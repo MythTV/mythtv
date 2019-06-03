@@ -10,7 +10,6 @@
 #include "mythavutil.h"
 #include "mythcorecontext.h"
 #include "mythconfig.h"
-#include "vaapi2context.h"
 extern "C" {
 #include "libswscale/swscale.h"
 #include "libavfilter/avfilter.h"

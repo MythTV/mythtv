@@ -500,9 +500,7 @@ using_frontend {
     using_vaapi:using_opengl_video {
         DEFINES += USING_VAAPI
         HEADERS += mythvaapicontext.h   mythvaapiinterop.h
-        HEADERS += vaapi2context.h
         SOURCES += mythvaapicontext.cpp mythvaapiinterop.cpp
-        SOURCES += vaapi2context.cpp
         LIBS    += -lva -lva-x11 -lva-glx -lEGL
     }
 

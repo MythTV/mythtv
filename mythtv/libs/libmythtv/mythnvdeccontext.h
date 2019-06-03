@@ -1,6 +1,9 @@
 #ifndef MYTHNVDECCONTEXT_H
 #define MYTHNVDECCONTEXT_H
 
+// Qt
+#include <QSize>
+
 // MythTV
 #include "mythframe.h"
 #include "mythcodecid.h"
@@ -14,6 +17,9 @@ extern "C" {
 #include "libavutil/pixdesc.h"
 #include "compat/cuda/dynlink_loader.h"
 }
+
+// Std
+#include <vector>
 
 class MythNVDECContext : public MythCodecContext
 {
@@ -52,7 +58,7 @@ class MythNVDECContext : public MythCodecContext
 
     static QMutex*     s_NVDECLock;
     static bool        s_NVDECAvailable;
-    static vector<MythNVDECCaps> s_NVDECDecoderCaps;
+    static std::vector<MythNVDECCaps> s_NVDECDecoderCaps;
     static void   NVDECCheck             (void);
     static void   NVDECCheckCallback     (void *Wait, void*, void*);
 

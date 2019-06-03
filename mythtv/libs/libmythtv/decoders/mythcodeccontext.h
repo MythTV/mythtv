@@ -34,60 +34,20 @@
 #include "mythtvexp.h"
 #include "mythcodecid.h"
 #include "mythframe.h"
-#include "videodisplayprofile.h"
 
-struct AVCodecContext;
-struct AVFrame;
-struct AVStream;
-struct AVFilterContext;
-struct AVFilterGraph;
-struct AVBufferRef;
-class MythPlayer;
+class VideoDisplayProfile;
 
 class MTV_PUBLIC MythCodecContext
 {
   public:
     MythCodecContext(void);
     virtual ~MythCodecContext() = default;
-    static MythCodecContext* createMythCodecContext(MythCodecID codec);
-    virtual int HwDecoderInit(AVCodecContext * /*ctx*/) { return 0; }
-    void setStream(AVStream *initStream) { stream = initStream; }
-    virtual int FilteredReceiveFrame(AVCodecContext *ctx, AVFrame *frame);
-    static QStringList GetDeinterlacers(const QString& decodername);
-    static bool isCodecDeinterlacer(const QString& decodername);
-    virtual QStringList GetDeinterlacers(void) { return QStringList(); }
-    virtual QString GetDeinterlaceFilter() { return QString(); }
-    void setPlayer(MythPlayer *tPlayer) { player = tPlayer; }
-    bool setDeinterlacer(bool enable, QString name = QString());
-    bool isDeinterlacing(void) { return filter_graph != nullptr;}
-    QString getDeinterlacerName(void) { return deinterlacername; }
-    bool BestDeint(void);
-    bool FallbackDeint(void);
-    bool getDoubleRate(void) { return doublerate; }
-    QString GetFallbackDeint(void);
-
-    // new temporay methods to be moved into MythHWContext
-    virtual void SetDeinterlacing(struct AVCodecContext*, VideoDisplayProfile*, bool) {}
-    virtual void PostProcessFrame(struct AVCodecContext*, VideoFrame*) {}
-    virtual bool IsDeinterlacing(bool &) { return false; }
-
-  protected:
-    virtual bool isValidDeinterlacer(QString /*name*/) { return false; }
-    virtual int InitDeinterlaceFilter(AVCodecContext *ctx, AVFrame *frame);
-    AVStream* stream;
-    AVFilterContext *buffersink_ctx;
-    AVFilterContext *buffersrc_ctx;
-    AVFilterGraph *filter_graph;
-    bool filtersInitialized;
-    AVBufferRef *hw_frames_ctx;
-    MythPlayer *player;
-    int64_t priorPts[2];
-    int64_t ptsUsed;
-    int width;
-    int height;
-    QString deinterlacername;
-    QMutex contextLock;
-    bool doublerate;
+    static MythCodecContext* CreateContext (MythCodecID codec);
+    virtual int    HwDecoderInit           (AVCodecContext*) { return 0; }
+    virtual int    FilteredReceiveFrame    (AVCodecContext *Context, AVFrame *Frame);
+    virtual void   SetDeinterlacing        (AVCodecContext*, VideoDisplayProfile*, bool) {}
+    virtual void   PostProcessFrame        (AVCodecContext*, VideoFrame*) {}
+    virtual bool   IsDeinterlacing         (bool &) { return false; }
 };
 
 #endif // MYTHCODECCONTEXT_H

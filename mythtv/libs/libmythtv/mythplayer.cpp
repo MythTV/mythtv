@@ -708,18 +708,7 @@ void MythPlayer::AutoDeint(VideoFrame *frame, bool allow_lock)
 
     if ((m_scan_tracker % 400) == 0)
     {
-        QString type;
-        //  = (m_scan_tracker < 0) ? "progressive" : "interlaced";
-        if (m_scan_tracker < 0)
-        {
-            if (decoder->GetMythCodecContext()->isDeinterlacing())
-                type = "codec-deinterlaced";
-            else
-                type = "progressive";
-        }
-        else
-            type = "interlaced";
-
+        QString type = (m_scan_tracker < 0) ? "progressive" : "interlaced";
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("%1 %2 frames seen.")
                 .arg(abs(m_scan_tracker)).arg(type));
     }
@@ -4382,15 +4371,6 @@ void MythPlayer::ClearAfterSeek(bool clearvideobuffers)
     commBreakMap.ResetLastSkip();
     needNewPauseFrame = true;
     ResetAVSync();
-
-    // Reset hardware deinterlacer
-    MythCodecContext *ctx = decoder->GetMythCodecContext();
-    if (ctx && ctx->isDeinterlacing())
-    {
-        QString currdeint = ctx->getDeinterlacerName();
-        ctx->setDeinterlacer(false);
-        ctx->setDeinterlacer(true, currdeint);
-    }
 }
 
 /*! \brief Discard video frames prior to seeking
@@ -5780,21 +5760,8 @@ void MythPlayer::SetDecoder(DecoderBase *dec)
     {
         while (!decoder_change_lock.tryLock(10))
             LOG(VB_GENERAL, LOG_INFO, LOC + "Waited 10ms for decoder lock");
-
-        if (!decoder)
-            decoder = dec;
-        else
-        {
-            // Copy the deinterlacer name to the new decoder.
-            DecoderBase *d = decoder;
-            decoder = dec;
-            if (d && decoder)
-            {
-                QString deinterlacer = d->GetMythCodecContext()->getDeinterlacerName();
-                decoder->GetMythCodecContext()->setDeinterlacer(true,deinterlacer);
-            }
-            delete d;
-        }
+        delete decoder;
+        decoder = dec;
         decoder_change_lock.unlock();
     }
     // reset passthrough override

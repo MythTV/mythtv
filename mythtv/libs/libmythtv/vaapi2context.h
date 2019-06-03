@@ -40,10 +40,25 @@ class MTV_PUBLIC Vaapi2Context : public MythCodecContext
     Vaapi2Context(void) = default;
     ~Vaapi2Context() override;
 
+    virtual int FilteredReceiveFrame(AVCodecContext *ctx, AVFrame *frame) override;
+
   protected:
     int InitDeinterlaceFilter(AVCodecContext *ctx, AVFrame *frame) override; // MythCodecContext
     void CloseFilters();
 
+
+    virtual int InitDeinterlaceFilter(AVCodecContext *ctx, AVFrame *frame);
+    AVStream* stream;
+    AVFilterContext *buffersink_ctx;
+    AVFilterContext *buffersrc_ctx;
+    AVFilterGraph *filter_graph;
+    bool filtersInitialized;
+    AVBufferRef *hw_frames_ctx;
+    int64_t priorPts[2];
+    int64_t ptsUsed;
+    int width;
+    int height;
+    bool doublerate;
 };
 
 #endif // VAAPI2CONTEXT_H

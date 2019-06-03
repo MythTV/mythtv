@@ -226,7 +226,7 @@ int MythNVDECContext::HwDecoderInit(AVCodecContext *Context)
  * have control over the scan type - control is effectively passed to CUDA to detect
  * and handle all deinterlacing.
 */
-void MythNVDECContext::SetDeinterlacing(struct AVCodecContext *Context,
+void MythNVDECContext::SetDeinterlacing(AVCodecContext *Context,
                                         VideoDisplayProfile *Profile, bool DoubleRate)
 {
     if (!Context)

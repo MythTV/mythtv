@@ -11383,8 +11383,9 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
     }
     else if (matchesGroup(actionName, "DEINTERLACER_", category, prefix))
     {
-        if (m_tvmScanType != kScan_Progressive
-            || ctx->m_player->GetMythCodecContext()->isDeinterlacing())
+        bool doublerate = false;
+        if (m_tvmScanType != kScan_Progressive ||
+            ctx->m_player->GetMythCodecContext()->IsDeinterlacing(doublerate))
         {
             foreach (QString deint, m_tvmDeinterlacers)
             {

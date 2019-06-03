@@ -1011,8 +1011,6 @@ void PlaybackProfileItemConfig::vrenderChanged(const QString &renderer)
     QStringList osds    = VideoDisplayProfile::GetOSDs(renderer);
     QStringList deints  = VideoDisplayProfile::GetDeinterlacers(renderer);
     QString decodername = m_decoder->getValue();
-    QStringList decoderdeints  = MythCodecContext::GetDeinterlacers(decodername);
-    deints.append(decoderdeints);
     QString     losd    = m_osdrend->getValue();
     QString     ldeint0 = m_deint0->getValue();
     QString     ldeint1 = m_deint1->getValue();

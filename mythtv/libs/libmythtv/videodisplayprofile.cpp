@@ -9,7 +9,6 @@ using namespace std;
 #include "mythlogging.h"
 #include "videooutbase.h"
 #include "avformatdecoder.h"
-#include "mythcodeccontext.h"
 
 
 // options are NNN NNN-MMM 0-MMM NNN-99999 >NNN >=NNN <MMM <=MMM or blank
@@ -260,8 +259,6 @@ bool ProfileItem::IsValid(QString *reason) const
     }
 
     QStringList deints    = VideoDisplayProfile::GetDeinterlacers(renderer);
-    QStringList decoderdeints  = MythCodecContext::GetDeinterlacers(decoder);
-    deints.append(decoderdeints);
     QString     deint0    = Get("pref_deint0");
     QString     deint1    = Get("pref_deint1");
     if (!deint0.isEmpty() && !deints.contains(deint0))

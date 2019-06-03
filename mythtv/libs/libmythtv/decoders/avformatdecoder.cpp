@@ -1590,17 +1590,9 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
                 .arg(ff_codec_id_string(enc->codec_id)));
     }
 
-    QString deinterlacer;
-    if (m_mythcodecctx)
-        deinterlacer = m_mythcodecctx->getDeinterlacerName();
     delete m_mythcodecctx;
-    m_mythcodecctx = MythCodecContext::createMythCodecContext(m_video_codec_id);
-    m_mythcodecctx->setPlayer(m_parent);
-    m_mythcodecctx->setStream(stream);
-    m_mythcodecctx->setDeinterlacer(true,deinterlacer);
-
-    int ret = m_mythcodecctx->HwDecoderInit(enc);
-    if (ret < 0)
+    m_mythcodecctx = MythCodecContext::CreateContext(m_video_codec_id);
+    if (m_mythcodecctx->HwDecoderInit(enc) < 0)
     {
         // force it to switch to software decoding
         m_averror_count = SEQ_PKT_ERR_MAX + 1;
