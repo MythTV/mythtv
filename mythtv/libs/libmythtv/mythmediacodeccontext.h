@@ -27,7 +27,6 @@ class MythMediaCodecContext : public MythCodecContext
 
   private:
     static int  InitialiseDecoder           (AVCodecContext *Context);
-    MythCodecID m_codecID;
 };
 
 #endif // MYTHMEDIACODECCONTEXT_H

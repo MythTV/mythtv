@@ -33,7 +33,6 @@ class MTV_PUBLIC MythVAAPIContext : public MythCodecContext
   private:
     static int  InitialiseContext        (AVCodecContext *Context);
     static VAProfile VAAPIProfileForCodec(const AVCodecContext *Codec);
-    MythCodecID m_codecID;
 };
 
 #endif // MYTHVAAPICONTEXT_H

@@ -16,8 +16,7 @@ bool MythNVDECContext::s_NVDECAvailable = false;
 vector<MythNVDECContext::MythNVDECCaps> MythNVDECContext::s_NVDECDecoderCaps = vector<MythNVDECContext::MythNVDECCaps>();
 
 MythNVDECContext::MythNVDECContext(MythCodecID CodecID)
-  : MythCodecContext(),
-    m_codecID(CodecID)
+  : MythCodecContext(CodecID)
 {
 }
 

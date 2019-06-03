@@ -87,8 +87,7 @@ MythCodecID MythMediaCodecContext::GetBestSupportedCodec(AVCodecContext*,
 }
 
 MythMediaCodecContext::MythMediaCodecContext(MythCodecID CodecID)
-  : MythCodecContext(),
-    m_codecID(CodecID)
+  : MythCodecContext(CodecID)
 {
 }
 

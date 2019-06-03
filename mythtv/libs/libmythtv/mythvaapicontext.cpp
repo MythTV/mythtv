@@ -19,8 +19,7 @@ extern "C" {
 #define LOC QString("VAAPIDec: ")
 
 MythVAAPIContext::MythVAAPIContext(MythCodecID CodecID)
-  : MythCodecContext(),
-    m_codecID(CodecID)
+  : MythCodecContext(CodecID)
 {
 }
 

@@ -47,38 +47,39 @@
 
 #define LOC QString("MythCodecContext: ")
 
-MythCodecContext::MythCodecContext()
+MythCodecContext::MythCodecContext(MythCodecID CodecID)
+  : m_codecID(CodecID)
 {
 }
 
 // static
-MythCodecContext *MythCodecContext::CreateContext(MythCodecID codec)
+MythCodecContext *MythCodecContext::CreateContext(MythCodecID Codec)
 {
     MythCodecContext *mctx = nullptr;
 #ifdef USING_VAAPI
-    if (codec_is_vaapi(codec) || codec_is_vaapi_dec(codec))
-        mctx = new MythVAAPIContext(codec);
+    if (codec_is_vaapi(Codec) || codec_is_vaapi_dec(Codec))
+        mctx = new MythVAAPIContext(Codec);
 #endif
 #ifdef USING_VDPAU
-    if (codec_is_vdpau_hw(codec) || codec_is_vdpau_hw(codec))
-        mctx = new MythVDPAUContext(codec);
+    if (codec_is_vdpau_hw(Codec) || codec_is_vdpau_hw(Codec))
+        mctx = new MythVDPAUContext(Codec);
 #endif
 #ifdef USING_NVDEC
-    if (codec_is_nvdec_dec(codec) || codec_is_nvdec(codec))
-        mctx = new MythNVDECContext(codec);
+    if (codec_is_nvdec_dec(Codec) || codec_is_nvdec(Codec))
+        mctx = new MythNVDECContext(Codec);
 #endif
 #ifdef USING_VTB
-    if (codec_is_vtb_dec(codec) || codec_is_vtb(codec))
-        mctx = new MythVTBContext(codec);
+    if (codec_is_vtb_dec(Codec) || codec_is_vtb(Codec))
+        mctx = new MythVTBContext(Codec);
 #endif
 #ifdef USING_MEDIACODEC
-    if (codec_is_mediacodec(codec) || codec_is_mediacodec_dec(codec))
-        mctx = new MythMediaCodecContext(codec);
+    if (codec_is_mediacodec(Codec) || codec_is_mediacodec_dec(Codec))
+        mctx = new MythMediaCodecContext(Codec);
 #endif
-    Q_UNUSED(codec);
+    Q_UNUSED(Codec);
 
     if (!mctx)
-        mctx = new MythCodecContext();
+        mctx = new MythCodecContext(Codec);
     return mctx;
 }
 

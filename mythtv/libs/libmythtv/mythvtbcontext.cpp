@@ -17,8 +17,7 @@ extern "C" {
 #define LOC QString("VTBDec: ")
 
 MythVTBContext::MythVTBContext(MythCodecID CodecID)
-  : MythCodecContext(),
-    m_codecID(CodecID)
+  : MythCodecContext(CodecID)
 {
 }
 

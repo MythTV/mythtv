@@ -30,8 +30,6 @@ class MythVTBContext : public MythCodecContext
   private:
     static bool CheckDecoderSupport      (uint StreamType, AVCodec **Codec);
     static int  InitialiseDecoder        (AVCodecContext *Context);
-
-    MythCodecID m_codecID;
 };
 
 #endif

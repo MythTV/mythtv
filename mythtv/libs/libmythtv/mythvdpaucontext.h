@@ -20,7 +20,6 @@ class MythVDPAUContext : public MythCodecContext
 
   private:
     static int  InitialiseContext        (AVCodecContext *Context);
-    MythCodecID m_codecID;
 };
 
 #endif // MYTHVDPAUCONTEXT_H

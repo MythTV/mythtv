@@ -43,10 +43,10 @@ class VideoDisplayProfile;
 class MTV_PUBLIC MythCodecContext
 {
   public:
-    MythCodecContext(void);
+    explicit MythCodecContext(MythCodecID CodecID);
     virtual ~MythCodecContext() = default;
 
-    static MythCodecContext* CreateContext (MythCodecID codec);
+    static MythCodecContext* CreateContext (MythCodecID Codec);
     static int  GetBuffer                  (struct AVCodecContext *Context, AVFrame *Frame, int Flags);
     static int  GetBuffer2                 (struct AVCodecContext *Context, AVFrame *Frame, int Flags);
     static int  GetBuffer3                 (struct AVCodecContext *Context, AVFrame *Frame, int Flags);
@@ -66,7 +66,8 @@ class MTV_PUBLIC MythCodecContext
     virtual bool   IsDeinterlacing         (bool &) { return false; }
 
   protected:
-    static void DestroyInterop         (MythOpenGLInterop *Interop);
+    static void DestroyInterop             (MythOpenGLInterop *Interop);
+    MythCodecID m_codecID;
 };
 
 #endif // MYTHCODECCONTEXT_H

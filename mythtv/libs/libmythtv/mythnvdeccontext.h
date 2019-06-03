@@ -63,7 +63,6 @@ class MythNVDECContext : public MythCodecContext
     static void   NVDECCheckCallback     (void *Wait, void*, void*);
 
   private:
-    MythCodecID   m_codecID              { kCodec_NONE };
     MythDeintType m_deinterlacer         { DEINT_NONE  };
     bool          m_deinterlacer2x       { false       };
 };

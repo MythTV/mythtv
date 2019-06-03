@@ -21,8 +21,7 @@ extern "C" {
  * \sa MythCodecContext
 */
 MythVDPAUContext::MythVDPAUContext(MythCodecID CodecID)
-  : MythCodecContext(),
-    m_codecID(CodecID)
+  : MythCodecContext(CodecID)
 {
 }
 
