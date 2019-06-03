@@ -7,7 +7,6 @@
 #include "mythrender_opengl.h"
 #include "videobuffers.h"
 #include "mythvtbinterop.h"
-#include "mythhwcontext.h"
 #include "mythvtbcontext.h"
 
 extern "C" {
@@ -27,7 +26,7 @@ int MythVTBContext::HwDecoderInit(AVCodecContext *Context)
 {
     if (codec_is_vtb_dec(m_codecID))
     {
-        AVBufferRef *device = MythHWContext::CreateDevice(AV_HWDEVICE_TYPE_VIDEOTOOLBOX);
+        AVBufferRef *device = MythCodecContext::CreateDevice(AV_HWDEVICE_TYPE_VIDEOTOOLBOX);
         if (device)
         {
             Context->hw_device_ctx = device;
@@ -36,7 +35,7 @@ int MythVTBContext::HwDecoderInit(AVCodecContext *Context)
     }
     else if (codec_is_vtb(m_codecID))
     {
-        return MythHWContext::InitialiseDecoder2(Context, MythVTBContext::InitialiseDecoder, "Create VTB decoder");
+        return MythCodecContext::InitialiseDecoder2(Context, MythVTBContext::InitialiseDecoder, "Create VTB decoder");
     }
 
     return -1;
@@ -130,7 +129,7 @@ int MythVTBContext::InitialiseDecoder(AVCodecContext *Context)
     // Add our interop class and set the callback for its release
     AVHWDeviceContext* devicectx = reinterpret_cast<AVHWDeviceContext*>(deviceref->data);
     devicectx->user_opaque = MythVTBInterop::Create(render, type);
-    devicectx->free        = MythHWContext::DeviceContextFinished;
+    devicectx->free        = MythCodecContext::DeviceContextFinished;
 
     // Create
     if (av_hwdevice_ctx_init(deviceref) < 0)

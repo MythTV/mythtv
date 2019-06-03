@@ -41,7 +41,6 @@ using namespace std;
 #include "lcddevice.h"
 
 #include "audiooutput.h"
-#include "mythcodeccontext.h"
 
 #ifdef USING_DXVA2
 #include "videoout_d3d.h"
@@ -1512,7 +1511,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
 #ifdef USING_VDPAU
     if (CODEC_IS_VDPAU(codec1, enc) && codec_is_vdpau_hw(m_video_codec_id))
     {
-        enc->get_buffer2     = MythHWContext::GetBuffer;
+        enc->get_buffer2     = MythCodecContext::GetBuffer;
         enc->get_format      = MythVDPAUContext::GetFormat;
         enc->slice_flags     = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
     }
@@ -1534,13 +1533,13 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
 #ifdef USING_VAAPI
     if (CODEC_IS_VAAPI(codec1, enc) && codec_is_vaapi(m_video_codec_id))
     {
-        enc->get_buffer2     = MythHWContext::GetBuffer;
+        enc->get_buffer2     = MythCodecContext::GetBuffer;
         enc->get_format      = MythVAAPIContext::GetFormat;
         enc->slice_flags     = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
     }
     else if (codec_is_vaapi_dec(m_video_codec_id))
     {
-        enc->get_buffer2     = MythHWContext::GetBuffer3;
+        enc->get_buffer2     = MythCodecContext::GetBuffer3;
         enc->get_format      = MythVAAPIContext::GetFormat2;
     }
     else
@@ -1566,7 +1565,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
 #ifdef USING_NVDEC
     if (codec_is_nvdec_dec(m_video_codec_id))
     {
-        enc->get_buffer2 = MythHWContext::GetBuffer3;
+        enc->get_buffer2 = MythCodecContext::GetBuffer3;
         enc->get_format = MythNVDECContext::GetFormat;
         m_directrendering = false;
     }
@@ -3861,12 +3860,12 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
 #ifdef USING_VTB
         // VideoToolBox does not call get_buffer2 - so initialise the frame now
         if (mpa_pic->format == AV_PIX_FMT_VIDEOTOOLBOX)
-            if (MythHWContext::GetBuffer2(context, mpa_pic, 0) >= 0)
+            if (MythCodecContext::GetBuffer2(context, mpa_pic, 0) >= 0)
                 picframe = reinterpret_cast<VideoFrame*>(mpa_pic->opaque);
 #endif
 #ifdef USING_MEDIACODEC
         if (mpa_pic->format == AV_PIX_FMT_MEDIACODEC)
-            if (MythHWContext::GetBuffer2(context, mpa_pic, 0) >= 0)
+            if (MythCodecContext::GetBuffer2(context, mpa_pic, 0) >= 0)
                 picframe = reinterpret_cast<VideoFrame*>(mpa_pic->opaque);
 #endif
 #ifdef USING_NVDEC

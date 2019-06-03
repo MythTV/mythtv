@@ -18,7 +18,7 @@ extern "C" {
  *
  * \sa MythVDPAUHelper
  * \sa MythVDAPUInterop
- * \sa MythHWContext
+ * \sa MythCodecContext
 */
 MythVDPAUContext::MythVDPAUContext(MythCodecID CodecID)
   : MythCodecContext(),
@@ -51,7 +51,7 @@ int MythVDPAUContext::InitialiseContext(AVCodecContext* Context)
         return -1;
 
     // Allocate the device context
-    AVBufferRef* hwdeviceref = MythHWContext::CreateDevice(AV_HWDEVICE_TYPE_VDPAU);
+    AVBufferRef* hwdeviceref = MythCodecContext::CreateDevice(AV_HWDEVICE_TYPE_VDPAU);
     if (!hwdeviceref)
         return -1;
 
@@ -89,7 +89,7 @@ int MythVDPAUContext::InitialiseContext(AVCodecContext* Context)
     // Add our interop class and set the callback for its release
     AVHWFramesContext* hwframesctx = reinterpret_cast<AVHWFramesContext*>(Context->hw_frames_ctx->data);
     hwframesctx->user_opaque = interop;
-    hwframesctx->free = &MythHWContext::FramesContextFinished;
+    hwframesctx->free = &MythCodecContext::FramesContextFinished;
 
     // Initialise frames context
     hwframesctx->sw_format = Context->sw_pix_fmt;
@@ -162,7 +162,7 @@ enum AVPixelFormat MythVDPAUContext::GetFormat(struct AVCodecContext* Context, c
     while (*PixFmt != AV_PIX_FMT_NONE)
     {
         if (*PixFmt == AV_PIX_FMT_VDPAU)
-            if (MythHWContext::InitialiseDecoder(Context, MythVDPAUContext::InitialiseContext, "VDPAU context creation") >= 0)
+            if (MythCodecContext::InitialiseDecoder(Context, MythVDPAUContext::InitialiseContext, "VDPAU context creation") >= 0)
                 return AV_PIX_FMT_VDPAU;
         PixFmt++;
     }
@@ -176,7 +176,7 @@ enum AVPixelFormat MythVDPAUContext::GetFormat2(struct AVCodecContext* Context, 
     {
         if (*PixFmt == AV_PIX_FMT_VDPAU)
         {
-            AVBufferRef *device = MythHWContext::CreateDevice(AV_HWDEVICE_TYPE_VDPAU);
+            AVBufferRef *device = MythCodecContext::CreateDevice(AV_HWDEVICE_TYPE_VDPAU);
             if (device)
             {
                 Context->hw_device_ctx = device;

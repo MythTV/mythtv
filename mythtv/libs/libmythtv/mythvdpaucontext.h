@@ -2,7 +2,6 @@
 #define MYTHVDPAUCONTEXT_H
 
 // MythTV
-#include "mythhwcontext.h"
 #include "mythcodeccontext.h"
 
 class MythVDPAUContext : public MythCodecContext

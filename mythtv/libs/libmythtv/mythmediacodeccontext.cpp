@@ -4,7 +4,6 @@
 #include "mythmainwindow.h"
 #include "avformatdecoder.h"
 #include "mythmediacodecinterop.h"
-#include "mythhwcontext.h"
 #include "mythmediacodeccontext.h"
 
 // FFmpeg
@@ -40,7 +39,7 @@ int MythMediaCodecContext::InitialiseDecoder(AVCodecContext *Context)
     // Create the hardware context
     AVBufferRef *hwdeviceref = av_hwdevice_ctx_alloc(AV_HWDEVICE_TYPE_MEDIACODEC);
     AVHWDeviceContext *hwdevicectx = reinterpret_cast<AVHWDeviceContext*>(hwdeviceref->data);
-    hwdevicectx->free = &MythHWContext::DeviceContextFinished;
+    hwdevicectx->free = &MythCodecContext::DeviceContextFinished;
     hwdevicectx->user_opaque = interop;
     AVMediaCodecDeviceContext *hwctx = reinterpret_cast<AVMediaCodecDeviceContext*>(hwdevicectx->hwctx);
     hwctx->surface = interop->GetSurface();
@@ -98,7 +97,7 @@ int MythMediaCodecContext::HwDecoderInit(AVCodecContext *Context)
     if (codec_is_mediacodec_dec(m_codecID))
         return 0;
     else if (codec_is_mediacodec_dec(m_codecID))
-        return MythHWContext::InitialiseDecoder2(Context, MythMediaCodecContext::InitialiseDecoder, "Create MediaCodec decoder");
+        return MythCodecContext::InitialiseDecoder2(Context, MythMediaCodecContext::InitialiseDecoder, "Create MediaCodec decoder");
     return -1;
 }
 

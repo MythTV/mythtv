@@ -8,7 +8,6 @@
 #include "mythlogging.h"
 #include "mythrender_opengl.h"
 #include "videobuffers.h"
-#include "mythhwcontext.h"
 #include "mythvaapiinterop.h"
 #include "mythvaapicontext.h"
 
@@ -34,7 +33,7 @@ int MythVAAPIContext::HwDecoderInit(AVCodecContext *Context)
     else if (codec_is_vaapi_dec(m_codecID))
     {
 
-        AVBufferRef *device = MythHWContext::CreateDevice(AV_HWDEVICE_TYPE_VAAPI,
+        AVBufferRef *device = MythCodecContext::CreateDevice(AV_HWDEVICE_TYPE_VAAPI,
                                                           gCoreContext->GetSetting("VAAPIDevice"));
         if (device)
         {
@@ -142,7 +141,7 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext *Context,
         return failure;
 
     // check for actual decoder support
-    AVBufferRef *hwdevicectx = MythHWContext::CreateDevice(AV_HWDEVICE_TYPE_VAAPI, gCoreContext->GetSetting("VAAPIDevice"));
+    AVBufferRef *hwdevicectx = MythCodecContext::CreateDevice(AV_HWDEVICE_TYPE_VAAPI, gCoreContext->GetSetting("VAAPIDevice"));
     if(!hwdevicectx)
         return failure;
 
@@ -242,7 +241,7 @@ AVPixelFormat MythVAAPIContext::GetFormat(AVCodecContext *Context, const AVPixel
     while (*PixFmt != AV_PIX_FMT_NONE)
     {
         if (*PixFmt == AV_PIX_FMT_VAAPI)
-            if (MythHWContext::InitialiseDecoder(Context, MythVAAPIContext::InitialiseContext, "VAAPI context creation") >= 0)
+            if (MythCodecContext::InitialiseDecoder(Context, MythVAAPIContext::InitialiseContext, "VAAPI context creation") >= 0)
                 return AV_PIX_FMT_VAAPI;
         PixFmt++;
     }
@@ -356,7 +355,7 @@ int MythVAAPIContext::InitialiseContext(AVCodecContext *Context)
     hw_frames_ctx->width             = Context->coded_width;
     hw_frames_ctx->height            = Context->coded_height;
     hw_frames_ctx->user_opaque       = interop;
-    hw_frames_ctx->free              = &MythHWContext::FramesContextFinished;
+    hw_frames_ctx->free              = &MythCodecContext::FramesContextFinished;
     res = av_hwframe_ctx_init(Context->hw_frames_ctx);
     if (res < 0)
     {
@@ -387,7 +386,7 @@ bool MythVAAPIContext::HaveVAAPI(bool ReCheck /*= false*/)
         return havevaapi;
     checked = true;
 
-    AVBufferRef *context = MythHWContext::CreateDevice(AV_HWDEVICE_TYPE_VAAPI, gCoreContext->GetSetting("VAAPIDevice"));
+    AVBufferRef *context = MythCodecContext::CreateDevice(AV_HWDEVICE_TYPE_VAAPI, gCoreContext->GetSetting("VAAPIDevice"));
     if (context)
     {
         AVHWDeviceContext    *hwdevice = reinterpret_cast<AVHWDeviceContext*>(context->data);

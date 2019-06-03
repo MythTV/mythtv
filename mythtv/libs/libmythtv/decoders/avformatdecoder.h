@@ -18,7 +18,7 @@
 #include "vbilut.h"
 #include "H264Parser.h"
 #include "videodisplayprofile.h"
-#include "mythhwcontext.h"
+#include "mythcodeccontext.h"
 #include "mythplayer.h"
 
 extern "C" {
@@ -211,7 +211,7 @@ class AvFormatDecoder : public DecoderBase
 
     friend int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic,
                               int flags);
-    friend int MythHWContext::GetBuffer3(struct AVCodecContext*, AVFrame*, int);
+    friend int MythCodecContext::GetBuffer3(struct AVCodecContext*, AVFrame*, int);
 
     friend int open_avf(URLContext *h, const char *filename, int flags);
     friend int read_avf(URLContext *h, uint8_t *buf, int buf_size);

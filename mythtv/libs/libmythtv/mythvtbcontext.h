@@ -3,7 +3,6 @@
 
 // MythTV
 #include "mythcodecid.h"
-#include "mythhwcontext.h"
 #include "mythcodeccontext.h"
 
 // FFmpeg

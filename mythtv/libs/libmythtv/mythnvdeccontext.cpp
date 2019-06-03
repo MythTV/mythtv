@@ -3,7 +3,6 @@
 #include "mythmainwindow.h"
 #include "avformatdecoder.h"
 #include "mythnvdecinterop.h"
-#include "mythhwcontext.h"
 #include "mythnvdeccontext.h"
 
 extern "C" {
@@ -182,7 +181,7 @@ int MythNVDECContext::InitialiseDecoder(AVCodecContext *Context)
 
     // Set release method, interop and CUDA context
     AVHWDeviceContext* hwdevicecontext = reinterpret_cast<AVHWDeviceContext*>(hwdeviceref->data);
-    hwdevicecontext->free = &MythHWContext::DeviceContextFinished;
+    hwdevicecontext->free = &MythCodecContext::DeviceContextFinished;
     hwdevicecontext->user_opaque = interop;
     AVCUDADeviceContext *devicehwctx = reinterpret_cast<AVCUDADeviceContext*>(hwdevicecontext->hwctx);
     devicehwctx->cuda_ctx = interop->GetCUDAContext();
@@ -204,12 +203,12 @@ int MythNVDECContext::HwDecoderInit(AVCodecContext *Context)
 {
     if (codec_is_nvdec(m_codecID))
     {
-        return MythHWContext::InitialiseDecoder2(Context, MythNVDECContext::InitialiseDecoder,
+        return MythCodecContext::InitialiseDecoder2(Context, MythNVDECContext::InitialiseDecoder,
                                                  "Create NVDEC decoder");
     }
     else if (codec_is_nvdec_dec(m_codecID))
     {
-        AVBufferRef *context = MythHWContext::CreateDevice(AV_HWDEVICE_TYPE_CUDA,
+        AVBufferRef *context = MythCodecContext::CreateDevice(AV_HWDEVICE_TYPE_CUDA,
                                                            gCoreContext->GetSetting("NVDECDevice"));
         if (context)
         {
@@ -406,7 +405,7 @@ int MythNVDECContext::GetBuffer(struct AVCodecContext *Context, AVFrame *Frame, 
 
     // Set the release method
     Frame->buf[1] = av_buffer_create(reinterpret_cast<uint8_t*>(videoframe), 0,
-                                     MythHWContext::ReleaseBuffer, avfd, 0);
+                                     MythCodecContext::ReleaseBuffer, avfd, 0);
     return 0;
 }
 
