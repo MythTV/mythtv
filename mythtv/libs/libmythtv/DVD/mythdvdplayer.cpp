@@ -10,6 +10,13 @@
 
 void MythDVDPlayer::AutoDeint(VideoFrame *frame, bool allow_lock)
 {
+    bool dummy = false;
+    if (decoder && decoder->GetMythCodecContext()->IsDeinterlacing(dummy))
+    {
+        MythPlayer::AutoDeint(frame, allow_lock);
+        return;
+    }
+
     (void)frame;
     (void)allow_lock;
     SetScanType(kScan_Interlaced);
