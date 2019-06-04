@@ -120,7 +120,7 @@ typedef enum MythDeintType
     DEINT_CPU    = 0x0010,
     DEINT_SHADER = 0x0020,
     DEINT_DRIVER = 0x0040,
-    DEINT_ALL    = 0xFFFF
+    DEINT_ALL    = 0x0077
 } MythDeintType;
 
 inline MythDeintType operator| (MythDeintType a, MythDeintType b) { return static_cast<MythDeintType>(static_cast<int>(a) | static_cast<int>(b)); }

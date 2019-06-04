@@ -92,6 +92,7 @@ vector<MythVideoTexture*> MythVTBInterop::Acquire(MythRenderOpenGL *Context,
                 texture->m_frameFormat = FMT_NV12; // TODO check this
                 texture->m_plane = plane;
                 texture->m_planeCount = planes;
+                texture->m_allowGLSLDeint = true;
                 result.push_back(texture);
             }
         }

@@ -49,15 +49,16 @@ class MythVideoTexture : public MythGLTexture
    ~MythVideoTexture();
 
   public:
-    bool           m_valid       { false };
-    VideoFrameType m_frameType   { FMT_NONE };
-    VideoFrameType m_frameFormat { FMT_NONE };
-    uint           m_plane       { 0 };
-    uint           m_planeCount  { 0 };
+    bool           m_valid          { false };
+    VideoFrameType m_frameType      { FMT_NONE };
+    VideoFrameType m_frameFormat    { FMT_NONE };
+    uint           m_plane          { 0 };
+    uint           m_planeCount     { 0 };
+    bool           m_allowGLSLDeint { false };
 #ifdef USING_MEDIACODEC
-    QMatrix4x4    *m_transform   { nullptr };
+    QMatrix4x4    *m_transform      { nullptr };
 #endif
-    MythAVCopy    *m_copyContext { nullptr };
+    MythAVCopy    *m_copyContext    { nullptr };
 
   protected:
     explicit MythVideoTexture(QOpenGLTexture* Texture);

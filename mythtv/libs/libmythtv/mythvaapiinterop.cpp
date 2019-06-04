@@ -168,7 +168,8 @@ uint MythVAAPIInteropGLX::GetFlagsForFrame(VideoFrame *Frame, FrameScanType Scan
     if (!Frame)
         return flags;
 
-    // Set deinterlacing
+    // Set deinterlacing. If VAAPI deinterlacing is enabled and available, the
+    // frame will be marked as progressive
     if (is_interlaced(Scan))
     {
         // As for VDPAU, only VAAPI can deinterlace these frames - so accept any deinterlacer
@@ -722,7 +723,8 @@ MythVAAPIInteropDRM::~MythVAAPIInteropDRM()
 
 vector<MythVideoTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context,
                                                        VideoColourSpace *ColourSpace,
-                                                       VideoFrame *Frame, FrameScanType)
+                                                       VideoFrame *Frame,
+                                                       FrameScanType Scan)
 {
     vector<MythVideoTexture*> result;
     if (!Frame)
@@ -738,6 +740,28 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context
         if (m_openglTextures.isEmpty())
             ColourSpace->SetSupportedAttributes(ALL_PICTURE_ATTRIBUTES);
         ColourSpace->UpdateColourSpace(Frame);
+    }
+
+    // If the frame is still marked as interlaced but a driver deint is preferred
+    // then VAAPI deinterlacing must be unavailable - so fall back to shader
+    // deinterlacers and mark the textures as 'deinterlaceable'
+    if (is_interlaced(Scan))
+    {
+        bool glsldeint = false;
+        MythDeintType pref = GetDoubleRateOption(Frame, DEINT_DRIVER);
+        if (pref)
+        {
+            glsldeint = true;
+        }
+        else
+        {
+            pref = GetSingleRateOption(Frame, DEINT_DRIVER);
+            if (pref)
+                glsldeint = true;
+        }
+
+        if (glsldeint)
+            Frame->deinterlace_allowed = (Frame->deinterlace_allowed & ~DEINT_DRIVER) | DEINT_SHADER;
     }
 
     // return cached texture if available
@@ -793,6 +817,8 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context
             }
             else
             {
+                for (uint i = 0; i < textures.size(); ++i)
+                    textures[i]->m_allowGLSLDeint = true;
                 MythVideoTexture::SetTextureFilters(m_context, textures, QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge);
                 CreateDRMBuffers(format, textures, vabufferinfo.handle, vaimage);
                 result = textures;

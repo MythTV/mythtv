@@ -168,6 +168,7 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
         for (uint plane = 0; plane < textures.size(); ++plane)
         {
             MythVideoTexture *tex = textures[plane];
+            tex->m_allowGLSLDeint = true;
             m_context->glBindTexture(tex->m_target, tex->m_textureId);
             QOpenGLTexture::PixelFormat pixformat  = hdr ? QOpenGLTexture::RG : QOpenGLTexture::Red;
             QOpenGLTexture::PixelType   pixtype    = QOpenGLTexture::UInt8;

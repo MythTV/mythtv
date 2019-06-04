@@ -170,6 +170,7 @@ bool OpenGLVideo::AddDeinterlacer(const VideoFrame *Frame, FrameScanType Scan, M
     if (other) // another double rate deinterlacer is enabled
     {
         m_deinterlacer = DEINT_NONE;
+        m_deinterlacer2x = false;
         return false;
     }
 
@@ -596,8 +597,8 @@ void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanT
                 }
             }
 #endif
-            // Enable deinterlacing for NVDEC and VTB
-            if (Frame && format_is_hwyuv(Frame->codec))
+            // Enable deinterlacing for NVDEC, VTB and VAAPI DRM if VPP is not available
+            if (inputtextures[0]->m_allowGLSLDeint)
                 AddDeinterlacer(Frame, Scan, DEINT_SHADER | DEINT_CPU); // pickup shader or cpu prefs
         }
         else
