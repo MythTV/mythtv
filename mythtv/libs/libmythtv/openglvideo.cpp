@@ -786,6 +786,7 @@ void OpenGLVideo::ResetTextures(void)
 void OpenGLVideo::LoadTextures(bool Deinterlacing, vector<MythVideoTexture*> &Current,
                                MythGLTexture **Textures, uint &TextureCount)
 {
+    bool usecurrent = true;
     if (Deinterlacing)
     {
         // temporary workaround for kernel deinterlacing of NVDEC and VTB hardware frames
@@ -794,6 +795,7 @@ void OpenGLVideo::LoadTextures(bool Deinterlacing, vector<MythVideoTexture*> &Cu
         {
             if (DEINT_HIGH == m_deinterlacer)
             {
+                usecurrent = false;
                 size_t count = Current.size();
                 for (uint i = 0; i < 3; ++i)
                     for (uint j = 0; j < count; ++j)
@@ -804,6 +806,7 @@ void OpenGLVideo::LoadTextures(bool Deinterlacing, vector<MythVideoTexture*> &Cu
         {
             // if we are using reference frames, we want the current frame in the middle
             // but next will be the first valid, followed by current...
+            usecurrent = false;
             size_t count = Current.size();
             vector<MythVideoTexture*> &current = Current[0]->m_valid ? Current : m_nextTextures;
             vector<MythVideoTexture*> &prev    = m_prevTextures[0]->m_valid ? m_prevTextures : current;
@@ -816,11 +819,10 @@ void OpenGLVideo::LoadTextures(bool Deinterlacing, vector<MythVideoTexture*> &Cu
                 Textures[TextureCount++] = reinterpret_cast<MythGLTexture*>(m_nextTextures[i]);
         }
     }
-    else
-    {
+
+    if (usecurrent)
         for (uint i = 0; i < Current.size(); ++i)
             Textures[TextureCount++] = reinterpret_cast<MythGLTexture*>(Current[i]);
-    }
 }
 
 QString OpenGLVideo::TypeToProfile(VideoFrameType Type)
