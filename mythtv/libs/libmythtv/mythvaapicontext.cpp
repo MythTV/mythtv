@@ -144,6 +144,22 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext *Context,
     if(!hwdevicectx)
         return failure;
 
+    // Check for ironlake decode only - which won't work due to FFmpeg frame format
+    // constraints. May apply to other platforms.
+    AVHWDeviceContext    *device = reinterpret_cast<AVHWDeviceContext*>(hwdevicectx->data);
+    AVVAAPIDeviceContext *hwctx  = reinterpret_cast<AVVAAPIDeviceContext*>(device->hwctx);
+
+    if (decodeonly)
+    {
+        QString vendor = vaQueryVendorString(hwctx->display);
+        if (vendor.contains("ironlake", Qt::CaseInsensitive))
+        {
+            LOG(VB_GENERAL, LOG_WARNING, LOC + "Disallowing VAAPI decode only for Ironlake");
+            av_buffer_unref(&hwdevicectx);
+            return failure;
+        }
+    }
+
     bool foundhwfmt   = false;
     bool foundswfmt   = false;
     bool foundprofile = false;
@@ -182,8 +198,6 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext *Context,
     }
 
     // FFmpeg checks profiles very late and never checks entrypoints.
-    AVHWDeviceContext    *device = reinterpret_cast<AVHWDeviceContext*>(hwdevicectx->data);
-    AVVAAPIDeviceContext *hwctx  = reinterpret_cast<AVVAAPIDeviceContext*>(device->hwctx);
     int profilecount = vaMaxNumProfiles(hwctx->display);
     VAProfile desired = VAAPIProfileForCodec(Context);
     VAProfile *profilelist = static_cast<VAProfile*>(av_malloc_array(static_cast<size_t>(profilecount), sizeof(VAProfile)));
