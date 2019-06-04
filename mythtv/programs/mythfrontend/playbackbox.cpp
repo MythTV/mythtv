@@ -247,9 +247,9 @@ static QString construct_sort_title(
 
         QString sortprefix;
         if (recpriority > 0)
-            sortprefix = QString("+%1").arg(1000 - recpriority, 3, QChar('0'));
+            sortprefix = QString("+%1").arg(1000 - recpriority, 3, 10, QChar('0'));
         else
-            sortprefix = QString("-%1").arg(-recpriority, 3, QChar('0'));
+            sortprefix = QString("-%1").arg(-recpriority, 3, 10, QChar('0'));
 
         sTitle = sortprefix + '-' + sTitle;
     }
@@ -808,7 +808,13 @@ void PlaybackBox::UpdateUIListItem(MythUIButtonListItem *item,
         QString tempSubTitle  = extract_subtitle(*pginfo, groupname);
 
         if (groupname == pginfo->GetTitle().toLower())
+        {
             item->SetText(tempSubTitle, "titlesubtitle");
+            // titlesubtitle will just have the subtitle, so put the full
+            // string in titlesubtitlefull, when a theme can then "depend" on.
+            item->SetText(pginfo->toString(ProgramInfo::kTitleSubtitle, " - "),
+                          "titlesubtitlefull");
+        }
     }
 
     // Recording and availability status
@@ -928,7 +934,13 @@ void PlaybackBox::ItemLoaded(MythUIButtonListItem *item)
         QString tempSubTitle  = extract_subtitle(*pginfo, groupname);
 
         if (groupname == pginfo->GetTitle().toLower())
+        {
             item->SetText(tempSubTitle, "titlesubtitle");
+            // titlesubtitle will just have the subtitle, so put the full
+            // string in titlesubtitlefull, when a theme can then "depend" on.
+            item->SetText(pginfo->toString(ProgramInfo::kTitleSubtitle, " - "),
+                          "titlesubtitlefull");
+        }
 
         item->DisplayState(state, "status");
 

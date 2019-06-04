@@ -44,22 +44,41 @@ public class AudioOutputAudioTrack
         int channelMask = 0;
         switch (channels)
         {
-            case 8:
-                channelMask |= AudioFormat.CHANNEL_OUT_BACK_LEFT | AudioFormat.CHANNEL_OUT_BACK_RIGHT;
-                // fall through
-            case 6:
-                channelMask |=  AudioFormat.CHANNEL_OUT_SIDE_LEFT | AudioFormat.CHANNEL_OUT_SIDE_RIGHT
-                    | AudioFormat.CHANNEL_OUT_FRONT_CENTER | AudioFormat.CHANNEL_OUT_LOW_FREQUENCY;
-                // fall through
-            case 2:
-                channelMask |=  AudioFormat.CHANNEL_OUT_FRONT_LEFT | AudioFormat.CHANNEL_OUT_FRONT_RIGHT;
-                break;
             case 1:
-                channelMask |=  AudioFormat.CHANNEL_OUT_FRONT_CENTER;
+                channelMask = AudioFormat.CHANNEL_OUT_MONO;
+                break;
+            case 2:
+                channelMask = AudioFormat.CHANNEL_OUT_STEREO;
+                break;
+            case 3:
+                channelMask = AudioFormat.CHANNEL_OUT_STEREO
+                    | AudioFormat.CHANNEL_OUT_FRONT_CENTER;
+                break;
+            case 4:
+                channelMask = AudioFormat.CHANNEL_OUT_QUAD;
+                break;
+            case 5:
+                channelMask = AudioFormat.CHANNEL_OUT_QUAD
+                    | AudioFormat.CHANNEL_OUT_FRONT_CENTER;
+                break;
+            case 6:
+                channelMask = AudioFormat.CHANNEL_OUT_5POINT1;
+                break;
+            case 7:
+                channelMask = AudioFormat.CHANNEL_OUT_5POINT1
+                    | AudioFormat.CHANNEL_OUT_BACK_CENTER;
+                break;
+            case 8:
+                // CHANNEL_OUT_7POINT1_SURROUND is only defined
+                // in api level 23 and up.
+                // channelMask = AudioFormat.CHANNEL_OUT_7POINT1_SURROUND;
+                channelMask = AudioFormat.CHANNEL_OUT_5POINT1
+                    | AudioFormat.CHANNEL_OUT_SIDE_LEFT
+                    | AudioFormat.CHANNEL_OUT_SIDE_RIGHT;
                 break;
             default:
                 // default treated as 2 channel (stereo)
-                channelMask |=  AudioFormat.CHANNEL_OUT_FRONT_LEFT | AudioFormat.CHANNEL_OUT_FRONT_RIGHT;
+                channelMask |=  AudioFormat.CHANNEL_OUT_STEREO;
                 break;
         }
         afb.setChannelMask(channelMask);

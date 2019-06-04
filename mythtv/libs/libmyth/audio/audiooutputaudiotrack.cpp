@@ -32,8 +32,6 @@ using namespace std;
 // Constants from Android Java API
 // class android.media.AudioFormat
 #define AF_CHANNEL_OUT_MONO 4
-#define AF_CHANNEL_OUT_STEREO 12
-#define AF_CHANNEL_OUT_SURROUND 1052
 #define AF_ENCODING_AC3 5
 #define AF_ENCODING_E_AC3 6
 #define AF_ENCODING_DTS 7

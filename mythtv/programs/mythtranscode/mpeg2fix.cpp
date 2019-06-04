@@ -94,10 +94,10 @@ static QString PtsTime(int64_t pts)
     }
     return QString("%1%2:%3:%4.%5")
         .arg(is_neg ? "-" : "")
-        .arg((uint)(pts / 90000.) / 3600, 2, QChar('0'))
-        .arg(((uint)(pts / 90000.) % 3600) / 60, 2, QChar('0'))
-        .arg(((uint)(pts / 90000.) % 3600) % 60, 2, QChar('0'))
-        .arg(((((uint)(pts / 90.) % 3600000) % 60000) % 1000), 3, QChar('0'));
+        .arg((uint)(pts / 90000.) / 3600, 2, 10, QChar('0'))
+        .arg(((uint)(pts / 90000.) % 3600) / 60, 2, 10, QChar('0'))
+        .arg(((uint)(pts / 90000.) % 3600) % 60, 2, 10, QChar('0'))
+        .arg(((((uint)(pts / 90.) % 3600000) % 60000) % 1000), 3, 10, QChar('0'));
 }
 
 MPEG2frame::MPEG2frame(int size) :
@@ -1014,8 +1014,8 @@ int MPEG2fixup::ProcessVideo(MPEG2frame *vf, mpeg2dec_t *dec)
         if (info->gop)
         {
             QString gop = QString("%1:%2:%3:%4 ")
-                .arg(info->gop->hours, 2, QChar('0')).arg(info->gop->minutes, 2, QChar('0'))
-                .arg(info->gop->seconds, 2, QChar('0')).arg(info->gop->pictures, 3, QChar('0'));
+                .arg(info->gop->hours, 2, 10, QChar('0')).arg(info->gop->minutes, 2, 10, QChar('0'))
+                .arg(info->gop->seconds, 2, 10, QChar('0')).arg(info->gop->pictures, 3, 10, QChar('0'));
             msg += gop;
         }
         if (info->current_picture)

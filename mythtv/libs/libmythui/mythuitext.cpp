@@ -399,16 +399,19 @@ void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
 
     if (GetFontProperties()->hasOutline())
     {
-        QTextLayout::FormatRange range;
-
         QColor outlineColor;
-        int outlineSize, outlineAlpha;
+        int    outlineSize, outlineAlpha;
 
         GetFontProperties()->GetOutline(outlineColor, outlineSize,
                                         outlineAlpha);
-        outlineColor.setAlpha(outlineAlpha);
 
         MythPoint  outline(outlineSize, outlineSize);
+
+#if QT_VERSION < QT_VERSION_CHECK(5,6,0) // else done in MythUIText::FormatTemplate
+        QTextLayout::FormatRange range;
+
+        outlineColor.setAlpha(outlineAlpha);
+
         outline.NormPoint(); // scale it to screen resolution
 
         QPen pen;
@@ -419,6 +422,7 @@ void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
         range.length = m_CutMessage.size();
         range.format.setTextOutline(pen);
         formats.push_back(range);
+#endif
 
         drawrect.setX(drawrect.x() - outline.x());
         drawrect.setWidth(drawrect.width() + outline.x());
@@ -456,6 +460,122 @@ void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
                       *GetFontProperties(), alpha, drawrect);
 }
 
+bool MythUIText::FormatTemplate(QString & paragraph, QTextLayout *layout)
+{
+#if QT_VERSION >= QT_VERSION_CHECK(5,6,0)
+    layout->clearFormats();
+#endif
+
+    FormatVector formats;
+    QTextLayout::FormatRange range;
+    QString fontname;
+    bool    res = false;  // Return true if paragraph changed.
+
+#if QT_VERSION >= QT_VERSION_CHECK(5,6,0) // else done in DrawSelf
+    if (GetFontProperties()->hasOutline())
+    {
+        int outlineSize, outlineAlpha;
+        QColor outlineColor;
+
+        GetFontProperties()->GetOutline(outlineColor, outlineSize,
+                                        outlineAlpha);
+
+        outlineColor.setAlpha(outlineAlpha);
+
+        MythPoint  outline(outlineSize, outlineSize);
+        outline.NormPoint(); // scale it to screen resolution
+
+        QPen pen;
+        pen.setBrush(outlineColor);
+        pen.setWidth(outline.x());
+
+        range.start = 0;
+        range.length = paragraph.size();
+        range.format.setTextOutline(pen);
+        formats.push_back(range);
+    }
+#endif
+
+    range.start = 0;
+    range.length = 0;
+
+    int pos = 0, end = 0;
+    while ((pos = paragraph.indexOf("[font]", pos, Qt::CaseInsensitive)) != -1)
+    {
+        if ((end = paragraph.indexOf("[/font]", pos + 1, Qt::CaseInsensitive))
+            != -1)
+        {
+            if (range.length == -1)
+            {
+                // End of the affected text
+                range.length = pos - range.start;
+                if (range.length > 0)
+                {
+                    formats.push_back(range);
+                    LOG(VB_GUI, LOG_DEBUG,
+                        QString("'%1' Setting \"%2\" with FONT %3")
+                        .arg(objectName())
+                        .arg(paragraph.mid(range.start, range.length))
+                        .arg(fontname));
+                }
+                range.length = 0;
+            }
+
+            int len = end - pos - 6;
+            fontname = paragraph.mid(pos + 6, len);
+
+            if (GetGlobalFontMap()->Contains(fontname))
+            {
+                MythFontProperties *fnt = GetGlobalFontMap()->GetFont(fontname);
+                range.start = pos;
+                range.length = -1;  // Need to find the end of the effect
+                range.format.setFont(fnt->face());
+                range.format.setFontStyleHint(QFont::SansSerif,
+                                              QFont::OpenGLCompatible);
+                range.format.setForeground(fnt->GetBrush());
+            }
+            else
+            {
+                LOG(VB_GUI, LOG_ERR,
+                    QString("'%1' Unknown Font '%2' specified in template.")
+                    .arg(objectName())
+                    .arg(fontname));
+            }
+
+            LOG(VB_GUI, LOG_DEBUG, QString("Removing %1 through %2 '%3'")
+                .arg(pos).arg(end + 7 - pos).arg(paragraph.mid(pos,
+                                                               end + 7 - pos)));
+            paragraph.remove(pos, end + 7 - pos);
+            res = true;
+        }
+        else
+        {
+            LOG(VB_GUI, LOG_ERR,
+                QString("'%1' Non-terminated [font] found in template")
+                .arg(objectName()));
+            break;
+        }
+    }
+
+    if (range.length == -1) // To the end
+    {
+        range.length = paragraph.length() - range.start;
+        formats.push_back(range);
+        LOG(VB_GUI, LOG_DEBUG,
+            QString("'%1' Setting \"%2\" with FONT %3")
+            .arg(objectName())
+            .arg(paragraph.mid(range.start, range.length))
+            .arg(fontname));
+    }
+
+#if QT_VERSION >= QT_VERSION_CHECK(5,6,0)
+    if (!formats.empty())
+        layout->setFormats(formats);
+#endif
+
+    return res;
+}
+
 bool MythUIText::Layout(QString & paragraph, QTextLayout *layout, bool final,
                         bool & overflow, qreal width, qreal & height,
                         bool force, qreal & last_line_width,
@@ -463,6 +583,7 @@ bool MythUIText::Layout(QString & paragraph, QTextLayout *layout, bool final,
 {
     int last_line = 0;
 
+    FormatTemplate(paragraph, layout);
     layout->setText(paragraph);
     layout->beginLayout();
     num_lines = 0;

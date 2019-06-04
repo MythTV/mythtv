@@ -27,6 +27,8 @@ class MythFontProperties;
  */
 class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
 {
+    using FontStates = QMap<QString, MythFontProperties>;
+
   public:
     MythUIText(MythUIType *parent, const QString &name);
     MythUIText(const QString &text, const MythFontProperties &font,
@@ -92,6 +94,7 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     void SetCanvasPosition(int x, int y);
     void ShiftCanvas(int x, int y);
 
+    bool FormatTemplate(QString & paragraph, QTextLayout *layout);
     bool Layout(QString & paragraph, QTextLayout *layout, bool final,
                 bool & overflow, qreal width, qreal & height, bool force,
                 qreal & last_line_width, QRectF & min_rect, int & num_lines);
@@ -133,7 +136,7 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     QVector<QTextLayout *> m_Layouts;
 
     MythFontProperties* m_Font    {nullptr};
-    QMap<QString, MythFontProperties> m_FontStates;
+    FontStates          m_FontStates;
 
     bool   m_colorCycling         {false};
     QColor m_startColor;

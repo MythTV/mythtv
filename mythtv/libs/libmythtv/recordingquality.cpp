@@ -118,7 +118,7 @@ QString RecordingQuality::toStringXML(void) const
 
     if (m_packet_count)
     {
-        str += QString(" countinuity_error_count=\"%1\" packet_count=\"%2\"")
+        str += QString(" continuity_error_count=\"%1\" packet_count=\"%2\"")
             .arg(m_continuity_error_count).arg(m_packet_count);
     }
 

@@ -350,7 +350,7 @@ void MythCCExtractorPlayer::Process608Captions(uint flags)
     for (; cc608it != m_cc608_info.end(); ++cc608it)
     {
         QString stream_id_str = (m_cc608_info.size() <= 1) ?
-            QString("") : QString("%1.").arg(i,2,QChar('0'));
+            QString("") : QString("%1.").arg(i,2,10,QChar('0'));
 
         CC608StreamType &subs = (*cc608it).subs;
         CC608StreamType::iterator it = subs.begin();
@@ -477,7 +477,7 @@ void MythCCExtractorPlayer::Process708Captions(uint flags)
     for (; cc708it != m_cc708_info.end(); ++cc708it)
     {
         QString stream_id_str = (m_cc708_info.size() <= 1) ?
-            QString("") : QString("%1.").arg(i,2,QChar('0'));
+            QString("") : QString("%1.").arg(i,2,10,QChar('0'));
 
         CC708StreamType &subs = (*cc708it).subs;
         CC708StreamType::iterator it = subs.begin();
@@ -578,7 +578,7 @@ void MythCCExtractorPlayer::ProcessTeletext(uint flags)
     for (; ttxit != m_ttx_info.end(); ++ttxit)
     {
         QString stream_id_str = (m_cc608_info.size() <= 1) ?
-            QString("") : QString("%1.").arg(i,2,QChar('0'));
+            QString("") : QString("%1.").arg(i,2,10,QChar('0'));
 
         TeletextStreamType &subs = (*ttxit).subs;
         TeletextStreamType::iterator it = subs.begin();

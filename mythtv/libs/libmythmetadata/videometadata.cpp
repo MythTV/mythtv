@@ -1222,7 +1222,7 @@ void VideoMetadata::toMap(InfoMap &metadataMap)
     metadataMap["tagline"] = GetTagline();
     metadataMap["director"] = GetDirector();
     metadataMap["studio"] = GetStudio();
-    metadataMap["description"] = GetPlot();
+    metadataMap["description0"] = metadataMap["description"] = GetPlot();
     metadataMap["genres"] = GetDisplayGenres(*this);
     metadataMap["countries"] = GetDisplayCountries(*this);
     metadataMap["cast"] = GetDisplayCast(*this).join(", ");
@@ -1298,6 +1298,7 @@ void ClearMap(InfoMap &metadataMap)
     metadataMap["director"] = "";
     metadataMap["studio"] = "";
     metadataMap["description"] = "";
+    metadataMap["description0"] = "";
     metadataMap["genres"] = "";
     metadataMap["countries"] = "";
     metadataMap["cast"] = "";

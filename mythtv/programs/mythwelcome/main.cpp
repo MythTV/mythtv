@@ -96,6 +96,8 @@ int main(int argc, char **argv)
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
+    cmdline.ApplySettingsOverride();
+
     if (!MSqlQuery::testDBConnection())
     {
         LOG(VB_GENERAL, LOG_ERR,
