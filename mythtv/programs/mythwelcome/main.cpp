@@ -88,6 +88,8 @@ int main(int argc, char **argv)
 #endif
 
     gContext = new MythContext(MYTH_BINARY_VERSION, true);
+
+    cmdline.ApplySettingsOverride();
     if (!gContext->Init())
     {
         LOG(VB_GENERAL, LOG_ERR,
