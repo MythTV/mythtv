@@ -136,6 +136,16 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext *Context,
     if (!(Decoder == "vaapi" || Decoder == "vaapi-dec") || !HaveVAAPI() || getenv("NO_VAAPI"))
         return failure;
 
+    // Full range formats are not supported
+    if (Context->pix_fmt == AV_PIX_FMT_YUVJ420P || Context->pix_fmt == AV_PIX_FMT_YUVJ422P ||
+        Context->pix_fmt == AV_PIX_FMT_YUVJ444P)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("VAAPI does not support format '%1'")
+            .arg(av_get_pix_fmt_name(Context->pix_fmt)));
+        return failure;
+    }
+
+    // direct rendering needs interop support
     if (!decodeonly && (MythOpenGLInterop::GetInteropType(success) == MythOpenGLInterop::Unsupported))
         return failure;
 
