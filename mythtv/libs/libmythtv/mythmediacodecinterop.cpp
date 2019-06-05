@@ -84,7 +84,6 @@ bool MythMediaCodecInterop::Initialise(QSize Size)
     // N.B. CreateTextures is not GL_TEXTURE_EXTERNAL_OES aware (no Qt enum)
     MythVideoTexture *texture = textures[0];
     texture->m_target = GL_TEXTURE_EXTERNAL_OES;
-    MythVideoTexture::SetTextureFilters(m_context, textures, QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge);
     glBindTexture(GL_TEXTURE_EXTERNAL_OES, texture->m_textureId);
 
     // Create surface

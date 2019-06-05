@@ -140,7 +140,6 @@ bool MythVDPAUInterop::InitVDPAU(AVVDPAUDeviceContext* DeviceContext, VdpVideoSu
                                                                                  QOpenGLTexture::Target2D);
             if (textures.empty())
                 return false;
-            MythVideoTexture::SetTextureFilters(m_context, textures, QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge);
             m_openglTextures.insert(DUMMY_INTEROP_ID, textures);
         }
     }

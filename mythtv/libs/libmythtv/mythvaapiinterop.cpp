@@ -599,7 +599,6 @@ vector<MythVideoTexture*> MythVAAPIInteropGLXPixmap::Acquire(MythRenderOpenGL *C
         vector<MythVideoTexture*> textures = MythVideoTexture::CreateTextures(m_context, FMT_VAAPI, FMT_RGBA32, size);
         if (textures.empty())
             return result;
-        MythVideoTexture::SetTextureFilters(m_context, textures, QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge);
         result.push_back(textures[0]);
         m_openglTextures.insert(DUMMY_INTEROP_ID, result);
     }
@@ -819,7 +818,6 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context
             {
                 for (uint i = 0; i < textures.size(); ++i)
                     textures[i]->m_allowGLSLDeint = true;
-                MythVideoTexture::SetTextureFilters(m_context, textures, QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge);
                 CreateDRMBuffers(format, textures, vabufferinfo.handle, vaimage);
                 result = textures;
             }

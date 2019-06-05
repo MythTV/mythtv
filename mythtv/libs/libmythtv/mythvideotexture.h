@@ -31,7 +31,8 @@ class MythVideoTexture : public MythGLTexture
     static void DeleteTexture (MythRenderOpenGL* Context, MythVideoTexture *Texture);
     static void DeleteTextures(MythRenderOpenGL* Context, vector<MythVideoTexture*> &Textures);
     static void SetTextureFilters(MythRenderOpenGL* Context, const vector<MythVideoTexture*> &Textures,
-                                  QOpenGLTexture::Filter Filter, QOpenGLTexture::WrapMode Wrap);
+                                  QOpenGLTexture::Filter Filter,
+                                  QOpenGLTexture::WrapMode Wrap = QOpenGLTexture::ClampToEdge);
     static MythVideoTexture* CreateTexture(MythRenderOpenGL *Context, QSize Size,
                                            QOpenGLTexture::Target Target = QOpenGLTexture::Target2D,
                                            QOpenGLTexture::PixelType PixelType = QOpenGLTexture::UInt8,
@@ -50,6 +51,7 @@ class MythVideoTexture : public MythGLTexture
 
   public:
     bool           m_valid          { false };
+    QOpenGLTexture::Filter m_filter { QOpenGLTexture::Linear };
     VideoFrameType m_frameType      { FMT_NONE };
     VideoFrameType m_frameFormat    { FMT_NONE };
     uint           m_plane          { 0 };

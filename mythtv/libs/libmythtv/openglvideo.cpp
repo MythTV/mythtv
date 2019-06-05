@@ -473,6 +473,8 @@ void OpenGLVideo::ResetFrameFormat(void)
     m_render->DeleteTexture(m_frameBufferTexture);
     m_frameBuffer = nullptr;
     m_frameBufferTexture = nullptr;
+    // textures are created with Linear filtering - which matches no resize
+    m_resizing = false;
 }
 
 /// \brief Update the current input texture using the data from the given video frame.
@@ -568,7 +570,9 @@ void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanT
         m_render->logDebugMarker(LOC + "PREP_FRAME_START");
 
     // Set required input textures for the last stage
-    // ProcessFrame is always called first, which will create/destroy textures as needed
+    // ProcessFrame is always called first, which will create/destroy software
+    // textures as needed
+    bool hwframes = false;
     vector<MythVideoTexture*> inputtextures = m_inputTextures;
     if (inputtextures.empty())
     {
@@ -576,6 +580,7 @@ void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanT
         inputtextures = MythOpenGLInterop::Retrieve(m_render, m_videoColourSpace, Frame, Scan);
         if (!inputtextures.empty())
         {
+            hwframes = true;
             QSize newsize = inputtextures[0]->m_size;
             VideoFrameType newsourcetype = inputtextures[0]->m_frameType;
             VideoFrameType newtargettype = inputtextures[0]->m_frameFormat;
@@ -655,9 +660,10 @@ void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanT
         }
     }
 
-    // set filtering if resizing has changed
+    // set software frame filtering if resizing has changed
     if (!resize && m_resizing)
     {
+        // remove framebuffer
         if (m_frameBufferTexture)
         {
             m_render->DeleteTexture(m_frameBufferTexture);
@@ -668,19 +674,29 @@ void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanT
             m_render->DeleteFramebuffer(m_frameBuffer);
             m_frameBuffer = nullptr;
         }
-        MythVideoTexture::SetTextureFilters(m_render, m_inputTextures, QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge);
-        MythVideoTexture::SetTextureFilters(m_render, m_prevTextures, QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge);
-        MythVideoTexture::SetTextureFilters(m_render, m_nextTextures, QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge);
+        // set filtering
+        MythVideoTexture::SetTextureFilters(m_render, m_inputTextures, QOpenGLTexture::Linear);
+        MythVideoTexture::SetTextureFilters(m_render, m_prevTextures, QOpenGLTexture::Linear);
+        MythVideoTexture::SetTextureFilters(m_render, m_nextTextures, QOpenGLTexture::Linear);
         m_resizing = false;
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Disabled resizing");
     }
     else if (!m_resizing && resize)
     {
-        MythVideoTexture::SetTextureFilters(m_render, m_inputTextures, QOpenGLTexture::Nearest, QOpenGLTexture::ClampToEdge);
-        MythVideoTexture::SetTextureFilters(m_render, m_prevTextures, QOpenGLTexture::Nearest, QOpenGLTexture::ClampToEdge);
-        MythVideoTexture::SetTextureFilters(m_render, m_nextTextures, QOpenGLTexture::Nearest, QOpenGLTexture::ClampToEdge);
+        // framebuffer will be created as needed below
+        MythVideoTexture::SetTextureFilters(m_render, m_inputTextures, QOpenGLTexture::Nearest);
+        MythVideoTexture::SetTextureFilters(m_render, m_prevTextures, QOpenGLTexture::Nearest);
+        MythVideoTexture::SetTextureFilters(m_render, m_nextTextures, QOpenGLTexture::Nearest);
         m_resizing = true;
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Enabled resizing");
+    }
+
+    // check hardware frames have the correct filtering
+    if (hwframes)
+    {
+        QOpenGLTexture::Filter filter = resize ? QOpenGLTexture::Nearest : QOpenGLTexture::Linear;
+        if (inputtextures[0]->m_filter != filter)
+            MythVideoTexture::SetTextureFilters(m_render, inputtextures, filter);
     }
 
     if (resize)
@@ -703,7 +719,7 @@ void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanT
             m_frameBufferTexture = reinterpret_cast<MythVideoTexture*>(m_render->CreateFramebufferTexture(m_frameBuffer));
             if (!m_frameBufferTexture)
                 return;
-            m_render->SetTextureFilters(m_frameBufferTexture, QOpenGLTexture::Linear, QOpenGLTexture::ClampToEdge);
+            m_render->SetTextureFilters(m_frameBufferTexture, QOpenGLTexture::Linear);
         }
 
         // coordinates

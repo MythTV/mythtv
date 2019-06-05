@@ -122,7 +122,8 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     MythGLTexture* CreateTextureFromQImage(QImage *Image);
     QSize GetTextureSize(const QSize &size, bool Normalised);
     int   GetTextureDataSize(MythGLTexture *Texture);
-    void  SetTextureFilters(MythGLTexture *Texture, QOpenGLTexture::Filter Filter, QOpenGLTexture::WrapMode Wrap);
+    void  SetTextureFilters(MythGLTexture *Texture, QOpenGLTexture::Filter Filter,
+                            QOpenGLTexture::WrapMode Wrap = QOpenGLTexture::ClampToEdge);
     void  ActiveTexture(GLuint ActiveTex);
     void  EnableTextures(GLenum Type = QOpenGLTexture::Target2D);
     void  DisableTextures(void);

@@ -52,7 +52,10 @@ void MythVideoTexture::SetTextureFilters(MythRenderOpenGL *Context,
                                          QOpenGLTexture::WrapMode Wrap)
 {
     for (uint i = 0; (i < Textures.size()) && Context; i++)
+    {
+        Textures[i]->m_filter = Filter;
         Context->SetTextureFilters(reinterpret_cast<MythGLTexture*>(Textures[i]), Filter, Wrap);
+    }
 }
 
 /*! \brief Create a set of textures suitable for the given Type and Format.
@@ -86,6 +89,7 @@ vector<MythVideoTexture*> MythVideoTexture::CreateTextures(MythRenderOpenGL *Con
  * \note This is a simple wrapper that deliberately does nothing more than create
  * a texture and sets suitable defaults. In most instances, hardware textures require
  * specific handling.
+ * \note Linear filtering is always set.
 */
 vector<MythVideoTexture*> MythVideoTexture::CreateHardwareTextures(MythRenderOpenGL *Context,
                                                                    VideoFrameType Type,
@@ -127,12 +131,13 @@ vector<MythVideoTexture*> MythVideoTexture::CreateHardwareTextures(MythRenderOpe
         result.push_back(texture);
     }
 
+    SetTextureFilters(Context, result, QOpenGLTexture::Linear);
     return result;
 }
 
 /*! \brief Create a set of OpenGL textures to represent the given Format.
  *
- * \todo Extend for frame types other than YV12.
+ * \note All textures are created with CreateTexture which defaults to Linear filtering.
 */
 vector<MythVideoTexture*> MythVideoTexture::CreateSoftwareTextures(MythRenderOpenGL *Context,
                                                                    VideoFrameType Type,
@@ -253,7 +258,6 @@ vector<MythVideoTexture*> MythVideoTexture::CreateSoftwareTextures(MythRenderOpe
     if (result.size() != count)
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to create all textures: %1 < %2")
             .arg(result.size()).arg(count));
-
     return result;
 }
 
