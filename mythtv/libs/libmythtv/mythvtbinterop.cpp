@@ -60,6 +60,12 @@ vector<MythVideoTexture*> MythVTBInterop::Acquire(MythRenderOpenGL *Context,
     // Lock
     OpenGLLocker locker(m_context);
 
+    // There are only ever one set of textures which are updated on each pass.
+    // Hence we cannot use reference frames without significant additional work here -
+    // but MythVTBSurfaceInterop will almost certainly always be used - so just drop back
+    // to Linearblend
+    Frame->deinterlace_allowed = (Frame->deinterlace_allowed & ~DEINT_HIGH) | DEINT_MEDIUM;
+
     // Update colourspace and initialise on first frame
     if (ColourSpace)
     {
@@ -215,6 +221,7 @@ vector<MythVideoTexture*> MythVTBSurfaceInterop::Acquire(MythRenderOpenGL *Conte
        MythVideoTexture* texture = result[plane];
         if (!texture)
             continue;
+        texture->m_allowGLSLDeint = true;
         m_context->EnableTextures(QOpenGLTexture::TargetRectangle);
         m_context->glBindTexture(texture->m_target, texture->m_textureId);
         GLenum format = plane == 0 ? QOpenGLTexture::Red : QOpenGLTexture::RG;
