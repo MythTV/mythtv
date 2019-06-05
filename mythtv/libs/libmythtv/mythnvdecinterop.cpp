@@ -26,6 +26,7 @@ MythNVDECInterop::MythNVDECInterop(MythRenderOpenGL *Context)
 
 MythNVDECInterop::~MythNVDECInterop()
 {
+    DeleteTextures();
     CleanupContext(m_context, m_cudaFuncs, m_cudaContext);
 }
 
@@ -35,6 +36,7 @@ void MythNVDECInterop::DeleteTextures(void)
     if (!(m_cudaContext && m_cudaFuncs))
         return;
 
+    OpenGLLocker locker(m_context);
     CUDA_CHECK(m_cudaFuncs, cuCtxPushCurrent(m_cudaContext));
 
     if (!m_openglTextures.isEmpty())
@@ -48,10 +50,8 @@ void MythNVDECInterop::DeleteTextures(void)
             for ( ; it2 != textures.end(); ++it2)
             {
                 QPair<CUarray,CUgraphicsResource> *data = reinterpret_cast<QPair<CUarray,CUgraphicsResource>*>((*it2)->m_data);
-                // Don't error check here - for some reason the context is deemed destroyed but pop/destroy below
-                // work fine
-                if (m_cudaFuncs && data && data->second)
-                    m_cudaFuncs->cuGraphicsUnregisterResource(&(data->second));
+                if (data && data->second)
+                    CUDA_CHECK(m_cudaFuncs, cuGraphicsUnregisterResource(data->second));
                 delete data;
                 (*it2)->m_data = nullptr;
             }
@@ -165,6 +165,7 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
             return result;
         }
 
+        bool success = true;
         for (uint plane = 0; plane < textures.size(); ++plane)
         {
             MythVideoTexture *tex = textures[plane];
@@ -189,12 +190,39 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
             CUgraphicsResource graphicsResource = nullptr;
             CUDA_CHECK(m_cudaFuncs, cuGraphicsGLRegisterImage(&graphicsResource, tex->m_textureId,
                                           QOpenGLTexture::Target2D, CU_GRAPHICS_REGISTER_FLAGS_WRITE_DISCARD));
-            CUDA_CHECK(m_cudaFuncs, cuGraphicsMapResources(1, &graphicsResource, nullptr));
-            CUDA_CHECK(m_cudaFuncs, cuGraphicsSubResourceGetMappedArray(&array, graphicsResource, 0, 0));
-            CUDA_CHECK(m_cudaFuncs, cuGraphicsUnmapResources(1, &graphicsResource, nullptr));
-            tex->m_data = reinterpret_cast<unsigned char*>(new QPair<CUarray,CUgraphicsResource>(array, graphicsResource));
+            if (graphicsResource)
+            {
+                CUDA_CHECK(m_cudaFuncs, cuGraphicsMapResources(1, &graphicsResource, nullptr));
+                CUDA_CHECK(m_cudaFuncs, cuGraphicsSubResourceGetMappedArray(&array, graphicsResource, 0, 0));
+                CUDA_CHECK(m_cudaFuncs, cuGraphicsUnmapResources(1, &graphicsResource, nullptr));
+                tex->m_data = reinterpret_cast<unsigned char*>(new QPair<CUarray,CUgraphicsResource>(array, graphicsResource));
+            }
+            else
+            {
+                success = false;
+                break;
+            }
         }
-        m_openglTextures.insert(cudabuffer, textures);
+
+        if (success)
+        {
+            m_openglTextures.insert(cudabuffer, textures);
+        }
+        else
+        {
+            vector<MythVideoTexture*>::iterator it = textures.begin();
+            for ( ; it != textures.end(); ++it)
+            {
+                QPair<CUarray,CUgraphicsResource> *data = reinterpret_cast<QPair<CUarray,CUgraphicsResource>*>((*it)->m_data);
+                if (data && data->second)
+                    CUDA_CHECK(m_cudaFuncs, cuGraphicsUnregisterResource(data->second));
+                delete data;
+                (*it)->m_data = nullptr;
+                if ((*it)->m_textureId)
+                    m_context->glDeleteTextures(1, &(*it)->m_textureId);
+                MythVideoTexture::DeleteTexture(m_context, *it);
+            }
+        }
     }
 
     if (!m_openglTextures.contains(cudabuffer))
