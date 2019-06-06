@@ -136,15 +136,6 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext *Context,
     if (!(Decoder == "vaapi" || Decoder == "vaapi-dec") || !HaveVAAPI() || getenv("NO_VAAPI"))
         return failure;
 
-    // Full range formats are not supported
-    if (Context->pix_fmt == AV_PIX_FMT_YUVJ420P || Context->pix_fmt == AV_PIX_FMT_YUVJ422P ||
-        Context->pix_fmt == AV_PIX_FMT_YUVJ444P)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + QString("VAAPI does not support format '%1'")
-            .arg(av_get_pix_fmt_name(Context->pix_fmt)));
-        return failure;
-    }
-
     // direct rendering needs interop support
     if (!decodeonly && (MythOpenGLInterop::GetInteropType(success) == MythOpenGLInterop::Unsupported))
         return failure;
@@ -240,6 +231,27 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext *Context,
                 }
             }
         }
+
+        // use JPEG support as a proxy for MJPEG (full range YUV)
+        if (foundentry && ((AV_PIX_FMT_YUVJ420P == Context->pix_fmt || AV_PIX_FMT_YUVJ422P == Context->pix_fmt ||
+                            AV_PIX_FMT_YUVJ444P == Context->pix_fmt)))
+        {
+            bool jpeg = false;
+            if (vaQueryConfigEntrypoints(hwctx->display, VAProfileJPEGBaseline, entrylist, &count) == VA_STATUS_SUCCESS)
+            {
+                for (int i = 0; i < count; ++i)
+                {
+                    if (entrylist[i] == VAEntrypointVLD)
+                    {
+                        jpeg = true;
+                        break;
+                    }
+                }
+            }
+            if (!jpeg)
+                foundentry = false;
+        }
+
         av_freep(&entrylist);
     }
 
@@ -247,15 +259,18 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext *Context,
 
     if (foundhwfmt && foundswfmt && foundprofile && sizeok && foundentry)
     {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' supports decoding '%2'")
-                .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_VAAPI)).arg((*Codec)->name));
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' supports decoding '%2 %3'")
+                .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_VAAPI)).arg((*Codec)->name)
+                .arg(av_get_pix_fmt_name(Context->pix_fmt)));
         PixFmt = AV_PIX_FMT_VAAPI;
         return success;
     }
 
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' does not support '%2' (format: %3 size: %4 profile: %5 entry: %6)")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC +
+            QString("HW device type '%1' does not support '%2 %7' (format: %3 size: %4 profile: %5 entry: %6)")
             .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_VAAPI)).arg((*Codec)->name)
-            .arg(foundswfmt).arg(sizeok).arg(foundprofile).arg(foundentry));
+            .arg(foundswfmt).arg(sizeok).arg(foundprofile).arg(foundentry)
+            .arg(av_get_pix_fmt_name(Context->pix_fmt)));
     return failure;
 }
 
