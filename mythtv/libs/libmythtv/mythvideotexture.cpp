@@ -157,8 +157,9 @@ vector<MythVideoTexture*> MythVideoTexture::CreateSoftwareTextures(MythRenderOpe
     // Strict OpenGL ES 2.0 has no GL_RED or GL_R8 so use Luminance alternatives which give the same result
     // There is no obvious alternative solution for GL_RG/8 for higher bit depths. These will fail on some
     // implementations
-    QOpenGLTexture::PixelFormat bytepixfmt = Context->isOpenGLES() ? QOpenGLTexture::Luminance: QOpenGLTexture::Red;
-    QOpenGLTexture::TextureFormat bytetexfmt = Context->isOpenGLES() ? QOpenGLTexture::LuminanceFormat: QOpenGLTexture::R8_UNorm;
+    bool luminance = Context->isOpenGLES() && Context->format().majorVersion() < 3;
+    QOpenGLTexture::PixelFormat bytepixfmt   = luminance ? QOpenGLTexture::Luminance       : QOpenGLTexture::Red;
+    QOpenGLTexture::TextureFormat bytetexfmt = luminance ? QOpenGLTexture::LuminanceFormat : QOpenGLTexture::R8_UNorm;
     for (uint plane = 0; plane < count; ++plane)
     {
         QSize size = Sizes[0];
