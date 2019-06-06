@@ -46,17 +46,15 @@ static const QString SampleNV12 =
 "    return yuv;\n"
 "}\n";
 
-// N.B. This always downsamples to 8bit. I can't get the dot product to work correctly
-// but is only used by CUDA interop - so may be related to how CUDA transfers data internally.
 static const QString SampleNV12HDR =
 "uniform highp vec2 m_scaler;\n"
 "highp vec3 sampleNV12(in sampler2D texture1, in sampler2D texture2, highp vec2 texcoord)\n"
 "{\n"
 "    highp vec3 yuv;\n"
-"    yuv.r = dot(texture2D(texture1, texcoord).rg, vec2(0.0, 1.0));\n" // <-- needs to be m_scaler
+"    yuv.r = dot(texture2D(texture1, texcoord).rg, m_scaler);\n"
 "    highp vec4 uv = texture2D(texture2, texcoord%NV12_UV_RECT%);\n"
-"    yuv.g = dot(uv.rg, vec2(0.0, 1.0));\n"
-"    yuv.b = dot(uv.ba, vec2(0.0, 1.0));\n"
+"    yuv.g = dot(uv.rg, m_scaler);\n"
+"    yuv.b = dot(uv.ba, m_scaler);\n"
 "    return yuv;\n"
 "}\n";
 

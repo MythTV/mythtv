@@ -101,8 +101,21 @@ void OpenGLVideo::UpdateShaderParameters(void)
                          maxheight - lineheight,                          /* maxheight  */
                          m_inputTextureSize.height() / 2.0f               /* fieldsize  */);
 
-    int range = (1 << ColorDepth(m_outputType)) - 1;
-    QVector2D scaler = QVector2D(1.0, 256.0) * 255.0 / static_cast<float>(range);
+    QVector2D scaler;
+    if (format_is_hw(m_inputType))
+    {
+        // For NVDEC and VAAPI 10bit. This implies a very different data
+        // format than software frames. Instead of XXXXXXXX:XX000000 we must
+        // have XXXXXXXX:000000XX. Output looks fine on an 8bit display but
+        // I can't confirm this is 100% accurate
+        scaler = QVector2D(1.0f / 255.0f, 1.0f);
+    }
+    else
+    {
+        int range = (1 << ColorDepth(m_outputType)) - 1;
+        scaler = QVector2D(1.0f, 256.0f) * 255.0f / static_cast<float>(range);
+    }
+
     for (int i = Progressive; i < ShaderCount; ++i)
     {
         if (m_shaders[i])
