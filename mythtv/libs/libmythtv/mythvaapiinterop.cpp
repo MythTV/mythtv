@@ -1,4 +1,4 @@
-// MythTV
+﻿// MythTV
 #include "videooutbase.h"
 #include "videocolourspace.h"
 #include "fourcc.h"
@@ -659,11 +659,6 @@ bool MythVAAPIInteropGLXPixmap::IsSupported(MythRenderOpenGL *Context)
     return extensions.contains("GLX_EXT_texture_from_pixmap");
 }
 
-#ifndef DRM_FORMAT_R8
-#define DRM_FORMAT_R8   MKTAG('R', '8', ' ', ' ')
-#define DRM_FORMAT_GR88 MKTAG('G', 'R', '8', '8')
-#endif
-
 MythVAAPIInteropDRM::MythVAAPIInteropDRM(MythRenderOpenGL *Context)
   : MythVAAPIInterop(Context, VAAPIEGLDRM),
     m_drmFile(),
@@ -842,8 +837,8 @@ VideoFrameType MythVAAPIInteropDRM::VATypeToMythType(uint32_t Fourcc)
         case VA_FOURCC_NV12: return FMT_NV12;
         case VA_FOURCC_YUY2: return FMT_YUY2;
         case VA_FOURCC_UYVY: return FMT_YUY2; // ?
-        case VA_FOURCC_P010: return FMT_YUV420P10;
-        case VA_FOURCC_P016: return FMT_YUV420P16;
+        case VA_FOURCC_P010: return FMT_P010;
+        case VA_FOURCC_P016: return FMT_P016;
         case VA_FOURCC_ARGB: return FMT_ARGB32;
         case VA_FOURCC_RGBA: return FMT_RGBA32;
     }
@@ -871,6 +866,12 @@ bool MythVAAPIInteropDRM::InitEGL(void)
     return true;
 }
 
+#ifndef DRM_FORMAT_R8
+#define DRM_FORMAT_R8       MKTAG('R', '8', ' ', ' ')
+#define DRM_FORMAT_GR88     MKTAG('G', 'R', '8', '8')
+#define DRM_FORMAT_ARGB8888 MKTAG('A', 'R', '2', '4')
+#endif
+
 /*! \brief Create a set of EGL images/DRM buffers associated with the given textures
 */
 void MythVAAPIInteropDRM::CreateDRMBuffers(VideoFrameType Format,
@@ -880,9 +881,9 @@ void MythVAAPIInteropDRM::CreateDRMBuffers(VideoFrameType Format,
     for (uint plane = 0; plane < Textures.size(); ++plane)
     {
         MythVideoTexture* texture = Textures[plane];
-        int fourcc = DRM_FORMAT_R8;
-        if ((Format == FMT_NV12) && (plane > 0))
-            fourcc = DRM_FORMAT_GR88;
+        int fourcc = (Format == FMT_P010) ? DRM_FORMAT_GR88 : DRM_FORMAT_R8;
+        if (plane > 0)
+            fourcc = (Format == FMT_P010) ? DRM_FORMAT_ARGB8888 : DRM_FORMAT_GR88;
         const EGLint attributes[] = {
                 EGL_LINUX_DRM_FOURCC_EXT, fourcc,
                 EGL_WIDTH,  texture->m_size.width(),
@@ -899,7 +900,7 @@ void MythVAAPIInteropDRM::CreateDRMBuffers(VideoFrameType Format,
 
         EGLImageKHR image = m_eglCreateImageKHR(display, EGL_NO_CONTEXT, EGL_LINUX_DMA_BUF_EXT, nullptr, attributes);
         if (!image)
-            LOG(VB_GENERAL, LOG_ERR, LOC + "No EGLImage");
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("No EGLImage for plane %1 %2").arg(plane).arg(eglGetError()));
 
         m_context->glBindTexture(texture->m_target, texture->m_textureId);
         m_eglImageTargetTexture2DOES(texture->m_target, image);

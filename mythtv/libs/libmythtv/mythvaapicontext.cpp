@@ -371,8 +371,7 @@ int MythVAAPIContext::InitialiseContext(AVCodecContext *Context)
         { VASurfaceAttribMemoryType,  VA_SURFACE_ATTRIB_SETTABLE, { VAGenericValueTypeInteger, { VA_SURFACE_ATTRIB_MEM_TYPE_VA} } } };
     vaapi_frames_ctx->attributes = prefs;
     vaapi_frames_ctx->nb_attributes = 3;
-
-    hw_frames_ctx->sw_format         = Context->sw_pix_fmt;
+    hw_frames_ctx->sw_format         = (Context->sw_pix_fmt == AV_PIX_FMT_YUV420P10) ? AV_PIX_FMT_P010 : AV_PIX_FMT_NV12;
     hw_frames_ctx->initial_pool_size = static_cast<int>(VideoBuffers::GetNumBuffers(FMT_VAAPI));
     hw_frames_ctx->format            = AV_PIX_FMT_VAAPI;
     hw_frames_ctx->width             = Context->coded_width;
