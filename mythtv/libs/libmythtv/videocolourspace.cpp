@@ -1,6 +1,7 @@
 // MythTV
 #include "mythcorecontext.h"
 #include "mythlogging.h"
+#include "mythavutil.h"
 #include "videocolourspace.h"
 
 // libavutil
@@ -57,6 +58,7 @@ VideoColourSpace::VideoColourSpace(VideoColourSpace *Parent)
     m_colourSpaceDepth(8),
     m_range(AVCOL_RANGE_MPEG),
     m_updatesDisabled(true),
+    m_colorShifted(0),
     m_parent(Parent)
 {
     if (m_parent)
@@ -240,6 +242,21 @@ void VideoColourSpace::Update(void)
     this->operator *= (yuv2rgb);
     scale(luma_scale, chroma_scale, chroma_scale);
     translate(offset, offset, offset);
+
+    // Scale when needed for 10/12/16bit fixed point data
+    // Raw 10bit video is represented as XXXXXXXX:XX000000
+    // Raw 12bit video is                XXXXXXXX:XXXX0000
+    // Raw 16bit video is                XXXXXXXX:XXXXXXXX
+    // and these formats are returned by FFmpeg when software decoding
+    // so we need to shift by the appropriate number of 'bits' (actually a float in the shader)
+    // Hardware decoders seem to return 'corrected' values
+    // i.e. 10bit as XXXXXXXXXX for both direct rendering and copy back.
+    // Works for NVDEC and VAAPI. VideoToolBox untested.
+    if ((m_colourSpaceDepth > 8) && !m_colorShifted)
+    {
+        float scaler = 65535.0f / ((1 << m_colourSpaceDepth) -1);
+        scale(scaler);
+    }
     static_cast<QMatrix4x4*>(this)->operator = (this->transposed());
     Debug();
     emit Updated();
@@ -277,30 +294,39 @@ bool VideoColourSpace::UpdateColourSpace(const VideoFrame *Frame)
         return false;
 
     int csp = Frame->colorspace;
+    VideoFrameType frametype = Frame->codec;
+    VideoFrameType softwaretype = PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->sw_pix_fmt));
+
     // workaround for nvdec mpeg2
     bool forced = false;
-    if (csp == AVCOL_SPC_RGB && (format_is_yuv(Frame->codec) || Frame->codec == FMT_NVDEC))
+    if (csp == AVCOL_SPC_RGB && (format_is_yuv(frametype) || frametype == FMT_NVDEC))
     {
         forced = true;
         csp = AVCOL_SPC_UNSPECIFIED;
     }
     int range = Frame->colorrange;
-    int depth = ColorDepth(Frame->codec);
+    int depth = ColorDepth(format_is_hw(frametype) ? softwaretype : frametype);
     if (csp == AVCOL_SPC_UNSPECIFIED)
         csp = (Frame->width < 1280) ? AVCOL_SPC_BT470BG : AVCOL_SPC_BT709;
-    if ((csp == m_colourSpace) && (m_colourSpaceDepth == depth) && (m_range == range))
+    if ((csp == m_colourSpace) && (m_colourSpaceDepth == depth) &&
+        (m_range == range) && (m_colorShifted == Frame->colorshifted))
+    {
         return false;
+    }
+
     m_colourSpace = csp;
     m_colourSpaceDepth = depth;
     m_range = range;
+    m_colorShifted = Frame->colorshifted;
 
     if (forced)
         LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Forcing inconsistent colourspace - frame format %1")
             .arg(format_description(Frame->codec)));
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Video Colourspace: %1 Depth: %2 Range: %3 (Stream: %4)")
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Video Colourspace:%1 Depth:%2 %3Range:%4 (Stream:%5)")
         .arg(av_color_space_name(static_cast<AVColorSpace>(m_colourSpace)))
         .arg(m_colourSpaceDepth)
-        .arg((AVCOL_RANGE_JPEG == m_range) ? "Full" : "Limited")
+        .arg((m_colourSpaceDepth > 8) ? (m_colorShifted ? "(Pre-scaled) " : "(Fixed point) ") : "")
+        .arg((AVCOL_RANGE_JPEG == m_range) ? "Full" : "Limited") 
         .arg(av_color_space_name(static_cast<AVColorSpace>(Frame->colorspace))));
 
     Update();

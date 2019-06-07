@@ -2912,6 +2912,7 @@ int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic, int flags)
         if (!decoder->GetPlayer()->ReAllocateFrame(frame, type))
             return -1;
 
+    frame->colorshifted = 0;
     uint max = planes(frame->codec);
     for (uint i = 0; i < 3; i++)
     {
@@ -3802,6 +3803,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
                 LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error %1 transferring the data to system memory")
                         .arg(ret));
             }
+            picframe->colorshifted = 1;
             av_freep(&pixelformats);
         }
         else

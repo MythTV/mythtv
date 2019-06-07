@@ -158,6 +158,7 @@ typedef struct VideoFrame_
     int colorprimaries;
     int colortransfer;
     int chromalocation;
+    int colorshifted; ///< 0 for software decoded 10/12/16bit frames. 1 for hardware decoders.
     MythDeintType deinterlace_single;
     MythDeintType deinterlace_double;
     MythDeintType deinterlace_allowed;
@@ -245,6 +246,7 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
     vf->colorprimaries   = 1; // BT.709
     vf->colortransfer    = 1; // BT.709
     vf->chromalocation   = 1; // default 4:2:0
+    vf->colorshifted   = 0;
     vf->deinterlace_single = DEINT_NONE;
     vf->deinterlace_double = DEINT_NONE;
     vf->deinterlace_allowed = DEINT_NONE;

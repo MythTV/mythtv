@@ -392,6 +392,9 @@ int MythNVDECContext::GetBuffer(struct AVCodecContext *Context, AVFrame *Frame, 
             videoframe->sw_pix_fmt = context->sw_format;
     }
 
+    // NVDEC 'fixes' 10/12/16bit colour values
+    videoframe->colorshifted = 1;
+
     // Frame->data[0] holds CUdeviceptr for the frame data - offsets calculated above
     videoframe->buf = Frame->data[0];
 

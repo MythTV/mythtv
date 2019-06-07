@@ -101,28 +101,12 @@ void OpenGLVideo::UpdateShaderParameters(void)
                          maxheight - lineheight,                          /* maxheight  */
                          m_inputTextureSize.height() / 2.0f               /* fieldsize  */);
 
-    QVector2D scaler;
-    if (format_is_hw(m_inputType))
-    {
-        // For NVDEC and VAAPI 10bit. This implies a very different data
-        // format than software frames. Instead of XXXXXXXX:XX000000 we must
-        // have XXXXXXXX:000000XX. Output looks fine on an 8bit display but
-        // I can't confirm this is 100% accurate
-        scaler = QVector2D(1.0f / 255.0f, 1.0f);
-    }
-    else
-    {
-        int range = (1 << ColorDepth(m_outputType)) - 1;
-        scaler = QVector2D(1.0f, 256.0f) * 255.0f / static_cast<float>(range);
-    }
-
     for (int i = Progressive; i < ShaderCount; ++i)
     {
         if (m_shaders[i])
         {
             m_render->EnableShaderProgram(m_shaders[i]);
             m_shaders[i]->setUniformValue("m_frameData", parameters);
-            m_shaders[i]->setUniformValue("m_scaler", scaler);
         }
     }
 }
@@ -370,11 +354,6 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Deint)
             }
         }
     }
-
-    // Set correct YUV depth sampler
-    int depth = ColorDepth(m_outputType);
-    fragment.replace("%YV12SAMPLER%", depth > 8 ? SampleYV12HDR : SampleYV12);
-    fragment.replace("%NV12SAMPLER%", depth > 8 ? SampleNV12HDR : SampleNV12);
 
     fragment.replace("SELECT_COLUMN", (FMT_YUY2 == m_outputType) ? SelectColumn : "");
     // update packing code so this can be removed

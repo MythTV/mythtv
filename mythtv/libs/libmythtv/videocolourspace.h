@@ -60,6 +60,7 @@ class VideoColourSpace : public QObject, public QMatrix4x4, public ReferenceCoun
     int       m_colourSpaceDepth;
     int       m_range;
     bool      m_updatesDisabled;
+    int       m_colorShifted;
     VideoColourSpace *m_parent;
 };
 

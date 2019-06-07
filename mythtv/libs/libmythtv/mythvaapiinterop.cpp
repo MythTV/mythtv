@@ -442,6 +442,8 @@ vector<MythVideoTexture*> MythVAAPIInteropGLXCopy::Acquire(MythRenderOpenGL *Con
     if (m_openglTextures.isEmpty())
     {
         // create a texture
+        // N.B. No apparent 10/12/16bit support here. Can't encourage vaCreateSurfaceGLX
+        // to work with a 16bit texture
         MythVideoTexture *texture = MythVideoTexture::CreateTexture(m_context, m_openglTextureSize);
         if (!texture)
             return result;
@@ -594,6 +596,8 @@ vector<MythVideoTexture*> MythVAAPIInteropGLXPixmap::Acquire(MythRenderOpenGL *C
         }
 
         // Create a texture
+        // N.B. as for GLX Copy there is no obvious 10/12/16bit support here.
+        // too many unknowns in this pipeline
         vector<QSize> size;
         size.push_back(m_openglTextureSize);
         vector<MythVideoTexture*> textures = MythVideoTexture::CreateTextures(m_context, FMT_VAAPI, FMT_RGBA32, size);
@@ -869,7 +873,8 @@ bool MythVAAPIInteropDRM::InitEGL(void)
 #ifndef DRM_FORMAT_R8
 #define DRM_FORMAT_R8       MKTAG('R', '8', ' ', ' ')
 #define DRM_FORMAT_GR88     MKTAG('G', 'R', '8', '8')
-#define DRM_FORMAT_ARGB8888 MKTAG('A', 'R', '2', '4')
+#define DRM_FORMAT_R16      MKTAG('R', '1', '6', ' ')
+#define DRM_FORMAT_GR32     MKTAG('G', 'R', '3', '2')
 #endif
 
 /*! \brief Create a set of EGL images/DRM buffers associated with the given textures
@@ -881,9 +886,9 @@ void MythVAAPIInteropDRM::CreateDRMBuffers(VideoFrameType Format,
     for (uint plane = 0; plane < Textures.size(); ++plane)
     {
         MythVideoTexture* texture = Textures[plane];
-        int fourcc = (Format == FMT_P010) ? DRM_FORMAT_GR88 : DRM_FORMAT_R8;
+        int fourcc = (Format == FMT_P010) ? DRM_FORMAT_R16 : DRM_FORMAT_R8;
         if (plane > 0)
-            fourcc = (Format == FMT_P010) ? DRM_FORMAT_ARGB8888 : DRM_FORMAT_GR88;
+            fourcc = (Format == FMT_P010) ? DRM_FORMAT_GR32 : DRM_FORMAT_GR88;
         const EGLint attributes[] = {
                 EGL_LINUX_DRM_FOURCC_EXT, fourcc,
                 EGL_WIDTH,  texture->m_size.width(),

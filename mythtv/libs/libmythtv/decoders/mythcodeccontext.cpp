@@ -103,6 +103,17 @@ int MythCodecContext::GetBuffer(struct AVCodecContext *Context, AVFrame *Frame, 
     if (ret < 0)
         return ret;
 
+    // set the underlying pixel format. Set here rather than guessing later.
+    if (Frame->hw_frames_ctx)
+    {
+        AVHWFramesContext *context = reinterpret_cast<AVHWFramesContext*>(Frame->hw_frames_ctx->data);
+        if (context)
+            videoframe->sw_pix_fmt = context->sw_format;
+    }
+
+    // VAAPI 'fixes' 10/12/16bit colour values. Irrelevant for VDPAU.
+    videoframe->colorshifted = 1;
+
     // avcodec_default_get_buffer2 will retrieve an AVBufferRef from the pool of
     // hardware surfaces stored within AVHWFramesContext. The pointer to the surface is stored
     // in Frame->data[3]. Store this in VideoFrame::buf for the interop class to use.
@@ -135,6 +146,10 @@ int MythCodecContext::GetBuffer2(struct AVCodecContext *Context, AVFrame *Frame,
     Frame->opaque           = videoframe;
     videoframe->pix_fmt     = Context->pix_fmt;
     Frame->reordered_opaque = Context->reordered_opaque;
+
+    // N.B. these are untested (VideoToolBox and MediaCodec)
+    videoframe->colorshifted = 1;
+    videoframe->sw_pix_fmt  = Context->sw_pix_fmt;
 
     // the hardware surface is stored in Frame->data[3]
     videoframe->buf = Frame->data[3];
