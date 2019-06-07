@@ -25,6 +25,7 @@ class MythMediaCodecContext : public MythCodecContext
                                              AVPixelFormat  &PixFmt);
     static AVPixelFormat GetFormat          (AVCodecContext*, const AVPixelFormat *PixFmt);
     void   PostProcessFrame                 (AVCodecContext*, VideoFrame*) override;
+    bool   IsDeinterlacing                  (bool &DoubleRate) override;
 
   private:
     static int  InitialiseDecoder           (AVCodecContext *Context);

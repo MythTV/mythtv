@@ -119,9 +119,21 @@ void MythMediaCodecContext::PostProcessFrame(AVCodecContext*, VideoFrame* Frame)
 {
     if (!Frame)
         return;
+
+    Frame->deinterlace_inuse = Frame->interlaced_frame ? (DEINT_BASIC | DEINT_DRIVER) : DEINT_NONE;
+    Frame->deinterlace_inuse2x = 0;
     Frame->interlaced_frame = 0;
     Frame->interlaced_reversed = 0;
     Frame->top_field_first = 0;
-    Frame->deinterlace_inuse = DEINT_BASIC | DEINT_DRIVER;
-    Frame->deinterlace_inuse2x = 0;
+    Frame->deinterlace_allowed = DEINT_NONE;
+}
+
+/*! /brief Say yes
+ *
+ * \note As for PostProcessFrame this may not be accurate.
+*/
+bool MythMediaCodecContext::IsDeinterlacing(bool &DoubleRate)
+{
+    DoubleRate = true;
+    return true;
 }
