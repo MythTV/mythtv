@@ -130,7 +130,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     void  DeleteTexture(MythGLTexture *Texture);
     int   GetBufferSize(QSize Size, QOpenGLTexture::PixelFormat Format, QOpenGLTexture::PixelType Type);
 
-    QOpenGLFramebufferObject* CreateFramebuffer(QSize &Size);
+    QOpenGLFramebufferObject* CreateFramebuffer(QSize &Size, GLenum InternalFormat = 0);
     MythGLTexture* CreateFramebufferTexture(QOpenGLFramebufferObject *Framebuffer);
     void  DeleteFramebuffer(QOpenGLFramebufferObject *Framebuffer);
     void  BindFramebuffer(QOpenGLFramebufferObject *Framebuffer);

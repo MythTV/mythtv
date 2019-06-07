@@ -641,13 +641,18 @@ void MythRenderOpenGL::DeleteTexture(MythGLTexture *Texture)
     doneCurrent();
 }
 
-QOpenGLFramebufferObject* MythRenderOpenGL::CreateFramebuffer(QSize &Size)
+QOpenGLFramebufferObject* MythRenderOpenGL::CreateFramebuffer(QSize &Size, GLenum InternalFormat)
 {
     if (!(m_features & Framebuffers))
         return nullptr;
 
     OpenGLLocker locker(this);
-    QOpenGLFramebufferObject *framebuffer = new QOpenGLFramebufferObject(Size);
+    QOpenGLFramebufferObject *framebuffer;
+    if (InternalFormat)
+        framebuffer = new QOpenGLFramebufferObject(Size, QOpenGLFramebufferObject::NoAttachment,
+                                                   GL_TEXTURE_2D, InternalFormat);
+    else
+        framebuffer = new QOpenGLFramebufferObject(Size);
     if (framebuffer->isValid())
     {
         if (framebuffer->isBound())
