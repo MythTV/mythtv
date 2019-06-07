@@ -53,6 +53,7 @@ class VideoOutputOpenGL : public VideoOutput
     QRect GetDisplayVisibleRect(void);
 
     MythRenderOpenGL      *m_render;
+    bool                   m_isGLES2;
     OpenGLVideo           *m_openGLVideo;
     QMap<MythPlayer*,OpenGLVideo*> m_openGLVideoPiPs;
     QMap<MythPlayer*,bool> m_openGLVideoPiPsReady;

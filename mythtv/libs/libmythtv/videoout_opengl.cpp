@@ -104,6 +104,7 @@ void VideoOutputOpenGL::GetRenderOptions(render_opts &Options,
 VideoOutputOpenGL::VideoOutputOpenGL(const QString &Profile)
   : VideoOutput(),
     m_render(nullptr),
+    m_isGLES2(false),
     m_openGLVideo(nullptr),
     m_openGLVideoPiPActive(nullptr),
     m_openGLPainter(nullptr),
@@ -129,6 +130,13 @@ VideoOutputOpenGL::VideoOutputOpenGL(const QString &Profile)
     // Retain and lock
     m_render->IncrRef();
     OpenGLLocker locker(m_render);
+
+    // Disallow unsupported video texturing on GLES2
+    if (m_render->isOpenGLES() && m_render->format().majorVersion() < 3)
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Disabling unsupported texture formats for GLES2");
+        m_isGLES2 = true;
+    }
 
     // Retrieve OpenGL painter
     MythMainWindow *win = MythMainWindow::getMainWindow();
@@ -601,7 +609,10 @@ VideoFrameType* VideoOutputOpenGL::DirectRenderFormats(void)
           FMT_YUV444P9, FMT_YUV444P10, FMT_YUV444P12, FMT_YUV444P14, FMT_YUV444P16,
           FMT_P010, FMT_P016,
           FMT_NONE };
-    return &openglformats[0];
+    // OpenGLES2 only allows luminance textures - no RG etc
+    static VideoFrameType opengles2formats[] =
+        { FMT_YV12, FMT_YUY2, FMT_YUV422P, FMT_YUV444P, FMT_NONE };
+    return m_isGLES2 ? &opengles2formats[0] : &openglformats[0];
 }
 
 void VideoOutputOpenGL::Show(FrameScanType /*scan*/)
