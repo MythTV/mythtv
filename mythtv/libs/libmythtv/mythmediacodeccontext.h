@@ -24,6 +24,7 @@ class MythMediaCodecContext : public MythCodecContext
                                              uint            StreamType,
                                              AVPixelFormat  &PixFmt);
     static AVPixelFormat GetFormat          (AVCodecContext*, const AVPixelFormat *PixFmt);
+    void   PostProcessFrame                 (AVCodecContext*, VideoFrame*) override;
 
   private:
     static int  InitialiseDecoder           (AVCodecContext *Context);

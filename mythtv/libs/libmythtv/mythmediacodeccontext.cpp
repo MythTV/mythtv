@@ -110,3 +110,18 @@ AVPixelFormat MythMediaCodecContext::GetFormat(AVCodecContext*, const AVPixelFor
     }
     return AV_PIX_FMT_NONE;
 }
+
+/*! \brief Mark all MediaCodec decoded frames as progressive,
+ *
+ * \note This may not be appropriate for all devices
+*/
+void MythMediaCodecContext::PostProcessFrame(AVCodecContext*, VideoFrame* Frame)
+{
+    if (!Frame)
+        return;
+    Frame->interlaced_frame = 0;
+    Frame->interlaced_reversed = 0;
+    Frame->top_field_first = 0;
+    Frame->deinterlace_inuse = DEINT_BASIC | DEINT_DRIVER;
+    Frame->deinterlace_inuse2x = 0;
+}
