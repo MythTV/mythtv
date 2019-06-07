@@ -700,7 +700,18 @@ void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanT
         // we need a framebuffer
         if (!m_frameBuffer)
         {
-            m_frameBuffer = m_render->CreateFramebuffer(m_videoDispDim);
+            // Use a 16bit float framebuffer if necessary and available (not GLES2) to maintain precision.
+            // The depth check will pick up all software formats as well as NVDEC, VideoToolBox and VAAPI DRM.
+            // VAAPI GLXPixmap and GLXCopy are currently not 10/12bit aware and VDPAU has no 10bit support -
+            // and all return RGB formats anyway. The MediaCoded texture format is an unknown but resizing will
+            // never be enabled as it returns an RGB frame - so if MediaCodec uses a 16bit texture, precision
+            // will be preserved.
+            bool sixteenbitfb = !(m_render->isOpenGLES() && m_render->format().majorVersion() < 3);
+            bool sixteenbitvid = ColorDepth(m_outputType) > 8;
+            GLenum format = (sixteenbitfb && sixteenbitvid) ? QOpenGLTexture::RGBA16F : 0;
+            if (format)
+                LOG(VB_PLAYBACK, LOG_INFO, LOC + "Using 16bit framebuffer texture");
+            m_frameBuffer = m_render->CreateFramebuffer(m_videoDispDim, format);
             if (!m_frameBuffer)
                 return;
         }
