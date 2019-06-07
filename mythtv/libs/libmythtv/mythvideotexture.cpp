@@ -89,7 +89,7 @@ vector<MythVideoTexture*> MythVideoTexture::CreateTextures(MythRenderOpenGL *Con
  * \note This is a simple wrapper that deliberately does nothing more than create
  * a texture and sets suitable defaults. In most instances, hardware textures require
  * specific handling.
- * \note Linear filtering is always set.
+ * \note Linear filtering is always set (except MediaCodec)
 */
 vector<MythVideoTexture*> MythVideoTexture::CreateHardwareTextures(MythRenderOpenGL *Context,
                                                                    VideoFrameType Type,
@@ -131,7 +131,9 @@ vector<MythVideoTexture*> MythVideoTexture::CreateHardwareTextures(MythRenderOpe
         result.push_back(texture);
     }
 
-    SetTextureFilters(Context, result, QOpenGLTexture::Linear);
+    // N.B. Don't set filtering for MediaCodec textures as we need to set the texture type first
+    if (Type != FMT_MEDIACODEC)
+        SetTextureFilters(Context, result, QOpenGLTexture::Linear);
     return result;
 }
 

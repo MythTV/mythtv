@@ -95,7 +95,7 @@ int MythMediaCodecContext::HwDecoderInit(AVCodecContext *Context)
 {
     if (codec_is_mediacodec_dec(m_codecID))
         return 0;
-    else if (codec_is_mediacodec_dec(m_codecID))
+    else if (codec_is_mediacodec(m_codecID))
         return MythCodecContext::InitialiseDecoder2(Context, MythMediaCodecContext::InitialiseDecoder, "Create MediaCodec decoder");
     return -1;
 }
