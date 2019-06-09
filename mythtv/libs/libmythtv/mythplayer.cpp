@@ -644,7 +644,7 @@ FrameScanType MythPlayer::detectInterlace(FrameScanType newScan,
 {
     QString dbg = QString("detectInterlace(") + toQString(newScan) +
         QString(", ") + toQString(scan) + QString(", ") +
-        QString("%1").arg(fps) + QString(", ") +
+        QString("%1").arg(static_cast<double>(fps)) + QString(", ") +
         QString("%1").arg(video_height) + QString(") ->");
 
     if (kScan_Ignore != newScan || kScan_Detect == scan)
@@ -662,7 +662,7 @@ FrameScanType MythPlayer::detectInterlace(FrameScanType newScan,
             scan = newScan;
     };
 
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + dbg+toQString(scan));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + dbg +toQString(scan));
 
     return scan;
 }
@@ -682,7 +682,7 @@ void MythPlayer::AutoDeint(VideoFrame *frame, bool allow_lock)
         if (m_scan_tracker < 0)
         {
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                QString("interlaced frame seen after %1 progressive frames")
+                QString("Interlaced frame seen after %1 progressive frames")
                     .arg(abs(m_scan_tracker)));
             m_scan_tracker = 2;
             if (allow_lock)
@@ -699,7 +699,7 @@ void MythPlayer::AutoDeint(VideoFrame *frame, bool allow_lock)
         if (m_scan_tracker > 0)
         {
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                QString("progressive frame seen after %1 interlaced frames")
+                QString("Progressive frame seen after %1 interlaced frames")
                     .arg(m_scan_tracker));
             m_scan_tracker = 0;
         }
@@ -2661,14 +2661,18 @@ void MythPlayer::VideoStart(void)
     int fr_int = (1000000.0 / video_frame_rate / static_cast<double>(temp_speed));
     int rf_int = MythDisplay::GetDisplayInfo(fr_int).Rate();
 
-    // Default to Interlaced playback to allocate the deinterlacer structures
+    // Default to interlaced playback but set the tracker to progressive
     // Enable autodetection of interlaced/progressive from video stream
-    // And initialoze m_scan_tracker to 2 which will immediately switch to
-    // progressive if the first frame is progressive in AutoDeint().
+    // Previously we set to interlaced and the scan tracker to 2 but this
+    // mis-'detected' a number of streams as interlaced when they are progressive.
+    // This significantly reduces the number of errors and also ensures we do not
+    // needlessly setup deinterlacers - which may consume significant resources.
+    // We set to interlaced for those streams whose frame rate is initially detected
+    // as e.g. 59.9 when it is actually 29.97 interlaced.
     m_scan             = kScan_Interlaced;
     m_scan_locked      = false;
     m_double_framerate = false;
-    m_scan_tracker     = 2;
+    m_scan_tracker     = -2;
 
     if (player_ctx->IsPIP() && FlagIsSet(kVideoIsNull))
     {

@@ -1429,8 +1429,10 @@ float AvFormatDecoder::normalized_fps(AVStream *stream, AVCodecContext *enc)
         fps = codec_fps;
     else if (container_fps < 121.0 && container_fps > 3.0)
         fps = container_fps;
+    // certain H.264 interlaced streams are detected at 2x using estimated (i.e. wrong)
     else if (estimated_fps < 121.0 && estimated_fps > 3.0)
         fps = estimated_fps;
+    // but average is less reliable as it does not account for issues like repeat frames
     else if (avg_fps < 121.0 && avg_fps > 3.0)
         fps = avg_fps;
     else
@@ -3268,13 +3270,13 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
             SequenceHeader *seq = reinterpret_cast<SequenceHeader*>(
                 const_cast<uint8_t*>(bufptr));
 
-            uint  width  = seq->width()  >> context->lowres;
-            uint  height = seq->height() >> context->lowres;
+            int  width  = static_cast<int>(seq->width())  >> context->lowres;
+            int  height = static_cast<int>(seq->height()) >> context->lowres;
             m_current_aspect = seq->aspect(context->codec_id ==
                                          AV_CODEC_ID_MPEG1VIDEO);
             if (stream->sample_aspect_ratio.num)
-                m_current_aspect = av_q2d(stream->sample_aspect_ratio) *
-                    width / height;
+                m_current_aspect = static_cast<float>(av_q2d(stream->sample_aspect_ratio) *
+                                                              width / height);
             if (aspect_override > 0.0F)
                 m_current_aspect = aspect_override;
             float seqFPS = seq->fps();
@@ -3282,19 +3284,21 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
             bool changed =
                 (seqFPS > static_cast<float>(m_fps)+0.01F) ||
                 (seqFPS < static_cast<float>(m_fps)-0.01F);
-            changed |= (width  != (uint)m_current_width );
-            changed |= (height != (uint)m_current_height);
+            changed |= (width  != m_current_width );
+            changed |= (height != m_current_height);
 
             if (changed)
             {
                 if (m_private_dec)
                     m_private_dec->Reset();
 
+                // N.B. we now set the default scan to kScan_Ignore as interlaced detection based on frame
+                // size and rate is extremely error prone and FFmpeg gets it right far more often.
                 // as for H.264, if a decoder deinterlacer is in operation - the stream must be progressive
                 bool doublerate = false;
                 bool decoderdeint = m_mythcodecctx->IsDeinterlacing(doublerate);
-                m_parent->SetVideoParams(width, height, seqFPS, m_current_aspect,
-                                         decoderdeint ? kScan_Progressive : kScan_Detect);
+                m_parent->SetVideoParams(width, height, static_cast<double>(seqFPS), m_current_aspect,
+                                         decoderdeint ? kScan_Progressive : kScan_Ignore);
 
                 m_current_width  = width;
                 m_current_height = height;
@@ -3314,9 +3318,8 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
                 float avFPS = normalized_fps(stream, context);
                 if ((seqFPS > avFPS+0.01F) || (seqFPS < avFPS-0.01F))
                 {
-                    LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                        QString("avFPS(%1) != seqFPS(%2)")
-                            .arg(avFPS).arg(seqFPS));
+                    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("avFPS(%1) != seqFPS(%2)")
+                            .arg(static_cast<double>(avFPS)).arg(static_cast<double>(seqFPS)));
                 }
             }
 
@@ -3365,7 +3368,7 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
 
     while (buf < buf_end)
     {
-        buf += m_h264_parser->addBytes(buf, buf_end - buf, 0);
+        buf += m_h264_parser->addBytes(buf, static_cast<unsigned int>(buf_end - buf), 0);
 
         if (m_h264_parser->stateChanged())
         {
@@ -3401,10 +3404,13 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
             if (m_private_dec)
                 m_private_dec->Reset();
 
+            // N.B. we now set the default scan to kScan_Ignore as interlaced detection based on frame
+            // size and rate is extremely error prone and FFmpeg gets it right far more often.
             // N.B. if a decoder deinterlacer is in use - the stream must be progressive
             bool doublerate = false;
             bool decoderdeint = m_mythcodecctx->IsDeinterlacing(doublerate);
-            m_parent->SetVideoParams(width, height, seqFPS, m_current_aspect, decoderdeint ? kScan_Progressive : kScan_Detect);
+            m_parent->SetVideoParams(width, height, seqFPS, m_current_aspect,
+                                     decoderdeint ? kScan_Progressive : kScan_Ignore);
 
             m_current_width  = width;
             m_current_height = height;

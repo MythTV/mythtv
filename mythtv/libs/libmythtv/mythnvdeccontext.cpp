@@ -230,6 +230,14 @@ void MythNVDECContext::SetDeinterlacing(AVCodecContext *Context,
     if (!Context)
         return;
 
+    // Don't enable for anything that cannot be interlaced
+    // We could use frame rate here but initial frame rate detection is not always accurate
+    // and we lose little by enabling deinterlacing. NVDEC will not deinterlace a
+    // progressive stream and any CUDA capable video card has memory to spare
+    // (assuming it even sets up deinterlacing for a progressive stream)
+    if (Context->height == 720) // 720P
+        return;
+
     MythDeintType deinterlacer = DEINT_NONE;
     MythDeintType singlepref = DEINT_HIGH | DEINT_DRIVER;
     MythDeintType doublepref = DoubleRate ? DEINT_HIGH | DEINT_DRIVER : DEINT_NONE;
