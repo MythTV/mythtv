@@ -94,6 +94,7 @@ class VideoOutWindow : public QObject
     void ApplySnapToVideoRect    (void);
     void PrintMoveResizeDebug    (void);
     void SetVideoAspectRatio     (float Aspect);
+    QSize Fix1088                (QSize Dimensions);
 
   private:
     QPoint  m_dbMove;         ///< Percentage move from database

@@ -459,7 +459,7 @@ bool VideoOutWindow::Init(const QSize &VideoDim, const QSize &VideoDispDim,
     if (m_pipState == kPBPRight)
             m_displayVisibleRect.moveLeft(pbp_width);
 
-    m_videoDispDim = VideoDispDim;
+    m_videoDispDim = Fix1088(VideoDispDim);
     m_videoDim = VideoDim;
     m_videoRect = QRect(m_displayVisibleRect.topLeft(), m_videoDispDim);
 
@@ -557,10 +557,18 @@ void VideoOutWindow::VideoAspectRatioChanged(float Aspect)
  */
 bool VideoOutWindow::InputChanged(const QSize &VideoDim, const QSize &VideoDispDim, float Aspect)
 {
-    m_videoDispDim = VideoDispDim;
+    m_videoDispDim = Fix1088(VideoDispDim);
     m_videoDim     = VideoDim;
     SetVideoAspectRatio(Aspect);
     return true;
+}
+
+QSize VideoOutWindow::Fix1088(QSize Dimensions)
+{
+    QSize result = Dimensions;
+    if ((result.height() == 1088) && ((result.width() == 1920) || (result.width() == 1440)))
+        result.setHeight(1080);
+    return result;
 }
 
 /**
