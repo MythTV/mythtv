@@ -256,108 +256,103 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Deint)
 
     if ((Default == Type) || (!format_is_yuv(m_outputType)))
     {
-        fragment = DefaultFragmentShader;
+        fragment = RGBFragmentShader;
 #ifdef USING_MEDIACODEC
         if (FMT_MEDIACODEC == m_inputType)
             vertex = MediaCodecVertexShader;
 #endif
     }
     // no interlaced shaders yet (i.e. interlaced chroma upsampling - not deinterlacers)
-    else if ((Progressive == Type) || (Interlaced == Type) || (Deint == DEINT_NONE))
+    else
     {
+        fragment = YUVFragmentShader;
+        QStringList defines;
+        bool kernel = false;
+        bool topfield = InterlacedTop == Type;
+        bool progressive = (Progressive == Type) || (Interlaced == Type) || (Deint == DEINT_NONE);
         if (format_is_420(m_outputType) || format_is_422(m_outputType) || format_is_444(m_outputType))
         {
-            fragment = YV12RGBFragmentShader;
+            defines << "YV12";
             cost = 3;
         }
         else if (format_is_nv12(m_outputType))
         {
-            fragment = NV12FragmentShader;
+            defines << "NV12";
             cost = 2;
         }
-        else if (format_is_packed(m_outputType))
+        else if (FMT_YUY2 == m_outputType)
+            defines << "YUYV" << "YUY2";
+        else if (FMT_YUYVHQ == m_outputType)
+            defines << "YUYV";
+
+        if (!progressive)
         {
-            fragment = YUV2RGBFragmentShader;
-            cost = 1;
+            if (topfield)
+                defines << "TOPFIELD";
+            switch (Deint)
+            {
+                case DEINT_BASIC:  cost *= 2;  defines << defines << "ONEFIELD"; break;
+                case DEINT_MEDIUM: cost *= 5;  defines << "LINEARBLEND"; break;
+                case DEINT_HIGH:   cost *= 15; defines << "KERNEL"; kernel = true; break;
+                default: break;
+            }
         }
-    }
-    else
-    {
-        uint bottom = (InterlacedBot == Type);
-        if (format_is_420(m_outputType) || format_is_422(m_outputType) || format_is_444(m_outputType))
+
+        // Start building the new fragment shader
+        // We do this in code otherwise the shader string becomes monolithic
+
+        // 'expand' calls to sampleYUV for multiple planes
+        // do this before we add the samplers
+        int count = static_cast<int>(planes(m_outputType));
+        for (int i = (kernel ? 2 : 0); (i >= 0) && count; i--)
         {
-            if (Deint == DEINT_BASIC)
+            QString find = QString("s_texture%1").arg(i);
+            QStringList replacelist;
+            for (int j = (i * count); j < ((i + 1) * count); ++j)
+                replacelist << QString("s_texture%1").arg(j);
+            fragment.replace(find, replacelist.join(", "));
+        }
+
+        // 'expand' calls to the kernel function
+        if (kernel && count)
+        {
+            for (int i = 1 ; i >= 0; i--)
             {
-                fragment = YV12RGBOneFieldFragmentShader[bottom];
-                cost = 6;
+                QString find1 = QString("sampler2D kernelTex%1").arg(i);
+                QString find2 = QString("kernelTex%1").arg(i);
+                QStringList replacelist1, replacelist2;
+                for (int j = 0; j < count; ++j)
+                {
+                    replacelist1 << QString("sampler2D kernelTexture%1%2").arg(i).arg(j);
+                    replacelist2 << QString("kernelTexture%1%2").arg(i).arg(j);
+                }
+                fragment.replace(find1, replacelist1.join(", "));
+                fragment.replace(find2, replacelist2.join(", "));
             }
-            else if (Deint == DEINT_MEDIUM)
-            {
-                fragment = YV12RGBLinearBlendFragmentShader[bottom];
-                cost = 15;
-            }
-            else if (Deint == DEINT_HIGH)
-            {
-                fragment = YV12RGBKernelShader[bottom];
-                cost = 45;
-            }
+        }
+
+        // Add defines
+        QString newfragment;
+        foreach (QString define, defines)
+            newfragment += QString("#define MYTHTV_%1\n").arg(define);
+
+        // Add the required samplers
+        int start = 0;
+        int end   = count;
+        if (kernel)
+        {
+            end *= 3;
+            if (topfield)
+                start += count;
             else
-            {
-                fragment = YV12RGBFragmentShader;
-                cost = 3;
-            }
+                end -= count;
         }
-        else if (format_is_nv12(m_outputType))
-        {
-            if (Deint == DEINT_BASIC)
-            {
-                fragment = NV12OneFieldFragmentShader[bottom];
-                cost = 4;
-            }
-            else if (Deint == DEINT_MEDIUM)
-            {
-                fragment = NV12LinearBlendFragmentShader[bottom];
-                cost = 10;
-            }
-            else if (Deint == DEINT_HIGH)
-            {
-                fragment = NV12KernelShader[bottom];
-                cost = 30;
-            }
-            else
-            {
-                fragment = NV12FragmentShader;
-                cost = 2;
-            }
-        }
-        else //packed
-        {
-            if (Deint == DEINT_BASIC)
-            {
-                fragment = OneFieldShader[bottom];
-                cost = 2;
-            }
-            else if (Deint == DEINT_MEDIUM)
-            {
-                fragment = LinearBlendShader[bottom];
-                cost = 5;
-            }
-            else if (Deint == DEINT_HIGH)
-            {
-                fragment = KernelShader[bottom];
-                cost = 15;
-            }
-            else
-            {
-                fragment = YUV2RGBFragmentShader;
-                cost = 1;
-            }
-        }
+        for (int i = start; i < end; ++i)
+            newfragment += QString("uniform sampler2D s_texture%1;\n").arg(i);
+        fragment = newfragment + fragment;
+
     }
 
-    fragment.replace("SELECT_COLUMN", (FMT_YUY2 == m_outputType) ? SelectColumn : "");
-    // update packing code so this can be removed
-    fragment.replace("%SWIZZLE%", (FMT_YUY2 == m_outputType) ? "arb" : "abr");
 
 #ifdef USING_VTB
     // N.B. Rectangular texture support is only currently used for VideoToolBox
