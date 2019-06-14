@@ -257,9 +257,11 @@ typedef enum
 
 #define codec_is_omxegl(id)   ((id > kCodec_OMXEGL_BEGIN) && (id < kCodec_OMXEGL_END))
 
-#define codec_sw_copy(id) (codec_is_std(id) || codec_is_mediacodec_dec(id) || \
-                           codec_is_vaapi_dec(id) || codec_is_nvdec_dec(id) || \
-                           codec_is_vtb_dec(id) || codec_is_vdpau_dec(id))
+#define codec_is_copyback(id) (codec_is_mediacodec_dec(id) || \
+                               codec_is_vaapi_dec(id) || codec_is_nvdec_dec(id) || \
+                               codec_is_vtb_dec(id) || codec_is_vdpau_dec(id))
+
+#define codec_sw_copy(id)     (codec_is_std(id) || codec_is_copyback(id))
 
 QString get_encoding_type(MythCodecID codecid);
 QString get_decoder_name(MythCodecID codec_id);

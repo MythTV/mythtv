@@ -10,6 +10,7 @@
 #include "mythtvexp.h"
 #include "mythframe.h"
 #include "mythdeque.h"
+#include "mythcodecid.h"
 
 // Std
 #include <vector>
@@ -65,9 +66,9 @@ class MTV_PUBLIC VideoBuffers
     bool CreateBuffers(VideoFrameType Type, int Width, int Height,
                        vector<YUVInfo> YUVInfos);
     bool CreateBuffers(VideoFrameType Type, int Width, int Height);
-    bool ReinitBuffer(VideoFrame *Frame, VideoFrameType Type);
+    bool ReinitBuffer(VideoFrame *Frame, VideoFrameType Type, MythCodecID CodecID);
     void DeleteBuffers(void);
-    void SetDeinterlacing(MythDeintType Single, MythDeintType Double);
+    void SetDeinterlacing(MythDeintType Single, MythDeintType Double, MythCodecID CodecID);
 
     void Reset(void);
     void DiscardFrames(bool NextFrameIsKeyFrame);
@@ -122,7 +123,8 @@ class MTV_PUBLIC VideoBuffers
     const frame_queue_t *Queue(BufferType Type) const;
     VideoFrame          *GetNextFreeFrameInternal(BufferType EnqueueTo);
     void                 ReleaseDecoderResources(VideoFrame *Frame);
-    void                 SetDeinterlacingFlags(VideoFrame &Frame, MythDeintType Single, MythDeintType Double);
+    void                 SetDeinterlacingFlags(VideoFrame &Frame, MythDeintType Single,
+                                               MythDeintType Double, MythCodecID CodecID);
 
     frame_queue_t        m_available;
     frame_queue_t        m_used;

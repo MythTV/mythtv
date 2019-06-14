@@ -436,7 +436,7 @@ void VideoOutput::SetDeinterlacing(bool Enable, bool DoubleRate)
 {
     if (!Enable)
     {
-        vbuffers.SetDeinterlacing(DEINT_NONE, DEINT_NONE);
+        vbuffers.SetDeinterlacing(DEINT_NONE, DEINT_NONE, video_codec_id);
         return;
     }
 
@@ -449,7 +449,7 @@ void VideoOutput::SetDeinterlacing(bool Enable, bool DoubleRate)
     //}
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("SetDeinterlacing: %1 DoubleRate %2")
         .arg(DeinterlacerPref(singlerate)).arg(DeinterlacerPref(doublerate)));
-    vbuffers.SetDeinterlacing(singlerate, doublerate);
+    vbuffers.SetDeinterlacing(singlerate, doublerate, video_codec_id);
 }
 
 /**
@@ -1446,7 +1446,7 @@ VideoFrameType* VideoOutput::DirectRenderFormats(void)
 
 bool VideoOutput::ReAllocateFrame(VideoFrame *Frame, VideoFrameType Type)
 {
-    return vbuffers.ReinitBuffer(Frame, Type);
+    return vbuffers.ReinitBuffer(Frame, Type, video_codec_id);
 }
 
 bool VideoOutput::IsEmbedding(void)

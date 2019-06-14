@@ -201,7 +201,7 @@ void VideoOutputNull::StopEmbedding(void)
 
 void VideoOutputNull::SetDeinterlacing(bool, bool)
 {
-    vbuffers.SetDeinterlacing(DEINT_NONE, DEINT_NONE);
+    vbuffers.SetDeinterlacing(DEINT_NONE, DEINT_NONE, video_codec_id);
 }
 
 void VideoOutputNull::PrepareFrame(VideoFrame *buffer, FrameScanType t,

@@ -7,6 +7,7 @@
 #include "fourcc.h"
 #include "compat.h"
 #include "mythlogging.h"
+#include "mythcodecid.h"
 #include "videobuffers.h"
 
 // FFmpeg
@@ -211,15 +212,16 @@ void VideoBuffers::Init(uint NumDecode, bool ExtraForPause,
 
     for (uint i = 0; i < NumDecode; i++)
         Enqueue(kVideoBuffer_avail, At(i));
-    SetDeinterlacing(DEINT_NONE, DEINT_NONE);
+    SetDeinterlacing(DEINT_NONE, DEINT_NONE, kCodec_NONE);
 }
 
-void VideoBuffers::SetDeinterlacing(MythDeintType Single, MythDeintType Double)
+void VideoBuffers::SetDeinterlacing(MythDeintType Single, MythDeintType Double,
+                                    MythCodecID CodecID)
 {
     QMutexLocker locker(&m_globalLock);
     frame_vector_t::iterator it = m_buffers.begin();
     for ( ; it != m_buffers.end(); ++it)
-        SetDeinterlacingFlags(*it, Single, Double);
+        SetDeinterlacingFlags(*it, Single, Double, CodecID);
 }
 
 /*! \brief Set the appropriate flags for single and double rate deinterlacing
@@ -227,19 +229,34 @@ void VideoBuffers::SetDeinterlacing(MythDeintType Single, MythDeintType Double)
  * \note Driver deinterlacers are only available for hardware frames with the exception of
  * NVDEC and VTB which can use shaders.
  * \note Shader and CPU deinterlacers are disabled for hardware frames (except for shaders with NVDEC and VTB)
- * \note There is no support for CPU deinterlacing of NV12 frames (and 10bit eqivalents) so we
- * fallback to shaders
  * \todo Handling of decoder deinterlacing with NVDEC
 */
-void VideoBuffers::SetDeinterlacingFlags(VideoFrame &Frame, MythDeintType Single, MythDeintType Double)
+void VideoBuffers::SetDeinterlacingFlags(VideoFrame &Frame, MythDeintType Single,
+                                         MythDeintType Double, MythCodecID CodecID)
 {
-    static const MythDeintType hardware = DEINT_ALL & ~(DEINT_CPU | DEINT_SHADER);
-    static const MythDeintType software = DEINT_ALL & ~DEINT_DRIVER;
-    static const MythDeintType shaders  = software & ~DEINT_CPU;
-    Frame.deinterlace_single = Single;
-    Frame.deinterlace_double = Double;
-    Frame.deinterlace_allowed = format_is_hw(Frame.codec) ? (format_is_hwyuv(Frame.codec) ? software : hardware) :
-                               (format_is_nv12(Frame.codec) ? shaders : software);
+    static const MythDeintType driver   = DEINT_ALL & ~(DEINT_CPU | DEINT_SHADER);
+    static const MythDeintType shader   = DEINT_ALL & ~(DEINT_CPU | DEINT_DRIVER);
+    static const MythDeintType software = DEINT_ALL & ~(DEINT_SHADER | DEINT_DRIVER);
+    Frame.deinterlace_single  = Single;
+    Frame.deinterlace_double  = Double;
+
+    if (codec_is_copyback(CodecID))
+    {
+        if (codec_is_vaapi_dec(CodecID) || codec_is_nvdec_dec(CodecID))
+            Frame.deinterlace_allowed = software | shader | driver;
+        else // VideoToolBox, MediaCodec and VDPAU copyback
+            Frame.deinterlace_allowed = software | shader;
+    }
+    else if (FMT_VTB == Frame.codec)
+        Frame.deinterlace_allowed = shader; // No driver deint and YUV frames returned
+    else if (FMT_NVDEC == Frame.codec)
+        Frame.deinterlace_allowed = shader | driver; // YUV frames and decoder deint
+    else if (FMT_VDPAU == Frame.codec)
+        Frame.deinterlace_allowed = driver; // No YUV frames for shaders
+    else if (FMT_VAAPI == Frame.codec)
+        Frame.deinterlace_allowed = driver; // DRM will allow shader if no VPP
+    else
+        Frame.deinterlace_allowed = software | shader;
 }
 
 /**
@@ -890,7 +907,7 @@ void VideoBuffers::DeleteBuffers(void)
         av_freep(&(m_buffers[i].buf));
 }
 
-bool VideoBuffers::ReinitBuffer(VideoFrame *Frame, VideoFrameType Type)
+bool VideoBuffers::ReinitBuffer(VideoFrame *Frame, VideoFrameType Type, MythCodecID CodecID)
 {
     if (!Frame)
         return false;
@@ -929,7 +946,7 @@ bool VideoBuffers::ReinitBuffer(VideoFrame *Frame, VideoFrameType Type)
             MythDeintType doubler = Frame->deinterlace_double;
             init(Frame, Type, buf, Frame->width, Frame->height, size);
             // retain deinterlacer settings and update restrictions based on new frame type
-            SetDeinterlacingFlags(*Frame, singler, doubler);
+            SetDeinterlacingFlags(*Frame, singler, doubler, CodecID);
             clear(Frame);
             LOG(VB_PLAYBACK, LOG_INFO, QString("Reallocated frame %1->%2")
                 .arg(format_description(old)).arg(format_description(Type)));
