@@ -141,6 +141,11 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext *Context,
     if (!(Decoder == "vaapi" || Decoder == "vaapi-dec") || !HaveVAAPI() || getenv("NO_VAAPI"))
         return failure;
 
+    // Simple check for known profile
+    VAProfile desired = VAAPIProfileForCodec(Context);
+    if (desired == VAProfileNone)
+        return failure;
+
     // direct rendering needs interop support
     if (!decodeonly && (MythOpenGLInterop::GetInteropType(success) == MythOpenGLInterop::Unsupported))
         return failure;
@@ -166,46 +171,31 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext *Context,
         }
     }
 
-    bool foundhwfmt   = false;
-    bool foundswfmt   = false;
     bool foundprofile = false;
     bool foundentry   = false;
     bool sizeok       = true;
 
-    AVHWFramesConstraints *constraints = av_hwdevice_get_hwframe_constraints(hwdevicectx, nullptr);
-    if (constraints)
+    VAConfigID config;
+    if (vaCreateConfig(hwctx->display, desired, VAEntrypointVLD, nullptr, 0, &config) == VA_STATUS_SUCCESS)
     {
-        if ((constraints->min_width > Context->width) || (constraints->min_height > Context->height))
-            sizeok = false;
-        if ((constraints->max_width < Context->width) || (constraints->max_height < Context->height))
-            sizeok = false;
+        AVVAAPIHWConfig *hwconfig = reinterpret_cast<AVVAAPIHWConfig*>(av_hwdevice_hwconfig_alloc(hwdevicectx));
+        hwconfig->config_id = config;
+        AVHWFramesConstraints *constraints = av_hwdevice_get_hwframe_constraints(hwdevicectx, hwconfig);
+        vaDestroyConfig(hwctx->display, config);
+        av_free(hwconfig);
 
-        enum AVPixelFormat *valid = constraints->valid_sw_formats;
-        while (*valid != AV_PIX_FMT_NONE)
+        if (constraints)
         {
-            if (*valid == PixFmt)
-            {
-                foundswfmt = true;
-                break;
-            }
-            valid++;
+            if ((constraints->min_width > Context->width) || (constraints->min_height > Context->height))
+                sizeok = false;
+            if ((constraints->max_width < Context->width) || (constraints->max_height < Context->height))
+                sizeok = false;
+            av_hwframe_constraints_free(&constraints);
         }
-        valid = constraints->valid_hw_formats;
-        while (*valid != AV_PIX_FMT_NONE)
-        {
-            if (*valid == AV_PIX_FMT_VAAPI)
-            {
-                foundhwfmt = true;
-                break;
-            }
-            valid++;
-        }
-        av_hwframe_constraints_free(&constraints);
     }
 
     // FFmpeg checks profiles very late and never checks entrypoints.
     int profilecount = vaMaxNumProfiles(hwctx->display);
-    VAProfile desired = VAAPIProfileForCodec(Context);
     VAProfile *profilelist = static_cast<VAProfile*>(av_malloc_array(static_cast<size_t>(profilecount), sizeof(VAProfile)));
     if (vaQueryConfigProfiles(hwctx->display, profilelist, &profilecount) == VA_STATUS_SUCCESS)
     {
@@ -262,7 +252,7 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext *Context,
 
     av_buffer_unref(&hwdevicectx);
 
-    if (foundhwfmt && foundswfmt && foundprofile && sizeok && foundentry)
+    if (foundprofile && sizeok && foundentry)
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' supports decoding '%2 %3'")
                 .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_VAAPI)).arg((*Codec)->name)
@@ -272,9 +262,9 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext *Context,
     }
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
-            QString("HW device type '%1' does not support '%2 %7' (format: %3 size: %4 profile: %5 entry: %6)")
+            QString("HW device type '%1' does not support '%2 %7' (Size:%3 Profile:%4 Entry: %5)")
             .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_VAAPI)).arg((*Codec)->name)
-            .arg(foundswfmt).arg(sizeok).arg(foundprofile).arg(foundentry)
+            .arg(sizeok).arg(foundprofile).arg(foundentry)
             .arg(av_get_pix_fmt_name(Context->pix_fmt)));
     return failure;
 }
