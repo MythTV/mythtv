@@ -34,12 +34,28 @@ class MythVAAPIInterop : public MythOpenGLInterop
     VADisplay   GetDisplay   (void);
     QString     GetVendor    (void);
 
-  protected:
-    void IniitaliseDisplay   (void);
+    static bool SetupDeinterlacer (MythDeintType Deinterlacer, bool DoubleRate,
+                                   AVBufferRef *FramesContext, int Width, int Height,
+                                   AVFilterGraph *&Graph, AVFilterContext *&Source,
+                                   AVFilterContext *&Sink);
 
   protected:
-    VADisplay           m_vaDisplay;
-    QString             m_vaVendor;
+    void IniitaliseDisplay   (void);
+    VASurfaceID Deinterlace  (VideoFrame *Frame, VASurfaceID Current, FrameScanType Scan);
+    void DestroyDeinterlacer (void);
+
+  protected:
+    VADisplay        m_vaDisplay         { nullptr };
+    QString          m_vaVendor          { };
+
+    MythDeintType    m_deinterlacer      { DEINT_NONE };
+    bool             m_deinterlacer2x    { false      };
+    AVFilterContext *m_filterSink        { nullptr };
+    AVFilterContext *m_filterSource      { nullptr };
+    AVFilterGraph   *m_filterGraph       { nullptr };
+    bool             m_filterError       { false   };
+    int              m_filterWidth       { 0 };
+    int              m_filterHeight      { 0 };
 };
 
 class MythVAAPIInteropGLX : public MythVAAPIInterop
@@ -62,7 +78,7 @@ class MythVAAPIInteropGLX : public MythVAAPIInterop
     int                 m_vaapiPictureAttributeCount;
     int                 m_vaapiHueBase;
     uint                m_vaapiColourSpace;
-    MythDeintType       m_deinterlacer;
+    MythDeintType       m_basicDeinterlacer;
 };
 
 class MythVAAPIInteropGLXCopy : public MythVAAPIInteropGLX

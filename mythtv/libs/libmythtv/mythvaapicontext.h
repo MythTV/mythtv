@@ -12,13 +12,22 @@ extern "C" {
 #include "libavutil/pixfmt.h"
 #include "libavutil/hwcontext.h"
 #include "libavcodec/avcodec.h"
+#include "libavfilter/avfilter.h"
+#include "libavformat/avformat.h"
+#include "libavfilter/buffersrc.h"
 }
 
 class MTV_PUBLIC MythVAAPIContext : public MythCodecContext
 {
   public:
-    explicit MythVAAPIContext(MythCodecID CodecID);
+    explicit MythVAAPIContext            (MythCodecID CodecID);
+   ~MythVAAPIContext() override;
+
     int    HwDecoderInit                 (AVCodecContext *Context) override;
+    int    FilteredReceiveFrame          (AVCodecContext *Context, AVFrame *Frame) override;
+    void   PostProcessFrame              (AVCodecContext *Context, VideoFrame *Frame) override;
+    bool   IsDeinterlacing               (bool &DoubleRate) override;
+
     static MythCodecID GetSupportedCodec (AVCodecContext *Context,
                                           AVCodec       **Codec,
                                           const QString  &Decoder,
@@ -33,6 +42,19 @@ class MTV_PUBLIC MythVAAPIContext : public MythCodecContext
   private:
     static int  InitialiseContext        (AVCodecContext *Context);
     static VAProfile VAAPIProfileForCodec(const AVCodecContext *Codec);
+    void        DestroyDeinterlacer      (void);
+
+    MythDeintType    m_deinterlacer      { DEINT_NONE };
+    bool             m_deinterlacer2x    { false      };
+    AVFilterContext *m_filterSink        { nullptr };
+    AVFilterContext *m_filterSource      { nullptr };
+    AVFilterGraph   *m_filterGraph       { nullptr };
+    bool             m_filterError       { false   };
+    AVBufferRef     *m_framesCtx         { nullptr };
+    int64_t          m_filterPriorPTS[2] { 0 };
+    int64_t          m_filterPTSUsed     { 0 };
+    int              m_filterWidth       { 0 };
+    int              m_filterHeight      { 0 };
 };
 
 #endif // MYTHVAAPICONTEXT_H

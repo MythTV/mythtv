@@ -1,4 +1,4 @@
-// Qt
+﻿// Qt
 #include <QCoreApplication>
 #include <QWaitCondition>
 
@@ -14,6 +14,7 @@
 extern "C" {
 #include "libavutil/hwcontext_vaapi.h"
 #include "libavutil/pixdesc.h"
+#include "libavfilter/buffersink.h"
 }
 
 #define LOC QString("VAAPIDec: ")
@@ -21,6 +22,11 @@ extern "C" {
 MythVAAPIContext::MythVAAPIContext(MythCodecID CodecID)
   : MythCodecContext(CodecID)
 {
+}
+
+MythVAAPIContext::~MythVAAPIContext(void)
+{
+    DestroyDeinterlacer();
 }
 
 int MythVAAPIContext::HwDecoderInit(AVCodecContext *Context)
@@ -31,7 +37,6 @@ int MythVAAPIContext::HwDecoderInit(AVCodecContext *Context)
     }
     else if (codec_is_vaapi_dec(m_codecID))
     {
-
         AVBufferRef *device = MythCodecContext::CreateDevice(AV_HWDEVICE_TYPE_VAAPI,
                                                           gCoreContext->GetSetting("VAAPIDevice"));
         if (device)
@@ -446,4 +451,167 @@ bool MythVAAPIContext::HaveVAAPI(bool ReCheck /*= false*/)
     }
 
     return havevaapi;
+}
+
+/*! \brief Retrieve decoded frame and optionally deinterlace.
+ *
+ * \note Deinterlacing is setup in PostProcessFrame which has
+ * access to deinterlacer preferences.
+*/
+int MythVAAPIContext::FilteredReceiveFrame(AVCodecContext *Context, AVFrame *Frame)
+{
+    int ret = 0;
+
+    while (true)
+    {
+        if (m_filterGraph && ((m_filterWidth != Context->width) || (m_filterHeight != Context->height)))
+        {
+            LOG(VB_GENERAL, LOG_WARNING, LOC + "Input changed - deleting filter");
+            DestroyDeinterlacer();
+        }
+
+        if (m_filterGraph)
+        {
+            ret = av_buffersink_get_frame(m_filterSink, Frame);
+            if  (ret >= 0)
+            {
+                if (m_filterPriorPTS[0] && m_filterPTSUsed == m_filterPriorPTS[1])
+                {
+                    Frame->pts = m_filterPriorPTS[1] + (m_filterPriorPTS[1] - m_filterPriorPTS[0]) / 2;
+                    Frame->scte_cc_len = 0;
+                    Frame->atsc_cc_len = 0;
+                    av_frame_remove_side_data(Frame, AV_FRAME_DATA_A53_CC);
+                }
+                else
+                {
+                    Frame->pts = m_filterPriorPTS[1];
+                    m_filterPTSUsed = m_filterPriorPTS[1];
+                }
+            }
+            if (ret != AVERROR(EAGAIN))
+                break;
+        }
+
+        // EAGAIN or no filter graph
+        ret = avcodec_receive_frame(Context, Frame);
+        if (ret < 0)
+            break;
+
+        m_filterPriorPTS[0] = m_filterPriorPTS[1];
+        m_filterPriorPTS[1] = Frame->pts;
+
+        if (!m_filterGraph)
+            break;
+
+        ret = av_buffersrc_add_frame(m_filterSource, Frame);
+        if (ret < 0)
+            break;
+    }
+
+    return ret;
+}
+
+void MythVAAPIContext::PostProcessFrame(AVCodecContext* Context, VideoFrame *Frame)
+{
+    if (!Frame || !codec_is_vaapi_dec(m_codecID) || !Context->hw_frames_ctx)
+        return;
+
+    // if VAAPI driver deints are errored or not available (older boards), then
+    // allow CPU/GLSL
+    if (m_filterError)
+    {
+        Frame->deinterlace_allowed = Frame->deinterlace_allowed & ~DEINT_DRIVER;
+        return;
+    }
+
+    // if this frame has already been deinterlaced, then flag the deinterlacer
+    // the FFmpeg vaapi deint filter does actually mark frames as progressive
+    if (m_deinterlacer)
+    {
+        Frame->deinterlace_inuse = m_deinterlacer | DEINT_DRIVER;
+        Frame->deinterlace_inuse2x = m_deinterlacer2x;
+    }
+
+    // N.B. this picks up the scan tracking in MythPlayer. So we can
+    // auto enable deinterlacing etc and override Progressive/Interlaced - but
+    // no reversed interlaced.
+    MythDeintType vaapideint = DEINT_NONE;
+    MythDeintType singlepref = GetSingleRateOption(Frame, DEINT_DRIVER);
+    MythDeintType doublepref = GetDoubleRateOption(Frame, DEINT_DRIVER);
+    bool doublerate = true;
+    bool other = false;
+
+    // For decode only, a CPU or shader deint may also be used/preferred
+    if (doublepref)
+        vaapideint = doublepref;
+    else if (GetDoubleRateOption(Frame, DEINT_CPU | DEINT_SHADER))
+        other = true;
+
+    if (!vaapideint && !other && singlepref)
+    {
+        doublerate = false;
+        vaapideint = singlepref;
+    }
+
+    // nothing to see
+    if (vaapideint == DEINT_NONE)
+    {
+        if (m_deinterlacer)
+            DestroyDeinterlacer();
+        return;
+    }
+
+    // already setup
+    if ((m_deinterlacer == vaapideint) && (m_deinterlacer2x == doublerate))
+        return;
+
+    // Start from scratch
+    DestroyDeinterlacer();
+    m_framesCtx = av_buffer_ref(Context->hw_frames_ctx);
+    if (!MythVAAPIInterop::SetupDeinterlacer(vaapideint, doublerate, Context->hw_frames_ctx,
+                                             Context->width, Context->height,
+                                             m_filterGraph, m_filterSource, m_filterSink))
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to create deinterlacer %1 - disabling")
+            .arg(DeinterlacerName(vaapideint | DEINT_DRIVER, doublerate, FMT_VAAPI)));
+        DestroyDeinterlacer();
+        m_filterError = true;
+    }
+    else
+    {
+        m_deinterlacer = vaapideint;
+        m_deinterlacer2x = doublerate;
+        m_filterWidth = Context->width;
+        m_filterHeight = Context->height;
+    }
+}
+
+bool MythVAAPIContext::IsDeinterlacing(bool &DoubleRate)
+{
+    if (m_deinterlacer)
+    {
+        DoubleRate = m_deinterlacer2x;
+        return true;
+    }
+    DoubleRate = false;
+    return false;
+}
+
+void MythVAAPIContext::DestroyDeinterlacer(void)
+{
+    if (m_filterGraph)
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Destroying VAAPI deinterlacer");
+    avfilter_graph_free(&m_filterGraph);
+    m_filterGraph = nullptr;
+    m_filterSink = nullptr;
+    m_filterSource = nullptr;
+    m_filterPTSUsed = 0;
+    m_filterPriorPTS[0] = 0;
+    m_filterPriorPTS[1] = 0;
+    m_filterWidth = 0;
+    m_filterHeight = 0;
+    if (m_framesCtx)
+        av_buffer_unref(&m_framesCtx);
+    m_deinterlacer = DEINT_NONE;
+    m_deinterlacer2x = false;
 }

@@ -4,6 +4,11 @@
 #include "fourcc.h"
 #include "mythvaapiinterop.h"
 
+extern "C" {
+#include "libavfilter/buffersrc.h"
+#include "libavfilter/buffersink.h"
+}
+
 #define LOC QString("VAAPIInterop: ")
 
 #define INIT_ST \
@@ -72,14 +77,13 @@ MythVAAPIInterop* MythVAAPIInterop::Create(MythRenderOpenGL *Context, Type Inter
 }
 
 MythVAAPIInterop::MythVAAPIInterop(MythRenderOpenGL *Context, Type InteropType)
-  : MythOpenGLInterop(Context, InteropType),
-    m_vaDisplay(nullptr),
-    m_vaVendor()
+  : MythOpenGLInterop(Context, InteropType)
 {
 }
 
 MythVAAPIInterop::~MythVAAPIInterop()
 {
+    DestroyDeinterlacer();
     if (m_vaDisplay)
         if (vaTerminate(m_vaDisplay) != VA_STATUS_SUCCESS)
             LOG(VB_GENERAL, LOG_WARNING, LOC + "Error closing VAAPI display");
@@ -112,6 +116,20 @@ void MythVAAPIInterop::IniitaliseDisplay(void)
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Created VAAPI %1.%2 display for %3 (%4)")
             .arg(major).arg(minor).arg(TypeToString(m_type)).arg(m_vaVendor));
     }
+}
+
+void MythVAAPIInterop::DestroyDeinterlacer(void)
+{
+    if (m_filterGraph)
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Destroying VAAPI deinterlacer");
+    avfilter_graph_free(&m_filterGraph);
+    m_filterGraph = nullptr;
+    m_filterSink = nullptr;
+    m_filterSource = nullptr;
+    m_filterWidth = 0;
+    m_filterHeight = 0;
+    m_deinterlacer = DEINT_NONE;
+    m_deinterlacer2x = false;
 }
 
 VASurfaceID MythVAAPIInterop::VerifySurface(MythRenderOpenGL *Context, VideoFrame *Frame)
@@ -153,7 +171,7 @@ MythVAAPIInteropGLX::MythVAAPIInteropGLX(MythRenderOpenGL *Context, Type Interop
     m_vaapiPictureAttributeCount(0),
     m_vaapiHueBase(0),
     m_vaapiColourSpace(0),
-    m_deinterlacer(DEINT_NONE)
+    m_basicDeinterlacer(DEINT_NONE)
 {
 }
 
@@ -168,9 +186,12 @@ uint MythVAAPIInteropGLX::GetFlagsForFrame(VideoFrame *Frame, FrameScanType Scan
     if (!Frame)
         return flags;
 
-    // Set deinterlacing. If VAAPI deinterlacing is enabled and available, the
-    // frame will be marked as progressive
-    if (is_interlaced(Scan))
+    // Set deinterlacing flags if VPP is not available
+    if (m_deinterlacer)
+    {
+        flags = VA_FRAME_PICTURE;
+    }
+    else if (is_interlaced(Scan))
     {
         // As for VDPAU, only VAAPI can deinterlace these frames - so accept any deinterlacer
         bool doublerate = true;
@@ -184,7 +205,7 @@ uint MythVAAPIInteropGLX::GetFlagsForFrame(VideoFrame *Frame, FrameScanType Scan
         if (driverdeint)
         {
             driverdeint = DEINT_BASIC;
-            if (m_deinterlacer != driverdeint)
+            if (m_basicDeinterlacer != driverdeint)
             {
                 LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Enabled deinterlacer '%1'")
                     .arg(DeinterlacerName(driverdeint | DEINT_DRIVER, doublerate, FMT_VAAPI)));
@@ -203,12 +224,12 @@ uint MythVAAPIInteropGLX::GetFlagsForFrame(VideoFrame *Frame, FrameScanType Scan
                 Frame->deinterlace_inuse2x = doublerate;
                 flags = top ? VA_BOTTOM_FIELD : VA_TOP_FIELD;
             }
-            m_deinterlacer = driverdeint;
+            m_basicDeinterlacer = driverdeint;
         }
-        else if (m_deinterlacer)
+        else if (m_basicDeinterlacer)
         {
             LOG(VB_PLAYBACK, LOG_INFO, LOC + "Disabled basic VAAPI deinterlacer");
-            m_deinterlacer = DEINT_NONE;
+            m_basicDeinterlacer = DEINT_NONE;
         }
     }
 
@@ -473,6 +494,9 @@ vector<MythVideoTexture*> MythVAAPIInteropGLXCopy::Acquire(MythRenderOpenGL *Con
         return result;
     result = m_openglTextures[DUMMY_INTEROP_ID];
 
+    // VPP deinterlacing
+    id = Deinterlace(Frame, id, Scan);
+
     // Copy surface to texture
     INIT_ST;
     va_status = vaCopySurfaceGLX(m_vaDisplay, m_glxSurface, id, GetFlagsForFrame(Frame, Scan));
@@ -611,6 +635,9 @@ vector<MythVideoTexture*> MythVAAPIInteropGLXPixmap::Acquire(MythRenderOpenGL *C
         return result;
     result = m_openglTextures[DUMMY_INTEROP_ID];
 
+    // VPP deinterlacing
+    id = Deinterlace(Frame, id, Scan);
+
     // Copy the surface to the texture
     INIT_ST;
     va_status = vaSyncSurface(m_vaDisplay, id);
@@ -740,27 +767,12 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context
         ColourSpace->UpdateColourSpace(Frame);
     }
 
-    // If the frame is still marked as interlaced but a driver deint is preferred
-    // then VAAPI deinterlacing must be unavailable - so fall back to shader
-    // deinterlacers and mark the textures as 'deinterlaceable'
-    if (is_interlaced(Scan))
-    {
-        bool glsldeint = false;
-        MythDeintType pref = GetDoubleRateOption(Frame, DEINT_DRIVER);
-        if (pref)
-        {
-            glsldeint = true;
-        }
-        else
-        {
-            pref = GetSingleRateOption(Frame, DEINT_DRIVER);
-            if (pref)
-                glsldeint = true;
-        }
+    // Deinterlace
+    id = Deinterlace(Frame, id, Scan);
 
-        if (glsldeint)
-            Frame->deinterlace_allowed = (Frame->deinterlace_allowed & ~DEINT_DRIVER) | DEINT_SHADER;
-    }
+    // fallback to shaders if VAAPI deints are unavailable
+    if (m_filterError)
+        Frame->deinterlace_allowed = (Frame->deinterlace_allowed & ~DEINT_DRIVER) | DEINT_SHADER;
 
     // return cached texture if available
     if (m_openglTextures.contains(id))
@@ -926,4 +938,238 @@ bool MythVAAPIInteropDRM::IsSupported(MythRenderOpenGL *Context)
     QByteArray extensions = QByteArray(eglQueryString(egldisplay, EGL_EXTENSIONS));
     return extensions.contains("EGL_EXT_image_dma_buf_import") &&
            Context->hasExtension("GL_OES_EGL_image");
+}
+
+bool MythVAAPIInterop::SetupDeinterlacer(MythDeintType Deinterlacer, bool DoubleRate,
+                                         AVBufferRef *FramesContext,
+                                         int Width, int Height,
+                                         // Outputs
+                                         AVFilterGraph *&Graph,
+                                         AVFilterContext *&Source,
+                                         AVFilterContext *&Sink)
+{
+    LOG(VB_GENERAL, LOG_WARNING, LOC + "VAAPI VPP deinterlacing is currently disabled");
+    return false;
+
+    if (!FramesContext)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "No hardware frames context");
+        return false;
+    }
+
+    int ret;
+    QString args;
+    QString deinterlacer = "bob";
+    if (DEINT_MEDIUM == Deinterlacer)
+        deinterlacer = "motion_adaptive";
+    else if (DEINT_HIGH == Deinterlacer)
+        deinterlacer = "motion_compensated";
+
+    // N.B. set auto to 0 otherwise we confuse playback if VAAPI does not deinterlace
+    QString filters = QString("deinterlace_vaapi=mode=%1:rate=%2:auto=0")
+            .arg(deinterlacer).arg(DoubleRate ? "field" : "frame");
+    const AVFilter *buffersrc  = avfilter_get_by_name("buffer");
+    const AVFilter *buffersink = avfilter_get_by_name("buffersink");
+    AVFilterInOut *outputs = avfilter_inout_alloc();
+    AVFilterInOut *inputs  = avfilter_inout_alloc();
+    AVBufferSrcParameters* params = nullptr;
+
+    Graph = avfilter_graph_alloc();
+    if (!outputs || !inputs || !Graph)
+    {
+        ret = AVERROR(ENOMEM);
+        goto end;
+    }
+
+    /* buffer video source: the decoded frames from the decoder will be inserted here. */
+    args = QString("video_size=%1x%2:pix_fmt=%3:time_base=1/1")
+                .arg(Width).arg(Height).arg(AV_PIX_FMT_VAAPI);
+
+    ret = avfilter_graph_create_filter(&Source, buffersrc, "in",
+                                       args.toLocal8Bit().constData(), nullptr, Graph);
+    if (ret < 0)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "avfilter_graph_create_filter failed for buffer source");
+        goto end;
+    }
+
+    params = av_buffersrc_parameters_alloc();
+    params->hw_frames_ctx = FramesContext;
+    ret = av_buffersrc_parameters_set(Source, params);
+
+    if (ret < 0)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "av_buffersrc_parameters_set failed");
+        goto end;
+    }
+    av_freep(&params);
+
+    /* buffer video sink: to terminate the filter chain. */
+    ret = avfilter_graph_create_filter(&Sink, buffersink, "out",
+                                       nullptr, nullptr, Graph);
+    if (ret < 0)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "avfilter_graph_create_filter failed for buffer sink");
+        goto end;
+    }
+
+    /*
+     * Set the endpoints for the filter graph. The filter_graph will
+     * be linked to the graph described by filters_descr.
+     */
+
+    /*
+     * The buffer source output must be connected to the input pad of
+     * the first filter described by filters_descr; since the first
+     * filter input label is not specified, it is set to "in" by
+     * default.
+     */
+    outputs->name       = av_strdup("in");
+    outputs->filter_ctx = Source;
+    outputs->pad_idx    = 0;
+    outputs->next       = nullptr;
+
+    /*
+     * The buffer sink input must be connected to the output pad of
+     * the last filter described by filters_descr; since the last
+     * filter output label is not specified, it is set to "out" by
+     * default.
+     */
+    inputs->name       = av_strdup("out");
+    inputs->filter_ctx = Sink;
+    inputs->pad_idx    = 0;
+    inputs->next       = nullptr;
+
+    if ((ret = avfilter_graph_parse_ptr(Graph, filters.toLocal8Bit(),
+                                        &inputs, &outputs, nullptr)) < 0)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("avfilter_graph_parse_ptr failed for %1")
+            .arg(filters));
+        goto end;
+    }
+
+    if ((ret = avfilter_graph_config(Graph, nullptr)) < 0)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("VAAPI deinterlacer config failed - '%1' unsupported?").arg(deinterlacer));
+        goto end;
+    }
+
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Created deinterlacer '%1'")
+        .arg(DeinterlacerName(Deinterlacer | DEINT_DRIVER, DoubleRate, FMT_VAAPI)));
+
+end:
+    if (ret < 0)
+    {
+        avfilter_graph_free(&Graph);
+        Graph = nullptr;
+    }
+    avfilter_inout_free(&inputs);
+    avfilter_inout_free(&outputs);
+    return ret >= 0;
+}
+
+VASurfaceID MythVAAPIInterop::Deinterlace(VideoFrame *Frame, VASurfaceID Current, FrameScanType Scan)
+{
+    VASurfaceID result = Current;
+    if (!Frame)
+        return result;
+
+    while (is_interlaced(Scan))
+    {
+        MythDeintType deinterlacer = DEINT_NONE;
+        bool doublerate = true;
+        MythDeintType doublepref = GetDoubleRateOption(Frame, DEINT_DRIVER);
+        MythDeintType singlepref = GetSingleRateOption(Frame, DEINT_DRIVER);
+        if (doublepref)
+        {
+            deinterlacer = doublepref;
+        }
+        else if (singlepref)
+        {
+            deinterlacer = singlepref;
+            doublerate = false;
+        }
+
+        if ((m_deinterlacer == deinterlacer) && (m_deinterlacer2x == doublerate) &&
+            (m_filterWidth == Frame->width) && (m_filterHeight == Frame->height))
+            break;
+
+        DestroyDeinterlacer();
+
+        if (!m_filterError && deinterlacer != DEINT_NONE)
+        {
+            AVBufferRef* frames = reinterpret_cast<AVBufferRef*>(Frame->priv[1]);
+            if (!frames)
+                break;
+            if (!MythVAAPIInterop::SetupDeinterlacer(deinterlacer, doublerate, frames,
+                                                     Frame->width, Frame->height,
+                                                     m_filterGraph, m_filterSource, m_filterSink))
+            {
+                LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to create VAAPI deinterlacer %1 - disabling")
+                    .arg(DeinterlacerName(deinterlacer | DEINT_DRIVER, doublerate, FMT_VAAPI)));
+                DestroyDeinterlacer();
+                m_filterError = true;
+            }
+            else
+            {
+                m_deinterlacer = deinterlacer;
+                m_deinterlacer2x = doublerate;
+                m_filterWidth = Frame->width;
+                m_filterHeight = Frame->height;
+                break;
+            }
+
+        }
+        break;
+    }
+
+    if (m_deinterlacer)
+    {
+        Frame->deinterlace_inuse = m_deinterlacer | DEINT_DRIVER;
+        Frame->deinterlace_inuse2x = m_deinterlacer2x;
+        while (true)
+        {
+            int ret = 0;
+            MythAVFrame sinkframe;
+            sinkframe->width = Frame->width;
+            sinkframe->height = Frame->height;
+            sinkframe->format =  AV_PIX_FMT_VAAPI;
+            ret = av_buffersink_get_frame(m_filterSink, sinkframe);
+            if  (ret >= 0)
+            {
+                // we have a filtered frame
+                result = static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(sinkframe->data[3]));
+                break;
+            }
+            else if (ret != AVERROR(EAGAIN))
+                break;
+
+            // add another frame
+            MythAVFrame sourceframe;
+            sourceframe->top_field_first = Frame->interlaced_reversed ? !Frame->top_field_first : Frame->top_field_first;
+            sourceframe->interlaced_frame = 1;
+            sourceframe->data[3] = Frame->buf;
+            sourceframe->buf[0] = av_buffer_ref(reinterpret_cast<AVBufferRef*>(Frame->priv[0]));
+            sourceframe->width  = Frame->width;
+            sourceframe->height = Frame->height;
+            sourceframe->format = AV_PIX_FMT_VAAPI;
+            ret = av_buffersrc_add_frame(m_filterSource, sourceframe);
+            sourceframe->data[3] = nullptr;
+            sourceframe->buf[0] = nullptr;
+            if (ret < 0)
+                break;
+
+            // try again
+            ret = av_buffersink_get_frame(m_filterSink, sinkframe);
+            if  (ret >= 0)
+            {
+                // we have a filtered frame
+                result = static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(sinkframe->data[3]));
+                break;
+            }
+            break;
+        }
+    }
+    return result;
 }
