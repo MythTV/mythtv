@@ -23,7 +23,6 @@ class MTV_PUBLIC MythVAAPIContext : public MythCodecContext
     explicit MythVAAPIContext            (MythCodecID CodecID);
    ~MythVAAPIContext() override;
 
-    int    HwDecoderInit                 (AVCodecContext *Context) override;
     int    FilteredReceiveFrame          (AVCodecContext *Context, AVFrame *Frame) override;
     void   PostProcessFrame              (AVCodecContext *Context, VideoFrame *Frame) override;
     bool   IsDeinterlacing               (bool &DoubleRate) override;
@@ -41,7 +40,9 @@ class MTV_PUBLIC MythVAAPIContext : public MythCodecContext
 
   private:
     static int  InitialiseContext        (AVCodecContext *Context);
+    static int  InitialiseContext2       (AVCodecContext *Context);
     static VAProfile VAAPIProfileForCodec(const AVCodecContext *Codec);
+    static AVPixelFormat FramesFormat    (AVPixelFormat Format);
     void        DestroyDeinterlacer      (void);
 
     MythDeintType    m_deinterlacer      { DEINT_NONE };

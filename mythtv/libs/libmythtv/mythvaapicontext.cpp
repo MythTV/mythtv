@@ -29,25 +29,6 @@ MythVAAPIContext::~MythVAAPIContext(void)
     DestroyDeinterlacer();
 }
 
-int MythVAAPIContext::HwDecoderInit(AVCodecContext *Context)
-{
-    if (codec_is_vaapi(m_codecID))
-    {
-        return 0;
-    }
-    else if (codec_is_vaapi_dec(m_codecID))
-    {
-        AVBufferRef *device = MythCodecContext::CreateDevice(AV_HWDEVICE_TYPE_VAAPI,
-                                                          gCoreContext->GetSetting("VAAPIDevice"));
-        if (device)
-        {
-            Context->hw_device_ctx = device;
-            return 0;
-        }
-    }
-    return -1;
-}
-
 VAProfile MythVAAPIContext::VAAPIProfileForCodec(const AVCodecContext *Codec)
 {
     if (!Codec)
@@ -121,6 +102,18 @@ VAProfile MythVAAPIContext::VAAPIProfileForCodec(const AVCodecContext *Codec)
     }
 
     return VAProfileNone;
+}
+
+inline AVPixelFormat MythVAAPIContext::FramesFormat(AVPixelFormat Format)
+{
+    switch (Format)
+    {
+        case AV_PIX_FMT_YUV420P10: return AV_PIX_FMT_P010;
+        case AV_PIX_FMT_YUV420P12:
+        case AV_PIX_FMT_YUV420P14:
+        case AV_PIX_FMT_YUV420P16: return AV_PIX_FMT_P016;
+        default: return AV_PIX_FMT_NV12;
+    }
 }
 
 /*! \brief Confirm whether VAAPI support is available given Decoder and Context
@@ -281,17 +274,20 @@ AVPixelFormat MythVAAPIContext::GetFormat(AVCodecContext *Context, const AVPixel
     return AV_PIX_FMT_NONE;
 }
 
-AVPixelFormat MythVAAPIContext::GetFormat2(AVCodecContext*, const AVPixelFormat *PixFmt)
+AVPixelFormat MythVAAPIContext::GetFormat2(AVCodecContext *Context, const AVPixelFormat *PixFmt)
 {
     while (*PixFmt != AV_PIX_FMT_NONE)
     {
         if (*PixFmt == AV_PIX_FMT_VAAPI)
-            return AV_PIX_FMT_VAAPI;
+            if (MythVAAPIContext::InitialiseContext2(Context) >= 0)
+                return AV_PIX_FMT_VAAPI;
         PixFmt++;
     }
     return AV_PIX_FMT_NONE;
 }
 
+/*! \brief Create a VAAPI hardware context with appropriate OpenGL interop.
+*/
 int MythVAAPIContext::InitialiseContext(AVCodecContext *Context)
 {
     if (!Context || !gCoreContext->IsUIThread())
@@ -381,7 +377,7 @@ int MythVAAPIContext::InitialiseContext(AVCodecContext *Context)
         { VASurfaceAttribMemoryType,  VA_SURFACE_ATTRIB_SETTABLE, { VAGenericValueTypeInteger, { VA_SURFACE_ATTRIB_MEM_TYPE_VA} } } };
     vaapi_frames_ctx->attributes = prefs;
     vaapi_frames_ctx->nb_attributes = 3;
-    hw_frames_ctx->sw_format         = (Context->sw_pix_fmt == AV_PIX_FMT_YUV420P10) ? AV_PIX_FMT_P010 : AV_PIX_FMT_NV12;
+    hw_frames_ctx->sw_format         = FramesFormat(Context->sw_pix_fmt);
     hw_frames_ctx->initial_pool_size = static_cast<int>(VideoBuffers::GetNumBuffers(FMT_VAAPI));
     hw_frames_ctx->format            = AV_PIX_FMT_VAAPI;
     hw_frames_ctx->width             = Context->coded_width;
@@ -400,6 +396,53 @@ int MythVAAPIContext::InitialiseContext(AVCodecContext *Context)
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("VAAPI FFmpeg buffer pool created with %1 surfaces")
         .arg(vaapi_frames_ctx->nb_surfaces));
     av_buffer_unref(&hwdeviceref);
+    return 0;
+}
+
+/*! \brief Create a VAAPI hardware context without OpenGL interop.
+ *
+ * \note We create our own frames context to ensure we can set the software format
+ * for 10bit video (to P010).
+ * \note Testing with Debian Buster, 10bit copyback requires the i965-va-driver-shaders package
+ * instead of i965-va-driver package. Expect a purple screen otherwise:)
+*/
+int MythVAAPIContext::InitialiseContext2(AVCodecContext *Context)
+{
+    if (!Context)
+        return -1;
+
+    AVBufferRef *device = MythCodecContext::CreateDevice(AV_HWDEVICE_TYPE_VAAPI,
+                                                      gCoreContext->GetSetting("VAAPIDevice"));
+    if (!device)
+        return -1;
+
+    Context->hw_frames_ctx = av_hwframe_ctx_alloc(device);
+    if (!Context->hw_frames_ctx)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create VAAPI hardware frames context");
+        av_buffer_unref(&device);
+        return -1;
+    }
+
+    AVHWFramesContext* hw_frames_ctx = reinterpret_cast<AVHWFramesContext*>(Context->hw_frames_ctx->data);
+    AVVAAPIFramesContext* vaapi_frames_ctx = reinterpret_cast<AVVAAPIFramesContext*>(hw_frames_ctx->hwctx);
+    hw_frames_ctx->sw_format         = FramesFormat(Context->sw_pix_fmt);
+    hw_frames_ctx->format            = AV_PIX_FMT_VAAPI;
+    hw_frames_ctx->width             = Context->width;
+    hw_frames_ctx->height            = Context->height;
+    hw_frames_ctx->initial_pool_size = static_cast<int>(VideoBuffers::GetNumBuffers(FMT_VAAPI));
+    hw_frames_ctx->free              = &MythCodecContext::FramesContextFinished;
+    if (av_hwframe_ctx_init(Context->hw_frames_ctx) < 0)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to initialise VAAPI frames context");
+        av_buffer_unref(&device);
+        av_buffer_unref(&(Context->hw_frames_ctx));
+        return -1;
+    }
+
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("VAAPI FFmpeg buffer pool created with %1 surfaces")
+        .arg(vaapi_frames_ctx->nb_surfaces));
+    av_buffer_unref(&device);
     return 0;
 }
 

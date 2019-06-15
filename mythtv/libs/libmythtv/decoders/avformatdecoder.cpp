@@ -2450,17 +2450,10 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     AVPixelFormat pixfmt = AV_PIX_FMT_YUV420P;
                     MythCodecID vaapimcid = MythVAAPIContext::GetSupportedCodec(enc, &codec, dec,
                                                                                 mpeg_version(enc->codec_id), pixfmt);
-                    if (codec_is_vaapi(vaapimcid))
+                    if (codec_is_vaapi(vaapimcid) || codec_is_vaapi_dec(vaapimcid))
                     {
                         m_video_codec_id = vaapimcid;
                         enc->pix_fmt = pixfmt;
-                        foundgpudecoder = true;
-                    }
-                    else if (codec_is_vaapi_dec(vaapimcid))
-                    {
-                        gCodecMap->freeCodecContext(m_ic->streams[selTrack]);
-                        enc = gCodecMap->getCodecContext(m_ic->streams[selTrack], codec);
-                        m_video_codec_id = vaapimcid;
                         foundgpudecoder = true;
                     }
                 }
