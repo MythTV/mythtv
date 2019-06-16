@@ -168,13 +168,6 @@ int MythCodecContext::GetBuffer2(struct AVCodecContext *Context, AVFrame *Frame,
     return 0;
 }
 
-/// \brief A generic hardware buffer initialisation method when the frame will be copied back to main memory.
-int MythCodecContext::GetBuffer3(struct AVCodecContext *Context, AVFrame *Frame, int Flags)
-{
-    static_cast<AvFormatDecoder*>(Context->opaque)->m_directrendering = false;
-    return avcodec_default_get_buffer2(Context, Frame, Flags);
-}
-
 void MythCodecContext::ReleaseBuffer(void *Opaque, uint8_t *Data)
 {
     AvFormatDecoder *decoder = static_cast<AvFormatDecoder*>(Opaque);

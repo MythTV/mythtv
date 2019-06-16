@@ -1537,12 +1537,11 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     {
         enc->get_buffer2     = MythCodecContext::GetBuffer;
         enc->get_format      = MythVAAPIContext::GetFormat;
-        enc->slice_flags     = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
     }
     else if (codec_is_vaapi_dec(m_video_codec_id))
     {
-        enc->get_buffer2     = MythCodecContext::GetBuffer3;
-        enc->get_format      = MythVAAPIContext::GetFormat2;
+        enc->get_format   = MythVAAPIContext::GetFormat2;
+        m_directrendering = false;
     }
     else
 #endif
@@ -1565,15 +1564,11 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     else
 #endif
 #ifdef USING_NVDEC
-    if (codec_is_nvdec_dec(m_video_codec_id))
-    {
-        enc->get_buffer2 = MythCodecContext::GetBuffer3;
-        enc->get_format = MythNVDECContext::GetFormat;
-        m_directrendering = false;
-    }
-    else if (codec_is_nvdec(m_video_codec_id))
+    if (codec_is_nvdec_dec(m_video_codec_id) || codec_is_nvdec(m_video_codec_id))
     {
         enc->get_format = MythNVDECContext::GetFormat;
+        if (codec_is_nvdec_dec(m_video_codec_id))
+            m_directrendering = false;
     }
     else
 #endif
