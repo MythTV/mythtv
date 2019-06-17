@@ -2189,8 +2189,9 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
     output_jmeter && output_jmeter->RecordCycleTime();
     avsync_avg = audio_adjustment * 1000;
 
+    bool decoderdeint = buffer && buffer->decoder_deinterlaced;
     FrameScanType ps = m_scan;
-    if (kScan_Detect == m_scan || kScan_Ignore == m_scan)
+    if (kScan_Detect == m_scan || kScan_Ignore == m_scan || decoderdeint)
     {
         ps = kScan_Progressive;
     }
@@ -2247,7 +2248,7 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
             SetErrored(tr("Serious error detected in Video Output"));
             return;
         }
-        if (m_double_framerate)
+        if (m_double_framerate && !decoderdeint)
         {
             //second stage of deinterlacer processing
             if (kScan_Interlaced == ps)

@@ -47,6 +47,8 @@ class MTV_PUBLIC MythVAAPIContext : public MythCodecContext
 
     MythDeintType    m_deinterlacer      { DEINT_NONE };
     bool             m_deinterlacer2x    { false      };
+    int              m_lastInterlaced    { 0 };
+    int              m_lastTopFieldFirst { 0 };
     AVFilterContext *m_filterSink        { nullptr };
     AVFilterContext *m_filterSource      { nullptr };
     AVFilterGraph   *m_filterGraph       { nullptr };

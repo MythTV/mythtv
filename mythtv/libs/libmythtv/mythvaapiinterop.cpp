@@ -76,6 +76,15 @@ MythVAAPIInterop* MythVAAPIInterop::Create(MythRenderOpenGL *Context, Type Inter
     return nullptr;
 }
 
+/*! \class MythVAAPIInterop
+ *
+ * \todo Fix VPP deinterlacing. Reference counting is completely broken when using
+ * the FFmpeg filter and there is significant visual corruption at the start of playabck.
+ * \todo Implement VPP ProCamp for GLX types. Not needed for DRM as we use our
+ * own shaders and colourspace control.
+ * \todo May need to add a codec check as in MythVAAPIContext to ensure we don't
+ * enable deinterlacing for HEVC and VP8/9
+*/
 MythVAAPIInterop::MythVAAPIInterop(MythRenderOpenGL *Context, Type InteropType)
   : MythOpenGLInterop(Context, InteropType)
 {
@@ -948,9 +957,6 @@ bool MythVAAPIInterop::SetupDeinterlacer(MythDeintType Deinterlacer, bool Double
                                          AVFilterContext *&Source,
                                          AVFilterContext *&Sink)
 {
-    LOG(VB_GENERAL, LOG_WARNING, LOC + "VAAPI VPP deinterlacing is currently disabled");
-    return false;
-
     if (!FramesContext)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "No hardware frames context");
@@ -1102,6 +1108,16 @@ VASurfaceID MythVAAPIInterop::Deinterlace(VideoFrame *Frame, VASurfaceID Current
             AVBufferRef* frames = reinterpret_cast<AVBufferRef*>(Frame->priv[1]);
             if (!frames)
                 break;
+
+            bool disabled = true;
+            if (disabled)
+            {
+                LOG(VB_GENERAL, LOG_INFO, LOC +
+                    "VAAPI VPP deinterlacing currently disabled for direct rendering");
+                m_filterError = true;
+                break;
+            }
+
             if (!MythVAAPIInterop::SetupDeinterlacer(deinterlacer, doublerate, frames,
                                                      Frame->width, Frame->height,
                                                      m_filterGraph, m_filterSource, m_filterSink))
@@ -1119,7 +1135,6 @@ VASurfaceID MythVAAPIInterop::Deinterlace(VideoFrame *Frame, VASurfaceID Current
                 m_filterHeight = Frame->height;
                 break;
             }
-
         }
         break;
     }

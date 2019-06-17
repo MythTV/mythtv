@@ -19,6 +19,16 @@ extern "C" {
 
 #define LOC QString("VAAPIDec: ")
 
+/*! \class MythVAAPIContext
+ *
+ * \todo VP8 creates multiple devices. May need to move initialisation back
+ * into HwDecoderInit
+ * \todo VPP deinterlacing is broken after a stream change for decode only
+ * \todo Fix crash when skipping to the end of an H.264 stream. Appears to be
+ * because the decoder is partially initialised but we never feed it any packets
+ * to complete the setup (as we have reached the end of the file).
+ * Should be a simple null pointer check in FFmpeg.
+*/
 MythVAAPIContext::MythVAAPIContext(MythCodecID CodecID)
   : MythCodecContext(CodecID)
 {
@@ -499,11 +509,23 @@ int MythVAAPIContext::FilteredReceiveFrame(AVCodecContext *Context, AVFrame *Fra
 
         // EAGAIN or no filter graph
         ret = avcodec_receive_frame(Context, Frame);
+        if (ret == 0)
+        {
+            // preserve interlaced flags
+            m_lastInterlaced = Frame->interlaced_frame;
+            m_lastTopFieldFirst = Frame->top_field_first;
+        }
+
         if (ret < 0)
             break;
 
+        // some streams with missing timestamps break frame timing when doublerate
+        // so replace with dts if available
+        int64_t pts = Frame->pts;
+        if (pts == AV_NOPTS_VALUE && Frame->pkt_dts != AV_NOPTS_VALUE && m_deinterlacer2x)
+            pts = Frame->pkt_dts;
         m_filterPriorPTS[0] = m_filterPriorPTS[1];
-        m_filterPriorPTS[1] = Frame->pts;
+        m_filterPriorPTS[1] = pts;
 
         if (!m_filterGraph)
             break;
@@ -528,13 +550,30 @@ void MythVAAPIContext::PostProcessFrame(AVCodecContext* Context, VideoFrame *Fra
         Frame->deinterlace_allowed = Frame->deinterlace_allowed & ~DEINT_DRIVER;
         return;
     }
+    else if (kCodec_HEVC_VAAPI_DEC == m_codecID || kCodec_VP9_VAAPI_DEC == m_codecID ||
+             kCodec_VP8_VAAPI_DEC == m_codecID)
+    {
+        // enabling VPP deinterlacing with these codecs breaks decoding for some reason.
+        // HEVC interlacing is not currently detected by FFmpeg and I can't find
+        // any interlaced VP8/9 material. Shaders and/or CPU deints will be available
+        // as appropriate
+        m_filterError = true;
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Disabling VAAPI VPP deinterlacer for %1")
+            .arg(toString(m_codecID)));
+        return;
+    }
 
-    // if this frame has already been deinterlaced, then flag the deinterlacer
-    // the FFmpeg vaapi deint filter does actually mark frames as progressive
+    // if this frame has already been deinterlaced, then flag the deinterlacer and
+    // that the frame has already been deinterlaced.
+    // the FFmpeg vaapi deint filter will mark frames as progressive, so restore the
+    // interlaced flags to ensure auto deinterlacing continues to work
     if (m_deinterlacer)
     {
+        Frame->interlaced_frame = m_lastInterlaced;
+        Frame->top_field_first = m_lastTopFieldFirst;
         Frame->deinterlace_inuse = m_deinterlacer | DEINT_DRIVER;
         Frame->deinterlace_inuse2x = m_deinterlacer2x;
+        Frame->decoder_deinterlaced = 1;
     }
 
     // N.B. this picks up the scan tracking in MythPlayer. So we can
