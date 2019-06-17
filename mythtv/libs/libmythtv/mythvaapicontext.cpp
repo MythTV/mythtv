@@ -23,7 +23,6 @@ extern "C" {
  *
  * \todo VP8 creates multiple devices. May need to move initialisation back
  * into HwDecoderInit
- * \todo VPP deinterlacing is broken after a stream change for decode only
  * \todo Fix crash when skipping to the end of an H.264 stream. Appears to be
  * because the decoder is partially initialised but we never feed it any packets
  * to complete the setup (as we have reached the end of the file).
@@ -630,9 +629,12 @@ void MythVAAPIContext::PostProcessFrame(AVCodecContext* Context, VideoFrame *Fra
     }
 }
 
-bool MythVAAPIContext::IsDeinterlacing(bool &DoubleRate)
+bool MythVAAPIContext::IsDeinterlacing(bool &DoubleRate, bool StreamChange)
 {
-    if (m_deinterlacer)
+    // the VAAPI deinterlacer can be turned on and off, so on stream changes
+    // return false to ensure auto deint works for the new format (the deinterlacer
+    // refers to the current format)
+    if (m_deinterlacer && !StreamChange)
     {
         DoubleRate = m_deinterlacer2x;
         return true;

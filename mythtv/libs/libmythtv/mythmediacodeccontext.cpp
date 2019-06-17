@@ -132,7 +132,7 @@ void MythMediaCodecContext::PostProcessFrame(AVCodecContext*, VideoFrame* Frame)
  *
  * \note As for PostProcessFrame this may not be accurate.
 */
-bool MythMediaCodecContext::IsDeinterlacing(bool &DoubleRate)
+bool MythMediaCodecContext::IsDeinterlacing(bool &DoubleRate, bool)
 {
     DoubleRate = true;
     return true;

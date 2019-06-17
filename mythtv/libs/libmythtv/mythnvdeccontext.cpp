@@ -340,7 +340,7 @@ void MythNVDECContext::PostProcessFrame(AVCodecContext*, VideoFrame *Frame)
     }
 }
 
-bool MythNVDECContext::IsDeinterlacing(bool &DoubleRate)
+bool MythNVDECContext::IsDeinterlacing(bool &DoubleRate, bool)
 {
     if (m_deinterlacer != DEINT_NONE)
     {

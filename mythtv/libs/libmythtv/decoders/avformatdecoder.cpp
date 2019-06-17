@@ -3284,7 +3284,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
                 // size and rate is extremely error prone and FFmpeg gets it right far more often.
                 // as for H.264, if a decoder deinterlacer is in operation - the stream must be progressive
                 bool doublerate = false;
-                bool decoderdeint = m_mythcodecctx->IsDeinterlacing(doublerate);
+                bool decoderdeint = m_mythcodecctx->IsDeinterlacing(doublerate, true);
                 m_parent->SetVideoParams(width, height, static_cast<double>(seqFPS), m_current_aspect,
                                          decoderdeint ? kScan_Progressive : kScan_Ignore);
 
@@ -3396,7 +3396,7 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
             // size and rate is extremely error prone and FFmpeg gets it right far more often.
             // N.B. if a decoder deinterlacer is in use - the stream must be progressive
             bool doublerate = false;
-            bool decoderdeint = m_mythcodecctx->IsDeinterlacing(doublerate);
+            bool decoderdeint = m_mythcodecctx->IsDeinterlacing(doublerate, true);
             m_parent->SetVideoParams(width, height, seqFPS, m_current_aspect,
                                      decoderdeint ? kScan_Progressive : kScan_Ignore);
 

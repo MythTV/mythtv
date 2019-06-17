@@ -62,7 +62,7 @@ class MTV_PUBLIC MythCodecContext
     virtual int    FilteredReceiveFrame    (AVCodecContext *Context, AVFrame *Frame);
     virtual void   SetDeinterlacing        (AVCodecContext*, VideoDisplayProfile*, bool) {}
     virtual void   PostProcessFrame        (AVCodecContext*, VideoFrame*) {}
-    virtual bool   IsDeinterlacing         (bool &) { return false; }
+    virtual bool   IsDeinterlacing         (bool &, bool = false) { return false; }
 
   protected:
     static void DestroyInterop             (MythOpenGLInterop *Interop);
