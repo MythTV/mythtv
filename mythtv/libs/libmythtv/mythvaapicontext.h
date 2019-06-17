@@ -23,6 +23,7 @@ class MTV_PUBLIC MythVAAPIContext : public MythCodecContext
     explicit MythVAAPIContext            (MythCodecID CodecID);
    ~MythVAAPIContext() override;
 
+    int    HwDecoderInit                 (AVCodecContext *Context) override;
     int    FilteredReceiveFrame          (AVCodecContext *Context, AVFrame *Frame) override;
     void   PostProcessFrame              (AVCodecContext *Context, VideoFrame *Frame) override;
     bool   IsDeinterlacing               (bool &DoubleRate, bool StreamChange = false) override;

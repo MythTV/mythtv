@@ -21,8 +21,6 @@ extern "C" {
 
 /*! \class MythVAAPIContext
  *
- * \todo VP8 creates multiple devices. May need to move initialisation back
- * into HwDecoderInit
  * \todo Fix crash when skipping to the end of an H.264 stream. Appears to be
  * because the decoder is partially initialised but we never feed it any packets
  * to complete the setup (as we have reached the end of the file).
@@ -126,9 +124,6 @@ inline AVPixelFormat MythVAAPIContext::FramesFormat(AVPixelFormat Format)
 }
 
 /*! \brief Confirm whether VAAPI support is available given Decoder and Context
- *
- * \todo Fix comparision of PixFmt against valid software formats - as PixFmt is
- * hard coded to YV420P in AvFormatDecoder
 */
 MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext *Context,
                                                 AVCodec **Codec,
@@ -271,6 +266,10 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext *Context,
     return failure;
 }
 
+/*! \note Creating the decoder here still causes issues on occasion (VP8) where multiple
+ * contexts are created. They do appear to be properly released however. FFmpeg will simply
+ * not accpet a context created before GetFormat
+*/
 AVPixelFormat MythVAAPIContext::GetFormat(AVCodecContext *Context, const AVPixelFormat *PixFmt)
 {
     while (*PixFmt != AV_PIX_FMT_NONE)
@@ -283,13 +282,12 @@ AVPixelFormat MythVAAPIContext::GetFormat(AVCodecContext *Context, const AVPixel
     return AV_PIX_FMT_NONE;
 }
 
-AVPixelFormat MythVAAPIContext::GetFormat2(AVCodecContext *Context, const AVPixelFormat *PixFmt)
+AVPixelFormat MythVAAPIContext::GetFormat2(AVCodecContext *, const AVPixelFormat *PixFmt)
 {
     while (*PixFmt != AV_PIX_FMT_NONE)
     {
         if (*PixFmt == AV_PIX_FMT_VAAPI)
-            if (MythVAAPIContext::InitialiseContext2(Context) >= 0)
-                return AV_PIX_FMT_VAAPI;
+            return AV_PIX_FMT_VAAPI;
         PixFmt++;
     }
     return AV_PIX_FMT_NONE;
@@ -465,6 +463,15 @@ bool MythVAAPIContext::HaveVAAPI(bool ReCheck /*= false*/)
     }
 
     return havevaapi;
+}
+
+int MythVAAPIContext::HwDecoderInit(AVCodecContext *Context)
+{
+    if (codec_is_vaapi(m_codecID))
+        return 0;
+    else if (codec_is_vaapi_dec(m_codecID))
+        return MythVAAPIContext::InitialiseContext2(Context);
+    return -1;
 }
 
 /*! \brief Retrieve decoded frame and optionally deinterlace.
