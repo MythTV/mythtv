@@ -725,12 +725,14 @@ bool MythUIGuideGrid::parseDefaultCategoryColors(QMap<QString, QString> &catColo
             break;
     }
 
+#ifndef Q_OS_ANDROID // Android does not get a file handle for assets file system
     if (f.handle() == -1)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unable to open '%1'")
             .arg(f.fileName()));
         return false;
     }
+#endif
 
     QDomDocument doc;
     QString errorMsg;
