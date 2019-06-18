@@ -1429,12 +1429,11 @@ float AvFormatDecoder::normalized_fps(AVStream *stream, AVCodecContext *enc)
         fps = codec_fps;
     else if (container_fps < 121.0 && container_fps > 3.0)
         fps = container_fps;
+    else if (avg_fps < 121.0 && avg_fps > 3.0)
+        fps = avg_fps;
     // certain H.264 interlaced streams are detected at 2x using estimated (i.e. wrong)
     else if (estimated_fps < 121.0 && estimated_fps > 3.0)
         fps = estimated_fps;
-    // but average is less reliable as it does not account for issues like repeat frames
-    else if (avg_fps < 121.0 && avg_fps > 3.0)
-        fps = avg_fps;
     else
         fps = 30000.0 / 1001.0; // 29.97 fps
 
