@@ -4607,16 +4607,7 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
     }
     else if (has_action(ACTION_SCREENSHOT, actions))
     {
-        ctx->LockDeletePlayer(__FILE__, __LINE__);
-        if (ctx->m_player && ctx->m_player->GetScreenShot())
-        {
-            // VideoOutput has saved screenshot
-        }
-        else
-        {
-            GetMythMainWindow()->ScreenShot();
-        }
-        ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+        GetMythMainWindow()->ScreenShot();
     }
     else if (has_action(ACTION_STOP, actions))
     {
@@ -9414,7 +9405,6 @@ void TV::customEvent(QEvent *e)
 
     if (message == ACTION_SCREENSHOT)
     {
-        PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
         int width = 0;
         int height = 0;
         QString filename;
@@ -9427,15 +9417,7 @@ void TV::customEvent(QEvent *e)
             if (me->ExtraDataCount() == 3)
                 filename = me->ExtraData(2);
         }
-        if (mctx && mctx->m_player &&
-            mctx->m_player->GetScreenShot(width, height, filename))
-        {
-        }
-        else
-        {
-            GetMythMainWindow()->ScreenShot(width, height, filename);
-        }
-        ReturnPlayerLock(mctx);
+        GetMythMainWindow()->ScreenShot(width, height, filename);
     }
     else if (message == ACTION_GETSTATUS)
     {

@@ -244,7 +244,6 @@ class MTV_PUBLIC MythPlayer
     bool    UsingNullVideo(void) const { return FlagIsSet(kVideoIsNull); }
     bool    HasTVChainNext(void) const;
     bool    CanSupportDoubleRate(void);
-    bool    GetScreenShot(int width = 0, int height = 0, QString filename = "");
     bool    IsWatchingInprogress(void) const;
 
     // Non-const gets

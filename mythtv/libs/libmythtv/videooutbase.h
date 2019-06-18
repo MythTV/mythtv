@@ -227,7 +227,6 @@ class VideoOutput
 
     virtual QString GetOSDRenderer(void) const;
     virtual MythPainter *GetOSDPainter(void) { return nullptr; }
-    virtual bool GetScreenShot(int = 0, int = 0, QString = "") { return false; }
 
     QString GetFilters(void) const;
     /// \brief translates caption/dvd button rectangle into 'screen' space

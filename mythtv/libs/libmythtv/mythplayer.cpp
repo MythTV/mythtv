@@ -4747,13 +4747,6 @@ bool MythPlayer::IsEmbedding(void)
     return false;
 }
 
-bool MythPlayer::GetScreenShot(int width, int height, QString filename)
-{
-    if (videoOutput)
-        return videoOutput->GetScreenShot(width, height, std::move(filename));
-    return false;
-}
-
 bool MythPlayer::HasTVChainNext(void) const
 {
     return player_ctx->m_tvchain && player_ctx->m_tvchain->HasNext();
