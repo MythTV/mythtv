@@ -378,8 +378,6 @@ using_frontend {
         DEFINES += USING_OPENMAX
         HEADERS += decoders/privatedecoder_omx.h
         SOURCES += decoders/privatedecoder_omx.cpp
-        HEADERS += videoout_omx.h
-        SOURCES += videoout_omx.cpp
         contains( HAVE_OPENMAX_BROADCOM, yes ) {
             DEFINES += OMX_SKIP64BIT USING_BROADCOM
             # Raspbian
@@ -410,7 +408,7 @@ using_frontend {
     HEADERS += videobuffers.h           vsync.h
     HEADERS += jitterometer.h
     HEADERS += videodisplayprofile.h    mythcodecid.h
-    HEADERS += videoouttypes.h          util-osd.h
+    HEADERS += videoouttypes.h
     HEADERS += videooutwindow.h         videocolourspace.h
     HEADERS += visualisations/videovisual.h
     HEADERS += visualisations/videovisualdefs.h
@@ -419,7 +417,7 @@ using_frontend {
     SOURCES += videobuffers.cpp         vsync.cpp
     SOURCES += jitterometer.cpp
     SOURCES += videodisplayprofile.cpp  mythcodecid.cpp
-    SOURCES += videooutwindow.cpp       util-osd.cpp
+    SOURCES += videooutwindow.cpp
     SOURCES += videocolourspace.cpp
     SOURCES += visualisations/videovisual.cpp
     SOURCES += mythdeinterlacer.cpp

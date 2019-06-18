@@ -240,7 +240,7 @@ class VideoOutput
     virtual void SetPIPState(PIPState setting);
 
     virtual QString GetOSDRenderer(void) const;
-    virtual MythPainter *GetOSDPainter(void) { return (MythPainter*)osd_painter; }
+    virtual MythPainter *GetOSDPainter(void) { return nullptr; }
     virtual bool GetScreenShot(int = 0, int = 0, QString = "") { return false; }
 
     QString GetFilters(void) const;
@@ -275,24 +275,13 @@ class VideoOutput
                      int keepprebuffer);
     void InitDisplayMeasurements(int width, int height, bool resize);
     virtual void ShowPIPs(VideoFrame *frame, const PIPMap &pipPlayers);
-    virtual void ShowPIP(VideoFrame        *frame,
-                         MythPlayer *pipplayer,
-                         PIPLocation        loc);
-
-    virtual bool DisplayOSD(VideoFrame *frame, OSD *osd);
+    virtual void ShowPIP(VideoFrame*, MythPlayer*, PIPLocation) { }
 
     QRect GetVisibleOSDBounds(float&, float&, float) const;
     QRect GetTotalOSDBounds(void) const;
     virtual bool hasFullScreenOSD(void) const { return false; }
 
     static void CopyFrame(VideoFrame* to, const VideoFrame* from);
-
-    void DoPipResize(int pipwidth, int pipheight);
-    void ShutdownPipResize(void);
-
-    void ResizeVideo(VideoFrame *frame);
-    void DoVideoResize(const QSize &inDim, const QSize &outDim);
-    virtual void ShutdownVideoResize(void);
 
     VideoOutWindow     window;
     QSize              db_display_dim;   ///< Screen dimensions in millimeters from DB
@@ -305,21 +294,6 @@ class VideoOutput
     // Video parameters
     MythCodecID          video_codec_id;
     VideoDisplayProfile *db_vdisp_profile;
-
-    // Picture-in-Picture
-    QSize   pip_desired_display_size;
-    QSize   pip_display_size;
-    QSize   pip_video_size;
-    unsigned char      *pip_tmp_buf;
-    unsigned char      *pip_tmp_buf2;
-    struct SwsContext  *pip_scaling_context;
-    VideoFrame pip_tmp_image;
-
-    // Video resizing (for ITV)
-    QSize   vsz_display_size;
-    QSize   vsz_video_size;
-    unsigned char      *vsz_tmp_buf;
-    struct SwsContext  *vsz_scale_context;
 
     /// VideoBuffers instance used to track video output buffers.
     VideoBuffers vbuffers;
@@ -334,12 +308,6 @@ class VideoOutput
     // Display information
     QSize monitor_sz;
     QSize monitor_dim;
-
-    // OSD painter and surface
-    MythYUVAPainter *osd_painter;
-    MythImage       *osd_image;
-    // Hack to ensure osd painter not deleted to soon
-    MythPainter     *invalid_osd_painter;
 
     // Visualisation
     VideoVisual     *m_visual;

@@ -22,7 +22,7 @@ QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # Input
 HEADERS  = mythmainwindow.h mythpainter.h mythimage.h mythrect.h
-HEADERS += myththemebase.h  mythpainter_qimage.h mythpainter_yuva.h
+HEADERS += myththemebase.h  mythpainter_qimage.h
 HEADERS += mythpainter_qt.h mythmainwindow_internal.h mythuihelper.h
 HEADERS += mythscreenstack.h mythgesture.h mythuitype.h mythscreentype.h
 HEADERS += mythuiimage.h mythuitext.h mythuistatetype.h  xmlparsebase.h
@@ -42,7 +42,7 @@ HEADERS += mythnotificationcenter.h mythnotificationcenter_private.h
 HEADERS += mythuicomposite.h mythnotification.h mythuidefines.h
 
 SOURCES  = mythmainwindow.cpp mythpainter.cpp mythimage.cpp mythrect.cpp
-SOURCES += myththemebase.cpp  mythpainter_qimage.cpp mythpainter_yuva.cpp
+SOURCES += myththemebase.cpp  mythpainter_qimage.cpp
 SOURCES += mythpainter_qt.cpp xmlparsebase.cpp mythuihelper.cpp
 SOURCES += mythscreenstack.cpp mythgesture.cpp mythuitype.cpp mythscreentype.cpp
 SOURCES += mythuiimage.cpp mythuitext.cpp mythuifilebrowser.cpp

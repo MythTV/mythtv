@@ -12,8 +12,6 @@
 #include "mythlogging.h"
 #include "mythmainwindow.h"
 #include "mythuihelper.h"
-#include "mythpainter_yuva.h"
-#include "util-osd.h"
 #include "mythxdisplay.h"
 #include "mythavutil.h"
 #include "mthreadpool.h"
@@ -25,10 +23,6 @@
 
 #ifdef USING_OPENGL_VIDEO
 #include "videoout_opengl.h"
-#endif
-
-#ifdef USING_OPENMAX
-#include "videoout_omx.h"
 #endif
 
 #include "videoout_null.h"
@@ -59,10 +53,6 @@ void VideoOutput::GetRenderOptions(render_opts &opts)
 #ifdef USING_OPENGL_VIDEO
     VideoOutputOpenGL::GetRenderOptions(opts, cpudeints);
 #endif // USING_OPENGL_VIDEO
-
-#ifdef USING_OPENMAX
-    VideoOutputOMX::GetRenderOptions(opts, cpudeints);
-#endif // USING_OPENMAX
 }
 
 /**
@@ -96,11 +86,6 @@ VideoOutput *VideoOutput::Create(
         renderers += VideoOutputOpenGL::
             GetAllowedRenderers(codec_id, video_dim_disp);
 #endif // USING_OPENGL_VIDEO
-
-#ifdef USING_OPENMAX
-        renderers += VideoOutputOMX::
-            GetAllowedRenderers(codec_id, video_dim_disp);
-#endif // USING_OPENMAX
     }
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "Allowed renderers: " +
@@ -154,11 +139,6 @@ VideoOutput *VideoOutput::Create(
         else if (renderer.contains("opengl"))
             vo = new VideoOutputOpenGL(renderer);
 #endif // USING_OPENGL_VIDEO
-
-#ifdef USING_OPENMAX
-        else if (renderer == VideoOutputOMX::kName)
-            vo = new VideoOutputOMX();
-#endif // USING_OPENMAX
 
         if (vo)
             vo->db_vdisp_profile = vprof;
@@ -307,18 +287,6 @@ VideoOutput::VideoOutput() :
     // Video parameters
     video_codec_id(kCodec_NONE),        db_vdisp_profile(nullptr),
 
-    // Picture-in-Picture stuff
-    pip_desired_display_size(160,128),  pip_display_size(0,0),
-    pip_video_size(0,0),
-    pip_tmp_buf(nullptr),               pip_tmp_buf2(nullptr),
-    pip_scaling_context(nullptr),
-
-    // Video resizing (for ITV)
-    vsz_display_size(0,0),
-    vsz_video_size(0,0),
-    vsz_tmp_buf(nullptr),
-    vsz_scale_context(nullptr),
-
     // Various state variables
     errorState(kError_None),            framesPlayed(0),
 
@@ -328,10 +296,6 @@ VideoOutput::VideoOutput() :
     // Physical display
     monitor_sz(640,480),                monitor_dim(400,300),
 
-    // OSD
-    osd_painter(nullptr),               osd_image(nullptr),
-    invalid_osd_painter(nullptr),
-
     // Visualisation
     m_visual(nullptr),
 
@@ -340,7 +304,6 @@ VideoOutput::VideoOutput() :
 
     m_deinterlacer()
 {
-    memset(&pip_tmp_image, 0, sizeof(pip_tmp_image));
     db_display_dim = QSize(gCoreContext->GetNumSetting("DisplaySizeWidth",  0),
                            gCoreContext->GetNumSetting("DisplaySizeHeight", 0));
 
@@ -360,16 +323,6 @@ VideoOutput::VideoOutput() :
  */
 VideoOutput::~VideoOutput()
 {
-    if (osd_image)
-        osd_image->DecrRef();
-    delete osd_painter;
-    delete invalid_osd_painter;
-    invalid_osd_painter = nullptr;
-
-    ShutdownPipResize();
-
-    VideoOutput::ShutdownVideoResize();
-
     delete db_vdisp_profile;
 
     ResizeForGui();
@@ -721,324 +674,11 @@ QRect VideoOutput::GetPIPRect(
     return window.GetPIPRect(location, pipplayer, do_pixel_adj);
 }
 
-/**
- * \fn VideoOutput::DoPipResize(int,int)
- * \brief Sets up Picture in Picture image resampler.
- * \param pipwidth  input width
- * \param pipheight input height
- * \sa ShutdownPipResize(), ShowPIPs(VideoFrame*,const PIPMap&)
- */
-void VideoOutput::DoPipResize(int pipwidth, int pipheight)
-{
-    QSize vid_size = QSize(pipwidth, pipheight);
-    if (vid_size == pip_desired_display_size)
-        return;
-
-    ShutdownPipResize();
-
-    pip_video_size   = vid_size;
-    pip_display_size = pip_desired_display_size;
-
-    int sz = buffersize(FMT_YV12,
-                        pip_display_size.width(), pip_display_size.height());
-    pip_tmp_buf = (unsigned char*)av_malloc(sz);
-    pip_tmp_buf2 = (unsigned char*)av_malloc(sz);
-
-    pip_scaling_context = sws_getCachedContext(pip_scaling_context,
-                              pip_video_size.width(), pip_video_size.height(),
-                              AV_PIX_FMT_YUV420P,
-                              pip_display_size.width(),
-                              pip_display_size.height(),
-                              AV_PIX_FMT_YUV420P, SWS_FAST_BILINEAR,
-                              nullptr, nullptr, nullptr);
-}
-
-/**
- * \fn VideoOutput::ShutdownPipResize()
- * \brief Shuts down Picture in Picture image resampler.
- * \sa VideoOutput::DoPipResize(int,int),
- *     ShowPIPs(VideoFrame*,const PIPMap&)
- */
-void VideoOutput::ShutdownPipResize(void)
-{
-    if (pip_tmp_buf)
-    {
-        av_freep(&pip_tmp_buf);
-    }
-
-    if (pip_tmp_buf2)
-    {
-        av_freep(&pip_tmp_buf2);
-    }
-
-    if (pip_scaling_context)
-    {
-        sws_freeContext(pip_scaling_context);
-        pip_scaling_context = nullptr;
-    }
-
-    pip_video_size   = QSize(0,0);
-    pip_display_size = QSize(0,0);
-}
-
 void VideoOutput::ShowPIPs(VideoFrame *frame, const PIPMap &pipPlayers)
 {
     PIPMap::const_iterator it = pipPlayers.begin();
     for (; it != pipPlayers.end(); ++it)
         ShowPIP(frame, it.key(), *it);
-}
-
-/**
- * \fn VideoOutput::ShowPIP(VideoFrame*,MythPlayer*,PIPLocation)
- * \brief Composites PiP image onto a video frame.
- *
- *  Note: This only works with memory backed VideoFrames.
- *
- * \param frame     Frame to composite PiP onto.
- * \param pipplayer Picture-in-Picture Player.
- * \param loc       Location of this PiP on the frame.
- */
-void VideoOutput::ShowPIP(VideoFrame  *frame,
-                          MythPlayer  *pipplayer,
-                          PIPLocation  loc)
-{
-    if (!pipplayer)
-        return;
-
-    const float video_aspect           = window.GetVideoAspect();
-//     const QRect display_video_rect     = window.GetDisplayVideoRect();
-//     const QRect video_rect             = window.GetVideoRect();
-//     const QRect display_visible_rect   = window.GetDisplayVisibleRect();
-//     const QSize video_disp_dim         = window.GetVideoDispDim();
-
-    int pipw, piph;
-    VideoFrame *pipimage       = pipplayer->GetCurrentFrame(pipw, piph);
-    const bool  pipActive      = pipplayer->IsPIPActive();
-    const bool  pipVisible     = pipplayer->IsPIPVisible();
-    const float pipVideoAspect = pipplayer->GetVideoAspect();
-//     const QSize pipVideoDim    = pipplayer->GetVideoBufferSize();
-
-    // If PiP is not initialized to values we like, silently ignore the frame.
-    if ((video_aspect <= 0) || (pipVideoAspect <= 0) ||
-        (frame->height <= 0) || (frame->width <= 0) ||
-        !pipimage || !pipimage->buf || pipimage->codec != FMT_YV12)
-    {
-        pipplayer->ReleaseCurrentFrame(pipimage);
-        return;
-    }
-
-    if (!pipVisible)
-    {
-        pipplayer->ReleaseCurrentFrame(pipimage);
-        return;
-    }
-
-    QRect position = GetPIPRect(loc, pipplayer);
-
-    pip_desired_display_size = position.size();
-
-    // Scale the image if we have to...
-    if (pipw != pip_desired_display_size.width() ||
-        piph != pip_desired_display_size.height())
-    {
-        DoPipResize(pipw, piph);
-
-        memset(&pip_tmp_image, 0, sizeof(pip_tmp_image));
-
-        if (pip_tmp_buf && pip_scaling_context)
-        {
-            AVFrame img_in, img_out;
-            av_image_fill_arrays(
-                img_out.data, img_out.linesize,
-                pip_tmp_buf, AV_PIX_FMT_YUV420P,
-                pip_display_size.width(), pip_display_size.height(),
-                IMAGE_ALIGN);
-
-            AVPictureFill(&img_in, pipimage);
-
-            sws_scale(pip_scaling_context, img_in.data, img_in.linesize, 0,
-                      piph, img_out.data, img_out.linesize);
-
-            pipw = pip_display_size.width();
-            piph = pip_display_size.height();
-
-            if (pipActive)
-            {
-                AVFrame img_padded;
-                av_image_fill_arrays(img_padded.data, img_padded.linesize,
-                    pip_tmp_buf2,
-                    AV_PIX_FMT_YUV420P, pipw, piph, IMAGE_ALIGN);
-
-                int color[3] = { 20, 0, 200 }; //deep red YUV format
-                av_picture_pad((AVPicture*)(&img_padded),
-                    (AVPicture*)(&img_out), piph, pipw,
-                               AV_PIX_FMT_YUV420P, 4, 4, 4, 4, color);
-
-                int offsets[3] = {0, int(img_padded.data[1] - img_padded.data[0]),
-                                    int(img_padded.data[2] - img_padded.data[0]) };
-                init(&pip_tmp_image, FMT_YV12, img_padded.data[0], pipw, piph,
-                    sizeof(int), img_padded.linesize, offsets);
-            }
-            else
-            {
-                int offsets[3] = {0, int(img_out.data[1] - img_out.data[0]),
-                                    int(img_out.data[2] - img_out.data[0]) };
-                init(&pip_tmp_image, FMT_YV12, img_out.data[0], pipw, piph,
-                    sizeof(int), img_out.linesize, offsets);
-            }
-        }
-    }
-
-    if ((position.left() >= 0) && (position.top() >= 0))
-    {
-        int xoff = position.left();
-        int yoff = position.top();
-        int xoff2[3] = { xoff, xoff>>1, xoff>>1 };
-        int yoff2[3] = { yoff, yoff>>1, yoff>>1 };
-
-        int pip_height = pip_tmp_image.height;
-        int height[3] = { pip_height, pip_height>>1, pip_height>>1 };
-        int pip_width = pip_tmp_image.width;
-        int widths[3] = { pip_width, pip_width>>1, pip_width>>1 };
-
-        for (int p = 0; p < 3; p++)
-        {
-            for (int h = pipActive ? 0 : 1; h < height[p]; h++)
-            {
-                memcpy((frame->buf + frame->offsets[p]) + (h + yoff2[p]) *
-                       frame->pitches[p] + xoff2[p],
-                       (pip_tmp_image.buf + pip_tmp_image.offsets[p]) + h *
-                       pip_tmp_image.pitches[p], widths[p]);
-            }
-        }
-    }
-
-    // we're done with the frame, release it
-    pipplayer->ReleaseCurrentFrame(pipimage);
-}
-
-/**
- * \brief Sets up Picture in Picture image resampler.
- * \param inDim  input width and height
- * \param outDim output width and height
- * \sa ShutdownPipResize(), ShowPIPs(VideoFrame*,const PIPMap&)
- */
-void VideoOutput::DoVideoResize(const QSize &inDim, const QSize &outDim)
-{
-    if ((inDim == vsz_video_size) && (outDim == vsz_display_size))
-        return;
-
-    ShutdownVideoResize();
-
-    vsz_video_size   = inDim;
-    vsz_display_size = outDim;
-
-    int sz = vsz_display_size.height() * vsz_display_size.width() * 3 / 2;
-    vsz_tmp_buf = new unsigned char[sz];
-
-    vsz_scale_context = sws_getCachedContext(vsz_scale_context,
-                              vsz_video_size.width(), vsz_video_size.height(),
-                              AV_PIX_FMT_YUV420P,
-                              vsz_display_size.width(),
-                              vsz_display_size.height(),
-                              AV_PIX_FMT_YUV420P, SWS_FAST_BILINEAR,
-                              nullptr, nullptr, nullptr);
-}
-
-void VideoOutput::ResizeVideo(VideoFrame *frame)
-{
-    if (frame->codec !=  FMT_YV12)
-        return;
-    QRect resize = window.GetITVDisplayRect();
-    if (resize.isEmpty())
-        return;
-
-    QSize frameDim(frame->width, frame->height);
-
-    // if resize is outside existing frame, abort
-    bool abort =
-        (resize.right() > frame->width || resize.bottom() > frame->height ||
-         resize.width() > frame->width || resize.height() > frame->height);
-    // if resize == existing frame, no need to carry on
-    abort |= !resize.left() && !resize.top() && (resize.size() == frameDim);
-
-    if (abort)
-    {
-        QRect dummy;
-        SetVideoResize(dummy);
-        return;
-    }
-
-    DoVideoResize(frameDim, resize.size());
-    if (!vsz_tmp_buf)
-    {
-        QRect dummy;
-        SetVideoResize(dummy);
-        return;
-    }
-
-    if (vsz_tmp_buf && vsz_scale_context)
-    {
-        AVFrame img_in, img_out;
-
-        av_image_fill_arrays(img_out.data, img_out.linesize,
-            vsz_tmp_buf, AV_PIX_FMT_YUV420P,
-            resize.width(), resize.height(),IMAGE_ALIGN);
-        av_image_fill_arrays(img_in.data, img_in.linesize,
-            frame->buf, AV_PIX_FMT_YUV420P,
-            frame->width, frame->height,IMAGE_ALIGN);
-        img_in.data[0] = frame->buf + frame->offsets[0];
-        img_in.data[1] = frame->buf + frame->offsets[1];
-        img_in.data[2] = frame->buf + frame->offsets[2];
-        img_in.linesize[0] = frame->pitches[0];
-        img_in.linesize[1] = frame->pitches[1];
-        img_in.linesize[2] = frame->pitches[2];
-        sws_scale(vsz_scale_context, img_in.data, img_in.linesize, 0,
-                      frame->height, img_out.data, img_out.linesize);
-    }
-
-    // Blanking the unused area can appear better but it costs CPU cycles
-    //clear(frame);
-
-    int xoff = resize.left();
-    int yoff = resize.top();
-    int resw = resize.width();
-    int vidw = frame->pitches[0];
-
-    unsigned char *yptr = frame->buf + frame->offsets[0];
-    unsigned char *videoyptr = vsz_tmp_buf;
-
-    // Copy Y (intensity values)
-    yptr += yoff * vidw + xoff;
-    for (int i = 0; i < resize.height(); i++)
-    {
-        memcpy(yptr, videoyptr, resw);
-        yptr += vidw;
-        videoyptr += resw;
-    }
-
-    // Copy U & V (half plane chroma values)
-    xoff /= 2;
-    yoff /= 2;
-
-    unsigned char *uptr = frame->buf + frame->offsets[1];
-    unsigned char *vptr = frame->buf + frame->offsets[2];
-    vidw = frame->pitches[1];
-    uptr += yoff * vidw + xoff;
-    vptr += yoff * vidw + xoff;
-
-    unsigned char *videouptr = vsz_tmp_buf + resw * resize.height();
-    unsigned char *videovptr = vsz_tmp_buf + (resw * resize.height() * 5) / 4;
-    resw /= 2;
-    for (int i = 0; i < resize.height() / 2; i ++)
-    {
-        memcpy(uptr, videouptr, resw);
-        uptr += vidw;
-        videouptr += resw;
-        memcpy(vptr, videovptr, resw);
-        vptr += vidw;
-        videovptr += resw;
-    }
 }
 
 AspectOverrideMode VideoOutput::GetAspectOverride(void) const
@@ -1056,24 +696,6 @@ float VideoOutput::GetDisplayAspect(void) const
     return window.GetDisplayAspect();
 }
 
-void VideoOutput::ShutdownVideoResize(void)
-{
-    if (vsz_tmp_buf)
-    {
-        delete [] vsz_tmp_buf;
-        vsz_tmp_buf = nullptr;
-    }
-
-    if (vsz_scale_context)
-    {
-        sws_freeContext(vsz_scale_context);
-        vsz_scale_context = nullptr;
-    }
-
-    vsz_video_size   = QSize(0,0);
-    vsz_display_size = QSize(0,0);
-}
-
 void VideoOutput::ClearDummyFrame(VideoFrame *frame)
 {
     // used by render devices to ignore frame rendering
@@ -1085,8 +707,6 @@ void VideoOutput::ClearDummyFrame(VideoFrame *frame)
 
 void VideoOutput::SetVideoResize(const QRect &VideoRect)
 {
-    if (VideoRect.isEmpty())
-        ShutdownVideoResize();
     window.SetITVResize(VideoRect);
 }
 
@@ -1096,186 +716,6 @@ void VideoOutput::SetVideoResize(const QRect &VideoRect)
 void VideoOutput::SetVideoScalingAllowed(bool change)
 {
     window.SetVideoScalingAllowed(change);
-}
-
-#ifndef MMX
-#define THREADED_OSD_RENDER 1
-#endif
-
-#ifdef THREADED_OSD_RENDER
-class OsdRender : public QRunnable
-{
-  public:
-    OsdRender(VideoFrame *frame, MythImage *osd_image, const QSize &dim, const QRect &vis) :
-        m_frame(frame), m_osd_image(osd_image), m_video_dim(dim), m_vis(vis)
-    { }
-
-    void run() override // QRunnable
-    {
-        switch (m_frame->codec)
-        {
-          case FMT_YV12: yv12(); break;
-          default: break;
-        }
-    }
-
-  private:
-    inline void yv12()
-    {
-#define ROUNDUP( _x,_z) ((_x) + ((-(_x)) & ((_z) - 1)) )
-#define ROUNDDN( _x,_z) ((_x) & ~((_z) - 1))
-        int left = m_vis.left();
-        left = ROUNDUP(left, ALIGN_C);
-        left = std::min(left, m_osd_image->width());
-
-        int right = m_vis.left() + m_vis.width();
-        right = ROUNDUP(right, ALIGN_C);
-        right = std::min(right, m_osd_image->width());
-
-        int top = m_vis.top();
-        top = ROUNDDN(top, ALIGN_C);
-
-        int bottom = m_vis.top() + m_vis.height();
-        bottom = ROUNDDN(bottom, ALIGN_C);
-
-        c_yuv888_to_yv12(m_frame, m_osd_image, left, top, right, bottom);
-    }
-
-  private:
-    VideoFrame * const m_frame;
-    MythImage * const m_osd_image;
-    QSize const m_video_dim;
-    QRect const m_vis;
-};
-#endif
-
-/**
- * \fn VideoOutput::DisplayOSD(VideoFrame*,OSD *,int,int)
- * \brief If the OSD has changed, this will convert the OSD buffer
- *        to the OSDSurface's color format.
- *
- * \return true if visible, false otherwise
- */
-bool VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
-{
-    if (!osd || !frame)
-        return false;
-
-    if (window.GetITVResizing())
-        ResizeVideo(frame);
-
-    if (!osd_painter)
-    {
-        osd_painter = new MythYUVAPainter();
-        if (!osd_painter)
-            return false;
-    }
-
-    QSize osd_size = GetTotalOSDBounds().size();
-    if (osd_image && (osd_image->size() != osd_size))
-    {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("OSD size changed."));
-        osd_image->DecrRef();
-        osd_image = nullptr;
-    }
-
-    if (!osd_image)
-    {
-        osd_image = osd_painter->GetFormatImage();
-        if (osd_image)
-        {
-            QImage blank = QImage(osd_size,
-                                  QImage::Format_ARGB32_Premultiplied);
-            osd_image->Assign(blank);
-            osd_image->ConvertToYUV();
-            osd_painter->Clear(osd_image,
-                               QRegion(QRect(QPoint(0,0), osd_size)));
-            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Created YV12 OSD."));
-        }
-        else
-            return false;
-    }
-
-    if (m_visual)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Visualiser not supported here");
-        // Clear the audio buffer
-        m_visual->Draw(QRect(), nullptr, nullptr);
-    }
-
-    switch (frame->codec)
-    {
-      case FMT_YV12:
-        break;
-      default:
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            "Display OSD: Frame format not supported.");
-        return false;
-    }
-
-    QRegion dirty   = QRegion();
-    QRegion visible = osd->Draw(osd_painter, osd_image, osd_size, dirty,
-                                frame->codec == FMT_YV12 ? ALIGN_X_MMX : 0,
-                                frame->codec == FMT_YV12 ? ALIGN_C : 0);
-    bool changed    = !dirty.isEmpty();
-    bool show       = !visible.isEmpty();
-
-    if (!show)
-        return show;
-
-    if (!changed && frame->codec != FMT_YV12)
-        return show;
-
-#ifdef THREADED_OSD_RENDER
-    QSize video_dim = window.GetVideoDim();
-    static MThreadPool s_pool("OsdRender");
-
-    // Split visible region for greater concurrency
-    QRect r = osd_image->rect();
-    QPoint c = r.center();
-    QVector<QRect> vis;
-#if QT_VERSION < QT_VERSION_CHECK(5, 8, 0)
-    vis += visible.intersected(QRect(r.topLeft(),c)).rects();
-    vis += visible.intersected(QRect(c,r.bottomRight())).rects();
-    vis += visible.intersected(QRect(r.bottomLeft(),c).normalized()).rects();
-    vis += visible.intersected(QRect(c,r.topRight()).normalized()).rects();
-#else
-    for (const QRect &tmp : visible.intersected(QRect(r.topLeft(),c)))
-        vis += tmp;
-    for (const QRect &tmp : visible.intersected(QRect(c,r.bottomRight())))
-        vis += tmp;
-    for (const QRect &tmp : visible.intersected(QRect(r.bottomLeft(),c).normalized()))
-        vis += tmp;
-    for (const QRect &tmp : visible.intersected(QRect(c,r.topRight()).normalized()))
-        vis += tmp;
-#endif
-    for (int i = 0; i < vis.size(); i++)
-    {
-        OsdRender *job = new OsdRender(frame, osd_image, video_dim, vis[i]);
-        job->setAutoDelete(true);
-        s_pool.start(job, "OsdRender");
-    }
-    s_pool.waitForDone();
-#else
-#if QT_VERSION < QT_VERSION_CHECK(5, 8, 0)
-    QVector<QRect> vis = visible.rects();
-    for (int i = 0; i < vis.size(); i++)
-    {
-        const QRect& r2 = vis[i];
-#else
-    for (const QRect& r2 : visible)
-    {
-#endif
-        int left   = min(r2.left(), osd_image->width());
-        int top    = min(r2.top(), osd_image->height());
-        int right  = min(left + r2.width(), osd_image->width());
-        int bottom = min(top + r2.height(), osd_image->height());
-
-        if (FMT_YV12 == frame->codec)
-            yuv888_to_yv12(frame, osd_image, left, top, right, bottom);
-    }
-#endif
-    return show;
 }
 
 bool VideoOutput::EnableVisualisation(AudioPlayer *audio, bool enable,
