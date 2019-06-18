@@ -478,6 +478,9 @@ int MythVAAPIContext::HwDecoderInit(AVCodecContext *Context)
  *
  * \note Deinterlacing is setup in PostProcessFrame which has
  * access to deinterlacer preferences.
+ * \note In testing, A/V sync is broken for a stream with timestamps that increment
+ * by 1 (when doublerate deinterlacing). This is presumably an anomaly. NVDEC
+ * doublerate deinterlacers produce the same problem.
 */
 int MythVAAPIContext::FilteredReceiveFrame(AVCodecContext *Context, AVFrame *Frame)
 {
