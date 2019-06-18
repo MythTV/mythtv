@@ -71,7 +71,8 @@ void Serializer::Serialize( const QVariant &vValue, const QString &_sName )
     if ((sName.length() > 0) && sName.at(0) == 'Q')
         sName = sName.mid( 1 );
 
-    m_hash.reset();
+    if ( !vValue.isNull() )
+        m_hash.addData( vValue.toString().toUtf8() );
 
     BeginSerialize( sName );
 
