@@ -26,18 +26,9 @@
 #endif
 
 #include "videoout_null.h"
-
-extern "C" {
-#include "libavcodec/avcodec.h"
-#include "libswscale/swscale.h"
-#include "libavutil/imgutils.h"
-}
-
 #include "videooutbase.h"
 
 #define LOC QString("VideoOutput: ")
-
-static QString to_comma_list(const QStringList &list);
 
 void VideoOutput::GetRenderOptions(render_opts &opts)
 {
@@ -88,13 +79,10 @@ VideoOutput *VideoOutput::Create(
 #endif // USING_OPENGL_VIDEO
     }
 
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + "Allowed renderers: " +
-            to_comma_list(renderers));
-
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Allowed renderers: %1").arg(renderers.join(",")));
     renderers = VideoDisplayProfile::GetFilteredRenderers(decoder, renderers);
-
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + "Allowed renderers (filt: " + decoder +
-            "): " + to_comma_list(renderers));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Allowed renderers (filt: %1): %2")
+        .arg(decoder).arg(renderers.join(",")));
 
     QString renderer;
 
@@ -141,7 +129,7 @@ VideoOutput *VideoOutput::Create(
 #endif // USING_OPENGL_VIDEO
 
         if (vo)
-            vo->db_vdisp_profile = vprof;
+            vo->m_dbDisplayProfile = vprof;
 
         if (vo && !(playerFlags & kVideoIsNull))
         {
@@ -182,7 +170,7 @@ VideoOutput *VideoOutput::Create(
                 return vo;
             }
 
-            vo->db_vdisp_profile = nullptr;
+            vo->m_dbDisplayProfile = nullptr;
             delete vo;
             vo = nullptr;
         }
@@ -194,7 +182,7 @@ VideoOutput *VideoOutput::Create(
                 return vo;
             }
 
-            vo->db_vdisp_profile = nullptr;
+            vo->m_dbDisplayProfile = nullptr;
             delete vo;
             vo = nullptr;
         }
@@ -280,21 +268,21 @@ VideoOutput *VideoOutput::Create(
  */
 VideoOutput::VideoOutput() :
     // DB Settings
-    db_display_dim(0,0),
-    db_aspectoverride(kAspect_Off), db_adjustfill(kAdjustFill_Off),
-    db_letterbox_colour(kLetterBoxColour_Black),
+    m_dbDisplayDimensions(0,0),
+    m_dbAspectOverride(kAspect_Off), m_dbAdjustFill(kAdjustFill_Off),
+    m_dbLetterboxColour(kLetterBoxColour_Black),
 
     // Video parameters
-    video_codec_id(kCodec_NONE),        db_vdisp_profile(nullptr),
+    m_videoCodecID(kCodec_NONE),        m_dbDisplayProfile(nullptr),
 
     // Various state variables
-    errorState(kError_None),            framesPlayed(0),
+    m_errorState(kError_None),            m_framesPlayed(0),
 
     // Custom display resolutions
-    display_res(nullptr),
+    m_displayRes(nullptr),
 
     // Physical display
-    monitor_sz(640,480),                monitor_dim(400,300),
+    m_monitorSize(640,480),                m_monitorDimensions(400,300),
 
     // Visualisation
     m_visual(nullptr),
@@ -304,14 +292,14 @@ VideoOutput::VideoOutput() :
 
     m_deinterlacer()
 {
-    db_display_dim = QSize(gCoreContext->GetNumSetting("DisplaySizeWidth",  0),
+    m_dbDisplayDimensions = QSize(gCoreContext->GetNumSetting("DisplaySizeWidth",  0),
                            gCoreContext->GetNumSetting("DisplaySizeHeight", 0));
 
-    db_aspectoverride = static_cast<AspectOverrideMode>(gCoreContext->GetNumSetting("AspectOverride", 0));
-    db_adjustfill = static_cast<AdjustFillMode>(gCoreContext->GetNumSetting("AdjustFill", 0));
-    db_letterbox_colour = static_cast<LetterBoxColour>(gCoreContext->GetNumSetting("LetterboxColour", 0));
+    m_dbAspectOverride = static_cast<AspectOverrideMode>(gCoreContext->GetNumSetting("AspectOverride", 0));
+    m_dbAdjustFill = static_cast<AdjustFillMode>(gCoreContext->GetNumSetting("AdjustFill", 0));
+    m_dbLetterboxColour = static_cast<LetterBoxColour>(gCoreContext->GetNumSetting("LetterboxColour", 0));
 
-    db_vdisp_profile = nullptr;
+    m_dbDisplayProfile = nullptr;
 }
 
 /**
@@ -320,10 +308,10 @@ VideoOutput::VideoOutput() :
  */
 VideoOutput::~VideoOutput()
 {
-    delete db_vdisp_profile;
+    delete m_dbDisplayProfile;
 
     ResizeForGui();
-    if (display_res)
+    if (m_displayRes)
         DisplayRes::Unlock();
 }
 
@@ -339,21 +327,21 @@ bool VideoOutput::Init(const QSize &video_dim_buf,
 {
     (void)winid;
 
-    video_codec_id = codec_id;
-    bool wasembedding = window.IsEmbedding();
+    m_videoCodecID = codec_id;
+    bool wasembedding = m_window.IsEmbedding();
     QRect oldrect;
     if (wasembedding)
     {
-        oldrect = window.GetEmbeddingRect();
+        oldrect = m_window.GetEmbeddingRect();
         StopEmbedding();
     }
 
-    bool mainSuccess = window.Init(video_dim_buf, video_dim_disp,
+    bool mainSuccess = m_window.Init(video_dim_buf, video_dim_disp,
                                    aspect, win_rect,
-                                   db_aspectoverride, db_adjustfill);
+                                   m_dbAspectOverride, m_dbAdjustFill);
 
-    if (db_vdisp_profile)
-        db_vdisp_profile->SetInput(window.GetVideoDim());
+    if (m_dbDisplayProfile)
+        m_dbDisplayProfile->SetInput(m_window.GetVideoDim());
 
     if (wasembedding)
         EmbedInWidget(oldrect);
@@ -365,28 +353,28 @@ bool VideoOutput::Init(const QSize &video_dim_buf,
 
 void VideoOutput::InitOSD(OSD *osd)
 {
-    if (db_vdisp_profile && !db_vdisp_profile->IsOSDFadeEnabled())
+    if (m_dbDisplayProfile && !m_dbDisplayProfile->IsOSDFadeEnabled())
         osd->DisableFade();
 }
 
 QString VideoOutput::GetFilters(void) const
 {
-    if (db_vdisp_profile)
-        return db_vdisp_profile->GetFilters();
+    if (m_dbDisplayProfile)
+        return m_dbDisplayProfile->GetFilters();
     return QString();
 }
 
 void VideoOutput::SetVideoFrameRate(float playback_fps)
 {
-    if (db_vdisp_profile)
-        db_vdisp_profile->SetOutput(playback_fps);
+    if (m_dbDisplayProfile)
+        m_dbDisplayProfile->SetOutput(playback_fps);
 }
 
 void VideoOutput::SetDeinterlacing(bool Enable, bool DoubleRate)
 {
     if (!Enable)
     {
-        vbuffers.SetDeinterlacing(DEINT_NONE, DEINT_NONE, video_codec_id);
+        m_videoBuffers.SetDeinterlacing(DEINT_NONE, DEINT_NONE, m_videoCodecID);
         return;
     }
 
@@ -399,7 +387,7 @@ void VideoOutput::SetDeinterlacing(bool Enable, bool DoubleRate)
     //}
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("SetDeinterlacing: %1 DoubleRate %2")
         .arg(DeinterlacerPref(singlerate)).arg(DeinterlacerPref(doublerate)));
-    vbuffers.SetDeinterlacing(singlerate, doublerate, video_codec_id);
+    m_videoBuffers.SetDeinterlacing(singlerate, doublerate, m_videoCodecID);
 }
 
 /**
@@ -410,7 +398,7 @@ void VideoOutput::SetDeinterlacing(bool Enable, bool DoubleRate)
  */
 void VideoOutput::VideoAspectRatioChanged(float aspect)
 {
-    window.VideoAspectRatioChanged(aspect);
+    m_window.VideoAspectRatioChanged(aspect);
 }
 
 /**
@@ -425,16 +413,16 @@ bool VideoOutput::InputChanged(const QSize &video_dim_buf,
                                bool        &/*aspect_only*/,
                                MythMultiLocker*)
 {
-    window.InputChanged(video_dim_buf, video_dim_disp, aspect);
+    m_window.InputChanged(video_dim_buf, video_dim_disp, aspect);
 
     AVCodecID avCodecId = myth2av_codecid(myth_codec_id);
     AVCodec *codec = avcodec_find_decoder(avCodecId);
     QString codecName;
     if (codec)
         codecName = codec->name;
-    if (db_vdisp_profile)
-        db_vdisp_profile->SetInput(window.GetVideoDim(),0,codecName);
-    video_codec_id = myth_codec_id;
+    if (m_dbDisplayProfile)
+        m_dbDisplayProfile->SetInput(m_window.GetVideoDim(),0,codecName);
+    m_videoCodecID = myth_codec_id;
     DiscardFrames(true);
     return true;
 }
@@ -443,7 +431,7 @@ bool VideoOutput::InputChanged(const QSize &video_dim_buf,
 */
 void VideoOutput::ResizeDisplayWindow(const QRect &rect, bool save_visible_rect)
 {
-    window.ResizeDisplayWindow(rect, save_visible_rect);
+    m_window.ResizeDisplayWindow(rect, save_visible_rect);
 }
 
 /**
@@ -452,7 +440,7 @@ void VideoOutput::ResizeDisplayWindow(const QRect &rect, bool save_visible_rect)
  */
 void VideoOutput::EmbedInWidget(const QRect &rect)
 {
-    window.EmbedInWidget(rect);
+    m_window.EmbedInWidget(rect);
 }
 
 /**
@@ -462,21 +450,7 @@ void VideoOutput::EmbedInWidget(const QRect &rect)
  */
 void VideoOutput::StopEmbedding(void)
 {
-    window.StopEmbedding();
-}
-
-/**
- * \fn VideoOutput::DrawSlice(VideoFrame*, int, int, int, int)
- * \brief Informs video output of new data for frame,
- *        used for hardware accelerated decoding.
- */
-void VideoOutput::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
-{
-    (void)frame;
-    (void)x;
-    (void)y;
-    (void)w;
-    (void)h;
+    m_window.StopEmbedding();
 }
 
 void VideoOutput::GetOSDBounds(QRect &total, QRect &visible,
@@ -497,13 +471,13 @@ void VideoOutput::GetOSDBounds(QRect &total, QRect &visible,
 QRect VideoOutput::GetVisibleOSDBounds(
     float &visible_aspect, float &font_scaling, float themeaspect) const
 {
-    QRect dvr = window.GetDisplayVisibleRect();
+    QRect dvr = m_window.GetDisplayVisibleRect();
     float dispPixelAdj = 1.0F;
     if (dvr.height() && dvr.width())
         dispPixelAdj = (GetDisplayAspect() * dvr.height()) / dvr.width();
 
-    float ova = window.GetOverridenVideoAspect();
-    QRect vr = window.GetVideoRect();
+    float ova = m_window.GetOverridenVideoAspect();
+    QRect vr = m_window.GetVideoRect();
     float vs = vr.height() ? static_cast<float>(vr.width()) / vr.height() : 1.0F;
     visible_aspect = themeaspect * (ova > 0.0f ? vs / ova : 1.F) * dispPixelAdj;
 
@@ -517,12 +491,12 @@ QRect VideoOutput::GetVisibleOSDBounds(
  */
 QRect VideoOutput::GetTotalOSDBounds(void) const
 {
-    return window.GetDisplayVisibleRect();
+    return m_window.GetDisplayVisibleRect();
 }
 
 QRect VideoOutput::GetMHEGBounds(void)
 {
-    return window.GetDisplayVideoRect();
+    return m_window.GetDisplayVideoRect();
 }
 
 /**
@@ -537,7 +511,7 @@ QRect VideoOutput::GetMHEGBounds(void)
  */
 void VideoOutput::MoveResize(void)
 {
-    window.MoveResize();
+    m_window.MoveResize();
 }
 
 /**
@@ -548,7 +522,7 @@ void VideoOutput::MoveResize(void)
  */
 void VideoOutput::Zoom(ZoomDirection direction)
 {
-    window.Zoom(direction);
+    m_window.Zoom(direction);
 }
 
 /**
@@ -558,7 +532,7 @@ void VideoOutput::Zoom(ZoomDirection direction)
  */
 void VideoOutput::ToggleMoveBottomLine(void)
 {
-    window.ToggleMoveBottomLine();
+    m_window.ToggleMoveBottomLine();
 }
 
 /**
@@ -567,7 +541,7 @@ void VideoOutput::ToggleMoveBottomLine(void)
  */
 void VideoOutput::SaveBottomLine(void)
 {
-    window.SaveBottomLine();
+    m_window.SaveBottomLine();
 }
 
 /**
@@ -579,7 +553,7 @@ void VideoOutput::SaveBottomLine(void)
  */
 void VideoOutput::ToggleAspectOverride(AspectOverrideMode aspectMode)
 {
-    window.ToggleAspectOverride(aspectMode);
+    m_window.ToggleAspectOverride(aspectMode);
 }
 
 /**
@@ -591,7 +565,7 @@ void VideoOutput::ToggleAspectOverride(AspectOverrideMode aspectMode)
  */
 void VideoOutput::ToggleAdjustFill(AdjustFillMode adjustFill)
 {
-    window.ToggleAdjustFill(adjustFill);
+    m_window.ToggleAdjustFill(adjustFill);
 }
 
 int VideoOutput::ChangePictureAttribute(
@@ -623,12 +597,12 @@ int VideoOutput::ChangePictureAttribute(
  */
 int VideoOutput::SetPictureAttribute(PictureAttribute attribute, int newValue)
 {
-    return videoColourSpace.SetPictureAttribute(attribute, newValue);
+    return m_videoColourSpace.SetPictureAttribute(attribute, newValue);
 }
 
 int VideoOutput::GetPictureAttribute(PictureAttribute attributeType)
 {
-    return videoColourSpace.GetPictureAttribute(attributeType);
+    return m_videoColourSpace.GetPictureAttribute(attributeType);
 }
 
 /**
@@ -636,7 +610,7 @@ int VideoOutput::GetPictureAttribute(PictureAttribute attributeType)
 */
 QString VideoOutput::GetOSDRenderer(void) const
 {
-    return db_vdisp_profile->GetOSDRenderer();
+    return m_dbDisplayProfile->GetOSDRenderer();
 }
 
 /*
@@ -645,7 +619,7 @@ QString VideoOutput::GetOSDRenderer(void) const
 QRect VideoOutput::GetPIPRect(
     PIPLocation location, MythPlayer *pipplayer, bool do_pixel_adj) const
 {
-    return window.GetPIPRect(location, pipplayer, do_pixel_adj);
+    return m_window.GetPIPRect(location, pipplayer, do_pixel_adj);
 }
 
 void VideoOutput::ShowPIPs(VideoFrame *frame, const PIPMap &pipPlayers)
@@ -657,17 +631,17 @@ void VideoOutput::ShowPIPs(VideoFrame *frame, const PIPMap &pipPlayers)
 
 AspectOverrideMode VideoOutput::GetAspectOverride(void) const
 {
-    return window.GetAspectOverride();
+    return m_window.GetAspectOverride();
 }
 
 AdjustFillMode VideoOutput::GetAdjustFill(void) const
 {
-    return window.GetAdjustFill();
+    return m_window.GetAdjustFill();
 }
 
 float VideoOutput::GetDisplayAspect(void) const
 {
-    return window.GetDisplayAspect();
+    return m_window.GetDisplayAspect();
 }
 
 void VideoOutput::ClearDummyFrame(VideoFrame *frame)
@@ -681,7 +655,7 @@ void VideoOutput::ClearDummyFrame(VideoFrame *frame)
 
 void VideoOutput::SetVideoResize(const QRect &VideoRect)
 {
-    window.SetITVResize(VideoRect);
+    m_window.SetITVResize(VideoRect);
 }
 
 /**
@@ -689,7 +663,7 @@ void VideoOutput::SetVideoResize(const QRect &VideoRect)
  */
 void VideoOutput::SetVideoScalingAllowed(bool change)
 {
-    window.SetVideoScalingAllowed(change);
+    m_window.SetVideoScalingAllowed(change);
 }
 
 bool VideoOutput::EnableVisualisation(AudioPlayer *audio, bool enable,
@@ -755,9 +729,8 @@ void VideoOutput::CopyFrame(VideoFrame *to, const VideoFrame *from)
 
 QRect VideoOutput::GetImageRect(const QRect &rect, QRect *display)
 {
-    qreal hscale, tmp;
-    tmp = 0.0;
-    QSize video_size   = window.GetVideoDispDim();
+    qreal hscale = 0.0;
+    QSize video_size   = m_window.GetVideoDispDim();
     int image_height   = video_size.height();
     int image_width    = (image_height > 720) ? 1920 :
                          (image_height > 576) ? 1280 : 720;
@@ -775,8 +748,8 @@ QRect VideoOutput::GetImageRect(const QRect &rect, QRect *display)
     }
     QRect result = rect1;
 
-    QRect dvr_rec = window.GetDisplayVideoRect();
-    QRect vid_rec = window.GetVideoRect();
+    QRect dvr_rec = m_window.GetDisplayVideoRect();
+    QRect vid_rec = m_window.GetVideoRect();
 
     hscale = image_aspect / pixel_aspect;
     if (hscale < 0.99 || hscale > 1.01)
@@ -821,20 +794,7 @@ QRect VideoOutput::GetSafeRect(void)
 
 void VideoOutput::SetPIPState(PIPState setting)
 {
-    window.SetPIPState(setting);
-}
-
-
-static QString to_comma_list(const QStringList &list)
-{
-    QString ret = "";
-    for (QStringList::const_iterator it = list.begin(); it != list.end(); ++it)
-        ret += *it + ",";
-
-    if (ret.length())
-        return ret.left(ret.length()-1);
-
-    return "";
+    m_window.SetPIPState(setting);
 }
 
 VideoFrameType* VideoOutput::DirectRenderFormats(void)
@@ -845,12 +805,12 @@ VideoFrameType* VideoOutput::DirectRenderFormats(void)
 
 bool VideoOutput::ReAllocateFrame(VideoFrame *Frame, VideoFrameType Type)
 {
-    return vbuffers.ReinitBuffer(Frame, Type, video_codec_id);
+    return m_videoBuffers.ReinitBuffer(Frame, Type, m_videoCodecID);
 }
 
 bool VideoOutput::IsEmbedding(void)
 {
-    return window.IsEmbedding();
+    return m_window.IsEmbedding();
 }
 
 /**
@@ -860,8 +820,8 @@ bool VideoOutput::IsEmbedding(void)
  */
 void VideoOutput::ResizeForGui(void)
 {
-    if (display_res)
-        display_res->SwitchToGUI();
+    if (m_displayRes)
+        m_displayRes->SwitchToGUI();
 }
 
 /**
@@ -877,27 +837,27 @@ void VideoOutput::ResizeForGui(void)
  */
 void VideoOutput::ResizeForVideo(int width, int height)
 {
-    if (!display_res)
+    if (!m_displayRes)
         return;
 
     if (!width || !height)
     {
-        width  = window.GetVideoDispDim().width();
-        height = window.GetVideoDispDim().height();
+        width  = m_window.GetVideoDispDim().width();
+        height = m_window.GetVideoDispDim().height();
         if (!width || !height)
             return;
     }
 
-    float rate = db_vdisp_profile ? db_vdisp_profile->GetOutput() : 0.0f;
-    if (display_res && display_res->SwitchToVideo(width, height, static_cast<double>(rate)))
+    float rate = m_dbDisplayProfile ? m_dbDisplayProfile->GetOutput() : 0.0f;
+    if (m_displayRes && m_displayRes->SwitchToVideo(width, height, static_cast<double>(rate)))
     {
         // Switching to custom display resolution succeeded
         // Make a note of the new size
-        window.SetDisplayDim(QSize(display_res->GetPhysicalWidth(),
-                                       display_res->GetPhysicalHeight()));
-        window.SetDisplayAspect(static_cast<float>(display_res->GetAspectRatio()));
+        m_window.SetDisplayDim(QSize(m_displayRes->GetPhysicalWidth(),
+                                       m_displayRes->GetPhysicalHeight()));
+        m_window.SetDisplayAspect(static_cast<float>(m_displayRes->GetAspectRatio()));
 
-        bool fullscreen = !window.UsingGuiSize();
+        bool fullscreen = !m_window.UsingGuiSize();
 
         // if width && height are zero users expect fullscreen playback
         if (!fullscreen)
@@ -909,10 +869,10 @@ void VideoOutput::ResizeForVideo(int width, int height)
 
         if (fullscreen)
         {
-            QSize sz(display_res->GetWidth(), display_res->GetHeight());
+            QSize sz(m_displayRes->GetWidth(), m_displayRes->GetHeight());
             const QRect display_visible_rect =
                     QRect(GetMythMainWindow()->geometry().topLeft(), sz);
-            window.SetDisplayVisibleRect(display_visible_rect);
+            m_window.SetDisplayVisibleRect(display_visible_rect);
             MoveResize();
             // Resize X window to fill new resolution
             MoveResizeWindow(display_visible_rect);
@@ -933,16 +893,16 @@ void VideoOutput::InitDisplayMeasurements(int width, int height, bool resize)
     // desired res, because X will mask off anything outside
     // the initial dimensions
     QSize sz1 = disp.m_res;
-    QSize sz2 = window.GetScreenGeometry().size();
+    QSize sz2 = m_window.GetScreenGeometry().size();
     QSize max_size = sz1.expandedTo(sz2);
 
-    if (window.UsingGuiSize())
+    if (m_window.UsingGuiSize())
         max_size = GetMythMainWindow()->geometry().size();
 
-    if (display_res)
+    if (m_displayRes)
     {
-        max_size.setWidth(display_res->GetMaxWidth());
-        max_size.setHeight(display_res->GetMaxHeight());
+        max_size.setWidth(m_displayRes->GetMaxWidth());
+        max_size.setHeight(m_displayRes->GetMaxHeight());
     }
 
     if (resize)
@@ -954,23 +914,23 @@ void VideoOutput::InitDisplayMeasurements(int width, int height, bool resize)
 
     // get the physical dimensions (in mm) of the display. If using
     // DisplayRes, this will be overridden when we call ResizeForVideo
-    if (db_display_dim.isEmpty())
+    if (m_dbDisplayDimensions.isEmpty())
     {
-        window.SetDisplayDim(disp.m_size);
+        m_window.SetDisplayDim(disp.m_size);
     }
     else
     {
-        window.SetDisplayDim(db_display_dim);
+        m_window.SetDisplayDim(m_dbDisplayDimensions);
         source = "Database";
     }
 
     // Set the display mode if required
-    if (display_res)
+    if (m_displayRes)
         ResizeForVideo(width, height);
 
     // Determine window and screen dimensions in pixels
     QSize screen_size = disp.m_res;
-    QSize window_size = window.GetDisplayVisibleRect().size();
+    QSize window_size = m_window.GetDisplayVisibleRect().size();
 
     float pixel_aspect = static_cast<float>(screen_size.width()) / screen_size.height();
 
@@ -980,14 +940,14 @@ void VideoOutput::InitDisplayMeasurements(int width, int height, bool resize)
             .arg(window_size.width()).arg(window_size.height()));
 
     // Check the display dimensions
-    QSize disp_dim = window.GetDisplayDim();
+    QSize disp_dim = m_window.GetDisplayDim();
     float disp_aspect;
 
     // If we are using Xinerama the display dimensions cannot be trusted.
     // We need to use the Xinerama monitor aspect ratio from the DB to set
     // the physical screen width. This assumes the height is correct, which
     // is more or less true in the typical side-by-side monitor setup.
-    if (window.UsingXinerama())
+    if (m_window.UsingXinerama())
     {
         source = "Xinerama";
         disp_aspect = static_cast<float>(gCoreContext->GetFloatSettingOnHost(
@@ -1013,8 +973,8 @@ void VideoOutput::InitDisplayMeasurements(int width, int height, bool resize)
             .arg(static_cast<double>(disp_aspect)));
 
     // Save the unscaled size and dimensions for window resizing
-    monitor_sz  = screen_size;
-    monitor_dim = disp_dim;
+    m_monitorSize  = screen_size;
+    m_monitorDimensions = disp_dim;
 
     // We must now scale the display measurements to our window size and save
     // them. If we are running fullscreen this is a no-op.
@@ -1023,18 +983,18 @@ void VideoOutput::InitDisplayMeasurements(int width, int height, bool resize)
                      (disp_dim.height() * window_size.height()) /
                       screen_size.height());
     disp_aspect = static_cast<float>(disp_dim.width()) / disp_dim.height();
-    window.SetDisplayDim(disp_dim);
-    window.SetDisplayAspect(disp_aspect);
+    m_window.SetDisplayDim(disp_dim);
+    m_window.SetDisplayAspect(disp_aspect);
 
     // If we are using XRandR, use the aspect ratio from it
-    if (display_res)
-        window.SetDisplayAspect(static_cast<float>(display_res->GetAspectRatio()));
+    if (m_displayRes)
+        m_window.SetDisplayAspect(static_cast<float>(m_displayRes->GetAspectRatio()));
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
         QString("Estimated window dimensions: %1x%2 mm  Aspect: %3")
-            .arg(window.GetDisplayDim().width())
-            .arg(window.GetDisplayDim().height())
-            .arg(static_cast<double>(window.GetDisplayAspect())));
+            .arg(m_window.GetDisplayDim().width())
+            .arg(m_window.GetDisplayDim().height())
+            .arg(static_cast<double>(m_window.GetDisplayAspect())));
 }
 
 int VideoOutput::CalcHueBase(const QString &adaptor_name)

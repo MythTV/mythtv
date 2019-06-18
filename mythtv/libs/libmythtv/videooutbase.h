@@ -26,20 +26,12 @@
 
 using namespace std;
 
-class MythPainter;
-class MythYUVAPainter;
-class MythImage;
 class MythPlayer;
 class OSD;
 class AudioPlayer;
 class MythRender;
 
 typedef QMap<MythPlayer*,PIPLocation> PIPMap;
-
-extern "C" {
-struct ImgReSampleContext;
-struct SwsContext;
-}
 
 class MythMultiLocker;
 
@@ -68,7 +60,7 @@ class VideoOutput
                               FrameScanType Scan = kScan_Ignore) = 0;
     virtual void PrepareFrame(VideoFrame *buffer, FrameScanType, OSD *osd) = 0;
     virtual void Show(FrameScanType) = 0;
-    VideoDisplayProfile *GetProfile() { return db_vdisp_profile; }
+    VideoDisplayProfile *GetProfile() { return m_dbDisplayProfile; }
 
 
     virtual void WindowResized(const QSize &) {}
@@ -107,12 +99,6 @@ class VideoOutput
                               float &visible_aspect, float &font_scaling,
                               float themeAspect) const;
     QRect        GetMHEGBounds(void);
-    virtual void DrawSlice(VideoFrame *frame, int x, int y, int w, int h);
-
-    /// \brief Draws non-video portions of the screen
-    /// \param sync if set any queued up draws are sent immediately to the
-    ///             graphics context and we block until they have completed.
-    virtual void DrawUnusedRects(bool sync = true) = 0;
 
     /// \brief Returns current display aspect ratio.
     virtual float GetDisplayAspect(void) const;
@@ -129,9 +115,9 @@ class VideoOutput
     virtual void ToggleAdjustFill(
         AdjustFillMode adjustFillMode = kAdjustFill_Toggle);
 
-    QString GetZoomString(void) const { return window.GetZoomString(); }
+    QString GetZoomString(void) const { return m_window.GetZoomString(); }
     PictureAttributeSupported GetSupportedPictureAttributes(void)
-        { return videoColourSpace.SupportedAttributes(); }
+        { return m_videoColourSpace.SupportedAttributes(); }
     int          ChangePictureAttribute(PictureAttribute, bool direction);
     virtual int  SetPictureAttribute(PictureAttribute, int newValue);
     int          GetPictureAttribute(PictureAttribute);
@@ -149,32 +135,32 @@ class VideoOutput
     virtual void* GetDecoderContext(unsigned char*, uint8_t*&) { return nullptr; }
 
     /// \brief Sets the number of frames played
-    virtual void SetFramesPlayed(long long fp) { framesPlayed = fp; }
+    virtual void SetFramesPlayed(long long fp) { m_framesPlayed = fp; }
     /// \brief Returns the number of frames played
-    virtual long long GetFramesPlayed(void) { return framesPlayed; }
+    virtual long long GetFramesPlayed(void) { return m_framesPlayed; }
 
     /// \brief Returns true if a fatal error has been encountered.
-    bool IsErrored() const { return errorState != kError_None; }
+    bool IsErrored() const { return m_errorState != kError_None; }
     /// \brief Returns error type
-    VideoErrorState GetError(void) const { return errorState; }
+    VideoErrorState GetError(void) const { return m_errorState; }
     // Video Buffer Management
     /// \brief Sets whether to use a normal number of buffers or fewer buffers.
-    void SetPrebuffering(bool normal) { vbuffers.SetPrebuffering(normal); }
+    void SetPrebuffering(bool normal) { m_videoBuffers.SetPrebuffering(normal); }
     /// \brief Tells video output to toss decoded buffers due to a seek
-    virtual void ClearAfterSeek(void) { vbuffers.ClearAfterSeek(); }
+    virtual void ClearAfterSeek(void) { m_videoBuffers.ClearAfterSeek(); }
     /// \brief Returns number of frames that are fully decoded.
     virtual int ValidVideoFrames(void) const
-        { return static_cast<int>(vbuffers.ValidVideoFrames()); }
+        { return static_cast<int>(m_videoBuffers.ValidVideoFrames()); }
     /// \brief Returns number of frames available for decoding onto.
-    int FreeVideoFrames(void) { return static_cast<int>(vbuffers.FreeVideoFrames()); }
+    int FreeVideoFrames(void) { return static_cast<int>(m_videoBuffers.FreeVideoFrames()); }
     /// \brief Returns true iff enough frames are available to decode onto.
-    bool EnoughFreeFrames(void) { return vbuffers.EnoughFreeFrames(); }
+    bool EnoughFreeFrames(void) { return m_videoBuffers.EnoughFreeFrames(); }
     /// \brief Returns true iff there are plenty of decoded frames ready
     ///        for display.
-    bool EnoughDecodedFrames(void) { return vbuffers.EnoughDecodedFrames(); }
+    bool EnoughDecodedFrames(void) { return m_videoBuffers.EnoughDecodedFrames(); }
     /// \brief Returns true iff we have at least the minimum number of
     ///        decoded frames ready for display.
-    bool EnoughPrebufferedFrames(void) { return vbuffers.EnoughPrebufferedFrames(); }
+    bool EnoughPrebufferedFrames(void) { return m_videoBuffers.EnoughPrebufferedFrames(); }
     virtual VideoFrameType* DirectRenderFormats(void);
     bool ReAllocateFrame(VideoFrame *Frame, VideoFrameType Type);
     /// \brief Returns if videooutput is embedding
@@ -184,25 +170,25 @@ class VideoOutput
      * \brief Blocks until it is possible to return a frame for decoding onto.
      */
     virtual VideoFrame *GetNextFreeFrame(void)
-        { return vbuffers.GetNextFreeFrame(); }
+        { return m_videoBuffers.GetNextFreeFrame(); }
     /// \brief Releases a frame from the ready for decoding queue onto the
     ///        queue of frames ready for display.
-    virtual void ReleaseFrame(VideoFrame *frame) { vbuffers.ReleaseFrame(frame); }
+    virtual void ReleaseFrame(VideoFrame *frame) { m_videoBuffers.ReleaseFrame(frame); }
     /// \brief Releases a frame for reuse if it is in limbo.
-    virtual void DeLimboFrame(VideoFrame *frame) { vbuffers.DeLimboFrame(frame); }
+    virtual void DeLimboFrame(VideoFrame *frame) { m_videoBuffers.DeLimboFrame(frame); }
     /// \brief Tell GetLastShownFrame() to return the next frame from the head
     ///        of the queue of frames to display.
-    virtual void StartDisplayingFrame(void) { vbuffers.StartDisplayingFrame(); }
+    virtual void StartDisplayingFrame(void) { m_videoBuffers.StartDisplayingFrame(); }
     /// \brief Releases frame returned from GetLastShownFrame() onto the
     ///        queue of frames ready for decoding onto.
     virtual void DoneDisplayingFrame(VideoFrame *frame)
-        { vbuffers.DoneDisplayingFrame(frame); }
+        { m_videoBuffers.DoneDisplayingFrame(frame); }
     /// \brief Releases frame from any queue onto the
     ///        queue of frames ready for decoding onto.
-    virtual void DiscardFrame(VideoFrame *frame) { vbuffers.DiscardFrame(frame); }
+    virtual void DiscardFrame(VideoFrame *frame) { m_videoBuffers.DiscardFrame(frame); }
     /// \brief Releases all frames not being actively displayed from any queue
     ///        onto the queue of frames ready for decoding onto.
-    virtual void DiscardFrames(bool kf) { vbuffers.DiscardFrames(kf); }
+    virtual void DiscardFrames(bool kf) { m_videoBuffers.DiscardFrames(kf); }
     /// \brief Clears the frame to black. Subclasses may choose
     ///        to mark the frame as a dummy and act appropriately
     virtual void ClearDummyFrame(VideoFrame* frame);
@@ -210,15 +196,15 @@ class VideoOutput
 
     /// \bug not implemented correctly. vpos is not updated.
     virtual VideoFrame *GetLastDecodedFrame(void)
-        { return vbuffers.GetLastDecodedFrame(); }
+        { return m_videoBuffers.GetLastDecodedFrame(); }
 
     /// \brief Returns frame from the head of the ready to be displayed queue,
     ///        if StartDisplayingFrame has been called.
     virtual VideoFrame *GetLastShownFrame(void)
-        { return vbuffers.GetLastShownFrame(); }
+        { return m_videoBuffers.GetLastShownFrame(); }
 
     /// \brief Returns string with status of each frame for debugging.
-    QString GetFrameStatus(void) const { return vbuffers.GetStatus(); }
+    QString GetFrameStatus(void) const { return m_videoBuffers.GetStatus(); }
 
     /// \brief Updates frame displayed when video is paused.
     virtual void UpdatePauseFrame(int64_t &disp_timecode) = 0;
@@ -282,31 +268,30 @@ class VideoOutput
 
     static void CopyFrame(VideoFrame* to, const VideoFrame* from);
 
-    VideoOutWindow     window;
-    QSize              db_display_dim;   ///< Screen dimensions in millimeters from DB
-    VideoColourSpace   videoColourSpace;
-    AspectOverrideMode db_aspectoverride;
-    AdjustFillMode     db_adjustfill;
-    LetterBoxColour    db_letterbox_colour;
-    QString            db_deint_filtername;
+    VideoOutWindow     m_window;
+    QSize              m_dbDisplayDimensions;   ///< Screen dimensions in millimeters from DB
+    VideoColourSpace   m_videoColourSpace;
+    AspectOverrideMode m_dbAspectOverride;
+    AdjustFillMode     m_dbAdjustFill;
+    LetterBoxColour    m_dbLetterboxColour;
 
     // Video parameters
-    MythCodecID          video_codec_id;
-    VideoDisplayProfile *db_vdisp_profile;
+    MythCodecID          m_videoCodecID;
+    VideoDisplayProfile *m_dbDisplayProfile;
 
     /// VideoBuffers instance used to track video output buffers.
-    VideoBuffers vbuffers;
+    VideoBuffers m_videoBuffers;
 
     // Various state variables
-    VideoErrorState errorState;
-    long long framesPlayed;
+    VideoErrorState m_errorState;
+    long long m_framesPlayed;
 
     // Custom display resolutions
-    DisplayRes *display_res;
+    DisplayRes *m_displayRes;
 
     // Display information
-    QSize monitor_sz;
-    QSize monitor_dim;
+    QSize m_monitorSize;
+    QSize m_monitorDimensions;
 
     // Visualisation
     VideoVisual     *m_visual;

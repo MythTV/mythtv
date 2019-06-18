@@ -37,7 +37,6 @@ class VideoOutputD3D : public VideoOutput
                       MythMultiLocker *Locks) override; // VideoOutput
     void MoveResizeWindow(QRect new_rect) override {;} // VideoOutput
     void UpdatePauseFrame(int64_t &disp_timecode) override; // VideoOutput
-    void DrawUnusedRects(bool) override {;} // VideoOutput
     void EmbedInWidget(const QRect &rect) override; // VideoOutput
     void StopEmbedding(void) override; // VideoOutput
     static QStringList GetAllowedRenderers(MythCodecID myth_codec_id,
@@ -56,7 +55,7 @@ class VideoOutputD3D : public VideoOutput
         { return true; }
     MythPainter *GetOSDPainter(void) override; // VideoOutput
     bool hasHWAcceleration(void) const override // VideoOutput
-        { return !codec_is_std(video_codec_id); }
+        { return !codec_is_std(m_videoCodecID); }
     void* GetDecoderContext(unsigned char* buf, uint8_t*& id) override; // VideoOutput
 
     bool CanVisualise(AudioPlayer *audio, MythRender */*render*/) override // VideoOutput

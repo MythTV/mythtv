@@ -1105,12 +1105,6 @@ void MythPlayer::DiscardVideoFrames(bool next_frame_keyframe)
         videoOutput->DiscardFrames(next_frame_keyframe);
 }
 
-void MythPlayer::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
-{
-    if (videoOutput)
-        videoOutput->DrawSlice(frame, x, y, w, h);
-}
-
 void* MythPlayer::GetDecoderContext(unsigned char* buf, uint8_t*& id)
 {
     if (videoOutput)

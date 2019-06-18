@@ -28,7 +28,6 @@ class VideoOutputNull : public VideoOutput
                       MythMultiLocker* Locks) override; // VideoOutput
     void EmbedInWidget(const QRect &rect) override; // VideoOutput
     void StopEmbedding(void) override; // VideoOutput
-    void DrawUnusedRects(bool sync = true) override; // VideoOutput
     void UpdatePauseFrame(int64_t &disp_timecode) override; // VideoOutput
     void ProcessFrame(VideoFrame *frame, OSD *osd,
                       const PIPMap &pipPlayers,

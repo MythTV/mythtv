@@ -117,7 +117,7 @@ VideoOutputOpenGL::VideoOutputOpenGL(const QString &Profile)
 {
     // Setup display switching
     if (gCoreContext->GetBoolSetting("UseVideoModes", false))
-        display_res = DisplayRes::GetDisplayRes(true);
+        m_displayRes = DisplayRes::GetDisplayRes(true);
 
     // Retrieve render context
     m_render = MythRenderOpenGL::GetOpenGLRender();
@@ -151,14 +151,14 @@ VideoOutputOpenGL::VideoOutputOpenGL(const QString &Profile)
 
     // Create OpenGLVideo
     QRect dvr = GetDisplayVisibleRect();
-    m_openGLVideo = new OpenGLVideo(m_render, &videoColourSpace, window.GetVideoDim(),
-                                    window.GetVideoDispDim(), dvr, window.GetDisplayVideoRect(),
-                                    window.GetVideoRect(), true, m_videoProfile);
+    m_openGLVideo = new OpenGLVideo(m_render, &m_videoColourSpace, m_window.GetVideoDim(),
+                                    m_window.GetVideoDispDim(), dvr, m_window.GetDisplayVideoRect(),
+                                    m_window.GetVideoRect(), true, m_videoProfile);
 
     // Connect VideoOutWindow to OpenGLVideo
-    QObject::connect(&window, &VideoOutWindow::VideoSizeChanged, m_openGLVideo, &OpenGLVideo::SetVideoDimensions);
-    QObject::connect(&window, &VideoOutWindow::VideoRectsChanged, m_openGLVideo, &OpenGLVideo::SetVideoRects);
-    QObject::connect(&window, &VideoOutWindow::VisibleRectChanged, m_openGLVideo, &OpenGLVideo::SetViewportRect);
+    QObject::connect(&m_window, &VideoOutWindow::VideoSizeChanged, m_openGLVideo, &OpenGLVideo::SetVideoDimensions);
+    QObject::connect(&m_window, &VideoOutWindow::VideoRectsChanged, m_openGLVideo, &OpenGLVideo::SetVideoRects);
+    QObject::connect(&m_window, &VideoOutWindow::VisibleRectChanged, m_openGLVideo, &OpenGLVideo::SetViewportRect);
 }
 
 VideoOutputOpenGL::~VideoOutputOpenGL()
@@ -181,14 +181,14 @@ VideoOutputOpenGL::~VideoOutputOpenGL()
 
 void VideoOutputOpenGL::DestroyBuffers(void)
 {
-    vbuffers.BeginLock(kVideoBuffer_pause);
-    while (vbuffers.Size(kVideoBuffer_pause))
-        vbuffers.DiscardFrame(vbuffers.Tail(kVideoBuffer_pause));
-    vbuffers.EndLock();
+    m_videoBuffers.BeginLock(kVideoBuffer_pause);
+    while (m_videoBuffers.Size(kVideoBuffer_pause))
+        m_videoBuffers.DiscardFrame(m_videoBuffers.Tail(kVideoBuffer_pause));
+    m_videoBuffers.EndLock();
 
     DiscardFrames(true);
-    vbuffers.DeleteBuffers();
-    vbuffers.Reset();
+    m_videoBuffers.DeleteBuffers();
+    m_videoBuffers.Reset();
     m_buffersCreated = false;
 }
 
@@ -211,30 +211,30 @@ bool VideoOutputOpenGL::Init(const QSize &VideoDim, const QSize &VideoDispDim, f
         return false;
 
     // Ensure any new profile preferences are handled after a stream change
-    if (db_vdisp_profile)
-        m_openGLVideo->SetProfile(db_vdisp_profile->GetVideoRenderer());
+    if (m_dbDisplayProfile)
+        m_openGLVideo->SetProfile(m_dbDisplayProfile->GetVideoRenderer());
 
     // Set default support for picture attributes
     InitPictureAttributes();
 
     // Setup display
-    QSize size = window.GetVideoDim();
+    QSize size = m_window.GetVideoDim();
     InitDisplayMeasurements(size.width(), size.height(), false);
 
     // Create buffers
-    if (!CreateBuffers(CodecId, window.GetVideoDim()))
+    if (!CreateBuffers(CodecId, m_window.GetVideoDim()))
         return false;
 
     // Adjust visible rect for embedding
     QRect dvr = GetDisplayVisibleRect();
-    if (video_codec_id == kCodec_NONE)
+    if (m_videoCodecID == kCodec_NONE)
     {
         m_render->SetViewPort(QRect(QPoint(), dvr.size()));
         MoveResize();
         return true;
     }
 
-    if (window.GetPIPState() >= kPIPStandAlone)
+    if (m_window.GetPIPState() >= kPIPStandAlone)
     {
         QRect tmprect = QRect(QPoint(0,0), dvr.size());
         ResizeDisplayWindow(tmprect, true);
@@ -253,10 +253,10 @@ bool VideoOutputOpenGL::InputChanged(const QSize &VideoDim, const QSize &VideoDi
                                      float Aspect, MythCodecID CodecId, bool &AspectOnly,
                                      MythMultiLocker* Locks)
 {
-    QSize currentvideodim     = window.GetVideoDim();
-    QSize currentvideodispdim = window.GetVideoDispDim();
-    MythCodecID currentcodec  = video_codec_id;
-    float currentaspect       = window.GetVideoAspect();
+    QSize currentvideodim     = m_window.GetVideoDim();
+    QSize currentvideodispdim = m_window.GetVideoDispDim();
+    MythCodecID currentcodec  = m_videoCodecID;
+    float currentaspect       = m_window.GetVideoAspect();
 
     if (m_newCodecId != kCodec_NONE)
     {
@@ -296,16 +296,16 @@ bool VideoOutputOpenGL::InputChanged(const QSize &VideoDim, const QSize &VideoDi
         if (support == MythOpenGLInterop::Unsupported)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "New video codec is not supported.");
-            errorState = kError_Unknown;
+            m_errorState = kError_Unknown;
             return false;
         }
     }
 
     // delete and recreate the buffers and flag that the input has changed
-    vbuffers.BeginLock(kVideoBuffer_all);
+    m_videoBuffers.BeginLock(kVideoBuffer_all);
     DestroyBuffers();
     m_buffersCreated = CreateBuffers(CodecId, VideoDim);
-    vbuffers.EndLock();
+    m_videoBuffers.EndLock();
     if (!m_buffersCreated)
         return false;
 
@@ -318,7 +318,7 @@ bool VideoOutputOpenGL::InputChanged(const QSize &VideoDim, const QSize &VideoDi
 
 QRect VideoOutputOpenGL::GetDisplayVisibleRect(void)
 {
-    QRect dvr = window.GetDisplayVisibleRect();
+    QRect dvr = m_window.GetDisplayVisibleRect();
 
     MythMainWindow *mainwin = GetMythMainWindow();
     if (!mainwin)
@@ -348,26 +348,26 @@ bool VideoOutputOpenGL::CreateBuffers(MythCodecID CodecID, QSize Size)
 
     if (codec_is_mediacodec_dec(CodecID))
     {
-        vbuffers.Init(VideoBuffers::GetNumBuffers(FMT_MEDIACODEC), false, 1, 4, 2, 1);
-        return vbuffers.CreateBuffers(FMT_YV12, Size.width(), Size.height());
+        m_videoBuffers.Init(VideoBuffers::GetNumBuffers(FMT_MEDIACODEC), false, 1, 4, 2, 1);
+        return m_videoBuffers.CreateBuffers(FMT_YV12, Size.width(), Size.height());
     }
     else if (codec_is_vtb_dec(CodecID))
     {
-        vbuffers.Init(VideoBuffers::GetNumBuffers(FMT_VTB), false, 1, 4, 2, 1);
-        return vbuffers.CreateBuffers(FMT_YV12, Size.width(), Size.height());
+        m_videoBuffers.Init(VideoBuffers::GetNumBuffers(FMT_VTB), false, 1, 4, 2, 1);
+        return m_videoBuffers.CreateBuffers(FMT_YV12, Size.width(), Size.height());
     }
 
     if (codec_is_mediacodec(CodecID))
-        return vbuffers.CreateBuffers(FMT_MEDIACODEC, Size, false, 1, 2, 2, 1);
+        return m_videoBuffers.CreateBuffers(FMT_MEDIACODEC, Size, false, 1, 2, 2, 1);
     else if (codec_is_vaapi(CodecID))
-        return vbuffers.CreateBuffers(FMT_VAAPI, Size, false, 2, 1, 4, 1);
+        return m_videoBuffers.CreateBuffers(FMT_VAAPI, Size, false, 2, 1, 4, 1);
     else if (codec_is_vtb(CodecID))
-        return vbuffers.CreateBuffers(FMT_VTB, Size, false, 1, 4, 2, 1);
+        return m_videoBuffers.CreateBuffers(FMT_VTB, Size, false, 1, 4, 2, 1);
     else if (codec_is_vdpau(CodecID))
-        return vbuffers.CreateBuffers(FMT_VDPAU, Size, false, 2, 1, 4, 1);
+        return m_videoBuffers.CreateBuffers(FMT_VDPAU, Size, false, 2, 1, 4, 1);
     else if (codec_is_nvdec(CodecID))
-        return vbuffers.CreateBuffers(FMT_NVDEC, Size, false, 2, 1, 4, 1);
-    return vbuffers.CreateBuffers(FMT_YV12, Size, false, 1, 12, 4, 2);
+        return m_videoBuffers.CreateBuffers(FMT_NVDEC, Size, false, 2, 1, 4, 1);
+    return m_videoBuffers.CreateBuffers(FMT_YV12, Size, false, 1, 12, 4, 2);
 }
 
 void VideoOutputOpenGL::ProcessFrame(VideoFrame *Frame, OSD */*osd*/,
@@ -383,16 +383,16 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *Frame, OSD */*osd*/,
     if (m_newCodecId != kCodec_NONE)
     {
         // Ensure we don't lose embedding through program changes.
-        bool wasembedding = window.IsEmbedding();
+        bool wasembedding = m_window.IsEmbedding();
         QRect oldrect;
         if (wasembedding)
         {
-            oldrect = window.GetEmbeddingRect();
+            oldrect = m_window.GetEmbeddingRect();
             StopEmbedding();
         }
 
         bool ok = Init(m_newVideoDim, m_newVideoDispDim, m_newAspect,
-                       0, window.GetDisplayVisibleRect(), m_newCodecId);
+                       0, m_window.GetDisplayVisibleRect(), m_newCodecId);
         m_newCodecId = kCodec_NONE;
         m_newVideoDim = QSize();
         m_newVideoDispDim = QSize();
@@ -415,7 +415,7 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *Frame, OSD */*osd*/,
     if (!dummy && swframe)
         m_deinterlacer.Filter(Frame, Scan);
 
-    if (!window.IsEmbedding())
+    if (!m_window.IsEmbedding())
     {
         m_openGLVideoPiPActive = nullptr;
         ShowPIPs(Frame, PiPPlayers);
@@ -445,7 +445,7 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, OSD 
     int topfieldfirst = 0;
     if (Frame)
     {
-        framesPlayed = Frame->frameNumber + 1;
+        m_framesPlayed = Frame->frameNumber + 1;
         topfieldfirst = Frame->interlaced_reversed ? !Frame->top_field_first : Frame->top_field_first;
         dummy = Frame->dummy;
     }
@@ -453,12 +453,12 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, OSD 
     {
         // see VideoOutputOpenGL::DoneDisplayingFrame
         // we only retain pause frames for hardware formats
-        if (vbuffers.Size(kVideoBuffer_pause))
-            Frame = vbuffers.Tail(kVideoBuffer_pause);
+        if (m_videoBuffers.Size(kVideoBuffer_pause))
+            Frame = m_videoBuffers.Tail(kVideoBuffer_pause);
     }
 
     m_render->BindFramebuffer(nullptr);
-    if (db_letterbox_colour == kLetterBoxColour_Gray25)
+    if (m_dbLetterboxColour == kLetterBoxColour_Gray25)
         m_render->SetBackground(127, 127, 127, 255);
     else
         m_render->SetBackground(0, 0, 0, 255);
@@ -482,7 +482,7 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, OSD 
     }
 
     // main UI when embedded
-    if (window.IsEmbedding())
+    if (m_window.IsEmbedding())
     {
         MythMainWindow *win = GetMythMainWindow();
         if (win && win->GetPaintWindow())
@@ -528,7 +528,7 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, OSD 
     }
 
     // visualisation
-    if (m_visual && m_openGLPainter && !window.IsEmbedding())
+    if (m_visual && m_openGLPainter && !m_window.IsEmbedding())
     {
         if (twopass)
             m_render->SetViewPort(first, true);
@@ -542,7 +542,7 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, OSD 
     }
 
     // OSD
-    if (Osd && m_openGLPainter && !window.IsEmbedding())
+    if (Osd && m_openGLPainter && !m_window.IsEmbedding())
     {
         if (twopass)
             m_render->SetViewPort(first, true);
@@ -579,25 +579,25 @@ void VideoOutputOpenGL::DoneDisplayingFrame(VideoFrame *Frame)
 
     bool retain = format_is_hw(Frame->codec);
 
-    vbuffers.BeginLock(kVideoBuffer_pause);
-    while (vbuffers.Size(kVideoBuffer_pause))
+    m_videoBuffers.BeginLock(kVideoBuffer_pause);
+    while (m_videoBuffers.Size(kVideoBuffer_pause))
     {
-        VideoFrame* frame = vbuffers.Dequeue(kVideoBuffer_pause);
+        VideoFrame* frame = m_videoBuffers.Dequeue(kVideoBuffer_pause);
         if (!retain || (retain && (frame != Frame)))
             VideoOutput::DoneDisplayingFrame(frame);
     }
 
     if (retain)
     {
-        vbuffers.Enqueue(kVideoBuffer_pause, Frame);
-        if (vbuffers.Contains(kVideoBuffer_used, Frame))
-            vbuffers.Remove(kVideoBuffer_used, Frame);
+        m_videoBuffers.Enqueue(kVideoBuffer_pause, Frame);
+        if (m_videoBuffers.Contains(kVideoBuffer_used, Frame))
+            m_videoBuffers.Remove(kVideoBuffer_used, Frame);
     }
     else
     {
-        vbuffers.DoneDisplayingFrame(Frame);
+        m_videoBuffers.DoneDisplayingFrame(Frame);
     }
-    vbuffers.EndLock();
+    m_videoBuffers.EndLock();
 }
 
 VideoFrameType* VideoOutputOpenGL::DirectRenderFormats(void)
@@ -661,8 +661,8 @@ QStringList VideoOutputOpenGL::GetAllowedRenderers(MythCodecID CodecId, const QS
 
 void VideoOutputOpenGL::UpdatePauseFrame(int64_t &DisplayTimecode)
 {
-    vbuffers.BeginLock(kVideoBuffer_used);
-    VideoFrame *used = vbuffers.Head(kVideoBuffer_used);
+    m_videoBuffers.BeginLock(kVideoBuffer_used);
+    VideoFrame *used = m_videoBuffers.Head(kVideoBuffer_used);
     if (used)
     {
         if (format_is_hw(used->codec))
@@ -675,12 +675,12 @@ void VideoOutputOpenGL::UpdatePauseFrame(int64_t &DisplayTimecode)
     {
         LOG(VB_PLAYBACK, LOG_WARNING, LOC + "Could not update pause frame");
     }
-    vbuffers.EndLock();
+    m_videoBuffers.EndLock();
 }
 
 void VideoOutputOpenGL::InitPictureAttributes(void)
 {
-    videoColourSpace.SetSupportedAttributes(ALL_PICTURE_ATTRIBUTES);
+    m_videoColourSpace.SetSupportedAttributes(ALL_PICTURE_ATTRIBUTES);
 }
 
 void VideoOutputOpenGL::ShowPIP(VideoFrame*, MythPlayer *PiPPlayer, PIPLocation Location)
@@ -701,14 +701,14 @@ void VideoOutputOpenGL::ShowPIP(VideoFrame*, MythPlayer *PiPPlayer, PIPLocation 
     }
 
     QRect position = GetPIPRect(Location, PiPPlayer);
-    QRect dvr = window.GetDisplayVisibleRect();
+    QRect dvr = m_window.GetDisplayVisibleRect();
 
     m_openGLVideoPiPsReady[PiPPlayer] = false;
     OpenGLVideo *gl_pipchain = m_openGLVideoPiPs[PiPPlayer];
     if (!gl_pipchain)
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Initialise PiP");
-        VideoColourSpace *colourspace = new VideoColourSpace(&videoColourSpace);
+        VideoColourSpace *colourspace = new VideoColourSpace(&m_videoColourSpace);
         m_openGLVideoPiPs[PiPPlayer] = gl_pipchain = new OpenGLVideo(m_render, colourspace,
                                                                 pipvideodim, pipvideodim,
                                                                 dvr, position, pipvideorect,
@@ -727,7 +727,7 @@ void VideoOutputOpenGL::ShowPIP(VideoFrame*, MythPlayer *PiPPlayer, PIPLocation 
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Re-initialise PiP.");
         delete gl_pipchain;
-        VideoColourSpace *colourspace = new VideoColourSpace(&videoColourSpace);
+        VideoColourSpace *colourspace = new VideoColourSpace(&m_videoColourSpace);
         m_openGLVideoPiPs[PiPPlayer] = gl_pipchain = new OpenGLVideo(m_render, colourspace,
                                                                 pipvideodim, pipvideodim,
                                                                 dvr, position, pipvideorect,

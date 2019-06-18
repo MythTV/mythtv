@@ -287,7 +287,6 @@ class MTV_PUBLIC MythPlayer
     void ClearDummyVideoFrame(VideoFrame *frame);
     void DiscardVideoFrame(VideoFrame *buffer);
     void DiscardVideoFrames(bool next_frame_keyframe);
-    void DrawSlice(VideoFrame *frame, int x, int y, int w, int h);
     /// Returns the stream decoder currently in use.
     DecoderBase *GetDecoder(void) { return decoder; }
     void *GetDecoderContext(unsigned char* buf, uint8_t*& id);
