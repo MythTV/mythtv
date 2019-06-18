@@ -38,7 +38,6 @@ class VideoOutputOpenGL : public VideoOutput
     void MoveResizeWindow(QRect NewRect) override;
     void RemovePIP(MythPlayer *PiPPlayer) override;
     bool IsPIPSupported(void) const override  { return true; }
-    bool hasFullScreenOSD(void) const override { return true; }
     MythPainter *GetOSDPainter(void) override;
     bool CanVisualise(AudioPlayer *Audio, MythRender *Render) override;
     bool SetupVisualisation(AudioPlayer *Audio, MythRender *Render, const QString &Name) override;

@@ -2519,16 +2519,8 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
             mainWindow->setGeometry(m_playerBounds);
             mainWindow->ResizePainterWindow(m_playerBounds.size());
         }
-        // PGB Do not disable the GUI when using openmax renderer,
-        // to ensure that space next to letterbox pictures
-        // is painted.
-        bool isOpenMaxRender = false;
-        if (ctx && ctx->m_player)
-        {
-            VideoOutput *vo = ctx->m_player->GetVideoOutput();
-            isOpenMaxRender = vo && vo->GetName() == "openmax";
-        }
-        if (!isOpenMaxRender && !m_weDisabledGUI)
+
+        if (!m_weDisabledGUI)
         {
             m_weDisabledGUI = true;
             GetMythMainWindow()->PushDrawDisabled();

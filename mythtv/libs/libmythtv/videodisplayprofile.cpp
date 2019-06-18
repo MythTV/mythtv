@@ -1743,14 +1743,6 @@ QString VideoDisplayProfile::GetOSDHelp(const QString &osd)
             "Uses OpenGL in a separate thread to overlay the OSD onto the video.");
     }
 
-#ifdef USING_OPENMAX
-    if (osd.contains("openmax"))
-    {
-        msg = QObject::tr(
-            "Uses OpenMAX to alpha blend the OSD onto the video.");
-    }
-#endif
-
     return msg;
 }
 

@@ -40,8 +40,6 @@ class VideoOutputD3D : public VideoOutput
     void DrawUnusedRects(bool) override {;} // VideoOutput
     void EmbedInWidget(const QRect &rect) override; // VideoOutput
     void StopEmbedding(void) override; // VideoOutput
-    bool hasFullScreenOSD(void) const override // VideoOutput
-        { return true; }
     static QStringList GetAllowedRenderers(MythCodecID myth_codec_id,
                                            const QSize &video_dim);
     static MythCodecID GetBestSupportedCodec(uint width, uint height,

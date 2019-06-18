@@ -164,9 +164,9 @@ class VideoOutput
     virtual void ClearAfterSeek(void) { vbuffers.ClearAfterSeek(); }
     /// \brief Returns number of frames that are fully decoded.
     virtual int ValidVideoFrames(void) const
-        { return vbuffers.ValidVideoFrames(); }
+        { return static_cast<int>(vbuffers.ValidVideoFrames()); }
     /// \brief Returns number of frames available for decoding onto.
-    int FreeVideoFrames(void) { return vbuffers.FreeVideoFrames(); }
+    int FreeVideoFrames(void) { return static_cast<int>(vbuffers.FreeVideoFrames()); }
     /// \brief Returns true iff enough frames are available to decode onto.
     bool EnoughFreeFrames(void) { return vbuffers.EnoughFreeFrames(); }
     /// \brief Returns true iff there are plenty of decoded frames ready
@@ -279,7 +279,6 @@ class VideoOutput
 
     QRect GetVisibleOSDBounds(float&, float&, float) const;
     QRect GetTotalOSDBounds(void) const;
-    virtual bool hasFullScreenOSD(void) const { return false; }
 
     static void CopyFrame(VideoFrame* to, const VideoFrame* from);
 

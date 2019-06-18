@@ -307,12 +307,9 @@ VideoOutput::VideoOutput() :
     db_display_dim = QSize(gCoreContext->GetNumSetting("DisplaySizeWidth",  0),
                            gCoreContext->GetNumSetting("DisplaySizeHeight", 0));
 
-    db_aspectoverride = (AspectOverrideMode)
-        gCoreContext->GetNumSetting("AspectOverride",      0);
-    db_adjustfill = (AdjustFillMode)
-        gCoreContext->GetNumSetting("AdjustFill",          0);
-    db_letterbox_colour = (LetterBoxColour)
-        gCoreContext->GetNumSetting("LetterboxColour",     0);
+    db_aspectoverride = static_cast<AspectOverrideMode>(gCoreContext->GetNumSetting("AspectOverride", 0));
+    db_adjustfill = static_cast<AdjustFillMode>(gCoreContext->GetNumSetting("AdjustFill", 0));
+    db_letterbox_colour = static_cast<LetterBoxColour>(gCoreContext->GetNumSetting("LetterboxColour", 0));
 
     db_vdisp_profile = nullptr;
 }
@@ -500,29 +497,18 @@ void VideoOutput::GetOSDBounds(QRect &total, QRect &visible,
 QRect VideoOutput::GetVisibleOSDBounds(
     float &visible_aspect, float &font_scaling, float themeaspect) const
 {
-    if (!hasFullScreenOSD())
-    {
-        return window.GetVisibleOSDBounds(
-            visible_aspect, font_scaling, themeaspect);
-    }
-
     QRect dvr = window.GetDisplayVisibleRect();
-
-    // This rounding works for I420 video...
-    QSize dvr2 = QSize(dvr.width()  & ~0x3,
-                       dvr.height() & ~0x1);
-
     float dispPixelAdj = 1.0F;
-    if (dvr2.height() && dvr2.width())
-        dispPixelAdj = (GetDisplayAspect() * dvr2.height()) / dvr2.width();
+    if (dvr.height() && dvr.width())
+        dispPixelAdj = (GetDisplayAspect() * dvr.height()) / dvr.width();
 
     float ova = window.GetOverridenVideoAspect();
     QRect vr = window.GetVideoRect();
-    float vs = vr.height() ? (float)vr.width() / vr.height() : 1.F;
-    visible_aspect = themeaspect * (ova ? vs / ova : 1.F) * dispPixelAdj;
+    float vs = vr.height() ? static_cast<float>(vr.width()) / vr.height() : 1.0F;
+    visible_aspect = themeaspect * (ova > 0.0f ? vs / ova : 1.F) * dispPixelAdj;
 
     font_scaling   = 1.0F;
-    return { QPoint(0,0), dvr2 };
+    return { QPoint(0,0), dvr.size() };
 }
 
 /**
@@ -531,24 +517,12 @@ QRect VideoOutput::GetVisibleOSDBounds(
  */
 QRect VideoOutput::GetTotalOSDBounds(void) const
 {
-    if (!hasFullScreenOSD())
-        return window.GetTotalOSDBounds();
-
-    QRect dvr = window.GetDisplayVisibleRect();
-    QSize dvr2 = QSize(dvr.width()  & ~0x3,
-                       dvr.height() & ~0x1);
-
-    return { QPoint(0,0), dvr2 };
+    return window.GetDisplayVisibleRect();
 }
 
 QRect VideoOutput::GetMHEGBounds(void)
 {
-    if (!hasFullScreenOSD())
-        return window.GetTotalOSDBounds();
-
-    QRect dvr = window.GetDisplayVideoRect();
-    return {QPoint(dvr.left() & ~0x1, dvr.top()  & ~0x1),
-            QSize(dvr.width() & ~0x1, dvr.height() & ~0x1)};
+    return window.GetDisplayVideoRect();
 }
 
 /**
@@ -781,65 +755,50 @@ void VideoOutput::CopyFrame(VideoFrame *to, const VideoFrame *from)
 
 QRect VideoOutput::GetImageRect(const QRect &rect, QRect *display)
 {
-    float hscale, tmp;
+    qreal hscale, tmp;
     tmp = 0.0;
-    QRect visible_osd  = GetVisibleOSDBounds(tmp, tmp, tmp);
     QSize video_size   = window.GetVideoDispDim();
     int image_height   = video_size.height();
     int image_width    = (image_height > 720) ? 1920 :
                          (image_height > 576) ? 1280 : 720;
-    float image_aspect = (float)image_width / (float)image_height;
-    float pixel_aspect = (float)video_size.width() /
-                         (float)video_size.height();
+    qreal image_aspect = static_cast<qreal>(image_width) / image_height;
+    qreal pixel_aspect = static_cast<qreal>(video_size.width()) / video_size.height();
 
     QRect rect1 = rect;
     if (display && display->isValid())
     {
         QMatrix m0;
-        m0.scale((float)image_width  / (float)display->width(),
-                 (float)image_height / (float)display->height());
+        m0.scale(static_cast<qreal>(image_width)  / display->width(),
+                 static_cast<qreal>(image_height) / display->height());
         rect1 = m0.mapRect(rect1);
         rect1.translate(display->left(), display->top());
     }
     QRect result = rect1;
 
-    if (hasFullScreenOSD())
+    QRect dvr_rec = window.GetDisplayVideoRect();
+    QRect vid_rec = window.GetVideoRect();
+
+    hscale = image_aspect / pixel_aspect;
+    if (hscale < 0.99 || hscale > 1.01)
     {
-        QRect dvr_rec = window.GetDisplayVideoRect();
-        QRect vid_rec = window.GetVideoRect();
-
-        hscale = image_aspect / pixel_aspect;
-        if (hscale < 0.99F || hscale > 1.01F)
-        {
-            vid_rec.setLeft(lroundf((float)vid_rec.left() * hscale));
-            vid_rec.setWidth(lroundf((float)vid_rec.width() * hscale));
-        }
-
-        float vscale = (float)dvr_rec.width() / (float)image_width;
-        hscale = (float)dvr_rec.height() / (float)image_height;
-        QMatrix m1;
-        m1.translate(dvr_rec.left(), dvr_rec.top());
-        m1.scale(vscale, hscale);
-
-        vscale = (float)image_width / (float)vid_rec.width();
-        hscale = (float)image_height / (float)vid_rec.height();
-        QMatrix m2;
-        m2.scale(vscale, hscale);
-        m2.translate(-vid_rec.left(), -vid_rec.top());
-
-        result = m2.mapRect(result);
-        result = m1.mapRect(result);
-        return result;
+        vid_rec.setLeft(static_cast<int>(lround(static_cast<qreal>(vid_rec.left()) * hscale)));
+        vid_rec.setWidth(static_cast<int>(lround(static_cast<qreal>(vid_rec.width()) * hscale)));
     }
 
-    hscale = pixel_aspect / image_aspect;
-    if (hscale < 0.99F || hscale > 1.01F)
-    {
-        result.setLeft(lroundf((float)rect1.left() * hscale));
-        result.setWidth(lroundf((float)rect1.width() * hscale));
-    }
+    qreal vscale = static_cast<qreal>(dvr_rec.width()) / image_width;
+    hscale = static_cast<qreal>(dvr_rec.height()) / image_height;
+    QMatrix m1;
+    m1.translate(dvr_rec.left(), dvr_rec.top());
+    m1.scale(vscale, hscale);
 
-    result.translate(-visible_osd.left(), -visible_osd.top());
+    vscale = static_cast<qreal>(image_width) / vid_rec.width();
+    hscale = static_cast<qreal>(image_height) / vid_rec.height();
+    QMatrix m2;
+    m2.scale(vscale, hscale);
+    m2.translate(-vid_rec.left(), -vid_rec.top());
+
+    result = m2.mapRect(result);
+    result = m1.mapRect(result);
     return result;
 }
 
@@ -854,8 +813,8 @@ QRect VideoOutput::GetSafeRect(void)
     static const float safeMargin = 0.05F;
     float dummy;
     QRect result = GetVisibleOSDBounds(dummy, dummy, 1.0F);
-    int safex = (int)((float)result.width()  * safeMargin);
-    int safey = (int)((float)result.height() * safeMargin);
+    int safex = static_cast<int>(static_cast<float>(result.width())  * safeMargin);
+    int safey = static_cast<int>(static_cast<float>(result.height()) * safeMargin);
     return { result.left() + safex, result.top() + safey,
              result.width() - (2 * safex), result.height() - (2 * safey) };
 }
@@ -930,13 +889,13 @@ void VideoOutput::ResizeForVideo(int width, int height)
     }
 
     float rate = db_vdisp_profile ? db_vdisp_profile->GetOutput() : 0.0f;
-    if (display_res && display_res->SwitchToVideo(width, height, rate))
+    if (display_res && display_res->SwitchToVideo(width, height, static_cast<double>(rate)))
     {
         // Switching to custom display resolution succeeded
         // Make a note of the new size
         window.SetDisplayDim(QSize(display_res->GetPhysicalWidth(),
                                        display_res->GetPhysicalHeight()));
-        window.SetDisplayAspect(display_res->GetAspectRatio());
+        window.SetDisplayAspect(static_cast<float>(display_res->GetAspectRatio()));
 
         bool fullscreen = !window.UsingGuiSize();
 
@@ -1013,8 +972,7 @@ void VideoOutput::InitDisplayMeasurements(int width, int height, bool resize)
     QSize screen_size = disp.m_res;
     QSize window_size = window.GetDisplayVisibleRect().size();
 
-    float pixel_aspect = (float)screen_size.width() /
-                         (float)screen_size.height();
+    float pixel_aspect = static_cast<float>(screen_size.width()) / screen_size.height();
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
         QString("Pixel dimensions: Screen %1x%2, window %3x%4")
@@ -1032,12 +990,12 @@ void VideoOutput::InitDisplayMeasurements(int width, int height, bool resize)
     if (window.UsingXinerama())
     {
         source = "Xinerama";
-        disp_aspect = gCoreContext->GetFloatSettingOnHost(
+        disp_aspect = static_cast<float>(gCoreContext->GetFloatSettingOnHost(
             "XineramaMonitorAspectRatio",
-            gCoreContext->GetHostName(), pixel_aspect);
+            gCoreContext->GetHostName(), static_cast<double>(pixel_aspect)));
         if (disp_dim.height() <= 0)
             disp_dim.setHeight(300);
-        disp_dim.setWidth(lroundf(disp_dim.height() * disp_aspect));
+        disp_dim.setWidth(static_cast<int>(lroundf(disp_dim.height() * disp_aspect)));
     }
 
     if (disp_dim.isEmpty())
@@ -1045,14 +1003,14 @@ void VideoOutput::InitDisplayMeasurements(int width, int height, bool resize)
         source = "Guessed!";
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Physical size of display unknown."
                 "\n\t\t\tAssuming 17\" monitor with square pixels.");
-        disp_dim = QSize(lroundf(300 * pixel_aspect), 300);
+        disp_dim = QSize(static_cast<int>(lroundf(300 * pixel_aspect)), 300);
     }
 
-    disp_aspect = (float) disp_dim.width() / (float) disp_dim.height();
+    disp_aspect = static_cast<float>(disp_dim.width()) / disp_dim.height();
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
         QString("%1 display dimensions: %2x%3 mm  Aspect: %4")
             .arg(source).arg(disp_dim.width()).arg(disp_dim.height())
-            .arg(disp_aspect));
+            .arg(static_cast<double>(disp_aspect)));
 
     // Save the unscaled size and dimensions for window resizing
     monitor_sz  = screen_size;
@@ -1064,19 +1022,19 @@ void VideoOutput::InitDisplayMeasurements(int width, int height, bool resize)
                       screen_size.width(),
                      (disp_dim.height() * window_size.height()) /
                       screen_size.height());
-    disp_aspect = (float) disp_dim.width() / (float) disp_dim.height();
+    disp_aspect = static_cast<float>(disp_dim.width()) / disp_dim.height();
     window.SetDisplayDim(disp_dim);
     window.SetDisplayAspect(disp_aspect);
 
     // If we are using XRandR, use the aspect ratio from it
     if (display_res)
-        window.SetDisplayAspect(display_res->GetAspectRatio());
+        window.SetDisplayAspect(static_cast<float>(display_res->GetAspectRatio()));
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
         QString("Estimated window dimensions: %1x%2 mm  Aspect: %3")
             .arg(window.GetDisplayDim().width())
             .arg(window.GetDisplayDim().height())
-            .arg(window.GetDisplayAspect()));
+            .arg(static_cast<double>(window.GetDisplayAspect())));
 }
 
 int VideoOutput::CalcHueBase(const QString &adaptor_name)
