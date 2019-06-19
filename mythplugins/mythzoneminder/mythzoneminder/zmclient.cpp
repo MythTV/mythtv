@@ -124,8 +124,6 @@ bool ZMClient::connectToHost(const QString &lhostname, unsigned int lport)
 
 bool ZMClient::sendReceiveStringList(QStringList &strList)
 {
-    QMutexLocker locker(&m_socketLock);
-
     QStringList origStrList = strList;
 
     bool ok = false;
@@ -182,6 +180,8 @@ bool ZMClient::sendReceiveStringList(QStringList &strList)
 
 bool ZMClient::checkProtoVersion(void)
 {
+    QMutexLocker locker(&m_commandLock);
+
     QStringList strList("HELLO");
     if (!sendReceiveStringList(strList))
     {
@@ -257,6 +257,8 @@ ZMClient::~ZMClient()
 
 void ZMClient::getServerStatus(QString &status, QString &cpuStat, QString &diskStat)
 {
+    QMutexLocker locker(&m_commandLock);
+
     QStringList strList("GET_SERVER_STATUS");
     if (!sendReceiveStringList(strList))
         return;
@@ -275,6 +277,8 @@ void ZMClient::getServerStatus(QString &status, QString &cpuStat, QString &diskS
 
 void ZMClient::updateMonitorStatus(void)
 {
+    QMutexLocker clocker(&m_commandLock);
+
     QStringList strList("GET_MONITOR_STATUS");
     if (!sendReceiveStringList(strList))
         return;
@@ -344,6 +348,8 @@ static QString stateToString(State state)
 
 bool ZMClient::updateAlarmStates(void)
 {
+    QMutexLocker clocker(&m_commandLock);
+
     QStringList strList("GET_ALARM_STATES");
     if (!sendReceiveStringList(strList))
         return false;
@@ -395,6 +401,8 @@ void ZMClient::getEventList(const QString &monitorName, bool oldestFirst,
                             const QString &date, bool includeContinuous,
                             vector<Event*> *eventList)
 {
+    QMutexLocker locker(&m_commandLock);
+
     eventList->clear();
 
     QStringList strList("GET_EVENT_LIST");
@@ -447,6 +455,8 @@ void ZMClient::getEventList(const QString &monitorName, bool oldestFirst,
 void ZMClient::getEventDates(const QString &monitorName, bool oldestFirst,
                             QStringList &dateList)
 {
+    QMutexLocker locker(&m_commandLock);
+
     dateList.clear();
 
     QStringList strList("GET_EVENT_DATES");
@@ -490,6 +500,8 @@ void ZMClient::getEventDates(const QString &monitorName, bool oldestFirst,
 
 void ZMClient::getFrameList(int eventID, vector<Frame*> *frameList)
 {
+    QMutexLocker locker(&m_commandLock);
+
     frameList->clear();
 
     QStringList strList("GET_FRAME_LIST");
@@ -534,6 +546,8 @@ void ZMClient::getFrameList(int eventID, vector<Frame*> *frameList)
 
 void ZMClient::deleteEvent(int eventID)
 {
+    QMutexLocker locker(&m_commandLock);
+
     QStringList strList("DELETE_EVENT");
     strList << QString::number(eventID);
     sendReceiveStringList(strList);
@@ -541,6 +555,8 @@ void ZMClient::deleteEvent(int eventID)
 
 void ZMClient::deleteEventList(vector<Event*> *eventList)
 {
+    QMutexLocker locker(&m_commandLock);
+
     // delete events in 100 event chunks
     QStringList strList("DELETE_EVENT_LIST");
     int count = 0;
@@ -626,6 +642,8 @@ bool ZMClient::readData(unsigned char *data, int dataSize)
 
 void ZMClient::getEventFrame(Event *event, int frameNo, MythImage **image)
 {
+    QMutexLocker locker(&m_commandLock);
+
     if (*image)
     {
         (*image)->DecrRef();
@@ -675,6 +693,8 @@ void ZMClient::getEventFrame(Event *event, int frameNo, MythImage **image)
 
 void ZMClient::getAnalyseFrame(Event *event, int frameNo, QImage &image)
 {
+    QMutexLocker locker(&m_commandLock);
+
     QStringList strList("GET_ANALYSE_FRAME");
     strList << QString::number(event->monitorID());
     strList << QString::number(event->eventID());
@@ -720,6 +740,8 @@ void ZMClient::getAnalyseFrame(Event *event, int frameNo, QImage &image)
 
 int ZMClient::getLiveFrame(int monitorID, QString &status, unsigned char* buffer, int bufferSize)
 {
+    QMutexLocker locker(&m_commandLock);
+
     QStringList strList("GET_LIVE_FRAME");
     strList << QString::number(monitorID);
     if (!sendReceiveStringList(strList))
@@ -776,6 +798,8 @@ int ZMClient::getLiveFrame(int monitorID, QString &status, unsigned char* buffer
 
 void ZMClient::getCameraList(QStringList &cameraList)
 {
+    QMutexLocker locker(&m_commandLock);
+
     cameraList.clear();
 
     QStringList strList("GET_CAMERA_LIST");
@@ -842,6 +866,7 @@ Monitor* ZMClient::getMonitorByID(int monID)
 
 void ZMClient::doGetMonitorList(void)
 {
+    QMutexLocker clocker(&m_commandLock);
     QMutexLocker locker(&m_listLock);
 
     for (int x = 0; x < m_monitorList.count(); x++)
@@ -908,6 +933,8 @@ void ZMClient::doGetMonitorList(void)
 
 void ZMClient::setMonitorFunction(const int monitorID, const QString &function, const bool enabled)
 {
+    QMutexLocker locker(&m_commandLock);
+
     QStringList strList("SET_MONITOR_FUNCTION");
     strList << QString::number(monitorID);
     strList << function;
