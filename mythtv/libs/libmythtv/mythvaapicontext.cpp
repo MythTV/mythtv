@@ -282,12 +282,13 @@ AVPixelFormat MythVAAPIContext::GetFormat(AVCodecContext *Context, const AVPixel
     return AV_PIX_FMT_NONE;
 }
 
-AVPixelFormat MythVAAPIContext::GetFormat2(AVCodecContext *, const AVPixelFormat *PixFmt)
+AVPixelFormat MythVAAPIContext::GetFormat2(AVCodecContext *Context, const AVPixelFormat *PixFmt)
 {
     while (*PixFmt != AV_PIX_FMT_NONE)
     {
         if (*PixFmt == AV_PIX_FMT_VAAPI)
-            return AV_PIX_FMT_VAAPI;
+            if (InitialiseContext2(Context) >= 0)
+                return AV_PIX_FMT_VAAPI;
         PixFmt++;
     }
     return AV_PIX_FMT_NONE;
@@ -409,7 +410,9 @@ int MythVAAPIContext::InitialiseContext(AVCodecContext *Context)
 /*! \brief Create a VAAPI hardware context without OpenGL interop.
  *
  * \note Testing with Debian Buster, 10bit copyback requires the i965-va-driver-shaders package
- * instead of i965-va-driver package. Expect a purple screen otherwise:)
+ * instead of i965-va-driver package. Expect a purple screen otherwise:) I suspect this
+ * is due to some unnecessary scaling somewhere - as the relevant code should only be hit
+ * if scaling is required.
 */
 int MythVAAPIContext::InitialiseContext2(AVCodecContext *Context)
 {
@@ -418,10 +421,33 @@ int MythVAAPIContext::InitialiseContext2(AVCodecContext *Context)
 
     AVBufferRef *device = MythCodecContext::CreateDevice(AV_HWDEVICE_TYPE_VAAPI,
                                                       gCoreContext->GetSetting("VAAPIDevice"));
-    if (!device)
+    Context->hw_frames_ctx = av_hwframe_ctx_alloc(device);
+    if (!Context->hw_frames_ctx)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create VAAPI hardware frames context");
+        av_buffer_unref(&device);
         return -1;
+    }
 
-    Context->hw_device_ctx = device;
+    AVHWFramesContext* hw_frames_ctx = reinterpret_cast<AVHWFramesContext*>(Context->hw_frames_ctx->data);
+    AVVAAPIFramesContext* vaapi_frames_ctx = reinterpret_cast<AVVAAPIFramesContext*>(hw_frames_ctx->hwctx);
+    hw_frames_ctx->sw_format         = FramesFormat(Context->sw_pix_fmt);
+    hw_frames_ctx->format            = AV_PIX_FMT_VAAPI;
+    hw_frames_ctx->width             = Context->coded_width;
+    hw_frames_ctx->height            = Context->coded_height;
+    hw_frames_ctx->initial_pool_size = static_cast<int>(VideoBuffers::GetNumBuffers(FMT_VAAPI));
+    hw_frames_ctx->free              = &MythCodecContext::FramesContextFinished;
+    if (av_hwframe_ctx_init(Context->hw_frames_ctx) < 0)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to initialise VAAPI frames context");
+        av_buffer_unref(&device);
+        av_buffer_unref(&(Context->hw_frames_ctx));
+        return -1;
+    }
+
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("VAAPI FFmpeg buffer pool created with %1 %2x%3 surfaces")
+        .arg(vaapi_frames_ctx->nb_surfaces).arg(Context->coded_width).arg(Context->coded_height));
+    av_buffer_unref(&device);
     return 0;
 }
 
@@ -465,15 +491,6 @@ bool MythVAAPIContext::HaveVAAPI(bool ReCheck /*= false*/)
     return havevaapi;
 }
 
-int MythVAAPIContext::HwDecoderInit(AVCodecContext *Context)
-{
-    if (codec_is_vaapi(m_codecID))
-        return 0;
-    else if (codec_is_vaapi_dec(m_codecID))
-        return MythVAAPIContext::InitialiseContext2(Context);
-    return -1;
-}
-
 /*! \brief Retrieve decoded frame and optionally deinterlace.
  *
  * \note Deinterlacing is setup in PostProcessFrame which has
@@ -488,7 +505,7 @@ int MythVAAPIContext::FilteredReceiveFrame(AVCodecContext *Context, AVFrame *Fra
 
     while (true)
     {
-        if (m_filterGraph && ((m_filterWidth != Context->width) || (m_filterHeight != Context->height)))
+        if (m_filterGraph && ((m_filterWidth != Context->coded_width) || (m_filterHeight != Context->coded_height)))
         {
             LOG(VB_GENERAL, LOG_WARNING, LOC + "Input changed - deleting filter");
             DestroyDeinterlacer();
@@ -622,7 +639,7 @@ void MythVAAPIContext::PostProcessFrame(AVCodecContext* Context, VideoFrame *Fra
     DestroyDeinterlacer();
     m_framesCtx = av_buffer_ref(Context->hw_frames_ctx);
     if (!MythVAAPIInterop::SetupDeinterlacer(vaapideint, doublerate, Context->hw_frames_ctx,
-                                             Context->width, Context->height,
+                                             Context->coded_width, Context->coded_height,
                                              m_filterGraph, m_filterSource, m_filterSink))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to create deinterlacer %1 - disabling")
@@ -634,8 +651,8 @@ void MythVAAPIContext::PostProcessFrame(AVCodecContext* Context, VideoFrame *Fra
     {
         m_deinterlacer = vaapideint;
         m_deinterlacer2x = doublerate;
-        m_filterWidth = Context->width;
-        m_filterHeight = Context->height;
+        m_filterWidth = Context->coded_width;
+        m_filterHeight = Context->coded_height;
     }
 }
 
