@@ -341,7 +341,7 @@ bool VideoOutput::Init(const QSize &video_dim_buf,
                                    m_dbAspectOverride, m_dbAdjustFill);
 
     if (m_dbDisplayProfile)
-        m_dbDisplayProfile->SetInput(m_window.GetVideoDim());
+        m_dbDisplayProfile->SetInput(m_window.GetVideoDispDim());
 
     if (wasembedding)
         EmbedInWidget(oldrect);
@@ -421,7 +421,7 @@ bool VideoOutput::InputChanged(const QSize &video_dim_buf,
     if (codec)
         codecName = codec->name;
     if (m_dbDisplayProfile)
-        m_dbDisplayProfile->SetInput(m_window.GetVideoDim(),0,codecName);
+        m_dbDisplayProfile->SetInput(m_window.GetVideoDispDim(),0,codecName);
     m_videoCodecID = myth_codec_id;
     DiscardFrames(true);
     return true;
