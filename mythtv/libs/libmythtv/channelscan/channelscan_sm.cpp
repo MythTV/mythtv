@@ -1548,6 +1548,7 @@ ScanDTVTransportList ChannelScanSM::GetChannelList(bool addFullTS) const
                 info.m_atsc_minor_channel = 0;
                 info.m_format = "MPTS";
                 info.m_use_on_air_guide = false;
+                info.m_is_encrypted = false;
                 item.m_channels.push_back(info);
             }
 
