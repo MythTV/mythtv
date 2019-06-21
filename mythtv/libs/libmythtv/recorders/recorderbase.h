@@ -227,7 +227,7 @@ class MTV_PUBLIC RecorderBase : public QRunnable
 
     /** \brief If requested, switch to new RingBuffer/ProgramInfo objects
      */
-    virtual void CheckForRingBufferSwitch(void);
+    virtual bool CheckForRingBufferSwitch(void);
 
     /** \brief Save the seektable to the DB
      */
