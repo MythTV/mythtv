@@ -172,7 +172,7 @@ class MTV_PUBLIC MythPlayer
     void SetWatchingRecording(bool mode);
     void SetWatched(bool forceWatched = false);
     void SetKeyframeDistance(int keyframedistance);
-    void SetVideoParams(int w, int h, double fps, float aspect,
+    void SetVideoParams(int w, int h, double fps, float aspect, int ReferenceFrames,
            FrameScanType scan = kScan_Ignore, const QString& codecName = QString());
     void SetFileLength(int total, int frames);
     void SetDuration(int duration);
@@ -733,6 +733,7 @@ class MTV_PUBLIC MythPlayer
     // Input Video Attributes
     QSize    video_disp_dim;  ///< Video (input) width & height
     QSize    video_dim;       ///< Video (input) buffer width & height
+    int      m_maxReferenceFrames; ///< Number of reference frames used in the video stream
     double   video_frame_rate;///< Video (input) Frame Rate (often inaccurate)
     float    video_aspect;    ///< Video (input) Apect Ratio
     float    forced_video_aspect;

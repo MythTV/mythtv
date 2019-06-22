@@ -28,7 +28,7 @@ class VideoOutputOpenGL : public VideoOutput
     void ClearAfterSeek(void) override;
     bool InputChanged(const QSize &VideoDim, const QSize &VideoDispDim,
                       float Aspect, MythCodecID CodecId, bool &AspectOnly,
-                      MythMultiLocker* Locks) override;
+                      MythMultiLocker* Locks, int ReferenceFrames) override;
     void UpdatePauseFrame(int64_t &DisplayTimecode) override;
     void InitPictureAttributes(void) override;
     void EmbedInWidget(const QRect &Rect) override;

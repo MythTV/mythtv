@@ -6,6 +6,7 @@
 #include "mythcontext.h"
 #include "mythmainwindow.h"
 #include "mythlogging.h"
+#include "decoders/avformatdecoder.h"
 #include "mythrender_opengl.h"
 #include "videobuffers.h"
 #include "mythvaapiinterop.h"
@@ -387,7 +388,8 @@ int MythVAAPIContext::InitialiseContext(AVCodecContext *Context)
     vaapi_frames_ctx->attributes = prefs;
     vaapi_frames_ctx->nb_attributes = 3;
     hw_frames_ctx->sw_format         = FramesFormat(Context->sw_pix_fmt);
-    hw_frames_ctx->initial_pool_size = static_cast<int>(VideoBuffers::GetNumBuffers(FMT_VAAPI, true));
+    int referenceframes = AvFormatDecoder::GetMaxReferenceFrames(Context);
+    hw_frames_ctx->initial_pool_size = static_cast<int>(VideoBuffers::GetNumBuffers(FMT_VAAPI, referenceframes, true));
     hw_frames_ctx->format            = AV_PIX_FMT_VAAPI;
     hw_frames_ctx->width             = Context->coded_width;
     hw_frames_ctx->height            = Context->coded_height;
@@ -402,8 +404,9 @@ int MythVAAPIContext::InitialiseContext(AVCodecContext *Context)
         return res;
     }
 
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("VAAPI FFmpeg buffer pool created with %1 surfaces")
-        .arg(vaapi_frames_ctx->nb_surfaces));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("VAAPI FFmpeg buffer pool created with %1 %2x%3 surfaces (%4 references)")
+        .arg(vaapi_frames_ctx->nb_surfaces).arg(Context->coded_width).arg(Context->coded_height)
+        .arg(referenceframes));
     av_buffer_unref(&hwdeviceref);
     return 0;
 }
@@ -430,13 +433,14 @@ int MythVAAPIContext::InitialiseContext2(AVCodecContext *Context)
         return -1;
     }
 
+    int referenceframes = AvFormatDecoder::GetMaxReferenceFrames(Context);
     AVHWFramesContext* hw_frames_ctx = reinterpret_cast<AVHWFramesContext*>(Context->hw_frames_ctx->data);
     AVVAAPIFramesContext* vaapi_frames_ctx = reinterpret_cast<AVVAAPIFramesContext*>(hw_frames_ctx->hwctx);
     hw_frames_ctx->sw_format         = FramesFormat(Context->sw_pix_fmt);
     hw_frames_ctx->format            = AV_PIX_FMT_VAAPI;
     hw_frames_ctx->width             = Context->coded_width;
     hw_frames_ctx->height            = Context->coded_height;
-    hw_frames_ctx->initial_pool_size = static_cast<int>(VideoBuffers::GetNumBuffers(FMT_VAAPI, true));
+    hw_frames_ctx->initial_pool_size = static_cast<int>(VideoBuffers::GetNumBuffers(FMT_VAAPI, referenceframes));
     hw_frames_ctx->free              = &MythCodecContext::FramesContextFinished;
     if (av_hwframe_ctx_init(Context->hw_frames_ctx) < 0)
     {
@@ -446,8 +450,9 @@ int MythVAAPIContext::InitialiseContext2(AVCodecContext *Context)
         return -1;
     }
 
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("VAAPI FFmpeg buffer pool created with %1 %2x%3 surfaces")
-        .arg(vaapi_frames_ctx->nb_surfaces).arg(Context->coded_width).arg(Context->coded_height));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("VAAPI FFmpeg buffer pool created with %1 %2x%3 surfaces (%4 references)")
+        .arg(vaapi_frames_ctx->nb_surfaces).arg(Context->coded_width).arg(Context->coded_height)
+        .arg(referenceframes));
     av_buffer_unref(&device);
     return 0;
 }

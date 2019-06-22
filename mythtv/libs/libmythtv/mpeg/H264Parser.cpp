@@ -1316,6 +1316,11 @@ void H264Parser::getFrameRate(FrameRate &result) const
         result = FrameRate(timeScale / 2, unitsInTick);
 }
 
+uint H264Parser::getRefFrames(void) const
+{
+    return num_ref_frames;
+}
+
 uint H264Parser::aspectRatio(void) const
 {
 

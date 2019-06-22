@@ -56,13 +56,13 @@ class MTV_PUBLIC VideoBuffers
     VideoBuffers() = default;
     virtual ~VideoBuffers();
 
-    static uint GetNumBuffers(int PixelFormat, bool Decoder = false);
+    static uint GetNumBuffers(int PixelFormat, int MaxReferenceFrames = 16, bool Decoder = false);
     void Init(uint NumDecode, bool ExtraForPause,
               uint NeedFree, uint NeedprebufferNormal,
               uint NeedPrebufferSmall, uint KeepPrebuffer);
     bool CreateBuffers(VideoFrameType Type, QSize Size, bool ExtraForPause,
                        uint NeedFree, uint NeedprebufferNormal,
-                       uint NeedPrebufferSmall, uint KeepPrebuffer);
+                       uint NeedPrebufferSmall, uint KeepPrebuffer, int MaxReferenceFrames = 16);
     bool CreateBuffers(VideoFrameType Type, int Width, int Height,
                        vector<YUVInfo> YUVInfos);
     bool CreateBuffers(VideoFrameType Type, int Width, int Height);

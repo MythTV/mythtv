@@ -164,6 +164,7 @@ class H264Parser {
     uint aspectRatio(void) const;
     double frameRate(void) const;
     void getFrameRate(FrameRate &result) const;
+    uint  getRefFrames(void) const;
 
     uint64_t frameAUstreamOffset(void) const {return frame_start_offset;}
     uint64_t keyframeAUstreamOffset(void) const {return keyframe_start_offset;}

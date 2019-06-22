@@ -93,7 +93,8 @@ bool VideoOutputNull::InputChanged(const QSize &video_dim_buf,
                                    float        aspect,
                                    MythCodecID  av_codec_id,
                                    bool        &aspect_only,
-                                   MythMultiLocker* Locks)
+                                   MythMultiLocker* Locks,
+                                   int          ReferenceFrames)
 {
     LOG(VB_PLAYBACK, LOG_INFO,
         QString("InputChanged(WxH = %1x%2, aspect = %3)")
@@ -118,15 +119,15 @@ bool VideoOutputNull::InputChanged(const QSize &video_dim_buf,
     }
 
     VideoOutput::InputChanged(video_dim_buf, video_dim_disp,
-                              aspect, av_codec_id, aspect_only, Locks);
+                              aspect, av_codec_id, aspect_only, Locks,
+                              ReferenceFrames);
     m_videoBuffers.DeleteBuffers();
 
     MoveResize();
 
     const QSize video_dim = m_window.GetVideoDim();
 
-    bool ok = m_videoBuffers.CreateBuffers(FMT_YV12, video_dim.width(),
-                                     video_dim.height());
+    bool ok = m_videoBuffers.CreateBuffers(FMT_YV12, video_dim.width(), video_dim.height());
     if (!ok)
     {
         LOG(VB_GENERAL, LOG_ERR, "VideoOutputNull::InputChanged(): "

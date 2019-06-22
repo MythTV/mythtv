@@ -188,6 +188,7 @@ MythPlayer::MythPlayer(PlayerFlags flags)
       m_lastFrameCodec(FMT_NONE),
       // Input Video Attributes
       video_disp_dim(0,0), video_dim(0,0),
+      m_maxReferenceFrames(16),
       video_frame_rate(29.97F), video_aspect(4.0F / 3.0F),
       forced_video_aspect(-1),
       resetScan(kScan_Ignore), m_scan(kScan_Interlaced),
@@ -516,7 +517,7 @@ bool MythPlayer::InitVideo(void)
                     decoder->GetVideoCodecID(),
                     pipState, video_dim, video_disp_dim, video_aspect,
                     parentWidget, embedRect,
-                    video_frame_rate, (uint)playerFlags, m_codecName);
+                    video_frame_rate, (uint)playerFlags, m_codecName, m_maxReferenceFrames);
 
     if (!videoOutput)
     {
@@ -594,7 +595,8 @@ void MythPlayer::ReinitVideo(void)
         videoOutput->SetVideoFrameRate(static_cast<float>(video_frame_rate));
         float aspect = (forced_video_aspect > 0) ? forced_video_aspect : video_aspect;
         if (!videoOutput->InputChanged(video_dim, video_disp_dim, aspect,
-                                       decoder->GetVideoCodecID(), aspect_only, &locker))
+                                       decoder->GetVideoCodecID(), aspect_only, &locker,
+                                       m_maxReferenceFrames))
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 "Failed to Reinitialize Video. Exiting..");
@@ -758,7 +760,7 @@ void MythPlayer::SetScanType(FrameScanType scan)
 }
 
 void MythPlayer::SetVideoParams(int width, int height, double fps, float aspect,
-                                FrameScanType scan, const QString& codecName)
+                                int ReferenceFrames, FrameScanType scan, const QString& codecName)
 {
     bool paramsChanged = false;
 
@@ -790,6 +792,12 @@ void MythPlayer::SetVideoParams(int width, int height, double fps, float aspect,
     if (!codecName.isEmpty())
     {
         m_codecName = codecName;
+        paramsChanged = true;
+    }
+
+    if (ReferenceFrames > 0)
+    {
+        m_maxReferenceFrames = ReferenceFrames;
         paramsChanged = true;
     }
 
@@ -838,7 +846,7 @@ void MythPlayer::OpenDummy(void)
     if (!videoOutput)
     {
         SetKeyframeDistance(15);
-        SetVideoParams(720, 576, 25.00, 1.25f);
+        SetVideoParams(720, 576, 25.00, 1.25f, 2);
     }
 
     player_ctx->LockPlayingInfo(__FILE__, __LINE__);

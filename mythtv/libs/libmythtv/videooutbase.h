@@ -44,7 +44,7 @@ class VideoOutput
         PIPState pipState,      const QSize &video_dim_buf,
         const QSize &video_dim_disp, float video_aspect,
         QWidget *parentwidget,  const QRect &embed_rect,   float video_prate,
-        uint playerFlags, QString &codecName);
+        uint playerFlags, QString &codecName, int ReferenceFrames);
 
     VideoOutput();
     virtual ~VideoOutput();
@@ -60,6 +60,7 @@ class VideoOutput
                               FrameScanType Scan = kScan_Ignore) = 0;
     virtual void PrepareFrame(VideoFrame *buffer, FrameScanType, OSD *osd) = 0;
     virtual void Show(FrameScanType) = 0;
+    void         SetReferenceFrames(int ReferenceFrames);
     VideoDisplayProfile *GetProfile() { return m_dbDisplayProfile; }
 
 
@@ -75,13 +76,16 @@ class VideoOutput
      *                        the aspect ratio has changed. It must be
      *                        initialized to false before calling this
      *                        function.
+     *  \param ReferenceFrames The max number of reference frames in use by the decoder,
+     *  which is used to optimise the number of video buffers.
      */
     virtual bool InputChanged(const QSize &video_dim_buf,
                               const QSize &video_dim_disp,
                               float        aspect,
                               MythCodecID  myth_codec_id,
                               bool        &aspect_changed,
-                              MythMultiLocker* Locks);
+                              MythMultiLocker* Locks,
+                              int          ReferenceFrames);
 
     virtual void VideoAspectRatioChanged(float aspect);
 
@@ -276,6 +280,7 @@ class VideoOutput
 
     // Video parameters
     MythCodecID          m_videoCodecID;
+    int                  m_maxReferenceFrames;
     VideoDisplayProfile *m_dbDisplayProfile;
 
     /// VideoBuffers instance used to track video output buffers.

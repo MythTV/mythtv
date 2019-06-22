@@ -1474,14 +1474,49 @@ enum AVPixelFormat get_format_dxva2(struct AVCodecContext *avctx,
 }
 #endif
 
+int AvFormatDecoder::GetMaxReferenceFrames(AVCodecContext *Context)
+{
+    switch (Context->codec_id)
+    {
+        case AV_CODEC_ID_H264:
+        {
+            int result = 16;
+            if (Context->extradata && (Context->extradata_size >= 7))
+            {
+                uint8_t offset = 0;
+                if (Context->extradata[0] == 1)
+                    offset = 9; // avCC
+                else if (AV_RB24(Context->extradata) == 0x01) // Annex B - 3 byte startcode 0x000001
+                    offset = 4;
+                else if (AV_RB32(Context->extradata) == 0x01) // Annex B - 4 byte startcode 0x00000001
+                    offset= 5;
+
+                if (offset)
+                {
+                    H264Parser parser;
+                    bool dummy;
+                    parser.parse_SPS(Context->extradata + offset,
+                                     static_cast<uint>(Context->extradata_size - offset), dummy, result);
+                }
+            }
+            return result;
+        }
+        case AV_CODEC_ID_H265: return 16;
+        case AV_CODEC_ID_VP9:  return 8;
+        case AV_CODEC_ID_VP8:  return 3;
+        default: break;
+    }
+    return 2;
+}
+
 void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
                                      bool selectedStream)
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
-        QString("InitVideoCodec() 0x%1 id(%2) type (%3).")
-            .arg((uint64_t)enc,0,16)
+        QString("InitVideoCodec ID:%1 Type:%2 Size:%3x%4")
             .arg(ff_codec_id_string(enc->codec_id))
-            .arg(ff_codec_type_string(enc->codec_type)));
+            .arg(ff_codec_type_string(enc->codec_type))
+            .arg(enc->width).arg(enc->height));
 
     if (ringBuffer && ringBuffer->IsDVD())
         m_directrendering = false;
@@ -1655,7 +1690,9 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         QString codecName;
         if (codec2)
             codecName = codec2->name;
-        m_parent->SetVideoParams(width, height, m_fps, m_current_aspect, kScan_Detect, codecName);
+        m_parent->SetVideoParams(width, height, static_cast<double>(m_fps),
+                                 m_current_aspect, GetMaxReferenceFrames(enc),
+                                 kScan_Detect, codecName);
         if (LCD *lcd = LCD::Get())
         {
             LCDVideoFormatSet video_format;
@@ -2618,12 +2655,12 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             tvformat == "pal-m" || tvformat == "atsc")
         {
             m_fps = 29.97;
-            m_parent->SetVideoParams(-1, -1, 29.97, 1.0f);
+            m_parent->SetVideoParams(-1, -1, 29.97, 1.0f, 16);
         }
         else
         {
             m_fps = 25.0;
-            m_parent->SetVideoParams(-1, -1, 25.0, 1.0f);
+            m_parent->SetVideoParams(-1, -1, 25.0, 1.0f, 16);
         }
     }
 
@@ -3284,7 +3321,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
                 // as for H.264, if a decoder deinterlacer is in operation - the stream must be progressive
                 bool doublerate = false;
                 bool decoderdeint = m_mythcodecctx->IsDeinterlacing(doublerate, true);
-                m_parent->SetVideoParams(width, height, static_cast<double>(seqFPS), m_current_aspect,
+                m_parent->SetVideoParams(width, height, static_cast<double>(seqFPS), m_current_aspect, 2,
                                          decoderdeint ? kScan_Progressive : kScan_Ignore);
 
                 m_current_width  = width;
@@ -3335,22 +3372,13 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
     const uint8_t  *buf_end = pkt->data + pkt->size;
     int num_frames = 0;
 
-    // crude NAL unit vs Annex B detection.
-    // the parser only understands Annex B
-    if (context->extradata && context->extradata_size >= 4)
+    // The parser only understands Annex B/bytestream format - so check for avCC
+    // format (starts with 0x01) and rely on FFmpeg keyframe detection
+    if (context->extradata && (context->extradata_size >= 7) && (context->extradata[0] == 0x01))
     {
-        int nal_size    = 0;
-        int size_length = (context->extradata[4] & 0x3) + 1;
-
-        for (int i = 0; i < size_length; i++)
-            nal_size += buf[i];
-
-        if (nal_size)
-        {
-            if (pkt->flags & AV_PKT_FLAG_KEY)
-                HandleGopStart(pkt, false);
-            return 1;
-        }
+        if (pkt->flags & AV_PKT_FLAG_KEY)
+            HandleGopStart(pkt, false);
+        return 1;
     }
 
     while (buf < buf_end)
@@ -3397,6 +3425,7 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
             bool doublerate = false;
             bool decoderdeint = m_mythcodecctx->IsDeinterlacing(doublerate, true);
             m_parent->SetVideoParams(width, height, seqFPS, m_current_aspect,
+                                     static_cast<int>(m_h264_parser->getRefFrames()),
                                      decoderdeint ? kScan_Progressive : kScan_Ignore);
 
             m_current_width  = width;

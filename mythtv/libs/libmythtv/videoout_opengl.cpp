@@ -251,7 +251,7 @@ bool VideoOutputOpenGL::Init(const QSize &VideoDim, const QSize &VideoDispDim, f
 
 bool VideoOutputOpenGL::InputChanged(const QSize &VideoDim, const QSize &VideoDispDim,
                                      float Aspect, MythCodecID CodecId, bool &AspectOnly,
-                                     MythMultiLocker* Locks)
+                                     MythMultiLocker* Locks, int ReferenceFrames)
 {
     QSize currentvideodim     = m_window.GetVideoDim();
     QSize currentvideodispdim = m_window.GetVideoDispDim();
@@ -267,20 +267,22 @@ bool VideoOutputOpenGL::InputChanged(const QSize &VideoDim, const QSize &VideoDi
         currentaspect = m_newAspect;
     }
 
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Video changed: %1x%2 (%3x%4) '%5' (Aspect %6)"
-                                             "-> %7x%8 (%9x%10) '%11' (Aspect %12)")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Video changed: %1x%2 (%3x%4) '%5' (Aspect %6 Refs %13)"
+                                             "-> %7x%8 (%9x%10) '%11' (Aspect %12 Refs %14)")
         .arg(currentvideodispdim.width()).arg(currentvideodispdim.height())
         .arg(currentvideodim.width()).arg(currentvideodim.height())
         .arg(toString(currentcodec)).arg(static_cast<double>(currentaspect))
         .arg(VideoDispDim.width()).arg(VideoDispDim.height())
         .arg(VideoDim.width()).arg(VideoDim.height())
-        .arg(toString(CodecId)).arg(static_cast<double>(Aspect)));
+        .arg(toString(CodecId)).arg(static_cast<double>(Aspect))
+        .arg(m_maxReferenceFrames).arg(ReferenceFrames));
 
     bool cidchanged = (CodecId != currentcodec);
     bool reschanged = (VideoDispDim != currentvideodispdim);
+    bool refschanged = m_maxReferenceFrames != ReferenceFrames;
 
     // aspect ratio changes are a no-op as changes are handled at display time
-    if (!cidchanged && !reschanged)
+    if (!cidchanged && !reschanged && !refschanged)
     {
         AspectOnly = true;
         return true;
@@ -302,6 +304,7 @@ bool VideoOutputOpenGL::InputChanged(const QSize &VideoDim, const QSize &VideoDi
     }
 
     // delete and recreate the buffers and flag that the input has changed
+    m_maxReferenceFrames = ReferenceFrames;
     m_videoBuffers.BeginLock(kVideoBuffer_all);
     DestroyBuffers();
     m_buffersCreated = CreateBuffers(CodecId, VideoDim);
@@ -346,28 +349,24 @@ bool VideoOutputOpenGL::CreateBuffers(MythCodecID CodecID, QSize Size)
     if (m_buffersCreated)
         return true;
 
-    if (codec_is_mediacodec_dec(CodecID))
+    if (codec_is_copyback(CodecID))
     {
-        m_videoBuffers.Init(VideoBuffers::GetNumBuffers(FMT_MEDIACODEC), false, 1, 4, 2, 1);
-        return m_videoBuffers.CreateBuffers(FMT_YV12, Size.width(), Size.height());
-    }
-    else if (codec_is_vtb_dec(CodecID))
-    {
-        m_videoBuffers.Init(VideoBuffers::GetNumBuffers(FMT_VTB), false, 1, 4, 2, 1);
+        m_videoBuffers.Init(VideoBuffers::GetNumBuffers(FMT_NONE), false, 1, 4, 2, 1);
         return m_videoBuffers.CreateBuffers(FMT_YV12, Size.width(), Size.height());
     }
 
     if (codec_is_mediacodec(CodecID))
         return m_videoBuffers.CreateBuffers(FMT_MEDIACODEC, Size, false, 1, 2, 2, 1);
     else if (codec_is_vaapi(CodecID))
-        return m_videoBuffers.CreateBuffers(FMT_VAAPI, Size, false, 2, 1, 4, 1);
+        return m_videoBuffers.CreateBuffers(FMT_VAAPI, Size, false, 2, 1, 4, 1, m_maxReferenceFrames);
     else if (codec_is_vtb(CodecID))
         return m_videoBuffers.CreateBuffers(FMT_VTB, Size, false, 1, 4, 2, 1);
     else if (codec_is_vdpau(CodecID))
         return m_videoBuffers.CreateBuffers(FMT_VDPAU, Size, false, 2, 1, 4, 1);
     else if (codec_is_nvdec(CodecID))
         return m_videoBuffers.CreateBuffers(FMT_NVDEC, Size, false, 2, 1, 4, 1);
-    return m_videoBuffers.CreateBuffers(FMT_YV12, Size, false, 1, 12, 4, 2);
+
+    return m_videoBuffers.CreateBuffers(FMT_YV12, Size, false, 1, 8, 4, 2, m_maxReferenceFrames);
 }
 
 void VideoOutputOpenGL::ProcessFrame(VideoFrame *Frame, OSD */*osd*/,

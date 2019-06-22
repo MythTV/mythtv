@@ -56,7 +56,7 @@ VideoOutput *VideoOutput::Create(
     PIPState pipState,      const QSize &video_dim_buf,
     const QSize &video_dim_disp, float video_aspect,
     QWidget *parentwidget,  const QRect &embed_rect, float video_prate,
-    uint playerFlags, QString &codecName)
+    uint playerFlags, QString &codecName, int ReferenceFrames)
 {
     QStringList renderers;
 
@@ -69,13 +69,11 @@ VideoOutput *VideoOutput::Create(
     else
     {
 #ifdef _WIN32
-        renderers += VideoOutputD3D::
-            GetAllowedRenderers(codec_id, video_dim_disp);
+        renderers += VideoOutputD3D::GetAllowedRenderers(codec_id, video_dim_disp);
 #endif
 
 #ifdef USING_OPENGL_VIDEO
-        renderers += VideoOutputOpenGL::
-            GetAllowedRenderers(codec_id, video_dim_disp);
+        renderers += VideoOutputOpenGL::GetAllowedRenderers(codec_id, video_dim_disp);
 #endif // USING_OPENGL_VIDEO
     }
 
@@ -162,6 +160,7 @@ VideoOutput *VideoOutput::Create(
 
             vo->SetPIPState(pipState);
             vo->SetVideoFrameRate(video_prate);
+            vo->SetReferenceFrames(ReferenceFrames);
             if (vo->Init(
                     video_dim_buf, video_dim_disp, video_aspect,
                     widget->winId(), display_rect, codec_id))
@@ -273,7 +272,9 @@ VideoOutput::VideoOutput() :
     m_dbLetterboxColour(kLetterBoxColour_Black),
 
     // Video parameters
-    m_videoCodecID(kCodec_NONE),        m_dbDisplayProfile(nullptr),
+    m_videoCodecID(kCodec_NONE),
+    m_maxReferenceFrames(16),
+    m_dbDisplayProfile(nullptr),
 
     // Various state variables
     m_errorState(kError_None),            m_framesPlayed(0),
@@ -370,6 +371,11 @@ void VideoOutput::SetVideoFrameRate(float playback_fps)
         m_dbDisplayProfile->SetOutput(playback_fps);
 }
 
+void VideoOutput::SetReferenceFrames(int ReferenceFrames)
+{
+    m_maxReferenceFrames = ReferenceFrames;
+}
+
 void VideoOutput::SetDeinterlacing(bool Enable, bool DoubleRate)
 {
     if (!Enable)
@@ -411,10 +417,11 @@ bool VideoOutput::InputChanged(const QSize &video_dim_buf,
                                float        aspect,
                                MythCodecID  myth_codec_id,
                                bool        &/*aspect_only*/,
-                               MythMultiLocker*)
+                               MythMultiLocker*,
+                               int          ReferenceFrames)
 {
     m_window.InputChanged(video_dim_buf, video_dim_disp, aspect);
-
+    m_maxReferenceFrames = ReferenceFrames;
     AVCodecID avCodecId = myth2av_codecid(myth_codec_id);
     AVCodec *codec = avcodec_find_decoder(avCodecId);
     QString codecName;

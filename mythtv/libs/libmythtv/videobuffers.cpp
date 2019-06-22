@@ -136,21 +136,27 @@ YUVInfo::YUVInfo(uint Width, uint Height, uint Size, const int *Pitches,
  * \see VideoOutput
  */
 
-uint VideoBuffers::GetNumBuffers(int PixelFormat, bool Decoder /*=false*/)
+uint VideoBuffers::GetNumBuffers(int PixelFormat, int MaxReferenceFrames, bool Decoder /*=false*/)
 {
+    uint refs = static_cast<uint>(MaxReferenceFrames);
     switch (PixelFormat)
     {
+        case FMT_DXVA2: return 30;
         case FMT_VDPAU: return 28;
-        case FMT_NVDEC: return 8;
         case FMT_VTB:   return 24;
         // Max 16 ref frames, 12 headroom and allocate 2 extra in the VAAPI frames
         // context for additional references held by the VPP deinterlacer (i.e.
         // prevent buffer starvation in the decoder)
         // This covers the 'worst case' samples.
-        case FMT_VAAPI: return Decoder ? 30 : 28;
-        case FMT_DXVA2: return 30;
-        case FMT_YV12:  return 31;
+        case FMT_VAAPI: return Decoder ? (refs + 14) : (refs + 12);
+        // Copyback of hardware frames. These decoders are buffering internally
+        // already - so no need for a large presentation buffer
+        case FMT_NONE:  return 8;
+        // As for copyback, these decoders buffer internally
+        case FMT_NVDEC: return 8;
         case FMT_MEDIACODEC: return 8;
+        // Standard software decode
+        case FMT_YV12:  return refs + 14;
         default: break;
     }
     return 30;
@@ -848,9 +854,10 @@ void VideoBuffers::ClearAfterSeek(void)
 
 bool VideoBuffers::CreateBuffers(VideoFrameType Type, QSize Size, bool ExtraForPause,
                                  uint NeedFree, uint NeedprebufferNormal,
-                                 uint NeedPrebufferSmall, uint KeepPrebuffer)
+                                 uint NeedPrebufferSmall, uint KeepPrebuffer,
+                                 int MaxReferenceFrames)
 {
-    Init(GetNumBuffers(Type), ExtraForPause, NeedFree, NeedprebufferNormal,
+    Init(GetNumBuffers(Type, MaxReferenceFrames), ExtraForPause, NeedFree, NeedprebufferNormal,
          NeedPrebufferSmall, KeepPrebuffer);
     return CreateBuffers(Type, Size.width(), Size.height());
 }
@@ -862,6 +869,8 @@ bool VideoBuffers::CreateBuffers(VideoFrameType Type, int Width, int Height)
         bool success = true;
         for (uint i = 0; i < Size(); i++)
             success &= CreateBuffer(Width, Height, i, nullptr, Type);
+        LOG(VB_PLAYBACK, LOG_INFO, QString("Created %1 %2 (%3x%4) video buffers")
+           .arg(Size()).arg(format_description(Type)).arg(Width).arg(Height));
         return success;
     }
 
