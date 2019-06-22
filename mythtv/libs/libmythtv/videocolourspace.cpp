@@ -294,10 +294,13 @@ bool VideoColourSpace::UpdateColourSpace(const VideoFrame *Frame)
         return false;
 
     int csp = Frame->colorspace;
+    int raw = csp;
     VideoFrameType frametype = Frame->codec;
     VideoFrameType softwaretype = PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->sw_pix_fmt));
 
-    // workaround for nvdec mpeg2
+    // workaround for NVDEC. NVDEC defaults to a colorspace of 0 - which happens
+    // to equate to RGB. In testing, NVDEC reports the same colourspace as FFmpeg
+    // software decode for MPEG2, MPEG4, H.264, HEVC and VP8. VP9 seems to go wrong (with limited samples)
     bool forced = false;
     if (csp == AVCOL_SPC_RGB && (format_is_yuv(frametype) || frametype == FMT_NVDEC))
     {
@@ -322,12 +325,12 @@ bool VideoColourSpace::UpdateColourSpace(const VideoFrame *Frame)
     if (forced)
         LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Forcing inconsistent colourspace - frame format %1")
             .arg(format_description(Frame->codec)));
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Video Colourspace:%1 Depth:%2 %3Range:%4 (Stream:%5)")
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Video Colourspace:%1(%2) Depth:%3 %4Range:%5")
         .arg(av_color_space_name(static_cast<AVColorSpace>(m_colourSpace)))
+        .arg(m_colourSpace == raw ? "Reported" : "Guessed")
         .arg(m_colourSpaceDepth)
         .arg((m_colourSpaceDepth > 8) ? (m_colorShifted ? "(Pre-scaled) " : "(Fixed point) ") : "")
-        .arg((AVCOL_RANGE_JPEG == m_range) ? "Full" : "Limited") 
-        .arg(av_color_space_name(static_cast<AVColorSpace>(Frame->colorspace))));
+        .arg((AVCOL_RANGE_JPEG == m_range) ? "Full" : "Limited"));
 
     Update();
     return true;
