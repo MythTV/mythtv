@@ -56,7 +56,7 @@ class MTV_PUBLIC VideoBuffers
     VideoBuffers() = default;
     virtual ~VideoBuffers();
 
-    static uint GetNumBuffers(int PixelFormat);
+    static uint GetNumBuffers(int PixelFormat, bool Decoder = false);
     void Init(uint NumDecode, bool ExtraForPause,
               uint NeedFree, uint NeedprebufferNormal,
               uint NeedPrebufferSmall, uint KeepPrebuffer);

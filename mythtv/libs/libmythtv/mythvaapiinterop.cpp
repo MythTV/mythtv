@@ -7,6 +7,7 @@
 extern "C" {
 #include "libavfilter/buffersrc.h"
 #include "libavfilter/buffersink.h"
+#include "libavutil/hwcontext_vaapi.h"
 }
 
 #define LOC QString("VAAPIInterop: ")
@@ -78,12 +79,10 @@ MythVAAPIInterop* MythVAAPIInterop::Create(MythRenderOpenGL *Context, Type Inter
 
 /*! \class MythVAAPIInterop
  *
- * \todo Fix VPP deinterlacing. Reference counting is completely broken when using
- * the FFmpeg filter and there is significant visual corruption at the start of playabck.
- * \todo Implement VPP ProCamp for GLX types. Not needed for DRM as we use our
- * own shaders and colourspace control.
- * \todo May need to add a codec check as in MythVAAPIContext to ensure we don't
- * enable deinterlacing for HEVC and VP8/9
+ * \todo Fix pause frame deinterlacing
+ * \todo Deinterlacing 'breaks' after certain stream changes (e.g. aspect ratio)
+ * \todo Scaling of some 1080 H.264 material (garbage line at bottom - presumably
+ * scaling from 1088 to 1080 - but only some files). Same effect on all VAAPI interop types.
 */
 MythVAAPIInterop::MythVAAPIInterop(MythRenderOpenGL *Context, Type InteropType)
   : MythOpenGLInterop(Context, InteropType)
@@ -135,10 +134,9 @@ void MythVAAPIInterop::DestroyDeinterlacer(void)
     m_filterGraph = nullptr;
     m_filterSink = nullptr;
     m_filterSource = nullptr;
-    m_filterWidth = 0;
-    m_filterHeight = 0;
     m_deinterlacer = DEINT_NONE;
     m_deinterlacer2x = false;
+    av_buffer_unref(&m_vppFramesContext);
 }
 
 VASurfaceID MythVAAPIInterop::VerifySurface(MythRenderOpenGL *Context, VideoFrame *Frame)
@@ -282,7 +280,6 @@ void MythVAAPIInteropGLX::InitPictureAttributes(VideoColourSpace *ColourSpace)
     va_status = vaQueryDisplayAttributes(m_vaDisplay, attribs, &actual);
     CHECK_ST;
 
-    int updatecscmatrix = -1;
     for (int i = 0; i < actual; i++)
     {
         int type = attribs[i].type;
@@ -302,8 +299,6 @@ void MythVAAPIInteropGLX::InitPictureAttributes(VideoColourSpace *ColourSpace)
                 supported_controls += kPictureAttributeSupported_Contrast;
             if (type == VADisplayAttribSaturation)
                 supported_controls += kPictureAttributeSupported_Colour;
-            if (type == VADisplayAttribCSCMatrix)
-                updatecscmatrix = i;
         }
     }
 
@@ -331,32 +326,6 @@ void MythVAAPIInteropGLX::InitPictureAttributes(VideoColourSpace *ColourSpace)
         SetPictureAttribute(kPictureAttribute_Contrast, ColourSpace->GetPictureAttribute(kPictureAttribute_Contrast));
     if (supported_controls & kPictureAttributeSupported_Colour)
         SetPictureAttribute(kPictureAttribute_Colour, ColourSpace->GetPictureAttribute(kPictureAttribute_Colour));
-
-    if (updatecscmatrix > -1)
-    {
-        // FIXME - this is untested. Presumably available with the VDPAU backend.
-        // UPDATE - not implemented in VDPAU backend. Looks like maybe Android only??
-        // If functioning correctly we need to turn off all of the other VA picture attributes
-        // as this acts, as for OpenGL, as the master colourspace conversion matrix.
-        // We can also enable Studio levels support.
-        QMatrix4x4 yuv = static_cast<QMatrix4x4>(*ColourSpace);
-        float raw[9];
-        raw[0] = yuv(0, 0); raw[1] = yuv(0, 1); raw[2] = yuv(0, 2);
-        raw[3] = yuv(1, 0); raw[4] = yuv(1, 1); raw[5] = yuv(1, 2);
-        raw[6] = yuv(2, 0); raw[7] = yuv(2, 1); raw[8] = yuv(2, 2);
-        m_vaapiPictureAttributes[updatecscmatrix].value = static_cast<int32_t>(raw[0]);
-        m_context->makeCurrent();
-        ok = true;
-        va_status = vaSetDisplayAttributes(m_vaDisplay, &m_vaapiPictureAttributes[updatecscmatrix], 1);
-        CHECK_ST;
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + "Updated VAAPI colourspace matrix");
-        m_context->doneCurrent();
-        m_vaapiColourSpace = VA_SRC_COLOR_MASK;
-    }
-    else
-    {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + "No CSC matrix support - using limited VAAPI colourspace types");
-    }
 }
 
 int MythVAAPIInteropGLX::SetPictureAttribute(PictureAttribute Attribute, int Value)
@@ -823,9 +792,9 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context
             vector<QSize> sizes;
             for (uint plane = 0 ; plane < count; ++plane)
             {
-                QSize size = m_openglTextureSize;
+                QSize size(vaimage.width, vaimage.height);
                 if (plane > 0)
-                    size = QSize(m_openglTextureSize.width() >> 1, m_openglTextureSize.height() >> 1);
+                    size = QSize(vaimage.width >> 1, vaimage.height >> 1);
                 sizes.push_back(size);
             }
 
@@ -1081,7 +1050,7 @@ VASurfaceID MythVAAPIInterop::Deinterlace(VideoFrame *Frame, VASurfaceID Current
     if (!Frame)
         return result;
 
-    while (is_interlaced(Scan))
+    while (!m_filterError && is_interlaced(Scan))
     {
         MythDeintType deinterlacer = DEINT_NONE;
         bool doublerate = true;
@@ -1097,29 +1066,70 @@ VASurfaceID MythVAAPIInterop::Deinterlace(VideoFrame *Frame, VASurfaceID Current
             doublerate = false;
         }
 
-        if ((m_deinterlacer == deinterlacer) && (m_deinterlacer2x == doublerate) &&
-            (m_filterWidth == Frame->width) && (m_filterHeight == Frame->height))
+        if ((m_deinterlacer == deinterlacer) && (m_deinterlacer2x == doublerate))
             break;
 
         DestroyDeinterlacer();
 
-        if (!m_filterError && deinterlacer != DEINT_NONE)
+        if (deinterlacer != DEINT_NONE)
         {
             AVBufferRef* frames = reinterpret_cast<AVBufferRef*>(Frame->priv[1]);
             if (!frames)
                 break;
 
-            bool disabled = true;
-            if (disabled)
+            AVBufferRef* hwdeviceref = av_hwdevice_ctx_alloc(AV_HWDEVICE_TYPE_VAAPI);
+            if (!hwdeviceref)
+                break;
+
+            AVHWDeviceContext* hwdevicecontext  = reinterpret_cast<AVHWDeviceContext*>(hwdeviceref->data);
+            hwdevicecontext->free = [](AVHWDeviceContext*) { LOG(VB_PLAYBACK, LOG_INFO, LOC + "VAAPI VPP device context finished"); };
+
+            AVVAAPIDeviceContext *vaapidevicectx = reinterpret_cast<AVVAAPIDeviceContext*>(hwdevicecontext->hwctx);
+            vaapidevicectx->display = m_vaDisplay; // re-use the existing display
+
+            if (av_hwdevice_ctx_init(hwdeviceref) < 0)
             {
-                LOG(VB_GENERAL, LOG_INFO, LOC +
-                    "VAAPI VPP deinterlacing currently disabled for direct rendering");
+                av_buffer_unref(&hwdeviceref);
                 m_filterError = true;
                 break;
             }
 
-            if (!MythVAAPIInterop::SetupDeinterlacer(deinterlacer, doublerate, frames,
-                                                     Frame->width, Frame->height,
+            AVBufferRef *newframes = av_hwframe_ctx_alloc(hwdeviceref);
+            if (!newframes)
+            {
+                m_filterError = true;
+                av_buffer_unref(&hwdeviceref);
+                break;
+            }
+
+            AVHWFramesContext* dstframes = reinterpret_cast<AVHWFramesContext*>(newframes->data);
+            AVHWFramesContext* srcframes = reinterpret_cast<AVHWFramesContext*>(frames->data);
+
+            m_filterWidth = srcframes->width;
+            m_filterHeight = srcframes->height;
+            static const int vpppoolsize = 2; // seems to be enough
+            dstframes->sw_format = srcframes->sw_format;
+            dstframes->width = m_filterWidth;
+            dstframes->height = m_filterHeight;
+            dstframes->initial_pool_size = vpppoolsize;
+            dstframes->format = AV_PIX_FMT_VAAPI;
+            dstframes->free = [](AVHWFramesContext*) { LOG(VB_PLAYBACK, LOG_INFO, LOC + "VAAPI VPP frames context finished"); };
+
+            if (av_hwframe_ctx_init(newframes) < 0)
+            {
+                m_filterError = true;
+                av_buffer_unref(&hwdeviceref);
+                av_buffer_unref(&newframes);
+                break;
+            }
+
+            m_vppFramesContext = newframes;
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("New VAAPI frame pool with %1 %2x%3 surfaces")
+                .arg(vpppoolsize).arg(m_filterWidth).arg(m_filterHeight));
+            av_buffer_unref(&hwdeviceref);
+
+            if (!MythVAAPIInterop::SetupDeinterlacer(deinterlacer, doublerate, m_vppFramesContext,
+                                                     m_filterWidth, m_filterHeight,
                                                      m_filterGraph, m_filterSource, m_filterSink))
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to create VAAPI deinterlacer %1 - disabling")
@@ -1131,13 +1141,14 @@ VASurfaceID MythVAAPIInterop::Deinterlace(VideoFrame *Frame, VASurfaceID Current
             {
                 m_deinterlacer = deinterlacer;
                 m_deinterlacer2x = doublerate;
-                m_filterWidth = Frame->width;
-                m_filterHeight = Frame->height;
                 break;
             }
         }
         break;
     }
+
+    if (!is_interlaced(Scan) && m_deinterlacer)
+        DestroyDeinterlacer();
 
     if (m_deinterlacer)
     {
@@ -1147,8 +1158,6 @@ VASurfaceID MythVAAPIInterop::Deinterlace(VideoFrame *Frame, VASurfaceID Current
         {
             int ret = 0;
             MythAVFrame sinkframe;
-            sinkframe->width = Frame->width;
-            sinkframe->height = Frame->height;
             sinkframe->format =  AV_PIX_FMT_VAAPI;
             ret = av_buffersink_get_frame(m_filterSink, sinkframe);
             if  (ret >= 0)
@@ -1166,8 +1175,8 @@ VASurfaceID MythVAAPIInterop::Deinterlace(VideoFrame *Frame, VASurfaceID Current
             sourceframe->interlaced_frame = 1;
             sourceframe->data[3] = Frame->buf;
             sourceframe->buf[0] = av_buffer_ref(reinterpret_cast<AVBufferRef*>(Frame->priv[0]));
-            sourceframe->width  = Frame->width;
-            sourceframe->height = Frame->height;
+            sourceframe->width  = m_filterWidth;
+            sourceframe->height = m_filterHeight;
             sourceframe->format = AV_PIX_FMT_VAAPI;
             ret = av_buffersrc_add_frame(m_filterSource, sourceframe);
             sourceframe->data[3] = nullptr;

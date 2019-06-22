@@ -136,14 +136,18 @@ YUVInfo::YUVInfo(uint Width, uint Height, uint Size, const int *Pitches,
  * \see VideoOutput
  */
 
-uint VideoBuffers::GetNumBuffers(int PixelFormat)
+uint VideoBuffers::GetNumBuffers(int PixelFormat, bool Decoder /*=false*/)
 {
     switch (PixelFormat)
     {
         case FMT_VDPAU: return 28;
         case FMT_NVDEC: return 8;
         case FMT_VTB:   return 24;
-        case FMT_VAAPI: return 24;
+        // Max 16 ref frames, 12 headroom and allocate 2 extra in the VAAPI frames
+        // context for additional references held by the VPP deinterlacer (i.e.
+        // prevent buffer starvation in the decoder)
+        // This covers the 'worst case' samples.
+        case FMT_VAAPI: return Decoder ? 30 : 28;
         case FMT_DXVA2: return 30;
         case FMT_YV12:  return 31;
         case FMT_MEDIACODEC: return 8;

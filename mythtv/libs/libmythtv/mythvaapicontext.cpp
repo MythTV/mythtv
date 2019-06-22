@@ -21,6 +21,7 @@ extern "C" {
 
 /*! \class MythVAAPIContext
  *
+ * \todo Scaling errors when deinterlacing H.264 1080 and for 10bit HEVC 1080p.
  * \todo Fix crash when skipping to the end of an H.264 stream. Appears to be
  * because the decoder is partially initialised but we never feed it any packets
  * to complete the setup (as we have reached the end of the file).
@@ -386,7 +387,7 @@ int MythVAAPIContext::InitialiseContext(AVCodecContext *Context)
     vaapi_frames_ctx->attributes = prefs;
     vaapi_frames_ctx->nb_attributes = 3;
     hw_frames_ctx->sw_format         = FramesFormat(Context->sw_pix_fmt);
-    hw_frames_ctx->initial_pool_size = static_cast<int>(VideoBuffers::GetNumBuffers(FMT_VAAPI));
+    hw_frames_ctx->initial_pool_size = static_cast<int>(VideoBuffers::GetNumBuffers(FMT_VAAPI, true));
     hw_frames_ctx->format            = AV_PIX_FMT_VAAPI;
     hw_frames_ctx->width             = Context->coded_width;
     hw_frames_ctx->height            = Context->coded_height;
@@ -435,7 +436,7 @@ int MythVAAPIContext::InitialiseContext2(AVCodecContext *Context)
     hw_frames_ctx->format            = AV_PIX_FMT_VAAPI;
     hw_frames_ctx->width             = Context->coded_width;
     hw_frames_ctx->height            = Context->coded_height;
-    hw_frames_ctx->initial_pool_size = static_cast<int>(VideoBuffers::GetNumBuffers(FMT_VAAPI));
+    hw_frames_ctx->initial_pool_size = static_cast<int>(VideoBuffers::GetNumBuffers(FMT_VAAPI, true));
     hw_frames_ctx->free              = &MythCodecContext::FramesContextFinished;
     if (av_hwframe_ctx_init(Context->hw_frames_ctx) < 0)
     {
