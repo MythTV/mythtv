@@ -800,9 +800,6 @@ void TV::InitKeys(void)
             QT_TRANSLATE_NOOP("MythControls", "Set the picture color"), "");
     REG_KEY("TV Playback", ACTION_SETHUE,
             QT_TRANSLATE_NOOP("MythControls", "Set the picture hue"), "");
-    REG_KEY("TV Playback", ACTION_TOGGLESTUDIOLEVELS,
-            QT_TRANSLATE_NOOP("MythControls", "Playback picture adjustments"),
-             "");
     REG_KEY("TV Playback", ACTION_TOGGLECHANCONTROLS,
             QT_TRANSLATE_NOOP("MythControls", "Recording picture adjustments "
             "for this channel"), "Ctrl+G");
@@ -1592,11 +1589,6 @@ void TV::GetStatus(void)
             {
                 status.insert("hue",
                   vo->GetPictureAttribute(kPictureAttribute_Hue));
-            }
-            if (supp & kPictureAttributeSupported_StudioLevels)
-            {
-                status.insert("studiolevels",
-                  vo->GetPictureAttribute(kPictureAttribute_StudioLevels));
             }
         }
     }
@@ -4804,8 +4796,6 @@ bool TV::ToggleHandleAction(PlayerContext *ctx,
         EnableVisualisation(ctx, false);
     else if (has_action("TOGGLEPICCONTROLS", actions))
         DoTogglePictureAttribute(ctx, kAdjustingPicture_Playback);
-    else if (has_action(ACTION_TOGGLESTUDIOLEVELS, actions))
-        DoToggleStudioLevels(ctx);
     else if (has_action(ACTION_TOGGLENIGHTMODE, actions))
         DoToggleNightMode(ctx);
     else if (has_action("TOGGLESTRETCH", actions))
@@ -9977,13 +9967,6 @@ PictureAttribute TV::NextPictureAdjustType(
     return ::next((PictureAttributeSupported)sup, attr);
 }
 
-void TV::DoToggleStudioLevels(const PlayerContext *ctx)
-{
-    ctx->LockDeletePlayer(__FILE__, __LINE__);
-    ctx->m_player->ToggleStudioLevels();
-    ctx->UnlockDeletePlayer(__FILE__, __LINE__);
-}
-
 void TV::DoToggleNightMode(const PlayerContext *ctx)
 {
     ctx->LockDeletePlayer(__FILE__, __LINE__);
@@ -10578,10 +10561,6 @@ void TV::OSDDialogEvent(int result, const QString& text, QString action)
         m_adjustingPictureAttribute = (PictureAttribute)
             (action.right(1).toInt() - 1);
         DoTogglePictureAttribute(actx, kAdjustingPicture_Playback);
-    }
-    else if (action.startsWith(ACTION_TOGGLESTUDIOLEVELS))
-    {
-        DoToggleStudioLevels(actx);
     }
     else if (action == ACTION_TOGGLENIGHTMODE)
     {
@@ -11316,13 +11295,8 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
             {
                 if (toMask((PictureAttribute)i) & m_tvmSup)
                 {
-                    QString action = prefix +
-                        QString::number(i - kPictureAttribute_MIN);
-                    active = m_tvmStudioLevels;
-                    if ((PictureAttribute)i == kPictureAttribute_StudioLevels)
-                        BUTTON(ACTION_TOGGLESTUDIOLEVELS,
-                               toString((PictureAttribute) i));
-                    else
+                    QString action = prefix + QString::number(i - kPictureAttribute_MIN);
+                    if ((PictureAttribute)i != kPictureAttribute_Range)
                         BUTTON(action, toString((PictureAttribute) i));
                 }
             }
@@ -11960,7 +11934,6 @@ void TV::PlaybackMenuInit(const MenuBase &menu)
     m_tvmAdjustFill        = kAdjustFill_Off;
     m_tvmFillAutoDetect    = false;
     m_tvmSup               = kPictureAttributeSupported_None;
-    m_tvmStudioLevels      = false;
     m_tvmStereoAllowed     = false;
     m_tvmStereoMode        = kStereoscopicModeNone;
     m_tvmScanType          = kScan_Ignore;
@@ -12070,8 +12043,6 @@ void TV::PlaybackMenuInit(const MenuBase &menu)
             m_tvmStereoAllowed  = vo->StereoscopicModesAllowed();
             m_tvmStereoMode     = vo->GetStereoscopicMode();
             m_tvmFillAutoDetect = !vo->hasHWAcceleration();
-            m_tvmStudioLevels   =
-                vo->GetPictureAttribute(kPictureAttribute_StudioLevels) > 0;
         }
         if (!m_tvmScanTypeLocked)
         {

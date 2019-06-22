@@ -48,7 +48,7 @@ VideoColourSpace::VideoColourSpace(VideoColourSpace *Parent)
     QMatrix4x4(),
     ReferenceCounter("Colour"),
     m_supportedAttributes(kPictureAttributeSupported_None),
-    m_studioLevels(false),
+    m_fullRange(true),
     m_brightness(0.0F),
     m_contrast(1.0F),
     m_saturation(1.0F),
@@ -66,26 +66,26 @@ VideoColourSpace::VideoColourSpace(VideoColourSpace *Parent)
         m_parent->IncrRef();
         connect(m_parent, &VideoColourSpace::PictureAttributeChanged, this, &VideoColourSpace::SetPictureAttribute);
         m_supportedAttributes = m_parent->SupportedAttributes();
-        m_dbSettings[kPictureAttribute_Brightness]   = m_parent->GetPictureAttribute(kPictureAttribute_Brightness);
-        m_dbSettings[kPictureAttribute_Contrast]     = m_parent->GetPictureAttribute(kPictureAttribute_Contrast);
-        m_dbSettings[kPictureAttribute_Colour]       = m_parent->GetPictureAttribute(kPictureAttribute_Colour);
-        m_dbSettings[kPictureAttribute_Hue]          = m_parent->GetPictureAttribute(kPictureAttribute_Hue);
-        m_dbSettings[kPictureAttribute_StudioLevels] = m_parent->GetPictureAttribute(kPictureAttribute_StudioLevels);
+        m_dbSettings[kPictureAttribute_Brightness] = m_parent->GetPictureAttribute(kPictureAttribute_Brightness);
+        m_dbSettings[kPictureAttribute_Contrast]   = m_parent->GetPictureAttribute(kPictureAttribute_Contrast);
+        m_dbSettings[kPictureAttribute_Colour]     = m_parent->GetPictureAttribute(kPictureAttribute_Colour);
+        m_dbSettings[kPictureAttribute_Hue]        = m_parent->GetPictureAttribute(kPictureAttribute_Hue);
+        m_dbSettings[kPictureAttribute_Range]      = m_parent->GetPictureAttribute(kPictureAttribute_Range);
     }
     else
     {
-        m_dbSettings[kPictureAttribute_Brightness]   = gCoreContext->GetNumSetting("PlaybackBrightness",   50);
-        m_dbSettings[kPictureAttribute_Contrast]     = gCoreContext->GetNumSetting("PlaybackContrast",     50);
-        m_dbSettings[kPictureAttribute_Colour]       = gCoreContext->GetNumSetting("PlaybackColour",       50);
-        m_dbSettings[kPictureAttribute_Hue]          = gCoreContext->GetNumSetting("PlaybackHue",          0);
-        m_dbSettings[kPictureAttribute_StudioLevels] = gCoreContext->GetNumSetting("PlaybackStudioLevels", 0);
+        m_dbSettings[kPictureAttribute_Brightness] = gCoreContext->GetNumSetting("PlaybackBrightness", 50);
+        m_dbSettings[kPictureAttribute_Contrast]   = gCoreContext->GetNumSetting("PlaybackContrast",   50);
+        m_dbSettings[kPictureAttribute_Colour]     = gCoreContext->GetNumSetting("PlaybackColour",     50);
+        m_dbSettings[kPictureAttribute_Hue]        = gCoreContext->GetNumSetting("PlaybackHue",        0);
+        m_dbSettings[kPictureAttribute_Range]      = gCoreContext->GetBoolSetting("GUIRGBLevels",      true);
     }
 
     SetBrightness(m_dbSettings[kPictureAttribute_Brightness]);
     SetContrast(m_dbSettings[kPictureAttribute_Contrast]);
     SetSaturation(m_dbSettings[kPictureAttribute_Colour]);
     SetHue(m_dbSettings[kPictureAttribute_Hue]);
-    SetStudioLevels(m_dbSettings[kPictureAttribute_StudioLevels]);
+    SetFullRange(m_dbSettings[kPictureAttribute_Range]);
     m_updatesDisabled = false;
     Update();
 }
@@ -140,10 +140,6 @@ int VideoColourSpace::SetPictureAttribute(PictureAttribute Attribute, int Value)
             break;
         case kPictureAttribute_Hue:
             SetHue(Value);
-            break;
-        case kPictureAttribute_StudioLevels:
-            Value = std::min(std::max(Value, 0), 1);
-            SetStudioLevels(Value > 0);
             break;
         default:
             Value = -1;
@@ -217,9 +213,8 @@ void VideoColourSpace::Update(void)
     // denormalise chroma
     yuv2rgb.translate(0.0F, -0.5F, -0.5F);
     // Levels adjustment
-    // If using limited/studio levels - this is a no-op.
-    // For level expansion, this expands to the full, unadulterated RGB range
-    // e.g. 0-255, 0-1023 etc.
+    // This is a no-op when using full range MJPEG sources and full range output
+    // or 'standard' limited range MPEG sources with limited range output.
     // N.B all of the quantization parameters scale perfectly between the different
     // standards and bitdepths (i.e. 709 8 and 10 bit, 2020 10 and 12bit).
     // In the event that we are displaying a downsampled format, the following
@@ -227,14 +222,16 @@ void VideoColourSpace::Update(void)
     // For example, YUV420P10 is downsampled by removing the 2 lower bits of
     // precision. We identify the resultant YUV420P frame as 8bit and calculate
     // the quantization/range accordingly.
-    bool fullrange = (m_range == AVCOL_RANGE_JPEG) || m_studioLevels;
+    bool expand   = (m_range == AVCOL_RANGE_MPEG) && m_fullRange;
+    bool contract = (m_range == AVCOL_RANGE_JPEG) && !m_fullRange;
+    bool noop     = !expand && !contract;
     float depth        =  (1 <<  m_colourSpaceDepth) - 1;
     float blacklevel   =  16 << (m_colourSpaceDepth - 8);
     float lumapeak     = 235 << (m_colourSpaceDepth - 8);
     float chromapeak   = 240 << (m_colourSpaceDepth - 8);
-    float luma_scale   = fullrange ? 1.0F : depth / (lumapeak - blacklevel);
-    float chroma_scale = fullrange ? 1.0F : depth / (chromapeak - blacklevel);
-    float offset       = fullrange ? 0.0F : -blacklevel / depth;
+    float luma_scale   = noop ? 1.0F : (expand ? depth / (lumapeak - blacklevel)   : (lumapeak - blacklevel) / depth);
+    float chroma_scale = noop ? 1.0F : (expand ? depth / (chromapeak - blacklevel) : (chromapeak - blacklevel) / depth);
+    float offset       = noop ? 0.0F : (expand ? -blacklevel / depth               : blacklevel / depth);
 
     setToIdentity();
     translate(m_brightness, m_brightness, m_brightness);
@@ -271,7 +268,7 @@ void VideoColourSpace::Debug(void)
         .arg(static_cast<qreal>(m_saturation), 2, 'f', 4, QLatin1Char('0'))
         .arg(static_cast<qreal>(m_hue)       , 2, 'f', 4, QLatin1Char('0'))
         .arg(static_cast<qreal>(m_alpha)     , 2, 'f', 4, QLatin1Char('0'))
-        .arg((AVCOL_RANGE_JPEG == m_range) || m_studioLevels ? "Full" : "Limited"));
+        .arg(m_fullRange ? "Full" : "Limited"));
 
     if (VERBOSE_LEVEL_CHECK(VB_PLAYBACK, LOG_DEBUG))
     {
@@ -308,6 +305,8 @@ bool VideoColourSpace::UpdateColourSpace(const VideoFrame *Frame)
         csp = AVCOL_SPC_UNSPECIFIED;
     }
     int range = Frame->colorrange;
+    if (range ==  AVCOL_RANGE_UNSPECIFIED)
+        range = AVCOL_RANGE_MPEG;
     int depth = ColorDepth(format_is_hw(frametype) ? softwaretype : frametype);
     if (csp == AVCOL_SPC_UNSPECIFIED)
         csp = (Frame->width < 1280) ? AVCOL_SPC_BT470BG : AVCOL_SPC_BT709;
@@ -325,20 +324,21 @@ bool VideoColourSpace::UpdateColourSpace(const VideoFrame *Frame)
     if (forced)
         LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Forcing inconsistent colourspace - frame format %1")
             .arg(format_description(Frame->codec)));
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Video Colourspace:%1(%2) Depth:%3 %4Range:%5")
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Source %1(%2) Depth:%3 %4Range:%5")
         .arg(av_color_space_name(static_cast<AVColorSpace>(m_colourSpace)))
         .arg(m_colourSpace == raw ? "Reported" : "Guessed")
         .arg(m_colourSpaceDepth)
         .arg((m_colourSpaceDepth > 8) ? (m_colorShifted ? "(Pre-scaled) " : "(Fixed point) ") : "")
         .arg((AVCOL_RANGE_JPEG == m_range) ? "Full" : "Limited"));
-
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Output Range:%1")
+        .arg(m_fullRange ? "Full" : "Limited"));
     Update();
     return true;
 }
 
-void VideoColourSpace::SetStudioLevels(bool Studio)
+void VideoColourSpace::SetFullRange(bool FullRange)
 {
-    m_studioLevels = Studio;
+    m_fullRange = FullRange;
     Update();
 }
 
@@ -388,8 +388,6 @@ void VideoColourSpace::SaveValue(PictureAttribute AttributeType, int Value)
         dbName = "PlaybackColour";
     else if (kPictureAttribute_Hue == AttributeType)
         dbName = "PlaybackHue";
-    else if (kPictureAttribute_StudioLevels == AttributeType)
-        dbName = "PlaybackStudioLevels";
 
     if (!dbName.isEmpty())
         gCoreContext->SaveSetting(dbName, Value);

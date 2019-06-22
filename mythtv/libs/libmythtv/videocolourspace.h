@@ -37,7 +37,7 @@ class VideoColourSpace : public QObject, public QMatrix4x4, public ReferenceCoun
     ~VideoColourSpace();
 
   private:
-    void  SetStudioLevels(bool Studio);
+    void  SetFullRange(bool FullRange);
     void  SetBrightness(int Value);
     void  SetContrast(int Value);
     void  SetHue(int Value);
@@ -50,7 +50,7 @@ class VideoColourSpace : public QObject, public QMatrix4x4, public ReferenceCoun
     PictureAttributeSupported  m_supportedAttributes;
     QMap<PictureAttribute,int> m_dbSettings;
 
-    bool      m_studioLevels;
+    bool      m_fullRange;
     float     m_brightness;
     float     m_contrast;
     float     m_saturation;

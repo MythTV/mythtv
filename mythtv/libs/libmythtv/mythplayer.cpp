@@ -5828,23 +5828,6 @@ QString MythPlayer::GetError(void) const
     return errorMsg;
 }
 
-void MythPlayer::ToggleStudioLevels(void)
-{
-    if (!videoOutput)
-        return;
-
-    if (!(videoOutput->GetSupportedPictureAttributes() &
-          kPictureAttributeSupported_StudioLevels))
-        return;
-
-    int val = videoOutput->GetPictureAttribute(kPictureAttribute_StudioLevels);
-    val = (val > 0) ? 0 : 1;
-    videoOutput->SetPictureAttribute(kPictureAttribute_StudioLevels, val);
-    QString msg = (val > 0) ? tr("Enabled Studio Levels") :
-                              tr("Disabled Studio Levels");
-    SetOSDMessage(msg, kOSDTimeout_Med);
-}
-
 void MythPlayer::ToggleNightMode(void)
 {
     if (!videoOutput)

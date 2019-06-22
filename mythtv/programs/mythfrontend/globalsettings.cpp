@@ -2706,6 +2706,18 @@ static HostComboBoxSetting *ThemePainter()
 }
 #endif
 
+static HostCheckBoxSetting *GUIRGBLevels()
+{
+    HostCheckBoxSetting *rgb = new HostCheckBoxSetting("GUIRGBLevels");
+    rgb->setLabel(AppearanceSettings::tr("Use full range RGB output"));
+    rgb->setValue(true);
+    rgb->setHelpText("Enable (recommended) to supply full range RGB output to your display device. "
+                     "Disable to supply limited range RGB output. This setting applies to both the "
+                     "GUI and media playback. Ideally the value of this setting should match a "
+                     "similar setting on your TV or monitor.");
+    return rgb;
+}
+
 static HostComboBoxSetting *ChannelFormat()
 {
     HostComboBoxSetting *gc = new HostComboBoxSetting("ChannelFormat");
@@ -4517,6 +4529,7 @@ AppearanceSettings::AppearanceSettings()
     screen->addChild(ThemePainter());
 #endif
     screen->addChild(MenuTheme());
+    screen->addChild(GUIRGBLevels());
 
     if (MythDisplay::GetNumberOfScreens() > 1)
     {

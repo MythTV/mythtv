@@ -368,7 +368,6 @@ class MTV_PUBLIC MythPlayer
     void UnlockOSD(void)  { osdLock.unlock(); }
 
     // Public picture controls
-    void ToggleStudioLevels(void);
     void ToggleNightMode(void);
 
     // Visualisations

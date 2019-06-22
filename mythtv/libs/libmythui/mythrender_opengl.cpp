@@ -142,6 +142,7 @@ MythRenderOpenGL::MythRenderOpenGL(const QSurfaceFormat& Format, QPaintDevice* D
     m_activeTextureTarget(0),
     m_blend(false),
     m_background(0x00000000),
+    m_fullRange(gCoreContext->GetBoolSetting("GUIRGBLevels", true)),
     m_projection(),
     m_transforms(),
     m_parameters(),
@@ -304,6 +305,7 @@ bool MythRenderOpenGL::Init(void)
     }
 
     LOG(VB_GENERAL, LOG_INFO, LOC + "Initialised MythRenderOpenGL");
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Using %1 range output").arg(m_fullRange ? "full" : "limited"));
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         logDebugMarker("RENDER_INIT_END");
     return true;
@@ -713,8 +715,7 @@ void MythRenderOpenGL::ClearFramebuffer(void)
 
 void MythRenderOpenGL::DrawBitmap(MythGLTexture *Texture, QOpenGLFramebufferObject *Target,
                                   const QRect &Source, const QRect &Destination,
-                                  QOpenGLShaderProgram *Program, int Alpha,
-                                  int Red, int Green, int Blue)
+                                  QOpenGLShaderProgram *Program, int Alpha)
 {
     makeCurrent();
 
@@ -758,7 +759,7 @@ void MythRenderOpenGL::DrawBitmap(MythGLTexture *Texture, QOpenGLFramebufferObje
     glEnableVertexAttribArray(VERTEX_INDEX);
     glEnableVertexAttribArray(TEXTURE_INDEX);
     glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(GLfloat), kVertexOffset);
-    glVertexAttrib4f(COLOR_INDEX, Red / 255.0f, Green / 255.0f, Blue / 255.0f, Alpha / 255.0f);
+    glVertexAttrib4f(COLOR_INDEX, 1.0f, 1.0f, 1.0f, Alpha / 255.0f);
     glVertexAttribPointerI(TEXTURE_INDEX, TEXTURE_SIZE, GL_FLOAT, GL_FALSE, TEXTURE_SIZE * sizeof(GLfloat), kTextureOffset);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glDisableVertexAttribArray(TEXTURE_INDEX);
@@ -843,6 +844,9 @@ void MythRenderOpenGL::DrawRoundRect(QOpenGLFramebufferObject *Target,
                                      const QBrush &FillBrush,
                                      const QPen &LinePen, int Alpha)
 {
+    static const float kLimitedRangeOffset = (16.0f / 255.0f);
+    static const float kLimitedRangeScale  = (219.0f / 255.0f);
+
     makeCurrent();
     BindFramebuffer(Target);
 
@@ -875,11 +879,22 @@ void MythRenderOpenGL::DrawRoundRect(QOpenGLFramebufferObject *Target,
         QOpenGLShaderProgram* fill = m_defaultPrograms[kShaderSimple];
 
         // Set the fill color
-        glVertexAttrib4f(COLOR_INDEX,
-                           FillBrush.color().red() / 255.0f,
-                           FillBrush.color().green() / 255.0f,
-                           FillBrush.color().blue() / 255.0f,
-                          (FillBrush.color().alpha() / 255.0f) * (Alpha / 255.0f));
+        if (m_fullRange)
+        {
+            glVertexAttrib4f(COLOR_INDEX,
+                               FillBrush.color().red() / 255.0f,
+                               FillBrush.color().green() / 255.0f,
+                               FillBrush.color().blue() / 255.0f,
+                              (FillBrush.color().alpha() / 255.0f) * (Alpha / 255.0f));
+        }
+        else
+        {
+            glVertexAttrib4f(COLOR_INDEX,
+                              (FillBrush.color().red() * kLimitedRangeScale) + kLimitedRangeOffset,
+                              (FillBrush.color().blue() * kLimitedRangeScale) + kLimitedRangeOffset,
+                              (FillBrush.color().green() * kLimitedRangeScale) + kLimitedRangeOffset,
+                              (FillBrush.color().alpha() / 255.0f) * (Alpha / 255.0f));
+        }
 
         // Set the radius
         m_parameters(2,0) = rad;
@@ -950,11 +965,22 @@ void MythRenderOpenGL::DrawRoundRect(QOpenGLFramebufferObject *Target,
         QOpenGLShaderProgram* hline = m_defaultPrograms[kShaderHorizLine];
 
         // Set the line color
-        glVertexAttrib4f(COLOR_INDEX,
-                           LinePen.color().red() / 255.0f,
-                           LinePen.color().green() / 255.0f,
-                           LinePen.color().blue() / 255.0f,
-                          (LinePen.color().alpha() / 255.0f) * (Alpha / 255.0f));
+        if (m_fullRange)
+        {
+            glVertexAttrib4f(COLOR_INDEX,
+                               LinePen.color().red() / 255.0f,
+                               LinePen.color().green() / 255.0f,
+                               LinePen.color().blue() / 255.0f,
+                              (LinePen.color().alpha() / 255.0f) * (Alpha / 255.0f));
+        }
+        else
+        {
+            glVertexAttrib4f(COLOR_INDEX,
+                              (LinePen.color().red() * kLimitedRangeScale) + kLimitedRangeOffset,
+                              (LinePen.color().blue() * kLimitedRangeScale) + kLimitedRangeOffset,
+                              (LinePen.color().green() * kLimitedRangeScale) + kLimitedRangeOffset,
+                              (FillBrush.color().alpha() / 255.0f) * (Alpha / 255.0f));
+        }
 
         // Set the radius and width
         m_parameters(2,0) = rad - lineWidth / 2.0f;
@@ -1426,7 +1452,7 @@ void MythRenderOpenGL::SetShaderProgramParams(QOpenGLShaderProgram *Program, con
 bool MythRenderOpenGL::CreateDefaultShaders(void)
 {
     m_defaultPrograms[kShaderSimple]     = CreateShaderProgram(kSimpleVertexShader, kSimpleFragmentShader);
-    m_defaultPrograms[kShaderDefault]    = CreateShaderProgram(kDefaultVertexShader, kDefaultFragmentShader);
+    m_defaultPrograms[kShaderDefault]    = CreateShaderProgram(kDefaultVertexShader, m_fullRange ? kDefaultFragmentShader : kDefaultFragmentShaderLimited);
     m_defaultPrograms[kShaderCircle]     = CreateShaderProgram(kDrawVertexShader, kCircleFragmentShader);
     m_defaultPrograms[kShaderCircleEdge] = CreateShaderProgram(kDrawVertexShader, kCircleEdgeFragmentShader);
     m_defaultPrograms[kShaderVertLine]   = CreateShaderProgram(kDrawVertexShader, kVertLineFragmentShader);

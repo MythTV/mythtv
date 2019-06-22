@@ -143,8 +143,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
 
     void  DrawBitmap(MythGLTexture *Texture, QOpenGLFramebufferObject *Target,
                      const QRect &Source, const QRect &Destination,
-                     QOpenGLShaderProgram *Program, int Alpha = 255,
-                     int Red = 255, int Green = 255, int Blue = 255);
+                     QOpenGLShaderProgram *Program, int Alpha = 255);
     void  DrawBitmap(MythGLTexture **Textures, uint TextureCount,
                      QOpenGLFramebufferObject *Target,
                      const QRect &Source, const QRect &Destination,
@@ -155,7 +154,6 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     void  DrawRoundRect(QOpenGLFramebufferObject *Target,
                         const QRect &Area, int CornerRadius,
                         const QBrush &FillBrush, const QPen &LinePen, int Alpha);
-    bool  RectanglesAreAccelerated(void) { return true; }
 
   public slots:
     void  messageLogged  (const QOpenGLDebugMessage &Message);
@@ -214,6 +212,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     GLenum     m_activeTextureTarget;
     bool       m_blend;
     int32_t    m_background;
+    bool       m_fullRange;
     QMatrix4x4 m_projection;
     QStack<QMatrix4x4> m_transforms;
     QMatrix4x4 m_parameters;

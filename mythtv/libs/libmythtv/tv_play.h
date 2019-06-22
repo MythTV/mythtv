@@ -666,7 +666,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
                               AspectOverrideMode aspectMode = kAspect_Toggle);
     void ToggleAdjustFill(PlayerContext*,
                           AdjustFillMode adjustfillMode = kAdjustFill_Toggle);
-    void DoToggleStudioLevels(const PlayerContext *ctx);
     void DoToggleNightMode(const PlayerContext*);
     void DoTogglePictureAttribute(const PlayerContext*,
                                   PictureAdjustType type);
@@ -1002,7 +1001,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     AdjustFillMode   m_tvmAdjustFill;
     bool             m_tvmFillAutoDetect;
     uint             m_tvmSup;
-    bool             m_tvmStudioLevels;
     bool             m_tvmStereoAllowed;
     StereoscopicMode m_tvmStereoMode;
     FrameScanType    m_tvmScanType;

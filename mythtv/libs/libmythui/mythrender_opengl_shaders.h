@@ -1,6 +1,8 @@
 #ifndef MYTHRENDER_OPENGL_SHADERS_H
 #define MYTHRENDER_OPENGL_SHADERS_H
 
+#include <QString>
+
 static const QString kDefaultVertexShader =
 "attribute vec2 a_position;\n"
 "attribute vec4 a_color;\n"
@@ -22,6 +24,15 @@ static const QString kDefaultFragmentShader =
 "void main(void)\n"
 "{\n"
 "    gl_FragColor = texture2D(s_texture0, v_texcoord0) * v_color;\n"
+"}\n";
+
+static const QString kDefaultFragmentShaderLimited =
+"uniform sampler2D s_texture0;\n"
+"varying highp vec4 v_color;\n"
+"varying highp vec2 v_texcoord0;\n"
+"void main(void)\n"
+"{\n"
+"    gl_FragColor = (texture2D(s_texture0, v_texcoord0) * v_color * vec4(0.85882, 0.85882, 0.85882, 1.0)) + vec4(0.06274, 0.06274, 0.06274, 0.0);\n"
 "}\n";
 
 static const QString kSimpleVertexShader =

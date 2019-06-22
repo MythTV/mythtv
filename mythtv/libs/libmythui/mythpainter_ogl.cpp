@@ -256,7 +256,7 @@ void MythOpenGLPainter::DrawRoundRect(const QRect &Area, int CornerRadius,
                                       const QBrush &FillBrush,
                                       const QPen &LinePen, int Alpha)
 {
-    if (m_render && m_render->RectanglesAreAccelerated())
+    if (m_render)
     {
         if (FillBrush.style() == Qt::SolidPattern ||
             FillBrush.style() == Qt::NoBrush)

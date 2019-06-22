@@ -249,7 +249,7 @@ vector<MythVideoTexture*> MythVDPAUInterop::Acquire(MythRenderOpenGL *Context,
     // the field/frame parameter
     bool doublerate = true;
     MythDeintType deinterlacer = DEINT_BASIC;
-    if (kScan_Interlaced == Scan || kScan_Intr2ndField == Scan)
+    if (is_interlaced(Scan))
     {
         MythDeintType driverdeint = GetDoubleRateOption(Frame, DEINT_DRIVER | DEINT_CPU | DEINT_SHADER);
         if (!driverdeint)

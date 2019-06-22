@@ -587,7 +587,7 @@ int VideoOutput::ChangePictureAttribute(
     if (kPictureAttribute_Hue == attributeType)
         newVal = newVal % 100;
 
-    if ((kPictureAttribute_StudioLevels == attributeType) && newVal > 1)
+    if ((kPictureAttribute_Range == attributeType) && newVal > 1)
         newVal = 1;
 
     newVal = min(max(newVal, 0), 100);
