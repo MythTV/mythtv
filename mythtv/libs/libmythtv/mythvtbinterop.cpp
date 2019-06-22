@@ -83,6 +83,11 @@ vector<MythVideoTexture*> MythVTBInterop::Acquire(MythRenderOpenGL *Context,
     int planes = CVPixelBufferGetPlaneCount(buffer);
     CVPixelBufferLockBaseAddress(buffer, kCVPixelBufferLock_ReadOnly);
 
+    // FIXME? There is no P010 support here as I cannot test it - but SurfaceInterop
+    // should be used at all times - so this code is not going to be hit.
+    // Note - and the reason this code is retained is because it may at some point
+    // be useful for an iOS port (iOS has no surace interop)
+
     // Create necessary textures
     if (m_openglTextures.isEmpty())
     {
@@ -95,7 +100,7 @@ vector<MythVideoTexture*> MythVTBInterop::Acquire(MythRenderOpenGL *Context,
             if (texture)
             {
                 texture->m_frameType = FMT_VTB;
-                texture->m_frameFormat = FMT_NV12; // TODO check this
+                texture->m_frameFormat = FMT_NV12;
                 texture->m_plane = plane;
                 texture->m_planeCount = planes;
                 texture->m_allowGLSLDeint = true;
@@ -169,14 +174,7 @@ vector<MythVideoTexture*> MythVTBSurfaceInterop::Acquire(MythRenderOpenGL *Conte
     if (ColourSpace)
     {
         if (m_openglTextures.isEmpty())
-        {
-            ColourSpace->SetSupportedAttributes(static_cast<PictureAttributeSupported>
-                                               (kPictureAttributeSupported_Brightness |
-                                                kPictureAttributeSupported_Contrast |
-                                                kPictureAttributeSupported_Colour |
-                                                kPictureAttributeSupported_Hue |
-                                                kPictureAttributeSupported_StudioLevels));
-        }
+            ColourSpace->SetSupportedAttributes(ALL_PICTURE_ATTRIBUTES);
         ColourSpace->UpdateColourSpace(Frame);
     }
 
@@ -213,8 +211,19 @@ vector<MythVideoTexture*> MythVTBSurfaceInterop::Acquire(MythRenderOpenGL *Conte
         int height = IOSurfaceGetHeightOfPlane(surface, plane);
         sizes.push_back(QSize(width, height));
     }
-    // TODO proper handling of all formats - this assumes NV12
-    result = MythVideoTexture::CreateTextures(m_context, FMT_VTB, FMT_NV12, sizes, QOpenGLTexture::TargetRectangle);
+    // NB P010 support is untested
+    // NB P010 support was added to FFmpeg in https://github.com/FFmpeg/FFmpeg/commit/036b4b0f85933f49a709
+    // which has not yet been merged into the MythTV FFmpeg version (as of 22/6/19)
+    VideoFrameType frameformat = PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->sw_pix_fmt));
+    if ((frameformat != FMT_NV12) && (frameformat != FMT_P010))
+    {
+        IOSurfaceUnlock(surface, kIOSurfaceLockReadOnly, nullptr);
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unsupported frame format %1")
+            .arg(format_description(frameformat)));
+        return result;
+    }
+
+    result = MythVideoTexture::CreateTextures(m_context, FMT_VTB, frameformat, sizes, QOpenGLTexture::TargetRectangle);
 
     for (uint plane = 0; plane < result.size(); ++plane)
     {
@@ -224,11 +233,14 @@ vector<MythVideoTexture*> MythVTBSurfaceInterop::Acquire(MythRenderOpenGL *Conte
         texture->m_allowGLSLDeint = true;
         m_context->EnableTextures(QOpenGLTexture::TargetRectangle);
         m_context->glBindTexture(texture->m_target, texture->m_textureId);
-        GLenum format = plane == 0 ? QOpenGLTexture::Red : QOpenGLTexture::RG;
+
+        GLenum format = (plane == 0) ? QOpenGLTexture::Red : QOpenGLTexture::RG;;
+        GLenum dataformat = (frameformat == FMT_NV12) ? QOpenGLTexture::UInt8 : QOpenGLTexture::UInt16;
+
         CGLError error = CGLTexImageIOSurface2D(
                 CGLGetCurrentContext(), QOpenGLTexture::TargetRectangle, format,
                 texture->m_size.width(), texture->m_size.height(),
-                format, QOpenGLTexture::UInt8, surface, plane);
+                format, dataformat, surface, plane);
         if (error != kCGLNoError)
             LOG(VB_GENERAL, LOG_ERR, LOC + QString("CGLTexImageIOSurface2D error %1").arg(error));
         m_context->glBindTexture(QOpenGLTexture::TargetRectangle, 0);
