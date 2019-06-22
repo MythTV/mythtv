@@ -142,13 +142,13 @@ uint VideoBuffers::GetNumBuffers(int PixelFormat, int MaxReferenceFrames, bool D
     switch (PixelFormat)
     {
         case FMT_DXVA2: return 30;
-        case FMT_VDPAU: return 28;
         case FMT_VTB:   return 24;
         // Max 16 ref frames, 12 headroom and allocate 2 extra in the VAAPI frames
         // context for additional references held by the VPP deinterlacer (i.e.
         // prevent buffer starvation in the decoder)
         // This covers the 'worst case' samples.
         case FMT_VAAPI: return Decoder ? (refs + 14) : (refs + 12);
+        case FMT_VDPAU: return refs + 12;
         // Copyback of hardware frames. These decoders are buffering internally
         // already - so no need for a large presentation buffer
         case FMT_NONE:  return 8;

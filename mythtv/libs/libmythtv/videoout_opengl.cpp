@@ -362,7 +362,7 @@ bool VideoOutputOpenGL::CreateBuffers(MythCodecID CodecID, QSize Size)
     else if (codec_is_vtb(CodecID))
         return m_videoBuffers.CreateBuffers(FMT_VTB, Size, false, 1, 4, 2, 1);
     else if (codec_is_vdpau(CodecID))
-        return m_videoBuffers.CreateBuffers(FMT_VDPAU, Size, false, 2, 1, 4, 1);
+        return m_videoBuffers.CreateBuffers(FMT_VDPAU, Size, false, 2, 1, 4, 1, m_maxReferenceFrames);
     else if (codec_is_nvdec(CodecID))
         return m_videoBuffers.CreateBuffers(FMT_NVDEC, Size, false, 2, 1, 4, 1);
 
