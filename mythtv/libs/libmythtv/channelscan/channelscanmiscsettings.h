@@ -206,6 +206,7 @@ class ScanSymbolRateDVBS: public TransMythUIComboBoxSetting
         addSelection("28000000");
         addSelection("28500000");
         addSelection("29500000");
+        addSelection("29700000");
         addSelection("29900000");
     }
 };
