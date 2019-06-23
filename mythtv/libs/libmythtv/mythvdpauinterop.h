@@ -45,6 +45,8 @@ class MythVDPAUInterop : public MythOpenGLInterop
     bool  InitVDPAU(AVVDPAUDeviceContext* DeviceContext, VdpVideoSurface Surface,
                     MythDeintType Deint, bool DoubleRate);
     void  Cleanup(void);
+    void  CleanupDeinterlacer(void);
+    void  RotateReferenceFrames(AVBufferRef *Buffer);
 
     VideoColourSpace   *m_colourSpace       { nullptr };
     MythVDPAUHelper    *m_helper            { nullptr };
@@ -54,6 +56,7 @@ class MythVDPAUInterop : public MythOpenGLInterop
     VdpChromaType       m_mixerChroma       { VDP_CHROMA_TYPE_420 };
     QSize               m_mixerSize         { };
     MythDeintType       m_deinterlacer      { DEINT_BASIC };
+    QVector<AVBufferRef*> m_referenceFrames { };
     MYTH_VDPAUINITNV    m_initNV            { nullptr };
     MYTH_VDPAUFININV    m_finiNV            { nullptr };
     MYTH_VDPAUREGOUTSURFNV m_registerNV     { nullptr };

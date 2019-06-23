@@ -341,7 +341,7 @@ VdpVideoMixer MythVDPAUHelper::CreateMixer(QSize Size, VdpChromaType ChromaType,
 
     if (DEINT_HIGH== Deinterlacer)
     {
-        features[featurecount] = VDP_VIDEO_MIXER_FEATURE_DEINTERLACE_TEMPORAL;
+        features[featurecount] = VDP_VIDEO_MIXER_FEATURE_DEINTERLACE_TEMPORAL_SPATIAL;
         featurecount++;
     }
 
@@ -362,7 +362,8 @@ VdpVideoMixer MythVDPAUHelper::CreateMixer(QSize Size, VdpChromaType ChromaType,
 }
 
 void MythVDPAUHelper::MixerRender(VdpVideoMixer Mixer, VdpVideoSurface Source,
-                                  VdpOutputSurface Dest, FrameScanType Scan, int TopFieldFirst)
+                                  VdpOutputSurface Dest, FrameScanType Scan, int TopFieldFirst,
+                                  QVector<AVBufferRef*>& Frames)
 {
     if (!m_valid || !Mixer || !Source || !Dest)
         return;
@@ -379,10 +380,40 @@ void MythVDPAUHelper::MixerRender(VdpVideoMixer Mixer, VdpVideoSurface Source,
                                 VDP_VIDEO_MIXER_PICTURE_STRUCTURE_TOP_FIELD;
     }
 
-    INIT_ST
-    status = m_vdpVideoMixerRender(Mixer, VDP_INVALID_HANDLE, nullptr, field,
-                                   0, nullptr, Source, 0, nullptr, nullptr, Dest, nullptr, nullptr, 0, nullptr);
-    CHECK_ST
+    int count = Frames.size();
+    if ((count < 1) || (field == VDP_VIDEO_MIXER_PICTURE_STRUCTURE_FRAME))
+    {
+        INIT_ST
+        status = m_vdpVideoMixerRender(Mixer, VDP_INVALID_HANDLE, nullptr, field,
+                                       0, nullptr, Source, 0, nullptr, nullptr, Dest, nullptr, nullptr, 0, nullptr);
+        CHECK_ST
+    }
+    else
+    {
+        VdpVideoSurface past[2]   = { VDP_INVALID_HANDLE, VDP_INVALID_HANDLE };
+        VdpVideoSurface future[1] = { VDP_INVALID_HANDLE };
+
+        VdpVideoSurface next    = static_cast<VdpVideoSurface>(reinterpret_cast<uintptr_t>(Frames[0]->data));
+        VdpVideoSurface current = static_cast<VdpVideoSurface>(reinterpret_cast<uintptr_t>(Frames[count > 1 ? 1 : 0]->data));
+        VdpVideoSurface last    = static_cast<VdpVideoSurface>(reinterpret_cast<uintptr_t>(Frames[count > 2 ? 2 : 0]->data));
+
+        if (field == VDP_VIDEO_MIXER_PICTURE_STRUCTURE_BOTTOM_FIELD)
+        {
+            future[0] = current;
+            past[0] = past[1] = last;
+        }
+        else
+        {
+            future[0] = next;
+            past[0] = current;
+            past[1] = last;
+        }
+
+        INIT_ST
+        status = m_vdpVideoMixerRender(Mixer, VDP_INVALID_HANDLE, nullptr, field,
+                                       2, past, current, 1, future, nullptr, Dest, nullptr, nullptr, 0, nullptr);
+        CHECK_ST
+    }
 }
 
 void MythVDPAUHelper::DeleteMixer(VdpVideoMixer Mixer)

@@ -46,7 +46,7 @@ class MythVDPAUHelper
     VdpVideoMixer    CreateMixer(QSize Size, VdpChromaType ChromaType = VDP_CHROMA_TYPE_420,
                                  MythDeintType Deinterlacer = DEINT_BASIC);
     void             MixerRender(VdpVideoMixer Mixer, VdpVideoSurface Source, VdpOutputSurface Dest,
-                                 FrameScanType Scan, int TopFieldFirst);
+                                 FrameScanType Scan, int TopFieldFirst, QVector<AVBufferRef*>& Frames);
     void             SetCSCMatrix(VdpVideoMixer Mixer, VideoColourSpace *ColourSpace);
     void             DeleteOutputSurface(VdpOutputSurface Surface);
     void             DeleteMixer(VdpVideoMixer Mixer);

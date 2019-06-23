@@ -44,6 +44,7 @@ MythVDPAUInterop::~MythVDPAUInterop()
         m_colourSpace->DecrRef();
 
     OpenGLLocker locker(m_context);
+    CleanupDeinterlacer();
     Cleanup();
     delete m_helper;
 }
@@ -69,6 +70,38 @@ void MythVDPAUInterop::Cleanup(void)
         m_finiNV();
 
     DeleteTextures();
+}
+
+void MythVDPAUInterop::CleanupDeinterlacer(void)
+{
+    while (!m_referenceFrames.isEmpty())
+    {
+        AVBufferRef* ref = m_referenceFrames.takeLast();
+        av_buffer_unref(&ref);
+    }
+}
+
+void MythVDPAUInterop::RotateReferenceFrames(AVBufferRef *Buffer)
+{
+    if (!Buffer)
+        return;
+
+    // release old frames
+    while (m_referenceFrames.size() > 3)
+    {
+        AVBufferRef* ref = m_referenceFrames.takeLast();
+        av_buffer_unref(&ref);
+    }
+
+    // don't retain twice for double rate
+    if ((m_referenceFrames.size() > 0) &&
+            (static_cast<VdpVideoSurface>(reinterpret_cast<uintptr_t>(m_referenceFrames[0]->data)) ==
+             static_cast<VdpVideoSurface>(reinterpret_cast<uintptr_t>(Buffer->data))))
+    {
+        return;
+    }
+
+    m_referenceFrames.push_front(av_buffer_ref(Buffer));
 }
 
 bool MythVDPAUInterop::InitNV(AVVDPAUDeviceContext* DeviceContext)
@@ -266,6 +299,11 @@ vector<MythVideoTexture*> MythVDPAUInterop::Acquire(MythRenderOpenGL *Context,
         }
     }
 
+    if ((deinterlacer == DEINT_HIGH) || (deinterlacer == DEINT_MEDIUM))
+        RotateReferenceFrames(reinterpret_cast<AVBufferRef*>(Frame->priv[0]));
+    else
+        CleanupDeinterlacer();
+
     // We need a mixer, an output surface and mapped texture
     if (!InitVDPAU(devicecontext, surface, deinterlacer, doublerate))
         return result;
@@ -296,7 +334,7 @@ vector<MythVideoTexture*> MythVDPAUInterop::Acquire(MythRenderOpenGL *Context,
     // Render surface
     m_helper->MixerRender(m_mixer, surface, m_outputSurface, Scan,
                           Frame->interlaced_reversed ? !Frame->top_field_first :
-                          Frame->top_field_first);
+                          Frame->top_field_first, m_referenceFrames);
     return m_openglTextures[DUMMY_INTEROP_ID];
 }
 
