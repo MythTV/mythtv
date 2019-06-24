@@ -33,9 +33,11 @@ class MythNVDECInterop : public MythOpenGLInterop
   private:
     bool           InitialiseCuda(void);
     void           DeleteTextures(void) override;
+    void           RotateReferenceFrames(CUdeviceptr Buffer);
 
     CUcontext      m_cudaContext;
     CudaFunctions *m_cudaFuncs;
+    QVector<CUdeviceptr> m_referenceFrames;
 };
 
 #endif // MYTHNVDECINTEROP_H

@@ -19,13 +19,15 @@
 MythNVDECInterop::MythNVDECInterop(MythRenderOpenGL *Context)
   : MythOpenGLInterop(Context, NVDEC),
     m_cudaContext(),
-    m_cudaFuncs(nullptr)
+    m_cudaFuncs(nullptr),
+    m_referenceFrames()
 {
     InitialiseCuda();
 }
 
 MythNVDECInterop::~MythNVDECInterop()
 {
+    m_referenceFrames.clear();
     DeleteTextures();
     CleanupContext(m_context, m_cudaFuncs, m_cudaContext);
 }
@@ -101,7 +103,7 @@ MythOpenGLInterop::Type MythNVDECInterop::GetInteropType(MythCodecID CodecId, My
 vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
                                                     VideoColourSpace *ColourSpace,
                                                     VideoFrame *Frame,
-                                                    FrameScanType)
+                                                    FrameScanType Scan)
 {
     vector<MythVideoTexture*> result;
     if (!Frame || !m_cudaContext || !m_cudaFuncs)
@@ -250,6 +252,47 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
     }
 
     CUDA_CHECK(m_cudaFuncs, cuCtxPopCurrent(&dummy));
+
+    // GLSL deinterlacing. The decoder will pick up any CPU or driver preference
+    // and return a stream of deinterlaced frames. Just check for GLSL here.
+    bool needreferences = false;
+    if (is_interlaced(Scan))
+    {
+        MythDeintType shader = GetDoubleRateOption(Frame, DEINT_SHADER);
+        if (shader)
+            needreferences = shader == DEINT_HIGH;
+        else
+            needreferences = GetSingleRateOption(Frame, DEINT_SHADER) == DEINT_HIGH;
+    }
+
+    if (needreferences)
+    {
+        RotateReferenceFrames(cudabuffer);
+        int size = m_referenceFrames.size();
+
+        CUdeviceptr next    = m_referenceFrames[0];
+        CUdeviceptr current = m_referenceFrames[size > 1 ? 1 : 0];
+        CUdeviceptr last    = m_referenceFrames[size > 2 ? 2 : 0];
+
+        if (!m_openglTextures.contains(next) || !m_openglTextures.contains(current) ||
+            !m_openglTextures.contains(last))
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Reference frame error");
+            return result;
+        }
+
+        result = m_openglTextures[last];
+        foreach (MythVideoTexture* tex, m_openglTextures[current])
+            result.push_back(tex);
+        foreach (MythVideoTexture* tex, m_openglTextures[next])
+            result.push_back(tex);
+        return result;
+    }
+    else
+    {
+        m_referenceFrames.clear();
+    }
+
     return result;
 }
 
@@ -325,4 +368,20 @@ void MythNVDECInterop::CleanupContext(MythRenderOpenGL *GLContext, CudaFunctions
             CUDA_CHECK(CudaFuncs, cuCtxDestroy(CudaContext));
         cuda_free_functions(&CudaFuncs);
     }
+}
+
+void MythNVDECInterop::RotateReferenceFrames(CUdeviceptr Buffer)
+{
+    if (!Buffer)
+        return;
+
+    // don't retain twice for double rate
+    if ((m_referenceFrames.size() > 0) && (m_referenceFrames[0] == Buffer))
+        return;
+
+    m_referenceFrames.push_front(Buffer);
+
+    // release old frames
+    while (m_referenceFrames.size() > 3)
+        m_referenceFrames.pop_back();
 }
