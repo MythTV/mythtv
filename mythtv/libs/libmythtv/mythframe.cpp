@@ -841,24 +841,30 @@ int ColorDepth(int Format)
     return 8;
 }
 
-MythDeintType GetSingleRateOption(const VideoFrame* Frame, MythDeintType Type)
+MythDeintType GetSingleRateOption(const VideoFrame* Frame, MythDeintType Type,
+                                  MythDeintType Override)
 {
-    if (!Frame)
-        return DEINT_NONE;
-    MythDeintType options = Frame->deinterlace_single & Frame->deinterlace_allowed;
-    if (!(options & Type))
-        return DEINT_NONE;
-    return GetDeinterlacer(options);
+    if (Frame)
+    {
+        MythDeintType options = Frame->deinterlace_single &
+                (Override ? Override : Frame->deinterlace_allowed);
+        if (options & Type)
+            return GetDeinterlacer(options);
+    }
+    return DEINT_NONE;
 }
 
-MythDeintType GetDoubleRateOption(const VideoFrame* Frame, MythDeintType Type)
+MythDeintType GetDoubleRateOption(const VideoFrame* Frame, MythDeintType Type,
+                                  MythDeintType Override)
 {
-    if (!Frame)
-        return DEINT_NONE;
-    MythDeintType options = Frame->deinterlace_double & Frame->deinterlace_allowed;
-    if (!(options & Type))
-        return DEINT_NONE;
-    return GetDeinterlacer(options);
+    if (Frame)
+    {
+        MythDeintType options = Frame->deinterlace_double &
+                (Override ? Override : Frame->deinterlace_allowed);
+        if (options & Type)
+            return GetDeinterlacer(options);
+    }
+    return DEINT_NONE;
 }
 
 MythDeintType GetDeinterlacer(MythDeintType Option)
