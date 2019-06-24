@@ -807,21 +807,51 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context
         ColourSpace->UpdateColourSpace(Frame);
     }
 
-    // Deinterlace
-    id = Deinterlace(Frame, id, Scan);
-
+    // Deinterlacing
     bool needreferenceframes = false;
-    // fallback to shaders if VAAPI deints are unavailable
-    if (m_filterError)
+
+    if (is_interlaced(Scan))
     {
-        Frame->deinterlace_allowed = (Frame->deinterlace_allowed & ~DEINT_DRIVER) | DEINT_SHADER;
-        // if the preferred deinterlacer is HIGH (Kernel), we need to manage reference frames
-        // accept any DEINT_HIGH setting as CPU cannot be used and DRIVER are now unavailable
-        MythDeintType deinterlacer = GetDoubleRateOption(Frame, DEINT_CPU | DEINT_SHADER);
-        if (deinterlacer == DEINT_HIGH)
-            needreferenceframes = true;
-        else if (deinterlacer == DEINT_NONE)
-            needreferenceframes = GetSingleRateOption(Frame, DEINT_CPU | DEINT_SHADER) == DEINT_HIGH;
+        // allow GLSL deinterlacers
+        Frame->deinterlace_allowed = Frame->deinterlace_allowed | DEINT_SHADER;
+
+        // is GLSL preferred - and if so do we need reference frames
+        bool glsldeint = false;
+
+        // we explicitly use a shader if preferred over driver. If CPU only
+        // is preferred, the default will be to use the driver instead and if that
+        // fails we fall back to GLSL
+        MythDeintType shader = GetDoubleRateOption(Frame, DEINT_SHADER);
+        MythDeintType driver = GetDoubleRateOption(Frame, DEINT_DRIVER);
+        if (m_filterError)
+            shader = GetDoubleRateOption(Frame, DEINT_SHADER | DEINT_CPU | DEINT_DRIVER, DEINT_ALL);
+        if (shader && !driver)
+        {
+            glsldeint = true;
+            needreferenceframes = shader == DEINT_HIGH;
+            Frame->deinterlace_double = Frame->deinterlace_double | DEINT_SHADER;
+        }
+        else if (!shader && !driver) // singlerate
+        {
+            shader = GetSingleRateOption(Frame, DEINT_SHADER);
+            driver = GetSingleRateOption(Frame, DEINT_DRIVER);
+            if (m_filterError)
+                shader = GetSingleRateOption(Frame, DEINT_SHADER | DEINT_CPU | DEINT_DRIVER, DEINT_ALL);
+            if (shader && !driver)
+            {
+                glsldeint = true;
+                needreferenceframes = shader == DEINT_HIGH;
+                Frame->deinterlace_single = Frame->deinterlace_single | DEINT_SHADER;
+            }
+        }
+
+        // driver deinterlacing
+        if (!glsldeint)
+            id = Deinterlace(Frame, id, Scan);
+
+        // fallback to shaders if VAAPI deints fail
+        if (m_filterError)
+            Frame->deinterlace_allowed = Frame->deinterlace_allowed & ~DEINT_DRIVER;
     }
 
     if (needreferenceframes)
@@ -1136,10 +1166,14 @@ VASurfaceID MythVAAPIInterop::Deinterlace(VideoFrame *Frame, VASurfaceID Current
 
     while (!m_filterError && is_interlaced(Scan))
     {
+        // N.B. for DRM the use of a shader deint is checked before we get here
         MythDeintType deinterlacer = DEINT_NONE;
         bool doublerate = true;
-        MythDeintType doublepref = GetDoubleRateOption(Frame, DEINT_DRIVER);
-        MythDeintType singlepref = GetSingleRateOption(Frame, DEINT_DRIVER);
+        // no CPU or GLSL deinterlacing so pick up these options as well
+        // N.B. Override deinterlacer_allowed to pick up any preference
+        MythDeintType doublepref = GetDoubleRateOption(Frame, DEINT_DRIVER | DEINT_SHADER | DEINT_CPU, DEINT_ALL);
+        MythDeintType singlepref = GetSingleRateOption(Frame, DEINT_DRIVER | DEINT_SHADER | DEINT_CPU, DEINT_ALL);
+
         if (doublepref)
         {
             deinterlacer = doublepref;
