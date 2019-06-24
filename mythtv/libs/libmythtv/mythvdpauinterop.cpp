@@ -284,11 +284,12 @@ vector<MythVideoTexture*> MythVDPAUInterop::Acquire(MythRenderOpenGL *Context,
     MythDeintType deinterlacer = DEINT_BASIC;
     if (is_interlaced(Scan))
     {
-        MythDeintType driverdeint = GetDoubleRateOption(Frame, DEINT_DRIVER | DEINT_CPU | DEINT_SHADER);
+        MythDeintType driverdeint = GetDoubleRateOption(Frame, DEINT_DRIVER | DEINT_CPU | DEINT_SHADER,
+                                                        DEINT_ALL);
         if (!driverdeint)
         {
             doublerate = false;
-            driverdeint = GetSingleRateOption(Frame, DEINT_DRIVER | DEINT_CPU | DEINT_SHADER);
+            driverdeint = GetSingleRateOption(Frame, DEINT_DRIVER | DEINT_CPU | DEINT_SHADER, DEINT_ALL);
         }
 
         if (driverdeint)
