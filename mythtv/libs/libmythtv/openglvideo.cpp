@@ -150,7 +150,9 @@ QSize OpenGLVideo::GetVideoSize(void) const
     return m_videoDim;
 }
 
-bool OpenGLVideo::AddDeinterlacer(const VideoFrame *Frame, FrameScanType Scan, MythDeintType Filter /* = DEINT_SHADER */)
+bool OpenGLVideo::AddDeinterlacer(const VideoFrame *Frame, FrameScanType Scan,
+                                  MythDeintType Filter  /* = DEINT_SHADER */,
+                                  bool CreateReferences /* = true */)
 {
     if (!Frame || !is_interlaced(Scan))
         return false;
@@ -198,7 +200,7 @@ bool OpenGLVideo::AddDeinterlacer(const VideoFrame *Frame, FrameScanType Scan, M
 
     // sanity check max texture units. Should only be an issue on old hardware (e.g. Pi)
     int max = m_render->GetMaxTextureUnits();
-    uint refstocreate = (deinterlacer == DEINT_HIGH) ? 2 : 0;
+    uint refstocreate = ((deinterlacer == DEINT_HIGH) && CreateReferences) ? 2 : 0;
     int totaltextures = static_cast<int>(planes(m_outputType)) * static_cast<int>(refstocreate + 1);
     if (totaltextures > max)
     {
@@ -591,7 +593,7 @@ void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanT
 #endif
             // Enable deinterlacing for NVDEC, VTB and VAAPI DRM if VPP is not available
             if (inputtextures[0]->m_allowGLSLDeint)
-                AddDeinterlacer(Frame, Scan, DEINT_SHADER | DEINT_CPU); // pickup shader or cpu prefs
+                AddDeinterlacer(Frame, Scan, DEINT_SHADER | DEINT_CPU, false); // pickup shader or cpu prefs
         }
         else
         {
@@ -803,18 +805,9 @@ void OpenGLVideo::LoadTextures(bool Deinterlacing, vector<MythVideoTexture*> &Cu
     bool usecurrent = true;
     if (Deinterlacing)
     {
-        // temporary workaround for kernel deinterlacing of NVDEC and VTB hardware frames
-        // for which there are currently no reference frames
         if (format_is_hw(m_inputType))
         {
-            if (DEINT_HIGH == m_deinterlacer)
-            {
-                usecurrent = false;
-                size_t count = Current.size();
-                for (uint i = 0; i < 3; ++i)
-                    for (uint j = 0; j < count; ++j)
-                        Textures[TextureCount++] = reinterpret_cast<MythGLTexture*>(Current[j]);
-            }
+            usecurrent = true;
         }
         else if ((m_nextTextures.size() == Current.size()) && (m_prevTextures.size() == Current.size()))
         {

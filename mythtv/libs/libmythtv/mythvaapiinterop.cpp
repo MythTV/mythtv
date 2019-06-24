@@ -673,7 +673,8 @@ MythVAAPIInteropDRM::MythVAAPIInteropDRM(MythRenderOpenGL *Context)
     m_drmFile(),
     m_eglImageTargetTexture2DOES(nullptr),
     m_eglCreateImageKHR(nullptr),
-    m_eglDestroyImageKHR(nullptr)
+    m_eglDestroyImageKHR(nullptr),
+    m_referenceFrames()
 {
     QString device = gCoreContext->GetSetting("VAAPIDevice");
     if (device.isEmpty())
@@ -700,6 +701,9 @@ MythVAAPIInteropDRM::MythVAAPIInteropDRM(MythRenderOpenGL *Context)
 MythVAAPIInteropDRM::~MythVAAPIInteropDRM()
 {
     OpenGLLocker locker(m_context);
+
+    CleanupReferenceFrames();
+
     EGLDisplay display = eglGetCurrentDisplay();
     if (!m_openglTextures.isEmpty() && InitEGL() && display)
     {
@@ -722,6 +726,64 @@ MythVAAPIInteropDRM::~MythVAAPIInteropDRM()
 
     if (m_drmFile.isOpen())
         m_drmFile.close();
+}
+
+void MythVAAPIInteropDRM::CleanupReferenceFrames(void)
+{
+    while (!m_referenceFrames.isEmpty())
+    {
+        AVBufferRef* ref = m_referenceFrames.takeLast();
+        av_buffer_unref(&ref);
+    }
+}
+
+void MythVAAPIInteropDRM::RotateReferenceFrames(AVBufferRef *Buffer)
+{
+    if (!Buffer)
+        return;
+
+    // don't retain twice for double rate
+    if ((m_referenceFrames.size() > 0) &&
+            (static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(m_referenceFrames[0]->data)) ==
+             static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(Buffer->data))))
+    {
+        return;
+    }
+
+    m_referenceFrames.push_front(av_buffer_ref(Buffer));
+
+    // release old frames
+    while (m_referenceFrames.size() > 3)
+    {
+        AVBufferRef* ref = m_referenceFrames.takeLast();
+        av_buffer_unref(&ref);
+    }
+}
+
+vector<MythVideoTexture*> MythVAAPIInteropDRM::GetReferenceFrames(void)
+{
+    vector<MythVideoTexture*> result;
+    int size = m_referenceFrames.size();
+    if (size < 1)
+        return result;
+
+    VASurfaceID next = static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(m_referenceFrames[0]->data));
+    VASurfaceID current = static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(m_referenceFrames[size > 1 ? 1 : 0]->data));
+    VASurfaceID last = static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(m_referenceFrames[size > 2 ? 2 : 0]->data));
+
+    if (!m_openglTextures.contains(next) || !m_openglTextures.contains(current) ||
+        !m_openglTextures.contains(last))
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Reference frame error");
+        return result;
+    }
+
+    result = m_openglTextures[last];
+    foreach (MythVideoTexture* tex, m_openglTextures[current])
+        result.push_back(tex);
+    foreach (MythVideoTexture* tex, m_openglTextures[next])
+        result.push_back(tex);
+    return result;
 }
 
 vector<MythVideoTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context,
@@ -748,13 +810,33 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context
     // Deinterlace
     id = Deinterlace(Frame, id, Scan);
 
+    bool needreferenceframes = false;
     // fallback to shaders if VAAPI deints are unavailable
     if (m_filterError)
+    {
         Frame->deinterlace_allowed = (Frame->deinterlace_allowed & ~DEINT_DRIVER) | DEINT_SHADER;
+        // if the preferred deinterlacer is HIGH (Kernel), we need to manage reference frames
+        // accept any DEINT_HIGH setting as CPU cannot be used and DRIVER are now unavailable
+        MythDeintType deinterlacer = GetDoubleRateOption(Frame, DEINT_CPU | DEINT_SHADER);
+        if (deinterlacer == DEINT_HIGH)
+            needreferenceframes = true;
+        else if (deinterlacer == DEINT_NONE)
+            needreferenceframes = GetSingleRateOption(Frame, DEINT_CPU | DEINT_SHADER) == DEINT_HIGH;
+    }
+
+    if (needreferenceframes)
+        RotateReferenceFrames(reinterpret_cast<AVBufferRef*>(Frame->priv[0]));
+    else
+        CleanupReferenceFrames();
 
     // return cached texture if available
     if (m_openglTextures.contains(id))
-        return m_openglTextures[id];
+    {
+        if (needreferenceframes)
+            return GetReferenceFrames();
+        else
+            return m_openglTextures[id];
+    }
 
     // Create new
     if (!InitEGL())
@@ -819,6 +901,8 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context
     CHECK_ST;
 
     m_openglTextures.insert(id, result);
+    if (needreferenceframes)
+        return GetReferenceFrames();
     return result;
 }
 

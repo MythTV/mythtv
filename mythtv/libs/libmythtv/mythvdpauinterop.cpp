@@ -86,13 +86,6 @@ void MythVDPAUInterop::RotateReferenceFrames(AVBufferRef *Buffer)
     if (!Buffer)
         return;
 
-    // release old frames
-    while (m_referenceFrames.size() > 3)
-    {
-        AVBufferRef* ref = m_referenceFrames.takeLast();
-        av_buffer_unref(&ref);
-    }
-
     // don't retain twice for double rate
     if ((m_referenceFrames.size() > 0) &&
             (static_cast<VdpVideoSurface>(reinterpret_cast<uintptr_t>(m_referenceFrames[0]->data)) ==
@@ -102,6 +95,13 @@ void MythVDPAUInterop::RotateReferenceFrames(AVBufferRef *Buffer)
     }
 
     m_referenceFrames.push_front(av_buffer_ref(Buffer));
+
+    // release old frames
+    while (m_referenceFrames.size() > 3)
+    {
+        AVBufferRef* ref = m_referenceFrames.takeLast();
+        av_buffer_unref(&ref);
+    }
 }
 
 bool MythVDPAUInterop::InitNV(AVVDPAUDeviceContext* DeviceContext)

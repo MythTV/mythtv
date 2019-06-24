@@ -143,12 +143,16 @@ class MythVAAPIInteropDRM : public MythVAAPIInterop
                                     uintptr_t Handle, VAImage &Image);
     bool           InitEGL(void);
     VideoFrameType VATypeToMythType(uint32_t Fourcc);
+    void           CleanupReferenceFrames(void);
+    void           RotateReferenceFrames(AVBufferRef *Buffer);
+    vector<MythVideoTexture*> GetReferenceFrames(void);
 
   private:
     QFile                m_drmFile;
     MYTH_EGLIMAGETARGET  m_eglImageTargetTexture2DOES;
     MYTH_EGLCREATEIMAGE  m_eglCreateImageKHR;
     MYTH_EGLDESTROYIMAGE m_eglDestroyImageKHR;
+    QVector<AVBufferRef*> m_referenceFrames;
 };
 
 #endif // MYTHVAAPIINTEROP_H

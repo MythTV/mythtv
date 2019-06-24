@@ -65,7 +65,8 @@ class OpenGLVideo : public QObject
     bool    CreateVideoShader(VideoShaderType Type, MythDeintType Deint = DEINT_NONE);
     void    LoadTextures(bool Deinterlacing, vector<MythVideoTexture*> &Current,
                          MythGLTexture** Textures, uint &TextureCount);
-    bool    AddDeinterlacer(const VideoFrame *Frame,  FrameScanType Scan, MythDeintType Filter = DEINT_SHADER);
+    bool    AddDeinterlacer(const VideoFrame *Frame,  FrameScanType Scan,
+                            MythDeintType Filter = DEINT_SHADER, bool CreateReferences = true);
 
     bool           m_valid;
     QString        m_profile;
