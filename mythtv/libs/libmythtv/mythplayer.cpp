@@ -1772,6 +1772,21 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
         disp_timecode = buffer->disp_timecode;
     }
 
+    bool decoderdeint = buffer && buffer->decoder_deinterlaced;
+    FrameScanType ps = m_scan;
+    if (kScan_Detect == m_scan || kScan_Ignore == m_scan || decoderdeint)
+    {
+        ps = kScan_Progressive;
+    }
+    else if (buffer && is_interlaced(ps))
+    {
+        ps = kScan_Interlaced;
+        buffer->interlaced_reversed = m_scan == kScan_Intr2ndField;
+    }
+
+    // only display the second field if needed
+    m_double_framerate = is_interlaced(ps) && m_lastDeinterlacer2x;
+
     float diverge = 0.0F;
     int frameDelay = m_double_framerate ? frame_interval / 2 : frame_interval;
     int vsync_delay_clock = 0;
@@ -1800,17 +1815,6 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
         if (divisor < 1)
             divisor=1;
         avsync_next = avsync_interval/divisor;
-    }
-
-    FrameScanType ps = m_scan;
-    if (kScan_Detect == m_scan || kScan_Ignore == m_scan)
-    {
-        ps = kScan_Progressive;
-    }
-    else if (buffer && is_interlaced(ps))
-    {
-        ps = kScan_Interlaced;
-        buffer->interlaced_reversed = m_scan == kScan_Intr2ndField;
     }
 
     bool max_video_behind = diverge < -max_diverge;
@@ -1909,12 +1913,9 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
             if (ps == kScan_Interlaced)
                 ps = kScan_Intr2ndField;
             osdLock.lock();
-            if (ps != kScan_Progressive)
-            {
-                // Only double rate CPU deinterlacers require an extra call to ProcessFrame
-                if (GetDoubleRateOption(buffer, DEINT_CPU) && !GetDoubleRateOption(buffer, DEINT_SHADER))
-                    videoOutput->ProcessFrame(buffer, osd, pip_players, ps);
-            }
+            // Only double rate CPU deinterlacers require an extra call to ProcessFrame
+            if (GetDoubleRateOption(buffer, DEINT_CPU) && !GetDoubleRateOption(buffer, DEINT_SHADER))
+                videoOutput->ProcessFrame(buffer, osd, pip_players, ps);
             videoOutput->PrepareFrame(buffer, ps, osd);
             osdLock.unlock();
             // Display the second field
@@ -2203,6 +2204,9 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
         buffer->interlaced_reversed = m_scan == kScan_Intr2ndField;
     }
 
+    // only display the second field if needed
+    m_double_framerate = is_interlaced(ps) && m_lastDeinterlacer2x;
+
     if (buffer && !dropframe)
     {
         osdLock.lock();
@@ -2250,18 +2254,15 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
             SetErrored(tr("Serious error detected in Video Output"));
             return;
         }
-        if (m_double_framerate && !decoderdeint)
+        if (m_double_framerate)
         {
             //second stage of deinterlacer processing
             if (kScan_Interlaced == ps)
                 ps = kScan_Intr2ndField;
             osdLock.lock();
-            if (ps != kScan_Progressive)
-            {
-                // Only double rate CPU deinterlacers require an extra call to ProcessFrame
-                if (GetDoubleRateOption(buffer, DEINT_CPU) && !GetDoubleRateOption(buffer, DEINT_SHADER))
-                    videoOutput->ProcessFrame(buffer, osd, pip_players, ps);
-            }
+            // Only double rate CPU deinterlacers require an extra call to ProcessFrame
+            if (GetDoubleRateOption(buffer, DEINT_CPU) && !GetDoubleRateOption(buffer, DEINT_SHADER))
+                videoOutput->ProcessFrame(buffer, osd, pip_players, ps);
             videoOutput->PrepareFrame(buffer, ps, osd);
             osdLock.unlock();
             // Display the second field
