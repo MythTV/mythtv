@@ -266,9 +266,10 @@ vector<MythVideoTexture*> MythVDPAUInterop::Acquire(MythRenderOpenGL *Context,
         return result;
 
     // Workaround HEVC interlaced bug
-    // VDPAU driver hangs if we try to render HEVC as interlaced (tested with version 418.56)
-    // Furthermore, testing with an HEVC interlaced stream, it looks like FFmpeg does not
-    // pick up the interlacing anyway - though that might be fixed with a proper HEVC stream parser
+    // VDPAU driver hangs if we try to render progressive HEVC as interlaced (tested with version 418.56)
+    // FFmpeg clearly currently has issues with interlaced HEVC (https://trac.ffmpeg.org/ticket/4141).
+    // Streams are always return with the field height.
+    // Deinterlacing does work with (some?) HEVC material flagged as interlaced.
     if ((kCodec_HEVC_VDPAU == m_codec) && is_interlaced(Scan) && !Frame->interlaced_frame)
     {
         // This should only be logged a couple of times before the scan is detected as progressive
