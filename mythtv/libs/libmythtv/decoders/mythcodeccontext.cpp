@@ -147,9 +147,16 @@ int MythCodecContext::GetBuffer2(struct AVCodecContext *Context, AVFrame *Frame,
     videoframe->pix_fmt     = Context->pix_fmt;
     Frame->reordered_opaque = Context->reordered_opaque;
 
-    // N.B. these are untested (VideoToolBox and MediaCodec)
+    // N.B. this is untested (VideoToolBox and MediaCodec)
     videoframe->colorshifted = 1;
-    videoframe->sw_pix_fmt  = Context->sw_pix_fmt;
+
+    // retrieve the software format
+    if (Frame->hw_frames_ctx)
+    {
+        AVHWFramesContext *context = reinterpret_cast<AVHWFramesContext*>(Frame->hw_frames_ctx->data);
+        if (context)
+            videoframe->sw_pix_fmt = context->sw_format;
+    }
 
     // the hardware surface is stored in Frame->data[3]
     videoframe->buf = Frame->data[3];

@@ -94,12 +94,14 @@ void OpenGLVideo::UpdateShaderParameters(void)
         return;
 
     OpenGLLocker locker(m_render);
-    GLfloat lineheight = 1.0f / m_inputTextureSize.height();
-    GLfloat maxheight  = m_videoDispDim.height() / static_cast<GLfloat>(m_inputTextureSize.height());
-    QVector4D parameters(lineheight,                                      /* lineheight */
-                        static_cast<GLfloat>(m_inputTextureSize.width()), /* 'Y' select */
-                         maxheight - lineheight,                          /* maxheight  */
-                         m_inputTextureSize.height() / 2.0f               /* fieldsize  */);
+    bool rect = m_textureTarget == QOpenGLTexture::TargetRectangle;
+    GLfloat lineheight = rect ? 1.0f : 1.0f / m_inputTextureSize.height();
+    GLfloat maxheight  = rect ? m_videoDispDim.height() : m_videoDispDim.height() / static_cast<GLfloat>(m_inputTextureSize.height());
+    GLfloat fieldsize  = rect ? 0.5f : m_inputTextureSize.height() / 2.0f;
+    QVector4D parameters(lineheight,                                       /* lineheight */
+                         static_cast<GLfloat>(m_inputTextureSize.width()), /* 'Y' select */
+                         maxheight - lineheight,                           /* maxheight  */
+                         fieldsize                                         /* fieldsize  */);
 
     for (int i = Progressive; i < ShaderCount; ++i)
     {

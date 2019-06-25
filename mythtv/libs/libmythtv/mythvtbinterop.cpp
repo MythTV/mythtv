@@ -158,7 +158,7 @@ MythVTBSurfaceInterop::~MythVTBSurfaceInterop()
 vector<MythVideoTexture*> MythVTBSurfaceInterop::Acquire(MythRenderOpenGL *Context,
                                                          VideoColourSpace *ColourSpace,
                                                          VideoFrame *Frame,
-                                                         FrameScanType)
+                                                         FrameScanType Scan)
 {
     vector<MythVideoTexture*> result;
     if (!Frame)
@@ -195,9 +195,36 @@ vector<MythVideoTexture*> MythVTBSurfaceInterop::Acquire(MythRenderOpenGL *Conte
     if (!surfaceid)
         return result;
 
+    // check whether we need to return multiple frames for GLSL kernel deinterlacing
+    bool needreferences = false;
+    if (is_interlaced(Scan))
+    {
+        MythDeintType shader = GetDoubleRateOption(Frame, DEINT_SHADER);
+        if (shader)
+            needreferences = shader == DEINT_HIGH;
+        else
+            needreferences = GetSingleRateOption(Frame, DEINT_SHADER) == DEINT_HIGH;
+    }
+
+    if (needreferences)
+    {
+        if (abs(Frame->frameNumber - m_discontinuity) > 1)
+            m_referenceFrames.clear();
+        RotateReferenceFrames(surfaceid);
+    }
+    else
+    {
+        m_referenceFrames.clear();
+    }
+    m_discontinuity = Frame->frameNumber;
+
     // return cached textures if available
     if (m_openglTextures.contains(surfaceid))
+    {
+        if (needreferences)
+            return GetReferenceFrames();
         return m_openglTextures[surfaceid];
+    }
 
     // Create new and attach to IOSurface
     int planes = IOSurfaceGetPlaneCount(surface);
@@ -248,5 +275,50 @@ vector<MythVideoTexture*> MythVTBSurfaceInterop::Acquire(MythRenderOpenGL *Conte
 
     IOSurfaceUnlock(surface, kIOSurfaceLockReadOnly, nullptr);
     m_openglTextures.insert(surfaceid, result);
+
+    if (needreferences)
+        return GetReferenceFrames();
+    return result;
+}
+
+void MythVTBSurfaceInterop::RotateReferenceFrames(IOSurfaceID Buffer)
+{
+    if (!Buffer)
+        return;
+
+    // don't retain twice for double rate
+    if ((m_referenceFrames.size() > 0) && (m_referenceFrames[0] == Buffer))
+        return;
+
+    m_referenceFrames.push_front(Buffer);
+
+    // release old frames
+    while (m_referenceFrames.size() > 3)
+        m_referenceFrames.pop_back();
+}
+
+vector<MythVideoTexture*> MythVTBSurfaceInterop::GetReferenceFrames(void)
+{
+    vector<MythVideoTexture*> result;
+    int size = m_referenceFrames.size();
+    if (size < 1)
+        return result;
+
+    IOSurfaceID next = m_referenceFrames[0];
+    IOSurfaceID current = m_referenceFrames[size > 1 ? 1 : 0];
+    IOSurfaceID last = m_referenceFrames[size > 2 ? 2 : 0];
+
+    if (!m_openglTextures.contains(next) || !m_openglTextures.contains(current) ||
+        !m_openglTextures.contains(last))
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Reference frame error");
+        return result;
+    }
+
+    result = m_openglTextures[last];
+    foreach (MythVideoTexture* tex, m_openglTextures[current])
+        result.push_back(tex);
+    foreach (MythVideoTexture* tex, m_openglTextures[next])
+        result.push_back(tex);
     return result;
 }

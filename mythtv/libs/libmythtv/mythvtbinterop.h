@@ -31,7 +31,14 @@ class MythVTBSurfaceInterop : public MythVTBInterop
     vector<MythVideoTexture*> Acquire(MythRenderOpenGL *Context,
                                       VideoColourSpace *ColourSpace,
                                       VideoFrame       *Frame,
-                                   FrameScanType     Scan) override;
+                                      FrameScanType     Scan) override;
+
+  private:
+
+    void                      RotateReferenceFrames(IOSurfaceID Buffer);
+    vector<MythVideoTexture*> GetReferenceFrames(void);
+    QVector<IOSurfaceID>      m_referenceFrames { };
+    long long                 m_discontinuity   { 0 };
 };
 
 #endif
