@@ -138,7 +138,6 @@ class MTV_PUBLIC ChannelImporter
 
     void CleanupDuplicates(ScanDTVTransportList &transports) const;
     void FilterServices(ScanDTVTransportList &transports) const;
-    void FilterChannelNumber(ScanDTVTransportList &transports) const;
     ScanDTVTransportList GetDBTransports(
         uint sourceid, ScanDTVTransportList&) const;
 

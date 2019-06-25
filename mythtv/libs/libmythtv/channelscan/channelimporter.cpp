@@ -82,9 +82,6 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
 
     FilterServices(transports);
 
-    if (m_lcn_only)
-        FilterChannelNumber(transports);
-
     // Pull in DB info
     sourceid = transports[0].m_channels[0].m_source_id;
     ScanDTVTransportList db_trans = GetDBTransports(sourceid, transports);
@@ -822,7 +819,15 @@ void ChannelImporter::FilterServices(ScanDTVTransportList &transports) const
             if (require_av && transports[i].m_channels[k].m_is_audio_service)
                 continue;
 
-            // filter channels out only in channels.conf, i.e. not found
+            // Filter channels out that do not have a logical channel number
+            if (m_lcn_only && transports[i].m_channels[k].m_chan_num.isEmpty())
+            {
+                QString msg = FormatChannel(transports[i], transports[i].m_channels[k]);
+                LOG(VB_GENERAL, LOG_DEBUG, QString("No LCN: %1").arg(msg));
+                continue;
+            }
+
+            // Filter channels out only in channels.conf, i.e. not found
             if (transports[i].m_channels[k].m_in_channels_conf &&
                 !(transports[i].m_channels[k].m_in_pat ||
                   transports[i].m_channels[k].m_in_pmt ||
@@ -831,26 +836,6 @@ void ChannelImporter::FilterServices(ScanDTVTransportList &transports) const
                   transports[i].m_channels[k].m_in_sdt))
                 continue;
 
-            filtered.push_back(transports[i].m_channels[k]);
-        }
-        transports[i].m_channels = filtered;
-    }
-}
-
-// Remove the channels that do not have a logical channel number
-void ChannelImporter::FilterChannelNumber(ScanDTVTransportList &transports) const
-{
-    for (size_t i = 0; i < transports.size(); ++i)
-    {
-        ChannelInsertInfoList filtered;
-        for (size_t k = 0; k < transports[i].m_channels.size(); ++k)
-        {
-            if (transports[i].m_channels[k].m_chan_num.isEmpty())
-            {
-                QString msg = FormatChannel(transports[i], transports[i].m_channels[k]);
-                LOG(VB_GENERAL, LOG_DEBUG, QString("No LCN: %1").arg(msg));
-                continue;
-            }
             filtered.push_back(transports[i].m_channels[k]);
         }
         transports[i].m_channels = filtered;
