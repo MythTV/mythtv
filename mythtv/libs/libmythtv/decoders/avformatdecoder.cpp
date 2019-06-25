@@ -5389,7 +5389,8 @@ bool AvFormatDecoder::GenerateDummyVideoFrames(void)
         if (!frame)
             return false;
 
-        m_parent->ClearDummyVideoFrame(frame);
+        clear(frame);
+        frame->dummy = 1;
         m_parent->ReleaseNextVideoFrame(frame, m_lastvpts);
         m_parent->DeLimboFrame(frame);
 

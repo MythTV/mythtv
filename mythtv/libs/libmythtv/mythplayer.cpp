@@ -1078,15 +1078,6 @@ void MythPlayer::ReleaseNextVideoFrame(VideoFrame *buffer,
         CheckAspectRatio(buffer);
 }
 
-/** \fn MythPlayer::ClearDummyVideoFrame(VideoFrame*)
- *  \brief Instructs VideoOutput to clear the frame to black.
- */
-void MythPlayer::ClearDummyVideoFrame(VideoFrame *frame)
-{
-    if (videoOutput)
-        videoOutput->ClearDummyFrame(frame);
-}
-
 /** \fn MythPlayer::DiscardVideoFrame(VideoFrame*)
  *  \brief Places frame in the available frames queue.
  */

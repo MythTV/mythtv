@@ -283,7 +283,6 @@ class MTV_PUBLIC MythPlayer
     virtual void ReleaseNextVideoFrame(VideoFrame *buffer, int64_t timecode,
                                        bool wrap = true);
     void ReleaseCurrentFrame(VideoFrame *frame);
-    void ClearDummyVideoFrame(VideoFrame *frame);
     void DiscardVideoFrame(VideoFrame *buffer);
     void DiscardVideoFrames(bool next_frame_keyframe);
     /// Returns the stream decoder currently in use.
