@@ -38,7 +38,6 @@ class MythVTBSurfaceInterop : public MythVTBInterop
     void                      RotateReferenceFrames(IOSurfaceID Buffer);
     vector<MythVideoTexture*> GetReferenceFrames(void);
     QVector<IOSurfaceID>      m_referenceFrames { };
-    long long                 m_discontinuity   { 0 };
 };
 
 #endif

@@ -95,5 +95,6 @@ class OpenGLVideo : public QObject
     int            m_extraFeatures;       ///< OR'd list of extra, Myth specific features
     bool           m_resizing;
     GLenum         m_textureTarget;       ///< Some interops require custom texture targets
+    long long      m_discontinuityCounter; ///< Check when to release reference frames after a skip
 };
 #endif // _OPENGL_VIDEO_H__

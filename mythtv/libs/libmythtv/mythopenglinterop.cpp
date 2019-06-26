@@ -196,7 +196,8 @@ MythOpenGLInterop::MythOpenGLInterop(MythRenderOpenGL *Context, Type InteropType
     m_context(Context),
     m_type(InteropType),
     m_openglTextures(),
-    m_openglTextureSize()
+    m_openglTextureSize(),
+    m_discontinuityCounter(0)
 {
     m_context->IncrRef();
 }

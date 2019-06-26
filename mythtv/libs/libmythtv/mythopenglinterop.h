@@ -63,6 +63,7 @@ class MythOpenGLInterop : public QObject, public ReferenceCounter
     Type                m_type;
     QHash<unsigned long long, vector<MythVideoTexture*> > m_openglTextures;
     QSize               m_openglTextureSize;
+    long long           m_discontinuityCounter;
 };
 
 #endif // MYTHOPENGLINTEROP_H

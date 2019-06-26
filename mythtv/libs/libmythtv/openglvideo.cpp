@@ -45,7 +45,8 @@ OpenGLVideo::OpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *ColourSpace
     m_features(),
     m_extraFeatures(0),
     m_resizing(false),
-    m_textureTarget(QOpenGLTexture::Target2D)
+    m_textureTarget(QOpenGLTexture::Target2D),
+    m_discontinuityCounter(0)
 {
     if (!m_render || !m_videoColourSpace)
         return;
@@ -535,6 +536,8 @@ void OpenGLVideo::ProcessFrame(const VideoFrame *Frame, FrameScanType Scan)
     {
         if (!m_nextTextures.empty() && !m_prevTextures.empty())
         {
+            if (abs(Frame->frameNumber - m_discontinuityCounter) > 1)
+                ResetTextures();
             vector<MythVideoTexture*> temp = m_prevTextures;
             m_prevTextures = m_inputTextures;
             m_inputTextures = m_nextTextures;
@@ -542,6 +545,7 @@ void OpenGLVideo::ProcessFrame(const VideoFrame *Frame, FrameScanType Scan)
             current = false;
         }
     }
+    m_discontinuityCounter = Frame->frameNumber;
 
     MythVideoTexture::UpdateTextures(m_render, Frame, current ? m_inputTextures : m_nextTextures);
 
