@@ -263,7 +263,6 @@ class DecoderBase
     void SaveTotalDuration(void);
     void ResetTotalDuration(void) { m_totalDuration = AVRationalInit(0); }
     void SaveTotalFrames(void);
-    bool GetVideoInverted(void) const { return m_video_inverted; }
     void TrackTotalDuration(bool track) { m_trackTotalDuration = track; }
     int GetfpsMultiplier(void) { return m_fpsMultiplier; }
     MythCodecContext *GetMythCodecContext(void) { return m_mythcodecctx; }
@@ -347,7 +346,7 @@ class DecoderBase
     bool                 m_waitingForChange        {false};
     long long            m_readAdjust              {0};
     bool                 m_justAfterChange         {false};
-    bool                 m_video_inverted          {false};
+    int                  m_videoRotation           {0};
 
     // Audio/Subtitle/EIA-608/EIA-708 stream selection
     bool                 m_decodeAllSubtitles      {false};

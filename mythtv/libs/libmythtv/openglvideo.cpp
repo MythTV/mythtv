@@ -46,7 +46,8 @@ OpenGLVideo::OpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *ColourSpace
     m_extraFeatures(0),
     m_resizing(false),
     m_textureTarget(QOpenGLTexture::Target2D),
-    m_discontinuityCounter(0)
+    m_discontinuityCounter(0),
+    m_lastRotation(0)
 {
     if (!m_render || !m_videoColourSpace)
         return;
@@ -744,7 +745,8 @@ void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanT
         LoadTextures(deinterlacing, inputtextures, &textures[0], numtextures);
 
         // render
-        m_render->DrawBitmap(textures, numtextures, m_frameBuffer, trect, vrect, m_shaders[program]);
+        m_render->DrawBitmap(textures, numtextures, m_frameBuffer,
+                             trect, vrect, m_shaders[program], 0);
 
         // reset for next stage
         inputtextures.clear();
@@ -787,8 +789,13 @@ void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanT
     uint numtextures = 0;
     LoadTextures(deinterlacing, inputtextures, &textures[0], numtextures);
 
+    // rotation
+    if (Frame)
+        m_lastRotation = Frame->rotation;
+
     // draw
-    m_render->DrawBitmap(textures, numtextures, nullptr, trect, m_displayVideoRect, m_shaders[program]);
+    m_render->DrawBitmap(textures, numtextures, nullptr, trect,
+                         m_displayVideoRect, m_shaders[program], m_lastRotation);
 
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         m_render->logDebugMarker(LOC + "PREP_FRAME_END");

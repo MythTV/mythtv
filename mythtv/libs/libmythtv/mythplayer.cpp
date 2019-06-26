@@ -530,9 +530,6 @@ bool MythPlayer::InitVideo(void)
     if (embedding && pipState == kPIPOff)
         videoOutput->EmbedInWidget(embedRect);
 
-    if (decoder && decoder->GetVideoInverted())
-        videoOutput->SetVideoFlip();
-
     return true;
 }
 

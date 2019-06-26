@@ -73,6 +73,7 @@ VideoOutWindow::VideoOutWindow() :
     m_videoAspectOverrideMode(kAspect_Off),
     // Adjust Fill
     m_adjustFill(kAdjustFill_Off),
+    m_rotation(0),
     // Screen settings
     m_videoRect(0, 0, 0, 0),
     m_displayVideoRect(0, 0, 0, 0),
@@ -129,9 +130,16 @@ void VideoOutWindow::PopulateGeometry(void)
  */
 void VideoOutWindow::MoveResize(void)
 {
+    // for 'portrait' mode, rotate the 'screen' dimensions
+    float tempdisplayaspect = m_displayAspect;
+    bool rotate = (m_rotation == 90) || (m_rotation == -90);
+    if (rotate)
+        Rotate();
+
     // Preset all image placement and sizing variables.
     m_videoRect = QRect(QPoint(0, 0), m_videoDispDim);
     m_displayVideoRect = m_displayVisibleRect;
+
 
     // Avoid too small frames for audio only streams (for OSD).
     if ((m_videoRect.width() <= 0) || (m_videoRect.height() <= 0))
@@ -145,18 +153,58 @@ void VideoOutWindow::MoveResize(void)
     ApplyDBScaleAndMove();
     ApplyLetterboxing();
     ApplyManualScaleAndMove();
-    ApplySnapToVideoRect();
-    PrintMoveResizeDebug();
 
     // Interactive TV (MHEG) embedding
     if (m_itvResizing)
         m_displayVideoRect = m_itvDisplayVideoRect;
+
+    // and switch back
+    if (rotate)
+        Rotate();
+    m_displayAspect = tempdisplayaspect;
+
+    PrintMoveResizeDebug();
 
     // TODO fine tune when these are emitted - it is not enough to just check whether the values
     // have changed
     emit VideoSizeChanged(m_videoDim, m_videoDispDim);
     emit VideoRectsChanged(m_displayVideoRect, m_videoRect);
     emit VisibleRectChanged(m_displayVisibleRect);
+}
+
+/*! \brief Adjust various settings to facilitate portrait mode calculations.
+ *
+ * This mimics rotating the screen around the video. While more complicated than
+ * simply adjusting the video dimensions and aspect ratio, this retains the correct
+ * video rectangle for use in the VideoOutput classes.
+ *
+ * \note To prevent a loss of precision over multiple passes, the original display
+ *  aspect ratio should be retained elsewhere.
+*/
+void VideoOutWindow::Rotate(void)
+{
+    m_dbMove = QPoint(m_dbMove.y(), m_dbMove.x());
+    float temp = m_dbHorizScale;
+    m_dbHorizScale = m_dbVertScale;
+    m_dbVertScale = temp;
+    temp = m_manualHorizScale;
+    m_manualHorizScale = m_manualVertScale;
+    m_manualVertScale = temp;
+    m_manualMove = QPoint(m_manualMove.y(), m_manualMove.x());
+    m_displayAspect = 1.0f / m_displayAspect;
+
+    m_displayVisibleRect = QRect(QPoint(m_displayVisibleRect.top(), m_displayVisibleRect.left()),
+                                        QSize(m_displayVisibleRect.height(), m_displayVisibleRect.width()));
+    m_displayVideoRect   = QRect(QPoint(m_displayVideoRect.top(), m_displayVideoRect.left()),
+                                 QSize(m_displayVideoRect.height(), m_displayVideoRect.width()));
+    if (m_adjustFill == kAdjustFill_HorizontalFill)
+        m_adjustFill = kAdjustFill_VerticalFill;
+    else if (m_adjustFill == kAdjustFill_VerticalFill)
+        m_adjustFill = kAdjustFill_HorizontalFill;
+    else if (m_adjustFill == kAdjustFill_HorizontalStretch)
+        m_adjustFill = kAdjustFill_VerticalStretch;
+    else if (m_adjustFill == kAdjustFill_VerticalStretch)
+        m_adjustFill = kAdjustFill_HorizontalStretch;
 }
 
 /*!  \brief Apply scales and moves for "Overscan" and "Underscan" DB settings.
@@ -401,49 +449,6 @@ void VideoOutWindow::ApplyLetterboxing(void)
     }
 }
 
-/** \fn VideoOutWindow::ApplySnapToVideoRect(void)
- *  \brief Snap displayed rectagle to video rectange if they are close.
- *
- *  If our display rectangle is within 5% of the video rectangle in
- *  either dimension then snap the display rectangle in that dimension
- *  to the video rectangle. The idea is to avoid scaling if it will
- *  result in only moderate distortion.
- */
-void VideoOutWindow::ApplySnapToVideoRect(void)
-{
-    if (m_pipState > kPIPOff)
-        return;
-
-    if (m_displayVideoRect.height() == 0 || m_displayVideoRect.width() == 0)
-        return;
-
-    if (!((m_dbVertScale == 0.0F) && (m_dbHorizScale == 0.0F) &&
-        (m_manualVertScale == 1.0F) && (m_manualHorizScale == 1.0F)))
-        return;
-
-    float ydiff = abs(m_displayVideoRect.height() - m_videoRect.height());
-    if ((ydiff / m_displayVideoRect.height()) < 0.05F)
-    {
-        m_displayVideoRect.moveTop(m_displayVideoRect.top() + (m_displayVideoRect.height() - m_videoRect.height()) / 2);
-        m_displayVideoRect.setHeight(m_videoRect.height());
-        LOG(VB_PLAYBACK, LOG_INFO,
-            QString("Snapping height to avoid scaling: height: %1, top: %2")
-                .arg(m_displayVideoRect.height())
-                .arg(m_displayVideoRect.top()));
-    }
-
-    float xdiff = abs(m_displayVideoRect.width() - m_videoRect.width());
-    if ((xdiff / m_displayVideoRect.width()) < 0.05F)
-    {
-        m_displayVideoRect.moveLeft(m_displayVideoRect.left() + (m_displayVideoRect.width() - m_videoRect.width()) / 2);
-        m_displayVideoRect.setWidth(m_videoRect.width());
-        LOG(VB_PLAYBACK, LOG_INFO,
-            QString("Snapping width to avoid scaling: width: %1, left: %2")
-                .arg(m_displayVideoRect.width())
-                .arg(m_displayVideoRect.left()));
-    }
-}
-
 bool VideoOutWindow::Init(const QSize &VideoDim, const QSize &VideoDispDim,
                           float Aspect, const QRect &DisplayVisibleRect,
                           AspectOverrideMode AspectOverride, AdjustFillMode AdjustFill)
@@ -650,6 +655,20 @@ void VideoOutWindow::SetITVResize(QRect Rect)
         m_itvResizing = true;
         m_itvDisplayVideoRect = Rect;
     }
+    MoveResize();
+}
+
+/*! \brief Set the rotation in degrees
+ *
+ * \note We only actually care about +- 90 here to enable 'portrait' mode
+*/
+void VideoOutWindow::SetRotation(int Rotation)
+{
+    if (Rotation == m_rotation)
+        return;
+    if ((Rotation < -180) || (Rotation > 180))
+        return;
+    m_rotation = Rotation;
     MoveResize();
 }
 

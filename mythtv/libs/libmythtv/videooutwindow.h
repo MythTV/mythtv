@@ -57,6 +57,7 @@ class VideoOutWindow : public QObject
     void SetVideoDim            (QSize Dim);
     void SetDisplayVisibleRect  (QRect Rect);
     void SetITVResize           (QRect Rect);
+    void SetRotation            (int Rotation);
 
     // Gets
     bool     IsEmbedding(void)             const { return m_embedding; }
@@ -91,10 +92,10 @@ class VideoOutWindow : public QObject
     void ApplyDBScaleAndMove     (void);
     void ApplyManualScaleAndMove (void);
     void ApplyLetterboxing       (void);
-    void ApplySnapToVideoRect    (void);
     void PrintMoveResizeDebug    (void);
     void SetVideoAspectRatio     (float Aspect);
     QSize Fix1088                (QSize Dimensions);
+    void Rotate                  (void);
 
   private:
     QPoint  m_dbMove;         ///< Percentage move from database
@@ -127,6 +128,7 @@ class VideoOutWindow : public QObject
     AspectOverrideMode m_videoAspectOverrideMode;
     /// Zoom mode
     AdjustFillMode m_adjustFill;
+    int     m_rotation;
 
     /// Pixel rectangle in video frame to display
     QRect   m_videoRect;

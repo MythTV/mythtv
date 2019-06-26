@@ -96,5 +96,6 @@ class OpenGLVideo : public QObject
     bool           m_resizing;
     GLenum         m_textureTarget;       ///< Some interops require custom texture targets
     long long      m_discontinuityCounter; ///< Check when to release reference frames after a skip
+    int            m_lastRotation;        ///< Track rotation for pause frame
 };
 #endif // _OPENGL_VIDEO_H__

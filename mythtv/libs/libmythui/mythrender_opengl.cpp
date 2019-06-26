@@ -741,7 +741,7 @@ void MythRenderOpenGL::DrawBitmap(MythGLTexture *Texture, QOpenGLFramebufferObje
 
     QOpenGLBuffer* buffer = Texture->m_vbo;
     buffer->bind();
-    if (UpdateTextureVertices(Texture, Source, Destination))
+    if (UpdateTextureVertices(Texture, Source, Destination, 0))
     {
         if (m_extraFeaturesUsed & kGLBufferMap)
         {
@@ -771,7 +771,8 @@ void MythRenderOpenGL::DrawBitmap(MythGLTexture *Texture, QOpenGLFramebufferObje
 void MythRenderOpenGL::DrawBitmap(MythGLTexture **Textures, uint TextureCount,
                                   QOpenGLFramebufferObject *Target,
                                   const QRect &Source, const QRect &Destination,
-                                  QOpenGLShaderProgram *Program)
+                                  QOpenGLShaderProgram *Program,
+                                  int Rotation)
 {
     if (!Textures || !TextureCount)
         return;
@@ -805,7 +806,7 @@ void MythRenderOpenGL::DrawBitmap(MythGLTexture **Textures, uint TextureCount,
 
     QOpenGLBuffer* buffer = first->m_vbo;
     buffer->bind();
-    if (UpdateTextureVertices(first, Source, Destination))
+    if (UpdateTextureVertices(first, Source, Destination, Rotation))
     {
         if (m_extraFeaturesUsed & kGLBufferMap)
         {
@@ -1146,16 +1147,18 @@ void MythRenderOpenGL::ReleaseResources(void)
 }
 
 bool MythRenderOpenGL::UpdateTextureVertices(MythGLTexture *Texture, const QRect &Source,
-                                             const QRect &Destination)
+                                             const QRect &Destination, int Rotation)
 {
     if (!Texture || (Texture && Texture->m_size.isEmpty()))
         return false;
 
-    if ((Texture->m_source == Source) && (Texture->m_destination == Destination))
+    if ((Texture->m_source == Source) && (Texture->m_destination == Destination) &&
+        (Texture->m_rotation == Rotation))
         return false;
 
-    Texture->m_source = Source;
+    Texture->m_source      = Source;
     Texture->m_destination = Destination;
+    Texture->m_rotation    = Rotation;
 
     GLfloat *data = Texture->m_vertexData;
     QSize    size = Texture->m_size;
@@ -1190,6 +1193,37 @@ bool MythRenderOpenGL::UpdateTextureVertices(MythGLTexture *Texture, const QRect
     data[5] = data[1] = Destination.top();
     data[4] = data[6] = Destination.left() + width;
     data[3] = data[7] = Destination.top()  + height;
+
+    if (Texture->m_rotation != 0)
+    {
+        GLfloat temp;
+        if (Texture->m_rotation == 90)
+        {
+            temp = data[(Texture->m_flip ? 7 : 1) + TEX_OFFSET];
+            data[(Texture->m_flip ? 7 : 1) + TEX_OFFSET] = data[(Texture->m_flip ? 1 : 7) + TEX_OFFSET];
+            data[(Texture->m_flip ? 1 : 7) + TEX_OFFSET] = temp;
+            data[2 + TEX_OFFSET] = data[6 + TEX_OFFSET];
+            data[4 + TEX_OFFSET] = data[0 + TEX_OFFSET];
+        }
+        else if (Texture->m_rotation == -90)
+        {
+            temp = data[0 + TEX_OFFSET];
+            data[0 + TEX_OFFSET] = data[6 + TEX_OFFSET];
+            data[6 + TEX_OFFSET] = temp;
+            data[3 + TEX_OFFSET] = data[1 + TEX_OFFSET];
+            data[5 + TEX_OFFSET] = data[7 + TEX_OFFSET];
+        }
+        // could be handled above but keep generic code path simpler
+        else if (abs(Texture->m_rotation) == 180)
+        {
+            temp = data[(Texture->m_flip ? 7 : 1) + TEX_OFFSET];
+            data[(Texture->m_flip ? 7 : 1) + TEX_OFFSET] = data[(Texture->m_flip ? 1 : 7) + TEX_OFFSET];
+            data[(Texture->m_flip ? 1 : 7) + TEX_OFFSET] = temp;
+            data[3 + TEX_OFFSET] = data[7 + TEX_OFFSET];
+            data[5 + TEX_OFFSET] = data[1 + TEX_OFFSET];
+        }
+    }
+
     return true;
 }
 

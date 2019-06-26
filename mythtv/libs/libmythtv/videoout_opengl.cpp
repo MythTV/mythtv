@@ -404,6 +404,9 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *Frame, OSD */*osd*/,
             return;
     }
 
+    if (Frame)
+        m_window.SetRotation(Frame->rotation);
+
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         m_render->logDebugMarker(LOC + "PROCESS_FRAME_START");
 

@@ -83,6 +83,7 @@ extern "C" {
 #include "libavformat/isom.h"
 #include "ivtv_myth.h"
 #include "libavutil/imgutils.h"
+#include "libavutil/display.h"
 }
 
 #ifdef _MSC_VER
@@ -1521,7 +1522,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     if (ringBuffer && ringBuffer->IsDVD())
         m_directrendering = false;
 
-    enc->opaque = (void *)this;
+    enc->opaque = static_cast<void*>(this);
     enc->get_buffer2 = get_avf_buffer;
     enc->slice_flags = 0;
 
@@ -1535,14 +1536,14 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     const AVCodec *codec1 = enc->codec;
 
     if (selectedStream)
-    {
         m_directrendering = true;
-    }
 
-    AVDictionaryEntry *metatag =
-        av_dict_get(stream->metadata, "rotate", nullptr, 0);
-    if (metatag && metatag->value && QString("180") == metatag->value)
-        m_video_inverted = true;
+    // retrieve rotation information
+    uint8_t* displaymatrix = av_stream_get_side_data(stream, AV_PKT_DATA_DISPLAYMATRIX, NULL);
+    if (displaymatrix)
+        m_videoRotation = static_cast<int>(-av_display_rotation_get(reinterpret_cast<int32_t*>(displaymatrix)));
+    else
+        m_videoRotation = 0;
 
 #ifdef USING_VDPAU
     if (CODEC_IS_VDPAU(codec1, enc) && codec_is_vdpau_hw(m_video_codec_id))
@@ -3876,6 +3877,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
             xf->deinterlace_inuse = DEINT_NONE;
             xf->deinterlace_inuse2x = 0;
             xf->decoder_deinterlaced = 0;
+            xf->rotation = m_videoRotation;
             m_parent->DiscardVideoFrame(xf);
         }
         if (tmp_frame)
@@ -3984,6 +3986,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
         picframe->deinterlace_inuse = DEINT_NONE;
         picframe->deinterlace_inuse2x = 0;
         picframe->decoder_deinterlaced = 0;
+        picframe->rotation         = m_videoRotation;
         m_parent->ReleaseNextVideoFrame(picframe, temppts);
         m_mythcodecctx->PostProcessFrame(context, picframe);
     }
@@ -5408,6 +5411,7 @@ bool AvFormatDecoder::GenerateDummyVideoFrames(void)
         frame->deinterlace_inuse = DEINT_NONE;
         frame->deinterlace_inuse2x = 0;
         frame->decoder_deinterlaced = 0;
+        frame->rotation         = 0;
 
         m_decoded_video_frame = frame;
         m_framesPlayed++;

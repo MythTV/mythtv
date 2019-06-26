@@ -125,7 +125,6 @@ class VideoOutput
 
     void         SetVideoResize(const QRect &VideoRect);
     void         SetVideoScalingAllowed(bool Allow);
-    virtual void SetVideoFlip(void) { }
     virtual QRect GetPIPRect(PIPLocation Location,
                              MythPlayer *PiPPlayer = nullptr,
                              bool DoPixelAdj = true) const;

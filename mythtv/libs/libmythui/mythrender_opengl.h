@@ -59,6 +59,7 @@ class MUI_PUBLIC MythGLTexture
     QRect           m_destination             { QRect() };
     GLfloat         m_vertexData[16]          { 0.0f };
     GLenum          m_target                  { QOpenGLTexture::Target2D };
+    int             m_rotation                { 0 };
 
   private:
     Q_DISABLE_COPY(MythGLTexture)
@@ -147,7 +148,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     void  DrawBitmap(MythGLTexture **Textures, uint TextureCount,
                      QOpenGLFramebufferObject *Target,
                      const QRect &Source, const QRect &Destination,
-                     QOpenGLShaderProgram *Program);
+                     QOpenGLShaderProgram *Program, int Rotation);
     void  DrawRect(QOpenGLFramebufferObject *Target,
                    const QRect &Area, const QBrush &FillBrush,
                    const QPen &LinePen, int Alpha);
@@ -165,7 +166,8 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     void  Init2DState(void);
     void  SetMatrixView(void);
     void  DeleteFramebuffers(void);
-    bool  UpdateTextureVertices(MythGLTexture *Texture, const QRect &Source, const QRect &Destination);
+    bool  UpdateTextureVertices(MythGLTexture *Texture, const QRect &Source,
+                                const QRect &Destination, int Rotation);
     GLfloat* GetCachedVertices(GLuint Type, const QRect &Area);
     void  ExpireVertices(int Max = 0);
     void  GetCachedVBO(GLuint Type, const QRect &Area);
