@@ -45,12 +45,13 @@ extern Scheduler   *sched;
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &rawStartTime ,
-                                           const QDateTime &rawEndTime   ,
+DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &rawStartTime,
+                                           const QDateTime &rawEndTime,
                                            bool             bDetails,
                                            int              nChannelGroupId,
                                            int              nStartIndex,
-                                           int              nCount)
+                                           int              nCount,
+                                           bool             bWithInvisible)
 {
     if (!rawStartTime.isValid())
         throw QString( "StartTime is invalid" );
@@ -76,7 +77,8 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &rawStartTime ,
 
     uint nTotalAvailable = 0;
     ChannelInfoList chanList = ChannelUtil::LoadChannels(nStartIndex, nCount,
-                                                         nTotalAvailable, true,
+                                                         nTotalAvailable,
+                                                         !bWithInvisible,
                                                          ChannelUtil::kChanOrderByChanNum,
                                                          ChannelUtil::kChanGroupByCallsign,
                                                          0,
@@ -177,7 +179,8 @@ DTC::ProgramList* Guide::GetProgramList(int              nStartIndex,
                                         bool bOnlyNew,
                                         bool bDetails,
                                         const QString   &sSort,
-                                        bool             bDescending)
+                                        bool             bDescending,
+                                        bool             bWithInvisible)
 {
     if (!rawStartTime.isNull() && !rawStartTime.isValid())
         throw QString( "StartTime is invalid" );
@@ -221,7 +224,10 @@ DTC::ProgramList* Guide::GetProgramList(int              nStartIndex,
                 + sSQL
                 + "oldprogram.oldtitle IS NULL AND ";
 
-    sSQL += "visible != 0 AND program.manualid = 0 "; // Exclude programmes created purely for 'manual' recording schedules
+    if (!bWithInvisible)
+        sSQL += "visible != 0 AND ";
+
+    sSQL += "program.manualid = 0 "; // Exclude programmes created purely for 'manual' recording schedules
 
     if (nChanId < 0)
         nChanId = 0;

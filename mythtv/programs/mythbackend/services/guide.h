@@ -53,7 +53,8 @@ class Guide : public GuideServices
                                                   bool             Details,
                                                   int              ChannelGroupId,
                                                   int              StartIndex,
-                                                  int              Count) override; // GuideServices
+                                                  int              Count,
+                                                  bool             WithInvisible) override; // GuideServices
 
         DTC::ProgramList*   GetProgramList      ( int              StartIndex,
                                                   int              Count,
@@ -67,7 +68,8 @@ class Guide : public GuideServices
                                                   bool             OnlyNew,
                                                   bool             Details,
                                                   const QString   &Sort,
-                                                  bool             Descending ) override; // GuideServices
+                                                  bool             Descending,
+                                                  bool             WithInvisible) override; // GuideServices
 
         DTC::Program*       GetProgramDetails   ( int              ChanId,
                                                   const QDateTime &StartTime ) override; // GuideServices
@@ -127,11 +129,13 @@ class ScriptableGuide : public QObject
                                   bool             Details,
                                   int              ChannelGroupId,
                                   int              StartIndex,
-                                  int              Count )
+                                  int              Count,
+                                  bool             WithInvisible)
         {
             SCRIPT_CATCH_EXCEPTION( nullptr,
                 return m_obj.GetProgramGuide( StartTime, EndTime, Details,
-                                              ChannelGroupId, StartIndex, Count );
+                                              ChannelGroupId, StartIndex, Count,
+                                              WithInvisible );
             )
         }
 
@@ -147,15 +151,16 @@ class ScriptableGuide : public QObject
                                 bool             OnlyNew,
                                 bool             Details,
                                 const QString   &Sort,
-                                bool             Descending)
+                                bool             Descending,
+                                bool             WithInvisible)
         {
             SCRIPT_CATCH_EXCEPTION( nullptr,
                 return m_obj.GetProgramList( StartIndex, Count,
-                                         StartTime, EndTime, ChanId,
-                                         TitleFilter, CategoryFilter,
-                                         PersonFilter, KeywordFilter,
-                                         OnlyNew, Details,
-                                         Sort, Descending );
+                                             StartTime, EndTime, ChanId,
+                                             TitleFilter, CategoryFilter,
+                                             PersonFilter, KeywordFilter,
+                                             OnlyNew, Details,
+                                             Sort, Descending, WithInvisible );
             )
         }
 
