@@ -76,7 +76,7 @@ class MTV_PUBLIC ChannelImporter
   public:
     ChannelImporter(bool gui, bool interactive,
                     bool _delete, bool insert, bool save,
-                    bool fta_only, bool lcn_only,
+                    bool fta_only, bool lcn_only, bool complete_only,
                     ServiceRequirements service_requirements,
                     bool success = false) :
         m_use_gui(gui),
@@ -86,6 +86,7 @@ class MTV_PUBLIC ChannelImporter
         m_do_save(save),
         m_fta_only(fta_only),
         m_lcn_only(lcn_only),
+        m_complete_only(complete_only),
         m_success(success),
         m_service_requirements(service_requirements) { }
 
@@ -235,6 +236,8 @@ class MTV_PUBLIC ChannelImporter
     bool                m_fta_only;
     /// Only services with logical channel numbers desired post scan?
     bool                m_lcn_only;
+    /// Only services with complete scandata desired post scan?
+    bool                m_complete_only;
     /// To pass information IPTV channel scan succeeded
     bool                m_success {false};
     /// Services desired post scan
