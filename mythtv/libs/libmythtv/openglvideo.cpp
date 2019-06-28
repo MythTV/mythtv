@@ -310,12 +310,24 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Deint)
         else if (FMT_YUYVHQ == m_outputType)
             defines << "YUYV";
 
-        // if primaries are disabled, the primaries conversion matrxi will be identity
+        // if primaries are disabled, the primaries conversion matrix will be identity
         // and we can optimise out the conversion.
         QMatrix4x4 primaries = m_videoColourSpace->GetPrimaryMatrix();
         if (!primaries.isIdentity())
             defines << "PRIMARIES";
 
+#ifdef USING_VTB
+        // N.B. Rectangular texture support is only currently used for VideoToolBox
+        // video frames which are NV12. Do not use rectangular textures for the 'default'
+        // shaders as it breaks video resizing and would require changes to our
+        // FramebufferObject code.
+        if ((m_textureTarget == QOpenGLTexture::TargetRectangle) && (Default != Type))
+            defines << "RECTS";
+#endif
+#ifdef USING_MEDIACODEC
+        if (m_textureTarget == GL_TEXTURE_EXTERNAL_OES)
+            defines << "EXTOES";
+#endif
         if (!progressive)
         {
             if (topfield)
@@ -382,35 +394,6 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Deint)
             newfragment += QString("uniform sampler2D s_texture%1;\n").arg(i);
         fragment = newfragment + fragment;
 
-    }
-
-#ifdef USING_VTB
-    // N.B. Rectangular texture support is only currently used for VideoToolBox
-    // video frames which are NV12. Do not use rectangular textures for the 'default'
-    // shaders as it breaks video resizing and would require changes to our
-    // FramebufferObject code.
-    if ((m_textureTarget == QOpenGLTexture::TargetRectangle) && (Default != Type))
-    {
-        // N.B. Currently only NV12 shaders are supported and deinterlacing parameters
-        // need fixing as well (when interop deinterlacing is fixed)
-        fragment.replace("%NV12_UV_RECT%", " * vec2(0.5, 0.5)");
-        fragment.replace("sampler2D", "sampler2DRect");
-        fragment.replace("texture2D", "texture2DRect");
-        fragment.prepend("#extension GL_ARB_texture_rectangle : enable\n");
-    }
-    else
-#endif
-#ifdef USING_MEDIACODEC
-    if (m_textureTarget == GL_TEXTURE_EXTERNAL_OES)
-    {
-        fragment.replace("%NV12_UV_RECT%", "");
-        fragment.replace("sampler2D", "samplerExternalOES");
-        fragment.prepend("#extension GL_OES_EGL_image_external : require\n");
-    }
-    else
-#endif
-    {
-        fragment.replace("%NV12_UV_RECT%", "");
     }
 
     m_shaderCost[Type] = cost;

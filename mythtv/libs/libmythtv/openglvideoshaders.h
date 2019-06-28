@@ -39,6 +39,15 @@ static const QString MediaCodecVertexShader =
 
 static const QString YUVFragmentShader =
 {
+"#ifdef MYTHTV_RECTS\n"
+"#extension GL_ARB_texture_rectangle : enable\n"
+"#define texture2D texture2DRect\n"
+"#define sampler2D sampler2DRect\n"
+"#endif\n"
+"#ifdef MYTHTV_EXTOES\n"
+"#extension GL_OES_EGL_image_external : require\n"
+"#define sampler2D samplerExternalOES\n"
+"#endif\n"
 "uniform highp mat4 m_colourMatrix;\n"
 "uniform highp vec4 m_frameData;\n"
 "varying highp vec2 v_texcoord0;\n"
@@ -51,9 +60,11 @@ static const QString YUVFragmentShader =
 "#ifdef MYTHTV_NV12\n"
 "highp vec4 sampleYUV(in sampler2D texture1, in sampler2D texture2, highp vec2 texcoord)\n"
 "{\n"
-"    return vec4(texture2D(texture1, texcoord).r,\n"
-"                texture2D(texture2, texcoord%NV12_UV_RECT%).rg,\n"
-"                1.0);\n"
+"#ifdef MYTHTV_RECTS\n"
+"    return vec4(texture2D(texture1, texcoord).r, texture2D(texture2, texcoord * vec2(0.5, 0.5)).rg, 1.0);\n"
+"#else\n"
+"    return vec4(texture2D(texture1, texcoord).r, texture2D(texture2, texcoord).rg, 1.0);\n"
+"#endif"
 "}\n"
 "#endif\n"
 
