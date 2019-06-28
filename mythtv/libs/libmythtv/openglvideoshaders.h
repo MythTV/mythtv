@@ -42,6 +42,11 @@ static const QString YUVFragmentShader =
 "uniform highp mat4 m_colourMatrix;\n"
 "uniform highp vec4 m_frameData;\n"
 "varying highp vec2 v_texcoord0;\n"
+"#ifdef MYTHTV_PRIMARIES\n"
+"uniform highp mat4 m_primaryMatrix;\n"
+"uniform highp float m_colourGamma;\n"
+"uniform highp float m_displayGamma;\n"
+"#endif\n"
 
 "#ifdef MYTHTV_NV12\n"
 "highp vec4 sampleYUV(in sampler2D texture1, in sampler2D texture2, highp vec2 texcoord)\n"
@@ -134,6 +139,11 @@ static const QString YUVFragmentShader =
 "#endif\n"
 "#else\n"
 "    gl_FragColor = yuv * m_colourMatrix;\n"
+"#ifdef MYTHTV_PRIMARIES\n"
+"    gl_FragColor.rgb = pow(max(vec3(0), gl_FragColor.rgb), vec3(m_colourGamma));\n"
+"    gl_FragColor     = max(vec4(0), m_primaryMatrix * gl_FragColor);\n"
+"    gl_FragColor.rgb = pow(gl_FragColor.rgb, vec3(m_displayGamma));\n"
+"#endif\n"
 "#endif\n"
 "}\n"
 };

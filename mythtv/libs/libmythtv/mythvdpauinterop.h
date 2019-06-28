@@ -35,7 +35,7 @@ class MythVDPAUInterop : public MythOpenGLInterop
                                       VideoFrame *Frame, FrameScanType Scan) override;
 
   public slots:
-    void  UpdateColourSpace(void);
+    void  UpdateColourSpace(bool PrimariesChanged);
 
   protected:
     MythVDPAUInterop(MythRenderOpenGL *Context, MythCodecID CodecID);

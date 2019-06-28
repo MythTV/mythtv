@@ -126,6 +126,13 @@ typedef enum StereoscopicMode
     kStereoscopicModeTopAndBottomDiscard,
 } StereoscopicMode;
 
+typedef enum PrimariesMode
+{
+    PrimariesDisabled = 0,
+    PrimariesAuto,
+    PrimariesAlways
+} PrimariesMode;
+
 inline QString StereoscopictoString(StereoscopicMode mode)
 {
     switch (mode)
@@ -230,20 +237,6 @@ inline QString toString(LetterBoxColour letterboxcolour)
     switch (letterboxcolour)
     {
         case kLetterBoxColour_Gray25: ret = QObject::tr("Gray"); break;
-        case kLetterBoxColour_Black:
-        case kLetterBoxColour_Toggle:
-        case kLetterBoxColour_END: break;
-    }
-
-    return ret;
-}
-
-inline QString toXString(LetterBoxColour letterboxcolour)
-{
-    QString ret = "gray0";
-    switch (letterboxcolour)
-    {
-        case kLetterBoxColour_Gray25: ret = "gray25"; break;
         case kLetterBoxColour_Black:
         case kLetterBoxColour_Toggle:
         case kLetterBoxColour_END: break;

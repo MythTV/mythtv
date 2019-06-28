@@ -56,7 +56,7 @@ class OpenGLVideo : public QObject
     void    SetVideoDimensions(const QSize &VideoDim, const QSize &VideoDispDim);
     void    SetVideoRects(const QRect &DisplayVideoRect, const QRect &VideoRect);
     void    SetViewportRect(const QRect &DisplayVisibleRect);
-    void    UpdateColourSpace(void);
+    void    UpdateColourSpace(bool PrimariesChanged);
     void    UpdateShaderParameters(void);
 
   private:

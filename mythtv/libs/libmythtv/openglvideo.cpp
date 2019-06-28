@@ -83,11 +83,30 @@ bool OpenGLVideo::IsValid(void) const
     return m_valid;
 }
 
-void OpenGLVideo::UpdateColourSpace(void)
+void OpenGLVideo::UpdateColourSpace(bool PrimariesChanged)
 {
     OpenGLLocker locker(m_render);
+
+    // if input/output type are unset - we haven't created the shaders yet
+    if (PrimariesChanged && (m_outputType != FMT_NONE))
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Primaries conversion changed - recreating shaders");
+        SetupFrameFormat(m_inputType, m_outputType, m_videoDim, m_textureTarget);
+    }
+
+    float colourgamma  = m_videoColourSpace->GetColourGamma();
+    float displaygamma = 1.0f / m_videoColourSpace->GetDisplayGamma();
+    QMatrix4x4 primary = m_videoColourSpace->GetPrimaryMatrix();
     for (int i = Progressive; i < ShaderCount; ++i)
+    {
         m_render->SetShaderProgramParams(m_shaders[i], *m_videoColourSpace, "m_colourMatrix");
+        m_render->SetShaderProgramParams(m_shaders[i], primary, "m_primaryMatrix");
+        if (m_shaders[i])
+        {
+            m_shaders[i]->setUniformValue("m_colourGamma", colourgamma);
+            m_shaders[i]->setUniformValue("m_displayGamma", displaygamma);
+        }
+    }
 }
 
 void OpenGLVideo::UpdateShaderParameters(void)
@@ -229,7 +248,7 @@ bool OpenGLVideo::AddDeinterlacer(const VideoFrame *Frame, FrameScanType Scan,
     }
 
     // ensure they work correctly
-    UpdateColourSpace();
+    UpdateColourSpace(false);
     UpdateShaderParameters();
     m_deinterlacer = deinterlacer;
 
@@ -290,6 +309,12 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Deint)
             defines << "YUYV" << "YUY2";
         else if (FMT_YUYVHQ == m_outputType)
             defines << "YUYV";
+
+        // if primaries are disabled, the primaries conversion matrxi will be identity
+        // and we can optimise out the conversion.
+        QMatrix4x4 primaries = m_videoColourSpace->GetPrimaryMatrix();
+        if (!primaries.isIdentity())
+            defines << "PRIMARIES";
 
         if (!progressive)
         {
@@ -358,7 +383,6 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Deint)
         fragment = newfragment + fragment;
 
     }
-
 
 #ifdef USING_VTB
     // N.B. Rectangular texture support is only currently used for VideoToolBox
@@ -442,7 +466,7 @@ bool OpenGLVideo::SetupFrameFormat(VideoFrameType InputType, VideoFrameType Outp
     if (!CreateVideoShader(Default) || !CreateVideoShader(Progressive))
         return false;
 
-    UpdateColourSpace();
+    UpdateColourSpace(false);
     UpdateShaderParameters();
     return true;
 }

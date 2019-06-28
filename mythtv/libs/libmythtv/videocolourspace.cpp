@@ -58,7 +58,15 @@ VideoColourSpace::VideoColourSpace(VideoColourSpace *Parent)
     m_colourSpaceDepth(8),
     m_range(AVCOL_RANGE_MPEG),
     m_updatesDisabled(true),
-    m_colorShifted(0),
+    m_colourShifted(0),
+    m_primariesMode(PrimariesAuto),
+    m_colourPrimaries(AVCOL_PRI_BT709),
+    m_displayPrimaries(AVCOL_PRI_BT709),
+    m_colourGamma(2.2f),
+    m_displayGamma(2.2f),
+    m_primaryMatrix(),
+    m_customDisplayGamma(2.2f),
+    m_customDisplayPrimaries(nullptr),
     m_parent(Parent)
 {
     if (m_parent)
@@ -71,6 +79,7 @@ VideoColourSpace::VideoColourSpace(VideoColourSpace *Parent)
         m_dbSettings[kPictureAttribute_Colour]     = m_parent->GetPictureAttribute(kPictureAttribute_Colour);
         m_dbSettings[kPictureAttribute_Hue]        = m_parent->GetPictureAttribute(kPictureAttribute_Hue);
         m_dbSettings[kPictureAttribute_Range]      = m_parent->GetPictureAttribute(kPictureAttribute_Range);
+        m_primariesMode = m_parent->GetPrimariesMode();
     }
     else
     {
@@ -92,6 +101,7 @@ VideoColourSpace::VideoColourSpace(VideoColourSpace *Parent)
 
 VideoColourSpace::~VideoColourSpace()
 {
+    delete m_customDisplayPrimaries;
     if (m_parent)
         m_parent->DecrRef();
 }
@@ -158,8 +168,6 @@ int VideoColourSpace::SetPictureAttribute(PictureAttribute Attribute, int Value)
  * The matrix is built from first principles to help with maintainability.
  * This an expensive task but it is only recalculated when a change is detected
  * or notified.
- *
- * Suppport for higher depth colorspaces is available but currently untested.
 */
 void VideoColourSpace::Update(void)
 {
@@ -249,32 +257,47 @@ void VideoColourSpace::Update(void)
     // Hardware decoders seem to return 'corrected' values
     // i.e. 10bit as XXXXXXXXXX for both direct rendering and copy back.
     // Works for NVDEC and VAAPI. VideoToolBox untested.
-    if ((m_colourSpaceDepth > 8) && !m_colorShifted)
+    if ((m_colourSpaceDepth > 8) && !m_colourShifted)
     {
         float scaler = 65535.0f / ((1 << m_colourSpaceDepth) -1);
         scale(scaler);
     }
     static_cast<QMatrix4x4*>(this)->operator = (this->transposed());
+
+    // check for a change in primaries conversion. This will need a recompile
+    // of the shaders - not just a parameter update.
+    float tmpsrcgamma = m_colourGamma;
+    float tmpdspgamma = m_displayGamma;
+    QMatrix4x4 tmpmatrix = m_primaryMatrix;
+    m_primaryMatrix = GetPrimaryConversion(m_colourPrimaries, m_displayPrimaries);
+    bool primchanged = !qFuzzyCompare(tmpsrcgamma, m_colourGamma) ||
+                       !qFuzzyCompare(tmpdspgamma, m_displayGamma) ||
+                       !qFuzzyCompare(tmpmatrix, m_primaryMatrix);
     Debug();
-    emit Updated();
+    emit Updated(primchanged);
 }
 
 void VideoColourSpace::Debug(void)
 {
+    bool primary = !m_primaryMatrix.isIdentity();
+
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
-        QString("Brightness: %1 Contrast: %2 Saturation: %3 Hue: %4 Alpha: %5 Range: %6")
+        QString("Brightness: %1 Contrast: %2 Saturation: %3 Hue: %4 Alpha: %5 Range: %6 Primary: %7")
         .arg(static_cast<qreal>(m_brightness), 2, 'f', 4, QLatin1Char('0'))
         .arg(static_cast<qreal>(m_contrast)  , 2, 'f', 4, QLatin1Char('0'))
         .arg(static_cast<qreal>(m_saturation), 2, 'f', 4, QLatin1Char('0'))
         .arg(static_cast<qreal>(m_hue)       , 2, 'f', 4, QLatin1Char('0'))
         .arg(static_cast<qreal>(m_alpha)     , 2, 'f', 4, QLatin1Char('0'))
-        .arg(m_fullRange ? "Full" : "Limited"));
+        .arg(m_fullRange ? "Full" : "Limited")
+        .arg(primary));
 
     if (VERBOSE_LEVEL_CHECK(VB_PLAYBACK, LOG_DEBUG))
     {
         QString stream;
         QDebug debug(&stream);
         debug << *this;
+        if (primary)
+            debug << m_primaryMatrix;
         LOG(VB_PLAYBACK, LOG_DEBUG, stream);
     }
 }
@@ -291,6 +314,7 @@ bool VideoColourSpace::UpdateColourSpace(const VideoFrame *Frame)
         return false;
 
     int csp = Frame->colorspace;
+    int primary = Frame->colorprimaries;
     int raw = csp;
     VideoFrameType frametype = Frame->codec;
     VideoFrameType softwaretype = PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->sw_pix_fmt));
@@ -310,8 +334,11 @@ bool VideoColourSpace::UpdateColourSpace(const VideoFrame *Frame)
     int depth = ColorDepth(format_is_hw(frametype) ? softwaretype : frametype);
     if (csp == AVCOL_SPC_UNSPECIFIED)
         csp = (Frame->width < 1280) ? AVCOL_SPC_BT470BG : AVCOL_SPC_BT709;
+    if (primary == AVCOL_PRI_UNSPECIFIED)
+        primary = (Frame->width < 1280) ? AVCOL_PRI_BT470BG : AVCOL_PRI_BT709;
     if ((csp == m_colourSpace) && (m_colourSpaceDepth == depth) &&
-        (m_range == range) && (m_colorShifted == Frame->colorshifted))
+        (m_range == range) && (m_colourShifted == Frame->colorshifted) &&
+        (primary == m_colourPrimaries))
     {
         return false;
     }
@@ -319,20 +346,35 @@ bool VideoColourSpace::UpdateColourSpace(const VideoFrame *Frame)
     m_colourSpace = csp;
     m_colourSpaceDepth = depth;
     m_range = range;
-    m_colorShifted = Frame->colorshifted;
+    m_colourShifted = Frame->colorshifted;
+    m_colourPrimaries = primary;
 
     if (forced)
         LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Forcing inconsistent colourspace - frame format %1")
             .arg(format_description(Frame->codec)));
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Source %1(%2) Depth:%3 %4Range:%5")
+
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Input : %1(%2) Primaries:%6 Depth:%3 %4Range:%5")
         .arg(av_color_space_name(static_cast<AVColorSpace>(m_colourSpace)))
         .arg(m_colourSpace == raw ? "Reported" : "Guessed")
         .arg(m_colourSpaceDepth)
-        .arg((m_colourSpaceDepth > 8) ? (m_colorShifted ? "(Pre-scaled) " : "(Fixed point) ") : "")
-        .arg((AVCOL_RANGE_JPEG == m_range) ? "Full" : "Limited"));
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Output Range:%1")
-        .arg(m_fullRange ? "Full" : "Limited"));
+        .arg((m_colourSpaceDepth > 8) ? (m_colourShifted ? "(Pre-scaled) " : "(Fixed point) ") : "")
+        .arg((AVCOL_RANGE_JPEG == m_range) ? "Full" : "Limited")
+        .arg(av_color_primaries_name(static_cast<AVColorPrimaries>(m_colourPrimaries))));
+
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Output: Range:%1 Primaries: %2")
+        .arg(m_fullRange ? "Full" : "Limited")
+        .arg(m_customDisplayPrimaries ? "Custom (screen)" :
+                av_color_primaries_name(static_cast<AVColorPrimaries>(m_displayPrimaries))));
+
     Update();
+
+    if (!m_primaryMatrix.isIdentity())
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Enabled colourspace primaries conversion from %1 to %2")
+            .arg(av_color_primaries_name(static_cast<AVColorPrimaries>(m_colourPrimaries)))
+            .arg(m_customDisplayPrimaries ? "Custom (screen)" :
+                 av_color_primaries_name(static_cast<AVColorPrimaries>(m_displayPrimaries))));
+    }
     return true;
 }
 
@@ -372,6 +414,32 @@ void VideoColourSpace::SetAlpha(int Value)
     Update();
 }
 
+QMatrix4x4 VideoColourSpace::GetPrimaryMatrix(void)
+{
+    return m_primaryMatrix;
+}
+
+float VideoColourSpace::GetColourGamma(void)
+{
+    return m_colourGamma;
+}
+
+float VideoColourSpace::GetDisplayGamma(void)
+{
+    return m_displayGamma;
+}
+
+PrimariesMode VideoColourSpace::GetPrimariesMode(void)
+{
+    return m_primariesMode;
+}
+
+void VideoColourSpace::SetPrimariesMode(PrimariesMode Mode)
+{
+    m_primariesMode = Mode;
+    Update();
+}
+
 /// \brief Save the PictureAttribute value to the database.
 void VideoColourSpace::SaveValue(PictureAttribute AttributeType, int Value)
 {
@@ -393,4 +461,97 @@ void VideoColourSpace::SaveValue(PictureAttribute AttributeType, int Value)
         gCoreContext->SaveSetting(dbName, Value);
 
     m_dbSettings[AttributeType] = Value;
+}
+
+QMatrix4x4 VideoColourSpace::GetPrimaryConversion(int Source, int Dest)
+{
+    QMatrix4x4 result; // identity
+    AVColorPrimaries source = static_cast<AVColorPrimaries>(Source);
+    AVColorPrimaries dest   = static_cast<AVColorPrimaries>(Dest);
+
+    if ((source == dest) || (m_primariesMode == PrimariesDisabled))
+        return result;
+
+    ColourPrimaries srcprimaries, dstprimaries;
+    GetPrimaries(source, srcprimaries, m_colourGamma);
+    GetPrimaries(dest,   dstprimaries, m_displayGamma);
+
+    // Auto will only enable if there is a significant difference between source
+    // and destination. Most people will not notice the difference bt709 and bt610 etc
+    // and we avoid extra GPU processing.
+    // BT2020 is currently the main target - which is easily differentiated by its gamma.
+    if ((m_primariesMode == PrimariesAuto) && qFuzzyCompare(m_colourGamma + 1.0f, m_displayGamma + 1.0f))
+        return result;
+
+    // N.B. Custom primaries are not yet implemented but will, some day soon,
+    // be read from the EDID
+    if (m_customDisplayPrimaries != nullptr)
+    {
+        dstprimaries = *m_customDisplayPrimaries;
+        m_displayGamma = m_customDisplayGamma;
+    }
+
+    return (RGBtoXYZ(srcprimaries) * RGBtoXYZ(dstprimaries).inverted());
+}
+
+void VideoColourSpace::GetPrimaries(int Primary, ColourPrimaries &Out, float &Gamma)
+{
+    AVColorPrimaries primary = static_cast<AVColorPrimaries>(Primary);
+    Gamma = 2.2f;
+    switch (primary)
+    {
+        case AVCOL_PRI_BT470BG:
+        case AVCOL_PRI_BT470M:    Out = BT610_625; return;
+        case AVCOL_PRI_SMPTE170M:
+        case AVCOL_PRI_SMPTE240M: Out = BT610_525; return;
+        case AVCOL_PRI_BT2020:    Out = BT2020; Gamma = 2.4f; return;
+        default: Out = BT709; return;
+    }
+}
+
+inline float CalcBy(const float p[3][2], const float w[2])
+{
+    float val = ((1-w[0])/w[1] - (1-p[0][0])/p[0][1]) * (p[1][0]/p[1][1] - p[0][0]/p[0][1]) -
+    (w[0]/w[1] - p[0][0]/p[0][1]) * ((1-p[1][0])/p[1][1] - (1-p[0][0])/p[0][1]);
+    val /= ((1-p[2][0])/p[2][1] - (1-p[0][0])/p[0][1]) * (p[1][0]/p[1][1] - p[0][0]/p[0][1]) -
+    (p[2][0]/p[2][1] - p[0][0]/p[0][1]) * ((1-p[1][0])/p[1][1] - (1-p[0][0])/p[0][1]);
+    return val;
+}
+
+inline float CalcGy(const float p[3][2], const float w[2], const float By)
+{
+    float val = w[0]/w[1] - p[0][0]/p[0][1] - By * (p[2][0]/p[2][1] - p[0][0]/p[0][1]);
+    val /= p[1][0]/p[1][1] - p[0][0]/p[0][1];
+    return val;
+}
+
+inline float CalcRy(const float By, const float Gy)
+{
+    return 1.0f - Gy - By;
+}
+
+/*! \brief Create a conversion matrix for RGB to XYZ with the given primaries
+ *
+ * This is a joyous mindbender. There are various explanations on the interweb
+ * but this is based on the Kodi implementation - with due credit to Team Kodi.
+ */
+QMatrix4x4 VideoColourSpace::RGBtoXYZ(ColourPrimaries Primaries)
+{
+    float By = CalcBy(Primaries.primaries, Primaries.whitepoint);
+    float Gy = CalcGy(Primaries.primaries, Primaries.whitepoint, By);
+    float Ry = CalcRy(By, Gy);
+
+    float temp[4][4];
+    temp[0][0] = Ry * Primaries.primaries[0][0] / Primaries.primaries[0][1];
+    temp[0][1] = Gy * Primaries.primaries[1][0] / Primaries.primaries[1][1];
+    temp[0][2] = By * Primaries.primaries[2][0] / Primaries.primaries[2][1];
+    temp[1][0] = Ry;
+    temp[1][1] = Gy;
+    temp[1][2] = By;
+    temp[2][0] = Ry / Primaries.primaries[0][1] * (1- Primaries.primaries[0][0] - Primaries.primaries[0][1]);
+    temp[2][1] = Gy / Primaries.primaries[1][1] * (1- Primaries.primaries[1][0] - Primaries.primaries[1][1]);
+    temp[2][2] = By / Primaries.primaries[2][1] * (1- Primaries.primaries[2][0] - Primaries.primaries[2][1]);
+    temp[0][3] = temp[1][3] = temp[2][3] = temp[3][0] = temp[3][1] = temp[3][2] = 0.0f;
+    temp[3][3] = 1.0f;
+    return QMatrix4x4(temp[0]);
 }
