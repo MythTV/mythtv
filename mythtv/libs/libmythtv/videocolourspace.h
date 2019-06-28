@@ -30,6 +30,17 @@ class VideoColourSpace : public QObject, public QMatrix4x4, public ReferenceCoun
     float GetDisplayGamma(void);
     PrimariesMode GetPrimariesMode(void);
 
+    struct ColourPrimaries
+    {
+        float primaries[3][2];
+        float whitepoint[2];
+    };
+
+    static const ColourPrimaries BT709;
+    static const ColourPrimaries BT610_525;
+    static const ColourPrimaries BT610_625;
+    static const ColourPrimaries BT2020;
+
   public slots:
     int   SetPictureAttribute(PictureAttribute Attribute, int Value);
     void  SetPrimariesMode(PrimariesMode Mode);
@@ -42,12 +53,6 @@ class VideoColourSpace : public QObject, public QMatrix4x4, public ReferenceCoun
     ~VideoColourSpace();
 
   private:
-    struct ColourPrimaries
-    {
-        float primaries[3][2];
-        float whitepoint[2];
-    };
-
     void  SetFullRange(bool FullRange);
     void  SetBrightness(int Value);
     void  SetContrast(int Value);
@@ -61,11 +66,6 @@ class VideoColourSpace : public QObject, public QMatrix4x4, public ReferenceCoun
     QMatrix4x4 RGBtoXYZ(ColourPrimaries Primaries);
 
   private:
-    static constexpr ColourPrimaries BT709     = {{{0.640f, 0.330f}, {0.300f, 0.600f}, {0.150f, 0.060f}}, {0.3127f, 0.3290f}};
-    static constexpr ColourPrimaries BT610_525 = {{{0.640f, 0.340f}, {0.310f, 0.595f}, {0.155f, 0.070f}}, {0.3127f, 0.3290f}};
-    static constexpr ColourPrimaries BT610_625 = {{{0.640f, 0.330f}, {0.290f, 0.600f}, {0.150f, 0.060f}}, {0.3127f, 0.3290f}};
-    static constexpr ColourPrimaries BT2020    = {{{0.708f, 0.292f}, {0.170f, 0.797f}, {0.131f, 0.046f}}, {0.3127f, 0.3290f}};
-
     PictureAttributeSupported  m_supportedAttributes;
     QMap<PictureAttribute,int> m_dbSettings;
 

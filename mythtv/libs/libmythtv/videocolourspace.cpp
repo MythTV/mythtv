@@ -13,6 +13,15 @@ extern "C" {
 // Std
 #include <cmath>
 
+const VideoColourSpace::ColourPrimaries VideoColourSpace::BT709 =
+    {{{0.640f, 0.330f}, {0.300f, 0.600f}, {0.150f, 0.060f}}, {0.3127f, 0.3290f}};
+const VideoColourSpace::ColourPrimaries VideoColourSpace::BT610_525 =
+    {{{0.640f, 0.340f}, {0.310f, 0.595f}, {0.155f, 0.070f}}, {0.3127f, 0.3290f}};
+const VideoColourSpace::ColourPrimaries VideoColourSpace::BT610_625 =
+    {{{0.640f, 0.330f}, {0.290f, 0.600f}, {0.150f, 0.060f}}, {0.3127f, 0.3290f}};
+const VideoColourSpace::ColourPrimaries VideoColourSpace::BT2020 =
+    {{{0.708f, 0.292f}, {0.170f, 0.797f}, {0.131f, 0.046f}}, {0.3127f, 0.3290f}};
+
 #define LOC QString("ColourSpace: ")
 
 /*! \class VideoColourSpace
