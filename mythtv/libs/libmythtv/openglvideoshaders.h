@@ -37,8 +37,8 @@ static const QString MediaCodecVertexShader =
 "}\n";
 #endif
 
-static const QString YUVFragmentShader =
-{
+// these need to come first but obviously after the defines...
+static const QString YUVFragmentExtensions =
 "#ifdef MYTHTV_RECTS\n"
 "#extension GL_ARB_texture_rectangle : enable\n"
 "#define texture2D texture2DRect\n"
@@ -47,7 +47,9 @@ static const QString YUVFragmentShader =
 "#ifdef MYTHTV_EXTOES\n"
 "#extension GL_OES_EGL_image_external : require\n"
 "#define sampler2D samplerExternalOES\n"
-"#endif\n"
+"#endif\n";
+
+static const QString YUVFragmentShader =
 "uniform highp mat4 m_colourMatrix;\n"
 "uniform highp vec4 m_frameData;\n"
 "varying highp vec2 v_texcoord0;\n"
@@ -64,7 +66,7 @@ static const QString YUVFragmentShader =
 "    return vec4(texture2D(texture1, texcoord).r, texture2D(texture2, texcoord * vec2(0.5, 0.5)).rg, 1.0);\n"
 "#else\n"
 "    return vec4(texture2D(texture1, texcoord).r, texture2D(texture2, texcoord).rg, 1.0);\n"
-"#endif"
+"#endif\n"
 "}\n"
 "#endif\n"
 
@@ -156,8 +158,7 @@ static const QString YUVFragmentShader =
 "    gl_FragColor.rgb = pow(gl_FragColor.rgb, vec3(m_displayGamma));\n"
 "#endif\n"
 "#endif\n"
-"}\n"
-};
+"}\n";
 
 // N.B. Currently unused
 static const QString BicubicShader =

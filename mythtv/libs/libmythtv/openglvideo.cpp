@@ -375,9 +375,9 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Deint)
         }
 
         // Add defines
-        QString newfragment;
+        QString glsldefines;
         foreach (QString define, defines)
-            newfragment += QString("#define MYTHTV_%1\n").arg(define);
+            glsldefines += QString("#define MYTHTV_%1\n").arg(define);
 
         // Add the required samplers
         int start = 0;
@@ -390,9 +390,10 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Deint)
             else
                 end -= count;
         }
+        QString glslsamplers;
         for (int i = start; i < end; ++i)
-            newfragment += QString("uniform sampler2D s_texture%1;\n").arg(i);
-        fragment = newfragment + fragment;
+            glslsamplers += QString("uniform sampler2D s_texture%1;\n").arg(i);
+        fragment = glsldefines + YUVFragmentExtensions + glslsamplers + fragment;
 
     }
 
