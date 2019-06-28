@@ -1539,7 +1539,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         m_directrendering = true;
 
     // retrieve rotation information
-    uint8_t* displaymatrix = av_stream_get_side_data(stream, AV_PKT_DATA_DISPLAYMATRIX, NULL);
+    uint8_t* displaymatrix = av_stream_get_side_data(stream, AV_PKT_DATA_DISPLAYMATRIX, nullptr);
     if (displaymatrix)
         m_videoRotation = static_cast<int>(-av_display_rotation_get(reinterpret_cast<int32_t*>(displaymatrix)));
     else
