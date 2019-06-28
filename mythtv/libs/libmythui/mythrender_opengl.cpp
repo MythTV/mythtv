@@ -1213,7 +1213,6 @@ bool MythRenderOpenGL::UpdateTextureVertices(MythGLTexture *Texture, const QRect
             data[3 + TEX_OFFSET] = data[1 + TEX_OFFSET];
             data[5 + TEX_OFFSET] = data[7 + TEX_OFFSET];
         }
-        // could be handled above but keep generic code path simpler
         else if (abs(Texture->m_rotation) == 180)
         {
             temp = data[(Texture->m_flip ? 7 : 1) + TEX_OFFSET];
@@ -1221,6 +1220,11 @@ bool MythRenderOpenGL::UpdateTextureVertices(MythGLTexture *Texture, const QRect
             data[(Texture->m_flip ? 1 : 7) + TEX_OFFSET] = temp;
             data[3 + TEX_OFFSET] = data[7 + TEX_OFFSET];
             data[5 + TEX_OFFSET] = data[1 + TEX_OFFSET];
+            temp = data[0 + TEX_OFFSET];
+            data[0 + TEX_OFFSET] = data[6 + TEX_OFFSET];
+            data[6 + TEX_OFFSET] = temp;
+            data[2 + TEX_OFFSET] = data[0 + TEX_OFFSET];
+            data[4 + TEX_OFFSET] = data[6 + TEX_OFFSET];
         }
     }
 
