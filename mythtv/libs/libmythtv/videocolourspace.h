@@ -80,6 +80,7 @@ class VideoColourSpace : public QObject, public QMatrix4x4, public ReferenceCoun
     int       m_range;
     bool      m_updatesDisabled;
     int       m_colourShifted;
+    int       m_colourTransfer;
     PrimariesMode m_primariesMode;
     int       m_colourPrimaries;
     int       m_displayPrimaries;

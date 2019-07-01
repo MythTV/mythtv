@@ -68,6 +68,7 @@ VideoColourSpace::VideoColourSpace(VideoColourSpace *Parent)
     m_range(AVCOL_RANGE_MPEG),
     m_updatesDisabled(true),
     m_colourShifted(0),
+    m_colourTransfer(AVCOL_TRC_BT709),
     m_primariesMode(PrimariesAuto),
     m_colourPrimaries(AVCOL_PRI_BT709),
     m_displayPrimaries(AVCOL_PRI_BT709),
@@ -322,9 +323,10 @@ bool VideoColourSpace::UpdateColourSpace(const VideoFrame *Frame)
     if (!Frame)
         return false;
 
-    int csp = Frame->colorspace;
-    int primary = Frame->colorprimaries;
-    int raw = csp;
+    int csp      = Frame->colorspace;
+    int primary  = Frame->colorprimaries;
+    int transfer = Frame->colortransfer;
+    int raw      = csp;
     VideoFrameType frametype = Frame->codec;
     VideoFrameType softwaretype = PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->sw_pix_fmt));
 
@@ -345,6 +347,8 @@ bool VideoColourSpace::UpdateColourSpace(const VideoFrame *Frame)
         csp = (Frame->width < 1280) ? AVCOL_SPC_BT470BG : AVCOL_SPC_BT709;
     if (primary == AVCOL_PRI_UNSPECIFIED)
         primary = (Frame->width < 1280) ? AVCOL_PRI_BT470BG : AVCOL_PRI_BT709;
+    if (transfer == AVCOL_TRC_UNSPECIFIED)
+        transfer = (Frame->width < 1280) ? AVCOL_TRC_GAMMA28 : AVCOL_TRC_BT709;
     if ((csp == m_colourSpace) && (m_colourSpaceDepth == depth) &&
         (m_range == range) && (m_colourShifted == Frame->colorshifted) &&
         (primary == m_colourPrimaries))
@@ -352,25 +356,27 @@ bool VideoColourSpace::UpdateColourSpace(const VideoFrame *Frame)
         return false;
     }
 
-    m_colourSpace = csp;
+    m_colourSpace      = csp;
     m_colourSpaceDepth = depth;
-    m_range = range;
-    m_colourShifted = Frame->colorshifted;
-    m_colourPrimaries = primary;
+    m_range            = range;
+    m_colourShifted    = Frame->colorshifted;
+    m_colourPrimaries  = primary;
+    m_colourTransfer   = transfer;
 
     if (forced)
         LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Forcing inconsistent colourspace - frame format %1")
             .arg(format_description(Frame->codec)));
 
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Input : %1(%2) Primaries:%6 Depth:%3 %4Range:%5")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Input : %1(%2) Depth:%3 %4Range:%5")
         .arg(av_color_space_name(static_cast<AVColorSpace>(m_colourSpace)))
-        .arg(m_colourSpace == raw ? "Reported" : "Guessed")
+        .arg(m_colourSpace == raw ? "Detected" : "Guessed")
         .arg(m_colourSpaceDepth)
         .arg((m_colourSpaceDepth > 8) ? (m_colourShifted ? "(Pre-scaled) " : "(Fixed point) ") : "")
-        .arg((AVCOL_RANGE_JPEG == m_range) ? "Full" : "Limited")
-        .arg(av_color_primaries_name(static_cast<AVColorPrimaries>(m_colourPrimaries))));
-
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Output: Range:%1 Primaries: %2")
+        .arg((AVCOL_RANGE_JPEG == m_range) ? "Full" : "Limited"));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Input : Primaries:%1 Transfer: %2")
+        .arg(av_color_primaries_name(static_cast<AVColorPrimaries>(m_colourPrimaries)))
+        .arg(av_color_transfer_name(static_cast<AVColorTransferCharacteristic>(m_colourTransfer))));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Output: Range:%1 Primaries: %2")
         .arg(m_fullRange ? "Full" : "Limited")
         .arg(m_customDisplayPrimaries ? "Custom (screen)" :
                 av_color_primaries_name(static_cast<AVColorPrimaries>(m_displayPrimaries))));
