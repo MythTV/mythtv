@@ -259,14 +259,11 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
     memset(vf->priv, 0, 4 * sizeof(unsigned char *));
 
     int width_aligned;
+    int height_aligned = (_height + 15) & ~0xf;
     if (!_aligned)
-    {
         width_aligned = _width;
-    }
     else
-    {
         width_aligned = (_width + _aligned - 1) & ~(_aligned - 1);
-    }
 
     if (p)
     {
@@ -274,7 +271,7 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
     }
     else
     {
-        for (int i = 0; i < 3; ++i)
+        for (uint i = 0; i < 3; ++i)
             vf->pitches[i] = pitch_for_plane(_codec, width_aligned, i);
     }
 
@@ -287,42 +284,42 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
         vf->offsets[0] = 0;
         if (FMT_YV12 == _codec)
         {
-            vf->offsets[1] = width_aligned * _height;
-            vf->offsets[2] = vf->offsets[1] + ((width_aligned + 1) >> 1) * ((_height+1) >> 1);
+            vf->offsets[1] = width_aligned * height_aligned;
+            vf->offsets[2] = vf->offsets[1] + ((width_aligned + 1) >> 1) * ((height_aligned+1) >> 1);
         }
         else if (format_is_420(_codec))
         {
-            vf->offsets[1] = (width_aligned << 1) * _height;
-            vf->offsets[2] = vf->offsets[1] + (width_aligned * (_height >> 1));
+            vf->offsets[1] = (width_aligned << 1) * height_aligned;
+            vf->offsets[2] = vf->offsets[1] + (width_aligned * (height_aligned >> 1));
         }
         else if (FMT_YUV422P == _codec)
         {
-            vf->offsets[1] = width_aligned * _height;
-            vf->offsets[2] = vf->offsets[1] + ((width_aligned + 1) >> 1) * _height;
+            vf->offsets[1] = width_aligned * height_aligned;
+            vf->offsets[2] = vf->offsets[1] + ((width_aligned + 1) >> 1) * height_aligned;
         }
         else if (format_is_422(_codec))
         {
-            vf->offsets[1] = (width_aligned << 1) * _height;
-            vf->offsets[2] = vf->offsets[1] + (width_aligned * _height);
+            vf->offsets[1] = (width_aligned << 1) * height_aligned;
+            vf->offsets[2] = vf->offsets[1] + (width_aligned * height_aligned);
         }
         else if (FMT_YUV444P == _codec)
         {
-            vf->offsets[1] = width_aligned * _height;
-            vf->offsets[2] = vf->offsets[1] + (width_aligned * _height);
+            vf->offsets[1] = width_aligned * height_aligned;
+            vf->offsets[2] = vf->offsets[1] + (width_aligned * height_aligned);
         }
         else if (format_is_444(_codec))
         {
-            vf->offsets[1] = (width_aligned << 1) * _height;
-            vf->offsets[2] = vf->offsets[1] + ((width_aligned << 1) * _height);
+            vf->offsets[1] = (width_aligned << 1) * height_aligned;
+            vf->offsets[2] = vf->offsets[1] + ((width_aligned << 1) * height_aligned);
         }
         else if (FMT_NV12 == _codec)
         {
-            vf->offsets[1] = width_aligned * _height;
+            vf->offsets[1] = width_aligned * height_aligned;
             vf->offsets[2] = 0;
         }
         else if (format_is_nv12(_codec))
         {
-            vf->offsets[1] = (width_aligned << 1) * _height;
+            vf->offsets[1] = (width_aligned << 1) * height_aligned;
             vf->offsets[2] = 0;
         }
         else
@@ -610,6 +607,7 @@ static inline uint buffersize(VideoFrameType type, int width, int height,
     // old versions of MythTV allowed people to set invalid
     // dimensions for MPEG-4 capture, no need to segfault..
     uint adj_w;
+    uint adj_h = (height + 15) & ~0xf;
     if (!_aligned)
     {
         adj_w = width;
@@ -619,8 +617,8 @@ static inline uint buffersize(VideoFrameType type, int width, int height,
         adj_w = (width  + _aligned - 1) & ~(_aligned - 1);
     }
     // Calculate rounding as necessary.
-    uint remainder = (adj_w * height * bpp) % bpb;
-    return (adj_w * height * bpp) / bpb + (remainder ? 1 : 0);
+    uint remainder = (adj_w * adj_h * bpp) % bpb;
+    return (adj_w * adj_h * bpp) / bpb + (remainder ? 1 : 0);
 }
 
 static inline void copybuffer(VideoFrame *dst, uint8_t *buffer,

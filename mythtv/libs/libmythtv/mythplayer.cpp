@@ -764,8 +764,7 @@ void MythPlayer::SetVideoParams(int width, int height, double fps, float aspect,
     if (width >= 1 && height >= 1)
     {
         paramsChanged  = true;
-        video_dim      = QSize((width + 15) & ~0xf, (height + 15) & ~0xf);
-        video_disp_dim = QSize(width, height);
+        video_dim      = video_disp_dim = QSize(width, height);
         video_aspect   = aspect > 0.0f ? aspect : static_cast<float>(width) / height;
     }
 
@@ -1029,14 +1028,6 @@ VideoFrameType* MythPlayer::DirectRenderFormats(void)
     if (videoOutput)
         return videoOutput->DirectRenderFormats();
     return &defaultformats[0];
-}
-
-/// \brief Reallocate the given from as Type
-bool MythPlayer::ReAllocateFrame(VideoFrame *Frame, VideoFrameType Type)
-{
-    if (videoOutput)
-        return videoOutput->ReAllocateFrame(Frame, Type);
-    return false;
 }
 
 /**

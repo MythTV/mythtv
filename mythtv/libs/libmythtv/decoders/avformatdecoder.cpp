@@ -2935,8 +2935,16 @@ int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic, int flags)
     if (!frame)
         return -1;
 
-    if (frame->codec != type)
-        if (!decoder->GetPlayer()->ReAllocateFrame(frame, type))
+    // workaround for 1080/1088 issues. We now default to the actual reported height
+    // for frames (which is usually 1080). FFmpeg appears to want/need 1088 for MPEG2, VC1 etc
+    // as we get some chroma corruption with 1080.
+    int height = pic->height;
+    if ((decoder->m_video_codec_id != kCodec_H264) && (decoder->m_video_codec_id != kCodec_HEVC))
+        height = (pic->height + 15) & ~0xf;
+    // the decoder will also sometimes decide that 1088 is the way to go for H.264
+    // and 544 for interlaced HEVC...
+    if ((frame->codec != type) || (frame->width != pic->width) || (frame->height != height))
+        if (!VideoBuffers::ReinitBuffer(frame, type, decoder->m_video_codec_id, pic->width, height))
             return -1;
 
     frame->colorshifted = 0;
@@ -3797,8 +3805,9 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
                 {
                     VideoFrameType type = PixelFormatToFrameType(best);
                     bool valid = picframe->codec == type;
-                    if (!valid)
-                        valid = m_parent->ReAllocateFrame(picframe, type);
+                    if (!valid || (picframe->width != mpa_pic->width) || (picframe->height != mpa_pic->height))
+                        valid = VideoBuffers::ReinitBuffer(picframe, type, m_video_codec_id,
+                                                           mpa_pic->width, mpa_pic->height);
 
                     if (valid)
                     {

@@ -66,7 +66,7 @@ class MTV_PUBLIC VideoBuffers
     bool CreateBuffers(VideoFrameType Type, int Width, int Height,
                        vector<YUVInfo> YUVInfos);
     bool CreateBuffers(VideoFrameType Type, int Width, int Height);
-    bool ReinitBuffer(VideoFrame *Frame, VideoFrameType Type, MythCodecID CodecID);
+    static bool ReinitBuffer(VideoFrame *Frame, VideoFrameType Type, MythCodecID CodecID, int Width, int Height);
     void DeleteBuffers(void);
     void SetDeinterlacing(MythDeintType Single, MythDeintType Double, MythCodecID CodecID);
 
@@ -123,7 +123,7 @@ class MTV_PUBLIC VideoBuffers
     const frame_queue_t *Queue(BufferType Type) const;
     VideoFrame          *GetNextFreeFrameInternal(BufferType EnqueueTo);
     void                 ReleaseDecoderResources(VideoFrame *Frame);
-    void                 SetDeinterlacingFlags(VideoFrame &Frame, MythDeintType Single,
+    static void          SetDeinterlacingFlags(VideoFrame &Frame, MythDeintType Single,
                                                MythDeintType Double, MythCodecID CodecID);
 
     frame_queue_t        m_available;

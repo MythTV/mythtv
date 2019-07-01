@@ -868,11 +868,6 @@ VideoFrameType* VideoOutput::DirectRenderFormats(void)
     return &defaultformats[0];
 }
 
-bool VideoOutput::ReAllocateFrame(VideoFrame *Frame, VideoFrameType Type)
-{
-    return m_videoBuffers.ReinitBuffer(Frame, Type, m_videoCodecID);
-}
-
 /**
  * \brief Blocks until it is possible to return a frame for decoding onto.
  */

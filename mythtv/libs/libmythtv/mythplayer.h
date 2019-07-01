@@ -275,7 +275,6 @@ class MTV_PUBLIC MythPlayer
 
     // Decoder stuff..
     VideoFrameType* DirectRenderFormats(void);
-    bool ReAllocateFrame(VideoFrame *Frame, VideoFrameType Type);
     VideoFrame *GetNextVideoFrame(void);
     VideoFrame *GetRawVideoFrame(long long frameNumber = -1);
     VideoFrame *GetCurrentFrame(int &w, int &h);

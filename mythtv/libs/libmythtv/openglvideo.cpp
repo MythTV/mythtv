@@ -425,6 +425,7 @@ bool OpenGLVideo::SetupFrameFormat(VideoFrameType InputType, VideoFrameType Outp
     m_inputType = InputType;
     m_outputType = OutputType;
     m_textureTarget = TextureTarget;
+    m_videoDim = Size;
 
     if (!format_is_hw(InputType))
     {

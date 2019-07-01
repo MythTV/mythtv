@@ -921,7 +921,8 @@ void VideoBuffers::DeleteBuffers(void)
         av_freep(&(m_buffers[i].buf));
 }
 
-bool VideoBuffers::ReinitBuffer(VideoFrame *Frame, VideoFrameType Type, MythCodecID CodecID)
+bool VideoBuffers::ReinitBuffer(VideoFrame *Frame, VideoFrameType Type, MythCodecID CodecID,
+                                int Width, int Height)
 {
     if (!Frame)
         return false;
@@ -932,45 +933,37 @@ bool VideoBuffers::ReinitBuffer(VideoFrame *Frame, VideoFrameType Type, MythCode
     }
 
     // Find the frame
-    BeginLock(kVideoBuffer_all);
-    for (uint i = 0; i < Size(); ++i)
+    VideoFrameType old = Frame->codec;
+    int size = static_cast<int>(buffersize(Type, Width, Height));
+    unsigned char *buf = Frame->buf;
+    bool newbuf = false;
+    if ((Frame->size != size) || !buf)
     {
-        if (At(i) == Frame)
+        // Free existing buffer
+        av_freep(&buf);
+        Frame->buf = nullptr;
+
+        // Initialise new
+        buf = static_cast<unsigned char*>(av_malloc(static_cast<size_t>(size + 64)));
+        if (!buf)
         {
-            VideoFrameType old = Frame->codec;
-            int size = static_cast<int>(buffersize(Type, Frame->width, Frame->height));
-            unsigned char *buf = Frame->buf;
-            if ((Frame->size != size) || !buf)
-            {
-                // Free existing buffer
-                av_freep(&buf);
-                Frame->buf = nullptr;
-
-                // Initialise new
-                buf = static_cast<unsigned char*>(av_malloc(static_cast<size_t>(size + 64)));
-                if (!buf)
-                {
-                    LOG(VB_GENERAL, LOG_ERR, "Failed to reallocate frame buffer");
-                    EndLock();
-                    return false;
-                }
-            }
-
-            MythDeintType singler = Frame->deinterlace_single;
-            MythDeintType doubler = Frame->deinterlace_double;
-            init(Frame, Type, buf, Frame->width, Frame->height, size);
-            // retain deinterlacer settings and update restrictions based on new frame type
-            SetDeinterlacingFlags(*Frame, singler, doubler, CodecID);
-            clear(Frame);
-            LOG(VB_PLAYBACK, LOG_INFO, QString("Reallocated frame %1->%2")
-                .arg(format_description(old)).arg(format_description(Type)));
-            EndLock();
-            return true;
+            LOG(VB_GENERAL, LOG_ERR, "Failed to reallocate frame buffer");
+            return false;
         }
+        newbuf = true;
     }
-    EndLock();
-    LOG(VB_GENERAL, LOG_ERR, "Failed to find frame to reallocate");
-    return false;
+
+    LOG(VB_PLAYBACK, LOG_INFO, QString("Reallocated frame %1 %2x%3->%4 %5x%6 (New buffer: %7)")
+        .arg(format_description(old)).arg(Frame->width).arg(Frame->height)
+        .arg(format_description(Type)).arg(Width).arg(Height)
+        .arg(newbuf));
+    MythDeintType singler = Frame->deinterlace_single;
+    MythDeintType doubler = Frame->deinterlace_double;
+    init(Frame, Type, buf, Width, Height, size);
+    // retain deinterlacer settings and update restrictions based on new frame type
+    SetDeinterlacingFlags(*Frame, singler, doubler, CodecID);
+    clear(Frame);
+    return true;
 }
 
 static unsigned long long to_bitmap(const frame_queue_t& Queue, int Num);

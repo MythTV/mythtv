@@ -109,7 +109,6 @@ class VideoOutput
     bool         EnoughDecodedFrames(void);
     bool         EnoughPrebufferedFrames(void);
     virtual VideoFrameType* DirectRenderFormats(void);
-    bool         ReAllocateFrame(VideoFrame *Frame, VideoFrameType Type);
     virtual VideoFrame *GetNextFreeFrame(void);
     virtual void ReleaseFrame(VideoFrame *Frame);
     virtual void DeLimboFrame(VideoFrame *Frame);
