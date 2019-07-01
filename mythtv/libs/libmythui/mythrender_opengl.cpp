@@ -8,6 +8,7 @@ using std::min;
 #include <QWindow>
 #include <QWidget>
 #include <QGuiApplication>
+#include <QOpenGLFunctions_3_2_Core>
 
 // MythTV
 #include "mythcorecontext.h"
@@ -91,10 +92,27 @@ MythRenderOpenGL* MythRenderOpenGL::Create(const QString&, QPaintDevice* Device)
         return nullptr;
     }
 
-    QSurfaceFormat format = QSurfaceFormat::defaultFormat();
+    // N.B the core profiles below are designed to target compute shader availability
     bool opengles = !qgetenv("USE_OPENGLES").isEmpty();
+    bool core     = !qgetenv("USE_OPENGLCORE").isEmpty();
+    QSurfaceFormat format = QSurfaceFormat::defaultFormat();
+    if (core)
+    {
+        format.setProfile(QSurfaceFormat::CoreProfile);
+        format.setMajorVersion(4);
+        format.setMinorVersion(3);
+    }
+
     if (opengles)
+    {
+        if (core)
+        {
+            format.setProfile(QSurfaceFormat::CoreProfile);
+            format.setMajorVersion(3);
+            format.setMinorVersion(1);
+        }
         format.setRenderableType(QSurfaceFormat::OpenGLES);
+    }
 
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         format.setOption(QSurfaceFormat::DebugContext);
@@ -137,9 +155,9 @@ MythRenderOpenGL::MythRenderOpenGL(const QSurfaceFormat& Format, QPaintDevice* D
     m_maxTextureSize(0),
     m_maxTextureUnits(0),
     m_colorDepth(0),
+    m_coreProfile(false),
     m_viewport(),
     m_activeTexture(0),
-    m_activeTextureTarget(0),
     m_blend(false),
     m_background(0x00000000),
     m_fullRange(gCoreContext->GetBoolSetting("GUIRGBLevels", true)),
@@ -148,6 +166,7 @@ MythRenderOpenGL::MythRenderOpenGL(const QSurfaceFormat& Format, QPaintDevice* D
     m_parameters(),
     m_cachedMatrixUniforms(),
     m_cachedUniformLocations(),
+    m_vao(0),
     m_flushEnabled(true),
     m_openglDebugger(nullptr),
     m_window(nullptr)
@@ -170,6 +189,14 @@ MythRenderOpenGL::~MythRenderOpenGL()
     LOG(VB_GENERAL, LOG_INFO, LOC + "MythRenderOpenGL closing");
     if (!isValid())
         return;
+
+    if (m_coreProfile && m_vao)
+    {
+        QOpenGLFunctions_3_2_Core* core = versionFunctions<QOpenGLFunctions_3_2_Core>();
+        if (core)
+            core->glDeleteVertexArrays(1, &m_vao);
+    }
+
     disconnect(this, &QOpenGLContext::aboutToBeDestroyed, this, &MythRenderOpenGL::contextToBeDestroyed);
     ReleaseResources();
 }
@@ -295,6 +322,21 @@ bool MythRenderOpenGL::Init(void)
     if (!isOpenGLES() || (isOpenGLES() && ((fmt.majorVersion() >= 3) || hasExtension("GL_EXT_unpack_subimage"))))
         m_extraFeatures |= kGLExtSubimage;
 
+    // check for core profile
+    m_coreProfile = fmt.profile() == QSurfaceFormat::OpenGLContextProfile::CoreProfile;
+
+    // if we have a core profile then we need a VAO bound - this is just a
+    // workaround for the time being
+    if (m_coreProfile)
+    {
+        QOpenGLFunctions_3_2_Core* core = versionFunctions<QOpenGLFunctions_3_2_Core>();
+        if (core)
+        {
+            core->glGenVertexArrays(1, &m_vao);
+            core->glBindVertexArray(m_vao);
+        }
+    }
+
     DebugFeatures();
 
     m_extraFeaturesUsed = m_extraFeatures;
@@ -343,6 +385,7 @@ void MythRenderOpenGL::DebugFeatures(void)
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Buffer mapping       : %1").arg(GLYesNo(m_extraFeatures & kGLBufferMap)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Framebuffer objects  : %1").arg(GLYesNo(m_features & Framebuffers)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Unpack Subimage      : %1").arg(GLYesNo(m_extraFeatures & kGLExtSubimage)));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Compute shaders      : %1").arg(GLYesNo(QOpenGLShader::hasOpenGLShaders(QOpenGLShader::Compute))));
 
     // warnings
     if (m_maxTextureUnits < 3)
@@ -571,7 +614,6 @@ void MythRenderOpenGL::SetTextureFilters(MythGLTexture *Texture, QOpenGLTexture:
         return;
 
     makeCurrent();
-    EnableTextures(Texture->m_target);
     if (Texture->m_texture)
     {
         Texture->m_texture->bind();
@@ -600,28 +642,6 @@ void MythRenderOpenGL::ActiveTexture(GLuint ActiveTex)
         glActiveTexture(ActiveTex);
         m_activeTexture = ActiveTex;
     }
-    doneCurrent();
-}
-
-void MythRenderOpenGL::EnableTextures(GLenum Type)
-{
-    if (isOpenGLES() || (m_activeTextureTarget == Type))
-        return;
-
-    makeCurrent();
-    glEnable(Type);
-    m_activeTextureTarget = Type;
-    doneCurrent();
-}
-
-void MythRenderOpenGL::DisableTextures(void)
-{
-    if (isOpenGLES() || !m_activeTextureTarget)
-        return;
-
-    makeCurrent();
-    glDisable(m_activeTextureTarget);
-    m_activeTextureTarget = 0;
     doneCurrent();
 }
 
@@ -731,7 +751,6 @@ void MythRenderOpenGL::DrawBitmap(MythGLTexture *Texture, QOpenGLFramebufferObje
     SetShaderProgramParams(Program, m_transforms.top(), "u_transform");
 
     GLenum textarget = Texture->m_target;
-    EnableTextures(textarget);
     Program->setUniformValue("s_texture0", 0);
     ActiveTexture(GL_TEXTURE0);
     if (Texture->m_texture)
@@ -791,7 +810,6 @@ void MythRenderOpenGL::DrawBitmap(MythGLTexture **Textures, uint TextureCount,
     SetShaderProgramParams(Program, m_transforms.top(), "u_transform");
 
     GLenum textarget = first->m_target;
-    EnableTextures(textarget);
     uint active_tex = 0;
     for (uint i = 0; i < TextureCount; i++)
     {
@@ -868,8 +886,6 @@ void MythRenderOpenGL::DrawRoundRect(QOpenGLFramebufferObject *Target,
     QRect tr(r.left() + r.width() - rad, r.top(), rad, rad);
     QRect bl(r.left(),  r.top() + r.height() - rad, rad, rad);
     QRect br(r.left() + r.width() - rad, r.top() + r.height() - rad, rad, rad);
-
-    DisableTextures();
 
     glEnableVertexAttribArray(VERTEX_INDEX);
 

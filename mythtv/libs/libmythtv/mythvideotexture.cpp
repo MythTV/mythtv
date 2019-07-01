@@ -619,7 +619,6 @@ MythVideoTexture* MythVideoTexture::CreateHelperTexture(MythRenderOpenGL *Contex
     StoreBicubicWeights(0, buf);
     StoreBicubicWeights(1, &buf[(width - 1) << 2]);
 
-    Context->EnableTextures();
     texture->m_texture->bind();
     texture->m_texture->setData(texture->m_pixelFormat, texture->m_pixelType, buf);
     LOG(VB_PLAYBACK, LOG_INFO, LOC +

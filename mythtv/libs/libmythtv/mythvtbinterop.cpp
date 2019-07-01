@@ -258,7 +258,6 @@ vector<MythVideoTexture*> MythVTBSurfaceInterop::Acquire(MythRenderOpenGL *Conte
         if (!texture)
             continue;
         texture->m_allowGLSLDeint = true;
-        m_context->EnableTextures(QOpenGLTexture::TargetRectangle);
         m_context->glBindTexture(texture->m_target, texture->m_textureId);
 
         GLenum format = (plane == 0) ? QOpenGLTexture::Red : QOpenGLTexture::RG;;

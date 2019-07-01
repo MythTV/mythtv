@@ -126,8 +126,6 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     void  SetTextureFilters(MythGLTexture *Texture, QOpenGLTexture::Filter Filter,
                             QOpenGLTexture::WrapMode Wrap = QOpenGLTexture::ClampToEdge);
     void  ActiveTexture(GLuint ActiveTex);
-    void  EnableTextures(GLenum Type = QOpenGLTexture::Target2D);
-    void  DisableTextures(void);
     void  DeleteTexture(MythGLTexture *Texture);
     int   GetBufferSize(QSize Size, QOpenGLTexture::PixelFormat Format, QOpenGLTexture::PixelType Type);
 
@@ -207,11 +205,11 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     int        m_maxTextureSize;
     int        m_maxTextureUnits;
     int        m_colorDepth;
+    bool       m_coreProfile;
 
     // State
     QRect      m_viewport;
     GLuint     m_activeTexture;
-    GLenum     m_activeTextureTarget;
     bool       m_blend;
     int32_t    m_background;
     bool       m_fullRange;
@@ -220,6 +218,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     QMatrix4x4 m_parameters;
     QHash<QString,QMatrix4x4> m_cachedMatrixUniforms;
     QHash<QOpenGLShaderProgram*, QHash<QByteArray, GLint> > m_cachedUniformLocations;
+    GLuint     m_vao; // core profile only
 
     // For Performance improvement set false to disable glFlush.
     // Needed for Raspberry pi
