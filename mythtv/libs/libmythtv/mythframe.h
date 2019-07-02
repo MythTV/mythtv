@@ -390,15 +390,15 @@ static inline int height_for_plane(VideoFrameType Type, int Height, uint Plane)
         case FMT_YUV420P12:
         case FMT_YUV420P14:
         case FMT_YUV420P16:
+            if (Plane == 0) return Height;
+            if (Plane < 3)  return Height >> 1;
+            break;
         case FMT_YUV422P:
         case FMT_YUV422P9:
         case FMT_YUV422P10:
         case FMT_YUV422P12:
         case FMT_YUV422P14:
         case FMT_YUV422P16:
-            if (Plane == 0) return Height;
-            if (Plane < 3)  return Height >> 1;
-            break;
         case FMT_YUV444P:
         case FMT_YUV444P9:
         case FMT_YUV444P10:
