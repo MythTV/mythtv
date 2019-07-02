@@ -8,7 +8,7 @@ using std::min;
 #include <QWindow>
 #include <QWidget>
 #include <QGuiApplication>
-#include <QOpenGLFunctions_3_2_Core>
+#include <QOpenGLExtraFunctions>
 
 // MythTV
 #include "mythcorecontext.h"
@@ -192,9 +192,9 @@ MythRenderOpenGL::~MythRenderOpenGL()
 
     if (m_coreProfile && m_vao)
     {
-        QOpenGLFunctions_3_2_Core* core = versionFunctions<QOpenGLFunctions_3_2_Core>();
-        if (core)
-            core->glDeleteVertexArrays(1, &m_vao);
+        QOpenGLExtraFunctions extra(nullptr);
+        extra.initializeOpenGLFunctions();
+        extra.glDeleteVertexArrays(1, &m_vao);
     }
 
     disconnect(this, &QOpenGLContext::aboutToBeDestroyed, this, &MythRenderOpenGL::contextToBeDestroyed);
@@ -329,12 +329,10 @@ bool MythRenderOpenGL::Init(void)
     // workaround for the time being
     if (m_coreProfile)
     {
-        QOpenGLFunctions_3_2_Core* core = versionFunctions<QOpenGLFunctions_3_2_Core>();
-        if (core)
-        {
-            core->glGenVertexArrays(1, &m_vao);
-            core->glBindVertexArray(m_vao);
-        }
+        QOpenGLExtraFunctions extra(nullptr);
+        extra.initializeOpenGLFunctions();
+        extra.glGenVertexArrays(1, &m_vao);
+        extra.glBindVertexArray(m_vao);
     }
 
     DebugFeatures();
