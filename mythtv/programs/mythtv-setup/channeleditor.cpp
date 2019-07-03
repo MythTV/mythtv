@@ -105,6 +105,7 @@ bool ChannelEditor::Create()
     // Sort List
     new MythUIButtonListItem(sortList, tr("Channel Name"));
     new MythUIButtonListItem(sortList, tr("Channel Number"));
+    new MythUIButtonListItem(sortList, tr("Multiplex Frequency"));
     connect(m_sourceList, SIGNAL(itemSelected(MythUIButtonListItem *)),
             SLOT(setSourceID(MythUIButtonListItem *)));
     sortList->SetValue(m_currentSortMode);
@@ -245,9 +246,12 @@ void ChannelEditor::fillList(void)
     bool fAllSources = true;
 
     QString querystr = "SELECT channel.name,channum,chanid,callsign,icon,"
-                       "visible ,videosource.name FROM channel "
+                       "channel.visible ,videosource.name, serviceid, "
+                       "dtv_multiplex.frequency FROM channel "
                        "LEFT JOIN videosource ON "
-                       "(channel.sourceid = videosource.sourceid) ";
+                       "(channel.sourceid = videosource.sourceid) "
+                       "LEFT JOIN dtv_multiplex ON "
+                       "(channel.mplexid = dtv_multiplex.mplexid)";
 
     if (m_sourceFilter == FILTER_ALL)
     {
@@ -267,6 +271,10 @@ void ChannelEditor::fillList(void)
     else if (m_currentSortMode == tr("Channel Number"))
     {
         querystr += " ORDER BY channum + 0";
+    }
+    else if (m_currentSortMode == tr("Multiplex Frequency"))
+    {
+        querystr += " ORDER BY dtv_multiplex.frequency, serviceid";
     }
 
     MSqlQuery query(MSqlQuery::InitCon());
