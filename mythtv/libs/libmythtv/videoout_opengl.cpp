@@ -33,7 +33,7 @@ void VideoOutputOpenGL::GetRenderOptions(render_opts &Options,
                 "opengldoubleratefieldorder";
 
     QStringList safe;
-    safe << "opengl" << "opengl-yv12" << "opengl-hquyv";
+    safe << "opengl" << "opengl-yv12";
 
     // all profiles can handle all software frames
     (*Options.safe_renderers)["dummy"].append(safe);
@@ -58,12 +58,6 @@ void VideoOutputOpenGL::GetRenderOptions(render_opts &Options,
     Options.deints->insert("opengl", SoftwareDeinterlacers + gldeints);
     (*Options.osds)["opengl"].append("opengl2");
     Options.priorities->insert("opengl", 65);
-
-    // OpenGL HQ UYV
-    Options.renderers->append("opengl-hquyv");
-    Options.deints->insert("opengl-hquyv", SoftwareDeinterlacers + gldeints);
-    (*Options.osds)["opengl-hquyv"].append("opengl2");
-    Options.priorities->insert("opengl-hquyv", 60);
 
     // OpenGL YV12
     Options.renderers->append("opengl-yv12");
@@ -653,7 +647,7 @@ QStringList VideoOutputOpenGL::GetAllowedRenderers(MythCodecID CodecId, const QS
 
     if (codec_sw_copy(CodecId))
     {
-        allowed << "opengl" << "opengl-yv12" << "opengl-hquyv";
+        allowed << "opengl" << "opengl-yv12";
         return allowed;
     }
 

@@ -1,6 +1,5 @@
 // MythTV
 #include "mythlogging.h"
-#include "util-opengl.h"
 #include "mythvideotexture.h"
 
 #define LOC QString("MythVidTex: ")
@@ -188,9 +187,6 @@ vector<MythVideoTexture*> MythVideoTexture::CreateSoftwareTextures(MythRenderOpe
                 size.setWidth(size.width() >> 1);
                 texture = CreateTexture(Context, size, Target);
                 break;
-            case FMT_YUYVHQ:
-                texture = CreateTexture(Context, size, Target);
-                break;
             case FMT_NV12:
                 if (plane == 0)
                 {
@@ -313,7 +309,6 @@ void MythVideoTexture::UpdateTextures(MythRenderOpenGL *Context,
                 {
                     case FMT_YV12:   YV12ToYV12(Context, Frame, texture, i); break;
                     case FMT_YUY2:   YV12ToYUYV(Frame, texture);    break;
-                    case FMT_YUYVHQ: YV12ToYUYVHQ(Frame, texture);  break;
                     default: break;
                 }
                 break;
@@ -519,31 +514,6 @@ inline void MythVideoTexture::YV12ToYUYV(const VideoFrame *Frame, MythVideoTextu
 
     // Update
     Texture->m_texture->setData(Texture->m_pixelFormat, Texture->m_pixelType, buffer);
-    Texture->m_valid = true;
-}
-
-/// \brief Copy YV12 frame data to a YUYV texture with high quality interlaced chroma sampling.
-inline void MythVideoTexture::YV12ToYUYVHQ(const VideoFrame *Frame, MythVideoTexture *Texture)
-{
-    // Create a buffer
-    if (!Texture->m_data)
-        if (!CreateBuffer(Texture, Texture->m_bufferSize))
-            return;
-
-    // Convert
-    if (Frame->interlaced_frame)
-    {
-        pack_yv12interlaced(Frame->buf, static_cast<unsigned char*>(Texture->m_data),
-                            Frame->offsets, Frame->pitches, Texture->m_size);
-    }
-    else
-    {
-        pack_yv12progressive(Frame->buf, static_cast<unsigned char*>(Texture->m_data),
-                             Frame->offsets, Frame->pitches, Texture->m_size);
-    }
-
-    // Update
-    Texture->m_texture->setData(Texture->m_pixelFormat, Texture->m_pixelType, Texture->m_data);
     Texture->m_valid = true;
 }
 

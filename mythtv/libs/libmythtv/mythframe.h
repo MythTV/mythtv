@@ -46,7 +46,6 @@ typedef enum FrameType_
     FMT_YUV444P16,
     // Packed YUV
     FMT_YUY2,
-    FMT_YUYVHQ, // temporary
     // NV12 and variants
     FMT_NV12,
     FMT_P010,
@@ -102,7 +101,7 @@ static inline int format_is_nv12(VideoFrameType Type)
 
 static inline int format_is_packed(VideoFrameType Type)
 {
-    return (Type == FMT_YUYVHQ) || (Type == FMT_YUY2);
+    return Type == FMT_YUY2;
 }
 
 static inline int format_is_yuv(VideoFrameType Type)
@@ -367,7 +366,6 @@ static inline int pitch_for_plane(VideoFrameType Type, int Width, uint Plane)
             if (Plane < 2) return Width << 1;
             break;
         case FMT_YUY2:
-        case FMT_YUYVHQ:
         case FMT_RGB24:
         case FMT_ARGB32:
         case FMT_RGBA32:
@@ -414,7 +412,6 @@ static inline int height_for_plane(VideoFrameType Type, int Height, uint Plane)
             if (Plane < 2) return Height >> 1;
             break;
         case FMT_YUY2:
-        case FMT_YUYVHQ:
         case FMT_RGB24:
         case FMT_ARGB32:
         case FMT_RGBA32:
@@ -531,7 +528,6 @@ static inline uint planes(VideoFrameType Type)
         case FMT_P016:
         case FMT_NV12:      return 2;
         case FMT_YUY2:
-        case FMT_YUYVHQ:
         case FMT_BGRA:
         case FMT_ARGB32:
         case FMT_RGB24:
@@ -557,7 +553,6 @@ static inline int bitsperpixel(VideoFrameType Type)
         case FMT_RGBA32:
         case FMT_ARGB32:
         case FMT_RGB32:
-        case FMT_YUYVHQ:
         case FMT_YUV422P9:
         case FMT_YUV422P10:
         case FMT_YUV422P12:
@@ -597,8 +592,8 @@ static inline uint buffersize(VideoFrameType type, int width, int height,
                               int _aligned = 64)
 {
     int  type_bpp = bitsperpixel(type);
-    uint bpp = type_bpp / 4; /* bits per pixel div common factor */
-    uint bpb =  8 / 4; /* bits per byte div common factor */
+    int bpp = type_bpp / 4; /* bits per pixel div common factor */
+    int bpb =  8 / 4; /* bits per byte div common factor */
 
     // make sure all our pitches are a multiple of 16 bytes
     // as U and V channels are half the size of Y channel
@@ -606,19 +601,12 @@ static inline uint buffersize(VideoFrameType type, int width, int height,
     // If the buffer sizes are not 32 bytes aligned, adjust.
     // old versions of MythTV allowed people to set invalid
     // dimensions for MPEG-4 capture, no need to segfault..
-    uint adj_w;
-    uint adj_h = (height + 15) & ~0xf;
-    if (!_aligned)
-    {
-        adj_w = width;
-    }
-    else
-    {
-        adj_w = (width  + _aligned - 1) & ~(_aligned - 1);
-    }
+    int adj_w = _aligned ? ((width  + _aligned - 1) & ~(_aligned - 1)) : width;
+    int adj_h = (height + 15) & ~0xf;
+
     // Calculate rounding as necessary.
-    uint remainder = (adj_w * adj_h * bpp) % bpb;
-    return (adj_w * adj_h * bpp) / bpb + (remainder ? 1 : 0);
+    int remainder = (adj_w * adj_h * bpp) % bpb;
+    return static_cast<uint>((adj_w * adj_h * bpp) / bpb + (remainder ? 1 : 0));
 }
 
 static inline void copybuffer(VideoFrame *dst, uint8_t *buffer,

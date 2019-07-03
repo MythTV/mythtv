@@ -294,7 +294,7 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Deint)
         QStringList defines;
         bool kernel = false;
         bool topfield = InterlacedTop == Type;
-        bool progressive = (Progressive == Type) || (Interlaced == Type) || (Deint == DEINT_NONE);
+        bool progressive = (Progressive == Type) || (Deint == DEINT_NONE);
         if (format_is_420(m_outputType) || format_is_422(m_outputType) || format_is_444(m_outputType))
         {
             defines << "YV12";
@@ -306,9 +306,9 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Deint)
             cost = 2;
         }
         else if (FMT_YUY2 == m_outputType)
-            defines << "YUYV" << "YUY2";
-        else if (FMT_YUYVHQ == m_outputType)
-            defines << "YUYV";
+        {
+            defines << "YUY2";
+        }
 
         // if primaries are disabled, the primaries conversion matrix will be identity
         // and we can optimise out the conversion.
@@ -330,8 +330,14 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Deint)
 #endif
         if (!progressive)
         {
+            // Chroma upsampling filter
+            if (format_is_420(m_outputType) || format_is_nv12(m_outputType))
+                defines << "CUE";
+
+            // field
             if (topfield)
                 defines << "TOPFIELD";
+
             switch (Deint)
             {
                 case DEINT_BASIC:  cost *= 2;  defines << defines << "ONEFIELD"; break;
@@ -520,13 +526,8 @@ void OpenGLVideo::ProcessFrame(const VideoFrame *Frame, FrameScanType Scan)
         (Frame->codec  != m_inputType))
     {
         VideoFrameType frametype = Frame->codec;
-        if (frametype == FMT_YV12)
-        {
-            if (m_profile == "opengl")
-                frametype = FMT_YUY2;
-            else if (m_profile == "opengl-hquyv")
-                frametype = FMT_YUYVHQ;
-        }
+        if ((frametype == FMT_YV12) && (m_profile == "opengl"))
+            frametype = FMT_YUY2;
         QSize size(Frame->width, Frame->height);
         if (!SetupFrameFormat(Frame->codec, frametype, size, QOpenGLTexture::Target2D))
             return;
@@ -620,10 +621,7 @@ void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanT
 
     // Determine which shader to use. This helps optimise the resize check.
     bool deinterlacing = false;
-    VideoShaderType program = Progressive;
-    if (!format_is_yuv(m_outputType))
-        program = Default;
-
+    VideoShaderType program = format_is_yuv(m_outputType) ? Progressive :  Default;
     if (m_deinterlacer != DEINT_NONE)
     {
         if (Scan == kScan_Interlaced)
@@ -863,7 +861,6 @@ QString OpenGLVideo::TypeToProfile(VideoFrameType Type)
     {
         case FMT_YUY2:    return "opengl"; // compatibility with old profiles
         case FMT_YV12:    return "opengl-yv12";
-        case FMT_YUYVHQ:  return "opengl-hquyv";
         case FMT_NV12:    return "opengl-nv12";
         default: break;
     }

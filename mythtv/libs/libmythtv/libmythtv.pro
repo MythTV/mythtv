@@ -475,8 +475,6 @@ using_frontend {
 
     using_opengl {
         DEFINES += USING_OPENGL
-        HEADERS += util-opengl.h
-        SOURCES += util-opengl.cpp
         using_opengles: DEFINES += USING_OPENGLES
     }
 

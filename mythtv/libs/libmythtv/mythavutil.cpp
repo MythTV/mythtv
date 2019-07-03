@@ -52,7 +52,6 @@ AVPixelFormat FrameTypeToPixelFormat(VideoFrameType type)
         case FMT_ARGB32:     return AV_PIX_FMT_ARGB;
         case FMT_RGBA32:     return AV_PIX_FMT_RGBA;
         case FMT_YUY2:       return AV_PIX_FMT_UYVY422;
-        case FMT_YUYVHQ:     return AV_PIX_FMT_NONE;
         case FMT_VDPAU:      return AV_PIX_FMT_VDPAU;
         case FMT_VTB:        return AV_PIX_FMT_VIDEOTOOLBOX;
         case FMT_VAAPI:      return AV_PIX_FMT_VAAPI;

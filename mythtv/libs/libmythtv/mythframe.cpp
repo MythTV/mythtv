@@ -48,7 +48,6 @@ const char* format_description(VideoFrameType Type)
         case FMT_BGRA:       return "BGRA";
         case FMT_YUY2:       return "YUY2";
         case FMT_NV12:       return "NV12";
-        case FMT_YUYVHQ:     return "YUYVHQ";
         case FMT_P010:       return "P010";
         case FMT_P016:       return "P016";
         case FMT_YUV420P9:   return "YUV420P9";

@@ -1486,9 +1486,9 @@ QString VideoDisplayProfile::GetVideoRendererHelp(const QString &renderer)
     if (renderer == "opengl")
     {
         msg = QObject::tr(
-            "Video is converted to an intermediate format by the CPU (UYVY) "
+            "Video is converted to an intermediate format by the CPU (YUV2) "
             "before OpenGL is used for color conversion, scaling, picture controls"
-            " and optionally deinterlacing. Processing is balanced between the CPU"
+            " and optionally deinterlacing. Processing is balanced between the CPU "
             "and GPU.");
     }
 
@@ -1498,15 +1498,6 @@ QString VideoDisplayProfile::GetVideoRendererHelp(const QString &renderer)
             "OpenGL is used for all color conversion, scaling, picture "
             "controls and optionally deinterlacing. CPU load is low but a more "
             "powerful GPU is needed for deinterlacing.");
-    }
-
-    if (renderer == "opengl-hquyv")
-    {
-        msg = QObject::tr(
-            "This renderer uses a higher quality CPU conversion for interlaced "
-            "content before using OpenGL for color conversion, scaling, picture"
-            " controls and optionally deinterlacing. CPU load is higher "
-            "particularly on embedded systems.");
     }
 
     if (renderer == "opengl-hw")

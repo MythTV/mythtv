@@ -29,8 +29,7 @@ class OpenGLVideo : public QObject
         Progressive   = 1, // Progressive video frame
         InterlacedTop = 2, // Deinterlace with top field first
         InterlacedBot = 3, // Deinterlace with bottom field first
-        Interlaced    = 4, // Interlaced but do not deinterlace
-        ShaderCount   = 5
+        ShaderCount   = 4
     };
 
     static QString        TypeToProfile(VideoFrameType Type);
