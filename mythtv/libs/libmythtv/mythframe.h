@@ -138,6 +138,7 @@ typedef struct VideoFrame_
     int bpp;
     int size;
     long long frameNumber;
+    long long frameCounter; ///< raw frame counter/ticker for discontinuity checks
     long long timecode;
     int64_t   disp_timecode;
     unsigned char *priv[4]; ///< random empty storage
@@ -232,6 +233,7 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
     vf->frame_rate = _rate;
     vf->size         = _size;
     vf->frameNumber  = 0;
+    vf->frameCounter = 0;
     vf->timecode     = 0;
     vf->interlaced_frame = 1;
     vf->interlaced_reversed = 0;

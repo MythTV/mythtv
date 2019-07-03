@@ -856,7 +856,7 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context
 
     if (needreferenceframes)
     {
-        if (abs(Frame->frameNumber - m_discontinuityCounter) > 1)
+        if (abs(Frame->frameCounter - m_discontinuityCounter) > 1)
             CleanupReferenceFrames();
         RotateReferenceFrames(reinterpret_cast<AVBufferRef*>(Frame->priv[0]));
     }
@@ -864,7 +864,7 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context
     {
         CleanupReferenceFrames();
     }
-    m_discontinuityCounter = Frame->frameNumber;
+    m_discontinuityCounter = Frame->frameCounter;
 
     // return cached texture if available
     if (m_openglTextures.contains(id))

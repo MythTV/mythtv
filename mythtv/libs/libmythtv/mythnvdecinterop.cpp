@@ -267,7 +267,7 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
 
     if (needreferences)
     {
-        if (abs(Frame->frameNumber - m_discontinuityCounter) > 1)
+        if (abs(Frame->frameCounter - m_discontinuityCounter) > 1)
             m_referenceFrames.clear();
 
         RotateReferenceFrames(cudabuffer);
@@ -295,7 +295,7 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
     {
         m_referenceFrames.clear();
     }
-    m_discontinuityCounter = Frame->frameNumber;
+    m_discontinuityCounter = Frame->frameCounter;
 
     return result;
 }

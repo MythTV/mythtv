@@ -3882,6 +3882,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
             xf->colortransfer = mpa_pic->color_trc;
             xf->chromalocation = mpa_pic->chroma_location;
             xf->frameNumber = m_framesPlayed;
+            xf->frameCounter = m_frameCounter++;
             xf->aspect = m_current_aspect;
             xf->deinterlace_inuse = DEINT_NONE;
             xf->deinterlace_inuse2x = 0;
@@ -3983,6 +3984,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
         picframe->repeat_pict      = mpa_pic->repeat_pict;
         picframe->disp_timecode    = NormalizeVideoTimecode(stream, temppts);
         picframe->frameNumber      = m_framesPlayed;
+        picframe->frameCounter     = m_frameCounter++;
         picframe->aspect           = m_current_aspect;
         picframe->dummy            = 0;
         picframe->directrendering  = m_directrendering ? 1 : 0;
@@ -5411,6 +5413,7 @@ bool AvFormatDecoder::GenerateDummyVideoFrames(void)
         frame->interlaced_reversed = 0;
         frame->repeat_pict      = 0; // not a repeated picture
         frame->frameNumber      = m_framesPlayed;
+        frame->frameCounter     = m_frameCounter++;
         frame->dummy            = 1;
         frame->colorspace       = AVCOL_SPC_BT709;
         frame->colorrange       = AVCOL_RANGE_MPEG;

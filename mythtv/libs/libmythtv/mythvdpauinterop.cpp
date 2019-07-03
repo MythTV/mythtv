@@ -303,7 +303,7 @@ vector<MythVideoTexture*> MythVDPAUInterop::Acquire(MythRenderOpenGL *Context,
 
     if ((deinterlacer == DEINT_HIGH) || (deinterlacer == DEINT_MEDIUM))
     {
-        if (abs(Frame->frameNumber - m_discontinuityCounter) > 1)
+        if (abs(Frame->frameCounter - m_discontinuityCounter) > 1)
             CleanupDeinterlacer();
         RotateReferenceFrames(reinterpret_cast<AVBufferRef*>(Frame->priv[0]));
     }
@@ -311,7 +311,7 @@ vector<MythVideoTexture*> MythVDPAUInterop::Acquire(MythRenderOpenGL *Context,
     {
         CleanupDeinterlacer();
     }
-    m_discontinuityCounter = Frame->frameNumber;
+    m_discontinuityCounter = Frame->frameCounter;
 
     // We need a mixer, an output surface and mapped texture
     if (!InitVDPAU(devicecontext, surface, deinterlacer, doublerate))

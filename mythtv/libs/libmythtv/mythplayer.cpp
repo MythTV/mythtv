@@ -2113,13 +2113,8 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
             framedue = unow + frame_interval / 2;
 
         // recalculate framesPlayed to conform to actual time code.
-
-        // MK 26/6/19 I've disabled this for now as it causes jumps in the frame
-        // numbers which prevent the VideoOutput classes detecting a discontinuity
-        // and releasing out of date reference frames for multi-frame deinterlacers
-
-        //framesPlayed = TranslatePositionMsToFrame(videotimecode + m_timeOffsetBase, false);
-        //decoder->SetFramesPlayed(framesPlayed);
+        framesPlayed = TranslatePositionMsToFrame(videotimecode + m_timeOffsetBase, false);
+        decoder->SetFramesPlayed(framesPlayed);
 
         lateness = unow - framedue;
         dropframe = false;

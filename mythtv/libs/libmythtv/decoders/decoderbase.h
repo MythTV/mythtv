@@ -305,6 +305,7 @@ class DecoderBase
 
     long long            m_framesPlayed            {0};
     long long            m_framesRead              {0};
+    long long            m_frameCounter            {0};
     AVRational           m_totalDuration;
     long long            m_lastKey                 {0};
     int                  m_keyframedist            {-1};

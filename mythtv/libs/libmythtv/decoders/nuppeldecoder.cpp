@@ -1183,6 +1183,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype, bool&)
 
             buf->aspect = m_current_aspect;
             buf->frameNumber = m_framesPlayed;
+            buf->frameCounter = m_frameCounter++;
             buf->dummy = 0;
             GetPlayer()->ReleaseNextVideoFrame(buf, m_frameheader.timecode);
 

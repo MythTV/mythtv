@@ -84,7 +84,7 @@ void VideoOutputNull::CreatePauseFrame(void)
          m_videoBuffers.GetScratchFrame()->size);
 
     av_pause_frame.frameNumber = m_videoBuffers.GetScratchFrame()->frameNumber;
-
+    av_pause_frame.frameCounter = m_videoBuffers.GetScratchFrame()->frameCounter;
     clear(&av_pause_frame);
 }
 

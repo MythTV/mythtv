@@ -787,6 +787,7 @@ void VideoOutput::CopyFrame(VideoFrame *To, const VideoFrame *From)
 
     To->frameNumber = From->frameNumber;
     To->disp_timecode = From->disp_timecode;
+    To->frameCounter = From->frameCounter;
 
     copy(To, From);
 }

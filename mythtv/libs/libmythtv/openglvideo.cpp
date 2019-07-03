@@ -547,7 +547,7 @@ void OpenGLVideo::ProcessFrame(const VideoFrame *Frame, FrameScanType Scan)
     {
         if (!m_nextTextures.empty() && !m_prevTextures.empty())
         {
-            if (abs(Frame->frameNumber - m_discontinuityCounter) > 1)
+            if (abs(Frame->frameCounter - m_discontinuityCounter) > 1)
                 ResetTextures();
             vector<MythVideoTexture*> temp = m_prevTextures;
             m_prevTextures = m_inputTextures;
@@ -556,7 +556,7 @@ void OpenGLVideo::ProcessFrame(const VideoFrame *Frame, FrameScanType Scan)
             current = false;
         }
     }
-    m_discontinuityCounter = Frame->frameNumber;
+    m_discontinuityCounter = Frame->frameCounter;
 
     MythVideoTexture::UpdateTextures(m_render, Frame, current ? m_inputTextures : m_nextTextures);
 
