@@ -310,12 +310,6 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Deint)
             defines << "YUY2";
         }
 
-        // if primaries are disabled, the primaries conversion matrix will be identity
-        // and we can optimise out the conversion.
-        QMatrix4x4 primaries = m_videoColourSpace->GetPrimaryMatrix();
-        if (!primaries.isIdentity())
-            defines << "PRIMARIES";
-
 #ifdef USING_VTB
         // N.B. Rectangular texture support is only currently used for VideoToolBox
         // video frames which are NV12. Do not use rectangular textures for the 'default'
@@ -380,6 +374,9 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Deint)
             }
         }
 
+        // Retrieve colour mappping defines
+        defines << m_videoColourSpace->GetColourMappingDefines();
+
         // Add defines
         QString glsldefines;
         foreach (QString define, defines)
@@ -399,8 +396,9 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Deint)
         QString glslsamplers;
         for (int i = start; i < end; ++i)
             glslsamplers += QString("uniform sampler2D s_texture%1;\n").arg(i);
-        fragment = glsldefines + YUVFragmentExtensions + glslsamplers + fragment;
 
+        // construct the final shader string
+        fragment = glsldefines + YUVFragmentExtensions + glslsamplers + fragment;
     }
 
     m_shaderCost[Type] = cost;

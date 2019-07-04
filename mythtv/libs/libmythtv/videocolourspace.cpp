@@ -429,6 +429,16 @@ void VideoColourSpace::SetAlpha(int Value)
     Update();
 }
 
+QStringList VideoColourSpace::GetColourMappingDefines(void)
+{
+    QStringList result;
+    if (m_primaryMatrix.isIdentity())
+        return result;
+
+    result << "COLOURMAPPING";
+    return result;
+}
+
 QMatrix4x4 VideoColourSpace::GetPrimaryMatrix(void)
 {
     return m_primaryMatrix;
@@ -549,6 +559,8 @@ inline float CalcRy(const float By, const float Gy)
  *
  * This is a joyous mindbender. There are various explanations on the interweb
  * but this is based on the Kodi implementation - with due credit to Team Kodi.
+ *
+ * \note We use QMatrix4x4 because QMatrix3x3 has no inverted method.
  */
 QMatrix4x4 VideoColourSpace::RGBtoXYZ(ColourPrimaries Primaries)
 {

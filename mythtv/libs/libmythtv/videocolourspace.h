@@ -20,14 +20,15 @@ class VideoColourSpace : public QObject, public QMatrix4x4, public ReferenceCoun
   public:
     explicit VideoColourSpace(VideoColourSpace *Parent = nullptr);
 
-    bool  UpdateColourSpace(const VideoFrame *Frame);
+    bool          UpdateColourSpace(const VideoFrame *Frame);
     PictureAttributeSupported SupportedAttributes(void) const;
-    void  SetSupportedAttributes(PictureAttributeSupported Supported);
-    int   GetPictureAttribute(PictureAttribute Attribute);
-    void  SetAlpha(int Value);
-    QMatrix4x4 GetPrimaryMatrix(void);
-    float GetColourGamma(void);
-    float GetDisplayGamma(void);
+    void          SetSupportedAttributes(PictureAttributeSupported Supported);
+    int           GetPictureAttribute(PictureAttribute Attribute);
+    void          SetAlpha(int Value);
+    QMatrix4x4    GetPrimaryMatrix(void);
+    QStringList   GetColourMappingDefines(void);
+    float         GetColourGamma(void);
+    float         GetDisplayGamma(void);
     PrimariesMode GetPrimariesMode(void);
 
     struct ColourPrimaries
