@@ -2711,7 +2711,21 @@ QString CardUtil::GetDeviceName(dvb_dev_type_t type, const QString &device)
         return devname;
     }
     if (DVB_DEV_CA == type)
-        return devname.replace(devname.indexOf("frontend"), 8, "ca");
+    {
+        tmp = tmp.replace(devname.indexOf("frontend"), 8, "ca");
+        if (QFile::exists(tmp))
+        {
+            LOG(VB_RECORD, LOG_DEBUG, LOC +
+                QString("Adapter Frontend ca number matches (%1)").arg(tmp));
+            return tmp;
+        }
+
+        // use ca0, allows multi-standard frontends, which only have one ca
+        devname = devname.replace(devname.indexOf("frontend"), 9, "ca0");
+        LOG(VB_RECORD, LOG_DEBUG, LOC +
+            QString("Adapter Frontend ca number not matching, using ca0 instead (%1)").arg(devname));
+        return devname;
+    }
     if (DVB_DEV_AUDIO == type)
         return devname.replace(devname.indexOf("frontend"), 8, "audio");
     if (DVB_DEV_VIDEO == type)

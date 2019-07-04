@@ -1525,7 +1525,7 @@ ScanDTVTransportList ChannelScanSM::GetChannelList(bool addFullTS) const
 
                 // Use transport stream ID as (fake) service ID
                 // to use in callsign and as channel number
-                info.m_service_id = info.m_pat_tsid;
+                info.m_service_id = info.m_sdt_tsid ? info.m_sdt_tsid : info.m_pat_tsid;
 
                 if (tuner_type == DTVTunerType::kTunerTypeASI)
                     info.m_callsign = QString("MPTS_%1")
@@ -1548,6 +1548,7 @@ ScanDTVTransportList ChannelScanSM::GetChannelList(bool addFullTS) const
                 info.m_atsc_minor_channel = 0;
                 info.m_format = "MPTS";
                 info.m_use_on_air_guide = false;
+                info.m_is_encrypted = false;
                 item.m_channels.push_back(info);
             }
 

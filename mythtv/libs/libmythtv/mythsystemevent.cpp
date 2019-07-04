@@ -210,6 +210,7 @@ void MythSystemEventHandler::SubstituteMatches(const QStringList &tokens,
     }
 
     command.replace(QString("%VERBOSELEVEL%"), QString("%1").arg(verboseMask));
+    command.replace("%VERBOSEMODE%", QString("%1").arg(logPropagateArgs));
 
     LOG(VB_FILE, LOG_DEBUG, LOC + QString("SubstituteMatches: AFTER : %1")
                                             .arg(command));

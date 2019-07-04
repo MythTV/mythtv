@@ -138,6 +138,7 @@ void ScanWizard::Scan()
         ChannelImporter ci(true, true, true, true, false,
                            DoFreeToAirOnly(),
                            DoChannelNumbersOnly(),
+                           DoCompleteChannelsOnly(),
                            GetServiceRequirements());
         ci.Process(transports, sourceid);
     }
@@ -180,7 +181,7 @@ void ScanWizard::Scan()
             GetInputName(),           GetSourceID(),
             DoIgnoreSignalTimeout(),  DoFollowNIT(),
             DoTestDecryption(),       DoFreeToAirOnly(),
-            DoChannelNumbersOnly(),
+            DoChannelNumbersOnly(),   DoCompleteChannelsOnly(),
             DoAddFullTS(),            GetServiceRequirements(),
             // stuff needed for particular scans
             GetMultiplex(),         start_chan,

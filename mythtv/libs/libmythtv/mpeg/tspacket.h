@@ -3,6 +3,7 @@
 #ifndef _TS_PACKET_H_
 #define _TS_PACKET_H_
 
+#include <chrono>
 #include <cstdlib>
 #include "mythcontext.h"
 #include "mythtvexp.h"
@@ -23,7 +24,10 @@
 class MTV_PUBLIC TSHeader
 {
   public:
-    TSHeader()
+    using Clock     = std::chrono::steady_clock;
+    using TimePoint = std::chrono::time_point<Clock, std::chrono::microseconds>;
+
+    TSHeader(void)
     {
         _tsdata[0] = SYNC_BYTE;
         /*
@@ -54,38 +58,73 @@ class MTV_PUBLIC TSHeader
     // gets
 
     //0.0  8 bits SYNC_BYTE
-    bool HasSync() const { return SYNC_BYTE == _tsdata[0]; }
+    bool HasSync(void) const { return SYNC_BYTE == _tsdata[0]; }
     //1.0  1 bit transport_packet_error (if set discard immediately:
     //       modem error)
-    bool TransportError() const { return bool(_tsdata[1]&0x80); }
+    bool TransportError(void) const { return bool(_tsdata[1]&0x80); }
     //1.1  1 bit payload_unit_start_indicator
     //  (if set this packet starts a section, and has pointerField)
-    bool PayloadStart() const { return bool(_tsdata[1]&0x40); }
+    bool PayloadStart(void) const { return bool(_tsdata[1]&0x40); }
        //1.2  1 bit transport_priority (ignore)
-    bool Priority() const { return bool(_tsdata[1]&0x20); }
+    bool Priority(void) const { return bool(_tsdata[1]&0x20); }
     //1.3  13 bit PID (packet ID, which transport stream)
-    inline unsigned int PID() const {
+    inline unsigned int PID(void) const {
         return ((_tsdata[1] << 8) + _tsdata[2]) & 0x1fff;
     }
     //3.0  2 bit transport_scrambling_control (00,01 OK; 10,11 scrambled)
-    unsigned int ScramblingControl() const { return (_tsdata[3] >> 6) & 0x3; }
+    unsigned int ScramblingControl(void) const { return (_tsdata[3] >> 6) & 0x3; }
     //3.2  2 bit adaptation_field_control
     //       (01-no adaptation field,payload only
     //        10-adaptation field only,no payload
     //        11-adaptation field followed by payload
     //        00-reserved)
-    unsigned int AdaptationFieldControl() const {
+    unsigned int AdaptationFieldControl(void) const {
         return (_tsdata[3] >> 4) & 0x3;
     }
     //3.4  4 bit continuity counter (should cycle 0->15 in sequence
     //       for each PID; if skip, we lost a packet; if dup, we can
     //       ignore packet)
-    unsigned int ContinuityCounter() const { return _tsdata[3] & 0xf; }
+    unsigned int ContinuityCounter(void) const { return _tsdata[3] & 0xf; }
 
     // shortcuts
-    bool Scrambled() const { return bool(_tsdata[3]&0x80); }
-    bool HasAdaptationField() const { return bool(_tsdata[3] & 0x20); }
-    bool HasPayload() const { return bool(_tsdata[3] & 0x10); }
+    bool Scrambled(void) const { return bool(_tsdata[3]&0x80); }
+    bool HasAdaptationField(void) const { return bool(_tsdata[3] & 0x20); }
+    size_t AdaptationFieldSize(void) const
+    { return (HasAdaptationField() ? static_cast<size_t>(_tsdata[4]) : 0); }
+    bool HasPayload(void) const { return bool(_tsdata[3] & 0x10); }
+
+    bool GetDiscontinuityIndicator(void) const
+    { return AdaptationFieldSize() > 0 && bool(_tsdata[5] & 0x80); }
+
+    bool HasPCR(void) const { return AdaptationFieldSize() > 0 &&
+                              bool(_tsdata[5] & 0x10); }
+
+    /*
+      The PCR field is a 42 bit field in the adaptation field of the
+      Transport Stream.  The PCR field consists of a 9 bit part that
+      increments at a 27MHz rate and a 33 bit part that increments at
+      a 90kHz rate (when the 27MHz part rolls over).
+    */
+    // The high-order 33bits (of the 48 total) are the 90kHz clock
+    int64_t GetPCRbase(void) const
+    { return ((static_cast<int64_t>(_tsdata[6]) << 25) |
+              (static_cast<int64_t>(_tsdata[7]) << 17) |
+              (static_cast<int64_t>(_tsdata[8]) << 9)  |
+              (static_cast<int64_t>(_tsdata[9]) << 1)  |
+              (_tsdata[10] >> 7)); }
+
+    // The low-order 9 bits (of the 48 total) are the 27MHz clock
+    int32_t GetPCRext(void) const
+    { return (((static_cast<int32_t>(_tsdata[10]) & 0x1) << 8) |
+              static_cast<int32_t>(_tsdata[11])); }
+
+    // PCR in a 27MHz clock
+    int64_t GetPCRraw(void) const
+    { return ((GetPCRbase() * 300) + GetPCRext()); }
+
+    // PCR as a time point
+    TimePoint GetPCR(void) const
+    { return TimePoint(std::chrono::microseconds(GetPCRraw() / 27)); }
 
     void SetTransportError(bool err) {
         if (err) _tsdata[1] |= 0x80; else _tsdata[1] &= (0xff-(0x80));
@@ -110,8 +149,8 @@ class MTV_PUBLIC TSHeader
         _tsdata[3] = (_tsdata[3] & 0xf0) | (cc & 0xf);
     }
 
-    const unsigned char* data() const { return _tsdata; }
-    unsigned char* data() { return _tsdata; }
+    const unsigned char* data(void) const { return _tsdata; }
+    unsigned char* data(void) { return _tsdata; }
 
     static const unsigned int kHeaderSize;
     static const unsigned char kPayloadOnlyHeader[4];
@@ -130,9 +169,9 @@ class MTV_PUBLIC TSPacket : public TSHeader
   public:
     /* note: payload is intenionally left uninitialized */
     // cppcheck-suppress uninitMemberVar
-    TSPacket() : TSHeader() { }
+    TSPacket(void) : TSHeader() { }
 
-    static TSPacket* CreatePayloadOnlyPacket()
+    static TSPacket* CreatePayloadOnlyPacket(void)
     {
         TSPacket *pkt = new TSPacket();
         pkt->InitHeader(kPayloadOnlyHeader);
@@ -141,7 +180,7 @@ class MTV_PUBLIC TSPacket : public TSHeader
         return pkt;
     }
 
-    inline TSPacket* CreateClone() const {
+    inline TSPacket* CreateClone(void) const {
         TSPacket *pkt = new TSPacket();
         memcpy(pkt, this, kSize);
         return pkt;
@@ -166,17 +205,17 @@ class MTV_PUBLIC TSPacket : public TSHeader
 
     // This points outside the TSHeader data, but is declared here because
     // it is used for the different types of packets that employ a TS Header
-    unsigned int AFCOffset() const { // only works if AFC fits in TSPacket
+    unsigned int AFCOffset(void) const { // only works if AFC fits in TSPacket
         return HasAdaptationField() ? _tspayload[0]+1+4 : 4;
     }
 
     //4.0  8 bits, iff payloadStart(), points to start of field
-    unsigned int StartOfFieldPointer() const 
+    unsigned int StartOfFieldPointer(void) const
         { return _tspayload[AFCOffset()-4]; }
-    void SetStartOfFieldPointer(uint sof) 
+    void SetStartOfFieldPointer(uint sof)
         { _tspayload[AFCOffset()-4] = sof; }
 
-    QString toString() const;
+    QString toString(void) const;
 
     static const unsigned int kSize;
     static const unsigned int kPayloadSize;

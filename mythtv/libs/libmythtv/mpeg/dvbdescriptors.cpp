@@ -512,7 +512,7 @@ QString ServiceDescriptorMapping::toString() const
     else if (IsTeletext())
         str.append(" (Teletext)");
     else
-        str.append(QString(" (Unknown %1)").arg(ServiceType(),2,16));
+        str.append(QString(" (Unknown 0x%1)").arg(ServiceType(),2,16,QChar('0')));
 
     return str;
 }

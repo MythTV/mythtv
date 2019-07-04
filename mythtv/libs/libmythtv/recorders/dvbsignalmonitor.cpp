@@ -222,11 +222,31 @@ void DVBSignalMonitor::UpdateValues(void)
             return;
         }
 
+        // Update signal status for display
+        DVBChannel *dvbchannel = GetDVBChannel();
+        if (dvbchannel)
+        {
+            // Get info from card
+            uint sig = (uint) (dvbchannel->GetSignalStrength() * 65535);
+            uint snr = (uint) (dvbchannel->GetSNR() * 65535);
+
+            // Set SignalMonitorValues from info from card.
+            {
+                QMutexLocker locker(&m_statusLock);
+
+                if (HasFlags(kSigMon_WaitForSig))
+                    m_signalStrength.SetValue(sig);
+                if (HasFlags(kDVBSigMon_WaitForSNR))
+                    signalToNoise.SetValue(snr);
+
+                // LOG(VB_CHANSCAN, LOG_DEBUG, LOC +
+                //     QString("Update sig:%1 snr:%2").arg(sig).arg(snr));
+            }
+        }
+
         EmitStatus();
         if (IsAllGood())
             SendMessageAllGood();
-
-        // TODO dtv signals...
 
         m_update_done = true;
         return;
@@ -273,7 +293,7 @@ void DVBSignalMonitor::UpdateValues(void)
 
         // BER and UB are actually uint32 values, but we
         // clamp them at 64K. This is because these values
-        // are acutally cumulative, but we don't try to
+        // are actually cumulative, but we don't try to
         // normalize these to a time period.
 
         wasLocked = m_signalLock.IsGood();

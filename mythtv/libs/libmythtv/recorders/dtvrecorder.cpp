@@ -1399,7 +1399,7 @@ void DTVRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt, bool insert)
     // If the PCRPID is valid and the PCR is not contained
     // in another stream, make sure the PCR stream is not
     // discarded (use PrivSec type as dummy 'valid' value)
-    if(pmt->PCRPID() != 0x1fff && pmt->FindPID(pmt->PCRPID()) == -1)
+    if (pmt->PCRPID() != 0x1fff && pmt->FindPID(pmt->PCRPID()) == -1)
         m_stream_id[pmt->PCRPID()] = StreamID::PrivSec;
 
     if (!m_ringBuffer)

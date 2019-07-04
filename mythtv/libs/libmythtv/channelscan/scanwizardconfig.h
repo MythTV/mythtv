@@ -44,6 +44,7 @@ class IgnoreSignalTimeout;
 class DesiredServices;
 class FreeToAirOnly;
 class ChannelNumbersOnly;
+class CompleteChannelsOnly;
 class AddFullTS;
 class TrustEncSISetting;
 

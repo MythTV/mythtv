@@ -76,6 +76,7 @@ class MPUBLIC ZMClient : public QObject
     bool sendReceiveStringList(QStringList &strList);
 
     QMutex              m_listLock          {QMutex::Recursive};
+    QMutex              m_commandLock       {QMutex::Recursive};
     QList<Monitor*>     m_monitorList;
     QMap<int, Monitor*> m_monitorMap;
 

@@ -19,6 +19,7 @@
  */
 
 #include <thread>
+#include <csignal>
 #include "commandlineparser.h"
 #include "MythExternRecApp.h"
 
@@ -101,11 +102,24 @@ bool MythExternRecApp::config(void)
     m_scan_command = settings.value("SCANNER/command", "").toString();
     m_scan_timeout = settings.value("SCANNER/timeout", "").toInt();
 
+    settings.beginGroup("ENVIRONMENT");
+
+    m_app_env.clear();
+    QStringList keys = settings.childKeys();
+    QStringList::const_iterator Ienv;
+    for (Ienv = keys.constBegin(); Ienv != keys.constEnd(); ++Ienv)
+    {
+        if (!(*Ienv).isEmpty() && (*Ienv)[0] != '#')
+            m_app_env.insert((*Ienv).toLocal8Bit().constData(),
+                             settings.value(*Ienv).toString());
+    }
+
     if (!m_channels_ini.isEmpty())
     {
         if (!QFileInfo::exists(m_channels_ini))
         {
-            // Assume the channels config is in the same directory as main config
+            // Assume the channels config is in the same directory as
+            // main config
             QDir conf_path = QFileInfo(m_config_ini).absolutePath();
             QFileInfo ini(conf_path, m_channels_ini);
             m_channels_ini = ini.absoluteFilePath();
@@ -128,6 +142,20 @@ bool MythExternRecApp::Open(void)
         LOG(VB_RECORD, LOG_ERR, LOC + ": No recorder provided.");
         emit SendMessage("Open", "0", "ERR:No recorder provided.");
         return false;
+    }
+
+    if (!m_app_env.isEmpty())
+    {
+        QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+        QMap<QString, QString>::const_iterator Ienv;
+        for (Ienv = m_app_env.constBegin();
+             Ienv != m_app_env.constEnd(); ++Ienv)
+        {
+            env.insert(Ienv.key(), Ienv.value());
+            LOG(VB_RECORD, LOG_INFO, LOC + QString(" ENV: '%1' = '%2'")
+                .arg(Ienv.key()).arg(Ienv.value()));
+        }
+        m_proc.setProcessEnvironment(env);
     }
 
     QObject::connect(&m_proc, &QProcess::started, this,
@@ -162,6 +190,31 @@ bool MythExternRecApp::Open(void)
     return true;
 }
 
+void MythExternRecApp::TerminateProcess(void)
+{
+    if (m_proc.state() == QProcess::Running)
+    {
+        LOG(VB_RECORD, LOG_INFO, LOC +
+            QString("Sending SIGINT to %1").arg(m_proc.pid()));
+        kill(m_proc.pid(), SIGINT);
+        m_proc.waitForFinished(5000);
+    }
+    if (m_proc.state() == QProcess::Running)
+    {
+        LOG(VB_RECORD, LOG_INFO, LOC +
+            QString("Sending SIGTERM to %1").arg(m_proc.pid()));
+        m_proc.terminate();
+        m_proc.waitForFinished();
+    }
+    if (m_proc.state() == QProcess::Running)
+    {
+        LOG(VB_RECORD, LOG_INFO, LOC +
+            QString("Sending SIGKILL to %1").arg(m_proc.pid()));
+        m_proc.kill();
+        m_proc.waitForFinished();
+    }
+}
+
 Q_SLOT void MythExternRecApp::Close(void)
 {
     if (m_run)
@@ -175,10 +228,7 @@ Q_SLOT void MythExternRecApp::Close(void)
     if (m_proc.state() == QProcess::Running)
     {
         m_proc.closeReadChannel(QProcess::StandardOutput);
-        m_proc.terminate();
-        m_proc.waitForFinished();
-        m_proc.kill();
-        m_proc.waitForFinished();
+        TerminateProcess();
         std::this_thread::sleep_for(std::chrono::microseconds(50));
     }
 
@@ -212,10 +262,7 @@ void MythExternRecApp::Run(void)
     if (m_proc.state() == QProcess::Running)
     {
         m_proc.closeReadChannel(QProcess::StandardOutput);
-        m_proc.terminate();
-        m_proc.waitForFinished();
-        m_proc.kill();
-        m_proc.waitForFinished();
+        TerminateProcess();
     }
 
     emit Done();
@@ -516,9 +563,7 @@ Q_SLOT void MythExternRecApp::StopStreaming(const QString & serial, bool silent)
     m_streaming = false;
     if (m_proc.state() == QProcess::Running)
     {
-        m_proc.terminate();
-        m_proc.waitForFinished(3000);
-        m_proc.kill();
+        TerminateProcess();
 
         LOG(VB_RECORD, LOG_INFO, LOC + ": External application terminated.");
         if (silent)

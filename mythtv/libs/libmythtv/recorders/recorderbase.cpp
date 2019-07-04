@@ -348,8 +348,10 @@ bool RecorderBase::PauseAndWait(int timeout)
     return IsPaused(true);
 }
 
-void RecorderBase::CheckForRingBufferSwitch(void)
+bool RecorderBase::CheckForRingBufferSwitch(void)
 {
+    bool did_switch = false;
+
     m_nextRingBufferLock.lock();
 
     RecordingQuality *recq = nullptr;
@@ -372,6 +374,7 @@ void RecorderBase::CheckForRingBufferSwitch(void)
         m_nextRecording = nullptr;
 
         StartNewFile();
+        did_switch = true;
     }
     m_nextRingBufferLock.unlock();
 
@@ -386,6 +389,7 @@ void RecorderBase::CheckForRingBufferSwitch(void)
     }
 
     m_ringBufferCheckTimer.restart();
+    return did_switch;
 }
 
 void RecorderBase::SetRecordingStatus(RecStatus::Type status,
@@ -632,16 +636,16 @@ void RecorderBase::SavePositionMap(bool force, bool finished)
         m_positionMapLock.unlock();
     }
 
-    // Make sure a ringbuffer switch is checked at least every 60
+    // Make sure a ringbuffer switch is checked at least every 3
     // seconds.  Otherwise, this check is only performed on keyframes,
     // and if there is a problem with the input we may never see one
     // again, resulting in a wedged recording.
     if (!finished && m_ringBufferCheckTimer.isRunning() &&
-        m_ringBufferCheckTimer.elapsed() > 60000)
+        m_ringBufferCheckTimer.elapsed() > 3000)
     {
-        LOG(VB_RECORD, LOG_WARNING, LOC + "It has been over 60 seconds "
-            "since we've checked for a ringbuffer switch.");
-        CheckForRingBufferSwitch();
+        if (CheckForRingBufferSwitch())
+            LOG(VB_RECORD, LOG_WARNING, LOC +
+                "Ringbuffer was switched due to timeout instead of keyframe.");
     }
 }
 

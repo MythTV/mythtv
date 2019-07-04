@@ -1440,6 +1440,7 @@ class ScramblingDescriptor : public MPEGDescriptor
     }
 };
 
+// DVB Bluebook A038 (Feb 2019) p 83, Table 89: Service type coding
 // Map serviceid's to their types
 class ServiceDescriptorMapping
 {
@@ -1447,49 +1448,61 @@ class ServiceDescriptorMapping
     explicit ServiceDescriptorMapping(const uint serviceid) { m_serviceid = serviceid; }
     enum
     {
-        kServiceTypeDigitalTelevision        = 0x01,
-        kServiceTypeDigitalRadioSound        = 0x02,
-        kServiceTypeTeletext                 = 0x03,
-        kServiceTypeNVODReference            = 0x04,
-        kServiceTypeNVODTimeShifted          = 0x05,
-        kServiceTypeMosaic                   = 0x06,
-        kServiceTypePALCodedSignal           = 0x07,
-        kServiceTypeSECAMCodedSignal         = 0x08,
-        kServiceTypeD_D2_MAC                 = 0x09,
-        kServiceTypeAdvancedCodecDigitalRadioSound        = 0x0A,
-        kServiceTypeNTSCCodedSignal          = 0x0B,
-        kServiceTypeDataBroadcast            = 0x0C,
-        kServiceTypeCommonInterface          = 0x0D,
-        kServiceTypeRCS_Map                  = 0x0E,
-        kServiceTypeRCS_FLS                  = 0x0F,
-        kServiceTypeDVB_MHP                  = 0x10,
-        kServiceTypeHDTV                     = 0x11,
-        kServiceTypeAdvancedCodecSDDigitalTelevision       = 0x16,
-        kServiceTypeAdvancedCodecHDDigitalTelevision       = 0x19,
-        kServiceTypeAdvancedCodecFrameCompatiblePlanoStereoscopicHDTelevisionService = 0x1c,
-        kServiceTypeUltraHD                  = 0x1f,
-        kServiceTypeEchoStarTV1              = 0x91,
-        kServiceTypeEchoStarTV2              = 0x9a,
-        kServiceTypeEchoStarTV3              = 0xa4,
-        kServiceTypeEchoStarTV4              = 0xa6,
-        kServiceTypeNimiqTV1                 = 0x81,
-        kServiceTypeNimiqTV2                 = 0x85,
-        kServiceTypeNimiqTV3                 = 0x86,
-        kServiceTypeNimiqTV4                 = 0x89,
-        kServiceTypeNimiqTV5                 = 0x8a,
-        kServiceTypeNimiqTV6                 = 0x8d,
-        kServiceTypeNimiqTV7                 = 0x8f,
-        kServiceTypeNimiqTV8                 = 0x90,
-        kServiceTypeNimiqTV9                 = 0x96,
+        kServiceTypeDigitalTelevision          = 0x01,
+        kServiceTypeDigitalRadioSound          = 0x02,
+        kServiceTypeTeletext                   = 0x03,
+        kServiceTypeNVODReference              = 0x04,
+        kServiceTypeNVODTimeShifted            = 0x05,
+        kServiceTypeMosaic                     = 0x06,
+        kServiceTypeFMRadio                    = 0x07,
+        kServiceTypeDVB_SRM                    = 0x08,
+        // reserved for future use             = 0x09,
+        kServiceTypeAdvancedCodecDigitalRadioSound = 0x0A,
+        kServiceTypeH264AVCMosaic              = 0x0B,
+        kServiceTypeDataBroadcast              = 0x0C,
+        kServiceTypeCommonInterface            = 0x0D,
+        kServiceTypeRCS_Map                    = 0x0E,
+        kServiceTypeRCS_FLS                    = 0x0F,
+        kServiceTypeDVB_MHP                    = 0x10,
+        kServiceTypeMPEG2HDDigitalTelevision   = 0x11,
+        // reserved for future use             = 0x12 to 0x15
+        kServiceTypeH264AVCSDDigitalTelevision = 0x16,
+        kServiceTypeH264AVCSDNVODTimeShifted   = 0x17,
+        kServiceTypeH264AVCSDNVODReference     = 0x18,
+        kServiceTypeH264AVCHDDigitalTelevision = 0x19,
+        kServiceTypeH264AVCHDNVODTimeShifted   = 0x1A,
+        kServiceTypeH264AVCHDNVODReference     = 0x1B,
+        kServiceTypeH264AVCFrameCompatiblePlanoStereoscopicHDDigitalTelevision = 0x1C,
+        kServiceTypeH264AVCFrameCompatiblePlanoStereoscopicHDNVODTimeShifted   = 0x1D,
+        kServiceTypeH264AVCFrameCompatiblePlanoStereoscopicHDNVODReference     = 0x1E,
+        kServiceTypeHEVCDigitalTelevision      = 0x1F,
+        kServiceTypeHEVCUHDDigitalTelevision   = 0x20,
+        // reserved for future use             = 0x21 to 0x7F
+        // user defined                        = 0x80 to 0xFE
+        // reserved for future use             = 0xFF
+        // User Defined descriptors for Dish network
+        kServiceTypeEchoStarTV1                = 0x91,
+        kServiceTypeEchoStarTV2                = 0x9a,
+        kServiceTypeEchoStarTV3                = 0xa4,
+        kServiceTypeEchoStarTV4                = 0xa6,
+        kServiceTypeNimiqTV1                   = 0x81,
+        kServiceTypeNimiqTV2                   = 0x85,
+        kServiceTypeNimiqTV3                   = 0x86,
+        kServiceTypeNimiqTV4                   = 0x89,
+        kServiceTypeNimiqTV5                   = 0x8a,
+        kServiceTypeNimiqTV6                   = 0x8d,
+        kServiceTypeNimiqTV7                   = 0x8f,
+        kServiceTypeNimiqTV8                   = 0x90,
+        kServiceTypeNimiqTV9                   = 0x96,
 
     };
     uint ServiceType(void) const { return m_serviceid; }
     bool IsDTV(void) const
     {
         return ((ServiceType() == kServiceTypeDigitalTelevision) ||
-                (ServiceType() ==
-                 kServiceTypeAdvancedCodecSDDigitalTelevision) ||
-                IsHDTV() || IsUHDTV() ||
+                (ServiceType() == kServiceTypeH264AVCSDDigitalTelevision) ||
+                IsHDTV() ||
+                IsUHDTV() ||
                 (ServiceType() == kServiceTypeEchoStarTV1) ||
                 (ServiceType() == kServiceTypeEchoStarTV2) ||
                 (ServiceType() == kServiceTypeEchoStarTV3) ||
@@ -1506,20 +1519,22 @@ class ServiceDescriptorMapping
     }
     bool IsDigitalAudio(void) const
     {
-        return ((ServiceType() == kServiceTypeDigitalRadioSound) ||
-                (ServiceType() == kServiceTypeAdvancedCodecDigitalRadioSound));
+        return
+            (ServiceType() == kServiceTypeDigitalRadioSound) ||
+            (ServiceType() == kServiceTypeAdvancedCodecDigitalRadioSound);
     }
     bool IsHDTV(void) const
     {
         return
-            (ServiceType() == kServiceTypeHDTV) ||
-            (ServiceType() == kServiceTypeAdvancedCodecHDDigitalTelevision) ||
-            (ServiceType() == kServiceTypeAdvancedCodecFrameCompatiblePlanoStereoscopicHDTelevisionService);
+            (ServiceType() == kServiceTypeMPEG2HDDigitalTelevision) ||
+            (ServiceType() == kServiceTypeH264AVCHDDigitalTelevision) ||
+            (ServiceType() == kServiceTypeH264AVCFrameCompatiblePlanoStereoscopicHDDigitalTelevision);
     }
     bool IsUHDTV(void) const
     {
         return
-            (ServiceType() == kServiceTypeUltraHD);
+            (ServiceType() == kServiceTypeHEVCDigitalTelevision) ||
+            (ServiceType() == kServiceTypeHEVCUHDDigitalTelevision);
     }
     bool IsTeletext(void) const
     {
@@ -1577,8 +1592,10 @@ class ServiceDescriptor : public MPEGDescriptor
 
     QString toString(void) const override // MPEGDescriptor
     {
-        return QString("ServiceDescriptor: %1 %2").arg(ServiceName())
-            .arg(ServiceDescriptorMapping(ServiceType()).toString());
+        return QString("ServiceDescriptor: %1 %2(0x%3)")
+            .arg(ServiceName())
+            .arg(ServiceDescriptorMapping(ServiceType()).toString())
+            .arg(ServiceType(),2,16,QChar('0'));
     }
 };
 

@@ -133,7 +133,7 @@ static int _img_read(void *handle, void *buf, int lba, int num_blocks)
 {
     int result = -1;
 
-    if (mythfile_seek(*((int*)handle), lba * 2048, SEEK_SET) != -1)
+    if (mythfile_seek(*((int*)handle), lba * 2048LL, SEEK_SET) != -1)
         result = mythfile_read(*((int*)handle), buf, num_blocks * 2048) / 2048;
 
     return result;
