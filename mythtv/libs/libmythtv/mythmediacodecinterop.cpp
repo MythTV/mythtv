@@ -90,7 +90,7 @@ bool MythMediaCodecInterop::Initialise(QSize Size)
     // Create surface
     m_surfaceTexture = QAndroidJniObject("android/graphics/SurfaceTexture", "(I)V", texture->m_textureId);
     //N.B. org/mythtv/android/SurfaceTextureListener is found in the packaging repo
-    m_surfaceListener = QAndroidJniObject("org/mythtv/android/SurfaceTextureListener", "(J)V", jlong(&m_frameWait));
+    m_surfaceListener = QAndroidJniObject("org/mythtv/video/SurfaceTextureListener", "(J)V", jlong(&m_frameWait));
     if (m_surfaceTexture.isValid() && m_surfaceListener.isValid())
     {
         m_surfaceTexture.callMethod<void>("setOnFrameAvailableListener",
