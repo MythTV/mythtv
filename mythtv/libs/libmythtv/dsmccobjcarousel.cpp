@@ -104,6 +104,13 @@ unsigned char *DSMCCCacheModuleData::AddModuleData(DsmccDb *ddb,
     for (size_t i = 0; i < m_blocks.size(); i++)
     {
         QByteArray *block = m_blocks[i];
+        if (block == nullptr)
+        {
+            LOG(VB_DSMCC, LOG_INFO,
+                QString("[dsmcc] Null data found, aborting reconstruction"));
+            free(tmp_data);
+            return nullptr;
+        }
         m_blocks[i] = nullptr;
         uint size = block->size();
         memcpy(tmp_data + curp, block->data(), size);
