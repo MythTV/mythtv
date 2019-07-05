@@ -234,6 +234,9 @@ void MONITOR::initMonitor(bool debug, const string &mmapPath, int shmKey)
     int shared_data_size;
     int frame_size = m_width * m_height * m_bytes_per_pixel;
 
+    if (!m_enabled)
+        return;
+
     if (checkVersion(1, 32, 0))
     {
         shared_data_size = sizeof(SharedData32) +
@@ -986,7 +989,7 @@ void ZMServer::handleGetMonitorStatus(void)
             string id = row[0];
             string type = row[2];
             string device = row[3];
-            string host = row[4];
+            string host = row[4] ? row[4] : "";
             string channel = row[5];
             string function = row[6];
             string enabled = row[7];
@@ -1734,7 +1737,7 @@ void ZMServer::getMonitorList(void)
             m->m_function = row[8];
             m->m_enabled = atoi(row[9]);
             m->m_device = row[10];
-            m->m_host = row[11];
+            m->m_host = row[11] ? row[11] : "";
             m->m_controllable = atoi(row[12]);
             m->m_trackMotion = atoi(row[13]);
 
