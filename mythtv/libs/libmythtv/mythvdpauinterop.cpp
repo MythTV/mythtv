@@ -196,7 +196,7 @@ bool MythVDPAUInterop::InitVDPAU(AVVDPAUDeviceContext* DeviceContext, VdpVideoSu
             }
             else
             {
-                m_accessNV(m_outputSurfaceReg, GL_READ_ONLY);
+                m_accessNV(m_outputSurfaceReg, QOpenGLBuffer::ReadOnly);
                 m_mapNV(1, &m_outputSurfaceReg);
             }
         }
