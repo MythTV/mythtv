@@ -241,7 +241,7 @@ void MONITOR::initMonitor(bool debug, const string &mmapPath, int shmKey)
     int shared_data_size;
     int frame_size = width * height * bytes_per_pixel;
 
-    if (!m_enabled)
+    if (!enabled)
         return;
 
     if (checkVersion(1, 26, 0))
