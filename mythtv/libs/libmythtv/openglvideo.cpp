@@ -34,6 +34,7 @@ OpenGLVideo::OpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *ColourSpace
     m_videoRect(VideoRect),
     m_deinterlacer(MythDeintType::DEINT_NONE),
     m_deinterlacer2x(false),
+    m_fallbackDeinterlacer(MythDeintType::DEINT_NONE),
     m_videoColourSpace(ColourSpace),
     m_viewportControl(ViewportControl),
     m_inputTextures(),
@@ -211,7 +212,7 @@ bool OpenGLVideo::AddDeinterlacer(const VideoFrame *Frame, FrameScanType Scan,
     // if we get this far, we cannot use driver deinterlacers, shader deints
     // are preferred over cpu, we have a deinterlacer but don't actually care whether
     // it is single or double rate
-    if (m_deinterlacer == deinterlacer)
+    if (m_deinterlacer == deinterlacer || (m_fallbackDeinterlacer && (m_fallbackDeinterlacer == deinterlacer)))
         return true;
 
     // Lock
@@ -227,6 +228,7 @@ bool OpenGLVideo::AddDeinterlacer(const VideoFrame *Frame, FrameScanType Scan,
     int totaltextures = static_cast<int>(planes(m_outputType)) * static_cast<int>(refstocreate + 1);
     if (totaltextures > max)
     {
+        m_fallbackDeinterlacer = deinterlacer;
         LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Insufficent texture units for deinterlacer '%1' (%2 < %3)")
             .arg(DeinterlacerName(deinterlacer | DEINT_SHADER, m_deinterlacer2x)).arg(max).arg(totaltextures));
         deinterlacer = DEINT_BASIC;
@@ -475,6 +477,7 @@ void OpenGLVideo::ResetFrameFormat(void)
     m_textureTarget = QOpenGLTexture::Target2D;
     m_inputTextureSize = QSize();
     m_deinterlacer = DEINT_NONE;
+    m_fallbackDeinterlacer = DEINT_NONE;
     m_render->DeleteFramebuffer(m_frameBuffer);
     m_render->DeleteTexture(m_frameBufferTexture);
     m_frameBuffer = nullptr;
