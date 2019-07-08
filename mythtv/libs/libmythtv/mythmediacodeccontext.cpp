@@ -55,7 +55,7 @@ int MythMediaCodecContext::InitialiseDecoder(AVCodecContext *Context)
     return 0;
 }
 
-MythCodecID MythMediaCodecContext::GetBestSupportedCodec(AVCodecContext*,
+MythCodecID MythMediaCodecContext::GetBestSupportedCodec(AVCodecContext* Context,
                                                          AVCodec       **Codec,
                                                          const QString  &Decoder,
                                                          uint            StreamType,
@@ -65,7 +65,7 @@ MythCodecID MythMediaCodecContext::GetBestSupportedCodec(AVCodecContext*,
     MythCodecID success = static_cast<MythCodecID>((decodeonly ? kCodec_MPEG1_MEDIACODEC_DEC : kCodec_MPEG1_MEDIACODEC) + (StreamType - 1));
     MythCodecID failure = static_cast<MythCodecID>(kCodec_MPEG1 + (StreamType - 1));
 
-    if ((Decoder != "mediacodec") && (Decoder != "mediacodec-dec"))
+    if (!Decoder.startsWith("mediacodec") || IsUnsupportedProfile(Context))
         return failure;
 
     QString decodername = QString((*Codec)->name) + "_mediacodec";

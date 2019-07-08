@@ -244,31 +244,6 @@ static int has_codec_parameters(AVStream *st)
     return 1;
 }
 
-static bool force_sw_decode(AVCodecContext *avctx)
-{
-    switch (avctx->codec_id)
-    {
-        case AV_CODEC_ID_H264:
-            switch (avctx->profile)
-            {
-                case FF_PROFILE_H264_HIGH_10:
-                case FF_PROFILE_H264_HIGH_10_INTRA:
-                case FF_PROFILE_H264_HIGH_422:
-                case FF_PROFILE_H264_HIGH_422_INTRA:
-                case FF_PROFILE_H264_HIGH_444_PREDICTIVE:
-                case FF_PROFILE_H264_HIGH_444_INTRA:
-                case FF_PROFILE_H264_CAVLC_444:
-                    return true;
-                default:
-                    break;
-            }
-            break;
-        default:
-            break;
-    }
-    return false;
-}
-
 static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
 {
     if (silence_ffmpeg_logging)
@@ -2431,25 +2406,15 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             m_video_codec_id = kCodec_NONE;
             int version = mpeg_version(enc->codec_id);
             if (version)
-                m_video_codec_id = (MythCodecID)(kCodec_MPEG1 + version - 1);
+                m_video_codec_id = static_cast<MythCodecID>(kCodec_MPEG1 + version - 1);
 
-                // Check it's a codec we can decode using GPU
-#ifdef USING_OPENMAX
-            // The OpenMAX decoder supports H264 high 10, 422 and 444 profiles
-            if (dec != "openmax")
-#endif
-            if (m_averror_count > SEQ_PKT_ERR_MAX || force_sw_decode(enc))
+            if (m_averror_count > SEQ_PKT_ERR_MAX)
             {
-                bool wasgpu = dec != "ffmpeg";
-                if (FlagIsSet(kDecodeAllowGPU) && force_sw_decode(enc) && wasgpu)
+                if (FlagIsSet(kDecodeAllowGPU) && (dec != "ffmpeg"))
                 {
-                    LOG(VB_GENERAL, LOG_WARNING, LOC +
-                        "Unsupported Video Profile - forcing software decode");
-                }
-                if (FlagIsSet(kDecodeAllowGPU) && m_averror_count > SEQ_PKT_ERR_MAX && wasgpu)
-                {
-                    LOG(VB_GENERAL, LOG_WARNING, LOC +
-                        "GPU decoding failed - forcing software decode");
+                    LOG(VB_GENERAL, LOG_WARNING, LOC + QString(
+                        "GPU/hardware decoder '%1' failed - forcing software decode")
+                        .arg(dec));
                 }
                 m_averror_count = 0;
                 dec = "ffmpeg";

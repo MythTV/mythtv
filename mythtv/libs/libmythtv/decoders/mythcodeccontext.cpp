@@ -283,6 +283,29 @@ AVBufferRef* MythCodecContext::CreateDevice(AVHWDeviceType Type, const QString &
     return nullptr;
 }
 
+/// Most hardware decoders do not support these codecs/profiles
+bool MythCodecContext::IsUnsupportedProfile(AVCodecContext *Context)
+{
+    switch (Context->codec_id)
+    {
+        case AV_CODEC_ID_H264:
+            switch (Context->profile)
+            {
+                case FF_PROFILE_H264_HIGH_10:
+                case FF_PROFILE_H264_HIGH_10_INTRA:
+                case FF_PROFILE_H264_HIGH_422:
+                case FF_PROFILE_H264_HIGH_422_INTRA:
+                case FF_PROFILE_H264_HIGH_444_PREDICTIVE:
+                case FF_PROFILE_H264_HIGH_444_INTRA:
+                case FF_PROFILE_H264_CAVLC_444: return true;
+                default: break;
+            }
+            break;
+        default: break;
+    }
+    return false;
+}
+
 /*! \brief Retrieve and process/filter AVFrame
  * \note This default implementation implements no processing/filtering
 */

@@ -137,7 +137,7 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext *Context,
     MythCodecID success = static_cast<MythCodecID>((decodeonly ? kCodec_MPEG1_VAAPI_DEC : kCodec_MPEG1_VAAPI) + (StreamType - 1));
     MythCodecID failure = static_cast<MythCodecID>(kCodec_MPEG1 + (StreamType - 1));
 
-    if (!(Decoder == "vaapi" || Decoder == "vaapi-dec") || !HaveVAAPI() || getenv("NO_VAAPI"))
+    if (!Decoder.startsWith("vaapi") || !HaveVAAPI() || getenv("NO_VAAPI"))
         return failure;
 
     // Simple check for known profile

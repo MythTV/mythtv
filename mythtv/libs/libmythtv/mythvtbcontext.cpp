@@ -99,7 +99,7 @@ MythCodecID MythVTBContext::GetSupportedCodec(AVCodecContext *,
     MythCodecID success = static_cast<MythCodecID>((decodeonly ? kCodec_MPEG1_VTB_DEC : kCodec_MPEG1_VTB) + (StreamType - 1));
     MythCodecID failure = static_cast<MythCodecID>(kCodec_MPEG1 + (StreamType - 1));
 
-    if ((Decoder != "vtb") && (Decoder != "vtb-dec"))
+    if (!Decoder.startsWith("vtb") || IsUnsupportedProfile(Context))
         return failure;
 
     // Check decoder support
