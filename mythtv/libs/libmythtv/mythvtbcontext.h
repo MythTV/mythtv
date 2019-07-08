@@ -15,10 +15,14 @@ extern "C" {
 class MythVTBContext : public MythCodecContext
 {
   public:
-    MythVTBContext(MythCodecID CodecID);
+    MythVTBContext(DecoderBase *Parent, MythCodecID CodecID);
 
     // Shared decode only and direct rendering
-    int         HwDecoderInit            (AVCodecContext *Context) override;
+
+    bool   RetrieveFrame                 (AVCodecContext* Context,
+                                          VideoFrame* Frame,
+                                          AVFrame* AvFrame) override;
+    int    HwDecoderInit                 (AVCodecContext *Context) override;
     static MythCodecID GetSupportedCodec (AVCodecContext *CodecContext,
                                           AVCodec       **Codec,
                                           const QString  &Decoder,

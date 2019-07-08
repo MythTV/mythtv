@@ -16,9 +16,20 @@ extern "C" {
 
 #define LOC QString("VTBDec: ")
 
-MythVTBContext::MythVTBContext(MythCodecID CodecID)
-  : MythCodecContext(CodecID)
+MythVTBContext::MythVTBContext(DecoderBase *Parent, MythCodecID CodecID)
+  : MythCodecContext(Parent, CodecID)
 {
+}
+
+bool MythVTBContext::RetrieveFrame(AVCodecContext* Context, VideoFrame* Frame, AVFrame* AvFrame)
+{
+    if (AvFrame->format != AV_PIX_FMT_VIDEOTOOLBOX)
+        return false;
+    if (codec_is_vtb_dec(m_codecID))
+        return RetrieveHWFrame(Frame, AvFrame);
+    else if (codec_is_vtb(m_codecID))
+        return GetBuffer2(Context, Frame, AvFrame, 0);
+    return false;
 }
 
 int MythVTBContext::HwDecoderInit(AVCodecContext *Context)

@@ -230,8 +230,7 @@ class AvFormatDecoder : public DecoderBase
     int  H264PreProcessPkt(AVStream *stream, AVPacket *pkt);
     bool PreProcessVideoPacket(AVStream *stream, AVPacket *pkt);
     virtual bool ProcessVideoPacket(AVStream *stream, AVPacket *pkt, bool &Retry);
-    virtual bool ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic);
-    AVPixelFormat GetBestVideoFormat(AVPixelFormat* Formats);
+    virtual bool ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame);
     bool ProcessAudioPacket(AVStream *stream, AVPacket *pkt,
                             DecodeType decodetype);
     bool ProcessSubtitlePacket(AVStream *stream, AVPacket *pkt);

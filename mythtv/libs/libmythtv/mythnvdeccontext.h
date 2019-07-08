@@ -24,8 +24,9 @@ extern "C" {
 class MythNVDECContext : public MythCodecContext
 {
   public:
-    explicit MythNVDECContext(MythCodecID CodecID);
+    MythNVDECContext(DecoderBase *Parent, MythCodecID CodecID);
     int  HwDecoderInit                   (AVCodecContext *Context) override;
+    bool RetrieveFrame                   (AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame) override;
     void SetDeinterlacing                (AVCodecContext *Context,
                                           VideoDisplayProfile *Profile, bool DoubleRate) override;
     void PostProcessFrame                (AVCodecContext *Context, VideoFrame *Frame) override;
@@ -36,8 +37,8 @@ class MythNVDECContext : public MythCodecContext
                                           uint            StreamType,
                                           AVPixelFormat  &PixFmt);
     static enum AVPixelFormat GetFormat  (AVCodecContext *Contextconst, const AVPixelFormat *PixFmt);
-    static int  GetBuffer                (AVCodecContext *Context,
-                                          AVFrame *Frame, int Flags);
+    static bool GetBuffer                (AVCodecContext *Context, VideoFrame *Frame,
+                                          AVFrame *AvFrame, int Flags);
     static int  InitialiseDecoder        (AVCodecContext *Context);
     static bool HaveNVDEC                (void);
 

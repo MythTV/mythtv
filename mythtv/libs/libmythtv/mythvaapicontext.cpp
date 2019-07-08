@@ -28,8 +28,8 @@ extern "C" {
  * to complete the setup (as we have reached the end of the file).
  * Should be a simple null pointer check in FFmpeg.
 */
-MythVAAPIContext::MythVAAPIContext(MythCodecID CodecID)
-  : MythCodecContext(CodecID)
+MythVAAPIContext::MythVAAPIContext(DecoderBase *Parent, MythCodecID CodecID)
+  : MythCodecContext(Parent, CodecID)
 {
 }
 
@@ -495,6 +495,15 @@ bool MythVAAPIContext::HaveVAAPI(bool ReCheck /*= false*/)
     }
 
     return havevaapi;
+}
+
+bool MythVAAPIContext::RetrieveFrame(AVCodecContext*, VideoFrame *Frame, AVFrame *AvFrame)
+{
+    if (AvFrame->format != AV_PIX_FMT_VAAPI)
+        return false;
+    if (codec_is_vaapi_dec(m_codecID))
+        return RetrieveHWFrame(Frame, AvFrame);
+    return false;
 }
 
 /*! \brief Retrieve decoded frame and optionally deinterlace.

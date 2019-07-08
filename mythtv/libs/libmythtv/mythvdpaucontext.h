@@ -7,7 +7,9 @@
 class MythVDPAUContext : public MythCodecContext
 {
   public:
-    explicit MythVDPAUContext(MythCodecID CodecID);
+    MythVDPAUContext(DecoderBase *Parent, MythCodecID CodecID);
+
+    bool   RetrieveFrame                 (AVCodecContext*, VideoFrame* Frame, AVFrame* AvFrame) override;
     static MythCodecID GetSupportedCodec (AVCodecContext *CodecContext,
                                           AVCodec       **Codec,
                                           const QString  &Decoder,

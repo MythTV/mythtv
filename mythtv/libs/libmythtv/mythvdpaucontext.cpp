@@ -20,8 +20,8 @@ extern "C" {
  * \sa MythVDAPUInterop
  * \sa MythCodecContext
 */
-MythVDPAUContext::MythVDPAUContext(MythCodecID CodecID)
-  : MythCodecContext(CodecID)
+MythVDPAUContext::MythVDPAUContext(DecoderBase *Parent, MythCodecID CodecID)
+  : MythCodecContext(Parent, CodecID)
 {
 }
 
@@ -185,4 +185,13 @@ enum AVPixelFormat MythVDPAUContext::GetFormat2(struct AVCodecContext* Context, 
         PixFmt++;
     }
     return AV_PIX_FMT_NONE;
+}
+
+bool MythVDPAUContext::RetrieveFrame(AVCodecContext*, VideoFrame *Frame, AVFrame *AvFrame)
+{
+    if (AvFrame->format != AV_PIX_FMT_VDPAU)
+        return false;
+    if (codec_is_vdpau_dec(m_codecID))
+        return RetrieveHWFrame(Frame, AvFrame);
+    return false;
 }

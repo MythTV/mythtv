@@ -267,6 +267,7 @@ class DecoderBase
     int GetfpsMultiplier(void) { return m_fpsMultiplier; }
     MythCodecContext *GetMythCodecContext(void) { return m_mythcodecctx; }
     VideoDisplayProfile * GetVideoDisplayProfile(void) { return &m_videoDisplayProfile; }
+    AVPixelFormat GetBestVideoFormat(AVPixelFormat* Formats);
 
   protected:
     virtual int  AutoSelectTrack(uint type);

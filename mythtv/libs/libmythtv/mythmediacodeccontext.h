@@ -15,8 +15,9 @@ class MythMediaCodecContext : public MythCodecContext
 {
   public:
     // MythCodecContext
-    MythMediaCodecContext(MythCodecID CodecID);
+    MythMediaCodecContext(DecoderBase *Parent, MythCodecID CodecID);
     int HwDecoderInit(AVCodecContext *Context) override;
+    bool RetrieveFrame(AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame) override;
 
     static MythCodecID GetBestSupportedCodec(AVCodecContext*,
                                              AVCodec       **Codec,

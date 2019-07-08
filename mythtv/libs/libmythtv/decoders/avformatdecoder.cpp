@@ -1548,14 +1548,15 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
 #ifdef USING_VDPAU
     if (CODEC_IS_VDPAU(codec1, enc) && codec_is_vdpau_hw(m_video_codec_id))
     {
-        enc->get_buffer2     = MythCodecContext::GetBuffer;
-        enc->get_format      = MythVDPAUContext::GetFormat;
-        enc->slice_flags     = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
+        enc->get_buffer2 = MythCodecContext::GetBuffer;
+        enc->get_format  = MythVDPAUContext::GetFormat;
+        enc->slice_flags = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
     }
     else if (codec_is_vdpau_dechw(m_video_codec_id))
     {
-        enc->get_format      = MythVDPAUContext::GetFormat2;
-        enc->slice_flags     = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
+        enc->get_format   = MythVDPAUContext::GetFormat2;
+        enc->slice_flags  = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
+        m_directrendering = false;
     }
     else
 #endif
@@ -1570,8 +1571,8 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
 #ifdef USING_VAAPI
     if (CODEC_IS_VAAPI(codec1, enc) && codec_is_vaapi(m_video_codec_id))
     {
-        enc->get_buffer2     = MythCodecContext::GetBuffer;
-        enc->get_format      = MythVAAPIContext::GetFormat;
+        enc->get_buffer2 = MythCodecContext::GetBuffer;
+        enc->get_format  = MythVAAPIContext::GetFormat;
     }
     else if (codec_is_vaapi_dec(m_video_codec_id))
     {
@@ -1585,8 +1586,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     {
         enc->get_format  = MythVTBContext::GetFormat;
         enc->slice_flags = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
-        if (codec_is_vtb_dec(m_video_codec_id))
-            m_directrendering = false;
+        m_directrendering = false;
     }
     else
 #endif
@@ -1602,8 +1602,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     if (codec_is_nvdec_dec(m_video_codec_id) || codec_is_nvdec(m_video_codec_id))
     {
         enc->get_format = MythNVDECContext::GetFormat;
-        if (codec_is_nvdec_dec(m_video_codec_id))
-            m_directrendering = false;
+        m_directrendering = false;
     }
     else
 #endif
@@ -1622,7 +1621,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     }
 
     delete m_mythcodecctx;
-    m_mythcodecctx = MythCodecContext::CreateContext(m_video_codec_id);
+    m_mythcodecctx = MythCodecContext::CreateContext(this, m_video_codec_id);
     if (m_mythcodecctx->HwDecoderInit(enc) < 0)
     {
         // force it to switch to software decoding
@@ -3708,27 +3707,10 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt, boo
     return true;
 }
 
-/*! \brief Find a suitable frame format that is mutually acceptable to the decoder and render device.
- * \note Most hardware decoders will only provide one software frame format.
- * \note Currently only the OpenGL renderer supports anything other than FMT_YV12/AV_PIX_FMT_YUV420P
-*/
-AVPixelFormat AvFormatDecoder::GetBestVideoFormat(AVPixelFormat* Formats)
-{
-    if (m_parent)
-    {
-        VideoFrameType* mythfmts = m_parent->DirectRenderFormats();
-        for (AVPixelFormat *format = Formats; *format != AV_PIX_FMT_NONE; format++)
-            for (VideoFrameType* mythfmt = mythfmts; *mythfmt != FMT_NONE; mythfmt++)
-                if (FrameTypeToPixelFormat(*mythfmt) == *format)
-                    return *format;
-    }
-    return AV_PIX_FMT_NONE;
-}
-
-bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
+bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
 {
 
-    AVCodecContext *context = gCodecMap->getCodecContext(stream);
+    AVCodecContext *context = gCodecMap->getCodecContext(Stream);
 
     // We need to mediate between ATSC and SCTE data when both are present.  If
     // both are present, we generally want to prefer ATSC.  However, there may
@@ -3738,8 +3720,8 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
     // frames, without an intervening ATSC frame, to cause a switch back to
     // considering SCTE frames.  The number 10 is somewhat arbitrarily chosen.
 
-    uint cc_len = (uint) max(mpa_pic->scte_cc_len,0);
-    uint8_t *cc_buf = mpa_pic->scte_cc_buf;
+    uint cc_len = static_cast<uint>(max(AvFrame->scte_cc_len,0));
+    uint8_t *cc_buf = AvFrame->scte_cc_buf;
     bool scte = true;
 
     // If we saw SCTE, then decrement a nonzero ignore_scte count.
@@ -3747,10 +3729,10 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
         --m_ignore_scte;
 
     // If both ATSC and SCTE caption data are available, prefer ATSC
-    if ((mpa_pic->atsc_cc_len > 0) || m_ignore_scte)
+    if ((AvFrame->atsc_cc_len > 0) || m_ignore_scte)
     {
-        cc_len = (uint) max(mpa_pic->atsc_cc_len, 0);
-        cc_buf = mpa_pic->atsc_cc_buf;
+        cc_len = static_cast<uint>(max(AvFrame->atsc_cc_len, 0));
+        cc_buf = AvFrame->atsc_cc_buf;
         scte = false;
         // If we explicitly saw ATSC, then reset ignore_scte count.
         if (cc_len > 0)
@@ -3763,101 +3745,47 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
 
     if (cc_len == 0) {
         // look for A53 captions
-        AVFrameSideData *side_data = av_frame_get_side_data(mpa_pic, AV_FRAME_DATA_A53_CC);
+        AVFrameSideData *side_data = av_frame_get_side_data(AvFrame, AV_FRAME_DATA_A53_CC);
         if (side_data && (side_data->size > 0)) {
-            DecodeCCx08(side_data->data, side_data->size, false);
+            DecodeCCx08(side_data->data, static_cast<uint>(side_data->size), false);
         }
     }
 
-    VideoFrame *picframe = (VideoFrame *)(mpa_pic->opaque);
+    VideoFrame *frame = static_cast<VideoFrame*>(AvFrame->opaque);
+    if (frame)
+        frame->directrendering = m_directrendering;
 
     if (FlagIsSet(kDecodeNoDecode))
     {
         // Do nothing, we just want the pts, captions, subtites, etc.
         // So we can release the unconverted blank video frame to the
         // display queue.
+        if (frame)
+            frame->directrendering = 0;
     }
     else if (!m_directrendering)
     {
-        AVFrame *tmp_frame = nullptr;
-        AVFrame *use_frame = nullptr;
-        VideoFrame *xf = picframe;
-        picframe = m_parent->GetNextVideoFrame();
-        bool used_picframe = false;
-#if defined(USING_VAAPI) || defined(USING_NVDEC) || defined(USING_VTB) || defined(USING_VDPAU)
-        if (AV_PIX_FMT_CUDA == static_cast<AVPixelFormat>(mpa_pic->format) ||
-            AV_PIX_FMT_VAAPI == static_cast<AVPixelFormat>(mpa_pic->format) ||
-            AV_PIX_FMT_VIDEOTOOLBOX == static_cast<AVPixelFormat>(mpa_pic->format) ||
-            AV_PIX_FMT_VDPAU == static_cast<AVPixelFormat>(mpa_pic->format))
-        {
-            tmp_frame = av_frame_alloc();
-            use_frame = tmp_frame;
-            /* retrieve data from GPU to CPU */
-            AVPixelFormat *pixelformats = nullptr;
-            int ret = av_hwframe_transfer_get_formats(mpa_pic->hw_frames_ctx,
-                                                      AV_HWFRAME_TRANSFER_DIRECTION_FROM,
-                                                      &pixelformats, 0);
-            if (ret == 0)
-            {
-                AVPixelFormat best = GetBestVideoFormat(pixelformats);
-                if (best != AV_PIX_FMT_NONE)
-                {
-                    VideoFrameType type = PixelFormatToFrameType(best);
-                    bool valid = picframe->codec == type;
-                    if (!valid || (picframe->width != mpa_pic->width) || (picframe->height != mpa_pic->height))
-                        valid = VideoBuffers::ReinitBuffer(picframe, type, m_video_codec_id,
-                                                           mpa_pic->width, mpa_pic->height);
+        VideoFrame *oldframe = frame;
+        frame = m_parent->GetNextVideoFrame();
+        frame->directrendering = 0;
 
-                    if (valid)
-                    {
-                        // Retrieve the picture directly into the Video Frame Buffer
-                        used_picframe = true;
-                        use_frame->format = best;
-                        uint max = planes(picframe->codec);
-                        for (uint i = 0; i < 3; i++)
-                        {
-                            use_frame->data[i]     = (i < max) ? (picframe->buf + picframe->offsets[i]) : nullptr;
-                            use_frame->linesize[i] = picframe->pitches[i];
-                        }
-
-                        // Dummy release method - we do not want to free the buffer
-                        use_frame->buf[0] = av_buffer_create(reinterpret_cast<uint8_t*>(picframe), 0,
-                                                             [](void*, uint8_t*){}, this, 0);
-                        use_frame->width = mpa_pic->width;
-                        use_frame->height = mpa_pic->height;
-                    }
-                }
-            }
-
-            if ((ret = av_hwframe_transfer_data(use_frame, mpa_pic, 0)) < 0)
-            {
-                LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error %1 transferring the data to system memory")
-                        .arg(ret));
-            }
-            picframe->colorshifted = 1;
-            av_freep(&pixelformats);
-        }
-        else
-#endif // USING_VAAPI || USING_NVDEC || USING_VTB || USING_VDPAU
-            use_frame = mpa_pic;
-
-        if (!used_picframe)
+        if (!m_mythcodecctx->RetrieveFrame(context, frame, AvFrame))
         {
             AVFrame tmppicture;
             av_image_fill_arrays(tmppicture.data, tmppicture.linesize,
-                                picframe->buf, AV_PIX_FMT_YUV420P, use_frame->width,
-                                use_frame->height, IMAGE_ALIGN);
-            tmppicture.data[0] = picframe->buf + picframe->offsets[0];
-            tmppicture.data[1] = picframe->buf + picframe->offsets[1];
-            tmppicture.data[2] = picframe->buf + picframe->offsets[2];
-            tmppicture.linesize[0] = picframe->pitches[0];
-            tmppicture.linesize[1] = picframe->pitches[1];
-            tmppicture.linesize[2] = picframe->pitches[2];
+                                 frame->buf, AV_PIX_FMT_YUV420P, AvFrame->width,
+                                 AvFrame->height, IMAGE_ALIGN);
+            tmppicture.data[0] = frame->buf + frame->offsets[0];
+            tmppicture.data[1] = frame->buf + frame->offsets[1];
+            tmppicture.data[2] = frame->buf + frame->offsets[2];
+            tmppicture.linesize[0] = frame->pitches[0];
+            tmppicture.linesize[1] = frame->pitches[1];
+            tmppicture.linesize[2] = frame->pitches[2];
 
             QSize dim = get_video_dim(*context);
-            m_sws_ctx = sws_getCachedContext(m_sws_ctx, use_frame->width,
-                                        use_frame->height, (AVPixelFormat)use_frame->format,
-                                        use_frame->width, use_frame->height,
+            m_sws_ctx = sws_getCachedContext(m_sws_ctx, AvFrame->width,
+                                        AvFrame->height, static_cast<AVPixelFormat>(AvFrame->format),
+                                        AvFrame->width, AvFrame->height,
                                         AV_PIX_FMT_YUV420P, SWS_FAST_BILINEAR,
                                         nullptr, nullptr, nullptr);
             if (!m_sws_ctx)
@@ -3865,78 +3793,58 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
                 LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to allocate sws context");
                 return false;
             }
-            sws_scale(m_sws_ctx, use_frame->data, use_frame->linesize, 0, dim.height(),
+            sws_scale(m_sws_ctx, AvFrame->data, AvFrame->linesize, 0, dim.height(),
                       tmppicture.data, tmppicture.linesize);
         }
-        if (xf)
+
+        // Discard any old VideoFrames
+        if (oldframe)
         {
             // Set the frame flags, but then discard it
             // since we are not using it for display.
-            xf->interlaced_frame = mpa_pic->interlaced_frame;
-            xf->top_field_first = mpa_pic->top_field_first;
-            xf->interlaced_reversed = 0;
-            xf->colorspace = mpa_pic->colorspace;
-            xf->colorrange = mpa_pic->color_range;
-            xf->colorprimaries = mpa_pic->color_primaries;
-            xf->colortransfer = mpa_pic->color_trc;
-            xf->chromalocation = mpa_pic->chroma_location;
-            xf->frameNumber = m_framesPlayed;
-            xf->frameCounter = m_frameCounter++;
-            xf->aspect = m_current_aspect;
-            xf->deinterlace_inuse = DEINT_NONE;
-            xf->deinterlace_inuse2x = 0;
-            xf->decoder_deinterlaced = 0;
-            xf->rotation = m_videoRotation;
-            m_parent->DiscardVideoFrame(xf);
+            oldframe->interlaced_frame = AvFrame->interlaced_frame;
+            oldframe->top_field_first = AvFrame->top_field_first;
+            oldframe->interlaced_reversed = 0;
+            oldframe->colorspace = AvFrame->colorspace;
+            oldframe->colorrange = AvFrame->color_range;
+            oldframe->colorprimaries = AvFrame->color_primaries;
+            oldframe->colortransfer = AvFrame->color_trc;
+            oldframe->chromalocation = AvFrame->chroma_location;
+            oldframe->frameNumber = m_framesPlayed;
+            oldframe->frameCounter = m_frameCounter++;
+            oldframe->aspect = m_current_aspect;
+            oldframe->deinterlace_inuse = DEINT_NONE;
+            oldframe->deinterlace_inuse2x = 0;
+            oldframe->decoder_deinterlaced = 0;
+            oldframe->rotation = m_videoRotation;
+            m_parent->DiscardVideoFrame(oldframe);
         }
-        if (tmp_frame)
-            av_frame_free(&tmp_frame);
     }
-    else if (!picframe)
+
+    if (!frame)
     {
-#ifdef USING_VTB
-        // VideoToolBox does not call get_buffer2 - so initialise the frame now
-        if (mpa_pic->format == AV_PIX_FMT_VIDEOTOOLBOX)
-            if (MythCodecContext::GetBuffer2(context, mpa_pic, 0) >= 0)
-                picframe = reinterpret_cast<VideoFrame*>(mpa_pic->opaque);
-#endif
-#ifdef USING_MEDIACODEC
-        if (mpa_pic->format == AV_PIX_FMT_MEDIACODEC)
-            if (MythCodecContext::GetBuffer2(context, mpa_pic, 0) >= 0)
-                picframe = reinterpret_cast<VideoFrame*>(mpa_pic->opaque);
-#endif
-#ifdef USING_NVDEC
-        if (mpa_pic->format == AV_PIX_FMT_CUDA)
-            if (MythNVDECContext::GetBuffer(context, mpa_pic, 0) >= 0)
-                picframe = reinterpret_cast<VideoFrame*>(mpa_pic->opaque);
-#endif
-        if (!picframe)
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC + "NULL videoframe - direct rendering not"
-                                           "correctly initialized.");
-            return false;
-        }
+        LOG(VB_GENERAL, LOG_ERR, LOC + "NULL videoframe - direct rendering not"
+                                       "correctly initialized.");
+        return false;
     }
 
     long long pts;
     if (m_use_frame_timing)
     {
-        pts = mpa_pic->pts;
+        pts = AvFrame->pts;
         if (pts == AV_NOPTS_VALUE)
-            pts = mpa_pic->pkt_dts;
+            pts = AvFrame->pkt_dts;
         if (pts == AV_NOPTS_VALUE)
-            pts = mpa_pic->reordered_opaque;
+            pts = AvFrame->reordered_opaque;
         if (pts == AV_NOPTS_VALUE)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "No PTS found - unable to process video.");
             return false;
         }
-        pts = (long long)(av_q2d(stream->time_base) *
-                                pts * 1000);
+        pts = static_cast<long long>(av_q2d(Stream->time_base) * pts * 1000);
     }
     else
-        pts = (long long)(av_q2d(stream->time_base) *
-                                mpa_pic->reordered_opaque * 1000);
+        pts = static_cast<long long>(av_q2d(Stream->time_base) * AvFrame->reordered_opaque * 1000);
 
     long long temppts = pts;
     // Validate the video pts against the last pts. If it's
@@ -3947,9 +3855,9 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
         (temppts + (1000 / m_fps) > m_lastvpts || temppts <= 0))
     {
         temppts = m_lastvpts;
-        temppts += (long long)(1000 / m_fps);
+        temppts += static_cast<long long>(1000 / m_fps);
         // MPEG2/H264 frames can be repeated, update pts accordingly
-        temppts += (long long)(mpa_pic->repeat_pict * 500 / m_fps);
+        temppts += static_cast<long long>(AvFrame->repeat_pict * 500 / m_fps);
     }
 
     // Calculate actual fps from the pts values.
@@ -3966,42 +3874,41 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
         if (fpschange > 0.9 && fpschange < 1.1)
             m_fpsMultiplier = 1;
         if (m_fpsMultiplier != prior)
-            m_parent->SetFrameRate(m_fps);
+            m_parent->SetFrameRate(static_cast<double>(m_fps));
     }
 
     LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC +
         QString("video timecode %1 %2 %3 %4%5")
-            .arg(m_use_frame_timing ? mpa_pic->pts : mpa_pic->reordered_opaque).arg(pts)
+            .arg(m_use_frame_timing ? AvFrame->pts : AvFrame->reordered_opaque).arg(pts)
             .arg(temppts).arg(m_lastvpts)
             .arg((pts != temppts) ? " fixup" : ""));
 
-    if (picframe)
+    if (frame)
     {
-        picframe->interlaced_frame = mpa_pic->interlaced_frame;
-        picframe->top_field_first  = mpa_pic->top_field_first;
-        picframe->interlaced_reversed = 0;
-        picframe->repeat_pict      = mpa_pic->repeat_pict;
-        picframe->disp_timecode    = NormalizeVideoTimecode(stream, temppts);
-        picframe->frameNumber      = m_framesPlayed;
-        picframe->frameCounter     = m_frameCounter++;
-        picframe->aspect           = m_current_aspect;
-        picframe->dummy            = 0;
-        picframe->directrendering  = m_directrendering ? 1 : 0;
-        picframe->colorspace       = mpa_pic->colorspace;
-        picframe->colorrange       = mpa_pic->color_range;
-        picframe->colorprimaries   = mpa_pic->color_primaries;
-        picframe->colortransfer    = mpa_pic->color_trc;
-        picframe->chromalocation   = mpa_pic->chroma_location;
-        picframe->pix_fmt          = mpa_pic->format;
-        picframe->deinterlace_inuse = DEINT_NONE;
-        picframe->deinterlace_inuse2x = 0;
-        picframe->decoder_deinterlaced = 0;
-        picframe->rotation         = m_videoRotation;
-        m_parent->ReleaseNextVideoFrame(picframe, temppts);
-        m_mythcodecctx->PostProcessFrame(context, picframe);
+        frame->interlaced_frame = AvFrame->interlaced_frame;
+        frame->top_field_first  = AvFrame->top_field_first;
+        frame->interlaced_reversed = 0;
+        frame->repeat_pict      = AvFrame->repeat_pict;
+        frame->disp_timecode    = NormalizeVideoTimecode(Stream, temppts);
+        frame->frameNumber      = m_framesPlayed;
+        frame->frameCounter     = m_frameCounter++;
+        frame->aspect           = m_current_aspect;
+        frame->dummy            = 0;
+        frame->colorspace       = AvFrame->colorspace;
+        frame->colorrange       = AvFrame->color_range;
+        frame->colorprimaries   = AvFrame->color_primaries;
+        frame->colortransfer    = AvFrame->color_trc;
+        frame->chromalocation   = AvFrame->chroma_location;
+        frame->pix_fmt          = AvFrame->format;
+        frame->deinterlace_inuse = DEINT_NONE;
+        frame->deinterlace_inuse2x = 0;
+        frame->decoder_deinterlaced = 0;
+        frame->rotation         = m_videoRotation;
+        m_parent->ReleaseNextVideoFrame(frame, temppts);
+        m_mythcodecctx->PostProcessFrame(context, frame);
     }
 
-    m_decoded_video_frame = picframe;
+    m_decoded_video_frame = frame;
     m_gotVideoFrame = true;
     if (++m_fpsSkip >= m_fpsMultiplier)
     {

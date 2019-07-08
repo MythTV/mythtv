@@ -23,7 +23,7 @@ DecoderBase::DecoderBase(MythPlayer *parent, const ProgramInfo &pginfo)
       // language preference
       m_languagePreference(iso639_get_language_key_list()),
       // this will be deleted and recreated once decoder is set up
-      m_mythcodecctx(new MythCodecContext(kCodec_NONE))
+      m_mythcodecctx(new MythCodecContext(this, kCodec_NONE))
 {
     ResetTracks();
     m_tracks[kTrackTypeAudio].push_back(StreamInfo(0, 0, 0, 0, 0));
@@ -1388,5 +1388,21 @@ DecoderBase::TranslatePositionRelToAbs(const frm_dir_map_t &deleteMap,
     return relPosition + addition;
 }
 
+/*! \brief Find a suitable frame format that is mutually acceptable to the decoder and render device.
+ * \note Most hardware decoders will only provide one software frame format.
+ * \note Currently only the OpenGL renderer supports anything other than FMT_YV12/AV_PIX_FMT_YUV420P
+*/
+AVPixelFormat DecoderBase::GetBestVideoFormat(AVPixelFormat* Formats)
+{
+    if (m_parent)
+    {
+        VideoFrameType* mythfmts = m_parent->DirectRenderFormats();
+        for (AVPixelFormat *format = Formats; *format != AV_PIX_FMT_NONE; format++)
+            for (VideoFrameType* mythfmt = mythfmts; *mythfmt != FMT_NONE; mythfmt++)
+                if (FrameTypeToPixelFormat(*mythfmt) == *format)
+                    return *format;
+    }
+    return AV_PIX_FMT_NONE;
+}
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

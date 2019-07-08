@@ -15,8 +15,8 @@ QMutex* MythNVDECContext::s_NVDECLock = new QMutex(QMutex::Recursive);
 bool MythNVDECContext::s_NVDECAvailable = false;
 vector<MythNVDECContext::MythNVDECCaps> MythNVDECContext::s_NVDECDecoderCaps = vector<MythNVDECContext::MythNVDECCaps>();
 
-MythNVDECContext::MythNVDECContext(MythCodecID CodecID)
-  : MythCodecContext(CodecID)
+MythNVDECContext::MythNVDECContext(DecoderBase *Parent, MythCodecID CodecID)
+  : MythCodecContext(Parent, CodecID)
 {
 }
 
@@ -362,61 +362,76 @@ enum AVPixelFormat MythNVDECContext::GetFormat(AVCodecContext*, const AVPixelFor
     return AV_PIX_FMT_NONE;
 }
 
+bool MythNVDECContext::RetrieveFrame(AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame)
+{
+    if (AvFrame->format != AV_PIX_FMT_CUDA)
+        return false;
+    if (codec_is_nvdec_dec(m_codecID))
+        return RetrieveHWFrame(Frame, AvFrame);
+    else if (codec_is_nvdec(m_codecID))
+        return GetBuffer(Context, Frame, AvFrame, 0);
+    return false;
+}
+
 /*! \brief Convert AVFrame data to MythFrame
  *
  * \note The CUDA decoder returns a complete AVFrame which should represent an NV12
  * frame held in device (GPU) memory. There is no need to call avcodec_default_get_buffer2.
 */
-int MythNVDECContext::GetBuffer(struct AVCodecContext *Context, AVFrame *Frame, int)
+bool MythNVDECContext::GetBuffer(struct AVCodecContext *Context, VideoFrame *Frame,
+                                 AVFrame *AvFrame, int)
 {
-    if ((Frame->format != AV_PIX_FMT_CUDA) || !Frame->data[0])
+    if ((AvFrame->format != AV_PIX_FMT_CUDA) || !AvFrame->data[0])
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Not a valid CUDA hw frame");
-        return -1;
+        return false;
     }
 
-    AvFormatDecoder *avfd = static_cast<AvFormatDecoder*>(Context->opaque);
-    VideoFrame *videoframe = avfd->GetPlayer()->GetNextVideoFrame();
+    if (!Context || !Frame)
+        return false;
+
+    AvFormatDecoder *decoder = static_cast<AvFormatDecoder*>(Context->opaque);
 
     for (int i = 0; i < 3; i++)
     {
-        videoframe->pitches[i] = Frame->linesize[i];
-        videoframe->offsets[i] = Frame->data[i] ? (static_cast<int>(Frame->data[i] - Frame->data[0])) : 0;
-        videoframe->priv[i] = nullptr;
+        Frame->pitches[i] = AvFrame->linesize[i];
+        Frame->offsets[i] = AvFrame->data[i] ? (static_cast<int>(AvFrame->data[i] - AvFrame->data[0])) : 0;
+        Frame->priv[i] = nullptr;
     }
 
-    videoframe->width = Frame->width;
-    videoframe->height = Frame->height;
+    Frame->width = AvFrame->width;
+    Frame->height = AvFrame->height;
+    Frame->pix_fmt = Context->pix_fmt;
+    Frame->directrendering = 1;
 
-    Frame->opaque           = videoframe;
-    videoframe->pix_fmt     = Context->pix_fmt;
-    Frame->reordered_opaque = Context->reordered_opaque;
+    AvFrame->opaque = Frame;
+    AvFrame->reordered_opaque = Context->reordered_opaque;
 
     // set the pixel format - normally NV12 but P010 for 10bit etc. Set here rather than guessing later.
-    if (Frame->hw_frames_ctx)
+    if (AvFrame->hw_frames_ctx)
     {
-        AVHWFramesContext *context = reinterpret_cast<AVHWFramesContext*>(Frame->hw_frames_ctx->data);
+        AVHWFramesContext *context = reinterpret_cast<AVHWFramesContext*>(AvFrame->hw_frames_ctx->data);
         if (context)
-            videoframe->sw_pix_fmt = context->sw_format;
+            Frame->sw_pix_fmt = context->sw_format;
     }
 
     // NVDEC 'fixes' 10/12/16bit colour values
-    videoframe->colorshifted = 1;
+    Frame->colorshifted = 1;
 
     // Frame->data[0] holds CUdeviceptr for the frame data - offsets calculated above
-    videoframe->buf = Frame->data[0];
+    Frame->buf = AvFrame->data[0];
 
     // Retain the buffer so it is not released before we display it
-    videoframe->priv[0] = reinterpret_cast<unsigned char*>(av_buffer_ref(Frame->buf[0]));
+    Frame->priv[0] = reinterpret_cast<unsigned char*>(av_buffer_ref(AvFrame->buf[0]));
 
     // We need the CUDA device context in the interop class and it also holds the reference
     // to the interop class itself
-    videoframe->priv[1] = reinterpret_cast<unsigned char*>(av_buffer_ref(Context->hw_device_ctx));
+    Frame->priv[1] = reinterpret_cast<unsigned char*>(av_buffer_ref(Context->hw_device_ctx));
 
     // Set the release method
-    Frame->buf[1] = av_buffer_create(reinterpret_cast<uint8_t*>(videoframe), 0,
-                                     MythCodecContext::ReleaseBuffer, avfd, 0);
-    return 0;
+    AvFrame->buf[1] = av_buffer_create(reinterpret_cast<uint8_t*>(Frame), 0,
+                                       MythCodecContext::ReleaseBuffer, decoder, 0);
+    return true;
 }
 
 MythNVDECContext::MythNVDECCaps::MythNVDECCaps(cudaVideoCodec Codec, uint Depth, cudaVideoChromaFormat Format,

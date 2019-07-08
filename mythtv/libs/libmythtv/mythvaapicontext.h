@@ -20,9 +20,10 @@ extern "C" {
 class MTV_PUBLIC MythVAAPIContext : public MythCodecContext
 {
   public:
-    explicit MythVAAPIContext            (MythCodecID CodecID);
+    MythVAAPIContext                     (DecoderBase *Parent, MythCodecID CodecID);
    ~MythVAAPIContext() override;
 
+    bool   RetrieveFrame                 (AVCodecContext*, VideoFrame* Frame, AVFrame* AvFrame) override;
     int    FilteredReceiveFrame          (AVCodecContext *Context, AVFrame *Frame) override;
     void   PostProcessFrame              (AVCodecContext *Context, VideoFrame *Frame) override;
     bool   IsDeinterlacing               (bool &DoubleRate, bool StreamChange = false) override;

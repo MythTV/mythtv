@@ -34,6 +34,7 @@
 #include "mythtvexp.h"
 #include "mythcodecid.h"
 #include "mythframe.h"
+#include "decoderbase.h"
 
 typedef int (*CreateHWDecoder)(AVCodecContext *Context);
 
@@ -43,12 +44,13 @@ class VideoDisplayProfile;
 class MTV_PUBLIC MythCodecContext
 {
   public:
-    explicit MythCodecContext(MythCodecID CodecID);
+    explicit MythCodecContext(DecoderBase *Parent, MythCodecID CodecID);
     virtual ~MythCodecContext() = default;
 
-    static MythCodecContext* CreateContext (MythCodecID Codec);
+    static MythCodecContext* CreateContext (DecoderBase *Parent, MythCodecID Codec);
     static int  GetBuffer                  (struct AVCodecContext *Context, AVFrame *Frame, int Flags);
-    static int  GetBuffer2                 (struct AVCodecContext *Context, AVFrame *Frame, int Flags);
+    static bool GetBuffer2                 (struct AVCodecContext *Context, VideoFrame *Frame,
+                                            AVFrame *AvFrame, int Flags);
     static int  InitialiseDecoder          (AVCodecContext *Context, CreateHWDecoder Callback, const QString &Debug);
     static int  InitialiseDecoder2         (AVCodecContext *Context, CreateHWDecoder Callback, const QString &Debug);
     static void ReleaseBuffer              (void *Opaque, uint8_t *Data);
@@ -59,14 +61,18 @@ class MTV_PUBLIC MythCodecContext
     static AVBufferRef* CreateDevice       (AVHWDeviceType Type, const QString &Device = QString());
 
     virtual int    HwDecoderInit           (AVCodecContext*) { return 0; }
+    virtual bool   RetrieveFrame           (AVCodecContext*, VideoFrame*, AVFrame*) { return false; }
     virtual int    FilteredReceiveFrame    (AVCodecContext *Context, AVFrame *Frame);
     virtual void   SetDeinterlacing        (AVCodecContext*, VideoDisplayProfile*, bool) {}
     virtual void   PostProcessFrame        (AVCodecContext*, VideoFrame*) {}
     virtual bool   IsDeinterlacing         (bool &, bool = false) { return false; }
 
   protected:
-    static void DestroyInterop             (MythOpenGLInterop *Interop);
-    MythCodecID m_codecID;
+    virtual bool   RetrieveHWFrame         (VideoFrame* Frame, AVFrame* AvFrame);
+    static void    DestroyInterop          (MythOpenGLInterop *Interop);
+
+    DecoderBase* m_parent;
+    MythCodecID  m_codecID;
 };
 
 #endif // MYTHCODECCONTEXT_H

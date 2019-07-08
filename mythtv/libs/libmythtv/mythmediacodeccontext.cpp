@@ -86,8 +86,8 @@ MythCodecID MythMediaCodecContext::GetBestSupportedCodec(AVCodecContext*,
     return failure;
 }
 
-MythMediaCodecContext::MythMediaCodecContext(MythCodecID CodecID)
-  : MythCodecContext(CodecID)
+MythMediaCodecContext::MythMediaCodecContext(DecoderBase *Parent, MythCodecID CodecID)
+  : MythCodecContext(Parent, CodecID)
 {
 }
 
@@ -98,6 +98,15 @@ int MythMediaCodecContext::HwDecoderInit(AVCodecContext *Context)
     else if (codec_is_mediacodec(m_codecID))
         return MythCodecContext::InitialiseDecoder2(Context, MythMediaCodecContext::InitialiseDecoder, "Create MediaCodec decoder");
     return -1;
+}
+
+bool MythMediaCodecContext::RetrieveFrame(AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame)
+{
+    if (AvFrame->format != AV_PIX_FMT_MEDIACODEC)
+        return false;
+    if (codec_is_mediacodec(m_codecID))
+        return GetBuffer2(Context, Frame, AvFrame, 0);
+    return false;
 }
 
 AVPixelFormat MythMediaCodecContext::GetFormat(AVCodecContext*, const AVPixelFormat *PixFmt)

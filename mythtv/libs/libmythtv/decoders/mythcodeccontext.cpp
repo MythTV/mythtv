@@ -47,39 +47,40 @@
 
 #define LOC QString("MythCodecContext: ")
 
-MythCodecContext::MythCodecContext(MythCodecID CodecID)
-  : m_codecID(CodecID)
+MythCodecContext::MythCodecContext(DecoderBase *Parent, MythCodecID CodecID)
+  : m_parent(Parent),
+    m_codecID(CodecID)
 {
 }
 
 // static
-MythCodecContext *MythCodecContext::CreateContext(MythCodecID Codec)
+MythCodecContext *MythCodecContext::CreateContext(DecoderBase *Parent, MythCodecID Codec)
 {
     MythCodecContext *mctx = nullptr;
 #ifdef USING_VAAPI
     if (codec_is_vaapi(Codec) || codec_is_vaapi_dec(Codec))
-        mctx = new MythVAAPIContext(Codec);
+        mctx = new MythVAAPIContext(Parent, Codec);
 #endif
 #ifdef USING_VDPAU
     if (codec_is_vdpau_hw(Codec) || codec_is_vdpau_hw(Codec))
-        mctx = new MythVDPAUContext(Codec);
+        mctx = new MythVDPAUContext(Parent, Codec);
 #endif
 #ifdef USING_NVDEC
     if (codec_is_nvdec_dec(Codec) || codec_is_nvdec(Codec))
-        mctx = new MythNVDECContext(Codec);
+        mctx = new MythNVDECContext(Parent, Codec);
 #endif
 #ifdef USING_VTB
     if (codec_is_vtb_dec(Codec) || codec_is_vtb(Codec))
-        mctx = new MythVTBContext(Codec);
+        mctx = new MythVTBContext(Parent, Codec);
 #endif
 #ifdef USING_MEDIACODEC
     if (codec_is_mediacodec(Codec) || codec_is_mediacodec_dec(Codec))
-        mctx = new MythMediaCodecContext(Codec);
+        mctx = new MythMediaCodecContext(Parent, Codec);
 #endif
     Q_UNUSED(Codec);
 
     if (!mctx)
-        mctx = new MythCodecContext(Codec);
+        mctx = new MythCodecContext(Parent, Codec);
     return mctx;
 }
 
@@ -135,44 +136,44 @@ int MythCodecContext::GetBuffer(struct AVCodecContext *Context, AVFrame *Frame, 
 
 
 /// \brief A generic hardware buffer initialisation method when AVHWFramesContext is NOT used.
-int MythCodecContext::GetBuffer2(struct AVCodecContext *Context, AVFrame *Frame, int)
+bool MythCodecContext::GetBuffer2(struct AVCodecContext *Context, VideoFrame* Frame,
+                                 AVFrame *AvFrame, int)
 {
-    if (!Frame || !Context)
-        return -1;
+    if (!AvFrame || !Context || !Frame)
+        return false;
 
     AvFormatDecoder *avfd = static_cast<AvFormatDecoder*>(Context->opaque);
-    VideoFrame *videoframe = avfd->GetPlayer()->GetNextVideoFrame();
 
-    Frame->opaque           = videoframe;
-    videoframe->pix_fmt     = Context->pix_fmt;
-    Frame->reordered_opaque = Context->reordered_opaque;
+    Frame->pix_fmt = Context->pix_fmt;
+    Frame->directrendering = 1;
+    Frame->colorshifted = 1;
 
-    // N.B. this is untested (VideoToolBox and MediaCodec)
-    videoframe->colorshifted = 1;
+    AvFrame->reordered_opaque = Context->reordered_opaque;
+    AvFrame->opaque = Frame;
 
     // retrieve the software format
-    if (Frame->hw_frames_ctx)
+    if (AvFrame->hw_frames_ctx)
     {
-        AVHWFramesContext *context = reinterpret_cast<AVHWFramesContext*>(Frame->hw_frames_ctx->data);
+        AVHWFramesContext *context = reinterpret_cast<AVHWFramesContext*>(AvFrame->hw_frames_ctx->data);
         if (context)
-            videoframe->sw_pix_fmt = context->sw_format;
+            Frame->sw_pix_fmt = context->sw_format;
     }
 
     // the hardware surface is stored in Frame->data[3]
-    videoframe->buf = Frame->data[3];
+    Frame->buf = AvFrame->data[3];
 
     // Frame->buf[0] contains the release method. Take another reference to
     // ensure the frame is not released before it is displayed.
-    videoframe->priv[0] = reinterpret_cast<unsigned char*>(av_buffer_ref(Frame->buf[0]));
+    Frame->priv[0] = reinterpret_cast<unsigned char*>(av_buffer_ref(AvFrame->buf[0]));
 
     // Retrieve and set the interop class
     AVHWDeviceContext *devicectx = reinterpret_cast<AVHWDeviceContext*>(Context->hw_device_ctx->data);
-    videoframe->priv[1] = reinterpret_cast<unsigned char*>(devicectx->user_opaque);
+    Frame->priv[1] = reinterpret_cast<unsigned char*>(devicectx->user_opaque);
 
     // Set release method
-    Frame->buf[1] = av_buffer_create(reinterpret_cast<uint8_t*>(videoframe), 0,
-                                     MythCodecContext::ReleaseBuffer, avfd, 0);
-    return 0;
+    AvFrame->buf[1] = av_buffer_create(reinterpret_cast<uint8_t*>(Frame), 0,
+                                       MythCodecContext::ReleaseBuffer, avfd, 0);
+    return true;
 }
 
 void MythCodecContext::ReleaseBuffer(void *Opaque, uint8_t *Data)
@@ -288,4 +289,59 @@ AVBufferRef* MythCodecContext::CreateDevice(AVHWDeviceType Type, const QString &
 int MythCodecContext::FilteredReceiveFrame(AVCodecContext *Context, AVFrame *Frame)
 {
     return avcodec_receive_frame(Context, Frame);
+}
+
+bool MythCodecContext::RetrieveHWFrame(VideoFrame *Frame, AVFrame *AvFrame)
+{
+    if (!Frame || !AvFrame)
+        return false;
+
+    AVFrame *temp = av_frame_alloc();
+    if (!temp)
+        return false;
+
+    AVPixelFormat *pixelformats = nullptr;
+    int ret = av_hwframe_transfer_get_formats(AvFrame->hw_frames_ctx,
+                                              AV_HWFRAME_TRANSFER_DIRECTION_FROM,
+                                              &pixelformats, 0);
+    if (ret == 0)
+    {
+        AVPixelFormat best = m_parent->GetBestVideoFormat(pixelformats);
+        if (best != AV_PIX_FMT_NONE)
+        {
+            VideoFrameType type = PixelFormatToFrameType(best);
+            bool valid = Frame->codec == type;
+            if (!valid || (Frame->width != AvFrame->width) || (Frame->height != AvFrame->height))
+                valid = VideoBuffers::ReinitBuffer(Frame, type, m_parent->GetVideoCodecID(),
+                                                   AvFrame->width, AvFrame->height);
+
+            if (valid)
+            {
+                // Retrieve the picture directly into the VideoFrame Buffer
+                temp->format = best;
+                uint max = planes(Frame->codec);
+                for (uint i = 0; i < 3; i++)
+                {
+                    temp->data[i]     = (i < max) ? (Frame->buf + Frame->offsets[i]) : nullptr;
+                    temp->linesize[i] = Frame->pitches[i];
+                }
+
+                // Dummy release method - we do not want to free the buffer
+                temp->buf[0] = av_buffer_create(reinterpret_cast<uint8_t*>(Frame), 0,
+                                                [](void*, uint8_t*){}, this, 0);
+                temp->width = AvFrame->width;
+                temp->height = AvFrame->height;
+            }
+        }
+    }
+    av_freep(&pixelformats);
+
+    // retrieve data from GPU to CPU
+    if (ret >= 0)
+        if ((ret = av_hwframe_transfer_data(temp, AvFrame, 0)) < 0)
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error %1 transferring the data to system memory").arg(ret));
+
+    Frame->colorshifted = 1;
+    av_frame_free(&temp);
+    return ret >= 0;
 }
