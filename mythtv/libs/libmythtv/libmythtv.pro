@@ -374,24 +374,6 @@ using_frontend {
     SOURCES += decoders/privatedecoder.cpp
     SOURCES += decoders/mythcodeccontext.cpp
 
-    using_openmax {
-        DEFINES += USING_OPENMAX
-        HEADERS += decoders/privatedecoder_omx.h
-        SOURCES += decoders/privatedecoder_omx.cpp
-        contains( HAVE_OPENMAX_BROADCOM, yes ) {
-            DEFINES += OMX_SKIP64BIT USING_BROADCOM
-            # Raspbian
-            QMAKE_CXXFLAGS += -isystem /opt/vc/include -isystem /opt/vc/include/IL -isystem /opt/vc/include/interface/vcos/pthreads -isystem /opt/vc/include/interface/vmcs_host/linux
-            # Ubuntu
-            QMAKE_CXXFLAGS += -isystem /usr/include/IL -isystem /usr/include/interface/vcos/pthreads -isystem /usr/include/interface/vmcs_host/linux
-            LIBS += -L/opt/vc/lib -lopenmaxil
-        }
-        contains( HAVE_OPENMAX_BELLAGIO, yes ) {
-            DEFINES += USING_BELLAGIO
-            #LIBS += -lomxil-bellagio
-        }
-    }
-
     using_libass {
         DEFINES += USING_LIBASS
         LIBS    += -lass
@@ -945,17 +927,6 @@ using_live: LIBS += -L../libmythlivemedia -lmythlivemedia-$$LIBVERSION
 using_backend:using_mp3lame: LIBS += -lmp3lame
 using_backend: LIBS += -llzo2
 LIBS += $$EXTRA_LIBS $$QMAKE_LIBS_DYNLOAD
-
-using_openmax {
-    contains( HAVE_OPENMAX_BROADCOM, yes ) {
-        using_opengl {
-            # For raspberry Pi Raspbian
-            exists(/opt/vc/lib/libbrcmEGL.so) {
-                LIBS += -L/opt/vc/lib/ -lbrcmGLESv2 -lbrcmEGL
-            }
-        }
-    }
-}
 
 !win32-msvc* {
     POST_TARGETDEPS += ../libmyth/libmyth-$${MYTH_SHLIB_EXT}

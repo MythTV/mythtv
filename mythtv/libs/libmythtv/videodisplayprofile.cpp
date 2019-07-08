@@ -893,11 +893,6 @@ QString VideoDisplayProfile::GetDecoderHelp(const QString& decoder)
             "DXVA2 will use the graphics hardware to "
             "accelerate video decoding and playback. ");
 
-    if (decoder == "openmax")
-        msg += QObject::tr(
-            "Openmax will use the graphics hardware to "
-            "accelerate video decoding on Raspberry Pi. ");
-
     if (decoder == "mediacodec-dec")
         msg += QObject::tr(
             "Mediacodec will use the graphics hardware to "
@@ -961,14 +956,6 @@ QString VideoDisplayProfile::GetDeinterlacerName(const QString &short_name)
         return QObject::tr("Advanced (1x, HW)");
     if ("vdpauadvanceddoublerate" == short_name)
         return QObject::tr("Advanced (2x, HW)");
-#ifdef USING_OPENMAX
-    if ("openmaxadvanced" == short_name)
-        return QObject::tr("Advanced (HW)");
-    if ("openmaxfast" == short_name)
-        return QObject::tr("Fast (HW)");
-    if ("openmaxlinedouble" == short_name)
-        return QObject::tr("Line double (HW)");
-#endif // def USING_OPENMAX
 #ifdef USING_VAAPI
     if ("vaapi2default" == short_name)
         return QObject::tr("Advanced (HW-VA)");
@@ -1386,29 +1373,6 @@ void VideoDisplayProfile::CreateProfiles(const QString &hostname)
         CreateProfile(groupid, 2, ">", 0, 0, "", 0, 0,
                       "ffmpeg", 2, true, "opengl", "opengl2", true,
                       "opengldoubleratekerneldeint", "openglkerneldeint",
-                      "");
-    }
-#endif
-
-#ifdef USING_OPENMAX
-#ifdef USING_OPENGLES
-    if (!profiles.contains("OpenMAX High Quality")) {
-        (void) QObject::tr("OpenMAX High Quality",
-                           "Sample: OpenMAX High Quality");
-        groupid = CreateProfileGroup("OpenMAX High Quality", hostname);
-        CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
-                      "openmax", 4, true, "openmax", "opengl", true,
-                      "openmaxadvanced", "onefield",
-                      "");
-    }
-#endif
-
-    if (!profiles.contains("OpenMAX Normal")) {
-        (void) QObject::tr("OpenMAX Normal", "Sample: OpenMAX Normal");
-        groupid = CreateProfileGroup("OpenMAX Normal", hostname);
-        CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
-                      "openmax", 4, true, "openmax", "softblend", false,
-                      "openmaxadvanced", "onefield",
                       "");
     }
 #endif

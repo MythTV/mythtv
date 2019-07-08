@@ -180,26 +180,10 @@ using_opengl {
     HEADERS += mythrender_opengl_defs.h mythrender_opengl_shaders.h
     using_opengles {
         DEFINES += USING_OPENGLES
-        # For raspberry Pi Raspbian
-        exists(/opt/vc/lib/libbrcmEGL.so) {
-            LIBS += -L/opt/vc/include -lbrcmGLESv2 -lbrcmEGL
-        }
     }
     inc.files += mythpainter_ogl.h
     mingw|win32-msvc*:LIBS += -lopengl32
 }
-
-using_openmax {
-    contains( HAVE_OPENMAX_BROADCOM, yes ) {
-        using_opengl {
-            # For raspberry Pi Raspbian
-            exists(/opt/vc/lib/libbrcmEGL.so) {
-                LIBS += -L/opt/vc/lib/ -lbrcmGLESv2 -lbrcmEGL
-            }
-        }
-    }
-}
-
 
 DEFINES += USING_QTWEBKIT
 DEFINES += MUI_API

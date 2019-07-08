@@ -40,8 +40,6 @@ void VideoOutputOpenGL::GetRenderOptions(render_opts &Options,
     (*Options.safe_renderers)["nuppel"].append(safe);
     if (Options.decoders->contains("ffmpeg"))
         (*Options.safe_renderers)["ffmpeg"].append(safe);
-    if (Options.decoders->contains("openmax"))
-        (*Options.safe_renderers)["openmax"].append(safe);
     if (Options.decoders->contains("mediacodec-dec"))
         (*Options.safe_renderers)["mediacodec-dec"].append(safe);
     if (Options.decoders->contains("vaapi-dec"))

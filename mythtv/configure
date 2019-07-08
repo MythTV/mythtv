@@ -134,7 +134,6 @@ Advanced options (experts only):
   --disable-vdpau          disable NVidia VDPAU hardware acceleration.
   --disable-vaapi          disable VAAPI hardware accelerated video decoding
   --disable-nvdec          disable NVDEC (CUVID) hardware accelerated video decoding
-  --disable-openmax        disable OpenMAX hardware accelerated video decoding
   --disable-dxva2          disable hardware accelerated decoding on windows
   --disable-mediacodec     disable hardware accelerated decoding on android
   --disable-opengl-video   disable OpenGL based video display
@@ -1972,7 +1971,6 @@ MYTHTV_CONFIG_LIST='
     opengl
     opengl_video
     opengl_themepainter
-    openmax
     qtwebkit
     qtscript
     qtdbus
@@ -1999,8 +1997,6 @@ MYTHTV_HAVE_LIST='
     ftime
     getifaddrs
     gettimeofday
-    openmax_bellagio
-    openmax_broadcom
     posix_fadvise
     libudev
     libuuid
@@ -2039,7 +2035,6 @@ USING_LIST='
     vaapi
     nvdec
     vdpau
-    openmax
     mediacodec
 '
 
@@ -5797,38 +5792,6 @@ check_type "vdpau/vdpau.h" "VdpPictureInfoHEVC"
 
 check_cpp_condition windows.h "!WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)" && enable winrt || disable winrt
 
-# check for OpenMAX header & lib
-enabled omx_rpi && enable openmax
-
-if  enabled openmax ; then
-    openmax_was_enabled=Y
-fi
-if ! disabled openmax; then
-    test -f /opt/vc/include/IL/OMX_Core.h && enable openmax
-fi
-if ! disabled openmax; then
-    if test -f /opt/vc/include/IL/OMX_Broadcom.h \
-        && test -f /opt/vc/lib/libopenmaxil.so ; then
-        enable openmax_broadcom
-    elif test -f /usr/include/bellagio/omxcore.h ; then
-        if test -f /usr/lib/libomxil-bellagio.so \
-           -o -f /usr/lib32/libomxil-bellagio.so \
-           -o -f /usr/lib64/libomxil-bellagio.so ; then
-            enable openmax
-            enable openmax_bellagio
-            add_extralibs -lomxil-bellagio
-        else
-            disable openmax
-        fi
-    else
-        disable openmax
-    fi
-fi
-
-if  test "$openmax_was_enabled" = "Y" && disabled openmax ; then
-    die "ERROR - Unable to enable openmax"
-fi
-
 if ! disabled w32threads && ! enabled pthreads; then
     check_func_headers "windows.h process.h" _beginthreadex &&
         enable w32threads || disable w32threads
@@ -7388,11 +7351,6 @@ if enabled x11 ; then
   echo "VDPAU support             ${vdpau-no}"
   echo "VAAPI support             ${vaapi-no}"
   echo "NVDEC support             ${nvdec-no}"
-  echo "OpenMAX support           ${openmax-no}"
-  if enabled openmax ; then
-    echo "OpenMAX Broadcom          ${openmax_broadcom-no}"
-    echo "OpenMAX Bellagio          ${openmax_bellagio-no}"
-  fi
 fi
   echo "OpenGL support            ${opengl-no}"
   echo "OpenGL video              ${opengl_video-no}"

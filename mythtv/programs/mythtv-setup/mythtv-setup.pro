@@ -42,14 +42,3 @@ macx {
 
 using_x11:DEFINES += USING_X11
 
-using_openmax {
-    contains( HAVE_OPENMAX_BROADCOM, yes ) {
-        ! using_opengl {
-            # For raspberry pi ubuntu
-            exists(/usr/lib/arm-linux-gnueabihf/mesa-egl/libEGL.so) {
-                QMAKE_RPATHDIR += /usr/lib/arm-linux-gnueabihf/mesa-egl
-            }
-        }
-    }
-}
-

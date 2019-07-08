@@ -66,8 +66,7 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
     memset(m_src_in_buf,         0, sizeof(m_src_in_buf));
     memset(m_audiobuffer,        0, sizeof(m_audiobuffer));
 
-    if (m_main_device.startsWith("OpenMAX:")
-        || m_main_device.startsWith("AudioTrack:"))
+    if (m_main_device.startsWith("AudioTrack:"))
         m_usesSpdif = false;
     // Handle override of SRC quality settings
     if (gCoreContext->GetBoolSetting("SRCQualityOverride", false))

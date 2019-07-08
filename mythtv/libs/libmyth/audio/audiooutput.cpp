@@ -40,9 +40,6 @@ using namespace std;
 #include "audiooutputopensles.h"
 #include "audiooutputaudiotrack.h"
 #endif
-#ifdef USING_OPENMAX
-#include "audiooutput_omx.h"
-#endif
 
 extern "C" {
 #include "libavcodec/avcodec.h"  // to get codec id
@@ -216,17 +213,6 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
 #else
         LOG(VB_GENERAL, LOG_ERR, "Audio output device is set to AudioTrack "
                                  "device but Android support is not compiled "
-                                 "in!");
-#endif
-    }
-    else if (main_device.startsWith("OpenMAX:"))
-    {
-#ifdef USING_OPENMAX
-        if (!getenv("NO_OPENMAX_AUDIO"))
-            ret = new AudioOutputOMX(settings);
-#else
-        LOG(VB_GENERAL, LOG_ERR, "Audio output device is set to a OpenMAX "
-                                 "device but OpenMAX support is not compiled "
                                  "in!");
 #endif
     }
@@ -586,29 +572,6 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
     {
         QString name = "AudioTrack:";
         QString desc =  tr("Android AudioTrack output. Supports surround sound.");
-        adc = GetAudioDeviceConfig(name, desc);
-        if (adc)
-        {
-            list->append(*adc);
-            delete adc;
-        }
-    }
-#endif
-
-#ifdef USING_OPENMAX
-    if (!getenv("NO_OPENMAX_AUDIO"))
-    {
-        QString name = "OpenMAX:analog";
-        QString desc =  tr("OpenMAX analog output.");
-        adc = GetAudioDeviceConfig(name, desc);
-        if (adc)
-        {
-            list->append(*adc);
-            delete adc;
-        }
-
-        name = "OpenMAX:hdmi";
-        desc =  tr("OpenMAX HDMI output.");
         adc = GetAudioDeviceConfig(name, desc);
         if (adc)
         {

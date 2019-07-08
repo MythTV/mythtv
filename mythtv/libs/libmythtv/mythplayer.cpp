@@ -1689,12 +1689,6 @@ void MythPlayer::InitAVSync(void)
     prior_audiotimecode = 0;
     prior_videotimecode = 0;
 
-    // Special averaging default of 60 for OpenMAX passthru
-    QString device = gCoreContext->GetSetting("AudioOutputDevice","");
-    int ac3pass = gCoreContext->GetNumSetting("AC3PassThru",-1);
-    if (device == "OpenMAX:hdmi" && ac3pass == 1)
-        avsync_averaging=60;
-
     // Allow override of averaging value
     avsync_averaging = gCoreContext->GetNumSetting("AVSyncAveraging", avsync_averaging);  // Number of frames to average
     if (avsync_averaging < 4)
