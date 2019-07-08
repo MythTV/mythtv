@@ -89,7 +89,7 @@ bool MythVTBContext::CheckDecoderSupport(uint StreamType, AVCodec **Codec)
     return true;
 }
 
-MythCodecID MythVTBContext::GetSupportedCodec(AVCodecContext *,
+MythCodecID MythVTBContext::GetSupportedCodec(AVCodecContext *Context,
                                               AVCodec **Codec,
                                               const QString &Decoder,
                                               uint StreamType,
