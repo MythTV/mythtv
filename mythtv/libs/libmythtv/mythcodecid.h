@@ -196,19 +196,35 @@ typedef enum
 
     kCodec_VTB_DEC_END,
 
-    kCodec_OMXEGL_BEGIN = kCodec_VTB_DEC_END,
-    kCodec_MPEG1_OMXEGL,
-    kCodec_MPEG2_OMXEGL,
-    kCodec_H263_OMXEGL,
-    kCodec_MPEG4_OMXEGL,
-    kCodec_H264_OMXEGL,
-    kCodec_VC1_OMXEGL,
-    kCodec_WMV3_OMXEGL,
-    kCodec_VP8_OMXEGL,
-    kCodec_VP9_OMXEGL,
-    kCodec_HEVC_OMXEGL,
+    kCodec_V4L2_BEGIN = kCodec_VTB_DEC_END,
 
-    kCodec_OMXEGL_END
+    kCodec_MPEG1_V4L2,
+    kCodec_MPEG2_V4L2,
+    kCodec_H263_V4L2,
+    kCodec_MPEG4_V4L2,
+    kCodec_H264_V4L2,
+    kCodec_VC1_V4L2,
+    kCodec_WMV3_V4L2,
+    kCodec_VP8_V4L2,
+    kCodec_VP9_V4L2,
+    kCodec_HEVC_V4L2,
+
+    kCodec_V4L2_END,
+
+    kCodec_V4L2_DEC_BEGIN = kCodec_V4L2_END,
+
+    kCodec_MPEG1_V4L2_DEC,
+    kCodec_MPEG2_V4L2_DEC,
+    kCodec_H263_V4L2_DEC,
+    kCodec_MPEG4_V4L2_DEC,
+    kCodec_H264_V4L2_DEC,
+    kCodec_VC1_V4L2_DEC,
+    kCodec_WMV3_V4L2_DEC,
+    kCodec_VP8_V4L2_DEC,
+    kCodec_VP9_V4L2_DEC,
+    kCodec_HEVC_V4L2_DEC,
+
+    kCodec_V4L2_DEC_END
 } MythCodecID;
 
 // MythCodecID convenience functions
@@ -255,11 +271,13 @@ typedef enum
 #define codec_is_vtb_dec(id)  ((id > kCodec_VTB_DEC_BEGIN) && \
                                (id < kCodec_VTB_DEC_END))
 
-#define codec_is_omxegl(id)   ((id > kCodec_OMXEGL_BEGIN) && (id < kCodec_OMXEGL_END))
+#define codec_is_v4l2(id)     ((id > kCodec_V4L2_BEGIN) && (id < kCodec_V4L2_END))
+#define codec_is_v4l2_dec(id) ((id > kCodec_V4L2_DEC_BEGIN) && (id < kCodec_V4L2_DEC_END))
 
 #define codec_is_copyback(id) (codec_is_mediacodec_dec(id) || \
                                codec_is_vaapi_dec(id) || codec_is_nvdec_dec(id) || \
-                               codec_is_vtb_dec(id) || codec_is_vdpau_dec(id))
+                               codec_is_vtb_dec(id) || codec_is_vdpau_dec(id) || \
+                               codec_is_v4l2_dec(id))
 
 #define codec_sw_copy(id)     (codec_is_std(id) || codec_is_copyback(id))
 
