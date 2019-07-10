@@ -682,6 +682,21 @@ bool V4L2util::GetResolution(int& width, int& height) const
     return true;
 }
 
+uint32_t V4L2util::GetCapabilities(void) const
+{
+    return m_capabilities;
+}
+
+QString V4L2util::GetDeviceName(void) const
+{
+    return m_deviceName;
+}
+
+QString V4L2util::GetDriverName(void) const
+{
+    return m_driverName;
+}
+
 bool V4L2util::HasTuner(void) const
 {
     return (m_capabilities & V4L2_CAP_TUNER) != 0U;

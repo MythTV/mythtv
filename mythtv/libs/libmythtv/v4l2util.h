@@ -34,6 +34,9 @@ class MTV_PUBLIC V4L2util
     bool GetVideoStandard(QString& name) const;
     int  GetSignalStrength(void) const;
     bool GetResolution(int& width, int& height) const;
+    uint32_t GetCapabilities(void) const;
+    QString  GetDeviceName(void) const;
+    QString  GetDriverName(void) const;
 
     bool HasTuner(void) const;
     bool HasAudioSupport(void) const;
