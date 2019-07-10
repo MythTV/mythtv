@@ -292,7 +292,7 @@ inline AVCodecID myth2av_codecid(MythCodecID codec_id)
 }
 
 // AV codec id convenience functions
-int mpeg_version(int codec_id);
+uint mpeg_version(int codec_id);
 #define CODEC_IS_H264(id)     (mpeg_version(id) == 5)
 #define CODEC_IS_MPEG(id)     (mpeg_version(id) && mpeg_version(id) <= 2)
 #define CODEC_IS_FFMPEG_MPEG(id) (CODEC_IS_MPEG(id))

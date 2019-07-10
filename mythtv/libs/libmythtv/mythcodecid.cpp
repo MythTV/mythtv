@@ -367,7 +367,7 @@ AVCodecID myth2av_codecid(MythCodecID codec_id, bool &vdpau)
     return AV_CODEC_ID_NONE;
 }
 
-int mpeg_version(int codec_id)
+uint mpeg_version(int codec_id)
 {
     switch (codec_id)
     {

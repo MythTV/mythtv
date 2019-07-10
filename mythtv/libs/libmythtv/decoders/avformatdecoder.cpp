@@ -71,6 +71,10 @@ extern "C" {
 #include "mythvdpauhelper.h"
 #endif
 
+#ifdef USING_V4L2
+#include "mythv4l2m2mcontext.h"
+#endif
+
 extern "C" {
 #include "libavutil/avutil.h"
 #include "libavutil/error.h"
@@ -389,6 +393,14 @@ void AvFormatDecoder::GetDecoders(render_opts &opts)
     (*opts.equiv_decoders)["vtb"].append("dummy");
     (*opts.equiv_decoders)["vtb-dec"].append("dummy");
 #endif
+#ifdef USING_V4L2
+    if (MythV4L2M2MContext::HaveV4L2Codecs())
+    {
+        opts.decoders->append("v4l2-dec");
+        (*opts.equiv_decoders)["v4l2-dec"].append("dummy");
+    }
+#endif
+
     PrivateDecoder::GetDecoders(opts);
 }
 
@@ -1581,6 +1593,13 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     }
     else
 #endif
+#ifdef USING_V4L2
+    if (codec_is_v4l2_dec(m_video_codec_id))
+    {
+        m_directrendering = false;
+    }
+    else
+#endif
     if (codec1 && codec1->capabilities & AV_CODEC_CAP_DR1)
     {
         // enc->flags          |= CODEC_FLAG_EMU_EDGE;
@@ -2404,7 +2423,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             }
 
             m_video_codec_id = kCodec_NONE;
-            int version = mpeg_version(enc->codec_id);
+            uint version = mpeg_version(enc->codec_id);
             if (version)
                 m_video_codec_id = static_cast<MythCodecID>(kCodec_MPEG1 + version - 1);
 
@@ -2520,6 +2539,24 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     }
                 }
 #endif // USING_NVDEC
+#ifdef USING_V4L2
+                if (!foundgpudecoder)
+                {
+                    MythCodecID v4l2mcid;
+                    AVPixelFormat pix_fmt = AV_PIX_FMT_YUV420P;
+                    v4l2mcid = MythV4L2M2MContext::GetSupportedCodec(enc, &codec, dec,
+                                    mpeg_version(static_cast<int>(enc->codec_id)), pix_fmt);
+
+                    if (codec_is_v4l2_dec(v4l2mcid))
+                    {
+                        gCodecMap->freeCodecContext(m_ic->streams[selTrack]);
+                        enc = gCodecMap->getCodecContext(m_ic->streams[selTrack], codec);
+                        m_video_codec_id = v4l2mcid;
+                        enc->pix_fmt = pix_fmt;
+                        foundgpudecoder = true;
+                    }
+                }
+#endif // USING_V4L2
             }
             // default to mpeg2
             if (m_video_codec_id == kCodec_NONE)

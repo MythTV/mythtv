@@ -41,6 +41,10 @@ void VideoOutputNull::GetRenderOptions(render_opts &opts,
     if (opts.decoders->contains("mediacodec-dec"))
         (*opts.safe_renderers)["mediacodec-dec"].append("null");
 #endif
+#ifdef USING_V4L2
+    if (opts.decoders->contains("v4l2-dec"))
+        (*opts.safe_renderers)["v4l2-dec"].append("null");
+#endif
     opts.priorities->insert("null", 10);
 }
 

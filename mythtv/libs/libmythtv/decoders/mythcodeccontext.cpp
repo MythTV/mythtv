@@ -43,6 +43,10 @@
 #ifdef USING_MEDIACODEC
 #include "mythmediacodeccontext.h"
 #endif
+#ifdef USING_V4L2
+#include "mythv4l2m2mcontext.h"
+#endif
+
 #include "mythcodeccontext.h"
 
 #define LOC QString("MythCodecContext: ")
@@ -77,6 +81,11 @@ MythCodecContext *MythCodecContext::CreateContext(DecoderBase *Parent, MythCodec
     if (codec_is_mediacodec(Codec) || codec_is_mediacodec_dec(Codec))
         mctx = new MythMediaCodecContext(Parent, Codec);
 #endif
+#ifdef USING_V4L2
+    if (codec_is_v4l2_dec(Codec))
+        mctx = new MythV4L2M2MContext(Parent, Codec);
+#endif
+
     Q_UNUSED(Codec);
 
     if (!mctx)

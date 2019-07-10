@@ -662,6 +662,8 @@ using_backend {
         HEADERS += recorders/v4l2encsignalmonitor.h
         SOURCES += recorders/v4l2encsignalmonitor.cpp
 
+        HEADERS += mythv4l2m2mcontext.h
+        SOURCES += mythv4l2m2mcontext.cpp
         DEFINES += USING_V4L2
     }
 

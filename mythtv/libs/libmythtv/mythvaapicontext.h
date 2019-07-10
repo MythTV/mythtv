@@ -31,7 +31,7 @@ class MTV_PUBLIC MythVAAPIContext : public MythCodecContext
     static MythCodecID GetSupportedCodec (AVCodecContext *Context,
                                           AVCodec       **Codec,
                                           const QString  &Decoder,
-                                          int             StreamType,
+                                          uint            StreamType,
                                           AVPixelFormat  &PixFmt);
     static enum AVPixelFormat GetFormat  (AVCodecContext *Context,
                                           const AVPixelFormat *PixFmt);
