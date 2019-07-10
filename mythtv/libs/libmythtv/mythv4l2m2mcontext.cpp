@@ -83,6 +83,18 @@ bool MythV4L2M2MContext::RetrieveFrame(AVCodecContext *Context, VideoFrame *Fram
     return false;
 }
 
+/*! \brief Reduce the number of capture buffers
+ *
+ * Testing on Pi 3, the default of 20 is too high and leads to memory allocation
+ * failures in the the kernel driver.
+*/
+AVDictionary* MythV4L2M2MContext::GetDecoderOptions(void)
+{
+    AVDictionary *options = nullptr;
+    av_dict_set_int(&options, "num_capture_buffers", 2, 0);
+    return options;
+}
+
 /*! \brief Retrieve a frame from CPU memory
  *
  * This is similar to the default, direct render supporting, get_av_buffer in

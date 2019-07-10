@@ -14,6 +14,7 @@ class MythV4L2M2MContext : public MythCodecContext
                                           uint            StreamType,
                                           AVPixelFormat  &PixFmt);
     bool        RetrieveFrame            (AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame) override;
+    AVDictionary* GetDecoderOptions      (void) override;
     static bool GetBuffer                (AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame, int);
     static bool GetDRMBuffer             (AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame, int);
     static bool HaveV4L2Codecs           (AVCodecID Codec = AV_CODEC_ID_NONE);
