@@ -1285,6 +1285,7 @@ bool MetadataOptions::Create()
     bool err = false;
 
     UIUtilE::Assign(this, m_inetrefEdit, "inetref_edit", &err);
+    UIUtilW::Assign(this, m_inetrefClear, "inetref_clear", &err);
     UIUtilE::Assign(this, m_seasonSpin, "season_spinbox", &err);
     UIUtilE::Assign(this, m_episodeSpin, "episode_spinbox", &err);
     UIUtilE::Assign(this, m_queryButton, "query_button", &err);
@@ -1305,6 +1306,8 @@ bool MetadataOptions::Create()
         return false;
     }
 
+    connect(m_inetrefClear, SIGNAL(Clicked()),
+            SLOT(ClearInetref()));
     connect(m_queryButton, SIGNAL(Clicked()),
             SLOT(PerformQuery()));
     connect(m_localFanartButton, SIGNAL(Clicked()),
@@ -1374,6 +1377,12 @@ void MetadataOptions::CreateBusyDialog(const QString& title)
 
     if (m_busyPopup->Create())
         m_popupStack->AddScreen(m_busyPopup);
+}
+
+void MetadataOptions::ClearInetref()
+{
+    m_recordingRule->m_inetref.clear();
+    m_inetrefEdit->SetText(m_recordingRule->m_inetref);
 }
 
 void MetadataOptions::PerformQuery()
