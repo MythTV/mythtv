@@ -6676,6 +6676,14 @@ if enabled x11; then
 			# This is hopefully temporary.
 			disable xnvctrl_external
 			;;
+                    *gentoo*)
+                        if [ -e "/usr/bin/nvidia-settings" ]
+                        then
+                            require XNVctrl "X11/Xlib.h NVCtrl/NVCtrl.h NVCtrl/NVCtrlLib.h" XNVCTRLIsNvScreen -lXNVCtrl || disable xnvctrl
+                        else
+                            disable xnvctrl_external
+                        fi
+                        ;;
 		    *)
                         require XNVctrl "X11/Xlib.h NVCtrl/NVCtrl.h NVCtrl/NVCtrlLib.h" XNVCTRLIsNvScreen -lXNVCtrl || disable xnvctrl
                         ;;
