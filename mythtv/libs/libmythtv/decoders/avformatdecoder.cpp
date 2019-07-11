@@ -2600,18 +2600,15 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             LOG(VB_GENERAL, LOG_INFO, LOC +
                 QString("Using %1 for video decoding")
                 .arg(GetCodecDecoderName()));
-
-            AVDictionary *options = m_mythcodecctx->GetDecoderOptions();
             {
                 QMutexLocker locker(avcodeclock);
-                if (!OpenAVCodec(enc, codec, options))
+                m_mythcodecctx->SetDecoderOptions(enc, codec);
+                if (!OpenAVCodec(enc, codec))
                 {
-                    av_dict_free(&options);
                     scanerror = -1;
                     break;
                 }
             }
-            av_dict_free(&options);
             break;
         }
     }
@@ -2674,8 +2671,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     return scanerror;
 }
 
-bool AvFormatDecoder::OpenAVCodec(AVCodecContext *avctx, const AVCodec *codec,
-                                  AVDictionary *Options)
+bool AvFormatDecoder::OpenAVCodec(AVCodecContext *avctx, const AVCodec *codec)
 {
     QMutexLocker locker(avcodeclock);
 
@@ -2683,7 +2679,7 @@ bool AvFormatDecoder::OpenAVCodec(AVCodecContext *avctx, const AVCodec *codec,
     if (QString("mediacodec") == codec->wrapper_name)
         av_jni_set_java_vm(QAndroidJniEnvironment::javaVM(), nullptr);
 #endif
-    int ret = avcodec_open2(avctx, codec, &Options);
+    int ret = avcodec_open2(avctx, codec, nullptr);
     if (ret < 0)
     {
         char error[AV_ERROR_MAX_STRING_SIZE];

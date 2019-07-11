@@ -67,7 +67,7 @@ class MTV_PUBLIC MythCodecContext
     virtual void   SetDeinterlacing        (AVCodecContext*, VideoDisplayProfile*, bool) {}
     virtual void   PostProcessFrame        (AVCodecContext*, VideoFrame*) {}
     virtual bool   IsDeinterlacing         (bool &, bool = false) { return false; }
-    virtual AVDictionary* GetDecoderOptions(void) { return nullptr; }
+    virtual void   SetDecoderOptions       (AVCodecContext*, AVCodec*) { return; }
 
   protected:
     virtual bool   RetrieveHWFrame         (VideoFrame* Frame, AVFrame* AvFrame);

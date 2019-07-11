@@ -11,6 +11,11 @@
 // Sys
 #include <sys/ioctl.h>
 
+// FFmpeg
+extern "C" {
+#include "libavutil/opt.h"
+}
+
 #define LOC QString("V4L2_M2M: ")
 
 MythV4L2M2MContext::MythV4L2M2MContext(DecoderBase *Parent, MythCodecID CodecID)
@@ -88,11 +93,14 @@ bool MythV4L2M2MContext::RetrieveFrame(AVCodecContext *Context, VideoFrame *Fram
  * Testing on Pi 3, the default of 20 is too high and leads to memory allocation
  * failures in the the kernel driver.
 */
-AVDictionary* MythV4L2M2MContext::GetDecoderOptions(void)
+void MythV4L2M2MContext::SetDecoderOptions(AVCodecContext* Context, AVCodec* Codec)
 {
-    AVDictionary *options = nullptr;
-    av_dict_set_int(&options, "num_capture_buffers", 2, 0);
-    return options;
+    if (!(Context && Codec))
+        return;
+    if (!(Codec->priv_class && Context->priv_data))
+        return;
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "Setting number of capture buffers to 2");
+    av_opt_set(Context->priv_data, "num_capture_buffers", "2", 0);
 }
 
 /*! \brief Retrieve a frame from CPU memory

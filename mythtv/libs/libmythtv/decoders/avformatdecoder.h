@@ -261,7 +261,7 @@ class AvFormatDecoder : public DecoderBase
     bool HasVideo(const AVFormatContext *ic);
     float normalized_fps(AVStream *stream, AVCodecContext *enc);
     void av_update_stream_timings_video(AVFormatContext *ic);
-    bool OpenAVCodec(AVCodecContext *avctx, const AVCodec *codec, AVDictionary *Options = nullptr);
+    bool OpenAVCodec(AVCodecContext *avctx, const AVCodec *codec);
 
     void UpdateFramesPlayed(void) override; // DecoderBase
     bool DoRewindSeek(long long desiredFrame) override; // DecoderBase
