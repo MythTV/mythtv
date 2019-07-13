@@ -123,9 +123,11 @@ void StreamHandler::Start(void)
         {
             LOG(VB_RECORD, LOG_INFO, LOC + "Restarting StreamHandler");
             SetRunningDesired(false);
+            m_restarting = true;
             locker.unlock();
             wait();
             locker.relock();
+            m_restarting = false;
         }
     }
 
@@ -161,7 +163,7 @@ bool StreamHandler::IsRunning(void) const
     // This used to use QMutexLocker, but that sometimes left the
     // mutex locked on exit, so...
     m_start_stop_lock.lock();
-    bool r = m_running;
+    bool r = m_running || m_restarting;
     m_start_stop_lock.unlock();
     return r;
 }
