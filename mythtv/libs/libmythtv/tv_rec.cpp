@@ -77,7 +77,7 @@ static int eit_start_rand(int eitTransportTimeout);
  */
 
 /**
- *  \brief Performs instance initialiation not requiring access to database.
+ *  \brief Performs instance initialization not requiring access to database.
  *
  *  \sa Init()
  *  \param _inputid
@@ -85,7 +85,7 @@ static int eit_start_rand(int eitTransportTimeout);
 TVRec::TVRec(int inputid)
       // Various threads
     : m_eventThread(new MThread("TVRecEvent", this)),
-      // Configuration variables from setup rutines
+      // Configuration variables from setup routines
       m_inputid(inputid)
 {
     s_inputs[m_inputid] = this;
@@ -113,7 +113,7 @@ bool TVRec::CreateChannel(const QString &startchannel,
     {
         if (!CardUtil::IsVBoxPresent(m_inputid))
         {
-            // VBOX presence failed  recorder is marked errored
+            // VBOX presence failed, recorder is marked errored
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("CreateChannel(%1) failed due to VBOX not responding "
                         "to network check on inputid [%2]")
