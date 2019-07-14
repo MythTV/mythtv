@@ -2393,7 +2393,7 @@ ChannelInfoList ChannelUtil::LoadChannels(uint startIndex, uint count,
                   "MIN(livetvorder) livetvorder "
                   "FROM channel "
                   "LEFT JOIN channelgroup ON channel.chanid = channelgroup.chanid "
-                  "LEFT JOIN capturecard  ON capturecard.sourceid = channel.sourceid ";
+                  "INNER JOIN capturecard  ON capturecard.sourceid = channel.sourceid ";
 
     QStringList cond;
     if (ignoreHidden)
