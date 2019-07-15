@@ -46,6 +46,9 @@
 #ifdef USING_V4L2
 #include "mythv4l2m2mcontext.h"
 #endif
+#ifdef USING_MMAL
+#include "mythmmalcontext.h"
+#endif
 
 #include "mythcodeccontext.h"
 
@@ -85,7 +88,10 @@ MythCodecContext *MythCodecContext::CreateContext(DecoderBase *Parent, MythCodec
     if (codec_is_v4l2_dec(Codec))
         mctx = new MythV4L2M2MContext(Parent, Codec);
 #endif
-
+#ifdef USING_MMAL
+    if (codec_is_mmal_dec(Codec))
+        mctx = new MythMMALContext(Parent, Codec);
+#endif
     Q_UNUSED(Codec);
 
     if (!mctx)

@@ -45,6 +45,10 @@ void VideoOutputNull::GetRenderOptions(render_opts &opts,
     if (opts.decoders->contains("v4l2-dec"))
         (*opts.safe_renderers)["v4l2-dec"].append("null");
 #endif
+#ifdef USING_MMAL
+    if (opts.decoders->contains("mmal-dec"))
+        (*opts.safe_renderers)["mmal-dec"].append("null");
+#endif
     opts.priorities->insert("null", 10);
 }
 

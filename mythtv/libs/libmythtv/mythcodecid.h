@@ -224,7 +224,37 @@ typedef enum
     kCodec_VP9_V4L2_DEC,
     kCodec_HEVC_V4L2_DEC,
 
-    kCodec_V4L2_DEC_END
+    kCodec_V4L2_DEC_END,
+
+    kCodec_MMAL_BEGIN = kCodec_V4L2_DEC_END,
+
+    kCodec_MPEG1_MMAL,
+    kCodec_MPEG2_MMAL,
+    kCodec_H263_MMAL,
+    kCodec_MPEG4_MMAL,
+    kCodec_H264_MMAL,
+    kCodec_VC1_MMAL,
+    kCodec_WMV3_MMAL,
+    kCodec_VP8_MMAL,
+    kCodec_VP9_MMAL,
+    kCodec_HEVC_MMAL,
+
+    kCodec_MMAL_END,
+
+    kCodec_MMAL_DEC_BEGIN = kCodec_MMAL_END,
+
+    kCodec_MPEG1_MMAL_DEC,
+    kCodec_MPEG2_MMAL_DEC,
+    kCodec_H263_MMAL_DEC,
+    kCodec_MPEG4_MMAL_DEC,
+    kCodec_H264_MMAL_DEC,
+    kCodec_VC1_MMAL_DEC,
+    kCodec_WMV3_MMAL_DEC,
+    kCodec_VP8_MMAL_DEC,
+    kCodec_VP9_MMAL_DEC,
+    kCodec_HEVC_MMAL_DEC,
+
+    kCodec_MMAL_DEC_END
 } MythCodecID;
 
 // MythCodecID convenience functions
@@ -274,10 +304,13 @@ typedef enum
 #define codec_is_v4l2(id)     ((id > kCodec_V4L2_BEGIN) && (id < kCodec_V4L2_END))
 #define codec_is_v4l2_dec(id) ((id > kCodec_V4L2_DEC_BEGIN) && (id < kCodec_V4L2_DEC_END))
 
+#define codec_is_mmal(id)     ((id > kCodec_MMAL_BEGIN) && (id < kCodec_MMAL_END))
+#define codec_is_mmal_dec(id) ((id > kCodec_MMAL_DEC_BEGIN) && (id < kCodec_MMAL_DEC_END))
+
 #define codec_is_copyback(id) (codec_is_mediacodec_dec(id) || \
                                codec_is_vaapi_dec(id) || codec_is_nvdec_dec(id) || \
                                codec_is_vtb_dec(id) || codec_is_vdpau_dec(id) || \
-                               codec_is_v4l2_dec(id))
+                               codec_is_v4l2_dec(id) || codec_is_mmal_dec(id))
 
 #define codec_sw_copy(id)     (codec_is_std(id) || codec_is_copyback(id))
 

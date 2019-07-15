@@ -169,6 +169,28 @@ QString toString(MythCodecID codecid)
         case kCodec_VP9_V4L2_DEC:   return "VP9 V4L2 DEC";
         case kCodec_HEVC_V4L2_DEC:  return "HEVC V4L2 DEC";
 
+        case kCodec_MPEG1_MMAL: return "MPEG1 MMAL";
+        case kCodec_MPEG2_MMAL: return "MPEG2 MMAL";
+        case kCodec_H263_MMAL:  return "H.263 MMAL";
+        case kCodec_MPEG4_MMAL: return "MPEG4 MMAL";
+        case kCodec_H264_MMAL:  return "H.264 MMAL";
+        case kCodec_VC1_MMAL:   return "VC1 MMAL";
+        case kCodec_WMV3_MMAL:  return "WMV3 MMAL";
+        case kCodec_VP8_MMAL:   return "VP8 MMAL";
+        case kCodec_VP9_MMAL:   return "VP9 MMAL";
+        case kCodec_HEVC_MMAL:  return "HEVC MMAL";
+
+        case kCodec_MPEG1_MMAL_DEC: return "MPEG1 MMAL DEC";
+        case kCodec_MPEG2_MMAL_DEC: return "MPEG2 MMAL DEC";
+        case kCodec_H263_MMAL_DEC:  return "H.263 MMAL DEC";
+        case kCodec_MPEG4_MMAL_DEC: return "MPEG4 MMAL DEC";
+        case kCodec_H264_MMAL_DEC:  return "H.264 MMAL DEC";
+        case kCodec_VC1_MMAL_DEC:   return "VC1 MMAL DEC";
+        case kCodec_WMV3_MMAL_DEC:  return "WMV3 MMAL DEC";
+        case kCodec_VP8_MMAL_DEC:   return "VP8 MMAL DEC";
+        case kCodec_VP9_MMAL_DEC:   return "VP9 MMAL DEC";
+        case kCodec_HEVC_MMAL_DEC:  return "HEVC MMAL DEC";
+
         default:
             break;
     }
@@ -229,6 +251,8 @@ AVCodecID myth2av_codecid(MythCodecID codec_id, bool &vdpau)
         case kCodec_MPEG1_NVDEC_DEC:
         case kCodec_MPEG1_VTB:
         case kCodec_MPEG1_VTB_DEC:
+        case kCodec_MPEG1_MMAL:
+        case kCodec_MPEG1_MMAL_DEC:
         case kCodec_MPEG1_V4L2:
         case kCodec_MPEG1_V4L2_DEC: return AV_CODEC_ID_MPEG1VIDEO;
 
@@ -242,6 +266,8 @@ AVCodecID myth2av_codecid(MythCodecID codec_id, bool &vdpau)
         case kCodec_MPEG2_NVDEC_DEC:
         case kCodec_MPEG2_VTB:
         case kCodec_MPEG2_VTB_DEC:
+        case kCodec_MPEG2_MMAL:
+        case kCodec_MPEG2_MMAL_DEC:
         case kCodec_MPEG2_V4L2:
         case kCodec_MPEG2_V4L2_DEC: return AV_CODEC_ID_MPEG2VIDEO;
 
@@ -255,6 +281,8 @@ AVCodecID myth2av_codecid(MythCodecID codec_id, bool &vdpau)
         case kCodec_H263_NVDEC_DEC:
         case kCodec_H263_VTB:
         case kCodec_H263_VTB_DEC:
+        case kCodec_H263_MMAL:
+        case kCodec_H263_MMAL_DEC:
         case kCodec_H263_V4L2:
         case kCodec_H263_V4L2_DEC: return AV_CODEC_ID_H263;
 
@@ -268,6 +296,8 @@ AVCodecID myth2av_codecid(MythCodecID codec_id, bool &vdpau)
         case kCodec_MPEG4_NVDEC_DEC:
         case kCodec_MPEG4_VTB:
         case kCodec_MPEG4_VTB_DEC:
+        case kCodec_MPEG4_MMAL:
+        case kCodec_MPEG4_MMAL_DEC:
         case kCodec_MPEG4_V4L2:
         case kCodec_MPEG4_V4L2_DEC: return AV_CODEC_ID_MPEG4;
 
@@ -281,6 +311,8 @@ AVCodecID myth2av_codecid(MythCodecID codec_id, bool &vdpau)
         case kCodec_H264_NVDEC_DEC:
         case kCodec_H264_VTB:
         case kCodec_H264_VTB_DEC:
+        case kCodec_H264_MMAL:
+        case kCodec_H264_MMAL_DEC:
         case kCodec_H264_V4L2:
         case kCodec_H264_V4L2_DEC: return AV_CODEC_ID_H264;
 
@@ -294,6 +326,8 @@ AVCodecID myth2av_codecid(MythCodecID codec_id, bool &vdpau)
         case kCodec_VC1_NVDEC_DEC:
         case kCodec_VC1_VTB:
         case kCodec_VC1_VTB_DEC:
+        case kCodec_VC1_MMAL:
+        case kCodec_VC1_MMAL_DEC:
         case kCodec_VC1_V4L2:
         case kCodec_VC1_V4L2_DEC: return AV_CODEC_ID_VC1;
 
@@ -307,6 +341,8 @@ AVCodecID myth2av_codecid(MythCodecID codec_id, bool &vdpau)
         case kCodec_WMV3_NVDEC_DEC:
         case kCodec_WMV3_VTB:
         case kCodec_WMV3_VTB_DEC:
+        case kCodec_WMV3_MMAL:
+        case kCodec_WMV3_MMAL_DEC:
         case kCodec_WMV3_V4L2:
         case kCodec_WMV3_V4L2_DEC: return AV_CODEC_ID_WMV3;
 
@@ -320,6 +356,8 @@ AVCodecID myth2av_codecid(MythCodecID codec_id, bool &vdpau)
         case kCodec_VP8_NVDEC_DEC:
         case kCodec_VP8_VTB:
         case kCodec_VP8_VTB_DEC:
+        case kCodec_VP8_MMAL:
+        case kCodec_VP8_MMAL_DEC:
         case kCodec_VP8_V4L2:
         case kCodec_VP8_V4L2_DEC: return AV_CODEC_ID_VP8;
 
@@ -333,6 +371,8 @@ AVCodecID myth2av_codecid(MythCodecID codec_id, bool &vdpau)
         case kCodec_VP9_NVDEC_DEC:
         case kCodec_VP9_VTB:
         case kCodec_VP9_VTB_DEC:
+        case kCodec_VP9_MMAL:
+        case kCodec_VP9_MMAL_DEC:
         case kCodec_VP9_V4L2:
         case kCodec_VP9_V4L2_DEC: return AV_CODEC_ID_VP9;
 
@@ -346,6 +386,8 @@ AVCodecID myth2av_codecid(MythCodecID codec_id, bool &vdpau)
         case kCodec_HEVC_NVDEC_DEC:
         case kCodec_HEVC_VTB:
         case kCodec_HEVC_VTB_DEC:
+        case kCodec_HEVC_MMAL:
+        case kCodec_HEVC_MMAL_DEC:
         case kCodec_HEVC_V4L2:
         case kCodec_HEVC_V4L2_DEC: return AV_CODEC_ID_HEVC;
 
@@ -361,6 +403,8 @@ AVCodecID myth2av_codecid(MythCodecID codec_id, bool &vdpau)
         case kCodec_NVDEC_DEC_END:
         case kCodec_VTB_END:
         case kCodec_VTB_DEC_END:
+        case kCodec_MMAL_END:
+        case kCodec_MMAL_DEC_END:
         case kCodec_V4L2_END:
         case kCodec_V4L2_DEC_END: break;
     }
@@ -407,6 +451,8 @@ QString get_encoding_type(MythCodecID codecid)
         case kCodec_MPEG1_VTB_DEC:
         case kCodec_MPEG1_V4L2:
         case kCodec_MPEG1_V4L2_DEC:
+        case kCodec_MPEG1_MMAL:
+        case kCodec_MPEG1_MMAL_DEC:
         case kCodec_MPEG2:
         case kCodec_MPEG2_VDPAU:
         case kCodec_MPEG2_VDPAU_DEC:
@@ -421,6 +467,8 @@ QString get_encoding_type(MythCodecID codecid)
         case kCodec_MPEG2_VTB_DEC:
         case kCodec_MPEG2_V4L2:
         case kCodec_MPEG2_V4L2_DEC:
+        case kCodec_MPEG2_MMAL:
+        case kCodec_MPEG2_MMAL_DEC:
             return "MPEG-2";
 
         case kCodec_H263:
@@ -437,6 +485,8 @@ QString get_encoding_type(MythCodecID codecid)
         case kCodec_H263_VTB_DEC:
         case kCodec_H263_V4L2:
         case kCodec_H263_V4L2_DEC:
+        case kCodec_H263_MMAL:
+        case kCodec_H263_MMAL_DEC:
             return "H.263";
 
         case kCodec_NUV_MPEG4:
@@ -454,6 +504,8 @@ QString get_encoding_type(MythCodecID codecid)
         case kCodec_MPEG4_VTB_DEC:
         case kCodec_MPEG4_V4L2:
         case kCodec_MPEG4_V4L2_DEC:
+        case kCodec_MPEG4_MMAL:
+        case kCodec_MPEG4_MMAL_DEC:
             return "MPEG-4";
 
         case kCodec_H264:
@@ -470,6 +522,8 @@ QString get_encoding_type(MythCodecID codecid)
         case kCodec_H264_VTB_DEC:
         case kCodec_H264_V4L2:
         case kCodec_H264_V4L2_DEC:
+        case kCodec_H264_MMAL:
+        case kCodec_H264_MMAL_DEC:
             return "H.264";
 
         case kCodec_VC1:
@@ -486,6 +540,8 @@ QString get_encoding_type(MythCodecID codecid)
         case kCodec_VC1_VTB_DEC:
         case kCodec_VC1_V4L2:
         case kCodec_VC1_V4L2_DEC:
+        case kCodec_VC1_MMAL:
+        case kCodec_VC1_MMAL_DEC:
             return "VC-1";
 
         case kCodec_WMV3:
@@ -502,6 +558,8 @@ QString get_encoding_type(MythCodecID codecid)
         case kCodec_WMV3_VTB_DEC:
         case kCodec_WMV3_V4L2:
         case kCodec_WMV3_V4L2_DEC:
+        case kCodec_WMV3_MMAL:
+        case kCodec_WMV3_MMAL_DEC:
             return "WMV3";
 
         case kCodec_VP8:
@@ -518,6 +576,8 @@ QString get_encoding_type(MythCodecID codecid)
         case kCodec_VP8_VTB_DEC:
         case kCodec_VP8_V4L2:
         case kCodec_VP8_V4L2_DEC:
+        case kCodec_VP8_MMAL:
+        case kCodec_VP8_MMAL_DEC:
             return "VP8";
 
         case kCodec_VP9:
@@ -534,6 +594,8 @@ QString get_encoding_type(MythCodecID codecid)
         case kCodec_VP9_VTB_DEC:
         case kCodec_VP9_V4L2:
         case kCodec_VP9_V4L2_DEC:
+        case kCodec_VP9_MMAL:
+        case kCodec_VP9_MMAL_DEC:
             return "VP9";
 
         case kCodec_HEVC:
@@ -550,6 +612,8 @@ QString get_encoding_type(MythCodecID codecid)
         case kCodec_HEVC_VTB_DEC:
         case kCodec_HEVC_V4L2:
         case kCodec_HEVC_V4L2_DEC:
+        case kCodec_HEVC_MMAL:
+        case kCodec_HEVC_MMAL_DEC:
             return "HEVC";
 
         case kCodec_NONE:
@@ -567,6 +631,8 @@ QString get_encoding_type(MythCodecID codecid)
         case kCodec_VTB_DEC_END:
         case kCodec_V4L2_END:
         case kCodec_V4L2_DEC_END:
+        case kCodec_MMAL_END:
+        case kCodec_MMAL_DEC_END:
             return QString();
     }
 
@@ -601,5 +667,9 @@ QString get_decoder_name(MythCodecID codec_id)
         return "v4l2";
     else if (codec_is_v4l2_dec(codec_id))
         return "v4l2-dec";
+    else if (codec_is_mmal(codec_id))
+        return "mmal";
+    else if (codec_is_mmal_dec(codec_id))
+        return "mmal-dec";
     return "ffmpeg";
 }

@@ -52,6 +52,8 @@ void VideoOutputOpenGL::GetRenderOptions(render_opts &Options,
         (*Options.safe_renderers)["vtb-dec"].append(safe);
     if (Options.decoders->contains("v4l2-dec"))
         (*Options.safe_renderers)["v4l2-dec"].append(safe);
+    if (Options.decoders->contains("mmal-dec"))
+        (*Options.safe_renderers)["mmal-dec"].append(safe);
 
     // OpenGL UYVY
     Options.renderers->append("opengl");

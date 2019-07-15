@@ -374,6 +374,15 @@ using_frontend {
     SOURCES += decoders/privatedecoder.cpp
     SOURCES += decoders/mythcodeccontext.cpp
 
+    using_mmal {
+        HEADERS += mythmmalcontext.h
+        SOURCES += mythmmalcontext.cpp
+        LIBS    += -L/opt/vc/lib -lmmal -lvcsm
+        DEFINES += USING_MMAL
+        # Raspbian
+        QMAKE_CXXFLAGS += -isystem /opt/vc/include
+    }
+
     using_libass {
         DEFINES += USING_LIBASS
         LIBS    += -lass

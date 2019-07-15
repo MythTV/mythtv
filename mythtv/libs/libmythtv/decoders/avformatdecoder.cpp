@@ -75,6 +75,10 @@ extern "C" {
 #include "mythv4l2m2mcontext.h"
 #endif
 
+#ifdef USING_MMAL
+#include "mythmmalcontext.h"
+#endif
+
 extern "C" {
 #include "libavutil/avutil.h"
 #include "libavutil/error.h"
@@ -399,6 +403,10 @@ void AvFormatDecoder::GetDecoders(render_opts &opts)
         opts.decoders->append("v4l2-dec");
         (*opts.equiv_decoders)["v4l2-dec"].append("dummy");
     }
+#endif
+#ifdef USING_MMAL
+    opts.decoders->append("mmal-dec");
+    (*opts.equiv_decoders)["mmal-dec"].append("dummy");
 #endif
 
     PrivateDecoder::GetDecoders(opts);
@@ -1600,6 +1608,13 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     }
     else
 #endif
+#ifdef USING_MMAL
+    if (codec_is_mmal_dec(m_video_codec_id))
+    {
+        m_directrendering = false;
+    }
+    else
+#endif
     if (codec1 && codec1->capabilities & AV_CODEC_CAP_DR1)
     {
         // enc->flags          |= CODEC_FLAG_EMU_EDGE;
@@ -2557,6 +2572,24 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     }
                 }
 #endif // USING_V4L2
+#ifdef USING_MMAL
+                if (!foundgpudecoder)
+                {
+                    MythCodecID mmalmcid;
+                    AVPixelFormat pix_fmt = AV_PIX_FMT_YUV420P;
+                    mmalmcid = MythMMALContext::GetSupportedCodec(enc, &codec, dec,
+                                    mpeg_version(static_cast<int>(enc->codec_id)), pix_fmt);
+
+                    if (codec_is_mmal_dec(mmalmcid))
+                    {
+                        gCodecMap->freeCodecContext(m_ic->streams[selTrack]);
+                        enc = gCodecMap->getCodecContext(m_ic->streams[selTrack], codec);
+                        m_video_codec_id = mmalmcid;
+                        enc->pix_fmt = pix_fmt;
+                        foundgpudecoder = true;
+                    }
+                }
+#endif // USING_MMAL
             }
             // default to mpeg2
             if (m_video_codec_id == kCodec_NONE)
