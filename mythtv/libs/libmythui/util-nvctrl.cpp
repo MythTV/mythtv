@@ -345,6 +345,7 @@ int GetNvidiaRates(t_screenrate& screenmap)
     delete d;
     return 1;
 #else // USING_XRANDR
+    Q_UNUSED(screenmap)
     return -1;
 #endif
 }
