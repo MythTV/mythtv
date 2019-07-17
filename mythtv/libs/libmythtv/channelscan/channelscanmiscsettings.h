@@ -147,9 +147,9 @@ class CompleteChannelsOnly : public TransMythUICheckBoxSetting
             QObject::tr(
                 "If set, only services that are present in the PAT, the PMT "
                 "and the SDT and that have a name will be added during the scan. "
-                "On satellites there are typically many incomplete "
-                "channels, such as feeds and offline channels, "
-                "that are not useful in a typical MythTV system. "
+                "On satellites there are many incomplete channels, "
+                "such as feeds and offline channels, "
+                "that are not useful in a MythTV system. "
                 "These are filtered out by this option."));
     };
 };
