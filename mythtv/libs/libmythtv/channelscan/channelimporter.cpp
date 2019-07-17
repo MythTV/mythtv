@@ -1179,9 +1179,20 @@ QString ChannelImporter::SimpleFormatChannel(
 }
 
 QString ChannelImporter::FormatChannels(
-    const ScanDTVTransportList      &transports,
+    const ScanDTVTransportList      &transports_in,
     const ChannelImporterBasicStats &info)
 {
+    // Sort transports in order of increasing frequency
+    struct less_than_key
+    {
+        inline bool operator() (const ScanDTVTransport &t1, const ScanDTVTransport &t2)
+        {
+            return t1.m_frequency < t2.m_frequency;
+        }
+    };
+    ScanDTVTransportList transports(transports_in);
+    std::sort(transports.begin(), transports.end(), less_than_key());
+
     QString msg;
 
     for (size_t i = 0; i < transports.size(); ++i)
