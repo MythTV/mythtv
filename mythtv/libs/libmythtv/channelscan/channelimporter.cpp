@@ -1648,7 +1648,7 @@ OkCancelType ChannelImporter::ShowManualChannelPopup(
     bool ok = (0 == dc);
 
     return (ok) ? kOCTOk :
-        ((1 == dc) ? kOCTCancel : kOCTCancelAll);
+        ((2 == dc) ? kOCTCancel : kOCTCancelAll);
 }
 
 OkCancelType ChannelImporter::QueryUserResolve(
