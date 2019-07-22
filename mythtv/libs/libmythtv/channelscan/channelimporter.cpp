@@ -1662,8 +1662,11 @@ OkCancelType ChannelImporter::QueryUserResolve(
     const ScanDTVTransport          &transport,
     ChannelInsertInfo               &chan)
 {
-    QString msg = tr("Channel %1 was found to be in conflict with other "
-                     "channels.").arg(SimpleFormatChannel(transport, chan));
+    QString m1 = tr("Channel %1 has channel number ")
+                    .arg(SimpleFormatChannel(transport, chan));
+    QString m2 = tr("%2 but that is already in use.")
+                    .arg(chan.m_chan_num);
+    QString msg = m1 + m2;
 
     OkCancelType ret = kOCTCancel;
 
@@ -1672,12 +1675,12 @@ OkCancelType ChannelImporter::QueryUserResolve(
         while (true)
         {
             QString msg2 = msg;
-            msg2 += " ";
+            msg2 += "\n";
             msg2 += tr("Please enter a unique channel number.");
 
             QString val = ComputeSuggestedChannelNum(info, transport, chan);
-            msg2 += " ";
-            msg2 += tr("Default value is %1").arg(val);
+            msg2 += "\n";
+            msg2 += tr("Default value is %1.").arg(val);
             ret = ShowManualChannelPopup(
                 GetMythMainWindow(), tr("Channel Importer"),
                 msg2, val);
