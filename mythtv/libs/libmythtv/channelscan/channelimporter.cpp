@@ -108,6 +108,10 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
         CollectUniquenessStats(transports, info);
 
     // Print out each channel
+    if (VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_ANY))
+    {
+        cout << "After processing:" << endl;
+    }
     cout << FormatChannels(transports, info).toLatin1().constData() << endl;
 
     // Create summary
@@ -532,8 +536,9 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
                 {
                     chan.m_channel_id = chanid;
 
-                    cout<<"Insert("<<chan.m_si_standard.toLatin1().constData()
-                        <<"): "<<chan.m_chan_num.toLatin1().constData()<<endl;
+                    cout<<QString("Insert: %1")
+                        .arg(FormatChannel(transports[i], chan))
+                        .toLatin1().constData()<<endl;
 
                     inserted = ChannelUtil::CreateChannel(
                         chan.m_db_mplexid,
@@ -664,9 +669,9 @@ ScanDTVTransportList ChannelImporter::UpdateChannels(
 
                 if (conflicting)
                 {
-                    cout<<"Skipping Update("
-                        <<chan.m_si_standard.toLatin1().constData()<<"): "
-                        <<chan.m_chan_num.toLatin1().constData()<<endl;
+                    cout<<QString("Skipping Update: %1")
+                        .arg(FormatChannel(transports[i], chan))
+                        .toLatin1().constData()<<endl;
                     handle = false;
                 }
             }
@@ -679,8 +684,9 @@ ScanDTVTransportList ChannelImporter::UpdateChannels(
             bool updated = false;
             if (handle)
             {
-                cout<<"Update("<<chan.m_si_standard.toLatin1().constData()<<"): "
-                    <<chan.m_chan_num.toLatin1().constData()<<endl;
+                cout<<QString("Update: %1")
+                    .arg(FormatChannel(transports[i], chan))
+                    .toLatin1().constData()<<endl;
 
                 ChannelUtil::UpdateInsertInfoFromDB(chan);
 
