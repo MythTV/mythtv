@@ -320,7 +320,7 @@ void ChannelImporter::InsertChannels(
         if (new_chan)
         {
             //: %n is the number of channels, %1 is the type of channel
-            QString msg = tr("Found %n new non-conflicting %1 channel(s).",
+            QString msg = tr("Found %n new %1 channel(s).",
                               "", new_chan).arg(toString(type));
 
             InsertAction action = QueryUserInsert(msg);
