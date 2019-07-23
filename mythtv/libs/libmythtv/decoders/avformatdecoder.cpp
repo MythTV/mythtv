@@ -1618,7 +1618,6 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     else if (codec_is_mmal(m_video_codec_id))
     {
         enc->get_format  = MythMMALContext::GetFormat;
-        enc->get_buffer2 = MythMMALContext::GetMMALBuffer;
         m_directrendering = false;
     }
     else
