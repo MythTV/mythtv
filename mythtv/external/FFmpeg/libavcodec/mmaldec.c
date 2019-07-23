@@ -296,6 +296,8 @@ static int ffmal_update_format(AVCodecContext *avctx)
         goto fail;
 
     if (avctx->pix_fmt == AV_PIX_FMT_MMAL) {
+        if ((status = mmal_port_parameter_set_boolean(decoder->output[0], MMAL_PARAMETER_ZERO_COPY, 1)))
+            goto fail;
         format_out->encoding = MMAL_ENCODING_OPAQUE;
     } else {
         format_out->encoding_variant = format_out->encoding = MMAL_ENCODING_I420;
@@ -333,7 +335,8 @@ static int ffmal_update_format(AVCodecContext *avctx)
         FFMAX(decoder->output[0]->buffer_size_min, decoder->output[0]->buffer_size_recommended);
     decoder->output[0]->buffer_num =
         FFMAX(decoder->output[0]->buffer_num_min, decoder->output[0]->buffer_num_recommended) + ctx->extra_buffers;
-    ctx->pool_out->pool = mmal_pool_create(decoder->output[0]->buffer_num,
+    ctx->pool_out->pool = mmal_port_pool_create(decoder->output[0],
+                                           decoder->output[0]->buffer_num,
                                            decoder->output[0]->buffer_size);
     if (!ctx->pool_out->pool) {
         ret = AVERROR(ENOMEM);
