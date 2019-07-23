@@ -181,6 +181,14 @@ using_opengl {
     using_opengles {
         DEFINES += USING_OPENGLES
     }
+    using_mmal {
+        LIBS    += -lEGL
+        DEFINES += USING_MMAL
+    }
+    using_vaapi {
+        LIBS    += -lEGL
+        DEFINES += USING_VAAPI
+    }
     inc.files += mythpainter_ogl.h
     mingw|win32-msvc*:LIBS += -lopengl32
 }

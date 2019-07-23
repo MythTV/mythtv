@@ -21,7 +21,9 @@ using std::min;
 #define LOC QString("OpenGL: ")
 
 // Egl
+#if defined (USING_MMAL) || defined (USING_VAAPI)
 #include "EGL/egl.h"
+#endif
 
 #ifdef Q_OS_ANDROID
 #include <android/log.h>
@@ -145,8 +147,10 @@ bool MythRenderOpenGL::IsEGL(void)
             egl = true;
         if (QGuiApplication::platformName().contains("xcb", Qt::CaseInsensitive))
             egl |= qgetenv("QT_XCB_GL_INTEGRATION") == "xcb_egl";
+#if defined (USING_MMAL) || defined (USING_VAAPI)
         if (!egl)
             egl = eglGetCurrentDisplay() != nullptr;
+#endif
     }
     return egl;
 }
@@ -386,7 +390,10 @@ void MythRenderOpenGL::DebugFeatures(void)
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("OpenGL vendor        : %1").arg(reinterpret_cast<const char*>(glGetString(GL_VENDOR))));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("OpenGL renderer      : %1").arg(reinterpret_cast<const char*>(glGetString(GL_RENDERER))));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("OpenGL version       : %1").arg(reinterpret_cast<const char*>(glGetString(GL_VERSION))));
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Qt platform          : %1 (EGL: %2)").arg(QGuiApplication::platformName()).arg(GLYesNo(IsEGL())));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Qt platform          : %1").arg(QGuiApplication::platformName()));
+#if defined (USING_MMAL) || defined (USING_VAAPI)
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("EGL                  : %1").arg(GLYesNo(IsEGL())));
+#endif
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Qt OpenGL format     : %1").arg(qtglversion));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Qt OpenGL surface    : %1").arg(qtglsurface));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Max texture size     : %1").arg(m_maxTextureSize));
