@@ -20,6 +20,9 @@ using std::min;
 #include "mythxdisplay.h"
 #define LOC QString("OpenGL: ")
 
+// Egl
+#include "EGL/egl.h"
+
 #ifdef Q_OS_ANDROID
 #include <android/log.h>
 #include <QWindow>
@@ -120,8 +123,19 @@ MythRenderOpenGL* MythRenderOpenGL::Create(const QString&, QPaintDevice* Device)
     return new MythRenderOpenGL(format, Device);
 }
 
+/*! \brief Check whether EGL is running
+ *
+ * \note This must be called from the main UI thread and the caller must make
+ * the context current.
+*/
 bool MythRenderOpenGL::IsEGL(void)
 {
+    if (!gCoreContext->IsUIThread())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "IsEGL must be called from the main thread");
+        return false;
+    }
+
     static bool egl = false;
     static bool checked = false;
     if (!checked)
@@ -131,6 +145,8 @@ bool MythRenderOpenGL::IsEGL(void)
             egl = true;
         if (QGuiApplication::platformName().contains("xcb", Qt::CaseInsensitive))
             egl |= qgetenv("QT_XCB_GL_INTEGRATION") == "xcb_egl";
+        if (!egl)
+            egl = eglGetCurrentDisplay() != nullptr;
     }
     return egl;
 }
@@ -370,7 +386,7 @@ void MythRenderOpenGL::DebugFeatures(void)
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("OpenGL vendor        : %1").arg(reinterpret_cast<const char*>(glGetString(GL_VENDOR))));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("OpenGL renderer      : %1").arg(reinterpret_cast<const char*>(glGetString(GL_RENDERER))));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("OpenGL version       : %1").arg(reinterpret_cast<const char*>(glGetString(GL_VERSION))));
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Qt platform          : %1").arg(QGuiApplication::platformName()));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Qt platform          : %1 (EGL: %2)").arg(QGuiApplication::platformName()).arg(GLYesNo(IsEGL())));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Qt OpenGL format     : %1").arg(qtglversion));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Qt OpenGL surface    : %1").arg(qtglsurface));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Max texture size     : %1").arg(m_maxTextureSize));
