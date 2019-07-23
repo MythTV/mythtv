@@ -1043,6 +1043,11 @@ void VideoOutput::InitDisplayMeasurements(int Width, int Height, bool Resize)
     QSize screen_size = disp.m_res;
     QSize window_size = m_window.GetDisplayVisibleRect().size();
 
+    if (screen_size.isEmpty())
+        screen_size = window_size.isEmpty() ? QSize(1920, 1080): window_size;
+    if (window_size.isEmpty())
+        window_size = screen_size;
+
     float pixel_aspect = static_cast<float>(screen_size.width()) / screen_size.height();
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
