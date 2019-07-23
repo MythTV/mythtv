@@ -1652,11 +1652,10 @@ void ChannelUtil::UpdateInsertInfoFromDB(ChannelInsertInfo &chan)
             if (useeit)
                 LOG(VB_GENERAL, LOG_ERR,
                     "Using EIT and xmltv for the same channel "
-                    "is a unsupported configuration.");
+                    "is an unsupported configuration.");
             chan.m_xmltvid = xmltvid;
-            chan.m_use_on_air_guide = useeit;
         }
-
+        chan.m_use_on_air_guide = useeit;
         chan.m_hidden = !visible;
     }
 }
