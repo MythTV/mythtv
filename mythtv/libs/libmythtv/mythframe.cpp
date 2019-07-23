@@ -69,7 +69,7 @@ const char* format_description(VideoFrameType Type)
         case FMT_VDPAU:      return "VDPAU";
         case FMT_VAAPI:      return "VAAPI";
         case FMT_DXVA2:      return "DXVA2";
-        case FMT_OMXEGL:     return "OMXEGL";
+        case FMT_MMAL:       return "MMAL";
         case FMT_MEDIACODEC: return "MediaCodec";
         case FMT_VTB:        return "VideoToolBox";
         case FMT_NVDEC:      return "NVDec";

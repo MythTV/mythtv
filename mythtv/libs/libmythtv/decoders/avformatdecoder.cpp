@@ -407,6 +407,8 @@ void AvFormatDecoder::GetDecoders(render_opts &opts)
 #ifdef USING_MMAL
     opts.decoders->append("mmal-dec");
     (*opts.equiv_decoders)["mmal-dec"].append("dummy");
+    opts.decoders->append("mmal");
+    (*opts.equiv_decoders)["mmal"].append("dummy");
 #endif
 
     PrivateDecoder::GetDecoders(opts);
@@ -1613,6 +1615,12 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     {
         m_directrendering = false;
     }
+    else if (codec_is_mmal(m_video_codec_id))
+    {
+        enc->get_format  = MythMMALContext::GetFormat;
+        enc->get_buffer2 = MythMMALContext::GetMMALBuffer;
+        m_directrendering = false;
+    }
     else
 #endif
     if (codec1 && codec1->capabilities & AV_CODEC_CAP_DR1)
@@ -2580,7 +2588,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     mmalmcid = MythMMALContext::GetSupportedCodec(enc, &codec, dec,
                                     mpeg_version(static_cast<int>(enc->codec_id)), pix_fmt);
 
-                    if (codec_is_mmal_dec(mmalmcid))
+                    if (codec_is_mmal_dec(mmalmcid) || codec_is_mmal(mmalmcid))
                     {
                         gCodecMap->freeCodecContext(m_ic->streams[selTrack]);
                         enc = gCodecMap->getCodecContext(m_ic->streams[selTrack], codec);
@@ -3856,7 +3864,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
 
     if (!frame)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "NULL videoframe - direct rendering not"
+        LOG(VB_GENERAL, LOG_ERR, LOC + "NULL videoframe - direct rendering not "
                                        "correctly initialized.");
         return false;
     }

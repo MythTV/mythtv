@@ -67,7 +67,7 @@ void VideoOutputOpenGL::GetRenderOptions(render_opts &Options,
     (*Options.osds)["opengl-yv12"].append("opengl2");
     Options.priorities->insert("opengl-yv12", 65);
 
-#if defined(USING_VAAPI) || defined (USING_VTB) || defined (USING_MEDIACODEC) || defined (USING_VDPAU) || defined (USING_NVDEC)
+#if defined(USING_VAAPI) || defined (USING_VTB) || defined (USING_MEDIACODEC) || defined (USING_VDPAU) || defined (USING_NVDEC) || defined (USING_MMAL)
     Options.renderers->append("opengl-hw");
     (*Options.deints)["opengl-hw"].append("none");
     (*Options.osds)["opengl-hw"].append("opengl2");
@@ -94,6 +94,10 @@ void VideoOutputOpenGL::GetRenderOptions(render_opts &Options,
 #ifdef USING_NVDEC
     if (Options.decoders->contains("nvdec"))
         (*Options.safe_renderers)["nvdec"].append("opengl-hw");
+#endif
+#ifdef USING_MMAL
+    if (Options.decoders->contains("mmal"))
+        (*Options.safe_renderers)["mmal"].append("opengl-hw");
 #endif
 }
 
@@ -361,6 +365,8 @@ bool VideoOutputOpenGL::CreateBuffers(MythCodecID CodecID, QSize Size)
         return m_videoBuffers.CreateBuffers(FMT_VDPAU, Size, false, 2, 1, 4, 1, m_maxReferenceFrames);
     else if (codec_is_nvdec(CodecID))
         return m_videoBuffers.CreateBuffers(FMT_NVDEC, Size, false, 2, 1, 4, 1);
+    else if (codec_is_mmal(CodecID))
+        return m_videoBuffers.CreateBuffers(FMT_MMAL, Size, false, 2, 1, 4, 1);
 
     return m_videoBuffers.CreateBuffers(FMT_YV12, Size, false, 1, 8, 4, 2, m_maxReferenceFrames);
 }

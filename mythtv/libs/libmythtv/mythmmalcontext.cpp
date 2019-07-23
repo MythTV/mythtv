@@ -7,11 +7,22 @@ extern "C" {
 #include "interface/vmcs_host/vc_vchi_gencmd.h"
 }
 
+// FFmpeg
+extern "C" {
+#include "libavutil/opt.h"
+}
+
 #define LOC QString("MMAL: ")
 
 MythMMALContext::MythMMALContext(DecoderBase *Parent, MythCodecID Codec)
   : MythCodecContext(Parent, Codec)
 {
+}
+
+MythMMALContext::~MythMMALContext()
+{
+    if (m_interop)
+        m_interop->DecrRef();
 }
 
 MythCodecID MythMMALContext::GetSupportedCodec(AVCodecContext *Context,
@@ -65,7 +76,6 @@ MythCodecID MythMMALContext::GetSupportedCodec(AVCodecContext *Context,
     }
     else
     {
-        LOG(VB_GENERAL, LOG_INFO, LOC + QString("response %1").arg(response));
         if (qstrcmp(response, "enabled") != 0)
             LOG(VB_GENERAL, LOG_INFO, LOC +QString("Codec '%1' not supported (no license?)")
                 .arg(avcodec_get_name((*Codec)->id)));
@@ -77,6 +87,10 @@ MythCodecID MythMMALContext::GetSupportedCodec(AVCodecContext *Context,
     vchi_disconnect(vchi_instance);
 
     if (!found)
+        return failure;
+
+    // check interop
+    if (!decodeonly && (MythOpenGLInterop::GetInteropType(success) == MythOpenGLInterop::Unsupported))
         return failure;
 
     // look for a decoder
@@ -100,7 +114,38 @@ bool MythMMALContext::RetrieveFrame(AVCodecContext *Context, VideoFrame *Frame, 
 {
     if (codec_is_mmal_dec(m_codecID))
         return GetBuffer(Context, Frame, AvFrame, 0);
+    else if (codec_is_mmal(m_codecID))
+        return GetBuffer2(Context, Frame, AvFrame, 0);
     return false;
+}
+
+
+int MythMMALContext::HwDecoderInit(AVCodecContext *Context)
+{
+    if (!Context)
+        return -1;
+
+    if (codec_is_mmal_dec(m_codecID))
+        return 0;
+
+    if (!codec_is_mmal(m_codecID) || Context->pix_fmt != AV_PIX_FMT_MMAL)
+        return -1;
+
+    MythRenderOpenGL *context = MythRenderOpenGL::GetOpenGLRender();
+    m_interop = MythMMALInterop::Create(context, MythOpenGLInterop::MMAL);
+    return m_interop ? 0 : -1;
+}
+
+void MythMMALContext::SetDecoderOptions(AVCodecContext *Context, AVCodec *Codec)
+{
+    if (!(codec_is_mmal(m_codecID)))
+        return;
+    if (!(Context && Codec))
+        return;
+    if (!(Codec->priv_class && Context->priv_data))
+        return;
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "Setting number of extra buffers to 8");
+    av_opt_set(Context->priv_data, "extra_buffers", "8", 0);
 }
 
 bool MythMMALContext::GetBuffer(AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame, int)
@@ -143,3 +188,49 @@ bool MythMMALContext::GetBuffer(AVCodecContext *Context, VideoFrame *Frame, AVFr
     return true;
 }
 
+bool MythMMALContext::GetBuffer2(AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame, int)
+{
+    // Sanity checks
+    if (!Context || !AvFrame || !Frame || !m_interop)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Error");
+        return false;
+    }
+
+    // MMAL?
+    if (Frame->codec != FMT_MMAL || static_cast<AVPixelFormat>(AvFrame->format) != AV_PIX_FMT_MMAL)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Not an MMAL frame");
+        return false;
+    }
+
+    Frame->width = AvFrame->width;
+    Frame->height = AvFrame->height;
+    Frame->pix_fmt = Context->pix_fmt;
+    Frame->sw_pix_fmt = Context->sw_pix_fmt;
+    Frame->directrendering = 1;
+    AvFrame->opaque = Frame;
+    AvFrame->reordered_opaque = Context->reordered_opaque;
+
+    // Frame->data[3] holds MMAL_BUFFER_HEADER_T
+    Frame->buf = AvFrame->data[3];
+    // Retain the buffer so it is not released before we display it
+    Frame->priv[0] = reinterpret_cast<unsigned char*>(av_buffer_ref(AvFrame->buf[0]));
+    // Add interop
+    Frame->priv[1] = reinterpret_cast<unsigned char*>(m_interop);
+    // Set the release method
+    AvFrame->buf[1] = av_buffer_create(reinterpret_cast<uint8_t*>(Frame), 0, MythCodecContext::ReleaseBuffer,
+                                       static_cast<AvFormatDecoder*>(Context->opaque), 0);
+    return true;
+}
+
+AVPixelFormat MythMMALContext::GetFormat(AVCodecContext*, const AVPixelFormat *PixFmt)
+{
+    while (*PixFmt != AV_PIX_FMT_NONE)
+    {
+        if (*PixFmt == AV_PIX_FMT_MMAL)
+            return AV_PIX_FMT_MMAL;
+        PixFmt++;
+    }
+    return AV_PIX_FMT_NONE;
+}

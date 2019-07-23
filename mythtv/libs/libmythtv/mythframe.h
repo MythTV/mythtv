@@ -54,7 +54,7 @@ typedef enum FrameType_
     FMT_VDPAU,
     FMT_VAAPI,
     FMT_DXVA2,
-    FMT_OMXEGL,
+    FMT_MMAL,
     FMT_MEDIACODEC,
     FMT_VTB,
     FMT_NVDEC
@@ -65,14 +65,9 @@ const char* format_description(VideoFrameType Type);
 static inline int format_is_hw(VideoFrameType Type)
 {
     return (Type == FMT_VDPAU) || (Type == FMT_VAAPI) ||
-           (Type == FMT_DXVA2) || (Type == FMT_OMXEGL) ||
+           (Type == FMT_DXVA2) || (Type == FMT_MMAL) ||
            (Type == FMT_MEDIACODEC) || (Type == FMT_VTB) ||
            (Type == FMT_NVDEC);
-}
-
-static inline int format_is_hwyuv(VideoFrameType Type)
-{
-    return (Type == FMT_NVDEC) || (Type == FMT_VTB);
 }
 
 static inline int format_is_420(VideoFrameType Type)
@@ -380,6 +375,51 @@ static inline int pitch_for_plane(VideoFrameType Type, int Width, uint Plane)
     return 0;
 }
 
+static inline int width_for_plane(VideoFrameType Type, int Width, uint Plane)
+{
+    switch (Type)
+    {
+        case FMT_YV12:
+        case FMT_YUV420P9:
+        case FMT_YUV420P10:
+        case FMT_YUV420P12:
+        case FMT_YUV420P14:
+        case FMT_YUV420P16:
+        case FMT_YUV422P:
+        case FMT_YUV422P9:
+        case FMT_YUV422P10:
+        case FMT_YUV422P12:
+        case FMT_YUV422P14:
+        case FMT_YUV422P16:
+            if (Plane == 0) return Width;
+            if (Plane < 3)  return (Width + 1) >> 1;
+            break;
+        case FMT_YUV444P:
+        case FMT_YUV444P9:
+        case FMT_YUV444P10:
+        case FMT_YUV444P12:
+        case FMT_YUV444P14:
+        case FMT_YUV444P16:
+            if (Plane < 3)  return Width;
+            break;
+        case FMT_NV12:
+        case FMT_P010:
+        case FMT_P016:
+            if (Plane < 2) return Width;
+            break;
+        case FMT_YUY2:
+        case FMT_RGB24:
+        case FMT_ARGB32:
+        case FMT_RGBA32:
+        case FMT_BGRA:
+        case FMT_RGB32:
+            if (Plane == 0) return Width;
+            break;
+        default: break; // None and hardware formats
+    }
+    return 0;
+}
+
 static inline int height_for_plane(VideoFrameType Type, int Height, uint Plane)
 {
     switch (Type)
@@ -547,7 +587,7 @@ static inline uint planes(VideoFrameType Type)
         case FMT_DXVA2:
         case FMT_MEDIACODEC:
         case FMT_NVDEC:
-        case FMT_OMXEGL:
+        case FMT_MMAL:
         case FMT_VTB:       return 0;
     }
     return 0;
@@ -588,7 +628,7 @@ static inline int bitsperpixel(VideoFrameType Type)
         case FMT_VDPAU:
         case FMT_VAAPI:
         case FMT_DXVA2:
-        case FMT_OMXEGL:
+        case FMT_MMAL:
         case FMT_MEDIACODEC:
         case FMT_NVDEC:
         case FMT_VTB: break;

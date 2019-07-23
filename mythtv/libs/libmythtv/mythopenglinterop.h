@@ -29,14 +29,15 @@ class MythOpenGLInterop : public QObject, public ReferenceCounter
     enum Type
     {
         Unsupported  = 0,
-        VAAPIGLXCOPY = 1,
-        VAAPIGLXPIX  = 2,
-        VAAPIEGLDRM  = 3,
-        VTBOPENGL    = 4,
-        VTBSURFACE   = 5,
-        MEDIACODEC   = 6,
-        VDPAU        = 7,
-        NVDEC
+        VAAPIGLXCOPY,
+        VAAPIGLXPIX,
+        VAAPIEGLDRM,
+        VTBOPENGL,
+        VTBSURFACE,
+        MEDIACODEC,
+        VDPAU,
+        NVDEC,
+        MMAL
     };
 
     static QStringList GetAllowedRenderers   (MythCodecID CodecId);

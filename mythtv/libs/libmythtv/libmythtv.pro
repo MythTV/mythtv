@@ -375,9 +375,10 @@ using_frontend {
     SOURCES += decoders/mythcodeccontext.cpp
 
     using_mmal {
-        HEADERS += mythmmalcontext.h
-        SOURCES += mythmmalcontext.cpp
+        HEADERS += mythmmalcontext.h   mythmmalinterop.h
+        SOURCES += mythmmalcontext.cpp mythmmalinterop.cpp
         LIBS    += -L/opt/vc/lib -lmmal -lvcsm
+        LIBS    += -lEGL
         DEFINES += USING_MMAL
         # Raspbian
         QMAKE_CXXFLAGS += -isystem /opt/vc/include

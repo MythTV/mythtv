@@ -89,7 +89,7 @@ MythCodecContext *MythCodecContext::CreateContext(DecoderBase *Parent, MythCodec
         mctx = new MythV4L2M2MContext(Parent, Codec);
 #endif
 #ifdef USING_MMAL
-    if (codec_is_mmal_dec(Codec))
+    if (codec_is_mmal_dec(Codec) || codec_is_mmal(Codec))
         mctx = new MythMMALContext(Parent, Codec);
 #endif
     Q_UNUSED(Codec);

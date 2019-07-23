@@ -320,7 +320,7 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Deint)
         if ((m_textureTarget == QOpenGLTexture::TargetRectangle) && (Default != Type))
             defines << "RECTS";
 #endif
-#ifdef USING_MEDIACODEC
+#if defined(USING_MEDIACODEC) || defined(USING_MMAL)
         if (m_textureTarget == GL_TEXTURE_EXTERNAL_OES)
             defines << "EXTOES";
 #endif
