@@ -141,7 +141,7 @@ class CompleteChannelsOnly : public TransMythUICheckBoxSetting
   public:
     CompleteChannelsOnly()
     {
-        setValue(false);
+        setValue(true);
         setLabel(QObject::tr("Complete scan data required"));
         setHelpText(
             QObject::tr(
