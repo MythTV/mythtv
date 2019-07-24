@@ -211,9 +211,12 @@ void AudioOutputAudioTrack::WriteAudio(unsigned char* aubuf, int size)
     QAndroidJniEnvironment env;
     if (m_actually_paused)
     {
-        jboolean param = true;
-        m_audioTrack->callMethod<void>("pause","(Z)V",param);
-        ANDROID_EXCEPTION_CLEAR
+        if (m_audioTrack)
+        {
+            jboolean param = true;
+            m_audioTrack->callMethod<void>("pause","(Z)V",param);
+            ANDROID_EXCEPTION_CLEAR
+        }
         return;
     }
     // create a java byte array
@@ -274,22 +277,23 @@ bool AudioOutputAudioTrack::AddData(void *in_buffer, int in_len,
 void AudioOutputAudioTrack::Pause(bool paused)
 {
     AudioOutputBase::Pause(paused);
-    jboolean param = paused;
-    m_audioTrack->callMethod<void>("pause","(Z)V",param);
+    if (m_audioTrack)
+    {
+        jboolean param = paused;
+        m_audioTrack->callMethod<void>("pause","(Z)V",param);
+    }
 }
 
 void AudioOutputAudioTrack::SetSourceBitrate(int rate)
 {
     AudioOutputBase::SetSourceBitrate(rate);
-    if (m_source_bitrate > 0)
+    if (m_source_bitrate > 0
+        && (m_passthru || m_enc)
+        &&  m_audioTrack)
     {
-        if (m_passthru || m_enc)
-        {
-            m_bitsPer10Frames = m_source_bitrate * 10 / m_source_samplerate;
-            jint bitsPer10Frames = m_bitsPer10Frames;
-            m_audioTrack->callMethod<void>("setBitsPer10Frames","(I)V",bitsPer10Frames);
-
-        }
+        m_bitsPer10Frames = m_source_bitrate * 10 / m_source_samplerate;
+        jint bitsPer10Frames = m_bitsPer10Frames;
+        m_audioTrack->callMethod<void>("setBitsPer10Frames","(I)V",bitsPer10Frames);
     }
 }
 
