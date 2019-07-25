@@ -39,7 +39,9 @@ using namespace std;
 #include "hdhrchannel.h"
 #include "scanmonitor.h"
 #include "asichannel.h"
+#ifdef USING_DVB        // for bug in gcc 8.3
 #include "dvbchannel.h"
+#endif
 #include "v4lchannel.h"
 #include "iptvchannel.h"
 #include "ExternalChannel.h"
