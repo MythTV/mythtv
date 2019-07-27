@@ -52,6 +52,10 @@
 #endif
 #include "mythcodeccontext.h"
 
+extern "C" {
+#include "libavutil/pixdesc.h"
+}
+
 #define LOC QString("MythCodecContext: ")
 
 MythCodecContext::MythCodecContext(DecoderBase *Parent, MythCodecID CodecID)
