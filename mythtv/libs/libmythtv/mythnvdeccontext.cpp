@@ -31,8 +31,8 @@ MythNVDECContext::MythNVDECContext(DecoderBase *Parent, MythCodecID CodecID)
 MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext *Context,
                                                 AVCodec       **Codec,
                                                 const QString  &Decoder,
-                                                uint            StreamType,
-                                                AVPixelFormat  &PixFmt)
+                                                AVStream       *Stream,
+                                                uint            StreamType)
 {
     bool decodeonly = Decoder == "nvdec-dec";
     MythCodecID success = static_cast<MythCodecID>((decodeonly ? kCodec_MPEG1_NVDEC_DEC : kCodec_MPEG1_NVDEC) + (StreamType - 1));
@@ -128,7 +128,8 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext *Context,
                             .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_CUDA)).arg((*Codec)->name)
                             .arg(format_description(type)).arg(depth + 8));
                     *Codec = codec;
-                    PixFmt = config->pix_fmt;
+                    gCodecMap->freeCodecContext(Stream);
+                    Context = gCodecMap->getCodecContext(Stream, *Codec);
                     return success;
                 }
                 break;
@@ -196,6 +197,18 @@ int MythNVDECContext::InitialiseDecoder(AVCodecContext *Context)
     Context->hw_device_ctx = hwdeviceref;
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "Created CUDA device context");
     return 0;
+}
+
+void MythNVDECContext::InitVideoCodec(AVCodecContext *Context, bool SelectedStream, bool &DirectRendering)
+{
+    if (codec_is_nvdec_dec(m_codecID) || codec_is_nvdec(m_codecID))
+    {
+        Context->get_format = MythNVDECContext::GetFormat;
+        DirectRendering = false;
+        return;
+    }
+
+    MythCodecContext::InitVideoCodec(Context, SelectedStream, DirectRendering);
 }
 
 int MythNVDECContext::HwDecoderInit(AVCodecContext *Context)

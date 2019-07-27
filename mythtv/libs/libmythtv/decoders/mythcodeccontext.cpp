@@ -32,6 +32,7 @@
 #include "mythvaapicontext.h"
 #endif
 #ifdef USING_VDPAU
+#include "mythvdpauhelper.h"
 #include "mythvdpaucontext.h"
 #endif
 #ifdef USING_NVDEC
@@ -49,7 +50,6 @@
 #ifdef USING_MMAL
 #include "mythmmalcontext.h"
 #endif
-
 #include "mythcodeccontext.h"
 
 #define LOC QString("MythCodecContext: ")
@@ -60,7 +60,6 @@ MythCodecContext::MythCodecContext(DecoderBase *Parent, MythCodecID CodecID)
 {
 }
 
-// static
 MythCodecContext *MythCodecContext::CreateContext(DecoderBase *Parent, MythCodecID Codec)
 {
     MythCodecContext *mctx = nullptr;
@@ -97,6 +96,139 @@ MythCodecContext *MythCodecContext::CreateContext(DecoderBase *Parent, MythCodec
     if (!mctx)
         mctx = new MythCodecContext(Parent, Codec);
     return mctx;
+}
+
+void MythCodecContext::GetDecoders(render_opts &Opts)
+{
+#ifdef USING_VDPAU
+    // Only enable VDPAU support if it is actually present
+    if (MythVDPAUHelper::HaveVDPAU())
+    {
+        Opts.decoders->append("vdpau");
+        (*Opts.equiv_decoders)["vdpau"].append("dummy");
+        Opts.decoders->append("vdpau-dec");
+        (*Opts.equiv_decoders)["vdpau-dec"].append("dummy");
+    }
+#endif
+#ifdef USING_DXVA2
+    Opts.decoders->append("dxva2");
+    (*Opts.equiv_decoders)["dxva2"].append("dummy");
+#endif
+
+#ifdef USING_VAAPI
+    // Only enable VAAPI if it is actually present and isn't actually VDPAU
+    if (MythVAAPIContext::HaveVAAPI())
+    {
+        Opts.decoders->append("vaapi");
+        (*Opts.equiv_decoders)["vaapi"].append("dummy");
+        Opts.decoders->append("vaapi-dec");
+        (*Opts.equiv_decoders)["vaapi-dec"].append("dummy");
+    }
+#endif
+#ifdef USING_NVDEC
+    // Only enable NVDec support if it is actually present
+    if (MythNVDECContext::HaveNVDEC())
+    {
+        Opts.decoders->append("nvdec");
+        (*Opts.equiv_decoders)["nvdec"].append("dummy");
+        Opts.decoders->append("nvdec-dec");
+        (*Opts.equiv_decoders)["nvdec-dec"].append("dummy");
+    }
+#endif
+#ifdef USING_MEDIACODEC
+    Opts.decoders->append("mediacodec");
+    (*Opts.equiv_decoders)["mediacodec"].append("dummy");
+    Opts.decoders->append("mediacodec-dec");
+    (*Opts.equiv_decoders)["mediacodec-dec"].append("dummy");
+#endif
+#ifdef USING_VTB
+    Opts.decoders->append("vtb");
+    Opts.decoders->append("vtb-dec");
+    (*Opts.equiv_decoders)["vtb"].append("dummy");
+    (*Opts.equiv_decoders)["vtb-dec"].append("dummy");
+#endif
+#ifdef USING_V4L2
+    if (MythV4L2M2MContext::HaveV4L2Codecs())
+    {
+        Opts.decoders->append("v4l2-dec");
+        (*Opts.equiv_decoders)["v4l2-dec"].append("dummy");
+    }
+#endif
+#ifdef USING_MMAL
+    Opts.decoders->append("mmal-dec");
+    (*Opts.equiv_decoders)["mmal-dec"].append("dummy");
+    Opts.decoders->append("mmal");
+    (*Opts.equiv_decoders)["mmal"].append("dummy");
+#endif
+}
+
+MythCodecID MythCodecContext::FindDecoder(const QString &Decoder, AVStream *Stream,
+                                          AVCodecContext *Context, AVCodec *Codec)
+{
+    MythCodecID result = kCodec_NONE;
+    uint streamtype = mpeg_version(Context->codec_id);
+
+#ifdef USING_VDPAU
+    result = MythVDPAUContext::GetSupportedCodec(Context, &Codec, Decoder, streamtype);
+    if (codec_is_vdpau_hw(result) || codec_is_vdpau_dechw(result))
+        return result;
+#endif
+#ifdef USING_VAAPI
+    result = MythVAAPIContext::GetSupportedCodec(Context, &Codec, Decoder, streamtype);
+    if (codec_is_vaapi(result) || codec_is_vaapi_dec(result))
+        return result;
+#endif
+#ifdef USING_VTB
+    result = MythVTBContext::GetSupportedCodec(Context, &Codec, Decoder, streamtype);
+    if (codec_is_vtb(result) || codec_is_vtb_dec(result))
+        return result;
+#endif
+#ifdef USING_DXVA2
+    result = VideoOutputD3D::GetBestSupportedCodec(width, height, Decoder, streamtype, false);
+    if (codec_is_dxva2(result))
+        return result;
+#endif
+#ifdef USING_MEDIACODEC
+    result = MythMediaCodecContext::GetBestSupportedCodec(Context, &Codec, Decoder, Stream, streamtype);
+    if (codec_is_mediacodec(result) || codec_is_mediacodec_dec(result))
+        return result;
+#endif
+#ifdef USING_NVDEC
+    result = MythNVDECContext::GetSupportedCodec(Context, &Codec, Decoder, Stream, streamtype);
+    if (codec_is_nvdec(result) || codec_is_nvdec_dec(result))
+        return result;
+#endif
+#ifdef USING_V4L2
+    result = MythV4L2M2MContext::GetSupportedCodec(Context, &Codec, Decoder, Stream, streamtype);
+    if (codec_is_v4l2_dec(result))
+        return result;
+#endif
+#ifdef USING_MMAL
+    result = MythMMALContext::GetSupportedCodec(Context, &Codec, Decoder, Stream, streamtype);
+    if (codec_is_mmal_dec(result) || codec_is_mmal(result))
+        return result;
+#endif
+
+    return kCodec_NONE;
+}
+
+void MythCodecContext::InitVideoCodec(AVCodecContext *Context,
+                                      bool SelectedStream, bool &DirectRendering)
+{
+    const AVCodec *codec1 = Context->codec;
+    if (codec1 && codec1->capabilities & AV_CODEC_CAP_DR1)
+    {
+        // Context->flags |= CODEC_FLAG_EMU_EDGE;
+    }
+    else
+    {
+        if (SelectedStream)
+            DirectRendering = false;
+        LOG(VB_PLAYBACK, LOG_INFO, LOC +
+            QString("Using software scaling to convert pixel format %1 for "
+                    "codec %2").arg(av_get_pix_fmt_name(Context->pix_fmt))
+                .arg(ff_codec_id_string(Context->codec_id)));
+    }
 }
 
 /// \brief A generic hardware buffer initialisation method when using AVHWFramesContext.

@@ -11,8 +11,9 @@ class MythV4L2M2MContext : public MythCodecContext
     static MythCodecID GetSupportedCodec (AVCodecContext *Context,
                                           AVCodec       **Codec,
                                           const QString  &Decoder,
-                                          uint            StreamType,
-                                          AVPixelFormat  &PixFmt);
+                                          AVStream       *Stream,
+                                          uint            StreamType);
+    void        InitVideoCodec           (AVCodecContext *Context, bool SelectedStream, bool &DirectRendering) override;
     bool        RetrieveFrame            (AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame) override;
     void        SetDecoderOptions        (AVCodecContext* Context, AVCodec* Codec) override;
     static bool GetBuffer                (AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame, int);

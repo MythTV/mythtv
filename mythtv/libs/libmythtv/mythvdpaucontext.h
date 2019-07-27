@@ -9,12 +9,13 @@ class MythVDPAUContext : public MythCodecContext
   public:
     MythVDPAUContext(DecoderBase *Parent, MythCodecID CodecID);
 
+    void   InitVideoCodec                (AVCodecContext *Context, bool SelectedStream, bool &DirectRendering) override;
     bool   RetrieveFrame                 (AVCodecContext*, VideoFrame* Frame, AVFrame* AvFrame) override;
+
     static MythCodecID GetSupportedCodec (AVCodecContext *CodecContext,
                                           AVCodec       **Codec,
                                           const QString  &Decoder,
-                                          uint            StreamType,
-                                          AVPixelFormat  &PixFmt);
+                                          uint            StreamType);
     static enum AVPixelFormat GetFormat  (AVCodecContext *Context,
                                           const enum AVPixelFormat *PixFmt);
     static enum AVPixelFormat GetFormat2 (AVCodecContext *Context,

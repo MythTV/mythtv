@@ -18,7 +18,7 @@ class MythVTBContext : public MythCodecContext
     MythVTBContext(DecoderBase *Parent, MythCodecID CodecID);
 
     // Shared decode only and direct rendering
-
+    void   InitVideoCodec                (AVCodecContext *Context, bool SelectedStream, bool &DirectRendering) override;
     bool   RetrieveFrame                 (AVCodecContext* Context,
                                           VideoFrame* Frame,
                                           AVFrame* AvFrame) override;
@@ -26,8 +26,7 @@ class MythVTBContext : public MythCodecContext
     static MythCodecID GetSupportedCodec (AVCodecContext *Context,
                                           AVCodec       **Codec,
                                           const QString  &Decoder,
-                                          uint            StreamType,
-                                          AVPixelFormat  &PixFmt);
+                                          uint            StreamType);
     static enum AVPixelFormat GetFormat  (AVCodecContext *Context,
                                           const enum AVPixelFormat *PixFmt);
 

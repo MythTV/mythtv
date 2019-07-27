@@ -23,6 +23,7 @@ class MTV_PUBLIC MythVAAPIContext : public MythCodecContext
     MythVAAPIContext                     (DecoderBase *Parent, MythCodecID CodecID);
    ~MythVAAPIContext() override;
 
+    void   InitVideoCodec                (AVCodecContext *Context, bool SelectedStream, bool &DirectRendering) override;
     bool   RetrieveFrame                 (AVCodecContext*, VideoFrame* Frame, AVFrame* AvFrame) override;
     int    FilteredReceiveFrame          (AVCodecContext *Context, AVFrame *Frame) override;
     void   PostProcessFrame              (AVCodecContext *Context, VideoFrame *Frame) override;
@@ -31,8 +32,7 @@ class MTV_PUBLIC MythVAAPIContext : public MythCodecContext
     static MythCodecID GetSupportedCodec (AVCodecContext *Context,
                                           AVCodec       **Codec,
                                           const QString  &Decoder,
-                                          uint            StreamType,
-                                          AVPixelFormat  &PixFmt);
+                                          uint            StreamType);
     static enum AVPixelFormat GetFormat  (AVCodecContext *Context,
                                           const AVPixelFormat *PixFmt);
     static enum AVPixelFormat GetFormat2 (AVCodecContext *Context,

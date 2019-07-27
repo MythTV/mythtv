@@ -25,6 +25,7 @@ class MythNVDECContext : public MythCodecContext
 {
   public:
     MythNVDECContext(DecoderBase *Parent, MythCodecID CodecID);
+    void InitVideoCodec                  (AVCodecContext *Context, bool SelectedStream, bool &DirectRendering) override;
     int  HwDecoderInit                   (AVCodecContext *Context) override;
     bool RetrieveFrame                   (AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame) override;
     void SetDeinterlacing                (AVCodecContext *Context,
@@ -34,8 +35,8 @@ class MythNVDECContext : public MythCodecContext
     static MythCodecID GetSupportedCodec (AVCodecContext *CodecContext,
                                           AVCodec       **Codec,
                                           const QString  &Decoder,
-                                          uint            StreamType,
-                                          AVPixelFormat  &PixFmt);
+                                          AVStream       *Stream,
+                                          uint            StreamType);
     static enum AVPixelFormat GetFormat  (AVCodecContext *Contextconst, const AVPixelFormat *PixFmt);
     static bool GetBuffer                (AVCodecContext *Context, VideoFrame *Frame,
                                           AVFrame *AvFrame, int Flags);

@@ -43,8 +43,8 @@ inline uint32_t V4L2CodecType(AVCodecID Id)
 MythCodecID MythV4L2M2MContext::GetSupportedCodec(AVCodecContext *Context,
                                                   AVCodec **Codec,
                                                   const QString &Decoder,
-                                                  uint StreamType,
-                                                  AVPixelFormat &PixFmt)
+                                                  AVStream *Stream,
+                                                  uint StreamType)
 {
     bool decodeonly = Decoder == "v4l2-dec";
     MythCodecID success = static_cast<MythCodecID>((decodeonly ? kCodec_MPEG1_V4L2_DEC : kCodec_MPEG1_V4L2) + (StreamType - 1));
@@ -77,8 +77,21 @@ MythCodecID MythV4L2M2MContext::GetSupportedCodec(AVCodecContext *Context,
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Found V4L2/FFmpeg decoder '%1'").arg(name));
     *Codec = codec;
-    PixFmt = decodeonly ? Context->pix_fmt : AV_PIX_FMT_DRM_PRIME;
+    gCodecMap->freeCodecContext(Stream);
+    Context = gCodecMap->getCodecContext(Stream, *Codec);
+    Context->pix_fmt = decodeonly ? Context->pix_fmt : AV_PIX_FMT_DRM_PRIME;
     return success;
+}
+
+void MythV4L2M2MContext::InitVideoCodec(AVCodecContext *Context, bool SelectedStream, bool &DirectRendering)
+{
+    if (codec_is_v4l2_dec(m_codecID))
+    {
+        DirectRendering = false;
+        return;
+    }
+
+    MythCodecContext::InitVideoCodec(Context, SelectedStream, DirectRendering);
 }
 
 bool MythV4L2M2MContext::RetrieveFrame(AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame)

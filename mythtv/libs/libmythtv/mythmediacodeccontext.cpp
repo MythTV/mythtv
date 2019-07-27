@@ -58,8 +58,8 @@ int MythMediaCodecContext::InitialiseDecoder(AVCodecContext *Context)
 MythCodecID MythMediaCodecContext::GetBestSupportedCodec(AVCodecContext* Context,
                                                          AVCodec       **Codec,
                                                          const QString  &Decoder,
-                                                         uint            StreamType,
-                                                         AVPixelFormat  &PixFmt)
+                                                         AVStream       *Stream,
+                                                         uint            StreamType)
 {
     bool decodeonly = Decoder == "mediacodec-dec";
     MythCodecID success = static_cast<MythCodecID>((decodeonly ? kCodec_MPEG1_MEDIACODEC_DEC : kCodec_MPEG1_MEDIACODEC) + (StreamType - 1));
@@ -76,8 +76,10 @@ MythCodecID MythMediaCodecContext::GetBestSupportedCodec(AVCodecContext* Context
     {
         *Codec = newCodec;
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' supports decoding '%2'")
-                .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_MEDIACODEC)).arg((*Codec)->name));
-        PixFmt = AV_PIX_FMT_MEDIACODEC;
+                .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_MEDIACODEC)).arg((*Codec)->name));        
+        gCodecMap->freeCodecContext(Stream);
+        Context = gCodecMap->getCodecContext(Stream, *Codec);
+        Context->pix_fmt = AV_PIX_FMT_MEDIACODEC;
         return success;
     }
 
@@ -89,6 +91,18 @@ MythCodecID MythMediaCodecContext::GetBestSupportedCodec(AVCodecContext* Context
 MythMediaCodecContext::MythMediaCodecContext(DecoderBase *Parent, MythCodecID CodecID)
   : MythCodecContext(Parent, CodecID)
 {
+}
+
+void MythMediaCodecContext::InitVideoCodec(AVCodecContext *Context, bool SelectedStream, bool &DirectRendering)
+{
+    if (CODEC_IS_MEDIACODEC(Context->codec))
+    {
+        Context->get_format = MythMediaCodecContext::GetFormat;
+        Context->slice_flags = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
+        return;
+    }
+
+    MythCodecContext::InitVideoCodec(Context, SelectedStream, DirectRendering);
 }
 
 int MythMediaCodecContext::HwDecoderInit(AVCodecContext *Context)

@@ -36,6 +36,11 @@
 #include "mythframe.h"
 #include "decoderbase.h"
 
+extern "C" {
+#include "libavcodec/avcodec.h"
+#include "libavformat/avformat.h"
+}
+
 typedef int (*CreateHWDecoder)(AVCodecContext *Context);
 
 class MythOpenGLInterop;
@@ -48,6 +53,9 @@ class MTV_PUBLIC MythCodecContext
     virtual ~MythCodecContext() = default;
 
     static MythCodecContext* CreateContext (DecoderBase *Parent, MythCodecID Codec);
+    static void GetDecoders                (render_opts &Opts);
+    static MythCodecID FindDecoder         (const QString &Decoder, AVStream *Stream,
+                                            AVCodecContext *Context, AVCodec *Codec);
     static int  GetBuffer                  (struct AVCodecContext *Context, AVFrame *Frame, int Flags);
     static bool GetBuffer2                 (struct AVCodecContext *Context, VideoFrame *Frame,
                                             AVFrame *AvFrame, int Flags);
@@ -61,6 +69,8 @@ class MTV_PUBLIC MythCodecContext
     static AVBufferRef* CreateDevice       (AVHWDeviceType Type, const QString &Device = QString());
     static bool IsUnsupportedProfile       (AVCodecContext *Context);
 
+    virtual void   InitVideoCodec          (AVCodecContext *Context,
+                                            bool SelectedStream, bool &DirectRendering);
     virtual int    HwDecoderInit           (AVCodecContext*) { return 0; }
     virtual bool   RetrieveFrame           (AVCodecContext*, VideoFrame*, AVFrame*) { return false; }
     virtual int    FilteredReceiveFrame    (AVCodecContext *Context, AVFrame *Frame);

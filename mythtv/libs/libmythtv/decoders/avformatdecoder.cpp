@@ -42,41 +42,11 @@ using namespace std;
 
 #include "audiooutput.h"
 
-#ifdef USING_DXVA2
-#include "videoout_d3d.h"
-#endif
-
-#ifdef USING_VAAPI
-#include "mythvaapicontext.h"
-#endif
-
-#ifdef USING_VTB
-#include "mythvtbcontext.h"
-#endif
-
 #ifdef USING_MEDIACODEC
-#include "mythmediacodeccontext.h"
 extern "C" {
 #include "libavcodec/jni.h"
 }
 #include <QtAndroidExtras>
-#endif
-
-#ifdef USING_NVDEC
-#include "mythnvdeccontext.h"
-#endif
-
-#ifdef USING_VDPAU
-#include "mythvdpaucontext.h"
-#include "mythvdpauhelper.h"
-#endif
-
-#ifdef USING_V4L2
-#include "mythv4l2m2mcontext.h"
-#endif
-
-#ifdef USING_MMAL
-#include "mythmmalcontext.h"
 #endif
 
 extern "C" {
@@ -350,67 +320,7 @@ void AvFormatDecoder::GetDecoders(render_opts &opts)
     (*opts.equiv_decoders)["ffmpeg"].append("nuppel");
     (*opts.equiv_decoders)["ffmpeg"].append("dummy");
 
-#ifdef USING_VDPAU
-    // Only enable VDPAU support if it is actually present
-    if (MythVDPAUHelper::HaveVDPAU())
-    {
-        opts.decoders->append("vdpau");
-        (*opts.equiv_decoders)["vdpau"].append("dummy");
-        opts.decoders->append("vdpau-dec");
-        (*opts.equiv_decoders)["vdpau-dec"].append("dummy");
-    }
-#endif
-#ifdef USING_DXVA2
-    opts.decoders->append("dxva2");
-    (*opts.equiv_decoders)["dxva2"].append("dummy");
-#endif
-
-#ifdef USING_VAAPI
-    // Only enable VAAPI if it is actually present and isn't actually VDPAU
-    if (MythVAAPIContext::HaveVAAPI())
-    {
-        opts.decoders->append("vaapi");
-        (*opts.equiv_decoders)["vaapi"].append("dummy");
-        opts.decoders->append("vaapi-dec");
-        (*opts.equiv_decoders)["vaapi-dec"].append("dummy");
-    }
-#endif
-#ifdef USING_NVDEC
-    // Only enable NVDec support if it is actually present
-    if (MythNVDECContext::HaveNVDEC())
-    {
-        opts.decoders->append("nvdec");
-        (*opts.equiv_decoders)["nvdec"].append("dummy");
-        opts.decoders->append("nvdec-dec");
-        (*opts.equiv_decoders)["nvdec-dec"].append("dummy");
-    }
-#endif
-#ifdef USING_MEDIACODEC
-    opts.decoders->append("mediacodec");
-    (*opts.equiv_decoders)["mediacodec"].append("dummy");
-    opts.decoders->append("mediacodec-dec");
-    (*opts.equiv_decoders)["mediacodec-dec"].append("dummy");
-#endif
-#ifdef USING_VTB
-    opts.decoders->append("vtb");
-    opts.decoders->append("vtb-dec");
-    (*opts.equiv_decoders)["vtb"].append("dummy");
-    (*opts.equiv_decoders)["vtb-dec"].append("dummy");
-#endif
-#ifdef USING_V4L2
-    if (MythV4L2M2MContext::HaveV4L2Codecs())
-    {
-        opts.decoders->append("v4l2-dec");
-        (*opts.equiv_decoders)["v4l2-dec"].append("dummy");
-    }
-#endif
-#ifdef USING_MMAL
-    opts.decoders->append("mmal-dec");
-    (*opts.equiv_decoders)["mmal-dec"].append("dummy");
-    opts.decoders->append("mmal");
-    (*opts.equiv_decoders)["mmal"].append("dummy");
-#endif
-
+    MythCodecContext::GetDecoders(opts);
     PrivateDecoder::GetDecoders(opts);
 }
 
@@ -1542,102 +1452,9 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     else
         m_videoRotation = 0;
 
-#ifdef USING_VDPAU
-    if (CODEC_IS_VDPAU(codec1, enc) && codec_is_vdpau_hw(m_video_codec_id))
-    {
-        enc->get_buffer2 = MythCodecContext::GetBuffer;
-        enc->get_format  = MythVDPAUContext::GetFormat;
-        enc->slice_flags = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
-    }
-    else if (codec_is_vdpau_dechw(m_video_codec_id))
-    {
-        enc->get_format   = MythVDPAUContext::GetFormat2;
-        enc->slice_flags  = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
-        m_directrendering = false;
-    }
-    else
-#endif
-#ifdef USING_DXVA2
-    if (CODEC_IS_DXVA2(codec1, enc))
-    {
-        enc->get_buffer2     = get_avf_buffer_dxva2;
-        enc->get_format      = get_format_dxva2;
-    }
-    else
-#endif
-#ifdef USING_VAAPI
-    if (CODEC_IS_VAAPI(codec1, enc) && codec_is_vaapi(m_video_codec_id))
-    {
-        enc->get_buffer2 = MythCodecContext::GetBuffer;
-        enc->get_format  = MythVAAPIContext::GetFormat;
-    }
-    else if (codec_is_vaapi_dec(m_video_codec_id))
-    {
-        enc->get_format   = MythVAAPIContext::GetFormat2;
-        m_directrendering = false;
-    }
-    else
-#endif
-#ifdef USING_VTB
-    if (codec_is_vtb(m_video_codec_id) || codec_is_vtb_dec(m_video_codec_id))
-    {
-        enc->get_format  = MythVTBContext::GetFormat;
-        enc->slice_flags = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
-        m_directrendering = false;
-    }
-    else
-#endif
-#ifdef USING_MEDIACODEC
-    if (CODEC_IS_MEDIACODEC(codec1))
-    {
-        enc->get_format = MythMediaCodecContext::GetFormat;
-        enc->slice_flags = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
-    }
-    else
-#endif
-#ifdef USING_NVDEC
-    if (codec_is_nvdec_dec(m_video_codec_id) || codec_is_nvdec(m_video_codec_id))
-    {
-        enc->get_format = MythNVDECContext::GetFormat;
-        m_directrendering = false;
-    }
-    else
-#endif
-#ifdef USING_V4L2
-    if (codec_is_v4l2_dec(m_video_codec_id))
-    {
-        m_directrendering = false;
-    }
-    else
-#endif
-#ifdef USING_MMAL
-    if (codec_is_mmal_dec(m_video_codec_id))
-    {
-        m_directrendering = false;
-    }
-    else if (codec_is_mmal(m_video_codec_id))
-    {
-        enc->get_format  = MythMMALContext::GetFormat;
-        m_directrendering = false;
-    }
-    else
-#endif
-    if (codec1 && codec1->capabilities & AV_CODEC_CAP_DR1)
-    {
-        // enc->flags          |= CODEC_FLAG_EMU_EDGE;
-    }
-    else
-    {
-        if (selectedStream)
-            m_directrendering = false;
-        LOG(VB_PLAYBACK, LOG_INFO, LOC +
-            QString("Using software scaling to convert pixel format %1 for "
-                    "codec %2").arg(av_get_pix_fmt_name(enc->pix_fmt))
-                .arg(ff_codec_id_string(enc->codec_id)));
-    }
-
     delete m_mythcodecctx;
     m_mythcodecctx = MythCodecContext::CreateContext(this, m_video_codec_id);
+    m_mythcodecctx->InitVideoCodec(enc, selectedStream, m_directrendering);
     if (m_mythcodecctx->HwDecoderInit(enc) < 0)
     {
         // force it to switch to software decoding
@@ -2464,140 +2281,14 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             bool foundgpudecoder = false;
             if (version && FlagIsSet(kDecodeAllowGPU))
             {
-#ifdef USING_VDPAU
-                if (!foundgpudecoder)
+                MythCodecID hwcodec = MythCodecContext::FindDecoder(dec, m_ic->streams[selTrack], enc, codec);
+                if (hwcodec != kCodec_NONE)
                 {
-                    MythCodecID vdpaumcid;
-                    AVPixelFormat pixfmt = AV_PIX_FMT_YUV420P;
-                    vdpaumcid = MythVDPAUContext::GetSupportedCodec(enc, &codec,
-                                                                    dec, mpeg_version(enc->codec_id), pixfmt);
-
-                    if (codec_is_vdpau_hw(vdpaumcid) || codec_is_vdpau_dechw(vdpaumcid))
-                    {
-                        m_video_codec_id = vdpaumcid;
-                        enc->pix_fmt = pixfmt;
-                        // cppcheck-suppress unreadVariable
-                        foundgpudecoder = true;
-                    }
+                    m_video_codec_id = hwcodec;
+                    foundgpudecoder = true;
                 }
-#endif // USING_VDPAU
-#ifdef USING_VAAPI
-                if (!foundgpudecoder)
-                {
-                    AVPixelFormat pixfmt = AV_PIX_FMT_YUV420P;
-                    MythCodecID vaapimcid = MythVAAPIContext::GetSupportedCodec(enc, &codec, dec,
-                                                                                mpeg_version(enc->codec_id), pixfmt);
-                    if (codec_is_vaapi(vaapimcid) || codec_is_vaapi_dec(vaapimcid))
-                    {
-                        m_video_codec_id = vaapimcid;
-                        enc->pix_fmt = pixfmt;
-                        foundgpudecoder = true;
-                    }
-                }
-#endif // USING_VAAPI
-#ifdef USING_VTB
-                if (!foundgpudecoder)
-                {
-                    MythCodecID vtbid;
-                    AVPixelFormat pixfmt = AV_PIX_FMT_YUV420P;
-                    vtbid = MythVTBContext::GetSupportedCodec(enc, &codec, dec, mpeg_version(enc->codec_id), pixfmt);
-                    if (codec_is_vtb(vtbid) || codec_is_vtb_dec(vtbid))
-                    {
-                        m_video_codec_id = vtbid;
-                        enc->pix_fmt = pixfmt;
-                        foundgpudecoder = true;
-                    }
-                }
-#endif
-#ifdef USING_DXVA2
-                if (!foundgpudecoder)
-                {
-                    MythCodecID dxva2_mcid;
-                    AVPixelFormat pix_fmt = AV_PIX_FMT_YUV420P;
-                    dxva2_mcid = VideoOutputD3D::GetBestSupportedCodec(
-                        width, height, dec, mpeg_version(enc->codec_id),
-                        false, pix_fmt);
-
-                    if (codec_is_dxva2(dxva2_mcid))
-                    {
-                        m_video_codec_id = dxva2_mcid;
-                        enc->pix_fmt = pix_fmt;
-                        // cppcheck-suppress unreadVariable
-                        foundgpudecoder = true;
-                    }
-                }
-#endif // USING_DXVA2
-#ifdef USING_MEDIACODEC
-                if (!foundgpudecoder)
-                {
-                    MythCodecID mediacodecmcid;
-                    AVPixelFormat pixfmt = AV_PIX_FMT_YUV420P;
-                    mediacodecmcid = MythMediaCodecContext::GetBestSupportedCodec(enc, &codec,
-                                                      dec, mpeg_version(enc->codec_id), pixfmt);
-
-                    if (codec_is_mediacodec(mediacodecmcid) || codec_is_mediacodec_dec(mediacodecmcid))
-                    {
-                        gCodecMap->freeCodecContext(m_ic->streams[selTrack]);
-                        enc = gCodecMap->getCodecContext(m_ic->streams[selTrack], codec);
-                        m_video_codec_id = mediacodecmcid;
-                        foundgpudecoder = true;
-                    }
-                }
-#endif // USING_MEDIACODEC
-#ifdef USING_NVDEC
-                if (!foundgpudecoder)
-                {
-                    MythCodecID nvdecmcid;
-                    AVPixelFormat pix_fmt = AV_PIX_FMT_YUV420P;
-                    nvdecmcid = MythNVDECContext::GetSupportedCodec(enc, &codec, dec,
-                                                                    mpeg_version(enc->codec_id), pix_fmt);
-
-                    if (codec_is_nvdec(nvdecmcid) || codec_is_nvdec_dec(nvdecmcid))
-                    {
-                        gCodecMap->freeCodecContext(m_ic->streams[selTrack]);
-                        enc = gCodecMap->getCodecContext(m_ic->streams[selTrack], codec);
-                        m_video_codec_id = nvdecmcid;
-                        foundgpudecoder = true;
-                    }
-                }
-#endif // USING_NVDEC
-#ifdef USING_V4L2
-                if (!foundgpudecoder)
-                {
-                    MythCodecID v4l2mcid;
-                    AVPixelFormat pix_fmt = AV_PIX_FMT_YUV420P;
-                    v4l2mcid = MythV4L2M2MContext::GetSupportedCodec(enc, &codec, dec,
-                                    mpeg_version(static_cast<int>(enc->codec_id)), pix_fmt);
-
-                    if (codec_is_v4l2_dec(v4l2mcid))
-                    {
-                        gCodecMap->freeCodecContext(m_ic->streams[selTrack]);
-                        enc = gCodecMap->getCodecContext(m_ic->streams[selTrack], codec);
-                        m_video_codec_id = v4l2mcid;
-                        enc->pix_fmt = pix_fmt;
-                        foundgpudecoder = true;
-                    }
-                }
-#endif // USING_V4L2
-#ifdef USING_MMAL
-                if (!foundgpudecoder)
-                {
-                    MythCodecID mmalmcid;
-                    AVPixelFormat pix_fmt = AV_PIX_FMT_YUV420P;
-                    mmalmcid = MythMMALContext::GetSupportedCodec(enc, &codec, dec,
-                                    mpeg_version(static_cast<int>(enc->codec_id)), pix_fmt);
-
-                    if (codec_is_mmal_dec(mmalmcid) || codec_is_mmal(mmalmcid))
-                    {
-                        gCodecMap->freeCodecContext(m_ic->streams[selTrack]);
-                        enc = gCodecMap->getCodecContext(m_ic->streams[selTrack], codec);
-                        m_video_codec_id = mmalmcid;
-                        enc->pix_fmt = pix_fmt;
-                        foundgpudecoder = true;
-                    }
-                }
-#endif // USING_MMAL
             }
+
             // default to mpeg2
             if (m_video_codec_id == kCodec_NONE)
             {

@@ -13,8 +13,9 @@ class MythMMALContext : public MythCodecContext
     static MythCodecID GetSupportedCodec(AVCodecContext *Context,
                                          AVCodec **Codec,
                                          const QString &Decoder,
-                                         uint StreamType,
-                                         AVPixelFormat &PixFmt);
+                                         AVStream *Stream,
+                                         uint StreamType);
+    void        InitVideoCodec          (AVCodecContext *Context, bool SelectedStream, bool &DirectRendering) override;
     bool        RetrieveFrame           (AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame) override;
     int         HwDecoderInit           (AVCodecContext *Context) override;
     void        SetDecoderOptions       (AVCodecContext *Context, AVCodec *Codec) override;

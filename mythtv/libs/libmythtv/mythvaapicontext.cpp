@@ -130,8 +130,7 @@ inline AVPixelFormat MythVAAPIContext::FramesFormat(AVPixelFormat Format)
 MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext *Context,
                                                 AVCodec **Codec,
                                                 const QString &Decoder,
-                                                uint StreamType,
-                                                AVPixelFormat &PixFmt)
+                                                uint StreamType)
 {
     bool decodeonly = Decoder == "vaapi-dec";
     MythCodecID success = static_cast<MythCodecID>((decodeonly ? kCodec_MPEG1_VAAPI_DEC : kCodec_MPEG1_VAAPI) + (StreamType - 1));
@@ -256,7 +255,7 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext *Context,
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' supports decoding '%2 %3'")
                 .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_VAAPI)).arg((*Codec)->name)
                 .arg(av_get_pix_fmt_name(Context->pix_fmt)));
-        PixFmt = AV_PIX_FMT_VAAPI;
+        Context->pix_fmt = AV_PIX_FMT_VAAPI;
         return success;
     }
 
@@ -495,6 +494,24 @@ bool MythVAAPIContext::HaveVAAPI(bool ReCheck /*= false*/)
     }
 
     return havevaapi;
+}
+
+void MythVAAPIContext::InitVideoCodec(AVCodecContext *Context, bool SelectedStream, bool &DirectRendering)
+{
+    if (codec_is_vaapi(m_codecID))
+    {
+        Context->get_buffer2 = MythCodecContext::GetBuffer;
+        Context->get_format  = MythVAAPIContext::GetFormat;
+        return;
+    }
+    else if (codec_is_vaapi_dec(m_codecID))
+    {
+        Context->get_format = MythVAAPIContext::GetFormat2;
+        DirectRendering = false;
+        return;
+    }
+
+    MythCodecContext::InitVideoCodec(Context, SelectedStream, DirectRendering);
 }
 
 bool MythVAAPIContext::RetrieveFrame(AVCodecContext*, VideoFrame *Frame, AVFrame *AvFrame)

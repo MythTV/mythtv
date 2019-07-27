@@ -28,8 +28,8 @@ MythMMALContext::~MythMMALContext()
 MythCodecID MythMMALContext::GetSupportedCodec(AVCodecContext *Context,
                                                AVCodec **Codec,
                                                const QString &Decoder,
-                                               uint StreamType,
-                                               AVPixelFormat &PixFmt)
+                                               AVStream *Stream,
+                                               uint StreamType)
 {
     bool decodeonly = Decoder == "mmal-dec";
     MythCodecID success = static_cast<MythCodecID>((decodeonly ? kCodec_MPEG1_MMAL_DEC : kCodec_MPEG1_MMAL) + (StreamType - 1));
@@ -105,9 +105,28 @@ MythCodecID MythMMALContext::GetSupportedCodec(AVCodecContext *Context,
     }
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Found MMAL/FFmpeg decoder '%1'").arg(name));
-    *Codec = codec;
-    PixFmt = decodeonly ? Context->pix_fmt : AV_PIX_FMT_MMAL;
+    *Codec = codec;    
+    gCodecMap->freeCodecContext(Stream);
+    Context = gCodecMap->getCodecContext(Stream, *Codec);
+    Context->pix_fmt = decodeonly ? Context->pix_fmt : AV_PIX_FMT_MMAL;
     return success;
+}
+
+void MythMMALContext::InitVideoCodec(AVCodecContext *Context, bool SelectedStream, bool &DirectRendering)
+{
+    if (codec_is_mmal_dec(m_codecID))
+    {
+        DirectRendering = false;
+        return;
+    }
+    else if (codec_is_mmal(m_codecID))
+    {
+        Context->get_format  = MythMMALContext::GetFormat;
+        DirectRendering = false;
+        return;
+    }
+
+    MythCodecContext::InitVideoCodec(Context, SelectedStream, DirectRendering);
 }
 
 bool MythMMALContext::RetrieveFrame(AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame)

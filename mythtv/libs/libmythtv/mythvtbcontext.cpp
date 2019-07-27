@@ -21,6 +21,19 @@ MythVTBContext::MythVTBContext(DecoderBase *Parent, MythCodecID CodecID)
 {
 }
 
+void MythVTBContext::InitVideoCodec(AVCodecContext *Context, bool SelectedStream, bool &DirectRendering)
+{
+    if (codec_is_vtb(m_codecID) || codec_is_vtb_dec(m_codecID))
+    {
+        Context->get_format  = MythVTBContext::GetFormat;
+        Context->slice_flags = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
+        DirectRendering = false;
+        return;
+    }
+
+    MythCodecContext::InitVideoCodec(Context, SelectedStream, DirectRendering);
+}
+
 bool MythVTBContext::RetrieveFrame(AVCodecContext* Context, VideoFrame* Frame, AVFrame* AvFrame)
 {
     if (AvFrame->format != AV_PIX_FMT_VIDEOTOOLBOX)
@@ -92,8 +105,7 @@ bool MythVTBContext::CheckDecoderSupport(uint StreamType, AVCodec **Codec)
 MythCodecID MythVTBContext::GetSupportedCodec(AVCodecContext *Context,
                                               AVCodec **Codec,
                                               const QString &Decoder,
-                                              uint StreamType,
-                                              AVPixelFormat &PixFmt)
+                                              uint StreamType)
 {
     bool decodeonly = Decoder == "vtb-dec"; 
     MythCodecID success = static_cast<MythCodecID>((decodeonly ? kCodec_MPEG1_VTB_DEC : kCodec_MPEG1_VTB) + (StreamType - 1));
@@ -106,7 +118,7 @@ MythCodecID MythVTBContext::GetSupportedCodec(AVCodecContext *Context,
     if (!CheckDecoderSupport(StreamType, Codec))
         return failure;
 
-    PixFmt = AV_PIX_FMT_VIDEOTOOLBOX;
+    Context->pix_fmt = AV_PIX_FMT_VIDEOTOOLBOX;
     return success;
 }
 

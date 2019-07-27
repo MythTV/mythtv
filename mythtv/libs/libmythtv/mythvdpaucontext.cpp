@@ -119,7 +119,7 @@ int MythVDPAUContext::InitialiseContext(AVCodecContext* Context)
 }
 
 MythCodecID MythVDPAUContext::GetSupportedCodec(AVCodecContext *Context, AVCodec **Codec, const QString &Decoder,
-                                                uint StreamType, AVPixelFormat &PixFmt)
+                                                uint StreamType)
 {
     bool decodeonly = Decoder == "vdpau-dec";
     MythCodecID success = static_cast<MythCodecID>((decodeonly ? kCodec_MPEG1_VDPAU_DEC : kCodec_MPEG1_VDPAU) + (StreamType - 1));
@@ -151,7 +151,7 @@ MythCodecID MythVDPAUContext::GetSupportedCodec(AVCodecContext *Context, AVCodec
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' supports decoding '%2 %3'")
             .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_VDPAU)).arg((*Codec)->name)
             .arg(format_description(type)));
-    PixFmt = AV_PIX_FMT_VDPAU;
+    Context->pix_fmt = AV_PIX_FMT_VDPAU;
     return success;
 }
 
@@ -194,4 +194,24 @@ bool MythVDPAUContext::RetrieveFrame(AVCodecContext*, VideoFrame *Frame, AVFrame
     if (codec_is_vdpau_dec(m_codecID))
         return RetrieveHWFrame(Frame, AvFrame);
     return false;
+}
+
+void MythVDPAUContext::InitVideoCodec(AVCodecContext *Context, bool SelectedStream, bool &DirectRendering)
+{
+    if (codec_is_vdpau_hw(m_codecID))
+    {
+        Context->get_buffer2 = MythCodecContext::GetBuffer;
+        Context->get_format  = MythVDPAUContext::GetFormat;
+        Context->slice_flags = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
+        return;
+    }
+    else if (codec_is_vdpau_dechw(m_codecID))
+    {
+        Context->get_format   = MythVDPAUContext::GetFormat2;
+        Context->slice_flags  = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
+        DirectRendering = false;
+        return;
+    }
+
+    MythCodecContext::InitVideoCodec(Context, SelectedStream, DirectRendering);
 }
