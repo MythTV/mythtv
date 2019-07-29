@@ -1626,6 +1626,32 @@ bool ChannelUtil::UpdateChannel(uint db_mplexid,
     return true;
 }
 
+void ChannelUtil::UpdateChannelNumberFromDB(ChannelInsertInfo &chan)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT channum "
+        "FROM channel "
+        "WHERE chanid = :ID");
+    query.bindValue(":ID", chan.m_channel_id);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("UpdateChannelNumberFromDB", query);
+        return;
+    }
+
+    if (query.next())
+    {
+        QString channum = query.value(0).toString();
+
+        if (!channum.isEmpty())
+        {
+            chan.m_chan_num = channum;
+        }
+    }
+}
+
 void ChannelUtil::UpdateInsertInfoFromDB(ChannelInsertInfo &chan)
 {
     MSqlQuery query(MSqlQuery::InitCon());

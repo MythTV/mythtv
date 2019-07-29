@@ -388,6 +388,7 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
     ScanDTVTransportList next_list;
 
     bool ignore_rest = false;
+    bool ok_all = false;
 
     // insert all channels with non-conflicting channum
     // and complete tuning information.
@@ -481,14 +482,38 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
                 if (m_is_interactive && !asked &&
                     (conflicting || (kChannelTypeConflictingFirst <= type)))
                 {
-                    OkCancelType rc =
-                        QueryUserResolve(info, transports[i], chan);
+                    bool ok_done = false;
+                    if (ok_all)
+                    {
+                        QString val = ComputeSuggestedChannelNum(chan);
+                        bool ok = CheckChannelNumber(val, chan);
+                        if (ok)
+                        {
+                            chan.m_chan_num = val;
+                            conflicting = false;
+                            ok_done = true;
+                        }
+                    }
+                    if (!ok_done)
+                    {
+                        OkCancelType rc =
+                            QueryUserResolve(info, transports[i], chan);
 
-                    conflicting = true;
-                    if (kOCTCancelAll == rc)
-                        ignore_rest = true;
-                    else if (kOCTOk == rc)
-                        conflicting = false;
+                        conflicting = true;
+                        if (kOCTCancelAll == rc)
+                        {
+                            ignore_rest = true;
+                        }
+                        else if (kOCTOk == rc)
+                        {
+                            conflicting = false;
+                        }
+                        else if (kOCTOkAll == rc)
+                        {
+                            conflicting = false;
+                            ok_all = true;
+                        }
+                    }
                 }
 
                 if (conflicting)
@@ -635,6 +660,10 @@ ScanDTVTransportList ChannelImporter::UpdateChannels(
             {
                 bool conflicting = false;
 
+                if (m_keep_channel_numbers)
+                {
+                    ChannelUtil::UpdateChannelNumberFromDB(chan);
+                }
                 if (chan.m_chan_num.isEmpty() || renameChannels ||
                     ChannelUtil::IsConflicting(
                         chan.m_chan_num, chan.m_source_id, chan.m_channel_id))
@@ -1251,8 +1280,8 @@ bool ChannelImporter::IsType(
                                         (chan.m_atsc_minor_channel)] == 1));
 
         case kDVBNonConflicting:
-            return ((chan.m_si_standard == "dvb") &&
-                    (info.m_prognum_cnt[chan.m_service_id] == 1));
+            return ((chan.m_si_standard == "dvb") /* &&
+                    (info.m_prognum_cnt[chan.m_service_id] == 1) */);
 
         case kMPEGNonConflicting:
             return ((chan.m_si_standard == "mpeg") &&
@@ -1324,14 +1353,10 @@ void ChannelImporter::CountChannels(
  * with an existing channel number. If so, fall back to incrementing a
  * per-source number to find an unused value.
  *
- * \param info       Unused.
- * \param transport  Unused.
  * \param chan       Info describing a channel
  * \return Returns a simple name for the channel.
  */
 QString ChannelImporter::ComputeSuggestedChannelNum(
-    const ChannelImporterBasicStats &/*info*/,
-    const ScanDTVTransport          &/*transport*/,
     const ChannelInsertInfo         &chan)
 {
     static QMutex          last_free_lock;
@@ -1657,6 +1682,76 @@ OkCancelType ChannelImporter::ShowManualChannelPopup(
         ((2 == dc) ? kOCTCancel : kOCTCancelAll);
 }
 
+OkCancelType ChannelImporter::ShowResolveChannelPopup(
+    MythMainWindow *parent, const QString& title,
+    const QString& message, QString &text)
+{
+    int dc = -1;
+    MythScreenStack *popupStack = parent->GetStack("popup stack");
+    MythDialogBox *popup = new MythDialogBox(title, message, popupStack,
+                                             "resolvechannelpopup");
+
+    if (popup->Create())
+    {
+        popup->AddButton(QCoreApplication::translate("(Common)", "OK"));
+        popup->AddButton(QCoreApplication::translate("(Common)", "OK All"));
+        popup->AddButton(tr("Edit"));
+        popup->AddButton(QCoreApplication::translate("(Common)", "Cancel"));
+        popup->AddButton(QCoreApplication::translate("(Common)", "Cancel All"));
+        QObject::connect(popup, &MythDialogBox::Closed,
+                         [&](const QString & /*resultId*/, int result)
+                         {
+                             dc = result;
+                             m_eventLoop.quit();
+                         });
+        popupStack->AddScreen(popup);
+        m_eventLoop.exec();
+    }
+    else
+    {
+        delete popup;
+        popup = nullptr;
+    }
+
+    // Choice "Edit"
+    if (2 == dc)
+    {
+        MythTextInputDialog *textEdit =
+            new MythTextInputDialog(popupStack,
+                                    tr("Please enter a unique channel number."),
+                                    FilterNone, false, text);
+        if (textEdit->Create())
+        {
+            QObject::connect(textEdit, &MythTextInputDialog::haveResult,
+                             [&](QString result)
+                             {
+                                 dc = 0;
+                                 text = std::move(result);
+                             });
+            QObject::connect(textEdit, &MythTextInputDialog::Exiting,
+                             [&]()
+                             {
+                                 m_eventLoop.quit();
+                             });
+
+            popupStack->AddScreen(textEdit);
+            m_eventLoop.exec();
+        }
+        else
+            delete textEdit;
+    }
+
+    OkCancelType rval = kOCTCancel;
+    switch (dc) {
+        case 0: rval = kOCTOk;        break;
+        case 1: rval = kOCTOkAll;     break;
+        case 2: rval = kOCTCancel;    break;    // "Edit" is done already
+        case 3: rval = kOCTCancel;    break;
+        case 4: rval = kOCTCancelAll; break;
+    }
+    return rval;
+}
+
 OkCancelType ChannelImporter::QueryUserResolve(
     const ChannelImporterBasicStats &info,
     const ScanDTVTransport          &transport,
@@ -1678,24 +1773,22 @@ OkCancelType ChannelImporter::QueryUserResolve(
             msg2 += "\n";
             msg2 += tr("Please enter a unique channel number.");
 
-            QString val = ComputeSuggestedChannelNum(info, transport, chan);
+            QString val = ComputeSuggestedChannelNum(chan);
             msg2 += "\n";
             msg2 += tr("Default value is %1.").arg(val);
-            ret = ShowManualChannelPopup(
+            ret = ShowResolveChannelPopup(
                 GetMythMainWindow(), tr("Channel Importer"),
                 msg2, val);
 
-            if (kOCTOk != ret)
+            if (kOCTOk != ret && kOCTOkAll != ret)
                 break; // user canceled..
 
-            bool ok = (val.length() >= 1);
-            ok = ok && ((val[0] >= '0') && (val[0] <= '9'));
-            ok = ok && !ChannelUtil::IsConflicting(
-                val, chan.m_source_id, chan.m_channel_id);
-
-            chan.m_chan_num = (ok) ? val : chan.m_chan_num;
+            bool ok = CheckChannelNumber(val, chan);
             if (ok)
+            {
+                chan.m_chan_num = val;
                 break;
+            }
         }
     }
     else if (m_is_interactive)
@@ -1727,14 +1820,10 @@ OkCancelType ChannelImporter::QueryUserResolve(
                 break; // user canceled..
             }
 
-            bool ok = (val.length() >= 1);
-            ok = ok && ((val[0] >= '0') && (val[0] <= '9'));
-            ok = ok && !ChannelUtil::IsConflicting(
-                val, chan.m_source_id, chan.m_channel_id);
-
-            chan.m_chan_num = (ok) ? val : chan.m_chan_num;
+            bool ok = CheckChannelNumber(val, chan);
             if (ok)
             {
+                chan.m_chan_num = val;
                 ret = kOCTOk;
                 break;
             }
@@ -1762,7 +1851,7 @@ OkCancelType ChannelImporter::QueryUserInsert(
             msg2 += " ";
             msg2 += tr("Please enter a unique channel number.");
 
-            QString val = ComputeSuggestedChannelNum(info, transport, chan);
+            QString val = ComputeSuggestedChannelNum(chan);
             msg2 += " ";
             msg2 += tr("Default value is %1").arg(val);
             ret = ShowManualChannelPopup(
@@ -1772,14 +1861,10 @@ OkCancelType ChannelImporter::QueryUserInsert(
             if (kOCTOk != ret)
                 break; // user canceled..
 
-            bool ok = (val.length() >= 1);
-            ok = ok && ((val[0] >= '0') && (val[0] <= '9'));
-            ok = ok && !ChannelUtil::IsConflicting(
-                val, chan.m_source_id, chan.m_channel_id);
-
-            chan.m_chan_num = (ok) ? val : chan.m_chan_num;
+            bool ok = CheckChannelNumber(val, chan);
             if (ok)
             {
+                chan.m_chan_num = val;
                 ret = kOCTOk;
                 break;
             }
@@ -1816,14 +1901,10 @@ OkCancelType ChannelImporter::QueryUserInsert(
                 break; // user canceled..
             }
 
-            bool ok = (val.length() >= 1);
-            ok = ok && ((val[0] >= '0') && (val[0] <= '9'));
-            ok = ok && !ChannelUtil::IsConflicting(
-                val, chan.m_source_id, chan.m_channel_id);
-
-            chan.m_chan_num = (ok) ? val : chan.m_chan_num;
+            bool ok = CheckChannelNumber(val, chan);
             if (ok)
             {
+                chan.m_chan_num = val;
                 ret = kOCTOk;
                 break;
             }
@@ -1831,4 +1912,19 @@ OkCancelType ChannelImporter::QueryUserInsert(
     }
 
     return ret;
+}
+
+// Check validity of a new channel number.
+// The channel number is not a number but it is a string that starts with a digit.
+// The channel number should not yet exist in this video source.
+//
+bool ChannelImporter::CheckChannelNumber(
+    const QString           &num,
+    const ChannelInsertInfo &chan)
+{
+    bool ok = (num.length() >= 1);
+    ok = ok && ((num[0] >= '0') && (num[0] <= '9'));
+    ok = ok && !ChannelUtil::IsConflicting(
+        num, chan.m_source_id, chan.m_channel_id);
+    return ok;
 }

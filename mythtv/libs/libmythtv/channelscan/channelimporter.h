@@ -27,6 +27,7 @@ typedef enum {
     kOCTCancelAll = -1,
     kOCTCancel    = +0,
     kOCTOk        = +1,
+    kOCTOkAll     = +2,
 } OkCancelType;
 
 class ChannelImporterBasicStats
@@ -182,11 +183,13 @@ class MTV_PUBLIC ChannelImporter
         ChannelInsertInfo               &chan);
 
     static QString ComputeSuggestedChannelNum(
-        const ChannelImporterBasicStats &info,
-        const ScanDTVTransport          &transport,
         const ChannelInsertInfo         &chan);
 
     OkCancelType ShowManualChannelPopup(
+        MythMainWindow *parent, const QString& title,
+        const QString& message, QString &text);
+
+    OkCancelType ShowResolveChannelPopup(
         MythMainWindow *parent, const QString& title,
         const QString& message, QString &text);
 
@@ -226,6 +229,10 @@ class MTV_PUBLIC ChannelImporter
         const ChannelImporterBasicStats &info,
         ChannelType type, uint &new_chan, uint &old_chan);
 
+    static bool CheckChannelNumber(
+        const QString           &num,
+        const ChannelInsertInfo &chan);
+
   private:
     bool                m_use_gui;
     bool                m_is_interactive;
@@ -238,6 +245,8 @@ class MTV_PUBLIC ChannelImporter
     bool                m_lcn_only;
     /// Only services with complete scandata desired post scan?
     bool                m_complete_only;
+    /// Keep existing channel numbers on channel update
+    bool                m_keep_channel_numbers      {true};
     /// To pass information IPTV channel scan succeeded
     bool                m_success {false};
     /// Services desired post scan
