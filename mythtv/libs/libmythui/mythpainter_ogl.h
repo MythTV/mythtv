@@ -57,7 +57,6 @@ class MUI_PUBLIC MythOpenGLPainter : public MythPainter
     MythRenderOpenGL *m_render;
     QOpenGLFramebufferObject* m_target;
     bool              m_swapControl;
-    bool              m_needsFlush;
 
     QMap<MythImage *, MythGLTexture*> m_imageToTextureMap;
     std::list<MythImage *>     m_ImageExpireList;
