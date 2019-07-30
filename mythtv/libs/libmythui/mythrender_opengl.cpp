@@ -187,7 +187,7 @@ MythRenderOpenGL::MythRenderOpenGL(const QSurfaceFormat& Format, QPaintDevice* D
     m_cachedMatrixUniforms(),
     m_cachedUniformLocations(),
     m_vao(0),
-    m_flushEnabled(true),
+    m_flushEnabled(false),
     m_openglDebugger(nullptr),
     m_window(nullptr)
 {
