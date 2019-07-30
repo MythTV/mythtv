@@ -1,11 +1,15 @@
+// Qt
 #include <QString>
 
+// MythTV
 #include "mythcorecontext.h"
 #include "commandlineparser.h"
 
-MythAVTestCommandLineParser::MythAVTestCommandLineParser() :
-    MythCommandLineParser(MYTH_APPNAME_MYTHAVTEST)
-{ MythCommandLineParser::LoadArguments(); }
+MythAVTestCommandLineParser::MythAVTestCommandLineParser()
+  : MythCommandLineParser(MYTH_APPNAME_MYTHAVTEST)
+{
+    MythAVTestCommandLineParser::LoadArguments();
+}
 
 QString MythAVTestCommandLineParser::GetHelpHeader(void) const
 {
