@@ -25,6 +25,7 @@ MythOpenGLPainter::MythOpenGLPainter(MythRenderOpenGL *Render, QWidget *Parent)
     m_render(Render),
     m_target(nullptr),
     m_swapControl(true),
+    m_needsFlush(false),
     m_imageToTextureMap(),
     m_ImageExpireList(),
     m_textureDeleteList(),
@@ -89,6 +90,7 @@ void MythOpenGLPainter::ClearCache(void)
 
 void MythOpenGLPainter::Begin(QPaintDevice *Parent)
 {
+    m_needsFlush = false;
     MythPainter::Begin(Parent);
 
     if (!m_parent)
@@ -140,7 +142,8 @@ void MythOpenGLPainter::End(void)
         return;
     }
 
-    m_render->Flush();
+    if (m_needsFlush)
+        m_render->Flush();
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         m_render->logDebugMarker("PAINTER_FRAME_END");
     if (m_target == nullptr && m_swapControl)
@@ -219,6 +222,7 @@ void MythOpenGLPainter::DrawImage(const QRect &Dest, MythImage *Image,
 {
     if (m_render)
     {
+        m_needsFlush = true;
         // Drawing an image  multiple times with the same VBO will stall most GPUs as
         // the VBO is re-mapped whilst still in use. Use a pooled VBO instead.
         MythGLTexture *texture = GetTextureFromCache(Image);
@@ -246,6 +250,7 @@ void MythOpenGLPainter::DrawRect(const QRect &Area, const QBrush &FillBrush,
     if ((FillBrush.style() == Qt::SolidPattern ||
          FillBrush.style() == Qt::NoBrush) && m_render)
     {
+        m_needsFlush = true;
         m_render->DrawRect(m_target, Area, FillBrush, LinePen, Alpha);
         return;
     }
@@ -256,15 +261,13 @@ void MythOpenGLPainter::DrawRoundRect(const QRect &Area, int CornerRadius,
                                       const QBrush &FillBrush,
                                       const QPen &LinePen, int Alpha)
 {
-    if (m_render)
+    if ((FillBrush.style() == Qt::SolidPattern ||
+         FillBrush.style() == Qt::NoBrush) && m_render)
     {
-        if (FillBrush.style() == Qt::SolidPattern ||
-            FillBrush.style() == Qt::NoBrush)
-        {
-            m_render->DrawRoundRect(m_target, Area, CornerRadius, FillBrush,
-                                      LinePen, Alpha);
-            return;
-        }
+        m_needsFlush = true;
+        m_render->DrawRoundRect(m_target, Area, CornerRadius, FillBrush,
+                                  LinePen, Alpha);
+        return;
     }
     MythPainter::DrawRoundRect(Area, CornerRadius, FillBrush, LinePen, Alpha);
 }
