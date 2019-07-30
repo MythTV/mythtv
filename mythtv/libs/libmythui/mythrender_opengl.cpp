@@ -209,14 +209,6 @@ MythRenderOpenGL::~MythRenderOpenGL()
     LOG(VB_GENERAL, LOG_INFO, LOC + "MythRenderOpenGL closing");
     if (!isValid())
         return;
-
-    if (m_coreProfile && m_vao)
-    {
-        QOpenGLExtraFunctions extra(nullptr);
-        extra.initializeOpenGLFunctions();
-        extra.glDeleteVertexArrays(1, &m_vao);
-    }
-
     disconnect(this, &QOpenGLContext::aboutToBeDestroyed, this, &MythRenderOpenGL::contextToBeDestroyed);
     ReleaseResources();
 }
@@ -1169,6 +1161,12 @@ void MythRenderOpenGL::ReleaseResources(void)
     DeleteDefaultShaders();
     ExpireVertices();
     ExpireVBOS();
+    if (m_coreProfile && m_vao)
+    {
+        QOpenGLExtraFunctions extra(nullptr);
+        extra.initializeOpenGLFunctions();
+        extra.glDeleteVertexArrays(1, &m_vao);
+    }
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         logDebugMarker("RENDER_RELEASE_END");
     if (m_openglDebugger)

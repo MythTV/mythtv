@@ -93,11 +93,9 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     void  Release(void) override;
     void  ReleaseResources(void) override;
 
-    // These functions are not virtual in the base QOpenGLContext
-    // class, so these are not overrides but new functions.
-    virtual void makeCurrent();
-    virtual void doneCurrent();
-    virtual void swapBuffers();
+    void  makeCurrent();
+    void  doneCurrent();
+    void  swapBuffers();
 
     void  setWidget(QWidget *Widget);
     bool  Init(void);
