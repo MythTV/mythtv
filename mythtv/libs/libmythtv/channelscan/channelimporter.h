@@ -152,14 +152,18 @@ class MTV_PUBLIC ChannelImporter
     ScanDTVTransportList InsertChannels(
         const ScanDTVTransportList &transports,
         const ChannelImporterBasicStats &info,
-        InsertAction action, ChannelType type,
-        ScanDTVTransportList &filtered);
+        InsertAction action,
+        ChannelType type,
+        ScanDTVTransportList &inserted,
+        ScanDTVTransportList &skipped);
 
     ScanDTVTransportList UpdateChannels(
         const ScanDTVTransportList &transports,
         const ChannelImporterBasicStats &info,
-        UpdateAction action, ChannelType type,
-        ScanDTVTransportList &filtered);
+        UpdateAction action,
+        ChannelType type,
+        ScanDTVTransportList &updated,
+        ScanDTVTransportList &skipped);
 
     /// For multiple channels
     DeleteAction QueryUserDelete(const QString &msg);
@@ -204,7 +208,7 @@ class MTV_PUBLIC ChannelImporter
 
     static QString FormatChannels(
         const ScanDTVTransportList      &transports,
-        const ChannelImporterBasicStats &info);
+        const ChannelImporterBasicStats *info = nullptr);
 
     static QString FormatChannel(
         const ScanDTVTransport          &transport,
@@ -229,8 +233,16 @@ class MTV_PUBLIC ChannelImporter
         const ChannelImporterBasicStats &info,
         ChannelType type, uint &new_chan, uint &old_chan);
 
+    static int SimpleCountChannels(
+        const ScanDTVTransportList &transports);
+
     static bool CheckChannelNumber(
         const QString           &num,
+        const ChannelInsertInfo &chan);
+
+    static void AddChanToCopy(
+        ScanDTVTransport &transport_copy,
+        const ScanDTVTransport &transport,
         const ChannelInsertInfo &chan);
 
   private:
