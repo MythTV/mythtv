@@ -882,7 +882,7 @@ DTVModulationSystem CardUtil::ProbeCurrentDeliverySystem(int fd_frontend)
     if (ret < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("FE_GET_PROPERTY ioctl failed (fd:%1)")
+            QString("FE_GET_PROPERTY ioctl failed (fd_frontend:%1)")
                 .arg(fd_frontend) + ENO);
         return delsys;
 	}
@@ -1108,7 +1108,7 @@ int CardUtil::SetDeliverySystem(uint inputid, DTVModulationSystem delsys)
         LOG(VB_GENERAL, LOG_ERR, 
             QString("CardUtil[%1]: ").arg(inputid) +
             QString("open failed (%1)").arg(device) + ENO);
-        return errno;
+        return ret;
     }
     ret = SetDeliverySystem(inputid, delsys, fd_frontend);
 
@@ -1195,7 +1195,6 @@ int CardUtil::OpenVideoDevice(const QString &device)
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Can't open DVB frontend (%1) for %2.")
                 .arg(dvbdev).arg(device) + ENO);
-        return errno;
     }
     return fd_frontend;
 }
