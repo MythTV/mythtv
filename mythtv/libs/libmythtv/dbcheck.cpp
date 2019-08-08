@@ -2616,9 +2616,9 @@ NULL
                 "UNIQUE KEY recgroup ( recgroup )"
                 ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
             // Create the built-in, 'special', groups
-            "INSERT INTO recgroups ( recgroup, special ) VALUES ( 'Default', '1' );",
-            "INSERT INTO recgroups ( recgroup, special ) VALUES ( 'LiveTV', '1' );",
-            "INSERT INTO recgroups ( recgroup, special ) VALUES ( 'Deleted', '1' );",
+            "INSERT INTO recgroups ( recgroupid, recgroup, special ) VALUES ( 1, 'Default', '1' );",
+            "INSERT INTO recgroups ( recgroupid, recgroup, special ) VALUES ( 2, 'LiveTV', '1' );",
+            "INSERT INTO recgroups ( recgroupid, recgroup, special ) VALUES ( 3, 'Deleted', '1' );",
             // Copy in the passwords for the built-in groups
             "DELETE FROM recgrouppassword WHERE password = '';",
             "UPDATE recgroups r, recgrouppassword p SET r.password = p.password WHERE r.recgroup = p.recgroup;",
