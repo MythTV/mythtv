@@ -176,13 +176,11 @@ class MTV_PUBLIC ChannelImporter
 
     /// For a single channel
     OkCancelType QueryUserResolve(
-        const ChannelImporterBasicStats &info,
         const ScanDTVTransport          &transport,
         ChannelInsertInfo               &chan);
 
     /// For a single channel
     OkCancelType QueryUserInsert(
-        const ChannelImporterBasicStats &info,
         const ScanDTVTransport          &transport,
         ChannelInsertInfo               &chan);
 

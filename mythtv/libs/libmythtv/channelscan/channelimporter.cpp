@@ -471,7 +471,7 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
 
             if (handle && kInsertManual == action)
             {
-                OkCancelType rc = QueryUserInsert(info, transports[i], chan);
+                OkCancelType rc = QueryUserInsert(transports[i], chan);
                 if (kOCTCancelAll == rc)
                 {
                     cancel_all = true;
@@ -542,7 +542,7 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
                     if (!ok_done)
                     {
                         OkCancelType rc =
-                            QueryUserResolve(info, transports[i], chan);
+                            QueryUserResolve(transports[i], chan);
 
                         conflicting = true;
                         if (kOCTCancelAll == rc)
@@ -1834,7 +1834,6 @@ OkCancelType ChannelImporter::ShowResolveChannelPopup(
 }
 
 OkCancelType ChannelImporter::QueryUserResolve(
-    const ChannelImporterBasicStats &info,
     const ScanDTVTransport          &transport,
     ChannelInsertInfo               &chan)
 {
@@ -1913,7 +1912,6 @@ OkCancelType ChannelImporter::QueryUserResolve(
 }
 
 OkCancelType ChannelImporter::QueryUserInsert(
-    const ChannelImporterBasicStats &info,
     const ScanDTVTransport          &transport,
     ChannelInsertInfo               &chan)
 {
