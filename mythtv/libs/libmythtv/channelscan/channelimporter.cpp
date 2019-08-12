@@ -1436,6 +1436,10 @@ QString ChannelImporter::ComputeSuggestedChannelNum(
     static QMutex          last_free_lock;
     static QMap<uint,uint> last_free_chan_num_map;
 
+    // Suggest existing channel number if non-conflicting
+    if (!ChannelUtil::IsConflicting(chan.m_chan_num, chan.m_source_id))
+        return chan.m_chan_num;
+
     QString channelFormat = "%1_%2";
     QString chan_num = channelFormat
         .arg(chan.m_atsc_major_channel)
