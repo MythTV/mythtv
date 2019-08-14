@@ -242,7 +242,7 @@ void ChannelInfo::LoadInputIds()
         query.bindValue(":CHANID", m_chanid);
 
         if (!query.exec())
-            MythDB::DBError("ChannelInfo::GetInputIds()", query);
+            MythDB::DBError("ChannelInfo::LoadInputIds()", query);
         else
         {
             while(query.next())
@@ -263,7 +263,7 @@ void ChannelInfo::LoadGroupIds()
         query.bindValue(":CHANID", m_chanid);
 
         if (!query.exec())
-            MythDB::DBError("ChannelInfo::GetInputIds()", query);
+            MythDB::DBError("ChannelInfo::LoadGroupIds()", query);
         else if (query.size() == 0)
         {
             // HACK Avoid re-running this query each time for channels
@@ -359,7 +359,7 @@ bool ChannelInsertInfo::SaveScan(uint scanid, uint transportid) const
 
     if (!query.exec())
     {
-        MythDB::DBError("ChannelInsertInfo SaveScan 1", query);
+        MythDB::DBError("ChannelInsertInfo::SaveScan()", query);
         return false;
     }
 
