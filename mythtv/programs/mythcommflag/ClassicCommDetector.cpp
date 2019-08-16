@@ -259,7 +259,7 @@ void ClassicCommDetector::Init()
          m_sceneChangeDetector,
          SIGNAL(haveNewInformation(unsigned int,bool,float)),
          this,
-         SLOT(m_sceneChangeDetectorHasNewInformation(unsigned int,bool,float))
+         SLOT(sceneChangeDetectorHasNewInformation(unsigned int,bool,float))
     );
 
     m_frameIsBlank = false;
