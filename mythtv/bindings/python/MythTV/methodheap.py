@@ -44,7 +44,7 @@ class MythBE( FileOps ):
         getLoad()                 - returns a tuple of load averages
         getRecordings()           - returns a list of all recordings
         getSGFile()               - returns information on a single file
-        getSGList()               - returns lists of directories, 
+        getSGList()               - returns lists of directories,
                                     files, and sizes
         getUptime()               - returns system uptime in seconds
         isActiveBackend()         - determines whether backend is
@@ -1136,7 +1136,7 @@ class MythXML( XMLConnection ):
         if default:
             args['Default'] = default
         return self._request('Myth/GetSetting', **args)\
-                         .readJSON()['SettingList']['Settings'][0]['Value']
+                                        .readJSON()['String']
 
     def getProgramGuide(self, starttime, endtime, startchan, numchan=None):
         """
@@ -1146,11 +1146,11 @@ class MythXML( XMLConnection ):
         endtime = datetime.duck(endtime)
         args = {'StartTime':starttime.utcisoformat().rsplit('.',1)[0],
                 'EndTime':endtime.utcisoformat().rsplit('.',1)[0],
-                'StartChanId':startchan, 'Details':1}
+                'StartChanId':startchan, 'Details':'1'}
         if numchan:
             args['NumOfChannels'] = numchan
         else:
-            args['NumOfChannels'] = 1
+            args['NumOfChannels'] = '1'
 
         dat = self._request('Guide/GetProgramGuide', **args).readJSON()
         for chan in dat['ProgramGuide']['Channels']:
@@ -1177,7 +1177,8 @@ class MythXML( XMLConnection ):
         """
         Returns a list of Program objects for recorded shows on the backend.
         """
-        for prog in self._request('Dvr/GetRecorded', Descending=descending)\
+        descendingstr = 'true' if descending else 'false'
+        for prog in self._request('Dvr/GetRecordedList', Descending=descendingstr)\
                     .readJSON()['ProgramList']['Programs']:
             yield Program.fromJSON(prog, self.db)
 
