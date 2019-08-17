@@ -347,7 +347,12 @@ bool DiSEqCDevTree::Load(const QString &device)
 bool DiSEqCDevTree::Load(uint cardid)
 {
     // clear children
+
+    // TODO find root cause so that "delete m_root" can be enabled again, see ticket #13465
+    // Not doing the "delete m_root" fixes a segfault but creates a memory leak
+#if 0
     delete m_root;
+#endif
     m_delete.clear();
     m_root = nullptr;
 
