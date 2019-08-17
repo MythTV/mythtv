@@ -30,7 +30,7 @@ class MSearch( object ):
                     port += 1
                 else:
                     raise MythError(MythError.SOCKET, e)
-        self.log(MythLog.DEBUG, MythLog.UPNP|MythLog.SOCKET,
+        self.log(MythLog.UPNP|MythLog.SOCKET, MythLog.DEBUG,
                     'Port %d opened for UPnP search.' % port)
         self.sock.setblocking(0.1)
 
@@ -49,7 +49,8 @@ class MSearch( object ):
                 content-length,   request,   date,   usn,    location,
                 cache-control,    server,    ext,    st
         """
-        self.log(MythLog.DEBUG, MythLog.UPNP, 'running UPnP search')
+        self.log(MythLog.UPNP, MythLog.DEBUG, 'running UPnP search')
+
         sock = self.sock
         sreq = '\r\n'.join(['M-SEARCH * HTTP/1.1',
                             'HOST: %s:%s' % self.addr,
@@ -81,7 +82,7 @@ class MSearch( object ):
                 if sdict['st'] not in filter:
                     continue
 
-            self.log(MythLog.UPNP, sdict['st'], sdict['location'])
+            self.log(MythLog.UPNP, MythLog.DEBUG, sdict['st'], sdict['location'])
             yield sdict
 
     def searchMythBE(self, timeout=5.0):
