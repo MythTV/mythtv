@@ -328,7 +328,7 @@ class deadlinesocket( socket.socket ):
             timeout = (deadline-t) if (deadline-t>0) else 0.0
             if len(select([self],[],[], timeout)[0]) == 0:
                 # deadline reached, terminate
-                return u''
+                return b''
 
             # append response to buffer
             p = buff.tell()
@@ -360,7 +360,7 @@ class deadlinesocket( socket.socket ):
             timeout = (deadline-t) if (deadline-t>0) else 0.0
             if len(select([self],[],[], timeout)[0]) == 0:
                 # deadline reached, terminate
-                return ''
+                return b''
 
             # append response to buffer
             p = buff.tell()
@@ -393,7 +393,9 @@ class deadlinesocket( socket.socket ):
         try:
             self.log(MythLog.SOCKET|MythLog.NETWORK, MythLog.DEBUG, \
                             'write --> %d' % len(data), py23_str(data, True))
-            data = '%-8d%s' % (len(data), data)
+            # build the byte array:
+            length = b'%-8d' % len(data)
+            data = b"".join([length, data])
             self.send(data, flags)
         except socket.error as e:
             raise MythError(MythError.SOCKET, e.args)
@@ -580,7 +582,7 @@ def py23_str(value, ignore_errors=False):
         return unicode(value, errors=error_method, encoding='utf-8')
     except NameError:  # Python 3
         try:
-            return str(value,errors=error_method, encoding='utf-8')
+            return str(value, errors=error_method, encoding='utf-8')
         except TypeError:  # Wasn't a bytes object, no need to decode
             return str(value)
 

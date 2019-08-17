@@ -126,8 +126,9 @@ class Record( CMPRecord, DBDataWrite, RECTYPE ):
         db = DBCache(db)
         super(Record, cls)._setClassDefs(db)
         defaults = cls._template('Default', db=db)
-        for k,v in defaults.iteritems():
+        for k,v in list(defaults.items()):
             cls._defaults[k] = v
+
 
     _stored_templates = {}
     @classmethod
@@ -135,8 +136,8 @@ class Record( CMPRecord, DBDataWrite, RECTYPE ):
         if name not in cls._stored_templates:
             db = DBCache(db)
             cls._setClassDefs(db)
-            tmp = cls._fromQuery("WHERE title=?", (name + " (Template)",))\
-                                    .next().iteritems()
+            tmp = next(cls._fromQuery("WHERE title=?", (name + " (Template)",)))\
+                                    .iteritems()
             data = {}
             for k,v in tmp:
                 if k in ['type', 'category', 'profile', 'recpriority',

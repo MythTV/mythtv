@@ -63,10 +63,10 @@ class System( DBCache ):
             s = cls(path, db=db)
             res = s(args)
             if len(res):
-                s.log(MythLog.SYSTEM, MythLog.DEBUG, '---- Output ----', res)
+                s.log(MythLog.SYSTEM, MythLog.DEBUG, '---- Output ----', res.decode('utf-8'))
             if len(s.stderr):
                 s.log(MythLog.SYSTEM, MythLog.DEBUG,
-                                               '---- Error  ----', s.stderr)
+                                               '---- Error  ----', s.stderr.decode('utf-8'))
             return 0
         except (MythDBError,MythFileError):
             return -1

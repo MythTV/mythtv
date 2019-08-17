@@ -129,7 +129,7 @@ class posixtzinfo( basetzinfo ):
     @staticmethod
     def _get_version(fd):
         """Confirm zoneinfo file magic string, and return version number."""
-        if fd.read(4) != 'TZif':
+        if fd.read(4) != b'TZif':
             raise MythTZError(MythTZError.TZ_INVALID_FILE)
         version = fd.read(1) # read version number
         fd.seek(15, 1) # skip reserved bytes
@@ -172,7 +172,7 @@ class posixtzinfo( basetzinfo ):
                 transitions[i] = ([t, tt, None, None, None, None])
                 if first_modern_transition is None:
                     first_modern_transition = i
-            except ValueError as e:
+            except (ValueError, OSError) as e:
                 # ValueError is only accepted until we have seen a modern
                 # transition.
                 if first_modern_transition is not None:
@@ -202,7 +202,7 @@ class posixtzinfo( basetzinfo ):
             transitions[i][5] = isdst
 
         # read in type names
-        for i, name in enumerate(fd.read(counts.abbrevs)[:-1].split('\0')):
+        for i, name in enumerate(fd.read(counts.abbrevs)[:-1].split(b'\0')):
             for j in range(first_modern_transition, counts.transitions):
                 if types[j] == i:
                     transitions[j][4] = name
@@ -222,17 +222,18 @@ class posixtzinfo( basetzinfo ):
 
     def __init__(self, name=None):
         if name:
-            fd = open('/usr/share/zoneinfo/' + name)
+            fd = open('/usr/share/zoneinfo/' + name, 'rb')
         elif os.getenv('TZ'):
-            fd = open('/usr/share/zoneinfo/' + os.getenv('TZ'))
+            fd = open('/usr/share/zoneinfo/' + os.getenv('TZ'), 'rb')
         else:
-            fd = open('/etc/localtime')
+            fd = open('/etc/localtime', 'rb')
 
         version = self._get_version(fd)
         if version == 2:
             self._process(fd, skip=True)
             self._get_version(fd)
         self._process(fd, version)
+        fd.close()
 
 class offsettzinfo( _pytzinfo ):
     """Customized timezone class that provides a simple static offset."""

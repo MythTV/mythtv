@@ -59,7 +59,7 @@ class MSearch( object ):
                             'ST: ssdp:all',''])
         self._runsearch = True
         # spam the request a couple times
-        [sock.sendto(sreq, self.dest) for i in range(3)]
+        [sock.sendto(sreq.encode('utf-8'), self.dest) for i in range(3)]
 
         atime = time()+timeout
         while (time()<atime) and self._runsearch:
@@ -67,6 +67,7 @@ class MSearch( object ):
                 sdata, saddr = sock.recvfrom(2048)
             except socket.error:
                 continue #no data, continue
+            sdata = sdata.decode('utf-8')
 
             lines = sdata.split('\n')
             sdict = {'request':lines[0].strip()}
