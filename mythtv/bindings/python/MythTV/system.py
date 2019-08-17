@@ -53,7 +53,7 @@ class System( DBCache ):
 
     @classmethod
     def system(cls, command, db=None):
-        command = command.lsplit(' ',1)
+        command = command.split(' ',1)
         path = command[0]
         args = ''
         if len(command) > 1:
@@ -114,7 +114,7 @@ class System( DBCache ):
                     break
             else:
                 raise MythFileError('Defined executable path does not exist.')
-                
+
         self.returncode = 0
         self.stderr = ''
         self.useshell = useshell
@@ -349,13 +349,13 @@ class Grabber( System ):
 
     def command(self, *args):
         return self._processMetadata(super(Grabber, self).command(*args))
- 
+
     def search(self, phrase, subtitle=None, tolerance=None, func=None):
         """
         obj.search(phrase, subtitle=None, tolerance=None) -> result generator
 
             Returns a generator of results matching the given search
-                phrase.  A secondary phrase can be given through the 
+                phrase.  A secondary phrase can be given through the
                 'subtitle' parameter, and an optional levenshtein
                 tolerance value can be given for filtering results.
         """
@@ -384,7 +384,7 @@ class Grabber( System ):
 
     def sortedSearch(self, phrase, subtitle=None, tolerance=None):
         """
-        Behaves like obj.search(), but sorts results based off 
+        Behaves like obj.search(), but sorts results based off
             levenshtein distance.
         """
         return sorted(self.search(phrase, subtitle, tolerance), \
