@@ -346,7 +346,7 @@ class DBDataWrite( DBData ):
 
         self._import(data)
         data = self._sanitize(dict(self))
-        for key,val in data.items():
+        for key,val in list(data.items()):
             if val is None:
                 del data[key]
             elif isinstance(val, datetime):
@@ -392,7 +392,7 @@ class DBDataWrite( DBData ):
         if (self._where is None) or (self._wheredat is None):
             return
         data = self._sanitize(dict(self))
-        for key, value in data.items():
+        for key, value in list(data.items()):
             if value == self._origdata[key]:
             # filter unchanged data
                 del data[key]
@@ -402,7 +402,7 @@ class DBDataWrite( DBData ):
             # no updates
             return
         format_string = ', '.join(['%s = ?' % d for d in data])
-        sql_values = data.values()
+        sql_values = list(data.values())
         sql_values.extend(self._getwheredat())
         with self._db.cursor(self._log) as cursor:
             cursor.execute("""UPDATE %s SET %s WHERE %s""" \

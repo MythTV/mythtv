@@ -25,6 +25,11 @@ except ImportError:
 
 import re
 
+try:
+    xrange
+except NameError:
+    xrange = range
+
 class CaptureCard( DBData ):
     pass
 
@@ -294,7 +299,7 @@ class MythBE( FileOps ):
             command = 'QUERY_FREE_SPACE_LIST'
         res = self.backendCommand(command).split(BACKEND_SEP)
         l = len(FreeSpace._field_order)
-        for i in xrange(len(res)/l):
+        for i in xrange(len(res)//l):
             yield FreeSpace(res[i*l:i*l+l])
 
     def getFreeSpaceSummary(self):
@@ -327,17 +332,18 @@ class MythBE( FileOps ):
         """
         def walk(self, host, sg, root, path):
             res = self.getSGList(host, sg, root+path+'/')
-            if res < 0:
-                return {}
-            dlist = list(res[0])
-            res = [dlist, dict(zip(res[1], res[2]))]
-            if path == '':
-                res = {'/':res}
+            if isinstance(res, tuple):
+                dlist = list(res[0])
+                res = [dlist, dict(zip(res[1], res[2]))]
+                if path == '':
+                    res = {'/':res}
+                else:
+                    res = {path:res}
+                for d in dlist:
+                    res.update(walk(self, host, sg, root, path+'/'+d))
+                return res
             else:
-                res = {path:res}
-            for d in dlist:
-                res.update(walk(self, host, sg, root, path+'/'+d))
-            return res
+                return {}
 
         bases = self.getSGList(host, sg, '')
         if (top == '/') or (top is None): top = ''
@@ -352,7 +358,7 @@ class MythBE( FileOps ):
                     walked[d] = res[d]
 
         res = []
-        for key, val in walked.iteritems():
+        for key, val in list(walked.items()):
             res.append((key, tuple(val[0]), val[1]))
         res.sort()
         return res

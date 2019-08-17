@@ -26,6 +26,11 @@ import weakref
 import re
 import os
 
+try:
+    xrange
+except NameError:
+    xrange = range
+
 class BECache( object ):
     """
     BECache(backend=None, noshutdown=False, db=None)
@@ -424,7 +429,7 @@ class FileTransfer( BEEvent ):
         if self._pos + size > self._size:
             size = self._size - self._pos
 
-        buff = ''
+        buff = b''
         while len(buff) < size:
             ct = size - len(buff)
             if ct > self._tsize:
