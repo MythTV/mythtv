@@ -708,7 +708,7 @@ class Job( DBDataWrite, JOBTYPE, JOBCMD, JOBFLAG, JOBSTATUS ):
             job.args = args
         if flags:
             job.flags = flags
-        job.create()
+        return job.create()
 
     @classmethod
     def fromProgram(cls, prog, type, status=None, schedruntime=None,
@@ -729,7 +729,7 @@ class Job( DBDataWrite, JOBTYPE, JOBCMD, JOBFLAG, JOBSTATUS ):
             job.args = args
         if flags:
             job.flags = flags
-        job.create()
+        return job.create()
 
 class Channel( DBDataWrite ):
     """Channel(chanid=None, db=None) -> Channel object"""
