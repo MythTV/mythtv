@@ -445,5 +445,5 @@ class SystemEvent( System ):
             cmd = eventdata['program'].formatJob(cmd)
         for a in ('sender','cardid','secs'):
             if a in eventdata:
-                cmd = cmd.replace('%%%s%%' % a, eventdata[a])
+                cmd = cmd.replace('%%%s%%' % a.upper(), eventdata[a])
         return self._runcmd(cmd)

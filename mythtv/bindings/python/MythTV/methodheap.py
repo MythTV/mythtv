@@ -448,7 +448,7 @@ class MythSystemEvent( BECache ):
         bs = BACKEND_SEP.replace('[','\[').replace(']','\]')
         re_process = re.compile(bs.join([
                 'BACKEND_MESSAGE',
-                'SYSTEM_EVENT (?P<event>[A-Z_]*)'
+                'SYSTEM_EVENT (?P<event>[A-Z0-9_]*)'
                     '( HOSTNAME (?P<hostname>[a-zA-Z0-9_\.]*))?'
                     '( SENDER (?P<sender>[a-zA-Z0-9_\.]*))?'
                     '( CARDID (?P<cardid>[0-9]*))?'
@@ -516,11 +516,11 @@ class MythSystemEvent( BECache ):
             self.registerevent(self._generic_handler)
 
     def _neweventconn(self):
-        return BEEventConnection(self.host, self.port, self.db.gethostname(), 3)
+        return BEEventConnection(self.host, self.port, self.db.gethostname(), level=3)
 
     @systemeventhandler
     def _generic_handler(self, event):
-        SystemEvent(event['event'], inst.db).command(event)
+        SystemEvent(event['event'], self.db).command(event)
 
 class Frontend( FEConnection ):
     _db = None
