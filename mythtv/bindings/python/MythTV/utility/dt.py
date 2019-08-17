@@ -430,7 +430,7 @@ class datetime( _pydatetime ):
             tz = cls.localTZ()
         dt.append(tz)
 
-        return cls(*tz)
+        return cls(*dt)
 
     @classmethod
     def duck(cls, t):
