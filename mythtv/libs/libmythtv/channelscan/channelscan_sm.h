@@ -244,7 +244,7 @@ class ChannelScanSM : public MPEGStreamListener,
 
     /// Found Channel Info
     ChannelList          m_channelList;
-    uint                 m_channelsFound       {999};
+    uint                 m_channelsFound       {0};
     ScannedChannelInfo  *m_currentInfo         {nullptr};
 
     // Analog Info
