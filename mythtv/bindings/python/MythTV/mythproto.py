@@ -185,12 +185,12 @@ def findfile(filename, sgroup, db=None):
     for sg in db.getStorageGroup(groupname=sgroup):
         # search given group
         if sg.local:
-            if os.access(sg.dirname+filename, os.F_OK):
+            if os.access(os.path.join(sg.dirname, filename), os.F_OK):
                 return sg
     for sg in db.getStorageGroup():
         # not found, search all other groups
         if sg.local:
-            if os.access(sg.dirname+filename, os.F_OK):
+            if os.access(os.path.join(sg.dirname, filename), os.F_OK):
                 return sg
     return None
 
@@ -627,7 +627,7 @@ class FileOps( BECache ):
         reschedule()        - trigger a run of the scheduler
         fileExists()        - check whether a file can be found on a backend
         download()          - issue a download by the backend
-        downloadTo()        - issue a download by the backend to a defined 
+        downloadTo()        - issue a download by the backend to a defined
                               location
         allocateEventLock() - create an EventLock object that will be locked
                               until a requested regular expression is
