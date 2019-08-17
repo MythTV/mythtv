@@ -81,12 +81,12 @@ class BECache( object ):
                 # given backend is IP address
                 self.host = backend
                 self.hostname = self.db._gethostfromaddr(
-                                            backend, 'BackendServerIP')
+                                            backend, 'BackendServerAddr')
             elif check_ipv6(backend):
                 # given backend is IPv6 address
                 self.host = backend
                 self.hostname = self.db._gethostfromaddr(
-                                            backend, 'BackendServerIP6')
+                                            backend, 'BackendServerAddr')
             else:
                 # given backend is hostname, pull address from database
                 self.hostname = backend
@@ -195,7 +195,7 @@ def findfile(filename, sgroup, db=None):
     return None
 
 def ftopen(file, mode, forceremote=False, nooverwrite=False, db=None, \
-                       chanid=None, starttime=None, download=False):
+                chanid=None, starttime=None, recordedid=None, download=False):
     """
     ftopen(file, mode, forceremote=False, nooverwrite=False, db=None)
                                         -> FileTransfer object
@@ -218,17 +218,6 @@ def ftopen(file, mode, forceremote=False, nooverwrite=False, db=None, \
     if mode not in ('r','w'):
         raise TypeError("File I/O must be of type 'r' or 'w'")
 
-    if chanid and starttime:
-        protoopen = lambda host, file, storagegroup: \
-                      RecordFileTransfer(host, file, storagegroup,\
-                                         mode, chanid, starttime, db)
-    elif download:
-        protoopen = lambda host, lfile, storagegroup: \
-                      DownloadFileTransfer(host, lfile, storagegroup, \
-                                           mode, file, db)
-    else:
-        protoopen = lambda host, file, storagegroup: \
-                      FileTransfer(host, file, storagegroup, mode, db)
 
     # process URI (myth://<group>@<host>[:<port>]/<path/to/file>)
     match = None
@@ -252,6 +241,24 @@ def ftopen(file, mode, forceremote=False, nooverwrite=False, db=None, \
     host = host.strip('[]')
     if reip.match(host) or check_ipv6(host):
         host = db._gethostfromaddr(host)
+
+    # select the correct transfer function:
+    if chanid and starttime and not recordedid:
+        #  get recordedid from FileOps class
+        recordedid = \
+            FileOps(host, db=db).getRecording(chanid, starttime).recordedid
+    if recordedid:
+        protoopen = lambda host, file, storagegroup: \
+                      RecordFileTransfer(host, file, storagegroup,\
+                                         mode, recordedid, db)
+    elif download:
+        protoopen = lambda host, lfile, storagegroup: \
+                      DownloadFileTransfer(host, lfile, storagegroup, \
+                                           mode, file, db)
+    else:
+        protoopen = lambda host, file, storagegroup: \
+                      FileTransfer(host, file, storagegroup, mode, db)
+
 
     # user forced to remote access
     if forceremote:
@@ -370,7 +377,7 @@ class FileTransfer( BEEvent ):
         self.mode = mode
 
         # open control socket
-        BEEvent.__init__(self, host, True, db=db)
+        BEEvent.__init__(self, host, blockshutdown=True, events=True, db=db)
         # open transfer socket
         self.ftsock = self.BETransConn(self.host, self.port,
                     self._conn.command.localname, self.filename,
@@ -549,18 +556,16 @@ class RecordFileTransfer( FileTransfer ):
             self.re_update = re.compile(\
               re.escape(BACKEND_SEP).\
                 join(['BACKEND_MESSAGE',
-                      'UPDATE_FILE_SIZE %s %s (?P<size>[0-9]*)' %\
-                         (self.chanid, \
-                          self.starttime.isoformat()),
+                      'UPDATE_FILE_SIZE %s (?P<size>[0-9]*)' %\
+                         (self.recordedid),
                       'empty']))
             return self.re_update
         match = self.re_update.match(event)
         self._size = int(match.group('size'))
 
     def __init__(self, host, filename, sgroup, mode,
-                       chanid, starttime, db=None):
-        self.chanid = chanid
-        self.starttime = starttime
+                       recordedid, db=None):
+        self.recordedid = recordedid
         FileTransfer.__init__(self, host, filename, sgroup, mode, db)
 
 class DownloadFileTransfer( FileTransfer ):
@@ -721,7 +726,7 @@ class FileOps( BECache ):
             eventlock = self.allocateEventLock(\
                     re.escape(BACKEND_SEP).\
                             join(['BACKEND_MESSAGE',
-                                  'DOWNLOAD_FILE UPDATE',
+                                  'DOWNLOAD_FILE (FINISHED|UPDATE)',
                                   re.escape(url)]))
         if filename[0] != '/':
             filename = '/'+filename
@@ -970,9 +975,7 @@ class Program( CMPRecord, DictData, RECSTATUS, AUDIO_PROPS, \
     def _openProto(self):
         filename = self.filename if self.filename.startswith('myth://') else \
                     (self.hostname, self.storagegroup, self.filename)
-        return ftopen(filename, 'r', db=self._db, chanid=self.chanid, \
-                      starttime=self.recstartts)
-
+        return ftopen(filename, 'r', db=self._db, recordedid = self.recordedid)
     def _openXML(self):
         xml = XMLConnection(self.hostname, 6544)
         return xml._request('Content/GetRecording', ChanId=self.chanid, \
