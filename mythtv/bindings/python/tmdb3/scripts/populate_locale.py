@@ -23,7 +23,7 @@ fd = open(fpath, 'r')
 while True:
     line = fd.readline()
     if len(line) == 0:
-        print "code endpoint not found, aborting!"
+        print ("code endpoint not found, aborting!")
         sys.exit(1)
     if line.startswith('########'):
         endpt = fd.tell()
@@ -44,7 +44,7 @@ for row in root.getroot().getchildren()[3].getchildren()[2].getchildren()[0]\
         # skip empty 639-1 code
         continue
     name, _, _, iso639_2, iso639_1 = [t.text for t in row]
-    
+
     fd.write('Language("{0}", "{1}", u"{2}")\n'.format(iso639_1, iso639_2, sanitize(name).encode('utf8')))
 
 root = lxml.html.parse('http://www.iso.org/iso/country_codes/iso_3166_code_lists/country_names_and_code_elements.htm').getroot()

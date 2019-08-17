@@ -7,9 +7,10 @@
 #-----------------------
 
 from copy import copy
-from locales import get_locale
-from tmdb_auth import get_session
+from .locales import get_locale
+from .tmdb_auth import get_session
 
+from future.utils import with_metaclass
 
 class NameRepr(object):
     """Mixin for __repr__ methods using 'name' attribute."""
@@ -74,7 +75,7 @@ class Poller(object):
             self.apply(req.new(language=None, country=None).readJSON())
             # re-apply the filtered first pass data over top the second
             # unfiltered set. this is to work around the issue that the
-            # properties have no way of knowing when they should or 
+            # properties have no way of knowing when they should or
             # should not overwrite existing data. the cache engine will
             # take care of the duplicate query
         self.apply(req.readJSON())
@@ -82,7 +83,7 @@ class Poller(object):
     def apply(self, data, set_nones=True):
         # apply data directly, bypassing callable function
         unfilled = False
-        for k, v in self.lookup.items():
+        for k, v in list(self.lookup.items()):
             if (k in data) and \
                     ((data[k] is not None) if callable(self.func) else True):
                 # argument received data, populate it
@@ -222,7 +223,7 @@ class Datalist(Data):
                     val._locale = inst._locale
                     val._session = inst._session
 
-                    for source, dest in self.passthrough.items():
+                    for source, dest in list(self.passthrough.items()):
                         setattr(val, dest, getattr(inst, source))
 
                 data.append(val)
@@ -288,7 +289,7 @@ class Datadict(Data):
                     val._locale = inst._locale
                     val._session = inst._session
 
-                    for source, dest in self.passthrough.items():
+                    for source, dest in list(self.passthrough.items()):
                         setattr(val, dest, getattr(inst, source))
 
                 data[self.getkey(val)] = val
@@ -310,7 +311,7 @@ class ElementType( type ):
 
         for base in reversed(bases):
             if isinstance(base, mcs):
-                for k, attr in base.__dict__.items():
+                for k, attr in list(base.__dict__.items()):
                     if isinstance(attr, Data):
                         # extract copies of each defined Data element from
                         # parent classes
@@ -321,7 +322,7 @@ class ElementType( type ):
                         # extract copies of each defined Poller function
                         # from parent classes
                         pollers[k] = attr.func
-        for k, attr in attrs.items():
+        for k, attr in list(attrs.items()):
             if isinstance(attr, Data):
                 data[k] = attr
         if '_populate' in attrs:
@@ -332,7 +333,7 @@ class ElementType( type ):
         # which Data points
         pollermap = dict([(k, []) for k in pollers])
         initargs = []
-        for k, v in data.items():
+        for k, v in list(data.items()):
             v.name = k
             if v.initarg:
                 initargs.append(v)
@@ -348,7 +349,7 @@ class ElementType( type ):
 
         # wrap each used poller function with a Poller class, and push into
         # the new class attributes
-        for k, v in pollermap.items():
+        for k, v in list(pollermap.items()):
             if len(v) == 0:
                 continue
             lookup = dict([(attr.field, attr.name) for attr in v])
@@ -398,6 +399,5 @@ class ElementType( type ):
         return obj
 
 
-class Element( object ):
-    __metaclass__ = ElementType
+class Element( with_metaclass( ElementType, object ) ):
     _lang = 'en'
