@@ -55,7 +55,7 @@ class SchemaUpdate( object ):
         except AttributeError as e:
             self.log(MythLog.GENERAL, MythLog.CRIT,
                      'failed at %d' % schema, 'no handler method')
-            raise MythDBError('Schema update failed, ' 
+            raise MythDBError('Schema update failed, '
                     "SchemaUpdate has no function 'up%s'" % schema)
 
         except StopIteration:
@@ -383,15 +383,16 @@ class deadlinesocket( socket.socket ):
         """
         size = int(self.dlrecv(8, flags, deadline))
         data = self.dlrecv(size, flags, deadline)
+        # data is utf-8 encoded, convert to unicode for logging and ignore errors
         self.log(MythLog.SOCKET|MythLog.NETWORK, MythLog.DEBUG, \
-                            'read <-- %d' % size, data)
+                            'read <-- %d' % size, py23_str(data, True))
         return data
 
     def sendheader(self, data, flags=0):
         """Send data, prepending the length in the first 8 bytes."""
         try:
             self.log(MythLog.SOCKET|MythLog.NETWORK, MythLog.DEBUG, \
-                                'write --> %d' % len(data), data)
+                            'write --> %d' % len(data), py23_str(data, True))
             data = '%-8d%s' % (len(data), data)
             self.send(data, flags)
         except socket.error as e:
@@ -571,6 +572,17 @@ def check_ipv6(n):
         return True
     except socket.error:
         return False
+
+def py23_str(value, ignore_errors=False):
+    error_methods = ('strict', 'ignore')
+    error_method  = error_methods[ignore_errors]
+    try:  # Python 2
+        return unicode(value, errors=error_method, encoding='utf-8')
+    except NameError:  # Python 3
+        try:
+            return str(value,errors=error_method, encoding='utf-8')
+        except TypeError:  # Wasn't a bytes object, no need to decode
+            return str(value)
 
 class QuickProperty( object ):
     def __init__(self, maskedvar, default=None, handler=None):
