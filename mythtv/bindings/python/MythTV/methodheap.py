@@ -16,6 +16,8 @@ from MythTV.dataheap import *
 
 from datetime import timedelta
 from weakref import proxy
+from collections import namedtuple
+
 try:
     from urllib import urlopen
 except ImportError:
@@ -57,6 +59,11 @@ class MythBE( FileOps ):
     """
 
     locked_tuners = {}
+
+    # Prepare tuple for backend command 'GET_FREE_INPUT_INFO'
+    _i_info = ('name', 'sourceid', 'inputid', 'mplexid', 'chanid', 'displayName',
+               'recPriority', 'scheduleOrder', 'livetvorder', 'quickTune')
+    _InputInfo = namedtuple('InputInfo', _i_info)
 
     def __del__(self):
         self.freeTuner()
@@ -107,11 +114,41 @@ class MythBE( FileOps ):
 
     def getFreeRecorderList(self):
         """
-        Returns a list of free recorders, or an empty list if none.
+        Returns a list of free recorders in preferred live TV order,
+        or an empty list if none.
         """
-        res = self.backendCommand('GET_FREE_RECORDER_LIST').split(BACKEND_SEP)
-        recorders = [int(d) for d in res]
+        res = self.backendCommand('GET_FREE_INPUT_INFO 0').split(BACKEND_SEP)
+        # this maps the list of variable length ('res') to InputInfo tuples:
+        res_inputinfo = \
+            [self._InputInfo(*el) for el in zip(*[iter(res)]*len(self._i_info))]
+        recorders = [x.inputid for x in res_inputinfo]
         return recorders
+
+    def getFreeInputInfo(self):
+        """
+        Return a list of 'InputInfo' tuples of free recorders in preferred
+        live TV order.
+        Returns an empty list if no recorders are available.
+        Introduced in protocol 87, changed in protocols 89, 90, 91.
+
+        InputInfo is a named tuple containing:
+        ('InputInfo', ('name', 'sourceid', 'inputid', 'mplexid', 'chanid',
+                       'displayName', 'recPriority', 'scheduleOrder',
+                       'livetvorder', 'quickTune')).
+
+        See definition of InputInfo in inputinfo.h.
+
+        Usage examples:
+
+        MythBE.getFreeInputInfo()[3].displayName   ---> 'Eingang 13:MPEG2TS'
+
+        [x.inputid for x in getFreeInputInfo()]   --->  list of free recorders
+        """
+        res = self.backendCommand('GET_FREE_INPUT_INFO 0').split(BACKEND_SEP)
+        # this maps the list of variable length ('res') to InputInfo tuples:
+        res_inputinfo = \
+            [self._InputInfo(*el) for el in zip(*[iter(res)]*len(self._i_info))]
+        return res_inputinfo
 
     def lockTuner(self,id=None):
         """
