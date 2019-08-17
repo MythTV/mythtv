@@ -428,7 +428,8 @@ class Recorded( CMPRecord, DBDataWrite ):
                                   ('a','%p'),('A','%p') ):
                 path = path.replace(pre+tag, self[data].strftime(format))
         if self.originalairdate is None:
-            airdate = date(1,1,1)
+            airdate = _default_datetime
+
         else:
             airdate = self.originalairdate
         for (tag, format) in (('y','%y'),('Y','%Y'),('n','%m'),('m','%m'),
