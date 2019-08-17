@@ -474,7 +474,10 @@ class datetime( _pydatetime ):
         return self.astimezone(self.UTCTZ()).strftime('%Y%m%d%H%M%S')
 
     def timestamp(self):
-        return time.mktime(self.timetuple()) + self.microsecond/1000000.
+         # utc time = local time - utc offset
+         utc_naive = self.replace(tzinfo=None) - self.utcoffset()
+         utc_epoch = self.utcfromtimestamp(0).replace(tzinfo=None)
+         return ((utc_naive - utc_epoch).total_seconds())
 
     def rfcformat(self):
         return self.strftime('%a, %d %b %Y %H:%M:%S %z')
