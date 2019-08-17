@@ -59,21 +59,23 @@ __version__ = "v0.7.0"
 # 0.6.14 Add support for Lists
 # 0.6.15 Add ability to search Collections
 # 0.6.16 Make absent primary images return None (previously u'')
-# 0.6.17 Add userrating/votes to Image, add overview to Collection, remove 
+# 0.6.17 Add userrating/votes to Image, add overview to Collection, remove
 #           releasedate sorting from Collection Movies
 # 0.7.0  Add support for television series data
+# 0.7.0.a  Added compatibility to python3, tested with python 3.6 and 2.7
 
-from request import set_key, Request
-from util import Datapoint, Datalist, Datadict, Element, NameRepr, SearchRepr
-from pager import PagedRequest
-from locales import get_locale, set_locale
-from tmdb_auth import get_session, set_session
-from tmdb_exceptions import *
+from .request import set_key, Request
+from .util import Datapoint, Datalist, Datadict, Element, NameRepr, SearchRepr
+from .pager import PagedRequest
+from .locales import get_locale, set_locale
+from .tmdb_auth import get_session, set_session
+from .tmdb_exceptions import *
 
 import json
-import urllib
-import urllib2
 import datetime
+import sys
+
+IS_PY3 = sys.version_info[0] == 3
 
 DEBUG = False
 
@@ -234,7 +236,7 @@ class Image(Element):
     width = Datapoint('width')
     language = Datapoint('iso_639_1')
     userrating = Datapoint('vote_average')
-    votes = Datapoint('vote_count') 
+    votes = Datapoint('vote_count')
 
     def sizes(self):
         return ['original']
@@ -265,10 +267,13 @@ class Image(Element):
         return self.filename == other.filename
 
     # special handling for boolean to see if exists
-    def __nonzero__(self):
+    def __bool__(self):
         if len(self.filename) == 0:
             return False
         return True
+
+    __nonzero__  = __bool__    # for  python2
+
 
     def __repr__(self):
         # BASE62 encoded filename, no need to worry about unicode
@@ -405,7 +410,7 @@ class AppleTrailer(Element):
     sources = Datadict('sources', handler=Trailer, attr='size')
 
     def sizes(self):
-        return self.sources.keys()
+        return list(self.sources.keys())
 
     def geturl(self, size=None):
         if size is None:
@@ -454,7 +459,7 @@ class Genre(NameRepr, Element):
             def _populate(self):
                 return Request('genre/list', language=self._locale.language)
         return GenreList(locale=locale).genres
-        
+
 
 class Studio(NameRepr, Element):
     id = Datapoint('id', initarg=1)
