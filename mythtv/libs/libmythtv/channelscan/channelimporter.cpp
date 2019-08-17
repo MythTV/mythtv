@@ -1338,9 +1338,9 @@ bool ChannelImporter::IsType(
     switch (type)
     {
         case kATSCNonConflicting:
-            return ((chan.m_si_standard == "atsc") &&
+            return ((chan.m_si_standard == "atsc") /* &&
                     (info.m_atscnum_cnt[(chan.m_atsc_major_channel << 16) |
-                                        (chan.m_atsc_minor_channel)] == 1));
+                                        (chan.m_atsc_minor_channel)] == 1) */);
 
         case kDVBNonConflicting:
             return ((chan.m_si_standard == "dvb") /* &&
