@@ -163,6 +163,7 @@ class posixtzinfo( basetzinfo ):
         # files have massively negative leading entries for e.g. the
         # big bang which gmtime() cannot cope with.
         first_modern_transition = None
+        i = 0   # assign i, in case the for-loop is not executed:
         for i in range(counts.transitions):  # read in epoch time data
             t = unpack(ttmfmt, fd.read(calcsize(ttmfmt)))[0]
 
@@ -176,6 +177,10 @@ class posixtzinfo( basetzinfo ):
                 # transition.
                 if first_modern_transition is not None:
                     raise e
+
+        # Special case if there are no modern transitions, like e.g. UTC timezone:
+        if ( (i == 0) and first_modern_transition is None ):
+            first_modern_transition = counts.transitions
 
         # read in transition type indexes
         types = [None]*counts.transitions
