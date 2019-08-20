@@ -701,7 +701,7 @@ bool DiSEqCDevTree::SendCommand(uint adr, uint cmd, uint repeats,
     bool resend_cmd = false;
 
     // prepare command
-    dvb_diseqc_master_cmd mcmd;
+    dvb_diseqc_master_cmd mcmd = {};
     mcmd.msg[0] = DISEQC_FRM;
     mcmd.msg[1] = adr;
     mcmd.msg[2] = cmd;
