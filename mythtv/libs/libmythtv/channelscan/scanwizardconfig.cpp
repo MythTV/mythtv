@@ -33,6 +33,7 @@ void ScanWizard::SetupConfig(
     m_ftaOnly = new FreeToAirOnly();
     m_lcnOnly = new ChannelNumbersOnly();
     m_completeOnly = new CompleteChannelsOnly();
+    m_fullSearch = new FullChannelSearch();
     m_addFullTS = new AddFullTS();
     m_trustEncSI = new TrustEncSISetting();
 
@@ -42,6 +43,7 @@ void ScanWizard::SetupConfig(
     addChild(m_ftaOnly);
     addChild(m_lcnOnly);
     addChild(m_completeOnly);
+    addChild(m_fullSearch);
     addChild(m_addFullTS);
     addChild(m_trustEncSI);
 
@@ -86,6 +88,11 @@ bool ScanWizard::DoChannelNumbersOnly(void) const
 bool ScanWizard::DoCompleteChannelsOnly(void) const
 {
     return m_completeOnly->boolValue();
+}
+
+bool ScanWizard::DoFullChannelSearch(void) const
+{
+    return m_fullSearch->boolValue();
 }
 
 bool ScanWizard::DoAddFullTS(void) const

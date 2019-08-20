@@ -68,7 +68,8 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
     // Print out each channel
     if (VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_ANY))
     {
-        cout << endl << "Channel list before processing: " << endl;
+        cout << endl << "Channel list before processing (";
+        cout << SimpleCountChannels(transports) << "):" << endl;
         ChannelImporterBasicStats infoA = CollectStats(transports);
         cout << FormatChannels(transports, &infoA).toLatin1().constData() << endl;
         cout << endl;
@@ -88,6 +89,17 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
 
     // Make sure "Open Cable" channels are marked that way.
     FixUpOpenCable(transports);
+
+
+    // All channels in the scan after comparing with the database
+    if (VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_ANY))
+    {
+        cout << endl << "Channel list after compare with database (";
+        cout << SimpleCountChannels(transports) << "):" << endl;
+        ChannelImporterBasicStats infoA = CollectStats(transports);
+        cout << FormatChannels(transports, &infoA).toLatin1().constData() << endl;
+        cout << endl;
+    }
 
     // If scan was not aborted prematurely..
     if (m_do_delete)
@@ -179,9 +191,10 @@ uint ChannelImporter::DeleteChannels(
     }
     else
     {
-        // List of off-air channels
-        cout << "Off-air channels (" << SimpleCountChannels(off_air_transports) << "):" << endl;
-        cout << FormatChannels(off_air_transports).toLatin1().constData() << endl;
+        // List of off-air channels (in database but not in the scan)
+        cout << endl << "Off-air channels (" << SimpleCountChannels(off_air_transports) << "):" << endl;
+        ChannelImporterBasicStats infoA = CollectStats(off_air_transports);
+        cout << FormatChannels(off_air_transports, &infoA).toLatin1().constData() << endl;
     }
 
     // Ask user whether to delete all or some of these stale channels
@@ -381,22 +394,22 @@ void ChannelImporter::InsertChannels(
     // List what has been done with each channel
     if (updated.size() > 0)
     {
-        cout << "Updated old channels (" << SimpleCountChannels(updated) << "):" << endl;
+        cout << endl << "Updated old channels (" << SimpleCountChannels(updated) << "):" << endl;
         cout << FormatChannels(updated).toLatin1().constData() << endl;
     }
     if (skipped_updates.size() > 0)
     {
-        cout << "Skipped old channels (" << SimpleCountChannels(skipped_updates) << "):" << endl;
+        cout << endl << "Skipped old channels (" << SimpleCountChannels(skipped_updates) << "):" << endl;
         cout << FormatChannels(skipped_updates).toLatin1().constData() << endl;
     }
     if (inserted.size() > 0)
     {
-        cout << "Inserted new channels (" << SimpleCountChannels(inserted) << "):" << endl;
+        cout << endl << "Inserted new channels (" << SimpleCountChannels(inserted) << "):" << endl;
         cout << FormatChannels(inserted).toLatin1().constData() << endl;
     }
     if (skipped_inserts.size() > 0)
     {
-        cout << "Skipped new channels (" << SimpleCountChannels(skipped_inserts) << "):" << endl;
+        cout << endl << "Skipped new channels (" << SimpleCountChannels(skipped_inserts) << "):" << endl;
         cout << FormatChannels(skipped_inserts).toLatin1().constData() << endl;
     }
 
@@ -969,6 +982,9 @@ ScanDTVTransportList ChannelImporter::GetDBTransports(
     uint sourceid, ScanDTVTransportList &transports) const
 {
     ScanDTVTransportList not_in_scan;
+    int found_in_same_transport = 0;
+    int found_in_other_transport = 0;
+    int found_nowhere = 0;
 
     DTVTunerType tuner_type(DTVTunerType::kTunerTypeATSC);
     if (!transports.empty())
@@ -997,62 +1013,109 @@ ScanDTVTransportList ChannelImporter::GetDBTransports(
 
     while (query.next())
     {
+        ScanDTVTransport db_transport;
         uint mplexid = query.value(0).toUInt();
+        if (db_transport.FillFromDB(tuner_type, mplexid))
+        {
+            if (db_transport.m_channels.empty())
+            {
+                continue;
+            }
+        }
 
-        ScanDTVTransport newt;
-        if (!newt.FillFromDB(tuner_type, mplexid))
-            continue;
-
-        bool newt_found = false;
+        bool found_transport = false;
         QMap<uint,bool> found_chan;
 
-        for (size_t i = 0; i < transports.size(); ++i)
+        // Search for old channels in the same transport of the scan.
+        for (size_t ist = 0; ist < transports.size(); ++ist)                                // All transports in scan
         {
-            if (!transports[i].IsEqual(tuner_type, newt, 500 * freq_mult, true))
-                continue;
+            ScanDTVTransport &transport = transports[ist];                                  // Scanned transport
 
-            transports[i].m_mplex = mplexid;
-            newt_found = true;
-            for (size_t j = 0; j < transports[i].m_channels.size(); ++j)
+            if (transport.IsEqual(tuner_type, db_transport, 500 * freq_mult, true))         // Same transport?
             {
-                ChannelInsertInfo &chan = transports[i].m_channels[j];
-                for (size_t k = 0; k < newt.m_channels.size(); ++k)
+                found_transport = true;
+                transport.m_mplex = db_transport.m_mplex;                                   // Found multiplex
+
+                for (size_t jdc = 0; jdc < db_transport.m_channels.size(); ++jdc)           // All channels in database transport
                 {
-                    if (newt.m_channels[k].IsSameChannel(chan, true))
+                    if (!found_chan[jdc])                                                   // Channel not found yet?
                     {
-                        found_chan[k] = true;
-                        chan.m_db_mplexid = mplexid;
-                        chan.m_channel_id = newt.m_channels[k].m_channel_id;
+                        ChannelInsertInfo &db_chan = db_transport.m_channels[jdc];          // Channel in database transport
+
+                        for (size_t ktc = 0; ktc < transport.m_channels.size(); ++ktc)      // All channels in scanned transport
+                        {
+                            ChannelInsertInfo &chan = transport.m_channels[ktc];            // Channel in scanned transport
+                            if (db_chan.IsSameChannel(chan, 2))                             // Same transport, relaxed check
+                            {
+                                found_in_same_transport++;
+                                found_chan[jdc] = true;                                     // Found channel from database in scan
+                                chan.m_db_mplexid = mplexid;                                // Found multiplex
+                                chan.m_channel_id = db_chan.m_channel_id;                   // This is the crucial field
+                                break;                                                      // Ready with scanned transport
+                            }
+                        }
                     }
                 }
             }
-            break;
         }
 
-        if (!newt_found)
+        // Search for old channels in all transports of the scan.
+        // This is done for all channels that have not yet been found.
+        // This can identify the channels that have moved to another transport.
+        if (m_full_channel_search)
         {
-            /* XXX HACK -- begin
-             * disabling adding transponders not found in the scan list
-             * to the db list to avoid deleting many channels as off air
-             * for a single transponder scan
-            not_in_scan.push_back(newt);
-             * XXX HACK -- end */
+            for (size_t idc = 0; idc < db_transport.m_channels.size(); ++idc)               // All channels in database transport
+            {
+                ChannelInsertInfo &db_chan = db_transport.m_channels[idc];                  // Channel in database transport
+
+                for (size_t jst = 0; jst < transports.size() && !found_chan[idc]; ++jst)    // All transports in scan until found
+                {
+                    ScanDTVTransport &transport = transports[jst];                          // Scanned transport
+                    for (size_t ksc = 0; ksc < transport.m_channels.size(); ++ksc)          // All channels in scanned transport
+                    {
+                        ChannelInsertInfo &chan = transport.m_channels[ksc];                // Channel in scanned transport
+                        if (db_chan.IsSameChannel(chan, 1))                                 // Different transport, check
+                        {                                                                   // network id and service id
+                            found_in_other_transport++;
+                            found_chan[idc] = true;                                         // Found channel from database in scan
+                            chan.m_channel_id = db_chan.m_channel_id;                       // This is the crucial field
+                            break;                                                          // Ready with scanned transport
+                        }
+                    }
+                }
+            }
         }
-        else
+
+        // If the transport in the database is found in the scan
+        // then all channels in that transport that are not found
+        // in the scan are copied to the "not_in_scan" list.
+        if (found_transport)
         {
-            ScanDTVTransport tmp = newt;
+            ScanDTVTransport tmp = db_transport;
             tmp.m_channels.clear();
 
-            for (size_t k = 0; k < newt.m_channels.size(); ++k)
+            for (size_t idc = 0; idc < db_transport.m_channels.size(); ++idc)
             {
-                if (!found_chan[k])
-                    tmp.m_channels.push_back(newt.m_channels[k]);
+                if (!found_chan[idc])
+                {
+                    tmp.m_channels.push_back(db_transport.m_channels[idc]);
+                    found_nowhere++;
+                }
             }
 
             if (!tmp.m_channels.empty())
                 not_in_scan.push_back(tmp);
         }
     }
+    LOG(VB_GENERAL, LOG_INFO, LOC +
+        QString("Old channels found in same transport: %1")
+            .arg(found_in_same_transport));
+    LOG(VB_GENERAL, LOG_INFO, LOC +
+        QString("Old channels found in other transport: %1")
+            .arg(found_in_other_transport));
+    LOG(VB_GENERAL, LOG_INFO, LOC +
+        QString("Old channels not found (off-air): %1")
+            .arg(found_nowhere));
 
     return not_in_scan;
 }

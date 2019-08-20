@@ -45,6 +45,7 @@ class DesiredServices;
 class FreeToAirOnly;
 class ChannelNumbersOnly;
 class CompleteChannelsOnly;
+class FullChannelSearch;
 class AddFullTS;
 class TrustEncSISetting;
 

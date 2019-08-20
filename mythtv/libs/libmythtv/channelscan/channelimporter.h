@@ -78,6 +78,7 @@ class MTV_PUBLIC ChannelImporter
     ChannelImporter(bool gui, bool interactive,
                     bool _delete, bool insert, bool save,
                     bool fta_only, bool lcn_only, bool complete_only,
+                    bool full_channel_search,
                     ServiceRequirements service_requirements,
                     bool success = false) :
         m_use_gui(gui),
@@ -88,6 +89,7 @@ class MTV_PUBLIC ChannelImporter
         m_fta_only(fta_only),
         m_lcn_only(lcn_only),
         m_complete_only(complete_only),
+        m_full_channel_search(full_channel_search),
         m_success(success),
         m_service_requirements(service_requirements) { }
 
@@ -257,6 +259,8 @@ class MTV_PUBLIC ChannelImporter
     bool                m_complete_only;
     /// Keep existing channel numbers on channel update
     bool                m_keep_channel_numbers      {true};
+    /// Full search for old channels
+    bool                m_full_channel_search       {false};
     /// To pass information IPTV channel scan succeeded
     bool                m_success {false};
     /// Services desired post scan

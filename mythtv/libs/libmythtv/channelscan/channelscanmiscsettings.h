@@ -154,6 +154,23 @@ class CompleteChannelsOnly : public TransMythUICheckBoxSetting
     };
 };
 
+class FullChannelSearch : public TransMythUICheckBoxSetting
+{
+  public:
+    FullChannelSearch()
+    {
+        setValue(false);
+        setLabel(QObject::tr("Full search for old channels"));
+        setHelpText(
+            QObject::tr(
+                "If set, compare all channels in the database with the channels found in "
+                "the scan; otherwise only the channels in the same transport are compared. "
+                "This option is useful when you want to keep channel data such as "
+                "the xmltvid and the icon path when doing a rescan "
+                "after channels have been rearranged across transports."));
+    };
+};
+
 class AddFullTS : public TransMythUICheckBoxSetting
 {
   public:
