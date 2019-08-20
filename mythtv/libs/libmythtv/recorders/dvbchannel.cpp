@@ -763,8 +763,8 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
         if (DTVTunerType::kTunerTypeDVBS2 == m_tunerType ||
             DTVTunerType::kTunerTypeDVBT2 == m_tunerType)
         {
-            struct dtv_property p_clear;
-            struct dtv_properties cmdseq_clear;
+            struct dtv_property p_clear = {};
+            struct dtv_properties cmdseq_clear = {};
 
             p_clear.cmd        = DTV_CLEAR;
             cmdseq_clear.num   = 1;
@@ -1035,10 +1035,9 @@ bool DVBChannel::HasLock(bool *ok) const
 // documented in dvbchannel.h
 double DVBChannel::GetSignalStrengthDVBv5(bool *ok) const
 {
-    struct dtv_property prop;
-    struct dtv_properties cmd;
+    struct dtv_property prop = {};
+    struct dtv_properties cmd = {};
 
-    memset(&prop, 0, sizeof(prop));
     prop.cmd = DTV_STAT_SIGNAL_STRENGTH;
     cmd.num = 1;
     cmd.props = &prop;
@@ -1123,8 +1122,8 @@ double DVBChannel::GetSignalStrength(bool *ok) const
 // documented in dvbchannel.h
 double DVBChannel::GetSNRDVBv5(bool *ok) const
 {
-    struct dtv_property prop;
-    struct dtv_properties cmd;
+    struct dtv_property prop = {};
+    struct dtv_properties cmd = {};
 
     memset(&prop, 0, sizeof(prop));
     prop.cmd = DTV_STAT_CNR;
@@ -1206,10 +1205,9 @@ double DVBChannel::GetSNR(bool *ok) const
 // documented in dvbchannel.h
 double DVBChannel::GetBitErrorRateDVBv5(bool *ok) const
 {
-    struct dtv_property prop[2];
-    struct dtv_properties cmd;
+    struct dtv_property prop[2] = {};
+    struct dtv_properties cmd = {};
 
-    memset(&prop, 0, sizeof(prop));
     prop[0].cmd = DTV_STAT_POST_ERROR_BIT_COUNT;
     prop[1].cmd = DTV_STAT_POST_TOTAL_BIT_COUNT;
     cmd.num = 2;
@@ -1285,10 +1283,9 @@ double DVBChannel::GetBitErrorRate(bool *ok) const
 // documented in dvbchannel.h
 double DVBChannel::GetUncorrectedBlockCountDVBv5(bool *ok) const
 {
-    struct dtv_property prop;
-    struct dtv_properties cmd;
+    struct dtv_property prop = {};
+    struct dtv_properties cmd = {};
 
-    memset(&prop, 0, sizeof(prop));
     prop.cmd = DTV_STAT_ERROR_BLOCK_COUNT;
     cmd.num = 1;
     cmd.props = &prop;
