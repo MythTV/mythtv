@@ -77,8 +77,8 @@ def saveScript(script):
         script.saveScript(name, os.path.expanduser(path))
 
 if __name__ == '__main__':
-    print "MythTV Interactive Script Downloader."
-    print "This script parses the wiki, and may take several minutes."
+    print("MythTV Interactive Script Downloader.")
+    print("This script parses the wiki, and may take several minutes.")
     tic = time()
     tmp = Script.getAll()
     print('Loading took %0.2f seconds' % (time()-tic))
