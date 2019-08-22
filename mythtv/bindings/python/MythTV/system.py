@@ -408,7 +408,10 @@ class Grabber( System ):
                 args = (inetref, season, episode)
             else:
                 args = (inetref,)
-        return self.command('-D', *args).next()
+        # inetref may expand to "my_grabber_script.xyz_1234" or "9876"
+        args = list(args)
+        args[0] = args[0].split("_")[-1]
+        return next(self.command('-D', *args))
 
 class SystemEvent( System ):
     """
