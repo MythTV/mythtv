@@ -337,7 +337,7 @@ def main():
 
         if opts.collectiondata:
             buildCollection(args[0], opts)
-    except RuntimeError, exc:
+    except RuntimeError as exc:
         sys.stdout.write('ERROR: ' + str(exc) + ' exception')
         sys.exit(1)
 
