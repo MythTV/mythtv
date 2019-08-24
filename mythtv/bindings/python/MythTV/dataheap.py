@@ -996,17 +996,17 @@ class Video( CMPVideo, VideoSchema, DBDataWrite ):
         for old in ('%20','_','.'):
             filename = filename.replace(old, ' ')
 
-        sep = '(?:\s?(?:-|/)?\s?)?'
+        sep = r'(?:\s?(?:-|/)?\s?)?'
         regex1 = re.compile(
-            sep.join(['^(.*[^s0-9])',
-                      '(?:s|(?:Season))?',
-                      '(\d{1,4})',
-                      '(?:[ex/]|Episode)',
-                      '(\d{1,3})',
-                      '(.*)$']), re.I)
+            sep.join([r'^(.*[^s0-9])',
+                      r'(?:s|(?:Season))?',
+                      r'(\d{1,4})',
+                      r'(?:[ex/]|Episode)',
+                      r'(\d{1,3})',
+                      r'(.*)$']), re.I)
 
-        regex2 = re.compile('(%s(?:Season%s\d*%s)*%s)$' \
-                            % (sep, sep, sep, sep), re.I)
+        title_pattern = r'(%s(?:Season%s\d*%s)*%s)$' % (sep, sep, sep, sep)
+        regex2 = re.compile(title_pattern, re.I)
 
         match1 = regex1.search(filename)
         if match1:

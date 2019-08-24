@@ -458,10 +458,10 @@ class FEConnection( object ):
                     'key':   lambda r: r=='OK',
                     'query': lambda r: r,
                     'play':  lambda r: r=='OK'}
-    _res_help = {'jump':  re.compile('(\w+)[ ]+- ([\w /,]+)'),
+    _res_help = {'jump':  re.compile(r'(\w+)[ ]+- ([\w /,]+)'),
                  'key':   lambda r: r.split('\r\n')[4].split(', '),
-                 'query': re.compile('query ([\w ]*\w+)[ \r\n]+- ([\w /,]+)'),
-                 'play':  re.compile('play ([\w -:]*\w+)[ \r\n]+- ([\w /:,\(\)]+)')}
+                 'query': re.compile(r'query ([\w ]*\w+)[ \r\n]+- ([\w /,]+)'),
+                 'play':  re.compile(r'play ([\w -:]*\w+)[ \r\n]+- ([\w /:,\(\)]+)')}
 
     def __init__(self, host, port, deadline=10.0, test=True):
         self.isConnected = False
@@ -473,7 +473,7 @@ class FEConnection( object ):
 
     @classmethod
     def fromUPNP(cls, timeout=5):
-        reLOC = re.compile('http://(?P<ip>[0-9\.]+):(?P<port>[0-9]+)/.*')
+        reLOC = re.compile(r'http://(?P<ip>[0-9\.]+):(?P<port>[0-9]+)/.*')
         msearch = MSearch()
         for res in msearch.searchMythFE(timeout):
             ip, port = reLOC.match(res['location']).group(1,2)
@@ -601,7 +601,7 @@ class XMLConnection( object ):
 
     @classmethod
     def fromUPNP(cls, timeout=5.0):
-        reLOC = re.compile('http://(?P<ip>[0-9\.]+):(?P<port>[0-9]+)/.*')
+        reLOC = re.compile(r'http://(?P<ip>[0-9\.]+):(?P<port>[0-9]+)/.*')
         msearch = MSearch()
         for res in msearch.searchMythBE(timeout):
             ip, port = reLOC.match(res['location']).group(1,2)

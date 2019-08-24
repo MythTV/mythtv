@@ -58,7 +58,7 @@ class BECache( object ):
 
     logmodule = 'Python Backend Connection'
     _shared = weakref.WeakValueDictionary()
-    _reip = re.compile('(?:\d{1,3}\.){3}\d{1,3}')
+    _reip = re.compile(r'(?:\d{1,3}\.){3}\d{1,3}')
 
     def __repr__(self):
         return "<%s 'myth://%s:%d/' at %s>" % \
@@ -217,8 +217,8 @@ def ftopen(file, mode, forceremote=False, nooverwrite=False, db=None, \
     db = DBCache(db)
     log = MythLog('Python File Transfer', db=db)
     reuri = re.compile(\
-        'myth://((?P<group>.*)@)?(?P<host>[\[\]a-zA-Z0-9_\-\.]*)(:[0-9]*)?/(?P<file>.*)')
-    reip = re.compile('(?:\d{1,3}\.){3}\d{1,3}')
+        r'myth://((?P<group>.*)@)?(?P<host>[\[\]a-zA-Z0-9_\-\.]*)(:[0-9]*)?/(?P<file>.*)')
+    reip = re.compile(r'(?:\d{1,3}\.){3}\d{1,3}')
 
     if mode not in ('r','w'):
         raise TypeError("File I/O must be of type 'r' or 'w'")
