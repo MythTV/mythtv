@@ -451,17 +451,17 @@ class BEEventMonitor( BECache ):
 class MythSystemEvent( BECache ):
     class systemeventhandler( object ):
         # decorator class for system events
-        bs = BACKEND_SEP.replace('[','\[').replace(']','\]')
+        bs = BACKEND_SEP.replace('[',r'\[').replace(']',r'\]')
         re_process = re.compile(bs.join([
-                'BACKEND_MESSAGE',
-                'SYSTEM_EVENT (?P<event>[A-Z0-9_]*)'
-                    '( HOSTNAME (?P<hostname>[a-zA-Z0-9_\.]*))?'
-                    '( SENDER (?P<sender>[a-zA-Z0-9_\.]*))?'
-                    '( CARDID (?P<cardid>[0-9]*))?'
-                    '( CHANID (?P<chanid>[0-9]*))?'
-                    '( STARTTIME (?P<starttime>[0-9-]*T[0-9-]))?'
-                    '( SECS (?P<secs>[0-9]*))?',
-                'empty']))
+                r'BACKEND_MESSAGE',
+                r'SYSTEM_EVENT (?P<event>[A-Z0-9_]*)'
+                    r'( HOSTNAME (?P<hostname>[a-zA-Z0-9_\.]*))?'
+                    r'( SENDER (?P<sender>[a-zA-Z0-9_\.]*))?'
+                    r'( CARDID (?P<cardid>[0-9]*))?'
+                    r'( CHANID (?P<chanid>[0-9]*))?'
+                    r'( STARTTIME (?P<starttime>[0-9-]*T[0-9-]))?'
+                    r'( SECS (?P<secs>[0-9]*))?',
+                r'empty']))
 
         def __init__(self, func):
             self.func = func
@@ -1143,7 +1143,7 @@ class MythXML( XMLConnection ):
         if backend is None:
             # use master backend
             backend = self.db.settings.NULL.MasterServerIP
-        if re.match('(?:\d{1,3}\.){3}\d{1,3}',backend) or \
+        if re.match(r'(?:\d{1,3}\.){3}\d{1,3}',backend) or \
                     check_ipv6(backend):
             # process ip address
             host = self.db._gethostfromaddr(backend)
