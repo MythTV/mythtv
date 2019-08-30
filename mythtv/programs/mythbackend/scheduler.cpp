@@ -2847,7 +2847,7 @@ void Scheduler::HandleIdleShutdown(
     // the frontend may have connected then gone idle between scheduler runs
     if (blockShutdown)
     {
-        if (m_mainServer->isClientConnected())
+        if (m_mainServer->isClientConnected(true))
         {
             LOG(VB_GENERAL, LOG_NOTICE, "Client is connected, removing startup block on shutdown");
             blockShutdown = false;
