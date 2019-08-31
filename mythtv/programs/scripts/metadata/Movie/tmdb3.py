@@ -35,10 +35,10 @@ import signal
 def print_etree(etostr):
     """lxml.etree.tostring is a bytes object in python3, and a str in python2.
     """
-    if sys.version_info[0] == 3:
-        sys.stdout.write(etostr.decode())
-    else:
+    if sys.version_info[0] == 2:
         sys.stdout.write(etostr)
+    else:
+        sys.stdout.write(etostr.decode())
 
 def timeouthandler(signal, frame):
     raise RuntimeError("Timed out")
@@ -149,7 +149,7 @@ def buildList(query, opts):
     count = 0
     while True:
         try:
-            res = results.next()
+            res = next(results)
         except StopIteration:
             # end of results
             break
