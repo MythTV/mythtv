@@ -8,7 +8,7 @@ from MythTV.static import MythSchema
 from MythTV.altdict import OrdDict, DictData
 from MythTV.logging import MythLog
 from MythTV.msearch import MSearch
-from MythTV.utility import datetime, dt, _donothing, QuickProperty
+from MythTV.utility import datetime, dt, _donothing, QuickProperty, py23_repr
 from MythTV.exceptions import MythError, MythDBError, MythTZError
 from MythTV.connections import DBConnection, LoggedCursor, XMLConnection
 
@@ -220,7 +220,7 @@ class DBData( DictData, MythSchema ):
                  hex(id(self)))
 
     def __repr__(self):
-        return str(self).encode('utf-8')
+        return py23_repr(str(self))
 
     def __getstate__(self):
         data = {'data':DictData.__getstate__(self)}
@@ -463,7 +463,7 @@ class DBDataRef( list ):
             self._changed = True
             self.__hash__()
         def __str__(self): return str(self.items())
-        def __repr__(self): return str(self).encode('utf-8')
+        def __repr__(self): return py23_repr(str(self))
         def __hash__(self):
             if self._changed:
                 self._hash = hash(sum(map(hash,self.values())))
@@ -1116,7 +1116,7 @@ class DBCache( MythSchema ):
         """Provides a dictionary-like list of table fieldnames"""
         class _FieldData( OrdDict ):
             def __str__(self): return str(list(self))
-            def __repr__(self): return str(self).encode('utf-8')
+            def __repr__(self): return py23_repr(str(self))
             def __iter__(self): return self.iterkeys()
             def __init__(self, result):
                 data = [(row[0],
@@ -1135,7 +1135,7 @@ class DBCache( MythSchema ):
                         raise KeyError(str(key))
         _localvars = ['_field_order','_db','_log']
         def __str__(self): return str(list(self))
-        def __repr__(self): return str(self).encode('utf-8')
+        def __repr__(self): return py23_repr(str(self))
         def __iter__(self): return self.iterkeys()
         def __init__(self, db, log):
             OrdDict.__init__(self)
@@ -1160,7 +1160,7 @@ class DBCache( MythSchema ):
         class _HostSettings( OrdDict ):
             _localvars = ['_field_order','_log','_db','_host','_insert','_where']
             def __str__(self): return str(list(self))
-            def __repr__(self): return str(self).encode('utf-8')
+            def __repr__(self): return py23_repr(str(self))
             def __iter__(self): return self.iterkeys()
             def __init__(self, db, log, host):
                 OrdDict.__init__(self)
@@ -1234,7 +1234,7 @@ class DBCache( MythSchema ):
 
         _localvars = ['_field_order','_log','_db']
         def __str__(self): return str(list(self))
-        def __repr__(self): return str(self).encode('utf-8')
+        def __repr__(self): return py23_repr(str(self))
         def __iter__(self): return self.iterkeys()
         def __init__(self, db, log):
             OrdDict.__init__(self)
@@ -1440,7 +1440,7 @@ class StorageGroup( DBData ):
                     (self.groupname, self.hostname,
                         self.dirname, hex(id(self)))
 
-    def __repr__(self): return str(self).encode('utf-8')
+    def __repr__(self): return py23_repr(str(self))
 
     def _evalwheredat(self, wheredat=None):
         DBData._evalwheredat(self, wheredat)

@@ -11,8 +11,8 @@ from MythTV.logging import MythLog
 from MythTV.altdict import DictData
 from MythTV.connections import BEConnection, BEEventConnection
 from MythTV.database import DBCache
-from MythTV.utility import CMPRecord, datetime, \
-                           ParseEnum, CopyData, CopyData2, check_ipv6
+from MythTV.utility import CMPRecord, datetime, ParseEnum, \
+                           CopyData, CopyData2, check_ipv6, py23_repr
 
 from datetime import date
 from time import sleep
@@ -828,7 +828,7 @@ class FreeSpace( DictData ):
                     % (self.path, self.host, hex(id(self)))
 
     def __repr__(self):
-        return str(self).encode('utf-8')
+        return py23_repr(str(self))
 
     def __init__(self, raw):
         DictData.__init__(self, raw)
@@ -879,7 +879,7 @@ class Program( CMPRecord, DictData, RECSTATUS, AUDIO_PROPS, \
                  self.starttime.isoformat(' '), hex(id(self)))
 
     def __repr__(self):
-        return str(self).encode('utf-8')
+        return py23_repr(str(self))
 
     def __init__(self, raw, db=None):
         DictData.__init__(self, raw)

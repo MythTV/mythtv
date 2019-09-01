@@ -7,7 +7,7 @@ Provides base classes for managing system calls.
 from MythTV.exceptions import MythError, MythDBError, MythFileError
 from MythTV.logging import MythLog
 from MythTV.altdict import DictData, OrdDict
-from MythTV.utility import levenshtein, DequeBuffer
+from MythTV.utility import levenshtein, DequeBuffer, py23_repr
 from MythTV.database import DBCache
 
 from subprocess import Popen
@@ -153,7 +153,7 @@ class System( DBCache ):
                     self.path, hex(id(self)))
 
     def __repr__(self):
-        return str(self).encode('utf-8')
+        return py23_repr(str(self))
 
     def append(self, *args):
         """

@@ -15,6 +15,7 @@ from builtins import map
 import weakref
 import socket
 import re
+import sys
 from builtins import range
 
 def _donothing(*args, **kwargs):
@@ -585,6 +586,12 @@ def py23_str(value, ignore_errors=False):
             return str(value, errors=error_method, encoding='utf-8')
         except TypeError:  # Wasn't a bytes object, no need to decode
             return str(value)
+
+def py23_repr(x):
+    if sys.version_info[0] == 2:
+        return(x.encode('utf-8'))
+    else:
+        return(x)
 
 class QuickProperty( object ):
     def __init__(self, maskedvar, default=None, handler=None):
