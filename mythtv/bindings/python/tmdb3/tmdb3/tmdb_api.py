@@ -64,8 +64,10 @@ __version__ = "v0.7.0"
 # 0.7.0  Add support for television series data
 # 0.7.0.a  Added compatibility to python3, tested with python 3.6 and 2.7
 
+from . import IS_PY2
+
 from .request import set_key, Request
-from .util import Datapoint, Datalist, Datadict, Element, NameRepr, SearchRepr
+from .util import Datapoint, Datalist, Datadict, Element, NameRepr, SearchRepr, tmdb3_repr
 from .pager import PagedRequest
 from .locales import get_locale, set_locale
 from .tmdb_auth import get_session, set_session
@@ -73,9 +75,6 @@ from .tmdb_exceptions import *
 
 import json
 import datetime
-import sys
-
-IS_PY3 = sys.version_info[0] == 3
 
 DEBUG = False
 
@@ -317,8 +316,8 @@ class AlternateTitle(Element):
         return self.country == other.country
 
     def __repr__(self):
-        return u"<{0.__class__.__name__} '{0.title}' ({0.country})>"\
-               .format(self).encode('utf-8')
+        return tmdb3_repr(u"<{0.__class__.__name__} '{0.title}' ({0.country})>"\
+               .format(self))
 
 
 class Person(Element):
@@ -335,8 +334,8 @@ class Person(Element):
     aliases = Datalist('also_known_as')
 
     def __repr__(self):
-        return u"<{0.__class__.__name__} '{0.name}'>"\
-                            .format(self).encode('utf-8')
+        return tmdb3_repr(u"<{0.__class__.__name__} '{0.name}'>"\
+                            .format(self))
 
     def _populate(self):
         return Request('person/{0}'.format(self.id))
@@ -359,8 +358,8 @@ class Cast(Person):
     order = Datapoint('order')
 
     def __repr__(self):
-        return u"<{0.__class__.__name__} '{0.name}' as '{0.character}'>"\
-               .format(self).encode('utf-8')
+        return tmdb3_repr(u"<{0.__class__.__name__} '{0.name}' as '{0.character}'>"\
+               .format(self))
 
 
 class Crew(Person):
@@ -368,8 +367,8 @@ class Crew(Person):
     department = Datapoint('department')
 
     def __repr__(self):
-        return u"<{0.__class__.__name__} '{0.name}','{0.job}'>"\
-               .format(self).encode('utf-8')
+        return tmdb3_repr(u"<{0.__class__.__name__} '{0.name}','{0.job}'>"\
+               .format(self))
 
 
 class Keyword(Element):
@@ -377,8 +376,7 @@ class Keyword(Element):
     name = Datapoint('name')
 
     def __repr__(self):
-        return u"<{0.__class__.__name__} {0.name}>"\
-               .format(self).encode('utf-8')
+        return tmdb3_repr(u"<{0.__class__.__name__} {0.name}>".format(self))
 
 
 class Release(Element):
@@ -386,8 +384,8 @@ class Release(Element):
     country = Datapoint('iso_3166_1')
     releasedate = Datapoint('release_date', handler=process_date)
     def __repr__(self):
-        return u"<{0.__class__.__name__} {0.country}, {0.releasedate}>"\
-               .format(self).encode('utf-8')
+        return tmdb3_repr(u"<{0.__class__.__name__} {0.country}, {0.releasedate}>"\
+               .format(self))
 
 
 class Trailer(Element):
@@ -430,8 +428,8 @@ class Translation(Element):
     englishname = Datapoint('english_name')
 
     def __repr__(self):
-        return u"<{0.__class__.__name__} '{0.name}' ({0.language})>"\
-               .format(self).encode('utf-8')
+        return tmdb3_repr(u"<{0.__class__.__name__} '{0.name}' ({0.language})>"\
+               .format(self))
 
 
 class Genre(NameRepr, Element):
@@ -719,16 +717,16 @@ class Movie(Element):
         return s
 
     def __repr__(self):
-        return u"<{0} {1}>".format(self.__class__.__name__,
-                                   self._printable_name()).encode('utf-8')
+        return tmdb3_repr(u"<{0} {1}>".format(self.__class__.__name__,
+                                   self._printable_name()))
 
 
 class ReverseCast( Movie ):
     character = Datapoint('character')
 
     def __repr__(self):
-        return (u"<{0.__class__.__name__} '{0.character}' on {1}>"
-                .format(self, self._printable_name()).encode('utf-8'))
+        return tmdb3_repr(u"<{0.__class__.__name__} '{0.character}' on {1}>"
+                .format(self, self._printable_name()))
 
 
 class ReverseCrew( Movie ):
@@ -736,8 +734,8 @@ class ReverseCrew( Movie ):
     job = Datapoint('job')
 
     def __repr__(self):
-        return (u"<{0.__class__.__name__} '{0.job}' for {1}>"
-                .format(self, self._printable_name()).encode('utf-8'))
+        return tmdb3_repr(u"<{0.__class__.__name__} '{0.job}' for {1}>"
+                .format(self, self._printable_name()))
 
 
 class Collection(NameRepr, Element):
