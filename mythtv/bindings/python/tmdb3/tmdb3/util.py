@@ -6,17 +6,26 @@
 # Author: Raymond Wagner
 #-----------------------
 
+from . import IS_PY2
+
 from copy import copy
 from .locales import get_locale
 from .tmdb_auth import get_session
 
 from future.utils import with_metaclass
 
+
+def tmdb3_repr(x):
+    if IS_PY2:
+        return(x.encode('utf-8'))
+    else:
+        return(x)
+
+
 class NameRepr(object):
     """Mixin for __repr__ methods using 'name' attribute."""
     def __repr__(self):
-        return u"<{0.__class__.__name__} '{0.name}'>"\
-                    .format(self).encode('utf-8')
+        return tmdb3_repr(u"<{0.__class__.__name__} '{0.name}'>".format(self))
 
 
 class SearchRepr(object):
@@ -26,7 +35,7 @@ class SearchRepr(object):
     """
     def __repr__(self):
         name = self._name if self._name else self._request._kwargs['query']
-        return u"<Search Results: {0}>".format(name).encode('utf-8')
+        return tmdb3_repr(u"<Search Results: {0}>".format(name))
 
 
 class Poller(object):
@@ -365,6 +374,7 @@ class ElementType( type ):
         attrs['_InitArgs'] = tuple(
                 [a.name for a in sorted(initargs, key=lambda x: x.initarg)])
         return type.__new__(mcs, name, bases, attrs)
+
 
     def __call__(cls, *args, **kwargs):
         obj = cls.__new__(cls)
