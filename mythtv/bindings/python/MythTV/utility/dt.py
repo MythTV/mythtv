@@ -11,10 +11,11 @@ from datetime import datetime as _pydatetime, \
                      tzinfo as _pytzinfo, \
                      timedelta
 from collections import namedtuple
+from future.utils import with_metaclass
 import os
 import re
 import time
-from . import singleton
+from .singleton import InputSingleton
 time.tzset()
 
 class basetzinfo( _pytzinfo ):
@@ -116,12 +117,11 @@ class basetzinfo( _pytzinfo ):
 #    database.
 #    """
 
-class posixtzinfo( basetzinfo ):
+class posixtzinfo( with_metaclass(InputSingleton, basetzinfo) ):
     """
     Customized timezone class that can import timezone data from the local
     POSIX zoneinfo files.
     """
-    __metaclass__ = singleton.InputSingleton
     _Count = namedtuple('Count', \
                         'gmt_indicators std_indicators leap_seconds '+\
                         'transitions types abbrevs')
