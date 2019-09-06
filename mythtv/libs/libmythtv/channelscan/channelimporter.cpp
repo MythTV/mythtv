@@ -65,6 +65,18 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
 
     ScanDTVTransportList transports = _transports;
 
+    // Print some scan parameters
+    {
+        cout << endl << "Scan parameters:" << endl;
+        bool require_av = (m_service_requirements & kRequireAV) == kRequireAV;
+        bool require_a  = (m_service_requirements & kRequireAudio) != 0;
+        cout << "Desired Services            : " << (require_av ? "tv" : require_a ? "radio" : "all") << endl;
+        cout << "Unencrypted Only            : " << (m_fta_only            ? "yes" : "no") << endl;
+        cout << "Logical Channel Numbers     : " << (m_lcn_only            ? "yes" : "no") << endl;
+        cout << "Complete scan data required : " << (m_complete_only       ? "yes" : "no") << endl;
+        cout << "Full search for old channels: " << (m_full_channel_search ? "yes" : "no") << endl;
+    }
+
     // Print out each channel
     if (VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_ANY))
     {
@@ -83,13 +95,22 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
 
     FilterServices(transports);
 
-    // Pull in DB info
+    // Print out each transport
+    uint transports_scanned_size = transports.size();
+    if (VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_ANY))
+    {
+        cout << endl;
+        cout << "Transport list (" << transports_scanned_size << "):" << endl;
+        cout << FormatTransports(transports).toLatin1().constData() << endl;
+    }
+
+    // Pull in DB info in transports
+    // Channels not found in scan but only in DB are returned in db_trans
     sourceid = transports[0].m_channels[0].m_source_id;
     ScanDTVTransportList db_trans = GetDBTransports(sourceid, transports);
 
     // Make sure "Open Cable" channels are marked that way.
     FixUpOpenCable(transports);
-
 
     // All channels in the scan after comparing with the database
     if (VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_ANY))
@@ -101,7 +122,8 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
         cout << endl;
     }
 
-    // If scan was not aborted prematurely..
+    // Add channels from the DB to the channels from the scan
+    // and possibly delete one or more of the off-air channels
     if (m_do_delete)
     {
         ScanDTVTransportList trans = transports;
@@ -125,7 +147,7 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
     cout << FormatChannels(transports, &info).toLatin1().constData() << endl;
 
     // Create summary
-    QString msg = GetSummary(transports.size(), info, stats);
+    QString msg = GetSummary(transports_scanned_size, info, stats);
     cout << msg.toLatin1().constData() << endl << endl;
 
     if (m_do_insert)
@@ -158,6 +180,8 @@ QString ChannelImporter::toString(ChannelType type)
     return "Unknown";
 }
 
+// Ask user what to do with the off-air channels
+//
 uint ChannelImporter::DeleteChannels(
     ScanDTVTransportList &transports)
 {
@@ -977,6 +1001,9 @@ void ChannelImporter::FilterServices(ScanDTVTransportList &transports) const
 /** \fn ChannelImporter::GetDBTransports(uint,ScanDTVTransportList&) const
  *  \brief Adds found channel info to transports list,
  *         returns channels in DB which were not found in scan
+ *         in another transport list. This can be the same transport
+ *         if e.g. one channel is in the DB but not in the scan, but
+ *         it can also contain transports that are not found in the scan.
  */
 ScanDTVTransportList ChannelImporter::GetDBTransports(
     uint sourceid, ScanDTVTransportList &transports) const
@@ -1360,6 +1387,40 @@ QString ChannelImporter::FormatChannels(
         for (size_t j = 0; j < transports[i].m_channels.size(); ++j)
             msg += FormatChannel(transports[i], transports[i].m_channels[j],
                                  info) + "\n";
+
+    return msg;
+}
+
+QString ChannelImporter::FormatTransport(
+    const ScanDTVTransport &transport)
+{
+    QString msg;
+    QTextStream ssMsg(&msg);
+
+    ssMsg << transport.m_modulation.toString().toLatin1().constData() << ":";
+    ssMsg << transport.m_frequency;
+
+    return msg;
+}
+
+QString ChannelImporter::FormatTransports(
+    const ScanDTVTransportList      &transports_in)
+{
+    // Sort transports in order of increasing frequency
+    struct less_than_key
+    {
+        inline bool operator() (const ScanDTVTransport &t1, const ScanDTVTransport &t2)
+        {
+            return t1.m_frequency < t2.m_frequency;
+        }
+    };
+    ScanDTVTransportList transports(transports_in);
+    std::sort(transports.begin(), transports.end(), less_than_key());
+
+    QString msg;
+
+    for (size_t i = 0; i < transports.size(); ++i)
+        msg += FormatTransport(transports[i]) + "\n";
 
     return msg;
 }
