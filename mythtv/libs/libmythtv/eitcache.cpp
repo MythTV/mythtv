@@ -388,9 +388,7 @@ bool EITCache::IsNewEIT(uint chanid,  uint tableid,   uint version,
             tblChgCnt++;
         }
         else if ((extract_table_id(*it) == tableid) &&
-                 ((extract_version(*it) < version) ||
-                  ((extract_version(*it) == kVersionMax) &&
-                   version < kVersionMax)))
+                 (extract_version(*it) != version))
         {
             // EIT updated version on current table
             verChgCnt++;
