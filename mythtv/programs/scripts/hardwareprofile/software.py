@@ -32,7 +32,7 @@ def read_lsb_release():
 initdefault_re = re.compile(r':(\d+):initdefault:')
 
 def read_runlevel():
-    defaultRunlevel = 'Unknown'
+    defaultRunlevel = '9'
     try:
         inittab = file('/etc/inittab').read()
         match = initdefault_re.search(inittab)
