@@ -804,6 +804,31 @@ void VideoOutWindow::ToggleAspectOverride(AspectOverrideMode AspectMode)
     VideoAspectRatioChanged(m_videoAspect);
 }
 
+/*! \brief Check whether the video display rect covers the entire window/framebuffer
+ *
+ * Used to avoid unnecessary screen clearing when possible.
+*/
+bool VideoOutWindow::VideoIsFullScreen(void) const
+{
+    if (IsEmbedding())
+        return false;
+
+    return m_displayVideoRect.contains(m_displayVisibleRect);
+}
+
+/*! \brief Return the region of DisplayVisibleRect that lies outside of DisplayVideoRect
+ *
+ *  \note This assumes VideoIsFullScreen has already been checked
+*/
+#if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
+QRegion VideoOutWindow::GetBoundingRegion(void) const
+{
+    QRegion visible(m_displayVisibleRect);
+    QRegion video(m_displayVideoRect);
+    return visible.subtracted(video);
+}
+#endif
+
 /*
  * \brief Determines PIP Window size and Position.
  */

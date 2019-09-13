@@ -864,6 +864,32 @@ void MythRenderOpenGL::DrawBitmap(MythGLTexture **Textures, uint TextureCount,
     doneCurrent();
 }
 
+static const float kLimitedRangeOffset = (16.0f / 255.0f);
+static const float kLimitedRangeScale  = (219.0f / 255.0f);
+
+/// \brief An optimised method to clear a QRect to the given color
+void MythRenderOpenGL::ClearRect(QOpenGLFramebufferObject *Target, const QRect &Area, int Color)
+{
+    makeCurrent();
+    BindFramebuffer(Target);
+    glEnableVertexAttribArray(VERTEX_INDEX);
+
+    // Set the fill color
+    float color = m_fullRange ? Color / 255.0f : (Color * kLimitedRangeScale) + kLimitedRangeOffset;
+    glVertexAttrib4f(COLOR_INDEX, color, color, color, 255.0f);
+
+    SetShaderProgramParams(m_defaultPrograms[kShaderSimple], m_projection, "u_projection");
+    SetShaderProgramParams(m_defaultPrograms[kShaderSimple], m_transforms.top(), "u_transform");
+
+    GetCachedVBO(GL_TRIANGLE_STRIP, Area);
+    glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(GLfloat), kVertexOffset);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    QOpenGLBuffer::release(QOpenGLBuffer::VertexBuffer);
+    glDisableVertexAttribArray(VERTEX_INDEX);
+    doneCurrent();
+}
+
 void MythRenderOpenGL::DrawRect(QOpenGLFramebufferObject *Target,
                                 const QRect &Area, const QBrush &FillBrush,
                                 const QPen &LinePen, int Alpha)
@@ -876,9 +902,6 @@ void MythRenderOpenGL::DrawRoundRect(QOpenGLFramebufferObject *Target,
                                      const QBrush &FillBrush,
                                      const QPen &LinePen, int Alpha)
 {
-    static const float kLimitedRangeOffset = (16.0f / 255.0f);
-    static const float kLimitedRangeScale  = (219.0f / 255.0f);
-
     makeCurrent();
     BindFramebuffer(Target);
 

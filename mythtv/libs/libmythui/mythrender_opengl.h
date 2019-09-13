@@ -151,6 +151,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     void  DrawRoundRect(QOpenGLFramebufferObject *Target,
                         const QRect &Area, int CornerRadius,
                         const QBrush &FillBrush, const QPen &LinePen, int Alpha);
+    void  ClearRect(QOpenGLFramebufferObject *Target, const QRect &Area, int Color);
 
   public slots:
     void  messageLogged  (const QOpenGLDebugMessage &Message);

@@ -12,6 +12,7 @@
 #include <QSize>
 #include <QRect>
 #include <QPoint>
+#include <QRegion>
 #include <QCoreApplication>
 
 // MythTV headers
@@ -86,6 +87,10 @@ class VideoOutWindow : public QObject
     QRect    GetTotalOSDBounds(void) const;
     QRect    GetPIPRect(PIPLocation  Location, MythPlayer *PiPPlayer  = nullptr,
                         bool DoPixelAdjustment = true) const;
+    bool     VideoIsFullScreen(void) const;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
+    QRegion  GetBoundingRegion(void) const;
+#endif
 
   private:
     void PopulateGeometry        (void);

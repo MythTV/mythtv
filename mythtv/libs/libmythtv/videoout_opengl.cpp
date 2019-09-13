@@ -495,11 +495,33 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, OSD 
     }
 
     m_render->BindFramebuffer(nullptr);
-    if (m_dbLetterboxColour == kLetterBoxColour_Gray25)
-        m_render->SetBackground(127, 127, 127, 255);
-    else
-        m_render->SetBackground(0, 0, 0, 255);
-    m_render->ClearFramebuffer();
+
+    // avoid clearing the framebuffer if it will be entirely overwritten by video
+    if (!m_window.VideoIsFullScreen())
+    {
+        int gray = m_dbLetterboxColour == kLetterBoxColour_Gray25 ? 127 : 0;
+
+#if QT_VERSION < QT_VERSION_CHECK(5, 8, 0)
+        // Qt < 5.8 uses a different QRegion API. Just clear and remove this code
+        // when 5.8 is standard
+        m_render->SetBackground(gray, gray, gray, 255);
+        m_render->ClearFramebuffer();
+#else
+        if (m_window.IsEmbedding())
+        {
+            // use MythRenderOpenGL rendering as it will clear to the appropriate 'black level'
+            m_render->ClearRect(nullptr, m_window.GetDisplayVisibleRect(), gray);
+        }
+        else
+        {
+            // in the vast majority of cases it is significantly quicker to just
+            // clear the unused portions of the screen
+            QRegion toclear = m_window.GetBoundingRegion();
+            for (QRegion::const_iterator it = toclear.begin() ; it != toclear.end(); ++it)
+                m_render->ClearRect(nullptr, *it, gray);
+        }
+#endif
+    }
 
     // time framebuffer clearing
     if (m_openGLPerf)
