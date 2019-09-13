@@ -178,6 +178,9 @@ using_opengl {
     SOURCES += mythpainter_ogl.cpp  mythrender_opengl.cpp
     HEADERS += mythpainter_ogl.h    mythrender_opengl.h
     HEADERS += mythrender_opengl_defs.h mythrender_opengl_shaders.h
+    HEADERS += mythopenglperf.h
+    SOURCES += mythopenglperf.cpp
+
     using_opengles {
         DEFINES += USING_OPENGLES
     }

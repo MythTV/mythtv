@@ -1,12 +1,13 @@
 #ifndef VIDEOOUT_OPENGL_H_
 #define VIDEOOUT_OPENGL_H_
 
-// MythTV headers
+// MythTV
 #include "videooutbase.h"
 #include "openglvideo.h"
 
 class MythRenderOpenGL;
 class MythOpenGLPainter;
+class MythOpenGLPerf;
 
 class VideoOutputOpenGL : public VideoOutput
 {
@@ -63,6 +64,9 @@ class VideoOutputOpenGL : public VideoOutput
     QSize                  m_newVideoDispDim;
     float                  m_newAspect;
     bool                   m_buffersCreated;
+
+    // performance monitoring (-v gpu)
+    MythOpenGLPerf        *m_openGLPerf;
 };
 
 #endif

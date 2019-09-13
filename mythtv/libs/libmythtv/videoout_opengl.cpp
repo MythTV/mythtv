@@ -6,6 +6,7 @@
 #include "videodisplayprofile.h"
 #include "osd.h"
 #include "mythuihelper.h"
+#include "mythopenglperf.h"
 #include "mythrender_opengl.h"
 #include "mythpainter_ogl.h"
 #include "mythcodeccontext.h"
@@ -113,7 +114,8 @@ VideoOutputOpenGL::VideoOutputOpenGL(const QString &Profile)
     m_newVideoDim(),
     m_newVideoDispDim(),
     m_newAspect(0.0f),
-    m_buffersCreated(false)
+    m_buffersCreated(false),
+    m_openGLPerf(nullptr)
 {
     // Setup display switching
     if (gCoreContext->GetBoolSetting("UseVideoModes", false))
@@ -130,6 +132,13 @@ VideoOutputOpenGL::VideoOutputOpenGL(const QString &Profile)
     // Retain and lock
     m_render->IncrRef();
     OpenGLLocker locker(m_render);
+
+    // enable performance monitoring if requested
+    // will report the execution time for the key GL code blocks
+    // N.B. 'Upload' should always be zero when using hardware decoding and direct
+    // rendering. Any copy cost for direct rendering will be included within 'Render'
+    if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
+        m_openGLPerf = new MythOpenGLPerf("GLVidPerf: ", { "Upload:", "Clear:", "Render:", "Flush:", "Swap:" });
 
     // Disallow unsupported video texturing on GLES2
     if (m_render->isOpenGLES() && m_render->format().majorVersion() < 3)
@@ -175,7 +184,12 @@ VideoOutputOpenGL::~VideoOutputOpenGL()
     if (m_openGLVideo)
         delete m_openGLVideo;
     if (m_render)
+    {
+        m_render->makeCurrent();
+        delete m_openGLPerf;
+        m_render->doneCurrent();
         m_render->DecrRef();
+    }
     m_render = nullptr;
 }
 
@@ -380,6 +394,10 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *Frame, OSD */*osd*/,
 
     OpenGLLocker ctx_lock(m_render);
 
+    // start the first timer
+    if (m_openGLPerf)
+        m_openGLPerf->RecordSample();
+
     // Process input changes
     if (m_newCodecId != kCodec_NONE)
     {
@@ -428,6 +446,10 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *Frame, OSD */*osd*/,
     if (m_openGLVideo && swframe && !dummy)
         m_openGLVideo->ProcessFrame(Frame, Scan);
 
+    // time texture update
+    if (m_openGLPerf)
+        m_openGLPerf->RecordSample();
+
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         m_render->logDebugMarker(LOC + "PROCESS_FRAME_END");
 }
@@ -461,12 +483,27 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, OSD 
             Frame = m_videoBuffers.Tail(kVideoBuffer_pause);
     }
 
+    // if process frame has not been called (double rate hardware deint), then
+    // we need to start the first 2 performance timers here
+    if (m_openGLPerf)
+    {
+        if (!m_openGLPerf->GetTimersRunning())
+        {
+            m_openGLPerf->RecordSample();
+            m_openGLPerf->RecordSample();
+        }
+    }
+
     m_render->BindFramebuffer(nullptr);
     if (m_dbLetterboxColour == kLetterBoxColour_Gray25)
         m_render->SetBackground(127, 127, 127, 255);
     else
         m_render->SetBackground(0, 0, 0, 255);
     m_render->ClearFramebuffer();
+
+    // time framebuffer clearing
+    if (m_openGLPerf)
+        m_openGLPerf->RecordSample();
 
     // stereoscopic views
     QRect main   = m_render->GetViewPort();
@@ -559,7 +596,15 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, OSD 
         }
     }
 
+    // time rendering
+    if (m_openGLPerf)
+        m_openGLPerf->RecordSample();
+
     m_render->Flush();
+
+    // time flush
+    if (m_openGLPerf)
+        m_openGLPerf->RecordSample();
 
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         m_render->logDebugMarker(LOC + "PREPARE_FRAME_END");
@@ -627,6 +672,16 @@ void VideoOutputOpenGL::Show(FrameScanType /*scan*/)
         if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
             m_render->logDebugMarker(LOC + "SHOW");
         m_render->swapBuffers();
+        if (m_openGLPerf)
+        {
+            // time buffer swap and log
+            // Results will normally be available on the next pass - and we will typically
+            // test every other frame as a result to avoid blocking in the driver.
+            // With the default of averaging over 30 samples this should give a 30 sample
+            // average over 60 frames
+            m_openGLPerf->RecordSample();
+            m_openGLPerf->LogSamples();
+        }
         m_render->doneCurrent();
     }
 }
