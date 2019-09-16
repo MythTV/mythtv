@@ -138,7 +138,14 @@ VideoOutputOpenGL::VideoOutputOpenGL(const QString &Profile)
     // N.B. 'Upload' should always be zero when using hardware decoding and direct
     // rendering. Any copy cost for direct rendering will be included within 'Render'
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
+    {
         m_openGLPerf = new MythOpenGLPerf("GLVidPerf: ", { "Upload:", "Clear:", "Render:", "Flush:", "Swap:" });
+        if (!m_openGLPerf->isCreated())
+        {
+            delete m_openGLPerf;
+            m_openGLPerf = nullptr;
+        }
+    }
 
     // Disallow unsupported video texturing on GLES2
     if (m_render->isOpenGLES() && m_render->format().majorVersion() < 3)

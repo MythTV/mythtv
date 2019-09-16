@@ -5,6 +5,28 @@
 #include <QVector>
 #include <QOpenGLTimeMonitor>
 
+// QOpenGLTimeMonitor is not available with Qt GLES2 builds
+#if defined(QT_OPENGL_ES_2)
+
+#ifndef GLuint64
+typedef uint64_t GLuint64;
+#endif
+
+class QOpenGLTimeMonitor
+{
+  public:
+    QOpenGLTimeMonitor() {};
+    void setSampleCount(int) {};
+    int  sampleCount() const { return 0; };
+    bool create() { return false; };
+    bool isCreated() const { return false; };
+    int  recordSample() { return 0; };
+    bool isResultAvailable() const { return false; };
+    QVector<GLuint64> waitForIntervals() const { return QVector<GLuint64>(); };
+    void reset() {};
+};
+#endif
+
 // MythTV
 #include "mythuiexp.h"
 
