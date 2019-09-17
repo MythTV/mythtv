@@ -2281,7 +2281,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             bool foundgpudecoder = false;
             if (version && FlagIsSet(kDecodeAllowGPU))
             {
-                MythCodecID hwcodec = MythCodecContext::FindDecoder(dec, m_ic->streams[selTrack], enc, codec);
+                MythCodecID hwcodec = MythCodecContext::FindDecoder(dec, m_ic->streams[selTrack], &enc, &codec);
                 if (hwcodec != kCodec_NONE)
                 {
                     m_video_codec_id = hwcodec;

@@ -28,7 +28,7 @@ MythNVDECContext::MythNVDECContext(DecoderBase *Parent, MythCodecID CodecID)
  * \note Interop support for rendering is implicitly assumed as it only
  * requires an OpenGL context which is checked in HaveNVDEC()
 */
-MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext *Context,
+MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext **Context,
                                                 AVCodec       **Codec,
                                                 const QString  &Decoder,
                                                 AVStream       *Stream,
@@ -39,13 +39,13 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext *Context,
     MythCodecID failure = static_cast<MythCodecID>(kCodec_MPEG1 + (StreamType - 1));
 
     // no brainers
-    if (!Decoder.startsWith("nvdec") || getenv("NO_NVDEC") || !HaveNVDEC() || IsUnsupportedProfile(Context))
+    if (!Decoder.startsWith("nvdec") || getenv("NO_NVDEC") || !HaveNVDEC() || IsUnsupportedProfile(*Context))
         return failure;
 
     // Check actual decoder capabilities. These are loaded statically and in a thread safe
     // manner in HaveNVDEC
     cudaVideoCodec cudacodec = cudaVideoCodec_NumCodecs;
-    switch (Context->codec_id)
+    switch ((*Context)->codec_id)
     {
         case AV_CODEC_ID_MPEG1VIDEO: cudacodec = cudaVideoCodec_MPEG1; break;
         case AV_CODEC_ID_MPEG2VIDEO: cudacodec = cudaVideoCodec_MPEG2; break;
@@ -59,7 +59,7 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext *Context,
     }
 
     cudaVideoChromaFormat cudaformat = cudaVideoChromaFormat_Monochrome;
-    VideoFrameType type = PixelFormatToFrameType(Context->pix_fmt);
+    VideoFrameType type = PixelFormatToFrameType((*Context)->pix_fmt);
     // N.B. on stream changes format is set to CUDA/NVDEC. This may break if the new
     // stream has an unsupported chroma but the decoder should fail gracefully - just later.
     if ((FMT_NVDEC == type) || (format_is_420(type)))
@@ -82,8 +82,8 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext *Context,
             if (((*it).m_codec == cudacodec) && ((*it).m_depth == depth) && ((*it).m_format == cudaformat))
             {
                 // match - now check restrictions
-                int width = Context->width;
-                int height = Context->height;
+                int width = (*Context)->width;
+                int height = (*Context)->height;
                 uint mblocks = static_cast<uint>((width * height) / 256);
                 if (((*it).m_maximum.width() >= width) && ((*it).m_maximum.height() >= height) &&
                     ((*it).m_minimum.width() <= width) && ((*it).m_minimum.height() <= height) &&
@@ -129,7 +129,7 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext *Context,
                             .arg(format_description(type)).arg(depth + 8));
                     *Codec = codec;
                     gCodecMap->freeCodecContext(Stream);
-                    Context = gCodecMap->getCodecContext(Stream, *Codec);
+                    *Context = gCodecMap->getCodecContext(Stream, *Codec);
                     return success;
                 }
                 break;

@@ -55,7 +55,7 @@ int MythMediaCodecContext::InitialiseDecoder(AVCodecContext *Context)
     return 0;
 }
 
-MythCodecID MythMediaCodecContext::GetBestSupportedCodec(AVCodecContext* Context,
+MythCodecID MythMediaCodecContext::GetBestSupportedCodec(AVCodecContext **Context,
                                                          AVCodec       **Codec,
                                                          const QString  &Decoder,
                                                          AVStream       *Stream,
@@ -65,7 +65,7 @@ MythCodecID MythMediaCodecContext::GetBestSupportedCodec(AVCodecContext* Context
     MythCodecID success = static_cast<MythCodecID>((decodeonly ? kCodec_MPEG1_MEDIACODEC_DEC : kCodec_MPEG1_MEDIACODEC) + (StreamType - 1));
     MythCodecID failure = static_cast<MythCodecID>(kCodec_MPEG1 + (StreamType - 1));
 
-    if (!Decoder.startsWith("mediacodec") || IsUnsupportedProfile(Context))
+    if (!Decoder.startsWith("mediacodec") || IsUnsupportedProfile(*Context))
         return failure;
 
     QString decodername = QString((*Codec)->name) + "_mediacodec";
@@ -78,8 +78,8 @@ MythCodecID MythMediaCodecContext::GetBestSupportedCodec(AVCodecContext* Context
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' supports decoding '%2'")
                 .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_MEDIACODEC)).arg((*Codec)->name));        
         gCodecMap->freeCodecContext(Stream);
-        Context = gCodecMap->getCodecContext(Stream, *Codec);
-        Context->pix_fmt = AV_PIX_FMT_MEDIACODEC;
+        *Context = gCodecMap->getCodecContext(Stream, *Codec);
+        (*Context)->pix_fmt = AV_PIX_FMT_MEDIACODEC;
         return success;
     }
 

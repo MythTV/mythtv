@@ -118,27 +118,27 @@ int MythVDPAUContext::InitialiseContext(AVCodecContext* Context)
     return 0;
 }
 
-MythCodecID MythVDPAUContext::GetSupportedCodec(AVCodecContext *Context, AVCodec **Codec, const QString &Decoder,
+MythCodecID MythVDPAUContext::GetSupportedCodec(AVCodecContext **Context, AVCodec **Codec, const QString &Decoder,
                                                 uint StreamType)
 {
     bool decodeonly = Decoder == "vdpau-dec";
     MythCodecID success = static_cast<MythCodecID>((decodeonly ? kCodec_MPEG1_VDPAU_DEC : kCodec_MPEG1_VDPAU) + (StreamType - 1));
     MythCodecID failure = static_cast<MythCodecID>(kCodec_MPEG1 + (StreamType - 1));
 
-    if (!Decoder.startsWith("vdpau") || getenv("NO_VDPAU") || IsUnsupportedProfile(Context))
+    if (!Decoder.startsWith("vdpau") || getenv("NO_VDPAU") || IsUnsupportedProfile(*Context))
         return failure;
 
     // VDPAU only supports 8bit 420p:(
     // N.B. It should probably be possible to force YUVJ420P support
-    VideoFrameType type = PixelFormatToFrameType(Context->pix_fmt);
-    bool vdpau = (type == FMT_YV12) && (AV_PIX_FMT_YUVJ420P != Context->pix_fmt) && MythVDPAUHelper::HaveVDPAU() &&
+    VideoFrameType type = PixelFormatToFrameType((*Context)->pix_fmt);
+    bool vdpau = (type == FMT_YV12) && (AV_PIX_FMT_YUVJ420P != (*Context)->pix_fmt) && MythVDPAUHelper::HaveVDPAU() &&
                  (decodeonly ? codec_is_vdpau_dechw(success) : codec_is_vdpau_hw(success));
     if (vdpau && (success == kCodec_MPEG4_VDPAU || success == kCodec_MPEG4_VDPAU_DEC))
         vdpau = MythVDPAUHelper::HaveMPEG4Decode();
     if (vdpau && (success == kCodec_H264_VDPAU || success == kCodec_H264_VDPAU_DEC))
-        vdpau = MythVDPAUHelper::CheckH264Decode(Context);
+        vdpau = MythVDPAUHelper::CheckH264Decode(*Context);
     if (vdpau && (success == kCodec_HEVC_VDPAU || success == kCodec_HEVC_VDPAU_DEC))
-        vdpau = MythVDPAUHelper::CheckHEVCDecode(Context);
+        vdpau = MythVDPAUHelper::CheckHEVCDecode(*Context);
 
     if (!vdpau)
     {
@@ -151,7 +151,7 @@ MythCodecID MythVDPAUContext::GetSupportedCodec(AVCodecContext *Context, AVCodec
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' supports decoding '%2 %3'")
             .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_VDPAU)).arg((*Codec)->name)
             .arg(format_description(type)));
-    Context->pix_fmt = AV_PIX_FMT_VDPAU;
+    (*Context)->pix_fmt = AV_PIX_FMT_VDPAU;
     return success;
 }
 

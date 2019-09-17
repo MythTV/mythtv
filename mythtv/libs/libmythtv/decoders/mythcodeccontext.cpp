@@ -167,23 +167,23 @@ void MythCodecContext::GetDecoders(render_opts &Opts)
 }
 
 MythCodecID MythCodecContext::FindDecoder(const QString &Decoder, AVStream *Stream,
-                                          AVCodecContext *Context, AVCodec *Codec)
+                                          AVCodecContext **Context, AVCodec **Codec)
 {
     MythCodecID result = kCodec_NONE;
-    uint streamtype = mpeg_version(Context->codec_id);
+    uint streamtype = mpeg_version((*Context)->codec_id);
 
 #ifdef USING_VDPAU
-    result = MythVDPAUContext::GetSupportedCodec(Context, &Codec, Decoder, streamtype);
+    result = MythVDPAUContext::GetSupportedCodec(Context, Codec, Decoder, streamtype);
     if (codec_is_vdpau_hw(result) || codec_is_vdpau_dechw(result))
         return result;
 #endif
 #ifdef USING_VAAPI
-    result = MythVAAPIContext::GetSupportedCodec(Context, &Codec, Decoder, streamtype);
+    result = MythVAAPIContext::GetSupportedCodec(Context, Codec, Decoder, streamtype);
     if (codec_is_vaapi(result) || codec_is_vaapi_dec(result))
         return result;
 #endif
 #ifdef USING_VTB
-    result = MythVTBContext::GetSupportedCodec(Context, &Codec, Decoder, streamtype);
+    result = MythVTBContext::GetSupportedCodec(Context, Codec, Decoder, streamtype);
     if (codec_is_vtb(result) || codec_is_vtb_dec(result))
         return result;
 #endif
@@ -193,22 +193,22 @@ MythCodecID MythCodecContext::FindDecoder(const QString &Decoder, AVStream *Stre
         return result;
 #endif
 #ifdef USING_MEDIACODEC
-    result = MythMediaCodecContext::GetBestSupportedCodec(Context, &Codec, Decoder, Stream, streamtype);
+    result = MythMediaCodecContext::GetBestSupportedCodec(Context, Codec, Decoder, Stream, streamtype);
     if (codec_is_mediacodec(result) || codec_is_mediacodec_dec(result))
         return result;
 #endif
 #ifdef USING_NVDEC
-    result = MythNVDECContext::GetSupportedCodec(Context, &Codec, Decoder, Stream, streamtype);
+    result = MythNVDECContext::GetSupportedCodec(Context, Codec, Decoder, Stream, streamtype);
     if (codec_is_nvdec(result) || codec_is_nvdec_dec(result))
         return result;
 #endif
 #ifdef USING_V4L2
-    result = MythV4L2M2MContext::GetSupportedCodec(Context, &Codec, Decoder, Stream, streamtype);
+    result = MythV4L2M2MContext::GetSupportedCodec(Context, Codec, Decoder, Stream, streamtype);
     if (codec_is_v4l2_dec(result))
         return result;
 #endif
 #ifdef USING_MMAL
-    result = MythMMALContext::GetSupportedCodec(Context, &Codec, Decoder, Stream, streamtype);
+    result = MythMMALContext::GetSupportedCodec(Context, Codec, Decoder, Stream, streamtype);
     if (codec_is_mmal_dec(result) || codec_is_mmal(result))
         return result;
 #endif

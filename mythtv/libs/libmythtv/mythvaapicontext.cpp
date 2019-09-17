@@ -127,7 +127,7 @@ inline AVPixelFormat MythVAAPIContext::FramesFormat(AVPixelFormat Format)
 
 /*! \brief Confirm whether VAAPI support is available given Decoder and Context
 */
-MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext *Context,
+MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext **Context,
                                                 AVCodec **Codec,
                                                 const QString &Decoder,
                                                 uint StreamType)
@@ -140,7 +140,7 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext *Context,
         return failure;
 
     // Simple check for known profile
-    VAProfile desired = VAAPIProfileForCodec(Context);
+    VAProfile desired = VAAPIProfileForCodec(*Context);
     if (desired == VAProfileNone)
         return failure;
 
@@ -184,9 +184,9 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext *Context,
 
         if (constraints)
         {
-            if ((constraints->min_width > Context->width) || (constraints->min_height > Context->height))
+            if ((constraints->min_width > (*Context)->width) || (constraints->min_height > (*Context)->height))
                 sizeok = false;
-            if ((constraints->max_width < Context->width) || (constraints->max_height < Context->height))
+            if ((constraints->max_width < (*Context)->width) || (constraints->max_height < (*Context)->height))
                 sizeok = false;
             av_hwframe_constraints_free(&constraints);
         }
@@ -226,8 +226,8 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext *Context,
         }
 
         // use JPEG support as a proxy for MJPEG (full range YUV)
-        if (foundentry && ((AV_PIX_FMT_YUVJ420P == Context->pix_fmt || AV_PIX_FMT_YUVJ422P == Context->pix_fmt ||
-                            AV_PIX_FMT_YUVJ444P == Context->pix_fmt)))
+        if (foundentry && ((AV_PIX_FMT_YUVJ420P == (*Context)->pix_fmt || AV_PIX_FMT_YUVJ422P == (*Context)->pix_fmt ||
+                            AV_PIX_FMT_YUVJ444P == (*Context)->pix_fmt)))
         {
             bool jpeg = false;
             if (vaQueryConfigEntrypoints(hwctx->display, VAProfileJPEGBaseline, entrylist, &count) == VA_STATUS_SUCCESS)
@@ -254,8 +254,8 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext *Context,
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' supports decoding '%2 %3'")
                 .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_VAAPI)).arg((*Codec)->name)
-                .arg(av_get_pix_fmt_name(Context->pix_fmt)));
-        Context->pix_fmt = AV_PIX_FMT_VAAPI;
+                .arg(av_get_pix_fmt_name((*Context)->pix_fmt)));
+        (*Context)->pix_fmt = AV_PIX_FMT_VAAPI;
         return success;
     }
 
@@ -263,7 +263,7 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext *Context,
             QString("HW device type '%1' does not support '%2 %7' (Size:%3 Profile:%4 Entry: %5)")
             .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_VAAPI)).arg((*Codec)->name)
             .arg(sizeok).arg(foundprofile).arg(foundentry)
-            .arg(av_get_pix_fmt_name(Context->pix_fmt)));
+            .arg(av_get_pix_fmt_name((*Context)->pix_fmt)));
     return failure;
 }
 

@@ -8,7 +8,7 @@ class MythV4L2M2MContext : public MythCodecContext
 {
   public:
     MythV4L2M2MContext(DecoderBase *Parent, MythCodecID CodecID);
-    static MythCodecID GetSupportedCodec (AVCodecContext *Context,
+    static MythCodecID GetSupportedCodec (AVCodecContext **Context,
                                           AVCodec       **Codec,
                                           const QString  &Decoder,
                                           AVStream       *Stream,

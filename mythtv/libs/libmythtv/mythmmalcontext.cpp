@@ -25,7 +25,7 @@ MythMMALContext::~MythMMALContext()
         m_interop->DecrRef();
 }
 
-MythCodecID MythMMALContext::GetSupportedCodec(AVCodecContext *Context,
+MythCodecID MythMMALContext::GetSupportedCodec(AVCodecContext **Context,
                                                AVCodec **Codec,
                                                const QString &Decoder,
                                                AVStream *Stream,
@@ -107,8 +107,8 @@ MythCodecID MythMMALContext::GetSupportedCodec(AVCodecContext *Context,
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Found MMAL/FFmpeg decoder '%1'").arg(name));
     *Codec = codec;    
     gCodecMap->freeCodecContext(Stream);
-    Context = gCodecMap->getCodecContext(Stream, *Codec);
-    Context->pix_fmt = decodeonly ? Context->pix_fmt : AV_PIX_FMT_MMAL;
+    *Context = gCodecMap->getCodecContext(Stream, *Codec);
+    (*Context)->pix_fmt = decodeonly ? (*Context)->pix_fmt : AV_PIX_FMT_MMAL;
     return success;
 }
 

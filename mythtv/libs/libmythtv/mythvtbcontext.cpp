@@ -102,7 +102,7 @@ bool MythVTBContext::CheckDecoderSupport(uint StreamType, AVCodec **Codec)
     return true;
 }
 
-MythCodecID MythVTBContext::GetSupportedCodec(AVCodecContext *Context,
+MythCodecID MythVTBContext::GetSupportedCodec(AVCodecContext **Context,
                                               AVCodec **Codec,
                                               const QString &Decoder,
                                               uint StreamType)
@@ -111,14 +111,14 @@ MythCodecID MythVTBContext::GetSupportedCodec(AVCodecContext *Context,
     MythCodecID success = static_cast<MythCodecID>((decodeonly ? kCodec_MPEG1_VTB_DEC : kCodec_MPEG1_VTB) + (StreamType - 1));
     MythCodecID failure = static_cast<MythCodecID>(kCodec_MPEG1 + (StreamType - 1));
 
-    if (!Decoder.startsWith("vtb") || IsUnsupportedProfile(Context))
+    if (!Decoder.startsWith("vtb") || IsUnsupportedProfile(*Context))
         return failure;
 
     // Check decoder support
     if (!CheckDecoderSupport(StreamType, Codec))
         return failure;
 
-    Context->pix_fmt = AV_PIX_FMT_VIDEOTOOLBOX;
+    (*Context)->pix_fmt = AV_PIX_FMT_VIDEOTOOLBOX;
     return success;
 }
 

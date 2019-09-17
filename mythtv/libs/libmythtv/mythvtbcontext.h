@@ -23,7 +23,7 @@ class MythVTBContext : public MythCodecContext
                                           VideoFrame* Frame,
                                           AVFrame* AvFrame) override;
     int    HwDecoderInit                 (AVCodecContext *Context) override;
-    static MythCodecID GetSupportedCodec (AVCodecContext *Context,
+    static MythCodecID GetSupportedCodec (AVCodecContext **Context,
                                           AVCodec       **Codec,
                                           const QString  &Decoder,
                                           uint            StreamType);

@@ -40,7 +40,7 @@ inline uint32_t V4L2CodecType(AVCodecID Id)
     }
     return 0;
 }
-MythCodecID MythV4L2M2MContext::GetSupportedCodec(AVCodecContext *Context,
+MythCodecID MythV4L2M2MContext::GetSupportedCodec(AVCodecContext **Context,
                                                   AVCodec **Codec,
                                                   const QString &Decoder,
                                                   AVStream *Stream,
@@ -78,8 +78,8 @@ MythCodecID MythV4L2M2MContext::GetSupportedCodec(AVCodecContext *Context,
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Found V4L2/FFmpeg decoder '%1'").arg(name));
     *Codec = codec;
     gCodecMap->freeCodecContext(Stream);
-    Context = gCodecMap->getCodecContext(Stream, *Codec);
-    Context->pix_fmt = decodeonly ? Context->pix_fmt : AV_PIX_FMT_DRM_PRIME;
+    *Context = gCodecMap->getCodecContext(Stream, *Codec);
+    (*Context)->pix_fmt = decodeonly ? (*Context)->pix_fmt : AV_PIX_FMT_DRM_PRIME;
     return success;
 }
 
