@@ -259,7 +259,10 @@ bool MythV4L2M2MContext::HaveV4L2Codecs(AVCodecID Codec /* = AV_CODEC_ID_NONE */
                             break;
                         // this is a bit of a shortcut
                         if (fdesc.pixelformat == V4L2_PIX_FMT_YUV420 ||
-                            fdesc.pixelformat == V4L2_PIX_FMT_NV12)
+                            fdesc.pixelformat == V4L2_PIX_FMT_NV12   ||
+                            fdesc.pixelformat == V4L2_PIX_FMT_NV12M  ||
+                            fdesc.pixelformat == V4L2_PIX_FMT_NV21   ||
+                            fdesc.pixelformat == V4L2_PIX_FMT_NV21M)
                         {
                             if (!s_supportedV4L2Codecs.contains(codec))
                                 s_supportedV4L2Codecs.append(codec);
