@@ -139,6 +139,7 @@ void ScanWizard::Scan()
                            DoFreeToAirOnly(),
                            DoChannelNumbersOnly(),
                            DoCompleteChannelsOnly(),
+                           DoFullChannelSearch(),
                            GetServiceRequirements());
         ci.Process(transports, sourceid);
     }
@@ -182,6 +183,7 @@ void ScanWizard::Scan()
             DoIgnoreSignalTimeout(),  DoFollowNIT(),
             DoTestDecryption(),       DoFreeToAirOnly(),
             DoChannelNumbersOnly(),   DoCompleteChannelsOnly(),
+            DoFullChannelSearch(),
             DoAddFullTS(),            GetServiceRequirements(),
             // stuff needed for particular scans
             GetMultiplex(),         start_chan,

@@ -191,7 +191,7 @@ class MythBackend {
     // Parse the records, starting at the offset point
         $row = 0;
         $col = 0;
-        $count = count($records);
+        $count = (is_array($records) ? count($records) : 0);
         for($i = $offset; $i < $count; $i++) {
             $rows[$row][$col] = $records[$i];
         // Every $NUMPROGRAMLINES fields (0 through ($NUMPROGRAMLINES-1)) means

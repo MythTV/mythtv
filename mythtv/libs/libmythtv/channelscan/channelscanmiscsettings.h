@@ -141,16 +141,33 @@ class CompleteChannelsOnly : public TransMythUICheckBoxSetting
   public:
     CompleteChannelsOnly()
     {
-        setValue(false);
+        setValue(true);
         setLabel(QObject::tr("Complete scan data required"));
         setHelpText(
             QObject::tr(
                 "If set, only services that are present in the PAT, the PMT "
                 "and the SDT and that have a name will be added during the scan. "
-                "On satellites there are typically many incomplete "
-                "channels, such as feeds and offline channels, "
-                "that are not useful in a typical MythTV system. "
+                "On satellites there are many incomplete channels, "
+                "such as feeds and offline channels, "
+                "that are not useful in a MythTV system. "
                 "These are filtered out by this option."));
+    };
+};
+
+class FullChannelSearch : public TransMythUICheckBoxSetting
+{
+  public:
+    FullChannelSearch()
+    {
+        setValue(false);
+        setLabel(QObject::tr("Full search for old channels"));
+        setHelpText(
+            QObject::tr(
+                "If set, compare all channels in the database with the channels found in "
+                "the scan; otherwise only the channels in the same transport are compared. "
+                "This option is useful when you want to keep channel data such as "
+                "the xmltvid and the icon path when doing a rescan "
+                "after channels have been rearranged across transports."));
     };
 };
 

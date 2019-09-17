@@ -133,7 +133,7 @@ QStringList DTVSignalMonitor::GetStatusList(void) const
         list<<m_seenCrypt.GetName()<<m_seenCrypt.GetStatus();
         list<<m_matchingCrypt.GetName()<<m_matchingCrypt.GetStatus();
     }
-    if (m_error != "")
+    if (!m_error.isEmpty())
     {
         list<<"error"<<m_error;
     }

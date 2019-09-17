@@ -72,7 +72,7 @@ import "/tv/js/tvutil.qjs"
 
     // Actually fetch the guide data
     //var PAGEINTERVAL = 10 * numPages;
-    var guideResult = guide.GetProgramGuide(guideStartTime, fetchEndTime, true, channelGroup, startIndex, 0);
+    var guideResult = guide.GetProgramGuide(guideStartTime, fetchEndTime, true, channelGroup, startIndex, 0, false);
     var channelList = guideResult.Channels;
 
     //var nextStartIndex = (startIndex + PAGEINTERVAL);

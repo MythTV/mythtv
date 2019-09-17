@@ -556,12 +556,12 @@ void MythUIGuideGrid::drawBackground(MythPainter *p, int xoffset, int yoffset, U
         {
             if (area.bottom() < m_progPastCol)
             {
-                fillColor = fillColor.dark();
+                fillColor = fillColor.darker();
                 area.adjust(breakin, breakin, -breakin, -breakin);
             }
             else
             {
-                overColor = fillColor.dark();
+                overColor = fillColor.darker();
                 int first = m_progPastCol - area.top();
                 int second = area.height() - first;
                 overArea = area;
@@ -582,12 +582,12 @@ void MythUIGuideGrid::drawBackground(MythPainter *p, int xoffset, int yoffset, U
         {
             if (area.right() < m_progPastCol)
             {
-                fillColor = fillColor.dark();
+                fillColor = fillColor.darker();
                 area.adjust(breakin, breakin, -breakin, -breakin);
             }
             else
             {
-                overColor = fillColor.dark();
+                overColor = fillColor.darker();
                 int first = m_progPastCol - area.left();
                 int second = area.width() - first;
                 overArea = area;

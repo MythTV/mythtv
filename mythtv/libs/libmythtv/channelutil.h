@@ -147,6 +147,7 @@ class MTV_PUBLIC ChannelUtil
         uint channel_id, const IPTVTuningData &tuning);
 
     static void    UpdateInsertInfoFromDB(ChannelInsertInfo &chan);
+    static void    UpdateChannelNumberFromDB(ChannelInsertInfo &chan);
 
     static bool    DeleteChannel(uint channel_id);
 

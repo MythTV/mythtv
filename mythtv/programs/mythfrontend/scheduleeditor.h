@@ -361,6 +361,7 @@ class MetadataOptions : public SchedEditChild
     bool Create(void) override; // MythScreenType
 
   protected slots:
+    void ClearInetref();
     void PerformQuery();
     void SelectLocalFanart();
     void SelectLocalCoverart();
@@ -414,6 +415,7 @@ class MetadataOptions : public SchedEditChild
     MythUISpinBox   *m_seasonSpin {nullptr};
     MythUISpinBox   *m_episodeSpin {nullptr};
 
+    MythUIButton    *m_inetrefClear {nullptr};
     MythUIButton    *m_queryButton {nullptr};
     MythUIButton    *m_localFanartButton {nullptr};
     MythUIButton    *m_localCoverartButton {nullptr};

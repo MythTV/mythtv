@@ -65,7 +65,8 @@ class SERVICE_PUBLIC GuideServices : public Service  //, public QScriptable ???
                                                           bool             Details,
                                                           int              ChannelGroupId,
                                                           int              StartIndex,
-                                                          int              Count) = 0;
+                                                          int              Count,
+                                                          bool             WithInvisible) = 0;
 
         virtual DTC::ProgramList*   GetProgramList      ( int              StartIndex,
                                                           int              Count,
@@ -79,7 +80,8 @@ class SERVICE_PUBLIC GuideServices : public Service  //, public QScriptable ???
                                                           bool             OnlyNew,
                                                           bool             Details,
                                                           const QString   &Sort,
-                                                          bool             Descending ) = 0;
+                                                          bool             Descending,
+                                                          bool             WithInvisible) = 0;
 
         virtual DTC::Program*       GetProgramDetails   ( int              ChanId,
                                                           const QDateTime &StartTime ) = 0;

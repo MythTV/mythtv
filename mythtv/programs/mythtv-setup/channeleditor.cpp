@@ -2,6 +2,7 @@
 #include <QCoreApplication>
 
 // MythTV
+#include "mythcorecontext.h"
 #include "mythprogressdialog.h"
 #include "mythuibuttonlist.h"
 #include "channelsettings.h"
@@ -508,6 +509,55 @@ void ChannelEditor::menu()
 void ChannelEditor::scan(void)
 {
 #ifdef USING_BACKEND
+
+    // Check if we have a video source selected
+    uint cardid = 0;
+    if (m_sourceFilter < 1)
+    {
+        MythConfirmationDialog *md = ShowOkPopup(QObject::tr(
+            "Please select a video source. 'All' cannot be used. "
+            "If you do not have a video source then "
+            "create one in the 'Video sources' menu page."));
+        WaitFor(md);
+        return;
+    }
+
+    // Check that the video source is connected to a capture card
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT capturecard.cardid "
+        "FROM capturecard, videosource "
+        "WHERE capturecard.sourceid = videosource.sourceid AND "
+        "      hostname             = :HOSTNAME            AND "
+        "      capturecard.sourceid = :SOURCEID            AND "
+        "      capturecard.parentid = 0");
+
+    query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
+    query.bindValue(":SOURCEID", m_sourceFilter);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythDB::DBError("ChannelEditor::scan()", query);
+        return;
+    }
+    if (query.next())
+    {
+        cardid = query.value(0).toUInt();
+    }
+
+    if (cardid < 1)
+    {
+        MythConfirmationDialog *md = ShowOkPopup(QObject::tr(
+            "No capture card!"
+            "\n"
+            "Please connect video source '%1' to a capture card "
+            "in the 'Input Connections' menu page.")
+            .arg(m_sourceFilterName));
+        WaitFor(md);
+        return;
+    }
+
+    // Create the dialog now that we have a video source and a capture card
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     StandardSettingDialog *ssd =
         new StandardSettingDialog(mainStack, "scanwizard",

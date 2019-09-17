@@ -94,10 +94,10 @@ class MTV_PUBLIC TSHeader
     bool HasPayload(void) const { return bool(_tsdata[3] & 0x10); }
 
     bool GetDiscontinuityIndicator(void) const
-    { return AdaptationFieldSize() > 0 && bool(_tsdata[5] & 0x80); }
+    { return AdaptationFieldSize() > 0 && bool(data()[5] & 0x80); }
 
     bool HasPCR(void) const { return AdaptationFieldSize() > 0 &&
-                              bool(_tsdata[5] & 0x10); }
+                              bool(data()[5] & 0x10); }
 
     /*
       The PCR field is a 42 bit field in the adaptation field of the
@@ -107,16 +107,16 @@ class MTV_PUBLIC TSHeader
     */
     // The high-order 33bits (of the 48 total) are the 90kHz clock
     int64_t GetPCRbase(void) const
-    { return ((static_cast<int64_t>(_tsdata[6]) << 25) |
-              (static_cast<int64_t>(_tsdata[7]) << 17) |
-              (static_cast<int64_t>(_tsdata[8]) << 9)  |
-              (static_cast<int64_t>(_tsdata[9]) << 1)  |
-              (_tsdata[10] >> 7)); }
+    { return ((static_cast<int64_t>(data()[6]) << 25) |
+              (static_cast<int64_t>(data()[7]) << 17) |
+              (static_cast<int64_t>(data()[8]) << 9)  |
+              (static_cast<int64_t>(data()[9]) << 1)  |
+              (data()[10] >> 7)); }
 
     // The low-order 9 bits (of the 48 total) are the 27MHz clock
     int32_t GetPCRext(void) const
-    { return (((static_cast<int32_t>(_tsdata[10]) & 0x1) << 8) |
-              static_cast<int32_t>(_tsdata[11])); }
+    { return (((static_cast<int32_t>(data()[10]) & 0x1) << 8) |
+              static_cast<int32_t>(data()[11])); }
 
     // PCR in a 27MHz clock
     int64_t GetPCRraw(void) const

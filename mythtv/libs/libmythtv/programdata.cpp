@@ -608,6 +608,54 @@ uint DBEvent::UpdateDB(
     return UpdateDB(q, chanid, p[match]);
 }
 
+// Update starttime in table record for single recordings
+// when the starttime of a program is changed.
+//
+// Return the number of rows affected:
+// 0    if program is not found in table record
+// 1    if program is found and updated
+//
+static int change_record(MSqlQuery &query, uint chanid,
+                          const QDateTime &old_starttime,
+                          const QDateTime &new_starttime)
+{
+    query.prepare("UPDATE record "
+                   "SET starttime = :NEWSTARTTIME, "
+                   "    startdate = :NEWSTARTDATE "
+                   "WHERE chanid  = :CHANID "
+                   "AND type      = :TYPE "
+                   "AND search    = :SEARCH "
+                   "AND starttime = :OLDSTARTTIME "
+                   "AND startdate = :OLDSTARTDATE ");
+    query.bindValue(":CHANID",       chanid);
+    query.bindValue(":TYPE",         kSingleRecord);
+    query.bindValue(":SEARCH",       kNoSearch);
+    query.bindValue(":OLDSTARTTIME", old_starttime.time());
+    query.bindValue(":OLDSTARTDATE", old_starttime.date());
+    query.bindValue(":NEWSTARTTIME", new_starttime.time());
+    query.bindValue(":NEWSTARTDATE", new_starttime.date());
+
+    int rows = 0;
+    if (!query.exec() || !query.isActive())
+    {
+        MythDB::DBError("Updating record", query);
+    }
+    else
+    {
+        rows = query.numRowsAffected();
+    }
+    if (rows > 0)
+    {
+        LOG(VB_EIT, LOG_DEBUG,
+            QString("EIT: Updated record: chanid:%1 old:%3 new:%4 rows:%5")
+            .arg(chanid)
+            .arg(old_starttime.toString(Qt::ISODate))
+            .arg(new_starttime.toString(Qt::ISODate))
+            .arg(rows));
+    }
+    return rows;
+}
+
 // Update matched item with current data.
 //
 uint DBEvent::UpdateDB(
@@ -622,6 +670,22 @@ uint DBEvent::UpdateDB(
     QString  lseriesId        = m_seriesId;
     QString  linetref         = m_inetref;
     QDate    loriginalairdate = m_originalairdate;
+
+    // Update starttime also in database table record so that
+    // tables program and record remain consistent.
+    if (m_starttime != match.m_starttime)
+    {
+        QDateTime const &old_starttime = match.m_starttime;
+        QDateTime const &new_starttime = m_starttime;
+        change_record(query, chanid, old_starttime, new_starttime);
+
+        LOG(VB_EIT, LOG_DEBUG,
+            QString("EIT: (U) change starttime from %1 to %2 for chanid:%3 program '%4' ")
+                    .arg(old_starttime.toString(Qt::ISODate))
+                    .arg(new_starttime.toString(Qt::ISODate))
+                    .arg(chanid)
+                    .arg(m_title.left(35)));
+    }
 
     if (ltitle.isEmpty() && !match.m_title.isEmpty())
         ltitle = match.m_title;
@@ -970,10 +1034,14 @@ bool DBEvent::MoveOutOfTheWayDB(
             return delete_program(query, chanid, prog.m_starttime);
         }
         LOG(VB_EIT, LOG_DEBUG,
-            QString("EIT: change '%1' starttime to %2")
-                    .arg(prog.m_title.left(35))
-                    .arg(m_endtime.toString(Qt::ISODate)));
+            QString("EIT: (M) change starttime from %1 to %2 for chanid:%3 program '%4' ")
+                    .arg(prog.m_starttime.toString(Qt::ISODate))
+                    .arg(m_endtime.toString(Qt::ISODate))
+                    .arg(chanid)
+                    .arg(prog.m_title.left(35)));
 
+        // Update starttime in tables record and program so they stay consistent.
+        change_record(query, chanid, prog.m_starttime, m_endtime);
         return change_program(query, chanid, prog.m_starttime,
                               m_endtime,        // New start time is our endtime
                               prog.m_endtime);  // Keep the end time

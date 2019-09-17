@@ -498,7 +498,7 @@ QString getSymlinkTarget(const QString &start_file,
     }
 
     for (uint i = 0; (i <= maxLinks) && fi.isSymLink() &&
-             !(link = fi.readLink()).isEmpty(); i++)
+             !(link = fi.symLinkTarget()).isEmpty(); i++)
     {
         cur_file = (link[0] == '/') ?
             link : // absolute link

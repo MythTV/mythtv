@@ -585,10 +585,9 @@ QStringList CardUtil::ProbeDeliverySystems(const QString &device)
         return delsyslist;
     }
 
-    struct dtv_property prop;
-    struct dtv_properties cmd;
+    struct dtv_property prop = {};
+    struct dtv_properties cmd = {};
 
-    memset(&prop, 0, sizeof(prop));
     prop.cmd = DTV_API_VERSION;
     cmd.num = 1;
     cmd.props = &prop;
@@ -631,17 +630,15 @@ QStringList CardUtil::ProbeDeliverySystems(int fd_frontend)
     QStringList delsyslist;
 
 #ifdef USING_DVB
-    unsigned int i;
-    struct dtv_property prop;
-    struct dtv_properties cmd;
+    struct dtv_property prop = {};
+    struct dtv_properties cmd = {};
 
-    memset(&prop, 0, sizeof(prop));
     prop.cmd = DTV_ENUM_DELSYS;
     cmd.num = 1;
     cmd.props = &prop;
     if (ioctl(fd_frontend, FE_GET_PROPERTY, &cmd) == 0)
     {
-        for (i = 0; i < prop.u.buffer.len; i++)
+        for (int i = 0; i < prop.u.buffer.len; i++)
         {
             delsyslist.push_back(DTVModulationSystem::toString(prop.u.buffer.data[i]));
         }
@@ -869,10 +866,9 @@ DTVModulationSystem CardUtil::ProbeCurrentDeliverySystem(int fd_frontend)
     DTVModulationSystem delsys;
 
 #ifdef USING_DVB
-    struct dtv_property prop;
-    struct dtv_properties cmd;
+    struct dtv_property prop = {};
+    struct dtv_properties cmd = {};
 
-    memset(&prop, 0, sizeof(prop));
     prop.cmd = DTV_DELIVERY_SYSTEM;
     // prop.u.data = delsys;
     cmd.num = 1;
@@ -882,7 +878,7 @@ DTVModulationSystem CardUtil::ProbeCurrentDeliverySystem(int fd_frontend)
     if (ret < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("FE_GET_PROPERTY ioctl failed (fd:%1)")
+            QString("FE_GET_PROPERTY ioctl failed (fd_frontend:%1)")
                 .arg(fd_frontend) + ENO);
         return delsys;
 	}
@@ -1108,7 +1104,7 @@ int CardUtil::SetDeliverySystem(uint inputid, DTVModulationSystem delsys)
         LOG(VB_GENERAL, LOG_ERR, 
             QString("CardUtil[%1]: ").arg(inputid) +
             QString("open failed (%1)").arg(device) + ENO);
-        return errno;
+        return ret;
     }
     ret = SetDeliverySystem(inputid, delsys, fd_frontend);
 
@@ -1150,10 +1146,9 @@ int CardUtil::SetDeliverySystem(uint inputid, DTVModulationSystem delsys, int fd
         QString("CardUtil[%1]: ").arg(inputid) +
         QString("Set delivery system: %1").arg(delsys.toString()));
 
-    struct dtv_property prop;
-    struct dtv_properties cmd;
+    struct dtv_property prop = {};
+    struct dtv_properties cmd = {};
 
-    memset(&prop, 0, sizeof(prop));
     prop.cmd = DTV_DELIVERY_SYSTEM;
     prop.u.data = delsys;
     cmd.num = 1;
@@ -1195,7 +1190,6 @@ int CardUtil::OpenVideoDevice(const QString &device)
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Can't open DVB frontend (%1) for %2.")
                 .arg(dvbdev).arg(device) + ENO);
-        return errno;
     }
     return fd_frontend;
 }

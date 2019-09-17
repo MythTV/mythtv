@@ -13,8 +13,6 @@ class SERVICE_PUBLIC RecStatus : public QObject
   Q_OBJECT
 
   public:
-    Q_ENUMS(Type)
-
     enum Type {
         Pending = -15,
         Failing = -14,
@@ -46,6 +44,7 @@ class SERVICE_PUBLIC RecStatus : public QObject
         Offline = 12
         //OtherShowing = 13 (obsolete)
     }; // note stored in int8_t in ProgramInfo
+    Q_ENUM(Type)
 
     static QString toUIState(Type);
     static QString toString(Type, uint id);

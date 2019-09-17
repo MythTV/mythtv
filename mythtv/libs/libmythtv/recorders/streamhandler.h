@@ -122,6 +122,7 @@ class StreamHandler : protected MThread, public DeviceReaderCB
     // blends these into a single class.
     volatile bool       m_bError                {false};
     bool                m_running               {false};
+    bool                m_restarting            {false};
     bool                m_using_buffering       {false};
     bool                m_using_section_reader  {false};
     QWaitCondition      m_running_state_changed;

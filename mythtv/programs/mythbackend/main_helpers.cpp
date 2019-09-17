@@ -55,6 +55,7 @@
 #include "mythtimezone.h"
 #include "signalhandling.h"
 #include "hardwareprofile.h"
+#include "eitcache.h"
 
 #include "mediaserver.h"
 #include "httpstatus.h"
@@ -604,6 +605,11 @@ int run_backend(MythBackendCommandLineParser &cmdline)
     else
     {
         LOG(VB_GENERAL, LOG_NOTICE, LOC + "Running as a slave backend.");
+    }
+
+   if (ismaster)
+    {
+        EITCache::ClearChannelLocks();
     }
 
     print_warnings(cmdline);

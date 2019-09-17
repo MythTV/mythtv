@@ -51,13 +51,13 @@ QString EITCache::GetStatistics(void) const
 {
     QMutexLocker locker(&m_eventMapLock);
     return QString(
-        "EITCache::statistics: Accesses: %1, Hits: %2, "
-        "Table Upgrades %3, New Versions: %4, New Endtimes: %5, Entries: %6, "
-        "Pruned Entries: %7, Pruned Hits: %8, Future Hits: %9, Wrong Channel Hits %10, "
-        "Hit Ratio %11.")
-        .arg(m_accessCnt).arg(m_hitCnt).arg(m_tblChgCnt).arg(m_verChgCnt).arg(m_endChgCnt)
-        .arg(m_entryCnt).arg(m_pruneCnt).arg(m_prunedHitCnt).arg(m_futureHitCnt)
-        .arg(m_wrongChannelHitCnt)
+        "EITCache stats: Access:%1 Hits:%2 "
+        "Table:%3 Version:%4 Endtime:%5 New:%6 "
+        "Pruned:%7 Pruned Hits:%8 Future:%9 Wrong Channel:%10 "
+        "Hit Ratio:%11")
+        .arg(m_accessCnt).arg(m_hitCnt)
+        .arg(m_tblChgCnt).arg(m_verChgCnt).arg(m_endChgCnt).arg(m_entryCnt)
+        .arg(m_pruneCnt).arg(m_prunedHitCnt).arg(m_futureHitCnt).arg(m_wrongChannelHitCnt)
         .arg((m_hitCnt+m_prunedHitCnt+m_futureHitCnt+m_wrongChannelHitCnt)/(double)m_accessCnt);
 }
 
@@ -381,9 +381,7 @@ bool EITCache::IsNewEIT(uint chanid,  uint tableid,   uint version,
             m_tblChgCnt++;
         }
         else if ((extract_table_id(*it) == tableid) &&
-                 ((extract_version(*it) < version) ||
-                  ((extract_version(*it) == kVersionMax) &&
-                   version < kVersionMax)))
+                 (extract_version(*it) != version))
         {
             // EIT updated version on current table
             m_verChgCnt++;

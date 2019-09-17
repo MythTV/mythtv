@@ -1626,6 +1626,32 @@ bool ChannelUtil::UpdateChannel(uint db_mplexid,
     return true;
 }
 
+void ChannelUtil::UpdateChannelNumberFromDB(ChannelInsertInfo &chan)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT channum "
+        "FROM channel "
+        "WHERE chanid = :ID");
+    query.bindValue(":ID", chan.m_channel_id);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("UpdateChannelNumberFromDB", query);
+        return;
+    }
+
+    if (query.next())
+    {
+        QString channum = query.value(0).toString();
+
+        if (!channum.isEmpty())
+        {
+            chan.m_chan_num = channum;
+        }
+    }
+}
+
 void ChannelUtil::UpdateInsertInfoFromDB(ChannelInsertInfo &chan)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1652,11 +1678,10 @@ void ChannelUtil::UpdateInsertInfoFromDB(ChannelInsertInfo &chan)
             if (useeit)
                 LOG(VB_GENERAL, LOG_ERR,
                     "Using EIT and xmltv for the same channel "
-                    "is a unsupported configuration.");
+                    "is an unsupported configuration.");
             chan.m_xmltvid = xmltvid;
-            chan.m_use_on_air_guide = useeit;
         }
-
+        chan.m_use_on_air_guide = useeit;
         chan.m_hidden = !visible;
     }
 }
@@ -2393,7 +2418,7 @@ ChannelInfoList ChannelUtil::LoadChannels(uint startIndex, uint count,
                   "MIN(livetvorder) livetvorder "
                   "FROM channel "
                   "LEFT JOIN channelgroup ON channel.chanid = channelgroup.chanid "
-                  "LEFT JOIN capturecard  ON capturecard.sourceid = channel.sourceid ";
+                  "INNER JOIN capturecard  ON capturecard.sourceid = channel.sourceid ";
 
     QStringList cond;
     if (ignoreHidden)

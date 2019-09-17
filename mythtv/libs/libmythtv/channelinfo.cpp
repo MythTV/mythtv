@@ -242,7 +242,7 @@ void ChannelInfo::LoadInputIds()
         query.bindValue(":CHANID", m_chanid);
 
         if (!query.exec())
-            MythDB::DBError("ChannelInfo::GetInputIds()", query);
+            MythDB::DBError("ChannelInfo::LoadInputIds()", query);
         else
         {
             while(query.next())
@@ -263,7 +263,7 @@ void ChannelInfo::LoadGroupIds()
         query.bindValue(":CHANID", m_chanid);
 
         if (!query.exec())
-            MythDB::DBError("ChannelInfo::GetInputIds()", query);
+            MythDB::DBError("ChannelInfo::LoadGroupIds()", query);
         else if (query.size() == 0)
         {
             // HACK Avoid re-running this query each time for channels
@@ -359,7 +359,7 @@ bool ChannelInsertInfo::SaveScan(uint scanid, uint transportid) const
 
     if (!query.exec())
     {
-        MythDB::DBError("ChannelInsertInfo SaveScan 1", query);
+        MythDB::DBError("ChannelInsertInfo::SaveScan()", query);
         return false;
     }
 
@@ -442,8 +442,12 @@ void ChannelInsertInfo::ImportExtraInfo(const ChannelInsertInfo &other)
         m_decryption_status  = other.m_decryption_status;
 }
 
+// relaxed  0   compare channels to check for duplicates
+//          1   compare channels across transports after rescan
+//          2   compare channels in same transport
+//
 bool ChannelInsertInfo::IsSameChannel(
-    const ChannelInsertInfo &other, bool relaxed) const
+    const ChannelInsertInfo &other, int relaxed) const
 {
     if (m_atsc_major_channel &&
         (m_atsc_major_channel == other.m_atsc_major_channel) &&
@@ -455,13 +459,27 @@ bool ChannelInsertInfo::IsSameChannel(
     if ((m_orig_netid == other.m_orig_netid) &&
         (m_sdt_tsid == other.m_sdt_tsid)     &&
         (m_service_id == other.m_service_id))
+    {
         return true;
+    }
 
     if (!m_orig_netid && !other.m_orig_netid &&
-        (m_pat_tsid == other.m_pat_tsid) && (m_service_id == other.m_service_id))
+        (m_pat_tsid == other.m_pat_tsid)     &&
+        (m_service_id == other.m_service_id))
+    {
         return true;
+    }
 
-    if (relaxed)
+    if (relaxed > 0)
+    {
+        if ((m_orig_netid == other.m_orig_netid) &&
+            (m_service_id == other.m_service_id))
+        {
+            return true;
+        }
+    }
+
+    if (relaxed > 1)
     {
         if (("mpeg" == m_si_standard || "mpeg" == other.m_si_standard ||
              "dvb" == m_si_standard || "dvb" == other.m_si_standard ||

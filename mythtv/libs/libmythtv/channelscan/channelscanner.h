@@ -78,6 +78,7 @@ class MTV_PUBLIC ChannelScanner
               bool           do_fta_only,
               bool           do_lcn_only,
               bool           do_complete_only,
+              bool           do_full_search,
               bool           do_add_full_ts,
               ServiceRequirements service_requirements,
               // stuff needed for particular scans
@@ -142,6 +143,9 @@ class MTV_PUBLIC ChannelScanner
 
     /// Only complete channels desired post scan?
     bool                     m_completeOnly        {false};
+
+    /// Extended search for old channels post scan?
+    bool                     m_fullSearch          {false};
 
     /// Add MPTS "full transport stream" channels
     bool                     m_addFullTS           {false};
