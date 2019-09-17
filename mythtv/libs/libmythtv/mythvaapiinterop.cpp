@@ -136,6 +136,8 @@ void MythVAAPIInterop::DestroyDeinterlacer(void)
     m_filterSource = nullptr;
     m_deinterlacer = DEINT_NONE;
     m_deinterlacer2x = false;
+    m_lastFilteredFrame = 0;
+    m_lastFilteredFrameCount = 0;
     av_buffer_unref(&m_vppFramesContext);
 }
 
@@ -1277,6 +1279,13 @@ VASurfaceID MythVAAPIInterop::Deinterlace(VideoFrame *Frame, VASurfaceID Current
 
     if (m_deinterlacer)
     {
+        // deinterlacing the pause frame repeatedly is unnecessary and, due to the
+        // buffering in the VAAPI frames context, causes the image to 'jiggle' when using
+        // double rate deinterlacing. If we are confident this is a pause frame we have seen,
+        // return the last deinterlaced frame.
+        if (Frame->pause_frame && m_lastFilteredFrame && (m_lastFilteredFrameCount == Frame->frameCounter))
+            return m_lastFilteredFrame;
+
         Frame->deinterlace_inuse = m_deinterlacer | DEINT_DRIVER;
         Frame->deinterlace_inuse2x = m_deinterlacer2x;
         while (true)
@@ -1288,7 +1297,8 @@ VASurfaceID MythVAAPIInterop::Deinterlace(VideoFrame *Frame, VASurfaceID Current
             if  (ret >= 0)
             {
                 // we have a filtered frame
-                result = static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(sinkframe->data[3]));
+                result = m_lastFilteredFrame = static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(sinkframe->data[3]));
+                m_lastFilteredFrameCount = Frame->frameCounter;
                 break;
             }
             else if (ret != AVERROR(EAGAIN))
@@ -1314,7 +1324,8 @@ VASurfaceID MythVAAPIInterop::Deinterlace(VideoFrame *Frame, VASurfaceID Current
             if  (ret >= 0)
             {
                 // we have a filtered frame
-                result = static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(sinkframe->data[3]));
+                result = m_lastFilteredFrame = static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(sinkframe->data[3]));
+                m_lastFilteredFrameCount = Frame->frameCounter;
                 break;
             }
             break;

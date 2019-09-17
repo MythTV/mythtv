@@ -143,6 +143,7 @@ typedef struct VideoFrame_
     int repeat_pict;
     int forcekey; ///< hardware encoded .nuv
     int dummy;
+    int pause_frame;
     int pitches[3]; ///< Y, U, & V pitches
     int offsets[3]; ///< Y, U, & V offsets
     int pix_fmt;
@@ -236,6 +237,7 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
     vf->repeat_pict      = 0;
     vf->forcekey         = 0;
     vf->dummy            = 0;
+    vf->pause_frame      = 0;
     vf->pix_fmt          = 0;
     vf->sw_pix_fmt       = -1; // AV_PIX_FMT_NONE
     vf->directrendering  = 1;

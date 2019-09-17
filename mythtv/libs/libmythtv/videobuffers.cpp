@@ -576,6 +576,8 @@ void VideoBuffers::Enqueue(BufferType Type, VideoFrame *Frame)
     m_globalLock.lock();
     queue->remove(Frame);
     queue->enqueue(Frame);
+    if (Type == kVideoBuffer_pause)
+        Frame->pause_frame = 1;
     m_globalLock.unlock();
 }
 

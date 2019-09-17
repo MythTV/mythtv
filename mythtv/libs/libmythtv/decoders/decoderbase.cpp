@@ -55,7 +55,7 @@ void DecoderBase::Reset(bool reset_video_data, bool seek_reset, bool reset_file)
     {
         ResetPosMap();
         m_framesPlayed = 0;
-        m_frameCounter = 0;
+        m_frameCounter += 100;
         m_fpsSkip = 0;
         m_framesRead = 0;
         m_totalDuration = AVRationalInit(0);
@@ -73,7 +73,7 @@ void DecoderBase::SeekReset(long long /*newkey*/, uint /*skipFrames*/,
                             bool /*doFlush*/, bool /*discardFrames*/)
 {
     m_readAdjust = 0;
-    m_frameCounter = 0;
+    m_frameCounter += 100; // NB don't just set to 0
 }
 
 void DecoderBase::SetWatchingRecording(bool mode)

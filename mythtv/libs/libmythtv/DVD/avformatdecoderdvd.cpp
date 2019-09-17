@@ -552,7 +552,7 @@ bool AvFormatDecoderDVD::DoRewindSeek(long long desiredFrame)
 
     ringBuffer->Seek(DVDFindPosition(desiredFrame), SEEK_SET);
     m_framesPlayed = m_framesRead = m_lastKey = desiredFrame + 1;
-    m_frameCounter = 0;
+    m_frameCounter += 100;
     return true;
 }
 
@@ -564,7 +564,7 @@ void AvFormatDecoderDVD::DoFastForwardSeek(long long desiredFrame, bool &needflu
     ringBuffer->Seek(DVDFindPosition(desiredFrame),SEEK_SET);
     needflush    = true;
     m_framesPlayed = m_framesRead = m_lastKey = desiredFrame + 1;
-    m_frameCounter = 0;
+    m_frameCounter += 100;
 }
 
 void AvFormatDecoderDVD::StreamChangeCheck(void)

@@ -3533,6 +3533,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
         {
             // Set the frame flags, but then discard it
             // since we are not using it for display.
+            oldframe->pause_frame = 0;
             oldframe->interlaced_frame = AvFrame->interlaced_frame;
             oldframe->top_field_first = AvFrame->top_field_first;
             oldframe->interlaced_reversed = 0;
@@ -3625,6 +3626,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
         frame->frameCounter     = m_frameCounter++;
         frame->aspect           = m_current_aspect;
         frame->dummy            = 0;
+        frame->pause_frame      = 0;
         frame->colorspace       = AvFrame->colorspace;
         frame->colorrange       = AvFrame->color_range;
         frame->colorprimaries   = AvFrame->color_primaries;
@@ -5052,6 +5054,7 @@ bool AvFormatDecoder::GenerateDummyVideoFrames(void)
         frame->frameNumber      = m_framesPlayed;
         frame->frameCounter     = m_frameCounter++;
         frame->dummy            = 1;
+        frame->pause_frame      = 0;
         frame->colorspace       = AVCOL_SPC_BT709;
         frame->colorrange       = AVCOL_RANGE_MPEG;
         frame->colorprimaries   = AVCOL_PRI_BT709;

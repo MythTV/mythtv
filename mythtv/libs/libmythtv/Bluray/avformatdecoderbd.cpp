@@ -42,7 +42,7 @@ bool AvFormatDecoderBD::DoRewindSeek(long long desiredFrame)
 
     ringBuffer->Seek(BDFindPosition(desiredFrame), SEEK_SET);
     m_framesPlayed = m_framesRead = m_lastKey = desiredFrame + 1;
-    m_frameCounter = 0;
+    m_frameCounter += 100;
     return true;
 }
 
@@ -54,7 +54,7 @@ void AvFormatDecoderBD::DoFastForwardSeek(long long desiredFrame, bool &needflus
     ringBuffer->Seek(BDFindPosition(desiredFrame), SEEK_SET);
     needflush    = true;
     m_framesPlayed = m_framesRead = m_lastKey = desiredFrame + 1;
-    m_frameCounter = 0;
+    m_frameCounter += 100;
 }
 
 void AvFormatDecoderBD::StreamChangeCheck(void)

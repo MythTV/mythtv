@@ -57,6 +57,8 @@ class MythVAAPIInterop : public MythOpenGLInterop
     bool             m_filterError       { false   };
     int              m_filterWidth       { 0 };
     int              m_filterHeight      { 0 };
+    VASurfaceID      m_lastFilteredFrame { 0 };
+    long long        m_lastFilteredFrameCount { 0 };
 };
 
 class MythVAAPIInteropGLX : public MythVAAPIInterop
