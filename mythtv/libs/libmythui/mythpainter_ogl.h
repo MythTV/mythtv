@@ -18,6 +18,8 @@ class MythRenderOpenGL;
 class QOpenGLBuffer;
 class QOpenGLFramebufferObject;
 
+#define MAX_BUFFER_POOL 70
+
 class MUI_PUBLIC MythOpenGLPainter : public MythPainter
 {
   public:
@@ -64,7 +66,8 @@ class MUI_PUBLIC MythOpenGLPainter : public MythPainter
     QMutex                     m_textureDeleteLock;
 
     QVector<MythGLTexture*>    m_mappedTextures;
-    QQueue<QOpenGLBuffer*>     m_mappedBufferPool;
+    QOpenGLBuffer*             m_mappedBufferPool[MAX_BUFFER_POOL] { nullptr };
+    int                        m_mappedBufferPoolIdx { 0 };
 };
 
 #endif

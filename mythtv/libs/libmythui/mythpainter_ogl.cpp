@@ -17,8 +17,6 @@
 
 using namespace std;
 
-#define MAX_BUFFER_POOL 40
-
 MythOpenGLPainter::MythOpenGLPainter(MythRenderOpenGL *Render, QWidget *Parent)
   : MythPainter(),
     m_parent(Parent),
@@ -29,11 +27,9 @@ MythOpenGLPainter::MythOpenGLPainter(MythRenderOpenGL *Render, QWidget *Parent)
     m_ImageExpireList(),
     m_textureDeleteList(),
     m_textureDeleteLock(),
-    m_mappedTextures(),
-    m_mappedBufferPool()
+    m_mappedTextures()
 {
     m_mappedTextures.reserve(MAX_BUFFER_POOL);
-    m_mappedBufferPool.reserve(MAX_BUFFER_POOL);
 }
 
 MythOpenGLPainter::~MythOpenGLPainter()
@@ -52,8 +48,8 @@ void MythOpenGLPainter::FreeResources(void)
     OpenGLLocker locker(m_render);
     ClearCache();
     DeleteTextures();
-    while (!m_mappedBufferPool.isEmpty())
-        delete m_mappedBufferPool.dequeue();
+    for (int i = 0; i < MAX_BUFFER_POOL; i++)
+        delete m_mappedBufferPool[i];
 }
 
 void MythOpenGLPainter::DeleteTextures(void)
@@ -119,8 +115,8 @@ void MythOpenGLPainter::Begin(QPaintDevice *Parent)
     m_render->makeCurrent();
 
     // initialise the VBO pool
-    while (m_mappedBufferPool.size() < MAX_BUFFER_POOL)
-        m_mappedBufferPool.enqueue(m_render->CreateVBO(MythRenderOpenGL::kVertexSize));
+    for (int i = 0 ; i < MAX_BUFFER_POOL; i++)
+        m_mappedBufferPool[i] = m_render->CreateVBO(static_cast<int>(MythRenderOpenGL::kVertexSize));
 
     if (m_target || m_swapControl)
     {
@@ -225,11 +221,12 @@ void MythOpenGLPainter::DrawImage(const QRect &Dest, MythImage *Image,
         if (texture && m_mappedTextures.contains(texture))
         {
             QOpenGLBuffer *vbo = texture->m_vbo;
-            texture->m_vbo = m_mappedBufferPool.dequeue();
+            texture->m_vbo = m_mappedBufferPool[m_mappedBufferPoolIdx++];
+            if (m_mappedBufferPoolIdx >= MAX_BUFFER_POOL)
+                m_mappedBufferPoolIdx = 0;
             texture->m_destination = QRect();
             m_render->DrawBitmap(texture, m_target, Source, Dest, nullptr, Alpha);
             texture->m_destination = QRect();
-            m_mappedBufferPool.enqueue(texture->m_vbo);
             texture->m_vbo = vbo;
         }
         else
