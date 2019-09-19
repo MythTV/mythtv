@@ -28,6 +28,8 @@ using_ivtv:DEFINES += USING_IVTV
 using_xrandr:DEFINES += USING_XRANDR
 using_opengl_video:DEFINES += USING_OPENGL_VIDEO
 using_vdpau:DEFINES += USING_VDPAU
+using_vaapi:using_opengl_video:DEFINES += USING_VAAPI
+using_mmal:DEFINES += USING_MMAL
 
 using_pulse:DEFINES += USING_PULSE
 using_alsa:DEFINES += USING_ALSA

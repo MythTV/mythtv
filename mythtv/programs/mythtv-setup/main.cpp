@@ -285,10 +285,6 @@ int main(int argc, char *argv[])
     QString region = "us";
     QString scanInputName = "";
 
-#if CONFIG_OMX_RPI
-    setenv("QT_XCB_GL_INTEGRATION","none",0);
-#endif
-
     MythTVSetupCommandLineParser cmdline;
     if (!cmdline.Parse(argc, argv))
     {

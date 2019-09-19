@@ -177,8 +177,23 @@ class VideoPerformanceTest
 int main(int argc, char *argv[])
 {
 
-#if CONFIG_OMX_RPI
-    setenv("QT_XCB_GL_INTEGRATION","none",0);
+#if defined (Q_OS_LINUX)
+#if defined (USING_VAAPI) || defined (USING_MMAL)
+    // When using VAAPI (linux/desktop only) we want to use EGL to ensure we
+    // can use zero copy video buffers for the best performance (N.B. not tested
+    // on AMD desktops). For non-VAAPI users this should make no difference - on NVidia
+    // installations it has no effect.
+    // Likewise for MMAL (Raspberry Pi), we want EGL for zero copy direct rendering.
+    // This is the only way to force Qt to use EGL and must be done before any
+    // GUI is created.
+    // If problems are encountered, set the environment variable NO_EGL
+    if (qgetenv("NO_EGL").isEmpty())
+        setenv("QT_XCB_GL_INTEGRATION", "xcb_egl", 0);
+
+    // This makes Xlib calls thread-safe which seems to be required for hardware
+    // accelerated Flash playback to work without causing mythfrontend to abort.
+    QApplication::setAttribute(Qt::AA_X11InitThreads);
+#endif
 #endif
 
     MythAVTestCommandLineParser cmdline;

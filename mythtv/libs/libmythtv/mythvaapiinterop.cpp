@@ -25,8 +25,7 @@ extern "C" {
 
 /*! \brief Return an 'interoperability' method that is supported by the current render device.
  *
- * DRM interop is the preferred option as it is copy free but requires EGL. To
- * force Qt to use EGL, try setting the environment variable 'QT_XCB_GL_INTEGRATION=xcb_egl'.
+ * DRM interop is the preferred option as it is copy free but requires EGL.
  * DRM returns raw YUV frames which gives us full colourspace and deinterlacing control.
  *
  * GLX Pixmap interop will copy the frame to an RGBA texture. VAAPI functionality is
