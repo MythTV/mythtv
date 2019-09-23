@@ -48,8 +48,9 @@ void MythOpenGLPainter::FreeResources(void)
     OpenGLLocker locker(m_render);
     ClearCache();
     DeleteTextures();
-    for (int i = 0; i < MAX_BUFFER_POOL; i++)
-        delete m_mappedBufferPool[i];
+    if (m_mappedBufferPoolReady)
+        for (int i = 0; i < MAX_BUFFER_POOL; i++)
+            delete m_mappedBufferPool[i];
 }
 
 void MythOpenGLPainter::DeleteTextures(void)
@@ -108,15 +109,19 @@ void MythOpenGLPainter::Begin(QPaintDevice *Parent)
         }
     }
 
+    if (!m_mappedBufferPoolReady)
+    {
+        m_mappedBufferPoolReady = true;
+        // initialise the VBO pool
+        for (int i = 0 ; i < MAX_BUFFER_POOL; i++)
+            m_mappedBufferPool[i] = m_render->CreateVBO(static_cast<int>(MythRenderOpenGL::kVertexSize));
+    }
+
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         m_render->logDebugMarker("PAINTER_FRAME_START");
 
     DeleteTextures();
     m_render->makeCurrent();
-
-    // initialise the VBO pool
-    for (int i = 0 ; i < MAX_BUFFER_POOL; i++)
-        m_mappedBufferPool[i] = m_render->CreateVBO(static_cast<int>(MythRenderOpenGL::kVertexSize));
 
     if (m_target || m_swapControl)
     {
@@ -221,13 +226,13 @@ void MythOpenGLPainter::DrawImage(const QRect &Dest, MythImage *Image,
         if (texture && m_mappedTextures.contains(texture))
         {
             QOpenGLBuffer *vbo = texture->m_vbo;
-            texture->m_vbo = m_mappedBufferPool[m_mappedBufferPoolIdx++];
-            if (m_mappedBufferPoolIdx >= MAX_BUFFER_POOL)
-                m_mappedBufferPoolIdx = 0;
+            texture->m_vbo = m_mappedBufferPool[m_mappedBufferPoolIdx];
             texture->m_destination = QRect();
             m_render->DrawBitmap(texture, m_target, Source, Dest, nullptr, Alpha);
             texture->m_destination = QRect();
             texture->m_vbo = vbo;
+            if (++m_mappedBufferPoolIdx >= MAX_BUFFER_POOL)
+                m_mappedBufferPoolIdx = 0;
         }
         else
         {

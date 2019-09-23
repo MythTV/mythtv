@@ -68,6 +68,7 @@ class MUI_PUBLIC MythOpenGLPainter : public MythPainter
     QVector<MythGLTexture*>    m_mappedTextures;
     QOpenGLBuffer*             m_mappedBufferPool[MAX_BUFFER_POOL] { nullptr };
     int                        m_mappedBufferPoolIdx { 0 };
+    bool                       m_mappedBufferPoolReady { false };
 };
 
 #endif
