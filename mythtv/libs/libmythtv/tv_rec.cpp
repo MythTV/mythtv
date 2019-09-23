@@ -1451,7 +1451,7 @@ void TVRec::run(void)
                 }
                 else
                 {
-                    LOG(VB_CHANNEL, LOG_INFO, LOC + QString(
+                    LOG(VB_EIT, LOG_INFO, LOC + QString(
                             "Postponing EIT scan on input [%1] "
                             "because input %2 is busy")
                         .arg(m_inputid).arg(busy_input.m_inputid));
