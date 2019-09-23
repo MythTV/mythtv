@@ -137,7 +137,7 @@ VideoOutputOpenGL::VideoOutputOpenGL(const QString &Profile)
     // will report the execution time for the key GL code blocks
     // N.B. 'Upload' should always be zero when using hardware decoding and direct
     // rendering. Any copy cost for direct rendering will be included within 'Render'
-    if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
+    if (VERBOSE_LEVEL_CHECK(VB_GPU | VB_PLAYBACK, LOG_INFO))
     {
         m_openGLPerf = new MythOpenGLPerf("GLVidPerf: ", { "Upload:", "Clear:", "Render:", "Flush:", "Swap:" });
         if (!m_openGLPerf->isCreated())
@@ -506,6 +506,9 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, OSD 
     // avoid clearing the framebuffer if it will be entirely overwritten by video
     if (!m_window.VideoIsFullScreen())
     {
+        if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
+            m_render->logDebugMarker(LOC + "CLEAR_START");
+
         int gray = m_dbLetterboxColour == kLetterBoxColour_Gray25 ? 127 : 0;
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 8, 0)
@@ -528,6 +531,9 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, OSD 
                 m_render->ClearRect(nullptr, *it, gray);
         }
 #endif
+
+        if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
+            m_render->logDebugMarker(LOC + "CLEAR_END");
     }
 
     // time framebuffer clearing
