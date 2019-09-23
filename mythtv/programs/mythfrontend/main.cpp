@@ -1895,7 +1895,7 @@ int main(int argc, char **argv)
     format.setDepthBufferSize(0);
     format.setStencilBufferSize(0);
     format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
-    format.setProfile(QSurfaceFormat::CoreProfile);
+    format.setProfile(QSurfaceFormat::CompatibilityProfile);
     format.setSwapInterval(1);
     QSurfaceFormat::setDefaultFormat(format);
 
@@ -1914,8 +1914,10 @@ int main(int argc, char **argv)
     // This is the only way to force Qt to use EGL and must be done before any
     // GUI is created.
     // If problems are encountered, set the environment variable NO_EGL
-    if (qgetenv("NO_EGL").isEmpty())
-        setenv("QT_XCB_GL_INTEGRATION", "xcb_egl", 0);
+
+    // Disabled this for now as it does actually break NVidia desktops
+    //if (qgetenv("NO_EGL").isEmpty())
+    //    setenv("QT_XCB_GL_INTEGRATION", "xcb_egl", 0);
 
     // This makes Xlib calls thread-safe which seems to be required for hardware
     // accelerated Flash playback to work without causing mythfrontend to abort.
