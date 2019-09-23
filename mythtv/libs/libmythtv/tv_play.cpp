@@ -1045,10 +1045,12 @@ void TV::InitFromDB(void)
     kv["EndOfRecordingExitPrompt"] = "0";
     kv["JumpToProgramOSD"]         = "1";
     kv["GuiSizeForTV"]             = "0";
+    kv["UseVideoModes"]            = "0";
     kv["ClearSavedPosition"]       = "1";
     kv["JobsRunOnRecordHost"]      = "0";
     kv["ContinueEmbeddedTVPlay"]   = "0";
     kv["UseFixedWindowSize"]       = "1";
+    kv["RunFrontendInWindow"]      = "0";
     kv["PersistentBrowseMode"]     = "0";
     kv["BrowseAllTuners"]          = "0";
     kv["ChannelOrdering"]          = "channum";
@@ -1095,10 +1097,12 @@ void TV::InitFromDB(void)
     m_dbEndOfRecExitPrompt = (kv["EndOfRecordingExitPrompt"].toInt() != 0);
     m_dbJumpPreferOsd      = (kv["JumpToProgramOSD"].toInt() != 0);
     m_dbUseGuiSizeForTv    = (kv["GuiSizeForTV"].toInt() != 0);
+    m_dbUseVideoModes      = (kv["UseVideoModes"].toInt() != 0);
     m_dbClearSavedPosition = (kv["ClearSavedPosition"].toInt() != 0);
     m_dbRunJobsOnRemote    = (kv["JobsRunOnRecordHost"].toInt() != 0);
     m_dbContinueEmbedded   = (kv["ContinueEmbeddedTVPlay"].toInt() != 0);
     m_dbUseFixedSize       = (kv["UseFixedWindowSize"].toInt() != 0);
+    m_dbRunFrontendInWindow= (kv["RunFrontendInWindow"].toInt() != 0);
     m_dbBrowseAlways       = (kv["PersistentBrowseMode"].toInt() != 0);
     m_dbBrowseAllTuners    = (kv["BrowseAllTuners"].toInt() != 0);
     db_channel_ordering    = kv["ChannelOrdering"];
@@ -1163,8 +1167,7 @@ bool TV::Init(bool createWindow)
 
     if (createWindow)
     {
-        bool fullscreen = !gCoreContext->GetBoolSetting("GuiSizeForTV", false);
-        bool switchMode = gCoreContext->GetBoolSetting("UseVideoModes", false);
+        bool fullscreen = !m_dbUseGuiSizeForTv;
 
         m_savedGuiBounds = QRect(GetMythMainWindow()->geometry().topLeft(),
                                  GetMythMainWindow()->size());
@@ -1200,7 +1203,7 @@ bool TV::Init(bool createWindow)
         }
 
         // main window sizing
-        if (switchMode)
+        if (m_dbUseVideoModes)
         {
             DisplayRes *display_res = DisplayRes::GetDisplayRes();
             if(display_res)
@@ -1309,7 +1312,8 @@ TV::~TV(void)
     // restore window to gui size and position
     MythMainWindow* mwnd = GetMythMainWindow();
     mwnd->setGeometry(m_savedGuiBounds);
-    mwnd->setFixedSize(m_savedGuiBounds.size());
+    if (m_dbUseFixedSize)
+        mwnd->setFixedSize(m_savedGuiBounds.size());
     mwnd->ResizePainterWindow(m_savedGuiBounds.size());
 #ifdef Q_OS_ANDROID
     mwnd->Show();
@@ -2496,10 +2500,9 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
     {
         if (!ctx->IsPIP())
             GetMythUI()->DisableScreensaver();
-        bool switchMode = gCoreContext->GetBoolSetting("UseVideoModes", false);
         // m_playerBounds is not applicable when switching modes so
         // skip this logic in that case.
-        if (!switchMode)
+        if (!m_dbUseVideoModes)
         {
             MythMainWindow *mainWindow = GetMythMainWindow();
             mainWindow->setBaseSize(m_playerBounds.size());
@@ -8671,9 +8674,10 @@ void TV::DoEditSchedule(int editType)
     mctx->UnlockDeletePlayer(__FILE__, __LINE__);
     ReturnPlayerLock(actx);
     MythMainWindow *mwnd = GetMythMainWindow();
-    if (!m_dbUseGuiSizeForTv || !m_dbUseFixedSize)
+    if (!m_dbUseGuiSizeForTv)
     {
-        mwnd->setFixedSize(m_savedGuiBounds.size());
+        if (m_dbUseFixedSize)
+            mwnd->setFixedSize(m_savedGuiBounds.size());
         mwnd->setGeometry(m_savedGuiBounds.left(), m_savedGuiBounds.top(),
                           m_savedGuiBounds.width(), m_savedGuiBounds.height());
     }
@@ -9699,9 +9703,7 @@ void TV::customEvent(QEvent *e)
 
         // m_playerBounds is not applicable when switching modes so
         // skip this logic in that case.
-        bool switchMode = gCoreContext->GetBoolSetting("UseVideoModes", false);
-        if (!switchMode
-            && (!m_dbUseGuiSizeForTv || !m_dbUseFixedSize))
+        if (!m_dbUseVideoModes && (!m_dbUseGuiSizeForTv || !m_dbUseFixedSize))
         {
             mwnd->setMinimumSize(QSize(16, 16));
             mwnd->setMaximumSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));

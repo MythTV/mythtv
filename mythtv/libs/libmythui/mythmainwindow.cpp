@@ -144,6 +144,7 @@ class MythMainWindowPrivate
     int                  m_xbase                {0};
     int                  m_ybase                {0};
     bool                 m_does_fill_screen     {false};
+    bool                 m_fixed_window_size    {true};
 
     bool                 m_ignore_lirc_keys     {false};
     bool                 m_ignore_joystick_keys {false};
@@ -628,7 +629,8 @@ void MythMainWindow::ResizePainterWindow(const QSize &size)
 {
     if (!d->m_paintwin)
         return;
-    d->m_paintwin->setFixedSize(size);
+    if (d->m_fixed_window_size)
+        d->m_paintwin->setFixedSize(size);
     d->m_paintwin->resize(size);
 }
 
@@ -1007,12 +1009,18 @@ void MythMainWindow::Init(const QString& forcedpainter, bool mayReInit)
     // Set window border based on fullscreen attribute
     Qt::WindowFlags flags = Qt::Window;
 
+    d->m_fixed_window_size = GetMythDB()->GetBoolSetting("UseFixedWindowSize", true);
     bool inwindow = GetMythDB()->GetBoolSetting("RunFrontendInWindow", false);
     bool fullscreen = d->m_does_fill_screen && !GetMythUI()->IsGeometryOverridden();
 
     // On Compiz/Unit, when the window is fullscreen and frameless changing
     // screen position ends up stuck. Adding a border temporarily prevents this
     setWindowFlags(windowFlags() & ~Qt::FramelessWindowHint);
+
+    if (d->m_fixed_window_size)
+        LOG(VB_GENERAL, LOG_INFO, "Using fixed window size");
+    else
+        LOG(VB_GENERAL, LOG_INFO, "Window is resizeable");
 
     if (!inwindow)
     {
@@ -1024,6 +1032,11 @@ void MythMainWindow::Init(const QString& forcedpainter, bool mayReInit)
 #ifdef _WIN32
     flags |= Qt::MSWindowsOwnDC;
 #endif
+
+    // NOTE if running fullscreen AND windowed (i.e. borders etc) then we do not
+    // have any idea at this time of the size of the borders/decorations.
+    // Typically, on linux, this means we create the UI slightly larger than
+    // required - as X adds the decorations at a later point.
 
     if (fullscreen && !inwindow)
     {
@@ -1037,7 +1050,7 @@ void MythMainWindow::Init(const QString& forcedpainter, bool mayReInit)
     }
     else
     {
-            // reset type
+        // reset type
         setWindowState(Qt::WindowNoState);
     }
 
@@ -1063,12 +1076,14 @@ void MythMainWindow::Init(const QString& forcedpainter, bool mayReInit)
     d->m_uiScreenRect = QRect(0, 0, d->m_screenwidth, d->m_screenheight);
 
     LOG(VB_GENERAL, LOG_INFO, QString("UI Screen Resolution: %1 x %2")
-                                        .arg(QString::number(d->m_screenwidth))
-                                        .arg(QString::number(d->m_screenheight)));
+        .arg(d->m_screenwidth).arg(d->m_screenheight));
 
     setGeometry(d->m_xbase, d->m_ybase, d->m_screenwidth, d->m_screenheight);
     // remove size constraints
-    setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+    setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+    // fix size if required (i.e. don't allow the user to resize)
+    if (d->m_fixed_window_size)
+        setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
     resize(d->m_screenwidth, d->m_screenheight);
 
     Show();
@@ -1196,7 +1211,9 @@ void MythMainWindow::Init(const QString& forcedpainter, bool mayReInit)
 
 void MythMainWindow::DelayedAction(void)
 {
-    setFixedSize(QSize(d->m_screenwidth, d->m_screenheight));
+    if (d->m_fixed_window_size)
+        setFixedSize(d->m_screenwidth, d->m_screenheight);
+    resize(d->m_screenwidth, d->m_screenheight);
     Show();
 
 #ifdef Q_OS_ANDROID
@@ -1386,7 +1403,8 @@ void MythMainWindow::ReinitDone(void)
     d->m_oldrender = nullptr;
 
     d->m_paintwin->move(0, 0);
-    d->m_paintwin->setFixedSize(size());
+    if (d->m_fixed_window_size)
+        d->m_paintwin->setFixedSize(size()); // why?
     d->m_paintwin->raise();
     ShowPainterWindow();
 
@@ -2859,9 +2877,7 @@ void MythMainWindow::ShowMouseCursor(bool show)
 {
     if (show && GetMythDB()->GetBoolSetting("HideMouseCursor", false))
         return;
-#ifdef QWS
-    QWSServer::setCursorVisible(show);
-#endif
+
     // Set cursor call must come after Show() to work on some systems.
     setCursor(show ? (Qt::ArrowCursor) : (Qt::BlankCursor));
 
