@@ -1132,40 +1132,6 @@ void VideoDisplayProfile::DeleteProfiles(const QString &HostName)
         MythDB::DBError("delete_profiles 3", query);
 }
 
-// Old style
-void VideoDisplayProfile::CreateProfile(uint GroupId, uint Priority,
-    const QString& Compare1, uint Width1, uint Height1,
-    const QString& Compare2, uint Width2, uint Height2,
-    QString Decoder, uint MaxCpus, bool SkipLoop, QString VideoRenderer,
-    QString Deint1, QString Deint2, QString Filters)
-{
-    QString width;
-    QString height;
-    if (!Compare1.isEmpty()
-         && ! (Compare1 == ">" && Width1 == 0 && Height1 == 0))
-    {
-        width.append(QString("%1%2").arg(Compare1).arg(Width1));
-        height.append(QString("%1%2").arg(Compare1).arg(Height1));
-        if (!Compare2.isEmpty())
-        {
-            width.append("&");
-            height.append("&");
-        }
-    }
-    if (!Compare2.isEmpty()
-         && ! (Compare2 == ">" && Width2 == 0 && Height2 == 0))
-    {
-        width.append(QString("%1%2").arg(Compare2).arg(Width2));
-        height.append(QString("%1%2").arg(Compare2).arg(Height2));
-    }
-    CreateProfile(
-        GroupId, Priority,
-        width, height, QString(),
-        std::move(Decoder), MaxCpus, SkipLoop, std::move(VideoRenderer),
-        std::move(Deint1), std::move(Deint2), std::move(Filters));
-}
-
-// New Style
 void VideoDisplayProfile::CreateProfile(uint GroupId, uint Priority,
     const QString& Width, const QString& Height, const QString& Codecs,
     const QString& Decoder, uint MaxCpus, bool SkipLoop, const QString& VideoRenderer,
@@ -1321,7 +1287,7 @@ void VideoDisplayProfile::CreateProfiles(const QString &HostName)
         (void) QObject::tr("OpenGL High Quality",
                            "Sample: OpenGL high quality");
         groupid = CreateProfileGroup("OpenGL High Quality", HostName);
-        CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
+        CreateProfile(groupid, 1, "", "", "",
                       "ffmpeg", 2, true, "opengl",
                       "greedyhdoubleprocessdeint", "greedyhdeint", "");
     }
@@ -1329,7 +1295,7 @@ void VideoDisplayProfile::CreateProfiles(const QString &HostName)
     if (!profiles.contains("OpenGL Normal")) {
         (void) QObject::tr("OpenGL Normal", "Sample: OpenGL average quality");
         groupid = CreateProfileGroup("OpenGL Normal", HostName);
-        CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
+        CreateProfile(groupid, 1, "", "", "",
                       "ffmpeg", 2, true, "opengl",
                       "opengldoubleratekerneldeint", "openglkerneldeint", "");
     }
@@ -1337,7 +1303,7 @@ void VideoDisplayProfile::CreateProfiles(const QString &HostName)
     if (!profiles.contains("OpenGL Slim")) {
         (void) QObject::tr("OpenGL Slim", "Sample: OpenGL low power GPU");
         groupid = CreateProfileGroup("OpenGL Slim", HostName);
-        CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
+        CreateProfile(groupid, 1, "", "", "",
                       "ffmpeg", 1, true, "opengl",
                       "opengldoubleratelinearblend", "opengllinearblend", "");
     }
@@ -1347,9 +1313,10 @@ void VideoDisplayProfile::CreateProfiles(const QString &HostName)
     if (!profiles.contains("VAAPI Normal")) {
         (void) QObject::tr("VAAPI Normal", "Sample: VAAPI average quality");
         groupid = CreateProfileGroup("VAAPI Normal", HostName);
-        CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
-                      "vaapi", 2, true, "opengl-hw", "none", "none", "");
-        CreateProfile(groupid, 2, ">", 0, 0, "", 0, 0,
+        CreateProfile(groupid, 1, "", "", "",
+                      "vaapi", 2, true, "opengl",
+                      "none", "none", "");
+        CreateProfile(groupid, 2, "", "", "",
                       "ffmpeg", 2, true, "opengl",
                       "opengldoubleratekerneldeint", "openglkerneldeint", "");
     }

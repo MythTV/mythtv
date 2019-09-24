@@ -93,11 +93,6 @@ class MTV_PUBLIC VideoDisplayProfile
     static bool        DeleteProfileGroup(const QString &GroupName, const QString &HostName);
     static uint        CreateProfileGroup(const QString &ProfileName, const QString &HostName);
     static void        CreateProfile(uint GroupId, uint Priority,
-                                     const QString& Compare1, uint Width1, uint Height1,
-                                     const QString& Compare2, uint Width2, uint Height2,
-                                     QString Decoder, uint MaxCpus, bool SkipLoop, QString VideoRenderer,
-                                     QString Deint1, QString Deint2, QString Filters);
-    static void        CreateProfile(uint GroupId, uint Priority,
                                      const QString& Width, const QString& Height, const QString& Codecs,
                                      const QString& Decoder, uint MaxCpus, bool SkipLoop, const QString& VideoRenderer,
                                      const QString& Deint1, const QString& Deint2, const QString& Filters);
