@@ -349,12 +349,16 @@ QRect VideoOutputOpenGL::GetDisplayVisibleRect(void)
         return dvr;
     QSize size = mainwin->size();
 
+    // may be called before m_window is initialised fully
+    if (dvr.isEmpty())
+        dvr = QRect(QPoint(0, 0), size);
+
     // If the Video screen mode has vertically less pixels
     // than the GUI screen mode - OpenGL coordinate adjustments
     // must be made to put the video at the top of the display
     // area instead of at the bottom.
     if (dvr.height() < size.height())
-        dvr.setTop(dvr.top()-size.height()+dvr.height());
+        dvr.setTop(dvr.top() - size.height() + dvr.height());
 
     // If the Video screen mode has horizontally less pixels
     // than the GUI screen mode - OpenGL width must be set
@@ -362,6 +366,7 @@ QRect VideoOutputOpenGL::GetDisplayVisibleRect(void)
     // invoked from playback is not cut off.
     if (dvr.width() < size.width())
         dvr.setWidth(size.width());
+
     return dvr;
 }
 
@@ -504,7 +509,7 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, OSD 
     m_render->BindFramebuffer(nullptr);
 
     // avoid clearing the framebuffer if it will be entirely overwritten by video
-    if (!m_window.VideoIsFullScreen())
+    if (!m_window.VideoIsFullScreen() || (!Frame || dummy))
     {
         if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
             m_render->logDebugMarker(LOC + "CLEAR_START");
@@ -517,7 +522,11 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, OSD 
         m_render->SetBackground(gray, gray, gray, 255);
         m_render->ClearFramebuffer();
 #else
-        if (m_window.IsEmbedding())
+        if (!Frame || dummy)
+        {
+            m_render->ClearFramebuffer();
+        }
+        else if (m_window.IsEmbedding())
         {
             // use MythRenderOpenGL rendering as it will clear to the appropriate 'black level'
             m_render->ClearRect(nullptr, m_window.GetDisplayVisibleRect(), gray);

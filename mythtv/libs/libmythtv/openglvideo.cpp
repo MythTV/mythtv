@@ -615,7 +615,8 @@ void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanT
         }
         else
         {
-            LOG(VB_GENERAL, LOG_WARNING, LOC + "No textures for display");
+            if (Frame)
+                LOG(VB_GENERAL, LOG_WARNING, LOC + "No textures for display");
             return;
         }
     }
