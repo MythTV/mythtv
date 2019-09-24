@@ -256,8 +256,8 @@ class PlaybackProfileConfig : public GroupSetting
 
   private:
     void ReloadSettings(void);
-    item_list_t m_items;
-    item_list_t m_del_items;
+    vector<ProfileItem> m_items;
+    vector<ProfileItem> m_del_items;
     QString     m_profile_name;
     uint        m_groupid {0};
 

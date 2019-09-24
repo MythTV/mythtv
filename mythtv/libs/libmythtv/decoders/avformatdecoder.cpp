@@ -314,7 +314,7 @@ static int get_canonical_lang(const char *lang_cstr)
     return iso639_key_to_canonical_key(lang);
 }
 
-void AvFormatDecoder::GetDecoders(render_opts &opts)
+void AvFormatDecoder::GetDecoders(RenderOptions &opts)
 {
     opts.decoders->append("ffmpeg");
     (*opts.equiv_decoders)["ffmpeg"].append("nuppel");

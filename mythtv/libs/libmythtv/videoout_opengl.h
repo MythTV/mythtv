@@ -12,7 +12,7 @@ class MythOpenGLPerf;
 class VideoOutputOpenGL : public VideoOutput
 {
   public:
-    static void GetRenderOptions(render_opts &Options, QStringList &SoftwareDeinteralacers);
+    static void GetRenderOptions(RenderOptions &Options, QStringList &SoftwareDeinteralacers);
     static QStringList GetAllowedRenderers(MythCodecID CodecId, const QSize &VideoDim);
 
     explicit VideoOutputOpenGL(const QString &Profile = QString());

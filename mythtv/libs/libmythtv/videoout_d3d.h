@@ -15,7 +15,7 @@
 class VideoOutputD3D : public VideoOutput
 {
   public:
-    static void GetRenderOptions(render_opts &opts, QStringList &cpudeints);
+    static void GetRenderOptions(RenderOptions &opts, QStringList &cpudeints);
     VideoOutputD3D();
    ~VideoOutputD3D();
 

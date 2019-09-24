@@ -1,6 +1,6 @@
 #include "privatedecoder.h"
 
-void PrivateDecoder::GetDecoders(render_opts &opts)
+void PrivateDecoder::GetDecoders(RenderOptions &opts)
 {
     Q_UNUSED(opts);
 }

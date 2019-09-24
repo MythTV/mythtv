@@ -29,7 +29,7 @@
 
 #define LOC QString("VideoOutput: ")
 
-void VideoOutput::GetRenderOptions(render_opts &Options)
+void VideoOutput::GetRenderOptions(RenderOptions &Options)
 {
     QStringList cpudeints;
     cpudeints += "none";

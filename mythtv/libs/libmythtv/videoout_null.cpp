@@ -11,7 +11,7 @@ const int kPrebufferFramesNormal = 12;
 const int kPrebufferFramesSmall = 4;
 const int kKeepPrebuffer = 2;
 
-void VideoOutputNull::GetRenderOptions(render_opts &opts,
+void VideoOutputNull::GetRenderOptions(RenderOptions &opts,
                                        QStringList &cpudeints)
 {
     opts.renderers->append("null");

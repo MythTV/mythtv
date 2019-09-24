@@ -21,7 +21,7 @@
  * but it is currently called statically and hence options would be fixed and unable
  * to reflect changes in UI render device.
 */
-void VideoOutputOpenGL::GetRenderOptions(render_opts &Options,
+void VideoOutputOpenGL::GetRenderOptions(RenderOptions &Options,
                                          QStringList &SoftwareDeinterlacers)
 {
     QStringList gldeints;

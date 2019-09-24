@@ -93,7 +93,7 @@ class AvFormatDecoder : public DecoderBase
     friend void HandleDVDStreamChange(void*);
     friend void HandleBDStreamChange(void*);
   public:
-    static void GetDecoders(render_opts &opts);
+    static void GetDecoders(RenderOptions &opts);
     AvFormatDecoder(MythPlayer *parent, const ProgramInfo &pginfo,
                     PlayerFlags flags);
     virtual ~AvFormatDecoder();

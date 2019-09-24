@@ -870,16 +870,13 @@ void PlaybackProfileItemConfig::Load(void)
         found |= (*itr == pdecoder);
     }
     if (!found && !pdecoder.isEmpty())
-    {
-        m_decoder->addSelection(
-            VideoDisplayProfile::GetDecoderName(pdecoder), pdecoder, true);
-    }
+        m_decoder->addSelection(VideoDisplayProfile::GetDecoderName(pdecoder), pdecoder, true);
     m_decoder->setHelpText(VideoDisplayProfile::GetDecoderHelp(pdecoder));
 
     if (!pmax_cpus.isEmpty())
-        m_max_cpus->setValue(pmax_cpus.toUInt());
+        m_max_cpus->setValue(pmax_cpus.toInt());
 
-    m_skiploop->setValue((!pskiploop.isEmpty()) ? (bool) pskiploop.toInt() : true);
+    m_skiploop->setValue((!pskiploop.isEmpty()) ? (pskiploop.toInt() > 0) : true);
 
     if (!prenderer.isEmpty())
         m_vidrend->setValue(prenderer);
@@ -920,7 +917,7 @@ void PlaybackProfileItemConfig::widthChanged(const QString &val)
     bool ok = true;
     QString oldvalue = m_item.Get("cond_width");
     m_item.Set("cond_width",val);
-    m_item.checkRange("cond_width", 640, &ok);
+    m_item.CheckRange("cond_width", 640, &ok);
     if (!ok)
     {
         ShowOkPopup(tr("Invalid width specification(%1), discarded").arg(val));
@@ -934,7 +931,7 @@ void PlaybackProfileItemConfig::heightChanged(const QString &val)
     bool ok = true;
     QString oldvalue = m_item.Get("cond_height");
     m_item.Set("cond_height",val);
-    m_item.checkRange("cond_height", 480, &ok);
+    m_item.CheckRange("cond_height", 480, &ok);
     if (!ok)
     {
         ShowOkPopup(tr("Invalid height specification(%1), discarded").arg(val));
@@ -948,7 +945,7 @@ void PlaybackProfileItemConfig::framerateChanged(const QString &val)
     bool ok = true;
     QString oldvalue = m_item.Get("cond_framerate");
     m_item.Set("cond_framerate",val);
-    m_item.checkRange("cond_framerate", 25.0F, &ok);
+    m_item.CheckRange("cond_framerate", 25.0F, &ok);
     if (!ok)
     {
         ShowOkPopup(tr("Invalid frame rate specification(%1), discarded").arg(val));

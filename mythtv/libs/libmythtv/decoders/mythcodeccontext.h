@@ -53,7 +53,7 @@ class MTV_PUBLIC MythCodecContext
     virtual ~MythCodecContext() = default;
 
     static MythCodecContext* CreateContext (DecoderBase *Parent, MythCodecID Codec);
-    static void GetDecoders                (render_opts &Opts);
+    static void GetDecoders                (RenderOptions &Opts);
     static MythCodecID FindDecoder         (const QString &Decoder, AVStream *Stream,
                                             AVCodecContext **Context, AVCodec **Codec);
     static int  GetBuffer                  (struct AVCodecContext *Context, AVFrame *Frame, int Flags);

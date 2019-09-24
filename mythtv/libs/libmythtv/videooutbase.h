@@ -39,7 +39,7 @@ class MythMultiLocker;
 class VideoOutput
 {
   public:
-    static void GetRenderOptions(render_opts &Options);
+    static void GetRenderOptions(RenderOptions &Options);
     static VideoOutput *Create(const QString &Decoder,    MythCodecID CodecID,
                                PIPState PiPState,         const QSize &VideoDim,
                                const QSize &VideoDispDim, float VideoAspect,

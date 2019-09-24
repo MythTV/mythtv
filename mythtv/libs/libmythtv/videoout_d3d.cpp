@@ -31,7 +31,7 @@ const int kKeepPrebuffer = 2;
 
 #define LOC      QString("VideoOutputD3D: ")
 
-void VideoOutputD3D::GetRenderOptions(render_opts &opts,
+void VideoOutputD3D::GetRenderOptions(RenderOptions &opts,
                                       QStringList &cpudeints)
 {
     opts.renderers->append("direct3d");

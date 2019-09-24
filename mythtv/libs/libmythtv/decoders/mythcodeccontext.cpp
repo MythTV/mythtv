@@ -102,7 +102,7 @@ MythCodecContext *MythCodecContext::CreateContext(DecoderBase *Parent, MythCodec
     return mctx;
 }
 
-void MythCodecContext::GetDecoders(render_opts &Opts)
+void MythCodecContext::GetDecoders(RenderOptions &Opts)
 {
 #ifdef USING_VDPAU
     // Only enable VDPAU support if it is actually present
