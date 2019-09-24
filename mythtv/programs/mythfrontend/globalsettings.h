@@ -211,7 +211,6 @@ class PlaybackProfileItemConfig : public GroupSetting
     void framerateChanged(const QString &val);
     void decoderChanged(const QString &dec);
     void vrenderChanged(const QString &renderer);
-    void orenderChanged(const QString &renderer);
     void deint0Changed(const QString &deint);
     void deint1Changed(const QString &deint);
     void InitLabel(void);
@@ -227,8 +226,6 @@ class PlaybackProfileItemConfig : public GroupSetting
     TransMythUISpinBoxSetting  *m_max_cpus     {nullptr};
     TransMythUICheckBoxSetting *m_skiploop     {nullptr};
     TransMythUIComboBoxSetting *m_vidrend      {nullptr};
-    TransMythUIComboBoxSetting *m_osdrend      {nullptr};
-    TransMythUICheckBoxSetting *m_osdfade      {nullptr};
     TransMythUIComboBoxSetting *m_deint0       {nullptr};
     TransMythUIComboBoxSetting *m_deint1       {nullptr};
     TransTextEditSetting       *m_filters      {nullptr};

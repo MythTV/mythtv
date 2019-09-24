@@ -153,7 +153,7 @@ void ChannelEditor::sendResult(int result)
 
 OSD::OSD(MythPlayer *player, QObject *parent, MythPainter *painter)
   : m_parent(player), m_ParentObject(parent), m_CurrentPainter(painter),
-    m_Rect(QRect()), m_Effects(true), m_FadeTime(kOSDFadeTime), m_Dialog(nullptr),
+    m_Rect(QRect()), m_FadeTime(kOSDFadeTime), m_Dialog(nullptr),
     m_PulsedDialogText(QString()), m_NextPulseUpdate(QDateTime()),
     m_Refresh(false), m_Visible(false), m_UIScaleOverride(false),
     m_SavedWMult(1.0F), m_SavedHMult(1.0F),   m_SavedUIRect(QRect()),
@@ -261,14 +261,7 @@ bool OSD::Reinit(const QRect &rect, float font_aspect)
     if (m_Dialog && m_Dialog->objectName() == OSD_DLG_NAVIGATE
         && m_Dialog->IsVisible())
     {
-        bool softBlend = (m_parent->GetVideoOutput()->GetOSDRenderer() == "softblend");
-        OsdNavigation *nav = static_cast<OsdNavigation *> (m_Dialog);
-        QString navFocus = nav->GetFocusWidget()->objectName();
-        if (softBlend && navFocus == "TOGGLEFILL")
-            // in this case continue with reinit
-            ;
-        else
-            return true;
+        return true;
     }
 
     HideAll(false);
@@ -687,7 +680,7 @@ bool OSD::DrawDirect(MythPainter* painter, QSize size, bool repaint)
         {
             visible = true;
             (*it)->Pulse();
-            if (m_Effects && m_ExpireTimes.contains((*it)))
+            if (m_ExpireTimes.contains((*it)))
             {
                 QTime expires = m_ExpireTimes.value((*it)).time();
                 int left = now.msecsTo(expires);
@@ -733,15 +726,12 @@ bool OSD::DrawDirect(MythPainter* painter, QSize size, bool repaint)
 
             visible = true;
             (*it2)->Pulse();
-            if (m_Effects)
-            {
-                QTime expires = nc->ScreenExpiryTime(*it2).time();
-                int left = now.msecsTo(expires);
-                if (left < 0)
-                    left = 0;
-                if (expires.isValid() && left < m_FadeTime)
-                    (*it2)->SetAlpha((255 * left) / m_FadeTime);
-            }
+            QTime expires = nc->ScreenExpiryTime(*it2).time();
+            int left = now.msecsTo(expires);
+            if (left < 0)
+                left = 0;
+            if (expires.isValid() && left < m_FadeTime)
+                (*it2)->SetAlpha((255 * left) / m_FadeTime);
             if ((*it2)->NeedsRedraw())
                 redraw = true;
         }
@@ -812,7 +802,7 @@ QRegion OSD::Draw(MythPainter* painter, QPaintDevice *device, QSize size,
                 visible = visible.united(vis);
 
             (*it)->Pulse();
-            if (m_Effects && m_ExpireTimes.contains((*it)))
+            if (m_ExpireTimes.contains((*it)))
             {
                 QTime expires = m_ExpireTimes.value((*it)).time();
                 int left = now.msecsTo(expires);
@@ -863,13 +853,10 @@ QRegion OSD::Draw(MythPainter* painter, QPaintDevice *device, QSize size,
                 visible = visible.united(vis);
 
             (*it2)->Pulse();
-            if (m_Effects)
-            {
-                QTime expires = nc->ScreenExpiryTime(*it2).time();
-                int left = now.msecsTo(expires);
-                if (expires.isValid() && left < m_FadeTime)
-                    (*it2)->SetAlpha((255 * left) / m_FadeTime);
-            }
+            QTime expires = nc->ScreenExpiryTime(*it2).time();
+            int left = now.msecsTo(expires);
+            if (expires.isValid() && left < m_FadeTime)
+                (*it2)->SetAlpha((255 * left) / m_FadeTime);
         }
 
         if ((*it2)->NeedsRedraw())

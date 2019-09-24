@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 
-#ifndef _VIDEO_DISPLAY_PROFILE_H_
-#define _VIDEO_DISPLAY_PROFILE_H_
+#ifndef VIDEO_DISPLAY_PROFILE_H_
+#define VIDEO_DISPLAY_PROFILE_H_
 
 #include <vector>
 using namespace std;
@@ -24,7 +24,6 @@ struct render_opts
     safe_list_t    *renderers;
     safe_map_t     *safe_renderers;
     safe_map_t     *deints;
-    safe_map_t     *osds;
     safe_map_t     *render_group;
     priority_map_t *priorities;
     safe_list_t    *decoders;
@@ -110,11 +109,6 @@ class MTV_PUBLIC VideoDisplayProfile
     QString GetVideoRenderer(void) const
         { return GetPreference("pref_videorenderer"); }
 
-    QString GetOSDRenderer(void) const
-        { return GetPreference("pref_osdrenderer"); }
-    bool IsOSDFadeEnabled(void) const
-        { return GetPreference("pref_osdfade").toInt(); }
-
     QString GetDeinterlacer(void) const
         { return GetPreference("pref_deint0"); }
     QString GetFallbackDeinterlacer(void) const
@@ -149,14 +143,12 @@ class MTV_PUBLIC VideoDisplayProfile
         const QString& cmp0, uint width0, uint height0,
         const QString& cmp1, uint width1, uint height1,
         QString decoder, uint max_cpus, bool skiploop, QString videorenderer,
-        QString osdrenderer, bool osdfade,
         QString deint0, QString deint1, QString filters);
 
     static void CreateProfile(
         uint groupid, uint priority,
         const QString& width, const QString& height, const QString& codecs,
         const QString& decoder, uint max_cpus, bool skiploop, const QString& videorenderer,
-        const QString& osdrenderer, bool osdfade,
         const QString& deint0, const QString& deint1, const QString& filters);
 
     static void        DeleteProfiles(const QString &hostname);
@@ -168,8 +160,6 @@ class MTV_PUBLIC VideoDisplayProfile
     static QStringList GetDeinterlacers(const QString &video_renderer);
     static QString     GetDeinterlacerName(const QString &short_name);
     static QString     GetDeinterlacerHelp(const QString &deint);
-    static QStringList GetOSDs(const QString &video_renderer);
-    static QString     GetOSDHelp(const QString &osd);
     static bool        IsFilterAllowed( const QString &video_renderer);
 
     static QStringList GetFilteredRenderers(const QString     &decoder,
@@ -205,7 +195,6 @@ class MTV_PUBLIC VideoDisplayProfile
     static safe_map_t     s_safe_renderer;
     static safe_map_t     s_safe_renderer_group;
     static safe_map_t     s_safe_deint;
-    static safe_map_t     s_safe_osd;
     static safe_map_t     s_safe_equiv_dec;
     static safe_list_t    s_safe_custom;
     static priority_map_t s_safe_renderer_priority;

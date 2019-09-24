@@ -714,8 +714,6 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
     m_max_cpus     = new TransMythUISpinBoxSetting(1, HAVE_THREADS ? 8 : 1, 1, 1);
     m_skiploop     = new TransMythUICheckBoxSetting();
     m_vidrend      = new TransMythUIComboBoxSetting();
-    m_osdrend      = new TransMythUIComboBoxSetting();
-    m_osdfade      = new TransMythUICheckBoxSetting();
     m_deint0       = new TransMythUIComboBoxSetting();
     m_deint1       = new TransMythUIComboBoxSetting();
     m_filters      = new TransTextEditSetting();
@@ -750,8 +748,6 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
     m_max_cpus->setLabel(tr("Max CPUs"));
     m_skiploop->setLabel(tr("Deblocking filter"));
     m_vidrend->setLabel(tr("Video renderer"));
-    m_osdrend->setLabel(tr("OSD renderer"));
-    m_osdfade->setLabel(tr("OSD fade"));
     m_deint0->setLabel(tr("Primary deinterlacer"));
     m_deint1->setLabel(tr("Fallback deinterlacer"));
     m_filters->setLabel(tr("Custom filters"));
@@ -767,15 +763,9 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
         tr("Example custom filter list: 'ivtc,denoise3d'"));
 
     m_skiploop->setHelpText(
-        tr("When unchecked the deblocking loopfilter will be disabled ") + "\n" +
-        tr("Disabling will significantly reduce the load on the CPU "
-           "when watching HD H.264 but may significantly reduce video quality."));
-
-    m_osdfade->setHelpText(
-        tr("When unchecked the OSD will not fade away but instead "
-           "will disappear abruptly.") + '\n' +
-        tr("Uncheck this if the video studders while the OSD is "
-           "fading away."));
+        tr("When unchecked the deblocking loopfilter will be disabled. ") + "\n" +
+        tr("Disabling will significantly reduce the load on the CPU for software decoding of "
+           "H.264 and HEVC material but may significantly reduce video quality."));
 
     addChild(m_width_range);
     addChild(m_height_range);
@@ -785,8 +775,6 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
     addChild(m_max_cpus);
     addChild(m_skiploop);
     addChild(m_vidrend);
-    addChild(m_osdrend);
-    addChild(m_osdfade);
 
     addChild(m_deint0);
     addChild(m_deint1);
@@ -804,8 +792,6 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
             this,    SLOT(decoderChanged(const QString&)));
     connect(m_vidrend, SIGNAL(valueChanged(const QString&)),
             this,    SLOT(vrenderChanged(const QString&)));
-    connect(m_osdrend, SIGNAL(valueChanged(const QString&)),
-            this,    SLOT(orenderChanged(const QString&)));
     connect(m_deint0, SIGNAL(valueChanged(const QString&)),
             this,    SLOT(deint0Changed(const QString&)));
     connect(m_deint1, SIGNAL(valueChanged(const QString&)),
@@ -866,8 +852,6 @@ void PlaybackProfileItemConfig::Load(void)
     QString pmax_cpus = m_item.Get("pref_max_cpus");
     QString pskiploop = m_item.Get("pref_skiploop");
     QString prenderer = m_item.Get("pref_videorenderer");
-    QString posd      = m_item.Get("pref_osdrenderer");
-    QString posdfade  = m_item.Get("pref_osdfade");
     QString pdeint0   = m_item.Get("pref_deint0");
     QString pdeint1   = m_item.Get("pref_deint1");
     QString pfilter   = m_item.Get("pref_filters");
@@ -899,10 +883,6 @@ void PlaybackProfileItemConfig::Load(void)
 
     if (!prenderer.isEmpty())
         m_vidrend->setValue(prenderer);
-    if (!posd.isEmpty())
-        m_osdrend->setValue(posd);
-
-    m_osdfade->setValue((!posdfade.isEmpty()) ? (bool) posdfade.toInt() : true);
 
     if (!pdeint0.isEmpty())
         m_deint0->setValue(pdeint0);
@@ -926,8 +906,6 @@ void PlaybackProfileItemConfig::Save(void)
     m_item.Set("pref_max_cpus",      m_max_cpus->getValue());
     m_item.Set("pref_skiploop",      (m_skiploop->boolValue()) ? "1" : "0");
     m_item.Set("pref_videorenderer", m_vidrend->getValue());
-    m_item.Set("pref_osdrenderer",   m_osdrend->getValue());
-    m_item.Set("pref_osdfade",       (m_osdfade->boolValue()) ? "1" : "0");
     m_item.Set("pref_deint0",        m_deint0->getValue());
     m_item.Set("pref_deint1",        m_deint1->getValue());
 
@@ -1008,17 +986,11 @@ void PlaybackProfileItemConfig::decoderChanged(const QString &dec)
 
 void PlaybackProfileItemConfig::vrenderChanged(const QString &renderer)
 {
-    QStringList osds    = VideoDisplayProfile::GetOSDs(renderer);
     QStringList deints  = VideoDisplayProfile::GetDeinterlacers(renderer);
     QString decodername = m_decoder->getValue();
-    QString     losd    = m_osdrend->getValue();
     QString     ldeint0 = m_deint0->getValue();
     QString     ldeint1 = m_deint1->getValue();
     QStringList::const_iterator it;
-
-    m_osdrend->clearSelections();
-    for (it = osds.begin(); it != osds.end(); ++it)
-        m_osdrend->addSelection(*it, *it, (*it == losd));
 
     m_deint0->clearSelections();
     for (it = deints.begin(); it != deints.end(); ++it)
@@ -1040,11 +1012,6 @@ void PlaybackProfileItemConfig::vrenderChanged(const QString &renderer)
     m_vidrend->setHelpText(VideoDisplayProfile::GetVideoRendererHelp(renderer));
 
     InitLabel();
-}
-
-void PlaybackProfileItemConfig::orenderChanged(const QString &renderer)
-{
-    m_osdrend->setHelpText(VideoDisplayProfile::GetOSDHelp(renderer));
 }
 
 void PlaybackProfileItemConfig::deint0Changed(const QString &deint)

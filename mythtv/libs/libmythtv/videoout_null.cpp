@@ -16,7 +16,6 @@ void VideoOutputNull::GetRenderOptions(render_opts &opts,
 {
     opts.renderers->append("null");
     opts.deints->insert("null", cpudeints);
-    (*opts.osds)["null"].append("softblend");
     (*opts.safe_renderers)["dummy"].append("null");
     (*opts.safe_renderers)["nuppel"].append("null");
     if (opts.decoders->contains("ffmpeg"))

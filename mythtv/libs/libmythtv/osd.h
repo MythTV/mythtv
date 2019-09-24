@@ -131,7 +131,7 @@ class MythOSDWindow : public MythScreenType
 
 class OSD
 {
-    Q_DECLARE_TR_FUNCTIONS(OSD);
+    Q_DECLARE_TR_FUNCTIONS(OSD)
 
   public:
     OSD(MythPlayer *player, QObject *parent, MythPainter *painter);
@@ -144,7 +144,6 @@ class OSD
     void    OverrideUIScale(bool log = true);
     void    RevertUIScale(void);
     bool    Reinit(const QRect &rect, float font_aspect);
-    void    DisableFade(void) { m_Effects = false; }
     void    SetFunctionalWindow(const QString &window,
                                 enum OSDFunctionalType type);
     void    SetTimeouts(int _short, int _medium, int _long);
@@ -218,7 +217,6 @@ class OSD
     QObject        *m_ParentObject;
     MythPainter    *m_CurrentPainter;
     QRect           m_Rect;
-    bool            m_Effects;
     int             m_FadeTime;
     MythScreenType *m_Dialog;
     QString         m_PulsedDialogText;

@@ -294,20 +294,6 @@ bool ProfileItem::IsValid(QString *reason) const
         return false;
     }
 
-    QStringList osds      = VideoDisplayProfile::GetOSDs(renderer);
-    QString     osd       = Get("pref_osdrenderer");
-    if (!osds.contains(osd))
-    {
-        if (reason)
-        {
-            *reason = QString("OSD Renderer %1 is not supported "
-                              "w/renderer %2 (supported: %3)")
-                .arg(osd).arg(renderer).arg(toCommaList(osds));
-        }
-
-        return false;
-    }
-
     QString     filter    = Get("pref_filters");
     if (!filter.isEmpty() && !VideoDisplayProfile::IsFilterAllowed(renderer))
     {
@@ -343,11 +329,9 @@ QString ProfileItem::toString(void) const
     uint    max_cpus  = Get("pref_max_cpus").toUInt();
     bool    skiploop  = Get("pref_skiploop").toInt() != 0;
     QString renderer  = Get("pref_videorenderer");
-    QString osd       = Get("pref_osdrenderer");
     QString deint0    = Get("pref_deint0");
     QString deint1    = Get("pref_deint1");
     QString filter    = Get("pref_filters");
-    bool    osdfade   = Get("pref_osdfade").toInt() != 0;
 
     QString cond = QString("w(%1) h(%2) framerate(%3) codecs(%4)")
         .arg(width).arg(height).arg(framerate).arg(codecs);
@@ -355,9 +339,7 @@ QString ProfileItem::toString(void) const
         .arg(cmp0).arg(QString(cmp1.isEmpty() ? "" : ",") + cmp1)
         .arg(decoder).arg(max_cpus).arg((skiploop) ? "enabled" : "disabled").arg(renderer)
         .arg(cond);
-    str += QString("osd(%1) osdfade(%2) deint(%3,%4) filt(%5)")
-        .arg(osd).arg((osdfade) ? "enabled" : "disabled")
-        .arg(deint0).arg(deint1).arg(filter);
+    str += QString("deint(%1,%2) filt(%3)").arg(deint0).arg(deint1).arg(filter);
 
     return str;
 }
@@ -371,7 +353,6 @@ bool           VideoDisplayProfile::s_safe_initialized = false;
 safe_map_t     VideoDisplayProfile::s_safe_renderer;
 safe_map_t     VideoDisplayProfile::s_safe_renderer_group;
 safe_map_t     VideoDisplayProfile::s_safe_deint;
-safe_map_t     VideoDisplayProfile::s_safe_osd;
 safe_map_t     VideoDisplayProfile::s_safe_equiv_dec;
 safe_list_t    VideoDisplayProfile::s_safe_custom;
 priority_map_t VideoDisplayProfile::s_safe_renderer_priority;
@@ -461,10 +442,6 @@ void VideoDisplayProfile::SetVideoRenderer(const QString &video_renderer)
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "Old preferences: " + toString());
 
     SetPreference("pref_videorenderer", video_renderer);
-
-    QStringList osds = GetOSDs(video_renderer);
-    if (!osds.contains(GetOSDRenderer()))
-        SetPreference("pref_osdrenderer", osds[0]);
 
     QStringList deints = GetDeinterlacers(video_renderer);
     if (!deints.contains(GetDeinterlacer()))
@@ -1106,7 +1083,6 @@ void VideoDisplayProfile::CreateProfile(
     const QString& cmp0, uint width0, uint height0,
     const QString& cmp1, uint width1, uint height1,
     QString decoder, uint max_cpus, bool skiploop, QString videorenderer,
-    QString osdrenderer, bool osdfade,
     QString deint0, QString deint1, QString filters)
 {
     QString width;
@@ -1132,7 +1108,6 @@ void VideoDisplayProfile::CreateProfile(
         groupid, priority,
         width, height, QString(),
         std::move(decoder), max_cpus, skiploop, std::move(videorenderer),
-        std::move(osdrenderer), osdfade,
         std::move(deint0), std::move(deint1), std::move(filters));
 }
 
@@ -1141,7 +1116,6 @@ void VideoDisplayProfile::CreateProfile(
     uint groupid, uint priority,
     const QString& width, const QString& height, const QString& codecs,
     const QString& decoder, uint max_cpus, bool skiploop, const QString& videorenderer,
-    const QString& osdrenderer, bool osdfade,
     const QString& deint0, const QString& deint1, const QString& filters)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1185,12 +1159,6 @@ void VideoDisplayProfile::CreateProfile(
 
     queryValue += "pref_videorenderer";
     queryData  += videorenderer;
-
-    queryValue += "pref_osdrenderer";
-    queryData  += osdrenderer;
-
-    queryValue += "pref_osdfade";
-    queryData  += (osdfade) ? "1" : "0";
 
     queryValue += "pref_deint0";
     queryData  += deint0;
@@ -1297,68 +1265,30 @@ void VideoDisplayProfile::CreateProfiles(const QString &hostname)
     QStringList profiles = GetProfiles(hostname);
     uint groupid;
 
-#ifdef USING_XV
-    if (!profiles.contains("High Quality")) {
-        (void) QObject::tr("High Quality", "Sample: high quality");
-        groupid = CreateProfileGroup("High Quality", hostname);
-        CreateProfile(groupid, 1, ">=", 1920, 1080, "", 0, 0,
-                      "ffmpeg", 2, true, "xv-blit", "softblend", true,
-                      "linearblend", "linearblend", "");
-        CreateProfile(groupid, 2, ">", 0, 0, "", 0, 0,
-                      "ffmpeg", 1, true, "xv-blit", "softblend", true,
-                      "yadifdoubleprocessdeint", "yadifdeint", "");
-    }
-
-    if (!profiles.contains("Normal")) {
-        (void) QObject::tr("Normal", "Sample: average quality");
-        groupid = CreateProfileGroup("Normal", hostname);
-        CreateProfile(groupid, 1, ">=", 1280, 720, "", 0, 0,
-                      "ffmpeg", 1, true, "xv-blit", "softblend", false,
-                      "linearblend", "linearblend", "");
-        CreateProfile(groupid, 2, ">", 0, 0, "", 0, 0,
-                      "ffmpeg", 1, true, "xv-blit", "softblend", true,
-                      "greedyhdoubleprocessdeint", "kerneldeint", "");
-    }
-
-    if (!profiles.contains("Slim")) {
-        (void) QObject::tr("Slim", "Sample: low CPU usage");
-        groupid = CreateProfileGroup("Slim", hostname);
-        CreateProfile(groupid, 1, ">=", 1280, 720, "", 0, 0,
-                      "ffmpeg", 1, true, "xv-blit", "softblend", false,
-                      "onefield", "onefield", "");
-        CreateProfile(groupid, 2, ">", 0, 0, "", 0, 0,
-                      "ffmpeg", 1, true, "xv-blit", "softblend", false,
-                      "linearblend", "linearblend", "");
-    }
-#endif
-
 #ifdef USING_OPENGL_VIDEO
     if (!profiles.contains("OpenGL High Quality")) {
         (void) QObject::tr("OpenGL High Quality",
                            "Sample: OpenGL high quality");
         groupid = CreateProfileGroup("OpenGL High Quality", hostname);
         CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
-                      "ffmpeg", 2, true, "opengl", "opengl2", true,
-                      "greedyhdoubleprocessdeint", "greedyhdeint",
-                      "");
+                      "ffmpeg", 2, true, "opengl",
+                      "greedyhdoubleprocessdeint", "greedyhdeint", "");
     }
 
     if (!profiles.contains("OpenGL Normal")) {
         (void) QObject::tr("OpenGL Normal", "Sample: OpenGL average quality");
         groupid = CreateProfileGroup("OpenGL Normal", hostname);
         CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
-                      "ffmpeg", 2, true, "opengl", "opengl2", true,
-                      "opengldoubleratekerneldeint", "openglkerneldeint",
-                      "");
+                      "ffmpeg", 2, true, "opengl",
+                      "opengldoubleratekerneldeint", "openglkerneldeint", "");
     }
 
     if (!profiles.contains("OpenGL Slim")) {
         (void) QObject::tr("OpenGL Slim", "Sample: OpenGL low power GPU");
         groupid = CreateProfileGroup("OpenGL Slim", hostname);
         CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
-                      "ffmpeg", 1, true, "opengl", "opengl2", true,
-                      "opengldoubleratelinearblend", "opengllinearblend",
-                      "");
+                      "ffmpeg", 1, true, "opengl",
+                      "opengldoubleratelinearblend", "opengllinearblend", "");
     }
 #endif
 
@@ -1367,13 +1297,10 @@ void VideoDisplayProfile::CreateProfiles(const QString &hostname)
         (void) QObject::tr("VAAPI Normal", "Sample: VAAPI average quality");
         groupid = CreateProfileGroup("VAAPI Normal", hostname);
         CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
-                      "vaapi", 2, true, "opengl-hw", "opengl2", true,
-                      "none", "none",
-                      "");
+                      "vaapi", 2, true, "opengl-hw", "none", "none", "");
         CreateProfile(groupid, 2, ">", 0, 0, "", 0, 0,
-                      "ffmpeg", 2, true, "opengl", "opengl2", true,
-                      "opengldoubleratekerneldeint", "openglkerneldeint",
-                      "");
+                      "ffmpeg", 2, true, "opengl",
+                      "opengldoubleratekerneldeint", "openglkerneldeint", "");
     }
 #endif
 
@@ -1384,9 +1311,7 @@ void VideoDisplayProfile::CreateProfiles(const QString &hostname)
         groupid = CreateProfileGroup("MediaCodec Normal", hostname);
         CreateProfile(groupid, 1, "", "", "",
                       "mediacodec-dec", 4, true, "opengl",
-                      "opengl2", true,
-                      "opengldoubleratelinearblend", "opengllinearblend",
-                      "");
+                      "opengldoubleratelinearblend", "opengllinearblend", "");
     }
 #endif
 
@@ -1397,9 +1322,7 @@ void VideoDisplayProfile::CreateProfiles(const QString &hostname)
         groupid = CreateProfileGroup("VAAPI2 Normal", hostname);
         CreateProfile(groupid, 1, "", "", "",
                       "vaapi-dec", 4, true, "opengl",
-                      "opengl2", true,
-                      "vaapi2doubleratedefault", "vaapi2default",
-                      "");
+                      "vaapi2doubleratedefault", "vaapi2default", "");
     }
 #endif
 
@@ -1410,9 +1333,7 @@ void VideoDisplayProfile::CreateProfiles(const QString &hostname)
         groupid = CreateProfileGroup("NVDEC Normal", hostname);
         CreateProfile(groupid, 1, "", "", "",
                       "nvdec", 4, true, "opengl",
-                      "opengl2", true,
-                      "nvdecdoublerateadaptive", "nvdecadaptive",
-                      "");
+                      "nvdecdoublerateadaptive", "nvdecadaptive", "");
     }
 #endif
 
@@ -1660,47 +1581,6 @@ QString VideoDisplayProfile::GetDeinterlacerHelp(const QString &deint)
     return msg;
 }
 
-QStringList VideoDisplayProfile::GetOSDs(const QString &video_renderer)
-{
-    QMutexLocker locker(&s_safe_lock);
-    InitStatics();
-
-    safe_map_t::const_iterator it = s_safe_osd.find(video_renderer);
-    QStringList tmp;
-    if (it != s_safe_osd.end())
-        tmp = *it;
-    return tmp;
-}
-
-QString VideoDisplayProfile::GetOSDHelp(const QString &osd)
-{
-
-    QString msg = QObject::tr("OSD rendering method");
-
-    if (osd.isEmpty())
-        return msg;
-
-    if (osd == "softblend")
-    {
-        msg = QObject::tr(
-            "Software OSD rendering uses your CPU to alpha blend the OSD.");
-    }
-
-    if (osd.contains("opengl"))
-    {
-        msg = QObject::tr(
-            "Uses OpenGL to alpha blend the OSD onto the video.");
-    }
-
-    if (osd =="threaded")
-    {
-        msg = QObject::tr(
-            "Uses OpenGL in a separate thread to overlay the OSD onto the video.");
-    }
-
-    return msg;
-}
-
 bool VideoDisplayProfile::IsFilterAllowed(const QString &video_renderer)
 {
     QMutexLocker locker(&s_safe_lock);
@@ -1764,7 +1644,6 @@ void VideoDisplayProfile::InitStatics(bool Reinit /*= false*/)
         s_safe_custom.clear();
         s_safe_renderer.clear();
         s_safe_deint.clear();
-        s_safe_osd.clear();
         s_safe_renderer_group.clear();
         s_safe_renderer_priority.clear();
         s_safe_decoders.clear();
@@ -1780,7 +1659,6 @@ void VideoDisplayProfile::InitStatics(bool Reinit /*= false*/)
     options.renderers      = &s_safe_custom;
     options.safe_renderers = &s_safe_renderer;
     options.deints         = &s_safe_deint;
-    options.osds           = &s_safe_osd;
     options.render_group   = &s_safe_renderer_group;
     options.priorities     = &s_safe_renderer_priority;
     options.decoders       = &s_safe_decoders;

@@ -59,19 +59,16 @@ void VideoOutputOpenGL::GetRenderOptions(render_opts &Options,
     // OpenGL UYVY
     Options.renderers->append("opengl");
     Options.deints->insert("opengl", SoftwareDeinterlacers + gldeints);
-    (*Options.osds)["opengl"].append("opengl2");
     Options.priorities->insert("opengl", 65);
 
     // OpenGL YV12
     Options.renderers->append("opengl-yv12");
     Options.deints->insert("opengl-yv12", SoftwareDeinterlacers + gldeints);
-    (*Options.osds)["opengl-yv12"].append("opengl2");
     Options.priorities->insert("opengl-yv12", 65);
 
 #if defined(USING_VAAPI) || defined (USING_VTB) || defined (USING_MEDIACODEC) || defined (USING_VDPAU) || defined (USING_NVDEC) || defined (USING_MMAL)
     Options.renderers->append("opengl-hw");
     (*Options.deints)["opengl-hw"].append("none");
-    (*Options.osds)["opengl-hw"].append("opengl2");
     (*Options.safe_renderers)["dummy"].append("opengl-hw");
     (*Options.safe_renderers)["nuppel"].append("opengl-hw");
     Options.priorities->insert("opengl-hw", 110);

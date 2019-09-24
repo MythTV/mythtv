@@ -330,12 +330,6 @@ bool VideoOutput::Init(const QSize &VideoDim, const QSize &VideoDispDim,
     return mainSuccess;
 }
 
-void VideoOutput::InitOSD(OSD *Osd)
-{
-    if (m_dbDisplayProfile && !m_dbDisplayProfile->IsOSDFadeEnabled())
-        Osd->DisableFade();
-}
-
 QString VideoOutput::GetFilters(void) const
 {
     if (m_dbDisplayProfile)
@@ -659,14 +653,6 @@ bool VideoOutput::EnoughDecodedFrames(void)
 bool VideoOutput::EnoughPrebufferedFrames(void)
 {
     return m_videoBuffers.EnoughPrebufferedFrames();
-}
-
-/**
-\ brief return OSD renderer type for this videoOutput
-*/
-QString VideoOutput::GetOSDRenderer(void) const
-{
-    return m_dbDisplayProfile->GetOSDRenderer();
 }
 
 /// \brief returns QRect of PIP based on PIPLocation

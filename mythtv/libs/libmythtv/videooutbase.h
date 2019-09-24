@@ -53,7 +53,7 @@ class VideoOutput
     virtual bool Init(const QSize &VideoDim, const QSize &VideoDispDim,
                       float VideoAspect,     WId WinID,
                       const QRect &WindowRect, MythCodecID CodecID);
-    virtual void InitOSD(OSD *Osd);
+    virtual void InitOSD(OSD *) { }
     virtual void SetVideoFrameRate(float);
     virtual void SetDeinterlacing(bool Enable, bool DoubleRate);
     virtual void ProcessFrame(VideoFrame *Frame, OSD *Osd, const PIPMap &PipPlayers,
@@ -129,7 +129,6 @@ class VideoOutput
                              bool DoPixelAdj = true) const;
     virtual void RemovePIP(MythPlayer *) { }
     virtual void SetPIPState(PIPState Setting);
-    virtual QString GetOSDRenderer(void) const;
     virtual MythPainter *GetOSDPainter(void) { return nullptr; }
 
     QString      GetFilters(void) const;
