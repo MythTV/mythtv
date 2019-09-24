@@ -49,8 +49,14 @@ void MythOpenGLPainter::FreeResources(void)
     ClearCache();
     DeleteTextures();
     if (m_mappedBufferPoolReady)
+    {
         for (int i = 0; i < MAX_BUFFER_POOL; i++)
+        {
             delete m_mappedBufferPool[i];
+            m_mappedBufferPool[i] = nullptr;
+        }
+        m_mappedBufferPoolReady = false;
+    }
 }
 
 void MythOpenGLPainter::DeleteTextures(void)
