@@ -19,8 +19,8 @@ void VideoOutputNull::GetRenderOptions(RenderOptions &Options)
     if (Options.decoders->contains("ffmpeg"))
         (*Options.safe_renderers)["ffmpeg"].append("null");
 #ifdef USING_VTB
-    if (opts.decoders->contains("vtb-dec"))
-        (*opts.safe_renderers)["vtb-dec"].append("null");
+    if (Options.decoders->contains("vtb-dec"))
+        (*Options.safe_renderers)["vtb-dec"].append("null");
 #endif
 #ifdef USING_VDPAU
     if (Options.decoders->contains("vdpau-dec"))
@@ -35,16 +35,16 @@ void VideoOutputNull::GetRenderOptions(RenderOptions &Options)
         (*Options.safe_renderers)["vaapi-dec"].append("null");
 #endif
 #ifdef USING_MEDIACODEC
-    if (opts.decoders->contains("mediacodec-dec"))
-        (*opts.safe_renderers)["mediacodec-dec"].append("null");
+    if (Options.decoders->contains("mediacodec-dec"))
+        (*Options.safe_renderers)["mediacodec-dec"].append("null");
 #endif
 #ifdef USING_V4L2
     if (Options.decoders->contains("v4l2-dec"))
         (*Options.safe_renderers)["v4l2-dec"].append("null");
 #endif
 #ifdef USING_MMAL
-    if (opts.decoders->contains("mmal-dec"))
-        (*opts.safe_renderers)["mmal-dec"].append("null");
+    if (Options.decoders->contains("mmal-dec"))
+        (*Options.safe_renderers)["mmal-dec"].append("null");
 #endif
     Options.priorities->insert("null", 10);
 }
