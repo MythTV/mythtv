@@ -11331,27 +11331,6 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
         active = (m_tvmScanTypeUnlocked == kScan_Intr2ndField);
         BUTTON("SELECTSCAN_2", tr("Interlaced (Reversed)"));
     }
-    else if (matchesGroup(actionName, "DEINTERLACER_", category, prefix))
-    {
-        bool doublerate = false;
-        if (m_tvmScanType != kScan_Progressive ||
-            ctx->m_player->GetMythCodecContext()->IsDeinterlacing(doublerate))
-        {
-            foreach (QString deint, m_tvmDeinterlacers)
-            {
-                if ((deint.contains("doublerate") ||
-                     deint.contains("doubleprocess") ||
-                     deint.contains("bobdeint")) && !m_tvmDoubleRate)
-                {
-                    continue;
-                }
-                QString action = prefix + deint;
-                active = (deint == m_tvmCurrentDeinterlacer);
-                QString trans = VideoDisplayProfile::GetDeinterlacerName(deint);
-                BUTTON(action, trans);
-            }
-        }
-    }
     else if (matchesGroup(actionName, "SELECTSUBTITLE_", category, prefix) ||
              matchesGroup(actionName, "SELECTRAWTEXT_",  category, prefix) ||
              matchesGroup(actionName, "SELECTCC708_",    category, prefix) ||

@@ -295,42 +295,6 @@ bool ProfileItem::IsValid(QString *Reason) const
         return false;
     }
 
-    QStringList deints    = VideoDisplayProfile::GetDeinterlacers(renderer);
-    QString     deint0    = Get("pref_deint0");
-    QString     deint1    = Get("pref_deint1");
-    if (!deint0.isEmpty() && !deints.contains(deint0))
-    {
-        if (Reason)
-        {
-            *Reason = QString("deinterlacer %1 is not supported "
-                              "w/renderer %2 (supported: %3)")
-                .arg(deint0).arg(renderer).arg(toCommaList(deints));
-        }
-
-        return false;
-    }
-
-    if (!deint1.isEmpty() &&
-        (!deints.contains(deint1) ||
-         deint1.contains("bobdeint") ||
-         deint1.contains("doublerate") ||
-         deint1.contains("doubleprocess")))
-    {
-        if (Reason)
-        {
-            if (deint1.contains("bobdeint") ||
-                deint1.contains("doublerate") ||
-                deint1.contains("doubleprocess"))
-                deints.removeAll(deint1);
-
-            *Reason = QString("deinterlacer %1 is not supported w/renderer %2 "
-                              "as second deinterlacer (supported: %3)")
-                .arg(deint1).arg(renderer).arg(toCommaList(deints));
-        }
-
-        return false;
-    }
-
     QString     filter    = Get("pref_filters");
     if (!filter.isEmpty() && !VideoDisplayProfile::IsFilterAllowed(renderer))
     {
@@ -389,12 +353,12 @@ QMutex                    VideoDisplayProfile::s_safe_lock(QMutex::Recursive);
 bool                      VideoDisplayProfile::s_safe_initialized = false;
 QMap<QString,QStringList> VideoDisplayProfile::s_safe_renderer;
 QMap<QString,QStringList> VideoDisplayProfile::s_safe_renderer_group;
-QMap<QString,QStringList> VideoDisplayProfile::s_safe_deint;
 QMap<QString,QStringList> VideoDisplayProfile::s_safe_equiv_dec;
 QStringList               VideoDisplayProfile::s_safe_custom;
 QMap<QString,uint>        VideoDisplayProfile::s_safe_renderer_priority;
 QMap<QString,QString>     VideoDisplayProfile::s_dec_name;
 QStringList               VideoDisplayProfile::s_safe_decoders;
+QList<QPair<QString,QString> > VideoDisplayProfile::s_deinterlacer_options;
 
 VideoDisplayProfile::VideoDisplayProfile()
 {
@@ -465,6 +429,16 @@ QString VideoDisplayProfile::GetDecoder(void) const
     return GetPreference("pref_decoder");
 }
 
+QString VideoDisplayProfile::GetSingleRatePreferences(void) const
+{
+    return GetPreference("pref_deint0");
+}
+
+QString VideoDisplayProfile::GetDoubleRatePreferences(void) const
+{
+    return GetPreference("pref_deint1");
+}
+
 uint VideoDisplayProfile::GetMaxCPUs(void) const
 {
     return GetPreference("pref_max_cpus").toUInt();
@@ -478,16 +452,6 @@ bool VideoDisplayProfile::IsSkipLoopEnabled(void) const
 QString VideoDisplayProfile::GetVideoRenderer(void) const
 {
     return GetPreference("pref_videorenderer");
-}
-
-QString VideoDisplayProfile::GetDeinterlacer(void) const
-{
-    return GetPreference("pref_deint0");
-}
-
-QString VideoDisplayProfile::GetFallbackDeinterlacer(void) const
-{
-    return GetPreference("pref_deint1");
 }
 
 QString VideoDisplayProfile::GetActualVideoRenderer(void) const
@@ -519,19 +483,6 @@ void VideoDisplayProfile::SetVideoRenderer(const QString &VideoRenderer)
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "Old preferences: " + toString());
 
     SetPreference("pref_videorenderer", VideoRenderer);
-
-    QStringList deints = GetDeinterlacers(VideoRenderer);
-    if (!deints.contains(GetDeinterlacer()))
-        SetPreference("pref_deint0", deints[0]);
-    if (!deints.contains(GetFallbackDeinterlacer()))
-        SetPreference("pref_deint1", deints[0]);
-    if (GetFallbackDeinterlacer().contains("bobdeint") ||
-        GetFallbackDeinterlacer().contains("doublerate") ||
-        GetFallbackDeinterlacer().contains("doubleprocess"))
-    {
-        SetPreference("pref_deint1", deints[1]);
-    }
-
     SetPreference("pref_filters", "");
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "New preferences: " + toString());
@@ -561,22 +512,6 @@ bool VideoDisplayProfile::IsDecoderCompatible(const QString &Decoder)
 
     QMutexLocker locker(&s_safe_lock);
     return (s_safe_equiv_dec[dec].contains(Decoder));
-}
-
-QString VideoDisplayProfile::GetFilteredDeint(const QString &Override)
-{
-    QString renderer = GetActualVideoRenderer();
-    QString deint    = GetDeinterlacer();
-
-    QMutexLocker locker(&m_lock);
-
-    if (!Override.isEmpty() && GetDeinterlacers(renderer).contains(Override))
-        deint = Override;
-
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("GetFilteredDeint(%1) : %2 -> '%3'")
-            .arg(Override).arg(renderer).arg(deint));
-
-    return deint;
 }
 
 QString VideoDisplayProfile::GetPreference(const QString &Key) const
@@ -941,96 +876,6 @@ QString VideoDisplayProfile::GetDecoderHelp(const QString& Decoder)
             "accelerate video decoding on NVIDIA Graphics Adapters. ");
 
     return msg;
-}
-
-QString VideoDisplayProfile::GetDeinterlacerName(const QString &ShortName)
-{
-    if ("none" == ShortName)
-        return QObject::tr("None");
-    if ("linearblend" == ShortName)
-        return QObject::tr("Linear blend");
-    if ("kerneldeint" == ShortName)
-        return QObject::tr("Kernel");
-    if ("kerneldoubleprocessdeint" == ShortName)
-        return QObject::tr("Kernel (2x)");
-    if ("greedyhdeint" == ShortName)
-        return QObject::tr("Greedy HighMotion");
-    if ("greedyhdoubleprocessdeint" == ShortName)
-        return QObject::tr("Greedy HighMotion (2x)");
-    if ("yadifdeint" == ShortName)
-        return QObject::tr("Yadif");
-    if ("yadifdoubleprocessdeint" == ShortName)
-        return QObject::tr("Yadif (2x)");
-    if ("bobdeint" == ShortName)
-        return QObject::tr("Bob (2x)");
-    if ("onefield" == ShortName)
-        return QObject::tr("One field");
-    if ("fieldorderdoubleprocessdeint" == ShortName)
-        return QObject::tr("Interlaced (2x)");
-    if ("opengllinearblend" == ShortName)
-        return QObject::tr("Linear blend (HW-GL)");
-    if ("openglkerneldeint" == ShortName)
-        return QObject::tr("Kernel (HW-GL)");
-    if ("openglbobdeint" == ShortName)
-        return QObject::tr("Bob (2x, HW-GL)");
-    if ("openglonefield" == ShortName)
-        return QObject::tr("One field (HW-GL)");
-    if ("opengldoubleratekerneldeint" == ShortName)
-        return QObject::tr("Kernel (2x, HW-GL)");
-    if ("opengldoubleratelinearblend" == ShortName)
-        return QObject::tr("Linear blend (2x, HW-GL)");
-    if ("opengldoubleratefieldorder" == ShortName)
-        return QObject::tr("Interlaced (2x, HW-GL)");
-    if ("vdpauonefield" == ShortName)
-        return QObject::tr("One Field (1x, HW)");
-    if ("vdpaubobdeint" == ShortName)
-        return QObject::tr("Bob (2x, HW)");
-    if ("vdpaubasic" == ShortName)
-        return QObject::tr("Temporal (1x, HW)");
-    if ("vdpaubasicdoublerate" == ShortName)
-        return QObject::tr("Temporal (2x, HW)");
-    if ("vdpauadvanced" == ShortName)
-        return QObject::tr("Advanced (1x, HW)");
-    if ("vdpauadvanceddoublerate" == ShortName)
-        return QObject::tr("Advanced (2x, HW)");
-#ifdef USING_VAAPI
-    if ("vaapi2default" == ShortName)
-        return QObject::tr("Advanced (HW-VA)");
-    if ("vaapi2bob" == ShortName)
-        return QObject::tr("Bob (HW-VA)");
-    if ("vaapi2weave" == ShortName)
-        return QObject::tr("Weave (HW-VA)");
-    if ("vaapi2motion_adaptive" == ShortName)
-        return QObject::tr("Motion Adaptive (HW-VA)");
-    if ("vaapi2motion_compensated" == ShortName)
-        return QObject::tr("Motion Compensated (HW-VA)");
-    if ("vaapi2doubleratedefault" == ShortName)
-        return QObject::tr("Advanced (2x, HW-VA)");
-    if ("vaapi2doubleratebob" == ShortName)
-        return QObject::tr("Bob (2x, HW-VA)");
-    if ("vaapi2doublerateweave" == ShortName)
-        return QObject::tr("Weave (2x, HW-VA)");
-    if ("vaapi2doubleratemotion_adaptive" == ShortName)
-        return QObject::tr("Motion Adaptive (2x, HW-VA)");
-    if ("vaapi2doubleratemotion_compensated" == ShortName)
-        return QObject::tr("Motion Compensated (2x, HW-VA)");
-#endif
-#ifdef USING_NVDEC
-    if ("nvdecweave" == ShortName)
-        return QObject::tr("Weave (HW-NV)");
-    if ("nvdecbob" == ShortName)
-        return QObject::tr("Bob (HW-NV)");
-    if ("nvdecadaptive" == ShortName)
-        return QObject::tr("Adaptive (HW-NV)");
-    if ("nvdecdoublerateweave" == ShortName)
-        return QObject::tr("Weave (2x, HW-NV)");
-    if ("nvdecdoubleratebob" == ShortName)
-        return QObject::tr("Bob (2x, HW-NV)");
-    if ("nvdecdoublerateadaptive" == ShortName)
-        return QObject::tr("Adaptive (2x, HW-NV)");
-#endif // USING_NVDEC
-
-    return "";
 }
 
 QStringList VideoDisplayProfile::GetProfiles(const QString &HostName)
@@ -1418,186 +1263,6 @@ QString VideoDisplayProfile::GetPreferredVideoRenderer(const QString &Decoder)
     return GetBestVideoRenderer(GetVideoRenderers(Decoder));
 }
 
-QStringList VideoDisplayProfile::GetDeinterlacers(const QString &VideoRenderer)
-{
-    QMutexLocker locker(&s_safe_lock);
-    InitStatics();
-
-    QMap<QString,QStringList>::const_iterator it = s_safe_deint.find(VideoRenderer);
-    QStringList tmp;
-    if (it != s_safe_deint.end())
-        tmp = *it;
-    return tmp;
-}
-
-QString VideoDisplayProfile::GetDeinterlacerHelp(const QString &Deinterlacer)
-{
-    if (Deinterlacer.isEmpty())
-        return "";
-
-    QString msg = "";
-
-    QString kDoubleRateMsg =
-        QObject::tr(
-            "This deinterlacer requires the display to be capable "
-            "of twice the frame rate as the source video.");
-
-    QString kNoneMsg =
-        QObject::tr("Perform no deinterlacing.") + " " +
-        QObject::tr(
-            "Use this with an interlaced display whose "
-            "resolution exactly matches the video size. "
-            "This is incompatible with MythTV zoom modes.");
-
-    QString kOneFieldMsg = QObject::tr(
-        "Shows only one of the two fields in the frame. "
-        "This looks good when displaying a high motion "
-        "1080i video on a 720p display.");
-
-    QString kBobMsg = QObject::tr(
-        "Shows one field of the frame followed by the "
-        "other field displaced vertically.") + " " +
-        kDoubleRateMsg;
-
-    QString kLinearBlendMsg = QObject::tr(
-        "Blends the odd and even fields linearly into one frame.");
-
-    QString kKernelMsg = QObject::tr(
-        "This filter disables deinterlacing when the two fields are "
-        "similar, and performs linear deinterlacing otherwise.");
-
-    QString kUsingGPU = QObject::tr("(Hardware Accelerated)");
-
-    QString kUsingVA = QObject::tr("(VAAPI Hardware Accelerated)");
-
-    QString kUsingNV = QObject::tr("(NVDEC Hardware Accelerated)");
-
-    QString kUsingGL = QObject::tr("(OpenGL Hardware Accelerated)");
-
-    QString kGreedyHMsg = QObject::tr(
-        "This deinterlacer uses several fields to reduce motion blur. "
-        "It has increased CPU requirements.");
-
-    QString kYadifMsg = QObject::tr(
-        "This deinterlacer uses several fields to reduce motion blur. "
-        "It has increased CPU requirements.");
-
-    QString kFieldOrderMsg = QObject::tr(
-        "This deinterlacer attempts to synchronize with interlaced displays "
-        "whose size and refresh rate exactly match the video source. "
-        "It has low CPU requirements.");
-
-    QString kBasicMsg = QObject::tr(
-        "This deinterlacer uses several fields to reduce motion blur. ");
-
-    QString kAdvMsg = QObject::tr(
-        "This deinterlacer uses multiple fields to reduce motion blur "
-        "and smooth edges. ");
-
-    QString kMostAdvMsg = QObject::tr(
-        "Use the most advanced hardware deinterlacing algorithm available. ");
-
-    QString kWeaveMsg = QObject::tr(
-        "Use the weave deinterlacing algorithm. ");
-
-    QString kMAMsg = QObject::tr(
-        "Use the motion adaptive deinterlacing algorithm. ");
-
-    QString kMCMsg = QObject::tr(
-        "Use the motion compensated deinterlacing algorithm. ");
-
-    if (Deinterlacer == "none")
-        msg = kNoneMsg;
-    else if (Deinterlacer == "onefield")
-        msg = kOneFieldMsg;
-    else if (Deinterlacer == "bobdeint")
-        msg = kBobMsg;
-    else if (Deinterlacer == "linearblend")
-        msg = kLinearBlendMsg;
-    else if (Deinterlacer == "kerneldeint")
-        msg = kKernelMsg;
-    else if (Deinterlacer == "kerneldoubleprocessdeint")
-        msg = kKernelMsg + " " + kDoubleRateMsg;
-    else if (Deinterlacer == "openglonefield")
-        msg = kOneFieldMsg + " " + kUsingGL;
-    else if (Deinterlacer == "openglbobdeint")
-        msg = kBobMsg + " " + kUsingGL;
-    else if (Deinterlacer == "opengllinearblend")
-        msg = kLinearBlendMsg + " " + kUsingGL;
-    else if (Deinterlacer == "openglkerneldeint")
-        msg = kKernelMsg + " " + kUsingGL;
-    else if (Deinterlacer == "opengldoubleratelinearblend")
-        msg = kLinearBlendMsg + " " +  kDoubleRateMsg + " " + kUsingGL;
-    else if (Deinterlacer == "opengldoubleratekerneldeint")
-        msg = kKernelMsg + " " +  kDoubleRateMsg + " " + kUsingGL;
-    else if (Deinterlacer == "opengldoubleratefieldorder")
-        msg = kFieldOrderMsg + " " +  kDoubleRateMsg  + " " + kUsingGL;
-    else if (Deinterlacer == "greedyhdeint")
-        msg = kGreedyHMsg;
-    else if (Deinterlacer == "greedyhdoubleprocessdeint")
-        msg = kGreedyHMsg + " " +  kDoubleRateMsg;
-    else if (Deinterlacer == "yadifdeint")
-        msg = kYadifMsg;
-    else if (Deinterlacer == "yadifdoubleprocessdeint")
-        msg = kYadifMsg + " " +  kDoubleRateMsg;
-    else if (Deinterlacer == "fieldorderdoubleprocessdeint")
-        msg = kFieldOrderMsg + " " +  kDoubleRateMsg;
-    else if (Deinterlacer == "vdpauonefield")
-        msg = kOneFieldMsg + " " + kUsingGPU;
-    else if (Deinterlacer == "vdpaubobdeint")
-        msg = kBobMsg + " " + kUsingGPU;
-    else if (Deinterlacer == "vdpaubasic")
-        msg = kBasicMsg + " " + kUsingGPU;
-    else if (Deinterlacer == "vdpauadvanced")
-        msg = kAdvMsg + " " + kUsingGPU;
-    else if (Deinterlacer == "vdpaubasicdoublerate")
-        msg = kBasicMsg + " " +  kDoubleRateMsg + " " + kUsingGPU;
-    else if (Deinterlacer == "vdpauadvanceddoublerate")
-        msg = kAdvMsg + " " +  kDoubleRateMsg + " " + kUsingGPU;
-    else if (Deinterlacer == "vaapionefield")
-        msg = kOneFieldMsg + " " + kUsingGPU;
-    else if (Deinterlacer == "vaapibobdeint")
-        msg = kBobMsg + " " + kUsingGPU;
-
-    else if (Deinterlacer == "vaapi2default")
-        msg = kMostAdvMsg + " " +  kUsingVA;
-    else if (Deinterlacer == "vaapi2bob")
-        msg = kBobMsg + " " +  kUsingVA;
-    else if (Deinterlacer == "vaapi2weave")
-        msg = kWeaveMsg + " " +  kUsingVA;
-    else if (Deinterlacer == "vaapi2motion_adaptive")
-        msg = kMAMsg + " " +  kUsingVA;
-    else if (Deinterlacer == "vaapi2motion_compensated")
-        msg = kMCMsg + " " +  kUsingVA;
-    else if (Deinterlacer == "vaapi2doubleratedefault")
-        msg = kMostAdvMsg + " " +  kDoubleRateMsg + " " + kUsingVA;
-    else if (Deinterlacer == "vaapi2doubleratebob")
-        msg = kBobMsg + " " +  kDoubleRateMsg + " " + kUsingVA;
-    else if (Deinterlacer == "vaapi2doublerateweave")
-        msg = kWeaveMsg + " " +  kDoubleRateMsg + " " + kUsingVA;
-    else if (Deinterlacer == "vaapi2doubleratemotion_adaptive")
-        msg = kMAMsg + " " +  kDoubleRateMsg + " " + kUsingVA;
-    else if (Deinterlacer == "vaapi2doubleratemotion_compensated")
-        msg = kMCMsg + " " +  kDoubleRateMsg + " " + kUsingVA;
-
-    else if (Deinterlacer == "nvdecweave")
-        msg = kWeaveMsg + " " +  kUsingNV;
-    else if (Deinterlacer == "nvdecbob")
-        msg = kBobMsg + " " +  kUsingNV;
-    else if (Deinterlacer == "nvdecadaptive")
-        msg = kMAMsg + " " +  kUsingNV;
-    else if (Deinterlacer == "nvdecdoublerateweave")
-        msg = kWeaveMsg + " " +  kDoubleRateMsg + " " +  kUsingNV;
-    else if (Deinterlacer == "nvdecdoubleratebob")
-        msg = kBobMsg + " " +  kDoubleRateMsg + " " +  kUsingNV;
-    else if (Deinterlacer == "nvdecdoublerateadaptive")
-        msg = kMAMsg + " " +  kDoubleRateMsg + " " +  kUsingNV;
-    else
-        msg = QObject::tr("'%1' has not been documented yet.").arg(Deinterlacer);
-
-    return msg;
-}
-
 bool VideoDisplayProfile::IsFilterAllowed(const QString &VideoRenderer)
 {
     QMutexLocker locker(&s_safe_lock);
@@ -1651,17 +1316,23 @@ QString VideoDisplayProfile::toString(void) const
         .arg(renderer).arg(osd).arg(deint0).arg(deint1).arg(filter);
 }
 
+QList<QPair<QString,QString> > VideoDisplayProfile::GetDeinterlacers(void)
+{
+    InitStatics();
+    return s_deinterlacer_options;
+}
+
 void VideoDisplayProfile::InitStatics(bool Reinit /*= false*/)
 {
     if (Reinit)
     {
         s_safe_custom.clear();
         s_safe_renderer.clear();
-        s_safe_deint.clear();
         s_safe_renderer_group.clear();
         s_safe_renderer_priority.clear();
         s_safe_decoders.clear();
         s_safe_equiv_dec.clear();
+        s_deinterlacer_options.clear();
     }
     else if (s_safe_initialized)
     {
@@ -1672,7 +1343,6 @@ void VideoDisplayProfile::InitStatics(bool Reinit /*= false*/)
     RenderOptions options;
     options.renderers      = &s_safe_custom;
     options.safe_renderers = &s_safe_renderer;
-    options.deints         = &s_safe_deint;
     options.render_group   = &s_safe_renderer_group;
     options.priorities     = &s_safe_renderer_priority;
     options.decoders       = &s_safe_decoders;
@@ -1686,4 +1356,9 @@ void VideoDisplayProfile::InitStatics(bool Reinit /*= false*/)
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("decoder<->render support: %1%2")
                 .arg(decoder, -12).arg(GetVideoRenderers(decoder).join(" ")));
+
+    s_deinterlacer_options.append(QPair<QString,QString>(DEINT_QUALITY_NONE,   QObject::tr("None")));
+    s_deinterlacer_options.append(QPair<QString,QString>(DEINT_QUALITY_LOW,    QObject::tr("Low quality")));
+    s_deinterlacer_options.append(QPair<QString,QString>(DEINT_QUALITY_MEDIUM, QObject::tr("Medium quality")));
+    s_deinterlacer_options.append(QPair<QString,QString>(DEINT_QUALITY_HIGH,   QObject::tr("High quality")));
 }

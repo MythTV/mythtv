@@ -8,7 +8,7 @@
 class VideoOutputNull : public VideoOutput
 {
   public:
-    static void GetRenderOptions(RenderOptions &opts, QStringList &cpudeints);
+    static void GetRenderOptions(RenderOptions &Options);
     VideoOutputNull();
    ~VideoOutputNull();
 

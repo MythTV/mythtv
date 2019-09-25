@@ -31,17 +31,14 @@ const int kKeepPrebuffer = 2;
 
 #define LOC      QString("VideoOutputD3D: ")
 
-void VideoOutputD3D::GetRenderOptions(RenderOptions &opts,
-                                      QStringList &cpudeints)
+void VideoOutputD3D::GetRenderOptions(RenderOptions &Options)
 {
-    opts.renderers->append("direct3d");
-    opts.deints->insert("direct3d", cpudeints);
-    (*opts.osds)["direct3d"].append("direct3d");
-    (*opts.safe_renderers)["dummy"].append("direct3d");
-    (*opts.safe_renderers)["nuppel"].append("direct3d");
-    if (opts.decoders->contains("ffmpeg"))
-        (*opts.safe_renderers)["ffmpeg"].append("direct3d");
-    opts.priorities->insert("direct3d", 70);
+    Options.renderers->append("direct3d");
+    (*Options.safe_renderers)["dummy"].append("direct3d");
+    (*Options.safe_renderers)["nuppel"].append("direct3d");
+    if (Options.decoders->contains("ffmpeg"))
+        (*Options.safe_renderers)["ffmpeg"].append("direct3d");
+    Options.priorities->insert("direct3d", 70);
 
 #ifdef USING_DXVA2
     if (opts.decoders->contains("dxva2"))

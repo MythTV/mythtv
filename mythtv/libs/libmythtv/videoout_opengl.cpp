@@ -21,18 +21,8 @@
  * but it is currently called statically and hence options would be fixed and unable
  * to reflect changes in UI render device.
 */
-void VideoOutputOpenGL::GetRenderOptions(RenderOptions &Options,
-                                         QStringList &SoftwareDeinterlacers)
+void VideoOutputOpenGL::GetRenderOptions(RenderOptions &Options)
 {
-    QStringList gldeints;
-    gldeints << "opengllinearblend" <<
-                "openglonefield" <<
-                "openglkerneldeint" <<
-                "openglbobdeint" <<
-                "opengldoubleratelinearblend" <<
-                "opengldoubleratekerneldeint" <<
-                "opengldoubleratefieldorder";
-
     QStringList safe;
     safe << "opengl" << "opengl-yv12";
 
@@ -58,17 +48,14 @@ void VideoOutputOpenGL::GetRenderOptions(RenderOptions &Options,
 
     // OpenGL UYVY
     Options.renderers->append("opengl");
-    Options.deints->insert("opengl", SoftwareDeinterlacers + gldeints);
     Options.priorities->insert("opengl", 65);
 
     // OpenGL YV12
     Options.renderers->append("opengl-yv12");
-    Options.deints->insert("opengl-yv12", SoftwareDeinterlacers + gldeints);
     Options.priorities->insert("opengl-yv12", 65);
 
 #if defined(USING_VAAPI) || defined (USING_VTB) || defined (USING_MEDIACODEC) || defined (USING_VDPAU) || defined (USING_NVDEC) || defined (USING_MMAL)
     Options.renderers->append("opengl-hw");
-    (*Options.deints)["opengl-hw"].append("none");
     (*Options.safe_renderers)["dummy"].append("opengl-hw");
     (*Options.safe_renderers)["nuppel"].append("opengl-hw");
     Options.priorities->insert("opengl-hw", 110);

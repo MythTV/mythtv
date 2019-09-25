@@ -714,8 +714,12 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
     m_max_cpus     = new TransMythUISpinBoxSetting(1, HAVE_THREADS ? 8 : 1, 1, 1);
     m_skiploop     = new TransMythUICheckBoxSetting();
     m_vidrend      = new TransMythUIComboBoxSetting();
-    m_deint0       = new TransMythUIComboBoxSetting();
-    m_deint1       = new TransMythUIComboBoxSetting();
+    m_singleDeint  = new TransMythUIComboBoxSetting();
+    m_singleShader = new TransMythUICheckBoxSetting();
+    m_singleDriver = new TransMythUICheckBoxSetting();
+    m_doubleDeint  = new TransMythUIComboBoxSetting();
+    m_doubleShader = new TransMythUICheckBoxSetting();
+    m_doubleDriver = new TransMythUICheckBoxSetting();
     m_filters      = new TransTextEditSetting();
 
     const QString rangeHelp(tr(" Valid formats for the setting are "
@@ -748,8 +752,53 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
     m_max_cpus->setLabel(tr("Max CPUs"));
     m_skiploop->setLabel(tr("Deblocking filter"));
     m_vidrend->setLabel(tr("Video renderer"));
-    m_deint0->setLabel(tr("Primary deinterlacer"));
-    m_deint1->setLabel(tr("Fallback deinterlacer"));
+
+    QString shaderdesc = "\t" + tr("Prefer OpenGL deinterlacers");
+    QString driverdesc = "\t" + tr("Prefer driver deinterlacers");
+    QString shaderhelp = tr("If possible, use GLSL shaders for deinterlacing in "
+                            "preference to software deinterlacers. Note: Even if "
+                            "disabled, shaders may be used if deinterlacing is "
+                            "enabled but software deinterlacers are unavailable.");
+    QString driverhelp = tr("If possible, use hardware drivers (e.g. VDPAU, VAAPI) "
+                            "for deinterlacing in preference to software and OpenGL "
+                            "deinterlacers. Note: Even if disabled, driver deinterlacers "
+                            "may be used if deinterlacing is enabled but other "
+                            "deinterlacers are unavailable.");
+
+    m_singleDeint->setLabel(tr("Deinterlacer quality (single rate)"));
+    m_singleShader->setLabel(shaderdesc);
+    m_singleDriver->setLabel(driverdesc);
+    m_doubleDeint->setLabel(tr("Deinterlacer quality (double rate)"));
+    m_doubleShader->setLabel(shaderdesc);
+    m_doubleDriver->setLabel(driverdesc);
+
+    m_singleShader->setHelpText(shaderhelp);
+    m_doubleShader->setHelpText(shaderhelp);
+    m_singleDriver->setHelpText(driverhelp);
+    m_doubleDriver->setHelpText(driverhelp);
+    m_singleDeint->setHelpText(
+        tr("Set the quality for single rate deinterlacing. Use 'None' to disable. "
+           "Higher quality deinterlacers require more system processing and resources. "
+           "Software deinterlacers are used by default unless OpenGL or driver preferences "
+           "are enabled."));
+    m_doubleDeint->setHelpText(
+        tr("Set the quality for double rate deinterlacing - which is only used "
+           "if the display can support the required frame rate. Use 'None' to "
+           "disable double rate deinterlacing."));
+
+    m_singleShader->setEnabled(false);
+    m_singleDriver->setEnabled(false);
+    m_doubleShader->setEnabled(false);
+    m_doubleDriver->setEnabled(false);
+
+    QList<QPair<QString,QString> > options = VideoDisplayProfile::GetDeinterlacers();
+    QList<QPair<QString,QString> >::const_iterator it = options.cbegin();
+    for ( ; it != options.cend(); ++it)
+    {
+        m_singleDeint->addSelection(it->second, it->first);
+        m_doubleDeint->addSelection(it->second, it->first);
+    }
+
     m_filters->setLabel(tr("Custom filters"));
 
     m_max_cpus->setHelpText(
@@ -776,8 +825,12 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
     addChild(m_skiploop);
     addChild(m_vidrend);
 
-    addChild(m_deint0);
-    addChild(m_deint1);
+    addChild(m_singleDeint);
+    addChild(m_singleShader);
+    addChild(m_singleDriver);
+    addChild(m_doubleDeint);
+    addChild(m_doubleShader);
+    addChild(m_doubleDriver);
     addChild(m_filters);
 
     connect(m_width_range, SIGNAL(valueChanged(const QString&)),
@@ -792,10 +845,10 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
             this,    SLOT(decoderChanged(const QString&)));
     connect(m_vidrend, SIGNAL(valueChanged(const QString&)),
             this,    SLOT(vrenderChanged(const QString&)));
-    connect(m_deint0, SIGNAL(valueChanged(const QString&)),
-            this,    SLOT(deint0Changed(const QString&)));
-    connect(m_deint1, SIGNAL(valueChanged(const QString&)),
-            this,    SLOT(deint1Changed(const QString&)));
+    connect(m_singleDeint, SIGNAL(valueChanged(const QString&)),
+            this,    SLOT(SingleQualityChanged(const QString&)));
+    connect(m_doubleDeint, SIGNAL(valueChanged(const QString&)),
+            this,    SLOT(DoubleQualityChanged(const QString&)));
 }
 
 uint PlaybackProfileItemConfig::GetIndex(void) const
@@ -852,8 +905,8 @@ void PlaybackProfileItemConfig::Load(void)
     QString pmax_cpus = m_item.Get("pref_max_cpus");
     QString pskiploop = m_item.Get("pref_skiploop");
     QString prenderer = m_item.Get("pref_videorenderer");
-    QString pdeint0   = m_item.Get("pref_deint0");
-    QString pdeint1   = m_item.Get("pref_deint1");
+    QString psingledeint = m_item.Get("pref_deint0");
+    QString pdoubledeint = m_item.Get("pref_deint1");
     QString pfilter   = m_item.Get("pref_filters");
     bool    found     = false;
 
@@ -881,10 +934,9 @@ void PlaybackProfileItemConfig::Load(void)
     if (!prenderer.isEmpty())
         m_vidrend->setValue(prenderer);
 
-    if (!pdeint0.isEmpty())
-        m_deint0->setValue(pdeint0);
-    if (!pdeint1.isEmpty())
-        m_deint1->setValue(pdeint1);
+    LoadQuality(m_singleDeint, m_singleShader, m_singleDriver, psingledeint);
+    LoadQuality(m_doubleDeint, m_doubleShader, m_doubleDriver, pdoubledeint);
+
     if (!pfilter.isEmpty())
         m_filters->setValue(pfilter);
 
@@ -903,9 +955,8 @@ void PlaybackProfileItemConfig::Save(void)
     m_item.Set("pref_max_cpus",      m_max_cpus->getValue());
     m_item.Set("pref_skiploop",      (m_skiploop->boolValue()) ? "1" : "0");
     m_item.Set("pref_videorenderer", m_vidrend->getValue());
-    m_item.Set("pref_deint0",        m_deint0->getValue());
-    m_item.Set("pref_deint1",        m_deint1->getValue());
-
+    m_item.Set("pref_deint0", GetQuality(m_singleDeint, m_singleShader, m_singleDriver));
+    m_item.Set("pref_deint1", GetQuality(m_doubleDeint, m_doubleShader, m_doubleDriver));
     QString tmp0 = m_filters->getValue();
     QString tmp1 = m_vidrend->getValue();
     QString tmp3 = VideoDisplayProfile::IsFilterAllowed(tmp1) ? tmp0 : "";
@@ -983,46 +1034,81 @@ void PlaybackProfileItemConfig::decoderChanged(const QString &dec)
 
 void PlaybackProfileItemConfig::vrenderChanged(const QString &renderer)
 {
-    QStringList deints  = VideoDisplayProfile::GetDeinterlacers(renderer);
-    QString decodername = m_decoder->getValue();
-    QString     ldeint0 = m_deint0->getValue();
-    QString     ldeint1 = m_deint1->getValue();
-    QStringList::const_iterator it;
-
-    m_deint0->clearSelections();
-    for (it = deints.begin(); it != deints.end(); ++it)
-    {
-        m_deint0->addSelection(VideoDisplayProfile::GetDeinterlacerName(*it),
-                             *it, (*it == ldeint0));
-    }
-
-    m_deint1->clearSelections();
-    for (it = deints.begin(); it != deints.end(); ++it)
-    {
-        if (!(*it).contains("bobdeint") && !(*it).contains("doublerate") &&
-            !(*it).contains("doubleprocess"))
-            m_deint1->addSelection(VideoDisplayProfile::GetDeinterlacerName(*it),
-                                 *it, (*it == ldeint1));
-    }
-
     m_filters->setEnabled(VideoDisplayProfile::IsFilterAllowed(renderer));
     m_vidrend->setHelpText(VideoDisplayProfile::GetVideoRendererHelp(renderer));
-
     InitLabel();
 }
 
-void PlaybackProfileItemConfig::deint0Changed(const QString &deint)
+void PlaybackProfileItemConfig::SingleQualityChanged(const QString &Quality)
 {
-    m_deint0->setHelpText(
-        tr("Main deinterlacing method. %1")
-        .arg(VideoDisplayProfile::GetDeinterlacerHelp(deint)));
+    bool enabled = Quality != DEINT_QUALITY_NONE;
+    m_singleShader->setEnabled(enabled);
+    m_singleDriver->setEnabled(enabled);
 }
 
-void PlaybackProfileItemConfig::deint1Changed(const QString &deint)
+void PlaybackProfileItemConfig::DoubleQualityChanged(const QString &Quality)
 {
-    m_deint1->setHelpText(
-        tr("Fallback deinterlacing method. %1")
-        .arg(VideoDisplayProfile::GetDeinterlacerHelp(deint)));
+    bool enabled = Quality != DEINT_QUALITY_NONE;
+    m_doubleShader->setEnabled(enabled);
+    m_doubleDriver->setEnabled(enabled);
+}
+
+/*! \brief Parse the required deinterlacing quality and preferences.
+ *
+ * \note Quality and preferences are stored in the database as a list of
+ * strings separate by a colon e.g. high:shader:driver. This avoids a database
+ * schema update and maintains some compatability between the old and new
+ * deinterlacer settings.
+*/
+void PlaybackProfileItemConfig::LoadQuality(TransMythUIComboBoxSetting *Deint,
+                                            TransMythUICheckBoxSetting *Shader,
+                                            TransMythUICheckBoxSetting *Driver,
+                                            QString &Value)
+{
+    bool enabled = true;
+
+    if (Value.contains(DEINT_QUALITY_HIGH))
+    {
+        Deint->setValue(DEINT_QUALITY_HIGH);
+    }
+    else if (Value.contains(DEINT_QUALITY_MEDIUM))
+    {
+        Deint->setValue(DEINT_QUALITY_MEDIUM);
+    }
+    else if (Value.contains(DEINT_QUALITY_LOW))
+    {
+        Deint->setValue(DEINT_QUALITY_LOW);
+    }
+    else
+    {
+        enabled = false;
+        Deint->setValue(DEINT_QUALITY_NONE);
+    }
+
+    Shader->setValue(Value.contains(DEINT_QUALITY_SHADER));
+    Driver->setValue(Value.contains(DEINT_QUALITY_DRIVER));
+    Shader->setEnabled(enabled);
+    Driver->setEnabled(enabled);
+}
+
+QString PlaybackProfileItemConfig::GetQuality(TransMythUIComboBoxSetting *Deint,
+                                              TransMythUICheckBoxSetting *Shader,
+                                              TransMythUICheckBoxSetting *Driver)
+{
+    QStringList values;
+    QString quality = Deint->getValue();
+    if (quality == DEINT_QUALITY_LOW || quality == DEINT_QUALITY_MEDIUM || quality == DEINT_QUALITY_HIGH)
+        values.append(quality);
+    else
+        values.append(DEINT_QUALITY_NONE);
+
+    // N.B. save these regardless to preserve preferences
+    if (Shader->boolValue())
+        values.append(DEINT_QUALITY_SHADER);
+    if (Driver->boolValue())
+        values.append(DEINT_QUALITY_DRIVER);
+
+    return values.join(":");
 }
 
 bool PlaybackProfileItemConfig::keyPressEvent(QKeyEvent *e)

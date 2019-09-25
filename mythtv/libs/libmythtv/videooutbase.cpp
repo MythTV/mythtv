@@ -31,17 +31,14 @@
 
 void VideoOutput::GetRenderOptions(RenderOptions &Options)
 {
-    QStringList cpudeints;
-    cpudeints += "none";
-
-    VideoOutputNull::GetRenderOptions(Options, cpudeints);
+    VideoOutputNull::GetRenderOptions(Options);
 
 #ifdef _WIN32
-    VideoOutputD3D::GetRenderOptions(Options, cpudeints);
+    VideoOutputD3D::GetRenderOptions(Options);
 #endif
 
 #ifdef USING_OPENGL_VIDEO
-    VideoOutputOpenGL::GetRenderOptions(Options, cpudeints);
+    VideoOutputOpenGL::GetRenderOptions(Options);
 #endif // USING_OPENGL_VIDEO
 }
 
@@ -348,23 +345,49 @@ void VideoOutput::SetReferenceFrames(int ReferenceFrames)
     m_maxReferenceFrames = ReferenceFrames;
 }
 
+MythDeintType VideoOutput::ParseDeinterlacer(const QString &Deinterlacer)
+{
+    MythDeintType result = DEINT_NONE;
+
+    if (Deinterlacer.contains(DEINT_QUALITY_HIGH))
+        result = DEINT_HIGH;
+    else if (Deinterlacer.contains(DEINT_QUALITY_MEDIUM))
+        result = DEINT_MEDIUM;
+    else if (Deinterlacer.contains(DEINT_QUALITY_LOW))
+        result = DEINT_BASIC;
+
+    if (result != DEINT_NONE)
+    {
+        result = result | DEINT_CPU; // NB always assumed
+        if (Deinterlacer.contains(DEINT_QUALITY_SHADER))
+            result = result | DEINT_SHADER;
+        if (Deinterlacer.contains(DEINT_QUALITY_DRIVER))
+            result = result | DEINT_DRIVER;
+    }
+
+    return result;
+}
+
 void VideoOutput::SetDeinterlacing(bool Enable, bool DoubleRate)
 {
     if (!Enable)
     {
         m_videoBuffers.SetDeinterlacing(DEINT_NONE, DEINT_NONE, m_videoCodecID);
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + "Disabled all deinterlacing");
         return;
     }
 
-    MythDeintType singlerate = DEINT_HIGH | DEINT_CPU | DEINT_SHADER | DEINT_DRIVER;
-    MythDeintType doublerate = DoubleRate ? DEINT_HIGH | DEINT_CPU | DEINT_SHADER | DEINT_DRIVER : DEINT_NONE;
-    //if (db_vdisp_profile)
-    //{
-    //    singlerate = db_vdisp_profile->GetFilteredDeint();
-    //    doublerate = DoubleRate ? db_vdisp_profile->GetFilteredDeint(true) : DEINT_NONE;
-    //}
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("SetDeinterlacing: %1 DoubleRate %2")
-        .arg(DeinterlacerPref(singlerate)).arg(DeinterlacerPref(doublerate)));
+    MythDeintType singlerate = DEINT_NONE;
+    MythDeintType doublerate = DEINT_NONE;
+    if (m_dbDisplayProfile)
+    {
+        singlerate = ParseDeinterlacer(m_dbDisplayProfile->GetSingleRatePreferences());
+        if (DoubleRate)
+            doublerate = ParseDeinterlacer(m_dbDisplayProfile->GetDoubleRatePreferences());
+    }
+
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("SetDeinterlacing (Doublerate %1): Single %2 Double %3")
+        .arg(DoubleRate).arg(DeinterlacerPref(singlerate)).arg(DeinterlacerPref(doublerate)));
     m_videoBuffers.SetDeinterlacing(singlerate, doublerate, m_videoCodecID);
 }
 

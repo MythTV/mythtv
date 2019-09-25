@@ -163,6 +163,7 @@ class VideoOutput
     QRect        GetTotalOSDBounds(void) const;
 
     static void  CopyFrame(VideoFrame* To, const VideoFrame* From);
+    MythDeintType ParseDeinterlacer(const QString &Deinterlacer);
 
     VideoOutWindow       m_window;
     QSize                m_dbDisplayDimensionsMM;

@@ -11,44 +11,42 @@ const int kPrebufferFramesNormal = 12;
 const int kPrebufferFramesSmall = 4;
 const int kKeepPrebuffer = 2;
 
-void VideoOutputNull::GetRenderOptions(RenderOptions &opts,
-                                       QStringList &cpudeints)
+void VideoOutputNull::GetRenderOptions(RenderOptions &Options)
 {
-    opts.renderers->append("null");
-    opts.deints->insert("null", cpudeints);
-    (*opts.safe_renderers)["dummy"].append("null");
-    (*opts.safe_renderers)["nuppel"].append("null");
-    if (opts.decoders->contains("ffmpeg"))
-        (*opts.safe_renderers)["ffmpeg"].append("null");
+    Options.renderers->append("null");
+    (*Options.safe_renderers)["dummy"].append("null");
+    (*Options.safe_renderers)["nuppel"].append("null");
+    if (Options.decoders->contains("ffmpeg"))
+        (*Options.safe_renderers)["ffmpeg"].append("null");
 #ifdef USING_VTB
     if (opts.decoders->contains("vtb-dec"))
         (*opts.safe_renderers)["vtb-dec"].append("null");
 #endif
 #ifdef USING_VDPAU
-    if (opts.decoders->contains("vdpau-dec"))
-        (*opts.safe_renderers)["vdpau-dec"].append("null");
+    if (Options.decoders->contains("vdpau-dec"))
+        (*Options.safe_renderers)["vdpau-dec"].append("null");
 #endif
 #ifdef USING_NVDEC
-    if (opts.decoders->contains("nvdec-dec"))
-        (*opts.safe_renderers)["nvdec-dec"].append("null");
+    if (Options.decoders->contains("nvdec-dec"))
+        (*Options.safe_renderers)["nvdec-dec"].append("null");
 #endif
 #ifdef USING_VAAPI
-    if (opts.decoders->contains("vaapi-dec"))
-        (*opts.safe_renderers)["vaapi-dec"].append("null");
+    if (Options.decoders->contains("vaapi-dec"))
+        (*Options.safe_renderers)["vaapi-dec"].append("null");
 #endif
 #ifdef USING_MEDIACODEC
     if (opts.decoders->contains("mediacodec-dec"))
         (*opts.safe_renderers)["mediacodec-dec"].append("null");
 #endif
 #ifdef USING_V4L2
-    if (opts.decoders->contains("v4l2-dec"))
-        (*opts.safe_renderers)["v4l2-dec"].append("null");
+    if (Options.decoders->contains("v4l2-dec"))
+        (*Options.safe_renderers)["v4l2-dec"].append("null");
 #endif
 #ifdef USING_MMAL
     if (opts.decoders->contains("mmal-dec"))
         (*opts.safe_renderers)["mmal-dec"].append("null");
 #endif
-    opts.priorities->insert("null", 10);
+    Options.priorities->insert("null", 10);
 }
 
 VideoOutputNull::VideoOutputNull() :

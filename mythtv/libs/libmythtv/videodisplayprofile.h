@@ -15,11 +15,17 @@
 #include <vector>
 using namespace std;
 
+#define DEINT_QUALITY_NONE   QString("none")
+#define DEINT_QUALITY_LOW    QString("low")
+#define DEINT_QUALITY_MEDIUM QString("medium")
+#define DEINT_QUALITY_HIGH   QString("high")
+#define DEINT_QUALITY_SHADER QString("shader")
+#define DEINT_QUALITY_DRIVER QString("driver")
+
 struct RenderOptions
 {
     QStringList               *renderers;
     QMap<QString,QStringList> *safe_renderers;
-    QMap<QString,QStringList> *deints;
     QMap<QString,QStringList> *render_group;
     QMap<QString,uint>        *priorities;
     QStringList               *decoders;
@@ -73,15 +79,15 @@ class MTV_PUBLIC VideoDisplayProfile
     uint    GetMaxCPUs(void) const ;
     bool    IsSkipLoopEnabled(void) const;
     QString GetVideoRenderer(void) const;
-    QString GetDeinterlacer(void) const;
-    QString GetFallbackDeinterlacer(void) const;
     QString GetActualVideoRenderer(void) const;
     QString GetFilters(void) const;
-    QString GetFilteredDeint(const QString &Override);
     QString toString(void) const;
+    QString GetSingleRatePreferences(void) const;
+    QString GetDoubleRatePreferences(void) const;
 
     // Statics
     static void        InitStatics(bool Reinit = false);
+    static QList<QPair<QString,QString> > GetDeinterlacers(void);
     static QStringList GetDecoders(void);
     static QStringList GetDecoderNames(void);
     static QString     GetDecoderName(const QString &Decoder);
@@ -101,9 +107,6 @@ class MTV_PUBLIC VideoDisplayProfile
     static QStringList GetVideoRenderers(const QString &Decoder);
     static QString     GetVideoRendererHelp(const QString &Renderer);
     static QString     GetPreferredVideoRenderer(const QString &Decoder);
-    static QStringList GetDeinterlacers(const QString &VideoRenderer);
-    static QString     GetDeinterlacerName(const QString &ShortName);
-    static QString     GetDeinterlacerHelp(const QString &Deinterlacer);
     static bool        IsFilterAllowed( const QString &VideoRenderer);
     static QStringList GetFilteredRenderers(const QString &Decoder, const QStringList &Renderers);
     static QString     GetBestVideoRenderer(const QStringList &Renderers);
@@ -131,12 +134,12 @@ class MTV_PUBLIC VideoDisplayProfile
     static bool                      s_safe_initialized;
     static QMap<QString,QStringList> s_safe_renderer;
     static QMap<QString,QStringList> s_safe_renderer_group;
-    static QMap<QString,QStringList> s_safe_deint;
     static QMap<QString,QStringList> s_safe_equiv_dec;
     static QStringList               s_safe_custom;
     static QMap<QString,uint>        s_safe_renderer_priority;
     static QMap<QString,QString>     s_dec_name;
     static QStringList               s_safe_decoders;
+    static QList<QPair<QString,QString> > s_deinterlacer_options;
 };
 
 #endif // VIDEO_DISPLAY_PROFILE_H_

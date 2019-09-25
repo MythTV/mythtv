@@ -211,8 +211,15 @@ class PlaybackProfileItemConfig : public GroupSetting
     void framerateChanged(const QString &val);
     void decoderChanged(const QString &dec);
     void vrenderChanged(const QString &renderer);
-    void deint0Changed(const QString &deint);
-    void deint1Changed(const QString &deint);
+    void SingleQualityChanged(const QString &Quality);
+    void DoubleQualityChanged(const QString &Quality);
+    static void LoadQuality(TransMythUIComboBoxSetting *Deint,
+                            TransMythUICheckBoxSetting *Shader,
+                            TransMythUICheckBoxSetting *Driver,
+                            QString &Value);
+    QString GetQuality(TransMythUIComboBoxSetting *Deint,
+                      TransMythUICheckBoxSetting *Shader,
+                      TransMythUICheckBoxSetting *Driver);
     void InitLabel(void);
     void DoDeleteSlot(bool);
 
@@ -226,8 +233,12 @@ class PlaybackProfileItemConfig : public GroupSetting
     TransMythUISpinBoxSetting  *m_max_cpus     {nullptr};
     TransMythUICheckBoxSetting *m_skiploop     {nullptr};
     TransMythUIComboBoxSetting *m_vidrend      {nullptr};
-    TransMythUIComboBoxSetting *m_deint0       {nullptr};
-    TransMythUIComboBoxSetting *m_deint1       {nullptr};
+    TransMythUIComboBoxSetting *m_singleDeint  {nullptr};
+    TransMythUICheckBoxSetting *m_singleShader {nullptr};
+    TransMythUICheckBoxSetting *m_singleDriver {nullptr};
+    TransMythUIComboBoxSetting *m_doubleDeint  {nullptr};
+    TransMythUICheckBoxSetting *m_doubleShader {nullptr};
+    TransMythUICheckBoxSetting *m_doubleDriver {nullptr};
     TransTextEditSetting       *m_filters      {nullptr};
     PlaybackProfileConfig      *m_parentConfig {nullptr};
     uint                        m_index        {0};
