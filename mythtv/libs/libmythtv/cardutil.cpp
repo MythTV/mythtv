@@ -638,7 +638,7 @@ QStringList CardUtil::ProbeDeliverySystems(int fd_frontend)
     cmd.props = &prop;
     if (ioctl(fd_frontend, FE_GET_PROPERTY, &cmd) == 0)
     {
-        for (int i = 0; i < prop.u.buffer.len; i++)
+        for (unsigned int i = 0; i < prop.u.buffer.len; i++)
         {
             delsyslist.push_back(DTVModulationSystem::toString(prop.u.buffer.data[i]));
         }

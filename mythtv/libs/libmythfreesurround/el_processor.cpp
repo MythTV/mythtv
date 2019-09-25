@@ -33,7 +33,7 @@ typedef FFTSample FFTComplexArray[2];
 #endif
 
 
-#ifdef USE_FFTW3
+#if defined(_WIN32) && defined(USE_FFTW3)
 #pragma comment (lib,"libfftw3f-3.lib")
 #endif
 

@@ -89,13 +89,12 @@ uint EITHelper::ProcessEvents(void)
     if (!insertCount)
         return 0;
 
-    if (!incomplete_events.empty() || !unmatched_etts.empty())
+    if (!incomplete_events.empty())
     {
         LOG(VB_EIT, LOG_INFO,
-            LOC + QString("Added %1 events -- complete(%2) "
-                          "incomplete(%3) unmatched(%4)")
+            LOC + QString("Added %1 events -- complete: %2 incomplete: %3")
                 .arg(insertCount).arg(db_events.size())
-                .arg(incomplete_events.size()).arg(unmatched_etts.size()));
+                .arg(incomplete_events.size()));
     }
     else
     {
@@ -147,7 +146,6 @@ void EITHelper::AddEIT(uint atsc_major, uint atsc_minor,
 {
     uint atsc_key = (atsc_major << 16) | atsc_minor;
     EventIDToATSCEvent &events = incomplete_events[atsc_key];
-    EventIDToETT &etts = unmatched_etts[atsc_key];
 
     for (uint i = 0; i < eit->EventCount(); i++)
     {
@@ -156,29 +154,24 @@ void EITHelper::AddEIT(uint atsc_major, uint atsc_minor,
                      eit->title(i).GetBestMatch(languagePreferences),
                      eit->Descriptors(i), eit->DescriptorsLength(i));
 
-        // Look to see if there has been a recent ett message with the same event id.
-        EventIDToETT::iterator it = etts.find(eit->EventID(i));
-        QString ett_text;
-        bool found_matching_ett = false;
-        if (it != etts.end())
+        // Create an event immediately if the ETM_location specifies
+        // that there is no ETT event coming; otherwise save the EIT
+        // event in the incomplete_events for this channel.
+        if (!ev.m_etm)
         {
-            // Don't use an ett description if it was scanned long in the past.
-            if (!it->IsStale()) {
-              ett_text = it->m_ett_text;
-              found_matching_ett = true;
-            }
-            etts.erase(it);
-        }
-
-        // Create an event immediately if a matching ett description was found,
-        // or if item is false, indicating that no ett description should be
-        // expected.
-        if (found_matching_ett || !ev.m_etm)
-        {
-            CompleteEvent(atsc_major, atsc_minor, ev, ett_text);
+            CompleteEvent(atsc_major, atsc_minor, ev, "");
         }
         else
         {
+            // If there is an existing EIT event with this event_id then
+            // delete the descriptor to avoid a memory leak.
+            EventIDToATSCEvent::iterator it = events.find(eit->EventID(i));
+            if (it != events.end())
+            {
+                delete [] (*it).m_desc;
+            }
+
+            // Save the EIT event in the incomplete_events for this channel.
             unsigned char *tmp = new unsigned char[ev.m_desc_length];
             memcpy(tmp, eit->Descriptors(i), ev.m_desc_length);
             ev.m_desc = tmp;
@@ -190,51 +183,27 @@ void EITHelper::AddEIT(uint atsc_major, uint atsc_minor,
 void EITHelper::AddETT(uint atsc_major, uint atsc_minor,
                        const ExtendedTextTable *ett)
 {
+    // Find the matching incomplete EIT event for this ETT
+    // If we have no EIT event then just discard the ETT.
     uint atsc_key = (atsc_major << 16) | atsc_minor;
-    // Try to match up the ett with an eit event.
     ATSCSRCToEvents::iterator eits_it = incomplete_events.find(atsc_key);
     if (eits_it != incomplete_events.end())
     {
         EventIDToATSCEvent::iterator it = (*eits_it).find(ett->EventID());
         if (it != (*eits_it).end())
         {
-            bool completed_event = false;
-            // Only consider eit events from the recent past.
+            // Only consider EIT events from the very recent past.
             if (!it->IsStale()) {
-              completed_event = true;
               CompleteEvent(
                   atsc_major, atsc_minor, *it,
                   ett->ExtendedTextMessage().GetBestMatch(languagePreferences));
             }
 
+            // Remove EIT event from the incomplete_event list.
             delete [] (*it).m_desc;
-
             (*eits_it).erase(it);
-
-            if (completed_event) return;
         }
     }
-
-    // Report if an unmatched ett was previously noted and overwrite it.
-    // See also https://code.mythtv.org/trac/ticket/11739
-    EventIDToETT &elist = unmatched_etts[atsc_key];
-    EventIDToETT::iterator existing_unmatched_ett_it =
-        elist.find(ett->EventID());
-    const QString next_ett_text = ett->ExtendedTextMessage()
-        .GetBestMatch(languagePreferences);
-    if (existing_unmatched_ett_it != elist.end() &&
-        existing_unmatched_ett_it->m_ett_text != next_ett_text)
-    {
-       LOG(VB_EIT, LOG_DEBUG, LOC +
-           QString("Overwriting previously unmatched ett. stale: %1 major: %2 "
-                   "minor: %3 old ett: %4  new ett: %5")
-               .arg(existing_unmatched_ett_it->IsStale())
-               .arg(atsc_major)
-               .arg(atsc_minor)
-               .arg(existing_unmatched_ett_it->m_ett_text)
-               .arg(next_ett_text));
-    }
-    elist.insert(ett->EventID(), ATSCEtt(next_ett_text));
 }
 
 static void parse_dvb_event_descriptors(const desc_list_t& list, FixupValue fix,
@@ -966,7 +935,7 @@ static uint get_chan_id_from_db_dvb(uint sourceid, uint serviceid,
     if (query.size() > 1)
     {
         LOG(VB_EIT, LOG_INFO,
-            LOC + QString("found %1 channels for networdid %2, "
+            LOC + QString("found %1 channels for networkid %2, "
                           "transportid %3, serviceid %4 but none "
                           "for current sourceid %5.")
                 .arg(query.size()).arg(networkid).arg(transportid)
