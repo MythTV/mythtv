@@ -167,7 +167,7 @@ class FullChannelSearch : public TransMythUICheckBoxSetting
                 "This option is useful when you want to keep channel data such as "
                 "the xmltvid and the icon path when doing a rescan "
                 "after channels have been rearranged across transports."));
-        setValue(false);
+        setValue(true);
     };
 };
 
