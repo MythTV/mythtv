@@ -558,7 +558,7 @@ static bool check_cardsource(int sourceid, QString &sourcename)
 
 void ChannelEditor::scan(void)
 {
-   // Check that we have a videosource and a connected capture card
+    // Check that we have a videosource and a connected capture card
     if (!check_cardsource(m_sourceFilter, m_sourceFilterName))
         return;
  
@@ -578,7 +578,7 @@ void ChannelEditor::scan(void)
 
 void ChannelEditor::transportEditor(void)
 {
-   // Check that we have a videosource and a connected capture card
+    // Check that we have a videosource and a connected capture card
     if (!check_cardsource(m_sourceFilter, m_sourceFilterName))
         return;
  
