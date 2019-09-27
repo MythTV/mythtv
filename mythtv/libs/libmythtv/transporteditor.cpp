@@ -182,7 +182,7 @@ void TransportListEditor::SetSourceID(uint _sourceid)
 TransportListEditor::TransportListEditor(uint sourceid) :
     m_videosource(new VideoSourceSelector(sourceid, QString(), false))
 {
-    setLabel(tr("Multiplex Editor"));
+    setLabel(tr("Transport Editor"));
 
     addChild(m_videosource);
     ButtonStandardSetting *newTransport =
