@@ -388,6 +388,10 @@ class Recorded( CMPRecord, DBDataWrite ):
         """Recorded.getProgram() -> Program object"""
         return Program.fromRecorded(self)
 
+    def getRecordedFile(self):
+        """Recorded.getRecordedFile() -> RecordedFile object"""
+        return RecordedFile.fromRecorded(self)
+
     def getRecordedProgram(self):
         """Recorded.getRecordedProgram() -> RecordedProgram object"""
         return RecordedProgram.fromRecorded(self)
@@ -550,6 +554,36 @@ class Recorded( CMPRecord, DBDataWrite ):
     def _playOnFe(self, fe):
         return fe.send('play','program %d %s' % \
                     (self.chanid, self.starttime.isoformat()))
+
+class RecordedFile( CMPRecord, DBDataWrite ):
+    """
+    RecordedFile(data=None, db=None) -> RecordedFile object
+            'data' is a recordedid
+    """
+    _key   = ['recordedid']
+    _defaults = {'filesize':0,          'width':0,        'height':0,
+                 'fps':0.0,             'aspect':0.0,     'audio_sample_rate':0,
+                 'audio_channels':0,    'audio_codec':'', 'video_codec':'',
+                 'comment':u'',         'hostname':'',    'storagegroup':'',
+                 'container':'',        'total_bitrate':0,
+                 'video_avg_bitrate':0, 'video_max_bitrate':0,
+                 'audio_avg_bitrate':0, 'audio_max_bitrate':0}
+
+    def __str__(self):
+        if self._wheredat is None:
+            return u"<Uninitialized RecordedFile at %s>" % hex(id(self))
+        return u"<RecordedFile '%s','%d' at %s>" % (self.basename,
+                self.recordedid, hex(id(self)))
+
+    def __repr__(self):
+        return py23_repr(str(self))
+
+    def __init__(self, data=None, db=None):
+        DBDataWrite.__init__(self, data, db)
+
+    @classmethod
+    def fromRecorded(cls, recorded):
+        return cls((recorded.recordedid), recorded._db)
 
 class RecordedProgram( CMPRecord, DBDataWrite ):
 
