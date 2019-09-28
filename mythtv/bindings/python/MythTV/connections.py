@@ -83,7 +83,7 @@ class _Connection_Pool( object ):
         for i in range(self._poolsize):
             self._pool.append(self._connect())
 
-    def __del__(self):
+    def _cleanup(self):
         for conn in self._pool:
             conn.close()
         for id,conn in self._inuse.items():
