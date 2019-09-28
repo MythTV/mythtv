@@ -686,7 +686,7 @@ class MythDB( DBCache ):
             partnumber, parttotal,  seriesid,   showtype,   programid,
             manualid,   generic,    cast,       livetv,     basename,
             syndicatedepisodenumber,            olderthan,  newerthan,
-            inetref,    season,     episode
+            inetref,    season,     episode,    recordedid
 
         Multiple keywords can be chained as such:
             obj.searchRecorded(title='Title', commflagged=False)
@@ -715,7 +715,7 @@ class MythDB( DBCache ):
                         'category','hostname','autoexpire','commflagged',
                         'stars','recgroup','playgroup','duplicate',
                         'transcoded','watched','storagegroup','basename',
-                        'inetref','season','episode'):
+                        'inetref','season','episode', 'recordedid'):
             return ('recorded.%s=%%s' % key, value, 0)
 
         # time matches
