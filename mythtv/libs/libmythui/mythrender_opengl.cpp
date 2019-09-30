@@ -67,6 +67,10 @@ OpenGLLocker::~OpenGLLocker()
 
 MythRenderOpenGL* MythRenderOpenGL::GetOpenGLRender(void)
 {
+    // Don't try and create the window
+    if (!HasMythMainWindow())
+        return nullptr;
+
     MythMainWindow* window = MythMainWindow::getMainWindow();
     if (!window)
         return nullptr;
