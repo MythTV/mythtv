@@ -226,6 +226,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
   private:
     void DebugFeatures (void);
     QOpenGLDebugLogger *m_openglDebugger;
+    QOpenGLDebugMessage::Types m_openGLDebuggerFilter;
     QWindow *m_window;
 };
 

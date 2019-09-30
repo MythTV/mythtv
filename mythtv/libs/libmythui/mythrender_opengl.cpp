@@ -102,8 +102,8 @@ MythRenderOpenGL* MythRenderOpenGL::Create(const QString&, QPaintDevice* Device)
     }
 
     // N.B the core profiles below are designed to target compute shader availability
-    bool opengles = !qgetenv("USE_OPENGLES").isEmpty();
-    bool core     = !qgetenv("USE_OPENGLCORE").isEmpty();
+    bool opengles = !qgetenv("MYTHTV_OPENGL_ES").isEmpty();
+    bool core     = !qgetenv("MYTHTV_OPENGL_CORE").isEmpty();
     QSurfaceFormat format = QSurfaceFormat::defaultFormat();
     if (core)
     {
@@ -193,6 +193,7 @@ MythRenderOpenGL::MythRenderOpenGL(const QSurfaceFormat& Format, QPaintDevice* D
     m_vao(0),
     m_flushEnabled(false),
     m_openglDebugger(nullptr),
+    m_openGLDebuggerFilter(QOpenGLDebugMessage::InvalidType),
     m_window(nullptr)
 {
     memset(m_defaultPrograms, 0, sizeof(m_defaultPrograms));
@@ -219,13 +220,27 @@ MythRenderOpenGL::~MythRenderOpenGL()
 
 void MythRenderOpenGL::messageLogged(const QOpenGLDebugMessage &Message)
 {
-    // filter out our own messages
-    if (Message.source() == QOpenGLDebugMessage::ApplicationSource)
+    // filter unwanted messages
+    if (m_openGLDebuggerFilter & Message.type())
         return;
 
-    QString message = Message.message();
+    QString source("Unknown");
     QString type("Unknown");
-    switch (Message.type())
+
+    switch (Message.source())
+    {
+        case QOpenGLDebugMessage::ApplicationSource: return; // filter out our own messages
+        case QOpenGLDebugMessage::APISource:            source = "API";        break;
+        case QOpenGLDebugMessage::WindowSystemSource:   source = "WinSys";     break;
+        case QOpenGLDebugMessage::ShaderCompilerSource: source = "ShaderComp"; break;
+        case QOpenGLDebugMessage::ThirdPartySource:     source = "3rdParty";   break;
+        case QOpenGLDebugMessage::OtherSource:          source = "Other";      break;
+        default: break;
+    }
+
+    // N.B. each break is on a separate line to allow setting individual break points
+    // when using synchronous logging
+        switch (Message.type())
     {
         case QOpenGLDebugMessage::ErrorType:
             type = "Error"; break;
@@ -247,10 +262,10 @@ void MythRenderOpenGL::messageLogged(const QOpenGLDebugMessage &Message)
             type = "GroupPop"; break;
         default: break;
     }
-    LOG(VB_GPU, LOG_INFO, QString("%1 %2: %3").arg(LOC).arg(type).arg(message));
+    LOG(VB_GPU, LOG_INFO, LOC + QString("Src: %1 Type: %2 Msg: %3").arg(source).arg(type).arg(Message.message()));
 }
 
-void MythRenderOpenGL::logDebugMarker(const QString &Message)
+void MythRenderOpenGL:: logDebugMarker(const QString &Message)
 {
     if (m_openglDebugger)
     {
@@ -285,12 +300,64 @@ bool MythRenderOpenGL::Init(void)
         {
             connect(m_openglDebugger, SIGNAL(messageLogged(QOpenGLDebugMessage)), this, SLOT(messageLogged(QOpenGLDebugMessage)));
             QOpenGLDebugLogger::LoggingMode mode = QOpenGLDebugLogger::AsynchronousLogging;
-#if 0
+
             // this will impact performance but can be very useful
-            mode = QOpenGLDebugLogger::SynchronousLogging;
-#endif
+            if (!qgetenv("MYTHTV_OPENGL_SYNCHRONOUS").isEmpty())
+                mode = QOpenGLDebugLogger::SynchronousLogging;
+
             m_openglDebugger->startLogging(mode);
-            LOG(VB_GENERAL, LOG_INFO, LOC + "GPU debug logging started");
+            if (mode == QOpenGLDebugLogger::AsynchronousLogging)
+                LOG(VB_GENERAL, LOG_INFO, LOC + "GPU debug logging started (async)");
+             else
+                LOG(VB_GENERAL, LOG_INFO, LOC + "Started synchronous GPU debug logging (will hurt performance)");
+
+            // filter messages. Some drivers can be extremely verbose for certain issues.
+            QStringList debug;
+            QString filter = qgetenv("MYTHTV_OPENGL_LOGFILTER");
+            if (filter.contains("other", Qt::CaseInsensitive))
+            {
+                m_openGLDebuggerFilter |= QOpenGLDebugMessage::OtherType;
+                debug << "Other";
+            }
+            if (filter.contains("error", Qt::CaseInsensitive))
+            {
+                m_openGLDebuggerFilter |= QOpenGLDebugMessage::ErrorType;
+                debug << "Error";
+            }
+            if (filter.contains("deprecated", Qt::CaseInsensitive))
+            {
+                m_openGLDebuggerFilter |= QOpenGLDebugMessage::DeprecatedBehaviorType;
+                debug << "Deprecated";
+            }
+            if (filter.contains("undefined", Qt::CaseInsensitive))
+            {
+                m_openGLDebuggerFilter |= QOpenGLDebugMessage::UndefinedBehaviorType;
+                debug << "Undefined";
+            }
+            if (filter.contains("portability", Qt::CaseInsensitive))
+            {
+                m_openGLDebuggerFilter |= QOpenGLDebugMessage::PortabilityType;
+                debug << "Portability";
+            }
+            if (filter.contains("performance", Qt::CaseInsensitive))
+            {
+                m_openGLDebuggerFilter |= QOpenGLDebugMessage::PerformanceType;
+                debug << "Performance";
+            }
+            if (filter.contains("grouppush", Qt::CaseInsensitive))
+            {
+                m_openGLDebuggerFilter |= QOpenGLDebugMessage::GroupPushType;
+                debug << "GroupPush";
+            }
+            if (filter.contains("grouppop", Qt::CaseInsensitive))
+            {
+                m_openGLDebuggerFilter |= QOpenGLDebugMessage::GroupPopType;
+                debug << "GroupPop";
+            }
+
+            if (!debug.isEmpty())
+                LOG(VB_GENERAL, LOG_INFO, LOC + QString("Filtering out GPU messages for: %1")
+                    .arg(debug.join(", ")));
         }
         else
         {
