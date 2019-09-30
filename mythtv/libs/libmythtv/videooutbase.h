@@ -146,6 +146,7 @@ class VideoOutput
     void         DestroyVisualisation(void);
 
     static int   CalcHueBase(const QString &AdaptorName);
+    static MythDeintType ParseDeinterlacer(const QString &Deinterlacer);
     virtual bool StereoscopicModesAllowed(void) const { return false; }
     void SetStereoscopicMode(StereoscopicMode mode) { m_stereo = mode; }
     StereoscopicMode GetStereoscopicMode(void) const { return m_stereo; }
@@ -163,7 +164,6 @@ class VideoOutput
     QRect        GetTotalOSDBounds(void) const;
 
     static void  CopyFrame(VideoFrame* To, const VideoFrame* From);
-    MythDeintType ParseDeinterlacer(const QString &Deinterlacer);
 
     VideoOutWindow       m_window;
     QSize                m_dbDisplayDimensionsMM;
