@@ -42,6 +42,10 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext **Context,
     if (!Decoder.startsWith("nvdec") || getenv("NO_NVDEC") || !HaveNVDEC() || IsUnsupportedProfile(*Context))
         return failure;
 
+    QString codecstr = ff_codec_id_string((*Context)->codec_id);
+    QString profile  = avcodec_profile_name((*Context)->codec_id, (*Context)->profile);
+    QString pixfmt   = av_get_pix_fmt_name((*Context)->pix_fmt);
+
     // Check actual decoder capabilities. These are loaded statically and in a thread safe
     // manner in HaveNVDEC
     cudaVideoCodec cudacodec = cudaVideoCodec_NumCodecs;
@@ -124,9 +128,9 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext **Context,
                 AVCodec *codec = avcodec_find_decoder_by_name(name.toLocal8Bit());
                 if (codec)
                 {
-                    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' supports decoding '%2 %3' depth %4")
-                            .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_CUDA)).arg((*Codec)->name)
-                            .arg(format_description(type)).arg(depth + 8));
+                    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' supports decoding '%2 %3 %4' depth %5")
+                            .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_CUDA)).arg(codecstr)
+                            .arg(profile).arg(pixfmt).arg(depth + 8));
                     *Codec = codec;
                     gCodecMap->freeCodecContext(Stream);
                     *Context = gCodecMap->getCodecContext(Stream, *Codec);
@@ -137,9 +141,9 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext **Context,
         }
     }
 
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' does not support decoding '%2 %3' depth %4")
-            .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_CUDA)).arg((*Codec)->name)
-            .arg(format_description(type)).arg(depth + 8));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' does not support decoding '%2 %3 %4' depth %5")
+            .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_CUDA)).arg(codecstr)
+            .arg(profile).arg(pixfmt).arg(depth + 8));
     return failure;
 }
 

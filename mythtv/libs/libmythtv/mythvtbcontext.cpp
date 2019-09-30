@@ -90,15 +90,25 @@ bool MythVTBContext::CheckDecoderSupport(uint StreamType, AVCodec **Codec)
         }
     }
 
+    QString codec   = ff_codec_id_string((*Context)->codec_id);
+    QString profile = avcodec_profile_name((*Context)->codec_id, (*Context)->profile);
+    QString pixfmt  = av_get_pix_fmt_name((*Context)->pix_fmt);
+
     if (!supported.contains(StreamType))
     {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' does not support decoding '%2'")
-                .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_VIDEOTOOLBOX)).arg((*Codec)->name));
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' does not support decoding '%2 %3 %4'")
+                .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_VIDEOTOOLBOX))
+                .arg(codec).arg(profile).arg(pixmt));
         return false;
     }
 
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' supports decoding '%2'")
-            .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_VIDEOTOOLBOX)).arg((*Codec)->name));
+    // There is no guarantee (and no obvious way to check) whether the given H264 or HEVC
+    // profile is actually supported.
+    bool maybe = (StreamType == 5) || (StreamType == 10);
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' %2 decoding '%3 %4 %5'")
+            .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_VIDEOTOOLBOX))
+            .arg(maybe ? "MAY support" : "supports")
+            .arg(codec).arg(profile).arg(pixfmt));
     return true;
 }
 

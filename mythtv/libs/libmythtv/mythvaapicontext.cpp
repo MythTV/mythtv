@@ -128,7 +128,7 @@ inline AVPixelFormat MythVAAPIContext::FramesFormat(AVPixelFormat Format)
 /*! \brief Confirm whether VAAPI support is available given Decoder and Context
 */
 MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext **Context,
-                                                AVCodec **Codec,
+                                                AVCodec **,
                                                 const QString &Decoder,
                                                 uint StreamType)
 {
@@ -139,10 +139,18 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext **Context,
     if (!Decoder.startsWith("vaapi") || !HaveVAAPI() || getenv("NO_VAAPI"))
         return failure;
 
+    QString codec   = ff_codec_id_string((*Context)->codec_id);
+    QString profile = avcodec_profile_name((*Context)->codec_id, (*Context)->profile);
+    QString pixfmt  = av_get_pix_fmt_name((*Context)->pix_fmt);
+
     // Simple check for known profile
     VAProfile desired = VAAPIProfileForCodec(*Context);
     if (desired == VAProfileNone)
+    {
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("VAAPI does not support decoding '%1 %2 %3'")
+            .arg(codec).arg(profile).arg(pixfmt));
         return failure;
+    }
 
     // direct rendering needs interop support
     if (!decodeonly && (MythOpenGLInterop::GetInteropType(success) == MythOpenGLInterop::Unsupported))
@@ -252,18 +260,18 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext **Context,
 
     if (foundprofile && sizeok && foundentry)
     {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' supports decoding '%2 %3'")
-                .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_VAAPI)).arg((*Codec)->name)
-                .arg(av_get_pix_fmt_name((*Context)->pix_fmt)));
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' supports decoding '%2 %3 %4'")
+                .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_VAAPI)).arg(codec)
+                .arg(profile).arg(pixfmt));
         (*Context)->pix_fmt = AV_PIX_FMT_VAAPI;
         return success;
     }
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
-            QString("HW device type '%1' does not support '%2 %7' (Size:%3 Profile:%4 Entry: %5)")
-            .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_VAAPI)).arg((*Codec)->name)
-            .arg(sizeok).arg(foundprofile).arg(foundentry)
-            .arg(av_get_pix_fmt_name((*Context)->pix_fmt)));
+            QString("HW device type '%1' does not support '%2 %3 %4' (Size:%5 Profile:%6 Entry: %7)")
+            .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_VAAPI))
+            .arg(codec).arg(profile).arg(pixfmt)
+            .arg(sizeok).arg(foundprofile).arg(foundentry));
     return failure;
 }
 

@@ -118,7 +118,9 @@ int MythVDPAUContext::InitialiseContext(AVCodecContext* Context)
     return 0;
 }
 
-MythCodecID MythVDPAUContext::GetSupportedCodec(AVCodecContext **Context, AVCodec **Codec, const QString &Decoder,
+MythCodecID MythVDPAUContext::GetSupportedCodec(AVCodecContext **Context,
+                                                AVCodec **,
+                                                const QString &Decoder,
                                                 uint StreamType)
 {
     bool decodeonly = Decoder == "vdpau-dec";
@@ -127,6 +129,10 @@ MythCodecID MythVDPAUContext::GetSupportedCodec(AVCodecContext **Context, AVCode
 
     if (!Decoder.startsWith("vdpau") || getenv("NO_VDPAU") || IsUnsupportedProfile(*Context))
         return failure;
+
+    QString codec   = ff_codec_id_string((*Context)->codec_id);
+    QString profile = avcodec_profile_name((*Context)->codec_id, (*Context)->profile);
+    QString pixfmt  = av_get_pix_fmt_name((*Context)->pix_fmt);
 
     // VDPAU only supports 8bit 420p:(
     // N.B. It should probably be possible to force YUVJ420P support
@@ -142,15 +148,15 @@ MythCodecID MythVDPAUContext::GetSupportedCodec(AVCodecContext **Context, AVCode
 
     if (!vdpau)
     {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' does not support decoding '%2 %3'")
-                .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_VDPAU)).arg((*Codec)->name)
-                .arg(format_description(type)));
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' does not support decoding '%2 %3 %4'")
+                .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_VDPAU)).arg(codec)
+                .arg(profile).arg(pixfmt));
         return failure;
     }
 
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' supports decoding '%2 %3'")
-            .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_VDPAU)).arg((*Codec)->name)
-            .arg(format_description(type)));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' supports decoding '%2 %3 %4'")
+            .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_VDPAU)).arg(codec)
+            .arg(profile).arg(pixfmt));
     (*Context)->pix_fmt = AV_PIX_FMT_VDPAU;
     return success;
 }
