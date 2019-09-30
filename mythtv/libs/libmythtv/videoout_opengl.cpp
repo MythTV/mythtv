@@ -147,6 +147,7 @@ VideoOutputOpenGL::VideoOutputOpenGL(const QString &Profile)
         return;
     }
 
+    // we need to control buffer swapping
     m_openGLPainter->SetSwapControl(false);
 
     // Create OpenGLVideo
@@ -210,6 +211,12 @@ bool VideoOutputOpenGL::Init(const QSize &VideoDim, const QSize &VideoDispDim, f
     }
 
     OpenGLLocker ctx_lock(m_render);
+
+    // if we are the main video player then free up as much video memory
+    // as possible at startup
+    PIPState pip = m_window.GetPIPState();
+    if ((kCodec_NONE == m_newCodecId) && ((kPIPOff == pip) || (kPBPLeft == pip)))
+        m_openGLPainter->FreeResources();
 
     // Default initialisation - mainly VideoOutWindow
     if (!VideoOutput::Init(VideoDim, VideoDispDim, Aspect, 0, DisplayVisibleRect, CodecId))
