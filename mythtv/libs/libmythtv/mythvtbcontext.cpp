@@ -98,7 +98,7 @@ bool MythVTBContext::CheckDecoderSupport(AVCodecContext **Context, uint StreamTy
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' does not support decoding '%2 %3 %4'")
                 .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_VIDEOTOOLBOX))
-                .arg(codec).arg(profile).arg(pixmt));
+                .arg(codec).arg(profile).arg(pixfmt));
         return false;
     }
 
@@ -113,7 +113,7 @@ bool MythVTBContext::CheckDecoderSupport(AVCodecContext **Context, uint StreamTy
 }
 
 MythCodecID MythVTBContext::GetSupportedCodec(AVCodecContext **Context,
-                                              AVCodec **Codec,
+                                              AVCodec **,
                                               const QString &Decoder,
                                               uint StreamType)
 {

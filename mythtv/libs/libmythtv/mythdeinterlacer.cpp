@@ -55,8 +55,8 @@ void MythDeinterlacer::Filter(VideoFrame *Frame, FrameScanType Scan)
         return;
     }
 
-    // Sanity check frame format - no NV12 support in libavfilter
-    if (!format_is_yuv(Frame->codec) || format_is_nv12(Frame->codec))
+    // Sanity check frame format
+    if (!format_is_yuv(Frame->codec))
     {
         Cleanup();
         return;
@@ -84,6 +84,15 @@ void MythDeinterlacer::Filter(VideoFrame *Frame, FrameScanType Scan)
             Cleanup();
             return;
         }
+    }
+
+    // libavfilter will not deinterlace NV12 frames. Allow shaders in this case
+    if (format_is_nv12(Frame->codec))
+    {
+        Cleanup();
+        Frame->deinterlace_single = Frame->deinterlace_single | DEINT_SHADER;
+        Frame->deinterlace_double = Frame->deinterlace_double | DEINT_SHADER;
+        return;
     }
 
     // Check for a change in input or deinterlacer
