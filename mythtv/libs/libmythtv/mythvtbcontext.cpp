@@ -64,7 +64,7 @@ int MythVTBContext::HwDecoderInit(AVCodecContext *Context)
     return -1;
 }
 
-bool MythVTBContext::CheckDecoderSupport(AVCodecContext **Context, uint StreamType, AVCodec **Codec)
+bool MythVTBContext::CheckDecoderSupport(AVCodecContext **Context, uint StreamType)
 {
     static bool initialised = false;
     static QVector<uint> supported;
@@ -125,7 +125,7 @@ MythCodecID MythVTBContext::GetSupportedCodec(AVCodecContext **Context,
         return failure;
 
     // Check decoder support
-    if (!CheckDecoderSupport(Context, StreamType, Codec))
+    if (!CheckDecoderSupport(Context, StreamType))
         return failure;
 
     (*Context)->pix_fmt = AV_PIX_FMT_VIDEOTOOLBOX;

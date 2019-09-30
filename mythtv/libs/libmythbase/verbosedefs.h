@@ -171,11 +171,11 @@ VERBOSE_MAP(VB_STDIO,     0x2000000000ULL, true,
    programs that have debugging enabled.
  */
 VERBOSE_MAP(VB_GPU,       0x4000000000ULL, true,
-            "GPU Commercial Flagging messages")
+            "GPU OpenGL driver messages")
 VERBOSE_MAP(VB_GPUAUDIO,  0x8000000000ULL, true,
             "GPU Audio Processing messages")
 VERBOSE_MAP(VB_GPUVIDEO,  0x10000000000ULL, true,
-            "GPU Video Processing messages")
+            "GPU video rendering messages")
 VERBOSE_MAP(VB_REFCOUNT,  0x20000000000ULL, true,
             "Reference Count messages")
 VERBOSE_MAP(VB_HTTP,  0x40000000000ULL, true,

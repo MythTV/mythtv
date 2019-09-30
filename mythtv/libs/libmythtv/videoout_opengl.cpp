@@ -121,7 +121,7 @@ VideoOutputOpenGL::VideoOutputOpenGL(const QString &Profile)
     // will report the execution time for the key GL code blocks
     // N.B. 'Upload' should always be zero when using hardware decoding and direct
     // rendering. Any copy cost for direct rendering will be included within 'Render'
-    if (VERBOSE_LEVEL_CHECK(VB_GPU | VB_PLAYBACK, LOG_INFO))
+    if (VERBOSE_LEVEL_CHECK(VB_GPUVIDEO, LOG_INFO))
     {
         m_openGLPerf = new MythOpenGLPerf("GLVidPerf: ", { "Upload:", "Clear:", "Render:", "Flush:", "Swap:" });
         if (!m_openGLPerf->isCreated())
