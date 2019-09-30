@@ -56,13 +56,14 @@ MythXDisplay *GetMythXDisplay(Display *d)
     return nullptr;
 }
 
-MythXDisplay *OpenMythXDisplay(void)
+MythXDisplay *OpenMythXDisplay(bool Warn /*= true*/)
 {
     MythXDisplay *disp = new MythXDisplay();
     if (disp && disp->Open())
         return disp;
 
-    LOG(VB_GENERAL, LOG_CRIT, "MythXOpenDisplay() failed");
+    if (Warn)
+        LOG(VB_GENERAL, LOG_CRIT, "MythXOpenDisplay() failed");
     delete disp;
     return nullptr;
 }

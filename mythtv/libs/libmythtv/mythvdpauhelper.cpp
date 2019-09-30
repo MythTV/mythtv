@@ -75,7 +75,7 @@ static const char* DummyGetError(VdpStatus)
 MythVDPAUHelper::MythVDPAUHelper(void)
   : m_createdDevice(true)
 {
-    m_display = OpenMythXDisplay();
+    m_display = OpenMythXDisplay(false);
     if (!m_display)
         return;
 
