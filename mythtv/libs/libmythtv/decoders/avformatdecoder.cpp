@@ -1115,6 +1115,16 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     if (!scanned)
     {
+
+        // With certain streams, we don't get a complete stream analysis and the video
+        // codec/frame format is not fully detected. This can have various consequences - from
+        // failed playback to not enabling hardware decoding (as the frame formt is not valid).
+        // Bump the duration (FFmpeg defaults to 5 seconds) to 60 seconds. This should
+        // not impact performance as in the vast majority of cases the scan is completed
+        // within a second or two (seconds in this case referring to stream duration - not the time
+        // it takes to complete the scan).
+        m_ic->max_analyze_duration = 60 * AV_TIME_BASE;
+
         int ret = FindStreamInfo();
         if (ret < 0)
         {
