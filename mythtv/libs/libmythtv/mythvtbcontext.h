@@ -31,7 +31,7 @@ class MythVTBContext : public MythCodecContext
                                           const enum AVPixelFormat *PixFmt);
 
   private:
-    static bool CheckDecoderSupport      (uint StreamType, AVCodec **Codec);
+    static bool CheckDecoderSupport      (AVCodecContext **Context, uint StreamType, AVCodec **Codec);
     static int  InitialiseDecoder        (AVCodecContext *Context);
 };
 

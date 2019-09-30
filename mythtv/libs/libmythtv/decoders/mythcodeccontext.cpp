@@ -427,7 +427,7 @@ AVBufferRef* MythCodecContext::CreateDevice(AVHWDeviceType Type, const QString &
     }
 
     char error[AV_ERROR_MAX_STRING_SIZE];
-    LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to create hardware device '%1'%2 Error '%3'")
+    LOG(VB_PLAYBACK, LOG_ERR, LOC + QString("Failed to create hardware device '%1'%2 Error '%3'")
         .arg(av_hwdevice_get_type_name(Type))
         .arg(Device == nullptr ? "" : QString(" (%1)").arg(Device))
         .arg(av_make_error_string(error, sizeof(error), res)));
