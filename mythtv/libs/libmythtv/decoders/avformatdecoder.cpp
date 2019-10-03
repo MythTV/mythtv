@@ -2324,14 +2324,24 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             if (FlagIsSet(kDecodeSingleThreaded))
                 thread_count = 1;
 
-            if (!foundgpudecoder)
-            {
-                LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Using %1 CPUs for decoding")
-                    .arg(HAVE_THREADS ? thread_count : 1));
-            }
-
             if (HAVE_THREADS)
-                enc->thread_count = static_cast<int>(thread_count);
+            {
+                // All of our callbacks are thread safe. This should improve
+                // concurrency with software decode
+                enc->thread_safe_callbacks = 1;
+
+                // Only use a single thread for hardware decoding. There is no
+                // performance improvement with multithreaded hardware decode
+                // and asynchronous callbacks create issues with decoders that
+                // use AVHWFrameContext where we need to release video resources
+                // before they are recreated
+                if (!foundgpudecoder)
+                {
+                    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Using %1 CPUs for decoding")
+                        .arg(HAVE_THREADS ? thread_count : 1));
+                    enc->thread_count = static_cast<int>(thread_count);
+                }
+            }
 
             InitVideoCodec(m_ic->streams[selTrack], enc, true);
 
