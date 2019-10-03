@@ -415,6 +415,9 @@ int MythVAAPIContext::InitialiseContext(AVCodecContext *Context)
         .arg(vaapi_frames_ctx->nb_surfaces).arg(Context->coded_width).arg(Context->coded_height)
         .arg(referenceframes));
     av_buffer_unref(&hwdeviceref);
+
+    NewHardwareFramesContext();
+
     return 0;
 }
 
@@ -461,6 +464,9 @@ int MythVAAPIContext::InitialiseContext2(AVCodecContext *Context)
         .arg(vaapi_frames_ctx->nb_surfaces).arg(Context->coded_width).arg(Context->coded_height)
         .arg(referenceframes));
     av_buffer_unref(&device);
+
+    NewHardwareFramesContext();
+
     return 0;
 }
 

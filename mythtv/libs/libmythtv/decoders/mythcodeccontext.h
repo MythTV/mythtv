@@ -29,6 +29,7 @@
 // Qt
 #include <QMutex>
 #include <QStringList>
+#include <QAtomicInt>
 
 // MythTV
 #include "mythtvexp.h"
@@ -82,6 +83,8 @@ class MTV_PUBLIC MythCodecContext
   protected:
     virtual bool   RetrieveHWFrame         (VideoFrame* Frame, AVFrame* AvFrame);
     static void    DestroyInterop          (MythOpenGLInterop *Interop);
+    static void    NewHardwareFramesContext(void);
+    static QAtomicInt s_hwFramesContextCount;
 
     DecoderBase* m_parent;
     MythCodecID  m_codecID;

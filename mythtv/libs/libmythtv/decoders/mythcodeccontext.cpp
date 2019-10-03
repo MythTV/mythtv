@@ -58,6 +58,8 @@ extern "C" {
 
 #define LOC QString("MythCodecContext: ")
 
+QAtomicInt MythCodecContext::s_hwFramesContextCount(0);
+
 MythCodecContext::MythCodecContext(DecoderBase *Parent, MythCodecID CodecID)
   : m_parent(Parent),
     m_codecID(CodecID)
@@ -346,8 +348,23 @@ void MythCodecContext::DestroyInteropCallback(void *Wait, void *Interop, void*)
         wait->wakeAll();
 }
 
+/*! \brief Track the number of concurrent frames contexts
+ *
+ * More than one hardware frames context is indicative of wider issues and needs
+ * to be avoided.
+ *
+ * This currently only applies to VDPAU and VAAPI
+*/
+void MythCodecContext::NewHardwareFramesContext(void)
+{
+    int count = ++s_hwFramesContextCount;
+    if (count != 1)
+        LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Error: %1 concurrent hardware frames contexts").arg(count));
+}
+
 void MythCodecContext::FramesContextFinished(AVHWFramesContext *Context)
 {
+    s_hwFramesContextCount--;
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("%1 frames context finished")
         .arg(av_hwdevice_get_type_name(Context->device_ctx->type)));
     MythOpenGLInterop *interop = reinterpret_cast<MythOpenGLInterop*>(Context->user_opaque);

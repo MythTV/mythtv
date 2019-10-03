@@ -25,12 +25,7 @@ MythVDPAUContext::MythVDPAUContext(DecoderBase *Parent, MythCodecID CodecID)
 {
 }
 
-/*! \brief Create a VDPAU device for use with direct rendering.
- *
- * \note For reasons I cannot understand, this must be performed as part of the GetFormat
- * call. Trying to initialise in HwDecoderInit fails to create the frames context
- * (sw_pix_fmt is not set) -  the same 'problem' appears in MythVAAPIContext
- */
+/// \brief Create a VDPAU device for use with direct rendering.
 int MythVDPAUContext::InitialiseContext(AVCodecContext* Context)
 {
     if (!gCoreContext->IsUIThread() || !Context)
@@ -115,6 +110,9 @@ int MythVDPAUContext::InitialiseContext(AVCodecContext* Context)
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("VDPAU buffer pool created"));
     av_buffer_unref(&hwdeviceref);
+
+    NewHardwareFramesContext();
+
     return 0;
 }
 
@@ -184,6 +182,7 @@ enum AVPixelFormat MythVDPAUContext::GetFormat2(struct AVCodecContext* Context, 
             AVBufferRef *device = MythCodecContext::CreateDevice(AV_HWDEVICE_TYPE_VDPAU);
             if (device)
             {
+                NewHardwareFramesContext();
                 Context->hw_device_ctx = device;
                 return AV_PIX_FMT_VDPAU;
             }
