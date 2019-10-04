@@ -100,6 +100,7 @@ void HLSStreamHandler::Return(HLSStreamHandler* & ref, int inputid)
 HLSStreamHandler::HLSStreamHandler(const IPTVTuningData& tuning, int inputid)
     : IPTVStreamHandler(tuning, inputid)
 {
+    LOG(VB_GENERAL, LOG_INFO, LOC + "ctor");
     m_hls        = new HLSReader();
     m_readbuffer = new uint8_t[BUFFER_SIZE];
 }
