@@ -179,11 +179,16 @@
                     </group>
                 </state>
                 <state name="disabledactive" from="active">
-                    <shape name="buttonbackgroundselection">
+                    <shape name="buttonbackground">
                         <fill style="gradient">
-                            <gradient start="#888888" end="#777777" alpha="255" />
+                            <gradient start="#888888" end="#777777" alpha="50" />
                         </fill>
                     </shape>
+                    <group name="labels">
+                        <textarea name="buttontext">
+                            <font>basesmallgrey</font>
+                        </textarea>
+                    </group>
                 </state>
                 <state name="disabledinactive" from="disabledactive">
                 </state>
