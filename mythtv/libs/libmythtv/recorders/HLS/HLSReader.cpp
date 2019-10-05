@@ -564,7 +564,7 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
                     --Iseg;
 
                 int64_t diff = (*Iseg).Sequence() - (*Inew).Sequence();
-                if (new_segments.size() > diff)
+                if (diff >= 0 && new_segments.size() > diff)
                 {
                     Inew += diff;
 
