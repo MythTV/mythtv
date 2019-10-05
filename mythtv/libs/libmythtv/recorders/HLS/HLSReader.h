@@ -96,6 +96,7 @@ class MTV_PUBLIC  HLSReader
 
   private:
     QString            m_m3u8;
+    QString            m_segment_base;
     StreamContainer    m_streams;
     SegmentContainer   m_segments;
     HLSRecStream      *m_curstream      {nullptr};

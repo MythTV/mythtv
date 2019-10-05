@@ -57,7 +57,8 @@ bool HLSReader::Open(const QString & m3u, int bitrate_index)
     }
 #else
     MythSingleDownload downloader;
-    if (!downloader.DownloadURL(m3u, &buffer))
+    QString redir;
+    if (!downloader.DownloadURL(m3u, &buffer, 30000, 0, 0, &redir))
     {
         LOG(VB_GENERAL, LOG_ERR,
             LOC + "Open failed: " + downloader.ErrorString());
@@ -76,6 +77,7 @@ bool HLSReader::Open(const QString & m3u, int bitrate_index)
     }
 
     m_m3u8 = m3u;
+    m_segment_base = redir.isEmpty() ? m3u : redir;
 
     QMutexLocker lock(&m_stream_lock);
     m_streams.clear();
@@ -348,7 +350,7 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
                 else
                 {
                     StreamContainer::iterator Istream;
-                    QString url = RelativeURI(m_m3u8, uri).toString();
+                    QString url = RelativeURI(m_segment_base, uri).toString();
 
                     if ((Istream = m_streams.find(url)) == m_streams.end())
                     {
@@ -358,7 +360,7 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
                                                          id, bandwidth))
                             break;
                         HLSRecStream *hls =
-                            new HLSRecStream(id, bandwidth, url);
+                            new HLSRecStream(id, bandwidth, url, m_segment_base);
 
                         if (hls)
                         {
@@ -390,7 +392,7 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
             if ((Istream = m_streams.find(M3U::DecodedURI(m_m3u8))) ==
                 m_streams.end())
             {
-                hls = new HLSRecStream(0, 0, m_m3u8);
+                hls = new HLSRecStream(0, 0, m_m3u8, m_segment_base);
                 if (hls)
                 {
                     LOG(VB_RECORD, LOG_INFO, LOC +
@@ -525,7 +527,7 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
                 {
                     new_segments.push_back
                         (HLSRecSegment(sequence_num, segment_duration, title,
-                                       RelativeURI(hls->M3U8Url(), line)));
+                                       RelativeURI(hls->SegmentBaseUrl(), line)));
                 }
                 else
                     ++skipped;
@@ -677,13 +679,20 @@ bool HLSReader::LoadMetaPlaylists(MythSingleDownload& downloader)
     if (!DownloadURL(m_curstream->Url(), &buffer))
         return false;
 #else
-    if (!downloader.DownloadURL(m_curstream->M3U8Url(), &buffer))
+    QString redir;
+    if (!downloader.DownloadURL(m_curstream->M3U8Url(), &buffer, 30000, 0, 0, &redir))
     {
         LOG(VB_GENERAL, LOG_WARNING,
             LOC + "Download failed: " + downloader.ErrorString());
         return false;
     }
 #endif
+
+    if (m_segment_base != redir)
+    {
+        m_segment_base = redir;
+        m_curstream->SetSegmentBaseUrl(redir);
+    }
 
     if (m_cancel || !ParseM3U8(buffer, m_curstream))
         return false;
