@@ -29,7 +29,7 @@ class MBASE_PUBLIC MythSingleDownload : public QObject
    ~MythSingleDownload(void) = default;
 
    bool DownloadURL(const QUrl &url, QByteArray *buffer, uint timeout = 30000,
-                    uint redirs = 0, qint64 maxsize = 0);
+                    uint redirs = 0, qint64 maxsize = 0, QString *final_url = nullptr);
    void Cancel(void);
    QString ErrorString(void) const { return m_errorstring; }
    QNetworkReply::NetworkError ErrorCode(void) const { return m_errorcode; }
