@@ -4,7 +4,7 @@
 #include "HLSReader.h"
 #include "HLS/m3u.h"
 
-#define LOC QString("%1: ").arg(m_curstream ? m_curstream->Url() : "HLSReader")
+#define LOC QString("%1: ").arg(m_curstream ? m_curstream->M3U8Url() : "HLSReader")
 
 /**
  * Handles relative URLs without breaking URI encoded parameters by avoiding
@@ -525,7 +525,7 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
                 {
                     new_segments.push_back
                         (HLSRecSegment(sequence_num, segment_duration, title,
-                                       RelativeURI(hls->Url(), line)));
+                                       RelativeURI(hls->M3U8Url(), line)));
                 }
                 else
                     ++skipped;
@@ -677,7 +677,7 @@ bool HLSReader::LoadMetaPlaylists(MythSingleDownload& downloader)
     if (!DownloadURL(m_curstream->Url(), &buffer))
         return false;
 #else
-    if (!downloader.DownloadURL(m_curstream->Url(), &buffer))
+    if (!downloader.DownloadURL(m_curstream->M3U8Url(), &buffer))
     {
         LOG(VB_GENERAL, LOG_WARNING,
             LOC + "Download failed: " + downloader.ErrorString());
