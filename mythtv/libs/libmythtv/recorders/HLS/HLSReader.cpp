@@ -121,6 +121,8 @@ bool HLSReader::Open(const QString & m3u, int bitrate_index)
         QString("Selected stream with %3 bitrate")
         .arg(m_curstream->Bitrate()));
 
+    QMutexLocker worker_lock(&m_worker_lock);
+
     m_playlistworker = new HLSPlaylistWorker(this);
     m_playlistworker->start();
 
@@ -145,6 +147,8 @@ void HLSReader::Close(bool quiet)
         delete *Istream;
     m_streams.clear();
 
+    QMutexLocker lock(&m_worker_lock);
+
     delete m_streamworker;
     m_streamworker = nullptr;
     delete m_playlistworker;
@@ -163,15 +167,17 @@ void HLSReader::Cancel(bool quiet)
     m_throttle_cond.wakeAll();
     m_throttle_lock.unlock();
 
-    QMutexLocker lock(&m_stream_lock);
+    QMutexLocker lock(&m_worker_lock);
 
     if (m_curstream)
         LOG(VB_RECORD, LOG_INFO, LOC + "Cancel");
 
     if (m_playlistworker)
         m_playlistworker->Cancel();
+
     if (m_streamworker)
         m_streamworker->Cancel();
+
 #ifdef HLS_USE_MYTHDOWNLOADMANAGER // MythDownloadManager leaks memory
     if (!m_sements.empty())
         CancelURL(m_segments.front().Url());
@@ -601,7 +607,11 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
                         "playlist size: %3, queued: %4")
                 .arg(behind).arg(behind - max_behind)
                 .arg(m_playlist_size).arg(m_segments.size()));
-            m_streamworker->CancelCurrentDownload();
+            m_worker_lock.lock();
+            if (m_streamworker)
+                m_streamworker->CancelCurrentDownload();
+            m_worker_lock.unlock();
+
             EnableDebugging();
             Iseg = m_segments.begin() + (behind - max_behind);
             m_segments.erase(m_segments.begin(), Iseg);
