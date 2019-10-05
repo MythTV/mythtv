@@ -73,6 +73,7 @@ class MythDownloadInfo
 
     QString          m_url;
     QUrl             m_redirectedTo;
+    QString         *m_finalUrl                    {nullptr};
     QNetworkRequest *m_request                     {nullptr};
     QNetworkReply   *m_reply                       {nullptr};
     QString          m_outFile;
@@ -370,7 +371,8 @@ bool MythDownloadManager::processItem(const QString &url, QNetworkRequest *req,
                                       const MRequestType reqType,
                                       const bool reload,
                                       AuthCallback authCallbackFn, void *authArg,
-                                   const QHash<QByteArray, QByteArray> *headers)
+                                      const QHash<QByteArray, QByteArray> *headers,
+                                      QString *finalUrl)
 {
     MythDownloadInfo *dlInfo = new MythDownloadInfo;
 
@@ -384,6 +386,7 @@ bool MythDownloadManager::processItem(const QString &url, QNetworkRequest *req,
     dlInfo->m_authCallback = authCallbackFn;
     dlInfo->m_authArg  = authArg;
     dlInfo->m_headers  = headers;
+    dlInfo->m_finalUrl = finalUrl;
 
     return downloadNow(dlInfo, true);
 }
@@ -453,9 +456,14 @@ bool MythDownloadManager::download(const QString &url, const QString &dest,
  *  \return true if download was successful, false otherwise.
  */
 bool MythDownloadManager::download(const QString &url, QByteArray *data,
-                                   const bool reload)
+                                   const bool reload, QString *finalUrl)
 {
-    return processItem(url, nullptr, QString(), data, kRequestGet, reload);
+    QString redirected;
+    if (!processItem(url, nullptr, QString(), data, kRequestGet, reload, NULL, NULL, NULL, &redirected))
+        return false;
+    if (!redirected.isEmpty() && finalUrl != nullptr)
+        *finalUrl = redirected;
+    return true;
 }
 
 /** \brief Downloads a URI to a QByteArray in blocking mode.
@@ -1224,6 +1232,9 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
             possibleRedirectUrl.isValid() &&
             possibleRedirectUrl.isRelative())  // Turn relative Url to absolute
             possibleRedirectUrl = reply->url().resolved(possibleRedirectUrl);
+
+        if (!possibleRedirectUrl.isEmpty() && dlInfo->m_finalUrl != nullptr)
+            *dlInfo->m_finalUrl = QString(possibleRedirectUrl.toString());
 
         dlInfo->m_redirectedTo =
              redirectUrl(possibleRedirectUrl, dlInfo->m_redirectedTo);
