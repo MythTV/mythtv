@@ -111,12 +111,12 @@ class FreeToAirOnly : public TransMythUICheckBoxSetting
   public:
     FreeToAirOnly()
     {
-        setValue(true);
         setLabel(QObject::tr("Unencrypted Only"));
         setHelpText(
             QObject::tr(
                 "If set, only non-encrypted channels will be "
                 "added during the scan."));
+        setValue(true);
     };
 };
 
@@ -125,7 +125,6 @@ class ChannelNumbersOnly : public TransMythUICheckBoxSetting
   public:
     ChannelNumbersOnly()
     {
-        setValue(false);
         setLabel(QObject::tr("Logical Channel Numbers required"));
         setHelpText(
             QObject::tr(
@@ -133,6 +132,7 @@ class ChannelNumbersOnly : public TransMythUICheckBoxSetting
                 "be added during the scan. This will filter out services "
                 "for set-top-box firmware download and video-on-demand "
                 "that can be present on DVB-C networks."));
+        setValue(false);
     };
 };
 
@@ -141,7 +141,6 @@ class CompleteChannelsOnly : public TransMythUICheckBoxSetting
   public:
     CompleteChannelsOnly()
     {
-        setValue(true);
         setLabel(QObject::tr("Complete scan data required"));
         setHelpText(
             QObject::tr(
@@ -151,6 +150,7 @@ class CompleteChannelsOnly : public TransMythUICheckBoxSetting
                 "such as feeds and offline channels, "
                 "that are not useful in a MythTV system. "
                 "These are filtered out by this option."));
+        setValue(true);
     };
 };
 
@@ -159,7 +159,6 @@ class FullChannelSearch : public TransMythUICheckBoxSetting
   public:
     FullChannelSearch()
     {
-        setValue(false);
         setLabel(QObject::tr("Full search for old channels"));
         setHelpText(
             QObject::tr(
@@ -168,6 +167,7 @@ class FullChannelSearch : public TransMythUICheckBoxSetting
                 "This option is useful when you want to keep channel data such as "
                 "the xmltvid and the icon path when doing a rescan "
                 "after channels have been rearranged across transports."));
+        setValue(true);
     };
 };
 
@@ -176,12 +176,12 @@ class AddFullTS : public TransMythUICheckBoxSetting
   public:
     AddFullTS()
     {
-        setValue(false);
         setLabel(QObject::tr("Add full Transport Stream channels"));
         setHelpText(
             QObject::tr(
                 "If set, Create MPTS channels, which allow "
                 "recording of the full, unaltered, transport stream."));
+        setValue(false);
     };
 };
 
@@ -197,6 +197,7 @@ class TrustEncSISetting : public TransMythUICheckBoxSetting
                         "flag is set spuriously. Attention: Enabling this "
                         "option increases the scan time for each encrypted "
                         "channel by a couple of seconds."));
+        setValue(false);
     }
 };
 

@@ -71,11 +71,12 @@ class MTV_PUBLIC IPTVTuningData
     IPTVTuningData(const QString &data_url, uint data_bitrate,
                    const QString &fec_type,
                    const QString &fec_url0, uint fec_bitrate0,
-                   const QString &fec_url1, uint fec_bitrate1) :
+                   const QString &fec_url1, uint fec_bitrate1,
+                   const IPTVProtocol protocol) :
         m_data_url(data_url),
-        m_fec_type(kNone), m_fec_url0(fec_url0), m_fec_url1(fec_url1)
+        m_fec_type(kNone), m_fec_url0(fec_url0), m_fec_url1(fec_url1),
+        m_protocol(protocol)
     {
-        GuessProtocol();
         m_bitrate[0] = data_bitrate;
         m_bitrate[1] = fec_bitrate0;
         m_bitrate[2] = fec_bitrate1;
@@ -217,8 +218,13 @@ class MTV_PUBLIC IPTVTuningData
             m_protocol = IPTVTuningData::inValid;
     }
 
+  IPTVProtocol GetProtocol(void) const
+  {
+      return m_protocol;
+  }
+
   protected:
-    bool IsHLSPlaylist(void)
+    bool IsHLSPlaylist(void) const
     {
         if (!qApp)
         {

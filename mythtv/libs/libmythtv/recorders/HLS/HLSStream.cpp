@@ -5,12 +5,13 @@
 #include "HLSReader.h"
 #include "HLSStream.h"
 
-#define LOC QString("%1 stream: ").arg(m_url)
+#define LOC QString("%1 stream: ").arg(m_m3u8_url)
 
-HLSRecStream::HLSRecStream(int seq, uint64_t bitrate, const QString& url)
+HLSRecStream::HLSRecStream(int seq, uint64_t bitrate, const QString& m3u8_url, const QString &segment_base_url)
     : m_id(seq),
       m_bitrate(bitrate),
-      m_url(url)
+      m_m3u8_url(m3u8_url),
+      m_segment_base_url(segment_base_url)
 {
     LOG(VB_RECORD, LOG_DEBUG, LOC + "ctor");
 #ifdef USING_LIBCRYPTO

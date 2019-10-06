@@ -506,57 +506,62 @@ void ChannelEditor::menu()
     }
 }
 
-void ChannelEditor::scan(void)
+// Check that we have a video source and that at least one
+// capture card is connected to the video source.
+//
+static bool check_cardsource(int sourceid, QString &sourcename)
 {
-#ifdef USING_BACKEND
-
-    // Check if we have a video source selected
-    uint cardid = 0;
-    if (m_sourceFilter < 1)
+    // Check for videosource
+    if (sourceid < 1)
     {
         MythConfirmationDialog *md = ShowOkPopup(QObject::tr(
-            "Please select a video source. 'All' cannot be used. "
-            "If you do not have a video source then "
-            "create one in the 'Video sources' menu page."));
+            "Select a video source. 'All' cannot be used. "
+            "If there is no video source then create one in the "
+            "'Video sources' menu page and connect a capture card."));
         WaitFor(md);
-        return;
+        return false;
     }
 
-    // Check that the video source is connected to a capture card
+    // Check for a connected capture card
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT capturecard.cardid "
-        "FROM capturecard, videosource "
-        "WHERE capturecard.sourceid = videosource.sourceid AND "
-        "      hostname             = :HOSTNAME            AND "
-        "      capturecard.sourceid = :SOURCEID            AND "
-        "      capturecard.parentid = 0");
-
+        "FROM  capturecard "
+        "WHERE capturecard.sourceid = :SOURCEID AND "
+        "      capturecard.hostname = :HOSTNAME");
+    query.bindValue(":SOURCEID", sourceid);
     query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
-    query.bindValue(":SOURCEID", m_sourceFilter);
 
     if (!query.exec() || !query.isActive())
     {
-        MythDB::DBError("ChannelEditor::scan()", query);
-        return;
+        MythDB::DBError("check_capturecard()", query);
+        return false;
     }
+    uint cardid = 0;
     if (query.next())
-    {
         cardid = query.value(0).toUInt();
-    }
 
     if (cardid < 1)
     {
         MythConfirmationDialog *md = ShowOkPopup(QObject::tr(
             "No capture card!"
             "\n"
-            "Please connect video source '%1' to a capture card "
+            "Connect video source '%1' to a capture card "
             "in the 'Input Connections' menu page.")
-            .arg(m_sourceFilterName));
+            .arg(sourcename));
         WaitFor(md);
-        return;
+        return false;
     }
 
+    return true;
+}
+
+void ChannelEditor::scan(void)
+{
+    // Check that we have a videosource and a connected capture card
+    if (!check_cardsource(m_sourceFilter, m_sourceFilterName))
+        return;
+ 
     // Create the dialog now that we have a video source and a capture card
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     StandardSettingDialog *ssd =
@@ -569,15 +574,15 @@ void ChannelEditor::scan(void)
     }
     else
         delete ssd;
-
-#else
-    LOG(VB_GENERAL, LOG_ERR,
-        "You must compile the backend to be able to scan for channels");
-#endif
 }
 
 void ChannelEditor::transportEditor(void)
 {
+    // Check that we have a videosource and a connected capture card
+    if (!check_cardsource(m_sourceFilter, m_sourceFilterName))
+        return;
+ 
+    // Create the dialog now that we have a video source and a capture card
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     StandardSettingDialog *ssd =
         new StandardSettingDialog(mainStack, "transporteditor",

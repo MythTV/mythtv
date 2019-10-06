@@ -1638,6 +1638,9 @@ bool ProgramData::IsUnchanged(
         "      colorcode       = :COLORCODE  AND "
         "      syndicatedepisodenumber = :SYNDICATEDEPISODENUMBER AND "
         "      programid       = :PROGRAMID  AND "
+        "      season          = :SEASON     AND "
+        "      episode         = :EPISODE    AND "
+        "      totalepisodes   = :TOTALEPISODES AND "
         "      inetref         = :INETREF");
 
     QString cattype = myth_category_type_to_string(pi.m_categoryType);
@@ -1666,6 +1669,9 @@ bool ProgramData::IsUnchanged(
     query.bindValue(":SYNDICATEDEPISODENUMBER",
                     denullify(pi.m_syndicatedepisodenumber));
     query.bindValue(":PROGRAMID",  denullify(pi.m_programId));
+    query.bindValue(":SEASON",     pi.m_season);
+    query.bindValue(":EPISODE",    pi.m_episode);
+    query.bindValue(":TOTALEPISODES", pi.m_totalepisodes);
     query.bindValue(":INETREF",    pi.m_inetref);
 
     if (query.exec() && query.next())

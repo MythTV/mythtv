@@ -58,7 +58,7 @@ class MTV_PUBLIC  HLSReader
     void ResetSequence(void) { m_cur_seq = -1; }
 
     QString StreamURL(void) const
-    { return QString("%1").arg(m_curstream ? m_curstream->Url() : ""); }
+    { return QString("%1").arg(m_curstream ? m_curstream->M3U8Url() : ""); }
 
 #ifdef HLS_USE_MYTHDOWNLOADMANAGER // MythDownloadManager leaks memory
     static bool DownloadURL(const QString &url, QByteArray *buffer);
@@ -96,6 +96,7 @@ class MTV_PUBLIC  HLSReader
 
   private:
     QString            m_m3u8;
+    QString            m_segment_base;
     StreamContainer    m_streams;
     SegmentContainer   m_segments;
     HLSRecStream      *m_curstream      {nullptr};
@@ -116,6 +117,7 @@ class MTV_PUBLIC  HLSReader
     uint               m_prebuffer_cnt  {10};
     QMutex             m_seq_lock;
     mutable QMutex     m_stream_lock;
+    mutable QMutex     m_worker_lock;
     QMutex             m_throttle_lock;
     QWaitCondition     m_throttle_cond;
     bool               m_debug          {false};

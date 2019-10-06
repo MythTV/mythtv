@@ -58,7 +58,7 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
     bool download(const QString &url, const QString &dest,
                   const bool reload = false);
     bool download(const QString &url, QByteArray *data,
-                  const bool reload = false);
+                  const bool reload = false, QString *finalUrl = nullptr);
     QNetworkReply *download(const QString &url, const bool reload = false);
     bool download(QNetworkRequest *req, QByteArray *data);
     bool downloadAuth(const QString &url, const QString &dest,
@@ -120,7 +120,8 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
                      const bool reload = false,
                      AuthCallback authCallback = nullptr,
                      void *authArg = nullptr,
-                     const QHash<QByteArray, QByteArray> *headers = nullptr);
+                     const QHash<QByteArray, QByteArray> *headers = nullptr,
+                     QString *finalUrl = nullptr);
 
     void downloadRemoteFile(MythDownloadInfo *dlInfo);
     void downloadQNetworkRequest(MythDownloadInfo *dlInfo);

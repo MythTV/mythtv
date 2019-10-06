@@ -79,7 +79,7 @@ void HLSStreamHandler::Return(HLSStreamHandler* & ref, int inputid)
     if ((it != s_hlshandlers.end()) && (*it == ref))
     {
         LOG(VB_RECORD, LOG_INFO, QString("HLSSH[%1]: Closing handler for %2")
-                           .arg(devname));
+                           .arg(inputid).arg(devname));
         ref->Stop();
         LOG(VB_RECORD, LOG_DEBUG, QString("HLSSH[%1]: handler for %2 stopped")
             .arg(inputid).arg(devname));
@@ -100,6 +100,7 @@ void HLSStreamHandler::Return(HLSStreamHandler* & ref, int inputid)
 HLSStreamHandler::HLSStreamHandler(const IPTVTuningData& tuning, int inputid)
     : IPTVStreamHandler(tuning, inputid)
 {
+    LOG(VB_GENERAL, LOG_INFO, LOC + "ctor");
     m_hls        = new HLSReader();
     m_readbuffer = new uint8_t[BUFFER_SIZE];
 }

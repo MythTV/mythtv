@@ -39,10 +39,13 @@ class IPTVChannelInfo
                     uint programnumber) :
         m_name(name), m_xmltvid(xmltvid), m_programNumber(programnumber),
         m_tuning(data_url, data_bitrate,
-                 fec_type, fec_url0, fec_bitrate0, fec_url1, fec_bitrate1)
+                 fec_type, fec_url0, fec_bitrate0, fec_url1, fec_bitrate1,
+                 IPTVTuningData::inValid)
     {
     }
 
+ protected:
+    friend class TestIPTVRecorder;
     bool IsValid(void) const
     {
         return !m_name.isEmpty() && m_tuning.IsValid();
