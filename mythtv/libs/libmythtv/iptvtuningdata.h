@@ -218,6 +218,11 @@ class MTV_PUBLIC IPTVTuningData
             m_protocol = IPTVTuningData::inValid;
     }
 
+  IPTVProtocol GetProtocol(void) const
+  {
+      return m_protocol;
+  }
+
   protected:
     bool IsHLSPlaylist(void) const
     {
