@@ -784,6 +784,7 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
         // TODO this won't work well in conjunction with the MythTimer
         // above...
         QElapsedTimer getframetimer;
+        getframetimer.start();
         bool retry = true;
         while (retry && !getframetimer.hasExpired(100))
         {
