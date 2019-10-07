@@ -343,9 +343,6 @@ void MythDeinterlacer::OneField(VideoFrame* Source, VideoFrame* Dest, bool Top)
     for (uint plane = 0; plane < srcplanes; ++plane)
     {
         int height = height_for_plane(Source->codec, Source->height, plane);
-        // it's pointless trying to deinterlace vertically subsampled chroma
-        if (height < Source->height)
-            break;
         int width = pitch_for_plane(Source->codec, Source->width, plane);
         int srcpitch = Source->pitches[plane];
         int dstpitch = Dest->pitches[plane];
