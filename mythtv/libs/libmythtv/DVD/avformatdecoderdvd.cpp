@@ -117,7 +117,7 @@ int AvFormatDecoderDVD::ReadPacket(AVFormatContext *ctx, AVPacket* pkt, bool& st
 
                             Reset(true, false, false);
                             m_audio->Reset();
-                            m_parent->DiscardVideoFrames(false);
+                            m_parent->DiscardVideoFrames(false, false);
                             break;
 
                         case DVDNAV_WAIT:

@@ -422,7 +422,7 @@ bool VideoOutput::InputChanged(const QSize &VideoDim, const QSize &VideoDispDim,
     if (m_dbDisplayProfile)
         m_dbDisplayProfile->SetInput(m_window.GetVideoDispDim(), 0 ,codecName);
     m_videoCodecID = CodecID;
-    DiscardFrames(true);
+    DiscardFrames(true, true);
     return true;
 }
 /**
@@ -928,7 +928,7 @@ void VideoOutput::DiscardFrame(VideoFrame *Frame)
 
 /// \brief Releases all frames not being actively displayed from any queue
 ///        onto the queue of frames ready for decoding onto.
-void VideoOutput::DiscardFrames(bool KeyFrame)
+void VideoOutput::DiscardFrames(bool KeyFrame, bool)
 {
     m_videoBuffers.DiscardFrames(KeyFrame);
 }

@@ -1078,18 +1078,20 @@ void MythPlayer::DiscardVideoFrame(VideoFrame *buffer)
 /** \fn MythPlayer::DiscardVideoFrames(bool)
  *  \brief Places frames in the available frames queue.
  *
- *   If called with 'next_frame_keyframe' set to false then all frames
+ *   If called with 'Keyframe' set to false then all frames
  *   not in use by the decoder are made available for decoding. Otherwise,
  *   all frames are made available for decoding; this is only safe if
  *   the next frame is a keyframe.
  *
- *  \param next_frame_keyframe if this is true all frames are placed
+ *  \param Keyframe if this is true all frames are placed
  *         in the available queue.
+ *  \param Flushed indicates that the decoder has been flushed AND the decoder
+ * requires ALL frames to be released (used for VAAPI and VDPAU pause frames)
  */
-void MythPlayer::DiscardVideoFrames(bool next_frame_keyframe)
+void MythPlayer::DiscardVideoFrames(bool KeyFrame, bool Flushed)
 {
     if (videoOutput)
-        videoOutput->DiscardFrames(next_frame_keyframe);
+        videoOutput->DiscardFrames(KeyFrame, Flushed);
 }
 
 void* MythPlayer::GetDecoderContext(unsigned char* buf, uint8_t*& id)
@@ -2423,7 +2425,7 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
                 "Discarding buffered frames.");
             // This call will result in some ugly frames, but allows us
             // to recover from serious problems if frames get leaked.
-            DiscardVideoFrames(true);
+            DiscardVideoFrames(true, true);
         }
         msecs = 30000;
         if (preBufferDebug)

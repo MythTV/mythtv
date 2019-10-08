@@ -187,12 +187,7 @@ VideoOutputOpenGL::~VideoOutputOpenGL()
 
 void VideoOutputOpenGL::DestroyBuffers(void)
 {
-    m_videoBuffers.BeginLock(kVideoBuffer_pause);
-    while (m_videoBuffers.Size(kVideoBuffer_pause))
-        m_videoBuffers.DiscardFrame(m_videoBuffers.Tail(kVideoBuffer_pause));
-    m_videoBuffers.EndLock();
-
-    DiscardFrames(true);
+    DiscardFrames(true, true);
     m_videoBuffers.DeleteBuffers();
     m_videoBuffers.Reset();
     m_buffersCreated = false;
@@ -682,6 +677,26 @@ void VideoOutputOpenGL::DoneDisplayingFrame(VideoFrame *Frame)
         m_videoBuffers.DoneDisplayingFrame(Frame);
     }
     m_videoBuffers.EndLock();
+}
+
+/*! \brief Discard video frames
+ *
+ * If Flushed is true, the decoder will probably reset the hardware decoder in
+ * use and we need to release any hardware pause frames so the decoder is released
+ * before a new one is created.
+*/
+void VideoOutputOpenGL::DiscardFrames(bool KeyFrame, bool Flushed)
+{
+    if (Flushed)
+    {
+        m_videoBuffers.BeginLock(kVideoBuffer_pause);
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("(%1): %2").arg(KeyFrame).arg(m_videoBuffers.GetStatus()));
+        while (m_videoBuffers.Size(kVideoBuffer_pause))
+            m_videoBuffers.DiscardFrame(m_videoBuffers.Tail(kVideoBuffer_pause));
+        m_videoBuffers.EndLock();
+    }
+
+    VideoOutput::DiscardFrames(KeyFrame, Flushed);
 }
 
 VideoFrameType* VideoOutputOpenGL::DirectRenderFormats(void)

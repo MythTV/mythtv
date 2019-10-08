@@ -283,7 +283,7 @@ class MTV_PUBLIC MythPlayer
                                        bool wrap = true);
     void ReleaseCurrentFrame(VideoFrame *frame);
     void DiscardVideoFrame(VideoFrame *buffer);
-    void DiscardVideoFrames(bool next_frame_keyframe);
+    void DiscardVideoFrames(bool KeyFrame, bool Flushed);
     /// Returns the stream decoder currently in use.
     DecoderBase *GetDecoder(void) { return decoder; }
     void *GetDecoderContext(unsigned char* buf, uint8_t*& id);

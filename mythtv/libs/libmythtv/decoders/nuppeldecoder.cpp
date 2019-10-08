@@ -1366,7 +1366,7 @@ void NuppelDecoder::SeekReset(long long newKey, uint skipFrames,
         avcodec_flush_buffers(m_mpa_vidctx);
 
     if (discardFrames)
-        GetPlayer()->DiscardVideoFrames(doFlush);
+        GetPlayer()->DiscardVideoFrames(doFlush, false);
 
     for (;(skipFrames > 0) && !m_ateof; skipFrames--)
     {

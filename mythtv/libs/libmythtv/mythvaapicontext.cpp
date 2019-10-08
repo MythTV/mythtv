@@ -716,6 +716,12 @@ bool MythVAAPIContext::IsDeinterlacing(bool &DoubleRate, bool StreamChange)
     return false;
 }
 
+bool MythVAAPIContext::DecoderWillResetOnFlush(void)
+{
+    // HEVC appears to be OK
+    return kCodec_H264_VAAPI == m_codecID;
+}
+
 void MythVAAPIContext::DestroyDeinterlacer(void)
 {
     if (m_filterGraph)

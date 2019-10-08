@@ -697,7 +697,10 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
 
     // Discard all the queued up decoded frames
     if (discardFrames)
-        m_parent->DiscardVideoFrames(doflush);
+    {
+        bool releaseall = m_mythcodecctx && m_mythcodecctx->DecoderWillResetOnFlush();
+        m_parent->DiscardVideoFrames(doflush, doflush && releaseall);
+    }
 
     if (doflush)
     {

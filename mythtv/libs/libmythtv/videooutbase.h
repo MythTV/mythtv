@@ -115,7 +115,7 @@ class VideoOutput
     virtual void StartDisplayingFrame(void);
     virtual void DoneDisplayingFrame(VideoFrame *Frame);
     virtual void DiscardFrame(VideoFrame *frame);
-    virtual void DiscardFrames(bool KeyFrame);
+    virtual void DiscardFrames(bool KeyFrame, bool);
     virtual void CheckFrameStates(void) { }
     virtual VideoFrame *GetLastDecodedFrame(void);
     virtual VideoFrame *GetLastShownFrame(void);

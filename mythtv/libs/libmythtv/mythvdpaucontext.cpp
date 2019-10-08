@@ -201,6 +201,11 @@ bool MythVDPAUContext::RetrieveFrame(AVCodecContext*, VideoFrame *Frame, AVFrame
     return false;
 }
 
+bool MythVDPAUContext::DecoderWillResetOnFlush(void)
+{
+    return m_codecID == kCodec_H264_VDPAU;
+}
+
 void MythVDPAUContext::InitVideoCodec(AVCodecContext *Context, bool SelectedStream, bool &DirectRendering)
 {
     if (codec_is_vdpau_hw(m_codecID))
