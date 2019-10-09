@@ -70,9 +70,9 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
         cout << endl << "Scan parameters:" << endl;
         bool require_av = (m_service_requirements & kRequireAV) == kRequireAV;
         bool require_a  = (m_service_requirements & kRequireAudio) != 0;
-        cout << "Desired Services            : " << (require_av ? "tv" : require_a ? "radio" : "all") << endl;
+        cout << "Desired Services            : " << (require_av ? "tv" : require_a ? "tv+radio" : "all") << endl;
         cout << "Unencrypted Only            : " << (m_fta_only            ? "yes" : "no") << endl;
-        cout << "Logical Channel Numbers     : " << (m_lcn_only            ? "yes" : "no") << endl;
+        cout << "Logical Channel Numbers only: " << (m_lcn_only            ? "yes" : "no") << endl;
         cout << "Complete scan data required : " << (m_complete_only       ? "yes" : "no") << endl;
         cout << "Full search for old channels: " << (m_full_channel_search ? "yes" : "no") << endl;
     }
