@@ -53,6 +53,11 @@ void MythVDPAUInterop::Cleanup(void)
 {
     OpenGLLocker locker(m_context);
 
+    // per the spec, this should automatically release any registered
+    // and mapped surfaces
+    if (m_finiNV)
+        m_finiNV();
+
     if (m_helper)
     {
         m_helper->DeleteOutputSurface(m_outputSurface);
@@ -65,9 +70,6 @@ void MythVDPAUInterop::Cleanup(void)
     m_deinterlacer = DEINT_NONE;
     m_mixerSize = QSize();
     m_mixerChroma = VDP_CHROMA_TYPE_420;
-
-    if (m_finiNV)
-        m_finiNV();
 
     DeleteTextures();
 }
@@ -120,6 +122,9 @@ bool MythVDPAUInterop::InitNV(AVVDPAUDeviceContext* DeviceContext)
     m_accessNV   = reinterpret_cast<MYTH_VDPAUSURFACCESSNV>(m_context->GetProcAddress("glVDPAUSurfaceAccessNV"));
     m_mapNV      = reinterpret_cast<MYTH_VDPAUMAPSURFNV>(m_context->GetProcAddress("glVDPAUMapSurfacesNV"));
 
+    delete m_helper;
+    m_helper = nullptr;
+
     if (m_initNV && m_finiNV && m_registerNV && m_accessNV && m_mapNV)
     {
         m_helper = new MythVDPAUHelper(DeviceContext);
@@ -169,8 +174,9 @@ bool MythVDPAUInterop::InitVDPAU(AVVDPAUDeviceContext* DeviceContext, VdpVideoSu
         {
             vector<QSize> sizes;
             sizes.push_back(size);
-            vector<MythVideoTexture*> textures = MythVideoTexture::CreateHardwareTextures(m_context, FMT_VDPAU, FMT_ARGB32, sizes,
-                                                                                 QOpenGLTexture::Target2D);
+            vector<MythVideoTexture*> textures =
+                    MythVideoTexture::CreateHardwareTextures(m_context, FMT_VDPAU, FMT_ARGB32, sizes,
+                                                             QOpenGLTexture::Target2D);
             if (textures.empty())
                 return false;
             m_openglTextures.insert(DUMMY_INTEROP_ID, textures);
@@ -181,9 +187,9 @@ bool MythVDPAUInterop::InitVDPAU(AVVDPAUDeviceContext* DeviceContext, VdpVideoSu
     {
         if (!m_outputSurfaceReg && !m_openglTextures.empty())
         {
-            // if this fails because another interop is registered, subsequent surface
-            // registration will fail and we will try again on the next pass - hopefully
-            // when all old frames have been de-ref'd (i.e. pause frames)
+            // This may fail if another interop is registered (but should not happen if
+            // decoder creataion is working properly). Subsequent surface
+            // registration will then fail and we will try again on the next pass
             m_initNV(reinterpret_cast<void*>(static_cast<uintptr_t>(DeviceContext->device)),
                      reinterpret_cast<const void*>(DeviceContext->get_proc_address));
             GLuint texid = m_openglTextures[DUMMY_INTEROP_ID][0]->m_textureId;
@@ -208,11 +214,7 @@ bool MythVDPAUInterop::InitVDPAU(AVVDPAUDeviceContext* DeviceContext, VdpVideoSu
 
 /*! \brief Map VDPAU video surfaces to an OpenGL texture.
  *
- * \note There can only be one VDPAU context mapped to an OpenGL context. This causes
- * a minor issue when seeking (usually with H.264) as the decoder is recreated but
- * we still have a pause frame associated with the old decoder. Hence this interop is not
- * released and remains bound to the OpenGL context. This resolves itself once the pause
- * frame is replaced (i.e. after one new frame is displayed).
+ * \note There can only be one VDPAU context mapped to an OpenGL context.
  *
  * \note We use a VdpVideoMixer to complete the conversion from YUV to RGB. Hence the returned
  * texture is RGB... We could use GL_NV_vdpau_interop2 to return raw YUV frames.
