@@ -135,7 +135,8 @@ QString ServiceDescriptionTable::toString(void) const
                 // Descriptors 0x80 to 0xFE are user defined, see
                 // Final draft ETSI EN 300 468 v1.13.1 (2012-04)
                 // Table 12: "Possible location of descriptors", page 33)
-                if(MPEGDescriptor(desc[j]).DescriptorTag() < 0x80)
+                if (MPEGDescriptor(desc[j]).DescriptorTag() < 0x80 ||
+                    MPEGDescriptor(desc[j]).DescriptorTag() == PrivateDescriptorID::freesat_callsign)
                 {
                     str.append(QString("    %1\n")
                                .arg(MPEGDescriptor(desc[j]).toString()));
