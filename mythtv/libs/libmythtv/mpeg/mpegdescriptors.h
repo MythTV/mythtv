@@ -199,6 +199,15 @@ class PrivateDescriptorID
         // Private -- CH UPC Cablecom
         upc_event_episode_title        = 0xA7,
 
+        // Private -- FreeSat Astra-2 28.2E
+        freesat_lcn_table              = 0xd3,  /* implemented */
+        freesat_region_table           = 0xd4,  /* implemented */
+        freesat_chan_cat_mapping       = 0xd5,  /* todo */
+        freesat_d6_table               = 0xd6,  /* unknown */
+        freesat_d7_table               = 0xd7,  /* unknown */
+        freesat_category_table         = 0xd8,  /* todo */
+        freesat_callsign               = 0xd9,  /* partial */
+
         // Private -- premiere.de
         premiere_content_order         = 0xF0,
         premiere_parental_information  = 0xF1,
@@ -214,8 +223,23 @@ class PrivateDataSpecifierID
   public:
     enum
     {
-        /* UPC Cablecom */
-        UPC1 = 0x00000600,
+        UPC1 = 0x00000600,      // UPC Cablecom
+        FSAT = 0x46534154,      // BBC UK FreeSat
+    };
+};
+
+/*
+ * Original_Network_ID from http://www.dvbservices.com/identifiers/original_network_id
+ */
+class OriginalNetworkID
+{
+  public:
+    enum
+    {
+        SES2    = 0x0002,       // Société Européenne des Satellites
+        BBC     = 0x003B,       // BBC / Freesat
+        TELENOR = 0x0046,       // Telenor Norway
+        NOZEMA  = 0x2210,       // Netherlands Digital Terrestrial Television
     };
 };
 
