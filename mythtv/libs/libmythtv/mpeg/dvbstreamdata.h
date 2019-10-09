@@ -18,6 +18,11 @@ typedef vector<const ServiceDescriptionTable*>  sdt_vec_t;
 typedef QMap<uint, sdt_ptr_t>    sdt_cache_t; // tsid+section->sdts
 typedef QMap<uint, sdt_vec_t>    sdt_map_t;   // tsid->sdts
 
+typedef BouquetAssociationTable*  bat_ptr_t;
+typedef BouquetAssociationTable const*  bat_const_ptr_t;
+typedef vector<const BouquetAssociationTable*>  bat_vec_t;
+typedef QMap<uint, bat_ptr_t>    bat_cache_t;  // batid+section->bats
+
 typedef vector<DVBMainStreamListener*>   dvb_main_listener_vec_t;
 typedef vector<DVBOtherStreamListener*>  dvb_other_listener_vec_t;
 typedef vector<DVBEITStreamListener*>    dvb_eit_listener_vec_t;
@@ -88,6 +93,10 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
     bool HasCachedSDT(bool current = true) const;
     bool HasCachedAnySDTs(bool current = true) const;
     bool HasCachedAllSDTs(bool current = true) const;
+    bool HasCachedAnyBAT(uint batid, bool current = true) const;
+    bool HasCachedAllBAT(uint batid, bool current = true) const;
+    bool HasCachedAnyBATs(bool current = true) const;
+    bool HasCachedAllBATs(bool current = true) const;
 
     nit_const_ptr_t GetCachedNIT(uint section_num, bool current = true) const;
     nit_vec_t GetCachedNIT(bool current = true) const;
@@ -97,6 +106,9 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
     sdt_vec_t GetCachedSDTs(bool current = true) const;
 
     void ReturnCachedSDTTables(sdt_vec_t&) const;
+
+    bat_const_ptr_t GetCachedBAT(uint batid, uint section_num, bool current = true) const;
+    bat_vec_t GetCachedBATs(bool current = true) const;
 
     void AddDVBMainListener(DVBMainStreamListener*);
     void AddDVBOtherListener(DVBOtherStreamListener*);
@@ -110,6 +122,8 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
     // Caching
     void CacheNIT(NetworkInformationTable*);
     void CacheSDT(ServiceDescriptionTable*);
+    void CacheBAT(BouquetAssociationTable*);
+
   protected:
     bool DeleteCachedTable(PSIPTable *psip) const override; // MPEGStreamData
 
@@ -144,6 +158,7 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
     // Caching
     mutable nit_cache_t       _cached_nit;  // section -> sdt
     mutable sdt_cache_t       _cached_sdts; // tsid+section -> sdt
+    mutable bat_cache_t       _cached_bats; // batid+section -> sdt
 };
 
 inline void DVBStreamData::SetDishNetEIT(bool use_dishnet_eit)
