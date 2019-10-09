@@ -17,7 +17,7 @@
 using std::vector;
 
 class VideoColourSpace;
-
+typedef void (*FreeAVHWDeviceContext)(struct AVHWDeviceContext*);
 #define DUMMY_INTEROP_ID 1
 
 class MythOpenGLInterop : public QObject, public ReferenceCounter
@@ -37,7 +37,8 @@ class MythOpenGLInterop : public QObject, public ReferenceCounter
         MEDIACODEC,
         VDPAU,
         NVDEC,
-        MMAL
+        MMAL,
+        DUMMY // used for default free/user_opaque storage
     };
 
     static QStringList GetAllowedRenderers   (MythCodecID CodecId);
@@ -48,12 +49,18 @@ class MythOpenGLInterop : public QObject, public ReferenceCounter
                                               VideoFrame *Frame,
                                               FrameScanType Scan);
     static QString     TypeToString          (Type InteropType);
+    static MythOpenGLInterop* CreateDummy    (void);
 
     virtual ~MythOpenGLInterop();
     virtual vector<MythVideoTexture*> Acquire(MythRenderOpenGL *Context,
                                               VideoColourSpace *ColourSpace,
-                                              VideoFrame *Frame, FrameScanType Scan) = 0;
+                                              VideoFrame *Frame, FrameScanType Scan);
     Type GetType(void);
+
+    void                                      SetDefaultFree(FreeAVHWDeviceContext FreeContext);
+    void                                      SetDefaultUserOpaque(void* UserOpaque);
+    FreeAVHWDeviceContext                     GetDefaultFree(void);
+    void*                                     GetDefaultUserOpaque(void);
 
   protected:
     explicit MythOpenGLInterop                (MythRenderOpenGL *Context, Type InteropType);
@@ -65,6 +72,9 @@ class MythOpenGLInterop : public QObject, public ReferenceCounter
     QHash<unsigned long long, vector<MythVideoTexture*> > m_openglTextures;
     QSize               m_openglTextureSize;
     long long           m_discontinuityCounter;
+
+    FreeAVHWDeviceContext m_defaultFree;
+    void               *m_defaultUserOpaque;
 };
 
 #endif // MYTHOPENGLINTEROP_H

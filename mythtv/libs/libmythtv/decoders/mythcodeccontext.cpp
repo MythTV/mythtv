@@ -74,7 +74,7 @@ MythCodecContext *MythCodecContext::CreateContext(DecoderBase *Parent, MythCodec
         mctx = new MythVAAPIContext(Parent, Codec);
 #endif
 #ifdef USING_VDPAU
-    if (codec_is_vdpau_hw(Codec) || codec_is_vdpau_hw(Codec))
+    if (codec_is_vdpau_hw(Codec) || codec_is_vdpau_dechw(Codec))
         mctx = new MythVDPAUContext(Parent, Codec);
 #endif
 #ifdef USING_NVDEC
@@ -378,7 +378,16 @@ void MythCodecContext::DeviceContextFinished(AVHWDeviceContext* Context)
         .arg(av_hwdevice_get_type_name(Context->type)));
     MythOpenGLInterop *interop = reinterpret_cast<MythOpenGLInterop*>(Context->user_opaque);
     if (interop)
+    {
         DestroyInterop(interop);
+        FreeAVHWDeviceContext free = interop->GetDefaultFree();
+        if (free)
+        {
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Calling default device context free");
+            Context->user_opaque = interop->GetDefaultUserOpaque();
+            free(Context);
+        }
+    }
 }
 
 void MythCodecContext::DestroyInterop(MythOpenGLInterop *Interop)
@@ -427,7 +436,7 @@ int MythCodecContext::InitialiseDecoder2(AVCodecContext *Context, CreateHWDecode
     return Context->hw_device_ctx ? 0 : -1;
 }
 
-AVBufferRef* MythCodecContext::CreateDevice(AVHWDeviceType Type, const QString &Device)
+AVBufferRef* MythCodecContext::CreateDevice(AVHWDeviceType Type, MythOpenGLInterop *Interop, const QString &Device)
 {
     AVBufferRef* result = nullptr;
     int res = av_hwdevice_ctx_create(&result, Type, Device.isEmpty() ? nullptr :
@@ -438,8 +447,22 @@ AVBufferRef* MythCodecContext::CreateDevice(AVHWDeviceType Type, const QString &
             .arg(av_hwdevice_get_type_name(Type))
             .arg(Device == nullptr ? "" : QString(" (%1)").arg(Device)));
         AVHWDeviceContext *context = reinterpret_cast<AVHWDeviceContext*>(result->data);
+
+        if ((context->free || context->user_opaque) && !Interop)
+        {
+            LOG(VB_PLAYBACK, LOG_INFO, "Creating dummy interop");
+            Interop = MythOpenGLInterop::CreateDummy();
+        }
+
+        if (Interop)
+        {
+            Interop->SetDefaultFree(context->free);
+            Interop->SetDefaultUserOpaque(context->user_opaque);
+            Interop->IncrRef();
+        }
+
         context->free = MythCodecContext::DeviceContextFinished;
-        context->user_opaque = nullptr;
+        context->user_opaque = Interop;
         return result;
     }
 

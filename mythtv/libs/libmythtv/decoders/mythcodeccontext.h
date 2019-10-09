@@ -67,7 +67,7 @@ class MTV_PUBLIC MythCodecContext
     static void DeviceContextFinished      (AVHWDeviceContext *Context);
     static void DestroyInteropCallback     (void *Wait, void *Interop, void*);
     static void CreateDecoderCallback      (void *Wait, void *Context, void *Callback);
-    static AVBufferRef* CreateDevice       (AVHWDeviceType Type, const QString &Device = QString());
+    static AVBufferRef* CreateDevice       (AVHWDeviceType Type, MythOpenGLInterop *Interop, const QString &Device = QString());
     static bool IsUnsupportedProfile       (AVCodecContext *Context);
 
     virtual void   InitVideoCodec          (AVCodecContext *Context,

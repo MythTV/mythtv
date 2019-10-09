@@ -44,12 +44,16 @@ int MythVDPAUContext::InitialiseContext(AVCodecContext* Context)
     if (type == MythOpenGLInterop::Unsupported)
         return -1;
 
+    // Create interop
+    MythVDPAUInterop *interop = MythVDPAUInterop::Create(render, vdpauid);
+    if (!interop)
+        return -1;
+
     // Allocate the device context
-    AVBufferRef* hwdeviceref = MythCodecContext::CreateDevice(AV_HWDEVICE_TYPE_VDPAU);
+    AVBufferRef* hwdeviceref = MythCodecContext::CreateDevice(AV_HWDEVICE_TYPE_VDPAU, interop);
     if (!hwdeviceref)
         return -1;
 
-    // Set release method
     AVHWDeviceContext* hwdevicecontext = reinterpret_cast<AVHWDeviceContext*>(hwdeviceref->data);
     if (!hwdevicecontext || (hwdevicecontext && !hwdevicecontext->hwctx))
         return -1;
@@ -58,14 +62,6 @@ int MythVDPAUContext::InitialiseContext(AVCodecContext* Context)
     if (av_hwdevice_ctx_init(hwdeviceref) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to initialise device context");
-        av_buffer_unref(&hwdeviceref);
-        return -1;
-    }
-
-    // Create interop
-    MythVDPAUInterop *interop = MythVDPAUInterop::Create(render, vdpauid);
-    if (!interop)
-    {
         av_buffer_unref(&hwdeviceref);
         return -1;
     }
@@ -179,7 +175,7 @@ enum AVPixelFormat MythVDPAUContext::GetFormat2(struct AVCodecContext* Context, 
     {
         if (*PixFmt == AV_PIX_FMT_VDPAU)
         {
-            AVBufferRef *device = MythCodecContext::CreateDevice(AV_HWDEVICE_TYPE_VDPAU);
+            AVBufferRef *device = MythCodecContext::CreateDevice(AV_HWDEVICE_TYPE_VDPAU, nullptr);
             if (device)
             {
                 NewHardwareFramesContext();

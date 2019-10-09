@@ -225,7 +225,7 @@ int MythNVDECContext::HwDecoderInit(AVCodecContext *Context)
     }
     else if (codec_is_nvdec_dec(m_codecID))
     {
-        AVBufferRef *context = MythCodecContext::CreateDevice(AV_HWDEVICE_TYPE_CUDA,
+        AVBufferRef *context = MythCodecContext::CreateDevice(AV_HWDEVICE_TYPE_CUDA, nullptr,
                                                            gCoreContext->GetSetting("NVDECDevice"));
         if (context)
         {

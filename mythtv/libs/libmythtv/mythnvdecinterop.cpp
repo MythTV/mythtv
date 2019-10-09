@@ -357,7 +357,7 @@ bool MythNVDECInterop::CreateCUDAContext(MythRenderOpenGL *GLContext, CudaFuncti
     }
 
     CudaFuncs->cuCtxPopCurrent(&dummy);
-    LOG(VB_GENERAL, LOG_INFO, LOC + "Created CUDA context");
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "Created CUDA context");
     return true;
 
 }

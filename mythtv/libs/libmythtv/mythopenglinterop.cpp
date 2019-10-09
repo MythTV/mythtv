@@ -40,6 +40,7 @@ QString MythOpenGLInterop::TypeToString(Type InteropType)
     if (InteropType == VDPAU)        return "VDPAU";
     if (InteropType == NVDEC)        return "NVDEC";
     if (InteropType == MMAL)         return "MMAL";
+    if (InteropType == DUMMY)        return "DUMMY";
     return "Unsupported";
 }
 
@@ -213,20 +214,39 @@ MythOpenGLInterop::MythOpenGLInterop(MythRenderOpenGL *Context, Type InteropType
     m_type(InteropType),
     m_openglTextures(),
     m_openglTextureSize(),
-    m_discontinuityCounter(0)
+    m_discontinuityCounter(0),
+    m_defaultFree(nullptr),
+    m_defaultUserOpaque(nullptr)
 {
-    m_context->IncrRef();
+    if (m_context)
+        m_context->IncrRef();
 }
 
 MythOpenGLInterop::~MythOpenGLInterop()
 {
     DeleteTextures();
-    m_context->DecrRef();
+    if (m_context)
+        m_context->DecrRef();
+}
+
+MythOpenGLInterop* MythOpenGLInterop::CreateDummy(void)
+{
+    // This is used to store AVHWDeviceContext free and user_opaque when
+    // set by the decoder in use. This usually applies to VAAPI and VDPAU
+    // and we do not always want or need to use MythRenderOpenGL e.g. when
+    // checking functionality only.
+    return new MythOpenGLInterop(nullptr, DUMMY);
+}
+
+vector<MythVideoTexture*> MythOpenGLInterop::Acquire(MythRenderOpenGL*, VideoColourSpace*,
+                                                     VideoFrame*, FrameScanType)
+{
+    return vector<MythVideoTexture*>();
 }
 
 void MythOpenGLInterop::DeleteTextures(void)
 {
-    if (!m_openglTextures.isEmpty())
+    if (m_context && !m_openglTextures.isEmpty())
     {
         OpenGLLocker locker(m_context);
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Deleting %1 textures").arg(m_openglTextures.size()));
@@ -250,4 +270,24 @@ void MythOpenGLInterop::DeleteTextures(void)
 MythOpenGLInterop::Type MythOpenGLInterop::GetType(void)
 {
     return m_type;
+}
+
+void MythOpenGLInterop::SetDefaultFree(FreeAVHWDeviceContext FreeContext)
+{
+    m_defaultFree = FreeContext;
+}
+
+void MythOpenGLInterop::SetDefaultUserOpaque(void* UserOpaque)
+{
+    m_defaultUserOpaque = UserOpaque;
+}
+
+FreeAVHWDeviceContext MythOpenGLInterop::GetDefaultFree(void)
+{
+    return m_defaultFree;
+}
+
+void* MythOpenGLInterop::GetDefaultUserOpaque(void)
+{
+    return m_defaultUserOpaque;
 }
