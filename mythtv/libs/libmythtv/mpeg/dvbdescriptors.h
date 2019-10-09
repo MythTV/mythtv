@@ -2132,8 +2132,6 @@ class FreesatLCNDescriptor : public MPEGDescriptor
     FreesatLCNDescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, PrivateDescriptorID::freesat_lcn_table)
     {
-        assert(PrivateDescriptorID::freesat_lcn_table== DescriptorTag());
-
         const unsigned char *payload = &data[2];
 
         if (len > 5)
@@ -2199,8 +2197,6 @@ class FreesatRegionDescriptor : public MPEGDescriptor
     FreesatRegionDescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, PrivateDescriptorID::freesat_region_table)
     {
-        assert(PrivateDescriptorID::freesat_region_table == DescriptorTag());
-
         const unsigned char *payload = &data[2];
 
         if (len > 6)
@@ -2256,7 +2252,6 @@ class FreesatCallsignDescriptor : public MPEGDescriptor
     FreesatCallsignDescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, PrivateDescriptorID::freesat_callsign)
     {
-        assert(PrivateDescriptorID::freesat_callsign == DescriptorTag());
     }
 
     //       Name             bits  loc  expected value
