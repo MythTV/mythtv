@@ -74,6 +74,11 @@ const uint ChannelScanSM::kATSCTableTimeout = 10 * 1000;
 /// No logic here, lets just wait at least 15 seconds.
 const uint ChannelScanSM::kMPEGTableTimeout = 15 * 1000;
 
+// Freesat default values
+static const uint kFSATBouquetID = 272;
+static const uint kFSATRegionID  = 1;
+static const uint kFSATRegionUndefined = 0xFFFF;
+
 QString ChannelScanSM::loc(const ChannelScanSM *siscan)
 {
     if (siscan && siscan->m_channel)
@@ -92,10 +97,11 @@ class ScannedChannelInfo
 
     bool IsEmpty() const
     {
-        return m_pats.empty() && m_pmts.empty()      &&
+        return m_pats.empty()  && m_pmts.empty()     &&
                m_program_encryption_status.isEmpty() &&
-               !m_mgt         && m_cvcts.empty()     && m_tvcts.empty() &&
-               m_nits.empty() && m_sdts.empty();
+               !m_mgt          && m_cvcts.empty()    &&
+               m_tvcts.empty() && m_nits.empty()     &&
+               m_sdts.empty()  && m_bats.empty();
     }
 
     // MPEG
@@ -111,6 +117,7 @@ class ScannedChannelInfo
     // DVB
     nit_vec_t               m_nits;
     sdt_map_t               m_sdts;
+    bat_vec_t               m_bats;
 };
 
 /** \class ChannelScanSM
@@ -163,6 +170,28 @@ ChannelScanSM::ChannelScanSM(ScanMonitor *_scan_monitor,
         LOG(VB_CHANSCAN, LOG_INFO, LOC + "Connecting up DTVSignalMonitor");
         ScanStreamData *data = new ScanStreamData();
 
+#if FSAT_IN_DB
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare(
+                "SELECT dvb_nit_id, bouquet_id, region_rid "
+                "FROM videosource "
+                "WHERE videosource.sourceid = :SOURCEID");
+        query.bindValue(":SOURCEID", _sourceID);
+        if (!query.exec() || !query.isActive())
+        {
+            MythDB::DBError("ChannelScanSM", query);
+        }
+        else if (query.next())
+        {
+            int nitid = query.value(0).toInt();
+            data->SetRealNetworkID(nitid);
+            LOG(VB_CHANSCAN, LOG_INFO, LOC +
+                QString("Setting NIT-ID to %1").arg(nitid));
+
+            m_fsat_bouquet_id = query.value(1).toInt();
+            m_fsat_region_id = query.value(2).toInt();
+        }
+#else
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare(
                 "SELECT dvb_nit_id "
@@ -179,7 +208,17 @@ ChannelScanSM::ChannelScanSM(ScanMonitor *_scan_monitor,
             data->SetRealNetworkID(nitid);
             LOG(VB_CHANSCAN, LOG_INFO, LOC +
                 QString("Setting NIT-ID to %1").arg(nitid));
+
+            // Freesat settings default or from the environment until it is in table videosource
+            QString fsat_bouquet_id = QString(getenv("FSAT_BOUQUET_ID"));
+            m_fsat_bouquet_id = fsat_bouquet_id.isEmpty() ? kFSATBouquetID: fsat_bouquet_id.toInt();
+            QString fsat_region_id = QString(getenv("FSAT_REGION_ID"));
+            m_fsat_region_id = fsat_region_id.isEmpty() ? kFSATRegionID : fsat_region_id.toInt();
         }
+#endif
+        LOG(VB_CHANSCAN, LOG_INFO, LOC +
+            QString("Freesat bouquet_id:%1 region_id:%2")
+                .arg(m_fsat_bouquet_id).arg(m_fsat_region_id));
 
         dtvSigMon->SetStreamData(data);
         dtvSigMon->AddFlags(SignalMonitor::kDTVSigMon_WaitForMGT |
@@ -429,8 +468,9 @@ void ChannelScanSM::HandleSDT(uint /*tsid*/, const ServiceDescriptionTable *sdt)
     LogLines(sdt->toString());
 
     // If this is Astra 28.2 add start listening for Freesat BAT and SDTo
-    if (!m_setOtherTables && (sdt->OriginalNetworkID() == 2 ||
-        sdt->OriginalNetworkID() == 59))
+    if (!m_setOtherTables && (
+        sdt->OriginalNetworkID() == OriginalNetworkID::SES2 ||
+        sdt->OriginalNetworkID() == OriginalNetworkID::BBC))
     {
         GetDTVSignalMonitor()->GetScanStreamData()->
                                SetFreesatAdditionalSI(true);
@@ -514,7 +554,7 @@ void ChannelScanSM::HandleBAT(const BouquetAssociationTable *bat)
                 // If the default authority is given in the SDT this
                 // overrides any definition in the BAT (or in the NIT)
                 LOG(VB_CHANSCAN, LOG_INFO, LOC +
-                    QString("found default authority(BAT) for service %1 %2 %3")
+                    QString("Found default authority in BAT for service %1 %2 %3")
                         .arg(netid).arg(tsid).arg(services.ServiceID(j)));
                uint64_t index = ((uint64_t)netid << 32) | (tsid << 16) |
                                  services.ServiceID(j);
@@ -553,7 +593,7 @@ void ChannelScanSM::HandleSDTo(uint tsid, const ServiceDescriptionTable *sdt)
             if (!authority.IsValid())
                 continue;
             LOG(VB_CHANSCAN, LOG_INFO, LOC +
-                QString("found default authority(SDTo) for service %1 %2 %3")
+                QString("Found default authority in SDTo for service %1 %2 %3")
                     .arg(netid).arg(tsid).arg(serviceId));
             m_defAuthorities[((uint64_t)netid << 32) | (tsid << 16) | serviceId] =
                 authority.DefaultAuthority();
@@ -855,6 +895,13 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
     }
     sd->ReturnCachedSDTTables(sdttmp);
 
+    if ((!wait_until_complete || sd->HasCachedAllBATs()) &&
+        (m_currentInfo->m_bats.empty() ||
+        m_timer.elapsed() > (int)m_otherTableTime))
+    {
+        m_currentInfo->m_bats = sd->GetCachedBATs();
+    }
+
     // Check if transport tuning is complete
     if (transport_tune_complete)
     {
@@ -870,6 +917,10 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
             transport_tune_complete &= !m_currentInfo->m_nits.empty();
             transport_tune_complete &= !m_currentInfo->m_sdts.empty();
         }
+        if (sd->HasCachedAnyBATs())
+        {
+            transport_tune_complete &= !m_currentInfo->m_bats.empty();
+        }
         if (transport_tune_complete)
         {
             LOG(VB_CHANSCAN, LOG_INFO, LOC +
@@ -877,13 +928,17 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
                         "\n\t\t\tcurrentInfo->m_pmts.empty():   %1"
                         "\n\t\t\tsd->HasCachedAnyNIT():         %2"
                         "\n\t\t\tsd->HasCachedAnySDTs():        %3"
-                        "\n\t\t\tcurrentInfo->m_nits.empty():   %4"
-                        "\n\t\t\tcurrentInfo->m_sdts.empty():   %5")
+                        "\n\t\t\tsd->HasCachedAnyBATs():        %4"
+                        "\n\t\t\tcurrentInfo->m_nits.empty():   %5"
+                        "\n\t\t\tcurrentInfo->m_sdts.empty():   %6"
+                        "\n\t\t\tcurrentInfo->m_bats.empty():   %7")
                     .arg(m_currentInfo->m_pmts.empty())
                     .arg(sd->HasCachedAnyNIT())
                     .arg(sd->HasCachedAnySDTs())
+                    .arg(sd->HasCachedAnyBATs())
                     .arg(m_currentInfo->m_nits.empty())
-                    .arg(m_currentInfo->m_sdts.empty()));
+                    .arg(m_currentInfo->m_sdts.empty())
+                    .arg(m_currentInfo->m_bats.empty()));
         }
     }
     if (!wait_until_complete)
@@ -1094,7 +1149,7 @@ static void update_info(ChannelInsertInfo &info,
     //             (dbver == "1067")
     bool force_guide_present = (
         // Telenor (NO)
-        (sdt->OriginalNetworkID() ==    70) ||
+        (sdt->OriginalNetworkID() == OriginalNetworkID::TELENOR) ||
 #if 0 // #9592#comment:23 - meanwhile my provider changed his signaling
         // Kabelplus (AT) formerly Kabelsignal, registered to NDS, see #9592
         (sdt->OriginalNetworkID() ==   222) ||
@@ -1102,7 +1157,7 @@ static void update_info(ChannelInsertInfo &info,
         // ERT (GR) from the private temporary allocation, see #9592:comment:17
         (sdt->OriginalNetworkID() == 65330) ||
         // Digitenne (NL) see #13427
-        (sdt->OriginalNetworkID() == 8720)
+        (sdt->OriginalNetworkID() == OriginalNetworkID::NOZEMA)
     );
     // HACK end -- special exception for these networks
 
@@ -1148,7 +1203,7 @@ static void update_info(ChannelInsertInfo &info,
 
     desc_list_t parsed =
         MPEGDescriptor::Parse(sdt->ServiceDescriptors(i),
-                                sdt->ServiceDescriptorsLength(i));
+                              sdt->ServiceDescriptorsLength(i));
     // Look for default authority
     const unsigned char *def_auth =
         MPEGDescriptor::Find(parsed, DescriptorID::default_authority);
@@ -1157,14 +1212,15 @@ static void update_info(ChannelInsertInfo &info,
         DefaultAuthorityDescriptor authority(def_auth);
         if (authority.IsValid())
         {
-            LOG(VB_CHANSCAN, LOG_INFO, QString("ChannelScanSM: found default "
-                                               "authority(SDT) for service %1 %2 %3")
-                .arg(info.m_orig_netid).arg(info.m_sdt_tsid).arg(info.m_service_id));
+            LOG(VB_CHANSCAN, LOG_INFO,
+                QString("ChannelScanSM: Found default authority in SDT for service %1 %2 %3")
+                    .arg(info.m_orig_netid).arg(info.m_sdt_tsid).arg(info.m_service_id));
             info.m_default_authority = authority.DefaultAuthority();
             return;
         }
     }
 
+    // If no authority in the SDT then use the one found in the BAT or the SDTo
     uint64_t index = (uint64_t)info.m_orig_netid << 32 |
         info.m_sdt_tsid << 16 | info.m_service_id;
     if (defAuthorities.contains(index))
@@ -1404,7 +1460,125 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
         }
     }
 
-    // Get IPTV or DVB Logical channel numbers
+    // BAT
+
+    // Freesat logical channel numbers
+
+    // Get the Logical Channel Number (LCN) information from the BAT.
+    // The first filter is on the bouquet ID.
+    // Then collect all LCN for the selected region and
+    // for the common (undefined) region with id 0xFFFF.
+    // The LCN of the selected region has priority; if
+    // a service is not defined there then look in the
+    // LCN table of the common region.
+    // This works because the BAT of each transport contains
+    // the LCN of all transports and services, not only of the
+    // transport that we are processing.
+    // Region 0 is defined but does not have a name.
+    //
+    // For reference, this website has the Freesat channel numbers:
+    // https://www.satellite-calculations.com/DVB/28.2E/28E_FreeSat_ChannelNumber.php
+    //
+
+    // Lookup tables for LCN to service ID
+    QMap<uint,uint> lcn_region;     // For the selected region
+    QMap<uint,uint> lcn_common;     // Undefined/common for all regions
+    QMap<uint,uint> lcn_result;     // Resulting table
+
+    bat_vec_t::const_iterator bats_it = scan_info->m_bats.begin();
+    for (; bats_it != scan_info->m_bats.end(); ++bats_it)
+    {
+        const BouquetAssociationTable *bat = *bats_it;
+
+        // Bouquet selected by user: 272 is "England HD"
+        if (bat->BouquetID() != m_fsat_bouquet_id)
+            continue;
+
+        for (uint t = 0; t < bat->TransportStreamCount(); ++t)
+        {
+            uint netid = bat->OriginalNetworkID(t);
+
+            if (!(netid == OriginalNetworkID::SES2 || netid == OriginalNetworkID::BBC))
+                continue;
+
+            desc_list_t parsed =
+                MPEGDescriptor::Parse(bat->TransportDescriptors(t),
+                                    bat->TransportDescriptorsLength(t));
+
+            uint priv_dsid = 0;
+            desc_list_t::const_iterator it = parsed.begin();
+            for (; it != parsed.end(); ++it)
+            {
+                if ((*it)[0] == DescriptorID::private_data_specifier)
+                {
+                    PrivateDataSpecifierDescriptor pd(*it);
+                    if (pd.IsValid())
+                        priv_dsid = pd.PrivateDataSpecifier();
+                }
+
+                if (priv_dsid == PrivateDataSpecifierID::FSAT &&
+                    (*it)[0] == PrivateDescriptorID::freesat_lcn_table)
+                {
+                    FreesatLCNDescriptor flcd(*it);
+                    if (flcd.IsValid())
+                    {
+                        for (uint i = 0; i<flcd.ServiceCount(); i++)
+                        {
+                            for (uint j=0; j<flcd.LCNCount(i); j++)
+                            {
+                                uint region_id = flcd.RegionID(i,j);
+                                uint service_id = flcd.ServiceID(i);
+                                uint lcn = flcd.LogicalChannelNumber(i,j);
+                                if (region_id == m_fsat_region_id)
+                                {
+                                    lcn_region[lcn] = service_id;
+                                    lcn_result[lcn] = service_id;
+                                }
+                                else if (region_id == kFSATRegionUndefined)
+                                {
+                                    lcn_common[lcn] =  service_id;
+                                    if (lcn_result.value(lcn,0) == 0)
+                                        lcn_result[lcn] = service_id;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Debug: print the resulting tables
+    if (VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_DEBUG))
+    {
+        for (uint i=1; i<2000; ++i)
+        {
+            uint lreg = lcn_region.value(i,0);
+            uint lcom = lcn_common.value(i,0);
+            uint lres = lcn_result.value(i,0);
+            if (lreg > 0 || lcom > 0 || lres > 0)
+            {
+                LOG(VB_CHANNEL, LOG_DEBUG, LOC +
+                    QString("RRR lcn:%1  lreg:%2  lcom:%3  lres:%4")
+                        .arg(i,4).arg(lreg,5).arg(lcom,5).arg(lres,5));
+            }
+        }
+    }
+
+    // Create the reverse table for LCN lookup on service id
+    // Lowest LCN is used in case the service has more than
+    // one logical channel number.
+    QMap<uint,uint> sid_lcn;
+    for (uint lcn=1999; lcn>0; --lcn)
+    {
+        uint sid = lcn_result.value(lcn,0);
+        if (sid > 0)
+            sid_lcn[sid] = lcn;
+    }
+
+    // ------------------------------------------------------------------------
+
+    // Get IPTV channel numbers
     for (dbchan_it = pnum_to_dbchan.begin();
          dbchan_it != pnum_to_dbchan.end(); ++dbchan_it)
     {
@@ -1413,42 +1587,68 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
         if (!info.m_chan_num.isEmpty())
             continue;
 
-        if (iptv_channel.isEmpty()) // DVB Logical channel numbers (LCN)
-        {
-            {
-                // Look for a logical channel number in the HD simulcast channel numbers.
-                // This gives the correct channel number when HD and SD versions of the same
-                // channel are simultaneously broadcast and the receiver is capable
-                // of receiving the HD signal.
-                QMap<qlonglong, uint>::const_iterator it = scnChanNums.find
-                        (((qlonglong)info.m_orig_netid<<32) | info.m_service_id);
-
-                if (it != scnChanNums.end())
-                {
-                    info.m_chan_num = QString::number(*it);
-                    continue;
-                }
-            }
-            {
-                // If there is no simulcast for this channel then descriptor 0x83
-                // gives the logical channel number. This can be either an SD
-                // or an HD channel.
-                QMap<qlonglong, uint>::const_iterator it = ukChanNums.find
-                        (((qlonglong)info.m_orig_netid<<32) | info.m_service_id);
-
-                if (it != ukChanNums.end())
-                    info.m_chan_num = QString::number(*it);
-            }
-        }
-        else // IPTV programs
+        if (!iptv_channel.isEmpty())
         {
             info.m_chan_num = iptv_channel;
             if (info.m_service_id)
                 info.m_chan_num += "-" + QString::number(info.m_service_id);
         }
+    }
+
+    // Get DVB Logical Channel Numbers
+    for (dbchan_it = pnum_to_dbchan.begin();
+         dbchan_it != pnum_to_dbchan.end(); ++dbchan_it)
+    {
+        ChannelInsertInfo &info = *dbchan_it;
+
+        if (!info.m_chan_num.isEmpty())
+            continue;
+
+        // DVB HD Simulcast channel numbers
+        //
+        // The HD simulcast channel number table gives the correct channel number
+        // when HD and SD versions of the same channel are simultaneously broadcast
+        // and the receiver is capable of receiving the HD signal.
+        // The latter is assumed correct for a MythTV system.
+        //
+        if (info.m_chan_num.isEmpty())
+        {
+            qlonglong key = ((qlonglong)info.m_orig_netid<<32) | info.m_service_id;
+            QMap<qlonglong, uint>::const_iterator it = scnChanNums.find(key);
+
+            if (it != scnChanNums.end())
+            {
+                info.m_chan_num = QString::number(*it);
+            }
+        }
+
+        // DVB Logical Channel Numbers (a.k.a. UK channel numbers)
+        if (info.m_chan_num.isEmpty())
+        {
+            qlonglong key = ((qlonglong)info.m_orig_netid<<32) | info.m_service_id;
+            QMap<qlonglong, uint>::const_iterator it = ukChanNums.find(key);
+
+            if (it != ukChanNums.end())
+            {
+                info.m_chan_num = QString::number(*it);
+            }
+        }
+
+        // DVB satellite Astra 28.2E Freesat channel numbers
+        if (info.m_chan_num.isEmpty())
+        {
+            uint key = info.m_service_id;
+            QMap<uint, uint>::const_iterator it = sid_lcn.find(key);
+
+            if (it != sid_lcn.end())
+            {
+                info.m_chan_num = QString::number(*it);
+            }
+        }
 
         LOG(VB_CHANSCAN, LOG_INFO, LOC +
-            QString("GetChannelList: set chan_num '%1' for '%2'")
+            QString("GetChannelList: service %1 (0x%2) chan_num '%3' callsign '%4'")
+                .arg(info.m_service_id).arg(info.m_service_id,4,16,QChar('0'))
                 .arg(info.m_chan_num).arg(info.m_callsign));
     }
 
