@@ -863,7 +863,8 @@ static uint get_chan_id_from_db_atsc(uint sourceid,
     query.prepare(
             "SELECT chanid, useonairguide "
             "FROM channel "
-            "WHERE atsc_major_chan = :MAJORCHAN AND "
+            "WHERE deleted         IS NULL AND "
+            "      atsc_major_chan = :MAJORCHAN AND "
             "      atsc_minor_chan = :MINORCHAN AND "
             "      sourceid        = :SOURCEID");
     query.bindValue(":MAJORCHAN", atsc_major);
@@ -893,7 +894,8 @@ static uint get_chan_id_from_db_dvb(uint sourceid, uint serviceid,
     QString qstr =
         "SELECT chanid, useonairguide, channel.sourceid "
         "FROM channel, dtv_multiplex "
-        "WHERE serviceid        = :SERVICEID   AND "
+        "WHERE deleted          IS NULL        AND "
+        "      serviceid        = :SERVICEID   AND "
         "      networkid        = :NETWORKID   AND "
         "      transportid      = :TRANSPORTID AND "
         "      channel.mplexid  = dtv_multiplex.mplexid";
@@ -912,7 +914,8 @@ static uint get_chan_id_from_db_dvb(uint sourceid, uint serviceid,
         qstr =
             "SELECT chanid, useonairguide, channel.sourceid "
             "FROM channel, dtv_multiplex "
-            "WHERE serviceid        = :SERVICEID   AND "
+            "WHERE deleted          IS NULL        AND "
+            "      serviceid        = :SERVICEID   AND "
             "      networkid        = :NETWORKID   AND "
             "      channel.mplexid  = dtv_multiplex.mplexid";
 
@@ -962,7 +965,8 @@ static uint get_chan_id_from_db_dtv(uint sourceid, uint serviceid,
     QString qstr =
         "SELECT c1.chanid, c1.useonairguide, c1.sourceid "
         "FROM channel c1, dtv_multiplex m, channel c2 "
-        "WHERE c1.serviceid        = :SERVICEID   AND "
+        "WHERE c1.deleted IS NULL AND "
+        "      c1.serviceid = :SERVICEID   AND "
         "      c1.mplexid  = m.mplexid AND "
         "      m.mplexid = c2.mplexid AND "
         "      c2.chanid = :CHANID";

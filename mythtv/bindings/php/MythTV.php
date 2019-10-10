@@ -267,7 +267,8 @@ class MythTV {
 
     public function LoadChannels() {
         $channelids = $sh->query('SELECT channel.chanid
-                                    FROM channel');
+                                    FROM channel
+                                    WHERE channel.deleted IS NULL');
         while ($chanid = $channelids->fetch_col())
             if (!isset($this->Channels[$chanid]))
                 $this->Channels[$chanid] = new MythTVChannel($this, $chanid);

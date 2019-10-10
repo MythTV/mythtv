@@ -116,7 +116,7 @@ package MythTV;
 # schema version supported in the main code.  We need to check that the schema
 # version in the database is as expected by the bindings, which are expected
 # to be kept in sync with the main code.
-    our $SCHEMA_VERSION = "1353";
+    our $SCHEMA_VERSION = "1354";
 
 # NUMPROGRAMLINES is defined in mythtv/libs/libmythtv/programinfo.h and is
 # the number of items in a ProgramInfo QStringList group used by
@@ -783,6 +783,7 @@ EOF
                                             FROM channel
                                                  LEFT JOIN dtv_multiplex
                                                         ON channel.mplexid = dtv_multiplex.mplexid
+                                            WHERE channel.deleted IS NULL
                                         ORDER BY chanid
                                          ');
         $sh->execute();

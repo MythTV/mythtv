@@ -3478,6 +3478,16 @@ nullptr
             return false;
     }
 
+    if (dbver == "1353")
+    {
+        const char *updates[] = {
+            "ALTER TABLE channel ADD COLUMN deleted TIMESTAMP NULL",
+            nullptr
+        };
+        if (!performActualUpdate(updates, "1354", dbver))
+            return false;
+    }
+
     return true;
 }
 

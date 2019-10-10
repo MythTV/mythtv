@@ -572,7 +572,8 @@ bool ScanDTVTransport::FillFromDB(DTVTunerType type, uint mplexid)
         "       d.transportid,   d.networkid,       c.default_authority,"
         "       c.service_type "
         "FROM channel AS c, dtv_multiplex AS d "
-        "WHERE c.mplexid = :MPLEXID AND"
+        "WHERE c.deleted IS NULL AND "
+        "      c.mplexid = :MPLEXID AND"
         "      c.mplexid = d.mplexid");
     query.bindValue(":MPLEXID", mplexid);
 

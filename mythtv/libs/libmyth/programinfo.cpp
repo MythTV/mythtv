@@ -5478,7 +5478,7 @@ bool LoadFromProgram(ProgramList &destination,
     // queries (no defaults.)
 
     if (!queryStr.contains("WHERE"))
-        queryStr += " WHERE visible != 0 ";
+        queryStr += " WHERE deleted IS NULL AND visible != 0 ";
 
     // NOTE: Any GROUP BY clause with a LIMIT is slow, adding at least
     // a couple of seconds to the query execution time

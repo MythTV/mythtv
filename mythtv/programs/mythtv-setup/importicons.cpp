@@ -287,7 +287,7 @@ bool ImportIconsWizard::initialLoad(const QString& name)
                         "dtv_multiplex.mplexid, channel.icon, channel.visible "
                         "FROM channel LEFT JOIN dtv_multiplex "
                         "ON channel.mplexid = dtv_multiplex.mplexid "
-                        "WHERE ");
+                        "WHERE deleted IS NULL AND ");
     if (!name.isEmpty())
         querystring.append("name=\"" + name + "\"");
     else

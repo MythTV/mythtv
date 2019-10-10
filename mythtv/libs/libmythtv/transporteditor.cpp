@@ -315,7 +315,8 @@ void TransportListEditor::Delete(TransportSetting *transport)
             if (!query.exec() || !query.isActive())
                 MythDB::DBError("TransportEditor -- delete multiplex", query);
 
-            query.prepare("DELETE FROM channel WHERE mplexid = :MPLEXID");
+            query.prepare("UPDATE channel SET deleted = NOW() "
+                          "WHERE deleted IS NULL AND mplexid = :MPLEXID");
             query.bindValue(":MPLEXID", mplexid);
 
             if (!query.exec() || !query.isActive())

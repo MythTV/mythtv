@@ -4701,6 +4701,7 @@ void ChannelGroupSetting::Load()
         "SELECT channel.chanid, channum, name, grpid FROM channel "
         "LEFT JOIN channelgroup "
         "ON (channel.chanid = channelgroup.chanid AND grpid = :GRPID) "
+        "WHERE deleted IS NULL "
         "ORDER BY channum+0; "; //to order by numeric value of channel number
 
     query.prepare(qstr);

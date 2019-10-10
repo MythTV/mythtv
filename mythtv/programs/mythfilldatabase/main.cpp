@@ -290,8 +290,9 @@ int main(int argc, char *argv[])
         updateLastRunStatus(status);
 
         MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("SELECT MAX(endtime) FROM program p LEFT JOIN channel c "
-                      "ON p.chanid=c.chanid WHERE c.sourceid= :SRCID "
+        query.prepare("SELECT MAX(endtime) FROM program p "
+                      "LEFT JOIN channel c ON p.chanid=c.chanid "
+                      "WHERE c.deleted IS NULL AND c.sourceid= :SRCID "
                       "AND manualid = 0 AND c.xmltvid != '';");
         query.bindValue(":SRCID", fromfile_id);
 
@@ -309,8 +310,9 @@ int main(int argc, char *argv[])
 
         updateLastRunEnd();
 
-        query.prepare("SELECT MAX(endtime) FROM program p LEFT JOIN channel c "
-                      "ON p.chanid=c.chanid WHERE c.sourceid= :SRCID "
+        query.prepare("SELECT MAX(endtime) FROM program p "
+                      "LEFT JOIN channel c ON p.chanid=c.chanid "
+                      "WHERE c.deleted IS NULL AND c.sourceid= :SRCID "
                       "AND manualid = 0 AND c.xmltvid != '';");
         query.bindValue(":SRCID", fromfile_id);
 
@@ -553,6 +555,7 @@ int main(int argc, char *argv[])
                     "      FROM program p, channel c "
                     "      WHERE p.programid <> '' "
                     "            AND p.chanid = c.chanid "
+                    "            AND c.deleted IS NULL "
                     "            AND c.visible = 1 "
                     "      GROUP BY p.programid "
                     "     ) AS firsts "
@@ -569,6 +572,7 @@ int main(int argc, char *argv[])
                     "      FROM program p, channel c "
                     "      WHERE p.programid = '' "
                     "            AND p.chanid = c.chanid "
+                    "            AND c.deleted IS NULL "
                     "            AND c.visible = 1 "
                     "      GROUP BY p.title, p.subtitle, partdesc "
                     "     ) AS firsts "
@@ -589,6 +593,7 @@ int main(int argc, char *argv[])
                     "      FROM program p, channel c "
                     "      WHERE p.programid <> '' "
                     "            AND p.chanid = c.chanid "
+                    "            AND c.deleted IS NULL "
                     "            AND c.visible = 1 "
                     "      GROUP BY p.programid "
                     "     ) AS lasts "
@@ -605,6 +610,7 @@ int main(int argc, char *argv[])
                     "      FROM program p, channel c "
                     "      WHERE p.programid = '' "
                     "            AND p.chanid = c.chanid "
+                    "            AND c.deleted IS NULL "
                     "            AND c.visible = 1 "
                     "      GROUP BY p.title, p.subtitle, partdesc "
                     "     ) AS lasts "

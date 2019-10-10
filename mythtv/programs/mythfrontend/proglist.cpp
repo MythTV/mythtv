@@ -1096,7 +1096,8 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
 
     if (m_type == plTitle) // per title listings
     {
-        where = "WHERE channel.visible = 1 "
+        where = "WHERE channel.deleted IS NULL "
+            "  AND channel.visible = 1 "
             "  AND program.endtime > :PGILSTART "
             "  AND (program.title = :PGILPHRASE0 OR "
             "       (program.seriesid <> '' AND "
@@ -1108,7 +1109,8 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
     {
         where = "LEFT JOIN oldprogram ON "
             "  oldprogram.oldtitle = program.title "
-            "WHERE channel.visible = 1 "
+            "WHERE channel.deleted IS NULL "
+            "  AND channel.visible = 1 "
             "  AND program.endtime > :PGILSTART "
             "  AND oldprogram.oldtitle IS NULL "
             "  AND program.manualid = 0 ";
@@ -1145,14 +1147,16 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
     }
     else if (m_type == plTitleSearch) // keyword search
     {
-        where = "WHERE channel.visible = 1 "
+        where = "WHERE channel.deleted IS NULL "
+            "  AND channel.visible = 1 "
             "  AND program.endtime > :PGILSTART "
             "  AND program.title LIKE :PGILLIKEPHRASE0 ";
         bindings[":PGILLIKEPHRASE0"] = QString("%") + qphrase + '%';
     }
     else if (m_type == plKeywordSearch) // keyword search
     {
-        where = "WHERE channel.visible = 1 "
+        where = "WHERE channel.deleted IS NULL "
+            "  AND channel.visible = 1 "
             "  AND program.endtime > :PGILSTART "
             "  AND (program.title LIKE :PGILLIKEPHRASE1 "
             "    OR program.subtitle LIKE :PGILLIKEPHRASE2 "
@@ -1163,7 +1167,9 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
     }
     else if (m_type == plPeopleSearch) // people search
     {
-        where = ", people, credits WHERE channel.visible = 1 "
+        where = ", people, credits "
+            "WHERE channel.deleted IS NULL "
+            "  AND channel.visible = 1 "
             "  AND program.endtime > :PGILSTART "
             "  AND people.name LIKE :PGILPHRASE1 "
             "  AND credits.person = people.person "
@@ -1185,7 +1191,8 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
                                 "program.chanid = programgenres.chanid AND "
                                 "program.starttime = programgenres.starttime ");
 
-            where += QString("WHERE channel.visible = 1 "
+            where += QString("WHERE channel.deleted IS NULL "
+                             "  AND channel.visible = 1 "
                              "  AND program.endtime > :PGILSTART "
                              "  AND ( ") + powerWhere + " ) ";
             MSqlAddMoreBindings(bindings, powerBindings);
@@ -1194,7 +1201,8 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
     else if (m_type == plSQLSearch) // complex search
     {
         qphrase.remove(QRegExp("^\\s*AND\\s+", Qt::CaseInsensitive));
-        where = QString("WHERE channel.visible = 1 "
+        where = QString("WHERE channel.deleted iS NULL "
+                        "  AND channel.visible = 1 "
                         "  AND program.endtime > :PGILSTART "
                         "  AND ( %1 ) ").arg(qphrase);
         if (!m_extraArg.isEmpty())
@@ -1202,7 +1210,8 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
     }
     else if (m_type == plChannel) // list by channel
     {
-        where = "WHERE channel.visible = 1 "
+        where = "WHERE channel.deleted IS NULL "
+            "  AND channel.visible = 1 "
             "  AND program.endtime > :PGILSTART "
             "  AND channel.chanid = :PGILPHRASE2 ";
         bindings[":PGILPHRASE2"] = qphrase;
@@ -1211,7 +1220,8 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
     {
         if (!m_useGenres)
         {
-            where = "WHERE channel.visible = 1 "
+            where = "WHERE channel.deleted IS NULL "
+                "  AND channel.visible = 1 "
                 "  AND program.endtime > :PGILSTART "
                 "  AND program.category = :PGILPHRASE3 ";
             bindings[":PGILPHRASE3"] = qphrase;
@@ -1222,7 +1232,8 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
                 "  program.chanid = g.chanid AND "
                 "  program.starttime = g.starttime AND "
                 "  genre = :PGILPHRASE4 "
-                "WHERE channel.visible = 1 "
+                "WHERE channel.deleted IS NULL "
+                "  AND channel.visible = 1 "
                 "  AND program.endtime > :PGILSTART ";
             bindings[":PGILPHRASE4"] = qphrase;
         }
@@ -1236,7 +1247,8 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
                 "  program.chanid = g2.chanid AND "
                 "  program.starttime = g2.starttime AND "
                 "  g2.genre = :GENRE2 "
-                "WHERE channel.visible = 1 "
+                "WHERE channel.deleted IS NULL "
+                "  AND channel.visible = 1 "
                 "  AND program.endtime > :PGILSTART ";
             bindings[":GENRE1"] = m_viewList[m_curView].section(":/:", 0, 0);
             bindings[":GENRE2"] = m_viewList[m_curView].section(":/:", 1, 1);
@@ -1244,7 +1256,8 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
     }
     else if (m_type == plMovies) // list movies
     {
-        where = "WHERE channel.visible = 1 "
+        where = "WHERE channel.deleted IS NULL "
+            "  AND channel.visible = 1 "
             "  AND program.endtime > :PGILSTART "
             "  AND program.category_type = 'movie' "
             "  AND program.stars " + qphrase + ' ';
@@ -1254,7 +1267,8 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
         QDateTime searchTime(m_searchTime);
         searchTime.setTime(QTime(searchTime.time().hour(), 0, 0));
         bindings[":PGILSEARCHTIME1"] = searchTime;
-        where = "WHERE channel.visible = 1 "
+        where = "WHERE channel.deleted IS NULL "
+            "  AND channel.visible = 1 "
             "  AND program.starttime >= :PGILSEARCHTIME1 ";
         if (m_titleSort)
         {
@@ -1268,7 +1282,8 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
         where = "JOIN recordmatch ON "
             " (program.starttime = recordmatch.starttime "
             "  AND program.chanid = recordmatch.chanid) "
-            "WHERE channel.visible = 1 "
+            "WHERE channel.deleted IS NULL "
+            "  AND channel.visible = 1 "
             "  AND program.endtime > :PGILSTART "
             "  AND recordmatch.recordid = :PGILPHRASE5 ";
         bindings[":PGILPHRASE5"] = qphrase;
@@ -1285,7 +1300,8 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
             QString fromc = query.value(0).toString();
             QString wherec = query.value(1).toString();
 
-            where = QString("WHERE channel.visible = 1 "
+            where = QString("WHERE channel.deleted IS NULL "
+                            "  AND channel.visible = 1 "
                             "  AND program.endtime > :PGILSTART "
                             "  AND ( %1 ) ").arg(wherec);
             if (!fromc.isEmpty())

@@ -476,7 +476,8 @@ QString V4LChannel::GetFormatForChannel(const QString& channum, const QString& i
     query.prepare(
         "SELECT tvformat "
         "FROM channel, capturecard "
-        "WHERE channum              = :CHANNUM   AND "
+        "WHERE deleted              IS NULL      AND "
+        "      channum              = :CHANNUM   AND "
         "      inputname            = :INPUTNAME AND "
         "      capturecard.cardid   = :INPUTID   AND "
         "      capturecard.sourceid = channel.sourceid");

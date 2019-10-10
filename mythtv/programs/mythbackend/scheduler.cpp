@@ -3715,7 +3715,7 @@ void Scheduler::UpdateManuals(uint recordid)
                   query.value(6).toTime(), Qt::UTC));
 
     query.prepare("SELECT chanid from channel "
-                  "WHERE callsign = :STATION");
+                  "WHERE deleted IS NULL AND callsign = :STATION");
     query.bindValue(":STATION", station);
     if (!query.exec())
     {
@@ -4071,7 +4071,8 @@ void Scheduler::UpdateMatches(uint recordid, uint sourceid, uint mplexid,
 "FROM (RECTABLE, program INNER JOIN channel "
 "      ON channel.chanid = program.chanid) ") + fromclauses[clause] + QString(
 " WHERE ") + whereclauses[clause] +
-    QString(" AND channel.visible = 1 ") +
+    QString(" AND channel.deleted IS NULL "
+            " AND channel.visible = 1 ") +
     filterClause + QString(" AND "
 
 "("
@@ -4906,6 +4907,7 @@ void Scheduler::GetAllScheduled(RecList &proglist, SchedSortColumn sortBy,
         "       channel.commmethod                      " // 25
         "FROM record "
         "LEFT JOIN channel ON channel.callsign = record.station "
+        "WHERE deleted IS NULL "
         "GROUP BY recordid "
         "ORDER BY %1 %2");
 

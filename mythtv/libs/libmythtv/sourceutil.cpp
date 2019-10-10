@@ -18,7 +18,8 @@ bool SourceUtil::HasDigitalChannel(uint sourceid)
     query.prepare(
         "SELECT mplexid, atsc_minor_chan, serviceid "
         "FROM channel "
-        "WHERE sourceid = :SOURCEID");
+        "WHERE deleted IS NULL AND "
+        "      sourceid = :SOURCEID");
     query.bindValue(":SOURCEID", sourceid);
 
     if (!query.exec())
@@ -69,7 +70,8 @@ QString SourceUtil::GetChannelSeparator(uint sourceid)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT channum "
                   "FROM channel "
-                  "WHERE sourceid = :SOURCEID");
+                  "WHERE deleted IS NULL AND "
+                  "      sourceid = :SOURCEID");
     query.bindValue(":SOURCEID", sourceid);
 
     if (query.exec() && query.isActive() && query.size() > 0)
@@ -111,7 +113,8 @@ uint SourceUtil::GetChannelCount(uint sourceid)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT sum(1) "
                   "FROM channel "
-                  "WHERE sourceid = :SOURCEID");
+                  "WHERE deleted IS NULL AND "
+                  "      sourceid = :SOURCEID");
     query.bindValue(":SOURCEID", sourceid);
     if (query.exec() && query.isActive() && query.next())
         return query.value(0).toUInt();
@@ -296,7 +299,8 @@ bool SourceUtil::IsEncoder(uint sourceid, bool strict)
     query.prepare(
         "SELECT atsc_minor_chan, serviceid "
         "FROM channel "
-        "WHERE sourceid = :SOURCEID");
+        "WHERE deleted IS NULL AND "
+        "      sourceid = :SOURCEID");
     query.bindValue(":SOURCEID", sourceid);
 
     bool has_any_chan = false;
@@ -490,24 +494,15 @@ bool SourceUtil::DeleteSource(uint sourceid)
     MSqlQuery query(MSqlQuery::InitCon());
 
     // Delete the channels associated with the source
-    query.prepare("DELETE FROM channel "
-                  "WHERE sourceid = :SOURCEID");
+    query.prepare("UPDATE channel "
+                  "SET deleted = NOW() "
+                  "WHERE deleted IS NULL AND "
+                  "      sourceid = :SOURCEID");
     query.bindValue(":SOURCEID", sourceid);
 
     if (!query.exec() || !query.isActive())
     {
         MythDB::DBError("Deleting Channels", query);
-        return false;
-    }
-
-    // Delete the multiplexes associated with the source
-    query.prepare("DELETE FROM dtv_multiplex "
-                  "WHERE sourceid = :SOURCEID");
-    query.bindValue(":SOURCEID", sourceid);
-
-    if (!query.exec() || !query.isActive())
-    {
-        MythDB::DBError("Deleting Multiplexes", query);
         return false;
     }
 
