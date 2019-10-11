@@ -22,11 +22,13 @@
 static bool parse_chan_info(const QString   &rawdata,
                             IPTVChannelInfo &info,
                             QString         &channum,
+                            int             &nextChanNum,
                             uint            &lineNum);
 
 static bool parse_extinf(const QString &line,
                          QString       &channum,
-                         QString       &name);
+                         QString       &name,
+                         int           &nextChanNum);
 
 IPTVChannelFetcher::IPTVChannelFetcher(
     uint cardid, const QString &inputname, uint sourceid,
@@ -289,13 +291,14 @@ fbox_chan_map_t IPTVChannelFetcher::ParsePlaylist(
     const QString &reallyrawdata, IPTVChannelFetcher *fetcher)
 {
     fbox_chan_map_t chanmap;
+    int nextChanNum = 1;
 
     QString rawdata = reallyrawdata;
     rawdata.replace("\r\n", "\n");
 
     // Verify header is ok
     QString header = rawdata.section("\n", 0, 0);
-    if (header != "#EXTM3U")
+    if (!header.startsWith("#EXTM3U"))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Invalid channel list header (%1)").arg(header));
@@ -320,6 +323,34 @@ fbox_chan_map_t IPTVChannelFetcher::ParsePlaylist(
                 .arg(num_channels));
     }
 
+    // get the next available channel number for the source (only used if we can't find one in the playlist)
+    if (fetcher)
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+        QString sql = "select MAX(CONVERT(channum, UNSIGNED INTEGER)) from channel where sourceid = :SOURCEID;";
+
+        query.prepare(sql);
+        query.bindValue(":SOURCEID", fetcher->m_sourceid);
+
+        if (!query.exec())
+        {
+            MythDB::DBError("Get next max channel number", query);
+        }
+        else
+        {
+            if (query.first())
+            {
+                nextChanNum = query.value(0).toInt() + 1;
+                LOG(VB_GENERAL, LOG_INFO, LOC + QString("Next available channel number from DB is: %1").arg(nextChanNum));
+            }
+            else
+            {
+                nextChanNum = 1;
+                LOG(VB_GENERAL, LOG_INFO, LOC + QString("No channels found for this source, using default channel number: %1").arg(nextChanNum));
+            }
+        }
+    }
+
     // Parse each channel
     uint lineNum = 1;
     for (uint i = 1; true; ++i)
@@ -327,7 +358,7 @@ fbox_chan_map_t IPTVChannelFetcher::ParsePlaylist(
         IPTVChannelInfo info;
         QString channum;
 
-        if (!parse_chan_info(rawdata, info, channum, lineNum))
+        if (!parse_chan_info(rawdata, info, channum, nextChanNum, lineNum))
             break;
 
         QString msg = tr("Encountered malformed channel");
@@ -357,6 +388,7 @@ fbox_chan_map_t IPTVChannelFetcher::ParsePlaylist(
 static bool parse_chan_info(const QString   &rawdata,
                             IPTVChannelInfo &info,
                             QString         &channum,
+                            int             &nextChanNum,
                             uint            &lineNum)
 {
     // #EXTINF:0,2 - France 2                <-- duration,channum - channame
@@ -386,7 +418,7 @@ static bool parse_chan_info(const QString   &rawdata,
         {
             if (line.startsWith("#EXTINF:"))
             {
-                parse_extinf(line.mid(line.indexOf(':')+1), channum, name);
+                parse_extinf(line.mid(line.indexOf(':')+1), channum, name, nextChanNum);
             }
             else if (line.startsWith("#EXTMYTHTV:"))
             {
@@ -425,7 +457,8 @@ static bool parse_chan_info(const QString   &rawdata,
 
 static bool parse_extinf(const QString &line,
                          QString       &channum,
-                         QString       &name)
+                         QString       &name,
+                         int           &nextChanNum)
 {
     // Parse extension portion, Freebox or SAT>IP format
     QRegExp chanNumName1("^-?\\d+,(\\d+)(?:\\.\\s|\\s-\\s)(.*)$");
@@ -482,10 +515,35 @@ static bool parse_extinf(const QString &line,
         }
     }
 
-    // line is supposed to contain the "0,2 - France 2" part
-    QString msg = LOC +
-        QString("Invalid header in channel list line \n\t\t\tEXTINF:%1")
-        .arg(line);
+    // Parse extension portion, https://github.com/iptv-org/iptv/blob/master/channels/ style
+    // EG. #EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="https://i.imgur.com/VejnhiB.png" group-title="News",BBC News
+    QRegExp chanNumName6("(^-?\\d+)\\s+[^,]*[^,]*,(.*)$");
+    pos = chanNumName6.indexIn(line);
+    if (pos != -1)
+    {
+        channum = chanNumName6.cap(1).simplified();
+        name = chanNumName6.cap(2).simplified();
+
+        bool ok;
+        int channel_number = channum.toInt(&ok);
+        if (ok && channel_number > 0)
+        {
+            if (channel_number >= nextChanNum)
+                nextChanNum = channel_number + 1;
+            return true;
+        }
+        else
+        {
+            // no valid channel number found use the default next one
+            LOG(VB_GENERAL, LOG_ERR, QString("No channel number found, using next available: %1 for channel: %2").arg(nextChanNum).arg(name));
+            channum = QString::number(nextChanNum);
+            nextChanNum++;
+            return true;
+        }
+    }
+
+    // not one of the formats we support
+    QString msg = LOC + QString("Invalid header in channel list line \n\t\t\tEXTINF:%1").arg(line);
     LOG(VB_GENERAL, LOG_ERR, msg);
     return false;
 }
