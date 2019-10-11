@@ -157,69 +157,78 @@ int  get_avf_buffer(struct AVCodecContext *c, AVFrame *pic, int flags);
 int  get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic, int flags);
 #endif
 
-static int determinable_frame_size(struct AVCodecContext *avctx)
-{
-    if (/*avctx->codec_id == AV_CODEC_ID_AAC ||*/
-        avctx->codec_id == AV_CODEC_ID_MP1 ||
-        avctx->codec_id == AV_CODEC_ID_MP2 ||
-        avctx->codec_id == AV_CODEC_ID_MP3/* ||
-        avctx->codec_id == AV_CODEC_ID_CELT*/)
-        return 1;
-    return 0;
-}
+// currently unused
+//static int determinable_frame_size(struct AVCodecContext *avctx)
+//{
+//    if (/*avctx->codec_id == AV_CODEC_ID_AAC ||*/
+//        avctx->codec_id == AV_CODEC_ID_MP1 ||
+//        avctx->codec_id == AV_CODEC_ID_MP2 ||
+//        avctx->codec_id == AV_CODEC_ID_MP3/* ||
+//        avctx->codec_id == AV_CODEC_ID_CELT*/)
+//        return 1;
+//    return 0;
+//}
 
-static int has_codec_parameters(AVStream *st)
-{
-    AVCodecContext *avctx = nullptr;
-
-#define FAIL(errmsg) do {                                     \
-    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + (errmsg));              \
-    return 0;                                                 \
+#define FAIL(errmsg) do {                       \
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + (errmsg)); \
+    return false;                                   \
 } while (false)
 
-    switch (st->codecpar->codec_type)
+static bool StreamHasRequiredParameters(AVStream *Stream)
+{
+    AVCodecContext *avctx = nullptr;
+    switch (Stream->codecpar->codec_type)
     {
-        case AVMEDIA_TYPE_AUDIO:
-            avctx = gCodecMap->getCodecContext(st);
-            if (!avctx)
-                FAIL("No codec for audio stream");
-            if (!avctx->frame_size && determinable_frame_size(avctx))
-                FAIL("unspecified frame size");
-            if (avctx->sample_fmt == AV_SAMPLE_FMT_NONE)
-                FAIL("unspecified sample format");
-            if (!avctx->sample_rate)
-                FAIL("unspecified sample rate");
-            if (!avctx->channels)
-                FAIL("unspecified number of channels");
-            if (!st->nb_decoded_frames && avctx->codec_id == AV_CODEC_ID_DTS)
-                FAIL("no decodable DTS frames");
-            break;
+        // We fail on video first as this is generally the most serious error
+        // and if we have video, we usually have everything else
         case AVMEDIA_TYPE_VIDEO:
-            avctx = gCodecMap->getCodecContext(st);
+            avctx = gCodecMap->getCodecContext(Stream);
             if (!avctx)
                 FAIL("No codec for video stream");
-            if (!avctx->width)
-                FAIL("unspecified size");
-            if (avctx->pix_fmt == AV_PIX_FMT_NONE)
-                FAIL("unspecified pixel format");
+            if (!Stream->codecpar->width || !Stream->codecpar->height)
+                FAIL("Unspecified video size");
+            if (Stream->codecpar->format == AV_PIX_FMT_NONE)
+                FAIL("Unspecified video pixel format");
             if (avctx->codec_id == AV_CODEC_ID_RV30 || avctx->codec_id == AV_CODEC_ID_RV40)
-                if (!st->sample_aspect_ratio.num && !avctx->sample_aspect_ratio.num && !st->codec_info_nb_frames)
-                    FAIL("no frame in rv30/40 and no sar");
+                if (!Stream->sample_aspect_ratio.num && !avctx->sample_aspect_ratio.num && !Stream->codec_info_nb_frames)
+                    FAIL("No frame in rv30/40 and no sar");
             break;
+        case AVMEDIA_TYPE_AUDIO:
+            avctx = gCodecMap->getCodecContext(Stream);
+            if (!avctx)
+                FAIL("No codec for audio stream");
+
+            // These checks are currently disabled as they continually fail but
+            // codec initialisation is fine - which just delays live tv startup.
+            // The worst offender appears to be audio description channel...
+
+            //if (!Stream->codecpar->frame_size && determinable_frame_size(avctx))
+            //    FAIL("Unspecified audio frame size");
+            //if (Stream->codecpar->format == AV_SAMPLE_FMT_NONE)
+            //    FAIL("Unspecified audio sample format");
+            //if (!Stream->codecpar->sample_rate)
+            //    FAIL("Unspecified audio sample rate");
+            //if (!Stream->codecpar->channels)
+            //    FAIL("Unspecified number of audio channels");
+            if (!Stream->nb_decoded_frames && avctx->codec_id == AV_CODEC_ID_DTS)
+                FAIL("No decodable DTS frames");
+            break;
+
         case AVMEDIA_TYPE_SUBTITLE:
-            if (st->codecpar->codec_id == AV_CODEC_ID_HDMV_PGS_SUBTITLE && !st->codecpar->width)
-                FAIL("unspecified size");
+            if (Stream->codecpar->codec_id == AV_CODEC_ID_HDMV_PGS_SUBTITLE && !Stream->codecpar->width)
+                FAIL("Unspecified subtitle size");
             break;
         case AVMEDIA_TYPE_DATA:
-            if(st->codecpar->codec_id == AV_CODEC_ID_NONE) return 1;
+            if (Stream->codecpar->codec_id == AV_CODEC_ID_NONE)
+                return true;
             break;
         default:
             break;
     }
 
-    if (st->codecpar->codec_id == AV_CODEC_ID_NONE)
-        FAIL("unknown codec");
-    return 1;
+    if (Stream->codecpar->codec_id == AV_CODEC_ID_NONE)
+        FAIL("Unknown codec");
+    return true;
 }
 
 static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
@@ -698,7 +707,7 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
     // Discard all the queued up decoded frames
     if (discardFrames)
     {
-        bool releaseall = m_mythcodecctx && m_mythcodecctx->DecoderWillResetOnFlush();
+        bool releaseall = m_mythcodecctx ? m_mythcodecctx->DecoderWillResetOnFlush() : false;
         m_parent->DiscardVideoFrames(doflush, doflush && releaseall);
     }
 
@@ -901,8 +910,8 @@ void AvFormatDecoder::InitByteContext(bool forceseek)
 
     // We can always seek during LiveTV
     m_ic->pb->seekable            = !streamed || forceseek;
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Buffer size: %1 streamed %2 seekable %3")
-        .arg(buf_size).arg(streamed).arg(m_ic->pb->seekable));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Buffer size: %1 Streamed %2 Seekable %3 Available %4")
+        .arg(buf_size).arg(streamed).arg(m_ic->pb->seekable).arg(ringBuffer->GetReadBufAvail()));
 }
 
 extern "C" void HandleStreamChange(void *data)
@@ -971,21 +980,17 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     AVProbeData probe;
     memset(&probe, 0, sizeof(AVProbeData));
     probe.filename = filename;
-    probe.buf = (unsigned char *)testbuf;
+    probe.buf = reinterpret_cast<unsigned char *>(testbuf);
     if (testbufsize + AVPROBE_PADDING_SIZE <= kDecoderProbeBufferSize)
         probe.buf_size = testbufsize;
     else
         probe.buf_size = kDecoderProbeBufferSize - AVPROBE_PADDING_SIZE;
-
     memset(probe.buf + probe.buf_size, 0, AVPROBE_PADDING_SIZE);
-
-    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "OpenFile -- begin");
 
     fmt = av_probe_input_format(&probe, static_cast<int>(true));
     if (!fmt)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("Probe failed for file: \"%1\".").arg(filename));
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Probe failed for '%1'").arg(filename));
         return -1;
     }
 
@@ -1001,17 +1006,24 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     }
 
     int err = 0;
-    bool found = false;
-    bool scanned = false;
+    bool scancomplete = false;
+    int  remainingscans  = 5;
 
-    if (m_livetv)
+    while (!scancomplete && remainingscans--)
     {
-        // We try to open the file for up to 1.5 second using only buffer in memory
-        MythTimer timer; timer.start();
+        bool found = false;
 
-        m_avfRingBuffer->SetInInit(true);
+        // With live tv, the ringbufer may contain insufficient data for complete
+        // initialisation so we try a few times with a slight pause each time to
+        // allow extra data to become available. In the worst case scenarios, the
+        // stream may not have a keyframe for 4-5 seconds.
+        // As a last resort, we will try and fallback to the original FFmpeg MPEG-TS
+        // demuxer if it is not already used.
+        // For regular videos, this shouldn't be an issue as the complete file
+        // should be available - though we try a little harder for streamed formats
+        int retries = m_livetv || ringBuffer->IsStreamed() ? 50 : 10;
 
-        while (!found && timer.elapsed() < 1500)
+        while (!found && --retries)
         {
             m_ic = avformat_alloc_context();
             if (!m_ic)
@@ -1020,105 +1032,49 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                 return -1;
             }
 
-            InitByteContext(true);
+            m_avfRingBuffer->SetInInit(m_livetv);
+            InitByteContext(m_livetv);
 
             err = avformat_open_input(&m_ic, filename, fmt, nullptr);
             if (err < 0)
             {
-                LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
-                    QString("avformat_open_input failed for in ram data after %1ms, retrying in 50ms")
-                    .arg(timer.elapsed()));
-                usleep(50 * 1000);  // wait 50ms
-                continue;
-            }
+                char error[AV_ERROR_MAX_STRING_SIZE];
+                av_make_error_string(error, sizeof(error), err);
+                LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Failed to open input ('%1')").arg(error));
 
-            // Test if we can find all streams details in what has been found so far
-            if (FindStreamInfo() < 0)
-            {
-                avformat_close_input(&m_ic);
-                LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
-                    QString("FindStreamInfo failed for in ram data after %1ms, retrying in 50ms")
-                    .arg(timer.elapsed()));
-                usleep(50 * 1000);  // wait 50ms
-                continue;
-            }
-
-            found = true;
-
-            for (uint i = 0; i < m_ic->nb_streams; i++)
-            {
-                if (!has_codec_parameters(m_ic->streams[i]))
+                // note - m_ic (AVFormatContext) is freed on failure
+                if (retries > 1)
                 {
-                    avformat_close_input(&m_ic);
-                    found = false;
-                    LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
-                        QString("Invalid streams found in ram data after %1ms, retrying in 50ms")
-                        .arg(timer.elapsed()));
-                    usleep(50 * 1000);  // wait 50ms
+                    // wait a little to buffer more data
+                    // 50*0.1 = 5 seconds max
+                    QThread::usleep(100000);
+                    // resets the read position
+                    m_avfRingBuffer->SetInInit(false);
+                    continue;
+                }
+
+                if (strcmp(fmt->name, "mpegts") == 0)
+                {
+                    fmt = av_find_input_format("mpegts-ffmpeg");
+                    if (fmt)
+                    {
+                        LOG(VB_GENERAL, LOG_ERR, LOC + "Attempting to use original FFmpeg MPEG-TS demuxer.");
+                        // resets the read position
+                        m_avfRingBuffer->SetInInit(false);
+                        continue;
+                    }
                     break;
                 }
             }
+            found = true;
         }
 
-        m_avfRingBuffer->SetInInit(false);
-
-        if (found)
-        {
-            LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                QString("File successfully opened after %1ms")
-                .arg(timer.elapsed()));
-        }
-        else
-        {
-            LOG(VB_PLAYBACK, LOG_WARNING, LOC +
-                QString("No streams found in ram data after %1ms, defaulting to in-file")
-                .arg(timer.elapsed()));
-        }
-        scanned = found;
-    }
-
-    // If we haven't opened the file so far, revert to old method
-    while (!found)
-    {
-        m_ic = avformat_alloc_context();
-        if (!m_ic)
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Could not allocate format context.");
-            return -1;
-        }
-
-        InitByteContext();
-
-        err = avformat_open_input(&m_ic, filename, fmt, nullptr);
         if (err < 0)
         {
-            if (strcmp(fmt->name, "mpegts") == 0)
-            {
-                fmt = av_find_input_format("mpegts-ffmpeg");
-                if (fmt)
-                {
-                    LOG(VB_GENERAL, LOG_ERR, LOC +
-                        QString("avformat_open_input failed with '%1' error.").arg(err));
-                    LOG(VB_GENERAL, LOG_ERR, LOC +
-                        QString("Attempting using original FFmpeg MPEG-TS demuxer."));
-                    // ic would have been freed due to the earlier failure
-                    continue;
-                }
-                break;
-            }
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Fatal error opening input. Aborting");
+            m_ic = nullptr;
+            return -1;
         }
-        found = true;
-    }
-    if (err < 0)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("avformat err(%1) on avformat_open_input call.").arg(err));
-        m_ic = nullptr;
-        return -1;
-    }
-
-    if (!scanned)
-    {
 
         // With certain streams, we don't get a complete stream analysis and the video
         // codec/frame format is not fully detected. This can have various consequences - from
@@ -1129,16 +1085,36 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         // it takes to complete the scan).
         m_ic->max_analyze_duration = 60 * AV_TIME_BASE;
 
-        int ret = FindStreamInfo();
-        if (ret < 0)
+        m_avfRingBuffer->SetInInit(m_livetv);
+        err = FindStreamInfo();
+        if (err < 0)
         {
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Could not find codec parameters. " +
-                    QString("file was \"%1\".").arg(filename));
-            avformat_close_input(&m_ic);
-            m_ic = nullptr;
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("Could not find codec parameters for '%1'").arg(filename));
+            CloseContext();
             return -1;
         }
+        m_avfRingBuffer->SetInInit(false);
+
+        // final sanity check that scanned streams are valid
+        scancomplete = true;
+        for (uint i = 0; i < m_ic->nb_streams; i++)
+        {
+            if (!StreamHasRequiredParameters(m_ic->streams[i]))
+            {
+                scancomplete = false;
+                if (remainingscans)
+                {
+                    CloseContext();
+                    LOG(VB_PLAYBACK, LOG_INFO, LOC + "Stream scan incomplete - retrying");
+                    QThread::usleep(250000); // wait 250ms
+                }
+                break;
+            }
+        }
     }
+
+    if (!scancomplete)
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Scan incomplete - playback may not work");
 
     m_ic->streams_changed = HandleStreamChange;
     m_ic->stream_change_data = this;
@@ -1164,9 +1140,12 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     }
 
     // Scan for the initial A/V streams
-    int ret = ScanStreams(novideo);
-    if (-1 == ret)
-        return ret;
+    err = ScanStreams(novideo);
+    if (-1 == err)
+    {
+        CloseContext();
+        return err;
+    }
 
     AutoSelectTracks(); // This is needed for transcoder
 
