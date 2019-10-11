@@ -3455,6 +3455,7 @@ bool MythPlayer::PauseDecoder(void)
     while (decoderThread && !killdecoder && (tries++ < 100) &&
            !decoderThreadPause.wait(&decoderPauseLock, 100))
     {
+        qApp->processEvents();
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Waited 100ms for decoder to pause");
     }
     pauseDecoder = false;
@@ -3481,8 +3482,8 @@ void MythPlayer::UnpauseDecoder(void)
         while (decoderThread && !killdecoder && (tries++ < 100) &&
               !decoderThreadUnpause.wait(&decoderPauseLock, 100))
         {
-            LOG(VB_GENERAL, LOG_WARNING, LOC +
-                "Waited 100ms for decoder to unpause");
+            qApp->processEvents();
+            LOG(VB_GENERAL, LOG_WARNING, LOC + "Waited 100ms for decoder to unpause");
         }
         unpauseDecoder = false;
     }
