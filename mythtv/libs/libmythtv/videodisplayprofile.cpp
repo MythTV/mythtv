@@ -1954,7 +1954,7 @@ void VideoDisplayProfile::init_statics(void)
 
     s_safe_initialized = true;
 
-    render_opts options;
+    render_opts options {};
     options.renderers      = &s_safe_custom;
     options.safe_renderers = &s_safe_renderer;
     options.deints         = &s_safe_deint;

@@ -709,8 +709,7 @@ void ZMServer::handleHello()
 
 long long ZMServer::getDiskSpace(const string &filename, long long &total, long long &used)
 {
-    struct statfs statbuf;
-    memset(&statbuf, 0, sizeof(statbuf));
+    struct statfs statbuf {};
     long long freespace = -1;
 
     total = used = -1;

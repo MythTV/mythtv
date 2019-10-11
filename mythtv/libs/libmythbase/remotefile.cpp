@@ -454,7 +454,7 @@ bool RemoteFile::Exists(const QString &url)
     if (url.isEmpty())
         return false;
 
-    struct stat fileinfo;
+    struct stat fileinfo {};
     return Exists(url, &fileinfo);
 }
 
@@ -658,7 +658,7 @@ bool RemoteFile::CopyFile (const QString& src, const QString& dst,
     if (success && verify)
     {
         // Check written file is correct size
-        struct stat fileinfo;
+        struct stat fileinfo {};
         long long dstSize = Exists(dst, &fileinfo) ? fileinfo.st_size : -1;
         long long srcSize = srcFile.GetFileSize();
         if (dstSize != srcSize)
@@ -1134,7 +1134,7 @@ long long RemoteFile::GetRealFileSize(void)
     if (!CheckConnection())
     {
         // Can't establish a new connection, using system one
-        struct stat fileinfo;
+        struct stat fileinfo {};
 
         if (Exists(m_path, &fileinfo))
         {
@@ -1163,7 +1163,7 @@ long long RemoteFile::GetRealFileSize(void)
         }
         else
         {
-            struct stat fileinfo;
+            struct stat fileinfo {};
 
             if (Exists(m_path, &fileinfo))
             {

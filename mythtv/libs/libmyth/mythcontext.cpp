@@ -382,7 +382,7 @@ bool MythContextPrivate::Init(const bool gui,
 
     if (gui)
     {
-        MythUIMenuCallbacks cbs;
+        MythUIMenuCallbacks cbs {};
         cbs.exec_program = exec_program_cb;
         cbs.exec_program_tv = exec_program_tv_cb;
         cbs.configplugin = configplugin_cb;

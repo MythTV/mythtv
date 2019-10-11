@@ -3100,7 +3100,7 @@ int render_wrapper_vdpau(struct AVCodecContext *s, AVFrame *src,
     {
         AvFormatDecoder *nd = (AvFormatDecoder *)(s->opaque);
         VideoFrame *frame = (VideoFrame *)src->opaque;
-        struct vdpau_render_state data;
+        struct vdpau_render_state data {};
 
         data.surface = (VdpVideoSurface)(uintptr_t)src->data[3];
         data.bitstream_buffers_used = count;

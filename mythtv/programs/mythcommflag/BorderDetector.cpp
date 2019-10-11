@@ -115,7 +115,7 @@ BorderDetector::getDimensions(const AVFrame *pgm, int pgmheight,
     const int               VERTSLOP = max(MAXLINES, pgmheight * 1 / 120);
     const int               HORIZSLOP = max(MAXLINES, pgmwidth * 1 / 160);
 
-    struct timeval          start, end, elapsed;
+    struct timeval          start {}, end {}, elapsed {};
     unsigned char           minval, maxval, val;
     int                     rr, cc, minrow, mincol, maxrow1, maxcol1, saved;
     int                     newrow, newcol, newwidth, newheight;

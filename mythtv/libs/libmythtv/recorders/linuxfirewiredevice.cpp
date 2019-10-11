@@ -987,7 +987,7 @@ static bool has_data(int fd, uint msec)
     FD_ZERO(&rfds);
     FD_SET(fd, &rfds);
 
-    struct timeval tv;
+    struct timeval tv {};
     tv.tv_sec  = msec / 1000;
     tv.tv_usec = (msec % 1000) * 1000;
 

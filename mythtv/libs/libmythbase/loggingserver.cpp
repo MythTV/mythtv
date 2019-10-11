@@ -187,7 +187,7 @@ bool FileLogger::logmsg(LoggingItem *item)
         return false;
 
     time_t epoch = item->epoch();
-    struct tm tm;
+    struct tm tm {};
     localtime_r(&epoch, &tm);
 
     strftime(timestamp, TIMESTAMP_MAX-8, "%Y-%m-%d %H:%M:%S",
@@ -463,7 +463,7 @@ bool DatabaseLogger::logqmsg(MSqlQuery &query, LoggingItem *item)
     char        timestamp[TIMESTAMP_MAX];
 
     time_t epoch = item->epoch();
-    struct tm tm;
+    struct tm tm {};
     localtime_r(&epoch, &tm);
 
     strftime(timestamp, TIMESTAMP_MAX-8, "%Y-%m-%d %H:%M:%S",

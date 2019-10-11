@@ -111,7 +111,7 @@ CC608Buffer *CC608Reader::GetOutputText(bool &changed, int &streamIdx)
                 (*inpos)++;
                 while (*inpos)
                 {
-                    struct teletextsubtitle st;
+                    struct teletextsubtitle st {};
                     memcpy(&st, inpos, sizeof(st));
                     inpos += sizeof(st);
 
@@ -163,7 +163,7 @@ void CC608Reader::SetMode(int mode)
 
 int CC608Reader::Update(unsigned char *inpos)
 {
-    struct ccsubtitle subtitle;
+    struct ccsubtitle subtitle {};
 
     memcpy(&subtitle, inpos, sizeof(subtitle));
     inpos += sizeof(ccsubtitle);

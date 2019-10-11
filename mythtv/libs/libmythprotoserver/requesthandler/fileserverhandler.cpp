@@ -630,7 +630,7 @@ bool FileServerHandler::HandleQueryFileExists(SocketHandler *socket,
             << fullname;
 
         // TODO: convert me to QFile
-        struct stat fileinfo;
+        struct stat fileinfo {};
         if (stat(fullname.toLocal8Bit().constData(), &fileinfo) >= 0)
         {
             res << QString::number(fileinfo.st_dev)

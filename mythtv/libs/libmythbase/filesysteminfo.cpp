@@ -228,8 +228,7 @@ void FileSystemInfo::PopulateDiskSpace(void)
 
 void FileSystemInfo::PopulateFSProp(void)
 {
-    struct statfs statbuf;
-    memset(&statbuf, 0, sizeof(statbuf));
+    struct statfs statbuf {};
 
     if (statfs(getPath().toLocal8Bit().constData(), &statbuf) == 0)
     {

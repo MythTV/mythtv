@@ -898,7 +898,7 @@ TemplateFinder::analyzeFrame(const VideoFrame *frame, long long frameno,
     int                 pgmwidth, pgmheight;
     int                 croprow, cropcol, cropwidth, cropheight;
     int                 excluderow, excludecol, excludewidth, excludeheight;
-    struct timeval      start, end, elapsed;
+    struct timeval      start {}, end {}, elapsed {};
 
     if (frameno < m_nextFrame)
     {

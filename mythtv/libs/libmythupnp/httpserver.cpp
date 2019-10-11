@@ -138,7 +138,7 @@ HttpServer::HttpServer() :
             .arg(LOBYTE(LOWORD(GetVersion())))
             .arg(HIBYTE(LOWORD(GetVersion())));
 #else
-        struct utsname uname_info;
+        struct utsname uname_info {};
         uname( &uname_info );
         s_platform = QString("%1/%2")
             .arg(uname_info.sysname).arg(uname_info.release);

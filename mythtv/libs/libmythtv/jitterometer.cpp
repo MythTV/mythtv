@@ -68,7 +68,7 @@ bool Jitterometer::RecordEndTime()
         return false;
 
     int cycles = m_num_cycles;
-    struct timeval timenow;
+    struct timeval timenow {};
     gettimeofday(&timenow, nullptr);
 
     if (m_starttime_valid)

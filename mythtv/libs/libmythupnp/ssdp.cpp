@@ -252,7 +252,7 @@ void SSDP::run()
     RunProlog();
 
     fd_set          read_set;
-    struct timeval  timeout;
+    struct timeval  timeout {};
 
     LOG(VB_UPNP, LOG_INFO, "SSDP::Run - SSDP Thread Started." );
 

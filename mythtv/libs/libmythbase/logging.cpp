@@ -120,7 +120,7 @@ void verboseHelp(void);
 void loggingGetTimeStamp(qlonglong *epoch, uint *usec)
 {
 #if HAVE_GETTIMEOFDAY
-    struct timeval  tv;
+    struct timeval tv {};
     gettimeofday(&tv, nullptr);
     *epoch = tv.tv_sec;
     if (usec)
@@ -430,7 +430,7 @@ bool LoggerThread::logConsole(LoggingItem *item)
         char   usPart[9];
         char   timestamp[TIMESTAMP_MAX];
         time_t epoch = item->epoch();
-        struct tm tm;
+        struct tm tm {};
         localtime_r(&epoch, &tm);
 
         strftime( timestamp, TIMESTAMP_MAX-8, "%Y-%m-%d %H:%M:%S",

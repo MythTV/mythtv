@@ -89,7 +89,7 @@ static QString relative_URI(const QString &surl, const QString &spath)
 
 static uint64_t mdate(void)
 {
-    timeval  t;
+    timeval  t {};
     gettimeofday(&t, nullptr);
     return t.tv_sec * 1000000ULL + t.tv_usec;
 }

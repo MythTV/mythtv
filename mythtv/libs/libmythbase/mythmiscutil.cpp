@@ -63,7 +63,7 @@ using namespace std;
 bool getUptime(time_t &uptime)
 {
 #ifdef __linux__
-    struct sysinfo sinfo;
+    struct sysinfo sinfo {};
     if (sysinfo(&sinfo) == -1)
     {
         LOG(VB_GENERAL, LOG_ERR, "sysinfo() error");
@@ -109,7 +109,7 @@ bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
 {
 #ifdef __linux__
     const size_t MB = (1024*1024);
-    struct sysinfo sinfo;
+    struct sysinfo sinfo {};
     if (sysinfo(&sinfo) == -1)
     {
         LOG(VB_GENERAL, LOG_ERR,

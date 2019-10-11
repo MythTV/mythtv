@@ -410,7 +410,7 @@ void ShowFormats(const OMXComponent &cmpnt, unsigned n, LogLevel_t level, uint64
     if  (!VERBOSE_LEVEL_CHECK(mask, level))
         return;
 
-    T fmt;
+    T fmt {};
     OMX_DATA_INIT(fmt);
     fmt.nPortIndex = cmpnt.Base() + n;
 

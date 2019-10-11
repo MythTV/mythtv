@@ -476,8 +476,7 @@ bool MpegRecorder::SetVideoCaptureFormat(int chanfd)
     if (m_driver == "hdpvr")
         return true;
 
-    struct v4l2_format vfmt;
-    memset(&vfmt, 0, sizeof(vfmt));
+    struct v4l2_format vfmt {};
 
     vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
@@ -504,8 +503,7 @@ bool MpegRecorder::SetVideoCaptureFormat(int chanfd)
 /// Set audio language mode
 bool MpegRecorder::SetLanguageMode(int chanfd)
 {
-    struct v4l2_tuner vt;
-    memset(&vt, 0, sizeof(struct v4l2_tuner));
+    struct v4l2_tuner vt {};
     if (ioctl(chanfd, VIDIOC_G_TUNER, &vt) < 0)
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Unable to get audio mode" + ENO);
@@ -550,8 +548,7 @@ bool MpegRecorder::SetLanguageMode(int chanfd)
 bool MpegRecorder::SetRecordingVolume(int chanfd)
 {
     // Get volume min/max values
-    struct v4l2_queryctrl qctrl;
-    memset(&qctrl, 0 , sizeof(struct v4l2_queryctrl));
+    struct v4l2_queryctrl qctrl {};
     qctrl.id = V4L2_CID_AUDIO_VOLUME;
     if ((ioctl(chanfd, VIDIOC_QUERYCTRL, &qctrl) < 0) ||
         (qctrl.flags & V4L2_CTRL_FLAG_DISABLED))
@@ -567,9 +564,7 @@ bool MpegRecorder::SetRecordingVolume(int chanfd)
     int ctrl_volume = min(qctrl.maximum, max(qctrl.minimum, value));
 
     // Set recording volume
-    struct v4l2_control ctrl;
-    ctrl.id = V4L2_CID_AUDIO_VOLUME;
-    ctrl.value = ctrl_volume;
+    struct v4l2_control ctrl {V4L2_CID_AUDIO_VOLUME, ctrl_volume};
 
     if (ioctl(chanfd, VIDIOC_S_CTRL, &ctrl) < 0)
     {
@@ -681,8 +676,7 @@ static int streamtype_ivtv_to_v4l2(int st)
 static void add_ext_ctrl(vector<struct v4l2_ext_control> &ctrl_list,
                          uint32_t id, int32_t value)
 {
-    struct v4l2_ext_control tmp_ctrl;
-    memset(&tmp_ctrl, 0, sizeof(struct v4l2_ext_control));
+    struct v4l2_ext_control tmp_ctrl {};
     tmp_ctrl.id    = id;
     tmp_ctrl.value = value;
     ctrl_list.push_back(tmp_ctrl);
@@ -717,8 +711,7 @@ static void set_ctrls(int fd, vector<struct v4l2_ext_control> &ext_ctrls)
 
     for (size_t i = 0; i < ext_ctrls.size(); i++)
     {
-        struct v4l2_ext_controls ctrls;
-        memset(&ctrls, 0, sizeof(struct v4l2_ext_controls));
+        struct v4l2_ext_controls ctrls {};
 
         int value = ext_ctrls[i].value;
 
@@ -792,8 +785,7 @@ bool MpegRecorder::SetV4L2DeviceOptions(int chanfd)
     int audioinput = m_audiodevice.toUInt(&ok);
     if (ok)
     {
-        struct v4l2_audio ain;
-        memset(&ain, 0, sizeof(ain));
+        struct v4l2_audio ain {};
         ain.index = audioinput;
         if (ioctl(chanfd, VIDIOC_ENUMAUDIO, &ain) < 0)
         {
@@ -813,7 +805,7 @@ bool MpegRecorder::SetV4L2DeviceOptions(int chanfd)
     // query supported audio codecs if spdif is not used
     if (m_driver == "hdpvr" && audioinput != 2)
     {
-        struct v4l2_queryctrl qctrl;
+        struct v4l2_queryctrl qctrl {};
         qctrl.id = V4L2_CID_MPEG_AUDIO_ENCODING;
 
         if (!ioctl(chanfd, VIDIOC_QUERYCTRL, &qctrl))
@@ -849,8 +841,7 @@ bool MpegRecorder::SetVBIOptions(int chanfd)
         else
             fd = chanfd;
 
-        struct v4l2_format vbifmt;
-        memset(&vbifmt, 0, sizeof(struct v4l2_format));
+        struct v4l2_format vbifmt {};
         vbifmt.type = V4L2_BUF_TYPE_SLICED_VBI_CAPTURE;
         vbifmt.fmt.sliced.service_set |= (VBIMode::PAL_TT == m_vbimode) ?
             V4L2_SLICED_VBI_625 : V4L2_SLICED_VBI_525;
@@ -882,12 +873,11 @@ bool MpegRecorder::SetVBIOptions(int chanfd)
                     .arg(vbifmt.fmt.sliced.service_set)
                     .arg(vbifmt.fmt.sliced.io_size));
 
-            struct v4l2_ext_control vbi_ctrl;
+            struct v4l2_ext_control vbi_ctrl {};
             vbi_ctrl.id      = V4L2_CID_MPEG_STREAM_VBI_FMT;
             vbi_ctrl.value   = V4L2_MPEG_STREAM_VBI_FMT_IVTV;
 
-            struct v4l2_ext_controls ctrls;
-            memset(&ctrls, 0, sizeof(struct v4l2_ext_controls));
+            struct v4l2_ext_controls ctrls {};
             ctrls.ctrl_class = V4L2_CTRL_CLASS_MPEG;
             ctrls.count      = 1;
             ctrls.controls   = &vbi_ctrl;
@@ -977,7 +967,7 @@ void MpegRecorder::run(void)
                 .arg(dummyBPS * 8));
     }
 
-    struct timeval tv;
+    struct timeval tv {};
     fd_set rdset;
 
     if (m_deviceIsMpegFile)
@@ -1414,8 +1404,7 @@ void MpegRecorder::StopEncoding(void)
     if (m_readfd < 0)
         return;
 
-    struct v4l2_encoder_cmd command;
-    memset(&command, 0, sizeof(struct v4l2_encoder_cmd));
+    struct v4l2_encoder_cmd command {};
     command.cmd   = V4L2_ENC_CMD_STOP;
     command.flags = V4L2_ENC_CMD_STOP_AT_GOP_END;
 
@@ -1487,8 +1476,7 @@ bool MpegRecorder::HandleResolutionChanges(void)
 {
     LOG(VB_RECORD, LOG_INFO, LOC + "Checking Resolution");
     uint pix = 0;
-    struct v4l2_format vfmt;
-    memset(&vfmt, 0, sizeof(vfmt));
+    struct v4l2_format vfmt {};
     vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
     if (0 == ioctl(m_chanfd, VIDIOC_G_FMT, &vfmt))

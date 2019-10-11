@@ -176,8 +176,8 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 time_t epochSeconds = 0;
                 short int timeZone = 0;
 #if HAVE_GETTIMEOFDAY
-                struct timeval   time;
-                struct timezone  zone;
+                struct timeval   time {};
+                struct timezone  zone {};
 
                 if (gettimeofday(&time, &zone) == -1)
                 {

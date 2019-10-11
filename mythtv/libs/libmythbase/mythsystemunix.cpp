@@ -104,9 +104,7 @@ void MythSystemLegacyIOHandler::run(void)
 
         while( run_system )
         {
-            struct timespec ts;
-            ts.tv_sec = 0;
-            ts.tv_nsec = 10*1000*1000;  // 10ms
+            struct timespec ts { 0, 10*1000*1000};  // 10ms
             nanosleep(&ts, nullptr); // ~100x per second, for ~3MBps throughput
             m_pLock.lock();
             if( m_pMap.isEmpty() )
@@ -115,8 +113,7 @@ void MythSystemLegacyIOHandler::run(void)
                 break;
             }
 
-            timeval tv;
-            tv.tv_sec = 0; tv.tv_usec = 0;
+            timeval tv {0, 0};
 
             int retval;
             fd_set fds = m_fds;
@@ -497,9 +494,7 @@ void MythSystemLegacySignalManager::run(void)
     LOG(VB_GENERAL, LOG_INFO, "Starting process signal handler");
     while (run_system)
     {
-        struct timespec ts;
-        ts.tv_sec = 0;
-        ts.tv_nsec = 50 * 1000 * 1000; // 50ms
+        struct timespec ts {0, 50 * 1000 * 1000}; // 50ms
         nanosleep(&ts, nullptr); // sleep 50ms
 
         while (run_system)

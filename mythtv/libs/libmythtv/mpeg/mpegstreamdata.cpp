@@ -852,7 +852,7 @@ double MPEGStreamData::TimeOffset(void) const
 
 void MPEGStreamData::UpdateTimeOffset(uint64_t _si_utc_time)
 {
-    struct timeval tm;
+    struct timeval tm {};
     if (gettimeofday(&tm, nullptr) != 0)
         return;
 

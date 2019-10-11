@@ -241,7 +241,7 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
 
     while (m_player->GetEof() == kEofStateNone)
     {
-        struct timeval startTime;
+        struct timeval startTime {};
         if (m_stillRecording)
             gettimeofday(&startTime, nullptr);
 
@@ -361,7 +361,7 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
             int secondsBehind = secondsRecorded - secondsFlagged;
             long usecPerFrame = (long)(1.0F / m_player->GetFrameRate() * 1000000);
 
-            struct timeval endTime;
+            struct timeval endTime {};
             gettimeofday(&endTime, nullptr);
 
             long long usecSleep =

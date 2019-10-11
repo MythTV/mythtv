@@ -115,7 +115,7 @@ bool PrivateDecoderCrystalHD::Init(const QString &decoder,
         return false;
     }
 
-    _BC_INFO_CRYSTAL_ info;
+    _BC_INFO_CRYSTAL_ info {};
     st = DtsCrystalHDVersion(m_device, &info);
     CHECK_ST;
     if (!ok)

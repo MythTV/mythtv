@@ -933,7 +933,7 @@ void MythUIHelper::PruneCacheDir(const QString& dirname)
     // is also slower just using dir.entryInfoList().
     foreach (const QFileInfo &fi, dir.entryInfoList())
     {
-        struct stat buf;
+        struct stat buf {};
         QString fullname = fi.filePath();
         if (not fullname.startsWith('/'))
             fullname = dirname + "/" + fullname;

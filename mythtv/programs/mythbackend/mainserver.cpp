@@ -3699,7 +3699,7 @@ void MainServer::HandleQueryFileExists(QStringList &slist, PlaybackSock *pbs)
         retlist << "1";
         retlist << fullname;
 
-        struct stat fileinfo;
+        struct stat fileinfo {};
         if (stat(fullname.toLocal8Bit().constData(), &fileinfo) >= 0)
         {
             retlist << QString::number(fileinfo.st_dev);
@@ -5102,7 +5102,7 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
     QMap <QString, bool>foundDirs;
     QString driveKey;
     QString localStr = "1";
-    struct statfs statbuf;
+    struct statfs statbuf {};
     QStringList groups(StorageGroup::kSpecialGroups);
     groups.removeAll("LiveTV");
     QString specialGroups = groups.join("', '");

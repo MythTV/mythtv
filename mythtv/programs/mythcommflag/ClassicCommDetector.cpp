@@ -421,7 +421,7 @@ bool ClassicCommDetector::go()
 
     while (m_player->GetEof() == kEofStateNone)
     {
-        struct timeval startTime;
+        struct timeval startTime {};
         if (m_stillRecording)
             gettimeofday(&startTime, nullptr);
 
@@ -564,7 +564,7 @@ bool ClassicCommDetector::go()
             int secondsBehind = secondsRecorded - secondsFlagged;
             long usecPerFrame = (long)(1.0F / m_player->GetFrameRate() * 1000000);
 
-            struct timeval endTime;
+            struct timeval endTime {};
             gettimeofday(&endTime, nullptr);
 
             long long usecSleep =
@@ -765,7 +765,7 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
     int bottomDarkRow = m_height - m_commDetectBorder - 1;
     int leftDarkCol = m_commDetectBorder;
     int rightDarkCol = m_width - m_commDetectBorder - 1;
-    FrameInfoEntry fInfo;
+    FrameInfoEntry fInfo {};
 
     if (!frame || !(frame->buf) || frame_number == -1 ||
         frame->codec != FMT_YV12)

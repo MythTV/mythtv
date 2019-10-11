@@ -196,8 +196,8 @@ void JoystickMenuThread::run(void)
     RunProlog();
 
     fd_set readfds;
-    struct js_event js;
-    struct timeval timeout;
+    struct js_event js {};
+    struct timeval timeout {};
 
     while (!m_bStop)
     {

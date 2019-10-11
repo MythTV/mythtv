@@ -98,7 +98,7 @@ void DVDInfo::GetNameAndSerialNum(dvdnav_t* nav,
 
     if (name.isEmpty() && serialnum.isEmpty())
     {
-        struct stat stat;
+        struct stat stat {};
         if ((mythfile_stat(filename.toLocal8Bit(), &stat) == 0) && S_ISDIR(stat.st_mode))
         {
             // Name and serial number are empty because we're reading

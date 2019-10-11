@@ -79,7 +79,7 @@ PGMConverter::getImage(const VideoFrame *frame, long long _frameno,
         int *pwidth, int *pheight)
 {
 #ifdef PGM_CONVERT_GREYSCALE
-    struct timeval      start, end, elapsed;
+    struct timeval      start {}, end {}, elapsed {};
 #endif /* PGM_CONVERT_GREYSCALE */
 
     if (m_frameno == _frameno)

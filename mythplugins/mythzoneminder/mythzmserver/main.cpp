@@ -55,9 +55,8 @@ int main(int argc, char **argv)
 {
     fd_set master;                  // master file descriptor list
     fd_set read_fds;                // temp file descriptor list for select()
-    struct sockaddr_in myaddr;      // server address
-    struct sockaddr_in remoteaddr;  // client address
-    struct timeval timeout;         // maximum time to wait for data
+    struct sockaddr_in myaddr {};   // server address
+    struct sockaddr_in remoteaddr {};// client address
     int fdmax;                      // maximum file descriptor number
     int listener;                   // listening socket descriptor
     int newfd;                      // newly accept()ed socket descriptor
@@ -311,8 +310,7 @@ int main(int argc, char **argv)
     while (!quit)
     {
         // the maximum time select() should wait
-        timeout.tv_sec = DB_CHECK_TIME;
-        timeout.tv_usec = 0;
+        struct timeval timeout {DB_CHECK_TIME, 0};
 
         read_fds = master; // copy it
         int res = select(fdmax+1, &read_fds, nullptr, nullptr, &timeout);

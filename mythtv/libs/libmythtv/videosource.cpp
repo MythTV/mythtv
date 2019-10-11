@@ -713,7 +713,7 @@ class VideoDevice : public CaptureCardComboBoxSetting
         {
             QFileInfo &fi = *it;
 
-            struct stat st;
+            struct stat st {};
             QString filepath = fi.absoluteFilePath();
             int err = lstat(filepath.toLocal8Bit().constData(), &st);
 

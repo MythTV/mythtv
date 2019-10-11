@@ -463,7 +463,7 @@ TemplateMatcher::analyzeFrame(const VideoFrame *frame, long long frameno,
     const AVFrame     *pgm;
     const AVFrame     *edges;
     int                 pgmwidth, pgmheight;
-    struct timeval      start, end, elapsed;
+    struct timeval      start {}, end {}, elapsed {};
 
     *pNextFrame = NEXTFRAME;
 

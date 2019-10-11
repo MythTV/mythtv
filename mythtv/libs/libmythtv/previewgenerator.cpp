@@ -537,7 +537,7 @@ bool PreviewGenerator::SaveOutFile(const QByteArray &data, const QDateTime &dt)
     if (ok && !remaining)
     {
         file.close();
-        struct utimbuf times;
+        struct utimbuf times {};
 #if QT_VERSION < QT_VERSION_CHECK(5,8,0)
         times.actime = times.modtime = dt.toTime_t();
 #else
@@ -702,7 +702,7 @@ bool PreviewGenerator::LocalPreviewRun(void)
     {
         // Backdate file to start of preview time in case a bookmark was made
         // while we were generating the preview.
-        struct utimbuf times;
+        struct utimbuf times {};
 #if QT_VERSION < QT_VERSION_CHECK(5,8,0)
         times.actime = times.modtime = dt.toTime_t();
 #else

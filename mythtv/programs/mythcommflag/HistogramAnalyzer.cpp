@@ -285,7 +285,7 @@ HistogramAnalyzer::analyzeFrame(const VideoFrame *frame, long long frameno)
     unsigned char       *pp, bordercolor;
     unsigned long long  sumval, sumsquares;
     int                 rr, cc, rr1, cc1, rr2, cc2, rr3, cc3;
-    struct timeval      start, end, elapsed;
+    struct timeval      start {}, end {}, elapsed {};
 
     if (m_lastframeno != UNCACHED && m_lastframeno == frameno)
         return FrameAnalyzer::ANALYZE_OK;

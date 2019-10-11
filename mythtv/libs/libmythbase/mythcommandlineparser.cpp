@@ -89,7 +89,7 @@ int GetTermWidth(void)
 #if defined(_WIN32) || defined(Q_OS_ANDROID)
     return TERMWIDTH;
 #else
-    struct winsize ws;
+    struct winsize ws {};
 
     if (ioctl(0, TIOCGWINSZ, &ws) != 0)
         return TERMWIDTH;

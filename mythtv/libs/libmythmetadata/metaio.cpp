@@ -226,10 +226,7 @@ void MetaIO::saveTimeStamps(void)
 
 void MetaIO::restoreTimeStamps(void)
 {
-    struct utimbuf new_times;
-
-    new_times.actime = m_fileinfo.st_atime;
-    new_times.modtime = m_fileinfo.st_mtime;
+    struct utimbuf new_times {m_fileinfo.st_atime, m_fileinfo.st_mtime};
 
     if (utime(m_filename.toLocal8Bit().constData(), &new_times) < 0)
     {

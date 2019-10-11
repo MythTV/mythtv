@@ -567,7 +567,7 @@ MythMediaStatus MythCDROMLinux::checkMedia()
                 off_t sr = lseek(m_DeviceHandle,
                                  (off_t) 2048*16, SEEK_SET);
 
-                struct iso_primary_descriptor buf;
+                struct iso_primary_descriptor buf {};
                 ssize_t readin = 0;
                 while ((sr != (off_t) -1) && (readin < 2048))
                 {
@@ -736,7 +736,7 @@ MythMediaError MythCDROMLinux::unlock()
 bool MythCDROMLinux::isSameDevice(const QString &path)
 {
     dev_t new_rdev;
-    struct stat sb;
+    struct stat sb {};
 
     if (stat(path.toLocal8Bit().constData(), &sb) < 0)
     {
@@ -763,18 +763,12 @@ bool MythCDROMLinux::isSameDevice(const QString &path)
 void MythCDROMLinux::setDeviceSpeed(const char *device, int speed)
 {
     int fd;
-    unsigned char buffer[28];
-    unsigned char cmd[16];
-    unsigned char sense[16];
-    struct sg_io_hdr sghdr;
-    struct stat st;
+    unsigned char buffer[28] {};
+    unsigned char cmd[16] {};
+    unsigned char sense[16] {};
+    struct sg_io_hdr sghdr {};
+    struct stat st {};
     int rate = 0;
-
-    memset(&sghdr, 0, sizeof(sghdr));
-    memset(buffer, 0, sizeof(buffer));
-    memset(sense, 0, sizeof(sense));
-    memset(cmd, 0, sizeof(cmd));
-    memset(&st, 0, sizeof(st));
 
     if ((fd = open(device, O_RDWR | O_NONBLOCK)) == -1)
     {

@@ -225,9 +225,7 @@ void VideoSelector::titleChanged(MythUIButtonListItem *item)
         if (v->size == 0)
         {
             bool bExists;
-
-            struct stat fileinfo;
-            memset(&fileinfo, 0, sizeof(fileinfo ));
+            struct stat fileinfo {};
 
             bExists = RemoteFile::Exists(v->filename, &fileinfo);
             if (bExists)

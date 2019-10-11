@@ -547,7 +547,7 @@ int cCiTransportConnection::CreateConnection(void)
 
 int cCiTransportConnection::Poll(void)
 {
-  struct timeval curr_time;
+  struct timeval curr_time {};
 
   if (m_state != stACTIVE)
     return ERROR;
@@ -1099,8 +1099,8 @@ void cCiDateTime::SetTimeOffset(double offset)
 bool cCiDateTime::SendDateTime(void)
 {
   time_t t = time(nullptr);
-  struct tm tm_gmt;
-  struct tm tm_loc;
+  struct tm tm_gmt {};
+  struct tm tm_loc {};
 
   // Avoid using signed time_t types
   if (timeOffset < 0)
@@ -1267,7 +1267,7 @@ bool cCiMMI::Process(int Length, const uint8_t *Data)
                  case DCC_SET_MMI_MODE:
                       if (l == 2 && *++d == MM_HIGH_LEVEL) {
                          struct tDisplayReply { uint8_t id; uint8_t mode; };
-                         tDisplayReply dr;
+                         tDisplayReply dr {};
                          dr.id = DRI_MMI_MODE_ACK;
                          dr.mode = MM_HIGH_LEVEL;
                          dbgprotocol("%d: ==> Display Reply\n", SessionId());
@@ -1376,7 +1376,7 @@ bool cCiMMI::SendAnswer(const char *Text)
 {
   dbgprotocol("%d: ==> Answ\n", SessionId());
   struct tAnswer { uint8_t id; char text[256]; };//XXX
-  tAnswer answer;
+  tAnswer answer {};
   answer.id = Text ? AI_ANSWER : AI_CANCEL;
   if (Text) {
      strncpy(answer.text, Text, sizeof(answer.text) - 1);
@@ -1905,7 +1905,7 @@ bool cHlCiHandler::Process(void)
 {
     cMutexLock MutexLock(&m_mutex);
 
-    struct ca_msg msg;
+    struct ca_msg msg {};
     switch(m_state) {
     case 0:
         // Get CA_system_ids
@@ -1973,7 +1973,7 @@ const unsigned short *cHlCiHandler::GetCaSystemIds(int /*Slot*/)
 bool cHlCiHandler::SetCaPmt(cCiCaPmt &CaPmt, int /*Slot*/)
 {
     cMutexLock MutexLock(&m_mutex);
-    struct ca_msg msg;
+    struct ca_msg msg {};
 
     esyslog("Setting CA PMT.");
     m_state = 2;

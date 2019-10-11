@@ -88,7 +88,7 @@ void Transcode::ReencoderAddKFA(long curframe, long lastkey, long num_keyframes)
     long delta = curframe - lastkey;
     if (delta != 0 && delta != keyframedist)
     {
-        struct kfatable_entry kfate;
+        struct kfatable_entry kfate {};
         kfate.adjust = keyframedist - delta;
         kfate.keyframe_number = num_keyframes;
         kfa_table->push_back(kfate);

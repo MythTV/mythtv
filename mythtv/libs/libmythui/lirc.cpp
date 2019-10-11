@@ -122,12 +122,11 @@ void LIRC::TeardownAll(void)
 static QByteArray get_ip(const QString &h)
 {
     QByteArray hba = h.toLatin1();
-    struct in_addr sin_addr;
+    struct in_addr sin_addr {};
     if (inet_aton(hba.constData(), &sin_addr))
         return hba;
 
-    struct addrinfo hints;
-    memset(&hints, 0, sizeof(hints));
+    struct addrinfo hints {};
     hints.ai_family   = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_protocol = IPPROTO_TCP;
@@ -192,8 +191,7 @@ bool LIRC::Init(void)
             return false;
         }
 
-        struct sockaddr_un addr;
-        memset(&addr, 0, sizeof(sockaddr_un));
+        struct sockaddr_un addr {};
         addr.sun_family = AF_UNIX;
         strncpy(addr.sun_path, dev.constData(),107);
 
@@ -230,8 +228,7 @@ bool LIRC::Init(void)
             port = (tmp[1].toUInt()) ? tmp[1].toUInt() : port;
         }
         QByteArray device = get_ip(dev);
-        struct sockaddr_in addr;
-        memset(&addr, 0, sizeof(sockaddr_in));
+        struct sockaddr_in addr {};
         addr.sin_family = AF_INET;
         addr.sin_port   = htons(port);
 
@@ -449,9 +446,7 @@ void LIRC::run(void)
         FD_SET(d->m_lircState->lirc_lircd, &readfds);
 
         // the maximum time select() should wait
-        struct timeval timeout;
-        timeout.tv_sec = 1; // 1 second
-        timeout.tv_usec = 100 * 1000; // 100 ms
+        struct timeval timeout {1, 100 * 1000}; // 1 second, 100 ms
 
         int ret = select(d->m_lircState->lirc_lircd + 1, &readfds, nullptr, nullptr,
                          &timeout);

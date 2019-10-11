@@ -2214,16 +2214,15 @@ static int isRemote(const QString& filename)
     if (!QFile::exists(filename))
         return 0;
 
-    struct statfs statbuf;
-    memset(&statbuf, 0, sizeof(statbuf));
-
 #if CONFIG_DARWIN
+    struct statfs statbuf {};
     if ((statfs(qPrintable(filename), &statbuf) == 0) &&
         ((!strcmp(statbuf.f_fstypename, "nfs")) ||      // NFS|FTP
             (!strcmp(statbuf.f_fstypename, "afpfs")) || // ApplShr
             (!strcmp(statbuf.f_fstypename, "smbfs"))))  // SMB
         return 2;
 #elif __linux__
+    struct statfs statbuf {};
     if ((statfs(qPrintable(filename), &statbuf) == 0) &&
         ((statbuf.f_type == 0x6969) ||      // NFS
             (statbuf.f_type == 0x517B)))    // SMB

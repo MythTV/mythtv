@@ -461,7 +461,7 @@ int FileRingBuffer::safe_read(int /*fd*/, void *data, uint sz)
     if (m_stopReads)
         return 0;
 
-    struct stat sb;
+    struct stat sb {};
 
     while (tot < sz)
     {
@@ -604,7 +604,7 @@ long long FileRingBuffer::GetRealFileSizeInternal(void) const
     {
         if (m_fd2 >= 0)
         {
-            struct stat sb;
+            struct stat sb {};
 
             ret = fstat(m_fd2, &sb);
             if (ret == 0 && S_ISREG(sb.st_mode))

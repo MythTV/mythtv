@@ -577,7 +577,7 @@ bool MediaMonitorUnix::AddDevice(MythMediaDevice* pDevice)
     }
 
     dev_t new_rdev;
-    struct stat sb;
+    struct stat sb {};
 
     if (stat(path.toLocal8Bit().constData(), &sb) < 0)
     {
@@ -635,7 +635,7 @@ bool MediaMonitorUnix::AddDevice(struct fstab * mep)
 #endif
 
     MythMediaDevice* pDevice = nullptr;
-    struct stat sbuf;
+    struct stat sbuf {};
 
     bool is_supermount = false;
     bool is_cdrom = false;

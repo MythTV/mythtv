@@ -50,7 +50,7 @@ void waitForBuffer(const struct timeval *framestart, int minlag, int flaglag,
         float fps, bool fullspeed)
 {
     long usperframe = (long)(1000000.0F / fps);
-    struct timeval now, elapsed;
+    struct timeval now {}, elapsed {};
     long sleepus;
 
     (void)gettimeofday(&now, nullptr);
@@ -574,7 +574,7 @@ bool CommDetector2::go(void)
         m_currentFrameNumber = 0;
         long long lastLoggedFrame = m_currentFrameNumber;
         QTime passTime, clock;
-        struct timeval getframetime;
+        struct timeval getframetime {};
 
         m_player->ResetTotalDuration();
 
@@ -587,7 +587,7 @@ bool CommDetector2::go(void)
         memset(&getframetime, 0, sizeof(getframetime));
         while (!(*m_currentPass).empty() && m_player->GetEof() == kEofStateNone)
         {
-            struct timeval start, end, elapsedtv;
+            struct timeval start {}, end {}, elapsedtv {};
 
             (void)gettimeofday(&start, nullptr);
             bool fetchNext = (nextFrame == m_currentFrameNumber + 1);
