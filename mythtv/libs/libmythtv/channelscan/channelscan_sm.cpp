@@ -173,7 +173,7 @@ ChannelScanSM::ChannelScanSM(ScanMonitor *_scan_monitor,
 #if FSAT_IN_DB
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare(
-                "SELECT dvb_nit_id, bouquet_id, region_rid "
+                "SELECT dvb_nit_id, bouquet_id, region_id "
                 "FROM videosource "
                 "WHERE videosource.sourceid = :SOURCEID");
         query.bindValue(":SOURCEID", _sourceID);
@@ -411,8 +411,9 @@ void ChannelScanSM::HandlePMT(uint /*program_num*/, const ProgramMapTable *pmt)
 {
     QMutexLocker locker(&m_lock);
 
-    LOG(VB_CHANSCAN, LOG_INFO, LOC + QString("Got a Program Map Table for %1")
-            .arg((*m_current).m_friendlyName));
+    LOG(VB_CHANSCAN, LOG_INFO, LOC + QString("Got a Program Map Table for %1 program %2 (0x%3)")
+            .arg((*m_current).m_friendlyName).arg(pmt->ProgramNumber())
+            .arg(pmt->ProgramNumber(),4,16,QChar('0')));
     LogLines(pmt->toString());
 
     if (!m_currentTestingDecryption &&
@@ -463,8 +464,9 @@ void ChannelScanSM::HandleSDT(uint /*tsid*/, const ServiceDescriptionTable *sdt)
     QMutexLocker locker(&m_lock);
 
     LOG(VB_CHANSCAN, LOG_INFO, LOC +
-        QString("Got a Service Description Table for %1")
-            .arg((*m_current).m_friendlyName));
+        QString("Got a Service Description Table for %1 section %2/%3")
+            .arg((*m_current).m_friendlyName)
+            .arg(sdt->Section()).arg(sdt->LastSection()));
     LogLines(sdt->toString());
 
     // If this is Astra 28.2 add start listening for Freesat BAT and SDTo
@@ -511,8 +513,9 @@ void ChannelScanSM::HandleNIT(const NetworkInformationTable *nit)
     QMutexLocker locker(&m_lock);
 
     LOG(VB_CHANSCAN, LOG_INFO, LOC +
-        QString("Got a Network Information Table for %1")
-            .arg((*m_current).m_friendlyName));
+        QString("Got a Network Information Table id %1 for %2 section %3/%4")
+            .arg(nit->NetworkID()).arg((*m_current).m_friendlyName)
+            .arg(nit->Section()).arg(nit->LastSection()));
     LogLines(nit->toString());
 
     UpdateChannelInfo(true);
@@ -523,8 +526,9 @@ void ChannelScanSM::HandleBAT(const BouquetAssociationTable *bat)
     QMutexLocker locker(&m_lock);
 
     LOG(VB_CHANSCAN, LOG_INFO, LOC +
-        QString("Got a Bouquet Association Table for %1")
-            .arg((*m_current).m_friendlyName));
+        QString("Got a Bouquet Association Table id %1 for %2 section %3/%4")
+            .arg(bat->BouquetID()).arg((*m_current).m_friendlyName)
+            .arg(bat->Section()).arg(bat->LastSection()));
     LogLines(bat->toString());
 
     m_otherTableTime = m_timer.elapsed() + m_otherTableTimeout;
@@ -549,12 +553,18 @@ void ChannelScanSM::HandleBAT(const BouquetAssociationTable *bat)
             if (!authority.IsValid() || !services.IsValid())
                 continue;
 
+            LOG(VB_CHANSCAN, LOG_INFO, LOC +
+                QString("Found default authority '%1' in BAT for services in %2 %3")
+                    .arg(authority.DefaultAuthority())
+                    .arg(netid).arg(tsid));
+
             for (uint j = 0; j < services.ServiceCount(); ++j)
             {
                 // If the default authority is given in the SDT this
                 // overrides any definition in the BAT (or in the NIT)
-                LOG(VB_CHANSCAN, LOG_INFO, LOC +
-                    QString("Found default authority in BAT for service %1 %2 %3")
+                LOG(VB_CHANSCAN, LOG_DEBUG, LOC +
+                    QString("Found default authority '%1' in BAT for service %2 %3 %4")
+                        .arg(authority.DefaultAuthority())
                         .arg(netid).arg(tsid).arg(services.ServiceID(j)));
                uint64_t index = ((uint64_t)netid << 32) | (tsid << 16) |
                                  services.ServiceID(j);
@@ -563,6 +573,7 @@ void ChannelScanSM::HandleBAT(const BouquetAssociationTable *bat)
             }
         }
     }
+    UpdateChannelInfo(true);
 }
 
 void ChannelScanSM::HandleSDTo(uint tsid, const ServiceDescriptionTable *sdt)
@@ -570,8 +581,8 @@ void ChannelScanSM::HandleSDTo(uint tsid, const ServiceDescriptionTable *sdt)
     QMutexLocker locker(&m_lock);
 
     LOG(VB_CHANSCAN, LOG_INFO, LOC +
-        QString("Got a Service Description Table (other) for Transport ID %1")
-            .arg(tsid));
+        QString("Got a Service Description Table (other) for Transport ID %1 section %2/%3")
+            .arg(tsid).arg(sdt->Section()).arg(sdt->LastSection()));
     LogLines(sdt->toString());
 
     m_otherTableTime = m_timer.elapsed() + m_otherTableTimeout;
@@ -593,7 +604,8 @@ void ChannelScanSM::HandleSDTo(uint tsid, const ServiceDescriptionTable *sdt)
             if (!authority.IsValid())
                 continue;
             LOG(VB_CHANSCAN, LOG_INFO, LOC +
-                QString("Found default authority in SDTo for service %1 %2 %3")
+                QString("Found default authority '%1' in SDTo for service %2 %3 %4")
+                    .arg(authority.DefaultAuthority())
                     .arg(netid).arg(tsid).arg(serviceId));
             m_defAuthorities[((uint64_t)netid << 32) | (tsid << 16) | serviceId] =
                 authority.DefaultAuthority();
@@ -805,6 +817,9 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
     QMutexLocker locker(&m_mutex);
 
     if (m_current == m_scanTransports.end())
+        return true;
+
+    if (wait_until_complete && !m_waitingForTables)
         return true;
 
     if (wait_until_complete && m_currentTestingDecryption)
@@ -1213,7 +1228,8 @@ static void update_info(ChannelInsertInfo &info,
         if (authority.IsValid())
         {
             LOG(VB_CHANSCAN, LOG_INFO,
-                QString("ChannelScanSM: Found default authority in SDT for service %1 %2 %3")
+                QString("ChannelScanSM: Found default authority '%1' in SDT for service %2 %3 %4")
+                    .arg(authority.DefaultAuthority())
                     .arg(info.m_orig_netid).arg(info.m_sdt_tsid).arg(info.m_service_id));
             info.m_default_authority = authority.DefaultAuthority();
             return;
