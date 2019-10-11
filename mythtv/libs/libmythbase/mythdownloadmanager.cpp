@@ -459,7 +459,8 @@ bool MythDownloadManager::download(const QString &url, QByteArray *data,
                                    const bool reload, QString *finalUrl)
 {
     QString redirected;
-    if (!processItem(url, nullptr, QString(), data, kRequestGet, reload, NULL, NULL, NULL, &redirected))
+    if (!processItem(url, nullptr, QString(), data, kRequestGet, reload,
+                     nullptr, nullptr, nullptr, &redirected))
         return false;
     if (!redirected.isEmpty() && finalUrl != nullptr)
         *finalUrl = redirected;
