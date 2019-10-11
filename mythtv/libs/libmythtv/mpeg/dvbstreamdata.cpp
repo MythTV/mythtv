@@ -673,6 +673,9 @@ bool DVBStreamData::HasCachedAllBATs(bool current) const
 {
     QMutexLocker locker(&_cache_lock);
 
+    if (_cached_bats.empty())
+        return false;
+
     bat_cache_t::const_iterator it = _cached_bats.begin();
     for (; it != _cached_bats.end(); ++it)
     {

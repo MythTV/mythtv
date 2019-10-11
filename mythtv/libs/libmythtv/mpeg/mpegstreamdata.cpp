@@ -1306,6 +1306,9 @@ bool MPEGStreamData::HasCachedAllPMTs(void) const
 {
     QMutexLocker locker(&_cache_lock);
 
+    if (_cached_pats.empty())
+        return false;
+
     pat_cache_t::const_iterator it = _cached_pats.begin();
     for (; it != _cached_pats.end(); ++it)
     {
