@@ -3,6 +3,8 @@
 #ifndef _DVB_DESCRIPTORS_H_
 #define _DVB_DESCRIPTORS_H_
 
+#include <cassert>
+
 #include <QMutex>
 #include <QString>
 
@@ -2132,16 +2134,16 @@ class FreesatLCNDescriptor : public MPEGDescriptor
     FreesatLCNDescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, PrivateDescriptorID::freesat_lcn_table)
     {
+        assert(PrivateDescriptorID::freesat_lcn_table== DescriptorTag());
+
         const unsigned char *payload = &data[2];
 
-        if (len > 5)
+        uint offset = 0;
+        while ((offset + 5 < DescriptorLength()) &&
+               (offset + 5 + payload[offset+4] <= DescriptorLength()))
         {
-            uint offset = 0;
-            while (payload[offset + 4] + offset <= (uint)len)
-            {
-                entries.push_back(&payload[offset]);
-                offset += payload[offset+4] + 5;
-            }
+            entries.push_back(&payload[offset]);
+            offset += 5 + payload[offset+4];
         }
     }
     //       Name                 bits  loc  expected value
@@ -2197,16 +2199,16 @@ class FreesatRegionDescriptor : public MPEGDescriptor
     FreesatRegionDescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, PrivateDescriptorID::freesat_region_table)
     {
+        assert(PrivateDescriptorID::freesat_region_table == DescriptorTag());
+
         const unsigned char *payload = &data[2];
 
-        if (len > 6)
+        uint offset = 0;
+        while ((offset + 6 < DescriptorLength()) &&
+               (offset + 6 + payload[offset+5] <= DescriptorLength()))
         {
-            uint offset = 0;
-            while (payload[offset + 5] + offset <= (uint)len)
-            {
-                entries.push_back(&payload[offset]);
-                offset += payload[offset+5] + 6;
-            }
+            entries.push_back(&payload[offset]);
+            offset += 6 + payload[offset+5];
         }
     }
     //       Name                 bits  loc  expected value
@@ -2252,6 +2254,7 @@ class FreesatCallsignDescriptor : public MPEGDescriptor
     FreesatCallsignDescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, PrivateDescriptorID::freesat_callsign)
     {
+        assert(PrivateDescriptorID::freesat_callsign == DescriptorTag());
     }
 
     //       Name             bits  loc  expected value
