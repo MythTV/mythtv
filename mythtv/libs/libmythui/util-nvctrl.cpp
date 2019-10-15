@@ -281,8 +281,8 @@ bool MythNVControl::GetNvidiaRates(MythXDisplay *MythDisplay, std::vector<Displa
     do
     {
         erased = false;
-        std::vector<DisplayResScreen>::const_iterator it = VideoModes.cbegin();
-        for ( ; it != VideoModes.cend(); ++it)
+        std::vector<DisplayResScreen>::iterator it = VideoModes.begin();
+        for ( ; it != VideoModes.end(); ++it)
         {
             QPair<int,int> resolution((*it).Width(), (*it).Height());
             if (!resolutions.contains(resolution))
