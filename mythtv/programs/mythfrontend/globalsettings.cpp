@@ -2468,15 +2468,29 @@ void VideoModeSettings::updateButton(MythUIButtonListItem *item)
     item->setDrawArrow(getValue() == "1");
 }
 
+static HostSpinBoxSetting* VideoModeChangePause(void)
+{
+    HostSpinBoxSetting *pause = new HostSpinBoxSetting("VideoModeChangePauseMS", 0, 5000, 100);
+    pause->setLabel(VideoModeSettings::tr("Pause while switching video modes (ms)"));
+    pause->setHelpText(VideoModeSettings::tr(
+        "For most displays, switching video modes takes time and media content can be missed. "
+        "If non-zero, this setting will delay all content while the video mode is changed. "
+        "The pause length (in ms) will be dependant on the display's characteristics."));
+    pause->setValue(0);
+    return pause;
+}
+
 VideoModeSettings::VideoModeSettings(const char *c) : HostCheckBoxSetting(c)
 {
     HostComboBoxSetting *res = TVVidModeResolution();
     HostRefreshRateComboBoxSetting *rate = TVVidModeRefreshRate();
+    HostSpinBoxSetting *pause = VideoModeChangePause();
 
     addChild(GuiVidModeResolution());
     addChild(res);
     addChild(rate);
     addChild(TVVidModeForceAspect());
+    addChild(pause);
     connect(res, SIGNAL(valueChanged(StandardSetting *)),
             rate, SLOT(ChangeResolution(StandardSetting *)));
 

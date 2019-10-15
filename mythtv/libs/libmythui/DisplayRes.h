@@ -148,6 +148,7 @@ class MUI_PUBLIC DisplayRes
 
   private:
     DisplayRes(const DisplayRes & rhs); // disable copy constructor;
+    void PauseForModeSwitch(void);
 
     tmode m_curMode;           // current mode
     DisplayResScreen m_mode[MAX_MODES];

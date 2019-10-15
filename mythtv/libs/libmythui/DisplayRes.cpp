@@ -1,8 +1,9 @@
-
+// MythTV
 #include "DisplayRes.h"
 #include "config.h"
 #include "mythlogging.h"
 #include "mythdb.h"
+#include "mythcorecontext.h"
 
 #ifdef USING_XRANDR
 #include "DisplayResX.h"
@@ -11,6 +12,12 @@
 #include "DisplayResOSX.h"
 #endif
 
+// Qt
+#include <QThread>
+#include <QApplication>
+#include <QElapsedTimer>
+
+#define LOC QString("DispRes: ")
 
 DisplayRes * DisplayRes::s_instance = nullptr;
 bool         DisplayRes::s_locked   = false;
@@ -60,7 +67,7 @@ bool DisplayRes::Initialize(void)
     GetDisplayInfo(tW, tH, tW_mm, tH_mm, tRate, m_pixelAspectRatio);
     m_mode[DESKTOP].Init();
     m_mode[DESKTOP] = DisplayResScreen(tW, tH, tW_mm, tH_mm, -1.0, tRate);
-    LOG(VB_GENERAL, LOG_NOTICE, QString("Desktop video mode: %1x%2 %3 Hz")
+    LOG(VB_GENERAL, LOG_NOTICE, LOC + QString("Desktop video mode: %1x%2 %3 Hz")
         .arg(tW).arg(tH).arg(tRate, 0, 'f', 3));
 
     // Initialize GUI mode
@@ -70,9 +77,9 @@ bool DisplayRes::Initialize(void)
     GetMythDB()->GetResolutionSetting("DisplaySize", tW_mm, tH_mm);
     m_mode[GUI] = DisplayResScreen(tW, tH, tW_mm, tH_mm, -1.0, tRate);
 
-    if (m_mode[DESKTOP] == m_mode[GUI] && tRate == 0)
+    if (m_mode[DESKTOP] == m_mode[GUI] && qFuzzyIsNull(tRate))
     {
-            // same resolution as current desktop
+        // same resolution as current desktop
         m_last = m_mode[DESKTOP];
     }
 
@@ -94,7 +101,7 @@ bool DisplayRes::Initialize(void)
         GetMythDB()->GetResolutionSetting("VidMode", iw, ih, iaspect, irate, i);
         GetMythDB()->GetResolutionSetting("TVVidMode", ow, oh, oaspect, orate, i);
 
-        if (!(iw || ih || irate))
+        if (!(iw || ih || !qFuzzyIsNull(irate)))
             break;
 
         if (!(ih && ow && oh))
@@ -116,8 +123,7 @@ bool DisplayRes::Initialize(void)
         m_maxHeight = std::max(m_maxHeight, screens[i].Height());
     }
 
-    LOG(VB_PLAYBACK, LOG_INFO, QString("max_width: %1 max_height: %2")
-
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Max width: %1 Max height: %2")
         .arg(m_maxWidth).arg(m_maxHeight));
 
     return true;
@@ -136,15 +142,14 @@ bool DisplayRes::SwitchToVideo(int iwidth, int iheight, double frate)
     if (key != 0)
     {
         m_mode[next_mode = CUSTOM_VIDEO] = next = m_inSizeToOutputMode[key];
-        LOG(VB_PLAYBACK, LOG_INFO, QString("Found custom screen override %1x%2")
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Found custom screen override %1x%2")
             .arg(next.Width()).arg(next.Height()));
     }
 
     // If requested refresh rate is 0, attempt to match video fps
-    if ((int) next.RefreshRate() == 0)
+    if (qFuzzyIsNull(next.RefreshRate()))
     {
-        LOG(VB_PLAYBACK, LOG_INFO,
-            QString("Trying to match best refresh rate %1Hz")
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Trying to match best refresh rate %1Hz")
             .arg(frate, 0, 'f', 3));
         next.SetRefreshRate(frate);
     }
@@ -156,17 +161,16 @@ bool DisplayRes::SwitchToVideo(int iwidth, int iheight, double frate)
                !(DisplayResScreen::compare_rates(m_last.RefreshRate(),
                                                  target_rate));
 
-    LOG(VB_GENERAL, LOG_INFO, QString("%1 %2x%3 %4 Hz")
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("%1 %2x%3 %4 Hz")
         .arg(chg ? "Changing to" : "Using")
         .arg(next.Width()).arg(next.Height())
         .arg(target_rate, 0, 'f', 3));
 
     if (chg && !SwitchToVideoMode(next.Width(), next.Height(), target_rate))
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("SwitchToVideo: Video size %1 x %2: "
-                                         "xrandr failed for %3 x %4")
-            .arg(iwidth).arg(iheight)
-            .arg(next.Width()).arg(next.Height()));
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("SwitchToVideo: Video size %1 x %2: "
+                                               "xrandr failed for %3 x %4")
+            .arg(iwidth).arg(iheight).arg(next.Width()).arg(next.Height()));
         return false;
     }
 
@@ -175,12 +179,15 @@ bool DisplayRes::SwitchToVideo(int iwidth, int iheight, double frate)
     m_last = next;
     m_last.SetRefreshRate(target_rate);
 
-    LOG(VB_PLAYBACK, LOG_INFO,
-        QString("SwitchToVideo: Video size %1 x %2: \n"
-                "    %7 displaying resolution %3 x %4, %5mm x %6mm")
-        .arg(iwidth).arg(iheight).arg(GetWidth()).arg(GetHeight())
-        .arg(GetPhysicalWidth()).arg(GetPhysicalHeight())
-        .arg((chg) ? "Switched to" : "Already"));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("SwitchToVideo: Video size %1x%2")
+        .arg(iwidth).arg(iheight));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("%1 displaying resolution %2x%3, %4mmx%5mm")
+        .arg((chg) ? "Switched to" : "Already")
+        .arg(GetWidth()).arg(GetHeight())
+        .arg(GetPhysicalWidth()).arg(GetPhysicalHeight()));
+
+    if (chg)
+        PauseForModeSwitch();
 
     return chg;
 }
@@ -192,24 +199,22 @@ bool DisplayRes::SwitchToGUI(tmode next_mode)
 
     // need to change video mode?
     // If GuiVidModeRefreshRate is 0, assume any refresh rate is good enough.
-    if (next.RefreshRate() == 0)
-    {
+    if (qFuzzyIsNull(next.RefreshRate()))
         next.SetRefreshRate(m_last.RefreshRate());
-    }
 
     DisplayResScreen::FindBestMatch(GetVideoModes(), next, target_rate);
     bool chg = !(next == m_last) ||
                !(DisplayResScreen::compare_rates(m_last.RefreshRate(),
                                                  target_rate));
 
-    LOG(VB_GENERAL, LOG_INFO, QString("%1 %2x%3 %4 Hz")
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("%1 %2x%3 %4 Hz")
         .arg(chg ? "Changing to" : "Using")
         .arg(next.Width()).arg(next.Height())
         .arg(target_rate, 0, 'f', 3));
 
     if (chg && !SwitchToVideoMode(next.Width(), next.Height(), target_rate))
     {
-        LOG(VB_GENERAL, LOG_ERR,
+        LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("SwitchToGUI: xrandr failed for %1x%2 %3  Hz")
             .arg(next.Width()).arg(next.Height())
             .arg(next.RefreshRate(), 0, 'f', 3));
@@ -221,8 +226,11 @@ bool DisplayRes::SwitchToGUI(tmode next_mode)
     m_last = next;
     m_last.SetRefreshRate(target_rate);
 
-    LOG(VB_GENERAL, LOG_INFO, QString("SwitchToGUI: Switched to %1x%2 %3 Hz")
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("SwitchToGUI: Switched to %1x%2 %3 Hz")
         .arg(GetWidth()).arg(GetHeight()).arg(GetRefreshRate(), 0, 'f', 3));
+
+    if (chg && (m_curMode != DESKTOP))
+        PauseForModeSwitch();
 
     return chg;
 }
@@ -231,7 +239,7 @@ bool DisplayRes::SwitchToCustomGUI(int width, int height, short rate)
 {
     m_mode[CUSTOM_GUI] = DisplayResScreen(width, height, m_mode[GUI].Width_mm(),
                                           m_mode[GUI].Height_mm(), -1.0,
-                                          (double)rate);
+                                          static_cast<double>(rate));
     return SwitchToGUI(CUSTOM_GUI);
 }
 
@@ -248,7 +256,7 @@ std::vector<double> DisplayRes::GetRefreshRates(int width,
     if (t < 0)
         return empty;
 
-    return drv[t].RefreshRates();
+    return drv[static_cast<size_t>(t)].RefreshRates();
 }
 
 /** \fn GetVideoModes(void)
@@ -269,4 +277,21 @@ DisplayResVector GetVideoModes(void)
     DisplayResVector empty;
 
     return empty;
+}
+
+void DisplayRes::PauseForModeSwitch(void)
+{
+    int pauselengthinms = gCoreContext->GetNumSetting("VideoModeChangePauseMS", 0);
+    if (pauselengthinms)
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("Pausing %1ms for video mode switch").arg(pauselengthinms));
+        QElapsedTimer timer;
+        timer.start();
+        while (!timer.hasExpired(pauselengthinms))
+        {
+            QThread::msleep(100);
+            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+        }
+    }
 }
