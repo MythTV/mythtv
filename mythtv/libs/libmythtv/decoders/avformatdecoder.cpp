@@ -1095,9 +1095,9 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         }
         m_avfRingBuffer->SetInInit(false);
 
-        // final sanity check that scanned streams are valid
+        // final sanity check that scanned streams are valid for live tv
         scancomplete = true;
-        for (uint i = 0; i < m_ic->nb_streams; i++)
+        for (uint i = 0; m_livetv && (i < m_ic->nb_streams); i++)
         {
             if (!StreamHasRequiredParameters(m_ic->streams[i]))
             {
