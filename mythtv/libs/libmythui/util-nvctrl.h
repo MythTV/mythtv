@@ -1,14 +1,29 @@
-#ifndef __UTIL_NVIDIA_H__
-#define __UTIL_NVIDIA_H__
+#ifndef UTIL_NVIDIA_H_
+#define UTIL_NVIDIA_H_
 
-#include <cstdlib>
-#include <map>
+// Qt
+#include <QString>
+
+#ifdef USING_XRANDR
+// MythTV
+#include "DisplayResScreen.h"
+class MythXDisplay;
+
+// Std
 #include <vector>
 using namespace std;
+#endif
 
-typedef map<unsigned int, double> t_screenrate;
+class MythNVControl
+{
+  public:
+    static int  CheckNVOpenGLSyncToVBlank(void);
 
-int GetNvidiaRates(t_screenrate& screenmap);
-int CheckNVOpenGLSyncToVBlank(void);
+#ifdef USING_XRANDR
+    static bool GetNvidiaRates(MythXDisplay *MythDisplay, vector<DisplayResScreen> &VideoModes);
 
+  protected:
+    static int  FindMetamode(const QStringList &Metamodes, const QString &Modename);
+#endif
+};
 #endif

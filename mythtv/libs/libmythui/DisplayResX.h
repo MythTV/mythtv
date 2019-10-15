@@ -17,6 +17,7 @@ class DisplayResX : public DisplayRes
     bool SwitchToVideoMode(int width, int height, double desired_rate) override; // DisplayRes
 
   private:
+    void DebugModes(const QString& Message) const;
     mutable std::vector<DisplayResScreen> m_videoModes;
     mutable std::vector<DisplayResScreen> m_videoModesUnsorted;
 };

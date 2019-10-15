@@ -113,18 +113,13 @@ const DisplayResVector& DisplayResX::GetVideoModes(void) const
         return m_videoModes;
 
     MythXDisplay *display = nullptr;
-
     XRRScreenConfiguration *cfg = GetScreenConfig(display);
-
     if (!cfg)
         return m_videoModes;
 
     int num_sizes, num_rates;
 
-    XRRScreenSize *sizes = nullptr;
-
-    sizes = XRRConfigSizes(cfg, &num_sizes);
-
+    XRRScreenSize *sizes = XRRConfigSizes(cfg, &num_sizes);
     for (int i = 0; i < num_sizes; ++i)
     {
         short *rates = nullptr;
@@ -132,69 +127,43 @@ const DisplayResVector& DisplayResX::GetVideoModes(void) const
                          i, &num_rates);
         DisplayResScreen scr(sizes[i].width, sizes[i].height,
                              sizes[i].mwidth, sizes[i].mheight,
-                             rates, num_rates);
+                             rates, static_cast<uint>(num_rates));
         m_videoModes.push_back(scr);
     }
+    XRRFreeScreenConfigInfo(cfg);
 
-#if CONFIG_XNVCTRL
-    t_screenrate screenmap;
+    DebugModes("Raw/unsorted XRANDR modes");
 
-    int nvidiarate = GetNvidiaRates(screenmap);
-
-    if (nvidiarate > 0)
-    {
-        // Update existing DisplayResScreen vector, and update it with
-        // new frequencies
-        for (size_t i = 0; i < m_videoModes.size(); i++)
-        {
-            DisplayResScreen scr = m_videoModes[i];
-            int w = scr.Width();
-            int h = scr.Height();
-            int mw = scr.Width_mm();
-            int mh = scr.Height_mm();
-            std::vector<double> newrates;
-            std::map<double, short> realRates;
-            const std::vector<double>& rates = scr.RefreshRates();
-            bool found = false;
-
-            for (std::vector<double>::const_iterator it = rates.begin();
-                    it !=  rates.end(); ++it)
-            {
-                uint64_t key = DisplayResScreen::CalcKey(w, h, *it);
-
-                if (screenmap.find(key) != screenmap.end())
-                {
-                    // Rate is defined in NV-CONTROL extension, use it
-                    newrates.push_back(screenmap[key]);
-                    realRates[screenmap[key]] = (int) round(*it);
-                    found = true;
-#if 1
-                    LOG(VB_PLAYBACK, LOG_DEBUG,
-                        QString("CustomRate Found, set %1x%2@%3 as %4Hz")
-                        .arg(w) .arg(h) .arg(*it) .arg(screenmap[key]));
-#endif
-                }
-            }
-
-            if (found)
-            {
-                m_videoModes.erase(m_videoModes.begin() + i);
-                std::sort(newrates.begin(), newrates.end());
-                m_videoModes.insert(m_videoModes.begin() + i,
-                                    DisplayResScreen(w, h, mw, mh, newrates,
-                                                     realRates));
-            }
-        }
-    }
+#if defined (CONFIG_XNVCTRL) && defined (USING_XRANDR)
+    if (MythNVControl::GetNvidiaRates(display, m_videoModes))
+        DebugModes("Updated/sorted XRANDR modes (interlaced modes may be removed)");
 #endif
 
     m_videoModesUnsorted = m_videoModes;
-
     std::sort(m_videoModes.begin(), m_videoModes.end());
-    XRRFreeScreenConfigInfo(cfg);
     delete display;
 
     return m_videoModes;
+}
+
+void DisplayResX::DebugModes(const QString &Message) const
+{
+    // This is intentionally formatted to match the output of xrandr for comparison
+    if (VERBOSE_LEVEL_CHECK(VB_PLAYBACK, LOG_INFO))
+    {
+        LOG(VB_PLAYBACK, LOG_INFO, Message + ":");
+        std::vector<DisplayResScreen>::const_iterator it = m_videoModes.cbegin();
+        for ( ; it != m_videoModes.cend(); ++it)
+        {
+            const std::vector<double>& rates = (*it).RefreshRates();
+            QStringList rateslist;
+            std::vector<double>::const_reverse_iterator it2 = rates.crbegin();
+            for ( ; it2 != rates.crend(); ++it2)
+                rateslist.append(QString("%1").arg(*it2, 2, 'f', 2, '0'));
+            LOG(VB_PLAYBACK, LOG_INFO, QString("%1x%2\t%3")
+                .arg((*it).Width()).arg((*it).Height()).arg(rateslist.join("\t")));
+        }
+    }
 }
 
 static XRRScreenConfiguration *GetScreenConfig(MythXDisplay*& display)
