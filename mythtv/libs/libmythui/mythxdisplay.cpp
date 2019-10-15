@@ -87,10 +87,10 @@ bool MythXDisplay::Open(void)
 {
     MythXLocker locker(this);
 
-    QString dispStr = MythUIHelper::GetX11Display();
+    m_displayName = MythUIHelper::GetX11Display();
     const char *dispCStr = nullptr;
-    if (!dispStr.isEmpty())
-        dispCStr = dispStr.toLatin1().constData();
+    if (!m_displayName.isEmpty())
+        dispCStr = m_displayName.toLatin1().constData();
 
     m_disp = XOpenDisplay(dispCStr);
     if (!m_disp)

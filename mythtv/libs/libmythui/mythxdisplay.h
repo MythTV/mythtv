@@ -3,6 +3,7 @@
 #ifndef _MYTHXDISPLAY_X_
 #define _MYTHXDISPLAY_X_
 
+#include <QString>
 #include <QMutex>
 
 #ifdef USING_X11
@@ -19,6 +20,7 @@ class MUI_PUBLIC MythXDisplay
     MythXDisplay() = default;
     ~MythXDisplay();
     Display *GetDisplay(void)          { return m_disp;       }
+    QString  GetDisplayName(void) const{ return m_displayName;}
     int      GetScreen(void) const     { return m_screen_num; }
     void     Lock(void)                { m_lock.lock();       }
     void     Unlock(void)              { m_lock.unlock();     }
@@ -50,6 +52,7 @@ class MUI_PUBLIC MythXDisplay
     GC            m_gc         {nullptr};
     Window        m_root       {0};
     QMutex        m_lock       {QMutex::Recursive};
+    QString       m_displayName{};
 };
 
 class MythXLocker
