@@ -31,8 +31,7 @@
 #define XTHREADS
 #endif /* XTHREADS */
 
-#define NEED_EVENTS
-#define NEED_REPLIES
+#include <stdint.h>
 #include <stdlib.h>
 #include <X11/Xlibint.h>
 #include <X11/Xutil.h>
@@ -41,9 +40,12 @@
 #include "NVCtrlLib.h"
 #include "nv_control.h"
 
-#define NVCTRL_EXT_NEED_CHECK          (XPointer)(~0)
-#define NVCTRL_EXT_NEED_NOTHING        (XPointer)(0)
-#define NVCTRL_EXT_NEED_TARGET_SWAP    (XPointer)(1)
+#define NVCTRL_EXT_EXISTS              1
+#define NVCTRL_EXT_NEED_TARGET_SWAP    2
+#define NVCTRL_EXT_64_BIT_ATTRIBUTES   4
+/* SetAttributeAndGetStatus supports target type other than X_SCREEN */
+#define NVCTRL_EXT_HAS_TARGET_SET_GET  8
+#define NVCTRL_EXT_NEED_CHECK          (~(uintptr_t)0)
 
 static XExtensionInfo _nvctrl_ext_info_data;
 static XExtensionInfo *nvctrl_ext_info = &_nvctrl_ext_info_data;
@@ -54,8 +56,12 @@ static /* const */ char *nvctrl_extension_name = NV_CONTROL_NAME;
 #define XNVCTRLSimpleCheckExtension(dpy,i) \
   XextSimpleCheckExtension (dpy, i, nvctrl_extension_name)
 
-static int close_display();
-static Bool wire_to_event();
+static uintptr_t version_flags(Display *dpy, XExtDisplayInfo *info);
+static Bool wire_to_event(Display *dpy, XEvent *host, xEvent *wire);
+
+// This is needed to define nvctrl_extension_hooks
+static XEXT_GENERATE_CLOSE_DISPLAY (close_display, nvctrl_ext_info)
+
 static /* const */ XExtensionHooks nvctrl_extension_hooks = {
     NULL,                               /* create_gc */
     NULL,                               /* copy_gc */
@@ -71,40 +77,24 @@ static /* const */ XExtensionHooks nvctrl_extension_hooks = {
 };
 
 static XEXT_GENERATE_FIND_DISPLAY (find_display, nvctrl_ext_info,
-                                   nvctrl_extension_name, 
+                                   nvctrl_extension_name,
                                    &nvctrl_extension_hooks,
-                                   NV_CONTROL_EVENTS, NVCTRL_EXT_NEED_CHECK)
-
-static XEXT_GENERATE_CLOSE_DISPLAY (close_display, nvctrl_ext_info)
+                                   NV_CONTROL_EVENTS,
+                                   (XPointer)NVCTRL_EXT_NEED_CHECK)
 
 /*
  * NV-CONTROL versions 1.8 and 1.9 pack the target_type and target_id
  * fields in reversed order.  In order to talk to one of these servers,
  * we need to swap these fields.
  */
+
 static void XNVCTRLCheckTargetData(Display *dpy, XExtDisplayInfo *info,
                                    int *target_type, int *target_id)
 {
-    /* Find out what the server's NV-CONTROL version is and
-     * setup for swapping if we need to.
-     */
-    if (info->data == NVCTRL_EXT_NEED_CHECK) {
-        int major, minor;
-
-        if (XNVCTRLQueryVersion(dpy, &major, &minor)) {
-            if (major == 1 &&
-                (minor == 8 || minor == 9)) {
-                info->data = NVCTRL_EXT_NEED_TARGET_SWAP;
-            } else {
-                info->data = NVCTRL_EXT_NEED_NOTHING;
-            }
-        } else {
-            info->data = NVCTRL_EXT_NEED_NOTHING;
-        }
-    }
+    uintptr_t flags = version_flags(dpy, info);
 
     /* We need to swap the target_type and target_id */
-    if (info->data == NVCTRL_EXT_NEED_TARGET_SWAP) {
+    if (flags & NVCTRL_EXT_NEED_TARGET_SWAP) {
         int tmp;
         tmp = *target_type;
         *target_type = *target_id;
@@ -129,6 +119,37 @@ Bool XNVCTRLQueryExtension (
     }
 }
 
+/*
+ * Retrieve any cached flags that depend on the version of the NV-CONTROL
+ * extension.
+ */
+
+static uintptr_t version_flags(Display *dpy, XExtDisplayInfo *info)
+{
+    uintptr_t data = (uintptr_t)info->data;
+
+    /* If necessary, determine the NV-CONTROL version */
+    if (data & NVCTRL_EXT_NEED_CHECK) {
+        int major, minor;
+        data = 0;
+        if (XNVCTRLQueryVersion(dpy, &major, &minor)) {
+            data |= NVCTRL_EXT_EXISTS;
+            if (major == 1 && (minor == 8 || minor == 9)) {
+                data |= NVCTRL_EXT_NEED_TARGET_SWAP;
+            }
+            if ((major > 1) || ((major == 1) && (minor > 18))) {
+                data |= NVCTRL_EXT_HAS_TARGET_SET_GET;
+            }
+            if ((major > 1) || ((major == 1) && (minor > 20))) {
+                data |= NVCTRL_EXT_64_BIT_ATTRIBUTES;
+            }
+        }
+
+        info->data = (XPointer)data;
+    }
+
+    return data;
+}
 
 Bool XNVCTRLQueryVersion (
     Display *dpy,
@@ -262,9 +283,10 @@ void XNVCTRLSetAttribute (
 }
 
 
-Bool XNVCTRLSetAttributeAndGetStatus (
+Bool XNVCTRLSetTargetAttributeAndGetStatus (
     Display *dpy,
-    int screen,
+    int target_type,
+    int target_id,
     unsigned int display_mask,
     unsigned int attribute,
     int value
@@ -273,8 +295,18 @@ Bool XNVCTRLSetAttributeAndGetStatus (
     xnvCtrlSetAttributeAndGetStatusReq *req;
     xnvCtrlSetAttributeAndGetStatusReply rep;
     Bool success;
+    uintptr_t flags;
 
     if(!XextHasExtension(info))
+        return False;
+
+    flags = version_flags(dpy, info);
+
+    if (!(flags & NVCTRL_EXT_EXISTS))
+        return False;
+
+    if (!(flags & NVCTRL_EXT_HAS_TARGET_SET_GET) &&
+        target_type != NV_CTRL_TARGET_TYPE_X_SCREEN)
         return False;
 
     XNVCTRLCheckExtension (dpy, info, False);
@@ -283,7 +315,8 @@ Bool XNVCTRLSetAttributeAndGetStatus (
     GetReq (nvCtrlSetAttributeAndGetStatus, req);
     req->reqType = info->codes->major_opcode;
     req->nvReqType = X_nvCtrlSetAttributeAndGetStatus;
-    req->screen = screen;
+    req->target_type = target_type;
+    req->target_id = target_id;
     req->display_mask = display_mask;
     req->attribute = attribute;
     req->value = value;
@@ -299,6 +332,18 @@ Bool XNVCTRLSetAttributeAndGetStatus (
     return success;
 }
 
+Bool XNVCTRLSetAttributeAndGetStatus (
+    Display *dpy,
+    int screen,
+    unsigned int display_mask,
+    unsigned int attribute,
+    int value
+){
+    return XNVCTRLSetTargetAttributeAndGetStatus(dpy,
+                                                 NV_CTRL_TARGET_TYPE_X_SCREEN,
+                                                 screen, display_mask,
+                                                 attribute, value);
+}
 
 
 Bool XNVCTRLQueryTargetAttribute (
@@ -333,8 +378,8 @@ Bool XNVCTRLQueryTargetAttribute (
         SyncHandle ();
         return False;
     }
-    if (value) *value = rep.value;
     exists = rep.flags;
+    if (exists && value) *value = rep.value;
     UnlockDisplay (dpy);
     SyncHandle ();
     return exists;
@@ -349,6 +394,46 @@ Bool XNVCTRLQueryAttribute (
 ){
     return XNVCTRLQueryTargetAttribute(dpy, NV_CTRL_TARGET_TYPE_X_SCREEN,
                                        screen, display_mask, attribute, value);
+}
+
+
+Bool XNVCTRLQueryTargetAttribute64 (
+    Display *dpy,
+    int target_type,
+    int target_id,
+    unsigned int display_mask,
+    unsigned int attribute,
+    int64_t *value
+){
+    XExtDisplayInfo *info = find_display(dpy);
+    xnvCtrlQueryAttribute64Reply rep;
+    xnvCtrlQueryAttributeReq *req;
+    Bool exists;
+
+    if (!XextHasExtension(info))
+        return False;
+
+    XNVCTRLCheckExtension(dpy, info, False);
+    XNVCTRLCheckTargetData(dpy, info, &target_type, &target_id);
+
+    LockDisplay(dpy);
+    GetReq(nvCtrlQueryAttribute, req);
+    req->reqType = info->codes->major_opcode;
+    req->nvReqType = X_nvCtrlQueryAttribute64;
+    req->target_type = target_type;
+    req->target_id = target_id;
+    req->display_mask = display_mask;
+    req->attribute = attribute;
+    if (!_XReply(dpy, (xReply *)&rep, 0, xTrue)) {
+        UnlockDisplay(dpy);
+        SyncHandle();
+        return False;
+    }
+    exists = rep.flags;
+    if (exists && value) *value = rep.value_64;
+    UnlockDisplay(dpy);
+    SyncHandle();
+    return exists;
 }
 
 
@@ -390,8 +475,11 @@ Bool XNVCTRLQueryTargetStringAttribute (
     length = rep.length;
     numbytes = rep.n;
     slop = numbytes & 3;
-    *ptr = (char *) Xmalloc(numbytes);
-    if (! *ptr) {
+    exists = rep.flags;
+    if (exists) {
+        *ptr = (char *) Xmalloc(numbytes);
+    }
+    if (!exists || !*ptr) {
         _XEatData(dpy, length);
         UnlockDisplay (dpy);
         SyncHandle ();
@@ -400,7 +488,6 @@ Bool XNVCTRLQueryTargetStringAttribute (
         _XRead(dpy, (char *) *ptr, numbytes);
         if (slop) _XEatData(dpy, 4-slop);
     }
-    exists = rep.flags;
     UnlockDisplay (dpy);
     SyncHandle ();
     return exists;
@@ -419,19 +506,20 @@ Bool XNVCTRLQueryStringAttribute (
 }
 
 
-Bool XNVCTRLSetStringAttribute (
+Bool XNVCTRLSetTargetStringAttribute (
     Display *dpy,
-    int screen,
+    int target_type,
+    int target_id,
     unsigned int display_mask,
     unsigned int attribute,
-    char *ptr
+    const char *ptr
 ){
     XExtDisplayInfo *info = find_display (dpy);
     xnvCtrlSetStringAttributeReq *req;
     xnvCtrlSetStringAttributeReply rep;
     int size;
     Bool success;
-    
+
     if(!XextHasExtension(info))
         return False;
 
@@ -443,13 +531,14 @@ Bool XNVCTRLSetStringAttribute (
     GetReq (nvCtrlSetStringAttribute, req);
     req->reqType = info->codes->major_opcode;
     req->nvReqType = X_nvCtrlSetStringAttribute;
-    req->screen = screen;
+    req->target_type = target_type;
+    req->target_id = target_id;
     req->display_mask = display_mask;
     req->attribute = attribute;
     req->length += ((size + 3) & ~3) >> 2;
     req->num_bytes = size;
     Data(dpy, ptr, size);
-    
+
     if (!_XReply (dpy, (xReply *) &rep, 0, False)) {
         UnlockDisplay (dpy);
         SyncHandle ();
@@ -457,32 +546,36 @@ Bool XNVCTRLSetStringAttribute (
     }
     UnlockDisplay (dpy);
     SyncHandle ();
-    
+
     success = rep.flags;
     return success;
 }
 
-
-Bool XNVCTRLQueryValidTargetAttributeValues (
+Bool XNVCTRLSetStringAttribute (
     Display *dpy,
+    int screen,
+    unsigned int display_mask,
+    unsigned int attribute,
+    const char *ptr
+){
+    return XNVCTRLSetTargetStringAttribute(dpy, NV_CTRL_TARGET_TYPE_X_SCREEN,
+                                           screen, display_mask,
+                                           attribute, ptr);
+}
+
+
+static Bool XNVCTRLQueryValidTargetAttributeValues32 (
+    Display *dpy,
+    XExtDisplayInfo *info,
     int target_type,
     int target_id,
     unsigned int display_mask,
     unsigned int attribute,                                 
     NVCTRLAttributeValidValuesRec *values
 ){
-    XExtDisplayInfo *info = find_display (dpy);
     xnvCtrlQueryValidAttributeValuesReply rep;
     xnvCtrlQueryValidAttributeValuesReq   *req;
     Bool exists;
-    
-    if (!values) return False;
-
-    if(!XextHasExtension(info))
-        return False;
-
-    XNVCTRLCheckExtension (dpy, info, False);
-    XNVCTRLCheckTargetData(dpy, info, &target_type, &target_id);
 
     LockDisplay (dpy);
     GetReq (nvCtrlQueryValidAttributeValues, req);
@@ -498,31 +591,252 @@ Bool XNVCTRLQueryValidTargetAttributeValues (
         return False;
     }
     exists = rep.flags;
-    values->type = rep.attr_type;
-    if (rep.attr_type == ATTRIBUTE_TYPE_RANGE) {
-        values->u.range.min = rep.min;
-        values->u.range.max = rep.max;
+    if (exists) {
+        values->type = rep.attr_type;
+        if (rep.attr_type == ATTRIBUTE_TYPE_RANGE) {
+            values->u.range.min = rep.min;
+            values->u.range.max = rep.max;
+        }
+        if (rep.attr_type == ATTRIBUTE_TYPE_INT_BITS) {
+            values->u.bits.ints = rep.bits;
+        }
+        values->permissions = rep.perms;
     }
-    if (rep.attr_type == ATTRIBUTE_TYPE_INT_BITS) {
-        values->u.bits.ints = rep.bits;
-    }
-    values->permissions = rep.perms;
     UnlockDisplay (dpy);
     SyncHandle ();
     return exists;
 }
 
+
+Bool XNVCTRLQueryValidTargetStringAttributeValues (
+    Display *dpy,
+    int target_type,
+    int target_id,
+    unsigned int display_mask,
+    unsigned int attribute,
+    NVCTRLAttributeValidValuesRec *values
+){
+    XExtDisplayInfo *info = find_display(dpy);
+    Bool exists;
+    xnvCtrlQueryValidAttributeValuesReply rep;
+    xnvCtrlQueryValidAttributeValuesReq   *req;
+
+    if (!values) return False;
+
+    if (!XextHasExtension(info))
+        return False;
+
+    XNVCTRLCheckExtension(dpy, info, False);
+
+    LockDisplay(dpy);
+    GetReq (nvCtrlQueryValidAttributeValues, req);
+    req->reqType = info->codes->major_opcode;
+    req->nvReqType = X_nvCtrlQueryValidStringAttributeValues;
+    req->target_type = target_type;
+    req->target_id = target_id;
+    req->display_mask = display_mask;
+    req->attribute = attribute;
+    if (!_XReply(dpy, (xReply *)&rep, 0, xTrue)) {
+        UnlockDisplay(dpy);
+        SyncHandle();
+        return False;
+    }
+    exists = rep.flags;
+    if (exists) {
+        values->type = rep.attr_type;
+        values->permissions = rep.perms;
+    }
+    UnlockDisplay(dpy);
+    SyncHandle();
+    return exists;
+}
+
+
+static Bool XNVCTRLQueryValidTargetAttributeValues64 (
+    Display *dpy,
+    XExtDisplayInfo *info,
+    int target_type,
+    int target_id,
+    unsigned int display_mask,
+    unsigned int attribute,
+    NVCTRLAttributeValidValuesRec *values
+){
+    xnvCtrlQueryValidAttributeValues64Reply rep;
+    xnvCtrlQueryValidAttributeValuesReq *req;
+    Bool exists;
+
+    LockDisplay(dpy);
+    GetReq(nvCtrlQueryValidAttributeValues, req);
+    req->reqType = info->codes->major_opcode;
+    req->nvReqType = X_nvCtrlQueryValidAttributeValues64;
+    req->target_type = target_type;
+    req->target_id = target_id;
+    req->display_mask = display_mask;
+    req->attribute = attribute;
+    if (!_XReply(dpy, (xReply *)&rep,
+                 sz_xnvCtrlQueryValidAttributeValues64Reply_extra,
+                 xTrue)) {
+        UnlockDisplay(dpy);
+        SyncHandle();
+        return False;
+    }
+    exists = rep.flags;
+    if (exists) {
+        values->type = rep.attr_type;
+        if (rep.attr_type == ATTRIBUTE_TYPE_RANGE) {
+            values->u.range.min = rep.min_64;
+            values->u.range.max = rep.max_64;
+        }
+        if (rep.attr_type == ATTRIBUTE_TYPE_INT_BITS) {
+            values->u.bits.ints = rep.bits_64;
+        }
+        values->permissions = rep.perms;
+    }
+    UnlockDisplay(dpy);
+    SyncHandle();
+    return exists;
+}
+
+Bool XNVCTRLQueryValidTargetAttributeValues (
+    Display *dpy,
+    int target_type,
+    int target_id,
+    unsigned int display_mask,
+    unsigned int attribute,
+    NVCTRLAttributeValidValuesRec *values
+){
+    XExtDisplayInfo *info = find_display(dpy);
+    Bool exists;
+    uintptr_t flags;
+
+    if (!values) return False;
+
+    if (!XextHasExtension(info))
+        return False;
+
+    XNVCTRLCheckExtension(dpy, info, False);
+    XNVCTRLCheckTargetData(dpy, info, &target_type, &target_id);
+
+    flags = version_flags(dpy,info);
+
+    if (!(flags & NVCTRL_EXT_EXISTS))
+        return False;
+
+    if (flags & NVCTRL_EXT_64_BIT_ATTRIBUTES) {
+        exists = XNVCTRLQueryValidTargetAttributeValues64(dpy, info,
+                                                          target_type,
+                                                          target_id,
+                                                          display_mask,
+                                                          attribute,
+                                                          values);
+    } else {
+        exists = XNVCTRLQueryValidTargetAttributeValues32(dpy, info,
+                                                          target_type,
+                                                          target_id,
+                                                          display_mask,
+                                                          attribute,
+                                                          values);
+    }
+    return exists;
+}
+
+
 Bool XNVCTRLQueryValidAttributeValues (
     Display *dpy,
     int screen,
     unsigned int display_mask,
-    unsigned int attribute,                                 
+    unsigned int attribute,
     NVCTRLAttributeValidValuesRec *values
 ){
     return XNVCTRLQueryValidTargetAttributeValues(dpy,
                                                   NV_CTRL_TARGET_TYPE_X_SCREEN,
                                                   screen, display_mask,
                                                   attribute, values);
+}
+
+
+static Bool QueryAttributePermissionsInternal (
+    Display *dpy,
+    unsigned int attribute,
+    NVCTRLAttributePermissionsRec *permissions,
+    unsigned int reqType
+){
+    XExtDisplayInfo *info = find_display (dpy);
+    xnvCtrlQueryAttributePermissionsReply rep;
+    xnvCtrlQueryAttributePermissionsReq *req;
+    Bool exists;
+
+    if(!XextHasExtension(info))
+        return False;
+
+    XNVCTRLCheckExtension (dpy, info, False);
+
+    LockDisplay(dpy);
+    GetReq(nvCtrlQueryAttributePermissions, req);
+    req->reqType = info->codes->major_opcode;
+    req->nvReqType = reqType;
+    req->attribute = attribute;
+    if (!_XReply (dpy, (xReply *) &rep, 0, xTrue)) {
+        UnlockDisplay (dpy);
+        SyncHandle();
+        return False;
+    }
+    exists = rep.flags;
+    if (exists && permissions) {
+        permissions->type = rep.attr_type;
+        permissions->permissions = rep.perms;
+    }
+    UnlockDisplay(dpy);
+    SyncHandle();
+    return exists;
+}
+
+
+Bool XNVCTRLQueryAttributePermissions (
+    Display *dpy,
+    unsigned int attribute,
+    NVCTRLAttributePermissionsRec *permissions
+){
+    return QueryAttributePermissionsInternal(dpy,
+                                             attribute,
+                                             permissions,
+                                             X_nvCtrlQueryAttributePermissions);
+}
+
+
+Bool XNVCTRLQueryStringAttributePermissions (
+    Display *dpy,
+    unsigned int attribute,
+    NVCTRLAttributePermissionsRec *permissions
+){
+    return QueryAttributePermissionsInternal(dpy,
+                                             attribute,
+                                             permissions,
+                                             X_nvCtrlQueryStringAttributePermissions);
+}
+
+
+Bool XNVCTRLQueryBinaryDataAttributePermissions (
+    Display *dpy,
+    unsigned int attribute,
+    NVCTRLAttributePermissionsRec *permissions
+){
+    return QueryAttributePermissionsInternal(dpy,
+                                             attribute,
+                                             permissions,
+                                             X_nvCtrlQueryBinaryDataAttributePermissions);
+}
+
+
+Bool XNVCTRLQueryStringOperationAttributePermissions (
+    Display *dpy,
+    unsigned int attribute,
+    NVCTRLAttributePermissionsRec *permissions
+){
+    return QueryAttributePermissionsInternal(dpy,
+                                             attribute,
+                                             permissions,
+                                             X_nvCtrlQueryStringOperationAttributePermissions);
 }
 
 
@@ -579,7 +893,7 @@ Bool XNVCTRLQueryGvoColorConversion (
     XExtDisplayInfo *info = find_display (dpy);
     xnvCtrlQueryGvoColorConversionReply rep;
     xnvCtrlQueryGvoColorConversionReq *req;
-    
+
     if(!XextHasExtension(info))
         return False;
 
@@ -705,8 +1019,11 @@ Bool XNVCTRLQueryTargetBinaryData (
     length = rep.length;
     numbytes = rep.n;
     slop = numbytes & 3;
-    *ptr = (char *) Xmalloc(numbytes);
-    if (! *ptr) {
+    exists = rep.flags;
+    if (exists) {
+        *ptr = (unsigned char *) Xmalloc(numbytes);
+    }
+    if (!exists || !*ptr) {
         _XEatData(dpy, length);
         UnlockDisplay (dpy);
         SyncHandle ();
@@ -715,7 +1032,6 @@ Bool XNVCTRLQueryTargetBinaryData (
         _XRead(dpy, (char *) *ptr, numbytes);
         if (slop) _XEatData(dpy, 4-slop);
     }
-    exists = rep.flags;
     if (len) *len = numbytes;
     UnlockDisplay (dpy);
     SyncHandle ();
@@ -741,7 +1057,7 @@ Bool XNVCTRLStringOperation (
     int target_id,
     unsigned int display_mask,
     unsigned int attribute,
-    char *pIn,
+    const char *pIn,
     char **ppOut
 ) {
     XExtDisplayInfo *info = find_display(dpy);
@@ -752,24 +1068,24 @@ Bool XNVCTRLStringOperation (
 
     if (!XextHasExtension(info))
         return False;
-    
+
     if (!ppOut)
         return False;
 
     *ppOut = NULL;
-    
+
     XNVCTRLCheckExtension(dpy, info, False);
     XNVCTRLCheckTargetData(dpy, info, &target_type, &target_id);
-    
+
     if (pIn) {
         inSize = strlen(pIn) + 1;
     } else {
         inSize = 0;
     }
-    
+
     LockDisplay(dpy);
     GetReq(nvCtrlStringOperation, req);
-    
+
     req->reqType = info->codes->major_opcode;
     req->nvReqType = X_nvCtrlStringOperation;
     req->target_type = target_type;
@@ -779,38 +1095,81 @@ Bool XNVCTRLStringOperation (
 
     req->length += ((inSize + 3) & ~3) >> 2;
     req->num_bytes = inSize;
-    
+
     if (pIn) {
         Data(dpy, pIn, inSize);
     }
-    
+
     if (!_XReply (dpy, (xReply *) &rep, 0, False)) {
         UnlockDisplay(dpy);
         SyncHandle();
         return False;
     }
-    
+
     length = rep.length;
     outSize = rep.num_bytes;
     slop = outSize & 3;
 
     if (outSize) *ppOut = (char *) Xmalloc(outSize);
-    
+
     if (!*ppOut) {
         _XEatData(dpy, length);
     } else {
         _XRead(dpy, (char *) *ppOut, outSize);
         if (slop) _XEatData(dpy, 4-slop);
     }
-    
+
     ret = rep.ret;
-    
+
     UnlockDisplay(dpy);
     SyncHandle();
-    
+
     return ret;
 }
 
+Bool XNVCTRLBindWarpPixmapName (
+    Display *dpy,
+    int screen,
+    Pixmap pix,
+    const char *name,
+    unsigned int dataType,
+    unsigned int vertexCount
+) {
+    XExtDisplayInfo *info = find_display(dpy);
+    xnvCtrlBindWarpPixmapNameReq *req;
+    unsigned int nameLen;
+
+    if (!XextHasExtension(info))
+        return False;
+
+    if (!name)
+        return False;
+
+    nameLen = strlen(name) + 1;
+
+    XNVCTRLCheckExtension(dpy, info, False);
+
+    LockDisplay(dpy);
+    GetReq(nvCtrlBindWarpPixmapName, req);
+
+    req->reqType = info->codes->major_opcode;
+    req->nvReqType = X_nvCtrlBindWarpPixmapName;
+
+    req->length += ((nameLen + 3) & ~3) >> 2;
+    req->num_bytes = nameLen;
+
+    req->screen = screen;
+    req->pixmap = pix;
+    req->dataType = dataType;
+    req->vertexCount = vertexCount;
+
+    Data(dpy, name, nameLen);
+
+    UnlockDisplay(dpy);
+    SyncHandle();
+
+    return True;
+}
 
 static Bool wire_to_event (Display *dpy, XEvent *host, xEvent *wire)
 {
@@ -932,7 +1291,7 @@ static Bool wire_to_event (Display *dpy, XEvent *host, xEvent *wire)
     default:
         return False;
     }
-    
+
     return True;
 }
 

@@ -41,6 +41,21 @@
  * 1.17        Added TARGET_BINARY_ATTRIBUTE_CHANGED_EVENT
  * 1.18        Updated QueryTargetCount to return a count of 0, rather than
  *             BadMatch, if an unknown TargetType is specified
+ * 1.19        Added TargetType support for SetAttributeAndGetStatus and
+ *             SetStringAttribute requests
+ * 1.20        Added COOLER TargetType
+ * 1.21        Added initial 64-bit integer attribute support (read-only)
+ * 1.22        Added X_nvCtrlQueryValidStringAttributeValues to check
+ *             string attribute permissions.
+ * 1.23        Added SENSOR TargetType
+ * 1.24        Fixed a bug where SLI_MOSAIC_MODE_AVAILABLE attribute would
+ *             report false positives via the GPU and X screen target types
+ * 1.25        Added 3D_VISION_PRO_TRANSCEIVER TargetType
+ * 1.26        Added XNVCTRLQueryXXXAttributePermissions.
+ * 1.27        Added DISPLAY TargetType
+ * 1.28        Added NV_CTRL_CURRENT_METAMODE_ID: clients should use this
+ *             attribute to switch MetaModes, rather than pass the MetaMode ID
+ *             through the RRSetScreenConfig protocol request.
  */
 
 #ifndef __NVCONTROL_H
@@ -51,7 +66,7 @@
 #define NV_CONTROL_NAME "NV-CONTROL"
 
 #define NV_CONTROL_MAJOR 1
-#define NV_CONTROL_MINOR 18
+#define NV_CONTROL_MINOR 29
 
 #define X_nvCtrlQueryExtension                      0
 #define X_nvCtrlIsNv                                1
@@ -60,8 +75,8 @@
 #define X_nvCtrlQueryStringAttribute                4
 #define X_nvCtrlQueryValidAttributeValues           5
 #define X_nvCtrlSelectNotify                        6
-#define X_nvCtrlSetGvoColorConversion_deprecated    7
-#define X_nvCtrlQueryGvoColorConversion_deprecated  8
+#define X_nvCtrlSetGvoColorConversionDeprecated     7
+#define X_nvCtrlQueryGvoColorConversionDeprecated   8
 #define X_nvCtrlSetStringAttribute                  9
 /* STUB X_nvCtrlQueryDDCCILutSize                   10 */
 /* STUB X_nvCtrlQueryDDCCISinglePointLutOperation   11 */
@@ -79,7 +94,16 @@
 #define X_nvCtrlSelectTargetNotify                  23
 #define X_nvCtrlQueryTargetCount                    24
 #define X_nvCtrlStringOperation                     25
-#define X_nvCtrlLastRequest  (X_nvCtrlStringOperation + 1)
+#define X_nvCtrlQueryValidAttributeValues64         26
+#define X_nvCtrlQueryAttribute64                    27
+#define X_nvCtrlQueryValidStringAttributeValues     28
+#define X_nvCtrlQueryAttributePermissions                29
+#define X_nvCtrlQueryStringAttributePermissions          30
+#define X_nvCtrlQueryBinaryDataAttributePermissions      31
+#define X_nvCtrlQueryStringOperationAttributePermissions 32
+#define X_nvCtrlBindWarpPixmapName                       33
+
+#define X_nvCtrlLastRequest (X_nvCtrlBindWarpPixmapName + 1)
 
 
 /* Define 32 bit floats */
@@ -172,13 +196,26 @@ typedef struct {
     CARD16 sequenceNumber B16;
     CARD32 length B32;
     CARD32 flags B32;
-    INT32  value B32;
+    INT32 value B32;
     CARD32 pad4 B32;
     CARD32 pad5 B32;
     CARD32 pad6 B32;
     CARD32 pad7 B32;
 } xnvCtrlQueryAttributeReply;
 #define sz_xnvCtrlQueryAttributeReply 32
+
+typedef struct {
+    BYTE type;
+    BYTE pad0;
+    CARD16 sequenceNumber B16;
+    CARD32 length B32;
+    CARD32 flags B32;
+    CARD32 pad3 B32;
+    int64_t value_64;
+    CARD32 pad6 B32;
+    CARD32 pad7 B32;
+} xnvCtrlQueryAttribute64Reply;
+#define sz_xnvCtrlQueryAttribute64Reply 32
 
 typedef struct {
     CARD8 reqType;
@@ -196,7 +233,8 @@ typedef struct {
     CARD8 reqType;
     CARD8 nvReqType;
     CARD16 length B16;
-    CARD32 screen B32;
+    CARD16 target_id B16;
+    CARD16 target_type B16;
     CARD32 display_mask B32;
     CARD32 attribute B32;
     INT32 value B32;
@@ -247,7 +285,8 @@ typedef struct {
     CARD8 reqType;
     CARD8 nvReqType;
     CARD16 length B16;
-    CARD32 screen B32;
+    CARD16 target_id B16;
+    CARD16 target_type B16;
     CARD32 display_mask B32;
     CARD32 attribute B32;
     CARD32 num_bytes B32;
@@ -285,13 +324,52 @@ typedef struct {
     CARD16 sequenceNumber B16;
     CARD32 length B32;
     CARD32 flags B32;
-    INT32  attr_type B32;
-    INT32  min B32;
-    INT32  max B32;
+    INT32 attr_type B32;
+    INT32 min B32;
+    INT32 max B32;
     CARD32 bits B32;
     CARD32 perms B32;
 } xnvCtrlQueryValidAttributeValuesReply;
 #define sz_xnvCtrlQueryValidAttributeValuesReply 32
+
+typedef struct {
+    BYTE type;
+    BYTE pad0;
+    CARD16 sequenceNumber B16;
+    CARD32 length B32;
+    CARD32 flags B32;
+    INT32 attr_type B32;
+    int64_t min_64;
+    int64_t max_64;
+    CARD64 bits_64;
+    CARD32 perms B32;
+    CARD32 pad1 B32;
+} xnvCtrlQueryValidAttributeValues64Reply;
+#define sz_xnvCtrlQueryValidAttributeValues64Reply 48
+#define sz_xnvCtrlQueryValidAttributeValues64Reply_extra ((48 - 32) >> 2)
+
+typedef struct {
+    CARD8 reqType;
+    CARD8 nvReqType;
+    CARD16 length B16;
+    CARD32 attribute B32;
+} xnvCtrlQueryAttributePermissionsReq;
+#define sz_xnvCtrlQueryAttributePermissionsReq 8
+
+typedef struct {
+    BYTE type;
+    BYTE pad0;
+    CARD16 sequenceNumber B16;
+    CARD32 length B32;
+    CARD32 flags B32;
+    INT32 attr_type B32;
+    CARD32 perms B32;
+    CARD32 pad5 B32;
+    CARD32 pad6 B32;
+    CARD32 pad7 B32;
+    CARD32 pad8 B32;
+} xnvCtrlQueryAttributePermissionsReply;
+#define sz_xnvCtrlQueryAttributePermissionsReply 32
 
 /* Set GVO Color Conversion request (deprecated) */
 typedef struct {
@@ -454,6 +532,18 @@ typedef struct {
     CARD32 padl7 B32;
 } xnvCtrlStringOperationReply;
 #define sz_xnvCtrlStringOperationReply 32
+
+typedef struct {
+    CARD8 reqType;
+    CARD8 nvReqType;
+    CARD16 length B16;
+    CARD32 screen B32;
+    CARD32 pixmap B32;
+    CARD32 num_bytes B32; /* Length of string */
+    CARD32 dataType B32;
+    CARD32 vertexCount B32;
+} xnvCtrlBindWarpPixmapNameReq;
+#define sz_xnvCtrlBindWarpPixmapNameReq 24
 
 typedef struct {
     union {

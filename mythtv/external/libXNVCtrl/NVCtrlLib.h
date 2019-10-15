@@ -166,6 +166,25 @@ Bool XNVCTRLSetAttributeAndGetStatus (
 
 
 /*
+ *  XNVCTRLSetTargetAttributeAndGetStatus -
+ *
+ * Same as XNVCTRLSetTargetAttribute().
+ * In addition, XNVCTRLSetTargetAttributeAndGetStatus() returns 
+ * True if the operation succeeds, False otherwise.
+ *
+ */
+
+Bool XNVCTRLSetTargetAttributeAndGetStatus (
+    Display *dpy,
+    int target_type,
+    int target_id,
+    unsigned int display_mask,
+    unsigned int attribute,
+    int value
+);
+
+
+/*
  *  XNVCTRLQueryAttribute -
  *
  *  Returns True if the attribute exists.  Returns False otherwise.
@@ -215,6 +234,34 @@ Bool XNVCTRLQueryTargetAttribute (
     unsigned int display_mask,
     unsigned int attribute,
     int *value
+);
+
+
+/*
+ * XNVCTRLQueryTargetAttribute64 -
+ *
+ *  Returns True if the attribute exists.  Returns False otherwise.
+ *  If XNVCTRLQueryTargetAttribute returns True, value will contain the
+ *  value of the specified attribute.
+ *
+ *  Not all attributes require the display_mask parameter; see
+ *  NVCtrl.h for details.
+ *
+ *  Note: this function behaves like XNVCTRLQueryTargetAttribute(),
+ *  but supports 64-bit integer attributes.
+ *
+ *  Possible errors:
+ *     BadValue - The target doesn't exist.
+ *     BadMatch - The NVIDIA driver does not control the target.
+ */
+
+Bool XNVCTRLQueryTargetAttribute64 (
+    Display *dpy,
+    int target_Type,
+    int target_id,
+    unsigned int display_mask,
+    unsigned int attribute,
+    int64_t *value
 );
 
 
@@ -279,13 +326,34 @@ Bool XNVCTRLQueryTargetStringAttribute (
  *     BadMatch - The NVIDIA driver is not present on that screen.
  *     BadAlloc - Insufficient resources to fulfill the request.
  */
- 
+
 Bool XNVCTRLSetStringAttribute (
     Display *dpy,
     int screen,
     unsigned int display_mask,
     unsigned int attribute,
-    char *ptr
+    const char *ptr
+);
+
+
+/*
+ *  XNVCTRLSetTargetStringAttribute -
+ *
+ *  Returns True if the operation succeded.  Returns False otherwise.
+ *
+ *  Possible X errors:
+ *     BadValue - The screen doesn't exist.
+ *     BadMatch - The NVIDIA driver is not present on that screen.
+ *     BadAlloc - Insufficient resources to fulfill the request.
+ */
+
+Bool XNVCTRLSetTargetStringAttribute (
+    Display *dpy,
+    int target_type,
+    int target_id,
+    unsigned int display_mask,
+    unsigned int attribute,
+    const char *ptr
 );
 
 
@@ -327,6 +395,85 @@ Bool XNVCTRLQueryValidTargetAttributeValues (
     unsigned int display_mask,
     unsigned int attribute,                                 
     NVCTRLAttributeValidValuesRec *values
+);
+
+
+/*
+ * XNVCTRLQueryValidTargetStringAttributeValues -
+ *
+ * Returns True if the attribute exists.  Returns False otherwise.  If
+ * XNVCTRLQueryValidTargetStringAttributeValues returns True, values will
+ * indicate the valid values for the specified attribute.
+ */
+
+ Bool XNVCTRLQueryValidTargetStringAttributeValues (
+    Display *dpy,
+    int target_type,
+    int target_id,
+    unsigned int display_mask,
+    unsigned int attribute,
+    NVCTRLAttributeValidValuesRec *values
+);
+
+
+/*
+ * XNVCTRLQueryAttributePermissions -
+ *
+ * Returns True if the attribute exists.  Returns False otherwise.  If
+ * XNVCTRLQueryAttributePermissions returns True, permissions will
+ * indicate the permission flags for the attribute.  It excludes read
+ * and write permissions.
+ */
+
+Bool XNVCTRLQueryAttributePermissions (
+    Display *dpy,
+    unsigned int attribute,
+    NVCTRLAttributePermissionsRec *permissions
+);
+
+
+/*
+ * XNVCTRLQueryStringAttributePermissions -
+ *
+ * Returns True if the attribute exists.  Returns False otherwise.  If
+ * XNVCTRLQueryStringAttributePermissions returns True, permissions will
+ * indicate the permission flags for the attribute.
+ */
+
+ Bool XNVCTRLQueryStringAttributePermissions (
+    Display *dpy,
+    unsigned int attribute,
+    NVCTRLAttributePermissionsRec *permissions
+);
+
+
+/*
+ * XNVCTRLQueryBinaryDataAttributePermissions -
+ *
+ * Returns True if the attribute exists.  Returns False otherwise.  If
+ * XNVCTRLQueryBinaryDataAttributePermissions returns True, permissions
+ * will indicate the permission flags for the attribute.
+ */
+
+ Bool XNVCTRLQueryBinaryDataAttributePermissions (
+    Display *dpy,
+    unsigned int attribute,
+    NVCTRLAttributePermissionsRec *permissions
+);
+
+
+/*
+ * XNVCTRLQueryStringOperationAttributePermissions -
+ *
+ * Returns True if the attribute exists.  Returns False otherwise.  If
+ * XNVCTRLQueryStringOperationAttributePermissions returns True,
+ * permissions will indicate the permission flags for the attribute.
+ */
+
+ Bool XNVCTRLQueryStringOperationAttributePermissions (
+    Display *dpy,
+    unsigned int attribute,
+    NVCTRLAttributePermissionsRec *permissions
 );
 
 
@@ -481,11 +628,70 @@ Bool XNVCTRLStringOperation (
     int target_id,
     unsigned int display_mask,
     unsigned int attribute,
-    char *pIn,
+    const char *pIn,
     char **ppOut
 );
 
+/*
+ * XNVCTRLBindWarpPixmapName -
+ *
+ * Binds a Pixmap to a string name and some meta-data. If the Pixmap is None,
+ * a previously bound name will be released from its Pixmap.
+ *
+ * These names are to be used with the "WarpMesh", "BlendTexture" and
+ * "OffsetTexture" MetaMode attributes.
+ *
+ * Returns True if successful, or False if the screen is not
+ * controlled by the NVIDIA driver.
+ *
+ * dataType should be one of:
+ *  - NV_CTRL_WARP_DATA_TYPE_BLEND_OR_OFFSET_TEXTURE
+ *  - NV_CTRL_WARP_DATA_TYPE_MESH_TRIANGLESTRIP_XYUVRQ
+ *  - NV_CTRL_WARP_DATA_TYPE_MESH_TRIANGLES_XYUVRQ
+ *
+ * For dataType = NV_CTRL_WARP_DATA_TYPE_MESH_*, the named Pixmap is expected
+ * to have a width multiple of 1024 pixels, have a depth of 32 and contain a
+ * binary representation of a list of six-component vertices. Each of these
+ * components is a 32-bit floating point value.
+ *
+ * The XY components should contain normalized vertex coordinates, to be
+ * rendered as a triangle list or strip.  The X and Y components' [0,1] range
+ * map to the display's MetaMode ViewportOut X and Y, respectively.
+ *
+ * The U, V, R, and Q components should contain normalized, projective texture
+ * coordinates:
+ * U, V: 2D texture coordinate.  U and V components' [0,1] range maps to the
+ *       display's MetaMode ViewportIn X and Y, respectively.
+ * R: unused
+ * Q: Used for interpolation purposes.  This is typically the third component
+ *    of the result of a multiplication by a 3x3 projective transform matrix.
+ *
+ * vertexCount should contain the amount of vertices represented by the Pixmap
+ * and is ignored if dataType = NV_CTRL_WARP_DATA_TYPE_BLEND_OR_OFFSET_TEXTURE.
+ *
+ *  Possible errors:
+ *     BadValue - The screen index is out of range
+ *     BadMatch - The screen isn't being driven by the NVIDIA driver
+ *     BadMatch - If pixmap_id is None, couldn't find the name to release.
+ *     BadPixmap - Couldn't find the Pixmap referenced by pixmap_id.
+ *     BadMatch - pixmap_id names a Pixmap owned by a different screen.
+ *     BadValue - dataType isn't one of NV_CTRL_WARP_DATA_TYPE_*.
+ *     BadAlloc - Insufficient resources to fulfill the request.
+ *  Possible errors if dataType is NV_CTRL_WARP_DATA_TYPE_MESH_*:
+ *     BadMatch - The Pixmap's width isn't a multiple of 1024.
+ *     BadMatch - The Pixmap's depth isn't 32.
+ *     BadMatch - The Pixmap cannot contain vertexCount XYUVRQ vertices.
+ *     BadValue - Invalid vertexCount for the data type.
+ */
 
+Bool XNVCTRLBindWarpPixmapName (
+    Display *dpy,
+    int screen,
+    Pixmap pixmap_id,
+    const char *name,
+    unsigned int dataType,
+    unsigned int vertexCount
+);
 
 /*
  * XNVCtrlSelectNotify -
