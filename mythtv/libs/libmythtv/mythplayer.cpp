@@ -4020,6 +4020,9 @@ void MythPlayer::ChangeSpeed(void)
     if (videoOutput && videosync)
         videoOutput->SetVideoFrameRate(static_cast<float>(video_frame_rate));
 
+    // ensure we re-check double rate support following a speed change
+    m_scan_initialized = false;
+
     if (normal_speed && audio.HasAudioOut())
     {
         audio.SetStretchFactor(play_speed);
