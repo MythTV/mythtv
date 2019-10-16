@@ -3,6 +3,8 @@
 #ifndef _DVB_DESCRIPTORS_H_
 #define _DVB_DESCRIPTORS_H_
 
+#include <cassert>
+
 #include <QMutex>
 #include <QString>
 
@@ -2112,6 +2114,163 @@ class DVBSimulcastChannelDescriptor : public MPEGDescriptor
 
     uint ChannelNumber(uint i) const
         { return ((_data[4 + (i<<2)] << 8) | _data[5 + (i<<2)]) & 0x3ff; }
+
+    QString toString(void) const override; // MPEGDescriptor
+};
+
+/**
+ *  \brief Freesat Logical Channel Number descriptor
+ *
+ * BAT descriptor ID 0xd3 (Private Extension)
+ *
+ * Provides the Logical Channel Number (LCN) for each channel.
+ *
+ * https://blog.nexusuk.org/2014/07/decoding-freesat-part-2.html
+ */
+
+class FreesatLCNDescriptor : public MPEGDescriptor
+{
+  public:
+    FreesatLCNDescriptor(const unsigned char *data, int len = 300) :
+        MPEGDescriptor(data, len, PrivateDescriptorID::freesat_lcn_table)
+    {
+        assert(PrivateDescriptorID::freesat_lcn_table== DescriptorTag());
+
+        const unsigned char *payload = &data[2];
+
+        uint offset = 0;
+        while ((offset + 5 < DescriptorLength()) &&
+               (offset + 5 + payload[offset+4] <= DescriptorLength()))
+        {
+            entries.push_back(&payload[offset]);
+            offset += 5 + payload[offset+4];
+        }
+    }
+    //       Name                 bits  loc  expected value
+    // descriptor_tag               8   0.0       0xd3
+    // descriptor_length            8   1.0
+    // for (i=0;i<N;i++) {
+    //   service_id                16   0.0+p
+    //   chan_id                   15   2.1+p
+    //   length                     8   4.0+p
+    //   for (j=0;j<N;j++) {
+    //     unknown                  4   0.0+p2
+    //     logical_channel_number   12  0.4+p2
+    //     region_id                16  2.0+p2
+    //   }
+    // }
+
+    uint ServiceCount(void) const
+        { return entries.size(); }
+
+    uint ServiceID(int i) const
+        { return *entries[i] << 8 | *(entries[i]+1); }
+
+    uint ChanID(int i) const
+        { return (*(entries[i] + 2) << 8 | *(entries[i] + 3)) & 0x7FFF; }
+
+    uint LCNCount(int i) const
+        { return *(entries[i] + 4) / 4; }
+
+    uint LogicalChannelNumber(int i, int j) const
+        { return (*(entries[i] + 5 + j*4) << 8 | *(entries[i] + 5 + j*4 + 1)) & 0xFFF; }
+
+    uint RegionID(int i, int j) const
+        { return *(entries[i] + 5 + j*4 + 2) << 8 | *(entries[i] + 5 + j*4 + 3); }
+
+    QString toString(void) const override; // MPEGDescriptor
+
+  private:
+    desc_list_t entries;
+};
+
+/**
+ *  \brief Freesat Region descriptor
+ *
+ * BAT descriptor ID 0xd4 (Private Extension)
+ *
+ * Region table
+ *
+ * https://blog.nexusuk.org/2014/07/decoding-freesat-part-2.html
+ */
+class FreesatRegionDescriptor : public MPEGDescriptor
+{
+  public:
+    FreesatRegionDescriptor(const unsigned char *data, int len = 300) :
+        MPEGDescriptor(data, len, PrivateDescriptorID::freesat_region_table)
+    {
+        assert(PrivateDescriptorID::freesat_region_table == DescriptorTag());
+
+        const unsigned char *payload = &data[2];
+
+        uint offset = 0;
+        while ((offset + 6 < DescriptorLength()) &&
+               (offset + 6 + payload[offset+5] <= DescriptorLength()))
+        {
+            entries.push_back(&payload[offset]);
+            offset += 6 + payload[offset+5];
+        }
+    }
+    //       Name                 bits  loc  expected value
+    // descriptor_tag               8   0.0       0xd4
+    // descriptor_length            8   1.0
+    // for (i=0;i<N;i++) {
+    //   region_id                 16   0.0+p
+    //   language_code             24   2.0+p     eng
+    //   text_length                8   5.0+p
+    //   for (j=0;j<N;j++) {
+    //      text_char               8
+    //   }
+    // }
+
+    uint RegionCount(void) const
+       { return entries.size(); }
+
+    int RegionID(uint i) const
+        { return *entries[i] << 8 | *(entries[i]+1); }
+
+    const QString Language(uint i) const
+        { return QString::fromLatin1((char *) entries[i] + 2, 3); }
+
+    const QString RegionName(uint i) const
+        { return QString::fromLatin1((char *) entries[i] + 6, *(entries[i] + 5)); }
+
+    QString toString(void) const override; // MPEGDescriptor
+
+  private:
+    desc_list_t entries;
+};
+
+/**
+ *  \brief Freesat Channel Callsign descriptor
+ *
+ * BAT descriptor 0xd9 (Private Extension)
+ *
+ * Provides the callsign for a channel.
+ */
+class FreesatCallsignDescriptor : public MPEGDescriptor
+{
+  public:
+    FreesatCallsignDescriptor(const unsigned char *data, int len = 300) :
+        MPEGDescriptor(data, len, PrivateDescriptorID::freesat_callsign)
+    {
+        assert(PrivateDescriptorID::freesat_callsign == DescriptorTag());
+    }
+
+    //       Name             bits  loc  expected value
+    // descriptor_tag           8   0.0       0xd8
+    // descriptor_length        8   1.0
+
+    // ISO_639_language_code   24   2.0
+    // callsign_length          8   5.0
+    // for (j=0;j<N;j++) {
+    //    callsign_char         8
+
+    const QString Language(void) const
+        { return QString::fromLatin1((char *) _data +2, 3); }
+
+    QString Callsign(void) const
+        { return dvb_decode_short_name(&_data[6], _data[5]); }
 
     QString toString(void) const override; // MPEGDescriptor
 };

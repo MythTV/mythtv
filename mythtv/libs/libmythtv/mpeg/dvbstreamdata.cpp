@@ -194,6 +194,11 @@ void DVBStreamData::Reset(uint desired_netid, uint desired_tsid,
             DeleteCachedTable(*sit);
         _cached_sdts.clear();
 
+        bat_cache_t::iterator bat = _cached_bats.begin();
+        for (; bat != _cached_bats.end(); ++bat)
+            DeleteCachedTable(*bat);
+        _cached_bats.clear();
+
         _cache_lock.unlock();
     }
     AddListeningPID(DVB_NIT_PID);
@@ -350,14 +355,26 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
         }
         case TableID::BAT:
         {
-            uint bid = psip.TableIDExtension();
-            _bat_status.SetSectionSeen(bid, psip.Version(), psip.Section(),
-                                        psip.LastSection());
-            BouquetAssociationTable bat(psip);
+            uint bouquet_id = psip.TableIDExtension();
+            _bat_status.SetSectionSeen(bouquet_id, psip.Version(), psip.Section(),
+                                       psip.LastSection());
 
-            QMutexLocker locker(&_listener_lock);
-            for (size_t i = 0; i < _dvb_other_listeners.size(); i++)
-                _dvb_other_listeners[i]->HandleBAT(&bat);
+            if (_cache_tables)
+            {
+                BouquetAssociationTable *bat =
+                    new BouquetAssociationTable(psip);
+                CacheBAT(bat);
+                QMutexLocker locker(&_listener_lock);
+                for (size_t i = 0; i < _dvb_other_listeners.size(); i++)
+                    _dvb_other_listeners[i]->HandleBAT(bat);
+            }
+            else
+            {
+                BouquetAssociationTable bat(psip);
+                QMutexLocker locker(&_listener_lock);
+                for (size_t i = 0; i < _dvb_other_listeners.size(); i++)
+                    _dvb_other_listeners[i]->HandleBAT(&bat);
+            }
 
             return true;
         }
@@ -608,6 +625,67 @@ bool DVBStreamData::HasCachedAllNIT(bool current) const
     return true;
 }
 
+bool DVBStreamData::HasCachedAnyBAT(uint batid, bool current) const
+{
+    QMutexLocker locker(&_cache_lock);
+
+    if (!current)
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            "Currently we ignore \'current\' param");
+
+    for (uint i = 0; i <= 255; i++)
+        if (_cached_bats.find((batid << 8) | i) != _cached_bats.end())
+            return true;
+
+    return false;
+}
+
+bool DVBStreamData::HasCachedAllBAT(uint batid, bool current) const
+{
+    QMutexLocker locker(&_cache_lock);
+
+    if (!current)
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            "Currently we ignore \'current\' param");
+
+    bat_cache_t::const_iterator it = _cached_bats.find(batid << 8);
+    if (it == _cached_bats.end())
+        return false;
+
+    uint last_section = (*it)->LastSection();
+    if (!last_section)
+        return true;
+
+    for (uint i = 1; i <= last_section; i++)
+        if (_cached_bats.find((batid << 8) | i) == _cached_bats.end())
+            return false;
+
+    return true;
+}
+
+bool DVBStreamData::HasCachedAnyBATs(bool /*current*/) const
+{
+    QMutexLocker locker(&_cache_lock);
+    return !_cached_bats.empty();
+}
+
+bool DVBStreamData::HasCachedAllBATs(bool current) const
+{
+    QMutexLocker locker(&_cache_lock);
+
+    if (_cached_bats.empty())
+        return false;
+
+    bat_cache_t::const_iterator it = _cached_bats.begin();
+    for (; it != _cached_bats.end(); ++it)
+    {
+        if (!HasCachedAllBAT(it.key() >> 8, current))
+            return false;
+    }
+
+    return true;
+}
+
 bool DVBStreamData::HasCachedAllSDT(uint tsid, bool current) const
 {
     QMutexLocker locker(&_cache_lock);
@@ -727,6 +805,45 @@ nit_vec_t DVBStreamData::GetCachedNIT(bool current) const
     return nits;
 }
 
+bat_const_ptr_t DVBStreamData::GetCachedBAT(
+    uint batid, uint section_num, bool current) const
+{
+    QMutexLocker locker(&_cache_lock);
+
+    if (!current)
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            "Currently we ignore \'current\' param");
+
+    bat_ptr_t bat = nullptr;
+
+    uint key = (batid << 8) | section_num;
+    bat_cache_t::const_iterator it = _cached_bats.find(key);
+    if (it != _cached_bats.end())
+        IncrementRefCnt(bat = *it);
+
+    return bat;
+}
+
+bat_vec_t DVBStreamData::GetCachedBATs(bool current) const
+{
+    QMutexLocker locker(&_cache_lock);
+
+    if (!current)
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            "Currently we ignore \'current\' param");
+
+    bat_vec_t bats;
+
+    bat_cache_t::const_iterator it = _cached_bats.begin();
+    for (; it != _cached_bats.end(); ++it)
+    {
+        IncrementRefCnt(*it);
+        bats.push_back(*it);
+    }
+
+    return bats;
+}
+
 sdt_const_ptr_t DVBStreamData::GetCachedSDT(
     uint tsid, uint section_num, bool current) const
 {
@@ -807,7 +924,8 @@ bool DVBStreamData::DeleteCachedTable(PSIPTable *psip) const
     if (!psip)
         return false;
 
-    uint tid = psip->TableIDExtension();
+    uint tid = psip->TableIDExtension();    // For SDTs
+    uint bid = psip->TableIDExtension();    // For BATs
 
     QMutexLocker locker(&_cache_lock);
     if (_cached_ref_cnt[psip] > 0)
@@ -825,6 +943,12 @@ bool DVBStreamData::DeleteCachedTable(PSIPTable *psip) const
              _cached_sdts[tid << 8 | psip->Section()])
     {
         _cached_sdts[tid << 8 | psip->Section()] = nullptr;
+        delete psip;
+    }
+    else if ((TableID::BAT == psip->TableID()) &&
+             _cached_bats[bid << 8 | psip->Section()])
+    {
+        _cached_bats[bid << 8 | psip->Section()] = nullptr;
         delete psip;
     }
     else
@@ -848,6 +972,19 @@ void DVBStreamData::CacheNIT(NetworkInformationTable *nit)
         DeleteCachedTable(*it);
 
     _cached_nit[nit->Section()] = nit;
+}
+
+void DVBStreamData::CacheBAT(BouquetAssociationTable *bat)
+{
+    uint key = (bat->BouquetID() << 8) | bat->Section();
+
+    QMutexLocker locker(&_cache_lock);
+
+    bat_cache_t::iterator it = _cached_bats.find(key);
+    if (it != _cached_bats.end())
+        DeleteCachedTable(*it);
+
+    _cached_bats[key] = bat;
 }
 
 void DVBStreamData::CacheSDT(ServiceDescriptionTable *sdt)

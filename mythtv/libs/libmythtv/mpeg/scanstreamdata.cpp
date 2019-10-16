@@ -21,11 +21,6 @@ ScanStreamData::~ScanStreamData() { ; }
  */
 bool ScanStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
 {
-    // Treat BAT and SDTo as redundant unless they are on the FREESAT_SI_PID
-    if (m_dvb_uk_freesat_si &&
-        (psip.TableID() == TableID::BAT || psip.TableID() == TableID::SDTo))
-        return pid != FREESAT_SI_PID;
-
     return (ATSCStreamData::IsRedundant(pid,psip) ||
             DVBStreamData::IsRedundant(pid,psip));
 }

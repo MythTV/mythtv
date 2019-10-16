@@ -618,15 +618,15 @@ MythUISpinBoxSetting::MythUISpinBoxSetting(Storage *_storage, int min, int max,
       m_pageMultiple(pageMultiple),
       m_special_value_text(special_value_text)
 {
-    //we default to 0 unless 0 is out of range
+    // We default to 0 unless 0 is out of range.
     if (m_min > 0 || m_max < 0)
         m_settingValue = QString::number(m_min);
 
-    // The setings pages were coded to assume a parameter true/false
+    // The settings pages were coded to assume a parameter true/false
     // meaning allow_single_step. Many pages use this but it was not
     // implemented. It is difficult to implement using the current
     // UI widget design. So I have changed it so you can specify
-    // the size of pageup / pagedown increments as an integer instead
+    // the size of pageup / pagedown increments as an integer instead.
     // For compatibility with callers still using true to indicate
     // allowing single step, the code will set the step size as 1 and
     // the pageup / pagedown as the requested step.
