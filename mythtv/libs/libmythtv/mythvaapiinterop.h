@@ -42,7 +42,8 @@ class MythVAAPIInterop : public MythOpenGLInterop
   protected:
     void IniitaliseDisplay   (void);
     VASurfaceID Deinterlace  (VideoFrame *Frame, VASurfaceID Current, FrameScanType Scan);
-    void DestroyDeinterlacer (void);
+    virtual void DestroyDeinterlacer (void);
+    virtual void PostInitDeinterlacer(void) { }
 
   protected:
     VADisplay        m_vaDisplay         { nullptr };
@@ -138,6 +139,11 @@ class MythVAAPIInteropDRM : public MythVAAPIInterop
                                       VideoColourSpace *ColourSpace,
                                       VideoFrame *Frame,FrameScanType Scan) final override;
     static bool    IsSupported(MythRenderOpenGL *Context);
+    void           DeleteTextures(void) override;
+
+  protected:
+    void           DestroyDeinterlacer(void) override;
+    void           PostInitDeinterlacer(void) override;
 
   private:
     void           CreateDRMBuffers(VideoFrameType Format,

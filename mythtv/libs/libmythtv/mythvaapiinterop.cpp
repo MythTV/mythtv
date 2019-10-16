@@ -704,6 +704,16 @@ MythVAAPIInteropDRM::~MythVAAPIInteropDRM()
     OpenGLLocker locker(m_context);
 
     CleanupReferenceFrames();
+    DestroyDeinterlacer();
+    DeleteTextures();
+
+    if (m_drmFile.isOpen())
+        m_drmFile.close();
+}
+
+void MythVAAPIInteropDRM::DeleteTextures(void)
+{
+    OpenGLLocker locker(m_context);
 
     EGLDisplay display = eglGetCurrentDisplay();
     if (!m_openglTextures.isEmpty() && InitEGL() && display)
@@ -725,8 +735,24 @@ MythVAAPIInteropDRM::~MythVAAPIInteropDRM()
         }
     }
 
-    if (m_drmFile.isOpen())
-        m_drmFile.close();
+    MythVAAPIInterop::DeleteTextures();
+}
+
+void MythVAAPIInteropDRM::DestroyDeinterlacer(void)
+{
+    if (m_filterGraph)
+    {
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + "Deleting deinterlacer frame cache");
+        DeleteTextures();
+    }
+    MythVAAPIInterop::DestroyDeinterlacer();
+}
+
+void MythVAAPIInteropDRM::PostInitDeinterlacer(void)
+{
+    // remove the old, non-deinterlaced frame cache
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "Deleting progressive frame cache");
+    DeleteTextures();
 }
 
 void MythVAAPIInteropDRM::CleanupReferenceFrames(void)
@@ -854,6 +880,10 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context
         if (m_filterError)
             Frame->deinterlace_allowed = Frame->deinterlace_allowed & ~DEINT_DRIVER;
     }
+    else if (m_deinterlacer)
+    {
+        DestroyDeinterlacer();
+    }
 
     if (needreferenceframes)
     {
@@ -876,10 +906,11 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context
             return m_openglTextures[id];
     }
 
+    OpenGLLocker locker(m_context);
+
     // Create new
     if (!InitEGL())
         return result;
-    OpenGLLocker locker(m_context);
 
     VAImage vaimage;
     memset(&vaimage, 0, sizeof(vaimage));
@@ -898,7 +929,8 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context
     VideoFrameType format = VATypeToMythType(vaimage.format.fourcc);
     if (format == FMT_NONE)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unsupported VA fourcc: %1").arg(fourcc_str(vaimage.format.fourcc)));
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unsupported VA fourcc: %1")
+            .arg(fourcc_str(static_cast<int32_t>(vaimage.format.fourcc))));
     }
     else
     {
@@ -1166,6 +1198,13 @@ end:
     return ret >= 0;
 }
 
+/*! \brief Perform VPP (VAAPI Post Processing) deinterlacing
+ *
+ * \note For advanced deinterlacers, the deinterlacer will typically return the
+ * current frame twice until it has enough reference frames. These are then mapped
+ * to an OpenGLTexture when using DRM but never used again. For best memory management
+ * we should not retain these textures. This is not relevant for GLX methods.
+*/
 VASurfaceID MythVAAPIInterop::Deinterlace(VideoFrame *Frame, VASurfaceID Current, FrameScanType Scan)
 {
     VASurfaceID result = Current;
@@ -1267,6 +1306,7 @@ VASurfaceID MythVAAPIInterop::Deinterlace(VideoFrame *Frame, VASurfaceID Current
             {
                 m_deinterlacer = deinterlacer;
                 m_deinterlacer2x = doublerate;
+                PostInitDeinterlacer();
                 break;
             }
         }
