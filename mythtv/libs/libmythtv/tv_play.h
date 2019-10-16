@@ -787,7 +787,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     bool              m_dbClearSavedPosition {false};
     bool              m_dbRunJobsOnRemote {false};
     bool              m_dbContinueEmbedded {false};
-    bool              m_dbUseFixedSize {true};
     bool              m_dbRunFrontendInWindow {false};
     bool              m_dbBrowseAlways {false};
     bool              m_dbBrowseAllTuners {false};

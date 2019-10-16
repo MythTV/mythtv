@@ -2547,19 +2547,6 @@ static HostCheckBoxSetting *RunInWindow()
     return gc;
 }
 
-static HostCheckBoxSetting *UseFixedWindowSize()
-{
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("UseFixedWindowSize");
-
-    gc->setLabel(AppearanceSettings::tr("Use fixed window size"));
-
-    gc->setValue(true);
-
-    gc->setHelpText(AppearanceSettings::tr("If disabled, the video playback "
-                                           "window can be resized"));
-    return gc;
-}
-
 static HostCheckBoxSetting *AlwaysOnTop()
 {
     HostCheckBoxSetting *gc = new HostCheckBoxSetting("AlwaysOnTop");
@@ -4609,7 +4596,6 @@ AppearanceSettings::AppearanceSettings()
     screen->addChild(GuiSizeForTV());
     screen->addChild(HideMouseCursor());
     screen->addChild(RunInWindow());
-    screen->addChild(UseFixedWindowSize());
     screen->addChild(AlwaysOnTop());
     screen->addChild(StartupScreenDelay());
     screen->addChild(GUIFontZoom());

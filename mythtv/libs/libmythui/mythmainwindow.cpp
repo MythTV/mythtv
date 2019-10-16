@@ -144,7 +144,6 @@ class MythMainWindowPrivate
     int                  m_xbase                {0};
     int                  m_ybase                {0};
     bool                 m_does_fill_screen     {false};
-    bool                 m_fixed_window_size    {true};
 
     bool                 m_ignore_lirc_keys     {false};
     bool                 m_ignore_joystick_keys {false};
@@ -629,8 +628,7 @@ void MythMainWindow::ResizePainterWindow(const QSize &size)
 {
     if (!d->m_paintwin)
         return;
-    if (d->m_fixed_window_size)
-        d->m_paintwin->setFixedSize(size);
+    d->m_paintwin->setFixedSize(size);
     d->m_paintwin->resize(size);
 }
 
@@ -1009,18 +1007,12 @@ void MythMainWindow::Init(const QString& forcedpainter, bool mayReInit)
     // Set window border based on fullscreen attribute
     Qt::WindowFlags flags = Qt::Window;
 
-    d->m_fixed_window_size = GetMythDB()->GetBoolSetting("UseFixedWindowSize", true);
     bool inwindow = GetMythDB()->GetBoolSetting("RunFrontendInWindow", false);
     bool fullscreen = d->m_does_fill_screen && !GetMythUI()->IsGeometryOverridden();
 
     // On Compiz/Unit, when the window is fullscreen and frameless changing
     // screen position ends up stuck. Adding a border temporarily prevents this
     setWindowFlags(windowFlags() & ~Qt::FramelessWindowHint);
-
-    if (d->m_fixed_window_size)
-        LOG(VB_GENERAL, LOG_INFO, "Using fixed window size");
-    else
-        LOG(VB_GENERAL, LOG_INFO, "Window is resizeable");
 
     if (!inwindow)
     {
@@ -1079,11 +1071,7 @@ void MythMainWindow::Init(const QString& forcedpainter, bool mayReInit)
         .arg(d->m_screenwidth).arg(d->m_screenheight));
 
     setGeometry(d->m_xbase, d->m_ybase, d->m_screenwidth, d->m_screenheight);
-    // remove size constraints
-    setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
-    // fix size if required (i.e. don't allow the user to resize)
-    if (d->m_fixed_window_size)
-        setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+    setFixedSize(d->m_screenwidth, d->m_screenheight);
     resize(d->m_screenwidth, d->m_screenheight);
 
     Show();
@@ -1211,8 +1199,7 @@ void MythMainWindow::Init(const QString& forcedpainter, bool mayReInit)
 
 void MythMainWindow::DelayedAction(void)
 {
-    if (d->m_fixed_window_size)
-        setFixedSize(d->m_screenwidth, d->m_screenheight);
+    setFixedSize(d->m_screenwidth, d->m_screenheight);
     resize(d->m_screenwidth, d->m_screenheight);
     Show();
 
@@ -1403,8 +1390,7 @@ void MythMainWindow::ReinitDone(void)
     d->m_oldrender = nullptr;
 
     d->m_paintwin->move(0, 0);
-    if (d->m_fixed_window_size)
-        d->m_paintwin->setFixedSize(size()); // why?
+    d->m_paintwin->setFixedSize(size());
     d->m_paintwin->raise();
     ShowPainterWindow();
 

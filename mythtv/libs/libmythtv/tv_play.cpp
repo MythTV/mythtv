@@ -1101,7 +1101,6 @@ void TV::InitFromDB(void)
     m_dbClearSavedPosition = (kv["ClearSavedPosition"].toInt() != 0);
     m_dbRunJobsOnRemote    = (kv["JobsRunOnRecordHost"].toInt() != 0);
     m_dbContinueEmbedded   = (kv["ContinueEmbeddedTVPlay"].toInt() != 0);
-    m_dbUseFixedSize       = (kv["UseFixedWindowSize"].toInt() != 0);
     m_dbRunFrontendInWindow= (kv["RunFrontendInWindow"].toInt() != 0);
     m_dbBrowseAlways       = (kv["PersistentBrowseMode"].toInt() != 0);
     m_dbBrowseAllTuners    = (kv["BrowseAllTuners"].toInt() != 0);
@@ -1312,16 +1311,13 @@ TV::~TV(void)
     // restore window to gui size and position
     MythMainWindow* mwnd = GetMythMainWindow();
     mwnd->setGeometry(m_savedGuiBounds);
-    if (m_dbUseFixedSize)
-        mwnd->setFixedSize(m_savedGuiBounds.size());
+    mwnd->setFixedSize(m_savedGuiBounds.size());
     mwnd->ResizePainterWindow(m_savedGuiBounds.size());
 #ifdef Q_OS_ANDROID
     mwnd->Show();
 #else
     mwnd->show();
 #endif
-    if (!m_dbUseGuiSizeForTv)
-        mwnd->move(m_savedGuiBounds.topLeft());
 
     delete m_lastProgram;
 
@@ -2506,11 +2502,8 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
         {
             MythMainWindow *mainWindow = GetMythMainWindow();
             mainWindow->setBaseSize(m_playerBounds.size());
-            mainWindow->setMinimumSize(
-                (m_dbUseFixedSize) ? m_playerBounds.size() : QSize(16, 16));
-            mainWindow->setMaximumSize(
-                (m_dbUseFixedSize) ? m_playerBounds.size() :
-                QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
+            mainWindow->setMinimumSize(m_playerBounds.size());
+            mainWindow->setMaximumSize(m_playerBounds.size());
             mainWindow->setGeometry(m_playerBounds);
             mainWindow->ResizePainterWindow(m_playerBounds.size());
         }
@@ -8676,10 +8669,8 @@ void TV::DoEditSchedule(int editType)
     MythMainWindow *mwnd = GetMythMainWindow();
     if (!m_dbUseGuiSizeForTv)
     {
-        if (m_dbUseFixedSize)
-            mwnd->setFixedSize(m_savedGuiBounds.size());
-        mwnd->setGeometry(m_savedGuiBounds.left(), m_savedGuiBounds.top(),
-                          m_savedGuiBounds.width(), m_savedGuiBounds.height());
+        mwnd->setFixedSize(m_savedGuiBounds.size());
+        mwnd->setGeometry(m_savedGuiBounds);
     }
 
     // Actually show the pop-up UI
@@ -9703,7 +9694,7 @@ void TV::customEvent(QEvent *e)
 
         // m_playerBounds is not applicable when switching modes so
         // skip this logic in that case.
-        if (!m_dbUseVideoModes && (!m_dbUseGuiSizeForTv || !m_dbUseFixedSize))
+        if (!m_dbUseVideoModes && !m_dbUseGuiSizeForTv)
         {
             mwnd->setMinimumSize(QSize(16, 16));
             mwnd->setMaximumSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
