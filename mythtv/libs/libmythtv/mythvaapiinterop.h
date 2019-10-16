@@ -51,6 +51,7 @@ class MythVAAPIInterop : public MythOpenGLInterop
 
     MythDeintType    m_deinterlacer      { DEINT_NONE };
     bool             m_deinterlacer2x    { false      };
+    bool             m_firstField        { true    };
     AVBufferRef     *m_vppFramesContext  { nullptr };
     AVFilterContext *m_filterSink        { nullptr };
     AVFilterContext *m_filterSource      { nullptr };

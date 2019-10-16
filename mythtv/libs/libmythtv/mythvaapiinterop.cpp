@@ -135,6 +135,7 @@ void MythVAAPIInterop::DestroyDeinterlacer(void)
     m_filterSource = nullptr;
     m_deinterlacer = DEINT_NONE;
     m_deinterlacer2x = false;
+    m_firstField = true;
     m_lastFilteredFrame = 0;
     m_lastFilteredFrameCount = 0;
     av_buffer_unref(&m_vppFramesContext);
@@ -1198,13 +1199,6 @@ end:
     return ret >= 0;
 }
 
-/*! \brief Perform VPP (VAAPI Post Processing) deinterlacing
- *
- * \note For advanced deinterlacers, the deinterlacer will typically return the
- * current frame twice until it has enough reference frames. These are then mapped
- * to an OpenGLTexture when using DRM but never used again. For best memory management
- * we should not retain these textures. This is not relevant for GLX methods.
-*/
 VASurfaceID MythVAAPIInterop::Deinterlace(VideoFrame *Frame, VASurfaceID Current, FrameScanType Scan)
 {
     VASurfaceID result = Current;
@@ -1327,47 +1321,64 @@ VASurfaceID MythVAAPIInterop::Deinterlace(VideoFrame *Frame, VASurfaceID Current
 
         Frame->deinterlace_inuse = m_deinterlacer | DEINT_DRIVER;
         Frame->deinterlace_inuse2x = m_deinterlacer2x;
-        while (true)
+
+        // 'pump' the filter with frames until it starts returning usefull output.
+        // This minimises discontinuities at start up (where we would otherwise
+        // show a couple of progressive frames first) and memory consumption for the DRM
+        // interop as we only cache OpenGL textures for the deinterlacer's frame
+        // pool.
+        int retries = 3;
+        while ((result == Current) && retries--)
         {
-            int ret = 0;
-            MythAVFrame sinkframe;
-            sinkframe->format =  AV_PIX_FMT_VAAPI;
-            ret = av_buffersink_get_frame(m_filterSink, sinkframe);
-            if  (ret >= 0)
+            while (true)
             {
-                // we have a filtered frame
-                result = m_lastFilteredFrame = static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(sinkframe->data[3]));
-                m_lastFilteredFrameCount = Frame->frameCounter;
+                int ret = 0;
+                MythAVFrame sinkframe;
+                sinkframe->format =  AV_PIX_FMT_VAAPI;
+
+                // only ask for a frame if we are expecting another
+                if (m_deinterlacer2x && !m_firstField)
+                {
+                    ret = av_buffersink_get_frame(m_filterSink, sinkframe);
+                    if  (ret >= 0)
+                    {
+                        // we have a filtered frame
+                        result = m_lastFilteredFrame = static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(sinkframe->data[3]));
+                        m_lastFilteredFrameCount = Frame->frameCounter;
+                        m_firstField = true;
+                        break;
+                    }
+                    else if (ret != AVERROR(EAGAIN))
+                        break;
+                }
+
+                // add another frame
+                MythAVFrame sourceframe;
+                sourceframe->top_field_first = Frame->interlaced_reversed ? !Frame->top_field_first : Frame->top_field_first;
+                sourceframe->interlaced_frame = 1;
+                sourceframe->data[3] = Frame->buf;
+                sourceframe->buf[0] = av_buffer_ref(reinterpret_cast<AVBufferRef*>(Frame->priv[0]));
+                sourceframe->width  = m_filterWidth;
+                sourceframe->height = m_filterHeight;
+                sourceframe->format = AV_PIX_FMT_VAAPI;
+                ret = av_buffersrc_add_frame(m_filterSource, sourceframe);
+                sourceframe->data[3] = nullptr;
+                sourceframe->buf[0] = nullptr;
+                if (ret < 0)
+                    break;
+
+                // try again
+                ret = av_buffersink_get_frame(m_filterSink, sinkframe);
+                if  (ret >= 0)
+                {
+                    // we have a filtered frame
+                    result = m_lastFilteredFrame = static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(sinkframe->data[3]));
+                    m_lastFilteredFrameCount = Frame->frameCounter;
+                    m_firstField = false;
+                    break;
+                }
                 break;
             }
-            else if (ret != AVERROR(EAGAIN))
-                break;
-
-            // add another frame
-            MythAVFrame sourceframe;
-            sourceframe->top_field_first = Frame->interlaced_reversed ? !Frame->top_field_first : Frame->top_field_first;
-            sourceframe->interlaced_frame = 1;
-            sourceframe->data[3] = Frame->buf;
-            sourceframe->buf[0] = av_buffer_ref(reinterpret_cast<AVBufferRef*>(Frame->priv[0]));
-            sourceframe->width  = m_filterWidth;
-            sourceframe->height = m_filterHeight;
-            sourceframe->format = AV_PIX_FMT_VAAPI;
-            ret = av_buffersrc_add_frame(m_filterSource, sourceframe);
-            sourceframe->data[3] = nullptr;
-            sourceframe->buf[0] = nullptr;
-            if (ret < 0)
-                break;
-
-            // try again
-            ret = av_buffersink_get_frame(m_filterSink, sinkframe);
-            if  (ret >= 0)
-            {
-                // we have a filtered frame
-                result = m_lastFilteredFrame = static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(sinkframe->data[3]));
-                m_lastFilteredFrameCount = Frame->frameCounter;
-                break;
-            }
-            break;
         }
     }
     return result;
