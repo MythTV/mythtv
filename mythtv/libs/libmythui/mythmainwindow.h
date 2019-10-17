@@ -43,6 +43,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     void Init(const QString& forcedpainter = QString(), bool mayReInit=true);
     void ReinitDone(void);
     void Show(void);
+    void MoveResize(QRect &Geometry);
 
     void AddScreenStack(MythScreenStack *stack, bool main = false);
     void PopScreenStack();
@@ -101,7 +102,6 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     MythNotificationCenter *GetCurrentNotificationCenter();
     void         ShowPainterWindow();
     void         HidePainterWindow();
-    void         ResizePainterWindow(const QSize &size);
 
     void GrabWindow(QImage &image);
     bool SaveScreenShot(const QImage &image, QString filename = "");

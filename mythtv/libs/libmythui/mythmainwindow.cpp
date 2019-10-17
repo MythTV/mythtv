@@ -609,7 +609,10 @@ QWidget *MythMainWindow::GetPaintWindow(void)
 void MythMainWindow::ShowPainterWindow(void)
 {
     if (d->m_paintwin)
+    {
         d->m_paintwin->show();
+        d->m_paintwin->raise();
+    }
     if (d->m_render)
         d->m_render->Release();
 }
@@ -622,14 +625,6 @@ void MythMainWindow::HidePainterWindow(void)
         if (!(d->m_render && d->m_render->IsShared()))
             d->m_paintwin->hide();
     }
-}
-
-void MythMainWindow::ResizePainterWindow(const QSize &size)
-{
-    if (!d->m_paintwin)
-        return;
-    d->m_paintwin->setFixedSize(size);
-    d->m_paintwin->resize(size);
 }
 
 MythRender *MythMainWindow::GetRenderDevice()
@@ -1070,10 +1065,7 @@ void MythMainWindow::Init(const QString& forcedpainter, bool mayReInit)
     LOG(VB_GENERAL, LOG_INFO, QString("UI Screen Resolution: %1 x %2")
         .arg(d->m_screenwidth).arg(d->m_screenheight));
 
-    setGeometry(d->m_xbase, d->m_ybase, d->m_screenwidth, d->m_screenheight);
-    setFixedSize(d->m_screenwidth, d->m_screenheight);
-    resize(d->m_screenwidth, d->m_screenheight);
-
+    MoveResize(d->m_screenRect);
     Show();
 
     if (!GetMythDB()->GetBoolSetting("HideMouseCursor", false))
@@ -1166,9 +1158,7 @@ void MythMainWindow::Init(const QString& forcedpainter, bool mayReInit)
         setAutoFillBackground(false);
     }
 
-    d->m_paintwin->move(0, 0);
-    ResizePainterWindow(size());
-    d->m_paintwin->raise();
+    MoveResize(d->m_screenRect);
     ShowPainterWindow();
 
     // Redraw the window now to avoid race conditions in EGLFS (Qt5.4) if a
@@ -1199,8 +1189,7 @@ void MythMainWindow::Init(const QString& forcedpainter, bool mayReInit)
 
 void MythMainWindow::DelayedAction(void)
 {
-    setFixedSize(d->m_screenwidth, d->m_screenheight);
-    resize(d->m_screenwidth, d->m_screenheight);
+    MoveResize(d->m_screenRect);
     Show();
 
 #ifdef Q_OS_ANDROID
@@ -1389,10 +1378,8 @@ void MythMainWindow::ReinitDone(void)
     // deletes the render context
     d->m_oldrender = nullptr;
 
-    d->m_paintwin->move(0, 0);
-    d->m_paintwin->setFixedSize(size());
-    d->m_paintwin->raise();
     ShowPainterWindow();
+    MoveResize(d->m_screenRect);
 
     d->m_drawTimer->start(1000 / drawRefresh);
 }
@@ -1418,6 +1405,19 @@ void MythMainWindow::Show(void)
     else
         ShowMenuBar();
 #endif
+}
+
+void MythMainWindow::MoveResize(QRect &Geometry)
+{
+    setFixedSize(Geometry.size());
+    setGeometry(Geometry);
+
+    if (d->m_paintwin)
+    {
+        d->m_paintwin->setFixedSize(Geometry.size());
+        d->m_paintwin->setGeometry(0, 0, Geometry.width(), Geometry.height());
+    }
+
 }
 
 uint MythMainWindow::PushDrawDisabled(void)

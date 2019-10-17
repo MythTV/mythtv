@@ -1166,8 +1166,14 @@ bool TV::Init(bool createWindow)
 
     if (createWindow)
     {
-        bool fullscreen = !m_dbUseGuiSizeForTv;
+        MythMainWindow *mainwindow = GetMythMainWindow();
+        if (!mainwindow)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "No MythMainWindow");
+            return false;
+        }
 
+        bool fullscreen = !m_dbUseGuiSizeForTv;
         m_savedGuiBounds = QRect(GetMythMainWindow()->geometry().topLeft(),
                                  GetMythMainWindow()->size());
 
@@ -1181,7 +1187,7 @@ bool TV::Init(bool createWindow)
                 (abs(m_savedGuiBounds.y()-ybase) < 3))
             {
                 m_savedGuiBounds = QRect(QPoint(xbase, ybase),
-                                         GetMythMainWindow()->size());
+                                         mainwindow->size());
             }
         }
 
@@ -1220,16 +1226,14 @@ bool TV::Init(bool createWindow)
                 if (fullscreen)
                 {
                     m_playerBounds.setSize(QSize(maxWidth, maxHeight));
-
                     // resize possibly avoids a bug on some systems
-                    GetMythMainWindow()->setGeometry(m_playerBounds);
-                    GetMythMainWindow()->ResizePainterWindow(m_playerBounds.size());
+                    mainwindow->MoveResize(m_playerBounds);
                 }
             }
         }
 
         // player window sizing
-        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+        MythScreenStack *mainStack = mainwindow->GetMainStack();
 
         m_myWindow = new TvPlayWindow(mainStack, "Playback");
 
@@ -1244,10 +1248,9 @@ bool TV::Init(bool createWindow)
             m_myWindow = nullptr;
         }
 
-        MythMainWindow *mainWindow = GetMythMainWindow();
-        if (mainWindow->GetPaintWindow())
-            mainWindow->GetPaintWindow()->update();
-        mainWindow->installEventFilter(this);
+        if (mainwindow->GetPaintWindow())
+            mainwindow->GetPaintWindow()->update();
+        mainwindow->installEventFilter(this);
         qApp->processEvents();
     }
 
@@ -1297,8 +1300,11 @@ TV::~TV(void)
     gCoreContext->removeListener(this);
     gCoreContext->UnregisterForPlayback(this);
 
-    if (GetMythMainWindow() && m_weDisabledGUI)
-        GetMythMainWindow()->PopDrawDisabled();
+    MythMainWindow* mwnd = GetMythMainWindow();
+    mwnd->removeEventFilter(this);
+
+    if (m_weDisabledGUI)
+        mwnd->PopDrawDisabled();
 
     if (m_myWindow)
     {
@@ -1309,10 +1315,7 @@ TV::~TV(void)
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "-- lock");
 
     // restore window to gui size and position
-    MythMainWindow* mwnd = GetMythMainWindow();
-    mwnd->setGeometry(m_savedGuiBounds);
-    mwnd->setFixedSize(m_savedGuiBounds.size());
-    mwnd->ResizePainterWindow(m_savedGuiBounds.size());
+    mwnd->MoveResize(m_savedGuiBounds);
 #ifdef Q_OS_ANDROID
     mwnd->Show();
 #else
@@ -2499,14 +2502,7 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
         // m_playerBounds is not applicable when switching modes so
         // skip this logic in that case.
         if (!m_dbUseVideoModes)
-        {
-            MythMainWindow *mainWindow = GetMythMainWindow();
-            mainWindow->setBaseSize(m_playerBounds.size());
-            mainWindow->setMinimumSize(m_playerBounds.size());
-            mainWindow->setMaximumSize(m_playerBounds.size());
-            mainWindow->setGeometry(m_playerBounds);
-            mainWindow->ResizePainterWindow(m_playerBounds.size());
-        }
+            GetMythMainWindow()->MoveResize(m_playerBounds);
 
         if (!m_weDisabledGUI)
         {
@@ -3540,7 +3536,7 @@ bool TV::eventFilter(QObject *o, QEvent *e)
 {
     // We want to intercept all resize events sent to the main window
     if ((e->type() == QEvent::Resize))
-        return (GetMythMainWindow()!= o) ? false : event(e);
+        return (GetMythMainWindow() != o) ? false : event(e);
 
     // Intercept keypress events unless they need to be handled by a main UI
     // screen (e.g. GuideGrid, ProgramFinder)
@@ -3593,7 +3589,7 @@ bool TV::event(QEvent *e)
             mctx->m_player->WindowResized(((const QResizeEvent*) e)->size());
         mctx->UnlockDeletePlayer(__FILE__, __LINE__);
         ReturnPlayerLock(mctx);
-        return true;
+        return false;
     }
 
     if (QEvent::KeyPress == e->type() ||
@@ -8668,10 +8664,7 @@ void TV::DoEditSchedule(int editType)
     ReturnPlayerLock(actx);
     MythMainWindow *mwnd = GetMythMainWindow();
     if (!m_dbUseGuiSizeForTv)
-    {
-        mwnd->setFixedSize(m_savedGuiBounds.size());
-        mwnd->setGeometry(m_savedGuiBounds);
-    }
+        mwnd->MoveResize(m_savedGuiBounds);
 
     // Actually show the pop-up UI
     switch (editType)
@@ -9695,12 +9688,7 @@ void TV::customEvent(QEvent *e)
         // m_playerBounds is not applicable when switching modes so
         // skip this logic in that case.
         if (!m_dbUseVideoModes && !m_dbUseGuiSizeForTv)
-        {
-            mwnd->setMinimumSize(QSize(16, 16));
-            mwnd->setMaximumSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
-            mwnd->setGeometry(m_playerBounds.left(), m_playerBounds.top(),
-                              m_playerBounds.width(), m_playerBounds.height());
-        }
+            mwnd->MoveResize(m_playerBounds);
 
         DoSetPauseState(actx, m_savedPause); // Restore pause states
 
