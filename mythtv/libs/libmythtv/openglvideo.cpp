@@ -615,6 +615,9 @@ void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanT
         else
         {
             LOG(VB_PLAYBACK, LOG_INFO, LOC + "Nothing to display");
+            // if this is live tv startup and the window rect has changed we
+            // must set the viewport
+            m_render->SetViewPort(QRect(QPoint(), m_masterViewportSize));
             return;
         }
     }
