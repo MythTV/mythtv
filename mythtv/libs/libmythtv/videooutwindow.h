@@ -28,9 +28,20 @@ class VideoOutWindow : public QObject
     VideoOutWindow();
 
     bool Init(const QSize &VideoDim, const QSize &VideoDispDim,
-              float Aspect, const QRect &DisplayVisibleRect,
+              float Aspect, const QRect &WindowRect,
               AspectOverrideMode AspectOverride, AdjustFillMode AdjustFill);
-    bool InputChanged           (const QSize &VideDim, const QSize &VideoDispDim, float Aspect);
+
+  signals:
+    // Note These are emitted from MoveResize - which must be called after any call
+    // that changes the current video dimensions or video rectangles.
+    void VideoSizeChanged       (const QSize &VideoDim, const QSize &VideoDispDim);
+    void VideoRectsChanged      (const QRect &DisplayVideoRect, const QRect &VideoRect);
+    void VisibleRectChanged     (const QRect &DisplayVisibleRect);
+    void WindowRectChanged      (const QRect &WindowRect);
+
+  public slots:
+    // Sets
+    void InputChanged           (const QSize &VideoDim, const QSize &VideoDispDim, float Aspect);
     void VideoAspectRatioChanged(float Aspect);
     void EmbedInWidget          (const QRect &Rect);
     void StopEmbedding          (void);
@@ -41,22 +52,10 @@ class VideoOutWindow : public QObject
     void Zoom                   (ZoomDirection Direction);
     void ToggleMoveBottomLine   (void);
     void SaveBottomLine         (void);
-
-  signals:
-    // Note These are emitted from MoveResize - which must be called after any call
-    // that changes the current video dimensions or video rectangles.
-    void VideoSizeChanged       (const QSize &VideoDim, const QSize &VideoDispDim);
-    void VideoRectsChanged      (const QRect &DisplayVideoRect, const QRect &VideoRect);
-    void VisibleRectChanged     (const QRect &DisplayVisibleRect);
-
-  public slots:
-    // Sets
     void SetVideoScalingAllowed (bool Change);
-    void SetDisplayDim          (QSize DisplayDim);
-    void SetDisplayAspect       (float DisplayAspect);
+    void SetDisplayProperties   (QSize DisplayDim, float DisplayAspect);
     void SetPIPState            (PIPState Setting);
-    void SetVideoDim            (QSize Dim);
-    void SetDisplayVisibleRect  (QRect Rect);
+    void SetWindowSize          (QSize Size);
     void SetITVResize           (QRect Rect);
     void SetRotation            (int Rotation);
 
@@ -69,6 +68,7 @@ class VideoOutWindow : public QObject
     PIPState GetPIPState(void)             const { return m_pipState; }
     float    GetOverridenVideoAspect(void) const { return m_videoAspectOverride;}
     QRect    GetDisplayVisibleRect(void)   const { return m_displayVisibleRect; }
+    QRect    GetWindowRect(void)           const { return m_windowRect; }
     QRect    GetScreenGeometry(void)       const { return m_screenGeometry; }
     QRect    GetVideoRect(void)            const { return m_videoRect; }
     QRect    GetDisplayVideoRect(void)     const { return m_displayVideoRect; }
@@ -142,6 +142,8 @@ class VideoOutWindow : public QObject
     /// Visible portion of display window in pixels.
     /// This may be bigger or smaller than display_video_rect.
     QRect   m_displayVisibleRect;
+    /// Rectangle describing QWidget bounds.
+    QRect   m_windowRect;
     /// Used to save the display_visible_rect for
     /// restoration after video embedding ends.
     QRect   m_tmpDisplayVisibleRect;

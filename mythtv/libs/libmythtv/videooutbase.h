@@ -53,7 +53,6 @@ class VideoOutput
     virtual bool Init(const QSize &VideoDim, const QSize &VideoDispDim,
                       float VideoAspect,     WId WinID,
                       const QRect &WindowRect, MythCodecID CodecID);
-    virtual void InitOSD(OSD *) { }
     virtual void SetVideoFrameRate(float);
     virtual void SetDeinterlacing(bool Enable, bool DoubleRate);
     virtual void ProcessFrame(VideoFrame *Frame, OSD *Osd, const PIPMap &PipPlayers,
@@ -153,8 +152,7 @@ class VideoOutput
 
   protected:
     virtual void MoveResize(void);
-    virtual void MoveResizeWindow(QRect NewRect) = 0;
-    void         InitDisplayMeasurements(int Width, int Height, bool Resize);
+    void         InitDisplayMeasurements(int Width, int Height);
     virtual void ShowPIPs(VideoFrame *Frame, const PIPMap &PiPPlayers);
     virtual void ShowPIP(VideoFrame*, MythPlayer*, PIPLocation) { }
 

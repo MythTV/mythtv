@@ -159,7 +159,7 @@ VideoOutputOpenGL::VideoOutputOpenGL(const QString &Profile)
     // Connect VideoOutWindow to OpenGLVideo
     QObject::connect(&m_window, &VideoOutWindow::VideoSizeChanged, m_openGLVideo, &OpenGLVideo::SetVideoDimensions);
     QObject::connect(&m_window, &VideoOutWindow::VideoRectsChanged, m_openGLVideo, &OpenGLVideo::SetVideoRects);
-    QObject::connect(&m_window, &VideoOutWindow::VisibleRectChanged, m_openGLVideo, &OpenGLVideo::SetViewportRect);
+    QObject::connect(&m_window, &VideoOutWindow::WindowRectChanged, m_openGLVideo, &OpenGLVideo::SetViewportRect);
 }
 
 VideoOutputOpenGL::~VideoOutputOpenGL()
@@ -226,7 +226,7 @@ bool VideoOutputOpenGL::Init(const QSize &VideoDim, const QSize &VideoDispDim, f
 
     // Setup display
     QSize size = m_window.GetVideoDim();
-    InitDisplayMeasurements(size.width(), size.height(), false);
+    InitDisplayMeasurements(size.width(), size.height());
 
     // Create buffers
     if (!CreateBuffers(CodecId, m_window.GetVideoDim()))
@@ -237,7 +237,6 @@ bool VideoOutputOpenGL::Init(const QSize &VideoDim, const QSize &VideoDispDim, f
     if (m_videoCodecID == kCodec_NONE)
     {
         m_render->SetViewPort(QRect(QPoint(), dvr.size()));
-        MoveResize();
         return true;
     }
 
@@ -251,8 +250,6 @@ bool VideoOutputOpenGL::Init(const QSize &VideoDim, const QSize &VideoDispDim, f
     if (m_openGLVideo->IsValid())
         m_openGLVideo->ResetFrameFormat();
 
-    // Finalise output
-    MoveResize();
     return true;
 }
 
@@ -408,6 +405,22 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *Frame, OSD */*osd*/,
             StopEmbedding();
         }
 
+        // Note - we don't call the default VideoOutput::InputChanged method as
+        // the OpenGL implementation is asynchronous.
+        // So we need to update the video display profile here. It is a little
+        // circular as we need to set the video dimensions first which are then
+        // reset in Init.
+        // All told needs a cleanup - not least because the use of codecName appears
+        // to be inconsistent.
+        m_window.InputChanged(m_newVideoDim, m_newVideoDispDim, m_newAspect);
+        AVCodecID avCodecId = myth2av_codecid(m_newCodecId);
+        AVCodec *codec = avcodec_find_decoder(avCodecId);
+        QString codecName;
+        if (codec)
+            codecName = codec->name;
+        if (m_dbDisplayProfile)
+            m_dbDisplayProfile->SetInput(m_window.GetVideoDispDim(), 0 , codecName);
+
         bool ok = Init(m_newVideoDim, m_newVideoDispDim, m_newAspect,
                        0, m_window.GetDisplayVisibleRect(), m_newCodecId);
         m_newCodecId = kCodec_NONE;
@@ -515,7 +528,7 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, OSD 
         else if (m_window.IsEmbedding())
         {
             // use MythRenderOpenGL rendering as it will clear to the appropriate 'black level'
-            m_render->ClearRect(nullptr, m_window.GetDisplayVisibleRect(), gray);
+            m_render->ClearRect(nullptr, m_window.GetWindowRect(), gray);
         }
         else
         {
@@ -714,6 +727,13 @@ VideoFrameType* VideoOutputOpenGL::DirectRenderFormats(void)
     return m_isGLES2 ? &opengles2formats[0] : &openglformats[0];
 }
 
+void VideoOutputOpenGL::WindowResized(const QSize &Size)
+{
+    m_window.SetWindowSize(Size);
+    QSize size = m_window.GetVideoDim();
+    InitDisplayMeasurements(size.width(), size.height());
+}
+
 void VideoOutputOpenGL::Show(FrameScanType /*scan*/)
 {
     if (m_render && !IsErrored())
@@ -872,24 +892,6 @@ void VideoOutputOpenGL::RemovePIP(MythPlayer *PiPPlayer)
         m_openGLVideoPiPs.remove(PiPPlayer);
         m_render->doneCurrent();
     }
-}
-
-void VideoOutputOpenGL::MoveResizeWindow(QRect NewRect)
-{
-    if (m_render)
-        m_render->MoveResizeWindow(NewRect);
-}
-
-void VideoOutputOpenGL::EmbedInWidget(const QRect &Rect)
-{
-    VideoOutput::EmbedInWidget(Rect);
-    MoveResize();
-}
-
-void VideoOutputOpenGL::StopEmbedding(void)
-{
-    VideoOutput::StopEmbedding();
-    MoveResize();
 }
 
 QStringList VideoOutputOpenGL::GetVisualiserList(void)

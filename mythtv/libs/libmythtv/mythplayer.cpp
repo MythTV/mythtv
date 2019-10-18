@@ -1173,6 +1173,7 @@ void MythPlayer::WindowResized(const QSize &new_size)
 {
     if (videoOutput)
         videoOutput->WindowResized(new_size);
+    ReinitOSD();
 }
 
 void MythPlayer::EnableTeletext(int page)
@@ -2581,10 +2582,8 @@ void MythPlayer::VideoStart(void)
 
         osdLock.lock();
         osd = new OSD(this, m_tv, videoOutput->GetOSDPainter());
-
         videoOutput->GetOSDBounds(total, visible, aspect, scaling, 1.0F);
         osd->Init(visible, aspect);
-        videoOutput->InitOSD(osd);
         osd->EnableSubtitles(kDisplayNone);
 
 #ifdef USING_MHEG

@@ -32,10 +32,7 @@ class VideoOutputOpenGL : public VideoOutput
                       MythMultiLocker* Locks, int ReferenceFrames) override;
     void UpdatePauseFrame(int64_t &DisplayTimecode) override;
     void InitPictureAttributes(void) override;
-    void EmbedInWidget(const QRect &Rect) override;
-    void StopEmbedding(void) override;
     void ShowPIP(VideoFrame *Frame, MythPlayer *PiPPlayer, PIPLocation Location) override;
-    void MoveResizeWindow(QRect NewRect) override;
     void RemovePIP(MythPlayer *PiPPlayer) override;
     bool IsPIPSupported(void) const override  { return true; }
     MythPainter *GetOSDPainter(void) override;
@@ -46,6 +43,7 @@ class VideoOutputOpenGL : public VideoOutput
     void DoneDisplayingFrame(VideoFrame *Frame) override;
     void DiscardFrames(bool KeyFrame, bool Flushed) override;
     VideoFrameType* DirectRenderFormats(void) override;
+    void WindowResized(const QSize &Size) override;
 
   protected:
     void DestroyBuffers(void);

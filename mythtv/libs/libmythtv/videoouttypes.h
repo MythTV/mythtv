@@ -199,6 +199,19 @@ inline QString toString(FrameScanType scan, bool brief = false)
     return ret;
 }
 
+inline QString toString(PIPState State)
+{
+    switch (State)
+    {
+    case kPIPOff: return QString("Pip Off");
+    case kPIPonTV: return QString("Pip on TV");
+    case kPIPStandAlone: return QString("Pip Standalone");
+    case kPBPLeft: return QString("PBP Left");
+    case kPBPRight: return QString("PBP Right");
+    }
+    return QString("Unknown");
+}
+
 inline QString toString(PIPLocation location)
 {
     QString ret;

@@ -973,9 +973,10 @@ void VideoOutput::ResizeForVideo(int Width, int Height)
     {
         // Switching to custom display resolution succeeded
         // Make a note of the new size
-        m_window.SetDisplayDim(QSize(m_displayRes->GetPhysicalWidth(),
-                                       m_displayRes->GetPhysicalHeight()));
-        m_window.SetDisplayAspect(static_cast<float>(m_displayRes->GetAspectRatio()));
+        m_window.SetDisplayProperties(QSize(m_displayRes->GetPhysicalWidth(),
+                                            m_displayRes->GetPhysicalHeight()),
+                                      static_cast<float>(m_displayRes->GetAspectRatio()));
+        m_window.SetWindowSize(QSize(m_displayRes->GetWidth(), m_displayRes->GetHeight()));
 
         bool fullscreen = !m_window.UsingGuiSize();
 
@@ -990,12 +991,9 @@ void VideoOutput::ResizeForVideo(int Width, int Height)
         if (fullscreen)
         {
             QSize sz(m_displayRes->GetWidth(), m_displayRes->GetHeight());
-            const QRect display_visible_rect =
-                    QRect(GetMythMainWindow()->geometry().topLeft(), sz);
-            m_window.SetDisplayVisibleRect(display_visible_rect);
-            MoveResize();
-            // Resize X window to fill new resolution
-            MoveResizeWindow(display_visible_rect);
+            QRect display_visible_rect = QRect(GetMythMainWindow()->geometry().topLeft(), sz);
+            if (HasMythMainWindow())
+                GetMythMainWindow()->MoveResize(display_visible_rect);
         }
     }
 }
@@ -1004,53 +1002,31 @@ void VideoOutput::ResizeForVideo(int Width, int Height)
  * \brief Init display measurements based on database settings and
  *        actual screen parameters.
  */
-void VideoOutput::InitDisplayMeasurements(int Width, int Height, bool Resize)
+void VideoOutput::InitDisplayMeasurements(int Width, int Height)
 {
     DisplayInfo disp = MythDisplay::GetDisplayInfo();
     QString     source = "Actual";
 
-    // The very first Resize needs to be the maximum possible
-    // desired res, because X will mask off anything outside
-    // the initial dimensions
-    QSize sz1 = disp.m_res;
-    QSize sz2 = m_window.GetScreenGeometry().size();
-    QSize max_size = sz1.expandedTo(sz2);
-
-    if (m_window.UsingGuiSize())
-        max_size = GetMythMainWindow()->geometry().size();
-
-    if (m_displayRes)
-    {
-        max_size.setWidth(m_displayRes->GetMaxWidth());
-        max_size.setHeight(m_displayRes->GetMaxHeight());
-    }
-
-    if (Resize)
-    {
-        MoveResizeWindow(QRect(GetMythMainWindow()->geometry().x(),
-                               GetMythMainWindow()->geometry().y(),
-                               max_size.width(), max_size.height()));
-    }
-
     // get the physical dimensions (in mm) of the display. If using
     // DisplayRes, this will be overridden when we call ResizeForVideo
-    if (m_dbDisplayDimensionsMM.isEmpty())
-    {
-        m_window.SetDisplayDim(disp.m_size);
-    }
+    float disp_aspect = m_window.GetDisplayAspect();
+    QSize disp_dim = m_dbDisplayDimensionsMM;
+    if (disp_dim.isEmpty())
+        disp_dim = disp.m_size;
     else
-    {
-        m_window.SetDisplayDim(m_dbDisplayDimensionsMM);
         source = "Database";
-    }
+    m_window.SetDisplayProperties(disp_dim, disp_aspect);
 
     // Set the display mode if required
     if (m_displayRes)
+    {
         ResizeForVideo(Width, Height);
+        disp = MythDisplay::GetDisplayInfo();
+    }
 
     // Determine window and screen dimensions in pixels
     QSize screen_size = disp.m_res;
-    QSize window_size = m_window.GetDisplayVisibleRect().size();
+    QSize window_size = m_window.GetWindowRect().size();
 
     if (screen_size.isEmpty())
         screen_size = window_size.isEmpty() ? QSize(1920, 1080): window_size;
@@ -1065,8 +1041,8 @@ void VideoOutput::InitDisplayMeasurements(int Width, int Height, bool Resize)
             .arg(window_size.width()).arg(window_size.height()));
 
     // Check the display dimensions
-    QSize disp_dim = m_window.GetDisplayDim();
-    float disp_aspect;
+    disp_aspect = m_window.GetDisplayAspect();
+    disp_dim = m_window.GetDisplayDim();
 
     // If we are using Xinerama the display dimensions cannot be trusted.
     // We need to use the Xinerama monitor aspect ratio from the DB to set
@@ -1086,8 +1062,8 @@ void VideoOutput::InitDisplayMeasurements(int Width, int Height, bool Resize)
     if (disp_dim.isEmpty())
     {
         source = "Guessed!";
-        LOG(VB_GENERAL, LOG_WARNING, LOC + "Physical size of display unknown."
-                "\n\t\t\tAssuming 17\" monitor with square pixels.");
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            "Physical size of display unknown. Assuming 17\" monitor with square pixels.");
         disp_dim = QSize(static_cast<int>(lroundf(300 * pixel_aspect)), 300);
     }
 
@@ -1108,18 +1084,12 @@ void VideoOutput::InitDisplayMeasurements(int Width, int Height, bool Resize)
                      (disp_dim.height() * window_size.height()) /
                       screen_size.height());
     disp_aspect = static_cast<float>(disp_dim.width()) / disp_dim.height();
-    m_window.SetDisplayDim(disp_dim);
-    m_window.SetDisplayAspect(disp_aspect);
 
     // If we are using XRandR, use the aspect ratio from it
     if (m_displayRes)
-        m_window.SetDisplayAspect(static_cast<float>(m_displayRes->GetAspectRatio()));
+        disp_aspect = static_cast<float>(m_displayRes->GetAspectRatio());
 
-    LOG(VB_PLAYBACK, LOG_INFO, LOC +
-        QString("Estimated window dimensions: %1x%2 mm  Aspect: %3")
-            .arg(m_window.GetDisplayDim().width())
-            .arg(m_window.GetDisplayDim().height())
-            .arg(static_cast<double>(m_window.GetDisplayAspect())));
+    m_window.SetDisplayProperties(disp_dim, disp_aspect);
 }
 
 ///\note Probably no longer required

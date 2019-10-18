@@ -74,8 +74,7 @@ class OpenGLVideo : public QObject
     MythRenderOpenGL *m_render;
     QSize          m_videoDispDim;        ///< Useful video frame size e.g. 1920x1080
     QSize          m_videoDim;            ///< Total video frame size e.g. 1920x1088
-    QSize          m_masterViewportSize;  ///< Current viewport into which OpenGL is rendered
-    QRect          m_displayVisibleRect;  ///< Total useful, visible rectangle
+    QSize          m_masterViewportSize;  ///< Current viewport into which OpenGL is rendered, usually the window size
     QRect          m_displayVideoRect;    ///< Sub-rect of display_visible_rect for video
     QRect          m_videoRect;           ///< Sub-rect of video_disp_dim to display (after zoom adjustments etc)
     MythDeintType  m_deinterlacer;

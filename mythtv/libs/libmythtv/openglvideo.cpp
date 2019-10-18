@@ -29,7 +29,6 @@ OpenGLVideo::OpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *ColourSpace
     m_videoDispDim(VideoDispDim),
     m_videoDim(VideoDim),
     m_masterViewportSize(DisplayVisibleRect.size()),
-    m_displayVisibleRect(DisplayVisibleRect),
     m_displayVideoRect(DisplayVideoRect),
     m_videoRect(VideoRect),
     m_deinterlacer(MythDeintType::DEINT_NONE),
@@ -778,10 +777,7 @@ void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanT
 
     // bind default framebuffer
     m_render->BindFramebuffer(nullptr);
-    if (m_viewportControl)
-        m_render->SetViewPort(QRect(QPoint(), m_displayVisibleRect.size()));
-    else
-        m_render->SetViewPort(QRect(QPoint(), m_masterViewportSize));
+    m_render->SetViewPort(QRect(QPoint(), m_masterViewportSize));
 
     // PiP border
     if (DrawBorder)

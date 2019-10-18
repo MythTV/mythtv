@@ -35,7 +35,6 @@ class VideoOutputNull : public VideoOutput
                       FrameScanType scan) override; // VideoOutput
     static QStringList GetAllowedRenderers(MythCodecID myth_codec_id,
                                            const QSize &video_dim);
-    void MoveResizeWindow(QRect ) override {;} // VideoOutput
     bool SetupVisualisation(AudioPlayer *, MythRender *,
                             const QString &) override // VideoOutput
         { return false; }
