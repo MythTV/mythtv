@@ -1002,7 +1002,7 @@ void VideoOutput::ResizeForVideo(int Width, int Height)
  * \brief Init display measurements based on database settings and
  *        actual screen parameters.
  */
-void VideoOutput::InitDisplayMeasurements(int Width, int Height)
+void VideoOutput::InitDisplayMeasurements(void)
 {
     DisplayInfo disp = MythDisplay::GetDisplayInfo();
     QString     source = "Actual";
@@ -1016,13 +1016,6 @@ void VideoOutput::InitDisplayMeasurements(int Width, int Height)
     else
         source = "Database";
     m_window.SetDisplayProperties(disp_dim, disp_aspect);
-
-    // Set the display mode if required
-    if (m_displayRes)
-    {
-        ResizeForVideo(Width, Height);
-        disp = MythDisplay::GetDisplayInfo();
-    }
 
     // Determine window and screen dimensions in pixels
     QSize screen_size = disp.m_res;

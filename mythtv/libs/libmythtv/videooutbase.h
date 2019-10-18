@@ -152,7 +152,7 @@ class VideoOutput
 
   protected:
     virtual void MoveResize(void);
-    void         InitDisplayMeasurements(int Width, int Height);
+    void         InitDisplayMeasurements(void);
     virtual void ShowPIPs(VideoFrame *Frame, const PIPMap &PiPPlayers);
     virtual void ShowPIP(VideoFrame*, MythPlayer*, PIPLocation) { }
 

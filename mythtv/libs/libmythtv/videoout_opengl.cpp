@@ -226,7 +226,11 @@ bool VideoOutputOpenGL::Init(const QSize &VideoDim, const QSize &VideoDispDim, f
 
     // Setup display
     QSize size = m_window.GetVideoDim();
-    InitDisplayMeasurements(size.width(), size.height());
+
+    // Set the display mode if required
+    if (m_displayRes && !m_window.IsEmbedding())
+        ResizeForVideo(size.width(), size.height());
+    InitDisplayMeasurements();
 
     // Create buffers
     if (!CreateBuffers(CodecId, m_window.GetVideoDim()))
@@ -733,8 +737,7 @@ VideoFrameType* VideoOutputOpenGL::DirectRenderFormats(void)
 void VideoOutputOpenGL::WindowResized(const QSize &Size)
 {
     m_window.SetWindowSize(Size);
-    QSize size = m_window.GetVideoDim();
-    InitDisplayMeasurements(size.width(), size.height());
+    InitDisplayMeasurements();
 }
 
 void VideoOutputOpenGL::Show(FrameScanType /*scan*/)
