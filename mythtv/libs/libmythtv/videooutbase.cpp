@@ -410,7 +410,7 @@ void VideoOutput::VideoAspectRatioChanged(float VideoAspect)
 bool VideoOutput::InputChanged(const QSize &VideoDim, const QSize &VideoDispDim,
                                float VideoAspect, MythCodecID  CodecID,
                                bool  &/*AspectOnly*/, MythMultiLocker*,
-                               int   ReferenceFrames)
+                               int   ReferenceFrames, bool)
 {
     m_window.InputChanged(VideoDim, VideoDispDim, VideoAspect);
     m_maxReferenceFrames = ReferenceFrames;

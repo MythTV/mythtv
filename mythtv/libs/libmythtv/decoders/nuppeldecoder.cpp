@@ -207,7 +207,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     GetPlayer()->SetKeyframeDistance(m_fileheader.keyframedist);
     GetPlayer()->SetVideoParams(m_fileheader.width, m_fileheader.height,
-                                m_fileheader.fps, m_current_aspect, 16);
+                                m_fileheader.fps, m_current_aspect, false, 16);
 
     m_video_width = m_fileheader.width;
     m_video_height = m_fileheader.height;
@@ -1339,7 +1339,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype, bool&)
 
                 GetPlayer()->SetKeyframeDistance(m_fileheader.keyframedist);
                 GetPlayer()->SetVideoParams(m_fileheader.width, m_fileheader.height,
-                                            m_fileheader.fps, m_current_aspect, 2);
+                                            m_fileheader.fps, m_current_aspect, false, 2);
             }
         }
     }

@@ -26,7 +26,8 @@ class VideoOutputNull : public VideoOutput
                       MythCodecID  av_codec_id,
                       bool        &aspect_only,
                       MythMultiLocker* Locks,
-                      int ReferenceFrames) override; // VideoOutput
+                      int ReferenceFrames,
+                      bool ForceChange) override; // VideoOutput
     void EmbedInWidget(const QRect &rect) override; // VideoOutput
     void StopEmbedding(void) override; // VideoOutput
     void UpdatePauseFrame(int64_t &disp_timecode) override; // VideoOutput

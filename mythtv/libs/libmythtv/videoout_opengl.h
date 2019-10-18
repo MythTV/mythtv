@@ -29,7 +29,8 @@ class VideoOutputOpenGL : public VideoOutput
     void ClearAfterSeek(void) override;
     bool InputChanged(const QSize &VideoDim, const QSize &VideoDispDim,
                       float Aspect, MythCodecID CodecId, bool &AspectOnly,
-                      MythMultiLocker* Locks, int ReferenceFrames) override;
+                      MythMultiLocker* Locks, int ReferenceFrames,
+                      bool ForceChange) override;
     void UpdatePauseFrame(int64_t &DisplayTimecode) override;
     void InitPictureAttributes(void) override;
     void ShowPIP(VideoFrame *Frame, MythPlayer *PiPPlayer, PIPLocation Location) override;

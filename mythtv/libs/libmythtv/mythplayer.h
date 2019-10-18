@@ -172,8 +172,10 @@ class MTV_PUBLIC MythPlayer
     void SetWatchingRecording(bool mode);
     void SetWatched(bool forceWatched = false);
     void SetKeyframeDistance(int keyframedistance);
-    void SetVideoParams(int w, int h, double fps, float aspect, int ReferenceFrames,
-           FrameScanType scan = kScan_Ignore, const QString& codecName = QString());
+    void SetVideoParams(int w, int h, double fps, float aspect,
+                        bool ForceUpdate, int ReferenceFrames,
+                        FrameScanType scan = kScan_Ignore,
+                        const QString& codecName = QString());
     void SetFileLength(int total, int frames);
     void SetDuration(int duration);
     void SetVideoResize(const QRect &videoRect);
@@ -295,7 +297,7 @@ class MTV_PUBLIC MythPlayer
     void SaveScreenshot(void);
 
     // Reinit
-    void ReinitVideo(void);
+    void ReinitVideo(bool ForceUpdate);
 
     // Add data
     virtual bool PrepareAudioSample(int64_t &timecode);

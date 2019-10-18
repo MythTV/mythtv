@@ -1517,7 +1517,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         if (codec2)
             codecName = codec2->name;
         m_parent->SetVideoParams(width, height, static_cast<double>(m_fps),
-                                 m_current_aspect, GetMaxReferenceFrames(enc),
+                                 m_current_aspect, false, GetMaxReferenceFrames(enc),
                                  kScan_Detect, codecName);
         if (LCD *lcd = LCD::Get())
         {
@@ -2387,13 +2387,13 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         if (tvformat == "ntsc" || tvformat == "ntsc-jp" ||
             tvformat == "pal-m" || tvformat == "atsc")
         {
-            m_fps = 29.97;
-            m_parent->SetVideoParams(-1, -1, 29.97, 1.0f, 16);
+            m_fps = 29.97f;
+            m_parent->SetVideoParams(-1, -1, 29.97, 1.0f, false, 16);
         }
         else
         {
             m_fps = 25.0;
-            m_parent->SetVideoParams(-1, -1, 25.0, 1.0f, 16);
+            m_parent->SetVideoParams(-1, -1, 25.0, 1.0f, false, 16);
         }
     }
 
@@ -3028,6 +3028,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
 
         if (m_start_code_state >= SLICE_MIN && m_start_code_state <= SLICE_MAX)
             continue;
+
         if (SEQ_START == m_start_code_state)
         {
             if (bufptr + 11 >= pkt->data + pkt->size)
@@ -3037,32 +3038,40 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
 
             int  width  = static_cast<int>(seq->width())  >> context->lowres;
             int  height = static_cast<int>(seq->height()) >> context->lowres;
-            m_current_aspect = seq->aspect(context->codec_id ==
-                                         AV_CODEC_ID_MPEG1VIDEO);
+            float aspect = seq->aspect(context->codec_id == AV_CODEC_ID_MPEG1VIDEO);
             if (stream->sample_aspect_ratio.num)
-                m_current_aspect = static_cast<float>(av_q2d(stream->sample_aspect_ratio) *
+                aspect = static_cast<float>(av_q2d(stream->sample_aspect_ratio) *
                                                               width / height);
-            if (aspect_override > 0.0F)
-                m_current_aspect = aspect_override;
             float seqFPS = seq->fps();
 
-            bool changed =
-                (seqFPS > static_cast<float>(m_fps)+0.01F) ||
-                (seqFPS < static_cast<float>(m_fps)-0.01F);
-            changed |= (width  != m_current_width );
-            changed |= (height != m_current_height);
+            bool changed = (width  != m_current_width );
+            changed     |= (height != m_current_height);
+            changed     |= (seqFPS > static_cast<float>(m_fps)+0.01F) ||
+                           (seqFPS < static_cast<float>(m_fps)-0.01F);
 
-            if (changed)
+            // some hardware decoders (e.g. VAAPI MPEG2) will reset when the aspect
+            // ratio changes
+            bool forceaspectchange = !qFuzzyCompare(m_current_aspect + 10.0f, aspect + 10.0f) &&
+                                      m_mythcodecctx && m_mythcodecctx->DecoderWillResetOnAspect();
+
+            m_current_aspect = aspect;
+
+            // N.B. this will break aspect ratio change detection above
+            if (aspect_override > 0.0F)
+                m_current_aspect = aspect_override;
+
+            if (changed || forceaspectchange)
             {
                 if (m_private_dec)
                     m_private_dec->Reset();
 
-                // N.B. we now set the default scan to kScan_Ignore as interlaced detection based on frame
+                // N.B. We now set the default scan to kScan_Ignore as interlaced detection based on frame
                 // size and rate is extremely error prone and FFmpeg gets it right far more often.
-                // as for H.264, if a decoder deinterlacer is in operation - the stream must be progressive
+                // As for H.264, if a decoder deinterlacer is in operation - the stream must be progressive
                 bool doublerate = false;
                 bool decoderdeint = m_mythcodecctx->IsDeinterlacing(doublerate, true);
-                m_parent->SetVideoParams(width, height, static_cast<double>(seqFPS), m_current_aspect, 2,
+                m_parent->SetVideoParams(width, height, static_cast<double>(seqFPS), m_current_aspect,
+                                         forceaspectchange, 2,
                                          decoderdeint ? kScan_Progressive : kScan_Ignore);
 
                 m_current_width  = width;
@@ -3146,7 +3155,7 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
             continue;
         }
 
-        m_current_aspect = get_aspect(*m_h264_parser);
+        float aspect = get_aspect(*m_h264_parser);
         int width  = static_cast<int>(m_h264_parser->pictureWidthCropped());
         int height = static_cast<int>(m_h264_parser->pictureHeightCropped());
         double seqFPS = m_h264_parser->frameRate();
@@ -3154,8 +3163,11 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
         bool res_changed = ((width  != m_current_width) || (height != m_current_height));
         bool fps_changed = (seqFPS > 0.0) && ((seqFPS > static_cast<double>(m_fps) + 0.01) ||
                                               (seqFPS < static_cast<double>(m_fps) - 0.01));
+        bool forcechange = !qFuzzyCompare(aspect + 10.0f, m_current_aspect) &&
+                            m_mythcodecctx && m_mythcodecctx->DecoderWillResetOnAspect();
+        m_current_aspect = aspect;
 
-        if (fps_changed || res_changed)
+        if (fps_changed || res_changed || forcechange)
         {
             if (m_private_dec)
                 m_private_dec->Reset();
@@ -3165,7 +3177,7 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
             // N.B. if a decoder deinterlacer is in use - the stream must be progressive
             bool doublerate = false;
             bool decoderdeint = m_mythcodecctx->IsDeinterlacing(doublerate, true);
-            m_parent->SetVideoParams(width, height, seqFPS, m_current_aspect,
+            m_parent->SetVideoParams(width, height, seqFPS, m_current_aspect, forcechange,
                                      static_cast<int>(m_h264_parser->getRefFrames()),
                                      decoderdeint ? kScan_Progressive : kScan_Ignore);
 

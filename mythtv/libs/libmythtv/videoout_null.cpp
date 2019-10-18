@@ -95,7 +95,8 @@ bool VideoOutputNull::InputChanged(const QSize &video_dim_buf,
                                    MythCodecID  av_codec_id,
                                    bool        &aspect_only,
                                    MythMultiLocker* Locks,
-                                   int          ReferenceFrames)
+                                   int          ReferenceFrames,
+                                   bool ForceChange)
 {
     LOG(VB_PLAYBACK, LOG_INFO,
         QString("InputChanged(WxH = %1x%2, aspect = %3)")
@@ -121,7 +122,7 @@ bool VideoOutputNull::InputChanged(const QSize &video_dim_buf,
 
     VideoOutput::InputChanged(video_dim_buf, video_dim_disp,
                               aspect, av_codec_id, aspect_only, Locks,
-                              ReferenceFrames);
+                              ReferenceFrames, ForceChange);
     m_videoBuffers.DeleteBuffers();
 
     MoveResize();

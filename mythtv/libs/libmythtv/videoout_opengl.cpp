@@ -259,7 +259,8 @@ bool VideoOutputOpenGL::Init(const QSize &VideoDim, const QSize &VideoDispDim, f
 
 bool VideoOutputOpenGL::InputChanged(const QSize &VideoDim, const QSize &VideoDispDim,
                                      float Aspect, MythCodecID CodecId, bool &AspectOnly,
-                                     MythMultiLocker* Locks, int ReferenceFrames)
+                                     MythMultiLocker* Locks, int ReferenceFrames,
+                                     bool ForceChange)
 {
     QSize currentvideodim     = m_window.GetVideoDim();
     QSize currentvideodispdim = m_window.GetVideoDispDim();
@@ -290,7 +291,7 @@ bool VideoOutputOpenGL::InputChanged(const QSize &VideoDim, const QSize &VideoDi
     bool refschanged = m_maxReferenceFrames != ReferenceFrames;
 
     // aspect ratio changes are a no-op as changes are handled at display time
-    if (!cidchanged && !reschanged && !refschanged)
+    if (!(cidchanged || reschanged || refschanged || ForceChange))
     {
         AspectOnly = true;
         return true;

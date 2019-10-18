@@ -80,6 +80,7 @@ class MTV_PUBLIC MythCodecContext
     virtual bool   IsDeinterlacing         (bool &, bool = false) { return false; }
     virtual void   SetDecoderOptions       (AVCodecContext*, AVCodec*) { return; }
     virtual bool   DecoderWillResetOnFlush (void) { return false; }
+    virtual bool   DecoderWillResetOnAspect(void) { return false; }
 
   protected:
     virtual bool   RetrieveHWFrame         (VideoFrame* Frame, AVFrame* AvFrame);

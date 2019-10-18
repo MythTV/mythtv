@@ -65,7 +65,7 @@ class VideoOutput
     virtual bool InputChanged(const QSize &VideoDim, const QSize &VideoDispDim,
                               float VideoAspect, MythCodecID  CodecID,
                               bool &AspectChanged, MythMultiLocker* Locks,
-                              int   ReferenceFrames);
+                              int   ReferenceFrames, bool ForceChange);
     virtual void VideoAspectRatioChanged(float VideoAspect);
     virtual void ResizeDisplayWindow(const QRect& Rect, bool SaveVisible);
     virtual void EmbedInWidget(const QRect &EmbedRect);

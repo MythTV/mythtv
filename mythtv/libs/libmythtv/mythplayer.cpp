@@ -582,7 +582,7 @@ void MythPlayer::ReinitOSD(void)
     }
 }
 
-void MythPlayer::ReinitVideo(void)
+void MythPlayer::ReinitVideo(bool ForceUpdate)
 {
 
     bool aspect_only = false;
@@ -593,7 +593,7 @@ void MythPlayer::ReinitVideo(void)
         float aspect = (forced_video_aspect > 0) ? forced_video_aspect : video_aspect;
         if (!videoOutput->InputChanged(video_dim, video_disp_dim, aspect,
                                        decoder->GetVideoCodecID(), aspect_only, &locker,
-                                       m_maxReferenceFrames))
+                                       m_maxReferenceFrames, ForceUpdate))
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 "Failed to Reinitialize Video. Exiting..");
@@ -756,10 +756,11 @@ void MythPlayer::SetScanType(FrameScanType scan)
     m_scan = scan;
 }
 
-void MythPlayer::SetVideoParams(int width, int height, double fps, float aspect,
+void MythPlayer::SetVideoParams(int width, int height, double fps,
+                                float aspect, bool ForceUpdate,
                                 int ReferenceFrames, FrameScanType scan, const QString& codecName)
 {
-    bool paramsChanged = false;
+    bool paramsChanged = ForceUpdate;
 
     if (width >= 1 && height >= 1)
     {
@@ -801,7 +802,7 @@ void MythPlayer::SetVideoParams(int width, int height, double fps, float aspect,
         return;
 
     if (videoOutput)
-        ReinitVideo();
+        ReinitVideo(ForceUpdate);
 
     if (IsErrored())
         return;
@@ -842,7 +843,7 @@ void MythPlayer::OpenDummy(void)
     if (!videoOutput)
     {
         SetKeyframeDistance(15);
-        SetVideoParams(720, 576, 25.00, 1.25f, 2);
+        SetVideoParams(720, 576, 25.00, 1.25f, false, 2);
     }
 
     player_ctx->LockPlayingInfo(__FILE__, __LINE__);

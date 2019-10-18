@@ -725,6 +725,12 @@ bool MythVAAPIContext::DecoderWillResetOnFlush(void)
     return kCodec_H264_VAAPI == m_codecID;
 }
 
+bool MythVAAPIContext::DecoderWillResetOnAspect(void)
+{
+    // Only MPEG2 tested so far
+    return (kCodec_MPEG2_VAAPI ==  m_codecID) || (kCodec_MPEG2_VAAPI_DEC == m_codecID);
+}
+
 void MythVAAPIContext::DestroyDeinterlacer(void)
 {
     if (m_filterGraph)
