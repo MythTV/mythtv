@@ -5590,7 +5590,8 @@ bool TV::CreatePBP(PlayerContext *ctx, const ProgramInfo *info)
     // This is safe because we are already holding lock for a ctx
     m_player.push_back(new PlayerContext(kPBPPlayerInUseID));
     PlayerContext *pbpctx = m_player.back();
-    if (m_noHardwareDecoders)
+    // see comment in CreatePIP on disabling hardware acceleration for secondary players
+    //if (m_noHardwareDecoders)
         pbpctx->SetNoHardwareDecoders();
     pbpctx->SetPIPState(kPBPRight);
 
@@ -5675,7 +5676,12 @@ bool TV::CreatePIP(PlayerContext *ctx, const ProgramInfo *info)
     }
 
     PlayerContext *pipctx = new PlayerContext(kPIPPlayerInUseID);
-    if (m_noHardwareDecoders)
+    // Hardware acceleration of PiP is currently disabled as the null video
+    // renderer cannot deal with hardware codecs which are returned by the display
+    // profile. The workaround would be to encourage the decoder, when using null
+    // video, to change the decoder to a decode only version - which will work
+    // with null video
+    //if (m_noHardwareDecoders)
         pipctx->SetNoHardwareDecoders();
     pipctx->SetNullVideo(true);
     pipctx->SetPIPState(kPIPonTV);
