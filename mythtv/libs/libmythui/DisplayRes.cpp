@@ -281,6 +281,9 @@ DisplayResVector GetVideoModes(void)
 
 void DisplayRes::PauseForModeSwitch(void)
 {
+    // this is currently disabled as it causes lockups and seg faults when
+    // exiting playback
+    /*
     int pauselengthinms = gCoreContext->GetNumSetting("VideoModeChangePauseMS", 0);
     if (pauselengthinms)
     {
@@ -294,4 +297,5 @@ void DisplayRes::PauseForModeSwitch(void)
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
         }
     }
+    */
 }

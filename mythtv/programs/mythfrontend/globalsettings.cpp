@@ -2490,7 +2490,8 @@ VideoModeSettings::VideoModeSettings(const char *c) : HostCheckBoxSetting(c)
     addChild(res);
     addChild(rate);
     addChild(TVVidModeForceAspect());
-    addChild(pause);
+    // This code is currently disabled as it is causes issues when exiting playback
+    //addChild(pause);
     connect(res, SIGNAL(valueChanged(StandardSetting *)),
             rate, SLOT(ChangeResolution(StandardSetting *)));
 
