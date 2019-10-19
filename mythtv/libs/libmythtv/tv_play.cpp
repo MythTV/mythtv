@@ -7177,6 +7177,13 @@ void TV::SwitchInputs(PlayerContext *ctx,
     if (!ctx->m_recorder)
         return;
 
+    // this will re-create the player. Ensure any outstanding events are delivered
+    // and processed before the player is deleted so that we don't confuse the
+    // state of the new player e.g. when switching inputs from the guide grid,
+    // "EPG_EXITING" may not be received until after the player is re-created
+    // and we inadvertantly disable drawing...
+    qApp->processEvents();
+
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("(%1,'%2',%3)")
             .arg(chanid).arg(channum).arg(inputid));
 
