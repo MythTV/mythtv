@@ -705,13 +705,6 @@ void MythPlayer::AutoDeint(VideoFrame *frame, bool allow_lock)
         m_scan_tracker--;
     }
 
-    if ((m_scan_tracker % 400) == 0)
-    {
-        QString type = (m_scan_tracker < 0) ? "progressive" : "interlaced";
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("%1 %2 frames seen.")
-                .arg(abs(m_scan_tracker)).arg(type));
-    }
-
     int min_count = !allow_lock ? 0 : 2;
     if (abs(m_scan_tracker) <= min_count)
         return;
@@ -2034,7 +2027,7 @@ void MythPlayer::WaitForTime(int64_t framedue)
     int64_t unow = m_avTimer.nsecsElapsed() / 1000;
     int64_t delay = framedue - unow;
     if (delay > 0)
-        QThread::usleep(delay);
+        QThread::usleep(static_cast<unsigned long>(delay));
 }
 
 #define AVSYNC_MAX_LATE 10000000
@@ -2055,7 +2048,7 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
     int64_t audio_adjustment = 0;
     int64_t unow = 0;
     int64_t lateness = 0;
-    int64_t playspeed1000 = (float)1000 / play_speed;
+    int64_t playspeed1000 = static_cast<int64_t>(1000.0f / play_speed);
     bool reset = false;
 
     while (framedue == 0)
@@ -2088,7 +2081,7 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
             maxtcval = 0;
             maxtcframes = 0;
             numdroppedframes = 0;
-            m_timeOffsetBase = TranslatePositionFrameToMs(framesPlayed, false) - videotimecode;
+            m_timeOffsetBase = static_cast<int64_t>(TranslatePositionFrameToMs(framesPlayed, false)) - videotimecode;
         }
 
         if (videotimecode == 0)
@@ -2111,8 +2104,8 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
             framedue = unow + frame_interval / 2;
 
         // recalculate framesPlayed to conform to actual time code.
-        framesPlayed = TranslatePositionMsToFrame(videotimecode + m_timeOffsetBase, false);
-        decoder->SetFramesPlayed(framesPlayed);
+        framesPlayed = TranslatePositionMsToFrame(static_cast<uint64_t>(videotimecode + m_timeOffsetBase), false);
+        decoder->SetFramesPlayed(static_cast<long long>(framesPlayed));
 
         lateness = unow - framedue;
         dropframe = false;
@@ -2138,11 +2131,11 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
             if (audio_adjustment * sign > 200)
                 // fix the sync within 15 - 20 frames
                 fix_amount = audio_adjustment * sign / 15;
-            int64_t speedup1000 = (float)1000 * play_speed;
-            rtcbase -= (int64_t)1000000 * fix_amount * sign / speedup1000;
+            int64_t speedup1000 = static_cast<int64_t>(1000 * play_speed);
+            rtcbase -= static_cast<int64_t>(1000000 * fix_amount * sign / speedup1000);
             if (audio_adjustment * sign > 20 || (framesPlayed % 400 == 0))
-                LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                    QString("AV Sync, audio ahead by %1 ms").arg(audio_adjustment));
+                LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("AV Sync: Audio %1 by %2 ms")
+                    .arg(audio_adjustment > 0 ? "ahead" : "behind").arg(abs(audio_adjustment)));
             if (audio_adjustment > 200)
                 pause_audio = true;
         }
@@ -2167,7 +2160,7 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
     disp_timecode = videotimecode;
 
     output_jmeter && output_jmeter->RecordCycleTime();
-    avsync_avg = audio_adjustment * 1000;
+    avsync_avg = static_cast<int>(audio_adjustment * 1000);
 
     bool decoderdeint = buffer && buffer->decoder_deinterlaced;
     FrameScanType ps = m_scan;
