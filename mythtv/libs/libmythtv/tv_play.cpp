@@ -1178,17 +1178,15 @@ bool TV::Init(bool createWindow)
                                  GetMythMainWindow()->size());
 
         // adjust for window manager wierdness.
+        int xbase, width, ybase, height;
+        float wmult, hmult;
+        GetMythUI()->GetScreenSettings(xbase, width, wmult,
+                                       ybase, height, hmult);
+        if ((abs(m_savedGuiBounds.x()-xbase) < 3) &&
+            (abs(m_savedGuiBounds.y()-ybase) < 3))
         {
-            int xbase, width, ybase, height;
-            float wmult, hmult;
-            GetMythUI()->GetScreenSettings(xbase, width, wmult,
-                                           ybase, height, hmult);
-            if ((abs(m_savedGuiBounds.x()-xbase) < 3) &&
-                (abs(m_savedGuiBounds.y()-ybase) < 3))
-            {
-                m_savedGuiBounds = QRect(QPoint(xbase, ybase),
-                                         mainwindow->size());
-            }
+            m_savedGuiBounds = QRect(QPoint(xbase, ybase),
+                                     mainwindow->size());
         }
 
         // if width && height are zero users expect fullscreen playback
@@ -1205,31 +1203,6 @@ bool TV::Init(bool createWindow)
             int xbase, width, ybase, height;
             GetMythUI()->GetScreenBounds(xbase, ybase, width, height);
             m_playerBounds = QRect(xbase, ybase, width, height);
-        }
-
-        // main window sizing
-        if (m_dbUseVideoModes)
-        {
-            DisplayRes *display_res = DisplayRes::GetDisplayRes();
-            if(display_res)
-            {
-                int maxWidth = 3840, maxHeight = 2160;
-
-                // The very first Resize needs to be the maximum possible
-                // desired res, because X will mask off anything outside
-                // the initial dimensions
-                maxWidth = display_res->GetMaxWidth();
-                maxHeight = display_res->GetMaxHeight();
-
-                // bit of a hack, but it's ok if the window is too
-                // big in fullscreen mode
-                if (fullscreen)
-                {
-                    m_playerBounds.setSize(QSize(maxWidth, maxHeight));
-                    // resize possibly avoids a bug on some systems
-                    mainwindow->MoveResize(m_playerBounds);
-                }
-            }
         }
 
         // player window sizing
@@ -8662,9 +8635,8 @@ void TV::DoEditSchedule(int editType)
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to find player index by context");
         return;
     }
-    do_pause[actx_index] = pause_active;
-    LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
-        QString("Pausing player: %1").arg(pause_active));
+    do_pause[static_cast<size_t>(actx_index)] = pause_active;
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("Pausing player: %1").arg(pause_active));
 
     m_savedPause = DoSetPauseState(actx, do_pause);
 
@@ -9700,7 +9672,7 @@ void TV::customEvent(QEvent *e)
 
         // m_playerBounds is not applicable when switching modes so
         // skip this logic in that case.
-        if (!m_dbUseVideoModes && !m_dbUseGuiSizeForTv)
+        if (!m_dbUseVideoModes)
             mwnd->MoveResize(m_playerBounds);
 
         DoSetPauseState(actx, m_savedPause); // Restore pause states
