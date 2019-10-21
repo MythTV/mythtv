@@ -501,8 +501,9 @@ void GameUI::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
-
+        auto dce = dynamic_cast<DialogCompletionEvent*>(event);
+        if (dce == nullptr)
+            return;
         QString resultid   = dce->GetId();
         QString resulttext = dce->GetResultText();
 
@@ -560,8 +561,9 @@ void GameUI::customEvent(QEvent *event)
     }
     if (event->type() == MetadataLookupEvent::kEventType)
     {
-        MetadataLookupEvent *lue = (MetadataLookupEvent *)event;
-
+        auto lue = dynamic_cast<MetadataLookupEvent *>(event);
+        if (lue == nullptr)
+            return;
         MetadataLookupList lul = lue->m_lookupList;
 
         if (m_busyPopup)
@@ -592,8 +594,9 @@ void GameUI::customEvent(QEvent *event)
     }
     else if (event->type() == MetadataLookupFailure::kEventType)
     {
-        MetadataLookupFailure *luf = (MetadataLookupFailure *)event;
-
+        auto luf = dynamic_cast<MetadataLookupFailure *>(event);
+        if (luf == nullptr)
+            return;
         MetadataLookupList lul = luf->m_lookupList;
 
         if (m_busyPopup)
@@ -619,8 +622,9 @@ void GameUI::customEvent(QEvent *event)
     }
     else if (event->type() == ImageDLEvent::kEventType)
     {
-        ImageDLEvent *ide = (ImageDLEvent *)event;
-
+        ImageDLEvent *ide = dynamic_cast<ImageDLEvent *>(event);
+        if (ide == nullptr)
+            return;
         MetadataLookup *lookup = ide->m_item;
 
         if (!lookup)

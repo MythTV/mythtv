@@ -210,8 +210,7 @@ void PlaylistEditorView::customEvent(QEvent *event)
     }
     else if (event->type() == MythEvent::MythEventMessage)
     {
-        MythEvent *me = static_cast<MythEvent*>(event);
-
+        MythEvent *me = dynamic_cast<MythEvent*>(event);
         if (!me)
             return;
 
@@ -232,10 +231,10 @@ void PlaylistEditorView::customEvent(QEvent *event)
     }
     else if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = static_cast<DialogCompletionEvent*>(event);
+        auto dce = static_cast<DialogCompletionEvent*>(event);
 
         // make sure the user didn't ESCAPE out of the menu
-        if (dce->GetResult() < 0)
+        if ((dce == nullptr) || (dce->GetResult() < 0))
             return;
 
         QString resultid   = dce->GetId();
@@ -1252,7 +1251,7 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
         while (climber)
         {
             dir = climber->GetText() + '/' + dir;
-            climber = (MusicGenericTree *) climber->getParent();
+            climber = dynamic_cast<MusicGenericTree *>(climber->getParent());
         }
 
         // remove the top two nodes
@@ -1326,7 +1325,7 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
         while (climber)
         {
             fields.append(climber->getAction());
-            climber = (MusicGenericTree *) climber->getParent();
+            climber = dynamic_cast<MusicGenericTree *>(climber->getParent());
         }
 
         MusicGenericTree *newnode = new MusicGenericTree(node, tr("All Tracks"), "all tracks");
@@ -1360,7 +1359,7 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
                     break;
                 }
 
-                mnode = (MusicGenericTree *) mnode->getParent();
+                mnode = dynamic_cast<MusicGenericTree *>(mnode->getParent());
 
             } while (mnode);
 

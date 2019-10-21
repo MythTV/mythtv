@@ -1123,9 +1123,8 @@ void BurnMenu::start(void)
 
 void BurnMenu::customEvent(QEvent *event)
 {
-    if (event->type() == DialogCompletionEvent::kEventType)
+    if (auto dce = dynamic_cast<DialogCompletionEvent*>(event))
     {
-        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
         if (dce->GetId() == "action")
         {
             doBurn(dce->GetResult());

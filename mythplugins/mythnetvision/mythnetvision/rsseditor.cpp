@@ -291,8 +291,8 @@ void RSSEditPopup::customEvent(QEvent *levent)
 {
     if (levent->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = (DialogCompletionEvent*)(levent);
-        if (dce->GetId() == CEID_NEWIMAGE)
+        auto dce = dynamic_cast<DialogCompletionEvent*>(levent);
+        if ((dce != nullptr) && (dce->GetId() == CEID_NEWIMAGE))
         {
             m_thumbImage->SetFilename(dce->GetResultText());
             m_thumbImage->Load();

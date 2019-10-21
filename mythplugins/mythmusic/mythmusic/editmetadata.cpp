@@ -737,10 +737,9 @@ void EditMetadataDialog::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
-
+        auto dce = dynamic_cast<DialogCompletionEvent*>(event);
         // make sure the user didn't ESCAPE out of the menu
-        if (dce->GetResult() < 0)
+        if ((dce == nullptr) || (dce->GetResult() < 0))
             return;
 
         QString resultid   = dce->GetId();
@@ -782,7 +781,9 @@ void EditMetadataDialog::customEvent(QEvent *event)
     }
     else if (event->type() == MythEvent::MythEventMessage)
     {
-        MythEvent *me = static_cast<MythEvent *>(event);
+        MythEvent *me = dynamic_cast<MythEvent *>(event);
+        if (me == nullptr)
+            return;
         QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);
 
         if (!tokens.isEmpty())
@@ -1095,10 +1096,9 @@ void EditAlbumartDialog::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
-
+        auto dce = dynamic_cast<DialogCompletionEvent*>(event);
         // make sure the user didn't ESCAPE out of the menu
-        if (dce->GetResult() < 0)
+        if ((dce == nullptr) || (dce->GetResult() < 0))
             return;
 
         QString resultid   = dce->GetId();
@@ -1170,7 +1170,9 @@ void EditAlbumartDialog::customEvent(QEvent *event)
     }
     else if (event->type() == MythEvent::MythEventMessage)
     {
-        MythEvent *me = static_cast<MythEvent *>(event);
+        MythEvent *me = dynamic_cast<MythEvent *>(event);
+        if (me == nullptr)
+            return;
         QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);
 
         if (!tokens.isEmpty())

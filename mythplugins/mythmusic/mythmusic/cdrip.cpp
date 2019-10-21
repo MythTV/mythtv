@@ -1442,8 +1442,9 @@ void Ripper::customEvent(QEvent* event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = static_cast<DialogCompletionEvent *>(event);
-
+        auto dce = dynamic_cast<DialogCompletionEvent *>(event);
+        if (dce == nullptr)
+            return;
         if (dce->GetId() == "conflictmenu")
         {
             int buttonNum = dce->GetResult();
@@ -1543,8 +1544,9 @@ void RipStatus::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = static_cast<DialogCompletionEvent *>(event);
-
+        DialogCompletionEvent *dce = dynamic_cast<DialogCompletionEvent *>(event);
+        if (dce == nullptr)
+            return;
         if (dce->GetId() == "stop_ripping" && dce->GetResult())
         {
             m_ripperThread->cancel();
@@ -1556,7 +1558,6 @@ void RipStatus::customEvent(QEvent *event)
     }
 
     RipStatusEvent *rse = dynamic_cast<RipStatusEvent *> (event);
-
     if (!rse)
         return;
 

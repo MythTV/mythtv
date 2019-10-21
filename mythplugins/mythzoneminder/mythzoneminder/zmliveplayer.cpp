@@ -276,10 +276,10 @@ void ZMLivePlayer::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = static_cast<DialogCompletionEvent*>(event);
+        auto dce = dynamic_cast<DialogCompletionEvent*>(event);
 
         // make sure the user didn't ESCAPE out of the menu
-        if (dce->GetResult() < 0)
+        if ((dce == nullptr) || (dce->GetResult() < 0))
             return;
 
         QString resultid   = dce->GetId();

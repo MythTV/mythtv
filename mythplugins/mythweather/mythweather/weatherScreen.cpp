@@ -131,14 +131,14 @@ bool WeatherScreen::prepareScreen(bool checkOnly)
             continue;
         }
 
-        if (dynamic_cast<MythUIText *>(widget))
+        if (auto w2 = dynamic_cast<MythUIText *>(widget))
         {
-            ((MythUIText *) widget)->SetText(itr.value());
+            w2->SetText(itr.value());
         }
-        else if (dynamic_cast<MythUIImage *>(widget))
+        else if (auto w3 = dynamic_cast<MythUIImage *>(widget))
         {
-            ((MythUIImage *) widget)->SetFilename(itr.value());
-            ((MythUIImage *) widget)->Load();
+            w3->SetFilename(itr.value());
+            w3->Load();
         }
 
         prepareWidget(widget);
