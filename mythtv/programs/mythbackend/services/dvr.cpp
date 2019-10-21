@@ -473,13 +473,21 @@ long Dvr::GetSavedBookmark( int RecordedId,
     uint64_t offset;
     bool isend=true;
     uint64_t position = ri.QueryBookmark();
+    // if no bookmark return 0
+    if (position == 0)
+        return 0;
     if (offsettype.toLower() == "position"){
-        ri.QueryKeyFramePosition(&offset, position, isend);
-        return offset;
+        // if bookmark cannot be converted to a keyframe we will
+        // just return the actual frame saved as the bookmark
+        if (ri.QueryKeyFramePosition(&offset, position, isend))
+            return offset;
     }
-    else if (offsettype.toLower() == "duration"){
-        ri.QueryKeyFrameDuration(&offset, position, isend);
-        return offset;
+    if (offsettype.toLower() == "duration"){
+        if (ri.QueryKeyFrameDuration(&offset, position, isend))
+            return offset;
+        else
+            // If bookmark cannot be converted to a duration return -1
+            return -1;
     }
     else
         return position;
