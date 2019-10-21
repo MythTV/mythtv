@@ -27,7 +27,7 @@ if (!ok) \
 }
 
 #define GET_PROC(FUNC_ID, PROC) \
-status = m_vdpGetProcAddress(m_device, FUNC_ID, (void **)&(PROC)); CHECK_ST
+status = m_vdpGetProcAddress(m_device, FUNC_ID, reinterpret_cast<void **>(&(PROC))); CHECK_ST
 
 bool MythVDPAUHelper::HaveVDPAU(void)
 {
@@ -56,6 +56,11 @@ bool MythVDPAUHelper::HaveMPEG4Decode(void)
     return gVDPAUMPEG4Available;
 }
 
+static void vdpau_preemption_callback(VdpDevice, void*)
+{
+    LOG(VB_GENERAL, LOG_WARNING, LOC + "Display pre-empted.");
+}
+
 /*! \class MythVDPAUHelper
  * \brief A simple wrapper around VDPAU functionality.
 */
@@ -64,6 +69,14 @@ MythVDPAUHelper::MythVDPAUHelper(AVVDPAUDeviceContext* Context)
     m_vdpGetProcAddress(Context->get_proc_address)
 {
     m_valid = InitProcs();
+    if (m_valid)
+    {
+        INIT_ST
+        status = m_vdpPreemptionCallbackRegister(m_device, vdpau_preemption_callback, this);
+        CHECK_ST
+        if (!ok)
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to register preemption callback");
+    }
 }
 
 static const char* DummyGetError(VdpStatus)
@@ -95,6 +108,8 @@ MythVDPAUHelper::MythVDPAUHelper(void)
 
 MythVDPAUHelper::~MythVDPAUHelper(void)
 {
+    if (m_vdpPreemptionCallbackRegister)
+        m_vdpPreemptionCallbackRegister(m_device, nullptr, nullptr);
     if (m_createdDevice && m_vdpDeviceDestroy)
         m_vdpDeviceDestroy(m_device);
     delete m_display;
@@ -123,6 +138,8 @@ bool MythVDPAUHelper::InitProcs(void)
     GET_PROC(VDP_FUNC_ID_OUTPUT_SURFACE_CREATE, m_vdpOutputSurfaceCreate)
     GET_PROC(VDP_FUNC_ID_OUTPUT_SURFACE_DESTROY, m_vdpOutputSurfaceDestroy)
     GET_PROC(VDP_FUNC_ID_VIDEO_SURFACE_GET_PARAMETERS, m_vdpVideoSurfaceGetParameters)
+    GET_PROC(VDP_FUNC_ID_PREEMPTION_CALLBACK_REGISTER, m_vdpPreemptionCallbackRegister)
+
     return ok;
 }
 

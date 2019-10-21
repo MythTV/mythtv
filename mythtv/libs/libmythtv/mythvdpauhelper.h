@@ -89,6 +89,7 @@ class MythVDPAUHelper
     VdpOutputSurfaceCreate           *m_vdpOutputSurfaceCreate           { nullptr };
     VdpOutputSurfaceDestroy          *m_vdpOutputSurfaceDestroy          { nullptr };
     VdpVideoSurfaceGetParameters     *m_vdpVideoSurfaceGetParameters     { nullptr };
+    VdpPreemptionCallbackRegister    *m_vdpPreemptionCallbackRegister    { nullptr };
 };
 
 #endif // MYTHVDPAUHELPER_H
