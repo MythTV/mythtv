@@ -175,7 +175,7 @@ class TransportScanItem
     bool               m_useTimer    {false}; /**< Set if timer is used after
                                               lock for getting PAT */
 
-    bool               m_scanning    {false}; ///< Probbably Unnecessary
+    bool               m_scanning    {false}; ///< Probably Unnecessary
     int                m_freqOffsets[3];     ///< Frequency offsets
     unsigned           m_timeoutTune {1000};  ///< Timeout to tune to a frequency
 
