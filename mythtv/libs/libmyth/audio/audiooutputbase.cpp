@@ -62,9 +62,6 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
     m_set_initial_vol(settings.m_set_initial_vol)
 {
     m_src_in = (float *)AOALIGN(m_src_in_buf);
-    memset(&m_src_data,          0, sizeof(SRC_DATA));
-    memset(m_src_in_buf,         0, sizeof(m_src_in_buf));
-    memset(m_audiobuffer,        0, sizeof(m_audiobuffer));
 
     if (m_main_device.startsWith("OpenMAX:")
         || m_main_device.startsWith("AudioTrack:"))

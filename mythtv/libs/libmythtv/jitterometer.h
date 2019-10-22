@@ -55,7 +55,7 @@ class MTV_PUBLIC Jitterometer
 
     int                 m_count           {0};
     int                 m_num_cycles;
-    struct timeval      m_starttime;
+    struct timeval      m_starttime       {0,0};
     bool                m_starttime_valid {false};
     QVector<uint>       m_times; // array of cycle lengths, in uS
     float               m_last_fps        {0};

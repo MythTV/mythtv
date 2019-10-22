@@ -112,7 +112,7 @@ class MTV_PUBLIC CC608Reader : public CC608Input
     int               m_writePosition {0};
     QMutex            m_inputBufLock;
     int               m_maxTextSize   {0};
-    TextContainer     m_inputBuffers[MAXTBUFFER+1];
+    TextContainer     m_inputBuffers[MAXTBUFFER+1] {};
     int               m_ccMode        {CC_CC1};
     int               m_ccPageNum     {0x888};
     // Output buffers

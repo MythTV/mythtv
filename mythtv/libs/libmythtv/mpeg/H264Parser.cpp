@@ -92,14 +92,11 @@ static const float eps = 1E-5;
 
 H264Parser::H264Parser(void)
 {
-    rbsp_buffer_size = 188 * 2;
     rbsp_buffer = new uint8_t[rbsp_buffer_size];
     if (rbsp_buffer == nullptr)
         rbsp_buffer_size = 0;
 
     Reset();
-    I_is_keyframe = true;
-    au_contains_keyframe_message = false;
 }
 
 void H264Parser::Reset(void)

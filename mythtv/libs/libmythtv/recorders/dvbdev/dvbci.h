@@ -78,7 +78,7 @@ private:
   char   *m_titleText    {nullptr};
   char   *m_subTitleText {nullptr};
   char   *m_bottomText   {nullptr};
-  char   *m_entries[MAX_CIMENU_ENTRIES];
+  char   *m_entries[MAX_CIMENU_ENTRIES] {};
   int     m_numEntries   {0};
   bool AddEntry(char *s);
   cCiMenu(cCiMMI *MMI, bool Selectable);
@@ -126,7 +126,7 @@ class cCiCaPmt {
 private:
   int     m_length        {0};
   int     m_infoLengthPos {0};
-  uint8_t m_capmt[2048]; ///< XXX is there a specified maximum?
+  uint8_t m_capmt[2048]   {0}; ///< XXX is there a specified maximum?
 public:
   cCiCaPmt(int ProgramNumber, uint8_t cplm = CPLM_ONLY);
   void AddElementaryStream(int type, int pid);
@@ -165,7 +165,7 @@ private:
   bool                    m_newCaSupport {false};
   bool                    m_hasUserIO    {false};
   bool                    m_needCaPmt    {false};
-  cCiSession             *m_sessions[MAX_CI_SESSION];
+  cCiSession             *m_sessions[MAX_CI_SESSION] {};
   cCiTransportLayer      *m_tpl          {nullptr};
   cCiTransportConnection *m_tc           {nullptr};
   int ResourceIdToInt(const uint8_t *Data);
@@ -207,7 +207,7 @@ class cHlCiHandler : public cCiHandler {
     int            m_numSlots;
     int            m_state          {0};
     int            m_numCaSystemIds {0};
-    unsigned short m_caSystemIds[MAXCASYSTEMIDS + 1]; // list is zero terminated!
+    unsigned short m_caSystemIds[MAXCASYSTEMIDS + 1] {0}; // list is zero terminated!
     cHlCiHandler(int Fd, int NumSlots);
     int CommHL(unsigned tag, unsigned function, struct ca_msg *msg);
     int GetData(unsigned tag, struct ca_msg *msg);

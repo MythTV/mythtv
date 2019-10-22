@@ -85,7 +85,7 @@ typedef struct {
     QString path;
 } LogPropagateOpts;
 
-LogPropagateOpts        logPropagateOpts;
+LogPropagateOpts        logPropagateOpts {false, 0, 0, true, ""};
 QString                 logPropagateArgs;
 QStringList             logPropagateArgList;
 
@@ -137,13 +137,6 @@ void loggingGetTimeStamp(qlonglong *epoch, uint *usec)
 #endif
 }
 
-LoggingItem::LoggingItem() :
-        ReferenceCounter("LoggingItem", false)
-{
-    m_message[0]='\0';
-    m_message[LOGLINE_MAX]='\0';
-}
-
 LoggingItem::LoggingItem(const char *_file, const char *_function,
                          int _line, LogLevel_t _level, LoggingType _type) :
         ReferenceCounter("LoggingItem", false),
@@ -152,9 +145,6 @@ LoggingItem::LoggingItem(const char *_file, const char *_function,
         m_file(strdup(_file)), m_function(strdup(_function))
 {
     loggingGetTimeStamp(&m_epoch, &m_usec);
-
-    m_message[0]='\0';
-    m_message[LOGLINE_MAX]='\0';
     setThreadTid();
 }
 

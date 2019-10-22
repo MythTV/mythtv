@@ -79,12 +79,6 @@ static float find_clock_diff(const QList<float> &list)
     return avg_diff;
 }
 
-VBI608Extractor::VBI608Extractor()
-{
-    m_code[0] = UINT16_MAX;
-    m_code[1] = UINT16_MAX;
-}
-
 bool VBI608Extractor::FindClocks(const unsigned char *buf, uint width)
 {
     m_rawMinimas.clear();

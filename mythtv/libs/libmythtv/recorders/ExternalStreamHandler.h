@@ -122,8 +122,8 @@ class ExternalStreamHandler : public StreamHandler
 
     int           m_apiVersion           {1};
     uint          m_serialNo             {0};
-    bool          m_hasTuner;
-    bool          m_hasPictureAttributes;
+    bool          m_hasTuner             {false};
+    bool          m_hasPictureAttributes {false};
 
     QByteArray    m_replay_buffer;
     bool          m_replay               {false};

@@ -287,7 +287,7 @@ typedef struct piano_key_data {
     vector<QRect>   m_rects;
     QSize           m_size;
 
-    unsigned long   m_offset_processed;
+    unsigned long   m_offset_processed {0};
 
     piano_key_data *m_piano_data       {nullptr};
     piano_audio    *m_audio_data       {nullptr};
@@ -315,7 +315,7 @@ class AlbumArt : public VisualBase
 
     QSize m_size;
     QSize m_cursize;
-    ImageType m_currImageType;
+    ImageType m_currImageType {IT_UNKNOWN};
     QImage m_image;
 
     MusicMetadata *m_currentMetadata {nullptr};

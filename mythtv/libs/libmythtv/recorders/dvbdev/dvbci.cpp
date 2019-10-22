@@ -240,10 +240,10 @@ bool cMutexLock::Lock(cMutex *Mutex)
 class cTPDU {
 private:
   int     m_size {0};
-  uint8_t m_data[MAX_TPDU_SIZE];
+  uint8_t m_data[MAX_TPDU_SIZE] {0};
   const uint8_t *GetData(const uint8_t *Data, int &Length);
 public:
-  cTPDU(void) { memset(m_data, 0, sizeof(uint8_t) * MAX_TPDU_SIZE); }
+  cTPDU(void) = default;
   cTPDU(uint8_t Slot, uint8_t Tcid, uint8_t Tag, int Length = 0, const uint8_t *Data = nullptr);
   uint8_t Slot(void) { return m_data[0]; }
   uint8_t Tcid(void) { return m_data[1]; }
@@ -370,12 +370,12 @@ enum eState { stIDLE, stCREATION, stACTIVE, stDELETION };
 class cCiTransportConnection {
   friend class cCiTransportLayer;
 private:
-  int             m_fd;
-  uint8_t         m_slot;
-  uint8_t         m_tcid;
+  int             m_fd            {-1};
+  uint8_t         m_slot          {0};
+  uint8_t         m_tcid          {0};
   eState          m_state         {stIDLE};
   cTPDU          *m_tpdu          {nullptr};
-  struct timeval  m_last_poll;
+  struct timeval  m_last_poll     {0,0};
   int             m_lastResponse  {ERROR};
   bool            m_dataAvailable {false};
   void Init(int Fd, uint8_t Slot, uint8_t Tcid);
@@ -398,8 +398,6 @@ public:
 
 cCiTransportConnection::cCiTransportConnection(void)
 {
-  m_last_poll.tv_sec = 0;
-  m_last_poll.tv_usec = 0;
   Init(-1, 0, 0);
 }
 
@@ -989,10 +987,10 @@ bool cCiApplicationInformation::EnterMenu(void)
 
 class cCiConditionalAccessSupport : public cCiSession {
 private:
-  int state;
-  int m_numCaSystemIds;
-  unsigned short m_caSystemIds[MAXCASYSTEMIDS + 1]; // list is zero terminated!
-  bool m_needCaPmt;
+  int state {0};
+  int m_numCaSystemIds {0};
+  unsigned short m_caSystemIds[MAXCASYSTEMIDS + 1] {0}; // list is zero terminated!
+  bool m_needCaPmt {false};
 public:
   cCiConditionalAccessSupport(int SessionId, cCiTransportConnection *Tc);
   bool Process(int Length = 0, const uint8_t *Data = nullptr) override; // cCiSession
@@ -1003,11 +1001,9 @@ public:
 
 cCiConditionalAccessSupport::cCiConditionalAccessSupport(
     int SessionId, cCiTransportConnection *Tc) :
-    cCiSession(SessionId, RI_CONDITIONAL_ACCESS_SUPPORT, Tc),
-    state(0), m_numCaSystemIds(0), m_needCaPmt(false)
+    cCiSession(SessionId, RI_CONDITIONAL_ACCESS_SUPPORT, Tc)
 {
   dbgprotocol("New Conditional Access Support (session id %d)\n", SessionId);
-  memset(m_caSystemIds, 0, sizeof(m_caSystemIds));
 }
 
 bool cCiConditionalAccessSupport::Process(int Length, const uint8_t *Data)
@@ -1393,8 +1389,6 @@ cCiMenu::cCiMenu(cCiMMI *MMI, bool Selectable)
 {
   m_mmi = MMI;
   m_selectable = Selectable;
-  for (int i = 0; i < MAX_CIMENU_ENTRIES; i++)
-      m_entries[i] = nullptr;
 }
 
 cCiMenu::~cCiMenu()
@@ -1545,8 +1539,6 @@ void cCiCaPmt::AddCaDescriptor(int ca_system_id, int ca_pid, int data_len,
 cLlCiHandler::cLlCiHandler(int Fd, int NumSlots)
 {
   m_numSlots = NumSlots;
-  for (int i = 0; i < MAX_CI_SESSION; i++)
-      m_sessions[i] = nullptr;
   m_tpl = new cCiTransportLayer(Fd, m_numSlots);
   m_fdCa = Fd;
 }
@@ -1867,7 +1859,6 @@ bool cLlCiHandler::connected() const
 cHlCiHandler::cHlCiHandler(int Fd, int NumSlots)
 {
     m_numSlots = NumSlots;
-    m_caSystemIds[0] = 0;
     m_fdCa = Fd;
     esyslog("New High level CI handler");
 }

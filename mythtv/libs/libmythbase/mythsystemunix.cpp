@@ -76,15 +76,6 @@ void ShutdownMythSystemLegacy(void)
         writeThread->wait();
 }
 
-MythSystemLegacyIOHandler::MythSystemLegacyIOHandler(bool read) :
-    MThread(QString("SystemIOHandler%1").arg(read ? "R" : "W")),
-    m_pMap(PMap_t()),
-    m_read(read)
-{
-    FD_ZERO(&m_fds);
-    m_readbuf[0] = '\0';
-}
-
 void MythSystemLegacyIOHandler::run(void)
 {
     RunProlog();
@@ -555,10 +546,6 @@ MythSystemLegacyUnix::MythSystemLegacyUnix(MythSystemLegacy *parent) :
     MythSystemLegacyPrivate("MythSystemLegacyUnix")
 {
     m_parent = parent;
-
-    m_stdpipe[0] = -1;
-    m_stdpipe[1] = -1;
-    m_stdpipe[2] = -1;
 
     connect(this, SIGNAL(started()), m_parent, SIGNAL(started()));
     connect(this, SIGNAL(finished()), m_parent, SIGNAL(finished()));

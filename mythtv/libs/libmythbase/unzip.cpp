@@ -522,19 +522,8 @@ UnZip::ZipEntry::ZipEntry()
 //! \internal
 UnzipPrivate::UnzipPrivate()
 {
-	skipAllEncrypted = false;
-	headers = nullptr;
-	device = nullptr;
-
-    memset(buffer1, 0, sizeof(buffer1));
-    memset(buffer2, 0, sizeof(buffer2));
-
 	uBuffer = (unsigned char*) buffer1;
-	crcTable = (quint32*) get_crc_table();
-
-	cdOffset = eocdOffset = 0;
-	cdEntryCount = 0;
-	unsupportedEntryCount = 0;
+	crcTable = (const quint32*) get_crc_table();
 }
 
 //! \internal Parses a Zip archive.

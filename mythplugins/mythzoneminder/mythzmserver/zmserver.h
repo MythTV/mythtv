@@ -279,17 +279,17 @@ class ZMServer
     void zmcControl(MONITOR *monitor, const string &mode);
     void zmaControl(MONITOR *monitor, const string &mode);
 
-    bool                 m_debug;
-    int                  m_sock;
+    bool                 m_debug              {false};
+    int                  m_sock               {-1};
     vector<MONITOR *>    m_monitors;
     map<int, MONITOR *>  m_monitorMap;
-    bool                 m_useDeepStorage;
-    bool                 m_useAnalysisImages;
+    bool                 m_useDeepStorage     {false};
+    bool                 m_useAnalysisImages  {false};
     string               m_eventFileFormat;
     string               m_analysisFileFormat;
     key_t                m_shmKey;
     string               m_mmapPath;
-    char                 m_buf[10];
+    char                 m_buf[10]            {0};
 };
 
 

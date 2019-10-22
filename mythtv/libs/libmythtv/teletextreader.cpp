@@ -12,8 +12,6 @@
 
 TeletextReader::TeletextReader()
 {
-    memset(m_pageinput, 0, sizeof(m_pageinput));
-    memset(m_header,    0, sizeof(m_header));
     for (int i = 0; i < 256; i++)
     {
         m_bitswap[i] = 0;

@@ -207,7 +207,7 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     }processState_t;
 
     dvdnav_t      *m_dvdnav                 {nullptr};
-    unsigned char  m_dvdBlockWriteBuf[DVD_BLOCK_SIZE];
+    unsigned char  m_dvdBlockWriteBuf[DVD_BLOCK_SIZE] {0};
     unsigned char *m_dvdBlockReadBuf        {nullptr};
     int            m_dvdBlockRPos           {0};
     int            m_dvdBlockWPos           {0};
@@ -282,13 +282,13 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     bool           m_inMenu                 {false};
     uint           m_buttonVersion          {1};
     int            m_buttonStreamID         {0};
-    uint32_t       m_clut[16];
-    uint8_t        m_button_color[4];
-    uint8_t        m_button_alpha[4];
+    uint32_t       m_clut[16]               {0};
+    uint8_t        m_button_color[4]        {0};
+    uint8_t        m_button_alpha[4]        {0};
     QRect          m_hl_button              {0,0,0,0};
     uint8_t       *m_menuSpuPkt             {nullptr};
     int            m_menuBuflength          {0};
-    AVSubtitle     m_dvdMenuButton;
+    AVSubtitle     m_dvdMenuButton          {};
     QMutex m_menuBtnLock;
 
     QMutex m_seekLock;

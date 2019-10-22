@@ -161,7 +161,7 @@ class MPUBLIC MusicCommon : public MythScreenType
     uint                   m_playlistMaxTime    {0};
 
     // for quick playlists
-    PlaylistOptions        m_playlistOptions;
+    PlaylistOptions        m_playlistOptions    {PL_REPLACE, PL_CURRENT};
     QString                m_whereClause;
 
     // for adding tracks from playlist editor

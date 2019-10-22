@@ -542,9 +542,6 @@ ZMServer::ZMServer(int sock, bool debug)
     }
 
     getMonitorList();
-
-    // zero buffer for conversion of integer to string in ADD_INT
-    memset (m_buf, '\0', sizeof(m_buf));
 }
 
 ZMServer::~ZMServer()

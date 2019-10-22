@@ -110,34 +110,34 @@ private:
     int bcomp(int16_t *rblock, int16_t *old, uint16_t *mask);
 #endif
     
-    int16_t block[64] MALIGN32;
-    int32_t ws[64*4] MALIGN32;
-    int32_t lqt[64] MALIGN32;
-    int32_t cqt[64] MALIGN32;
-    int32_t liqt[64] MALIGN32;
-    int32_t ciqt[64] MALIGN32;
-    int32_t lb8;
-    int32_t cb8;
-    int32_t Ywidth;
-    int32_t Cwidth;
-    int32_t Ysize;
-    int32_t Csize;
-    int16_t *old {nullptr};
-    int16_t *old_start {nullptr};
-    int key_count;
+    int16_t  block[64] MALIGN32 {0};
+    int32_t  ws[64*4]  MALIGN32 {0};
+    int32_t  lqt[64]   MALIGN32 {0};
+    int32_t  cqt[64]   MALIGN32 {0};
+    int32_t  liqt[64]  MALIGN32 {0};
+    int32_t  ciqt[64]  MALIGN32 {0};
+    int32_t  lb8                {0};
+    int32_t  cb8                {0};
+    int32_t  Ywidth             {0};
+    int32_t  Cwidth             {0};
+    int32_t  Ysize              {0};
+    int32_t  Csize              {0};
+    int16_t  *old               {nullptr};
+    int16_t  *old_start         {nullptr};
+    int       key_count         {0};
 
-    int width;
-    int height;
-    int Q;
-    int f;
+    int       width             {0};
+    int       height            {0};
+    int       Q                 {0};
+    int       f                 {0};
 #ifdef MMX
-    mmx_t lmask;
-    mmx_t cmask;
+    mmx_t     lmask             {};
+    mmx_t     cmask             {};
 #else
-    uint16_t lmask;
-    uint16_t cmask;
+    uint16_t  lmask             {0};
+    uint16_t  cmask             {0};
 #endif
-    int key_rate;
+    int       key_rate          {0};
 };
 
 typedef struct {

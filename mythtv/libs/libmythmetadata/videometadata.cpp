@@ -339,52 +339,52 @@ class VideoMetadataImp
     void saveToDatabase();
 
   private:
-    QString m_title;
-    QString m_sortTitle;
-    QString m_subtitle;
-    QString m_sortSubtitle;
-    QString m_tagline;
-    QString m_inetref;
-    int m_collectionref;
-    QString m_homepage;
-    QString m_director;
-    QString m_studio;
-    QString m_plot;
-    QString m_rating;
-    QString m_playcommand;
-    QString m_category;
-    genre_list m_genres;
-    country_list m_countries;
-    cast_list m_cast;
-    QString m_filename;
-    QString m_sortFilename;
-    QString m_hash;
-    QString m_trailer;
-    QString m_coverfile;
-    QString m_screenshot;
-    QString m_banner;
-    QString m_fanart;
-    QString m_host;
+    QString              m_title;
+    QString              m_sortTitle;
+    QString              m_subtitle;
+    QString              m_sortSubtitle;
+    QString              m_tagline;
+    QString              m_inetref;
+    int                  m_collectionref {0};
+    QString              m_homepage;
+    QString              m_director;
+    QString              m_studio;
+    QString              m_plot;
+    QString              m_rating;
+    QString              m_playcommand;
+    QString              m_category;
+    genre_list           m_genres;
+    country_list         m_countries;
+    cast_list            m_cast;
+    QString              m_filename;
+    QString              m_sortFilename;
+    QString              m_hash;
+    QString              m_trailer;
+    QString              m_coverfile;
+    QString              m_screenshot;
+    QString              m_banner;
+    QString              m_fanart;
+    QString               m_host;
 
-    int m_categoryID;
-    int m_childID;
-    int m_year;
-    QDate m_releasedate;
-    int m_length;
-    int m_playcount;
-    int m_season;
-    int m_episode;
-    QDate m_insertdate;
-    ParentalLevel::Level m_showlevel;
-    bool m_browse;
-    bool m_watched;
-    unsigned int m_id;  // videometadata.intid
-    float m_userrating;
-    bool m_processed;
-    VideoContentType m_contenttype;
+    int                  m_categoryID    {0};
+    int                  m_childID       {-1};
+    int                  m_year          {VIDEO_YEAR_DEFAULT};
+    QDate                m_releasedate;
+    int                  m_length        {0};
+    int                  m_playcount     {0};
+    int                  m_season        {0};
+    int                  m_episode       {0};
+    QDate                m_insertdate;
+    ParentalLevel::Level m_showlevel     {ParentalLevel::plNone};
+    bool                 m_browse        {true};
+    bool                 m_watched       {false};
+    unsigned int         m_id            {0};  // videometadata.intid
+    float                m_userrating    {0.0};
+    bool                 m_processed     {false};
+    VideoContentType     m_contenttype   {kContentUnknown};
 
     // not in DB
-    QString m_prefix;
+    QString              m_prefix;
 };
 
 /////////////////////////////

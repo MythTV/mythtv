@@ -127,11 +127,11 @@ class MUI_PUBLIC MythPainter
 
     QPaintDevice *m_Parent      {nullptr};
     int m_HardwareCacheSize     {0};
-    int m_MaxHardwareCacheSize;
+    int m_MaxHardwareCacheSize  {0};
 
   private:
     int64_t m_SoftwareCacheSize {0};
-    int64_t m_MaxSoftwareCacheSize;
+    int64_t m_MaxSoftwareCacheSize {1024 * 1024 * 48};
 
     QMutex           m_allocationLock;
     QSet<MythImage*> m_allocatedImages;

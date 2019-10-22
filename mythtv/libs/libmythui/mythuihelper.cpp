@@ -92,7 +92,10 @@ void DestroyMythUI()
 class MythUIHelperPrivate
 {
 public:
-    explicit MythUIHelperPrivate(MythUIHelper *p);
+    explicit MythUIHelperPrivate(MythUIHelper *p)
+    : m_cacheLock(new QMutex(QMutex::Recursive)),
+      m_imageThreadPool(new MThreadPool("MythUIHelper")),
+      parent(p) {}
     ~MythUIHelperPrivate();
 
     void Init();
@@ -170,7 +173,7 @@ public:
 
     MThreadPool *m_imageThreadPool           {nullptr};
 
-    MythUIMenuCallbacks callbacks;
+    MythUIMenuCallbacks callbacks            {nullptr,nullptr,nullptr,nullptr,nullptr};
 
     MythUIHelper *parent                     {nullptr};
 
@@ -183,18 +186,6 @@ int MythUIHelperPrivate::x_override = -1;
 int MythUIHelperPrivate::y_override = -1;
 int MythUIHelperPrivate::w_override = -1;
 int MythUIHelperPrivate::h_override = -1;
-
-MythUIHelperPrivate::MythUIHelperPrivate(MythUIHelper *p)
-    : m_cacheLock(new QMutex(QMutex::Recursive)),
-      m_imageThreadPool(new MThreadPool("MythUIHelper")),
-      parent(p)
-{
-    callbacks.exec_program = nullptr;
-    callbacks.exec_program_tv = nullptr;
-    callbacks.configplugin = nullptr;
-    callbacks.plugin = nullptr;
-    callbacks.eject = nullptr;
-}
 
 MythUIHelperPrivate::~MythUIHelperPrivate()
 {

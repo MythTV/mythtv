@@ -94,9 +94,6 @@ NuppelVideoRecorder::NuppelVideoRecorder(TVRec *rec, ChannelBase *channel) :
     SetPositionMapType(MARK_KEYFRAME);
 
     m_containerFormat = formatNUV;
-
-    memset(&m_stm, 0, sizeof(struct timeval));
-    memset(&m_tzone, 0, sizeof(struct timezone));
 }
 
 NuppelVideoRecorder::~NuppelVideoRecorder(void)

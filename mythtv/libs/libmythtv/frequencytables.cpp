@@ -15,8 +15,6 @@ static freq_table_list_t get_matching_freq_tables_internal(
 
 TransportScanItem::TransportScanItem()
 {
-    memset(m_freqOffsets, 0, sizeof(int)*3);
-
     m_tuning.Clear();
 }
 
@@ -29,8 +27,6 @@ TransportScanItem::TransportScanItem(uint           sourceid,
       m_sourceID(sourceid),
       m_timeoutTune(_timeoutTune)
 {
-    memset(m_freqOffsets, 0, sizeof(int)*3);
-
     m_tuning.Clear();
     m_tuning.m_sistandard = _si_std;
 
@@ -50,7 +46,6 @@ TransportScanItem::TransportScanItem(uint           _sourceid,
       m_sourceID(_sourceid),
       m_timeoutTune(_timeoutTune)
 {
-    memset(m_freqOffsets, 0, sizeof(int)*3);
     m_tuning = _tuning;
 }
 
@@ -64,7 +59,6 @@ TransportScanItem::TransportScanItem(uint                _sourceid,
       m_sourceID(_sourceid),
       m_timeoutTune(_timeoutTune)
 {
-    memset(m_freqOffsets, 0, sizeof(int)*3);
     m_expectedChannels = _tuning.channels;
 
     m_tuning.Clear();
@@ -92,8 +86,6 @@ TransportScanItem::TransportScanItem(uint sourceid,
       m_friendlyNum(freqNum), m_sourceID(sourceid),
       m_timeoutTune(timeoutTune)
 {
-    memset(m_freqOffsets, 0, sizeof(int)*3);
-
     m_tuning.Clear();
 
     // setup tuning params
@@ -142,7 +134,6 @@ TransportScanItem::TransportScanItem(uint _sourceid,
     m_timeoutTune(_timeoutTune),
     m_iptvTuning(_tuning), m_iptvChannel(_channel)
 {
-    memset(m_freqOffsets, 0, sizeof(int)*3);
     m_tuning.Clear();
     m_tuning.m_sistandard = "MPEG";
 }

@@ -31,7 +31,7 @@ class MPUBLIC SPDIFEncoder
   private:
     bool                m_complete {false};
     AVFormatContext    *m_oc       {nullptr};
-    unsigned char       m_buffer[AudioOutput::MAX_SIZE_BUFFER];
+    unsigned char       m_buffer[AudioOutput::MAX_SIZE_BUFFER] {0};
     long                m_size     {0};
 };
 

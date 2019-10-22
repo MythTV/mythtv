@@ -193,7 +193,7 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
     RTjpeg             *m_rtjc                   {nullptr};
 
 #define OUT_LEN (1024*1024 + 1024*1024 / 64 + 16 + 3)    
-    lzo_byte            m_out[OUT_LEN];
+    lzo_byte            m_out[OUT_LEN] {};
 #define HEAP_ALLOC(var,size) \
     long __LZO_MMODEL var [ ((size) + (sizeof(long) - 1)) / sizeof(long) ]    
     HEAP_ALLOC(wrkmem, LZO1X_1_MEM_COMPRESS);
@@ -220,8 +220,8 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
     long                m_audio_buffer_size      {0};
     long                m_text_buffer_size       {0};
 
-    struct timeval      m_stm;
-    struct timezone     m_tzone;
+    struct timeval      m_stm                    {0,0};
+    struct timezone     m_tzone                  {0,0};
 
     NVRWriteThread     *m_write_thread           {nullptr};
     NVRAudioThread     *m_audio_thread           {nullptr};

@@ -155,10 +155,11 @@ class LoggingItem: public QObject, public ReferenceCounter
     char               *m_appName    {nullptr};
     char               *m_table      {nullptr};
     char               *m_logFile    {nullptr};
-    char                m_message[LOGLINE_MAX+1];
+    char                m_message[LOGLINE_MAX+1] {0};
 
   private:
-    LoggingItem();
+    LoggingItem()
+        : ReferenceCounter("LoggingItem", false) {};
     LoggingItem(const char *_file, const char *_function,
                 int _line, LogLevel_t _level, LoggingType _type);
     ~LoggingItem();

@@ -181,7 +181,7 @@ class META_PUBLIC MetaIO
     QString m_filename;
     QString m_filenameFormat;
 
-    struct stat m_fileinfo;
+    struct stat m_fileinfo {};
 };
 
 #endif

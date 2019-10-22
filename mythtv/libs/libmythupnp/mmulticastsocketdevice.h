@@ -49,12 +49,7 @@ class MMulticastSocketDevice : public MSocketDevice
   public:
     MMulticastSocketDevice() :
         MSocketDevice(MSocketDevice::Datagram),
-        m_local_addresses(QNetworkInterface::allAddresses()),
-        m_port(0)
-    {
-        memset(&m_imr, 0, sizeof(struct ip_mreq));
-    }
-
+        m_local_addresses(QNetworkInterface::allAddresses()) {}
     MMulticastSocketDevice(const QString& sAddress, quint16 nPort, u_char ttl = 0);
 
     virtual ~MMulticastSocketDevice();
@@ -71,8 +66,8 @@ class MMulticastSocketDevice : public MSocketDevice
   private:
     QList<QHostAddress> m_local_addresses;
     QHostAddress        m_address;
-    quint16             m_port;
-    struct ip_mreq      m_imr;
+    quint16             m_port {0};
+    struct ip_mreq      m_imr {};
 };
 
 #endif // _MULTICAST_SOCKET_DEVICE_H_

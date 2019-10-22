@@ -25,12 +25,6 @@ DeviceReadBuffer::DeviceReadBuffer(
       m_using_poll(use_poll),
       m_poll_timeout_is_error(error_exit_on_poll_timeout)
 {
-    for (int i = 0; i < 2; i++)
-    {
-        m_wake_pipe[i] = -1;
-        m_wake_pipe_flags[i] = 0;
-    }
-
 #ifdef USING_MINGW
 #warning mingw DeviceReadBuffer::Poll
     if (m_using_poll)

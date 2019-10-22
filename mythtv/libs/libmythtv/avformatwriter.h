@@ -16,7 +16,7 @@ extern "C" {
 class MTV_PUBLIC AVFormatWriter : public FileWriterBase
 {
   public:
-    AVFormatWriter();
+    AVFormatWriter() {};
    ~AVFormatWriter();
 
     bool Init(void) override; // FileWriterBase
@@ -45,7 +45,7 @@ class MTV_PUBLIC AVFormatWriter : public FileWriterBase
     AVFRingBuffer         *m_avfRingBuffer {nullptr};
     RingBuffer            *m_ringBuffer    {nullptr};
 
-    AVOutputFormat         m_fmt;
+    AVOutputFormat         m_fmt           {};
     AVFormatContext       *m_ctx           {nullptr};
     AVStream              *m_videoStream   {nullptr};
     AVCodec               *m_avVideoCodec  {nullptr};

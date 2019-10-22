@@ -56,28 +56,28 @@ public:
 	// Replace this with whatever else you use to store/retrieve the password.
 	QString password;
 
-	bool skipAllEncrypted;
+	bool skipAllEncrypted {false};
 
-	QMap<QString,ZipEntryP*>* headers;
+	QMap<QString,ZipEntryP*>* headers {nullptr};
 
-	QIODevice* device;
+	QIODevice* device {nullptr};
 
-	char buffer1[UNZIP_READ_BUFFER];
-	char buffer2[UNZIP_READ_BUFFER];
+	char buffer1[UNZIP_READ_BUFFER] {0};
+	char buffer2[UNZIP_READ_BUFFER] {0};
 
 	unsigned char* uBuffer;
 	const quint32* crcTable;
 
 	// Central Directory (CD) offset
-	quint32 cdOffset;
+	quint32 cdOffset {0};
 	// End of Central Directory (EOCD) offset
-	quint32 eocdOffset;
+	quint32 eocdOffset {0};
 
 	// Number of entries in the Central Directory (as to the EOCD record)
-	quint16 cdEntryCount;
+	quint16 cdEntryCount {0};
 
 	// The number of detected entries that have been skipped because of a non compatible format
-	quint16 unsupportedEntryCount;
+	quint16 unsupportedEntryCount {0};
 
 	QString comment;
 

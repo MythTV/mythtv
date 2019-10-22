@@ -23,17 +23,6 @@
 #include "exportnative.h"
 #include "themeselector.h"
 
-SelectDestination::SelectDestination(
-    MythScreenStack *parent, bool nativeMode, const QString& name) :
-    MythScreenType(parent, name),
-    m_nativeMode(nativeMode)
-{
-    m_archiveDestination.type = AD_FILE;
-    m_archiveDestination.name = nullptr;
-    m_archiveDestination.description = nullptr;
-    m_archiveDestination.freeSpace = 0LL;
-}
-
 SelectDestination::~SelectDestination(void)
 {
     saveConfiguration();

@@ -37,11 +37,6 @@ AudioOutputPulseAudio::AudioOutputPulseAudio(const AudioSettings &settings) :
     for (unsigned int i = 0; i < PA_CHANNELS_MAX; ++i)
         m_volume_control.values[i] = PA_VOLUME_MUTED;
 
-    // unecessary initialization to keep coverity happy
-    memset(&m_sample_spec, 0, sizeof(m_sample_spec));
-    memset(&m_channel_map, 0, sizeof(m_channel_map));
-    memset(&m_buffer_settings, 0, sizeof(m_buffer_settings));
-
     InitSettings(settings);
     if (settings.m_init)
         Reconfigure(settings);

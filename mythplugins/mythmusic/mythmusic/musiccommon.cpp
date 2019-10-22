@@ -58,9 +58,6 @@ MusicCommon::MusicCommon(MythScreenStack *parent, MythScreenType *parentScreen,
         lcd->switchToTime();
         lcd->setFunctionLEDs(FUNC_MUSIC, true);
     }
-
-    m_playlistOptions.insertPLOption = PL_REPLACE;
-    m_playlistOptions.playPLOption = PL_CURRENT;
 }
 
 MusicCommon::~MusicCommon(void)

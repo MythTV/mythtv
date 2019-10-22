@@ -176,7 +176,7 @@ class TransportScanItem
                                               lock for getting PAT */
 
     bool               m_scanning    {false}; ///< Probbably Unnecessary
-    int                m_freqOffsets[3];     ///< Frequency offsets
+    int                m_freqOffsets[3] {0,0,0}; ///< Frequency offsets
     unsigned           m_timeoutTune {1000};  ///< Timeout to tune to a frequency
 
     DTVMultiplex       m_tuning;              ///< Tuning info

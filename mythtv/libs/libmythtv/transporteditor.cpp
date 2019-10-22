@@ -35,7 +35,6 @@ using namespace std;
 
 #include "transporteditor.h"
 #include "videosource.h"
-#include "cardutil.h"
 #include "mythcorecontext.h"
 #include "mythdb.h"
 

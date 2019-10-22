@@ -12,7 +12,6 @@ Jitterometer::Jitterometer(const QString &nname, int ncycles)
   : m_num_cycles(ncycles), m_name(nname)
 {
     m_times.resize(m_num_cycles);
-    memset(&m_starttime, 0, sizeof(struct timeval));
 
     if (m_name.isEmpty())
         m_name = "Jitterometer";
