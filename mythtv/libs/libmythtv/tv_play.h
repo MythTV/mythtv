@@ -795,7 +795,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     bool              m_dbRememberLastChannelGroup {false};
     ChannelGroupList  m_dbChannelGroups;
 
-    CommSkipMode      m_autoCommercialSkip;
     bool              m_tryUnflaggedSkip {false};
 
     bool              m_smartForward {false};
@@ -809,7 +808,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     uint              m_switchToInputId {0};
 
     QMutex            m_initFromDBLock;
-    bool              m_initFromDBDone;
+    bool              m_initFromDBDone {false};
     QWaitCondition    m_initFromDBWait;
 
     /// True if the user told MythTV to stop plaback. If this is false
@@ -847,9 +846,9 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     /// with the appropriate UI message.
     vector<SleepTimerInfo> m_sleepTimes;
     uint                   m_sleepIndex {0};          ///< Index into sleep_times.
-    uint                   m_sleepTimerTimeout;    ///< Current sleep timeout in msec
-    int                    m_sleepTimerId {0};         ///< Timer for turning off playback.
-    int                    m_sleepDialogTimerId {0};   ///< Timer for sleep dialog.
+    uint                   m_sleepTimerTimeout {0};   ///< Current sleep timeout in msec
+    int                    m_sleepTimerId {0};        ///< Timer for turning off playback.
+    int                    m_sleepDialogTimerId {0};  ///< Timer for sleep dialog.
     /// Timer for turning off playback after idle period.
     int                    m_idleTimerId {0};
     int                    m_idleDialogTimerId {0}; ///< Timer for idle dialog.
@@ -871,7 +870,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     /// Input key presses queued up so far to form a valid ChanNum
     mutable QString        m_queuedChanNum;
     /// Queued ChanID (from EPG channel selector)
-    uint                   m_queuedChanID;
+    uint                   m_queuedChanID {0};
     /// Initial chanid override for Live TV
     uint                   m_initialChanID {0};
 
@@ -947,7 +946,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     /// These are only modified in UI thread, so no lock is needed
     /// to read this value in the UI thread.
     mutable QMutex      m_channelGroupLock;
-    volatile int        m_channelGroupId;
+    volatile int        m_channelGroupId {-1};
     ChannelInfoList     m_channelGroupChannelList;
 
     // Network Control stuff
@@ -993,65 +992,65 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     int         m_tvmCurtrack[kTrackTypeCount];
 
     // Audio
-    bool    m_tvmAvsync;
-    bool    m_tvmVisual;
+    bool    m_tvmAvsync {true};
+    bool    m_tvmVisual {false};
     QString m_tvmActive;
-    bool    m_tvmUpmixing;
-    bool    m_tvmCanUpmix;
+    bool    m_tvmUpmixing {false};
+    bool    m_tvmCanUpmix {false};
     QStringList m_tvmVisualisers;
 
     // Video
-    AspectOverrideMode m_tvmAspectOverride;
-    AdjustFillMode   m_tvmAdjustFill;
-    bool             m_tvmFillAutoDetect;
-    uint             m_tvmSup;
-    bool             m_tvmStudioLevels;
-    bool             m_tvmStereoAllowed;
-    StereoscopicMode m_tvmStereoMode;
-    FrameScanType    m_tvmScanType;
-    FrameScanType    m_tvmScanTypeUnlocked;
-    bool             m_tvmScanTypeLocked;
+    AspectOverrideMode m_tvmAspectOverride {kAspect_Off};
+    AdjustFillMode   m_tvmAdjustFill {kAdjustFill_Off};
+    bool             m_tvmFillAutoDetect {false};
+    uint             m_tvmSup {kPictureAttributeSupported_None};
+    bool             m_tvmStudioLevels {false};
+    bool             m_tvmStereoAllowed {false};
+    StereoscopicMode m_tvmStereoMode {kStereoscopicModeNone};
+    FrameScanType    m_tvmScanType {kScan_Ignore};
+    FrameScanType    m_tvmScanTypeUnlocked {kScan_Ignore};
+    bool             m_tvmScanTypeLocked {false};
     QString          m_tvmCurMode;
     QStringList      m_tvmDeinterlacers;
     QString          m_tvmCurrentDeinterlacer;
-    bool             m_tvmDoubleRate;
+    bool             m_tvmDoubleRate {false};
 
     // Playback
-    int          m_tvmSpeedX100;
-    TVState      m_tvmState;
-    bool         m_tvmIsRecording;
-    bool         m_tvmIsRecorded;
-    bool         m_tvmIsVideo;
-    CommSkipMode m_tvmCurSkip;
-    bool         m_tvmIsPaused;
-    bool         m_tvmAllowPIP;
-    bool         m_tvmAllowPBP;
-    bool         m_tvmHasPIP;
-    bool         m_tvmHasPBP;
-    int          m_tvmFreeRecorderCount;
-    bool         m_tvmIsDvd;
-    bool         m_tvmIsBd;
-    bool         m_tvmJump;
-    bool         m_tvmIsLiveTv;
-    bool         m_tvmPreviousChan;
+    int          m_tvmSpeedX100         {100};
+    TVState      m_tvmState             {kState_None};
+    bool         m_tvmIsRecording       {false};
+    bool         m_tvmIsRecorded        {false};
+    bool         m_tvmIsVideo           {false};
+    CommSkipMode m_tvmCurSkip           {kCommSkipOff};
+    bool         m_tvmIsPaused          {false};
+    bool         m_tvmAllowPIP          {false};
+    bool         m_tvmAllowPBP          {false};
+    bool         m_tvmHasPIP            {false};
+    bool         m_tvmHasPBP            {false};
+    int          m_tvmFreeRecorderCount {-1};
+    bool         m_tvmIsDvd             {false};
+    bool         m_tvmIsBd              {false};
+    bool         m_tvmJump              {false};
+    bool         m_tvmIsLiveTv          {false};
+    bool         m_tvmPreviousChan      {false};
 
     // Navigate
-    int              m_tvmNumChapters;
-    int              m_tvmCurrentChapter;
+    int              m_tvmNumChapters {0};
+    int              m_tvmCurrentChapter {0};
     QList<long long> m_tvmChapterTimes;
-    int              m_tvmNumAngles;
-    int              m_tvmCurrentAngle;
-    int              m_tvmNumTitles;
-    int              m_tvmCurrentTitle;
+    int              m_tvmNumAngles {0};
+    int              m_tvmCurrentAngle {0};
+    int              m_tvmNumTitles {0};
+    int              m_tvmCurrentTitle {0};
     // Subtitles
-    uint             m_tvmSubsCapMode;
-    bool             m_tvmSubsHaveText;
-    bool             m_tvmSubsForcedOn;
-    bool             m_tvmSubsEnabled;
-    bool             m_tvmSubsHaveSubs;
+    uint             m_tvmSubsCapMode {0};
+    bool             m_tvmSubsHaveText {false};
+    bool             m_tvmSubsForcedOn {true};
+    bool             m_tvmSubsEnabled {false};
+    bool             m_tvmSubsHaveSubs {false};
 
-    bool             m_tvmIsOn;
-    bool             m_tvmTranscoding;
+    bool             m_tvmIsOn {false};
+    bool             m_tvmTranscoding {false};
 
     QVariant         m_tvmJumprecBackHack;
     // End of playback menu state caching

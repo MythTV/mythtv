@@ -12042,7 +12042,6 @@ void TV::PlaybackMenuInit(const MenuBase &menu)
     m_tvmState             = ctx->GetState();
     m_tvmIsRecording       = (m_tvmState == kState_WatchingRecording);
     m_tvmIsRecorded        = (m_tvmState == kState_WatchingPreRecorded);
-    m_tvmIsRecorded        = (m_tvmState == kState_WatchingPreRecorded);
     m_tvmIsVideo           = (m_tvmState == kState_WatchingVideo);
     m_tvmCurSkip           = kCommSkipOff;
     m_tvmIsPaused          = false;
