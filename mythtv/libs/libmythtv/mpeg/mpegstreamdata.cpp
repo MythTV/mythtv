@@ -734,7 +734,7 @@ bool MPEGStreamData::HandleTables(uint pid, const PSIPTable &psip)
 
 void MPEGStreamData::ProcessPAT(const ProgramAssociationTable *pat)
 {
-    bool foundProgram = pat->FindPID(_desired_program) != 0u;
+    bool foundProgram = pat->FindPID(_desired_program) != 0U;
 
     _listener_lock.lock();
     for (size_t i = 0; i < _mpeg_listeners.size(); i++)
