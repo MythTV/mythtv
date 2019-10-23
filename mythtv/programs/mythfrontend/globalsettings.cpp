@@ -2484,13 +2484,13 @@ VideoModeSettings::VideoModeSettings(const char *c) : HostCheckBoxSetting(c)
 {
     HostComboBoxSetting *res = TVVidModeResolution();
     HostRefreshRateComboBoxSetting *rate = TVVidModeRefreshRate();
-    HostSpinBoxSetting *pause = VideoModeChangePause();
+    // This code is currently disabled as it is causes issues when exiting playback
+    //HostSpinBoxSetting *pause = VideoModeChangePause();
 
     addChild(GuiVidModeResolution());
     addChild(res);
     addChild(rate);
     addChild(TVVidModeForceAspect());
-    // This code is currently disabled as it is causes issues when exiting playback
     //addChild(pause);
     connect(res, SIGNAL(valueChanged(StandardSetting *)),
             rate, SLOT(ChangeResolution(StandardSetting *)));
