@@ -191,7 +191,7 @@ MythRenderOpenGL::MythRenderOpenGL(const QSurfaceFormat& Format, QPaintDevice* D
     m_cachedMatrixUniforms(),
     m_cachedUniformLocations(),
     m_vao(0),
-    m_flushEnabled(false),
+    m_flushEnabled(true),
     m_openglDebugger(nullptr),
     m_openGLDebuggerFilter(QOpenGLDebugMessage::InvalidType),
     m_window(nullptr)
@@ -589,12 +589,6 @@ void MythRenderOpenGL::Release(void)
     while (m_lockLevel > 0)
         doneCurrent();
 #endif
-}
-
-void MythRenderOpenGL::MoveResizeWindow(const QRect &rect)
-{
-    if (m_window)
-        m_window->setGeometry(rect);
 }
 
 void MythRenderOpenGL::SetViewPort(const QRect &rect, bool viewportonly)

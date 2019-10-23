@@ -105,7 +105,6 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     int   GetExtraFeatures(void) const;
     QOpenGLFunctions::OpenGLFeatures GetFeatures(void) const;
     bool  IsRecommendedRenderer(void);
-    void  MoveResizeWindow(const QRect &rect);
     void  SetViewPort(const QRect &rect, bool viewportonly = false);
     QRect GetViewPort(void) { return m_viewport; }
     void  PushTransformation(const UIEffects &fx, QPointF &center);
