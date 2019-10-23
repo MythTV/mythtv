@@ -70,17 +70,17 @@ void MythOpenGLPerf::LogSamples(void)
     // log and reset when necessary
     if (m_sampleCount > m_totalSamples)
     {
-        m_sampleCount = 0;
         QStringList results;
         GLuint64 total = 0;
         for (int i = 0; i < m_timerData.size(); ++i)
         {
-            results.append(m_timerNames[i] + QString::number((m_timerData[i] / 1000000000.0) / m_totalSamples, '0', 4));
+            results.append(m_timerNames[i] + QString::number((m_timerData[i] / 1000000000.0) / m_sampleCount, '0', 4));
             total += m_timerData[i];
             m_timerData[i] = 0;
         }
-        LOG(VB_GPU, LOG_INFO, m_name + results.join(" ") +
-            QString(" Total fps: %1").arg(1000000000.0 / (static_cast<double>(total) / m_totalSamples)));
+        LOG(VB_GPUVIDEO, LOG_INFO, m_name + results.join(" ") +
+            QString(" Total fps: %1").arg(1000000000.0 / (static_cast<double>(total) / m_sampleCount)));
+        m_sampleCount = 0;
     }
 
     // clear timers
