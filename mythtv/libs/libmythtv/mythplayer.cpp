@@ -124,119 +124,15 @@ static int toTrackType(int type)
 
 MythPlayer::MythPlayer(PlayerFlags flags)
     : playerFlags(flags),
-      decoder(nullptr),             decoder_change_lock(QMutex::Recursive),
-      videoOutput(nullptr),         player_ctx(nullptr),
-      decoderThread(nullptr),       playerThread(nullptr),
-#ifdef Q_OS_ANDROID
-      playerThreadId(0),
-#endif
-      // Window stuff
-      parentWidget(nullptr), embedding(false), embedRect(QRect()),
-      // State
-      totalDecoderPause(false), decoderPaused(false),
-      inJumpToProgramPause(false),
-      pauseDecoder(false), unpauseDecoder(false),
-      killdecoder(false),   decoderSeek(-1),     decodeOneFrame(false),
-      needNewPauseFrame(false),
-      bufferPaused(false),  videoPaused(false),
-      allpaused(false),     playing(false),
-      m_double_framerate(false),    m_double_process(false),
-      m_deint_possible(true),
-      livetv(false),
-      watchingrecording(false),
-      transcoding(false),
-      hasFullPositionMap(false),    limitKeyRepeat(false),
-                                    errorType(kError_None),
-      // Chapter stuff
-      jumpchapter(0),
-      // Bookmark stuff
-      bookmarkseek(0),
-      // Seek
-      fftime(0),
-      // Playback misc.
-      videobuf_retries(0),          framesPlayed(0),
-      framesPlayedExtra(0),
-      totalFrames(0),               totalLength(0),
-      totalDuration(0),
-      rewindtime(0),
-      m_latestVideoTimecode(-1),
-      // Input Video Attributes
-      video_disp_dim(0,0), video_dim(0,0),
-      video_frame_rate(29.97F), video_aspect(4.0F / 3.0F),
-      forced_video_aspect(-1),
-      resetScan(kScan_Ignore), m_scan(kScan_Interlaced),
-      m_scan_locked(false), m_scan_tracker(0), m_scan_initialized(false),
-      keyframedist(30),
-      // Prebuffering
-      buffering(false),
-      // General Caption/Teletext/Subtitle support
-      textDisplayMode(kDisplayNone),
-      prevTextDisplayMode(kDisplayNone),
-      prevNonzeroTextDisplayMode(kDisplayNone),
-      // Support for analog captions and teletext
-      vbimode(VBIMode::None),
-      ttPageNum(0x888),
-      // Support for captions, teletext, etc. decoded by libav
-      textDesired(false), enableCaptions(false), disableCaptions(false),
-      enableForcedSubtitles(false), disableForcedSubtitles(false),
-      allowForcedSubtitles(true),
       // CC608/708
       cc608(this), cc708(this),
-      // MHEG/MHI Interactive TV visible in OSD
-      itvVisible(false),
-      interactiveTV(nullptr),
-      itvEnabled(false),
-      // OSD stuff
-      osd(nullptr), reinit_osd(false), osdLock(QMutex::Recursive),
       // Audio
       audio(this, (flags & kAudioMuted) != 0),
-      // Picture-in-Picture stuff
-      pip_active(false),            pip_visible(true),
       // Filters
-      videoFiltersForProgram(""),   videoFiltersOverride(""),
-      postfilt_width(0),            postfilt_height(0),
-      videoFilters(nullptr),        FiltMan(new FilterManager()),
-
-      forcePositionMapSync(false),  pausedBeforeEdit(false),
-      speedBeforeEdit(1.0F),
-      // Playback (output) speed control
-      decoder_lock(QMutex::Recursive),
-      next_play_speed(1.0F),        next_normal_speed(true),
-      play_speed(1.0F),             normal_speed(true),
-      frame_interval((int)(1000000.0F / 30)), m_frame_interval(0),
-      m_fpsMultiplier(1),
-      ffrew_skip(1),ffrew_adjust(0),
-      fileChanged(false),
-      // Audio and video synchronization stuff
-      videosync(nullptr),           avsync_delay(0),
-      avsync_adjustment(0),         avsync_avg(0),
-      avsync_predictor(0),          avsync_predictor_enabled(false),
-      refreshrate(0),
-      lastsync(false),              repeat_delay(0),
-      disp_timecode(0),             avsync_audiopaused(false),
-      // AVSync for Raspberry Pi digital streams
-      avsync_averaging(4),  // Number of frames to average
-      avsync_interval(0),   // Number of frames skip between sync checks
-      avsync_next(0),      // Frames till next sync check
-      // Time Code stuff
-      prevtc(0),                    prevrp(0),
-      savedAudioTimecodeOffset(0),
-      rtcbase(0),
-      maxtcval(0), maxtcframes(0),
-      numdroppedframes(0),
-      prior_audiotimecode(0),
-      prior_videotimecode(0),
-      m_timeOffsetBase(0),
-      // LiveTVChain stuff
-      m_tv(nullptr),                isDummy(false),
-      // Counter for buffering messages
-      bufferingCounter(0),
+      FiltMan(new FilterManager()),
       // Debugging variables
-      output_jmeter(new Jitterometer(LOC)),
-      disable_passthrough(false)
+      output_jmeter(new Jitterometer(LOC))
 {
-    memset(&tc_lastval, 0, sizeof(tc_lastval));
-    memset(&tc_wrap,    0, sizeof(tc_wrap));
     max_diverge = float(gCoreContext->GetFloatSetting
         ("PlayerMaxDiverge", 3.0));
     if (max_diverge < 1.0F)
