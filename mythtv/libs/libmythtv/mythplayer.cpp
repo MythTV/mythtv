@@ -3505,6 +3505,10 @@ void MythPlayer::DecoderEnd(void)
 {
     PauseDecoder();
     SetPlaying(false);
+    // Ensure any hardware frames are released (after pausing the decoder) to
+    // allow the decoder to exit cleanly
+    DiscardVideoFrames(true, true);
+
     killdecoder = true;
     int tries = 0;
     while (decoderThread && !decoderThread->wait(100) && (tries++ < 50))
