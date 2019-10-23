@@ -424,19 +424,20 @@ bool LoggerThread::logConsole(LoggingItem *item)
     char                line[MAX_STRING_LENGTH];
 
     if (item->m_type & kStandardIO)
-        snprintf( line, MAX_STRING_LENGTH, "%s", item->m_message );
+    {
+        snprintf(line, MAX_STRING_LENGTH, "%s", item->m_message);
+    }
     else
     {
-        char   usPart[9];
-        char   timestamp[TIMESTAMP_MAX];
+        char usPart[9];
+        char timestamp[TIMESTAMP_MAX];
         time_t epoch = item->epoch();
         struct tm tm;
         localtime_r(&epoch, &tm);
-
-        strftime( timestamp, TIMESTAMP_MAX-8, "%Y-%m-%d %H:%M:%S",
-                  (const struct tm *)&tm );
-        snprintf( usPart, 9, ".%06d", (int)(item->m_usec) );
-        strcat( timestamp, usPart );
+        strftime(timestamp, TIMESTAMP_MAX-8, "%Y-%m-%d %H:%M:%S",
+                 static_cast<const struct tm *>(&tm));
+        snprintf(usPart, 9, ".%06d", static_cast<int>(item->m_usec));
+        strcat(timestamp, usPart);
         char shortname;
 
         {
@@ -449,16 +450,25 @@ bool LoggerThread::logConsole(LoggingItem *item)
         }
 
 #if CONFIG_DEBUGTYPE
-        snprintf( line, MAX_STRING_LENGTH, "%s %c  %s:%d:%s  %s\n", timestamp,
-                  shortname, item->m_file, item->m_line, item->m_function, item->m_message );
+        if(item->tid())
+        {
+            snprintf(line, MAX_STRING_LENGTH, "%s %c [%d/%" PREFIX64 "d] %s %s:%d:%s  %s\n", timestamp,
+                     shortname, item->pid(), item->tid(), item->rawThreadName(),
+                     item->m_file, item->m_line, item->m_function, item->m_message);
+        }
+        else
+        {
+            snprintf(line, MAX_STRING_LENGTH, "%s %c [%d] %s %s:%d:%s  %s\n", timestamp,
+                     shortname, item->pid(), item->rawThreadName(),
+                     item->m_file, item->m_line, item->m_function, item->m_message);
+        }
 #else
-        snprintf( line, MAX_STRING_LENGTH, "%s %c  %s\n", timestamp,
-                  shortname, item->m_message );
+        snprintf(line, MAX_STRING_LENGTH, "%s %c  %s\n", timestamp,
+                  shortname, item->m_message);
 #endif
     }
 
-    int result = write( 1, line, strlen(line) );
-    (void)result;
+    (void)write(1, line, strlen(line));
 
 #else // Q_OS_ANDROID
 
