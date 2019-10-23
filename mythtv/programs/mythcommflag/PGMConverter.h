@@ -31,7 +31,7 @@ class PGMConverter
 {
 public:
     /* Ctor/dtor. */
-    PGMConverter(void);
+    PGMConverter(void) = default;
     ~PGMConverter(void);
 
     int MythPlayerInited(const MythPlayer *player);
@@ -43,9 +43,9 @@ private:
     long long       m_frameno       {-1}; /* frame number */
     int             m_width         {-1}; /* frame dimensions */
     int             m_height        {-1}; /* frame dimensions */
-    AVFrame         m_pgm;                /* grayscale frame */
+    AVFrame         m_pgm           {};   /* grayscale frame */
 #ifdef PGM_CONVERT_GREYSCALE
-    struct timeval  m_convert_time;
+    struct timeval  m_convert_time  {0,0};
     bool            m_time_reported {false};
     MythAVCopy     *m_copy          {nullptr};
 #endif /* PGM_CONVERT_GREYSCALE */

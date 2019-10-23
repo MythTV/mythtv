@@ -263,13 +263,7 @@ public:
           m_verticalLayout(gs.m_verticalLayout),
           m_firstTime(gs.m_firstTime),
           m_lastTime(gs.m_lastTime),
-          m_proglists(proglists)
-    {
-        for (unsigned int i = m_firstRow;
-             i < m_firstRow + m_numRows; ++i)
-            for (int j = 0; j < MAX_DISPLAY_TIMES; ++j)
-                m_programInfos[i][j] = nullptr;
-    }
+          m_proglists(proglists) {}
     ~GuideUpdateProgramRow() override = default;
     bool ExecuteNonUI(void) override // GuideUpdaterBase
     {
@@ -513,12 +507,6 @@ GuideGrid::GuideGrid(MythScreenStack *parent,
 
     for (uint i = 0; i < MAX_DISPLAY_CHANS; i++)
         m_programs.push_back(nullptr);
-
-    for (int x = 0; x < MAX_DISPLAY_TIMES; ++x)
-    {
-        for (int y = 0; y < MAX_DISPLAY_CHANS; ++y)
-            m_programInfos[y][x] = nullptr;
-    }
 
     m_originalStartTime = MythDate::current();
     if (startTime.isValid() &&

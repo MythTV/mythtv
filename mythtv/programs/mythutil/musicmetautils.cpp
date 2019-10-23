@@ -339,12 +339,13 @@ static int CalcTrackLength(const MythUtilCommandLineParser &cmdline)
     return GENERIC_EXIT_OK;
 }
 
-typedef struct
+class LyricsGrabber
 {
+public:
     QString name;
     QString filename;
-    int priority;
-} LyricsGrabber;
+    int     priority {99};
+};
 
 static int FindLyrics(const MythUtilCommandLineParser &cmdline)
 {

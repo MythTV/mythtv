@@ -21,12 +21,6 @@ extern "C" {
 
 using namespace commDetector2;
 
-PGMConverter::PGMConverter(void)
-{
-    memset(&m_pgm, 0, sizeof(m_pgm));
-    memset(&m_convert_time, 0, sizeof(m_convert_time));
-}
-
 PGMConverter::~PGMConverter(void)
 {
     m_width = -1;

@@ -18,7 +18,6 @@ using namespace commDetector2;
 
 BorderDetector::BorderDetector(void)
 {
-    memset(&m_analyze_time, 0, sizeof(m_analyze_time));
     m_debugLevel = gCoreContext->GetNumSetting("BorderDetectorDebugLevel", 0);
 
     if (m_debugLevel >= 1)

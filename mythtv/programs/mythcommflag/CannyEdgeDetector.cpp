@@ -49,12 +49,6 @@ CannyEdgeDetector::CannyEdgeDetector(void)
     }
     for (ii = 0; ii < mask_width; ii++)
         m_mask[ii] /= sum;    /* normalize to [0,1] */
-
-    memset(&m_s1, 0, sizeof(m_s1));
-    memset(&m_s2, 0, sizeof(m_s2));
-    memset(&m_convolved, 0, sizeof(m_convolved));
-    memset(&m_edges, 0, sizeof(m_edges));
-    memset(&m_exclude, 0, sizeof(m_exclude));
 }
 
 CannyEdgeDetector::~CannyEdgeDetector(void)

@@ -54,9 +54,9 @@ public:
 private:
     int resetBuffers(int newwidth, int newheight);
 
-    PGMConverter   *m_pgmConverter;
-    BorderDetector *m_borderDetector;
-    EdgeDetector   *m_edgeDetector;
+    PGMConverter   *m_pgmConverter     {nullptr};
+    BorderDetector *m_borderDetector   {nullptr};
+    EdgeDetector   *m_edgeDetector     {nullptr};
 
     unsigned int    m_sampleTime       {20 * 60}; /* amount of time to analyze */
     int             m_frameInterval;              /* analyze every <Interval> frames */
@@ -72,13 +72,13 @@ private:
     int             maxcontentrow1     {INT_MAX}; /* minrow + height ("maxrow + 1") */
     int             maxcontentcol1     {INT_MAX}; /* mincol + width ("maxcol + 1") */
 
-    AVFrame         m_tmpl;                       /* logo-matching template */
+    AVFrame         m_tmpl             {};        /* logo-matching template */
     int             m_tmplrow          {-1};
     int             m_tmplcol          {-1};
     int             m_tmplwidth        {-1};
     int             m_tmplheight       {-1};
 
-    AVFrame         m_cropped;                    /* cropped version of frame */
+    AVFrame         m_cropped          {};        /* cropped version of frame */
     int             m_cwidth           {-1};      /* cropped width */
     int             m_cheight          {-1};      /* cropped height */
 
@@ -92,7 +92,7 @@ private:
     bool            m_debug_frames     {false};
     bool            m_tmpl_valid       {false};
     bool            m_tmpl_done        {false};
-    struct timeval  m_analyze_time;
+    struct timeval  m_analyze_time     {0,0};
 };
 
 #endif  /* !__TEMPLATEFINDER_H__ */

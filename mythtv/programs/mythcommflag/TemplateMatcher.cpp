@@ -339,9 +339,6 @@ TemplateMatcher::TemplateMatcher(PGMConverter *pgmc, EdgeDetector *ed,
     m_debugdata(debugdir + "/TemplateMatcher-yuv.txt")
 #endif /* !PGM_CONVERT_GREYSCALE */
 {
-    memset(&m_cropped, 0, sizeof(m_cropped));
-    memset(&m_analyze_time, 0, sizeof(m_analyze_time));
-
     /*
      * debugLevel:
      *      0: no debugging

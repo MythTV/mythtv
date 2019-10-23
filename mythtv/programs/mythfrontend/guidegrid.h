@@ -241,7 +241,7 @@ private:
     QMap<uint,uint>      m_channelInfoIdx;
 
     vector<ProgramList*> m_programs;
-    ProgInfoGuideArray m_programInfos;
+    ProgInfoGuideArray m_programInfos {};
     ProgramList  m_recList;
 
     QDateTime m_originalStartTime;

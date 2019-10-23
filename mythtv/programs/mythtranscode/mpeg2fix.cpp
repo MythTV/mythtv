@@ -478,20 +478,6 @@ static int fill_buffers(void *r, int finish)
     return (rx->WaitBuffers());
 }
 
-MPEG2replex::MPEG2replex()
-{
-    memset(&m_vrbuf, 0, sizeof(m_vrbuf));
-    memset(m_extrbuf, 0, sizeof(m_extrbuf));
-    memset(&m_index_vrbuf, 0, sizeof(m_index_vrbuf));
-    memset(m_index_extrbuf, 0, sizeof(m_index_extrbuf));
-    memset(m_exttype, 0, sizeof(m_exttype));
-    memset(m_exttypcnt, 0, sizeof(m_exttypcnt));
-    memset(m_extframe, 0, sizeof(m_extframe));
-    memset(&m_seq_head, 0, sizeof(m_seq_head));
-    pthread_mutex_init(&m_mutex, nullptr);
-    pthread_cond_init(&m_cond, nullptr);
-}
-
 MPEG2replex::~MPEG2replex()
 {
     if (m_vrbuf.size)

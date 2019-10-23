@@ -86,25 +86,25 @@ class PTSOffsetQueue
 class MPEG2replex
 {
   public:
-    MPEG2replex();
+    MPEG2replex() = default;
     ~MPEG2replex();
     void Start();
     int WaitBuffers();
     int             m_done                    {0};
     QString         m_outfile;
     int             m_otype                   {0};
-    ringbuffer      m_vrbuf;
-    ringbuffer      m_extrbuf[N_AUDIO];
-    ringbuffer      m_index_vrbuf;
-    ringbuffer      m_index_extrbuf[N_AUDIO];
+    ringbuffer      m_vrbuf                   {};
+    ringbuffer      m_extrbuf[N_AUDIO]        {};
+    ringbuffer      m_index_vrbuf             {};
+    ringbuffer      m_index_extrbuf[N_AUDIO]  {};
     int             m_ext_count               {0};
-    int             m_exttype[N_AUDIO];
-    int             m_exttypcnt[N_AUDIO];
+    int             m_exttype[N_AUDIO]        {0};
+    int             m_exttypcnt[N_AUDIO]      {0};
 
-    pthread_mutex_t m_mutex;
-    pthread_cond_t  m_cond;
-    audio_frame_t   m_extframe[N_AUDIO];
-    sequence_t      m_seq_head;
+    pthread_mutex_t m_mutex                   {};
+    pthread_cond_t  m_cond                    {};
+    audio_frame_t   m_extframe[N_AUDIO]       {};
+    sequence_t      m_seq_head                {};
 
   private:
     multiplex_t    *m_mplex                   {nullptr};
@@ -227,7 +227,7 @@ class MPEG2fixup
     frm_dir_map_t m_delMap;
     frm_dir_map_t m_saveMap;
 
-    pthread_t     m_thread;
+    pthread_t     m_thread          {};
 
     AVFormatContext *m_inputFC      {nullptr};
     AVFrame         *m_picture      {nullptr};
@@ -235,8 +235,8 @@ class MPEG2fixup
     int             m_vid_id        {-1};
     int             m_ext_count     {0};
     QMap <int, int> m_aud_map;
-    int64_t         m_ptsIncrement;
-    bool            m_mkvfile;
+    int64_t         m_ptsIncrement  {0};
+    bool            m_mkvfile       {false};
 
     bool            m_discard       {false};
     //control options
@@ -251,12 +251,12 @@ class MPEG2fixup
 
     //progress indicators
     QDateTime       m_statustime;
-    bool            m_showprogress;
-    uint64_t        m_filesize;
+    bool            m_showprogress  {false};
+    uint64_t        m_filesize      {0};
     int             m_framenum      {0};
-    int             m_status_update_time;
-    uint64_t        m_last_written_pos;
-    uint16_t        m_inv_zigzag_direct16[64];
+    int             m_status_update_time      {5};
+    uint64_t        m_last_written_pos        {0};
+    uint16_t        m_inv_zigzag_direct16[64] {};
     bool            m_zigzag_init   {false};
 };
 

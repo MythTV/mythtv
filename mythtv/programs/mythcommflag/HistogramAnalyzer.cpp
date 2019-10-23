@@ -146,9 +146,6 @@ HistogramAnalyzer::HistogramAnalyzer(PGMConverter *pgmc, BorderDetector *bd,
     , m_debugdata(debugdir + "/HistogramAnalyzer-yuv.txt")
 #endif /* !PGM_CONVERT_GREYSCALE */
 {
-    memset(m_histval, 0, sizeof(int) * (UCHAR_MAX + 1));
-    memset(&m_analyze_time, 0, sizeof(m_analyze_time));
-
     /*
      * debugLevel:
      *      0: no debugging

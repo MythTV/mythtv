@@ -738,10 +738,6 @@ TemplateFinder::TemplateFinder(PGMConverter *pgmc, BorderDetector *bd,
         QString("TemplateFinder: sampleTime=%1s, samplesNeeded=%2, endFrame=%3")
             .arg(m_sampleTime).arg(samplesNeeded).arg(m_endFrame));
 
-    memset(&m_cropped, 0, sizeof(m_cropped));
-    memset(&m_tmpl, 0, sizeof(m_tmpl));
-    memset(&m_analyze_time, 0, sizeof(m_analyze_time));
-
     /*
      * debugLevel:
      *      0: no extra debugging
