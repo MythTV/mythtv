@@ -1443,7 +1443,7 @@ static enum AVPixelFormat get_format_vdpau(struct AVCodecContext *avctx,
     if (nd)
         player =  nd->GetPlayer();
     if (player)
-        videoOut = (VideoOutputVDPAU*)(player->GetVideoOutput());
+        videoOut = dynamic_cast<VideoOutputVDPAU*>(player->GetVideoOutput());
 
     if (videoOut)
     {
@@ -1453,8 +1453,9 @@ static enum AVPixelFormat get_format_vdpau(struct AVCodecContext *avctx,
         render->BindContext(avctx);
         if (avctx->hwaccel_context)
         {
-            ((AVVDPAUContext*)(avctx->hwaccel_context))->render2 =
-                render_wrapper_vdpau;
+            auto vdpau_context = (AVVDPAUContext*)(avctx->hwaccel_context);
+            if (vdpau_context != nullptr)
+                vdpau_context->render2 = render_wrapper_vdpau;
         }
     }
 

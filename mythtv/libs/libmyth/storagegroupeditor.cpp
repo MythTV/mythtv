@@ -299,7 +299,9 @@ void StorageGroupEditor::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
+        DialogCompletionEvent *dce = dynamic_cast<DialogCompletionEvent*>(event);
+        if (dce == nullptr)
+            return;
         QString resultid  = dce->GetId();
 
         if (resultid == "editsetting")

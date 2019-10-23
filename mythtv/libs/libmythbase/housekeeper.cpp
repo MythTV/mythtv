@@ -823,7 +823,9 @@ void HouseKeeper::customEvent(QEvent *e)
 {
     if (e->type() == MythEvent::MythEventMessage)
     {
-        MythEvent *me = static_cast<MythEvent*>(e);
+        MythEvent *me = dynamic_cast<MythEvent*>(e);
+        if (me == nullptr)
+            return;
         if ((me->Message().left(20) == "HOUSE_KEEPER_RUNNING") ||
             (me->Message().left(23) == "HOUSE_KEEPER_SUCCESSFUL"))
         {

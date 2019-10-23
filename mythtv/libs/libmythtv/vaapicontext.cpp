@@ -132,7 +132,7 @@ class VAAPIDisplay : ReferenceCounter
             if (!mw)
                 return false;
             MythRenderOpenGL *gl =
-                static_cast<MythRenderOpenGL*>(mw->GetRenderDevice());
+                dynamic_cast<MythRenderOpenGL*>(mw->GetRenderDevice());
             if (!gl)
             {
                 LOG(VB_PLAYBACK, LOG_ERR, LOC +

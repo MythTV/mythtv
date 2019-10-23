@@ -501,7 +501,9 @@ public:
 
 void RotorPosMap::valueChanged(StandardSetting *setting)
 {
-    RotorPosTextEdit *posEdit = static_cast<RotorPosTextEdit*>(setting);
+    RotorPosTextEdit *posEdit = dynamic_cast<RotorPosTextEdit*>(setting);
+    if (posEdit == nullptr)
+        return;
     QString value = posEdit->getValue();
     if (value.isEmpty())
         m_posmap.erase(m_posmap.find(posEdit->m_id));

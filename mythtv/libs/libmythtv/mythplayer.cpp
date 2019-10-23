@@ -2652,7 +2652,7 @@ void MythPlayer::PreProcessNormalFrame(void)
         if (osd && videoOutput->GetOSDPainter())
         {
             InteractiveScreen *window =
-                (InteractiveScreen*)osd->GetWindow(OSD_WIN_INTERACT);
+                dynamic_cast<InteractiveScreen *>(osd->GetWindow(OSD_WIN_INTERACT));
             if ((interactiveTV->ImageHasChanged() || !itvVisible) && window)
             {
                 interactiveTV->UpdateOSD(window, videoOutput->GetOSDPainter());

@@ -122,7 +122,9 @@ void ImageSearchResultsDialog::customEvent(QEvent *event)
 {
     if (event->type() == ThumbnailDLEvent::kEventType)
     {
-        ThumbnailDLEvent *tde = (ThumbnailDLEvent *)event;
+        ThumbnailDLEvent *tde = dynamic_cast<ThumbnailDLEvent *>(event);
+        if (tde == nullptr)
+            return;
 
         ThumbnailData *data = tde->m_thumb;
 

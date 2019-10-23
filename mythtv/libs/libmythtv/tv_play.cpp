@@ -3610,8 +3610,9 @@ bool TV::event(QEvent *e)
     {
         PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
         mctx->LockDeletePlayer(__FILE__, __LINE__);
-        if (mctx->m_player)
-            mctx->m_player->WindowResized(((const QResizeEvent*) e)->size());
+        const QResizeEvent *qre = dynamic_cast<const QResizeEvent*>(e);
+        if (qre && mctx->m_player)
+            mctx->m_player->WindowResized(qre->size());
         mctx->UnlockDeletePlayer(__FILE__, __LINE__);
         ReturnPlayerLock(mctx);
         return true;
@@ -3876,11 +3877,11 @@ bool TV::TranslateKeyPressOrGesture(const QString &context,
     if (QEvent::KeyPress == e->type())
     {
         return GetMythMainWindow()->TranslateKeyPress(
-                    context, (QKeyEvent*)e, actions, allowJumps);
+            context, dynamic_cast<QKeyEvent*>(e), actions, allowJumps);
     }
     if (MythGestureEvent::kEventType == e->type())
     {
-        return TranslateGesture(context, (MythGestureEvent*)e, actions, isLiveTV);
+        return TranslateGesture(context, dynamic_cast<MythGestureEvent*>(e), actions, isLiveTV);
     }
 
     return false;
@@ -3955,11 +3956,13 @@ bool TV::ProcessKeypressOrGesture(PlayerContext *actx, QEvent *e)
     {
         if (QEvent::KeyPress == e->type())
         {
-            handled = osd->DialogHandleKeypress((QKeyEvent*)e);
+            QKeyEvent *qke = dynamic_cast<QKeyEvent*>(e);
+            handled = (qke != nullptr) && osd->DialogHandleKeypress(qke);
         }
         if (MythGestureEvent::kEventType == e->type())
         {
-            handled = osd->DialogHandleGesture((MythGestureEvent*)e);
+            MythGestureEvent *mge = dynamic_cast<MythGestureEvent*>(e);
+            handled = (mge != nullptr) && osd->DialogHandleGesture(mge);
         }
     }
     ReturnOSDLock(actx, osd);
@@ -4021,7 +4024,10 @@ bool TV::ProcessKeypressOrGesture(PlayerContext *actx, QEvent *e)
     // This allows hex teletext entry and minor channel entry.
     if (QEvent::KeyPress == e->type())
     {
-        const QString txt = ((QKeyEvent*)e)->text();
+        QKeyEvent *qke = dynamic_cast<QKeyEvent*>(e);
+        if (qke == nullptr)
+            return false;
+        const QString txt = qke->text();
         if (HasQueuedInput() && (1 == txt.length()))
         {
             bool ok = false;
@@ -4093,7 +4099,7 @@ bool TV::ProcessKeypressOrGesture(PlayerContext *actx, QEvent *e)
 
     if (QEvent::KeyPress == e->type())
     {
-        handled = handled || SysEventHandleAction((QKeyEvent*)e, actions);
+        handled = handled || SysEventHandleAction(dynamic_cast<QKeyEvent*>(e), actions);
     }
     handled = handled || BrowseHandleAction(actx, actions);
     handled = handled || ManualZoomHandleAction(actx, actions);
@@ -9302,7 +9308,9 @@ void TV::customEvent(QEvent *e)
 
     if (e->type() == MythEvent::MythUserMessage)
     {
-        MythEvent *me = static_cast<MythEvent*>(e);
+        MythEvent *me = dynamic_cast<MythEvent*>(e);
+        if (me == nullptr)
+            return;
         QString message = me->Message();
 
         if (message.isEmpty())
@@ -9382,7 +9390,9 @@ void TV::customEvent(QEvent *e)
             return;
         }
 
-        MythMediaEvent *me = static_cast<MythMediaEvent*>(e);
+        MythMediaEvent *me = dynamic_cast<MythMediaEvent*>(e);
+        if (me == nullptr)
+            return;
         MythMediaDevice *device = me->getDevice();
 
         QString filename = mctx->m_buffer ? mctx->m_buffer->GetFilename() : "";
@@ -9409,7 +9419,9 @@ void TV::customEvent(QEvent *e)
         return;
 
     uint cardnum   = 0;
-    MythEvent *me = static_cast<MythEvent*>(e);
+    MythEvent *me = dynamic_cast<MythEvent*>(e);
+    if (me == nullptr)
+        return;
     QString message = me->Message();
 
     // TODO Go through these and make sure they make sense...

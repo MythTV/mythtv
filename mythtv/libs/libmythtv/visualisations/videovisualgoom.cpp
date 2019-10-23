@@ -41,7 +41,7 @@ VideoVisualGoom::~VideoVisualGoom()
         m_render->Type() == kRenderOpenGL2ES))
     {
         MythRenderOpenGL *glrender =
-                    static_cast<MythRenderOpenGL*>(m_render);
+                    dynamic_cast<MythRenderOpenGL*>(m_render);
         if (glrender)
             glrender->DeleteTexture(m_surface);
         m_surface = 0;
@@ -53,7 +53,7 @@ VideoVisualGoom::~VideoVisualGoom()
        (m_render->Type() == kRenderVDPAU))
     {
         MythRenderVDPAU *render =
-                    static_cast<MythRenderVDPAU*>(m_render);
+                    dynamic_cast<MythRenderVDPAU*>(m_render);
         if (render)
             render->DestroyBitmapSurface(m_surface);
         m_surface = 0;
@@ -101,7 +101,7 @@ void VideoVisualGoom::Draw(const QRect &area, MythPainter */*painter*/,
         (m_render->Type() == kRenderOpenGL2ES))
     {
         MythRenderOpenGL *glrender =
-                    static_cast<MythRenderOpenGL*>(m_render);
+                    dynamic_cast<MythRenderOpenGL*>(m_render);
         if (!m_surface && glrender && m_buffer)
         {
             m_surface = glrender->CreateTexture(m_area.size(),
@@ -132,7 +132,7 @@ void VideoVisualGoom::Draw(const QRect &area, MythPainter */*painter*/,
     if (m_render->Type() == kRenderVDPAU)
     {
         MythRenderVDPAU *render =
-                    static_cast<MythRenderVDPAU*>(m_render);
+                    dynamic_cast<MythRenderVDPAU*>(m_render);
 
         if (!m_surface && render)
             m_surface = render->CreateBitmapSurface(m_area.size());

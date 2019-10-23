@@ -1152,7 +1152,9 @@ void MythDownloadManager::removeListener(QObject *caller)
  */
 void MythDownloadManager::downloadError(QNetworkReply::NetworkError errorCode)
 {
-    QNetworkReply *reply = (QNetworkReply*)sender();
+    auto reply = dynamic_cast<QNetworkReply *>(sender());
+    if (reply == nullptr)
+        return;
 
     LOG(VB_FILE, LOG_DEBUG, LOC + QString("downloadError %1 ")
                     .arg(errorCode) + reply->errorString() );
@@ -1436,7 +1438,9 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
 void MythDownloadManager::downloadProgress(qint64 bytesReceived,
                                            qint64 bytesTotal)
 {
-    QNetworkReply *reply = (QNetworkReply*)sender();
+    auto reply = dynamic_cast<QNetworkReply *>(sender());
+    if (reply == nullptr)
+        return;
 
     LOG(VB_FILE, LOG_DEBUG, LOC +
         QString("downloadProgress(%1, %2) (for reply %3)")
@@ -1659,7 +1663,9 @@ void MythDownloadManager::saveCookieJar(const QString &filename)
     if (!m_manager->cookieJar())
         return;
 
-    MythCookieJar *jar = static_cast<MythCookieJar *>(m_manager->cookieJar());
+    auto jar = dynamic_cast<MythCookieJar *>(m_manager->cookieJar());
+    if (jar == nullptr)
+        return;
     jar->save(filename);
 }
 
@@ -1679,7 +1685,9 @@ QNetworkCookieJar *MythDownloadManager::copyCookieJar(void)
     if (!m_manager->cookieJar())
         return nullptr;
 
-    MythCookieJar *inJar = static_cast<MythCookieJar *>(m_manager->cookieJar());
+    auto inJar = dynamic_cast<MythCookieJar *>(m_manager->cookieJar());
+    if (inJar == nullptr)
+        return nullptr;
     MythCookieJar *outJar = new MythCookieJar;
     outJar->copyAllCookies(*inJar);
 
@@ -1694,7 +1702,10 @@ void MythDownloadManager::refreshCookieJar(QNetworkCookieJar *jar)
     QMutexLocker locker(&m_cookieLock);
     delete m_inCookieJar;
 
-    MythCookieJar *inJar = static_cast<MythCookieJar *>(jar);
+    auto inJar = dynamic_cast<MythCookieJar *>(jar);
+    if (inJar == nullptr)
+        return;
+
     MythCookieJar *outJar = new MythCookieJar;
     outJar->copyAllCookies(*inJar);
     m_inCookieJar = static_cast<QNetworkCookieJar *>(outJar);
@@ -1709,10 +1720,13 @@ void MythDownloadManager::updateCookieJar(void)
 {
     QMutexLocker locker(&m_cookieLock);
 
-    MythCookieJar *inJar = static_cast<MythCookieJar *>(m_inCookieJar);
-    MythCookieJar *outJar = new MythCookieJar;
-    outJar->copyAllCookies(*inJar);
-    m_manager->setCookieJar(static_cast<QNetworkCookieJar *>(outJar));
+    auto inJar = dynamic_cast<MythCookieJar *>(m_inCookieJar);
+    if (inJar != nullptr)
+    {
+        MythCookieJar *outJar = new MythCookieJar;
+        outJar->copyAllCookies(*inJar);
+        m_manager->setCookieJar(static_cast<QNetworkCookieJar *>(outJar));
+    }
 
     delete m_inCookieJar;
     m_inCookieJar = nullptr;

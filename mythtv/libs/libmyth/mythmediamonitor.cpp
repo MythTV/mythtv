@@ -808,8 +808,15 @@ bool MediaMonitor::eventFilter(QObject *obj, QEvent *event)
 {
     if (event->type() == MythMediaEvent::kEventType)
     {
-        MythMediaDevice *pDev = ((MythMediaEvent*)event)->getDevice();
+        MythMediaEvent *me = dynamic_cast<MythMediaEvent *>(event);
+        if (me == nullptr)
+        {
+            LOG(VB_GENERAL, LOG_ALERT,
+                     "MediaMonitor::eventFilter() couldn't cast event");
+            return true;
+        }
 
+        MythMediaDevice *pDev = me->getDevice();
         if (!pDev)
         {
             LOG(VB_GENERAL, LOG_ALERT,

@@ -261,7 +261,9 @@ void MythSystemEventHandler::customEvent(QEvent *e)
 {
     if (e->type() == MythEvent::MythEventMessage)
     {
-        MythEvent *me = static_cast<MythEvent *>(e);
+        MythEvent *me = dynamic_cast<MythEvent *>(e);
+        if (me == nullptr)
+            return;
         QString msg = me->Message().simplified();
 
         if (msg == "CLEAR_SETTINGS_CACHE")

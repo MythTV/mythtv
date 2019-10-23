@@ -1774,7 +1774,9 @@ bool cLlCiHandler::Process(void)
             UserIO |= m_sessions[i]->HasUserIO();
             if (m_sessions[i]->ResourceId() == RI_CONDITIONAL_ACCESS_SUPPORT)
             {
-                cCiConditionalAccessSupport *cas = (cCiConditionalAccessSupport *) m_sessions[i];
+                auto cas = dynamic_cast<cCiConditionalAccessSupport *>(m_sessions[i]);
+                if (cas == nullptr)
+                    continue;
                 m_needCaPmt |= cas->NeedCaPmt();
             }
         }
@@ -1789,7 +1791,7 @@ bool cLlCiHandler::Process(void)
 bool cLlCiHandler::EnterMenu(int Slot)
 {
   cMutexLock MutexLock(&m_mutex);
-  cCiApplicationInformation *api = (cCiApplicationInformation *)GetSessionByResourceId(RI_APPLICATION_INFORMATION, Slot);
+  auto api = dynamic_cast<cCiApplicationInformation *>(GetSessionByResourceId(RI_APPLICATION_INFORMATION, Slot));
   return api ? api->EnterMenu() : false;
 }
 
@@ -1797,7 +1799,7 @@ cCiMenu *cLlCiHandler::GetMenu(void)
 {
   cMutexLock MutexLock(&m_mutex);
   for (int Slot = 0; Slot < m_numSlots; Slot++) {
-      cCiMMI *mmi = (cCiMMI *)GetSessionByResourceId(RI_MMI, Slot);
+      cCiMMI *mmi = dynamic_cast<cCiMMI *>(GetSessionByResourceId(RI_MMI, Slot));
       if (mmi)
          return mmi->Menu();
       }
@@ -1808,7 +1810,7 @@ cCiEnquiry *cLlCiHandler::GetEnquiry(void)
 {
   cMutexLock MutexLock(&m_mutex);
   for (int Slot = 0; Slot < m_numSlots; Slot++) {
-      cCiMMI *mmi = (cCiMMI *)GetSessionByResourceId(RI_MMI, Slot);
+      cCiMMI *mmi = dynamic_cast<cCiMMI *>(GetSessionByResourceId(RI_MMI, Slot));
       if (mmi)
          return mmi->Enquiry();
       }
@@ -1818,14 +1820,14 @@ cCiEnquiry *cLlCiHandler::GetEnquiry(void)
 const unsigned short *cLlCiHandler::GetCaSystemIds(int Slot)
  {
   cMutexLock MutexLock(&m_mutex);
-  cCiConditionalAccessSupport *cas = (cCiConditionalAccessSupport *)GetSessionByResourceId(RI_CONDITIONAL_ACCESS_SUPPORT, Slot);
+  auto cas = dynamic_cast<cCiConditionalAccessSupport *>(GetSessionByResourceId(RI_CONDITIONAL_ACCESS_SUPPORT, Slot));
   return cas ? cas->GetCaSystemIds() : nullptr;
 }
 
 bool cLlCiHandler::SetCaPmt(cCiCaPmt &CaPmt, int Slot)
 {
   cMutexLock MutexLock(&m_mutex);
-  cCiConditionalAccessSupport *cas = (cCiConditionalAccessSupport *)GetSessionByResourceId(RI_CONDITIONAL_ACCESS_SUPPORT, Slot);
+  auto cas = dynamic_cast<cCiConditionalAccessSupport *>(GetSessionByResourceId(RI_CONDITIONAL_ACCESS_SUPPORT, Slot));
   return cas && cas->SendPMT(CaPmt);
 }
 
@@ -1836,7 +1838,7 @@ void cLlCiHandler::SetTimeOffset(double offset_in_seconds)
 
     for (uint i = 0; i < (uint) NumSlots(); i++)
     {
-        dt = (cCiDateTime*) GetSessionByResourceId(RI_DATE_TIME, i);
+        dt = dynamic_cast<cCiDateTime*>(GetSessionByResourceId(RI_DATE_TIME, i));
         if (dt)
             dt->SetTimeOffset(offset_in_seconds);
     }

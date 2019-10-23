@@ -306,7 +306,10 @@ void BackendSelection::customEvent(QEvent *event)
 {
     if (event->type() == MythEvent::MythEventMessage)
     {
-        MythEvent *me      = static_cast<MythEvent *>(event);
+        MythEvent *me      = dynamic_cast<MythEvent *>(event);
+        if (me == nullptr)
+            return;
+
         const QString&    message = me->Message();
         const QString&    URI     = me->ExtraData(0);
         const QString&    URN     = me->ExtraData(1);

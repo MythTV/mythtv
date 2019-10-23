@@ -817,7 +817,7 @@ void MythRAOPConnection::audioRetry(void)
  */
 void MythRAOPConnection::readClient(void)
 {
-    QTcpSocket *socket = (QTcpSocket *)sender();
+    QTcpSocket *socket = dynamic_cast<QTcpSocket *>(sender());
     if (!socket)
         return;
 
@@ -1106,7 +1106,9 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
         if (tags.contains("Transport"))
         {
             // New client is trying to play audio, disconnect all the other clients
-            ((MythRAOPDevice*)parent())->DeleteAllClients(this);
+            auto dev = dynamic_cast<MythRAOPDevice*>(parent());
+            if (dev != nullptr)
+                dev->DeleteAllClients(this);
             gCoreContext->WantingPlayback(parent());
             m_playbackStarted = true;
 
@@ -1758,11 +1760,16 @@ void MythRAOPConnection::newEventClient(QTcpSocket *client)
 
 void MythRAOPConnection::deleteEventClient(void)
 {
-    QTcpSocket *client = static_cast<QTcpSocket *>(sender());
+    QTcpSocket *client = dynamic_cast<QTcpSocket *>(sender());
+    QString label;
+
+    if (client != nullptr)
+        label = QString("%1:%2").arg(client->peerAddress().toString()).arg(client->peerPort());
+    else
+        label = QString("unknown");
 
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
-        QString("%1:%2 disconnected from RAOP events server.")
-        .arg(client->peerAddress().toString()).arg(client->peerPort()));
+        QString("%1 disconnected from RAOP events server.").arg(label));
 }
 
 void MythRAOPConnection::SendNotification(bool update)

@@ -490,7 +490,7 @@ void VideoOutputOpenGL::CreatePainter(void)
     }
     else
     {
-        gl_painter = (MythOpenGLPainter*)win->GetCurrentPainter();
+        gl_painter = dynamic_cast<MythOpenGLPainter*>(win->GetCurrentPainter());
         if (!gl_painter)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to get painter");

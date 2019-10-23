@@ -2634,7 +2634,10 @@ class InputName : public MythUIComboBoxSetting
     void fillSelections() {
         clearSelections();
         addSelection(QObject::tr("(None)"), "None");
-        uint cardid = static_cast<CardInputDBStorage*>(GetStorage())->getInputID();
+        CardInputDBStorage *storage = dynamic_cast<CardInputDBStorage*>(GetStorage());
+        if (storage == nullptr)
+            return;
+        uint cardid = storage->getInputID();
         QString type = CardUtil::GetRawInputType(cardid);
         QString device = CardUtil::GetVideoDevice(cardid);
         QStringList inputs;
@@ -2892,7 +2895,10 @@ void StartingChannel::SetSourceID(const QString &sourceid)
         return;
 
     // Get the existing starting channel
-    int inputId = static_cast<CardInputDBStorage*>(GetStorage())->getInputID();
+    CardInputDBStorage *storage = dynamic_cast<CardInputDBStorage*>(GetStorage());
+    if (storage == nullptr)
+        return;
+    int inputId = storage->getInputID();
     QString startChan = CardUtil::GetStartingChannel(inputId);
 
     ChannelInfoList channels = ChannelUtil::GetAllChannels(sourceid.toUInt());
