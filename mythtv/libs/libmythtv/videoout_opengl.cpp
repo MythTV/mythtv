@@ -254,6 +254,9 @@ bool VideoOutputOpenGL::Init(const QSize &VideoDim, const QSize &VideoDispDim, f
     if (m_openGLVideo->IsValid())
         m_openGLVideo->ResetFrameFormat();
 
+    // This works around an issue with VDPAU direct rendering using legacy drivers
+    m_render->Flush();
+
     return true;
 }
 
