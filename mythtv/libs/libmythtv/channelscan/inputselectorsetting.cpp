@@ -38,6 +38,11 @@ InputSelector::InputSelector(uint default_cardid,
     m_default_inputname(default_inputname)
 {
     setLabel(tr("Input"));
+    setHelpText(
+        QObject::tr(
+            "Select a capture card from the capture cards that are "
+            "connected to the currently selected video source."
+            ));
 }
 
 void InputSelector::Load(void)
