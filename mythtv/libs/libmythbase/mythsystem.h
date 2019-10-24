@@ -96,14 +96,14 @@ class MBASE_PUBLIC MythSystem
     static MythSystem *Create(
         const QStringList &args,
         uint flags = kMSNone,
-        QString startPath = QString(),
+        const QString& startPath = QString(),
         Priority cpuPriority = kInheritPriority,
         Priority diskPriority = kInheritPriority);
 
     static MythSystem *Create(
         const QString& args,
         uint flags = kMSNone,
-        QString startPath = QString(),
+        const QString& startPath = QString(),
         Priority cpuPriority = kInheritPriority,
         Priority diskPriority = kInheritPriority);
 

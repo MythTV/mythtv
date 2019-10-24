@@ -40,15 +40,15 @@ class LCDProcClient : public QObject
     void setMusicProgress(QString time, float value);
     void setMusicRepeat(int repeat);
     void setMusicShuffle(int shuffle);
-    void switchToChannel(QString channum = "", QString title = "", 
-                         QString subtitle = "");
+    void switchToChannel(const QString& channum = "", const QString& title = "", 
+                         const QString& subtitle = "");
     void setChannelProgress(const QString &time, float value);
-    void switchToMenu(QList<LCDMenuItem> *menuItems, QString app_name = "",
+    void switchToMenu(QList<LCDMenuItem> *menuItems, const QString& app_name = "",
                       bool popMenu = true);
     void switchToGeneric(QList<LCDTextItem> *textItems);
     void setGenericProgress(bool busy, float value);
 
-    void switchToVolume(QString app_name);
+    void switchToVolume(const QString& app_name);
     void setVolumeLevel(float value);
 
     void switchToNothing();

@@ -81,7 +81,7 @@ public:
 class GroupTransition : public Transition
 {
 public:
-    GroupTransition(GroupAnimation *animation, QString name);
+    GroupTransition(GroupAnimation *animation, const QString& name);
     virtual ~GroupTransition();
     void Start(Slide &from, Slide &to,
                bool forwards, float speed = 1.0) override; // Transition

@@ -675,21 +675,21 @@ uint ScanDTVTransport::SaveScan(uint scanid) const
 
 bool ScanDTVTransport::ParseTuningParams(
     DTVTunerType type,
-    QString _frequency,    QString _inversion,      QString _symbolrate,
-    QString _fec,          QString _polarity,
-    QString _hp_code_rate, QString _lp_code_rate,   QString _ofdm_modulation,
-    QString _trans_mode,   QString _guard_interval, QString _hierarchy,
-    QString _modulation,   QString _bandwidth,      QString _mod_sys,
-    QString _rolloff)
+    const QString& _frequency,    const QString& _inversion,      const QString& _symbolrate,
+    const QString& _fec,          const QString& _polarity,
+    const QString& _hp_code_rate, const QString& _lp_code_rate,   const QString& _ofdm_modulation,
+    const QString& _trans_mode,   const QString& _guard_interval, const QString& _hierarchy,
+    const QString& _modulation,   const QString& _bandwidth,      const QString& _mod_sys,
+    const QString& _rolloff)
 {
     m_tuner_type = type;
 
     return DTVMultiplex::ParseTuningParams(
         type,
-        std::move(_frequency),     std::move(_inversion),       std::move(_symbolrate),
-        std::move(_fec),           std::move(_polarity),
-        std::move(_hp_code_rate),  std::move(_lp_code_rate),    std::move(_ofdm_modulation),
-        std::move(_trans_mode),    std::move(_guard_interval),  std::move(_hierarchy),
-        std::move(_modulation),    std::move(_bandwidth),       std::move(_mod_sys),
-        std::move(_rolloff));
+        _frequency,     _inversion,       _symbolrate,
+        _fec,           _polarity,
+        _hp_code_rate,  _lp_code_rate,    _ofdm_modulation,
+        _trans_mode,    _guard_interval,  _hierarchy,
+        _modulation,    _bandwidth,       _mod_sys,
+        _rolloff);
 }

@@ -213,10 +213,8 @@ uint MPoolThread::s_thread_num = 0;
 class MThreadPoolPrivate
 {
   public:
-    explicit MThreadPoolPrivate(const QString &name) :
-        m_name(name)
-    {
-    }
+    explicit MThreadPoolPrivate(QString name) :
+        m_name(std::move(name)) {}
 
     int GetRealMaxThread(void)
     {
@@ -362,7 +360,7 @@ void MThreadPool::start(QRunnable *runnable, const QString& debugName, int prior
 }
 
 void MThreadPool::startReserved(
-    QRunnable *runnable, QString debugName, int waitForAvailMS)
+    QRunnable *runnable, const QString& debugName, int waitForAvailMS)
 {
     QMutexLocker locker(&m_priv->m_lock);
     if (waitForAvailMS > 0 && m_priv->m_avail_threads.empty() &&
@@ -378,14 +376,14 @@ void MThreadPool::startReserved(
             left = waitForAvailMS - t.elapsed();
         }
     }
-    TryStartInternal(runnable, std::move(debugName), true);
+    TryStartInternal(runnable, debugName, true);
 }
 
 
-bool MThreadPool::tryStart(QRunnable *runnable, QString debugName)
+bool MThreadPool::tryStart(QRunnable *runnable, const QString& debugName)
 {
     QMutexLocker locker(&m_priv->m_lock);
-    return TryStartInternal(runnable, std::move(debugName), false);
+    return TryStartInternal(runnable, debugName, false);
 }
 
 bool MThreadPool::TryStartInternal(

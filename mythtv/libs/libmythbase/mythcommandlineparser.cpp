@@ -535,9 +535,9 @@ bool CommandLineArg::Set(const QString& opt, const QByteArray& val)
 
 /** \brief Set argument as parent of given child
  */
-CommandLineArg* CommandLineArg::SetParentOf(QString opt)
+CommandLineArg* CommandLineArg::SetParentOf(const QString &opt)
 {
-    m_children << new CommandLineArg(std::move(opt));
+    m_children << new CommandLineArg(opt);
     return this;
 }
 
@@ -553,9 +553,9 @@ CommandLineArg* CommandLineArg::SetParentOf(QStringList opts)
 
 /** \brief Set argument as child of given parent
  */
-CommandLineArg* CommandLineArg::SetParent(QString opt)
+CommandLineArg* CommandLineArg::SetParent(const QString &opt)
 {
-    m_parents << new CommandLineArg(std::move(opt));
+    m_parents << new CommandLineArg(opt);
     return this;
 }
 
@@ -571,9 +571,9 @@ CommandLineArg* CommandLineArg::SetParent(QStringList opts)
 
 /** \brief Set argument as child of given parent
  */
-CommandLineArg* CommandLineArg::SetChildOf(QString opt)
+CommandLineArg* CommandLineArg::SetChildOf(const QString &opt)
 {
-    m_parents << new CommandLineArg(std::move(opt));
+    m_parents << new CommandLineArg(opt);
     return this;
 }
 
@@ -589,9 +589,9 @@ CommandLineArg* CommandLineArg::SetChildOf(QStringList opts)
 
 /** \brief Set argument as parent of given child
  */
-CommandLineArg* CommandLineArg::SetChild(QString opt)
+CommandLineArg* CommandLineArg::SetChild(const QString& opt)
 {
-    m_children << new CommandLineArg(std::move(opt));
+    m_children << new CommandLineArg(opt);
     return this;
 }
 
@@ -651,9 +651,9 @@ CommandLineArg* CommandLineArg::SetRequiredChildOf(QStringList opts)
 
 /** \brief Set argument as requiring given option
  */
-CommandLineArg* CommandLineArg::SetRequires(QString opt)
+CommandLineArg* CommandLineArg::SetRequires(const QString& opt)
 {
-    m_requires << new CommandLineArg(std::move(opt));
+    m_requires << new CommandLineArg(opt);
     return this;
 }
 
@@ -669,9 +669,9 @@ CommandLineArg* CommandLineArg::SetRequires(QStringList opts)
 
 /** \brief Set argument as incompatible with given option
  */
-CommandLineArg* CommandLineArg::SetBlocks(QString opt)
+CommandLineArg* CommandLineArg::SetBlocks(const QString &opt)
 {
-    m_blocks << new CommandLineArg(std::move(opt));
+    m_blocks << new CommandLineArg(opt);
     return this;
 }
 
@@ -2549,14 +2549,14 @@ bool MythCommandLineParser::SetValue(const QString &key, const QVariant& value)
 
 /** \brief Read in logging options and initialize the logging interface
  */
-int MythCommandLineParser::ConfigureLogging(QString mask, unsigned int progress)
+int MythCommandLineParser::ConfigureLogging(const QString& mask, unsigned int progress)
 {
     int err = 0;
 
     // Setup the defaults
     verboseString = "";
     verboseMask   = 0;
-    verboseArgParse(std::move(mask));
+    verboseArgParse(mask);
 
     if (toBool("verbose"))
     {

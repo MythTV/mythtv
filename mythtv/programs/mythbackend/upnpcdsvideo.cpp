@@ -256,7 +256,7 @@ bool UPnpCDSVideo::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
 
 bool UPnpCDSVideo::LoadMetadata(const UPnpCDSRequest* pRequest,
                                  UPnpCDSExtensionResults* pResults,
-                                 IDTokenMap tokens, QString currentToken)
+                                 const IDTokenMap& tokens, const QString& currentToken)
 {
     if (currentToken.isEmpty())
     {
@@ -320,7 +320,7 @@ bool UPnpCDSVideo::LoadMetadata(const UPnpCDSRequest* pRequest,
 
 bool UPnpCDSVideo::LoadChildren(const UPnpCDSRequest* pRequest,
                                 UPnpCDSExtensionResults* pResults,
-                                IDTokenMap tokens, QString currentToken)
+                                const IDTokenMap& tokens, const QString& currentToken)
 {
     if (currentToken.isEmpty() || currentToken == m_sExtensionId.toLower())
     {

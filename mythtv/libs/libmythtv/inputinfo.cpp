@@ -11,7 +11,7 @@ void InputInfo::Clear(void)
 
 #define NEXT() do { ++it; if (it == end) return false; } while (false)
 bool InputInfo::FromStringList(QStringList::const_iterator &it,
-                               QStringList::const_iterator end)
+                               const QStringList::const_iterator& end)
 {
     if (it == end)
         return false;

@@ -197,7 +197,7 @@ class ScheduleEditor : public ScheduleCommon,
   private:
     Q_DISABLE_COPY(ScheduleEditor);
     void Load(void) override; // MythScreenType
-    void LoadTemplate(QString name);
+    void LoadTemplate(const QString& name);
     void DeleteRule(void);
 
     void showTemplateMenu(void);

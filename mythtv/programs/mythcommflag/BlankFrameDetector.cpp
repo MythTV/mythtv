@@ -374,7 +374,7 @@ computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
 
 };  /* namespace */
 
-BlankFrameDetector::BlankFrameDetector(HistogramAnalyzer *ha, QString debugdir)
+BlankFrameDetector::BlankFrameDetector(HistogramAnalyzer *ha, const QString &debugdir)
     : m_histogramAnalyzer(ha)
 {
     /*
@@ -385,7 +385,7 @@ BlankFrameDetector::BlankFrameDetector(HistogramAnalyzer *ha, QString debugdir)
     m_debugLevel = gCoreContext->GetNumSetting("BlankFrameDetectorDebugLevel", 0);
 
     if (m_debugLevel >= 1)
-        createDebugDirectory(std::move(debugdir),
+        createDebugDirectory(debugdir,
             QString("BlankFrameDetector debugLevel %1").arg(m_debugLevel));
 }
 

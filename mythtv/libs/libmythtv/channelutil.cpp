@@ -369,13 +369,13 @@ static void handle_transport_desc(vector<uint> &muxes,
     }
 }
 
-uint ChannelUtil::CreateMultiplex(int  sourceid,      QString sistandard,
-                                  uint64_t frequency, QString modulation,
-                                  int  transport_id,  int     network_id)
+uint ChannelUtil::CreateMultiplex(int      sourceid,     const QString& sistandard,
+                                  uint64_t frequency,    const QString& modulation,
+                                  int      transport_id, int            network_id)
 {
     return CreateMultiplex(
-        sourceid,           std::move(sistandard),
-        frequency,          std::move(modulation),
+        sourceid,           sistandard,
+        frequency,          modulation,
         transport_id,       network_id,
         -1,                 -1,
         -1,                 -1,
@@ -387,30 +387,30 @@ uint ChannelUtil::CreateMultiplex(int  sourceid,      QString sistandard,
 }
 
 uint ChannelUtil::CreateMultiplex(
-    int         sourceid,     QString     sistandard,
-    uint64_t    freq,         QString     modulation,
+    int            sourceid,     const QString& sistandard,
+    uint64_t       freq,         const QString& modulation,
     // DVB specific
-    int         transport_id, int         network_id,
-    int         symbol_rate,  signed char bandwidth,
-    signed char polarity,     signed char inversion,
-    signed char trans_mode,
-    QString     inner_FEC,    QString     constellation,
-    signed char hierarchy,    QString     hp_code_rate,
-    QString     lp_code_rate, QString     guard_interval,
-    QString     mod_sys,      QString     rolloff)
+    int            transport_id, int            network_id,
+    int            symbol_rate,  signed char    bandwidth,
+    signed char    polarity,     signed char    inversion,
+    signed char    trans_mode,
+    const QString& inner_FEC,    const QString& constellation,
+    signed char    hierarchy,    const QString& hp_code_rate,
+    const QString& lp_code_rate, const QString& guard_interval,
+    const QString& mod_sys,      const QString& rolloff)
 {
     return insert_dtv_multiplex(
-        sourceid,           std::move(sistandard),
-        freq,               std::move(modulation),
+        sourceid,           sistandard,
+        freq,               modulation,
         // DVB specific
         transport_id,       network_id,
         symbol_rate,        bandwidth,
         polarity,           inversion,
         trans_mode,
-        std::move(inner_FEC),    std::move(constellation),
-        hierarchy,               std::move(hp_code_rate),
-        std::move(lp_code_rate), std::move(guard_interval),
-        std::move(mod_sys),      std::move(rolloff));
+        inner_FEC,          constellation,
+        hierarchy,          hp_code_rate,
+        lp_code_rate,       guard_interval,
+        mod_sys,            rolloff);
 }
 
 uint ChannelUtil::CreateMultiplex(uint sourceid, const DTVMultiplex &mux,
@@ -1479,10 +1479,10 @@ bool ChannelUtil::CreateChannel(uint db_mplexid,
                                 bool hidden,
                                 bool hidden_in_guide,
                                 const QString &freqid,
-                                QString icon,
+                                const QString& icon,
                                 QString format,
-                                QString xmltvid,
-                                QString default_authority)
+                                const QString& xmltvid,
+                                const QString& default_authority)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 

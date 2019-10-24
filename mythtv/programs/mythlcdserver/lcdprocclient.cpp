@@ -2248,7 +2248,7 @@ void LCDProcClient::switchToMusic(const QString &artist, const QString &album, c
     startMusic(artist, album, track);
 }
 
-void LCDProcClient::switchToChannel(QString channum, QString title, QString subtitle)
+void LCDProcClient::switchToChannel(const QString& channum, const QString& title, const QString& subtitle)
 {
     if (!m_lcdReady )
         return;
@@ -2258,10 +2258,10 @@ void LCDProcClient::switchToChannel(QString channum, QString title, QString subt
     if (debug_level > 1)
         LOG(VB_GENERAL, LOG_INFO, "LCDProcClient: switchToChannel");
 
-    startChannel(std::move(channum), std::move(title), std::move(subtitle));
+    startChannel(channum, title, subtitle);
 }
 
-void LCDProcClient::switchToMenu(QList<LCDMenuItem> *menuItems, QString app_name,
+void LCDProcClient::switchToMenu(QList<LCDMenuItem> *menuItems, const QString& app_name,
                                  bool popMenu)
 {
     if (!m_lcdReady )
@@ -2270,7 +2270,7 @@ void LCDProcClient::switchToMenu(QList<LCDMenuItem> *menuItems, QString app_name
     if (debug_level > 1)
         LOG(VB_GENERAL, LOG_INFO, "LCDProcClient: switchToMenu");
 
-    startMenu(menuItems, std::move(app_name), popMenu);
+    startMenu(menuItems, app_name, popMenu);
 }
 
 void LCDProcClient::switchToGeneric(QList<LCDTextItem> *textItems)
@@ -2285,7 +2285,7 @@ void LCDProcClient::switchToGeneric(QList<LCDTextItem> *textItems)
     startGeneric(textItems);
 }
 
-void LCDProcClient::switchToVolume(QString app_name)
+void LCDProcClient::switchToVolume(const QString& app_name)
 {
     if (!m_lcdReady )
         return;
@@ -2295,7 +2295,7 @@ void LCDProcClient::switchToVolume(QString app_name)
     if (debug_level > 1)
         LOG(VB_GENERAL, LOG_INFO, "LCDProcClient: switchToVolume");
 
-    startVolume(std::move(app_name));
+    startVolume(app_name);
 }
 
 void LCDProcClient::switchToNothing()

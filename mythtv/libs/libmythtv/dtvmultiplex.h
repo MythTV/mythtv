@@ -126,12 +126,12 @@ class MTV_PUBLIC ScanDTVTransport : public DTVMultiplex
 
     bool ParseTuningParams(
         DTVTunerType type,
-        QString frequency,    QString inversion,      QString symbolrate,
-        QString fec,          QString polarity,
-        QString hp_code_rate, QString lp_code_rate,   QString ofdm_modulation,
-        QString trans_mode,   QString guard_interval, QString hierarchy,
-        QString modulation,   QString bandwidth,
-        QString mod_sys,      QString rolloff);
+        const QString& frequency,    const QString& inversion,      const QString& symbolrate,
+        const QString& fec,          const QString& polarity,
+        const QString& hp_code_rate, const QString& lp_code_rate,   const QString& ofdm_modulation,
+        const QString& trans_mode,   const QString& guard_interval, const QString& hierarchy,
+        const QString& modulation,   const QString& bandwidth,
+        const QString& mod_sys,      const QString& rolloff);
 
   public:
     DTVTunerType          m_tuner_type {DTVTunerType::kTunerTypeUnknown};

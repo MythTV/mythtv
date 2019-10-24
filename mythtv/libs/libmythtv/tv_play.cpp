@@ -7377,10 +7377,10 @@ void TV::ToggleChannelFavorite(PlayerContext */*ctx*/)
         "TV::ToggleChannelFavorite() -- currently disabled");
 }
 
-void TV::ToggleChannelFavorite(PlayerContext *ctx, QString changroup_name)
+void TV::ToggleChannelFavorite(PlayerContext *ctx, const QString& changroup_name)
 {
     if (ctx->m_recorder)
-        ctx->m_recorder->ToggleChannelFavorite(std::move(changroup_name));
+        ctx->m_recorder->ToggleChannelFavorite(changroup_name);
 }
 
 QString TV::GetQueuedInput(void) const

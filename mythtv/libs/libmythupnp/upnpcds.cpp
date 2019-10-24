@@ -960,8 +960,9 @@ QString UPnpCDSExtension::RemoveToken( const QString &sToken,
  *
  */
 bool UPnpCDSExtension::LoadMetadata(const UPnpCDSRequest* /*pRequest*/,
-                                     UPnpCDSExtensionResults* /*pResults*/,
-                                     IDTokenMap /*tokens*/, QString /*currentToken*/)
+                                    UPnpCDSExtensionResults* /*pResults*/,
+                                    const IDTokenMap& /*tokens*/,
+                                    const QString& /*currentToken*/)
 {
     return false;
 }
@@ -982,7 +983,8 @@ bool UPnpCDSExtension::LoadMetadata(const UPnpCDSRequest* /*pRequest*/,
  */
 bool UPnpCDSExtension::LoadChildren(const UPnpCDSRequest* /*pRequest*/,
                                     UPnpCDSExtensionResults* /*pResults*/,
-                                    IDTokenMap /*tokens*/, QString /*currentToken*/)
+                                    const IDTokenMap& /*tokens*/,
+                                    const QString& /*currentToken*/)
 {
     return false;
 }

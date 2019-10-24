@@ -25,7 +25,7 @@ class PROTOSERVER_PUBLIC FileServerHandler : public SocketRequestHandler
                              QStringList &slist) override; // SocketRequestHandler
     void connectionClosed(MythSocket *socket) override; // SocketRequestHandler
 
-    bool DeleteFile(QString filename, QString storagegroup);
+    bool DeleteFile(const QString& filename, const QString& storagegroup);
 
     QList<FileSystemInfo> QueryFileSystems(void);
     QList<FileSystemInfo> QueryAllFileSystems(void);

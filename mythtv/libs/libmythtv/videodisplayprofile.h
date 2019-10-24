@@ -65,8 +65,8 @@ class MTV_PUBLIC ProfileItem
     pref_map_t GetAll(void) const { return pref; }
 
     // Other
-    bool checkRange(QString key, float fvalue, bool *ok = nullptr) const;
-    bool checkRange(QString key, int ivalue, bool *ok = nullptr) const;
+    bool checkRange(const QString& key, float fvalue, bool *ok = nullptr) const;
+    bool checkRange(const QString& key, int ivalue, bool *ok = nullptr) const;
     bool checkRange(const QString& key,
         float fvalue, int ivalue, bool isFloat, bool *ok = nullptr) const;
     bool IsMatch(const QSize &size, float framerate, const QString &codecName) const;
@@ -147,9 +147,9 @@ class MTV_PUBLIC VideoDisplayProfile
         uint groupid, uint priority,
         const QString& cmp0, uint width0, uint height0,
         const QString& cmp1, uint width1, uint height1,
-        QString decoder, uint max_cpus, bool skiploop, QString videorenderer,
-        QString osdrenderer, bool osdfade,
-        QString deint0, QString deint1, QString filters);
+        const QString& decoder, uint max_cpus, bool skiploop, const QString& videorenderer,
+        const QString& osdrenderer, bool osdfade,
+        const QString& deint0, const QString& deint1, const QString& filters);
 
     static void CreateProfile(
         uint groupid, uint priority,

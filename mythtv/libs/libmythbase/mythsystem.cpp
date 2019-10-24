@@ -206,22 +206,22 @@ class MythSystemLegacyWrapper : public MythSystem
 MythSystem *MythSystem::Create(
     const QStringList &args,
     uint flags,
-    QString startPath,
+    const QString& startPath,
     Priority cpuPriority,
     Priority diskPriority)
 {
     return MythSystemLegacyWrapper::Create(
-        args, flags, std::move(startPath), cpuPriority, diskPriority);
+        args, flags, startPath, cpuPriority, diskPriority);
 }
 
 MythSystem *MythSystem::Create(
     const QString& args,
     uint flags,
-    QString startPath,
+    const QString& startPath,
     Priority cpuPriority,
     Priority diskPriority)
 {
     return MythSystem::Create(
-        args.split(QRegExp("\\s+")), flags, std::move(startPath),
+        args.split(QRegExp("\\s+")), flags, startPath,
         cpuPriority, diskPriority);
 }

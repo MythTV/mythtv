@@ -279,7 +279,7 @@ void UPnpCDSTv::CreateRoot()
 
 bool UPnpCDSTv::LoadMetadata(const UPnpCDSRequest* pRequest,
                               UPnpCDSExtensionResults* pResults,
-                              IDTokenMap tokens, QString currentToken)
+                              const IDTokenMap& tokens, const QString& currentToken)
 {
     if (currentToken.isEmpty())
     {
@@ -351,7 +351,7 @@ bool UPnpCDSTv::LoadMetadata(const UPnpCDSRequest* pRequest,
 
 bool UPnpCDSTv::LoadChildren(const UPnpCDSRequest* pRequest,
                              UPnpCDSExtensionResults* pResults,
-                             IDTokenMap tokens, QString currentToken)
+                             const IDTokenMap& tokens, const QString& currentToken)
 {
     if (currentToken.isEmpty() || currentToken == m_sExtensionId.toLower())
     {

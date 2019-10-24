@@ -453,10 +453,10 @@ void FileAssocDialog::OnNewExtensionPressed()
             SLOT(OnNewExtensionComplete(QString)));
 }
 
-void FileAssocDialog::OnNewExtensionComplete(QString newExtension)
+void FileAssocDialog::OnNewExtensionComplete(const QString& newExtension)
 {
     UIDToFAPair::UID_type new_sel = 0;
-    if (m_private->AddExtension(std::move(newExtension), new_sel))
+    if (m_private->AddExtension(newExtension, new_sel))
     {
         m_private->SetSelectionOverride(new_sel);
         UpdateScreen(true);

@@ -738,9 +738,9 @@ bool FileServerHandler::HandleDeleteFile(SocketHandler *socket,
     return HandleDeleteFile(socket, slist[1], slist[2]);
 }
 
-bool FileServerHandler::DeleteFile(QString filename, QString storagegroup)
+bool FileServerHandler::DeleteFile(const QString& filename, const QString& storagegroup)
 {
-    return HandleDeleteFile(nullptr, std::move(filename), std::move(storagegroup));
+    return HandleDeleteFile(nullptr, filename, storagegroup);
 }
 
 bool FileServerHandler::HandleDeleteFile(SocketHandler *socket,

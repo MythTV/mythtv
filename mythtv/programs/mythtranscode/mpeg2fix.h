@@ -148,7 +148,7 @@ class MPEG2fixup
     bool InitAV(const QString& inputfile, const char *type, int64_t offset);
     void ScanAudio();
     int ProcessVideo(MPEG2frame *vf, mpeg2dec_t *dec);
-    void WriteFrame(QString filename, MPEG2frame *f);
+    void WriteFrame(const QString& filename, MPEG2frame *f);
     void WriteFrame(const QString& filename, AVPacket *pkt);
     void WriteYUV(const QString& filename, const mpeg2_info_t *info);
     void WriteData(const QString& filename, uint8_t *data, int size);

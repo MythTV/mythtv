@@ -146,7 +146,7 @@ static QString evaluateDateValue(QString sDate)
     return sDate;
 }
 
-QString getCriteriaSQL(const QString& fieldName, QString operatorName,
+QString getCriteriaSQL(const QString& fieldName, const QString &operatorName,
                        QString value1, QString value2)
 {
     QString result;
@@ -164,7 +164,7 @@ QString getCriteriaSQL(const QString& fieldName, QString operatorName,
     result = Field->sqlName;
 
     SmartPLOperator *Operator;
-    Operator = lookupOperator(std::move(operatorName));
+    Operator = lookupOperator(operatorName);
     if (!Operator)
     {
         return QString();
@@ -273,10 +273,10 @@ QString getOrderBySQL(const QString& orderByFields)
     return result;
 }
 
-QString getSQLFieldName(QString fieldName)
+QString getSQLFieldName(const QString &fieldName)
 {
     SmartPLField *Field;
-    Field = lookupField(std::move(fieldName));
+    Field = lookupField(fieldName);
     if (!Field)
     {
         return "";
@@ -1081,10 +1081,10 @@ void SmartPlaylistEditor::getSmartPlaylistCategories(void)
 }
 
 // static function to delete a smartplaylist and any associated smartplaylist items
-bool SmartPlaylistEditor::deleteSmartPlaylist(QString category, const QString& name)
+bool SmartPlaylistEditor::deleteSmartPlaylist(const QString &category, const QString& name)
 {
     // get categoryid
-    int categoryid = SmartPlaylistEditor::lookupCategoryID(std::move(category));
+    int categoryid = SmartPlaylistEditor::lookupCategoryID(category);
 
     MSqlQuery query(MSqlQuery::InitCon());
 

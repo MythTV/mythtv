@@ -70,11 +70,8 @@ void WeatherScreen::setValue(const QString &key, const QString &value)
         m_dataValueMap[key] = prepareDataItem(key, value);
 }
 
-void WeatherScreen::newData(QString loc, units_t units, DataMap data)
+void WeatherScreen::newData(const QString& /*loc*/, units_t /*units*/, DataMap data)
 {
-    (void) loc;
-    (void) units;
-
     DataMap::iterator itr = data.begin();
     while (itr != data.end())
     {

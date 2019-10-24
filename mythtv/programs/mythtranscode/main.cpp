@@ -108,7 +108,7 @@ static int CheckJobQueue()
 }
 
 static int QueueTranscodeJob(ProgramInfo *pginfo, const QString& profile,
-                            QString hostname, bool usecutlist)
+                            const QString& hostname, bool usecutlist)
 {
     RecordingInfo recinfo(*pginfo);
     if (!profile.isEmpty())
@@ -116,7 +116,7 @@ static int QueueTranscodeJob(ProgramInfo *pginfo, const QString& profile,
 
     if (JobQueue::QueueJob(JOB_TRANSCODE, pginfo->GetChanID(),
                            pginfo->GetRecordingStartTime(),
-                           std::move(hostname), "", "",
+                           hostname, "", "",
                            usecutlist ? JOB_USE_CUTLIST : 0))
     {
         LOG(VB_GENERAL, LOG_NOTICE,

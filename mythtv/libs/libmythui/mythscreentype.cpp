@@ -301,7 +301,7 @@ void MythScreenType::Load(void)
     // Virtual
 }
 
-void MythScreenType::LoadInBackground(QString message)
+void MythScreenType::LoadInBackground(const QString& message)
 {
     m_LoadLock.acquire();
 
@@ -310,7 +310,7 @@ void MythScreenType::LoadInBackground(QString message)
 
     m_ScreenStack->AllowReInit();
 
-    OpenBusyPopup(std::move(message));
+    OpenBusyPopup(message);
 
     ScreenLoadTask *loadTask = new ScreenLoadTask(*this);
     MThreadPool::globalInstance()->start(loadTask, "ScreenLoad");

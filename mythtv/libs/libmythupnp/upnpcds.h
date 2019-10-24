@@ -225,13 +225,13 @@ class UPNP_PUBLIC UPnpCDSExtension
         virtual void CreateRoot ( );
 
         virtual bool LoadMetadata ( const UPnpCDSRequest *pRequest,
-                                     UPnpCDSExtensionResults *pResults,
-                                     IDTokenMap tokens,
-                                     QString currentToken );
+                                    UPnpCDSExtensionResults *pResults,
+                                    const IDTokenMap& tokens,
+                                    const QString& currentToken );
         virtual bool LoadChildren ( const UPnpCDSRequest *pRequest,
                                     UPnpCDSExtensionResults *pResults,
-                                    IDTokenMap tokens,
-                                    QString currentToken );
+                                    const IDTokenMap& tokens,
+                                    const QString& currentToken );
 
         IDTokenMap TokenizeIDString ( const QString &Id ) const;
         IDToken    GetCurrentToken  ( const QString &Id ) const;

@@ -52,7 +52,7 @@ class WeatherScreen : public MythScreenType
     void screenReady(WeatherScreen *);
 
   public slots:
-    virtual void newData(QString loc, units_t units, DataMap data);
+    virtual void newData(const QString& /*loc*/, units_t /*units*/, DataMap data);
 
   protected:
     units_t         m_units      {SI_UNITS};

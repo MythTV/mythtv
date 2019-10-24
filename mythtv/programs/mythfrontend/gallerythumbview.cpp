@@ -58,9 +58,9 @@ public:
     typedef QMap<ImagePtrK, QString> TransferMap;
     typedef QSet<ImagePtrK> ImageSet;
 
-    TransferThread(const TransferMap &files, bool move, MythUIProgressDialog *dialog)
+    TransferThread(TransferMap files, bool move, MythUIProgressDialog *dialog)
         : MThread("FileTransfer"),
-          m_move(move), m_files(files), m_dialog(dialog) {}
+          m_move(move), m_files(std::move(files)), m_dialog(dialog) {}
 
     ImageSet GetResult(void) { return m_failed; }
 

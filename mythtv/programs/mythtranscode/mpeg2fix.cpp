@@ -1030,7 +1030,7 @@ int MPEG2fixup::ProcessVideo(MPEG2frame *vf, mpeg2dec_t *dec)
     return 0;
 }
 
-void MPEG2fixup::WriteFrame(QString filename, MPEG2frame *f)
+void MPEG2fixup::WriteFrame(const QString& filename, MPEG2frame *f)
 {
     MPEG2frame *tmpFrame = GetPoolFrame(f);
     if (tmpFrame == nullptr)
@@ -1046,7 +1046,7 @@ void MPEG2fixup::WriteFrame(QString filename, MPEG2frame *f)
             }
         }
     }
-    WriteFrame(std::move(filename), &tmpFrame->m_pkt);
+    WriteFrame(filename, &tmpFrame->m_pkt);
     m_framePool.enqueue(tmpFrame);
 }
    

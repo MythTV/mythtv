@@ -260,7 +260,7 @@ bool UPnpCDSMusic::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
 
 bool UPnpCDSMusic::LoadMetadata(const UPnpCDSRequest* pRequest,
                                  UPnpCDSExtensionResults* pResults,
-                                 IDTokenMap tokens, QString currentToken)
+                                 const IDTokenMap& tokens, const QString& currentToken)
 {
     if (currentToken.isEmpty())
     {
@@ -324,7 +324,7 @@ bool UPnpCDSMusic::LoadMetadata(const UPnpCDSRequest* pRequest,
 
 bool UPnpCDSMusic::LoadChildren(const UPnpCDSRequest* pRequest,
                                  UPnpCDSExtensionResults* pResults,
-                                 IDTokenMap tokens, QString currentToken)
+                                 const IDTokenMap& tokens, const QString& currentToken)
 {
     if (currentToken.isEmpty() || currentToken == m_sExtensionId.toLower())
     {

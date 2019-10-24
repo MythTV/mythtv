@@ -2742,7 +2742,7 @@ class InputGroup : public TransMythUIComboBoxSetting
         }
     }
 
-    virtual void Save(QString /*destination*/) { Save(); }
+    virtual void Save(const QString& /*destination*/) { Save(); }
 
   private:
     const CardInput &m_cardInput;

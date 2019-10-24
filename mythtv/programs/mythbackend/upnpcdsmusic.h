@@ -35,12 +35,12 @@ class UPnpCDSMusic : public UPnpCDSExtension
 
         bool LoadMetadata( const UPnpCDSRequest *pRequest,
                             UPnpCDSExtensionResults *pResults,
-                            IDTokenMap tokens,
-                            QString currentToken ) override; // UPnpCDSExtension
+                            const IDTokenMap& tokens,
+                            const QString& currentToken ) override; // UPnpCDSExtension
         bool LoadChildren( const UPnpCDSRequest *pRequest,
                            UPnpCDSExtensionResults *pResults,
-                           IDTokenMap tokens,
-                           QString currentToken ) override; // UPnpCDSExtension
+                           const IDTokenMap& tokens,
+                           const QString& currentToken ) override; // UPnpCDSExtension
 
     private:
 

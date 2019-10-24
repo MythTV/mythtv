@@ -23,7 +23,7 @@ class MythUIStateType;
 class MUI_PUBLIC MFileInfo : public QFileInfo
 {
   public:
-    MFileInfo(QString fileName = "", QString sgDir = "", bool isDir = false,
+    MFileInfo(const QString& fileName = "", QString sgDir = "", bool isDir = false,
               qint64 size = 0);
    ~MFileInfo() = default;
 

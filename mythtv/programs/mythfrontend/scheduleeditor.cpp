@@ -321,9 +321,9 @@ void ScheduleEditor::Load()
     m_loaded = true;
 }
 
-void ScheduleEditor::LoadTemplate(QString name)
+void ScheduleEditor::LoadTemplate(const QString& name)
 {
-    m_recordingRule->LoadTemplate(std::move(name));
+    m_recordingRule->LoadTemplate(name);
     Load();
     emit templateLoaded();
 }

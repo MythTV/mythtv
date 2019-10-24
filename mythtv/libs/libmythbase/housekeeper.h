@@ -59,8 +59,8 @@ class MBASE_PUBLIC HouseKeeperTask : public ReferenceCounter
     QDateTime       QueryLastSuccess(void);
     QDateTime       UpdateLastRun(bool successful=true)
                    { return UpdateLastRun(MythDate::current(), successful); }
-    virtual QDateTime UpdateLastRun(QDateTime last, bool successful=true);
-    virtual void    SetLastRun(QDateTime last, bool successful=true);
+    virtual QDateTime UpdateLastRun(const QDateTime& last, bool successful=true);
+    virtual void    SetLastRun(const QDateTime& last, bool successful=true);
 
     virtual bool    DoCheckRun(QDateTime /*now*/)   { return false;         }
     virtual bool    DoRun(void)                     { return false;         }
@@ -88,10 +88,10 @@ class MBASE_PUBLIC PeriodicHouseKeeperTask : public HouseKeeperTask
                             float max=1.1, int retry=0, HouseKeeperScope scope=kHKGlobal,
                             HouseKeeperStartup startup=kHKNormal);
     bool DoCheckRun(QDateTime now) override; // HouseKeeperTask
-    virtual bool InWindow(QDateTime now);
-    virtual bool PastWindow(QDateTime now);
-    QDateTime UpdateLastRun(QDateTime last, bool successful=true) override; // HouseKeeperTask
-    void SetLastRun(QDateTime last, bool successful=true) override; // HouseKeeperTask
+    virtual bool InWindow(const QDateTime& now);
+    virtual bool PastWindow(const QDateTime& now);
+    QDateTime UpdateLastRun(const QDateTime& last, bool successful=true) override; // HouseKeeperTask
+    void SetLastRun(const QDateTime& last, bool successful=true) override; // HouseKeeperTask
     virtual void SetWindow(float min, float max);
 
   protected:
@@ -114,7 +114,7 @@ class MBASE_PUBLIC DailyHouseKeeperTask : public PeriodicHouseKeeperTask
                          HouseKeeperScope scope=kHKGlobal,
                          HouseKeeperStartup startup=kHKNormal);
     virtual void SetHourWindow(int min, int max);
-    bool InWindow(QDateTime now) override; // PeriodicHouseKeeperTask
+    bool InWindow(const QDateTime& now) override; // PeriodicHouseKeeperTask
 
   protected:
     void CalculateWindow(void) override; // PeriodicHouseKeeperTask

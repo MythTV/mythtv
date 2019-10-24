@@ -22,9 +22,9 @@
 #include "mythcorecontext.h"
 
 /////////////////////////////////////////////////////////////////////
-MFileInfo::MFileInfo(QString fileName, QString sgDir, bool isDir, qint64 size)
+MFileInfo::MFileInfo(const QString& fileName, QString sgDir, bool isDir, qint64 size)
 {
-    init(std::move(fileName), std::move(sgDir), isDir, size);
+    init(fileName, std::move(sgDir), isDir, size);
 }
 
 void MFileInfo::init(const QString& fileName, QString sgDir, bool isDir,
