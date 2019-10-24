@@ -226,7 +226,8 @@ class MTV_PUBLIC ChannelUtil
                                         uint channelGroupID = 0,
                                         bool liveTVOnly = false,
                                         const QString& callsign = "",
-                                        const QString& channum = "");
+                                        const QString& channum = "",
+                                        bool ignoreUntunable = true);
 
     /**
      * \deprecated Use LoadChannels instead

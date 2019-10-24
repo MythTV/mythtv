@@ -49,7 +49,8 @@ class Channel : public ChannelServices
                                                      bool      OnlyVisible,
                                                      bool      Details,
                                                      bool      OrderByName,
-                                                     bool      GroupByCallsign) override; // ChannelServices
+                                                     bool      GroupByCallsign,
+                                                     bool      OnlyTunable ) override; // ChannelServices
 
         DTC::ChannelInfo*      GetChannelInfo      ( uint     ChanID     ) override; // ChannelServices
 
@@ -178,11 +179,12 @@ class ScriptableChannel : public QObject
                                        bool     OnlyVisible = false,
                                        bool     Details = false,
                                        bool     OrderByName = false,
-                                       bool     GroupByCallsign = false
+                                       bool     GroupByCallsign = false,
+                                       bool     OnlyTunable = false
                                      )
         {
             SCRIPT_CATCH_EXCEPTION( nullptr,
-                return m_obj.GetChannelInfoList( SourceID, ChannelGroupID, StartIndex, Count, OnlyVisible, Details, OrderByName, GroupByCallsign );
+                return m_obj.GetChannelInfoList( SourceID, ChannelGroupID, StartIndex, Count, OnlyVisible, Details, OrderByName, GroupByCallsign, OnlyTunable );
             )
         }
 

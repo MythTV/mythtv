@@ -53,7 +53,8 @@ DTC::ChannelInfoList* Channel::GetChannelInfoList( uint nSourceID,
                                                    bool bOnlyVisible,
                                                    bool bDetails,
                                                    bool bOrderByName,
-                                                   bool bGroupByCallsign )
+                                                   bool bGroupByCallsign,
+                                                   bool bOnlyTunable )
 {
     ChannelInfoList chanList;
 
@@ -62,7 +63,8 @@ DTC::ChannelInfoList* Channel::GetChannelInfoList( uint nSourceID,
     chanList = ChannelUtil::LoadChannels( 0, 0, nTotalAvailable, bOnlyVisible,
                                           bOrderByName ? ChannelUtil::kChanOrderByName : ChannelUtil::kChanOrderByChanNum,
                                           bGroupByCallsign ? ChannelUtil::kChanGroupByCallsign : ChannelUtil::kChanGroupByChanid,
-                                          nSourceID, nChannelGroupID);
+                                          nSourceID, nChannelGroupID, false, "",
+                                          "", bOnlyTunable);
 
     // ----------------------------------------------------------------------
     // Build Response

@@ -76,7 +76,8 @@ class SERVICE_PUBLIC ChannelServices : public Service
                                                              bool           OnlyVisible,
                                                              bool           Details,
                                                              bool           OrderByName,
-                                                             bool           GroupByCallsign ) = 0;
+                                                             bool           GroupByCallsign,
+                                                             bool           OnlyTunable ) = 0;
 
         virtual DTC::ChannelInfo*      GetChannelInfo      ( uint           ChanID     ) = 0;
 

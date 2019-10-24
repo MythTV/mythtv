@@ -2398,7 +2398,8 @@ ChannelInfoList ChannelUtil::LoadChannels(uint startIndex, uint count,
                                           uint channelGroupID,
                                           bool liveTVOnly,
                                           const QString& callsign,
-                                          const QString& channum)
+                                          const QString& channum,
+                                          bool ignoreUntunable)
 {
     ChannelInfoList channelList;
 
@@ -2417,8 +2418,10 @@ ChannelInfoList ChannelUtil::LoadChannels(uint startIndex, uint count,
                   "             ORDER BY livetvorder), " // Creates a CSV list of inputids for this channel
                   "MIN(livetvorder) livetvorder "
                   "FROM channel "
-                  "LEFT JOIN channelgroup ON channel.chanid = channelgroup.chanid "
-                  "INNER JOIN capturecard  ON capturecard.sourceid = channel.sourceid ";
+                  "LEFT JOIN channelgroup ON channel.chanid = channelgroup.chanid ";
+
+    sql += QString("%1 JOIN capturecard ON capturecard.sourceid = channel.sourceid ")
+                   .arg(ignoreUntunable ? "INNER" : "LEFT");
 
     QStringList cond;
     if (ignoreHidden)
