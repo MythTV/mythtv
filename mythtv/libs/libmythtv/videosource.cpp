@@ -1057,7 +1057,10 @@ class DVBCardName : public GroupSetting
     DVBCardName()
     {
         setLabel(QObject::tr("Frontend ID"));
-        setEnabled(false);
+        setHelpText(
+            QObject::tr("Identification string reported by the card. "
+                        "If the message \"Could not get card info...\" appears "
+                        "the card can be in use by another program."));
     };
 };
 
