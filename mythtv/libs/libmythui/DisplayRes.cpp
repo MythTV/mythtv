@@ -229,9 +229,6 @@ bool DisplayRes::SwitchToGUI(tmode next_mode)
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("SwitchToGUI: Switched to %1x%2 %3 Hz")
         .arg(GetWidth()).arg(GetHeight()).arg(GetRefreshRate(), 0, 'f', 3));
 
-    if (chg && (m_curMode != DESKTOP))
-        PauseForModeSwitch();
-
     return chg;
 }
 
@@ -281,9 +278,6 @@ DisplayResVector GetVideoModes(void)
 
 void DisplayRes::PauseForModeSwitch(void)
 {
-    // this is currently disabled as it causes lockups and seg faults when
-    // exiting playback
-    /*
     int pauselengthinms = gCoreContext->GetNumSetting("VideoModeChangePauseMS", 0);
     if (pauselengthinms)
     {
@@ -297,5 +291,4 @@ void DisplayRes::PauseForModeSwitch(void)
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
         }
     }
-    */
 }
