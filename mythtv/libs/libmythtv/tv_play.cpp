@@ -1200,7 +1200,6 @@ bool TV::Init(bool createWindow)
         m_playerBounds = m_savedGuiBounds;
         if (fullscreen)
         {
-            int xbase, width, ybase, height;
             GetMythUI()->GetScreenBounds(xbase, ybase, width, height);
             m_playerBounds = QRect(xbase, ybase, width, height);
         }
