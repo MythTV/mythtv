@@ -707,7 +707,8 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
     // Discard all the queued up decoded frames
     if (discardFrames)
     {
-        bool releaseall = m_mythcodecctx ? m_mythcodecctx->DecoderWillResetOnFlush() : false;
+        bool releaseall = m_mythcodecctx ? (m_mythcodecctx->DecoderWillResetOnFlush() ||
+                                            m_mythcodecctx->DecoderNeedsReset(nullptr)) : false;
         m_parent->DiscardVideoFrames(doflush, doflush && releaseall);
     }
 
@@ -1926,6 +1927,17 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         {
             case AVMEDIA_TYPE_VIDEO:
             {
+                // reset any potentially errored hardware decoders
+                if (m_resetHardwareDecoders)
+                {
+                    if (gCodecMap->hasCodecContext(m_ic->streams[strm]))
+                    {
+                        AVCodecContext* ctx = gCodecMap->getCodecContext(m_ic->streams[strm]);
+                        if (ctx && (ctx->hw_frames_ctx || ctx->hw_device_ctx))
+                            gCodecMap->freeCodecContext(m_ic->streams[strm]);
+                    }
+                }
+
                 if (!par->codec_id)
                 {
                     LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -2176,6 +2188,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     }
 
     // Now find best video track to play
+    m_resetHardwareDecoders = false;
     if (!novideo && m_ic)
     {
         for(;;)
@@ -3356,11 +3369,15 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt, boo
                 .arg(av_make_error_string(error, sizeof(error), ret))
                 .arg(ret).arg(gotpicture));
         }
+
         if (ret2 < 0)
+        {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("video avcodec_send_packet error: %1 (%2) gotpicture:%3")
                 .arg(av_make_error_string(error, sizeof(error), ret2))
                 .arg(ret2).arg(gotpicture));
+        }
+
         if (++m_averror_count > SEQ_PKT_ERR_MAX)
         {
             // If erroring on GPU assist, try switching to software decode
@@ -3369,6 +3386,13 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt, boo
             else
                 m_streams_changed = true;
         }
+
+        if (m_mythcodecctx->DecoderNeedsReset(context))
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC + "Decoder needs reset");
+            m_resetHardwareDecoders = m_streams_changed = true;
+        }
+
         if (ret == AVERROR_EXTERNAL || ret2 == AVERROR_EXTERNAL)
         {
             LOG(VB_PLAYBACK, LOG_INFO, LOC + "FFmpeg external library error - assuming streams changed");

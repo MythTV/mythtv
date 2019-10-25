@@ -380,7 +380,10 @@ class AvFormatDecoder : public DecoderBase
     float              m_fps                          {0.0F};
     bool               m_codec_is_mpeg                {false};
     bool               m_processFrames                {true};
-    bool               m_streams_changed              {false};
+
+    bool               m_streams_changed              { false };
+    bool               m_resetHardwareDecoders        { false };
+
     // Value in milliseconds, from setting AudioReadAhead
     int                m_audioReadAhead               {100};
 };

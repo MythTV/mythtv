@@ -58,7 +58,7 @@ void MythVDPAUInterop::Cleanup(void)
     if (m_finiNV)
         m_finiNV();
 
-    if (m_helper)
+    if (m_helper && !m_preempted)
     {
         m_helper->DeleteOutputSurface(m_outputSurface);
         m_helper->DeleteMixer(m_mixer);
@@ -130,6 +130,7 @@ bool MythVDPAUInterop::InitNV(AVVDPAUDeviceContext* DeviceContext)
         m_helper = new MythVDPAUHelper(DeviceContext);
         if (m_helper->IsValid())
         {
+            connect(m_helper, &MythVDPAUHelper::DisplayPreempted, this, &MythVDPAUInterop::DisplayPreempted, Qt::DirectConnection);
             LOG(VB_PLAYBACK, LOG_INFO, LOC + "Ready");
             return true;
         }
@@ -227,6 +228,15 @@ vector<MythVideoTexture*> MythVDPAUInterop::Acquire(MythRenderOpenGL *Context,
     vector<MythVideoTexture*> result;
     if (!Frame)
         return result;
+
+    if (m_preempted)
+    {
+        // Don't spam the logs with this warning
+        if (!m_preemptedWarning)
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Display preempted. Decoder needs to be reset");
+        m_preemptedWarning = true;
+        return result;
+    }
 
     if (Context && (Context != m_context))
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Mismatched OpenGL contexts");
@@ -356,4 +366,19 @@ void MythVDPAUInterop::UpdateColourSpace(bool)
 
     OpenGLLocker locker(m_context);
     m_helper->SetCSCMatrix(m_mixer, m_colourSpace);
+}
+
+void MythVDPAUInterop::DisplayPreempted(void)
+{
+    // N.B. Pre-emption is irrecoverable here. We ensure the error state is recorded
+    // and when AvFormatDecoder/MythCodecContext hit a problem, IsPreempted is checked.
+    // The decoder context is then released, along with the associated interop
+    // class (i.e. this) and a new interop is created.
+    LOG(VB_GENERAL, LOG_INFO, LOC + "VDPAU display preempted");
+    m_preempted = true;
+}
+
+bool MythVDPAUInterop::IsPreempted(void)
+{
+    return m_preempted;
 }

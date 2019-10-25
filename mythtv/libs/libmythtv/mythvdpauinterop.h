@@ -36,6 +36,8 @@ class MythVDPAUInterop : public MythOpenGLInterop
 
   public slots:
     void  UpdateColourSpace(bool PrimariesChanged);
+    void  DisplayPreempted(void);
+    bool  IsPreempted(void);
 
   protected:
     MythVDPAUInterop(MythRenderOpenGL *Context, MythCodecID CodecID);
@@ -63,6 +65,8 @@ class MythVDPAUInterop : public MythOpenGLInterop
     MYTH_VDPAUSURFACCESSNV m_accessNV       { nullptr };
     MYTH_VDPAUMAPSURFNV m_mapNV             { nullptr };
     MythCodecID         m_codec             { kCodec_NONE };
+    bool                m_preempted         { false   };
+    bool                m_preemptedWarning  { false   };
 };
 
 #endif // MYTHVDPAUINTEROP_H

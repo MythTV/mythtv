@@ -56,9 +56,11 @@ bool MythVDPAUHelper::HaveMPEG4Decode(void)
     return gVDPAUMPEG4Available;
 }
 
-static void vdpau_preemption_callback(VdpDevice, void*)
+static void vdpau_preemption_callback(VdpDevice, void* Opaque)
 {
-    LOG(VB_GENERAL, LOG_WARNING, LOC + "Display pre-empted.");
+    MythVDPAUHelper* helper = static_cast<MythVDPAUHelper*>(Opaque);
+    if (helper)
+        helper->SetPreempted();
 }
 
 /*! \class MythVDPAUHelper
@@ -146,6 +148,11 @@ bool MythVDPAUHelper::InitProcs(void)
 bool MythVDPAUHelper::IsValid(void)
 {
     return m_valid;
+}
+
+void MythVDPAUHelper::SetPreempted(void)
+{
+    emit DisplayPreempted();
 }
 
 bool MythVDPAUHelper::CheckMPEG4(void)

@@ -20,8 +20,10 @@ extern "C" {
 class MythXDisplay;
 class VideoColourSpace;
 
-class MythVDPAUHelper
+class MythVDPAUHelper : public QObject
 {
+    Q_OBJECT
+
   public:
     enum VDPMixerFeature
     {
@@ -41,6 +43,7 @@ class MythVDPAUHelper
     ~MythVDPAUHelper(void);
 
     bool             IsValid(void);
+    void             SetPreempted(void);
     bool             IsFeatureAvailable(uint Feature);
     VdpOutputSurface CreateOutputSurface(QSize Size);
     VdpVideoMixer    CreateMixer(QSize Size, VdpChromaType ChromaType = VDP_CHROMA_TYPE_420,
@@ -51,6 +54,9 @@ class MythVDPAUHelper
     void             DeleteOutputSurface(VdpOutputSurface Surface);
     void             DeleteMixer(VdpVideoMixer Mixer);
     QSize            GetSurfaceParameters(VdpVideoSurface Surface, VdpChromaType &Chroma);
+
+  signals:
+    void   DisplayPreempted(void);
 
   protected:
     MythVDPAUHelper(void);

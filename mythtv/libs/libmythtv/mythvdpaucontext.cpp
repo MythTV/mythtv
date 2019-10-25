@@ -207,6 +207,37 @@ bool MythVDPAUContext::DecoderWillResetOnAspect(void)
     return (m_codecID == kCodec_MPEG2_VDPAU) || (m_codecID == kCodec_MPEG2_VDPAU_DEC);
 }
 
+/*! \brief Report whether the decoder is known to be errored.
+ *
+ * This is used to determine whether the VDPAU display has been preempted. FFmpeg
+ * does not deal with preemption so we need to detect it ourselves in the interop
+ * class. We do not necessarily have a frame at this point, so need to access the interop
+ * through AVHWFramesContext.
+ *
+ * \note May be called without a current AVCodecContext to confirm any previous reset request.
+*/
+bool MythVDPAUContext::DecoderNeedsReset(AVCodecContext* Context)
+{
+    if (m_resetRequired)
+        return true;
+
+    if (!codec_is_vdpau_hw(m_codecID))
+        return false;
+    if (!Context)
+        return false;
+    if (!Context->hw_frames_ctx)
+        return false;
+
+    AVHWFramesContext* hwframesctx = reinterpret_cast<AVHWFramesContext*>(Context->hw_frames_ctx->data);
+    MythVDPAUInterop* interop = reinterpret_cast<MythVDPAUInterop*>(hwframesctx->user_opaque);
+    if (interop && interop->IsPreempted())
+    {
+        m_resetRequired = true;
+        return true;
+    }
+    return false;
+}
+
 void MythVDPAUContext::InitVideoCodec(AVCodecContext *Context, bool SelectedStream, bool &DirectRendering)
 {
     if (codec_is_vdpau_hw(m_codecID))

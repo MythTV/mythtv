@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+﻿//////////////////////////////////////////////////////////////////////////////
 // Copyright (c) 2017 MythTV Developers <mythtv-dev@mythtv.org>
 //
 // This is part of MythTV (https://www.mythtv.org)
@@ -81,6 +81,7 @@ class MTV_PUBLIC MythCodecContext
     virtual void   SetDecoderOptions       (AVCodecContext*, AVCodec*) { return; }
     virtual bool   DecoderWillResetOnFlush (void) { return false; }
     virtual bool   DecoderWillResetOnAspect(void) { return false; }
+    virtual bool   DecoderNeedsReset       (AVCodecContext*) { return m_resetRequired; }
 
   protected:
     virtual bool   RetrieveHWFrame         (VideoFrame* Frame, AVFrame* AvFrame);
@@ -88,8 +89,9 @@ class MTV_PUBLIC MythCodecContext
     static void    NewHardwareFramesContext(void);
     static QAtomicInt s_hwFramesContextCount;
 
-    DecoderBase* m_parent;
-    MythCodecID  m_codecID;
+    DecoderBase* m_parent        { nullptr     };
+    MythCodecID  m_codecID       { kCodec_NONE };
+    bool         m_resetRequired { false       };
 };
 
 #endif // MYTHCODECCONTEXT_H
