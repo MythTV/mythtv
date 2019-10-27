@@ -16,12 +16,10 @@
 #define LOC_WARN QString("NewsSite, Warning: ")
 #define LOC_ERR  QString("NewsSite, Error: ")
 
-NewsSite::NewsSite(const QString   &name,
-                   const QString   &url,
-                   const QDateTime &updated,
-                   const bool       podcast) :
-    m_name(name),  m_url(url), m_urlReq(url),
-    m_updated(updated),
+NewsSite::NewsSite(QString name, const QString &url,
+                   QDateTime updated, const bool podcast) :
+    m_name(std::move(name)), m_url(url), m_urlReq(url),
+    m_updated(std::move(updated)),
     m_destDir(GetConfDir()+"/MythNews"),
     m_podcast(podcast)
 {

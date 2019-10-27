@@ -1,5 +1,5 @@
-#include <QStringList>
 #include <QMetaType>
+#include <QStringList>
 #include <QTimer>
 
 #include <mythcontext.h>
@@ -26,9 +26,9 @@ static const QString _Location = "MythGame";
 class GameTreeInfo
 {
   public:
-    GameTreeInfo(const QString& levels, const QString& filter)
+    GameTreeInfo(const QString& levels, QString  filter)
       : m_levels(levels.split(" "))
-      , m_filter(filter)
+      , m_filter(std::move(filter))
     {
     }
 
