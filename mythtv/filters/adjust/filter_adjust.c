@@ -197,7 +197,7 @@ static void fillTable(uint8_t *table, int in_min, int in_max, int out_min,
         float f = ((float)i - in_min) / (in_max - in_min);
         f = f < 0.0F ? 0.0F : f;
         f = f > 1.0F ? 1.0F : f;
-        table[i] = lround(powf (f, gamma) * (out_max - out_min) + out_min);
+        table[i] = lroundf(powf (f, gamma) * (out_max - out_min) + out_min);
     }
 }
 
