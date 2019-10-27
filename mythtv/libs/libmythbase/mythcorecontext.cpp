@@ -1456,12 +1456,12 @@ bool MythCoreContext::SendReceiveStringList(
 class SendAsyncMessage : public QRunnable
 {
   public:
-    SendAsyncMessage(const QString &msg, const QStringList &extra) :
-        m_message(msg), m_extraData(extra)
+    SendAsyncMessage(QString msg, QStringList extra) :
+        m_message(std::move(msg)), m_extraData(std::move(extra))
     {
     }
 
-    explicit SendAsyncMessage(const QString &msg) : m_message(msg) { }
+    explicit SendAsyncMessage(QString msg) : m_message(std::move(msg)) { }
 
     void run(void) override // QRunnable
     {

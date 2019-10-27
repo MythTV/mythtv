@@ -30,8 +30,8 @@ class MUI_PUBLIC MythUIButtonListItem
         FullChecked
     };
 
-    MythUIButtonListItem(MythUIButtonList *lbtype, const QString& text,
-                         const QString& image = "", bool checkable = false,
+    MythUIButtonListItem(MythUIButtonList *lbtype, QString text,
+                         QString image = "", bool checkable = false,
                          CheckState state = CantCheck, bool showArrow = false,
                          int listPosition = -1);
     MythUIButtonListItem(MythUIButtonList *lbtype, const QString& text,

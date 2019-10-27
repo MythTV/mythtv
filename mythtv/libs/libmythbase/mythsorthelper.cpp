@@ -2,6 +2,7 @@
 // vim: set expandtab tabstop=4 shiftwidth=4
 
 #include "mythsorthelper.h"
+
 #include "mythcorecontext.h"
 
 /**
@@ -79,10 +80,10 @@ MythSortHelper::MythSortHelper()
 MythSortHelper::MythSortHelper(
     Qt::CaseSensitivity case_sensitive,
     SortPrefixMode prefix_mode,
-    const QString &exclusions) :
+    QString exclusions) :
     m_case_sensitive(case_sensitive),
     m_prefix_mode(prefix_mode),
-    m_exclusions(exclusions)
+    m_exclusions(std::move(exclusions))
 {
     MythSortHelperCommon();
 }

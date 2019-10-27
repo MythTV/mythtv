@@ -12,9 +12,9 @@
 
 #include <cmath>
 
+#include <QStringList>
 #include <QTextCodec>
 #include <QTextStream>
-#include <QStringList>
 
 #include "upnp.h"
 #include "eventing.h"
@@ -59,10 +59,10 @@ uint StateVariables::BuildNotifyBody(
 /////////////////////////////////////////////////////////////////////////////
 
 Eventing::Eventing(const QString &sExtensionName,
-                   const QString &sEventMethodName,
+                   QString sEventMethodName,
                    const QString &sSharePath) :
     HttpServerExtension(sExtensionName, sSharePath),
-    m_sEventMethodName(sEventMethodName),
+    m_sEventMethodName(std::move(sEventMethodName)),
     m_nSubscriptionDuration(
         UPnp::GetConfiguration()->GetValue("UPnP/SubscriptionDuration", 1800))
 {

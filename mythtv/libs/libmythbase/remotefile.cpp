@@ -1,9 +1,9 @@
 #include <iostream>
 using namespace std;
 
-#include <QUrl>
 #include <QFile>
 #include <QFileInfo>
+#include <QUrl>
 
 // POSIX C headers
 #include <unistd.h>
@@ -69,10 +69,10 @@ static bool RemoteSendReceiveStringList(const QString &host, QStringList &strlis
     return ok;
 }
 
-RemoteFile::RemoteFile(const QString &url, bool write, bool usereadahead,
+RemoteFile::RemoteFile(QString url, bool write, bool usereadahead,
                        int timeout_ms,
                        const QStringList *possibleAuxiliaryFiles) :
-    m_path(url),
+    m_path(std::move(url)),
     m_usereadahead(usereadahead),  m_timeout_ms(timeout_ms),
     m_writemode(write)
 {

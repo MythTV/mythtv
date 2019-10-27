@@ -141,10 +141,10 @@ void StorageGroupEditor::DoDeleteSlot(bool doDelete)
 
 StorageGroupDirStorage::StorageGroupDirStorage(StorageUser *_user,
                                                int id,
-                                               const QString &group) :
+                                               QString group) :
     SimpleDBStorage(_user, "storagegroup", "dirname"),
     m_id(id),
-    m_group(group)
+    m_group(std::move(group))
 {
 }
 

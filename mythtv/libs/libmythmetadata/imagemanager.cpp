@@ -33,9 +33,9 @@
 class Device
 {
 public:
-    Device(const QString &name, const QString &mount,
+    Device(QString name, QString mount,
            MythMediaDevice *media = nullptr, QTemporaryDir *import = nullptr)
-        : m_present(true), m_name(name), m_mount(mount),
+        : m_present(true), m_name(std::move(name)), m_mount(std::move(mount)),
           m_media(media), m_dir(import)
     {
         // Path relative to TEMP storage group
@@ -1124,8 +1124,8 @@ bool ImageDbLocal::CreateTable()
 class ReadMetaThread : public QRunnable
 {
 public:
-    ReadMetaThread(ImagePtrK im, const QString &path)
-        : m_im(std::move(im)), m_path(path) {}
+    ReadMetaThread(ImagePtrK im, QString path)
+        : m_im(std::move(im)), m_path(std::move(path)) {}
 
     void run() override // QRunnable
     {

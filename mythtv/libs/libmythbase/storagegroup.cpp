@@ -45,9 +45,10 @@ const QStringList StorageGroup::kSpecialGroups = QStringList()
  *  \param allowFallback allow the storage group search code to fall back if
  *                  no dirs exist for the specified group/host
  */
-StorageGroup::StorageGroup(const QString &group, const QString &hostname,
+StorageGroup::StorageGroup(QString group, QString hostname,
                            bool allowFallback) :
-    m_groupname(group), m_hostname(hostname), m_allowFallback(allowFallback)
+    m_groupname(std::move(group)), m_hostname(std::move(hostname)),
+    m_allowFallback(allowFallback)
 {
     m_dirlist.clear();
 

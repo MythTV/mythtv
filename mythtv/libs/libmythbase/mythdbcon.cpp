@@ -73,8 +73,8 @@ bool TestDatabase(const QString& dbHostName,
     return ret;
 }
 
-MSqlDatabase::MSqlDatabase(const QString &name)
-    : m_name(name)
+MSqlDatabase::MSqlDatabase(QString name)
+    : m_name(std::move(name))
 {
     if (!QSqlDatabase::isDriverAvailable("QMYSQL"))
     {
@@ -913,8 +913,8 @@ void MSqlAddMoreBindings(MSqlBindings &output, MSqlBindings &addfrom)
 }
 
 struct Holder {
-    Holder( const QString& hldr = QString(), int pos = -1 )
-        : holderName( hldr ), holderPos( pos ) {}
+    Holder( QString hldr = QString(), int pos = -1 )
+        : holderName(std::move( hldr )), holderPos( pos ) {}
 
     bool operator==( const Holder& h ) const
         { return h.holderPos == holderPos && h.holderName == holderName; }

@@ -33,10 +33,9 @@ class SingleValueImp
     typedef std::map<int, QString> entry_map;
 
   public:
-    SingleValueImp(const QString &table_name, const QString &id_name,
-                   const QString &value_name) : m_table_name(table_name),
-        m_id_name(id_name), m_value_name(value_name),
-        m_clean_stub(this)
+    SingleValueImp(QString table_name, QString id_name, QString value_name)
+        : m_table_name(std::move(table_name)), m_id_name(std::move(id_name)),
+          m_value_name(std::move(value_name)), m_clean_stub(this)
     {
         m_insert_sql = QString("INSERT INTO %1 (%2) VALUES (:NAME)")
                 .arg(m_table_name).arg(m_value_name);
@@ -260,9 +259,9 @@ class MultiValueImp
     typedef std::map<int, entry> id_map;
 
   public:
-    MultiValueImp(const QString &table_name, const QString &id_name,
-                  const QString &value_name) : m_table_name(table_name),
-        m_id_name(id_name), m_value_name(value_name),
+    MultiValueImp(QString table_name, QString id_name,
+                  QString value_name) : m_table_name(std::move(table_name)),
+        m_id_name(std::move(id_name)), m_value_name(std::move(value_name)),
         m_clean_stub(this)
     {
         m_insert_sql = QString("INSERT INTO %1 (%2, %3) VALUES (:ID, :VALUE)")

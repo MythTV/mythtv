@@ -33,7 +33,7 @@ class MBASE_PUBLIC MythSortHelper
     MythSortHelper();
     explicit MythSortHelper(MythSortHelper *other);
     MythSortHelper(Qt::CaseSensitivity case_sensitive, SortPrefixMode prefix_mode,
-                   const QString &exclusions);
+                   QString exclusions);
 
     QString doTitle(const QString& title) const;
     QString doPathname(const QString& pathname) const;

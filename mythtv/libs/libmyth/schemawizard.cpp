@@ -23,12 +23,12 @@ using std::endl;
 static SchemaUpgradeWizard * c_wizard = nullptr;
 
 
-SchemaUpgradeWizard::SchemaUpgradeWizard(const QString &DBSchemaSetting,
-                                         const QString &appName,
-                                         const QString &upgradeSchemaVal)
-    : m_schemaSetting(DBSchemaSetting),
-      m_schemaName(appName),
-      m_newSchemaVer(upgradeSchemaVal)
+SchemaUpgradeWizard::SchemaUpgradeWizard(QString DBSchemaSetting,
+                                         QString appName,
+                                         QString upgradeSchemaVal)
+    : m_schemaSetting(std::move(DBSchemaSetting)),
+      m_schemaName(std::move(appName)),
+      m_newSchemaVer(std::move(upgradeSchemaVal))
 {
     c_wizard = this;
 

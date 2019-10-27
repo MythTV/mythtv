@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <chrono> // for milliseconds
 #include <thread> // for sleep_for
+
 #include <vector>
 using namespace std;
 
@@ -72,15 +73,15 @@ QMutex LIRC::lirclib_lock;
  */
 
 LIRC::LIRC(QObject *main_window,
-           const QString &lircd_device,
-           const QString &our_program,
-           const QString &config_file)
+           QString lircd_device,
+           QString our_program,
+           QString config_file)
     : MThread("LIRC"),
       lock(QMutex::Recursive),
       m_mainWindow(main_window),
-      lircdDevice(lircd_device),
-      program(our_program),
-      configFile(config_file),
+      lircdDevice(std::move(lircd_device)),
+      program(std::move(our_program)),
+      configFile(std::move(config_file)),
       doRun(false),
       buf_offset(0),
       eofCount(0),

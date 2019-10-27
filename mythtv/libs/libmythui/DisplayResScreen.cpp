@@ -18,17 +18,18 @@ DisplayResScreen::DisplayResScreen(int w, int h, int mw, int mh,
 }
 
 DisplayResScreen::DisplayResScreen(int w, int h, int mw, int mh,
-                                   const std::vector<double>& refreshRate)
-    : m_width(w), m_height(h), m_width_mm(mw), m_height_mm(mh), m_refreshRates(refreshRate)
+                                   std::vector<double> refreshRate)
+    : m_width(w), m_height(h), m_width_mm(mw), m_height_mm(mh),
+      m_refreshRates(std::move(refreshRate))
 {
     SetAspectRatio(-1.0);
 }
 
 DisplayResScreen::DisplayResScreen(int w, int h, int mw, int mh,
-                                   const std::vector<double>& refreshRate,
-                                   const std::map<double, short>& realrates)
-: realRates(realrates), m_width(w), m_height(h), m_width_mm(mw), m_height_mm(mh),
-  m_refreshRates(refreshRate), m_custom(true)
+                                   std::vector<double> refreshRate,
+                                   std::map<double, short> realrates)
+: realRates(std::move(realrates)), m_width(w), m_height(h), m_width_mm(mw),
+  m_height_mm(mh), m_refreshRates(std::move(refreshRate)), m_custom(true)
 {
     SetAspectRatio(-1.0);
 }

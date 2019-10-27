@@ -36,15 +36,15 @@ class MPUBLIC RSSSite : public QObject
         }
     };
 
-    RSSSite(const QString& title,
-                  const QString& sortTitle,
-                  const QString& image,
-                  const ArticleType& type,
-                  const QString& description,
-                  const QString& url,
-                  const QString& author,
-                  const bool& download,
-                  const QDateTime& updated);
+    RSSSite(QString title,
+            QString sortTitle,
+            QString image,
+            const ArticleType& type,
+            QString description,
+            QString url,
+            QString author,
+            const bool& download,
+            QDateTime updated);
 
     ~RSSSite() = default;
 

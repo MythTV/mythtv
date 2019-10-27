@@ -28,14 +28,15 @@ QEvent::Type DialogCompletionEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
 
-MythMenu::MythMenu(const QString &text, QObject *retobject, const QString &resultid) :
-    m_text(text), m_resultid(resultid), m_retObject(retobject)
+MythMenu::MythMenu(QString text, QObject *retobject, QString resultid) :
+    m_text(std::move(text)), m_resultid(std::move(resultid)), m_retObject(retobject)
 {
     Init();
 }
 
-MythMenu::MythMenu(const QString &title, const QString &text, QObject *retobject, const QString &resultid) :
-    m_title(title), m_text(text), m_resultid(resultid), m_retObject(retobject)
+MythMenu::MythMenu(QString title, QString text, QObject *retobject, QString resultid) :
+    m_title(std::move(title)), m_text(std::move(text)), m_resultid(std::move(resultid)),
+    m_retObject(retobject)
 {
     Init();
 }
@@ -668,10 +669,10 @@ void MythTextInputDialog::sendResult()
 /////////////////////////////////////////////////////////////////
 
 MythSpinBoxDialog::MythSpinBoxDialog(MythScreenStack *parent,
-                                     const QString &message)
+                                     QString message)
     : MythScreenType(parent, "mythspinboxpopup"),
       m_spinBox(nullptr),
-      m_message(message),
+      m_message(std::move(message)),
       m_retObject(nullptr),
       m_id("")
 {
@@ -904,12 +905,12 @@ void MythUISearchDialog::slotUpdateList(void)
 ////////////////////////////////////////////////////////////////////////
 
 MythTimeInputDialog::MythTimeInputDialog(MythScreenStack *parent,
-                                         const QString &message,
+                                         QString message,
                                          int resolutionFlags,
                                          QDateTime startTime,
                                          int rangeLimit)
     : MythScreenType(parent, "timepopup"),
-        m_message(message), m_startTime(std::move(startTime)),
+        m_message(std::move(message)), m_startTime(std::move(startTime)),
         m_resolution(resolutionFlags), m_rangeLimit(rangeLimit),
         m_dateList(nullptr), m_timeList(nullptr), m_retObject(nullptr)
 {

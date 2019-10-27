@@ -44,7 +44,7 @@ class StorageGroupDirStorage : public SimpleDBStorage
 {
   public:
     StorageGroupDirStorage(StorageUser *_user, int id,
-                           const QString &group);
+                           QString group);
 
   protected:
     QString GetSetClause(MSqlBindings &bindings) const override; // SimpleDBStorage

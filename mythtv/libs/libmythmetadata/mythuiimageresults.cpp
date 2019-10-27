@@ -1,8 +1,8 @@
 
 #include "mythuiimageresults.h"
 
-#include <QFile>
 #include <QDir>
+#include <QFile>
 
 #include "mythdirs.h"
 #include "mythdate.h"
@@ -13,11 +13,11 @@
 
 ImageSearchResultsDialog::ImageSearchResultsDialog(
     MythScreenStack *lparent,
-    const ArtworkList& list,
+    ArtworkList list,
     const VideoArtworkType type) :
 
     MythScreenType(lparent, "videosearchresultspopup"),
-    m_list(list),
+    m_list(std::move(list)),
     m_type(type)
 {
     m_imageDownload = new MetadataImageDownload(this);

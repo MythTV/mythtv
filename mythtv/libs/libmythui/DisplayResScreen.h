@@ -28,10 +28,10 @@ class MUI_PUBLIC DisplayResScreen
     DisplayResScreen(int w, int h, int mw, int mh,
                      double aspectRatio/* = -1.0*/, double refreshRate/* = 0*/);
     DisplayResScreen(int w, int h, int mw, int mh,
-                     const std::vector<double>& refreshRates);
+                     std::vector<double> refreshRates);
     DisplayResScreen(int w, int h, int mw, int mh,
-                     const std::vector<double>& refreshRates,
-                     const std::map<double, short>& realrates);
+                     std::vector<double> refreshRates,
+                     std::map<double, short> realrates);
     DisplayResScreen(int w, int h, int mw, int mh,
                      const double* refreshRates, uint rr_length);
     DisplayResScreen(int w, int h, int mw, int mh,

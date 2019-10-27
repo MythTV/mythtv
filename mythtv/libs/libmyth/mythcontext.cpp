@@ -14,8 +14,8 @@
 #include <cmath>
 #include <iostream>
 
-#include <queue>
 #include <algorithm>
+#include <queue>
 #include <thread>
 
 using namespace std;
@@ -1544,8 +1544,8 @@ void MythContextSlotHandler::VersionMismatchPopupClosed(void)
     qApp->exit(GENERIC_EXIT_SOCKET_ERROR);
 }
 
-MythContext::MythContext(const QString &binversion, bool needsBackend)
-    : m_app_binary_version(binversion)
+MythContext::MythContext(QString binversion, bool needsBackend)
+    : m_app_binary_version(std::move(binversion))
 {
 #ifdef _WIN32
     static bool WSAStarted = false;

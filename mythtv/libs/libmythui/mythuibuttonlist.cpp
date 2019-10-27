@@ -3193,10 +3193,10 @@ bool MythUIButtonList::DoFind(bool doMove, bool searchForward)
 //////////////////////////////////////////////////////////////////////////////
 
 MythUIButtonListItem::MythUIButtonListItem(MythUIButtonList *lbtype,
-                                           const QString &text, const QString &image,
+                                           QString text, QString image,
                                            bool checkable, CheckState state,
                                            bool showArrow, int listPosition)
-    : m_parent(lbtype), m_text(text), m_imageFilename(image),
+    : m_parent(lbtype), m_text(std::move(text)), m_imageFilename(std::move(image)),
       m_checkable(checkable), m_state(state), m_showArrow(showArrow)
 {
     if (!lbtype)

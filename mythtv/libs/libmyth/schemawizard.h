@@ -27,8 +27,8 @@ class MPUBLIC SchemaUpgradeWizard : public QObject, public DBUtil
     Q_OBJECT
 
   public:
-    SchemaUpgradeWizard(const QString &DBSchemaSetting, const QString &appName,
-                        const QString &upgradeSchemaVal);
+    SchemaUpgradeWizard(QString DBSchemaSetting, QString appName,
+                        QString upgradeSchemaVal);
     ~SchemaUpgradeWizard();
 
 

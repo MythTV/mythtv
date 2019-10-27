@@ -7,9 +7,9 @@
 
 // QT headers
 #include <QImageReader>
-#include <QPainter>
 #include <QMatrix>
 #include <QNetworkReply>
+#include <QPainter>
 #include <QRgb>
 
 // Mythdb headers
@@ -460,8 +460,8 @@ void MythImage::ConvertToYUV(void)
     }
 }
 
-MythImageReader::MythImageReader(const QString &fileName)
-  : m_fileName(fileName)
+MythImageReader::MythImageReader(QString fileName)
+  : m_fileName(std::move(fileName))
 {
     if ((m_fileName.startsWith("http://")) ||
         (m_fileName.startsWith("https://")) ||

@@ -32,7 +32,7 @@ class META_PUBLIC MetaGrabberScript
     MetaGrabberScript() = default;
     explicit MetaGrabberScript(const QDomElement &dom);
     explicit MetaGrabberScript(const QString &path);
-    MetaGrabberScript(const QString &path, const QDomElement &dom);
+    MetaGrabberScript(QString path, const QDomElement &dom);
     MetaGrabberScript(const MetaGrabberScript &/*other*/) = default;
 
     MetaGrabberScript& operator=(const MetaGrabberScript &other);

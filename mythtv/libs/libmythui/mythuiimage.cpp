@@ -7,14 +7,14 @@
 #include <ctime>
 
 // QT
-#include <QFile>
+#include <QCoreApplication>
 #include <QDir>
 #include <QDomDocument>
+#include <QEvent>
+#include <QFile>
 #include <QImageReader>
 #include <QReadWriteLock>
 #include <QRunnable>
-#include <QEvent>
-#include <QCoreApplication>
 
 // libmythbase
 #include "mythlogging.h"
@@ -429,19 +429,19 @@ class ImageLoadEvent : public QEvent
 {
   public:
     ImageLoadEvent(const MythUIImage *parent, MythImage *image,
-                   const QString &basefile, const QString &filename,
+                   QString basefile, QString filename,
                    int number, bool aborted)
         : QEvent(kEventType),
-          m_parent(parent), m_image(image), m_basefile(basefile),
-          m_filename(filename), m_number(number),
+          m_parent(parent), m_image(image), m_basefile(std::move(basefile)),
+          m_filename(std::move(filename)), m_number(number),
           m_aborted(aborted) { }
 
     ImageLoadEvent(const MythUIImage *parent, AnimationFrames *frames,
-                   const QString &basefile,
-                   const QString &filename, bool aborted)
+                   QString basefile,
+                   QString filename, bool aborted)
         : QEvent(kEventType),
-          m_parent(parent), m_basefile(basefile),
-          m_filename(filename),
+          m_parent(parent), m_basefile(std::move(basefile)),
+          m_filename(std::move(filename)),
           m_images(frames), m_aborted(aborted) { }
 
     const MythUIImage *GetParent() const    { return m_parent; }
@@ -478,10 +478,10 @@ class ImageLoadThread : public QRunnable
 {
   public:
     ImageLoadThread(const MythUIImage *parent, MythPainter *painter,
-                    const ImageProperties &imProps, const QString &basefile,
+                    const ImageProperties &imProps, QString basefile,
                     int number, ImageCacheMode mode) :
         m_parent(parent), m_painter(painter), m_imageProperties(imProps),
-        m_basefile(basefile), m_number(number), m_cacheMode(mode)
+        m_basefile(std::move(basefile)), m_number(number), m_cacheMode(mode)
     {
     }
 
