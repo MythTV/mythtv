@@ -9,15 +9,15 @@
 
 // Qt headers
 #include <QApplication>
-#include <QEvent>
-#include <QFileInfo>
-#include <QFile>
-#include <QDialog>
 #include <QCursor>
+#include <QDialog>
 #include <QDir>
+#include <QEvent>
+#include <QFile>
+#include <QFileInfo>
+#include <QFontDatabase>
 #include <QImage>
 #include <QTextCodec>
-#include <QFontDatabase>
 
 // MythTV headers
 #include "mythconfig.h"
@@ -1118,9 +1118,9 @@ void PlaybackProfileItemConfig::IncreasePriority(void)
     m_parentConfig->swap(m_index, m_index - 1);
 }
 
-PlaybackProfileConfig::PlaybackProfileConfig(const QString &profilename,
+PlaybackProfileConfig::PlaybackProfileConfig(QString profilename,
                                              StandardSetting *parent) :
-    m_profile_name(profilename)
+    m_profile_name(std::move(profilename))
 {
     setVisible(false);
     m_groupid = VideoDisplayProfile::GetProfileGroupID(

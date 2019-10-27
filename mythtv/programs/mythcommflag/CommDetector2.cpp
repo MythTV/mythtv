@@ -9,9 +9,9 @@
 using namespace std;
 
 // Qt headers
+#include <QCoreApplication>
 #include <QDir>
 #include <QFileInfo>
-#include <QCoreApplication>
 
 // MythTV headers
 #include "compat.h"
@@ -308,16 +308,16 @@ CommDetector2::CommDetector2(
     bool               fullSpeed_in,
     MythPlayer        *player_in,
     int                chanid,
-    const QDateTime   &startts_in,
-    const QDateTime   &endts_in,
-    const QDateTime   &recstartts_in,
-    const QDateTime   &recendts_in,
+    QDateTime          startts_in,
+    QDateTime          endts_in,
+    QDateTime          recstartts_in,
+    QDateTime          recendts_in,
     bool               useDB) :
     m_commDetectMethod((enum SkipTypes)(commDetectMethod_in & ~COMM_DETECT_2)),
     m_showProgress(showProgress_in),  m_fullSpeed(fullSpeed_in),
     m_player(player_in),
-    m_startts(startts_in),            m_endts(endts_in),
-    m_recstartts(recstartts_in),      m_recendts(recendts_in),
+    m_startts(std::move(startts_in)),       m_endts(std::move(endts_in)),
+    m_recstartts(std::move(recstartts_in)), m_recendts(std::move(recendts_in)),
     m_isRecording(MythDate::current() < m_recendts),
     m_debugdir("")
 {

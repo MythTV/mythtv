@@ -31,7 +31,7 @@ class ImportIconsWizard : public MythScreenType
 
   public:
     ImportIconsWizard(MythScreenStack *parent, bool fRefresh,
-                      const QString &channelname = "");
+                      QString channelname = "");
    ~ImportIconsWizard();
 
     bool Create(void) override; // MythScreenType

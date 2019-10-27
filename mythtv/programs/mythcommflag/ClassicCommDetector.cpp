@@ -13,8 +13,8 @@
 using namespace std;
 
 // Qt headers
-#include <QString>
 #include <QCoreApplication>
+#include <QString>
 
 // MythTV headers
 #include "mythmiscutil.h"
@@ -128,18 +128,18 @@ ClassicCommDetector::ClassicCommDetector(SkipType commDetectMethod_in,
                                          bool showProgress_in,
                                          bool fullSpeed_in,
                                          MythPlayer* player_in,
-                                         const QDateTime& startedAt_in,
-                                         const QDateTime& stopsAt_in,
-                                         const QDateTime& recordingStartedAt_in,
-                                         const QDateTime& recordingStopsAt_in) :
+                                         QDateTime startedAt_in,
+                                         QDateTime stopsAt_in,
+                                         QDateTime recordingStartedAt_in,
+                                         QDateTime recordingStopsAt_in) :
 
 
     m_commDetectMethod(commDetectMethod_in),
     m_player(player_in),
-    m_startedAt(startedAt_in),
-    m_stopsAt(stopsAt_in),
-    m_recordingStartedAt(recordingStartedAt_in),
-    m_recordingStopsAt(recordingStopsAt_in),
+    m_startedAt(std::move(startedAt_in)),
+    m_stopsAt(std::move(stopsAt_in)),
+    m_recordingStartedAt(std::move(recordingStartedAt_in)),
+    m_recordingStopsAt(std::move(recordingStopsAt_in)),
     m_stillRecording(m_recordingStopsAt > MythDate::current()),
     m_fullSpeed(fullSpeed_in),
     m_showProgress(showProgress_in)

@@ -9,8 +9,8 @@ using namespace std;
 
 //qt
 #include <QCoreApplication>
-#include <QKeyEvent>
 #include <QDateTime>
+#include <QKeyEvent>
 
 // libmythbase
 #include "mythdate.h"
@@ -67,10 +67,10 @@ const unsigned long kUpdateMS = 60 * 1000UL; // Grid update interval (mS)
 static bool SelectionIsTunable(const ChannelInfoList &selection);
 
 JumpToChannel::JumpToChannel(
-    JumpToChannelListener *parent, const QString &start_entry,
+    JumpToChannelListener *parent, QString start_entry,
     int start_chan_idx, int cur_chan_idx, uint rows_disp) :
     m_listener(parent),
-    m_entry(start_entry),
+    m_entry(std::move(start_entry)),
     m_previous_start_channel_index(start_chan_idx),
     m_previous_current_channel_index(cur_chan_idx),
     m_rows_displayed(rows_disp),
@@ -194,24 +194,25 @@ class GuideStatus
 {
 public:
     GuideStatus(unsigned int firstRow, unsigned int numRows,
-                const QVector<int> &channums,
+                QVector<int> channums,
                 const MythRect &gg_programRect,
                 int gg_channelCount,
-                const QDateTime &currentStartTime,
-                const QDateTime &currentEndTime,
+                QDateTime currentStartTime,
+                QDateTime currentEndTime,
                 uint currentStartChannel,
                 int currentRow, int currentCol,
                 int channelCount, int timeCount,
                 bool verticalLayout,
-                const QDateTime &firstTime, const QDateTime &lastTime)
-        : m_firstRow(firstRow), m_numRows(numRows), m_channums(channums),
+                QDateTime firstTime, QDateTime lastTime)
+        : m_firstRow(firstRow), m_numRows(numRows),
+          m_channums(std::move(channums)),
           m_gg_programRect(gg_programRect), m_gg_channelCount(gg_channelCount),
-          m_currentStartTime(currentStartTime),
-          m_currentEndTime(currentEndTime),
+          m_currentStartTime(std::move(currentStartTime)),
+          m_currentEndTime(std::move(currentEndTime)),
           m_currentStartChannel(currentStartChannel), m_currentRow(currentRow),
           m_currentCol(currentCol), m_channelCount(channelCount),
           m_timeCount(timeCount), m_verticalLayout(verticalLayout),
-          m_firstTime(firstTime), m_lastTime(lastTime) {}
+          m_firstTime(std::move(firstTime)), m_lastTime(std::move(lastTime)) {}
     const unsigned int m_firstRow, m_numRows;
     const QVector<int> m_channums;
     const MythRect m_gg_programRect;
@@ -246,7 +247,7 @@ class GuideUpdateProgramRow : public GuideUpdaterBase
 {
 public:
     GuideUpdateProgramRow(GuideGrid *guide, const GuideStatus &gs,
-                          const QVector<ProgramList*> &proglists)
+                          QVector<ProgramList*> proglists)
         : GuideUpdaterBase(guide),
           m_firstRow(gs.m_firstRow),
           m_numRows(gs.m_numRows),
@@ -263,7 +264,7 @@ public:
           m_verticalLayout(gs.m_verticalLayout),
           m_firstTime(gs.m_firstTime),
           m_lastTime(gs.m_lastTime),
-          m_proglists(proglists) {}
+          m_proglists(std::move(proglists)) {}
     ~GuideUpdateProgramRow() override = default;
     bool ExecuteNonUI(void) override // GuideUpdaterBase
     {
@@ -483,14 +484,14 @@ void GuideGrid::RunProgramGuide(uint chanid, const QString &channum,
 }
 
 GuideGrid::GuideGrid(MythScreenStack *parent,
-                     uint chanid, const QString &channum, const QDateTime &startTime,
+                     uint chanid, QString channum, const QDateTime &startTime,
                      TV *player, bool embedVideo,
                      bool allowFinder, int changrpid)
          : ScheduleCommon(parent, "guidegrid"),
            m_selectRecThreshold(gCoreContext->GetNumSetting("SelChangeRecThreshold", 16)),
            m_allowFinder(allowFinder),
            m_startChanID(chanid),
-           m_startChanNum(channum),
+           m_startChanNum(std::move(channum)),
            m_sortReverse(gCoreContext->GetBoolSetting("EPGSortReverse", false)),
            m_player(player),
            m_embedVideo(embedVideo),

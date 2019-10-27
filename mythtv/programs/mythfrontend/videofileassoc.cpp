@@ -46,8 +46,8 @@ namespace
             m_fa.extension = new_extension;
         }
 
-        explicit FileAssociationWrap(const FileAssociations::file_association &fa) :
-            m_fa(fa) {}
+        explicit FileAssociationWrap(FileAssociations::file_association fa) :
+            m_fa(std::move(fa)) {}
 
         unsigned int GetIDx(void) const { return m_fa.id; }
         QString GetExtension(void) const { return m_fa.extension; }

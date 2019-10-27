@@ -3,10 +3,10 @@
 
 using namespace std;
 
-#include <QString>
-#include <QRegExp>
-#include <QDir>
 #include <QApplication>
+#include <QDir>
+#include <QRegExp>
+#include <QString>
 #include <QTime>
 
 #include "tv_play.h"
@@ -33,9 +33,9 @@ using namespace std;
 class VideoPerformanceTest
 {
   public:
-    VideoPerformanceTest(const QString &filename, bool novsync, bool onlydecode,
+    VideoPerformanceTest(QString filename, bool novsync, bool onlydecode,
                          int runfor, bool deint, bool gpu)
-      : file(filename), novideosync(novsync), decodeonly(onlydecode),
+      : file(std::move(filename)), novideosync(novsync), decodeonly(onlydecode),
         secondstorun(runfor), deinterlace(deint), allowgpu(gpu), ctx(nullptr)
     {
         if (secondstorun < 1)

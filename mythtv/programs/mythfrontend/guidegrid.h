@@ -52,7 +52,7 @@ class JumpToChannel : public QObject
 
   public:
     JumpToChannel(
-        JumpToChannelListener *parent, const QString &start_entry,
+        JumpToChannelListener *parent, QString start_entry,
         int start_chan_idx, int cur_chan_idx, uint rows_disp);
 
     bool ProcessEntry(const QStringList &actions, const QKeyEvent *e);
@@ -158,7 +158,7 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
 
   protected:
     GuideGrid(MythScreenStack *parentStack,
-              uint chanid, const QString &channum,
+              uint chanid, QString channum,
               const QDateTime &startTime,
               TV *player = nullptr,
               bool embedVideo = false,

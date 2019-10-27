@@ -8,10 +8,10 @@
 
 using namespace std;
 
-#include <QDir>
 #include <QCoreApplication>
-#include <QTime>
+#include <QDir>
 #include <QThread>
+#include <QTime>
 
 #include "commandlineparser.h"
 #include "mythfilerecorder.h"
@@ -25,9 +25,10 @@ using namespace std;
 #define VERSION "1.0.0"
 #define LOC QString("File(%1): ").arg(m_fileName)
 
-Streamer::Streamer(Commands *parent, const QString &fname,
+Streamer::Streamer(Commands *parent, QString fname,
                    int data_rate, bool loopinput) :
-    m_parent(parent), m_fileName(fname), m_file(nullptr), m_loop(loopinput),
+    m_parent(parent), m_fileName(std::move(fname)), m_file(nullptr),
+    m_loop(loopinput),
     m_bufferMax(188 * 100000), m_blockSize(m_bufferMax / 4),
     m_data_rate(data_rate), m_data_read(0)
 {

@@ -35,16 +35,16 @@ using namespace std;
 #define LOC_ERR  QString("ProgLister, Error: ")
 
 ProgLister::ProgLister(MythScreenStack *parent, ProgListType pltype,
-                       const QString &view, const QString &extraArg,
-                       const QDateTime &selectedTime) :
+                       QString view, QString extraArg,
+                       QDateTime selectedTime) :
     ScheduleCommon(parent, "ProgLister"),
     m_type(pltype),
-    m_extraArg(extraArg),
+    m_extraArg(std::move(extraArg)),
     m_startTime(MythDate::current()),
     m_searchTime(m_startTime),
-    m_selectedTime(selectedTime),
+    m_selectedTime(std::move(selectedTime)),
     m_channelOrdering(gCoreContext->GetSetting("ChannelOrdering", "channum")),
-    m_view(view)
+    m_view(std::move(view))
 {
     if (pltype == plMovies)
     {
@@ -75,11 +75,11 @@ ProgLister::ProgLister(MythScreenStack *parent, ProgListType pltype,
 
 // previously recorded ctor
 ProgLister::ProgLister(
-    MythScreenStack *parent, uint recid, const QString &title) :
+    MythScreenStack *parent, uint recid, QString title) :
     ScheduleCommon(parent, "PreviousList"),
     m_type(plPreviouslyRecorded),
     m_recid(recid),
-    m_title(title),
+    m_title(std::move(title)),
     m_startTime(MythDate::current()),
     m_searchTime(m_startTime),
     m_channelOrdering(gCoreContext->GetSetting("ChannelOrdering", "channum")),

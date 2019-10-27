@@ -23,9 +23,9 @@
 #include "mythprogressdialog.h"
 
 ImportIconsWizard::ImportIconsWizard(MythScreenStack *parent, bool fRefresh,
-                                     const QString &channelname)
+                                     QString channelname)
                   :MythScreenType(parent, "ChannelIconImporter"),
-    m_strChannelname(channelname), m_fRefresh(fRefresh)
+    m_strChannelname(std::move(channelname)), m_fRefresh(fRefresh)
 {
     if (!m_strChannelname.isEmpty())
         LOG(VB_GENERAL, LOG_INFO,

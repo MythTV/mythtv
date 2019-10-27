@@ -50,10 +50,10 @@ class ClassicCommDetector : public CommDetectorBase
     public:
         ClassicCommDetector(SkipType commDetectMethod, bool showProgress,
                             bool fullSpeed, MythPlayer* player,
-                            const QDateTime& startedAt_in,
-                            const QDateTime& stopsAt_in,
-                            const QDateTime& recordingStartedAt_in,
-                            const QDateTime& recordingStopsAt_in);
+                            QDateTime startedAt_in,
+                            QDateTime stopsAt_in,
+                            QDateTime recordingStartedAt_in,
+                            QDateTime recordingStopsAt_in);
         virtual void deleteLater(void);
 
         bool go() override; // CommDetectorBase

@@ -4,8 +4,8 @@
 
 // Qt headers
 #include <QCoreApplication>
-#include <QRunnable>
 #include <QRegExp>
+#include <QRunnable>
 
 // MythTV headers
 #include "mythcorecontext.h"
@@ -43,10 +43,10 @@ class ThemeExtractThread : public QRunnable
 {
   public:
     ThemeExtractThread(ThemeChooser *parent,
-                       const QString &srcFile, const QString &destDir) :
+                       QString srcFile, QString destDir) :
         m_parent(parent),
-        m_srcFile(srcFile),
-        m_destDir(destDir) {}
+        m_srcFile(std::move(srcFile)),
+        m_destDir(std::move(destDir)) {}
 
     void run() override // QRunnable
     {

@@ -241,7 +241,7 @@ class PlaybackProfileConfig : public GroupSetting
     Q_OBJECT
 
   public:
-    PlaybackProfileConfig(const QString &profilename, StandardSetting *parent);
+    PlaybackProfileConfig(QString profilename, StandardSetting *parent);
     virtual ~PlaybackProfileConfig() = default;
 
     void Save(void) override; // StandardSetting
