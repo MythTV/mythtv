@@ -135,8 +135,6 @@ class MTV_PUBLIC PlayerContext
     bool IsEmbedding(void) const;
     bool HasPlayer(void) const;
     bool IsPlayerErrored(void) const;
-    bool IsPlayerRecoverable(void) const;
-    bool IsPlayerDecoderErrored(void) const;
     bool IsPlayerPlaying(void) const;
     bool IsRecorderErrored(void) const;
     bool InStateChange(void) const;

@@ -27,7 +27,6 @@ const int kNumBuffers = 31;
 const int kNeedFreeFrames = 1;
 const int kPrebufferFramesNormal = 10;
 const int kPrebufferFramesSmall = 4;
-const int kKeepPrebuffer = 2;
 
 #define LOC      QString("VideoOutputD3D: ")
 
@@ -263,15 +262,14 @@ bool VideoOutputD3D::CreateBuffers(void)
 {
     if (codec_is_dxva2(m_videoCodecID))
     {
-        m_videoBuffers.Init(VideoBuffers::GetNumBuffers(FMT_DXVA2), false, 2, 1, 4, 1);
+        m_videoBuffers.Init(VideoBuffers::GetNumBuffers(FMT_DXVA2), false, 2, 1, 4);
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Created %1 empty DXVA2 buffers.")
             .arg(VideoBuffers::GetNumBuffers(FMT_DXVA2)));
         return true;
     }
 
     m_videoBuffers.Init(VideoBuffers::GetNumBuffers(FMT_YV12), true, kNeedFreeFrames,
-                  kPrebufferFramesNormal, kPrebufferFramesSmall,
-                  kKeepPrebuffer);
+                  kPrebufferFramesNormal, kPrebufferFramesSmall);
     return true;
 
 }
@@ -651,18 +649,6 @@ MythCodecID VideoOutputD3D::GetBestSupportedCodec(
         return test_cid;
 #endif
     return (MythCodecID)(kCodec_MPEG1 + (stream_type - 1));
-}
-
-
-void* VideoOutputD3D::GetDecoderContext(unsigned char* buf, uint8_t*& id)
-{
-    (void)buf;
-    (void)id;
-#ifdef USING_DXVA2
-    if (m_decoder)
-        return (void*)&m_decoder->m_context;
-#endif
-    return nullptr;
 }
 
 bool VideoOutputD3D::CreateDecoder(void)

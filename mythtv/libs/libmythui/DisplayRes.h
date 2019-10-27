@@ -124,10 +124,6 @@ class MUI_PUBLIC DisplayRes
      * @{
      */
 
-    /// \brief Returns maximum width in pixels supported by display.
-    int GetMaxWidth(void)    const { return m_maxWidth; }
-    /// \brief Returns maximum height in pixels supported by display.
-    int GetMaxHeight(void)   const { return m_maxHeight; }
     /// \brief Returns the pixel aspect ratio of the display.
     double GetPixelAspectRatio(void) const { return m_pixelAspectRatio; }
     /// \brief Returns all video modes supported by the display.
@@ -138,7 +134,7 @@ class MUI_PUBLIC DisplayRes
 
   protected:
     /// \brief DisplayRes is an abstract class, instanciate with GetDisplayRes(void)
-    DisplayRes(void) : m_curMode(GUI), m_maxWidth(0), m_maxHeight(0), m_pixelAspectRatio(1.0) {;}
+    DisplayRes(void) : m_curMode(GUI), m_pixelAspectRatio(1.0) {;}
     virtual ~DisplayRes(void) {;}
 
     // These methods are implemented by the subclasses
@@ -153,14 +149,9 @@ class MUI_PUBLIC DisplayRes
     tmode m_curMode;           // current mode
     DisplayResScreen m_mode[MAX_MODES];
     DisplayResScreen m_last;    // mirror of mode[current_mode]
-
     /// maps input video parameters to output video modes
     DisplayResMap m_inSizeToOutputMode;
-
-    int m_maxWidth, m_maxHeight;
-
     double m_pixelAspectRatio;
-
     static DisplayRes *s_instance;
     static bool        s_locked;
 };

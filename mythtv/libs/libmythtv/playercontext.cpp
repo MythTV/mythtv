@@ -292,18 +292,6 @@ bool PlayerContext::IsPlayerErrored(void) const
     return m_player && m_player->IsErrored();
 }
 
-bool PlayerContext::IsPlayerRecoverable(void) const
-{
-    QMutexLocker locker(&m_deletePlayerLock);
-    return m_player && m_player->IsErrorRecoverable();
-}
-
-bool PlayerContext::IsPlayerDecoderErrored(void) const
-{
-    QMutexLocker locker(&m_deletePlayerLock);
-    return m_player && m_player->IsDecoderErrored();
-}
-
 bool PlayerContext::IsPlayerPlaying(void) const
 {
     QMutexLocker locker(&m_deletePlayerLock);

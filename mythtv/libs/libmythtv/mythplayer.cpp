@@ -1088,13 +1088,6 @@ void MythPlayer::DiscardVideoFrames(bool KeyFrame, bool Flushed)
         videoOutput->DiscardFrames(KeyFrame, Flushed);
 }
 
-void* MythPlayer::GetDecoderContext(unsigned char* buf, uint8_t*& id)
-{
-    if (videoOutput)
-        return videoOutput->GetDecoderContext(buf, id);
-    return nullptr;
-}
-
 bool MythPlayer::HasReachedEof(void) const
 {
     EofState eof = GetEof();
@@ -2337,10 +2330,7 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
         return false;
 
     if (!(min_buffers ? (videoOutput->ValidVideoFrames() >= min_buffers) :
-                        (GetEof() != kEofStateNone) ||
-                        (videoOutput->hasHWAcceleration() ?
-                            videoOutput->EnoughPrebufferedFrames() :
-                            videoOutput->EnoughDecodedFrames())))
+                        (GetEof() != kEofStateNone) || videoOutput->EnoughDecodedFrames()))
     {
         SetBuffering(true);
 
@@ -5185,22 +5175,6 @@ void MythPlayer::GetPlaybackData(InfoMap &infoMap)
         infoMap["load"] = output_jmeter->GetLastCPUStats();
     }
     GetCodecDescription(infoMap);
-}
-
-int MythPlayer::GetSecondsBehind(void) const
-{
-    if (!player_ctx->m_recorder)
-        return 0;
-
-    long long written = player_ctx->m_recorder->GetFramesWritten();
-    long long played = framesPlayed;
-
-    if (played > written)
-        played = written;
-    if (played < 0)
-        played = 0;
-
-    return (int)(static_cast<double>(written - played) / video_frame_rate);
 }
 
 int64_t MythPlayer::GetSecondsPlayed(bool honorCutList, int divisor) const

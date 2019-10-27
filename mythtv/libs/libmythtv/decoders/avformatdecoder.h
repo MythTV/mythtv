@@ -120,9 +120,6 @@ class AvFormatDecoder : public DecoderBase
 
     bool IsLastFrameKey(void) const override { return false; } // DecoderBase
 
-    bool IsCodecMPEG(void) const override // DecoderBase
-        { return m_codec_is_mpeg; }
-
     /// This is a No-op for this class.
     void WriteStoredData(RingBuffer *rb, bool storevid,
                          long timecodeOffset) override // DecoderBase
@@ -194,10 +191,7 @@ class AvFormatDecoder : public DecoderBase
     AvFormatDecoder &operator=(const AvFormatDecoder &) = delete; // not copyable
 
   protected:
-    RingBuffer *getRingBuf(void) { return ringBuffer; }
-
-    int AutoSelectTrack(uint type) override; // DecoderBase
-
+    int  AutoSelectTrack(uint type) override; // DecoderBase
     void ScanATSCCaptionStreams(int av_index);
     void UpdateATSCCaptionTracks(void);
     void UpdateCaptionTracksFromStreams(bool check_608, bool check_708);
@@ -241,9 +235,6 @@ class AvFormatDecoder : public DecoderBase
     void ProcessVBIDataPacket(const AVStream *stream, const AVPacket *pkt);
     void ProcessDVBDataPacket(const AVStream *stream, const AVPacket *pkt);
     void ProcessDSMCCPacket(const AVStream *stream, const AVPacket *pkt);
-
-    float GetMpegAspect(AVCodecContext *context, int aspect_ratio_info,
-                        int width, int height);
 
     void SeekReset(long long, uint skipFrames, bool doFlush, bool discardFrames) override; // DecoderBase
 
@@ -378,7 +369,6 @@ class AvFormatDecoder : public DecoderBase
     AudioInfo          m_audioOut;
 
     float              m_fps                          {0.0F};
-    bool               m_codec_is_mpeg                {false};
     bool               m_processFrames                {true};
 
     bool               m_streams_changed              { false };

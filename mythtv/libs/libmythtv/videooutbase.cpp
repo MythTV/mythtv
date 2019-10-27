@@ -671,13 +671,6 @@ bool VideoOutput::EnoughDecodedFrames(void)
     return m_videoBuffers.EnoughDecodedFrames();
 }
 
-/// \brief Returns true iff we have at least the minimum number of
-///        decoded frames ready for display.
-bool VideoOutput::EnoughPrebufferedFrames(void)
-{
-    return m_videoBuffers.EnoughPrebufferedFrames();
-}
-
 /// \brief returns QRect of PIP based on PIPLocation
 QRect VideoOutput::GetPIPRect(PIPLocation Location, MythPlayer *PiPPlayer, bool DoPixelAdj) const
 {

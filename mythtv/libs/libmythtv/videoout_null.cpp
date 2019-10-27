@@ -9,7 +9,6 @@ using namespace std;
 const int kNeedFreeFrames = 1;
 const int kPrebufferFramesNormal = 12;
 const int kPrebufferFramesSmall = 4;
-const int kKeepPrebuffer = 2;
 
 void VideoOutputNull::GetRenderOptions(RenderOptions &Options)
 {
@@ -169,8 +168,7 @@ bool VideoOutputNull::Init(const QSize &video_dim_buf,
                       aspect, winid, win_rect, codec_id);
 
     m_videoBuffers.Init(VideoBuffers::GetNumBuffers(FMT_YV12), true, kNeedFreeFrames,
-                  kPrebufferFramesNormal, kPrebufferFramesSmall,
-                  kKeepPrebuffer);
+                  kPrebufferFramesNormal, kPrebufferFramesSmall);
 
     // XXX should this be GetActualVideoDim() ?
     const QSize video_dim = m_window.GetVideoDim();

@@ -93,8 +93,7 @@ class VideoOutput
     virtual void InitPictureAttributes(void) { }
     virtual bool IsPIPSupported(void) const { return false; }
     virtual bool IsPBPSupported(void) const { return false; }
-    virtual bool hasHWAcceleration(void) const { return false; }
-    virtual void* GetDecoderContext(unsigned char*, uint8_t*&) { return nullptr; }
+    bool         HasSoftwareFrames(void) const { return codec_sw_copy(m_videoCodecID); }
     virtual void SetFramesPlayed(long long FramesPlayed);
     virtual long long GetFramesPlayed(void);
     bool         IsErrored() const;
@@ -106,7 +105,6 @@ class VideoOutput
     int          FreeVideoFrames(void);
     bool         EnoughFreeFrames(void);
     bool         EnoughDecodedFrames(void);
-    bool         EnoughPrebufferedFrames(void);
     virtual VideoFrameType* DirectRenderFormats(void);
     virtual VideoFrame *GetNextFreeFrame(void);
     virtual void ReleaseFrame(VideoFrame *Frame);

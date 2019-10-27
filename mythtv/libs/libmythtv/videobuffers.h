@@ -59,10 +59,10 @@ class MTV_PUBLIC VideoBuffers
     static uint GetNumBuffers(int PixelFormat, int MaxReferenceFrames = 16, bool Decoder = false);
     void Init(uint NumDecode, bool ExtraForPause,
               uint NeedFree, uint NeedprebufferNormal,
-              uint NeedPrebufferSmall, uint KeepPrebuffer);
+              uint NeedPrebufferSmall);
     bool CreateBuffers(VideoFrameType Type, QSize Size, bool ExtraForPause,
                        uint NeedFree, uint NeedprebufferNormal,
-                       uint NeedPrebufferSmall, uint KeepPrebuffer, int MaxReferenceFrames = 16);
+                       uint NeedPrebufferSmall, int MaxReferenceFrames = 16);
     bool CreateBuffers(VideoFrameType Type, int Width, int Height,
                        vector<YUVInfo> YUVInfos);
     bool CreateBuffers(VideoFrameType Type, int Width, int Height);
@@ -106,7 +106,6 @@ class MTV_PUBLIC VideoBuffers
     uint FreeVideoFrames(void) const;
     bool EnoughFreeFrames(void) const;
     bool EnoughDecodedFrames(void) const;
-    bool EnoughPrebufferedFrames(void) const;
 
     const VideoFrame *At(uint i) const;
     const VideoFrame *GetLastDecodedFrame(void) const;
@@ -140,7 +139,6 @@ class MTV_PUBLIC VideoBuffers
     uint                 m_needPrebufferFrames       { 0 };
     uint                 m_needPrebufferFramesNormal { 0 };
     uint                 m_needPrebufferFramesSmall  { 0 };
-    uint                 m_keepPrebufferFrames       { 0 };
     bool                 m_createdPauseFrame         { false };
     uint                 m_rpos                      { 0 };
     uint                 m_vpos                      { 0 };

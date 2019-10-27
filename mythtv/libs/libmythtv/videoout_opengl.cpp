@@ -368,24 +368,24 @@ bool VideoOutputOpenGL::CreateBuffers(MythCodecID CodecID, QSize Size)
 
     if (codec_is_copyback(CodecID))
     {
-        m_videoBuffers.Init(VideoBuffers::GetNumBuffers(FMT_NONE), false, 1, 4, 2, 1);
+        m_videoBuffers.Init(VideoBuffers::GetNumBuffers(FMT_NONE), false, 1, 4, 2);
         return m_videoBuffers.CreateBuffers(FMT_YV12, Size.width(), Size.height());
     }
 
     if (codec_is_mediacodec(CodecID))
-        return m_videoBuffers.CreateBuffers(FMT_MEDIACODEC, Size, false, 1, 2, 2, 1);
+        return m_videoBuffers.CreateBuffers(FMT_MEDIACODEC, Size, false, 1, 2, 2);
     else if (codec_is_vaapi(CodecID))
-        return m_videoBuffers.CreateBuffers(FMT_VAAPI, Size, false, 2, 1, 4, 1, m_maxReferenceFrames);
+        return m_videoBuffers.CreateBuffers(FMT_VAAPI, Size, false, 2, 1, 4, m_maxReferenceFrames);
     else if (codec_is_vtb(CodecID))
-        return m_videoBuffers.CreateBuffers(FMT_VTB, Size, false, 1, 4, 2, 1);
+        return m_videoBuffers.CreateBuffers(FMT_VTB, Size, false, 1, 4, 2);
     else if (codec_is_vdpau(CodecID))
-        return m_videoBuffers.CreateBuffers(FMT_VDPAU, Size, false, 2, 1, 4, 1, m_maxReferenceFrames);
+        return m_videoBuffers.CreateBuffers(FMT_VDPAU, Size, false, 2, 1, 4, m_maxReferenceFrames);
     else if (codec_is_nvdec(CodecID))
-        return m_videoBuffers.CreateBuffers(FMT_NVDEC, Size, false, 2, 1, 4, 1);
+        return m_videoBuffers.CreateBuffers(FMT_NVDEC, Size, false, 2, 1, 4);
     else if (codec_is_mmal(CodecID))
-        return m_videoBuffers.CreateBuffers(FMT_MMAL, Size, false, 2, 1, 4, 1);
+        return m_videoBuffers.CreateBuffers(FMT_MMAL, Size, false, 2, 1, 4);
 
-    return m_videoBuffers.CreateBuffers(FMT_YV12, Size, false, 1, 8, 4, 2, m_maxReferenceFrames);
+    return m_videoBuffers.CreateBuffers(FMT_YV12, Size, false, 1, 8, 4, m_maxReferenceFrames);
 }
 
 void VideoOutputOpenGL::ProcessFrame(VideoFrame *Frame, OSD */*osd*/,

@@ -2249,8 +2249,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     .arg(get_decoder_name(m_video_codec_id)).arg(m_streams_changed));
             }
 
-            m_codec_is_mpeg = CODEC_IS_FFMPEG_MPEG(enc->codec_id);
-
             delete m_private_dec;
             m_private_dec = nullptr;
             m_h264_parser->Reset();

@@ -53,9 +53,6 @@ class VideoOutputD3D : public VideoOutput
     bool IsPIPSupported(void) const override // VideoOutput
         { return true; }
     MythPainter *GetOSDPainter(void) override; // VideoOutput
-    bool hasHWAcceleration(void) const override // VideoOutput
-        { return !codec_is_std(m_videoCodecID); }
-    void* GetDecoderContext(unsigned char* buf, uint8_t*& id) override; // VideoOutput
 
     bool CanVisualise(AudioPlayer *audio, MythRender */*render*/) override // VideoOutput
         { return VideoOutput::CanVisualise(audio, (MythRender*)m_render); }

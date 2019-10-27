@@ -186,7 +186,6 @@ class DecoderBase
     virtual int64_t NormalizeVideoTimecode(int64_t timecode) { return timecode; }
 
     virtual bool IsLastFrameKey(void) const = 0;
-    virtual bool IsCodecMPEG(void) const { return false; }
     virtual void WriteStoredData(RingBuffer *rb, bool storevid,
                                  long timecodeOffset) = 0;
     virtual void ClearStoredData(void) { return; }

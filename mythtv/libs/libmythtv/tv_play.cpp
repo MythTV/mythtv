@@ -3008,23 +3008,6 @@ void TV::timerEvent(QTimerEvent *te)
         bool error = false;
         PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
 
-        if (mctx->IsPlayerErrored())
-        {
-            if (mctx->IsPlayerRecoverable())
-                RestartMainPlayer(mctx);
-
-            if (mctx->IsPlayerDecoderErrored())
-            {
-                LOG(VB_GENERAL, LOG_EMERG, LOC +
-                    QString("Serious hardware decoder error detected. "
-                            "Disabling hardware decoders."));
-                m_noHardwareDecoders = true;
-                for (size_t i = 0; i < m_player.size(); i++)
-                    m_player[i]->SetNoHardwareDecoders();
-                RestartMainPlayer(mctx);
-            }
-        }
-
         if (mctx->IsRecorderErrored() ||
             mctx->IsPlayerErrored() ||
             mctx->IsErrored())
@@ -11986,7 +11969,7 @@ void TV::PlaybackMenuInit(const MenuBase &menu)
             m_tvmSup            = vo->GetSupportedPictureAttributes();
             m_tvmStereoAllowed  = vo->StereoscopicModesAllowed();
             m_tvmStereoMode     = vo->GetStereoscopicMode();
-            m_tvmFillAutoDetect = !vo->hasHWAcceleration();
+            m_tvmFillAutoDetect = vo->HasSoftwareFrames();  
         }
         if (!m_tvmScanTypeLocked)
         {

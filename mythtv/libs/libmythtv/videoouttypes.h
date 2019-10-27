@@ -155,8 +155,6 @@ typedef enum VideoErrorState
 {
     kError_None            = 0x00,
     kError_Unknown         = 0x01,
-    kError_Decode          = 0x02, // VDPAU decoder error
-    kError_Switch_Renderer = 0x04, // Current renderer is not preferred choice
 } VideoErrorState;
 
 inline bool is_interlaced(FrameScanType scan)

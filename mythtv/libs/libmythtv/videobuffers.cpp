@@ -184,12 +184,10 @@ VideoBuffers::~VideoBuffers()
  * \param NeedPrebufferNormal number buffers you can put in used or limbo normally
  * \param NeedPrebufferSmall  number of buffers you can put in used or limbo
  *                            after SetPrebuffering(false) has been called.
- * \param KeepPrebuffer       number of buffers in used or limbo that are considered
- *                            enough for decent playback.
  */
 void VideoBuffers::Init(uint NumDecode, bool ExtraForPause,
                         uint NeedFree,  uint NeedPrebufferNormal,
-                        uint NeedPrebufferSmall, uint KeepPrebuffer)
+                        uint NeedPrebufferSmall)
 {
     QMutexLocker locker(&m_globalLock);
 
@@ -215,7 +213,6 @@ void VideoBuffers::Init(uint NumDecode, bool ExtraForPause,
     m_needPrebufferFrames       = NeedPrebufferNormal;
     m_needPrebufferFramesNormal = NeedPrebufferNormal;
     m_needPrebufferFramesSmall  = NeedPrebufferSmall;
-    m_keepPrebufferFrames       = KeepPrebuffer;
     m_createdPauseFrame         = ExtraForPause;
 
     if (m_createdPauseFrame)
@@ -719,11 +716,6 @@ bool VideoBuffers::EnoughDecodedFrames(void) const
     return Size(kVideoBuffer_used) >= m_needPrebufferFrames;
 }
 
-bool VideoBuffers::EnoughPrebufferedFrames(void) const
-{
-    return Size(kVideoBuffer_used) >= m_keepPrebufferFrames;
-}
-
 const VideoFrame* VideoBuffers::GetLastDecodedFrame(void) const
 {
     return At(m_vpos);
@@ -863,11 +855,10 @@ void VideoBuffers::ClearAfterSeek(void)
 
 bool VideoBuffers::CreateBuffers(VideoFrameType Type, QSize Size, bool ExtraForPause,
                                  uint NeedFree, uint NeedprebufferNormal,
-                                 uint NeedPrebufferSmall, uint KeepPrebuffer,
-                                 int MaxReferenceFrames)
+                                 uint NeedPrebufferSmall, int MaxReferenceFrames)
 {
     Init(GetNumBuffers(Type, MaxReferenceFrames), ExtraForPause, NeedFree, NeedprebufferNormal,
-         NeedPrebufferSmall, KeepPrebuffer);
+         NeedPrebufferSmall);
     return CreateBuffers(Type, Size.width(), Size.height());
 }
 

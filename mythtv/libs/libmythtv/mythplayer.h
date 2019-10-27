@@ -107,7 +107,7 @@ class DecoderThread : public MThread
   public:
     DecoderThread(MythPlayer *mp, bool start_paused)
       : MThread("Decoder"), m_mp(mp), m_start_paused(start_paused) { }
-    ~DecoderThread() { wait(); }
+    ~DecoderThread() override { wait(); }
 
   protected:
     void run(void) override; // MThread
@@ -192,7 +192,6 @@ class MTV_PUBLIC MythPlayer
     bool    IsAudioNeeded(void)
         { return !(FlagIsSet(kVideoIsNull)) && player_ctx->IsAudioNeeded(); }
     uint    GetVolume(void) { return audio.GetVolume(); }
-    int     GetSecondsBehind(void) const;
     int     GetFreeVideoFrames(void) const;
     AspectOverrideMode GetAspectOverride(void) const;
     AdjustFillMode     GetAdjustFill(void) const;
@@ -219,10 +218,6 @@ class MTV_PUBLIC MythPlayer
     int64_t  GetLatestVideoTimecode() const   { return m_latestVideoTimecode; }
     virtual  uint64_t GetBookmark(void);
     QString   GetError(void) const;
-    bool      IsErrorRecoverable(void) const
-        { return (errorType & kError_Switch_Renderer); }
-    bool      IsDecoderErrored(void)   const
-        { return (errorType & kError_Decode); }
     QString   GetEncodingType(void) const;
     void      GetCodecDescription(InfoMap &infoMap);
     QString   GetXDS(const QString &key) const;
@@ -288,13 +283,9 @@ class MTV_PUBLIC MythPlayer
     void DiscardVideoFrames(bool KeyFrame, bool Flushed);
     /// Returns the stream decoder currently in use.
     DecoderBase *GetDecoder(void) { return decoder; }
-    void *GetDecoderContext(unsigned char* buf, uint8_t*& id);
     virtual bool HasReachedEof(void) const;
     void SetDisablePassThrough(bool disabled);
     void ForceSetupAudioStream(void);
-
-    // Preview Image stuff
-    void SaveScreenshot(void);
 
     // Reinit
     void ReinitVideo(bool ForceUpdate);

@@ -114,18 +114,6 @@ bool DisplayRes::Initialize(void)
         m_inSizeToOutputMode[key] = scr;
     }
 
-    // Find maximum resolution, needed for initializing X11 window
-    const DisplayResVector& screens = GetVideoModes();
-
-    for (size_t i = 0; i < screens.size(); ++i)
-    {
-        m_maxWidth = std::max(m_maxWidth, screens[i].Width());
-        m_maxHeight = std::max(m_maxHeight, screens[i].Height());
-    }
-
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Max width: %1 Max height: %2")
-        .arg(m_maxWidth).arg(m_maxHeight));
-
     return true;
 }
 
