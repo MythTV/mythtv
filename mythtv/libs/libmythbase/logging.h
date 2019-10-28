@@ -181,7 +181,7 @@ class LoggerThread : public QObject, public MThread
     void run(void) override; // MThread
     void stop(void);
     bool flush(int timeoutMS = 200000);
-    void handleItem(LoggingItem *item);
+    static void handleItem(LoggingItem *item);
     void fillItem(LoggingItem *item);
   private:
     Q_DISABLE_COPY(LoggerThread);

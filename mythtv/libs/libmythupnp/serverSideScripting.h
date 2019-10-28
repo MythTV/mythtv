@@ -75,7 +75,7 @@ class UPNP_PUBLIC ServerSideScripting
 
         ScriptInfo *GetLoadedScript ( const QString &sFileName );
 
-        QString ReadFileContents    ( const QString &sFileName ) const;
+        static QString ReadFileContents    ( const QString &sFileName ) ;
 
         QString CreateMethodFromFile( const QString &sFileName ) const;
 

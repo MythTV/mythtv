@@ -1255,7 +1255,7 @@ CommandLineArg* MythCommandLineParser::add(QStringList arglist,
 
 /** \brief Print application version information
  */
-void MythCommandLineParser::PrintVersion(void) const
+void MythCommandLineParser::PrintVersion(void)
 {
     cout << "Please attach all output as a file in bug reports." << endl;
     cout << "MythTV Version : " << MYTH_SOURCE_VERSION << endl;

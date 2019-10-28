@@ -99,14 +99,14 @@ public:
 
 	inline void decryptBytes(quint32* keys, char* buffer, qint64 read);
 
-	inline quint32 getULong(const unsigned char* data, quint32 offset) const;
-	inline quint64 getULLong(const unsigned char* data, quint32 offset) const;
-	inline quint16 getUShort(const unsigned char* data, quint32 offset) const;
-	inline int decryptByte(quint32 key2) const;
+	static inline quint32 getULong(const unsigned char* data, quint32 offset) ;
+	static inline quint64 getULLong(const unsigned char* data, quint32 offset) ;
+	static inline quint16 getUShort(const unsigned char* data, quint32 offset) ;
+	static inline int decryptByte(quint32 key2) ;
 	inline void updateKeys(quint32* keys, int c) const;
 	inline void initKeys(const QString& pwd, quint32* keys) const;
 
-	inline QDateTime convertDateTime(const unsigned char date[2], const unsigned char time[2]) const;
+	static inline QDateTime convertDateTime(const unsigned char date[2], const unsigned char time[2]) ;
 };
 
 #endif // OSDAB_UNZIP_P__H

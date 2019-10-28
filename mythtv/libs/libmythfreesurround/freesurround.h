@@ -49,7 +49,7 @@ public:
     long long getLatency();
     uint frameLatency();
 
-    uint framesPerBlock();
+    static uint framesPerBlock();
 
 protected:
     void process_block();

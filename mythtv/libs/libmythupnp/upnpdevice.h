@@ -153,21 +153,21 @@ class UPNP_PUBLIC UPnpDeviceDesc
 
         void    _InternalLoad( QDomNode  oNode, UPnpDevice *pCurDevice );
 
-        void     ProcessIconList   ( const QDomNode& oListNode, UPnpDevice *pDevice );
-        void     ProcessServiceList( const QDomNode& oListNode, UPnpDevice *pDevice );
+        static void     ProcessIconList   ( const QDomNode& oListNode, UPnpDevice *pDevice );
+        static void     ProcessServiceList( const QDomNode& oListNode, UPnpDevice *pDevice );
         void     ProcessDeviceList ( const QDomNode& oListNode, UPnpDevice *pDevice );
 
         void     OutputDevice( QTextStream &os,
                                UPnpDevice *pDevice,
                                const QString &sUserAgent = "" );
 
-        void     SetStrValue ( const QDomNode &n, QString &sValue );
-        void     SetNumValue ( const QDomNode &n, int     &nValue );
-        void     SetBoolValue( const QDomNode &n, bool    &nValue );
+        static void     SetStrValue ( const QDomNode &n, QString &sValue );
+        static void     SetNumValue ( const QDomNode &n, int     &nValue );
+        static void     SetBoolValue( const QDomNode &n, bool    &nValue );
 
-        QString  FormatValue ( const NameValue &node );
-        QString  FormatValue ( const QString &sName, const QString &sValue );
-        QString  FormatValue ( const QString &sName, int nValue );
+        static QString  FormatValue ( const NameValue &node );
+        static QString  FormatValue ( const QString &sName, const QString &sValue );
+        static QString  FormatValue ( const QString &sName, int nValue );
 
         QString  GetHostName ();
 

@@ -93,7 +93,7 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
     void updateCookieJar(void);
 
     QString getHeader(const QUrl &url, const QString &header);
-    QString getHeader(const QNetworkCacheMetaData &cacheData, const QString &header);
+    static QString getHeader(const QNetworkCacheMetaData &cacheData, const QString &header);
 
   private slots:
     // QNetworkAccessManager signals
@@ -127,15 +127,15 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
     void downloadQNetworkRequest(MythDownloadInfo *dlInfo);
     bool downloadNow(MythDownloadInfo *dlInfo, bool deleteInfo = true);
 #ifndef _WIN32
-    bool downloadNowLinkLocal(MythDownloadInfo *dlInfo, bool deleteInfo);
+    static bool downloadNowLinkLocal(MythDownloadInfo *dlInfo, bool deleteInfo);
 #endif
     void downloadCanceled(void);
 
-    QUrl redirectUrl(const QUrl& possibleRedirectUrl,
-                     const QUrl& oldRedirectUrl) const;
+    static QUrl redirectUrl(const QUrl& possibleRedirectUrl,
+                            const QUrl& oldRedirectUrl) ;
 
-    bool saveFile(const QString &outFile, const QByteArray &data,
-                  const bool append = false);
+    static bool saveFile(const QString &outFile, const QByteArray &data,
+                         const bool append = false);
 
     void updateCookieJar(QNetworkCookieJar *jar);
 

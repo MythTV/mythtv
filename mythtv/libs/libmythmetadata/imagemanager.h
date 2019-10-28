@@ -204,7 +204,7 @@ public:
     QString MakeThumbUrl(const QString &devPath, const QString &path = "") const
     { return GetAbsThumbPath(devPath, path); }
 
-    void Notify(const QString &mesg, const QStringList &extra) const;
+    static void Notify(const QString &mesg, const QStringList &extra) ;
 
 protected:
     // Adapter functions used by Database for local images. Negate ids in & out
@@ -244,7 +244,7 @@ public:
                                       devPath + "/" + path,
                                       THUMBNAIL_STORAGE_GROUP); }
 
-    void Notify(const QString &mesg, const QStringList &extra) const;
+    static void Notify(const QString &mesg, const QStringList &extra) ;
 
 protected:
     // Adapter functions used by Database for remote images. Do nothing
@@ -458,18 +458,18 @@ public:
     // UI actions on all images
     void        CreateThumbnails(const ImageIdList &ids, bool forFolder);
     QString     ScanImagesAction(bool start, bool local = false);
-    QStringList ScanQuery();
+    static QStringList ScanQuery();
     QString     HideFiles(bool hidden, const ImageIdList &ids);
     QString     ChangeOrientation(ImageFileTransform transform, const ImageIdList &ids);
     QString     SetCover(int parent, int cover);
     void        RequestMetaData(int id);
-    QString     IgnoreDirs(const QString &excludes);
+    static QString     IgnoreDirs(const QString &excludes);
     QString     MakeDir(int, const QStringList &names, bool rescan = true);
     QString     RenameFile(const ImagePtrK& im, const QString &name);
     QString     CreateImages(int, const ImageListK &images);
     QString     MoveDbImages(const ImagePtrK& destDir, ImageListK &images, const QString &);
     QString     DeleteFiles(const ImageIdList &);
-    void        ClearStorageGroup();
+    static void ClearStorageGroup();
     void        CloseDevices(int devId = DEVICE_INVALID, bool eject = false);
 
     using ImageAdapterBase::ConstructPath;
@@ -483,7 +483,7 @@ public:
 
     // UI helper functions
     void SetDateFormat(const QString &format)    { m_dateFormat = format; }
-    QString LongDateOf(const ImagePtrK&) const;
+    static QString LongDateOf(const ImagePtrK&) ;
     QString ShortDateOf(const ImagePtrK&) const;
     QString DeviceCaption(ImageItemK &im) const;
     QString CrumbName(ImageItemK &im, bool getPath = false) const;

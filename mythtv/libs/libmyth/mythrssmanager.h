@@ -73,8 +73,8 @@ class MPUBLIC RSSSite : public QObject
 
   private:
 
-    QUrl redirectUrl(const QUrl& possibleRedirectUrl,
-                     const QUrl& oldRedirectUrl) const;
+    static QUrl redirectUrl(const QUrl& possibleRedirectUrl,
+                            const QUrl& oldRedirectUrl) ;
 
     QString     m_title;
     QString     m_sortTitle;

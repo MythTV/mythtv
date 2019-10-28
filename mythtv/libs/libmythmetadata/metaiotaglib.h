@@ -27,10 +27,10 @@ class META_PUBLIC MetaIOTagLib : public MetaIO
     MusicMetadata* read(const QString &filename) override = 0; // MetaIO
 
   protected:
-    int getTrackLength(TagLib::File *file);
+    static int getTrackLength(TagLib::File *file);
     int getTrackLength(const QString &filename) override; // MetaIO
     void ReadGenericMetadata(TagLib::Tag *tag, MusicMetadata *metadata);
-    void WriteGenericMetadata(TagLib::Tag *tag, const MusicMetadata *metadata);
+    static void WriteGenericMetadata(TagLib::Tag *tag, const MusicMetadata *metadata);
 };
 
 #endif

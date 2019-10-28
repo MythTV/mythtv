@@ -99,10 +99,10 @@ class MUI_PUBLIC MythPainter
     void SetMaximumCacheSizes(int hardware, int software);
 
   protected:
-    void DrawTextPriv(MythImage *im, const QString &msg, int flags,
-                      const QRect &r, const MythFontProperties &font);
-    void DrawRectPriv(MythImage *im, const QRect &area, int radius, int ellipse,
-                      const QBrush &fillBrush, const QPen &linePen);
+    static void DrawTextPriv(MythImage *im, const QString &msg, int flags,
+                             const QRect &r, const MythFontProperties &font);
+    static void DrawRectPriv(MythImage *im, const QRect &area, int radius, int ellipse,
+                             const QBrush &fillBrush, const QPen &linePen);
 
     MythImage *GetImageFromString(const QString &msg, int flags, const QRect &r,
                                   const MythFontProperties &font);

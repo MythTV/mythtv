@@ -1180,7 +1180,7 @@ void MythDownloadManager::downloadError(QNetworkReply::NetworkError errorCode)
  *  \return empty QUrl if we were not redirected, otherwise the redirected URL
  */
 QUrl MythDownloadManager::redirectUrl(const QUrl& possibleRedirectUrl,
-                                      const QUrl& oldRedirectUrl) const
+                                      const QUrl& oldRedirectUrl)
 {
     LOG(VB_FILE, LOG_DEBUG, LOC + QString("redirectUrl()"));
     QUrl redirectUrl;

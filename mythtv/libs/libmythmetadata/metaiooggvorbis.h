@@ -28,7 +28,7 @@ class META_PUBLIC MetaIOOggVorbis : public MetaIOTagLib
     MusicMetadata* read(const QString &filename) override; // MetaIOTagLib
 
   private:
-    TagLib::Ogg::Vorbis::File *OpenFile(const QString &filename);
+    static TagLib::Ogg::Vorbis::File *OpenFile(const QString &filename);
 };
 
 #endif

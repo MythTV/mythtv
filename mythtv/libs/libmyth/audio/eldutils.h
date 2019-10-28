@@ -84,8 +84,8 @@ class MPUBLIC ELD
     int update_eld(const char *buf, int size);
     void update_sad(int index, const char *buf);
     QString sad_desc(int index);
-    QString print_pcm_rates(int pcm);
-    QString print_pcm_bits(int pcm);
+    static QString print_pcm_rates(int pcm);
+    static QString print_pcm_bits(int pcm);
 
         /*
          * CEA Short Audio Descriptor data

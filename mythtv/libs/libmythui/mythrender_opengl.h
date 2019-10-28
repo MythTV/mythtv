@@ -169,13 +169,13 @@ class MUI_PUBLIC MythRenderOpenGL : protected MythRenderContext, public MythRend
     void* GetTextureBuffer(uint tex, bool create_buffer = true);
     void  UpdateTexture(uint tex, void *buf);
     int   GetTextureType(bool &rect);
-    bool  IsRectTexture(uint type);
+    static bool  IsRectTexture(uint type);
     uint  CreateHelperTexture(void);
     uint  CreateTexture(QSize act_size, bool use_pbo, uint type,
                         uint data_type = GL_UNSIGNED_BYTE,
                         uint data_fmt = GL_RGBA, uint internal_fmt = GL_RGBA8,
                         uint filter = GL_LINEAR, uint wrap = GL_CLAMP_TO_EDGE);
-    QSize GetTextureSize(uint type, const QSize &size);
+    static QSize GetTextureSize(uint type, const QSize &size);
     QSize GetTextureSize(uint tex);
     int   GetTextureDataSize(uint tex);
     void  SetTextureFilters(uint tex, uint filt, uint wrap);
@@ -242,7 +242,7 @@ class MUI_PUBLIC MythRenderOpenGL : protected MythRenderContext, public MythRend
     void GetCachedVBO(GLuint type, const QRect &area);
     void ExpireVBOS(uint max = 0);
     bool ClearTexture(uint tex);
-    uint GetBufferSize(QSize size, uint fmt, uint type);
+    static uint GetBufferSize(QSize size, uint fmt, uint type);
 
     static void StoreBicubicWeights(float x, float *dst);
 

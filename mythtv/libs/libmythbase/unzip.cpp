@@ -276,7 +276,7 @@ QString UnZip::archiveComment() const
 /*!
 	Returns a locale translated error string for a given error code.
 */
-QString UnZip::formatError(UnZip::ErrorCode c) const
+QString UnZip::formatError(UnZip::ErrorCode c)
 {
 	switch (c)
 	{
@@ -1244,7 +1244,7 @@ bool UnzipPrivate::createDirectory(const QString& path)
 /*!
 	\internal Reads an quint32 (4 bytes) from a byte array starting at given offset.
 */
-quint32 UnzipPrivate::getULong(const unsigned char* data, quint32 offset) const
+quint32 UnzipPrivate::getULong(const unsigned char* data, quint32 offset)
 {
 	quint32 res = (quint32) data[offset];
 	res |= (((quint32)data[offset+1]) << 8);
@@ -1257,7 +1257,7 @@ quint32 UnzipPrivate::getULong(const unsigned char* data, quint32 offset) const
 /*!
 	\internal Reads an quint64 (8 bytes) from a byte array starting at given offset.
 */
-quint64 UnzipPrivate::getULLong(const unsigned char* data, quint32 offset) const
+quint64 UnzipPrivate::getULLong(const unsigned char* data, quint32 offset)
 {
 	quint64 res = (quint64) data[offset];
 	res |= (((quint64)data[offset+1]) << 8);
@@ -1274,7 +1274,7 @@ quint64 UnzipPrivate::getULLong(const unsigned char* data, quint32 offset) const
 /*!
 	\internal Reads an quint16 (2 bytes) from a byte array starting at given offset.
 */
-quint16 UnzipPrivate::getUShort(const unsigned char* data, quint32 offset) const
+quint16 UnzipPrivate::getUShort(const unsigned char* data, quint32 offset)
 {
 	return (quint16) data[offset] | (((quint16)data[offset+1]) << 8);
 }
@@ -1282,7 +1282,7 @@ quint16 UnzipPrivate::getUShort(const unsigned char* data, quint32 offset) const
 /*!
 	\internal Return the next byte in the pseudo-random sequence
  */
-int UnzipPrivate::decryptByte(quint32 key2) const
+int UnzipPrivate::decryptByte(quint32 key2)
 {
 	quint16 temp = ((quint16)(key2) & 0xffff) | 2;
 	return ((temp * (temp ^ 1)) >> 8) & 0xff;
@@ -1369,7 +1369,7 @@ void UnzipPrivate::decryptBytes(quint32* keys, char* buffer, qint64 read)
 /*!
 	\internal Converts date and time values from ZIP format to a QDateTime object.
 */
-QDateTime UnzipPrivate::convertDateTime(const unsigned char date[2], const unsigned char time[2]) const
+QDateTime UnzipPrivate::convertDateTime(const unsigned char date[2], const unsigned char time[2])
 {
 	QDateTime dt;
 

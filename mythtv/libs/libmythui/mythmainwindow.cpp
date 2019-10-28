@@ -141,7 +141,7 @@ class MythMainWindowPrivate
     {
     }
 
-    int TranslateKeyNum(QKeyEvent *e);
+    static int TranslateKeyNum(QKeyEvent *e);
 
     float                m_wmult                {1.0F};
     float                m_hmult                {1.0F};
@@ -1899,7 +1899,7 @@ void MythMainWindow::RegisterKey(const QString &context, const QString &action,
 }
 
 QString MythMainWindow::GetKey(const QString &context,
-                               const QString &action) const
+                               const QString &action)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     if (!query.isConnected())

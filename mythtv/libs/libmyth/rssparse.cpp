@@ -282,7 +282,7 @@ public:
 
 private:
 
-    QList<MRSSEntry> CollectChildren(const QDomElement& holder)
+    static QList<MRSSEntry> CollectChildren(const QDomElement& holder)
     {
          QList<MRSSEntry> result;
          QDomNodeList entries = holder.elementsByTagNameNS(Parse::s_MediaRSS,
@@ -359,7 +359,7 @@ private:
         return result;
     }
 
-    ArbitraryLocatedData GetArbitraryLocatedDataFor(const QDomElement& holder)
+    static ArbitraryLocatedData GetArbitraryLocatedDataFor(const QDomElement& holder)
     {
         ArbitraryLocatedData result;
 
@@ -377,7 +377,7 @@ private:
         return result;
     }
 
-    QString GetURL(const QDomElement& element)
+    static QString GetURL(const QDomElement& element)
     {
         QList<QDomNode> elems = GetDirectChildrenNS(element, Parse::s_MediaRSS,
             "player");
@@ -387,7 +387,7 @@ private:
         return elems.at(0).toElement().attribute("url");
     }
 
-    QString GetTitle(const QDomElement& element)
+    static QString GetTitle(const QDomElement& element)
     {
         QList<QDomNode> elems = GetDirectChildrenNS(element, Parse::s_MediaRSS,
             "title");
@@ -399,7 +399,7 @@ private:
         return Parse::UnescapeHTML(telem.text());
     }
 
-    QString GetDescription(const QDomElement& element)
+    static QString GetDescription(const QDomElement& element)
     {
         QList<QDomNode> elems = GetDirectChildrenNS(element, Parse::s_MediaRSS,
             "description");
@@ -411,7 +411,7 @@ private:
         return Parse::UnescapeHTML(telem.text());
     }
 
-    QString GetKeywords(const QDomElement& element)
+    static QString GetKeywords(const QDomElement& element)
     {
         QList<QDomNode> elems = GetDirectChildrenNS(element, Parse::s_MediaRSS,
             "keywords");
@@ -423,7 +423,7 @@ private:
         return telem.text();
     }
 
-    int GetInt(const QDomElement& elem, const QString& attrname)
+    static int GetInt(const QDomElement& elem, const QString& attrname)
     {
         if (elem.hasAttribute(attrname))
         {
@@ -435,7 +435,7 @@ private:
         return int();
     }
 
-    QList<MRSSThumbnail> GetThumbnails(const QDomElement& element)
+    static QList<MRSSThumbnail> GetThumbnails(const QDomElement& element)
     {
         QList<MRSSThumbnail> result;
         QList<QDomNode> thumbs = GetDirectChildrenNS(element, Parse::s_MediaRSS,
@@ -459,7 +459,7 @@ private:
         return result;
     }
 
-    QList<MRSSCredit> GetCredits(const QDomElement& element)
+    static QList<MRSSCredit> GetCredits(const QDomElement& element)
     {
         QList<MRSSCredit> result;
         QList<QDomNode> credits = GetDirectChildrenNS(element, Parse::s_MediaRSS,
@@ -480,7 +480,7 @@ private:
         return result;
     }
 
-    QList<MRSSComment> GetComments(const QDomElement& element)
+    static QList<MRSSComment> GetComments(const QDomElement& element)
     {
         QList<MRSSComment> result;
         QList<QDomNode> commParents = GetDirectChildrenNS(element, Parse::s_MediaRSS,
@@ -542,7 +542,7 @@ private:
         return result;
     }
 
-    QList<MRSSPeerLink> GetPeerLinks(const QDomElement& element)
+    static QList<MRSSPeerLink> GetPeerLinks(const QDomElement& element)
     {
         QList<MRSSPeerLink> result;
         QList<QDomNode> links = GetDirectChildrenNS(element, Parse::s_MediaRSS,
@@ -561,7 +561,7 @@ private:
         return result;
     }
 
-    QList<MRSSScene> GetScenes(const QDomElement& element)
+    static QList<MRSSScene> GetScenes(const QDomElement& element)
     {
         QList<MRSSScene> result;
         QList<QDomNode> scenesNode = GetDirectChildrenNS(element, Parse::s_MediaRSS,
@@ -588,7 +588,7 @@ private:
         return result;
     }
 
-    ArbitraryLocatedData CollectArbitraryLocatedData(const QDomElement& element)
+    static ArbitraryLocatedData CollectArbitraryLocatedData(const QDomElement& element)
     {
 
         QString rating;
@@ -938,7 +938,7 @@ ResultItem* Parse::ParseItem(const QDomElement& item) const
               episode, customhtml));
 }
 
-QString Parse::GetLink(const QDomElement& parent) const
+QString Parse::GetLink(const QDomElement& parent)
 {
     QString result;
     QDomElement link = parent.firstChildElement("link");
@@ -957,7 +957,7 @@ QString Parse::GetLink(const QDomElement& parent) const
     return result;
 }
 
-QString Parse::GetAuthor(const QDomElement& parent) const
+QString Parse::GetAuthor(const QDomElement& parent)
 {
     QString result("");
     QDomNodeList nodes = parent.elementsByTagNameNS(s_ITunes,
@@ -979,7 +979,7 @@ QString Parse::GetAuthor(const QDomElement& parent) const
     return result;
 }
 
-QString Parse::GetCommentsRSS(const QDomElement& parent) const
+QString Parse::GetCommentsRSS(const QDomElement& parent)
 {
     QString result;
     QDomNodeList nodes = parent.elementsByTagNameNS(s_WFW,
@@ -989,7 +989,7 @@ QString Parse::GetCommentsRSS(const QDomElement& parent) const
     return result;
 }
 
-QString Parse::GetCommentsLink(const QDomElement& parent) const
+QString Parse::GetCommentsLink(const QDomElement& parent)
 {
     QString result;
     QDomNodeList nodes = parent.elementsByTagNameNS("", "comments");
@@ -998,7 +998,7 @@ QString Parse::GetCommentsLink(const QDomElement& parent) const
     return result;
 }
 
-QDateTime Parse::GetDCDateTime(const QDomElement& parent) const
+QDateTime Parse::GetDCDateTime(const QDomElement& parent)
 {
     QDomNodeList dates = parent.elementsByTagNameNS(s_DC, "date");
     if (!dates.size())
@@ -1053,7 +1053,7 @@ QDateTime Parse::RFC822TimeToQDateTime(const QString& t) const
     return result;
 }
 
-QDateTime Parse::FromRFC3339(const QString& t) const
+QDateTime Parse::FromRFC3339(const QString& t)
 {
     int hoursShift = 0, minutesShift = 0;
     if (t.size() < 19)
@@ -1087,7 +1087,7 @@ QDateTime Parse::FromRFC3339(const QString& t) const
     return result;
 }
 
-QList<Enclosure> Parse::GetEnclosures(const QDomElement& entry) const
+QList<Enclosure> Parse::GetEnclosures(const QDomElement& entry)
 {
     QList<Enclosure> result;
     QDomNodeList links = entry.elementsByTagName("enclosure");
@@ -1108,7 +1108,7 @@ QList<Enclosure> Parse::GetEnclosures(const QDomElement& entry) const
     return result;
 }
 
-QList<MRSSEntry> Parse::GetMediaRSS(const QDomElement& item) const
+QList<MRSSEntry> Parse::GetMediaRSS(const QDomElement& item)
 {
     return MRSSParser() (item);
 }

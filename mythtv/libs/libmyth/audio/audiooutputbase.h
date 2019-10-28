@@ -49,7 +49,7 @@ class SPDIFEncoder;
 class AudioOutputBase : public AudioOutput, public MThread
 {
  public:
-    const char *quality_string(int q);
+    static const char *quality_string(int q);
     explicit AudioOutputBase(const AudioSettings &settings);
     ~AudioOutputBase() override;
 

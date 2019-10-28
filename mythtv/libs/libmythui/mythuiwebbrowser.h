@@ -30,16 +30,16 @@ class BrowserApi : public QObject
     void setWebView(QWebView *view);
 
   public slots:
-    void Play(void);
-    void Stop(void);
-    void Pause(void);
+    static void Play(void);
+    static void Stop(void);
+    static void Pause(void);
 
-    void SetVolume(int volumn);
+    static void SetVolume(int volumn);
     int GetVolume(void);
 
-    void PlayFile(const QString& filename);
-    void PlayTrack(int trackID);
-    void PlayURL(const QString& url);
+    static void PlayFile(const QString& filename);
+    static void PlayTrack(int trackID);
+    static void PlayURL(const QString& url);
 
     QString GetMetadata(void);
 
@@ -108,11 +108,11 @@ class MythWebView : public QWebView
     void openBusyPopup(const QString &message);
     void closeBusyPopup(void);
 
-    bool isMusicFile(const QString &extension, const QString &mimetype);
-    bool isVideoFile(const QString &extension, const QString &mimetype);
+    static bool isMusicFile(const QString &extension, const QString &mimetype);
+    static bool isVideoFile(const QString &extension, const QString &mimetype);
 
     QString getReplyMimetype(void);
-    QString getExtensionForMimetype(const QString &mimetype);
+    static QString getExtensionForMimetype(const QString &mimetype);
 
     MythWebPage      *m_webpage         {nullptr};
     MythUIWebBrowser *m_parentBrowser   {nullptr};

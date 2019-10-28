@@ -18,7 +18,7 @@ class META_PUBLIC ImageSearchResultsDialog : public MythScreenType
     ~ImageSearchResultsDialog();
 
     bool Create() override; // MythScreenType
-    void cleanCacheDir();
+    static void cleanCacheDir();
     void customEvent(QEvent *event) override; // MythUIType
 
   signals:

@@ -601,8 +601,8 @@ class MPUBLIC ProgramInfo
     // Slow DB sets
     virtual void SaveFilesize(uint64_t fsize); /// TODO Move to RecordingInfo
     void SaveBookmark(uint64_t frame);
-    void SaveDVDBookmark(const QStringList &fields) const;
-    void SaveBDBookmark(const QStringList &fields) const;
+    static void SaveDVDBookmark(const QStringList &fields) ;
+    static void SaveBDBookmark(const QStringList &fields) ;
     void SaveEditing(bool edit);
     void SaveTranscodeStatus(TranscodingStatus trans);
     void SaveWatched(bool watchedFlag);

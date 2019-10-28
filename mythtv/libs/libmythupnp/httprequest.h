@@ -237,7 +237,7 @@ class UPNP_PUBLIC HTTPRequest
         QByteArray      GetResponsePage     ( void ); // Static response e.g. 400, 404, 501
 
         QString         GetRequestProtocol  () const;
-        QString         GetResponseProtocol () const;
+        static QString         GetResponseProtocol () ;
 
         QString         GetRequestType () const;
 
@@ -251,7 +251,7 @@ class UPNP_PUBLIC HTTPRequest
 
         void            SetKeepAliveTimeout ( int nTimeout ) { m_nKeepAliveTimeout = nTimeout; }
 
-        bool            IsUrlProtected      ( const QString &sBaseUrl );
+        static bool            IsUrlProtected      ( const QString &sBaseUrl );
 
         // ------------------------------------------------------------------
 

@@ -104,7 +104,7 @@ public:
     void StoreGUIsettings(void);
 
     double GetPixelAspectRatio(void);
-    void WaitForScreenChange(void) const;
+    static void WaitForScreenChange(void) ;
 
     bool      m_themeloaded {false}; ///< Do we have a palette and pixmap to use?
     QString   m_menuthemepathname;
@@ -378,7 +378,7 @@ double MythUIHelperPrivate::GetPixelAspectRatio(void)
     return m_pixelAspectRatio;
 }
 
-void MythUIHelperPrivate::WaitForScreenChange(void) const
+void MythUIHelperPrivate::WaitForScreenChange(void)
 {
     // Wait for screen signal change, so we later get updated screen resolution
     QEventLoop loop;

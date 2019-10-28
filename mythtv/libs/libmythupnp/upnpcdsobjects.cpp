@@ -1029,7 +1029,7 @@ CDSObject *CDSObject::CreateStorageFolder( const QString& sId, const QString& sT
     return( pObject );
 }
 
-bool CDSObject::FilterContains(const FilterMap &filter, const QString& name) const
+bool CDSObject::FilterContains(const FilterMap &filter, const QString& name)
 {
     // ContentDirectory Service, 2013 UPnP Forum
     // 2.3.18 A_ARG_TYPE_Filter

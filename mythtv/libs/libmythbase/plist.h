@@ -20,14 +20,14 @@ class MBASE_PUBLIC PList
     QVariant        ParseBinaryNode(quint64 num);
     QVariantMap     ParseBinaryDict(quint8 *data);
     QList<QVariant> ParseBinaryArray(quint8 *data);
-    QVariant        ParseBinaryString(quint8 *data);
-    QVariant        ParseBinaryReal(quint8 *data);
-    QVariant        ParseBinaryDate(quint8 *data);
-    QVariant        ParseBinaryData(quint8 *data);
-    QVariant        ParseBinaryUnicode(quint8 *data);
-    QVariant        ParseBinaryUInt(quint8 **data);
-    quint64         GetBinaryCount(quint8 **data);
-    quint64         GetBinaryUInt(quint8 *p, quint64 size);
+    static QVariant ParseBinaryString(quint8 *data);
+    static QVariant ParseBinaryReal(quint8 *data);
+    static QVariant ParseBinaryDate(quint8 *data);
+    static QVariant ParseBinaryData(quint8 *data);
+    static QVariant ParseBinaryUnicode(quint8 *data);
+    static QVariant ParseBinaryUInt(quint8 **data);
+    static quint64  GetBinaryCount(quint8 **data);
+    static quint64  GetBinaryUInt(quint8 *p, quint64 size);
     quint8*         GetBinaryObject(quint64 num);
 
   private:

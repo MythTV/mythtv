@@ -1154,7 +1154,7 @@ QString MythCoreContext::resolveSettingAddress(const QString &name,
  * If keepscope boolean is clear (default), the scopeId will be removed
  */
 QString MythCoreContext::resolveAddress(const QString &host, ResolveType type,
-                                        bool keepscope) const
+                                        bool keepscope)
 {
     QHostAddress addr(host);
 

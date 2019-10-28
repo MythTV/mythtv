@@ -22,11 +22,11 @@ class PROTOSERVER_PUBLIC BaseRequestHandler : public SocketRequestHandler
         { return "BASIC"; }
 
   private:
-    bool HandleQueryLoad(SocketHandler *sock);
-    bool HandleQueryUptime(SocketHandler *sock);
-    bool HandleQueryHostname(SocketHandler *sock);
-    bool HandleQueryMemStats(SocketHandler *sock);
-    bool HandleQueryTimeZone(SocketHandler *sock);
+    static bool HandleQueryLoad(SocketHandler *sock);
+    static bool HandleQueryUptime(SocketHandler *sock);
+    static bool HandleQueryHostname(SocketHandler *sock);
+    static bool HandleQueryMemStats(SocketHandler *sock);
+    static bool HandleQueryTimeZone(SocketHandler *sock);
 };
 
 #endif

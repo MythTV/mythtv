@@ -1003,7 +1003,7 @@ bool UPnpCDSExtension::LoadChildren(const UPnpCDSRequest* /*pRequest*/,
  *
  *      Video/Directory=45/Directory=63/Directory=82
  */
-IDTokenMap UPnpCDSExtension::TokenizeIDString(const QString& Id) const
+IDTokenMap UPnpCDSExtension::TokenizeIDString(const QString& Id)
 {
     IDTokenMap tokenMap;
 
@@ -1039,7 +1039,7 @@ IDTokenMap UPnpCDSExtension::TokenizeIDString(const QString& Id) const
  *
  *      Video/Directory=45/Directory=63/Directory=82
  */
-IDToken UPnpCDSExtension::GetCurrentToken(const QString& Id) const
+IDToken UPnpCDSExtension::GetCurrentToken(const QString& Id)
 {
     QStringList tokens = Id.split('/');
     QString current = tokens.last();

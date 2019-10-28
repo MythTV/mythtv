@@ -242,7 +242,7 @@ class CECAdapterPriv
         m_adapter = nullptr;
     }
 
-    int LogMessage(const cec_log_message &message)
+    static int LogMessage(const cec_log_message &message)
     {
         QString msg(message.message);
         LogLevel_t lvl = LOG_UNKNOWN;
@@ -258,7 +258,7 @@ class CECAdapterPriv
         return 1;
     }
 
-    void LogMessage(const cec_log_message* message)
+    static void LogMessage(const cec_log_message* message)
     {
         QString msg(message->message);
         LogLevel_t lvl = LOG_UNKNOWN;
@@ -1005,7 +1005,7 @@ class CECAdapterPriv
     }
 
 #if CEC_LIB_VERSION_MAJOR >= 2
-    int HandleAlert(const libcec_alert alert, const libcec_parameter &data)
+    static int HandleAlert(const libcec_alert alert, const libcec_parameter &data)
     {
         // These aren't handled yet
         // Note that we *DON'T* want to just show these

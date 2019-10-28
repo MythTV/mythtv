@@ -117,7 +117,7 @@ class MBASE_PUBLIC MythCommandLineParser
    ~MythCommandLineParser();
 
     virtual void LoadArguments(void) {};
-    void PrintVersion(void) const;
+    static void PrintVersion(void) ;
     void PrintHelp(void) const;
     QString GetHelpString(void) const;
     virtual QString GetHelpHeader(void) const { return ""; }

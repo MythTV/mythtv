@@ -902,7 +902,7 @@ QString HTTPRequest::GetRequestProtocol() const
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QString HTTPRequest::GetResponseProtocol() const
+QString HTTPRequest::GetResponseProtocol()
 {
     // RFC 2145
     //

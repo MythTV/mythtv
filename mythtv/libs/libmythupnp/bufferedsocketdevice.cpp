@@ -328,7 +328,7 @@ qlonglong BufferedSocketDevice::Size()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-qlonglong BufferedSocketDevice::At() const
+qlonglong BufferedSocketDevice::At()
 {
     return( 0 );
 }

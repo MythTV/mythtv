@@ -95,10 +95,10 @@ class MythContextPrivate : public QObject
     bool    UPnPconnect(const DeviceLocation *backend, const QString &PIN);
     void    ShowGuiStartup(void);
     bool    checkPort(QString &host, int port, int timeLimit);
-    void    processEvents(void);
+    static void processEvents(void);
     bool    saveSettingsCache(void);
     void    loadSettingsCacheOverride(void);
-    void    clearSettingsCacheOverride(void);
+    static void clearSettingsCacheOverride(void);
 
 
   protected:

@@ -2754,7 +2754,7 @@ QStringList ProgramInfo::QueryDVDBookmark(
     return fields;
 }
 
-void ProgramInfo::SaveDVDBookmark(const QStringList &fields) const
+void ProgramInfo::SaveDVDBookmark(const QStringList &fields)
 {
     QStringList::const_iterator it = fields.begin();
     MSqlQuery query(MSqlQuery::InitCon());
@@ -2816,7 +2816,7 @@ QStringList ProgramInfo::QueryBDBookmark(const QString &serialid) const
     return fields;
 }
 
-void ProgramInfo::SaveBDBookmark(const QStringList &fields) const
+void ProgramInfo::SaveBDBookmark(const QStringList &fields)
 {
     QStringList::const_iterator it = fields.begin();
     MSqlQuery query(MSqlQuery::InitCon());

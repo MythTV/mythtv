@@ -60,7 +60,7 @@ class MPUBLIC SchemaUpgradeWizard : public QObject, public DBUtil
 
   private:
     void              BusyPopup(const QString &message);
-    MythSchemaUpgrade GuiPrompt(const QString &message,
+    static MythSchemaUpgrade GuiPrompt(const QString &message,
                                 bool upgradable, bool expert);
 
     bool              m_autoUpgrade {false};///< If no UI, always upgrade

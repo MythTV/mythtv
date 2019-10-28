@@ -31,7 +31,7 @@ public:
     void SetMaxSamples(unsigned samples) { m_maxSamples = samples; }
     void SetSampleRate(unsigned sample_rate) { m_sample_rate = sample_rate; }
 
-    inline int BitsPerChannel() const { return sizeof(short) * CHAR_BIT; }
+    static inline int BitsPerChannel() { return sizeof(short) * CHAR_BIT; }
     inline int Channels() const { return m_channels; }
 
     inline int64_t Next() const { return m_tcNext; }

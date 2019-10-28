@@ -30,7 +30,7 @@ class META_PUBLIC MetadataResultsDialog : public MythScreenType
   private slots:
     void customEvent(QEvent *event) override; // MythUIType
 
-    void cleanCacheDir();
+    static void cleanCacheDir();
     void sendResult(MythUIButtonListItem* item);
 };
 

@@ -150,7 +150,7 @@ class MPUBLIC AudioOutputSettings
              * Display in human readable form the digital features
              * supported by the output device
              */
-        QString FeaturesToString(DigitalFeature arg);
+        static QString FeaturesToString(DigitalFeature arg);
         QString FeaturesToString(void)
         { return FeaturesToString((DigitalFeature)m_features); };
 

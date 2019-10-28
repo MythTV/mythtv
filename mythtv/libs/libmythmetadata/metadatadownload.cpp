@@ -211,7 +211,7 @@ void MetadataDownload::run()
 
 unsigned int MetadataDownload::findExactMatchCount(MetadataLookupList list,
                                                    const QString &originaltitle,
-                                                   bool withArt) const
+                                                   bool withArt)
 {
     unsigned int exactMatches = 0;
     unsigned int exactMatchesWithArt = 0;
@@ -240,7 +240,7 @@ unsigned int MetadataDownload::findExactMatchCount(MetadataLookupList list,
 }
 
 MetadataLookup* MetadataDownload::findBestMatch(MetadataLookupList list,
-                                            const QString &originaltitle) const
+                                            const QString &originaltitle)
 {
     QStringList titles;
     MetadataLookup *ret = nullptr;
