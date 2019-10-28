@@ -22,7 +22,7 @@ public:
         {(void) action;}
 
 private:
-    void blur_8(unsigned char *ptr, int w, int h, int bpl);
+    static void blur_8(unsigned char *ptr, int w, int h, int bpl);
 
     void generate_cmap(unsigned int color);
     void generate_phongdat(void);

@@ -38,7 +38,7 @@ class DVDThemeSelector : public MythScreenType
 
   private:
     void getThemeList(void);
-    QString loadFile(const QString &filename);
+    static QString loadFile(const QString &filename);
     void loadConfiguration(void);
     void saveConfiguration(void);
 

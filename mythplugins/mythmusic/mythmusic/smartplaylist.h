@@ -224,7 +224,7 @@ class SmartPLResultViewer : public MythScreenType
     void setSQL(const QString& sql);
 
   private slots:
-    void trackVisible(MythUIButtonListItem *item);
+    static void trackVisible(MythUIButtonListItem *item);
     void trackSelected(MythUIButtonListItem *item);
 
   private:

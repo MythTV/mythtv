@@ -49,7 +49,7 @@ public:
     void changeView(void);
     void toggleShowContinuous(void);
     void eventChanged(MythUIButtonListItem *item);
-    void eventVisible(MythUIButtonListItem *item);
+    static void eventVisible(MythUIButtonListItem *item);
     void cameraChanged(void);
     void dateChanged(void);
     void playerExited(void);

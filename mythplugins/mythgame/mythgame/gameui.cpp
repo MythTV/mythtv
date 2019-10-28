@@ -762,7 +762,7 @@ QString GameUI::getFillSql(MythGenericTree *node) const
     return sql;
 }
 
-QString GameUI::getChildLevelString(MythGenericTree *node) const
+QString GameUI::getChildLevelString(MythGenericTree *node)
 {
     unsigned this_level = node->getInt();
     while (node->getInt() != 1)
@@ -772,7 +772,7 @@ QString GameUI::getChildLevelString(MythGenericTree *node) const
     return gi->getLevel(this_level - 1);
 }
 
-QString GameUI::getFilter(MythGenericTree *node) const
+QString GameUI::getFilter(MythGenericTree *node)
 {
     while (node->getInt() != 1)
         node = node->getParent();
@@ -780,7 +780,7 @@ QString GameUI::getFilter(MythGenericTree *node) const
     return gi->getFilter();
 }
 
-int GameUI::getLevelsOnThisBranch(MythGenericTree *node) const
+int GameUI::getLevelsOnThisBranch(MythGenericTree *node)
 {
     while (node->getInt() != 1)
         node = node->getParent();
@@ -789,7 +789,7 @@ int GameUI::getLevelsOnThisBranch(MythGenericTree *node) const
     return gi->getDepth();
 }
 
-bool GameUI::isLeaf(MythGenericTree *node) const
+bool GameUI::isLeaf(MythGenericTree *node)
 {
   return (node->getInt() - 1) == getLevelsOnThisBranch(node);
 }

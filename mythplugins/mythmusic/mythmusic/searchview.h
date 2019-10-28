@@ -35,8 +35,8 @@ class SearchView : public MusicCommon
     void fieldSelected(MythUIButtonListItem *item);
     void criteriaChanged(void);
 
-    void trackClicked(MythUIButtonListItem *item);
-    void trackVisible(MythUIButtonListItem *item);
+    static void trackClicked(MythUIButtonListItem *item);
+    static void trackVisible(MythUIButtonListItem *item);
 
   private:
     bool                 m_playTrack    {false};

@@ -44,8 +44,8 @@ class RSSEditPopup : public MythScreenType
     bool keyPressEvent(QKeyEvent*) override; // MythScreenType
 
   private:
-    QUrl redirectUrl(const QUrl& possibleRedirectUrl,
-                     const QUrl& oldRedirectUrl) const;
+    static QUrl redirectUrl(const QUrl& possibleRedirectUrl,
+                            const QUrl& oldRedirectUrl) ;
 
     RSSSite                *m_site         {nullptr};
     QString                 m_urlText;
@@ -74,7 +74,7 @@ class RSSEditPopup : public MythScreenType
     void ParseAndSave(void);
     void SlotSave(QNetworkReply *reply);
     void DoFileBrowser(void);
-    void SelectImagePopup(const QString &prefix,
+    static void SelectImagePopup(const QString &prefix,
                         QObject &inst,
                         const QString &returnEvent);
     void customEvent(QEvent *levent) override; // MythUIType

@@ -162,7 +162,7 @@ void RSSEditPopup::ParseAndSave(void)
 }
 
 QUrl RSSEditPopup::redirectUrl(const QUrl& possibleRedirectUrl,
-                               const QUrl& oldRedirectUrl) const
+                               const QUrl& oldRedirectUrl)
 {
     QUrl redirectUrl;
     if(!possibleRedirectUrl.isEmpty() && possibleRedirectUrl != oldRedirectUrl)

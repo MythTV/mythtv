@@ -251,16 +251,16 @@ class ZMServer
     bool send(const string &s, const unsigned char *buffer, int dataLen) const;
     void sendError(const string &error);
     void getMonitorList(void);
-    int  getFrame(unsigned char *buffer, int bufferSize, MONITOR *monitor);
-    long long getDiskSpace(const string &filename, long long &total, long long &used);
-    void tokenize(const string &command, vector<string> &tokens);
+    static int  getFrame(unsigned char *buffer, int bufferSize, MONITOR *monitor);
+    static long long getDiskSpace(const string &filename, long long &total, long long &used);
+    static void tokenize(const string &command, vector<string> &tokens);
     void handleHello(void);
-    string runCommand(const string& command);
-    void getMonitorStatus(const string &id, const string &type,
-                          const string &device, const string &host,
-                          const string &channel, const string &function,
-                          string &zmcStatus, string &zmaStatus,
-                          const string &enabled);
+    static string runCommand(const string& command);
+    static void getMonitorStatus(const string &id, const string &type,
+                                 const string &device, const string &host,
+                                 const string &channel, const string &function,
+                                 string &zmcStatus, string &zmaStatus,
+                                 const string &enabled);
     void handleGetServerStatus(void);
     void handleGetMonitorStatus(void);
     void handleGetAlarmStates(void);

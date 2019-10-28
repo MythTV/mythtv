@@ -84,17 +84,17 @@ class NativeArchive
       NativeArchive(void);
       ~NativeArchive(void);
 
-      int doNativeArchive(const QString &jobFile);
-      int doImportArchive(const QString &xmlFile, int chanID);
-      bool copyFile(const QString &source, const QString &destination);
-      int importRecording(const QDomElement &itemNode,
-                          const QString &xmlFile, int chanID);
-      int importVideo(const QDomElement &itemNode, const QString &xmlFile);
-      int exportRecording(QDomElement &itemNode, const QString &saveDirectory);
-      int exportVideo(QDomElement &itemNode, const QString &saveDirectory);
+      static int doNativeArchive(const QString &jobFile);
+      static int doImportArchive(const QString &xmlFile, int chanID);
+      static bool copyFile(const QString &source, const QString &destination);
+      static int importRecording(const QDomElement &itemNode,
+                                 const QString &xmlFile, int chanID);
+      static int importVideo(const QDomElement &itemNode, const QString &xmlFile);
+      static int exportRecording(QDomElement &itemNode, const QString &saveDirectory);
+      static int exportVideo(QDomElement &itemNode, const QString &saveDirectory);
   private:
-      QString findNodeText(const QDomElement &elem, const QString &nodeName);
-      int getFieldList(QStringList &fieldList, const QString &tableName);
+      static QString findNodeText(const QDomElement &elem, const QString &nodeName);
+      static int getFieldList(QStringList &fieldList, const QString &tableName);
 };
 
 NativeArchive::NativeArchive(void)

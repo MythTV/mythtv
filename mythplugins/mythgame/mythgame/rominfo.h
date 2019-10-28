@@ -71,7 +71,7 @@ class RomInfo
 
     ~RomInfo() = default;
 
-    bool FindImage(QString BaseFileName, QString *result);
+    static bool FindImage(QString BaseFileName, QString *result);
 
     int Id() const { return m_id; }
     void setId(const int &lid) { m_id = lid; }
