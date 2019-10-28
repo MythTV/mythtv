@@ -369,7 +369,7 @@ void ImportMusicDialog::addPressed()
         QString fullFilename;
 
         QUrl url(m_musicStorageDir);
-        fullFilename = gCoreContext->GenMythURL(url.host(), 0, saveFilename, "Music");
+        fullFilename = MythCoreContext::GenMythURL(url.host(), 0, saveFilename, "Music");
 
 
         // we need to manually copy the file extension
@@ -1103,7 +1103,7 @@ void ImportCoverArtDialog::updateStatus()
         QString fullFilename;
 
         QUrl url(m_musicStorageDir);
-        fullFilename = gCoreContext->GenMythURL(url.host(), 0, saveFilename, "Music");
+        fullFilename = MythCoreContext::GenMythURL(url.host(), 0, saveFilename, "Music");
         QString dir = fullFilename.section( '/', 0, -2);
 
         QFileInfo fi(m_filelist[m_currentFile]);

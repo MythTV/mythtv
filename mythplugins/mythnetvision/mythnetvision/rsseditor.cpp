@@ -216,7 +216,7 @@ void RSSEditPopup::SlotSave(QNetworkReply* reply)
         if (description.isEmpty())
             description = channel.firstChildElement("description").text();
         if (author.isEmpty())
-            author = parser.GetAuthor(channel);
+            author = Parse::GetAuthor(channel);
         if (author.isEmpty())
             author = channel.firstChildElement("managingEditor").text();
         if (author.isEmpty())

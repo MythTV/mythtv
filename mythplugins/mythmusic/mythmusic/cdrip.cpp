@@ -375,7 +375,7 @@ void CDRipperThread::run(void)
                 encoder.reset();
 
                 // copy track to the BE
-                destFile = gCoreContext->GenMythURL(url.host(), 0, destFile, "Music");
+                destFile = MythCoreContext::GenMythURL(url.host(), 0, destFile, "Music");
 
                 QApplication::postEvent(m_parent, new RipStatusEvent(RipStatusEvent::kCopyStartEvent, 0));
                 RemoteFile::CopyFile(saveDir + outfile, destFile, true);
@@ -909,7 +909,7 @@ bool Ripper::deleteExistingTrack(RipTrack *track)
         int trackID = query.value(0).toInt();
         QString filename = query.value(1).toString();
         QUrl url(m_musicStorageDir);
-        filename = gCoreContext->GenMythURL(url.host(), 0, filename, "Music");
+        filename = MythCoreContext::GenMythURL(url.host(), 0, filename, "Music");
 
         // delete file
         // FIXME: RemoteFile::DeleteFile will only work with files on the master BE

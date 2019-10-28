@@ -231,7 +231,7 @@ static void runScan(void)
 
     LOG(VB_GENERAL, LOG_INFO, "Scanning for music files");
 
-    gMusicData->scanMusic();
+    MusicData::scanMusic();
 }
 
 static void startImport(void)
@@ -876,8 +876,8 @@ static void setupKeys(void)
 
 int mythplugin_init(const char *libversion)
 {
-    if (!gCoreContext->TestPluginVersion("mythmusic", libversion,
-                                    MYTH_BINARY_VERSION))
+    if (!MythCoreContext::TestPluginVersion("mythmusic", libversion,
+                                            MYTH_BINARY_VERSION))
         return -1;
 
     gCoreContext->ActivateSettingsCache(false);

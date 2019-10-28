@@ -971,9 +971,9 @@ int NativeArchive::importRecording(const QDomElement &itemNode,
         }
     }
 
-    QString destFile = gCoreContext->GenMythURL(gCoreContext->GetMasterHostName(),
-                                                gCoreContext->GetMasterServerPort(),
-                                                basename , "Default");
+    QString destFile = MythCoreContext::GenMythURL(gCoreContext->GetMasterHostName(),
+                                                   MythCoreContext::GetMasterServerPort(),
+                                                   basename , "Default");
 
     // copy file to recording directory
     LOG(VB_JOBQUEUE, LOG_INFO, "Copying video file to: " + destFile);
@@ -2359,7 +2359,7 @@ int main(int argc, char **argv)
 
     if (cmdline.toBool("showversion"))
     {
-        cmdline.PrintVersion();
+        MythArchiveHelperCommandLineParser::PrintVersion();
         return GENERIC_EXIT_OK;
     }
 
