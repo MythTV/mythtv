@@ -272,7 +272,7 @@ MythImage *AudioOutputGraph::GetImage(int64_t timecode) const
     if (width <= 0)
         return nullptr;
 
-    const unsigned range = 1U << m_buffer->BitsPerChannel();
+    const unsigned range = 1U << AudioOutputGraph::Buffer::BitsPerChannel();
     const double threshold = 20 * log10(1.0 / range); // 16bit=-96.3296dB => ~6dB/bit
     const int height = (int)-ceil(threshold); // 96
     if (height <= 0)

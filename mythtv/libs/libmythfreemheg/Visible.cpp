@@ -55,7 +55,7 @@ void MHVisible::Initialise(MHParseNode *p, MHEngine *engine)
 
     if (! pOriginalBox)
     {
-        p->Failure("OriginalBoxSize missing");
+        MHParseNode::Failure("OriginalBoxSize missing");
     }
     else
     {

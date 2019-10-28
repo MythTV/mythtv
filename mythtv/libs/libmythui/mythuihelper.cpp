@@ -71,8 +71,8 @@ MythUIHelper *MythUIHelper::getMythUI(void)
 
 void MythUIHelper::destroyMythUI(void)
 {
-    mythui->PruneCacheDir(GetRemoteCacheDir());
-    mythui->PruneCacheDir(GetThumbnailDir());
+    MythUIHelper::PruneCacheDir(GetRemoteCacheDir());
+    MythUIHelper::PruneCacheDir(GetThumbnailDir());
     uiLock.lock();
     delete mythui;
     mythui = nullptr;

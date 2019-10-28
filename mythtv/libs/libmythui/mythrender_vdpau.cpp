@@ -571,7 +571,7 @@ bool MythRenderVDPAU::GetScreenShot(int width, int height, QString filename)
 
         img = img.scaled(width, height, Qt::KeepAspectRatio,
                          Qt::SmoothTransformation);
-        success = window->SaveScreenShot(img, std::move(filename));
+        success = MythMainWindow::SaveScreenShot(img, std::move(filename));
     }
     delete [] buffer;
     return success;

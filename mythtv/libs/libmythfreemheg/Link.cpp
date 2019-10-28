@@ -66,7 +66,7 @@ void MHLink::Initialise(MHParseNode *p, MHEngine *engine)
                     m_EventData.m_Type = MHUnion::U_String;
                     break;
                 default:
-                    pEventData->Failure("Unknown type of event data");
+                    MHParseNode::Failure("Unknown type of event data");
             }
         }
     }
@@ -76,7 +76,7 @@ void MHLink::Initialise(MHParseNode *p, MHEngine *engine)
 
         if (! pEventSource)
         {
-            p->Failure("Missing :EventSource");
+            MHParseNode::Failure("Missing :EventSource");
         }
         else
         {
@@ -87,7 +87,7 @@ void MHLink::Initialise(MHParseNode *p, MHEngine *engine)
 
         if (! pEventType)
         {
-            p->Failure("Missing :EventType");
+            MHParseNode::Failure("Missing :EventType");
         }
         else
         {
@@ -115,7 +115,7 @@ void MHLink::Initialise(MHParseNode *p, MHEngine *engine)
                     m_EventData.m_Type = MHUnion::U_String;
                     break;
                 default:
-                    pEventDataArg->Failure("Unknown type of event data");
+                    MHParseNode::Failure("Unknown type of event data");
             }
         }
     }

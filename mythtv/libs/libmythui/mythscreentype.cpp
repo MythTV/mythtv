@@ -564,6 +564,6 @@ MythPainter* MythScreenType::GetPainter(void)
     if (m_Painter)
         return m_Painter;
     if (m_ScreenStack)
-        return m_ScreenStack->GetPainter();
+        return MythScreenStack::GetPainter();
     return GetMythPainter();
 }

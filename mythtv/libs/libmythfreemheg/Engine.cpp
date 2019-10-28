@@ -231,7 +231,7 @@ MHGroup *MHEngine::ParseProgram(QByteArray &text)
                 pRes = new MHScene;
                 break;
             default:
-                pTree->Failure("Expected Application or Scene"); // throws exception.
+                MHParseNode::Failure("Expected Application or Scene"); // throws exception.
         }
 
         pRes->Initialise(pTree, this); // Convert the parse tree.

@@ -3100,7 +3100,7 @@ void MythMainWindow::EnterStandby(bool manual)
                     ("MasterServerName");
     gCoreContext->GetSettingOnHost
                     ("BackendServerAddr", masterserver);
-    gCoreContext->GetMasterServerPort();
+    MythCoreContext::GetMasterServerPort();
     gCoreContext->GetSetting("WOLbackendCommand", "");
 
     // While in standby do not attempt to wake the backend

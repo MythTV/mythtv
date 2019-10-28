@@ -343,7 +343,7 @@ QList<UnZip::ZipEntry> UnZip::entryList() const
 			z.compressedSize = entry->szComp;
 			z.uncompressedSize = entry->szUncomp;
 			z.crc32 = entry->crc;
-			z.lastModified = d->convertDateTime(entry->modDate, entry->modTime);
+			z.lastModified = UnzipPrivate::convertDateTime(entry->modDate, entry->modTime);
 
 			z.compression = entry->compMethod == 0 ? NoCompression : entry->compMethod == 8 ? Deflated : UnknownCompression;
 			z.type = z.filename.endsWith("/") ? Directory : File;

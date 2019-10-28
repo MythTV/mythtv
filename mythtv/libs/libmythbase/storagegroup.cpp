@@ -844,10 +844,10 @@ QStringList StorageGroup::getGroupDirs(const QString &groupname,
              * value using QString::fromUtf8() to prevent corruption. */
             dirname = QString::fromUtf8(query.value(0)
                                         .toByteArray().constData());
-            groups += gCoreContext->GenMythURL(query.value(1).toString(),
-                                               0,
-                                               dirname,
-                                               groupname);
+            groups += MythCoreContext::GenMythURL(query.value(1).toString(),
+                                                  0,
+                                                  dirname,
+                                                  groupname);
         }
     }
 

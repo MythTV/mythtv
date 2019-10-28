@@ -234,8 +234,8 @@ MetadataLookupList MetadataFactory::SynchronousLookup(MetadataLookup *lookup)
 
 bool MetadataFactory::VideoGrabbersFunctional()
 {
-    return (m_lookupthread->MovieGrabberWorks() &&
-            m_lookupthread->TelevisionGrabberWorks());
+    return (MetadataDownload::MovieGrabberWorks() &&
+            MetadataDownload::TelevisionGrabberWorks());
 }
 
 void MetadataFactory::VideoScan()

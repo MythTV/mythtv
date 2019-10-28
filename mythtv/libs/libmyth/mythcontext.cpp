@@ -970,7 +970,7 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
                     ("MasterServerName");
                 backendIP = gCoreContext->GetSettingOnHost
                     ("BackendServerAddr", masterserver);
-                backendPort = gCoreContext->GetMasterServerPort();
+                backendPort = MythCoreContext::GetMasterServerPort();
                 [[clang::fallthrough]];
             case st_beWOL:
                 if (!beWOLCmd.isEmpty()) {

@@ -1905,7 +1905,7 @@ bool HTTPRequest::BasicAuthentication()
         return false;
 
     MythSessionManager *sessionManager = gCoreContext->GetSessionManager();
-    if (!sessionManager->IsValidUser(sUsername))
+    if (!MythSessionManager::IsValidUser(sUsername))
     {
         LOG(VB_GENERAL, LOG_WARNING, "Authorization attempt with invalid username");
         return false;
@@ -2033,7 +2033,7 @@ bool HTTPRequest::DigestAuthentication()
     }
 
     MythSessionManager *sessionManager = gCoreContext->GetSessionManager();
-    if (!sessionManager->IsValidUser(paramMap["username"]))
+    if (!MythSessionManager::IsValidUser(paramMap["username"]))
     {
         LOG(VB_GENERAL, LOG_WARNING, "Authorization attempt with invalid username");
         return false;
@@ -2047,7 +2047,7 @@ bool HTTPRequest::DigestAuthentication()
 
     // If you're still reading this, well done, not far to go now
 
-    QByteArray a1 = sessionManager->GetPasswordDigest(paramMap["username"]).toLatin1();
+    QByteArray a1 = MythSessionManager::GetPasswordDigest(paramMap["username"]).toLatin1();
     //QByteArray a1 = "bcd911b2ecb15ffbd6d8e6e744d60cf6";
     QString methodDigest = QString("%1:%2").arg(GetRequestType()).arg(paramMap["uri"]);
     QByteArray a2 = QCryptographicHash::hash(methodDigest.toLatin1(),

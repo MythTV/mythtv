@@ -1225,7 +1225,8 @@ static int CECCommandCallback(void *adapter, const cec_command CEC_CALLBACK_PARA
 #if CEC_LIB_VERSION_MAJOR >= 4
 static void CECLogMessageCallback(void *adapter, const cec_log_message* message)
 {
-    ((CECAdapterPriv*)adapter)->LogMessage(message);
+    Q_UNUSED(adapter);
+    CECAdapterPriv::LogMessage(message);
 }
 
 static void CECKeyPressCallback(void *adapter, const cec_keypress* keypress)
@@ -1250,7 +1251,8 @@ static int CECAlertCallback(void *adapter, const libcec_alert alert, const libce
 #if CEC_LIB_VERSION_MAJOR >= 4
 static void CECAlertCallback(void *adapter, const libcec_alert alert, const libcec_parameter data)
 {
-    ((CECAdapterPriv*)adapter)->HandleAlert(alert, data);
+    Q_UNUSED(adapter);
+    CECAdapterPriv::HandleAlert(alert, data);
 }
 #endif
 static void CECSourceActivatedCallback(void *adapter, const cec_logical_address address, const uint8_t activated)

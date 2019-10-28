@@ -89,7 +89,7 @@ void MHGroup::Initialise(MHParseNode *p, MHEngine *engine)
 
     if (pItems == nullptr)
     {
-        p->Failure("Missing :Items block");
+        MHParseNode::Failure("Missing :Items block");
         return;
     }
 
