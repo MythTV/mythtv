@@ -5505,7 +5505,7 @@ int Scheduler::FillRecordingDir(
                 }
             }
 
-            m_expirer->ClearExpireList(expiring);
+            AutoExpire::ClearExpireList(expiring);
         }
         else // passes 1 & 3 (or 1 & 2 if !simulateAutoExpire)
         {

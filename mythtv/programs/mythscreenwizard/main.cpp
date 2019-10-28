@@ -129,7 +129,7 @@ int main(int argc, char **argv)
 
     if (cmdline.toBool("showversion"))
     {
-        cmdline.PrintVersion();
+        MythScreenWizardCommandLineParser::PrintVersion();
         return GENERIC_EXIT_OK;
     }
 

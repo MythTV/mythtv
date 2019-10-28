@@ -1760,7 +1760,7 @@ static bool WasAutomaticStart(void)
 
     // Is backend running?
     //
-    if( gCoreContext->BackendIsRunning() )
+    if( MythCoreContext::BackendIsRunning() )
     {
         QDateTime startupTime = QDateTime();
 
@@ -1890,7 +1890,7 @@ int main(int argc, char **argv)
 
     if (cmdline.toBool("showversion"))
     {
-        cmdline.PrintVersion();
+        MythFrontendCommandLineParser::PrintVersion();
         return GENERIC_EXIT_OK;
     }
 

@@ -1013,10 +1013,10 @@ ThemeUpdateChecker::ThemeUpdateChecker(void) :
         m_mythVersions << version;
     }
 
-    m_infoPackage = gCoreContext->GenMythURL(gCoreContext->GetMasterHostName(),
-                                             gCoreContext->GetMasterServerPort(),
-                                             "remotethemes/themes.zip",
-                                             "Temp");
+    m_infoPackage = MythCoreContext::GenMythURL(gCoreContext->GetMasterHostName(),
+                                                MythCoreContext::GetMasterServerPort(),
+                                                "remotethemes/themes.zip",
+                                                "Temp");
 
     gCoreContext->SaveSetting("ThemeUpdateStatus", "");
 
@@ -1063,12 +1063,12 @@ void ThemeUpdateChecker::checkForUpdate(void)
         {
 
             QString remoteThemeDir =
-                gCoreContext->GenMythURL(gCoreContext->GetMasterHostName(),
-                                         gCoreContext->GetMasterServerPort(),
-                                         QString("remotethemes/%1/%2")
-                                         .arg(*Iversion)
-                                         .arg(GetMythUI()->GetThemeName()),
-                                         "Temp");
+                MythCoreContext::GenMythURL(gCoreContext->GetMasterHostName(),
+                                            MythCoreContext::GetMasterServerPort(),
+                                            QString("remotethemes/%1/%2")
+                                            .arg(*Iversion)
+                                            .arg(GetMythUI()->GetThemeName()),
+                                            "Temp");
 
             QString infoXML = remoteThemeDir;
             infoXML.append("/themeinfo.xml");

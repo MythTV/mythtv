@@ -185,7 +185,7 @@ int main(int argc, char *argv[])
 
     if (cmdline.toBool("showversion"))
     {
-        cmdline.PrintVersion();
+        MythTranscodeCommandLineParser::PrintVersion();
         return GENERIC_EXIT_OK;
     }
 
@@ -751,8 +751,8 @@ static int transUnlink(const QString& filename, ProgramInfo *pginfo)
     {
         int port = gCoreContext->GetBackendServerPort(hostname);
         QString basename = filename.section('/', -1);
-        QString uri = gCoreContext->GenMythURL(hostname, port, basename,
-                                               pginfo->GetStorageGroup());
+        QString uri = MythCoreContext::GenMythURL(hostname, port, basename,
+                                                  pginfo->GetStorageGroup());
 
         LOG(VB_GENERAL, LOG_NOTICE, QString("Requesting delete for file '%1'.")
                 .arg(uri));

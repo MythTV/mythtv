@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
 
     if (cmdline.toBool("showversion"))
     {
-        cmdline.PrintVersion();
+        MythMetadataLookupCommandLineParser::PrintVersion();
         return GENERIC_EXIT_OK;
     }
 
@@ -143,7 +143,7 @@ int main(int argc, char *argv[])
     else if (cmdline.toBool("refresh-all-rules"))
     {
         lookup->HandleAllRecordingRules();
-        lookup->CopyRuleInetrefsToRecordings();
+        LookerUpper::CopyRuleInetrefsToRecordings();
     }
     else if (cmdline.toBool("refresh-all-artwork"))
         lookup->HandleAllArtwork(false);
@@ -152,7 +152,7 @@ int main(int argc, char *argv[])
     else
     {
         // refresh-all is default behavior if no other arguments given
-        lookup->CopyRuleInetrefsToRecordings();
+        LookerUpper::CopyRuleInetrefsToRecordings();
         lookup->HandleAllRecordings(cmdline.toBool("refresh-rules"));
     }
 

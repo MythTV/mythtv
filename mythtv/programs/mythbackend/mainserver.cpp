@@ -2169,7 +2169,8 @@ void MainServer::HandleQueryRecordings(const QString& type, PlaybackSock *pbs)
         if ((proginfo->GetHostname() == gCoreContext->GetHostName()) ||
             (!slave && m_masterBackendOverride))
         {
-            proginfo->SetPathname(gCoreContext->GenMythURL(host,port,proginfo->GetBasename()));
+            proginfo->SetPathname(MythCoreContext::GenMythURL(host,port,
+                                                              proginfo->GetBasename()));
             if (!proginfo->GetFilesize())
             {
                 QString tmpURL = GetPlaybackURL(proginfo);
@@ -2230,9 +2231,9 @@ void MainServer::HandleQueryRecordings(const QString& type, PlaybackSock *pbs)
                 if (!backendPortMap.contains(hostname))
                     backendPortMap[hostname] = gCoreContext->GetBackendServerPort(hostname);
 
-                p->SetPathname(gCoreContext->GenMythURL(hostname,
-                                                        backendPortMap[hostname],
-                                                        p->GetBasename()));
+                p->SetPathname(MythCoreContext::GenMythURL(hostname,
+                                                           backendPortMap[hostname],
+                                                           p->GetBasename()));
             }
         }
 
@@ -2313,7 +2314,8 @@ void MainServer::HandleFillProgramInfo(QStringList &slist, PlaybackSock *pbs)
         if (playbackhost == gCoreContext->GetHostName())
             pginfo.SetPathname(lpath);
         else
-            pginfo.SetPathname(gCoreContext->GenMythURL(host,port,pginfo.GetBasename()));
+            pginfo.SetPathname(MythCoreContext::GenMythURL(host,port,
+                                                           pginfo.GetBasename()));
 
         const QFileInfo info(lpath);
         pginfo.SetFilesize(info.size());
@@ -3996,19 +3998,19 @@ void MainServer::HandleQueryFindFile(QStringList &slist, PlaybackSock *pbs)
             QStringList filteredFiles = files.filter(QRegExp(fi.fileName()));
             for (int x = 0; x < filteredFiles.size(); x++)
             {
-                fileList << gCoreContext->GenMythURL(gCoreContext->GetHostName(),
-                                                     gCoreContext->GetBackendServerPort(),
-                                                     fi.path() + '/' + filteredFiles[x],
-                                                     storageGroup);
+                fileList << MythCoreContext::GenMythURL(gCoreContext->GetHostName(),
+                                                        gCoreContext->GetBackendServerPort(),
+                                                        fi.path() + '/' + filteredFiles[x],
+                                                        storageGroup);
             }
         }
         else
         {
             if (!sgroup.FindFile(filename).isEmpty())
             {
-                fileList << gCoreContext->GenMythURL(gCoreContext->GetHostName(),
-                                                     gCoreContext->GetBackendServerPort(),
-                                                     filename, storageGroup);
+                fileList << MythCoreContext::GenMythURL(gCoreContext->GetHostName(),
+                                                        gCoreContext->GetBackendServerPort(),
+                                                        filename, storageGroup);
             }
         }
     }
@@ -4083,7 +4085,7 @@ void MainServer::HandleQueryFindFile(QStringList &slist, PlaybackSock *pbs)
 
                     for (int x = 0; x < filteredFiles.size(); x++)
                     {
-                        fileList << gCoreContext->GenMythURL(gCoreContext->GetHostName(),
+                        fileList << MythCoreContext::GenMythURL(gCoreContext->GetHostName(),
                                                                 gCoreContext->GetBackendServerPort(),
                                                                 fi.path() + '/' + filteredFiles[x],
                                                                 storageGroup);
@@ -4094,9 +4096,9 @@ void MainServer::HandleQueryFindFile(QStringList &slist, PlaybackSock *pbs)
                     QString fname = sgroup.FindFile(filename);
                     if (!fname.isEmpty())
                     {
-                        fileList << gCoreContext->GenMythURL(gCoreContext->GetMasterHostName(),
-                                                        gCoreContext->GetMasterServerPort(),
-                                                        filename, storageGroup);
+                        fileList << MythCoreContext::GenMythURL(gCoreContext->GetMasterHostName(),
+                                                                MythCoreContext::GetMasterServerPort(),
+                                                                filename, storageGroup);
                     }
                 }
             }
@@ -8176,7 +8178,7 @@ void MainServer::reconnectTimeout(void)
     MythSocket *masterServerSock = new MythSocket(-1, this);
 
     QString server = gCoreContext->GetMasterServerIP();
-    int port = gCoreContext->GetMasterServerPort();
+    int port = MythCoreContext::GetMasterServerPort();
 
     LOG(VB_GENERAL, LOG_NOTICE, LOC +
         QString("Connecting to master server: %1:%2")

@@ -584,7 +584,7 @@ void GalleryThumbView::Start()
 {
     // Detect any running BE scans
     // Expects OK, scanner id, current#, total#
-    QStringList message = m_mgr.ScanQuery();
+    QStringList message = ImageManagerFe::ScanQuery();
     if (message.size() == 4 && message[0] == "OK")
     {
         UpdateScanProgress(message[1], message[2].toInt(), message[3].toInt());
@@ -962,7 +962,7 @@ void GalleryThumbView::SetUiSelection(MythUIButtonListItem *item)
             if (im->m_id != GALLERY_DB_ID)
             {
                 if (im->IsFile() || im->IsDevice())
-                    text << m_mgr.LongDateOf(im);
+                    text << ImageManagerFe::LongDateOf(im);
 
                 if (!im->m_comment.isEmpty())
                     text << im->m_comment;
@@ -1650,7 +1650,7 @@ void GalleryThumbView::ShowSettings()
         // Request rescan
         QString exclusions = gCoreContext->GetSetting("GalleryIgnoreFilter");
         m_view->ClearCache();
-        m_mgr.IgnoreDirs(exclusions);
+        ImageManagerFe::IgnoreDirs(exclusions);
     });
 }
 

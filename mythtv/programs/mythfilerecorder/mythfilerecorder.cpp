@@ -402,7 +402,7 @@ int main(int argc, char *argv[])
 
     if (cmdline.toBool("showversion"))
     {
-        cmdline.PrintVersion();
+        MythFileRecorderCommandLineParser::PrintVersion();
         return GENERIC_EXIT_OK;
     }
 

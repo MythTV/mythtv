@@ -908,7 +908,7 @@ bool Myth::BackupDatabase(void)
 
     LOG(VB_GENERAL, LOG_NOTICE, "Performing API invoked DB Backup.");
 
-    status = dbutil.BackupDB(filename);
+    status = DBUtil::BackupDB(filename);
 
     if (status == kDB_Backup_Completed)
     {
@@ -1014,7 +1014,7 @@ QString Myth::ProfileText()
     QString sProfileText;
 
     HardwareProfile profile;
-    sProfileText = profile.GetHardwareProfile();
+    sProfileText = HardwareProfile::GetHardwareProfile();
 
     return sProfileText;
 }
@@ -1094,10 +1094,7 @@ bool Myth::ManageDigestUser( const QString &sAction,
 bool Myth::ManageUrlProtection( const QString &sServices,
                                 const QString &sAdminPassword )
 {
-
-    MythSessionManager *sessionManager =  gCoreContext->GetSessionManager();
-
-    if (!sessionManager->IsValidUser("admin"))
+    if (!MythSessionManager::IsValidUser("admin"))
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Backend has no '%1' user!")
                                          .arg("admin"));
@@ -1105,7 +1102,7 @@ bool Myth::ManageUrlProtection( const QString &sServices,
     }
 
     if (MythSessionManager::CreateDigest("admin", sAdminPassword) !=
-            sessionManager->GetPasswordDigest("admin"))
+        MythSessionManager::GetPasswordDigest("admin"))
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Incorrect password for user: %1")
                                          .arg("admin"));
