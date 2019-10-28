@@ -89,8 +89,8 @@ class ProgLister : public ScheduleCommon
 
     ProgramInfo *GetCurrentProgram(void) const override; // ScheduleCommon
 
-    bool PowerStringToSQL(
-        const QString &qphrase, QString &output, MSqlBindings &bindings) const;
+    static bool PowerStringToSQL(
+        const QString &qphrase, QString &output, MSqlBindings &bindings) ;
 
   private:
     ProgListType      m_type;

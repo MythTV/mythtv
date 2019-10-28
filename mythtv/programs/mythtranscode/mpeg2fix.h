@@ -124,7 +124,7 @@ class MPEG2fixup
     ~MPEG2fixup();
     int Start();
     void AddRangeList(QStringList rangelist, int type);
-    void ShowRangeMap(frm_dir_map_t *mapPtr, QString msg);
+    static void ShowRangeMap(frm_dir_map_t *mapPtr, QString msg);
     int BuildKeyframeIndex(QString &file, frm_pos_map_t &posMap, frm_pos_map_t &durMap);
 
     void SetAllAudio(bool keep) { m_allaudio = keep; }
@@ -141,7 +141,7 @@ class MPEG2fixup
     MPEG2replex m_rx;
 
   private:
-    int FindMPEG2Header(const uint8_t *buf, int size, uint8_t code);
+    static int FindMPEG2Header(const uint8_t *buf, int size, uint8_t code);
     void InitReplex();
     void FrameInfo(MPEG2frame *f);
     int AddFrame(MPEG2frame *f);
@@ -150,15 +150,15 @@ class MPEG2fixup
     int ProcessVideo(MPEG2frame *vf, mpeg2dec_t *dec);
     void WriteFrame(const QString& filename, MPEG2frame *f);
     void WriteFrame(const QString& filename, AVPacket *pkt);
-    void WriteYUV(const QString& filename, const mpeg2_info_t *info);
-    void WriteData(const QString& filename, uint8_t *data, int size);
+    static void WriteYUV(const QString& filename, const mpeg2_info_t *info);
+    static void WriteData(const QString& filename, uint8_t *data, int size);
     bool BuildFrame(AVPacket *pkt, const QString& fname);
     MPEG2frame *GetPoolFrame(AVPacket *pkt);
     MPEG2frame *GetPoolFrame(MPEG2frame *f);
     int GetFrame(AVPacket *pkt);
     bool FindStart();
-    void SetRepeat(MPEG2frame *vf, int nb_fields, bool topff);
-    void SetRepeat(uint8_t *ptr, int size, int fields, bool topff);
+    static void SetRepeat(MPEG2frame *vf, int nb_fields, bool topff);
+    static void SetRepeat(uint8_t *ptr, int size, int fields, bool topff);
     MPEG2frame *FindFrameNum(int frameNum);
     void RenumberFrames(int start_pos, int delta);
     void StoreSecondary();
@@ -168,10 +168,10 @@ class MPEG2fixup
     int InsertFrame(int frameNum, int64_t deltaPTS,
                      int64_t ptsIncrement, int64_t initPTS);
     void AddSequence(MPEG2frame *frame1, MPEG2frame *frame2);
-    FrameList ReorderDTStoPTS(FrameList *dtsOrder, int pos);
+    static FrameList ReorderDTStoPTS(FrameList *dtsOrder, int pos);
     void InitialPTSFixup(MPEG2frame *curFrame, int64_t &origvPTS,
                          int64_t &PTSdiscrep, int numframes, bool fix);
-    void SetFrameNum(uint8_t *ptr, int num);
+    static void SetFrameNum(uint8_t *ptr, int num);
     static int GetFrameNum(const MPEG2frame *frame)
     {
         return frame->m_mpeg2_pic.temporal_reference;
@@ -208,7 +208,7 @@ class MPEG2fixup
         return m_inputFC->streams[id]->parser;
     }
 
-    void dumpList(FrameList *list);
+    static void dumpList(FrameList *list);
 
     int (*check_abort)()                      {nullptr};
     void (*update_status)(float percent_done) {nullptr};

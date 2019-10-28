@@ -753,7 +753,7 @@ class VideoDialogPrivate
         }
     }
 
-    void DelayVideoListDestruction(const VideoListPtr& videoList)
+    static void DelayVideoListDestruction(const VideoListPtr& videoList)
     {
         m_savedPtr = new VideoListDeathDelay(videoList);
     }

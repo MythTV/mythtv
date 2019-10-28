@@ -14,9 +14,9 @@ class ExitPrompter : public QObject
    ~ExitPrompter() = default;
 
   public slots:
-    void quit(void);
-    void halt(void);
-    void reboot(void);
-    void standby(void);
+    static void quit(void);
+    static void halt(void);
+    static void reboot(void);
+    static void standby(void);
     void handleExit(void);
 };

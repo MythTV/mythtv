@@ -24,7 +24,7 @@ class ProgDetails : public MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
   private:
-    QString getRatings(bool recorded, uint chanid, const QDateTime& startts);
+    static QString getRatings(bool recorded, uint chanid, const QDateTime& startts);
     void updatePage(void);
     void addItem(const QString &title, const QString &value,
                  ProgInfoList::VisibleLevel level);

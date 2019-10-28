@@ -3291,7 +3291,7 @@ void PlaybackBox::ShowActionPopup(const ProgramInfo &pginfo)
     DisplayPopupMenu();
 }
 
-QString PlaybackBox::CreateProgramInfoString(const ProgramInfo &pginfo) const
+QString PlaybackBox::CreateProgramInfoString(const ProgramInfo &pginfo)
 {
     QDateTime recstartts = pginfo.GetRecordingStartTime();
     QDateTime recendts   = pginfo.GetRecordingEndTime();

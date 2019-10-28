@@ -63,9 +63,9 @@ class UPnpCDSMusic : public UPnpCDSExtension
                                     const IDTokenMap& tokens);
 
         // Common code helpers
-        QString BuildWhereClause( QStringList clauses,
+        static QString BuildWhereClause( QStringList clauses,
                                   IDTokenMap tokens );
-        void    BindValues ( MSqlQuery &query,
+        static void    BindValues ( MSqlQuery &query,
                              IDTokenMap tokens );
 };
 

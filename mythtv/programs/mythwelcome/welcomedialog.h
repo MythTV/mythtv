@@ -51,8 +51,8 @@ class WelcomeDialog : public MythScreenType
     void updateStatusMessage(void);
     bool checkConnectionToServer(void);
     void checkAutoStart(void);
-    void runMythFillDatabase(void);
-    void ShowSettings(GroupSetting* screen);
+    static void runMythFillDatabase(void);
+    static void ShowSettings(GroupSetting* screen);
 
     //
     //  GUI stuff

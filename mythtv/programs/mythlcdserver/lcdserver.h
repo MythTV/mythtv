@@ -42,10 +42,10 @@ class LCDServer : public QObject
     void newConnection(QTcpSocket *socket);
     void endConnection(void);
     void readSocket();
-    QStringList parseCommand(QString &command);
+    static QStringList parseCommand(QString &command);
     void parseTokens(const QStringList &tokens, QTcpSocket *socket);
     void shutDown();
-    void sendMessage(QTcpSocket *where, const QString &what);
+    static void sendMessage(QTcpSocket *where, const QString &what);
     void sendConnected(QTcpSocket *socket);
     void switchToTime(QTcpSocket *socket);
     void switchToMusic(const QStringList &tokens, QTcpSocket *socket);

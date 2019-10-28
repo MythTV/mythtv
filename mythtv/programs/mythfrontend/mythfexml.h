@@ -43,11 +43,11 @@ class MythFEXML : public Eventing
 
   private:
 
-    MythFEXMLMethod GetMethod( const QString &sURI );
+    static MythFEXMLMethod GetMethod( const QString &sURI );
 
-    void GetScreenShot    ( HTTPRequest *pRequest );
-    void GetActionListTest( HTTPRequest *pRequest );
-    void GetRemote        ( HTTPRequest *pRequest );
+    static void GetScreenShot    ( HTTPRequest *pRequest );
+    static void GetActionListTest( HTTPRequest *pRequest );
+    static void GetRemote        ( HTTPRequest *pRequest );
 
   public:
     MythFEXML( UPnpDevice *pDevice ,  const QString &sSharePath);

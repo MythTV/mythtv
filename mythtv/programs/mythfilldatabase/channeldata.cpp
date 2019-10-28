@@ -115,7 +115,7 @@ unsigned int ChannelData::promptForChannelUpdates(
     return(chanid);
 }
 
-QString ChannelData::normalizeChannelKey(const QString &chanName) const
+QString ChannelData::normalizeChannelKey(const QString &chanName)
 {
     QString result = chanName;
 
@@ -149,7 +149,7 @@ ChannelList ChannelData::channelList(int sourceId)
 }
 
 ChannelInfo ChannelData::FindMatchingChannel(const ChannelInfo &chanInfo,
-                                             ChannelList existingChannels) const
+                                             ChannelList existingChannels)
 {
     ChannelList::iterator it;
     for (it = existingChannels.begin(); it != existingChannels.end(); ++it)

@@ -522,7 +522,7 @@ void ProgLister::SetViewFromList(const QString& item)
 }
 
 bool ProgLister::PowerStringToSQL(
-    const QString &qphrase, QString &output, MSqlBindings &bindings) const
+    const QString &qphrase, QString &output, MSqlBindings &bindings)
 {
     output.clear();
 

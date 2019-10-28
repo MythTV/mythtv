@@ -21,10 +21,10 @@ class ScheduleCommon : public MythScreenType
         : MythScreenType(parent, name) {};
    ~ScheduleCommon() = default;
 
-    void ShowUpcoming(const QString &title, const QString &seriesid) const;
-    void EditScheduled(ProgramInfo *pginfo);
-    void EditScheduled(RecordingInfo *recinfo);
-    void MakeOverride(RecordingInfo *recinfo);
+    static void ShowUpcoming(const QString &title, const QString &seriesid) ;
+    static void EditScheduled(ProgramInfo *pginfo);
+    static void EditScheduled(RecordingInfo *recinfo);
+    static void MakeOverride(RecordingInfo *recinfo);
 
     void customEvent(QEvent*) override; // MythUIType
     virtual ProgramInfo *GetCurrentProgram(void) const { return nullptr; };
@@ -45,7 +45,7 @@ class ScheduleCommon : public MythScreenType
     virtual void EditCustom(void);
 
   private:
-    bool IsFindApplicable(const RecordingInfo &recInfo) const;
+    static bool IsFindApplicable(const RecordingInfo &recInfo) ;
 
 };
 

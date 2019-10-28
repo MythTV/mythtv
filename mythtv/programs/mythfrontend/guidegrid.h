@@ -268,7 +268,7 @@ private:
     bool    m_embedVideo                  {false};
     QTimer *m_previewVideoRefreshTimer    {nullptr}; // audited ref #5318
     void    EmbedTVWindow(void);
-    void    HideTVWindow(void);
+    static void    HideTVWindow(void);
     QRect   m_videoRect;
 
     QString m_channelOrdering;

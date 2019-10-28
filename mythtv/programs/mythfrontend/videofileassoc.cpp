@@ -235,7 +235,7 @@ class FileAssocDialogPrivate
         return ret;
     }
 
-    FileAssociationWrap *GetCurrentFA(MythUIButtonList *buttonList)
+    static FileAssociationWrap *GetCurrentFA(MythUIButtonList *buttonList)
     {
         MythUIButtonListItem *item = buttonList->GetItemCurrent();
         if (item)

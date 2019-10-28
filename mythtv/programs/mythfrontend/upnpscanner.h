@@ -88,12 +88,12 @@ class UPNPScanner : public QObject
 
     // xml parsing of device description
     bool ParseDescription(const QUrl &url, QNetworkReply *reply);
-    void ParseDevice(QDomElement &element, QString &controlURL,
-                     QString &eventURL, QString &friendlyName);
-    void ParseServiceList(QDomElement &element, QString &controlURL,
-                          QString &eventURL);
-    void ParseService(QDomElement &element, QString &controlURL,
-                      QString &eventURL);
+    static void ParseDevice(QDomElement &element, QString &controlURL,
+                            QString &eventURL, QString &friendlyName);
+    static void ParseServiceList(QDomElement &element, QString &controlURL,
+                                 QString &eventURL);
+    static void ParseService(QDomElement &element, QString &controlURL,
+                             QString &eventURL);
 
     // convert MediaServerItems to video metadata
     void GetServerContent(QString &usn, MediaServerItem *content,

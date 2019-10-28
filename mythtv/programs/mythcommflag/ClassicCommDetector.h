@@ -97,7 +97,7 @@ class ClassicCommDetector : public CommDetectorBase
                                int64_t start_frame);
         frm_dir_map_t Combine2Maps(
             const frm_dir_map_t &a, const frm_dir_map_t &b) const;
-        void UpdateFrameBlock(FrameBlock *fbp, FrameInfoEntry finfo,
+        static void UpdateFrameBlock(FrameBlock *fbp, FrameInfoEntry finfo,
                               int format, int aspect);
         void BuildAllMethodsCommList(void);
         void BuildBlankFrameCommList(void);
@@ -106,8 +106,8 @@ class ClassicCommDetector : public CommDetectorBase
         void MergeBlankCommList(void);
         bool FrameIsInBreakMap(uint64_t f, const frm_dir_map_t &breakMap) const;
         void DumpMap(frm_dir_map_t &map);
-        void CondenseMarkMap(show_map_t &map, int spacing, int length);
-        void ConvertShowMapToCommMap(
+        static void CondenseMarkMap(show_map_t &map, int spacing, int length);
+        static void ConvertShowMapToCommMap(
             frm_dir_map_t &out, const show_map_t &in);
         void CleanupFrameInfo(void);
         void GetLogoCommBreakMap(show_map_t &map);

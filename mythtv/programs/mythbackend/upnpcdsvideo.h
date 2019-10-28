@@ -64,13 +64,13 @@ class UPnpCDSVideo : public UPnpCDSExtension
                          const IDTokenMap& tokens );
 
 
-        void PopulateArtworkURIS( CDSObject *pItem, int nVidID,
+        static void PopulateArtworkURIS( CDSObject *pItem, int nVidID,
                                   const QUrl &URIBase );
 
         // Common code helpers
-        QString BuildWhereClause( QStringList clauses,
+        static QString BuildWhereClause( QStringList clauses,
                                   IDTokenMap tokens );
-        void    BindValues ( MSqlQuery &query,
+        static void    BindValues ( MSqlQuery &query,
                              IDTokenMap tokens );
 
         QStringMap             m_mapBackendIp;

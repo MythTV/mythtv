@@ -1624,7 +1624,7 @@ void NetworkControl::customEvent(QEvent *e)
     }
 }
 
-QString NetworkControl::listSchedule(const QString& chanID) const
+QString NetworkControl::listSchedule(const QString& chanID)
 {
     QString result("");
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1729,7 +1729,7 @@ QString NetworkControl::listRecordings(const QString& chanid, const QString& sta
     return result;
 }
 
-QString NetworkControl::listChannels(const uint start, const uint limit) const
+QString NetworkControl::listChannels(const uint start, const uint limit)
 {
     QString result;
     MSqlQuery query(MSqlQuery::InitCon());

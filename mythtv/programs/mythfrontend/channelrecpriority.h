@@ -46,7 +46,7 @@ class ChannelRecPriority : public MythScreenType
     void ShowMenu(void) override; // MythScreenType
     void upcoming(void);
     void changeRecPriority(int howMuch);
-    void applyChannelRecPriorityChange(const QString&, const QString&);
+    static void applyChannelRecPriorityChange(const QString&, const QString&);
 
     void saveRecPriority(void);
 
