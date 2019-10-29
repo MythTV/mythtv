@@ -170,52 +170,55 @@ ChannelScanSM::ChannelScanSM(ScanMonitor *_scan_monitor,
         LOG(VB_CHANSCAN, LOG_INFO, LOC + "Connecting up DTVSignalMonitor");
         ScanStreamData *data = new ScanStreamData();
 
-#if FSAT_IN_DB
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare(
-                "SELECT dvb_nit_id, bouquet_id, region_id "
-                "FROM videosource "
-                "WHERE videosource.sourceid = :SOURCEID");
-        query.bindValue(":SOURCEID", _sourceID);
-        if (!query.exec() || !query.isActive())
+        if (gCoreContext->GetNumSetting("DBSchemaVer") > 1350)
         {
-            MythDB::DBError("ChannelScanSM", query);
-        }
-        else if (query.next())
-        {
-            int nitid = query.value(0).toInt();
-            data->SetRealNetworkID(nitid);
-            LOG(VB_CHANSCAN, LOG_INFO, LOC +
-                QString("Setting NIT-ID to %1").arg(nitid));
+            MSqlQuery query(MSqlQuery::InitCon());
+            query.prepare(
+                    "SELECT dvb_nit_id, bouquet_id, region_id "
+                    "FROM videosource "
+                    "WHERE videosource.sourceid = :SOURCEID");
+            query.bindValue(":SOURCEID", _sourceID);
+            if (!query.exec() || !query.isActive())
+            {
+                MythDB::DBError("ChannelScanSM", query);
+            }
+            else if (query.next())
+            {
+                int nitid = query.value(0).toInt();
+                data->SetRealNetworkID(nitid);
+                LOG(VB_CHANSCAN, LOG_INFO, LOC +
+                    QString("Setting NIT-ID to %1").arg(nitid));
 
-            m_bouquet_id = query.value(1).toInt();
-            m_region_id = query.value(2).toInt();
+                m_bouquet_id = query.value(1).toInt();
+                m_region_id = query.value(2).toInt();
+            }
         }
-#else
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare(
-                "SELECT dvb_nit_id "
-                "FROM videosource "
-                "WHERE videosource.sourceid = :SOURCEID");
-        query.bindValue(":SOURCEID", _sourceID);
-        if (!query.exec() || !query.isActive())
+        else
         {
-            MythDB::DBError("ChannelScanSM", query);
-        }
-        else if (query.next())
-        {
-            int nitid = query.value(0).toInt();
-            data->SetRealNetworkID(nitid);
-            LOG(VB_CHANSCAN, LOG_INFO, LOC +
-                QString("Setting NIT-ID to %1").arg(nitid));
+            MSqlQuery query(MSqlQuery::InitCon());
+            query.prepare(
+                    "SELECT dvb_nit_id "
+                    "FROM videosource "
+                    "WHERE videosource.sourceid = :SOURCEID");
+            query.bindValue(":SOURCEID", _sourceID);
+            if (!query.exec() || !query.isActive())
+            {
+                MythDB::DBError("ChannelScanSM", query);
+            }
+            else if (query.next())
+            {
+                int nitid = query.value(0).toInt();
+                data->SetRealNetworkID(nitid);
+                LOG(VB_CHANSCAN, LOG_INFO, LOC +
+                    QString("Setting NIT-ID to %1").arg(nitid));
 
-            // Bouquet and region default or from the environment until it is in table videosource
-            QString bouquet_id = QString(getenv("FSAT_BOUQUET_ID"));
-            m_bouquet_id = bouquet_id.isEmpty() ? kBouquetID : bouquet_id.toInt();
-            QString region_id = QString(getenv("FSAT_REGION_ID"));
-            m_region_id = region_id.isEmpty() ? kRegionID : region_id.toInt();
+                // Bouquet and region default or from the environment
+                QString bouquet_id = QString(getenv("FSAT_BOUQUET_ID"));
+                m_bouquet_id = bouquet_id.isEmpty() ? kBouquetID : bouquet_id.toInt();
+                QString region_id = QString(getenv("FSAT_REGION_ID"));
+                m_region_id = region_id.isEmpty() ? kRegionID : region_id.toInt();
+            }
         }
-#endif
         LOG(VB_CHANSCAN, LOG_INFO, LOC +
             QString("Freesat/BSkyB bouquet_id:%1 region_id:%2")
                 .arg(m_bouquet_id).arg(m_region_id));
