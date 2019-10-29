@@ -29,13 +29,13 @@ class TestMPEGTables: public QObject
     Q_OBJECT
 
   private slots:
-    void pat_test(void);
+    static void pat_test(void);
 
-    void dvbdate(void);
+    static void dvbdate(void);
 
-    void tdt_test(void);
+    static void tdt_test(void);
 
-    void ContentIdentifierDescriptor_test(void);
+    static void ContentIdentifierDescriptor_test(void);
 
     /** test for coverity 1047220: Incorrect deallocator used:
      * Calling "PSIPTable::~PSIPTable()" frees "(&psip)->_fullbuffer"
@@ -44,34 +44,34 @@ class TestMPEGTables: public QObject
      * _allocSize should be 0 thus we are not freeing something we didn't
      * allocate in the first place (false positive)
      */
-    void clone_test(void);
+    static void clone_test(void);
 
     /** test PrivateDataSpecifierDescriptor */
-    void PrivateDataSpecifierDescriptor_test (void);
+    static void PrivateDataSpecifierDescriptor_test (void);
 
     /** test for https://code.mythtv.org/trac/ticket/12091
      * UPC Cablecom switched from standard DVB key/value set to
      * custom descriptors
      */
-    void PrivateUPCCablecomEpisodetitleDescriptor_test (void);
+    static void PrivateUPCCablecomEpisodetitleDescriptor_test (void);
 
     /** test for DVB-EIT style cast
      */
-    void ItemList_test (void);
+    static void ItemList_test (void);
 
     /** test decoding chinese multi-byte strings, #12507
      */
-    void TestUCS2 (void);
+    static void TestUCS2 (void);
 
     /** test ParentalRatingDescriptor, #12553
      */
-    void ParentalRatingDescriptor_test (void);
+    static void ParentalRatingDescriptor_test (void);
 
     /** test items from ExtendedEventDescriptor
      */
-    void ExtendedEventDescriptor_test (void);
+    static void ExtendedEventDescriptor_test (void);
 
     /** test US channel names for trailing \0 characters, #12612
       */
-    void OTAChannelName_test (void);
+    static void OTAChannelName_test (void);
 };

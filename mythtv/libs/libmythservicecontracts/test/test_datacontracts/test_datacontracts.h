@@ -27,9 +27,9 @@ class TestDataContracts: public QObject
 private slots:
     void initTestCase(void);
     void cleanupTestCase(void);
-    void test_channelinfo(void);
-    void test_program(void);
-    void test_programlist(void);
-    void test_recrule(void);
-    void test_recordinginfo(void);
+    static void test_channelinfo(void);
+    static void test_program(void);
+    static void test_programlist(void);
+    static void test_recrule(void);
+    static void test_recordinginfo(void);
 };
