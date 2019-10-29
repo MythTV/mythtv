@@ -1080,11 +1080,9 @@ bool Myth::ManageDigestUser( const QString &sAction,
         return false;
     }
 
-    return gCoreContext->GetSessionManager()->ManageDigestUser(sessionAction,
-                                                               sUserName,
-                                                               sPassword,
-                                                               sNewPassword,
-                                                               sAdminPassword);
+    return MythSessionManager::ManageDigestUser(sessionAction, sUserName,
+                                                sPassword, sNewPassword,
+                                                sAdminPassword);
 }
 
 /////////////////////////////////////////////////////////////////////////////

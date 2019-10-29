@@ -984,10 +984,10 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
                             if (m_inMenu)
                             {
                                 m_autoselectsubtitle = true;
-                                GetMythUI()->RestoreScreensaver();
+                                MythUIHelper::RestoreScreensaver();
                             }
                             else
-                                GetMythUI()->DisableScreensaver();
+                                MythUIHelper::DisableScreensaver();
                         }
 
                         // if we are in a looping menu, we don't want to reset the

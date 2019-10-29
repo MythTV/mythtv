@@ -172,12 +172,12 @@ void NetBase::ShowWebVideo()
 void NetBase::RunCmdWithoutScreensaver(const QString &cmd)
 {
     GetMythMainWindow()->PauseIdleTimer(true);
-    GetMythUI()->DisableScreensaver();
+    MythUIHelper::DisableScreensaver();
     GetMythMainWindow()->AllowInput(false);
     myth_system(cmd, kMSDontDisableDrawing);
     GetMythMainWindow()->AllowInput(true);
     GetMythMainWindow()->PauseIdleTimer(false);
-    GetMythUI()->RestoreScreensaver();
+    MythUIHelper::RestoreScreensaver();
 }
 
 void NetBase::SlotDeleteVideo()

@@ -2912,7 +2912,7 @@ bool MythUIButtonList::ParseElement(
             else
             {
                 QString context = element.attribute("context", "");
-                QString keylist = GetMythMainWindow()->GetKey(context, action);
+                QString keylist = MythMainWindow::GetKey(context, action);
                 QStringList keys = keylist.split(',', QString::SkipEmptyParts);
                 if (!keys.empty())
                     m_actionRemap[trigger] = keys[0];

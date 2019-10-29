@@ -577,11 +577,11 @@ void TV::InitKeys(void)
     // Check if this is a new frontend - if PAUSE returns
     // "?" then frontend is new, never used before, so we will not assign
     // any default bookmark keys
-    QString testKey = GetMythMainWindow()->GetKey("TV Playback", ACTION_PAUSE);
+    QString testKey = MythMainWindow::GetKey("TV Playback", ACTION_PAUSE);
     if (testKey != "?")
     {
         int alternate = gCoreContext->GetNumSetting("AltClearSavedPosition",0);
-        QString selectKeys = GetMythMainWindow()->GetKey("Global", ACTION_SELECT);
+        QString selectKeys = MythMainWindow::GetKey("Global", ACTION_SELECT);
         if (selectKeys != "?")
         {
             if (alternate)
@@ -2503,7 +2503,7 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
              TRANSITION(kState_None, kState_WatchingLiveTV))
     {
         if (!ctx->IsPIP())
-            GetMythUI()->DisableScreensaver();
+            MythUIHelper::DisableScreensaver();
         bool switchMode = gCoreContext->GetBoolSetting("UseVideoModes", false);
         // m_playerBounds is not applicable when switching modes so
         // skip this logic in that case.
@@ -4630,7 +4630,7 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
         }
         else
         {
-            GetMythMainWindow()->ScreenShot();
+            MythMainWindow::ScreenShot();
         }
         ctx->UnlockDeletePlayer(__FILE__, __LINE__);
     }
@@ -6371,7 +6371,7 @@ void TV::DoPlay(PlayerContext *ctx)
     DoPlayerSeek(ctx, time);
     UpdateOSDSeekMessage(ctx, ctx->GetPlayMessage(), kOSDTimeout_Med);
 
-    GetMythUI()->DisableScreensaver();
+    MythUIHelper::DisableScreensaver();
 
     SetSpeedChangeTimer(0, __LINE__);
     gCoreContext->emitTVPlaybackPlaying();
@@ -6436,7 +6436,7 @@ void TV::DoTogglePauseFinish(PlayerContext *ctx, float time, bool showOSD)
         DoPlayerSeek(ctx, time);
         if (showOSD)
             UpdateOSDSeekMessage(ctx, ctx->GetPlayMessage(), kOSDTimeout_Short);
-        GetMythUI()->DisableScreensaver();
+        MythUIHelper::DisableScreensaver();
     }
 
     SetSpeedChangeTimer(0, __LINE__);
@@ -7655,7 +7655,7 @@ void TV::ChangeChannel(PlayerContext *ctx, ChannelChangeDirection direction)
     if (ContextIsPaused(ctx, __FILE__, __LINE__))
     {
         HideOSDWindow(ctx, "osd_status");
-        GetMythUI()->DisableScreensaver();
+        MythUIHelper::DisableScreensaver();
     }
 
     // Save the current channel if this is the first time
@@ -7824,7 +7824,7 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
     if (ContextIsPaused(ctx, __FILE__, __LINE__))
     {
         HideOSDWindow(ctx, "osd_status");
-        GetMythUI()->DisableScreensaver();
+        MythUIHelper::DisableScreensaver();
     }
 
     // Save the current channel if this is the first time
@@ -9483,7 +9483,7 @@ void TV::customEvent(QEvent *e)
         }
         else
         {
-            GetMythMainWindow()->ScreenShot(width, height, filename);
+            MythMainWindow::ScreenShot(width, height, filename);
         }
         ReturnPlayerLock(mctx);
     }
@@ -13274,7 +13274,7 @@ bool TV::IsSameProgram(int player_idx, const ProgramInfo *rcinfo) const
 void TV::RestoreScreenSaver(const PlayerContext *ctx)
 {
     if (ctx == GetPlayer(ctx, 0))
-        GetMythUI()->RestoreScreensaver();
+        MythUIHelper::RestoreScreensaver();
 }
 
 bool TV::ContextIsPaused(PlayerContext *ctx, const char *file, int location)

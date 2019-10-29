@@ -664,7 +664,7 @@ class CECAdapterPriv
         if (0 == action)
             return 1;
 
-        GetMythUI()->ResetScreensaver();
+        MythUIHelper::ResetScreensaver();
         QKeyEvent* ke = new QKeyEvent(QEvent::KeyPress, action, modifier);
         qApp->postEvent(GetMythMainWindow(), (QEvent*)ke);
 
@@ -999,7 +999,7 @@ class CECAdapterPriv
         if (0 == action)
             return;
 
-        GetMythUI()->ResetScreensaver();
+        MythUIHelper::ResetScreensaver();
         QKeyEvent* ke = new QKeyEvent(QEvent::KeyPress, action, Qt::NoModifier);
         qApp->postEvent(GetMythMainWindow(), (QEvent*)ke);
     }
@@ -1080,7 +1080,7 @@ class CECAdapterPriv
             .arg(activated ? "Activated" : "Deactivated"));
 
         if (activated)
-            GetMythUI()->ResetScreensaver();
+            MythUIHelper::ResetScreensaver();
     }
 #endif
 

@@ -64,7 +64,7 @@ void VisualBase::drawWarning(QPainter *p, const QColor &back, const QSize &size,
 {
     p->fillRect(0, 0, size.width(), size.height(), back);
     p->setPen(Qt::white);
-    QFont font = GetMythUI()->GetMediumFont();
+    QFont font = MythUIHelper::GetMediumFont();
     font.setPointSizeF(fontSize * (size.width() / 800.0));
     p->setFont(font);
 

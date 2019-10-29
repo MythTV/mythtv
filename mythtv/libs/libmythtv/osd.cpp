@@ -837,7 +837,7 @@ QRegion OSD::Draw(MythPainter* painter, QPaintDevice *device, QSize size,
     QList<MythScreenType*>::iterator it2 = notifications.begin();
     while (it2 != notifications.end())
     {
-        if (!GetNotificationCenter()->ScreenCreated(*it2))
+        if (!MythNotificationCenter::ScreenCreated(*it2))
         {
             if (!m_UIScaleOverride)
             {

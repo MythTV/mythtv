@@ -1020,7 +1020,7 @@ void MythMainWindow::Init(const QString& forcedpainter, bool mayReInit)
     Qt::WindowFlags flags = Qt::Window;
 
     bool inwindow = GetMythDB()->GetBoolSetting("RunFrontendInWindow", false);
-    bool fullscreen = d->m_does_fill_screen && !GetMythUI()->IsGeometryOverridden();
+    bool fullscreen = d->m_does_fill_screen && !MythUIHelper::IsGeometryOverridden();
 
     // On Compiz/Unit, when the window is fullscreen and frameless changing
     // screen position ends up stuck. Adding a border temporarily prevents this
@@ -1415,7 +1415,7 @@ void MythMainWindow::ReinitDone(void)
 void MythMainWindow::Show(void)
 {
     bool inwindow = GetMythDB()->GetBoolSetting("RunFrontendInWindow", false);
-    bool fullscreen = d->m_does_fill_screen && !GetMythUI()->IsGeometryOverridden();
+    bool fullscreen = d->m_does_fill_screen && !MythUIHelper::IsGeometryOverridden();
 
     if (fullscreen && !inwindow && !d->m_firstinit)
     {
@@ -2574,7 +2574,7 @@ void MythMainWindow::customEvent(QEvent *ce)
         }
         else
         {
-            GetMythUI()->ResetScreensaver();
+            MythUIHelper::ResetScreensaver();
             if (GetMythUI()->GetScreenIsAsleep())
                 return;
 
@@ -2598,7 +2598,7 @@ void MythMainWindow::customEvent(QEvent *ce)
 
         if (keycode)
         {
-            GetMythUI()->ResetScreensaver();
+            MythUIHelper::ResetScreensaver();
             if (GetMythUI()->GetScreenIsAsleep())
                 return;
 

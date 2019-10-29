@@ -445,7 +445,7 @@ bool MythScreenType::keyPressEvent(QKeyEvent *event)
         else if (action.startsWith("SYSEVENT"))
             gCoreContext->SendSystemEvent(QString("KEY_%1").arg(action.mid(8)));
         else if (action == ACTION_SCREENSHOT)
-            GetMythMainWindow()->ScreenShot();
+            MythMainWindow::ScreenShot();
         else if (action == ACTION_TVPOWERON)
             GetMythMainWindow()->HandleTVPower(true);
         else if (action == ACTION_TVPOWEROFF)

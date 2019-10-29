@@ -502,7 +502,7 @@ QString NetworkControl::processKey(NetworkCommand *nc)
             if (keyTextMap.contains(keyCode))
                 keyText = keyTextMap[keyCode];
 
-            GetMythUI()->ResetScreensaver();
+            MythUIHelper::ResetScreensaver();
 
             event = new QKeyEvent(QEvent::KeyPress, keyCode, Qt::NoModifier,
                                   keyText);
@@ -546,7 +546,7 @@ QString NetworkControl::processKey(NetworkCommand *nc)
                     modifiers = Qt::ShiftModifier;
             }
 
-            GetMythUI()->ResetScreensaver();
+            MythUIHelper::ResetScreensaver();
 
             event = new QKeyEvent(QEvent::KeyPress, keyCode, modifiers,
                                   nc->getArg(curToken));
@@ -631,7 +631,7 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
 
             timer.start();
             while ((timer.elapsed() < 10000) &&
-                   (!GetMythUI()->IsTopScreenInitialized()))
+                   (!MythUIHelper::IsTopScreenInitialized()))
                 std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
 

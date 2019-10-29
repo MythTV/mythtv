@@ -166,7 +166,7 @@ bool Frontend::PlayRecording(int RecordedId, int ChanId,
 
         timer.start();
         while ((timer.elapsed() < 10000) &&
-               (!GetMythUI()->IsTopScreenInitialized()))
+               (!MythUIHelper::IsTopScreenInitialized()))
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
@@ -441,7 +441,7 @@ bool Frontend::SendKey(const QString &sKey)
 
     if (ret)
     {
-        GetMythUI()->ResetScreensaver();
+        MythUIHelper::ResetScreensaver();
 
         event = new QKeyEvent(QEvent::KeyPress, keyCode, Qt::NoModifier,
                               keyText);
