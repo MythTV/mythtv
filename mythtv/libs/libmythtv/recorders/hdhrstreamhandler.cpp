@@ -325,7 +325,15 @@ bool HDHRStreamHandler::Open(void)
                 m_tuner_types.emplace_back(DTVTunerType::kTunerTypeOCUR);
             }
         }
-        else if (QString(model).toLower().contains("dvb"))
+        else if (QString(model).toLower().endsWith("dvbt"))
+        {
+            m_tuner_types.emplace_back(DTVTunerType::kTunerTypeDVBT);
+        }
+        else if (QString(model).toLower().endsWith("dvbc"))
+        {
+            m_tuner_types.emplace_back(DTVTunerType::kTunerTypeDVBC);
+        }
+        else if (QString(model).toLower().endsWith("dvbtc"))
         {
             m_tuner_types.emplace_back(DTVTunerType::kTunerTypeDVBT);
             m_tuner_types.emplace_back(DTVTunerType::kTunerTypeDVBC);

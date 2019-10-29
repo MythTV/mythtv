@@ -411,6 +411,7 @@ class MTV_PUBLIC CardUtil
 
     // HDHomeRun info
     static bool         HDHRdoesDVB(const QString &device);
+    static bool         HDHRdoesDVBC(const QString &device);
     static QString      GetHDHRdesc(const QString &device);
 
     // VBox info
