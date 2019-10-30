@@ -133,7 +133,6 @@ static int quickdnr(VideoFilter *f, VideoFrame *frame, int field)
     ThisFilter *tf = (ThisFilter *)f;
     int thr1[3], thr2[3], height[3];
     uint8_t *avg[3], *buf[3];
-    int i, y;
 
     TF_VARS;
 
@@ -144,10 +143,10 @@ static int quickdnr(VideoFilter *f, VideoFrame *frame, int field)
 
     init_vars(tf, frame, thr1, thr2, height, avg, buf);
 
-    for (i = 0; i < 3; i++)
+    for (int i = 0; i < 3; i++)
     {
         int sz = height[i] * frame->pitches[i];
-        for (y = 0; y < sz; y++)
+        for (int y = 0; y < sz; y++)
         {
             if (abs(avg[i][y] - buf[i][y]) < thr1[i])
                 buf[i][y] = avg[i][y] = (avg[i][y] + buf[i][y]) >> 1;
@@ -167,7 +166,6 @@ static int quickdnr2(VideoFilter *f, VideoFrame *frame, int field)
     ThisFilter *tf = (ThisFilter *)f;
     int thr1[3], thr2[3], height[3];
     uint8_t *avg[3], *buf[3];
-    int i, y;
 
     TF_VARS;
 
@@ -178,10 +176,10 @@ static int quickdnr2(VideoFilter *f, VideoFrame *frame, int field)
 
     init_vars(tf, frame, thr1, thr2, height, avg, buf);
 
-    for (i = 0; i < 3; i++)
+    for (int i = 0; i < 3; i++)
     {
         int sz = height[i] * frame->pitches[i];
-        for (y = 0; y < sz; y++)
+        for (int y = 0; y < sz; y++)
         {
             int t = abs(avg[i][y] - buf[i][y]);
             if (t < thr1[i])
@@ -211,7 +209,6 @@ static int quickdnrMMX(VideoFilter *f, VideoFrame *frame, int field)
     const uint64_t sign_convert = 0x8080808080808080LL;
     int thr1[3], thr2[3], height[3];
     uint64_t *avg[3], *buf[3];
-    int i, y;
 
     TF_VARS;
 
@@ -238,7 +235,7 @@ static int quickdnrMMX(VideoFilter *f, VideoFrame *frame, int field)
 
     __asm__ volatile("movq (%0), %%mm4" : : "r" (&sign_convert));
 
-    for (i = 0; i < 3; i++)
+    for (int i = 0; i < 3; i++)
     {
         int sz = (height[i] * frame->pitches[i]) >> 3;
 
@@ -247,7 +244,7 @@ static int quickdnrMMX(VideoFilter *f, VideoFrame *frame, int field)
         else
             __asm__ volatile("movq (%0), %%mm5" : : "r" (&tf->Chroma_threshold_mask1));
 
-        for (y = 0; y < sz; y++)
+        for (int y = 0; y < sz; y++)
         {
             __asm__ volatile(
             "movq (%0), %%mm0     \n\t" // avg[i]
@@ -282,20 +279,19 @@ static int quickdnrMMX(VideoFilter *f, VideoFrame *frame, int field)
     __asm__ volatile("emms\n\t");
 
     // filter the leftovers from the mmx rutine
-    for (i = 0; i < 3; i++)
+    for (int i = 0; i < 3; i++)
     {
         uint8_t *avg8[3], *buf8[3];
-        int end, beg;
 
         init_vars(tf, frame, thr1, thr2, height, avg8, buf8);
 
-        end = height[i] * frame->pitches[i];
-        beg = end & ~0x7;
+        int end = height[i] * frame->pitches[i];
+        int beg = end & ~0x7;
 
         if (beg == end)
             continue;
 
-        for (y = beg; y < end; y++)
+        for (int y = beg; y < end; y++)
         {
             if (abs(avg8[i][y] - buf8[i][y]) < thr1[i])
                 buf8[i][y] = avg8[i][y] = (avg8[i][y] + buf8[i][y]) >> 1;
@@ -317,7 +313,6 @@ static int quickdnr2MMX(VideoFilter *f, VideoFrame *frame, int field)
     const uint64_t sign_convert = 0x8080808080808080LL;
     int thr1[3], thr2[3], height[3];
     uint64_t *avg[3], *buf[3];
-    int i, y;
 
     TF_VARS;
 
@@ -332,7 +327,7 @@ static int quickdnr2MMX(VideoFilter *f, VideoFrame *frame, int field)
 
     __asm__ volatile("movq (%0), %%mm4" : : "r" (&sign_convert));
 
-    for (i = 0; i < 3; i++)
+    for (int i = 0; i < 3; i++)
     {
         int sz = (height[i] * frame->pitches[i]) >> 3;
 
@@ -341,7 +336,7 @@ static int quickdnr2MMX(VideoFilter *f, VideoFrame *frame, int field)
         else
             __asm__ volatile("movq (%0), %%mm5" : : "r" (&tf->Chroma_threshold_mask1));
 
-        for (y = 0; y < sz; y++)
+        for (int y = 0; y < sz; y++)
         {
             uint64_t *mask2 = (0 == i) ?
                 &tf->Luma_threshold_mask2 : &tf->Chroma_threshold_mask2;
@@ -404,21 +399,20 @@ static int quickdnr2MMX(VideoFilter *f, VideoFrame *frame, int field)
     __asm__ volatile("emms\n\t");
 
     // filter the leftovers from the mmx rutine
-    for (i = 0; i < 3; i++)
+    for (int i = 0; i < 3; i++)
     {
         int thr1a[3], thr2a[3], heighta[3];
         uint8_t *avg8[3], *buf8[3];
-        int end, beg;
 
         init_vars(tf, frame, thr1a, thr2a, heighta, avg8, buf8);
 
-        end = heighta[i] * frame->pitches[i];
-        beg = end & ~0x7;
+        int end = heighta[i] * frame->pitches[i];
+        int beg = end & ~0x7;
 
         if (beg == end)
             continue;
 
-        for (y = beg; y < end; y++)
+        for (int y = beg; y < end; y++)
         {
             int t = abs(avg8[i][y] - buf8[i][y]);
             if (t < thr1a[i])
@@ -453,13 +447,11 @@ static VideoFilter *new_filter(VideoFrameType inpixfmt,
                                const int *width, const int *height, const char *options,
                                int threads)
 {
-    unsigned int Param1, Param2, Param3, Param4;
-    int i, double_threshold = 1;
-    ThisFilter *filter;
+    unsigned int Param1 = 0, Param2 = 0, Param3 = 0, Param4 = 0;
+    int double_threshold = 1;
 
     (void) width;
     (void) height;
-    (void) i;
     (void) threads;
 
     if (inpixfmt != FMT_YV12 || outpixfmt != FMT_YV12)
@@ -469,7 +461,7 @@ static VideoFilter *new_filter(VideoFrameType inpixfmt,
         return NULL;
     }
 
-    filter = malloc(sizeof(ThisFilter));
+    ThisFilter *filter = malloc(sizeof(ThisFilter));
     if (filter == NULL)
     {
         fprintf(stderr, "Couldn't allocate memory for filter\n");
@@ -524,7 +516,7 @@ static VideoFilter *new_filter(VideoFrameType inpixfmt,
     if (av_get_cpu_flags() > AV_CPU_FLAG_MMX2)
     {
         filter->vf.filter = (double_threshold) ? &quickdnr2MMX : &quickdnrMMX;
-        for (i = 0; i < 8; i++)
+        for (int i = 0; i < 8; i++)
         {
             // 8 sign-shifted bytes!
             filter->Luma_threshold_mask1 =

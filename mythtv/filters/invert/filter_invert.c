@@ -43,8 +43,6 @@ static VideoFilter *new_filter(VideoFrameType inpixfmt,
                                const int *width, const int *height, const char *options,
                                int threads)
 {
-    ThisFilter *filter;
-    
     (void)width;
     (void)height;
     (void)options;
@@ -55,8 +53,7 @@ static VideoFilter *new_filter(VideoFrameType inpixfmt,
          inpixfmt != FMT_YUV422P) )
         return NULL;
     
-    filter = malloc(sizeof(ThisFilter));
-
+    ThisFilter *filter = malloc(sizeof(ThisFilter));
     if (filter == NULL)
     {
         fprintf(stderr,"Couldn't allocate memory for filter\n");

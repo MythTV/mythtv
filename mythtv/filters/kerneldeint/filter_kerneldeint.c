@@ -95,8 +95,7 @@ static void line_filter_c(uint8_t *dst, int width, int start_width,
                           const uint8_t *src1, const uint8_t *src2, const uint8_t *src3,
                           const uint8_t *src4, const uint8_t *src5)
 {
-    int X;
-    for (X = start_width; X < width; X++)
+    for (int X = start_width; X < width; X++)
     {
         if (ABS((int)src3[X] - (int)src2[X]) > 11)
             dst[X] = CLAMP((src2[X] * 4 + src4[X] * 4
@@ -180,8 +179,8 @@ static void line_filter_mmx_fast(uint8_t *dst, int width, int start_width,
                                  uint8_t *buf, const uint8_t *src2, const uint8_t *src3,
                                  const uint8_t *src4, const uint8_t *src5)
 {
-    int X;
-    for (X = start_width; X < width - 7; X += 8)
+    int X = start_width;
+    for ( ; X < width - 7; X += 8)
     {
         mmx_start(buf, src2, src3, src4, X);
         movq_r2m (mm4, buf[X]);
@@ -195,8 +194,8 @@ static void line_filter_mmx(uint8_t *dst, int width, int start_width,
                             const uint8_t *src1, const uint8_t *src2, const uint8_t *src3,
                             const uint8_t *src4, const uint8_t *src5)
 {
-    int X;
-    for (X = start_width; X < width - 7; X += 8)
+    int X = start_width;
+    for ( ; X < width - 7; X += 8)
     {
         mmx_start(src1, src2, src3, src4, X);
         mmx_end(src3, src5, dst, X);
@@ -209,8 +208,7 @@ static void line_filter_mmx(uint8_t *dst, int width, int start_width,
 static void store_ref(struct ThisFilter *p, uint8_t *src, int src_offsets[3],
                       int src_stride[3], int width, int height)
 {
-    int i;
-    for (i = 0; i < 3; i++)
+    for (int i = 0; i < 3; i++)
     {
         if (src_stride[i] < 1)
             continue;
@@ -225,10 +223,9 @@ static void store_ref(struct ThisFilter *p, uint8_t *src, int src_offsets[3],
         }
         else
         {
-            int j;
             uint8_t *src2 = src + src_offsets[i];
             uint8_t *dest = p->ref[i];
-            for (j = 0; j < h; j++)
+            for (int j = 0; j < h; j++)
             {
                 memcpy(dest, src2, w);
                 src2 += src_stride[i];
@@ -242,8 +239,7 @@ static int AllocFilter(ThisFilter* filter, int width, int height)
 {
     if ((width != filter->width) || (height != filter->height))
     {
-        int i;
-        for (i = 0; i < 3; i++)
+        for (int i = 0; i < 3; i++)
         {
             if (filter->ref[i])
                 free(filter->ref[i]);
@@ -279,8 +275,8 @@ static void filter_func(struct ThisFilter *p, uint8_t *dst, int dst_offsets[3],
         total_slices = 1;
     }
 
-    int i, y;
-    uint8_t *dest, *src1, *src2, *src3, *src4, *src5;
+    uint8_t *dest = NULL, *src1 = NULL, *src2 = NULL,
+        *src3 = NULL, *src4 = NULL, *src5 = NULL;
     int channels = p->skipchroma ? 1 : 3;
     int    field = parity ^ tff;
 
@@ -297,7 +293,7 @@ static void filter_func(struct ThisFilter *p, uint8_t *dst, int dst_offsets[3],
         last_slice = 1;
     }
 
-    for (i = 0; i < channels; i++)
+    for (int i = 0; i < channels; i++)
     {
 
         int is_chroma = !!i;
@@ -340,7 +336,7 @@ static void filter_func(struct ThisFilter *p, uint8_t *dst, int dst_offsets[3],
                 dest += dst_stride[i] << 1;
             }
 
-            for (y = start; y < end; y++)
+            for (int y = start; y < end; y++)
             {
                 if ((y ^ (1 - field)) & 1)
                     p->line_filter(dest, w, 0, src1, src2, src3, src4, src5);
@@ -393,7 +389,7 @@ static void filter_func(struct ThisFilter *p, uint8_t *dst, int dst_offsets[3],
             }
             dest += field_stride;
 
-            for (y = start; y < end; y += 2)
+            for (int y = start; y < end; y += 2)
             {
                 p->line_filter_fast(dest, w, 0, src1, src2, src3, src4, src5);
                 dest += field_stride;
@@ -480,13 +476,12 @@ static int KernelDeint(VideoFilter *f, VideoFrame *frame, int field)
 
     if (filter->actual_threads > 1 && filter->double_rate)
     {
-        int i;
-        for (i = 0; i < filter->actual_threads; i++)
+        for (int i = 0; i < filter->actual_threads; i++)
             filter->threads[i].ready = 1;
         filter->frame = frame;
         filter->field = field;
         filter->ready = filter->actual_threads;
-        i = 0;
+        int i = 0;
         while (filter->ready > 0 && i < 1000)
         {
             usleep(1000);
@@ -512,8 +507,7 @@ static void CleanupKernelDeintFilter(VideoFilter *f)
 {
     ThisFilter *filter = (ThisFilter *) f;
 
-    int i;
-    for (i = 0; i < 3; i++)
+    for (int i = 0; i < 3; i++)
     {
         uint8_t **p= &filter->ref[i];
         if (*p)
@@ -524,7 +518,7 @@ static void CleanupKernelDeintFilter(VideoFilter *f)
     if (filter->threads != NULL)
     {
         filter->kill_threads = 1;
-        for (i = 0; i < filter->requested_threads; i++)
+        for (int i = 0; i < filter->requested_threads; i++)
             if (filter->threads[i].exists)
                 pthread_join(filter->threads[i].id, NULL);
         free(filter->threads);
@@ -536,7 +530,6 @@ static VideoFilter *NewKernelDeintFilter(VideoFrameType inpixfmt,
                                          const int *width, const int *height,
                                          const char *options, int threads)
 {
-    ThisFilter *filter;
     (void) options;
     (void) threads;
 
@@ -546,7 +539,7 @@ static VideoFilter *NewKernelDeintFilter(VideoFrameType inpixfmt,
         return NULL;
     }
 
-    filter = (ThisFilter *) malloc (sizeof(ThisFilter));
+    ThisFilter *filter = (ThisFilter *) malloc (sizeof(ThisFilter));
     if (filter == NULL)
     {
         LOG(VB_GENERAL, LOG_ERR,

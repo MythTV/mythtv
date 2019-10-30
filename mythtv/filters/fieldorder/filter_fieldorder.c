@@ -99,14 +99,12 @@ static inline void * memcpy_pic(void * dst, const void * src,
 static void store_ref(struct ThisFilter *p, uint8_t *src, int src_offsets[3],
                       int src_stride[3], int width, int height)
 {
-    int i;
-
     memcpy (p->ref[NREFS], p->ref[0], sizeof(uint8_t *) * NCHANS);
     memmove(p->ref[0], p->ref[1], sizeof(uint8_t *) * NREFS * NCHANS);
     memcpy (&p->got_frames[NREFS], &p->got_frames[0], sizeof(uint8_t));
     memmove(&p->got_frames[0], &p->got_frames[1], sizeof(uint8_t) * NREFS);
 
-    for (i = 0; i < NCHANS; i++)
+    for (int i = 0; i < NCHANS; i++)
     {
         int is_chroma = !!i;
         memcpy_pic(p->ref[NREFS-1][i], src + src_offsets[i],
@@ -120,19 +118,17 @@ static void filter_func(struct ThisFilter *p, uint8_t *dst,
                         int dst_offsets[3], const int dst_stride[3], int width,
                         int height, int parity, int tff, int dirty)
 {
-    int i, y;
-    uint8_t nr_p, nr_c;
-    nr_c = NREFS - 1;
-    nr_p = p->got_frames[NREFS - 2] ? (NREFS - 2) : nr_c;
+    uint8_t nr_c = NREFS - 1;
+    uint8_t nr_p = p->got_frames[NREFS - 2] ? (NREFS - 2) : nr_c;
 
-    for (i = 0; i < NCHANS; i++)
+    for (int i = 0; i < NCHANS; i++)
     {
         int is_chroma = !!i;
         int w    = width  >> is_chroma;
         int h    = height >> is_chroma;
         int refs = p->stride[i];
 
-        for (y = 0; y < h; y++)
+        for (int y = 0; y < h; y++)
         {
             int do_copy = dirty;
             uint8_t *dst2 = dst + dst_offsets[i] + y * dst_stride[i];
@@ -180,9 +176,8 @@ static int FieldorderDeint (VideoFilter * f, VideoFrame * frame, int field)
 
 static void CleanupFieldorderDeintFilter(VideoFilter * filter)
 {
-    int i;
     ThisFilter* f = (ThisFilter*)filter;
-    for (i = 0; i < NCHANS * NREFS; i++)
+    for (int i = 0; i < NCHANS * NREFS; i++)
     {
         uint8_t **p= &f->ref[i / NCHANS][i % NCHANS];
         if (*p) free(*p);
@@ -195,13 +190,12 @@ static VideoFilter *FieldorderDeintFilter(VideoFrameType inpixfmt,
                                           const int *width, const int *height,
                                           const char *options, int threads)
 {
-    ThisFilter *filter;
     (void) inpixfmt;
     (void) outpixfmt;
     (void) options;
     (void) threads;
 
-    filter = (ThisFilter *) malloc (sizeof(ThisFilter));
+    ThisFilter *filter = (ThisFilter *) malloc (sizeof(ThisFilter));
     if (filter == NULL)
     {
         fprintf (stderr, "FieldorderDeint: failed to allocate memory for filter.\n");

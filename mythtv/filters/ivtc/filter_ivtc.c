@@ -74,8 +74,6 @@ IvtcFilter (VideoFilter *vf, VideoFrame *frame, int field)
 
     SetupFilter(filter, frame->width, frame->height, (int*)frame->pitches);
 
-    struct pullup_buffer *b;
-    struct pullup_frame *f;
     int ypitch  = filter->context->stride[0];
     int height  = filter->height;
     int cpitch  = filter->context->stride[1];
@@ -86,10 +84,10 @@ IvtcFilter (VideoFilter *vf, VideoFrame *frame, int field)
     if (c->bpp[0] == 0)
         c->bpp[0] = c->bpp[1] = c->bpp[2] = frame->bpp;
 
-    b = pullup_get_buffer(c,2);
+    struct pullup_buffer *b = pullup_get_buffer(c,2);
     if (!b)
     {
-        f = pullup_get_frame(c);
+        struct pullup_frame *f = pullup_get_frame(c);
         pullup_release_frame(f);
         return 0;
     }
@@ -108,8 +106,7 @@ IvtcFilter (VideoFilter *vf, VideoFrame *frame, int field)
 
     pullup_release_buffer(b, 2);
 
-    f = pullup_get_frame(c);
-
+    struct pullup_frame *f = pullup_get_frame(c);
     if (!f)
         return 0;
 
@@ -198,15 +195,12 @@ static VideoFilter *NewIvtcFilter(VideoFrameType inpixfmt,
     (void) threads;
     (void) options;
 
-    ThisFilter *filter;
-
     if (inpixfmt != FMT_YV12)
         return NULL;
     if (outpixfmt != FMT_YV12)
         return NULL;
 
-    filter = malloc (sizeof (ThisFilter));
-
+    ThisFilter *filter = malloc (sizeof (ThisFilter));
     if (filter == NULL)
     {
         fprintf (stderr, "Ivtc: failed to allocate memory for filter\n");

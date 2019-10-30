@@ -239,13 +239,12 @@ static VideoFilter* GreedyHDeintFilter(VideoFrameType inpixfmt,
                                        const int *width, const int *height, const char *options,
                                        int threads)
 {
-    ThisFilter *filter;
     (void) inpixfmt;
     (void) outpixfmt;
     (void) options;
     (void) threads;
 
-    filter = (ThisFilter *) malloc (sizeof(ThisFilter));
+    ThisFilter *filter = (ThisFilter *) malloc (sizeof(ThisFilter));
     if (filter == NULL)
     {
         fprintf (stderr, "GreedyHDeint: failed to allocate memory for filter.\n");

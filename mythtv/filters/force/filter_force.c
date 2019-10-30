@@ -10,13 +10,10 @@ static VideoFilter *
 new_force_template (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
                     VideoFrameType mypixfmt)
 {
-    VideoFilter *filter;
-    
     if (inpixfmt != mypixfmt || outpixfmt != mypixfmt)
         return NULL;
 
-    filter = (VideoFilter *) malloc(sizeof(VideoFilter));
-
+    VideoFilter *filter = (VideoFilter *) malloc(sizeof(VideoFilter));
     if (filter)
     {
         filter->filter = NULL;

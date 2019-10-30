@@ -75,14 +75,12 @@ static void yv12_to_yuy2_c
  int width, int height, int progressive) 
 {
 
-    uint8_t *p_line1, *p_line2 = yuy2_map;
-    const uint8_t *p_y1, *p_y2 = y_src;
+    uint8_t *p_line2 = yuy2_map;
+    const uint8_t *p_y2 = y_src;
     const uint8_t *p_u = u_src;
     const uint8_t *p_v = v_src;
     const uint8_t *p_u2 = u_src + u_src_pitch;
     const uint8_t *p_v2 = v_src + v_src_pitch;
-
-    int i_x, i_y;
 
     const int i_source_margin = y_src_pitch - width;
     const int i_source_u_margin = u_src_pitch - width/2;
@@ -92,15 +90,15 @@ static void yv12_to_yuy2_c
 
     if ( progressive ) 
     {
-        for ( i_y = height / 2 ; i_y-- ; )
+        for ( int i_y = height / 2 ; i_y-- ; )
         {
-            p_line1 = p_line2;
+            uint8_t *p_line1 = p_line2;
             p_line2 += yuy2_pitch;
 
-            p_y1 = p_y2;
+            const uint8_t *p_y1 = p_y2;
             p_y2 += y_src_pitch;
 
-            for ( i_x = width / 2 ; i_x-- ; )
+            for ( int i_x = width / 2 ; i_x-- ; )
             {
                 C_YUV420_YUYV( );
             }
@@ -125,15 +123,15 @@ static void yv12_to_yuy2_c
     {
         p_u2 = u_src + 2*u_src_pitch;
         p_v2 = v_src + 2*v_src_pitch;
-        for ( i_y = height / 4 ; i_y-- ; )
+        for ( int i_y = height / 4 ; i_y-- ; )
         {
-            p_line1 = p_line2;
+            uint8_t *p_line1 = p_line2;
             p_line2 += 2 * yuy2_pitch;
 
-            p_y1 = p_y2;
+            const uint8_t *p_y1 = p_y2;
             p_y2 += 2 * y_src_pitch;
 
-            for ( i_x = width / 2 ; i_x-- ; )
+            for ( int i_x = width / 2 ; i_x-- ; )
             {
                 C_YUV420_YUYV( );
             }
@@ -161,15 +159,15 @@ static void yv12_to_yuy2_c
         p_u2 = u_src + 3*u_src_pitch;
         p_v2 = v_src + 3*v_src_pitch;
 
-        for ( i_y = height / 4 ; i_y-- ; )
+        for ( int i_y = height / 4 ; i_y-- ; )
         {
-            p_line1 = p_line2;
+            uint8_t *p_line1 = p_line2;
             p_line2 += 2 * yuy2_pitch;
 
-            p_y1 = p_y2;
+            const uint8_t *p_y1 = p_y2;
             p_y2 += 2 * y_src_pitch;
 
-            for ( i_x = width / 2 ; i_x-- ; )
+            for ( int i_x = width / 2 ; i_x-- ; )
             {
                 C_YUV420_YUYV( );
             }
@@ -239,14 +237,12 @@ static void yv12_to_yuy2_mmxext
  unsigned char *yuy2_map, int yuy2_pitch,
  int width, int height, int progressive ) 
 {
-    uint8_t *p_line1, *p_line2 = yuy2_map;
-    const uint8_t *p_y1, *p_y2 = y_src;
+    uint8_t *p_line2 = yuy2_map;
+    const uint8_t *p_y2 = y_src;
     const uint8_t *p_u = u_src;
     const uint8_t *p_v = v_src;
     const uint8_t *p_u2 = u_src + u_src_pitch;
     const uint8_t *p_v2 = v_src + v_src_pitch;
-
-    int i_x, i_y;
 
     const int i_source_margin = y_src_pitch - width;
     const int i_source_u_margin = u_src_pitch - width/2;
@@ -255,19 +251,19 @@ static void yv12_to_yuy2_mmxext
 
     if ( progressive ) 
     {
-        for ( i_y = height / 2; i_y-- ; )
+        for ( int i_y = height / 2; i_y-- ; )
         {
-            p_line1 = p_line2;
+            uint8_t *p_line1 = p_line2;
             p_line2 += yuy2_pitch;
 
-            p_y1 = p_y2;
+            const uint8_t *p_y1 = p_y2;
             p_y2 += y_src_pitch;
 
-            for ( i_x = width / 8 ; i_x-- ; )
+            for ( int i_x = width / 8 ; i_x-- ; )
             {
                 MMXEXT_YUV420_YUYV( );
             }
-            for ( i_x = (width % 8) / 2 ; i_x-- ; )
+            for ( int i_x = (width % 8) / 2 ; i_x-- ; )
             {
                 C_YUV420_YUYV( );
             }
@@ -292,19 +288,19 @@ static void yv12_to_yuy2_mmxext
     {
         p_u2 = u_src + 2*u_src_pitch;
         p_v2 = v_src + 2*v_src_pitch;
-        for ( i_y = height / 4 ; i_y-- ; )
+        for ( int i_y = height / 4 ; i_y-- ; )
         {
-            p_line1 = p_line2;
+            uint8_t *p_line1 = p_line2;
             p_line2 += 2 * yuy2_pitch;
 
-            p_y1 = p_y2;
+            const uint8_t *p_y1 = p_y2;
             p_y2 += 2 * y_src_pitch;
 
-            for ( i_x = width / 8 ; i_x-- ; )
+            for ( int i_x = width / 8 ; i_x-- ; )
             {
                 MMXEXT_YUV420_YUYV( );
             }
-            for ( i_x = (width % 8) / 2 ; i_x-- ; )
+            for ( int i_x = (width % 8) / 2 ; i_x-- ; )
             {
                 C_YUV420_YUYV( );
             }
@@ -332,19 +328,19 @@ static void yv12_to_yuy2_mmxext
         p_u2 = u_src + 3*u_src_pitch;
         p_v2 = v_src + 3*v_src_pitch;
 
-        for ( i_y = height / 4 ; i_y-- ; )
+        for ( int i_y = height / 4 ; i_y-- ; )
         {
-            p_line1 = p_line2;
+            uint8_t *p_line1 = p_line2;
             p_line2 += 2 * yuy2_pitch;
 
-            p_y1 = p_y2;
+            const uint8_t *p_y1 = p_y2;
             p_y2 += 2 * y_src_pitch;
 
-            for ( i_x = width / 8 ; i_x-- ; )
+            for ( int i_x = width / 8 ; i_x-- ; )
             {
                 MMXEXT_YUV420_YUYV( );
             }
-            for ( i_x = (width % 8) / 2 ; i_x-- ; )
+            for ( int i_x = (width % 8) / 2 ; i_x-- ; )
             {
                 C_YUV420_YUYV( );
             }
@@ -390,15 +386,13 @@ static void yuy2_to_yv12_c
     uint8_t *p_u = u_dst;
     uint8_t *p_v = v_dst;
 
-    int i_x, i_y;
-
     const int i_dest_margin = y_dst_pitch - width;
     const int i_dest_u_margin = u_dst_pitch - width/2;
     const int i_dest_v_margin = v_dst_pitch - width/2;
     const int i_source_margin = yuy2_pitch - width*2;
 
 
-    for ( i_y = height / 2 ; i_y-- ; )
+    for ( int i_y = height / 2 ; i_y-- ; )
     {
         const uint8_t *p_line1 = p_line2;
         p_line2 += yuy2_pitch;
@@ -406,7 +400,7 @@ static void yuy2_to_yv12_c
         uint8_t *p_y1 = p_y2;
         p_y2 += y_dst_pitch;
 
-        for ( i_x = width / 8 ; i_x-- ; )
+        for ( int i_x = width / 8 ; i_x-- ; )
         {
             C_YUYV_YUV420( );
             C_YUYV_YUV420( );
@@ -484,8 +478,6 @@ static void yuy2_to_yv12_mmxext
     uint8_t *p_u = u_dst;
     uint8_t *p_v = v_dst;
 
-    int i_x, i_y;
-
     const int i_dest_margin = y_dst_pitch - width;
     const int i_dest_u_margin = u_dst_pitch - width/2;
     const int i_dest_v_margin = v_dst_pitch - width/2;
@@ -496,7 +488,7 @@ static void yuy2_to_yv12_mmxext
             "psrlw $8, %mm7               \n\t" /* 00 ff 00 ff 00 ff 00 ff */
             );
 
-    for ( i_y = height / 2 ; i_y-- ; )
+    for ( int i_y = height / 2 ; i_y-- ; )
     {
         const uint8_t *p_line1 = p_line2;
         p_line2 += yuy2_pitch;
@@ -504,7 +496,7 @@ static void yuy2_to_yv12_mmxext
         uint8_t *p_y1 = p_y2;
         p_y2 += y_dst_pitch;
 
-        for ( i_x = width / 8 ; i_x-- ; )
+        for ( int i_x = width / 8 ; i_x-- ; )
         {
             MMXEXT_YUYV_YUV420( );
         }
@@ -524,13 +516,12 @@ static void yuy2_to_yv12_mmxext
 static void vfilter_chroma_332_packed422_scanline_mmx( uint8_t *output, int width,
         uint8_t *m, uint8_t *t, uint8_t *b )
 {
-    int i;
     const mmx_t ymask = { 0x00ff00ff00ff00ffULL };
     const mmx_t cmask = { 0xff00ff00ff00ff00ULL };
 
     // Get width in bytes.
     width *= 2; 
-    i = width / 8;
+    int i = width / 8;
     width -= i * 8;
 
     movq_m2r( ymask, mm7 );
@@ -627,13 +618,11 @@ void init_yuv_conversion(void)
 
 void apply_chroma_filter( uint8_t *data, int stride, int width, int height )
 {
-    int i;
-
     /* ok, using linearblend inplace is a bit weird: the result of a scanline
      * interpolation will affect the next scanline. this might not be a problem
      * at all, we just want a kind of filter here.
      */
-    for ( i = 0; i < height; i++, data += stride ) 
+    for ( int i = 0; i < height; i++, data += stride ) 
     {
         vfilter_chroma_332_packed422_scanline( data, width,
                 data, 

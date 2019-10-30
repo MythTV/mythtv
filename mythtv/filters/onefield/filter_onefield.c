@@ -30,12 +30,11 @@ int oneFieldFilter(VideoFilter *f, VideoFrame *frame, int field)
     int bottom = filter->bottom;
     int stride = frame->pitches[0];
     int ymax = height - 2;
-    int y;
     unsigned char *yoff = frame->buf + frame->offsets[0];
     unsigned char *uoff = frame->buf + frame->offsets[1];
     unsigned char *voff = frame->buf + frame->offsets[2];
 
-    for (y = 0; y < ymax; y += 2) 
+    for (int y = 0; y < ymax; y += 2) 
     {
         unsigned char *src = (bottom ? &(yoff[(y+1)*stride]) : &(yoff[y*stride]));
         unsigned char *dst = (bottom ? &(yoff[y*stride]) : &(yoff[(y+1)*stride]));
@@ -45,7 +44,7 @@ int oneFieldFilter(VideoFilter *f, VideoFrame *frame, int field)
     stride = frame->pitches[1];
     ymax = height / 2 - 2;
   
-    for (y = 0; y < ymax; y += 2)
+    for (int y = 0; y < ymax; y += 2)
     {
         unsigned char *src = (bottom ? &(uoff[(y+1)*stride]) : &(uoff[y*stride]));
         unsigned char *dst = (bottom ? &(uoff[y*stride]) : &(uoff[(y+1)*stride]));
@@ -63,7 +62,6 @@ static VideoFilter *new_filter(VideoFrameType inpixfmt,
                                const int *width, const int *height, const char *options,
                                int threads)
 {
-    OFFilter *filter;
     (void)width;
     (void)height;
     (void)threads;
@@ -71,8 +69,7 @@ static VideoFilter *new_filter(VideoFrameType inpixfmt,
     if (inpixfmt != FMT_YV12 || outpixfmt != FMT_YV12)
         return NULL;
 
-    filter = malloc(sizeof(OFFilter));
-
+    OFFilter *filter = malloc(sizeof(OFFilter));
     if (filter == NULL)
     {
         fprintf(stderr,"Couldn't allocate memory for filter\n");

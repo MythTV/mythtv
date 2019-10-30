@@ -83,8 +83,7 @@ static int vflip(VideoFilter *vf, VideoFrame *frame, int field)
     memcpy(ouroffsets, frame->offsets, 3 * sizeof(int));
     qsort(ouroffsets, 3, sizeof(int), comp);
 
-    int datasize;
-    datasize = (ouroffsets[1] - ouroffsets[0]) / frame->height;
+    int datasize = (ouroffsets[1] - ouroffsets[0]) / frame->height;
     if (!swap(frame, datasize, ouroffsets[0], 0))
         return 0;
     datasize = (ouroffsets[2] - ouroffsets[1]) / frame->height;
@@ -104,8 +103,6 @@ static VideoFilter *new_filter(VideoFrameType inpixfmt,
                                const int *width, const int *height, const char *options,
                                int threads)
 {
-    ThisFilter *filter;
-
     (void)width;
     (void)height;
     (void)options;
@@ -116,8 +113,7 @@ static VideoFilter *new_filter(VideoFrameType inpixfmt,
          inpixfmt != FMT_YUV422P) )
         return NULL;
 
-    filter = malloc(sizeof(ThisFilter));
-
+    ThisFilter *filter = malloc(sizeof(ThisFilter));
     if (filter == NULL)
     {
         fprintf(stderr, "Couldn't allocate memory for filter\n");

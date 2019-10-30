@@ -289,8 +289,6 @@ static int linearBlendFilter(VideoFilter *f, VideoFrame *frame, int  field)
     unsigned char *yptr = frame->buf + frame->offsets[0];
     int stride = frame->pitches[0];
     int ymax = height - 8;
-    int x,y;
-    unsigned char *src;
     unsigned char *uoff = frame->buf + frame->offsets[1];
     unsigned char *voff = frame->buf + frame->offsets[2];
     LBFilter *vf = (LBFilter *)f;
@@ -298,11 +296,11 @@ static int linearBlendFilter(VideoFilter *f, VideoFrame *frame, int  field)
 
     TF_START;
 
-    for (y = 0; y < ymax; y+=8)
+    for (int y = 0; y < ymax; y+=8)
     {  
-        for (x = 0; x < stride; x+=8)
+        for (int x = 0; x < stride; x+=8)
         {
-            src = yptr + x + y * stride;
+            unsigned char *src = yptr + x + y * stride;
             (vf->subfilter)(src, stride);  
         }
     }
@@ -310,11 +308,11 @@ static int linearBlendFilter(VideoFilter *f, VideoFrame *frame, int  field)
     stride = frame->pitches[1];
     ymax = height / 2 - 8;
   
-    for (y = 0; y < ymax; y += 8)
+    for (int y = 0; y < ymax; y += 8)
     {
-        for (x = 0; x < stride; x += 8)
+        for (int x = 0; x < stride; x += 8)
         {
-            src = uoff + x + y * stride;
+            unsigned char *src = uoff + x + y * stride;
             (vf->subfilter)(src, stride);
        
             src = voff + x + y * stride;
@@ -336,7 +334,6 @@ static VideoFilter *new_filter(VideoFrameType inpixfmt,
                                const int *width, const int *height, const char *options,
                                int threads)
 {
-    LBFilter *filter;
     (void)width;
     (void)height;
     (void)options;
@@ -344,8 +341,7 @@ static VideoFilter *new_filter(VideoFrameType inpixfmt,
     if (inpixfmt != FMT_YV12 || outpixfmt != FMT_YV12)
         return NULL;
 
-    filter = malloc(sizeof(LBFilter));
-
+    LBFilter *filter = malloc(sizeof(LBFilter));
     if (filter == NULL)
     {
         fprintf(stderr,"Couldn't allocate memory for filter\n");
