@@ -111,7 +111,6 @@ void NetEditorBase::SlotLoadedData()
     while (!grabber.isNull())
     {
         QString title, author, image, description, type, commandline;
-        double version;
         bool search = false;
         bool tree = false;
 
@@ -121,7 +120,7 @@ void NetEditorBase::SlotLoadedData()
         image = grabber.firstChildElement("thumbnail").text();
         type = grabber.firstChildElement("type").text();
         description = grabber.firstChildElement("description").text();
-        version = grabber.firstChildElement("version").text().toDouble();
+        double version = grabber.firstChildElement("version").text().toDouble();
 
         QString searchstring = grabber.firstChildElement("search").text();
 

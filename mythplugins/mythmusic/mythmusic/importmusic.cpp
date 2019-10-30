@@ -558,11 +558,9 @@ void ImportMusicDialog::scanDirectory(QString &directory, vector<TrackInfo*> *tr
         return;
 
     QFileInfoList::const_iterator it = list.begin();
-    const QFileInfo *fi;
-
     while (it != list.end())
     {
-        fi = &(*it);
+        const QFileInfo *fi = &(*it);
         ++it;
         QString filename = fi->absoluteFilePath();
         if (fi->isDir())
@@ -1067,11 +1065,9 @@ void ImportCoverArtDialog::scanDirectory()
         return;
 
     QFileInfoList::const_iterator it = list.begin();
-    const QFileInfo *fi;
-
     while (it != list.end())
     {
-        fi = &(*it);
+        const QFileInfo *fi = &(*it);
         ++it;
         QString filename = fi->absoluteFilePath();
         if (!fi->isDir())

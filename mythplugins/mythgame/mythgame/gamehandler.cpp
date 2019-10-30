@@ -818,7 +818,7 @@ GameHandler* GameHandler::GetHandlerByName(const QString& systemname)
 
 void GameHandler::Launchgame(RomInfo *romdata, const QString& systemname)
 {
-    GameHandler *handler;
+    GameHandler *handler = nullptr;
 
     if (!systemname.isEmpty() && !systemname.isNull())
     {

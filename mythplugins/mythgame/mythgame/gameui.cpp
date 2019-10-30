@@ -839,11 +839,10 @@ void GameUI::fillNode(MythGenericTree *node)
             }
             else
             {
-                RomInfo *newRomInfo;
+                RomInfo *newRomInfo = nullptr;
                 if (node->getInt() > 1)
                 {
-                    RomInfo *currentRomInfo;
-                    currentRomInfo = node->GetData().value<RomInfo *>();
+                    RomInfo *currentRomInfo = node->GetData().value<RomInfo *>();
                     newRomInfo = new RomInfo(*currentRomInfo);
                 }
                 else

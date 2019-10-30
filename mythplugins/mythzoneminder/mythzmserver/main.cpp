@@ -57,14 +57,11 @@ int main(int argc, char **argv)
     fd_set read_fds;                // temp file descriptor list for select()
     struct sockaddr_in myaddr {};   // server address
     struct sockaddr_in remoteaddr {};// client address
-    int fdmax;                      // maximum file descriptor number
-    int listener;                   // listening socket descriptor
-    int newfd;                      // newly accept()ed socket descriptor
+    int fdmax = -1;                 // maximum file descriptor number
+    int listener = -1;              // listening socket descriptor
+    int newfd = -1;                 // newly accept()ed socket descriptor
     char buf[4096];                 // buffer for client data
-    int nbytes;
     int yes=1;                      // for setsockopt() SO_REUSEADDR, below
-    socklen_t addrlen;
-    int i;
     bool quit = false;              // quit flag
 
     bool debug = false;             // debug mode enabled
@@ -329,7 +326,7 @@ int main(int argc, char **argv)
         }
 
         // run through the existing connections looking for data to read
-        for (i = 0; i <= fdmax; i++)
+        for (int i = 0; i <= fdmax; i++)
         {
             if (FD_ISSET(i, &read_fds))
             {
@@ -337,7 +334,7 @@ int main(int argc, char **argv)
                 if (i == listener) 
                 {
                     // handle new connections
-                    addrlen = sizeof(remoteaddr);
+                    socklen_t addrlen = sizeof(remoteaddr);
                     if ((newfd = accept(listener,
                                         (struct sockaddr *) &remoteaddr,
                                                                &addrlen)) == -1)
@@ -364,7 +361,8 @@ int main(int argc, char **argv)
                 else
                 {
                     // handle data from a client
-                    if ((nbytes = recv(i, buf, sizeof(buf), 0)) <= 0)
+                    int nbytes = recv(i, buf, sizeof(buf), 0);
+                    if (nbytes <= 0)
                     {
                         // got error or connection closed by client
                         if (nbytes == 0)

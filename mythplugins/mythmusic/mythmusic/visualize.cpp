@@ -94,7 +94,6 @@ void LogScale::setMax(int maxscale, int maxrange)
 
     delete [] m_indices;
 
-    double alpha;
     long double domain = (long double) maxscale;
     long double range  = (long double) maxrange;
     long double x  = 1.0;
@@ -115,7 +114,7 @@ void LogScale::setMax(int maxscale, int maxrange)
         x -= dx;
     }
 
-    alpha = x;
+    double alpha = x;
     for (int i = 1; i < (int) domain; i++)
     {
         int scaled = (int) floor(0.5 + (alpha * log((double(i) + alpha) / alpha)));
@@ -640,8 +639,8 @@ bool Spectrum::process(VisualNode *node)
     // values
     bool allZero = true;
 
-    uint i;
-    long w = 0, index;
+    uint i = 0;
+    long w = 0;
     QRect *rectsp = m_rects.data();
     double *magnitudesp = m_magnitudes.data();
 
@@ -654,15 +653,13 @@ bool Spectrum::process(VisualNode *node)
         if (node->m_right)
             fast_real_set_from_short(m_rin, node->m_right, i);
     }
-    else
-        i = 0;
 
     fast_reals_set(m_lin + i, m_rin + i, 0, FFTW_N - i);
 
     fftw_execute(m_lplan);
     fftw_execute(m_rplan);
 
-    index = 1;
+    long index = 1;
 
     for (i = 0; (int)i < m_rects.size(); i++, w += m_analyzerBarWidth)
     {
@@ -815,10 +812,10 @@ void Squares::resize (const QSize &newsize) {
 
 void Squares::drawRect(QPainter *p, QRect *rect, int i, int c, int w, int h)
 {
-    double r, g, b, per;
+    double per = NAN;
     int correction = (m_actualSize.width() % m_rects.size ()) / 2;
     int x = ((i / 2) * w) + correction;
-    int y;
+    int y = 0;
 
     if (i % 2 == 0)
     {
@@ -833,11 +830,11 @@ void Squares::drawRect(QPainter *p, QRect *rect, int i, int c, int w, int h)
 
     per = clamp(per, 1.0, 0.0);
 
-    r = m_startColor.red() +
+    double r = m_startColor.red() +
         (m_targetColor.red() - m_startColor.red()) * (per * per);
-    g = m_startColor.green() +
+    double g = m_startColor.green() +
         (m_targetColor.green() - m_startColor.green()) * (per * per);
-    b = m_startColor.blue() +
+    double b = m_startColor.blue() +
         (m_targetColor.blue() - m_startColor.blue()) * (per * per);
 
     r = clamp(r, 255.0, 0.0);
@@ -905,9 +902,8 @@ Piano::Piano()
     /* Lowest note on piano is 4 octaves below concert A */
     double bottom_A = concert_A / 2.0 / 2.0 / 2.0 / 2.0;
 
-    unsigned int key;
     double current_freq = bottom_A;
-    for (key = 0; key < PIANO_N; key++)
+    for (uint key = 0; key < PIANO_N; key++)
     {
         // This is constant through time
         m_piano_data[key].coeff = (goertzel_data)(2.0 * cos(2.0 * M_PI * current_freq / sample_rate));
@@ -942,8 +938,7 @@ Piano::~Piano()
 
 void Piano::zero_analysis(void)
 {
-    unsigned int key;
-    for (key = 0; key < PIANO_N; key++)
+    for (uint key = 0; key < PIANO_N; key++)
     {
         // These get updated continously, and must be stored between chunks of audio data
         m_piano_data[key].q2 = 0.0F;
@@ -990,8 +985,7 @@ void Piano::resize(const QSize &newsize)
 
     m_rects.resize(PIANO_N);
 
-    unsigned int key;
-    for (key = 0; key < PIANO_N; key++)
+    for (uint key = 0; key < PIANO_N; key++)
     {
         int note = ((int)key - 3 + 12) % 12;  // This means that C=0, C#=1, D=2, etc (since lowest note is bottom A)
         if (note == 0) // If we're on a 'C', move the left 'cursor' over an octave
@@ -1034,7 +1028,7 @@ void Piano::resize(const QSize &newsize)
     }
 
     m_magnitude.resize(PIANO_N);
-    for (key = 0; key < (uint)m_magnitude.size(); key++)
+    for (uint key = 0; key < (uint)m_magnitude.size(); key++)
     {
         m_magnitude[key] = 0.0;
     }
@@ -1069,8 +1063,7 @@ bool Piano::process_all_types(VisualNode *node, bool /*this_will_be_displayed*/)
     // Take a bunch of data in *node and break it down into piano key spectrum values
     // NB: Remember the state data between calls, so as to accumulate more accurate results.
     bool allZero = true;
-    uint n;
-    goertzel_data magnitude2, magnitude_av;
+    uint n = 0;
 
     if (node)
     {
@@ -1136,14 +1129,16 @@ bool Piano::process_all_types(VisualNode *node, bool /*this_will_be_displayed*/)
         // Only do this update if we've processed enough chunks for this key...
         if (n_samples > m_piano_data[key].samples_process_before_display_update)
         {
-            magnitude2 = q1*q1 + q2*q2 - q1*q2*coeff;
+            goertzel_data magnitude2 = q1*q1 + q2*q2 - q1*q2*coeff;
 
 #if 0
             // This is RMS of signal
-            magnitude_av = sqrt(magnitude2)/(goertzel_data)n_samples; // Should be 0<magnitude_av<.5
+            goertzel_data magnitude_av =
+                sqrt(magnitude2)/(goertzel_data)n_samples; // Should be 0<magnitude_av<.5
 #else
             // This is pure magnitude of signal
-            magnitude_av = magnitude2/(goertzel_data)n_samples/(goertzel_data)n_samples; // Should be 0<magnitude_av<.25
+            goertzel_data magnitude_av =
+                magnitude2/(goertzel_data)n_samples/(goertzel_data)n_samples; // Should be 0<magnitude_av<.25
 #endif
 
 #if 0
@@ -1212,8 +1207,7 @@ bool Piano::draw(QPainter *p, const QColor &back)
     QRect *rectsp = &m_rects[0];
     double *magnitudep = &m_magnitude[0];
 
-    unsigned int key, n = PIANO_N;
-    double r, g, b, per;
+    unsigned int n = PIANO_N;
 
     p->fillRect(0, 0, m_size.width(), m_size.height(), back);
 
@@ -1223,7 +1217,7 @@ bool Piano::draw(QPainter *p, const QColor &back)
 
     // Sweep up across the keys, making sure the max_magnitude_seen is at minimum X% of its neighbours
     double mag = PIANO_RMS_NEGLIGIBLE;
-    for (key = 0; key < n; key++)
+    for (uint key = 0; key < n; key++)
     {
         if (m_piano_data[key].max_magnitude_seen < static_cast<float>(mag))
         {
@@ -1242,7 +1236,7 @@ bool Piano::draw(QPainter *p, const QColor &back)
     mag = PIANO_RMS_NEGLIGIBLE;
     for (int key_i = n - 1; key_i >= 0; key_i--)
     {
-        key = key_i; // Wow, this is to avoid a zany error for ((unsigned)0)--
+        uint key = key_i; // Wow, this is to avoid a zany error for ((unsigned)0)--
         if (m_piano_data[key].max_magnitude_seen < static_cast<float>(mag))
         {
             // Spread the previous value to this key
@@ -1259,7 +1253,7 @@ bool Piano::draw(QPainter *p, const QColor &back)
     // Now find the key that has been hit the hardest relative to its experience, and renormalize...
     // Set a minimum, to prevent divide-by-zero (and also all-pressed when music very quiet)
     double magnitude_max = PIANO_RMS_NEGLIGIBLE;
-    for (key = 0; key < n; key++)
+    for (uint key = 0; key < n; key++)
     {
         mag = m_piano_data[key].magnitude / m_piano_data[key].max_magnitude_seen;
         if (magnitude_max < mag)
@@ -1269,12 +1263,12 @@ bool Piano::draw(QPainter *p, const QColor &back)
     }
 
     // Deal with all the white keys first
-    for (key = 0; key < n; key++)
+    for (uint key = 0; key < n; key++)
     {
         if (m_piano_data[key].is_black_note)
             continue;
 
-        per = magnitudep[key] / magnitude_max;
+        double per = magnitudep[key] / magnitude_max;
         per = clamp(per, 1.0, 0.0);        // By construction, this should be unnecessary
 
         if (per < PIANO_KEYPRESS_TOO_LIGHT)
@@ -1282,28 +1276,28 @@ bool Piano::draw(QPainter *p, const QColor &back)
         LOG(VB_GENERAL, LOG_DEBUG, QString("Piano : Display key %1, magnitude=%2, seen=%3")
                 .arg(key).arg(per*100.0).arg(m_piano_data[key].max_magnitude_seen));
 
-        r = m_whiteStartColor.red() + (m_whiteTargetColor.red() - m_whiteStartColor.red()) * per;
-        g = m_whiteStartColor.green() + (m_whiteTargetColor.green() - m_whiteStartColor.green()) * per;
-        b = m_whiteStartColor.blue() + (m_whiteTargetColor.blue() - m_whiteStartColor.blue()) * per;
+        double r = m_whiteStartColor.red() + (m_whiteTargetColor.red() - m_whiteStartColor.red()) * per;
+        double g = m_whiteStartColor.green() + (m_whiteTargetColor.green() - m_whiteStartColor.green()) * per;
+        double b = m_whiteStartColor.blue() + (m_whiteTargetColor.blue() - m_whiteStartColor.blue()) * per;
 
         p->fillRect(rectsp[key], QColor(int(r), int(g), int(b)));
     }
 
     // Then overlay the black keys
-    for (key = 0; key < n; key++)
+    for (uint key = 0; key < n; key++)
     {
         if (!m_piano_data[key].is_black_note)
             continue;
 
-        per = magnitudep[key]/magnitude_max;
+        double per = magnitudep[key]/magnitude_max;
         per = clamp(per, 1.0, 0.0);        // By construction, this should be unnecessary
 
         if (per < PIANO_KEYPRESS_TOO_LIGHT)
             per = 0.0; // Clamp to zero for lightly detected keys
 
-        r = m_blackStartColor.red() + (m_blackTargetColor.red() - m_blackStartColor.red()) * per;
-        g = m_blackStartColor.green() + (m_blackTargetColor.green() - m_blackStartColor.green()) * per;
-        b = m_blackStartColor.blue() + (m_blackTargetColor.blue() - m_blackStartColor.blue()) * per;
+        double r = m_blackStartColor.red() + (m_blackTargetColor.red() - m_blackStartColor.red()) * per;
+        double g = m_blackStartColor.green() + (m_blackTargetColor.green() - m_blackStartColor.green()) * per;
+        double b = m_blackStartColor.blue() + (m_blackTargetColor.blue() - m_blackStartColor.blue()) * per;
 
         p->fillRect(rectsp[key], QColor(int(r), int(g), int(b)));
     }

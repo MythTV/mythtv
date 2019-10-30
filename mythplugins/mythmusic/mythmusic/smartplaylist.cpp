@@ -154,8 +154,7 @@ QString getCriteriaSQL(const QString& fieldName, const QString &operatorName,
     if (fieldName.isEmpty())
         return result;
 
-    SmartPLField *Field;
-    Field = lookupField(fieldName);
+    SmartPLField *Field = lookupField(fieldName);
     if (!Field)
     {
         return "";
@@ -163,8 +162,7 @@ QString getCriteriaSQL(const QString& fieldName, const QString &operatorName,
 
     result = Field->sqlName;
 
-    SmartPLOperator *Operator;
-    Operator = lookupOperator(operatorName);
+    SmartPLOperator *Operator = lookupOperator(operatorName);
     if (!Operator)
     {
         return QString();
@@ -251,8 +249,7 @@ QString getOrderBySQL(const QString& orderByFields)
     for (int x = 0; x < list.count(); x++)
     {
         fieldName = list[x].trimmed();
-        SmartPLField *Field;
-        Field = lookupField(fieldName.left(fieldName.length() - 4));
+        SmartPLField *Field = lookupField(fieldName.left(fieldName.length() - 4));
         if (Field)
         {
             if (fieldName.right(3) == "(D)")
@@ -275,8 +272,7 @@ QString getOrderBySQL(const QString& orderByFields)
 
 QString getSQLFieldName(const QString &fieldName)
 {
-    SmartPLField *Field;
-    Field = lookupField(fieldName);
+    SmartPLField *Field = lookupField(fieldName);
     if (!Field)
     {
         return "";
@@ -755,7 +751,7 @@ void SmartPlaylistEditor::saveClicked(void)
     }
 
     // get smartplaylistid
-    int ID;
+    int ID = -1;
     query.prepare("SELECT smartplaylistid FROM music_smartplaylists "
                   "WHERE categoryid = :CATEGORYID AND name = :NAME;");
     query.bindValue(":CATEGORYID", categoryid);
@@ -816,7 +812,7 @@ void SmartPlaylistEditor::loadFromDatabase(const QString& category, const QStrin
     int categoryid = SmartPlaylistEditor::lookupCategoryID(category);
 
     MSqlQuery query(MSqlQuery::InitCon());
-    int ID;
+    int ID = -1;
 
     query.prepare("SELECT smartplaylistid, name, categoryid, matchtype, orderby, limitto "
                   "FROM music_smartplaylists WHERE name = :NAME AND categoryid = :CATEGORYID;");
@@ -1089,7 +1085,7 @@ bool SmartPlaylistEditor::deleteSmartPlaylist(const QString &category, const QSt
     MSqlQuery query(MSqlQuery::InitCon());
 
     // get playlist ID
-    int ID;
+    int ID = -1;
     query.prepare("SELECT smartplaylistid FROM music_smartplaylists WHERE name = :NAME "
                   "AND categoryid = :CATEGORYID;");
     query.bindValue(":NAME", name);
@@ -1166,7 +1162,7 @@ bool SmartPlaylistEditor::deleteCategory(const QString& category)
 // static function to lookup the categoryid given its name
 int SmartPlaylistEditor::lookupCategoryID(const QString& category)
 {
-    int ID;
+    int ID = -1;
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT categoryid FROM music_smartplaylist_categories "
                   "WHERE name = :CATEGORY;");
@@ -1300,8 +1296,7 @@ void CriteriaRowEditor::updateValues(void)
 
 void CriteriaRowEditor::saveClicked()
 {
-    SmartPLField *Field;
-    Field = lookupField(m_fieldSelector->GetValue());
+    SmartPLField *Field = lookupField(m_fieldSelector->GetValue());
     if (!Field)
         return;
 
@@ -1333,11 +1328,9 @@ void CriteriaRowEditor::enableSaveButton()
 {
     bool enabled = false;
 
-    SmartPLField *Field;
-    Field = lookupField(m_fieldSelector->GetValue());
+    SmartPLField *Field = lookupField(m_fieldSelector->GetValue());
 
-    SmartPLOperator *Operator;
-    Operator = lookupOperator(m_operatorSelector->GetValue());
+    SmartPLOperator *Operator = lookupOperator(m_operatorSelector->GetValue());
 
     if (Field && Operator)
     {
@@ -1370,8 +1363,7 @@ void CriteriaRowEditor::enableSaveButton()
 
 void CriteriaRowEditor::fieldChanged(void)
 {
-    SmartPLField *Field;
-    Field = lookupField(m_fieldSelector->GetValue());
+    SmartPLField *Field = lookupField(m_fieldSelector->GetValue());
     if (!Field)
         return;
 
@@ -1422,13 +1414,11 @@ void CriteriaRowEditor::fieldChanged(void)
 
 void CriteriaRowEditor::operatorChanged(void)
 {
-    SmartPLField *Field;
-    Field = lookupField(m_fieldSelector->GetValue());
+    SmartPLField *Field = lookupField(m_fieldSelector->GetValue());
     if (!Field)
         return;
 
-    SmartPLOperator *Operator;
-    Operator = lookupOperator(m_operatorSelector->GetValue());
+    SmartPLOperator *Operator = lookupOperator(m_operatorSelector->GetValue());
     if (!Operator)
         return;
 

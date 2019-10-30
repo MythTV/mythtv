@@ -1474,7 +1474,7 @@ void PlaylistEditorView::getSmartPlaylistTracks(MusicGenericTree *node, int play
     // find smartplaylist
     QString matchType;
     QString orderBy;
-    int limitTo;
+    int limitTo = 0;
 
     query.prepare("SELECT smartplaylistid, matchtype, orderby, limitto "
                   "FROM music_smartplaylists "

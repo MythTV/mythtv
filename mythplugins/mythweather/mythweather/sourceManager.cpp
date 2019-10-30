@@ -296,8 +296,7 @@ bool SourceManager::findPossibleSources(QStringList types,
         ScriptInfo *si = m_scripts.at(x);
         QStringList stypes = si->types;
         bool handled = true;
-        int i;
-        for (i = 0; i < types.count() && handled; ++i)
+        for (int i = 0; i < types.count() && handled; ++i)
         {
             handled = stypes.contains(types[i]);
         }

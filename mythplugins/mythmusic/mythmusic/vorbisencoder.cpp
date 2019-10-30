@@ -73,7 +73,7 @@ VorbisEncoder::VorbisEncoder(const QString &outfile, int qualitylevel,
     ogg_stream_packetin(&m_os, &header_comments);
     ogg_stream_packetin(&m_os, &header_codebooks);
 
-    int result;
+    int result = 0;
     while ((result = ogg_stream_flush(&m_os, &m_og)))
     {
         if (!result || !m_out)

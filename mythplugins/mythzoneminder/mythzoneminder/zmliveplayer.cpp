@@ -315,14 +315,13 @@ void ZMLivePlayer::changePlayerMonitor(int playerNo)
     m_frameTimer->stop();
 
     int oldMonID = m_players->at(playerNo - 1)->getMonitor()->id;
-    Monitor *mon;
 
     // find the old monitor ID in the list of available monitors
-    int pos;
+    int pos = 0;
     for (pos = 0; pos < ZMClient::get()->getMonitorCount(); pos++)
     {
-        mon = ZMClient::get()->getMonitorAt(pos);
-        if (oldMonID == mon->id)
+        Monitor *omon = ZMClient::get()->getMonitorAt(pos);
+        if (oldMonID == omon->id)
         {
             break;
         }
@@ -336,7 +335,7 @@ void ZMLivePlayer::changePlayerMonitor(int playerNo)
     if (pos >= ZMClient::get()->getMonitorCount())
         pos = 0;
 
-    mon = ZMClient::get()->getMonitorAt(pos);
+    Monitor *mon = ZMClient::get()->getMonitorAt(pos);
 
     m_players->at(playerNo - 1)->setMonitor(mon);
     m_players->at(playerNo - 1)->updateCamera();
