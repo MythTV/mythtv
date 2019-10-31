@@ -93,6 +93,7 @@ inline void LogMessageList::InitializeCustomTypes()
     qRegisterMetaType< LogMessageList*  >();
 
     LogMessage::InitializeCustomTypes();
+    LabelValue::InitializeCustomTypes();
 }
 
 } // namespace DTC
