@@ -105,7 +105,9 @@ class Channel : public ChannelServices
                                                            const QString &Password,
                                                            bool          UseEIT,
                                                            const QString &ConfigPath,
-                                                           int           NITId ) override; // ChannelServices
+                                                           int           NITId,
+                                                           uint          BouquetId,
+                                                           uint          RegionId ) override; // ChannelServices
 
         int                       AddVideoSource         ( const QString &SourceName,
                                                            const QString &Grabber,
@@ -115,7 +117,9 @@ class Channel : public ChannelServices
                                                            const QString &Password,
                                                            bool          UseEIT,
                                                            const QString &ConfigPath,
-                                                           int           NITId ) override; // ChannelServices
+                                                           int           NITId,
+                                                           uint          BouquetId,
+                                                           uint          RegionId ) override; // ChannelServices
 
         bool                      RemoveVideoSource      ( uint SourceID ) override; // ChannelServices
 
@@ -277,12 +281,14 @@ class ScriptableChannel : public QObject
                                  const QString &Password,
                                  bool          UseEIT,
                                  const QString &ConfigPath,
-                                 int           NITId )
+                                 int           NITId,
+                                 uint          BouquetId,
+                                 uint          RegionId )
         {
             SCRIPT_CATCH_EXCEPTION( false,
                 return m_obj.UpdateVideoSource( SourceID, SourceName, Grabber,
                                             UserId, FreqTable, LineupId, Password,
-                                            UseEIT, ConfigPath, NITId );
+                                            UseEIT, ConfigPath, NITId, BouquetId, RegionId );
             )
         }
 
@@ -294,12 +300,14 @@ class ScriptableChannel : public QObject
                                  const QString &Password,
                                  bool          UseEIT,
                                  const QString &ConfigPath,
-                                 int           NITId )
+                                 int           NITId,
+                                 uint          BouquetId,
+                                 uint          RegionId )
         {
             SCRIPT_CATCH_EXCEPTION( false,
                 return m_obj.AddVideoSource( SourceName, Grabber, UserId,
                                          FreqTable, LineupId, Password,
-                                         UseEIT, ConfigPath, NITId );
+                                         UseEIT, ConfigPath, NITId, BouquetId, RegionId );
             )
         }
 

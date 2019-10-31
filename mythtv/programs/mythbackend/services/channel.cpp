@@ -213,7 +213,7 @@ DTC::VideoSourceList* Channel::GetVideoSourceList()
 
     query.prepare("SELECT sourceid, name, xmltvgrabber, userid, "
                   "freqtable, lineupid, password, useeit, configpath, "
-                  "dvb_nit_id FROM videosource "
+                  "dvb_nit_id, bouquet_id, region_id FROM videosource "
                   "ORDER BY sourceid" );
 
     if (!query.exec())
@@ -244,6 +244,8 @@ DTC::VideoSourceList* Channel::GetVideoSourceList()
         pVideoSource->setUseEIT        ( query.value(7).toBool()      );
         pVideoSource->setConfigPath    ( query.value(8).toString()    );
         pVideoSource->setNITId         ( query.value(9).toInt()       );
+        pVideoSource->setBouquetId     ( query.value(10).toInt()      );
+        pVideoSource->setRegionId      ( query.value(11).toInt()      );
     }
 
     pList->setAsOf          ( MythDate::current() );
@@ -314,11 +316,13 @@ bool Channel::UpdateVideoSource( uint nSourceId,
                                  const QString &sPassword,
                                  bool          bUseEIT,
                                  const QString &sConfigPath,
-                                 int           nNITId )
+                                 int           nNITId,
+                                 uint          nBouquetId,
+                                 uint          nRegionId )
 {
     bool bResult = SourceUtil::UpdateSource(nSourceId, sSourceName, sGrabber, sUserId, sFreqTable,
                                        sLineupId, sPassword, bUseEIT, sConfigPath,
-                                       nNITId);
+                                       nNITId, nBouquetId, nRegionId);
 
     return bResult;
 }
@@ -335,11 +339,13 @@ int  Channel::AddVideoSource( const QString &sSourceName,
                               const QString &sPassword,
                               bool          bUseEIT,
                               const QString &sConfigPath,
-                              int           nNITId )
+                              int           nNITId,
+                              uint          nBouquetId,
+                              uint          nRegionId )
 {
     int nResult = SourceUtil::CreateSource(sSourceName, sGrabber, sUserId, sFreqTable,
                                        sLineupId, sPassword, bUseEIT, sConfigPath,
-                                       nNITId);
+                                       nNITId, nBouquetId, nRegionId);
 
     return nResult;
 }

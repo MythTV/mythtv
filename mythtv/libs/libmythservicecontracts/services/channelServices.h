@@ -131,7 +131,9 @@ class SERVICE_PUBLIC ChannelServices : public Service
                                                                    const QString &Password,
                                                                    bool          UseEIT,
                                                                    const QString &ConfigPath,
-                                                                   int           NITId ) = 0;
+                                                                   int           NITId,
+                                                                   uint          BouquetId,
+                                                                   uint          RegionId ) = 0;
 
         virtual bool                      RemoveVideoSource      ( uint          SourceID ) = 0;
 
@@ -144,7 +146,9 @@ class SERVICE_PUBLIC ChannelServices : public Service
                                                                    const QString &Password,
                                                                    bool          UseEIT,
                                                                    const QString &ConfigPath,
-                                                                   int           NITId ) = 0;
+                                                                   int           NITId,
+                                                                   uint          BouquetId,
+                                                                   uint          RegionId ) = 0;
 
         virtual DTC::LineupList*          GetDDLineupList        ( const QString &Source,
                                                                    const QString &UserId,

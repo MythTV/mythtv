@@ -189,8 +189,8 @@ ChannelScanSM::ChannelScanSM(ScanMonitor *_scan_monitor,
                 LOG(VB_CHANSCAN, LOG_INFO, LOC +
                     QString("Setting NIT-ID to %1").arg(nitid));
 
-                m_bouquet_id = query.value(1).toInt();
-                m_region_id = query.value(2).toInt();
+                m_bouquet_id = query.value(1).toUInt();
+                m_region_id = query.value(2).toUInt();
             }
         }
         else
@@ -214,9 +214,9 @@ ChannelScanSM::ChannelScanSM(ScanMonitor *_scan_monitor,
 
                 // Bouquet and region default or from the environment
                 QString bouquet_id = QString(getenv("FSAT_BOUQUET_ID"));
-                m_bouquet_id = bouquet_id.isEmpty() ? kBouquetID : bouquet_id.toInt();
+                m_bouquet_id = bouquet_id.isEmpty() ? kBouquetID : bouquet_id.toUInt();
                 QString region_id = QString(getenv("FSAT_REGION_ID"));
-                m_region_id = region_id.isEmpty() ? kRegionID : region_id.toInt();
+                m_region_id = region_id.isEmpty() ? kRegionID : region_id.toUInt();
             }
         }
         LOG(VB_CHANSCAN, LOG_INFO, LOC +

@@ -404,14 +404,16 @@ bool SourceUtil::UpdateSource( uint sourceid, const QString& sourcename,
                                const QString& grabber, const QString& userid,
                                const QString& freqtable, const QString& lineupid,
                                const QString& password, bool useeit,
-                               const QString& configpath, int nitid)
+                               const QString& configpath, int nitid,
+                               uint bouquetid, uint regionid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("UPDATE videosource SET name = :NAME, xmltvgrabber = :XMLTVGRABBER, "
                   "userid = :USERID, freqtable = :FREQTABLE, lineupid = :LINEUPID,"
                   "password = :PASSWORD, useeit = :USEEIT, configpath = :CONFIGPATH, "
-                  "dvb_nit_id = :NITID WHERE sourceid = :SOURCEID");
+                  "dvb_nit_id = :NITID, bouquet_id = :BOUQUETID, region_id = :REGIONID "
+                  "WHERE sourceid = :SOURCEID");
 
     query.bindValue(":NAME", sourcename);
     query.bindValue(":XMLTVGRABBER", grabber);
@@ -422,6 +424,8 @@ bool SourceUtil::UpdateSource( uint sourceid, const QString& sourcename,
     query.bindValue(":USEEIT", useeit);
     query.bindValue(":CONFIGPATH", configpath);
     query.bindValue(":NITID", nitid);
+    query.bindValue(":BOUQUETID", bouquetid);
+    query.bindValue(":REGIONID", regionid);
     query.bindValue(":SOURCEID", sourceid);
 
     if (!query.exec() || !query.isActive())
@@ -437,13 +441,15 @@ int SourceUtil::CreateSource( const QString& sourcename,
                                const QString& grabber, const QString& userid,
                                const QString& freqtable, const QString& lineupid,
                                const QString& password, bool useeit,
-                               const QString& configpath, int nitid)
+                               const QString& configpath, int nitid,
+                               uint bouquetid, uint regionid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("INSERT INTO videosource (name,xmltvgrabber,userid,freqtable,lineupid,"
-                  "password,useeit,configpath,dvb_nit_id) VALUES (:NAME, :XMLTVGRABBER, "
-                  ":USERID, :FREQTABLE, :LINEUPID, :PASSWORD, :USEEIT, :CONFIGPATH, :NITID)");
+                  "password,useeit,configpath,dvb_nit_id,bouquet_id,region_id) "
+                  "VALUES (:NAME, :XMLTVGRABBER, :USERID, :FREQTABLE, :LINEUPID, :PASSWORD, "
+                  ":USEEIT, :CONFIGPATH, :NITID, :BOUQUETID, :REGIONID)");
 
     query.bindValue(":NAME", sourcename);
     query.bindValue(":XMLTVGRABBER", grabber);
@@ -454,6 +460,8 @@ int SourceUtil::CreateSource( const QString& sourcename,
     query.bindValue(":USEEIT", useeit);
     query.bindValue(":CONFIGPATH", configpath);
     query.bindValue(":NITID", nitid);
+    query.bindValue(":BOUQUETID", bouquetid);
+    query.bindValue(":REGIONID", regionid);
 
     if (!query.exec() || !query.isActive())
     {
