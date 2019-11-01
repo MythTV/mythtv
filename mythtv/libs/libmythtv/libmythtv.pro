@@ -69,8 +69,8 @@ macx {
     LIBS += -framework VideoToolBox
     LIBS += -framework IOSurface
     DEFINES += USING_VTB
-    HEADERS += opengl/mythvtbinterop.h   mythvtbcontext.h
-    SOURCES += opengl/mythvtbinterop.cpp mythvtbcontext.cpp
+    HEADERS += opengl/mythvtbinterop.h   decoders/mythvtbcontext.h
+    SOURCES += opengl/mythvtbinterop.cpp decoders/mythvtbcontext.cpp
 
     using_firewire:using_backend {
         QMAKE_CXXFLAGS += -F$${CONFIG_MAC_AVC}
@@ -375,8 +375,8 @@ using_frontend {
     SOURCES += decoders/mythcodeccontext.cpp
 
     using_mmal {
-        HEADERS += mythmmalcontext.h   opengl/mythmmalinterop.h
-        SOURCES += mythmmalcontext.cpp opengl/mythmmalinterop.cpp
+        HEADERS += decoders/mythmmalcontext.h   opengl/mythmmalinterop.h
+        SOURCES += decoders/mythmmalcontext.cpp opengl/mythmmalinterop.cpp
         LIBS    += -L/opt/vc/lib -lmmal -lvcsm
         LIBS    += -lEGL
         DEFINES += USING_MMAL
@@ -457,11 +457,11 @@ using_frontend {
     using_vdpau {
         DEFINES += USING_VDPAU
         HEADERS += opengl/mythvdpauinterop.h
-        HEADERS += mythvdpaucontext.h
-        HEADERS += mythvdpauhelper.h
+        HEADERS += decoders/mythvdpaucontext.h
+        HEADERS += decoders/mythvdpauhelper.h
         SOURCES += opengl/mythvdpauinterop.cpp
-        SOURCES += mythvdpaucontext.cpp
-        SOURCES += mythvdpauhelper.cpp
+        SOURCES += decoders/mythvdpaucontext.cpp
+        SOURCES += decoders/mythvdpauhelper.cpp
         LIBS += -lvdpau
     }
 
@@ -485,24 +485,24 @@ using_frontend {
 
     using_vaapi:using_opengl_video {
         DEFINES += USING_VAAPI
-        HEADERS += mythvaapicontext.h   opengl/mythvaapiinterop.h
-        SOURCES += mythvaapicontext.cpp opengl/mythvaapiinterop.cpp
+        HEADERS += decoders/mythvaapicontext.h   opengl/mythvaapiinterop.h
+        SOURCES += decoders/mythvaapicontext.cpp opengl/mythvaapiinterop.cpp
         LIBS    += -lva -lva-x11 -lva-glx -lEGL
     }
 
     using_nvdec {
         DEFINES += USING_NVDEC
         HEADERS += opengl/mythnvdecinterop.h
-        HEADERS += mythnvdeccontext.h
+        HEADERS += decoders/mythnvdeccontext.h
         SOURCES += opengl/mythnvdecinterop.cpp
-        SOURCES += mythnvdeccontext.cpp
+        SOURCES += decoders/mythnvdeccontext.cpp
         INCLUDEPATH += ../../external/nv-codec-headers/include
     }
 
     using_mediacodec {
         DEFINES += USING_MEDIACODEC
-        HEADERS += mythmediacodeccontext.h   opengl/mythmediacodecinterop.h
-        SOURCES += mythmediacodeccontext.cpp opengl/mythmediacodecinterop.cpp
+        HEADERS += decoders/mythmediacodeccontext.h   opengl/mythmediacodecinterop.h
+        SOURCES += decoders/mythmediacodeccontext.cpp opengl/mythmediacodecinterop.cpp
     }
 
     # Misc. frontend
@@ -672,8 +672,8 @@ using_backend {
         HEADERS += recorders/v4l2encsignalmonitor.h
         SOURCES += recorders/v4l2encsignalmonitor.cpp
 
-        HEADERS += mythv4l2m2mcontext.h
-        SOURCES += mythv4l2m2mcontext.cpp
+        HEADERS += decoders/mythv4l2m2mcontext.h
+        SOURCES += decoders/mythv4l2m2mcontext.cpp
         DEFINES += USING_V4L2
     }
 

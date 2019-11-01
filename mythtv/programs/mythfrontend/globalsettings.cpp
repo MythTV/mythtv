@@ -47,7 +47,7 @@
 #include "AirPlay/mythraopconnection.h"
 #endif
 #ifdef USING_VAAPI
-#include "mythvaapicontext.h"
+#include "decoders/mythvaapicontext.h"
 #endif
 
 //Use for playBackGroup, to be remove at one point
