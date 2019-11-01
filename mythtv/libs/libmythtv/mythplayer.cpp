@@ -2548,13 +2548,10 @@ void MythPlayer::EnableFrameRateMonitor(bool enable)
     output_jmeter->SetNumCycles(static_cast<int>(rate));
 }
 
-void MythPlayer::ForceDeinterlacer(const QString &overridefilter)
+void MythPlayer::ForceDeinterlacer(bool DoubleRate, MythDeintType Deinterlacer)
 {
-    if (!videoOutput)
-        return;
-
-    (void)overridefilter;
-    LOG(VB_GENERAL, LOG_ERR, LOC + "ForceDeinterlacer not yet re-implemented");
+    if (videoOutput)
+        videoOutput->SetDeinterlacing(true, DoubleRate, Deinterlacer);
 }
 
 void MythPlayer::VideoStart(void)

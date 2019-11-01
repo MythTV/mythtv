@@ -180,7 +180,7 @@ class MTV_PUBLIC MythPlayer
     void SetDuration(int duration);
     void SetVideoResize(const QRect &videoRect);
     void EnableFrameRateMonitor(bool enable = false);
-    void ForceDeinterlacer(const QString &override = QString());
+    void ForceDeinterlacer(bool DoubleRate, MythDeintType Deinterlacer);
     void SetFrameRate(double fps);
 
     // Gets

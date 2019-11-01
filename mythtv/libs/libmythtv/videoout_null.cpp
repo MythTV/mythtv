@@ -200,8 +200,13 @@ void VideoOutputNull::StopEmbedding(void)
         VideoOutput::StopEmbedding();
 }
 
-void VideoOutputNull::SetDeinterlacing(bool, bool)
+void VideoOutputNull::SetDeinterlacing(bool Enable, bool DoubleRate, MythDeintType Force /*=DEINT_NONE*/)
 {
+    if (DEINT_NONE != Force)
+    {
+        VideoOutput::SetDeinterlacing(Enable, DoubleRate, Force);
+        return;
+    }
     m_videoBuffers.SetDeinterlacing(DEINT_NONE, DEINT_NONE, m_videoCodecID);
 }
 

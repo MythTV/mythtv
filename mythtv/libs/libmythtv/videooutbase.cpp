@@ -368,7 +368,7 @@ MythDeintType VideoOutput::ParseDeinterlacer(const QString &Deinterlacer)
     return result;
 }
 
-void VideoOutput::SetDeinterlacing(bool Enable, bool DoubleRate)
+void VideoOutput::SetDeinterlacing(bool Enable, bool DoubleRate, MythDeintType Force /*=DEINT_NONE*/)
 {
     if (!Enable)
     {
@@ -379,7 +379,14 @@ void VideoOutput::SetDeinterlacing(bool Enable, bool DoubleRate)
 
     MythDeintType singlerate = DEINT_NONE;
     MythDeintType doublerate = DEINT_NONE;
-    if (m_dbDisplayProfile)
+    if (DEINT_NONE != Force)
+    {
+        singlerate = Force;
+        if (DoubleRate)
+            doublerate = Force;
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + "Overriding deinterlacers");
+    }
+    else if (m_dbDisplayProfile)
     {
         singlerate = ParseDeinterlacer(m_dbDisplayProfile->GetSingleRatePreferences());
         if (DoubleRate)

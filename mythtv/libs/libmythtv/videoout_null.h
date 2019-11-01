@@ -10,13 +10,13 @@ class VideoOutputNull : public VideoOutput
   public:
     static void GetRenderOptions(RenderOptions &Options);
     VideoOutputNull();
-   ~VideoOutputNull();
+   ~VideoOutputNull() override;
 
     bool Init(const QSize &video_dim_buf,
               const QSize &video_dim_disp,
               float aspect,
               WId winid, const QRect &win_rect, MythCodecID codec_id) override; // VideoOutput
-    void SetDeinterlacing(bool Enable, bool DoubleRate) override;
+    void SetDeinterlacing(bool Enable, bool DoubleRate, MythDeintType Force = DEINT_NONE) override;
     void PrepareFrame(VideoFrame *buffer, FrameScanType, OSD *osd) override; // VideoOutput
     void Show(FrameScanType ) override; // VideoOutput
     void CreatePauseFrame(void);

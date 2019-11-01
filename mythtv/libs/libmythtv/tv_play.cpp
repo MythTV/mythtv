@@ -12231,8 +12231,8 @@ void TV::HandleDeinterlacer(PlayerContext *ctx, const QString &action)
 
     QString deint = action.mid(13);
     ctx->LockDeletePlayer(__FILE__, __LINE__);
-    if (ctx->m_player)
-        ctx->m_player->ForceDeinterlacer(deint);
+    //if (ctx->m_player)
+    //    ctx->m_player->ForceDeinterlacer(deint);
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 }
 

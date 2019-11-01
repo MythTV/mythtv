@@ -615,9 +615,6 @@ int Transcode::TranscodeFile(const QString &inputname,
         }
 
         arb->m_audioFrameSize = avfw->GetAudioFrameSize() * arb->m_channels * 2;
-
-        //GetPlayer()->SetVideoFilters(
-        //    gCoreContext->GetSetting("HTTPLiveStreamFilters", "yadif=1:-1:1"));
     }
 #if CONFIG_LIBMP3LAME 
     else if (fifodir.isEmpty())
@@ -877,6 +874,10 @@ int Transcode::TranscodeFile(const QString &inputname,
         delete avfw2;
         return REENCODE_ERROR;
     }
+
+    // must come after InitForTranscode - which creates the VideoOutput instance
+    if (hlsMode)
+        GetPlayer()->ForceDeinterlacer(false, DEINT_CPU | DEINT_MEDIUM);
 
     VideoFrame frame;
     memset(&frame, 0, sizeof(frame));

@@ -54,7 +54,7 @@ class VideoOutput
                       float VideoAspect,     WId WinID,
                       const QRect &WindowRect, MythCodecID CodecID);
     virtual void SetVideoFrameRate(float);
-    virtual void SetDeinterlacing(bool Enable, bool DoubleRate);
+    virtual void SetDeinterlacing(bool Enable, bool DoubleRate, MythDeintType Force = DEINT_NONE);
     virtual void ProcessFrame(VideoFrame *Frame, OSD *Osd, const PIPMap &PipPlayers,
                               FrameScanType Scan = kScan_Ignore) = 0;
     virtual void PrepareFrame(VideoFrame *Frame, FrameScanType, OSD *Osd) = 0;
