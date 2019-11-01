@@ -617,11 +617,10 @@ void MythUIFileBrowser::updateLocalFileList()
     else
     {
         QFileInfoList::const_iterator it = list.begin();
-        const QFileInfo *fi;
 
         while (it != list.end())
         {
-            fi = &(*it);
+            const QFileInfo *fi = &(*it);
             MFileInfo finfo(fi->filePath());
 
             if (finfo.fileName() == ".")

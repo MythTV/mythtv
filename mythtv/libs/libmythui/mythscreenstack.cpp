@@ -141,8 +141,7 @@ void MythScreenStack::PopScreen(MythScreenType *screen, bool allowFade,
 
     if (!m_Children.isEmpty())
     {
-        QVector<MythScreenType *>::Iterator it;
-        for (it = m_DrawOrder.begin(); it != m_DrawOrder.end(); ++it)
+        for (auto it = m_DrawOrder.begin(); it != m_DrawOrder.end(); ++it)
         {
             if (*it != screen && !(*it)->IsDeleting())
             {
@@ -237,9 +236,7 @@ void MythScreenStack::RecalculateDrawOrder(void)
     if (m_Children.isEmpty())
         return;
 
-    QVector<MythScreenType *>::Iterator it;
-
-    for (it = m_Children.begin(); it != m_Children.end(); ++it)
+    for (auto it = m_Children.begin(); it != m_Children.end(); ++it)
     {
         MythScreenType *screen = (*it);
 
@@ -265,8 +262,7 @@ void MythScreenStack::DoNewFadeTransition(void)
 
     if (m_newTop->IsFullscreen())
     {
-        QVector<MythScreenType *>::Iterator it;
-        for (it = m_DrawOrder.begin(); it != m_DrawOrder.end(); ++it)
+        for (auto it = m_DrawOrder.begin(); it != m_DrawOrder.end(); ++it)
         {
             if (!(*it)->IsDeleting())
                 (*it)->AdjustAlpha(1, -kFadeVal);
@@ -318,8 +314,9 @@ void MythScreenStack::CheckDeletes(bool force)
         {
             bool found = false;
 
-            QVector<MythScreenType *>::Iterator test;
-            for (test = m_DrawOrder.begin(); test != m_DrawOrder.end(); ++test)
+            for (auto test = m_DrawOrder.begin();
+                 test != m_DrawOrder.end();
+                 ++test)
             {
                 if (*it == *test)
                 {
@@ -334,8 +331,9 @@ void MythScreenStack::CheckDeletes(bool force)
 
         if (deleteit)
         {
-            QVector<MythScreenType *>::Iterator test;
-            for (test = m_Children.begin(); test != m_Children.end(); ++test)
+            for (auto test = m_Children.begin();
+                 test != m_Children.end();
+                 ++test)
             {
                 if (*test == *it)
                 {
@@ -368,8 +366,7 @@ QString MythScreenStack::GetLocation(bool fullPath) const
     if (fullPath)
     {
         QString path;
-        QVector<MythScreenType *>::const_iterator it;
-        for (it = m_Children.begin(); it != m_Children.end(); ++it)
+        for (auto it = m_Children.begin(); it != m_Children.end(); ++it)
         {
             if (!(*it)->IsDeleting())
             {

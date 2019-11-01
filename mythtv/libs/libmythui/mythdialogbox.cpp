@@ -551,7 +551,6 @@ MythConfirmationDialog  *ShowOkPopup(const QString &message, QObject *parent,
                                      const char *slot, bool showCancel)
 {
     QString                  LOC = "ShowOkPopup('" + message + "') - ";
-    MythConfirmationDialog  *pop;
     MythScreenStack         *stk = nullptr;
 
     MythMainWindow *win = GetMythMainWindow();
@@ -571,7 +570,7 @@ MythConfirmationDialog  *ShowOkPopup(const QString &message, QObject *parent,
         return nullptr;
     }
 
-    pop = new MythConfirmationDialog(stk, message, showCancel);
+    auto pop = new MythConfirmationDialog(stk, message, showCancel);
     if (pop->Create())
     {
         stk->AddScreen(pop);
@@ -939,7 +938,6 @@ bool MythTimeInputDialog::Create()
     m_dateList->SetVisible(false);
     m_timeList->SetVisible(false);
 
-    MythUIButtonListItem *item;
     // Date
     if (kNoDate != (m_resolution & 0xF))
     {
@@ -958,7 +956,6 @@ bool MythTimeInputDialog::Create()
         }
 
         QString text;
-        int flags;
         bool selected = false;
         for (int x = 0; x <= limit; x++)
         {
@@ -966,7 +963,7 @@ bool MythTimeInputDialog::Create()
             if (m_resolution & kDay)
             {
                 date = date.addDays(1);
-                flags = MythDate::kDateFull | MythDate::kSimplify;
+                int flags = MythDate::kDateFull | MythDate::kSimplify;
                 if (m_rangeLimit >= 356)
                     flags |= MythDate::kAddYear;
                 text = MythDate::toString(date, flags);
@@ -991,7 +988,7 @@ bool MythTimeInputDialog::Create()
                     selected = true;
             }
 
-            item = new MythUIButtonListItem(m_dateList, text, nullptr, false);
+            auto item = new MythUIButtonListItem(m_dateList, text, nullptr, false);
             item->SetData(QVariant(date));
 
             if (selected)
@@ -1032,7 +1029,7 @@ bool MythTimeInputDialog::Create()
                     selected = true;
             }
 
-            item = new MythUIButtonListItem(m_timeList, text, nullptr, false);
+            auto item = new MythUIButtonListItem(m_timeList, text, nullptr, false);
             item->SetData(QVariant(time));
 
             if (selected)

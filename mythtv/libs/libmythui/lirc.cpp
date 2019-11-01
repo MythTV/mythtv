@@ -132,7 +132,7 @@ static QByteArray get_ip(const QString &h)
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_protocol = IPPROTO_TCP;
 
-    struct addrinfo *result;
+    struct addrinfo *result = nullptr;
     int err = getaddrinfo(hba.constData(), nullptr, &hints, &result);
     if (err)
     {

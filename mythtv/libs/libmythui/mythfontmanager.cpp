@@ -248,8 +248,8 @@ bool MythFontManager::RegisterFont(const QString &fontPath,
             return false;
         id = ref->GetFontID();
     }
-    MythFontReference *fontReference;
-    fontReference = new MythFontReference(fontPath, registeredFor, id);
+    MythFontReference *fontReference =
+        new MythFontReference(fontPath, registeredFor, id);
     m_fontPathToReference.insert(fontPath, fontReference);
     return true;
 }

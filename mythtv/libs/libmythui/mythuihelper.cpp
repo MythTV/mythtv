@@ -807,11 +807,10 @@ void MythUIHelper::ClearOldImageCache(void)
 
     QFileInfoList::const_iterator it = list.begin();
     QMap<QDateTime, QString> dirtimes;
-    const QFileInfo *fi;
 
     while (it != list.end())
     {
-        fi = &(*it++);
+        const QFileInfo *fi = &(*it++);
 
         if (fi->isDir() && !fi->isSymLink())
         {
@@ -862,11 +861,10 @@ void MythUIHelper::RemoveCacheDir(const QString &dirname)
     dir.setFilter(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
     QFileInfoList list = dir.entryInfoList();
     QFileInfoList::const_iterator it = list.begin();
-    const QFileInfo *fi;
 
     while (it != list.end())
     {
-        fi = &(*it++);
+        const QFileInfo *fi = &(*it++);
 
         if (fi->isFile() && !fi->isSymLink())
         {
@@ -1029,8 +1027,8 @@ void MythUIHelper::ParseGeometryOverride(const QString &geometry)
         return;
     }
 
-    bool parsed;
-    int tmp_w, tmp_h;
+    bool parsed = false;
+    int tmp_w = 0, tmp_h = 0;
 
     tmp_w = geo[1].toInt(&parsed);
 
@@ -1066,38 +1064,29 @@ void MythUIHelper::ParseGeometryOverride(const QString &geometry)
 
     if (longForm)
     {
-        int tmp_x, tmp_y;
-        tmp_x = geo[3].toInt(&parsed);
-
+        int tmp_x = geo[3].toInt(&parsed);
         if (!parsed)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 "Could not parse horizontal offset of geometry override");
-        }
-
-        if (parsed)
-        {
-            tmp_y = geo[4].toInt(&parsed);
-
-            if (!parsed)
-            {
-                LOG(VB_GENERAL, LOG_ERR, LOC +
-                    "Could not parse vertical offset of geometry override");
-            }
-        }
-
-        if (parsed)
-        {
-            MythUIHelperPrivate::x_override = tmp_x;
-            MythUIHelperPrivate::y_override = tmp_y;
-            LOG(VB_GENERAL, LOG_INFO, LOC +
-                QString("Overriding GUI offset: x=%1 y=%2")
-                .arg(tmp_x).arg(tmp_y));
-        }
-        else
-        {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to override GUI offset.");
+            return;
         }
+
+        int tmp_y = geo[4].toInt(&parsed);
+        if (!parsed)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                "Could not parse vertical offset of geometry override");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to override GUI offset.");
+            return;
+        }
+
+        MythUIHelperPrivate::x_override = tmp_x;
+        MythUIHelperPrivate::y_override = tmp_y;
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("Overriding GUI offset: x=%1 y=%2")
+            .arg(tmp_x).arg(tmp_y));
     }
 }
 

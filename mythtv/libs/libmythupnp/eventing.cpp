@@ -90,11 +90,9 @@ inline short Eventing::HoldEvents()
     // -=>TODO: Should use an Atomic increment... 
     //          need to research available functions.
 
-    short nVal;
-
     m_mutex.lock();
     bool err = (m_nHoldCount >= 127);
-    nVal = (m_nHoldCount++);
+    short nVal = (m_nHoldCount++);
     m_mutex.unlock();
 
     if (err)
@@ -116,10 +114,8 @@ inline short Eventing::ReleaseEvents()
 {
     // -=>TODO: Should use an Atomic decrement... 
 
-    short nVal;
-
     m_mutex.lock();
-    nVal = (m_nHoldCount--);
+    short nVal = (m_nHoldCount--);
     m_mutex.unlock();
 
     if (nVal == 0)

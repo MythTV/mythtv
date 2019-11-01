@@ -51,7 +51,7 @@ int CheckNVOpenGLSyncToVBlank(void)
         return -1;
     }
 
-    int major, minor;
+    int major = 0, minor = 0;
     if (!XNVCTRLQueryVersion(dpy, &major, &minor))
         return -1;
 
@@ -93,18 +93,10 @@ int GetNvidiaRates(t_screenrate& screenmap)
     {
         return -1;
     }
-    Display *dpy;
-    bool ret;
-    int screen, display_devices, mask, major, minor, len, j;
-    char *str, *start;
-    int nDisplayDevice;
+    int display_devices = 0, major = 0, minor = 0;
 
-    char *pMetaModes, *pModeLines[8], *tmp, *modeString;
-    char *modeLine, *modeName;
-    int MetaModeLen, ModeLineLen[8];
-    int thisMask;
-    int id;
-    int twinview =  0;
+    char *pMetaModes = nullptr, *pModeLines[8], *tmp = nullptr;
+    int MetaModeLen = 0, ModeLineLen[8];
     map<int, map<int,bool> > maprate;
 
     memset(pModeLines, 0, sizeof(pModeLines));
@@ -115,8 +107,8 @@ int GetNvidiaRates(t_screenrate& screenmap)
      * extension is present on the screen we want to use.
      */
 
-    dpy = d->GetDisplay();
-    screen = d->GetScreen();
+    Display *dpy = d->GetDisplay();
+    int screen = d->GetScreen();
 
     if (!XNVCTRLIsNvScreen(dpy, screen))
     {
@@ -128,7 +120,7 @@ int GetNvidiaRates(t_screenrate& screenmap)
         return -1;
     }
 
-    ret = (XNVCTRLQueryVersion(dpy, &major, &minor) != 0);
+    int ret = (XNVCTRLQueryVersion(dpy, &major, &minor) != 0);
     if (!ret)
     {
         LOG(VB_GUI, LOG_INFO,
@@ -138,6 +130,7 @@ int GetNvidiaRates(t_screenrate& screenmap)
         return -1;
     }
 
+    int twinview = 0;
     ret = (XNVCTRLQueryAttribute(dpy, screen, 0, NV_CTRL_DYNAMIC_TWINVIEW, &twinview) != 0);
 
     if (!ret)
@@ -188,12 +181,15 @@ int GetNvidiaRates(t_screenrate& screenmap)
      * this X screen; we'll need these later
      */
 
-    nDisplayDevice = 0;
+    int nDisplayDevice = 0;
 
-    for (mask = 1; mask < (1 << 24); mask <<= 1)
+    for (int mask = 1; mask < (1 << 24); mask <<= 1)
     {
+        int len = 0;
+
         if (!(display_devices & mask)) continue;
 
+        char *str = nullptr;
         ret = (XNVCTRLQueryBinaryData(dpy, screen, mask,
                                NV_CTRL_BINARY_DATA_MODELINES,
                                (unsigned char **)&str, &len) != 0);
@@ -202,7 +198,7 @@ int GetNvidiaRates(t_screenrate& screenmap)
             LOG(VB_GUI, LOG_ERR,
                "Unknown error. Failed to query the enabled Display Devices.");
             // Free Memory currently allocated
-            for (j=0; j < nDisplayDevice; ++j)
+            for (int j=0; j < nDisplayDevice; ++j)
             {
                 free(pModeLines[j]);
             }
@@ -217,9 +213,10 @@ int GetNvidiaRates(t_screenrate& screenmap)
     }
 
     /* now, parse each MetaMode */
-    str = start = pMetaModes;
+    char *str = pMetaModes;
+    char *start = pMetaModes;
 
-    for (j = 0; j < MetaModeLen - 1; ++j)
+    for (int j = 0; j < MetaModeLen - 1; ++j)
     {
         /*
          * if we found the end of a line, treat the string from
@@ -228,7 +225,7 @@ int GetNvidiaRates(t_screenrate& screenmap)
 
         if ((str[j] == '\0') && (str[j+1] != '\0'))
         {
-            id = extract_id_string(start);
+            int id = extract_id_string(start);
             /*
              * the MetaMode may be preceded with "token=value"
              * pairs, separated by the main MetaMode with "::"; if
@@ -248,10 +245,13 @@ int GetNvidiaRates(t_screenrate& screenmap)
             /* split the MetaMode string by comma */
 
             char *strtok_state = nullptr;
-            for (modeString = strtok_r(tmp, ",", &strtok_state);
+            for (char *modeString = strtok_r(tmp, ",", &strtok_state);
                  modeString;
                  modeString = strtok_r(nullptr, ",", &strtok_state))
             {
+                char *modeName = nullptr;
+                int thisMask = 0;
+
                 /*
                  * retrieve the modeName and display device mask
                  * for this segment of the Metamode
@@ -263,7 +263,7 @@ int GetNvidiaRates(t_screenrate& screenmap)
                 nDisplayDevice = 0;
                 if (thisMask)
                 {
-                    for (mask = 1; mask < (1 << 24); mask <<= 1)
+                    for (int mask = 1; mask < (1 << 24); mask <<= 1)
                     {
                         if (!(display_devices & mask)) continue;
                         if (thisMask & mask) break;
@@ -271,28 +271,25 @@ int GetNvidiaRates(t_screenrate& screenmap)
                     }
                 }
 
-                modeLine = find_modeline(modeName,
+                char *modeLine = find_modeline(modeName,
                                          pModeLines[nDisplayDevice],
                                          ModeLineLen[nDisplayDevice]);
 
                 if (modeLine && !modeline_is_interlaced(modeLine))
                 {
-                    int w, h, vfl, hfl, i, irate;
-                    double dcl, r;
                     char *buf[9] = {nullptr};
-                    uint64_t key, key2;
 
                     // skip name
                     tmp = strchr(modeLine, '"');
                     tmp = strchr(tmp+1, '"') +1 ;
                     while (*tmp == ' ')
                         tmp++;
-                    i = 0;
-                    for (modeString = strtok_r(tmp, " ", &strtok_state);
-                         modeString;
-                         modeString = strtok_r(nullptr, " ", &strtok_state))
+                    int i = 0;
+                    for (char *modeString2 = strtok_r(tmp, " ", &strtok_state);
+                         modeString2;
+                         modeString2 = strtok_r(nullptr, " ", &strtok_state))
                     {
-                        buf[i++] = modeString;
+                        buf[i++] = modeString2;
 
                         if (i == 9) // We're only interested in the first 9 tokens [0 ... 8]
                             break;
@@ -305,17 +302,18 @@ int GetNvidiaRates(t_screenrate& screenmap)
                         continue;
                     }
 
-                    w = strtol(buf[1], nullptr, 10);
-                    h = strtol(buf[5], nullptr, 10);
-                    vfl = strtol(buf[8], nullptr, 10);
-                    hfl = strtol(buf[4], nullptr, 10);
+                    int w = strtol(buf[1], nullptr, 10);
+                    int h = strtol(buf[5], nullptr, 10);
+                    int vfl = strtol(buf[8], nullptr, 10);
+                    int hfl = strtol(buf[4], nullptr, 10);
                     istringstream istr(buf[0]);
                     istr.imbue(locale("C"));
+                    double dcl = NAN;
                     istr >> dcl;
-                    r = (dcl * 1000000.0) / (vfl * hfl);
-                    irate = (int) round(r * 1000.0);
-                    key = DisplayResScreen::CalcKey(w, h, (double) id);
-                    key2 = DisplayResScreen::CalcKey(w, h, 0.0);
+                    double r = (dcl * 1000000.0) / (vfl * hfl);
+                    int irate = (int) round(r * 1000.0);
+                    uint64_t key = DisplayResScreen::CalcKey(w, h, (double) id);
+                    uint64_t key2 = DisplayResScreen::CalcKey(w, h, 0.0);
                     // We need to eliminate duplicates, giving priority to the first entries found
                     if (maprate.find(key2) == maprate.end())
                     {
@@ -337,7 +335,7 @@ int GetNvidiaRates(t_screenrate& screenmap)
         }
     }
     // Free Memory
-    for (j=0; j < nDisplayDevice; ++j)
+    for (int j=0; j < nDisplayDevice; ++j)
     {
         free(pModeLines[j]);
     }
@@ -397,14 +395,12 @@ static unsigned int display_device_mask(char *str)
 
 static void parse_mode_string(char *modeString, char **modeName, int *mask)
 {
-    char *colon, *s_end, tmp;
-
     // Skip space
     while (*modeString == ' ')
     {
         modeString++;
     }
-    colon = strchr(modeString, ':');
+    char *colon = strchr(modeString, ':');
 
     if (colon)
     {
@@ -428,7 +424,7 @@ static void parse_mode_string(char *modeString, char **modeName, int *mask)
      * find the modename; stop at the last ' @' (would be easier with regex)
      */
 
-    s_end = strchr(modeString, '\0');
+    char *s_end = strchr(modeString, '\0');
 
     for (char *s = modeString; *s; s++)
     {
@@ -436,7 +432,7 @@ static void parse_mode_string(char *modeString, char **modeName, int *mask)
             s_end = s;
     }
 
-    tmp = *s_end;
+    char tmp = *s_end;
     *s_end = '\0';
     *modeName = strdup(modeString);
     *s_end = tmp;
@@ -451,13 +447,9 @@ static void parse_mode_string(char *modeString, char **modeName, int *mask)
 
 static char *find_modeline(char *modeName, char *pModeLines, int ModeLineLen)
 {
-    char *start, *beginQuote, *endQuote;
-    int j;
-    bool match = false;
+    char *start = pModeLines;
 
-    start = pModeLines;
-
-    for (j = 0; j < ModeLineLen; j++)
+    for (int j = 0; j < ModeLineLen; j++)
     {
         if (pModeLines[j] == '\0')
         {
@@ -467,13 +459,13 @@ static char *find_modeline(char *modeName, char *pModeLines, int ModeLineLen)
              * can compare it to modeName
              */
 
-            beginQuote = strchr(start, '"');
-            endQuote = beginQuote ? strchr(beginQuote+1, '"') : nullptr;
+            char *beginQuote = strchr(start, '"');
+            char *endQuote = beginQuote ? strchr(beginQuote+1, '"') : nullptr;
 
             if (beginQuote && endQuote)
             {
                 *endQuote = '\0';
-                match = (strcmp(modeName, beginQuote+1) == 0);
+                bool match = (strcmp(modeName, beginQuote+1) == 0);
                 *endQuote = '"';
 
                 /*
@@ -508,10 +500,8 @@ static char *find_modeline(char *modeName, char *pModeLines, int ModeLineLen)
  */
 static int extract_id_string(char *str)
 {
-    char *begin, *end;
-    int id;
-
-    begin = strstr(str, "id=");
+    char *end = nullptr;
+    char *begin = strstr(str, "id=");
     if (!begin)
     {
         return -1;
@@ -525,7 +515,7 @@ static int extract_id_string(char *str)
         end++;
     }
     *end = '\0';
-    id = atoi(begin);
+    int id = atoi(begin);
     free(begin);
     return id;
 }

@@ -561,7 +561,7 @@ uint MythRenderOpenGL::CreateTexture(QSize act_size, bool use_pbo,
 
     EnableTextures(0, type);
 
-    GLuint tex;
+    GLuint tex = 0;
     glGenTextures(1, &tex);
     glBindTexture(type, tex);
 
@@ -792,7 +792,7 @@ bool MythRenderOpenGL::CreateFrameBuffer(uint &fb, uint tex)
         return false;
 
     QSize size = m_textures[tex].m_size;
-    GLuint glfb;
+    GLuint glfb = 0;
 
     makeCurrent();
     glCheck();
@@ -809,8 +809,7 @@ bool MythRenderOpenGL::CreateFrameBuffer(uint &fb, uint tex)
     m_glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                              m_textures[tex].m_type, tex, 0);
 
-    GLenum status;
-    status = m_glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    GLenum status = m_glCheckFramebufferStatus(GL_FRAMEBUFFER);
     m_glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(tmp_viewport.left(), tmp_viewport.top(),
                tmp_viewport.width(), tmp_viewport.height());
@@ -877,8 +876,7 @@ void MythRenderOpenGL::DeleteFrameBuffer(uint fb)
         return;
 
     makeCurrent();
-    QVector<GLuint>::iterator it;
-    for (it = m_framebuffers.begin(); it != m_framebuffers.end(); ++it)
+    for (auto it = m_framebuffers.begin(); it != m_framebuffers.end(); ++it)
     {
         if (*it == fb)
         {
@@ -1027,7 +1025,7 @@ void* MythRenderOpenGL::GetProcAddress(const QString &proc) const
 {
     // TODO FIXME - this should really return a void(*) not void*
     static const QString exts[4] = { "", "ARB", "EXT", "OES" };
-    void *result;
+    void *result = nullptr;
     for (int i = 0; i < 4; i++)
     {
 #ifdef USING_OPENGLES
@@ -1101,7 +1099,7 @@ bool MythRenderOpenGL::InitFeatures(void)
     m_max_tex_size = (maxtexsz) ? maxtexsz : 512;
 
     m_extensions = (const char*) glGetString(GL_EXTENSIONS);
-    bool rects;
+    bool rects = false;
     m_default_texture_type = GetTextureType(rects);
     if (rects)
         m_exts_supported += kGLExtRect;
@@ -1274,7 +1272,7 @@ uint MythRenderOpenGL::CreatePBO(uint tex)
                  m_textures[tex].m_size.height(), 0,
                  m_textures[tex].m_data_fmt, m_textures[tex].m_data_type, nullptr);
 
-    GLuint tmp_pbo;
+    GLuint tmp_pbo = 0;
     m_glGenBuffers(1, &tmp_pbo);
     m_glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 
@@ -1287,7 +1285,7 @@ uint MythRenderOpenGL::CreateVBO(void)
     if (!(m_exts_used & kGLExtVBO))
         return 0;
 
-    GLuint tmp_vbo;
+    GLuint tmp_vbo = 0;
     m_glGenBuffers(1, &tmp_vbo);
     return tmp_vbo;
 }
@@ -1342,8 +1340,7 @@ void MythRenderOpenGL::DeleteTextures(void)
 
 void MythRenderOpenGL::DeleteFrameBuffers(void)
 {
-    QVector<GLuint>::iterator it;
-    for (it = m_framebuffers.begin(); it != m_framebuffers.end(); ++it)
+    for (auto it = m_framebuffers.begin(); it != m_framebuffers.end(); ++it)
         m_glDeleteFramebuffers(1, &(*(it)));
     m_framebuffers.clear();
     Flush(true);
@@ -1563,8 +1560,8 @@ bool MythRenderOpenGL::ClearTexture(uint tex)
 
 uint MythRenderOpenGL::GetBufferSize(QSize size, uint fmt, uint type)
 {
-    uint bytes;
-    uint bpp;
+    uint bytes = 0;
+    uint bpp = 0;
 
     if (fmt ==GL_RGBA)
     {

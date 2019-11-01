@@ -368,8 +368,7 @@ int MSocketDevice::option(Option opt) const
 
     if (n != -1)
     {
-        QT_SOCKOPTLEN_T len;
-        len = sizeof(v);
+        QT_SOCKOPTLEN_T len = sizeof(v);
         int r = ::getsockopt(fd, SOL_SOCKET, n, (char*) & v, &len);
 
         if (r >= 0)
@@ -517,8 +516,8 @@ bool MSocketDevice::connect(const QHostAddress &addr, quint16 port)
 
     struct sockaddr_in a4 {};
     struct sockaddr_in6 a6 {};
-    struct sockaddr *aa;
-    QT_SOCKLEN_T aalen;
+    struct sockaddr *aa = nullptr;
+    QT_SOCKLEN_T aalen = 0;
 
     if (addr.protocol() == QAbstractSocket::IPv6Protocol)
     {
@@ -623,7 +622,7 @@ bool MSocketDevice::bind(const QHostAddress &address, quint16 port)
     if (!isValid())
         return false;
 
-    int r;
+    int r = 0;
 
     if (address.protocol() == QAbstractSocket::IPv6Protocol)
     {
@@ -744,9 +743,9 @@ int MSocketDevice::accept()
 
     QT_SOCKLEN_T l = sizeof(aa);
 
-    bool done;
+    bool done = true;
 
-    int s;
+    int s = -1;
 
     do
     {
@@ -946,8 +945,7 @@ qint64 MSocketDevice::readData(char *data, qint64 maxlen)
         // then select() will keep falling through
         if (t == Datagram)
         {
-            QT_SOCKLEN_T sz;
-            sz = sizeof(aa);
+            QT_SOCKLEN_T sz = sizeof(aa);
             ::recvfrom(fd, data, 0, 0, (struct sockaddr *) & aa, &sz);
             qt_socket_getportaddr((struct sockaddr *)&aa, &pp, &pa);
         }
@@ -991,8 +989,7 @@ qint64 MSocketDevice::readData(char *data, qint64 maxlen)
         if (t == Datagram)
         {
             memset(&aa, 0, sizeof(aa));
-            QT_SOCKLEN_T sz;
-            sz = sizeof(aa);
+            QT_SOCKLEN_T sz = sizeof(aa);
             r = ::recvfrom(fd, data, maxlen, 0,
                            (struct sockaddr *) & aa, &sz);
 
@@ -1115,7 +1112,7 @@ qint64 MSocketDevice::writeData(const char *data, qint64 len)
     bool done = false;
 
     int r = 0;
-    bool timeout;
+    bool timeout = false;
 
     while (!done)
     {
@@ -1243,9 +1240,8 @@ qint64 MSocketDevice::writeBlock(const char * data, quint64 len,
 
     struct sockaddr_in a4 {};
     struct sockaddr_in6 a6 {};
-    struct sockaddr *aa;
-
-    QT_SOCKLEN_T slen;
+    struct sockaddr *aa = nullptr;
+    QT_SOCKLEN_T slen = 0;
 
     if (host.protocol() == QAbstractSocket::IPv6Protocol)
     {
@@ -1357,9 +1353,7 @@ void MSocketDevice::fetchConnectionParameters()
 
     struct sockaddr_storage sa {};
 
-    QT_SOCKLEN_T sz;
-
-    sz = sizeof(sa);
+    QT_SOCKLEN_T sz = sizeof(sa);
 
     if (!::getsockname(fd, (struct sockaddr *)(&sa), &sz))
         qt_socket_getportaddr((struct sockaddr *)&sa, &p, &a);

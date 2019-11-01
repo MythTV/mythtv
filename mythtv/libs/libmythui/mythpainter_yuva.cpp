@@ -162,7 +162,7 @@ MythFontProperties* MythYUVAPainter::GetConvertedFont(const MythFontProperties &
         {
             QPoint offset;
             QColor color;
-            int alpha;
+            int alpha = 255;
             font.GetShadow(offset, color, alpha);
             yuv_color = rgb_to_yuv(color);
             new_font->SetShadow(true, offset, yuv_color, alpha);
@@ -171,7 +171,7 @@ MythFontProperties* MythYUVAPainter::GetConvertedFont(const MythFontProperties &
         if (font.hasOutline())
         {
             QColor color;
-            int size, alpha;
+            int size = 0, alpha = 255;
             font.GetOutline(color, size, alpha);
             yuv_color = rgb_to_yuv(color);
             new_font->SetOutline(true, yuv_color, size, alpha);

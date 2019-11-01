@@ -437,23 +437,22 @@ void MythImage::ConvertToYUV(void)
 
     m_isYUV = true;
 
-    int r, r1, g, g1, b, b1, a;
     for (int i = 0; i < height(); i ++)
     {
         QRgb *data = (QRgb*)scanLine(i);
         for (int j = 0; j < width(); j++)
         {
-            r = qRed(data[j]);
-            g = qGreen(data[j]);
-            b = qBlue(data[j]);
-            a = qAlpha(data[j]);
+            int r = qRed(data[j]);
+            int g = qGreen(data[j]);
+            int b = qBlue(data[j]);
+            int a = qAlpha(data[j]);
 
-            r1 = (FIX(0.299) * r + FIX(0.587) * g +
-                  FIX(0.114) * b + ONE_HALF) >> SCALEBITS;
-            g1 = ((- FIX(0.169) * r - FIX(0.331) * g +
-                  FIX(0.499) * b + ONE_HALF) >> SCALEBITS) + 128;
-            b1 = ((FIX(0.499) * r - FIX(0.418) * g -
-                  FIX(0.0813) * b + ONE_HALF) >> SCALEBITS) + 128;
+            int r1 = (FIX(0.299) * r + FIX(0.587) * g +
+                      FIX(0.114) * b + ONE_HALF) >> SCALEBITS;
+            int g1 = ((- FIX(0.169) * r - FIX(0.331) * g +
+                       FIX(0.499) * b + ONE_HALF) >> SCALEBITS) + 128;
+            int b1 = ((FIX(0.499) * r - FIX(0.418) * g -
+                       FIX(0.0813) * b + ONE_HALF) >> SCALEBITS) + 128;
 
             data[j] = qRgba(r1, g1, b1, a);
         }

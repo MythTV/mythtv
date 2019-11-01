@@ -176,7 +176,6 @@ int BufferedSocketDevice::ReadBytes()
     }
 
     qlonglong nbytes = m_pSocket->bytesAvailable();
-    qlonglong nread;
 
     QByteArray *a = nullptr;
 
@@ -185,7 +184,7 @@ int BufferedSocketDevice::ReadBytes()
         a = new QByteArray();
         a->resize(nbytes);
 
-        nread = m_pSocket->readBlock(
+        qlonglong nread = m_pSocket->readBlock(
             a->data(), maxToRead ? std::min(nbytes, maxToRead) : nbytes);
 
         if (( nread > 0 ) && ( nread != a->size() ))
@@ -553,7 +552,7 @@ int BufferedSocketDevice::Getch()
 
         if (m_bufRead.size() > 0 ) 
         {
-            uchar c;
+            uchar c = '\0';
 
             m_bufRead.consumeBytes( 1, (char*)&c );
         

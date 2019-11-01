@@ -288,8 +288,7 @@ void SSDP::run()
         timeout.tv_sec  = 1;
         timeout.tv_usec = 0;
 
-        int count;
-        count = select(nMaxSocket + 1, &read_set, nullptr, nullptr, &timeout);
+        int count = select(nMaxSocket + 1, &read_set, nullptr, nullptr, &timeout);
 
         for (int nIdx = 0; count && nIdx < (int)NumberOfSockets; nIdx++ )
         {
@@ -813,7 +812,7 @@ void SSDPExtension::GetDeviceList( HTTPRequest *pRequest )
     QString     sXML;
     QTextStream os(&sXML, QIODevice::WriteOnly);
 
-    uint nDevCount, nEntryCount;
+    uint nDevCount = 0, nEntryCount = 0;
     SSDPCache::Instance()->OutputXML(os, &nDevCount, &nEntryCount);
 
     NameValues list;

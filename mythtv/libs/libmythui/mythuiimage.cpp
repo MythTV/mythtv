@@ -2,6 +2,7 @@
 #include "mythuiimage.h"
 
 // C++
+#include <cmath>
 #include <cstdint>
 #include <cstdlib>
 #include <ctime>
@@ -309,8 +310,8 @@ class ImageLoader
             // and the screen resolution. We want to avoid scaling twice.
             if (!bResize && imProps.m_isThemeImage)
             {
-                float wmult; // Width multipler
-                float hmult; // Height multipler
+                float wmult = NAN; // Width multipler
+                float hmult = NAN; // Height multipler
                 GetMythUI()->GetScreenSettings(wmult, hmult);
                 if (wmult != 1.0F || hmult != 1.0F)
                 {
@@ -328,8 +329,8 @@ class ImageLoader
                 MythImage *newMaskImage = painter->GetFormatImage();
                 if (newMaskImage->Load(imProps.GetMaskImageFilename()))
                 {
-                    float wmult; // Width multipler
-                    float hmult; // Height multipler
+                    float wmult = NAN; // Width multipler
+                    float hmult = NAN; // Height multipler
                     GetMythUI()->GetScreenSettings(wmult, hmult);
                     if (wmult != 1.0F || hmult != 1.0F)
                     {
@@ -494,12 +495,11 @@ class ImageLoadThread : public QRunnable
         // the point of caching remote images
         if (ImageLoader::SupportsAnimation(filename))
         {
-             AnimationFrames *frames;
-
-             frames = ImageLoader::LoadAnimatedImage(m_painter,
-                                                     m_imageProperties,
-                                                     m_cacheMode, m_parent,
-                                                     aborted);
+             AnimationFrames *frames =
+                 ImageLoader::LoadAnimatedImage(m_painter,
+                                                m_imageProperties,
+                                                m_cacheMode, m_parent,
+                                                aborted);
 
              if (frames && frames->count() > 1)
              {
@@ -726,9 +726,8 @@ void MythUIImage::SetDelays(QVector<int> delays)
 {
     QWriteLocker updateLocker(&d->m_UpdateLock);
     QMutexLocker imageLocker(&m_ImagesLock);
-    QVector<int>::iterator it;
 
-    for (it = delays.begin(); it != delays.end(); ++it)
+    for (auto it = delays.begin(); it != delays.end(); ++it)
         m_Delays[m_Delays.size()] = *it;
 
     if (m_Delay == -1)
@@ -811,9 +810,7 @@ void MythUIImage::SetImages(QVector<MythImage *> *images)
 
     m_imageProperties.m_isThemeImage = false;
 
-    QVector<MythImage *>::iterator it;
-
-    for (it = images->begin(); it != images->end(); ++it)
+    for (auto it = images->begin(); it != images->end(); ++it)
     {
         MythImage *im = (*it);
 
@@ -875,9 +872,7 @@ void MythUIImage::SetAnimationFrames(AnimationFrames frames)
     QVector<int> delays;
     QVector<MythImage *> images;
 
-    AnimationFrames::iterator it;
-
-    for (it = frames.begin(); it != frames.end(); ++it)
+    for (auto it = frames.begin(); it != frames.end(); ++it)
     {
         images.append((*it).first);
         delays.append((*it).second);
@@ -1043,11 +1038,10 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
                 QString("Load(), spawning thread to load '%1'").arg(filename));
 
             m_runningThreads++;
-            ImageLoadThread *bImgThread;
-            bImgThread = new ImageLoadThread(this, GetPainter(),
-                                             imProps,
-                                             bFilename, i,
-                                             static_cast<ImageCacheMode>(cacheMode2));
+            ImageLoadThread *bImgThread =
+                new ImageLoadThread(this, GetPainter(),
+                                    imProps, bFilename, i,
+                                    static_cast<ImageCacheMode>(cacheMode2));
             GetMythUI()->GetImageThreadPool()->start(bImgThread, "ImageLoad");
         }
         else
@@ -1062,9 +1056,8 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
 
             if (ImageLoader::SupportsAnimation(filename))
             {
-                AnimationFrames *myFrames;
-
-                myFrames = ImageLoader::LoadAnimatedImage(GetPainter(), imProps,
+                AnimationFrames *myFrames =
+                    ImageLoader::LoadAnimatedImage(GetPainter(), imProps,
                                         static_cast<ImageCacheMode>(cacheMode2),
                                         this, aborted);
 
@@ -1535,22 +1528,16 @@ void MythUIImage::customEvent(QEvent *event)
 {
     if (event->type() == ImageLoadEvent::kEventType)
     {
-        MythImage *image = nullptr;
-        AnimationFrames *animationFrames = nullptr;
-        int number = 0;
-        QString filename;
-        bool aborted;
-
         ImageLoadEvent *le = static_cast<ImageLoadEvent *>(event);
 
         if (le->GetParent() != this)
             return;
 
-        image           = le->GetImage();
-        number          = le->GetNumber();
-        filename        = le->GetFilename();
-        animationFrames = le->GetAnimationFrames();
-        aborted         = le->GetAbortState();
+        MythImage *image                 = le->GetImage();
+        int number                       = le->GetNumber();
+        QString filename                 = le->GetFilename();
+        AnimationFrames *animationFrames = le->GetAnimationFrames();
+        bool aborted                     = le->GetAbortState();
 
         m_runningThreads--;
 
@@ -1574,9 +1561,8 @@ void MythUIImage::customEvent(QEvent *event)
 
             if (animationFrames)
             {
-                AnimationFrames::iterator it;
-
-                for (it = animationFrames->begin(); it != animationFrames->end();
+                for (auto it = animationFrames->begin();
+                     it != animationFrames->end();
                      ++it)
                 {
                     MythImage *im = (*it).first;

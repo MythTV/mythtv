@@ -196,21 +196,16 @@ QString MythGesture::translate(void)
     /*flag indicating the start of a stroke - always count it in the sequence*/
     bool first_bin = true;
 
-    /* bin boundary and size variables */
-    int delta_x, delta_y;
-    int bound_x_1, bound_x_2;
-    int bound_y_1, bound_y_2;
-
     /* determine size of grid */
-    delta_x = m_max_x - m_min_x;
-    delta_y = m_max_y - m_min_y;
+    int delta_x = m_max_x - m_min_x;
+    int delta_y = m_max_y - m_min_y;
 
     /* calculate bin boundary positions */
-    bound_x_1 = m_min_x + (delta_x / 3);
-    bound_x_2 = m_min_x + 2 * (delta_x / 3);
+    int bound_x_1 = m_min_x + (delta_x / 3);
+    int bound_x_2 = m_min_x + 2 * (delta_x / 3);
 
-    bound_y_1 = m_min_y + (delta_y / 3);
-    bound_y_2 = m_min_y + 2 * (delta_y / 3);
+    int bound_y_1 = m_min_y + (delta_y / 3);
+    int bound_y_2 = m_min_y + 2 * (delta_y / 3);
 
     if (delta_x > m_scale_ratio * delta_y)
     {

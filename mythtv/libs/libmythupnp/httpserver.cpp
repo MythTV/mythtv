@@ -479,7 +479,7 @@ void HttpWorker::run(void)
     bool                    bTimeout   = false;
     bool                    bKeepAlive = true;
     HTTPRequest            *pRequest   = nullptr;
-    QTcpSocket             *pSocket;
+    QTcpSocket             *pSocket    = nullptr;
     bool                    bEncrypted = false;
 
     if (m_connectionType == kSSLServer)
