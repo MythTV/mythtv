@@ -1,5 +1,5 @@
-#ifndef OPENGLVIDEOSHADERS_H
-#define OPENGLVIDEOSHADERS_H
+#ifndef MYTH_OPENGLVIDEOSHADERS_H
+#define MYTH_OPENGLVIDEOSHADERS_H
 
 #include <QString>
 
@@ -213,4 +213,4 @@ static const QString BicubicShader =
 "    tex10        = mix(tex10, tex11, parmy.z);\n"
 "    gl_FragColor = mix(tex00, tex10, parmx.z);\n"
 "}\n";
-#endif // OPENGLVIDEOSHADERS_H
+#endif // MYTH_OPENGLVIDEOSHADERS_H

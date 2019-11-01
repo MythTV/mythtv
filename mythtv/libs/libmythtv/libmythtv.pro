@@ -28,7 +28,7 @@ contains(INCLUDEPATH, /usr/X11R6/include) {
 DEPENDPATH  += .
 DEPENDPATH  += ../libmyth ../libmyth/audio
 DEPENDPATH  += ../libmythbase
-DEPENDPATH  += ./mpeg ./channelscan ./visualisations ./mheg ./decoders
+DEPENDPATH  += ./mpeg ./channelscan ./visualisations ./mheg ./decoders ./opengl
 DEPENDPATH  += ./recorders
 DEPENDPATH  += ./recorders/dvbdev
 DEPENDPATH  += ./recorders/rtp
@@ -69,8 +69,8 @@ macx {
     LIBS += -framework VideoToolBox
     LIBS += -framework IOSurface
     DEFINES += USING_VTB
-    HEADERS += mythvtbinterop.h   mythvtbcontext.h
-    SOURCES += mythvtbinterop.cpp mythvtbcontext.cpp
+    HEADERS += opengl/mythvtbinterop.h   mythvtbcontext.h
+    SOURCES += opengl/mythvtbinterop.cpp mythvtbcontext.cpp
 
     using_firewire:using_backend {
         QMAKE_CXXFLAGS += -F$${CONFIG_MAC_AVC}
@@ -375,8 +375,8 @@ using_frontend {
     SOURCES += decoders/mythcodeccontext.cpp
 
     using_mmal {
-        HEADERS += mythmmalcontext.h   mythmmalinterop.h
-        SOURCES += mythmmalcontext.cpp mythmmalinterop.cpp
+        HEADERS += mythmmalcontext.h   opengl/mythmmalinterop.h
+        SOURCES += mythmmalcontext.cpp opengl/mythmmalinterop.cpp
         LIBS    += -L/opt/vc/lib -lmmal -lvcsm
         LIBS    += -lEGL
         DEFINES += USING_MMAL
@@ -456,10 +456,10 @@ using_frontend {
 
     using_vdpau {
         DEFINES += USING_VDPAU
-        HEADERS += mythvdpauinterop.h
+        HEADERS += opengl/mythvdpauinterop.h
         HEADERS += mythvdpaucontext.h
         HEADERS += mythvdpauhelper.h
-        SOURCES += mythvdpauinterop.cpp
+        SOURCES += opengl/mythvdpauinterop.cpp
         SOURCES += mythvdpaucontext.cpp
         SOURCES += mythvdpauhelper.cpp
         LIBS += -lvdpau
@@ -472,37 +472,37 @@ using_frontend {
 
     using_opengl_video {
         DEFINES += USING_OPENGL_VIDEO
-        HEADERS += openglvideo.h
-        HEADERS += videoout_opengl.h
-        HEADERS += openglvideoshaders.h
-        HEADERS += mythopenglinterop.h
-        HEADERS += mythvideotexture.h
-        SOURCES += openglvideo.cpp
-        SOURCES += videoout_opengl.cpp
-        SOURCES += mythopenglinterop.cpp
-        SOURCES += mythvideotexture.cpp
+        HEADERS += opengl/mythopenglvideo.h
+        HEADERS += opengl/videooutopengl.h
+        HEADERS += opengl/mythopenglvideoshaders.h
+        HEADERS += opengl/mythopenglinterop.h
+        HEADERS += opengl/mythvideotexture.h
+        SOURCES += opengl/mythopenglvideo.cpp
+        SOURCES += opengl/videooutopengl.cpp
+        SOURCES += opengl/mythopenglinterop.cpp
+        SOURCES += opengl/mythvideotexture.cpp
     }
 
     using_vaapi:using_opengl_video {
         DEFINES += USING_VAAPI
-        HEADERS += mythvaapicontext.h   mythvaapiinterop.h
-        SOURCES += mythvaapicontext.cpp mythvaapiinterop.cpp
+        HEADERS += mythvaapicontext.h   opengl/mythvaapiinterop.h
+        SOURCES += mythvaapicontext.cpp opengl/mythvaapiinterop.cpp
         LIBS    += -lva -lva-x11 -lva-glx -lEGL
     }
 
     using_nvdec {
         DEFINES += USING_NVDEC
-        HEADERS += mythnvdecinterop.h
+        HEADERS += opengl/mythnvdecinterop.h
         HEADERS += mythnvdeccontext.h
-        SOURCES += mythnvdecinterop.cpp
+        SOURCES += opengl/mythnvdecinterop.cpp
         SOURCES += mythnvdeccontext.cpp
         INCLUDEPATH += ../../external/nv-codec-headers/include
     }
 
     using_mediacodec {
         DEFINES += USING_MEDIACODEC
-        HEADERS += mythmediacodeccontext.h   mythmediacodecinterop.h
-        SOURCES += mythmediacodeccontext.cpp mythmediacodecinterop.cpp
+        HEADERS += mythmediacodeccontext.h   opengl/mythmediacodecinterop.h
+        SOURCES += mythmediacodeccontext.cpp opengl/mythmediacodecinterop.cpp
     }
 
     # Misc. frontend

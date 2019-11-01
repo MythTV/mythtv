@@ -11,7 +11,7 @@
 #include "mythpainter_ogl.h"
 #include "mythcodeccontext.h"
 #include "mythopenglinterop.h"
-#include "videoout_opengl.h"
+#include "videooutopengl.h"
 
 #define LOC QString("VidOutGL: ")
 
@@ -152,14 +152,14 @@ VideoOutputOpenGL::VideoOutputOpenGL(const QString &Profile)
 
     // Create OpenGLVideo
     QRect dvr = GetDisplayVisibleRect();
-    m_openGLVideo = new OpenGLVideo(m_render, &m_videoColourSpace, m_window.GetVideoDim(),
-                                    m_window.GetVideoDispDim(), dvr, m_window.GetDisplayVideoRect(),
-                                    m_window.GetVideoRect(), true, m_videoProfile);
+    m_openGLVideo = new MythOpenGLVideo(m_render, &m_videoColourSpace, m_window.GetVideoDim(),
+                                        m_window.GetVideoDispDim(), dvr, m_window.GetDisplayVideoRect(),
+                                        m_window.GetVideoRect(), true, m_videoProfile);
 
     // Connect VideoOutWindow to OpenGLVideo
-    QObject::connect(&m_window, &VideoOutWindow::VideoSizeChanged, m_openGLVideo, &OpenGLVideo::SetVideoDimensions);
-    QObject::connect(&m_window, &VideoOutWindow::VideoRectsChanged, m_openGLVideo, &OpenGLVideo::SetVideoRects);
-    QObject::connect(&m_window, &VideoOutWindow::WindowRectChanged, m_openGLVideo, &OpenGLVideo::SetViewportRect);
+    QObject::connect(&m_window, &VideoOutWindow::VideoSizeChanged,  m_openGLVideo, &MythOpenGLVideo::SetVideoDimensions);
+    QObject::connect(&m_window, &VideoOutWindow::VideoRectsChanged, m_openGLVideo, &MythOpenGLVideo::SetVideoRects);
+    QObject::connect(&m_window, &VideoOutWindow::WindowRectChanged, m_openGLVideo, &MythOpenGLVideo::SetViewportRect);
 }
 
 VideoOutputOpenGL::~VideoOutputOpenGL()
@@ -603,7 +603,7 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, OSD 
     // PiPs/PBPs
     if (!m_openGLVideoPiPs.empty())
     {
-        QMap<MythPlayer*,OpenGLVideo*>::iterator it = m_openGLVideoPiPs.begin();
+        QMap<MythPlayer*,MythOpenGLVideo*>::iterator it = m_openGLVideoPiPs.begin();
         for (; it != m_openGLVideoPiPs.end(); ++it)
         {
             if (m_openGLVideoPiPsReady[it.key()])
@@ -843,12 +843,12 @@ void VideoOutputOpenGL::ShowPIP(VideoFrame*, MythPlayer *PiPPlayer, PIPLocation 
     QRect dvr = m_window.GetDisplayVisibleRect();
 
     m_openGLVideoPiPsReady[PiPPlayer] = false;
-    OpenGLVideo *gl_pipchain = m_openGLVideoPiPs[PiPPlayer];
+    MythOpenGLVideo *gl_pipchain = m_openGLVideoPiPs[PiPPlayer];
     if (!gl_pipchain)
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Initialise PiP");
         VideoColourSpace *colourspace = new VideoColourSpace(&m_videoColourSpace);
-        m_openGLVideoPiPs[PiPPlayer] = gl_pipchain = new OpenGLVideo(m_render, colourspace,
+        m_openGLVideoPiPs[PiPPlayer] = gl_pipchain = new MythOpenGLVideo(m_render, colourspace,
                                                                 pipvideodim, pipvideodim,
                                                                 dvr, position, pipvideorect,
                                                                 false, m_videoProfile);
@@ -867,7 +867,7 @@ void VideoOutputOpenGL::ShowPIP(VideoFrame*, MythPlayer *PiPPlayer, PIPLocation 
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Re-initialise PiP.");
         delete gl_pipchain;
         VideoColourSpace *colourspace = new VideoColourSpace(&m_videoColourSpace);
-        m_openGLVideoPiPs[PiPPlayer] = gl_pipchain = new OpenGLVideo(m_render, colourspace,
+        m_openGLVideoPiPs[PiPPlayer] = gl_pipchain = new MythOpenGLVideo(m_render, colourspace,
                                                                 pipvideodim, pipvideodim,
                                                                 dvr, position, pipvideorect,
                                                                 false, m_videoProfile);

@@ -3,7 +3,7 @@
 
 // MythTV
 #include "videooutbase.h"
-#include "openglvideo.h"
+#include "mythopenglvideo.h"
 
 class MythRenderOpenGL;
 class MythOpenGLPainter;
@@ -53,10 +53,10 @@ class VideoOutputOpenGL : public VideoOutput
 
     MythRenderOpenGL      *m_render;
     bool                   m_isGLES2;
-    OpenGLVideo           *m_openGLVideo;
-    QMap<MythPlayer*,OpenGLVideo*> m_openGLVideoPiPs;
+    MythOpenGLVideo       *m_openGLVideo;
+    QMap<MythPlayer*,MythOpenGLVideo*> m_openGLVideoPiPs;
     QMap<MythPlayer*,bool> m_openGLVideoPiPsReady;
-    OpenGLVideo           *m_openGLVideoPiPActive;
+    MythOpenGLVideo       *m_openGLVideoPiPActive;
     MythOpenGLPainter     *m_openGLPainter;
     QString                m_videoProfile;
     MythCodecID            m_newCodecId;

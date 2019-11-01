@@ -18,7 +18,7 @@
 #include "videoout_d3d.h"
 #endif
 #ifdef USING_OPENGL_VIDEO
-#include "videoout_opengl.h"
+#include "videooutopengl.h"
 #endif
 #include "videoout_null.h"
 #include "videooutbase.h"

@@ -3,23 +3,26 @@
 #include "tv.h"
 #include "mythrender_opengl.h"
 #include "mythavutil.h"
-#include "openglvideoshaders.h"
-#include "openglvideo.h"
+#include "mythopenglvideoshaders.h"
+#include "mythopenglvideo.h"
 
 #define LOC QString("GLVid: ")
 #define MAX_VIDEO_TEXTURES 10 // YV12 Kernel deinterlacer + 1
 
 /**
- * \class OpenGLVideo
+ * \class MythOpenGLVideo
  *
- * OpenGLVideo is responsible for displaying video frames on screen using OpenGL.
- * Frames may be sourced from main or graphics memory and OpenGLVideo must
+ * MythOpenGLVideo is responsible for displaying video frames on screen using OpenGL.
+ * Frames may be sourced from main or graphics memory and MythOpenGLVideo must
  * handle colourspace conversion, deinterlacing and scaling as required.
+ *
+ * \note MythOpenGLVideo has no knowledge of buffering, timing and other presentation
+ * state. Its role is to render video frames on screen.
 */
-OpenGLVideo::OpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *ColourSpace,
-                         QSize VideoDim, QSize VideoDispDim,
-                         QRect DisplayVisibleRect, QRect DisplayVideoRect, QRect VideoRect,
-                         bool  ViewportControl, QString Profile)
+MythOpenGLVideo::MythOpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *ColourSpace,
+                                 QSize VideoDim, QSize VideoDispDim,
+                                 QRect DisplayVisibleRect, QRect DisplayVideoRect, QRect VideoRect,
+                                 bool  ViewportControl, QString Profile)
   : QObject(),
     m_valid(false),
     m_profile(Profile),
@@ -56,7 +59,7 @@ OpenGLVideo::OpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *ColourSpace
     m_render->IncrRef();
 
     m_videoColourSpace->IncrRef();
-    connect(m_videoColourSpace, &VideoColourSpace::Updated, this, &OpenGLVideo::UpdateColourSpace);
+    connect(m_videoColourSpace, &VideoColourSpace::Updated, this, &MythOpenGLVideo::UpdateColourSpace);
 
     // Set OpenGL feature support
     m_features      = m_render->GetFeatures();
@@ -64,7 +67,7 @@ OpenGLVideo::OpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *ColourSpace
     m_valid = true;
 }
 
-OpenGLVideo::~OpenGLVideo()
+MythOpenGLVideo::~MythOpenGLVideo()
 {
     if (m_videoColourSpace)
         m_videoColourSpace->DecrRef();
@@ -78,12 +81,12 @@ OpenGLVideo::~OpenGLVideo()
     m_render->DecrRef();
 }
 
-bool OpenGLVideo::IsValid(void) const
+bool MythOpenGLVideo::IsValid(void) const
 {
     return m_valid;
 }
 
-void OpenGLVideo::UpdateColourSpace(bool PrimariesChanged)
+void MythOpenGLVideo::UpdateColourSpace(bool PrimariesChanged)
 {
     OpenGLLocker locker(m_render);
 
@@ -109,7 +112,7 @@ void OpenGLVideo::UpdateColourSpace(bool PrimariesChanged)
     }
 }
 
-void OpenGLVideo::UpdateShaderParameters(void)
+void MythOpenGLVideo::UpdateShaderParameters(void)
 {
     if (m_inputTextureSize.isEmpty())
         return;
@@ -134,48 +137,48 @@ void OpenGLVideo::UpdateShaderParameters(void)
     }
 }
 
-void OpenGLVideo::SetMasterViewport(QSize Size)
+void MythOpenGLVideo::SetMasterViewport(QSize Size)
 {
     m_masterViewportSize = Size;
 }
 
-void OpenGLVideo::SetVideoDimensions(const QSize &VideoDim, const QSize &VideoDispDim)
+void MythOpenGLVideo::SetVideoDimensions(const QSize &VideoDim, const QSize &VideoDispDim)
 {
     m_videoDim = VideoDim;
     m_videoDispDim = VideoDispDim;
 }
 
-void OpenGLVideo::SetVideoRects(const QRect &DisplayVideoRect, const QRect &VideoRect)
+void MythOpenGLVideo::SetVideoRects(const QRect &DisplayVideoRect, const QRect &VideoRect)
 {
     m_displayVideoRect = DisplayVideoRect;
     m_videoRect = VideoRect;
 }
 
-void OpenGLVideo::SetViewportRect(const QRect &DisplayVisibleRect)
+void MythOpenGLVideo::SetViewportRect(const QRect &DisplayVisibleRect)
 {
     SetMasterViewport(DisplayVisibleRect.size());
 }
 
-QString OpenGLVideo::GetProfile(void) const
+QString MythOpenGLVideo::GetProfile(void) const
 {
     if (format_is_hw(m_inputType))
         return TypeToProfile(m_inputType);
     return TypeToProfile(m_outputType);
 }
 
-void OpenGLVideo::SetProfile(const QString &Profile)
+void MythOpenGLVideo::SetProfile(const QString &Profile)
 {
     m_profile = Profile;
 }
 
-QSize OpenGLVideo::GetVideoSize(void) const
+QSize MythOpenGLVideo::GetVideoSize(void) const
 {
     return m_videoDim;
 }
 
-bool OpenGLVideo::AddDeinterlacer(const VideoFrame *Frame, FrameScanType Scan,
-                                  MythDeintType Filter  /* = DEINT_SHADER */,
-                                  bool CreateReferences /* = true */)
+bool MythOpenGLVideo::AddDeinterlacer(const VideoFrame *Frame, FrameScanType Scan,
+                                      MythDeintType Filter  /* = DEINT_SHADER */,
+                                      bool CreateReferences /* = true */)
 {
     if (!Frame || !is_interlaced(Scan))
         return false;
@@ -266,7 +269,7 @@ bool OpenGLVideo::AddDeinterlacer(const VideoFrame *Frame, FrameScanType Scan,
  * (A dependent read is defined as any texture read that does not use the exact
  * texture coordinates passed into the fragment shader)
 */
-bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Deint)
+bool MythOpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Deint)
 {
     if (!m_render || !(m_features & QOpenGLFunctions::Shaders))
         return false;
@@ -411,8 +414,8 @@ bool OpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Deint)
     return true;
 }
 
-bool OpenGLVideo::SetupFrameFormat(VideoFrameType InputType, VideoFrameType OutputType,
-                                   QSize Size, GLenum TextureTarget)
+bool MythOpenGLVideo::SetupFrameFormat(VideoFrameType InputType, VideoFrameType OutputType,
+                                       QSize Size, GLenum TextureTarget)
 {
     QString texnew = (TextureTarget == QOpenGLTexture::TargetRectangle) ? "Rect" :
                      (TextureTarget == GL_TEXTURE_EXTERNAL_OES) ? "OES" : "2D";
@@ -461,7 +464,7 @@ bool OpenGLVideo::SetupFrameFormat(VideoFrameType InputType, VideoFrameType Outp
     return true;
 }
 
-void OpenGLVideo::ResetFrameFormat(void)
+void MythOpenGLVideo::ResetFrameFormat(void)
 {
     for (int i = 0; i < ShaderCount; ++i)
         if (m_shaders[i])
@@ -486,7 +489,7 @@ void OpenGLVideo::ResetFrameFormat(void)
 }
 
 /// \brief Update the current input texture using the data from the given video frame.
-void OpenGLVideo::ProcessFrame(const VideoFrame *Frame, FrameScanType Scan)
+void MythOpenGLVideo::ProcessFrame(const VideoFrame *Frame, FrameScanType Scan)
 {
     if (Frame->codec == FMT_NONE)
         return;
@@ -564,8 +567,8 @@ void OpenGLVideo::ProcessFrame(const VideoFrame *Frame, FrameScanType Scan)
         m_render->logDebugMarker(LOC + "UPDATE_FRAME_END");
 }
 
-void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanType Scan,
-                               StereoscopicMode Stereo, bool DrawBorder)
+void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanType Scan,
+                                   StereoscopicMode Stereo, bool DrawBorder)
 {
     if (!m_render)
         return;
@@ -809,7 +812,7 @@ void OpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameScanT
 }
 
 /// \brief Clear reference frames after a seek as they will contain old images.
-void OpenGLVideo::ResetTextures(void)
+void MythOpenGLVideo::ResetTextures(void)
 {
     for (uint i = 0; i < m_inputTextures.size(); ++i)
         m_inputTextures[i]->m_valid = false;
@@ -819,8 +822,8 @@ void OpenGLVideo::ResetTextures(void)
         m_nextTextures[i]->m_valid = false;
 }
 
-void OpenGLVideo::LoadTextures(bool Deinterlacing, vector<MythVideoTexture*> &Current,
-                               MythGLTexture **Textures, uint &TextureCount)
+void MythOpenGLVideo::LoadTextures(bool Deinterlacing, vector<MythVideoTexture*> &Current,
+                                   MythGLTexture **Textures, uint &TextureCount)
 {
     bool usecurrent = true;
     if (Deinterlacing)
@@ -852,7 +855,7 @@ void OpenGLVideo::LoadTextures(bool Deinterlacing, vector<MythVideoTexture*> &Cu
             Textures[TextureCount++] = reinterpret_cast<MythGLTexture*>(Current[i]);
 }
 
-QString OpenGLVideo::TypeToProfile(VideoFrameType Type)
+QString MythOpenGLVideo::TypeToProfile(VideoFrameType Type)
 {
     if (format_is_hw(Type))
         return "opengl-hw";

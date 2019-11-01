@@ -1,5 +1,5 @@
-#ifndef _OPENGL_VIDEO_H__
-#define _OPENGL_VIDEO_H__
+#ifndef MYTH_OPENGL_VIDEO_H_
+#define MYTH_OPENGL_VIDEO_H_
 
 // Qt
 #include <QRect>
@@ -18,7 +18,7 @@
 using std::vector;
 using std::map;
 
-class OpenGLVideo : public QObject
+class MythOpenGLVideo : public QObject
 {
     Q_OBJECT
 
@@ -34,11 +34,11 @@ class OpenGLVideo : public QObject
 
     static QString        TypeToProfile(VideoFrameType Type);
 
-    OpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *ColourSpace,
-                QSize VideoDim, QSize VideoDispDim, QRect DisplayVisibleRect,
-                QRect DisplayVideoRect, QRect videoRect,
-                bool ViewportControl, QString Profile);
-   ~OpenGLVideo();
+    MythOpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *ColourSpace,
+                    QSize VideoDim, QSize VideoDispDim, QRect DisplayVisibleRect,
+                    QRect DisplayVideoRect, QRect videoRect,
+                    bool ViewportControl, QString Profile);
+   ~MythOpenGLVideo();
 
     bool    IsValid(void) const;
     void    ProcessFrame(const VideoFrame *Frame, FrameScanType Scan = kScan_Progressive);
@@ -97,4 +97,4 @@ class OpenGLVideo : public QObject
     long long      m_discontinuityCounter; ///< Check when to release reference frames after a skip
     int            m_lastRotation;        ///< Track rotation for pause frame
 };
-#endif // _OPENGL_VIDEO_H__
+#endif // MYTH_OPENGL_VIDEO_H_
