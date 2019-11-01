@@ -3,14 +3,14 @@
 using namespace std;
 
 #include "mythlogging.h"
-#include "videoout_null.h"
+#include "mythvideooutnull.h"
 #include "videodisplayprofile.h"
 
 const int kNeedFreeFrames = 1;
 const int kPrebufferFramesNormal = 12;
 const int kPrebufferFramesSmall = 4;
 
-void VideoOutputNull::GetRenderOptions(RenderOptions &Options)
+void MythVideoOutputNull::GetRenderOptions(RenderOptions &Options)
 {
     Options.renderers->append("null");
     (*Options.safe_renderers)["dummy"].append("null");
@@ -48,14 +48,14 @@ void VideoOutputNull::GetRenderOptions(RenderOptions &Options)
     Options.priorities->insert("null", 10);
 }
 
-VideoOutputNull::VideoOutputNull() :
+MythVideoOutputNull::MythVideoOutputNull() :
     global_lock(QMutex::Recursive)
 {
     LOG(VB_PLAYBACK, LOG_INFO, "VideoOutputNull()");
     memset(&av_pause_frame, 0, sizeof(av_pause_frame));
 }
 
-VideoOutputNull::~VideoOutputNull()
+MythVideoOutputNull::~MythVideoOutputNull()
 {
     LOG(VB_PLAYBACK, LOG_INFO, "~VideoOutputNull()");
     QMutexLocker locker(&global_lock);
@@ -69,7 +69,7 @@ VideoOutputNull::~VideoOutputNull()
     m_videoBuffers.DeleteBuffers();
 }
 
-void VideoOutputNull::CreatePauseFrame(void)
+void MythVideoOutputNull::CreatePauseFrame(void)
 {
     if (av_pause_frame.buf)
     {
@@ -88,14 +88,14 @@ void VideoOutputNull::CreatePauseFrame(void)
     clear(&av_pause_frame);
 }
 
-bool VideoOutputNull::InputChanged(const QSize &video_dim_buf,
-                                   const QSize &video_dim_disp,
-                                   float        aspect,
-                                   MythCodecID  av_codec_id,
-                                   bool        &aspect_only,
-                                   MythMultiLocker* Locks,
-                                   int          ReferenceFrames,
-                                   bool ForceChange)
+bool MythVideoOutputNull::InputChanged(const QSize &video_dim_buf,
+                                       const QSize &video_dim_disp,
+                                       float        aspect,
+                                       MythCodecID  av_codec_id,
+                                       bool        &aspect_only,
+                                       MythMultiLocker* Locks,
+                                       int          ReferenceFrames,
+                                       bool         ForceChange)
 {
     LOG(VB_PLAYBACK, LOG_INFO,
         QString("InputChanged(WxH = %1x%2, aspect = %3)")
@@ -119,9 +119,9 @@ bool VideoOutputNull::InputChanged(const QSize &video_dim_buf,
         return true;
     }
 
-    VideoOutput::InputChanged(video_dim_buf, video_dim_disp,
-                              aspect, av_codec_id, aspect_only, Locks,
-                              ReferenceFrames, ForceChange);
+    MythVideoOutput::InputChanged(video_dim_buf, video_dim_disp,
+                                  aspect, av_codec_id, aspect_only, Locks,
+                                  ReferenceFrames, ForceChange);
     m_videoBuffers.DeleteBuffers();
 
     MoveResize();
@@ -146,10 +146,10 @@ bool VideoOutputNull::InputChanged(const QSize &video_dim_buf,
     return ok;
 }
 
-bool VideoOutputNull::Init(const QSize &video_dim_buf,
-                           const QSize &video_dim_disp,
-                           float aspect, WId winid,
-                           const QRect &win_rect, MythCodecID codec_id)
+bool MythVideoOutputNull::Init(const QSize &video_dim_buf,
+                               const QSize &video_dim_disp,
+                               float aspect, WId winid,
+                               const QRect &win_rect, MythCodecID codec_id)
 {
     if ((video_dim_disp.width() <= 0) || (video_dim_disp.height() <= 0))
         return false;
@@ -164,8 +164,8 @@ bool VideoOutputNull::Init(const QSize &video_dim_buf,
 
     QMutexLocker locker(&global_lock);
 
-    VideoOutput::Init(video_dim_buf, video_dim_disp,
-                      aspect, winid, win_rect, codec_id);
+    MythVideoOutput::Init(video_dim_buf, video_dim_disp,
+                          aspect, winid, win_rect, codec_id);
 
     m_videoBuffers.Init(VideoBuffers::GetNumBuffers(FMT_YV12), true, kNeedFreeFrames,
                   kPrebufferFramesNormal, kPrebufferFramesSmall);
@@ -186,32 +186,31 @@ bool VideoOutputNull::Init(const QSize &video_dim_buf,
     return true;
 }
 
-void VideoOutputNull::EmbedInWidget(const QRect &rect)
+void MythVideoOutputNull::EmbedInWidget(const QRect &rect)
 {
     QMutexLocker locker(&global_lock);
     if (!m_window.IsEmbedding())
-        VideoOutput::EmbedInWidget(rect);
+        MythVideoOutput::EmbedInWidget(rect);
 }
 
-void VideoOutputNull::StopEmbedding(void)
+void MythVideoOutputNull::StopEmbedding(void)
 {
     QMutexLocker locker(&global_lock);
     if (m_window.IsEmbedding())
-        VideoOutput::StopEmbedding();
+        MythVideoOutput::StopEmbedding();
 }
 
-void VideoOutputNull::SetDeinterlacing(bool Enable, bool DoubleRate, MythDeintType Force /*=DEINT_NONE*/)
+void MythVideoOutputNull::SetDeinterlacing(bool Enable, bool DoubleRate, MythDeintType Force /*=DEINT_NONE*/)
 {
     if (DEINT_NONE != Force)
     {
-        VideoOutput::SetDeinterlacing(Enable, DoubleRate, Force);
+        MythVideoOutput::SetDeinterlacing(Enable, DoubleRate, Force);
         return;
     }
     m_videoBuffers.SetDeinterlacing(DEINT_NONE, DEINT_NONE, m_videoCodecID);
 }
 
-void VideoOutputNull::PrepareFrame(VideoFrame *buffer, FrameScanType t,
-                                   OSD *osd)
+void MythVideoOutputNull::PrepareFrame(VideoFrame *buffer, FrameScanType t, OSD *osd)
 {
     (void)osd;
     (void)t;
@@ -222,11 +221,11 @@ void VideoOutputNull::PrepareFrame(VideoFrame *buffer, FrameScanType t,
     m_framesPlayed = buffer->frameNumber + 1;
 }
 
-void VideoOutputNull::Show(FrameScanType  /*scan*/)
+void MythVideoOutputNull::Show(FrameScanType  /*scan*/)
 {
 }
 
-void VideoOutputNull::UpdatePauseFrame(int64_t &disp_timecode)
+void MythVideoOutputNull::UpdatePauseFrame(int64_t &disp_timecode)
 {
     QMutexLocker locker(&global_lock);
 
@@ -249,8 +248,7 @@ void VideoOutputNull::UpdatePauseFrame(int64_t &disp_timecode)
     disp_timecode = av_pause_frame.disp_timecode;
 }
 
-void VideoOutputNull::ProcessFrame(VideoFrame *Frame, OSD*, const PIPMap &,
-                                   FrameScanType Scan)
+void MythVideoOutputNull::ProcessFrame(VideoFrame *Frame, OSD*, const PIPMap &, FrameScanType Scan)
 {
     if (Frame && !Frame->dummy)
         m_deinterlacer.Filter(Frame, Scan);

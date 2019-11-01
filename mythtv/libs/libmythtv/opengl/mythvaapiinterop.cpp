@@ -1,5 +1,5 @@
 ﻿// MythTV
-#include "videooutbase.h"
+#include "mythvideoout.h"
 #include "videocolourspace.h"
 #include "fourcc.h"
 #include "mythvaapiinterop.h"
@@ -268,7 +268,7 @@ void MythVAAPIInteropGLX::InitPictureAttributes(VideoColourSpace *ColourSpace)
         return;
 
     OpenGLLocker locker(m_context);
-    m_vaapiHueBase = VideoOutput::CalcHueBase(m_vaVendor);
+    m_vaapiHueBase = MythVideoOutput::CalcHueBase(m_vaVendor);
 
     delete [] m_vaapiPictureAttributes;
     m_vaapiPictureAttributeCount = 0;

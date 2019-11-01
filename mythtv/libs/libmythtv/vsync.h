@@ -22,7 +22,7 @@
 #include <sys/time.h>
 #include <ctime>
 
-class VideoOutput;
+class MythVideoOutput;
 
 extern bool tryingVideoSync;
 
@@ -46,7 +46,7 @@ class VideoSync
 // virtual base class
 {
   public:
-    VideoSync(VideoOutput*, int refreshint);
+    VideoSync(MythVideoOutput*, int refreshint);
     virtual ~VideoSync() = default;
 
     /// \brief Returns name of instanciated VSync method.
@@ -89,13 +89,13 @@ class VideoSync
     virtual void Stop(void) {}
 
     // documented in vsync.cpp
-    static VideoSync *BestMethod(VideoOutput *, uint refresh_interval);
+    static VideoSync *BestMethod(MythVideoOutput *, uint refresh_interval);
 
   protected:
     int64_t GetTime(void);
     int CalcDelay(int nominal_frame_interval);
 
-    VideoOutput *m_video_output     {nullptr};
+    MythVideoOutput *m_video_output     {nullptr};
     int          m_refresh_interval; // of display
     int64_t      m_nexttrigger      {0};
     int          m_delay            {-1};
@@ -113,7 +113,7 @@ class VideoSync
 class DRMVideoSync : public VideoSync
 {
   public:
-    DRMVideoSync(VideoOutput *, int refresh_interval);
+    DRMVideoSync(MythVideoOutput *, int refresh_interval);
     ~DRMVideoSync();
 
     QString getName(void) const override // VideoSync
@@ -143,7 +143,7 @@ class DRMVideoSync : public VideoSync
 class RTCVideoSync : public VideoSync
 {
   public:
-    RTCVideoSync(VideoOutput *, int refresh_interval);
+    RTCVideoSync(MythVideoOutput *, int refresh_interval);
     ~RTCVideoSync();
 
     QString getName(void) const override // VideoSync
@@ -169,7 +169,7 @@ class RTCVideoSync : public VideoSync
 class BusyWaitVideoSync : public VideoSync
 {
   public:
-    BusyWaitVideoSync(VideoOutput *vo, int ri) : VideoSync(vo, ri) {};
+    BusyWaitVideoSync(MythVideoOutput *vo, int ri) : VideoSync(vo, ri) {};
     ~BusyWaitVideoSync() = default;
 
     QString getName(void) const override // VideoSync
@@ -195,7 +195,7 @@ class BusyWaitVideoSync : public VideoSync
 class USleepVideoSync : public VideoSync
 {
   public:
-    USleepVideoSync(VideoOutput *vo, int ri) : VideoSync(vo, ri) {}
+    USleepVideoSync(MythVideoOutput *vo, int ri) : VideoSync(vo, ri) {}
     ~USleepVideoSync() = default;
 
     QString getName(void) const override // VideoSync
@@ -207,7 +207,7 @@ class USleepVideoSync : public VideoSync
 class DummyVideoSync : public VideoSync
 {
   public:
-    DummyVideoSync(VideoOutput* vo, int ri) : VideoSync(vo, ri) { }
+    DummyVideoSync(MythVideoOutput* vo, int ri) : VideoSync(vo, ri) { }
     ~DummyVideoSync() = default;
 
     QString getName(void) const override // VideoSync

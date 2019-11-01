@@ -29,7 +29,7 @@ void BDOverlayScreen::DisplayBDOverlay(BDOverlay *overlay)
     SetArea(rect);
     DeleteAllChildren();
 
-    VideoOutput *vo = m_player->GetVideoOutput();
+    MythVideoOutput *vo = m_player->GetVideoOutput();
     if (!vo)
         return;
 

@@ -1,7 +1,5 @@
-// -*- Mode: c++ -*-
-
-#ifndef VIDEOOUTBASE_H_
-#define VIDEOOUTBASE_H_
+#ifndef MYTH_VIDEOOUT_H_
+#define MYTH_VIDEOOUT_H_
 
 // Qt
 #include <QSize>
@@ -36,19 +34,19 @@ typedef QMap<MythPlayer*,PIPLocation> PIPMap;
 
 class MythMultiLocker;
 
-class VideoOutput
+class MythVideoOutput
 {
   public:
     static void GetRenderOptions(RenderOptions &Options);
-    static VideoOutput *Create(const QString &Decoder,    MythCodecID CodecID,
-                               PIPState PiPState,         const QSize &VideoDim,
-                               const QSize &VideoDispDim, float VideoAspect,
-                               QWidget *ParentWidget,     const QRect &EmbedRect,
-                               float FrameRate,           uint  PlayerFlags,
-                               QString &Codec,            int ReferenceFrames);
+    static MythVideoOutput *Create(const QString &Decoder,    MythCodecID CodecID,
+                                   PIPState PiPState,         const QSize &VideoDim,
+                                   const QSize &VideoDispDim, float VideoAspect,
+                                   QWidget *ParentWidget,     const QRect &EmbedRect,
+                                   float FrameRate,           uint  PlayerFlags,
+                                   QString &Codec,            int ReferenceFrames);
 
-    VideoOutput();
-    virtual ~VideoOutput();
+    MythVideoOutput();
+    virtual ~MythVideoOutput();
 
     virtual bool Init(const QSize &VideoDim, const QSize &VideoDispDim,
                       float VideoAspect,     WId WinID,
@@ -182,4 +180,4 @@ class VideoOutput
     MythDeinterlacer     m_deinterlacer;
 };
 
-#endif
+#endif // MYTH_VIDEOOUT_H_

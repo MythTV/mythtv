@@ -12,7 +12,7 @@
 #include "dxva2decoder.h"
 #endif
 
-class VideoOutputD3D : public VideoOutput
+class VideoOutputD3D : public MythVideoOutput
 {
   public:
     static void GetRenderOptions(RenderOptions &Options);
@@ -55,10 +55,10 @@ class VideoOutputD3D : public VideoOutput
     MythPainter *GetOSDPainter(void) override; // VideoOutput
 
     bool CanVisualise(AudioPlayer *audio, MythRender */*render*/) override // VideoOutput
-        { return VideoOutput::CanVisualise(audio, (MythRender*)m_render); }
+        { return MythVideoOutput::CanVisualise(audio, (MythRender*)m_render); }
     bool SetupVisualisation(AudioPlayer *audio, MythRender */*render*/,
                             const QString &name) override // VideoOutput
-        { return VideoOutput::SetupVisualisation(audio, (MythRender*)m_render, name); }
+        { return MythVideoOutput::SetupVisualisation(audio, (MythRender*)m_render, name); }
 
   private:
     void TearDown(void);

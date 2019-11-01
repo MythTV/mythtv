@@ -7,7 +7,6 @@
 #include "mythdate.h"
 #include "mythcorecontext.h"
 #include "signalmonitor.h"
-#include "videooutbase.h"
 #include "mythdb.h"
 #include "mythsocket.h"
 #include "mythlogging.h"

@@ -2,21 +2,21 @@
 #define VIDEOOUT_OPENGL_H_
 
 // MythTV
-#include "videooutbase.h"
+#include "mythvideoout.h"
 #include "mythopenglvideo.h"
 
 class MythRenderOpenGL;
 class MythOpenGLPainter;
 class MythOpenGLPerf;
 
-class VideoOutputOpenGL : public VideoOutput
+class MythVideoOutputOpenGL : public MythVideoOutput
 {
   public:
     static void GetRenderOptions(RenderOptions &Options);
     static QStringList GetAllowedRenderers(MythCodecID CodecId, const QSize &VideoDim);
 
-    explicit VideoOutputOpenGL(const QString &Profile = QString());
-    ~VideoOutputOpenGL() override;
+    explicit MythVideoOutputOpenGL(const QString &Profile = QString());
+    ~MythVideoOutputOpenGL() override;
 
     // VideoOutput
     bool Init(const QSize &VideoDim, const QSize &VideoDispDim, float Aspect,

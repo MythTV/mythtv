@@ -2,7 +2,6 @@
 #include "mythcontext.h"
 #include "mythmainwindow.h"
 #include "mythplayer.h"
-#include "videooutbase.h"
 #include "videodisplayprofile.h"
 #include "osd.h"
 #include "mythuihelper.h"
@@ -11,7 +10,7 @@
 #include "mythpainter_ogl.h"
 #include "mythcodeccontext.h"
 #include "mythopenglinterop.h"
-#include "videooutopengl.h"
+#include "mythvideooutopengl.h"
 
 #define LOC QString("VidOutGL: ")
 
@@ -21,7 +20,7 @@
  * but it is currently called statically and hence options would be fixed and unable
  * to reflect changes in UI render device.
 */
-void VideoOutputOpenGL::GetRenderOptions(RenderOptions &Options)
+void MythVideoOutputOpenGL::GetRenderOptions(RenderOptions &Options)
 {
     QStringList safe;
     safe << "opengl" << "opengl-yv12";
@@ -86,8 +85,8 @@ void VideoOutputOpenGL::GetRenderOptions(RenderOptions &Options)
 #endif
 }
 
-VideoOutputOpenGL::VideoOutputOpenGL(const QString &Profile)
-  : VideoOutput(),
+MythVideoOutputOpenGL::MythVideoOutputOpenGL(const QString &Profile)
+  : MythVideoOutput(),
     m_render(nullptr),
     m_isGLES2(false),
     m_openGLVideo(nullptr),
@@ -162,7 +161,7 @@ VideoOutputOpenGL::VideoOutputOpenGL(const QString &Profile)
     QObject::connect(&m_window, &VideoOutWindow::WindowRectChanged, m_openGLVideo, &MythOpenGLVideo::SetViewportRect);
 }
 
-VideoOutputOpenGL::~VideoOutputOpenGL()
+MythVideoOutputOpenGL::~MythVideoOutputOpenGL()
 {
     DestroyBuffers();
     while (!m_openGLVideoPiPs.empty())
@@ -185,7 +184,7 @@ VideoOutputOpenGL::~VideoOutputOpenGL()
     m_render = nullptr;
 }
 
-void VideoOutputOpenGL::DestroyBuffers(void)
+void MythVideoOutputOpenGL::DestroyBuffers(void)
 {
     DiscardFrames(true, true);
     m_videoBuffers.DeleteBuffers();
@@ -193,8 +192,8 @@ void VideoOutputOpenGL::DestroyBuffers(void)
     m_buffersCreated = false;
 }
 
-bool VideoOutputOpenGL::Init(const QSize &VideoDim, const QSize &VideoDispDim, float Aspect,
-                             WId, const QRect &DisplayVisibleRect, MythCodecID CodecId)
+bool MythVideoOutputOpenGL::Init(const QSize &VideoDim, const QSize &VideoDispDim, float Aspect,
+                                 WId, const QRect &DisplayVisibleRect, MythCodecID CodecId)
 {
     if (!m_render || !m_openGLPainter || !m_openGLVideo)
         return false;
@@ -214,7 +213,7 @@ bool VideoOutputOpenGL::Init(const QSize &VideoDim, const QSize &VideoDispDim, f
         m_openGLPainter->FreeResources();
 
     // Default initialisation - mainly VideoOutWindow
-    if (!VideoOutput::Init(VideoDim, VideoDispDim, Aspect, 0, DisplayVisibleRect, CodecId))
+    if (!MythVideoOutput::Init(VideoDim, VideoDispDim, Aspect, 0, DisplayVisibleRect, CodecId))
         return false;
 
     // Ensure any new profile preferences are handled after a stream change
@@ -260,10 +259,10 @@ bool VideoOutputOpenGL::Init(const QSize &VideoDim, const QSize &VideoDispDim, f
     return true;
 }
 
-bool VideoOutputOpenGL::InputChanged(const QSize &VideoDim, const QSize &VideoDispDim,
-                                     float Aspect, MythCodecID CodecId, bool &AspectOnly,
-                                     MythMultiLocker* Locks, int ReferenceFrames,
-                                     bool ForceChange)
+bool MythVideoOutputOpenGL::InputChanged(const QSize &VideoDim, const QSize &VideoDispDim,
+                                         float Aspect, MythCodecID CodecId, bool &AspectOnly,
+                                         MythMultiLocker* Locks, int ReferenceFrames,
+                                         bool ForceChange)
 {
     QSize currentvideodim     = m_window.GetVideoDim();
     QSize currentvideodispdim = m_window.GetVideoDispDim();
@@ -331,7 +330,7 @@ bool VideoOutputOpenGL::InputChanged(const QSize &VideoDim, const QSize &VideoDi
     return true;
 }
 
-QRect VideoOutputOpenGL::GetDisplayVisibleRect(void)
+QRect MythVideoOutputOpenGL::GetDisplayVisibleRect(void)
 {
     QRect dvr = m_window.GetDisplayVisibleRect();
 
@@ -361,7 +360,7 @@ QRect VideoOutputOpenGL::GetDisplayVisibleRect(void)
     return dvr;
 }
 
-bool VideoOutputOpenGL::CreateBuffers(MythCodecID CodecID, QSize Size)
+bool MythVideoOutputOpenGL::CreateBuffers(MythCodecID CodecID, QSize Size)
 {
     if (m_buffersCreated)
         return true;
@@ -388,9 +387,9 @@ bool VideoOutputOpenGL::CreateBuffers(MythCodecID CodecID, QSize Size)
     return m_videoBuffers.CreateBuffers(FMT_YV12, Size, false, 1, 8, 4, m_maxReferenceFrames);
 }
 
-void VideoOutputOpenGL::ProcessFrame(VideoFrame *Frame, OSD */*osd*/,
-                                     const PIPMap &PiPPlayers,
-                                     FrameScanType Scan)
+void MythVideoOutputOpenGL::ProcessFrame(VideoFrame *Frame, OSD */*osd*/,
+                                         const PIPMap &PiPPlayers,
+                                         FrameScanType Scan)
 {
     if (!m_render)
         return;
@@ -473,7 +472,7 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *Frame, OSD */*osd*/,
         m_render->logDebugMarker(LOC + "PROCESS_FRAME_END");
 }
 
-void VideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, OSD *Osd)
+void MythVideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, OSD *Osd)
 {
     if (!m_render)
         return;
@@ -675,7 +674,7 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, OSD 
  * without a frame so retain the most recent frame by removing
  * it from the 'used' queue and adding it to the 'pause' queue.
 */
-void VideoOutputOpenGL::DoneDisplayingFrame(VideoFrame *Frame)
+void MythVideoOutputOpenGL::DoneDisplayingFrame(VideoFrame *Frame)
 {
     if (!Frame)
         return;
@@ -687,7 +686,7 @@ void VideoOutputOpenGL::DoneDisplayingFrame(VideoFrame *Frame)
     {
         VideoFrame* frame = m_videoBuffers.Dequeue(kVideoBuffer_pause);
         if (!retain || (retain && (frame != Frame)))
-            VideoOutput::DoneDisplayingFrame(frame);
+            MythVideoOutput::DoneDisplayingFrame(frame);
     }
 
     if (retain)
@@ -709,7 +708,7 @@ void VideoOutputOpenGL::DoneDisplayingFrame(VideoFrame *Frame)
  * use and we need to release any hardware pause frames so the decoder is released
  * before a new one is created.
 */
-void VideoOutputOpenGL::DiscardFrames(bool KeyFrame, bool Flushed)
+void MythVideoOutputOpenGL::DiscardFrames(bool KeyFrame, bool Flushed)
 {
     if (Flushed)
     {
@@ -720,10 +719,10 @@ void VideoOutputOpenGL::DiscardFrames(bool KeyFrame, bool Flushed)
         m_videoBuffers.EndLock();
     }
 
-    VideoOutput::DiscardFrames(KeyFrame, Flushed);
+    MythVideoOutput::DiscardFrames(KeyFrame, Flushed);
 }
 
-VideoFrameType* VideoOutputOpenGL::DirectRenderFormats(void)
+VideoFrameType* MythVideoOutputOpenGL::DirectRenderFormats(void)
 {
     static VideoFrameType openglformats[] =
         { FMT_YV12,     FMT_NV12,      FMT_YUY2,      FMT_YUV422P,   FMT_YUV444P,
@@ -738,13 +737,13 @@ VideoFrameType* VideoOutputOpenGL::DirectRenderFormats(void)
     return m_isGLES2 ? &opengles2formats[0] : &openglformats[0];
 }
 
-void VideoOutputOpenGL::WindowResized(const QSize &Size)
+void MythVideoOutputOpenGL::WindowResized(const QSize &Size)
 {
     m_window.SetWindowSize(Size);
     InitDisplayMeasurements();
 }
 
-void VideoOutputOpenGL::Show(FrameScanType /*scan*/)
+void MythVideoOutputOpenGL::Show(FrameScanType /*scan*/)
 {
     if (m_render && !IsErrored())
     {
@@ -766,11 +765,11 @@ void VideoOutputOpenGL::Show(FrameScanType /*scan*/)
     }
 }
 
-void VideoOutputOpenGL::ClearAfterSeek(void)
+void MythVideoOutputOpenGL::ClearAfterSeek(void)
 {
     if (m_openGLVideo)
         m_openGLVideo->ResetTextures();
-    VideoOutput::ClearAfterSeek();
+    MythVideoOutput::ClearAfterSeek();
 }
 
 /*! \brief Generate a list of supported OpenGL profiles.
@@ -782,7 +781,7 @@ void VideoOutputOpenGL::ClearAfterSeek(void)
  * filtering, we allow the OpenGL video code to fallback to a supported, reasonable
  * alternative.
 */
-QStringList VideoOutputOpenGL::GetAllowedRenderers(MythCodecID CodecId, const QSize&)
+QStringList MythVideoOutputOpenGL::GetAllowedRenderers(MythCodecID CodecId, const QSize&)
 {
     QStringList allowed;
     if (getenv("NO_OPENGL"))
@@ -798,7 +797,7 @@ QStringList VideoOutputOpenGL::GetAllowedRenderers(MythCodecID CodecId, const QS
     return allowed;
 }
 
-void VideoOutputOpenGL::UpdatePauseFrame(int64_t &DisplayTimecode)
+void MythVideoOutputOpenGL::UpdatePauseFrame(int64_t &DisplayTimecode)
 {
     m_videoBuffers.BeginLock(kVideoBuffer_used);
     VideoFrame *used = m_videoBuffers.Head(kVideoBuffer_used);
@@ -817,12 +816,12 @@ void VideoOutputOpenGL::UpdatePauseFrame(int64_t &DisplayTimecode)
     m_videoBuffers.EndLock();
 }
 
-void VideoOutputOpenGL::InitPictureAttributes(void)
+void MythVideoOutputOpenGL::InitPictureAttributes(void)
 {
     m_videoColourSpace.SetSupportedAttributes(ALL_PICTURE_ATTRIBUTES);
 }
 
-void VideoOutputOpenGL::ShowPIP(VideoFrame*, MythPlayer *PiPPlayer, PIPLocation Location)
+void MythVideoOutputOpenGL::ShowPIP(VideoFrame*, MythPlayer *PiPPlayer, PIPLocation Location)
 {
     if (!PiPPlayer)
         return;
@@ -892,7 +891,7 @@ void VideoOutputOpenGL::ShowPIP(VideoFrame*, MythPlayer *PiPPlayer, PIPLocation 
     PiPPlayer->ReleaseCurrentFrame(pipimage);
 }
 
-void VideoOutputOpenGL::RemovePIP(MythPlayer *PiPPlayer)
+void MythVideoOutputOpenGL::RemovePIP(MythPlayer *PiPPlayer)
 {
     if (m_openGLVideoPiPs.contains(PiPPlayer))
     {
@@ -904,24 +903,24 @@ void VideoOutputOpenGL::RemovePIP(MythPlayer *PiPPlayer)
     }
 }
 
-QStringList VideoOutputOpenGL::GetVisualiserList(void)
+QStringList MythVideoOutputOpenGL::GetVisualiserList(void)
 {
     if (m_render)
         return VideoVisual::GetVisualiserList(m_render->Type());
-    return VideoOutput::GetVisualiserList();
+    return MythVideoOutput::GetVisualiserList();
 }
 
-MythPainter *VideoOutputOpenGL::GetOSDPainter(void)
+MythPainter *MythVideoOutputOpenGL::GetOSDPainter(void)
 {
     return m_openGLPainter;
 }
 
-bool VideoOutputOpenGL::CanVisualise(AudioPlayer *Audio, MythRender*)
+bool MythVideoOutputOpenGL::CanVisualise(AudioPlayer *Audio, MythRender*)
 {
-    return VideoOutput::CanVisualise(Audio, m_render);
+    return MythVideoOutput::CanVisualise(Audio, m_render);
 }
 
-bool VideoOutputOpenGL::SetupVisualisation(AudioPlayer *Audio, MythRender*, const QString &Name)
+bool MythVideoOutputOpenGL::SetupVisualisation(AudioPlayer *Audio, MythRender*, const QString &Name)
 {
-    return VideoOutput::SetupVisualisation(Audio, m_render, Name);
+    return MythVideoOutput::SetupVisualisation(Audio, m_render, Name);
 }

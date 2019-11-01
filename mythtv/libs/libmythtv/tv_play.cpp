@@ -1542,7 +1542,7 @@ void TV::GetStatus(void)
         }
         if (ctx->m_player->GetVideoOutput())
         {
-            VideoOutput *vo = ctx->m_player->GetVideoOutput();
+            MythVideoOutput *vo = ctx->m_player->GetVideoOutput();
             PictureAttributeSupported supp =
                     vo->GetSupportedPictureAttributes();
             if (supp & kPictureAttributeSupported_Brightness)
@@ -4374,7 +4374,7 @@ bool TV::SubtitleDelayHandleAction(PlayerContext *ctx,
 bool TV::DiscMenuHandleAction(PlayerContext *ctx, const QStringList &actions)
 {
     int64_t pts = 0;
-    VideoOutput *output = ctx->m_player->GetVideoOutput();
+    MythVideoOutput *output = ctx->m_player->GetVideoOutput();
     if (output)
     {
         VideoFrame *frame = output->GetLastShownFrame();
@@ -9996,7 +9996,7 @@ void TV::DoChangePictureAttribute(
 
         if (ctx->m_player->GetVideoOutput())
         {
-            VideoOutput *vo = ctx->m_player->GetVideoOutput();
+            MythVideoOutput *vo = ctx->m_player->GetVideoOutput();
             if ((newvalue >= 0) && (newvalue <= 100))
                 value = vo->SetPictureAttribute(attr, newvalue);
             else
@@ -11963,7 +11963,7 @@ void TV::PlaybackMenuInit(const MenuBase &menu)
         //        ctx->m_player->GetVideoOutput()->GetDeinterlacer();
         if (m_tvmVisual)
             m_tvmVisualisers = ctx->m_player->GetVisualiserList();
-        VideoOutput *vo = ctx->m_player->GetVideoOutput();
+        MythVideoOutput *vo = ctx->m_player->GetVideoOutput();
         if (vo)
         {
             m_tvmSup            = vo->GetSupportedPictureAttributes();

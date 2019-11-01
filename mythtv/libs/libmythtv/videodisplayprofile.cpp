@@ -3,7 +3,7 @@
 #include "mythcorecontext.h"
 #include "mythdb.h"
 #include "mythlogging.h"
-#include "videooutbase.h"
+#include "mythvideoout.h"
 #include "avformatdecoder.h"
 
 // Std
@@ -1358,7 +1358,7 @@ void VideoDisplayProfile::InitStatics(bool Reinit /*= false*/)
 
     // N.B. assumes NuppelDecoder and DummyDecoder always present
     AvFormatDecoder::GetDecoders(options);
-    VideoOutput::GetRenderOptions(options);
+    MythVideoOutput::GetRenderOptions(options);
 
     foreach(QString decoder, s_safe_decoders)
         LOG(VB_PLAYBACK, LOG_INFO, LOC +

@@ -512,7 +512,7 @@ bool MythPlayer::InitVideo(void)
         return false;
     }
 
-    videoOutput = VideoOutput::Create(
+    videoOutput = MythVideoOutput::Create(
                     decoder->GetCodecDecoderName(),
                     decoder->GetVideoCodecID(),
                     pipState, video_dim, video_disp_dim, video_aspect,

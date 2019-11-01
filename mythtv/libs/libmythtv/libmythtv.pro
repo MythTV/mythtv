@@ -396,7 +396,7 @@ using_frontend {
     SOURCES += subtitlescreen.cpp       interactivescreen.cpp
 
     # Video output
-    HEADERS += videooutbase.h           videoout_null.h
+    HEADERS += mythvideoout.h           mythvideooutnull.h
     HEADERS += videobuffers.h           vsync.h
     HEADERS += jitterometer.h
     HEADERS += videodisplayprofile.h    mythcodecid.h
@@ -405,7 +405,7 @@ using_frontend {
     HEADERS += visualisations/videovisual.h
     HEADERS += visualisations/videovisualdefs.h
     HEADERS += mythdeinterlacer.h
-    SOURCES += videooutbase.cpp         videoout_null.cpp
+    SOURCES += mythvideoout.cpp         mythvideooutnull.cpp
     SOURCES += videobuffers.cpp         vsync.cpp
     SOURCES += jitterometer.cpp
     SOURCES += videodisplayprofile.cpp  mythcodecid.cpp
@@ -473,12 +473,12 @@ using_frontend {
     using_opengl_video {
         DEFINES += USING_OPENGL_VIDEO
         HEADERS += opengl/mythopenglvideo.h
-        HEADERS += opengl/videooutopengl.h
+        HEADERS += opengl/mythvideooutopengl.h
         HEADERS += opengl/mythopenglvideoshaders.h
         HEADERS += opengl/mythopenglinterop.h
         HEADERS += opengl/mythvideotexture.h
         SOURCES += opengl/mythopenglvideo.cpp
-        SOURCES += opengl/videooutopengl.cpp
+        SOURCES += opengl/mythvideooutopengl.cpp
         SOURCES += opengl/mythopenglinterop.cpp
         SOURCES += opengl/mythvideotexture.cpp
     }

@@ -1455,7 +1455,7 @@ void SubtitleScreen::DisplayDVDButton(AVSubtitle* dvdButton, QRect &buttonPos)
     if (!dvdButton || !m_player)
         return;
 
-    VideoOutput *vo = m_player->GetVideoOutput();
+    MythVideoOutput *vo = m_player->GetVideoOutput();
     if (!vo)
         return;
 
@@ -1687,7 +1687,7 @@ void SubtitleScreen::Pulse(void)
 {
     QList<MythUIType *>::iterator it, itNext;
 
-    VideoOutput    *videoOut = m_player->GetVideoOutput();
+    MythVideoOutput *videoOut = m_player->GetVideoOutput();
     VideoFrame *currentFrame = videoOut ? videoOut->GetLastShownFrame() : nullptr;
     long long now = currentFrame ? currentFrame->timecode : LLONG_MAX;
     bool needRescale = (m_textFontZoom != m_textFontZoomPrev);
@@ -1803,7 +1803,7 @@ void SubtitleScreen::DisplayAVSubtitles(void)
     if (subs->m_buffers.empty() && (kDisplayAVSubtitle != m_subtitleType))
         return;
 
-    VideoOutput    *videoOut = m_player->GetVideoOutput();
+    MythVideoOutput *videoOut = m_player->GetVideoOutput();
     VideoFrame *currentFrame = videoOut ? videoOut->GetLastShownFrame() : nullptr;
 
     if (!currentFrame || !videoOut)
@@ -2024,7 +2024,7 @@ int SubtitleScreen::DisplayScaledAVSubtitles(const AVSubtitleRect *rect,
     bbox.setWidth(bbox.width() * m_textFontZoom / 100);
     bbox.setHeight(bbox.height() * m_textFontZoom / 100);
 
-    VideoOutput *videoOut = m_player->GetVideoOutput();
+    MythVideoOutput *videoOut = m_player->GetVideoOutput();
     QRect scaled = videoOut->GetImageRect(bbox, &display);
 
     if (scaled.size() != orig_rect.size())
@@ -2088,7 +2088,7 @@ void SubtitleScreen::DisplayTextSubtitles(void)
 
     bool changed = (m_textFontZoom != m_textFontZoomPrev);
     changed |= (m_textFontDelayMs != m_textFontDelayMsPrev);
-    VideoOutput *vo = m_player->GetVideoOutput();
+    MythVideoOutput *vo = m_player->GetVideoOutput();
     if (!vo)
         return;
     m_safeArea = vo->GetSafeRect();
@@ -2164,7 +2164,7 @@ void SubtitleScreen::DisplayRawTextSubtitles(void)
     if (subs.empty())
         return;
 
-    VideoOutput *vo = m_player->GetVideoOutput();
+    MythVideoOutput *vo = m_player->GetVideoOutput();
     if (!vo)
         return;
 
@@ -2274,7 +2274,7 @@ void SubtitleScreen::DisplayCC708Subtitles(void)
 
 void SubtitleScreen::AddScaledImage(QImage &img, QRect &pos)
 {
-    VideoOutput *vo = m_player->GetVideoOutput();
+    MythVideoOutput *vo = m_player->GetVideoOutput();
     if (!vo)
         return;
 
@@ -2485,7 +2485,7 @@ void SubtitleScreen::RenderAssTrack(uint64_t timecode)
     if (!m_player || !m_assRenderer || !m_assTrack)
         return;
 
-    VideoOutput *vo = m_player->GetVideoOutput();
+    MythVideoOutput *vo = m_player->GetVideoOutput();
     if (!vo )
         return;
 

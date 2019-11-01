@@ -15,7 +15,7 @@ class VideoColourSpace : public QObject, public QMatrix4x4, public ReferenceCoun
 {
     Q_OBJECT
 
-    friend class VideoOutput;
+    friend class MythVideoOutput;
 
   public:
     explicit VideoColourSpace(VideoColourSpace *Parent = nullptr);

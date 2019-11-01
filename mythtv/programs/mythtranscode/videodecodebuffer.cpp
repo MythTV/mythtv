@@ -1,7 +1,6 @@
 #include "videodecodebuffer.h"
 
 #include "mythplayer.h"
-#include "videooutbase.h"
 
 #include <chrono> // for milliseconds
 #include <thread> // for sleep_for

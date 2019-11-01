@@ -6,7 +6,7 @@
 #include <QObject>
 
 // MythTV
-#include "videooutbase.h"
+#include "mythvideoout.h"
 #include "videoouttypes.h"
 #include "mythrender_opengl.h"
 #include "mythavutil.h"

@@ -106,7 +106,7 @@ bool PlayerContext::IsPIPSupported(void) const
     QMutexLocker locker(&m_deletePlayerLock);
     if (m_player)
     {
-        const VideoOutput *vid = m_player->GetVideoOutput();
+        const MythVideoOutput *vid = m_player->GetVideoOutput();
         if (vid)
             supported = vid->IsPIPSupported();
     }
@@ -124,7 +124,7 @@ bool PlayerContext::IsPBPSupported(void) const
     QMutexLocker locker(&m_deletePlayerLock);
     if (m_player)
     {
-        const VideoOutput *vid = m_player->GetVideoOutput();
+        const MythVideoOutput *vid = m_player->GetVideoOutput();
         if (vid)
             supported = vid->IsPBPSupported();
     }

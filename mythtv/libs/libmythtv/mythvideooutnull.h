@@ -1,16 +1,15 @@
-#ifndef VIDEOOUT_NULL_H_
-#define VIDEOOUT_NULL_H_
+#ifndef MYTH_VIDEOOUT_NULL_H_
+#define MYTH_VIDEOOUT_NULL_H_
 
-#include <QMutex>
+// MythTV
+#include "mythvideoout.h"
 
-#include "videooutbase.h"
-
-class VideoOutputNull : public VideoOutput
+class MythVideoOutputNull : public MythVideoOutput
 {
   public:
     static void GetRenderOptions(RenderOptions &Options);
-    VideoOutputNull();
-   ~VideoOutputNull() override;
+    MythVideoOutputNull();
+   ~MythVideoOutputNull() override;
 
     bool Init(const QSize &video_dim_buf,
               const QSize &video_dim_disp,

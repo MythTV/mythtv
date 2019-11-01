@@ -16,7 +16,7 @@
 #include "playercontext.h"
 #include "volumebase.h"
 #include "osd.h"
-#include "videooutbase.h"
+#include "mythvideoout.h"
 #include "teletextreader.h"
 #include "subtitlereader.h"
 #include "cc608reader.h"
@@ -35,7 +35,7 @@
 
 #include "mythtvexp.h"
 
-class VideoOutput;
+class MythVideoOutput;
 class RemoteEncoder;
 class MythSqlDatabase;
 class ProgramInfo;
@@ -249,7 +249,7 @@ class MTV_PUBLIC MythPlayer
     virtual char *GetScreenGrab(int secondsin, int &bufflen,
                                 int &vw, int &vh, float &ar);
     InteractiveTV *GetInteractiveTV(void);
-    VideoOutput *GetVideoOutput(void)       { return videoOutput; }
+    MythVideoOutput *GetVideoOutput(void)       { return videoOutput; }
     MythCodecContext *GetMythCodecContext(void) { return decoder->GetMythCodecContext(); }
 
     // Title stuff
@@ -637,7 +637,7 @@ class MTV_PUBLIC MythPlayer
     PlayerFlags    playerFlags;
     DecoderBase   *decoder;
     mutable QMutex decoder_change_lock;
-    VideoOutput   *videoOutput;
+    MythVideoOutput *videoOutput;
     PlayerContext *player_ctx;
     DecoderThread *decoderThread;
     QThread       *playerThread;

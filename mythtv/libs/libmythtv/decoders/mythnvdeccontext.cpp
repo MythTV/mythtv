@@ -3,7 +3,7 @@
 #include "mythmainwindow.h"
 #include "avformatdecoder.h"
 #include "mythnvdecinterop.h"
-#include "videooutbase.h"
+#include "mythvideoout.h"
 #include "mythnvdeccontext.h"
 
 extern "C" {
@@ -261,9 +261,9 @@ void MythNVDECContext::SetDeinterlacing(AVCodecContext *Context,
     MythDeintType doublepref = DEINT_NONE;
     if (Profile)
     {
-        singlepref = VideoOutput::ParseDeinterlacer(Profile->GetSingleRatePreferences());
+        singlepref = MythVideoOutput::ParseDeinterlacer(Profile->GetSingleRatePreferences());
         if (DoubleRate)
-            doublepref = VideoOutput::ParseDeinterlacer(Profile->GetDoubleRatePreferences());
+            doublepref = MythVideoOutput::ParseDeinterlacer(Profile->GetDoubleRatePreferences());
     }
 
     // Deinterlacers are not filtered (as we have no frame) - so mask appropriately

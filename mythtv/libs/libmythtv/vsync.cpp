@@ -42,7 +42,7 @@
 #endif
 
 using namespace std;
-#include "videooutbase.h"
+#include "mythvideoout.h"
 #include "vsync.h"
 
 bool tryingVideoSync = false;
@@ -66,7 +66,7 @@ int VideoSync::s_forceskip = 0;
 /** \fn VideoSync::BestMethod(VideoOutput*,uint)
  *  \brief Returns the most sophisticated video sync method available.
  */
-VideoSync *VideoSync::BestMethod(VideoOutput *video_output,
+VideoSync *VideoSync::BestMethod(MythVideoOutput *video_output,
                                  uint refresh_interval)
 {
     VideoSync *trial = nullptr;
@@ -101,7 +101,7 @@ VideoSync *VideoSync::BestMethod(VideoOutput *video_output,
  *  \brief Used by BestMethod(VideoOutput*,uint) to initialize
  *         video synchronization method.
  */
-VideoSync::VideoSync(VideoOutput *video_output, int refreshint) :
+VideoSync::VideoSync(MythVideoOutput *video_output, int refreshint) :
     m_video_output(video_output), m_refresh_interval(refreshint)
 {
 }
@@ -202,7 +202,7 @@ static int drmWaitVBlank(int fd, drm_wait_vblank_t *vbl)
 
 const char *DRMVideoSync::s_dri_dev = "/dev/dri/card0";
 
-DRMVideoSync::DRMVideoSync(VideoOutput *vo, int refresh_interval) :
+DRMVideoSync::DRMVideoSync(MythVideoOutput *vo, int refresh_interval) :
     VideoSync(vo, refresh_interval)
 {
     m_dri_fd = -1;
@@ -297,7 +297,7 @@ int DRMVideoSync::WaitForFrame(int nominal_frame_interval, int extra_delay)
 
 #ifdef __linux__
 #define RTCRATE 1024
-RTCVideoSync::RTCVideoSync(VideoOutput *vo, int refresh_interval) :
+RTCVideoSync::RTCVideoSync(MythVideoOutput *vo, int refresh_interval) :
     VideoSync(vo, refresh_interval)
 {
     m_rtcfd = -1;

@@ -25,7 +25,7 @@ using namespace std;
 #include "mythlogging.h"
 #include "signalhandling.h"
 #include "mythmiscutil.h"
-#include "videooutbase.h"
+#include "mythvideoout.h"
 
 // libmythui
 #include "mythuihelper.h"
@@ -78,7 +78,7 @@ class VideoPerformanceTest
             return;
         }
 
-        VideoOutput *vo = mp->GetVideoOutput();
+        MythVideoOutput *vo = mp->GetVideoOutput();
         if (!vo)
         {
             LOG(VB_GENERAL, LOG_ERR, "No video output.");

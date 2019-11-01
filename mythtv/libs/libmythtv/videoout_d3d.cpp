@@ -46,7 +46,7 @@ void VideoOutputD3D::GetRenderOptions(RenderOptions &Options)
 }
 
 VideoOutputD3D::VideoOutputD3D(void)
-  : VideoOutput(),         m_lock(QMutex::Recursive),
+  : MythVideoOutput(),         m_lock(QMutex::Recursive),
     m_hWnd(nullptr),       m_render(nullptr),
     m_video(nullptr),
     m_render_valid(false), m_render_reset(false), m_pip_active(nullptr),
@@ -211,7 +211,7 @@ bool VideoOutputD3D::Init(const QSize &video_dim_buf,
     QMutexLocker locker(&m_lock);
     m_hWnd      = (HWND)winid;
 
-    VideoOutput::Init(video_dim_buf, video_dim_disp,
+    MythVideoOutput::Init(video_dim_buf, video_dim_disp,
                       aspect, winid, win_rect, codec_id);
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Init with codec: %1")
@@ -407,7 +407,7 @@ void VideoOutputD3D::EmbedInWidget(const QRect &rect)
     if (m_window.IsEmbedding())
         return;
 
-    VideoOutput::EmbedInWidget(rect);
+    MythVideoOutput::EmbedInWidget(rect);
     // TODO: Initialise m_hEmbedWnd?
 }
 
@@ -416,7 +416,7 @@ void VideoOutputD3D::StopEmbedding(void)
     if (!m_window.IsEmbedding())
         return;
 
-    VideoOutput::StopEmbedding();
+    MythVideoOutput::StopEmbedding();
 }
 
 void VideoOutputD3D::UpdatePauseFrame(int64_t &disp_timecode)

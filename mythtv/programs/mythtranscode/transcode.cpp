@@ -1061,7 +1061,7 @@ int Transcode::TranscodeFile(const QString &inputname,
     float rateTimeConv = arb->m_eff_audiorate / 1000.0F;
     float vidFrameTime = 1000.0F / video_frame_rate;
     int wait_recover = 0;
-    VideoOutput *videoOutput = GetPlayer()->GetVideoOutput();
+    MythVideoOutput *videoOutput = GetPlayer()->GetVideoOutput();
     bool is_key = false;
     bool first_loop = true;
     AVFrame imageIn, imageOut;

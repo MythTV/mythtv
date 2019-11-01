@@ -6,15 +6,15 @@
 #include <QMutex>
 #include <QRunnable>
 
-#include "videooutbase.h"
+#include "mythvideoout.h"
 
 class MythPlayer;
-class VideoOutput;
+class MythVideoOutput;
 
 class VideoDecodeBuffer : public QRunnable
 {
   public:
-    VideoDecodeBuffer(MythPlayer *player, VideoOutput *videoout,
+    VideoDecodeBuffer(MythPlayer *player, MythVideoOutput *videoout,
         bool cutlist, int size = 5)
         : m_player(player),        m_videoOutput(videoout),
           m_honorCutlist(cutlist), m_maxFrames(size) {}
@@ -33,7 +33,7 @@ class VideoDecodeBuffer : public QRunnable
     } DecodedFrameInfo;
 
     MythPlayer * const      m_player      {nullptr};
-    VideoOutput * const     m_videoOutput {nullptr};
+    MythVideoOutput * const m_videoOutput {nullptr};
     bool const              m_honorCutlist;
     int const               m_maxFrames;
     bool volatile           m_runThread   {true};
