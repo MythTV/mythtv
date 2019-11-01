@@ -628,6 +628,7 @@ AVStream* AVFormatWriter::AddAudioStream(void)
     c->bit_rate     = m_audioBitrate;
     c->sample_rate  = m_audioFrameRate;
     c->channels     = m_audioChannels;
+    c->channel_layout = static_cast<uint64_t>(av_get_default_channel_layout(m_audioChannels));
 
     // c->flags |= CODEC_FLAG_QSCALE; // VBR
     // c->global_quality = blah;
