@@ -252,7 +252,9 @@ void MHTokenGroup::Activation(MHEngine *engine)
             {
                 engine->FindObject(m_TokenGrpItems.GetAt(i)->m_Object)->Activation(engine);
             }
-            catch (char const *) {}
+            catch (...)
+            {
+            }
         }
     }
 

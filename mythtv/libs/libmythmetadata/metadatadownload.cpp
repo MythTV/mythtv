@@ -245,7 +245,7 @@ MetadataLookup* MetadataDownload::findBestMatch(MetadataLookupList list,
     QStringList titles;
     MetadataLookup *ret = nullptr;
     QDate exactTitleDate;
-    float exactTitlePopularity;
+    float exactTitlePopularity = 0.0F;
     int exactMatches = 0;
     int exactMatchesWithArt = 0;
     bool foundMatchWithArt = false;

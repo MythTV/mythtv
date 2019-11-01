@@ -318,15 +318,13 @@ void AudioOutputSettings::setFeature(bool val, DigitalFeature arg)
  */
 AudioOutputSettings* AudioOutputSettings::GetCleaned(bool newcopy)
 {
-    AudioOutputSettings* aosettings;
+    AudioOutputSettings* aosettings = this;
 
     if (newcopy)
     {
         aosettings = new AudioOutputSettings;
         *aosettings = *this;
     }
-    else
-        aosettings = this;
 
     if (m_invalid)
         return aosettings;
@@ -377,12 +375,10 @@ AudioOutputSettings* AudioOutputSettings::GetCleaned(bool newcopy)
  */
 AudioOutputSettings* AudioOutputSettings::GetUsers(bool newcopy)
 {
-    AudioOutputSettings* aosettings;
+    AudioOutputSettings* aosettings = this;
 
     if (newcopy)
         aosettings = GetCleaned(newcopy);
-    else
-        aosettings = this;
 
     if (aosettings->m_invalid)
         return aosettings;

@@ -312,8 +312,8 @@ long long copy(QFile &dst, QFile &src, uint block_size)
     long long total_bytes = 0LL;
     while (ok)
     {
-        long long rlen, off = 0;
-        rlen = src.read(buf, buflen);
+        long long off = 0;
+        long long rlen = src.read(buf, buflen);
         if (rlen<0)
         {
             LOG(VB_GENERAL, LOG_ERR, "read error");
@@ -470,7 +470,7 @@ int intResponse(const QString &query, int def)
     QString str_resp = getResponse(query, QString("%1").arg(def));
     if (str_resp.isEmpty())
         return def;
-    bool ok;
+    bool ok = false;
     int resp = str_resp.toInt(&ok);
     return (ok ? resp : def);
 }
@@ -538,9 +538,7 @@ bool IsMACAddress(const QString& MAC)
         return false;
     }
 
-    int y;
-    bool ok;
-    for (y = 0; y < 6; y++)
+    for (int y = 0; y < 6; y++)
     {
         if (tokens[y].isEmpty())
         {
@@ -550,6 +548,7 @@ bool IsMACAddress(const QString& MAC)
             return false;
         }
 
+        bool ok = false;
         int value = tokens[y].toInt(&ok, 16);
         if (!ok)
         {
@@ -619,10 +618,8 @@ bool WakeOnLAN(const QString& MAC)
 {
     char msg[1024] = "\xFF\xFF\xFF\xFF\xFF\xFF";
     int  msglen = 6;
-    int  x, y;
     QStringList tokens = MAC.split(':');
     int macaddr[6];
-    bool ok;
 
     if (tokens.size() != 6)
     {
@@ -631,8 +628,9 @@ bool WakeOnLAN(const QString& MAC)
         return false;
     }
 
-    for (y = 0; y < 6; y++)
+    for (int y = 0; y < 6; y++)
     {
+        bool ok = false;
         macaddr[y] = tokens[y].toInt(&ok, 16);
 
         if (!ok)
@@ -643,8 +641,8 @@ bool WakeOnLAN(const QString& MAC)
         }
     }
 
-    for (x = 0; x < 16; x++)
-        for (y = 0; y < 6; y++)
+    for (int x = 0; x < 16; x++)
+        for (int y = 0; y < 6; y++)
             msg[msglen++] = macaddr[y];
 
     LOG(VB_NETWORK, LOG_INFO,
@@ -937,13 +935,11 @@ void setHttpProxy(void)
 
 void wrapList(QStringList &list, int width)
 {
-    int i;
-
     // if this is triggered, something has gone seriously wrong
     // the result won't really be usable, but at least it won't crash
     width = max(width, 5);
 
-    for(i = 0; i < list.size(); i++)
+    for (int i = 0; i < list.size(); i++)
     {
         QString string = list.at(i);
 

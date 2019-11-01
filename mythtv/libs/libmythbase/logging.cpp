@@ -427,14 +427,12 @@ bool LoggerThread::logConsole(LoggingItem *item)
                   (const struct tm *)&tm );
         snprintf( usPart, 9, ".%06d", (int)(item->m_usec) );
         strcat( timestamp, usPart );
-        char shortname;
+        char shortname = '-';
 
         {
             QMutexLocker locker(&loglevelMapMutex);
             LoglevelDef *lev = loglevelMap.value(item->m_level, nullptr);
-            if (!lev)
-                shortname = '-';
-            else
+            if (lev != nullptr)
                 shortname = lev->shortname;
         }
 
@@ -669,8 +667,7 @@ void logPropagateCalc(void)
 #if !defined(_WIN32) && !defined(Q_OS_ANDROID)
     if (logPropagateOpts.facility >= 0)
     {
-        const CODE *syslogname;
-
+        const CODE *syslogname = nullptr;
         for (syslogname = &facilitynames[0];
              (syslogname->c_name &&
               syslogname->c_val != logPropagateOpts.facility); syslogname++);
@@ -805,8 +802,8 @@ int syslogGetFacility(const QString& facility)
     Q_UNUSED(facility);
     return( -2 );
 #else
-    const CODE *name;
-    int i;
+    const CODE *name = nullptr;
+    int i = 0;
     QByteArray ba = facility.toLocal8Bit();
     char *string = (char *)ba.constData();
 
@@ -974,7 +971,6 @@ void verboseHelp(void)
 int verboseArgParse(const QString& arg)
 {
     QString option;
-    int     idx;
 
     if (!verboseInitialized)
         verboseInit();
@@ -1035,7 +1031,8 @@ int verboseArgParse(const QString& arg)
         }
         else
         {
-            if ((idx = option.indexOf(':')) != -1)
+            int idx = option.indexOf(':');
+            if (idx != -1)
             {
                 optionLevel = option.mid(idx + 1);
                 option = option.left(idx);

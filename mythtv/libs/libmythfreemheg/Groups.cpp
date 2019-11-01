@@ -390,12 +390,11 @@ int MHGroup::CheckTimers(MHEngine *engine)
 {
     QTime currentTime = QTime::currentTime(); // Get current time
     QList<MHTimer *>::iterator it = m_Timers.begin();
-    MHTimer *pTimer;
     int nMSecs = 0;
 
     while (it != m_Timers.end())
     {
-        pTimer = *it;
+        MHTimer *pTimer = *it;
 
         if (pTimer->m_Time <= currentTime)   // Use <= rather than < here so we fire timers with zero time immediately.
         {

@@ -54,7 +54,6 @@ AudioOutputPulseAudio::~AudioOutputPulseAudio()
 
 AudioOutputSettings* AudioOutputPulseAudio::GetOutputSettings(bool /*digital*/)
 {
-    AudioFormat fmt;
     m_aosettings = new AudioOutputSettings();
     QString fn_log_tag = "OpenDevice, ";
 
@@ -98,6 +97,7 @@ AudioOutputSettings* AudioOutputPulseAudio::GetOutputSettings(bool /*digital*/)
     pa_threaded_mainloop_unlock(m_mainloop);
 
     // All formats except S24 (pulse wants S24LSB)
+    AudioFormat fmt = FORMAT_NONE;
     while ((fmt = m_aosettings->GetNextFormat()))
     {
         if (fmt == FORMAT_S24
@@ -468,7 +468,7 @@ char *AudioOutputPulseAudio::ChooseHost(void)
     QString fn_log_tag = "ChooseHost, ";
     char *pulse_host = nullptr;
     char *device = strdup(m_main_device.toLatin1().constData());
-    const char *host;
+    const char *host = nullptr;
 
     for (host=device; host && *host != ':' && *host != 0; host++);
 
@@ -559,8 +559,8 @@ bool AudioOutputPulseAudio::ConnectPlaybackStream(void)
     pa_stream_connect_playback(m_pstream, nullptr, &m_buffer_settings,
                                (pa_stream_flags_t)flags, nullptr, nullptr);
 
-    pa_context_state_t cstate;
-    pa_stream_state_t sstate;
+    pa_context_state_t cstate = PA_CONTEXT_UNCONNECTED;
+    pa_stream_state_t sstate = PA_STREAM_UNCONNECTED;
     bool connected = false, failed = false;
 
     while (!(connected || failed))

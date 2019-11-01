@@ -88,9 +88,6 @@ void *AudioOutputDigitalEncoder::realloc(void *ptr,
 bool AudioOutputDigitalEncoder::Init(
     AVCodecID codec_id, int bitrate, int samplerate, int channels)
 {
-    AVCodec *codec;
-    int ret;
-
     LOG(VB_AUDIO, LOG_INFO, LOC +
         QString("Init codecid=%1, br=%2, sr=%3, ch=%4")
             .arg(ff_codec_id_string(codec_id)) .arg(bitrate)
@@ -105,7 +102,7 @@ bool AudioOutputDigitalEncoder::Init(
     // Clear digital encoder from all existing content
     Reset();
 
-    codec = avcodec_find_encoder_by_name("ac3_fixed");
+    AVCodec *codec = avcodec_find_encoder_by_name("ac3_fixed");
     if (!codec)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Could not find codec");
@@ -121,7 +118,7 @@ bool AudioOutputDigitalEncoder::Init(
     m_av_context->sample_fmt     = AV_SAMPLE_FMT_S16P;
 
     // open it
-    ret = avcodec_open2(m_av_context, codec, nullptr);
+    int ret = avcodec_open2(m_av_context, codec, nullptr);
     if (ret < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +

@@ -362,7 +362,6 @@ int AudioOutputJACK::JackCallback(jack_nframes_t nframes)
     float *bufs[JACK_CHANNELS_MAX];
     int bytes_needed = nframes * m_output_bytes_per_frame;
     int bytes_read = 0;
-    int i;
 
     // Check for stale_client set during shutdown callback
     _jack_client_close(&m_stale_client);
@@ -370,7 +369,7 @@ int AudioOutputJACK::JackCallback(jack_nframes_t nframes)
     // Deal with xruns which may have occured
     // Basically read and discard the data which should have been played
     int t_jack_xruns = m_jack_xruns;
-    for (i = 0; i < t_jack_xruns; i++)
+    for (int i = 0; i < t_jack_xruns; i++)
     {
         bytes_read = GetAudioData(m_aubuf, m_fragment_size, true);
         VBERROR("Discarded one audio fragment to compensate for xrun");
@@ -378,7 +377,7 @@ int AudioOutputJACK::JackCallback(jack_nframes_t nframes)
     m_jack_xruns -= t_jack_xruns;
 
     // Get jack output buffers
-    for (i = 0; i < m_channels; i++)
+    for (int i = 0; i < m_channels; i++)
         bufs[i] = (float*)jack_port_get_buffer(m_ports[i], nframes);
 
     if (m_pauseaudio || m_killaudio)
@@ -472,14 +471,13 @@ int AudioOutputJACK::_JackGraphOrderCallback(void *arg)
 */
 int AudioOutputJACK::JackGraphOrderCallback(void)
 {
-    int i;
     jack_latency_range_t latency_range;
-    jack_nframes_t port_latency, max_latency = 0;
+    jack_nframes_t max_latency = 0;
 
-    for (i = 0; i < m_channels; ++i)
+    for (int i = 0; i < m_channels; ++i)
     {
         jack_port_get_latency_range( m_ports[i], JackPlaybackLatency, &latency_range );
-        port_latency = latency_range.max;
+        jack_nframes_t port_latency = latency_range.max;
         if (port_latency > max_latency)
             max_latency = port_latency;
     }
@@ -573,7 +571,7 @@ jack_client_t* AudioOutputJACK::_jack_client_open(void)
     QString client_name = QString("mythtv_%1").arg(getpid());
     jack_options_t open_options =
         (jack_options_t)(JackUseExactName | JackNoStartServer);
-    jack_status_t open_status;
+    jack_status_t open_status = JackFailure;
 
     jack_client_t *client = jack_client_open(client_name.toLatin1().constData(),
                               open_options, &open_status);

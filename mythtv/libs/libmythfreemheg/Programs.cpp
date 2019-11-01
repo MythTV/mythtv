@@ -500,11 +500,11 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
 
                 GetString(args.GetAt(2), searchString, engine);
                 // Strings are indexed from one.
-                int nPos;
+                int nPos = 0;
 
                 for (nPos = nStart - 1; nPos <= string.Size() - searchString.Size(); nPos++)
                 {
-                    int i;
+                    int i = 0;
 
                     for (i = 0; i < searchString.Size(); i++)
                     {
@@ -557,11 +557,11 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
 
                 GetString(args.GetAt(2), searchString, engine);
                 // Strings are indexed from one.
-                int nPos;
+                int nPos = 0;
 
                 for (nPos = nStart - 1; nPos <= string.Size() - searchString.Size(); nPos++)
                 {
-                    int i;
+                    int i = 0;
 
                     for (i = 0; i < searchString.Size(); i++)
                     {
@@ -661,7 +661,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
             if (args.Size() == 5)
             {
                 int channelId = GetInt(args.GetAt(0), engine);
-                int netId, origNetId, transportId, serviceId;
+                int netId = 0, origNetId = 0, transportId = 0, serviceId = 0;
                 // Look the information up in the database.
                 bool res = engine->GetContext()->GetServiceInfo(channelId, netId, origNetId,
                                                                 transportId, serviceId);
@@ -1011,7 +1011,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
             MHERROR(QString("Unknown ResidentProgram %1").arg(m_Name.Printable()));
         }
     }
-    catch (char const *)
+    catch (...)
     {
         QStringList params;
         for (int i = 0; i < args.Size(); ++i)

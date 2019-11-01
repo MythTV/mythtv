@@ -954,7 +954,7 @@ bool FileServerHandler::HandleQueryFileTransfer(SocketHandler *socket,
 
     QStringList res;
     int recnum = commands[1].toInt();
-    FileTransfer *ft;
+    FileTransfer *ft = nullptr;
 
     {
         QReadLocker rlock(&m_ftLock);

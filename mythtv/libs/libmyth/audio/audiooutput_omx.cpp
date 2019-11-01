@@ -199,7 +199,7 @@ bool AudioOutputOMX::OpenDevice(void)
 
     m_audiorender.Shutdown();
 
-    OMX_ERRORTYPE e;
+    OMX_ERRORTYPE e = OMX_ErrorNone;
     unsigned nBitPerSample = 0;
 
     OMX_AUDIO_PARAM_PORTFORMATTYPE fmt;
@@ -612,7 +612,7 @@ AudioOutputSettings* AudioOutputOMX::GetOutputSettings(bool /*passthrough*/)
 
     m_audiorender.Shutdown();
 
-    OMX_ERRORTYPE e;
+    OMX_ERRORTYPE e = OMX_ErrorNone;
     OMX_AUDIO_PARAM_PORTFORMATTYPE fmt;
     OMX_DATA_INIT(fmt);
     fmt.nPortIndex = m_audiorender.Base();
@@ -649,7 +649,7 @@ AudioOutputSettings* AudioOutputOMX::GetOutputSettings(bool /*passthrough*/)
 
     m_audiorender.GetParameter(OMX_IndexParamAudioPcm, &pcm);
 
-    AudioFormat afmt;
+    AudioFormat afmt = FORMAT_NONE;
     while ((afmt = settings->GetNextFormat()))
     {
         if (::Format2Pcm(pcm, afmt) &&
@@ -817,7 +817,7 @@ OMX_ERRORTYPE AudioOutputOMX::FreeBuffersCB()
         OMX_BUFFERHEADERTYPE *hdr = m_ibufs.takeFirst();
         m_lock.unlock();
 
-        OMX_ERRORTYPE e;
+        OMX_ERRORTYPE e = OMX_ErrorNone;
         e = OMX_FreeBuffer(m_audiorender.Handle(), m_audiorender.Base(), hdr);
         if (e != OMX_ErrorNone)
             LOG(VB_AUDIO, LOG_ERR, LOC + QString(
@@ -842,7 +842,7 @@ OMX_ERRORTYPE AudioOutputOMX::AllocBuffersCB()
         .arg(uBufs).arg(def.nBufferSize));
     while (uBufs--)
     {
-        OMX_BUFFERHEADERTYPE *hdr;
+        OMX_BUFFERHEADERTYPE *hdr = nullptr;
         OMX_ERRORTYPE e = OMX_AllocateBuffer(m_audiorender.Handle(), &hdr,
             def.nPortIndex, this, def.nBufferSize);
         if (e != OMX_ErrorNone)

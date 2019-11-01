@@ -1208,7 +1208,7 @@ PeopleMap ParsePeople(const QDomElement& people)
             if (person.hasAttribute("job"))
             {
                 QString jobstring = person.attribute("job");
-                PeopleType type;
+                PeopleType type = kPersonActor;
                 if (jobstring.toLower() == "actor")
                     type = kPersonActor;
                 else if (jobstring.toLower() == "author")
@@ -1266,7 +1266,7 @@ ArtworkMap ParseArtwork(const QDomElement& artwork)
             if (image.hasAttribute("type"))
             {
                 QString typestring = image.attribute("type");
-                VideoArtworkType type;
+                VideoArtworkType type = kArtworkCoverart;
                 if (typestring.toLower() == "coverart")
                     type = kArtworkCoverart;
                 else if (typestring.toLower() == "fanart")
@@ -1311,20 +1311,17 @@ ArtworkMap ParseArtwork(const QDomElement& artwork)
 int editDistance( const QString& s, const QString& t )
 {
 #define D( i, j ) d[(i) * n + (j)]
-    int i;
-    int j;
     int m = s.length() + 1;
     int n = t.length() + 1;
     int *d = new int[m * n];
-    int result;
 
-    for ( i = 0; i < m; i++ )
+    for ( int i = 0; i < m; i++ )
       D( i, 0 ) = i;
-    for ( j = 0; j < n; j++ )
+    for ( int j = 0; j < n; j++ )
       D( 0, j ) = j;
-    for ( i = 1; i < m; i++ )
+    for ( int i = 1; i < m; i++ )
     {
-        for ( j = 1; j < n; j++ )
+        for ( int j = 1; j < n; j++ )
         {
             if ( s[i - 1] == t[j - 1] )
                 D( i, j ) = D( i - 1, j - 1 );
@@ -1337,7 +1334,7 @@ int editDistance( const QString& s, const QString& t )
             }
         }
     }
-    result = D( m - 1, n - 1 );
+    int result = D( m - 1, n - 1 );
     delete[] d;
     return result;
 #undef D
@@ -1394,7 +1391,7 @@ QDateTime RFC822TimeToQDateTime(const QString& t)
     QString ltimezone = tmp.takeAt(tmp.size() -1);
     if (ltimezone.size() == 5)
     {
-        bool ok;
+        bool ok = false;
         int tz = ltimezone.toInt(&ok);
         if(ok)
         {

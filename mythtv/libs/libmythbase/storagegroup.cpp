@@ -672,9 +672,9 @@ QString StorageGroup::FindNextDirMostFree(void)
 {
     QString nextDir;
     int64_t nextDirFree = 0;
-    int64_t thisDirTotal;
-    int64_t thisDirUsed;
-    int64_t thisDirFree;
+    int64_t thisDirTotal = 0;
+    int64_t thisDirUsed = 0;
+    int64_t thisDirFree = 0;
 
     LOG(VB_FILE, LOG_DEBUG, LOC + QString("FindNextDirMostFree: Starting"));
 

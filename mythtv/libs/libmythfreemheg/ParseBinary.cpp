@@ -108,15 +108,14 @@ int MHParseBinary::ParseInt(int endInt)
 //  Simple recursive parser for ASN1 BER.
 MHParseNode *MHParseBinary::DoParse()
 {
-    unsigned char ch;
     // Tag class
     enum { Universal, Context/*, Pseudo*/ } tagClass = Universal;
     // Byte count of end of this item.  Set to INDEFINITE_LENGTH if the length is Indefinite.
-    int endOfItem;
+    int endOfItem = 0;
     unsigned int tagNumber = 0;
 
     // Read the first character.
-    ch = GetNextChar();
+    unsigned char ch = GetNextChar();
 
     // ASN1 Coding rules: Top two bits (0 and 1) indicate the tag class.
     // 0x00 - Universal,  0x40 - Application, 0x80 - Context-specific, 0xC0 - Private

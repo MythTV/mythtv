@@ -156,26 +156,24 @@ int AudioOutputALSA::GetPCMInfo(int &card, int &device, int &subdevice)
     if (!m_pcm_handle)
         return -1;
 
-    int err;
     snd_pcm_info_t *pcm_info = nullptr;
-    int tcard, tdevice, tsubdevice;
 
     snd_pcm_info_alloca(&pcm_info);
 
-    err = snd_pcm_info(m_pcm_handle, pcm_info);
+    int err = snd_pcm_info(m_pcm_handle, pcm_info);
     CHECKERR("snd_pcm_info");
 
     err = snd_pcm_info_get_card(pcm_info);
     CHECKERR("snd_pcm_info_get_card");
-    tcard = err;
+    int tcard = err;
 
     err = snd_pcm_info_get_device(pcm_info);
     CHECKERR("snd_pcm_info_get_device");
-    tdevice = err;
+    int tdevice = err;
 
     err = snd_pcm_info_get_subdevice(pcm_info);
     CHECKERR("snd_pcm_info_get_subdevice");
-    tsubdevice = err;
+    int tsubdevice = err;
 
     m_card = card = tcard;
     m_device = device = tdevice;
@@ -186,7 +184,7 @@ int AudioOutputALSA::GetPCMInfo(int &card, int &device, int &subdevice)
 
 bool AudioOutputALSA::IncPreallocBufferSize(int requested, int buffer_time)
 {
-    int card, device, subdevice;
+    int card = 0, device = 0, subdevice = 0;
 
     m_pbufsize = 0;
 
@@ -243,22 +241,24 @@ bool AudioOutputALSA::IncPreallocBufferSize(int requested, int buffer_time)
 QByteArray *AudioOutputALSA::GetELD(int card, int device, int subdevice)
 {
     QByteArray *result = nullptr;
-    snd_hctl_t *hctl;
-    snd_hctl_elem_t *elem;
-    snd_ctl_elem_info_t *info;     snd_ctl_elem_info_alloca(&info);
-    snd_ctl_elem_id_t *id;         snd_ctl_elem_id_alloca(&id);
-    snd_ctl_elem_value_t *control; snd_ctl_elem_value_alloca(&control);
-    snd_ctl_elem_type_t type;
+    snd_hctl_t *hctl = nullptr;
+    snd_ctl_elem_info_t *info = nullptr;
+    snd_ctl_elem_id_t *id = nullptr;
+    snd_ctl_elem_value_t *control = nullptr;
 
-    int err;
+    snd_ctl_elem_info_alloca(&info);
+    snd_ctl_elem_id_alloca(&id);
+    snd_ctl_elem_value_alloca(&control);
 
     snd_ctl_elem_id_set_interface(id, SND_CTL_ELEM_IFACE_PCM);
     snd_ctl_elem_id_set_name(id, "ELD");
     snd_ctl_elem_id_set_device(id, device);
     snd_ctl_elem_id_set_subdevice(id, subdevice);
-    if ((err = snd_hctl_open(&hctl,
-                             QString("hw:%1").arg(card).toLatin1().constData(),
-                             0)) < 0)
+
+    int err = snd_hctl_open(&hctl,
+                            QString("hw:%1").arg(card).toLatin1().constData(),
+                            0);
+    if (err < 0)
     {
         VBAUDIO(QString("Control %1 open error: %2")
                 .arg(card)
@@ -273,10 +273,11 @@ QByteArray *AudioOutputALSA::GetELD(int card, int device, int subdevice)
         /* frees automatically the control which cannot be added. */
         return nullptr;
     }
-    elem = snd_hctl_find_elem(hctl, id);
+    snd_hctl_elem_t *elem = snd_hctl_find_elem(hctl, id);
     if (elem)
     {
-        if ((err = snd_hctl_elem_info(elem, info)) < 0)
+        err = snd_hctl_elem_info(elem, info);
+        if (err < 0)
         {
             VBAUDIO(QString("Control %1 snd_hctl_elem_info error: %2")
                     .arg(card)
@@ -285,7 +286,7 @@ QByteArray *AudioOutputALSA::GetELD(int card, int device, int subdevice)
             return nullptr;
         }
         unsigned int count = snd_ctl_elem_info_get_count(info);
-        type = snd_ctl_elem_info_get_type(info);
+        snd_ctl_elem_type_t type = snd_ctl_elem_info_get_type(info);
         if (!snd_ctl_elem_info_is_readable(info))
         {
             VBAUDIO(QString("Control %1 element info is not readable")
@@ -317,10 +318,10 @@ QByteArray *AudioOutputALSA::GetELD(int card, int device, int subdevice)
 
 AudioOutputSettings* AudioOutputALSA::GetOutputSettings(bool passthrough)
 {
-    snd_pcm_hw_params_t *params;
+    snd_pcm_hw_params_t *params = nullptr;
     snd_pcm_format_t afmt = SND_PCM_FORMAT_UNKNOWN;
-    AudioFormat fmt;
-    int err;
+    AudioFormat fmt = FORMAT_NONE;
+    int err = 0;
 
     AudioOutputSettings *settings = new AudioOutputSettings();
 
@@ -384,7 +385,7 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings(bool passthrough)
         if (snd_pcm_hw_params_test_channels(m_pcm_handle, params, channels) >= 0)
             settings->AddSupportedChannels(channels);
 
-    int card, device, subdevice;
+    int card = 0, device = 0, subdevice = 0;
     if (GetPCMInfo(card, device, subdevice) >= 0)
     {
         // Check if we can retrieve ELD for this device
@@ -446,9 +447,8 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings(bool passthrough)
 
 bool AudioOutputALSA::OpenDevice()
 {
-    snd_pcm_format_t format;
-    uint buffer_time, period_time;
-    int err;
+    snd_pcm_format_t format = SND_PCM_FORMAT_UNKNOWN;
+    int err = 0;
 
     if (m_pcm_handle != nullptr)
         CloseDevice();
@@ -475,9 +475,9 @@ bool AudioOutputALSA::OpenDevice()
     }
 
     // buffer 0.5s worth of samples
-    buffer_time = gCoreContext->GetNumSetting("ALSABufferOverride", 500) * 1000;
+    uint buffer_time = gCoreContext->GetNumSetting("ALSABufferOverride", 500) * 1000;
 
-    period_time = 4;      // aim for an interrupt every (1/4th of buffer_time)
+    uint period_time = 4; // aim for an interrupt every (1/4th of buffer_time)
 
     err = SetParameters(m_pcm_handle, format, m_channels, m_samplerate,
                         buffer_time, period_time);
@@ -512,7 +512,7 @@ template <class AudioDataType>
 static inline void _ReorderSmpteToAlsa(AudioDataType *buf, uint frames,
                                        uint extrach)
 {
-    AudioDataType tmpC, tmpLFE, *buf2;
+    AudioDataType tmpC, tmpLFE, *buf2 = nullptr;
 
     for (uint i = 0; i < frames; i++)
     {
@@ -543,7 +543,6 @@ void AudioOutputALSA::WriteAudio(uchar *aubuf, int size)
 {
     uchar *tmpbuf = aubuf;
     uint frames = size / m_output_bytes_per_frame;
-    int err;
 
     if (m_pcm_handle == nullptr)
     {
@@ -576,7 +575,7 @@ void AudioOutputALSA::WriteAudio(uchar *aubuf, int size)
             continue;
         }
 
-        err = lw;
+        int err = lw;
 
         switch (err)
         {
@@ -654,11 +653,10 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
                                    uint channels, uint rate, uint buffer_time,
                                    uint period_time)
 {
-    int err;
-    snd_pcm_hw_params_t  *params;
-    snd_pcm_sw_params_t  *swparams;
-    snd_pcm_uframes_t     period_size, period_size_min, period_size_max;
-    snd_pcm_uframes_t     buffer_size, buffer_size_min, buffer_size_max;
+    snd_pcm_hw_params_t  *params = nullptr;
+    snd_pcm_sw_params_t  *swparams = nullptr;
+    snd_pcm_uframes_t     period_size = 0, period_size_min = 0, period_size_max = 0;
+    snd_pcm_uframes_t     buffer_size = 0, buffer_size_min = 0, buffer_size_max = 0;
 
     VBAUDIO(QString("SetParameters(format=%1, channels=%2, rate=%3, "
                     "buffer_time=%4, period_time=%5)")
@@ -675,7 +673,7 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
     snd_pcm_sw_params_alloca(&swparams);
 
     /* choose all parameters */
-    err = snd_pcm_hw_params_any(handle, params);
+    int err = snd_pcm_hw_params_any(handle, params);
     CHECKERR("No playback configurations available");
 
     /* set the interleaved read/write format */
@@ -830,11 +828,10 @@ int AudioOutputALSA::GetVolumeChannel(int channel) const
     if (!snd_mixer_selem_has_playback_channel(m_mixer.elem, chan))
         return retvol;
 
-    long mixervol;
-    int chk;
-    if ((chk = snd_mixer_selem_get_playback_volume(m_mixer.elem,
-                                                   chan,
-                                                   &mixervol)) < 0)
+    long mixervol = 0;
+    int chk = snd_mixer_selem_get_playback_volume(m_mixer.elem, chan,
+                                                  &mixervol);
+    if (chk < 0)
     {
         VBERROR(QString("failed to get channel %1 volume, mixer %2/%3: %4")
                 .arg(channel).arg(m_mixer.device)
@@ -891,8 +888,8 @@ bool AudioOutputALSA::OpenMixer(void)
 
     QString mixer_device_tag = QString("mixer device %1").arg(m_mixer.device);
 
-    int chk;
-    if ((chk = snd_mixer_open(&m_mixer.handle, 0)) < 0)
+    int chk = snd_mixer_open(&m_mixer.handle, 0);
+    if (chk < 0)
     {
         VBERROR(QString("failed to open mixer device %1: %2")
                 .arg(mixer_device_tag).arg(snd_strerror(chk)));
@@ -970,7 +967,7 @@ bool AudioOutputALSA::OpenMixer(void)
 
     if (m_set_initial_vol)
     {
-        int initial_vol;
+        int initial_vol = 80;
         if (m_mixer.control == "PCM")
             initial_vol = gCoreContext->GetNumSetting("PCMMixerVolume", 80);
         else
@@ -985,7 +982,7 @@ bool AudioOutputALSA::OpenMixer(void)
 QMap<QString, QString> *AudioOutputALSA::GetDevices(const char *type)
 {
     QMap<QString, QString> *alsadevs = new QMap<QString, QString>();
-    void **hints, **n;
+    void **hints = nullptr, **n = nullptr;
 
     if (snd_device_name_hint(-1, type, &hints) < 0)
         return alsadevs;

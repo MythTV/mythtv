@@ -1032,8 +1032,6 @@ void MythDownloadManager::cancelDownload(const QString &url, bool block)
  */
 void MythDownloadManager::cancelDownload(const QStringList &urls, bool block)
 {
-    MythDownloadInfo *dlInfo;
-
     m_infoLock->lock();
     foreach (QString url, urls)
     {
@@ -1041,7 +1039,7 @@ void MythDownloadManager::cancelDownload(const QStringList &urls, bool block)
         while (lit.hasNext())
         {
             lit.next();
-            dlInfo = lit.value();
+            MythDownloadInfo *dlInfo = lit.value();
             if (dlInfo->m_url == url)
             {
                 if (!m_cancellationQueue.contains(dlInfo))
@@ -1052,7 +1050,7 @@ void MythDownloadManager::cancelDownload(const QStringList &urls, bool block)
 
         if (m_downloadInfos.contains(url))
         {
-            dlInfo = m_downloadInfos[url];
+            MythDownloadInfo *dlInfo = m_downloadInfos[url];
 
             if (!m_cancellationQueue.contains(dlInfo))
                 m_cancellationQueue.append(dlInfo);
@@ -1086,13 +1084,12 @@ void MythDownloadManager::cancelDownload(const QStringList &urls, bool block)
 void MythDownloadManager::downloadCanceled()
 {
     QMutexLocker locker(m_infoLock);
-    MythDownloadInfo *dlInfo;
 
     QMutableListIterator<MythDownloadInfo*> lit(m_cancellationQueue);
     while (lit.hasNext())
     {
         lit.next();
-        dlInfo = lit.value();
+        MythDownloadInfo *dlInfo = lit.value();
         dlInfo->m_lock.lock();
 
         if (dlInfo->m_reply)
@@ -1120,12 +1117,11 @@ void MythDownloadManager::downloadCanceled()
 void MythDownloadManager::removeListener(QObject *caller)
 {
     QMutexLocker locker(m_infoLock);
-    MythDownloadInfo *dlInfo;
 
     QList <MythDownloadInfo*>::iterator lit = m_downloadQueue.begin();
     for (; lit != m_downloadQueue.end(); ++lit)
     {
-        dlInfo = *lit;
+        MythDownloadInfo *dlInfo = *lit;
         if (dlInfo->m_caller == caller)
         {
             dlInfo->m_caller  = nullptr;
@@ -1137,7 +1133,7 @@ void MythDownloadManager::removeListener(QObject *caller)
     QMap <QString, MythDownloadInfo*>::iterator mit = m_downloadInfos.begin();
     for (; mit != m_downloadInfos.end(); ++mit)
     {
-        dlInfo = mit.value();
+        MythDownloadInfo *dlInfo = mit.value();
         if (dlInfo->m_caller == caller)
         {
             dlInfo->m_caller  = nullptr;

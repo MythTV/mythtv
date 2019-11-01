@@ -299,7 +299,7 @@ MSqlDatabase *MDBManager::popConnection(bool reuse)
 
     m_lock.lock();
 
-    MSqlDatabase *db;
+    MSqlDatabase *db = nullptr;
 
 #if REUSE_CONNECTION
     if (reuse)

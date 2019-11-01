@@ -1024,7 +1024,7 @@ QDateTime Parse::RFC822TimeToQDateTime(const QString& t) const
     QString tmpTimezone = tmp.takeAt(tmp.size() -1);
     if (tmpTimezone.size() == 5)
     {
-        bool ok;
+        bool ok = false;
         int tz = tmpTimezone.toInt(&ok);
         if(ok)
         {
@@ -1062,7 +1062,7 @@ QDateTime Parse::FromRFC3339(const QString& t)
     QRegExp fractionalSeconds("(\\.)(\\d+)");
     if (fractionalSeconds.indexIn(t) > -1)
     {
-        bool ok;
+        bool ok = false;
         int fractional = fractionalSeconds.cap(2).toInt(&ok);
         if (ok)
         {

@@ -195,13 +195,11 @@ bool FileLogger::logmsg(LoggingItem *item)
     snprintf( usPart, 9, ".%06d", (int)(item->usec()) );
     strcat( timestamp, usPart );
 
-    char shortname;
+    char shortname = '-';
     {
         QMutexLocker locker(&loglevelMapMutex);
         LoglevelMap::iterator it = loglevelMap.find(item->level());
-        if (it == loglevelMap.end())
-            shortname = '-';
-        else
+        if (it != loglevelMap.end())
             shortname = (*it)->shortname;
     }
 
@@ -281,14 +279,12 @@ bool SyslogLogger::logmsg(LoggingItem *item)
     if (!m_opened || item->facility() <= 0)
         return false;
 
-    char shortname;
+    char shortname = '-';
 
     {
         QMutexLocker locker(&loglevelMapMutex);
         LoglevelDef *lev = loglevelMap.value(item->level(), nullptr);
-        if (!lev)
-            shortname = '-';
-        else
+        if (lev != nullptr)
             shortname = lev->shortname;
     }
     syslog(item->level() | item->facility(), "%s[%d]: %c %s %s:%d (%s) %s",
@@ -824,13 +820,12 @@ void LogForwardThread::forwardMessage(LogMessage *msg)
 
         // Need to find or create the loggers
         LoggerList *loggers = new LoggerList;
-        LoggerBase *logger;
 
         // FileLogger from logFile
         QString logfile = item->logFile();
         if (!logfile.isEmpty())
         {
-            logger = FileLogger::create(logfile, lock2.mutex());
+            LoggerBase *logger = FileLogger::create(logfile, lock2.mutex());
 
             ClientList *clients = logRevClientMap.value(logger);
 
@@ -846,7 +841,7 @@ void LogForwardThread::forwardMessage(LogMessage *msg)
         int facility = item->facility();
         if (facility > 0)
         {
-            logger = SyslogLogger::create(lock2.mutex());
+            LoggerBase *logger = SyslogLogger::create(lock2.mutex());
 
             ClientList *clients = logRevClientMap.value(logger);
 
@@ -861,7 +856,7 @@ void LogForwardThread::forwardMessage(LogMessage *msg)
         // Journal Logger
         if (facility == SYSTEMD_JOURNAL_FACILITY)
         {
-            logger = JournalLogger::create(lock2.mutex());
+            LoggerBase *logger = JournalLogger::create(lock2.mutex());
 
             ClientList *clients = logRevClientMap.value(logger);
 
@@ -878,7 +873,7 @@ void LogForwardThread::forwardMessage(LogMessage *msg)
         QString table = item->table();
         if (!table.isEmpty())
         {
-            logger = DatabaseLogger::create(table, lock2.mutex());
+            LoggerBase *logger = DatabaseLogger::create(table, lock2.mutex());
 
             ClientList *clients = logRevClientMap.value(logger);
 

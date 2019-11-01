@@ -106,7 +106,7 @@ void MythSystemLegacyIOHandler::run(void)
 
             timeval tv {0, 0};
 
-            int retval;
+            int retval = -1;
             fd_set fds = m_fds;
 
             if( m_read )
@@ -144,9 +144,9 @@ void MythSystemLegacyIOHandler::run(void)
 
 void MythSystemLegacyIOHandler::HandleRead(int fd, QBuffer *buff)
 {
-    int len;
     errno = 0;
-    if( (len = read(fd, &m_readbuf, 65536)) <= 0 )
+    int len = read(fd, &m_readbuf, 65536);
+    if( len <= 0 )
     {
         if( errno != EAGAIN )
         {
@@ -274,9 +274,8 @@ void MythSystemLegacyManager::run(void)
         }
         m_mapLock.unlock();
 
-        MythSystemLegacyUnix     *ms;
-        pid_t               pid;
-        int                 status;
+        pid_t pid = 0;
+        int   status = 0;
 
         // check for any newly exited processes
         listLock.lock();
@@ -293,7 +292,7 @@ void MythSystemLegacyManager::run(void)
             }
 
             // pop exited process off managed list, add to cleanup list
-            ms = m_pMap.take(pid);
+            MythSystemLegacyUnix *ms = m_pMap.take(pid);
             m_mapLock.unlock();
 
             // Occasionally, the caller has deleted the structure from under
@@ -376,7 +375,7 @@ void MythSystemLegacyManager::run(void)
         {
             next = i + 1;
             pid  = i.key();
-            ms   = i.value();
+            MythSystemLegacyUnix *ms = i.value();
             if (!ms)
                 continue;
 
@@ -859,12 +858,11 @@ void MythSystemLegacyUnix::Fork(time_t timeout)
     char *command = strdup(cmdUTF8.constData());
 
     char **cmdargs = (char **)malloc((args.size() + 1) * sizeof(char *));
-    QStringList::const_iterator it;
 
     if (cmdargs)
     {
-        int i;
-        for (i = 0, it = args.constBegin(); it != args.constEnd(); ++it)
+        int i = 0;
+        for (auto it = args.constBegin(); it != args.constEnd(); ++it)
         {
             cmdargs[i++] = strdup(it->toUtf8().constData());
         }

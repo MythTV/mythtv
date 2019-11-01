@@ -198,7 +198,7 @@ void OMXComponent::Shutdown()
 
     for (unsigned port = 0; port < Ports(); ++port)
     {
-        OMX_ERRORTYPE e;
+        OMX_ERRORTYPE e = OMX_ErrorNone;
         if (PortDef(port).eDir == OMX_DirOutput)
             e = OMX_SetupTunnel(Handle(), Base() + port, nullptr, 0);
         else

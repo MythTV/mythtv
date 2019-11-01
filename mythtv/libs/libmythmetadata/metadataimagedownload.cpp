@@ -75,7 +75,7 @@ void MetadataImageDownload::run()
     RunProlog();
 
     // Always handle thumbnails first, they're higher priority.
-    ThumbnailData *thumb;
+    ThumbnailData *thumb = nullptr;
     while ((thumb = moreThumbs()) != nullptr)
     {
         QString sFilename = getDownloadFilename(thumb->title, thumb->url);

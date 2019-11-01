@@ -145,7 +145,7 @@ bool GUIStartup::updateProgress(bool finished)
 {
     if (m_progressTimer)
     {
-        int elapsed;
+        int elapsed = 0;
         if (finished)
             elapsed = m_total;
         else

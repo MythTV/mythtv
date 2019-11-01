@@ -379,25 +379,17 @@ void MHSetData::Perform(MHEngine *engine)
     else
     {
         MHContentRef referenced;
-        int size, cc;
+        int size = 0, cc = 0;
         m_Referenced.GetValue(referenced, engine);
 
         if (m_fSizePresent)
         {
             size = m_ContentSize.GetValue(engine);
         }
-        else
-        {
-            size = 0;
-        }
 
         if (m_fCCPriorityPresent)
         {
             cc = m_CCPriority.GetValue(engine);
-        }
-        else
-        {
-            cc = 0;
         }
 
         engine->FindObject(target)->SetData(referenced, m_fSizePresent, size, m_fCCPriorityPresent, cc, engine);

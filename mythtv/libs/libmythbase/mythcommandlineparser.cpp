@@ -713,11 +713,10 @@ CommandLineArg* CommandLineArg::SetRemoved(QString remstr, QString remver)
  */
 void CommandLineArg::SetParentOf(CommandLineArg *other, bool forward)
 {
-    int i;
     bool replaced = false;
     other->IncrRef();
 
-    for (i = 0; i < m_children.size(); i++)
+    for (int i = 0; i < m_children.size(); i++)
     {
         if (m_children[i]->m_name == other->m_name)
         {
@@ -742,11 +741,10 @@ void CommandLineArg::SetParentOf(CommandLineArg *other, bool forward)
  */
 void CommandLineArg::SetChildOf(CommandLineArg *other, bool forward)
 {
-    int i;
     bool replaced = false;
     other->IncrRef();
 
-    for (i = 0; i < m_parents.size(); i++)
+    for (int i = 0; i < m_parents.size(); i++)
     {
         if (m_parents[i]->m_name == other->m_name)
         {
@@ -771,11 +769,10 @@ void CommandLineArg::SetChildOf(CommandLineArg *other, bool forward)
  */
 void CommandLineArg::SetRequires(CommandLineArg *other, bool /*forward*/)
 {
-    int i;
     bool replaced = false;
     other->IncrRef();
 
-    for (i = 0; i < m_requires.size(); i++)
+    for (int i = 0; i < m_requires.size(); i++)
     {
         if (m_requires[i]->m_name == other->m_name)
         {
@@ -801,11 +798,10 @@ void CommandLineArg::SetRequires(CommandLineArg *other, bool /*forward*/)
  */
 void CommandLineArg::SetBlocks(CommandLineArg *other, bool forward)
 {
-    int i;
     bool replaced = false;
     other->IncrRef();
 
-    for (i = 0; i < m_blocks.size(); i++)
+    for (int i = 0; i < m_blocks.size(); i++)
     {
         if (m_blocks[i]->m_name == other->m_name)
         {
@@ -916,11 +912,11 @@ QString CommandLineArg::GetPreferredKeyword(void) const
 {
     QStringList::const_iterator it;
     QString preferred;
-    int len = 0, len2;
+    int len = 0;
 
     for (it = m_keywords.constBegin(); it != m_keywords.constEnd(); ++it)
     {
-        len2 = (*it).size();
+        int len2 = (*it).size();
         if (len2 > len)
         {
             preferred = *it;
@@ -1035,7 +1031,7 @@ void CommandLineArg::PrintVerbose(void) const
     QMap<QString, QVariant>::const_iterator it;
     QVariantList vlist;
     QVariantList::const_iterator it2;
-    bool first;
+    bool first = true;
 
     switch (m_type)
     {
@@ -1085,8 +1081,6 @@ void CommandLineArg::PrintVerbose(void) const
 
       case QVariant::Map:
         tmpmap = m_stored.toMap();
-        first = true;
-
         for (it = tmpmap.begin(); it != tmpmap.end(); ++it)
         {
             if (first)
@@ -1225,7 +1219,7 @@ CommandLineArg* MythCommandLineParser::add(QStringList arglist,
         const QString& name, QVariant::Type type, QVariant def,
         QString help, QString longhelp)
 {
-    CommandLineArg *arg;
+    CommandLineArg *arg = nullptr;
 
     if (m_namedArgs.contains(name))
         arg = m_namedArgs[name];
@@ -1430,10 +1424,10 @@ int MythCommandLineParser::getOpt(int argc, const char * const * argv,
  */
 bool MythCommandLineParser::Parse(int argc, const char * const * argv)
 {
-    int res;
+    int res = kEnd;
     QString opt;
     QByteArray val;
-    CommandLineArg *argdef;
+    CommandLineArg *argdef = nullptr;
 
     // reconnect interdependencies between command line options
     if (!ReconcileLinks())
@@ -2528,7 +2522,7 @@ LogLevel_t MythCommandLineParser::GetLogLevel(void)
  */
 bool MythCommandLineParser::SetValue(const QString &key, const QVariant& value)
 {
-    CommandLineArg *arg;
+    CommandLineArg *arg = nullptr;
 
     if (!m_namedArgs.contains(key))
     {

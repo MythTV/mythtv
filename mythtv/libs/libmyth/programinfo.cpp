@@ -712,7 +712,7 @@ ProgramInfo::ProgramInfo(const QString &_pathname)
         return;
     }
 
-    uint _chanid;
+    uint _chanid = 0;
     QDateTime _recstartts;
     if (!gCoreContext->IsDatabaseIgnored() &&
         QueryKeyFromPathname(_pathname, _chanid, _recstartts) &&
@@ -1440,7 +1440,7 @@ bool ProgramInfo::FromStringList(QStringList::const_iterator &it,
     INT_FROM_LIST(m_recpriority2);      // 39
     INT_FROM_LIST(m_parentid);          // 40
     STR_FROM_LIST(m_storagegroup);      // 41
-    uint audioproperties, videoproperties, subtitleType;
+    uint audioproperties = 0, videoproperties = 0, subtitleType = 0;
     INT_FROM_LIST(audioproperties);   // 42
     INT_FROM_LIST(videoproperties);   // 43
     INT_FROM_LIST(subtitleType);      // 44
@@ -1488,8 +1488,6 @@ void ProgramInfo::ToMap(InfoMap &progMap,
         gCoreContext->GetSetting("LongChannelFormat", "<num> <name>");
 
     QDateTime timeNow = MythDate::current();
-
-    int hours, minutes, seconds;
 
     progMap["title"] = m_title;
     progMap["subtitle"] = m_subtitle;
@@ -1623,13 +1621,13 @@ void ProgramInfo::ToMap(InfoMap &progMap,
 
     progMap["filesize"] = locale.toString((quint64)m_filesize);
 
-    seconds = m_recstartts.secsTo(m_recendts);
-    minutes = seconds / 60;
+    int seconds = m_recstartts.secsTo(m_recendts);
+    int minutes = seconds / 60;
 
     QString min_str = QObject::tr("%n minute(s)","",minutes);
 
     progMap["lenmins"] = min_str;
-    hours   = minutes / 60;
+    int hours   = minutes / 60;
     minutes = minutes % 60;
 
     progMap["lentime"] = min_str;
@@ -3466,7 +3464,6 @@ void ProgramInfo::SaveMarkupMap(
     for (it = marks.begin(); it != marks.end(); ++it)
     {
         uint64_t frame = it.key();
-        int mark_type;
         QString querystr;
 
         if ((min_frame >= 0) && (frame < (uint64_t)min_frame))
@@ -3475,7 +3472,7 @@ void ProgramInfo::SaveMarkupMap(
         if ((max_frame >= 0) && (frame > (uint64_t)max_frame))
             continue;
 
-        mark_type = (type != MARK_ALL) ? type : *it;
+        int mark_type = (type != MARK_ALL) ? type : *it;
 
         if (IsVideo())
         {
@@ -5464,7 +5461,7 @@ bool LoadFromProgram(ProgramList &destination,
                      const QString &sql, const MSqlBindings &bindings,
                      const ProgramList &schedList)
 {
-    uint count;
+    uint count = 0;
 
     QString queryStr = sql;
     // ------------------------------------------------------------------------
@@ -5603,7 +5600,7 @@ ProgramInfo* LoadProgramFromProgram(const uint chanid,
     // Get all Pending Scheduled Programs
 
     ProgramList  schedList;
-    bool hasConflicts;
+    bool hasConflicts = false;
     LoadFromScheduler(schedList, hasConflicts);
 
     // ----------------------------------------------------------------------
@@ -6026,7 +6023,7 @@ bool GetNextRecordingList(QDateTime &nextRecordingStart,
 {
     nextRecordingStart = QDateTime();
 
-    bool dummy;
+    bool dummy = false;
     bool *conflicts = (hasConflicts) ? hasConflicts : &dummy;
 
     ProgramList progList;

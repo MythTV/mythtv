@@ -70,7 +70,7 @@ void MHActionSequence::Initialise(MHParseNode *p, MHEngine *engine)
     for (int i = 0; i < p->GetArgCount(); i++)
     {
         MHParseNode *pElemAction = p->GetArgN(i);
-        MHElemAction *pAction;
+        MHElemAction *pAction = nullptr;
 
         switch (pElemAction->GetTagNo())
         {

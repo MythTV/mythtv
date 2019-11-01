@@ -461,7 +461,7 @@ UnZip::ErrorCode UnZip::extractFile(const QString& filename, QIODevice* dev, Ext
 UnZip::ErrorCode UnZip::extractFiles(const QStringList& filenames, const QString& dirname, ExtractionOptions options)
 {
 	QDir dir(dirname);
-	ErrorCode ec;
+	ErrorCode ec = Ok;
 
 	for (QStringList::ConstIterator itr = filenames.constBegin(); itr != filenames.constEnd(); ++itr)
 	{
@@ -481,7 +481,7 @@ UnZip::ErrorCode UnZip::extractFiles(const QStringList& filenames, const QString
  */
 UnZip::ErrorCode UnZip::extractFiles(const QStringList& filenames, const QDir& dir, ExtractionOptions options)
 {
-	ErrorCode ec;
+	ErrorCode ec = Ok;
 
 	for (QStringList::ConstIterator itr = filenames.constBegin(); itr != filenames.constEnd(); ++itr)
 	{
@@ -545,7 +545,7 @@ UnZip::ErrorCode UnzipPrivate::openArchive(QIODevice* dev)
 		return UnZip::OpenFailed;
 	}
 
-	UnZip::ErrorCode ec;
+	UnZip::ErrorCode ec = UnZip::Ok;
 
 	ec = seekToCentralDirectory();
 	if (ec != UnZip::Ok)
@@ -762,7 +762,7 @@ UnZip::ErrorCode UnzipPrivate::seekToCentralDirectory()
 	}
 	else
 	{
-		qint64 read;
+		qint64 read = 0;
 		char* p = nullptr;
 
 		offset -= UNZIP_EOCD_SIZE;
@@ -1112,7 +1112,7 @@ UnZip::ErrorCode UnzipPrivate::extractFile(const QString& path, ZipEntryP& entry
 	uInt cur = 0;
 
 	// extract data
-	qint64 read;
+	qint64 read = 0;
 	quint64 tot = 0;
 
 	quint32 myCRC = crc32(0L, Z_NULL, 0);
@@ -1149,13 +1149,13 @@ UnZip::ErrorCode UnzipPrivate::extractFile(const QString& path, ZipEntryP& entry
 		zstr.next_in = Z_NULL;
 		zstr.avail_in = 0;
 
-		int zret;
+		int zret = Z_OK;
 
 		// Use inflateInit2 with negative windowBits to get raw decompression
 		if ( (zret = inflateInit2_(&zstr, -MAX_WBITS, ZLIB_VERSION, sizeof(z_stream))) != Z_OK )
 			return UnZip::ZlibError;
 
-		int szDecomp;
+		int szDecomp = 0;
 
 		// Decompress until deflate stream ends or end of file
 		do
@@ -1343,7 +1343,7 @@ UnZip::ErrorCode UnzipPrivate::testPassword(quint32* keys, const QString& file, 
 */
 bool UnzipPrivate::testKeys(const ZipEntryP& header, quint32* keys)
 {
-	char lastByte;
+	char lastByte = 0;
 
 	// decrypt encryption header
 	for (int i=0; i<11; ++i)

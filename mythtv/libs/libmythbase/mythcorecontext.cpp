@@ -1554,7 +1554,7 @@ void MythCoreContext::readyRead(MythSocket *sock)
         else if (message.startsWith("FILE_WRITTEN"))
         {
             QString file;
-            uint64_t size;
+            uint64_t size = 0;
             int NUMTOKENS = 3; // Number of tokens expected
 
             if (tokens.size() == NUMTOKENS)
@@ -1833,7 +1833,6 @@ void MythCoreContext::WaitUntilSignals(const char *signal1, ...)
     if (!signal1)
         return;
 
-    const char *s;
     QEventLoop eventLoop;
     va_list vl;
 
@@ -1843,7 +1842,7 @@ void MythCoreContext::WaitUntilSignals(const char *signal1, ...)
     connect(this, signal1, &eventLoop, SLOT(quit()));
 
     va_start(vl, signal1);
-    s = va_arg(vl, const char *);
+    const char *s = va_arg(vl, const char *);
     while (s)
     {
         LOG(VB_GENERAL, LOG_DEBUG, LOC +

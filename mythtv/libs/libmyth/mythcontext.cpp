@@ -153,7 +153,7 @@ static void exec_program_tv_cb(const QString &cmd)
     QStringList tokens = cmd.simplified().split(" ");
     QStringList strlist;
 
-    bool cardidok;
+    bool cardidok = false;
     int wantcardid = tokens[0].toInt(&cardidok, 10);
 
     if (cardidok && wantcardid > 0)

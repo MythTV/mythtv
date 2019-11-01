@@ -24,9 +24,8 @@ extern "C" {
 SPDIFEncoder::SPDIFEncoder(const QString& muxer, AVCodecID codec_id)
 {
     QByteArray dev_ba     = muxer.toLatin1();
-    AVOutputFormat *fmt;
 
-    fmt = av_guess_format(dev_ba.constData(), nullptr, nullptr);
+    AVOutputFormat *fmt = av_guess_format(dev_ba.constData(), nullptr, nullptr);
     if (!fmt)
     {
         LOG(VB_AUDIO, LOG_ERR, LOC + "av_guess_format");

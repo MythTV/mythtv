@@ -637,7 +637,7 @@ bool RemoteFile::CopyFile (const QString& src, const QString& dst,
     dstFile.SetBlocking(true);
 
     bool success = true;
-    int srcLen;
+    int srcLen = 0;
 
     while ((srcLen = srcFile.Read(buf, readSize)) > 0)
     {
@@ -1150,7 +1150,7 @@ long long RemoteFile::GetRealFileSize(void)
 
     if (ok && !strlist.isEmpty())
     {
-        bool validate;
+        bool validate = false;
         long long size = strlist[0].toLongLong(&validate);
 
         if (validate)

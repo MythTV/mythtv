@@ -189,8 +189,6 @@ bool MythCDROMLinux::hasWritableMedia()
 {
     unsigned char    buffer[32];
     CDROMgenericCmd  cgc;
-    CDROMdiscInfo   *di;
-
 
     memset(buffer, 0, sizeof(buffer));
     memset(&cgc,   0, sizeof(cgc));
@@ -209,8 +207,7 @@ bool MythCDROMLinux::hasWritableMedia()
         return false;
     }
 
-    di = (CDROMdiscInfo *) buffer;
-
+    CDROMdiscInfo *di = (CDROMdiscInfo *) buffer;
     switch (di->disc_status)
     {
         case MEDIA_IS_EMPTY:
@@ -242,8 +239,6 @@ int MythCDROMLinux::SCSIstatus()
 {
     unsigned char    buffer[8];
     CDROMgenericCmd  cgc;
-    CDROMeventStatus *es;
-
 
     memset(buffer, 0, sizeof(buffer));
     memset(&cgc,   0, sizeof(cgc));
@@ -257,7 +252,7 @@ int MythCDROMLinux::SCSIstatus()
     cgc.buflen = sizeof(buffer);
     cgc.data_direction = CGC_DATA_READ;
 
-    es = (CDROMeventStatus *) buffer;
+    CDROMeventStatus *es = (CDROMeventStatus *) buffer;
 
     if ((ioctl(m_DeviceHandle, CDROM_SEND_PACKET, &cgc) < 0)
         || es->nea                           // drive does not support request
@@ -340,7 +335,7 @@ struct StHandle {
 // This is copied from eject.c by Jeff Tranter (tranter@pobox.com)
 MythMediaError MythCDROMLinux::ejectSCSI()
 {
-    int k;
+    int k = 0;
     sg_io_hdr_t io_hdr;
     unsigned char allowRmBlk[6] = {ALLOW_MEDIUM_REMOVAL, 0, 0, 0, 0, 0};
     unsigned char startStop1Blk[6] = {START_STOP, 0, 0, 0, 1, 0}; // start
@@ -735,7 +730,6 @@ MythMediaError MythCDROMLinux::unlock()
 
 bool MythCDROMLinux::isSameDevice(const QString &path)
 {
-    dev_t new_rdev;
     struct stat sb {};
 
     if (stat(path.toLocal8Bit().constData(), &sb) < 0)
@@ -744,7 +738,7 @@ bool MythCDROMLinux::isSameDevice(const QString &path)
             QString("Failed to stat '%1'").arg(path) + ENO);
         return false;
     }
-    new_rdev = sb.st_rdev;
+    dev_t new_rdev = sb.st_rdev;
 
     // Check against m_DevicePath...
     if (stat(m_DevicePath.toLocal8Bit().constData(), &sb) < 0)
@@ -762,7 +756,6 @@ bool MythCDROMLinux::isSameDevice(const QString &path)
  */
 void MythCDROMLinux::setDeviceSpeed(const char *device, int speed)
 {
-    int fd;
     unsigned char buffer[28] {};
     unsigned char cmd[16] {};
     unsigned char sense[16] {};
@@ -770,7 +763,8 @@ void MythCDROMLinux::setDeviceSpeed(const char *device, int speed)
     struct stat st {};
     int rate = 0;
 
-    if ((fd = open(device, O_RDWR | O_NONBLOCK)) == -1)
+    int fd = open(device, O_RDWR | O_NONBLOCK);
+    if (fd == -1)
     {
         LOG(VB_MEDIA, LOG_ERR, LOC +
             " Changing CD/DVD speed needs write access");

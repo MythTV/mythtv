@@ -561,7 +561,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
 
     /* Set samplerate_tmp and channels_tmp to appropriate values
        if passing through */
-    int samplerate_tmp, channels_tmp;
+    int samplerate_tmp = 0, channels_tmp = 0;
     if (settings.m_use_passthru)
     {
         samplerate_tmp = settings.m_samplerate;
@@ -674,7 +674,6 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
 
     if (m_need_resampler && m_src_quality > QUALITY_DISABLED)
     {
-        int error;
         m_samplerate = dest_rate;
 
         VBGENERAL(QString("Resampling from %1 kHz to %2 kHz with quality %3")
@@ -683,6 +682,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
 
         int chans = m_needs_downmix ? m_configured_channels : m_source_channels;
 
+        int error = 0;
         m_src_ctx = src_new(2-m_src_quality, chans, &error);
         if (error)
         {
@@ -1015,20 +1015,17 @@ int64_t AudioOutputBase::GetAudiotime(void)
         return 0;
 
     // output bits per 10 frames
-    int64_t obpf;
+    int64_t obpf = 0;
 
     if (m_passthru && !usesSpdif())
         obpf = m_source_bitrate * 10 / m_source_samplerate;
-    else
-    if (m_enc && !usesSpdif())
+    else if (m_enc && !usesSpdif())
     {
         // re-encode bitrate is hardcoded at 448000
         obpf = 448000 * 10 / m_source_samplerate;
     }
     else
         obpf = m_output_bytes_per_frame * 80;
-
-    int64_t oldaudiotime;
 
     /* We want to calculate 'audiotime', which is the timestamp of the audio
        Which is leaving the sound card at this instant.
@@ -1054,7 +1051,7 @@ int64_t AudioOutputBase::GetAudiotime(void)
        scaled appropriately if output format != internal format */
     int64_t main_buffer = audioready();
 
-    oldaudiotime = m_audiotime;
+    int64_t oldaudiotime = m_audiotime;
 
     /* timecode is the stretch adjusted version
        of major post-stretched buffer contents
@@ -1316,7 +1313,6 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
     int bpf      = m_bytes_per_frame;
     int len      = in_len;
     bool music   = false;
-    int bdiff;
 
     if (!m_configure_succeeded)
     {
@@ -1491,7 +1487,7 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
         frames = len / bpf;
         frames_final += frames;
 
-        bdiff = kAudioRingBufferSize - m_waud;
+        int bdiff = kAudioRingBufferSize - m_waud;
         if ((len % bpf) != 0 && bdiff < len)
         {
             VBERROR(QString("AddData: Corruption likely: len = %1 (bpf = %2)")
