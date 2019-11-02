@@ -41,7 +41,7 @@
 class SERVICE_PUBLIC ChannelServices : public Service
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.6" );
+    Q_CLASSINFO( "version"    , "1.7" );
     Q_CLASSINFO( "AddDBChannel_Method",              "POST" )
     Q_CLASSINFO( "UpdateDBChannel_Method",           "POST" )
     Q_CLASSINFO( "RemoveDBChannel_Method",           "POST" )
