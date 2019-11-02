@@ -74,9 +74,7 @@ const uint ChannelScanSM::kATSCTableTimeout = 10 * 1000;
 /// No logic here, lets just wait at least 15 seconds.
 const uint ChannelScanSM::kMPEGTableTimeout = 15 * 1000;
 
-// Astra 28.2E satellite Logical Channel Number selection default values
-static const uint kBouquetID = 272;                 // Freesat England HD
-static const uint kRegionID  = 1;                   // London
+// Astra 28.2E satellite Freesat/BSkyB
 static const uint kRegionUndefined = 0xFFFF;        // Not regional
 
 QString ChannelScanSM::loc(const ChannelScanSM *siscan)
@@ -170,55 +168,27 @@ ChannelScanSM::ChannelScanSM(ScanMonitor *_scan_monitor,
         LOG(VB_CHANSCAN, LOG_INFO, LOC + "Connecting up DTVSignalMonitor");
         ScanStreamData *data = new ScanStreamData();
 
-        if (gCoreContext->GetNumSetting("DBSchemaVer") > 1350)
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare(
+                "SELECT dvb_nit_id, bouquet_id, region_id "
+                "FROM videosource "
+                "WHERE videosource.sourceid = :SOURCEID");
+        query.bindValue(":SOURCEID", _sourceID);
+        if (!query.exec() || !query.isActive())
         {
-            MSqlQuery query(MSqlQuery::InitCon());
-            query.prepare(
-                    "SELECT dvb_nit_id, bouquet_id, region_id "
-                    "FROM videosource "
-                    "WHERE videosource.sourceid = :SOURCEID");
-            query.bindValue(":SOURCEID", _sourceID);
-            if (!query.exec() || !query.isActive())
-            {
-                MythDB::DBError("ChannelScanSM", query);
-            }
-            else if (query.next())
-            {
-                int nitid = query.value(0).toInt();
-                data->SetRealNetworkID(nitid);
-                LOG(VB_CHANSCAN, LOG_INFO, LOC +
-                    QString("Setting NIT-ID to %1").arg(nitid));
-
-                m_bouquet_id = query.value(1).toUInt();
-                m_region_id = query.value(2).toUInt();
-            }
+            MythDB::DBError("ChannelScanSM", query);
         }
-        else
+        else if (query.next())
         {
-            MSqlQuery query(MSqlQuery::InitCon());
-            query.prepare(
-                    "SELECT dvb_nit_id "
-                    "FROM videosource "
-                    "WHERE videosource.sourceid = :SOURCEID");
-            query.bindValue(":SOURCEID", _sourceID);
-            if (!query.exec() || !query.isActive())
-            {
-                MythDB::DBError("ChannelScanSM", query);
-            }
-            else if (query.next())
-            {
-                int nitid = query.value(0).toInt();
-                data->SetRealNetworkID(nitid);
-                LOG(VB_CHANSCAN, LOG_INFO, LOC +
-                    QString("Setting NIT-ID to %1").arg(nitid));
+            int nitid = query.value(0).toInt();
+            data->SetRealNetworkID(nitid);
+            LOG(VB_CHANSCAN, LOG_INFO, LOC +
+                QString("Setting NIT-ID to %1").arg(nitid));
 
-                // Bouquet and region default or from the environment
-                QString bouquet_id = QString(getenv("FSAT_BOUQUET_ID"));
-                m_bouquet_id = bouquet_id.isEmpty() ? kBouquetID : bouquet_id.toUInt();
-                QString region_id = QString(getenv("FSAT_REGION_ID"));
-                m_region_id = region_id.isEmpty() ? kRegionID : region_id.toUInt();
-            }
+            m_bouquet_id = query.value(1).toUInt();
+            m_region_id = query.value(2).toUInt();
         }
+
         LOG(VB_CHANSCAN, LOG_INFO, LOC +
             QString("Freesat/BSkyB bouquet_id:%1 region_id:%2")
                 .arg(m_bouquet_id).arg(m_region_id));
