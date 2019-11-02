@@ -13,14 +13,13 @@ void Cutter::SetCutList(frm_dir_map_t &deleteMap, PlayerContext *ctx)
     // Break each cut into two parts, the first for
     // the player and the second for the transcode loop.
     frm_dir_map_t           remainingCutList;
-    frm_dir_map_t::Iterator it;
     int64_t                 start = 0;
-    int64_t                 leadinLength;
+    int64_t                 leadinLength = 0;
 
     m_tracker.SetPlayerContext(ctx);
     m_foreshortenedCutList.clear();
 
-    for (it = deleteMap.begin(); it != deleteMap.end(); ++it)
+    for (auto it = deleteMap.begin(); it != deleteMap.end(); ++it)
     {
         switch(it.value())
         {

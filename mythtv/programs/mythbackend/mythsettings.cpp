@@ -100,7 +100,7 @@ static void fill_setting(
                 !setting->m_data_list.contains(setting->m_data.toLower(),
                                                Qt::CaseInsensitive))
             {
-                bool ok;
+                bool ok = false;
                 long long idata = setting->m_data.toLongLong(&ok);
                 if (ok)
                 {

@@ -697,7 +697,7 @@ bool ImportIconsWizard::search(const QString& strParam)
                 entry.strLogo = ret[2];
                 m_listSearch.append(entry);
 
-                MythUIButtonListItem *item;
+                MythUIButtonListItem *item = nullptr;
                 if (prevIconName == entry.strName)
                 {
                     QString newname = QString("%1 (%2)").arg(entry.strName)

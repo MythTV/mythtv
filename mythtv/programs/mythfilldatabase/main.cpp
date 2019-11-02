@@ -78,8 +78,8 @@ int main(int argc, char *argv[])
 
     myth_nice(19);
 
-    int retval;
-    if ((retval = cmdline.ConfigureLogging()) != GENERIC_EXIT_OK)
+    int retval = cmdline.ConfigureLogging();
+    if (retval != GENERIC_EXIT_OK)
         return retval;
 
     if (cmdline.toBool("manual"))
@@ -192,7 +192,7 @@ int main(int argc, char *argv[])
                 fill_data.SetRefresh(FillData::kRefreshAll, enable);
             else if ((*i).contains("-"))
             {
-                bool ok;
+                bool ok = false;
                 QStringList r = (*i).split("-");
 
                 uint lower = r[0].toUInt(&ok);
@@ -220,7 +220,7 @@ int main(int argc, char *argv[])
             }
             else
             {
-                bool ok;
+                bool ok = false;
                 uint day = (*i).toUInt(&ok);
                 if (!ok)
                 {
@@ -440,11 +440,10 @@ int main(int argc, char *argv[])
         {
             QString orig_programid = sel.value(0).toString();
             QString new_programid = orig_programid.left(10);
-            int     partnum, parttotal;
             QString part;
 
-            partnum   = sel.value(1).toInt();
-            parttotal = sel.value(2).toInt();
+            int partnum   = sel.value(1).toInt();
+            int parttotal = sel.value(2).toInt();
 
             part.setNum(parttotal);
             new_programid.append(part.rightJustified(2, '0'));

@@ -299,7 +299,7 @@ WeightList FlatView::CalculateSeasonalWeights(ImageList &files)
     for (int i = 0; i < files.size(); ++i)
     {
         ImagePtrK im = files.at(i);
-        double weight;
+        double weight = 0;
 
         if (im->m_date == 0)
             weight = DEFAULT_WEIGHT;
@@ -488,7 +488,7 @@ bool DirectoryView::LoadFromDb(int parentId)
     // Determine parent (defaulting to ancestor) & get initial children
     ImageList files, dirs;
     ImagePtr parent;
-    int count;
+    int count = 0;
     // Root is guaranteed to return at least 1 item
     while ((count = m_mgr.GetDirectory(parentId, parent, files, dirs)) == 0)
     {

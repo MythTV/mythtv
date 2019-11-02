@@ -347,7 +347,7 @@ void ChannelRecPriority::SortList()
         m_currentItem = channelItem;
     }
 
-    int i, j;
+    int i = 0, j = 0;
     vector<RecPriorityInfo> sortingList;
     QMap<QString, ChannelInfo>::iterator pit;
     vector<RecPriorityInfo>::iterator sit;

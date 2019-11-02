@@ -1178,7 +1178,7 @@ int main(int argc, char *argv[])
     else if (cmdline.toBool("jobid"))
     {
         jobID = cmdline.toInt("jobid");
-        uint chanid;
+        uint chanid = 0;
         QDateTime starttime;
 
         if (!JobQueue::GetJobInfoFromID(jobID, jobType, chanid, starttime))

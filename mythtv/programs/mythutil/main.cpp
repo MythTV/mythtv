@@ -74,8 +74,8 @@ int main(int argc, char *argv[])
 
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHUTIL);
 
-    int retval;
-    if ((retval = cmdline.ConfigureLogging(defaultVerbose)) != GENERIC_EXIT_OK)
+    int retval = cmdline.ConfigureLogging(defaultVerbose);
+    if (retval != GENERIC_EXIT_OK)
         return retval;
 
     if (!cmdline.toBool("loglevel"))

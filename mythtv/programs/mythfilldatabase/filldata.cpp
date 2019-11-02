@@ -179,9 +179,7 @@ bool FillData::GrabData(const Source& source, int offset)
     LOG(VB_XMLTV, LOG_INFO,
             "----------------- Start of XMLTV output -----------------");
 
-    unsigned int systemcall_status;
-
-    systemcall_status = myth_system(command, kMSRunShell);
+    uint systemcall_status = myth_system(command, kMSRunShell);
     bool succeeded = (systemcall_status == GENERIC_EXIT_OK);
 
     LOG(VB_XMLTV, LOG_INFO,

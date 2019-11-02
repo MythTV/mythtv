@@ -198,7 +198,7 @@ bool Frontend::PlayVideo(const QString &Id, bool UseBookmark)
         return false;
     }
 
-    bool ok;
+    bool ok = false;
     quint64 id = Id.toUInt(&ok);
     if (!ok)
     {
@@ -334,7 +334,7 @@ void Frontend::InitialiseActions(void)
 
 bool Frontend::SendKey(const QString &sKey)
 {
-    int keyCode;
+    int keyCode = 0;
     bool ret = false;
     QObject *keyDest = nullptr;
     QKeyEvent *event = nullptr;

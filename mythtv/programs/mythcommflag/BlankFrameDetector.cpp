@@ -63,15 +63,11 @@ computeBlankMap(FrameAnalyzer::FrameMap *blankMap, long long nframes,
     const float             MEDIANPCTILE = 0.95;
     const float             STDDEVPCTILE = 0.85;
 
-    long long       frameno, segb, sege, nblanks;
-    long long       blankno, blankno1, blankno2;
-    long long       stddevno, stddevno1, stddevno2;
-    unsigned char   *blankmedian, maxmedian;
-    float           *blankstddev, maxstddev;
+    long long       frameno = 1, segb = 0, sege = 0;
 
     /* Count and select for monochromatic frames. */
 
-    nblanks = 0;
+    long long nblanks = 0;
     for (frameno = 0; frameno < nframes; frameno++)
     {
         if (monochromatic[frameno] && pickmedian(median[frameno],
@@ -89,9 +85,9 @@ computeBlankMap(FrameAnalyzer::FrameMap *blankMap, long long nframes,
 
     /* Select percentile values from monochromatic frames. */
 
-    blankmedian = new unsigned char[nblanks];
-    blankstddev = new float[nblanks];
-    blankno = 0;
+    uchar *blankmedian = new unsigned char[nblanks];
+    float *blankstddev = new float[nblanks];
+    long long blankno = 0;
     for (frameno = 0; frameno < nframes; frameno++)
     {
         if (monochromatic[frameno] && pickmedian(median[frameno],
@@ -105,16 +101,16 @@ computeBlankMap(FrameAnalyzer::FrameMap *blankMap, long long nframes,
 
     qsort(blankmedian, nblanks, sizeof(*blankmedian), sort_ascending_uchar);
     blankno = min(nblanks - 1, (long long)roundf(nblanks * MEDIANPCTILE));
-    maxmedian = blankmedian[blankno];
+    uchar maxmedian = blankmedian[blankno];
 
     qsort(blankstddev, nblanks, sizeof(*blankstddev), sort_ascending_float);
-    stddevno = min(nblanks - 1, (long long)roundf(nblanks * STDDEVPCTILE));
-    maxstddev = blankstddev[stddevno];
+    long long stddevno = min(nblanks - 1, (long long)roundf(nblanks * STDDEVPCTILE));
+    float maxstddev = blankstddev[stddevno];
 
     /* Determine effective percentile ranges (for debugging). */
 
-    blankno1 = blankno;
-    blankno2 = blankno;
+    long long blankno1 = blankno;
+    long long blankno2 = blankno;
     while (blankno1 > 0 && blankmedian[blankno1] == maxmedian)
         blankno1--;
     if (blankmedian[blankno1] != maxmedian)
@@ -124,8 +120,8 @@ computeBlankMap(FrameAnalyzer::FrameMap *blankMap, long long nframes,
     if (blankno2 == nblanks)
         blankno2--;
 
-    stddevno1 = stddevno;
-    stddevno2 = stddevno;
+    long long stddevno1 = stddevno;
+    long long stddevno2 = stddevno;
     while (stddevno1 > 0 && blankstddev[stddevno1] == maxstddev)
         stddevno1--;
     if (blankstddev[stddevno1] != maxstddev)

@@ -51,13 +51,12 @@ void waitForBuffer(const struct timeval *framestart, int minlag, int flaglag,
 {
     long usperframe = (long)(1000000.0F / fps);
     struct timeval now {}, elapsed {};
-    long sleepus;
 
     (void)gettimeofday(&now, nullptr);
     timersub(&now, framestart, &elapsed);
 
     // Sleep for one frame's worth of time.
-    sleepus = usperframe - elapsed.tv_sec * 1000000 - elapsed.tv_usec;
+    long sleepus = usperframe - elapsed.tv_sec * 1000000 - elapsed.tv_usec;
     if (sleepus <= 0)
         return;
 
@@ -121,7 +120,7 @@ long long processFrame(FrameAnalyzerItem &pass,
                        const VideoFrame *frame,
                        long long frameno)
 {
-    long long nextFrame;
+    long long nextFrame = 0;
     long long minNextFrame = FrameAnalyzer::ANYFRAME;
 
     FrameAnalyzerItem::iterator it = pass.begin();
@@ -257,19 +256,17 @@ void createDebugDirectory(const QString& dirname, const QString& comment)
 
 QString frameToTimestamp(long long frameno, float fps)
 {
-    int         ms, ss, mm, hh;
+    int ms = (int)roundf(frameno / fps * 1000);
 
-    ms = (int)roundf(frameno / fps * 1000);
-
-    ss = ms / 1000;
+    int ss = ms / 1000;
     ms %= 1000;
     if (ms >= 500)
         ss++;
 
-    mm = ss / 60;
+    int mm = ss / 60;
     ss %= 60;
 
-    hh = mm / 60;
+    int hh = mm / 60;
     mm %= 60;
 
     return QString("%1:%2:%3")
@@ -278,14 +275,12 @@ QString frameToTimestamp(long long frameno, float fps)
 
 QString frameToTimestampms(long long frameno, float fps)
 {
-    int         ms, ss, mm;
+    int ms = (int)roundf(frameno / fps * 1000);
 
-    ms = (int)roundf(frameno / fps * 1000);
-
-    ss = ms / 1000;
+    int ss = ms / 1000;
     ms %= 1000;
 
-    mm = ss / 60;
+    int mm = ss / 60;
     ss %= 60;
 
     return QString("%1:%2:%3")
@@ -467,19 +462,18 @@ void CommDetector2::reportState(int elapsedms, long long frameno,
 
 int CommDetector2::computeBreaks(long long nframes)
 {
-    int             trow, tcol, twidth, theight;
-    TemplateMatcher *matcher;
+    int trow = 0, tcol = 0, twidth = 0, theight = 0;
 
     m_breaks.clear();
 
-    matcher = m_logoFinder &&
-        m_logoFinder->getTemplate(&trow, &tcol, &twidth, &theight) ? m_logoMatcher :
-        nullptr;
+    TemplateMatcher *matcher = nullptr;
+    if (m_logoFinder && m_logoFinder->getTemplate(&trow, &tcol, &twidth, &theight))
+        matcher = m_logoMatcher;
 
     if (matcher && m_blankFrameDetector)
     {
-        int cmp;
-        if (!(cmp = matcher->templateCoverage(nframes, m_finished)))
+        int cmp = matcher->templateCoverage(nframes, m_finished);
+        if (cmp == 0)
         {
             if (matcher->adjustForBlanks(m_blankFrameDetector, nframes))
                 return -1;
@@ -781,14 +775,12 @@ void CommDetector2::GetCommercialBreakList(frm_dir_map_t &marks)
             iimark != marks.end();
             ++iimark)
     {
-        long long   markstart, markend;
-
         /* Display as 1-based frame numbers. */
-        markstart = iimark.key() + 1;   /* MARK_COMM_BEGIN */
+        long long markstart = iimark.key() + 1;   /* MARK_COMM_BEGIN */
         ++iimark;                       /* MARK_COMM_END */
         if (iimark == marks.end())
             break;
-        markend = iimark.key() + 1;
+        long long markend = iimark.key() + 1;
 
         LOG(VB_COMMFLAG, LOG_INFO, QString("Break: frame %1-%2 (%3-%4, %5)")
                 .arg(markstart, 6).arg(markend, 6)

@@ -141,9 +141,8 @@ bool Transcode::GetProfile(const QString& profileName, const QString& encodingTy
     }
     else
     {
-        bool isNum;
-        int profileID;
-        profileID = profileName.toInt(&isNum);
+        bool isNum = false;
+        int profileID = profileName.toInt(&isNum);
         // If a bad profile is specified, there will be trouble
         if (isNum && profileID > 0)
             m_recProfile->loadByID(profileID);
@@ -889,7 +888,7 @@ int Transcode::TranscodeFile(const QString &inputname,
 
     if (rescale)
     {
-        size_t newSize;
+        size_t newSize = 0;
         if (nonAligned)
         {
             // Set a stride identical to actual width, to ease fifo post-conversion process.
@@ -924,7 +923,7 @@ int Transcode::TranscodeFile(const QString &inputname,
     if (!fifodir.isEmpty())
     {
         AudioPlayer *aplayer = GetPlayer()->GetAudio();
-        const char  *audio_codec_name;
+        const char  *audio_codec_name = "unknown";
 
         switch(aplayer->GetCodec())
         {
@@ -962,8 +961,8 @@ int Transcode::TranscodeFile(const QString &inputname,
         // If cutlist is used then get info on first uncut frame
         if (honorCutList && fifo_info)
         {
-            bool is_key;
-            int did_ff;
+            bool is_key = false;
+            int did_ff = 0;
             GetPlayer()->TranscodeGetNextFrame(did_ff, is_key, true);
 
             QSize buf_size2 = GetPlayer()->GetVideoBufferSize();

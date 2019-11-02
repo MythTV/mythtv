@@ -115,11 +115,9 @@ BorderDetector::getDimensions(const AVFrame *pgm, int pgmheight,
     const int               HORIZSLOP = max(MAXLINES, pgmwidth * 1 / 160);
 
     struct timeval          start {}, end {}, elapsed {};
-    unsigned char           minval, maxval, val;
-    int                     rr, cc, minrow, mincol, maxrow1, maxcol1, saved;
-    int                     newrow, newcol, newwidth, newheight;
-    bool                    top, bottom, left, right, inrange;
-    int                     range, outliers, lines;
+    int                     minrow = 0, mincol = 0, maxrow1 = 0, maxcol1 = 0;
+    int                     newrow = 0, newcol = 0, newwidth = 0, newheight = 0;
+    bool                    top = false, bottom = false;
 
     (void)gettimeofday(&start, nullptr);
 
@@ -143,23 +141,23 @@ BorderDetector::getDimensions(const AVFrame *pgm, int pgmheight,
     for (;;)
     {
         /* Find left edge. */
-        left = false;
-        minval = UCHAR_MAX;
-        maxval = 0;
-        lines = 0;
-        saved = mincol;
-        for (cc = mincol; cc < maxcol1; cc++)
+        bool left = false;
+        uchar minval = UCHAR_MAX;
+        uchar maxval = 0;
+        int lines = 0;
+        int saved = mincol;
+        for (int cc = mincol; cc < maxcol1; cc++)
         {
-            outliers = 0;
-            inrange = true;
-            for (rr = minrow; rr < maxrow1; rr++)
+            int outliers = 0;
+            bool inrange = true;
+            for (int rr = minrow; rr < maxrow1; rr++)
             {
                 if (m_logo && rrccinrect(rr, cc, m_logorow, m_logocol,
                             m_logowidth, m_logoheight))
                     continue;   /* Exclude logo area from analysis. */
 
-                val = pgm->data[0][rr * pgmwidth + cc];
-                range = max(maxval, val) - min(minval, val) + 1;
+                uchar val = pgm->data[0][rr * pgmwidth + cc];
+                int range = max(maxval, val) - min(minval, val) + 1;
                 if (range > MAXRANGE)
                 {
                     if (outliers++ < MAXOUTLIERS)
@@ -197,21 +195,21 @@ found_left:
          * Find right edge. Keep same minval/maxval (pillarboxing colors) as
          * left edge.
          */
-        right = false;
+        bool right = false;
         lines = 0;
         saved = maxcol1 - 1;
-        for (cc = maxcol1 - 1; cc >= mincol; cc--)
+        for (int cc = maxcol1 - 1; cc >= mincol; cc--)
         {
-            outliers = 0;
-            inrange = true;
-            for (rr = minrow; rr < maxrow1; rr++)
+            int outliers = 0;
+            bool inrange = true;
+            for (int rr = minrow; rr < maxrow1; rr++)
             {
                 if (m_logo && rrccinrect(rr, cc, m_logorow, m_logocol,
                             m_logowidth, m_logoheight))
                     continue;   /* Exclude logo area from analysis. */
 
-                val = pgm->data[0][rr * pgmwidth + cc];
-                range = max(maxval, val) - min(minval, val) + 1;
+                uchar val = pgm->data[0][rr * pgmwidth + cc];
+                int range = max(maxval, val) - min(minval, val) + 1;
                 if (range > MAXRANGE)
                 {
                     if (outliers++ < MAXOUTLIERS)
@@ -253,18 +251,18 @@ found_right:
         maxval = 0;
         lines = 0;
         saved = minrow;
-        for (rr = minrow; rr < maxrow1; rr++)
+        for (int rr = minrow; rr < maxrow1; rr++)
         {
-            outliers = 0;
-            inrange = true;
-            for (cc = mincol; cc < maxcol1; cc++)
+            int outliers = 0;
+            bool inrange = true;
+            for (int cc = mincol; cc < maxcol1; cc++)
             {
                 if (m_logo && rrccinrect(rr, cc, m_logorow, m_logocol,
                             m_logowidth, m_logoheight))
                     continue;   /* Exclude logo area from analysis. */
 
-                val = pgm->data[0][rr * pgmwidth + cc];
-                range = max(maxval, val) - min(minval, val) + 1;
+                uchar val = pgm->data[0][rr * pgmwidth + cc];
+                int range = max(maxval, val) - min(minval, val) + 1;
                 if (range > MAXRANGE)
                 {
                     if (outliers++ < MAXOUTLIERS)
@@ -302,18 +300,18 @@ found_top:
         bottom = false;
         lines = 0;
         saved = maxrow1 - 1;
-        for (rr = maxrow1 - 1; rr >= minrow; rr--)
+        for (int rr = maxrow1 - 1; rr >= minrow; rr--)
         {
-            outliers = 0;
-            inrange = true;
-            for (cc = mincol; cc < maxcol1; cc++)
+            int outliers = 0;
+            bool inrange = true;
+            for (int cc = mincol; cc < maxcol1; cc++)
             {
                 if (m_logo && rrccinrect(rr, cc, m_logorow, m_logocol,
                             m_logowidth, m_logoheight))
                     continue;   /* Exclude logo area from analysis. */
 
-                val = pgm->data[0][rr * pgmwidth + cc];
-                range = max(maxval, val) - min(minval, val) + 1;
+                uchar val = pgm->data[0][rr * pgmwidth + cc];
+                int range = max(maxval, val) - min(minval, val) + 1;
                 if (range > MAXRANGE)
                 {
                     if (outliers++ < MAXOUTLIERS)

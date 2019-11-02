@@ -180,7 +180,7 @@ void ViewScheduleDiff::fillList(void)
 
     QString callsign;
     QDateTime startts, recstartts;
-    bool dummy;
+    bool dummy = false;
 
     LoadFromScheduler(m_recListBefore, dummy);
     LoadFromScheduler(m_recListAfter,  dummy, m_altTable, m_recordid);

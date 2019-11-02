@@ -1435,7 +1435,7 @@ void ProgLister::UpdateDisplay(const ProgramInfo *selected)
         RestoreSelection(selected, offset);
     else if (m_selectedTime.isValid())
     {
-        size_t i;
+        size_t i = 0;
         for (i = 0; i < m_itemList.size(); ++i)
         {
             if (m_selectedTime <= m_itemList[i]->GetScheduledStartTime())
@@ -1449,7 +1449,7 @@ void ProgLister::UpdateDisplay(const ProgramInfo *selected)
 void ProgLister::RestoreSelection(const ProgramInfo *selected,
                                   int selectedOffset)
 {
-    plCompare *comp;
+    plCompare *comp = nullptr;
     if (!m_titleSort)
         comp = new plTimeSort();
     else if (m_type == plPreviouslyRecorded)
@@ -1457,10 +1457,10 @@ void ProgLister::RestoreSelection(const ProgramInfo *selected,
     else
         comp = new plTitleSort();
 
-    int i;
+    int i = 0;
     for (i = m_itemList.size() - 2; i >= 0; i--)
     {
-        bool dobreak;
+        bool dobreak = false;
         if (m_reverseSort)
             dobreak = comp->operator()(selected, m_itemList[i]);
         else

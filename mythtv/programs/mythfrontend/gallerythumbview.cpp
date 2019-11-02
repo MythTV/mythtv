@@ -205,7 +205,7 @@ bool GalleryThumbView::Create()
     // Determine zoom levels supported by theme
     // images0 must exist; images1, images2 etc. are optional and enable zoom
     int               zoom = 0;
-    MythUIButtonList *widget;
+    MythUIButtonList *widget = nullptr;
     do
     {
         QString name = QString("images%1").arg(zoom++);
@@ -1163,7 +1163,7 @@ void GalleryThumbView::MenuTransform(MythMenu *mainMenu)
 */
 void GalleryThumbView::MenuAction(MythMenu *mainMenu)
 {
-    MythMenu *menu;
+    MythMenu *menu = nullptr;
     ImagePtrK selected = m_menuState.m_selected;
 
     // Operate on current marked files, if any

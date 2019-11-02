@@ -628,7 +628,7 @@ void FillCutList(DTC::CutList* pCutList, RecordingInfo* rInfo, int marktype)
             }
             else if (marktype == 1)
             {
-                uint64_t offset;
+                uint64_t offset = 0;
                 if (rInfo->QueryKeyFramePosition(&offset, it.key(), isend))
                 {
                   DTC::Cutting *pCutting = pCutList->AddNewCutting();
@@ -638,7 +638,7 @@ void FillCutList(DTC::CutList* pCutList, RecordingInfo* rInfo, int marktype)
             }
             else if (marktype == 2)
             {
-                uint64_t offset;
+                uint64_t offset = 0;
                 if (rInfo->QueryKeyFrameDuration(&offset, it.key(), isend))
                 {
                   DTC::Cutting *pCutting = pCutList->AddNewCutting();
@@ -674,7 +674,7 @@ void FillCommBreak(DTC::CutList* pCutList, RecordingInfo* rInfo, int marktype)
             }
             else if (marktype == 1)
             {
-                uint64_t offset;
+                uint64_t offset = 0;
                 if (rInfo->QueryKeyFramePosition(&offset, it.key(), isend))
                 {
                   DTC::Cutting *pCutting = pCutList->AddNewCutting();
@@ -684,7 +684,7 @@ void FillCommBreak(DTC::CutList* pCutList, RecordingInfo* rInfo, int marktype)
             }
             else if (marktype == 2)
             {
-                uint64_t offset;
+                uint64_t offset = 0;
                 if (rInfo->QueryKeyFrameDuration(&offset, it.key(), isend))
                 {
                   DTC::Cutting *pCutting = pCutList->AddNewCutting();

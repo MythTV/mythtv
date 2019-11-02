@@ -964,7 +964,7 @@ QString NetworkControl::processQuery(NetworkCommand *nc)
     else if (is_abbrev("uptime", nc->getArg(1)))
     {
         QString str;
-        time_t  uptime;
+        time_t  uptime = 0;
 
         if (getUptime(uptime))
             str = QString::number(uptime);
@@ -990,7 +990,7 @@ QString NetworkControl::processQuery(NetworkCommand *nc)
     else if (is_abbrev("memstats", nc->getArg(1)))
     {
         QString str;
-        int     totalMB, freeMB, totalVM, freeVM;
+        int     totalMB = 0, freeMB = 0, totalVM = 0, freeVM = 0;
 
         if (getMemStats(totalMB, freeMB, totalVM, freeVM))
             str = QString("%1 %2 %3 %4")
@@ -1584,7 +1584,6 @@ void NetworkControl::customEvent(QEvent *e)
     }
     else if (e->type() == kNetworkControlDataReadyEvent)
     {
-        NetworkCommand *nc;
         QString reply;
 
         QMutexLocker locker(&clientLock);
@@ -1592,7 +1591,7 @@ void NetworkControl::customEvent(QEvent *e)
 
         while (!networkControlReplies.isEmpty())
         {
-            nc = networkControlReplies.front();
+            NetworkCommand *nc = networkControlReplies.front();
             networkControlReplies.pop_front();
 
             reply = nc->getCommand();
@@ -1734,8 +1733,6 @@ QString NetworkControl::listChannels(const uint start, const uint limit)
     QString result;
     MSqlQuery query(MSqlQuery::InitCon());
     QString queryStr;
-    uint cnt;
-    uint maxcnt;
     uint sqlStart = start;
 
     // sql starts at zero, we want to start at 1
@@ -1758,8 +1755,8 @@ QString NetworkControl::listChannels(const uint start, const uint limit)
         return result;
     }
 
-    maxcnt = query.size();
-    cnt = 0;
+    uint maxcnt = query.size();
+    uint cnt = 0;
     if (maxcnt == 0)    // Feedback we have no usefull information
     {
         result += QString("0:0 0 \"Invalid\" \"Invalid\"");

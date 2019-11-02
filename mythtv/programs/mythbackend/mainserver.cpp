@@ -3479,7 +3479,7 @@ void MainServer::HandleQueryUptime(PlaybackSock *pbs)
 {
     MythSocket    *pbssock = pbs->getSocket();
     QStringList strlist;
-    time_t      uptime;
+    time_t      uptime = 0;
 
     if (getUptime(uptime))
         strlist << QString::number(uptime);
@@ -3516,7 +3516,7 @@ void MainServer::HandleQueryMemStats(PlaybackSock *pbs)
 {
     MythSocket    *pbssock = pbs->getSocket();
     QStringList strlist;
-    int         totalMB, freeMB, totalVM, freeVM;
+    int         totalMB = 0, freeMB = 0, totalVM = 0, freeVM = 0;
 
     if (getMemStats(totalMB, freeMB, totalVM, freeVM))
         strlist << QString::number(totalMB) << QString::number(freeMB)
@@ -5135,7 +5135,6 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
         QDir checkDir("");
         QString dirID;
         QString currentDir;
-        int bSize;
         while (query.next())
         {
             dirID = query.value(0).toString();
@@ -5156,7 +5155,7 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
                     getDiskSpace(cdir.constData(), totalKB, usedKB);
                     memset(&statbuf, 0, sizeof(statbuf));
                     localStr = "1"; // Assume local
-                    bSize = 0;
+                    int bSize = 0;
 
                     if (statfs(currentDir.toLocal8Bit().constData(), &statbuf) == 0)
                     {
@@ -6935,7 +6934,7 @@ void MainServer::HandleMusicGetLyricGrabbers(const QStringList &/*slist*/, Playb
 
         QDomDocument domDoc;
         QString errorMsg;
-        int errorLine, errorColumn;
+        int errorLine = 0, errorColumn = 0;
 
         if (!domDoc.setContent(result, false, &errorMsg, &errorLine, &errorColumn))
         {
@@ -7813,8 +7812,8 @@ void MainServer::connectionClosed(MythSocket *socket)
                     gBackendContext->SetFrontendDisconnected(pbs->getHostname());
             }
 
-            LiveTVChain *chain;
-            if ((chain = GetExistingChain(sock)))
+            LiveTVChain *chain = GetExistingChain(sock);
+            if (chain != nullptr)
             {
                 chain->DelHostSocket(sock);
                 if (chain->HostSocketCount() == 0)

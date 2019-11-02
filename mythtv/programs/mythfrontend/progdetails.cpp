@@ -119,9 +119,8 @@ void ProgDetails::addItem(const QString &title, const QString &value,
 
 bool ProgDetails::keyPressEvent(QKeyEvent *event)
 {
-    bool handled;
     QStringList actions;
-    handled = GetMythMainWindow()->TranslateKeyPress("Global", event, actions);
+    bool handled = GetMythMainWindow()->TranslateKeyPress("Global", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
@@ -166,7 +165,6 @@ void ProgDetails::PowerPriorities(const QString & ptable)
     QString  pwrpri;
     QString  desc;
     QString  adjustmsg;
-    int      adj;
     int      total = 0;
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -253,7 +251,7 @@ void ProgDetails::PowerPriorities(const QString & ptable)
 
     while (query.next())
     {
-        adj = query.value(0).toInt();
+        int adj = query.value(0).toInt();
         if (adj)
         {
             QString sclause = query.value(1).toString();
@@ -298,7 +296,7 @@ void ProgDetails::PowerPriorities(const QString & ptable)
         adjustmsg = QString("%1 : ").arg((*Itest).first);
         if (query.exec() && query.next())
         {
-            adj = query.value(0).toInt();
+            int adj = query.value(0).toInt();
             if (adj)
             {
                 adjustmsg += tr(" MATCHED, adding %1").arg(adj);

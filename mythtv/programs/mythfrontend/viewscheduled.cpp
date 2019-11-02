@@ -343,8 +343,7 @@ void ViewScheduled::LoadList(bool useExistingData)
         ProgramList plist = m_recgroupList[m_currentGroup];
 
         int listPos = ((int) plist.size()) - 1;
-        int i;
-        for (i = listPos; i >= 0; --i)
+        for (int i = listPos; i >= 0; --i)
         {
             ProgramInfo *pginfo = plist[i];
             if (callsign == pginfo->GetChannelSchedulingID() &&

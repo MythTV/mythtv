@@ -1075,9 +1075,8 @@ void ProgramRecPriority::changeRecPriority(int howMuch)
     if (!pgRecInfo)
         return;
 
-    int tempRecPriority;
     // inc/dec recording priority
-    tempRecPriority = pgRecInfo->GetRecordingPriority() + howMuch;
+    int tempRecPriority = pgRecInfo->GetRecordingPriority() + howMuch;
     if (tempRecPriority > -100 && tempRecPriority < 100)
     {
         pgRecInfo->m_recpriority = tempRecPriority;

@@ -2223,9 +2223,9 @@ void FilterOptMixin::Load(void)
     if (m_activeFiltersList)
         m_activeFiltersList->Reset();
 
-    MythUIButtonListItem *button;
+    MythUIButtonListItem *button = nullptr;
     QStringList::iterator Idesc;
-    int  idx;
+    int  idx = 0;
     bool not_empty = m_filtersList && !m_filtersList->IsEmpty();
     for (Idesc = m_descriptions.begin(), idx = 0;
          Idesc != m_descriptions.end(); ++Idesc, ++idx)
@@ -2268,13 +2268,12 @@ void FilterOptMixin::Save()
 
     // Iterate through button list, and build the mask
     uint32_t filter_mask = 0;
-    int idx, end;
 
-    end = m_filtersList->GetCount();
-    for (idx = 0; idx < end; ++idx)
+    int end = m_filtersList->GetCount();
+    for (int idx = 0; idx < end; ++idx)
     {
-        MythUIButtonListItem *button;
-        if ((button = m_filtersList->GetItemAt(idx)) &&
+        MythUIButtonListItem *button = m_filtersList->GetItemAt(idx);
+        if (button != nullptr &&
             button->state() == MythUIButtonListItem::FullChecked)
             filter_mask |= (1 << button->GetData().value<uint32_t>());
     }

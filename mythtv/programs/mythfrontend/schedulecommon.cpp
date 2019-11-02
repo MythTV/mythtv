@@ -93,9 +93,9 @@ void ScheduleCommon::ShowUpcomingScheduled(void) const
         return;
 
     RecordingInfo ri(*pginfo);
-    uint id;
 
-    if ((id = ri.GetRecordingRuleID()) == 0)
+    uint id = ri.GetRecordingRuleID();
+    if (id == 0)
         return ShowUpcoming(pginfo->GetTitle(), pginfo->GetSeriesID());
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();

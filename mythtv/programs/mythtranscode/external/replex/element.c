@@ -64,13 +64,9 @@ uint64_t add_pts_audio(uint64_t pts, audio_frame_t *aframe, uint64_t frames)
 
 void fix_audio_count(uint64_t *acount, audio_frame_t *aframe, uint64_t origpts, uint64_t pts)
 {
-	int64_t diff;
-	uint64_t di;
-	int c=0;
-
-	di = (samples [3-aframe->layer] * 27000000ULL);
-	diff = ptsdiff(origpts,pts);
-	c=(aframe->frequency * diff+di/2)/di;
+	uint64_t di = (samples [3-aframe->layer] * 27000000ULL);
+	int64_t diff = ptsdiff(origpts,pts);
+	int c=(aframe->frequency * diff+di/2)/di;
 	if (c) LOG(VB_GENERAL, LOG_INFO, "fix audio frames %d", c);
 	*acount += c;
 }
@@ -153,13 +149,12 @@ void fix_video_count(sequence_t *s, uint64_t *frame, uint64_t origpts, uint64_t 
 	
 void pts2time(uint64_t pts, uint8_t *buf, int len)
 {
-	uint8_t h,m,s;
 	int c = 0;
 
 	pts = (pts/300)%MAX_PTS;
-	h = (uint8_t)(pts/90000)/3600;
-	m = (uint8_t)((pts/90000)%3600)/60;
-	s = (uint8_t)((pts/90000)%3600)%60;
+	uint8_t h = (uint8_t)(pts/90000)/3600;
+	uint8_t m = (uint8_t)((pts/90000)%3600)/60;
+	uint8_t s = (uint8_t)((pts/90000)%3600)%60;
 
 	while (c+7 < len){
 		if (buf[c] == 0x00 && buf[c+1] == 0x00 && buf[c+2] == 0x01 && 
@@ -196,25 +191,22 @@ void pts2time(uint64_t pts, uint8_t *buf, int len)
 int get_video_info(ringbuffer *rbuf, sequence_t *s, int off, int le)
 {
         uint8_t buf[150];
-        uint8_t *headr;
-        int sw,i;
         int form = -1;
         int c = 0;
-	int re = 0;
-
 
         s->set = 0;
         s->ext_set = 0;
 	s->pulldown_set = 0;
-        if ((re = ring_find_mpg_header(rbuf, SEQUENCE_HDR_CODE, off, le)) < 0)
+        int re = ring_find_mpg_header(rbuf, SEQUENCE_HDR_CODE, off, le);
+        if (re < 0)
 		return re;
-	headr = buf+4;
+	uint8_t *headr = buf+4;
 	if (ring_peek(rbuf, buf, 150, off) < 0) return -2;
 	
 	s->h_size	= ((headr[1] &0xF0) >> 4) | (headr[0] << 4);
 	s->v_size	= ((headr[1] &0x0F) << 8) | (headr[2]);
     
-        sw = (int)((headr[3]&0xF0) >> 4) ;
+        int sw = (int)((headr[3]&0xF0) >> 4) ;
 
 	if (DEBUG){
 		switch( sw ){
@@ -312,7 +304,7 @@ int get_video_info(ringbuffer *rbuf, sequence_t *s, int off, int le)
 	else {
 		s->flags |= headr[c+63] & 0x01;
 		memset(s->intra_quant, 0, 64);
-		for (i=0;i<64;i++)
+		for (int i=0;i<64;i++)
 			s->intra_quant[i] |= (headr[c+i] >> 1) |
 				(( headr[c-1+i] & 0x01) << 7);
 
@@ -330,15 +322,13 @@ int get_video_info(ringbuffer *rbuf, sequence_t *s, int off, int le)
 int find_audio_sync(ringbuffer *rbuf, uint8_t *buf, int off, int type, int le)
 {
 	int found = 0;
-	int c=0;
-	int l;
-	uint8_t b1,b2,m2;
+	int l=0;
 	int r=0;
 
 	memset(buf,0,7);
-	b1 = 0x00;
-	b2 = 0x00;
-	m2 = 0xFF;
+	uint8_t b1 = 0x00;
+	uint8_t b2 = 0x00;
+	uint8_t m2 = 0xFF;
 	switch(type){
 	case AC3:
 		b1 = 0x0B;
@@ -357,9 +347,9 @@ int find_audio_sync(ringbuffer *rbuf, uint8_t *buf, int off, int type, int le)
 		return -1;
 	}
 
-	c = off;
+	int c = off;
 	while ( c-off < le){
-		uint8_t b;
+		uint8_t b = 0;
 		if ((r = mring_peek(rbuf, &b, 1, c)) <0) return -1;
 		switch(found){
 
@@ -383,13 +373,11 @@ int find_audio_sync(ringbuffer *rbuf, uint8_t *buf, int off, int type, int le)
 int find_audio_s(const uint8_t *rbuf, int off, int type, int le)
 {
 	int found = 0;
-	int c=0;
-	int l;
-	uint8_t b1,b2,m2;
+	int l=0;
 
-	b1 = 0x00;
-	b2 = 0x00;
-	m2 = 0xFF;
+	uint8_t b1 = 0x00;
+	uint8_t b2 = 0x00;
+	uint8_t m2 = 0xFF;
 	switch(type){
 	case AC3:
 		b1 = 0x0B;
@@ -408,7 +396,7 @@ int find_audio_s(const uint8_t *rbuf, int off, int type, int le)
 		return -1;
 	}
 
-	c = off;
+	int c = off;
 	while ( c < le){
 		uint8_t b=rbuf[c];
 		switch(found){
@@ -431,8 +419,8 @@ int check_audio_header(ringbuffer *rbuf, audio_frame_t * af, int  off, int le,
 		       int type)
 {
 	uint8_t headr[7];
-	uint8_t frame;
-	int fr;
+	uint8_t frame = 0;
+	int fr = 0;
 	int half = 0;
 	int c=0;
 	
@@ -544,16 +532,12 @@ int get_audio_info(ringbuffer *rbuf, audio_frame_t *af, int off, int le)
 
 int get_ac3_info(ringbuffer *rbuf, audio_frame_t *af, int off, int le)
 {
-	int c=0;
 	uint8_t headr[7];
-	uint8_t frame;
-	int half = 0;
-	int fr;
-	
 
 	af->set=0;
 
-	if ((c = find_audio_sync(rbuf, headr, off, AC3, le)) < 0 ) 
+	int c = find_audio_sync(rbuf, headr, off, AC3, le);
+	if (c < 0) 
 		return c;
 
 	af->off = c;
@@ -562,13 +546,13 @@ int get_ac3_info(ringbuffer *rbuf, audio_frame_t *af, int off, int le)
 
 	if (DEBUG)
 		LOG(VB_GENERAL, LOG_DEBUG, "AC3 stream:");
-	frame = (headr[4]&0x3F);
+	uint8_t frame = (headr[4]&0x3F);
 	af->bit_rate = ac3_bitrates[frame>>1]*1000;
-	half = ac3half[headr[5] >> 3];
+	int half = ac3half[headr[5] >> 3];
 	if (DEBUG)
 		LOG(VB_GENERAL, LOG_DEBUG, "  bit rate: %d kb/s",
 		    af->bit_rate/1000);
-	fr = (headr[4] & 0xc0) >> 6;
+	int fr = (headr[4] & 0xc0) >> 6;
 	af->frequency = (ac3_freq[fr] *100) >> half;
 	
 	if (DEBUG)
@@ -603,30 +587,21 @@ int get_ac3_info(ringbuffer *rbuf, audio_frame_t *af, int off, int le)
 
 int get_video_ext_info(ringbuffer *rbuf, sequence_t *s, int off, int le)
 {
-        uint8_t *headr;
         uint8_t buf[12];
-	uint8_t ext_id;
-	int re=0;
 
-        if (( re =ring_find_mpg_header(rbuf, EXTENSION_START_CODE, off, le)) < 0){
+        int re =ring_find_mpg_header(rbuf, EXTENSION_START_CODE, off, le);
+        if (re < 0) {
 		LOG(VB_GENERAL, LOG_ERR, "Error in find_mpg_header");
 		return re;
 	}
 
 	if (ring_peek(rbuf, buf, 5, off) < 0) return -2;
-	headr=buf+4;
+	uint8_t *headr=buf+4;
 	
-	ext_id = (headr[0]&0xF0) >> 4;
+	uint8_t ext_id = (headr[0]&0xF0) >> 4;
 
 	switch (ext_id){
 	case SEQUENCE_EXTENSION:{
-		uint16_t hsize;
-		uint16_t vsize;
-		uint32_t vbvb;
-		uint32_t bitrate;
-		uint8_t  fr_n, fr_d;
-
-
 		if (s->ext_set || !s->set) break;
 		if (ring_peek(rbuf, buf, 10, off) < 0) return -2;
 		headr=buf+4;
@@ -654,15 +629,15 @@ int get_video_ext_info(ringbuffer *rbuf, sequence_t *s, int off, int le)
 			}
 		}
 		
-		hsize = ((headr[1]&0x01)<<12) | ((headr[2]&0x80)<<6);
-		vsize = ((headr[2]&0x60)<<7);
+		uint16_t hsize = ((headr[1]&0x01)<<12) | ((headr[2]&0x80)<<6);
+		uint16_t vsize = ((headr[2]&0x60)<<7);
 		s->h_size	|= hsize;
 		s->v_size	|= vsize;
 		if (DEBUG)
 			LOG(VB_GENERAL, LOG_DEBUG, "  size = %dx%d",
 			    s->h_size, s->v_size);
 		
-		bitrate = ((headr[2]& 0x1F) << 25) | (( headr[3] & 0xFE ) << 17);
+		uint32_t bitrate = ((headr[2]& 0x1F) << 25) | (( headr[3] & 0xFE ) << 17);
 		s->bit_rate |= bitrate;
 	
 		if (DEBUG)
@@ -670,13 +645,13 @@ int get_video_ext_info(ringbuffer *rbuf, sequence_t *s, int off, int le)
 			    400.0*(s->bit_rate)/1000000.0);
 
 
-		vbvb = (headr[4]<<10);
+		uint32_t vbvb = (headr[4]<<10);
 		s->vbv_buffer_size |= vbvb;
 		if (DEBUG)
 			LOG(VB_GENERAL, LOG_DEBUG, "  vbvbuffer %d",
 			    16*1024*(s->vbv_buffer_size));
-		fr_n = (headr[5] & 0x60) >> 6;
-		fr_d = (headr[5] & 0x1F);
+		uint8_t fr_n = (headr[5] & 0x60) >> 6;
+		uint8_t fr_d = (headr[5] & 0x1F);
 	
 		s->frame_rate = s->frame_rate * (fr_n+1) / (fr_d+1);
 		if (DEBUG)

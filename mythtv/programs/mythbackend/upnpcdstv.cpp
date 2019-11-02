@@ -153,7 +153,6 @@ void UPnpCDSTv::CreateRoot()
                                          m_sName,
                                          "0");
 
-    CDSObject* pContainer;
     QString containerId = m_sExtensionId + "/%1";
 
     // HACK: I'm not entirely happy with this solution, but it's at least
@@ -168,7 +167,7 @@ void UPnpCDSTv::CreateRoot()
     // -----------------------------------------------------------------------
     // All Recordings
     // -----------------------------------------------------------------------
-    pContainer = CDSObject::CreateContainer ( containerId.arg("Recording"),
+    CDSObject* pContainer = CDSObject::CreateContainer ( containerId.arg("Recording"),
                                               QObject::tr("All Recordings"),
                                               m_sExtensionId, // Parent Id
                                               nullptr );

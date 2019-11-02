@@ -64,13 +64,11 @@ scenechange_data_diff(const SceneChangeDetector::SceneChangeData *sc1,
 bool
 writeData(const QString& filename, const unsigned short *scdiff, long long nframes)
 {
-    FILE            *fp;
-    long long       frameno;
-
     QByteArray fname = filename.toLocal8Bit();
-    if (!(fp = fopen(fname.constData(), "w")))
+    FILE *fp = fopen(fname.constData(), "w");
+    if (fp == nullptr)
         return false;
-    for (frameno = 0; frameno < nframes; frameno++)
+    for (long long frameno = 0; frameno < nframes; frameno++)
         (void)fprintf(fp, "%5u\n", scdiff[frameno]);
     if (fclose(fp))
         LOG(VB_COMMFLAG, LOG_ERR, QString("Error closing %1: %2")
@@ -85,10 +83,8 @@ computeChangeMap(FrameAnalyzer::FrameMap *changeMap, long long nframes,
     /*
      * Look for sudden changes in histogram.
      */
-    long long           frameno;
-
     changeMap->clear();
-    for (frameno = 0; frameno < nframes; frameno++)
+    for (long long frameno = 0; frameno < nframes; frameno++)
     {
         if (scdiff[frameno] > mindiff)
             changeMap->insert(frameno, 0);

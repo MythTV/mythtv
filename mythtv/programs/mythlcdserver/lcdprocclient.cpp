@@ -119,11 +119,8 @@ LCDProcClient::LCDProcClient(LCDServer *lparent)
 
 bool LCDProcClient::SetupLCD ()
 {
-    QString lcd_host;
-    int lcd_port;
-
-    lcd_host = gCoreContext->GetSetting("LCDHost", "localhost");
-    lcd_port = gCoreContext->GetNumSetting("LCDPort", 13666);
+    QString lcd_host = gCoreContext->GetSetting("LCDHost", "localhost");
+    int lcd_port = gCoreContext->GetNumSetting("LCDPort", 13666);
 
     if (lcd_host.length() > 0 && lcd_port > 1024)
         connectToHost(lcd_host, lcd_port);
@@ -899,9 +896,7 @@ void LCDProcClient::outputRightText(const QString& theScreen, QString theText, c
                           int row)
 {
     QString aString;
-    unsigned int x;
-
-    x = (int)( m_lcdWidth - theText.length()) + 1;
+    unsigned int x = (int)( m_lcdWidth - theText.length()) + 1;
 
     aString = "widget_set ";
     aString += theScreen;
@@ -955,12 +950,11 @@ void LCDProcClient::formatScrollingWidgets()
 
     int max_len = 0;
     QList<LCDTextItem>::iterator it = m_lcdTextItems->begin();
-    LCDTextItem *curItem;
 
     // Get the length of the longest item to scroll
     for(; it != m_lcdTextItems->end(); ++it)
     {
-        curItem = &(*it);
+        LCDTextItem *curItem = &(*it);
         if (curItem->getText().length() > max_len)
             max_len = curItem->getText().length();
     }
@@ -969,7 +963,7 @@ void LCDProcClient::formatScrollingWidgets()
     it = m_lcdTextItems->begin();
     while (it != m_lcdTextItems->end())
     {
-        curItem = &(*it);
+        LCDTextItem *curItem = &(*it);
         ++it;
         if (curItem->getText().length() > (int) m_lcdWidth )
         {
@@ -1012,12 +1006,11 @@ void LCDProcClient::scrollWidgets()
         return; // Weird...
 
     QList<LCDTextItem>::iterator it = m_lcdTextItems->begin();
-    LCDTextItem *curItem;
 
     unsigned int len = 0;
     for(; it != m_lcdTextItems->end(); ++it)
     {
-        curItem = &(*it);
+        LCDTextItem *curItem = &(*it);
         if (curItem->getScroll())
         {
             // Note that all scrollable items have the same lenght!
@@ -1209,7 +1202,6 @@ void LCDProcClient::startMenu(QList<LCDMenuItem> *menuItems, QString app_name,
         outputCenteredText("Menu", std::move(app_name), "topWidget", 1);
 
     QList<LCDMenuItem>::iterator it = menuItems->begin();
-    LCDMenuItem *curItem;
 
     // First loop through and figure out where the selected item is in the
     // list so we know how many above and below to display
@@ -1219,7 +1211,7 @@ void LCDProcClient::startMenu(QList<LCDMenuItem> *menuItems, QString app_name,
 
     while (it != menuItems->end())
     {
-        curItem = &(*it);
+        LCDMenuItem *curItem = &(*it);
         ++it;
         if (curItem->isSelected() && !oneSelected)
         {
@@ -1251,7 +1243,7 @@ void LCDProcClient::startMenu(QList<LCDMenuItem> *menuItems, QString app_name,
     counter = 1;
     while (itTemp != menuItems->end())
     {
-        curItem = &(*itTemp);
+        LCDMenuItem *curItem = &(*itTemp);
         ++itTemp;
         m_lcdMenuItems->append(LCDMenuItem(curItem->isSelected(),
                              curItem->isChecked(), curItem->ItemName(),
@@ -1266,7 +1258,7 @@ void LCDProcClient::startMenu(QList<LCDMenuItem> *menuItems, QString app_name,
         it = menuItems->begin();
         while (it != menuItems->end())
         {
-            curItem = &(*it);
+            LCDMenuItem *curItem = &(*it);
             ++it;
             if (curItem->isSelected())
             {
@@ -1349,7 +1341,7 @@ void LCDProcClient::startMenu(QList<LCDMenuItem> *menuItems, QString app_name,
     counter = 1;
     while (it != menuItems->end())
     {
-        curItem = &(*it);
+        LCDMenuItem *curItem = &(*it);
         // Can't write more menu items then we have on the display
         if ((counter + 1) > m_lcdHeight )
             break;
@@ -1439,7 +1431,6 @@ void LCDProcClient::scrollMenuText()
 
     QString aString, bString;
     QList<LCDMenuItem>::iterator it = m_lcdMenuItems->begin();
-    LCDMenuItem *curItem;
 
     ++m_menuScrollPosition;
 
@@ -1450,7 +1441,7 @@ void LCDProcClient::scrollMenuText()
 
     while (it != m_lcdMenuItems->end())
     {
-        curItem = &(*it);
+        LCDMenuItem *curItem = &(*it);
         ++it;
         if (curItem->isSelected())
         {
@@ -1467,7 +1458,7 @@ void LCDProcClient::scrollMenuText()
     {
         while (it != m_lcdMenuItems->end())
         {
-            curItem = &(*it);
+            LCDMenuItem *curItem = &(*it);
             ++it;
             if (curItem->isSelected())
             {
@@ -1538,7 +1529,7 @@ void LCDProcClient::scrollMenuText()
 
     while (it != m_lcdMenuItems->end())
     {
-        curItem = &(*it);
+        LCDMenuItem *curItem = &(*it);
         ++it;
         if (curItem->ItemName().length() > longest_line)
             longest_line = curItem->ItemName().length();
@@ -1558,7 +1549,7 @@ void LCDProcClient::scrollMenuText()
         it = m_lcdMenuItems->begin();
         while (it != m_lcdMenuItems->end())
         {
-            curItem = &(*it);
+            LCDMenuItem *curItem = &(*it);
             ++it;
             curItem->setScrollPos(curItem->getIndent());
         }
@@ -1589,7 +1580,7 @@ void LCDProcClient::scrollMenuText()
     counter = 1;
     while (it != m_lcdMenuItems->end() && counter <= m_lcdHeight )
     {
-        curItem = &(*it);
+        LCDMenuItem *curItem = &(*it);
         // Can't write more menu items then we have on the display
         if ((counter + 1) > m_lcdHeight )
             break;
@@ -1893,7 +1884,7 @@ void LCDProcClient::dostdclock()
     }
 
     QString aString;
-    int x, y;
+    int x = 0, y = 0;
 
     if ( m_lcdHeight < 3)
         y = m_lcdHeight;
@@ -1966,7 +1957,7 @@ void LCDProcClient::outputRecStatus(void)
 
     QString aString, status;
     QStringList list;
-    int listTime;
+    int listTime = 0;
 
     TunerStatus tuner = m_tunerList[m_lcdTunerNo];
 
@@ -2201,7 +2192,7 @@ void LCDProcClient::outputGeneric()
 void LCDProcClient::outputVolume()
 {
     QString aString;
-    int line;
+    int line = 3;
 
     if ( m_lcdHeight > 1)
     {

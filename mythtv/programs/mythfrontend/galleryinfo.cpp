@@ -169,7 +169,7 @@ void InfoList::CreateCount(ImageItemK &im)
     if (im.IsDevice() && im.IsLocal())
     {
         // Returns KiB
-        int64_t total, used;
+        int64_t total = 0, used = 0;
         int64_t free = getDiskSpace(im.m_filePath, total, used);
         if (total > 0)
             CreateButton(tr("Free space"), tr("%L1 (%L2\%) Used: %L3 / %L4")

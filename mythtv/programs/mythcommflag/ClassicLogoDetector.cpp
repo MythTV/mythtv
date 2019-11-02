@@ -75,8 +75,6 @@ bool ClassicLogoDetector::searchForLogo(MythPlayer* player)
     int seekIncrement =
         (int)(m_commDetectLogoSampleSpacing * player->GetFrameRate());
     int maxLoops = m_commDetectLogoSamplesNeeded;
-    EdgeMaskEntry *edgeCounts;
-    unsigned int pos, i, x, y, dx, dy;
     int edgeDiffs[] = {5, 7, 10, 15, 20, 30, 40, 50, 60, 0 };
 
 
@@ -84,7 +82,7 @@ bool ClassicLogoDetector::searchForLogo(MythPlayer* player)
 
     m_logoInfoAvailable = false;
 
-    edgeCounts = new EdgeMaskEntry[m_width * m_height];
+    EdgeMaskEntry *edgeCounts = new EdgeMaskEntry[m_width * m_height];
 
     // Back in 2005, a threshold of 50 minimum pixelsInMask was established.
     // I don't know whether that was tested against SD or HD resolutions.
@@ -96,7 +94,7 @@ bool ClassicLogoDetector::searchForLogo(MythPlayer* player)
     // This should improve logo detection for SD video.
     int minPixelsInMask = 50 * (m_width*m_height) / (1280*720 / 16);
 
-    for (i = 0; edgeDiffs[i] != 0 && !m_logoInfoAvailable; i++)
+    for (uint i = 0; edgeDiffs[i] != 0 && !m_logoInfoAvailable; i++)
     {
         int pixelsInMask = 0;
 
@@ -144,17 +142,17 @@ bool ClassicLogoDetector::searchForLogo(MythPlayer* player)
         memset(fakeFrame, 0, width * height * 3 / 2);
 #endif
 
-        for (y = 0; y < m_height; y++)
+        for (uint y = 0; y < m_height; y++)
         {
             if ((y > (m_height/4)) && (y < (m_height * 3 / 4)))
                 continue;
 
-            for (x = 0; x < m_width; x++)
+            for (uint x = 0; x < m_width; x++)
             {
                 if ((x > (m_width/4)) && (x < (m_width * 3 / 4)))
                     continue;
 
-                pos = y * m_width + x;
+                uint pos = y * m_width + x;
 
                 if (edgeCounts[pos].isedge > (maxLoops * 0.66))
                 {
@@ -181,18 +179,18 @@ bool ClassicLogoDetector::searchForLogo(MythPlayer* player)
 
         SetLogoMaskArea();
 
-        for (y = m_logoMinY; y < m_logoMaxY; y++)
+        for (uint y = m_logoMinY; y < m_logoMaxY; y++)
         {
-            for (x = m_logoMinX; x < m_logoMaxX; x++)
+            for (uint x = m_logoMinX; x < m_logoMaxX; x++)
             {
                 int neighbors = 0;
 
                 if (!m_edgeMask[y * m_width + x].isedge)
                     continue;
 
-                for (dy = y - 2; dy <= (y + 2); dy++ )
+                for (uint dy = y - 2; dy <= (y + 2); dy++ )
                 {
-                    for (dx = x - 2; dx <= (x + 2); dx++ )
+                    for (uint dx = x - 2; dx <= (x + 2); dx++ )
                     {
                         if (m_edgeMask[dy * m_width + dx].isedge)
                             neighbors++;
@@ -211,16 +209,16 @@ bool ClassicLogoDetector::searchForLogo(MythPlayer* player)
                 .arg(m_logoMaxX).arg(m_logoMaxY));
 
 #ifdef SHOW_DEBUG_WIN
-        for (x = m_logoMinX; x < m_logoMaxX; x++)
+        for (uint x = m_logoMinX; x < m_logoMaxX; x++)
         {
-            pos = m_logoMinY * width + x;
+            uint pos = m_logoMinY * width + x;
             fakeFrame[pos] = 0x7f;
             pos = m_logoMaxY * width + x;
             fakeFrame[pos] = 0x7f;
         }
-        for (y = m_logoMinY; y < m_logoMaxY; y++)
+        for (uint y = m_logoMinY; y < m_logoMaxY; y++)
         {
-            pos = y * width + m_logoMinX;
+            uint pos = y * width + m_logoMinX;
             fakeFrame[pos] = 0x7f;
             pos = y * width + m_logoMaxX;
             fakeFrame[pos] = 0x7f;
@@ -367,10 +365,6 @@ bool ClassicLogoDetector::doesThisFrameContainTheFoundLogo(
     VideoFrame* frame)
 {
     int radius = 2;
-    unsigned int x, y;
-    int pos1, pos2, pos3;
-    int edgePos;
-    int pixel;
     int goodEdges = 0;
     int badEdges = 0;
     int testEdges = 0;
@@ -379,16 +373,16 @@ bool ClassicLogoDetector::doesThisFrameContainTheFoundLogo(
     unsigned char* framePtr = frame->buf;
     int bytesPerLine = frame->pitches[0];
 
-    for (y = m_logoMinY; y <= m_logoMaxY; y++ )
+    for (uint y = m_logoMinY; y <= m_logoMaxY; y++ )
     {
-        for (x = m_logoMinX; x <= m_logoMaxX; x++ )
+        for (uint x = m_logoMinX; x <= m_logoMaxX; x++ )
         {
-            pos1 = y * bytesPerLine + x;
-            edgePos = y * m_width + x;
-            pos2 = (y - radius) * bytesPerLine + x;
-            pos3 = (y + radius) * bytesPerLine + x;
+            int pos1 = y * bytesPerLine + x;
+            int edgePos = y * m_width + x;
+            int pos2 = (y - radius) * bytesPerLine + x;
+            int pos3 = (y + radius) * bytesPerLine + x;
 
-            pixel = framePtr[pos1];
+            int pixel = framePtr[pos1];
 
             if (m_edgeMask[edgePos].horiz)
             {
@@ -446,23 +440,21 @@ void ClassicLogoDetector::DetectEdges(VideoFrame *frame, EdgeMaskEntry *edges,
     int r = 2;
     unsigned char *buf = frame->buf;
     int bytesPerLine = frame->pitches[0];
-    unsigned char p;
-    unsigned int pos, x, y;
 
-    for (y = m_commDetectBorder + r; y < (m_height - m_commDetectBorder - r); y++)
+    for (uint y = m_commDetectBorder + r; y < (m_height - m_commDetectBorder - r); y++)
     {
         if ((y > (m_height/4)) && (y < (m_height * 3 / 4)))
             continue;
 
-        for (x = m_commDetectBorder + r; x < (m_width - m_commDetectBorder - r); x++)
+        for (uint x = m_commDetectBorder + r; x < (m_width - m_commDetectBorder - r); x++)
         {
             int edgeCount = 0;
 
             if ((x > (m_width/4)) && (x < (m_width * 3 / 4)))
                 continue;
 
-            pos = y * m_width + x;
-            p = buf[y * bytesPerLine + x];
+            uint pos = y * m_width + x;
+            uchar p = buf[y * bytesPerLine + x];
 
             if (( abs(buf[y * bytesPerLine + (x - r)] - p) >= edgeDiff) ||
                 ( abs(buf[y * bytesPerLine + (x + r)] - p) >= edgeDiff))

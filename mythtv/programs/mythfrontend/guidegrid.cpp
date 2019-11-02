@@ -143,7 +143,7 @@ bool JumpToChannel::ProcessEntry(const QStringList &actions, const QKeyEvent *e)
     }
 
     QString txt = e->text();
-    bool isUInt;
+    bool isUInt = false;
     txt.toUInt(&isUInt);
     if (isUInt)
     {
@@ -671,7 +671,7 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
         if (!m_jumpToChannel)
         {
             QString chanNum = actions[0];
-            bool isNum;
+            bool isNum = false;
             (void)chanNum.toInt(&isNum);
             if (isNum)
             {
@@ -1795,7 +1795,7 @@ void GuideUpdateProgramRow::fillProgramRowInfosWith(int row,
             isCurrent = m_currentRow == row && (m_currentCol >= x) &&
                 (m_currentCol < (x + spread));
 
-            int recFlag;
+            int recFlag = 0;
             switch (pginfo->GetRecordingRuleType())
             {
             case kSingleRecord:
@@ -1823,7 +1823,7 @@ void GuideUpdateProgramRow::fillProgramRowInfosWith(int row,
                 break;
             }
 
-            int recStat;
+            int recStat = 0;
             if (pginfo->GetRecordingStatus() == RecStatus::Conflict ||
                 pginfo->GetRecordingStatus() == RecStatus::Offline)
                 recStat = 2;
@@ -1972,8 +1972,7 @@ void GuideGrid::customEvent(QEvent *event)
         }
         else if (resultid == "channelgrouptogglemenu")
         {
-            int changroupid;
-            changroupid = ChannelGroup::GetChannelGroupId(resulttext);
+            int changroupid = ChannelGroup::GetChannelGroupId(resulttext);
 
             if (changroupid > 0)
                 toggleChannelFavorite(changroupid);
@@ -1982,7 +1981,7 @@ void GuideGrid::customEvent(QEvent *event)
         {
             if (buttonnum >= 0)
             {
-                int changroupid;
+                int changroupid = -1;
 
                 if (resulttext == QObject::tr("All Channels"))
                     changroupid = -1;

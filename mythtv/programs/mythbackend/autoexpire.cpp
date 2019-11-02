@@ -906,7 +906,7 @@ void AutoExpire::FillDBOrdered(pginfolist_t &expireList, int expMethod)
     QString where;
     QString orderby;
     QString msg;
-    int maxAge;
+    int maxAge = 0;
 
     switch (expMethod)
     {

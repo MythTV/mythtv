@@ -41,10 +41,9 @@ int pgm_set(const AVFrame *pict, int height)
 {
     const int   width = pict->linesize[0];
     const int   size = height * width;
-    int         score, ii;
 
-    score = 0;
-    for (ii = 0; ii < size; ii++)
+    int score = 0;
+    for (int ii = 0; ii < size; ii++)
         if (pict->data[0][ii])
             score++;
     return score;
@@ -55,7 +54,6 @@ int pgm_match(const AVFrame *tmpl, const AVFrame *test, int height,
 {
     /* Return the number of matching "edge" and non-edge pixels. */
     const int       width = tmpl->linesize[0];
-    int             score, rr, cc;
 
     if (width != test->linesize[0])
     {
@@ -65,25 +63,23 @@ int pgm_match(const AVFrame *tmpl, const AVFrame *test, int height,
         return -1;
     }
 
-    score = 0;
-    for (rr = 0; rr < height; rr++)
+    int score = 0;
+    for (int rr = 0; rr < height; rr++)
     {
-        for (cc = 0; cc < width; cc++)
+        for (int cc = 0; cc < width; cc++)
         {
-            int r2min, r2max, r2, c2min, c2max, c2;
-
             if (!tmpl->data[0][rr * width + cc])
                 continue;
 
-            r2min = max(0, rr - radius);
-            r2max = min(height, rr + radius);
+            int r2min = max(0, rr - radius);
+            int r2max = min(height, rr + radius);
 
-            c2min = max(0, cc - radius);
-            c2max = min(width, cc + radius);
+            int c2min = max(0, cc - radius);
+            int c2max = min(width, cc + radius);
 
-            for (r2 = r2min; r2 <= r2max; r2++)
+            for (int r2 = r2min; r2 <= r2max; r2++)
             {
-                for (c2 = c2min; c2 <= c2max; c2++)
+                for (int c2 = c2min; c2 <= c2max; c2++)
                 {
                     if (test->data[0][r2 * width + c2])
                     {
@@ -103,14 +99,12 @@ next_pixel:
 
 bool readMatches(const QString& filename, unsigned short *matches, long long nframes)
 {
-    FILE        *fp;
-    long long   frameno;
-
     QByteArray fname = filename.toLocal8Bit();
-    if (!(fp = fopen(fname.constData(), "r")))
+    FILE *fp = fopen(fname.constData(), "r");
+    if (fp == nullptr)
         return false;
 
-    for (frameno = 0; frameno < nframes; frameno++)
+    for (long long frameno = 0; frameno < nframes; frameno++)
     {
         int nitems = fscanf(fp, "%20hu", &matches[frameno]);
         if (nitems != 1)
@@ -136,14 +130,12 @@ error:
 
 bool writeMatches(const QString& filename, unsigned short *matches, long long nframes)
 {
-    FILE        *fp;
-    long long   frameno;
-
     QByteArray fname = filename.toLocal8Bit();
-    if (!(fp = fopen(fname.constData(), "w")))
+    FILE *fp = fopen(fname.constData(), "w");
+    if (fp == nullptr)
         return false;
 
-    for (frameno = 0; frameno < nframes; frameno++)
+    for (long long frameno = 0; frameno < nframes; frameno++)
         (void)fprintf(fp, "%hu\n", matches[frameno]);
 
     if (fclose(fp))
@@ -155,13 +147,10 @@ bool writeMatches(const QString& filename, unsigned short *matches, long long nf
 int finishedDebug(long long nframes, const unsigned short *matches,
                   const unsigned char *match)
 {
-    unsigned short  low, high, score;
-    long long       startframe;
-
-    score = matches[0];
-    low = score;
-    high = score;
-    startframe = 0;
+    ushort score = matches[0];
+    ushort low = score;
+    ushort high = score;
+    long long startframe = 0;
 
     for (long long frameno = 1; frameno < nframes; frameno++)
     {
@@ -210,12 +199,10 @@ unsigned int range_area(const unsigned short *freq, unsigned short start,
 {
     /* Return the integrated area under the curve of the plotted histogram. */
     const unsigned short    width = end - start;
-    unsigned short          matchcnt;
-    unsigned int            sum, nsamples;
 
-    sum = 0;
-    nsamples = 0;
-    for (matchcnt = start; matchcnt < end; matchcnt++)
+    uint sum = 0;
+    uint nsamples = 0;
+    for (ushort matchcnt = start; matchcnt < end; matchcnt++)
     {
         if (freq[matchcnt])
         {
@@ -258,50 +245,41 @@ unsigned short pick_mintmpledges(const unsigned short *matches,
     static const float  MATCHSTART = 0.20;
     static const float  MATCHEND = 0.80;
 
-    unsigned short      matchrange, matchstart, matchend;
-    unsigned short      leftwidth, middlewidth, rightwidth;
-    unsigned short      *sorted, minmatch, maxmatch, *freq;
-    int                 nfreq, matchcnt, local_minimum;
-    unsigned int        maxdelta;
-
-    sorted = new unsigned short[nframes];
+    ushort *sorted = new unsigned short[nframes];
     memcpy(sorted, matches, nframes * sizeof(*matches));
     qsort(sorted, nframes, sizeof(*sorted), sort_ascending);
-    minmatch = sorted[0];
-    maxmatch = sorted[nframes - 1];
-    matchrange = maxmatch - minmatch;
+    ushort minmatch = sorted[0];
+    ushort maxmatch = sorted[nframes - 1];
+    ushort matchrange = maxmatch - minmatch;
     /* degenerate minmatch==maxmatch case is gracefully handled */
 
-    leftwidth = (unsigned short)(LEFTWIDTH * matchrange);
-    middlewidth = (unsigned short)(MIDDLEWIDTH * matchrange);
-    rightwidth = (unsigned short)(RIGHTWIDTH * matchrange);
+    ushort leftwidth = (unsigned short)(LEFTWIDTH * matchrange);
+    ushort middlewidth = (unsigned short)(MIDDLEWIDTH * matchrange);
+    ushort rightwidth = (unsigned short)(RIGHTWIDTH * matchrange);
 
-    nfreq = maxmatch + 1;
-    freq = new unsigned short[nfreq];
+    int nfreq = maxmatch + 1;
+    ushort *freq = new unsigned short[nfreq];
     memset(freq, 0, nfreq * sizeof(*freq));
     for (long long frameno = 0; frameno < nframes; frameno++)
         freq[matches[frameno]]++;   /* freq[<matchcnt>] = <framecnt> */
 
-    matchstart = minmatch + (unsigned short)(MATCHSTART * matchrange);
-    matchend = minmatch + (unsigned short)(MATCHEND * matchrange);
+    ushort matchstart = minmatch + (unsigned short)(MATCHSTART * matchrange);
+    ushort matchend = minmatch + (unsigned short)(MATCHEND * matchrange);
 
-    local_minimum = matchstart;
-    maxdelta = 0;
-    for (matchcnt = matchstart + leftwidth + middlewidth / 2;
+    int local_minimum = matchstart;
+    uint maxdelta = 0;
+    for (int matchcnt = matchstart + leftwidth + middlewidth / 2;
             matchcnt < matchend - rightwidth - middlewidth / 2;
             matchcnt++)
     {
-        unsigned short  p0, p1, p2, p3;
-        unsigned int    leftscore, middlescore, rightscore;
+        ushort p0 = matchcnt - leftwidth - middlewidth / 2;
+        ushort p1 = p0 + leftwidth;
+        ushort p2 = p1 + middlewidth;
+        ushort p3 = p2 + rightwidth;
 
-        p0 = matchcnt - leftwidth - middlewidth / 2;
-        p1 = p0 + leftwidth;
-        p2 = p1 + middlewidth;
-        p3 = p2 + rightwidth;
-
-        leftscore = range_area(freq, p0, p1);
-        middlescore = range_area(freq, p1, p2);
-        rightscore = range_area(freq, p2, p3);
+        uint leftscore = range_area(freq, p0, p1);
+        uint middlescore = range_area(freq, p1, p2);
+        uint rightscore = range_area(freq, p2, p3);
         if (middlescore < leftscore && middlescore < rightscore)
         {
             unsigned int delta = (leftscore - middlescore) +
@@ -457,14 +435,14 @@ TemplateMatcher::analyzeFrame(const VideoFrame *frame, long long frameno,
      */
     const int           JITTER_RADIUS = 0;
 
-    const AVFrame     *pgm;
-    const AVFrame     *edges;
-    int                 pgmwidth, pgmheight;
+    const AVFrame      *edges = nullptr;
+    int                 pgmwidth = 0, pgmheight = 0;
     struct timeval      start {}, end {}, elapsed {};
 
     *pNextFrame = NEXTFRAME;
 
-    if (!(pgm = m_pgmConverter->getImage(frame, frameno, &pgmwidth, &pgmheight)))
+    const AVFrame *pgm = m_pgmConverter->getImage(frame, frameno, &pgmwidth, &pgmheight);
+    if (pgm == nullptr)
         goto error;
 
     (void)gettimeofday(&start, nullptr);
@@ -508,10 +486,8 @@ TemplateMatcher::finished(long long nframes, bool final)
     const int       MINBREAKLEN = (int)roundf(45 * m_fps);  /* frames */
     const int       MINSEGLEN = (int)roundf(105 * m_fps);    /* frames */
 
-    int                                 tmpledges, mintmpledges;
-    int                                 minbreaklen, minseglen;
-    long long                           brkb;
-    FrameAnalyzer::FrameMap::Iterator   bb;
+    int             minbreaklen = 1, minseglen = 1;
+    long long       brkb = 0;
 
     if (!m_matches_done && m_debug_matches)
     {
@@ -523,8 +499,8 @@ TemplateMatcher::finished(long long nframes, bool final)
         }
     }
 
-    tmpledges = pgm_set(m_tmpl, m_tmplheight);
-    mintmpledges = pick_mintmpledges(m_matches, nframes);
+    int tmpledges = pgm_set(m_tmpl, m_tmplheight);
+    int mintmpledges = pick_mintmpledges(m_matches, nframes);
 
     LOG(VB_COMMFLAG, LOG_INFO,
         QString("TemplateMatcher::finished %1x%2@(%3,%4),"
@@ -832,7 +808,7 @@ int
 TemplateMatcher::computeBreaks(FrameAnalyzer::FrameMap *breaks)
 {
     breaks->clear();
-    for (FrameAnalyzer::FrameMap::Iterator bb = m_breakMap.begin();
+    for (auto bb = m_breakMap.begin();
             bb != m_breakMap.end();
             ++bb)
     {

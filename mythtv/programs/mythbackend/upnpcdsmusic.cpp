@@ -86,7 +86,6 @@ void UPnpCDSMusic::CreateRoot()
                                          m_sName,
                                          "0");
 
-    CDSObject* pContainer;
     QString containerId = m_sExtensionId + "/%1";
 
     // HACK: I'm not entirely happy with this solution, but it's at least
@@ -101,7 +100,7 @@ void UPnpCDSMusic::CreateRoot()
     // -----------------------------------------------------------------------
     // All Tracks
     // -----------------------------------------------------------------------
-    pContainer = CDSObject::CreateContainer ( containerId.arg("Track"),
+    CDSObject* pContainer = CDSObject::CreateContainer ( containerId.arg("Track"),
                                               QObject::tr("All Tracks"),
                                               m_sExtensionId, // Parent Id
                                               nullptr );

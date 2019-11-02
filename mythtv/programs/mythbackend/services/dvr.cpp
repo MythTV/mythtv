@@ -469,7 +469,7 @@ long Dvr::GetSavedBookmark( int RecordedId,
         ri = RecordingInfo(RecordedId);
     else
         ri = RecordingInfo(chanid, recstarttsRaw.toUTC());
-    uint64_t offset;
+    uint64_t offset = 0;
     bool isend=true;
     uint64_t position = ri.QueryBookmark();
     if (offsettype.toLower() == "position"){
@@ -505,7 +505,7 @@ bool Dvr::SetSavedBookmark( int RecordedId,
         ri = RecordingInfo(RecordedId);
     else
         ri = RecordingInfo(chanid, recstarttsRaw.toUTC());
-    uint64_t position;
+    uint64_t position = 0;
     bool isend=true;
     if (offsettype.toLower() == "position"){
         if (!ri.QueryPositionKeyFrame(&position, Offset, isend))
@@ -530,7 +530,7 @@ DTC::CutList* Dvr::GetRecordedCutList ( int RecordedId,
                                         const QDateTime &recstarttsRaw,
                                         const QString &offsettype )
 {
-    int marktype;
+    int marktype = 0;
     if ((RecordedId <= 0) &&
         (chanid <= 0 || !recstarttsRaw.isValid()))
         throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
@@ -563,7 +563,7 @@ DTC::CutList* Dvr::GetRecordedCommBreak ( int RecordedId,
                                           const QDateTime &recstarttsRaw,
                                           const QString &offsettype )
 {
-    int marktype;
+    int marktype = 0;
     if ((RecordedId <= 0) &&
         (chanid <= 0 || !recstarttsRaw.isValid()))
         throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
@@ -594,7 +594,7 @@ DTC::CutList* Dvr::GetRecordedCommBreak ( int RecordedId,
 DTC::CutList* Dvr::GetRecordedSeek ( int RecordedId,
                                      const QString &offsettype )
 {
-    MarkTypes marktype;
+    MarkTypes marktype = MARK_UNSET;
     if (RecordedId <= 0)
         throw QString("Recorded ID appears invalid.");
 
@@ -1420,7 +1420,7 @@ DTC::RecRuleList* Dvr::GetRecordScheduleList( int nStartIndex,
                                               const QString  &Sort,
                                               bool Descending )
 {
-    Scheduler::SchedSortColumn sortingColumn;
+    Scheduler::SchedSortColumn sortingColumn = Scheduler::kSortTitle;
     if (Sort.toLower() == "lastrecorded")
         sortingColumn = Scheduler::kSortLastRecorded;
     else if (Sort.toLower() == "nextrecording")
@@ -1509,7 +1509,7 @@ DTC::RecRule* Dvr::GetRecordSchedule( uint      nRecordId,
     {
         // Despite the use of RecordingInfo, this only applies to programs in the
         // present or future, not to recordings? Confused yet?
-        RecordingInfo::LoadStatus status;
+        RecordingInfo::LoadStatus status = RecordingInfo::kNoProgram;
         RecordingInfo info(nChanId, dStartTime, false, 0, &status);
         if (status != RecordingInfo::kFoundProgram)
             throw QString("Program does not exist.");
@@ -1572,7 +1572,7 @@ bool Dvr::DisableRecordSchedule( uint nRecordId )
 
 int Dvr::RecordedIdForKey(int chanid, const QDateTime &recstarttsRaw)
 {
-    int recordedid;
+    int recordedid = 0;
 
     if (!RecordingInfo::QueryRecordedIdForKey(recordedid, chanid,
                                               recstarttsRaw))
@@ -1583,7 +1583,7 @@ int Dvr::RecordedIdForKey(int chanid, const QDateTime &recstarttsRaw)
 
 int Dvr::RecordedIdForPathname(const QString & pathname)
 {
-    uint recordedid;
+    uint recordedid = 0;
 
     if (!ProgramInfo::QueryRecordedIdFromPathname(pathname, recordedid))
         return -1;
@@ -1609,7 +1609,7 @@ QString Dvr::RecStatusToDescription(int RecStatus, int recType,
 
 QString Dvr::RecTypeToString(QString recType)
 {
-    bool ok;
+    bool ok = false;
     RecordingType enumType = static_cast<RecordingType>(recType.toInt(&ok, 10));
     if (ok)
         return toString(enumType);
@@ -1619,7 +1619,7 @@ QString Dvr::RecTypeToString(QString recType)
 
 QString Dvr::RecTypeToDescription(QString recType)
 {
-    bool ok;
+    bool ok = false;
     RecordingType enumType = static_cast<RecordingType>(recType.toInt(&ok, 10));
     if (ok)
         return toDescription(enumType);

@@ -479,7 +479,6 @@ bool Scheduler::FillRecordList(void)
 void Scheduler::FillRecordListFromDB(uint recordid)
 {
     struct timeval fillstart {}, fillend {};
-    float matchTime, checkTime, placeTime;
 
     MSqlQuery query(m_dbConn);
     QString thequery;
@@ -525,8 +524,8 @@ void Scheduler::FillRecordListFromDB(uint recordid)
     gettimeofday(&fillstart, nullptr);
     UpdateMatches(recordid, 0, 0, QDateTime());
     gettimeofday(&fillend, nullptr);
-    matchTime = ((fillend.tv_sec - fillstart.tv_sec ) * 1000000 +
-                 (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0;
+    float matchTime = ((fillend.tv_sec - fillstart.tv_sec ) * 1000000 +
+                       (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0;
 
     LOG(VB_SCHEDULE, LOG_INFO, "CreateTempTables...");
     CreateTempTables();
@@ -535,14 +534,14 @@ void Scheduler::FillRecordListFromDB(uint recordid)
     LOG(VB_SCHEDULE, LOG_INFO, "UpdateDuplicates...");
     UpdateDuplicates();
     gettimeofday(&fillend, nullptr);
-    checkTime = ((fillend.tv_sec - fillstart.tv_sec ) * 1000000 +
-                 (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0;
+    float checkTime = ((fillend.tv_sec - fillstart.tv_sec ) * 1000000 +
+                       (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0;
 
     gettimeofday(&fillstart, nullptr);
     FillRecordList();
     gettimeofday(&fillend, nullptr);
-    placeTime = ((fillend.tv_sec - fillstart.tv_sec ) * 1000000 +
-                 (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0;
+    float placeTime = ((fillend.tv_sec - fillstart.tv_sec ) * 1000000 +
+                       (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0;
 
     LOG(VB_SCHEDULE, LOG_INFO, "DeleteTempTables...");
     DeleteTempTables();
@@ -568,7 +567,7 @@ void Scheduler::FillRecordListFromDB(uint recordid)
 void Scheduler::FillRecordListFromMaster(void)
 {
     RecordingList schedList(false);
-    bool dummy;
+    bool dummy = false;
     LoadFromScheduler(schedList, dummy);
 
     QMutexLocker lockit(&m_schedLock);
@@ -946,13 +945,11 @@ void Scheduler::BuildWorkList(void)
 
 bool Scheduler::ClearWorkList(void)
 {
-    RecordingInfo *p;
-
     if (m_reclist_changed)
     {
         while (!m_worklist.empty())
         {
-            p = m_worklist.front();
+            RecordingInfo *p = m_worklist.front();
             delete p;
             m_worklist.pop_front();
         }
@@ -962,14 +959,14 @@ bool Scheduler::ClearWorkList(void)
 
     while (!m_reclist.empty())
     {
-        p = m_reclist.front();
+        RecordingInfo *p = m_reclist.front();
         delete p;
         m_reclist.pop_front();
     }
 
     while (!m_worklist.empty())
     {
-        p = m_worklist.front();
+        RecordingInfo *p = m_worklist.front();
         m_reclist.push_back(p);
         m_worklist.pop_front();
     }
@@ -1198,9 +1195,7 @@ const RecordingInfo *Scheduler::FindConflict(
 
 void Scheduler::MarkOtherShowings(RecordingInfo *p)
 {
-    RecList *showinglist;
-
-    showinglist = &m_titlelistmap[p->GetTitle().toLower()];
+    RecList *showinglist = &m_titlelistmap[p->GetTitle().toLower()];
     MarkShowingsList(*showinglist, p);
 
     if (p->GetRecordingRuleType() == kOneRecord ||
@@ -2313,7 +2308,6 @@ bool Scheduler::HandleReschedule(void)
     m_dbConn = MSqlQuery::SchedCon();
 
     struct timeval fillstart {}, fillend {};
-    float matchTime, checkTime, placeTime;
 
     gettimeofday(&fillstart, nullptr);
     QString msg;
@@ -2406,8 +2400,8 @@ bool Scheduler::HandleReschedule(void)
     }
 
     gettimeofday(&fillend, nullptr);
-    matchTime = ((fillend.tv_sec - fillstart.tv_sec ) * 1000000 +
-                 (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0;
+    float matchTime = ((fillend.tv_sec - fillstart.tv_sec ) * 1000000 +
+                       (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0;
 
     LOG(VB_SCHEDULE, LOG_INFO, "CreateTempTables...");
     CreateTempTables();
@@ -2419,14 +2413,14 @@ bool Scheduler::HandleReschedule(void)
         UpdateDuplicates();
     }
     gettimeofday(&fillend, nullptr);
-    checkTime = ((fillend.tv_sec - fillstart.tv_sec ) * 1000000 +
-                 (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0;
+    float checkTime = ((fillend.tv_sec - fillstart.tv_sec ) * 1000000 +
+                       (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0;
 
     gettimeofday(&fillstart, nullptr);
     bool worklistused = FillRecordList();
     gettimeofday(&fillend, nullptr);
-    placeTime = ((fillend.tv_sec - fillstart.tv_sec ) * 1000000 +
-                 (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0;
+    float placeTime = ((fillend.tv_sec - fillstart.tv_sec ) * 1000000 +
+                       (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0;
 
     LOG(VB_SCHEDULE, LOG_INFO, "DeleteTempTables...");
     DeleteTempTables();
@@ -3720,10 +3714,10 @@ void Scheduler::UpdateManuals(uint recordid)
     while (query.next())
         chanidlist.push_back(query.value(0).toUInt());
 
-    int progcount;
-    int skipdays;
-    bool weekday;
-    int daysoff;
+    int progcount = 0;
+    int skipdays = 1;
+    bool weekday = false;
+    int daysoff = 0;
     QDateTime lstartdt = startdt.toLocalTime();
 
     switch (rectype)
@@ -4039,14 +4033,13 @@ void Scheduler::UpdateMatches(uint recordid, uint sourceid, uint mplexid,
             MythDB::DBError("UpdateMatches4", query);
     }
 
-    int clause;
     QStringList fromclauses, whereclauses;
 
     BuildNewRecordsQueries(recordid, fromclauses, whereclauses, bindings);
 
     if (VERBOSE_LEVEL_CHECK(VB_SCHEDULE, LOG_INFO))
     {
-        for (clause = 0; clause < fromclauses.count(); ++clause)
+        for (int clause = 0; clause < fromclauses.count(); ++clause)
         {
             LOG(VB_SCHEDULE, LOG_INFO, QString("Query %1: %2/%3")
                 .arg(clause).arg(fromclauses[clause])
@@ -4054,7 +4047,7 @@ void Scheduler::UpdateMatches(uint recordid, uint sourceid, uint mplexid,
         }
     }
 
-    for (clause = 0; clause < fromclauses.count(); ++clause)
+    for (int clause = 0; clause < fromclauses.count(); ++clause)
     {
         QString query2 = QString(
 "REPLACE INTO recordmatch (recordid, chanid, starttime, manualid, "

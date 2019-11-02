@@ -74,8 +74,8 @@ int main(int argc, char *argv[])
            .toUtf8().constData(), 1);
 #endif
 
-    int retval;
-    if ((retval = cmdline.ConfigureLogging()) != GENERIC_EXIT_OK)
+    int retval = cmdline.ConfigureLogging();
+    if (retval != GENERIC_EXIT_OK)
         return retval;
 
     ///////////////////////////////////////////////////////////////////////
@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
 
     if (cmdline.toBool("jobid"))
     {
-        uint chanid;
+        uint chanid = 0;
         QDateTime starttime;
         int jobType = JOB_METADATA;
 
