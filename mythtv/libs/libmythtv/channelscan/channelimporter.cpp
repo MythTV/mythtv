@@ -656,7 +656,8 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
                         QString(),
                         chan.m_format,
                         QString(),
-                        chan.m_default_authority);
+                        chan.m_default_authority,
+                        chan.m_service_type);
 
                     if (!transports[i].m_iptv_tuning.GetDataURL().isEmpty())
                         ChannelUtil::CreateIPTVTuningData(chan.m_channel_id,
@@ -825,7 +826,8 @@ ScanDTVTransportList ChannelImporter::UpdateChannels(
                     QString(),
                     chan.m_format,
                     QString(),
-                    chan.m_default_authority);
+                    chan.m_default_authority,
+                    chan.m_service_type);
             }
 
             if (updated)

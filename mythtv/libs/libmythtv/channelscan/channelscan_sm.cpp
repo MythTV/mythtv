@@ -1192,6 +1192,18 @@ static void update_info(ChannelInsertInfo &info,
         service_name = desc->ServiceName();
         if (service_name.trimmed().isEmpty())
             service_name.clear();
+
+        info.m_service_type = desc->ServiceType();
+        info.m_is_data_service =
+            (desc && !desc->IsDTV() && !desc->IsDigitalAudio());
+        info.m_is_audio_service = (desc && desc->IsDigitalAudio());
+        delete desc;
+    }
+    else
+    {
+        LOG(VB_CHANSCAN, LOG_INFO, "ChannelScanSM: " +
+            QString("No ServiceDescriptor for onid %1 tid %2 sid %3")
+                .arg(sdt->OriginalNetworkID()).arg(sdt->TSID()).arg(sdt->ServiceID(i)));
     }
 
     if (info.m_callsign.isEmpty())
@@ -1206,16 +1218,10 @@ static void update_info(ChannelInsertInfo &info,
 
     info.m_hidden           = false;
     info.m_hidden_in_guide  = false;
-
-    info.m_is_data_service =
-        (desc && !desc->IsDTV() && !desc->IsDigitalAudio());
-    info.m_is_audio_service = (desc && desc->IsDigitalAudio());
-    delete desc;
-
-    info.m_service_id = sdt->ServiceID(i);
-    info.m_sdt_tsid   = sdt->TSID();
-    info.m_orig_netid = sdt->OriginalNetworkID();
-    info.m_in_sdt     = true;
+    info.m_service_id       = sdt->ServiceID(i);
+    info.m_sdt_tsid         = sdt->TSID();
+    info.m_orig_netid       = sdt->OriginalNetworkID();
+    info.m_in_sdt           = true;
 
     desc_list_t parsed =
         MPEGDescriptor::Parse(sdt->ServiceDescriptors(i),
