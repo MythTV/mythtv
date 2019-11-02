@@ -69,7 +69,8 @@ class Channel : public ChannelServices
                                                      const QString &Icon,
                                                      const QString &Format,
                                                      const QString &XMLTVID,
-                                                     const QString &DefaultAuthority ) override; // ChannelServices
+                                                     const QString &DefaultAuthority,
+                                                     uint          ServiceType ) override; // ChannelServices
 
         bool                   AddDBChannel        ( uint          MplexID,
                                                      uint          SourceID,
@@ -86,7 +87,8 @@ class Channel : public ChannelServices
                                                      const QString &Icon,
                                                      const QString &Format,
                                                      const QString &XMLTVID,
-                                                     const QString &DefaultAuthority ) override; // ChannelServices
+                                                     const QString &DefaultAuthority,
+                                                     uint          ServiceType ) override; // ChannelServices
 
         bool                   RemoveDBChannel     ( uint          ChannelID ) override; // ChannelServices
 
@@ -214,14 +216,15 @@ class ScriptableChannel : public QObject
                                    const QString &Icon,
                                    const QString &Format,
                                    const QString &XMLTVID,
-                                   const QString &DefaultAuthority )
+                                   const QString &DefaultAuthority,
+                                   uint          ServiceType )
         {
             SCRIPT_CATCH_EXCEPTION( false,
                 return m_obj.UpdateDBChannel(MplexID, SourceID, ChannelID,
                                          CallSign, ChannelName, ChannelNumber,
                                          ServiceID, ATSCMajorChannel, ATSCMinorChannel,
                                          UseEIT, visible, FrequencyID, Icon, Format,
-                                         XMLTVID, DefaultAuthority);
+                                         XMLTVID, DefaultAuthority, ServiceType);
             )
         }
 
@@ -240,14 +243,15 @@ class ScriptableChannel : public QObject
                                    const QString &Icon,
                                    const QString &Format,
                                    const QString &XMLTVID,
-                                   const QString &DefaultAuthority )
+                                   const QString &DefaultAuthority,
+                                   uint          ServiceType )
         {
             SCRIPT_CATCH_EXCEPTION( false,
                 return m_obj.AddDBChannel(MplexID, SourceID, ChannelID,
                                       CallSign, ChannelName, ChannelNumber,
                                       ServiceID, ATSCMajorChannel, ATSCMinorChannel,
                                       UseEIT, Visible, FrequencyID, Icon, Format,
-                                      XMLTVID, DefaultAuthority);
+                                      XMLTVID, DefaultAuthority, ServiceType);
             )
         }
 

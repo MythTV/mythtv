@@ -155,13 +155,15 @@ bool Channel::UpdateDBChannel( uint          MplexID,
                                const QString &Icon,
                                const QString &Format,
                                const QString &XMLTVID,
-                               const QString &DefaultAuthority )
+                               const QString &DefaultAuthority,
+                               uint          ServiceType )
 {
     bool bResult = ChannelUtil::UpdateChannel( MplexID, SourceID, ChannelID,
                              CallSign, ChannelName, ChannelNumber,
                              ServiceID, ATSCMajorChannel, ATSCMinorChannel,
                              UseEIT, !visible, false, FrequencyID,
-                             Icon, Format, XMLTVID, DefaultAuthority );
+                             Icon, Format, XMLTVID, DefaultAuthority,
+                             ServiceType );
 
     return bResult;
 }
@@ -181,13 +183,15 @@ bool Channel::AddDBChannel( uint          MplexID,
                             const QString &Icon,
                             const QString &Format,
                             const QString &XMLTVID,
-                            const QString &DefaultAuthority )
+                            const QString &DefaultAuthority,
+                            uint          ServiceType )
 {
     bool bResult = ChannelUtil::CreateChannel( MplexID, SourceID, ChannelID,
                              CallSign, ChannelName, ChannelNumber,
                              ServiceID, ATSCMajorChannel, ATSCMinorChannel,
                              UseEIT, !visible, false, FrequencyID,
-                             Icon, Format, XMLTVID, DefaultAuthority );
+                             Icon, Format, XMLTVID, DefaultAuthority,
+                             ServiceType );
 
     return bResult;
 }

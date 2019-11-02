@@ -23,6 +23,7 @@ class MythTVChannel {
     var $outputfilters;
     var $recpriority;
     var $serviceid;
+    var $service_type;
     var $sourceid;
     var $tmoffset;
     var $tvformat;

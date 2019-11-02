@@ -96,7 +96,8 @@ class SERVICE_PUBLIC ChannelServices : public Service
                                                              const QString &Icon,
                                                              const QString &Format,
                                                              const QString &XMLTVID,
-                                                             const QString &DefaultAuthority ) = 0;
+                                                             const QString &DefaultAuthority,
+                                                             uint          ServiceType ) = 0;
 
         virtual bool                   UpdateDBChannel     ( uint          MplexID,
                                                              uint          SourceID,
@@ -113,7 +114,8 @@ class SERVICE_PUBLIC ChannelServices : public Service
                                                              const QString &Icon,
                                                              const QString &Format,
                                                              const QString &XMLTVID,
-                                                             const QString &DefaultAuthority ) = 0;
+                                                             const QString &DefaultAuthority,
+                                                             uint          ServiceType ) = 0;
 
         virtual bool                   RemoveDBChannel     ( uint          ChannelID ) = 0;
 
