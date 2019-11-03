@@ -10,6 +10,7 @@
 
 extern "C" {
 #include "libavfilter/avfilter.h"
+#include "libswscale/swscale.h"
 }
 
 class MythDeinterlacer
@@ -24,7 +25,6 @@ class MythDeinterlacer
     bool             Initialise   (VideoFrame *Frame, MythDeintType Deinterlacer,
                                    bool DoubleRate, bool TopFieldFirst);
     inline void      Cleanup      (void);
-    static void      OneField     (VideoFrame *Source, VideoFrame *Dest, bool Top);
 
   private:
     VideoFrameType   m_inputType  { FMT_NONE };
@@ -39,6 +39,7 @@ class MythDeinterlacer
     AVFilterContext* m_source     { nullptr };
     AVFilterContext* m_sink       { nullptr };
     VideoFrame*      m_bobFrame   { nullptr };
+    SwsContext*      m_swsContext { nullptr };
 };
 
 #endif // MYTHDEINTERLACER_H

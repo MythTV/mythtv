@@ -18,14 +18,14 @@ extern "C" {
  * quality and using single or double frame rate.
  *
  * The following deinterlacers are used:
- * Basic - a simple onefield/bob (N.B. Subject to change!)
+ * Basic - onefield/bob using libswcale
  * Medium - libavfilter's yadif
  * High - libavfilter's bwdif
  *
  * \note libavfilter frame doubling filters expect frames to be presented
  * in the correct order and will break if they do not receive a frame followed
  * by the retrieval of 2 'fields'.
- * \note There is no support for deinterlacig NV12 frame formats
+ * \note There is no support for deinterlacig NV12 frame formats in libavilter
 */
 MythDeinterlacer::~MythDeinterlacer()
 {
@@ -86,8 +86,9 @@ void MythDeinterlacer::Filter(VideoFrame *Frame, FrameScanType Scan)
         }
     }
 
-    // libavfilter will not deinterlace NV12 frames. Allow shaders in this case
-    if (format_is_nv12(Frame->codec))
+    // libavfilter will not deinterlace NV12 frames. Allow shaders in this case.
+    // libswscale (for bob/onefield) is fine.
+    if (format_is_nv12(Frame->codec) && (deinterlacer != DEINT_BASIC))
     {
         Cleanup();
         Frame->deinterlace_single = Frame->deinterlace_single | DEINT_SHADER;
@@ -97,9 +98,8 @@ void MythDeinterlacer::Filter(VideoFrame *Frame, FrameScanType Scan)
 
     // Check for a change in input or deinterlacer
     if (Frame->width != m_width     || Frame->height  != m_height ||
-        Frame->codec != m_inputType || Frame->pix_fmt != m_inputFmt ||
         deinterlacer != m_deintType || doublerate     != m_doubleRate ||
-        topfieldfirst != m_topFirst)
+        topfieldfirst != m_topFirst || Frame->codec   != m_inputType)
     {
         LOG(VB_GENERAL, LOG_INFO, LOC +
             QString("Deinterlacer change: %1x%2 %3 dr:%4 tff:%5 -> %6x%7 %8 dr:%9 tff:%10")
@@ -121,54 +121,78 @@ void MythDeinterlacer::Filter(VideoFrame *Frame, FrameScanType Scan)
     // onefield or bob
     if (m_deintType == DEINT_BASIC)
     {
-        if (m_doubleRate)
+        if (!m_swsContext)
+            return;
+
+        // we need a frame for caching - both to preserve the second field if
+        // needed and ensure we are not filtering in place (i.e. from src to src).
+        if (!m_bobFrame)
         {
-            // create a VideoFrame to cache the second field
+            m_bobFrame = new VideoFrame;
             if (!m_bobFrame)
-            {
-                m_bobFrame = new VideoFrame;
-                if (!m_bobFrame)
-                    return;
-                memset(m_bobFrame, 0, sizeof(VideoFrame));
-                LOG(VB_PLAYBACK, LOG_INFO, "Created new 'bob' cache frame");
-            }
-
-            // copy Frame metadata, preserving any existing buffer allocation
-            unsigned char *buf = m_bobFrame->buf;
-            int size = m_bobFrame->size;
-            memcpy(m_bobFrame, Frame, sizeof(VideoFrame_));
-            m_bobFrame->priv[0] = m_bobFrame->priv[1] = m_bobFrame->priv[2] = m_bobFrame->priv[3] = nullptr;
-            m_bobFrame->buf = buf;
-            m_bobFrame->size = size;
-
-            if (!m_bobFrame->buf || (m_bobFrame->size != Frame->size))
-            {
-                av_free(m_bobFrame->buf);
-                m_bobFrame->buf = static_cast<unsigned char*>(av_malloc(static_cast<size_t>(Frame->size + 64)));
-                m_bobFrame->size = Frame->size;
-            }
-
-            if (!m_bobFrame->buf)
                 return;
-
-            if (kScan_Interlaced == Scan)
-            {
-                // cache the other field
-                OneField(Frame, m_bobFrame, !m_topFirst);
-                // double the current
-                OneField(Frame, Frame, m_topFirst);
-            }
-            else
-            {
-                // retrieve the cached field
-                OneField(m_bobFrame, Frame, m_topFirst);
-                // and double it
-                OneField(Frame, Frame, !m_topFirst);
-            }
+            memset(m_bobFrame, 0, sizeof(VideoFrame));
+            LOG(VB_PLAYBACK, LOG_INFO, "Created new 'bob' cache frame");
         }
-        else
+
+        // copy Frame metadata, preserving any existing buffer allocation
+        unsigned char *buf = m_bobFrame->buf;
+        int size = m_bobFrame->size;
+        memcpy(m_bobFrame, Frame, sizeof(VideoFrame_));
+        m_bobFrame->priv[0] = m_bobFrame->priv[1] = m_bobFrame->priv[2] = m_bobFrame->priv[3] = nullptr;
+        m_bobFrame->buf = buf;
+        m_bobFrame->size = size;
+
+        if (!m_bobFrame->buf || (m_bobFrame->size != Frame->size))
         {
-            OneField(Frame, Frame, Scan == kScan_Interlaced ? m_topFirst : !m_topFirst);
+            av_free(m_bobFrame->buf);
+            m_bobFrame->buf = static_cast<unsigned char*>(av_malloc(static_cast<size_t>(Frame->size + 64)));
+            m_bobFrame->size = Frame->size;
+        }
+
+        if (!m_bobFrame->buf)
+            return;
+
+        // copy/cache on first pass
+        if (kScan_Interlaced == Scan)
+            memcpy(m_bobFrame->buf, Frame->buf, static_cast<size_t>(m_bobFrame->size));
+
+        // Convert VideoFrame to AVFrame - no copy
+        AVFrame dstframe;
+        if ((AVPictureFill(m_frame, m_bobFrame, m_inputFmt) < 1) ||
+            (AVPictureFill(&dstframe, Frame, m_inputFmt) < 1))
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Error converting frame");
+            return;
+        }
+
+        bool topfield   = Scan == kScan_Interlaced ? m_topFirst : !m_topFirst;
+        dstframe.width  = Frame->width;
+        dstframe.height = Frame->height;
+        dstframe.format = Frame->pix_fmt;
+
+        m_frame->width  = m_bobFrame->width;
+        m_frame->format = m_bobFrame->pix_fmt;
+
+        // Fake the frame height and stride to simulate a single field
+        m_frame->height = Frame->height >> 1;
+        m_frame->interlaced_frame = 0;
+        uint nbplanes = planes(m_inputType);
+        for (uint i = 0; i < nbplanes; i++)
+        {
+            if (!topfield)
+                m_frame->data[i] = m_frame->data[i] + m_frame->linesize[i];
+            m_frame->linesize[i] = m_frame->linesize[i] << 1;
+        }
+
+        // and scale to full height
+        int result = sws_scale(m_swsContext, m_frame->data, m_frame->linesize, 0, m_frame->height,
+                               dstframe.data, dstframe.linesize);
+
+        if (result != Frame->height)
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Error scaling frame: height %1 expected %2")
+                .arg(result).arg(Frame->height));
         }
         return;
     }
@@ -228,11 +252,12 @@ void MythDeinterlacer::Filter(VideoFrame *Frame, FrameScanType Scan)
 
 void MythDeinterlacer::Cleanup(void)
 {
-    if (m_graph)
-    {
+    if (m_graph || m_swsContext)
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Removing CPU deinterlacer");
-        avfilter_graph_free(&m_graph);
-    }
+
+    avfilter_graph_free(&m_graph);
+    sws_freeContext(m_swsContext);
+    m_swsContext = nullptr;
 
     if (m_bobFrame)
     {
@@ -259,17 +284,24 @@ bool MythDeinterlacer::Initialise(VideoFrame *Frame, MythDeintType Deinterlacer,
     m_width     = Frame->width;
     m_height    = Frame->height;
     m_inputType = Frame->codec;
-    m_inputFmt  = static_cast<AVPixelFormat>(Frame->pix_fmt);
+    m_inputFmt  = FrameTypeToPixelFormat(Frame->codec);
     QString name = DeinterlacerName(Deinterlacer | DEINT_CPU, DoubleRate);
 
     // simple onefield/bob?
     if (Deinterlacer == DEINT_BASIC)
     {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Using deinterlacer '%1'").arg(name));
         m_deintType  = Deinterlacer;
         m_doubleRate = DoubleRate;
         m_topFirst   = TopFieldFirst;
-        return true;
+        m_swsContext = sws_getCachedContext(m_swsContext, m_width, m_height >> 1, m_inputFmt,
+                                            m_width, m_height, m_inputFmt, SWS_FAST_BILINEAR,
+                                            nullptr, nullptr, nullptr);
+        if (m_swsContext != nullptr)
+        {
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Using deinterlacer '%1'").arg(name));
+            return true;
+        }
+        return false;
     }
 
     // Sanity check the frame formats
@@ -329,32 +361,4 @@ bool MythDeinterlacer::Initialise(VideoFrame *Frame, MythDeintType Deinterlacer,
     avfilter_inout_free(&inputs);
     avfilter_inout_free(&outputs);
     return false;
-}
-
-///\brief Copy a field from Source to Dest
-void MythDeinterlacer::OneField(VideoFrame* Source, VideoFrame* Dest, bool Top)
-{
-    if (!Source || !Dest)
-        return;
-    if (Source->codec != Dest->codec || Source->width != Dest->width || Source->height != Dest->height)
-        return;
-
-    uint srcplanes = planes(Source->codec);
-    for (uint plane = 0; plane < srcplanes; ++plane)
-    {
-        int height = height_for_plane(Source->codec, Source->height, plane);
-        int width = pitch_for_plane(Source->codec, Source->width, plane);
-        int srcpitch = Source->pitches[plane];
-        int dstpitch = Dest->pitches[plane];
-        unsigned char *src = Source->buf + Source->offsets[plane] + (Top ? 0 : srcpitch);
-        unsigned char *dst = Dest->buf + Dest->offsets[plane] + (Top ? dstpitch : 0);
-        srcpitch *= 2;
-        dstpitch *= 2;
-        for (int y = 0; y < height; y += 2)
-        {
-            memcpy(dst, src, static_cast<size_t>(width));
-            src += srcpitch;
-            dst += dstpitch;
-        }
-    }
 }
