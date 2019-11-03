@@ -23,7 +23,7 @@
 #include "mythuiexp.h"
 #include "mythlogging.h"
 #include "mythrender_base.h"
-#include "mythrender_opengl_defs.h"
+#include "mythrenderopengldefs.h"
 #include "mythuianimation.h"
 
 typedef enum

@@ -8,7 +8,7 @@
 // MythTV
 #include "mythvideoout.h"
 #include "videoouttypes.h"
-#include "mythrender_opengl.h"
+#include "opengl/mythrenderopengl.h"
 #include "mythavutil.h"
 #include "mythopenglinterop.h"
 

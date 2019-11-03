@@ -67,7 +67,7 @@ using namespace std;
 #include "mythscreentype.h"
 #include "mythpainter.h"
 #ifdef USE_OPENGL_PAINTER
-#include "mythpainter_ogl.h"
+#include "mythpainteropengl.h"
 #endif
 #include "mythpainter_qt.h"
 #include "mythgesture.h"

@@ -1,19 +1,14 @@
 // Config header generated in base directory by configure
 #include "config.h"
 
-// Own header
-#include "mythpainter_ogl.h"
-
-// QT headers
+// Qt
 #include <QCoreApplication>
 #include <QPainter>
 
-// libmythbase headers
-#include "mythlogging.h"
-
-// Mythui headers
+// MythTV
 #include "mythmainwindow_internal.h"
-#include "mythrender_opengl.h"
+#include "mythrenderopengl.h"
+#include "mythpainteropengl.h"
 
 using namespace std;
 

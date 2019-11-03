@@ -7,7 +7,7 @@
 #include "mythmainwindow.h"
 #include "mythlogging.h"
 #include "decoders/avformatdecoder.h"
-#include "mythrender_opengl.h"
+#include "opengl/mythrenderopengl.h"
 #include "videobuffers.h"
 #include "mythvaapiinterop.h"
 #include "mythvaapicontext.h"

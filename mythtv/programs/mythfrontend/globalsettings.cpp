@@ -41,7 +41,7 @@
 #include "decoders/mythcodeccontext.h"
 #include "mythsorthelper.h"
 #ifdef USE_OPENGL_PAINTER
-#include "mythrender_opengl.h"
+#include "opengl/mythrenderopengl.h"
 #endif
 #ifdef USING_AIRPLAY
 #include "AirPlay/mythraopconnection.h"

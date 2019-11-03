@@ -3,7 +3,7 @@
 #include "mythmainwindow.h"
 
 #ifdef USING_OPENGL
-#include "mythrender_opengl.h"
+#include "opengl/mythrenderopengl.h"
 #endif
 
 extern "C" {

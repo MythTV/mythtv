@@ -4,7 +4,7 @@
 #include "mythcodecid.h"
 #include "mythframe.h"
 #include "avformatdecoder.h"
-#include "mythrender_opengl.h"
+#include "opengl/mythrenderopengl.h"
 #include "videobuffers.h"
 #include "mythvtbinterop.h"
 #include "mythvtbcontext.h"

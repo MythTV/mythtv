@@ -6,7 +6,7 @@ class MythMainWindow;
 class MythMainWindowPrivate;
 
 #ifdef USE_OPENGL_PAINTER
-#include "mythrender_opengl.h"
+#include "mythrenderopengl.h"
 
 class MythPainterWindowGL : public QWidget
 {
@@ -15,7 +15,7 @@ class MythPainterWindowGL : public QWidget
   public:
     MythPainterWindowGL(MythMainWindow *win, MythMainWindowPrivate *priv,
                         MythRenderOpenGL *rend);
-    ~MythPainterWindowGL();
+    ~MythPainterWindowGL() override;
     QPaintEngine *paintEngine() const override;
 
     // QWidget

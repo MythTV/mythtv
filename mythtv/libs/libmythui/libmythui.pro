@@ -12,6 +12,8 @@ CONFIG += thread dll
 target.path = $${LIBDIR}
 INSTALLS = target
 
+DEPENDPATH  += ./opengl
+INCLUDEPATH += $$DEPENDPATH
 INCLUDEPATH += ../libmythbase
 INCLUDEPATH += ../.. ../
 INCLUDEPATH += ../.. ../../external/FFmpeg
@@ -175,11 +177,11 @@ mingw | win32-msvc*{
 
 using_opengl {
     using_opengl_themepainter:DEFINES += USE_OPENGL_PAINTER
-    SOURCES += mythpainter_ogl.cpp  mythrender_opengl.cpp
-    HEADERS += mythpainter_ogl.h    mythrender_opengl.h
-    HEADERS += mythrender_opengl_defs.h mythrender_opengl_shaders.h
-    HEADERS += mythopenglperf.h
-    SOURCES += mythopenglperf.cpp
+    SOURCES += opengl/mythpainteropengl.cpp  opengl/mythrenderopengl.cpp
+    HEADERS += opengl/mythpainteropengl.h    opengl/mythrenderopengl.h
+    HEADERS += opengl/mythrenderopengldefs.h opengl/mythrenderopenglshaders.h
+    HEADERS += opengl/mythopenglperf.h
+    SOURCES += opengl/mythopenglperf.cpp
 
     using_opengles {
         DEFINES += USING_OPENGLES

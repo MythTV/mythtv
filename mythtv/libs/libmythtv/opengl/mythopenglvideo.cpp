@@ -1,7 +1,7 @@
 // MythTV
 #include "mythcontext.h"
 #include "tv.h"
-#include "mythrender_opengl.h"
+#include "opengl/mythrenderopengl.h"
 #include "mythavutil.h"
 #include "mythopenglvideoshaders.h"
 #include "mythopenglvideo.h"

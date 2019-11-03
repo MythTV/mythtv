@@ -13,8 +13,8 @@ using std::min;
 // MythTV
 #include "mythcorecontext.h"
 #include "mythmainwindow.h"
-#include "mythrender_opengl.h"
-#include "mythrender_opengl_shaders.h"
+#include "mythrenderopengl.h"
+#include "mythrenderopenglshaders.h"
 #include "mythlogging.h"
 #include "mythuitype.h"
 #include "mythxdisplay.h"

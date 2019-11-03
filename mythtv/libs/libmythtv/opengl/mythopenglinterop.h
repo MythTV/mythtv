@@ -5,7 +5,7 @@
 #include <QObject>
 
 // MythTV
-#include "mythrender_opengl.h"
+#include "opengl/mythrenderopengl.h"
 #include "referencecounter.h"
 #include "videoouttypes.h"
 #include "mythcodecid.h"

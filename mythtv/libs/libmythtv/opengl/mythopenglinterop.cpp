@@ -5,7 +5,7 @@
 #include "mythmainwindow.h"
 #include "mythcorecontext.h"
 #include "videocolourspace.h"
-#include "mythrender_opengl.h"
+#include "opengl/mythrenderopengl.h"
 #include "mythopenglinterop.h"
 
 #ifdef USING_VAAPI
