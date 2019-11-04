@@ -82,7 +82,7 @@ int MythVDPAUContext::InitialiseContext(AVCodecContext* Context)
     hwframesctx->free = &MythCodecContext::FramesContextFinished;
 
     // Initialise frames context
-    hwframesctx->sw_format = Context->sw_pix_fmt;
+    hwframesctx->sw_format = Context->sw_pix_fmt == AV_PIX_FMT_YUVJ420P ? AV_PIX_FMT_YUV420P : Context->sw_pix_fmt;
     hwframesctx->format    = AV_PIX_FMT_VDPAU;
     hwframesctx->width     = Context->coded_width;
     hwframesctx->height    = Context->coded_height;
@@ -129,9 +129,8 @@ MythCodecID MythVDPAUContext::GetSupportedCodec(AVCodecContext **Context,
     QString pixfmt  = av_get_pix_fmt_name((*Context)->pix_fmt);
 
     // VDPAU only supports 8bit 420p:(
-    // N.B. It should probably be possible to force YUVJ420P support
     VideoFrameType type = PixelFormatToFrameType((*Context)->pix_fmt);
-    bool vdpau = (type == FMT_YV12) && (AV_PIX_FMT_YUVJ420P != (*Context)->pix_fmt) && MythVDPAUHelper::HaveVDPAU() &&
+    bool vdpau = (type == FMT_YV12) && MythVDPAUHelper::HaveVDPAU() &&
                  (decodeonly ? codec_is_vdpau_dechw(success) : codec_is_vdpau_hw(success));
     if (vdpau && (success == kCodec_MPEG4_VDPAU || success == kCodec_MPEG4_VDPAU_DEC))
         vdpau = MythVDPAUHelper::HaveMPEG4Decode();
@@ -179,6 +178,8 @@ enum AVPixelFormat MythVDPAUContext::GetFormat2(struct AVCodecContext* Context, 
             if (device)
             {
                 NewHardwareFramesContext();
+                if (Context->sw_pix_fmt == AV_PIX_FMT_YUVJ420P)
+                    Context->sw_pix_fmt = AV_PIX_FMT_YUV420P;
                 Context->hw_device_ctx = device;
                 return AV_PIX_FMT_VDPAU;
             }
