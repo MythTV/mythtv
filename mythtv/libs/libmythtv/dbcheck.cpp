@@ -1313,6 +1313,7 @@ nullptr
         const char *updates[] = {
 "DELETE FROM profilegroups WHERE id >= 15;",
 "DELETE FROM recordingprofiles WHERE profilegroup >= 15;",
+// NOLINTNEXTLINE(bugprone-suspicious-missing-comma)
 "INSERT INTO profilegroups SET id = '15', name = 'ASI Recorder (DVEO)',"
 " cardtype = 'ASI', is_default = 1;",
 "INSERT INTO recordingprofiles SET name = \"Default\", profilegroup = 15;",
@@ -1474,6 +1475,7 @@ nullptr
     if (dbver == "1277")
     {
         const char *updates[] = {
+// NOLINTNEXTLINE(bugprone-suspicious-missing-comma)
 "ALTER TABLE record ADD autometadata TINYINT(1) NOT NULL DEFAULT "
 "    0 AFTER autouserjob4;",
 "ALTER TABLE record ADD inetref VARCHAR(40) NOT NULL AFTER programid;",
@@ -1619,6 +1621,7 @@ nullptr
 "UPDATE record SET filter = filter | 2 WHERE record.dupin & 0x40",
 "UPDATE record SET filter = filter | 5 WHERE record.dupin & 0x80",
 "UPDATE record SET dupin = dupin & ~0xe0",
+// NOLINTNEXTLINE(bugprone-suspicious-missing-comma)
 "INSERT INTO recordfilter (filterid, description, clause, newruledefault) "
 "    VALUES (6, 'This Episode', '(program.programid <> '''' AND program.programid = RECTABLE.programid) OR (program.programid = '''' AND program.subtitle = RECTABLE.subtitle AND program.description = RECTABLE.description)', 0);",
 nullptr
@@ -1645,6 +1648,7 @@ nullptr
         const char *updates[] = {
 "DELETE FROM profilegroups WHERE id >= 17;",
 "DELETE FROM recordingprofiles WHERE profilegroup >= 17;",
+// NOLINTNEXTLINE(bugprone-suspicious-missing-comma)
 "INSERT INTO profilegroups SET id = '17', name = 'Ceton Recorder',"
 " cardtype = 'CETON', is_default = 1;",
 "INSERT INTO recordingprofiles SET name = \"Default\", profilegroup = 17;",
@@ -1831,6 +1835,7 @@ nullptr
 "ALTER TABLE recordmatch ADD UNIQUE INDEX (recordid, chanid, starttime)",
 "UPDATE recordfilter SET description='Prime time' WHERE filterid=3",
 "UPDATE recordfilter SET description='This episode' WHERE filterid=6",
+// NOLINTNEXTLINE(bugprone-suspicious-missing-comma)
 "REPLACE INTO recordfilter (filterid, description, clause, newruledefault) "
 "    VALUES (7, 'This series', '(RECTABLE.seriesid <> '''' AND program.seriesid = RECTABLE.seriesid)', 0);",
 nullptr
@@ -2667,6 +2672,7 @@ nullptr
     {
         const char *updates[] = {
         // add inetref to (recorded)program before season/episode
+            // NOLINTNEXTLINE(bugprone-suspicious-missing-comma)
             "ALTER TABLE program "
             " ADD COLUMN inetref varchar(40) DEFAULT '' AFTER videoprop;",
             "ALTER TABLE recordedprogram "

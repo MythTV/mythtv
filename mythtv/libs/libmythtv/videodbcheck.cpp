@@ -373,6 +373,7 @@ bool doUpgradeVideoDatabaseSchema(void)
     if (dbver == "1016")
     {
         const QString updates[] = {
+// NOLINTNEXTLINE(bugprone-suspicious-missing-comma)
 "ALTER TABLE dvdbookmark"
 "  MODIFY serialid varbinary(16) NOT NULL default '',"
 "  MODIFY name varbinary(32) default NULL;",
@@ -417,6 +418,7 @@ bool doUpgradeVideoDatabaseSchema(void)
     if (dbver == "1017")
     {
         const QString updates[] = {
+// NOLINTNEXTLINE(bugprone-suspicious-missing-comma)
 "ALTER TABLE dvdbookmark"
 "  DEFAULT CHARACTER SET default,"
 "  MODIFY serialid varchar(16) CHARACTER SET utf8 NOT NULL default '',"
