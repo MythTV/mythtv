@@ -829,18 +829,24 @@ static uint8_t get_tlm(Jpeg2000DecoderContext *s, int n)
     return 0;
 }
 
-static uint8_t get_plt(Jpeg2000DecoderContext *s, int n)
+static int get_plt(Jpeg2000DecoderContext *s, int n)
 {
     int i;
+    int v;
 
     av_log(s->avctx, AV_LOG_DEBUG,
             "PLT marker at pos 0x%X\n", bytestream2_tell(&s->g) - 4);
 
+    if (n < 4)
+        return AVERROR_INVALIDDATA;
+
     /*Zplt =*/ bytestream2_get_byte(&s->g);
 
     for (i = 0; i < n - 3; i++) {
-        bytestream2_get_byte(&s->g);
+        v = bytestream2_get_byte(&s->g);
     }
+    if (v & 0x80)
+        return AVERROR_INVALIDDATA;
 
     return 0;
 }
@@ -1171,7 +1177,10 @@ static int jpeg2000_decode_packets_po_iteration(Jpeg2000DecoderContext *s, Jpeg2
                 step_x = FFMIN(step_x, rlevel->log2_prec_width  + reducedresno);
                 step_y = FFMIN(step_y, rlevel->log2_prec_height + reducedresno);
             }
-            av_assert0(step_x < 32 && step_y < 32);
+            if (step_x >= 31 || step_y >= 31){
+                avpriv_request_sample(s->avctx, "CPRL with large step");
+                return AVERROR_PATCHWELCOME;
+            }
             step_x = 1<<step_x;
             step_y = 1<<step_y;
 
@@ -1597,7 +1606,7 @@ static int decode_cblk(Jpeg2000DecoderContext *s, Jpeg2000CodingStyle *codsty,
                cblk->data + cblk->length - 2*(term_cnt < cblk->nb_terminations) - t1->mqc.bp);
     }
 
-    return 0;
+    return 1;
 }
 
 /* TODO: Verify dequantization for lossless case
@@ -1694,6 +1703,7 @@ static inline void tile_codeblocks(Jpeg2000DecoderContext *s, Jpeg2000Tile *tile
     for (compno = 0; compno < s->ncomponents; compno++) {
         Jpeg2000Component *comp     = tile->comp + compno;
         Jpeg2000CodingStyle *codsty = tile->codsty + compno;
+        int coded = 0;
 
         t1.stride = (1<<codsty->log2_cblk_width) + 2;
 
@@ -1723,11 +1733,14 @@ static inline void tile_codeblocks(Jpeg2000DecoderContext *s, Jpeg2000Tile *tile
                          cblkno++) {
                         int x, y;
                         Jpeg2000Cblk *cblk = prec->cblk + cblkno;
-                        decode_cblk(s, codsty, &t1, cblk,
+                        int ret = decode_cblk(s, codsty, &t1, cblk,
                                     cblk->coord[0][1] - cblk->coord[0][0],
                                     cblk->coord[1][1] - cblk->coord[1][0],
                                     bandpos);
-
+                        if (ret)
+                            coded = 1;
+                        else
+                            continue;
                         x = cblk->coord[0][0] - band->coord[0][0];
                         y = cblk->coord[1][0] - band->coord[1][0];
 
@@ -1743,7 +1756,9 @@ static inline void tile_codeblocks(Jpeg2000DecoderContext *s, Jpeg2000Tile *tile
         } /* end reslevel */
 
         /* inverse DWT */
-        ff_dwt_decode(&comp->dwt, codsty->transform == FF_DWT97 ? (void*)comp->f_data : (void*)comp->i_data);
+        if (coded)
+            ff_dwt_decode(&comp->dwt, codsty->transform == FF_DWT97 ? (void*)comp->f_data : (void*)comp->i_data);
+
     } /*end comp */
 }
 

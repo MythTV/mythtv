@@ -1292,6 +1292,13 @@ static int dvbsub_parse_region_segment(AVCodecContext *avctx,
         display->y_pos = AV_RB16(buf) & 0xfff;
         buf += 2;
 
+        if (display->x_pos >= region->width ||
+            display->y_pos >= region->height) {
+            av_log(avctx, AV_LOG_ERROR, "Object outside region\n");
+            av_free(display);
+            return AVERROR_INVALIDDATA;
+        }
+
         if ((object->type == 1 || object->type == 2) && buf+1 < buf_end) {
             display->fgcolor = *buf++;
             display->bgcolor = *buf++;
@@ -1596,8 +1603,9 @@ static int dvbsub_parse_display_definition_segment(AVCodecContext *avctx,
     display_def->width   = bytestream_get_be16(&buf) + 1;
     display_def->height  = bytestream_get_be16(&buf) + 1;
     if (!avctx->width || !avctx->height) {
-        avctx->width  = display_def->width;
-        avctx->height = display_def->height;
+        int ret = ff_set_dimensions(avctx, display_def->width, display_def->height);
+        if (ret < 0)
+            return ret;
     }
 
     if (info_byte & 1<<3) { // display_window_flag

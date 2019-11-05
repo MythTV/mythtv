@@ -570,7 +570,7 @@ static void fill_buffer(AVIOContext *s)
     }
 
     /* make buffer smaller in case it ended up large after probing */
-    if (s->read_packet && s->orig_buffer_size && s->buffer_size > s->orig_buffer_size) {
+    if (s->read_packet && s->orig_buffer_size && s->buffer_size > s->orig_buffer_size && len >= s->orig_buffer_size) {
         if (dst == s->buffer && s->buf_ptr != dst) {
             int ret = ffio_set_buf_size(s, s->orig_buffer_size);
             if (ret < 0)
@@ -578,7 +578,6 @@ static void fill_buffer(AVIOContext *s)
 
             s->checksum_ptr = dst = s->buffer;
         }
-        av_assert0(len >= s->orig_buffer_size);
         len = s->orig_buffer_size;
     }
 
@@ -1179,12 +1178,6 @@ int avio_open2(AVIOContext **s, const char *filename, int flags,
                const AVIOInterruptCB *int_cb, AVDictionary **options)
 {
     return ffio_open_whitelist(s, filename, flags, int_cb, options, NULL, NULL);
-}
-
-int ffio_open2_wrapper(struct AVFormatContext *s, AVIOContext **pb, const char *url, int flags,
-                       const AVIOInterruptCB *int_cb, AVDictionary **options)
-{
-    return ffio_open_whitelist(pb, url, flags, int_cb, options, s->protocol_whitelist, s->protocol_blacklist);
 }
 
 int avio_close(AVIOContext *s)

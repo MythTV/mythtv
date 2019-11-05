@@ -429,19 +429,19 @@ static int mxf_get_stream_index(AVFormatContext *s, KLVPacket *klv, int body_sid
     return s->nb_streams == 1 && s->streams[0]->priv_data ? 0 : -1;
 }
 
-static int find_body_sid_by_offset(MXFContext *mxf, int64_t offset)
+static int find_body_sid_by_absolute_offset(MXFContext *mxf, int64_t offset)
 {
     // we look for partition where the offset is placed
     int a, b, m;
-    int64_t this_partition;
+    int64_t pack_ofs;
 
     a = -1;
     b = mxf->partitions_count;
 
     while (b - a > 1) {
-        m         = (a + b) >> 1;
-        this_partition = mxf->partitions[m].this_partition;
-        if (this_partition <= offset)
+        m = (a + b) >> 1;
+        pack_ofs = mxf->partitions[m].pack_ofs;
+        if (pack_ofs <= offset)
             a = m;
         else
             b = m;
@@ -590,7 +590,7 @@ static int mxf_decrypt_triplet(AVFormatContext *s, AVPacket *pkt, KLVPacket *klv
     if (!IS_KLV_KEY(klv, mxf_essence_element_key))
         return AVERROR_INVALIDDATA;
 
-    body_sid = find_body_sid_by_offset(mxf, klv->offset);
+    body_sid = find_body_sid_by_absolute_offset(mxf, klv->offset);
     index = mxf_get_stream_index(s, klv, body_sid);
     if (index < 0)
         return AVERROR_INVALIDDATA;
@@ -654,6 +654,7 @@ static int mxf_read_primer_pack(void *arg, AVIOContext *pb, int tag, int size, U
 static int mxf_read_partition_pack(void *arg, AVIOContext *pb, int tag, int size, UID uid, int64_t klv_offset)
 {
     MXFContext *mxf = arg;
+    AVFormatContext *s = mxf->fc;
     MXFPartition *partition, *tmp_part;
     UID op;
     uint64_t footer_partition;
@@ -717,6 +718,12 @@ static int mxf_read_partition_pack(void *arg, AVIOContext *pb, int tag, int size
         return AVERROR_INVALIDDATA;
     }
     nb_essence_containers = avio_rb32(pb);
+
+    if (partition->type == Header) {
+        char str[36];
+        snprintf(str, sizeof(str), "%08x.%08x.%08x.%08x", AV_RB32(&op[0]), AV_RB32(&op[4]), AV_RB32(&op[8]), AV_RB32(&op[12]));
+        av_dict_set(&s->metadata, "operational_pattern_ul", str, 0);
+    }
 
     if (partition->this_partition &&
         partition->previous_partition == partition->this_partition) {
@@ -1328,6 +1335,7 @@ static const MXFCodecUL mxf_picture_essence_container_uls[] = {
     { { 0x06,0x0e,0x2b,0x34,0x04,0x01,0x01,0x01,0x0d,0x01,0x03,0x01,0x02,0x05,0x00,0x00 }, 14,   AV_CODEC_ID_RAWVIDEO, NULL, 15, RawVWrap }, /* uncompressed picture */
     { { 0x06,0x0e,0x2b,0x34,0x04,0x01,0x01,0x0a,0x0e,0x0f,0x03,0x01,0x02,0x20,0x01,0x01 }, 15,     AV_CODEC_ID_HQ_HQA },
     { { 0x06,0x0e,0x2b,0x34,0x04,0x01,0x01,0x0a,0x0e,0x0f,0x03,0x01,0x02,0x20,0x02,0x01 }, 15,        AV_CODEC_ID_HQX },
+    { { 0x06,0x0e,0x2b,0x34,0x04,0x01,0x01,0x0a,0x0e,0x15,0x00,0x04,0x02,0x10,0x00,0x01 }, 16,       AV_CODEC_ID_HEVC, NULL, 15 }, /* Canon XF-HEVC */
     { { 0x06,0x0e,0x2b,0x34,0x01,0x01,0x01,0xff,0x4b,0x46,0x41,0x41,0x00,0x0d,0x4d,0x4f }, 14,   AV_CODEC_ID_RAWVIDEO }, /* Legacy ?? Uncompressed Picture */
     { { 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00 },  0,      AV_CODEC_ID_NONE },
 };
@@ -1537,10 +1545,7 @@ static int mxf_absolute_bodysid_offset(MXFContext *mxf, int body_sid, int64_t of
  */
 static int64_t mxf_essence_container_end(MXFContext *mxf, int body_sid)
 {
-    int x;
-    int64_t ret = 0;
-
-    for (x = 0; x < mxf->partitions_count; x++) {
+    for (int x = mxf->partitions_count - 1; x >= 0; x--) {
         MXFPartition *p = &mxf->partitions[x];
 
         if (p->body_sid != body_sid)
@@ -1549,10 +1554,10 @@ static int64_t mxf_essence_container_end(MXFContext *mxf, int body_sid)
         if (!p->essence_length)
             return 0;
 
-        ret = p->essence_offset + p->essence_length;
+        return p->essence_offset + p->essence_length;
     }
 
-    return ret;
+    return 0;
 }
 
 /* EditUnit -> absolute offset */
@@ -2070,15 +2075,15 @@ static int mxf_parse_physical_source_package(MXFContext *mxf, MXFTrack *source_t
                 continue;
             }
 
-        if (physical_track->edit_rate.num <= 0 ||
-            physical_track->edit_rate.den <= 0) {
-            av_log(mxf->fc, AV_LOG_WARNING,
-                   "Invalid edit rate (%d/%d) found on structural"
-                   " component #%d, defaulting to 25/1\n",
-                   physical_track->edit_rate.num,
-                   physical_track->edit_rate.den, i);
-            physical_track->edit_rate = (AVRational){25, 1};
-        }
+            if (physical_track->edit_rate.num <= 0 ||
+                physical_track->edit_rate.den <= 0) {
+                av_log(mxf->fc, AV_LOG_WARNING,
+                       "Invalid edit rate (%d/%d) found on structural"
+                       " component #%d, defaulting to 25/1\n",
+                       physical_track->edit_rate.num,
+                       physical_track->edit_rate.den, i);
+                physical_track->edit_rate = (AVRational){25, 1};
+            }
 
             for (k = 0; k < physical_track->sequence->structural_components_count; k++) {
                 if (!(mxf_tc = mxf_resolve_timecode_component(mxf, &physical_track->sequence->structural_components_refs[k])))
@@ -2432,6 +2437,18 @@ static int mxf_parse_structural_metadata(MXFContext *mxf)
                 default:
                     av_log(mxf->fc, AV_LOG_INFO, "Unknown frame layout type: %d\n", descriptor->frame_layout);
             }
+
+            if (st->codecpar->codec_id == AV_CODEC_ID_PRORES) {
+                switch (descriptor->essence_codec_ul[14]) {
+                case 1: st->codecpar->codec_tag = MKTAG('a','p','c','o'); break;
+                case 2: st->codecpar->codec_tag = MKTAG('a','p','c','s'); break;
+                case 3: st->codecpar->codec_tag = MKTAG('a','p','c','n'); break;
+                case 4: st->codecpar->codec_tag = MKTAG('a','p','c','h'); break;
+                case 5: st->codecpar->codec_tag = MKTAG('a','p','4','h'); break;
+                case 6: st->codecpar->codec_tag = MKTAG('a','p','4','x'); break;
+                }
+            }
+
             if (st->codecpar->codec_id == AV_CODEC_ID_RAWVIDEO) {
                 st->codecpar->format = descriptor->pix_fmt;
                 if (st->codecpar->format == AV_PIX_FMT_NONE) {
@@ -2536,6 +2553,24 @@ static int mxf_parse_structural_metadata(MXFContext *mxf)
         }
     }
 
+    for (int i = 0; i < mxf->fc->nb_streams; i++) {
+        MXFTrack *track1 = mxf->fc->streams[i]->priv_data;
+        if (track1 && track1->body_sid) {
+            for (int j = i + 1; j < mxf->fc->nb_streams; j++) {
+                MXFTrack *track2 = mxf->fc->streams[j]->priv_data;
+                if (track2 && track1->body_sid == track2->body_sid && track1->wrapping != track2->wrapping) {
+                    if (track1->wrapping == UnknownWrapped)
+                        track1->wrapping = track2->wrapping;
+                    else if (track2->wrapping == UnknownWrapped)
+                        track2->wrapping = track1->wrapping;
+                    else
+                        av_log(mxf->fc, AV_LOG_ERROR, "stream %d and stream %d have the same BodySID (%d) "
+                                                      "with different wrapping\n", i, j, track1->body_sid);
+                }
+            }
+        }
+    }
+
     ret = 0;
 fail_and_free:
     return ret;
@@ -2544,23 +2579,24 @@ fail_and_free:
 static int64_t mxf_timestamp_to_int64(uint64_t timestamp)
 {
     struct tm time = { 0 };
+    int msecs;
     time.tm_year = (timestamp >> 48) - 1900;
     time.tm_mon  = (timestamp >> 40 & 0xFF) - 1;
     time.tm_mday = (timestamp >> 32 & 0xFF);
     time.tm_hour = (timestamp >> 24 & 0xFF);
     time.tm_min  = (timestamp >> 16 & 0xFF);
     time.tm_sec  = (timestamp >> 8  & 0xFF);
+    msecs        = (timestamp & 0xFF) * 4;
 
-    /* msvcrt versions of strftime calls the invalid parameter handler
-     * (aborting the process if one isn't set) if the parameters are out
-     * of range. */
+    /* Clip values for legacy reasons. Maybe we should return error instead? */
     time.tm_mon  = av_clip(time.tm_mon,  0, 11);
     time.tm_mday = av_clip(time.tm_mday, 1, 31);
     time.tm_hour = av_clip(time.tm_hour, 0, 23);
     time.tm_min  = av_clip(time.tm_min,  0, 59);
     time.tm_sec  = av_clip(time.tm_sec,  0, 59);
+    msecs        = av_clip(msecs, 0, 999);
 
-    return (int64_t)av_timegm(&time) * 1000000;
+    return (int64_t)av_timegm(&time) * 1000000 + msecs * 1000;
 }
 
 #define SET_STR_METADATA(pb, name, str) do { \
@@ -2578,7 +2614,7 @@ static int64_t mxf_timestamp_to_int64(uint64_t timestamp)
 
 #define SET_TS_METADATA(pb, name, var, str) do { \
     var = avio_rb64(pb); \
-    if ((ret = avpriv_dict_set_timestamp(&s->metadata, name, mxf_timestamp_to_int64(var)) < 0)) \
+    if (var && (ret = avpriv_dict_set_timestamp(&s->metadata, name, mxf_timestamp_to_int64(var))) < 0) \
         return ret; \
 } while (0)
 
@@ -3102,9 +3138,12 @@ static void mxf_read_random_index_pack(AVFormatContext *s)
         goto end;
     avio_seek(s->pb, file_size - length, SEEK_SET);
     if (klv_read_packet(&klv, s->pb) < 0 ||
-        !IS_KLV_KEY(klv.key, mxf_random_index_pack_key) ||
-        klv.length != length - 20)
+        !IS_KLV_KEY(klv.key, mxf_random_index_pack_key))
         goto end;
+    if (klv.next_klv != file_size || klv.length <= 4 || (klv.length - 4) % 12) {
+        av_log(s, AV_LOG_WARNING, "Invalid RIP KLV length\n");
+        goto end;
+    }
 
     avio_skip(s->pb, klv.length - 12);
     mxf->footer_partition = avio_rb64(s->pb);
@@ -3435,7 +3474,7 @@ static int mxf_read_packet(AVFormatContext *s, AVPacket *pkt)
         if (IS_KLV_KEY(klv.key, mxf_essence_element_key) ||
             IS_KLV_KEY(klv.key, mxf_canopus_essence_element_key) ||
             IS_KLV_KEY(klv.key, mxf_avid_essence_element_key)) {
-            int body_sid = find_body_sid_by_offset(mxf, klv.offset);
+            int body_sid = find_body_sid_by_absolute_offset(mxf, klv.offset);
             int index = mxf_get_stream_index(s, &klv, body_sid);
             int64_t next_ofs;
             AVStream *st;
@@ -3469,8 +3508,8 @@ static int mxf_read_packet(AVFormatContext *s, AVPacket *pkt)
                 } else {
                     if ((size = next_ofs - pos) <= 0) {
                         av_log(s, AV_LOG_ERROR, "bad size: %"PRId64"\n", size);
-                        ret = AVERROR_INVALIDDATA;
-                        goto skip;
+                        mxf->current_klv_data = (KLVPacket){{0}};
+                        return AVERROR_INVALIDDATA;
                     }
                     // We must not overread, because the next edit unit might be in another KLV
                     if (size > max_data_size)
@@ -3560,7 +3599,7 @@ static int mxf_read_close(AVFormatContext *s)
     return 0;
 }
 
-static int mxf_probe(AVProbeData *p) {
+static int mxf_probe(const AVProbeData *p) {
     const uint8_t *bufp = p->buf;
     const uint8_t *end = p->buf + p->buf_size;
 

@@ -410,7 +410,8 @@ static void yuv2nv12cX_c(SwsContext *c, const int16_t *chrFilter, int chrFilterS
     const uint8_t *chrDither = c->chrDither8;
     int i;
 
-    if (dstFormat == AV_PIX_FMT_NV12)
+    if (dstFormat == AV_PIX_FMT_NV12 ||
+        dstFormat == AV_PIX_FMT_NV24)
         for (i=0; i<chrDstW; i++) {
             int u = chrDither[i & 7] << 12;
             int v = chrDither[(i + 3) & 7] << 12;
@@ -853,11 +854,6 @@ yuv2422_1_c_template(SwsContext *c, const int16_t *buf0,
                 V  = av_clip_uint8(V);
             }
 
-            Y1 = av_clip_uint8(Y1);
-            Y2 = av_clip_uint8(Y2);
-            U  = av_clip_uint8(U);
-            V  = av_clip_uint8(V);
-
             output_pixels(i * 4, Y1, U, Y2, V);
         }
     } else {
@@ -874,11 +870,6 @@ yuv2422_1_c_template(SwsContext *c, const int16_t *buf0,
                 U  = av_clip_uint8(U);
                 V  = av_clip_uint8(V);
             }
-
-            Y1 = av_clip_uint8(Y1);
-            Y2 = av_clip_uint8(Y2);
-            U  = av_clip_uint8(U);
-            V  = av_clip_uint8(V);
 
             output_pixels(i * 4, Y1, U, Y2, V);
         }
@@ -2506,7 +2497,8 @@ av_cold void ff_sws_init_output_funcs(SwsContext *c,
     } else {
         *yuv2plane1 = yuv2plane1_8_c;
         *yuv2planeX = yuv2planeX_8_c;
-        if (dstFormat == AV_PIX_FMT_NV12 || dstFormat == AV_PIX_FMT_NV21)
+        if (dstFormat == AV_PIX_FMT_NV12 || dstFormat == AV_PIX_FMT_NV21 ||
+            dstFormat == AV_PIX_FMT_NV24 || dstFormat == AV_PIX_FMT_NV42)
             *yuv2nv12cX = yuv2nv12cX_c;
     }
 

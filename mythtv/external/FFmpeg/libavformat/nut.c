@@ -43,6 +43,7 @@ const AVCodecTag ff_nut_video_tags[] = {
     { AV_CODEC_ID_XFACE,            MKTAG('X', 'F', 'A', 'C') },
     { AV_CODEC_ID_VP9,              MKTAG('V', 'P', '9', '0') },
     { AV_CODEC_ID_HEVC,             MKTAG('H', 'E', 'V', 'C') },
+    { AV_CODEC_ID_CPIA,             MKTAG('C', 'P', 'i', 'A') },
     { AV_CODEC_ID_RAWVIDEO,         MKTAG('R', 'G', 'B', 15 ) },
     { AV_CODEC_ID_RAWVIDEO,         MKTAG('B', 'G', 'R', 15 ) },
     { AV_CODEC_ID_RAWVIDEO,         MKTAG('R', 'G', 'B', 16 ) },
@@ -142,6 +143,11 @@ const AVCodecTag ff_nut_video_tags[] = {
     { AV_CODEC_ID_RAWVIDEO,         MKTAG(10,   10, '4', 'Y') },
     { AV_CODEC_ID_RAWVIDEO,         MKTAG('Y', '4',   0,  10) },
     { AV_CODEC_ID_RAWVIDEO,         MKTAG(10,    0, '4', 'Y') },
+
+    { AV_CODEC_ID_RAWVIDEO,         MKTAG('Y', '4',   0,  12) },
+    { AV_CODEC_ID_RAWVIDEO,         MKTAG(12,    0, '4', 'Y') },
+    { AV_CODEC_ID_RAWVIDEO,         MKTAG('Y', '4',  10,  12) },
+    { AV_CODEC_ID_RAWVIDEO,         MKTAG(12,   10, '4', 'Y') },
 
     { AV_CODEC_ID_RAWVIDEO,         MKTAG('Y', '1',   0,  12) },
     { AV_CODEC_ID_RAWVIDEO,         MKTAG(12,    0, '1', 'Y') },
