@@ -70,6 +70,11 @@ static inline int format_is_hw(VideoFrameType Type)
            (Type == FMT_NVDEC);
 }
 
+static inline int format_is_hwframes(VideoFrameType Type)
+{
+    return (Type == FMT_VDPAU) || (Type == FMT_VAAPI);
+}
+
 static inline int format_is_420(VideoFrameType Type)
 {
     return (Type == FMT_YV12) || (Type == FMT_YUV420P9) || (Type == FMT_YUV420P10) ||

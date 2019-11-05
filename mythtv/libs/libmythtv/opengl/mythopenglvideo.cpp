@@ -582,6 +582,14 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
     // ProcessFrame is always called first, which will create/destroy software
     // textures as needed
     bool hwframes = false;
+    bool useframebufferimage = false;
+
+    // We lose the pause frame when seeking and using VDPAU or VAAPI direct rendering.
+    // As a workaround, we always use the resize stage so the last displayed frame
+    // should be retained in the Framebuffer used for resizing. If there is
+    // nothing to display, then fallback to this framebuffer.
+    bool resize = Frame ? format_is_hwframes(Frame->codec) : format_is_hwframes(m_inputType);
+
     vector<MythVideoTexture*> inputtextures = m_inputTextures;
     if (inputtextures.empty())
     {
@@ -617,11 +625,19 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
         }
         else
         {
-            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Nothing to display");
-            // if this is live tv startup and the window rect has changed we
-            // must set the viewport
-            m_render->SetViewPort(QRect(QPoint(), m_masterViewportSize));
-            return;
+            if (resize && m_frameBuffer && m_frameBufferTexture)
+            {
+                LOG(VB_PLAYBACK, LOG_INFO, "Using existing framebuffer");
+                useframebufferimage = true;
+            }
+            else
+            {
+                LOG(VB_PLAYBACK, LOG_INFO, LOC + "Nothing to display");
+                // if this is live tv startup and the window rect has changed we
+                // must set the viewport
+                m_render->SetViewPort(QRect(QPoint(), m_masterViewportSize));
+                return;
+            }
         }
     }
 
@@ -650,8 +666,7 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
     }
 
     // Decide whether to use render to texture - for performance or quality
-    bool resize = false;
-    if (format_is_yuv(m_outputType))
+    if (format_is_yuv(m_outputType) && !resize)
     {
         // ensure deinterlacing works correctly when down scaling in height
         resize = (m_videoDispDim.height() > m_displayVideoRect.height()) && deinterlacing;
@@ -710,56 +725,60 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
 
     if (resize)
     {
-        // render to texture stage
-        if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
-            m_render->logDebugMarker(LOC + "RENDER_TO_TEXTURE");
-
-        // we need a framebuffer
-        if (!m_frameBuffer)
+        // only render to the framebuffer if there is something to update
+        if (!useframebufferimage)
         {
-            // Use a 16bit float framebuffer if necessary and available (not GLES2) to maintain precision.
-            // The depth check will pick up all software formats as well as NVDEC, VideoToolBox and VAAPI DRM.
-            // VAAPI GLXPixmap and GLXCopy are currently not 10/12bit aware and VDPAU has no 10bit support -
-            // and all return RGB formats anyway. The MediaCoded texture format is an unknown but resizing will
-            // never be enabled as it returns an RGB frame - so if MediaCodec uses a 16bit texture, precision
-            // will be preserved.
-            bool sixteenbitfb = !(m_render->isOpenGLES() && m_render->format().majorVersion() < 3);
-            bool sixteenbitvid = ColorDepth(m_outputType) > 8;
-            GLenum format = (sixteenbitfb && sixteenbitvid) ? QOpenGLTexture::RGBA16F : 0;
-            if (format)
-                LOG(VB_PLAYBACK, LOG_INFO, LOC + "Using 16bit framebuffer texture");
-            m_frameBuffer = m_render->CreateFramebuffer(m_videoDispDim, format);
+            // render to texture stage
+            if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
+                m_render->logDebugMarker(LOC + "RENDER_TO_TEXTURE");
+
+            // we need a framebuffer
             if (!m_frameBuffer)
-                return;
-        }
+            {
+                // Use a 16bit float framebuffer if necessary and available (not GLES2) to maintain precision.
+                // The depth check will pick up all software formats as well as NVDEC, VideoToolBox and VAAPI DRM.
+                // VAAPI GLXPixmap and GLXCopy are currently not 10/12bit aware and VDPAU has no 10bit support -
+                // and all return RGB formats anyway. The MediaCoded texture format is an unknown but resizing will
+                // never be enabled as it returns an RGB frame - so if MediaCodec uses a 16bit texture, precision
+                // will be preserved.
+                bool sixteenbitfb = !(m_render->isOpenGLES() && m_render->format().majorVersion() < 3);
+                bool sixteenbitvid = ColorDepth(m_outputType) > 8;
+                GLenum format = (sixteenbitfb && sixteenbitvid) ? QOpenGLTexture::RGBA16F : 0;
+                if (format)
+                    LOG(VB_PLAYBACK, LOG_INFO, LOC + "Using 16bit framebuffer texture");
+                m_frameBuffer = m_render->CreateFramebuffer(m_videoDispDim, format);
+                if (!m_frameBuffer)
+                    return;
+            }
 
-        // and its associated texture
-        if (!m_frameBufferTexture)
-        {
-            m_frameBufferTexture = reinterpret_cast<MythVideoTexture*>(m_render->CreateFramebufferTexture(m_frameBuffer));
+            // and its associated texture
             if (!m_frameBufferTexture)
-                return;
-            m_render->SetTextureFilters(m_frameBufferTexture, QOpenGLTexture::Linear);
+            {
+                m_frameBufferTexture = reinterpret_cast<MythVideoTexture*>(m_render->CreateFramebufferTexture(m_frameBuffer));
+                if (!m_frameBufferTexture)
+                    return;
+                m_render->SetTextureFilters(m_frameBufferTexture, QOpenGLTexture::Linear);
+            }
+
+            // coordinates
+            QRect vrect(QPoint(0, 0), m_videoDispDim);
+            QRect trect = vrect;
+            if (FMT_YUY2 == m_outputType)
+                trect.setWidth(m_videoDispDim.width() >> 1);
+
+            // framebuffer
+            m_render->BindFramebuffer(m_frameBuffer);
+            m_render->SetViewPort(vrect);
+
+            // bind correct textures
+            MythGLTexture* textures[MAX_VIDEO_TEXTURES];
+            uint numtextures = 0;
+            LoadTextures(deinterlacing, inputtextures, &textures[0], numtextures);
+
+            // render
+            m_render->DrawBitmap(textures, numtextures, m_frameBuffer,
+                                 trect, vrect, m_shaders[program], 0);
         }
-
-        // coordinates
-        QRect vrect(QPoint(0, 0), m_videoDispDim);
-        QRect trect = vrect;
-        if (FMT_YUY2 == m_outputType)
-            trect.setWidth(m_videoDispDim.width() >> 1);
-
-        // framebuffer
-        m_render->BindFramebuffer(m_frameBuffer);
-        m_render->SetViewPort(vrect);
-
-        // bind correct textures
-        MythGLTexture* textures[MAX_VIDEO_TEXTURES];
-        uint numtextures = 0;
-        LoadTextures(deinterlacing, inputtextures, &textures[0], numtextures);
-
-        // render
-        m_render->DrawBitmap(textures, numtextures, m_frameBuffer,
-                             trect, vrect, m_shaders[program], 0);
 
         // reset for next stage
         inputtextures.clear();
