@@ -71,6 +71,12 @@ VideoSourceSelector::VideoSourceSelector(uint           _initial_sourceid,
     m_mustHaveMplexId(_must_have_mplexid)
 {
     setLabel(tr("Video Source"));
+    setHelpText(
+        QObject::tr(
+            "Select a video source that is connected to one "
+            "or more capture cards. Default is the video source "
+            "selected in the Channel Editor page."
+            ));
 }
 
 void VideoSourceSelector::Load(void)
@@ -120,7 +126,6 @@ void VideoSourceSelector::Load(void)
     {
         if (cnt)
             setValue(sel);
-        setEnabled(false);
     }
 
     TransMythUIComboBoxSetting::Load();
@@ -364,6 +369,40 @@ class DVBNetID : public MythUISpinBoxSetting
     };
 };
 
+class BouquetID : public MythUISpinBoxSetting
+{
+  public:
+    BouquetID(const VideoSource &parent, signed int value, signed int min_val) :
+        MythUISpinBoxSetting(new VideoSourceDBStorage(this, parent, "bouquet_id"),
+                             min_val, 0xffff, 1)
+    {
+       setLabel(QObject::tr("Bouquet ID"));
+       setHelpText(QObject::tr("Bouquet ID for Freesat or BSkyB on satellite Astra-2 28.2E. "
+                               "Leave this at 0 if you do not receive this satellite. "
+                               "This is needed to get the Freesat and Sky channel numbers. "
+                               "Value 272 selects Freesat bouquet 'England HD'. "
+                               "See the MythTV Wiki https://www.mythtv.org/wiki/DVB_UK."));
+       setValue(value);
+    };
+};
+
+class RegionID : public MythUISpinBoxSetting
+{
+  public:
+    RegionID(const VideoSource &parent, signed int value, signed int min_val) :
+        MythUISpinBoxSetting(new VideoSourceDBStorage(this, parent, "region_id"),
+                             min_val, 100, 1)
+    {
+       setLabel(QObject::tr("Region ID"));
+       setHelpText(QObject::tr("Region ID for Freesat or BSkyB on satellite Astra-2 28.2E. "
+                               "Leave this at 0 you do not receive this satellite.  "
+                               "This is needed to get the Freesat and Sky channel numbers. "
+                               "Value 1 selects region London. "
+                               "See the MythTV Wiki https://www.mythtv.org/wiki/DVB_UK."));
+       setValue(value);
+    };
+};
+
 FreqTableSelector::FreqTableSelector(const VideoSource &parent) :
     MythUIComboBoxSetting(new VideoSourceDBStorage(this, parent, "freqtable"))
 {
@@ -578,6 +617,11 @@ VideoSource::VideoSource()
     addChild(new XMLTVGrabber(*this));
     addChild(new FreqTableSelector(*this));
     addChild(new DVBNetID(*this, -1, -1));
+    if (gCoreContext->GetNumSetting("DBSchemaVer") > 1350)
+    {
+        addChild(new BouquetID(*this, 0, 0));
+        addChild(new RegionID(*this, 0, 0));
+    }
 }
 
 bool VideoSource::canDelete(void)
@@ -1052,7 +1096,10 @@ class DVBCardName : public GroupSetting
     DVBCardName()
     {
         setLabel(QObject::tr("Frontend ID"));
-        setEnabled(false);
+        setHelpText(
+            QObject::tr("Identification string reported by the card. "
+                        "If the message \"Could not get card info...\" appears "
+                        "the card can be in use by another program."));
     };
 };
 

@@ -134,6 +134,10 @@ static QString format_dvbc(const DTVMultiplex &tuning, const QString &mod)
 {
     const QChar b = tuning.m_bandwidth.toChar();
 
+    // need bandwidth to set modulation and symbol rate
+    if ((QChar('a') == b) && (mod != "auto") && (tuning.m_symbolrate > 0))
+        return QString("a8%1-%2")
+            .arg(mod).arg(tuning.m_symbolrate/1000);
     if ((QChar('a') == b) || (mod == "auto"))
         return "auto"; // uses bandwidth from channel map
     if ((QChar('a') != b) && (tuning.m_symbolrate > 0))

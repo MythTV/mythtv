@@ -60,6 +60,7 @@ class SERVICE_PUBLIC ChannelInfo : public QObject
     Q_PROPERTY( QString   DefaultAuth     READ DefaultAuth    WRITE setDefaultAuth    DESIGNABLE SerializeDetails )
     Q_PROPERTY( QString   ChannelGroups   READ ChannelGroups  WRITE setChannelGroups  DESIGNABLE SerializeDetails )
     Q_PROPERTY( QString   Inputs          READ Inputs         WRITE setInputs         DESIGNABLE SerializeDetails )
+    Q_PROPERTY( uint      ServiceType     READ ServiceType    WRITE setServiceType    DESIGNABLE SerializeDetails )
 
     Q_PROPERTY( QVariantList Programs    READ Programs DESIGNABLE true )
 
@@ -85,6 +86,7 @@ class SERVICE_PUBLIC ChannelInfo : public QObject
     PROPERTYIMP       ( QString     , DefaultAuth    )
     PROPERTYIMP       ( QString     , ChannelGroups  )
     PROPERTYIMP       ( QString     , Inputs         )
+    PROPERTYIMP       ( uint        , ServiceType    )
 
     PROPERTYIMP_RO_REF( QVariantList, Programs       )
 

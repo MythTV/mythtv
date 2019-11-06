@@ -120,6 +120,33 @@ static inline unsigned int qsv_fifo_size(const AVFifoBuffer* fifo)
     return av_fifo_size(fifo) / qsv_fifo_item_size();
 }
 
+static int check_dec_param(AVCodecContext *avctx, QSVContext *q, mfxVideoParam *param_in)
+{
+    mfxVideoParam param_out = { .mfx.CodecId = param_in->mfx.CodecId };
+    mfxStatus ret;
+
+#define CHECK_MATCH(x) \
+    do { \
+      if (param_out.mfx.x != param_in->mfx.x) {   \
+          av_log(avctx, AV_LOG_WARNING, "Required "#x" %d is unsupported\n", \
+          param_in->mfx.x); \
+      } \
+    } while (0)
+
+    ret = MFXVideoDECODE_Query(q->session, param_in, &param_out);
+
+    if (ret < 0) {
+        CHECK_MATCH(CodecId);
+        CHECK_MATCH(CodecProfile);
+        CHECK_MATCH(CodecLevel);
+        CHECK_MATCH(FrameInfo.Width);
+        CHECK_MATCH(FrameInfo.Height);
+#undef CHECK_MATCH
+        return 0;
+    }
+    return 1;
+}
+
 static int qsv_decode_init(AVCodecContext *avctx, QSVContext *q)
 {
     const AVPixFmtDescriptor *desc;
@@ -176,7 +203,7 @@ static int qsv_decode_init(AVCodecContext *avctx, QSVContext *q)
 
     param.mfx.CodecId      = ret;
     param.mfx.CodecProfile = ff_qsv_profile_to_mfx(avctx->codec_id, avctx->profile);
-    param.mfx.CodecLevel   = avctx->level == FF_LEVEL_UNKNOWN ? MFX_LEVEL_UNKNOWN : avctx->level;
+    param.mfx.CodecLevel   = ff_qsv_level_to_mfx(avctx->codec_id, avctx->level);
 
     param.mfx.FrameInfo.BitDepthLuma   = desc->comp[0].depth;
     param.mfx.FrameInfo.BitDepthChroma = desc->comp[0].depth;
@@ -205,6 +232,12 @@ static int qsv_decode_init(AVCodecContext *avctx, QSVContext *q)
     param.AsyncDepth  = q->async_depth;
     param.ExtParam    = q->ext_buffers;
     param.NumExtParam = q->nb_ext_buffers;
+
+    if (!check_dec_param(avctx, q, &param)) {
+        //Just give a warning instead of an error since it is still decodable possibly.
+        av_log(avctx, AV_LOG_WARNING,
+               "Current input bitstream is not supported by QSV decoder.\n");
+    }
 
     ret = MFXVideoDECODE_Init(q->session, &param);
     if (ret < 0)
@@ -372,6 +405,8 @@ static int qsv_decode(AVCodecContext *avctx, QSVContext *q,
         ++q->zero_consume_run;
         if (q->zero_consume_run > 1)
             ff_qsv_print_warning(avctx, ret, "A decode call did not consume any data");
+    } else if (!*sync && bs.DataOffset) {
+        ++q->buffered_count;
     } else {
         q->zero_consume_run = 0;
     }
@@ -499,6 +534,8 @@ int ff_qsv_process_data(AVCodecContext *avctx, QSVContext *q,
         if (!q->avctx_internal)
             return AVERROR(ENOMEM);
 
+        q->avctx_internal->codec_id = avctx->codec_id;
+
         q->parser = av_parser_init(avctx->codec_id);
         if (!q->parser)
             return AVERROR(ENOMEM);
@@ -526,6 +563,16 @@ int ff_qsv_process_data(AVCodecContext *avctx, QSVContext *q,
                                            AV_PIX_FMT_NONE,
                                            AV_PIX_FMT_NONE };
         enum AVPixelFormat qsv_format;
+        AVPacket zero_pkt = {0};
+
+        if (q->buffered_count) {
+            q->reinit_flag = 1;
+            /* decode zero-size pkt to flush the buffered pkt before reinit */
+            q->buffered_count--;
+            return qsv_decode(avctx, q, frame, got_frame, &zero_pkt);
+        }
+
+        q->reinit_flag = 0;
 
         qsv_format = ff_qsv_map_pixfmt(q->parser->format, &q->fourcc);
         if (qsv_format < 0) {

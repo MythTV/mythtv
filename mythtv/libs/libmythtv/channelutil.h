@@ -117,7 +117,8 @@ class MTV_PUBLIC ChannelUtil
                                  QString icon    = QString(),
                                  QString format  = "Default",
                                  QString xmltvid = QString(),
-                                 QString default_authority = QString());
+                                 QString default_authority = QString(),
+                                 uint service_type = 0);
 
     static bool    UpdateChannel(uint db_mplexid,
                                  uint source_id,
@@ -135,7 +136,8 @@ class MTV_PUBLIC ChannelUtil
                                  const QString& icon    = QString(),
                                  QString format  = QString(),
                                  const QString& xmltvid = QString(),
-                                 const QString& default_authority = QString());
+                                 const QString& default_authority = QString(),
+                                 uint service_type = 0);
 
     static bool    CreateIPTVTuningData(
         uint channel_id, const IPTVTuningData &tuning)
@@ -226,7 +228,8 @@ class MTV_PUBLIC ChannelUtil
                                         uint channelGroupID = 0,
                                         bool liveTVOnly = false,
                                         const QString& callsign = "",
-                                        const QString& channum = "");
+                                        const QString& channum = "",
+                                        bool ignoreUntunable = true);
 
     /**
      * \deprecated Use LoadChannels instead

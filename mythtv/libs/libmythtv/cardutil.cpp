@@ -2763,6 +2763,34 @@ bool CardUtil::HDHRdoesDVB(const QString &device)
 }
 
 /**
+ * If the device is valid, check if the model does DVB-C.
+ */
+
+bool CardUtil::HDHRdoesDVBC(const QString &device)
+{
+    (void) device;
+
+#ifdef USING_HDHOMERUN
+    hdhomerun_device_t  *hdhr;
+    hdhr = hdhomerun_device_create_from_str(device.toLatin1(), nullptr);
+    if (!hdhr)
+        return false;
+
+    const char *model = hdhomerun_device_get_model_str(hdhr);
+    if (model && strstr(model, "dvbc"))
+    {
+        hdhomerun_device_destroy(hdhr);
+        return true;
+    }
+
+    hdhomerun_device_destroy(hdhr);
+
+#endif
+
+    return false;
+}
+
+/**
  * Get a nicely formatted string describing the device
  */
 

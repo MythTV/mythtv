@@ -24,9 +24,6 @@
 #include "libavutil/float_dsp.h"
 #include "libavutil/opt.h"
 
-#define FF_INTERNAL_FIELDS 1
-#include "framequeue.h"
-
 #include "audio.h"
 #include "avfilter.h"
 #include "formats.h"
@@ -37,7 +34,6 @@ typedef struct AudioMultiplyContext {
     const AVClass *class;
 
     AVFrame *frames[2];
-    int64_t pts;
     int planes;
     int channels;
     int samples_align;
@@ -85,8 +81,8 @@ static int activate(AVFilterContext *ctx)
 
     FF_FILTER_FORWARD_STATUS_BACK_ALL(ctx->outputs[0], ctx);
 
-    nb_samples = FFMIN(ff_framequeue_queued_samples(&ctx->inputs[0]->fifo),
-                       ff_framequeue_queued_samples(&ctx->inputs[1]->fifo));
+    nb_samples = FFMIN(ff_inlink_queued_samples(ctx->inputs[0]),
+                       ff_inlink_queued_samples(ctx->inputs[1]));
     for (i = 0; i < ctx->nb_inputs && nb_samples > 0; i++) {
         if (s->frames[i])
             continue;
@@ -98,21 +94,20 @@ static int activate(AVFilterContext *ctx)
         }
     }
 
-    if (nb_samples > 0 && s->frames[0] && s->frames[1]) {
+    if (s->frames[0] && s->frames[1]) {
         AVFrame *out;
         int plane_samples;
 
         if (av_sample_fmt_is_planar(ctx->inputs[0]->format))
-            plane_samples = FFALIGN(nb_samples, s->samples_align);
+            plane_samples = FFALIGN(s->frames[0]->nb_samples, s->samples_align);
         else
-            plane_samples = FFALIGN(nb_samples * s->channels, s->samples_align);
+            plane_samples = FFALIGN(s->frames[0]->nb_samples * s->channels, s->samples_align);
 
-        out = ff_get_audio_buffer(ctx->outputs[0], nb_samples);
+        out = ff_get_audio_buffer(ctx->outputs[0], s->frames[0]->nb_samples);
         if (!out)
             return AVERROR(ENOMEM);
 
-        out->pts = s->pts;
-        s->pts += nb_samples;
+        out->pts = s->frames[0]->pts;
 
         if (av_get_packed_sample_fmt(ctx->inputs[0]->format) == AV_SAMPLE_FMT_FLT) {
             for (i = 0; i < s->planes; i++) {
@@ -150,7 +145,7 @@ static int activate(AVFilterContext *ctx)
 
     if (ff_outlink_frame_wanted(ctx->outputs[0])) {
         for (i = 0; i < 2; i++) {
-            if (ff_framequeue_queued_samples(&ctx->inputs[i]->fifo) > 0)
+            if (ff_inlink_queued_samples(ctx->inputs[i]) > 0)
                 continue;
             ff_inlink_request_frame(ctx->inputs[i]);
             return 0;

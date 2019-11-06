@@ -23,11 +23,9 @@
 #include "libavutil/opt.h"
 #include "libavutil/pixdesc.h"
 
-#define FF_INTERNAL_FIELDS 1
-#include "libavfilter/framequeue.h"
-
 #include "avfilter.h"
 #include "drawutils.h"
+#include "filters.h"
 #include "internal.h"
 
 #define PLANE_R 0x01
@@ -101,6 +99,8 @@ AVFILTER_DEFINE_CLASS(extractplanes);
         AV_PIX_FMT_YUV422P12##suf,                             \
         AV_PIX_FMT_YUV444P12##suf,                             \
         AV_PIX_FMT_YUV440P12##suf,                             \
+        AV_PIX_FMT_YUVA422P12##suf,                            \
+        AV_PIX_FMT_YUVA444P12##suf,                            \
         AV_PIX_FMT_GBRP10##suf, AV_PIX_FMT_GBRAP10##suf,       \
         AV_PIX_FMT_GBRP12##suf, AV_PIX_FMT_GBRAP12##suf,       \
         AV_PIX_FMT_YUV420P9##suf,                              \
@@ -282,7 +282,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *frame)
         const int idx = s->map[i];
         AVFrame *out;
 
-        if (outlink->status_in)
+        if (ff_outlink_get_status(outlink))
             continue;
 
         out = ff_get_video_buffer(outlink, outlink->w, outlink->h);

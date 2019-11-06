@@ -739,6 +739,7 @@ class Channel( DBDataWrite ):
                  'useonairguide':0,      'atsc_major_chan':0,
                  'tmoffset':0,           'default_authority':'',
                  'commmethod':-1,        'atsc_minor_chan':0,
+                 'service_type':0,
                  'last_record':_default_datetime}
 
     def __str__(self):

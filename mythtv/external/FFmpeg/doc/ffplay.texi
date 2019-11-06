@@ -66,6 +66,8 @@ Set custom interval, in seconds, for seeking using left/right keys. Default is 1
 Disable graphical display.
 @item -noborder
 Borderless window.
+@item -alwaysontop
+Window always on top. Available on: X11 with SDL >= 2.0.5, Windows SDL >= 2.0.6.
 @item -volume
 Set the startup volume. 0 means silence, 100 means no volume reduction or
 amplification. Negative values are treated as 0, values above 100 are treated
@@ -194,6 +196,12 @@ Do not limit the input buffer size, read as much data as possible from the
 input as soon as possible. Enabled by default for realtime streams, where data
 may be dropped if not read in time. Use this option to enable infinite buffers
 for all inputs, use @option{-noinfbuf} to disable it.
+
+@item -filter_threads @var{nb_threads}
+Defines how many threads are used to process a filter pipeline. Each pipeline
+will produce a thread pool with this many threads available for parallel
+processing. The default is 0 which means that the thread count will be
+determined by the number of available CPUs.
 
 @end table
 

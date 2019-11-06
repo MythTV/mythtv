@@ -44,6 +44,7 @@ ChannelInfo::ChannelInfo(const ChannelInfo &other)
     m_useonairguide     = other.m_useonairguide;
     m_mplexid           = (other.m_mplexid == 32767) ? 0 : other.m_mplexid;
     m_serviceid         = other.m_serviceid;
+    m_service_type      = other.m_service_type;
     m_atsc_major_chan   = other.m_atsc_major_chan;
     m_atsc_minor_chan   = other.m_atsc_minor_chan;
     m_last_record       = other.m_last_record;

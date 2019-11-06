@@ -31,6 +31,7 @@ HEADERS = adler32.h                                                     \
           file.h                                                        \
           frame.h                                                       \
           hash.h                                                        \
+          hdr_dynamic_metadata.h                                        \
           hmac.h                                                        \
           hwcontext.h                                                   \
           hwcontext_cuda.h                                              \
@@ -78,6 +79,7 @@ HEADERS = adler32.h                                                     \
           version.h                                                     \
           xtea.h                                                        \
           tea.h                                                         \
+          tx.h                                                          \
 
 HEADERS-$(CONFIG_LZO)                   += lzo.h
 
@@ -94,6 +96,7 @@ OBJS = adler32.o                                                        \
        aes_ctr.o                                                        \
        audio_fifo.o                                                     \
        avstring.o                                                       \
+       avsscanf.o                                                       \
        base64.o                                                         \
        blowfish.o                                                       \
        bprint.o                                                         \
@@ -118,6 +121,7 @@ OBJS = adler32.o                                                        \
        fixed_dsp.o                                                      \
        frame.o                                                          \
        hash.o                                                           \
+       hdr_dynamic_metadata.o                                           \
        hmac.o                                                           \
        hwcontext.o                                                      \
        imgutils.o                                                       \
@@ -156,6 +160,7 @@ OBJS = adler32.o                                                        \
        xga_font_data.o                                                  \
        xtea.o                                                           \
        tea.o                                                            \
+       tx.o                                                             \
 
 OBJS-$(CONFIG_CUDA)                     += hwcontext_cuda.o
 OBJS-$(CONFIG_D3D11VA)                  += hwcontext_d3d11va.o
@@ -175,7 +180,8 @@ OBJS += $(COMPAT_OBJS:%=../compat/%)
 SLIBOBJS-$(HAVE_GNU_WINDRES)            += avutilres.o
 
 SKIPHEADERS-$(HAVE_CUDA_H)             += hwcontext_cuda.h
-SKIPHEADERS-$(CONFIG_CUDA)             += hwcontext_cuda_internal.h
+SKIPHEADERS-$(CONFIG_CUDA)             += hwcontext_cuda_internal.h     \
+                                          cuda_check.h
 SKIPHEADERS-$(CONFIG_D3D11VA)          += hwcontext_d3d11va.h
 SKIPHEADERS-$(CONFIG_DXVA2)            += hwcontext_dxva2.h
 SKIPHEADERS-$(CONFIG_QSV)              += hwcontext_qsv.h

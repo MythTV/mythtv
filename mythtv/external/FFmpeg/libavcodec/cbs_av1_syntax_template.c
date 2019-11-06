@@ -419,16 +419,17 @@ static int FUNC(frame_size_with_refs)(CodedBitstreamContext *ctx, RWContext *rw,
     for (i = 0; i < AV1_REFS_PER_FRAME; i++) {
         flags(found_ref[i], 1, i);
         if (current->found_ref[i]) {
-            AV1ReferenceFrameState *ref =
-                &priv->ref[current->ref_frame_idx[i]];
+            AV1ReferenceFrameState *ref;
 
-            if (!ref->valid) {
+            if (current->ref_frame_idx[i] < 0 ||
+                !priv->ref[current->ref_frame_idx[i]].valid) {
                 av_log(ctx->log_ctx, AV_LOG_ERROR,
                        "Missing reference frame needed for frame size "
                        "(ref = %d, ref_frame_idx = %d).\n",
                        i, current->ref_frame_idx[i]);
                 return AVERROR_INVALIDDATA;
             }
+            ref = &priv->ref[current->ref_frame_idx[i]];
 
             priv->upscaled_width = ref->upscaled_width;
             priv->frame_width    = ref->frame_width;
@@ -1637,15 +1638,65 @@ static int FUNC(metadata_hdr_mdcv)(CodedBitstreamContext *ctx, RWContext *rw,
     int err, i;
 
     for (i = 0; i < 3; i++) {
-        fcs(16, primary_chromaticity_x[i], 0, 50000, 1, i);
-        fcs(16, primary_chromaticity_y[i], 0, 50000, 1, i);
+        fbs(16, primary_chromaticity_x[i], 1, i);
+        fbs(16, primary_chromaticity_y[i], 1, i);
     }
 
-    fc(16, white_point_chromaticity_x, 0, 50000);
-    fc(16, white_point_chromaticity_y, 0, 50000);
+    fb(16, white_point_chromaticity_x);
+    fb(16, white_point_chromaticity_y);
 
     fc(32, luminance_max, 1, MAX_UINT_BITS(32));
-    fc(32, luminance_min, 0, current->luminance_max >> 6);
+    // luminance_min must be lower than luminance_max. Convert luminance_max from
+    // 24.8 fixed point to 18.14 fixed point in order to compare them.
+    fc(32, luminance_min, 0, FFMIN(((uint64_t)current->luminance_max << 6) - 1,
+                                   MAX_UINT_BITS(32)));
+
+    return 0;
+}
+
+static int FUNC(scalability_structure)(CodedBitstreamContext *ctx, RWContext *rw,
+                                       AV1RawMetadataScalability *current)
+{
+    CodedBitstreamAV1Context *priv = ctx->priv_data;
+    const AV1RawSequenceHeader *seq;
+    int err, i, j;
+
+    if (!priv->sequence_header) {
+        av_log(ctx->log_ctx, AV_LOG_ERROR, "No sequence header available: "
+               "unable to parse scalability metadata.\n");
+        return AVERROR_INVALIDDATA;
+    }
+    seq = priv->sequence_header;
+
+    fb(2, spatial_layers_cnt_minus_1);
+    flag(spatial_layer_dimensions_present_flag);
+    flag(spatial_layer_description_present_flag);
+    flag(temporal_group_description_present_flag);
+    fc(3, scalability_structure_reserved_3bits, 0, 0);
+    if (current->spatial_layer_dimensions_present_flag) {
+        for (i = 0; i <= current->spatial_layers_cnt_minus_1; i++) {
+            fcs(16, spatial_layer_max_width[i],
+                0, seq->max_frame_width_minus_1 + 1, 1, i);
+            fcs(16, spatial_layer_max_height[i],
+                0, seq->max_frame_height_minus_1 + 1, 1, i);
+        }
+    }
+    if (current->spatial_layer_description_present_flag) {
+        for (i = 0; i <= current->spatial_layers_cnt_minus_1; i++)
+            fbs(8, spatial_layer_ref_id[i], 1, i);
+    }
+    if (current->temporal_group_description_present_flag) {
+        fb(8, temporal_group_size);
+        for (i = 0; i < current->temporal_group_size; i++) {
+            fbs(3, temporal_group_temporal_id[i], 1, i);
+            flags(temporal_group_temporal_switching_up_point_flag[i], 1, i);
+            flags(temporal_group_spatial_switching_up_point_flag[i], 1, i);
+            fbs(3, temporal_group_ref_cnt[i], 1, i);
+            for (j = 0; j < current->temporal_group_ref_cnt[i]; j++) {
+                fbs(8, temporal_group_ref_pic_diff[i][j], 2, i, j);
+            }
+        }
+    }
 
     return 0;
 }
@@ -1653,9 +1704,14 @@ static int FUNC(metadata_hdr_mdcv)(CodedBitstreamContext *ctx, RWContext *rw,
 static int FUNC(metadata_scalability)(CodedBitstreamContext *ctx, RWContext *rw,
                                       AV1RawMetadataScalability *current)
 {
-    // TODO: scalability metadata.
+    int err;
 
-    return AVERROR_PATCHWELCOME;
+    fb(8, scalability_mode_idc);
+
+    if (current->scalability_mode_idc == AV1_SCALABILITY_SS)
+        CHECK(FUNC(scalability_structure)(ctx, rw, current));
+
+    return 0;
 }
 
 static int FUNC(metadata_itut_t35)(CodedBitstreamContext *ctx, RWContext *rw,
@@ -1671,15 +1727,7 @@ static int FUNC(metadata_itut_t35)(CodedBitstreamContext *ctx, RWContext *rw,
 #ifdef READ
     // The payload runs up to the start of the trailing bits, but there might
     // be arbitrarily many trailing zeroes so we need to read through twice.
-    {
-        GetBitContext tmp = *rw;
-        current->payload_size = 0;
-        for (i = 0; get_bits_left(rw) >= 8; i++) {
-            if (get_bits(rw, 8))
-                current->payload_size = i;
-        }
-        *rw = tmp;
-    }
+    current->payload_size = cbs_av1_get_payload_bytes_left(rw);
 
     current->payload_ref = av_buffer_alloc(current->payload_size);
     if (!current->payload_ref)
@@ -1706,19 +1754,19 @@ static int FUNC(metadata_timecode)(CodedBitstreamContext *ctx, RWContext *rw,
     fb(9, n_frames);
 
     if (current->full_timestamp_flag) {
-        fb(6, seconds_value);
-        fb(6, minutes_value);
-        fb(5, hours_value);
+        fc(6, seconds_value, 0, 59);
+        fc(6, minutes_value, 0, 59);
+        fc(5, hours_value,   0, 23);
     } else {
         flag(seconds_flag);
         if (current->seconds_flag) {
-            fb(6, seconds_value);
+            fc(6, seconds_value, 0, 59);
             flag(minutes_flag);
             if (current->minutes_flag) {
-                fb(6, minutes_value);
+                fc(6, minutes_value, 0, 59);
                 flag(hours_flag);
                 if (current->hours_flag)
-                    fb(5, hours_value);
+                    fc(5, hours_value, 0, 23);
             }
         }
     }
@@ -1726,6 +1774,8 @@ static int FUNC(metadata_timecode)(CodedBitstreamContext *ctx, RWContext *rw,
     fb(5, time_offset_length);
     if (current->time_offset_length > 0)
         fb(current->time_offset_length, time_offset_value);
+    else
+        infer(time_offset_length, 0);
 
     return 0;
 }
@@ -1757,6 +1807,30 @@ static int FUNC(metadata_obu)(CodedBitstreamContext *ctx, RWContext *rw,
         // Unknown metadata type.
         return AVERROR_PATCHWELCOME;
     }
+
+    return 0;
+}
+
+static int FUNC(padding_obu)(CodedBitstreamContext *ctx, RWContext *rw,
+                             AV1RawPadding *current)
+{
+    int i, err;
+
+    HEADER("Padding");
+
+#ifdef READ
+    // The payload runs up to the start of the trailing bits, but there might
+    // be arbitrarily many trailing zeroes so we need to read through twice.
+    current->payload_size = cbs_av1_get_payload_bytes_left(rw);
+
+    current->payload_ref = av_buffer_alloc(current->payload_size);
+    if (!current->payload_ref)
+        return AVERROR(ENOMEM);
+    current->payload = current->payload_ref->data;
+#endif
+
+    for (i = 0; i < current->payload_size; i++)
+        xf(8, obu_padding_byte[i], current->payload[i], 0x00, 0xff, 1, i);
 
     return 0;
 }

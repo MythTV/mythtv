@@ -42,9 +42,9 @@ enum AICBands {
     NUM_BANDS
 };
 
-static const int aic_num_band_coeffs[NUM_BANDS] = { 64, 32, 192, 96 };
+static const uint8_t aic_num_band_coeffs[NUM_BANDS] = { 64, 32, 192, 96 };
 
-static const int aic_band_off[NUM_BANDS] = { 0, 64, 96, 288 };
+static const uint16_t aic_band_off[NUM_BANDS] = { 0, 64, 96, 288 };
 
 static const uint8_t aic_quant_matrix[64] = {
      8, 16, 19, 22, 22, 26, 26, 27,
@@ -207,6 +207,9 @@ static int aic_decode_coeffs(GetBitContext *gb, int16_t *dst,
     const uint8_t *scan = aic_scan[band | force_chroma];
     int mb, idx;
     unsigned val;
+
+    if (get_bits_left(gb) < 5)
+        return AVERROR_INVALIDDATA;
 
     has_skips  = get_bits1(gb);
     coeff_type = get_bits1(gb);

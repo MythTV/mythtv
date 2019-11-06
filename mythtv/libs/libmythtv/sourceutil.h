@@ -37,12 +37,14 @@ class MTV_PUBLIC SourceUtil
                                  const QString& grabber, const QString& userid,
                                  const QString& freqtable, const QString& lineupid,
                                  const QString& password, bool useeit,
-                                 const QString& configpath, int nitid);
+                                 const QString& configpath, int nitid,
+                                 uint bouquet_id, uint region_id);
     static int     CreateSource( const QString& sourcename,
                                  const QString& grabber, const QString& userid,
                                  const QString& freqtable, const QString& lineupid,
                                  const QString& password, bool useeit,
-                                 const QString& configpath, int nitid);
+                                 const QString& configpath, int nitid,
+                                 uint bouquet_id, uint region_id);
     static bool    DeleteSource(uint sourceid);
     static bool    DeleteAllSources(void);
 };

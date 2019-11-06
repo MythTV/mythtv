@@ -25,7 +25,7 @@ static const H264LevelDescriptor h264_levels[] = {
     //  | level_idc     |       MaxFS            |    MaxCPB        | MaxMvsPer2Mb
     //  |     | cs3f    |         |  MaxDpbMbs   |       |  MaxVmvR |   |
     { "1",   10, 0,     1485,     99,    396,     64,    175,   64, 2,  0 },
-    { "1b",  10, 1,     1485,     99,    396,    128,    350,   64, 2,  0 },
+    { "1b",  11, 1,     1485,     99,    396,    128,    350,   64, 2,  0 },
     { "1b",   9, 0,     1485,     99,    396,    128,    350,   64, 2,  0 },
     { "1.1", 11, 0,     3000,    396,    900,    192,    500,  128, 2,  0 },
     { "1.2", 12, 0,     6000,    396,   2376,    384,   1000,  128, 2,  0 },
@@ -89,6 +89,7 @@ const H264LevelDescriptor *ff_h264_get_level(int level_idc,
 
 const H264LevelDescriptor *ff_h264_guess_level(int profile_idc,
                                                int64_t bitrate,
+                                               int framerate,
                                                int width, int height,
                                                int max_dec_frame_buffering)
 {
@@ -119,6 +120,9 @@ const H264LevelDescriptor *ff_h264_guess_level(int profile_idc,
             int max_dpb_frames =
                 FFMIN(level->max_dpb_mbs / (width_mbs * height_mbs), 16);
             if (max_dec_frame_buffering > max_dpb_frames)
+                continue;
+
+            if (framerate > (level->max_mbps / (width_mbs * height_mbs)))
                 continue;
         }
 

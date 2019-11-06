@@ -30,7 +30,7 @@
   * build the fuzz target.
     Choose the value of FFMPEG_CODEC (e.g. AV_CODEC_ID_DVD_SUBTITLE) and
     choose one of FUZZ_FFMPEG_VIDEO, FUZZ_FFMPEG_AUDIO, FUZZ_FFMPEG_SUBTITLE.
-    clang -fsanitize=address -fsanitize-coverage=trace-pc-guard,trace-cmp tools/target_dec_fuzzer.c -o target_dec_fuzzer -I.   -DFFMPEG_CODEC=AV_CODEC_ID_MPEG1VIDEO -DFUZZ_FFMPEG_VIDEO ../../libfuzzer/libFuzzer.a   -Llibavcodec -Llibavdevice -Llibavfilter -Llibavformat -Llibavresample -Llibavutil -Llibpostproc -Llibswscale -Llibswresample -Wl,--as-needed -Wl,-z,noexecstack -Wl,--warn-common -Wl,-rpath-link=libpostproc:libswresample:libswscale:libavfilter:libavdevice:libavformat:libavcodec:libavutil:libavresample -lavdevice -lavfilter -lavformat -lavcodec -lswresample -lswscale -lavutil -ldl -lxcb -lxcb-shm -lxcb -lxcb-xfixes  -lxcb -lxcb-shape -lxcb -lX11 -lasound -lm -lbz2 -lz -pthread
+    clang -fsanitize=address -fsanitize-coverage=trace-pc-guard,trace-cmp tools/target_dec_fuzzer.c -o target_dec_fuzzer -I.   -DFFMPEG_CODEC=AV_CODEC_ID_MPEG1VIDEO -DFUZZ_FFMPEG_VIDEO ../../libfuzzer/libFuzzer.a   -Llibavcodec -Llibavdevice -Llibavfilter -Llibavformat -Llibavresample -Llibavutil -Llibpostproc -Llibswscale -Llibswresample -Wl,--as-needed -Wl,-z,noexecstack -Wl,--warn-common -Wl,-rpath-link=:libpostproc:libswresample:libswscale:libavfilter:libavdevice:libavformat:libavcodec:libavutil:libavresample -lavdevice -lavfilter -lavformat -lavcodec -lswresample -lswscale -lavutil -ldl -lxcb -lxcb-shm -lxcb -lxcb-xfixes  -lxcb -lxcb-shape -lxcb -lX11 -lasound -lm -lbz2 -lz -pthread
   * create a corpus directory and put some samples there (empty dir is ok too):
     mkdir CORPUS && cp some-files CORPUS
 
@@ -137,6 +137,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     const uint8_t *last = data;
     const uint8_t *end = data + size;
     uint32_t it = 0;
+    uint64_t ec_pixels = 0;
     int (*decode_handler)(AVCodecContext *avctx, AVFrame *picture,
                           int *got_picture_ptr,
                           const AVPacket *avpkt) = NULL;
@@ -174,7 +175,9 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
     if (size > 1024) {
         GetByteContext gbc;
-        bytestream2_init(&gbc, data + size - 1024, 1024);
+        int extradata_size;
+        size -= 1024;
+        bytestream2_init(&gbc, data + size, 1024);
         ctx->width                              = bytestream2_get_le32(&gbc);
         ctx->height                             = bytestream2_get_le32(&gbc);
         ctx->bit_rate                           = bytestream2_get_le64(&gbc);
@@ -182,15 +185,25 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
         // Try to initialize a parser for this codec, note, this may fail which just means we test without one
         if (bytestream2_get_byte(&gbc) & 1)
             parser = av_parser_init(c->id);
+
+        extradata_size = bytestream2_get_le32(&gbc);
+        if (extradata_size < size) {
+            ctx->extradata = av_mallocz(extradata_size + AV_INPUT_BUFFER_PADDING_SIZE);
+            if (ctx->extradata) {
+                ctx->extradata_size = extradata_size;
+                size -= ctx->extradata_size;
+                memcpy(ctx->extradata, data + size, ctx->extradata_size);
+            }
+        }
         if (av_image_check_size(ctx->width, ctx->height, 0, ctx))
             ctx->width = ctx->height = 0;
-        size -= 1024;
     }
 
     int res = avcodec_open2(ctx, c, NULL);
     if (res < 0) {
         av_free(ctx);
         av_free(parser_avctx);
+        av_parser_close(parser);
         return 0; // Failure of avcodec_open2() does not imply that a issue was found
     }
     parser_avctx->codec_id = ctx->codec_id;
@@ -244,7 +257,8 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
             av_frame_unref(frame);
             int ret = decode_handler(ctx, frame, &got_frame, &avpkt);
 
-            if (it > 20)
+            ec_pixels += ctx->width * ctx->height;
+            if (it > 20 || ec_pixels > 4 * ctx->max_pixels)
                 ctx->error_concealment = 0;
 
             if (ret <= 0 || ret > avpkt.size)
@@ -268,9 +282,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
     av_frame_free(&frame);
     avcodec_free_context(&ctx);
-    av_freep(&ctx);
     avcodec_free_context(&parser_avctx);
-    av_freep(&parser_avctx);
     av_parser_close(parser);
     FDBDesroy(&buffer);
     return 0;

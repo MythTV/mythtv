@@ -140,8 +140,8 @@ bool ClassicLogoDetector::searchForLogo(MythPlayer* player)
 
 #ifdef SHOW_DEBUG_WIN
         unsigned char *fakeFrame;
-        fakeFrame = new unsigned char[width * height * 3 / 2];
-        memset(fakeFrame, 0, width * height * 3 / 2);
+        fakeFrame = new unsigned char[m_width * m_height * 3 / 2];
+        memset(fakeFrame, 0, m_width * m_height * 3 / 2);
 #endif
 
         for (y = 0; y < m_height; y++)
@@ -213,16 +213,16 @@ bool ClassicLogoDetector::searchForLogo(MythPlayer* player)
 #ifdef SHOW_DEBUG_WIN
         for (x = m_logoMinX; x < m_logoMaxX; x++)
         {
-            pos = m_logoMinY * width + x;
+            pos = m_logoMinY * m_width + x;
             fakeFrame[pos] = 0x7f;
-            pos = m_logoMaxY * width + x;
+            pos = m_logoMaxY * m_width + x;
             fakeFrame[pos] = 0x7f;
         }
         for (y = m_logoMinY; y < m_logoMaxY; y++)
         {
-            pos = y * width + m_logoMinX;
+            pos = y * m_width + m_logoMinX;
             fakeFrame[pos] = 0x7f;
-            pos = y * width + m_logoMaxX;
+            pos = y * m_width + m_logoMaxX;
             fakeFrame[pos] = 0x7f;
         }
 

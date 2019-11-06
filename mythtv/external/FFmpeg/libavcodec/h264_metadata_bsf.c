@@ -222,7 +222,8 @@ static int h264_metadata_update_sps(AVBSFContext *bsf,
         if (ctx->level == LEVEL_AUTO) {
             const H264LevelDescriptor *desc;
             int64_t bit_rate;
-            int width, height;
+            int width, height, dpb_frames;
+            int framerate;
 
             if (sps->vui.nal_hrd_parameters_present_flag) {
                 bit_rate = (sps->vui.nal_hrd_parameters.bit_rate_value_minus1[0] + 1) *
@@ -236,13 +237,21 @@ static int h264_metadata_update_sps(AVBSFContext *bsf,
                 bit_rate = 0;
             }
 
+            // Don't use max_dec_frame_buffering if it is only inferred.
+            dpb_frames = sps->vui.bitstream_restriction_flag ?
+                sps->vui.max_dec_frame_buffering : H264_MAX_DPB_FRAMES;
+
             width  = 16 * (sps->pic_width_in_mbs_minus1 + 1);
             height = 16 * (sps->pic_height_in_map_units_minus1 + 1) *
                 (2 - sps->frame_mbs_only_flag);
 
-            desc = ff_h264_guess_level(sps->profile_idc, bit_rate,
-                                       width, height,
-                                       sps->vui.max_dec_frame_buffering);
+            if (sps->vui.timing_info_present_flag)
+                framerate = sps->vui.time_scale / sps->vui.num_units_in_tick / 2;
+            else
+                framerate = 0;
+
+            desc = ff_h264_guess_level(sps->profile_idc, bit_rate, framerate,
+                                       width, height, dpb_frames);
             if (desc) {
                 level_idc = desc->level_idc;
             } else {
@@ -258,7 +267,7 @@ static int h264_metadata_update_sps(AVBSFContext *bsf,
             if (sps->profile_idc == 66 ||
                 sps->profile_idc == 77 ||
                 sps->profile_idc == 88) {
-                sps->level_idc = 10;
+                sps->level_idc = 11;
                 sps->constraint_set3_flag = 1;
             } else {
                 sps->level_idc = 9;
@@ -274,21 +283,18 @@ static int h264_metadata_update_sps(AVBSFContext *bsf,
     return 0;
 }
 
-static int h264_metadata_filter(AVBSFContext *bsf, AVPacket *out)
+static int h264_metadata_filter(AVBSFContext *bsf, AVPacket *pkt)
 {
     H264MetadataContext *ctx = bsf->priv_data;
-    AVPacket *in = NULL;
     CodedBitstreamFragment *au = &ctx->access_unit;
     int err, i, j, has_sps;
     H264RawAUD aud;
-    uint8_t *displaymatrix_side_data = NULL;
-    size_t displaymatrix_side_data_size = 0;
 
-    err = ff_bsf_get_packet(bsf, &in);
+    err = ff_bsf_get_packet_ref(bsf, pkt);
     if (err < 0)
         return err;
 
-    err = ff_cbs_read_packet(ctx->cbc, au, in);
+    err = ff_cbs_read_packet(ctx->cbc, au, pkt);
     if (err < 0) {
         av_log(bsf, AV_LOG_ERROR, "Failed to read packet.\n");
         goto fail;
@@ -419,16 +425,9 @@ static int h264_metadata_filter(AVBSFContext *bsf, AVPacket *out)
     }
 
     if (ctx->delete_filler) {
-        for (i = 0; i < au->nb_units; i++) {
+        for (i = au->nb_units - 1; i >= 0; i--) {
             if (au->units[i].type == H264_NAL_FILLER_DATA) {
-                // Filler NAL units.
-                err = ff_cbs_delete_unit(ctx->cbc, au, i);
-                if (err < 0) {
-                    av_log(bsf, AV_LOG_ERROR, "Failed to delete "
-                           "filler NAL.\n");
-                    goto fail;
-                }
-                --i;
+                ff_cbs_delete_unit(ctx->cbc, au, i);
                 continue;
             }
 
@@ -436,34 +435,24 @@ static int h264_metadata_filter(AVBSFContext *bsf, AVPacket *out)
                 // Filler SEI messages.
                 H264RawSEI *sei = au->units[i].content;
 
-                for (j = 0; j < sei->payload_count; j++) {
+                for (j = sei->payload_count - 1; j >= 0; j--) {
                     if (sei->payload[j].payload_type ==
-                        H264_SEI_TYPE_FILLER_PAYLOAD) {
-                        err = ff_cbs_h264_delete_sei_message(ctx->cbc, au,
-                                                             &au->units[i], j);
-                        if (err < 0) {
-                            av_log(bsf, AV_LOG_ERROR, "Failed to delete "
-                                   "filler SEI message.\n");
-                            goto fail;
-                        }
-                        // Renumbering might have happened, start again at
-                        // the same NAL unit position.
-                        --i;
-                        break;
-                    }
+                        H264_SEI_TYPE_FILLER_PAYLOAD)
+                        ff_cbs_h264_delete_sei_message(ctx->cbc, au,
+                                                       &au->units[i], j);
                 }
             }
         }
     }
 
     if (ctx->display_orientation != PASS) {
-        for (i = 0; i < au->nb_units; i++) {
+        for (i = au->nb_units - 1; i >= 0; i--) {
             H264RawSEI *sei;
             if (au->units[i].type != H264_NAL_SEI)
                 continue;
             sei = au->units[i].content;
 
-            for (j = 0; j < sei->payload_count; j++) {
+            for (j = sei->payload_count - 1; j >= 0; j--) {
                 H264RawSEIDisplayOrientation *disp;
                 int32_t *matrix;
 
@@ -474,18 +463,12 @@ static int h264_metadata_filter(AVBSFContext *bsf, AVPacket *out)
 
                 if (ctx->display_orientation == REMOVE ||
                     ctx->display_orientation == INSERT) {
-                    err = ff_cbs_h264_delete_sei_message(ctx->cbc, au,
-                                                         &au->units[i], j);
-                    if (err < 0) {
-                        av_log(bsf, AV_LOG_ERROR, "Failed to delete "
-                               "display orientation SEI message.\n");
-                        goto fail;
-                    }
-                    --i;
-                    break;
+                    ff_cbs_h264_delete_sei_message(ctx->cbc, au,
+                                                   &au->units[i], j);
+                    continue;
                 }
 
-                matrix = av_mallocz(9 * sizeof(int32_t));
+                matrix = av_malloc(9 * sizeof(int32_t));
                 if (!matrix) {
                     err = AVERROR(ENOMEM);
                     goto fail;
@@ -497,11 +480,17 @@ static int h264_metadata_filter(AVBSFContext *bsf, AVPacket *out)
                 av_display_matrix_flip(matrix, disp->hor_flip, disp->ver_flip);
 
                 // If there are multiple display orientation messages in an
-                // access unit then ignore all but the last one.
-                av_freep(&displaymatrix_side_data);
-
-                displaymatrix_side_data      = (uint8_t*)matrix;
-                displaymatrix_side_data_size = 9 * sizeof(int32_t);
+                // access unit, then the last one added to the packet (i.e.
+                // the first one in the access unit) will prevail.
+                err = av_packet_add_side_data(pkt, AV_PKT_DATA_DISPLAYMATRIX,
+                                              (uint8_t*)matrix,
+                                              9 * sizeof(int32_t));
+                if (err < 0) {
+                    av_log(bsf, AV_LOG_ERROR, "Failed to attach extracted "
+                           "displaymatrix side data to packet.\n");
+                    av_freep(matrix);
+                    goto fail;
+                }
             }
         }
     }
@@ -515,7 +504,7 @@ static int h264_metadata_filter(AVBSFContext *bsf, AVPacket *out)
         int size;
         int write = 0;
 
-        data = av_packet_get_side_data(in, AV_PKT_DATA_DISPLAYMATRIX, &size);
+        data = av_packet_get_side_data(pkt, AV_PKT_DATA_DISPLAYMATRIX, &size);
         if (data && size >= 9 * sizeof(int32_t)) {
             int32_t matrix[9];
             int hflip, vflip;
@@ -575,38 +564,20 @@ static int h264_metadata_filter(AVBSFContext *bsf, AVPacket *out)
         }
     }
 
-    err = ff_cbs_write_packet(ctx->cbc, out, au);
+    err = ff_cbs_write_packet(ctx->cbc, pkt, au);
     if (err < 0) {
         av_log(bsf, AV_LOG_ERROR, "Failed to write packet.\n");
         goto fail;
-    }
-
-    err = av_packet_copy_props(out, in);
-    if (err < 0)
-        goto fail;
-
-    if (displaymatrix_side_data) {
-        err = av_packet_add_side_data(out, AV_PKT_DATA_DISPLAYMATRIX,
-                                      displaymatrix_side_data,
-                                      displaymatrix_side_data_size);
-        if (err) {
-            av_log(bsf, AV_LOG_ERROR, "Failed to attach extracted "
-                   "displaymatrix side data to packet.\n");
-            goto fail;
-        }
-        displaymatrix_side_data = NULL;
     }
 
     ctx->done_first_au = 1;
 
     err = 0;
 fail:
-    ff_cbs_fragment_uninit(ctx->cbc, au);
-    av_freep(&displaymatrix_side_data);
+    ff_cbs_fragment_reset(ctx->cbc, au);
 
     if (err < 0)
-        av_packet_unref(out);
-    av_packet_free(&in);
+        av_packet_unref(pkt);
 
     return err;
 }
@@ -645,13 +616,15 @@ static int h264_metadata_init(AVBSFContext *bsf)
 
     err = 0;
 fail:
-    ff_cbs_fragment_uninit(ctx->cbc, au);
+    ff_cbs_fragment_reset(ctx->cbc, au);
     return err;
 }
 
 static void h264_metadata_close(AVBSFContext *bsf)
 {
     H264MetadataContext *ctx = bsf->priv_data;
+
+    ff_cbs_fragment_free(ctx->cbc, &ctx->access_unit);
     ff_cbs_close(&ctx->cbc);
 }
 
