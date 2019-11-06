@@ -249,6 +249,8 @@ bool MythV4L2M2MContext::HaveV4L2Codecs(AVCodecID Codec /* = AV_CODEC_ID_NONE */
 
                 if (found)
                 {
+                    QStringList pixformats;
+                    bool foundfmt = false;
                     // check capture
                     memset(&fdesc, 0, sizeof(fdesc));
                     fdesc.type = capturetype;
@@ -257,8 +259,13 @@ bool MythV4L2M2MContext::HaveV4L2Codecs(AVCodecID Codec /* = AV_CODEC_ID_NONE */
                         int res = ioctl(v4l2dev.FD(), VIDIOC_ENUM_FMT, &fdesc);
                         if (res)
                             break;
+                        pixformats.append(fourcc_str(static_cast<int>(fdesc.pixelformat)));
+
                         // this is a bit of a shortcut
                         if (fdesc.pixelformat == V4L2_PIX_FMT_YUV420 ||
+                            fdesc.pixelformat == V4L2_PIX_FMT_YVU420 ||
+                            fdesc.pixelformat == V4L2_PIX_FMT_YUV420M ||
+                            fdesc.pixelformat == V4L2_PIX_FMT_YVU420M ||
                             fdesc.pixelformat == V4L2_PIX_FMT_NV12   ||
                             fdesc.pixelformat == V4L2_PIX_FMT_NV12M  ||
                             fdesc.pixelformat == V4L2_PIX_FMT_NV21   ||
@@ -267,9 +274,18 @@ bool MythV4L2M2MContext::HaveV4L2Codecs(AVCodecID Codec /* = AV_CODEC_ID_NONE */
                             if (!s_supportedV4L2Codecs.contains(codec))
                                 s_supportedV4L2Codecs.append(codec);
                             debug.append(avcodec_get_name(codec));
+                            foundfmt = true;
                             break;
                         }
                         fdesc.index++;
+                    }
+
+                    if (!foundfmt)
+                    {
+                        if (pixformats.isEmpty())
+                            pixformats.append("None");
+                        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Codec '%1' has no supported formats (Supported: %2)")
+                            .arg(codec).arg(pixformats.join((","))));
                     }
                 }
             }
