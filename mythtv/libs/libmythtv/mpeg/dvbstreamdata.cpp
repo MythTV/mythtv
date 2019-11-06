@@ -207,13 +207,31 @@ void DVBStreamData::Reset(uint desired_netid, uint desired_tsid,
 }
 
 /** \fn DVBStreamData::HandleTables(uint pid, const PSIPTable&)
- *  \brief Assembles PSIP packets and processes them.
- *  \todo This is just a stub.
+ *  \brief Process PSIP packets.
  */
 bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
 {
     if (MPEGStreamData::HandleTables(pid, psip))
         return true;
+
+    // If the user specified a network ID and that network ID is a NITo then change that NITo into
+    // the NIT and change the NIT into a NITo. See ticket #7486.
+    if (_dvb_real_network_id > 0)
+    {
+        if ((psip.TableID() == TableID::NIT  && psip.TableIDExtension() != (uint)_dvb_real_network_id) ||
+            (psip.TableID() == TableID::NITo && psip.TableIDExtension() == (uint)_dvb_real_network_id)  )
+        {
+            NetworkInformationTable *nit = new NetworkInformationTable(psip);
+            if (!nit->Mutate())
+            {
+                delete nit;
+                return true;
+            }
+            bool retval = HandleTables(pid, *nit);
+            delete nit;
+            return retval;
+        }
+    }
 
     if (IsRedundant(pid, psip))
         return true;
@@ -222,21 +240,8 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
     {
         case TableID::NIT:
         {
-            if (_dvb_real_network_id >= 0 && psip.TableIDExtension() != (uint)_dvb_real_network_id)
-            {
-                NetworkInformationTable *nit = new NetworkInformationTable(psip);
-                if (!nit->Mutate())
-                {
-                    delete nit;
-                    return true;
-                }
-                bool retval = HandleTables(pid, *nit);
-                delete nit;
-                return retval;
-            }
-
             _nit_status.SetSectionSeen(psip.Version(), psip.Section(),
-                                        psip.LastSection());
+                                       psip.LastSection());
 
             if (_cache_tables)
             {
@@ -292,19 +297,6 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
         }
         case TableID::NITo:
         {
-            if (_dvb_real_network_id >= 0 && psip.TableIDExtension() == (uint)_dvb_real_network_id)
-            {
-                NetworkInformationTable *nit = new NetworkInformationTable(psip);
-                if (!nit->Mutate())
-                {
-                    delete nit;
-                    return true;
-                }
-                bool retval = HandleTables(pid, *nit);
-                delete nit;
-                return retval;
-            }
-
             _nito_status.SetSectionSeen(psip.Version(), psip.Section(),
                                         psip.LastSection());
             NetworkInformationTable nit(psip);
