@@ -61,8 +61,6 @@ using namespace std;
 #include HDHOMERUN_HEADERFILE
 #endif
 
-static const uint kDefaultMultirecCount = 2;
-
 VideoSourceSelector::VideoSourceSelector(uint           _initial_sourceid,
                                          const QString &_card_types,
                                          bool           _must_have_mplexid) :
@@ -134,12 +132,12 @@ void VideoSourceSelector::Load(void)
 class InstanceCount : public MythUISpinBoxSetting
 {
   public:
-    InstanceCount(const CardInput &parent, int _initValue) :
+    InstanceCount(const CardInput &parent) :
         MythUISpinBoxSetting(new CardInputDBStorage(this, parent, "reclimit"),
                              1, 10, 1)
     {
         setLabel(QObject::tr("Max recordings"));
-        setValue(_initValue);
+        setValue(1);
         setHelpText(
             QObject::tr(
                 "Maximum number of simultaneous recordings MythTV will "
@@ -3105,7 +3103,7 @@ CardInput::CardInput(const QString & cardtype, const QString & device,
     interact->setLabel(QObject::tr("Interactions between inputs"));
     if (CardUtil::IsTunerSharingCapable(cardtype))
     {
-        m_instanceCount = new InstanceCount(*this, kDefaultMultirecCount);
+        m_instanceCount = new InstanceCount(*this);
         interact->addChild(m_instanceCount);
         m_schedGroup = new SchedGroup(*this);
         interact->addChild(m_schedGroup);
