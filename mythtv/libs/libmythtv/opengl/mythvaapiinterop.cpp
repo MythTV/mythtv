@@ -1361,6 +1361,10 @@ VASurfaceID MythVAAPIInterop::Deinterlace(VideoFrame *Frame, VASurfaceID Current
                 sourceframe->width  = m_filterWidth;
                 sourceframe->height = m_filterHeight;
                 sourceframe->format = AV_PIX_FMT_VAAPI;
+                // N.B. This is required after changes in FFmpeg. Using the vpp
+                // frames context doesn't seem correct - but using the 'master'
+                // context does not work
+                sourceframe->hw_frames_ctx = av_buffer_ref(m_vppFramesContext);
                 ret = av_buffersrc_add_frame(m_filterSource, sourceframe);
                 sourceframe->data[3] = nullptr;
                 sourceframe->buf[0] = nullptr;
