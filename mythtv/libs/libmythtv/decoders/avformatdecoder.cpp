@@ -2319,7 +2319,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             // N.B. MediaCodec and NVDEC require frame timing
             m_use_frame_timing = false;
             if ((!ringBuffer->IsDVD() && (codec_sw_copy(m_video_codec_id) ||
-                codec_is_mediacodec(m_video_codec_id) || codec_is_nvdec(m_video_codec_id))))
+                codec_is_mediacodec(m_video_codec_id))) || codec_is_nvdec(m_video_codec_id))
             {
                 m_use_frame_timing = true;
             }
