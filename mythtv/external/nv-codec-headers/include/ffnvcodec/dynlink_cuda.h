@@ -41,22 +41,23 @@
 #define CU_CTX_SCHED_BLOCKING_SYNC 4
 
 typedef int CUdevice;
-typedef void* CUarray;
-typedef void* CUcontext;
-typedef void* CUstream;
-typedef void* CUevent;
-typedef void* CUfunction;
-typedef void* CUmodule;
-typedef void* CUtexObject;
-typedef void* CUmipmappedArray;
-typedef void* CUgraphicsResource;
-typedef void* CUexternalMemory;
-typedef void* CUexternalSemaphore;
 #if defined(__x86_64) || defined(AMD64) || defined(_M_AMD64)
 typedef unsigned long long CUdeviceptr;
 #else
 typedef unsigned int CUdeviceptr;
 #endif
+typedef unsigned long long CUtexObject;
+
+typedef struct CUarray_st            *CUarray;
+typedef struct CUctx_st              *CUcontext;
+typedef struct CUstream_st           *CUstream;
+typedef struct CUevent_st            *CUevent;
+typedef struct CUfunc_st             *CUfunction;
+typedef struct CUmod_st              *CUmodule;
+typedef struct CUmipmappedArray_st   *CUmipmappedArray;
+typedef struct CUgraphicsResource_st *CUgraphicsResource;
+typedef struct CUextMemory_st        *CUexternalMemory;
+typedef struct CUextSemaphore_st     *CUexternalSemaphore;
 
 typedef enum cudaError_enum {
     CUDA_SUCCESS = 0,
@@ -323,11 +324,13 @@ typedef CUresult CUDAAPI tcuCtxPopCurrent_v2(CUcontext *pctx);
 typedef CUresult CUDAAPI tcuCtxDestroy_v2(CUcontext ctx);
 typedef CUresult CUDAAPI tcuMemAlloc_v2(CUdeviceptr *dptr, size_t bytesize);
 typedef CUresult CUDAAPI tcuMemAllocPitch_v2(CUdeviceptr *dptr, size_t *pPitch, size_t WidthInBytes, size_t Height, unsigned int ElementSizeBytes);
+typedef CUresult CUDAAPI tcuMemsetD8Async(CUdeviceptr dstDevice, unsigned char uc, size_t N, CUstream hStream);
 typedef CUresult CUDAAPI tcuMemFree_v2(CUdeviceptr dptr);
 typedef CUresult CUDAAPI tcuMemcpy2D_v2(const CUDA_MEMCPY2D *pcopy);
 typedef CUresult CUDAAPI tcuMemcpy2DAsync_v2(const CUDA_MEMCPY2D *pcopy, CUstream hStream);
 typedef CUresult CUDAAPI tcuGetErrorName(CUresult error, const char** pstr);
 typedef CUresult CUDAAPI tcuGetErrorString(CUresult error, const char** pstr);
+typedef CUresult CUDAAPI tcuCtxGetDevice(CUdevice *device);
 
 typedef CUresult CUDAAPI tcuStreamCreate(CUstream *phStream, unsigned int flags);
 typedef CUresult CUDAAPI tcuStreamQuery(CUstream hStream);
@@ -359,6 +362,7 @@ typedef CUresult CUDAAPI tcuDestroyExternalMemory(CUexternalMemory extMem);
 typedef CUresult CUDAAPI tcuExternalMemoryGetMappedBuffer(CUdeviceptr* devPtr, CUexternalMemory extMem, const CUDA_EXTERNAL_MEMORY_BUFFER_DESC* bufferDesc);
 typedef CUresult CUDAAPI tcuExternalMemoryGetMappedMipmappedArray(CUmipmappedArray* mipmap, CUexternalMemory extMem, const CUDA_EXTERNAL_MEMORY_MIPMAPPED_ARRAY_DESC* mipmapDesc);
 typedef CUresult CUDAAPI tcuMipmappedArrayGetLevel(CUarray* pLevelArray, CUmipmappedArray hMipmappedArray, unsigned int level);
+typedef CUresult CUDAAPI tcuMipmappedArrayDestroy(CUmipmappedArray hMipmappedArray);
 
 typedef CUresult CUDAAPI tcuImportExternalSemaphore(CUexternalSemaphore* extSem_out, const CUDA_EXTERNAL_SEMAPHORE_HANDLE_DESC* semHandleDesc);
 typedef CUresult CUDAAPI tcuDestroyExternalSemaphore(CUexternalSemaphore extSem);

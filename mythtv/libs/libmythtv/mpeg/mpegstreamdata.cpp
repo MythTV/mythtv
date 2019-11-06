@@ -681,11 +681,11 @@ bool MPEGStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
 }
 
 /** \fn MPEGStreamData::HandleTables(uint pid, const PSIPTable &psip)
- *  \brief Assembles PSIP packets and processes them.
+ *  \brief Process PSIP packets.
  */
 bool MPEGStreamData::HandleTables(uint pid, const PSIPTable &psip)
 {
-    if (IsRedundant(pid, psip))
+    if (MPEGStreamData::IsRedundant(pid, psip))
         return true;
 
     const int version = psip.Version();
@@ -936,7 +936,7 @@ void MPEGStreamData::HandleTSTables(const TSPacket* tspacket)
 
     // Don't decode redundant packets,
     // but if it is a desired PAT or PMT emit a "heartbeat" signal.
-    if (IsRedundant(tspacket->PID(), *psip))
+    if (MPEGStreamData::IsRedundant(tspacket->PID(), *psip))
     {
         if (TableID::PAT == psip->TableID())
         {
