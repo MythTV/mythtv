@@ -195,7 +195,7 @@ void ScanTypeSetting::SetInput(const QString &cardids_inputname)
                 addSelection(tr("Full Scan (Tuned)"),
                              QString::number(NITAddScan_DVBC));
                 addSelection(tr("Full Scan"),
-                             QString::number(FullScan_DVBC), true);
+                             QString::number(FullScan_DVBC));
             }
             else if (CardUtil::HDHRdoesDVB(CardUtil::GetVideoDevice(cardid)))
             {
