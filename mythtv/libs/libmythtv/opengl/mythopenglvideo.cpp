@@ -50,7 +50,8 @@ MythOpenGLVideo::MythOpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *Col
     m_resizing(false),
     m_textureTarget(QOpenGLTexture::Target2D),
     m_discontinuityCounter(0),
-    m_lastRotation(0)
+    m_lastRotation(0),
+    m_chromaUpsamplingFilter(false)
 {
     if (!m_render || !m_videoColourSpace)
         return;
@@ -65,6 +66,10 @@ MythOpenGLVideo::MythOpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *Col
     m_features      = m_render->GetFeatures();
     m_extraFeatures = m_render->GetExtraFeatures();
     m_valid = true;
+
+    m_chromaUpsamplingFilter = gCoreContext->GetBoolSetting("ChromaUpsamplingFilter", true);
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Chroma upsampling filter %1")
+        .arg(m_chromaUpsamplingFilter ? "enabled" : "disabled"));
 }
 
 MythOpenGLVideo::~MythOpenGLVideo()
@@ -329,8 +334,11 @@ bool MythOpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Dein
         if (!progressive)
         {
             // Chroma upsampling filter
-            if (format_is_420(m_outputType) || format_is_nv12(m_outputType))
+            if ((format_is_420(m_outputType) || format_is_nv12(m_outputType)) &&
+                m_chromaUpsamplingFilter)
+            {
                 defines << "CUE";
+            }
 
             // field
             if (topfield)
@@ -338,7 +346,7 @@ bool MythOpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Dein
 
             switch (Deint)
             {
-                case DEINT_BASIC:  cost *= 2;  defines << defines << "ONEFIELD"; break;
+                case DEINT_BASIC:  cost *= 2;  defines << "ONEFIELD"; break;
                 case DEINT_MEDIUM: cost *= 5;  defines << "LINEARBLEND"; break;
                 case DEINT_HIGH:   cost *= 15; defines << "KERNEL"; kernel = true; break;
                 default: break;

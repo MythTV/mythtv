@@ -96,5 +96,6 @@ class MythOpenGLVideo : public QObject
     GLenum         m_textureTarget;       ///< Some interops require custom texture targets
     long long      m_discontinuityCounter; ///< Check when to release reference frames after a skip
     int            m_lastRotation;        ///< Track rotation for pause frame
+    bool           m_chromaUpsamplingFilter; /// Attempt to fix Chroma Upsampling Error in shaders
 };
 #endif // MYTH_OPENGL_VIDEO_H_

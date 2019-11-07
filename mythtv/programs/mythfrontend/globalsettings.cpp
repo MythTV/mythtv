@@ -70,6 +70,20 @@ static HostSpinBoxSetting *AudioReadAhead()
     return gc;
 }
 
+static HostCheckBoxSetting *ChromaUpsampling()
+{
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("ChromaUpsamplingFilter");
+    gc->setLabel(PlaybackSettings::tr("Enable Chroma Upsampling Filter when deinterlacing"));
+    gc->setHelpText(PlaybackSettings::tr(
+        "The 'Chroma upsampling error' affects the quality of interlaced material "
+        "for the most common, standard video formats and results in jagged/indistinct "
+        "edges to brightly coloured areas of video. This filter attempts to fix "
+        "the problem in the OpenGL shaders. It adds a small amount of overhead to "
+        "video rendering but may not be suitable in all cases. Enabled by default."));
+    gc->setValue(false);
+    return gc;
+}
+
 #ifdef USING_VAAPI
 static HostTextEditSetting *VAAPIDevice()
 {
@@ -4300,6 +4314,7 @@ void PlaybackSettings::Load(void)
     advanced->setLabel(tr("Advanced Playback Settings"));
     advanced->addChild(RealtimePriority());
     advanced->addChild(AudioReadAhead());
+    advanced->addChild(ChromaUpsampling());
 #ifdef USING_VAAPI
     advanced->addChild(VAAPIDevice());
 #endif
