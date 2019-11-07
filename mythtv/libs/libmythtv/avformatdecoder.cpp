@@ -1697,6 +1697,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
                 .arg(ff_codec_id_string(enc->codec_id)));
     }
 
+    // NOLINTNEXTLINE(readability-misleading-indentation)
     QString deinterlacer;
     if (m_mythcodecctx)
         deinterlacer = m_mythcodecctx->getDeinterlacerName();
@@ -2538,6 +2539,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 dec = "ffmpeg";
             }
 
+            // NOLINTNEXTLINE(readability-misleading-indentation)
             if (version && FlagIsSet(kDecodeAllowGPU))
             {
                 bool foundgpudecoder = false;

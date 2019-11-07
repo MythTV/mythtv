@@ -1155,6 +1155,7 @@ void MythMainWindow::Init(const QString& forcedpainter, bool mayReInit)
     }
 #endif
 
+    // NOLINTNEXTLINE(readability-misleading-indentation)
     if (!d->m_painter && !d->m_paintwin)
     {
         LOG(VB_GENERAL, LOG_INFO, "Using the Qt painter");

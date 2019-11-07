@@ -1623,6 +1623,7 @@ void MythUIImage::customEvent(QEvent *event)
             Reset();
         }
 
+        // NOLINTNEXTLINE(readability-misleading-indentation)
         emit LoadComplete();
     }
 }

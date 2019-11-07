@@ -1319,6 +1319,7 @@ void CriteriaRowEditor::saveClicked()
         m_criteriaRow->m_value2 = m_value2Edit->GetText();
     }
 
+    // NOLINTNEXTLINE(readability-misleading-indentation)
     emit criteriaChanged();
 
     Close();
