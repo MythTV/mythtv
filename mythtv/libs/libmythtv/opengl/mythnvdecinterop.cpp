@@ -233,8 +233,9 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
     }
 
     // Copy device data to array data (i.e. texture) - surely this can be avoided?
-    // N.B. we don't use cuMemcpy2DAsync as it gives occasional 'green screen' flashes,
-    // even with subsequent synchronisation
+    // In theory, asynchronous copies should not be required but we use async
+    // followed by stream synchronisation to ensure CUDA and OpenGL are in sync
+    // which avoids presenting old/stale frames when the GPU is under load.
     result = m_openglTextures[cudabuffer];
     for (uint i = 0; i < result.size(); ++i)
     {
@@ -248,9 +249,10 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
         cpy.dstArray      = data->first;
         cpy.WidthInBytes  = static_cast<size_t>(result[i]->m_size.width()) * (hdr ? 2 : 1);
         cpy.Height        = static_cast<size_t>(result[i]->m_size.height());
-        CUDA_CHECK(m_cudaFuncs, cuMemcpy2D(&cpy));
+        CUDA_CHECK(m_cudaFuncs, cuMemcpy2DAsync(&cpy, nullptr));
     }
 
+    CUDA_CHECK(m_cudaFuncs, cuStreamSynchronize(nullptr));
     CUDA_CHECK(m_cudaFuncs, cuCtxPopCurrent(&dummy));
 
     // GLSL deinterlacing. The decoder will pick up any CPU or driver preference
