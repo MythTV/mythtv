@@ -631,7 +631,7 @@ static void parse_cc_packet(CC708Reader* cb_cbs, CaptionPacket* pkt,
 #elif DEBUG_CAPTIONS
     if (len > pkt_size)
 #else
-    if (false)
+    if (false) // NOLINT(readability-simplify-boolean-expr)
 #endif
     {
         int j;

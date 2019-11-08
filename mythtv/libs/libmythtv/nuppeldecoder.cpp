@@ -121,7 +121,7 @@ QString NuppelDecoder::GetRawEncodingType(void)
 bool NuppelDecoder::ReadFileheader(struct rtfileheader *fh)
 {
     if (ringBuffer->Read(fh, FILEHEADERSIZE) != FILEHEADERSIZE)
-        return false;
+        return false; // NOLINT(readability-simplify-boolean-expr)
 
 #if HAVE_BIGENDIAN
     fh->width         = bswap_32(fh->width);
@@ -142,7 +142,7 @@ bool NuppelDecoder::ReadFileheader(struct rtfileheader *fh)
 bool NuppelDecoder::ReadFrameheader(struct rtframeheader *fh)
 {
     if (ringBuffer->Read(fh, FRAMEHEADERSIZE) != FRAMEHEADERSIZE)
-        return false;
+        return false; // NOLINT(readability-simplify-boolean-expr)
 
 #if HAVE_BIGENDIAN
     fh->timecode     = bswap_32(fh->timecode);
