@@ -7,6 +7,10 @@ extern "C" {
 #include "libavutil/pixdesc.h"
 }
 
+// Egl
+#include <EGL/egl.h>
+#include <EGL/eglext.h>
+
 #define LOC QString("MMALInterop: ")
 
 MythMMALInterop::MythMMALInterop(MythRenderOpenGL *Context)
@@ -53,27 +57,6 @@ MythMMALInterop* MythMMALInterop::Create(MythRenderOpenGL *Context, Type Interop
     if (InteropType == MMAL)
         return new MythMMALInterop(Context);
     return nullptr;
-}
-
-bool MythMMALInterop::InitEGL(void)
-{
-    if (m_eglImageTargetTexture2DOES && m_eglCreateImageKHR && m_eglDestroyImageKHR)
-        return true;
-
-    if (!m_context)
-        return false;
-
-    OpenGLLocker locker(m_context);
-    m_eglImageTargetTexture2DOES = reinterpret_cast<MYTH_EGLIMAGETARGET>(eglGetProcAddress("glEGLImageTargetTexture2DOES"));
-    m_eglCreateImageKHR          = reinterpret_cast<MYTH_EGLCREATEIMAGE>(eglGetProcAddress("eglCreateImageKHR"));
-    m_eglDestroyImageKHR         = reinterpret_cast<MYTH_EGLDESTROYIMAGE>(eglGetProcAddress("eglDestroyImageKHR"));
-
-    if (!(m_eglCreateImageKHR && m_eglDestroyImageKHR && m_eglImageTargetTexture2DOES))
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to resolve EGL functions");
-        return false;
-    }
-    return true;
 }
 
 MMAL_BUFFER_HEADER_T* MythMMALInterop::VerifyBuffer(MythRenderOpenGL *Context, VideoFrame *Frame)
@@ -152,21 +135,10 @@ vector<MythVideoTexture*> MythMMALInterop::Acquire(MythRenderOpenGL *Context,
         }
     }
 
-    // Create new
-    if (!InitEGL())
-        return result;
-
     OpenGLLocker locker(m_context);
 
     VideoFrameType format = FMT_YV12;
     uint count = planes(format);
-
-    EGLDisplay display = eglGetCurrentDisplay();
-    if (!display)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "No EGLDisplay");
-        return result;
-    }
 
     if (m_openglTextures.isEmpty())
     {
@@ -203,15 +175,16 @@ vector<MythVideoTexture*> MythMMALInterop::Acquire(MythRenderOpenGL *Context,
             target = EGL_IMAGE_BRCM_MULTIMEDIA_U;
         else if (plane == 2)
             target = EGL_IMAGE_BRCM_MULTIMEDIA_V;
-        EGLImageKHR image = m_eglCreateImageKHR(display, EGL_NO_CONTEXT, target,
-                                                (EGLClientBuffer)buffer->data, nullptr);
+
+        EGLImageKHR image = m_context->eglCreateImageKHR(m_context->GetEGLDisplay(), EGL_NO_CONTEXT, target,
+                                                        (EGLClientBuffer)buffer->data, nullptr);
         if (!image)
             LOG(VB_GENERAL, LOG_ERR, LOC + QString("No EGLImage for plane %1 %2").arg(plane).arg(eglGetError()));
 
         m_context->glBindTexture(texture->m_target, texture->m_textureId);
-        m_eglImageTargetTexture2DOES(texture->m_target, image);
+        m_context->eglImageTargetTexture2DOES(texture->m_target, image);
         m_context->glBindTexture(texture->m_target, 0);
-        m_eglDestroyImageKHR(display, image);
+        m_context->eglDestroyImageKHR(m_context->GetEGLDisplay(), image);
     }
 
     return result;

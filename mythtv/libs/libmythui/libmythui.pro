@@ -182,18 +182,19 @@ using_opengl {
     HEADERS += opengl/mythrenderopengldefs.h opengl/mythrenderopenglshaders.h
     HEADERS += opengl/mythopenglperf.h
     SOURCES += opengl/mythopenglperf.cpp
+    HEADERS += opengl/mythegl.h
+    SOURCES += opengl/mythegl.cpp
 
     using_opengles {
         DEFINES += USING_OPENGLES
     }
-    using_mmal {
+
+    # this will need extra configure support when EGL use is extended
+    using_mmal | using_vaapi {
         LIBS    += -lEGL
-        DEFINES += USING_MMAL
+        DEFINES += USING_EGL
     }
-    using_vaapi {
-        LIBS    += -lEGL
-        DEFINES += USING_VAAPI
-    }
+
     inc.files += mythpainter_ogl.h
     mingw|win32-msvc*:LIBS += -lopengl32
 }

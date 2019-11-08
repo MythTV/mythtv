@@ -106,7 +106,7 @@ QString MythVAAPIInterop::GetVendor(void)
     return m_vaVendor;
 }
 
-void MythVAAPIInterop::IniitaliseDisplay(void)
+void MythVAAPIInterop::InitaliseDisplay(void)
 {
     if (!m_vaDisplay)
         return;
@@ -403,7 +403,7 @@ MythVAAPIInteropGLXCopy::MythVAAPIInteropGLXCopy(MythRenderOpenGL *Context)
       LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create GLX VADisplay");
       return;
     }
-    IniitaliseDisplay();
+    InitaliseDisplay();
 }
 
 MythVAAPIInteropGLXCopy::~MythVAAPIInteropGLXCopy()
@@ -495,7 +495,7 @@ MythVAAPIInteropGLXPixmap::MythVAAPIInteropGLXPixmap(MythRenderOpenGL *Context)
     if (!m_vaDisplay)
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create X11 VADisplay");
     else
-        IniitaliseDisplay();
+        InitaliseDisplay();
     InitPixmaps();
 }
 
@@ -670,12 +670,13 @@ bool MythVAAPIInteropGLXPixmap::IsSupported(MythRenderOpenGL *Context)
     return extensions.contains("GLX_EXT_texture_from_pixmap");
 }
 
+// EGL
+#include <EGL/egl.h>
+#include <EGL/eglext.h>
+
 MythVAAPIInteropDRM::MythVAAPIInteropDRM(MythRenderOpenGL *Context)
   : MythVAAPIInterop(Context, VAAPIEGLDRM),
     m_drmFile(),
-    m_eglImageTargetTexture2DOES(nullptr),
-    m_eglCreateImageKHR(nullptr),
-    m_eglDestroyImageKHR(nullptr),
     m_referenceFrames()
 {
     QString device = gCoreContext->GetSetting("VAAPIDevice");
@@ -696,8 +697,7 @@ MythVAAPIInteropDRM::MythVAAPIInteropDRM(MythRenderOpenGL *Context)
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to open %1").arg(device));
         return;
     }
-    IniitaliseDisplay();
-    InitEGL();
+    InitaliseDisplay();
 }
 
 MythVAAPIInteropDRM::~MythVAAPIInteropDRM()
@@ -716,8 +716,7 @@ void MythVAAPIInteropDRM::DeleteTextures(void)
 {
     OpenGLLocker locker(m_context);
 
-    EGLDisplay display = eglGetCurrentDisplay();
-    if (!m_openglTextures.isEmpty() && InitEGL() && display)
+    if (!m_openglTextures.isEmpty() && m_context->IsEGL())
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Deleting DRM buffers");
         QHash<unsigned long long, vector<MythVideoTexture*> >::const_iterator it = m_openglTextures.constBegin();
@@ -729,7 +728,7 @@ void MythVAAPIInteropDRM::DeleteTextures(void)
             {
                 if ((*it2)->m_data)
                 {
-                    m_eglDestroyImageKHR(display, (*it2)->m_data);
+                    m_context->eglDestroyImageKHR(m_context->GetEGLDisplay(), (*it2)->m_data);
                     (*it2)->m_data = nullptr;
                 }
             }
@@ -909,10 +908,6 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context
 
     OpenGLLocker locker(m_context);
 
-    // Create new
-    if (!InitEGL())
-        return result;
-
     VAImage vaimage;
     memset(&vaimage, 0, sizeof(vaimage));
     vaimage.buf = vaimage.image_id = VA_INVALID_ID;
@@ -994,27 +989,6 @@ VideoFrameType MythVAAPIInteropDRM::VATypeToMythType(uint32_t Fourcc)
     return FMT_NONE;
 }
 
-bool MythVAAPIInteropDRM::InitEGL(void)
-{
-    if (m_eglImageTargetTexture2DOES && m_eglCreateImageKHR && m_eglDestroyImageKHR)
-        return true;
-
-    if (!m_context)
-        return false;
-
-    OpenGLLocker locker(m_context);
-    m_eglImageTargetTexture2DOES = reinterpret_cast<MYTH_EGLIMAGETARGET>(eglGetProcAddress("glEGLImageTargetTexture2DOES"));
-    m_eglCreateImageKHR          = reinterpret_cast<MYTH_EGLCREATEIMAGE>(eglGetProcAddress("eglCreateImageKHR"));
-    m_eglDestroyImageKHR         = reinterpret_cast<MYTH_EGLDESTROYIMAGE>(eglGetProcAddress("eglDestroyImageKHR"));
-
-    if (!(m_eglCreateImageKHR && m_eglDestroyImageKHR && m_eglImageTargetTexture2DOES))
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to resolve EGL functions");
-        return false;
-    }
-    return true;
-}
-
 #ifndef DRM_FORMAT_R8
 #define DRM_FORMAT_R8       MKTAG('R', '8', ' ', ' ')
 #define DRM_FORMAT_GR88     MKTAG('G', 'R', '8', '8')
@@ -1044,16 +1018,13 @@ void MythVAAPIInteropDRM::CreateDRMBuffers(VideoFrameType Format,
                 EGL_NONE
         };
 
-        EGLDisplay display = eglGetCurrentDisplay();
-        if (!display)
-            LOG(VB_GENERAL, LOG_ERR, LOC + "No EGLDisplay");
-
-        EGLImageKHR image = m_eglCreateImageKHR(display, EGL_NO_CONTEXT, EGL_LINUX_DMA_BUF_EXT, nullptr, attributes);
+        EGLImageKHR image = m_context->eglCreateImageKHR(m_context->GetEGLDisplay(), EGL_NO_CONTEXT,
+                                                         EGL_LINUX_DMA_BUF_EXT, nullptr, attributes);
         if (!image)
             LOG(VB_GENERAL, LOG_ERR, LOC + QString("No EGLImage for plane %1 %2").arg(plane).arg(eglGetError()));
 
         m_context->glBindTexture(texture->m_target, texture->m_textureId);
-        m_eglImageTargetTexture2DOES(texture->m_target, image);
+        m_context->eglImageTargetTexture2DOES(texture->m_target, image);
         m_context->glBindTexture(texture->m_target, 0);
         texture->m_data = static_cast<unsigned char *>(image);
     }
@@ -1065,11 +1036,8 @@ bool MythVAAPIInteropDRM::IsSupported(MythRenderOpenGL *Context)
         return false;
 
     OpenGLLocker locker(Context);
-    EGLDisplay egldisplay = eglGetCurrentDisplay();
-    if (!egldisplay)
-        return false;
-    QByteArray extensions = QByteArray(eglQueryString(egldisplay, EGL_EXTENSIONS));
-    return extensions.contains("EGL_EXT_image_dma_buf_import") &&
+    return Context->IsEGL() &&
+           Context->HasEGLExtension("EGL_EXT_image_dma_buf_import") &&
            Context->hasExtension("GL_OES_EGL_image");
 }
 

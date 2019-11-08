@@ -25,6 +25,7 @@
 #include "mythrender_base.h"
 #include "mythrenderopengldefs.h"
 #include "mythuianimation.h"
+#include "mythegl.h"
 
 typedef enum
 {
@@ -79,14 +80,13 @@ typedef enum
 class QWindow;
 class QPaintDevice;
 
-class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctions, public MythRender
+class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctions, public MythEGL, public MythRender
 {
     Q_OBJECT
 
   public:
     static MythRenderOpenGL* GetOpenGLRender(void);
     static MythRenderOpenGL* Create(const QString &Painter, QPaintDevice* Device = nullptr);
-    static bool IsEGL(void);
     MythRenderOpenGL(const QSurfaceFormat &Format, QPaintDevice* Device, RenderType Type = kRenderOpenGL);
 
     // MythRender
@@ -223,6 +223,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     bool       m_flushEnabled;
 
   private:
+    Q_DISABLE_COPY(MythRenderOpenGL)
     void DebugFeatures (void);
     QOpenGLDebugLogger *m_openglDebugger;
     QOpenGLDebugMessage::Types m_openGLDebuggerFilter;

@@ -40,7 +40,7 @@ class MythVAAPIInterop : public MythOpenGLInterop
                                    AVFilterContext *&Sink);
 
   protected:
-    void IniitaliseDisplay   (void);
+    void InitaliseDisplay    (void);
     VASurfaceID Deinterlace  (VideoFrame *Frame, VASurfaceID Current, FrameScanType Scan);
     virtual void DestroyDeinterlacer (void);
     virtual void PostInitDeinterlacer(void) { }
@@ -125,12 +125,6 @@ class MythVAAPIInteropGLXPixmap : public MythVAAPIInteropGLX
     MYTH_GLXRELEASETEXIMAGEEXT m_glxReleaseTexImageEXT;
 };
 
-#include <EGL/egl.h>
-#include <EGL/eglext.h>
-typedef void  ( * MYTH_EGLIMAGETARGET)  (GLenum, EGLImage);
-typedef EGLImageKHR ( * MYTH_EGLCREATEIMAGE)  (EGLDisplay, EGLContext, EGLenum, EGLClientBuffer, const EGLint *);
-typedef void  ( * MYTH_EGLDESTROYIMAGE) (EGLDisplay, EGLImage);
-
 class MythVAAPIInteropDRM : public MythVAAPIInterop
 {
   public:
@@ -150,17 +144,13 @@ class MythVAAPIInteropDRM : public MythVAAPIInterop
     void           CreateDRMBuffers(VideoFrameType Format,
                                     vector<MythVideoTexture*> Textures,
                                     uintptr_t Handle, VAImage &Image);
-    bool           InitEGL(void);
     VideoFrameType VATypeToMythType(uint32_t Fourcc);
     void           CleanupReferenceFrames(void);
     void           RotateReferenceFrames(AVBufferRef *Buffer);
     vector<MythVideoTexture*> GetReferenceFrames(void);
 
   private:
-    QFile                m_drmFile;
-    MYTH_EGLIMAGETARGET  m_eglImageTargetTexture2DOES;
-    MYTH_EGLCREATEIMAGE  m_eglCreateImageKHR;
-    MYTH_EGLDESTROYIMAGE m_eglDestroyImageKHR;
+    QFile                 m_drmFile;
     QVector<AVBufferRef*> m_referenceFrames;
 };
 
