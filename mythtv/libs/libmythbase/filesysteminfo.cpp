@@ -145,7 +145,7 @@ QList<FileSystemInfo> FileSystemInfo::RemoteGetInfo(MythSocket *sock)
     QList<FileSystemInfo> fsInfos;
     QStringList strlist(QString("QUERY_FREE_SPACE_LIST"));
 
-    bool sent = 0;
+    bool sent = false;
 
     if (sock)
         sent = sock->SendReceiveStringList(strlist);

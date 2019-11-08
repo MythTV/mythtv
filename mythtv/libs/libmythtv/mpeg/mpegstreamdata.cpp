@@ -859,7 +859,7 @@ void MPEGStreamData::UpdateTimeOffset(uint64_t _si_utc_time)
  */
 void MPEGStreamData::HandleTSTables(const TSPacket* tspacket)
 {
-    bool morePSIPTables;
+    bool morePSIPTables = false;
   HAS_ANOTHER_PSIP:
     // Assemble PSIP
     PSIPTable *psip = AssemblePSIP(tspacket, morePSIPTables);

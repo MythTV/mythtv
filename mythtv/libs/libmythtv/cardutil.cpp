@@ -2301,7 +2301,7 @@ QStringList CardUtil::ProbeAudioInputs(const QString& device, const QString& inp
 
 QStringList CardUtil::ProbeV4LVideoInputs(const QString& device)
 {
-    bool ok;
+    bool ok = false;
     QStringList ret;
     QByteArray dev = device.toLatin1();
     int videofd = open(dev.constData(), O_RDWR);
@@ -2334,7 +2334,7 @@ QStringList CardUtil::ProbeV4LAudioInputs(const QString& device)
 {
     LOG(VB_GENERAL, LOG_DEBUG, QString("ProbeV4LAudioInputs(%1)").arg(device));
 
-    bool ok;
+    bool ok = false;
     QStringList ret;
     int videofd = open(device.toLatin1().constData(), O_RDWR);
     if (videofd < 0)
@@ -2772,7 +2772,7 @@ QString CardUtil::GetHDHRdesc(const QString &device)
         deviceIsIP = true;
     else
     {
-        bool validID;
+        bool validID = false;
 
         uint32_t dev = device.toUInt(&validID, 16);
         if (!validID || !hdhomerun_discover_validate_device_id(dev))
