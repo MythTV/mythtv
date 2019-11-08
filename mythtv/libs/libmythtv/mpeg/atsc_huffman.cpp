@@ -6,175 +6,11 @@
  * atsc_huffman.h
  *------------------------------------------------------------------------*/
 
-extern unsigned char ATSC_C5[];
-extern unsigned char ATSC_C7[];
-static const unsigned char *atsc_tables[] =
-{
-    nullptr,
-    ATSC_C5,
-    ATSC_C7,
-};
-
 struct huffman_table {
     unsigned int  encoded_sequence;
     unsigned char character;
     unsigned char number_of_bits;
 };
-extern struct huffman_table Table128[];
-extern struct huffman_table Table255[];
-
-extern unsigned char Huff2Lookup128[];
-extern unsigned char Huff2Lookup256[];
-
-/* returns the root for character input from table Table[] */
-static inline int huffman1_get_root(uint input, const unsigned char *table)
-{
-    if (input > 127)
-        return -1;
-    return (table[input * 2] << 8) | table[(input * 2) + 1];
-}
-
-/* Returns the bit number bit from string test[] */
-static inline bool huffman1_get_bit(const unsigned char *src, uint bit)
-{
-    return (src[(bit - (bit & 0x7)) >> 3] >> (7 - (bit & 0x7))) & 0x01;
-}
-
-QString atsc_huffman1_to_string(const unsigned char *compressed,
-                                uint size, uint table_index)
-{
-    QString retval = "";
-
-    const unsigned char *table = atsc_tables[table_index];
-    int totalbits = size * 8;
-    int bit = 0;
-    int root = huffman1_get_root(0, table);
-    int node = 0;
-
-    while (bit < totalbits)
-    {
-        bool thebit = huffman1_get_bit(compressed, bit);
-        unsigned char val = (thebit) ? table[root + (node*2) + 1] : table[root + (node*2)];
-
-        if (val & 0x80)
-        {
-            /* Got a Null Character so return */
-            if ((val & 0x7F) == 0)
-            {
-                return retval;
-            }
-            /* Escape character so next character is uncompressed */
-            if ((val & 0x7F) == 27)
-            {
-                unsigned char val2 = 0;
-                for (int i = 0 ; i < 7 ; i++)
-                {
-                    val2 |=
-                        huffman1_get_bit(compressed, bit + i + 2) << (6 - i);
-                }
-                retval += QChar(val2);
-                bit += 8;
-                root = huffman1_get_root(val2, table);
-            }
-            /* Standard Character */
-            else
-            {
-                root = huffman1_get_root(val & 0x7F, table);
-                retval += QChar(val & 0x7F);
-            }
-            node = 0;
-        }
-        else
-            node = val;
-        bit++;
-    }
-    /* If you get here something went wrong so just return a blank string */
-    return QString("");
-}
-
-static inline int huffman2_get_bit(unsigned char &bitpos,
-                                   const unsigned char **bufptr)
-{
-   int ret = ((**bufptr & bitpos) != 0);
-   bitpos >>= 1;
-   if (!bitpos)
-   {
-       bitpos = 0x80;
-       (*bufptr)++;
-   }
-   return ret;
-}
-
-static inline void huffman2_set_pos(unsigned char &bitpos,
-                                    const unsigned char **bufptr,
-                                    const unsigned char *buffer,
-                                    uint pos)
-{
-    *bufptr = buffer + (pos >> 3);
-    bitpos  = 0x80 >> (pos & 0x7);
-}
-
-QString atsc_huffman2_to_string(const unsigned char *compressed,
-                                uint length, uint table)
-{
-    QString decompressed = "";
-
-    unsigned char        bitpos;
-    const unsigned char *bufptr;
-    huffman2_set_pos(bitpos, &bufptr, compressed, 0);
-
-    // Determine which huffman table to use
-    struct huffman_table *ptrTable;
-    const unsigned char  *lookup;
-    uint                  min_size;
-    uint                  max_size;
-    if (table == 1)
-    {
-        ptrTable = Table128;
-        lookup   = Huff2Lookup128;
-        min_size = 3;
-        max_size = 12;
-    }
-    else
-    {
-        ptrTable = Table255;
-        lookup   = Huff2Lookup256;
-        min_size = 2;
-        max_size = 14;
-    }
-
-    // walk thru all the bits in the byte array, finding each sequence in the
-    // list and decoding it to a character.
-    uint total_bits  = length << 3;
-    uint current_bit = 0;
-
-    while (current_bit + 3 < total_bits)
-    {
-        uint cur_size = 0;
-        uint bits     = 0;
-
-        for (; cur_size < min_size; cur_size++)
-            bits = (bits << 1) | huffman2_get_bit(bitpos, &bufptr);
-
-        while (cur_size < max_size)
-        {
-            uint key = lookup[bits];
-            if (key && (ptrTable[key].number_of_bits == cur_size))
-            {
-                decompressed += ptrTable[key].character;
-                current_bit += cur_size;
-                break;
-            }
-            bits = (bits << 1) | huffman2_get_bit(bitpos, &bufptr);
-            cur_size++;
-        }
-
-        if (cur_size == max_size)
-            huffman2_set_pos(bitpos, &bufptr, compressed, ++current_bit);
-    }
-
-    return decompressed;
-}
 
 unsigned char ATSC_C5[] =
 {
@@ -648,6 +484,13 @@ unsigned char ATSC_C7[] =
     0xE1, 0xE5, 0xEC, 0xFA, 0x9B, 0xEF, 0xE9, 0x01,
     0x02, 0x03, 0x04, 0x05, 0x9B, 0x9B, 0x9B, 0x9B,
     0x9B, 0x9B, 0x9B, 0x9B, 0x9B, 0x9B
+};
+
+static const unsigned char *atsc_tables[] =
+{
+    nullptr,
+    ATSC_C5,
+    ATSC_C7,
 };
 
 struct huffman_table Table128[] =
@@ -2331,3 +2174,153 @@ unsigned char Huff2Lookup256[] =
     0xf0, 0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7,
     0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff,
 };
+
+/* returns the root for character input from table Table[] */
+static inline int huffman1_get_root(uint input, const unsigned char *table)
+{
+    if (input > 127)
+        return -1;
+    return (table[input * 2] << 8) | table[(input * 2) + 1];
+}
+
+/* Returns the bit number bit from string test[] */
+static inline bool huffman1_get_bit(const unsigned char *src, uint bit)
+{
+    return (src[(bit - (bit & 0x7)) >> 3] >> (7 - (bit & 0x7))) & 0x01;
+}
+
+QString atsc_huffman1_to_string(const unsigned char *compressed,
+                                uint size, uint table_index)
+{
+    QString retval = "";
+
+    const unsigned char *table = atsc_tables[table_index];
+    int totalbits = size * 8;
+    int bit = 0;
+    int root = huffman1_get_root(0, table);
+    int node = 0;
+
+    while (bit < totalbits)
+    {
+        bool thebit = huffman1_get_bit(compressed, bit);
+        unsigned char val = (thebit) ? table[root + (node*2) + 1] : table[root + (node*2)];
+
+        if (val & 0x80)
+        {
+            /* Got a Null Character so return */
+            if ((val & 0x7F) == 0)
+            {
+                return retval;
+            }
+            /* Escape character so next character is uncompressed */
+            if ((val & 0x7F) == 27)
+            {
+                unsigned char val2 = 0;
+                for (int i = 0 ; i < 7 ; i++)
+                {
+                    val2 |=
+                        huffman1_get_bit(compressed, bit + i + 2) << (6 - i);
+                }
+                retval += QChar(val2);
+                bit += 8;
+                root = huffman1_get_root(val2, table);
+            }
+            /* Standard Character */
+            else
+            {
+                root = huffman1_get_root(val & 0x7F, table);
+                retval += QChar(val & 0x7F);
+            }
+            node = 0;
+        }
+        else
+            node = val;
+        bit++;
+    }
+    /* If you get here something went wrong so just return a blank string */
+    return QString("");
+}
+
+static inline int huffman2_get_bit(unsigned char &bitpos,
+                                   const unsigned char **bufptr)
+{
+   int ret = ((**bufptr & bitpos) != 0);
+   bitpos >>= 1;
+   if (!bitpos)
+   {
+       bitpos = 0x80;
+       (*bufptr)++;
+   }
+   return ret;
+}
+
+static inline void huffman2_set_pos(unsigned char &bitpos,
+                                    const unsigned char **bufptr,
+                                    const unsigned char *buffer,
+                                    uint pos)
+{
+    *bufptr = buffer + (pos >> 3);
+    bitpos  = 0x80 >> (pos & 0x7);
+}
+
+QString atsc_huffman2_to_string(const unsigned char *compressed,
+                                uint length, uint table)
+{
+    QString decompressed = "";
+
+    unsigned char        bitpos;
+    const unsigned char *bufptr;
+    huffman2_set_pos(bitpos, &bufptr, compressed, 0);
+
+    // Determine which huffman table to use
+    struct huffman_table *ptrTable;
+    const unsigned char  *lookup;
+    uint                  min_size;
+    uint                  max_size;
+    if (table == 1)
+    {
+        ptrTable = Table128;
+        lookup   = Huff2Lookup128;
+        min_size = 3;
+        max_size = 12;
+    }
+    else
+    {
+        ptrTable = Table255;
+        lookup   = Huff2Lookup256;
+        min_size = 2;
+        max_size = 14;
+    }
+
+    // walk thru all the bits in the byte array, finding each sequence in the
+    // list and decoding it to a character.
+    uint total_bits  = length << 3;
+    uint current_bit = 0;
+
+    while (current_bit + 3 < total_bits)
+    {
+        uint cur_size = 0;
+        uint bits     = 0;
+
+        for (; cur_size < min_size; cur_size++)
+            bits = (bits << 1) | huffman2_get_bit(bitpos, &bufptr);
+
+        while (cur_size < max_size)
+        {
+            uint key = lookup[bits];
+            if (key && (ptrTable[key].number_of_bits == cur_size))
+            {
+                decompressed += ptrTable[key].character;
+                current_bit += cur_size;
+                break;
+            }
+            bits = (bits << 1) | huffman2_get_bit(bitpos, &bufptr);
+            cur_size++;
+        }
+
+        if (cur_size == max_size)
+            huffman2_set_pos(bitpos, &bufptr, compressed, ++current_bit);
+    }
+
+    return decompressed;
+}
