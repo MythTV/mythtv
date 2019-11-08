@@ -1001,13 +1001,11 @@ void MythMainWindow::Init(const QString& forcedpainter, bool mayReInit)
     GetMythUI()->GetScreenSettings(d->m_xbase, d->m_screenwidth, d->m_wmult,
                                    d->m_ybase, d->m_screenheight, d->m_hmult);
 
-    if (GetMythDB()->GetNumSetting("GuiOffsetX") > 0 ||
-        GetMythDB()->GetNumSetting("GuiWidth")   > 0 ||
-        GetMythDB()->GetNumSetting("GuiOffsetY") > 0 ||
-        GetMythDB()->GetNumSetting("GuiHeight")  > 0)
-        d->m_does_fill_screen = false;
-    else
-        d->m_does_fill_screen = true;
+    d->m_does_fill_screen =
+        (GetMythDB()->GetNumSetting("GuiOffsetX") == 0 &&
+         GetMythDB()->GetNumSetting("GuiWidth")   == 0 &&
+         GetMythDB()->GetNumSetting("GuiOffsetY") == 0 &&
+         GetMythDB()->GetNumSetting("GuiHeight")  == 0);
 
     // Set window border based on fullscreen attribute
     Qt::WindowFlags flags = Qt::Window;

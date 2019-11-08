@@ -4611,7 +4611,7 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
             }
 
             int rate   = m_sigMonMode ? 0 : 100;
-            bool notify = m_sigMonMode ? false : true;
+            bool notify = !m_sigMonMode;
 
             PauseLiveTV(ctx);
             ctx->m_recorder->SetSignalMonitoringRate(rate, notify);

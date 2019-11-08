@@ -2046,10 +2046,7 @@ void DVDRingBuffer::SetTrack(uint type, int trackNo)
     if (type == kTrackTypeSubtitle)
     {
         m_curSubtitleTrack = trackNo;
-        if (trackNo < 0)
-            m_autoselectsubtitle = true;
-        else
-            m_autoselectsubtitle = false;
+        m_autoselectsubtitle = (trackNo < 0);
     }
     else if (type == kTrackTypeAudio)
     {

@@ -58,11 +58,7 @@ StatusBox::StatusBox(MythScreenStack *parent)
 
     gCoreContext->SendReceiveStringList(strlist);
 
-    if (strlist[0] == "TRUE")
-        m_isBackendActive = true;
-    else
-        m_isBackendActive = false;
-
+    m_isBackendActive = (strlist[0] == "TRUE");
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
 }
 

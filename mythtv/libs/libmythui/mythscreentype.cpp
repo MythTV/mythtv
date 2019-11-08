@@ -506,15 +506,8 @@ bool MythScreenType::ParseElement(
 
         SetArea(rectN);
 
-        if (m_Area.width() < screenArea.width() ||
-            m_Area.height() < screenArea.height())
-        {
-            m_FullScreen = false;
-        }
-        else
-        {
-            m_FullScreen = true;
-        }
+        m_FullScreen = (m_Area.width()  >= screenArea.width() &&
+                        m_Area.height() >= screenArea.height());
     }
     else
     {
