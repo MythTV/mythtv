@@ -615,11 +615,8 @@ VideoSource::VideoSource()
     addChild(new XMLTVGrabber(*this));
     addChild(new FreqTableSelector(*this));
     addChild(new DVBNetID(*this, -1, -1));
-    if (gCoreContext->GetNumSetting("DBSchemaVer") > 1350)
-    {
-        addChild(new BouquetID(*this, 0, 0));
-        addChild(new RegionID(*this, 0, 0));
-    }
+    addChild(new BouquetID(*this, 0, 0));
+    addChild(new RegionID(*this, 0, 0));
 }
 
 bool VideoSource::canDelete(void)
