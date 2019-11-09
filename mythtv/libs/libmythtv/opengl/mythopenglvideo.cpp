@@ -284,13 +284,21 @@ bool MythOpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Dein
         m_render->DeleteShaderProgram(m_shaders[Type]);
     m_shaders[Type] = nullptr;
 
+    QStringList defines;
     QString vertex = DefaultVertexShader;
     QString fragment;
     int cost = 1;
 
+    if (m_textureTarget == GL_TEXTURE_EXTERNAL_OES)
+        defines << "EXTOES";
+
     if ((Default == Type) || (!format_is_yuv(m_outputType)))
     {
-        fragment = RGBFragmentShader;
+        QString glsldefines;
+        foreach (QString define, defines)
+            glsldefines += QString("#define MYTHTV_%1\n").arg(define);
+        fragment = glsldefines + YUVFragmentExtensions + RGBFragmentShader;
+
 #ifdef USING_MEDIACODEC
         if (FMT_MEDIACODEC == m_inputType)
             vertex = MediaCodecVertexShader;
@@ -300,7 +308,6 @@ bool MythOpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Dein
     else
     {
         fragment = YUVFragmentShader;
-        QStringList defines;
         bool kernel = false;
         bool topfield = InterlacedTop == Type;
         bool progressive = (Progressive == Type) || (Deint == DEINT_NONE);
@@ -326,10 +333,6 @@ bool MythOpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Dein
         // FramebufferObject code.
         if ((m_textureTarget == QOpenGLTexture::TargetRectangle) && (Default != Type))
             defines << "RECTS";
-#endif
-#if defined(USING_MEDIACODEC) || defined(USING_MMAL)
-        if (m_textureTarget == GL_TEXTURE_EXTERNAL_OES)
-            defines << "EXTOES";
 #endif
         if (!progressive)
         {
