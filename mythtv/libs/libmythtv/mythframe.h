@@ -57,7 +57,8 @@ typedef enum FrameType_
     FMT_MMAL,
     FMT_MEDIACODEC,
     FMT_VTB,
-    FMT_NVDEC
+    FMT_NVDEC,
+    FMT_DRMPRIME
 } VideoFrameType;
 
 const char* format_description(VideoFrameType Type);
@@ -67,7 +68,7 @@ static inline int format_is_hw(VideoFrameType Type)
     return (Type == FMT_VDPAU) || (Type == FMT_VAAPI) ||
            (Type == FMT_DXVA2) || (Type == FMT_MMAL) ||
            (Type == FMT_MEDIACODEC) || (Type == FMT_VTB) ||
-           (Type == FMT_NVDEC);
+           (Type == FMT_NVDEC) || (Type == FMT_DRMPRIME);
 }
 
 static inline int format_is_hwframes(VideoFrameType Type)
@@ -595,6 +596,7 @@ static inline uint planes(VideoFrameType Type)
         case FMT_MEDIACODEC:
         case FMT_NVDEC:
         case FMT_MMAL:
+        case FMT_DRMPRIME:
         case FMT_VTB:       return 0;
     }
     return 0;
@@ -638,6 +640,7 @@ static inline int bitsperpixel(VideoFrameType Type)
         case FMT_MMAL:
         case FMT_MEDIACODEC:
         case FMT_NVDEC:
+        case FMT_DRMPRIME:
         case FMT_VTB: break;
     }
     return 8;

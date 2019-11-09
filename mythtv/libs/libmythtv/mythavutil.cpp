@@ -59,6 +59,7 @@ AVPixelFormat FrameTypeToPixelFormat(VideoFrameType type)
         case FMT_NVDEC:      return AV_PIX_FMT_CUDA;
         case FMT_DXVA2:      return AV_PIX_FMT_DXVA2_VLD;
         case FMT_MMAL:       return AV_PIX_FMT_MMAL;
+        case FMT_DRMPRIME:   return AV_PIX_FMT_DRM_PRIME;
         case FMT_NONE: break;
     }
     return AV_PIX_FMT_NONE;
@@ -104,6 +105,7 @@ VideoFrameType PixelFormatToFrameType(AVPixelFormat fmt)
         case AV_PIX_FMT_VAAPI:     return FMT_VAAPI;
         case AV_PIX_FMT_DXVA2_VLD: return FMT_DXVA2;
         case AV_PIX_FMT_MEDIACODEC: return FMT_MEDIACODEC;
+        case AV_PIX_FMT_DRM_PRIME: return FMT_DRMPRIME;
         default: break;
     }
     return FMT_NONE;

@@ -73,6 +73,7 @@ const char* format_description(VideoFrameType Type)
         case FMT_MEDIACODEC: return "MediaCodec";
         case FMT_VTB:        return "VideoToolBox";
         case FMT_NVDEC:      return "NVDec";
+        case FMT_DRMPRIME:   return "DRM-PRIME";
     }
     return "?";
 }
