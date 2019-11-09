@@ -387,7 +387,23 @@ QString MPEGDescriptor::DescriptorTagString(void) const
     if (IsValid()) { DESC_NAME d(_data, DescriptorLength()+2); \
     if (d.IsValid()) str = d.toString(); } } while (false)
 
-QString MPEGDescriptor::toString() const
+QString MPEGDescriptor::descrDump(QString name) const
+{
+    QString str;
+    str = QString("%1 Descriptor (0x%2) length(%3). Dumping\n")
+            .arg(name)
+            .arg(DescriptorTag(),2,16,QChar('0'))
+            .arg(DescriptorLength());
+    str.append(hexdump());
+    return str;
+}
+
+QString MPEGDescriptor::toString(void) const
+{
+    return toStringPD(0);
+}
+
+QString MPEGDescriptor::toStringPD(uint priv_dsid) const
 {
     QString str;
 
@@ -395,70 +411,88 @@ QString MPEGDescriptor::toString() const
         str = "Invalid Descriptor";
     else if (DescriptorID::registration == DescriptorTag())
         SET_STRING(RegistrationDescriptor);
+    else if (DescriptorID::conditional_access == DescriptorTag())
+        SET_STRING(ConditionalAccessDescriptor);
     else if (DescriptorID::iso_639_language == DescriptorTag())
         SET_STRING(ISO639LanguageDescriptor);
     else if (DescriptorID::avc_video == DescriptorTag())
         SET_STRING(AVCVideoDescriptor);
-    else if (DescriptorID::ac3_audio_stream == DescriptorTag())
-        SET_STRING(AudioStreamDescriptor);
-    else if (DescriptorID::caption_service == DescriptorTag())
-        SET_STRING(CaptionServiceDescriptor);
-    else if (DescriptorID::extended_channel_name == DescriptorTag())
-        SET_STRING(ExtendedChannelNameDescriptor);
-    else if (DescriptorID::component_name == DescriptorTag())
-        SET_STRING(ComponentNameDescriptor);
-    else if (DescriptorID::conditional_access == DescriptorTag())
-        SET_STRING(ConditionalAccessDescriptor);
+    else if (DescriptorID::hevc_video == DescriptorTag())
+        SET_STRING(HEVCVideoDescriptor);
     else if (DescriptorID::network_name == DescriptorTag())
         SET_STRING(NetworkNameDescriptor);
-    //else if (DescriptorID::linkage == DescriptorTag())
-    //    SET_STRING(LinkageDescriptor);
-    else if (DescriptorID::adaptation_field_data == DescriptorTag())
-        SET_STRING(AdaptationFieldDataDescriptor);
-    //else if (DescriptorID::ancillary_data == DescriptorTag())
-    //    SET_STRING(AncillaryDataDescriptor);
-    else if (DescriptorID::cable_delivery_system == DescriptorTag())
-        SET_STRING(CableDeliverySystemDescriptor);
+    else if (DescriptorID::service_list == DescriptorTag())
+        SET_STRING(ServiceListDescriptor);
     else if (DescriptorID::satellite_delivery_system == DescriptorTag())
         SET_STRING(SatelliteDeliverySystemDescriptor);
+    else if (DescriptorID::cable_delivery_system == DescriptorTag())
+        SET_STRING(CableDeliverySystemDescriptor);
+    else if (DescriptorID::bouquet_name == DescriptorTag())
+        SET_STRING(BouquetNameDescriptor);
+    else if (DescriptorID::service == DescriptorTag())
+        SET_STRING(ServiceDescriptor);
+    else if (DescriptorID::country_availability == DescriptorTag())
+        SET_STRING(CountryAvailabilityDescriptor);
+    //else if (DescriptorID::linkage == DescriptorTag())
+    //    SET_STRING(LinkageDescriptor);
+    else if (DescriptorID::stream_identifier == DescriptorTag())
+        SET_STRING(StreamIdentifierDescriptor);
+    else if (DescriptorID::teletext == DescriptorTag())
+        SET_STRING(TeletextDescriptor);
     else if (DescriptorID::terrestrial_delivery_system == DescriptorTag())
         SET_STRING(TerrestrialDeliverySystemDescriptor);
     else if (DescriptorID::frequency_list == DescriptorTag())
         SET_STRING(FrequencyListDescriptor);
-    else if (DescriptorID::service == DescriptorTag())
-        SET_STRING(ServiceDescriptor);
-    else if (DescriptorID::stream_identifier == DescriptorTag())
-        SET_STRING(StreamIdentifierDescriptor);
+    //else if (DescriptorID::ancillary_data == DescriptorTag())
+    //    SET_STRING(AncillaryDataDescriptor);
+    else if (DescriptorID::adaptation_field_data == DescriptorTag())
+        SET_STRING(AdaptationFieldDataDescriptor);
     else if (DescriptorID::default_authority == DescriptorTag())
         SET_STRING(DefaultAuthorityDescriptor);
-    else if (DescriptorID::bouquet_name == DescriptorTag())
-        SET_STRING(BouquetNameDescriptor);
-    else if (DescriptorID::country_availability == DescriptorTag())
-        SET_STRING(CountryAvailabilityDescriptor);
-    else if (DescriptorID::service_list == DescriptorTag())
-        SET_STRING(ServiceListDescriptor);
+    //
+    // User Defined DVB descriptors, range 0x80-0xFE
+    else if (priv_dsid == PrivateDataSpecifierID::BSB1 &&
+             PrivateDescriptorID::bskyb_lcn_table== DescriptorTag())
+        SET_STRING(BSkyBLCNDescriptor);
+    else if (priv_dsid == PrivateDataSpecifierID::FSAT &&
+             PrivateDescriptorID::freesat_region_table == DescriptorTag())
+        SET_STRING(FreesatRegionDescriptor);
+    else if (priv_dsid == PrivateDataSpecifierID::FSAT &&
+             PrivateDescriptorID::freesat_lcn_table== DescriptorTag())
+        SET_STRING(FreesatLCNDescriptor);
+    else if (priv_dsid == PrivateDataSpecifierID::FSAT &&
+             PrivateDescriptorID::freesat_callsign== DescriptorTag())
+        SET_STRING(FreesatCallsignDescriptor);
+    else if (priv_dsid == PrivateDataSpecifierID::CASEMA &&
+             PrivateDescriptorID::casema_video_on_demand== DescriptorTag())
+        descrDump("Video on Demand");
+    else if ((priv_dsid == PrivateDataSpecifierID::EACEM  ||
+              priv_dsid == PrivateDataSpecifierID::NORDIG ||
+              priv_dsid == PrivateDataSpecifierID::ITC     ) &&
+             PrivateDescriptorID::dvb_simulcast_channel_descriptor == DescriptorTag())
+        SET_STRING(DVBSimulcastChannelDescriptor);
+    else if ((priv_dsid == PrivateDataSpecifierID::EACEM  ||
+              priv_dsid == PrivateDataSpecifierID::NORDIG ||
+              priv_dsid == PrivateDataSpecifierID::ITC    ) &&
+             PrivateDescriptorID::dvb_logical_channel_descriptor == DescriptorTag())
+        SET_STRING(DVBLogicalChannelDescriptor);
+    //
+    // POSSIBLY UNSAFE ! -- begin
+    // ATSC/SCTE descriptors, range 0x80-0xFE
+    else if (DescriptorID::ac3_audio_stream == DescriptorTag())
+        SET_STRING(AudioStreamDescriptor);
+    else if (DescriptorID::caption_service == DescriptorTag())
+        SET_STRING(CaptionServiceDescriptor);
     else if (DescriptorID::scte_cue_identifier == DescriptorTag())
         SET_STRING(CueIdentifierDescriptor);
     else if (DescriptorID::scte_revision_detection == DescriptorTag())
         SET_STRING(RevisionDetectionDescriptor);
-    else if (DescriptorID::teletext == DescriptorTag())
-        SET_STRING(TeletextDescriptor);
-    else if (DescriptorID::hevc_video == DescriptorTag())
-        SET_STRING(HEVCVideoDescriptor);
-    /// POSSIBLY UNSAFE ! -- begin
-    else if (PrivateDescriptorID::dvb_logical_channel_descriptor == DescriptorTag())
-        SET_STRING(DVBLogicalChannelDescriptor);
-    else if (PrivateDescriptorID::dvb_simulcast_channel_descriptor == DescriptorTag())
-        SET_STRING(DVBSimulcastChannelDescriptor);
-    else if (PrivateDescriptorID::bskyb_lcn_table== DescriptorTag())
-        SET_STRING(BSkyBLCNDescriptor);
-    else if (PrivateDescriptorID::freesat_region_table == DescriptorTag())
-        SET_STRING(FreesatRegionDescriptor);
-    else if (PrivateDescriptorID::freesat_lcn_table== DescriptorTag())
-        SET_STRING(FreesatLCNDescriptor);
-    else if (PrivateDescriptorID::freesat_callsign== DescriptorTag())
-        SET_STRING(FreesatCallsignDescriptor);
-    /// POSSIBLY UNSAFE ! -- end
+    else if (DescriptorID::extended_channel_name == DescriptorTag())
+        SET_STRING(ExtendedChannelNameDescriptor);
+    else if (priv_dsid == 0 &&
+             DescriptorID::component_name == DescriptorTag())
+        SET_STRING(ComponentNameDescriptor);
+    // POSSIBLY UNSAFE ! -- end
     else
     {
         str = QString("%1 Descriptor (0x%2) length(%3). Dumping\n")
