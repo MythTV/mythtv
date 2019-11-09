@@ -477,6 +477,7 @@ using_frontend {
         HEADERS += opengl/mythopenglvideoshaders.h
         HEADERS += opengl/mythopenglinterop.h
         HEADERS += opengl/mythvideotexture.h
+        HEADERS += opengl/mythegldefs.h
         SOURCES += opengl/mythopenglvideo.cpp
         SOURCES += opengl/mythvideooutopengl.cpp
         SOURCES += opengl/mythopenglinterop.cpp

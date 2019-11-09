@@ -7,9 +7,8 @@ extern "C" {
 #include "libavutil/pixdesc.h"
 }
 
-// Egl
-#include <EGL/egl.h>
-#include <EGL/eglext.h>
+// EGL
+#include "mythegldefs.h"
 
 #define LOC QString("MMALInterop: ")
 

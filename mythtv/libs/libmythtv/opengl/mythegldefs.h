@@ -1,0 +1,85 @@
+#ifndef MYTHEGLDEFS_H
+#define MYTHEGLDEFS_H
+
+// This file exists solely to work around conflicts between the generic and
+// Broadcom EGL headers when using both open and closed source drivers/features
+// on the Raspberry Pi.
+
+#include <EGL/egl.h>
+#include <EGL/eglext.h>
+
+#ifndef EGL_IMAGE_BRCM_MULTIMEDIA_Y
+#define EGL_IMAGE_BRCM_MULTIMEDIA_Y 0x99930C0
+#endif
+#ifndef EGL_IMAGE_BRCM_MULTIMEDIA_U
+#define EGL_IMAGE_BRCM_MULTIMEDIA_U 0x99930C1
+#endif
+#ifndef EGL_IMAGE_BRCM_MULTIMEDIA_V
+#define EGL_IMAGE_BRCM_MULTIMEDIA_V 0x99930C2
+#endif
+
+#ifndef EGL_LINUX_DRM_FOURCC_EXT
+#define EGL_LINUX_DRM_FOURCC_EXT        0x3271
+#endif
+#ifndef EGL_DMA_BUF_PLANE0_FD_EXT
+#define EGL_DMA_BUF_PLANE0_FD_EXT       0x3272
+#endif
+#ifndef EGL_DMA_BUF_PLANE0_OFFSET_EXT
+#define EGL_DMA_BUF_PLANE0_OFFSET_EXT   0x3273
+#endif
+#ifndef EGL_DMA_BUF_PLANE0_PITCH_EXT
+#define EGL_DMA_BUF_PLANE0_PITCH_EXT    0x3274
+#endif
+#ifndef EGL_DMA_BUF_PLANE1_FD_EXT
+#define EGL_DMA_BUF_PLANE1_FD_EXT       0x3275
+#endif
+#ifndef EGL_DMA_BUF_PLANE1_OFFSET_EXT
+#define EGL_DMA_BUF_PLANE1_OFFSET_EXT   0x3276
+#endif
+#ifndef EGL_DMA_BUF_PLANE1_PITCH_EXT
+#define EGL_DMA_BUF_PLANE1_PITCH_EXT    0x3277
+#endif
+#ifndef EGL_DMA_BUF_PLANE2_FD_EXT
+#define EGL_DMA_BUF_PLANE2_FD_EXT       0x3278
+#endif
+#ifndef EGL_DMA_BUF_PLANE2_OFFSET_EXT
+#define EGL_DMA_BUF_PLANE2_OFFSET_EXT   0x3279
+#endif
+#ifndef EGL_DMA_BUF_PLANE2_PITCH_EXT
+#define EGL_DMA_BUF_PLANE2_PITCH_EXT    0x327A
+#endif
+#ifndef EGL_YUV_COLOR_SPACE_HINT_EXT
+#define EGL_YUV_COLOR_SPACE_HINT_EXT    0x327B
+#endif
+#ifndef EGL_SAMPLE_RANGE_HINT_EXT
+#define EGL_SAMPLE_RANGE_HINT_EXT       0x327C
+#endif
+#ifndef EGL_YUV_CHROMA_HORIZONTAL_SITING_HINT_EXT
+#define EGL_YUV_CHROMA_HORIZONTAL_SITING_HINT_EXT  0x327D
+#endif
+#ifndef EGL_YUV_CHROMA_VERTICAL_SITING_HINT_EXT
+#define EGL_YUV_CHROMA_VERTICAL_SITING_HINT_EXT    0x327E
+#endif
+#ifndef EGL_ITU_REC601_EXT
+#define EGL_ITU_REC601_EXT   0x327F
+#endif
+#ifndef EGL_ITU_REC709_EXT
+#define EGL_ITU_REC709_EXT   0x3280
+#endif
+#ifndef EGL_ITU_REC2020_EXT
+#define EGL_ITU_REC2020_EXT  0x3281
+#endif
+#ifndef EGL_YUV_FULL_RANGE_EXT
+#define EGL_YUV_FULL_RANGE_EXT    0x3282
+#endif
+#ifndef EGL_YUV_NARROW_RANGE_EXT
+#define EGL_YUV_NARROW_RANGE_EXT  0x3283
+#endif
+#ifndef EGL_YUV_CHROMA_SITING_0_EXT
+#define EGL_YUV_CHROMA_SITING_0_EXT    0x3284
+#endif
+#ifndef EGL_YUV_CHROMA_SITING_0_5_EXT
+#define EGL_YUV_CHROMA_SITING_0_5_EXT  0x3285
+#endif
+
+#endif // MYTHEGLDEFS_H
