@@ -1977,6 +1977,7 @@ MYTHTV_CONFIG_LIST='
     qtdbus
     taglib
     v4l2
+    v4l2prime
     v4l1
     valgrind
     x11
@@ -2601,6 +2602,7 @@ opengles_deps="GLES2_gl2_h"
 opengl_video_deps="opengl"
 opengl_themepainter_deps="opengl"
 v4l2_deps="linux_videodev2_h"
+v4l2prime_deps="v4l2"
 v4l1_deps="backend v4l2 linux_videodev_h"
 xrandr_deps="x11"
 asi_deps="backend"
@@ -2764,6 +2766,7 @@ enable opengl_themepainter
 enable symbol_visibility
 enable v4l1
 enable v4l2
+enable v4l2prime
 enable x11
 enable xnvctrl
 enable xnvctrl_external
@@ -4718,6 +4721,7 @@ case $target_os in
         disable dvb
         disable v4l1
         disable v4l2
+        disable v4l2prime
         disable x11
         # Workaround compile errors from missing u_int/uint def
         CFLAGS=`echo $CFLAGS | sed 's/-D_POSIX_C_SOURCE=200112//'`
@@ -4767,6 +4771,7 @@ case $target_os in
         disable symver
         disable v4l1
         disable v4l2
+        disable v4l2prime
         enable  windows
         disable x11
         disable qtdbus
@@ -7170,6 +7175,10 @@ if enabled mmal; then
     ffopts="$ffopts --enable-mmal"
 fi
 
+if enabled v4l2; then
+    ffopts="$ffopts --enable-libdrm"
+fi
+
 ffmpeg_extra_cflags="$extra_cflags -w"
 
 ## Call FFmpeg configure here
@@ -7205,6 +7214,10 @@ if ! grep "^CONFIG_NVDEC=yes$" external/FFmpeg/ffbuild/config.mak ; then
     disable nvdec
 fi
 
+# If ffmpeg disabled libdrm then disable v4l2prime
+if ! grep "^CONFIG_LIBDRM=yes$" external/FFmpeg/ffbuild/config.mak ; then
+    disable v4l2prime
+fi
 if test "$quiet" != "yes"; then
 
 echo
@@ -7379,7 +7392,7 @@ if enabled x11 ; then
   echo "VAAPI support             ${vaapi-no}"
   echo "NVDEC support             ${nvdec-no}"
 fi
-  echo "Video4Linux codecs        ${v4l2-no}"
+  echo "Video4Linux codecs        ${v4l2-no} (DRM ${v4l2prime-no})"
   echo "MMAL decoder support      ${mmal-no}"
   echo "OpenGL support            ${opengl-no}"
   echo "OpenGL video              ${opengl_video-no}"

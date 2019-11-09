@@ -21,6 +21,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include <drm_fourcc.h>
 #include <linux/videodev2.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
@@ -29,6 +30,7 @@
 #include <poll.h>
 #include "libavcodec/avcodec.h"
 #include "libavcodec/internal.h"
+#include "libavutil/hwcontext.h"
 #include "v4l2_context.h"
 #include "v4l2_buffers.h"
 #include "v4l2_m2m.h"
@@ -203,7 +205,79 @@ static enum AVColorTransferCharacteristic v4l2_get_color_trc(V4L2Buffer *buf)
     return AVCOL_TRC_UNSPECIFIED;
 }
 
-static void v4l2_free_buffer(void *opaque, uint8_t *unused)
+static uint8_t * v4l2_get_drm_frame(V4L2Buffer *avbuf)
+{
+    AVDRMFrameDescriptor *drm_desc = &avbuf->drm_frame;
+    AVDRMLayerDescriptor *layer;
+
+    /* fill the DRM frame descriptor */
+    drm_desc->nb_objects = avbuf->num_planes;
+    drm_desc->nb_layers = 1;
+
+    layer = &drm_desc->layers[0];
+    layer->nb_planes = avbuf->num_planes;
+
+    for (int i = 0; i < avbuf->num_planes; i++) {
+        layer->planes[i].object_index = i;
+        layer->planes[i].offset = 0;
+        layer->planes[i].pitch = avbuf->plane_info[i].bytesperline;
+    }
+
+    switch (avbuf->context->av_pix_fmt) {
+    case AV_PIX_FMT_YUYV422:
+
+        layer->format = DRM_FORMAT_YUYV;
+        layer->nb_planes = 1;
+
+        break;
+
+    case AV_PIX_FMT_NV12:
+    case AV_PIX_FMT_NV21:
+
+        layer->format = avbuf->context->av_pix_fmt == AV_PIX_FMT_NV12 ?
+            DRM_FORMAT_NV12 : DRM_FORMAT_NV21;
+
+        if (avbuf->num_planes > 1)
+            break;
+
+        layer->nb_planes = 2;
+
+        layer->planes[1].object_index = 0;
+        layer->planes[1].offset = avbuf->plane_info[0].bytesperline *
+            avbuf->context->format.fmt.pix.height;
+        layer->planes[1].pitch = avbuf->plane_info[0].bytesperline;
+        break;
+
+    case AV_PIX_FMT_YUV420P:
+
+        layer->format = DRM_FORMAT_YUV420;
+
+        if (avbuf->num_planes > 1)
+            break;
+
+        layer->nb_planes = 3;
+
+        layer->planes[1].object_index = 0;
+        layer->planes[1].offset = avbuf->plane_info[0].bytesperline *
+            avbuf->context->format.fmt.pix.height;
+        layer->planes[1].pitch = avbuf->plane_info[0].bytesperline >> 1;
+
+        layer->planes[2].object_index = 0;
+        layer->planes[2].offset = layer->planes[1].offset +
+            ((avbuf->plane_info[0].bytesperline *
+              avbuf->context->format.fmt.pix.height) >> 2);
+        layer->planes[2].pitch = avbuf->plane_info[0].bytesperline >> 1;
+        break;
+
+    default:
+        drm_desc->nb_layers = 0;
+        break;
+    }
+
+    return (uint8_t *) drm_desc;
+}
+
+static void v4l2_free_buffer(void *opaque, uint8_t *data)
 {
     V4L2Buffer* avbuf = opaque;
     V4L2m2mContext *s = buf_to_m2mctx(avbuf);
@@ -227,27 +301,49 @@ static void v4l2_free_buffer(void *opaque, uint8_t *unused)
     }
 }
 
-static int v4l2_buf_to_bufref(V4L2Buffer *in, int plane, AVBufferRef **buf)
+static int v4l2_buffer_export_drm(V4L2Buffer* avbuf)
+{
+    struct v4l2_exportbuffer expbuf;
+    int i, ret;
+
+    for (i = 0; i < avbuf->num_planes; i++) {
+        memset(&expbuf, 0, sizeof(expbuf));
+
+        expbuf.index = avbuf->buf.index;
+        expbuf.type = avbuf->buf.type;
+        expbuf.plane = i;
+
+        ret = ioctl(buf_to_m2mctx(avbuf)->fd, VIDIOC_EXPBUF, &expbuf);
+        if (ret < 0)
+            return AVERROR(errno);
+
+        if (V4L2_TYPE_IS_MULTIPLANAR(avbuf->buf.type)) {
+            /* drm frame */
+            avbuf->drm_frame.objects[i].size = avbuf->buf.m.planes[i].length;
+            avbuf->drm_frame.objects[i].fd = expbuf.fd;
+            avbuf->drm_frame.objects[i].format_modifier = DRM_FORMAT_MOD_LINEAR;
+        } else {
+            /* drm frame */
+            avbuf->drm_frame.objects[0].size = avbuf->buf.length;
+            avbuf->drm_frame.objects[0].fd = expbuf.fd;
+            avbuf->drm_frame.objects[0].format_modifier = DRM_FORMAT_MOD_LINEAR;
+        }
+    }
+
+    return 0;
+}
+
+static int v4l2_buf_increase_ref(V4L2Buffer *in)
 {
     V4L2m2mContext *s = buf_to_m2mctx(in);
-
-    if (plane >= in->num_planes)
-        return AVERROR(EINVAL);
-
-    /* even though most encoders return 0 in data_offset encoding vp8 does require this value */
-    *buf = av_buffer_create((char *)in->plane_info[plane].mm_addr + in->planes[plane].data_offset,
-                            in->plane_info[plane].length, v4l2_free_buffer, in, 0);
-    if (!*buf)
-        return AVERROR(ENOMEM);
 
     if (in->context_ref)
         atomic_fetch_add(&in->context_refcount, 1);
     else {
         in->context_ref = av_buffer_ref(s->self_ref);
-        if (!in->context_ref) {
-            av_buffer_unref(buf);
+        if (!in->context_ref)
             return AVERROR(ENOMEM);
-        }
+
         in->context_refcount = 1;
     }
 
@@ -255,6 +351,46 @@ static int v4l2_buf_to_bufref(V4L2Buffer *in, int plane, AVBufferRef **buf)
     atomic_fetch_add_explicit(&s->refcount, 1, memory_order_relaxed);
 
     return 0;
+}
+
+static int v4l2_buf_to_bufref_drm(V4L2Buffer *in, AVBufferRef **buf)
+{
+    int ret;
+
+    *buf = av_buffer_create((uint8_t *) &in->drm_frame,
+                            sizeof(in->drm_frame),
+                            v4l2_free_buffer,
+                            in, AV_BUFFER_FLAG_READONLY);
+    if (!*buf)
+        return AVERROR(ENOMEM);
+
+    ret = v4l2_buf_increase_ref(in);
+    if (ret)
+         av_buffer_unref(buf);
+
+    return ret;
+}
+
+static int v4l2_buf_to_bufref(V4L2Buffer *in, int plane, AVBufferRef **buf)
+{
+    int ret;
+
+    if (plane >= in->num_planes)
+        return AVERROR(EINVAL);
+
+    /* most encoders return 0 in data_offset but vp8 does require this value */
+    *buf = av_buffer_create((char *)in->plane_info[plane].mm_addr + in->planes[plane].data_offset,
+                            in->plane_info[plane].length,
+                            v4l2_free_buffer,
+                            in, 0);
+    if (!*buf)
+        return AVERROR(ENOMEM);
+
+    ret = v4l2_buf_increase_ref(in);
+    if (ret)
+        av_buffer_unref(buf);
+
+    return ret;
 }
 
 static int v4l2_bufref_to_buf(V4L2Buffer *out, int plane, const uint8_t* data, int size, AVBufferRef* bref)
@@ -267,7 +403,8 @@ static int v4l2_bufref_to_buf(V4L2Buffer *out, int plane, const uint8_t* data, i
     bytesused = FFMIN(size, out->plane_info[plane].length);
     length = out->plane_info[plane].length;
 
-    memcpy(out->plane_info[plane].mm_addr, data, FFMIN(size, out->plane_info[plane].length));
+    memcpy(out->plane_info[plane].mm_addr, data,
+           FFMIN(size, out->plane_info[plane].length));
 
     if (V4L2_TYPE_IS_MULTIPLANAR(out->buf.type)) {
         out->planes[plane].bytesused = bytesused;
@@ -291,7 +428,10 @@ int ff_v4l2_buffer_avframe_to_buf(const AVFrame *frame, V4L2Buffer* out)
     int i, ret;
 
     for(i = 0; i < out->num_planes; i++) {
-        ret = v4l2_bufref_to_buf(out, i, frame->buf[i]->data, frame->buf[i]->size, frame->buf[i]);
+        ret = v4l2_bufref_to_buf(out, i,
+                                frame->buf[i]->data,
+                                frame->buf[i]->size,
+                                frame->buf[i]);
         if (ret)
             return ret;
     }
@@ -309,40 +449,52 @@ int ff_v4l2_buffer_buf_to_avframe(AVFrame *frame, V4L2Buffer *avbuf)
     av_frame_unref(frame);
 
     /* 1. get references to the actual data */
-    for (i = 0; i < avbuf->num_planes; i++) {
-        ret = v4l2_buf_to_bufref(avbuf, i, &frame->buf[i]);
+    if (buf_to_m2mctx(avbuf)->output_drm) {
+        /* 1. get references to the actual data */
+        ret = v4l2_buf_to_bufref_drm(avbuf, &frame->buf[0]);
         if (ret)
             return ret;
 
-        frame->linesize[i] = avbuf->plane_info[i].bytesperline;
-        frame->data[i] = frame->buf[i]->data;
-    }
+        frame->data[0] = (uint8_t *) v4l2_get_drm_frame(avbuf);
+        frame->format = AV_PIX_FMT_DRM_PRIME;
+        frame->hw_frames_ctx = av_buffer_ref(avbuf->context->frames_ref);
+    } else {
+        /* 1. get references to the actual data */
+        for (i = 0; i < avbuf->num_planes; i++) {
+            ret = v4l2_buf_to_bufref(avbuf, i, &frame->buf[i]);
+            if (ret)
+                return ret;
 
-    /* 1.1 fixup special cases */
-    switch (avbuf->context->av_pix_fmt) {
-    case AV_PIX_FMT_NV12:
-        if (avbuf->num_planes > 1)
+            frame->linesize[i] = avbuf->plane_info[i].bytesperline;
+            frame->data[i] = frame->buf[i]->data;
+        }
+
+        /* 1.1 fixup special cases */
+        switch (avbuf->context->av_pix_fmt) {
+        case AV_PIX_FMT_NV12:
+            if (avbuf->num_planes > 1)
+                break;
+            frame->linesize[1] = avbuf->plane_info[0].bytesperline;
+            frame->data[1] = frame->buf[0]->data + avbuf->plane_info[0].bytesperline * avbuf->context->format.fmt.pix_mp.height;
             break;
-        frame->linesize[1] = avbuf->plane_info[0].bytesperline;
-        frame->data[1] = frame->buf[0]->data + avbuf->plane_info[0].bytesperline * avbuf->context->format.fmt.pix_mp.height;
-        break;
-    case AV_PIX_FMT_YUV420P:
-        if (avbuf->num_planes > 1)
+        case AV_PIX_FMT_YUV420P:
+            if (avbuf->num_planes > 1)
+                break;
+            frame->linesize[1] = frame->linesize[2] = avbuf->plane_info[0].bytesperline >> 1;
+            frame->data[1] = frame->buf[0]->data + avbuf->plane_info[0].bytesperline * avbuf->context->format.fmt.pix_mp.height;
+            frame->data[2] = frame->data[1] + ((avbuf->plane_info[0].bytesperline * avbuf->context->format.fmt.pix_mp.height) >> 2);
             break;
-        frame->linesize[1] = frame->linesize[2] = avbuf->plane_info[0].bytesperline >> 1;
-        frame->data[1] = frame->buf[0]->data + avbuf->plane_info[0].bytesperline * avbuf->context->format.fmt.pix_mp.height;
-        frame->data[2] = frame->data[1] + ((avbuf->plane_info[0].bytesperline * avbuf->context->format.fmt.pix_mp.height) >> 2);
-        break;
-    default:
-        break;
+        default:
+            break;
+        }
+        frame->format = avbuf->context->av_pix_fmt;
     }
 
     /* 2. get frame information */
     frame->key_frame = !!(avbuf->buf.flags & V4L2_BUF_FLAG_KEYFRAME);
-    frame->format = avbuf->context->av_pix_fmt;
     frame->color_primaries = v4l2_get_color_primaries(avbuf);
-    frame->colorspace = v4l2_get_color_space(avbuf);
     frame->color_range = v4l2_get_color_range(avbuf);
+    frame->colorspace = v4l2_get_color_space(avbuf);
     frame->color_trc = v4l2_get_color_trc(avbuf);
     frame->pts = v4l2_get_pts(avbuf);
 
@@ -368,7 +520,8 @@ int ff_v4l2_buffer_buf_to_avpkt(AVPacket *pkt, V4L2Buffer *avbuf)
     if (ret)
         return ret;
 
-    pkt->size = V4L2_TYPE_IS_MULTIPLANAR(avbuf->buf.type) ? avbuf->buf.m.planes[0].bytesused : avbuf->buf.bytesused;
+    pkt->size = V4L2_TYPE_IS_MULTIPLANAR(avbuf->buf.type) ?
+        avbuf->buf.m.planes[0].bytesused : avbuf->buf.bytesused;
     pkt->data = pkt->buf->data;
 
     if (avbuf->buf.flags & V4L2_BUF_FLAG_KEYFRAME)
@@ -409,6 +562,27 @@ int ff_v4l2_buffer_initialize(V4L2Buffer* avbuf, int index)
     avbuf->buf.type = ctx->type;
     avbuf->buf.index = index;
 
+    if (buf_to_m2mctx(avbuf)->output_drm) {
+        AVHWFramesContext *hwframes;
+
+        av_buffer_unref(&ctx->frames_ref);
+
+        ctx->frames_ref = av_hwframe_ctx_alloc(buf_to_m2mctx(avbuf)->device_ref);
+        if (!ctx->frames_ref) {
+            ret = AVERROR(ENOMEM);
+            return ret;
+        }
+
+        hwframes = (AVHWFramesContext*)ctx->frames_ref->data;
+        hwframes->format = AV_PIX_FMT_DRM_PRIME;
+        hwframes->sw_format = ctx->av_pix_fmt;
+        hwframes->width = ctx->width;
+        hwframes->height = ctx->height;
+        ret = av_hwframe_ctx_init(ctx->frames_ref);
+        if (ret < 0)
+            return ret;
+    }
+
     if (V4L2_TYPE_IS_MULTIPLANAR(ctx->type)) {
         avbuf->buf.length = VIDEO_MAX_PLANES;
         avbuf->buf.m.planes = avbuf->planes;
@@ -424,6 +598,7 @@ int ff_v4l2_buffer_initialize(V4L2Buffer* avbuf, int index)
             /* in MP, the V4L2 API states that buf.length means num_planes */
             if (avbuf->num_planes >= avbuf->buf.length)
                 break;
+
             if (avbuf->buf.m.planes[avbuf->num_planes].length)
                 avbuf->num_planes++;
         }
@@ -438,14 +613,24 @@ int ff_v4l2_buffer_initialize(V4L2Buffer* avbuf, int index)
 
         if (V4L2_TYPE_IS_MULTIPLANAR(ctx->type)) {
             avbuf->plane_info[i].length = avbuf->buf.m.planes[i].length;
-            avbuf->plane_info[i].mm_addr = mmap(NULL, avbuf->buf.m.planes[i].length,
-                                           PROT_READ | PROT_WRITE, MAP_SHARED,
-                                           buf_to_m2mctx(avbuf)->fd, avbuf->buf.m.planes[i].m.mem_offset);
+
+            if ((V4L2_TYPE_IS_OUTPUT(ctx->type) && buf_to_m2mctx(avbuf)->output_drm) ||
+                !buf_to_m2mctx(avbuf)->output_drm) {
+                avbuf->plane_info[i].mm_addr = mmap(NULL, avbuf->buf.m.planes[i].length,
+                                               PROT_READ | PROT_WRITE, MAP_SHARED,
+                                               buf_to_m2mctx(avbuf)->fd,
+                                               avbuf->buf.m.planes[i].m.mem_offset);
+            }
         } else {
             avbuf->plane_info[i].length = avbuf->buf.length;
-            avbuf->plane_info[i].mm_addr = mmap(NULL, avbuf->buf.length,
-                                          PROT_READ | PROT_WRITE, MAP_SHARED,
-                                          buf_to_m2mctx(avbuf)->fd, avbuf->buf.m.offset);
+
+            if ((V4L2_TYPE_IS_OUTPUT(ctx->type) && buf_to_m2mctx(avbuf)->output_drm) ||
+                !buf_to_m2mctx(avbuf)->output_drm) {
+                avbuf->plane_info[i].mm_addr = mmap(NULL, avbuf->buf.length,
+                                              PROT_READ | PROT_WRITE, MAP_SHARED,
+                                              buf_to_m2mctx(avbuf)->fd,
+                                              avbuf->buf.m.offset);
+            }
         }
 
         if (avbuf->plane_info[i].mm_addr == MAP_FAILED)
@@ -454,16 +639,21 @@ int ff_v4l2_buffer_initialize(V4L2Buffer* avbuf, int index)
 
     avbuf->status = V4L2BUF_AVAILABLE;
 
-    if (V4L2_TYPE_IS_OUTPUT(ctx->type))
-        return 0;
-
     if (V4L2_TYPE_IS_MULTIPLANAR(ctx->type)) {
-        avbuf->buf.m.planes = avbuf->planes;
         avbuf->buf.length   = avbuf->num_planes;
-
+        avbuf->buf.m.planes = avbuf->planes;
     } else {
         avbuf->buf.bytesused = avbuf->planes[0].bytesused;
         avbuf->buf.length    = avbuf->planes[0].length;
+    }
+
+    if (V4L2_TYPE_IS_OUTPUT(ctx->type))
+        return 0;
+
+    if (buf_to_m2mctx(avbuf)->output_drm) {
+        ret = v4l2_buffer_export_drm(avbuf);
+        if (ret)
+                return ret;
     }
 
     return ff_v4l2_buffer_enqueue(avbuf);

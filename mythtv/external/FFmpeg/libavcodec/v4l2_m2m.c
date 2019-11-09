@@ -159,7 +159,9 @@ static int v4l2_configure_contexts(V4L2m2mContext* s)
         goto error;
     }
 
-    /* decoder's buffers need to be updated at a later stage */
+    /* decoder's capture buffers are updated during v4l2_try_start once we find
+     * the valid format.
+     */
     if (!av_codec_is_decoder(s->avctx->codec)) {
         ret = ff_v4l2_context_init(&s->capture);
         if (ret) {
