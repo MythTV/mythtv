@@ -395,7 +395,7 @@ bool PeriodicHouseKeeperTask::DoCheckRun(QDateTime now)
     // remember, this is computing the probability that up to this point, one
     //      of these tests has returned positive, so each individual test has
     //      a necessarily low probability
-    bool res = (rand() > (int)(prob2 * RAND_MAX));
+    bool res = (rand() > (int)(prob2 * static_cast<float>(RAND_MAX)));
     m_currentProb = prob;
 //  if (res)
 //      LOG(VB_GENERAL, LOG_DEBUG, QString("%1 will run: this=%2; total=%3")

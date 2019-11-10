@@ -213,7 +213,8 @@ char *AudioOutputUtil::GeneratePinkFrames(char *frames, int channels,
             if (chn==channel)
             {
                 /* Don't use MAX volume */
-                double res = generate_pink_noise_sample(&pink) * 0x03fffffff;
+                double res = generate_pink_noise_sample(&pink) *
+                    static_cast<float>(0x03fffffff);
                 int32_t ires = res;
                 if (bits == 16)
                     *samp16++ = LE_SHORT(ires >> 16);
