@@ -22,6 +22,17 @@
 #define VA_FOURCC_I420 0x30323449
 #endif
 
+#define INIT_ST \
+  VAStatus va_status; \
+  bool ok = true
+
+#define CHECK_ST \
+  ok &= (va_status == VA_STATUS_SUCCESS); \
+  if (!ok) \
+      LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error at %1:%2 (#%3, %4)") \
+              .arg(__FILE__).arg( __LINE__).arg(va_status) \
+              .arg(vaErrorStr(va_status)))
+
 class MythVAAPIInterop : public MythOpenGLInterop
 {
   public:
@@ -61,97 +72,6 @@ class MythVAAPIInterop : public MythOpenGLInterop
     int              m_filterHeight      { 0 };
     VASurfaceID      m_lastFilteredFrame { 0 };
     long long        m_lastFilteredFrameCount { 0 };
-};
-
-class MythVAAPIInteropGLX : public MythVAAPIInterop
-{
-    Q_OBJECT
-
-  public:
-    MythVAAPIInteropGLX(MythRenderOpenGL *Context, Type InteropType);
-    virtual ~MythVAAPIInteropGLX() override;
-
-  public slots:
-    int  SetPictureAttribute(PictureAttribute Attribute, int Value);
-
-  protected:
-    uint GetFlagsForFrame(VideoFrame *Frame, FrameScanType Scan);
-    void InitPictureAttributes(VideoColourSpace *ColourSpace);
-
-  protected:
-    VADisplayAttribute *m_vaapiPictureAttributes;
-    int                 m_vaapiPictureAttributeCount;
-    int                 m_vaapiHueBase;
-    uint                m_vaapiColourSpace;
-    MythDeintType       m_basicDeinterlacer;
-};
-
-class MythVAAPIInteropGLXCopy : public MythVAAPIInteropGLX
-{
-  public:
-    MythVAAPIInteropGLXCopy(MythRenderOpenGL *Context);
-    ~MythVAAPIInteropGLXCopy() override;
-    vector<MythVideoTexture*> Acquire(MythRenderOpenGL *Context,
-                                      VideoColourSpace *ColourSpace,
-                                      VideoFrame *Frame, FrameScanType Scan) final override;
-
-  private:
-    void* m_glxSurface;
-};
-
-#include "va/va_x11.h"
-#include "GL/glx.h"
-#include "GL/glxext.h"
-typedef void ( * MYTH_GLXBINDTEXIMAGEEXT)(Display*, GLXDrawable, int, int*);
-typedef void ( * MYTH_GLXRELEASETEXIMAGEEXT)(Display*, GLXDrawable, int);
-
-class MythVAAPIInteropGLXPixmap : public MythVAAPIInteropGLX
-{
-  public:
-    MythVAAPIInteropGLXPixmap(MythRenderOpenGL *Context);
-    ~MythVAAPIInteropGLXPixmap() override;
-    vector<MythVideoTexture*> Acquire(MythRenderOpenGL *Context,
-                                      VideoColourSpace *ColourSpace,
-                                      VideoFrame *Frame, FrameScanType Scan) final override;
-    static bool IsSupported(MythRenderOpenGL *Context);
-
-  private:
-    bool        InitPixmaps(void);
-
-    // Texture from Pixmap
-    Pixmap                     m_pixmap;
-    GLXPixmap                  m_glxPixmap;
-    MYTH_GLXBINDTEXIMAGEEXT    m_glxBindTexImageEXT;
-    MYTH_GLXRELEASETEXIMAGEEXT m_glxReleaseTexImageEXT;
-};
-
-class MythVAAPIInteropDRM : public MythVAAPIInterop
-{
-  public:
-    MythVAAPIInteropDRM(MythRenderOpenGL *Context);
-    ~MythVAAPIInteropDRM() override;
-    vector<MythVideoTexture*> Acquire(MythRenderOpenGL *Context,
-                                      VideoColourSpace *ColourSpace,
-                                      VideoFrame *Frame,FrameScanType Scan) final override;
-    static bool    IsSupported(MythRenderOpenGL *Context);
-    void           DeleteTextures(void) override;
-
-  protected:
-    void           DestroyDeinterlacer(void) override;
-    void           PostInitDeinterlacer(void) override;
-
-  private:
-    void           CreateDRMBuffers(VideoFrameType Format,
-                                    vector<MythVideoTexture*> Textures,
-                                    uintptr_t Handle, VAImage &Image);
-    VideoFrameType VATypeToMythType(uint32_t Fourcc);
-    void           CleanupReferenceFrames(void);
-    void           RotateReferenceFrames(AVBufferRef *Buffer);
-    vector<MythVideoTexture*> GetReferenceFrames(void);
-
-  private:
-    QFile                 m_drmFile;
-    QVector<AVBufferRef*> m_referenceFrames;
 };
 
 #endif // MYTHVAAPIINTEROP_H
