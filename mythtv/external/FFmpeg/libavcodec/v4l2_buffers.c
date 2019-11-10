@@ -301,6 +301,10 @@ static void v4l2_free_buffer(void *opaque, uint8_t *data)
     }
 }
 
+#ifndef DRM_FORMAT_MOD_LINEAR
+#define DRM_FORMAT_MOD_LINEAR	fourcc_mod_code(NONE, 0)
+#endif
+
 static int v4l2_buffer_export_drm(V4L2Buffer* avbuf)
 {
     struct v4l2_exportbuffer expbuf;
