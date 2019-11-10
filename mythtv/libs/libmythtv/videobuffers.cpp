@@ -156,6 +156,7 @@ uint VideoBuffers::GetNumBuffers(int PixelFormat, int MaxReferenceFrames, bool D
         case FMT_NVDEC: return 8;
         case FMT_MEDIACODEC: return 8;
         case FMT_MMAL: return 8;
+        case FMT_DRMPRIME: return 8;
         // Standard software decode
         case FMT_YV12:  return refs + 14;
         default: break;
@@ -255,6 +256,8 @@ void VideoBuffers::SetDeinterlacingFlags(VideoFrame &Frame, MythDeintType Single
         else // VideoToolBox, MediaCodec and VDPAU copyback
             Frame.deinterlace_allowed = software | shader;
     }
+    else if (FMT_DRMPRIME == Frame.codec)
+        Frame.deinterlace_allowed = DEINT_NONE; // V4L2 - currently RGBA frames only
     else if (FMT_MMAL == Frame.codec)
         Frame.deinterlace_allowed = shader; // No driver deint yet (TODO) and YUV frames returned
     else if (FMT_VTB == Frame.codec)
@@ -298,18 +301,15 @@ void VideoBuffers::SetPrebuffering(bool Normal)
 
 void VideoBuffers::ReleaseDecoderResources(VideoFrame *Frame)
 {
-#if defined(USING_MEDIACODEC) || defined(USING_VTB) || defined(USING_VAAPI) || defined(USING_VDPAU) || defined(USING_NVDEC) || defined(USING_MMAL)
-    if ((Frame->codec == FMT_VTB)   || (Frame->codec == FMT_MEDIACODEC) ||
-        (Frame->codec == FMT_VAAPI) || (Frame->codec == FMT_VDPAU) ||
-        (Frame->codec == FMT_NVDEC) || (Frame->codec == FMT_MMAL))
+#if defined(USING_MEDIACODEC) || defined(USING_VTB) || defined(USING_VAAPI) || defined(USING_VDPAU) || defined(USING_NVDEC) || defined(USING_MMAL) || defined(USING_V4L2PRIME)
+    if (format_is_hw(Frame->codec))
     {
         AVBufferRef* ref = reinterpret_cast<AVBufferRef*>(Frame->priv[0]);
         if (ref != nullptr)
             av_buffer_unref(&ref);
         Frame->buf = Frame->priv[0] = nullptr;
 #if defined(USING_VAAPI) || defined(USING_VDPAU) || defined(USING_NVDEC)
-        if ((Frame->codec == FMT_VAAPI) || (Frame->codec == FMT_VDPAU) ||
-            (Frame->codec == FMT_NVDEC))
+        if (format_is_hwframes(Frame->codec) || (Frame->codec == FMT_NVDEC))
         {
             ref = reinterpret_cast<AVBufferRef*>(Frame->priv[1]);
             if (ref != nullptr)

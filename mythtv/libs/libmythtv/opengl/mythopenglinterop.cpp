@@ -26,6 +26,9 @@
 #ifdef USING_MMAL
 #include "mythmmalinterop.h"
 #endif
+#ifdef USING_V4L2PRIME
+#include "mythdrmprimeinterop.h"
+#endif
 
 #define LOC QString("OpenGLInterop: ")
 
@@ -40,6 +43,7 @@ QString MythOpenGLInterop::TypeToString(Type InteropType)
     if (InteropType == VDPAU)        return "VDPAU";
     if (InteropType == NVDEC)        return "NVDEC";
     if (InteropType == MMAL)         return "MMAL";
+    if (InteropType == DRMPRIME)     return "DRM PRIME";
     if (InteropType == DUMMY)        return "DUMMY";
     return "Unsupported";
 }
@@ -71,6 +75,10 @@ QStringList MythOpenGLInterop::GetAllowedRenderers(MythCodecID CodecId)
 #endif
 #ifdef USING_MMAL
     else if (codec_is_mmal(CodecId) && (GetInteropType(CodecId) != Unsupported))
+        result << "opengl-hw";
+#endif
+#ifdef USING_V4L2PRIME
+    else if (codec_is_v4l2(CodecId) && (GetInteropType(CodecId) != Unsupported))
         result << "opengl-hw";
 #endif
     return result;
@@ -123,6 +131,10 @@ MythOpenGLInterop::Type MythOpenGLInterop::GetInteropType(MythCodecID CodecId)
     if (codec_is_mmal(CodecId))
         supported = MythMMALInterop::GetInteropType(CodecId);
 #endif
+#ifdef USING_V4L2PRIME
+    if (codec_is_v4l2(CodecId))
+        supported = MythDRMPRIMEInterop::GetInteropType(CodecId);
+#endif
 
     if (Unsupported == supported)
         LOG(VB_GENERAL, LOG_WARNING, LOC + QString("No render support for codec '%1'").arg(toString(CodecId)));
@@ -168,6 +180,10 @@ vector<MythVideoTexture*> MythOpenGLInterop::Retrieve(MythRenderOpenGL *Context,
     if ((Frame->codec == FMT_MMAL) && (Frame->pix_fmt == AV_PIX_FMT_MMAL))
         validhwcodec = true;
 #endif
+#ifdef USING_V4L2PRIME
+    if ((Frame->codec == FMT_DRMPRIME) && (Frame->pix_fmt == AV_PIX_FMT_DRM_PRIME))
+        validhwcodec = true;
+#endif
 
     if (!(validhwframe && validhwcodec))
     {
@@ -175,7 +191,8 @@ vector<MythVideoTexture*> MythOpenGLInterop::Retrieve(MythRenderOpenGL *Context,
         return result;
     }
 
-    if ((Frame->codec == FMT_VTB) || (Frame->codec == FMT_MEDIACODEC) || (Frame->codec == FMT_MMAL))
+    if ((Frame->codec == FMT_VTB)  || (Frame->codec == FMT_MEDIACODEC) ||
+        (Frame->codec == FMT_MMAL) || (Frame->codec == FMT_DRMPRIME))
     {
         interop = reinterpret_cast<MythOpenGLInterop*>(Frame->priv[1]);
     }

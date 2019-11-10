@@ -130,8 +130,8 @@ vector<MythVideoTexture*> MythVideoTexture::CreateHardwareTextures(MythRenderOpe
         result.push_back(texture);
     }
 
-    // N.B. Don't set filtering for MediaCodec/MMAL textures as we need to set the texture type first
-    if (!(Type == FMT_MEDIACODEC || Type == FMT_MMAL))
+    // N.B. Don't set filtering for MediaCodec/MMAL/V4L2Prime textures as we need to set the texture type first
+    if (!(Type == FMT_MEDIACODEC || Type == FMT_MMAL || Type == FMT_DRMPRIME))
         SetTextureFilters(Context, result, QOpenGLTexture::Linear);
     return result;
 }

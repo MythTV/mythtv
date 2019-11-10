@@ -90,7 +90,7 @@ MythCodecContext *MythCodecContext::CreateContext(DecoderBase *Parent, MythCodec
         mctx = new MythMediaCodecContext(Parent, Codec);
 #endif
 #ifdef USING_V4L2
-    if (codec_is_v4l2_dec(Codec))
+    if (codec_is_v4l2_dec(Codec) || codec_is_v4l2(Codec))
         mctx = new MythV4L2M2MContext(Parent, Codec);
 #endif
 #ifdef USING_MMAL
@@ -156,6 +156,10 @@ void MythCodecContext::GetDecoders(RenderOptions &Opts)
 #ifdef USING_V4L2
     if (MythV4L2M2MContext::HaveV4L2Codecs())
     {
+#ifdef USING_V4L2PRIME
+        Opts.decoders->append("v4l2");
+        (*Opts.equiv_decoders)["v4l2"].append("dummy");
+#endif
         Opts.decoders->append("v4l2-dec");
         (*Opts.equiv_decoders)["v4l2-dec"].append("dummy");
     }
@@ -206,7 +210,7 @@ MythCodecID MythCodecContext::FindDecoder(const QString &Decoder, AVStream *Stre
 #endif
 #ifdef USING_V4L2
     result = MythV4L2M2MContext::GetSupportedCodec(Context, Codec, Decoder, Stream, streamtype);
-    if (codec_is_v4l2_dec(result))
+    if (codec_is_v4l2_dec(result) || codec_is_v4l2(result))
         return result;
 #endif
 #ifdef USING_MMAL

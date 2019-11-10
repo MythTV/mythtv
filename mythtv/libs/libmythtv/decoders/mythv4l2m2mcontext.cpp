@@ -6,6 +6,7 @@
 #include "v4l2util.h"
 #include "fourcc.h"
 #include "avformatdecoder.h"
+#include "mythdrmprimeinterop.h"
 #include "mythv4l2m2mcontext.h"
 
 // Sys
@@ -21,6 +22,12 @@ extern "C" {
 MythV4L2M2MContext::MythV4L2M2MContext(DecoderBase *Parent, MythCodecID CodecID)
   : MythCodecContext(Parent, CodecID)
 {
+}
+
+MythV4L2M2MContext::~MythV4L2M2MContext()
+{
+    if (m_interop)
+        m_interop->DecrRef();
 }
 
 inline uint32_t V4L2CodecType(AVCodecID Id)
@@ -83,8 +90,30 @@ MythCodecID MythV4L2M2MContext::GetSupportedCodec(AVCodecContext **Context,
     return success;
 }
 
+int MythV4L2M2MContext::HwDecoderInit(AVCodecContext *Context)
+{
+    if (!Context)
+        return -1;
+
+    if (codec_is_v4l2_dec(m_codecID))
+        return 0;
+
+    if (!codec_is_v4l2(m_codecID) || Context->pix_fmt != AV_PIX_FMT_DRM_PRIME)
+        return -1;
+
+    MythRenderOpenGL *context = MythRenderOpenGL::GetOpenGLRender();
+    m_interop = MythDRMPRIMEInterop::Create(context, MythOpenGLInterop::DRMPRIME);
+    return m_interop ? 0 : -1;
+}
+
 void MythV4L2M2MContext::InitVideoCodec(AVCodecContext *Context, bool SelectedStream, bool &DirectRendering)
 {
+    if (codec_is_v4l2(m_codecID))
+    {
+        DirectRendering = false;
+        Context->get_format = MythV4L2M2MContext::GetFormat;
+        return;
+    }
     if (codec_is_v4l2_dec(m_codecID))
     {
         DirectRendering = false;
@@ -96,7 +125,9 @@ void MythV4L2M2MContext::InitVideoCodec(AVCodecContext *Context, bool SelectedSt
 
 bool MythV4L2M2MContext::RetrieveFrame(AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame)
 {
-    if (codec_is_v4l2_dec(m_codecID))
+    if (codec_is_v4l2(m_codecID))
+        return GetDRMBuffer(Context, Frame, AvFrame, 0);
+    else if (codec_is_v4l2_dec(m_codecID))
         return GetBuffer(Context, Frame, AvFrame, 0);
     return false;
 }
@@ -112,15 +143,18 @@ void MythV4L2M2MContext::SetDecoderOptions(AVCodecContext* Context, AVCodec* Cod
         return;
     if (!(Codec->priv_class && Context->priv_data))
         return;
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + "Setting number of capture buffers to 2");
-    av_opt_set(Context->priv_data, "num_capture_buffers", "2", 0);
+
+    // Honestly - I don't know:)
+    int buffers = codec_is_v4l2(m_codecID) ? 8 : 2;
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Setting number of capture buffers to %1").arg(buffers));
+    av_opt_set_int(Context->priv_data, "num_capture_buffers", buffers, 0);
 }
 
 /*! \brief Retrieve a frame from CPU memory
  *
  * This is similar to the default, direct render supporting, get_av_buffer in
  * AvFormatDecoder but we copy the data from the AVFrame rather than providing
- * our own buffer.
+ * our own buffer (the codec does not support direct rendering).
 */
 bool MythV4L2M2MContext::GetBuffer(AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame, int)
 {
@@ -166,8 +200,41 @@ bool MythV4L2M2MContext::GetDRMBuffer(AVCodecContext *Context, VideoFrame *Frame
     if (!Context || !AvFrame || !Frame)
         return false;
 
-    // TODO
-    return false;
+    if (Frame->codec != FMT_DRMPRIME || static_cast<AVPixelFormat>(AvFrame->format) != AV_PIX_FMT_DRM_PRIME)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Not a DRM PRIME buffer");
+        return false;
+    }
+
+    Frame->width = AvFrame->width;
+    Frame->height = AvFrame->height;
+    Frame->pix_fmt = Context->pix_fmt;
+    Frame->sw_pix_fmt = Context->sw_pix_fmt;
+    Frame->directrendering = 1;
+    AvFrame->opaque = Frame;
+    AvFrame->reordered_opaque = Context->reordered_opaque;
+
+    // Frame->data[0] holds AVDRMFrameDescriptor
+    Frame->buf = AvFrame->data[0];
+    // Retain the buffer so it is not released before we display it
+    Frame->priv[0] = reinterpret_cast<unsigned char*>(av_buffer_ref(AvFrame->buf[0]));
+    // Add interop
+    Frame->priv[1] = reinterpret_cast<unsigned char*>(m_interop);
+    // Set the release method
+    AvFrame->buf[1] = av_buffer_create(reinterpret_cast<uint8_t*>(Frame), 0, MythCodecContext::ReleaseBuffer,
+                                       static_cast<AvFormatDecoder*>(Context->opaque), 0);
+    return true;
+}
+
+AVPixelFormat MythV4L2M2MContext::GetFormat(AVCodecContext*, const AVPixelFormat *PixFmt)
+{
+    while (*PixFmt != AV_PIX_FMT_NONE)
+    {
+        if (*PixFmt == AV_PIX_FMT_DRM_PRIME)
+            return AV_PIX_FMT_DRM_PRIME;
+        PixFmt++;
+    }
+    return AV_PIX_FMT_NONE;
 }
 
 bool MythV4L2M2MContext::HaveV4L2Codecs(AVCodecID Codec /* = AV_CODEC_ID_NONE */)

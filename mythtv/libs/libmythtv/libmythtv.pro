@@ -676,6 +676,13 @@ using_backend {
         HEADERS += decoders/mythv4l2m2mcontext.h
         SOURCES += decoders/mythv4l2m2mcontext.cpp
         DEFINES += USING_V4L2
+
+        using_v4l2prime:using_opengl_video {
+            DEFINES += USING_V4L2PRIME
+            HEADERS += opengl/mythdrmprimeinterop.h
+            SOURCES += opengl/mythdrmprimeinterop.cpp
+            LIBS    += -ldrm
+        }
     }
 
     # Support for cable boxes that provide Firewire out

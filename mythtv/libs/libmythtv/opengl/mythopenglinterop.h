@@ -38,6 +38,7 @@ class MythOpenGLInterop : public QObject, public ReferenceCounter
         VDPAU,
         NVDEC,
         MMAL,
+        DRMPRIME,
         DUMMY // used for default free/user_opaque storage
     };
 
