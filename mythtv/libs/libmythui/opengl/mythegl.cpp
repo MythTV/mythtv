@@ -21,6 +21,9 @@ bool MythEGL::IsEGL()
 
 bool MythEGL::InitEGL(void)
 {
+    // N.B. Strictly speaking this reports both whether EGL is in use and whether
+    // EGL_KHR_image functionality is present - which is currently the only thing
+    // we are interested in.
 #ifdef USING_EGL
     if (m_eglImageTargetTexture2DOES && m_eglCreateImageKHR && m_eglDestroyImageKHR && m_eglDisplay)
         return true;
@@ -31,10 +34,7 @@ bool MythEGL::InitEGL(void)
     OpenGLLocker locker(m_context);
     m_eglDisplay = eglGetCurrentDisplay();
     if (!m_eglDisplay)
-    {
-        LOG(VB_GENERAL, LOG_INFO, LOC + "No EGL display");
         return false;
-    }
 
     m_eglImageTargetTexture2DOES = reinterpret_cast<MYTH_EGLIMAGETARGET>(eglGetProcAddress("glEGLImageTargetTexture2DOES"));
     m_eglCreateImageKHR          = reinterpret_cast<MYTH_EGLCREATEIMAGE>(eglGetProcAddress("eglCreateImageKHR"));
@@ -57,6 +57,8 @@ bool MythEGL::HasEGLExtension(QString Extension)
         QByteArray extensions = QByteArray(eglQueryString(m_eglDisplay, EGL_EXTENSIONS));
         return extensions.contains(Extension.data()->toLatin1());
     }
+#else
+    (void)Extension;
 #endif
     return false;
 }
@@ -64,6 +66,15 @@ bool MythEGL::HasEGLExtension(QString Extension)
 void* MythEGL::GetEGLDisplay(void)
 {
     return m_eglDisplay;
+}
+
+qint32 MythEGL::GetEGLError(void)
+{
+#ifdef USING_EGL
+    return static_cast<qint32>(eglGetError());
+#else
+    return 0; // EGL_FALSE
+#endif
 }
 
 void MythEGL::eglImageTargetTexture2DOES(GLenum Target, void *Image)

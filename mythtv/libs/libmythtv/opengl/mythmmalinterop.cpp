@@ -178,7 +178,8 @@ vector<MythVideoTexture*> MythMMALInterop::Acquire(MythRenderOpenGL *Context,
         EGLImageKHR image = m_context->eglCreateImageKHR(m_context->GetEGLDisplay(), EGL_NO_CONTEXT, target,
                                                         (EGLClientBuffer)buffer->data, nullptr);
         if (!image)
-            LOG(VB_GENERAL, LOG_ERR, LOC + QString("No EGLImage for plane %1 %2").arg(plane).arg(eglGetError()));
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("No EGLImage for plane %1 %2")
+                .arg(plane).arg(m_context->GetEGLError()));
 
         m_context->glBindTexture(texture->m_target, texture->m_textureId);
         m_context->eglImageTargetTexture2DOES(texture->m_target, image);

@@ -671,8 +671,7 @@ bool MythVAAPIInteropGLXPixmap::IsSupported(MythRenderOpenGL *Context)
 }
 
 // EGL
-#include <EGL/egl.h>
-#include <EGL/eglext.h>
+#include "mythegldefs.h"
 
 MythVAAPIInteropDRM::MythVAAPIInteropDRM(MythRenderOpenGL *Context)
   : MythVAAPIInterop(Context, VAAPIEGLDRM),
@@ -1021,7 +1020,8 @@ void MythVAAPIInteropDRM::CreateDRMBuffers(VideoFrameType Format,
         EGLImageKHR image = m_context->eglCreateImageKHR(m_context->GetEGLDisplay(), EGL_NO_CONTEXT,
                                                          EGL_LINUX_DMA_BUF_EXT, nullptr, attributes);
         if (!image)
-            LOG(VB_GENERAL, LOG_ERR, LOC + QString("No EGLImage for plane %1 %2").arg(plane).arg(eglGetError()));
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("No EGLImage for plane %1 %2")
+                .arg(plane).arg(m_context->GetEGLError()));
 
         m_context->glBindTexture(texture->m_target, texture->m_textureId);
         m_context->eglImageTargetTexture2DOES(texture->m_target, image);

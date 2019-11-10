@@ -184,7 +184,7 @@ vector<MythVideoTexture*> MythDRMPRIMEInterop::Acquire(MythRenderOpenGL *Context
     EGLImageKHR image = m_context->eglCreateImageKHR(m_context->GetEGLDisplay(), EGL_NO_CONTEXT,
                                                      EGL_LINUX_DMA_BUF_EXT, nullptr, &attrs[0]);
     if (!image)
-        LOG(VB_GENERAL, LOG_ERR, LOC + QString("No EGLImage '%1'").arg(eglGetError()));
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("No EGLImage '%1'").arg(m_context->GetEGLError()));
 
     MythVideoTexture *texture = result[0];
     m_context->glBindTexture(texture->m_target, texture->m_textureId);

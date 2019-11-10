@@ -22,6 +22,7 @@ class MUI_PUBLIC MythEGL
     bool  IsEGL(void);
     bool  HasEGLExtension(QString Extension);
     void* GetEGLDisplay(void);
+    qint32 GetEGLError(void);
     void  eglImageTargetTexture2DOES (GLenum Target, void* Image);
     void* eglCreateImageKHR          (void* Disp, void* Context, unsigned int Target,
                                       void* Buffer, const int32_t *Attributes);
