@@ -79,6 +79,7 @@ typedef struct LensfunContext {
     float focal_length;
     float aperture;
     float focus_distance;
+    float scale;
     int target_geometry;
     int reverse;
     int interpolation_type;
@@ -108,6 +109,7 @@ static const AVOption lensfun_options[] = {
     { "focal_length", "focal length of video (zoom; constant for the duration of the use of this filter)", OFFSET(focal_length), AV_OPT_TYPE_FLOAT, {.dbl=18}, 0.0, DBL_MAX, FLAGS },
     { "aperture", "aperture (constant for the duration of the use of this filter)", OFFSET(aperture), AV_OPT_TYPE_FLOAT, {.dbl=3.5}, 0.0, DBL_MAX, FLAGS },
     { "focus_distance", "focus distance (constant for the duration of the use of this filter)", OFFSET(focus_distance), AV_OPT_TYPE_FLOAT, {.dbl=1000.0f}, 0.0, DBL_MAX, FLAGS },
+    { "scale", "scale factor applied after corrections (0.0 means automatic scaling)", OFFSET(scale), AV_OPT_TYPE_FLOAT, {.dbl=0.0}, 0.0, DBL_MAX, FLAGS },
     { "target_geometry", "target geometry of the lens correction (only when geometry correction is enabled)", OFFSET(target_geometry), AV_OPT_TYPE_INT, {.i64=LF_RECTILINEAR}, 0, INT_MAX, FLAGS, "lens_geometry" },
         { "rectilinear", "rectilinear lens (default)", 0, AV_OPT_TYPE_CONST, {.i64=LF_RECTILINEAR}, 0, 0, FLAGS, "lens_geometry" },
         { "fisheye", "fisheye lens", 0, AV_OPT_TYPE_CONST, {.i64=LF_FISHEYE}, 0, 0, FLAGS, "lens_geometry" },
@@ -228,7 +230,7 @@ static int config_props(AVFilterLink *inlink)
                                    lensfun->focal_length,
                                    lensfun->aperture,
                                    lensfun->focus_distance,
-                                   0.0,
+                                   lensfun->scale,
                                    lensfun->target_geometry,
                                    lensfun_mode,
                                    lensfun->reverse);
@@ -463,7 +465,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
                                vignetting_filter_slice,
                                &vignetting_thread_data,
                                NULL,
-                               FFMIN(outlink->h, ctx->graph->nb_threads));
+                               FFMIN(outlink->h, ff_filter_get_nb_threads(ctx)));
     }
 
     if (lensfun->mode & (GEOMETRY_DISTORTION | SUBPIXEL_DISTORTION)) {
@@ -491,7 +493,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
                                distortion_correction_filter_slice,
                                &distortion_correction_thread_data,
                                NULL,
-                               FFMIN(outlink->h, ctx->graph->nb_threads));
+                               FFMIN(outlink->h, ff_filter_get_nb_threads(ctx)));
 
         av_frame_free(&in);
         return ff_filter_frame(outlink, out);

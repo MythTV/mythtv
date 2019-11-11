@@ -3,6 +3,8 @@
 #ifndef _DVB_DESCRIPTORS_H_
 #define _DVB_DESCRIPTORS_H_
 
+#include <cassert>
+
 #include <QMutex>
 #include <QString>
 
@@ -2132,16 +2134,16 @@ class FreesatLCNDescriptor : public MPEGDescriptor
     FreesatLCNDescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, PrivateDescriptorID::freesat_lcn_table)
     {
+        assert(PrivateDescriptorID::freesat_lcn_table== DescriptorTag());
+
         const unsigned char *payload = &data[2];
 
-        if (len > 5)
+        uint offset = 0;
+        while ((offset + 5 < DescriptorLength()) &&
+               (offset + 5 + payload[offset+4] <= DescriptorLength()))
         {
-            uint offset = 0;
-            while (payload[offset + 4] + offset <= (uint)len)
-            {
-                entries.push_back(&payload[offset]);
-                offset += payload[offset+4] + 5;
-            }
+            entries.push_back(&payload[offset]);
+            offset += 5 + payload[offset+4];
         }
     }
     //       Name                 bits  loc  expected value
@@ -2197,16 +2199,16 @@ class FreesatRegionDescriptor : public MPEGDescriptor
     FreesatRegionDescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, PrivateDescriptorID::freesat_region_table)
     {
+        assert(PrivateDescriptorID::freesat_region_table == DescriptorTag());
+
         const unsigned char *payload = &data[2];
 
-        if (len > 6)
+        uint offset = 0;
+        while ((offset + 6 < DescriptorLength()) &&
+               (offset + 6 + payload[offset+5] <= DescriptorLength()))
         {
-            uint offset = 0;
-            while (payload[offset + 5] + offset <= (uint)len)
-            {
-                entries.push_back(&payload[offset]);
-                offset += payload[offset+5] + 6;
-            }
+            entries.push_back(&payload[offset]);
+            offset += 6 + payload[offset+5];
         }
     }
     //       Name                 bits  loc  expected value
@@ -2252,6 +2254,7 @@ class FreesatCallsignDescriptor : public MPEGDescriptor
     FreesatCallsignDescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, PrivateDescriptorID::freesat_callsign)
     {
+        assert(PrivateDescriptorID::freesat_callsign == DescriptorTag());
     }
 
     //       Name             bits  loc  expected value
@@ -2268,6 +2271,64 @@ class FreesatCallsignDescriptor : public MPEGDescriptor
 
     QString Callsign(void) const
         { return dvb_decode_short_name(&_data[6], _data[5]); }
+
+    QString toString(void) const override; // MPEGDescriptor
+};
+
+/**
+ *  \brief BSkyB Logical Channel Number descriptor
+ *
+ * BAT descriptor ID 0xb1 (Private Extension)
+ *
+ * Provides the Logical Channel Number (LCN) for each channel.
+ *
+ * Descriptor layout from tvheadend src/input/mpegts/dvb_psi.c
+ * function dvb_bskyb_local_channels
+ */
+
+class BSkyBLCNDescriptor : public MPEGDescriptor
+{
+  public:
+    BSkyBLCNDescriptor(const unsigned char *data, int len = 300) :
+        MPEGDescriptor(data, len, PrivateDescriptorID::bskyb_lcn_table)
+    {
+        assert(PrivateDescriptorID::bskyb_lcn_table== DescriptorTag());
+    }
+    //       Name                 bits  loc  expected value
+    // descriptor_tag               8   0.0       0xd3
+    // descriptor_length            8   1.0
+    // region_id                   16   2.0
+    // for (i=0;i<N;i++) {
+    //   service_id                16   0.0+p
+    //   service_type               8   2.0+p
+    //   unknown                   16   3.0+p
+    //   logical_channel_number    16   5.0+p2
+    //   unknown                   16   7.0+p2
+    // }
+
+    uint RegionID(void) const
+        { return (*(_data + 3) != 0xFF) ? *(_data + 3) : 0xFFFF;}
+
+    uint RegionRaw(void) const
+        { return *(_data + 2) << 8 | *(_data + 3);}
+
+    uint ServiceCount(void) const
+        { return (DescriptorLength() - 2) / 9; }
+
+    uint ServiceID(int i) const
+        { return *(_data + 4 + i*9) << 8 | *(_data + 5 + i*9); }
+
+    uint ServiceType(int i) const
+        { return *(_data + 6 + i*9); }
+
+    uint Unknown1(int i) const
+        { return *(_data + 7 + i*9) << 8 | *(_data + 8 + i*9); }
+
+    uint LogicalChannelNumber(int i) const
+        { return *(_data + 9 + i*9) << 8 | *(_data + 10 + i*9); }
+
+    uint Unknown2(int i) const
+        { return *(_data + 11 + i*9) << 8 | *(_data + 12 + i*9); }
 
     QString toString(void) const override; // MPEGDescriptor
 };

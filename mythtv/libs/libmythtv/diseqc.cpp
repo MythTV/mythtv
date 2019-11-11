@@ -2566,8 +2566,6 @@ bool DiSEqCDevLNB::IsHorizontal(const DTVMultiplex &tuning) const
 uint32_t DiSEqCDevLNB::GetIntermediateFrequency(
     const DiSEqCDevSettings& /*settings*/, const DTVMultiplex &tuning) const
 {
-    (void) tuning;
-
     uint64_t abs_freq = tuning.m_frequency;
     uint lof = (IsHighBand(tuning)) ? m_lof_hi : m_lof_lo;
 

@@ -158,6 +158,20 @@ class TestIPTVRecorder: public QObject
                                 "#EXTINF:0002 tvg-id=\"daserste.de\" group-title=\"DE Hauptsender\" tvg-logo=\"609281.png\", [COLOR gold]Das Erste[/COLOR]\n"
                                 "http://api.iptv.ink/pl.m3u8?ch=71565725\n");
 
+        /*
+         *  https://github.com/iptv-org/iptv/blob/master/channels/ playlist no channel number
+         */
+        QString rawdataIPTVOrg ("#EXTM3U x-tvg-url=\"http://195.154.221.171/epg/guideuk.xml.gz\"\n"
+                                "#EXTINF:-1 tvg-id=\"\" tvg-name=\"\" tvg-logo=\"https://i.imgur.com/kDB44LV.jpg\" group-title=\"Music\",60 North\n"
+                                "https://eu-de-edge-01.zetcast.net/ShetlandWebcams/Studio1ABR/playlist.m3u8\n");
+
+         /*
+         *  https://github.com/iptv-org/iptv/blob/master/channels/ playlist with channel number in duration
+         */
+        QString rawdataIPTVOrg2 ("#EXTM3U x-tvg-url=\"http://195.154.221.171/epg/guideuk.xml.gz\"\n"
+                                 "#EXTINF:123 tvg-id=\"\" tvg-name=\"\" tvg-logo=\"https://i.imgur.com/VejnhiB.png\" group-title=\"News\",BBC News\n"
+                                 "https://streamingserver001.viewtvgroup.com/kapanglivetv-uksat-bbcnews/tracks-v1a1/mono.m3u8\n");
+
         fbox_chan_map_t chanmap;
 
         /* test plain old MPEG-2 TS over multicast playlist */
@@ -217,6 +231,20 @@ class TestIPTVRecorder: public QObject
         QVERIFY (!chanmap["0002"].m_tuning.IsValid ());
         QCOMPARE (chanmap["0002"].m_tuning.GetProtocol(), IPTVTuningData::inValid);
         QCOMPARE (chanmap["0002"].m_name, QString ("[COLOR gold]Das Erste[/COLOR]"));
+
+        /* test playlist from iptv-org/iptv with no channel number (will default to 1*/
+        chanmap = IPTVChannelFetcher::ParsePlaylist (rawdataIPTVOrg, nullptr);
+        QVERIFY (!chanmap["1"].IsValid ());
+        QVERIFY (!chanmap["1"].m_tuning.IsValid ());
+        QCOMPARE (chanmap["1"].m_tuning.GetProtocol(), IPTVTuningData::inValid);
+        QCOMPARE (chanmap["1"].m_name, QString ("60 North"));
+
+        /* test playlist from iptv-org/iptv with channel number */
+        chanmap = IPTVChannelFetcher::ParsePlaylist (rawdataIPTVOrg2, nullptr);
+        QVERIFY (!chanmap["123"].IsValid ());
+        QVERIFY (!chanmap["123"].m_tuning.IsValid ());
+        QCOMPARE (chanmap["123"].m_tuning.GetProtocol(), IPTVTuningData::inValid);
+        QCOMPARE (chanmap["123"].m_name, QString ("BBC News"));
     }
 
     /**

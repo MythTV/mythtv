@@ -44,7 +44,7 @@
 class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "5.1" );
+    Q_CLASSINFO( "version"    , "5.2" );
     Q_CLASSINFO( "AddStorageGroupDir_Method",    "POST" )
     Q_CLASSINFO( "RemoveStorageGroupDir_Method", "POST" )
     Q_CLASSINFO( "PutSetting_Method",            "POST" )
@@ -54,6 +54,7 @@ class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
     Q_CLASSINFO( "SendNotification_Method",      "POST" )
     Q_CLASSINFO( "BackupDatabase_Method",        "POST" )
     Q_CLASSINFO( "CheckDatabase_Method",         "POST" )
+    Q_CLASSINFO( "DelayShutdown_Method",         "POST" )
     Q_CLASSINFO( "ProfileSubmit_Method",         "POST" )
     Q_CLASSINFO( "ProfileDelete_Method",         "POST" )
     Q_CLASSINFO( "ManageDigestUser_Method",      "POST" )
@@ -163,6 +164,8 @@ class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
         virtual bool                BackupDatabase      ( void ) = 0;
 
         virtual bool                CheckDatabase       ( bool Repair ) = 0;
+
+        virtual bool                DelayShutdown       ( void ) = 0;
 
         virtual bool                ProfileSubmit       ( void ) = 0;
 

@@ -66,7 +66,7 @@ typedef struct APNGDemuxContext {
  *     ...
  *     IDAT
  */
-static int apng_probe(AVProbeData *p)
+static int apng_probe(const AVProbeData *p)
 {
     GetByteContext gb;
     int state = 0;
@@ -342,6 +342,10 @@ static int apng_read_packet(AVFormatContext *s, AVPacket *pkt)
 
     len = avio_rb32(pb);
     tag = avio_rl32(pb);
+
+    if (avio_feof(pb))
+        return AVERROR_EOF;
+
     switch (tag) {
     case MKTAG('f', 'c', 'T', 'L'):
         if (len != 26)

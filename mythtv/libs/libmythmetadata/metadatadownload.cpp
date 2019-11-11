@@ -668,7 +668,7 @@ MetadataLookupList MetadataDownload::handleTelevision(MetadataLookup *lookup)
                                           lookup->GetSubtitle(), lookup, false);
         }
 
-        if (list.isEmpty() && lookup->GetSeason() && lookup->GetEpisode())
+        if (list.isEmpty() && (lookup->GetSeason() || lookup->GetEpisode()))
         {
             list = grabber.LookupData(lookup->GetInetref(), lookup->GetSeason(),
                                       lookup->GetEpisode(), lookup);

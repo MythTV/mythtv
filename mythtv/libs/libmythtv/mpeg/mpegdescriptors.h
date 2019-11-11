@@ -199,6 +199,9 @@ class PrivateDescriptorID
         // Private -- CH UPC Cablecom
         upc_event_episode_title        = 0xA7,
 
+        // Private -- BSkyB Astra-2 28.2E
+        bskyb_lcn_table                = 0xb1,  /* todo */
+
         // Private -- FreeSat Astra-2 28.2E
         freesat_lcn_table              = 0xd3,  /* implemented */
         freesat_region_table           = 0xd4,  /* implemented */
@@ -224,7 +227,8 @@ class PrivateDataSpecifierID
     enum
     {
         UPC1 = 0x00000600,      // UPC Cablecom
-        FSAT = 0x46534154,      // BBC UK FreeSat
+        BSB1 = 0x00000002,      // UK BSkyB on Astra 28.2E
+        FSAT = 0x46534154,      // UK BBC FreeSat on Astra 28.2E
     };
 };
 

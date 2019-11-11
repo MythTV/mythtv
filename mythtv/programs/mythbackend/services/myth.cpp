@@ -46,6 +46,7 @@
 #include "mythdate.h"
 #include "mythversion.h"
 #include "serviceUtil.h"
+#include "scheduler.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -933,6 +934,14 @@ bool Myth::CheckDatabase( bool repair )
         LOG(VB_GENERAL, LOG_ERR, "Database check failed.");
 
     return bResult;
+}
+
+bool Myth::DelayShutdown( void )
+{
+    Scheduler *scheduler = dynamic_cast<Scheduler*>(gCoreContext->GetScheduler());
+    scheduler->DelayShutdown();
+    LOG(VB_GENERAL, LOG_NOTICE, "Shutdown delayed 5 minutes for external application.");
+    return true;
 }
 
 /////////////////////////////////////////////////////////////////////////////

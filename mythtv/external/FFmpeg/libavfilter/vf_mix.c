@@ -108,7 +108,7 @@ static av_cold int init(AVFilterContext *ctx)
             break;
 
         p = NULL;
-        sscanf(arg, "%f", &s->weights[i]);
+        av_sscanf(arg, "%f", &s->weights[i]);
         s->wfactor += s->weights[i];
         last = i;
     }
@@ -217,8 +217,8 @@ static int config_output(AVFilterLink *outlink)
 {
     AVFilterContext *ctx = outlink->src;
     MixContext *s = ctx->priv;
-    AVRational time_base = ctx->inputs[0]->time_base;
     AVRational frame_rate = ctx->inputs[0]->frame_rate;
+    AVRational sar = ctx->inputs[0]->sample_aspect_ratio;
     AVFilterLink *inlink = ctx->inputs[0];
     int height = ctx->inputs[0]->h;
     int width = ctx->inputs[0]->w;
@@ -252,8 +252,8 @@ static int config_output(AVFilterLink *outlink)
 
     outlink->w          = width;
     outlink->h          = height;
-    outlink->time_base  = time_base;
     outlink->frame_rate = frame_rate;
+    outlink->sample_aspect_ratio = sar;
 
     if ((ret = ff_framesync_init(&s->fs, ctx, s->nb_inputs)) < 0)
         return ret;
@@ -271,7 +271,10 @@ static int config_output(AVFilterLink *outlink)
         in[i].after  = (s->duration == 1 || (s->duration == 2 && i == 0)) ? EXT_STOP : EXT_INFINITY;
     }
 
-    return ff_framesync_configure(&s->fs);
+    ret = ff_framesync_configure(&s->fs);
+    outlink->time_base = s->fs.time_base;
+
+    return ret;
 }
 
 static av_cold void uninit(AVFilterContext *ctx)
@@ -348,14 +351,25 @@ static int tmix_filter_frame(AVFilterLink *inlink, AVFrame *in)
     ThreadData td;
     AVFrame *out;
 
+    if (s->nb_inputs == 1)
+        return ff_filter_frame(outlink, in);
+
     if (s->nb_frames < s->nb_inputs) {
         s->frames[s->nb_frames] = in;
         s->nb_frames++;
-        return 0;
+        if (s->nb_frames < s->nb_inputs)
+            return 0;
     } else {
         av_frame_free(&s->frames[0]);
         memmove(&s->frames[0], &s->frames[1], sizeof(*s->frames) * (s->nb_inputs - 1));
         s->frames[s->nb_inputs - 1] = in;
+    }
+
+    if (ctx->is_disabled) {
+        out = av_frame_clone(s->frames[0]);
+        if (!out)
+            return AVERROR(ENOMEM);
+        return ff_filter_frame(outlink, out);
     }
 
     out = ff_get_video_buffer(outlink, outlink->w, outlink->h);
@@ -371,7 +385,7 @@ static int tmix_filter_frame(AVFilterLink *inlink, AVFrame *in)
 }
 
 static const AVOption tmix_options[] = {
-    { "frames", "set number of successive frames to mix", OFFSET(nb_inputs), AV_OPT_TYPE_INT, {.i64=3}, 2, 128, .flags = FLAGS },
+    { "frames", "set number of successive frames to mix", OFFSET(nb_inputs), AV_OPT_TYPE_INT, {.i64=3}, 1, 128, .flags = FLAGS },
     { "weights", "set weight for each frame", OFFSET(weights_str), AV_OPT_TYPE_STRING, {.str="1 1 1"}, 0, 0, .flags = FLAGS },
     { "scale", "set scale", OFFSET(scale), AV_OPT_TYPE_FLOAT, {.dbl=0}, 0, INT16_MAX, .flags = FLAGS },
     { NULL },
@@ -398,7 +412,7 @@ AVFilter ff_vf_tmix = {
     .inputs        = inputs,
     .init          = init,
     .uninit        = uninit,
-    .flags         = AVFILTER_FLAG_SLICE_THREADS,
+    .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_INTERNAL | AVFILTER_FLAG_SLICE_THREADS,
 };
 
 #endif /* CONFIG_TMIX_FILTER */

@@ -256,6 +256,8 @@ static int decompress_texture_thread(AVCodecContext *avctx, void *arg,
 #define CHECKPOINT(x)                                                         \
     do {                                                                      \
         if (state == 0) {                                                     \
+            if (bytestream2_get_bytes_left(gbc) < 4)                          \
+                return AVERROR_INVALIDDATA;                                   \
             value = bytestream2_get_le32(gbc);                                \
             state = 16;                                                       \
         }                                                                     \
@@ -426,7 +428,8 @@ static int fill_optable(unsigned *table0, OpcodeTable *table1, int nb_elements)
 static int get_opcodes(GetByteContext *gb, uint32_t *table, uint8_t *dst, int op_size, int nb_elements)
 {
     OpcodeTable optable[1024];
-    int sum, x, val, lshift, rshift, ret, size_in_bits, i, idx;
+    int sum, x, val, lshift, rshift, ret, i, idx;
+    int64_t size_in_bits;
     unsigned endoffset, newoffset, offset;
     unsigned next;
     uint8_t *src = (uint8_t *)gb->buffer;
@@ -742,6 +745,9 @@ static int dxv_decompress_cocg(DXVContext *ctx, GetByteContext *gb,
     int skip0, skip1, oi0 = 0, oi1 = 0;
     int ret, state0 = 0, state1 = 0;
 
+    if (op_offset < 12)
+        return AVERROR_INVALIDDATA;
+
     dst = tex_data;
     bytestream2_skip(gb, op_offset - 12);
     if (op_size0 > max_op_size0)
@@ -1050,6 +1056,10 @@ static int dxv_decode(AVCodecContext *avctx, void *data,
 
     avctx->pix_fmt = AV_PIX_FMT_RGBA;
     avctx->colorspace = AVCOL_SPC_RGB;
+
+    ctx->tex_funct = NULL;
+    ctx->tex_funct_planar[0] = NULL;
+    ctx->tex_funct_planar[1] = NULL;
 
     tag = bytestream2_get_le32(gbc);
     switch (tag) {

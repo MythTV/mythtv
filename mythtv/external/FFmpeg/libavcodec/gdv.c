@@ -294,6 +294,8 @@ static int decompress_5(AVCodecContext *avctx, unsigned skip)
 
     while (bytestream2_get_bytes_left_p(pb) > 0 && bytestream2_get_bytes_left(gb) > 0) {
         int tag = read_bits2(&bits, gb);
+        if (bytestream2_get_bytes_left(gb) < 1)
+            return AVERROR_INVALIDDATA;
         if (tag == 0) {
             bytestream2_put_byte(pb, bytestream2_get_byte(gb));
         } else if (tag == 1) {
@@ -306,7 +308,7 @@ static int decompress_5(AVCodecContext *avctx, unsigned skip)
             int len;
             int b = bytestream2_get_byte(gb);
             if (b == 0) {
-                break;
+                return 0;
             }
             if (b != 0xFF) {
                 len = b;
@@ -321,6 +323,8 @@ static int decompress_5(AVCodecContext *avctx, unsigned skip)
             lz_copy(pb, g2, off, len);
         }
     }
+    if (bytestream2_get_bytes_left_p(pb) > 0)
+        return AVERROR_INVALIDDATA;
     return 0;
 }
 
@@ -443,6 +447,9 @@ static int decompress_68(AVCodecContext *avctx, unsigned skip, unsigned use8)
         }
     }
 
+    if (bytestream2_get_bytes_left_p(pb) > 0)
+        return AVERROR_INVALIDDATA;
+
     return 0;
 }
 
@@ -473,6 +480,8 @@ static int gdv_decode_frame(AVCodecContext *avctx, void *data,
     if (pal && pal_size == AVPALETTE_SIZE)
         memcpy(gdv->pal, pal, AVPALETTE_SIZE);
 
+    if (compression < 2 && bytestream2_get_bytes_left(gb) < 256*3)
+        return AVERROR_INVALIDDATA;
     rescale(gdv, gdv->frame, avctx->width, avctx->height,
             !!(flags & 0x10), !!(flags & 0x20));
 
@@ -480,8 +489,6 @@ static int gdv_decode_frame(AVCodecContext *avctx, void *data,
     case 1:
         memset(gdv->frame + PREAMBLE_SIZE, 0, gdv->frame_size - PREAMBLE_SIZE);
     case 0:
-        if (bytestream2_get_bytes_left(gb) < 256*3)
-            return AVERROR_INVALIDDATA;
         for (i = 0; i < 256; i++) {
             unsigned r = bytestream2_get_byte(gb);
             unsigned g = bytestream2_get_byte(gb);
@@ -514,12 +521,10 @@ static int gdv_decode_frame(AVCodecContext *avctx, void *data,
 
     if (!gdv->scale_v && !gdv->scale_h) {
         int sidx = PREAMBLE_SIZE, didx = 0;
-        int y, x;
+        int y;
 
         for (y = 0; y < avctx->height; y++) {
-            for (x = 0; x < avctx->width; x++) {
-                dst[x+didx] = gdv->frame[x+sidx];
-            }
+            memcpy(dst + didx, gdv->frame + sidx, avctx->width);
             sidx += avctx->width;
             didx += frame->linesize[0];
         }

@@ -450,6 +450,8 @@ QString MPEGDescriptor::toString() const
         SET_STRING(DVBLogicalChannelDescriptor);
     else if (PrivateDescriptorID::dvb_simulcast_channel_descriptor == DescriptorTag())
         SET_STRING(DVBSimulcastChannelDescriptor);
+    else if (PrivateDescriptorID::bskyb_lcn_table== DescriptorTag())
+        SET_STRING(BSkyBLCNDescriptor);
     else if (PrivateDescriptorID::freesat_region_table == DescriptorTag())
         SET_STRING(FreesatRegionDescriptor);
     else if (PrivateDescriptorID::freesat_lcn_table== DescriptorTag())

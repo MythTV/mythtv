@@ -686,7 +686,7 @@ class MTV_PUBLIC ProgramMapTable : public PSIPTable
                                    const vector<uint>        &types,
                                    const vector<desc_list_t> &prog_desc);
 
-    /// stream that contrains program clock reference.
+    /// stream that contains program clock reference.
     uint PCRPID(void) const
         { return ((psipdata()[0] << 8) | psipdata()[1]) & 0x1fff; }
 

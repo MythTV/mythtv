@@ -51,6 +51,7 @@ package MythTV::Channel;
         $self->{'videofilters'}      = $data->{'videofilters'};
         $self->{'visible'}           = $data->{'visible'};
         $self->{'xmltvid'}           = $data->{'xmltvid'};
+        $self->{'service_type'}      = $data->{'service_type'};
 
     # DVB fields, from the dtv_multiplex table
         $self->{'dtv_bandwidth'}            = $data->{'dtv_bandwidth'};

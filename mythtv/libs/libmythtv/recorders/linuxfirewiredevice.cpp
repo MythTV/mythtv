@@ -116,7 +116,7 @@ const uint LinuxFirewireDevice::kMaxBufferedPackets  = 4 * 1024 * 1024 / 188;
 int linux_firewire_device_tspacket_handler(
     unsigned char *tspacket, int len, uint dropped, void *callback_data);
 void *linux_firewire_device_port_handler_thunk(void *param);
-static bool has_data(int fd, uint msec);
+static bool has_data(int fd, int msec);
 static QString speed_to_string(uint speed);
 static int linux_firewire_device_bus_reset_handler(
     raw1394handle_t handle, uint generation);
@@ -981,7 +981,7 @@ int linux_firewire_device_tspacket_handler(
     return 1;
 }
 
-static bool has_data(int fd, uint msec)
+static bool has_data(int fd, int msec)
 {
     fd_set rfds;
     FD_ZERO(&rfds);

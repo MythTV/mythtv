@@ -214,6 +214,8 @@ void avcodec_align_dimensions2(AVCodecContext *s, int *width, int *height,
     case AV_PIX_FMT_YUVA422P9BE:
     case AV_PIX_FMT_YUVA422P10LE:
     case AV_PIX_FMT_YUVA422P10BE:
+    case AV_PIX_FMT_YUVA422P12LE:
+    case AV_PIX_FMT_YUVA422P12BE:
     case AV_PIX_FMT_YUVA422P16LE:
     case AV_PIX_FMT_YUVA422P16BE:
     case AV_PIX_FMT_YUV440P10LE:
@@ -234,6 +236,8 @@ void avcodec_align_dimensions2(AVCodecContext *s, int *width, int *height,
     case AV_PIX_FMT_YUVA444P9BE:
     case AV_PIX_FMT_YUVA444P10LE:
     case AV_PIX_FMT_YUVA444P10BE:
+    case AV_PIX_FMT_YUVA444P12LE:
+    case AV_PIX_FMT_YUVA444P12BE:
     case AV_PIX_FMT_YUVA444P16LE:
     case AV_PIX_FMT_YUVA444P16BE:
     case AV_PIX_FMT_GBRP9LE:
@@ -538,6 +542,7 @@ int attribute_align_arg ff_codec_open2_recursive(AVCodecContext *avctx, const AV
 int attribute_align_arg avcodec_open2(AVCodecContext *avctx, const AVCodec *codec, AVDictionary **options)
 {
     int ret = 0;
+    int codec_init_ok = 0;
     AVDictionary *tmp = NULL;
     const AVPixFmtDescriptor *pixdesc;
 
@@ -931,6 +936,7 @@ FF_ENABLE_DEPRECATION_WARNINGS
         if (ret < 0) {
             goto free_and_end;
         }
+        codec_init_ok = 1;
     }
 
     ret=0;
@@ -955,6 +961,10 @@ FF_ENABLE_DEPRECATION_WARNINGS
         }
         if (avctx->channels && avctx->channels < 0 ||
             avctx->channels > FF_SANE_NB_CHANNELS) {
+            ret = AVERROR(EINVAL);
+            goto free_and_end;
+        }
+        if (avctx->bits_per_coded_sample < 0) {
             ret = AVERROR(EINVAL);
             goto free_and_end;
         }
@@ -1014,8 +1024,9 @@ end:
 
     return ret;
 free_and_end:
-    if (avctx->codec &&
-        (avctx->codec->caps_internal & FF_CODEC_CAP_INIT_CLEANUP))
+    if (avctx->codec && avctx->codec->close &&
+        (codec_init_ok ||
+         (avctx->codec->caps_internal & FF_CODEC_CAP_INIT_CLEANUP)))
         avctx->codec->close(avctx);
 
     if (codec->priv_class && codec->priv_data_size)
@@ -1030,6 +1041,7 @@ FF_ENABLE_DEPRECATION_WARNINGS
 
     av_dict_free(&tmp);
     av_freep(&avctx->priv_data);
+    av_freep(&avctx->subtitle_header);
     if (avctx->internal) {
         av_frame_free(&avctx->internal->to_free);
         av_frame_free(&avctx->internal->compat_decode_frame);
@@ -1397,10 +1409,8 @@ const char *avcodec_profile_name(enum AVCodecID codec_id, int profile)
 
 unsigned avcodec_version(void)
 {
-//    av_assert0(AV_CODEC_ID_V410==164);
     av_assert0(AV_CODEC_ID_PCM_S8_PLANAR==65563);
     av_assert0(AV_CODEC_ID_ADPCM_G722==69660);
-//     av_assert0(AV_CODEC_ID_BMV_AUDIO==86071);
     av_assert0(AV_CODEC_ID_SRT==94216);
     av_assert0(LIBAVCODEC_VERSION_MICRO >= 100);
 
@@ -1595,8 +1605,6 @@ static int get_audio_frame_duration(enum AVCodecID id, int sr, int ch, int ba,
             return 256 * (frame_bytes / 64);
         if (id == AV_CODEC_ID_RA_144)
             return 160 * (frame_bytes / 20);
-        if (id == AV_CODEC_ID_G723_1)
-            return 240 * (frame_bytes / 24);
 
         if (bps > 0) {
             /* calc from frame_bytes and bits_per_coded_sample */
@@ -2204,4 +2212,23 @@ int64_t ff_guess_coded_bitrate(AVCodecContext *avctx)
               framerate.num / framerate.den;
 
     return bitrate;
+}
+
+int ff_int_from_list_or_default(void *ctx, const char * val_name, int val,
+                                const int * array_valid_values, int default_value)
+{
+    int i = 0, ref_val;
+
+    while (1) {
+        ref_val = array_valid_values[i];
+        if (ref_val == INT_MAX)
+            break;
+        if (val == ref_val)
+            return val;
+        i++;
+    }
+    /* val is not a valid value */
+    av_log(ctx, AV_LOG_DEBUG,
+           "%s %d are not supported. Set to default value : %d\n", val_name, val, default_value);
+    return default_value;
 }

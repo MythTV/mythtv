@@ -217,9 +217,9 @@ class ChannelScanSM : public MPEGStreamListener,
     bool              m_testDecryption;
     bool              m_extendScanList    {false};
 
-    // Freesat
-    uint              m_fsat_bouquet_id   {0};
-    uint              m_fsat_region_id    {0};
+    // Freesat and BSkyB
+    uint              m_bouquet_id        {0};
+    uint              m_region_id         {0};
 
     // Optional info
     DTVTunerType      m_scanDTVTunerType  {DTVTunerType::kTunerTypeUnknown};

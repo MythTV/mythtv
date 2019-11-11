@@ -3,7 +3,7 @@ function initGuideDataSources() {
         url:'/Channel/GetVideoSourceList',
         datatype: "json",
         colNames:['Source ID', 'Source Name', 'Grabber Name', 'User Name', 'Frequency Table',
-                  'Lineup ID', 'Password', 'Use EIT', 'Configure Path', 'NIT ID'],
+                  'Lineup ID', 'Password', 'Use EIT', 'Configure Path', 'NIT ID', 'Bouquet ID', 'Region ID'],
         colModel:[
             {name:'Id', width:130, sorttype:"int", hidden:false, jsonmap:"Id"},
             {name:'SourceName', width:280, sorttype:"text", jsonmap:"SourceName"},
@@ -14,7 +14,9 @@ function initGuideDataSources() {
             {name:'Password', width:40, align:"center", sortable:true, hidden:true, jsonmap:"Password"},
             {name:'UseEIT', width:80, align:"right", sorttype:"bool", jsonmap:"UseEIT"},
             {name:'ConfigPath', width:40, align:"center", sortable:true, hidden:true, jsonmap:"ConfigPath"},
-            {name:'NITId', width:200, align:"right", sorttype:"text", hidden:true, jsonmap:"NITId"}
+            {name:'NITId', width:200, align:"right", sorttype:"text", hidden:true, jsonmap:"NITId"},
+            {name:'BouquetId', width:200, align:"right", sorttype:"text", hidden:true, jsonmap:"BouquetId"},
+            {name:'RegionId', width:200, align:"right", sorttype:"text", hidden:true, jsonmap:"RegionId"}
         ],
         jsonReader: { 
            root:"VideoSourceList.VideoSources", 

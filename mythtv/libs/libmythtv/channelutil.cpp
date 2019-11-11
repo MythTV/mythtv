@@ -1482,7 +1482,8 @@ bool ChannelUtil::CreateChannel(uint db_mplexid,
                                 const QString& icon,
                                 QString format,
                                 const QString& xmltvid,
-                                const QString& default_authority)
+                                const QString& default_authority,
+                                uint service_type)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -1498,7 +1499,8 @@ bool ChannelUtil::CreateChannel(uint db_mplexid,
     qstr +=
         "   atsc_major_chan,           atsc_minor_chan,   "
         "   useonairguide, visible,    tvformat,          "
-        "   icon,          xmltvid,    default_authority) "
+        "   icon,          xmltvid,    default_authority, "
+        "   service_type) "
         "VALUES "
         "  (:CHANID,       :CHANNUM,   :SOURCEID,         "
         "   :CALLSIGN,     :NAME,      :SERVICEID,        ";
@@ -1507,7 +1509,8 @@ bool ChannelUtil::CreateChannel(uint db_mplexid,
     qstr +=
         "   :MAJORCHAN,                :MINORCHAN,        "
         "   :USEOAG,       :VISIBLE,   :TVFORMAT,         "
-        "   :ICON,         :XMLTVID,   :AUTHORITY)        ";
+        "   :ICON,         :XMLTVID,   :AUTHORITY,        "
+        "   :SERVICETYPE )        ";
 
     query.prepare(qstr);
 
@@ -1531,10 +1534,11 @@ bool ChannelUtil::CreateChannel(uint db_mplexid,
         query.bindValue(":FREQID",    freqid);
 
     QString tvformat = (atsc_minor_channel > 0) ? "ATSC" : std::move(format);
-    query.bindValueNoNull(":TVFORMAT", tvformat);
-    query.bindValueNoNull(":ICON", icon);
-    query.bindValueNoNull(":XMLTVID", xmltvid);
-    query.bindValueNoNull(":AUTHORITY", default_authority);
+    query.bindValueNoNull(":TVFORMAT",    tvformat);
+    query.bindValueNoNull(":ICON",        icon);
+    query.bindValueNoNull(":XMLTVID",     xmltvid);
+    query.bindValueNoNull(":AUTHORITY",   default_authority);
+    query.bindValue      (":SERVICETYPE", service_type);
 
     if (!query.exec() || !query.isActive())
     {
@@ -1560,7 +1564,8 @@ bool ChannelUtil::UpdateChannel(uint db_mplexid,
                                 const QString& icon,
                                 QString format,
                                 const QString& xmltvid,
-                                const QString& default_authority)
+                                const QString& default_authority,
+                                uint service_type)
 {
     if (!channel_id)
         return false;
@@ -1574,7 +1579,7 @@ bool ChannelUtil::UpdateChannel(uint db_mplexid,
         "    atsc_major_chan = :MAJORCHAN, atsc_minor_chan = :MINORCHAN, "
         "    callsign        = :CALLSIGN,  name            = :NAME,      "
         "    sourceid        = :SOURCEID,  useonairguide   = :USEOAG,    "
-        "    visible         = :VISIBLE "
+        "    visible         = :VISIBLE,   service_type    = :SERVICETYPE "
         "WHERE chanid=:CHANID")
         .arg((!set_channum)       ? "" : "channum  = :CHANNUM,  ")
         .arg((freqid.isEmpty())   ? "" : "freqid   = :FREQID,   ")
@@ -1596,13 +1601,14 @@ bool ChannelUtil::UpdateChannel(uint db_mplexid,
     query.bindValueNoNull(":CALLSIGN",  callsign);
     query.bindValueNoNull(":NAME",      service_name);
 
-    query.bindValue(":MPLEXID",   db_mplexid);
+    query.bindValue(":MPLEXID",     db_mplexid);
+    query.bindValue(":SERVICEID",   service_id);
+    query.bindValue(":MAJORCHAN",   atsc_major_channel);
+    query.bindValue(":MINORCHAN",   atsc_minor_channel);
+    query.bindValue(":USEOAG",      use_on_air_guide);
+    query.bindValue(":VISIBLE",     !hidden);
+    query.bindValue(":SERVICETYPE", service_type);
 
-    query.bindValue(":SERVICEID", service_id);
-    query.bindValue(":MAJORCHAN", atsc_major_channel);
-    query.bindValue(":MINORCHAN", atsc_minor_channel);
-    query.bindValue(":USEOAG",    use_on_air_guide);
-    query.bindValue(":VISIBLE",   !hidden);
     (void) hidden_in_guide; // MythTV can't hide the channel in just the guide.
 
     if (!freqid.isEmpty())
@@ -2398,7 +2404,8 @@ ChannelInfoList ChannelUtil::LoadChannels(uint startIndex, uint count,
                                           uint channelGroupID,
                                           bool liveTVOnly,
                                           const QString& callsign,
-                                          const QString& channum)
+                                          const QString& channum,
+                                          bool ignoreUntunable)
 {
     ChannelInfoList channelList;
 
@@ -2417,8 +2424,10 @@ ChannelInfoList ChannelUtil::LoadChannels(uint startIndex, uint count,
                   "             ORDER BY livetvorder), " // Creates a CSV list of inputids for this channel
                   "MIN(livetvorder) livetvorder "
                   "FROM channel "
-                  "LEFT JOIN channelgroup ON channel.chanid = channelgroup.chanid "
-                  "INNER JOIN capturecard  ON capturecard.sourceid = channel.sourceid ";
+                  "LEFT JOIN channelgroup ON channel.chanid = channelgroup.chanid ";
+
+    sql += QString("%1 JOIN capturecard ON capturecard.sourceid = channel.sourceid ")
+                   .arg(ignoreUntunable ? "INNER" : "LEFT");
 
     QStringList cond;
     if (ignoreHidden)

@@ -49,6 +49,8 @@ extern const uint8_t ff_interleaved_dirac_golomb_vlc_code[256];
 
 /**
  * Read an unsigned Exp-Golomb code in the range 0 to 8190.
+ *
+ * @returns the read value or a negative error code.
  */
 static inline int get_ue_golomb(GetBitContext *gb)
 {
@@ -476,15 +478,19 @@ static inline int get_ur_golomb_jpegls(GetBitContext *gb, int k, int limit,
         return buf;
     } else {
         int i;
-        for (i = 0; i < limit && SHOW_UBITS(re, gb, 1) == 0; i++) {
+        for (i = 0; i + MIN_CACHE_BITS <= limit && SHOW_UBITS(re, gb, MIN_CACHE_BITS) == 0; i += MIN_CACHE_BITS) {
             if (gb->size_in_bits <= (int)re_index) {
                 CLOSE_READER(re, gb);
                 return -1;
             }
-            LAST_SKIP_BITS(re, gb, 1);
+            LAST_SKIP_BITS(re, gb, MIN_CACHE_BITS);
             UPDATE_CACHE(re, gb);
         }
-        SKIP_BITS(re, gb, 1);
+        for (; i < limit && SHOW_UBITS(re, gb, 1) == 0; i++) {
+            SKIP_BITS(re, gb, 1);
+        }
+        LAST_SKIP_BITS(re, gb, 1);
+        UPDATE_CACHE(re, gb);
 
         if (i < limit - 1) {
             if (k) {

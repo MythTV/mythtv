@@ -99,6 +99,7 @@ class MTV_PUBLIC ChannelInfo
     
     uint         m_mplexid           {0};
     uint         m_serviceid         {0};
+    uint         m_service_type      {0};
     uint         m_atsc_major_chan   {0};
     uint         m_atsc_minor_chan   {0};
 
@@ -150,7 +151,7 @@ class MTV_PUBLIC ChannelInsertInfo
         bool           _is_encrypted,       bool           _is_data_service,
         bool           _is_audio_service,   bool           _is_opencable,
         bool           _could_be_opencable, int            _decryption_status,
-        const QString& _default_authority) :
+        const QString& _default_authority,  uint           _service_type) :
     m_db_mplexid(_db_mplexid),
     m_source_id(_source_id),
     m_channel_id(_channel_id),
@@ -158,6 +159,7 @@ class MTV_PUBLIC ChannelInsertInfo
     m_service_name(_service_name),
     m_chan_num(_chan_num),
     m_service_id(_service_id),
+    m_service_type(_service_type),
     m_atsc_major_channel(_atsc_major_channel),
     m_atsc_minor_channel(_atsc_minor_channel),
     m_use_on_air_guide(_use_on_air_guide),
@@ -205,6 +207,7 @@ class MTV_PUBLIC ChannelInsertInfo
     QString m_service_name;
     QString m_chan_num;
     uint    m_service_id         {0};
+    uint    m_service_type       {0};
     uint    m_atsc_major_channel {0};
     uint    m_atsc_minor_channel {0};
     bool    m_use_on_air_guide   {false};

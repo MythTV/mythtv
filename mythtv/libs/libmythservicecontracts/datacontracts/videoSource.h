@@ -26,6 +26,8 @@ class SERVICE_PUBLIC VideoSource : public QObject
     Q_PROPERTY( bool            UseEIT          READ UseEIT           WRITE setUseEIT         )
     Q_PROPERTY( QString         ConfigPath      READ ConfigPath       WRITE setConfigPath     )
     Q_PROPERTY( int             NITId           READ NITId            WRITE setNITId          )
+    Q_PROPERTY( uint            BouquetId       READ BouquetId        WRITE setBouquetId      )
+    Q_PROPERTY( uint            RegionId        READ RegionId         WRITE setRegionId       )
 
     PROPERTYIMP    ( int        , Id             )
     PROPERTYIMP    ( QString    , SourceName     )
@@ -37,6 +39,8 @@ class SERVICE_PUBLIC VideoSource : public QObject
     PROPERTYIMP    ( bool       , UseEIT         )
     PROPERTYIMP    ( QString    , ConfigPath     )
     PROPERTYIMP    ( int        , NITId          )
+    PROPERTYIMP    ( uint       , BouquetId      )
+    PROPERTYIMP    ( uint       , RegionId       )
 
     public:
 
@@ -46,7 +50,9 @@ class SERVICE_PUBLIC VideoSource : public QObject
             : QObject         ( parent ),
               m_Id            ( 0      ),
               m_UseEIT        ( false  ),
-              m_NITId         ( 0      )
+              m_NITId         ( 0      ),
+              m_BouquetId     ( 0      ),
+              m_RegionId      ( 0      )
         {
         }
 
@@ -62,6 +68,8 @@ class SERVICE_PUBLIC VideoSource : public QObject
             m_UseEIT        = src->m_UseEIT        ;
             m_ConfigPath    = src->m_ConfigPath    ;
             m_NITId         = src->m_NITId         ;
+            m_BouquetId     = src->m_BouquetId     ;
+            m_RegionId      = src->m_RegionId      ;
         }
 
     private:

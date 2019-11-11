@@ -3445,6 +3445,39 @@ nullptr
             return false;
     }
 
+    if (dbver == "1350")
+    {
+        const char *updates[] = {
+            "ALTER TABLE videosource ADD COLUMN bouquet_id INT DEFAULT 0;",
+            "ALTER TABLE videosource ADD COLUMN region_id INT DEFAULT 0;",
+            nullptr
+        };
+        if (!performActualUpdate(updates, "1351", dbver))
+            return false;
+    }
+
+    if (dbver == "1351")
+    {
+        const char *updates[] = {
+            "ALTER TABLE videosource MODIFY bouquet_id INT UNSIGNED;",
+            "ALTER TABLE videosource MODIFY region_id INT UNSIGNED;",
+            "ALTER TABLE channel ADD COLUMN service_type INT UNSIGNED DEFAULT 0 AFTER serviceid;",
+            nullptr
+        };
+        if (!performActualUpdate(updates, "1352", dbver))
+            return false;
+    }
+
+    if (dbver == "1352")
+    {
+        const char *updates[] = {
+            "ALTER TABLE capturecard MODIFY schedgroup TINYINT(1) DEFAULT 1 NOT NULL",
+            nullptr
+        };
+        if (!performActualUpdate(updates, "1353", dbver))
+            return false;
+    }
+
     return true;
 }
 

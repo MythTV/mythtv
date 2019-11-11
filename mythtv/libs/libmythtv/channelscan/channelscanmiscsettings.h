@@ -179,7 +179,7 @@ class AddFullTS : public TransMythUICheckBoxSetting
         setLabel(QObject::tr("Add full Transport Stream channels"));
         setHelpText(
             QObject::tr(
-                "If set, Create MPTS channels, which allow "
+                "If set, create MPTS channels, which allow "
                 "recording of the full, unaltered, transport stream."));
         setValue(false);
     };

@@ -64,7 +64,7 @@ static int check_pack_header(const uint8_t *buf)
     return (buf[1] & 0xC0) == 0x40 || (buf[1] & 0xF0) == 0x20;
 }
 
-static int mpegps_probe(AVProbeData *p)
+static int mpegps_probe(const AVProbeData *p)
 {
     uint32_t code = -1;
     int i;
@@ -714,7 +714,7 @@ AVInputFormat ff_mpegps_demuxer = {
 #define REF_STRING "# VobSub index file,"
 #define MAX_LINE_SIZE 2048
 
-static int vobsub_probe(AVProbeData *p)
+static int vobsub_probe(const AVProbeData *p)
 {
     if (!strncmp(p->buf, REF_STRING, sizeof(REF_STRING) - 1))
         return AVPROBE_SCORE_MAX;
@@ -733,7 +733,7 @@ static int vobsub_read_header(AVFormatContext *s)
     int stream_id = -1;
     char id[64] = {0};
     char alt[MAX_LINE_SIZE] = {0};
-    AVInputFormat *iformat;
+    ff_const59 AVInputFormat *iformat;
 
     if (!vobsub->sub_name) {
         char *ext;

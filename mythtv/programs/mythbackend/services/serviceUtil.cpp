@@ -218,6 +218,7 @@ bool FillChannelInfo( DTC::ChannelInfo *pChannel,
         pChannel->setUseEIT(channelInfo.m_useonairguide);
         pChannel->setXMLTVID(channelInfo.m_xmltvid);
         pChannel->setDefaultAuth(channelInfo.m_default_authority);
+        pChannel->setServiceType(channelInfo.m_service_type);
 
         QList<uint> groupIds = channelInfo.GetGroupIds();
         QString sGroupIds;

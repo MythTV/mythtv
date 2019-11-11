@@ -190,7 +190,14 @@ void ScanTypeSetting::SetInput(const QString &cardids_inputname)
                          QString::number(ExistingScanImport));
             break;
         case CardUtil::HDHOMERUN:
-            if (CardUtil::HDHRdoesDVB(CardUtil::GetVideoDevice(cardid)))
+            if (CardUtil::HDHRdoesDVBC(CardUtil::GetVideoDevice(cardid)))
+            {
+                addSelection(tr("Full Scan (Tuned)"),
+                             QString::number(NITAddScan_DVBC));
+                addSelection(tr("Full Scan"),
+                             QString::number(FullScan_DVBC));
+            }
+            else if (CardUtil::HDHRdoesDVB(CardUtil::GetVideoDevice(cardid)))
             {
                 addSelection(tr("Full Scan"),
                              QString::number(FullScan_DVBT), true);

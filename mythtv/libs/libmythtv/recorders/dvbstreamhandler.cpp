@@ -125,7 +125,7 @@ void DVBStreamHandler::run(void)
 /** \fn DVBStreamHandler::RunTS(void)
  *  \brief Uses TS filtering devices to read a DVB device for tables & data
  *
- *  This supports all types of MPEG based stream data, but is extreemely
+ *  This supports all types of MPEG based stream data, but is extremely
  *  slow with DVB over USB 1.0 devices which for efficiency reasons buffer
  *  a stream until a full block transfer buffer full of the requested
  *  tables is available. This takes a very long time when you are just
