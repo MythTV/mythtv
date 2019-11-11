@@ -266,7 +266,7 @@ void MythOpenGLInterop::DeleteTextures(void)
     if (m_context && !m_openglTextures.isEmpty())
     {
         OpenGLLocker locker(m_context);
-        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Deleting %1 textures").arg(m_openglTextures.size()));
+        int count = 0;
         QHash<unsigned long long, vector<MythVideoTexture*> >::const_iterator it = m_openglTextures.constBegin();
         for ( ; it != m_openglTextures.constEnd(); ++it)
         {
@@ -277,9 +277,12 @@ void MythOpenGLInterop::DeleteTextures(void)
                 if ((*it2)->m_textureId)
                     m_context->glDeleteTextures(1, &(*it2)->m_textureId);
                 MythVideoTexture::DeleteTexture(m_context, *it2);
+                count++;
             }
             textures.clear();
         }
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Deleted %1 textures in %2 groups")
+            .arg(count).arg(m_openglTextures.size()));
         m_openglTextures.clear();
     }
 }

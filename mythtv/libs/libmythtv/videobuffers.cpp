@@ -156,7 +156,8 @@ uint VideoBuffers::GetNumBuffers(int PixelFormat, int MaxReferenceFrames, bool D
         case FMT_NVDEC: return 8;
         case FMT_MEDIACODEC: return 8;
         case FMT_MMAL: return 8;
-        case FMT_DRMPRIME: return 8;
+        // the default number of output buffers in FFmpeg v4l2_m2m.h is 6
+        case FMT_DRMPRIME: return 6;
         // Standard software decode
         case FMT_YV12:  return refs + 14;
         default: break;
@@ -257,7 +258,7 @@ void VideoBuffers::SetDeinterlacingFlags(VideoFrame &Frame, MythDeintType Single
             Frame.deinterlace_allowed = software | shader;
     }
     else if (FMT_DRMPRIME == Frame.codec)
-        Frame.deinterlace_allowed = DEINT_NONE; // V4L2 - currently RGBA frames only
+        Frame.deinterlace_allowed = shader; // No driver deint - if RGBA frames are returned, shaders will be disabled
     else if (FMT_MMAL == Frame.codec)
         Frame.deinterlace_allowed = shader; // No driver deint yet (TODO) and YUV frames returned
     else if (FMT_VTB == Frame.codec)

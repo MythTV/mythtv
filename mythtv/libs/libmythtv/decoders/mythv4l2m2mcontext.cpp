@@ -144,10 +144,11 @@ void MythV4L2M2MContext::SetDecoderOptions(AVCodecContext* Context, AVCodec* Cod
     if (!(Codec->priv_class && Context->priv_data))
         return;
 
-    // Honestly - I don't know:)
-    int buffers = codec_is_v4l2(m_codecID) ? 8 : 2;
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Setting number of capture buffers to %1").arg(buffers));
-    av_opt_set_int(Context->priv_data, "num_capture_buffers", buffers, 0);
+    // best guess currently - this matches the number of capture buffers to the
+    // number of output buffers - and hence to the number of video buffers for
+    // direct rendering
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "Setting number of capture buffers to 6");
+    av_opt_set_int(Context->priv_data, "num_capture_buffers", 6, 0);
 }
 
 /*! \brief Retrieve a frame from CPU memory
