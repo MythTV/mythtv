@@ -1972,6 +1972,7 @@ MYTHTV_CONFIG_LIST='
     opengl
     opengl_video
     opengl_themepainter
+    egl
     qtwebkit
     qtscript
     qtdbus
@@ -2034,6 +2035,7 @@ USING_LIST='
     dxva2
     opengl
     opengles
+    egl
     vaapi
     nvdec
     vdpau
@@ -2599,6 +2601,7 @@ mpegtsraw_demuxer_deps="merge_libavformat_mpegts_c"
 mythtranscode_deps="backend frontend"
 opengl_deps_any="agl_h GL_gl_h EGL_egl_h GLES2_gl2_h darwin windows x11"
 opengles_deps="GLES2_gl2_h"
+egl_deps="EGL_egl_h"
 opengl_video_deps="opengl"
 opengl_themepainter_deps="opengl"
 v4l2_deps="linux_videodev2_h"
@@ -2761,6 +2764,7 @@ enable mmal
 enable mythtranscode
 enable opengl
 enable opengles
+enable egl
 enable opengl_video
 enable opengl_themepainter
 enable symbol_visibility
@@ -5992,6 +5996,13 @@ enabled opengl            && { check_lib opengl GL/glx.h glXGetProcAddress "-lGL
                                } ||
                                die "ERROR: opengl not found."
                              }
+
+enabled egl &&  { check_lib EGL EGL/egl.h eglGetProcAddress "-lEGL" ||
+                  {
+                    check_pkg_config EGL egl EGL/egl.h eglGetProcAddress && enable egl
+                  }
+                }
+
 if enabled libmpeg2external; then
     check_lib libmpeg2external mpeg2dec/mpeg2.h mpeg2_init -lmpeg2 || disable libmpeg2external
     if disabled libmpeg2external; then
@@ -7395,6 +7406,8 @@ fi
   echo "Video4Linux codecs        ${v4l2-no} (DRM ${v4l2prime-no})"
   echo "MMAL decoder support      ${mmal-no}"
   echo "OpenGL support            ${opengl-no}"
+  echo "OpenGL ES 2.0             ${opengles-no}"
+  echo "EGL support               ${egl-no}"
   echo "OpenGL video              ${opengl_video-no}"
   echo "OpenGL ThemePainter       ${opengl_themepainter-no}"
   if test x"$target_os" = x"mingw32" ; then
@@ -7415,7 +7428,6 @@ if enabled frontend; then
 fi
 echo "libdns_sd (Bonjour)       ${libdns_sd-no}"
 echo "libcrypto                 ${libcrypto-no}"
-echo "OpenGL ES 2.0             ${opengles-no}"
 if enabled libbluray_external; then
     echo "bluray support            yes (system)"
 else

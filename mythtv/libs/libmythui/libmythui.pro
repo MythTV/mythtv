@@ -189,8 +189,7 @@ using_opengl {
         DEFINES += USING_OPENGLES
     }
 
-    # this will need extra configure support when EGL use is extended
-    using_mmal | using_vaapi {
+    using_egl {
         LIBS    += -lEGL
         DEFINES += USING_EGL
     }
