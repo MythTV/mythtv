@@ -332,13 +332,13 @@ class Videos(object):
                     tmpName = anchor.text
                 if tmpName == u'Revision3 Beta':
                     continue
-                if showURL != None:
+                if showURL is not None:
                     url = etree.SubElement(tmpDirectory, "url")
                     etree.SubElement(url, "name").text = tmpName
                     etree.SubElement(url, "href").text = showURL
                     etree.SubElement(url, "filter").text = showFilter
                     etree.SubElement(url, "parserType").text = u'html'
-            if tmpDirectory.find('url') != None:
+            if tmpDirectory.find('url') is not None:
                 showData.append(tmpDirectory)
 
         if self.config['debug_enabled']:
@@ -391,11 +391,11 @@ class Videos(object):
                             mp4Format.attrib['enabled'] = u'false'
                         mp4Format.attrib['name'] = format.text
                         mp4Format.attrib['rss'] = link
-                    if tmpShow.find('mp4Format') != None:
+                    if tmpShow.find('mp4Format') is not None:
                         tmpDirectory.append(tmpShow)
 
             # If there is any data then add to new rev3.xml element tree
-            if tmpDirectory.find('show') != None:
+            if tmpDirectory.find('show') is not None:
                 userRev3.append(tmpDirectory)
 
         if self.config['debug_enabled']:
@@ -731,16 +731,16 @@ class Videos(object):
             for index in range(len(names)):
                 names[index] = self.common.massageText(names[index])
             channel = channelFilter(result)[0]
-            if channel.find('image') != None:
+            if channel.find('image') is not None:
                 channelThumbnail = self.common.ampReplace(imageFilter(channel)[0].text)
             else:
                 channelThumbnail = self.common.ampReplace(channel.find('link').text.replace(u'/watch/', u'/images/')+u'100.jpg')
             channelLanguage = u'en'
-            if channel.find('language') != None:
+            if channel.find('language') is not None:
                 channelLanguage = channel.find('language').text[:2]
             # Create a new directory and/or subdirectory if required
             if names[0] != categoryDir:
-                if categoryDir != None:
+                if categoryDir is not None:
                     channelTree.append(categoryElement)
                 categoryElement = etree.XML(u'<directory></directory>')
                 if names[0] == personalFeed:
@@ -813,7 +813,7 @@ class Videos(object):
                 showElement.append(rev3Item)
 
         # Add the last directory processed
-        if categoryElement.xpath('.//item') != None:
+        if categoryElement.xpath('.//item') is not None:
             channelTree.append(categoryElement)
 
         # Check that there was at least some items

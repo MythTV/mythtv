@@ -279,7 +279,7 @@ class Videos(object):
 
         ip = getExternalIP()
 
-        if ip == None:
+        if ip is None:
             return {}
 
         try:
@@ -371,7 +371,7 @@ class Videos(object):
 
 
     def textUtf8(self, text):
-        if text == None:
+        if text is None:
             return text
         try:
             return unicode(text, 'utf8')
@@ -541,7 +541,7 @@ class Videos(object):
             sys.stderr.write(u"! Error: Unknown error during a Video search (%s)\nError(%s)\n" % (title, e))
             sys.exit(1)
 
-        if data == None:
+        if data is None:
             return None
         if not len(data):
             return None

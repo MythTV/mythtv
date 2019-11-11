@@ -111,7 +111,7 @@ class xpathFunctions(object):
         webURL = args[0]
         # If this is for the download then just return what was found for the "link" element
         if self.persistence.has_key('cinemarvLinkGeneration'):
-            if self.persistence['cinemarvLinkGeneration'] != None:
+            if self.persistence['cinemarvLinkGeneration'] is not None:
                 returnValue = self.persistence['cinemarvLinkGeneration']
                 self.persistence['cinemarvLinkGeneration'] = None
                 return returnValue
@@ -124,7 +124,7 @@ class xpathFunctions(object):
         except Exception, errmsg:
             sys.stderr.write(u'!Warning: The web page URL(%s) could not be read, error(%s)\n' % (webURL, errmsg))
             return webURL
-        if webPageElement == None:
+        if webPageElement is None:
             self.persistence['cinemarvLinkGeneration'] = webURL
             return webURL
 
@@ -147,7 +147,7 @@ class xpathFunctions(object):
         return True if the link does not starts with "http://"
         return False if the link starts with "http://"
         '''
-        if self.persistence['cinemarvLinkGeneration'] == None:
+        if self.persistence['cinemarvLinkGeneration'] is None:
             return False
 
         if self.persistence['cinemarvLinkGeneration'].startswith(u'http://'):

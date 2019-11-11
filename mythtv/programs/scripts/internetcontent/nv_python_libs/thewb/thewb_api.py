@@ -92,7 +92,7 @@ def can_int(x):
     >>> _can_int("A test")
     False
     """
-    if x == None:
+    if x is None:
         return False
     try:
         int(x)
@@ -433,7 +433,7 @@ class Videos(object):
         itemDwnLink = etree.XPath('.//media:content', namespaces=self.common.namespaces)
         itemDict = {}
         for result in searchResults:
-            if linkFilter(result) != None:   # Make sure that this result actually has a video
+            if linkFilter(result) is not None:   # Make sure that this result actually has a video
                 thewbItem = etree.XML(self.common.mnvItem)
                 # These videos are only viewable in the US so add a country indicator
                 etree.SubElement(thewbItem, "{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}country").text = u'us'
@@ -600,11 +600,11 @@ class Videos(object):
 
         # Process any user specified searches
         showItems = {}
-        if len(showFeeds) != None:
+        if len(showFeeds) is not None:
             for searchDetails in showFeeds:
                 try:
                     data = self.searchTitle(searchDetails.text.strip(), 1, self.page_limit, ignoreError=True)
-                    if data[0] == None:
+                    if data[0] is None:
                     	continue
                 except TheWBVideoNotFound, msg:
                     sys.stderr.write(u"%s\n" % msg)
@@ -685,7 +685,7 @@ class Videos(object):
         self.rssName = etree.XPath('title', namespaces=self.common.namespaces)
         self.feedFilter = etree.XPath('//url[text()=$url]')
         self.HTMLparser = etree.HTMLParser()
-        if rssData.find('url') != None:
+        if rssData.find('url') is not None:
             try:
                 resultTree = self.common.getUrlData(rssData)
             except Exception, errormsg:

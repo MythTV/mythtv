@@ -478,7 +478,7 @@ class Videos(object):
         searchResultTree = []
         searchFilter = etree.XPath(u"//item")
         userSearchStrings = u'userSearchStrings'
-        if self.userPrefs.find(userSearchStrings) != None:
+        if self.userPrefs.find(userSearchStrings) is not None:
             userSearch = self.userPrefs.find(userSearchStrings).xpath('./userSearch')
             if len(userSearch):
                 for searchDetails in userSearch:
@@ -513,7 +513,7 @@ class Videos(object):
         # Create a structure of feeds that can be concurrently downloaded
         rssData = etree.XML(u'<xml></xml>')
         for feedType in [u'treeviewURLS', ]:
-            if self.userPrefs.find(feedType) == None:
+            if self.userPrefs.find(feedType) is None:
                 continue
             if not len(self.userPrefs.find(feedType).xpath('./url')):
                 continue
@@ -540,7 +540,7 @@ class Videos(object):
             print
 
         # Get the RSS Feed data
-        if rssData.find('url') != None:
+        if rssData.find('url') is not None:
             try:
                 resultTree = self.common.getUrlData(rssData)
             except Exception, errormsg:
@@ -591,7 +591,7 @@ class Videos(object):
                 channelLanguage = u'en'
                 # Create a new directory and/or subdirectory if required
                 if names[0] != categoryDir:
-                    if categoryDir != None:
+                    if categoryDir is not None:
                         channelTree.append(categoryElement)
                     categoryElement = etree.XML(u'<directory></directory>')
                     categoryElement.attrib['name'] = names[0]
@@ -617,7 +617,7 @@ class Videos(object):
                         huluItem.find('author').text = u'Hulu'
                     huluItem.find('pubDate').text = pubdate
                     description = etree.HTML(etree.tostring(descriptionFilter(itemData)[0], method="text", encoding=unicode).strip())
-                    if descFilter2(description)[0].text != None:
+                    if descFilter2(description)[0].text is not None:
                         huluItem.find('description').text = self.common.massageText(descFilter2(description)[0].text.strip())
                     else:
                         huluItem.find('description').text = u''
@@ -667,8 +667,8 @@ class Videos(object):
                             break
 
             # Add the last directory processed
-            if categoryElement != None:
-                if categoryElement.xpath('.//item') != None:
+            if categoryElement is not None:
+                if categoryElement.xpath('.//item') is not None:
                     channelTree.append(categoryElement)
 
         # Check that there was at least some items

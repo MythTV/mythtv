@@ -276,7 +276,7 @@ class Common(object):
 
 
     def textUtf8(self, text):
-        if text == None:
+        if text is None:
             return text
         try:
             return unicode(text, 'utf8')
@@ -369,7 +369,7 @@ class Common(object):
 
         ip = getExternalIP()
 
-        if ip == None:
+        if ip is None:
             return {}
 
         try:
@@ -508,7 +508,7 @@ class Common(object):
             urlDictionary[key]['morePages'] = u'false'
             urlDictionary[key]['tmp'] = None
             urlDictionary[key]['tree'] = None
-            if element.find('parameter') != None:
+            if element.find('parameter') is not None:
                 urlDictionary[key]['parameter'] = element.find('parameter').text
 
         if self.debug:
@@ -747,7 +747,7 @@ for xsltExtension in %(filename)s.__xsltExtentionList__:
         # Currently there are no link specific Web pages
         if not self.linksWebPage:
             self.linksWebPage = etree.parse(u'%s/nv_python_libs/configs/XML/customeHtmlPageList.xml' % (self.baseProcessingDir, ))
-        if self.linksWebPage.find(sourceLink) != None:
+        if self.linksWebPage.find(sourceLink) is not None:
             return u'file://%s/nv_python_libs/configs/HTML/%s' % (self.baseProcessingDir, self.linksWebPage.find(sourceLink).text)
         return u'file://%s/nv_python_libs/configs/HTML/%s' % (self.baseProcessingDir, 'nodownloads.html')
     # end linkWebPage()
@@ -1015,7 +1015,7 @@ self.urlDictionary[self.urlKey]['parameter']) )
                     else:
                         continue
                 # Was any data found?
-                if self.urlDictionary[self.urlKey]['tmp'].getroot() == None:
+                if self.urlDictionary[self.urlKey]['tmp'].getroot() is None:
                     sys.stderr.write(u"No Xslt results for Name(%s)\n" % self.urlKey)
                     sys.stderr.write(u"No Xslt results for url(%s)\n" % self.urlDictionary[self.urlKey]['href'])
                     if len(self.urlDictionary[self.urlKey]['filter']) == index-1:

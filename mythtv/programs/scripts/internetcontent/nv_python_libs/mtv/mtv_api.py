@@ -307,7 +307,7 @@ class Videos(object):
 
 
     def textUtf8(self, text):
-        if text == None:
+        if text is None:
             return text
         try:
             return unicode(text, 'utf8')
@@ -392,7 +392,7 @@ class Videos(object):
         # Make sure there are no item elements that are None
         for item in data:
             for key in item.keys():
-                if item[key] == None:
+                if item[key] is None:
                     item[key] = u''
 
         # Massage each field and eliminate any item without a URL
@@ -420,7 +420,7 @@ class Videos(object):
                 if key == 'content':
                     if len(item[key]):
                         if item[key][0].has_key('language'):
-                            if item[key][0]['language'] != None:
+                            if item[key][0]['language'] is not None:
                                 item['language'] = item[key][0]['language']
                 if key == 'published_parsed': # '2009-12-21T00:00:00Z'
                     if item[key]:
@@ -465,7 +465,7 @@ class Videos(object):
         metadata = {}
         cur_size = True
         for e in etree:
-            if e.tag.endswith(u'content') and e.text == None:
+            if e.tag.endswith(u'content') and e.text is None:
                 index = e.get('url').rindex(u':')
                 metadata['video'] = self.mtvHtmlPath % (title,  e.get('url')[index+1:])
                 # !! This tag will need to be added at a later date
@@ -536,7 +536,7 @@ class Videos(object):
             sys.stderr.write(u"! Error: Unknown error during a Video search (%s)\nError(%s)\n" % (title, e))
             sys.exit(1)
 
-        if data == None:
+        if data is None:
             return None
         if not len(data):
             return None
@@ -696,25 +696,25 @@ class Videos(object):
             metadata['language'] = self.config['language']
             for e in elements:
                 if e.tag.endswith(u'title'):
-                    if e.text != None:
+                    if e.text is not None:
                         metadata['title'] = self.massageDescription(e.text.strip())
                     else:
                         metadata['title'] = u''
                     continue
                 if e.tag == u'content':
-                    if e.text != None:
+                    if e.text is not None:
                         metadata['media_description'] = self.massageDescription(e.text.strip())
                     else:
                         metadata['media_description'] = u''
                     continue
                 if e.tag.endswith(u'published'): # '2007-03-06T00:00:00Z'
-                    if e.text != None:
+                    if e.text is not None:
                         pub_time = time.strptime(e.text.strip(), "%Y-%m-%dT%H:%M:%SZ")
                         metadata['published_parsed'] = time.strftime('%a, %d %b %Y %H:%M:%S GMT', pub_time)
                     else:
                         metadata['published_parsed'] = u''
                     continue
-                if e.tag.endswith(u'content') and e.text == None:
+                if e.tag.endswith(u'content') and e.text is None:
                     metadata['video'] =  self.ampReplace(e.get('url'))
                     metadata['duration'] =  e.get('duration')
                     continue
