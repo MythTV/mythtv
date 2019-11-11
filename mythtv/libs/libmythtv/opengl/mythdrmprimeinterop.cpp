@@ -14,8 +14,13 @@ extern "C" {
 
 #define LOC QString("DRMInterop: ")
 
-MythDRMPRIMEInterop::MythDRMPRIMEInterop(MythRenderOpenGL *Context)
-  : MythOpenGLInterop(Context, DRMPRIME)
+// Note: EnableCacheing is enabled by default. When disabled, this instance is owned
+// by another interop class which will manage cacheing itself and will also expect
+// that other features such as display attributes and deinterlacer settings are not
+// overridden.
+MythDRMPRIMEInterop::MythDRMPRIMEInterop(MythRenderOpenGL *Context, bool EnableCacheing)
+  : MythOpenGLInterop(Context, DRMPRIME),
+    m_enableCacheing(EnableCacheing)
 {
     OpenGLLocker locker(m_context);
     m_openGLES = m_context->isOpenGLES();
@@ -139,15 +144,14 @@ static void inline DebugDRMFrame(AVDRMFrameDescriptor* Desc)
 
 /*! \brief Copy the frame described by AVDRMFrameDescriptor to an OpenGLTexture.
  *
- * This code currently uses the OpenGL ES2.0 'version' of EGL_EXT_image_dma_buf_import.
+ * This code uses the OpenGL ES2.0 'version' of EGL_EXT_image_dma_buf_import.
  * The incoming DRM planes are combined into a single RGB texture, with limited hints
  * for colourspace handling. Hence there are no picture controls and currently
  * no deinterlacing support (although for the Raspberry Pi VC4 codecs and Amlogic
  * S905 drivers the interlacing flags do not appear to be passed through anyway).
  *
- * For OpenGL ES3.0 capable devices, we should be able pass the planes into the
- * driver as separate textures - which will allow full colourspace control and deinterlacing
- * (as for VAAPI DRM interop).
+ * For OpenGL ES3.0 capable devices, we call AcquireYUV which should return a
+ * complete set of textures representing the YUV frame.
 */
 vector<MythVideoTexture*> MythDRMPRIMEInterop::Acquire(MythRenderOpenGL *Context,
                                                       VideoColourSpace *ColourSpace,
@@ -175,12 +179,15 @@ vector<MythVideoTexture*> MythDRMPRIMEInterop::Acquire(MythRenderOpenGL *Context
         return result;
     }
 
-    // Disable picture attributes on first pass
-    if (ColourSpace && m_openglTextures.isEmpty())
-        ColourSpace->SetSupportedAttributes(kPictureAttributeSupported_None);
+    if (m_enableCacheing)
+    {
+        // Disable picture attributes on first pass
+        if (ColourSpace && m_openglTextures.isEmpty())
+            ColourSpace->SetSupportedAttributes(kPictureAttributeSupported_None);
 
-    // Disable shader based deinterlacing for RGBA frames
-    Frame->deinterlace_allowed = Frame->deinterlace_allowed & ~DEINT_SHADER;
+        // Disable shader based deinterlacing for RGBA frames
+        Frame->deinterlace_allowed = Frame->deinterlace_allowed & ~DEINT_SHADER;
+    }
 
     // do we need a new texture
     unsigned long long id = reinterpret_cast<unsigned long long>(drmdesc);
@@ -258,6 +265,8 @@ vector<MythVideoTexture*> MythDRMPRIMEInterop::Acquire(MythRenderOpenGL *Context
         m_context->eglImageTargetTexture2DOES(texture->m_target, image);
         m_context->glBindTexture(texture->m_target, 0);
         texture->m_data = static_cast<unsigned char *>(image);
+        if (!m_enableCacheing)
+            return textures;
         m_openglTextures.insert(id, textures);
     }
 
@@ -273,13 +282,6 @@ vector<MythVideoTexture*> MythDRMPRIMEInterop::AcquireYUV(AVDRMFrameDescriptor* 
 {
     vector<MythVideoTexture*> result;
 
-    // Update frame colourspace and initialise on first frame
-    if (ColourSpace)
-    {
-        if (m_openglTextures.isEmpty())
-            ColourSpace->SetSupportedAttributes(ALL_PICTURE_ATTRIBUTES);
-        ColourSpace->UpdateColourSpace(Frame);
-    }
 
     // Check frame format
     VideoFrameType format = PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->sw_pix_fmt));
@@ -295,8 +297,19 @@ vector<MythVideoTexture*> MythDRMPRIMEInterop::AcquireYUV(AVDRMFrameDescriptor* 
         return result;
     }
 
-    // Enable shader based deinterlacing for YUV frames
-    Frame->deinterlace_allowed = Frame->deinterlace_allowed | DEINT_SHADER;
+    if (m_enableCacheing)
+    {
+        // Update frame colourspace and initialise on first frame
+        if (ColourSpace)
+        {
+            if (m_openglTextures.isEmpty())
+                ColourSpace->SetSupportedAttributes(ALL_PICTURE_ATTRIBUTES);
+            ColourSpace->UpdateColourSpace(Frame);
+        }
+
+        // Enable shader based deinterlacing for YUV frames IF we are the owner
+        Frame->deinterlace_allowed = Frame->deinterlace_allowed | DEINT_SHADER;
+    }
 
     // return cached texture if available
     unsigned long long id = reinterpret_cast<unsigned long long>(Desc);
@@ -347,7 +360,8 @@ vector<MythVideoTexture*> MythDRMPRIMEInterop::AcquireYUV(AVDRMFrameDescriptor* 
         result[plane]->m_data = static_cast<unsigned char *>(image);
     }
 
-    m_openglTextures.insert(id, result);
+    if (m_enableCacheing)
+        m_openglTextures.insert(id, result);
     return result;
 }
 

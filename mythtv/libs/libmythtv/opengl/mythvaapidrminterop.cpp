@@ -5,6 +5,15 @@
 #include "fourcc.h"
 #include "mythvaapidrminterop.h"
 
+// DRM PRIME interop largely for testing
+#ifdef USING_V4L2PRIME
+#include "mythdrmprimeinterop.h"
+extern "C" {
+#include "libavutil/hwcontext_drm.h"
+}
+#include <unistd.h>
+#endif
+
 #define LOC QString("VAAPIDRM: ")
 
 MythVAAPIInteropDRM::MythVAAPIInteropDRM(MythRenderOpenGL *Context)
@@ -29,11 +38,19 @@ MythVAAPIInteropDRM::MythVAAPIInteropDRM(MythRenderOpenGL *Context)
         return;
     }
     InitaliseDisplay();
+#ifdef USING_V4L2PRIME
+    if (!qgetenv("MYTHTV_VAAPI_PRIME").isEmpty())
+        m_drmPrimeInterop = new MythDRMPRIMEInterop(Context, false);
+#endif
 }
 
 MythVAAPIInteropDRM::~MythVAAPIInteropDRM()
 {
     OpenGLLocker locker(m_context);
+
+#ifdef USING_V4L2PRIME
+    CleanupDRMPRIME();
+#endif
 
     CleanupReferenceFrames();
     DestroyDeinterlacer();
@@ -49,7 +66,7 @@ void MythVAAPIInteropDRM::DeleteTextures(void)
 
     if (!m_openglTextures.isEmpty() && m_context->IsEGL())
     {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + "Deleting DRM buffers");
+        int count = 0;
         QHash<unsigned long long, vector<MythVideoTexture*> >::const_iterator it = m_openglTextures.constBegin();
         for ( ; it != m_openglTextures.constEnd(); ++it)
         {
@@ -61,9 +78,12 @@ void MythVAAPIInteropDRM::DeleteTextures(void)
                 {
                     m_context->eglDestroyImageKHR(m_context->GetEGLDisplay(), (*it2)->m_data);
                     (*it2)->m_data = nullptr;
+                    count++;
                 }
             }
         }
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Deleted %1 EGL images in %2 groups")
+            .arg(count).arg(m_openglTextures.size()));
     }
 
     MythVAAPIInterop::DeleteTextures();
@@ -239,6 +259,15 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context
 
     OpenGLLocker locker(m_context);
 
+
+#ifdef USING_V4L2PRIME
+    if (m_drmPrimeInterop)
+    {
+        result = AcquirePrime(id, Context, ColourSpace, Frame, Scan);
+    }
+    else
+    {
+#endif
     VAImage vaimage;
     memset(&vaimage, 0, sizeof(vaimage));
     vaimage.buf = vaimage.image_id = VA_INVALID_ID;
@@ -296,7 +325,9 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context
     CHECK_ST;
     va_status = vaDestroyImage(m_vaDisplay, vaimage.image_id);
     CHECK_ST;
-
+#ifdef USING_V4L2PRIME
+    }
+#endif
     m_openglTextures.insert(id, result);
     if (needreferenceframes)
         return GetReferenceFrames();
@@ -372,3 +403,84 @@ bool MythVAAPIInteropDRM::IsSupported(MythRenderOpenGL *Context)
            Context->HasEGLExtension("EGL_EXT_image_dma_buf_import") &&
            Context->hasExtension("GL_OES_EGL_image");
 }
+
+#ifdef USING_V4L2PRIME
+/*! \brief Export the given VideoFrame as a DRM PRIME descriptor
+ *
+ * This is funcionally equivalent to the 'regular' VAAPI version but is useful
+ * for testing DRM PRIME functionality on desktops.
+*/
+vector<MythVideoTexture*> MythVAAPIInteropDRM::AcquirePrime(VASurfaceID Id,
+                                                            MythRenderOpenGL *Context,
+                                                            VideoColourSpace *ColourSpace,
+                                                            VideoFrame *Frame,
+                                                            FrameScanType Scan)
+{
+    vector<MythVideoTexture*> result;
+
+    if (!m_drmFrames.contains(Id))
+    {
+        INIT_ST;
+        uint32_t exportflags = VA_EXPORT_SURFACE_SEPARATE_LAYERS | VA_EXPORT_SURFACE_READ_ONLY;
+        VADRMPRIMESurfaceDescriptor vadesc;
+        va_status = vaExportSurfaceHandle(m_vaDisplay, Id,
+                                          VA_SURFACE_ATTRIB_MEM_TYPE_DRM_PRIME_2,
+                                          exportflags, &vadesc);
+        CHECK_ST;
+
+        AVDRMFrameDescriptor *drmdesc = reinterpret_cast<AVDRMFrameDescriptor*>(av_mallocz(sizeof(*drmdesc)));
+        drmdesc->nb_objects = static_cast<int>(vadesc.num_objects);
+        for (uint i = 0; i < vadesc.num_objects; i++)
+        {
+            drmdesc->objects[i].fd              = vadesc.objects[i].fd;
+            drmdesc->objects[i].size            = vadesc.objects[i].size;
+            drmdesc->objects[i].format_modifier = vadesc.objects[i].drm_format_modifier;
+        }
+        drmdesc->nb_layers = static_cast<int>(vadesc.num_layers);
+        for (uint i = 0; i < vadesc.num_layers; i++)
+        {
+            drmdesc->layers[i].format    = vadesc.layers[i].drm_format;
+            drmdesc->layers[i].nb_planes = static_cast<int>(vadesc.layers[i].num_planes);
+            for (uint j = 0; j < vadesc.layers[i].num_planes; j++)
+            {
+                drmdesc->layers[i].planes[j].object_index = static_cast<int>(vadesc.layers[i].object_index[j]);
+                drmdesc->layers[i].planes[j].offset       = vadesc.layers[i].offset[j];
+                drmdesc->layers[i].planes[j].pitch        = vadesc.layers[i].pitch[j];
+            }
+        }
+        m_drmFrames.insert(Id, drmdesc);
+    }
+
+    if (!m_drmFrames.contains(Id))
+        return result;
+
+    unsigned char* temp = Frame->buf;
+    Frame->buf = reinterpret_cast<unsigned char*>(m_drmFrames[Id]);
+    Frame->codec = FMT_DRMPRIME;
+    Frame->pix_fmt = AV_PIX_FMT_DRM_PRIME;
+    result = m_drmPrimeInterop->Acquire(Context, ColourSpace, Frame, Scan);
+    Frame->buf = temp;
+    Frame->codec = FMT_VAAPI;
+    Frame->pix_fmt = AV_PIX_FMT_VAAPI;
+    return result;
+}
+
+void MythVAAPIInteropDRM::CleanupDRMPRIME(void)
+{
+    if (m_drmPrimeInterop)
+        m_drmPrimeInterop->DecrRef();
+
+    if (!m_drmFrames.isEmpty())
+    {
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Releasing %1 DRM descriptors").arg(m_drmFrames.size()));
+        QHash<unsigned long long, AVDRMFrameDescriptor*>::iterator it = m_drmFrames.begin();
+        for ( ; it != m_drmFrames.end(); ++it)
+        {
+            for (int i = 0; i < (*it)->nb_objects; i++)
+                close((*it)->objects[i].fd);
+            av_freep(&(*it));
+        }
+    }
+}
+
+#endif

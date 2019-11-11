@@ -12,7 +12,7 @@ class MythDRMPRIMEInterop : public MythOpenGLInterop
     static MythDRMPRIMEInterop* Create(MythRenderOpenGL *Context, Type InteropType);
     static Type GetInteropType(MythCodecID CodecId, MythRenderOpenGL *Context = nullptr);
 
-    MythDRMPRIMEInterop(MythRenderOpenGL *Context);
+    MythDRMPRIMEInterop(MythRenderOpenGL *Context, bool EnableCacheing = true);
     virtual ~MythDRMPRIMEInterop() override;
 
     void DeleteTextures(void) override;
@@ -26,6 +26,7 @@ class MythDRMPRIMEInterop : public MythOpenGLInterop
                                          VideoColourSpace *ColourSpace,
                                          VideoFrame *Frame, FrameScanType Scan);
     AVDRMFrameDescriptor*     VerifyBuffer(MythRenderOpenGL *Context, VideoFrame *Frame);
+    bool m_enableCacheing { true  };
     bool m_openGLES       { true  };
     bool m_fullYUVSupport { false };
 };
