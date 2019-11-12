@@ -6,13 +6,11 @@
 #include "mythvaapidrminterop.h"
 
 // DRM PRIME interop largely for testing
-#ifdef USING_V4L2PRIME
 #include "mythdrmprimeinterop.h"
 extern "C" {
 #include "libavutil/hwcontext_drm.h"
 }
 #include <unistd.h>
-#endif
 
 #define LOC QString("VAAPIDRM: ")
 
@@ -38,19 +36,16 @@ MythVAAPIInteropDRM::MythVAAPIInteropDRM(MythRenderOpenGL *Context)
         return;
     }
     InitaliseDisplay();
-#ifdef USING_V4L2PRIME
+
     if (!qgetenv("MYTHTV_VAAPI_PRIME").isEmpty())
         m_drmPrimeInterop = new MythDRMPRIMEInterop(Context, false);
-#endif
 }
 
 MythVAAPIInteropDRM::~MythVAAPIInteropDRM()
 {
     OpenGLLocker locker(m_context);
 
-#ifdef USING_V4L2PRIME
     CleanupDRMPRIME();
-#endif
 
     CleanupReferenceFrames();
     DestroyDeinterlacer();
@@ -259,75 +254,71 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context
 
     OpenGLLocker locker(m_context);
 
-
-#ifdef USING_V4L2PRIME
     if (m_drmPrimeInterop)
     {
         result = AcquirePrime(id, Context, ColourSpace, Frame, Scan);
     }
     else
     {
-#endif
-    VAImage vaimage;
-    memset(&vaimage, 0, sizeof(vaimage));
-    vaimage.buf = vaimage.image_id = VA_INVALID_ID;
-    INIT_ST;
-    va_status = vaDeriveImage(m_vaDisplay, id, &vaimage);
-    CHECK_ST;
-    uint count = vaimage.num_planes;
+        VAImage vaimage;
+        memset(&vaimage, 0, sizeof(vaimage));
+        vaimage.buf = vaimage.image_id = VA_INVALID_ID;
+        INIT_ST;
+        va_status = vaDeriveImage(m_vaDisplay, id, &vaimage);
+        CHECK_ST;
+        uint count = vaimage.num_planes;
 
-    VABufferInfo vabufferinfo;
-    memset(&vabufferinfo, 0, sizeof(vabufferinfo));
-    vabufferinfo.mem_type = VA_SURFACE_ATTRIB_MEM_TYPE_DRM_PRIME;
-    va_status = vaAcquireBufferHandle(m_vaDisplay, vaimage.buf, &vabufferinfo);
-    CHECK_ST;
+        VABufferInfo vabufferinfo;
+        memset(&vabufferinfo, 0, sizeof(vabufferinfo));
+        vabufferinfo.mem_type = VA_SURFACE_ATTRIB_MEM_TYPE_DRM_PRIME;
+        va_status = vaAcquireBufferHandle(m_vaDisplay, vaimage.buf, &vabufferinfo);
+        CHECK_ST;
 
-    VideoFrameType format = VATypeToMythType(vaimage.format.fourcc);
-    if (format == FMT_NONE)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unsupported VA fourcc: %1")
-            .arg(fourcc_str(static_cast<int32_t>(vaimage.format.fourcc))));
-    }
-    else
-    {
-        if (count != planes(format))
+        VideoFrameType format = VATypeToMythType(vaimage.format.fourcc);
+        if (format == FMT_NONE)
         {
-            LOG(VB_GENERAL, LOG_ERR, LOC + QString("Inconsistent plane count %1 != %2")
-                .arg(count).arg(planes(format)));
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unsupported VA fourcc: %1")
+                .arg(fourcc_str(static_cast<int32_t>(vaimage.format.fourcc))));
         }
         else
         {
-            vector<QSize> sizes;
-            for (uint plane = 0 ; plane < count; ++plane)
+            if (count != planes(format))
             {
-                QSize size(vaimage.width, vaimage.height);
-                if (plane > 0)
-                    size = QSize(vaimage.width >> 1, vaimage.height >> 1);
-                sizes.push_back(size);
-            }
-
-            vector<MythVideoTexture*> textures = MythVideoTexture::CreateTextures(m_context, FMT_VAAPI, format, sizes);
-            if (textures.size() != count)
-            {
-                LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create all textures");
+                LOG(VB_GENERAL, LOG_ERR, LOC + QString("Inconsistent plane count %1 != %2")
+                    .arg(count).arg(planes(format)));
             }
             else
             {
-                for (uint i = 0; i < textures.size(); ++i)
-                    textures[i]->m_allowGLSLDeint = true;
-                CreateDRMBuffers(format, textures, vabufferinfo.handle, vaimage);
-                result = textures;
+                vector<QSize> sizes;
+                for (uint plane = 0 ; plane < count; ++plane)
+                {
+                    QSize size(vaimage.width, vaimage.height);
+                    if (plane > 0)
+                        size = QSize(vaimage.width >> 1, vaimage.height >> 1);
+                    sizes.push_back(size);
+                }
+
+                vector<MythVideoTexture*> textures = MythVideoTexture::CreateTextures(m_context, FMT_VAAPI, format, sizes);
+                if (textures.size() != count)
+                {
+                    LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create all textures");
+                }
+                else
+                {
+                    for (uint i = 0; i < textures.size(); ++i)
+                        textures[i]->m_allowGLSLDeint = true;
+                    CreateDRMBuffers(format, textures, vabufferinfo.handle, vaimage);
+                    result = textures;
+                }
             }
         }
+
+        va_status = vaReleaseBufferHandle(m_vaDisplay, vaimage.buf);
+        CHECK_ST;
+        va_status = vaDestroyImage(m_vaDisplay, vaimage.image_id);
+        CHECK_ST;
     }
 
-    va_status = vaReleaseBufferHandle(m_vaDisplay, vaimage.buf);
-    CHECK_ST;
-    va_status = vaDestroyImage(m_vaDisplay, vaimage.image_id);
-    CHECK_ST;
-#ifdef USING_V4L2PRIME
-    }
-#endif
     m_openglTextures.insert(id, result);
     if (needreferenceframes)
         return GetReferenceFrames();
@@ -404,7 +395,6 @@ bool MythVAAPIInteropDRM::IsSupported(MythRenderOpenGL *Context)
            Context->hasExtension("GL_OES_EGL_image");
 }
 
-#ifdef USING_V4L2PRIME
 /*! \brief Export the given VideoFrame as a DRM PRIME descriptor
  *
  * This is funcionally equivalent to the 'regular' VAAPI version but is useful
@@ -482,5 +472,3 @@ void MythVAAPIInteropDRM::CleanupDRMPRIME(void)
         }
     }
 }
-
-#endif

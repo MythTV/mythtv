@@ -40,7 +40,7 @@
 #include "langsettings.h"
 #include "decoders/mythcodeccontext.h"
 #include "mythsorthelper.h"
-#ifdef USE_OPENGL_PAINTER
+#ifdef USING_OPENGL
 #include "opengl/mythrenderopengl.h"
 #endif
 #ifdef USING_AIRPLAY

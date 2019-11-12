@@ -66,7 +66,7 @@ using namespace std;
 
 #include "mythscreentype.h"
 #include "mythpainter.h"
-#ifdef USE_OPENGL_PAINTER
+#ifdef USING_OPENGL
 #include "mythpainteropengl.h"
 #endif
 #include "mythpainter_qt.h"
@@ -331,7 +331,7 @@ MythNotificationCenter *GetNotificationCenter(void)
     return mainWin->GetCurrentNotificationCenter();
 }
 
-#ifdef USE_OPENGL_PAINTER
+#ifdef USING_OPENGL
 MythPainterWindowGL::MythPainterWindowGL(MythMainWindow *win,
                                          MythMainWindowPrivate *priv,
                                          MythRenderOpenGL *rend)
@@ -1104,7 +1104,7 @@ void MythMainWindow::Init(const QString& forcedpainter, bool mayReInit)
         d->m_paintwin = new MythPainterWindowD3D9(this, d);
     }
 #endif
-#ifdef USE_OPENGL_PAINTER
+#ifdef USING_OPENGL
     if ((!d->m_painter && !d->m_paintwin) &&
         (painter == AUTO_PAINTER || painter.contains(OPENGL_PAINTER)))
     {

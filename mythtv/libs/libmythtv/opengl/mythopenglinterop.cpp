@@ -26,9 +26,7 @@
 #ifdef USING_MMAL
 #include "mythmmalinterop.h"
 #endif
-#ifdef USING_V4L2PRIME
 #include "mythdrmprimeinterop.h"
-#endif
 
 #define LOC QString("OpenGLInterop: ")
 
@@ -53,34 +51,8 @@ QStringList MythOpenGLInterop::GetAllowedRenderers(MythCodecID CodecId)
     QStringList result;
     if (codec_sw_copy(CodecId))
         return result;
-#ifdef USING_VAAPI
-    else if (codec_is_vaapi(CodecId) && (GetInteropType(CodecId) != Unsupported))
+    if (GetInteropType(CodecId) != Unsupported)
         result << "opengl-hw";
-#endif
-#ifdef USING_VTB
-    else if (codec_is_vtb(CodecId) && (GetInteropType(CodecId) != Unsupported))
-        result << "opengl-hw";
-#endif
-#ifdef USING_MEDIACODEC
-    else if (codec_is_mediacodec(CodecId) /*&& (GetInteropType(CodecId) != Unsupported)*/)
-        result << "opengl-hw";
-#endif
-#ifdef USING_VDPAU
-    else if (codec_is_vdpau_hw(CodecId) && (GetInteropType(CodecId) != Unsupported))
-        result << "opengl-hw";
-#endif
-#ifdef USING_NVDEC
-    else if (codec_is_nvdec(CodecId) && (GetInteropType(CodecId) != Unsupported))
-        result << "opengl-hw";
-#endif
-#ifdef USING_MMAL
-    else if (codec_is_mmal(CodecId) && (GetInteropType(CodecId) != Unsupported))
-        result << "opengl-hw";
-#endif
-#ifdef USING_V4L2PRIME
-    else if (codec_is_v4l2(CodecId) && (GetInteropType(CodecId) != Unsupported))
-        result << "opengl-hw";
-#endif
     return result;
 }
 
@@ -131,10 +103,8 @@ MythOpenGLInterop::Type MythOpenGLInterop::GetInteropType(MythCodecID CodecId)
     if (codec_is_mmal(CodecId))
         supported = MythMMALInterop::GetInteropType(CodecId);
 #endif
-#ifdef USING_V4L2PRIME
     if (codec_is_v4l2(CodecId))
         supported = MythDRMPRIMEInterop::GetInteropType(CodecId);
-#endif
 
     if (Unsupported == supported)
         LOG(VB_GENERAL, LOG_WARNING, LOC + QString("No render support for codec '%1'").arg(toString(CodecId)));
@@ -153,44 +123,14 @@ vector<MythVideoTexture*> MythOpenGLInterop::Retrieve(MythRenderOpenGL *Context,
     if (!(Context && Frame))
         return result;
 
-    MythOpenGLInterop* interop = nullptr;
-    bool validhwframe = Frame->priv[1];
-    bool validhwcodec = false;
-#ifdef USING_VTB
-    if ((Frame->codec == FMT_VTB) && (Frame->pix_fmt == AV_PIX_FMT_VIDEOTOOLBOX))
-        validhwcodec = true;
-#endif
-#ifdef USING_VAAPI
-    if ((Frame->codec == FMT_VAAPI) && (Frame->pix_fmt == AV_PIX_FMT_VAAPI))
-        validhwcodec = true;
-#endif
-#ifdef USING_MEDIACODEC
-    if ((Frame->codec == FMT_MEDIACODEC) && (Frame->pix_fmt == AV_PIX_FMT_MEDIACODEC))
-        validhwcodec = true;
-#endif
-#ifdef USING_VDPAU
-    if ((Frame->codec == FMT_VDPAU) && (Frame->pix_fmt == AV_PIX_FMT_VDPAU))
-        validhwcodec = true;
-#endif
-#ifdef USING_NVDEC
-    if ((Frame->codec == FMT_NVDEC) && (Frame->pix_fmt == AV_PIX_FMT_CUDA))
-        validhwcodec = true;
-#endif
-#ifdef USING_MMAL
-    if ((Frame->codec == FMT_MMAL) && (Frame->pix_fmt == AV_PIX_FMT_MMAL))
-        validhwcodec = true;
-#endif
-#ifdef USING_V4L2PRIME
-    if ((Frame->codec == FMT_DRMPRIME) && (Frame->pix_fmt == AV_PIX_FMT_DRM_PRIME))
-        validhwcodec = true;
-#endif
-
-    if (!(validhwframe && validhwcodec))
+    if (!(Frame->priv[1] && format_is_hw(Frame->codec) &&
+         (Frame->codec == PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->pix_fmt)))))
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Not a valid hardware frame");
         return result;
     }
 
+    MythOpenGLInterop* interop = nullptr;
     if ((Frame->codec == FMT_VTB)  || (Frame->codec == FMT_MEDIACODEC) ||
         (Frame->codec == FMT_MMAL) || (Frame->codec == FMT_DRMPRIME))
     {

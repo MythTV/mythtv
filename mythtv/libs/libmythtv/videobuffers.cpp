@@ -302,14 +302,13 @@ void VideoBuffers::SetPrebuffering(bool Normal)
 
 void VideoBuffers::ReleaseDecoderResources(VideoFrame *Frame)
 {
-#if defined(USING_MEDIACODEC) || defined(USING_VTB) || defined(USING_VAAPI) || defined(USING_VDPAU) || defined(USING_NVDEC) || defined(USING_MMAL) || defined(USING_V4L2PRIME)
     if (format_is_hw(Frame->codec))
     {
         AVBufferRef* ref = reinterpret_cast<AVBufferRef*>(Frame->priv[0]);
         if (ref != nullptr)
             av_buffer_unref(&ref);
         Frame->buf = Frame->priv[0] = nullptr;
-#if defined(USING_VAAPI) || defined(USING_VDPAU) || defined(USING_NVDEC)
+
         if (format_is_hwframes(Frame->codec) || (Frame->codec == FMT_NVDEC))
         {
             ref = reinterpret_cast<AVBufferRef*>(Frame->priv[1]);
@@ -317,9 +316,7 @@ void VideoBuffers::ReleaseDecoderResources(VideoFrame *Frame)
                 av_buffer_unref(&ref);
             Frame->priv[1] = nullptr;
         }
-#endif
     }
-#endif
     (void)Frame;
 }
 

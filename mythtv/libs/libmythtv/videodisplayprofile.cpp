@@ -1127,7 +1127,7 @@ void VideoDisplayProfile::CreateProfiles(const QString &HostName)
     QStringList profiles = GetProfiles(HostName);
     uint groupid;
 
-#ifdef USING_OPENGL_VIDEO
+#ifdef USING_OPENGL
     if (!profiles.contains("OpenGL High Quality")) {
         (void) QObject::tr("OpenGL High Quality",
                            "Sample: OpenGL high quality");
@@ -1188,7 +1188,7 @@ void VideoDisplayProfile::CreateProfiles(const QString &HostName)
     }
 #endif
 
-#if defined(USING_NVDEC) && defined(USING_OPENGL_VIDEO)
+#if defined(USING_NVDEC) && defined(USING_OPENGL)
     if (!profiles.contains("NVDEC Normal")) {
         (void) QObject::tr("NVDEC Normal", "Sample: NVDEC Normal");
         groupid = CreateProfileGroup("NVDEC Normal", HostName);
@@ -1198,7 +1198,7 @@ void VideoDisplayProfile::CreateProfiles(const QString &HostName)
     }
 #endif
 
-#if defined(USING_VTB) && defined(USING_OPENGL_VIDEO)
+#if defined(USING_VTB) && defined(USING_OPENGL)
     if (!profiles.contains("VideoToolBox Normal")) {
         (void) QObject::tr("VideoToolBox Normal", "Sample: VideoToolBox Normal");
         groupid = CreateProfileGroup("VideoToolBox Normal", HostName);

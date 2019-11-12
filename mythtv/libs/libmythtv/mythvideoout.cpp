@@ -14,7 +14,7 @@
 #ifdef _WIN32
 #include "videoout_d3d.h"
 #endif
-#ifdef USING_OPENGL_VIDEO
+#ifdef USING_OPENGL
 #include "mythvideooutopengl.h"
 #endif
 #include "mythvideooutnull.h"
@@ -34,9 +34,9 @@ void MythVideoOutput::GetRenderOptions(RenderOptions &Options)
     VideoOutputD3D::GetRenderOptions(Options);
 #endif
 
-#ifdef USING_OPENGL_VIDEO
+#ifdef USING_OPENGL
     MythVideoOutputOpenGL::GetRenderOptions(Options);
-#endif // USING_OPENGL_VIDEO
+#endif // USING_OPENGL
 }
 
 /**
@@ -65,9 +65,9 @@ MythVideoOutput *MythVideoOutput::Create(const QString &Decoder,    MythCodecID 
         renderers += VideoOutputD3D::GetAllowedRenderers(CodecID, VideoDispDim);
 #endif
 
-#ifdef USING_OPENGL_VIDEO
+#ifdef USING_OPENGL
         renderers += MythVideoOutputOpenGL::GetAllowedRenderers(CodecID, VideoDispDim);
-#endif // USING_OPENGL_VIDEO
+#endif // USING_OPENGL
     }
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Allowed renderers: %1").arg(renderers.join(",")));
@@ -114,10 +114,10 @@ MythVideoOutput *MythVideoOutput::Create(const QString &Decoder,    MythCodecID 
             vo = new VideoOutputD3D();
 #endif // _WIN32
 
-#ifdef USING_OPENGL_VIDEO
+#ifdef USING_OPENGL
         else if (renderer.contains("opengl"))
             vo = new MythVideoOutputOpenGL(renderer);
-#endif // USING_OPENGL_VIDEO
+#endif // USING_OPENGL
 
         if (vo)
             vo->m_dbDisplayProfile = vprof;

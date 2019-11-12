@@ -374,16 +374,6 @@ using_frontend {
     SOURCES += decoders/privatedecoder.cpp
     SOURCES += decoders/mythcodeccontext.cpp
 
-    using_mmal {
-        HEADERS += decoders/mythmmalcontext.h   opengl/mythmmalinterop.h
-        SOURCES += decoders/mythmmalcontext.cpp opengl/mythmmalinterop.cpp
-        LIBS    += -L/opt/vc/lib -lmmal -lvcsm
-        LIBS    += -lEGL
-        DEFINES += USING_MMAL
-        # Raspbian
-        QMAKE_CXXFLAGS += -isystem /opt/vc/include
-    }
-
     using_libass {
         DEFINES += USING_LIBASS
         LIBS    += -lass
@@ -454,6 +444,37 @@ using_frontend {
 
     using_x11:DEFINES += USING_X11
 
+    using_opengl {
+        DEFINES += USING_OPENGL
+        using_opengles: DEFINES += USING_OPENGLES
+        HEADERS += opengl/mythopenglvideo.h
+        HEADERS += opengl/mythvideooutopengl.h
+        HEADERS += opengl/mythopenglvideoshaders.h
+        HEADERS += opengl/mythopenglinterop.h
+        HEADERS += opengl/mythvideotexture.h
+        HEADERS += opengl/mythegldefs.h
+        HEADERS += opengl/mythdrmprimeinterop.h
+        SOURCES += opengl/mythopenglvideo.cpp
+        SOURCES += opengl/mythvideooutopengl.cpp
+        SOURCES += opengl/mythopenglinterop.cpp
+        SOURCES += opengl/mythvideotexture.cpp
+        SOURCES += opengl/mythdrmprimeinterop.cpp
+    }
+
+    using_mmal {
+        HEADERS += decoders/mythmmalcontext.h   opengl/mythmmalinterop.h
+        SOURCES += decoders/mythmmalcontext.cpp opengl/mythmmalinterop.cpp
+        LIBS    += -L/opt/vc/lib -lmmal -lvcsm
+        LIBS    += -lEGL
+        DEFINES += USING_MMAL
+        # Raspbian
+        QMAKE_CXXFLAGS += -isystem /opt/vc/include
+    }
+
+    using_v4l2prime {
+        DEFINES += USING_V4L2PRIME
+    }
+
     using_vdpau {
         DEFINES += USING_VDPAU
         HEADERS += opengl/mythvdpauinterop.h
@@ -465,32 +486,13 @@ using_frontend {
         LIBS += -lvdpau
     }
 
-    using_opengl {
-        DEFINES += USING_OPENGL
-        using_opengles: DEFINES += USING_OPENGLES
-    }
-
-    using_opengl_video {
-        DEFINES += USING_OPENGL_VIDEO
-        HEADERS += opengl/mythopenglvideo.h
-        HEADERS += opengl/mythvideooutopengl.h
-        HEADERS += opengl/mythopenglvideoshaders.h
-        HEADERS += opengl/mythopenglinterop.h
-        HEADERS += opengl/mythvideotexture.h
-        HEADERS += opengl/mythegldefs.h
-        SOURCES += opengl/mythopenglvideo.cpp
-        SOURCES += opengl/mythvideooutopengl.cpp
-        SOURCES += opengl/mythopenglinterop.cpp
-        SOURCES += opengl/mythvideotexture.cpp
-    }
-
-    using_vaapi:using_opengl_video {
+    using_vaapi:using_opengl {
         DEFINES += USING_VAAPI
         HEADERS += decoders/mythvaapicontext.h    opengl/mythvaapiinterop.h
         SOURCES += decoders/mythvaapicontext.cpp  opengl/mythvaapiinterop.cpp
         HEADERS += opengl/mythvaapidrminterop.h   opengl/mythvaapiglxinterop.h
         SOURCES += opengl/mythvaapidrminterop.cpp opengl/mythvaapiglxinterop.cpp
-        LIBS    += -lva -lva-x11 -lva-glx -lEGL
+        LIBS    += -lva -lva-x11 -lva-glx -lva-drm
     }
 
     using_nvdec {
@@ -678,13 +680,6 @@ using_backend {
         HEADERS += decoders/mythv4l2m2mcontext.h
         SOURCES += decoders/mythv4l2m2mcontext.cpp
         DEFINES += USING_V4L2
-
-        using_v4l2prime:using_opengl_video {
-            DEFINES += USING_V4L2PRIME
-            HEADERS += opengl/mythdrmprimeinterop.h
-            SOURCES += opengl/mythdrmprimeinterop.cpp
-            LIBS    += -ldrm
-        }
     }
 
     # Support for cable boxes that provide Firewire out

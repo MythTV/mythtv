@@ -176,7 +176,7 @@ mingw | win32-msvc*{
 }
 
 using_opengl {
-    using_opengl_themepainter:DEFINES += USE_OPENGL_PAINTER
+    DEFINES += USING_OPENGL
     SOURCES += opengl/mythpainteropengl.cpp  opengl/mythrenderopengl.cpp
     HEADERS += opengl/mythpainteropengl.h    opengl/mythrenderopengl.h
     HEADERS += opengl/mythrenderopengldefs.h opengl/mythrenderopenglshaders.h
@@ -194,7 +194,6 @@ using_opengl {
         DEFINES += USING_EGL
     }
 
-    inc.files += mythpainter_ogl.h
     mingw|win32-msvc*:LIBS += -lopengl32
 }
 

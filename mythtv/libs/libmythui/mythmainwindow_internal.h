@@ -5,7 +5,7 @@
 class MythMainWindow;
 class MythMainWindowPrivate;
 
-#ifdef USE_OPENGL_PAINTER
+#ifdef USING_OPENGL
 #include "mythrenderopengl.h"
 
 class MythPainterWindowGL : public QWidget

@@ -1970,8 +1970,6 @@ MYTHTV_CONFIG_LIST='
     mheg
     mmal
     opengl
-    opengl_video
-    opengl_themepainter
     egl
     qtwebkit
     qtscript
@@ -1990,6 +1988,7 @@ MYTHTV_CONFIG_LIST='
     debugtype
     systemd_notify
     systemd_journal
+    drm
 '
 
 MYTHTV_HAVE_LIST='
@@ -2036,6 +2035,7 @@ USING_LIST='
     opengl
     opengles
     egl
+    drm
     vaapi
     nvdec
     vdpau
@@ -2602,10 +2602,8 @@ mythtranscode_deps="backend frontend"
 opengl_deps_any="agl_h GL_gl_h EGL_egl_h GLES2_gl2_h darwin windows x11"
 opengles_deps="GLES2_gl2_h"
 egl_deps="EGL_egl_h"
-opengl_video_deps="opengl"
-opengl_themepainter_deps="opengl"
 v4l2_deps="linux_videodev2_h"
-v4l2prime_deps="v4l2"
+v4l2prime_deps="v4l2 drm"
 v4l1_deps="backend v4l2 linux_videodev_h"
 xrandr_deps="x11"
 asi_deps="backend"
@@ -2765,8 +2763,6 @@ enable mythtranscode
 enable opengl
 enable opengles
 enable egl
-enable opengl_video
-enable opengl_themepainter
 enable symbol_visibility
 enable v4l1
 enable v4l2
@@ -4893,6 +4889,7 @@ case $target_os in
         enable libudev
         enable libuuid
         enable pic
+        enable drm
 	if [ x`uname -m` = x"armv7l" ]; then
 	    disable vaapi
 	fi
@@ -6002,6 +5999,9 @@ enabled egl &&  { check_lib EGL EGL/egl.h eglGetProcAddress "-lEGL" ||
                     check_pkg_config EGL egl EGL/egl.h eglGetProcAddress && enable egl
                   }
                 }
+
+enabled drm && use_pkg_config libdrm libdrm xf86drm.h drmGetVersion || disable drm
+enabled drm && check_cpp_condition drm_fourcc.h 'defined(DRM_FORMAT_MOD_LINEAR)' || disable drm
 
 if enabled libmpeg2external; then
     check_lib libmpeg2external mpeg2dec/mpeg2.h mpeg2_init -lmpeg2 || disable libmpeg2external
@@ -7186,7 +7186,7 @@ if enabled mmal; then
     ffopts="$ffopts --enable-mmal"
 fi
 
-if enabled v4l2; then
+if enabled drm; then
     ffopts="$ffopts --enable-libdrm"
 fi
 
@@ -7225,10 +7225,6 @@ if ! grep "^CONFIG_NVDEC=yes$" external/FFmpeg/ffbuild/config.mak ; then
     disable nvdec
 fi
 
-# If ffmpeg disabled libdrm then disable v4l2prime
-if ! grep "^CONFIG_LIBDRM=yes$" external/FFmpeg/ffbuild/config.mak ; then
-    disable v4l2prime
-fi
 if test "$quiet" != "yes"; then
 
 echo
@@ -7403,13 +7399,12 @@ if enabled x11 ; then
   echo "VAAPI support             ${vaapi-no}"
   echo "NVDEC support             ${nvdec-no}"
 fi
+  echo "DRM support               ${drm-no}"
   echo "Video4Linux codecs        ${v4l2-no} (DRM ${v4l2prime-no})"
   echo "MMAL decoder support      ${mmal-no}"
   echo "OpenGL support            ${opengl-no}"
   echo "OpenGL ES 2.0             ${opengles-no}"
   echo "EGL support               ${egl-no}"
-  echo "OpenGL video              ${opengl_video-no}"
-  echo "OpenGL ThemePainter       ${opengl_themepainter-no}"
   if test x"$target_os" = x"mingw32" ; then
     echo "Windows (Direct3D)        yes"
     echo "DXVA2 support             ${dxva2-no}"
