@@ -30,6 +30,7 @@ MythDRMPRIMEInterop::MythDRMPRIMEInterop(MythRenderOpenGL *Context, bool EnableC
         m_fullYUVSupport = true;
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Full YUV DRM support available");
     }
+    m_hasModifiers = m_context->HasEGLExtension("EGL_EXT_image_dma_buf_import_modifiers");
 }
 
 MythDRMPRIMEInterop::~MythDRMPRIMEInterop()
@@ -222,42 +223,52 @@ vector<MythVideoTexture*> MythDRMPRIMEInterop::Acquire(MythRenderOpenGL *Context
                 break;
         }
 
-        std::vector<EGLint> attrs = {
-            EGL_LINUX_DRM_FOURCC_EXT,      static_cast<EGLint>(drmdesc->layers[0].format),
+        static const EGLint PLANE_FD[4] =
+            { EGL_DMA_BUF_PLANE0_FD_EXT, EGL_DMA_BUF_PLANE1_FD_EXT,
+              EGL_DMA_BUF_PLANE2_FD_EXT, EGL_DMA_BUF_PLANE3_FD_EXT };
+        static const EGLint PLANE_OFFSET[4] =
+            { EGL_DMA_BUF_PLANE0_OFFSET_EXT, EGL_DMA_BUF_PLANE1_OFFSET_EXT,
+              EGL_DMA_BUF_PLANE2_OFFSET_EXT, EGL_DMA_BUF_PLANE3_OFFSET_EXT };
+        static const EGLint PLANE_PITCH[4] =
+            { EGL_DMA_BUF_PLANE0_PITCH_EXT, EGL_DMA_BUF_PLANE1_PITCH_EXT,
+              EGL_DMA_BUF_PLANE2_PITCH_EXT, EGL_DMA_BUF_PLANE3_PITCH_EXT };
+        static const EGLint PLANE_MODLO[4] =
+            { EGL_DMA_BUF_PLANE0_MODIFIER_LO_EXT, EGL_DMA_BUF_PLANE1_MODIFIER_LO_EXT,
+              EGL_DMA_BUF_PLANE2_MODIFIER_LO_EXT, EGL_DMA_BUF_PLANE3_MODIFIER_LO_EXT };
+        static const EGLint PLANE_MODHI[4] =
+            { EGL_DMA_BUF_PLANE0_MODIFIER_HI_EXT, EGL_DMA_BUF_PLANE1_MODIFIER_HI_EXT,
+              EGL_DMA_BUF_PLANE2_MODIFIER_HI_EXT, EGL_DMA_BUF_PLANE3_MODIFIER_HI_EXT };
+
+        AVDRMLayerDescriptor* layer = &drmdesc->layers[0];
+
+        QVector<EGLint> attribs = {
+            EGL_LINUX_DRM_FOURCC_EXT,      static_cast<EGLint>(layer->format),
             EGL_WIDTH,                     Frame->width,
             EGL_HEIGHT,                    Frame->height,
             EGL_YUV_COLOR_SPACE_HINT_EXT,  colourspace,
             EGL_SAMPLE_RANGE_HINT_EXT,     Frame->colorrange == AVCOL_RANGE_JPEG ? EGL_YUV_FULL_RANGE_EXT : EGL_YUV_NARROW_RANGE_EXT,
             EGL_YUV_CHROMA_VERTICAL_SITING_HINT_EXT,   EGL_YUV_CHROMA_SITING_0_EXT,
-            EGL_YUV_CHROMA_HORIZONTAL_SITING_HINT_EXT, EGL_YUV_CHROMA_SITING_0_EXT,
-            EGL_DMA_BUF_PLANE0_FD_EXT,     drmdesc->objects[drmdesc->layers[0].planes[0].object_index].fd,
-            EGL_DMA_BUF_PLANE0_OFFSET_EXT, static_cast<EGLint>(drmdesc->layers[0].planes[0].offset),
-            EGL_DMA_BUF_PLANE0_PITCH_EXT,  static_cast<EGLint>(drmdesc->layers[0].planes[0].pitch)
+            EGL_YUV_CHROMA_HORIZONTAL_SITING_HINT_EXT, EGL_YUV_CHROMA_SITING_0_EXT
         };
 
-        if (drmdesc->layers[0].nb_planes > 1)
+        for (int plane = 0; plane < layer->nb_planes; ++plane)
         {
-            attrs.push_back(EGL_DMA_BUF_PLANE1_FD_EXT);
-            attrs.push_back(drmdesc->objects[drmdesc->layers[0].planes[1].object_index].fd);
-            attrs.push_back(EGL_DMA_BUF_PLANE1_OFFSET_EXT);
-            attrs.push_back(static_cast<EGLint>(drmdesc->layers[0].planes[1].offset));
-            attrs.push_back(EGL_DMA_BUF_PLANE1_PITCH_EXT);
-            attrs.push_back(static_cast<EGLint>(drmdesc->layers[0].planes[1].pitch));
+            AVDRMPlaneDescriptor* drmplane = &layer->planes[plane];
+            attribs << PLANE_FD[plane]     << drmdesc->objects[drmplane->object_index].fd
+                    << PLANE_OFFSET[plane] << static_cast<EGLint>(drmplane->offset)
+                    << PLANE_PITCH[plane]  << static_cast<EGLint>(drmplane->pitch);
+            if (m_hasModifiers && (drmdesc->objects[drmplane->object_index].format_modifier != 0 /* DRM_FORMAT_MOD_NONE*/))
+            {
+                attribs << PLANE_MODLO[plane]
+                        << static_cast<EGLint>(drmdesc->objects[drmplane->object_index].format_modifier & 0xffffffff)
+                        << PLANE_MODHI[plane]
+                        << static_cast<EGLint>(drmdesc->objects[drmplane->object_index].format_modifier >> 32);
+            }
         }
-
-        if (drmdesc->layers[0].nb_planes > 2)
-        {
-            attrs.push_back(EGL_DMA_BUF_PLANE2_FD_EXT);
-            attrs.push_back(drmdesc->objects[drmdesc->layers[0].planes[2].object_index].fd);
-            attrs.push_back(EGL_DMA_BUF_PLANE2_OFFSET_EXT);
-            attrs.push_back(static_cast<EGLint>(drmdesc->layers[0].planes[2].offset));
-            attrs.push_back(EGL_DMA_BUF_PLANE2_PITCH_EXT);
-            attrs.push_back(static_cast<EGLint>(drmdesc->layers[0].planes[2].pitch));
-        }
-        attrs.push_back(EGL_NONE);
+        attribs << EGL_NONE;
 
         EGLImageKHR image = m_context->eglCreateImageKHR(m_context->GetEGLDisplay(), EGL_NO_CONTEXT,
-                                                         EGL_LINUX_DMA_BUF_EXT, nullptr, &attrs[0]);
+                                                         EGL_LINUX_DMA_BUF_EXT, nullptr, attribs.data());
         if (!image)
             LOG(VB_GENERAL, LOG_ERR, LOC + QString("No EGLImage '%1'").arg(m_context->GetEGLError()));
         MythVideoTexture *texture = textures[0];
@@ -337,19 +348,29 @@ vector<MythVideoTexture*> MythDRMPRIMEInterop::AcquireYUV(AVDRMFrameDescriptor* 
 
     for (uint plane = 0; plane < result.size(); ++plane)
     {
-        AVDRMLayerDescriptor* layer = &Desc->layers[plane];
-        const EGLint attributes[] = {
-                EGL_LINUX_DRM_FOURCC_EXT, static_cast<EGLint>(layer->format),
-                EGL_WIDTH,  result[plane]->m_size.width(),
-                EGL_HEIGHT, result[plane]->m_size.height(),
-                EGL_DMA_BUF_PLANE0_FD_EXT,     Desc->objects[layer->planes[0].object_index].fd,
-                EGL_DMA_BUF_PLANE0_OFFSET_EXT, static_cast<EGLint>(layer->planes[0].offset),
-                EGL_DMA_BUF_PLANE0_PITCH_EXT,  static_cast<EGLint>(layer->planes[0].pitch),
-                EGL_NONE
+        AVDRMLayerDescriptor* layer    = &Desc->layers[plane];
+        AVDRMPlaneDescriptor* drmplane = &layer->planes[0];
+        QVector<EGLint> attribs = {
+            EGL_LINUX_DRM_FOURCC_EXT, static_cast<EGLint>(layer->format),
+            EGL_WIDTH,  result[plane]->m_size.width(),
+            EGL_HEIGHT, result[plane]->m_size.height(),
+            EGL_DMA_BUF_PLANE0_FD_EXT,     Desc->objects[drmplane->object_index].fd,
+            EGL_DMA_BUF_PLANE0_OFFSET_EXT, static_cast<EGLint>(drmplane->offset),
+            EGL_DMA_BUF_PLANE0_PITCH_EXT,  static_cast<EGLint>(drmplane->pitch)
         };
 
+        if (m_hasModifiers && (Desc->objects[drmplane->object_index].format_modifier != 0 /* DRM_FORMAT_MOD_NONE*/))
+        {
+            attribs << EGL_DMA_BUF_PLANE0_MODIFIER_LO_EXT
+                    << static_cast<EGLint>(Desc->objects[drmplane->object_index].format_modifier & 0xffffffff)
+                    << EGL_DMA_BUF_PLANE0_MODIFIER_HI_EXT
+                    << static_cast<EGLint>(Desc->objects[drmplane->object_index].format_modifier >> 32);
+        }
+
+        attribs << EGL_NONE;
+
         EGLImageKHR image = m_context->eglCreateImageKHR(m_context->GetEGLDisplay(), EGL_NO_CONTEXT,
-                                                         EGL_LINUX_DMA_BUF_EXT, nullptr, attributes);
+                                                         EGL_LINUX_DMA_BUF_EXT, nullptr, attribs.data());
         if (!image)
             LOG(VB_GENERAL, LOG_ERR, LOC + QString("No EGLImage for plane %1 %2")
                 .arg(plane).arg(m_context->GetEGLError()));

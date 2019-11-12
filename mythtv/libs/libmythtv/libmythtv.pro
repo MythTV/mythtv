@@ -452,13 +452,15 @@ using_frontend {
         HEADERS += opengl/mythopenglvideoshaders.h
         HEADERS += opengl/mythopenglinterop.h
         HEADERS += opengl/mythvideotexture.h
-        HEADERS += opengl/mythegldefs.h
-        HEADERS += opengl/mythdrmprimeinterop.h
         SOURCES += opengl/mythopenglvideo.cpp
         SOURCES += opengl/mythvideooutopengl.cpp
         SOURCES += opengl/mythopenglinterop.cpp
         SOURCES += opengl/mythvideotexture.cpp
-        SOURCES += opengl/mythdrmprimeinterop.cpp
+        !macx {
+            HEADERS += opengl/mythegldefs.h
+            HEADERS += opengl/mythdrmprimeinterop.h
+            SOURCES += opengl/mythdrmprimeinterop.cpp
+        }
     }
 
     using_mmal {

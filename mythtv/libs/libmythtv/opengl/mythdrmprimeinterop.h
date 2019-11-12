@@ -29,6 +29,7 @@ class MythDRMPRIMEInterop : public MythOpenGLInterop
     bool m_enableCacheing { true  };
     bool m_openGLES       { true  };
     bool m_fullYUVSupport { false };
+    bool m_hasModifiers   { false };
 };
 
 #endif // MYTHDRMPRIMEINTEROP_H
