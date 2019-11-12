@@ -450,7 +450,7 @@ private:
         }
 #else
         // enforce odd symmetry
-        for (f=1;f<halfN;f++) {
+        for (unsigned f=1;f<halfN;f++) {
             src[N-f][0] = src[f][0];
             src[N-f][1] = -src[f][1];   // complex conjugate
         }
