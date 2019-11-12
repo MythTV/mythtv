@@ -408,6 +408,7 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::AcquirePrime(VASurfaceID Id,
 {
     vector<MythVideoTexture*> result;
 
+#if VA_CHECK_VERSION(1, 1, 0)
     if (!m_drmFrames.contains(Id))
     {
         INIT_ST;
@@ -452,6 +453,7 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::AcquirePrime(VASurfaceID Id,
     Frame->buf = temp;
     Frame->codec = FMT_VAAPI;
     Frame->pix_fmt = AV_PIX_FMT_VAAPI;
+#endif
     return result;
 }
 
