@@ -3084,6 +3084,13 @@ bool Scheduler::AssignGroupInput(RecordingInfo &ri,
     return bestid;
 }
 
+// Called to delay shutdown for 5 minutes
+void Scheduler::DelayShutdown()
+{
+    m_delayShutdownTime = QDateTime::currentMSecsSinceEpoch() + 5*60*1000;
+}
+
+
 void Scheduler::HandleIdleShutdown(
     bool &blockShutdown, QDateTime &idleSince,
     int prerollseconds, int idleTimeoutSecs, int idleWaitForRecordingTime,
@@ -3114,6 +3121,9 @@ void Scheduler::HandleIdleShutdown(
     }
     else
     {
+        // Check for delay shutdown request
+        bool delay = (m_delayShutdownTime > QDateTime::currentMSecsSinceEpoch());
+
         QDateTime curtime = MythDate::current();
 
         // find out, if we are currently recording (or LiveTV)
@@ -3130,7 +3140,7 @@ void Scheduler::HandleIdleShutdown(
 
         // If there are BLOCKING clients, then we're not idle
         bool blocking = m_mainServer->isClientConnected(true);
-        if (!blocking && !recording)
+        if (!blocking && !recording && !delay)
         {
             // have we received a RESET_IDLETIME message?
             resetIdleTime_lock.lock();
@@ -3271,6 +3281,10 @@ void Scheduler::HandleIdleShutdown(
             if (blocking)
                 LOG(logmask, LOG_NOTICE, "Blocking shutdown because "
                                          "of a connected client");
+
+            if (delay)
+                LOG(logmask, LOG_NOTICE, "Blocking shutdown because "
+                                         "of delay request from external application");
 
             // not idle, make the time invalid
             if (idleSince.isValid())

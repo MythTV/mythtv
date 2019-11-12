@@ -129,6 +129,8 @@ class Myth : public MythServices
 
         bool                CheckDatabase       ( bool Repair ) override; // MythServices
 
+        bool                DelayShutdown       ( void ) override; // MythServices
+
         bool                ProfileSubmit       ( void ) override; // MythServices
 
         bool                ProfileDelete       ( void ) override; // MythServices
@@ -360,6 +362,13 @@ class ScriptableMyth : public QObject
         {
             SCRIPT_CATCH_EXCEPTION( false,
                 return m_obj.CheckDatabase( Repair );
+            )
+        }
+
+        bool DelayShutdown( void )
+        {
+            SCRIPT_CATCH_EXCEPTION( false,
+                return m_obj.DelayShutdown();
             )
         }
 

@@ -122,6 +122,7 @@ class Scheduler : public MThread, public MythScheduler
     int GetError(void) const { return error; }
 
     void AddChildInput(uint parentid, uint childid);
+    void DelayShutdown();
 
   protected:
     void run(void) override; // MThread
@@ -283,6 +284,8 @@ class Scheduler : public MThread, public MythScheduler
     QDateTime livetvTime;
 
     QDateTime lastPrepareTime;
+    // Delay shutdown util this time (ms since epoch);
+    int64_t m_delayShutdownTime        {0};
 
     OpenEndType m_openEnd;
 
