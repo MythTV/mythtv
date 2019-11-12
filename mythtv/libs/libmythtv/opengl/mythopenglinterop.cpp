@@ -26,7 +26,9 @@
 #ifdef USING_MMAL
 #include "mythmmalinterop.h"
 #endif
+#ifdef USING_EGL
 #include "mythdrmprimeinterop.h"
+#endif
 
 #define LOC QString("OpenGLInterop: ")
 
@@ -103,8 +105,10 @@ MythOpenGLInterop::Type MythOpenGLInterop::GetInteropType(MythCodecID CodecId)
     if (codec_is_mmal(CodecId))
         supported = MythMMALInterop::GetInteropType(CodecId);
 #endif
+#ifdef USING_EGL
     if (codec_is_v4l2(CodecId))
         supported = MythDRMPRIMEInterop::GetInteropType(CodecId);
+#endif
 
     if (Unsupported == supported)
         LOG(VB_GENERAL, LOG_WARNING, LOC + QString("No render support for codec '%1'").arg(toString(CodecId)));

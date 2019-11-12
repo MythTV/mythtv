@@ -69,8 +69,8 @@ macx {
     LIBS += -framework VideoToolBox
     LIBS += -framework IOSurface
     DEFINES += USING_VTB
-    HEADERS += opengl/mythvtbinterop.h   decoders/mythvtbcontext.h
-    SOURCES += opengl/mythvtbinterop.cpp decoders/mythvtbcontext.cpp
+    HEADERS += decoders/mythvtbcontext.h
+    SOURCES += decoders/mythvtbcontext.cpp
 
     using_firewire:using_backend {
         QMAKE_CXXFLAGS += -F$${CONFIG_MAC_AVC}
@@ -404,70 +404,15 @@ using_frontend {
     SOURCES += visualisations/videovisual.cpp
     SOURCES += mythdeinterlacer.cpp
 
-   using_opengl : !win32-msvc* {
-        # Goom
-        HEADERS += visualisations/goom/filters.h
-        HEADERS += visualisations/goom/goomconfig.h
-        HEADERS += visualisations/goom/goom_core.h
-        HEADERS += visualisations/goom/goom_tools.h
-        HEADERS += visualisations/goom/graphic.h
-        HEADERS += visualisations/goom/ifs.h
-        HEADERS += visualisations/goom/lines.h
-        HEADERS += visualisations/goom/drawmethods.h
-        HEADERS += visualisations/goom/mmx.h
-        HEADERS += visualisations/goom/mathtools.h
-        HEADERS += visualisations/goom/surf3d.h
-        HEADERS += visualisations/goom/tentacle3d.h
-        HEADERS += visualisations/goom/v3d.h
-        HEADERS += visualisations/videovisualgoom.h
-
-        SOURCES += visualisations/goom/filters.c
-        SOURCES += visualisations/goom/goom_core.c
-        SOURCES += visualisations/goom/graphic.c
-        SOURCES += visualisations/goom/tentacle3d.c
-        SOURCES += visualisations/goom/ifs.c
-        SOURCES += visualisations/goom/ifs_display.c
-        SOURCES += visualisations/goom/lines.c
-        SOURCES += visualisations/goom/surf3d.c
-        SOURCES += visualisations/goom/zoom_filter_mmx.c
-        SOURCES += visualisations/goom/zoom_filter_xmmx.c
-        SOURCES += visualisations/videovisualgoom.cpp
-    }
-
-    using_libfftw3 {
-        DEFINES += FFTW3_SUPPORT
-        HEADERS += visualisations/videovisualspectrum.h
-        SOURCES += visualisations/videovisualspectrum.cpp
-        using_opengl: HEADERS += visualisations/videovisualcircles.h
-        using_opengl: SOURCES += visualisations/videovisualcircles.cpp
-    }
-
-    using_x11:DEFINES += USING_X11
-
-    using_opengl {
-        DEFINES += USING_OPENGL
-        using_opengles: DEFINES += USING_OPENGLES
-        HEADERS += opengl/mythopenglvideo.h
-        HEADERS += opengl/mythvideooutopengl.h
-        HEADERS += opengl/mythopenglvideoshaders.h
-        HEADERS += opengl/mythopenglinterop.h
-        HEADERS += opengl/mythvideotexture.h
-        SOURCES += opengl/mythopenglvideo.cpp
-        SOURCES += opengl/mythvideooutopengl.cpp
-        SOURCES += opengl/mythopenglinterop.cpp
-        SOURCES += opengl/mythvideotexture.cpp
-        !macx {
-            HEADERS += opengl/mythegldefs.h
-            HEADERS += opengl/mythdrmprimeinterop.h
-            SOURCES += opengl/mythdrmprimeinterop.cpp
-        }
-    }
-
+    # Note - all OpenGL/EGL interop files are added under using_opengl...
+    # They are however referenced, without ifdef guards, from the relevant
+    # following files. It is essentially assumed that any given hardware
+    # acceleration must have associated OpenGL support (e.g. there is no VDPAU
+    # without a functioning NVidia driver)
     using_mmal {
-        HEADERS += decoders/mythmmalcontext.h   opengl/mythmmalinterop.h
-        SOURCES += decoders/mythmmalcontext.cpp opengl/mythmmalinterop.cpp
+        HEADERS += decoders/mythmmalcontext.h
+        SOURCES += decoders/mythmmalcontext.cpp
         LIBS    += -L/opt/vc/lib -lmmal -lvcsm
-        LIBS    += -lEGL
         DEFINES += USING_MMAL
         # Raspbian
         QMAKE_CXXFLAGS += -isystem /opt/vc/include
@@ -479,37 +424,130 @@ using_frontend {
 
     using_vdpau {
         DEFINES += USING_VDPAU
-        HEADERS += opengl/mythvdpauinterop.h
-        HEADERS += decoders/mythvdpaucontext.h
-        HEADERS += decoders/mythvdpauhelper.h
-        SOURCES += opengl/mythvdpauinterop.cpp
-        SOURCES += decoders/mythvdpaucontext.cpp
-        SOURCES += decoders/mythvdpauhelper.cpp
+        HEADERS += decoders/mythvdpaucontext.h   decoders/mythvdpauhelper.h
+        SOURCES += decoders/mythvdpaucontext.cpp decoders/mythvdpauhelper.cpp
         LIBS += -lvdpau
     }
 
-    using_vaapi:using_opengl {
+    using_vaapi {
         DEFINES += USING_VAAPI
-        HEADERS += decoders/mythvaapicontext.h    opengl/mythvaapiinterop.h
-        SOURCES += decoders/mythvaapicontext.cpp  opengl/mythvaapiinterop.cpp
-        HEADERS += opengl/mythvaapidrminterop.h   opengl/mythvaapiglxinterop.h
-        SOURCES += opengl/mythvaapidrminterop.cpp opengl/mythvaapiglxinterop.cpp
+        HEADERS += decoders/mythvaapicontext.h
+        SOURCES += decoders/mythvaapicontext.cpp
         LIBS    += -lva -lva-x11 -lva-glx -lva-drm
     }
 
     using_nvdec {
         DEFINES += USING_NVDEC
-        HEADERS += opengl/mythnvdecinterop.h
         HEADERS += decoders/mythnvdeccontext.h
-        SOURCES += opengl/mythnvdecinterop.cpp
         SOURCES += decoders/mythnvdeccontext.cpp
         INCLUDEPATH += ../../external/nv-codec-headers/include
     }
 
     using_mediacodec {
         DEFINES += USING_MEDIACODEC
-        HEADERS += decoders/mythmediacodeccontext.h   opengl/mythmediacodecinterop.h
-        SOURCES += decoders/mythmediacodeccontext.cpp opengl/mythmediacodecinterop.cpp
+        HEADERS += decoders/mythmediacodeccontext.h
+        SOURCES += decoders/mythmediacodeccontext.cpp
+    }
+
+    using_libfftw3 {
+        DEFINES += FFTW3_SUPPORT
+        HEADERS += visualisations/videovisualspectrum.h
+        SOURCES += visualisations/videovisualspectrum.cpp
+    }
+
+    using_x11:DEFINES += USING_X11
+
+    using_opengl {
+        DEFINES += USING_OPENGL
+        using_opengles: DEFINES += USING_OPENGLES
+
+        HEADERS += opengl/mythopenglvideo.h
+        HEADERS += opengl/mythvideooutopengl.h
+        HEADERS += opengl/mythopenglvideoshaders.h
+        HEADERS += opengl/mythopenglinterop.h
+        HEADERS += opengl/mythvideotexture.h
+        SOURCES += opengl/mythopenglvideo.cpp
+        SOURCES += opengl/mythvideooutopengl.cpp
+        SOURCES += opengl/mythopenglinterop.cpp
+        SOURCES += opengl/mythvideotexture.cpp
+
+        using_vaapi {
+            HEADERS += opengl/mythvaapiinterop.h   opengl/mythvaapiglxinterop.h
+            SOURCES += opengl/mythvaapiinterop.cpp opengl/mythvaapiglxinterop.cpp
+        }
+
+        using_vdpau {
+            HEADERS += opengl/mythvdpauinterop.h
+            SOURCES += opengl/mythvdpauinterop.cpp
+        }
+
+        using_nvdec {
+            HEADERS += opengl/mythnvdecinterop.h
+            SOURCES += opengl/mythnvdecinterop.cpp
+        }
+
+        using_mediacodec {
+            # this may technically be egl...
+            HEADERS += opengl/mythmediacodecinterop.h
+            SOURCES += opengl/mythmediacodecinterop.cpp
+        }
+
+        macx {
+            HEADERS += opengl/mythvtbinterop.h
+            SOURCES += opengl/mythvtbinterop.cpp
+        }
+
+        using_egl {
+            DEFINES += USING_EGL
+            HEADERS += opengl/mythegldefs.h
+            HEADERS += opengl/mythdrmprimeinterop.h
+            SOURCES += opengl/mythdrmprimeinterop.cpp
+
+            using_mmal {
+                HEADERS += opengl/mythmmalinterop.h
+                SOURCES += opengl/mythmmalinterop.cpp
+            }
+
+            using_vaapi {
+                HEADERS += opengl/mythvaapidrminterop.h
+                SOURCES += opengl/mythvaapidrminterop.cpp
+            }
+        }
+
+        using_libfftw3 {
+            HEADERS += visualisations/videovisualcircles.h
+            SOURCES += visualisations/videovisualcircles.cpp
+        }
+
+        !win32-msvc* {
+            # Goom
+            HEADERS += visualisations/goom/filters.h
+            HEADERS += visualisations/goom/goomconfig.h
+            HEADERS += visualisations/goom/goom_core.h
+            HEADERS += visualisations/goom/goom_tools.h
+            HEADERS += visualisations/goom/graphic.h
+            HEADERS += visualisations/goom/ifs.h
+            HEADERS += visualisations/goom/lines.h
+            HEADERS += visualisations/goom/drawmethods.h
+            HEADERS += visualisations/goom/mmx.h
+            HEADERS += visualisations/goom/mathtools.h
+            HEADERS += visualisations/goom/surf3d.h
+            HEADERS += visualisations/goom/tentacle3d.h
+            HEADERS += visualisations/goom/v3d.h
+            HEADERS += visualisations/videovisualgoom.h
+
+            SOURCES += visualisations/goom/filters.c
+            SOURCES += visualisations/goom/goom_core.c
+            SOURCES += visualisations/goom/graphic.c
+            SOURCES += visualisations/goom/tentacle3d.c
+            SOURCES += visualisations/goom/ifs.c
+            SOURCES += visualisations/goom/ifs_display.c
+            SOURCES += visualisations/goom/lines.c
+            SOURCES += visualisations/goom/surf3d.c
+            SOURCES += visualisations/goom/zoom_filter_mmx.c
+            SOURCES += visualisations/goom/zoom_filter_xmmx.c
+            SOURCES += visualisations/videovisualgoom.cpp
+        }
     }
 
     # Misc. frontend
