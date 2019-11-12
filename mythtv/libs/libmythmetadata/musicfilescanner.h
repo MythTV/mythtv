@@ -38,20 +38,20 @@ class META_PUBLIC MusicFileScanner
 
     private:
         void BuildFileList(QString &directory, MusicLoadedMap &music_files, MusicLoadedMap &art_files, int parentid);
-        int  GetDirectoryId(const QString &directory, const int &parentid);
-        bool HasFileChanged(const QString &filename, const QString &date_modified);
+        static int  GetDirectoryId(const QString &directory, const int &parentid);
+        static bool HasFileChanged(const QString &filename, const QString &date_modified);
         void AddFileToDB(const QString &filename, const QString &startDir);
         void RemoveFileFromDB (const QString &filename, const QString &startDir);
         void UpdateFileInDB(const QString &filename, const QString &startDir);
         void ScanMusic(MusicLoadedMap &music_files);
         void ScanArtwork(MusicLoadedMap &music_files);
-        void cleanDB();
-        bool IsArtFile(const QString &filename);
-        bool IsMusicFile(const QString &filename);
+        static void cleanDB();
+        static bool IsArtFile(const QString &filename);
+        static bool IsMusicFile(const QString &filename);
 
-        void updateLastRunEnd(void);
-        void updateLastRunStart(void);
-        void updateLastRunStatus(QString &status);
+        static void updateLastRunEnd(void);
+        static void updateLastRunStart(void);
+        static void updateLastRunStatus(QString &status);
 
         QStringList  m_startDirs;
         IdCache  m_directoryid;

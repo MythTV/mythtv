@@ -110,14 +110,11 @@ bool MMembuf::scanNewline(QByteArray *store)
     if (_size == 0)
         return false;
     int i = 0; // index into 'store'
-    QByteArray *a = nullptr;
-    char *p;
-    int n;
     bool retval = false;
     for (int j = 0; j < buf.size(); ++j) {
-        a = buf.at(j);
-        p = a->data();
-        n = a->size();
+        QByteArray *a = buf.at(j);
+        char *p = a->data();
+        int n = a->size();
         if (!j) {
             // first buffer
             p += _index;

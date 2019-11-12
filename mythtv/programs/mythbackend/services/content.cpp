@@ -911,7 +911,7 @@ DTC::LiveStreamInfo *Content::AddLiveStream( const QString   &sStorageGroup,
     else
     {
         sFullFileName =
-            gCoreContext->GenMythURL(sHostName, 0, sFileName, sStorageGroup);
+            MythCoreContext::GenMythURL(sHostName, 0, sFileName, sStorageGroup);
     }
 
     HTTPLiveStream *hls = new

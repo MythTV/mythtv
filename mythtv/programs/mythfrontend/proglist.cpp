@@ -35,16 +35,16 @@ using namespace std;
 #define LOC_ERR  QString("ProgLister, Error: ")
 
 ProgLister::ProgLister(MythScreenStack *parent, ProgListType pltype,
-                       const QString &view, const QString &extraArg,
-                       const QDateTime &selectedTime) :
+                       QString view, QString extraArg,
+                       QDateTime selectedTime) :
     ScheduleCommon(parent, "ProgLister"),
     m_type(pltype),
-    m_extraArg(extraArg),
+    m_extraArg(std::move(extraArg)),
     m_startTime(MythDate::current()),
     m_searchTime(m_startTime),
-    m_selectedTime(selectedTime),
+    m_selectedTime(std::move(selectedTime)),
     m_channelOrdering(gCoreContext->GetSetting("ChannelOrdering", "channum")),
-    m_view(view)
+    m_view(std::move(view))
 {
     if (pltype == plMovies)
     {
@@ -75,11 +75,11 @@ ProgLister::ProgLister(MythScreenStack *parent, ProgListType pltype,
 
 // previously recorded ctor
 ProgLister::ProgLister(
-    MythScreenStack *parent, uint recid, const QString &title) :
+    MythScreenStack *parent, uint recid, QString title) :
     ScheduleCommon(parent, "PreviousList"),
     m_type(plPreviouslyRecorded),
     m_recid(recid),
-    m_title(title),
+    m_title(std::move(title)),
     m_startTime(MythDate::current()),
     m_searchTime(m_startTime),
     m_channelOrdering(gCoreContext->GetSetting("ChannelOrdering", "channum")),
@@ -522,7 +522,7 @@ void ProgLister::SetViewFromList(const QString& item)
 }
 
 bool ProgLister::PowerStringToSQL(
-    const QString &qphrase, QString &output, MSqlBindings &bindings) const
+    const QString &qphrase, QString &output, MSqlBindings &bindings)
 {
     output.clear();
 
@@ -1435,7 +1435,7 @@ void ProgLister::UpdateDisplay(const ProgramInfo *selected)
         RestoreSelection(selected, offset);
     else if (m_selectedTime.isValid())
     {
-        size_t i;
+        size_t i = 0;
         for (i = 0; i < m_itemList.size(); ++i)
         {
             if (m_selectedTime <= m_itemList[i]->GetScheduledStartTime())
@@ -1449,7 +1449,7 @@ void ProgLister::UpdateDisplay(const ProgramInfo *selected)
 void ProgLister::RestoreSelection(const ProgramInfo *selected,
                                   int selectedOffset)
 {
-    plCompare *comp;
+    plCompare *comp = nullptr;
     if (!m_titleSort)
         comp = new plTimeSort();
     else if (m_type == plPreviouslyRecorded)
@@ -1457,10 +1457,10 @@ void ProgLister::RestoreSelection(const ProgramInfo *selected,
     else
         comp = new plTitleSort();
 
-    int i;
+    int i = 0;
     for (i = m_itemList.size() - 2; i >= 0; i--)
     {
-        bool dobreak;
+        bool dobreak = false;
         if (m_reverseSort)
             dobreak = comp->operator()(selected, m_itemList[i]);
         else

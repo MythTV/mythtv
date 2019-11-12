@@ -249,10 +249,10 @@ VideoMetadata* meta_data_node::getData()
 
 meta_dir_node::meta_dir_node(const QString &path, const QString &name,
                             meta_dir_node *parent, bool is_path_root,
-                            const QString &host, const QString &prefix,
-                            const QVariant &data)
+                            QString host, QString prefix,
+                            QVariant data)
   : meta_node(parent, is_path_root), m_path(path), m_name(name),
-    m_host(host), m_prefix(prefix), m_data(data)
+    m_host(std::move(host)), m_prefix(std::move(prefix)), m_data(std::move(data))
 {
     if (!name.length())
         m_name = path;

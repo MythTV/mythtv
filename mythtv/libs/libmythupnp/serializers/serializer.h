@@ -50,7 +50,7 @@ class UPNP_PUBLIC Serializer
         void SerializeObject          ( const QObject *pObject, const QString &sName );
         void SerializeObjectProperties( const QObject *pObject );
 
-        QString    ReadPropertyMetadata  ( const QObject *pObject, 
+        static QString    ReadPropertyMetadata  ( const QObject *pObject, 
                                                  const QString&  sPropName,
                                                  const QString&  sKey );
 

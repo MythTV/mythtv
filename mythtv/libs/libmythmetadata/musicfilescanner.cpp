@@ -84,13 +84,12 @@ void MusicFileScanner::BuildFileList(QString &directory, MusicLoadedMap &music_f
         return;
 
     QFileInfoList::const_iterator it = list.begin();
-    const QFileInfo *fi;
 
     // Recursively traverse directory
     int newparentid = 0;
     while (it != list.end())
     {
-        fi = &(*it);
+        const QFileInfo *fi = &(*it);
         ++it;
         QString filename = fi->absoluteFilePath();
         if (fi->isDir())
@@ -431,7 +430,7 @@ void MusicFileScanner::cleanDB()
     parentquery.prepare("SELECT COUNT(*) FROM music_directories "
                         "WHERE parent_id=:DIRECTORYID ");
 
-    int deletedCount;
+    int deletedCount = 0;
 
     do
     {

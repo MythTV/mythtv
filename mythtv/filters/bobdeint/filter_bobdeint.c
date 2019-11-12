@@ -31,15 +31,14 @@ typedef struct BDFilter
 static void doSplit(BDFilter *filter, unsigned char *buf, int lines, int width)
 {
     /* Algorithm shamelessly stolen from mplayer's vo_yuv4mpeg */
-    int k_start, modv;
     unsigned char *line_state = filter->line_state;
     unsigned char *tmp = filter->tmp_ptr;
     
-    modv = lines - 1;
+    int modv = lines - 1;
     if (ODD(lines))
         modv = lines;
     memset(line_state, 0, modv);
-    k_start = 1;
+    int k_start = 1;
     line_state[0] = 1;
     while (k_start < modv)
     {
@@ -109,7 +108,6 @@ static VideoFilter *new_filter(VideoFrameType inpixfmt,
                                const int *width, const int *height, const char *options,
                                int threads)
 {
-    BDFilter *filter;
     (void)width;
     (void)height;
     (void)options;
@@ -118,8 +116,7 @@ static VideoFilter *new_filter(VideoFrameType inpixfmt,
     if (inpixfmt != FMT_YV12 || outpixfmt != FMT_YV12)
         return NULL;
 
-    filter = malloc(sizeof(BDFilter));
-
+    BDFilter *filter = malloc(sizeof(BDFilter));
     if (filter == NULL)
     {
         fprintf(stderr,"Couldn't allocate memory for filter\n");

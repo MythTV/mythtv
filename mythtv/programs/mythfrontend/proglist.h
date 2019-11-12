@@ -39,10 +39,10 @@ class ProgLister : public ScheduleCommon
 
   public:
     ProgLister(MythScreenStack *parent, ProgListType pltype,
-               const QString &view, const QString &extraArg,
-               const QDateTime &selectedTime = QDateTime());
+               QString view, QString extraArg,
+               QDateTime selectedTime = QDateTime());
     explicit ProgLister(MythScreenStack *parent, uint recid = 0,
-                        const QString &title = QString());
+                        QString title = QString());
     ~ProgLister();
 
     bool Create(void) override; // MythScreenType
@@ -89,8 +89,8 @@ class ProgLister : public ScheduleCommon
 
     ProgramInfo *GetCurrentProgram(void) const override; // ScheduleCommon
 
-    bool PowerStringToSQL(
-        const QString &qphrase, QString &output, MSqlBindings &bindings) const;
+    static bool PowerStringToSQL(
+        const QString &qphrase, QString &output, MSqlBindings &bindings) ;
 
   private:
     ProgListType      m_type;

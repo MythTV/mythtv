@@ -162,7 +162,7 @@ void RSSEditPopup::ParseAndSave(void)
 }
 
 QUrl RSSEditPopup::redirectUrl(const QUrl& possibleRedirectUrl,
-                               const QUrl& oldRedirectUrl) const
+                               const QUrl& oldRedirectUrl)
 {
     QUrl redirectUrl;
     if(!possibleRedirectUrl.isEmpty() && possibleRedirectUrl != oldRedirectUrl)
@@ -216,7 +216,7 @@ void RSSEditPopup::SlotSave(QNetworkReply* reply)
         if (description.isEmpty())
             description = channel.firstChildElement("description").text();
         if (author.isEmpty())
-            author = parser.GetAuthor(channel);
+            author = Parse::GetAuthor(channel);
         if (author.isEmpty())
             author = channel.firstChildElement("managingEditor").text();
         if (author.isEmpty())
@@ -291,8 +291,8 @@ void RSSEditPopup::customEvent(QEvent *levent)
 {
     if (levent->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = (DialogCompletionEvent*)(levent);
-        if (dce->GetId() == CEID_NEWIMAGE)
+        auto dce = dynamic_cast<DialogCompletionEvent*>(levent);
+        if ((dce != nullptr) && (dce->GetId() == CEID_NEWIMAGE))
         {
             m_thumbImage->SetFilename(dce->GetResultText());
             m_thumbImage->Load();

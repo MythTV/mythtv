@@ -77,18 +77,16 @@ uint8_t mpeg2_scan_alt[64] ATTR_ALIGN(16) = {
 void mpeg2_header_state_init (mpeg2dec_t * mpeg2dec)
 {
     if (mpeg2dec->sequence.width != (unsigned)-1) {
-	int i;
-
 	mpeg2dec->sequence.width = (unsigned)-1;
 	if (!mpeg2dec->custom_fbuf)
-	    for (i = mpeg2dec->alloc_index_user;
+	    for (int i = mpeg2dec->alloc_index_user;
 		 i < mpeg2dec->alloc_index; i++) {
 		mpeg2_free (mpeg2dec->fbuf_alloc[i].fbuf.buf[0]);
 		mpeg2_free (mpeg2dec->fbuf_alloc[i].fbuf.buf[1]);
 		mpeg2_free (mpeg2dec->fbuf_alloc[i].fbuf.buf[2]);
 	    }
 	if (mpeg2dec->convert_start)
-	    for (i = 0; i < 3; i++) {
+	    for (int i = 0; i < 3; i++) {
 		mpeg2_free (mpeg2dec->yuv_buf[i][0]);
 		mpeg2_free (mpeg2dec->yuv_buf[i][1]);
 		mpeg2_free (mpeg2dec->yuv_buf[i][2]);
@@ -140,12 +138,11 @@ int mpeg2_header_sequence (mpeg2dec_t * mpeg2dec)
 	/* unofficial: libmpeg3 "Unofficial economy rates" 5/10/12/15 fps */
 	5400000, 2700000, 2250000, 1800000, 0, 0
     };
-    int i;
 
     if ((buffer[6] & 0x20) != 0x20)	/* missing marker_bit */
 	return 1;
 
-    i = (buffer[0] << 16) | (buffer[1] << 8) | buffer[2];
+    int i = (buffer[0] << 16) | (buffer[1] << 8) | buffer[2];
     if (! (sequence->display_width = sequence->picture_width = i >> 12))
 	return 1;
     if (! (sequence->display_height = sequence->picture_height = i & 0xfff))
@@ -202,7 +199,6 @@ static int sequence_ext (mpeg2dec_t * mpeg2dec)
 {
     uint8_t * buffer = mpeg2dec->chunk_start;
     mpeg2_sequence_t * sequence = &(mpeg2dec->new_sequence);
-    uint32_t flags;
 
     if (!(buffer[3] & 1))
 	return 1;
@@ -215,7 +211,7 @@ static int sequence_ext (mpeg2dec_t * mpeg2dec)
 	(buffer[2] << 7) & 0x3000;
     sequence->width = (sequence->picture_width + 15) & ~15;
     sequence->height = (sequence->picture_height + 15) & ~15;
-    flags = sequence->flags | SEQ_FLAG_MPEG2;
+    uint32_t flags = sequence->flags | SEQ_FLAG_MPEG2;
     if (!(buffer[1] & 8)) {
 	flags &= ~SEQ_FLAG_PROGRESSIVE_SEQUENCE;
 	sequence->height = (sequence->height + 31) & ~31;
@@ -275,19 +271,18 @@ static int sequence_display_ext (mpeg2dec_t * mpeg2dec)
 
 static inline void simplify (unsigned int * u, unsigned int * v)
 {
-    unsigned int a, b, tmp;
-
-    a = *u;	b = *v;
+    unsigned int a = *u;
+    unsigned int b = *v;
     while (a) {	/* find greatest common divisor */
-	tmp = a;	a = b % tmp;	b = tmp;
+	unsigned int tmp = a;	a = b % tmp;	b = tmp;
     }
     *u /= b;	*v /= b;
 }
 
 static inline void finalize_sequence (mpeg2_sequence_t * sequence)
 {
-    int width;
-    int height;
+    int width = 0;
+    int height = 0;
 
     sequence->byte_rate *= 50;
 
@@ -360,13 +355,12 @@ int mpeg2_guess_aspect (const mpeg2_sequence_t * sequence,
 	{352, 480}, /* 525 lines, 6.75 MHz (D2, 1/2 D1, CVD, DVD) */
 	{352, 240}  /* 525  lines. 6.75 MHz, 1 field (D4, VCD, DSS, DVD) */
     };
-    unsigned int width, height, pix_width, pix_height, DAR_16_9;
-    size_t i;
+    size_t i = 0;
 
     *pixel_width = sequence->pixel_width;
     *pixel_height = sequence->pixel_height;
-    width = sequence->picture_width;
-    height = sequence->picture_height;
+    unsigned int width = sequence->picture_width;
+    unsigned int height = sequence->picture_height;
     for (i = 0; i < sizeof (video_modes) / sizeof (video_modes[0]); i++)
 	if (width == video_modes[i].width && height == video_modes[i].height)
 	    break;
@@ -375,11 +369,13 @@ int mpeg2_guess_aspect (const mpeg2_sequence_t * sequence,
 	width != sequence->display_width || height != sequence->display_height)
 	return 0;
 
+    unsigned int pix_width = 1, pix_height = 1;
     for (pix_height = 1; height * pix_height < 480; pix_height <<= 1);
     height *= pix_height;
     for (pix_width = 1; width * pix_width <= 352; pix_width <<= 1);
     width *= pix_width;
 
+    unsigned int DAR_16_9 = 0;
     if (! (sequence->flags & SEQ_FLAG_MPEG2)) {
 	static unsigned int mpeg1_check[2][2] = {{11, 54}, {27, 45}};
 	DAR_16_9 = (sequence->pixel_height == 27 ||
@@ -422,9 +418,8 @@ static void copy_matrix (mpeg2dec_t * mpeg2dec, int index)
 static void finalize_matrix (mpeg2dec_t * mpeg2dec)
 {
     mpeg2_decoder_t * decoder = &(mpeg2dec->decoder);
-    int i;
 
-    for (i = 0; i < 2; i++) {
+    for (int i = 0; i < 2; i++) {
 	if (mpeg2dec->copy_matrix & (1 << i))
 	    copy_matrix (mpeg2dec, i);
 	if ((mpeg2dec->copy_matrix & (4 << i)) &&
@@ -524,9 +519,7 @@ void mpeg2_header_gop_finalize (mpeg2dec_t * mpeg2dec)
 
 void mpeg2_set_fbuf (mpeg2dec_t * mpeg2dec, int b_type)
 {
-    int i;
-
-    for (i = 0; i < 3; i++)
+    for (int i = 0; i < 3; i++)
 	if (mpeg2dec->fbuf[1] != &mpeg2dec->fbuf_alloc[i].fbuf &&
 	    mpeg2dec->fbuf[2] != &mpeg2dec->fbuf_alloc[i].fbuf) {
 	    mpeg2dec->fbuf[0] = &mpeg2dec->fbuf_alloc[i].fbuf;
@@ -545,7 +538,6 @@ int mpeg2_header_picture (mpeg2dec_t * mpeg2dec)
     uint8_t * buffer = mpeg2dec->chunk_start;
     mpeg2_picture_t * picture = &(mpeg2dec->new_picture);
     mpeg2_decoder_t * decoder = &(mpeg2dec->decoder);
-    int type;
 
     mpeg2dec->state = ((mpeg2dec->state != STATE_SLICE_1ST) ?
 		       STATE_PICTURE : STATE_PICTURE_2ND);
@@ -553,7 +545,7 @@ int mpeg2_header_picture (mpeg2dec_t * mpeg2dec)
 
     picture->temporal_reference = (buffer[0] << 2) | (buffer[1] >> 6);
 
-    type = (buffer [1] >> 3) & 7;
+    int type = (buffer [1] >> 3) & 7;
     if (type == PIC_FLAG_CODING_TYPE_P || type == PIC_FLAG_CODING_TYPE_B) {
 	/* forward_f_code and backward_f_code - used in mpeg1 only */
 	decoder->f_motion.f_code[1] = (buffer[3] >> 2) & 1;
@@ -602,7 +594,6 @@ static int picture_coding_ext (mpeg2dec_t * mpeg2dec)
     uint8_t * buffer = mpeg2dec->chunk_start;
     mpeg2_picture_t * picture = &(mpeg2dec->new_picture);
     mpeg2_decoder_t * decoder = &(mpeg2dec->decoder);
-    uint32_t flags;
 
     /* pre subtract 1 for use later in compute_motion_vector */
     decoder->f_motion.f_code[0] = (buffer[0] & 15) - 1;
@@ -610,7 +601,7 @@ static int picture_coding_ext (mpeg2dec_t * mpeg2dec)
     decoder->b_motion.f_code[0] = (buffer[1] & 15) - 1;
     decoder->b_motion.f_code[1] = (buffer[2] >> 4) - 1;
 
-    flags = picture->flags;
+    uint32_t flags = picture->flags;
     decoder->intra_dc_precision = 7 - ((buffer[2] >> 2) & 3);
     decoder->picture_structure = buffer[2] & 3;
     switch (decoder->picture_structure) {
@@ -653,19 +644,17 @@ static int picture_display_ext (mpeg2dec_t * mpeg2dec)
 {
     uint8_t * buffer = mpeg2dec->chunk_start;
     mpeg2_picture_t * picture = &(mpeg2dec->new_picture);
-    int i, nb_pos;
+    int i = 0;
 
-    nb_pos = picture->nb_fields;
+    int nb_pos = picture->nb_fields;
     if (mpeg2dec->sequence.flags & SEQ_FLAG_PROGRESSIVE_SEQUENCE)
 	nb_pos >>= 1;
 
     for (i = 0; i < nb_pos; i++) {
-	int x, y;
-
-	x = ((buffer[4*i] << 24) | (buffer[4*i+1] << 16) |
-	     (buffer[4*i+2] << 8) | buffer[4*i+3]) >> (11-2*i);
-	y = ((buffer[4*i+2] << 24) | (buffer[4*i+3] << 16) |
-	     (buffer[4*i+4] << 8) | buffer[4*i+5]) >> (10-2*i);
+	int x = ((buffer[4*i] << 24) | (buffer[4*i+1] << 16) |
+                 (buffer[4*i+2] << 8) | buffer[4*i+3]) >> (11-2*i);
+	int y = ((buffer[4*i+2] << 24) | (buffer[4*i+3] << 16) |
+                 (buffer[4*i+4] << 8) | buffer[4*i+5]) >> (10-2*i);
 	if (! (x & y & 1))
 	    return 1;
 	picture->display_offset[i].x = mpeg2dec->display_offset_x = x >> 1;
@@ -688,12 +677,10 @@ void mpeg2_header_picture_finalize (mpeg2dec_t * mpeg2dec, uint32_t accels)
     decoder->coding_type = mpeg2dec->new_picture.flags & PIC_MASK_CODING_TYPE;
 
     if (mpeg2dec->state == STATE_PICTURE) {
-	mpeg2_picture_t * picture;
-	mpeg2_picture_t * other;
-
 	decoder->second_field = 0;
 
-	picture = other = mpeg2dec->pictures;
+	mpeg2_picture_t *other = mpeg2dec->pictures;
+	mpeg2_picture_t *picture = other;
 	if (old_type_b ^ (mpeg2dec->picture < mpeg2dec->pictures + 2))
 	    picture += 2;
 	else
@@ -728,8 +715,6 @@ void mpeg2_header_picture_finalize (mpeg2dec_t * mpeg2dec, uint32_t accels)
 	if (mpeg2dec->convert) {
 	    mpeg2_convert_init_t convert_init;
 	    if (!mpeg2dec->convert_start) {
-		int y_size, uv_size;
-
 		mpeg2dec->decoder.convert_id =
 		    mpeg2_malloc (mpeg2dec->convert_id_size,
 				  MPEG2_ALLOC_CONVERT_ID);
@@ -741,8 +726,8 @@ void mpeg2_header_picture_finalize (mpeg2dec_t * mpeg2dec, uint32_t accels)
 		mpeg2dec->convert_start = convert_init.start;
 		mpeg2dec->decoder.convert = convert_init.copy;
 
-		y_size = decoder->stride_frame * mpeg2dec->sequence.height;
-		uv_size = y_size >> (2 - mpeg2dec->decoder.chroma_format);
+		int y_size = decoder->stride_frame * mpeg2dec->sequence.height;
+		int uv_size = y_size >> (2 - mpeg2dec->decoder.chroma_format);
 		mpeg2dec->yuv_buf[0][0] =
 		    (uint8_t *) mpeg2_malloc (y_size, MPEG2_ALLOC_YUV);
 		mpeg2dec->yuv_buf[0][1] =
@@ -766,9 +751,7 @@ void mpeg2_header_picture_finalize (mpeg2dec_t * mpeg2dec, uint32_t accels)
 	    }
 	    if (!mpeg2dec->custom_fbuf) {
 		while (mpeg2dec->alloc_index < 3) {
-		    mpeg2_fbuf_t * fbuf;
-
-		    fbuf = &mpeg2dec->fbuf_alloc[mpeg2dec->alloc_index++].fbuf;
+		    mpeg2_fbuf_t *fbuf = &mpeg2dec->fbuf_alloc[mpeg2dec->alloc_index++].fbuf;
 		    fbuf->id = NULL;
 		    fbuf->buf[0] =
 			(uint8_t *) mpeg2_malloc (convert_init.buf_size[0],
@@ -784,13 +767,10 @@ void mpeg2_header_picture_finalize (mpeg2dec_t * mpeg2dec, uint32_t accels)
 	    }
 	} else if (!mpeg2dec->custom_fbuf) {
 	    while (mpeg2dec->alloc_index < 3) {
-		mpeg2_fbuf_t * fbuf;
-		int y_size, uv_size;
-
-		fbuf = &(mpeg2dec->fbuf_alloc[mpeg2dec->alloc_index++].fbuf);
+		mpeg2_fbuf_t *fbuf = &(mpeg2dec->fbuf_alloc[mpeg2dec->alloc_index++].fbuf);
 		fbuf->id = NULL;
-		y_size = decoder->stride_frame * mpeg2dec->sequence.height;
-		uv_size = y_size >> (2 - decoder->chroma_format);
+		int y_size = decoder->stride_frame * mpeg2dec->sequence.height;
+		int uv_size = y_size >> (2 - decoder->chroma_format);
 		fbuf->buf[0] = (uint8_t *) mpeg2_malloc (y_size,
 							 MPEG2_ALLOC_YUV);
 		fbuf->buf[1] = (uint8_t *) mpeg2_malloc (uv_size,
@@ -821,11 +801,10 @@ static int copyright_ext (mpeg2dec_t * mpeg2dec)
 static int quant_matrix_ext (mpeg2dec_t * mpeg2dec)
 {
     uint8_t * buffer = mpeg2dec->chunk_start;
-    int i, j;
 
-    for (i = 0; i < 4; i++)
+    for (int i = 0; i < 4; i++)
 	if (buffer[0] & (8 >> i)) {
-	    for (j = 0; j < 64; j++)
+	    for (int j = 0; j < 64; j++)
 		mpeg2dec->new_quantizer_matrix[i][mpeg2_scan_norm[j]] =
 		    (buffer[j] << (i+5)) | (buffer[j+1] >> (3-i));
 	    mpeg2dec->copy_matrix |= 1 << i;
@@ -841,10 +820,9 @@ int mpeg2_header_extension (mpeg2dec_t * mpeg2dec)
 	0, sequence_ext, sequence_display_ext, quant_matrix_ext,
 	copyright_ext, 0, 0, picture_display_ext, picture_coding_ext
     };
-    int ext, ext_bit;
 
-    ext = mpeg2dec->chunk_start[0] >> 4;
-    ext_bit = 1 << ext;
+    int ext = mpeg2dec->chunk_start[0] >> 4;
+    int ext_bit = 1 << ext;
 
     if (!(mpeg2dec->ext_state & ext_bit))
 	return 0;	/* ignore illegal extensions */
@@ -868,14 +846,13 @@ static void prescale (mpeg2dec_t * mpeg2dec, int index)
 	24, 28, 32, 36, 40, 44,  48,  52,
 	56, 64, 72, 80, 88, 96, 104, 112
     };
-    int i, j, k;
     mpeg2_decoder_t * decoder = &(mpeg2dec->decoder);
 
     if (mpeg2dec->scaled[index] != mpeg2dec->q_scale_type) {
 	mpeg2dec->scaled[index] = mpeg2dec->q_scale_type;
-	for (i = 0; i < 32; i++) {
-	    k = mpeg2dec->q_scale_type ? non_linear_scale[i] : (i << 1);
-	    for (j = 0; j < 64; j++)
+	for (int i = 0; i < 32; i++) {
+	    int k = mpeg2dec->q_scale_type ? non_linear_scale[i] : (i << 1);
+	    for (int j = 0; j < 64; j++)
 		decoder->quantizer_prescale[index][i][j] =
 		    k * mpeg2dec->quantizer_matrix[index][j];
 	}
@@ -921,9 +898,7 @@ mpeg2_state_t mpeg2_header_slice_start (mpeg2dec_t * mpeg2dec)
 		mpeg2dec->yuv_index ^= 1;
 	}
     } else {
-	int b_type;
-
-	b_type = (mpeg2dec->decoder.coding_type == B_TYPE);
+	int b_type = (mpeg2dec->decoder.coding_type == B_TYPE);
 	mpeg2_init_fbuf (&(mpeg2dec->decoder), mpeg2dec->fbuf[0]->buf,
 			 mpeg2dec->fbuf[b_type + 1]->buf,
 			 mpeg2dec->fbuf[b_type]->buf);
@@ -944,11 +919,8 @@ static mpeg2_state_t seek_sequence (mpeg2dec_t * mpeg2dec)
 
 mpeg2_state_t mpeg2_header_end (mpeg2dec_t * mpeg2dec)
 {
-    mpeg2_picture_t * picture;
-    int b_type;
-
-    b_type = (mpeg2dec->decoder.coding_type == B_TYPE);
-    picture = mpeg2dec->pictures;
+    int b_type = (mpeg2dec->decoder.coding_type == B_TYPE);
+    mpeg2_picture_t *picture = mpeg2dec->pictures;
     if ((mpeg2dec->picture >= picture + 2) ^ b_type)
 	picture = mpeg2dec->pictures + 2;
 

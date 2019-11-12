@@ -24,7 +24,7 @@ QEvent::Type ScreenSaverEvent::kEventType =
 ScreenSaverControl::ScreenSaverControl() :
     m_screenSavers(QList<ScreenSaver *>())
 {
-    ScreenSaver * tmp;
+    ScreenSaver *tmp = nullptr;
 #if defined(USING_DBUS)
     tmp = new ScreenSaverDBus();
     m_screenSavers.push_back(tmp);

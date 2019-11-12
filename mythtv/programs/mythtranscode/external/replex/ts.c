@@ -177,10 +177,9 @@ static unsigned int crc_table[256] = {
 
 static unsigned int crc32_04c11db7 (const unsigned char *d, int len, unsigned int crc)
 {
-   register int i;
    const unsigned char *u = d; // Saves '& 0xff'
 
-   for (i=0; i<len; i++)
+   for (int i=0; i<len; i++)
       crc = (crc << 8) ^ crc_table[((crc >> 24) ^ *u++)];
 
    return crc;
@@ -190,9 +189,6 @@ static int write_ts_header(int pid, int payload_start, int count,
 		    int64_t SCR, uint8_t *obuf, int stuff)
 {
 	int c = 0;
-	uint8_t *scr;
-	uint32_t lscr;
-	uint16_t scr_ext = 0;
 
 	obuf[c++] = 0x47;
 	obuf[c++] = (payload_start ? 0x40 : 0x00) | ((pid >> 8) & 0x1f);
@@ -214,12 +210,11 @@ static int write_ts_header(int pid, int payload_start, int count,
 			size--;
 		}
 		if(SCR >= 0) {
-			uint8_t bit;
-			lscr = (uint32_t) ((SCR/300ULL) & 0xFFFFFFFFULL);
-			bit = (lscr & 0x01) << 7;
+			uint32_t lscr = (uint32_t) ((SCR/300ULL) & 0xFFFFFFFFULL);
+			uint8_t bit = (lscr & 0x01) << 7;
 			lscr = htonl(lscr >> 1);
-			scr = (uint8_t *) &lscr;
-			scr_ext = (uint16_t) ((SCR%300ULL) & 0x1FFULL);
+			uint8_t *scr = (uint8_t *) &lscr;
+			uint16_t scr_ext = (uint16_t) ((SCR%300ULL) & 0x1FFULL);
 			obuf[c++] = scr[0];
 			obuf[c++] = scr[1];
 			obuf[c++] = scr[2];
@@ -239,14 +234,12 @@ int write_video_ts(uint64_t vpts, uint64_t vdts, uint64_t SCR, uint8_t *buf,
 {
 //Unlike program streams, we only do one PES per frame
 	static int count = 0;
-	int add;
 	int pos = 0;
-	int p   = 0;
 	int stuff = 0;
 	int length = *vlength;
 
 	if (! length) return 0;
-	p = 4;
+	int p = 4;
 	if ( ptsdts ) {
 		p += PES_H_MIN + 8;
 
@@ -281,7 +274,7 @@ int write_video_ts(uint64_t vpts, uint64_t vdts, uint64_t SCR, uint8_t *buf,
 			*vlength);
 	}
 
-	add = ring_read( vrbuffer, buf+pos, length-pos);
+	int add = ring_read( vrbuffer, buf+pos, length-pos);
 	*vlength = add;
 	if (add < 0) return -1;
 	pos += add;
@@ -294,14 +287,12 @@ int write_audio_ts(int n, uint64_t pts, uint8_t *buf, int *alength,
 {
 	static int count[32] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 	                        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-	int add;
 	int pos = 0;
-	int p   = 0;
 	int stuff = 0;
 	int length = *alength;
 
 	if (!length) return 0;
-	p = 4;
+	int p = 4;
 
 	if (ptsdts == PTS_ONLY){
 		p += PES_H_MIN + 5;
@@ -321,7 +312,7 @@ int write_audio_ts(int n, uint64_t pts, uint8_t *buf, int *alength,
 		pos = write_ts_header(TS_MP2PID+n, 0, count[n], -1, buf, stuff);
 	}
 	count[n] = (count[n]+1) & 0x0f;
-	add = ring_read( arbuffer, buf+pos, length-pos);
+	int add = ring_read( arbuffer, buf+pos, length-pos);
 	*alength = add;
 	if (add < 0) return -1;
 	pos += add;
@@ -339,14 +330,12 @@ int write_ac3_ts(int n, uint64_t pts, uint8_t *buf, int *alength,
 {
 	static int count[32] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 	                        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-	int add;
 	int pos = 0;
-	int p   = 0;
 	int stuff = 0;
 	int length = *alength;
 
 	if (!length) return 0;
-	p = 4;
+	int p = 4;
 
 	if (ptsdts == PTS_ONLY){
 		p += PES_H_MIN + 5 + 4; //PES header + PTS + PS1
@@ -373,7 +362,7 @@ int write_ac3_ts(int n, uint64_t pts, uint8_t *buf, int *alength,
 	}
 	count[n] = (count[n]+1) & 0x0f;
 
-	add = ring_read( ac3rbuffer, buf+pos, length-pos);
+	int add = ring_read( ac3rbuffer, buf+pos, length-pos);
 	*alength = add;
 	if (add < 0) return -1;
 	pos += add;
@@ -390,7 +379,7 @@ void write_ts_patpmt(extdata_t *ext, int extcnt, uint8_t prog_num, uint8_t *buf)
 {
 #define PMTPID 0x20
 	static int count = 0;
-	int pos, i, pmtpos = 13;
+	int pmtpos = 13;
 	//PMT Program number = 1
 	//PMT PID = 0x20
 	uint8_t pat[17] = {0x00, 0x00, 0xb0, 0x0d, 0xfe, 0xef, 0xc1, 0x00, 0x00,
@@ -400,7 +389,7 @@ void write_ts_patpmt(extdata_t *ext, int extcnt, uint8_t prog_num, uint8_t *buf)
 
 	//PAT
 	pat[10] = prog_num;
-	pos = write_ts_header(0x00, 1, count, -1, buf, 0);
+	int pos = write_ts_header(0x00, 1, count, -1, buf, 0);
 	*(uint32_t *)(pat+13)= htonl(crc32_04c11db7(pat+1, 12, 0xffffffff));
 	memcpy(buf+pos, pat, 17);
 	pos += 17;
@@ -408,9 +397,9 @@ void write_ts_patpmt(extdata_t *ext, int extcnt, uint8_t prog_num, uint8_t *buf)
 	pos = TS_SIZE;
 	//PMT
 	pos += write_ts_header(PMTPID, 1, count, -1, buf+pos, 0);
-	for(i = 0; i <= extcnt; i++) {
-		uint8_t type;
-		uint32_t pid;
+	for(int i = 0; i <= extcnt; i++) {
+		uint8_t type = 0xFF;
+		uint32_t pid = 0x1FFF;
 		int n =  ext[i-1].strmnum;
 		if(i == 0) {
 			type = 0x02;

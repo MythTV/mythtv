@@ -536,8 +536,8 @@ bool MythRenderVDPAU::GetScreenShot(int width, int height, QString filename)
     if (m_surface >= (uint)m_surfaces.size())
         return false;
 
-    VdpRGBAFormat fmt;
-    uint32_t w, h;
+    VdpRGBAFormat fmt = 0;
+    uint32_t w = 0, h = 0;
     VdpOutputSurface surface = m_outputSurfaces[m_surfaces[m_surface]].m_id;
     INIT_ST
     vdp_st = vdp_output_surface_get_parameters(surface, &fmt, &w, &h);
@@ -571,7 +571,7 @@ bool MythRenderVDPAU::GetScreenShot(int width, int height, QString filename)
 
         img = img.scaled(width, height, Qt::KeepAspectRatio,
                          Qt::SmoothTransformation);
-        success = window->SaveScreenShot(img, std::move(filename));
+        success = MythMainWindow::SaveScreenShot(img, std::move(filename));
     }
     delete [] buffer;
     return success;
@@ -616,7 +616,7 @@ uint MythRenderVDPAU::CreateOutputSurface(const QSize &size, VdpRGBAFormat fmt,
     if ((existing && !m_outputSurfaces.contains(existing)) || size.isEmpty())
         return 0;
 
-    VdpOutputSurface tmp;
+    VdpOutputSurface tmp = 0;
     vdp_st = vdp_output_surface_create(m_device, fmt, size.width(),
                                        size.height(), &tmp);
     CHECK_ST
@@ -658,7 +658,7 @@ uint MythRenderVDPAU::CreateVideoSurface(const QSize &size, VdpChromaType type,
     if ((existing && !m_videoSurfaces.contains(existing)) || size.isEmpty())
         return 0;
 
-    VdpOutputSurface tmp;
+    VdpOutputSurface tmp = 0;
     vdp_st = vdp_video_surface_create(m_device, type, size.width(),
                                       size.height(), &tmp);
     CHECK_ST
@@ -702,7 +702,7 @@ uint MythRenderVDPAU::CreateBitmapSurface(const QSize &size, VdpRGBAFormat fmt,
     if ((existing && !m_bitmapSurfaces.contains(existing)) || size.isEmpty())
         return 0;
 
-    VdpBitmapSurface tmp;
+    VdpBitmapSurface tmp = 0;
     vdp_st = vdp_bitmap_surface_create(m_device, fmt, size.width(),
                                        size.height(), true, &tmp);
     CHECK_ST
@@ -746,7 +746,7 @@ uint MythRenderVDPAU::CreateDecoder(const QSize &size,
         references < 1)
         return 0;
 
-    VdpDecoder tmp;
+    VdpDecoder tmp = 0;
     vdp_st = vdp_decoder_create(m_device, profile, size.width(),
                                 size.height(), references, &tmp);
     CHECK_ST
@@ -789,7 +789,7 @@ uint MythRenderVDPAU::CreateVideoMixer(const QSize &size, uint layers,
     if ((existing && !m_videoMixers.contains(existing)) || size.isEmpty())
         return 0;
 
-    VdpVideoMixer tmp;
+    VdpVideoMixer tmp = 0;
     uint width  = size.width();
     uint height = size.height();
 
@@ -1248,7 +1248,7 @@ bool MythRenderVDPAU::SetMixerAttribute(uint id, uint attrib, float value)
     if (!m_videoMixers.contains(id) || attrib < kVDPAttribFiltersStart)
         return false;
 
-    VdpVideoMixerAttribute attr;
+    VdpVideoMixerAttribute attr = 0;
     void const * val = { &value };
 
     if (attrib == kVDPAttribNoiseReduction)
@@ -1508,7 +1508,7 @@ QSize MythRenderVDPAU::GetSurfaceSize(uint id)
 
     uint width = 0;
     uint height = 0;
-    VdpChromaType dummy;
+    VdpChromaType dummy = 0;
 
     INIT_ST
     vdp_st = vdp_video_surface_get_parameters(m_videoSurfaces[id].m_id,
@@ -1763,13 +1763,13 @@ bool MythRenderVDPAU::CheckHardwareSupport(void)
 
         if (vdp_get_api_version)
         {
-            uint version;
+            uint version = 0;
             vdp_get_api_version(&version);
             LOG(VB_GENERAL, LOG_INFO, LOC + QString("Version %1").arg(version));
         }
         if (vdp_get_information_string)
         {
-            const char * info;
+            const char *info = nullptr;
             vdp_get_information_string(&info);
             QString vendor(info);
 
@@ -1797,7 +1797,7 @@ bool MythRenderVDPAU::CheckHardwareSupport(void)
         {
         INIT_ST
         VdpBool supported = false;
-        uint32_t tmp1, tmp2, tmp3, tmp4;
+        uint32_t tmp1 = 0, tmp2 = 0, tmp3 = 0, tmp4 = 0;
         vdp_st = vdp_decoder_query_capabilities(m_device,
                     VDP_DECODER_PROFILE_MPEG4_PART2_ASP, &supported,
                     &tmp1, &tmp2, &tmp3, &tmp4);
@@ -1810,7 +1810,7 @@ bool MythRenderVDPAU::CheckHardwareSupport(void)
         {
         INIT_ST
         VdpBool supported = false;
-        uint32_t tmp1, tmp2, tmp3, tmp4;
+        uint32_t tmp1 = 0, tmp2 = 0, tmp3 = 0, tmp4 = 0;
         vdp_st = vdp_decoder_query_capabilities(m_device,
                     VDP_DECODER_PROFILE_HEVC_MAIN, &supported,
                     &tmp1, &tmp2, &tmp3, &tmp4);

@@ -19,7 +19,7 @@ bool BaseRequestHandler::HandleAnnounce(MythSocket *socket,
     if (commands.size() != 4)
         return false;
 
-    bool blockShutdown;
+    bool blockShutdown = true;
     if (commands[1] == "Playback")
         blockShutdown = true;
     else if (commands[1] == "Monitor")
@@ -130,7 +130,7 @@ bool BaseRequestHandler::HandleQueryLoad(SocketHandler *sock)
 bool BaseRequestHandler::HandleQueryUptime(SocketHandler *sock)
 {
     QStringList strlist;
-    time_t      uptime;
+    time_t      uptime = 0;
 
     if (getUptime(uptime))
         strlist << QString::number(uptime);
@@ -167,7 +167,7 @@ bool BaseRequestHandler::HandleQueryHostname(SocketHandler *sock)
 bool BaseRequestHandler::HandleQueryMemStats(SocketHandler *sock)
 {
     QStringList strlist;
-    int         totalMB, freeMB, totalVM, freeVM;
+    int         totalMB = 0, freeMB = 0, totalVM = 0, freeVM = 0;
 
     if (getMemStats(totalMB, freeMB, totalVM, freeVM))
     {

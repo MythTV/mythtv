@@ -48,7 +48,7 @@ private:
 
     /* Debugging. */
     int                     m_debugLevel      {0};
-    struct timeval          m_analyze_time;
+    struct timeval          m_analyze_time    {0,0};
     bool                    m_time_reported   {false};
 };
 

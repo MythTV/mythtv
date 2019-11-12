@@ -205,13 +205,12 @@ void FileSelector::OKPressed()
     {
         // loop though selected files and add them to the list
         QString f;
-        ArchiveItem *a;
 
         // remove any items that have been removed from the list
         QList<ArchiveItem *> tempAList;
         for (int x = 0; x < m_archiveList->size(); x++)
         {
-            a = m_archiveList->at(x);
+            ArchiveItem *a = m_archiveList->at(x);
             bool found = false;
 
             for (int y = 0; y < m_selectedList.size(); y++)
@@ -239,7 +238,7 @@ void FileSelector::OKPressed()
 
             for (int y = 0; y < m_archiveList->size(); y++)
             {
-                a = m_archiveList->at(y);
+                ArchiveItem *a = m_archiveList->at(y);
                 if (a->filename == f)
                 {
                     tempSList.append(f);
@@ -264,7 +263,7 @@ void FileSelector::OKPressed()
                 if (pos > 0)
                     title = f.mid(pos + 1);
 
-                a = new ArchiveItem;
+                ArchiveItem *a = new ArchiveItem;
                 a->type = "File";
                 a->title = title;
                 a->subtitle = "";

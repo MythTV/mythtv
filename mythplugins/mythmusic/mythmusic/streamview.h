@@ -41,7 +41,7 @@ class StreamView : public MusicCommon
 
   private slots:
     void streamItemClicked(MythUIButtonListItem *item);
-    void streamItemVisible(MythUIButtonListItem *item);
+    static void streamItemVisible(MythUIButtonListItem *item);
     void doRemoveStream(bool ok);
 
   private:
@@ -110,11 +110,11 @@ class SearchStream : public MythScreenType
     void updateStreams(void);
     void doUpdateStreams(void);
     void streamClicked(MythUIButtonListItem *item);
-    void streamVisible(MythUIButtonListItem *item);
+    static void streamVisible(MythUIButtonListItem *item);
 
   private:
     void Load(void) override; // MythScreenType
-    void loadStreams(void);
+    static void loadStreams(void);
     void updateBroadcasters(void);
     void updateGenres(void);
     void updateCountries(void);

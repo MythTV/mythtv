@@ -108,7 +108,7 @@ void HDHRSignalMonitor::UpdateValues(void)
         return;
     }
 
-    struct hdhomerun_tuner_status_t status;
+    struct hdhomerun_tuner_status_t status {};
     streamHandler->GetTunerStatus(&status);
 
     uint sig = status.signal_strength;

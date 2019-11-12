@@ -73,7 +73,7 @@ class MUI_PUBLIC MythUIGuideGrid : public MythUIType
     void CopyFrom(MythUIType *base) override; // MythUIType
     void CreateCopy(MythUIType *parent) override; // MythUIType
 
-    bool parseDefaultCategoryColors(QMap<QString, QString> &catColors);
+    static bool parseDefaultCategoryColors(QMap<QString, QString> &catColors);
 
   private:
 
@@ -117,13 +117,13 @@ class MUI_PUBLIC MythUIGuideGrid : public MythUIType
     void drawCurrent(MythPainter *p, int xoffset, int yoffset, UIGTCon *data,
                      int alphaMod);
 
-    QColor calcColor(const QColor &color, int alpha);
+    static QColor calcColor(const QColor &color, int alpha);
 
     QList<UIGTCon*> *m_allData  {nullptr};
     UIGTCon m_selectedItem;
 
-    MythUIImage *m_recImages[RECSTATUSSIZE];
-    MythUIImage *m_arrowImages[ARROWIMAGESIZE];
+    MythUIImage *m_recImages[RECSTATUSSIZE]    {};
+    MythUIImage *m_arrowImages[ARROWIMAGESIZE] {};
 
     // themeable settings
     int    m_channelCount       {5};

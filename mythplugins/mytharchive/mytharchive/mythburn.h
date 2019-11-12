@@ -89,8 +89,8 @@ class MythBurn : public MythScreenType
     void loadConfiguration(void);
     void saveConfiguration(void);
     EncoderProfile *getProfileFromName(const QString &profileName);
-    QString loadFile(const QString &filename);
-    bool isArchiveItemValid(const QString &type, const QString &filename);
+    static QString loadFile(const QString &filename);
+    static bool isArchiveItemValid(const QString &type, const QString &filename);
     void loadEncoderProfiles(void);
     EncoderProfile *getDefaultProfile(ArchiveItem *item);
     void setProfile(EncoderProfile *profile, ArchiveItem *item);
@@ -143,7 +143,7 @@ class BurnMenu : public QObject
 
   private:
     void customEvent(QEvent *event) override; // QObject
-    void doBurn(int mode);
+    static void doBurn(int mode);
 };
 
 #endif

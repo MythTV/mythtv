@@ -47,7 +47,7 @@ class ThemeChooser : public MythScreenType
     void popupClosed(const QString& which, int result);
     void saveAndReload(void);
     void toggleFullscreenPreview(void);
-    void toggleThemeUpdateNotifications(void);
+    static void toggleThemeUpdateNotifications(void);
     void refreshDownloadableThemes(void);
     void removeTheme(void);
 

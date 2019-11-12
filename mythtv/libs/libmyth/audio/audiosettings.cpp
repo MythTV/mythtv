@@ -33,8 +33,8 @@ AudioSettings::AudioSettings(const AudioSettings &other) :
 }
 
 AudioSettings::AudioSettings(
-    const QString              &main_device,
-    const QString              &passthru_device,
+    QString                     main_device,
+    QString                     passthru_device,
     AudioFormat                 format,
     int                         channels,
     AVCodecID                   codec,
@@ -44,8 +44,8 @@ AudioSettings::AudioSettings(
     bool                        use_passthru,
     int                         upmixer_startup,
     AudioOutputSettings        *custom) :
-    m_main_device(main_device),
-    m_passthru_device(passthru_device),
+    m_main_device(std::move(main_device)),
+    m_passthru_device(std::move(passthru_device)),
     m_format(format),
     m_channels(channels),
     m_codec(codec),

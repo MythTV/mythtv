@@ -125,11 +125,10 @@ bool UPnp::Initialize( QList<QHostAddress> &sIPAddrList, int nServicePort, HttpS
     }
 
     g_IPAddrList   = sIPAddrList;
-    int it;
     bool ipv4 = gCoreContext->GetBoolSetting("IPv4Support",true);
     bool ipv6 = gCoreContext->GetBoolSetting("IPv6Support",true);
 
-    for (it = 0; it < g_IPAddrList.size(); ++it)
+    for (int it = 0; it < g_IPAddrList.size(); ++it)
     {
         // If IPV4 support is disabled and this is an IPV4 address,
         // remove this address

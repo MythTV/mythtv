@@ -59,10 +59,10 @@ class GameUI : public MythScreenType
     void createBusyDialog(const QString& title);
 
     QString getFillSql(MythGenericTree* node) const;
-    QString getChildLevelString(MythGenericTree *node) const;
-    QString getFilter(MythGenericTree *node) const;
-    int     getLevelsOnThisBranch(MythGenericTree *node) const;
-    bool    isLeaf(MythGenericTree *node) const;
+    static QString getChildLevelString(MythGenericTree *node);
+    static QString getFilter(MythGenericTree *node) ;
+    static int     getLevelsOnThisBranch(MythGenericTree *node);
+    static bool    isLeaf(MythGenericTree *node);
     void    fillNode(MythGenericTree *node);
     void    resetOtherTrees(MythGenericTree *node);
     void    updateChangedNode(MythGenericTree *node, RomInfo *romInfo);

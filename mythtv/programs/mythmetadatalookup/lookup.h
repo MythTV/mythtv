@@ -24,7 +24,7 @@ class LookerUpper : public QObject
     void HandleAllRecordingRules(void);
     void HandleAllArtwork(bool aggressive = false);
 
-    void CopyRuleInetrefsToRecordings();
+    static void CopyRuleInetrefsToRecordings();
 
   private:
     void customEvent(QEvent *event) override; // QObject

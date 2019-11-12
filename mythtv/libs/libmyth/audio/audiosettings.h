@@ -27,8 +27,8 @@ class MPUBLIC AudioSettings
     AudioSettings() = default;
     AudioSettings(const AudioSettings &other);
     AudioSettings(
-        const QString          &main_device,
-        const QString          &passthru_device,
+        QString                 main_device,
+        QString                 passthru_device,
         AudioFormat             format,
         int                     channels,
         AVCodecID               codec,

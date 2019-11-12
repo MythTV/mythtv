@@ -34,11 +34,11 @@ class UPNP_PUBLIC  UPnpMSRR : public Eventing
         QString         m_sServiceDescFileName;
         QString         m_sControlUrl;
 
-        UPnpMSRRMethod  GetMethod                  ( const QString &sURI  );
+        static UPnpMSRRMethod  GetMethod                  ( const QString &sURI  );
 
-        void            HandleIsAuthorized         ( HTTPRequest *pRequest );
-        void            HandleRegisterDevice       ( HTTPRequest *pRequest );
-        void            HandleIsValidated          ( HTTPRequest *pRequest );
+        static void            HandleIsAuthorized         ( HTTPRequest *pRequest );
+        static void            HandleRegisterDevice       ( HTTPRequest *pRequest );
+        static void            HandleIsValidated          ( HTTPRequest *pRequest );
 
     protected:
 

@@ -45,9 +45,10 @@ const QStringList StorageGroup::kSpecialGroups = QStringList()
  *  \param allowFallback allow the storage group search code to fall back if
  *                  no dirs exist for the specified group/host
  */
-StorageGroup::StorageGroup(const QString &group, const QString &hostname,
+StorageGroup::StorageGroup(QString group, QString hostname,
                            bool allowFallback) :
-    m_groupname(group), m_hostname(hostname), m_allowFallback(allowFallback)
+    m_groupname(std::move(group)), m_hostname(std::move(hostname)),
+    m_allowFallback(allowFallback)
 {
     m_dirlist.clear();
 
@@ -671,9 +672,9 @@ QString StorageGroup::FindNextDirMostFree(void)
 {
     QString nextDir;
     int64_t nextDirFree = 0;
-    int64_t thisDirTotal;
-    int64_t thisDirUsed;
-    int64_t thisDirFree;
+    int64_t thisDirTotal = 0;
+    int64_t thisDirUsed = 0;
+    int64_t thisDirFree = 0;
 
     LOG(VB_FILE, LOG_DEBUG, LOC + QString("FindNextDirMostFree: Starting"));
 
@@ -843,10 +844,10 @@ QStringList StorageGroup::getGroupDirs(const QString &groupname,
              * value using QString::fromUtf8() to prevent corruption. */
             dirname = QString::fromUtf8(query.value(0)
                                         .toByteArray().constData());
-            groups += gCoreContext->GenMythURL(query.value(1).toString(),
-                                               0,
-                                               dirname,
-                                               groupname);
+            groups += MythCoreContext::GenMythURL(query.value(1).toString(),
+                                                  0,
+                                                  dirname,
+                                                  groupname);
         }
     }
 

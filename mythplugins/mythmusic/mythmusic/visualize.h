@@ -91,7 +91,7 @@ class VisualBase
     virtual int getDesiredFPS(void) { return m_fps; }
     // Override this if you need the potential of capturing more data than the default
     virtual unsigned long getDesiredSamples(void) { return SAMPLES_DEFAULT_SIZE; }
-    void drawWarning(QPainter *p, const QColor &back, const QSize &size, const QString& warning, int fontsize = 28);
+    static void drawWarning(QPainter *p, const QColor &back, const QSize &size, const QString& warning, int fontsize = 28);
 
   protected:
     int  m_fps                {20};
@@ -185,7 +185,7 @@ class Spectrum : public VisualBase
         {(void) action;}
 
   protected:
-    inline double clamp(double cur, double max, double min);
+    static inline double clamp(double cur, double max, double min);
 
     QColor             m_startColor       {Qt::blue};
     QColor             m_targetColor      {Qt::red};
@@ -275,7 +275,7 @@ typedef struct piano_key_data {
         {(void) action;}
 
   protected:
-    inline double clamp(double cur, double max, double min);
+    static inline double clamp(double cur, double max, double min);
     bool process_all_types(VisualNode *node, bool this_will_be_displayed);
     void zero_analysis(void);
 
@@ -287,7 +287,7 @@ typedef struct piano_key_data {
     vector<QRect>   m_rects;
     QSize           m_size;
 
-    unsigned long   m_offset_processed;
+    unsigned long   m_offset_processed {0};
 
     piano_key_data *m_piano_data       {nullptr};
     piano_audio    *m_audio_data       {nullptr};
@@ -315,7 +315,7 @@ class AlbumArt : public VisualBase
 
     QSize m_size;
     QSize m_cursize;
-    ImageType m_currImageType;
+    ImageType m_currImageType {IT_UNKNOWN};
     QImage m_image;
 
     MusicMetadata *m_currentMetadata {nullptr};

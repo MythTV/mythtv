@@ -47,7 +47,7 @@ static QHash<uint,bool> extract_pids(const QString &pidsStr, bool required)
         QStringList pidsList = pidsStr.split(",");
         for (uint i = 0; i < (uint) pidsList.size(); i++)
         {
-            bool ok;
+            bool ok = false;
             uint tmp = pidsList[i].toUInt(&ok, 0);
             if (ok && (tmp < 0x2000))
                 use_pid[tmp] = true;

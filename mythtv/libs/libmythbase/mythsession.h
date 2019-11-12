@@ -106,7 +106,7 @@ class MBASE_PUBLIC MythSessionManager
      *        session open for them!
      * \param username
      */
-    bool IsValidUser(const QString &username);
+    static bool IsValidUser(const QString &username);
 
     /**
      * \brief Check if the session token is valid
@@ -128,7 +128,7 @@ class MBASE_PUBLIC MythSessionManager
      *
      * The username should be checked for validity first
      */
-    QString GetPasswordDigest(const QString &username);
+    static QString GetPasswordDigest(const QString &username);
 
     /**
      * \brief Login user by digest
@@ -170,11 +170,11 @@ class MBASE_PUBLIC MythSessionManager
      * \param newPassword if action=DIGEST_USER_CHANGE_PW
      * \param adminPassword if action=DIGEST_USER_ADD
      */
-    bool ManageDigestUser(DigestUserActions action,
-                          const QString    &username,
-                          const QString    &password,
-                          const QString    &newPassword,
-                          const QString    &adminPassword);
+    static bool ManageDigestUser(DigestUserActions action,
+                                 const QString    &username,
+                                 const QString    &password,
+                                 const QString    &newPassword,
+                                 const QString    &adminPassword);
 
   private:
     /**
@@ -207,16 +207,16 @@ class MBASE_PUBLIC MythSessionManager
      */
     void DestroyUserSession(const QString &sessionToken);
 
-    bool AddDigestUser(const QString &username,
-                       const QString &password,
-                       const QString &adminPassword);
+    static bool AddDigestUser(const QString &username,
+                              const QString &password,
+                              const QString &adminPassword);
 
-    bool RemoveDigestUser(const QString &username,
-                          const QString &password);
+    static bool RemoveDigestUser(const QString &username,
+                                 const QString &password);
 
-    bool ChangeDigestUserPassword(const QString &username,
-                                  const QString &oldPassword,
-                                  const QString &newPassword);
+    static bool ChangeDigestUserPassword(const QString &username,
+                                         const QString &oldPassword,
+                                         const QString &newPassword);
 
     QMap<QString, MythUserSession> m_sessionList;
 };

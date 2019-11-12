@@ -42,12 +42,12 @@
 
 #define LOC QString("SWiz: ")
 
-ScanWizard::ScanWizard(uint    default_sourceid,
-                       uint    default_cardid,
-                       QString default_inputname) :
+ScanWizard::ScanWizard(uint           default_sourceid,
+                       uint           default_cardid,
+                       const QString& default_inputname) :
     m_scannerPane(new ChannelScannerGUI())
 {
-    SetupConfig(default_sourceid, default_cardid, std::move(default_inputname));
+    SetupConfig(default_sourceid, default_cardid, default_inputname);
     ButtonStandardSetting *scanButton = new ButtonStandardSetting(tr("Scan"));
     connect(scanButton, SIGNAL(clicked()), SLOT(Scan()));
     addChild(scanButton);

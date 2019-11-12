@@ -16,7 +16,7 @@ class BlankFrameDetector : public FrameAnalyzer
 {
 public:
     /* Ctor/dtor. */
-    BlankFrameDetector(HistogramAnalyzer *ha, QString debugdir);
+    BlankFrameDetector(HistogramAnalyzer *ha, const QString& debugdir);
 
     /* FrameAnalyzer interface. */
     const char *name(void) const override // FrameAnalyzer
@@ -33,7 +33,7 @@ public:
     /* BlankFrameDetector interface. */
     const FrameAnalyzer::FrameMap *getBlanks(void) const { return &m_blankMap; }
     int computeForLogoSurplus(const TemplateMatcher *templateMatcher);
-    int computeForLogoDeficit(const TemplateMatcher *templateMatcher);
+    static int computeForLogoDeficit(const TemplateMatcher *templateMatcher);
     int computeBreaks(FrameMap *breaks);
 
 private:

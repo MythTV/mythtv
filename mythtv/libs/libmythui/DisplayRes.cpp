@@ -1,3 +1,4 @@
+#include <cmath>
 
 #include "DisplayRes.h"
 #include "config.h"
@@ -188,7 +189,7 @@ bool DisplayRes::SwitchToVideo(int iwidth, int iheight, double frate)
 bool DisplayRes::SwitchToGUI(tmode next_mode)
 {
     DisplayResScreen next = m_mode[next_mode];
-    double target_rate;
+    double target_rate = NAN;
 
     // need to change video mode?
     // If GuiVidModeRefreshRate is 0, assume any refresh rate is good enough.
@@ -238,7 +239,7 @@ bool DisplayRes::SwitchToCustomGUI(int width, int height, short rate)
 std::vector<double> DisplayRes::GetRefreshRates(int width,
         int height) const
 {
-    double tr;
+    double tr = NAN;
     std::vector<double> empty;
 
     const DisplayResScreen drs(width, height, 0, 0, -1.0, 0.0);

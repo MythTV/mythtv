@@ -112,7 +112,7 @@ class DatabaseLogger : public LoggerBase
     void prepare(MSqlQuery &query);
   private:
     bool isDatabaseReady(void);
-    bool tableExists(const QString &table);
+    static bool tableExists(const QString &table);
 
     DBLoggerThread *m_thread;   ///< The database queue handling thread
     QString m_query;            ///< The database query to insert log messages
@@ -143,11 +143,11 @@ class LogForwardThread : public QObject, public MThread
   private:
     bool m_aborted {false};          ///< Flag to abort the thread.
 
-    void forwardMessage(LogMessage *msg);
+    static void forwardMessage(LogMessage *msg);
   signals:
     void incomingSigHup(void);
   protected slots:
-    void handleSigHup(void);
+    static void handleSigHup(void);
 };
 
 MBASE_PUBLIC bool logForwardStart(void);

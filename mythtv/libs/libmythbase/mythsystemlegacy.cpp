@@ -42,7 +42,6 @@
 #include "mythcorecontext.h"
 #include "mythevent.h"
 #include "mythlogging.h"
-#include "exitcodes.h"
 
 #if CONFIG_CYGWIN || defined(_WIN32)
 #include "mythsystemwindows.h"

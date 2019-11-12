@@ -11,7 +11,7 @@
 class MBASE_PUBLIC StorageGroup
 {
   public:
-    StorageGroup(const QString &group = "", const QString &hostname = "",
+    StorageGroup(QString group = "", QString hostname = "",
                  const bool allowFallback = true);
 
     void    Init(const QString &group = "Default",

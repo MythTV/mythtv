@@ -33,9 +33,9 @@
 class Device
 {
 public:
-    Device(const QString &name, const QString &mount,
+    Device(QString name, QString mount,
            MythMediaDevice *media = nullptr, QTemporaryDir *import = nullptr)
-        : m_present(true), m_name(name), m_mount(mount),
+        : m_present(true), m_name(std::move(name)), m_mount(std::move(mount)),
           m_media(media), m_dir(import)
     {
         // Path relative to TEMP storage group
@@ -85,7 +85,7 @@ public:
      \brief Clears all files and sub-dirs within a directory
      \param path Dir to clear
     */
-    void RemoveDirContents(const QString& path)
+    static void RemoveDirContents(const QString& path)
     {
         QDir(path).removeRecursively();
     }
@@ -393,7 +393,7 @@ ImageItem *ImageAdapterLocal::CreateItem(const QFileInfo &fi, int parentId,
  * \param extra Message data
  */
 void ImageAdapterLocal::Notify(const QString &mesg,
-                               const QStringList &extra) const
+                               const QStringList &extra)
 {
     QString host(gCoreContext->GetHostName());
     gCoreContext->SendEvent(MythEvent(QString("%1 %2").arg(mesg, host), extra));
@@ -462,7 +462,7 @@ ImageItem *ImageAdapterSg::CreateItem(const QFileInfo &fi, int parentId,
  * \param extra Message data
  */
 void ImageAdapterSg::Notify(const QString &mesg,
-                            const QStringList &extra) const
+                            const QStringList &extra)
 {
     gCoreContext->SendEvent(MythEvent(mesg, extra));
 }
@@ -1124,8 +1124,8 @@ bool ImageDbLocal::CreateTable()
 class ReadMetaThread : public QRunnable
 {
 public:
-    ReadMetaThread(ImagePtrK im, const QString &path)
-        : m_im(std::move(im)), m_path(path) {}
+    ReadMetaThread(ImagePtrK im, QString path)
+        : m_im(std::move(im)), m_path(std::move(path)) {}
 
     void run() override // QRunnable
     {
@@ -2310,7 +2310,7 @@ QString ImageManagerFe::DeleteFiles(const ImageIdList &ids)
  \param im Image or dir
  \return QString Time or date string formatted as per Myth general settings
 */
-QString ImageManagerFe::LongDateOf(const ImagePtrK& im) const
+QString ImageManagerFe::LongDateOf(const ImagePtrK& im)
 {
     if (im->m_id == GALLERY_DB_ID)
         return "";

@@ -36,8 +36,8 @@
  *  \brief Create a new KeyBindings instance.
  *  \param hostname The host for which to create the key bindings.
  */
-KeyBindings::KeyBindings(const QString &hostname)
-    : m_hostname(hostname)
+KeyBindings::KeyBindings(QString hostname)
+    : m_hostname(std::move(hostname))
 {
     LoadMandatoryBindings();
     LoadContexts();

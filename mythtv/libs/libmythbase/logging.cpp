@@ -85,7 +85,7 @@ typedef struct {
     QString path;
 } LogPropagateOpts;
 
-LogPropagateOpts        logPropagateOpts;
+LogPropagateOpts        logPropagateOpts {false, 0, 0, true, ""};
 QString                 logPropagateArgs;
 QStringList             logPropagateArgList;
 
@@ -120,7 +120,7 @@ void verboseHelp(void);
 void loggingGetTimeStamp(qlonglong *epoch, uint *usec)
 {
 #if HAVE_GETTIMEOFDAY
-    struct timeval  tv;
+    struct timeval tv {};
     gettimeofday(&tv, nullptr);
     *epoch = tv.tv_sec;
     if (usec)
@@ -137,13 +137,6 @@ void loggingGetTimeStamp(qlonglong *epoch, uint *usec)
 #endif
 }
 
-LoggingItem::LoggingItem() :
-        ReferenceCounter("LoggingItem", false)
-{
-    m_message[0]='\0';
-    m_message[LOGLINE_MAX]='\0';
-}
-
 LoggingItem::LoggingItem(const char *_file, const char *_function,
                          int _line, LogLevel_t _level, LoggingType _type) :
         ReferenceCounter("LoggingItem", false),
@@ -152,9 +145,6 @@ LoggingItem::LoggingItem(const char *_file, const char *_function,
         m_file(strdup(_file)), m_function(strdup(_function))
 {
     loggingGetTimeStamp(&m_epoch, &m_usec);
-
-    m_message[0]='\0';
-    m_message[LOGLINE_MAX]='\0';
     setThreadTid();
 }
 
@@ -430,21 +420,19 @@ bool LoggerThread::logConsole(LoggingItem *item)
         char   usPart[9];
         char   timestamp[TIMESTAMP_MAX];
         time_t epoch = item->epoch();
-        struct tm tm;
+        struct tm tm {};
         localtime_r(&epoch, &tm);
 
         strftime( timestamp, TIMESTAMP_MAX-8, "%Y-%m-%d %H:%M:%S",
                   (const struct tm *)&tm );
         snprintf( usPart, 9, ".%06d", (int)(item->m_usec) );
         strcat( timestamp, usPart );
-        char shortname;
+        char shortname = '-';
 
         {
             QMutexLocker locker(&loglevelMapMutex);
             LoglevelDef *lev = loglevelMap.value(item->m_level, nullptr);
-            if (!lev)
-                shortname = '-';
-            else
+            if (lev != nullptr)
                 shortname = lev->shortname;
         }
 
@@ -679,8 +667,7 @@ void logPropagateCalc(void)
 #if !defined(_WIN32) && !defined(Q_OS_ANDROID)
     if (logPropagateOpts.facility >= 0)
     {
-        const CODE *syslogname;
-
+        const CODE *syslogname = nullptr;
         for (syslogname = &facilitynames[0];
              (syslogname->c_name &&
               syslogname->c_val != logPropagateOpts.facility); syslogname++);
@@ -815,8 +802,8 @@ int syslogGetFacility(const QString& facility)
     Q_UNUSED(facility);
     return( -2 );
 #else
-    const CODE *name;
-    int i;
+    const CODE *name = nullptr;
+    int i = 0;
     QByteArray ba = facility.toLocal8Bit();
     char *string = (char *)ba.constData();
 
@@ -984,7 +971,6 @@ void verboseHelp(void)
 int verboseArgParse(const QString& arg)
 {
     QString option;
-    int     idx;
 
     if (!verboseInitialized)
         verboseInit();
@@ -1045,7 +1031,8 @@ int verboseArgParse(const QString& arg)
         }
         else
         {
-            if ((idx = option.indexOf(':')) != -1)
+            int idx = option.indexOf(':');
+            if (idx != -1)
             {
                 optionLevel = option.mid(idx + 1);
                 option = option.left(idx);

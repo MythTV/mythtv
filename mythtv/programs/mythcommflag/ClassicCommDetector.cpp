@@ -13,8 +13,8 @@
 using namespace std;
 
 // Qt headers
-#include <QString>
 #include <QCoreApplication>
+#include <QString>
 
 // MythTV headers
 #include "mythmiscutil.h"
@@ -128,18 +128,18 @@ ClassicCommDetector::ClassicCommDetector(SkipType commDetectMethod_in,
                                          bool showProgress_in,
                                          bool fullSpeed_in,
                                          MythPlayer* player_in,
-                                         const QDateTime& startedAt_in,
-                                         const QDateTime& stopsAt_in,
-                                         const QDateTime& recordingStartedAt_in,
-                                         const QDateTime& recordingStopsAt_in) :
+                                         QDateTime startedAt_in,
+                                         QDateTime stopsAt_in,
+                                         QDateTime recordingStartedAt_in,
+                                         QDateTime recordingStopsAt_in) :
 
 
     m_commDetectMethod(commDetectMethod_in),
     m_player(player_in),
-    m_startedAt(startedAt_in),
-    m_stopsAt(stopsAt_in),
-    m_recordingStartedAt(recordingStartedAt_in),
-    m_recordingStopsAt(recordingStopsAt_in),
+    m_startedAt(std::move(startedAt_in)),
+    m_stopsAt(std::move(stopsAt_in)),
+    m_recordingStartedAt(std::move(recordingStartedAt_in)),
+    m_recordingStopsAt(std::move(recordingStopsAt_in)),
     m_stillRecording(m_recordingStopsAt > MythDate::current()),
     m_fullSpeed(fullSpeed_in),
     m_showProgress(showProgress_in)
@@ -197,11 +197,7 @@ void ClassicCommDetector::Init()
 
     m_lastFrameNumber = -2;
     m_curFrameNumber = -1;
-
-    if (getenv("DEBUGCOMMFLAG"))
-        m_verboseDebugging = true;
-    else
-        m_verboseDebugging = false;
+    m_verboseDebugging = (getenv("DEBUGCOMMFLAG") != nullptr);
 
     LOG(VB_COMMFLAG, LOG_INFO,
         QString("Commercial Detection initialized: "
@@ -392,7 +388,7 @@ bool ClassicCommDetector::go()
     QTime flagTime;
     flagTime.start();
 
-    long long myTotalFrames;
+    long long myTotalFrames = 0;
     if (m_recordingStopsAt < MythDate::current() )
         myTotalFrames = m_player->GetTotalFrameCount();
     else
@@ -408,7 +404,7 @@ bool ClassicCommDetector::go()
     }
 
 
-    float flagFPS;
+    float flagFPS = 0.0;
     long long  currentFrameNumber = 0LL;
     float aspect = m_player->GetVideoAspect();
     int prevpercent = -1;
@@ -421,7 +417,7 @@ bool ClassicCommDetector::go()
 
     while (m_player->GetEof() == kEofStateNone)
     {
-        struct timeval startTime;
+        struct timeval startTime {};
         if (m_stillRecording)
             gettimeofday(&startTime, nullptr);
 
@@ -512,11 +508,9 @@ bool ClassicCommDetector::go()
             else
                 flagFPS = 0.0;
 
-            int percentage;
+            int percentage = 0;
             if (myTotalFrames)
                 percentage = currentFrameNumber * 100 / myTotalFrames;
-            else
-                percentage = 0;
 
             if (percentage > 100)
                 percentage = 100;
@@ -564,7 +558,7 @@ bool ClassicCommDetector::go()
             int secondsBehind = secondsRecorded - secondsFlagged;
             long usecPerFrame = (long)(1.0F / m_player->GetFrameRate() * 1000000);
 
-            struct timeval endTime;
+            struct timeval endTime {};
             gettimeofday(&endTime, nullptr);
 
             long long usecSleep =
@@ -754,7 +748,6 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
 {
     int max = 0;
     int min = 255;
-    unsigned char pixel;
     int blankPixelsChecked = 0;
     long long totBrightness = 0;
     unsigned char *rowMax = new unsigned char[m_height];
@@ -765,7 +758,7 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
     int bottomDarkRow = m_height - m_commDetectBorder - 1;
     int leftDarkCol = m_commDetectBorder;
     int rightDarkCol = m_width - m_commDetectBorder - 1;
-    FrameInfoEntry fInfo;
+    FrameInfoEntry fInfo {};
 
     if (!frame || !(frame->buf) || frame_number == -1 ||
         frame->codec != FMT_YV12)
@@ -836,7 +829,7 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
         for(int x = m_commDetectBorder; x < (m_width - m_commDetectBorder);
                 x += m_horizSpacing)
         {
-            pixel = framePtr[y * bytesPerLine + x];
+            uchar pixel = framePtr[y * bytesPerLine + x];
 
             if (m_commDetectMethod & COMM_DETECT_BLANKS)
             {
@@ -1194,17 +1187,10 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
 {
     LOG(VB_COMMFLAG, LOG_INFO, "CommDetect::BuildAllMethodsCommList()");
 
-    FrameBlock *fblock;
-    FrameBlock *fbp;
-    int curBlock = 0;
-    int maxBlock = 0;
     int lastScore = 0;
-    uint64_t curFrame = 0;
-    int64_t  breakStart = 0;
     uint64_t lastStart = 0;
     uint64_t lastEnd = 0;
     int64_t firstLogoFrame = -1;
-    bool lastFrameWasBlank = false;
     int format = COMM_FORMAT_NORMAL;
     int aspect = COMM_ASPECT_NORMAL;
     QString msgformat("%1 %2:%3 %4 %5 %6 %7 %8 %9 %10 %11 %12 %13 %14 %15");
@@ -1215,12 +1201,12 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
 
     m_commBreakMap.clear();
 
-    fblock = new FrameBlock[m_blankFrameCount + 2];
+    FrameBlock *fblock = new FrameBlock[m_blankFrameCount + 2];
 
-    curBlock = 0;
-    curFrame = 1;
+    int curBlock = 0;
+    uint64_t curFrame = 1;
 
-    fbp = &fblock[curBlock];
+    FrameBlock *fbp = &fblock[curBlock];
     fbp->start = 0;
     fbp->bfCount = 0;
     fbp->logoCount = 0;
@@ -1231,7 +1217,7 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
     fbp->aspectMatch = 0;
     fbp->score = 0;
 
-    lastFrameWasBlank = true;
+    bool lastFrameWasBlank = true;
 
     if (m_decoderFoundAspectChanges)
     {
@@ -1333,7 +1319,7 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
     if ((fbp->scCount) && (fbp->length > 1.05))
         fbp->scRate = fbp->scCount / fbp->length;
 
-    maxBlock = curBlock;
+    int maxBlock = curBlock;
     curBlock = 0;
     lastScore = 0;
 
@@ -1623,7 +1609,7 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
         "--- ------ ------ ------ ----- ------ ------ -----");
     curBlock = 0;
     lastScore = 0;
-    breakStart = -1;
+    int64_t breakStart = -1;
     while (curBlock <= maxBlock)
     {
         fbp = &fblock[curBlock];
@@ -1869,12 +1855,10 @@ void ClassicCommDetector::BuildBlankFrameCommList(void)
     long long *c_end   = new long long[m_blankFrameMap.count()];
     int frames = 0;
     int commercials = 0;
-    int i, x;
-    frm_dir_map_t::iterator it;
 
     m_blankCommMap.clear();
 
-    for (it = m_blankFrameMap.begin(); it != m_blankFrameMap.end(); ++it)
+    for (auto it = m_blankFrameMap.begin(); it != m_blankFrameMap.end(); ++it)
         bframes[frames++] = it.key();
 
     if (frames == 0)
@@ -1888,9 +1872,9 @@ void ClassicCommDetector::BuildBlankFrameCommList(void)
     // detect individual commercials from blank frames
     // commercial end is set to frame right before ending blank frame to
     //    account for instances with only a single blank frame between comms.
-    for(i = 0; i < frames; i++ )
+    for(int i = 0; i < frames; i++ )
     {
-        for(x=i+1; x < frames; x++ )
+        for(int x=i+1; x < frames; x++ )
         {
             // check for various length spots since some channels don't
             // have blanks inbetween commercials just at the beginning and
@@ -1945,7 +1929,7 @@ void ClassicCommDetector::BuildBlankFrameCommList(void)
         }
     }
 
-    i = 0;
+    int i = 0;
 
     // don't allow single commercial at head
     // of show unless followed by another
@@ -1970,6 +1954,7 @@ void ClassicCommDetector::BuildBlankFrameCommList(void)
         r = c_end[i];
         if ( i < (commercials-1))
         {
+            int x = 0;
             for(x = 0; x < (frames-1); x++)
                 if (bframes[x] == r)
                     break;
@@ -2013,14 +1998,14 @@ void ClassicCommDetector::BuildBlankFrameCommList(void)
     delete[] bframes;
 
     LOG(VB_COMMFLAG, LOG_INFO, "Blank-Frame Commercial Map" );
-    for(it = m_blankCommMap.begin(); it != m_blankCommMap.end(); ++it)
+    for(auto it = m_blankCommMap.begin(); it != m_blankCommMap.end(); ++it)
         LOG(VB_COMMFLAG, LOG_INFO, QString("    %1:%2")
                 .arg(it.key()).arg(*it));
 
     MergeBlankCommList();
 
     LOG(VB_COMMFLAG, LOG_INFO, "Merged Blank-Frame Commercial Break Map" );
-    for(it = m_blankCommBreakMap.begin(); it != m_blankCommBreakMap.end(); ++it)
+    for(auto it = m_blankCommBreakMap.begin(); it != m_blankCommBreakMap.end(); ++it)
         LOG(VB_COMMFLAG, LOG_INFO, QString("    %1:%2")
                 .arg(it.key()).arg(*it));
 }
@@ -2375,9 +2360,6 @@ void ClassicCommDetector::CleanupFrameInfo(void)
 {
     LOG(VB_COMMFLAG, LOG_INFO, "CommDetect::CleanupFrameInfo()");
 
-    int value;
-    int before, after;
-
     // try to account for noisy signal causing blank frames to be undetected
     if ((m_framesProcessed > (m_fps * 60)) &&
         (m_blankFrameCount < (m_framesProcessed * 0.0004)))
@@ -2412,7 +2394,7 @@ void ClassicCommDetector::CleanupFrameInfo(void)
 
         for (uint64_t i = 1; i <= m_framesProcessed; i++)
         {
-            value = frameInfo[i].flagMask;
+            int value = frameInfo[i].flagMask;
             frameInfo[i].flagMask = value & ~COMM_FRAME_BLANK;
 
             if (( (frameInfo[i].flagMask & COMM_FRAME_BLANK) == 0) &&
@@ -2435,17 +2417,17 @@ void ClassicCommDetector::CleanupFrameInfo(void)
         if ((i < 10) || ((i+10) > m_framesProcessed))
             continue;
 
-        before = 0;
+        int before = 0;
         for (int offset = 1; offset <= 10; offset++)
             if ((frameInfo[i - offset].flagMask & COMM_FRAME_LOGO_PRESENT) != 0)
                 before++;
 
-        after = 0;
+        int after = 0;
         for (int offset = 1; offset <= 10; offset++)
             if ((frameInfo[i + offset].flagMask & COMM_FRAME_LOGO_PRESENT) != 0)
                 after++;
 
-        value = frameInfo[i].flagMask;
+        int value = frameInfo[i].flagMask;
         if (value == -1)
             frameInfo[i].flagMask = 0;
 

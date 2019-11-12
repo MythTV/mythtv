@@ -119,7 +119,7 @@ VideoSync::VideoSync(VideoOutput *video_output, int refreshint) :
 
 int64_t VideoSync::GetTime(void)
 {
-    struct timeval now_tv;
+    struct timeval now_tv {};
     gettimeofday(&now_tv, nullptr);
     return now_tv.tv_sec * 1000000LL + now_tv.tv_usec;
 }

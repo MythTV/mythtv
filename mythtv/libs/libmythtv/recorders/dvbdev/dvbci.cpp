@@ -240,10 +240,10 @@ bool cMutexLock::Lock(cMutex *Mutex)
 class cTPDU {
 private:
   int     m_size {0};
-  uint8_t m_data[MAX_TPDU_SIZE];
+  uint8_t m_data[MAX_TPDU_SIZE] {0};
   const uint8_t *GetData(const uint8_t *Data, int &Length);
 public:
-  cTPDU(void) { memset(m_data, 0, sizeof(uint8_t) * MAX_TPDU_SIZE); }
+  cTPDU(void) = default;
   cTPDU(uint8_t Slot, uint8_t Tcid, uint8_t Tag, int Length = 0, const uint8_t *Data = nullptr);
   uint8_t Slot(void) { return m_data[0]; }
   uint8_t Tcid(void) { return m_data[1]; }
@@ -370,12 +370,12 @@ enum eState { stIDLE, stCREATION, stACTIVE, stDELETION };
 class cCiTransportConnection {
   friend class cCiTransportLayer;
 private:
-  int             m_fd;
-  uint8_t         m_slot;
-  uint8_t         m_tcid;
+  int             m_fd            {-1};
+  uint8_t         m_slot          {0};
+  uint8_t         m_tcid          {0};
   eState          m_state         {stIDLE};
   cTPDU          *m_tpdu          {nullptr};
-  struct timeval  m_last_poll;
+  struct timeval  m_last_poll     {0,0};
   int             m_lastResponse  {ERROR};
   bool            m_dataAvailable {false};
   void Init(int Fd, uint8_t Slot, uint8_t Tcid);
@@ -398,8 +398,6 @@ public:
 
 cCiTransportConnection::cCiTransportConnection(void)
 {
-  m_last_poll.tv_sec = 0;
-  m_last_poll.tv_usec = 0;
   Init(-1, 0, 0);
 }
 
@@ -547,7 +545,7 @@ int cCiTransportConnection::CreateConnection(void)
 
 int cCiTransportConnection::Poll(void)
 {
-  struct timeval curr_time;
+  struct timeval curr_time {};
 
   if (m_state != stACTIVE)
     return ERROR;
@@ -989,10 +987,10 @@ bool cCiApplicationInformation::EnterMenu(void)
 
 class cCiConditionalAccessSupport : public cCiSession {
 private:
-  int state;
-  int m_numCaSystemIds;
-  unsigned short m_caSystemIds[MAXCASYSTEMIDS + 1]; // list is zero terminated!
-  bool m_needCaPmt;
+  int state {0};
+  int m_numCaSystemIds {0};
+  unsigned short m_caSystemIds[MAXCASYSTEMIDS + 1] {0}; // list is zero terminated!
+  bool m_needCaPmt {false};
 public:
   cCiConditionalAccessSupport(int SessionId, cCiTransportConnection *Tc);
   bool Process(int Length = 0, const uint8_t *Data = nullptr) override; // cCiSession
@@ -1003,11 +1001,9 @@ public:
 
 cCiConditionalAccessSupport::cCiConditionalAccessSupport(
     int SessionId, cCiTransportConnection *Tc) :
-    cCiSession(SessionId, RI_CONDITIONAL_ACCESS_SUPPORT, Tc),
-    state(0), m_numCaSystemIds(0), m_needCaPmt(false)
+    cCiSession(SessionId, RI_CONDITIONAL_ACCESS_SUPPORT, Tc)
 {
   dbgprotocol("New Conditional Access Support (session id %d)\n", SessionId);
-  memset(m_caSystemIds, 0, sizeof(m_caSystemIds));
 }
 
 bool cCiConditionalAccessSupport::Process(int Length, const uint8_t *Data)
@@ -1099,8 +1095,8 @@ void cCiDateTime::SetTimeOffset(double offset)
 bool cCiDateTime::SendDateTime(void)
 {
   time_t t = time(nullptr);
-  struct tm tm_gmt;
-  struct tm tm_loc;
+  struct tm tm_gmt {};
+  struct tm tm_loc {};
 
   // Avoid using signed time_t types
   if (timeOffset < 0)
@@ -1267,7 +1263,7 @@ bool cCiMMI::Process(int Length, const uint8_t *Data)
                  case DCC_SET_MMI_MODE:
                       if (l == 2 && *++d == MM_HIGH_LEVEL) {
                          struct tDisplayReply { uint8_t id; uint8_t mode; };
-                         tDisplayReply dr;
+                         tDisplayReply dr {};
                          dr.id = DRI_MMI_MODE_ACK;
                          dr.mode = MM_HIGH_LEVEL;
                          dbgprotocol("%d: ==> Display Reply\n", SessionId());
@@ -1376,7 +1372,7 @@ bool cCiMMI::SendAnswer(const char *Text)
 {
   dbgprotocol("%d: ==> Answ\n", SessionId());
   struct tAnswer { uint8_t id; char text[256]; };//XXX
-  tAnswer answer;
+  tAnswer answer {};
   answer.id = Text ? AI_ANSWER : AI_CANCEL;
   if (Text) {
      strncpy(answer.text, Text, sizeof(answer.text) - 1);
@@ -1393,8 +1389,6 @@ cCiMenu::cCiMenu(cCiMMI *MMI, bool Selectable)
 {
   m_mmi = MMI;
   m_selectable = Selectable;
-  for (int i = 0; i < MAX_CIMENU_ENTRIES; i++)
-      m_entries[i] = nullptr;
 }
 
 cCiMenu::~cCiMenu()
@@ -1545,8 +1539,6 @@ void cCiCaPmt::AddCaDescriptor(int ca_system_id, int ca_pid, int data_len,
 cLlCiHandler::cLlCiHandler(int Fd, int NumSlots)
 {
   m_numSlots = NumSlots;
-  for (int i = 0; i < MAX_CI_SESSION; i++)
-      m_sessions[i] = nullptr;
   m_tpl = new cCiTransportLayer(Fd, m_numSlots);
   m_fdCa = Fd;
 }
@@ -1782,7 +1774,9 @@ bool cLlCiHandler::Process(void)
             UserIO |= m_sessions[i]->HasUserIO();
             if (m_sessions[i]->ResourceId() == RI_CONDITIONAL_ACCESS_SUPPORT)
             {
-                cCiConditionalAccessSupport *cas = (cCiConditionalAccessSupport *) m_sessions[i];
+                auto cas = dynamic_cast<cCiConditionalAccessSupport *>(m_sessions[i]);
+                if (cas == nullptr)
+                    continue;
                 m_needCaPmt |= cas->NeedCaPmt();
             }
         }
@@ -1797,7 +1791,7 @@ bool cLlCiHandler::Process(void)
 bool cLlCiHandler::EnterMenu(int Slot)
 {
   cMutexLock MutexLock(&m_mutex);
-  cCiApplicationInformation *api = (cCiApplicationInformation *)GetSessionByResourceId(RI_APPLICATION_INFORMATION, Slot);
+  auto api = dynamic_cast<cCiApplicationInformation *>(GetSessionByResourceId(RI_APPLICATION_INFORMATION, Slot));
   return api ? api->EnterMenu() : false;
 }
 
@@ -1805,7 +1799,7 @@ cCiMenu *cLlCiHandler::GetMenu(void)
 {
   cMutexLock MutexLock(&m_mutex);
   for (int Slot = 0; Slot < m_numSlots; Slot++) {
-      cCiMMI *mmi = (cCiMMI *)GetSessionByResourceId(RI_MMI, Slot);
+      cCiMMI *mmi = dynamic_cast<cCiMMI *>(GetSessionByResourceId(RI_MMI, Slot));
       if (mmi)
          return mmi->Menu();
       }
@@ -1816,7 +1810,7 @@ cCiEnquiry *cLlCiHandler::GetEnquiry(void)
 {
   cMutexLock MutexLock(&m_mutex);
   for (int Slot = 0; Slot < m_numSlots; Slot++) {
-      cCiMMI *mmi = (cCiMMI *)GetSessionByResourceId(RI_MMI, Slot);
+      cCiMMI *mmi = dynamic_cast<cCiMMI *>(GetSessionByResourceId(RI_MMI, Slot));
       if (mmi)
          return mmi->Enquiry();
       }
@@ -1826,14 +1820,14 @@ cCiEnquiry *cLlCiHandler::GetEnquiry(void)
 const unsigned short *cLlCiHandler::GetCaSystemIds(int Slot)
  {
   cMutexLock MutexLock(&m_mutex);
-  cCiConditionalAccessSupport *cas = (cCiConditionalAccessSupport *)GetSessionByResourceId(RI_CONDITIONAL_ACCESS_SUPPORT, Slot);
+  auto cas = dynamic_cast<cCiConditionalAccessSupport *>(GetSessionByResourceId(RI_CONDITIONAL_ACCESS_SUPPORT, Slot));
   return cas ? cas->GetCaSystemIds() : nullptr;
 }
 
 bool cLlCiHandler::SetCaPmt(cCiCaPmt &CaPmt, int Slot)
 {
   cMutexLock MutexLock(&m_mutex);
-  cCiConditionalAccessSupport *cas = (cCiConditionalAccessSupport *)GetSessionByResourceId(RI_CONDITIONAL_ACCESS_SUPPORT, Slot);
+  auto cas = dynamic_cast<cCiConditionalAccessSupport *>(GetSessionByResourceId(RI_CONDITIONAL_ACCESS_SUPPORT, Slot));
   return cas && cas->SendPMT(CaPmt);
 }
 
@@ -1844,7 +1838,7 @@ void cLlCiHandler::SetTimeOffset(double offset_in_seconds)
 
     for (uint i = 0; i < (uint) NumSlots(); i++)
     {
-        dt = (cCiDateTime*) GetSessionByResourceId(RI_DATE_TIME, i);
+        dt = dynamic_cast<cCiDateTime*>(GetSessionByResourceId(RI_DATE_TIME, i));
         if (dt)
             dt->SetTimeOffset(offset_in_seconds);
     }
@@ -1867,7 +1861,6 @@ bool cLlCiHandler::connected() const
 cHlCiHandler::cHlCiHandler(int Fd, int NumSlots)
 {
     m_numSlots = NumSlots;
-    m_caSystemIds[0] = 0;
     m_fdCa = Fd;
     esyslog("New High level CI handler");
 }
@@ -1905,7 +1898,7 @@ bool cHlCiHandler::Process(void)
 {
     cMutexLock MutexLock(&m_mutex);
 
-    struct ca_msg msg;
+    struct ca_msg msg {};
     switch(m_state) {
     case 0:
         // Get CA_system_ids
@@ -1973,7 +1966,7 @@ const unsigned short *cHlCiHandler::GetCaSystemIds(int /*Slot*/)
 bool cHlCiHandler::SetCaPmt(cCiCaPmt &CaPmt, int /*Slot*/)
 {
     cMutexLock MutexLock(&m_mutex);
-    struct ca_msg msg;
+    struct ca_msg msg {};
 
     esyslog("Setting CA PMT.");
     m_state = 2;

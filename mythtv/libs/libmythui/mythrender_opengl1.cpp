@@ -120,13 +120,13 @@ uint MythRenderOpenGL1::CreateShaderObject(const QString &vert, const QString &f
         return 0;
 
     bool success = true;
-    GLint error;
+    GLint error = 0;
 
     makeCurrent();
 
     QByteArray tmp = frag.toLatin1();
 
-    GLuint glfp;
+    GLuint glfp = 0;
     m_glGenProgramsARB(1, &glfp);
     m_glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, glfp);
     m_glProgramStringARB(GL_FRAGMENT_PROGRAM_ARB,
@@ -171,8 +171,7 @@ void MythRenderOpenGL1::DeleteShaderObject(uint fp)
         return;
 
     makeCurrent();
-    QVector<GLuint>::iterator it;
-    for (it = m_programs.begin(); it != m_programs.end(); ++it)
+    for (auto it = m_programs.begin(); it != m_programs.end(); ++it)
     {
         if (*it == fp)
         {
@@ -273,8 +272,7 @@ void MythRenderOpenGL1::PopTransformation(void)
 
 void MythRenderOpenGL1::DeleteShaders(void)
 {
-    QVector<GLuint>::iterator it;
-    for (it = m_programs.begin(); it != m_programs.end(); ++it)
+    for (auto it = m_programs.begin(); it != m_programs.end(); ++it)
         m_glDeleteProgramsARB(1, &(*(it)));
     m_programs.clear();
     Flush(true);

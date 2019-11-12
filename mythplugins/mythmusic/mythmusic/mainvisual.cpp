@@ -146,7 +146,7 @@ void MainVisual::prepare()
 // Caller holds mutex() lock
 void MainVisual::add(const void *buffer, unsigned long b_len, unsigned long timecode, int source_channels, int bits_per_sample)
 {
-    unsigned long len = b_len, cnt;
+    unsigned long len = b_len;
     short *l = nullptr, *r = nullptr;
     bool s32le = false;
 
@@ -165,7 +165,7 @@ void MainVisual::add(const void *buffer, unsigned long b_len, unsigned long time
     if (len > m_samples)
         len = m_samples;
 
-    cnt = len;
+    int cnt = len;
 
     if (source_channels == 2)
     {

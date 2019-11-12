@@ -319,7 +319,6 @@ AudioOutput::AudioDeviceConfig* AudioOutput::GetAudioDeviceConfig(
     QString &name, QString &desc, bool willsuspendpa)
 {
     AudioOutputSettings aosettings(true);
-    AudioOutput::AudioDeviceConfig *adc;
 
     AudioOutput *ao = OpenAudio(name, QString(), willsuspendpa);
     if (ao)
@@ -406,7 +405,7 @@ AudioOutput::AudioDeviceConfig* AudioOutput::GetAudioDeviceConfig(
     }
     LOG(VB_AUDIO, LOG_INFO, QString("Found %1 (%2)")
                                 .arg(name).arg(capabilities));
-    adc = new AudioOutput::AudioDeviceConfig(name, capabilities);
+    auto adc = new AudioOutput::AudioDeviceConfig(name, capabilities);
     adc->m_settings = aosettings;
     return adc;
 }
@@ -435,7 +434,6 @@ static void fillSelectionsFromDir(const QDir &dir,
 AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
 {
     ADCVect *list = new ADCVect;
-    AudioDeviceConfig *adc;
 
 #ifdef USING_PULSE
     bool pasuspended = PulseHandler::Suspend(PulseHandler::kPulseSuspend);
@@ -453,7 +451,7 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
             QString desc = i.value();
             QString devname = QString("ALSA:%1").arg(key);
 
-            adc = GetAudioDeviceConfig(devname, desc);
+            auto adc = GetAudioDeviceConfig(devname, desc);
             if (!adc)
                 continue;
             list->append(*adc);
@@ -483,7 +481,7 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
     {
         QString name = "JACK:";
         QString desc = tr("Use JACK default sound server.");
-        adc = GetAudioDeviceConfig(name, desc);
+        auto adc = GetAudioDeviceConfig(name, desc);
         if (adc)
         {
             list->append(*adc);
@@ -504,7 +502,7 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
                 QString desc = i.value();
                 QString devname = QString("CoreAudio:%1").arg(key);
 
-                adc = GetAudioDeviceConfig(devname, desc);
+                auto adc = GetAudioDeviceConfig(devname, desc);
                 if (!adc)
                     continue;
                 list->append(*adc);
@@ -514,7 +512,7 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
         delete devs;
         QString name = "CoreAudio:Default Output Device";
         QString desc = tr("CoreAudio default output");
-        adc = GetAudioDeviceConfig(name, desc);
+        auto adc = GetAudioDeviceConfig(name, desc);
         if (adc)
         {
             list->append(*adc);
@@ -526,7 +524,7 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
     {
         QString name = "Windows:";
         QString desc = "Windows default output";
-        adc = GetAudioDeviceConfig(name, desc);
+        auto adc = GetAudioDeviceConfig(name, desc);
         if (adc)
         {
             list->append(*adc);
@@ -563,7 +561,7 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
     {
         QString name = "PulseAudio:default";
         QString desc =  tr("PulseAudio default sound server.");
-        adc = GetAudioDeviceConfig(name, desc);
+        auto adc = GetAudioDeviceConfig(name, desc);
         if (adc)
         {
             list->append(*adc);
@@ -576,7 +574,7 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
     {
         QString name = "OpenSLES:";
         QString desc =  tr("OpenSLES default output. Stereo support only.");
-        adc = GetAudioDeviceConfig(name, desc);
+        auto adc = GetAudioDeviceConfig(name, desc);
         if (adc)
         {
             list->append(*adc);
@@ -586,7 +584,7 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
     {
         QString name = "AudioTrack:";
         QString desc =  tr("Android AudioTrack output. Supports surround sound.");
-        adc = GetAudioDeviceConfig(name, desc);
+        auto adc = GetAudioDeviceConfig(name, desc);
         if (adc)
         {
             list->append(*adc);
@@ -600,7 +598,7 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
     {
         QString name = "OpenMAX:analog";
         QString desc =  tr("OpenMAX analog output.");
-        adc = GetAudioDeviceConfig(name, desc);
+        auto adc = GetAudioDeviceConfig(name, desc);
         if (adc)
         {
             list->append(*adc);
@@ -620,7 +618,7 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
 
     QString name = "NULL";
     QString desc = "NULL device";
-    adc = GetAudioDeviceConfig(name, desc);
+    auto adc = GetAudioDeviceConfig(name, desc);
     if (adc)
     {
         list->append(*adc);
@@ -641,7 +639,6 @@ int AudioOutput::DecodeAudio(AVCodecContext *ctx,
                              const AVPacket *pkt)
 {
     bool got_frame = false;
-    int ret;
     char error[AV_ERROR_MAX_STRING_SIZE];
 
     data_size = 0;
@@ -663,7 +660,7 @@ int AudioOutput::DecodeAudio(AVCodecContext *ctx,
 //  into separate routines or separate threads.
 //  Also now that it always consumes a whole buffer some code
 //  in the caller may be able to be optimized.
-    ret = avcodec_receive_frame(ctx,m_frame);
+    int ret = avcodec_receive_frame(ctx,m_frame);
     if (ret == 0)
         got_frame = true;
     if (ret == AVERROR(EAGAIN))
@@ -698,7 +695,7 @@ int AudioOutput::DecodeAudio(AVCodecContext *ctx,
 
     // May need to convert audio to S16
     AudioConvert converter(fmt, CanProcess(fmt) ? fmt : FORMAT_S16);
-    uint8_t* src;
+    uint8_t* src = nullptr;
 
     if (av_sample_fmt_is_planar(format))
     {

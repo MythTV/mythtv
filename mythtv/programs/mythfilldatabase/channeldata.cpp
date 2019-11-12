@@ -60,7 +60,7 @@ bool ChannelData::insert_chan(uint sourceid)
     bool insert_channels = m_channelUpdates;
     if (!insert_channels)
     {
-        bool isEncoder, isUnscanable;
+        bool isEncoder = false, isUnscanable = false;
         bool isCableCard  = SourceUtil::IsCableCardPresent(sourceid);
         if (m_cardType.isEmpty())
         {
@@ -115,7 +115,7 @@ unsigned int ChannelData::promptForChannelUpdates(
     return(chanid);
 }
 
-QString ChannelData::normalizeChannelKey(const QString &chanName) const
+QString ChannelData::normalizeChannelKey(const QString &chanName)
 {
     QString result = chanName;
 
@@ -149,7 +149,7 @@ ChannelList ChannelData::channelList(int sourceId)
 }
 
 ChannelInfo ChannelData::FindMatchingChannel(const ChannelInfo &chanInfo,
-                                             ChannelList existingChannels) const
+                                             ChannelList existingChannels)
 {
     ChannelList::iterator it;
     for (it = existingChannels.begin(); it != existingChannels.end(); ++it)
@@ -393,7 +393,7 @@ void ChannelData::handleChannels(int id, ChannelInfoList *chanlist)
         }
         else if (insertChan) // Only insert channels for non-scannable sources
         {
-            int major, minor = 0;
+            int major = 0, minor = 0;
             long long freq = 0;
             get_atsc_stuff((*i).m_channum, id, (*i).m_freqid.toInt(), major, minor, freq);
 

@@ -70,28 +70,26 @@ static void denoise(uint8_t *Frame,
                     int W, int H,
                     const uint8_t *Spatial, const uint8_t *Temporal)
 {
-    uint8_t prev;
-    int X, Y;
     uint8_t *LineCur = Frame;
     uint8_t *LinePrev = FramePrev;
 
-    prev = Line[0] = Frame[0];
+    uint8_t prev = Line[0] = Frame[0];
     Frame[0] = LowPass (FramePrev[0], Frame[1], Temporal);
-    for (X = 1; X < W; X++)
+    for (int X = 1; X < W; X++)
     {
         prev = LowPass (prev, Frame[X], Spatial);
         Line[X] = prev;
         FramePrev[X] = Frame[X] = LowPass (FramePrev[X], prev, Temporal);
     }
 
-    for (Y = 1; Y < H; Y++)
+    for (int Y = 1; Y < H; Y++)
     {
         LineCur += W;
         LinePrev += W;
         prev = LineCur[0];
         Line[0] = LowPass (Line[0], prev, Spatial);
         LineCur[0] = LowPass (LinePrev[0], Line[0], Temporal);
-        for (X = 1; X < W; X++)
+        for (int X = 1; X < W; X++)
         {
             prev = LowPass (prev, LineCur[X], Spatial);
             Line[X] = LowPass (Line[X], prev, Spatial);
@@ -108,7 +106,7 @@ static void denoiseMMX(uint8_t *Frame,
                        int W, int H,
                        const uint8_t *Spatial, const uint8_t *Temporal)
 {
-    int X, i;
+    int X = 0;
     uint8_t *LineCur = Frame;
     uint8_t *LinePrev = FramePrev;
     uint8_t *End = Frame + W * H;
@@ -152,7 +150,7 @@ static void denoiseMMX(uint8_t *Frame,
         movq_m2r (Line[X], mm4);
         movq_m2r (Line[X+8], mm6);
 
-        for (i = 0; i < 16; i++)
+        for (int i = 0; i < 16; i++)
             cbuf[i] = Temporal[wbuf[i]];
 
         paddb_m2r (cbuf[0], mm4);
@@ -206,7 +204,7 @@ static void denoiseMMX(uint8_t *Frame,
             movq_m2r (LineCur[X], mm4);
             movq_m2r (LineCur[X+8], mm6);
 
-            for (i = 0; i < 16; i++)
+            for (int i = 0; i < 16; i++)
                 cbuf[i] = Spatial[wbuf[i]];
 
             movq_m2r (LinePrev[X], mm0);
@@ -243,7 +241,7 @@ static void denoiseMMX(uint8_t *Frame,
             movq_m2r (Line[X], mm4);
             movq_m2r (Line[X+8], mm6);
 
-            for (i = 0; i < 16; i++)
+            for (int i = 0; i < 16; i++)
                 cbuf[i] = Temporal[wbuf[i]];
 
             paddb_m2r (cbuf[0], mm4);
@@ -389,7 +387,6 @@ static VideoFilter *NewDenoise3DFilter(VideoFrameType inpixfmt,
     double LumTmp    = PARAM3_DEFAULT;
     double ChromSpac = PARAM2_DEFAULT;
     double ChromTmp  = 0.0;
-    ThisFilter *filter;
 
     (void) width;
     (void) height;
@@ -401,7 +398,7 @@ static VideoFilter *NewDenoise3DFilter(VideoFrameType inpixfmt,
         return NULL;
     }
 
-    filter = malloc(sizeof (ThisFilter));
+    ThisFilter *filter = malloc(sizeof (ThisFilter));
     if (filter == NULL)
     {
         fprintf (stderr, "Denoise3D: failed to allocate memory for filter\n");
@@ -424,7 +421,7 @@ static VideoFilter *NewDenoise3DFilter(VideoFrameType inpixfmt,
 
     if (options)
     {
-        double param1, param2, param3;
+        double param1=NAN, param2=NAN, param3=NAN;
         switch (sscanf(options, "%20lf:%20lf:%20lf",
                        &param1, &param2, &param3))
         {

@@ -737,10 +737,9 @@ void EditMetadataDialog::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
-
+        auto dce = dynamic_cast<DialogCompletionEvent*>(event);
         // make sure the user didn't ESCAPE out of the menu
-        if (dce->GetResult() < 0)
+        if ((dce == nullptr) || (dce->GetResult() < 0))
             return;
 
         QString resultid   = dce->GetId();
@@ -782,7 +781,9 @@ void EditMetadataDialog::customEvent(QEvent *event)
     }
     else if (event->type() == MythEvent::MythEventMessage)
     {
-        MythEvent *me = static_cast<MythEvent *>(event);
+        MythEvent *me = dynamic_cast<MythEvent *>(event);
+        if (me == nullptr)
+            return;
         QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);
 
         if (!tokens.isEmpty())
@@ -803,15 +804,15 @@ void EditMetadataDialog::customEvent(QEvent *event)
                 {
                     QString cleanName = fixFilename(s_metadata->Artist().toLower());
                     QString file = QString("Icons/%1/%2.jpg").arg("artist").arg(cleanName);
-                    newFilename = gCoreContext->GenMythURL(gCoreContext->GetMasterHostName(),
-                                                           0, file, "MusicArt");
+                    newFilename = MythCoreContext::GenMythURL(gCoreContext->GetMasterHostName(),
+                                                              0, file, "MusicArt");
                 }
                 else if (m_searchType == "genre")
                 {
                     QString cleanName = fixFilename(s_metadata->Genre().toLower());
                     QString file = QString("Icons/%1/%2.jpg").arg("genre").arg(cleanName);
-                    newFilename = gCoreContext->GenMythURL(gCoreContext->GetMasterHostName(),
-                                                           0, file, "MusicArt");
+                    newFilename = MythCoreContext::GenMythURL(gCoreContext->GetMasterHostName(),
+                                                              0, file, "MusicArt");
                 }
                 else if (m_searchType == "album")
                 {
@@ -1095,10 +1096,9 @@ void EditAlbumartDialog::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
-
+        auto dce = dynamic_cast<DialogCompletionEvent*>(event);
         // make sure the user didn't ESCAPE out of the menu
-        if (dce->GetResult() < 0)
+        if ((dce == nullptr) || (dce->GetResult() < 0))
             return;
 
         QString resultid   = dce->GetId();
@@ -1170,7 +1170,9 @@ void EditAlbumartDialog::customEvent(QEvent *event)
     }
     else if (event->type() == MythEvent::MythEventMessage)
     {
-        MythEvent *me = static_cast<MythEvent *>(event);
+        MythEvent *me = dynamic_cast<MythEvent *>(event);
+        if (me == nullptr)
+            return;
         QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);
 
         if (!tokens.isEmpty())
@@ -1328,9 +1330,9 @@ void EditAlbumartDialog::doCopyImageToTag(const AlbumArtImage *image)
 
     // copy the image to the tracks host
     QFileInfo fi(image->m_filename);
-    QString saveFilename = gCoreContext->GenMythURL(s_metadata->Hostname(), 0,
-                                                    QString("AlbumArt/") + fi.fileName(),
-                                                    "MusicArt");
+    QString saveFilename = MythCoreContext::GenMythURL(s_metadata->Hostname(), 0,
+                                                       QString("AlbumArt/") + fi.fileName(),
+                                                       "MusicArt");
 
     RemoteFile::CopyFile(image->m_filename, saveFilename, true);
 

@@ -45,10 +45,9 @@ ZMClient *ZMClient::get(void)
 bool ZMClient::setupZMClient(void)
 {
     QString zmserver_host;
-    int zmserver_port;
 
     zmserver_host = gCoreContext->GetSetting("ZoneMinderServerIP", "");
-    zmserver_port = gCoreContext->GetNumSetting("ZoneMinderServerPort", -1);
+    int zmserver_port = gCoreContext->GetNumSetting("ZoneMinderServerPort", -1);
 
     // don't try to connect if we don't have a valid host or port
     if (zmserver_host.isEmpty() || zmserver_port == -1)
@@ -290,7 +289,7 @@ void ZMClient::updateMonitorStatus(void)
         return;
     }
 
-    bool bOK;
+    bool bOK = false;
     int monitorCount = strList[1].toInt(&bOK);
     if (!bOK)
     {
@@ -361,7 +360,7 @@ bool ZMClient::updateAlarmStates(void)
         return false;
     }
 
-    bool bOK;
+    bool bOK = false;
     int monitorCount = strList[1].toInt(&bOK);
     if (!bOK)
     {
@@ -420,7 +419,7 @@ void ZMClient::getEventList(const QString &monitorName, bool oldestFirst,
         return;
     }
 
-    bool bOK;
+    bool bOK = false;
     int eventCount = strList[1].toInt(&bOK);
     if (!bOK)
     {
@@ -472,7 +471,7 @@ void ZMClient::getEventDates(const QString &monitorName, bool oldestFirst,
         return;
     }
 
-    bool bOK;
+    bool bOK = false;
     int dateCount = strList[1].toInt(&bOK);
     if (!bOK)
     {
@@ -516,7 +515,7 @@ void ZMClient::getFrameList(int eventID, vector<Frame*> *frameList)
         return;
     }
 
-    bool bOK;
+    bool bOK = false;
     int frameCount = strList[1].toInt(&bOK);
     if (!bOK)
     {
@@ -587,7 +586,6 @@ bool ZMClient::readData(unsigned char *data, int dataSize)
     int errmsgtime = 0;
     MythTimer timer;
     timer.start();
-    int elapsed;
 
     while (dataSize > 0)
     {
@@ -617,7 +615,7 @@ bool ZMClient::readData(unsigned char *data, int dataSize)
         }
         else
         {
-            elapsed = timer.elapsed();
+            int elapsed = timer.elapsed();
             if (elapsed  > 10000)
             {
                 if ((elapsed - errmsgtime) > 10000)
@@ -813,7 +811,7 @@ void ZMClient::getCameraList(QStringList &cameraList)
         return;
     }
 
-    bool bOK;
+    bool bOK = false;
     int cameraCount = strList[1].toInt(&bOK);
     if (!bOK)
     {
@@ -886,7 +884,7 @@ void ZMClient::doGetMonitorList(void)
         return;
     }
 
-    bool bOK;
+    bool bOK = false;
     int monitorCount = strList[1].toInt(&bOK);
     if (!bOK)
     {
@@ -967,8 +965,7 @@ void ZMClient::customEvent (QEvent* event)
 {
     if (event->type() == MythEvent::MythEventMessage)
     {
-        MythEvent *me = static_cast<MythEvent*>(event);
-
+        MythEvent *me = dynamic_cast<MythEvent*>(event);
         if (!me)
             return;
 

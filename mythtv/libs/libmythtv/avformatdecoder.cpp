@@ -426,10 +426,6 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
       m_ccd708(new CC708Decoder(parent->GetCC708Reader())),
       m_ttd(new TeletextDecoder(parent->GetTeletextReader()))
 {
-    memset(&m_readcontext, 0, sizeof(m_readcontext));
-    memset(m_ccX08_in_pmt, 0, sizeof(m_ccX08_in_pmt));
-    memset(m_ccX08_in_tracks, 0, sizeof(m_ccX08_in_tracks));
-
     m_audioSamples = (uint8_t *)av_mallocz(AudioOutput::MAX_SIZE_BUFFER);
     m_ccd608->SetIgnoreTimecode(true);
 
@@ -1447,7 +1443,7 @@ static enum AVPixelFormat get_format_vdpau(struct AVCodecContext *avctx,
     if (nd)
         player =  nd->GetPlayer();
     if (player)
-        videoOut = (VideoOutputVDPAU*)(player->GetVideoOutput());
+        videoOut = dynamic_cast<VideoOutputVDPAU*>(player->GetVideoOutput());
 
     if (videoOut)
     {
@@ -1457,8 +1453,9 @@ static enum AVPixelFormat get_format_vdpau(struct AVCodecContext *avctx,
         render->BindContext(avctx);
         if (avctx->hwaccel_context)
         {
-            ((AVVDPAUContext*)(avctx->hwaccel_context))->render2 =
-                render_wrapper_vdpau;
+            auto vdpau_context = (AVVDPAUContext*)(avctx->hwaccel_context);
+            if (vdpau_context != nullptr)
+                vdpau_context->render2 = render_wrapper_vdpau;
         }
     }
 
@@ -1700,6 +1697,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
                 .arg(ff_codec_id_string(enc->codec_id)));
     }
 
+    // NOLINTNEXTLINE(readability-misleading-indentation)
     QString deinterlacer;
     if (m_mythcodecctx)
         deinterlacer = m_mythcodecctx->getDeinterlacerName();
@@ -2541,6 +2539,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 dec = "ffmpeg";
             }
 
+            // NOLINTNEXTLINE(readability-misleading-indentation)
             if (version && FlagIsSet(kDecodeAllowGPU))
             {
                 bool foundgpudecoder = false;
@@ -3100,7 +3099,7 @@ int render_wrapper_vdpau(struct AVCodecContext *s, AVFrame *src,
     {
         AvFormatDecoder *nd = (AvFormatDecoder *)(s->opaque);
         VideoFrame *frame = (VideoFrame *)src->opaque;
-        struct vdpau_render_state data;
+        struct vdpau_render_state data {};
 
         data.surface = (VdpVideoSurface)(uintptr_t)src->data[3];
         data.bitstream_buffers_used = count;

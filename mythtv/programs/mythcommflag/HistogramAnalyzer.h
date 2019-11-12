@@ -63,7 +63,7 @@ private:
     int                  *m_fheight       {nullptr}; /* area of borders */
     Histogram            *m_histogram     {nullptr}; /* histogram */
     unsigned char        *m_monochromatic {nullptr}; /* computed boolean */
-    int                   m_histval[UCHAR_MAX + 1];  /* temporary buffer */
+    int                   m_histval[UCHAR_MAX + 1] {0}; /* temporary buffer */
     unsigned char        *m_buf           {nullptr}; /* temporary buffer */
     long long             m_lastframeno   {-1};
 
@@ -72,7 +72,7 @@ private:
     QString               m_debugdata;              /* filename */
     bool                  m_debug_histval {false};
     bool                  m_histval_done  {false};
-    struct timeval        m_analyze_time;
+    struct timeval        m_analyze_time  {0,0};
 };
 
 #endif  /* !__HISTOGRAMANALYZER_H__ */

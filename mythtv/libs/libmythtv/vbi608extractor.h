@@ -29,7 +29,7 @@
 class VBI608Extractor
 {
   public:
-    VBI608Extractor();
+    VBI608Extractor() {};
 
     uint16_t GetCode1(void) const { return m_code[0]; }
     uint16_t GetCode2(void) const { return m_code[1]; }
@@ -51,7 +51,7 @@ class VBI608Extractor
     QList<float> m_minimas;
     float        m_start       {0.0F};
     float        m_rate        {0.0F};
-    uint16_t     m_code[2];
+    uint16_t     m_code[2]     {UINT16_MAX, UINT16_MAX};
 };
 
 #endif // _VBI_608_EXTRACTOR_H_

@@ -313,8 +313,7 @@ void recalcItemSize(ArchiveItem *item)
         if (item->duration == 0)
             return;
 
-        int length;
-
+        int length = 0;
         if (item->hasCutlist && item->useCutlist)
             length = item->cutDuration;
         else

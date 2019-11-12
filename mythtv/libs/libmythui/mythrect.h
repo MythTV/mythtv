@@ -61,8 +61,8 @@ class MUI_PUBLIC MythRect : public QRect
     QRect toQRect(void) const;
 
   private:
-    bool parsePosition(float &percent, int &offset, int &absolute,
-                       const QString &value, bool is_size);
+    static bool parsePosition(float &percent, int &offset, int &absolute,
+                              const QString &value, bool is_size);
 
     float m_percentWidth  {0.0F};
     float m_percentHeight {0.0F};
@@ -112,8 +112,8 @@ class MUI_PUBLIC MythPoint : public QPoint
     QPoint toQPoint(void) const;
 
   private:
-    bool parsePosition(float &percent, int &offset, int &absolute,
-                       const QString &value);
+    static bool parsePosition(float &percent, int &offset, int &absolute,
+                              const QString &value);
 
     float m_percentX    {0.0F};
     float m_percentY    {0.0F};

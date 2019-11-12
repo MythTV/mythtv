@@ -29,9 +29,9 @@ class MBASE_PUBLIC MThreadPool
     static void ShutdownAllPools(void);
 
     void start(QRunnable *runnable, const QString& debugName, int priority = 0);
-    bool tryStart(QRunnable *runnable, QString debugName);
+    bool tryStart(QRunnable *runnable, const QString& debugName);
 
-    void startReserved(QRunnable *runnable, QString debugName,
+    void startReserved(QRunnable *runnable, const QString& debugName,
                        int waitForAvailMS = 0);
 
     int expiryTimeout(void) const;

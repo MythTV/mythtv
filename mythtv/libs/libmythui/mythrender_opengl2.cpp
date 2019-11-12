@@ -820,7 +820,7 @@ uint MythRenderOpenGL2::CreateShader(int type, const QString &source)
     const char* tmp[1] = { src.constData() };
     m_glShaderSource(result, 1, tmp, nullptr);
     m_glCompileShader(result);
-    GLint compiled;
+    GLint compiled = false;
     m_glGetShaderiv(result, GL_COMPILE_STATUS, &compiled);
     if (!compiled)
     {
@@ -860,7 +860,7 @@ bool MythRenderOpenGL2::ValidateShaderObject(uint obj)
 
 bool MythRenderOpenGL2::CheckObjectStatus(uint obj)
 {
-    int ok;
+    int ok = false;
 #ifdef GL_LINK_STATUS
     m_glGetProgramiv(obj, GL_LINK_STATUS, &ok);
 #else
@@ -872,7 +872,6 @@ bool MythRenderOpenGL2::CheckObjectStatus(uint obj)
     LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to link shader object.");
     int infologLength = 0;
     int charsWritten  = 0;
-    char *infoLog;
 #ifdef GL_INFO_LOG_LENGTH
     m_glGetProgramiv(obj, GL_INFO_LOG_LENGTH, &infologLength);
 #else
@@ -880,7 +879,7 @@ bool MythRenderOpenGL2::CheckObjectStatus(uint obj)
 #endif
     if (infologLength > 0)
     {
-        infoLog = (char *)malloc(infologLength);
+        char *infoLog = (char *)malloc(infologLength);
         m_glGetProgramInfoLog(obj, infologLength, &charsWritten, infoLog);
         LOG(VB_GENERAL, LOG_ERR, QString("\n\n%1").arg(infoLog));
         free(infoLog);

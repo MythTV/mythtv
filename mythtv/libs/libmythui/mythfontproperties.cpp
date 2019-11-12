@@ -219,8 +219,8 @@ MythFontProperties *MythFontProperties::ParseFromXml(
         fromBase = true;
     }
 
-    int size, pixelsize;
-    size = pixelsize = -1;
+    int size = -1;
+    int pixelsize = -1;
 
     QString face = element.attribute("face", "");
     if (face.isEmpty())

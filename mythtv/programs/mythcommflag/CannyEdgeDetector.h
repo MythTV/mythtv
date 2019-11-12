@@ -35,12 +35,12 @@ private:
 
     unsigned int   *m_sgm         {nullptr}; /* squared-gradient magnitude */
     unsigned int   *m_sgmsorted   {nullptr}; /* squared-gradient magnitude */
-    AVFrame         m_s1;                    /* smoothed grayscale frame */
-    AVFrame         m_s2;                    /* smoothed grayscale frame */
-    AVFrame         m_convolved;             /* smoothed grayscale frame */
+    AVFrame         m_s1          {};        /* smoothed grayscale frame */
+    AVFrame         m_s2          {};        /* smoothed grayscale frame */
+    AVFrame         m_convolved   {};        /* smoothed grayscale frame */
     int             m_ewidth      {-1};      /* dimensions */
     int             m_eheight     {-1};      /* dimensions */
-    AVFrame         m_edges;                 /* detected edges */
+    AVFrame         m_edges       {};        /* detected edges */
 
     struct {
         int         row, col, width, height;

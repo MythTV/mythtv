@@ -51,10 +51,6 @@ DTVRecorder::DTVRecorder(TVRec *rec) :
 
     DTVRecorder::ResetForNewFile();
 
-    memset(m_stream_id,  0, sizeof(m_stream_id));
-    memset(m_pid_status, 0, sizeof(m_pid_status));
-    memset(m_continuity_counter, 0xff, sizeof(m_continuity_counter));
-
     m_minimum_recording_quality =
         gCoreContext->GetNumSetting("MinimumRecordingQuality", 95);
 

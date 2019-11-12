@@ -121,9 +121,8 @@ namespace
 
 void EditRomInfoDialog::customEvent(QEvent *event)
 {
-    if (event->type() == DialogCompletionEvent::kEventType)
+    if (auto dce = dynamic_cast<DialogCompletionEvent*>(event))
     {
-        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
         const QString resultid = dce->GetId();
 
         if (resultid == CEID_FANARTFILE)

@@ -47,7 +47,7 @@ class DTVChannel : public ChannelBase
     QString GetFormat(void) { return m_tvFormat; }
 
     /// \brief To be used by the channel scanner and possibly the EIT scanner.
-    virtual bool TuneMultiplex(uint mplexid, QString inputname);
+    virtual bool TuneMultiplex(uint mplexid, const QString& inputname);
     /// \brief This performs the actual frequency tuning and in some cases
     ///        input switching.
     ///

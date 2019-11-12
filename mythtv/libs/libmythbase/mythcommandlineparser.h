@@ -40,14 +40,14 @@ class MBASE_PUBLIC CommandLineArg : public ReferenceCounter
     void            Set(QVariant val)               { m_stored = val;
                                                       m_given = true; }
 
-    CommandLineArg* SetParent(QString opt);
+    CommandLineArg* SetParent(const QString &opt);
     CommandLineArg* SetParent(QStringList opts);
-    CommandLineArg* SetParentOf(QString opt);
+    CommandLineArg* SetParentOf(const QString &opt);
     CommandLineArg* SetParentOf(QStringList opts);
 
-    CommandLineArg* SetChild(QString opt);
+    CommandLineArg* SetChild(const QString& opt);
     CommandLineArg* SetChild(QStringList opt);
-    CommandLineArg* SetChildOf(QString opt);
+    CommandLineArg* SetChildOf(const QString& opt);
     CommandLineArg* SetChildOf(QStringList opts);
 
     CommandLineArg* SetRequiredChild(const QString& opt);
@@ -55,9 +55,9 @@ class MBASE_PUBLIC CommandLineArg : public ReferenceCounter
     CommandLineArg* SetRequiredChildOf(const QString& opt);
     CommandLineArg* SetRequiredChildOf(QStringList opt);
 
-    CommandLineArg* SetRequires(QString opt);
+    CommandLineArg* SetRequires(const QString &opt);
     CommandLineArg* SetRequires(QStringList opts);
-    CommandLineArg* SetBlocks(QString opt);
+    CommandLineArg* SetBlocks(const QString &opt);
     CommandLineArg* SetBlocks(QStringList opts);
 
     CommandLineArg* SetDeprecated(QString depstr = "");
@@ -117,7 +117,7 @@ class MBASE_PUBLIC MythCommandLineParser
    ~MythCommandLineParser();
 
     virtual void LoadArguments(void) {};
-    void PrintVersion(void) const;
+    static void PrintVersion(void) ;
     void PrintHelp(void) const;
     QString GetHelpString(void) const;
     virtual QString GetHelpHeader(void) const { return ""; }
@@ -258,7 +258,7 @@ class MBASE_PUBLIC MythCommandLineParser
     QDateTime               toDateTime(const QString& key) const;
 
     bool                    SetValue(const QString &key, const QVariant& value);
-    int                     ConfigureLogging(QString mask = "general",
+    int                     ConfigureLogging(const QString& mask = "general",
                                              unsigned int progress = 0);
     void                    ApplySettingsOverride(void);
     int                     Daemonize(void);

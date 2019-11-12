@@ -28,10 +28,10 @@ class TestSortHelper : public QObject
     Q_OBJECT
 
 private slots:
-    void Singleton(void);
-    void titles_timing_data(void);
-    void titles_timing(void);
-    void pathnames_timing_data(void);
-    void pathnames_timing(void);
-    void Variations_test(void);
+    static void Singleton(void);
+    static void titles_timing_data(void);
+    static void titles_timing(void);
+    static void pathnames_timing_data(void);
+    static void pathnames_timing(void);
+    static void Variations_test(void);
 };

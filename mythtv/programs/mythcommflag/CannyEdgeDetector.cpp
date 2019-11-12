@@ -28,33 +28,24 @@ CannyEdgeDetector::CannyEdgeDetector(void)
     const double    sigma = 0.5;
     const double    TWO_SIGMA2 = 2 * sigma * sigma;
 
-    double          val, sum;
-    int             mask_width, rr, ii;
-
     /* The SGM computations require that mask_radius >= 2. */
     m_mask_radius = max(2, (int)roundf(TRUNCATION * sigma));
-    mask_width = 2 * m_mask_radius + 1;
+    int mask_width = 2 * m_mask_radius + 1;
 
     /* Compute Gaussian mask. */
     m_mask = new double[mask_width];
-    val = 1.0;  /* Initialize center of Gaussian mask (rr=0 => exp(0)). */
+    double val = 1.0;  /* Initialize center of Gaussian mask (rr=0 => exp(0)). */
     m_mask[m_mask_radius] = val;
-    sum = val;
-    for (rr = 1; rr <= m_mask_radius; rr++)
+    double sum = val;
+    for (int rr = 1; rr <= m_mask_radius; rr++)
     {
         val = exp(-(rr * rr) / TWO_SIGMA2); // Gaussian weight(rr,sigma)
         m_mask[m_mask_radius + rr] = val;
         m_mask[m_mask_radius - rr] = val;
         sum += 2 * val;
     }
-    for (ii = 0; ii < mask_width; ii++)
+    for (int ii = 0; ii < mask_width; ii++)
         m_mask[ii] /= sum;    /* normalize to [0,1] */
-
-    memset(&m_s1, 0, sizeof(m_s1));
-    memset(&m_s2, 0, sizeof(m_s2));
-    memset(&m_convolved, 0, sizeof(m_convolved));
-    memset(&m_edges, 0, sizeof(m_edges));
-    memset(&m_exclude, 0, sizeof(m_exclude));
 }
 
 CannyEdgeDetector::~CannyEdgeDetector(void)

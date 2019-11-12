@@ -79,7 +79,7 @@ class BookmarkManager : public MythScreenType
     void slotDoDeleteMarked(bool doDelete);
     void slotBrowserClosed(void);
 
-    void slotSettings(void);
+    static void slotSettings(void);
     void slotSetHomepage(void);
     void slotAddBookmark(void);
     void slotEditBookmark(void);

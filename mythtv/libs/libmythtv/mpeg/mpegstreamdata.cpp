@@ -41,28 +41,10 @@ using namespace std;
 MPEGStreamData::MPEGStreamData(int desiredProgram, int cardnum,
                                bool cacheTables)
     : _cardid(cardnum),
-      _sistandard("mpeg"),
-      _have_CRC_bug(false),
-      _si_time_offset_cnt(0),
-      _si_time_offset_indx(0),
-      _eit_helper(nullptr), _eit_rate(0.0F),
-      _listening_disabled(false),
-      _encryption_lock(QMutex::Recursive), _listener_lock(QMutex::Recursive),
-      _cache_tables(cacheTables), _cache_lock(QMutex::Recursive),
+      _cache_tables(cacheTables),
       // Single program stuff
-      _desired_program(desiredProgram),
-      _recording_type("all"),
-      _strip_pmt_descriptors(false),
-      _normalize_stream_type(true),
-      _pid_video_single_program(0xffffffff),
-      _pid_pmt_single_program(0xffffffff),
-      _pmt_single_program_num_video(1),
-      _pmt_single_program_num_audio(0),
-      _pat_single_program(nullptr), _pmt_single_program(nullptr),
-      _invalid_pat_seen(false), _invalid_pat_warning(false)
+      _desired_program(desiredProgram)
 {
-    memset(_si_time_offsets, 0, sizeof(_si_time_offsets));
-
     MPEGStreamData::AddListeningPID(MPEG_PAT_PID);
     MPEGStreamData::AddListeningPID(MPEG_CAT_PID);
 }
@@ -752,7 +734,7 @@ bool MPEGStreamData::HandleTables(uint pid, const PSIPTable &psip)
 
 void MPEGStreamData::ProcessPAT(const ProgramAssociationTable *pat)
 {
-    bool foundProgram = pat->FindPID(_desired_program) != 0u;
+    bool foundProgram = pat->FindPID(_desired_program) != 0U;
 
     _listener_lock.lock();
     for (size_t i = 0; i < _mpeg_listeners.size(); i++)
@@ -852,7 +834,7 @@ double MPEGStreamData::TimeOffset(void) const
 
 void MPEGStreamData::UpdateTimeOffset(uint64_t _si_utc_time)
 {
-    struct timeval tm;
+    struct timeval tm {};
     if (gettimeofday(&tm, nullptr) != 0)
         return;
 
@@ -877,7 +859,7 @@ void MPEGStreamData::UpdateTimeOffset(uint64_t _si_utc_time)
  */
 void MPEGStreamData::HandleTSTables(const TSPacket* tspacket)
 {
-    bool morePSIPTables;
+    bool morePSIPTables = false;
   HAS_ANOTHER_PSIP:
     // Assemble PSIP
     PSIPTable *psip = AssemblePSIP(tspacket, morePSIPTables);

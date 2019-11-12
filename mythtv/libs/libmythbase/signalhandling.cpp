@@ -178,7 +178,7 @@ void SignalHandler::SetHandlerPrivate(int signum, SigHandlerFunc handler)
 
     if (!sa_handler_already_set)
     {
-        struct sigaction sa;
+        struct sigaction sa {};
         sa.sa_sigaction = SignalHandler::signalHandler;
         sigemptyset(&sa.sa_mask);
         sa.sa_flags = SA_RESTART | SA_SIGINFO;

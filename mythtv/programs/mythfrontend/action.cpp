@@ -37,8 +37,8 @@
  *  \param description The description of the action.
  *  \param keys The key sequence (strings) that trigger the action.
  */
-Action::Action(const QString &description, const QString &keys)
-    : m_description(description),
+Action::Action(QString description, const QString &keys)
+    : m_description(std::move(description)),
       m_keys(QKeySequence(keys).toString().split(", "))
 {
 }

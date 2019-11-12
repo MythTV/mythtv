@@ -2169,7 +2169,8 @@ void MainServer::HandleQueryRecordings(const QString& type, PlaybackSock *pbs)
         if ((proginfo->GetHostname() == gCoreContext->GetHostName()) ||
             (!slave && m_masterBackendOverride))
         {
-            proginfo->SetPathname(gCoreContext->GenMythURL(host,port,proginfo->GetBasename()));
+            proginfo->SetPathname(MythCoreContext::GenMythURL(host,port,
+                                                              proginfo->GetBasename()));
             if (!proginfo->GetFilesize())
             {
                 QString tmpURL = GetPlaybackURL(proginfo);
@@ -2230,9 +2231,9 @@ void MainServer::HandleQueryRecordings(const QString& type, PlaybackSock *pbs)
                 if (!backendPortMap.contains(hostname))
                     backendPortMap[hostname] = gCoreContext->GetBackendServerPort(hostname);
 
-                p->SetPathname(gCoreContext->GenMythURL(hostname,
-                                                        backendPortMap[hostname],
-                                                        p->GetBasename()));
+                p->SetPathname(MythCoreContext::GenMythURL(hostname,
+                                                           backendPortMap[hostname],
+                                                           p->GetBasename()));
             }
         }
 
@@ -2313,7 +2314,8 @@ void MainServer::HandleFillProgramInfo(QStringList &slist, PlaybackSock *pbs)
         if (playbackhost == gCoreContext->GetHostName())
             pginfo.SetPathname(lpath);
         else
-            pginfo.SetPathname(gCoreContext->GenMythURL(host,port,pginfo.GetBasename()));
+            pginfo.SetPathname(MythCoreContext::GenMythURL(host,port,
+                                                           pginfo.GetBasename()));
 
         const QFileInfo info(lpath);
         pginfo.SetFilesize(info.size());
@@ -3477,7 +3479,7 @@ void MainServer::HandleQueryUptime(PlaybackSock *pbs)
 {
     MythSocket    *pbssock = pbs->getSocket();
     QStringList strlist;
-    time_t      uptime;
+    time_t      uptime = 0;
 
     if (getUptime(uptime))
         strlist << QString::number(uptime);
@@ -3514,7 +3516,7 @@ void MainServer::HandleQueryMemStats(PlaybackSock *pbs)
 {
     MythSocket    *pbssock = pbs->getSocket();
     QStringList strlist;
-    int         totalMB, freeMB, totalVM, freeVM;
+    int         totalMB = 0, freeMB = 0, totalVM = 0, freeVM = 0;
 
     if (getMemStats(totalMB, freeMB, totalVM, freeVM))
         strlist << QString::number(totalMB) << QString::number(freeMB)
@@ -3699,7 +3701,7 @@ void MainServer::HandleQueryFileExists(QStringList &slist, PlaybackSock *pbs)
         retlist << "1";
         retlist << fullname;
 
-        struct stat fileinfo;
+        struct stat fileinfo {};
         if (stat(fullname.toLocal8Bit().constData(), &fileinfo) >= 0)
         {
             retlist << QString::number(fileinfo.st_dev);
@@ -3996,19 +3998,19 @@ void MainServer::HandleQueryFindFile(QStringList &slist, PlaybackSock *pbs)
             QStringList filteredFiles = files.filter(QRegExp(fi.fileName()));
             for (int x = 0; x < filteredFiles.size(); x++)
             {
-                fileList << gCoreContext->GenMythURL(gCoreContext->GetHostName(),
-                                                     gCoreContext->GetBackendServerPort(),
-                                                     fi.path() + '/' + filteredFiles[x],
-                                                     storageGroup);
+                fileList << MythCoreContext::GenMythURL(gCoreContext->GetHostName(),
+                                                        gCoreContext->GetBackendServerPort(),
+                                                        fi.path() + '/' + filteredFiles[x],
+                                                        storageGroup);
             }
         }
         else
         {
             if (!sgroup.FindFile(filename).isEmpty())
             {
-                fileList << gCoreContext->GenMythURL(gCoreContext->GetHostName(),
-                                                     gCoreContext->GetBackendServerPort(),
-                                                     filename, storageGroup);
+                fileList << MythCoreContext::GenMythURL(gCoreContext->GetHostName(),
+                                                        gCoreContext->GetBackendServerPort(),
+                                                        filename, storageGroup);
             }
         }
     }
@@ -4083,7 +4085,7 @@ void MainServer::HandleQueryFindFile(QStringList &slist, PlaybackSock *pbs)
 
                     for (int x = 0; x < filteredFiles.size(); x++)
                     {
-                        fileList << gCoreContext->GenMythURL(gCoreContext->GetHostName(),
+                        fileList << MythCoreContext::GenMythURL(gCoreContext->GetHostName(),
                                                                 gCoreContext->GetBackendServerPort(),
                                                                 fi.path() + '/' + filteredFiles[x],
                                                                 storageGroup);
@@ -4094,9 +4096,9 @@ void MainServer::HandleQueryFindFile(QStringList &slist, PlaybackSock *pbs)
                     QString fname = sgroup.FindFile(filename);
                     if (!fname.isEmpty())
                     {
-                        fileList << gCoreContext->GenMythURL(gCoreContext->GetMasterHostName(),
-                                                        gCoreContext->GetMasterServerPort(),
-                                                        filename, storageGroup);
+                        fileList << MythCoreContext::GenMythURL(gCoreContext->GetMasterHostName(),
+                                                                MythCoreContext::GetMasterServerPort(),
+                                                                filename, storageGroup);
                     }
                 }
             }
@@ -5102,7 +5104,7 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
     QMap <QString, bool>foundDirs;
     QString driveKey;
     QString localStr = "1";
-    struct statfs statbuf;
+    struct statfs statbuf {};
     QStringList groups(StorageGroup::kSpecialGroups);
     groups.removeAll("LiveTV");
     QString specialGroups = groups.join("', '");
@@ -5133,7 +5135,6 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
         QDir checkDir("");
         QString dirID;
         QString currentDir;
-        int bSize;
         while (query.next())
         {
             dirID = query.value(0).toString();
@@ -5154,7 +5155,7 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
                     getDiskSpace(cdir.constData(), totalKB, usedKB);
                     memset(&statbuf, 0, sizeof(statbuf));
                     localStr = "1"; // Assume local
-                    bSize = 0;
+                    int bSize = 0;
 
                     if (statfs(currentDir.toLocal8Bit().constData(), &statbuf) == 0)
                     {
@@ -6933,7 +6934,7 @@ void MainServer::HandleMusicGetLyricGrabbers(const QStringList &/*slist*/, Playb
 
         QDomDocument domDoc;
         QString errorMsg;
-        int errorLine, errorColumn;
+        int errorLine = 0, errorColumn = 0;
 
         if (!domDoc.setContent(result, false, &errorMsg, &errorLine, &errorColumn))
         {
@@ -7811,8 +7812,8 @@ void MainServer::connectionClosed(MythSocket *socket)
                     gBackendContext->SetFrontendDisconnected(pbs->getHostname());
             }
 
-            LiveTVChain *chain;
-            if ((chain = GetExistingChain(sock)))
+            LiveTVChain *chain = GetExistingChain(sock);
+            if (chain != nullptr)
             {
                 chain->DelHostSocket(sock);
                 if (chain->HostSocketCount() == 0)
@@ -8176,7 +8177,7 @@ void MainServer::reconnectTimeout(void)
     MythSocket *masterServerSock = new MythSocket(-1, this);
 
     QString server = gCoreContext->GetMasterServerIP();
-    int port = gCoreContext->GetMasterServerPort();
+    int port = MythCoreContext::GetMasterServerPort();
 
     LOG(VB_GENERAL, LOG_NOTICE, LOC +
         QString("Connecting to master server: %1:%2")

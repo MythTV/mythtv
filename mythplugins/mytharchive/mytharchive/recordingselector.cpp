@@ -286,19 +286,16 @@ void RecordingSelector::titleChanged(MythUIButtonListItem *item)
 void RecordingSelector::OKPressed()
 {
     // loop though selected recordings and add them to the list
-    ProgramInfo *p;
-    ArchiveItem *a;
-
     // remove any items that have been removed from the list
     QList<ArchiveItem *> tempAList;
     for (int x = 0; x < m_archiveList->size(); x++)
     {
-        a = m_archiveList->at(x);
+        ArchiveItem *a = m_archiveList->at(x);
         bool found = false;
 
         for (int y = 0; y < m_selectedList.size(); y++)
         {
-            p = m_selectedList.at(y);
+            ProgramInfo *p = m_selectedList.at(y);
             if (a->type != "Recording" || a->filename == p->GetPlaybackURL(false, true))
             {
                 found = true;
@@ -317,11 +314,11 @@ void RecordingSelector::OKPressed()
     QList<ProgramInfo *> tempSList;
     for (int x = 0; x < m_selectedList.size(); x++)
     {
-        p = m_selectedList.at(x);
+        ProgramInfo *p = m_selectedList.at(x);
 
         for (int y = 0; y < m_archiveList->size(); y++)
         {
-            a = m_archiveList->at(y);
+            ArchiveItem *a = m_archiveList->at(y);
             if (a->filename == p->GetPlaybackURL(false, true))
             {
                 tempSList.append(p);
@@ -336,8 +333,8 @@ void RecordingSelector::OKPressed()
     // add all that are left
     for (int x = 0; x < m_selectedList.size(); x++)
     {
-        p = m_selectedList.at(x);
-        a = new ArchiveItem;
+        ProgramInfo *p = m_selectedList.at(x);
+        ArchiveItem *a = new ArchiveItem;
         a->type = "Recording";
         a->title = p->GetTitle();
         a->subtitle = p->GetSubtitle();
@@ -380,11 +377,10 @@ void RecordingSelector::updateRecordingList(void)
 
     if (m_categorySelector)
     {
-        ProgramInfo *p;
         vector<ProgramInfo *>::iterator i = m_recordingList->begin();
         for ( ; i != m_recordingList->end(); ++i)
         {
-            p = *i;
+            ProgramInfo *p = *i;
 
             if (p->GetTitle() == m_categorySelector->GetValue() ||
                 m_categorySelector->GetValue() == tr("All Recordings"))

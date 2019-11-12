@@ -524,8 +524,7 @@ static int DoFlagCommercials(
     MythCommFlagPlayer* cfp, enum SkipTypes commDetectMethod,
     const QString &outputfilename, bool useDB)
 {
-    CommDetectorFactory factory;
-    commDetector = factory.makeCommDetector(
+    commDetector = CommDetectorFactory::makeCommDetector(
         commDetectMethod, showPercentage,
         fullSpeed, cfp,
         program_info->GetChanID(),
@@ -1102,7 +1101,7 @@ int main(int argc, char *argv[])
 
     if (cmdline.toBool("showversion"))
     {
-        cmdline.PrintVersion();
+        MythCommFlagCommandLineParser::PrintVersion();
         return GENERIC_EXIT_OK;
     }
 
@@ -1179,7 +1178,7 @@ int main(int argc, char *argv[])
     else if (cmdline.toBool("jobid"))
     {
         jobID = cmdline.toInt("jobid");
-        uint chanid;
+        uint chanid = 0;
         QDateTime starttime;
 
         if (!JobQueue::GetJobInfoFromID(jobID, jobType, chanid, starttime))

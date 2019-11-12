@@ -195,7 +195,7 @@ QScreen* MythDisplay::GetScreen(void)
     }
 
     // No name match.  These were previously numbers.
-    bool ok;
+    bool ok = false;
     int screen_num = name.toInt(&ok);
     QList<QScreen *>screens = qGuiApp->screens();
     if (ok && (screen_num >= 0) && (screen_num < screens.size())) {

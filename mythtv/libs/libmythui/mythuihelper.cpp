@@ -71,8 +71,8 @@ MythUIHelper *MythUIHelper::getMythUI(void)
 
 void MythUIHelper::destroyMythUI(void)
 {
-    mythui->PruneCacheDir(GetRemoteCacheDir());
-    mythui->PruneCacheDir(GetThumbnailDir());
+    MythUIHelper::PruneCacheDir(GetRemoteCacheDir());
+    MythUIHelper::PruneCacheDir(GetThumbnailDir());
     uiLock.lock();
     delete mythui;
     mythui = nullptr;
@@ -92,7 +92,10 @@ void DestroyMythUI()
 class MythUIHelperPrivate
 {
 public:
-    explicit MythUIHelperPrivate(MythUIHelper *p);
+    explicit MythUIHelperPrivate(MythUIHelper *p)
+    : m_cacheLock(new QMutex(QMutex::Recursive)),
+      m_imageThreadPool(new MThreadPool("MythUIHelper")),
+      parent(p) {}
     ~MythUIHelperPrivate();
 
     void Init();
@@ -101,7 +104,7 @@ public:
     void StoreGUIsettings(void);
 
     double GetPixelAspectRatio(void);
-    void WaitForScreenChange(void) const;
+    static void WaitForScreenChange(void) ;
 
     bool      m_themeloaded {false}; ///< Do we have a palette and pixmap to use?
     QString   m_menuthemepathname;
@@ -170,7 +173,7 @@ public:
 
     MThreadPool *m_imageThreadPool           {nullptr};
 
-    MythUIMenuCallbacks callbacks;
+    MythUIMenuCallbacks callbacks            {nullptr,nullptr,nullptr,nullptr,nullptr};
 
     MythUIHelper *parent                     {nullptr};
 
@@ -183,18 +186,6 @@ int MythUIHelperPrivate::x_override = -1;
 int MythUIHelperPrivate::y_override = -1;
 int MythUIHelperPrivate::w_override = -1;
 int MythUIHelperPrivate::h_override = -1;
-
-MythUIHelperPrivate::MythUIHelperPrivate(MythUIHelper *p)
-    : m_cacheLock(new QMutex(QMutex::Recursive)),
-      m_imageThreadPool(new MThreadPool("MythUIHelper")),
-      parent(p)
-{
-    callbacks.exec_program = nullptr;
-    callbacks.exec_program_tv = nullptr;
-    callbacks.configplugin = nullptr;
-    callbacks.plugin = nullptr;
-    callbacks.eject = nullptr;
-}
 
 MythUIHelperPrivate::~MythUIHelperPrivate()
 {
@@ -387,7 +378,7 @@ double MythUIHelperPrivate::GetPixelAspectRatio(void)
     return m_pixelAspectRatio;
 }
 
-void MythUIHelperPrivate::WaitForScreenChange(void) const
+void MythUIHelperPrivate::WaitForScreenChange(void)
 {
     // Wait for screen signal change, so we later get updated screen resolution
     QEventLoop loop;
@@ -816,11 +807,10 @@ void MythUIHelper::ClearOldImageCache(void)
 
     QFileInfoList::const_iterator it = list.begin();
     QMap<QDateTime, QString> dirtimes;
-    const QFileInfo *fi;
 
     while (it != list.end())
     {
-        fi = &(*it++);
+        const QFileInfo *fi = &(*it++);
 
         if (fi->isDir() && !fi->isSymLink())
         {
@@ -871,11 +861,10 @@ void MythUIHelper::RemoveCacheDir(const QString &dirname)
     dir.setFilter(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
     QFileInfoList list = dir.entryInfoList();
     QFileInfoList::const_iterator it = list.begin();
-    const QFileInfo *fi;
 
     while (it != list.end())
     {
-        fi = &(*it++);
+        const QFileInfo *fi = &(*it++);
 
         if (fi->isFile() && !fi->isSymLink())
         {
@@ -933,7 +922,7 @@ void MythUIHelper::PruneCacheDir(const QString& dirname)
     // is also slower just using dir.entryInfoList().
     foreach (const QFileInfo &fi, dir.entryInfoList())
     {
-        struct stat buf;
+        struct stat buf {};
         QString fullname = fi.filePath();
         if (not fullname.startsWith('/'))
             fullname = dirname + "/" + fullname;
@@ -1038,8 +1027,8 @@ void MythUIHelper::ParseGeometryOverride(const QString &geometry)
         return;
     }
 
-    bool parsed;
-    int tmp_w, tmp_h;
+    bool parsed = false;
+    int tmp_w = 0, tmp_h = 0;
 
     tmp_w = geo[1].toInt(&parsed);
 
@@ -1075,38 +1064,29 @@ void MythUIHelper::ParseGeometryOverride(const QString &geometry)
 
     if (longForm)
     {
-        int tmp_x, tmp_y;
-        tmp_x = geo[3].toInt(&parsed);
-
+        int tmp_x = geo[3].toInt(&parsed);
         if (!parsed)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 "Could not parse horizontal offset of geometry override");
-        }
-
-        if (parsed)
-        {
-            tmp_y = geo[4].toInt(&parsed);
-
-            if (!parsed)
-            {
-                LOG(VB_GENERAL, LOG_ERR, LOC +
-                    "Could not parse vertical offset of geometry override");
-            }
-        }
-
-        if (parsed)
-        {
-            MythUIHelperPrivate::x_override = tmp_x;
-            MythUIHelperPrivate::y_override = tmp_y;
-            LOG(VB_GENERAL, LOG_INFO, LOC +
-                QString("Overriding GUI offset: x=%1 y=%2")
-                .arg(tmp_x).arg(tmp_y));
-        }
-        else
-        {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to override GUI offset.");
+            return;
         }
+
+        int tmp_y = geo[4].toInt(&parsed);
+        if (!parsed)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                "Could not parse vertical offset of geometry override");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to override GUI offset.");
+            return;
+        }
+
+        MythUIHelperPrivate::x_override = tmp_x;
+        MythUIHelperPrivate::y_override = tmp_y;
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("Overriding GUI offset: x=%1 y=%2")
+            .arg(tmp_x).arg(tmp_y));
     }
 }
 

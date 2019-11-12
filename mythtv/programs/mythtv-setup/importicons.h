@@ -31,7 +31,7 @@ class ImportIconsWizard : public MythScreenType
 
   public:
     ImportIconsWizard(MythScreenStack *parent, bool fRefresh,
-                      const QString &channelname = "");
+                      QString channelname = "");
    ~ImportIconsWizard();
 
     bool Create(void) override; // MythScreenType
@@ -88,20 +88,20 @@ class ImportIconsWizard : public MythScreenType
      * \param str the string to change
      * \return the actual string
      */
-    QString escape_csv(const QString& str);
+    static QString escape_csv(const QString& str);
 
     /*! \brief extracts the csv values out of a string
      * \param strLine the string to work on
      * \return the actual QStringList
      */
-    QStringList extract_csv(const QString& strLine);
+    static QStringList extract_csv(const QString& strLine);
 
     /*! \brief use the equivalent of wget to fetch the POST command
      * \param url the url to send this to
      * \param strParam the string to send
      * \return the actual string
      */
-    QString wget(QUrl& url,const QString& strParam);
+    static QString wget(QUrl& url,const QString& strParam);
 
     /*! \brief looks up the string to determine the caller/xmltvid
      * \param strParam the string to work on

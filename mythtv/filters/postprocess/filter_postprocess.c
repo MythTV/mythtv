@@ -89,12 +89,11 @@ static VideoFilter *new_filter(VideoFrameType inpixfmt,
                                int threads)
 {
     (void) threads;
-    ThisFilter *filter;
 
     if ( inpixfmt != FMT_YV12 || outpixfmt != FMT_YV12 )
         return NULL;
 
-    filter = (ThisFilter*) malloc(sizeof(ThisFilter));
+    ThisFilter *filter = (ThisFilter*) malloc(sizeof(ThisFilter));
     if (filter == NULL)
     {
         fprintf(stderr,"Couldn't allocate memory for filter\n");

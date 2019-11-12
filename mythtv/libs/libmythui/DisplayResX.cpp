@@ -40,26 +40,25 @@ bool DisplayResX::GetDisplayInfo(int &w_pix, int &h_pix, int &w_mm,
 
 bool DisplayResX::SwitchToVideoMode(int width, int height, double desired_rate)
 {
-    double rate;
+    double rate = NAN;
     DisplayResScreen desired_screen(width, height, 0, 0, -1.0, desired_rate);
     int idx = DisplayResScreen::FindBestMatch(m_videoModesUnsorted,
               desired_screen, rate);
 
     if (idx >= 0)
     {
-        short finalrate;
         MythXDisplay *display = nullptr;
         XRRScreenConfiguration *cfg = GetScreenConfig(display);
 
         if (!cfg)
             return false;
 
-        Rotation rot;
+        Rotation rot = 0;
 
         XRRConfigCurrentConfiguration(cfg, &rot);
 
         // Search real xrandr rate for desired_rate
-        finalrate = (short) rate;
+        short finalrate = (short) rate;
 
         for (size_t i = 0; i < m_videoModes.size(); i++)
         {
@@ -119,7 +118,7 @@ const DisplayResVector& DisplayResX::GetVideoModes(void) const
     if (!cfg)
         return m_videoModes;
 
-    int num_sizes, num_rates;
+    int num_sizes = 0, num_rates = 0;
 
     XRRScreenSize *sizes = nullptr;
 

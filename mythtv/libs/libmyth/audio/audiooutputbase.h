@@ -49,7 +49,7 @@ class SPDIFEncoder;
 class AudioOutputBase : public AudioOutput, public MThread
 {
  public:
-    const char *quality_string(int q);
+    static const char *quality_string(int q);
     explicit AudioOutputBase(const AudioSettings &settings);
     ~AudioOutputBase() override;
 
@@ -281,9 +281,9 @@ class AudioOutputBase : public AudioOutput, public MThread
     float            *m_src_in;
 
     // All actual buffers
-    SRC_DATA          m_src_data;
+    SRC_DATA          m_src_data                          {};
     uint              m_memory_corruption_test0           {0xdeadbeef};
-    float             m_src_in_buf[kAudioSRCInputSize + 16];
+    float             m_src_in_buf[kAudioSRCInputSize + 16] {};
     uint              m_memory_corruption_test1           {0xdeadbeef};;
     float            *m_src_out                           {nullptr};
     int               m_kAudioSRCOutputSize               {0};
@@ -291,7 +291,7 @@ class AudioOutputBase : public AudioOutput, public MThread
     /**
      * main audio buffer
      */
-    uchar             m_audiobuffer[kAudioRingBufferSize];
+    uchar             m_audiobuffer[kAudioRingBufferSize] {0};
     uint              m_memory_corruption_test3           {0xdeadbeef};;
     bool              m_configure_succeeded               {false};
     int64_t           m_length_last_data                  {0};

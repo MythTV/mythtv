@@ -36,18 +36,18 @@
 
 void show_buf(uint8_t *buf, int length)
 {
-	int i,j,r;
 	uint8_t buffer[100];
 	uint8_t temp[8];
 	buffer[0] = '\0';
 
-	for (i=0; i<length; i+=16){
+	for (int i=0; i<length; i+=16){
+		int j = 0;
 		for (j=0; j < 8 && j+i<length; j++)
 		{
 			sprintf(temp,"0x%02x ", (int)(buf[i+j]));
 			strcat(buffer, temp);
 		}
-		for (r=j; r<8; r++) 			
+		for (int r=j; r<8; r++)
 			strcat(buffer, "     ");
 
 		strcat(buffer, "  ");
@@ -57,7 +57,7 @@ void show_buf(uint8_t *buf, int length)
 			sprintf(temp, "0x%02x ", (int)(buf[i+j]));
 			strcat(buffer, temp);
 		}
-		for (r=j; r<16; r++) 			
+		for (int r=j; r<16; r++)
 			strcat(buffer, "     ");
 
 		for (j=0; j < 16 && j+i<length; j++){
@@ -151,10 +151,8 @@ int find_any_header(uint8_t *head, const uint8_t *buf, int length)
 
 uint64_t trans_pts_dts(const uint8_t *pts)
 {
-	uint64_t wts;
-	
-	wts = ((uint64_t)((pts[0] & 0x0E) << 5) | 
-	       ((pts[1] & 0xFC) >> 2)) << 24; 
+	uint64_t wts = ((uint64_t)((pts[0] & 0x0E) << 5) |
+                        ((pts[1] & 0xFC) >> 2)) << 24;
 	wts |= (((pts[1] & 0x03) << 6) |
 		((pts[2] & 0xFC) >> 2)) << 16; 
 	wts |= (((pts[2] & 0x02) << 6) |
@@ -188,7 +186,7 @@ int ring_find_mpg_header(ringbuffer *rbuf, uint8_t head, int off, int le)
 
 	c = off;
 	while ( c-off < le){
-		uint8_t b;
+		uint8_t b = 0;
 		if ( mring_peek(rbuf, &b, 1, c) <0) return -1;
 		switch(found){
 
@@ -227,7 +225,7 @@ int ring_find_any_header(ringbuffer *rbuf, uint8_t *head, int off, int le)
 
 	c = off;
 	while ( c-off < le){
-		uint8_t b;
+		uint8_t b = 0;
 		if ( mring_peek(rbuf, &b, 1, c) <0){
 			return -1;
 		}

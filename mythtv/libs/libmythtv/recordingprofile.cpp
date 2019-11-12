@@ -383,9 +383,9 @@ class BitrateMode : public MythUIComboBoxSetting, public CodecParamStorage
 {
   public:
     BitrateMode(const RecordingProfile& parent,
-                QString setting = "mpeg2bitratemode") :
+                const QString& setting = "mpeg2bitratemode") :
         MythUIComboBoxSetting(this),
-        CodecParamStorage(this, parent, std::move(setting))
+        CodecParamStorage(this, parent, setting)
     {
         setLabel(QObject::tr("Bitrate Mode"));
 
@@ -765,12 +765,12 @@ class AverageBitrate : public MythUISpinBoxSetting, public CodecParamStorage
 {
   public:
     AverageBitrate(const RecordingProfile &parent,
-                   QString setting = "mpeg2bitrate",
+                   const QString& setting = "mpeg2bitrate",
                    uint min_br = 1000, uint max_br = 16000,
                    uint default_br = 4500, uint increment = 100,
                    QString label = QString()) :
         MythUISpinBoxSetting(this, min_br, max_br, increment),
-        CodecParamStorage(this, parent, std::move(setting))
+        CodecParamStorage(this, parent, setting)
     {
         if (label.isEmpty())
             label = QObject::tr("Avg. Bitrate (kb/s)");
@@ -786,12 +786,12 @@ class PeakBitrate : public MythUISpinBoxSetting, public CodecParamStorage
 {
   public:
     PeakBitrate(const RecordingProfile &parent,
-                QString setting = "mpeg2maxbitrate",
+                const QString& setting = "mpeg2maxbitrate",
                 uint min_br = 1000, uint max_br = 16000,
                 uint default_br = 6000, uint increment = 100,
                 QString label = QString()) :
         MythUISpinBoxSetting(this, min_br, max_br, increment),
-        CodecParamStorage(this, parent, std::move(setting))
+        CodecParamStorage(this, parent, setting)
     {
         if (label.isEmpty())
             label = QObject::tr("Max. Bitrate (kb/s)");

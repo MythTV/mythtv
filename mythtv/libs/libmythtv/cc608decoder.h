@@ -82,67 +82,67 @@ class CC608Decoder
     void XDSPacketParse(const vector<unsigned char> &xds_buf);
     bool XDSPacketCRC(const vector<unsigned char> &xds_buf);
 
-    CC608Input     *m_reader           {nullptr};
+    CC608Input     *m_reader                {nullptr};
 
-    bool            m_ignore_time_code {false};
+    bool            m_ignore_time_code      {false};
 
-    time_t          m_last_seen[4];
+    time_t          m_last_seen[4]          {0};
 
     // per-field
-    int             m_badvbi[2];
-    int             m_lasttc[2];
-    int             m_lastcode[2];
-    int             m_lastcodetc[2];
-    int             m_ccmode[2];      // 0=cc1/txt1, 1=cc2/txt2
-    int             m_xds[2];
-    int             m_txtmode[4];
+    int             m_badvbi[2]             { 0,  0};
+    int             m_lasttc[2]             { 0,  0};
+    int             m_lastcode[2]           {-1, -1};
+    int             m_lastcodetc[2]         { 0,  0};
+    int             m_ccmode[2]             {-1, -1}; // 0=cc1/txt1, 1=cc2/txt2
+    int             m_xds[2]                { 0,  0};
+    int             m_txtmode[4]            { 0,  0,  0,  0};
 
     // per-mode state
-    int             m_lastrow[8];
-    int             m_newrow[8];
-    int             m_newcol[8];
-    int             m_newattr[8]; // color+italic+underline
-    int             m_timecode[8];
-    int             m_row[8];
-    int             m_col[8];
-    int             m_rowcount[8];
-    int             m_style[8];
-    int             m_linecont[8];
-    int             m_resumetext[8];
-    int             m_lastclr[8];
+    int             m_lastrow[8]            {0};
+    int             m_newrow[8]             {0};
+    int             m_newcol[8]             {0};
+    int             m_newattr[8]            {0}; // color+italic+underline
+    int             m_timecode[8]           {0};
+    int             m_row[8]                {0};
+    int             m_col[8]                {0};
+    int             m_rowcount[8]           {0};
+    int             m_style[8]              {0};
+    int             m_linecont[8]           {0};
+    int             m_resumetext[8]         {0};
+    int             m_lastclr[8]            {0};
     QString         m_ccbuf[8];
 
     // translation table
     QChar           m_stdchar[128];
 
     // temporary buffer
-    unsigned char  *m_rbuf             {nullptr};
-    int             m_last_format_tc[2];
-    int             m_last_format_data[2];
+    unsigned char  *m_rbuf                  {nullptr};
+    int             m_last_format_tc[2]     {0, 0};
+    int             m_last_format_data[2]   {0, 0};
 
     // VPS data
-    char            m_vps_pr_label[20];
-    char            m_vps_label[20];
-    int             m_vps_l            {0};
+    char            m_vps_pr_label[20]      {0};
+    char            m_vps_label[20]         {0};
+    int             m_vps_l                 {0};
 
     // WSS data
-    uint            m_wss_flags        {0};
-    bool            m_wss_valid        {false};
+    uint            m_wss_flags             {0};
+    bool            m_wss_valid             {false};
 
-    int             m_xds_cur_service  {-1};
+    int             m_xds_cur_service       {-1};
     vector<unsigned char> m_xds_buf[7];
-    uint            m_xds_crc_passed   {0};
-    uint            m_xds_crc_failed   {0};
+    uint            m_xds_crc_passed        {0};
+    uint            m_xds_crc_failed        {0};
 
-    mutable QMutex  m_xds_lock         {QMutex::Recursive};
-    uint            m_xds_rating_systems[2];
-    uint            m_xds_rating[2][4];
+    mutable QMutex  m_xds_lock              {QMutex::Recursive};
+    uint            m_xds_rating_systems[2] {0};
+    uint            m_xds_rating[2][4]      {{0}};
     QString         m_xds_program_name[2];
     vector<uint>    m_xds_program_type[2];
 
     QString         m_xds_net_call;
     QString         m_xds_net_name;
-    uint            m_xds_tsid         {0};
+    uint            m_xds_tsid              {0};
 
     QString         m_xds_program_type_string[96];
 };

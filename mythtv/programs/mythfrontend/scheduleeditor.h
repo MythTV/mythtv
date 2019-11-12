@@ -73,7 +73,7 @@ class StoreOptMixin
     void PromptForRecGroup(void);
     void SetRecGroup(int recgroupID, QString recgroup);
 
-    int CreateRecordingGroup(const QString &groupName);
+    static int CreateRecordingGroup(const QString &groupName);
 
     MythUIButtonList *m_recprofileList   {nullptr};
     MythUIButtonList *m_recgroupList     {nullptr};
@@ -130,7 +130,7 @@ class FilterOptMixin
     void Load(void);
     void Save(void);
     void RuleChanged(void);
-    void ToggleSelected(MythUIButtonListItem *item);
+    static void ToggleSelected(MythUIButtonListItem *item);
 
     MythUIButtonList *m_filtersList       {nullptr};
     MythUIButtonList *m_activeFiltersList {nullptr};
@@ -186,7 +186,7 @@ class ScheduleEditor : public ScheduleCommon,
   protected slots:
     void RuleChanged(MythUIButtonListItem *item);
     void DupMethodChanged(MythUIButtonListItem *);
-    void FilterChanged(MythUIButtonListItem *);
+    static void FilterChanged(MythUIButtonListItem *);
     void MaxEpisodesChanged(MythUIButtonListItem *);
     void PromptForRecGroup(void);
     void TranscodeChanged(bool enable);
@@ -197,7 +197,7 @@ class ScheduleEditor : public ScheduleCommon,
   private:
     Q_DISABLE_COPY(ScheduleEditor);
     void Load(void) override; // MythScreenType
-    void LoadTemplate(QString name);
+    void LoadTemplate(const QString& name);
     void DeleteRule(void);
 
     void showTemplateMenu(void);
@@ -305,7 +305,7 @@ class SchedFilterEditor : public SchedEditChild, public FilterOptMixin
     bool Create(void) override; // MythScreenType
 
   protected slots:
-    void ToggleSelected(MythUIButtonListItem *item);
+    static void ToggleSelected(MythUIButtonListItem *item);
 
   private:
     void Load(void) override; // SchedEditChild
@@ -383,11 +383,11 @@ class MetadataOptions : public SchedEditChild
     void Save(void) override; // SchedEditChild
 
     void CreateBusyDialog(const QString& title);
-    void FindImagePopup(const QString &prefix,
-                        const QString &prefixAlt,
-                        QObject &inst,
-                        const QString &returnEvent);
-    QStringList GetSupportedImageExtensionFilter();
+    static void FindImagePopup(const QString &prefix,
+                               const QString &prefixAlt,
+                               QObject &inst,
+                               const QString &returnEvent);
+    static QStringList GetSupportedImageExtensionFilter();
 
     void HandleDownloadedImages(MetadataLookup *lookup);
     MetadataLookup *CreateLookup(MetadataType mtype);

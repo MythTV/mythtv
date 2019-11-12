@@ -1154,7 +1154,7 @@ QString MythCoreContext::resolveSettingAddress(const QString &name,
  * If keepscope boolean is clear (default), the scopeId will be removed
  */
 QString MythCoreContext::resolveAddress(const QString &host, ResolveType type,
-                                        bool keepscope) const
+                                        bool keepscope)
 {
     QHostAddress addr(host);
 
@@ -1456,12 +1456,12 @@ bool MythCoreContext::SendReceiveStringList(
 class SendAsyncMessage : public QRunnable
 {
   public:
-    SendAsyncMessage(const QString &msg, const QStringList &extra) :
-        m_message(msg), m_extraData(extra)
+    SendAsyncMessage(QString msg, QStringList extra) :
+        m_message(std::move(msg)), m_extraData(std::move(extra))
     {
     }
 
-    explicit SendAsyncMessage(const QString &msg) : m_message(msg) { }
+    explicit SendAsyncMessage(QString msg) : m_message(std::move(msg)) { }
 
     void run(void) override // QRunnable
     {
@@ -1554,7 +1554,7 @@ void MythCoreContext::readyRead(MythSocket *sock)
         else if (message.startsWith("FILE_WRITTEN"))
         {
             QString file;
-            uint64_t size;
+            uint64_t size = 0;
             int NUMTOKENS = 3; // Number of tokens expected
 
             if (tokens.size() == NUMTOKENS)
@@ -1833,7 +1833,6 @@ void MythCoreContext::WaitUntilSignals(const char *signal1, ...)
     if (!signal1)
         return;
 
-    const char *s;
     QEventLoop eventLoop;
     va_list vl;
 
@@ -1843,7 +1842,7 @@ void MythCoreContext::WaitUntilSignals(const char *signal1, ...)
     connect(this, signal1, &eventLoop, SLOT(quit()));
 
     va_start(vl, signal1);
-    s = va_arg(vl, const char *);
+    const char *s = va_arg(vl, const char *);
     while (s)
     {
         LOG(VB_GENERAL, LOG_DEBUG, LOC +

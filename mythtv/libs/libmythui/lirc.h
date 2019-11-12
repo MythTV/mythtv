@@ -26,9 +26,9 @@ class LIRC : public QObject, public MThread
     Q_OBJECT
   public:
     LIRC(QObject *main_window,
-         const QString &lircd_device,
-         const QString &our_program,
-         const QString &config_file);
+         QString lircd_device,
+         QString our_program,
+         QString config_file);
     bool Init(void);
 
     virtual void start(void);

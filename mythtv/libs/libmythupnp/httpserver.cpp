@@ -138,7 +138,7 @@ HttpServer::HttpServer() :
             .arg(LOBYTE(LOWORD(GetVersion())))
             .arg(HIBYTE(LOWORD(GetVersion())));
 #else
-        struct utsname uname_info;
+        struct utsname uname_info {};
         uname( &uname_info );
         s_platform = QString("%1/%2")
             .arg(uname_info.sysname).arg(uname_info.release);
@@ -479,7 +479,7 @@ void HttpWorker::run(void)
     bool                    bTimeout   = false;
     bool                    bKeepAlive = true;
     HTTPRequest            *pRequest   = nullptr;
-    QTcpSocket             *pSocket;
+    QTcpSocket             *pSocket    = nullptr;
     bool                    bEncrypted = false;
 
     if (m_connectionType == kSSLServer)

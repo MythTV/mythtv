@@ -251,8 +251,6 @@ void ScreenSetup::updateHelpText()
 
 void ScreenSetup::loadData()
 {
-    ScreenListInfo *si;
-
     QStringList types;
 
     ScreenListMap screenListMap = loadScreens();
@@ -261,8 +259,7 @@ void ScreenSetup::loadData()
     ScreenListMap::const_iterator i = screenListMap.constBegin();
     while (i != screenListMap.constEnd())
     {
-
-        si = &screenListMap[i.key()];
+        ScreenListInfo *si = &screenListMap[i.key()];
         types = si->m_dataTypes;
         si->m_units = ENG_UNITS;
 
@@ -328,7 +325,7 @@ void ScreenSetup::loadData()
 
         if (active_screens.find(draworder) == active_screens.end())
         {
-            si = new ScreenListInfo(screenListMap[name]);
+            ScreenListInfo *si = new ScreenListInfo(screenListMap[name]);
             // Clear types first as we will re-insert the values from the database
             si->m_types.clear();
             si->m_units = units;
@@ -350,7 +347,7 @@ void ScreenSetup::loadData()
         }
         else
         {
-            si = active_screens[draworder];
+            ScreenListInfo *si = active_screens[draworder];
             for (QStringList::Iterator type_i = types.begin();
                  type_i != types.end(); ++type_i )
             {
@@ -594,7 +591,9 @@ void ScreenSetup::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
+        auto dce = dynamic_cast<DialogCompletionEvent*>(event);
+        if (dce == nullptr)
+            return;
 
         QString resultid  = dce->GetId();
         int     buttonnum = dce->GetResult();
@@ -958,10 +957,9 @@ void LocationDialog::doSearch()
     // if a screen makes it this far, theres at least one source for it
     m_sourceManager->findPossibleSources(m_types, sources);
     QString search = m_locationEdit->GetText();
-    ScriptInfo *si;
     for (int x = 0; x < sources.size(); x++)
     {
-        si = sources.at(x);
+        ScriptInfo *si = sources.at(x);
         if (!result_cache.contains(si))
         {
             QStringList results = m_sourceManager->getLocationList(si, search);
@@ -975,7 +973,7 @@ void LocationDialog::doSearch()
     QMap<ScriptInfo *, QStringList>::iterator it;
     for (it = result_cache.begin(); it != result_cache.end(); ++it)
     {
-        si = it.key();
+        ScriptInfo *si = it.key();
         QStringList results = it.value();
         QString name = si->name;
         QStringList::iterator rit;

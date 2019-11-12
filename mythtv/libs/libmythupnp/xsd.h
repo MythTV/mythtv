@@ -35,7 +35,7 @@ class UPNP_PUBLIC Xsd : public QDomDocument
 {
     protected:
 
-        QString     ReadPropertyMetadata ( QObject *pObject, 
+        static QString     ReadPropertyMetadata ( QObject *pObject, 
                                            const QString&  sPropName,
                                            const QString&  sKey );
                                          
@@ -55,8 +55,8 @@ class UPNP_PUBLIC Xsd : public QDomDocument
 
         QDomElement CreateComplexTypeNode( QMetaObject *pMetaObject );
 
-        bool        IsNillable           ( const QString       &sType );
-        bool        IsEnum               ( const QMetaProperty &metaProperty,
+        static bool        IsNillable           ( const QString       &sType );
+        static bool        IsEnum               ( const QMetaProperty &metaProperty,
                                            const QString       &sType );
 
     public:

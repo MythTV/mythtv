@@ -254,10 +254,8 @@ void NetTree::UpdateItem(MythUIButtonListItem *item)
         video->toMap(metadataMap);
         item->SetTextFromMap(metadataMap);
 
-        int pos;
-        if (m_type == DLG_TREE)
-            pos = 0;
-        else
+        int pos = 0;
+        if (m_type != DLG_TREE)
             pos = m_siteButtonList->GetItemPos(item);
 
         QString dlfile = video->GetThumbnail();
@@ -281,10 +279,8 @@ void NetTree::UpdateItem(MythUIButtonListItem *item)
             QString tpath = node->GetData().toString();
             if (tpath.startsWith("http://"))
             {
-                uint pos;
-                if (m_type == DLG_TREE)
-                    pos = 0;
-                else
+                uint pos = 0;
+                if (m_type != DLG_TREE)
                     pos = m_siteButtonList->GetItemPos(item);
 
                 QString dlfile = GetThumbnailFilename(tpath,
@@ -816,8 +812,8 @@ void NetTree::UpdateCurrentItem(void)
 
 void NetTree::SlotItemChanged()
 {
-    ResultItem *item;
-    RSSSite *site;
+    ResultItem *item = nullptr;
+    RSSSite *site = nullptr;
 
     if (m_type == DLG_TREE)
     {
@@ -939,13 +935,11 @@ void NetTree::customEvent(QEvent *event)
 {
     if (event->type() == ThumbnailDLEvent::kEventType)
     {
-        ThumbnailDLEvent *tde = (ThumbnailDLEvent *)event;
-
+        ThumbnailDLEvent *tde = dynamic_cast<ThumbnailDLEvent *>(event);
         if (!tde)
             return;
 
         ThumbnailData *data = tde->m_thumb;
-
         if (!data)
             return;
 

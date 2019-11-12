@@ -480,7 +480,7 @@ void ImageScanThread<DBFS>::SyncFile(const QFileInfo &fileInfo, int devId,
         im->m_isHidden = dbIm->m_isHidden;
 
         // Set date, comment from file meta data
-        int fileOrient;
+        int fileOrient = 0;
         PopulateMetadata(absFilePath, im->m_type,
                          im->m_comment, im->m_date, fileOrient);
 
@@ -508,7 +508,7 @@ void ImageScanThread<DBFS>::SyncFile(const QFileInfo &fileInfo, int devId,
         LOG(VB_FILE, LOG_INFO,  QString("New file %1").arg(absFilePath));
 
         // Set date, comment from file meta data
-        int fileOrient;
+        int fileOrient = 0;
         PopulateMetadata(absFilePath, im->m_type,
                          im->m_comment, im->m_date, fileOrient);
 

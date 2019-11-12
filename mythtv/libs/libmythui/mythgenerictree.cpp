@@ -445,7 +445,7 @@ void MythGenericTree::sortBySelectable()
 
     QList<MythGenericTree*>::iterator it;
     it = m_subnodes->begin();
-    MythGenericTree *child;
+    MythGenericTree *child = nullptr;
     while ((child = *it) != nullptr)
     {
         child->sortBySelectable();
@@ -456,10 +456,9 @@ void MythGenericTree::sortBySelectable()
 void MythGenericTree::deleteAllChildren()
 {
     m_selectedSubnode = nullptr;
-    MythGenericTree *child;
     while (!m_subnodes->isEmpty())
     {
-        child = m_subnodes->takeFirst();
+        MythGenericTree *child = m_subnodes->takeFirst();
         delete child;
         child = nullptr;
     }

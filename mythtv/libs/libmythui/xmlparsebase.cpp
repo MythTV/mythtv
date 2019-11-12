@@ -93,7 +93,7 @@ MythPoint XMLParseBase::parsePoint(QDomElement &element, bool normalize)
 
 QSize XMLParseBase::parseSize(const QString &text, bool normalize)
 {
-    int x, y;
+    int x = 0, y = 0;
     QSize retval;
 
     QStringList tmp = text.split(",");

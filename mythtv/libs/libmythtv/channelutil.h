@@ -53,22 +53,22 @@ class MTV_PUBLIC ChannelUtil
     // Multiplex Stuff
 
     static uint    CreateMultiplex(
-        int  sourceid,          QString sistandard,
-        uint64_t frequency,     QString modulation,
+        int  sourceid,          const QString& sistandard,
+        uint64_t frequency,     const QString& modulation,
         int  transport_id = -1, int     network_id = -1);
 
     static uint    CreateMultiplex(
-        int         sourceid,     QString     sistandard,
-        uint64_t    frequency,    QString     modulation,
+        int            sourceid,     const QString& sistandard,
+        uint64_t       frequency,    const QString& modulation,
         // DVB specific
-        int         transport_id, int         network_id,
-        int         symbol_rate,  signed char bandwidth,
-        signed char polarity,     signed char inversion,
-        signed char trans_mode,
-        QString     inner_FEC,    QString     constellation,
-        signed char hierarchy,    QString     hp_code_rate,
-        QString     lp_code_rate, QString     guard_interval,
-        QString     mod_sys,      QString     rolloff);
+        int            transport_id, int            network_id,
+        int            symbol_rate,  signed char    bandwidth,
+        signed char    polarity,     signed char    inversion,
+        signed char    trans_mode,
+        const QString& inner_FEC,    const QString& constellation,
+        signed char    hierarchy,    const QString& hp_code_rate,
+        const QString& lp_code_rate, const QString& guard_interval,
+        const QString& mod_sys,      const QString& rolloff);
 
     static uint    CreateMultiplex(uint sourceid, const DTVMultiplex&,
                                    int transport_id, int network_id);
@@ -114,10 +114,10 @@ class MTV_PUBLIC ChannelUtil
                                  bool hidden,
                                  bool hidden_in_guide,
                                  const QString &freqid,
-                                 QString icon    = QString(),
+                                 const QString& icon    = QString(),
                                  QString format  = "Default",
-                                 QString xmltvid = QString(),
-                                 QString default_authority = QString(),
+                                 const QString& xmltvid = QString(),
+                                 const QString& default_authority = QString(),
                                  uint service_type = 0);
 
     static bool    UpdateChannel(uint db_mplexid,

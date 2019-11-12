@@ -103,9 +103,7 @@ int64_t ptsdiff(uint64_t pts1, uint64_t pts2)
 /* use, if you need  an unsigned result in pts range */
 uint64_t uptsdiff(uint64_t pts1, uint64_t pts2)
 {
-	int64_t diff;
-
-	diff = pts1 - pts2;
+	int64_t diff = pts1 - pts2;
 		
 	if (diff < 0){
 		diff = MAX_PTS2 +diff;
@@ -115,7 +113,7 @@ uint64_t uptsdiff(uint64_t pts1, uint64_t pts2)
 
 int ptscmp(uint64_t pts1, uint64_t pts2)
 {
-	int ret;
+	int ret = -1;
 
 	if (pts1 > pts2){
 		if ((pts1 - pts2) > MAX_PTS2/2)
@@ -164,10 +162,8 @@ void init_pes_in(pes_in_t *p, int t, ringbuffer *rb, int wi){
 
 void get_pes (pes_in_t *p, uint8_t *buf, int count, void (*func)(pes_in_t *p))
 {
-
-	int l;
-	unsigned short *pl;
-        int done;
+	unsigned short *pl = NULL;
+	int done = 1;
 
 	uint8_t headr[3] = { 0x00, 0x00, 0x01} ;
 	do {
@@ -339,7 +335,7 @@ void get_pes (pes_in_t *p, uint8_t *buf, int count, void (*func)(pes_in_t *p))
 
 
 				while (c < count && p->found < p->plength+6){
-					l = count -c;
+					int l = count -c;
 					if (l+p->found > p->plength+6)
 						l = p->plength+6-p->found;
 					if (p->withbuf)
@@ -449,8 +445,7 @@ static void kill_ps(ps_packet *p)
 
 static void setlength_ps(ps_packet *p)
 {
-        short *ll;
-        ll = (short *) p->sheader_llength;
+	short *ll = (short *) p->sheader_llength;
 	p->sheader_length = ntohs(*ll) - 6;
 }
 
@@ -463,7 +458,6 @@ static void setl_ps(ps_packet *p)
 
 static int cwrite_ps(uint8_t *buf, ps_packet *p, uint32_t length)
 {
-        long count,i;
         (void)length;
         uint8_t headr1[4] = {0x00, 0x00, 0x01, PACK_START };
         uint8_t headr2[4] = {0x00, 0x00, 0x01, SYS_START };
@@ -471,14 +465,14 @@ static int cwrite_ps(uint8_t *buf, ps_packet *p, uint32_t length)
 
 
         memcpy(buf,headr1,4);
-        count = 4;
+	long count = 4;
 	memcpy(buf+count,p->scr,6);
 	count += 6;
 	memcpy(buf+count,p->mux_rate,3);
 	count += 3;
 	memcpy(buf+count,&p->stuff_length,1);
 	count++;
-	for(i=0; i< (p->stuff_length & 3); i++){
+	for (long i=0; i< (p->stuff_length & 3); i++){
 		memcpy(buf+count,&buffy,1);
 		count++;
 	}
@@ -517,15 +511,12 @@ static int write_ps_header(uint8_t *buf,
 		    uint8_t    navpack)
 {
 	ps_packet p;
-	uint8_t *scr;
-	uint32_t lscr;
-	uint16_t scr_ext = 0;
 
 	init_ps(&p);
 	
-	lscr = htonl((uint32_t) ((SCR/300ULL) & 0x00000000FFFFFFFF));
-	scr = (uint8_t *) &lscr;
-	scr_ext = (uint16_t) ((SCR%300ULL) & 0x00000000000001FF);
+	uint32_t lscr = htonl((uint32_t) ((SCR/300ULL) & 0x00000000FFFFFFFF));
+	uint8_t *scr = (uint8_t *) &lscr;
+	uint16_t scr_ext = (uint16_t) ((SCR%300ULL) & 0x00000000000001FF);
 	
 // SCR = 0
 	p.scr[0] = 0x44;
@@ -609,26 +600,21 @@ int write_pes_header(uint8_t id, int length , uint64_t PTS, uint64_t DTS,
 {
 	uint8_t le[2];
 	uint8_t dummy[3];
-	uint8_t *pts;
 	uint8_t ppts[5];
-	uint32_t lpts;
-	uint8_t *dts;
 	uint8_t pdts[5];
-	uint32_t ldts;
-	int c;
 	uint8_t headr[3] = {0x00, 0x00, 0x01};
 	
-	lpts = htonl((PTS/300ULL) & 0x00000000FFFFFFFFULL);
-	pts = (uint8_t *) &lpts;
+	uint32_t lpts = htonl((PTS/300ULL) & 0x00000000FFFFFFFFULL);
+	uint8_t *pts = (uint8_t *) &lpts;
 	get_pespts(pts,ppts);
 	if ((PTS/300ULL) & 0x0000000100000000ULL) ppts[0] |= 0x80;
 
-	ldts = htonl((DTS/300ULL) & 0x00000000FFFFFFFFULL);
-	dts = (uint8_t *) &ldts;
+	uint32_t ldts = htonl((DTS/300ULL) & 0x00000000FFFFFFFFULL);
+	uint8_t *dts = (uint8_t *) &ldts;
 	get_pespts(dts,pdts);
 	if ((DTS/300ULL) & 0x0000000100000000ULL) pdts[0] |= 0x80;
 
-	c = 0;
+	int c = 0;
 	memcpy(obuf+c,headr,3);
 	c += 3;
 	memcpy(obuf+c,&id,1);
@@ -702,14 +688,11 @@ int write_video_pes( int pack_size, int extcnt, uint64_t vpts,
 		     uint8_t *buf, int *vlength, 
 		     uint8_t ptsdts, ringbuffer *vrbuffer)
 {
-	int add;
-	int pos = 0;
-	int p   = 0;
 	int stuff = 0;
 	int length = *vlength;
 
 	if (! length) return 0;
-	p = PS_HEADER_L1+PES_H_MIN;
+	int p = PS_HEADER_L1+PES_H_MIN;
 
 	if ( ptsdts == PTS_ONLY){
 		p += 5;
@@ -727,7 +710,7 @@ int write_video_pes( int pack_size, int extcnt, uint64_t vpts,
 			length = length+p;
 	}
 
-	pos = write_ps_header(buf,SCR,muxr, extcnt, 0, 0, 1, 1, 
+	int pos = write_ps_header(buf,SCR,muxr, extcnt, 0, 0, 1, 1,
 			      1, 0);
 
 	pos += write_pes_header( 0xE0, length-pos, vpts, vdts, buf+pos, 
@@ -737,7 +720,7 @@ int write_video_pes( int pack_size, int extcnt, uint64_t vpts,
 			*vlength);
 	}
 
-	add = ring_read( vrbuffer, buf+pos, length-pos);
+	int add = ring_read( vrbuffer, buf+pos, length-pos);
 	*vlength = add;
 	if (add < 0) return -1;
 	pos += add;
@@ -754,14 +737,11 @@ int write_audio_pes(  int pack_size, int extcnt, int n, uint64_t pts,
 		      uint64_t SCR, uint32_t muxr, uint8_t *buf, int *alength, 
 		      uint8_t ptsdts, 	ringbuffer *arbuffer)
 {
-	int add;
-	int pos = 0;
-	int p   = 0;
 	int stuff = 0;
 	int length = *alength;
 
 	if (!length) return 0;
-	p = PS_HEADER_L1+PES_H_MIN;
+	int p = PS_HEADER_L1+PES_H_MIN;
 
 	if (ptsdts == PTS_ONLY){
 		p += 5;
@@ -776,11 +756,11 @@ int write_audio_pes(  int pack_size, int extcnt, int n, uint64_t pts,
 		} else 
 			length = length+p;
 	}
-	pos = write_ps_header(buf,SCR,muxr, extcnt, 0, 0, 1, 1, 
+	int pos = write_ps_header(buf,SCR,muxr, extcnt, 0, 0, 1, 1,
 			      1, 0);
 	pos += write_pes_header( 0xC0+n, length-pos, pts, 0, buf+pos, stuff, 
 				 ptsdts);
-	add = ring_read( arbuffer, buf+pos, length-pos);
+	int add = ring_read( arbuffer, buf+pos, length-pos);
 	*alength = add;
 	if (add < 0) return -1;
 	pos += add;
@@ -803,14 +783,11 @@ int write_ac3_pes(  int pack_size, int extcnt, int n,
 		    uint32_t muxr, uint8_t *buf, int *alength, uint8_t ptsdts,
 		    int nframes,int ac3_off, ringbuffer *ac3rbuffer)
 {
-	int add;
-	int pos = 0;
-	int p   = 0;
 	int stuff = 0;
 	int length = *alength;
 
 	if (!length) return 0;
-	p = PS_HEADER_L1+PES_H_MIN+4;
+	int p = PS_HEADER_L1+PES_H_MIN+4;
 
 	if (ptsdts == PTS_ONLY){
 		p += 5;
@@ -825,7 +802,7 @@ int write_ac3_pes(  int pack_size, int extcnt, int n,
 		} else 
 			length = length+p;
 	}
-	pos = write_ps_header(buf,SCR,muxr, extcnt, 0, 0, 1, 1, 
+	int pos = write_ps_header(buf,SCR,muxr, extcnt, 0, 0, 1, 1,
 			      1, 0);
 
 	pos += write_pes_header( PRIVATE_STREAM1, length-pos, pts, 0, 
@@ -836,7 +813,7 @@ int write_ac3_pes(  int pack_size, int extcnt, int n,
 	buf[pos+3] = (ac3_off)& 0xFF;
 	pos += 4;
 
-	add = ring_read( ac3rbuffer, buf+pos, length-pos);
+	int add = ring_read( ac3rbuffer, buf+pos, length-pos);
 	*alength = add;
 	if (add < 0) return -1;
 	pos += add;

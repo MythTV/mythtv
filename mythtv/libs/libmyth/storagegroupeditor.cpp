@@ -141,10 +141,10 @@ void StorageGroupEditor::DoDeleteSlot(bool doDelete)
 
 StorageGroupDirStorage::StorageGroupDirStorage(StorageUser *_user,
                                                int id,
-                                               const QString &group) :
+                                               QString group) :
     SimpleDBStorage(_user, "storagegroup", "dirname"),
     m_id(id),
-    m_group(group)
+    m_group(std::move(group))
 {
 }
 
@@ -299,7 +299,9 @@ void StorageGroupEditor::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
+        DialogCompletionEvent *dce = dynamic_cast<DialogCompletionEvent*>(event);
+        if (dce == nullptr)
+            return;
         QString resultid  = dce->GetId();
 
         if (resultid == "editsetting")

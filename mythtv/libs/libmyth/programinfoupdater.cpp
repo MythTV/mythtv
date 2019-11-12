@@ -42,7 +42,7 @@ void ProgramInfoUpdater::insert(
 
 void ProgramInfoUpdater::run(void)
 {
-    bool workDone;
+    bool workDone = false;
 
     do {
         workDone = false;

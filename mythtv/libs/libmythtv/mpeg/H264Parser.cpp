@@ -92,14 +92,11 @@ static const float eps = 1E-5;
 
 H264Parser::H264Parser(void)
 {
-    rbsp_buffer_size = 188 * 2;
     rbsp_buffer = new uint8_t[rbsp_buffer_size];
     if (rbsp_buffer == nullptr)
         rbsp_buffer_size = 0;
 
     Reset();
-    I_is_keyframe = true;
-    au_contains_keyframe_message = false;
 }
 
 void H264Parser::Reset(void)
@@ -1125,9 +1122,9 @@ void H264Parser::decode_SEI(GetBitContext *gb)
           case SEI_TYPE_RECOVERY_POINT:
             recovery_frame_cnt = get_ue_golomb(gb);
             // cppcheck-suppress unreadVariable
-            exact_match_flag = (get_bits1(gb) != 0u);
+            exact_match_flag = (get_bits1(gb) != 0U);
             // cppcheck-suppress unreadVariable
-            broken_link_flag = (get_bits1(gb) != 0u);
+            broken_link_flag = (get_bits1(gb) != 0U);
             // cppcheck-suppress unreadVariable
             changing_group_slice_idc = get_bits(gb, 2);
             au_contains_keyframe_message = (recovery_frame_cnt == 0);
@@ -1291,7 +1288,7 @@ void H264Parser::vui_parameters(GetBitContext * gb)
     {
         unitsInTick = get_bits_long(gb, 32); //num_units_in_tick
         timeScale = get_bits_long(gb, 32);   //time_scale
-        fixedRate = (get_bits1(gb) != 0u);
+        fixedRate = (get_bits1(gb) != 0U);
     }
 }
 

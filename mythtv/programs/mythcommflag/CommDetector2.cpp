@@ -9,9 +9,9 @@
 using namespace std;
 
 // Qt headers
+#include <QCoreApplication>
 #include <QDir>
 #include <QFileInfo>
-#include <QCoreApplication>
 
 // MythTV headers
 #include "compat.h"
@@ -50,14 +50,13 @@ void waitForBuffer(const struct timeval *framestart, int minlag, int flaglag,
         float fps, bool fullspeed)
 {
     long usperframe = (long)(1000000.0F / fps);
-    struct timeval now, elapsed;
-    long sleepus;
+    struct timeval now {}, elapsed {};
 
     (void)gettimeofday(&now, nullptr);
     timersub(&now, framestart, &elapsed);
 
     // Sleep for one frame's worth of time.
-    sleepus = usperframe - elapsed.tv_sec * 1000000 - elapsed.tv_usec;
+    long sleepus = usperframe - elapsed.tv_sec * 1000000 - elapsed.tv_usec;
     if (sleepus <= 0)
         return;
 
@@ -121,7 +120,7 @@ long long processFrame(FrameAnalyzerItem &pass,
                        const VideoFrame *frame,
                        long long frameno)
 {
-    long long nextFrame;
+    long long nextFrame = 0;
     long long minNextFrame = FrameAnalyzer::ANYFRAME;
 
     FrameAnalyzerItem::iterator it = pass.begin();
@@ -257,19 +256,17 @@ void createDebugDirectory(const QString& dirname, const QString& comment)
 
 QString frameToTimestamp(long long frameno, float fps)
 {
-    int         ms, ss, mm, hh;
+    int ms = (int)roundf(frameno / fps * 1000);
 
-    ms = (int)roundf(frameno / fps * 1000);
-
-    ss = ms / 1000;
+    int ss = ms / 1000;
     ms %= 1000;
     if (ms >= 500)
         ss++;
 
-    mm = ss / 60;
+    int mm = ss / 60;
     ss %= 60;
 
-    hh = mm / 60;
+    int hh = mm / 60;
     mm %= 60;
 
     return QString("%1:%2:%3")
@@ -278,14 +275,12 @@ QString frameToTimestamp(long long frameno, float fps)
 
 QString frameToTimestampms(long long frameno, float fps)
 {
-    int         ms, ss, mm;
+    int ms = (int)roundf(frameno / fps * 1000);
 
-    ms = (int)roundf(frameno / fps * 1000);
-
-    ss = ms / 1000;
+    int ss = ms / 1000;
     ms %= 1000;
 
-    mm = ss / 60;
+    int mm = ss / 60;
     ss %= 60;
 
     return QString("%1:%2:%3")
@@ -308,16 +303,16 @@ CommDetector2::CommDetector2(
     bool               fullSpeed_in,
     MythPlayer        *player_in,
     int                chanid,
-    const QDateTime   &startts_in,
-    const QDateTime   &endts_in,
-    const QDateTime   &recstartts_in,
-    const QDateTime   &recendts_in,
+    QDateTime          startts_in,
+    QDateTime          endts_in,
+    QDateTime          recstartts_in,
+    QDateTime          recendts_in,
     bool               useDB) :
     m_commDetectMethod((enum SkipTypes)(commDetectMethod_in & ~COMM_DETECT_2)),
     m_showProgress(showProgress_in),  m_fullSpeed(fullSpeed_in),
     m_player(player_in),
-    m_startts(startts_in),            m_endts(endts_in),
-    m_recstartts(recstartts_in),      m_recendts(recendts_in),
+    m_startts(std::move(startts_in)),       m_endts(std::move(endts_in)),
+    m_recstartts(std::move(recstartts_in)), m_recendts(std::move(recendts_in)),
     m_isRecording(MythDate::current() < m_recendts),
     m_debugdir("")
 {
@@ -467,19 +462,18 @@ void CommDetector2::reportState(int elapsedms, long long frameno,
 
 int CommDetector2::computeBreaks(long long nframes)
 {
-    int             trow, tcol, twidth, theight;
-    TemplateMatcher *matcher;
+    int trow = 0, tcol = 0, twidth = 0, theight = 0;
 
     m_breaks.clear();
 
-    matcher = m_logoFinder &&
-        m_logoFinder->getTemplate(&trow, &tcol, &twidth, &theight) ? m_logoMatcher :
-        nullptr;
+    TemplateMatcher *matcher = nullptr;
+    if (m_logoFinder && m_logoFinder->getTemplate(&trow, &tcol, &twidth, &theight))
+        matcher = m_logoMatcher;
 
     if (matcher && m_blankFrameDetector)
     {
-        int cmp;
-        if (!(cmp = matcher->templateCoverage(nframes, m_finished)))
+        int cmp = matcher->templateCoverage(nframes, m_finished);
+        if (cmp == 0)
         {
             if (matcher->adjustForBlanks(m_blankFrameDetector, nframes))
                 return -1;
@@ -492,7 +486,7 @@ int CommDetector2::computeBreaks(long long nframes)
                     m_blankFrameDetector->computeForLogoSurplus(matcher))
                 return -1;
             if (cmp < 0 &&
-                    m_blankFrameDetector->computeForLogoDeficit(matcher))
+                    BlankFrameDetector::computeForLogoDeficit(matcher))
                 return -1;
 
             if (m_blankFrameDetector->computeBreaks(&m_breaks))
@@ -574,7 +568,7 @@ bool CommDetector2::go(void)
         m_currentFrameNumber = 0;
         long long lastLoggedFrame = m_currentFrameNumber;
         QTime passTime, clock;
-        struct timeval getframetime;
+        struct timeval getframetime {};
 
         m_player->ResetTotalDuration();
 
@@ -587,7 +581,7 @@ bool CommDetector2::go(void)
         memset(&getframetime, 0, sizeof(getframetime));
         while (!(*m_currentPass).empty() && m_player->GetEof() == kEofStateNone)
         {
-            struct timeval start, end, elapsedtv;
+            struct timeval start {}, end {}, elapsedtv {};
 
             (void)gettimeofday(&start, nullptr);
             bool fetchNext = (nextFrame == m_currentFrameNumber + 1);
@@ -781,14 +775,12 @@ void CommDetector2::GetCommercialBreakList(frm_dir_map_t &marks)
             iimark != marks.end();
             ++iimark)
     {
-        long long   markstart, markend;
-
         /* Display as 1-based frame numbers. */
-        markstart = iimark.key() + 1;   /* MARK_COMM_BEGIN */
+        long long markstart = iimark.key() + 1;   /* MARK_COMM_BEGIN */
         ++iimark;                       /* MARK_COMM_END */
         if (iimark == marks.end())
             break;
-        markend = iimark.key() + 1;
+        long long markend = iimark.key() + 1;
 
         LOG(VB_COMMFLAG, LOG_INFO, QString("Break: frame %1-%2 (%3-%4, %5)")
                 .arg(markstart, 6).arg(markend, 6)

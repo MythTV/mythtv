@@ -96,7 +96,7 @@ void HardwareProfile::GenerateUUIDs(void)
     m_publicuuid = GetPublicUUIDFromFile();
 }
 
-QString HardwareProfile::GetPrivateUUIDFromFile() const
+QString HardwareProfile::GetPrivateUUIDFromFile()
 {
     QString ret;
 
@@ -138,7 +138,7 @@ QString HardwareProfile::GetPublicUUIDFromFile() const
     return ret;
 }
 
-QString HardwareProfile::GetAdminPasswordFromFile() const
+QString HardwareProfile::GetAdminPasswordFromFile()
 {
     QString ret;
 
@@ -259,7 +259,7 @@ QString HardwareProfile::GetProfileURL() const
     return ret;
 }
 
-QString HardwareProfile::GetHardwareProfile() const
+QString HardwareProfile::GetHardwareProfile()
 {
     QString cmd = GetShareDir() + "hardwareprofile/sendProfile.py";
     QStringList args;

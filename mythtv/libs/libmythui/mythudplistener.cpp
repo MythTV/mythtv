@@ -145,7 +145,7 @@ void MythUDPListener::Process(const QByteArray &buf, const QHostAddress& /*sende
                 type = e.text();
             else if (notification && e.tagName() == "progress")
             {
-                bool ok;
+                bool ok = false;
                 progress = e.text().toFloat(&ok);
                 if (!ok)
                     progress = -1.0F;

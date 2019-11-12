@@ -288,7 +288,7 @@ class AvFormatDecoder : public DecoderBase
     AVFormatContext   *m_ic                           {nullptr};
     // AVFormatParameters params;
 
-    URLContext         m_readcontext;
+    URLContext         m_readcontext                  {};
 
     int                m_frame_decoded                {0};
     VideoFrame        *m_decoded_video_frame          {nullptr};
@@ -351,15 +351,15 @@ class AvFormatDecoder : public DecoderBase
     CC608Decoder      *m_ccd608                       {nullptr};
     CC708Decoder      *m_ccd708                       {nullptr};
     TeletextDecoder   *m_ttd                          {nullptr};
-    int                m_cc608_parity_table[256];
+    int                m_cc608_parity_table[256]      {0};
     /// Lookup table for whether a stream was seen in the PMT
     /// entries 0-3 correspond to CEA-608 CC1 through CC4, while
     /// entries 4-67 corresport to CEA-708 streams 0 through 64
-    bool               m_ccX08_in_pmt[64+4];
+    bool               m_ccX08_in_pmt[64+4]           {};
     /// Lookup table for whether a stream is represented in the UI
     /// entries 0-3 correspond to CEA-608 CC1 through CC4, while
     /// entries 4-67 corresport to CEA-708 streams 0 through 64
-    bool               m_ccX08_in_tracks[64+4];
+    bool               m_ccX08_in_tracks[64+4]        {};
     /// StreamInfo for 608 and 708 Captions seen in the PMT descriptor
     QList<StreamInfo>  m_pmt_tracks;
     /// TrackType (608 or 708) for Captions seen in the PMT descriptor

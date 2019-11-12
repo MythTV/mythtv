@@ -12,9 +12,9 @@
 
 #include <cmath>
 
+#include <QStringList>
 #include <QTextCodec>
 #include <QTextStream>
-#include <QStringList>
 
 #include "upnp.h"
 #include "eventing.h"
@@ -59,10 +59,10 @@ uint StateVariables::BuildNotifyBody(
 /////////////////////////////////////////////////////////////////////////////
 
 Eventing::Eventing(const QString &sExtensionName,
-                   const QString &sEventMethodName,
+                   QString sEventMethodName,
                    const QString &sSharePath) :
     HttpServerExtension(sExtensionName, sSharePath),
-    m_sEventMethodName(sEventMethodName),
+    m_sEventMethodName(std::move(sEventMethodName)),
     m_nSubscriptionDuration(
         UPnp::GetConfiguration()->GetValue("UPnP/SubscriptionDuration", 1800))
 {
@@ -90,11 +90,9 @@ inline short Eventing::HoldEvents()
     // -=>TODO: Should use an Atomic increment... 
     //          need to research available functions.
 
-    short nVal;
-
     m_mutex.lock();
     bool err = (m_nHoldCount >= 127);
-    nVal = (m_nHoldCount++);
+    short nVal = (m_nHoldCount++);
     m_mutex.unlock();
 
     if (err)
@@ -116,10 +114,8 @@ inline short Eventing::ReleaseEvents()
 {
     // -=>TODO: Should use an Atomic decrement... 
 
-    short nVal;
-
     m_mutex.lock();
-    nVal = (m_nHoldCount--);
+    short nVal = (m_nHoldCount--);
     m_mutex.unlock();
 
     if (nVal == 0)

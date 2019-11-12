@@ -69,7 +69,7 @@ private:
     unsigned char          *m_match             {nullptr};  /* boolean result: 1/0 */
 
     float                   m_fps               {0.0F};
-    AVFrame                 m_cropped;                     /* pre-allocated buffer */
+    AVFrame                 m_cropped           {};        /* pre-allocated buffer */
     FrameAnalyzer::FrameMap m_breakMap;                    /* frameno => nframes */
 
     /* Debugging */
@@ -80,7 +80,7 @@ private:
     bool                    m_debug_matches     {false};
     bool                    m_debug_removerunts {false};
     bool                    m_matches_done      {false};
-    struct timeval          m_analyze_time;
+    struct timeval          m_analyze_time      {0,0};
 };
 
 #endif  /* !__TEMPLATEMATCHER_H__ */

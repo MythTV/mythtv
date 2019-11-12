@@ -149,7 +149,7 @@ RingBuffer *RingBuffer::Create(
     }
     if (!stream_only && mythurl)
     {
-        struct stat fileInfo;
+        struct stat fileInfo {};
         if ((RemoteFile::Exists(lfilename, &fileInfo)) &&
             (S_ISDIR(fileInfo.st_mode)))
         {
@@ -882,7 +882,7 @@ void RingBuffer::run(void)
     RunProlog();
 
     // These variables are used to adjust the read block size
-    struct timeval lastread, now;
+    struct timeval lastread {}, now {};
     int readtimeavg = 300;
     bool ignore_for_read_timing = true;
     int eofreads = 0;

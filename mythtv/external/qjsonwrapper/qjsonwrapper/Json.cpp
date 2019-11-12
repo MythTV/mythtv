@@ -75,7 +75,7 @@ qvariant2qobject( const QVariantMap& variant, QObject* object )
 QVariant
 parseJson( const QByteArray& jsonData, bool* ok )
 {
-    QJsonParseError error;
+    QJsonParseError error {};
     QJsonDocument doc = QJsonDocument::fromJson( jsonData, &error );
     if ( ok != nullptr )
     {

@@ -89,7 +89,7 @@ int GetTermWidth(void)
 #if defined(_WIN32) || defined(Q_OS_ANDROID)
     return TERMWIDTH;
 #else
-    struct winsize ws;
+    struct winsize ws {};
 
     if (ioctl(0, TIOCGWINSZ, &ws) != 0)
         return TERMWIDTH;
@@ -535,9 +535,9 @@ bool CommandLineArg::Set(const QString& opt, const QByteArray& val)
 
 /** \brief Set argument as parent of given child
  */
-CommandLineArg* CommandLineArg::SetParentOf(QString opt)
+CommandLineArg* CommandLineArg::SetParentOf(const QString &opt)
 {
-    m_children << new CommandLineArg(std::move(opt));
+    m_children << new CommandLineArg(opt);
     return this;
 }
 
@@ -553,9 +553,9 @@ CommandLineArg* CommandLineArg::SetParentOf(QStringList opts)
 
 /** \brief Set argument as child of given parent
  */
-CommandLineArg* CommandLineArg::SetParent(QString opt)
+CommandLineArg* CommandLineArg::SetParent(const QString &opt)
 {
-    m_parents << new CommandLineArg(std::move(opt));
+    m_parents << new CommandLineArg(opt);
     return this;
 }
 
@@ -571,9 +571,9 @@ CommandLineArg* CommandLineArg::SetParent(QStringList opts)
 
 /** \brief Set argument as child of given parent
  */
-CommandLineArg* CommandLineArg::SetChildOf(QString opt)
+CommandLineArg* CommandLineArg::SetChildOf(const QString &opt)
 {
-    m_parents << new CommandLineArg(std::move(opt));
+    m_parents << new CommandLineArg(opt);
     return this;
 }
 
@@ -589,9 +589,9 @@ CommandLineArg* CommandLineArg::SetChildOf(QStringList opts)
 
 /** \brief Set argument as parent of given child
  */
-CommandLineArg* CommandLineArg::SetChild(QString opt)
+CommandLineArg* CommandLineArg::SetChild(const QString& opt)
 {
-    m_children << new CommandLineArg(std::move(opt));
+    m_children << new CommandLineArg(opt);
     return this;
 }
 
@@ -651,9 +651,9 @@ CommandLineArg* CommandLineArg::SetRequiredChildOf(QStringList opts)
 
 /** \brief Set argument as requiring given option
  */
-CommandLineArg* CommandLineArg::SetRequires(QString opt)
+CommandLineArg* CommandLineArg::SetRequires(const QString& opt)
 {
-    m_requires << new CommandLineArg(std::move(opt));
+    m_requires << new CommandLineArg(opt);
     return this;
 }
 
@@ -669,9 +669,9 @@ CommandLineArg* CommandLineArg::SetRequires(QStringList opts)
 
 /** \brief Set argument as incompatible with given option
  */
-CommandLineArg* CommandLineArg::SetBlocks(QString opt)
+CommandLineArg* CommandLineArg::SetBlocks(const QString &opt)
 {
-    m_blocks << new CommandLineArg(std::move(opt));
+    m_blocks << new CommandLineArg(opt);
     return this;
 }
 
@@ -713,11 +713,10 @@ CommandLineArg* CommandLineArg::SetRemoved(QString remstr, QString remver)
  */
 void CommandLineArg::SetParentOf(CommandLineArg *other, bool forward)
 {
-    int i;
     bool replaced = false;
     other->IncrRef();
 
-    for (i = 0; i < m_children.size(); i++)
+    for (int i = 0; i < m_children.size(); i++)
     {
         if (m_children[i]->m_name == other->m_name)
         {
@@ -742,11 +741,10 @@ void CommandLineArg::SetParentOf(CommandLineArg *other, bool forward)
  */
 void CommandLineArg::SetChildOf(CommandLineArg *other, bool forward)
 {
-    int i;
     bool replaced = false;
     other->IncrRef();
 
-    for (i = 0; i < m_parents.size(); i++)
+    for (int i = 0; i < m_parents.size(); i++)
     {
         if (m_parents[i]->m_name == other->m_name)
         {
@@ -771,11 +769,10 @@ void CommandLineArg::SetChildOf(CommandLineArg *other, bool forward)
  */
 void CommandLineArg::SetRequires(CommandLineArg *other, bool /*forward*/)
 {
-    int i;
     bool replaced = false;
     other->IncrRef();
 
-    for (i = 0; i < m_requires.size(); i++)
+    for (int i = 0; i < m_requires.size(); i++)
     {
         if (m_requires[i]->m_name == other->m_name)
         {
@@ -801,11 +798,10 @@ void CommandLineArg::SetRequires(CommandLineArg *other, bool /*forward*/)
  */
 void CommandLineArg::SetBlocks(CommandLineArg *other, bool forward)
 {
-    int i;
     bool replaced = false;
     other->IncrRef();
 
-    for (i = 0; i < m_blocks.size(); i++)
+    for (int i = 0; i < m_blocks.size(); i++)
     {
         if (m_blocks[i]->m_name == other->m_name)
         {
@@ -916,11 +912,11 @@ QString CommandLineArg::GetPreferredKeyword(void) const
 {
     QStringList::const_iterator it;
     QString preferred;
-    int len = 0, len2;
+    int len = 0;
 
     for (it = m_keywords.constBegin(); it != m_keywords.constEnd(); ++it)
     {
-        len2 = (*it).size();
+        int len2 = (*it).size();
         if (len2 > len)
         {
             preferred = *it;
@@ -1035,7 +1031,7 @@ void CommandLineArg::PrintVerbose(void) const
     QMap<QString, QVariant>::const_iterator it;
     QVariantList vlist;
     QVariantList::const_iterator it2;
-    bool first;
+    bool first = true;
 
     switch (m_type)
     {
@@ -1085,8 +1081,6 @@ void CommandLineArg::PrintVerbose(void) const
 
       case QVariant::Map:
         tmpmap = m_stored.toMap();
-        first = true;
-
         for (it = tmpmap.begin(); it != tmpmap.end(); ++it)
         {
             if (first)
@@ -1225,7 +1219,7 @@ CommandLineArg* MythCommandLineParser::add(QStringList arglist,
         const QString& name, QVariant::Type type, QVariant def,
         QString help, QString longhelp)
 {
-    CommandLineArg *arg;
+    CommandLineArg *arg = nullptr;
 
     if (m_namedArgs.contains(name))
         arg = m_namedArgs[name];
@@ -1255,7 +1249,7 @@ CommandLineArg* MythCommandLineParser::add(QStringList arglist,
 
 /** \brief Print application version information
  */
-void MythCommandLineParser::PrintVersion(void) const
+void MythCommandLineParser::PrintVersion(void)
 {
     cout << "Please attach all output as a file in bug reports." << endl;
     cout << "MythTV Version : " << MYTH_SOURCE_VERSION << endl;
@@ -1430,10 +1424,10 @@ int MythCommandLineParser::getOpt(int argc, const char * const * argv,
  */
 bool MythCommandLineParser::Parse(int argc, const char * const * argv)
 {
-    int res;
+    int res = kEnd;
     QString opt;
     QByteArray val;
-    CommandLineArg *argdef;
+    CommandLineArg *argdef = nullptr;
 
     // reconnect interdependencies between command line options
     if (!ReconcileLinks())
@@ -2528,7 +2522,7 @@ LogLevel_t MythCommandLineParser::GetLogLevel(void)
  */
 bool MythCommandLineParser::SetValue(const QString &key, const QVariant& value)
 {
-    CommandLineArg *arg;
+    CommandLineArg *arg = nullptr;
 
     if (!m_namedArgs.contains(key))
     {
@@ -2549,14 +2543,14 @@ bool MythCommandLineParser::SetValue(const QString &key, const QVariant& value)
 
 /** \brief Read in logging options and initialize the logging interface
  */
-int MythCommandLineParser::ConfigureLogging(QString mask, unsigned int progress)
+int MythCommandLineParser::ConfigureLogging(const QString& mask, unsigned int progress)
 {
     int err = 0;
 
     // Setup the defaults
     verboseString = "";
     verboseMask   = 0;
-    verboseArgParse(std::move(mask));
+    verboseArgParse(mask);
 
     if (toBool("verbose"))
     {

@@ -475,7 +475,7 @@ bool ServiceHost::FormatResponse( HTTPRequest *pRequest, QObject *pResults )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool ServiceHost::FormatResponse( HTTPRequest *pRequest, QFileInfo oInfo )
+bool ServiceHost::FormatResponse( HTTPRequest *pRequest, const QFileInfo& oInfo )
 {
     QString sName = oInfo.absoluteFilePath();
 
@@ -500,7 +500,7 @@ bool ServiceHost::FormatResponse( HTTPRequest *pRequest, QFileInfo oInfo )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool ServiceHost::FormatResponse( HTTPRequest *pRequest, QVariant vValue )
+bool ServiceHost::FormatResponse( HTTPRequest *pRequest, const QVariant& vValue )
 {
     if ( vValue.canConvert< QObject* >()) 
     { 

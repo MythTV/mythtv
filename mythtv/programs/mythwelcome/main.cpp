@@ -62,15 +62,15 @@ int main(int argc, char **argv)
 
     if (cmdline.toBool("showversion"))
     {
-        cmdline.PrintVersion();
+        MythWelcomeCommandLineParser::PrintVersion();
         return GENERIC_EXIT_OK;
     }
 
     QApplication a(argc, argv);
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHWELCOME);
 
-    int retval;
-    if ((retval = cmdline.ConfigureLogging()) != GENERIC_EXIT_OK)
+    int retval = cmdline.ConfigureLogging();
+    if (retval != GENERIC_EXIT_OK)
         return retval;
 
     if (cmdline.toBool("setup"))
@@ -127,7 +127,7 @@ int main(int argc, char **argv)
 
     MythScreenStack *mainStack = mainWindow->GetMainStack();
 
-    MythScreenType *screen;
+    MythScreenType *screen = nullptr;
     if (bShowSettings)
         screen = new StandardSettingDialog(mainStack, "shutdown",
                                            new MythShutdownSettings());

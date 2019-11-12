@@ -84,17 +84,17 @@ class NativeArchive
       NativeArchive(void);
       ~NativeArchive(void);
 
-      int doNativeArchive(const QString &jobFile);
-      int doImportArchive(const QString &xmlFile, int chanID);
-      bool copyFile(const QString &source, const QString &destination);
-      int importRecording(const QDomElement &itemNode,
-                          const QString &xmlFile, int chanID);
-      int importVideo(const QDomElement &itemNode, const QString &xmlFile);
-      int exportRecording(QDomElement &itemNode, const QString &saveDirectory);
-      int exportVideo(QDomElement &itemNode, const QString &saveDirectory);
+      static int doNativeArchive(const QString &jobFile);
+      static int doImportArchive(const QString &xmlFile, int chanID);
+      static bool copyFile(const QString &source, const QString &destination);
+      static int importRecording(const QDomElement &itemNode,
+                                 const QString &xmlFile, int chanID);
+      static int importVideo(const QDomElement &itemNode, const QString &xmlFile);
+      static int exportRecording(QDomElement &itemNode, const QString &saveDirectory);
+      static int exportVideo(QDomElement &itemNode, const QString &saveDirectory);
   private:
-      QString findNodeText(const QDomElement &elem, const QString &nodeName);
-      int getFieldList(QStringList &fieldList, const QString &tableName);
+      static QString findNodeText(const QDomElement &elem, const QString &nodeName);
+      static int getFieldList(QStringList &fieldList, const QString &tableName);
 };
 
 NativeArchive::NativeArchive(void)
@@ -971,9 +971,9 @@ int NativeArchive::importRecording(const QDomElement &itemNode,
         }
     }
 
-    QString destFile = gCoreContext->GenMythURL(gCoreContext->GetMasterHostName(),
-                                                gCoreContext->GetMasterServerPort(),
-                                                basename , "Default");
+    QString destFile = MythCoreContext::GenMythURL(gCoreContext->GetMasterHostName(),
+                                                   MythCoreContext::GetMasterServerPort(),
+                                                   basename , "Default");
 
     // copy file to recording directory
     LOG(VB_JOBQUEUE, LOG_INFO, "Copying video file to: " + destFile);
@@ -1235,7 +1235,7 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
     }
 
     // get intid field for inserted record
-    int intid;
+    int intid = 0;
     query.prepare("SELECT intid FROM videometadata WHERE filename = :FILENAME;");
     query.bindValue(":FILENAME", path + "/" + basename);
     if (query.exec() && query.next())
@@ -1274,7 +1274,7 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
             {
                 n = nodeList.item(x);
                 QDomElement e = n.toElement();
-                int genreID;
+                int genreID = 0;
                 QString genre = e.attribute("genre");
 
                 // see if this genre already exists
@@ -1344,7 +1344,7 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
             {
                 n = nodeList.item(x);
                 QDomElement e = n.toElement();
-                int countryID;
+                int countryID = 0;
                 QString country = e.attribute("country");
 
                 // see if this country already exists
@@ -1402,7 +1402,7 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
     {
         n = nodeList.item(0);
         QDomElement e = n.toElement();
-        int categoryID;
+        int categoryID = 0;
         QString category = e.attribute("category");
         // see if this category already exists
         query.prepare("SELECT intid FROM videocategory "
@@ -1571,8 +1571,8 @@ static int grabThumbnail(const QString& inFile, const QString& thumbList, const 
     }
 
     // find the first video stream
-    int videostream = -1, width, height;
-    float fps;
+    int videostream = -1, width = 0, height = 0;
+    float fps = NAN;
 
     for (uint i = 0; i < inputFC->nb_streams; i++)
     {
@@ -1636,7 +1636,6 @@ static int grabThumbnail(const QString& inFile, const QString& thumbList, const 
 
     int frameNo = -1, thumbCount = 0;
     bool frameFinished = false;
-    int keyFrame;
 
     while (av_read_frame(inputFC, &pkt) >= 0)
     {
@@ -1655,7 +1654,7 @@ static int grabThumbnail(const QString& inFile, const QString& thumbList, const 
                     frameFinished = true;
                 if (ret == 0 || ret == AVERROR(EAGAIN))
                     avcodec_send_packet(codecCtx, &pkt);
-                keyFrame = frame->key_frame;
+                int keyFrame = frame->key_frame;
 
                 while (!frameFinished || !keyFrame)
                 {
@@ -1958,7 +1957,7 @@ static int getFileInfo(const QString& inFile, const QString& outFile, int lenMet
                 stream.setAttribute("height", par->height);
                 stream.setAttribute("bitrate", (qlonglong)par->bit_rate);
 
-                float fps;
+                float fps = NAN;
                 if (st->r_frame_rate.den && st->r_frame_rate.num)
                     fps = av_q2d(st->r_frame_rate);
                 else
@@ -1982,9 +1981,8 @@ static int getFileInfo(const QString& inFile, const QString& outFile, int lenMet
 
                 if (st->start_time != (int) AV_NOPTS_VALUE)
                 {
-                    int secs, us;
-                    secs = st->start_time / AV_TIME_BASE;
-                    us = st->start_time % AV_TIME_BASE;
+                    int secs = st->start_time / AV_TIME_BASE;
+                    int us = st->start_time % AV_TIME_BASE;
                     stream.setAttribute("start_time", QString("%1.%2")
                             .arg(secs).arg(av_rescale(us, 1000000, AV_TIME_BASE)));
                 }
@@ -2106,9 +2104,8 @@ static int getFileInfo(const QString& inFile, const QString& outFile, int lenMet
 
                 if (st->start_time != (int) AV_NOPTS_VALUE)
                 {
-                    int secs, us;
-                    secs = st->start_time / AV_TIME_BASE;
-                    us = st->start_time % AV_TIME_BASE;
+                    int secs = st->start_time / AV_TIME_BASE;
+                    int us = st->start_time % AV_TIME_BASE;
                     stream.setAttribute("start_time", QString("%1.%2")
                             .arg(secs).arg(av_rescale(us, 1000000, AV_TIME_BASE)));
                 }
@@ -2214,16 +2211,15 @@ static int isRemote(const QString& filename)
     if (!QFile::exists(filename))
         return 0;
 
-    struct statfs statbuf;
-    memset(&statbuf, 0, sizeof(statbuf));
-
 #if CONFIG_DARWIN
+    struct statfs statbuf {};
     if ((statfs(qPrintable(filename), &statbuf) == 0) &&
         ((!strcmp(statbuf.f_fstypename, "nfs")) ||      // NFS|FTP
             (!strcmp(statbuf.f_fstypename, "afpfs")) || // ApplShr
             (!strcmp(statbuf.f_fstypename, "smbfs"))))  // SMB
         return 2;
 #elif __linux__
+    struct statfs statbuf {};
     if ((statfs(qPrintable(filename), &statbuf) == 0) &&
         ((statbuf.f_type == 0x6969) ||      // NFS
             (statbuf.f_type == 0x517B)))    // SMB
@@ -2360,7 +2356,7 @@ int main(int argc, char **argv)
 
     if (cmdline.toBool("showversion"))
     {
-        cmdline.PrintVersion();
+        MythArchiveHelperCommandLineParser::PrintVersion();
         return GENERIC_EXIT_OK;
     }
 
@@ -2368,7 +2364,7 @@ int main(int argc, char **argv)
     QCoreApplication::setApplicationName("mytharchivehelper");
 
     // by default we only output our messages
-    int retval;
+    int retval = GENERIC_EXIT_OK;
     QString mask("jobqueue");
     if ((retval = cmdline.ConfigureLogging(mask)) != GENERIC_EXIT_OK)
         return retval;

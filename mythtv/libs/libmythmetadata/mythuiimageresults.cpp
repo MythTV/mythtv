@@ -1,8 +1,8 @@
 
 #include "mythuiimageresults.h"
 
-#include <QFile>
 #include <QDir>
+#include <QFile>
 
 #include "mythdirs.h"
 #include "mythdate.h"
@@ -13,11 +13,11 @@
 
 ImageSearchResultsDialog::ImageSearchResultsDialog(
     MythScreenStack *lparent,
-    const ArtworkList& list,
+    ArtworkList list,
     const VideoArtworkType type) :
 
     MythScreenType(lparent, "videosearchresultspopup"),
-    m_list(list),
+    m_list(std::move(list)),
     m_type(type)
 {
     m_imageDownload = new MetadataImageDownload(this);
@@ -122,7 +122,9 @@ void ImageSearchResultsDialog::customEvent(QEvent *event)
 {
     if (event->type() == ThumbnailDLEvent::kEventType)
     {
-        ThumbnailDLEvent *tde = (ThumbnailDLEvent *)event;
+        ThumbnailDLEvent *tde = dynamic_cast<ThumbnailDLEvent *>(event);
+        if (tde == nullptr)
+            return;
 
         ThumbnailData *data = tde->m_thumb;
 

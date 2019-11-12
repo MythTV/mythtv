@@ -17,14 +17,14 @@ using namespace std;
 // If value is 0 or negative assume a match (i.e. value unknown assumes a match)
 // float values must be no more than 3 decimals.
 
-bool ProfileItem::checkRange(QString key, float fvalue, bool *ok) const
+bool ProfileItem::checkRange(const QString& key, float fvalue, bool *ok) const
 {
-    return checkRange(std::move(key), fvalue, 0, true, ok);
+    return checkRange(key, fvalue, 0, true, ok);
 }
 
-bool ProfileItem::checkRange(QString key, int ivalue, bool *ok) const
+bool ProfileItem::checkRange(const QString& key, int ivalue, bool *ok) const
 {
-    return checkRange(std::move(key), 0.0, ivalue, false, ok);
+    return checkRange(key, 0.0, ivalue, false, ok);
 }
 
 bool ProfileItem::checkRange(const QString& key,
@@ -1130,9 +1130,9 @@ void VideoDisplayProfile::CreateProfile(
     uint groupid, uint priority,
     const QString& cmp0, uint width0, uint height0,
     const QString& cmp1, uint width1, uint height1,
-    QString decoder, uint max_cpus, bool skiploop, QString videorenderer,
-    QString osdrenderer, bool osdfade,
-    QString deint0, QString deint1, QString filters)
+    const QString& decoder, uint max_cpus, bool skiploop, const QString& videorenderer,
+    const QString& osdrenderer, bool osdfade,
+    const QString& deint0, const QString& deint1, const QString& filters)
 {
     QString width;
     QString height;
@@ -1156,9 +1156,9 @@ void VideoDisplayProfile::CreateProfile(
     CreateProfile(
         groupid, priority,
         width, height, QString(),
-        std::move(decoder), max_cpus, skiploop, std::move(videorenderer),
-        std::move(osdrenderer), osdfade,
-        std::move(deint0), std::move(deint1), std::move(filters));
+        decoder, max_cpus, skiploop, videorenderer,
+        osdrenderer, osdfade,
+        deint0, deint1, filters);
 }
 
 // New Style
@@ -1954,7 +1954,7 @@ void VideoDisplayProfile::init_statics(void)
 
     s_safe_initialized = true;
 
-    render_opts options;
+    render_opts options {};
     options.renderers      = &s_safe_custom;
     options.safe_renderers = &s_safe_renderer;
     options.deints         = &s_safe_deint;

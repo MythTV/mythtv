@@ -59,7 +59,7 @@ class MTV_PUBLIC InputInfo
     virtual ~InputInfo() = default;
 
     virtual bool FromStringList(QStringList::const_iterator &it,
-                                QStringList::const_iterator  end);
+                                const QStringList::const_iterator& end);
     virtual void ToStringList(QStringList &list) const;
 
     virtual void Clear(void);

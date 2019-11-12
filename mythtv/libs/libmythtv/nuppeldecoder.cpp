@@ -121,7 +121,7 @@ QString NuppelDecoder::GetRawEncodingType(void)
 bool NuppelDecoder::ReadFileheader(struct rtfileheader *fh)
 {
     if (ringBuffer->Read(fh, FILEHEADERSIZE) != FILEHEADERSIZE)
-        return false;
+        return false; // NOLINT(readability-simplify-boolean-expr)
 
 #if HAVE_BIGENDIAN
     fh->width         = bswap_32(fh->width);
@@ -142,7 +142,7 @@ bool NuppelDecoder::ReadFileheader(struct rtfileheader *fh)
 bool NuppelDecoder::ReadFrameheader(struct rtframeheader *fh)
 {
     if (ringBuffer->Read(fh, FRAMEHEADERSIZE) != FRAMEHEADERSIZE)
-        return false;
+        return false; // NOLINT(readability-simplify-boolean-expr)
 
 #if HAVE_BIGENDIAN
     fh->timecode     = bswap_32(fh->timecode);
@@ -165,7 +165,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     m_tracks[kTrackTypeVideo].push_back(si);
     m_selectedTrack[kTrackTypeVideo] = si;
 
-    struct rtframeheader frameheader;
+    struct rtframeheader frameheader {};
     long long startpos = 0;
     int foundit = 0;
     char *space;
@@ -307,7 +307,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     if (m_usingextradata && m_extradata.seektable_offset > 0)
     {
         long long currentpos = ringBuffer->GetReadPosition();
-        struct rtframeheader seek_frameheader;
+        struct rtframeheader seek_frameheader {};
 
         int seekret = ringBuffer->Seek(m_extradata.seektable_offset, SEEK_SET);
         if (seekret == -1)
@@ -334,11 +334,8 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
                 int numentries = seek_frameheader.packetlength /
                                  sizeof(struct seektable_entry);
-                struct seektable_entry ste;
+                struct seektable_entry ste {0, 0};
                 int offset = 0;
-
-                ste.file_offset = 0;
-                ste.keyframe_number = 0;
 
                 m_positionMapLock.lock();
 
@@ -386,7 +383,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         m_hasFullPositionMap)
     {
         long long currentpos = ringBuffer->GetReadPosition();
-        struct rtframeheader kfa_frameheader;
+        struct rtframeheader kfa_frameheader {};
 
         int kfa_ret = ringBuffer->Seek(m_extradata.keyframeadjust_offset,
                                        SEEK_SET);
@@ -414,7 +411,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
                 int numentries = kfa_frameheader.packetlength /
                                  sizeof(struct kfatable_entry);
-                struct kfatable_entry kfate;
+                struct kfatable_entry kfate {};
                 int offset = 0;
                 int adjust = 0;
                 QMap<long long, int> keyFrameAdjustMap;
@@ -1303,7 +1300,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
             unsigned char *eop = m_strm + m_frameheader.packetlength;
             unsigned char *cur = m_strm;
 
-            struct rtfileheader tmphead;
+            struct rtfileheader tmphead {};
             struct rtfileheader *fh = &tmphead;
 
             memcpy(fh, cur, min((int)sizeof(*fh), m_frameheader.packetlength));

@@ -58,9 +58,6 @@ MusicCommon::MusicCommon(MythScreenStack *parent, MythScreenType *parentScreen,
         lcd->switchToTime();
         lcd->setFunctionLEDs(FUNC_MUSIC, true);
     }
-
-    m_playlistOptions.insertPLOption = PL_REPLACE;
-    m_playlistOptions.playPLOption = PL_CURRENT;
 }
 
 MusicCommon::~MusicCommon(void)
@@ -923,7 +920,7 @@ void MusicCommon::updateProgressBar()
     if (gPlayer->getPlayMode() == MusicPlayer::PLAYMODE_RADIO)
     {
         // radio mode so show the buffer fill level since we don't know the track length
-        int available, maxSize;
+        int available = 0, maxSize = 0;
         gPlayer->getBufferStatus(&available, &maxSize);
 
         if (m_infoText)
@@ -1001,7 +998,7 @@ void MusicCommon::cycleVisualizer(void)
     {
         if (m_randomVisualizer)
         {
-            unsigned int next_visualizer;
+            unsigned int next_visualizer = 0;
 
             //Find a visual thats not like the previous visual
             do
@@ -1356,10 +1353,10 @@ void MusicCommon::customEvent(QEvent *event)
     }
     else if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = static_cast<DialogCompletionEvent*>(event);
+        auto dce = dynamic_cast<DialogCompletionEvent*>(event);
 
         // make sure the user didn't ESCAPE out of the menu
-        if (dce->GetResult() < 0)
+        if ((dce == nullptr) || (dce->GetResult() < 0))
             return;
 
         QString resultid   = dce->GetId();
@@ -2553,7 +2550,7 @@ void MusicCommon::showPlaylistOptionsMenu(bool addMainMenu)
 
 void MusicCommon::doUpdatePlaylist(void)
 {
-    int curTrackID, trackCount = 0;
+    int curTrackID = -1, trackCount = 0;
     int curPos = gPlayer->getCurrentTrackPos();
 
     if (gPlayer->getCurrentPlaylist())
@@ -2562,8 +2559,6 @@ void MusicCommon::doUpdatePlaylist(void)
     // store id of current track
     if (gPlayer->getCurrentMetadata())
         curTrackID = gPlayer->getCurrentMetadata()->ID();
-    else
-        curTrackID = -1;
 
     if (!m_whereClause.isEmpty())
     {

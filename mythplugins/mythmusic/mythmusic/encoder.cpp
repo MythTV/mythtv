@@ -8,8 +8,8 @@
 
 using namespace std;
 
-Encoder::Encoder(const QString &outfile, int qualitylevel, MusicMetadata *metadata)
-    : m_outfile(outfile), m_quality(qualitylevel),
+Encoder::Encoder(QString outfile, int qualitylevel, MusicMetadata *metadata)
+    : m_outfile(std::move(outfile)), m_quality(qualitylevel),
       m_metadata(metadata)
 {
     if (!m_outfile.isEmpty())

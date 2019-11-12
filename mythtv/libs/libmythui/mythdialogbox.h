@@ -84,8 +84,8 @@ class MUI_PUBLIC MythMenu
   friend class MythDialogBox;
 
   public:
-    MythMenu(const QString &text, QObject *retobject, const QString &resultid);
-    MythMenu(const QString &title, const QString &text, QObject *retobject, const QString &resultid);
+    MythMenu(QString text, QObject *retobject, QString resultid);
+    MythMenu(QString title, QString text, QObject *retobject, QString resultid);
     ~MythMenu(void);
 
     void AddItem(const QString &title, QVariant data = 0, MythMenu *subMenu = nullptr,
@@ -296,7 +296,7 @@ class MUI_PUBLIC MythSpinBoxDialog : public MythScreenType
     Q_OBJECT
 
   public:
-    MythSpinBoxDialog(MythScreenStack *parent, const QString &message);
+    MythSpinBoxDialog(MythScreenStack *parent, QString message);
 
     bool Create(void) override; // MythScreenType
     void SetReturnEvent(QObject *retobject, const QString &resultid);
@@ -403,7 +403,7 @@ class MUI_PUBLIC MythTimeInputDialog : public MythScreenType
         kAllDates     = 0x300
     };
 
-    MythTimeInputDialog(MythScreenStack *parent, const QString &message,
+    MythTimeInputDialog(MythScreenStack *parent, QString message,
                         int resolutionFlags,
                         QDateTime startTime = QDateTime::currentDateTime(),
                         int rangeLimit = 14);

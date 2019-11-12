@@ -23,29 +23,29 @@
 #include "commandlineparser.h"
 #include "MythExternRecApp.h"
 
-#include <QtCore/QtCore>
+#include <QElapsedTimer>
 #include <QFileInfo>
 #include <QProcess>
-#include <QElapsedTimer>
+#include <QtCore/QtCore>
 
 #define LOC Desc()
 
-MythExternRecApp::MythExternRecApp(const QString & command,
-                                   const QString & conf_file,
-                                   const QString & log_file,
-                                   const QString & logging)
+MythExternRecApp::MythExternRecApp(QString command,
+                                   QString conf_file,
+                                   QString log_file,
+                                   QString logging)
     : m_fatal(false)
     , m_run(true)
     , m_streaming(false)
     , m_result(0)
     , m_buffer_max(188 * 10000)
     , m_block_size(m_buffer_max / 4)
-    , m_rec_command(command)
+    , m_rec_command(std::move(command))
     , m_lock_timeout(0)
     , m_scan_timeout(120000)
-    , m_log_file(log_file)
-    , m_logging(logging)
-    , m_config_ini(conf_file)
+    , m_log_file(std::move(log_file))
+    , m_logging(std::move(logging))
+    , m_config_ini(std::move(conf_file))
     , m_tuned(false)
     , m_chan_settings(nullptr)
     , m_channel_idx(-1)

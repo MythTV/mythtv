@@ -111,6 +111,10 @@ public:
         delete m_remoteFile;
         delete m_localFile;
     }
+
+    RemoteFileWrapper(const RemoteFileWrapper &) = delete;            // not copyable
+    RemoteFileWrapper &operator=(const RemoteFileWrapper &) = delete; // not copyable
+
     bool isOpen(void) const {
         if (m_isRemote)
             return m_remoteFile->isOpen();
@@ -134,9 +138,6 @@ public:
         return 0;
     }
 private:
-    RemoteFileWrapper(const RemoteFileWrapper &) = delete;            // not copyable
-    RemoteFileWrapper &operator=(const RemoteFileWrapper &) = delete; // not copyable
-
     bool m_isRemote;
     RemoteFile *m_remoteFile;
     QFile *m_localFile;

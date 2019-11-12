@@ -43,7 +43,7 @@ class GameScannerThread : public MThread
 
   private:
 
-    void removeOrphan(const int id);
+    static void removeOrphan(const int id);
 
     void verifyFiles();
     void updateDB();

@@ -136,8 +136,7 @@ int V4LRecorder::OpenVBIDevice(void)
     if (VBIMode::NTSC_CC == m_vbimode)
     {
 #ifdef USING_V4L2
-        struct v4l2_format fmt;
-        memset(&fmt, 0, sizeof(fmt));
+        struct v4l2_format fmt {};
         fmt.type = V4L2_BUF_TYPE_VBI_CAPTURE;
         if (0 != ioctl(fd, VIDIOC_G_FMT, &fmt))
         {
@@ -264,11 +263,9 @@ void V4LRecorder::RunVBIDevice(void)
         if (!IsHelperRequested() || IsErrored())
             break;
 
-        struct timeval tv;
+        struct timeval tv {0, 5000};
         fd_set rdset;
 
-        tv.tv_sec = 0;
-        tv.tv_usec = 5000;
         FD_ZERO(&rdset);
         FD_SET(m_vbi_fd, &rdset);
 

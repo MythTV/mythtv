@@ -427,10 +427,7 @@ void Commands::Run(void)
     setObjectName("Commands");
 
     QString cmd;
-    int    timeout = 250;
 
-    int ret;
-    int poll_cnt = 1;
     struct pollfd polls[2];
     memset(polls, 0, sizeof(polls));
 
@@ -446,7 +443,9 @@ void Commands::Run(void)
 
     while (m_parent->m_run)
     {
-        ret = poll(polls, poll_cnt, timeout);
+        int timeout = 250;
+        int poll_cnt = 1;
+        int ret = poll(polls, poll_cnt, timeout);
 
         if (polls[0].revents & POLLHUP)
         {
@@ -547,7 +546,6 @@ void Buffer::Run(void)
     uint64_t   written = 0;
     uint64_t   write_cnt = 0;
     uint64_t   empty_cnt = 0;
-    uint       sz;
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Buffer: Ready for data.");
 
@@ -593,7 +591,7 @@ void Buffer::Run(void)
 
                 if (!pkt.empty())
                 {
-                    sz = write(1, pkt.data(), pkt.size());
+                    uint sz = write(1, pkt.data(), pkt.size());
                     written += sz;
                     ++write_cnt;
 

@@ -141,7 +141,7 @@ class MythMainWindowPrivate
     {
     }
 
-    int TranslateKeyNum(QKeyEvent *e);
+    static int TranslateKeyNum(QKeyEvent *e);
 
     float                m_wmult                {1.0F};
     float                m_hmult                {1.0F};
@@ -668,8 +668,7 @@ MythScreenStack *MythMainWindow::GetMainStack(void)
 
 MythScreenStack *MythMainWindow::GetStack(const QString &stackname)
 {
-    QVector<MythScreenStack *>::Iterator it;
-    for (it = d->m_stackList.begin(); it != d->m_stackList.end(); ++it)
+    for (auto it = d->m_stackList.begin(); it != d->m_stackList.end(); ++it)
     {
         if ((*it)->objectName() == stackname)
             return *it;
@@ -701,14 +700,12 @@ void MythMainWindow::animate(void)
     if (!d->m_repaintRegion.isEmpty())
         redraw = true;
 
-    QVector<MythScreenStack *>::Iterator it;
-    for (it = d->m_stackList.begin(); it != d->m_stackList.end(); ++it)
+    for (auto it = d->m_stackList.begin(); it != d->m_stackList.end(); ++it)
     {
         QVector<MythScreenType *> drawList;
         (*it)->GetDrawOrder(drawList);
 
-        QVector<MythScreenType *>::Iterator screenit;
-        for (screenit = drawList.begin(); screenit != drawList.end();
+        for (auto screenit = drawList.begin(); screenit != drawList.end();
              ++screenit)
         {
             (*screenit)->Pulse();
@@ -726,7 +723,7 @@ void MythMainWindow::animate(void)
     if (redraw && !(d->m_render && d->m_render->IsShared()))
         d->m_paintwin->update(d->m_repaintRegion);
 
-    for (it = d->m_stackList.begin(); it != d->m_stackList.end(); ++it)
+    for (auto it = d->m_stackList.begin(); it != d->m_stackList.end(); ++it)
         (*it)->ScheduleInitIfNeeded();
 
     d->m_drawTimer->blockSignals(false);
@@ -748,14 +745,12 @@ void MythMainWindow::drawScreen(void)
 
         // Check for any widgets that have been updated since we built
         // the dirty region list in ::animate()
-        QVector<MythScreenStack *>::Iterator it;
-        for (it = d->m_stackList.begin(); it != d->m_stackList.end(); ++it)
+        for (auto it = d->m_stackList.begin(); it != d->m_stackList.end(); ++it)
         {
             QVector<MythScreenType *> redrawList;
             (*it)->GetDrawOrder(redrawList);
 
-            QVector<MythScreenType *>::Iterator screenit;
-            for (screenit = redrawList.begin(); screenit != redrawList.end();
+            for (auto screenit = redrawList.begin(); screenit != redrawList.end();
                  ++screenit)
             {
                 if ((*screenit)->NeedsRedraw())
@@ -841,14 +836,12 @@ void MythMainWindow::draw(MythPainter *painter /* = 0 */)
         if (r != d->m_uiScreenRect)
             painter->SetClipRect(r);
 
-        QVector<MythScreenStack *>::Iterator it;
-        for (it = d->m_stackList.begin(); it != d->m_stackList.end(); ++it)
+        for (auto it = d->m_stackList.begin(); it != d->m_stackList.end(); ++it)
         {
             QVector<MythScreenType *> redrawList;
             (*it)->GetDrawOrder(redrawList);
 
-            QVector<MythScreenType *>::Iterator screenit;
-            for (screenit = redrawList.begin(); screenit != redrawList.end();
+            for (auto screenit = redrawList.begin(); screenit != redrawList.end();
                  ++screenit)
             {
                 (*screenit)->Draw(painter, 0, 0, 255, r);
@@ -885,7 +878,7 @@ void MythMainWindow::closeEvent(QCloseEvent *e)
 
 void MythMainWindow::GrabWindow(QImage &image)
 {
-    WId winid;
+    WId winid = 0;
     QWidget *active = QApplication::activeWindow();
     if (active)
         winid = active->winId();
@@ -1008,19 +1001,17 @@ void MythMainWindow::Init(const QString& forcedpainter, bool mayReInit)
     GetMythUI()->GetScreenSettings(d->m_xbase, d->m_screenwidth, d->m_wmult,
                                    d->m_ybase, d->m_screenheight, d->m_hmult);
 
-    if (GetMythDB()->GetNumSetting("GuiOffsetX") > 0 ||
-        GetMythDB()->GetNumSetting("GuiWidth")   > 0 ||
-        GetMythDB()->GetNumSetting("GuiOffsetY") > 0 ||
-        GetMythDB()->GetNumSetting("GuiHeight")  > 0)
-        d->m_does_fill_screen = false;
-    else
-        d->m_does_fill_screen = true;
+    d->m_does_fill_screen =
+        (GetMythDB()->GetNumSetting("GuiOffsetX") == 0 &&
+         GetMythDB()->GetNumSetting("GuiWidth")   == 0 &&
+         GetMythDB()->GetNumSetting("GuiOffsetY") == 0 &&
+         GetMythDB()->GetNumSetting("GuiHeight")  == 0);
 
     // Set window border based on fullscreen attribute
     Qt::WindowFlags flags = Qt::Window;
 
     bool inwindow = GetMythDB()->GetBoolSetting("RunFrontendInWindow", false);
-    bool fullscreen = d->m_does_fill_screen && !GetMythUI()->IsGeometryOverridden();
+    bool fullscreen = d->m_does_fill_screen && !MythUIHelper::IsGeometryOverridden();
 
     // On Compiz/Unit, when the window is fullscreen and frameless changing
     // screen position ends up stuck. Adding a border temporarily prevents this
@@ -1162,6 +1153,7 @@ void MythMainWindow::Init(const QString& forcedpainter, bool mayReInit)
     }
 #endif
 
+    // NOLINTNEXTLINE(readability-misleading-indentation)
     if (!d->m_painter && !d->m_paintwin)
     {
         LOG(VB_GENERAL, LOG_INFO, "Using the Qt painter");
@@ -1415,7 +1407,7 @@ void MythMainWindow::ReinitDone(void)
 void MythMainWindow::Show(void)
 {
     bool inwindow = GetMythDB()->GetBoolSetting("RunFrontendInWindow", false);
-    bool fullscreen = d->m_does_fill_screen && !GetMythUI()->IsGeometryOverridden();
+    bool fullscreen = d->m_does_fill_screen && !MythUIHelper::IsGeometryOverridden();
 
     if (fullscreen && !inwindow && !d->m_firstinit)
     {
@@ -1596,8 +1588,7 @@ void MythMainWindow::SetDrawEnabled(bool enable)
 
 void MythMainWindow::SetEffectsEnabled(bool enable)
 {
-    QVector<MythScreenStack *>::Iterator it;
-    for (it = d->m_stackList.begin(); it != d->m_stackList.end(); ++it)
+    for (auto it = d->m_stackList.begin(); it != d->m_stackList.end(); ++it)
     {
         if (enable)
             (*it)->EnableEffects();
@@ -1899,7 +1890,7 @@ void MythMainWindow::RegisterKey(const QString &context, const QString &action,
 }
 
 QString MythMainWindow::GetKey(const QString &context,
-                               const QString &action) const
+                               const QString &action)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     if (!query.isConnected())
@@ -2129,8 +2120,6 @@ void MythMainWindow::AllowInput(bool allow)
 
 void MythMainWindow::mouseTimeout(void)
 {
-    MythGestureEvent *e;
-
     /* complete the stroke if its our first timeout */
     if (d->m_gesture.recording())
     {
@@ -2138,7 +2127,7 @@ void MythMainWindow::mouseTimeout(void)
     }
 
     /* get the last gesture */
-    e = d->m_gesture.gesture();
+    MythGestureEvent *e = d->m_gesture.gesture();
 
     if (e->gesture() < MythGestureEvent::Click)
         QCoreApplication::postEvent(this, e);
@@ -2247,8 +2236,6 @@ bool MythMainWindow::keyLongPressFilter(QEvent **e,
 
 bool MythMainWindow::eventFilter(QObject * /*watched*/, QEvent *e)
 {
-    MythGestureEvent *ge;
-
     /* Don't let anything through if input is disallowed. */
     if (!d->m_AllowInput)
         return true;
@@ -2307,8 +2294,9 @@ bool MythMainWindow::eventFilter(QObject * /*watched*/, QEvent *e)
                 break;
             }
 
-            QVector<MythScreenStack *>::Iterator it;
-            for (it = d->m_stackList.end()-1; it != d->m_stackList.begin()-1; --it)
+            for (auto it = d->m_stackList.end()-1;
+                 it != d->m_stackList.begin()-1;
+                 --it)
             {
                 MythScreenType *top = (*it)->GetTopScreen();
                 if (top)
@@ -2356,10 +2344,9 @@ bool MythMainWindow::eventFilter(QObject * /*watched*/, QEvent *e)
             if (d->m_gesture.recording())
             {
                 d->m_gesture.stop();
-                ge = d->m_gesture.gesture();
+                MythGestureEvent *ge = d->m_gesture.gesture();
 
                 QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent*>(e);
-                QVector<MythScreenStack *>::iterator it;
 
                 /* handle clicks separately */
                 if (ge->gesture() == MythGestureEvent::Click)
@@ -2395,7 +2382,8 @@ bool MythMainWindow::eventFilter(QObject * /*watched*/, QEvent *e)
 
                     ge->SetButton(button);
 
-                    for (it = d->m_stackList.end()-1; it != d->m_stackList.begin()-1;
+                    for (auto it = d->m_stackList.end()-1;
+                         it != d->m_stackList.begin()-1;
                          --it)
                     {
                         MythScreenType *screen = (*it)->GetTopScreen();
@@ -2433,7 +2421,8 @@ bool MythMainWindow::eventFilter(QObject * /*watched*/, QEvent *e)
 
                     ge->SetPosition(p);
                     
-                    for (it = d->m_stackList.end()-1; it != d->m_stackList.begin()-1;
+                    for (auto it = d->m_stackList.end()-1;
+                         it != d->m_stackList.begin()-1;
                          --it)
                     {
                         MythScreenType *screen = (*it)->GetTopScreen();
@@ -2574,7 +2563,7 @@ void MythMainWindow::customEvent(QEvent *ce)
         }
         else
         {
-            GetMythUI()->ResetScreensaver();
+            MythUIHelper::ResetScreensaver();
             if (GetMythUI()->GetScreenIsAsleep())
                 return;
 
@@ -2598,7 +2587,7 @@ void MythMainWindow::customEvent(QEvent *ce)
 
         if (keycode)
         {
-            GetMythUI()->ResetScreensaver();
+            MythUIHelper::ResetScreensaver();
             if (GetMythUI()->GetScreenIsAsleep())
                 return;
 
@@ -2641,13 +2630,11 @@ void MythMainWindow::customEvent(QEvent *ce)
         // actions which would not be appropriate when the screen doesn't have
         // focus. It is the programmers responsibility to ignore events when
         // necessary.
-        QVector<MythScreenStack *>::Iterator it;
-        for (it = d->m_stackList.begin(); it != d->m_stackList.end(); ++it)
+        for (auto it = d->m_stackList.begin(); it != d->m_stackList.end(); ++it)
         {
             QVector<MythScreenType *> screenList;
             (*it)->GetScreenList(screenList);
-            QVector<MythScreenType *>::Iterator sit;
-            for (sit = screenList.begin(); sit != screenList.end(); ++sit)
+            for (auto sit = screenList.begin(); sit != screenList.end(); ++sit)
             {
                 MythScreenType *screen = (*sit);
                 if (screen)
@@ -3100,7 +3087,7 @@ void MythMainWindow::EnterStandby(bool manual)
                     ("MasterServerName");
     gCoreContext->GetSettingOnHost
                     ("BackendServerAddr", masterserver);
-    gCoreContext->GetMasterServerPort();
+    MythCoreContext::GetMasterServerPort();
     gCoreContext->GetSetting("WOLbackendCommand", "");
 
     // While in standby do not attempt to wake the backend

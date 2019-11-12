@@ -26,6 +26,6 @@ class TestMythIOWrapper : public QObject
 
   private slots:
     void initTestCase();
-    void local_directory_test(void);
+    static void local_directory_test(void);
     void cleanupTestCase();
 };

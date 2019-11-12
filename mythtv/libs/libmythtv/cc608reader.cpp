@@ -11,7 +11,6 @@ using namespace std;
 CC608Reader::CC608Reader(MythPlayer *parent)
   : m_parent(parent)
 {
-    memset(&m_inputBuffers, 0, sizeof(m_inputBuffers));
     m_maxTextSize = 8 * (sizeof(teletextsubtitle) + VT_WIDTH);
     for (int i = 0; i < MAXTBUFFER; i++)
         m_inputBuffers[i].buffer = new unsigned char[m_maxTextSize + 1];
@@ -111,7 +110,7 @@ CC608Buffer *CC608Reader::GetOutputText(bool &changed, int &streamIdx)
                 (*inpos)++;
                 while (*inpos)
                 {
-                    struct teletextsubtitle st;
+                    struct teletextsubtitle st {};
                     memcpy(&st, inpos, sizeof(st));
                     inpos += sizeof(st);
 
@@ -163,7 +162,7 @@ void CC608Reader::SetMode(int mode)
 
 int CC608Reader::Update(unsigned char *inpos)
 {
-    struct ccsubtitle subtitle;
+    struct ccsubtitle subtitle {};
 
     memcpy(&subtitle, inpos, sizeof(subtitle));
     inpos += sizeof(ccsubtitle);

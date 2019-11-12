@@ -197,18 +197,18 @@ class MPUBLIC Parse : public QObject
     ResultItem::resultList parseRSS(const QDomDocument& domDoc);
     ResultItem* ParseItem(const QDomElement& item) const;
 
-    QString GetLink(const QDomElement&) const;
-    QString GetAuthor(const QDomElement&) const;
-    QString GetCommentsRSS(const QDomElement&) const;
-    QString GetCommentsLink(const QDomElement&) const;
-    QDateTime GetDCDateTime(const QDomElement&) const;
-    QDateTime FromRFC3339(const QString&) const;
+    static QString GetLink(const QDomElement&);
+    static QString GetAuthor(const QDomElement&);
+    static QString GetCommentsRSS(const QDomElement&);
+    static QString GetCommentsLink(const QDomElement&);
+    static QDateTime GetDCDateTime(const QDomElement&);
+    static QDateTime FromRFC3339(const QString&);
     QDateTime RFC822TimeToQDateTime (const QString&) const;
     int GetNumComments (const QDomElement&) const;
     QStringList GetAllCategories (const QDomElement&) const;
     QPair<double, double> GetGeoPoint (const QDomElement&) const;
-    QList<MRSSEntry> GetMediaRSS (const QDomElement&) const;
-    QList<Enclosure> GetEnclosures(const QDomElement& entry) const;
+    static QList<MRSSEntry> GetMediaRSS (const QDomElement&);
+    static QList<Enclosure> GetEnclosures(const QDomElement& entry);
     static QString UnescapeHTML (const QString&);
 
   private:

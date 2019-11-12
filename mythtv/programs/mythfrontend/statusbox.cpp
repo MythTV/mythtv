@@ -58,11 +58,7 @@ StatusBox::StatusBox(MythScreenStack *parent)
 
     gCoreContext->SendReceiveStringList(strlist);
 
-    if (strlist[0] == "TRUE")
-        m_isBackendActive = true;
-    else
-        m_isBackendActive = false;
-
+    m_isBackendActive = (strlist[0] == "TRUE");
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
 }
 
@@ -105,9 +101,8 @@ bool StatusBox::Create()
 
 void StatusBox::Init()
 {
-    MythUIButtonListItem *item;
-
-    item = new MythUIButtonListItem(m_categoryList, tr("Listings Status"),
+    MythUIButtonListItem *item =
+        new MythUIButtonListItem(m_categoryList, tr("Listings Status"),
                             qVariantFromValue((void*)SLOT(doListingsStatus())));
     item->DisplayState("listings", "icon");
 
@@ -286,9 +281,7 @@ void StatusBox::clicked(MythUIButtonListItem *item)
     else if (currentItem == tr("Job Queue"))
     {
         QStringList msgs;
-        int jobStatus;
-
-        jobStatus = JobQueue::GetJobStatus(logline.data.toInt());
+        int jobStatus = JobQueue::GetJobStatus(logline.data.toInt());
 
         if (jobStatus == JOB_QUEUED)
         {
@@ -515,7 +508,6 @@ void StatusBox::doListingsStatus()
     QDateTime mfdLastRunStart, mfdLastRunEnd, mfdNextRunStart;
     QString mfdLastRunStatus;
     QString querytext;
-    int DaysOfData;
     QDateTime qdtNow, GuideDataThrough;
 
     qdtNow = MythDate::current();
@@ -564,7 +556,7 @@ void StatusBox::doListingsStatus()
         AddLogLine(tmp, helpmsg);
     }
 
-    DaysOfData = qdtNow.daysTo(GuideDataThrough);
+    int DaysOfData = qdtNow.daysTo(GuideDataThrough);
 
     if (GuideDataThrough.isNull())
     {
@@ -774,8 +766,7 @@ void StatusBox::doScheduleStatus()
                                     .arg(tr("marked as HDTV"));
         AddLogLine(tmpstr, helpmsg);
     }
-    int i;
-    for (i = 1; i <= maxSource; ++i)
+    for (int i = 1; i <= maxSource; ++i)
     {
         if (sourceMatch[i] > 0)
         {
@@ -785,7 +776,7 @@ void StatusBox::doScheduleStatus()
             AddLogLine(tmpstr, helpmsg);
         }
     }
-    for (i = 1; i <= maxCard; ++i)
+    for (int i = 1; i <= maxCard; ++i)
     {
         if (cardMatch[i] > 0)
         {
@@ -1158,20 +1149,17 @@ static void disk_usage_with_rec_time_kb(QStringList& out, long long total,
 
 static QString uptimeStr(time_t uptime)
 {
-    int     days, hours, min, secs;
-    QString str;
-
-    str = "   " + StatusBox::tr("Uptime") + ": ";
+    QString str = "   " + StatusBox::tr("Uptime") + ": ";
 
     if (uptime == 0)
         return str + StatusBox::tr("unknown", "unknown uptime");
 
-    days = uptime/(60*60*24);
+    int days = uptime/(60*60*24);
     uptime -= days*60*60*24;
-    hours = uptime/(60*60);
+    int hours = uptime/(60*60);
     uptime -= hours*60*60;
-    min  = uptime/60;
-    secs = uptime%60;
+    int min  = uptime/60;
+    int secs = uptime%60;
 
     if (days > 0)
     {
@@ -1261,9 +1249,9 @@ void StatusBox::doMachineStatus()
     if (m_justHelpText)
         m_justHelpText->SetText(machineStr);
 
-    int           totalM, usedM, freeM;    // Physical memory
-    int           totalS, usedS, freeS;    // Virtual  memory (swap)
-    time_t        uptime;
+    int           totalM = 0, usedM = 0, freeM = 0;    // Physical memory
+    int           totalS = 0, usedS = 0, freeS = 0;    // Virtual  memory (swap)
+    time_t        uptime = 0;
 
     QString line;
     if (m_isBackendActive)
@@ -1477,7 +1465,6 @@ void StatusBox::doAutoExpireList(bool updateExpList)
     if (m_justHelpText)
         m_justHelpText->SetText(helpmsg);
 
-    ProgramInfo*          pginfo;
     QString               contentLine;
     QString               detailInfo;
     QString               staticInfo;
@@ -1500,7 +1487,7 @@ void StatusBox::doAutoExpireList(bool updateExpList)
 
     for (it = m_expList.begin(); it != m_expList.end(); ++it)
     {
-        pginfo = *it;
+        ProgramInfo *pginfo = *it;
 
         totalSize += pginfo->GetFilesize();
         if (pginfo->GetRecordingGroup() == "LiveTV")
@@ -1529,7 +1516,7 @@ void StatusBox::doAutoExpireList(bool updateExpList)
 
     for (it = m_expList.begin(); it != m_expList.end(); ++it)
     {
-        pginfo = *it;
+        ProgramInfo *pginfo = *it;
         QDateTime starttime = pginfo->GetRecordingStartTime();
         QDateTime endtime = pginfo->GetRecordingEndTime();
         contentLine =

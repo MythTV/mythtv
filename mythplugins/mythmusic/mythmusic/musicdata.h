@@ -43,7 +43,7 @@ class MusicData : public QObject
     MusicData() = default;
     ~MusicData();
 
-    void scanMusic(void);
+    static void scanMusic(void);
     void loadMusic(void);
 
   public slots:

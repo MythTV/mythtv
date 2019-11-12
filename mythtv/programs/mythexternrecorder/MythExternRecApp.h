@@ -34,8 +34,8 @@ class MythExternRecApp : public QObject
     Q_OBJECT
 
   public:
-    MythExternRecApp(const QString & command, const QString & conf_file,
-                     const QString & log_file, const QString & logging);
+    MythExternRecApp(QString command,  QString conf_file,
+                     QString log_file, QString logging);
     ~MythExternRecApp(void);
 
     bool Open(void);

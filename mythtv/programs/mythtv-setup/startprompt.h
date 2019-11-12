@@ -14,9 +14,9 @@ class StartPrompter : public QObject
   public slots:
     void handleStart();
     void backendRunningPrompt();
-    void leaveBackendRunning();
-    void stopBackend();
-    void quit();
+    static void leaveBackendRunning();
+    static void stopBackend();
+    static void quit();
 
   private:
     StartPrompter(const StartPrompter &);

@@ -60,11 +60,11 @@ class ThumbFinder : public MythScreenType
   private:
     void Init(void) override; // MythScreenType
     bool getThumbImages(void);
-    int  getChapterCount(const QString &menuTheme);
+    static int getChapterCount(const QString &menuTheme);
     void changeSeekAmount(bool up);
     void updateCurrentPos(void);
     bool seekToFrame(int frame, bool checkPos = true);
-    QString createThumbDir(void);
+    static QString createThumbDir(void);
     QString frameToTime(int64_t frame, bool addFrame = false);
 
     // avcodec stuff

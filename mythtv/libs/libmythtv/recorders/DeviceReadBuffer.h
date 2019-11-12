@@ -84,8 +84,8 @@ class DeviceReadBuffer : protected MThread
 
     QString                 m_videodevice;
     int                     m_stream_fd             {-1};
-    mutable int             m_wake_pipe[2];
-    mutable long            m_wake_pipe_flags[2];
+    mutable int             m_wake_pipe[2]          {-1,-1};
+    mutable long            m_wake_pipe_flags[2]    {0,0};
 
     DeviceReaderCB         *m_readerCB              {nullptr};
 

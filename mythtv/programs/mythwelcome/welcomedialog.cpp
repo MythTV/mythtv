@@ -265,8 +265,8 @@ bool WelcomeDialog::keyPressEvent(QKeyEvent *event)
             QString mythshutdown_lock =
                 m_appBinDir + "mythshutdown --lock";
 
-            uint statusCode;
-            statusCode = myth_system(mythshutdown_status + logPropagateArgs, kMSDontBlockInputDevs);
+            uint statusCode =
+                myth_system(mythshutdown_status + logPropagateArgs, kMSDontBlockInputDevs);
 
             // is shutdown locked by a user
             if (!(statusCode & 0xFF00) && statusCode & 16)

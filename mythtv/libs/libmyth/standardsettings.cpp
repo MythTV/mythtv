@@ -610,13 +610,13 @@ int MythUIComboBoxSetting::size(void) const
 *******************************************************************************/
 MythUISpinBoxSetting::MythUISpinBoxSetting(Storage *_storage, int min, int max,
                                            int step, int pageMultiple,
-                                           const QString &special_value_text)
+                                           QString special_value_text)
     : StandardSetting(_storage),
       m_min(min),
       m_max(max),
       m_step(step),
       m_pageMultiple(pageMultiple),
-      m_special_value_text(special_value_text)
+      m_special_value_text(std::move(special_value_text))
 {
     // We default to 0 unless 0 is out of range.
     if (m_min > 0 || m_max < 0)
@@ -802,7 +802,9 @@ void StandardSettingDialog::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
+        auto dce = dynamic_cast<DialogCompletionEvent*>(event);
+        if (dce == nullptr)
+            return;
         QString resultid  = dce->GetId();
 
         if (resultid == "leveldown")

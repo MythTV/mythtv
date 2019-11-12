@@ -68,15 +68,15 @@ class AudioReencodeBuffer : public AudioOutput
     void      bufferOutputData(bool) override       { return; } // AudioOutput
     int       readOutputData(unsigned char*, int ) override { return 0; } // AudioOutput
 
-    int                  m_channels;
-    int                  m_bytes_per_frame;
-    int                  m_eff_audiorate;
+    int                  m_channels        {-1};
+    int                  m_bytes_per_frame {-1};
+    int                  m_eff_audiorate   {-1};
     long long            m_last_audiotime  {0};
-    bool                 m_passthru;
+    bool                 m_passthru        {false};
     int                  m_audioFrameSize  {0};
 
   private:
-    bool                 m_initpassthru;
+    bool                 m_initpassthru    {false};
     QMutex               m_bufferMutex;
     QList<AudioBuffer *> m_bufferList;
     AudioBuffer         *m_saveBuffer      {nullptr};

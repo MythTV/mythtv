@@ -30,11 +30,11 @@ class LogViewer : public MythScreenType
     void setFilenames(const QString &progressLog, const QString &fullLog);
 
   protected slots:
-    void cancelClicked(void);
+    static void cancelClicked(void);
     void updateClicked(void);
     void updateTimerTimeout(void);
     void toggleAutoUpdate(void);
-    bool loadFile(const QString& filename, QStringList &list, int startline);
+    static bool loadFile(const QString& filename, QStringList &list, int startline);
     void showProgressLog(void);
     void showFullLog(void);
     void ShowMenu(void) override; // MythScreenType
@@ -42,7 +42,7 @@ class LogViewer : public MythScreenType
 
   private:
     void Init(void) override; // MythScreenType
-    QString getSetting(const QString &key);
+    static QString getSetting(const QString &key);
 
     bool                m_autoUpdate   {false};
     int                 m_updateTime   {DEFAULT_UPDATE_TIME};

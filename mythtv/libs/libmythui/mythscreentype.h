@@ -99,7 +99,7 @@ class MUI_PUBLIC MythScreenType : public MythUIComposite
     virtual void Load(void);   // ONLY to be used for loading data, NO UI WORK or it will segfault
     virtual void Init(void);   // UI work to draw data loaded
 
-    void LoadInBackground(QString message = "");
+    void LoadInBackground(const QString& message = "");
     void ReloadInBackground(void);
 
     void OpenBusyPopup(const QString& message = "");

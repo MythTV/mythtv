@@ -30,7 +30,9 @@ typedef QList<QPointer<MythSystemLegacyUnix> > MSList_t;
 class MythSystemLegacyIOHandler: public MThread
 {
     public:
-        explicit MythSystemLegacyIOHandler(bool read);
+        explicit MythSystemLegacyIOHandler(bool read)
+            : MThread(QString("SystemIOHandler%1").arg(read ? "R" : "W")),
+              m_pMap(PMap_t()), m_read(read) {};
         ~MythSystemLegacyIOHandler() { wait(); }
         void   run(void) override; // MThread
 
@@ -49,10 +51,10 @@ class MythSystemLegacyIOHandler: public MThread
         QMutex          m_pLock;
         PMap_t          m_pMap;
 
-        fd_set m_fds;
+        fd_set m_fds   {};
         int    m_maxfd {-1};
-        bool   m_read;
-        char   m_readbuf[65536];
+        bool   m_read  {true};
+        char   m_readbuf[65536] {0};
 };
 
 // spawn separate thread for signals to prevent manager
@@ -111,7 +113,7 @@ class MBASE_PUBLIC MythSystemLegacyUnix : public MythSystemLegacyPrivate
         pid_t       m_pid     {0};
         time_t      m_timeout {0};
 
-        int         m_stdpipe[3];
+        int         m_stdpipe[3] {-1,-1, -1};
 };
 
 #endif // _MYTHSYSTEM_UNIX_H_

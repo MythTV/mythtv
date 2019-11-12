@@ -2793,20 +2793,7 @@ int RTjpeg::SetIntra(int *key, int *lm, int *cm)
 
 RTjpeg::RTjpeg(void)
 {
-    for (int i = 0; i < 64; i++)
-    {
-        block[i] = 0;
-        lqt[i] = cqt[i] = liqt[i] = ciqt[i] = 0;
-        for (int j = 0; j < 4; j++)
-            ws[i*j] = 0;
-    }
-    lb8 = cb8 = Ywidth = Cwidth = Ysize = Csize = key_count = 0;
-    width = height = Q = f = key_rate = 0;
-
-    old = old_start = nullptr;
-
 #ifdef MMX
-    lmask.q = cmask.q = 0;
     RTjpeg_ones.q = 0x0001000100010001LL;
     RTjpeg_half.q = 0x7fff7fff7fff7fffLL;
     RTjpeg_C4.q   = 0x2D412D412D412D41LL;
@@ -2814,8 +2801,6 @@ RTjpeg::RTjpeg(void)
     RTjpeg_C2mC6.q= 0x22A322A322A322A3LL;
     RTjpeg_C2pC6.q= 0x539F539F539F539FLL;
     RTjpeg_zero.q = 0x0000000000000000LL;
-#else
-    lmask = cmask = 0;
 #endif
 }
 

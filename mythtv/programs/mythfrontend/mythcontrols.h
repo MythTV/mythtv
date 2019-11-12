@@ -83,7 +83,7 @@ class MythControls : public MythScreenType
     void    LoadData(const QString &hostname);
     void    ChangeButtonFocus(int direction);
     void    ChangeView(void);
-    void    SetListContents(MythUIButtonList *uilist,
+    static void    SetListContents(MythUIButtonList *uilist,
                             const QStringList & contents,
                             bool arrows = false);
     void    UpdateRightList(void);

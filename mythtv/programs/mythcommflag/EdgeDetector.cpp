@@ -36,23 +36,21 @@ sgm_init_exclude(unsigned int *sgm, const AVFrame *src, int srcheight,
      * that pixel: how much it differs from its neighbors.
      */
     const int       srcwidth = src->linesize[0];
-    int             rr, cc, dx, dy, rr2, cc2;
-    unsigned char   *rr0, *rr1;
 
     memset(sgm, 0, srcwidth * srcheight * sizeof(*sgm));
-    rr2 = srcheight - 1;
-    cc2 = srcwidth - 1;
-    for (rr = 0; rr < rr2; rr++)
+    int rr2 = srcheight - 1;
+    int cc2 = srcwidth - 1;
+    for (int rr = 0; rr < rr2; rr++)
     {
-        for (cc = 0; cc < cc2; cc++)
+        for (int cc = 0; cc < cc2; cc++)
         {
             if (!rrccinrect(rr, cc, excluderow, excludecol,
                         excludewidth, excludeheight))
             {
-                rr0 = &src->data[0][rr * srcwidth + cc];
-                rr1 = &src->data[0][(rr + 1) * srcwidth + cc];
-                dx = rr1[1] - rr0[0];   /* southeast - northwest */
-                dy = rr1[0] - rr0[1];   /* southwest - northeast */
+                uchar *rr0 = &src->data[0][rr * srcwidth + cc];
+                uchar *rr1 = &src->data[0][(rr + 1) * srcwidth + cc];
+                int dx = rr1[1] - rr0[0];   /* southeast - northwest */
+                int dy = rr1[0] - rr0[1];   /* southwest - northeast */
                 sgm[rr * srcwidth + cc] = dx * dx + dy * dy;
             }
         }
@@ -91,8 +89,6 @@ edge_mark(AVFrame *dst, int dstheight,
 
     const int           dstwidth = dst->linesize[0];
     const int           padded_width = extraleft + dstwidth + extraright;
-    unsigned int        thresholdval;
-    int                 nn, dstnn, ii, rr, cc, first;
 
     (void)extrabottom;  /* gcc */
 
@@ -102,10 +98,10 @@ edge_mark(AVFrame *dst, int dstheight,
      * sgmsorted: sorted SGM values of unexcluded areas of unpadded image (same
      * dimensions as "dst").
      */
-    nn = 0;
-    for (rr = 0; rr < dstheight; rr++)
+    int nn = 0;
+    for (int rr = 0; rr < dstheight; rr++)
     {
-        for (cc = 0; cc < dstwidth; cc++)
+        for (int cc = 0; cc < dstwidth; cc++)
         {
             if (!rrccinrect(rr, cc, excluderow, excludecol,
                         excludewidth, excludeheight))
@@ -116,7 +112,7 @@ edge_mark(AVFrame *dst, int dstheight,
         }
     }
 
-    dstnn = dstwidth * dstheight;
+    int dstnn = dstwidth * dstheight;
 #if 0
     assert(nn == dstnn -
             (min(max(0, excluderow + excludeheight), dstheight) -
@@ -134,27 +130,26 @@ edge_mark(AVFrame *dst, int dstheight,
 
     qsort(sgmsorted, nn, sizeof(*sgmsorted), sort_ascending);
 
-    ii = percentile * nn / 100;
-    thresholdval = sgmsorted[ii];
+    int ii = percentile * nn / 100;
+    uint thresholdval = sgmsorted[ii];
 
     /*
      * Try not to pick up too many edges, and eliminate degenerate edge-less
      * cases.
      */
+    int first = ii;
     for (first = ii; first > 0 && sgmsorted[first] == thresholdval; first--) ;
     if (sgmsorted[first] != thresholdval)
         first++;
     if (first * 100 / nn < MINTHRESHOLDPCT)
     {
-        unsigned int    newthresholdval;
-
-        int last, last2 = nn - 1;
+        int last = ii, last2 = nn - 1;
         for (last = ii; last < last2 && sgmsorted[last] == thresholdval;
                 last++) ;
         if (sgmsorted[last] != thresholdval)
             last--;
 
-        newthresholdval = sgmsorted[min(last + 1, nn - 1)];
+        uint newthresholdval = sgmsorted[min(last + 1, nn - 1)];
         if (thresholdval == newthresholdval)
         {
             /* Degenerate case; no edges (e.g., blank frame). */
@@ -165,9 +160,9 @@ edge_mark(AVFrame *dst, int dstheight,
     }
 
     /* sgm is a padded matrix; dst is the unpadded matrix. */
-    for (rr = 0; rr < dstheight; rr++)
+    for (int rr = 0; rr < dstheight; rr++)
     {
-        for (cc = 0; cc < dstwidth; cc++)
+        for (int cc = 0; cc < dstwidth; cc++)
         {
             if (!rrccinrect(rr, cc, excluderow, excludecol,
                         excludewidth, excludeheight) &&

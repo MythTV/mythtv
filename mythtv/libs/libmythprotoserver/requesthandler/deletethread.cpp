@@ -96,7 +96,7 @@ void DeleteThread::ProcessNew(void)
     while (true)
     {
         // pull a new path from the stack
-        DeleteHandler *handler;
+        DeleteHandler *handler = nullptr;
         {
             QMutexLocker lock(&m_newlock);
             if (m_newfiles.isEmpty())

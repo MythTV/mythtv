@@ -197,7 +197,7 @@ static void fillTable(uint8_t *table, int in_min, int in_max, int out_min,
         float f = ((float)i - in_min) / (in_max - in_min);
         f = f < 0.0F ? 0.0F : f;
         f = f > 1.0F ? 1.0F : f;
-        table[i] = lround(powf (f, gamma) * (out_max - out_min) + out_min);
+        table[i] = lroundf(powf (f, gamma) * (out_max - out_min) + out_min);
     }
 }
 
@@ -206,14 +206,12 @@ static int fillTableMMX(uint8_t *table, mmx_t *shift, mmx_t *scale, mmx_t *min,
                    int in_min, int in_max, int out_min, int out_max,
                    float gamma)
 {
-    int shiftc, scalec, i;
-
     fillTable(table, in_min, in_max, out_min, out_max, gamma);
-    scalec = ((out_max - out_min) << 15)/(in_max - in_min);
+    int scalec = ((out_max - out_min) << 15)/(in_max - in_min);
     if ((av_get_cpu_flags() & AV_CPU_FLAG_MMX) == 0 || gamma < 0.9999F ||
         gamma > 1.00001F || scalec > 32767 << 7)
         return 0;
-    shiftc = 2;
+    int shiftc = 2;
     while (scalec > 32767)
     {
         shiftc++;
@@ -221,11 +219,11 @@ static int fillTableMMX(uint8_t *table, mmx_t *shift, mmx_t *scale, mmx_t *min,
     }
     if (shiftc > 7)
         return 0;
-    for (i = 0; i < 4; i++)
+    for (int i = 0; i < 4; i++)
     {
         scale->w[i] = scalec;
     }
-    for (i = 0; i < 8; i++)
+    for (int i = 0; i < 8; i++)
         min->b[i] = in_min;
     shift->q = shiftc;
     return 1;
@@ -236,7 +234,6 @@ static VideoFilter *
 newAdjustFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt, 
                  const int *width, const int *height, const char *options, int threads)
 {
-    ThisFilter *filter;
     int numopts = 0, ymin = 16, ymax = 253, cmin = 16, cmax = 240;
     float ygamma = 1.0F, cgamma = 1.0F;
     (void) width;
@@ -268,8 +265,7 @@ newAdjustFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
         cgamma = 1.0F;
     }
 
-    filter = malloc (sizeof (ThisFilter));
-
+    ThisFilter *filter = malloc (sizeof (ThisFilter));
     if (filter == NULL)
     {
         fprintf (stderr, "adjust: failed to allocate memory for filter\n");

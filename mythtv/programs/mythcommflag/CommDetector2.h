@@ -40,8 +40,8 @@ class CommDetector2 : public CommDetectorBase
     CommDetector2(
         SkipType commDetectMethod,
         bool showProgress, bool fullSpeed, MythPlayer* player,
-        int chanid, const QDateTime& startts, const QDateTime& endts,
-        const QDateTime& recstartts, const QDateTime& recendts, bool useDB);
+        int chanid, QDateTime startts, QDateTime endts,
+        QDateTime recstartts, QDateTime recendts, bool useDB);
     bool go(void) override; // CommDetectorBase
     void GetCommercialBreakList(frm_dir_map_t &marks) override; // CommDetectorBase
     void recordingFinished(long long totalFileSize) override; // CommDetectorBase

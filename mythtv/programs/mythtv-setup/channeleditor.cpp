@@ -730,7 +730,7 @@ void ChannelEditor::customEvent(QEvent *event)
         {
             MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-            ImportIconsWizard *iconwizard;
+            ImportIconsWizard *iconwizard = nullptr;
 
             QString channelname = dce->GetData().toString();
 

@@ -799,12 +799,11 @@ void mpeg2_idct_mmx_init (void)
 {
     extern uint8_t mpeg2_scan_norm[64];
     extern uint8_t mpeg2_scan_alt[64];
-    int i, j;
 
     /* the mmx/mmxext idct uses a reordered input, so we patch scan tables */
 
-    for (i = 0; i < 64; i++) {
-	j = mpeg2_scan_norm[i];
+    for (int i = 0; i < 64; i++) {
+	int j = mpeg2_scan_norm[i];
 	mpeg2_scan_norm[i] = (j & 0x38) | ((j & 6) >> 1) | ((j & 1) << 2);
 	j = mpeg2_scan_alt[i];
 	mpeg2_scan_alt[i] = (j & 0x38) | ((j & 6) >> 1) | ((j & 1) << 2);

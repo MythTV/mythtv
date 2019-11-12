@@ -459,7 +459,8 @@ bool MythDownloadManager::download(const QString &url, QByteArray *data,
                                    const bool reload, QString *finalUrl)
 {
     QString redirected;
-    if (!processItem(url, nullptr, QString(), data, kRequestGet, reload, NULL, NULL, NULL, &redirected))
+    if (!processItem(url, nullptr, QString(), data, kRequestGet, reload,
+                     nullptr, nullptr, nullptr, &redirected))
         return false;
     if (!redirected.isEmpty() && finalUrl != nullptr)
         *finalUrl = redirected;
@@ -1031,8 +1032,6 @@ void MythDownloadManager::cancelDownload(const QString &url, bool block)
  */
 void MythDownloadManager::cancelDownload(const QStringList &urls, bool block)
 {
-    MythDownloadInfo *dlInfo;
-
     m_infoLock->lock();
     foreach (QString url, urls)
     {
@@ -1040,7 +1039,7 @@ void MythDownloadManager::cancelDownload(const QStringList &urls, bool block)
         while (lit.hasNext())
         {
             lit.next();
-            dlInfo = lit.value();
+            MythDownloadInfo *dlInfo = lit.value();
             if (dlInfo->m_url == url)
             {
                 if (!m_cancellationQueue.contains(dlInfo))
@@ -1051,7 +1050,7 @@ void MythDownloadManager::cancelDownload(const QStringList &urls, bool block)
 
         if (m_downloadInfos.contains(url))
         {
-            dlInfo = m_downloadInfos[url];
+            MythDownloadInfo *dlInfo = m_downloadInfos[url];
 
             if (!m_cancellationQueue.contains(dlInfo))
                 m_cancellationQueue.append(dlInfo);
@@ -1085,13 +1084,12 @@ void MythDownloadManager::cancelDownload(const QStringList &urls, bool block)
 void MythDownloadManager::downloadCanceled()
 {
     QMutexLocker locker(m_infoLock);
-    MythDownloadInfo *dlInfo;
 
     QMutableListIterator<MythDownloadInfo*> lit(m_cancellationQueue);
     while (lit.hasNext())
     {
         lit.next();
-        dlInfo = lit.value();
+        MythDownloadInfo *dlInfo = lit.value();
         dlInfo->m_lock.lock();
 
         if (dlInfo->m_reply)
@@ -1119,12 +1117,11 @@ void MythDownloadManager::downloadCanceled()
 void MythDownloadManager::removeListener(QObject *caller)
 {
     QMutexLocker locker(m_infoLock);
-    MythDownloadInfo *dlInfo;
 
     QList <MythDownloadInfo*>::iterator lit = m_downloadQueue.begin();
     for (; lit != m_downloadQueue.end(); ++lit)
     {
-        dlInfo = *lit;
+        MythDownloadInfo *dlInfo = *lit;
         if (dlInfo->m_caller == caller)
         {
             dlInfo->m_caller  = nullptr;
@@ -1136,7 +1133,7 @@ void MythDownloadManager::removeListener(QObject *caller)
     QMap <QString, MythDownloadInfo*>::iterator mit = m_downloadInfos.begin();
     for (; mit != m_downloadInfos.end(); ++mit)
     {
-        dlInfo = mit.value();
+        MythDownloadInfo *dlInfo = mit.value();
         if (dlInfo->m_caller == caller)
         {
             dlInfo->m_caller  = nullptr;
@@ -1151,7 +1148,9 @@ void MythDownloadManager::removeListener(QObject *caller)
  */
 void MythDownloadManager::downloadError(QNetworkReply::NetworkError errorCode)
 {
-    QNetworkReply *reply = (QNetworkReply*)sender();
+    auto reply = dynamic_cast<QNetworkReply *>(sender());
+    if (reply == nullptr)
+        return;
 
     LOG(VB_FILE, LOG_DEBUG, LOC + QString("downloadError %1 ")
                     .arg(errorCode) + reply->errorString() );
@@ -1177,7 +1176,7 @@ void MythDownloadManager::downloadError(QNetworkReply::NetworkError errorCode)
  *  \return empty QUrl if we were not redirected, otherwise the redirected URL
  */
 QUrl MythDownloadManager::redirectUrl(const QUrl& possibleRedirectUrl,
-                                      const QUrl& oldRedirectUrl) const
+                                      const QUrl& oldRedirectUrl)
 {
     LOG(VB_FILE, LOG_DEBUG, LOC + QString("redirectUrl()"));
     QUrl redirectUrl;
@@ -1435,7 +1434,9 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
 void MythDownloadManager::downloadProgress(qint64 bytesReceived,
                                            qint64 bytesTotal)
 {
-    QNetworkReply *reply = (QNetworkReply*)sender();
+    auto reply = dynamic_cast<QNetworkReply *>(sender());
+    if (reply == nullptr)
+        return;
 
     LOG(VB_FILE, LOG_DEBUG, LOC +
         QString("downloadProgress(%1, %2) (for reply %3)")
@@ -1658,7 +1659,9 @@ void MythDownloadManager::saveCookieJar(const QString &filename)
     if (!m_manager->cookieJar())
         return;
 
-    MythCookieJar *jar = static_cast<MythCookieJar *>(m_manager->cookieJar());
+    auto jar = dynamic_cast<MythCookieJar *>(m_manager->cookieJar());
+    if (jar == nullptr)
+        return;
     jar->save(filename);
 }
 
@@ -1678,7 +1681,9 @@ QNetworkCookieJar *MythDownloadManager::copyCookieJar(void)
     if (!m_manager->cookieJar())
         return nullptr;
 
-    MythCookieJar *inJar = static_cast<MythCookieJar *>(m_manager->cookieJar());
+    auto inJar = dynamic_cast<MythCookieJar *>(m_manager->cookieJar());
+    if (inJar == nullptr)
+        return nullptr;
     MythCookieJar *outJar = new MythCookieJar;
     outJar->copyAllCookies(*inJar);
 
@@ -1693,7 +1698,10 @@ void MythDownloadManager::refreshCookieJar(QNetworkCookieJar *jar)
     QMutexLocker locker(&m_cookieLock);
     delete m_inCookieJar;
 
-    MythCookieJar *inJar = static_cast<MythCookieJar *>(jar);
+    auto inJar = dynamic_cast<MythCookieJar *>(jar);
+    if (inJar == nullptr)
+        return;
+
     MythCookieJar *outJar = new MythCookieJar;
     outJar->copyAllCookies(*inJar);
     m_inCookieJar = static_cast<QNetworkCookieJar *>(outJar);
@@ -1708,10 +1716,13 @@ void MythDownloadManager::updateCookieJar(void)
 {
     QMutexLocker locker(&m_cookieLock);
 
-    MythCookieJar *inJar = static_cast<MythCookieJar *>(m_inCookieJar);
-    MythCookieJar *outJar = new MythCookieJar;
-    outJar->copyAllCookies(*inJar);
-    m_manager->setCookieJar(static_cast<QNetworkCookieJar *>(outJar));
+    auto inJar = dynamic_cast<MythCookieJar *>(m_inCookieJar);
+    if (inJar != nullptr)
+    {
+        MythCookieJar *outJar = new MythCookieJar;
+        outJar->copyAllCookies(*inJar);
+        m_manager->setCookieJar(static_cast<QNetworkCookieJar *>(outJar));
+    }
 
     delete m_inCookieJar;
     m_inCookieJar = nullptr;

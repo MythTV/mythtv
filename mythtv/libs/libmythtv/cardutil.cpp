@@ -125,7 +125,7 @@ bool CardUtil::IsCableCardPresent(uint inputid,
     {
 #ifdef USING_HDHOMERUN
         hdhomerun_device_t *hdhr;
-        hdhomerun_tuner_status_t status;
+        hdhomerun_tuner_status_t status {};
         QString device = GetVideoDevice(inputid);
         hdhr = hdhomerun_device_create_from_str(device.toLatin1(), nullptr);
         if (!hdhr)
@@ -704,8 +704,7 @@ QString CardUtil::ProbeDVBFrontendName(const QString &device)
     if (fd_frontend < 0)
         return "ERROR_OPEN";
 
-    struct dvb_frontend_info info;
-    memset(&info, 0, sizeof(info));
+    struct dvb_frontend_info info {};
     int err = ioctl(fd_frontend, FE_GET_INFO, &info);
     if (err < 0)
     {
@@ -2104,8 +2103,7 @@ bool CardUtil::hasV4L2(int videofd)
 {
     (void) videofd;
 #ifdef USING_V4L2
-    struct v4l2_capability vcap;
-    memset(&vcap, 0, sizeof(vcap));
+    struct v4l2_capability vcap {};
 
     return ((ioctl(videofd, VIDIOC_QUERYCAP, &vcap) >= 0) &&
             ((vcap.capabilities & V4L2_CAP_VIDEO_CAPTURE) != 0U));
@@ -2128,8 +2126,7 @@ bool CardUtil::GetV4LInfo(
 
 #ifdef USING_V4L2
     // First try V4L2 query
-    struct v4l2_capability capability;
-    memset(&capability, 0, sizeof(struct v4l2_capability));
+    struct v4l2_capability capability {};
     if (ioctl(videofd, VIDIOC_QUERYCAP, &capability) >= 0)
     {
         input = QString::fromLatin1((const char*)capability.card);
@@ -2164,8 +2161,7 @@ InputNames CardUtil::ProbeV4LVideoInputs(int videofd, bool &ok)
     bool usingv4l2 = hasV4L2(videofd);
 
     // V4L v2 query
-    struct v4l2_input vin;
-    memset(&vin, 0, sizeof(vin));
+    struct v4l2_input vin {};
     while (usingv4l2 && (ioctl(videofd, VIDIOC_ENUMINPUT, &vin) >= 0))
     {
         QString input((char *)vin.name);
@@ -2231,8 +2227,7 @@ InputNames CardUtil::ProbeV4LAudioInputs(int videofd, bool &ok)
     bool usingv4l2 = hasV4L2(videofd);
 
     // V4L v2 query
-    struct v4l2_audio ain;
-    memset(&ain, 0, sizeof(ain));
+    struct v4l2_audio ain {};
     while (usingv4l2 && (ioctl(videofd, VIDIOC_ENUMAUDIO, &ain) >= 0))
     {
         QString input((char *)ain.name);
@@ -2306,7 +2301,7 @@ QStringList CardUtil::ProbeAudioInputs(const QString& device, const QString& inp
 
 QStringList CardUtil::ProbeV4LVideoInputs(const QString& device)
 {
-    bool ok;
+    bool ok = false;
     QStringList ret;
     QByteArray dev = device.toLatin1();
     int videofd = open(dev.constData(), O_RDWR);
@@ -2339,7 +2334,7 @@ QStringList CardUtil::ProbeV4LAudioInputs(const QString& device)
 {
     LOG(VB_GENERAL, LOG_DEBUG, QString("ProbeV4LAudioInputs(%1)").arg(device));
 
-    bool ok;
+    bool ok = false;
     QStringList ret;
     int videofd = open(device.toLatin1().constData(), O_RDWR);
     if (videofd < 0)
@@ -2805,7 +2800,7 @@ QString CardUtil::GetHDHRdesc(const QString &device)
         deviceIsIP = true;
     else
     {
-        bool validID;
+        bool validID = false;
 
         uint32_t dev = device.toUInt(&validID, 16);
         if (!validID || !hdhomerun_discover_validate_device_id(dev))
@@ -2926,8 +2921,7 @@ int CardUtil::GetASIDeviceNumber(const QString &device, QString *error)
 {
 #ifdef USING_ASI
     // basic confirmation
-    struct stat statbuf;
-    memset(&statbuf, 0, sizeof(statbuf));
+    struct stat statbuf {};
     if (stat(device.toLocal8Bit().constData(), &statbuf) < 0)
     {
         if (error)

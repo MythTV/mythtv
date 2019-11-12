@@ -120,7 +120,7 @@ public:
 
 	QString archiveComment() const;
 
-	QString formatError(UnZip::ErrorCode c) const;
+	static QString formatError(UnZip::ErrorCode c) ;
 
 	bool contains(const QString& file) const;
 

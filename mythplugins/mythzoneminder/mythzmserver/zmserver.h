@@ -251,16 +251,16 @@ class ZMServer
     bool send(const string &s, const unsigned char *buffer, int dataLen) const;
     void sendError(const string &error);
     void getMonitorList(void);
-    int  getFrame(unsigned char *buffer, int bufferSize, MONITOR *monitor);
-    long long getDiskSpace(const string &filename, long long &total, long long &used);
-    void tokenize(const string &command, vector<string> &tokens);
+    static int  getFrame(unsigned char *buffer, int bufferSize, MONITOR *monitor);
+    static long long getDiskSpace(const string &filename, long long &total, long long &used);
+    static void tokenize(const string &command, vector<string> &tokens);
     void handleHello(void);
-    string runCommand(const string& command);
-    void getMonitorStatus(const string &id, const string &type,
-                          const string &device, const string &host,
-                          const string &channel, const string &function,
-                          string &zmcStatus, string &zmaStatus,
-                          const string &enabled);
+    static string runCommand(const string& command);
+    static void getMonitorStatus(const string &id, const string &type,
+                                 const string &device, const string &host,
+                                 const string &channel, const string &function,
+                                 string &zmcStatus, string &zmaStatus,
+                                 const string &enabled);
     void handleGetServerStatus(void);
     void handleGetMonitorStatus(void);
     void handleGetAlarmStates(void);
@@ -279,17 +279,17 @@ class ZMServer
     void zmcControl(MONITOR *monitor, const string &mode);
     void zmaControl(MONITOR *monitor, const string &mode);
 
-    bool                 m_debug;
-    int                  m_sock;
+    bool                 m_debug              {false};
+    int                  m_sock               {-1};
     vector<MONITOR *>    m_monitors;
     map<int, MONITOR *>  m_monitorMap;
-    bool                 m_useDeepStorage;
-    bool                 m_useAnalysisImages;
+    bool                 m_useDeepStorage     {false};
+    bool                 m_useAnalysisImages  {false};
     string               m_eventFileFormat;
     string               m_analysisFileFormat;
     key_t                m_shmKey;
     string               m_mmapPath;
-    char                 m_buf[10];
+    char                 m_buf[10]            {0};
 };
 
 

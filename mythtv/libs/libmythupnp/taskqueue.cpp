@@ -111,8 +111,6 @@ void TaskQueue::run( )
 {
     RunProlog();
 
-    Task *pTask;
-
     LOG(VB_UPNP, LOG_INFO, "TaskQueue Thread Running.");
 
     while ( !m_bTermRequested )
@@ -124,7 +122,8 @@ void TaskQueue::run( )
         TaskTime ttNow;
         gettimeofday( (&ttNow), nullptr );
 
-        if ((pTask = GetNextExpiredTask( ttNow )) != nullptr)
+        Task *pTask = GetNextExpiredTask( ttNow );
+        if (pTask != nullptr)
         {
             try
             {

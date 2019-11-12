@@ -304,7 +304,7 @@ int main(int argc, char *argv[])
 
     if (cmdline.toBool("showversion"))
     {
-        cmdline.PrintVersion();
+        MythTVSetupCommandLineParser::PrintVersion();
         return GENERIC_EXIT_OK;
     }
 
@@ -348,9 +348,9 @@ int main(int argc, char *argv[])
     if (cmdline.toBool("geometry"))
         geometry = cmdline.toString("geometry");
 
-    int retval;
     QString mask("general");
-    if ((retval = cmdline.ConfigureLogging(mask, quiet)) != GENERIC_EXIT_OK)
+    int retval = cmdline.ConfigureLogging(mask, quiet);
+    if (retval != GENERIC_EXIT_OK)
         return retval;
 
     if (cmdline.toBool("expert"))
@@ -502,7 +502,7 @@ int main(int argc, char *argv[])
         {
             ChannelScannerCLI scanner(doScanSaveOnly, scanInteractive);
 
-            int scantype;
+            int scantype = ScanTypeSetting::FullScan_ATSC;
             if (frequencyStandard == "atsc")
                 scantype = ScanTypeSetting::FullScan_ATSC;
             else if (frequencyStandard == "dvbt")

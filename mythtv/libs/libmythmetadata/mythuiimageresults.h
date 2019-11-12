@@ -13,12 +13,12 @@ class META_PUBLIC ImageSearchResultsDialog : public MythScreenType
 
   public:
     ImageSearchResultsDialog(MythScreenStack *lparent,
-            const ArtworkList& list, const VideoArtworkType type);
+            ArtworkList list, const VideoArtworkType type);
 
     ~ImageSearchResultsDialog();
 
     bool Create() override; // MythScreenType
-    void cleanCacheDir();
+    static void cleanCacheDir();
     void customEvent(QEvent *event) override; // MythUIType
 
   signals:

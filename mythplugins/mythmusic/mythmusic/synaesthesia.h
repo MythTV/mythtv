@@ -31,12 +31,12 @@ public:
 private:
     void setupPalette(void);
     void coreInit(void);
-    int bitReverser(int i);
+    static int bitReverser(int i);
     void fft(double *x, double *y);
     void setStarSize(double lsize);
 
     inline void addPixel(int x, int y, int br1, int br2);
-    inline void addPixelFast(unsigned char *p, int br1, int br2);
+    static inline void addPixelFast(unsigned char *p, int br1, int br2);
     inline unsigned char getPixel(int x, int y, int where);
 
     inline void fadePixelWave(int x, int y, int where, int step);

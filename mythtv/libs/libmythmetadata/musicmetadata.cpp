@@ -1960,18 +1960,18 @@ void AlbumArtImages::findImages(void)
                 if (embedded)
                 {
                     if (url.scheme() == "myth")
-                        image->m_filename = gCoreContext->GenMythURL(url.host(), url.port(),
-                                                                   QString("AlbumArt/") + query.value(1).toString(),
-                                                                   "MusicArt");
+                        image->m_filename = MythCoreContext::GenMythURL(url.host(), url.port(),
+                                                                        QString("AlbumArt/") + query.value(1).toString(),
+                                                                        "MusicArt");
                     else
                         image->m_filename = query.value(1).toString();
                 }
                 else
                 {
                     if (url.scheme() == "myth")
-                        image->m_filename =  gCoreContext->GenMythURL(url.host(), url.port(),
-                                                                    query.value(1).toString(),
-                                                                    "Music");
+                        image->m_filename =  MythCoreContext::GenMythURL(url.host(), url.port(),
+                                                                         query.value(1).toString(),
+                                                                         "Music");
                     else
                         image->m_filename = query.value(1).toString();
                 }
@@ -2053,15 +2053,15 @@ void AlbumArtImages::scanForImages()
 
         if (image->m_embedded)
         {
-            image->m_filename = gCoreContext->GenMythURL(m_parent->Hostname(), 0,
-                                                       QString("AlbumArt/") + strList[x + 4],
-                                                       "MusicArt");
+            image->m_filename = MythCoreContext::GenMythURL(m_parent->Hostname(), 0,
+                                                            QString("AlbumArt/") + strList[x + 4],
+                                                            "MusicArt");
         }
         else
         {
-            image->m_filename =  gCoreContext->GenMythURL(m_parent->Hostname(), 0,
-                                                        strList[x + 4],
-                                                        "Music");
+            image->m_filename =  MythCoreContext::GenMythURL(m_parent->Hostname(), 0,
+                                                             strList[x + 4],
+                                                             "Music");
         }
 
         image->m_hostname = strList[x + 5];

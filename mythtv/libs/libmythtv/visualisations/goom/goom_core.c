@@ -480,17 +480,21 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 				switch (vtmp = (iRAND (15))) {
 				case 0:
                                     
+                                        // NOLINTNEXTLINE(misc-redundant-expression)
 					zfd.vPlaneEffect = iRAND (3) - iRAND (3);
+                                        // NOLINTNEXTLINE(misc-redundant-expression)
 					zfd.hPlaneEffect = iRAND (3) - iRAND (3);
 					break;
 				case 3:
 					zfd.vPlaneEffect = 0;
+                                        // NOLINTNEXTLINE(misc-redundant-expression)
 					zfd.hPlaneEffect = iRAND (8) - iRAND (8);
 					break;
 				case 4:
 				case 5:
 				case 6:
 				case 7:
+                                        // NOLINTNEXTLINE(misc-redundant-expression)
 					zfd.vPlaneEffect = iRAND (5) - iRAND (5);
 					zfd.hPlaneEffect = -zfd.vPlaneEffect;
 					break;
@@ -504,10 +508,13 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 					break;
 				case 13:
 					zfd.hPlaneEffect = 0;
+                                        // NOLINTNEXTLINE(misc-redundant-expression)
 					zfd.vPlaneEffect = iRAND (10) - iRAND (10);
 					break;
 				case 14:
+                                        // NOLINTNEXTLINE(misc-redundant-expression)
 					zfd.hPlaneEffect = iRAND (10) - iRAND (10);
+                                        // NOLINTNEXTLINE(misc-redundant-expression)
 					zfd.vPlaneEffect = iRAND (10) - iRAND (10);
 					break;
 				default:

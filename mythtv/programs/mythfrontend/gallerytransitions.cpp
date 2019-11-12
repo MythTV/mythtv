@@ -144,8 +144,8 @@ void TransitionNone::Start(Slide &from, Slide &to,
  \param name The name for this transition. This string will be used in
              log messages.
 */
-GroupTransition::GroupTransition(GroupAnimation *animation, QString name)
-    : Transition(std::move(name)), m_animation(animation)
+GroupTransition::GroupTransition(GroupAnimation *animation, const QString& name)
+    : Transition(name), m_animation(animation)
 {
     // Complete transition when the group finishes
     connect(m_animation, SIGNAL(finished()), this, SLOT(Finished()));

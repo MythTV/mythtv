@@ -46,6 +46,7 @@
 
 #ifdef __cplusplus
 
+#include "exitcodes.h"  // included for GENERIC_EXIT_OK
 #include "mythsystem.h" // included for MythSystemFlag and MythSignal
 typedef MythSystemMask MythSystemFlag;
 
@@ -180,7 +181,7 @@ class MBASE_PUBLIC MythSystemLegacy : public QObject
     void ProcessFlags(uint flags);
 
     // FIXME if we already have a private helper, why all this?
-    uint        m_status;
+    uint        m_status {GENERIC_EXIT_OK};
     QSemaphore  m_semReady;
 
     QString     m_command;

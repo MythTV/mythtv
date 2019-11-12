@@ -574,15 +574,13 @@ void MythBurn::createConfigFile(const QString &filename)
     job.appendChild(media);
 
     // now loop though selected archive items and add them to the xml file
-    ArchiveItem *a;
-    MythUIButtonListItem *item;
     for (int x = 0; x < m_archiveButtonList->GetCount(); x++)
     {
-        item = m_archiveButtonList->GetItemAt(x);
+        MythUIButtonListItem *item = m_archiveButtonList->GetItemAt(x);
         if (!item)
             continue;
 
-        a = item->GetData().value<ArchiveItem *>();
+        ArchiveItem *a = item->GetData().value<ArchiveItem *>();
         if (!a)
             continue;
 
@@ -717,15 +715,13 @@ void MythBurn::saveConfiguration(void)
                         query);
 
     // save new list of archive items to DB
-    ArchiveItem *a;
-    MythUIButtonListItem *item;
     for (int x = 0; x < m_archiveButtonList->GetCount(); x++)
     {
-        item = m_archiveButtonList->GetItemAt(x);
+        MythUIButtonListItem *item = m_archiveButtonList->GetItemAt(x);
         if (!item)
             continue;
 
-        a = item->GetData().value<ArchiveItem *>();
+        ArchiveItem *a = item->GetData().value<ArchiveItem *>();
         if (!a)
             continue;
 
@@ -1123,9 +1119,8 @@ void BurnMenu::start(void)
 
 void BurnMenu::customEvent(QEvent *event)
 {
-    if (event->type() == DialogCompletionEvent::kEventType)
+    if (auto dce = dynamic_cast<DialogCompletionEvent*>(event))
     {
-        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
         if (dce->GetId() == "action")
         {
             doBurn(dce->GetResult());

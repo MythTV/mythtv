@@ -224,59 +224,59 @@ class H264Parser {
     void decode_SEI(GetBitContext * gb);
     void vui_parameters(GetBitContext * gb);
 
-    bool       AU_pending;
-    bool       state_changed;
-    bool       seen_sps;
-    bool       au_contains_keyframe_message;
-    bool       is_keyframe;
-    bool       I_is_keyframe;
+    bool       AU_pending                   {false};
+    bool       state_changed                {false};
+    bool       seen_sps                     {false};
+    bool       au_contains_keyframe_message {false};
+    bool       is_keyframe                  {false};
+    bool       I_is_keyframe                {true};
 
-    uint32_t   sync_accumulator;
-    uint8_t   *rbsp_buffer;
-    uint32_t   rbsp_buffer_size;
-    uint32_t   rbsp_index;
-    uint32_t   consecutive_zeros;
-    bool       have_unfinished_NAL;
+    uint32_t   sync_accumulator             {0xffffffff};
+    uint8_t   *rbsp_buffer                  {nullptr};
+    uint32_t   rbsp_buffer_size             {188 * 2};
+    uint32_t   rbsp_index                   {0};
+    uint32_t   consecutive_zeros            {0};
+    bool       have_unfinished_NAL          {false};
 
-    int        prev_frame_num, frame_num;
-    uint       slice_type;
-    int        prev_pic_parameter_set_id, pic_parameter_set_id;
-    int8_t     prev_field_pic_flag, field_pic_flag;
-    int8_t     prev_bottom_field_flag, bottom_field_flag;
-    uint8_t    prev_nal_ref_idc, nal_ref_idc;
-    uint8_t    prev_pic_order_cnt_type, pic_order_cnt_type;
-    int        prev_pic_order_cnt_lsb, pic_order_cnt_lsb;
-    int        prev_delta_pic_order_cnt_bottom, delta_pic_order_cnt_bottom;
-    int        prev_delta_pic_order_cnt[2], delta_pic_order_cnt[2];
-    uint8_t    prev_nal_unit_type, nal_unit_type;
-    uint       prev_idr_pic_id, idr_pic_id;
+    int        prev_frame_num {-1}, frame_num {-1};
+    uint       slice_type {SLICE_UNDEF};
+    int        prev_pic_parameter_set_id {-1}, pic_parameter_set_id {-1};
+    int8_t     prev_field_pic_flag {-1}, field_pic_flag {-1};
+    int8_t     prev_bottom_field_flag {-1}, bottom_field_flag {-1};
+    uint8_t    prev_nal_ref_idc {111}, nal_ref_idc {111};  //  != [0|1|2|3]
+    uint8_t    prev_pic_order_cnt_type {0}, pic_order_cnt_type {0};
+    int        prev_pic_order_cnt_lsb {0}, pic_order_cnt_lsb {0};
+    int        prev_delta_pic_order_cnt_bottom {0}, delta_pic_order_cnt_bottom {0};
+    int        prev_delta_pic_order_cnt[2] {0}, delta_pic_order_cnt[2] {0};
+    uint8_t    prev_nal_unit_type {UNKNOWN}, nal_unit_type {UNKNOWN};
+    uint       prev_idr_pic_id {65536}, idr_pic_id {65536};
 
-    uint       log2_max_frame_num, log2_max_pic_order_cnt_lsb;
-    uint       seq_parameter_set_id;
+    uint       log2_max_frame_num {0}, log2_max_pic_order_cnt_lsb {0};
+    uint       seq_parameter_set_id {0};
 
-    uint8_t    delta_pic_order_always_zero_flag;
-    uint8_t    separate_colour_plane_flag;
-    int8_t     frame_mbs_only_flag;
-    int8_t     pic_order_present_flag;
-    int8_t     redundant_pic_cnt_present_flag;
-    int8_t     chroma_format_idc;
+    uint8_t    delta_pic_order_always_zero_flag {0};
+    uint8_t    separate_colour_plane_flag       {0};
+    int8_t     frame_mbs_only_flag              {-1};
+    int8_t     pic_order_present_flag           {-1};
+    int8_t     redundant_pic_cnt_present_flag   {0};
+    int8_t     chroma_format_idc                {1};
 
-    uint       num_ref_frames;
-    uint       redundant_pic_cnt;
+    uint       num_ref_frames                   {0};
+    uint       redundant_pic_cnt                {0};
 //    uint       pic_width_in_mbs, pic_height_in_map_units;
-    uint       pic_width, pic_height;
-    uint       frame_crop_left_offset;
-    uint       frame_crop_right_offset;
-    uint       frame_crop_top_offset;
-    uint       frame_crop_bottom_offset;
-    uint8_t    aspect_ratio_idc;
-    uint       sar_width, sar_height;
-    uint32_t   unitsInTick, timeScale;
-    bool       fixedRate;
+    uint       pic_width {0}, pic_height        {0};
+    uint       frame_crop_left_offset           {0};
+    uint       frame_crop_right_offset          {0};
+    uint       frame_crop_top_offset            {0};
+    uint       frame_crop_bottom_offset         {0};
+    uint8_t    aspect_ratio_idc                 {0};
+    uint       sar_width {0}, sar_height {0};
+    uint32_t   unitsInTick {0}, timeScale {0};
+    bool       fixedRate {false};
 
-    uint64_t   pkt_offset, AU_offset, frame_start_offset, keyframe_start_offset;
-    uint64_t   SPS_offset;
-    bool       on_frame, on_key_frame;
+    uint64_t   pkt_offset {0}, AU_offset {0}, frame_start_offset {0}, keyframe_start_offset {0};
+    uint64_t   SPS_offset {0};
+    bool       on_frame {false}, on_key_frame {false};
 };
 
 #endif /* H264PARSER_H */

@@ -90,10 +90,9 @@ void MythUISpinBox::SetRange(int low, int high, int step, uint pageMultiple)
  */
 void MythUISpinBox::AddSelection(int value, const QString &label)
 {
-    MythUIButtonListItem *item;
     if (!label.isEmpty())
     {
-        item = GetItemByData(value);
+        MythUIButtonListItem *item = GetItemByData(value);
         if (item)
         {
             item->SetText(label);
@@ -105,7 +104,7 @@ void MythUISpinBox::AddSelection(int value, const QString &label)
 
     for (int pos = 0; pos < m_itemList.size(); pos++)
     {
-        item = m_itemList.at(pos);
+        MythUIButtonListItem *item = m_itemList.at(pos);
         if (item->GetData().toInt() > value)
         {
             insertPos = pos;

@@ -40,11 +40,11 @@ public:
     bool TagExists(const QString &filename) override; // MetaIO
 
 private:
-    TagLib::FLAC::File *OpenFile(const QString &filename);
-    TagLib::FLAC::Picture *getPictureFromFile(TagLib::FLAC::File *flacfile,
-                                              ImageType type);
-    TagLib::FLAC::Picture::Type PictureTypeFromImageType(ImageType itype);
-    QString getExtFromMimeType(const QString &mimeType);
+    static TagLib::FLAC::File *OpenFile(const QString &filename);
+    static TagLib::FLAC::Picture *getPictureFromFile(TagLib::FLAC::File *flacfile,
+                                                     ImageType type);
+    static TagLib::FLAC::Picture::Type PictureTypeFromImageType(ImageType itype);
+    static QString getExtFromMimeType(const QString &mimeType);
 };
 
 #endif

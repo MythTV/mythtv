@@ -164,7 +164,7 @@ QSize MythXDisplay::GetDisplayDimensions(void)
 float MythXDisplay::GetRefreshRate(void)
 {
     XF86VidModeModeLine mode_line;
-    int dot_clock;
+    int dot_clock = 0;
     MythXLocker locker(this);
 
     if (!XF86VidModeGetModeLine(m_disp, m_screen_num, &dot_clock, &mode_line))

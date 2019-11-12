@@ -655,7 +655,7 @@ void ServerPool::newUdpDatagram(void)
         QByteArray buffer;
         buffer.resize(socket->pendingDatagramSize());
         QHostAddress sender;
-        quint16 senderPort;
+        quint16 senderPort = 0;
 
         socket->readDatagram(buffer.data(), buffer.size(),
                              &sender, &senderPort);

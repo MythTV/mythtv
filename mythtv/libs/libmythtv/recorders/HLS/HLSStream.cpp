@@ -14,9 +14,6 @@ HLSRecStream::HLSRecStream(int seq, uint64_t bitrate, const QString& m3u8_url, c
       m_segment_base_url(segment_base_url)
 {
     LOG(VB_RECORD, LOG_DEBUG, LOC + "ctor");
-#ifdef USING_LIBCRYPTO
-    memset(m_AESIV, 0, sizeof(m_AESIV));
-#endif
 }
 
 HLSRecStream::~HLSRecStream(void)

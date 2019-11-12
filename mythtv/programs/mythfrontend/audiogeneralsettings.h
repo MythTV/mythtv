@@ -54,29 +54,29 @@ class AudioConfigSettings : public GroupSetting
     void setMPCMEnabled(bool flag);
 
     AudioDeviceComboBox *OutputDevice();
-    HostComboBoxSetting *MaxAudioChannels();
-    HostCheckBoxSetting *AudioUpmix();
-    HostComboBoxSetting *AudioUpmixType();
-    HostCheckBoxSetting *AC3PassThrough();
-    HostCheckBoxSetting *DTSPassThrough();
-    HostCheckBoxSetting *EAC3PassThrough();
-    HostCheckBoxSetting *TrueHDPassThrough();
-    HostCheckBoxSetting *DTSHDPassThrough();
-    HostCheckBoxSetting *MythControlsVolume();
-    HostComboBoxSetting *MixerDevice();
-    HostComboBoxSetting *MixerControl();
-    HostSpinBoxSetting  *MixerVolume();
-    HostSpinBoxSetting  *PCMVolume();
+    static HostComboBoxSetting *MaxAudioChannels();
+    static HostCheckBoxSetting *AudioUpmix();
+    static HostComboBoxSetting *AudioUpmixType();
+    static HostCheckBoxSetting *AC3PassThrough();
+    static HostCheckBoxSetting *DTSPassThrough();
+    static HostCheckBoxSetting *EAC3PassThrough();
+    static HostCheckBoxSetting *TrueHDPassThrough();
+    static HostCheckBoxSetting *DTSHDPassThrough();
+    static HostCheckBoxSetting *MythControlsVolume();
+    static HostComboBoxSetting *MixerDevice();
+    static HostComboBoxSetting *MixerControl();
+    static HostSpinBoxSetting  *MixerVolume();
+    static HostSpinBoxSetting  *PCMVolume();
 
     //advanced setting
-    HostCheckBoxSetting *MPCM();
-    HostCheckBoxSetting *SRCQualityOverride();
-    HostComboBoxSetting *SRCQuality();
-    HostCheckBoxSetting *Audio48kOverride();
-    HostCheckBoxSetting *PassThroughOverride();
-    HostComboBoxSetting *PassThroughOutputDevice();
-    HostCheckBoxSetting *SPDIFRateOverride();
-    HostCheckBoxSetting *HBRPassthrough();
+    static HostCheckBoxSetting *MPCM();
+    static HostCheckBoxSetting *SRCQualityOverride();
+    static HostComboBoxSetting *SRCQuality();
+    static HostCheckBoxSetting *Audio48kOverride();
+    static HostCheckBoxSetting *PassThroughOverride();
+    static HostComboBoxSetting *PassThroughOutputDevice();
+    static HostCheckBoxSetting *SPDIFRateOverride();
+    static HostCheckBoxSetting *HBRPassthrough();
 
     bool                CheckPassthrough();
 

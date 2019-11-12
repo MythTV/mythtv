@@ -119,7 +119,7 @@ class MusicPlayer : public QObject, public MythObservable
     void         loadPlaylist(void);
     void         loadStreamPlaylist(void);
     Playlist    *getCurrentPlaylist(void);
-    StreamList  *getStreamList(void);
+    static StreamList *getStreamList(void);
 
     // these add and remove tracks from the active playlist
     void         removeTrack(int trackID);

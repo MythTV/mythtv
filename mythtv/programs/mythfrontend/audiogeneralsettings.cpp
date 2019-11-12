@@ -62,7 +62,6 @@ void AudioDeviceComboBox::edit(MythScreenType * screen)
 void AudioDeviceComboBox::AudioRescan()
 {
     AudioOutput::ADCVect &vect = m_parent->AudioDeviceVect();
-    AudioOutput::ADCVect::const_iterator it;
 
     if (vect.empty())
         return;
@@ -72,7 +71,7 @@ void AudioDeviceComboBox::AudioRescan()
 
     // Adding the current value first avoids marking the setting as changed
     addSelection(value, value, true);
-    for (it = vect.begin(); it != vect.end(); ++it)
+    for (auto it = vect.begin(); it != vect.end(); ++it)
     {
         if (value != it->m_name)
             addSelection(it->m_name, it->m_name);
@@ -237,10 +236,9 @@ void AudioConfigSettings::AudioRescan()
         return;
 
     AudioOutput::ADCVect* list = AudioOutput::GetOutputList();
-    AudioOutput::ADCVect::const_iterator it;
 
     audiodevs.clear();
-    for (it = list->begin(); it != list->end(); ++it)
+    for (auto it = list->begin(); it != list->end(); ++it)
         audiodevs.insert(it->m_name, *it);
 
     devices = *list;
@@ -971,8 +969,8 @@ bool AudioTest::event(QEvent *event)
     if (!cce->m_fulltest)
         return false;
 
-    bool fl, fr, c, lfe, sl, sr, rl, rr;
-    fl = fr = c = lfe = sl = sr = rl = rr = false;
+    bool fl = false, fr = false, c = false, lfe = false;
+    bool sl = false, sr = false, rl = false, rr = false;
 
     if (channel == "frontleft")
     {

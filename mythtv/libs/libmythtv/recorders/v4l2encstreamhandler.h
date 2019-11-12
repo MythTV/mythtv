@@ -108,7 +108,7 @@ class V4L2encStreamHandler : public StreamHandler
     int           m_bitrate                {-1};
     int           m_max_bitrate            {-1};
     int           m_audio_codec            {-1};
-    int           m_audio_layer;
+    int           m_audio_layer            {V4L2_MPEG_AUDIO_ENCODING_LAYER_1};
     int           m_audio_samplerate       {-1};
     int           m_audio_bitrateL1        {-1};
     int           m_audio_bitrateL2        {-1};

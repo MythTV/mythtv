@@ -198,7 +198,7 @@ void OMXComponent::Shutdown()
 
     for (unsigned port = 0; port < Ports(); ++port)
     {
-        OMX_ERRORTYPE e;
+        OMX_ERRORTYPE e = OMX_ErrorNone;
         if (PortDef(port).eDir == OMX_DirOutput)
             e = OMX_SetupTunnel(Handle(), Base() + port, nullptr, 0);
         else
@@ -410,7 +410,7 @@ void ShowFormats(const OMXComponent &cmpnt, unsigned n, LogLevel_t level, uint64
     if  (!VERBOSE_LEVEL_CHECK(mask, level))
         return;
 
-    T fmt;
+    T fmt {};
     OMX_DATA_INIT(fmt);
     fmt.nPortIndex = cmpnt.Base() + n;
 

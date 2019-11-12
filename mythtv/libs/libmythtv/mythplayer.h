@@ -634,153 +634,153 @@ class MTV_PUBLIC MythPlayer
 
   protected:
     PlayerFlags    playerFlags;
-    DecoderBase   *decoder;
-    mutable QMutex decoder_change_lock;
-    VideoOutput   *videoOutput;
-    PlayerContext *player_ctx;
-    DecoderThread *decoderThread;
-    QThread       *playerThread;
+    DecoderBase   *decoder              {nullptr};
+    mutable QMutex decoder_change_lock  {QMutex::Recursive};
+    VideoOutput   *videoOutput          {nullptr};
+    PlayerContext *player_ctx           {nullptr};
+    DecoderThread *decoderThread        {nullptr};
+    QThread       *playerThread         {nullptr};
 #ifdef Q_OS_ANDROID
-    int            playerThreadId;
+    int            playerThreadId       {0};
 #endif
 
     // Window stuff
-    QWidget *parentWidget;
-    bool     embedding;
-    QRect    embedRect;
-    float defaultDisplayAspect;
+    QWidget *parentWidget               {nullptr};
+    bool     embedding                  {false};
+    QRect    embedRect                  {0,0,0,0};
+    float    defaultDisplayAspect       {1.7777F};
 
     // State
     QWaitCondition decoderThreadPause;
     QWaitCondition decoderThreadUnpause;
     mutable QMutex decoderPauseLock;
     mutable QMutex decoderSeekLock;
-    bool           totalDecoderPause;
-    bool           decoderPaused;
-    bool           inJumpToProgramPause;
-    bool           pauseDecoder;
-    bool           unpauseDecoder;
-    bool volatile  killdecoder;
-    int64_t        decoderSeek;
-    bool           decodeOneFrame;
-    bool           needNewPauseFrame;
+    bool           totalDecoderPause    {false};
+    bool           decoderPaused        {false};
+    bool           inJumpToProgramPause {false};
+    bool           pauseDecoder         {false};
+    bool           unpauseDecoder       {false};
+    bool volatile  killdecoder          {false};
+    int64_t        decoderSeek          {-1};
+    bool           decodeOneFrame       {false};
+    bool           needNewPauseFrame    {false};
     mutable QMutex bufferPauseLock;
     mutable QMutex videoPauseLock;
     mutable QMutex pauseLock;
-    bool           bufferPaused;
-    bool           videoPaused;
-    bool           allpaused;
-    bool           playing;
+    bool           bufferPaused         {false};
+    bool           videoPaused          {false};
+    bool           allpaused            {false};
+    bool           playing              {false};
 
     mutable QWaitCondition playingWaitCond;
     mutable QMutex vidExitLock;
     mutable QMutex playingLock;
-    bool     m_double_framerate;///< Output fps is double Video (input) rate
-    bool     m_double_process;///< Output filter must processed at double rate
-    bool     m_deint_possible;
-    bool     livetv;
-    bool     watchingrecording;
-    bool     transcoding;
-    bool     hasFullPositionMap;
-    mutable bool     limitKeyRepeat;
+    bool     m_double_framerate         {false};///< Output fps is double Video (input) rate
+    bool     m_double_process           {false};///< Output filter must processed at double rate
+    bool     m_deint_possible           {true};
+    bool     livetv                     {false};
+    bool     watchingrecording          {false};
+    bool     transcoding                {false};
+    bool     hasFullPositionMap         {false};
+    mutable bool     limitKeyRepeat     {false};
     mutable QMutex   errorLock;
     QString  errorMsg;   ///< Reason why NVP exited with a error
-    int errorType;
+    int errorType                       {kError_None};
 
     // Chapter stuff
-    int jumpchapter;
+    int jumpchapter                     {0};
 
     // Bookmark stuff
-    uint64_t bookmarkseek;
-    int      clearSavedPosition;
+    uint64_t bookmarkseek               {0};
+    int      clearSavedPosition         {1};
     int      endExitPrompt;
 
     // Seek
     /// If fftime>0, number of frames to seek forward.
     /// If fftime<0, number of frames to seek backward.
-    long long fftime;
+    long long fftime                    {0};
 
     // Playback misc.
     /// How often we have tried to wait for a video output buffer and failed
-    int       videobuf_retries;
-    uint64_t  framesPlayed;
+    int       videobuf_retries          {0};
+    uint64_t  framesPlayed              {0};
     // "Fake" frame counter for when the container frame rate doesn't
     // match the stream frame rate.
-    uint64_t  framesPlayedExtra;
-    uint64_t  totalFrames;
-    long long totalLength;
-    int64_t   totalDuration;
-    long long rewindtime;
-    int64_t   m_latestVideoTimecode;
+    uint64_t  framesPlayedExtra         {0};
+    uint64_t  totalFrames               {0};
+    long long totalLength               {0};
+    int64_t   totalDuration             {0};
+    long long rewindtime                {0};
+    int64_t   m_latestVideoTimecode     {-1};
     QElapsedTimer m_avTimer;
 
     // -- end state stuff --
 
     // Input Video Attributes
-    QSize    video_disp_dim;  ///< Video (input) width & height
-    QSize    video_dim;       ///< Video (input) buffer width & height
-    double   video_frame_rate;///< Video (input) Frame Rate (often inaccurate)
-    float    video_aspect;    ///< Video (input) Apect Ratio
-    float    forced_video_aspect;
+    QSize    video_disp_dim             {0,0}; ///< Video (input) width & height
+    QSize    video_dim                  {0,0}; ///< Video (input) buffer width & height
+    double   video_frame_rate           {29.97F};///< Video (input) Frame Rate (often inaccurate)
+    float    video_aspect               {4.0F / 3.0F};    ///< Video (input) Apect Ratio
+    float    forced_video_aspect        {-1};
     /// Tell the player thread to set the scan type (and hence deinterlacers)
-    FrameScanType resetScan;
+    FrameScanType resetScan             {kScan_Ignore};
     /// Video (input) Scan Type (interlaced, progressive, detect, ignore...)
-    FrameScanType m_scan;
+    FrameScanType m_scan                {kScan_Interlaced};
     /// Set when the user selects a scan type, overriding the detected one
-    bool     m_scan_locked;
+    bool     m_scan_locked              {false};
     /// Used for tracking of scan type for auto-detection of interlacing
-    int      m_scan_tracker;
+    int      m_scan_tracker             {0};
     /// Set when SetScanType runs the first time
-    bool     m_scan_initialized;
+    bool     m_scan_initialized         {false};
     /// Video (input) Number of frames between key frames (often inaccurate)
-    uint     keyframedist;
+    uint     keyframedist               {30};
     /// Codec Name - used by playback profile
     QString  m_codecName;
 
     // Buffering
-    bool     buffering;
+    bool     buffering                  {false};
     QTime    buffering_start;
     QTime    buffering_last_msg;
 
     // General Caption/Teletext/Subtitle support
-    uint     textDisplayMode;
-    uint     prevTextDisplayMode;
-    uint     prevNonzeroTextDisplayMode;
+    uint     textDisplayMode            {kDisplayNone};
+    uint     prevTextDisplayMode        {kDisplayNone};
+    uint     prevNonzeroTextDisplayMode {kDisplayNone};
 
     // Support for analog captions and teletext
     // (i.e. Vertical Blanking Interval (VBI) encoded data.)
-    uint     vbimode;         ///< VBI decoder to use
-    int      ttPageNum;       ///< VBI page to display when in PAL vbimode
+    uint     vbimode                    {VBIMode::None}; ///< VBI decoder to use
+    int      ttPageNum                  {0x888}; ///< VBI page to display when in PAL vbimode
 
     // Support for captions, teletext, etc. decoded by libav
     SubtitleReader subReader;
     TeletextReader ttxReader;
     /// This allows us to enable captions/subtitles later if the streams
     /// are not immediately available when the video starts playing.
-    bool      captionsEnabledbyDefault;
-    bool      textDesired;
-    bool      enableCaptions;
-    bool      disableCaptions;
-    bool      enableForcedSubtitles;
-    bool      disableForcedSubtitles;
-    bool      allowForcedSubtitles;
+    bool      captionsEnabledbyDefault  {false};
+    bool      textDesired               {false};
+    bool      enableCaptions            {false};
+    bool      disableCaptions           {false};
+    bool      enableForcedSubtitles     {false};
+    bool      disableForcedSubtitles    {false};
+    bool      allowForcedSubtitles      {true};
 
     // CC608/708
     CC608Reader cc608;
     CC708Reader cc708;
 
     // Support for MHEG/MHI
-    bool       itvVisible;
-    InteractiveTV *interactiveTV;
-    bool       itvEnabled;
+    bool       itvVisible               {false};
+    InteractiveTV *interactiveTV        {nullptr};
+    bool       itvEnabled               {false};
     QMutex     itvLock;
     QMutex     streamLock;
     QString    m_newStream; // Guarded by streamLock
 
     // OSD stuff
-    OSD  *osd;
-    bool  reinit_osd;
-    QMutex osdLock;
+    OSD  *osd                           {nullptr};
+    bool  reinit_osd                    {false};
+    QMutex osdLock                      {QMutex::Recursive};
 
     // Audio stuff
     AudioPlayer audio;
@@ -788,93 +788,93 @@ class MTV_PUBLIC MythPlayer
 
     // Picture-in-Picture
     PIPMap         pip_players;
-    volatile bool  pip_active;
-    volatile bool  pip_visible;
+    volatile bool  pip_active           {false};
+    volatile bool  pip_visible          {true};
     PIPLocation    pip_default_loc;
 
     // Filters
     QMutex   videofiltersLock;
-    QString  videoFiltersForProgram;
-    QString  videoFiltersOverride;
-    int      postfilt_width;  ///< Post-Filter (output) width
-    int      postfilt_height; ///< Post-Filter (output) height
-    FilterChain   *videoFilters;
-    FilterManager *FiltMan;
+    QString  videoFiltersForProgram     {};
+    QString  videoFiltersOverride       {};
+    int      postfilt_width             {0}; ///< Post-Filter (output) width
+    int      postfilt_height            {0}; ///< Post-Filter (output) height
+    FilterChain   *videoFilters         {nullptr};
+    FilterManager *FiltMan              {nullptr};
 
     // Commercial filtering
     CommBreakMap   commBreakMap;
-    bool       forcePositionMapSync;
+    bool       forcePositionMapSync     {false};
     // Manual editing
     DeleteMap  deleteMap;
-    bool       pausedBeforeEdit;
+    bool       pausedBeforeEdit         {false};
     QTime      editUpdateTimer;
-    float      speedBeforeEdit;
+    float      speedBeforeEdit          {1.0F};
 
     // Playback (output) speed control
     /// Lock for next_play_speed and next_normal_speed
-    QMutex     decoder_lock;
-    float      next_play_speed;
-    bool       next_normal_speed;
+    QMutex     decoder_lock             {QMutex::Recursive};
+    float      next_play_speed          {1.0F};
+    bool       next_normal_speed        {true};
 
-    float      play_speed;
-    bool       normal_speed;
-    int        frame_interval;///< always adjusted for play_speed
-    int        m_frame_interval;///< used to detect changes to frame_interval
-    int        m_fpsMultiplier;///< used to detect changes
+    float      play_speed               {1.0F};
+    bool       normal_speed             {true};
+    int        frame_interval           {(int)(1000000.0F / 30)};///< always adjusted for play_speed
+    int        m_frame_interval         {0}; ///< used to detect changes to frame_interval
+    int        m_fpsMultiplier          {1}; ///< used to detect changes
 
-    int        ffrew_skip;
-    int        ffrew_adjust;
-    bool       fileChanged;
+    int        ffrew_skip               {1};
+    int        ffrew_adjust             {0};
+    bool       fileChanged              {false};
 
     // Audio and video synchronization stuff
-    VideoSync *videosync;
-    int        avsync_delay;
-    int        avsync_adjustment;
-    int        avsync_avg;
-    int        avsync_predictor;
-    bool       avsync_predictor_enabled;
-    int        refreshrate;
-    bool       lastsync;
-    bool       decode_extra_audio;
-    int        repeat_delay;
-    int64_t    disp_timecode;
-    bool       avsync_audiopaused;
-    float      max_diverge;  // from setting PlayerMaxDiverge default 2
+    VideoSync *videosync                {nullptr};
+    int        avsync_delay             {0};
+    int        avsync_adjustment        {0};
+    int        avsync_avg               {0};
+    int        avsync_predictor         {0};
+    bool       avsync_predictor_enabled {false};
+    int        refreshrate              {0};
+    bool       lastsync                 {false};
+    bool       decode_extra_audio       {false};
+    int        repeat_delay             {0};
+    int64_t    disp_timecode            {0};
+    bool       avsync_audiopaused       {false};
+    float      max_diverge              {3.0F};  // from setting PlayerMaxDiverge default 2
     // AVSync for Raspberry Pi digital streams
-    int        avsync_averaging; // Number of frames to average
-    int        avsync_interval;  // Number of frames skip between sync checks
-    int        avsync_next;      // Frames till next sync check
+    int        avsync_averaging         {4}; // Number of frames to average
+    int        avsync_interval          {0}; // Number of frames skip between sync checks
+    int        avsync_next              {0}; // Frames till next sync check
 
     // Time Code stuff
-    int        prevtc;        ///< 32 bit timecode if last VideoFrame shown
-    int        prevrp;        ///< repeat_pict of last frame
-    int64_t    tc_wrap[TCTYPESMAX];
-    int64_t    tc_lastval[TCTYPESMAX];
-    int64_t    savedAudioTimecodeOffset;
+    int        prevtc                   {0}; ///< 32 bit timecode if last VideoFrame shown
+    int        prevrp                   {0}; ///< repeat_pict of last frame
+    int64_t    tc_wrap[TCTYPESMAX]      {};
+    int64_t    tc_lastval[TCTYPESMAX]   {};
+    int64_t    savedAudioTimecodeOffset {0};
 
     // AVSync2
-    int64_t   rtcbase;        // real time clock base for presentation time (microsecs)
-    int64_t   maxtcval;       // maximum to date video tc
-    int       maxtcframes;    // number of frames seen since max to date tc
-    int64_t   avsync2adjustms; // number of milliseconds to adjust for av sync errors
-    int       numdroppedframes; // number of consecutive dropped frames.
-    int64_t   prior_audiotimecode;    // time code from prior frame
-    int64_t   prior_videotimecode;    // time code from prior frame
-    int64_t   m_timeOffsetBase;
+    int64_t   rtcbase                   {0}; // real time clock base for presentation time (microsecs)
+    int64_t   maxtcval                  {0}; // maximum to date video tc
+    int       maxtcframes               {0}; // number of frames seen since max to date tc
+    int64_t   avsync2adjustms           {10};// number of milliseconds to adjust for av sync errors
+    int       numdroppedframes          {0}; // number of consecutive dropped frames.
+    int64_t   prior_audiotimecode       {0}; // time code from prior frame
+    int64_t   prior_videotimecode       {0}; // time code from prior frame
+    int64_t   m_timeOffsetBase          {0};
 
     // LiveTV
-    TV *m_tv;
-    bool isDummy;
+    TV *m_tv                            {nullptr};
+    bool isDummy                        {false};
 
     // Counter for buffering messages
-    int  bufferingCounter;
+    int  bufferingCounter               {0};
 
     // Debugging variables
-    Jitterometer *output_jmeter;
+    Jitterometer *output_jmeter         {nullptr};
 
   private:
     void syncWithAudioStretch();
-    bool disable_passthrough;
+    bool disable_passthrough            {false};
 };
 
 #endif

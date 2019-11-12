@@ -148,8 +148,8 @@ void VideoScannerThread::SetDirs(QStringList dirs)
             for (iter2 = mdirs.begin(); iter2 != mdirs.end(); ++iter2)
                 // backend is online, but has no directories listed
                 // fall back to those on the master backend
-                dirs.append(gCoreContext->GenMythURL(*iter,
-                                            0, *iter2, "Videos"));
+                dirs.append(MythCoreContext::GenMythURL(*iter,
+                                                        0, *iter2, "Videos"));
 
     m_directories = dirs;
 }

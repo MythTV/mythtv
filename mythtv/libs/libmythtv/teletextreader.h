@@ -127,10 +127,10 @@ class TeletextReader
     int              m_cursubpage         {-1};
     bool             m_curpage_showheader {true};
     bool             m_curpage_issubtitle {false};
-    int              m_pageinput[3];
+    int              m_pageinput[3]       {0};
     bool             m_transparent        {false};
     bool             m_revealHidden       {false};
-    uint8_t          m_header[40];
+    uint8_t          m_header[40]         {0};
     bool             m_header_changed     {false};
     bool             m_page_changed       {false};
     TeletextMagazine m_magazines[8];

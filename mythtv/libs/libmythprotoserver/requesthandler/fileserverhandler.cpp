@@ -630,7 +630,7 @@ bool FileServerHandler::HandleQueryFileExists(SocketHandler *socket,
             << fullname;
 
         // TODO: convert me to QFile
-        struct stat fileinfo;
+        struct stat fileinfo {};
         if (stat(fullname.toLocal8Bit().constData(), &fileinfo) >= 0)
         {
             res << QString::number(fileinfo.st_dev)
@@ -738,9 +738,9 @@ bool FileServerHandler::HandleDeleteFile(SocketHandler *socket,
     return HandleDeleteFile(socket, slist[1], slist[2]);
 }
 
-bool FileServerHandler::DeleteFile(QString filename, QString storagegroup)
+bool FileServerHandler::DeleteFile(const QString& filename, const QString& storagegroup)
 {
-    return HandleDeleteFile(nullptr, std::move(filename), std::move(storagegroup));
+    return HandleDeleteFile(nullptr, filename, storagegroup);
 }
 
 bool FileServerHandler::HandleDeleteFile(SocketHandler *socket,
@@ -954,7 +954,7 @@ bool FileServerHandler::HandleQueryFileTransfer(SocketHandler *socket,
 
     QStringList res;
     int recnum = commands[1].toInt();
-    FileTransfer *ft;
+    FileTransfer *ft = nullptr;
 
     {
         QReadLocker rlock(&m_ftLock);

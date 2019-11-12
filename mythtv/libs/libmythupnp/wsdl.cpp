@@ -477,7 +477,7 @@ bool Wsdl::IsCustomType( QString &sTypeName )
             break;
     }
 
-    return !((id == -1) || (id < QMetaType::User));
+    return !(id < QMetaType::User);
 }
 
 /////////////////////////////////////////////////////////////////////////////

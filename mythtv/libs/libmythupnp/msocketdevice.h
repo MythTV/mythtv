@@ -79,7 +79,7 @@ public:
     }
 
     void  close() override; // QIODevice
-    bool  flush();
+    static bool  flush();
 
     // Implementation of QIODevice abstract virtual functions
     qint64  size() const override; // QIODevice

@@ -145,7 +145,7 @@ QList<FileSystemInfo> FileSystemInfo::RemoteGetInfo(MythSocket *sock)
     QList<FileSystemInfo> fsInfos;
     QStringList strlist(QString("QUERY_FREE_SPACE_LIST"));
 
-    bool sent;
+    bool sent = false;
 
     if (sock)
         sent = sock->SendReceiveStringList(strlist);
@@ -228,8 +228,7 @@ void FileSystemInfo::PopulateDiskSpace(void)
 
 void FileSystemInfo::PopulateFSProp(void)
 {
-    struct statfs statbuf;
-    memset(&statbuf, 0, sizeof(statbuf));
+    struct statfs statbuf {};
 
     if (statfs(getPath().toLocal8Bit().constData(), &statbuf) == 0)
     {

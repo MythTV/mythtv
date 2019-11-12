@@ -76,15 +76,6 @@ void ShutdownMythSystemLegacy(void)
         writeThread->wait();
 }
 
-MythSystemLegacyIOHandler::MythSystemLegacyIOHandler(bool read) :
-    MThread(QString("SystemIOHandler%1").arg(read ? "R" : "W")),
-    m_pMap(PMap_t()),
-    m_read(read)
-{
-    FD_ZERO(&m_fds);
-    m_readbuf[0] = '\0';
-}
-
 void MythSystemLegacyIOHandler::run(void)
 {
     RunProlog();
@@ -104,9 +95,7 @@ void MythSystemLegacyIOHandler::run(void)
 
         while( run_system )
         {
-            struct timespec ts;
-            ts.tv_sec = 0;
-            ts.tv_nsec = 10*1000*1000;  // 10ms
+            struct timespec ts { 0, 10*1000*1000};  // 10ms
             nanosleep(&ts, nullptr); // ~100x per second, for ~3MBps throughput
             m_pLock.lock();
             if( m_pMap.isEmpty() )
@@ -115,10 +104,9 @@ void MythSystemLegacyIOHandler::run(void)
                 break;
             }
 
-            timeval tv;
-            tv.tv_sec = 0; tv.tv_usec = 0;
+            timeval tv {0, 0};
 
-            int retval;
+            int retval = -1;
             fd_set fds = m_fds;
 
             if( m_read )
@@ -156,9 +144,9 @@ void MythSystemLegacyIOHandler::run(void)
 
 void MythSystemLegacyIOHandler::HandleRead(int fd, QBuffer *buff)
 {
-    int len;
     errno = 0;
-    if( (len = read(fd, &m_readbuf, 65536)) <= 0 )
+    int len = read(fd, &m_readbuf, 65536);
+    if( len <= 0 )
     {
         if( errno != EAGAIN )
         {
@@ -286,9 +274,8 @@ void MythSystemLegacyManager::run(void)
         }
         m_mapLock.unlock();
 
-        MythSystemLegacyUnix     *ms;
-        pid_t               pid;
-        int                 status;
+        pid_t pid = 0;
+        int   status = 0;
 
         // check for any newly exited processes
         listLock.lock();
@@ -305,7 +292,7 @@ void MythSystemLegacyManager::run(void)
             }
 
             // pop exited process off managed list, add to cleanup list
-            ms = m_pMap.take(pid);
+            MythSystemLegacyUnix *ms = m_pMap.take(pid);
             m_mapLock.unlock();
 
             // Occasionally, the caller has deleted the structure from under
@@ -388,7 +375,7 @@ void MythSystemLegacyManager::run(void)
         {
             next = i + 1;
             pid  = i.key();
-            ms   = i.value();
+            MythSystemLegacyUnix *ms = i.value();
             if (!ms)
                 continue;
 
@@ -497,9 +484,7 @@ void MythSystemLegacySignalManager::run(void)
     LOG(VB_GENERAL, LOG_INFO, "Starting process signal handler");
     while (run_system)
     {
-        struct timespec ts;
-        ts.tv_sec = 0;
-        ts.tv_nsec = 50 * 1000 * 1000; // 50ms
+        struct timespec ts {0, 50 * 1000 * 1000}; // 50ms
         nanosleep(&ts, nullptr); // sleep 50ms
 
         while (run_system)
@@ -560,10 +545,6 @@ MythSystemLegacyUnix::MythSystemLegacyUnix(MythSystemLegacy *parent) :
     MythSystemLegacyPrivate("MythSystemLegacyUnix")
 {
     m_parent = parent;
-
-    m_stdpipe[0] = -1;
-    m_stdpipe[1] = -1;
-    m_stdpipe[2] = -1;
 
     connect(this, SIGNAL(started()), m_parent, SIGNAL(started()));
     connect(this, SIGNAL(finished()), m_parent, SIGNAL(finished()));
@@ -877,12 +858,11 @@ void MythSystemLegacyUnix::Fork(time_t timeout)
     char *command = strdup(cmdUTF8.constData());
 
     char **cmdargs = (char **)malloc((args.size() + 1) * sizeof(char *));
-    QStringList::const_iterator it;
 
     if (cmdargs)
     {
-        int i;
-        for (i = 0, it = args.constBegin(); it != args.constEnd(); ++it)
+        int i = 0;
+        for (auto it = args.constBegin(); it != args.constEnd(); ++it)
         {
             cmdargs[i++] = strdup(it->toUtf8().constData());
         }

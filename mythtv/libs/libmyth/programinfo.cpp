@@ -279,44 +279,44 @@ ProgramInfo::ProgramInfo(uint _chanid, const QDateTime &_recstartts)
  */
 ProgramInfo::ProgramInfo(
     uint  _recordedid,
-    const QString &_title,
-    const QString &_sortTitle,
-    const QString &_subtitle,
-    const QString &_sortSubtitle,
-    const QString &_description,
+    QString _title,
+    QString _sortTitle,
+    QString _subtitle,
+    QString _sortSubtitle,
+    QString _description,
     uint  _season,
     uint  _episode,
     uint  _totalepisodes,
-    const QString &_syndicatedepisode,
-    const QString &_category,
+    QString _syndicatedepisode,
+    QString _category,
 
     uint _chanid,
-    const QString &_channum,
-    const QString &_chansign,
-    const QString &_channame,
-    const QString &_chanplaybackfilters,
+    QString _channum,
+    QString _chansign,
+    QString _channame,
+    QString _chanplaybackfilters,
 
-    const QString &_recgroup,
-    const QString &_playgroup,
+    QString _recgroup,
+    QString _playgroup,
 
     const QString &_pathname,
 
-    const QString &_hostname,
-    const QString &_storagegroup,
+    QString _hostname,
+    QString _storagegroup,
 
-    const QString &_seriesid,
-    const QString &_programid,
-    const QString &_inetref,
+    QString _seriesid,
+    QString _programid,
+    QString _inetref,
     CategoryType  _catType,
 
     int _recpriority,
 
     uint64_t _filesize,
 
-    const QDateTime &_startts,
-    const QDateTime &_endts,
-    const QDateTime &_recstartts,
-    const QDateTime &_recendts,
+    QDateTime _startts,
+    QDateTime _endts,
+    QDateTime _recstartts,
+    QDateTime _recendts,
 
     float _stars,
 
@@ -324,7 +324,7 @@ ProgramInfo::ProgramInfo(
     uint _partnumber,
     uint _parttotal,
     const QDate &_originalAirDate,
-    const QDateTime &_lastmodified,
+    QDateTime _lastmodified,
 
     RecStatus::Type _recstatus,
 
@@ -339,51 +339,51 @@ ProgramInfo::ProgramInfo(
     uint _audioproperties,
     uint _videoproperties,
     uint _subtitleType,
-    const QString &_inputname,
-    const QDateTime &_bookmarkupdate) :
-    m_title(_title),
-    m_sortTitle(_sortTitle),
-    m_subtitle(_subtitle),
-    m_sortSubtitle(_sortSubtitle),
-    m_description(_description),
+    QString _inputname,
+    QDateTime _bookmarkupdate) :
+    m_title(std::move(_title)),
+    m_sortTitle(std::move(_sortTitle)),
+    m_subtitle(std::move(_subtitle)),
+    m_sortSubtitle(std::move(_sortSubtitle)),
+    m_description(std::move(_description)),
     m_season(_season),
     m_episode(_episode),
     m_totalepisodes(_totalepisodes),
-    m_syndicatedepisode(_syndicatedepisode),
-    m_category(_category),
+    m_syndicatedepisode(std::move(_syndicatedepisode)),
+    m_category(std::move(_category)),
 
     m_recpriority(_recpriority),
 
     m_chanid(_chanid),
-    m_chanstr(_channum),
-    m_chansign(_chansign),
-    m_channame(_channame),
-    m_chanplaybackfilters(_chanplaybackfilters),
+    m_chanstr(std::move(_channum)),
+    m_chansign(std::move(_chansign)),
+    m_channame(std::move(_channame)),
+    m_chanplaybackfilters(std::move(_chanplaybackfilters)),
 
-    m_recgroup(_recgroup),
-    m_playgroup(_playgroup),
+    m_recgroup(std::move(_recgroup)),
+    m_playgroup(std::move(_playgroup)),
 
     m_pathname(_pathname),
 
-    m_hostname(_hostname),
-    m_storagegroup(_storagegroup),
+    m_hostname(std::move(_hostname)),
+    m_storagegroup(std::move(_storagegroup)),
 
-    m_seriesid(_seriesid),
-    m_programid(_programid),
-    m_inetref(_inetref),
+    m_seriesid(std::move(_seriesid)),
+    m_programid(std::move(_programid)),
+    m_inetref(std::move(_inetref)),
     m_catType(_catType),
 
     m_filesize(_filesize),
 
-    m_startts(_startts),
-    m_endts(_endts),
-    m_recstartts(_recstartts),
-    m_recendts(_recendts),
+    m_startts(std::move(_startts)),
+    m_endts(std::move(_endts)),
+    m_recstartts(std::move(_recstartts)),
+    m_recendts(std::move(_recendts)),
 
     m_stars(clamp(_stars, 0.0F, 1.0F)),
 
     m_originalAirDate(_originalAirDate),
-    m_lastmodified(_lastmodified),
+    m_lastmodified(std::move(_lastmodified)),
     m_lastInUseTime(MythDate::current().addSecs(-4 * 60 * 60)),
 
     m_recordid(_recordid),
@@ -402,8 +402,8 @@ ProgramInfo::ProgramInfo(
     m_dupmethod(_dupmethod),
 
     m_recordedid(_recordedid),
-    m_inputname(_inputname),
-    m_bookmarkupdate(_bookmarkupdate)
+    m_inputname(std::move(_inputname)),
+    m_bookmarkupdate(std::move(_bookmarkupdate))
 {
     if (m_originalAirDate.isValid() && m_originalAirDate < QDate(1940, 1, 1))
         m_originalAirDate = QDate();
@@ -416,28 +416,28 @@ ProgramInfo::ProgramInfo(
  *  \brief Constructs a ProgramInfo from data in 'oldrecorded' table
  */
 ProgramInfo::ProgramInfo(
-    const QString &_title,
-    const QString &_sortTitle,
-    const QString &_subtitle,
-    const QString &_sortSubtitle,
-    const QString &_description,
+    QString _title,
+    QString _sortTitle,
+    QString _subtitle,
+    QString _sortSubtitle,
+    QString _description,
     uint  _season,
     uint  _episode,
-    const QString &_category,
+    QString _category,
 
     uint _chanid,
-    const QString &_channum,
-    const QString &_chansign,
-    const QString &_channame,
+    QString _channum,
+    QString _chansign,
+    QString _channame,
 
-    const QString &_seriesid,
-    const QString &_programid,
-    const QString &_inetref,
+    QString _seriesid,
+    QString _programid,
+    QString _inetref,
 
-    const QDateTime &_startts,
-    const QDateTime &_endts,
-    const QDateTime &_recstartts,
-    const QDateTime &_recendts,
+    QDateTime _startts,
+    QDateTime _endts,
+    QDateTime _recstartts,
+    QDateTime _recendts,
 
     RecStatus::Type _recstatus,
 
@@ -448,28 +448,28 @@ ProgramInfo::ProgramInfo(
     uint _findid,
 
     bool duplicate) :
-    m_title(_title),
-    m_sortTitle(_sortTitle),
-    m_subtitle(_subtitle),
-    m_sortSubtitle(_sortSubtitle),
-    m_description(_description),
+    m_title(std::move(_title)),
+    m_sortTitle(std::move(_sortTitle)),
+    m_subtitle(std::move(_subtitle)),
+    m_sortSubtitle(std::move(_sortSubtitle)),
+    m_description(std::move(_description)),
     m_season(_season),
     m_episode(_episode),
-    m_category(_category),
+    m_category(std::move(_category)),
 
     m_chanid(_chanid),
-    m_chanstr(_channum),
-    m_chansign(_chansign),
-    m_channame(_channame),
+    m_chanstr(std::move(_channum)),
+    m_chansign(std::move(_chansign)),
+    m_channame(std::move(_channame)),
 
-    m_seriesid(_seriesid),
-    m_programid(_programid),
-    m_inetref(_inetref),
+    m_seriesid(std::move(_seriesid)),
+    m_programid(std::move(_programid)),
+    m_inetref(std::move(_inetref)),
 
-    m_startts(_startts),
-    m_endts(_endts),
-    m_recstartts(_recstartts),
-    m_recendts(_recendts),
+    m_startts(std::move(_startts)),
+    m_endts(std::move(_endts)),
+    m_recstartts(std::move(_recstartts)),
+    m_recendts(std::move(_recendts)),
 
     m_lastmodified(m_startts),
     m_lastInUseTime(MythDate::current().addSecs(-4 * 60 * 60)),
@@ -491,27 +491,27 @@ ProgramInfo::ProgramInfo(
  *  \brief Constructs a ProgramInfo from listings data in 'program' table
  */
 ProgramInfo::ProgramInfo(
-    const QString &_title,
-    const QString &_sortTitle,
-    const QString &_subtitle,
-    const QString &_sortSubtitle,
-    const QString &_description,
-    const QString &_syndicatedepisode,
-    const QString &_category,
+    QString _title,
+    QString _sortTitle,
+    QString _subtitle,
+    QString _sortSubtitle,
+    QString _description,
+    QString _syndicatedepisode,
+    QString _category,
 
     uint _chanid,
-    const QString &_channum,
-    const QString &_chansign,
-    const QString &_channame,
-    const QString &_chanplaybackfilters,
+    QString _channum,
+    QString _chansign,
+    QString _channame,
+    QString _chanplaybackfilters,
 
-    const QDateTime &_startts,
-    const QDateTime &_endts,
-    const QDateTime &_recstartts,
-    const QDateTime &_recendts,
+    QDateTime _startts,
+    QDateTime _endts,
+    QDateTime _recstartts,
+    QDateTime _recendts,
 
-    const QString &_seriesid,
-   const QString &_programid,
+    QString _seriesid,
+   QString _programid,
     const CategoryType _catType,
 
     float _stars,
@@ -537,31 +537,31 @@ ProgramInfo::ProgramInfo(
     uint _totalepisodes,
 
     const ProgramList &schedList) :
-    m_title(_title),
-    m_sortTitle(_sortTitle),
-    m_subtitle(_subtitle),
-    m_sortSubtitle(_sortSubtitle),
-    m_description(_description),
+    m_title(std::move(_title)),
+    m_sortTitle(std::move(_sortTitle)),
+    m_subtitle(std::move(_subtitle)),
+    m_sortSubtitle(std::move(_sortSubtitle)),
+    m_description(std::move(_description)),
     m_season(_season),
     m_episode(_episode),
     m_totalepisodes(_totalepisodes),
-    m_syndicatedepisode(_syndicatedepisode),
-    m_category(_category),
+    m_syndicatedepisode(std::move(_syndicatedepisode)),
+    m_category(std::move(_category)),
 
     m_chanid(_chanid),
-    m_chanstr(_channum),
-    m_chansign(_chansign),
-    m_channame(_channame),
-    m_chanplaybackfilters(_chanplaybackfilters),
+    m_chanstr(std::move(_channum)),
+    m_chansign(std::move(_chansign)),
+    m_channame(std::move(_channame)),
+    m_chanplaybackfilters(std::move(_chanplaybackfilters)),
 
-    m_seriesid(_seriesid),
-    m_programid(_programid),
+    m_seriesid(std::move(_seriesid)),
+    m_programid(std::move(_programid)),
     m_catType(_catType),
 
-    m_startts(_startts),
-    m_endts(_endts),
-    m_recstartts(_recstartts),
-    m_recendts(_recendts),
+    m_startts(std::move(_startts)),
+    m_endts(std::move(_endts)),
+    m_recstartts(std::move(_recstartts)),
+    m_recendts(std::move(_recendts)),
 
     m_stars(clamp(_stars, 0.0F, 1.0F)),
 
@@ -637,66 +637,66 @@ ProgramInfo::ProgramInfo(
  *  \brief Constructs a basic ProgramInfo (used by RecordingInfo)
  */
 ProgramInfo::ProgramInfo(
-    const QString &_title,
-    const QString &_sortTitle,
-    const QString &_subtitle,
-    const QString &_sortSubtitle,
-    const QString &_description,
+    QString _title,
+    QString _sortTitle,
+    QString _subtitle,
+    QString _sortSubtitle,
+    QString _description,
     uint  _season,
     uint  _episode,
     uint  _totalepisodes,
-    const QString &_category,
+    QString _category,
 
     uint _chanid,
-    const QString &_channum,
-    const QString &_chansign,
-    const QString &_channame,
-    const QString &_chanplaybackfilters,
+    QString _channum,
+    QString _chansign,
+    QString _channame,
+    QString _chanplaybackfilters,
 
-    const QString &_recgroup,
-    const QString &_playgroup,
+    QString _recgroup,
+    QString _playgroup,
 
-    const QDateTime &_startts,
-    const QDateTime &_endts,
-    const QDateTime &_recstartts,
-    const QDateTime &_recendts,
+    QDateTime _startts,
+    QDateTime _endts,
+    QDateTime _recstartts,
+    QDateTime _recendts,
 
-    const QString &_seriesid,
-    const QString &_programid,
-    const QString &_inetref,
-    const QString &_inputname) :
-    m_title(_title),
-    m_sortTitle(_sortTitle),
-    m_subtitle(_subtitle),
-    m_sortSubtitle(_sortSubtitle),
-    m_description(_description),
+    QString _seriesid,
+    QString _programid,
+    QString _inetref,
+    QString _inputname) :
+    m_title(std::move(_title)),
+    m_sortTitle(std::move(_sortTitle)),
+    m_subtitle(std::move(_subtitle)),
+    m_sortSubtitle(std::move(_sortSubtitle)),
+    m_description(std::move(_description)),
     m_season(_season),
     m_episode(_episode),
     m_totalepisodes(_totalepisodes),
-    m_category(_category),
+    m_category(std::move(_category)),
 
     m_chanid(_chanid),
-    m_chanstr(_channum),
-    m_chansign(_chansign),
-    m_channame(_channame),
-    m_chanplaybackfilters(_chanplaybackfilters),
+    m_chanstr(std::move(_channum)),
+    m_chansign(std::move(_chansign)),
+    m_channame(std::move(_channame)),
+    m_chanplaybackfilters(std::move(_chanplaybackfilters)),
 
-    m_recgroup(_recgroup),
-    m_playgroup(_playgroup),
+    m_recgroup(std::move(_recgroup)),
+    m_playgroup(std::move(_playgroup)),
 
-    m_seriesid(_seriesid),
-    m_programid(_programid),
-    m_inetref(_inetref),
+    m_seriesid(std::move(_seriesid)),
+    m_programid(std::move(_programid)),
+    m_inetref(std::move(_inetref)),
 
-    m_startts(_startts),
-    m_endts(_endts),
-    m_recstartts(_recstartts),
-    m_recendts(_recendts),
+    m_startts(std::move(_startts)),
+    m_endts(std::move(_endts)),
+    m_recstartts(std::move(_recstartts)),
+    m_recendts(std::move(_recendts)),
 
     m_lastmodified(MythDate::current()),
     m_lastInUseTime(m_lastmodified.addSecs(-4 * 60 * 60)),
 
-    m_inputname(_inputname)
+    m_inputname(std::move(_inputname))
 {
     ensureSortFields();
 }
@@ -712,7 +712,7 @@ ProgramInfo::ProgramInfo(const QString &_pathname)
         return;
     }
 
-    uint _chanid;
+    uint _chanid = 0;
     QDateTime _recstartts;
     if (!gCoreContext->IsDatabaseIgnored() &&
         QueryKeyFromPathname(_pathname, _chanid, _recstartts) &&
@@ -1440,7 +1440,7 @@ bool ProgramInfo::FromStringList(QStringList::const_iterator &it,
     INT_FROM_LIST(m_recpriority2);      // 39
     INT_FROM_LIST(m_parentid);          // 40
     STR_FROM_LIST(m_storagegroup);      // 41
-    uint audioproperties, videoproperties, subtitleType;
+    uint audioproperties = 0, videoproperties = 0, subtitleType = 0;
     INT_FROM_LIST(audioproperties);   // 42
     INT_FROM_LIST(videoproperties);   // 43
     INT_FROM_LIST(subtitleType);      // 44
@@ -1488,8 +1488,6 @@ void ProgramInfo::ToMap(InfoMap &progMap,
         gCoreContext->GetSetting("LongChannelFormat", "<num> <name>");
 
     QDateTime timeNow = MythDate::current();
-
-    int hours, minutes, seconds;
 
     progMap["title"] = m_title;
     progMap["subtitle"] = m_subtitle;
@@ -1623,13 +1621,13 @@ void ProgramInfo::ToMap(InfoMap &progMap,
 
     progMap["filesize"] = locale.toString((quint64)m_filesize);
 
-    seconds = m_recstartts.secsTo(m_recendts);
-    minutes = seconds / 60;
+    int seconds = m_recstartts.secsTo(m_recendts);
+    int minutes = seconds / 60;
 
     QString min_str = QObject::tr("%n minute(s)","",minutes);
 
     progMap["lenmins"] = min_str;
-    hours   = minutes / 60;
+    int hours   = minutes / 60;
     minutes = minutes % 60;
 
     progMap["lentime"] = min_str;
@@ -2534,9 +2532,9 @@ QString ProgramInfo::GetPlaybackURL(
         (gCoreContext->GetBoolSetting("MasterBackendOverride", false)) &&
         (RemoteCheckFile(this, false)))
     {
-        tmpURL = gCoreContext->GenMythURL(gCoreContext->GetMasterHostName(),
-                                          gCoreContext->GetMasterServerPort(),
-                                          basename);
+        tmpURL = MythCoreContext::GenMythURL(gCoreContext->GetMasterHostName(),
+                                             MythCoreContext::GetMasterServerPort(),
+                                             basename);
 
         LOG(VB_FILE, LOG_INFO, LOC +
             QString("GetPlaybackURL: Found @ '%1'").arg(tmpURL));
@@ -2544,9 +2542,9 @@ QString ProgramInfo::GetPlaybackURL(
     }
 
     // Fallback to streaming from the backend the recording was created on
-    tmpURL = gCoreContext->GenMythURL(m_hostname,
-                                      gCoreContext->GetBackendServerPort(m_hostname),
-                                      basename);
+    tmpURL = MythCoreContext::GenMythURL(m_hostname,
+                                         gCoreContext->GetBackendServerPort(m_hostname),
+                                         basename);
 
     LOG(VB_FILE, LOG_INFO, LOC +
         QString("GetPlaybackURL: Using default of: '%1'") .arg(tmpURL));
@@ -2754,7 +2752,7 @@ QStringList ProgramInfo::QueryDVDBookmark(
     return fields;
 }
 
-void ProgramInfo::SaveDVDBookmark(const QStringList &fields) const
+void ProgramInfo::SaveDVDBookmark(const QStringList &fields)
 {
     QStringList::const_iterator it = fields.begin();
     MSqlQuery query(MSqlQuery::InitCon());
@@ -2816,7 +2814,7 @@ QStringList ProgramInfo::QueryBDBookmark(const QString &serialid) const
     return fields;
 }
 
-void ProgramInfo::SaveBDBookmark(const QStringList &fields) const
+void ProgramInfo::SaveBDBookmark(const QStringList &fields)
 {
     QStringList::const_iterator it = fields.begin();
     MSqlQuery query(MSqlQuery::InitCon());
@@ -3466,7 +3464,6 @@ void ProgramInfo::SaveMarkupMap(
     for (it = marks.begin(); it != marks.end(); ++it)
     {
         uint64_t frame = it.key();
-        int mark_type;
         QString querystr;
 
         if ((min_frame >= 0) && (frame < (uint64_t)min_frame))
@@ -3475,7 +3472,7 @@ void ProgramInfo::SaveMarkupMap(
         if ((max_frame >= 0) && (frame > (uint64_t)max_frame))
             continue;
 
-        mark_type = (type != MARK_ALL) ? type : *it;
+        int mark_type = (type != MARK_ALL) ? type : *it;
 
         if (IsVideo())
         {
@@ -5464,7 +5461,7 @@ bool LoadFromProgram(ProgramList &destination,
                      const QString &sql, const MSqlBindings &bindings,
                      const ProgramList &schedList)
 {
-    uint count;
+    uint count = 0;
 
     QString queryStr = sql;
     // ------------------------------------------------------------------------
@@ -5603,7 +5600,7 @@ ProgramInfo* LoadProgramFromProgram(const uint chanid,
     // Get all Pending Scheduled Programs
 
     ProgramList  schedList;
-    bool hasConflicts;
+    bool hasConflicts = false;
     LoadFromScheduler(schedList, hasConflicts);
 
     // ----------------------------------------------------------------------
@@ -6026,7 +6023,7 @@ bool GetNextRecordingList(QDateTime &nextRecordingStart,
 {
     nextRecordingStart = QDateTime();
 
-    bool dummy;
+    bool dummy = false;
     bool *conflicts = (hasConflicts) ? hasConflicts : &dummy;
 
     ProgramList progList;

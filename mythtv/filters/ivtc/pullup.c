@@ -15,7 +15,7 @@
 #if HAVE_MMX
 static int diff_y_mmx(const unsigned char *a, const unsigned char *b, int s)
 {
-	int ret;
+	int ret = 0;
         __asm__ volatile (
 		"movl $4, %%ecx \n\t"
 		"pxor %%mm4, %%mm4 \n\t"
@@ -63,7 +63,7 @@ static int diff_y_mmx(const unsigned char *a, const unsigned char *b, int s)
 
 static int licomb_y_mmx(const unsigned char *a, const unsigned char *b, int s)
 {
-	int ret;
+	int ret = 0;
         __asm__ volatile (
 		"movl $4, %%ecx \n\t"
 		"pxor %%mm6, %%mm6 \n\t"
@@ -154,7 +154,7 @@ static int licomb_y_mmx(const unsigned char *a, const unsigned char *b, int s)
 static int var_y_mmx(const unsigned char *a, const unsigned char *b, int s)
 {
     (void) b;
-	int ret;
+	int ret = 0;
         __asm__ volatile (
 		"movl $3, %%ecx \n\t"
 		"pxor %%mm4, %%mm4 \n\t"
@@ -204,9 +204,9 @@ static int var_y_mmx(const unsigned char *a, const unsigned char *b, int s)
 
 static int diff_y(const unsigned char *a, const unsigned char *b, int s)
 {
-	int i, j, diff=0;
-	for (i=4; i; i--) {
-		for (j=0; j<8; j++)
+	int diff=0;
+	for (int i=4; i; i--) {
+		for (int j=0; j<8; j++)
                         diff += ABS(a[j]-b[j]);
 		a+=s; b+=s;
 	}
@@ -215,9 +215,9 @@ static int diff_y(const unsigned char *a, const unsigned char *b, int s)
 
 static int licomb_y(const unsigned char *a, const unsigned char *b, int s)
 {
-	int i, j, diff=0;
-	for (i=4; i; i--) {
-		for (j=0; j<8; j++)
+	int diff=0;
+	for (int i=4; i; i--) {
+		for (int j=0; j<8; j++)
 			diff += ABS((a[j]<<1) - b[j-s] - b[j])
 				+ ABS((b[j]<<1) - a[j] - a[j+s]);
 		a+=s; b+=s;
@@ -230,9 +230,9 @@ static int qpcomb_y(const unsigned char *a, const unsigned char *b, int s)
 
 static int qpcomb_y(const unsigned char *a, const unsigned char *b, int s)
 {
-	int i, j, diff=0;
-	for (i=4; i; i--) {
-		for (j=0; j<8; j++)
+	int diff=0;
+	for (int i=4; i; i--) {
+		for (int j=0; j<8; j++)
 			diff += ABS(a[j] - 3*b[j-s] + 3*a[j+s] - b[j]);
 		a+=s; b+=s;
 	}
@@ -251,9 +251,9 @@ static int licomb_y_test(const unsigned char *a, const unsigned char *b, int s)
 
 static int var_y(const unsigned char *a, const unsigned char *b, int s)
 {
-	int i, j, var=0;
-	for (i=3; i; i--) {
-		for (j=0; j<8; j++) {
+	int var=0;
+	for (int i=3; i; i--) {
+		for (int j=0; j<8; j++) {
 			var += ABS(a[j]-a[j+s]);
 		}
 		a+=s; b+=s;
@@ -271,10 +271,9 @@ static int var_y(const unsigned char *a, const unsigned char *b, int s)
 
 static void alloc_buffer(struct pullup_context *c, struct pullup_buffer *b)
 {
-	int i;
 	if (b->planes) return;
 	b->planes = calloc(c->nplanes, sizeof(unsigned char *));
-	for (i = 0; i < c->nplanes; i++) {
+	for (int i = 0; i < c->nplanes; i++) {
 		b->planes[i] = malloc(c->h[i]*c->stride[i]);
 		/* Deal with idiotic 128=0 for chroma: */
 		memset(b->planes[i], c->background[i], c->h[i]*c->stride[i]);
@@ -298,8 +297,6 @@ void pullup_release_buffer(struct pullup_buffer *b, int parity)
 
 struct pullup_buffer *pullup_get_buffer(struct pullup_context *c, int parity)
 {
-	int i;
-
 	/* Try first to get the sister buffer for the previous field */
 	if (parity < 2 && c->last && parity != c->last->parity
 	    && !c->last->buffer->lock[parity]) {
@@ -308,7 +305,7 @@ struct pullup_buffer *pullup_get_buffer(struct pullup_context *c, int parity)
 	}
 	
 	/* Prefer a buffer with both fields open */
-	for (i = 0; i < c->nbuffers; i++) {
+	for (int i = 0; i < c->nbuffers; i++) {
 		if (c->buffers[i].lock[0]) continue;
 		if (c->buffers[i].lock[1]) continue;
 		alloc_buffer(c, &c->buffers[i]);
@@ -318,7 +315,7 @@ struct pullup_buffer *pullup_get_buffer(struct pullup_context *c, int parity)
 	if (parity == 2) return 0;
 	
 	/* Search for any half-free buffer */
-	for (i = 0; i < c->nbuffers; i++) {
+	for (int i = 0; i < c->nbuffers; i++) {
 		if (((parity+1) & 1) && c->buffers[i].lock[0]) continue;
 		if (((parity+1) & 2) && c->buffers[i].lock[1]) continue;
 		alloc_buffer(c, &c->buffers[i]);
@@ -338,8 +335,6 @@ static void compute_metric(struct pullup_context *c,
 	struct pullup_field *fb, int pb,
 	int (*func)(const unsigned char *, const unsigned char *, int), int *dest)
 {
-	unsigned char *a, *b;
-	int x, y;
 	int mp = c->metric_plane;
 	int xstep = c->bpp[mp];
 	int ystep = c->stride[mp]<<3;
@@ -354,11 +349,11 @@ static void compute_metric(struct pullup_context *c,
 		return;
 	}
 
-	a = fa->buffer->planes[mp] + pa * c->stride[mp] + c->metric_offset;
-	b = fb->buffer->planes[mp] + pb * c->stride[mp] + c->metric_offset;
+	unsigned char *a = fa->buffer->planes[mp] + pa * c->stride[mp] + c->metric_offset;
+	unsigned char *b = fb->buffer->planes[mp] + pb * c->stride[mp] + c->metric_offset;
 
-	for (y = c->metric_h; y; y--) {
-		for (x = 0; x < w; x += xstep) {
+	for (int y = c->metric_h; y; y--) {
+		for (int x = 0; x < w; x += xstep) {
 			*dest++ = func(a + x, b + x, s);
 		}
 		a += ystep; b += ystep;
@@ -379,8 +374,8 @@ static void alloc_metrics(struct pullup_context *c, struct pullup_field *f)
 
 static struct pullup_field *make_field_queue(struct pullup_context *c, int len)
 {
-	struct pullup_field *head, *f;
-	f = head = calloc(1, sizeof(struct pullup_field));
+	struct pullup_field *head = calloc(1, sizeof(struct pullup_field));
+	struct pullup_field *f = head;
 	alloc_metrics(c, f);
 	for (; len > 0; len--) {
 		f->next = calloc(1, sizeof(struct pullup_field));
@@ -407,15 +402,13 @@ static void check_field_queue(struct pullup_context *c)
 
 void pullup_submit_field(struct pullup_context *c, struct pullup_buffer *b, int parity)
 {
-	struct pullup_field *f;
-	
 	/* Grow the circular list if needed */
 	check_field_queue(c);
 	
 	/* Cannot have two fields of same parity in a row; drop the new one */
 	if (c->last && c->last->parity == parity) return;
 
-	f = c->head;
+	struct pullup_field *f = c->head;
 	f->parity = parity;
 	f->buffer = pullup_lock_buffer(b, parity);
 	f->flags = 0;
@@ -434,9 +427,7 @@ void pullup_submit_field(struct pullup_context *c, struct pullup_buffer *b, int 
 
 void pullup_flush_fields(struct pullup_context *c)
 {
-	struct pullup_field *f;
-	
-	for (f = c->first; f && f != c->head; f = f->next) {
+	for (struct pullup_field *f = c->first; f && f != c->head; f = f->next) {
 		pullup_release_buffer(f->buffer, f->parity);
 		f->buffer = 0;
 	}
@@ -463,17 +454,16 @@ void pullup_flush_fields(struct pullup_context *c)
 static int queue_length(struct pullup_field *begin, struct pullup_field *end)
 {
 	int count = 1;
-	struct pullup_field *f;
 	
 	if (!begin || !end) return 0;
-	for (f = begin; f != end; f = f->next) count++;
+	for (struct pullup_field *f = begin; f != end; f = f->next)
+            count++;
 	return count;
 }
 
 static int find_first_break(struct pullup_field *f, int max)
 {
-	int i;
-	for (i = 0; i < max; i++) {
+	for (int i = 0; i < max; i++) {
 		if (f->breaks & BREAK_RIGHT || f->next->breaks & BREAK_LEFT)
 			return i+1;
 		f = f->next;
@@ -518,8 +508,7 @@ static void compute_breaks(struct pullup_context *c, struct pullup_field *f0)
 
 static void compute_affinity(struct pullup_context *c, struct pullup_field *f)
 {
-	int i;
-	int max_l=0, max_r=0, l;
+	int max_l=0, max_r=0;
 	if (f->flags & F_HAVE_AFFINITY) return;
 	f->flags |= F_HAVE_AFFINITY;
 	if (f->buffer == f->next->next->buffer) {
@@ -531,7 +520,7 @@ static void compute_affinity(struct pullup_context *c, struct pullup_field *f)
 		return;
 	}
 	if (1) {
-		for (i = 0; i < c->metric_len; i++) {
+		for (int i = 0; i < c->metric_len; i++) {
 			int lv = f->prev->var[i];
 			int rv = f->next->var[i];
 			int v = f->var[i];
@@ -539,7 +528,7 @@ static void compute_affinity(struct pullup_context *c, struct pullup_field *f)
 			int rc = f->next->comb[i] - (v+rv) + ABS(v-rv);
 			lc = lc>0 ? lc : 0;
 			rc = rc>0 ? rc : 0;
-			l = lc - rc;
+			int l = lc - rc;
 			if (l > max_l) max_l = l;
 			if (-l > max_r) max_r = -l;
 		}
@@ -547,8 +536,8 @@ static void compute_affinity(struct pullup_context *c, struct pullup_field *f)
 		if (max_r > 6*max_l) f->affinity = -1;
 		else if (max_l > 6*max_r) f->affinity = 1;
 	} else {
-		for (i = 0; i < c->metric_len; i++) {
-			l = f->comb[i] - f->next->comb[i];
+		for (int i = 0; i < c->metric_len; i++) {
+			int l = f->comb[i] - f->next->comb[i];
 			if (l > max_l) max_l = l;
 			if (-l > max_r) max_r = -l;
 		}
@@ -561,8 +550,8 @@ static void compute_affinity(struct pullup_context *c, struct pullup_field *f)
 static void foo(struct pullup_context *c)
 {
 	struct pullup_field *f = c->first;
-	int i, n = queue_length(f, c->last);
-	for (i = 0; i < n-1; i++) {
+	int n = queue_length(f, c->last);
+	for (int i = 0; i < n-1; i++) {
 		if (i < n-3) compute_breaks(c, f);
 		compute_affinity(c, f);
 		f = f->next;
@@ -575,14 +564,13 @@ static int decide_frame_length(struct pullup_context *c)
 	struct pullup_field *f1 = f0->next;
 	struct pullup_field *f2 = f1->next;
 	/*struct pullup_field *f3 = f2->next;*/
-	int l;
 	
 	if (queue_length(c->first, c->last) < 4) return 0;
 	foo(c);
 
 	if (f0->affinity == -1) return 1;
 
-	l = find_first_break(f0, 3);
+	int l = find_first_break(f0, 3);
 	if (l == 1 && c->strict_breaks < 0) l = 0;
 	
 	switch (l) {
@@ -616,20 +604,19 @@ static int decide_frame_length(struct pullup_context *c)
 
 static void print_aff_and_breaks(struct pullup_context *c, struct pullup_field *f)
 {
-	int i;
 	struct pullup_field *f0 = f;
 	const char aff_l[] = "+..", aff_r[] = "..+";
 
 	(void) c;
 
 	printf("\naffinity: ");
-	for (i = 0; i < 4; i++) {
+	for (int i = 0; i < 4; i++) {
 		printf("%c%d%c", aff_l[1+f->affinity], i, aff_r[1+f->affinity]);
 		f = f->next;
 	}
 	f = f0;
 	printf("\nbreaks:   ");
-	for (i=0; i<4; i++) {
+	for (int i=0; i<4; i++) {
 		printf("%c%d%c",
                        (f->breaks & BREAK_LEFT) ? '|' : '.',
                        i,
@@ -645,7 +632,6 @@ static void print_aff_and_breaks(struct pullup_context *c, struct pullup_field *
 
 struct pullup_frame *pullup_get_frame(struct pullup_context *c)
 {
-	int i;
 	struct pullup_frame *fr = c->frame;
 	int n = decide_frame_length(c);
 	int aff = c->first->next->affinity;
@@ -662,7 +648,7 @@ struct pullup_frame *pullup_get_frame(struct pullup_context *c)
 	fr->length = n;
 	fr->parity = c->first->parity;
 	fr->buffer = 0;
-	for (i = 0; i < n; i++) {
+	for (int i = 0; i < n; i++) {
 		/* We cheat and steal the buffer without release+relock */
 		fr->ifields[i] = c->first->buffer;
 		c->first->buffer = 0;
@@ -709,11 +695,10 @@ static void copy_field(struct pullup_context *c, struct pullup_buffer *dest,
 
 void pullup_pack_frame(struct pullup_context *c, struct pullup_frame *fr)
 {
-	int i;
 	/*int par = fr->parity;*/
 	if (fr->buffer) return;
 	if (fr->length < 2) return; /* FIXME: deal with this */
-	for (i = 0; i < 2; i++)
+	for (int i = 0; i < 2; i++)
 	{
 		if (fr->ofields[i]->lock[i^1]) continue;
 		fr->buffer = fr->ofields[i];
@@ -729,8 +714,7 @@ void pullup_pack_frame(struct pullup_context *c, struct pullup_frame *fr)
 
 void pullup_release_frame(struct pullup_frame *fr)
 {
-	int i;
-	for (i = 0; i < fr->length; i++)
+	for (int i = 0; i < fr->length; i++)
 		pullup_release_buffer(fr->ifields[i], fr->parity ^ (i&1));
 	pullup_release_buffer(fr->ofields[0], 0);
 	pullup_release_buffer(fr->ofields[1], 1);
@@ -745,11 +729,7 @@ void pullup_release_frame(struct pullup_frame *fr)
 
 struct pullup_context *pullup_alloc_context(void)
 {
-	struct pullup_context *c;
-
-	c = calloc(1, sizeof(struct pullup_context));
-
-	return c;
+	return calloc(1, sizeof(struct pullup_context));
 }
 
 void pullup_preinit_context(struct pullup_context *c)
@@ -804,9 +784,8 @@ void pullup_init_context(struct pullup_context *c)
 
 void pullup_free_context(struct pullup_context *c)
 {
-	struct pullup_field *f;
 	free(c->buffers);
-	f = c->head;
+	struct pullup_field *f = c->head;
 	do {
 		free(f->diffs);
 		free(f->comb);

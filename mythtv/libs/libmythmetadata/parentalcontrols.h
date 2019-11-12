@@ -29,7 +29,7 @@ class META_PUBLIC ParentalLevel
     bool good() const { return !m_hitlimit; }
 
   private:
-    Level m_level;
+    Level m_level   {plNone};
     bool m_hitlimit {false};
 };
 

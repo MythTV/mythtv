@@ -52,15 +52,15 @@ int main(int argc, char *argv[])
 
     if (cmdline.toBool("showversion"))
     {
-        cmdline.PrintVersion();
+        MythExternRecorderCommandLineParser::PrintVersion();
         return GENERIC_EXIT_OK;
     }
 
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mythexternrecorder");
 
-    int retval;
-    if ((retval = cmdline.ConfigureLogging()) != GENERIC_EXIT_OK)
+    int retval = cmdline.ConfigureLogging();
+    if (retval != GENERIC_EXIT_OK)
         return retval;
     QString logfile = cmdline.GetLogFilePath();
     QString logging = logPropagateArgs;

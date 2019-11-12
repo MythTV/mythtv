@@ -13,7 +13,7 @@ class MusicMetadata;
 class Encoder
 {
   public:
-    Encoder(const QString &outfile, int qualitylevel, MusicMetadata *metadata);
+    Encoder(QString outfile, int qualitylevel, MusicMetadata *metadata);
     virtual ~Encoder();
     virtual int addSamples(int16_t * bytes, unsigned int len) = 0;
 

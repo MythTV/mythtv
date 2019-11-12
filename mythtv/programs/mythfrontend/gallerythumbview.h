@@ -49,7 +49,7 @@ private:
     void    SelectZoomWidget(int change);
     QString CheckThumbnail(MythUIButtonListItem *, const ImagePtrK&,
                            ImageIdList &request, int);
-    void    UpdateThumbnail(MythUIButtonListItem *, const ImagePtrK&,
+    static void    UpdateThumbnail(MythUIButtonListItem *, const ImagePtrK&,
                             const QString &url, int);
     void    MenuMain();
     void    MenuShow(MythMenu *);

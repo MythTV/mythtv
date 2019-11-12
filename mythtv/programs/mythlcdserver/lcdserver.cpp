@@ -370,7 +370,7 @@ void LCDServer::switchToGeneric(const QStringList &tokens, QTcpSocket *socket)
 
     for (int x = 1; x < tokens.count(); x += 5)
     {
-        bool bOK;
+        bool bOK = false;
         int row = tokens[x].toInt(&bOK);
         if (!bOK)
         {
@@ -381,7 +381,7 @@ void LCDServer::switchToGeneric(const QStringList &tokens, QTcpSocket *socket)
             return;
         }
 
-        TEXT_ALIGNMENT align;
+        TEXT_ALIGNMENT align = ALIGN_LEFT;
         if (tokens[x + 1] == "ALIGN_LEFT")
             align = ALIGN_LEFT;
         else if (tokens[x + 1] == "ALIGN_RIGHT")
@@ -399,7 +399,7 @@ void LCDServer::switchToGeneric(const QStringList &tokens, QTcpSocket *socket)
 
         QString text = tokens[x + 2];
         QString screen = tokens[x + 3];
-        bool scrollable;
+        bool scrollable = false;
         if (tokens[x + 4] == "TRUE")
             scrollable = true;
         else if (tokens[x + 4] == "FALSE")
@@ -493,7 +493,7 @@ void LCDServer::switchToMenu(const QStringList &tokens, QTcpSocket *socket)
 
     QString appName = tokens[1];
 
-    bool bPopup;
+    bool bPopup = false;
     if (tokens[2] == "TRUE")
         bPopup = true;
     else if (tokens[2] == "FALSE")
@@ -513,7 +513,7 @@ void LCDServer::switchToMenu(const QStringList &tokens, QTcpSocket *socket)
     {
         QString text = tokens[x];
 
-        CHECKED_STATE checked;
+        CHECKED_STATE checked = CHECKED;
         if (tokens[x + 1] == "CHECKED")
             checked = CHECKED;
         else if (tokens[x + 1] == "UNCHECKED")
@@ -529,7 +529,7 @@ void LCDServer::switchToMenu(const QStringList &tokens, QTcpSocket *socket)
             return;
         }
 
-        bool selected;
+        bool selected = false;
         if (tokens[x + 2] == "TRUE")
             selected = true;
         else if (tokens[x + 2] == "FALSE")
@@ -543,7 +543,7 @@ void LCDServer::switchToMenu(const QStringList &tokens, QTcpSocket *socket)
             return;
         }
 
-        bool scrollable;
+        bool scrollable = false;
         if (tokens[x + 3] == "TRUE")
             scrollable = true;
         else if (tokens[x + 3] == "FALSE")
@@ -557,7 +557,7 @@ void LCDServer::switchToMenu(const QStringList &tokens, QTcpSocket *socket)
             return;
         }
 
-        bool bOK;
+        bool bOK = false;
         int indent = tokens[x + 4].toInt(&bOK);
         if (!bOK)
         {
@@ -592,7 +592,7 @@ void LCDServer::setChannelProgress(const QStringList &tokens, QTcpSocket *socket
         return;
     }
 
-    bool bOK;
+    bool bOK = false;
     float progress = tokens[2].toFloat(&bOK);
     if (!bOK)
     {
@@ -624,7 +624,7 @@ void LCDServer::setGenericProgress(const QStringList &tokens, QTcpSocket *socket
         return;
     }
 
-    bool bOK;
+    bool bOK = false;
     bool busy = tokens[1].toInt(&bOK) != 0;
     if (!bOK)
     {
@@ -665,7 +665,7 @@ void LCDServer::setMusicProgress(const QStringList &tokens, QTcpSocket *socket)
         return;
     }
 
-    bool bOK;
+    bool bOK = false;
     float progress = tokens[2].toFloat(&bOK);
     if (!bOK)
     {
@@ -707,7 +707,7 @@ void LCDServer::setMusicProp(const QStringList &tokens, QTcpSocket *socket)
             sendMessage(socket, "HUH?");
             return;
         }
-        bool bOk;
+        bool bOk = false;
         int state = tokens[2].toInt (&bOk);
         if (!bOk)
         {
@@ -730,7 +730,7 @@ void LCDServer::setMusicProp(const QStringList &tokens, QTcpSocket *socket)
             sendMessage(socket, "HUH?");
             return;
         }
-        bool bOk;
+        bool bOk = false;
         int state = tokens[2].toInt (&bOk);
         if (!bOk)
         {
@@ -769,7 +769,7 @@ void LCDServer::setVolumeLevel(const QStringList &tokens, QTcpSocket *socket)
         return;
     }
 
-    bool bOK;
+    bool bOK = false;
     float progress = tokens[1].toFloat(&bOK);
     if (!bOK)
     {
@@ -800,7 +800,7 @@ void LCDServer::updateLEDs(const QStringList &tokens, QTcpSocket *socket)
         return;
     }
 
-    bool bOK;
+    bool bOK = false;
     int mask = tokens[1].toInt(&bOK);
     if (!bOK)
     {

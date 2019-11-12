@@ -150,15 +150,13 @@ static inline void * memcpy_pic2(void * dst, const void * src,
 static void store_ref(struct ThisFilter *p, uint8_t *src, int src_offsets[3],
                       int src_stride[3], int width, int height)
 {
-    int i;
-
     memcpy (p->ref[3], p->ref[0], sizeof(uint8_t *)*3);
     memmove(p->ref[0], p->ref[1], sizeof(uint8_t *)*3*3);
 
     memcpy (&p->got_frames[3], &p->got_frames[0], sizeof(uint8_t));
     memmove(&p->got_frames[0], &p->got_frames[1], sizeof(uint8_t) * 3);
 
-    for (i=0; i<3; i++)
+    for (int i=0; i<3; i++)
     {
         int is_chroma= !!i;
         memcpy_pic(p->ref[2][i], src + src_offsets[i], width>>is_chroma,
@@ -234,11 +232,10 @@ static void filter_line_mmx2(struct ThisFilter *p, uint8_t *dst,
     static const uint64_t pw_1 = 0x0001000100010001ULL;
     static const uint64_t pb_1 = 0x0101010101010101ULL;
     const int mode = p->mode;
-    uint64_t tmp0, tmp1, tmp2, tmp3;
-    int x;
+    uint64_t tmp0 = 0, tmp1 = 0, tmp2 = 0, tmp3 = 0;
 
 #define FILTER\
-    for (x=0; x<w; x+=4){\
+    for (int x=0; x<w; x+=4){\
         __asm__ volatile(\
             "pxor      %%mm7, %%mm7 \n\t"\
             LOAD4("(%[cur],%[mrefs])", %%mm0) /* c = cur[x-refs] */\
@@ -394,10 +391,9 @@ static void filter_line_c(struct ThisFilter *p, uint8_t *dst,
                           int w, int refs, int parity)
 {
     (void) p;
-    int x;
     const uint8_t *prev2= parity ? prev : cur ;
     const uint8_t *next2= parity ? cur  : next;
-    for (x=0; x<w; x++)
+    for (int x=0; x<w; x++)
     {
         int c= cur[-refs];
         int d= (prev2[0] + next2[0])>>1;
@@ -409,7 +405,7 @@ static void filter_line_c(struct ThisFilter *p, uint8_t *dst,
         int spatial_pred= (c+e)>>1;
         int spatial_score= ABS(cur[-refs-1] - cur[+refs-1]) + ABS(c-e)
                          + ABS(cur[-refs+1] - cur[+refs+1]) - 1;
-        int score;
+        int score = 0;
 
 #define CHECK(j)\
     {   score= ABS(cur[-refs-1+(j)] - cur[+refs-1-(j)])\
@@ -451,10 +447,8 @@ static void filter_func(struct ThisFilter *p, uint8_t *dst, int dst_offsets[3],
     if (total_slices < 1)
         return;
 
-    int y, i;
-    uint8_t nr_p, nr_c;
-    nr_c = p->got_frames[1] ? 1: 2;
-    nr_p = p->got_frames[0] ? 0: nr_c;
+    uint8_t nr_c = p->got_frames[1] ? 1: 2;
+    uint8_t nr_p = p->got_frames[0] ? 0: nr_c;
     int slice_height = height / total_slices;
     slice_height     = (slice_height >> 1) << 1;
     int starth       = slice_height * this_slice;
@@ -462,7 +456,7 @@ static void filter_func(struct ThisFilter *p, uint8_t *dst, int dst_offsets[3],
     if ((this_slice + 1) >= total_slices)
         endh = height;
 
-    for (i = 0; i < 3; i++)
+    for (int i = 0; i < 3; i++)
     {
         int is_chroma= !!i;
         int w     = width  >> is_chroma;
@@ -470,7 +464,7 @@ static void filter_func(struct ThisFilter *p, uint8_t *dst, int dst_offsets[3],
         int end   = endh   >> is_chroma;
         int refs  = p->stride[i];
 
-        for (y = start; y < end; y++)
+        for (int y = start; y < end; y++)
         {
             uint8_t *dst2= dst + dst_offsets[i] + y*dst_stride[i];
             int field = parity ^ tff;
@@ -516,13 +510,12 @@ static int YadifDeint (VideoFilter * f, VideoFrame * frame, int field)
     }
     else
     {
-        int i;
-        for (i = 0; i < filter->actual_threads; i++)
+        for (int i = 0; i < filter->actual_threads; i++)
             filter->threads[i].ready = 1;
         filter->field = field;
         filter->frame = frame;
         filter->ready = filter->actual_threads;
-        i = 0;
+        int i = 0;
         while (filter->ready > 0 && i < 1000)
         {
             usleep(1000);
@@ -538,19 +531,18 @@ static int YadifDeint (VideoFilter * f, VideoFrame * frame, int field)
 
 static void CleanupYadifDeintFilter (VideoFilter * filter)
 {
-    int i;
     ThisFilter* f = (ThisFilter*)filter;
 
     if (f->threads != NULL)
     {
         f->kill_threads = 1;
-        for (i = 0; i < f->requested_threads; i++)
+        for (int i = 0; i < f->requested_threads; i++)
             if (f->threads[i].exists)
                 pthread_join(f->threads[i].id, NULL);
         free(f->threads);
     }
 
-    for (i = 0; i < 3*3; i++)
+    for (int i = 0; i < 3*3; i++)
     {
         uint8_t **p= &f->ref[i%3][i/3];
         if (*p) free(*p - 3*f->stride[i/3]);
@@ -595,12 +587,11 @@ static VideoFilter * YadifDeintFilter(VideoFrameType inpixfmt,
                                       const int *width, const int *height, const char *options,
                                       int threads)
 {
-    ThisFilter *filter;
     (void) options;
 
     fprintf(stderr, "YadifDeint: In-Pixformat = %d Out-Pixformat=%d\n",
             inpixfmt, outpixfmt);
-    filter = (ThisFilter *) malloc (sizeof(ThisFilter));
+    ThisFilter *filter = (ThisFilter *) malloc (sizeof(ThisFilter));
     if (filter == NULL)
     {
         fprintf (stderr, "YadifDeint: failed to allocate memory.\n");

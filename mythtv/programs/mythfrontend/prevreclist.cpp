@@ -26,8 +26,8 @@
 using namespace std;
 
 // QT
-#include <QString>
 #include <QDateTime>
+#include <QString>
 
 //MythTV
 #include "mythcorecontext.h"
@@ -55,10 +55,10 @@ static const int fReverseSort = 2;
 static const int fDefault = fReverseSort;
 
 PrevRecordedList::PrevRecordedList(MythScreenStack *parent, uint recid,
-    const QString &title) :
+    QString title) :
     ScheduleCommon(parent,"PrevRecordedList"),
     m_recid(recid),
-    m_title(title)
+    m_title(std::move(title))
 {
 
     if (m_recid && !m_title.isEmpty())

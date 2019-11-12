@@ -62,10 +62,10 @@ AudioOutputSettings* AudioOutputOSS::GetOutputSettings(bool /*digital*/)
         VBERRENO("Error retrieving formats");
     else
     {
-        int ofmt;
-
         while (AudioFormat fmt = settings->GetNextFormat())
         {
+            int ofmt = AFMT_QUERY;
+
             switch (fmt)
             {
                 case FORMAT_U8:  ofmt = AFMT_U8;       break;
@@ -141,7 +141,7 @@ bool AudioOutputOSS::OpenDevice()
     }
 
     bool err = false;
-    int  format;
+    int  format = AFMT_QUERY;
 
     switch (m_output_format)
     {
@@ -203,7 +203,7 @@ bool AudioOutputOSS::OpenDevice()
 
     m_soundcard_buffer_size = info.bytes;
 
-    int caps;
+    int caps = 0;
 
     if (ioctl(m_audiofd, SNDCTL_DSP_GETCAPS, &caps) == 0)
     {
@@ -238,10 +238,9 @@ void AudioOutputOSS::WriteAudio(uchar *aubuf, int size)
     if (m_audiofd < 0)
         return;
 
-    uchar *tmpbuf;
     int written = 0, lw = 0;
 
-    tmpbuf = aubuf;
+    uchar *tmpbuf = aubuf;
 
     while ((written < size) &&
            ((lw = write(m_audiofd, tmpbuf, size - written)) > 0))
@@ -296,9 +295,8 @@ void AudioOutputOSS::VolumeInit()
 
     if (m_set_initial_vol)
     {
-        int tmpVol;
         int volume = gCoreContext->GetNumSetting("MasterMixerVolume", 80);
-        tmpVol = (volume << 8) + volume;
+        int tmpVol = (volume << 8) + volume;
         int ret = ioctl(m_mixerfd, MIXER_WRITE(SOUND_MIXER_VOLUME), &tmpVol);
         if (ret < 0)
             VBERROR(QString("Error Setting initial Master Volume") + ENO);

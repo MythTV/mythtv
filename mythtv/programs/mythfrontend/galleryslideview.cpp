@@ -636,7 +636,7 @@ void GallerySlideView::TransitionComplete()
     {
         // show the date & comment
         QStringList text;
-        text << m_mgr.LongDateOf(im);
+        text << ImageManagerFe::LongDateOf(im);
 
         if (!im->m_comment.isEmpty())
             text << im->m_comment;
