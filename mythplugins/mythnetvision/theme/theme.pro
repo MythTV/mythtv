@@ -7,8 +7,6 @@ TARGET = themenop
 TEMPLATE = app
 CONFIG -= qt moc
 
-QMAKE_COPY_DIR = sh ../../cpsvndir
-
 defaultfiles.path = $${PREFIX}/share/mythtv/themes/default
 defaultfiles.files = default/*.xml
 
