@@ -1,6 +1,5 @@
 // MythTV
 #include "mythcorecontext.h"
-#include "mythegldefs.h"
 #include "videocolourspace.h"
 #include "fourcc.h"
 #include "mythvaapidrminterop.h"
@@ -11,6 +10,9 @@ extern "C" {
 #include "libavutil/hwcontext_drm.h"
 }
 #include <unistd.h>
+
+// EGL
+#include "mythegldefs.h"
 
 #define LOC QString("VAAPIDRM: ")
 
@@ -453,6 +455,12 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::AcquirePrime(VASurfaceID Id,
     Frame->buf = temp;
     Frame->codec = FMT_VAAPI;
     Frame->pix_fmt = AV_PIX_FMT_VAAPI;
+#else
+    (void)Id;
+    (void)Context;
+    (void)ColourSpace;
+    (void)Frame;
+    (void)Scan;
 #endif
     return result;
 }
