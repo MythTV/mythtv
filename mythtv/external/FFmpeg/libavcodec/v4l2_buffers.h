@@ -110,7 +110,7 @@ int ff_v4l2_buffer_avpkt_to_buf(const AVPacket *pkt, V4L2Buffer *out);
  *
  * @returns 0 in case of success, a negative AVERROR code otherwise
  */
-int ff_v4l2_buffer_avframe_to_buf(const AVFrame *frame, V4L2Buffer* out);
+int ff_v4l2_buffer_avframe_to_buf(const AVFrame *frame, V4L2Buffer *out);
 
 /**
  * Initializes a V4L2Buffer
@@ -130,5 +130,6 @@ int ff_v4l2_buffer_initialize(V4L2Buffer* avbuf, int index);
  * @returns 0 in case of success, a negative AVERROR code otherwise
  */
 int ff_v4l2_buffer_enqueue(V4L2Buffer* avbuf);
+
 
 #endif // AVCODEC_V4L2_BUFFERS_H
