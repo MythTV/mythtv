@@ -44,6 +44,8 @@ bool MythEGL::InitEGL(void)
         return true;
 
     LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to resolve EGL functions");
+#else
+    (void)m_context;
 #endif
     return false;
 }
