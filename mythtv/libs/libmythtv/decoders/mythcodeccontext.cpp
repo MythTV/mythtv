@@ -167,8 +167,11 @@ void MythCodecContext::GetDecoders(RenderOptions &Opts)
 #ifdef USING_MMAL
     Opts.decoders->append("mmal-dec");
     (*Opts.equiv_decoders)["mmal-dec"].append("dummy");
-    Opts.decoders->append("mmal");
-    (*Opts.equiv_decoders)["mmal"].append("dummy");
+    if (MythOpenGLInterop::GetInteropType(kCodec_H264_MMAL) != MythOpenGLInterop::Unsupported)
+    {
+        Opts.decoders->append("mmal");
+        (*Opts.equiv_decoders)["mmal"].append("dummy");
+    }
 #endif
 }
 
