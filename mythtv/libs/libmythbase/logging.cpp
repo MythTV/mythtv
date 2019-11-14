@@ -177,13 +177,13 @@ QByteArray LoggingItem::toByteArray(void)
 /// \return C-string of the thread name
 char *LoggingItem::getThreadName(void)
 {
-    static constexpr char s_unknown[] = "thread_unknown";
+    static constexpr char kSUnknown[] = "thread_unknown";
 
     if( m_threadName )
         return m_threadName;
 
     QMutexLocker locker(&logThreadMutex);
-    return logThreadHash.value(m_threadId, (char *)s_unknown);
+    return logThreadHash.value(m_threadId, (char *)kSUnknown);
 }
 
 /// \brief Get the thread ID of the thread that produced the LoggingItem
