@@ -148,17 +148,16 @@ vector<MythVideoTexture*> MythMMALInterop::Acquire(MythRenderOpenGL *Context,
             sizes.push_back(size);
         }
 
-        vector<MythVideoTexture*> textures = MythVideoTexture::CreateTextures(m_context, FMT_MMAL, format, sizes);
+        vector<MythVideoTexture*> textures =
+                MythVideoTexture::CreateTextures(m_context, FMT_MMAL, format, sizes,GL_TEXTURE_EXTERNAL_OES);
         if (textures.size() != count)
             LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create all textures");
 
         for (uint i = 0; i < textures.size(); ++i)
         {
-            textures[i]->m_target = GL_TEXTURE_EXTERNAL_OES;
             textures[i]->m_allowGLSLDeint = true;
             textures[i]->m_flip = false;
         }
-        MythVideoTexture::SetTextureFilters(m_context, textures, QOpenGLTexture::Linear);
         m_openglTextures.insert(DUMMY_INTEROP_ID, textures);
     }
 

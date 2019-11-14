@@ -62,14 +62,11 @@ inline vector<MythVideoTexture*> MythEGLDMABUF::CreateComposed(AVDRMFrameDescrip
 {
     vector<QSize> sizes;
     sizes.push_back(QSize(Frame->width, Frame->height));
-    vector<MythVideoTexture*> textures = MythVideoTexture::CreateTextures(Context, Frame->codec, FMT_RGBA32, sizes);
+    vector<MythVideoTexture*> textures =
+            MythVideoTexture::CreateTextures(Context, Frame->codec, FMT_RGBA32, sizes,
+                                             m_gltwo ? GL_TEXTURE_EXTERNAL_OES : QOpenGLTexture::Target2D);
     for (uint i = 0; i < textures.size(); ++i)
-    {
         textures[i]->m_allowGLSLDeint = false;
-        if (m_gltwo)
-            textures[i]->m_target = GL_TEXTURE_EXTERNAL_OES;
-    }
-    MythVideoTexture::SetTextureFilters(Context, textures, QOpenGLTexture::Linear);
 
     EGLint colourspace = EGL_ITU_REC709_EXT;
     switch (Frame->colorspace)
@@ -161,14 +158,11 @@ inline vector<MythVideoTexture*> MythEGLDMABUF::CreateSeparate(AVDRMFrameDescrip
     }
 
     VideoFrameType format = PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->sw_pix_fmt));
-    vector<MythVideoTexture*> result = MythVideoTexture::CreateTextures(Context, Frame->codec, format, sizes);
+    vector<MythVideoTexture*> result =
+            MythVideoTexture::CreateTextures(Context, Frame->codec, format, sizes,
+                                             m_gltwo ? GL_TEXTURE_EXTERNAL_OES : QOpenGLTexture::Target2D);
     for (uint i = 0; i < result.size(); ++i)
-    {
         result[i]->m_allowGLSLDeint = true;
-        if (m_gltwo)
-            result[i]->m_target = GL_TEXTURE_EXTERNAL_OES;
-    }
-    MythVideoTexture::SetTextureFilters(Context, result, QOpenGLTexture::Linear);
 
     for (uint plane = 0; plane < result.size(); ++plane)
     {

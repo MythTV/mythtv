@@ -24,7 +24,7 @@ class MythVideoTexture : public MythGLTexture
                                                     VideoFrameType Type,
                                                     VideoFrameType Format,
                                                     vector<QSize> Sizes,
-                                                    QOpenGLTexture::Target Target = QOpenGLTexture::Target2D);
+                                                    GLenum Target = QOpenGLTexture::Target2D);
     static MythVideoTexture* CreateHelperTexture(MythRenderOpenGL *Context);
     static void UpdateTextures(MythRenderOpenGL* Context, const VideoFrame *Frame,
                                const vector<MythVideoTexture*> &Textures);
@@ -34,19 +34,12 @@ class MythVideoTexture : public MythGLTexture
                                   QOpenGLTexture::Filter Filter,
                                   QOpenGLTexture::WrapMode Wrap = QOpenGLTexture::ClampToEdge);
     static MythVideoTexture* CreateTexture(MythRenderOpenGL *Context, QSize Size,
-                                           QOpenGLTexture::Target Target = QOpenGLTexture::Target2D,
+                                           GLenum Target = QOpenGLTexture::Target2D,
                                            QOpenGLTexture::PixelType PixelType = QOpenGLTexture::UInt8,
                                            QOpenGLTexture::PixelFormat PixelFormat = QOpenGLTexture::RGBA,
                                            QOpenGLTexture::TextureFormat Format = QOpenGLTexture::NoFormat,
                                            QOpenGLTexture::Filter Filter = QOpenGLTexture::Linear,
                                            QOpenGLTexture::WrapMode Wrap = QOpenGLTexture::ClampToEdge);
-    static vector<MythVideoTexture*> CreateHardwareTextures(MythRenderOpenGL* Context,
-                                                            VideoFrameType Type, VideoFrameType Format,
-                                                            vector<QSize> Sizes, QOpenGLTexture::Target Target);
-    static vector<MythVideoTexture*> CreateSoftwareTextures(MythRenderOpenGL* Context,
-                                                            VideoFrameType Type, VideoFrameType Format,
-                                                            vector<QSize> Sizes, QOpenGLTexture::Target Target);
-
    ~MythVideoTexture();
 
   public:
@@ -67,6 +60,13 @@ class MythVideoTexture : public MythGLTexture
     explicit MythVideoTexture(GLuint Texture);
 
   private:
+    static vector<MythVideoTexture*> CreateHardwareTextures(MythRenderOpenGL* Context,
+                                                            VideoFrameType Type, VideoFrameType Format,
+                                                            vector<QSize> Sizes, GLenum Target);
+    static vector<MythVideoTexture*> CreateSoftwareTextures(MythRenderOpenGL* Context,
+                                                            VideoFrameType Type, VideoFrameType Format,
+                                                            vector<QSize> Sizes, GLenum Target);
+
     Q_DISABLE_COPY(MythVideoTexture)
     static void YV12ToYV12   (MythRenderOpenGL *Context, const VideoFrame *Frame, MythVideoTexture* Texture, uint Plane);
     static void YV12ToYUYV   (const VideoFrame *Frame, MythVideoTexture* Texture);

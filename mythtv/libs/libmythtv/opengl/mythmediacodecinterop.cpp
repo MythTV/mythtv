@@ -73,7 +73,8 @@ bool MythMediaCodecInterop::Initialise(QSize Size)
     // Create texture
     vector<QSize> sizes;
     sizes.push_back(Size);
-    vector<MythVideoTexture*> textures = MythVideoTexture::CreateTextures(m_context, FMT_MEDIACODEC, FMT_RGBA32, sizes);
+    vector<MythVideoTexture*> textures =
+            MythVideoTexture::CreateTextures(m_context, FMT_MEDIACODEC, FMT_RGBA32, sizes, GL_TEXTURE_EXTERNAL_OES);
     if (textures.empty())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create texture");
@@ -81,10 +82,7 @@ bool MythMediaCodecInterop::Initialise(QSize Size)
     }
 
     // Set the texture type
-    // N.B. CreateTextures is not GL_TEXTURE_EXTERNAL_OES aware (no Qt enum)
     MythVideoTexture *texture = textures[0];
-    texture->m_target = GL_TEXTURE_EXTERNAL_OES;
-    MythVideoTexture::SetTextureFilters(m_context, textures, QOpenGLTexture::Linear);
     glBindTexture(GL_TEXTURE_EXTERNAL_OES, texture->m_textureId);
 
     // Create surface

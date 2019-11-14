@@ -159,8 +159,8 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
         vector<QSize> sizes;
         sizes.push_back(QSize(Frame->width, Frame->height));
         sizes.push_back(QSize(Frame->width, Frame->height >> 1));
-        vector<MythVideoTexture*> textures = MythVideoTexture::CreateTextures(
-                    m_context, FMT_NVDEC, type, sizes, QOpenGLTexture::Target2D);
+        vector<MythVideoTexture*> textures =
+                MythVideoTexture::CreateTextures(m_context, FMT_NVDEC, type, sizes);
         if (textures.empty())
         {
             CUDA_CHECK(m_cudaFuncs, cuCtxPopCurrent(&dummy));

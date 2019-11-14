@@ -66,7 +66,7 @@ vector<MythVideoTexture*> MythVideoTexture::CreateTextures(MythRenderOpenGL *Con
                                                            VideoFrameType Type,
                                                            VideoFrameType Format,
                                                            vector<QSize> Sizes,
-                                                           QOpenGLTexture::Target Target)
+                                                           GLenum Target)
 {
     vector<MythVideoTexture*> result;
     if (!Context || Sizes.empty())
@@ -94,7 +94,7 @@ vector<MythVideoTexture*> MythVideoTexture::CreateHardwareTextures(MythRenderOpe
                                                                    VideoFrameType Type,
                                                                    VideoFrameType Format,
                                                                    vector<QSize> Sizes,
-                                                                   QOpenGLTexture::Target Target)
+                                                                   GLenum Target)
 {
     vector<MythVideoTexture*> result;
 
@@ -130,9 +130,7 @@ vector<MythVideoTexture*> MythVideoTexture::CreateHardwareTextures(MythRenderOpe
         result.push_back(texture);
     }
 
-    // N.B. Don't set filtering for MediaCodec/MMAL/V4L2Prime textures as we need to set the texture type first
-    if (!(Type == FMT_MEDIACODEC || Type == FMT_MMAL || Type == FMT_DRMPRIME))
-        SetTextureFilters(Context, result, QOpenGLTexture::Linear);
+    SetTextureFilters(Context, result, QOpenGLTexture::Linear);
     return result;
 }
 
@@ -144,7 +142,7 @@ vector<MythVideoTexture*> MythVideoTexture::CreateSoftwareTextures(MythRenderOpe
                                                                    VideoFrameType Type,
                                                                    VideoFrameType Format,
                                                                    vector<QSize> Sizes,
-                                                                   QOpenGLTexture::Target Target)
+                                                                   GLenum Target)
 {
     vector<MythVideoTexture*> result;
 
@@ -414,7 +412,7 @@ void MythVideoTexture::UpdateTextures(MythRenderOpenGL *Context,
 */
 MythVideoTexture* MythVideoTexture::CreateTexture(MythRenderOpenGL *Context,
                                                   QSize Size,
-                                                  QOpenGLTexture::Target Target,
+                                                  GLenum Target,
                                                   QOpenGLTexture::PixelType PixelType,
                                                   QOpenGLTexture::PixelFormat PixelFormat,
                                                   QOpenGLTexture::TextureFormat Format,
@@ -430,7 +428,7 @@ MythVideoTexture* MythVideoTexture::CreateTexture(MythRenderOpenGL *Context,
     if (!datasize)
         return nullptr;
 
-    QOpenGLTexture *texture = new QOpenGLTexture(Target);
+    QOpenGLTexture *texture = new QOpenGLTexture(static_cast<QOpenGLTexture::Target>(Target));
     texture->setAutoMipMapGenerationEnabled(false);
     texture->setMipLevels(1);
     texture->setSize(Size.width(), Size.height()); // this triggers creation
