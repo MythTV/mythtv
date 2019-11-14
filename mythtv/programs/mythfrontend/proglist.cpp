@@ -534,7 +534,7 @@ bool ProgLister::PowerStringToSQL(
         return false;
     };
 
-    static const QString bindinglist[6] =
+    static const QString kBindingList[6] =
     {
         ":POWERTITLE",
         ":POWERSUB",
@@ -544,7 +544,7 @@ bool ProgLister::PowerStringToSQL(
         ":POWERCALLSIGN",
     };
 
-    static const QString outputlist[6] =
+    static const QString kOutputList[6] =
     {
         "program.title LIKE :POWERTITLE ",
         "program.subtitle LIKE :POWERSUB ",
@@ -562,9 +562,9 @@ bool ProgLister::PowerStringToSQL(
         if (!output.isEmpty())
             output += "\nAND ";
 
-        output += outputlist[i];
-        bindings[bindinglist[i]] =
-            (!outputlist[i].contains("=")) ?
+        output += kOutputList[i];
+        bindings[kBindingList[i]] =
+            (!kOutputList[i].contains("=")) ?
             QString('%') + field[i] + QString('%') : field[i];
     }
 

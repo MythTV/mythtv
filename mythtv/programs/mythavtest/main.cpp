@@ -36,42 +36,42 @@ class VideoPerformanceTest
   public:
     VideoPerformanceTest(const QString &filename, bool decodeno, bool onlydecode,
                          int runfor, bool deint, bool gpu)
-      : file(filename),
-        nodecode(decodeno),
-        decodeonly(onlydecode),
-        secondstorun(runfor),
-        deinterlace(deint),
-        allowgpu(gpu),
-        ctx(nullptr)
+      : m_file(filename),
+        m_noDecode(decodeno),
+        m_decodeOnly(onlydecode),
+        m_secondsToRun(runfor),
+        m_deinterlace(deint),
+        m_allowGpu(gpu),
+        m_ctx(nullptr)
     {
-        if (secondstorun < 1)
-            secondstorun = 1;
-        if (secondstorun > 3600)
-            secondstorun = 3600;
+        if (m_secondsToRun < 1)
+            m_secondsToRun = 1;
+        if (m_secondsToRun > 3600)
+            m_secondsToRun = 3600;
     }
 
    ~VideoPerformanceTest()
     {
-        delete ctx;
+        delete m_ctx;
     }
 
     void Test(void)
     {
         PIPMap dummy;
-        RingBuffer *rb  = RingBuffer::Create(file, false, true, 2000);
+        RingBuffer *rb  = RingBuffer::Create(m_file, false, true, 2000);
         MythPlayer  *mp  = new MythPlayer(
-            (PlayerFlags)(kAudioMuted | (allowgpu ? (kDecodeAllowGPU | kDecodeAllowEXT): kNoFlags)));
+            (PlayerFlags)(kAudioMuted | (m_allowGpu ? (kDecodeAllowGPU | kDecodeAllowEXT): kNoFlags)));
         mp->GetAudio()->SetAudioInfo("NULL", "NULL", 0, 0);
         mp->GetAudio()->SetNoAudio();
-        ctx = new PlayerContext("VideoPerformanceTest");
-        ctx->SetRingBuffer(rb);
-        ctx->SetPlayer(mp);
-        ProgramInfo *pinfo = new ProgramInfo(file);
-        ctx->SetPlayingInfo(pinfo); // makes a copy
+        m_ctx = new PlayerContext("VideoPerformanceTest");
+        m_ctx->SetRingBuffer(rb);
+        m_ctx->SetPlayer(mp);
+        ProgramInfo *pinfo = new ProgramInfo(m_file);
+        m_ctx->SetPlayingInfo(pinfo); // makes a copy
         delete pinfo;
-        mp->SetPlayerInfo(nullptr, GetMythMainWindow(), ctx);
+        mp->SetPlayerInfo(nullptr, GetMythMainWindow(), m_ctx);
 
-        FrameScanType scan = deinterlace ? kScan_Interlaced : kScan_Progressive;
+        FrameScanType scan = m_deinterlace ? kScan_Interlaced : kScan_Progressive;
         if (!mp->StartPlaying())
         {
             LOG(VB_GENERAL, LOG_ERR, "Failed to start playback.");
@@ -90,13 +90,13 @@ class VideoPerformanceTest
         LOG(VB_GENERAL, LOG_INFO, "Otherwise rate will be limited to that of the display.");
         LOG(VB_GENERAL, LOG_INFO, "-----------------------------------");
         LOG(VB_GENERAL, LOG_INFO, QString("Starting video performance test for '%1'.")
-            .arg(file));
+            .arg(m_file));
         LOG(VB_GENERAL, LOG_INFO, QString("Test will run for %1 seconds.")
-            .arg(secondstorun));
+            .arg(m_secondsToRun));
 
-        if (nodecode)
+        if (m_noDecode)
             LOG(VB_GENERAL, LOG_INFO, "No decode after startup - checking display performance");
-        else if (decodeonly)
+        else if (m_decodeOnly)
             LOG(VB_GENERAL, LOG_INFO, "Decoding frames only - skipping display.");
 
         DecoderBase* dec = mp->GetDecoder();
@@ -105,7 +105,7 @@ class VideoPerformanceTest
 
         Jitterometer *jitter = new Jitterometer("Performance: ", static_cast<int>(mp->GetFrameRate()));
 
-        int ms = secondstorun * 1000;
+        int ms = m_secondsToRun * 1000;
         QTime start = QTime::currentTime();
         VideoFrame *frame = nullptr;
         while (true)
@@ -135,18 +135,18 @@ class VideoPerformanceTest
 
             mp->SetBuffering(false);
             vo->StartDisplayingFrame();
-            if ((nodecode && !frame) || !nodecode)
+            if ((m_noDecode && !frame) || !m_noDecode)
                 frame = vo->GetLastShownFrame();
             mp->CheckAspectRatio(frame);
 
-            if (!decodeonly)
+            if (!m_decodeOnly)
             {
                 MythDeintType doubledeint = GetDoubleRateOption(frame, DEINT_CPU | DEINT_SHADER | DEINT_DRIVER);
                 vo->ProcessFrame(frame, nullptr, dummy, scan);
                 vo->PrepareFrame(frame, scan, nullptr);
                 vo->Show(scan);
 
-                if (doubledeint && deinterlace)
+                if (doubledeint && m_deinterlace)
                 {
                     doubledeint = GetDoubleRateOption(frame, DEINT_CPU);
                     MythDeintType other = GetDoubleRateOption(frame, DEINT_SHADER | DEINT_DRIVER);
@@ -156,7 +156,7 @@ class VideoPerformanceTest
                     vo->Show(scan);
                 }
             }
-            if (!nodecode)
+            if (!m_noDecode)
                 vo->DoneDisplayingFrame(frame);
             jitter->RecordCycleTime();
         }
@@ -165,13 +165,13 @@ class VideoPerformanceTest
     }
 
   private:
-    QString file;
-    bool    nodecode;
-    bool    decodeonly;
-    int     secondstorun;
-    bool    deinterlace;
-    bool    allowgpu;
-    PlayerContext *ctx;
+    QString        m_file;
+    bool           m_noDecode;
+    bool           m_decodeOnly;
+    int            m_secondsToRun;
+    bool           m_deinterlace;
+    bool           m_allowGpu;
+    PlayerContext *m_ctx;
 };
 
 int main(int argc, char *argv[])

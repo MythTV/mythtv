@@ -342,9 +342,9 @@ static int CalcTrackLength(const MythUtilCommandLineParser &cmdline)
 class LyricsGrabber
 {
 public:
-    QString name;
-    QString filename;
-    int     priority {99};
+    QString m_name;
+    QString m_filename;
+    int     m_priority {99};
 };
 
 static int FindLyrics(const MythUtilCommandLineParser &cmdline)
@@ -511,11 +511,11 @@ static int FindLyrics(const MythUtilCommandLineParser &cmdline)
         QDomNode itemNode = itemList.item(0);
 
         LyricsGrabber grabber;
-        grabber.name = itemNode.namedItem(QString("name")).toElement().text();
-        grabber.priority = itemNode.namedItem(QString("priority")).toElement().text().toInt();
-        grabber.filename = scripts.at(x);
+        grabber.m_name = itemNode.namedItem(QString("name")).toElement().text();
+        grabber.m_priority = itemNode.namedItem(QString("priority")).toElement().text().toInt();
+        grabber.m_filename = scripts.at(x);
 
-        grabberMap.insert(grabber.priority, grabber);
+        grabberMap.insert(grabber.m_priority, grabber);
     }
 
     // try each grabber in turn until we find a match
@@ -526,24 +526,24 @@ static int FindLyrics(const MythUtilCommandLineParser &cmdline)
 
         ++i;
 
-        if (grabberName != "ALL" && grabberName != grabber.name)
+        if (grabberName != "ALL" && grabberName != grabber.m_name)
             continue;
 
-        LOG(VB_GENERAL, LOG_NOTICE, QString("Trying grabber: %1, Priority: %2").arg(grabber.name).arg(grabber.priority));
-        QString statusMessage = QObject::tr("Searching '%1' for lyrics...").arg(grabber.name);
+        LOG(VB_GENERAL, LOG_NOTICE, QString("Trying grabber: %1, Priority: %2").arg(grabber.m_name).arg(grabber.m_priority));
+        QString statusMessage = QObject::tr("Searching '%1' for lyrics...").arg(grabber.m_name);
         gCoreContext->SendMessage(QString("MUSIC_LYRICS_STATUS %1 %2").arg(songID).arg(statusMessage));
 
         QProcess p;
         p.start(QString("python %1 --artist=\"%2\" --album=\"%3\" --title=\"%4\" --filename=\"%5\"")
-                        .arg(grabber.filename).arg(artist).arg(album).arg(title).arg(filename));
+                        .arg(grabber.m_filename).arg(artist).arg(album).arg(title).arg(filename));
         p.waitForFinished(-1);
         QString result = p.readAllStandardOutput();
 
-        LOG(VB_GENERAL, LOG_DEBUG, QString("Grabber: %1, Exited with code: %2").arg(grabber.name).arg(p.exitCode()));
+        LOG(VB_GENERAL, LOG_DEBUG, QString("Grabber: %1, Exited with code: %2").arg(grabber.m_name).arg(p.exitCode()));
 
         if (p.exitCode() == 0)
         {
-            LOG(VB_GENERAL, LOG_NOTICE, QString("Lyrics Found using: %1").arg(grabber.name));
+            LOG(VB_GENERAL, LOG_NOTICE, QString("Lyrics Found using: %1").arg(grabber.m_name));
 
             // save these lyrics to speed up future lookups if it is a DB track
             if (ID_TO_REPO(songID) == RT_Database)

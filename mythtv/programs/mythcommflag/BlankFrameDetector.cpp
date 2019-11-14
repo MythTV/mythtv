@@ -208,18 +208,18 @@ computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
      *
      * Common commercial-break lengths.
      */
-    static const struct {
-        int     len;    /* seconds */
-        int     delta;  /* seconds */
-    } breaktype[] = {
+    static constexpr struct {
+        int     m_len;    /* seconds */
+        int     m_delta;  /* seconds */
+    } kBreakType[] = {
         /* Sort by "len". */
         { 15,   2 },
         { 20,   2 },
         { 30,   5 },
         { 60,   5 },
     };
-    static const unsigned int   nbreaktypes =
-        sizeof(breaktype)/sizeof(*breaktype);
+    static constexpr unsigned int kNBreakTypes =
+        sizeof(kBreakType)/sizeof(*kBreakType);
 
     /*
      * TUNABLE:
@@ -227,7 +227,7 @@ computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
      * Shortest non-commercial length, used to coalesce consecutive commercial
      * breaks that are usually identified due to in-commercial cuts.
      */
-    static const int MINCONTENTLEN = (int)roundf(10 * fps);
+    static const int kMinContentLen = (int)roundf(10 * fps);
 
     breakMap->clear();
     for (FrameAnalyzer::FrameMap::const_iterator iiblank = blankMap->begin();
@@ -238,7 +238,7 @@ computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
         long long iilen = *iiblank;
         long long start = brkb + iilen / 2;
 
-        for (unsigned int ii = 0; ii < nbreaktypes; ii++)
+        for (unsigned int ii = 0; ii < kNBreakTypes; ii++)
         {
             /* Look for next blank frame that is an acceptable distance away. */
             FrameAnalyzer::FrameMap::const_iterator jjblank = iiblank;
@@ -249,14 +249,14 @@ computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
                 long long end = brke + jjlen / 2;
 
                 long long testlen = (long long)roundf((end - start) / fps);
-                if (testlen > breaktype[ii].len + breaktype[ii].delta)
+                if (testlen > kBreakType[ii].m_len + kBreakType[ii].m_delta)
                     break;      /* Too far ahead; break to next break length. */
 
-                long long delta = testlen - breaktype[ii].len;
+                long long delta = testlen - kBreakType[ii].m_len;
                 if (delta < 0)
                     delta = 0 - delta;
 
-                if (delta > breaktype[ii].delta)
+                if (delta > kBreakType[ii].m_delta)
                     continue;   /* Outside delta range; try next end-blank. */
 
                 /* Mark this commercial break. */
@@ -319,7 +319,7 @@ computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
                 continue;
             }
 
-            if (iie + MINCONTENTLEN < jjb)
+            if (iie + kMinContentLen < jjb)
             {
                 /* (jjb,jje) is too far ahead. */
                 ++iibreak;

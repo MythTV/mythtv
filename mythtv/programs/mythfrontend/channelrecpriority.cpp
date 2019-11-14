@@ -23,8 +23,8 @@ using namespace std;
 
 typedef struct RecPriorityInfo
 {
-    ChannelInfo *chan;
-    int cnt;
+    ChannelInfo *m_chan;
+    int          m_cnt;
 } RecPriorityInfo;
 
 class channelSort
@@ -32,9 +32,9 @@ class channelSort
     public:
         bool operator()(const RecPriorityInfo &a, const RecPriorityInfo &b)
         {
-            if (a.chan->m_channum.toInt() == b.chan->m_channum.toInt())
-                return(a.chan->m_sourceid > b.chan->m_sourceid);
-            return(a.chan->m_channum.toInt() > b.chan->m_channum.toInt());
+            if (a.m_chan->m_channum.toInt() == b.m_chan->m_channum.toInt())
+                return(a.m_chan->m_sourceid > b.m_chan->m_sourceid);
+            return(a.m_chan->m_channum.toInt() > b.m_chan->m_channum.toInt());
         }
 };
 
@@ -43,9 +43,9 @@ class channelRecPrioritySort
     public:
         bool operator()(const RecPriorityInfo &a, const RecPriorityInfo &b)
         {
-            if (a.chan->m_recpriority == b.chan->m_recpriority)
-                return (a.chan->m_channum.toInt() > b.chan->m_channum.toInt());
-            return (a.chan->m_recpriority < b.chan->m_recpriority);
+            if (a.m_chan->m_recpriority == b.m_chan->m_recpriority)
+                return (a.m_chan->m_channum.toInt() > b.m_chan->m_channum.toInt());
+            return (a.m_chan->m_recpriority < b.m_chan->m_recpriority);
         }
 };
 
@@ -383,7 +383,7 @@ void ChannelRecPriority::SortList()
         RecPriorityInfo *recPriorityInfo = &(*sit);
 
         // find recPriorityInfo[i] in m_sortedChannel
-        for (j = 0, pit = m_channelData.begin(); j !=recPriorityInfo->cnt; j++, ++pit);
+        for (j = 0, pit = m_channelData.begin(); j !=recPriorityInfo->m_cnt; j++, ++pit);
 
         m_sortedChannel[QString::number(999-i)] = &(*pit);
     }

@@ -292,11 +292,11 @@ class PTSListener :
     PTSListener()
     {
         for (int i = 0; i < 256; i++)
-            m_pts_count[i] = 0;
+            m_ptsCount[i] = 0;
         for (int i = 0; i < 256; i++)
-            m_pts_first[i] = -1LL;
+            m_ptsFirst[i] = -1LL;
         for (int i = 0; i < 256; i++)
-            m_pts_last[i] = -1LL;
+            m_ptsLast[i] = -1LL;
 
     }
     bool ProcessTSPacket(const TSPacket &tspacket) override; // TSPacketListener
@@ -306,28 +306,28 @@ class PTSListener :
     { return ProcessTSPacket(tspacket); }
     int64_t GetFirstPTS(void) const
     {
-        QMap<uint,uint>::const_iterator it = m_pts_streams.begin();
+        QMap<uint,uint>::const_iterator it = m_ptsStreams.begin();
         int64_t pts = -1LL;
         uint32_t pts_count = 0;
-        for (; it != m_pts_streams.end(); ++it)
+        for (; it != m_ptsStreams.end(); ++it)
         {
-            if(m_pts_count[*it] > pts_count){
-                pts = m_pts_first[*it];
-                pts_count = m_pts_count[*it];
+            if(m_ptsCount[*it] > pts_count){
+                pts = m_ptsFirst[*it];
+                pts_count = m_ptsCount[*it];
             }
         }
         return pts;
     }
     int64_t GetLastPTS(void) const
     {
-        QMap<uint,uint>::const_iterator it = m_pts_streams.begin();
+        QMap<uint,uint>::const_iterator it = m_ptsStreams.begin();
         int64_t pts = -1LL;
         uint32_t pts_count = 0;
-        for (; it != m_pts_streams.end(); ++it)
+        for (; it != m_ptsStreams.end(); ++it)
         {
-            if(m_pts_count[*it] > pts_count){
-                pts = m_pts_last[*it];
-                pts_count = m_pts_count[*it];
+            if(m_ptsCount[*it] > pts_count){
+                pts = m_ptsLast[*it];
+                pts_count = m_ptsCount[*it];
             }
         }
         return pts;
@@ -339,11 +339,11 @@ class PTSListener :
     }
 
   public:
-    uint32_t m_start_code {0xFFFFFFFF};
-    QMap<uint,uint> m_pts_streams;
-    uint32_t m_pts_count[256];
-    int64_t  m_pts_first[256];
-    int64_t  m_pts_last[256];
+    uint32_t        m_startCode     {0xFFFFFFFF};
+    QMap<uint,uint> m_ptsStreams;
+    uint32_t        m_ptsCount[256];
+    int64_t         m_ptsFirst[256];
+    int64_t         m_ptsLast[256];
 };
 
 
@@ -353,7 +353,7 @@ bool PTSListener::ProcessTSPacket(const TSPacket &tspacket)
     // looking for first byte of MPEG start code (3 bytes 0 0 1)
     // otherwise, pick up search where we left off.
     const bool payloadStart = tspacket.PayloadStart();
-    m_start_code = (payloadStart) ? 0xffffffff : m_start_code;
+    m_startCode = (payloadStart) ? 0xffffffff : m_startCode;
 
     // Scan for PES header codes; specifically picture_start
     // sequence_start (SEQ) and group_start (GOP).
@@ -365,13 +365,13 @@ bool PTSListener::ProcessTSPacket(const TSPacket &tspacket)
 
     while (bufptr < bufend)
     {
-        bufptr = avpriv_find_start_code(bufptr, bufend, &m_start_code);
+        bufptr = avpriv_find_start_code(bufptr, bufend, &m_startCode);
         int bytes_left = bufend - bufptr;
-        if ((m_start_code & 0xffffff00) == 0x00000100)
+        if ((m_startCode & 0xffffff00) == 0x00000100)
         {
             // At this point we have seen the start code 0 0 1
             // the next byte will be the PES packet stream id.
-            const int stream_id = m_start_code & 0x000000ff;
+            const int stream_id = m_startCode & 0x000000ff;
             if ((stream_id < 0xc0) || (stream_id > 0xef) ||
                 (bytes_left < 10))
             {
@@ -387,16 +387,16 @@ bool PTSListener::ProcessTSPacket(const TSPacket &tspacket)
                     (uint64_t(bufptr[i+2] & 0xfe) << 14) |
                     (uint64_t(bufptr[i+3]       ) <<  7) |
                     (uint64_t(bufptr[i+4] & 0xfe) >> 1);
-                m_pts_streams[stream_id] = stream_id;
-                m_pts_last[stream_id] = pts;
-                if (m_pts_count[stream_id] < 30)
+                m_ptsStreams[stream_id] = stream_id;
+                m_ptsLast[stream_id] = pts;
+                if (m_ptsCount[stream_id] < 30)
                 {
-                    if (!m_pts_count[stream_id])
-                        m_pts_first[stream_id] = pts;
-                    else if (pts < m_pts_first[stream_id])
-                        m_pts_first[stream_id] = pts;
+                    if (!m_ptsCount[stream_id])
+                        m_ptsFirst[stream_id] = pts;
+                    else if (pts < m_ptsFirst[stream_id])
+                        m_ptsFirst[stream_id] = pts;
                 }
-                m_pts_count[stream_id]++;
+                m_ptsCount[stream_id]++;
             }
         }
     }
@@ -408,7 +408,7 @@ class PrintOutput
 {
   public:
     PrintOutput(RingBuffer *out, bool use_xml) :
-        m_out(out), m_use_xml(use_xml)
+        m_out(out), m_useXml(use_xml)
     {
     }
 
@@ -429,12 +429,12 @@ class PrintOutput
     {
         if (!psip)
             return;
-        Output(((m_use_xml) ? psip->toStringXML(0) : psip->toString()) + "\n");
+        Output(((m_useXml) ? psip->toStringXML(0) : psip->toString()) + "\n");
     }
 
   protected:
     RingBuffer *m_out;
-    bool m_use_xml;
+    bool m_useXml;
 };
 
 class PrintMPEGStreamListener : public MPEGStreamListener, public PrintOutput
@@ -444,7 +444,7 @@ class PrintMPEGStreamListener : public MPEGStreamListener, public PrintOutput
         RingBuffer *out, PTSListener &ptsl, bool autopts,
         MPEGStreamData *sd, const QHash<uint,bool> &use_pid, bool use_xml) :
         PrintOutput(out, use_xml), m_ptsl(ptsl),
-        m_autopts(autopts), m_sd(sd), m_use_pid(use_pid)
+        m_autopts(autopts), m_sd(sd), m_usePid(use_pid)
     {
         if (m_autopts)
             m_sd->AddListeningPID(MPEG_PAT_PID);
@@ -452,7 +452,7 @@ class PrintMPEGStreamListener : public MPEGStreamListener, public PrintOutput
 
     void HandlePAT(const ProgramAssociationTable *pat) override // MPEGStreamListener
     {
-        if (pat && (!m_autopts || m_use_pid[MPEG_PAT_PID]))
+        if (pat && (!m_autopts || m_usePid[MPEG_PAT_PID]))
             Output(pat);
         if (pat && m_autopts)
         {
@@ -469,7 +469,7 @@ class PrintMPEGStreamListener : public MPEGStreamListener, public PrintOutput
 
     void HandlePMT(uint /*program_num*/, const ProgramMapTable *pmt) override // MPEGStreamListener
     {
-        if (pmt && (!m_autopts || m_use_pid[pmt->tsheader()->PID()]))
+        if (pmt && (!m_autopts || m_usePid[pmt->tsheader()->PID()]))
             Output(pmt);
         if (pmt && m_autopts)
         {
@@ -499,7 +499,7 @@ class PrintMPEGStreamListener : public MPEGStreamListener, public PrintOutput
 
     void HandleSplice(const SpliceInformationTable *sit) override // MPEGStreamListener
     {
-        if (sit && m_use_xml)
+        if (sit && m_useXml)
         {
             Output(sit->toStringXML(
                        0, m_ptsl.GetFirstPTS(), m_ptsl.GetLastPTS()) + "\n");
@@ -518,7 +518,7 @@ class PrintMPEGStreamListener : public MPEGStreamListener, public PrintOutput
     const PTSListener &m_ptsl;
     bool m_autopts;
     MPEGStreamData *m_sd;
-    const QHash<uint,bool> &m_use_pid;
+    const QHash<uint,bool> &m_usePid;
 };
 
 class PrintATSCMainStreamListener :
