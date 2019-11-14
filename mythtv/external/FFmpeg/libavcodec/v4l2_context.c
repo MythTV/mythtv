@@ -247,6 +247,8 @@ static int v4l2_stop_decode(V4L2Context *ctx)
         /* DECODER_CMD is optional */
         if (errno == ENOTTY)
             return ff_v4l2_context_set_status(ctx, VIDIOC_STREAMOFF);
+        else
+            return AVERROR(errno);
     }
 
     return 0;
@@ -265,6 +267,8 @@ static int v4l2_stop_encode(V4L2Context *ctx)
         /* ENCODER_CMD is optional */
         if (errno == ENOTTY)
             return ff_v4l2_context_set_status(ctx, VIDIOC_STREAMOFF);
+        else
+            return AVERROR(errno);
     }
 
     return 0;
@@ -420,7 +424,7 @@ static int v4l2_release_buffers(V4L2Context* ctx)
     struct v4l2_requestbuffers req = {
         .memory = V4L2_MEMORY_MMAP,
         .type = ctx->type,
-        .count = 0, /* 0 -> unmap all buffers from the driver */
+        .count = 0, /* 0 -> unmaps buffers from the driver */
     };
     int ret, i, j;
 
@@ -449,8 +453,7 @@ static int v4l2_release_buffers(V4L2Context* ctx)
 unmap:
             if (p->mm_addr && p->length)
                 if (munmap(p->mm_addr, p->length) < 0)
-                    av_log(logger(ctx), AV_LOG_ERROR, "%s unmap plane (%s))\n",
-                        ctx->name, av_err2str(AVERROR(errno)));
+                    av_log(logger(ctx), AV_LOG_ERROR, "%s unmap plane (%s))\n", ctx->name, av_err2str(AVERROR(errno)));
         }
     }
 
@@ -670,7 +673,7 @@ int ff_v4l2_context_dequeue_packet(V4L2Context* ctx, AVPacket* pkt)
     return ff_v4l2_buffer_buf_to_avpkt(pkt, avbuf);
 }
 
-int ff_v4l2_context_get_format(V4L2Context* ctx)
+int ff_v4l2_context_get_format(V4L2Context* ctx, int probe)
 {
     struct v4l2_format_update fmt = { 0 };
     int ret;
@@ -680,7 +683,7 @@ int ff_v4l2_context_get_format(V4L2Context* ctx)
         if (ret)
             return ret;
 
-        fmt.update_avfmt = 1;
+        fmt.update_avfmt = !probe;
         v4l2_save_to_context(ctx, &fmt);
 
         /* format has been tried already */
@@ -737,8 +740,10 @@ int ff_v4l2_context_init(V4L2Context* ctx)
     req.memory = V4L2_MEMORY_MMAP;
     req.type = ctx->type;
     ret = ioctl(s->fd, VIDIOC_REQBUFS, &req);
-    if (ret < 0)
+    if (ret < 0) {
+        av_log(logger(ctx), AV_LOG_ERROR, "%s VIDIOC_REQBUFS failed: %s\n", ctx->name, strerror(errno));
         return AVERROR(errno);
+    }
 
     ctx->num_buffers = req.count;
     ctx->buffers = av_mallocz(ctx->num_buffers * sizeof(V4L2Buffer));

@@ -60,7 +60,7 @@ static inline int v4l2_mplane_video(struct v4l2_capability *cap)
     return 0;
 }
 
-static int v4l2_prepare_contexts(V4L2m2mContext* s)
+static int v4l2_prepare_contexts(V4L2m2mContext* s, int probe)
 {
     struct v4l2_capability cap;
     void *log_ctx = s->priv;
@@ -68,7 +68,7 @@ static int v4l2_prepare_contexts(V4L2m2mContext* s)
 
     s->capture.done = s->output.done = 0;
     s->capture.name = "capture";
-    s->output.name = "output ";
+    s->output.name = "output";
     atomic_init(&s->refcount, 0);
     sem_init(&s->refsync, 0, 0);
 
@@ -77,7 +77,10 @@ static int v4l2_prepare_contexts(V4L2m2mContext* s)
     if (ret < 0)
         return ret;
 
-    av_log(log_ctx, AV_LOG_INFO, "driver '%s' on card '%s'\n", cap.driver, cap.card);
+    av_log(log_ctx, probe ? AV_LOG_DEBUG : AV_LOG_INFO,
+                     "driver '%s' on card '%s' in %s mode\n", cap.driver, cap.card,
+                     v4l2_mplane_video(&cap) ? "mplane" :
+                     v4l2_splane_video(&cap) ? "splane" : "unknown");
 
     if (v4l2_mplane_video(&cap)) {
         s->capture.type = V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE;
@@ -103,17 +106,17 @@ static int v4l2_probe_driver(V4L2m2mContext* s)
     if (s->fd < 0)
         return AVERROR(errno);
 
-    ret = v4l2_prepare_contexts(s);
+    ret = v4l2_prepare_contexts(s, 1);
     if (ret < 0)
         goto done;
 
-    ret = ff_v4l2_context_get_format(&s->output);
+    ret = ff_v4l2_context_get_format(&s->output, 1);
     if (ret) {
         av_log(log_ctx, AV_LOG_DEBUG, "v4l2 output format not supported\n");
         goto done;
     }
 
-    ret = ff_v4l2_context_get_format(&s->capture);
+    ret = ff_v4l2_context_get_format(&s->capture, 1);
     if (ret) {
         av_log(log_ctx, AV_LOG_DEBUG, "v4l2 capture format not supported\n");
         goto done;
@@ -134,14 +137,25 @@ static int v4l2_configure_contexts(V4L2m2mContext* s)
 {
     void *log_ctx = s->priv;
     int ret;
+    struct v4l2_format ofmt, cfmt;
 
     s->fd = open(s->devname, O_RDWR | O_NONBLOCK, 0);
     if (s->fd < 0)
         return AVERROR(errno);
 
-    ret = v4l2_prepare_contexts(s);
+    ret = v4l2_prepare_contexts(s, 0);
     if (ret < 0)
         goto error;
+
+    ofmt = s->output.format;
+    cfmt = s->capture.format;
+    av_log(log_ctx, AV_LOG_INFO, "requesting formats: output=%s capture=%s\n",
+                                 av_fourcc2str(V4L2_TYPE_IS_MULTIPLANAR(ofmt.type) ?
+                                               ofmt.fmt.pix_mp.pixelformat :
+                                               ofmt.fmt.pix.pixelformat),
+                                 av_fourcc2str(V4L2_TYPE_IS_MULTIPLANAR(cfmt.type) ?
+                                               cfmt.fmt.pix_mp.pixelformat :
+                                               cfmt.fmt.pix.pixelformat));
 
     ret = ff_v4l2_context_set_format(&s->output);
     if (ret) {
@@ -161,9 +175,7 @@ static int v4l2_configure_contexts(V4L2m2mContext* s)
         goto error;
     }
 
-    /* decoder's capture buffers are updated during v4l2_try_start once we find
-     * the valid format.
-     */
+    /* decoder's buffers need to be updated at a later stage */
     if (!s->avctx || !av_codec_is_decoder(s->avctx->codec)) {
         ret = ff_v4l2_context_init(&s->capture);
         if (ret) {
@@ -213,7 +225,7 @@ int ff_v4l2_m2m_codec_reinit(V4L2m2mContext* s)
     ff_v4l2_context_release(&s->capture);
 
     /* 3. get the new capture format */
-    ret = ff_v4l2_context_get_format(&s->capture);
+    ret = ff_v4l2_context_get_format(&s->capture, 0);
     if (ret) {
         av_log(log_ctx, AV_LOG_ERROR, "query the new capture format\n");
         return ret;
@@ -246,13 +258,13 @@ int ff_v4l2_m2m_codec_full_reinit(V4L2m2mContext *s)
 
     ret = ff_v4l2_context_set_status(&s->output, VIDIOC_STREAMOFF);
     if (ret) {
-        av_log(s->avctx, AV_LOG_ERROR, "output VIDIOC_STREAMOFF\n");
+        av_log(log_ctx, AV_LOG_ERROR, "output VIDIOC_STREAMOFF\n");
         goto error;
     }
 
     ret = ff_v4l2_context_set_status(&s->capture, VIDIOC_STREAMOFF);
     if (ret) {
-            av_log(s->avctx, AV_LOG_ERROR, "capture VIDIOC_STREAMOFF\n");
+            av_log(log_ctx, AV_LOG_ERROR, "capture VIDIOC_STREAMOFF\n");
             goto error;
     }
 
@@ -264,13 +276,13 @@ int ff_v4l2_m2m_codec_full_reinit(V4L2m2mContext *s)
     s->draining = 0;
     s->reinit = 0;
 
-    ret = ff_v4l2_context_get_format(&s->output);
+    ret = ff_v4l2_context_get_format(&s->output, 0);
     if (ret) {
         av_log(log_ctx, AV_LOG_DEBUG, "v4l2 output format not supported\n");
         goto error;
     }
 
-    ret = ff_v4l2_context_get_format(&s->capture);
+    ret = ff_v4l2_context_get_format(&s->capture, 0);
     if (ret) {
         av_log(log_ctx, AV_LOG_DEBUG, "v4l2 capture format not supported\n");
         goto error;
@@ -328,7 +340,7 @@ int ff_v4l2_m2m_codec_end(V4L2m2mPriv *priv)
 
     ret = ff_v4l2_context_set_status(&s->output, VIDIOC_STREAMOFF);
     if (ret)
-            av_log(priv, AV_LOG_ERROR, "VIDIOC_STREAMOFF %s\n", s->output.name);
+        av_log(priv, AV_LOG_ERROR, "VIDIOC_STREAMOFF %s\n", s->output.name);
 
     ret = ff_v4l2_context_set_status(&s->capture, VIDIOC_STREAMOFF);
     if (ret)
@@ -365,7 +377,7 @@ int ff_v4l2_m2m_codec_init(V4L2m2mPriv *priv)
         strncpy(s->devname, node, strlen(node) + 1);
         ret = v4l2_probe_driver(s);
         if (!ret)
-                break;
+            break;
     }
 
     closedir(dirp);
@@ -403,6 +415,7 @@ int ff_v4l2_m2m_create_context(V4L2m2mPriv *priv, V4L2m2mContext **s)
     priv->context->capture.num_buffers = priv->num_capture_buffers;
     priv->context->output.num_buffers  = priv->num_output_buffers;
     priv->context->self_ref = priv->context_ref;
+    priv->context->fd = -1;
 
     return 0;
 }
