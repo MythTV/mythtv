@@ -421,9 +421,7 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::AcquirePrime(VASurfaceID Id,
 #else
     (void)Id;
     (void)Context;
-    (void)ColourSpace;
     (void)Frame;
-    (void)Scan;
 #endif
     return result;
 }
