@@ -169,14 +169,14 @@ static void fromXMLTVDate(QString &timestr, QDateTime &dt)
         else
         {
             tzoffset = "+0000";
-            static bool warned_once_on_implicit_utc = false;
-            if (!warned_once_on_implicit_utc)
+            static bool s_warnedOnceOnImplicitUtc = false;
+            if (!s_warnedOnceOnImplicitUtc)
             {
                 LOG(VB_XMLTV, LOG_WARNING, "No explicit time zone found, "
                     "guessing implicit UTC! Please consider enhancing "
                     "the guide source to provide explicit UTC or local "
                     "time instead.");
-                warned_once_on_implicit_utc = true;
+                s_warnedOnceOnImplicitUtc = true;
             }
         }
     }

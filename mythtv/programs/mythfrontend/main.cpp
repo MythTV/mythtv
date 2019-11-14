@@ -218,7 +218,7 @@ namespace
       public:
         BookmarkDialog(ProgramInfo *pginfo, MythScreenStack *parent) :
                 MythScreenType(parent, "bookmarkdialog"),
-                pgi(pginfo)
+                m_pgi(pginfo)
         {
         }
 
@@ -259,19 +259,19 @@ namespace
                     }
                     else if (buttonnum != 0)
                     {
-                        delete pgi;
+                        delete m_pgi;
                         return;
                     }
 
-                    TV::StartTV(pgi, flags);
+                    TV::StartTV(m_pgi, flags);
 
-                    delete pgi;
+                    delete m_pgi;
                 }
             }
         }
 
       private:
-        ProgramInfo* pgi {nullptr};
+        ProgramInfo* m_pgi {nullptr};
     };
 
     void cleanup()

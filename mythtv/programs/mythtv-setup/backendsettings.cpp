@@ -121,8 +121,8 @@ static HostCheckBoxSetting *UseLinkLocal()
 class IpAddressSettings : public HostCheckBoxSetting
 {
   public:
-     HostComboBoxSetting *localServerIP;
-     HostComboBoxSetting *localServerIP6;
+     HostComboBoxSetting *m_localServerIP;
+     HostComboBoxSetting *m_localServerIP6;
      explicit IpAddressSettings(/*Setting* trigger*/) :
          HostCheckBoxSetting("ListenOnAllIps")
      {
@@ -132,11 +132,11 @@ class IpAddressSettings : public HostCheckBoxSetting
                         "Address assigned to it. Recommended for most users "
                         "for ease and reliability."));
 
-         localServerIP = LocalServerIP();
-         localServerIP6 = LocalServerIP6();
+         m_localServerIP = LocalServerIP();
+         m_localServerIP6 = LocalServerIP6();
          // show ip addresses if ListenOnAllIps is off
-         addTargetedChild("0", localServerIP);
-         addTargetedChild("0", localServerIP6);
+         addTargetedChild("0", m_localServerIP);
+         addTargetedChild("0", m_localServerIP6);
          addTargetedChild("0", UseLinkLocal());
      };
 };
@@ -893,10 +893,10 @@ BackendSettings::BackendSettings()
     server->addChild(m_ipAddressSettings);
     connect(m_ipAddressSettings, &HostCheckBoxSetting::valueChanged,
             this, &BackendSettings::listenChanged);
-    connect(m_ipAddressSettings->localServerIP,
+    connect(m_ipAddressSettings->m_localServerIP,
             static_cast<void (StandardSetting::*)(const QString&)>(&StandardSetting::valueChanged),
             this, &BackendSettings::listenChanged);
-    connect(m_ipAddressSettings->localServerIP6,
+    connect(m_ipAddressSettings->m_localServerIP6,
             static_cast<void (StandardSetting::*)(const QString&)>(&StandardSetting::valueChanged),
             this, &BackendSettings::listenChanged);
     m_backendServerAddr = BackendServerAddr();
@@ -1056,9 +1056,9 @@ void BackendSettings::listenChanged()
     else
     {
         m_backendServerAddr->addSelection(
-            m_ipAddressSettings->localServerIP->getValue());
+            m_ipAddressSettings->m_localServerIP->getValue());
         m_backendServerAddr->addSelection(
-            m_ipAddressSettings->localServerIP6->getValue());
+            m_ipAddressSettings->m_localServerIP6->getValue());
     }
     // Remove the blank entry that is caused by clearSelections
     // TODO probably not needed anymore?
@@ -1138,15 +1138,15 @@ void BackendSettings::Save(void)
     {
         QString bea = m_backendServerAddr->getValue();
         // initialize them to localhost values
-        m_ipAddressSettings->localServerIP->setValue(0);
-        m_ipAddressSettings->localServerIP6->setValue(0);
+        m_ipAddressSettings->m_localServerIP->setValue(0);
+        m_ipAddressSettings->m_localServerIP6->setValue(0);
         QString ip4 = MythCoreContext::resolveAddress
             (bea,MythCoreContext::ResolveIPv4);
         QString ip6 = MythCoreContext::resolveAddress
             (bea,MythCoreContext::ResolveIPv6);
         // the setValue calls below only set the value if it is in the list.
-        m_ipAddressSettings->localServerIP->setValue(ip4);
-        m_ipAddressSettings->localServerIP6->setValue(ip6);
+        m_ipAddressSettings->m_localServerIP->setValue(ip4);
+        m_ipAddressSettings->m_localServerIP6->setValue(ip6);
     }
 
     GroupSetting::Save();

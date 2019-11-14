@@ -14,11 +14,11 @@
 
 typedef struct edgemaskentry
 {
-    int isedge;
-    int horiz;
-    int vert;
-    int rdiag;
-    int ldiag;
+    int m_isEdge;
+    int m_horiz;
+    int m_vert;
+    int m_rdiag;
+    int m_ldiag;
 }
 EdgeMaskEntry;
 
@@ -154,9 +154,9 @@ bool ClassicLogoDetector::searchForLogo(MythPlayer* player)
 
                 uint pos = y * m_width + x;
 
-                if (edgeCounts[pos].isedge > (maxLoops * 0.66))
+                if (edgeCounts[pos].m_isEdge > (maxLoops * 0.66))
                 {
-                    m_edgeMask[pos].isedge = 1;
+                    m_edgeMask[pos].m_isEdge = 1;
                     pixelsInMask++;
 #ifdef SHOW_DEBUG_WIN
                     fakeFrame[pos] = 0xff;
@@ -164,16 +164,16 @@ bool ClassicLogoDetector::searchForLogo(MythPlayer* player)
 
                 }
 
-                if (edgeCounts[pos].horiz > (maxLoops * 0.66))
-                    m_edgeMask[pos].horiz = 1;
+                if (edgeCounts[pos].m_horiz > (maxLoops * 0.66))
+                    m_edgeMask[pos].m_horiz = 1;
 
-                if (edgeCounts[pos].vert > (maxLoops * 0.66))
-                    m_edgeMask[pos].vert = 1;
+                if (edgeCounts[pos].m_vert > (maxLoops * 0.66))
+                    m_edgeMask[pos].m_vert = 1;
 
-                if (edgeCounts[pos].ldiag > (maxLoops * 0.66))
-                    m_edgeMask[pos].ldiag = 1;
-                if (edgeCounts[pos].rdiag > (maxLoops * 0.66))
-                    m_edgeMask[pos].rdiag = 1;
+                if (edgeCounts[pos].m_ldiag > (maxLoops * 0.66))
+                    m_edgeMask[pos].m_ldiag = 1;
+                if (edgeCounts[pos].m_rdiag > (maxLoops * 0.66))
+                    m_edgeMask[pos].m_rdiag = 1;
             }
         }
 
@@ -185,20 +185,20 @@ bool ClassicLogoDetector::searchForLogo(MythPlayer* player)
             {
                 int neighbors = 0;
 
-                if (!m_edgeMask[y * m_width + x].isedge)
+                if (!m_edgeMask[y * m_width + x].m_isEdge)
                     continue;
 
                 for (uint dy = y - 2; dy <= (y + 2); dy++ )
                 {
                     for (uint dx = x - 2; dx <= (x + 2); dx++ )
                     {
-                        if (m_edgeMask[dy * m_width + dx].isedge)
+                        if (m_edgeMask[dy * m_width + dx].m_isEdge)
                             neighbors++;
                     }
                 }
 
                 if (neighbors < 5)
-                    m_edgeMask[y * m_width + x].isedge = 0;
+                    m_edgeMask[y * m_width + x].m_isEdge = 0;
             }
         }
 
@@ -279,7 +279,7 @@ void ClassicLogoDetector::SetLogoMaskArea()
     {
         for (unsigned int x = 0; x < m_width; x++)
         {
-            if (m_edgeMask[y * m_width + x].isedge)
+            if (m_edgeMask[y * m_width + x].m_isEdge)
             {
                 if (x < m_logoMinX)
                     m_logoMinX = x;
@@ -384,7 +384,7 @@ bool ClassicLogoDetector::doesThisFrameContainTheFoundLogo(
 
             int pixel = framePtr[pos1];
 
-            if (m_edgeMask[edgePos].horiz)
+            if (m_edgeMask[edgePos].m_horiz)
             {
                 if ((abs(framePtr[pos1 - radius] - pixel) >= m_logoEdgeDiff) ||
                     (abs(framePtr[pos1 + radius] - pixel) >= m_logoEdgeDiff))
@@ -399,7 +399,7 @@ bool ClassicLogoDetector::doesThisFrameContainTheFoundLogo(
                 testNotEdges++;
             }
 
-            if (m_edgeMask[edgePos].vert)
+            if (m_edgeMask[edgePos].m_vert)
             {
                 if ((abs(framePtr[pos2] - pixel) >= m_logoEdgeDiff) ||
                     (abs(framePtr[pos3] - pixel) >= m_logoEdgeDiff))
@@ -459,32 +459,32 @@ void ClassicLogoDetector::DetectEdges(VideoFrame *frame, EdgeMaskEntry *edges,
             if (( abs(buf[y * bytesPerLine + (x - r)] - p) >= edgeDiff) ||
                 ( abs(buf[y * bytesPerLine + (x + r)] - p) >= edgeDiff))
             {
-                edges[pos].horiz++;
+                edges[pos].m_horiz++;
                 edgeCount++;
             }
             if (( abs(buf[(y - r) * bytesPerLine + x] - p) >= edgeDiff) ||
                 ( abs(buf[(y + r) * bytesPerLine + x] - p) >= edgeDiff))
             {
-                edges[pos].vert++;
+                edges[pos].m_vert++;
                 edgeCount++;
             }
 
             if (( abs(buf[(y - r) * bytesPerLine + (x - r)] - p) >= edgeDiff) ||
                 ( abs(buf[(y + r) * bytesPerLine + (x + r)] - p) >= edgeDiff))
             {
-                edges[pos].ldiag++;
+                edges[pos].m_ldiag++;
                 edgeCount++;
             }
 
             if (( abs(buf[(y - r) * bytesPerLine + (x + r)] - p) >= edgeDiff) ||
                 ( abs(buf[(y + r) * bytesPerLine + (x - r)] - p) >= edgeDiff))
             {
-                edges[pos].rdiag++;
+                edges[pos].m_rdiag++;
                 edgeCount++;
             }
 
             if (edgeCount >= 3)
-                edges[pos].isedge++;
+                edges[pos].m_isEdge++;
         }
     }
 }

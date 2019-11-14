@@ -233,7 +233,7 @@ int write_video_ts(uint64_t vpts, uint64_t vdts, uint64_t SCR, uint8_t *buf,
 		   int *vlength, uint8_t ptsdts, ringbuffer *vrbuffer)
 {
 //Unlike program streams, we only do one PES per frame
-	static int count = 0;
+	static int s_count = 0;
 	int pos = 0;
 	int stuff = 0;
 	int length = *vlength;
@@ -260,14 +260,14 @@ int write_video_ts(uint64_t vpts, uint64_t vdts, uint64_t SCR, uint8_t *buf,
 	LOG(VB_GENERAL, LOG_INFO, "SCR: %f PTS: %f DTS: %f",
 		 SCR/27000000.0, vpts / 27000000.0, vdts / 27000000.0);
 #endif
-		pos = write_ts_header(TS_VIDPID, 1, count, SCR, buf, stuff);
+		pos = write_ts_header(TS_VIDPID, 1, s_count, SCR, buf, stuff);
 		// always use length == 0 for video streams
 		pos += write_pes_header( 0xE0, 6, vpts, vdts, buf+pos, 
 					 0, ptsdts);
 	} else {
-		pos = write_ts_header(TS_VIDPID, 0, count, -1, buf, stuff);
+		pos = write_ts_header(TS_VIDPID, 0, s_count, -1, buf, stuff);
 	}
-	count = (count+1) & 0x0f;
+	s_count = (s_count+1) & 0x0f;
 
 	if (length-pos > *vlength){
 		LOG(VB_GENERAL, LOG_ERR, "WHAT THE HELL  %d > %d\n", length-pos,
@@ -285,8 +285,8 @@ int write_video_ts(uint64_t vpts, uint64_t vdts, uint64_t SCR, uint8_t *buf,
 int write_audio_ts(int n, uint64_t pts, uint8_t *buf, int *alength,
 		   uint8_t ptsdts, ringbuffer *arbuffer)
 {
-	static int count[32] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	                        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+	static int s_count[32] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+				  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 	int pos = 0;
 	int stuff = 0;
 	int length = *alength;
@@ -305,13 +305,13 @@ int write_audio_ts(int n, uint64_t pts, uint8_t *buf, int *alength,
 		length = TS_SIZE;
 	}
 	if(ptsdts) {
-		pos = write_ts_header(TS_MP2PID+n, 1, count[n], -1, buf, stuff);
+		pos = write_ts_header(TS_MP2PID+n, 1, s_count[n], -1, buf, stuff);
 		pos += write_pes_header( 0xC0+n, *alength + PES_H_MIN + 5, pts,
 					 0, buf+pos, 0, ptsdts);
 	} else {
-		pos = write_ts_header(TS_MP2PID+n, 0, count[n], -1, buf, stuff);
+		pos = write_ts_header(TS_MP2PID+n, 0, s_count[n], -1, buf, stuff);
 	}
-	count[n] = (count[n]+1) & 0x0f;
+	s_count[n] = (s_count[n]+1) & 0x0f;
 	int add = ring_read( arbuffer, buf+pos, length-pos);
 	*alength = add;
 	if (add < 0) return -1;
@@ -328,8 +328,8 @@ int write_audio_ts(int n, uint64_t pts, uint8_t *buf, int *alength,
 int write_ac3_ts(int n, uint64_t pts, uint8_t *buf, int *alength,
 	 uint8_t ptsdts, int nframes, ringbuffer *ac3rbuffer)
 {
-	static int count[32] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	                        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+	static int s_count[32] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+				  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 	int pos = 0;
 	int stuff = 0;
 	int length = *alength;
@@ -348,7 +348,7 @@ int write_ac3_ts(int n, uint64_t pts, uint8_t *buf, int *alength,
 		length = TS_SIZE;
 	}
 	if(ptsdts) {
-		pos = write_ts_header(TS_AC3PID+n, 1, count[n], -1, buf, stuff);
+		pos = write_ts_header(TS_AC3PID+n, 1, s_count[n], -1, buf, stuff);
 		pos += write_pes_header( PRIVATE_STREAM1,
 					 *alength + 4 + PES_H_MIN + 5,
 					 pts, 0, buf+pos, 0, ptsdts);
@@ -358,9 +358,9 @@ int write_ac3_ts(int n, uint64_t pts, uint8_t *buf, int *alength,
 		buf[pos+3] = 0x00;
 		pos += 4;
 	} else {
-		pos = write_ts_header(TS_AC3PID+n, 0, count[n], -1, buf, stuff);
+		pos = write_ts_header(TS_AC3PID+n, 0, s_count[n], -1, buf, stuff);
 	}
-	count[n] = (count[n]+1) & 0x0f;
+	s_count[n] = (s_count[n]+1) & 0x0f;
 
 	int add = ring_read( ac3rbuffer, buf+pos, length-pos);
 	*alength = add;
@@ -378,7 +378,7 @@ int write_ac3_ts(int n, uint64_t pts, uint8_t *buf, int *alength,
 void write_ts_patpmt(extdata_t *ext, int extcnt, uint8_t prog_num, uint8_t *buf)
 {
 #define PMTPID 0x20
-	static int count = 0;
+	static int s_count = 0;
 	int pmtpos = 13;
 	//PMT Program number = 1
 	//PMT PID = 0x20
@@ -389,14 +389,14 @@ void write_ts_patpmt(extdata_t *ext, int extcnt, uint8_t prog_num, uint8_t *buf)
 
 	//PAT
 	pat[10] = prog_num;
-	int pos = write_ts_header(0x00, 1, count, -1, buf, 0);
+	int pos = write_ts_header(0x00, 1, s_count, -1, buf, 0);
 	*(uint32_t *)(pat+13)= htonl(crc32_04c11db7(pat+1, 12, 0xffffffff));
 	memcpy(buf+pos, pat, 17);
 	pos += 17;
 	memset(buf+pos, 0xff, TS_SIZE - pos);
 	pos = TS_SIZE;
 	//PMT
-	pos += write_ts_header(PMTPID, 1, count, -1, buf+pos, 0);
+	pos += write_ts_header(PMTPID, 1, s_count, -1, buf+pos, 0);
 	for(int i = 0; i <= extcnt; i++) {
 		uint8_t type = 0xFF;
 		uint32_t pid = 0x1FFF;
@@ -441,5 +441,5 @@ void write_ts_patpmt(extdata_t *ext, int extcnt, uint8_t prog_num, uint8_t *buf)
 	pos += pmtpos;
 	memset(buf+pos, 0xff, 2*TS_SIZE - pos);
 	pos = 2*TS_SIZE;
-	count = (count+1) & 0x0f;
+	s_count = (s_count+1) & 0x0f;
 }

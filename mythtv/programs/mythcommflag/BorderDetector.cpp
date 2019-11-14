@@ -81,14 +81,14 @@ BorderDetector::getDimensions(const AVFrame *pgm, int pgmheight,
      * pillarboxing (when one is embedded inside the other) are different
      * colors.
      */
-    static const unsigned char  MAXRANGE = 32;
+    static constexpr unsigned char kMaxRange = 32;
 
     /*
      * TUNABLE: The maximum number of consecutive rows or columns with too many
      * outlier points that may be scanned before declaring the existence of a
      * border.
      */
-    static const int        MAXLINES = 2;
+    static constexpr int    kMaxLines = 2;
 
     const int               pgmwidth = pgm->linesize[0];
 
@@ -111,8 +111,8 @@ BorderDetector::getDimensions(const AVFrame *pgm, int pgmheight,
      * or noise between edges and content. (Really, a more general case of
      * VERTMARGIN and HORIZMARGIN, above.)
      */
-    const int               VERTSLOP = max(MAXLINES, pgmheight * 1 / 120);
-    const int               HORIZSLOP = max(MAXLINES, pgmwidth * 1 / 160);
+    const int               VERTSLOP = max(kMaxLines, pgmheight * 1 / 120);
+    const int               HORIZSLOP = max(kMaxLines, pgmwidth * 1 / 160);
 
     struct timeval          start {}, end {}, elapsed {};
     int                     minrow = 0, mincol = 0, maxrow1 = 0, maxcol1 = 0;
@@ -158,12 +158,12 @@ BorderDetector::getDimensions(const AVFrame *pgm, int pgmheight,
 
                 uchar val = pgm->data[0][rr * pgmwidth + cc];
                 int range = max(maxval, val) - min(minval, val) + 1;
-                if (range > MAXRANGE)
+                if (range > kMaxRange)
                 {
                     if (outliers++ < MAXOUTLIERS)
                         continue;   /* Next row. */
                     inrange = false;
-                    if (lines++ < MAXLINES)
+                    if (lines++ < kMaxLines)
                         break;  /* Next column. */
                     goto found_left;
                 }
@@ -210,12 +210,12 @@ found_left:
 
                 uchar val = pgm->data[0][rr * pgmwidth + cc];
                 int range = max(maxval, val) - min(minval, val) + 1;
-                if (range > MAXRANGE)
+                if (range > kMaxRange)
                 {
                     if (outliers++ < MAXOUTLIERS)
                         continue;   /* Next row. */
                     inrange = false;
-                    if (lines++ < MAXLINES)
+                    if (lines++ < kMaxLines)
                         break;  /* Next column. */
                     goto found_right;
                 }
@@ -263,12 +263,12 @@ found_right:
 
                 uchar val = pgm->data[0][rr * pgmwidth + cc];
                 int range = max(maxval, val) - min(minval, val) + 1;
-                if (range > MAXRANGE)
+                if (range > kMaxRange)
                 {
                     if (outliers++ < MAXOUTLIERS)
                         continue;   /* Next column. */
                     inrange = false;
-                    if (lines++ < MAXLINES)
+                    if (lines++ < kMaxLines)
                         break;  /* Next row. */
                     goto found_top;
                 }
@@ -312,12 +312,12 @@ found_top:
 
                 uchar val = pgm->data[0][rr * pgmwidth + cc];
                 int range = max(maxval, val) - min(minval, val) + 1;
-                if (range > MAXRANGE)
+                if (range > kMaxRange)
                 {
                     if (outliers++ < MAXOUTLIERS)
                         continue;   /* Next column. */
                     inrange = false;
-                    if (lines++ < MAXLINES)
+                    if (lines++ < kMaxLines)
                         break;  /* Next row. */
                     goto found_bottom;
                 }

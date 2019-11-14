@@ -90,7 +90,7 @@ bool Frontend::SendAction(const QString &Action, const QString &Value,
     if (!IsValidAction(Action))
         return false;
 
-    static const QStringList value_actions =
+    static const QStringList kValueActions =
         QStringList() << ACTION_HANDLEMEDIA  << ACTION_SETVOLUME <<
                          ACTION_SETAUDIOSYNC << ACTION_SETBRIGHTNESS <<
                          ACTION_SETCONTRAST  << ACTION_SETCOLOUR <<
@@ -98,7 +98,7 @@ bool Frontend::SendAction(const QString &Action, const QString &Value,
                          ACTION_SWITCHTITLE  << ACTION_SWITCHANGLE <<
                          ACTION_SEEKABSOLUTE;
 
-    if (!Value.isEmpty() && value_actions.contains(Action))
+    if (!Value.isEmpty() && kValueActions.contains(Action))
     {
         MythEvent* me = new MythEvent(Action, QStringList(Value));
         qApp->postEvent(GetMythMainWindow(), me);
@@ -300,11 +300,11 @@ bool Frontend::IsValidAction(const QString &Action)
 
 void Frontend::InitialiseActions(void)
 {
-    static bool initialised = false;
-    if (initialised)
+    static bool s_initialised = false;
+    if (s_initialised)
         return;
 
-    initialised = true;
+    s_initialised = true;
     KeyBindings *bindings = new KeyBindings(gCoreContext->GetHostName());
     if (bindings)
     {
