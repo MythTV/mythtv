@@ -77,41 +77,41 @@ static const mmx_t mm_cpool[] =
 
 typedef struct ThisFilter
 {
-    VideoFilter vf;
+    VideoFilter    m_vf;
 
-    long long frames_nr[2];
-    int8_t got_frames[2];
-    unsigned char* frames[2];
-    unsigned char* deint_frame;
-    long long last_framenr;
+    long long      m_framesNr[2];
+    int8_t         m_gotFrames[2];
+    unsigned char* m_frames[2];
+    unsigned char* m_deintFrame;
+    long long      m_lastFrameNr;
 
-    int width;
-    int height;
+    int            m_width;
+    int            m_height;
 
-    int mm_flags;
+    int            m_mmFlags;
     TF_STRUCT;
 } ThisFilter;
 
 static void AllocFilter(ThisFilter* filter, int width, int height)
 {
-    if ((width != filter->width) || height != filter->height)
+    if ((width != filter->m_width) || height != filter->m_height)
     {
-        printf("greedyhdeint: size changed from %d x %d -> %d x %d\n", filter->width, filter->height, width, height);
-        if (filter->frames[0])
+        printf("greedyhdeint: size changed from %d x %d -> %d x %d\n", filter->m_width, filter->m_height, width, height);
+        if (filter->m_frames[0])
         {
-            free(filter->frames[0]);
-            free(filter->frames[1]);
-            free(filter->deint_frame);
+            free(filter->m_frames[0]);
+            free(filter->m_frames[1]);
+            free(filter->m_deintFrame);
         }
-        filter->frames[0] = malloc(width * height * 2);
-        filter->frames[1] = malloc(width * height * 2);
-        memset(filter->frames[0], 0, width * height * 2);
-        memset(filter->frames[1], 0, width * height * 2);
-        filter->deint_frame = malloc(width * height * 2);
-        filter->width = width;
-        filter->height = height;
-        memset(filter->got_frames, 0, sizeof(filter->got_frames));
-        memset(filter->frames_nr, 0, sizeof(filter->frames_nr));
+        filter->m_frames[0] = malloc(width * height * 2);
+        filter->m_frames[1] = malloc(width * height * 2);
+        memset(filter->m_frames[0], 0, width * height * 2);
+        memset(filter->m_frames[1], 0, width * height * 2);
+        filter->m_deintFrame = malloc(width * height * 2);
+        filter->m_width = width;
+        filter->m_height = height;
+        memset(filter->m_gotFrames, 0, sizeof(filter->m_gotFrames));
+        memset(filter->m_framesNr, 0, sizeof(filter->m_framesNr));
     }
 }
 
@@ -128,13 +128,13 @@ static int GreedyHDeint (VideoFilter * f, VideoFrame * frame, int field)
 
     AllocFilter((ThisFilter*)f, frame->width, frame->height);
 
-    if (filter->last_framenr != frame->frameNumber)
+    if (filter->m_lastFrameNr != frame->frameNumber)
     {
         //this is no double call, really a new frame
-        cur_frame = (filter->last_framenr + 1) & 1;
-        last_frame = (filter->last_framenr) & 1;
+        cur_frame = (filter->m_lastFrameNr + 1) & 1;
+        last_frame = (filter->m_lastFrameNr) & 1;
         //check if really the previous frame (cause mythtv AutoDeInt behauviour)
-        if (filter->last_framenr != (frame->frameNumber - 1))
+        if (filter->m_lastFrameNr != (frame->frameNumber - 1))
         {
             cur_frame = frame->frameNumber & 1;
             last_frame = cur_frame;
@@ -149,7 +149,7 @@ static int GreedyHDeint (VideoFilter * f, VideoFrame * frame, int field)
                         frame->buf + frame->offsets[0], frame->pitches[0],
                         frame->buf + frame->offsets[1], frame->pitches[1],
                         frame->buf + frame->offsets[2], frame->pitches[2],
-                        filter->frames[cur_frame], 2 * frame->width,
+                        filter->m_frames[cur_frame], 2 * frame->width,
                         frame->width, frame->height,
                         1 - frame->interlaced_frame);
                 break;
@@ -162,39 +162,39 @@ static int GreedyHDeint (VideoFilter * f, VideoFrame * frame, int field)
     else
     {
         //double call
-        cur_frame = (filter->last_framenr) & 1;
-        last_frame = (filter->last_framenr + 1) & 1;
+        cur_frame = (filter->m_lastFrameNr) & 1;
+        last_frame = (filter->m_lastFrameNr + 1) & 1;
         bottom_field = frame->top_field_first? 1 : 0;
     }
-    filter->got_frames[cur_frame] = 1;
-    filter->frames_nr[cur_frame] = frame->frameNumber;
+    filter->m_gotFrames[cur_frame] = 1;
+    filter->m_framesNr[cur_frame] = frame->frameNumber;
 
     //must be done for first frame or deinterlacing would use an "empty" memory block/frame
-    if (!filter->got_frames[last_frame])
+    if (!filter->m_gotFrames[last_frame])
         last_frame = cur_frame;
 
     int valid = 1;
 #ifdef MMX
     /* SSE Version has best quality. 3DNOW and MMX a litte bit impure */
-    if (filter->mm_flags & AV_CPU_FLAG_SSE)
+    if (filter->m_mmFlags & AV_CPU_FLAG_SSE)
     {
         greedyh_filter_sse(
-            filter->deint_frame, 2 * frame->width,
-            filter->frames[cur_frame], filter->frames[last_frame],
+            filter->m_deintFrame, 2 * frame->width,
+            filter->m_frames[cur_frame], filter->m_frames[last_frame],
             bottom_field, field, frame->width, frame->height);
     }
-    else if (filter->mm_flags & AV_CPU_FLAG_3DNOW)
+    else if (filter->m_mmFlags & AV_CPU_FLAG_3DNOW)
     {
         greedyh_filter_3dnow(
-            filter->deint_frame, 2 * frame->width,
-            filter->frames[cur_frame], filter->frames[last_frame],
+            filter->m_deintFrame, 2 * frame->width,
+            filter->m_frames[cur_frame], filter->m_frames[last_frame],
             bottom_field, field, frame->width, frame->height);
     }
-    else if (filter->mm_flags & AV_CPU_FLAG_MMX)
+    else if (filter->m_mmFlags & AV_CPU_FLAG_MMX)
     {
         greedyh_filter_mmx(
-            filter->deint_frame, 2 * frame->width,
-            filter->frames[cur_frame], filter->frames[last_frame],
+            filter->m_deintFrame, 2 * frame->width,
+            filter->m_frames[cur_frame], filter->m_frames[last_frame],
             bottom_field, field, frame->width, frame->height);
     }
     else
@@ -209,19 +209,19 @@ static int GreedyHDeint (VideoFilter * f, VideoFrame * frame, int field)
     }
 
 #if 0
-      apply_chroma_filter(filter->deint_frame, frame->width * 2,
+      apply_chroma_filter(filter->m_deintFrame, frame->width * 2,
                           frame->width, frame->height );
 #endif
 
     /* convert back to yv12, cause myth only works with this format */
     if ( valid) yuy2_to_yv12(
-        filter->deint_frame, 2 * frame->width,
+        filter->m_deintFrame, 2 * frame->width,
         frame->buf + frame->offsets[0], frame->pitches[0],
         frame->buf + frame->offsets[1], frame->pitches[1],
         frame->buf + frame->offsets[2], frame->pitches[2],
         frame->width, frame->height);
 
-    filter->last_framenr = frame->frameNumber;
+    filter->m_lastFrameNr = frame->frameNumber;
 
     return 0;
 }
@@ -229,9 +229,9 @@ static int GreedyHDeint (VideoFilter * f, VideoFrame * frame, int field)
 static void CleanupGreedyHDeintFilter(VideoFilter * filter)
 {
     ThisFilter* f = (ThisFilter*)filter;
-    free(f->deint_frame);
-    free(f->frames[0]);
-    free(f->frames[1]);
+    free(f->m_deintFrame);
+    free(f->m_frames[0]);
+    free(f->m_frames[1]);
 }
 
 static VideoFilter* GreedyHDeintFilter(VideoFrameType inpixfmt,
@@ -251,31 +251,31 @@ static VideoFilter* GreedyHDeintFilter(VideoFrameType inpixfmt,
         return NULL;
     }
 
-    filter->width = 0;
-    filter->height = 0;
-    memset(filter->frames, 0, sizeof(filter->frames));
-    filter->deint_frame = 0;
+    filter->m_width = 0;
+    filter->m_height = 0;
+    memset(filter->m_frames, 0, sizeof(filter->m_frames));
+    filter->m_deintFrame = 0;
 
     AllocFilter(filter, *width, *height);
 
     init_yuv_conversion();
 #ifdef MMX
-    filter->mm_flags = av_get_cpu_flags();
+    filter->m_mmFlags = av_get_cpu_flags();
     TF_INIT(filter);
 #else
-    filter->mm_flags = 0;
+    filter->m_mmFlags = 0;
 #endif
-    if (!(filter->mm_flags & (AV_CPU_FLAG_SSE|AV_CPU_FLAG_3DNOW|AV_CPU_FLAG_MMX)))
+    if (!(filter->m_mmFlags & (AV_CPU_FLAG_SSE|AV_CPU_FLAG_3DNOW|AV_CPU_FLAG_MMX)))
     {
         /* TODO plain old C implementation */
         fprintf (stderr, "GreedyHDeint: Requires MMX extensions.\n");
-        CleanupGreedyHDeintFilter(&filter->vf);
+        CleanupGreedyHDeintFilter(&filter->m_vf);
         free(filter);
         return NULL;
     }
 
-    filter->vf.filter = &GreedyHDeint;
-    filter->vf.cleanup = &CleanupGreedyHDeintFilter;
+    filter->m_vf.filter = &GreedyHDeint;
+    filter->m_vf.cleanup = &CleanupGreedyHDeintFilter;
     return (VideoFilter *) filter;
 }
 

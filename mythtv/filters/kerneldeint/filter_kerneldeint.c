@@ -38,39 +38,39 @@ static const mmx_t mm_cpool[] = { { 0x0000000000000000LL }, };
 
 struct DeintThread
 {
-    int       ready;
-    pthread_t id;
-    int       exists;
+    int       m_ready;
+    pthread_t m_id;
+    int       m_exists;
 };
 
 typedef struct ThisFilter
 {
-    VideoFilter vf;
+    VideoFilter m_vf;
 
-    struct DeintThread *threads;
-    VideoFrame *frame;
-    int         field;
-    int         ready;
-    int         kill_threads;
-    int         actual_threads;
-    int         requested_threads;
-    pthread_mutex_t mutex;
+    struct DeintThread *m_threads;
+    VideoFrame         *m_frame;
+    int                 m_field;
+    int                 m_ready;
+    int                 m_killThreads;
+    int                 m_actualThreads;
+    int                 m_requestedThreads;
+    pthread_mutex_t     m_mutex;
 
-    int       skipchroma;
-    int       mm_flags;
-    int       width;
-    int       height;
-    long long last_framenr;
-    uint8_t  *ref[3];
-    int       ref_stride[3];
+    int                 m_skipChroma;
+    int                 m_mmFlags;
+    int                 m_width;
+    int                 m_height;
+    long long           m_lastFrameNr;
+    uint8_t            *m_ref[3];
+    int                 m_refStride[3];
 
-    int       dirty_frame;
-    int       double_rate;
-    int       double_call;
-    void (*line_filter)(uint8_t *dst, int width, int start_width,
+    int                 m_dirtyFrame;
+    int                 m_doubleRate;
+    int                 m_doubleCall;
+    void (*m_lineFilter)(uint8_t *dst, int width, int start_width,
                         const uint8_t *src1, const uint8_t *src2, const uint8_t *src3,
                         const uint8_t *src4, const uint8_t *src5);
-    void (*line_filter_fast)(uint8_t *dst, int width, int start_width,
+    void (*m_lineFilterFast)(uint8_t *dst, int width, int start_width,
                              uint8_t *src1, const uint8_t *src2, const uint8_t *src3,
                              const uint8_t *src4, const uint8_t *src5);
     TF_STRUCT;
@@ -217,19 +217,19 @@ static void store_ref(struct ThisFilter *p, uint8_t *src, int src_offsets[3],
         int h = height >> is_chroma;
         int w = width  >> is_chroma;
 
-        if (p->ref_stride[i] == src_stride[i])
+        if (p->m_refStride[i] == src_stride[i])
         {
-            memcpy(p->ref[i], src + src_offsets[i], src_stride[i] * h);
+            memcpy(p->m_ref[i], src + src_offsets[i], src_stride[i] * h);
         }
         else
         {
             uint8_t *src2 = src + src_offsets[i];
-            uint8_t *dest = p->ref[i];
+            uint8_t *dest = p->m_ref[i];
             for (int j = 0; j < h; j++)
             {
                 memcpy(dest, src2, w);
                 src2 += src_stride[i];
-                dest += p->ref_stride[i];
+                dest += p->m_refStride[i];
             }
         }
     }
@@ -237,26 +237,26 @@ static void store_ref(struct ThisFilter *p, uint8_t *src, int src_offsets[3],
 
 static int AllocFilter(ThisFilter* filter, int width, int height)
 {
-    if ((width != filter->width) || (height != filter->height))
+    if ((width != filter->m_width) || (height != filter->m_height))
     {
         for (int i = 0; i < 3; i++)
         {
-            if (filter->ref[i])
-                free(filter->ref[i]);
+            if (filter->m_ref[i])
+                free(filter->m_ref[i]);
 
             int is_chroma= !!i;
             int w = ((width      + 31) & (~31)) >> is_chroma;
             int h = ((height + 6 + 31) & (~31)) >> is_chroma;
             int size = w * h * sizeof(uint8_t);
 
-            filter->ref_stride[i] = w;
-            filter->ref[i] = (uint8_t*) malloc(size);
-            if (!filter->ref[i])
+            filter->m_refStride[i] = w;
+            filter->m_ref[i] = (uint8_t*) malloc(size);
+            if (!filter->m_ref[i])
                 return 0;
-            memset(filter->ref[i], is_chroma ? 127 : 0, size);
+            memset(filter->m_ref[i], is_chroma ? 127 : 0, size);
         }
-        filter->width  = width;
-        filter->height = height;
+        filter->m_width  = width;
+        filter->m_height = height;
     }
     return 1;
 }
@@ -277,7 +277,7 @@ static void filter_func(struct ThisFilter *p, uint8_t *dst, int dst_offsets[3],
 
     uint8_t *dest = NULL, *src1 = NULL, *src2 = NULL,
         *src3 = NULL, *src4 = NULL, *src5 = NULL;
-    int channels = p->skipchroma ? 1 : 3;
+    int channels = p->m_skipChroma ? 1 : 3;
     int    field = parity ^ tff;
 
     int first_slice  = (this_slice == 0);
@@ -306,9 +306,9 @@ static void filter_func(struct ThisFilter *p, uint8_t *dst, int dst_offsets[3],
         if (last_slice)
             end -= (5 + field);
 
-        int src_pitch = p->ref_stride[i];
+        int src_pitch = p->m_refStride[i];
         dest = dst + dst_offsets[i] + (start * dst_stride[i]);
-        src1 = p->ref[i] + (start * src_pitch);
+        src1 = p->m_ref[i] + (start * src_pitch);
 
         if (double_rate)
         {
@@ -320,13 +320,13 @@ static void filter_func(struct ThisFilter *p, uint8_t *dst, int dst_offsets[3],
             if (first_slice)
             {
                 if (!field)
-                    p->line_filter(dest, w, 0, src1, src1, src1, src2, src3);
+                    p->m_lineFilter(dest, w, 0, src1, src1, src1, src2, src3);
                 else if (dirty)
                     memcpy(dest, src1, w);    
                 dest += dst_stride[i];
 
                 if (field)
-                    p->line_filter(dest, w, 0, src1, src1, src2, src3, src4);
+                    p->m_lineFilter(dest, w, 0, src1, src1, src2, src3, src4);
                 else if (dirty)
                     memcpy(dest, src2, w);    
                 dest += dst_stride[i];
@@ -339,7 +339,7 @@ static void filter_func(struct ThisFilter *p, uint8_t *dst, int dst_offsets[3],
             for (int y = start; y < end; y++)
             {
                 if ((y ^ (1 - field)) & 1)
-                    p->line_filter(dest, w, 0, src1, src2, src3, src4, src5);
+                    p->m_lineFilter(dest, w, 0, src1, src2, src3, src4, src5);
                 else if (dirty)
                     memcpy(dest, src3, w);
 
@@ -354,13 +354,13 @@ static void filter_func(struct ThisFilter *p, uint8_t *dst, int dst_offsets[3],
             if (last_slice)
             {
                 if (!field)
-                    p->line_filter(dest, w, 0, src2, src3, src4, src5, src5);
+                    p->m_lineFilter(dest, w, 0, src2, src3, src4, src5, src5);
                 else if (dirty)
                     memcpy(dest, src4, w);    
                 dest += dst_stride[i];
 
                 if (field)
-                    p->line_filter(dest, w, 0, src3, src4, src5, src5, src5);
+                    p->m_lineFilter(dest, w, 0, src3, src4, src5, src5, src5);
                 else if (dirty)
                     memcpy(dest, src5, w);
             }
@@ -377,7 +377,7 @@ static void filter_func(struct ThisFilter *p, uint8_t *dst, int dst_offsets[3],
             if (field)
             {
                 dest += dst_stride[i];
-                p->line_filter_fast(dest, w, 0, src1, src2, src2, src3, src4);
+                p->m_lineFilterFast(dest, w, 0, src1, src2, src2, src3, src4);
                 src2 = src3;
                 src3 = src4;
                 src4 = src5;
@@ -385,13 +385,13 @@ static void filter_func(struct ThisFilter *p, uint8_t *dst, int dst_offsets[3],
             }
             else
             {
-                p->line_filter_fast(dest, w, 0, src1, src2, src2, src2, src3);
+                p->m_lineFilterFast(dest, w, 0, src1, src2, src2, src2, src3);
             }
             dest += field_stride;
 
             for (int y = start; y < end; y += 2)
             {
-                p->line_filter_fast(dest, w, 0, src1, src2, src3, src4, src5);
+                p->m_lineFilterFast(dest, w, 0, src1, src2, src3, src4, src5);
                 dest += field_stride;
                 src2 = src4;
                 src3 = src5;
@@ -400,13 +400,13 @@ static void filter_func(struct ThisFilter *p, uint8_t *dst, int dst_offsets[3],
             }
 
             if (field)
-                p->line_filter_fast(dest, w, 0, src1, src4, src5, src5, src5);
+                p->m_lineFilterFast(dest, w, 0, src1, src4, src5, src5, src5);
             else
-                p->line_filter_fast(dest, w, 0, src1, src3, src4, src5, src5);
+                p->m_lineFilterFast(dest, w, 0, src1, src3, src4, src5, src5);
         }
     }
 #if HAVE_MMX
-    if (p->mm_flags & AV_CPU_FLAG_MMX)
+    if (p->m_mmFlags & AV_CPU_FLAG_MMX)
         emms();
 #endif
 }
@@ -415,29 +415,29 @@ static void *KernelThread(void *args)
 {
     ThisFilter *filter = (ThisFilter*)args;
 
-    pthread_mutex_lock(&(filter->mutex));
-    int num = filter->actual_threads;
-    filter->actual_threads = num + 1;
-    pthread_mutex_unlock(&(filter->mutex));
+    pthread_mutex_lock(&(filter->m_mutex));
+    int num = filter->m_actualThreads;
+    filter->m_actualThreads = num + 1;
+    pthread_mutex_unlock(&(filter->m_mutex));
 
-    while (!filter->kill_threads)
+    while (!filter->m_killThreads)
     {
         usleep(1000);
-        if (filter->ready &&
-            filter->frame != NULL &&
-            filter->threads[num].ready)
+        if (filter->m_ready &&
+            filter->m_frame != NULL &&
+            filter->m_threads[num].m_ready)
         {
             filter_func(
-                filter, filter->frame->buf, filter->frame->offsets,
-                filter->frame->pitches, filter->frame->width,
-                filter->frame->height, filter->field,
-                filter->frame->top_field_first, filter->double_rate,
-                filter->dirty_frame, num, filter->actual_threads);
+                filter, filter->m_frame->buf, filter->m_frame->offsets,
+                filter->m_frame->pitches, filter->m_frame->width,
+                filter->m_frame->height, filter->m_field,
+                filter->m_frame->top_field_first, filter->m_doubleRate,
+                filter->m_dirtyFrame, num, filter->m_actualThreads);
 
-            pthread_mutex_lock(&(filter->mutex));
-            filter->ready = filter->ready - 1;
-            filter->threads[num].ready = 0;
-            pthread_mutex_unlock(&(filter->mutex));
+            pthread_mutex_lock(&(filter->m_mutex));
+            filter->m_ready = filter->m_ready - 1;
+            filter->m_threads[num].m_ready = 0;
+            pthread_mutex_unlock(&(filter->m_mutex));
         }
     }
     pthread_exit(NULL);
@@ -457,32 +457,32 @@ static int KernelDeint(VideoFilter *f, VideoFrame *frame, int field)
 
     TF_START;
 
-    filter->dirty_frame = 1;
-    if (filter->last_framenr == frame->frameNumber)
+    filter->m_dirtyFrame = 1;
+    if (filter->m_lastFrameNr == frame->frameNumber)
     {
-        filter->double_call = 1;
+        filter->m_doubleCall = 1;
     }
     else
     {
-        filter->double_rate = filter->double_call;
-        filter->double_call = 0;
-        filter->dirty_frame = 0;
-        if (filter->double_rate)
+        filter->m_doubleRate = filter->m_doubleCall;
+        filter->m_doubleCall = 0;
+        filter->m_dirtyFrame = 0;
+        if (filter->m_doubleRate)
         {
             store_ref(filter, frame->buf,  frame->offsets,
                       frame->pitches, frame->width, frame->height);
         }
     }
 
-    if (filter->actual_threads > 1 && filter->double_rate)
+    if (filter->m_actualThreads > 1 && filter->m_doubleRate)
     {
-        for (int i = 0; i < filter->actual_threads; i++)
-            filter->threads[i].ready = 1;
-        filter->frame = frame;
-        filter->field = field;
-        filter->ready = filter->actual_threads;
+        for (int i = 0; i < filter->m_actualThreads; i++)
+            filter->m_threads[i].m_ready = 1;
+        filter->m_frame = frame;
+        filter->m_field = field;
+        filter->m_ready = filter->m_actualThreads;
         int i = 0;
-        while (filter->ready > 0 && i < 1000)
+        while (filter->m_ready > 0 && i < 1000)
         {
             usleep(1000);
             i++;
@@ -493,10 +493,10 @@ static int KernelDeint(VideoFilter *f, VideoFrame *frame, int field)
         filter_func(
             filter, frame->buf, frame->offsets, frame->pitches,
             frame->width, frame->height, field, frame->top_field_first,
-            filter->double_rate, filter->dirty_frame, 0, 1);
+            filter->m_doubleRate, filter->m_dirtyFrame, 0, 1);
     }
 
-    filter->last_framenr = frame->frameNumber;
+    filter->m_lastFrameNr = frame->frameNumber;
 
     TF_END(filter, "KernelDeint: ");
 
@@ -509,19 +509,19 @@ static void CleanupKernelDeintFilter(VideoFilter *f)
 
     for (int i = 0; i < 3; i++)
     {
-        uint8_t **p= &filter->ref[i];
+        uint8_t **p= &filter->m_ref[i];
         if (*p)
             free(*p);
         *p= NULL;
     }
 
-    if (filter->threads != NULL)
+    if (filter->m_threads != NULL)
     {
-        filter->kill_threads = 1;
-        for (int i = 0; i < filter->requested_threads; i++)
-            if (filter->threads[i].exists)
-                pthread_join(filter->threads[i].id, NULL);
-        free(filter->threads);
+        filter->m_killThreads = 1;
+        for (int i = 0; i < filter->m_requestedThreads; i++)
+            if (filter->m_threads[i].m_exists)
+                pthread_join(filter->m_threads[i].m_id, NULL);
+        free(filter->m_threads);
     }
 }
 
@@ -547,25 +547,25 @@ static VideoFilter *NewKernelDeintFilter(VideoFrameType inpixfmt,
         return NULL;
     }
 
-    filter->mm_flags = 0;
-    filter->line_filter = &line_filter_c;
-    filter->line_filter_fast = &line_filter_c_fast;
+    filter->m_mmFlags = 0;
+    filter->m_lineFilter = &line_filter_c;
+    filter->m_lineFilterFast = &line_filter_c_fast;
 #if HAVE_MMX
-    filter->mm_flags = av_get_cpu_flags();
-    if (filter->mm_flags & AV_CPU_FLAG_MMX)
+    filter->m_mmFlags = av_get_cpu_flags();
+    if (filter->m_mmFlags & AV_CPU_FLAG_MMX)
     {
-        filter->line_filter = &line_filter_mmx;
-        filter->line_filter_fast = &line_filter_mmx_fast;
+        filter->m_lineFilter = &line_filter_mmx;
+        filter->m_lineFilterFast = &line_filter_mmx_fast;
     }
 #endif
 
-    filter->skipchroma   = 0;
-    filter->width        = 0;
-    filter->height       = 0;
-    filter->last_framenr = -1;
-    filter->double_call  = 0;
-    filter->double_rate  = 1;
-    memset(filter->ref, 0, sizeof(filter->ref));
+    filter->m_skipChroma   = 0;
+    filter->m_width        = 0;
+    filter->m_height       = 0;
+    filter->m_lastFrameNr  = -1;
+    filter->m_doubleCall   = 0;
+    filter->m_doubleRate   = 1;
+    memset(filter->m_ref, 0, sizeof(filter->m_ref));
     if (!AllocFilter(filter, *width, *height))
     {
         LOG(VB_GENERAL, LOG_ERR, "KernelDeint: failed to allocate buffers.");
@@ -575,46 +575,46 @@ static VideoFilter *NewKernelDeintFilter(VideoFrameType inpixfmt,
 
     TF_INIT(filter);
 
-    filter->vf.filter  = &KernelDeint;
-    filter->vf.cleanup = &CleanupKernelDeintFilter;
+    filter->m_vf.filter  = &KernelDeint;
+    filter->m_vf.cleanup = &CleanupKernelDeintFilter;
 
-    filter->frame = NULL;
-    filter->field = 0;
-    filter->ready = 0;
-    filter->kill_threads = 0;
-    filter->actual_threads  = 0;
-    filter->requested_threads  = threads;
-    filter->threads = NULL; 
+    filter->m_frame = NULL;
+    filter->m_field = 0;
+    filter->m_ready = 0;
+    filter->m_killThreads = 0;
+    filter->m_actualThreads  = 0;
+    filter->m_requestedThreads  = threads;
+    filter->m_threads = NULL;
 
-    if (filter->requested_threads > 1)
+    if (filter->m_requestedThreads > 1)
     {
-        filter->threads = (struct DeintThread *) calloc(threads,
+        filter->m_threads = (struct DeintThread *) calloc(threads,
                           sizeof(struct DeintThread));
-        if (filter->threads == NULL)
+        if (filter->m_threads == NULL)
         {
             LOG(VB_GENERAL, LOG_ERR, "KernelDeint: failed to allocate memory "
                     "for threads - falling back to existing, single thread.");
-            filter->requested_threads = 1;
+            filter->m_requestedThreads = 1;
         }
     }
 
-    if (filter->requested_threads > 1)
+    if (filter->m_requestedThreads > 1)
     {
-        pthread_mutex_init(&(filter->mutex), NULL);
+        pthread_mutex_init(&(filter->m_mutex), NULL);
         int success = 0;
-        for (int i = 0; i < filter->requested_threads; i++)
+        for (int i = 0; i < filter->m_requestedThreads; i++)
         {
-            if (pthread_create(&(filter->threads[i].id), NULL,
+            if (pthread_create(&(filter->m_threads[i].m_id), NULL,
                                KernelThread, (void*)filter) != 0)
-                filter->threads[i].exists = 0;
+                filter->m_threads[i].m_exists = 0;
             else
             {
                 success++;
-                filter->threads[i].exists = 1;
+                filter->m_threads[i].m_exists = 1;
             }
         }
 
-        if (success < filter->requested_threads)
+        if (success < filter->m_requestedThreads)
         {
             LOG(VB_GENERAL, LOG_NOTICE,
                 "KernelDeint: failed to create all threads - "
@@ -623,7 +623,7 @@ static VideoFilter *NewKernelDeintFilter(VideoFrameType inpixfmt,
         else
         {
             int timeout = 0;
-            while (filter->actual_threads != filter->requested_threads)
+            while (filter->m_actualThreads != filter->m_requestedThreads)
             {
                 timeout++;
                 if (timeout > 5000)
@@ -639,7 +639,7 @@ static VideoFilter *NewKernelDeintFilter(VideoFrameType inpixfmt,
         }
     }
 
-    if (filter->actual_threads < 1 )
+    if (filter->m_actualThreads < 1 )
         LOG(VB_PLAYBACK, LOG_INFO, "KernelDeint: Using existing thread.");
 
     return (VideoFilter *) filter;

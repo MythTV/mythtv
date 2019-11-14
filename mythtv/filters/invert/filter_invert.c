@@ -11,7 +11,7 @@
 
 typedef struct ThisFilter
 {
-    VideoFilter vf;
+    VideoFilter m_vf;
     TF_STRUCT;
 } ThisFilter;
 
@@ -59,8 +59,8 @@ static VideoFilter *new_filter(VideoFrameType inpixfmt,
         fprintf(stderr,"Couldn't allocate memory for filter\n");
         return NULL;
     }
-    filter->vf.filter = &invert;
-    filter->vf.cleanup = NULL;
+    filter->m_vf.filter = &invert;
+    filter->m_vf.cleanup = NULL;
     TF_INIT(filter)
     return (VideoFilter *) filter;
 }

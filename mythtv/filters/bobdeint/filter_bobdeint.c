@@ -17,13 +17,13 @@
 
 typedef struct BDFilter
 {
-    VideoFilter vf;
+    VideoFilter    m_vf;
 
     /* functions and variables below here considered "private" */
-    unsigned char *tmp_ptr;
-    int tmp_size;
-    unsigned char *line_state;
-    int state_size;
+    unsigned char *m_tmpPtr;
+    int            m_tmpSize;
+    unsigned char *m_lineState;
+    int            m_stateSize;
 } BDFilter;
 
 #define ODD(_n) (((_n)%2)==1)
@@ -31,8 +31,8 @@ typedef struct BDFilter
 static void doSplit(BDFilter *filter, unsigned char *buf, int lines, int width)
 {
     /* Algorithm shamelessly stolen from mplayer's vo_yuv4mpeg */
-    unsigned char *line_state = filter->line_state;
-    unsigned char *tmp = filter->tmp_ptr;
+    unsigned char *line_state = filter->m_lineState;
+    unsigned char *tmp = filter->m_tmpPtr;
     
     int modv = lines - 1;
     if (ODD(lines))
@@ -71,17 +71,17 @@ int bobDeintFilter(VideoFilter *f, VideoFrame *frame, int field)
     unsigned char *uoff = frame->buf + frame->offsets[1];
     unsigned char *voff = frame->buf + frame->offsets[2];
 
-    if (filter->tmp_size < width) 
+    if (filter->m_tmpSize < width)
     {
-        filter->tmp_ptr = (unsigned char *)realloc(
-            filter->tmp_ptr, width * sizeof(unsigned char));
-        filter->tmp_size = width;
+        filter->m_tmpPtr = (unsigned char *)realloc(
+            filter->m_tmpPtr, width * sizeof(unsigned char));
+        filter->m_tmpSize = width;
     }
-    if (filter->state_size < height) 
+    if (filter->m_stateSize < height)
     {
-        filter->line_state = (unsigned char *)realloc(
-            filter->line_state, height * sizeof(unsigned char));
-        filter->state_size = height;
+        filter->m_lineState = (unsigned char *)realloc(
+            filter->m_lineState, height * sizeof(unsigned char));
+        filter->m_stateSize = height;
     }
 
     doSplit(filter, yoff, ymax, stride);
@@ -97,10 +97,10 @@ int bobDeintFilter(VideoFilter *f, VideoFrame *frame, int field)
 void bobDtor(VideoFilter *f)
 {
     BDFilter *filter = (BDFilter *)(f);
-    if (filter->line_state)
-        free(filter->line_state);
-    if (filter->tmp_ptr)
-        free(filter->tmp_ptr);
+    if (filter->m_lineState)
+        free(filter->m_lineState);
+    if (filter->m_tmpPtr)
+        free(filter->m_tmpPtr);
 }
 
 static VideoFilter *new_filter(VideoFrameType inpixfmt,
@@ -123,12 +123,12 @@ static VideoFilter *new_filter(VideoFrameType inpixfmt,
         return NULL;
     }
 
-    filter->vf.filter = &bobDeintFilter;
-    filter->tmp_size = 0;
-    filter->tmp_ptr = NULL;
-    filter->state_size = 0;
-    filter->line_state = NULL;
-    filter->vf.cleanup = &bobDtor;
+    filter->m_vf.filter = &bobDeintFilter;
+    filter->m_tmpSize = 0;
+    filter->m_tmpPtr = NULL;
+    filter->m_stateSize = 0;
+    filter->m_lineState = NULL;
+    filter->m_vf.cleanup = &bobDtor;
     return (VideoFilter *)filter;
 }
 

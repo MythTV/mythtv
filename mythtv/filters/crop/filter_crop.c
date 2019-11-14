@@ -30,9 +30,9 @@
 
 typedef struct ThisFilter
 {
-        VideoFilter vf;
+        VideoFilter m_vf;
 
-        int yp1, yp2, xp1, xp2;
+        int m_yp1, m_yp2, m_xp1, m_xp2;
 
         TF_STRUCT;
 
@@ -57,14 +57,14 @@ static int crop(VideoFilter *f, VideoFrame *frame, int field)
 
     // Luma top
     int sz = (frame->pitches[0] * frame->height) >> 3; // div 8 bytes
-    for (int y = 0; (y < tf->yp1 * frame->pitches[0] << 1) && (y < sz); y += 2)
+    for (int y = 0; (y < tf->m_yp1 * frame->pitches[0] << 1) && (y < sz); y += 2)
     {
         ybuf[y + 0] = Y_black;
         ybuf[y + 1] = Y_black;
     }
 
     // Luma bottom
-    for (int y = ((frame->height >> 4) - tf->yp2) * frame->pitches[0] << 1;
+    for (int y = ((frame->height >> 4) - tf->m_yp2) * frame->pitches[0] << 1;
          y < sz; y += 2)
     {
         ybuf[y + 0] = Y_black;
@@ -73,14 +73,14 @@ static int crop(VideoFilter *f, VideoFrame *frame, int field)
 
     // Chroma top
     sz = (frame->pitches[1] * (frame->height >> 1)) >> 3; // div 8 bytes
-    for (int y = 0; (y < tf->yp1 * frame->pitches[1]) && (y < sz); y++)
+    for (int y = 0; (y < tf->m_yp1 * frame->pitches[1]) && (y < sz); y++)
     {
         ubuf[y] = UV_black;
         vbuf[y] = UV_black;
     }
 
     // Chroma bottom
-    for (int y = ((frame->height >> 4) - tf->yp2) * frame->pitches[1]; y < sz; y++)
+    for (int y = ((frame->height >> 4) - tf->m_yp2) * frame->pitches[1]; y < sz; y++)
     {
         ubuf[y] = UV_black;
         vbuf[y] = UV_black;
@@ -90,16 +90,16 @@ static int crop(VideoFilter *f, VideoFrame *frame, int field)
     sz = (frame->pitches[0] * frame->height) >> 3; // div 8 bytes
     int t1 = frame->pitches[0] << 1;
     int t2 = frame->pitches[0] >> 3;
-    for (int y = tf->yp1 * t1;
-         (y < ((frame->height >> 4) - tf->yp2) * t1) && (y < sz); y += t2)
+    for (int y = tf->m_yp1 * t1;
+         (y < ((frame->height >> 4) - tf->m_yp2) * t1) && (y < sz); y += t2)
     {
-        for (int x = 0; (x < (tf->xp1 << 1)) && (x < t1); x += 2)
+        for (int x = 0; (x < (tf->m_xp1 << 1)) && (x < t1); x += 2)
         {
             ybuf[y + x + 0] = Y_black;
             ybuf[y + x + 1] = Y_black;
         }
 
-        for (int x = t2 - (tf->xp2 << 1); (x < t2) && (x < t1); x += 2)
+        for (int x = t2 - (tf->m_xp2 << 1); (x < t2) && (x < t1); x += 2)
         {
             ybuf[y + x + 0] = Y_black;
             ybuf[y + x + 1] = Y_black;
@@ -108,17 +108,17 @@ static int crop(VideoFilter *f, VideoFrame *frame, int field)
 
     // Chroma left and right
     sz = (frame->pitches[1] * (frame->height >> 1)) >> 3; // div 8 bytes
-    t1 = (frame->pitches[1] * ((frame->height >> 4) - tf->yp2) << 2) >> 2;
+    t1 = (frame->pitches[1] * ((frame->height >> 4) - tf->m_yp2) << 2) >> 2;
     t2 = frame->pitches[1] >> 3;
-    for (int y = (frame->pitches[1] * tf->yp1) >> 1; (y < t1) && (y < sz); y += t2)
+    for (int y = (frame->pitches[1] * tf->m_yp1) >> 1; (y < t1) && (y < sz); y += t2)
     {
-        for (int x = 0; x < tf->xp1; x++)
+        for (int x = 0; x < tf->m_xp1; x++)
         {
             ubuf[y + x] = UV_black;
             vbuf[y + x] = UV_black;
         }
 
-        for (int x = t2 - tf->xp2; x < t2; x++)
+        for (int x = t2 - tf->m_xp2; x < t2; x++)
         {
             ubuf[y + x] = UV_black;
             vbuf[y + x] = UV_black;
@@ -155,7 +155,7 @@ static int cropMMX(VideoFilter *f, VideoFrame *frame, int field)
   
     // Luma top
     int sz = (frame->pitches[0] * frame->height) >> 3; // div 8 bytes
-    for (int y = 0; (y < tf->yp1 * frame->pitches[0] << 1) && (y < sz); y += 2)
+    for (int y = 0; (y < tf->m_yp1 * frame->pitches[0] << 1) && (y < sz); y += 2)
     {
         __asm__ volatile("movq %%mm0, (%0)     \n\t"
                      "movq %%mm0, 8(%0)    \n\t"
@@ -163,7 +163,7 @@ static int cropMMX(VideoFilter *f, VideoFrame *frame, int field)
     }
 
     // Luma bottom
-    for (int y = ((frame->height >> 4) - tf->yp2) * frame->pitches[0] << 1;
+    for (int y = ((frame->height >> 4) - tf->m_yp2) * frame->pitches[0] << 1;
          y < sz; y += 2)
     {
         __asm__ volatile("movq %%mm0, (%0)     \n\t"
@@ -173,7 +173,7 @@ static int cropMMX(VideoFilter *f, VideoFrame *frame, int field)
 
     // Chroma top
     sz = (frame->pitches[1] * (frame->height >> 1)) >> 3; // div 8 bytes
-    for (int y = 0; (y < tf->yp1 * frame->pitches[1]) && (y < sz); y++)
+    for (int y = 0; (y < tf->m_yp1 * frame->pitches[1]) && (y < sz); y++)
     {
         __asm__ volatile("movq %%mm1, (%0)    \n\t"
                      "movq %%mm1, (%1)    \n\t"
@@ -181,7 +181,7 @@ static int cropMMX(VideoFilter *f, VideoFrame *frame, int field)
     }
 
     // Chroma bottom
-    for (int y = ((frame->height >> 4) - tf->yp2) * frame->pitches[1]; y < sz; y++)
+    for (int y = ((frame->height >> 4) - tf->m_yp2) * frame->pitches[1]; y < sz; y++)
     {
         __asm__ volatile("movq %%mm1, (%0)    \n\t"
                      "movq %%mm1, (%1)    \n\t"
@@ -192,17 +192,17 @@ static int cropMMX(VideoFilter *f, VideoFrame *frame, int field)
     sz = (frame->pitches[0] * frame->height) >> 3; // div 8 bytes
     int t1 = frame->pitches[0] << 1;
     int t2 = frame->pitches[0] >> 3;
-    for (int y = tf->yp1 * t1;
-         (y < ((frame->height >> 4) - tf->yp2) * t1) && (y < sz); y += t2)
+    for (int y = tf->m_yp1 * t1;
+         (y < ((frame->height >> 4) - tf->m_yp2) * t1) && (y < sz); y += t2)
     {
-        for (int x = 0; (x < (tf->xp1 << 1)) && (x < t1); x += 2)
+        for (int x = 0; (x < (tf->m_xp1 << 1)) && (x < t1); x += 2)
         {
             __asm__ volatile("movq %%mm0, (%0)     \n\t"
                          "movq %%mm0, 8(%0)    \n\t"
                          : : "r" (ybuf + y + x));
         }
 
-        for (int x = t2 - (tf->xp2 << 1); (x < t2) && (x < t1); x += 2)
+        for (int x = t2 - (tf->m_xp2 << 1); (x < t2) && (x < t1); x += 2)
         {
             __asm__ volatile("movq %%mm0, (%0)     \n\t"
                          "movq %%mm0, 8(%0)    \n\t"
@@ -212,18 +212,18 @@ static int cropMMX(VideoFilter *f, VideoFrame *frame, int field)
 
     // Chroma left and right
     sz = (frame->pitches[1] * (frame->height >> 1)) >> 3; // div 8 bytes
-    t1 = (frame->pitches[1] * ((frame->height >> 4) - tf->yp2) << 2) >> 2;
+    t1 = (frame->pitches[1] * ((frame->height >> 4) - tf->m_yp2) << 2) >> 2;
     t2 = frame->pitches[1] >> 3;
-    for (int y = (frame->pitches[1] * tf->yp1) >> 1; (y < t1) && (y < sz); y += t2)
+    for (int y = (frame->pitches[1] * tf->m_yp1) >> 1; (y < t1) && (y < sz); y += t2)
     {
-        for (int x = 0; x < tf->xp1; x++)
+        for (int x = 0; x < tf->m_xp1; x++)
         {
             __asm__ volatile("movq %%mm1, (%0)    \n\t"
                          "movq %%mm1, (%1)    \n\t"
                          : : "r" (ubuf + y + x), "r" (vbuf + y + x));
         }
 
-        for (int x = t2 - tf->xp2; x < t2; x++)
+        for (int x = t2 - tf->m_xp2; x < t2; x++)
         {
             __asm__ volatile("movq %%mm1, (%0)    \n\t"
                          "movq %%mm1, (%1)    \n\t"
@@ -262,7 +262,7 @@ static VideoFilter *new_filter(VideoFrameType inpixfmt,
         return NULL;
     }
 
-    filter->yp1 = filter->yp2 = filter->xp1 = filter->xp2 = 1;
+    filter->m_yp1 = filter->m_yp2 = filter->m_xp1 = filter->m_xp2 = 1;
 
     if (options)
     {
@@ -270,19 +270,19 @@ static VideoFilter *new_filter(VideoFrameType inpixfmt,
         if (sscanf(options, "%20u:%20u:%20u:%20u",
                    &param1, &param2, &param3, &param4) == 4)
         {
-            filter->yp1 = param1;
-            filter->yp2 = param3;
-            filter->xp1 = param2;
-            filter->xp2 = param4;
+            filter->m_yp1 = param1;
+            filter->m_yp2 = param3;
+            filter->m_xp1 = param2;
+            filter->m_xp2 = param4;
         }
     }
 
-    filter->vf.cleanup = NULL;
-    filter->vf.filter  = &crop;
+    filter->m_vf.cleanup = NULL;
+    filter->m_vf.filter  = &crop;
 
 #ifdef MMX
     if (av_get_cpu_flags() & AV_CPU_FLAG_MMX)
-        filter->vf.filter = &cropMMX;
+        filter->m_vf.filter = &cropMMX;
 #endif
 
     TF_INIT(filter);

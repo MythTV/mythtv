@@ -16,10 +16,10 @@
 
 typedef struct OFFilter
 {
-    VideoFilter vf;
+    VideoFilter m_vf;
 
     /* functions and variables below here considered "private" */
-    int bottom;
+    int m_bottom;
 } OFFilter;
 
 int oneFieldFilter(VideoFilter *f, VideoFrame *frame, int field)
@@ -27,7 +27,7 @@ int oneFieldFilter(VideoFilter *f, VideoFrame *frame, int field)
     (void)field;
     OFFilter *filter = (OFFilter *)(f);
     int height = frame->height;
-    int bottom = filter->bottom;
+    int bottom = filter->m_bottom;
     int stride = frame->pitches[0];
     int ymax = height - 2;
     unsigned char *yoff = frame->buf + frame->offsets[0];
@@ -76,12 +76,12 @@ static VideoFilter *new_filter(VideoFrameType inpixfmt,
         return NULL;
     }
 
-    filter->vf.filter = &oneFieldFilter;
-    filter->bottom = 0;
+    filter->m_vf.filter = &oneFieldFilter;
+    filter->m_bottom = 0;
     if (options != NULL && strstr(options, "bottom") != NULL)
-        filter->bottom = 1;
+        filter->m_bottom = 1;
 
-    filter->vf.cleanup = NULL;
+    filter->m_vf.cleanup = NULL;
     return (VideoFilter *)filter;
 }
 

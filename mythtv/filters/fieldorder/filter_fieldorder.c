@@ -24,16 +24,16 @@
 
 typedef struct ThisFilter
 {
-    VideoFilter vf;
+    VideoFilter  m_vf;
 
-    long long last_framenr;
+    long long    m_lastFrameNr;
 
-    uint8_t *ref[NREFS + 1][NCHANS];
-    int stride[NCHANS];
-    int8_t got_frames[NREFS + 1];
+    uint8_t     *m_ref[NREFS + 1][NCHANS];
+    int          m_stride[NCHANS];
+    int8_t       m_gotFrames[NREFS + 1];
 
-    int width;
-    int height;
+    int          m_width;
+    int          m_height;
 
     TF_STRUCT;
 } ThisFilter;
@@ -41,11 +41,11 @@ typedef struct ThisFilter
 
 static void AllocFilter(ThisFilter* filter, int width, int height)
 {
-    if ((width != filter->width) || height != filter->height)
+    if ((width != filter->m_width) || height != filter->m_height)
     {
         for (int i = 0; i < NCHANS * NREFS; i++)
         {
-            uint8_t **p = &filter->ref[i / NCHANS][i % NCHANS];
+            uint8_t **p = &filter->m_ref[i / NCHANS][i % NCHANS];
             if (*p) free(*p);
             *p = NULL;
         }
@@ -55,16 +55,16 @@ static void AllocFilter(ThisFilter* filter, int width, int height)
             int w = ((width   + 31) & (~31)) >> is_chroma;
             int h = ((height  + 31) & (~31)) >> is_chroma;
 
-            filter->stride[i] = w;
+            filter->m_stride[i] = w;
             for (int j = 0; j < NREFS; j++) 
             {
-                filter->ref[j][i] =
+                filter->m_ref[j][i] =
                     (uint8_t*)calloc(w * h * sizeof(uint8_t), 1);
             }
         }
-        filter->width  = width;
-        filter->height = height;
-        memset(filter->got_frames, 0, sizeof(filter->got_frames));
+        filter->m_width  = width;
+        filter->m_height = height;
+        memset(filter->m_gotFrames, 0, sizeof(filter->m_gotFrames));
     }
 }
 
@@ -99,19 +99,19 @@ static inline void * memcpy_pic(void * dst, const void * src,
 static void store_ref(struct ThisFilter *p, uint8_t *src, int src_offsets[3],
                       int src_stride[3], int width, int height)
 {
-    memcpy (p->ref[NREFS], p->ref[0], sizeof(uint8_t *) * NCHANS);
-    memmove(p->ref[0], p->ref[1], sizeof(uint8_t *) * NREFS * NCHANS);
-    memcpy (&p->got_frames[NREFS], &p->got_frames[0], sizeof(uint8_t));
-    memmove(&p->got_frames[0], &p->got_frames[1], sizeof(uint8_t) * NREFS);
+    memcpy (p->m_ref[NREFS], p->m_ref[0], sizeof(uint8_t *) * NCHANS);
+    memmove(p->m_ref[0], p->m_ref[1], sizeof(uint8_t *) * NREFS * NCHANS);
+    memcpy (&p->m_gotFrames[NREFS], &p->m_gotFrames[0], sizeof(uint8_t));
+    memmove(&p->m_gotFrames[0], &p->m_gotFrames[1], sizeof(uint8_t) * NREFS);
 
     for (int i = 0; i < NCHANS; i++)
     {
         int is_chroma = !!i;
-        memcpy_pic(p->ref[NREFS-1][i], src + src_offsets[i],
+        memcpy_pic(p->m_ref[NREFS-1][i], src + src_offsets[i],
                    width >> is_chroma, height >> is_chroma,
-                   p->stride[i], src_stride[i]);
+                   p->m_stride[i], src_stride[i]);
     }
-    p->got_frames[NREFS - 1] = 1;
+    p->m_gotFrames[NREFS - 1] = 1;
 }
 
 static void filter_func(struct ThisFilter *p, uint8_t *dst,
@@ -119,24 +119,24 @@ static void filter_func(struct ThisFilter *p, uint8_t *dst,
                         int height, int parity, int tff, int dirty)
 {
     uint8_t nr_c = NREFS - 1;
-    uint8_t nr_p = p->got_frames[NREFS - 2] ? (NREFS - 2) : nr_c;
+    uint8_t nr_p = p->m_gotFrames[NREFS - 2] ? (NREFS - 2) : nr_c;
 
     for (int i = 0; i < NCHANS; i++)
     {
         int is_chroma = !!i;
         int w    = width  >> is_chroma;
         int h    = height >> is_chroma;
-        int refs = p->stride[i];
+        int refs = p->m_stride[i];
 
         for (int y = 0; y < h; y++)
         {
             int do_copy = dirty;
             uint8_t *dst2 = dst + dst_offsets[i] + y * dst_stride[i];
-            uint8_t *src  = &p->ref[nr_c][i][y * refs];
+            uint8_t *src  = &p->m_ref[nr_c][i][y * refs];
             int     field = parity ^ tff;
             if (((y ^ (1 - field)) & 1) && !parity)
             {
-                src = &p->ref[nr_p][i][y * refs];
+                src = &p->m_ref[nr_p][i][y * refs];
                 do_copy = 1;
             }
             if (do_copy)
@@ -152,11 +152,11 @@ static int FieldorderDeint (VideoFilter * f, VideoFrame * frame, int field)
     AllocFilter(filter, frame->width, frame->height);
 
     int dirty = 1;
-    if (filter->last_framenr != frame->frameNumber)
+    if (filter->m_lastFrameNr != frame->frameNumber)
     {
-        if (filter->last_framenr != (frame->frameNumber - 1))
+        if (filter->m_lastFrameNr != (frame->frameNumber - 1))
         {
-            memset(filter->got_frames, 0, sizeof(filter->got_frames));
+            memset(filter->m_gotFrames, 0, sizeof(filter->m_gotFrames));
         }
         store_ref(filter, frame->buf,  frame->offsets,
                   frame->pitches, frame->width, frame->height);
@@ -168,7 +168,7 @@ static int FieldorderDeint (VideoFilter * f, VideoFrame * frame, int field)
         frame->width, frame->height, field, frame->top_field_first,
         dirty);
 
-    filter->last_framenr = frame->frameNumber;
+    filter->m_lastFrameNr = frame->frameNumber;
 
     return 0;
 }
@@ -179,7 +179,7 @@ static void CleanupFieldorderDeintFilter(VideoFilter * filter)
     ThisFilter* f = (ThisFilter*)filter;
     for (int i = 0; i < NCHANS * NREFS; i++)
     {
-        uint8_t **p= &f->ref[i / NCHANS][i % NCHANS];
+        uint8_t **p= &f->m_ref[i / NCHANS][i % NCHANS];
         if (*p) free(*p);
         *p= NULL;
     }
@@ -202,14 +202,14 @@ static VideoFilter *FieldorderDeintFilter(VideoFrameType inpixfmt,
         return NULL;
     }
 
-    filter->width = 0;
-    filter->height = 0;
-    memset(filter->ref, 0, sizeof(filter->ref));
+    filter->m_width = 0;
+    filter->m_height = 0;
+    memset(filter->m_ref, 0, sizeof(filter->m_ref));
 
     AllocFilter(filter, *width, *height);
 
-    filter->vf.filter = &FieldorderDeint;
-    filter->vf.cleanup = &CleanupFieldorderDeintFilter;
+    filter->m_vf.filter = &FieldorderDeint;
+    filter->m_vf.cleanup = &CleanupFieldorderDeintFilter;
     return (VideoFilter *) filter;
 }
 

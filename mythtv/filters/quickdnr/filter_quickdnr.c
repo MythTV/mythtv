@@ -45,20 +45,20 @@
 
 typedef struct ThisFilter
 {
-        VideoFilter vf;
+        VideoFilter m_vf;
 
-        uint64_t Luma_threshold_mask1;
-        uint64_t Luma_threshold_mask2;
-        uint64_t Chroma_threshold_mask1;
-        uint64_t Chroma_threshold_mask2;
-        uint8_t  Luma_threshold1;
-        uint8_t  Luma_threshold2;
-        uint8_t  Chroma_threshold1;
-        uint8_t  Chroma_threshold2;
-        uint8_t *average;
-        int      average_size;
-        int      offsets[3];
-        int      pitches[3];
+        uint64_t m_lumaThresholdMask1;
+        uint64_t m_lumaThresholdMask2;
+        uint64_t m_chromaThresholdMask1;
+        uint64_t m_chromaThresholdMask2;
+        uint8_t  m_lumaThreshold1;
+        uint8_t  m_lumaThreshold2;
+        uint8_t  m_chromaThreshold1;
+        uint8_t  m_chromaThreshold2;
+        uint8_t *m_average;
+        int      m_averageSize;
+        int      m_offsets[3];
+        int      m_pitches[3];
 
         TF_STRUCT;
 
@@ -66,18 +66,18 @@ typedef struct ThisFilter
 
 static int alloc_avg(ThisFilter *filter, int size)
 {
-    if (filter->average_size >= size)
+    if (filter->m_averageSize >= size)
         return 1;
 
-    uint8_t *tmp = realloc(filter->average, size);
+    uint8_t *tmp = realloc(filter->m_average, size);
     if (!tmp)
     {
         fprintf(stderr, "Couldn't allocate memory for DNR buffer\n");
         return 0;
     }
 
-    filter->average = tmp;
-    filter->average_size = size;
+    filter->m_average = tmp;
+    filter->m_averageSize = size;
 
     return 1;
 }
@@ -87,16 +87,16 @@ static int init_avg(ThisFilter *filter, VideoFrame *frame)
     if (!alloc_avg(filter, frame->size))
         return 0;
 
-    if ((filter->offsets[0] != frame->offsets[0]) ||
-        (filter->offsets[1] != frame->offsets[1]) ||
-        (filter->offsets[2] != frame->offsets[2]) ||
-        (filter->pitches[0] != frame->pitches[0]) ||
-        (filter->pitches[1] != frame->pitches[1]) ||
-        (filter->pitches[2] != frame->pitches[2]))
+    if ((filter->m_offsets[0] != frame->offsets[0]) ||
+        (filter->m_offsets[1] != frame->offsets[1]) ||
+        (filter->m_offsets[2] != frame->offsets[2]) ||
+        (filter->m_pitches[0] != frame->pitches[0]) ||
+        (filter->m_pitches[1] != frame->pitches[1]) ||
+        (filter->m_pitches[2] != frame->pitches[2]))
     {
-        memcpy(filter->average, frame->buf, frame->size);
-        memcpy(filter->offsets, frame->offsets, sizeof(int) * 3);
-        memcpy(filter->pitches, frame->pitches, sizeof(int) * 3);
+        memcpy(filter->m_average, frame->buf, frame->size);
+        memcpy(filter->m_offsets, frame->offsets, sizeof(int) * 3);
+        memcpy(filter->m_pitches, frame->pitches, sizeof(int) * 3);
     }
 
     return 1;
@@ -106,21 +106,21 @@ static void init_vars(ThisFilter *tf, VideoFrame *frame,
                       int *thr1, int *thr2, int *height,
                       uint8_t **avg, uint8_t **buf)
 {
-    thr1[0] = tf->Luma_threshold1;
-    thr1[1] = tf->Chroma_threshold1;
-    thr1[2] = tf->Chroma_threshold1;
+    thr1[0] = tf->m_lumaThreshold1;
+    thr1[1] = tf->m_chromaThreshold1;
+    thr1[2] = tf->m_chromaThreshold1;
 
-    thr2[0] = tf->Luma_threshold2;
-    thr2[1] = tf->Chroma_threshold2;
-    thr2[2] = tf->Chroma_threshold2;
+    thr2[0] = tf->m_lumaThreshold2;
+    thr2[1] = tf->m_chromaThreshold2;
+    thr2[2] = tf->m_chromaThreshold2;
 
     height[0] = frame->height;
     height[1] = frame->height >> 1;
     height[2] = frame->height >> 1;
 
-    avg[0] = tf->average + frame->offsets[0];
-    avg[1] = tf->average + frame->offsets[1];
-    avg[2] = tf->average + frame->offsets[2];
+    avg[0] = tf->m_average + frame->offsets[0];
+    avg[1] = tf->m_average + frame->offsets[1];
+    avg[2] = tf->m_average + frame->offsets[2];
 
     buf[0] = frame->buf + frame->offsets[0];
     buf[1] = frame->buf + frame->offsets[1];
@@ -240,9 +240,9 @@ static int quickdnrMMX(VideoFilter *f, VideoFrame *frame, int field)
         int sz = (height[i] * frame->pitches[i]) >> 3;
 
         if (0 == i)
-            __asm__ volatile("movq (%0), %%mm5" : : "r" (&tf->Luma_threshold_mask1));
+            __asm__ volatile("movq (%0), %%mm5" : : "r" (&tf->m_lumaThresholdMask1));
         else
-            __asm__ volatile("movq (%0), %%mm5" : : "r" (&tf->Chroma_threshold_mask1));
+            __asm__ volatile("movq (%0), %%mm5" : : "r" (&tf->m_chromaThresholdMask1));
 
         for (int y = 0; y < sz; y++)
         {
@@ -332,14 +332,14 @@ static int quickdnr2MMX(VideoFilter *f, VideoFrame *frame, int field)
         int sz = (height[i] * frame->pitches[i]) >> 3;
 
         if (0 == i)
-            __asm__ volatile("movq (%0), %%mm5" : : "r" (&tf->Luma_threshold_mask1));
+            __asm__ volatile("movq (%0), %%mm5" : : "r" (&tf->m_lumaThresholdMask1));
         else
-            __asm__ volatile("movq (%0), %%mm5" : : "r" (&tf->Chroma_threshold_mask1));
+            __asm__ volatile("movq (%0), %%mm5" : : "r" (&tf->m_chromaThresholdMask1));
 
         for (int y = 0; y < sz; y++)
         {
             uint64_t *mask2 = (0 == i) ?
-                &tf->Luma_threshold_mask2 : &tf->Chroma_threshold_mask2;
+                &tf->m_lumaThresholdMask2 : &tf->m_chromaThresholdMask2;
 
             __asm__ volatile(
                 "movq (%0), %%mm0     \n\t" // avg[i]
@@ -438,8 +438,8 @@ static void cleanup(VideoFilter *vf)
 {
     ThisFilter *tf = (ThisFilter*) vf;
 
-    if (tf->average)
-        free(tf->average);
+    if (tf->m_average)
+        free(tf->m_average);
 }
 
 static VideoFilter *new_filter(VideoFrameType inpixfmt,
@@ -469,12 +469,12 @@ static VideoFilter *new_filter(VideoFrameType inpixfmt,
     }
 
     memset(filter, 0, sizeof(ThisFilter));
-    filter->vf.cleanup        = &cleanup;
-    filter->Luma_threshold1   = LUMA_THRESHOLD1_DEFAULT;
-    filter->Chroma_threshold1 = CHROMA_THRESHOLD1_DEFAULT;
-    filter->Luma_threshold2   = LUMA_THRESHOLD2_DEFAULT;
-    filter->Chroma_threshold2 = CHROMA_THRESHOLD2_DEFAULT;
-    double_threshold          = 1;
+    filter->m_vf.cleanup       = &cleanup;
+    filter->m_lumaThreshold1   = LUMA_THRESHOLD1_DEFAULT;
+    filter->m_chromaThreshold1 = CHROMA_THRESHOLD1_DEFAULT;
+    filter->m_lumaThreshold2   = LUMA_THRESHOLD2_DEFAULT;
+    filter->m_chromaThreshold2 = CHROMA_THRESHOLD2_DEFAULT;
+    double_threshold           = 1;
 
     if (options)
     {
@@ -484,25 +484,25 @@ static VideoFilter *new_filter(VideoFrameType inpixfmt,
         {
             case 1:
                 //These might be better as logarithmic if this gets used a lot.
-                filter->Luma_threshold1   = ((uint8_t) Param1) * 40 / 255;
-                filter->Luma_threshold2   = ((uint8_t) Param1) * 4/255 > 2 ?
+                filter->m_lumaThreshold1   = ((uint8_t) Param1) * 40 / 255;
+                filter->m_lumaThreshold2   = ((uint8_t) Param1) * 4/255 > 2 ?
                     2 : ((uint8_t) Param1) * 4/255;
-                filter->Chroma_threshold1 = ((uint8_t) Param1) * 80 / 255;
-                filter->Chroma_threshold2 = ((uint8_t) Param1) * 8/255 > 4 ?
+                filter->m_chromaThreshold1 = ((uint8_t) Param1) * 80 / 255;
+                filter->m_chromaThreshold2 = ((uint8_t) Param1) * 8/255 > 4 ?
                     4 : ((uint8_t) Param1) * 8/255;
                 break;
 
             case 2:
-                filter->Luma_threshold1   = (uint8_t) Param1;
-                filter->Chroma_threshold1 = (uint8_t) Param2;
+                filter->m_lumaThreshold1   = (uint8_t) Param1;
+                filter->m_chromaThreshold1 = (uint8_t) Param2;
                 double_threshold = 0;
                 break;
 
             case 4:
-                filter->Luma_threshold1   = (uint8_t) Param1;
-                filter->Luma_threshold2   = (uint8_t) Param2;
-                filter->Chroma_threshold1 = (uint8_t) Param3;
-                filter->Chroma_threshold2 = (uint8_t) Param4;
+                filter->m_lumaThreshold1   = (uint8_t) Param1;
+                filter->m_lumaThreshold2   = (uint8_t) Param2;
+                filter->m_chromaThreshold1 = (uint8_t) Param3;
+                filter->m_chromaThreshold2 = (uint8_t) Param4;
                 break;
 
             default:
@@ -510,38 +510,38 @@ static VideoFilter *new_filter(VideoFrameType inpixfmt,
         }
     }
 
-    filter->vf.filter  = (double_threshold) ? &quickdnr2 : &quickdnr;
+    filter->m_vf.filter  = (double_threshold) ? &quickdnr2 : &quickdnr;
 
 #ifdef MMX
     if (av_get_cpu_flags() > AV_CPU_FLAG_MMX2)
     {
-        filter->vf.filter = (double_threshold) ? &quickdnr2MMX : &quickdnrMMX;
+        filter->m_vf.filter = (double_threshold) ? &quickdnr2MMX : &quickdnrMMX;
         for (int i = 0; i < 8; i++)
         {
             // 8 sign-shifted bytes!
-            filter->Luma_threshold_mask1 =
-                (filter->Luma_threshold_mask1 << 8) +
-                ((filter->Luma_threshold1 > 0x80) ?
-                 (filter->Luma_threshold1 - 0x80) :
-                 (filter->Luma_threshold1 + 0x80));
+            filter->m_lumaThresholdMask1 =
+                (filter->m_lumaThresholdMask1 << 8) +
+                ((filter->m_lumaThreshold1 > 0x80) ?
+                 (filter->m_lumaThreshold1 - 0x80) :
+                 (filter->m_lumaThreshold1 + 0x80));
 
-            filter->Chroma_threshold_mask1 =
-                (filter->Chroma_threshold_mask1 << 8) +
-                ((filter->Chroma_threshold1 > 0x80) ?
-                 (filter->Chroma_threshold1 - 0x80) :
-                 (filter->Chroma_threshold1 + 0x80));
+            filter->m_chromaThresholdMask1 =
+                (filter->m_chromaThresholdMask1 << 8) +
+                ((filter->m_chromaThreshold1 > 0x80) ?
+                 (filter->m_chromaThreshold1 - 0x80) :
+                 (filter->m_chromaThreshold1 + 0x80));
 
-            filter->Luma_threshold_mask2 =
-                (filter->Luma_threshold_mask2 << 8) +
-                ((filter->Luma_threshold2 > 0x80) ?
-                 (filter->Luma_threshold2 - 0x80) :
-                 (filter->Luma_threshold2 + 0x80));
+            filter->m_lumaThresholdMask2 =
+                (filter->m_lumaThresholdMask2 << 8) +
+                ((filter->m_lumaThreshold2 > 0x80) ?
+                 (filter->m_lumaThreshold2 - 0x80) :
+                 (filter->m_lumaThreshold2 + 0x80));
 
-            filter->Chroma_threshold_mask2 =
-                (filter->Chroma_threshold_mask2 << 8) +
-                ((filter->Chroma_threshold2 > 0x80) ?
-                 (filter->Chroma_threshold2 - 0x80) :
-                 (filter->Chroma_threshold2 + 0x80));
+            filter->m_chromaThresholdMask2 =
+                (filter->m_chromaThresholdMask2 << 8) +
+                ((filter->m_chromaThreshold2 > 0x80) ?
+                 (filter->m_chromaThreshold2 - 0x80) :
+                 (filter->m_chromaThreshold2 + 0x80));
         }
     }
 #endif
@@ -552,21 +552,21 @@ static VideoFilter *new_filter(VideoFrameType inpixfmt,
     fprintf(stderr, "DNR Loaded: 0x%X Params: %u %u \n"
             "Luma1:   %3d 0x%X%X  Luma2:   0x%X%X\n"
             "Chroma1: %3d %X%X    Chroma2: 0x%X%X\n",
-            av_get_cpu_flags(), Param1, Param2, filter->Luma_threshold1,
-            ((int*)&filter->Luma_threshold_mask1)[1],
-            ((int*)&filter->Luma_threshold_mask1)[0],
-            ((int*)&filter->Luma_threshold_mask2)[1],
-            ((int*)&filter->Luma_threshold_mask2)[0],
-            filter->Chroma_threshold1,
-            ((int*)&filter->Chroma_threshold_mask1)[1],
-            ((int*)&filter->Chroma_threshold_mask1)[0],
-            ((int*)&filter->Chroma_threshold_mask2)[1],
-            ((int*)&filter->Chroma_threshold_mask2)[0]
+            av_get_cpu_flags(), Param1, Param2, filter->m_Luma_threshold1,
+            ((int*)&filter->m_lumaThresholdMask1)[1],
+            ((int*)&filter->m_lumaThresholdMask1)[0],
+            ((int*)&filter->m_lumaThresholdMask2)[1],
+            ((int*)&filter->m_lumaThresholdMask2)[0],
+            filter->m_Chroma_threshold1,
+            ((int*)&filter->m_Chroma_threshold_mask1)[1],
+            ((int*)&filter->m_Chroma_threshold_mask1)[0],
+            ((int*)&filter->m_Chroma_threshold_mask2)[1],
+            ((int*)&filter->m_Chroma_threshold_mask2)[0]
         );
 
     fprintf(stderr, "Options:%d:%d:%d:%d\n",
-            filter->Luma_threshold1, filter->Luma_threshold2,
-            filter->Chroma_threshold1, filter->Chroma_threshold2);
+            filter->m_Luma_threshold1, filter->m_Luma_threshold2,
+            filter->m_Chroma_threshold1, filter->m_chromaThreshold2);
 #endif
 
     return (VideoFilter*) filter;
