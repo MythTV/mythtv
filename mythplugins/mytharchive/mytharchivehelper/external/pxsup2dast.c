@@ -89,15 +89,15 @@ int sup2dast(const char *supfile, const char *ifofile, int delay_ms);
 
 struct exc__state 
 {
-    struct exc__state * prev;
-    jmp_buf env; 
+    struct exc__state *m_prev;
+    jmp_buf            m_env;
 };
 
 struct 
 {
-    struct exc__state * last;
-    char msgbuf[1024];
-    int  buflen;
+    struct exc__state *m_last;
+    char               m_msgbuf[1024];
+    int                m_buflen;
 } EXC /* = { 0 }*/ ;
 
 // These macros now all take a parameter 'x' to specify a recursion
@@ -105,28 +105,28 @@ struct
 // level of recursion, preventing the compiler from complaining about
 // shadowed variables.
 #define exc_try(x) do { struct exc__state exc_s##x; int exc_type##x GCCATTR_UNUSED; \
-    exc_s##x.prev = EXC.last; EXC.last = &exc_s##x; if ((exc_type##x = setjmp(exc_s##x.env)) == 0)
+    exc_s##x.m_prev = EXC.m_last; EXC.m_last = &exc_s##x; if ((exc_type##x = setjmp(exc_s##x.m_env)) == 0)
 
-#define exc_ftry(x) do { struct exc__state exc_s##x, *exc_p##x = EXC.last;    \
-    int exc_type##x GCCATTR_UNUSED; exc_s##x.prev = EXC.last; \
-    EXC.last = &exc_s##x; if ((exc_type##x = setjmp(exc_s##x.env)) == 0)
+#define exc_ftry(x) do { struct exc__state exc_s##x, *exc_p##x = EXC.m_last;    \
+    int exc_type##x GCCATTR_UNUSED; exc_s##x.prev = EXC.m_last; \
+    EXC.m_last = &exc_s##x; if ((exc_type##x = setjmp(exc_s##x.env)) == 0)
 
 #define exc_catch(x,t) else if ((t) == exc_type##x)
 
-#define exc_end(x) else __exc_throw(exc_type##x); EXC.last = exc_s##x.prev; } while (0)
+#define exc_end(x) else __exc_throw(exc_type##x); EXC.m_last = exc_s##x.m_prev; } while (0)
 
-#define exc_return(x) for (EXC.last = exc_p##x;) return
+#define exc_return(x) for (EXC.m_last = exc_p##x;) return
 
-#define exc_fthrow(x) for (EXC.last = exc_p##x;) ex_throw
+#define exc_fthrow(x) for (EXC.m_last = exc_p##x;) ex_throw
 
 #define exc_catchall else
-#define exc_endall(x) EXC.last = exc_s##x.prev; } while (0)
+#define exc_endall(x) EXC.m_last = exc_s##x.m_prev; } while (0)
 
 static void __exc_throw(int type) /* protoadd GCCATTR_NORETURN */ 
 {
-    struct exc__state * exc_s = EXC.last;
-    EXC.last = EXC.last->prev;
-    longjmp(exc_s->env, type);
+    struct exc__state * exc_s = EXC.m_last;
+    EXC.m_last = EXC.m_last->m_prev;
+    longjmp(exc_s->m_env, type);
 }
 
 static void exc_throw(int type, const char * format, ...)
@@ -138,35 +138,35 @@ static void exc_throw(int type, const char * format, ...)
         int err = errno;
 
         va_start(ap, format);
-        unsigned int len = vsnprintf(EXC.msgbuf, sizeof EXC.msgbuf, format, ap);
+        unsigned int len = vsnprintf(EXC.m_msgbuf, sizeof EXC.m_msgbuf, format, ap);
         va_end(ap);
 
-        if (len >= sizeof EXC.msgbuf) 
+        if (len >= sizeof EXC.m_msgbuf)
         {
-            len = sizeof EXC.msgbuf - 1;
-            EXC.msgbuf[len] = '\0'; 
+            len = sizeof EXC.m_msgbuf - 1;
+            EXC.m_msgbuf[len] = '\0';
         }
         else 
         {
             if (format[strlen(format) - 1] == ':') 
             {
-                int l = snprintf(&EXC.msgbuf[len], sizeof EXC.msgbuf - len,
+                int l = snprintf(&EXC.m_msgbuf[len], sizeof EXC.m_msgbuf - len,
                       " %s.", strerror(err));
-                if (l + len >= sizeof EXC.msgbuf) 
+                if (l + len >= sizeof EXC.m_msgbuf)
                 {
-                    len = sizeof EXC.msgbuf - 1;
-                    EXC.msgbuf[len] = '\0'; 
+                    len = sizeof EXC.m_msgbuf - 1;
+                    EXC.m_msgbuf[len] = '\0';
                 }
                 else
                     len += l; 
             }
         }
-        EXC.buflen = len; 
+        EXC.m_buflen = len;
     }
     else 
     {
-        EXC.msgbuf[0] = '\0';
-        EXC.buflen = 0; 
+        EXC.m_msgbuf[0] = '\0';
+        EXC.m_buflen = 0;
     }
 
     __exc_throw(type); 
@@ -391,120 +391,120 @@ static void argpalette(const char * arg,
 /* typedef struct _Png4File Png4File; */
 struct _Png4File 
 {
-    FILE * fh;
-    int width;
-    int hleft;
-    int nibble;
-    int bufpos;
-    int chunklen;
-    eu32 crc;
-    eu32 adler;
-    eu8 palettechunk[24];
-    eu8 buffer[65536]; 
+    FILE *m_fh;
+    int   m_width;
+    int   m_hleft;
+    int   m_nibble;
+    int   m_bufPos;
+    int   m_chunkLen;
+    eu32  m_crc;
+    eu32  m_adler;
+    eu8   m_paletteChunk[24];
+    eu8   m_buffer[65536];
 };
 
 static void png4file_init(Png4File * self, eu8 palette[4][3])
 {
-    memcpy(self->palettechunk, "\0\0\0\x0c" "PLTE", 8);
-    memcpy(self->palettechunk + 8, palette, 12);
-    self->crc = 0 /*crc32(0, Z_NULL, 0)*/;
-    self->crc = crc32(self->crc, self->palettechunk + 4, 16);
-    set_uint32_be(self->palettechunk + 20, self->crc); 
+    memcpy(self->m_paletteChunk, "\0\0\0\x0c" "PLTE", 8);
+    memcpy(self->m_paletteChunk + 8, palette, 12);
+    self->m_crc = 0 /*crc32(0, Z_NULL, 0)*/;
+    self->m_crc = crc32(self->m_crc, self->m_paletteChunk + 4, 16);
+    set_uint32_be(self->m_paletteChunk + 20, self->m_crc);
 }
 
 static void png4file_open(Png4File * self,
                     const char * filename, int height, int width) 
 {
-    self->fh = xfopen(filename, "wb");
-    self->width = width;
-    self->hleft = height;
-    self->nibble = -1;
+    self->m_fh = xfopen(filename, "wb");
+    self->m_width = width;
+    self->m_hleft = height;
+    self->m_nibble = -1;
 
-    xxfwrite(self->fh, CUS "\x89PNG\r\n\x1a\n" "\0\0\0\x0d", 12);
+    xxfwrite(self->m_fh, CUS "\x89PNG\r\n\x1a\n" "\0\0\0\x0d", 12);
 
-    memcpy(self->buffer, "IHDR", 4);
-    set_uint32_be(self->buffer + 4, width);
-    set_uint32_be(self->buffer + 8, height);
-    memcpy(self->buffer + 12, "\004\003\0\0\0", 5);
+    memcpy(self->m_buffer, "IHDR", 4);
+    set_uint32_be(self->m_buffer + 4, width);
+    set_uint32_be(self->m_buffer + 8, height);
+    memcpy(self->m_buffer + 12, "\004\003\0\0\0", 5);
 
-    eu32 crc = crc32(0, self->buffer, 17);
-    set_uint32_be(self->buffer + 17, crc);
-    xxfwrite(self->fh, self->buffer, 21);
+    eu32 crc = crc32(0, self->m_buffer, 17);
+    set_uint32_be(self->m_buffer + 17, crc);
+    xxfwrite(self->m_fh, self->m_buffer, 21);
 
-    xxfwrite(self->fh, self->palettechunk, sizeof self->palettechunk);
+    xxfwrite(self->m_fh, self->m_paletteChunk, sizeof self->m_paletteChunk);
 
     /* XXX quick hack, first color transparent. */
-    xxfwriteCS(self->fh, "\0\0\0\001" "tRNS" "\0" "\x40\xe6\xd8\x66");
+    xxfwriteCS(self->m_fh, "\0\0\0\001" "tRNS" "\0" "\x40\xe6\xd8\x66");
 
-    xxfwrite(self->fh, CUS "\0\0\0\0IDAT" "\x78\001", 10);
-    self->buffer[0] = '\0';
-    self->buffer[5] = '\0';
-    self->bufpos = 6;
-    self->chunklen = 2; /* 78 01, zlib header */
-    self->crc = crc32(0, CUS "IDAT" "\x78\001", 6);
-    self->adler = 1 /* adler32(0, Z_NULL, 0) */; 
+    xxfwrite(self->m_fh, CUS "\0\0\0\0IDAT" "\x78\001", 10);
+    self->m_buffer[0] = '\0';
+    self->m_buffer[5] = '\0';
+    self->m_bufPos = 6;
+    self->m_chunkLen = 2; /* 78 01, zlib header */
+    self->m_crc = crc32(0, CUS "IDAT" "\x78\001", 6);
+    self->m_adler = 1 /* adler32(0, Z_NULL, 0) */; 
 }
 
 static void png4file_flush(Png4File * self) 
 {
-    int l = self->bufpos - 5;
-    self->chunklen += self->bufpos;
-    set_uint16_le(self->buffer + 1, l);
-    set_uint16_le(self->buffer + 3, l ^ 0xffff);
-    xxfwrite(self->fh, self->buffer, self->bufpos);
-    self->crc = crc32(self->crc, self->buffer, self->bufpos);
-    self->adler = adler32(self->adler, self->buffer + 5, self->bufpos - 5);
-    self->buffer[0] = '\0';
-    self->bufpos = 5; 
+    int l = self->m_bufPos - 5;
+    self->m_chunkLen += self->m_bufPos;
+    set_uint16_le(self->m_buffer + 1, l);
+    set_uint16_le(self->m_buffer + 3, l ^ 0xffff);
+    xxfwrite(self->m_fh, self->m_buffer, self->m_bufPos);
+    self->m_crc = crc32(self->m_crc, self->m_buffer, self->m_bufPos);
+    self->m_adler = adler32(self->m_adler, self->m_buffer + 5, self->m_bufPos - 5);
+    self->m_buffer[0] = '\0';
+    self->m_bufPos = 5;
 }
 
 static void png4file_addpixel(Png4File * self, eu8 pixel) 
 {
-    if (self->nibble < 0)
-        self->nibble = (pixel << 4);
+    if (self->m_nibble < 0)
+        self->m_nibble = (pixel << 4);
     else 
     {
-        self->buffer[self->bufpos++] = self->nibble | pixel;
-        self->nibble = -1;
-        if (self->bufpos == sizeof self->buffer - 4)
+        self->m_buffer[self->m_bufPos++] = self->m_nibble | pixel;
+        self->m_nibble = -1;
+        if (self->m_bufPos == sizeof self->m_buffer - 4)
             png4file_flush(self); 
     }
 }
 
 static void png4file_endrow(Png4File * self) 
 {
-    if (self->nibble >= 0) 
+    if (self->m_nibble >= 0)
     {
-        self->buffer[self->bufpos++] = self->nibble;
-        self->nibble = -1; 
+        self->m_buffer[self->m_bufPos++] = self->m_nibble;
+        self->m_nibble = -1;
     }
 
-    self->hleft--;
-    if (self->hleft)
-        self->buffer[self->bufpos++] = '\0'; 
+    self->m_hleft--;
+    if (self->m_hleft)
+        self->m_buffer[self->m_bufPos++] = '\0';
 }
 
 static void png4file_close(Png4File * self) 
 {
     eu8 adlerbuf[4];
-    self->buffer[0] = 0x01;
-    if (self->bufpos)
+    self->m_buffer[0] = 0x01;
+    if (self->m_bufPos)
         png4file_flush(self);
     else 
     {
-        self->bufpos = 5;
+        self->m_bufPos = 5;
         png4file_flush(self); 
     }
 
-    set_uint32_be(adlerbuf, self->adler);
-    xxfwrite(self->fh, adlerbuf, 4);
-    self->crc = crc32(self->crc, adlerbuf, 4);
-    xxfwrite_uint32_be(self->fh, self->crc);
-    xxfwriteCS(self->fh, "\0\0\0\0" "IEND" "\xae\x42\x60\x82");
-    xfseek0(self->fh, 70);
-    xxfwrite_uint32_be(self->fh, self->chunklen + 4 /* adler*/);
-    fclose(self->fh);
-    self->fh = NULL; 
+    set_uint32_be(adlerbuf, self->m_adler);
+    xxfwrite(self->m_fh, adlerbuf, 4);
+    self->m_crc = crc32(self->m_crc, adlerbuf, 4);
+    xxfwrite_uint32_be(self->m_fh, self->m_crc);
+    xxfwriteCS(self->m_fh, "\0\0\0\0" "IEND" "\xae\x42\x60\x82");
+    xfseek0(self->m_fh, 70);
+    xxfwrite_uint32_be(self->m_fh, self->m_chunkLen + 4 /* adler*/);
+    fclose(self->m_fh);
+    self->m_fh = NULL;
 }
 
 static eu8 getnibble(eu8 ** data, int * nibble) 
@@ -617,23 +617,23 @@ static char * pts2ts(fu32 pts, char * rvbuf, bool is_png_filename)
 
 struct _BoundStr 
 {
-    eu8 * p;
-    int l; 
+    eu8 *m_p;
+    int  m_l;
 };
 
 static void boundstr_init(BoundStr * bs, eu8 * p, int l) 
 {
-    bs->p = p;
-    bs->l = l; 
+    bs->m_p = p;
+    bs->m_l = l;
 }
 
 static eu8 * boundstr_read(BoundStr * bs, int l) 
 {
-    if (l > bs->l)
+    if (l > bs->m_l)
         exc_throw(IndexError, "XXX IndexError %p.", bs);
-    eu8 * rp = bs->p;
-    bs->p += l;
-    bs->l -= l;
+    eu8 * rp = bs->m_p;
+    bs->m_p += l;
+    bs->m_l -= l;
     return rp; 
 }
 
@@ -966,7 +966,7 @@ int sup2dast(const char *supfile, const char *ifofile ,int delay_ms)
 
     exc_catchall 
     {
-        if (write(2, EXC.msgbuf, EXC.buflen) != EXC.buflen)
+        if (write(2, EXC.m_msgbuf, EXC.m_buflen) != EXC.m_buflen)
             printf("ERROR: write failed");
 
         if (write(2, "\n", 1) != 1)
