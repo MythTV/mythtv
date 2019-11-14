@@ -123,9 +123,4 @@ cleanall: clean
 
 compdb:
 	@echo "Building ../compile_commands.json"
-	@JFILES="$(shell find .. -name *.o.json \
-			 | grep -v /external/ \
-			 | grep -v /moc_ \
-			 | grep -v dummy.o.json)"; \
-	 sed -e '1s/^/[\n/' -e '$$s/,$$/\n]/' $$JFILES > ../compile_commands.json
-	@echo "If the output looks wrong, did you remember to clear ccache?"
+	@programs/scripts/build_commdb.py
