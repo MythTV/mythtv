@@ -134,6 +134,9 @@ Checks: '-*,
        -cppcoreguidelines-slicing,
        -cppcoreguidelines-special-member-functions,
 
+    google-explicit-constructor,
+   -google-runtime-int,
+
     misc-*,
 
         # Cases exist. Need to add getters/setters to classes. ,
@@ -186,11 +189,15 @@ Checks: '-*,
        -readability-function-size,
 
         # Will fix member names, but not any uses of the changed
-        # memeber names. ,
+        # memeber names.
+        #
+        # Done for all but libmythtv and libmythui. ,
        -readability-identifier-naming,
 
         # Wants to convert all "if (x)" pointer validity checks to be
-        # "if (x != nullptr)" ,
+        # "if (x != nullptr)".  These should be ignored as the
+        # AllowPointerConditions key is set to "1", but tidy complains
+        # anyway. ,
        -readability-implicit-bool-conversion,
 
         # Has two issues:
