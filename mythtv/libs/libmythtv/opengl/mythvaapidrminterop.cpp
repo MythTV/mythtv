@@ -4,20 +4,19 @@
 #include "fourcc.h"
 #include "mythvaapidrminterop.h"
 
-// DRM PRIME interop largely for testing
-#include "mythdrmprimeinterop.h"
+// FFmpeg
 extern "C" {
 #include "libavutil/hwcontext_drm.h"
 }
-#include <unistd.h>
 
-// EGL
-#include "mythegldefs.h"
+// Std
+#include <unistd.h>
 
 #define LOC QString("VAAPIDRM: ")
 
 MythVAAPIInteropDRM::MythVAAPIInteropDRM(MythRenderOpenGL *Context)
-  : MythVAAPIInterop(Context, VAAPIEGLDRM)
+  : MythVAAPIInterop(Context, VAAPIEGLDRM),
+    MythEGLDMABUF(Context)
 {
     QString device = gCoreContext->GetSetting("VAAPIDevice");
     if (device.isEmpty())
@@ -39,8 +38,12 @@ MythVAAPIInteropDRM::MythVAAPIInteropDRM(MythRenderOpenGL *Context)
     }
     InitaliseDisplay();
 
-    if (!qgetenv("MYTHTV_VAAPI_PRIME").isEmpty())
-        m_drmPrimeInterop = new MythDRMPRIMEInterop(Context, false);
+    // DRM PRIME is preferred as it explicitly sets the fourcc's for each layer -
+    // so we don't have to guess. But it is not available with older libva and
+    // there are reports it does not work with some Radeon drivers
+    m_usePrime = TestPrimeInterop();
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Using %1 for interop")
+        .arg(m_usePrime ? "DRM PRIME" : "VAAPI handle"));
 }
 
 MythVAAPIInteropDRM::~MythVAAPIInteropDRM()
@@ -255,75 +258,85 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context
     }
 
     OpenGLLocker locker(m_context);
-
-    if (m_drmPrimeInterop)
-    {
-        result = AcquirePrime(id, Context, ColourSpace, Frame, Scan);
-    }
-    else
-    {
-        VAImage vaimage;
-        memset(&vaimage, 0, sizeof(vaimage));
-        vaimage.buf = vaimage.image_id = VA_INVALID_ID;
-        INIT_ST;
-        va_status = vaDeriveImage(m_vaDisplay, id, &vaimage);
-        CHECK_ST;
-        uint count = vaimage.num_planes;
-
-        VABufferInfo vabufferinfo;
-        memset(&vabufferinfo, 0, sizeof(vabufferinfo));
-        vabufferinfo.mem_type = VA_SURFACE_ATTRIB_MEM_TYPE_DRM_PRIME;
-        va_status = vaAcquireBufferHandle(m_vaDisplay, vaimage.buf, &vabufferinfo);
-        CHECK_ST;
-
-        VideoFrameType format = VATypeToMythType(vaimage.format.fourcc);
-        if (format == FMT_NONE)
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unsupported VA fourcc: %1")
-                .arg(fourcc_str(static_cast<int32_t>(vaimage.format.fourcc))));
-        }
-        else
-        {
-            if (count != planes(format))
-            {
-                LOG(VB_GENERAL, LOG_ERR, LOC + QString("Inconsistent plane count %1 != %2")
-                    .arg(count).arg(planes(format)));
-            }
-            else
-            {
-                vector<QSize> sizes;
-                for (uint plane = 0 ; plane < count; ++plane)
-                {
-                    QSize size(vaimage.width, vaimage.height);
-                    if (plane > 0)
-                        size = QSize(vaimage.width >> 1, vaimage.height >> 1);
-                    sizes.push_back(size);
-                }
-
-                vector<MythVideoTexture*> textures = MythVideoTexture::CreateTextures(m_context, FMT_VAAPI, format, sizes);
-                if (textures.size() != count)
-                {
-                    LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create all textures");
-                }
-                else
-                {
-                    for (uint i = 0; i < textures.size(); ++i)
-                        textures[i]->m_allowGLSLDeint = true;
-                    CreateDRMBuffers(format, textures, vabufferinfo.handle, vaimage);
-                    result = textures;
-                }
-            }
-        }
-
-        va_status = vaReleaseBufferHandle(m_vaDisplay, vaimage.buf);
-        CHECK_ST;
-        va_status = vaDestroyImage(m_vaDisplay, vaimage.image_id);
-        CHECK_ST;
-    }
-
+    result = m_usePrime ? AcquirePrime(id, Context, Frame): AcquireVAAPI(id, Context, Frame);
     m_openglTextures.insert(id, result);
     if (needreferenceframes)
         return GetReferenceFrames();
+    return result;
+}
+
+#ifndef DRM_FORMAT_R8
+#define MKTAG2(a,b,c,d) ((a) | ((b) << 8) | ((c) << 16) | (static_cast<unsigned>(d) << 24))
+#define DRM_FORMAT_R8       MKTAG2('R', '8', ' ', ' ')
+#define DRM_FORMAT_GR88     MKTAG2('G', 'R', '8', '8')
+#define DRM_FORMAT_R16      MKTAG2('R', '1', '6', ' ')
+#define DRM_FORMAT_GR32     MKTAG2('G', 'R', '3', '2')
+#endif
+
+vector<MythVideoTexture*> MythVAAPIInteropDRM::AcquireVAAPI(VASurfaceID Id,
+                                                            MythRenderOpenGL *Context,
+                                                            VideoFrame *Frame)
+{
+    vector<MythVideoTexture*> result;
+
+    VAImage vaimage;
+    memset(&vaimage, 0, sizeof(vaimage));
+    vaimage.buf = vaimage.image_id = VA_INVALID_ID;
+    INIT_ST;
+    va_status = vaDeriveImage(m_vaDisplay, Id, &vaimage);
+    CHECK_ST;
+    uint numplanes = vaimage.num_planes;
+
+    VABufferInfo vabufferinfo;
+    memset(&vabufferinfo, 0, sizeof(vabufferinfo));
+    vabufferinfo.mem_type = VA_SURFACE_ATTRIB_MEM_TYPE_DRM_PRIME;
+    va_status = vaAcquireBufferHandle(m_vaDisplay, vaimage.buf, &vabufferinfo);
+    CHECK_ST;
+
+    VideoFrameType format = VATypeToMythType(vaimage.format.fourcc);
+    if (format == FMT_NONE)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unsupported VA fourcc: %1")
+            .arg(fourcc_str(static_cast<int32_t>(vaimage.format.fourcc))));
+    }
+    else
+    {
+        if (numplanes != planes(format))
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("Inconsistent plane count %1 != %2")
+                .arg(numplanes).arg(planes(format)));
+        }
+        else
+        {
+            AVDRMFrameDescriptor drmdesc;
+            memset(&drmdesc, 0, sizeof(drmdesc));
+            drmdesc.nb_objects = 1;
+            drmdesc.nb_layers = static_cast<int>(numplanes);
+            drmdesc.objects[0].fd = static_cast<int>(vabufferinfo.handle);
+            drmdesc.objects[0].size = 0;
+            drmdesc.objects[0].format_modifier = 0;
+
+            for (uint i = 0; i < numplanes; ++i)
+            {
+                uint32_t fourcc = (format == FMT_P010) ? DRM_FORMAT_R16 : DRM_FORMAT_R8;
+                if (i > 0)
+                    fourcc = (format == FMT_P010) ? DRM_FORMAT_GR32 : DRM_FORMAT_GR88;
+                drmdesc.layers[i].nb_planes = 1;
+                drmdesc.layers[i].format = fourcc;
+                drmdesc.layers[i].planes[0].object_index = 0;
+                drmdesc.layers[i].planes[0].pitch = vaimage.pitches[i];
+                drmdesc.layers[i].planes[0].offset = vaimage.offsets[i];
+            }
+
+            result = CreateTextures(&drmdesc, Context, Frame);
+        }
+    }
+
+    va_status = vaReleaseBufferHandle(m_vaDisplay, vaimage.buf);
+    CHECK_ST;
+    va_status = vaDestroyImage(m_vaDisplay, vaimage.image_id);
+    CHECK_ST;
+
     return result;
 }
 
@@ -344,58 +357,35 @@ VideoFrameType MythVAAPIInteropDRM::VATypeToMythType(uint32_t Fourcc)
     return FMT_NONE;
 }
 
-#ifndef DRM_FORMAT_R8
-#define DRM_FORMAT_R8       MKTAG('R', '8', ' ', ' ')
-#define DRM_FORMAT_GR88     MKTAG('G', 'R', '8', '8')
-#define DRM_FORMAT_R16      MKTAG('R', '1', '6', ' ')
-#define DRM_FORMAT_GR32     MKTAG('G', 'R', '3', '2')
-#endif
-
-/*! \brief Create a set of EGL images/DRM buffers associated with the given textures
-*/
-void MythVAAPIInteropDRM::CreateDRMBuffers(VideoFrameType Format,
-                                           vector<MythVideoTexture*> Textures,
-                                           uintptr_t Handle, VAImage &Image)
-{
-    for (uint plane = 0; plane < Textures.size(); ++plane)
-    {
-        MythVideoTexture* texture = Textures[plane];
-        int fourcc = (Format == FMT_P010) ? DRM_FORMAT_R16 : DRM_FORMAT_R8;
-        if (plane > 0)
-            fourcc = (Format == FMT_P010) ? DRM_FORMAT_GR32 : DRM_FORMAT_GR88;
-        const EGLint attributes[] = {
-                EGL_LINUX_DRM_FOURCC_EXT, fourcc,
-                EGL_WIDTH,  texture->m_size.width(),
-                EGL_HEIGHT, texture->m_size.height(),
-                EGL_DMA_BUF_PLANE0_FD_EXT,     static_cast<EGLint>(Handle),
-                EGL_DMA_BUF_PLANE0_OFFSET_EXT, static_cast<EGLint>(Image.offsets[plane]),
-                EGL_DMA_BUF_PLANE0_PITCH_EXT,  static_cast<EGLint>(Image.pitches[plane]),
-                EGL_NONE
-        };
-
-        EGLImageKHR image = m_context->eglCreateImageKHR(m_context->GetEGLDisplay(), EGL_NO_CONTEXT,
-                                                         EGL_LINUX_DMA_BUF_EXT, nullptr, attributes);
-        if (!image)
-            LOG(VB_GENERAL, LOG_ERR, LOC + QString("No EGLImage for plane %1 %2")
-                .arg(plane).arg(m_context->GetEGLError()));
-
-        m_context->glBindTexture(texture->m_target, texture->m_textureId);
-        m_context->eglImageTargetTexture2DOES(texture->m_target, image);
-        m_context->glBindTexture(texture->m_target, 0);
-        texture->m_data = static_cast<unsigned char *>(image);
-    }
-}
-
 bool MythVAAPIInteropDRM::IsSupported(MythRenderOpenGL *Context)
 {
-    if (!Context)
-        return false;
-
-    OpenGLLocker locker(Context);
-    return Context->IsEGL() &&
-           Context->HasEGLExtension("EGL_EXT_image_dma_buf_import") &&
-           Context->hasExtension("GL_OES_EGL_image");
+    return HaveDMABuf(Context);
 }
+
+#if VA_CHECK_VERSION(1, 1, 0)
+static inline void VADRMtoPRIME(VADRMPRIMESurfaceDescriptor* VaDRM, AVDRMFrameDescriptor* Prime)
+{
+    Prime->nb_objects = static_cast<int>(VaDRM->num_objects);
+    for (uint i = 0; i < VaDRM->num_objects; i++)
+    {
+        Prime->objects[i].fd              = VaDRM->objects[i].fd;
+        Prime->objects[i].size            = VaDRM->objects[i].size;
+        Prime->objects[i].format_modifier = VaDRM->objects[i].drm_format_modifier;
+    }
+    Prime->nb_layers = static_cast<int>(VaDRM->num_layers);
+    for (uint i = 0; i < VaDRM->num_layers; i++)
+    {
+        Prime->layers[i].format    = VaDRM->layers[i].drm_format;
+        Prime->layers[i].nb_planes = static_cast<int>(VaDRM->layers[i].num_planes);
+        for (uint j = 0; j < VaDRM->layers[i].num_planes; j++)
+        {
+            Prime->layers[i].planes[j].object_index = static_cast<int>(VaDRM->layers[i].object_index[j]);
+            Prime->layers[i].planes[j].offset       = VaDRM->layers[i].offset[j];
+            Prime->layers[i].planes[j].pitch        = VaDRM->layers[i].pitch[j];
+        }
+    }
+}
+#endif
 
 /*! \brief Export the given VideoFrame as a DRM PRIME descriptor
  *
@@ -404,9 +394,7 @@ bool MythVAAPIInteropDRM::IsSupported(MythRenderOpenGL *Context)
 */
 vector<MythVideoTexture*> MythVAAPIInteropDRM::AcquirePrime(VASurfaceID Id,
                                                             MythRenderOpenGL *Context,
-                                                            VideoColourSpace *ColourSpace,
-                                                            VideoFrame *Frame,
-                                                            FrameScanType Scan)
+                                                            VideoFrame *Frame)
 {
     vector<MythVideoTexture*> result;
 
@@ -422,39 +410,14 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::AcquirePrime(VASurfaceID Id,
         CHECK_ST;
 
         AVDRMFrameDescriptor *drmdesc = reinterpret_cast<AVDRMFrameDescriptor*>(av_mallocz(sizeof(*drmdesc)));
-        drmdesc->nb_objects = static_cast<int>(vadesc.num_objects);
-        for (uint i = 0; i < vadesc.num_objects; i++)
-        {
-            drmdesc->objects[i].fd              = vadesc.objects[i].fd;
-            drmdesc->objects[i].size            = vadesc.objects[i].size;
-            drmdesc->objects[i].format_modifier = vadesc.objects[i].drm_format_modifier;
-        }
-        drmdesc->nb_layers = static_cast<int>(vadesc.num_layers);
-        for (uint i = 0; i < vadesc.num_layers; i++)
-        {
-            drmdesc->layers[i].format    = vadesc.layers[i].drm_format;
-            drmdesc->layers[i].nb_planes = static_cast<int>(vadesc.layers[i].num_planes);
-            for (uint j = 0; j < vadesc.layers[i].num_planes; j++)
-            {
-                drmdesc->layers[i].planes[j].object_index = static_cast<int>(vadesc.layers[i].object_index[j]);
-                drmdesc->layers[i].planes[j].offset       = vadesc.layers[i].offset[j];
-                drmdesc->layers[i].planes[j].pitch        = vadesc.layers[i].pitch[j];
-            }
-        }
+        VADRMtoPRIME(&vadesc, drmdesc);
         m_drmFrames.insert(Id, drmdesc);
     }
 
     if (!m_drmFrames.contains(Id))
         return result;
 
-    unsigned char* temp = Frame->buf;
-    Frame->buf = reinterpret_cast<unsigned char*>(m_drmFrames[Id]);
-    Frame->codec = FMT_DRMPRIME;
-    Frame->pix_fmt = AV_PIX_FMT_DRM_PRIME;
-    result = m_drmPrimeInterop->Acquire(Context, ColourSpace, Frame, Scan);
-    Frame->buf = temp;
-    Frame->codec = FMT_VAAPI;
-    Frame->pix_fmt = AV_PIX_FMT_VAAPI;
+    result = CreateTextures(m_drmFrames[Id], Context, Frame);
 #else
     (void)Id;
     (void)Context;
@@ -467,9 +430,6 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::AcquirePrime(VASurfaceID Id,
 
 void MythVAAPIInteropDRM::CleanupDRMPRIME(void)
 {
-    if (m_drmPrimeInterop)
-        m_drmPrimeInterop->DecrRef();
-
     if (!m_drmFrames.isEmpty())
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Releasing %1 DRM descriptors").arg(m_drmFrames.size()));
@@ -481,4 +441,69 @@ void MythVAAPIInteropDRM::CleanupDRMPRIME(void)
             av_freep(&(*it));
         }
     }
+}
+
+bool MythVAAPIInteropDRM::TestPrimeInterop(void)
+{
+    static bool supported = false;
+#if VA_CHECK_VERSION(1, 1, 0)
+    static bool checked = false;
+
+    if (checked)
+        return supported;
+    checked = true;
+
+    OpenGLLocker locker(m_context);
+
+    VASurfaceID surface;
+    VAStatus status;
+
+    VASurfaceAttrib attribs = {};
+    attribs.flags = VA_SURFACE_ATTRIB_SETTABLE;
+    attribs.type = VASurfaceAttribPixelFormat;
+    attribs.value.type = VAGenericValueTypeInteger;
+    attribs.value.value.i = VA_FOURCC_NV12;
+
+    if (vaCreateSurfaces(m_vaDisplay, VA_RT_FORMAT_YUV420, 1920, 1080,
+                         &surface, 1, &attribs, 1) == VA_STATUS_SUCCESS)
+    {
+        VADRMPRIMESurfaceDescriptor vadesc;
+        status = vaExportSurfaceHandle(m_vaDisplay, surface, VA_SURFACE_ATTRIB_MEM_TYPE_DRM_PRIME_2,
+                                       VA_EXPORT_SURFACE_READ_ONLY | VA_EXPORT_SURFACE_SEPARATE_LAYERS,
+                                       &vadesc);
+        if (status == VA_STATUS_SUCCESS)
+        {
+            VideoFrame frame;
+            init(&frame, FMT_DRMPRIME, nullptr, 1920, 1080, 0);
+            frame.sw_pix_fmt = AV_PIX_FMT_NV12;
+            AVDRMFrameDescriptor drmdesc;
+            memset(&drmdesc, 0, sizeof(drmdesc));
+            VADRMtoPRIME(&vadesc, &drmdesc);
+            vector<MythVideoTexture*> textures = CreateTextures(&drmdesc, m_context, &frame);
+
+            if (textures.size() > 0)
+            {
+                supported = true;
+                vector<MythVideoTexture*>::iterator it = textures.begin();
+                for ( ; it != textures.end(); ++it)
+                {
+                    supported &= (*it)->m_data && (*it)->m_textureId;
+                    if ((*it)->m_data)
+                        m_context->eglDestroyImageKHR(m_context->GetEGLDisplay(), (*it)->m_data);
+                    (*it)->m_data = nullptr;
+                    if ((*it)->m_textureId)
+                        m_context->glDeleteTextures(1, &(*it)->m_textureId);
+                    MythVideoTexture::DeleteTexture(m_context, *it);
+                }
+                textures.clear();
+            }
+            for (uint32_t i = 0; i < vadesc.num_objects; ++i)
+                close(vadesc.objects[i].fd);
+        }
+        vaDestroySurfaces(m_vaDisplay, &surface, 1);
+    }
+#endif
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("VAAPI DRM PRIME interop is %1supported")
+        .arg(supported ? "" : "not "));
+    return supported;
 }

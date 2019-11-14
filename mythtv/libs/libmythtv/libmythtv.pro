@@ -500,8 +500,10 @@ using_frontend {
         using_egl {
             DEFINES += USING_EGL
             HEADERS += opengl/mythegldefs.h
+            HEADERS += opengl/mythegldmabuf.h
             HEADERS += opengl/mythdrmprimeinterop.h
             SOURCES += opengl/mythdrmprimeinterop.cpp
+            SOURCES += opengl/mythegldmabuf.cpp
 
             using_mmal {
                 HEADERS += opengl/mythmmalinterop.h

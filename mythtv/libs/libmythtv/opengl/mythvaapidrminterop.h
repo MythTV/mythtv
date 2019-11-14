@@ -2,12 +2,13 @@
 #define MYTHVAAPIDRMINTEROP_H
 
 // MythTV
+#include "mythegldmabuf.h"
 #include "mythvaapiinterop.h"
 
 class MythDRMPRIMEInterop;
 struct AVDRMFrameDescriptor;
 
-class MythVAAPIInteropDRM : public MythVAAPIInterop
+class MythVAAPIInteropDRM : public MythVAAPIInterop, public MythEGLDMABUF
 {
   public:
     MythVAAPIInteropDRM(MythRenderOpenGL *Context);
@@ -23,9 +24,6 @@ class MythVAAPIInteropDRM : public MythVAAPIInterop
     void           PostInitDeinterlacer(void) override;
 
   private:
-    void           CreateDRMBuffers(VideoFrameType Format,
-                                    vector<MythVideoTexture*> Textures,
-                                    uintptr_t Handle, VAImage &Image);
     VideoFrameType VATypeToMythType(uint32_t Fourcc);
     void           CleanupReferenceFrames(void);
     void           RotateReferenceFrames(AVBufferRef *Buffer);
@@ -35,12 +33,13 @@ class MythVAAPIInteropDRM : public MythVAAPIInterop
     QFile                 m_drmFile         { };
     QVector<AVBufferRef*> m_referenceFrames { };
 
-
+    vector<MythVideoTexture*> AcquireVAAPI(VASurfaceID Id, MythRenderOpenGL *Context,
+                                           VideoFrame *Frame);
     vector<MythVideoTexture*> AcquirePrime(VASurfaceID Id, MythRenderOpenGL *Context,
-                                           VideoColourSpace *ColourSpace,
-                                           VideoFrame *Frame,FrameScanType Scan);
+                                           VideoFrame *Frame);
     void                      CleanupDRMPRIME(void);
-    MythDRMPRIMEInterop*      m_drmPrimeInterop { nullptr };
+    bool                      TestPrimeInterop(void);
+    bool                      m_usePrime { false };
     QHash<unsigned long long, AVDRMFrameDescriptor*> m_drmFrames { };
 };
 
