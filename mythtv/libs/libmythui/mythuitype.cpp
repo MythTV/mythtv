@@ -2,11 +2,15 @@
 // Own header
 #include "mythuitype.h"
 
+// C++ headers
+#include <utility>
+
 // QT headers
 #include <QDomDocument>
 #include <QEvent>
 #include <QKeyEvent>
-#include <utility>
+#include <QInputMethodEvent>
+#include <QDomDocument>
 
 // XML headers
 #include "xmlparsebase.h"
@@ -997,6 +1001,14 @@ bool MythUIType::keyPressEvent(QKeyEvent * /*event*/)
     return false;
 }
 
+/** \brief Input Method event handler
+ *
+ *  \param event Input Method event
+ */
+bool MythUIType::inputMethodEvent(QInputMethodEvent * /*event*/)
+{
+    return false;
+}
 
 void MythUIType::customEvent(QEvent *event)
 {

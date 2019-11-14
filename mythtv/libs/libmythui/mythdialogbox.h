@@ -225,6 +225,7 @@ class MUI_PUBLIC MythDialogBox : public MythScreenType
     }
 
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
+    bool inputMethodEvent(QInputMethodEvent *event) override;// MythScreenType
     bool gestureEvent(MythGestureEvent *event) override; // MythScreenType
 
   public slots:
