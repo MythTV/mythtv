@@ -32,9 +32,9 @@
 /* Calculate pseudo-random 32 bit number based on linear congruential method. */
 static unsigned long generate_random_number( void )
 {
-    static unsigned long rand_seed = 22222;  /* Change this for different random sequences. */
-    rand_seed = (rand_seed * 196314165) + 907633515;
-    return rand_seed;
+    static unsigned long s_randSeed = 22222;  /* Change this for different random sequences. */
+    s_randSeed = (s_randSeed * 196314165) + 907633515;
+    return s_randSeed;
 }
 
 /* Setup PinkNoise structure for N rows of generators. */

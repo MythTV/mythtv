@@ -195,11 +195,11 @@ void SignalHandler::SetHandlerPrivate(int signum, SigHandlerFunc handler)
 }
 
 typedef struct {
-    int signum;
-    int code;
-    int pid;
-    int uid;
-    uint64_t value;
+    int      m_signum;
+    int      m_code;
+    int      m_pid;
+    int      m_uid;
+    uint64_t m_value;
 } SignalInfo;
 
 void SignalHandler::signalHandler(int signum, siginfo_t *info, void *context)
@@ -207,18 +207,18 @@ void SignalHandler::signalHandler(int signum, siginfo_t *info, void *context)
     SignalInfo signalInfo;
 
     (void)context;
-    signalInfo.signum = signum;
+    signalInfo.m_signum = signum;
 #ifdef _WIN32
     (void)info;
-    signalInfo.code   = 0;
-    signalInfo.pid    = 0;
-    signalInfo.uid    = 0;
-    signalInfo.value  = 0;
+    signalInfo.m_code   = 0;
+    signalInfo.m_pid    = 0;
+    signalInfo.m_uid    = 0;
+    signalInfo.m_value  = 0;
 #else
-    signalInfo.code   = (info ? info->si_code : 0);
-    signalInfo.pid    = (info ? (int)info->si_pid : 0);
-    signalInfo.uid    = (info ? (int)info->si_uid : 0);
-    signalInfo.value  = (info ? *(uint64_t *)&info->si_value : 0);
+    signalInfo.m_code   = (info ? info->si_code : 0);
+    signalInfo.m_pid    = (info ? (int)info->si_pid : 0);
+    signalInfo.m_uid    = (info ? (int)info->si_uid : 0);
+    signalInfo.m_value  = (info ? *(uint64_t *)&info->si_value : 0);
 #endif
 
     // Keep trying if there's no room to write, but stop on error (-1)
@@ -292,7 +292,7 @@ void SignalHandler::handleSignal(void)
     SignalInfo signalInfo;
     int ret = ::read(s_sigFd[1], &signalInfo, sizeof(SignalInfo));
     bool infoComplete = (ret == sizeof(SignalInfo));
-    int signum = (infoComplete ? signalInfo.signum : 0);
+    int signum = (infoComplete ? signalInfo.m_signum : 0);
 
     if (infoComplete)
     {
@@ -300,8 +300,8 @@ void SignalHandler::handleSignal(void)
         signame = strdup(signame ? signame : "Unknown Signal");
         LOG(VB_GENERAL, LOG_CRIT,
             QString("Received %1: Code %2, PID %3, UID %4, Value 0x%5")
-            .arg(signame) .arg(signalInfo.code) .arg(signalInfo.pid)
-            .arg(signalInfo.uid) .arg(signalInfo.value,8,16,QChar('0')));
+            .arg(signame) .arg(signalInfo.m_code) .arg(signalInfo.m_pid)
+            .arg(signalInfo.m_uid) .arg(signalInfo.m_value,8,16,QChar('0')));
         free(signame);
     }
 

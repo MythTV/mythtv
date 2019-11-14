@@ -325,8 +325,8 @@ const char *rchTagNames[] =
 // Some example programs use these colour names
 static struct
 {
-    const char *name;
-    unsigned char r, g, b, t;
+    const char *m_name;
+    unsigned char m_r, m_g, m_b, m_t;
 } colourTable[] =
 {
     { "black",          0,  0,  0,  0   },
@@ -782,7 +782,7 @@ void MHParseText::NextSym()
                 // Check the colour table.  If it's there generate a string containing the colour info.
                 for (int i = 0; i < (int)(sizeof(colourTable) / sizeof(colourTable[0])); i++)
                 {
-                    if (stricmp(buff, colourTable[i].name) == 0)
+                    if (stricmp(buff, colourTable[i].m_name) == 0)
                     {
                         m_nType = PTString;
                         unsigned char *str = (unsigned char *)realloc(m_String, 4 + 1);
@@ -793,10 +793,10 @@ void MHParseText::NextSym()
                         }
 
                         m_String = str;
-                        m_String[0] = colourTable[i].r;
-                        m_String[1] = colourTable[i].g;
-                        m_String[2] = colourTable[i].b;
-                        m_String[3] = colourTable[i].t;
+                        m_String[0] = colourTable[i].m_r;
+                        m_String[1] = colourTable[i].m_g;
+                        m_String[2] = colourTable[i].m_b;
+                        m_String[3] = colourTable[i].m_t;
                         m_nStringLength = 4;
                         m_String[m_nStringLength] = 0;
                         return;

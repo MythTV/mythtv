@@ -981,26 +981,26 @@ void wrapList(QStringList &list, int width)
 
 QString xml_indent(uint level)
 {
-    static QReadWriteLock rw_lock;
-    static QMap<uint,QString> cache;
+    static QReadWriteLock s_rwLock;
+    static QMap<uint,QString> s_cache;
 
-    rw_lock.lockForRead();
-    QMap<uint,QString>::const_iterator it = cache.find(level);
-    if (it != cache.end())
+    s_rwLock.lockForRead();
+    QMap<uint,QString>::const_iterator it = s_cache.find(level);
+    if (it != s_cache.end())
     {
         QString tmp = *it;
-        rw_lock.unlock();
+        s_rwLock.unlock();
         return tmp;
     }
-    rw_lock.unlock();
+    s_rwLock.unlock();
 
     QString ret = "";
     for (uint i = 0; i < level; i++)
         ret += "    ";
 
-    rw_lock.lockForWrite();
-    cache[level] = ret;
-    rw_lock.unlock();
+    s_rwLock.lockForWrite();
+    s_cache[level] = ret;
+    s_rwLock.unlock();
 
     return ret;
 }
