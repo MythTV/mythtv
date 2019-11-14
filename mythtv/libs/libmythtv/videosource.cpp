@@ -350,6 +350,20 @@ class CaptureCardTextEditSetting : public MythUITextEditSetting
     }
 };
 
+class ScanFrequency : public MythUITextEditSetting
+{
+  public:
+    ScanFrequency(const VideoSource &parent) :
+        MythUITextEditSetting(new VideoSourceDBStorage(this, parent, "scanfrequency"))
+    {
+       setLabel(QObject::tr("Scan Frequency"));
+       setHelpText(QObject::tr("The frequency to start scanning this video source. "
+                               "This is then default for 'Full Scan (Tuned)' channel scanning. "
+                               "Frequency value in Hz for DVB-T/T2/C, in kHz for DVB-S/S2. "
+                               "Leave at 0 if not known. "));
+    };
+};
+
 class DVBNetID : public MythUISpinBoxSetting
 {
   public:
@@ -614,6 +628,7 @@ VideoSource::VideoSource()
     addChild(m_name = new Name(*this));
     addChild(new XMLTVGrabber(*this));
     addChild(new FreqTableSelector(*this));
+    addChild(new ScanFrequency(*this));
     addChild(new DVBNetID(*this, -1, -1));
     addChild(new BouquetID(*this, 0, 0));
     addChild(new RegionID(*this, 0, 0));

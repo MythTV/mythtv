@@ -55,6 +55,7 @@ class MTV_PUBLIC ScanWizard : public GroupSetting
   protected slots:
     void Scan();
     void SetInput(const QString &cardid_inputname);
+    void SetPaneDefaults(const QString &cardid_inputname);
 
   protected:
     uint               m_lastHWCardID   {0};

@@ -817,6 +817,40 @@ DTVTunerType CardUtil::ProbeTunerType(const QString &device)
     return tunertype;
 }
 
+// Get the tuner type from the multiplex
+DTVTunerType CardUtil::GetTunerTypeFromMultiplex(uint mplexid)
+{
+    DTVTunerType tuner_type;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT mod_sys "
+        "FROM dtv_multiplex "
+        "WHERE dtv_multiplex.mplexid = :MPLEXID");
+    query.bindValue(":MPLEXID", mplexid);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("CardUtil::GetTunerTypeFromMultiplex", query);
+        return tuner_type;
+    }
+
+    if (!query.next())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Could not find mod_sys in dtv_multiplex for mplexid %1")
+                .arg(mplexid));
+
+        return tuner_type;
+    }
+
+    DTVModulationSystem mod_sys;
+    mod_sys.Parse(query.value(0).toString());
+    tuner_type = CardUtil::ConvertToTunerType(mod_sys);
+
+    return tuner_type;
+}
+
 // Get the currently configured delivery system from the database
 DTVModulationSystem CardUtil::GetDeliverySystem(uint inputid)
 {

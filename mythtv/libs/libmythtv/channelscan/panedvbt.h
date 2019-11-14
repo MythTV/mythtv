@@ -59,8 +59,18 @@ class PaneDVBT : public GroupSetting
     QString coderate_lp(void)    const { return m_pcoderate_lp->getValue();   }
     QString coderate_hp(void)    const { return m_pcoderate_hp->getValue();   }
     QString trans_mode(void)     const { return m_ptrans_mode->getValue();    }
-    QString guard_interval(void) const { return m_pguard_interval->getValue(); }
+    QString guard_interval(void) const { return m_pguard_interval->getValue();}
     QString hierarchy(void)      const { return m_phierarchy->getValue();     }
+
+    void setFrequency(uint frequency)             { m_pfrequency->setValue(frequency);          }
+    void setBandwidth(QString bandwidth)          { m_pbandwidth->setValue(bandwidth);          }
+    void setInversion(QString inversion)          { m_pinversion->setValue(inversion);          }
+    void setConstellation(QString constellation)  { m_pconstellation->setValue(constellation);  }
+    void setCodeRateLP(QString coderate_lp)       { m_pcoderate_lp->setValue(coderate_lp);      }
+    void setCodeRateHP(QString coderate_hp)       { m_pcoderate_hp->setValue(coderate_hp);      }
+    void setTransmode(QString trans_mode)         { m_ptrans_mode->setValue(trans_mode);        }
+    void setGuardInterval(QString guard_interval) { m_pguard_interval->setValue(guard_interval);}
+    void setHierarchy(QString hierarchy)          { m_phierarchy->setValue(hierarchy);          }
 
   protected:
     ScanFrequency        *m_pfrequency      {nullptr};

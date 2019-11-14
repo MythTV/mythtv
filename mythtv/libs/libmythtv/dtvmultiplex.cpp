@@ -4,6 +4,7 @@
 #include "mpeg/dvbdescriptors.h"
 #include "mythdb.h"
 #include "mythlogging.h"
+#include "cardutil.h"
 #include <utility>
 
 #define LOC      QString("DTVMux: ")

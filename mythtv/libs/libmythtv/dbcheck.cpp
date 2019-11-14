@@ -3488,6 +3488,16 @@ nullptr
             return false;
     }
 
+    if (dbver == "1354")
+    {
+        const char *updates[] = {
+            "ALTER TABLE videosource ADD COLUMN scanfrequency INT UNSIGNED DEFAULT 0;",
+            nullptr
+        };
+        if (!performActualUpdate(updates, "1355", dbver))
+            return false;
+    }
+
     return true;
 }
 
