@@ -399,6 +399,14 @@ void MythDialogBox::AddButton(const QString &title, const char *slot,
     m_buttonList->GetVisibleCount();
 }
 
+bool MythDialogBox::inputMethodEvent(QInputMethodEvent *event)
+{
+    if (GetFocusWidget()->inputMethodEvent(event))
+        return true;
+
+	return false;
+}
+
 bool MythDialogBox::keyPressEvent(QKeyEvent *event)
 {
     if (GetFocusWidget()->keyPressEvent(event))

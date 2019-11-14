@@ -7,6 +7,7 @@
 #include <QSemaphore>
 #include <QEvent>
 
+class QInputMethodEvent;
 class ScreenLoadTask;
 class MythScreenStack;
 class MythUIBusyDialog;
@@ -50,6 +51,7 @@ class MUI_PUBLIC MythScreenType : public MythUIComposite
 
     virtual bool Create(void); // do the actual work of making the screen.
     bool keyPressEvent(QKeyEvent *) override; // MythUIType
+	bool inputMethodEvent(QInputMethodEvent *event) override;// MythUIType
     bool gestureEvent(MythGestureEvent *) override; // MythUIType
     virtual void ShowMenu(void);
 

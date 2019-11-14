@@ -7,6 +7,7 @@
 #include <QChar>
 #include <QKeyEvent>
 #include <QDomDocument>
+#include <QInputMethodEvent>
 #include <Qt>
 
 // libmythbase headers
@@ -56,6 +57,9 @@ MythUITextEdit::MythUITextEdit(MythUIType *parent, const QString &name)
     m_lastKeyPress.start();
 
     m_composeKey = 0;
+
+    m_messageBak.clear();
+    m_isIMEinput = false;
 }
 
 void MythUITextEdit::Select()
@@ -283,6 +287,19 @@ bool MythUITextEdit::InsertCharacter(const QString &character)
     return true;
 }
 
+// This is used for updating IME.
+bool MythUITextEdit::UpdateTmpString(const QString &str)
+{
+	if (!m_Text)
+        return false;
+
+	if(str.isEmpty()) return false;
+	QString newmessage = m_Message;
+	newmessage.append(str);
+    SetText(newmessage, false);
+	return true;
+}
+
 void MythUITextEdit::RemoveCharacter(int position)
 {
     if (m_Message.isEmpty() || position < 0 || position >= m_Message.size())
@@ -426,8 +443,44 @@ static void LoadDeadKeys(QMap<QPair<int, int>, int> &map)
     return;
 }
 
+bool MythUITextEdit::inputMethodEvent(QInputMethodEvent *event)
+{
+    // 1st test.
+    if(m_isPassword) return false;
+
+	bool _bak = m_isIMEinput;
+    if(!m_isIMEinput && (event->commitString().isEmpty() || event->preeditString().isEmpty())) {
+        m_isIMEinput = true;
+        m_messageBak = m_Message;
+    }
+/*	printf("IME: %s->%s PREEDIT=\"%s\" COMMIT=\"%s\"\n"
+		   , (_bak) ? "ON" : "OFF"
+		   , (m_isIMEinput) ? "ON" : "OFF"
+		   , event->preeditString().toUtf8().constData()
+		   , event->commitString().toUtf8().constData());*/
+    if(!event->commitString().isEmpty() && m_isIMEinput) {
+	    m_Message = m_messageBak;
+	    m_messageBak.clear();
+	    InsertText(event->commitString());
+	    m_isIMEinput = false;
+		return true; // commited
+    } else if(m_isIMEinput && !event->preeditString().isEmpty()) {
+	    m_Message = m_messageBak;
+	    UpdateTmpString(event->preeditString());
+	    return true; // preedited
+    } else if(m_isIMEinput && _bak) { // Abort?
+        m_isIMEinput = false;
+        QString newmessage= m_messageBak;
+		m_messageBak.clear();
+		SetText(newmessage, true);
+		return true;
+	}
+    return true; // Not commited
+}
+
 bool MythUITextEdit::keyPressEvent(QKeyEvent *event)
 {
+	if(m_isIMEinput) return true; // Prefer IME then keyPress.
     m_lastKeyPress.restart();
 
     QStringList actions;
