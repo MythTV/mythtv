@@ -142,11 +142,13 @@ void MythOpenGLPainter::End(void)
         return;
     }
 
-    m_render->Flush();
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         m_render->logDebugMarker("PAINTER_FRAME_END");
     if (m_target == nullptr && m_swapControl)
+    {
+        m_render->Flush();
         m_render->swapBuffers();
+    }
     m_render->doneCurrent();
 
     m_mappedTextures.clear();
