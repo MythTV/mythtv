@@ -54,10 +54,10 @@ class MSocketDevicePrivate
 
 public:
     explicit MSocketDevicePrivate(MSocketDevice::Protocol p)
-            : protocol(p)
+            : m_protocol(p)
     { }
 
-    MSocketDevice::Protocol protocol;
+    MSocketDevice::Protocol m_protocol;
 };
 
 
@@ -272,15 +272,15 @@ MSocketDevice::Type MSocketDevice::type() const
 */
 MSocketDevice::Protocol MSocketDevice::protocol() const
 {
-    if (d->protocol == Unknown)
-        d->protocol = getProtocol();
+    if (d->m_protocol == Unknown)
+        d->m_protocol = getProtocol();
 
-    return d->protocol;
+    return d->m_protocol;
 }
 
 void MSocketDevice::setProtocol(Protocol protocol)
 {
-    d->protocol = protocol;
+    d->m_protocol = protocol;
 }
 
 /*!
@@ -320,7 +320,7 @@ void MSocketDevice::setSocket(int socket, Type type)
 
     fd = socket;
 
-    d->protocol = Unknown;
+    d->m_protocol = Unknown;
 
     e = NoError;
 

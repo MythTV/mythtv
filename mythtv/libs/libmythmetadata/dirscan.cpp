@@ -19,11 +19,11 @@ namespace
       private:
         typedef std::map<QString, bool> ext_map;
         ext_map m_extensions;
-        bool m_list_unknown;
+        bool m_listUnknown;
 
       public:
         ext_lookup(const FileAssociations::ext_ignore_list &ext_disposition,
-                   bool list_unknown) : m_list_unknown(list_unknown)
+                   bool list_unknown) : m_listUnknown(list_unknown)
         {
             for (FileAssociations::ext_ignore_list::const_iterator p =
                  ext_disposition.begin(); p != ext_disposition.end(); ++p)
@@ -38,7 +38,7 @@ namespace
             ext_map::const_iterator p = m_extensions.find(extension.toLower());
             if (p != m_extensions.end())
                 return p->second;
-            return !m_list_unknown;
+            return !m_listUnknown;
         }
     };
 

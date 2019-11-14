@@ -45,8 +45,8 @@ if( (x) >= 0 ) { \
 
 typedef struct
 {
-    MythSystemLegacyUnix *ms;
-    int             type;
+    MythSystemLegacyUnix *m_ms;
+    int                   m_type;
 } FDType_t;
 typedef QMap<int, FDType_t*> FDMap_t;
 
@@ -165,8 +165,8 @@ void MythSystemLegacyIOHandler::HandleRead(int fd, QBuffer *buff)
         fdLock.unlock();
 
         // Emit the data ready signal (1 = stdout, 2 = stderr)
-        MythSystemLegacyUnix *ms = fdType->ms;
-        emit ms->readDataReady(fdType->type);
+        MythSystemLegacyUnix *ms = fdType->m_ms;
+        emit ms->readDataReady(fdType->m_type);
     }
 }
 
@@ -451,8 +451,8 @@ void MythSystemLegacyManager::append(MythSystemLegacyUnix *ms)
     if( ms->GetSetting("UseStdout") )
     {
         FDType_t *fdType = new FDType_t;
-        fdType->ms = ms;
-        fdType->type = 1;
+        fdType->m_ms = ms;
+        fdType->m_type = 1;
         fdLock.lock();
         fdMap.insert( ms->m_stdpipe[1], fdType );
         fdLock.unlock();
@@ -462,8 +462,8 @@ void MythSystemLegacyManager::append(MythSystemLegacyUnix *ms)
     if( ms->GetSetting("UseStderr") )
     {
         FDType_t *fdType = new FDType_t;
-        fdType->ms = ms;
-        fdType->type = 2;
+        fdType->m_ms = ms;
+        fdType->m_type = 2;
         fdLock.lock();
         fdMap.insert( ms->m_stdpipe[2], fdType );
         fdLock.unlock();

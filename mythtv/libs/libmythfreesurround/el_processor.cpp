@@ -48,55 +48,55 @@ class decoder_impl {
 public:
     // create an instance of the decoder
     //  blocksize is fixed over the lifetime of this object for performance reasons
-    decoder_impl(unsigned blocksize=8192): N(blocksize), halfN(blocksize/2) {
+    decoder_impl(unsigned blocksize=8192): m_n(blocksize), m_halfN(blocksize/2) {
 #ifdef USE_FFTW3
         // create FFTW buffers
-        lt = (float*)fftwf_malloc(sizeof(float)*N);
-        rt = (float*)fftwf_malloc(sizeof(float)*N);
-        dst = (float*)fftwf_malloc(sizeof(float)*N);
-        dftL = (fftwf_complex*)fftwf_malloc(sizeof(fftwf_complex)*N);
-        dftR = (fftwf_complex*)fftwf_malloc(sizeof(fftwf_complex)*N);
-        src = (fftwf_complex*)fftwf_malloc(sizeof(fftwf_complex)*N);
-        loadL = fftwf_plan_dft_r2c_1d(N, lt, dftL,FFTW_MEASURE);
-        loadR = fftwf_plan_dft_r2c_1d(N, rt, dftR,FFTW_MEASURE);
-        store = fftwf_plan_dft_c2r_1d(N, src, dst,FFTW_MEASURE);    
+        m_lt = (float*)fftwf_malloc(sizeof(float)*m_n);
+        m_rt = (float*)fftwf_malloc(sizeof(float)*m_n);
+        m_dst = (float*)fftwf_malloc(sizeof(float)*m_n);
+        m_dftL = (fftwf_complex*)fftwf_malloc(sizeof(fftwf_complex)*m_n);
+        m_dftR = (fftwf_complex*)fftwf_malloc(sizeof(fftwf_complex)*m_n);
+        m_src = (fftwf_complex*)fftwf_malloc(sizeof(fftwf_complex)*m_n);
+        m_loadL = fftwf_plan_dft_r2c_1d(m_n, m_lt, m_dftL,FFTW_MEASURE);
+        m_loadR = fftwf_plan_dft_r2c_1d(m_n, m_rt, m_dftR,FFTW_MEASURE);
+        m_store = fftwf_plan_dft_c2r_1d(m_n, m_src, m_dst,FFTW_MEASURE);
 #else
         // create lavc fft buffers
-        lt = (float*)av_malloc(sizeof(FFTSample)*N);
-        rt = (float*)av_malloc(sizeof(FFTSample)*N);
-        dftL = (FFTComplexArray*)av_malloc(sizeof(FFTComplex)*N*2);
-        dftR = (FFTComplexArray*)av_malloc(sizeof(FFTComplex)*N*2);
-        src = (FFTComplexArray*)av_malloc(sizeof(FFTComplex)*N*2);
-        fftContextForward = (FFTContext*)av_malloc(sizeof(FFTContext));
-        memset(fftContextForward, 0, sizeof(FFTContext));
-        fftContextReverse = (FFTContext*)av_malloc(sizeof(FFTContext));
-        memset(fftContextReverse, 0, sizeof(FFTContext));
-        ff_fft_init(fftContextForward, 13, 0);
-        ff_fft_init(fftContextReverse, 13, 1);
+        m_lt = (float*)av_malloc(sizeof(FFTSample)*m_n);
+        m_rt = (float*)av_malloc(sizeof(FFTSample)*m_n);
+        m_dftL = (FFTComplexArray*)av_malloc(sizeof(FFTComplex)*m_n*2);
+        m_dftR = (FFTComplexArray*)av_malloc(sizeof(FFTComplex)*m_n*2);
+        m_src = (FFTComplexArray*)av_malloc(sizeof(FFTComplex)*m_n*2);
+        m_fftContextForward = (FFTContext*)av_malloc(sizeof(FFTContext));
+        memset(m_fftContextForward, 0, sizeof(FFTContext));
+        m_fftContextReverse = (FFTContext*)av_malloc(sizeof(FFTContext));
+        memset(m_fftContextReverse, 0, sizeof(FFTContext));
+        ff_fft_init(m_fftContextForward, 13, 0);
+        ff_fft_init(m_fftContextReverse, 13, 1);
 #endif
         // resize our own buffers
-        frontR.resize(N);
-        frontL.resize(N);
-        avg.resize(N);
-        surR.resize(N);
-        surL.resize(N);
-        trueavg.resize(N);
-        xfs.resize(N);
-        yfs.resize(N);
-        inbuf[0].resize(N);
-        inbuf[1].resize(N);
+        m_frontR.resize(m_n);
+        m_frontL.resize(m_n);
+        m_avg.resize(m_n);
+        m_surR.resize(m_n);
+        m_surL.resize(m_n);
+        m_trueavg.resize(m_n);
+        m_xFs.resize(m_n);
+        m_yFs.resize(m_n);
+        m_inbuf[0].resize(m_n);
+        m_inbuf[1].resize(m_n);
         for (unsigned c=0;c<6;c++) {
-            outbuf[c].resize(N);
-            filter[c].resize(N);
+            m_outbuf[c].resize(m_n);
+            m_filter[c].resize(m_n);
         }
         sample_rate(48000);
         // generate the window function (square root of hann, b/c it is applied before and after the transform)
-        wnd.resize(N);
-        for (unsigned k=0;k<N;k++)
-            wnd[k] = sqrt(0.5*(1-std::cos(2*PI*k/N))/N);
-        current_buf = 0;
-        memset(inbufs, 0, sizeof(inbufs));
-        memset(outbufs, 0, sizeof(outbufs));
+        m_wnd.resize(m_n);
+        for (unsigned k=0;k<m_n;k++)
+            m_wnd[k] = sqrt(0.5*(1-std::cos(2*PI*k/m_n))/m_n);
+        m_currentBuf = 0;
+        memset(m_inbufs, 0, sizeof(m_inbufs));
+        memset(m_outbufs, 0, sizeof(m_outbufs));
         // set the default coefficients
         surround_coefficients(0.8165,0.5774);
         phase_mode(0);
@@ -108,44 +108,44 @@ public:
     ~decoder_impl() {
 #ifdef USE_FFTW3
         // clean up the FFTW stuff
-        fftwf_destroy_plan(store);
-        fftwf_destroy_plan(loadR);
-        fftwf_destroy_plan(loadL);
-        fftwf_free(src); 
-        fftwf_free(dftR);
-        fftwf_free(dftL);
-        fftwf_free(dst);
-        fftwf_free(rt);
-        fftwf_free(lt);
+        fftwf_destroy_plan(m_store);
+        fftwf_destroy_plan(m_loadR);
+        fftwf_destroy_plan(m_loadL);
+        fftwf_free(m_src);
+        fftwf_free(m_dftR);
+        fftwf_free(m_dftL);
+        fftwf_free(m_dst);
+        fftwf_free(m_rt);
+        fftwf_free(m_lt);
 #else
-        ff_fft_end(fftContextForward);
-        ff_fft_end(fftContextReverse);
-        av_free(src); 
-        av_free(dftR);
-        av_free(dftL);
-        av_free(rt);
-        av_free(lt);
-        av_free(fftContextForward); 
-        av_free(fftContextReverse); 
+        ff_fft_end(m_fftContextForward);
+        ff_fft_end(m_fftContextReverse);
+        av_free(m_src);
+        av_free(m_dftR);
+        av_free(m_dftL);
+        av_free(m_rt);
+        av_free(m_lt);
+        av_free(m_fftContextForward);
+        av_free(m_fftContextReverse);
 #endif
     }
 
     float ** getInputBuffers()
     {
-        inbufs[0] = &inbuf[0][current_buf*halfN];
-        inbufs[1] = &inbuf[1][current_buf*halfN];
-        return inbufs;
+        m_inbufs[0] = &m_inbuf[0][m_currentBuf*m_halfN];
+        m_inbufs[1] = &m_inbuf[1][m_currentBuf*m_halfN];
+        return m_inbufs;
     }
 
     float ** getOutputBuffers()
     {
-        outbufs[0] = &outbuf[0][current_buf*halfN];
-        outbufs[1] = &outbuf[1][current_buf*halfN];
-        outbufs[2] = &outbuf[2][current_buf*halfN];
-        outbufs[3] = &outbuf[3][current_buf*halfN];
-        outbufs[4] = &outbuf[4][current_buf*halfN];
-        outbufs[5] = &outbuf[5][current_buf*halfN];
-        return outbufs;
+        m_outbufs[0] = &m_outbuf[0][m_currentBuf*m_halfN];
+        m_outbufs[1] = &m_outbuf[1][m_currentBuf*m_halfN];
+        m_outbufs[2] = &m_outbuf[2][m_currentBuf*m_halfN];
+        m_outbufs[3] = &m_outbuf[3][m_currentBuf*m_halfN];
+        m_outbufs[4] = &m_outbuf[4][m_currentBuf*m_halfN];
+        m_outbufs[5] = &m_outbuf[5][m_currentBuf*m_halfN];
+        return m_outbufs;
     }
 
     // decode a chunk of stereo sound, has to contain exactly blocksize samples
@@ -154,64 +154,64 @@ public:
     //  adaption_rate [0..1] determines how fast the steering gets adapted, 1=instantaneous, 0.1 = very slow adaption
     void decode(float center_width, float dimension, float adaption_rate) {
         // process first part
-        int index = current_buf*halfN;
-        float *in_second[2] = {&inbuf[0][index],&inbuf[1][index]};
-        current_buf ^= 1;
-        index = current_buf*halfN;
-        float *in_first[2] = {&inbuf[0][index],&inbuf[1][index]};
+        int index = m_currentBuf*m_halfN;
+        float *in_second[2] = {&m_inbuf[0][index],&m_inbuf[1][index]};
+        m_currentBuf ^= 1;
+        index = m_currentBuf*m_halfN;
+        float *in_first[2] = {&m_inbuf[0][index],&m_inbuf[1][index]};
         add_output(in_first,in_second,center_width,dimension,adaption_rate,true);
         // shift last half of input buffer to the beginning
     }
     
     // flush the internal buffers
     void flush() {
-        for (unsigned k=0;k<N;k++) {
+        for (unsigned k=0;k<m_n;k++) {
             for (unsigned c=0;c<6;c++)
-                outbuf[c][k] = 0;
-            inbuf[0][k] = 0;
-            inbuf[1][k] = 0;
+                m_outbuf[c][k] = 0;
+            m_inbuf[0][k] = 0;
+            m_inbuf[1][k] = 0;
         }
     }
 
     // set lfe filter params
     void sample_rate(unsigned int srate) {
         // lfe filter is just straight through band limited
-        unsigned int cutoff = (30*N)/srate;
-        for (unsigned f=0;f<=halfN;f++) {           
+        unsigned int cutoff = (30*m_n)/srate;
+        for (unsigned f=0;f<=m_halfN;f++) {
             if (f<cutoff)
-                filter[5][f] = 0.5*sqrt(0.5);
+                m_filter[5][f] = 0.5*sqrt(0.5);
             else
-                filter[5][f] = 0.0;
+                m_filter[5][f] = 0.0;
         }
     }
 
     // set the assumed surround mixing coefficients
     void surround_coefficients(float a, float b) {
         // calc the simple coefficients
-        surround_high = a;
-        surround_low = b;
-        surround_balance = (a-b)/(a+b);
-        surround_level = 1/(a+b);
+        m_surroundHigh = a;
+        m_surroundLow = b;
+        m_surroundBalance = (a-b)/(a+b);
+        m_surroundLevel = 1/(a+b);
         // calc the linear coefficients
         cfloat i(0,1), u((a+b)*i), v((b-a)*i), n(0.25,0),o(1,0);
-        A = (v-o)*n; B = (o-u)*n; C = (-o-v)*n; D = (o+u)*n;
-        E = (o+v)*n; F = (o+u)*n; G = (o-v)*n;  H = (o-u)*n;
+        m_a = (v-o)*n; m_b = (o-u)*n; m_c = (-o-v)*n; m_d = (o+u)*n;
+        m_e = (o+v)*n; m_f = (o+u)*n; m_g = (o-v)*n;  m_h = (o-u)*n;
     }
 
     // set the phase shifting mode
     void phase_mode(unsigned mode) {
         const float modes[4][2] = {{0,0},{0,PI},{PI,0},{-PI/2,PI/2}};
-        phase_offsetL = modes[mode][0];
-        phase_offsetR = modes[mode][1];
+        m_phaseOffsetL = modes[mode][0];
+        m_phaseOffsetR = modes[mode][1];
     }
 
     // what steering mode should be chosen
-    void steering_mode(bool mode) { linear_steering = mode; }
+    void steering_mode(bool mode) { m_linearSteering = mode; }
 
     // set front & rear separation controls
     void separation(float front, float rear) {
-        front_separation = front;
-        rear_separation = rear;
+        m_frontSeparation = front;
+        m_rearSeparation = rear;
     }
 
 private:
@@ -228,7 +228,7 @@ private:
     // handle the output buffering for overlapped calls of block_decode
     void add_output(float *input1[2], float *input2[2], float center_width, float dimension, float adaption_rate, bool /*result*/=false) {
         // add the windowed data to the last 1/2 of the output buffer
-        float *out[6] = {&outbuf[0][0],&outbuf[1][0],&outbuf[2][0],&outbuf[3][0],&outbuf[4][0],&outbuf[5][0]};
+        float *out[6] = {&m_outbuf[0][0],&m_outbuf[1][0],&m_outbuf[2][0],&m_outbuf[3][0],&m_outbuf[4][0],&m_outbuf[5][0]};
         block_decode(input1,input2,out,center_width,dimension,adaption_rate);
     }
 
@@ -238,18 +238,18 @@ private:
         // - first it improves the FFT resolution b/c boundary discontinuities (and their frequencies) get removed
         // - second it allows for smooth blending of varying filters between the blocks
         {
-            float* pWnd = &wnd[0];
-            float* pLt = &lt[0];
-            float* pRt = &rt[0];
+            float* pWnd = &m_wnd[0];
+            float* pLt =  &m_lt[0];
+            float* pRt =  &m_rt[0];
             float* pIn0 = input1[0];
             float* pIn1 = input1[1];
-            for (unsigned k=0;k<halfN;k++) {
+            for (unsigned k=0;k<m_halfN;k++) {
                 *pLt++ = *pIn0++ * *pWnd;
                 *pRt++ = *pIn1++ * *pWnd++;
             }
             pIn0 = input2[0];
             pIn1 = input2[1];
-            for (unsigned k=0;k<halfN;k++) {
+            for (unsigned k=0;k<m_halfN;k++) {
                 *pLt++ = *pIn0++ * *pWnd;
                 *pRt++ = *pIn1++ * *pWnd++;
             }
@@ -257,22 +257,22 @@ private:
 
 #ifdef USE_FFTW3
         // ... and tranform it into the frequency domain
-        fftwf_execute(loadL);
-        fftwf_execute(loadR);
+        fftwf_execute(m_loadL);
+        fftwf_execute(m_loadR);
 #else
-        ff_fft_permuteRC(fftContextForward, lt, (FFTComplex*)&dftL[0]);
-        av_fft_calc(fftContextForward, (FFTComplex*)&dftL[0]);
+        ff_fft_permuteRC(m_fftContextForward, m_lt, (FFTComplex*)&m_dftL[0]);
+        av_fft_calc(m_fftContextForward, (FFTComplex*)&m_dftL[0]);
 
-        ff_fft_permuteRC(fftContextForward, rt, (FFTComplex*)&dftR[0]);
-        av_fft_calc(fftContextForward, (FFTComplex*)&dftR[0]);
+        ff_fft_permuteRC(m_fftContextForward, m_rt, (FFTComplex*)&m_dftR[0]);
+        av_fft_calc(m_fftContextForward, (FFTComplex*)&m_dftR[0]);
 #endif
 
         // 2. compare amplitude and phase of each DFT bin and produce the X/Y coordinates in the sound field
         //    but dont do DC or N/2 component
-        for (unsigned f=0;f<halfN;f++) {           
+        for (unsigned f=0;f<m_halfN;f++) {
             // get left/right amplitudes/phases
-            float ampL = amplitude(dftL[f]), ampR = amplitude(dftR[f]);
-            float phaseL = phase(dftL[f]), phaseR = phase(dftR[f]);
+            float ampL = amplitude(m_dftL[f]), ampR = amplitude(m_dftR[f]);
+            float phaseL = phase(m_dftL[f]), phaseR = phase(m_dftR[f]);
 //          if (ampL+ampR < epsilon)
 //              continue;       
 
@@ -283,33 +283,33 @@ private:
             if (phaseDiff > PI) phaseDiff -= 2*PI;
             phaseDiff = abs(phaseDiff);
 
-            if (linear_steering) {
+            if (m_linearSteering) {
                 // --- this is the fancy new linear mode ---
 
                 // get sound field x/y position
-                yfs[f] = get_yfs(ampDiff,phaseDiff);
-                xfs[f] = get_xfs(ampDiff,yfs[f]);
+                m_yFs[f] = get_yfs(ampDiff,phaseDiff);
+                m_xFs[f] = get_xfs(ampDiff,m_yFs[f]);
 
                 // add dimension control
-                yfs[f] = clamp(yfs[f] - dimension);
+                m_yFs[f] = clamp(m_yFs[f] - dimension);
 
                 // add crossfeed control
-                xfs[f] = clamp(xfs[f] * (front_separation*(1+yfs[f])/2 + rear_separation*(1-yfs[f])/2));
+                m_xFs[f] = clamp(m_xFs[f] * (m_frontSeparation*(1+m_yFs[f])/2 + m_rearSeparation*(1-m_yFs[f])/2));
 
                 // 3. generate frequency filters for each output channel
-                float left = (1-xfs[f])/2, right = (1+xfs[f])/2;
-                float front = (1+yfs[f])/2, back = (1-yfs[f])/2;
+                float left = (1-m_xFs[f])/2, right = (1+m_xFs[f])/2;
+                float front = (1+m_yFs[f])/2, back = (1-m_yFs[f])/2;
                 float volume[5] = {
-                    front * (left * center_width + max(0,-xfs[f]) * (1-center_width)),  // left
-                    front * center_level*((1-abs(xfs[f])) * (1-center_width)),          // center
-                    front * (right * center_width + max(0, xfs[f]) * (1-center_width)), // right
-                    back * surround_level * left,                                       // left surround
-                    back * surround_level * right                                       // right surround
+                    front * (left * center_width + max(0,-m_xFs[f]) * (1-center_width)),  // left
+                    front * center_level*((1-abs(m_xFs[f])) * (1-center_width)),          // center
+                    front * (right * center_width + max(0, m_xFs[f]) * (1-center_width)), // right
+                    back * m_surroundLevel * left,                                        // left surround
+                    back * m_surroundLevel * right                                        // right surround
                 };
 
                 // adapt the prior filter
                 for (unsigned c=0;c<5;c++)
-                    filter[c][f] = (1-adaption_rate)*filter[c][f] + adaption_rate*volume[c];
+                    m_filter[c][f] = (1-adaption_rate)*m_filter[c][f] + adaption_rate*volume[c];
 
             } else {
                 // --- this is the old & simple steering mode ---
@@ -322,57 +322,57 @@ private:
                 phaseDiff = abs(phaseDiff);
 
                 // determine sound field x-position
-                xfs[f] = ampDiff;
+                m_xFs[f] = ampDiff;
 
                 // determine preliminary sound field y-position from phase difference
-                yfs[f] = 1 - (phaseDiff/PI)*2;
+                m_yFs[f] = 1 - (phaseDiff/PI)*2;
 
-                if (abs(xfs[f]) > surround_balance) {
+                if (abs(m_xFs[f]) > m_surroundBalance) {
                     // blend linearly between the surrounds and the fronts if the balance exceeds the surround encoding balance
                     // this is necessary because the sound field is trapezoidal and will be stretched behind the listener
-                    float frontness = (abs(xfs[f]) - surround_balance)/(1-surround_balance);
-                    yfs[f]  = (1-frontness) * yfs[f] + frontness * 1; 
+                    float frontness = (abs(m_xFs[f]) - m_surroundBalance)/(1-m_surroundBalance);
+                    m_yFs[f]  = (1-frontness) * m_yFs[f] + frontness * 1;
                 }
 
                 // add dimension control
-                yfs[f] = clamp(yfs[f] - dimension);
+                m_yFs[f] = clamp(m_yFs[f] - dimension);
 
                 // add crossfeed control
-                xfs[f] = clamp(xfs[f] * (front_separation*(1+yfs[f])/2 + rear_separation*(1-yfs[f])/2));
+                m_xFs[f] = clamp(m_xFs[f] * (m_frontSeparation*(1+m_yFs[f])/2 + m_rearSeparation*(1-m_yFs[f])/2));
 
                 // 3. generate frequency filters for each output channel, according to the signal position
                 // the sum of all channel volumes must be 1.0
-                float left = (1-xfs[f])/2, right = (1+xfs[f])/2;
-                float front = (1+yfs[f])/2, back = (1-yfs[f])/2;
+                float left = (1-m_xFs[f])/2, right = (1+m_xFs[f])/2;
+                float front = (1+m_yFs[f])/2, back = (1-m_yFs[f])/2;
                 float volume[5] = {
-                    front * (left * center_width + max(0,-xfs[f]) * (1-center_width)),      // left
-                    front * center_level*((1-abs(xfs[f])) * (1-center_width)),              // center
-                    front * (right * center_width + max(0, xfs[f]) * (1-center_width)),     // right
-                    back * surround_level*max(0,min(1,((1-(xfs[f]/surround_balance))/2))),  // left surround
-                    back * surround_level*max(0,min(1,((1+(xfs[f]/surround_balance))/2)))   // right surround
+                    front * (left * center_width + max(0,-m_xFs[f]) * (1-center_width)),      // left
+                    front * center_level*((1-abs(m_xFs[f])) * (1-center_width)),              // center
+                    front * (right * center_width + max(0, m_xFs[f]) * (1-center_width)),     // right
+                    back * m_surroundLevel*max(0,min(1,((1-(m_xFs[f]/m_surroundBalance))/2))),// left surround
+                    back * m_surroundLevel*max(0,min(1,((1+(m_xFs[f]/m_surroundBalance))/2))) // right surround
                 };
 
                 // adapt the prior filter
                 for (unsigned c=0;c<5;c++)
-                    filter[c][f] = (1-adaption_rate)*filter[c][f] + adaption_rate*volume[c];
+                    m_filter[c][f] = (1-adaption_rate)*m_filter[c][f] + adaption_rate*volume[c];
             }
 
             // ... and build the signal which we want to position
-            frontL[f] = polar(ampL+ampR,phaseL);
-            frontR[f] = polar(ampL+ampR,phaseR);
-            avg[f] = frontL[f] + frontR[f];
-            surL[f] = polar(ampL+ampR,phaseL+phase_offsetL);
-            surR[f] = polar(ampL+ampR,phaseR+phase_offsetR);
-            trueavg[f] = cfloat(dftL[f][0] + dftR[f][0], dftL[f][1] + dftR[f][1]);
+            m_frontL[f] = polar(ampL+ampR,phaseL);
+            m_frontR[f] = polar(ampL+ampR,phaseR);
+            m_avg[f] = m_frontL[f] + m_frontR[f];
+            m_surL[f] = polar(ampL+ampR,phaseL+m_phaseOffsetL);
+            m_surR[f] = polar(ampL+ampR,phaseR+m_phaseOffsetR);
+            m_trueavg[f] = cfloat(m_dftL[f][0] + m_dftR[f][0], m_dftL[f][1] + m_dftR[f][1]);
         }
 
         // 4. distribute the unfiltered reference signals over the channels
-        apply_filter(&frontL[0],&filter[0][0],&output[0][0]);   // front left
-        apply_filter(&avg[0], &filter[1][0],&output[1][0]);     // front center
-        apply_filter(&frontR[0],&filter[2][0],&output[2][0]);   // front right
-        apply_filter(&surL[0],&filter[3][0],&output[3][0]);     // surround left
-        apply_filter(&surR[0],&filter[4][0],&output[4][0]);     // surround right
-        apply_filter(&trueavg[0],&filter[5][0],&output[5][0]);  // lfe
+        apply_filter(&m_frontL[0], &m_filter[0][0],&output[0][0]);  // front left
+        apply_filter(&m_avg[0],    &m_filter[1][0],&output[1][0]);  // front center
+        apply_filter(&m_frontR[0], &m_filter[2][0],&output[2][0]);  // front right
+        apply_filter(&m_surL[0],   &m_filter[3][0],&output[3][0]);  // surround left
+        apply_filter(&m_surR[0],   &m_filter[4][0],&output[4][0]);  // surround right
+        apply_filter(&m_trueavg[0],&m_filter[5][0],&output[5][0]);  // lfe
     }
 
 #define FASTER_CALC
@@ -426,22 +426,22 @@ private:
     // filter the complex source signal and add it to target
     void apply_filter(cfloat *signal, const float *flt, float *target) {
         // filter the signal
-        for (unsigned f=0;f<=halfN;f++) {
-            src[f][0] = signal[f].real() * flt[f];
-            src[f][1] = signal[f].imag() * flt[f];
+        for (unsigned f=0;f<=m_halfN;f++) {
+            m_src[f][0] = signal[f].real() * flt[f];
+            m_src[f][1] = signal[f].imag() * flt[f];
         }
 #ifdef USE_FFTW3
         // transform into time domain
-        fftwf_execute(store);
+        fftwf_execute(m_store);
 
-        float* pT1   = &target[current_buf*halfN];
-        float* pWnd1 = &wnd[0];
-        float* pDst1 = &dst[0];
-        float* pT2   = &target[(current_buf^1)*halfN];
-        float* pWnd2 = &wnd[halfN];
-        float* pDst2 = &dst[halfN];
+        float* pT1   = &target[m_currentBuf*m_halfN];
+        float* pWnd1 = &m_wnd[0];
+        float* pDst1 = &m_dst[0];
+        float* pT2   = &target[(m_currentBuf^1)*m_halfN];
+        float* pWnd2 = &m_wnd[m_halfN];
+        float* pDst2 = &m_dst[m_halfN];
         // add the result to target, windowed
-        for (unsigned int k=0;k<halfN;k++)
+        for (unsigned int k=0;k<m_halfN;k++)
         {
             // 1st part is overlap add
             *pT1++ += *pWnd1++ * *pDst1++;
@@ -450,21 +450,21 @@ private:
         }
 #else
         // enforce odd symmetry
-        for (f=1;f<halfN;f++) {
-            src[N-f][0] = src[f][0];
-            src[N-f][1] = -src[f][1];   // complex conjugate
+        for (unsigned f=1;f<m_halfN;f++) {
+            m_src[m_n-f][0] = m_src[f][0];
+            m_src[m_n-f][1] = -m_src[f][1];   // complex conjugate
         }
-        av_fft_permute(fftContextReverse, (FFTComplex*)&src[0]);
-        av_fft_calc(fftContextReverse, (FFTComplex*)&src[0]);
+        av_fft_permute(m_fftContextReverse, (FFTComplex*)&m_src[0]);
+        av_fft_calc(m_fftContextReverse, (FFTComplex*)&m_src[0]);
 
-        float* pT1   = &target[current_buf*halfN];
-        float* pWnd1 = &wnd[0];
-        float* pDst1 = &src[0][0];
-        float* pT2   = &target[(current_buf^1)*halfN];
-        float* pWnd2 = &wnd[halfN];
-        float* pDst2 = &src[halfN][0];
+        float* pT1   = &target[m_currentBuf*m_halfN];
+        float* pWnd1 = &m_wnd[0];
+        float* pDst1 = &m_src[0][0];
+        float* pT2   = &target[(m_currentBuf^1)*m_halfN];
+        float* pWnd2 = &m_wnd[m_halfN];
+        float* pDst2 = &m_src[m_halfN][0];
         // add the result to target, windowed
-        for (unsigned int k=0;k<halfN;k++)
+        for (unsigned int k=0;k<m_halfN;k++)
         {
             // 1st part is overlap add
             *pT1++ += *pWnd1++ * *pDst1; pDst1 += 2;
@@ -515,38 +515,38 @@ private:
     }
 #endif
 
-    unsigned int N;                    // the block size
-    unsigned int halfN;                // half block size precalculated
+    unsigned int m_n;                    // the block size
+    unsigned int m_halfN;                // half block size precalculated
 #ifdef USE_FFTW3
     // FFTW data structures
-    float *lt,*rt,*dst;                // left total, right total (source arrays), destination array
-    fftwf_complex *dftL,*dftR,*src;    // intermediate arrays (FFTs of lt & rt, processing source)
-    fftwf_plan loadL,loadR,store;      // plans for loading the data into the intermediate format and back
+    float *m_lt,*m_rt,*m_dst;              // left total, right total (source arrays), destination array
+    fftwf_complex *m_dftL,*m_dftR,*m_src;  // intermediate arrays (FFTs of lt & rt, processing source)
+    fftwf_plan m_loadL,m_loadR,m_store;    // plans for loading the data into the intermediate format and back
 #else
-    FFTContext *fftContextForward, *fftContextReverse; 
-    FFTSample *lt,*rt;                 // left total, right total (source arrays), destination array
-    FFTComplexArray *dftL,*dftR,*src;  // intermediate arrays (FFTs of lt & rt, processing source)
+    FFTContext *m_fftContextForward, *m_fftContextReverse;
+    FFTSample *m_lt,*m_rt;                 // left total, right total (source arrays), destination array
+    FFTComplexArray *m_dftL,*m_dftR,*m_src;// intermediate arrays (FFTs of lt & rt, processing source)
 #endif
     // buffers
-    std::vector<cfloat> frontL,frontR,avg,surL,surR; // the signal (phase-corrected) in the frequency domain
-    std::vector<cfloat> trueavg;       // for lfe generation
-    std::vector<float> xfs,yfs;        // the feature space positions for each frequency bin
-    std::vector<float> wnd;            // the window function, precalculated
-    std::vector<float> filter[6];      // a frequency filter for each output channel
-    std::vector<float> inbuf[2];       // the sliding input buffers
-    std::vector<float> outbuf[6];      // the sliding output buffers
+    std::vector<cfloat> m_frontL,m_frontR,m_avg,m_surL,m_surR; // the signal (phase-corrected) in the frequency domain
+    std::vector<cfloat> m_trueavg;       // for lfe generation
+    std::vector<float> m_xFs,m_yFs;      // the feature space positions for each frequency bin
+    std::vector<float> m_wnd;            // the window function, precalculated
+    std::vector<float> m_filter[6];      // a frequency filter for each output channel
+    std::vector<float> m_inbuf[2];       // the sliding input buffers
+    std::vector<float> m_outbuf[6];      // the sliding output buffers
     // coefficients
-    float surround_high,surround_low;  // high and low surround mixing coefficient (e.g. 0.8165/0.5774)
-    float surround_balance;            // the xfs balance that follows from the coeffs
-    float surround_level;              // gain for the surround channels (follows from the coeffs
-    float phase_offsetL, phase_offsetR;// phase shifts to be applied to the rear channels
-    float front_separation;            // front stereo separation
-    float rear_separation;             // rear stereo separation
-    bool linear_steering;              // whether the steering should be linear or not
-    cfloat A,B,C,D,E,F,G,H;            // coefficients for the linear steering
-    int current_buf;                   // specifies which buffer is 2nd half of input sliding buffer
-    float * inbufs[2];                 // for passing back to driver
-    float * outbufs[6];                // for passing back to driver
+    float m_surroundHigh,m_surroundLow;  // high and low surround mixing coefficient (e.g. 0.8165/0.5774)
+    float m_surroundBalance;             // the xfs balance that follows from the coeffs
+    float m_surroundLevel;               // gain for the surround channels (follows from the coeffs
+    float m_phaseOffsetL, m_phaseOffsetR;// phase shifts to be applied to the rear channels
+    float m_frontSeparation;             // front stereo separation
+    float m_rearSeparation;              // rear stereo separation
+    bool m_linearSteering;               // whether the steering should be linear or not
+    cfloat m_a,m_b,m_c,m_d,m_e,m_f,m_g,m_h; // coefficients for the linear steering
+    int m_currentBuf;                    // specifies which buffer is 2nd half of input sliding buffer
+    float * m_inbufs[2];                 // for passing back to driver
+    float * m_outbufs[6];                // for passing back to driver
 
     friend class fsurround_decoder;
 };

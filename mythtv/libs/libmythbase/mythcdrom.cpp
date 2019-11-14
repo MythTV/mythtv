@@ -138,8 +138,8 @@ void MythCDROM::setDeviceSpeed(const char *devicePath, int speed)
 
 typedef struct
 {
-    udfread_block_input input;  /* This *must* be the first entry in the struct */
-    RemoteFile*         file;
+    udfread_block_input m_input;  /* This *must* be the first entry in the struct */
+    RemoteFile*         m_file;
 } blockInput_t;
 
 static int _def_close(udfread_block_input *p_gen)
@@ -147,10 +147,10 @@ static int _def_close(udfread_block_input *p_gen)
     blockInput_t *p = (blockInput_t *)p_gen;
     int result = -1;
 
-    if (p && p->file)
+    if (p && p->m_file)
     {
-        delete p->file;
-        p->file = nullptr;
+        delete p->m_file;
+        p->m_file = nullptr;
         result = 0;
     }
 
@@ -161,7 +161,7 @@ static uint32_t _def_size(udfread_block_input *p_gen)
 {
     blockInput_t *p = (blockInput_t *)p_gen;
 
-    return (uint32_t)(p->file->GetRealFileSize() / UDF_BLOCK_SIZE);
+    return (uint32_t)(p->m_file->GetRealFileSize() / UDF_BLOCK_SIZE);
 }
 
 static int _def_read(udfread_block_input *p_gen, uint32_t lba, void *buf, uint32_t nblocks, int flags)
@@ -170,8 +170,8 @@ static int _def_read(udfread_block_input *p_gen, uint32_t lba, void *buf, uint32
     int result = -1;
     blockInput_t *p = (blockInput_t *)p_gen;
 
-    if (p && p->file && (p->file->Seek(lba * UDF_BLOCK_SIZE, SEEK_SET) != -1))
-        result = p->file->Read(buf, nblocks * UDF_BLOCK_SIZE) / UDF_BLOCK_SIZE;
+    if (p && p->m_file && (p->m_file->Seek(lba * UDF_BLOCK_SIZE, SEEK_SET) != -1))
+        result = p->m_file->Read(buf, nblocks * UDF_BLOCK_SIZE) / UDF_BLOCK_SIZE;
 
     return result;
 }
@@ -188,15 +188,15 @@ MythCDROM::ImageType MythCDROM::inspectImage(const QString &path)
     {
         blockInput_t blockInput;
 
-        blockInput.file = new RemoteFile(path); // Normally deleted via a call to udfread_close
-        blockInput.input.close = _def_close;
-        blockInput.input.read = _def_read;
-        blockInput.input.size = _def_size;
+        blockInput.m_file = new RemoteFile(path); // Normally deleted via a call to udfread_close
+        blockInput.m_input.close = _def_close;
+        blockInput.m_input.read = _def_read;
+        blockInput.m_input.size = _def_size;
 
-        if (blockInput.file->isOpen())
+        if (blockInput.m_file->isOpen())
         {
             udfread *udf = udfread_init();
-            if (udfread_open_input(udf, &blockInput.input) == 0)
+            if (udfread_open_input(udf, &blockInput.m_input) == 0)
             {
                 UDFDIR *dir = udfread_opendir(udf, "/BDMV");
 
@@ -230,13 +230,13 @@ MythCDROM::ImageType MythCDROM::inspectImage(const QString &path)
             else
             {
                 // Open failed, so we have clean this up here
-                delete blockInput.file;
+                delete blockInput.m_file;
             }
         }
         else
         {
             LOG(VB_MEDIA, LOG_ERR, QString("inspectImage - unable to open \"%1\"").arg(path));
-            delete blockInput.file;
+            delete blockInput.m_file;
         }
     }
 

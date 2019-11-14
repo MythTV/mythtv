@@ -815,8 +815,8 @@ const char *Coding2String(OMX_VIDEO_CODINGTYPE eCompressionFormat)
             // Quiet compiler warning.
             break;
     }
-    static char buf[32];
-    return strcpy(buf, qPrintable(QString("VIDEO_Coding 0x%1")
+    static char s_buf[32];
+    return strcpy(s_buf, qPrintable(QString("VIDEO_Coding 0x%1")
                                     .arg(eCompressionFormat,0,16)));
 }
 
@@ -842,8 +842,8 @@ const char *Coding2String(OMX_IMAGE_CODINGTYPE eCompressionFormat)
             // Quiet compiler warning.
             break;
     }
-    static char buf[32];
-    return strcpy(buf, qPrintable(QString("IMAGE_Coding 0x%1")
+    static char s_buf[32];
+    return strcpy(s_buf, qPrintable(QString("IMAGE_Coding 0x%1")
                                     .arg(eCompressionFormat,0,16)));
 }
 
@@ -892,8 +892,8 @@ const char *Coding2String(OMX_AUDIO_CODINGTYPE eEncoding)
             // Quiet compiler warning.
             break;
     }
-    static char buf[32];
-    return strcpy(buf, qPrintable(QString("AUDIO_Coding 0x%1")
+    static char s_buf[32];
+    return strcpy(s_buf, qPrintable(QString("AUDIO_Coding 0x%1")
                                     .arg(eEncoding,0,16)));
 }
 
@@ -914,8 +914,8 @@ const char *Other2String(OMX_OTHER_FORMATTYPE eFormat)
             // Quiet compiler warning.
             break;
     }
-    static char buf[32];
-    return strcpy(buf, qPrintable(QString("Other format 0x%1")
+    static char s_buf[32];
+    return strcpy(s_buf, qPrintable(QString("Other format 0x%1")
                                     .arg(eFormat,0,16)));
 }
 
@@ -983,8 +983,8 @@ const char *Format2String(OMX_COLOR_FORMATTYPE eColorFormat)
             // Quiet compiler warning.
             break;
     }
-    static char buf[32];
-    return strcpy(buf, qPrintable(QString("COLOR_Format 0x%1")
+    static char s_buf[32];
+    return strcpy(s_buf, qPrintable(QString("COLOR_Format 0x%1")
                                     .arg(eColorFormat,0,16)));
 }
 
@@ -1008,8 +1008,8 @@ const char *Event2String(OMX_EVENTTYPE eEvent)
             // Quiet compiler warning.
             break;
     }
-    static char buf[32];
-    return strcpy(buf, qPrintable(QString("Event 0x%1").arg(eEvent,0,16)));
+    static char s_buf[32];
+    return strcpy(s_buf, qPrintable(QString("Event 0x%1").arg(eEvent,0,16)));
 }
 
 const char *Error2String(OMX_ERRORTYPE eError)
@@ -1065,8 +1065,8 @@ const char *Error2String(OMX_ERRORTYPE eError)
             // Quiet compiler warning.
             break;
     }
-    static char buf[32];
-    return strcpy(buf, qPrintable(QString("Error 0x%1").arg(eError,0,16)));
+    static char s_buf[32];
+    return strcpy(s_buf, qPrintable(QString("Error 0x%1").arg(eError,0,16)));
 }
 
 const char *State2String(OMX_STATETYPE eState)
@@ -1083,8 +1083,8 @@ const char *State2String(OMX_STATETYPE eState)
             // Quiet compiler warning.
             break;
     }
-    static char buf[32];
-    return strcpy(buf, qPrintable(QString("State 0x%1").arg(eState,0,16)));
+    static char s_buf[32];
+    return strcpy(s_buf, qPrintable(QString("State 0x%1").arg(eState,0,16)));
 }
 
 const char *Command2String(OMX_COMMANDTYPE cmd)
@@ -1100,8 +1100,8 @@ const char *Command2String(OMX_COMMANDTYPE cmd)
             // Quiet compiler warning.
             break;
     }
-    static char buf[32];
-    return strcpy(buf, qPrintable(QString("Command 0x%1").arg(cmd,0,16)));
+    static char s_buf[32];
+    return strcpy(s_buf, qPrintable(QString("Command 0x%1").arg(cmd,0,16)));
 }
 
 #define FLAG2LIST(_f,_n,_l)\
@@ -1188,8 +1188,8 @@ const char *Filter2String(OMX_IMAGEFILTERTYPE eType)
             // Quiet compiler warning.
             break;
     }
-    static char buf[32];
-    return strcpy(buf, qPrintable(QString("FilterType 0x%1").arg(eType,0,16)));
+    static char s_buf[32];
+    return strcpy(s_buf, qPrintable(QString("FilterType 0x%1").arg(eType,0,16)));
 }
 
 } // namespace omxcontext

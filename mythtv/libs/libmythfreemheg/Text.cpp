@@ -470,12 +470,12 @@ class MHTextItem
 {
   public:
     MHTextItem();
-    MHOctetString m_Text; // UTF-8 text
-    QString m_Unicode; // Unicode text
-    int m_nUnicode; // Number of characters in it
-    int m_Width; // Size of this block
-    MHRgba m_Colour; // Colour of the text
-    int m_nTabCount; // Number of tabs immediately before this (usually zero)
+    MHOctetString m_text;      // UTF-8 text
+    QString       m_unicode;   // Unicode text
+    int           m_nUnicode;  // Number of characters in it
+    int           m_width;     // Size of this block
+    MHRgba        m_colour;    // Colour of the text
+    int           m_nTabCount; // Number of tabs immediately before this (usually zero)
 
     // Generate new items inheriting properties from the previous
     MHTextItem *NewItem();
@@ -484,15 +484,15 @@ class MHTextItem
 MHTextItem::MHTextItem()
 {
     m_nUnicode = 0;
-    m_Width = 0; // Size of this block
-    m_Colour = MHRgba(0, 0, 0, 255);
+    m_width = 0; // Size of this block
+    m_colour = MHRgba(0, 0, 0, 255);
     m_nTabCount = 0;
 }
 
 MHTextItem *MHTextItem::NewItem()
 {
     MHTextItem *pItem = new MHTextItem;
-    pItem->m_Colour = m_Colour;
+    pItem->m_colour = m_colour;
     return pItem;
 }
 
@@ -502,7 +502,7 @@ class MHTextLine
   public:
     MHTextLine() = default;
     ~MHTextLine();
-    MHSequence <MHTextItem *> m_Items;
+    MHSequence <MHTextItem *> m_items;
     int m_nLineWidth {0};
     int m_nLineHeight {0};
     int m_nDescent {0};
@@ -510,9 +510,9 @@ class MHTextLine
 
 MHTextLine::~MHTextLine()
 {
-    for (int i = 0; i < m_Items.Size(); i++)
+    for (int i = 0; i < m_items.Size(); i++)
     {
-        delete(m_Items.GetAt(i));
+        delete(m_items.GetAt(i));
     }
 }
 
@@ -557,11 +557,11 @@ void MHText::Redraw()
     // Set up the first item on the first line.
     MHTextItem *pCurrItem = new MHTextItem;
     MHTextLine *pCurrLine = new MHTextLine;
-    pCurrLine->m_Items.Append(pCurrItem);
+    pCurrLine->m_items.Append(pCurrItem);
     theText.Append(pCurrLine);
-    MHStack <MHRgba> m_ColourStack; // Stack to handle nested colour codes.
-    m_ColourStack.Push(textColour);
-    pCurrItem->m_Colour = textColour;
+    MHStack <MHRgba> colourStack; // Stack to handle nested colour codes.
+    colourStack.Push(textColour);
+    pCurrItem->m_colour = textColour;
 
 //  FILE *fd=stdout; fprintf(fd, "Redraw Text "); m_Content.PrintMe(fd, 0); fprintf(fd, "\n");
     int i = 0;
@@ -572,10 +572,10 @@ void MHText::Redraw()
 
         if (ch == 0x09) // Tab - start a new item if we have any text in the existing one.
         {
-            if (pCurrItem->m_Text.Size() != 0)
+            if (pCurrItem->m_text.Size() != 0)
             {
                 pCurrItem = pCurrItem->NewItem();
-                pCurrLine->m_Items.Append(pCurrItem);
+                pCurrLine->m_items.Append(pCurrItem);
             }
             if (m_HorizJ == Start)
                 pCurrItem->m_nTabCount++;
@@ -588,7 +588,7 @@ void MHText::Redraw()
             pCurrLine = new MHTextLine;
             theText.Append(pCurrLine);
             pCurrItem = pCurrItem->NewItem();
-            pCurrLine->m_Items.Append(pCurrItem);
+            pCurrLine->m_items.Append(pCurrItem);
         }
 
         else if (ch == 0x1b)   // Escape - special codes.
@@ -616,16 +616,16 @@ void MHText::Redraw()
                 if (code == 0x43 && paramCount == 4 && i + paramCount <= m_Content.Size())
                 {
                     // Start of colour.
-                    if (pCurrItem->m_Text.Size() != 0)
+                    if (pCurrItem->m_text.Size() != 0)
                     {
                         pCurrItem = pCurrItem->NewItem();
-                        pCurrLine->m_Items.Append(pCurrItem);
+                        pCurrLine->m_items.Append(pCurrItem);
                     }
 
-                    pCurrItem->m_Colour = MHRgba(m_Content.GetAt(i), m_Content.GetAt(i + 1),
+                    pCurrItem->m_colour = MHRgba(m_Content.GetAt(i), m_Content.GetAt(i + 1),
                                                  m_Content.GetAt(i + 2), 255 - m_Content.GetAt(i + 3));
                     // Push this colour onto the colour stack.
-                    m_ColourStack.Push(pCurrItem->m_Colour);
+                    colourStack.Push(pCurrItem->m_colour);
                 }
                 else
                 {
@@ -640,19 +640,19 @@ void MHText::Redraw()
 
                 if (code == 0x63)
                 {
-                    if (m_ColourStack.Size() > 1)
+                    if (colourStack.Size() > 1)
                     {
-                        m_ColourStack.Pop();
+                        colourStack.Pop();
 
                         // Start a new item since we're using a new colour.
-                        if (pCurrItem->m_Text.Size() != 0)
+                        if (pCurrItem->m_text.Size() != 0)
                         {
                             pCurrItem = pCurrItem->NewItem();
-                            pCurrLine->m_Items.Append(pCurrItem);
+                            pCurrLine->m_items.Append(pCurrItem);
                         }
 
                         // Set the subsequent text in the colour we're using now.
-                        pCurrItem->m_Colour = m_ColourStack.Top();
+                        pCurrItem->m_colour = colourStack.Top();
                     }
                 }
                 else MHLOG(MHLogWarning, QString("Unknown text escape code 0x%1").arg(code,2,16));
@@ -675,7 +675,7 @@ void MHText::Redraw()
                 i++;
             }
 
-            pCurrItem->m_Text.Append(MHOctetString(m_Content, nStart, i - nStart));
+            pCurrItem->m_text.Append(MHOctetString(m_Content, nStart, i - nStart));
         }
     }
 
@@ -691,30 +691,30 @@ void MHText::Redraw()
         MHTextLine *pLine = theText.GetAt(i);
         pLine->m_nLineWidth = 0;
 
-        for (int j = 0; j < pLine->m_Items.Size(); j++)
+        for (int j = 0; j < pLine->m_items.Size(); j++)
         {
-            MHTextItem *pItem = pLine->m_Items.GetAt(j);
+            MHTextItem *pItem = pLine->m_items.GetAt(j);
 
             // Set any tabs.
             pLine->m_nLineWidth = Tabs(pLine->m_nLineWidth, pItem->m_nTabCount);
 
-            if (pItem->m_Unicode.isEmpty())   // Convert UTF-8 to Unicode.
+            if (pItem->m_unicode.isEmpty())   // Convert UTF-8 to Unicode.
             {
-                int s = pItem->m_Text.Size();
-                pItem->m_Unicode = QString::fromUtf8((const char *)pItem->m_Text.Bytes(), s);
-                pItem->m_nUnicode = pItem->m_Unicode.length();
+                int s = pItem->m_text.Size();
+                pItem->m_unicode = QString::fromUtf8((const char *)pItem->m_text.Bytes(), s);
+                pItem->m_nUnicode = pItem->m_unicode.length();
             }
 
             // Fit the text onto the line.
             int nFullText = pItem->m_nUnicode;
             // Get the box size and update pItem->m_nUnicode to the number that will fit.
-            QRect rect = m_pDisplay->GetBounds(pItem->m_Unicode, pItem->m_nUnicode, m_nBoxWidth - pLine->m_nLineWidth);
+            QRect rect = m_pDisplay->GetBounds(pItem->m_unicode, pItem->m_nUnicode, m_nBoxWidth - pLine->m_nLineWidth);
 
             if (nFullText != pItem->m_nUnicode && m_fTextWrap)   // Doesn't fit, we have to word-wrap.
             {
                 int nTruncated = pItem->m_nUnicode; // Just in case.
                 // Now remove characters until we find a word-break character.
-                while (pItem->m_nUnicode > 0 && pItem->m_Unicode[pItem->m_nUnicode] != ' ')
+                while (pItem->m_nUnicode > 0 && pItem->m_unicode[pItem->m_nUnicode] != ' ')
                 {
                     pItem->m_nUnicode--;
                 }
@@ -736,7 +736,7 @@ void MHText::Redraw()
                 int nNewStart = pItem->m_nUnicode;
 
                 // Remove any spaces at the start of the new section.
-                while (nNewWidth != 0 && pItem->m_Unicode[nNewStart] == ' ')
+                while (nNewWidth != 0 && pItem->m_unicode[nNewStart] == ' ')
                 {
                     nNewStart++;
                     nNewWidth--;
@@ -749,29 +749,29 @@ void MHText::Redraw()
                     theText.InsertAt(pNewLine, i + 1);
                     // The first item on the new line is the rest of the text.
                     MHTextItem *pNewItem = pItem->NewItem();
-                    pNewLine->m_Items.Append(pNewItem);
-                    pNewItem->m_Unicode = pItem->m_Unicode.mid(nNewStart, nNewWidth);
+                    pNewLine->m_items.Append(pNewItem);
+                    pNewItem->m_unicode = pItem->m_unicode.mid(nNewStart, nNewWidth);
                     pNewItem->m_nUnicode = nNewWidth;
 
                     // Move any remaining items, e.g. in a different colour, from this line onto the new line.
-                    while (pLine->m_Items.Size() > j + 1)
+                    while (pLine->m_items.Size() > j + 1)
                     {
-                        pNewLine->m_Items.Append(pLine->m_Items.GetAt(j + 1));
-                        pLine->m_Items.RemoveAt(j + 1);
+                        pNewLine->m_items.Append(pLine->m_items.GetAt(j + 1));
+                        pLine->m_items.RemoveAt(j + 1);
                     }
                 }
 
                 // Remove any spaces at the end of the old section.  If we don't do that and
                 // we are centering or right aligning the text we'll get it wrong.
-                while (pItem->m_nUnicode > 1 && pItem->m_Unicode[pItem->m_nUnicode-1] == ' ')
+                while (pItem->m_nUnicode > 1 && pItem->m_unicode[pItem->m_nUnicode-1] == ' ')
                 {
                     pItem->m_nUnicode--;
                 }
 
-                rect = m_pDisplay->GetBounds(pItem->m_Unicode, pItem->m_nUnicode);
+                rect = m_pDisplay->GetBounds(pItem->m_unicode, pItem->m_nUnicode);
             }
 
-            pItem->m_Width = rect.width();
+            pItem->m_width = rect.width();
             pLine->m_nLineWidth += rect.width();
 
             if (rect.height() > pLine->m_nLineHeight)
@@ -823,20 +823,20 @@ void MHText::Redraw()
             xOffset = (m_nBoxWidth - pLine->m_nLineWidth) / 2;
         }
 
-        for (int j = 0; j < pLine->m_Items.Size(); j++)
+        for (int j = 0; j < pLine->m_items.Size(); j++)
         {
-            MHTextItem *pItem = pLine->m_Items.GetAt(j);
+            MHTextItem *pItem = pLine->m_items.GetAt(j);
 
             // Tab across if necessary.
             xOffset = Tabs(xOffset, pItem->m_nTabCount);
 
-            if (! pItem->m_Unicode.isEmpty())   // We may have blank lines.
+            if (! pItem->m_unicode.isEmpty())   // We may have blank lines.
             {
                 m_pDisplay->AddText(xOffset, yOffset + (pLine->m_nLineHeight + lineSpace) / 2 - pLine->m_nDescent,
-                                    pItem->m_Unicode.left(pItem->m_nUnicode), pItem->m_Colour);
+                                    pItem->m_unicode.left(pItem->m_nUnicode), pItem->m_colour);
             }
 
-            xOffset += pItem->m_Width;
+            xOffset += pItem->m_width;
         }
 
         yOffset += lineSpace;

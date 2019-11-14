@@ -2128,7 +2128,7 @@ AlbumArtImage *AlbumArtImages::getImageAt(uint index)
 QString AlbumArtImages::getTypeName(ImageType type)
 {
     // these const's should match the ImageType enum's
-    static const char* type_strings[] = {
+    static const char* s_typeStrings[] = {
         QT_TR_NOOP("Unknown"),            // IT_UNKNOWN
         QT_TR_NOOP("Front Cover"),        // IT_FRONTCOVER
         QT_TR_NOOP("Back Cover"),         // IT_BACKCOVER
@@ -2138,14 +2138,14 @@ QString AlbumArtImages::getTypeName(ImageType type)
     };
 
     return QCoreApplication::translate("AlbumArtImages",
-                                       type_strings[type]);
+                                       s_typeStrings[type]);
 }
 
 // static method to get a filename from an ImageType
 QString AlbumArtImages::getTypeFilename(ImageType type)
 {
     // these const's should match the ImageType enum's
-    static const char* filename_strings[] = {
+    static const char* s_filenameStrings[] = {
         QT_TR_NOOP("unknown"),      // IT_UNKNOWN
         QT_TR_NOOP("front"),        // IT_FRONTCOVER
         QT_TR_NOOP("back"),         // IT_BACKCOVER
@@ -2155,7 +2155,7 @@ QString AlbumArtImages::getTypeFilename(ImageType type)
     };
 
     return QCoreApplication::translate("AlbumArtImages",
-                                       filename_strings[type]);
+                                       s_filenameStrings[type]);
 }
 
 // static method to guess the image type from the filename
