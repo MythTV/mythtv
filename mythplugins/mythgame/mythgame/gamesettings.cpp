@@ -6,9 +6,9 @@
 #include "gamesettings.h"
 
 struct GameTypes {
-    QString   nameStr;
-    QString   idStr;
-    QString   extensions;
+    QString   m_nameStr;
+    QString   m_idStr;
+    QString   m_extensions;
 };
 
 #define MAX_GAME_TYPES 12
@@ -35,9 +35,9 @@ QString GetGameTypeName(const QString &GameType)
 
     for (int i = 0; i < MAX_GAME_TYPES; i++)
     {
-        if (GameTypeList[i].idStr == GameType) {
+        if (GameTypeList[i].m_idStr == GameType) {
             result = QCoreApplication::translate("(GameTypes)",
-                                                 GameTypeList[i].nameStr.toUtf8());
+                                                 GameTypeList[i].m_nameStr.toUtf8());
             break;
         }
     }
@@ -50,8 +50,8 @@ QString GetGameTypeExtensions(const QString &GameType)
 
     for (int i = 0; i < MAX_GAME_TYPES; i++)
     {
-        if (GameTypeList[i].idStr == GameType) {
-            result = GameTypeList[i].extensions;
+        if (GameTypeList[i].m_idStr == GameType) {
+            result = GameTypeList[i].m_extensions;
             break;
         }
     }
@@ -260,8 +260,8 @@ struct GameType : public MythUIComboBoxSetting
         for (int i = 0; i < MAX_GAME_TYPES; i++)
         {
             addSelection(QCoreApplication::translate("(GameTypes)",
-                                                     GameTypeList[i].nameStr.toUtf8()),
-                         GameTypeList[i].idStr);
+                                                     GameTypeList[i].m_nameStr.toUtf8()),
+                         GameTypeList[i].m_idStr);
         }
         setValue(0);
         setHelpText(TR("Type of Game/Emulator. Mostly for informational "

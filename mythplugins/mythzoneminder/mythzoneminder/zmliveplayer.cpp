@@ -345,7 +345,7 @@ void ZMLivePlayer::changePlayerMonitor(int playerNo)
 
 void ZMLivePlayer::updateFrame()
 {
-    static unsigned char buffer[MAX_IMAGE_SIZE];
+    static unsigned char s_buffer[MAX_IMAGE_SIZE];
     m_frameTimer->stop();
 
     // get a list of monitor id's that need updating
@@ -360,7 +360,7 @@ void ZMLivePlayer::updateFrame()
     for (int x = 0; x < monList.count(); x++)
     {
         QString status;
-        int frameSize = ZMClient::get()->getLiveFrame(monList[x], status, buffer, sizeof(buffer));
+        int frameSize = ZMClient::get()->getLiveFrame(monList[x], status, s_buffer, sizeof(s_buffer));
 
         if (frameSize > 0 && !status.startsWith("ERROR"))
         {
@@ -375,7 +375,7 @@ void ZMLivePlayer::updateFrame()
                         p->getMonitor()->status = status;
                         p->updateStatus();
                     }
-                    p->updateFrame(buffer);
+                    p->updateFrame(s_buffer);
                 }
             }
         }
