@@ -69,7 +69,7 @@ class MythContextPrivate : public QObject
     friend class MythContextSlotHandler;
 
   public:
-    MythContextPrivate(MythContext *lparent);
+    explicit MythContextPrivate(MythContext *lparent);
    ~MythContextPrivate() override;
 
     bool Init        (bool gui,

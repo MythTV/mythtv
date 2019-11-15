@@ -87,7 +87,7 @@ public:
     explicit StCdioDevice(const QString& dev) : m_cdio(openCdio(dev)) { }
     ~StCdioDevice() { if (m_cdio) cdio_destroy(m_cdio); }
 
-    operator CdIo_t*() const { return m_cdio; }
+    operator CdIo_t*() const { return m_cdio; } // NOLINT(google-explicit-constructor)
 };
 
 

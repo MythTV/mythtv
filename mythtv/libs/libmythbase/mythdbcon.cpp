@@ -913,7 +913,7 @@ void MSqlAddMoreBindings(MSqlBindings &output, MSqlBindings &addfrom)
 }
 
 struct Holder {
-    Holder( QString hldr = QString(), int pos = -1 )
+    explicit Holder( QString hldr = QString(), int pos = -1 )
         : m_holderName(std::move( hldr )), m_holderPos( pos ) {}
 
     bool operator==( const Holder& h ) const

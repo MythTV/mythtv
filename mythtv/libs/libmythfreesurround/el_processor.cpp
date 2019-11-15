@@ -48,7 +48,7 @@ class decoder_impl {
 public:
     // create an instance of the decoder
     //  blocksize is fixed over the lifetime of this object for performance reasons
-    decoder_impl(unsigned blocksize=8192): m_n(blocksize), m_halfN(blocksize/2) {
+    explicit decoder_impl(unsigned blocksize=8192): m_n(blocksize), m_halfN(blocksize/2) {
 #ifdef USE_FFTW3
         // create FFTW buffers
         m_lt = (float*)fftwf_malloc(sizeof(float)*m_n);

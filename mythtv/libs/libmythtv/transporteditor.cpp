@@ -436,7 +436,7 @@ class DTVStandard : public MythUIComboBoxSetting, public MuxDBStorage
 class Frequency : public MythUITextEditSetting, public MuxDBStorage
 {
   public:
-    Frequency(const MultiplexID *id, bool in_kHz = false) :
+    explicit Frequency(const MultiplexID *id, bool in_kHz = false) :
         MythUITextEditSetting(this), MuxDBStorage(this, id, "frequency")
     {
         QString hz = (in_kHz) ? "kHz" : "Hz";

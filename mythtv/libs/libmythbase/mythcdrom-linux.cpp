@@ -329,7 +329,7 @@ struct StHandle {
     const int m_fd;
     explicit StHandle(const char *dev) : m_fd(open(dev, O_RDWR | O_NONBLOCK)) { }
     ~StHandle() { close(m_fd); }
-    operator int() const { return m_fd; }
+    operator int() const { return m_fd; } // NOLINT(google-explicit-constructor)
 };
 
 // This is copied from eject.c by Jeff Tranter (tranter@pobox.com)
