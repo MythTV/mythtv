@@ -55,11 +55,13 @@ AudioOutputSettings* AudioOutputNULL::GetOutputSettings(bool /*digital*/)
     // Pretend that we support everything
     AudioOutputSettings *settings = new AudioOutputSettings();
 
+    // NOLINTNEXTLINE(bugprone-infinite-loop)
     while (int rate = settings->GetNextRate())
     {
         settings->AddSupportedRate(rate);
     }
 
+    // NOLINTNEXTLINE(bugprone-infinite-loop)
     while (AudioFormat fmt = settings->GetNextFormat())
     {
         settings->AddSupportedFormat(fmt);

@@ -361,6 +361,7 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings(bool passthrough)
              "(using plugin?)");
     }
 
+    // NOLINTNEXTLINE(bugprone-infinite-loop)
     while (int rate = settings->GetNextRate())
         if(snd_pcm_hw_params_test_rate(m_pcm_handle, params, rate, 0) >= 0)
             settings->AddSupportedRate(rate);
