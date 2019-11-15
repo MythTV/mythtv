@@ -70,7 +70,6 @@ static int CheckRecordings(const MythUtilCommandLineParser &cmdline)
 {
     cout << "Checking Recordings" << endl;
 
-    ProgramInfo *p;
     std::vector<ProgramInfo *> *recordingList = RemoteGetRecordedList(-1);
     std::vector<ProgramInfo *>  missingRecordings;
     std::vector<ProgramInfo *>  zeroByteRecordings;
@@ -91,7 +90,7 @@ static int CheckRecordings(const MythUtilCommandLineParser &cmdline)
         vector<ProgramInfo *>::iterator i = recordingList->begin();
         for ( ; i != recordingList->end(); ++i)
         {
-            p = *i;
+            ProgramInfo *p = *i;
             // ignore live tv and deleted recordings
             if (p->GetRecordingGroup() == "LiveTV" ||
                 p->GetRecordingGroup() == "Deleted")
@@ -184,7 +183,7 @@ static int CheckRecordings(const MythUtilCommandLineParser &cmdline)
         vector<ProgramInfo *>::iterator i = missingRecordings.begin();
         for ( ; i != missingRecordings.end(); ++i)
         {
-            p = *i;
+            ProgramInfo *p = *i;
             cout << qPrintable(CreateProgramInfoString(*p)) << endl;
             cout << qPrintable(p->GetPlaybackURL()) << endl;
             cout << "-------------------------------------------------------------------" << endl;
@@ -199,7 +198,7 @@ static int CheckRecordings(const MythUtilCommandLineParser &cmdline)
         vector<ProgramInfo *>::iterator i = zeroByteRecordings.begin();
         for ( ; i != zeroByteRecordings.end(); ++i)
         {
-            p = *i;
+            ProgramInfo *p = *i;
             cout << qPrintable(CreateProgramInfoString(*p)) << endl;
             cout << qPrintable(p->GetPlaybackURL()) << endl;
             cout << "-------------------------------------------------------------------" << endl;
@@ -214,7 +213,7 @@ static int CheckRecordings(const MythUtilCommandLineParser &cmdline)
         vector<ProgramInfo *>::iterator i = noSeektableRecordings.begin();
         for ( ; i != noSeektableRecordings.end(); ++i)
         {
-            p = *i;
+            ProgramInfo *p = *i;
             cout << qPrintable(CreateProgramInfoString(*p)) << endl;
             cout << qPrintable(p->GetPlaybackURL()) << endl;
             cout << "File size is " << qPrintable(formatSize(p->GetFilesize(), 2)) << endl;

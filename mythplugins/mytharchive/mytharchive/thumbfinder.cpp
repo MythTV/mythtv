@@ -402,14 +402,13 @@ void ThumbFinder::updateThumb(void)
 
 QString ThumbFinder::frameToTime(int64_t frame, bool addFrame)
 {
-    int hour, min, sec;
     QString str;
 
-    sec = (int) (frame / m_fps);
+    int sec = (int) (frame / m_fps);
     frame = frame - (int) (sec * m_fps);
-    min = sec / 60;
+    int min = sec / 60;
     sec %= 60;
-    hour = min / 60;
+    int hour = min / 60;
     min %= 60;
 
     if (addFrame)
@@ -443,7 +442,7 @@ bool ThumbFinder::getThumbImages()
     m_updateFrame = true;
     getFrameImage();
 
-    int chapterLen;
+    int chapterLen = 0;
     if (m_thumbCount)
         chapterLen = m_finalDuration / m_thumbCount;
     else
@@ -495,14 +494,11 @@ bool ThumbFinder::getThumbImages()
 
         if (!thumb)
         {
-            QString time;
-            int chapter, hour, min, sec;
-
-            chapter = chapterLen * (x - 1);
-            hour = chapter / 3600;
-            min = (chapter % 3600) / 60;
-            sec = chapter % 60;
-            time = time.sprintf("%02d:%02d:%02d", hour, min, sec);
+            int chapter = chapterLen * (x - 1);
+            int hour = chapter / 3600;
+            int min = (chapter % 3600) / 60;
+            int sec = chapter % 60;
+            QString time = QString::asprintf("%02d:%02d:%02d", hour, min, sec);
 
             int64_t frame = (int64_t) (chapter * ceil(m_fps));
 
@@ -694,11 +690,9 @@ bool ThumbFinder::seekToFrame(int frame, bool checkPos)
 
 bool ThumbFinder::seekForward()
 {
-    int inc;
     int64_t currentFrame = (m_currentPTS - m_startPTS) / m_frameTime;
-    int64_t newFrame;
 
-    inc = SeekAmounts[m_currentSeek].amount;
+    int inc = SeekAmounts[m_currentSeek].amount;
 
     if (inc == -1)
         inc = 1;
@@ -722,7 +716,7 @@ bool ThumbFinder::seekForward()
     else
         inc = (int) (inc * ceil(m_fps));
 
-    newFrame = currentFrame + inc - m_offset;
+    int64_t newFrame = currentFrame + inc - m_offset;
     if (newFrame == currentFrame + 1)
         getFrameImage(false);
     else
@@ -733,11 +727,9 @@ bool ThumbFinder::seekForward()
 
 bool ThumbFinder::seekBackward()
 {
-    int inc;
-    int64_t newFrame;
     int64_t currentFrame = (m_currentPTS - m_startPTS) / m_frameTime;
 
-    inc = SeekAmounts[m_currentSeek].amount;
+    int inc = SeekAmounts[m_currentSeek].amount;
     if (inc == -1)
         inc = -1;
     else if (inc == -2)
@@ -761,7 +753,7 @@ bool ThumbFinder::seekBackward()
     else
         inc = (int) (-inc * ceil(m_fps));
 
-    newFrame = currentFrame + inc - m_offset;
+    int64_t newFrame = currentFrame + inc - m_offset;
     seekToFrame(newFrame);
 
     return true;
@@ -778,7 +770,6 @@ bool ThumbFinder::getFrameImage(bool needKeyFrame, int64_t requiredPTS)
     av_init_packet(&pkt);
 
     bool frameFinished = false;
-    int keyFrame;
     int frameCount = 0;
     bool gotKeyFrame = false;
 
@@ -788,7 +779,7 @@ bool ThumbFinder::getFrameImage(bool needKeyFrame, int64_t requiredPTS)
         {
             frameCount++;
 
-            keyFrame = pkt.flags & AV_PKT_FLAG_KEY;
+            int keyFrame = pkt.flags & AV_PKT_FLAG_KEY;
 
             if (m_startPTS == -1 && pkt.dts != AV_NOPTS_VALUE)
             {
@@ -903,14 +894,12 @@ void ThumbFinder::updatePositionBar(int64_t frame)
     frm_dir_map_t::const_iterator it;
 
     brush.setColor(Qt::red);
-    double startdelta, enddelta;
 
     for (it = m_deleteMap.begin(); it != m_deleteMap.end(); ++it)
     {
+        double startdelta = size.width();
         if (it.key() != 0)
             startdelta = (m_archiveItem->duration * m_fps) / it.key();
-        else
-            startdelta = size.width();
 
         ++it;
         if (it == m_deleteMap.end())
@@ -919,10 +908,10 @@ void ThumbFinder::updatePositionBar(int64_t frame)
             break;
         }
 
+        double enddelta = size.width();
         if (it.key() != 0)
             enddelta = (m_archiveItem->duration * m_fps) / it.key();
-        else
-            enddelta = size.width();
+
         int start = (int) (size.width() / startdelta);
         int end = (int) (size.width() / enddelta);
         p.fillRect(start - 1, 0, end - start, size.height(), brush);

@@ -36,6 +36,7 @@
 
 #include "mythtvexp.h"
 #include "standardsettings.h"
+#include "cardutil.h"
 
 class VideoSourceSelector;
 class MultiplexID;
@@ -86,8 +87,8 @@ class MTV_PUBLIC TransportListEditor : public GroupSetting
   private:
     VideoSourceSelector *m_videosource {nullptr};
     QVector<StandardSetting*> m_list;
-    uint m_sourceid;
-    uint m_cardtype;
+    uint m_sourceid  {0};
+    uint m_cardtype  {CardUtil::ERROR_PROBE};
     bool m_isLoading {false};
 };
 

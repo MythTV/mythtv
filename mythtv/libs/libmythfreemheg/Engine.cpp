@@ -231,7 +231,7 @@ MHGroup *MHEngine::ParseProgram(QByteArray &text)
                 pRes = new MHScene;
                 break;
             default:
-                pTree->Failure("Expected Application or Scene"); // throws exception.
+                MHParseNode::Failure("Expected Application or Scene"); // throws exception.
         }
 
         pRes->Initialise(pTree, this); // Convert the parse tree.
@@ -417,8 +417,6 @@ void MHEngine::Quit()
 
 void MHEngine::TransitionToScene(const MHObjectRef &target)
 {
-    int i;
-
     if (m_fInTransition)
     {
         // TransitionTo is not allowed in OnStartUp or OnCloseDown actions.
@@ -460,7 +458,7 @@ void MHEngine::TransitionToScene(const MHObjectRef &target)
     // Deactivate any non-shared ingredients in the application.
     MHApplication *pApp = CurrentApp();
 
-    for (i = pApp->m_Items.Size(); i > 0; i--)
+    for (int i = pApp->m_Items.Size(); i > 0; i--)
     {
         MHIngredient *pItem = pApp->m_Items.GetAt(i - 1);
 
@@ -554,7 +552,7 @@ QString MHEngine::GetPathName(const MHOctetString &str)
     }
 
     // Remove any occurrences of x/../
-    int nPos;
+    int nPos = -1;
 
     while ((nPos = csPath.indexOf("/../")) >= 0)
     {
@@ -630,7 +628,7 @@ void MHEngine::RunActions()
 
             pAction->Perform(this);
         }
-        catch (char const *)
+        catch (...)
         {
         }
     }
@@ -1001,7 +999,7 @@ void MHEngine::RequestExternalContent(MHIngredient *pRequester)
                     reinterpret_cast< const unsigned char * >(text.constData()),
                     text.size(), this);
             }
-            catch (char const *)
+            catch (...)
             {}
         }
         else
@@ -1030,11 +1028,10 @@ void MHEngine::RequestExternalContent(MHIngredient *pRequester)
 void MHEngine::CancelExternalContentRequest(MHIngredient *pRequester)
 {
     QList<MHExternContent *>::iterator it = m_ExternContentTable.begin();
-    MHExternContent *pContent;
 
     while (it != m_ExternContentTable.end())
     {
-        pContent = *it;
+        MHExternContent *pContent = *it;
 
         if (pContent->m_pRequester == pRequester)
         {
@@ -1073,7 +1070,7 @@ void MHEngine::CheckContentRequests()
                         reinterpret_cast< const unsigned char * >(text.constData()),
                         text.size(), this);
                 }
-                catch (char const *)
+                catch (...)
                 {}
             }
             else
@@ -1117,7 +1114,7 @@ bool MHEngine::LoadStorePersistent(bool fIsLoad, const MHOctetString &fileName, 
 
     // See if there is an entry there already.
     MHPSEntry *pEntry = nullptr;
-    int i;
+    int i = 0;
 
     for (i = 0; i < m_PersistentStore.Size(); i++)
     {

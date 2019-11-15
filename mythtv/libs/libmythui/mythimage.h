@@ -20,7 +20,7 @@ class MythUIHelper;
 class MUI_PUBLIC MythImageReader: public QImageReader
 {
   public:
-    explicit MythImageReader(const QString &fileName);
+    explicit MythImageReader(QString fileName);
    ~MythImageReader();
 
   private:

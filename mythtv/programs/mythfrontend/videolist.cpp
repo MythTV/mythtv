@@ -182,12 +182,12 @@ struct metadata_path_sort
     }
 
   private:
-    bool sort(const VideoMetadata *lhs, const VideoMetadata *rhs)
+    static bool sort(const VideoMetadata *lhs, const VideoMetadata *rhs)
     {
         return sort(lhs->GetSortFilename(), rhs->GetSortFilename());
     }
 
-    bool sort(const QString &lhs, const QString &rhs)
+    static bool sort(const QString &lhs, const QString &rhs)
     {
         return naturalCompare(lhs, rhs) < 0;
     }

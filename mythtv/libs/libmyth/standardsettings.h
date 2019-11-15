@@ -340,7 +340,7 @@ class MPUBLIC MythUISpinBoxSetting : public StandardSetting
 
     MythUISpinBoxSetting(Storage *_storage, int min, int max, int step,
                          int pageMultiple = 8,
-                         const QString &special_value_text = QString());
+                         QString special_value_text = QString());
   private:
     int m_min;
     int m_max;

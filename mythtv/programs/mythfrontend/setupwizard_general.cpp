@@ -99,7 +99,7 @@ void GeneralSetupWizard::loadData()
         m_profileLocation->SetText(m_hardwareProfile->GetProfileURL());
 
     if (m_adminPassword)
-        m_adminPassword->SetText(m_hardwareProfile->GetAdminPasswordFromFile());
+        m_adminPassword->SetText(HardwareProfile::GetAdminPasswordFromFile());
 }
 
 void GeneralSetupWizard::slotNext(void)
@@ -150,7 +150,7 @@ void GeneralSetupWizard::OnSubmitPromptReturn(bool submit)
             if (m_profileLocation)
                 m_profileLocation->SetText(m_hardwareProfile->GetProfileURL());
             if (m_adminPassword)
-                m_adminPassword->SetText(m_hardwareProfile->GetAdminPasswordFromFile());
+                m_adminPassword->SetText(HardwareProfile::GetAdminPasswordFromFile());
         }
         else
         {

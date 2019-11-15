@@ -212,7 +212,9 @@ void StreamView::customEvent(QEvent *event)
     }
     else if (event->type() == MythEvent::MythEventMessage)
     {
-        MythEvent *me = static_cast<MythEvent *>(event);
+        MythEvent *me = dynamic_cast<MythEvent *>(event);
+        if (me == nullptr)
+            return;
         QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);
 
         if (tokens.isEmpty())
@@ -263,7 +265,7 @@ void StreamView::customEvent(QEvent *event)
         if (!dhe)
             return;
 
-        int available, maxSize;
+        int available = 0, maxSize = 0;
         dhe->getBufferStatus(&available, &maxSize);
 
         if (m_bufferStatus)
@@ -285,10 +287,10 @@ void StreamView::customEvent(QEvent *event)
     }
     else if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = static_cast<DialogCompletionEvent*>(event);
+        auto dce = dynamic_cast<DialogCompletionEvent*>(event);
 
         // make sure the user didn't ESCAPE out of the menu
-        if (dce->GetResult() < 0)
+        if ((dce == nullptr) || (dce->GetResult() < 0))
             return;
 
         QString resultid   = dce->GetId();

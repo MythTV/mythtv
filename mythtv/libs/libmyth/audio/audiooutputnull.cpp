@@ -26,7 +26,6 @@ using namespace std;
 AudioOutputNULL::AudioOutputNULL(const AudioSettings &settings) :
     AudioOutputBase(settings)
 {
-    memset(m_pcm_output_buffer, 0, sizeof(char) * NULLAUDIO_OUTPUT_BUFFER_SIZE);
     InitSettings(settings);
     if (settings.m_init)
         Reconfigure(settings);

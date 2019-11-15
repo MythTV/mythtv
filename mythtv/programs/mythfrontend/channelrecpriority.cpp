@@ -251,7 +251,8 @@ void ChannelRecPriority::FillList(void)
         }
     }
     result.prepare("SELECT chanid, channum, sourceid, callsign, "
-                   "icon, recpriority, name FROM channel WHERE visible=1;");
+                   "icon, recpriority, name FROM channel "
+                   "WHERE deleted IS NULL AND visible = 1");
 
     if (result.exec())
     {
@@ -347,7 +348,7 @@ void ChannelRecPriority::SortList()
         m_currentItem = channelItem;
     }
 
-    int i, j;
+    int i = 0, j = 0;
     vector<RecPriorityInfo> sortingList;
     QMap<QString, ChannelInfo>::iterator pit;
     vector<RecPriorityInfo>::iterator sit;

@@ -256,11 +256,8 @@ MythMediaDevice * MediaMonitor::selectDrivePopup(const QString &label,
  */
 void MediaMonitor::ChooseAndEjectMedia(void)
 {
-    MythMediaDevice *selected;
-
-
-    selected = selectDrivePopup(tr("Select removable media"
-                                   " to eject or insert"), true);
+    MythMediaDevice *selected =
+        selectDrivePopup(tr("Select removable media to eject or insert"), true);
 
     // If the user cancelled, no need to display or do anything more
     if (selected == (MythMediaDevice *) -1)
@@ -445,10 +442,9 @@ void MediaMonitor::CheckDevices(void)
     QMutexLocker locker(&m_DevicesLock);
 
     QList<MythMediaDevice*>::iterator itr = m_Devices.begin();
-    MythMediaDevice* pDev;
     while (itr != m_Devices.end())
     {
-        pDev = *itr;
+        MythMediaDevice* pDev = *itr;
         if (pDev)
             pDev->checkMedia();
         ++itr;
@@ -808,8 +804,15 @@ bool MediaMonitor::eventFilter(QObject *obj, QEvent *event)
 {
     if (event->type() == MythMediaEvent::kEventType)
     {
-        MythMediaDevice *pDev = ((MythMediaEvent*)event)->getDevice();
+        MythMediaEvent *me = dynamic_cast<MythMediaEvent *>(event);
+        if (me == nullptr)
+        {
+            LOG(VB_GENERAL, LOG_ALERT,
+                     "MediaMonitor::eventFilter() couldn't cast event");
+            return true;
+        }
 
+        MythMediaDevice *pDev = me->getDevice();
         if (!pDev)
         {
             LOG(VB_GENERAL, LOG_ALERT,

@@ -98,8 +98,6 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    bool useDB;
-
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHCCEXTRACTOR);
 
     MythCCExtractorCommandLineParser cmdline;
@@ -121,7 +119,7 @@ int main(int argc, char *argv[])
 
     if (cmdline.toBool("showversion"))
     {
-        cmdline.PrintVersion();
+        MythCCExtractorCommandLineParser::PrintVersion();
         return GENERIC_EXIT_OK;
     }
 
@@ -134,7 +132,7 @@ int main(int argc, char *argv[])
 
     QString destdir = cmdline.toString("destdir");
 
-    useDB = !QFile::exists(infile);
+    bool useDB = !QFile::exists(infile);
 
     CleanupGuard callCleanup(cleanup);
 

@@ -23,17 +23,6 @@
 #include "exportnative.h"
 #include "themeselector.h"
 
-SelectDestination::SelectDestination(
-    MythScreenStack *parent, bool nativeMode, const QString& name) :
-    MythScreenType(parent, name),
-    m_nativeMode(nativeMode)
-{
-    m_archiveDestination.type = AD_FILE;
-    m_archiveDestination.name = nullptr;
-    m_archiveDestination.description = nullptr;
-    m_archiveDestination.freeSpace = 0LL;
-}
-
 SelectDestination::~SelectDestination(void)
 {
     saveConfiguration();
@@ -248,7 +237,7 @@ void SelectDestination::setDestination(MythUIButtonListItem* item)
             m_doBurnText->Show();
             break;
         case AD_FILE:
-            int64_t dummy;
+            int64_t dummy = 0;
             ArchiveDestinations[itemNo].freeSpace = 
                     getDiskSpace(m_filenameEdit->GetText(), dummy, dummy);
 
@@ -301,7 +290,7 @@ void SelectDestination::fileFinderClosed(const QString& filename)
 
 void SelectDestination::filenameEditLostFocus()
 {
-    int64_t dummy;
+    int64_t dummy = 0;
     m_archiveDestination.freeSpace = getDiskSpace(m_filenameEdit->GetText(), dummy, dummy);
 
     // if we don't get a valid freespace value it probably means the file doesn't

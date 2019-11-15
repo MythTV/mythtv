@@ -23,7 +23,7 @@ class MythUDPListener : public QObject
     virtual void deleteLater(void);
 
   private slots:
-    void Process(const QByteArray &buf, const QHostAddress& sender,
+    static void Process(const QByteArray &buf, const QHostAddress& sender,
                  quint16 senderPort);
 
   private:

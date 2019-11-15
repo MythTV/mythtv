@@ -203,8 +203,6 @@ char *AudioOutputUtil::GeneratePinkFrames(char *frames, int channels,
 
     initialize_pink_noise(&pink, bits);
 
-    double   res;
-    int32_t  ires;
     int16_t *samp16 = (int16_t*) frames;
     int32_t *samp32 = (int32_t*) frames;
 
@@ -214,8 +212,10 @@ char *AudioOutputUtil::GeneratePinkFrames(char *frames, int channels,
         {
             if (chn==channel)
             {
-                res = generate_pink_noise_sample(&pink) * 0x03fffffff; /* Don't use MAX volume */
-                ires = res;
+                /* Don't use MAX volume */
+                double res = generate_pink_noise_sample(&pink) *
+                    static_cast<float>(0x03fffffff);
+                int32_t ires = res;
                 if (bits == 16)
                     *samp16++ = LE_SHORT(ires >> 16);
                 else
@@ -246,7 +246,6 @@ int AudioOutputUtil::DecodeAudio(AVCodecContext *ctx,
 {
     MythAVFrame frame;
     bool got_frame = false;
-    int ret;
     char error[AV_ERROR_MAX_STRING_SIZE];
 
     data_size = 0;
@@ -261,7 +260,7 @@ int AudioOutputUtil::DecodeAudio(AVCodecContext *ctx,
 //  into separate routines or separate threads.
 //  Also now that it always consumes a whole buffer some code
 //  in the caller may be able to be optimized.
-    ret = avcodec_receive_frame(ctx,frame);
+    int ret = avcodec_receive_frame(ctx,frame);
     if (ret == 0)
         got_frame = true;
     if (ret == AVERROR(EAGAIN))

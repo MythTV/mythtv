@@ -369,7 +369,7 @@ void ImportMusicDialog::addPressed()
         QString fullFilename;
 
         QUrl url(m_musicStorageDir);
-        fullFilename = gCoreContext->GenMythURL(url.host(), 0, saveFilename, "Music");
+        fullFilename = MythCoreContext::GenMythURL(url.host(), 0, saveFilename, "Music");
 
 
         // we need to manually copy the file extension
@@ -558,11 +558,9 @@ void ImportMusicDialog::scanDirectory(QString &directory, vector<TrackInfo*> *tr
         return;
 
     QFileInfoList::const_iterator it = list.begin();
-    const QFileInfo *fi;
-
     while (it != list.end())
     {
-        fi = &(*it);
+        const QFileInfo *fi = &(*it);
         ++it;
         QString filename = fi->absoluteFilePath();
         if (fi->isDir())
@@ -896,9 +894,8 @@ void ImportMusicDialog::showImportCoverArtDialog(void)
 
 void ImportMusicDialog::customEvent(QEvent *event)
 {
-    if (event->type() == DialogCompletionEvent::kEventType)
+    if (auto dce = dynamic_cast<DialogCompletionEvent*>(event))
     {
-        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
         if (dce->GetId() == "locationchange")
         {
             m_locationEdit->SetText(dce->GetResultText());
@@ -1068,11 +1065,9 @@ void ImportCoverArtDialog::scanDirectory()
         return;
 
     QFileInfoList::const_iterator it = list.begin();
-    const QFileInfo *fi;
-
     while (it != list.end())
     {
-        fi = &(*it);
+        const QFileInfo *fi = &(*it);
         ++it;
         QString filename = fi->absoluteFilePath();
         if (!fi->isDir())
@@ -1104,7 +1099,7 @@ void ImportCoverArtDialog::updateStatus()
         QString fullFilename;
 
         QUrl url(m_musicStorageDir);
-        fullFilename = gCoreContext->GenMythURL(url.host(), 0, saveFilename, "Music");
+        fullFilename = MythCoreContext::GenMythURL(url.host(), 0, saveFilename, "Music");
         QString dir = fullFilename.section( '/', 0, -2);
 
         QFileInfo fi(m_filelist[m_currentFile]);

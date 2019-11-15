@@ -242,7 +242,7 @@ bool Xsd::GetXSD( HTTPRequest *pRequest, QString sTypeName )
     //
     // ----------------------------------------------------------------------
 
-    if (!(bIsArray || bIsMap) && ((id == -1) || (id < QMetaType::User)))
+    if (!(bIsArray || bIsMap) && (id < QMetaType::User))
         return false;
 
     // ------------------------------------------------------------------

@@ -17,7 +17,7 @@ class ThreadedFileWriter;
 class MBASE_PUBLIC RemoteFile
 {
   public:
-    RemoteFile(const QString &url = "",
+    RemoteFile(QString url = "",
                bool write = false,
                bool usereadahead = true,
                int timeout_ms = 2000/*RingBuffer::kDefaultOpenTimeout*/,

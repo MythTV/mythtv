@@ -124,7 +124,7 @@ int main(int argc, char **argv)
 
     if (cmdline.toBool("showversion"))
     {
-        cmdline.PrintVersion();
+        MythScreenWizardCommandLineParser::PrintVersion();
         return GENERIC_EXIT_OK;
     }
 
@@ -137,9 +137,9 @@ int main(int argc, char **argv)
     new QApplication(argc, argv);
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHSCREENWIZARD);
 
-    int retval;
     QString mask("general");
-    if ((retval = cmdline.ConfigureLogging(mask, false)) != GENERIC_EXIT_OK)
+    int retval = cmdline.ConfigureLogging(mask, false);
+    if (retval != GENERIC_EXIT_OK)
         return retval;
 
     CleanupGuard callCleanup(cleanup);

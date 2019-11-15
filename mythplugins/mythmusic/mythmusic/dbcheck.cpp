@@ -342,6 +342,7 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
             "    INDEX (name)"
             ");",
 
+            // NOLINTNEXTLINE(bugprone-suspicious-missing-comma)
             "INSERT INTO smartplaylistcategory SET categoryid = 1, "
             "    name = \"Decades\";",
             "INSERT INTO smartplaylistcategory SET categoryid = 2, "
@@ -517,6 +518,7 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
             "RENAME TABLE smartplaylistitem TO music_smartplaylist_items;",
             "RENAME TABLE smartplaylistcategory TO music_smartplaylist_categories;",
             // Run necessary SQL to migrate the table structure
+            // NOLINTNEXTLINE(bugprone-suspicious-missing-comma)
             "CREATE TEMPORARY TABLE tmp_artists"
             "  SELECT DISTINCT artist FROM musicmetadata;",
             "INSERT INTO tmp_artists"
@@ -575,6 +577,7 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
         const QString updates[] =
         {
             "ALTER TABLE music_songs MODIFY lastplay DATETIME DEFAULT NULL;",
+            // NOLINTNEXTLINE(bugprone-suspicious-missing-comma)
             "CREATE TABLE music_directories (directory_id int(20) NOT NULL AUTO_INCREMENT "
             "PRIMARY KEY, path TEXT NOT NULL, "
             "parent_id INT(20) NOT NULL DEFAULT '0') ;",
@@ -731,6 +734,7 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
         {
             QString("ALTER DATABASE %1 DEFAULT CHARACTER SET latin1;")
                     .arg(gContext->GetDatabaseParams().dbName),
+            // NOLINTNEXTLINE(bugprone-suspicious-missing-comma)
             "ALTER TABLE music_albumart"
             "  MODIFY filename varbinary(255) NOT NULL default '';",
             "ALTER TABLE music_albums"
@@ -780,6 +784,7 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
         {
             QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
                     .arg(gContext->GetDatabaseParams().dbName),
+            // NOLINTNEXTLINE(bugprone-suspicious-missing-comma)
             "ALTER TABLE music_albumart"
             "  DEFAULT CHARACTER SET default,"
             "  MODIFY filename varchar(255) CHARACTER SET utf8 NOT NULL default '';",

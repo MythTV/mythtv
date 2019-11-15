@@ -383,7 +383,7 @@ void DTVChannel::HandleScriptEnd(bool /*ok*/)
     // will save the current channel to (*it)->startChanNum
 }
 
-bool DTVChannel::TuneMultiplex(uint mplexid, QString /*inputname*/)
+bool DTVChannel::TuneMultiplex(uint mplexid, const QString& /*inputname*/)
 {
     DTVMultiplex tuning;
     if (!tuning.FillFromDB(m_tunerType, mplexid))

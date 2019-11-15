@@ -53,12 +53,12 @@ uint ProfileItem::GetPriority(void) const
 // If string is blank then assumes a match.
 // If value is 0 or negative assume a match (i.e. value unknown assumes a match)
 // float values must be no more than 3 decimals.
-bool ProfileItem::CheckRange(QString Key, float Value, bool *Ok) const
+bool ProfileItem::CheckRange(const QString Key, float Value, bool *Ok) const
 {
     return CheckRange(std::move(Key), Value, 0, true, Ok);
 }
 
-bool ProfileItem::CheckRange(QString Key, int Value, bool *Ok) const
+bool ProfileItem::CheckRange(const QString Key, int Value, bool *Ok) const
 {
     return CheckRange(std::move(Key), 0.0, Value, false, Ok);
 }
@@ -1348,7 +1348,7 @@ void VideoDisplayProfile::InitStatics(bool Reinit /*= false*/)
     }
     s_safe_initialized = true;
 
-    RenderOptions options;
+    RenderOptions options {};
     options.renderers      = &s_safe_custom;
     options.safe_renderers = &s_safe_renderer;
     options.render_group   = &s_safe_renderer_group;

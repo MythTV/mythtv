@@ -72,7 +72,7 @@ static int CopyFile(const MythUtilCommandLineParser &cmdline)
     long long totalBytes = srcRB->GetRealFileSize();
     long long totalBytesCopied = 0;
     bool ok = true;
-    int r;
+    int r = 0;
     while (ok && ((r = srcRB->Read(buf, readSize)) > 0))
     {
         int ret = destRB->Write(buf, r);

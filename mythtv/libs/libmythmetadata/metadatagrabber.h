@@ -32,7 +32,7 @@ class META_PUBLIC MetaGrabberScript
     MetaGrabberScript() = default;
     explicit MetaGrabberScript(const QDomElement &dom);
     explicit MetaGrabberScript(const QString &path);
-    MetaGrabberScript(const QString &path, const QDomElement &dom);
+    MetaGrabberScript(QString path, const QDomElement &dom);
     MetaGrabberScript(const MetaGrabberScript &/*other*/) = default;
 
     MetaGrabberScript& operator=(const MetaGrabberScript &other);
@@ -92,7 +92,7 @@ class META_PUBLIC MetaGrabberScript
 
     void ParseGrabberVersion(const QDomElement &item);
     MetadataLookupList RunGrabber(const QStringList &args, MetadataLookup *lookup, bool passseas);
-    void SetDefaultArgs(QStringList &args);
+    static void SetDefaultArgs(QStringList &args);
 };
 
 Q_DECLARE_METATYPE(MetaGrabberScript*)

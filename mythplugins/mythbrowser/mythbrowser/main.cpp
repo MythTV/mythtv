@@ -121,7 +121,8 @@ static void setupKeys(void)
 
 int mythplugin_init(const char *libversion)
 {
-    if (!gCoreContext->TestPluginVersion("mythbrowser", libversion, MYTH_BINARY_VERSION))
+    if (!MythCoreContext::TestPluginVersion("mythbrowser", libversion,
+                                            MYTH_BINARY_VERSION))
         return -1;
 
     UpgradeBrowserDatabaseSchema();

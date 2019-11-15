@@ -30,7 +30,7 @@ public:
     MusicMetadata* read(const QString &filename) override; // MetaIOTagLib
 
 private:
-    TagLib::WavPack::File *OpenFile(const QString &filename);
+    static TagLib::WavPack::File *OpenFile(const QString &filename);
 };
 
 #endif

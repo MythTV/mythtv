@@ -45,7 +45,7 @@ class MHParseNode
     virtual ~MHParseNode() = default;
     enum NodeType m_nNodeType;
 
-    void Failure(const char *p); // Report a parse failure.
+    static void Failure(const char *p); // Report a parse failure.
 
     // Destructors - extract data and raise an exception if the Node Type is wrong.
 

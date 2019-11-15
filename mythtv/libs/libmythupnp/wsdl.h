@@ -59,9 +59,9 @@ class UPNP_PUBLIC Wsdl : public QDomDocument
                                             QString       sTypeName,
                                             bool          bReturnType = false );
 
-        bool        IsCustomType          ( QString &sTypeName );
+        static bool        IsCustomType          ( QString &sTypeName );
 
-        QString     ReadClassInfo         ( const QMetaObject *pMeta, 
+        static QString     ReadClassInfo         ( const QMetaObject *pMeta, 
                                             const QString     &sKey );
 
         QString     AddTypeInfo           ( QString            sType );

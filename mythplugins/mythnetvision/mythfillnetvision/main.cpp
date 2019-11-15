@@ -71,14 +71,14 @@ int main(int argc, char *argv[])
 
     if (cmdline.toBool("showversion"))
     {
-        cmdline.PrintVersion();
+        MythFillNVCommandLineParser::PrintVersion();
         return GENERIC_EXIT_OK;
     }
 
     QCoreApplication a(argc, argv);
     QCoreApplication::setApplicationName("mythfillnetvision");
 
-    int retval;
+    int retval = GENERIC_EXIT_OK;
     if ((retval = cmdline.ConfigureLogging()) != GENERIC_EXIT_OK)
         return retval;
     

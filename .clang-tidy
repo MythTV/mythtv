@@ -1,8 +1,76 @@
 # Crappy parser.  Only uses a comma to delineate the end of a line, so
 # all comments must end with a comma. A single quote inside a comment
 # also screws up the parsing.
+#
+# The goal is to pass all of the following:
+#
+#     bugprone-*
+#     cert-*
+#     clang-analyzer-*
+#     cppcoreguidelines-*
+#     misc-*
+#     modernize-*
+#     performance-*
+#     readability-*
+#
+# Some specific checks may never be enabled, like
+# clang-analyzer-security.insecureAPI.strcpy which requires a missing
+# library to fix problems.  Others like modernize-redundant-void-arg
+# seem unnecessary.  Some others may never be enabled by default, like
+# clang-analyzer-core.CallAndMessage which doesn't understand
+# dynamic_cast and gives lots of false positives.
+#,
 
 Checks: '-*,
+
+    bugprone-*,
+        # A handful of warnings
+        bugprone-integer-division,
+
+        # Bunch of warnings.... ,
+        # Comment out this and the cppcoreguidelines version. ,
+       -bugprone-narrowing-conversions,
+
+        # Errors in code?  GroupAnimation overrides several parent
+        # functions with an explicit nullptr.  Shouldnt it just call
+        # up? ,
+        bugprone-parent-virtual-call,
+
+        # Prevent self-assignment.  Needs to be investigated.
+       -bugprone-unhandled-self-assignment,
+
+    # Explicitly list the tests that arent aliases. ,
+    cert-*,
+
+        # Dont declare c-style varardic functions. ,
+       -cert-dcl50-cpp,
+
+        # Using function invokes a command interpreter. Should fix. ,
+       -cert-env33-c,
+
+        # Should throw anonymous temporary values.
+       -cert-err09-cpp,
+       -cert-err61-cpp,
+
+        # string-to-number conversion functions that do not verify the
+        # validity of the conversion. Needs work. ,
+       -cert-err34-c,
+
+        # Lots of complaints about constructors of static objects
+        # possibly throwing exceptions that cant be caught.  These
+        # all appear to be within Qt code that cant be fixed by us. ,
+       -cert-err58-cpp,
+
+        # Dont use floating point variable for looping. ,
+       -cert-flp30-c,
+
+        # Limited randomness. Should fix. ,
+       -cert-msc30-c,
+       -cert-msc50-cpp,
+
+        # Alias for -bugprone-unhandled-self-assignment. ,
+       -cert-oop54-cpp,
+
     clang-analyzer-*,
         # Not tested. ,
        -clang-analyzer-apiModeling.*,
@@ -24,7 +92,7 @@ Checks: '-*,
         # need to be chased down. ,
        -clang-analyzer-cplusplus.NewDeleteLeaks,
 
-        # Tested on x86-64. ,
+        # Most testing on x86-64. ,
        -clang-analyzer-osx.*,
 
         # Cant fix due to missing LIB_EXT1 extensions. ,
@@ -34,36 +102,42 @@ Checks: '-*,
 
     clang-diagnostic-error,
 
-    bugprone-*,
-        # Not investigated yet. ,
-        bugprone-argument-comment,
-
-        # A handful of warnings
-       -bugprone-integer-division,
-
+    # Explicitly list the tests that arent aliases. ,
+    #cppcoreguidelines-*,
+       -cppcoreguidelines-avoid-goto,
+       -cppcoreguidelines-interfaces-global-init,
+       -cppcoreguidelines-macro-usage,
         # Bunch of warnings.... ,
-       -bugprone-narrowing-conversions,
+       -cppcoreguidelines-narrowing-conversions,
+       -cppcoreguidelines-no-malloc,
+        # No gsl. ,
+       -cppcoreguidelines-owning-memory,
+        # No gsl. ,
+       -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
+        # No gsl. ,
+       -cppcoreguidelines-pro-bounds-constant-array-index,
+        # Bunch of warnings.... ,
+       -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+        cppcoreguidelines-pro-type-const-cast,
+        # Bunch of warnings.... ,
+       -cppcoreguidelines-pro-type-cstyle-cast,
+       -cppcoreguidelines-pro-type-member-init,
+       -cppcoreguidelines-pro-type-reinterpret-cast,
+       -cppcoreguidelines-pro-type-static-cast-downcast,
 
-        # Errors in code?  GroupAnimation overrides several parent
-        # functions with an explicit nullptr.  Shouldnt it just call
-        # up? ,
-       -bugprone-parent-virtual-call,
+        # Recommends using boost:: to access unions. ,
+       -cppcoreguidelines-pro-type-union-access,
 
-        # Half dozen errors, all in SQL statements. ,
-       -bugprone-suspicious-missing-comma,
+        # Warns on every LogPrintLine. ,
+       -cppcoreguidelines-pro-type-vararg,
+
+       -cppcoreguidelines-slicing,
+       -cppcoreguidelines-special-member-functions,
 
     misc-*,
 
         # Cases exist. Need to add getters/setters to classes. ,
        -misc-non-private-member-variables-in-classes,
-
-        # Complains about code like "RAND () % 3 - RAND () % 3", not
-        # understanding that RAND() doesnt always return the same
-        # value. ,
-        #
-        # Two spots that check (id == -1) || (id < x) which is
-        # redundant. ,
-       -misc-redundant-expression,
 
         # Cases exist. Need evaluation. ,
        -misc-throw-by-value-catch-by-reference,
@@ -71,13 +145,10 @@ Checks: '-*,
     modernize-*,
 
         # Lots of changes to be done. ,
-        modernize-avoid-c-arrays,
+       -modernize-avoid-c-arrays,
 
         # Not investigated yet. ,
        -modernize-loop-convert,
-
-        # Lots of changes to be done. ,
-        modernize-pass-by-value,
 
         # Run again.  Seems like should do more.  Supposedly presence
         # of *any* of \\, \<squote>, \<dquote>, \?, octal, hex. ,
@@ -92,6 +163,9 @@ Checks: '-*,
         # One weirdness in videooutput_xv.cpp.  Making the proposed
         # change causes one of the programs to fail in the link stage. ,
        -modernize-use-emplace,
+
+        # Why would anyone want this? ,
+       -modernize-use-trailing-return-type,
 
         # Noisy. Needs work.,
        -modernize-use-using,
@@ -110,11 +184,13 @@ Checks: '-*,
        -readability-braces-around-statements,
         # Not investigated yet. ,
        -readability-function-size,
-        # Not investigated yet. ,
+
+        # Will fix member names, but not any uses of the changed
+        # memeber names. ,
        -readability-identifier-naming,
 
         # Wants to convert all "if (x)" pointer validity checks to be
-        # "if (x != nullptr)"
+        # "if (x != nullptr)" ,
        -readability-implicit-bool-conversion,
 
         # Has two issues:
@@ -136,20 +212,16 @@ Checks: '-*,
         # Lots of noise. Needs work. ,
        -readability-magic-numbers,
 
-        # Has problems with a couple of emit calls. ,
-       -readability-misleading-indentation,
-
         # Doesnt understand MMX assembly code. ,
        -readability-non-const-parameter,
 
-        # Has two false positives that look like they could be
-        # simplified, only because of conditionally compiled code that
-        # isnt compiled in. ,
-       -readability-simplify-boolean-expr,
 '
 
 CheckOptions:
   - key:      bugprone-suspicious-string-compare.WarnOnLogicalNotComparison
+    value:    '1'
+
+  - key:      cppcoreguidelines-pro-type-member-init.IgnoreArrays
     value:    '1'
 
   - key:      modernize-make-shared.IgnoreMacros
@@ -186,3 +258,18 @@ CheckOptions:
     value:    '::std::basic_string;::std::basic_string_view;::std::vector;::std::array;QByteArray;QString'
   - key:      readability-uppercase-literal-suffix.IgnoreMacros
     value:    '0'
+
+  - key:      readability-identifier-naming.MemberCase
+    value:    'camelBack'
+  - key:      readability-identifier-naming.MemberPrefix
+    value:    'm_'
+  - key:      readability-identifier-naming.MethodCase
+    value:    'camelBack'
+  - key:      readability-identifier-naming.StaticConstantCase
+    value:    'camelBack'
+  - key:      readability-identifier-naming.StaticConstantPrefix
+    value:    'k'
+  - key:      readability-identifier-naming.StaticVariableCase
+    value:    'camelBack'
+  - key:      readability-identifier-naming.StaticVariablePrefix
+    value:    's_'

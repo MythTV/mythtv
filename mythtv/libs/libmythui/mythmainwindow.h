@@ -64,7 +64,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
                  const QString &key);
     void RegisterKey(const QString &context, const QString &action,
                      const QString &description, const QString &key);
-    QString GetKey(const QString &context, const QString &action) const;
+    static QString GetKey(const QString &context, const QString &action);
     QString GetActionText(const QString &context, const QString &action) const;
 
     void ClearJump(const QString &destination);
@@ -103,9 +103,9 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     void         ShowPainterWindow();
     void         HidePainterWindow();
 
-    void GrabWindow(QImage &image);
-    bool SaveScreenShot(const QImage &image, QString filename = "");
-    bool ScreenShot(int w = 0, int h = 0, QString filename = "");
+    static void GrabWindow(QImage &image);
+    static bool SaveScreenShot(const QImage &image, QString filename = "");
+    static bool ScreenShot(int w = 0, int h = 0, QString filename = "");
     void RemoteScreenShot(QString filename, int x, int y);
 
     void AllowInput(bool allow);

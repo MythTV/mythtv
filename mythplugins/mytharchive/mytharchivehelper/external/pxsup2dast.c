@@ -124,8 +124,7 @@ struct
 
 static void __exc_throw(int type) /* protoadd GCCATTR_NORETURN */ 
 {
-    struct exc__state * exc_s;
-    exc_s = EXC.last;
+    struct exc__state * exc_s = EXC.last;
     EXC.last = EXC.last->prev;
     longjmp(exc_s->env, type);
 }
@@ -136,11 +135,10 @@ static void exc_throw(int type, const char * format, ...)
     if (format != NULL) 
     {
         va_list ap;
-        unsigned int len;
         int err = errno;
 
         va_start(ap, format);
-        len = vsnprintf(EXC.msgbuf, sizeof EXC.msgbuf, format, ap);
+        unsigned int len = vsnprintf(EXC.msgbuf, sizeof EXC.msgbuf, format, ap);
         va_end(ap);
 
         if (len >= sizeof EXC.msgbuf) 
@@ -204,12 +202,10 @@ static void xxfwrite(FILE * stream, const eu8 * ptr, size_t size)
 static void yuv2rgb(int y,   int cr,  int cb,
             eu8 * r, eu8 * g, eu8 * b)  
 {
-    int lr, lg, lb;
-
     /* from dvdauthor... */
-    lr = (500 + 1164 * (y - 16) + 1596 * (cr - 128)              ) /1000;
-    lg = (500 + 1164 * (y - 16) -  813 * (cr - 128) - 391 * (cb - 128)) / 1000;
-    lb = (500 + 1164 * (y - 16)                    + 2018 * (cb - 128)) / 1000;
+    int lr = (500 + 1164 * (y - 16) + 1596 * (cr - 128)              ) /1000;
+    int lg = (500 + 1164 * (y - 16) -  813 * (cr - 128) - 391 * (cb - 128)) / 1000;
+    int lb = (500 + 1164 * (y - 16)                    + 2018 * (cb - 128)) / 1000;
 
     *r = (lr < 0)? 0: (lr > 255)? 255: (eu8)lr;
     *g = (lg < 0)? 0: (lg > 255)? 255: (eu8)lg;
@@ -333,26 +329,24 @@ static void xxfwrite_uint32_be(FILE * fh, eu32 value)
 static void ifopalette(const char * filename,
              eu8 yuvpalette[16][3], eu8 rgbpalette[16][3])  
 {
-    eu8 buf[1024], r, g, b;
-    fu32 offset, pgc;
-    int i;
-    FILE * fh;
+    eu8 buf[1024];
 
-    fh = xfopen(filename, "rb");
+    FILE *fh = xfopen(filename, "rb");
         if (memcmp(xxfread(fh, buf, 12), "DVDVIDEO-VTS", 12) != 0)
             exc_throw(MiscError,
                     "(IFO) file %s not of type DVDVIDEO-VTS.", filename);
 
     xfseek0(fh, 0xcc);
-    offset = get_uint32_be(xxfread(fh, buf, 4));
+    fu32 offset = get_uint32_be(xxfread(fh, buf, 4));
     xfseek0(fh, offset * 0x800 + 12);
-    pgc = offset * 0x800 + get_uint32_be(xxfread(fh, buf, 4));
+    fu32 pgc = offset * 0x800 + get_uint32_be(xxfread(fh, buf, 4));
     /* seek to palette */
     xfseek0(fh, pgc + 0xa4);
     xxfread(fh, buf, 16 * 4);
     fclose(fh);
-    for (i = 0; i < 16; i++) 
+    for (int i = 0; i < 16; i++)
     {
+        eu8 r = 0, g = 0, b = 0;
         eu8 * p = buf + i * 4 + 1;
         yuvpalette[i][0] =p[0]; yuvpalette[i][1] =p[1]; yuvpalette[i][2] =p[2];
         yuv2rgb(p[0], p[1], p[2], &r, &g, &b);
@@ -363,9 +357,11 @@ static void ifopalette(const char * filename,
 
 static void set2palettes(int value, eu8 * yuvpalpart, eu8 * rgbpalpart) 
 {
-    eu8 r, g, b, y, cr, cb;
+    eu8 y = 0, cr = 0, cb = 0;
 
-    r = value >> 16; g = value >> 8; b = value;
+    eu8 r = value >> 16;
+    eu8 g = value >> 8;
+    eu8 b = value;
     rgbpalpart[0] = r, rgbpalpart[1] = g,  rgbpalpart[2] = b;
     rgb2yuv(r, g, b, &y, &cr, &cb);
     yuvpalpart[0] = y, yuvpalpart[1] = cr, yuvpalpart[2] = cb; 
@@ -375,7 +371,7 @@ static void set2palettes(int value, eu8 * yuvpalpart, eu8 * rgbpalpart)
 static void argpalette(const char * arg,
                eu8 yuvpalette[16][3], eu8 rgbpalette[16][3])  
 {
-    unsigned int i;
+    unsigned int i = 0;
 
     if (strlen(arg) != 20 || arg[6] != ',' || arg[13] != ',')
         exc_throw(MiscError, "Palette arg %s invalid.\n", arg);
@@ -419,7 +415,6 @@ static void png4file_init(Png4File * self, eu8 palette[4][3])
 static void png4file_open(Png4File * self,
                     const char * filename, int height, int width) 
 {
-    eu32 crc;
     self->fh = xfopen(filename, "wb");
     self->width = width;
     self->hleft = height;
@@ -432,7 +427,7 @@ static void png4file_open(Png4File * self,
     set_uint32_be(self->buffer + 8, height);
     memcpy(self->buffer + 12, "\004\003\0\0\0", 5);
 
-    crc = crc32(0, self->buffer, 17);
+    eu32 crc = crc32(0, self->buffer, 17);
     set_uint32_be(self->buffer + 17, crc);
     xxfwrite(self->fh, self->buffer, 21);
 
@@ -530,7 +525,7 @@ static void getpixelline(eu8 ** data, int width, Png4File * picfile)
 {
     int nibble = -1;
     int col = 0;
-    int number, cindex;
+    int number = 0, cindex = 0;
     /* Originally from gtkspu - this from the python implementation of this */
 
     while (1) 
@@ -589,12 +584,11 @@ static void makebitmap(eu8 * data, int w, int h, int top, int bot,
 {
     eu8 * top_ibuf = data + top;
     eu8 * bot_ibuf = data + bot;
-    int i;
     Png4File picfile;
 
     png4file_init(&picfile, palette); /* not bottleneck even re-doing this every time */
     png4file_open(&picfile, filename, h, w);
-    for (i = 0; i < h / 2; i++) 
+    for (int i = 0; i < h / 2; i++)
     {
         getpixelline(&top_ibuf, w, &picfile);
         getpixelline(&bot_ibuf, w, &picfile);
@@ -635,10 +629,9 @@ static void boundstr_init(BoundStr * bs, eu8 * p, int l)
 
 static eu8 * boundstr_read(BoundStr * bs, int l) 
 {
-    eu8 * rp;
     if (l > bs->l)
         exc_throw(IndexError, "XXX IndexError %p.", bs);
-    rp = bs->p;
+    eu8 * rp = bs->p;
     bs->p += l;
     bs->l -= l;
     return rp; 
@@ -654,7 +647,6 @@ static void pxsubtitle(const char * supfile, FILE * ofh, eu8 palette[16][3],
     char  junk[32];
     char  sptsstr[32];
     eu8   data[65536];
-    eu8 * ctrl;
     time_t volatile pt = 0;
     bool volatile last = false;
     /*char  transparent[8]; */
@@ -681,9 +673,8 @@ static void pxsubtitle(const char * supfile, FILE * ofh, eu8 palette[16][3],
             eu32 volatile pts = get_uint32_le(xxfread(sfh, data, 8));
             eu16 size = get_uint16_be(xxfread(sfh, data, 2));
             eu16 pack = get_uint16_be(xxfread(sfh, data, 2));
-            eu32 endpts;
             xxfread(sfh, data, pack - 4);
-            ctrl = data + pack - 4;
+            eu8 * ctrl = data + pack - 4;
             xxfread(sfh, ctrl, size - pack);
 
             exc_try(2)
@@ -696,17 +687,14 @@ static void pxsubtitle(const char * supfile, FILE * ofh, eu8 palette[16][3],
             last = true;
             exc_end(2);
             {
-                time_t ct;
                 BoundStr bs;
-                int  prev;
                 int x1 = -1, x2 = -1, y1 = -1, y2 = -1;
                 int top_field = -1, bot_field = -1;
                 int end = 0;
-                int colcon_length;
                 eu8 this_palette[4][3];
                 boundstr_init(&bs, ctrl, size - pack);
 
-                prev = 0;
+                int prev = 0;
                 while (1) 
                 {
                     int date = get_uint16_be(boundstr_read(&bs, 2));
@@ -714,9 +702,10 @@ static void pxsubtitle(const char * supfile, FILE * ofh, eu8 palette[16][3],
 
                     while (1) 
                     {
-                        eu8 * p;
+                        eu8 * p = 0;
                         eu8 cmd = boundstr_read(&bs, 1)[0];
-                        int xpalette, i, n;
+                        int xpalette = 0;
+                        int colcon_length = 0;
                         switch (cmd) 
                         {
                             case 0x00:      /* force display: */
@@ -728,8 +717,8 @@ static void pxsubtitle(const char * supfile, FILE * ofh, eu8 palette[16][3],
                                 continue;
                             case 0x03:                /* palette */
                                 xpalette = get_uint16_be(boundstr_read(&bs, 2));
-                                for (n = 0; n < 4; n++) {
-                                    i = (xpalette >> (n * 4) & 0x0f);
+                                for (int n = 0; n < 4; n++) {
+                                    int i = (xpalette >> (n * 4) & 0x0f);
                                     this_palette[n][0] = palette[i][0];
                                     this_palette[n][1] = palette[i][1];
                                     this_palette[n][2] = palette[i][2];
@@ -773,7 +762,7 @@ static void pxsubtitle(const char * supfile, FILE * ofh, eu8 palette[16][3],
                 if (end > 500)
                     end = 500;
 
-                endpts = tmppts + end * 1000; /* ProjectX ! (other: 900, 1024) */
+                eu32 endpts = tmppts + end * 1000; /* ProjectX ! (other: 900, 1024) */
 
                 if (tmppts <= lastendpts)
                 {
@@ -797,6 +786,7 @@ static void pxsubtitle(const char * supfile, FILE * ofh, eu8 palette[16][3],
                 pts2ts(pts, fnbuf_fp, true);
                 pts2ts(tmppts, sptsstr + 1, false);
 
+                time_t ct = 0;
                 if (pt != time(&ct)) 
                 {
                     pt = ct;
@@ -858,16 +848,13 @@ static void usage(const char * pn) /* protoadd GCCATTR_NORETURN */
 
 static bool samepalette(char * filename, eu8 palette[16][3])
 {
-    FILE * fh;
-    int i;
-    unsigned int r,g,b;
-
     if (!fexists(filename))
         return false;
 
-    fh = xfopen(filename, "rb");
-    for (i = 0; i < 16; i++)
+    FILE *fh = xfopen(filename, "rb");
+    for (int i = 0; i < 16; i++)
     {
+        unsigned int r=0,g=0,b=0;
         if (fscanf(fh, "%02x%02x%02x\n", &r, &g, &b) != 3 ||
                r != palette[i][0] || g != palette[i][1] || b != palette[i][2]) 
         {
@@ -883,13 +870,12 @@ int sup2dast(const char *supfile, const char *ifofile ,int delay_ms)
 {
     exc_try(1)
     {
-        int i;
+        int i = 0;
         eu8 yuvpalette[16][3], rgbpalette[16][3];
         char fnbuf[1024];
-        char * p;
+        char * p = NULL;
 
-        bool createpics;
-        FILE * fh;
+        bool createpics = false;
 
         memset(yuvpalette, 0, sizeof(yuvpalette));
         memset(rgbpalette, 0, sizeof(rgbpalette));
@@ -934,7 +920,7 @@ int sup2dast(const char *supfile, const char *ifofile ,int delay_ms)
         }
 
         strcpy(p, "spumux.tmp");
-        fh = xfopen(fnbuf, "wb");
+        FILE *fh = xfopen(fnbuf, "wb");
 
         xxfwriteCS(fh, "<subpictures>\n <stream>\n");
         pxsubtitle(supfile, fh, rgbpalette, createpics, delay_ms, fnbuf, p);
@@ -947,12 +933,11 @@ int sup2dast(const char *supfile, const char *ifofile ,int delay_ms)
 
         if (createpics) 
         {
-            FILE * yuvfh, *rgbfh;
             printf("Writing palette.ycrcb and palette.rgb.\n");
             strcpy(p, "palette.ycrcb");
-            yuvfh = xfopen(fnbuf, "wb");
+            FILE *yuvfh = xfopen(fnbuf, "wb");
             strcpy(p, "palette.rgb");
-            rgbfh = xfopen(fnbuf, "wb");
+            FILE *rgbfh = xfopen(fnbuf, "wb");
             for (i = 0; i < 16; i++) 
             {
                 fprintf(yuvfh, "%02x%02x%02x\n",

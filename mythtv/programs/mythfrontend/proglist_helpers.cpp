@@ -178,7 +178,7 @@ void PhrasePopup::recordClicked(void)
             return;
 
         MSqlBindings bindings;
-        if (m_parent->PowerStringToSQL(text, what, bindings))
+        if (ProgLister::PowerStringToSQL(text, what, bindings))
             fromgenre = QString("LEFT JOIN programgenres ON "
                                 "program.chanid = programgenres.chanid AND "
                                 "program.starttime = programgenres.starttime ");
@@ -359,7 +359,7 @@ void PowerSearchPopup::recordClicked(void)
             return;
 
         MSqlBindings bindings;
-        if (m_parent->PowerStringToSQL(text, what, bindings))
+        if (ProgLister::PowerStringToSQL(text, what, bindings))
             fromgenre = QString(
                 "LEFT JOIN programgenres ON "
                 "program.chanid = programgenres.chanid AND "

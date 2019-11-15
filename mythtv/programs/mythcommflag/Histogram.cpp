@@ -5,14 +5,6 @@
 
 #include "mythframe.h"
 
-Histogram::Histogram()
-{
-    memset(m_data,0,sizeof(m_data));
-
-    // prevent division by 0 in case a virgin histogram gets used.
-    m_numberOfSamples =1;
-}
-
 void Histogram::generateFromImage(VideoFrame* frame, unsigned int frameWidth,
          unsigned int frameHeight, unsigned int minScanX, unsigned int maxScanX,
          unsigned int minScanY, unsigned int maxScanY, unsigned int XSpacing,

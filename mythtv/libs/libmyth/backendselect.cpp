@@ -155,9 +155,8 @@ void BackendSelection::AddItem(DeviceLocation *dev)
         // We only want the version number, not the library version info
         infomap["version"] = infomap["modelnumber"].section('.', 0, 1);
 
-        MythUIButtonListItem *item;
-        item = new MythUIButtonListItem(m_backendList, infomap["modelname"],
-                                        qVariantFromValue(dev));
+        auto item = new MythUIButtonListItem(m_backendList, infomap["modelname"],
+                                             qVariantFromValue(dev));
         item->SetTextFromMap(infomap);
 
         bool protoMatch = (infomap["protocolversion"] == MYTH_PROTO_VERSION);
@@ -189,13 +188,12 @@ bool BackendSelection::ConnectBackend(DeviceLocation *dev)
 {
     QString          error;
     QString          message;
-    UPnPResultCode   stat;
 
     m_USN   = dev->m_sUSN;
 
     MythXMLClient client( dev->m_sLocation );
 
-    stat    = client.GetConnectionInfo(m_pinCode, m_DBparams, message);
+    UPnPResultCode stat = client.GetConnectionInfo(m_pinCode, m_DBparams, message);
 
     QString backendName = dev->GetFriendlyName();
 
@@ -306,7 +304,10 @@ void BackendSelection::customEvent(QEvent *event)
 {
     if (event->type() == MythEvent::MythEventMessage)
     {
-        MythEvent *me      = static_cast<MythEvent *>(event);
+        MythEvent *me      = dynamic_cast<MythEvent *>(event);
+        if (me == nullptr)
+            return;
+
         const QString&    message = me->Message();
         const QString&    URI     = me->ExtraData(0);
         const QString&    URN     = me->ExtraData(1);

@@ -40,7 +40,7 @@ class Action
   public:
     /// \brief Create a new empty action.
     explicit Action(const QString &description) : m_description(description) {}
-    Action(const QString &description, const QString &keys);
+    Action(QString description, const QString &keys);
 
     // Commands
     bool AddKey(const QString &key);

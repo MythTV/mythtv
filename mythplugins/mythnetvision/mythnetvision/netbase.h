@@ -28,9 +28,9 @@ class NetBase : public MythScreenType
     virtual ResultItem *GetStreamItem() = 0;
     virtual void LoadData(void) = 0;
     void InitProgressDialog();
-    void CleanCacheDir();
+    static void CleanCacheDir();
     void DownloadVideo(const QString &url, const QString &dest);
-    void RunCmdWithoutScreensaver(const QString &cmd);
+    static void RunCmdWithoutScreensaver(const QString &cmd);
 
   protected slots:
     void StreamWebVideo(void);

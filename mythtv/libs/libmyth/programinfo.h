@@ -80,44 +80,44 @@ class MPUBLIC ProgramInfo
     ProgramInfo(uint chanid, const QDateTime &recstartts);
     /// Constructs a ProgramInfo from data in 'recorded' table
     ProgramInfo(uint recordedid,
-                const QString &title,
-                const QString &sortTitle,
-                const QString &subtitle,
-                const QString &sortSubtitle,
-                const QString &description,
+                QString title,
+                QString sortTitle,
+                QString subtitle,
+                QString sortSubtitle,
+                QString description,
                 uint season,
                 uint episode,
                 uint totalepisodes,
-                const QString &syndicatedepisode,
-                const QString &category,
+                QString syndicatedepisode,
+                QString category,
 
                 uint chanid,
-                const QString &channum,
-                const QString &chansign,
-                const QString &channame,
-                const QString &chanplaybackfilters,
+                QString channum,
+                QString chansign,
+                QString channame,
+                QString chanplaybackfilters,
 
-                const QString &recgroup,
-                const QString &playgroup,
+                QString recgroup,
+                QString playgroup,
 
                 const QString &pathname,
 
-                const QString &hostname,
-                const QString &storagegroup,
+                QString hostname,
+                QString storagegroup,
 
-                const QString &seriesid,
-                const QString &programid,
-                const QString &inetref,
+                QString seriesid,
+                QString programid,
+                QString inetref,
                 CategoryType  catType,
 
                 int recpriority,
 
                 uint64_t filesize,
 
-                const QDateTime &startts,
-                const QDateTime &endts,
-                const QDateTime &recstartts,
-                const QDateTime &recendts,
+                QDateTime startts,
+                QDateTime endts,
+                QDateTime recstartts,
+                QDateTime recendts,
 
                 float stars,
 
@@ -126,7 +126,7 @@ class MPUBLIC ProgramInfo
                 uint parttotal,
 
                 const QDate &originalAirDate,
-                const QDateTime &lastmodified,
+                QDateTime lastmodified,
 
                 RecStatus::Type recstatus,
 
@@ -141,32 +141,32 @@ class MPUBLIC ProgramInfo
                 uint audioproperties,
                 uint videoproperties,
                 uint subtitleType,
-                const QString &inputname,
-                const QDateTime &bookmarkupdate);
+                QString inputname,
+                QDateTime bookmarkupdate);
 
     /// Constructs a ProgramInfo from data in 'oldrecorded' table
-    ProgramInfo(const QString &title,
-                const QString &sortTitle,
-                const QString &subtitle,
-                const QString &sortSubtitle,
-                const QString &description,
+    ProgramInfo(QString title,
+                QString sortTitle,
+                QString subtitle,
+                QString sortSubtitle,
+                QString description,
                 uint season,
                 uint episode,
-                const QString &category,
+                QString category,
 
                 uint chanid,
-                const QString &channum,
-                const QString &chansign,
-                const QString &channame,
+                QString channum,
+                QString chansign,
+                QString channame,
 
-                const QString &seriesid,
-                const QString &programid,
-                const QString &inetref,
+                QString seriesid,
+                QString programid,
+                QString inetref,
 
-                const QDateTime &startts,
-                const QDateTime &endts,
-                const QDateTime &recstartts,
-                const QDateTime &recendts,
+                QDateTime startts,
+                QDateTime endts,
+                QDateTime recstartts,
+                QDateTime recendts,
 
                 RecStatus::Type recstatus,
 
@@ -179,27 +179,27 @@ class MPUBLIC ProgramInfo
                 bool duplicate);
 
     /// Constructs a ProgramInfo from listings data in 'program' table
-    ProgramInfo(const QString &title,
-                const QString &sortTitle,
-                const QString &subtitle,
-                const QString &sortSubtitle,
-                const QString &description,
-                const QString &syndicatedepisode,
-                const QString &category,
+    ProgramInfo(QString title,
+                QString sortTitle,
+                QString subtitle,
+                QString sortSubtitle,
+                QString description,
+                QString syndicatedepisode,
+                QString category,
 
                 uint chanid,
-                const QString &channum,
-                const QString &chansign,
-                const QString &channame,
-                const QString &chanplaybackfilters,
+                QString channum,
+                QString chansign,
+                QString channame,
+                QString chanplaybackfilters,
 
-                const QDateTime &startts,
-                const QDateTime &endts,
-                const QDateTime &recstartts,
-                const QDateTime &recendts,
+                QDateTime startts,
+                QDateTime endts,
+                QDateTime recstartts,
+                QDateTime recendts,
 
-                const QString &seriesid,
-                const QString &programid,
+                QString seriesid,
+                QString programid,
                 const CategoryType catType,
 
                 float stars,
@@ -225,34 +225,34 @@ class MPUBLIC ProgramInfo
 
                 const ProgramList &schedList);
     /// Constructs a basic ProgramInfo (used by RecordingInfo)
-    ProgramInfo(const QString &title,
-                const QString &sortTitle,
-                const QString &subtitle,
-                const QString &sortSubtitle,
-                const QString &description,
+    ProgramInfo(QString title,
+                QString sortTitle,
+                QString subtitle,
+                QString sortSubtitle,
+                QString description,
                 uint season,
                 uint episode,
                 uint totalepisodes,
-                const QString &category,
+                QString category,
 
                 uint chanid,
-                const QString &channum,
-                const QString &chansign,
-                const QString &channame,
-                const QString &chanplaybackfilters,
+                QString channum,
+                QString chansign,
+                QString channame,
+                QString chanplaybackfilters,
 
-                const QString &recgroup,
-                const QString &playgroup,
+                QString recgroup,
+                QString playgroup,
 
-                const QDateTime &startts,
-                const QDateTime &endts,
-                const QDateTime &recstartts,
-                const QDateTime &recendts,
+                QDateTime startts,
+                QDateTime endts,
+                QDateTime recstartts,
+                QDateTime recendts,
 
-                const QString &seriesid,
-                const QString &programid,
-                const QString &inetref,
-                const QString &inputname);
+                QString seriesid,
+                QString programid,
+                QString inetref,
+                QString inputname);
     /// Constructs a ProgramInfo for a pathname.
     explicit ProgramInfo(const QString &pathname);
     /// Constructs a ProgramInfo for a video.
@@ -601,8 +601,8 @@ class MPUBLIC ProgramInfo
     // Slow DB sets
     virtual void SaveFilesize(uint64_t fsize); /// TODO Move to RecordingInfo
     void SaveBookmark(uint64_t frame);
-    void SaveDVDBookmark(const QStringList &fields) const;
-    void SaveBDBookmark(const QStringList &fields) const;
+    static void SaveDVDBookmark(const QStringList &fields) ;
+    static void SaveBDBookmark(const QStringList &fields) ;
     void SaveEditing(bool edit);
     void SaveTranscodeStatus(TranscodingStatus trans);
     void SaveWatched(bool watchedFlag);

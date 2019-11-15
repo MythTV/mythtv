@@ -138,7 +138,7 @@ int mythfile_open(const char *pathname, int flags)
     LOG(VB_FILE, LOG_DEBUG, QString("mythfile_open('%1', %2)")
             .arg(pathname).arg(flags));
 
-    struct stat fileinfo;
+    struct stat fileinfo {};
     if (mythfile_stat(pathname, &fileinfo))
         return -1;
 

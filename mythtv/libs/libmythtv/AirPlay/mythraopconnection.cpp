@@ -329,9 +329,7 @@ void MythRAOPConnection::udpDataReady(QByteArray buf, const QHostAddress& /*peer
         delete decoded;
         return;
     }
-    AudioPacket frames;
-    frames.seq    = seq;
-    frames.data   = decoded;
+    AudioPacket frames { seq, decoded };
     m_audioQueue.insert(timestamp, frames);
     ProcessAudio();
 }
@@ -365,7 +363,8 @@ void MythRAOPConnection::ProcessSync(const QByteArray &buf)
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("Receiving SYNC packet"));
     }
 
-    timeval  t; gettimeofday(&t, nullptr);
+    timeval  t {};
+    gettimeofday(&t, nullptr);
     m_timeLastSync = t.tv_sec * 1000 + t.tv_usec / 1000;
 
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("SYNC: cur:%1 next:%2 time:%3")
@@ -493,7 +492,7 @@ void MythRAOPConnection::SendTimeRequest(void)
     if (!m_clientControlSocket) // should never happen
         return;
 
-    timeval t;
+    timeval t {};
     gettimeofday(&t, nullptr);
 
     unsigned char req[32];
@@ -528,7 +527,7 @@ void MythRAOPConnection::SendTimeRequest(void)
  */
 void MythRAOPConnection::ProcessTimeResponse(const QByteArray &buf)
 {
-    timeval t1, t2;
+    timeval t1 {}, t2 {};
     const char *req = buf.constData();
 
     t1.tv_sec  = qFromBigEndian(*(uint32_t *)(req + 8));
@@ -646,10 +645,7 @@ uint32_t MythRAOPConnection::decodeAudioPacket(uint8_t type,
                 (ctx->channels * av_get_bytes_per_sample(ctx->sample_fmt));
 
             frames_added += num_samples;
-            AudioData block;
-            block.data    = samples;
-            block.length  = data_size;
-            block.frames  = num_samples;
+            AudioData block {samples, data_size, num_samples};
             dest->append(block);
         }
         tmp_pkt.data += ret;
@@ -669,7 +665,8 @@ void MythRAOPConnection::ProcessAudio()
         // packets, so unpause as early as possible
         m_audio->Pause(false);
     }
-    timeval  t; gettimeofday(&t, nullptr);
+    timeval  t {};
+    gettimeofday(&t, nullptr);
     uint64_t dtime    = (t.tv_sec * 1000 + t.tv_usec / 1000) - m_timeLastSync;
     uint64_t rtp      = dtime + m_currentTimestamp;
     uint64_t buffered = m_audioStarted ? m_audio->GetAudioBufferedTime() : 0;
@@ -820,7 +817,7 @@ void MythRAOPConnection::audioRetry(void)
  */
 void MythRAOPConnection::readClient(void)
 {
-    QTcpSocket *socket = (QTcpSocket *)sender();
+    QTcpSocket *socket = dynamic_cast<QTcpSocket *>(sender());
     if (!socket)
         return;
 
@@ -1109,7 +1106,9 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
         if (tags.contains("Transport"))
         {
             // New client is trying to play audio, disconnect all the other clients
-            ((MythRAOPDevice*)parent())->DeleteAllClients(this);
+            auto dev = dynamic_cast<MythRAOPDevice*>(parent());
+            if (dev != nullptr)
+                dev->DeleteAllClients(this);
             gCoreContext->WantingPlayback(parent());
             m_playbackStarted = true;
 
@@ -1761,11 +1760,16 @@ void MythRAOPConnection::newEventClient(QTcpSocket *client)
 
 void MythRAOPConnection::deleteEventClient(void)
 {
-    QTcpSocket *client = static_cast<QTcpSocket *>(sender());
+    QTcpSocket *client = dynamic_cast<QTcpSocket *>(sender());
+    QString label;
+
+    if (client != nullptr)
+        label = QString("%1:%2").arg(client->peerAddress().toString()).arg(client->peerPort());
+    else
+        label = QString("unknown");
 
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
-        QString("%1:%2 disconnected from RAOP events server.")
-        .arg(client->peerAddress().toString()).arg(client->peerPort()));
+        QString("%1 disconnected from RAOP events server.").arg(label));
 }
 
 void MythRAOPConnection::SendNotification(bool update)

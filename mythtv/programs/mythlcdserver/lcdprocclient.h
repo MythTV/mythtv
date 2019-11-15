@@ -40,15 +40,15 @@ class LCDProcClient : public QObject
     void setMusicProgress(QString time, float value);
     void setMusicRepeat(int repeat);
     void setMusicShuffle(int shuffle);
-    void switchToChannel(QString channum = "", QString title = "", 
-                         QString subtitle = "");
+    void switchToChannel(const QString& channum = "", const QString& title = "", 
+                         const QString& subtitle = "");
     void setChannelProgress(const QString &time, float value);
-    void switchToMenu(QList<LCDMenuItem> *menuItems, QString app_name = "",
+    void switchToMenu(QList<LCDMenuItem> *menuItems, const QString& app_name = "",
                       bool popMenu = true);
     void switchToGeneric(QList<LCDTextItem> *textItems);
     void setGenericProgress(bool busy, float value);
 
-    void switchToVolume(QString app_name);
+    void switchToVolume(const QString& app_name);
     void setVolumeLevel(float value);
 
     void switchToNothing();
@@ -135,105 +135,105 @@ class LCDProcClient : public QObject
     void setVersion(const QString &, const QString &);
     void describeServer();
 
-    QString m_activeScreen;
+    QString             m_activeScreen;
 
-    QTcpSocket *m_socket;
-    QTimer *m_timeTimer;
-    QTimer *m_scrollWTimer;
-    QTimer *m_preScrollWTimer;
-    QTimer *m_menuScrollTimer;
-    QTimer *m_menuPreScrollTimer;
-    QTimer *m_popMenuTimer;
-    QTimer *m_checkConnectionsTimer;
-    QTimer *m_recStatusTimer;
-    QTimer *m_scrollListTimer;
-    QTimer *m_showMessageTimer;
-    QTimer *m_updateRecInfoTimer;
+    QTcpSocket         *m_socket                {nullptr};
+    QTimer             *m_timeTimer             {nullptr};
+    QTimer             *m_scrollWTimer          {nullptr};
+    QTimer             *m_preScrollWTimer       {nullptr};
+    QTimer             *m_menuScrollTimer       {nullptr};
+    QTimer             *m_menuPreScrollTimer    {nullptr};
+    QTimer             *m_popMenuTimer          {nullptr};
+    QTimer             *m_checkConnectionsTimer {nullptr};
+    QTimer             *m_recStatusTimer        {nullptr};
+    QTimer             *m_scrollListTimer       {nullptr};
+    QTimer             *m_showMessageTimer      {nullptr};
+    QTimer             *m_updateRecInfoTimer    {nullptr};
 
-    QString  m_prioTop;
-    QString  m_prioUrgent;
-    QString  m_prioHigh;
-    QString  m_prioMedium;
-    QString  m_prioLow;
-    QString  m_prioOff;
+    QString             m_prioTop;
+    QString             m_prioUrgent;
+    QString             m_prioHigh;
+    QString             m_prioMedium;
+    QString             m_prioLow;
+    QString             m_prioOff;
 
-    unsigned int m_lcdWidth;
-    unsigned int m_lcdHeight;
-    unsigned int m_cellWidth;
-    unsigned int m_cellHeight;
+    unsigned int        m_lcdWidth              {5};
+    unsigned int        m_lcdHeight             {1};
+    unsigned int        m_cellWidth             {1};
+    unsigned int        m_cellHeight            {1};
 
-    QString m_serverVersion;
-    QString m_protocolVersion;
-    int m_pVersion;
+    QString             m_serverVersion;
+    QString             m_protocolVersion;
+    int                 m_pVersion              {0};
 
-    float m_EQlevels[10];
-    float m_progress;
-    QString m_channelTime;
+    float               m_progress              {0.0};
+    QString             m_channelTime;
     /** true if the generic progress indicator is a busy
         (ie. doesn't have a known total steps */
-    bool m_busyProgress;
+    bool                m_busyProgress          {false};
     /** Current position of the busy indicator,
         used if @p m_busyProgress is true. */
-    int m_busyPos;
+    int                 m_busyPos               {0};
     /** How many "blocks" the busy indicator must be,
         used if @p m_busyProgress is true. */
-    float m_busyIndicatorSize;
+    float               m_busyIndicatorSize     {0.0};
     /** Direction of the busy indicator on the, -1 or 1,
         used if @p m_busyProgress is true. */
-    int m_busyDirection;
-    float m_genericProgress;
-    float m_volumeLevel;
+    int                 m_busyDirection         {1};
+    float               m_genericProgress       {0.0};
+    float               m_volumeLevel           {0.0};
 
-    float m_musicProgress;
-    QString m_musicTime;
-    int m_musicRepeat;
-    int m_musicShuffle;
+    float               m_musicProgress         {0.0};
+    QString             m_musicTime;
+    int                 m_musicRepeat           {0};
+    int                 m_musicShuffle          {0};
 
-    QList<LCDTextItem> *m_lcdTextItems;
-    //QString m_scrollingText;
-    QString m_scrollScreen;
-    unsigned int m_scrollPosition;
-    QString m_timeFormat;
-    QString m_dateFormat;
+    QList<LCDTextItem> *m_lcdTextItems          {nullptr};
+    //QString           m_scrollingText;
+    QString             m_scrollScreen;
+    unsigned int        m_scrollPosition        {0};
+    QString             m_timeFormat;
+    QString             m_dateFormat;
 
-    QStringList m_scrollListItems;
-    QString m_scrollListScreen, m_scrollListWidget;
-    int m_scrollListRow;
-    unsigned int m_scrollListItem;
+    QStringList         m_scrollListItems;
+    QString             m_scrollListScreen;
+    QString             m_scrollListWidget;
+    int                 m_scrollListRow         {0};
+    unsigned int        m_scrollListItem        {0};
 
-    unsigned int m_menuScrollPosition;
-    QList<LCDMenuItem> *m_lcdMenuItems;
+    unsigned int        m_menuScrollPosition    {0};
+    QList<LCDMenuItem> *m_lcdMenuItems          {nullptr};
 
-    bool m_connected;
-    bool m_timeFlash;
+    bool                m_connected             {false};
+    bool                m_timeFlash             {false};
 
-    QString m_sendBuffer;
-    QString m_lastCommand;
-    QString m_hostname;
-    unsigned int m_port;
+    QString             m_sendBuffer;
+    QString             m_lastCommand;
+    QString             m_hostname;
+    unsigned int        m_port                  {13666};
 
-    bool m_lcdReady;
+    bool                m_lcdReady              {false};
 
-    bool m_lcdShowTime;
-    bool m_lcdShowMenu;
-    bool m_lcdShowGeneric;
-    bool m_lcdShowMusic;
-    bool m_lcdShowChannel;
-    bool m_lcdShowVolume;
-    bool m_lcdShowRecstatus;
-    bool m_lcdBacklightOn;
-    bool m_lcdHeartbeatOn;
-    bool m_lcdBigClock;
-    int  m_lcdPopupTime;
-    QString m_lcdShowMusicItems;
-    QString m_lcdKeyString;
-    LCDServer *m_parentLCDServer;
-    QString m_startupMessage;
-    uint m_startupShowTime;
+    bool                m_lcdShowTime           {true};
+    bool                m_lcdShowMenu           {true};
+    bool                m_lcdShowGeneric        {true};
+    bool                m_lcdShowMusic          {true};
+    bool                m_lcdShowChannel        {true};
+    bool                m_lcdShowVolume         {true};
+    bool                m_lcdShowRecstatus      {true};
+    bool                m_lcdBacklightOn        {true};
+    bool                m_lcdHeartbeatOn        {true};
+    bool                m_lcdBigClock           {true};
+    int                 m_lcdPopupTime          {0};
+    QString             m_lcdShowMusicItems;
+    QString             m_lcdKeyString;
+    LCDServer *         m_parentLCDServer       {nullptr};
+    QString             m_startupMessage;
+    uint                m_startupShowTime       {0};
 
-    bool m_isRecording;
-    bool m_isTimeVisible;
-    int m_lcdTunerNo;
+    bool                m_isRecording           {false};
+    bool                m_isTimeVisible         {false};
+    int                 m_lcdTunerNo            {0};
 
     vector<TunerStatus> m_tunerList;
 };

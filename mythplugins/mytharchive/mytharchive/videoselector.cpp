@@ -224,12 +224,9 @@ void VideoSelector::titleChanged(MythUIButtonListItem *item)
     {
         if (v->size == 0)
         {
-            bool bExists;
+            struct stat fileinfo {};
 
-            struct stat fileinfo;
-            memset(&fileinfo, 0, sizeof(fileinfo ));
-
-            bExists = RemoteFile::Exists(v->filename, &fileinfo);
+            bool bExists = RemoteFile::Exists(v->filename, &fileinfo);
             if (bExists)
                 v->size = (uint64_t)fileinfo.st_size;
 
@@ -246,19 +243,16 @@ void VideoSelector::titleChanged(MythUIButtonListItem *item)
 void VideoSelector::OKPressed()
 {
     // loop though selected videos and add them to the list
-    VideoInfo *v;
-    ArchiveItem *a;
-
     // remove any items that have been removed from the list
     QList<ArchiveItem *> tempAList;
     for (int x = 0; x < m_archiveList->size(); x++)
     {
-        a = m_archiveList->at(x);
+        ArchiveItem *a = m_archiveList->at(x);
         bool found = false;
 
         for (int y = 0; y < m_selectedList.size(); y++)
         {
-            v = m_selectedList.at(y);
+            VideoInfo *v = m_selectedList.at(y);
             if (a->type != "Video" || a->filename == v->filename)
             {
                 found = true;
@@ -277,11 +271,11 @@ void VideoSelector::OKPressed()
     QList<VideoInfo *> tempSList;
     for (int x = 0; x < m_selectedList.size(); x++)
     {
-        v = m_selectedList.at(x);
+        VideoInfo *v = m_selectedList.at(x);
 
         for (int y = 0; y < m_archiveList->size(); y++)
         {
-            a = m_archiveList->at(y);
+            ArchiveItem *a = m_archiveList->at(y);
             if (a->filename == v->filename)
             {
                 tempSList.append(v);
@@ -296,8 +290,8 @@ void VideoSelector::OKPressed()
     // add all that are left
     for (int x = 0; x < m_selectedList.size(); x++)
     {
-        v = m_selectedList.at(x);
-        a = new ArchiveItem;
+        VideoInfo *v = m_selectedList.at(x);
+        ArchiveItem *a = new ArchiveItem;
         a->type = "Video";
         a->title = v->title;
         a->subtitle = "";

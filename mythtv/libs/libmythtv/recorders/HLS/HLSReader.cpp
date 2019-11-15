@@ -21,7 +21,7 @@ static QUrl RelativeURI (const QString& baseString, const QString& uriString)
 
 static uint64_t MDate(void)
 {
-    timeval  t;
+    timeval t {};
     gettimeofday(&t, nullptr);
     return t.tv_sec * 1000000ULL + t.tv_usec;
 }

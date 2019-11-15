@@ -147,7 +147,7 @@ void RawSettingsEditor::Save(void)
         ++it;
     }
 
-    if (changed && (!gCoreContext->IsMasterHost() || gCoreContext->BackendIsRunning()))
+    if (changed && (!gCoreContext->IsMasterHost() || MythCoreContext::BackendIsRunning()))
         gCoreContext->SendMessage("CLEAR_SETTINGS_CACHE");
 
     Close();
@@ -180,7 +180,6 @@ void RawSettingsEditor::selectionChanged(MythUIButtonListItem *item)
  */
 void RawSettingsEditor::updatePrevNextTexts(void)
 {
-    MythUIButtonListItem *tmpitem;
     int curPos = m_settingsList->GetCurrentPos();
     int recs   = m_settingsList->GetCount();
 
@@ -197,7 +196,7 @@ void RawSettingsEditor::updatePrevNextTexts(void)
                 if (m_prevNextShapes.contains(i))
                     m_prevNextShapes[i]->Show();
 
-                tmpitem = m_settingsList->GetItemAt(curPos + i);
+                auto tmpitem = m_settingsList->GetItemAt(curPos + i);
                 m_prevNextTexts[i]->SetText(
                     m_settingValues[tmpitem->GetData().toString()]);
             }

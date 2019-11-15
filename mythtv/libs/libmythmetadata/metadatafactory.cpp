@@ -234,8 +234,8 @@ MetadataLookupList MetadataFactory::SynchronousLookup(MetadataLookup *lookup)
 
 bool MetadataFactory::VideoGrabbersFunctional()
 {
-    return (m_lookupthread->MovieGrabberWorks() &&
-            m_lookupthread->TelevisionGrabberWorks());
+    return (MetadataDownload::MovieGrabberWorks() &&
+            MetadataDownload::TelevisionGrabberWorks());
 }
 
 void MetadataFactory::VideoScan()
@@ -508,10 +508,11 @@ void MetadataFactory::customEvent(QEvent *levent)
 {
     if (levent->type() == MetadataLookupEvent::kEventType)
     {
-        MetadataLookupEvent *lue = (MetadataLookupEvent *)levent;
+        auto lue = dynamic_cast<MetadataLookupEvent *>(levent);
+        if (lue == nullptr)
+            return;
 
         MetadataLookupList lul = lue->m_lookupList;
-
         if (lul.isEmpty())
             return;
 
@@ -530,10 +531,11 @@ void MetadataFactory::customEvent(QEvent *levent)
     }
     else if (levent->type() == MetadataLookupFailure::kEventType)
     {
-        MetadataLookupFailure *luf = (MetadataLookupFailure *)levent;
+        auto luf = dynamic_cast<MetadataLookupFailure *>(levent);
+        if (luf == nullptr)
+            return;
 
         MetadataLookupList lul = luf->m_lookupList;
-
         if (lul.isEmpty())
             return;
 
@@ -549,10 +551,11 @@ void MetadataFactory::customEvent(QEvent *levent)
     }
     else if (levent->type() == ImageDLEvent::kEventType)
     {
-        ImageDLEvent *ide = (ImageDLEvent *)levent;
+        ImageDLEvent *ide = dynamic_cast<ImageDLEvent *>(levent);
+        if (ide == nullptr)
+            return;
 
         MetadataLookup *lookup = ide->m_item;
-
         if (!lookup)
             return;
 
@@ -563,10 +566,11 @@ void MetadataFactory::customEvent(QEvent *levent)
     }
     else if (levent->type() == ImageDLFailureEvent::kEventType)
     {
-        ImageDLFailureEvent *ide = (ImageDLFailureEvent *)levent;
+        ImageDLFailureEvent *ide = dynamic_cast<ImageDLFailureEvent *>(levent);
+        if (ide == nullptr)
+            return;
 
         MetadataLookup *lookup = ide->m_item;
-
         if (!lookup)
             return;
 
@@ -577,8 +581,7 @@ void MetadataFactory::customEvent(QEvent *levent)
     }
     else if (levent->type() == VideoScanChanges::kEventType)
     {
-        VideoScanChanges *vsc = (VideoScanChanges *)levent;
-
+        VideoScanChanges *vsc = dynamic_cast<VideoScanChanges *>(levent);
         if (!vsc)
             return;
 

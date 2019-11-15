@@ -21,12 +21,6 @@ extern "C" {
 
 using namespace commDetector2;
 
-PGMConverter::PGMConverter(void)
-{
-    memset(&m_pgm, 0, sizeof(m_pgm));
-    memset(&m_convert_time, 0, sizeof(m_convert_time));
-}
-
 PGMConverter::~PGMConverter(void)
 {
     m_width = -1;
@@ -79,7 +73,7 @@ PGMConverter::getImage(const VideoFrame *frame, long long _frameno,
         int *pwidth, int *pheight)
 {
 #ifdef PGM_CONVERT_GREYSCALE
-    struct timeval      start, end, elapsed;
+    struct timeval      start {}, end {}, elapsed {};
 #endif /* PGM_CONVERT_GREYSCALE */
 
     if (m_frameno == _frameno)

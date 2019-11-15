@@ -29,7 +29,7 @@ class AudioOutputDigitalEncoder
 
   private:
     void   Reset(void);
-    void  *realloc(void *ptr, size_t old_size, size_t new_size);
+    static void *realloc(void *ptr, size_t old_size, size_t new_size);
 
     AVCodecContext *m_av_context        {nullptr};
     outbuf_t       *m_out               {nullptr};

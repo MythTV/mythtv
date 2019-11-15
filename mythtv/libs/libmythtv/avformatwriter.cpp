@@ -38,11 +38,6 @@ extern "C" {
 #define LOC_ERR QString("AVFW(%1) Error: ").arg(m_filename)
 #define LOC_WARN QString("AVFW(%1) Warning: ").arg(m_filename)
 
-AVFormatWriter::AVFormatWriter()
-{
-    memset(&m_fmt, 0, sizeof(m_fmt));
-}
-
 AVFormatWriter::~AVFormatWriter()
 {
     QMutexLocker locker(avcodeclock);

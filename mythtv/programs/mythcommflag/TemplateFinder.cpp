@@ -74,11 +74,10 @@ pgm_scorepixels(unsigned int *scores, int width, int row, int col,
 {
     /* Every time a pixel is an edge, give it a point. */
     const int   srcwidth = src->linesize[0];
-    int         rr, cc;
 
-    for (rr = 0; rr < srcheight; rr++)
+    for (int rr = 0; rr < srcheight; rr++)
     {
-        for (cc = 0; cc < srcwidth; cc++)
+        for (int cc = 0; cc < srcwidth; cc++)
         {
             if (src->data[0][rr * srcwidth + cc])
                 scores[(row + rr) * width + col + cc]++;
@@ -99,15 +98,13 @@ bounding_score(const AVFrame *img, int row, int col, int width, int height)
 {
     /* Return a value between [0..1] */
     const int       imgwidth = img->linesize[0];
-    unsigned int    score;
-    int             rr, cc, rr2, cc2;
 
-    score = 0;
-    rr2 = row + height;
-    cc2 = col + width;
-    for (rr = row; rr < rr2; rr++)
+    uint score = 0;
+    int rr2 = row + height;
+    int cc2 = col + width;
+    for (int rr = row; rr < rr2; rr++)
     {
-        for (cc = col; cc < cc2; cc++)
+        for (int cc = col; cc < cc2; cc++)
         {
             if (img->data[0][rr * imgwidth + cc])
                 score++;
@@ -161,31 +158,27 @@ bounding_box(const AVFrame *img, int imgheight,
     const int           VERTSLOP = max(4, imgheight * 1 / 15);
     const int           HORIZSLOP = max(4, imgwidth * 1 / 20);
 
-    int                 maxwidth, maxheight;
-    int                 width, height, row, col;
-    int                 newrow, newcol, newright, newbottom;
+    int maxwidth = (maxcol1 - mincol) * MAXWIDTHPCT / 100;
+    int maxheight = (maxrow1 - minrow) * MAXHEIGHTPCT / 100;
 
-    maxwidth = (maxcol1 - mincol) * MAXWIDTHPCT / 100;
-    maxheight = (maxrow1 - minrow) * MAXHEIGHTPCT / 100;
-
-    row = minrow;
-    col = mincol;
-    width = maxcol1 - mincol;
-    height = maxrow1 - minrow;
+    int row = minrow;
+    int col = mincol;
+    int width = maxcol1 - mincol;
+    int height = maxrow1 - minrow;
+    int newrow = 0, newcol = 0, newright = 0, newbottom = 0;
 
     for (;;)
     {
-        float           score, newscore;
-        int             ii;
+        float           newscore = NAN;
         bool            improved = false;
 
         LOG(VB_COMMFLAG, LOG_INFO, QString("bounding_box %1x%2@(%3,%4)")
                 .arg(width).arg(height).arg(col).arg(row));
 
         /* Chop top. */
-        score = bounding_score(img, row, col, width, height);
+        float score = bounding_score(img, row, col, width, height);
         newrow = row;
-        for (ii = 1; ii < height; ii++)
+        for (int ii = 1; ii < height; ii++)
         {
             if ((newscore = bounding_score(img, row + ii, col,
                             width, height - ii)) < score)
@@ -198,7 +191,7 @@ bounding_box(const AVFrame *img, int imgheight,
         /* Chop left. */
         score = bounding_score(img, row, col, width, height);
         newcol = col;
-        for (ii = 1; ii < width; ii++)
+        for (int ii = 1; ii < width; ii++)
         {
             if ((newscore = bounding_score(img, row, col + ii,
                             width - ii, height)) < score)
@@ -211,7 +204,7 @@ bounding_box(const AVFrame *img, int imgheight,
         /* Chop bottom. */
         score = bounding_score(img, row, col, width, height);
         newbottom = row + height;
-        for (ii = 1; ii < height; ii++)
+        for (int ii = 1; ii < height; ii++)
         {
             if ((newscore = bounding_score(img, row, col,
                             width, height - ii)) < score)
@@ -224,7 +217,7 @@ bounding_box(const AVFrame *img, int imgheight,
         /* Chop right. */
         score = bounding_score(img, row, col, width, height);
         newright = col + width;
-        for (ii = 1; ii < width; ii++)
+        for (int ii = 1; ii < width; ii++)
         {
             if ((newscore = bounding_score(img, row, col,
                             width - ii, height)) < score)
@@ -266,16 +259,15 @@ bounding_box(const AVFrame *img, int imgheight,
             /* Too wide; test left and right portions. */
             int             chop = width / 3;
             int             chopwidth = width - chop;
-            float           left, right, minscore, maxscore;
 
-            left = bounding_score(img, row, col, chopwidth, height);
-            right = bounding_score(img, row, col + chop, chopwidth, height);
+            float left = bounding_score(img, row, col, chopwidth, height);
+            float right = bounding_score(img, row, col + chop, chopwidth, height);
             LOG(VB_COMMFLAG, LOG_INFO, 
                 QString("bounding_box too wide (%1 > %2); left=%3, right=%4")
                     .arg(width).arg(maxwidth)
                     .arg(left, 0, 'f', 3).arg(right, 0, 'f', 3));
-            minscore = min(left, right);
-            maxscore = max(left, right);
+            float minscore = min(left, right);
+            float maxscore = max(left, right);
             if (maxscore < 3 * minscore / 2)
             {
                 /*
@@ -299,16 +291,15 @@ bounding_box(const AVFrame *img, int imgheight,
             /* Too tall; test upper and lower portions. */
             int             chop = height / 3;
             int             chopheight = height - chop;
-            float           upper, lower, minscore, maxscore;
 
-            upper = bounding_score(img, row, col, width, chopheight);
-            lower = bounding_score(img, row + chop, col, width, chopheight);
+            float upper = bounding_score(img, row, col, width, chopheight);
+            float lower = bounding_score(img, row + chop, col, width, chopheight);
             LOG(VB_COMMFLAG, LOG_INFO,
                 QString("bounding_box too tall (%1 > %2); upper=%3, lower=%4")
                     .arg(height).arg(maxheight)
                     .arg(upper, 0, 'f', 3).arg(lower, 0, 'f', 3));
-            minscore = min(upper, lower);
-            maxscore = max(upper, lower);
+            float minscore = min(upper, lower);
+            float maxscore = max(upper, lower);
             if (maxscore < 3 * minscore / 2)
             {
                 /*
@@ -461,8 +452,8 @@ template_alloc(const unsigned int *scores, int width, int height,
     static const float      MINSCOREPCTILE = 0.998;
 
     const int               nn = width * height;
-    int                     ii, first, last;
-    unsigned int            *sortedscores, threshscore;
+    int                     ii = 0, first = 0, last = 0;
+    unsigned int            threshscore = 0;
     AVFrame               thresh;
 
     if (av_image_alloc(thresh.data, thresh.linesize,
@@ -474,7 +465,7 @@ template_alloc(const unsigned int *scores, int width, int height,
         return false;
     }
 
-    sortedscores = new unsigned int[nn];
+    uint *sortedscores = new unsigned int[nn];
     memcpy(sortedscores, scores, nn * sizeof(*sortedscores));
     qsort(sortedscores, nn, sizeof(*sortedscores), sort_ascending);
 
@@ -581,12 +572,11 @@ analyzeFrameDebug(long long frameno, const AVFrame *pgm, int pgmheight,
     static const int    delta = 24;
     static int          lastrow, lastcol, lastwidth, lastheight;
     const int           cropwidth = cropped->linesize[0];
-    int                 rowsame, colsame, widthsame, heightsame;
 
-    rowsame = abs(lastrow - croprow) <= delta ? 1 : 0;
-    colsame = abs(lastcol - cropcol) <= delta ? 1 : 0;
-    widthsame = abs(lastwidth - cropwidth) <= delta ? 1 : 0;
-    heightsame = abs(lastheight - cropheight) <= delta ? 1 : 0;
+    int rowsame = abs(lastrow - croprow) <= delta ? 1 : 0;
+    int colsame = abs(lastcol - cropcol) <= delta ? 1 : 0;
+    int widthsame = abs(lastwidth - cropwidth) <= delta ? 1 : 0;
+    int heightsame = abs(lastheight - cropheight) <= delta ? 1 : 0;
 
     if (frameno > 0 && rowsame + colsame + widthsame + heightsame >= 3)
         return true;
@@ -737,10 +727,6 @@ TemplateFinder::TemplateFinder(PGMConverter *pgmc, BorderDetector *bd,
     LOG(VB_COMMFLAG, LOG_INFO,
         QString("TemplateFinder: sampleTime=%1s, samplesNeeded=%2, endFrame=%3")
             .arg(m_sampleTime).arg(samplesNeeded).arg(m_endFrame));
-
-    memset(&m_cropped, 0, sizeof(m_cropped));
-    memset(&m_tmpl, 0, sizeof(m_tmpl));
-    memset(&m_analyze_time, 0, sizeof(m_analyze_time));
 
     /*
      * debugLevel:
@@ -894,11 +880,9 @@ TemplateFinder::analyzeFrame(const VideoFrame *frame, long long frameno,
     static const float  EXCLUDEWIDTH = 0.5;
     static const float  EXCLUDEHEIGHT = 0.5;
 
-    const AVFrame     *pgm, *edges;
-    int                 pgmwidth, pgmheight;
-    int                 croprow, cropcol, cropwidth, cropheight;
-    int                 excluderow, excludecol, excludewidth, excludeheight;
-    struct timeval      start, end, elapsed;
+    int                 pgmwidth= 0, pgmheight = 0;
+    int                 croprow= 0, cropcol = 0, cropwidth = 0, cropheight = 0;
+    struct timeval      start {}, end {}, elapsed {};
 
     if (frameno < m_nextFrame)
     {
@@ -909,7 +893,8 @@ TemplateFinder::analyzeFrame(const VideoFrame *frame, long long frameno,
     m_nextFrame = frameno + m_frameInterval;
     *pNextFrame = min(m_endFrame, m_nextFrame);
 
-    if (!(pgm = m_pgmConverter->getImage(frame, frameno, &pgmwidth, &pgmheight)))
+    const AVFrame *pgm = m_pgmConverter->getImage(frame, frameno, &pgmwidth, &pgmheight);
+    if (pgm == nullptr)
         goto error;
 
     if (!m_borderDetector->getDimensions(pgm, pgmheight, frameno,
@@ -939,15 +924,16 @@ TemplateFinder::analyzeFrame(const VideoFrame *frame, long long frameno,
          * Translate the excluded area of the screen into "cropped"
          * coordinates.
          */
-        excludewidth = (int)(pgmwidth * EXCLUDEWIDTH);
-        excludeheight = (int)(pgmheight * EXCLUDEHEIGHT);
-        excluderow = (pgmheight - excludeheight) / 2 - croprow;
-        excludecol = (pgmwidth - excludewidth) / 2 - cropcol;
+        int excludewidth = (int)(pgmwidth * EXCLUDEWIDTH);
+        int excludeheight = (int)(pgmheight * EXCLUDEHEIGHT);
+        int excluderow = (pgmheight - excludeheight) / 2 - croprow;
+        int excludecol = (pgmwidth - excludewidth) / 2 - cropcol;
         (void)m_edgeDetector->setExcludeArea(excluderow, excludecol,
                 excludewidth, excludeheight);
 
-        if (!(edges = m_edgeDetector->detectEdges(&m_cropped, cropheight,
-                        FRAMESGMPCTILE)))
+        const AVFrame *edges =
+            m_edgeDetector->detectEdges(&m_cropped, cropheight, FRAMESGMPCTILE);
+        if (edges == nullptr)
             goto error;
 
         if (pgm_scorepixels(scores, pgmwidth, croprow, cropcol,

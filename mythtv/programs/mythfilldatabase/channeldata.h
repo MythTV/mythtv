@@ -19,10 +19,10 @@ class ChannelData
     unsigned int promptForChannelUpdates(ChannelInfoList::iterator chaninfo,
                                          unsigned int chanid);
 
-    ChannelInfo FindMatchingChannel(const ChannelInfo &chanInfo,
-                            ChannelList existingChannels) const;
-    ChannelList channelList(int sourceId);
-    QString normalizeChannelKey(const QString &chanName) const;
+    static ChannelInfo FindMatchingChannel(const ChannelInfo &chanInfo,
+                            ChannelList existingChannels);
+    static ChannelList channelList(int sourceId);
+    static QString normalizeChannelKey(const QString &chanName);
 
   public:
     bool    m_interactive       {false};

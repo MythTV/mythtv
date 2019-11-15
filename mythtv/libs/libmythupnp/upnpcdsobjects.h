@@ -279,7 +279,7 @@ class UPNP_PUBLIC CDSObject : public ReferenceCounter
         static  CDSObject *CreateStorageFolder    ( const QString& sId, const QString& sTitle, const QString& sParentId, CDSObject *pObject = nullptr );
 
     private:
-        bool FilterContains( const FilterMap &filter, const QString &name ) const;
+        static bool FilterContains( const FilterMap &filter, const QString &name ) ;
 
 };
 

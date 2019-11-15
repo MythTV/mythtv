@@ -92,8 +92,7 @@ void MythNotificationScreenStack::PopScreen(MythScreenType *screen, bool allowFa
 
     if (!m_Children.isEmpty())
     {
-        QVector<MythScreenType *>::Iterator it;
-        for (it = m_DrawOrder.begin(); it != m_DrawOrder.end(); ++it)
+        for (auto it = m_DrawOrder.begin(); it != m_DrawOrder.end(); ++it)
         {
             if (*it != screen && !(*it)->IsDeleting())
             {
@@ -209,7 +208,7 @@ MythNotificationScreen::~MythNotificationScreen()
 
 void MythNotificationScreen::SetNotification(MythNotification &notification)
 {
-    bool update;
+    bool update = false;
     m_update = kNone;
 
     m_type = notification.type();
@@ -504,7 +503,7 @@ void MythNotificationScreen::SetErrorState(void)
     if (!m_errorState)
         return;
 
-    const char *state;
+    const char *state = "ok";
 
     if (m_type == MythNotification::Error)
     {
@@ -994,7 +993,7 @@ void NCPrivate::ProcessQueue(void)
  */
 MythNotificationScreen *NCPrivate::CreateScreen(MythNotification *n, int id)
 {
-    MythNotificationScreen *screen;
+    MythNotificationScreen *screen = nullptr;
 
     if (n)
     {
@@ -1256,7 +1255,7 @@ void NCPrivate::GetNotificationScreens(QList<MythScreenType*> &_screens)
             if ((screen->m_visibility & MythNotification::kPlayback) == 0)
                 continue;
 
-            MythNotificationScreen *newscreen;
+            MythNotificationScreen *newscreen = nullptr;
 
             if (!m_converted.contains(screen))
             {
@@ -1501,7 +1500,7 @@ void ShowNotification(MythNotification::Type type,
     if (!GetNotificationCenter())
         return;
 
-    MythNotification *n;
+    MythNotification *n = nullptr;
     DMAP data;
 
     data["minm"] = msg;

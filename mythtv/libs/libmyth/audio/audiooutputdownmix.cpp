@@ -174,13 +174,12 @@ int AudioOutputDownmix::DownmixFrames(int channels_in, int  channels_out,
     //    .arg(frames).arg(channels_in).arg(channels_out));
     if (channels_out == 2)
     {
-        float tmp;
         int index = channels_in - 1;
         for (int n=0; n < frames; n++)
         {
             for (int i=0; i < channels_out; i++)
             {
-                tmp = 0.0F;
+                float tmp = 0.0F;
                 for (int j=0; j < channels_in; j++)
                     tmp += src[j] * stereo_matrix[index][j][i];
                 *dst++ = tmp;
@@ -190,13 +189,12 @@ int AudioOutputDownmix::DownmixFrames(int channels_in, int  channels_out,
     }
     else if (channels_out == 6)
     {
-        float tmp;
         int index = channels_in - 6;
         for (int n=0; n < frames; n++)
         {
             for (int i=0; i < channels_out; i++)
             {
-                tmp = 0.0F;
+                float tmp = 0.0F;
                 for (int j=0; j < channels_in; j++)
                     tmp += src[j] * s51_matrix[index][j][i];
                 *dst++ = tmp;

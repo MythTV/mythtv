@@ -122,7 +122,7 @@ class UPNP_PUBLIC UPnp
 
         virtual void Start();
 
-        void CleanUp      ();
+        static void CleanUp      ();
 
         UPnpDevice *RootDevice() { return &(g_UPnpDeviceDesc.m_rootDevice); }
 

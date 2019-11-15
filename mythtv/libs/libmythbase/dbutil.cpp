@@ -778,7 +778,6 @@ bool DBUtil::ParseDBMSVersion()
         if (!QueryDBMSVersion())
             return false;
 
-    bool ok;
     QString section;
     int pos = 0, i = 0;
     int version[3] = {-1, -1, -1};
@@ -786,6 +785,7 @@ bool DBUtil::ParseDBMSVersion()
 
     while ((i < 3) && ((pos = digits.indexIn(m_versionString, pos)) > -1))
     {
+        bool ok = false;
         section = digits.cap(1);
         pos += digits.matchedLength();
         version[i] = section.toInt(&ok, 10);

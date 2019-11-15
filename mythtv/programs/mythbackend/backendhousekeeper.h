@@ -19,11 +19,12 @@ class CleanupTask : public DailyHouseKeeperTask
     bool DoRun(void) override; // HouseKeeperTask
 
   private:
-    void CleanupOldRecordings(void);
-    void CleanupInUsePrograms(void);
-    void CleanupOrphanedLiveTV(void);
-    void CleanupRecordedTables(void);
-    void CleanupProgramListings(void);
+    static void CleanupOldRecordings(void);
+    static void CleanupInUsePrograms(void);
+    static void CleanupOrphanedLiveTV(void);
+    static void CleanupRecordedTables(void);
+    static void CleanupChannelTables(void);
+    static void CleanupProgramListings(void);
 };
 
 class RadioStreamUpdateTask : public DailyHouseKeeperTask

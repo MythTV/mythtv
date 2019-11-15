@@ -68,9 +68,9 @@ class MUI_PUBLIC MythUIVirtualKeyboard : public MythScreenType
     void loadKeyDefinitions(const QString &lang);
     void parseKey(const QDomElement &element);
     void updateKeys(bool connectSignals = false);
-    QString decodeChar(QString c);
+    static QString decodeChar(QString c);
     QString getKeyText(const KeyDefinition& key);
-    void loadEventKeyDefinitions(KeyEventDefinition *keyDef, const QString &action);
+    static void loadEventKeyDefinitions(KeyEventDefinition *keyDef, const QString &action);
 
     MythUITextEdit *m_parentEdit   {nullptr};
     PopupPosition   m_preferredPos;

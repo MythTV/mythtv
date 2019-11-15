@@ -56,28 +56,28 @@ public:
 	// Replace this with whatever else you use to store/retrieve the password.
 	QString password;
 
-	bool skipAllEncrypted;
+	bool skipAllEncrypted {false};
 
-	QMap<QString,ZipEntryP*>* headers;
+	QMap<QString,ZipEntryP*>* headers {nullptr};
 
-	QIODevice* device;
+	QIODevice* device {nullptr};
 
-	char buffer1[UNZIP_READ_BUFFER];
-	char buffer2[UNZIP_READ_BUFFER];
+	char buffer1[UNZIP_READ_BUFFER] {0};
+	char buffer2[UNZIP_READ_BUFFER] {0};
 
 	unsigned char* uBuffer;
 	const quint32* crcTable;
 
 	// Central Directory (CD) offset
-	quint32 cdOffset;
+	quint32 cdOffset {0};
 	// End of Central Directory (EOCD) offset
-	quint32 eocdOffset;
+	quint32 eocdOffset {0};
 
 	// Number of entries in the Central Directory (as to the EOCD record)
-	quint16 cdEntryCount;
+	quint16 cdEntryCount {0};
 
 	// The number of detected entries that have been skipped because of a non compatible format
-	quint16 unsupportedEntryCount;
+	quint16 unsupportedEntryCount {0};
 
 	QString comment;
 
@@ -99,14 +99,14 @@ public:
 
 	inline void decryptBytes(quint32* keys, char* buffer, qint64 read);
 
-	inline quint32 getULong(const unsigned char* data, quint32 offset) const;
-	inline quint64 getULLong(const unsigned char* data, quint32 offset) const;
-	inline quint16 getUShort(const unsigned char* data, quint32 offset) const;
-	inline int decryptByte(quint32 key2) const;
+	static inline quint32 getULong(const unsigned char* data, quint32 offset) ;
+	static inline quint64 getULLong(const unsigned char* data, quint32 offset) ;
+	static inline quint16 getUShort(const unsigned char* data, quint32 offset) ;
+	static inline int decryptByte(quint32 key2) ;
 	inline void updateKeys(quint32* keys, int c) const;
 	inline void initKeys(const QString& pwd, quint32* keys) const;
 
-	inline QDateTime convertDateTime(const unsigned char date[2], const unsigned char time[2]) const;
+	static inline QDateTime convertDateTime(const unsigned char date[2], const unsigned char time[2]) ;
 };
 
 #endif // OSDAB_UNZIP_P__H

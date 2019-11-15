@@ -61,8 +61,6 @@ using namespace std;
 #include HDHOMERUN_HEADERFILE
 #endif
 
-static const uint kDefaultMultirecCount = 2;
-
 VideoSourceSelector::VideoSourceSelector(uint           _initial_sourceid,
                                          const QString &_card_types,
                                          bool           _must_have_mplexid) :
@@ -134,12 +132,12 @@ void VideoSourceSelector::Load(void)
 class InstanceCount : public MythUISpinBoxSetting
 {
   public:
-    InstanceCount(const CardInput &parent, int _initValue) :
+    InstanceCount(const CardInput &parent) :
         MythUISpinBoxSetting(new CardInputDBStorage(this, parent, "reclimit"),
                              1, 10, 1)
     {
         setLabel(QObject::tr("Max recordings"));
-        setValue(_initValue);
+        setValue(1);
         setHelpText(
             QObject::tr(
                 "Maximum number of simultaneous recordings MythTV will "
@@ -350,6 +348,20 @@ class CaptureCardTextEditSetting : public MythUITextEditSetting
         MythUITextEditSetting(new CaptureCardDBStorage(this, parent, setting))
     {
     }
+};
+
+class ScanFrequency : public MythUITextEditSetting
+{
+  public:
+    ScanFrequency(const VideoSource &parent) :
+        MythUITextEditSetting(new VideoSourceDBStorage(this, parent, "scanfrequency"))
+    {
+       setLabel(QObject::tr("Scan Frequency"));
+       setHelpText(QObject::tr("The frequency to start scanning this video source. "
+                               "This is then default for 'Full Scan (Tuned)' channel scanning. "
+                               "Frequency value in Hz for DVB-T/T2/C, in kHz for DVB-S/S2. "
+                               "Leave at 0 if not known. "));
+    };
 };
 
 class DVBNetID : public MythUISpinBoxSetting
@@ -616,12 +628,10 @@ VideoSource::VideoSource()
     addChild(m_name = new Name(*this));
     addChild(new XMLTVGrabber(*this));
     addChild(new FreqTableSelector(*this));
+    addChild(new ScanFrequency(*this));
     addChild(new DVBNetID(*this, -1, -1));
-    if (gCoreContext->GetNumSetting("DBSchemaVer") > 1350)
-    {
-        addChild(new BouquetID(*this, 0, 0));
-        addChild(new RegionID(*this, 0, 0));
-    }
+    addChild(new BouquetID(*this, 0, 0));
+    addChild(new RegionID(*this, 0, 0));
 }
 
 bool VideoSource::canDelete(void)
@@ -757,7 +767,7 @@ class VideoDevice : public CaptureCardComboBoxSetting
         {
             QFileInfo &fi = *it;
 
-            struct stat st;
+            struct stat st {};
             QString filepath = fi.absoluteFilePath();
             int err = lstat(filepath.toLocal8Bit().constData(), &st);
 
@@ -2681,7 +2691,10 @@ class InputName : public MythUIComboBoxSetting
     void fillSelections() {
         clearSelections();
         addSelection(QObject::tr("(None)"), "None");
-        uint cardid = static_cast<CardInputDBStorage*>(GetStorage())->getInputID();
+        CardInputDBStorage *storage = dynamic_cast<CardInputDBStorage*>(GetStorage());
+        if (storage == nullptr)
+            return;
+        uint cardid = storage->getInputID();
         QString type = CardUtil::GetRawInputType(cardid);
         QString device = CardUtil::GetVideoDevice(cardid);
         QStringList inputs;
@@ -2786,7 +2799,7 @@ class InputGroup : public TransMythUIComboBoxSetting
         }
     }
 
-    virtual void Save(QString /*destination*/) { Save(); }
+    virtual void Save(const QString& /*destination*/) { Save(); }
 
   private:
     const CardInput &m_cardInput;
@@ -2939,7 +2952,10 @@ void StartingChannel::SetSourceID(const QString &sourceid)
         return;
 
     // Get the existing starting channel
-    int inputId = static_cast<CardInputDBStorage*>(GetStorage())->getInputID();
+    CardInputDBStorage *storage = dynamic_cast<CardInputDBStorage*>(GetStorage());
+    if (storage == nullptr)
+        return;
+    int inputId = storage->getInputID();
     QString startChan = CardUtil::GetStartingChannel(inputId);
 
     ChannelInfoList channels = ChannelUtil::GetAllChannels(sourceid.toUInt());
@@ -3105,7 +3121,7 @@ CardInput::CardInput(const QString & cardtype, const QString & device,
     interact->setLabel(QObject::tr("Interactions between inputs"));
     if (CardUtil::IsTunerSharingCapable(cardtype))
     {
-        m_instanceCount = new InstanceCount(*this, kDefaultMultirecCount);
+        m_instanceCount = new InstanceCount(*this);
         interact->addChild(m_instanceCount);
         m_schedGroup = new SchedGroup(*this);
         interact->addChild(m_schedGroup);

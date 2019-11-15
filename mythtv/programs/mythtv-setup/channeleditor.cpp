@@ -252,7 +252,8 @@ void ChannelEditor::fillList(void)
                        "LEFT JOIN videosource ON "
                        "(channel.sourceid = videosource.sourceid) "
                        "LEFT JOIN dtv_multiplex ON "
-                       "(channel.mplexid = dtv_multiplex.mplexid)";
+                       "(channel.mplexid = dtv_multiplex.mplexid) "
+                       "WHERE deleted IS NULL ";
 
     if (m_sourceFilter == FILTER_ALL)
     {
@@ -260,7 +261,7 @@ void ChannelEditor::fillList(void)
     }
     else
     {
-        querystr += QString(" WHERE channel.sourceid='%1' ")
+        querystr += QString("AND channel.sourceid='%1' ")
                            .arg(m_sourceFilter);
         fAllSources = false;
     }
@@ -710,14 +711,17 @@ void ChannelEditor::customEvent(QEvent *event)
                 else
                 {
                     tmp = tmp.left(tmp.length() - 1);
-                    query.prepare(QString("DELETE FROM channel "
-                    "WHERE sourceid NOT IN (%1)").arg(tmp));
+                    query.prepare(QString("UPDATE channel "
+                    "SET deleted = NOW() "
+                    "WHERE deleted IS NULL AND "
+                    "      sourceid NOT IN (%1)").arg(tmp));
                 }
             }
             else
             {
-                query.prepare("DELETE FROM channel "
-                "WHERE sourceid = :SOURCEID");
+                query.prepare("UPDATE channel "
+                "SET deleted = NOW() "
+                "WHERE deleted IS NULL AND sourceid = :SOURCEID");
                 query.bindValue(":SOURCEID", m_sourceFilter);
             }
 
@@ -730,7 +734,7 @@ void ChannelEditor::customEvent(QEvent *event)
         {
             MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-            ImportIconsWizard *iconwizard;
+            ImportIconsWizard *iconwizard = nullptr;
 
             QString channelname = dce->GetData().toString();
 

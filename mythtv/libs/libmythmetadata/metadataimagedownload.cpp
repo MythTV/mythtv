@@ -75,7 +75,7 @@ void MetadataImageDownload::run()
     RunProlog();
 
     // Always handle thumbnails first, they're higher priority.
-    ThumbnailData *thumb;
+    ThumbnailData *thumb = nullptr;
     while ((thumb = moreThumbs()) != nullptr)
     {
         QString sFilename = getDownloadFilename(thumb->title, thumb->url);
@@ -457,7 +457,7 @@ QString getStorageGroupURL(VideoArtworkType type, const QString& host)
     QString sgroup = getStorageGroupName(type);
     uint port = gCoreContext->GetBackendServerPort(host);
 
-    return gCoreContext->GenMythURL(host, port, "", sgroup);
+    return MythCoreContext::GenMythURL(host, port, "", sgroup);
 }
 
 QString getLocalStorageGroupPath(VideoArtworkType type, const QString& host)

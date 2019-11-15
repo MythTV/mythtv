@@ -23,7 +23,7 @@ class MythUIStateType;
 class MUI_PUBLIC MFileInfo : public QFileInfo
 {
   public:
-    MFileInfo(QString fileName = "", QString sgDir = "", bool isDir = false,
+    MFileInfo(const QString& fileName = "", QString sgDir = "", bool isDir = false,
               qint64 size = 0);
    ~MFileInfo() = default;
 
@@ -99,7 +99,7 @@ class MUI_PUBLIC MythUIFileBrowser : public MythScreenType
 
   private:
     void SetPath(const QString &startPath);
-    bool GetRemoteFileList(const QString &url, const QString &sgDir,
+    static bool GetRemoteFileList(const QString &url, const QString &sgDir,
                            QStringList &list);
     void updateFileList(void);
     void updateRemoteFileList(void);
@@ -107,8 +107,8 @@ class MUI_PUBLIC MythUIFileBrowser : public MythScreenType
     void updateSelectedList(void);
     void updateWidgets(void);
 
-    bool IsImage(QString extension);
-    QString FormatSize(int size);
+    static bool IsImage(QString extension);
+    static QString FormatSize(int size);
 
     bool               m_isRemote        {false};
 

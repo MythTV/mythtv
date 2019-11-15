@@ -402,7 +402,7 @@ void VideoFilterSettings::setTextFilter(const QString& val)
     m_changed_state |= kFilterTextFilterChanged;
     if (m_re_season.indexIn(val) != -1)
     {
-        bool res;
+        bool res = false;
         QStringList list = m_re_season.capturedTexts();
         m_season = list[1].toInt(&res);
         if (!res)

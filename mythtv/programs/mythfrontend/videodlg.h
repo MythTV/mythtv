@@ -150,16 +150,16 @@ class VideoDialog : public MythScreenType
 
     virtual void loadData();
     void fetchVideos();
-    QString RemoteImageCheck(const QString& host, const QString& filename);
-    QString GetCoverImage(MythGenericTree *node);
+    static QString RemoteImageCheck(const QString& host, const QString& filename);
+    static QString GetCoverImage(MythGenericTree *node);
     QString GetFirstImage(MythGenericTree *node, const QString& type,
                           const QString& gpnode = QString(), int levels = 0);
-    QString GetImageFromFolder(VideoMetadata *metadata);
-    QString GetScreenshot(MythGenericTree *node);
-    QString GetBanner(MythGenericTree *node);
-    QString GetFanart(MythGenericTree *node);
+    static QString GetImageFromFolder(VideoMetadata *metadata);
+    static QString GetScreenshot(MythGenericTree *node);
+    static QString GetBanner(MythGenericTree *node);
+    static QString GetFanart(MythGenericTree *node);
 
-    VideoMetadata *GetMetadata(MythUIButtonListItem *item);
+    static VideoMetadata *GetMetadata(MythUIButtonListItem *item);
 
     void handleDirSelect(MythGenericTree *node);
     void handleDynamicDirSelect(MythGenericTree *node);

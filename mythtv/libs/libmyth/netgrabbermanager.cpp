@@ -90,6 +90,7 @@ void GrabberScript::run()
             QString("Internet Content Source %1 crashed while grabbing tree.")
                 .arg(m_title));
 
+    // NOLINTNEXTLINE(readability-misleading-indentation)
     emit finished();
     RunEpilog();
 }

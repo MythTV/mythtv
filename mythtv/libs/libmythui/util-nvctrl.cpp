@@ -30,7 +30,7 @@ int MythNVControl::CheckNVOpenGLSyncToVBlank(void)
     if (!XNVCTRLIsNvScreen(xdisplay, xscreen))
         return -1;
 
-    int major, minor;
+    int major = 0, minor = 0;
     if (!XNVCTRLQueryVersion(xdisplay, &major, &minor))
         return -1;
 

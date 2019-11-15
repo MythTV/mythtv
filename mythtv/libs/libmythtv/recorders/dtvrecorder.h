@@ -178,15 +178,15 @@ class DTVRecorder :
     // TS recorder stuff
     bool                     m_record_mpts                {false};
     bool                     m_record_mpts_only           {false};
-    unsigned char            m_stream_id[0x1fff + 1];
-    unsigned char            m_pid_status[0x1fff + 1];
-    unsigned char            m_continuity_counter[0x1fff + 1];
+    unsigned char            m_stream_id[0x1fff + 1] {0};
+    unsigned char            m_pid_status[0x1fff + 1] {0};
+    unsigned char            m_continuity_counter[0x1fff + 1] {0};
     vector<TSPacket>         m_scratch;
 
     // Statistics
-    int                      m_minimum_recording_quality;
+    int                      m_minimum_recording_quality  {95};
     bool                     m_use_pts                    {false}; // vs use dts
-    uint64_t                 m_ts_count[256];
+    uint64_t                 m_ts_count[256]              {0};
     int64_t                  m_ts_last[256];
     int64_t                  m_ts_first[256];
     QDateTime                m_ts_first_dt[256];

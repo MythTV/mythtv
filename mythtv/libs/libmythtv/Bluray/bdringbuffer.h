@@ -219,7 +219,7 @@ class MTV_PUBLIC BDRingBuffer : public RingBuffer
     uint8_t            m_stillTime                   {0};
     uint8_t            m_stillMode                   {BLURAY_STILL_NONE};
     volatile bool      m_inMenu                      {false};
-    BD_EVENT           m_lastEvent;
+    BD_EVENT           m_lastEvent                   {BD_EVENT_NONE, 0};
     processState_t     m_processState                {PROCESS_NORMAL};
     QByteArray         m_pendingData;
     int64_t            m_timeDiff                    {0};

@@ -102,7 +102,7 @@ class GameHandler : public QObject
     QString GameType() const { return m_gametype; }
     QStringList ValidExtensions() const { return m_validextensions; }
 
-    void clearAllMetadata(void);
+    static void clearAllMetadata(void);
 
     static GameHandler* GetHandler(RomInfo *rominfo);
     static GameHandler* GetHandlerByName(const QString& systemname);

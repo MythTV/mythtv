@@ -53,31 +53,31 @@ class HttpStatus : public HttpServerExtension
 
     private:
 
-        HttpStatusMethod GetMethod( const QString &sURI );
+        static HttpStatusMethod GetMethod( const QString &sURI );
 
         void    GetStatusXML      ( HTTPRequest *pRequest );
         void    GetStatusHTML     ( HTTPRequest *pRequest );
 
         void    FillStatusXML     ( QDomDocument *pDoc);
     
-        void    PrintStatus       ( QTextStream &os, QDomDocument *pDoc );
-        int     PrintEncoderStatus( QTextStream &os, const QDomElement& encoders );
-        int     PrintScheduled    ( QTextStream &os, const QDomElement& scheduled );
-        int     PrintFrontends    ( QTextStream &os, const QDomElement& frontends );
-        int     PrintBackends     ( QTextStream &os, const QDomElement& backends );
-        int     PrintJobQueue     ( QTextStream &os, const QDomElement& jobs );
-        int     PrintMachineInfo  ( QTextStream &os, const QDomElement& info );
-        int     PrintMiscellaneousInfo ( QTextStream &os, const QDomElement& info );
+        static void    PrintStatus       ( QTextStream &os, QDomDocument *pDoc );
+        static int     PrintEncoderStatus( QTextStream &os, const QDomElement& encoders );
+        static int     PrintScheduled    ( QTextStream &os, const QDomElement& scheduled );
+        static int     PrintFrontends    ( QTextStream &os, const QDomElement& frontends );
+        static int     PrintBackends     ( QTextStream &os, const QDomElement& backends );
+        static int     PrintJobQueue     ( QTextStream &os, const QDomElement& jobs );
+        static int     PrintMachineInfo  ( QTextStream &os, const QDomElement& info );
+        static int     PrintMiscellaneousInfo ( QTextStream &os, const QDomElement& info );
 
-        void    FillProgramInfo   ( QDomDocument *pDoc,
-                                    QDomNode     &node,
-                                    ProgramInfo  *pInfo,
-                                    bool          bIncChannel = true,
-                                    bool          bDetails    = true );
+        static void    FillProgramInfo   ( QDomDocument *pDoc,
+                                           QDomNode     &node,
+                                           ProgramInfo  *pInfo,
+                                           bool          bIncChannel = true,
+                                           bool          bDetails    = true );
 
-        void    FillChannelInfo   ( QDomElement  &channel,
-                                    ProgramInfo  *pInfo,
-                                    bool          bDetails = true );
+        static void    FillChannelInfo   ( QDomElement  &channel,
+                                           ProgramInfo  *pInfo,
+                                           bool          bDetails = true );
 
 
     public:

@@ -92,9 +92,6 @@ NuppelVideoRecorder::NuppelVideoRecorder(TVRec *rec, ChannelBase *channel) :
     SetPositionMapType(MARK_KEYFRAME);
 
     m_containerFormat = formatNUV;
-
-    memset(&m_stm, 0, sizeof(struct timeval));
-    memset(&m_tzone, 0, sizeof(struct timezone));
 }
 
 NuppelVideoRecorder::~NuppelVideoRecorder(void)
@@ -862,8 +859,7 @@ void NuppelVideoRecorder::ProbeV4L2(void)
 #ifdef USING_V4L2
     m_usingv4l2 = true;
 
-    struct v4l2_capability vcap;
-    memset(&vcap, 0, sizeof(vcap));
+    struct v4l2_capability vcap {};
 
     if (ioctl(m_channelfd, VIDIOC_QUERYCAP, &vcap) < 0)
     {
@@ -927,11 +923,7 @@ void NuppelVideoRecorder::run(void)
     m_positionMapDelta.clear();
     m_positionMapLock.unlock();
 
-    if (m_videocodec.toLower() == "rtjpeg")
-        m_useavcodec = false;
-    else
-        m_useavcodec = true;
-
+    m_useavcodec = (m_videocodec.toLower() != "rtjpeg");
     if (m_useavcodec)
         m_useavcodec = SetupAVCodecVideo();
 
@@ -1195,8 +1187,7 @@ void NuppelVideoRecorder::DoV4L1(void) {}
 #ifdef USING_V4L2
 bool NuppelVideoRecorder::SetFormatV4L2(void)
 {
-    struct v4l2_format     vfmt;
-    memset(&vfmt, 0, sizeof(vfmt));
+    struct v4l2_format     vfmt {};
 
     vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
@@ -1286,13 +1277,9 @@ bool NuppelVideoRecorder::SetFormatV4L2(void) { return false; }
 #define MAX_VIDEO_BUFFERS 5
 void NuppelVideoRecorder::DoV4L2(void)
 {
-    struct v4l2_buffer     vbuf;
-    struct v4l2_requestbuffers vrbuf;
-    struct v4l2_control    vc;
-
-    memset(&vbuf, 0, sizeof(vbuf));
-    memset(&vrbuf, 0, sizeof(vrbuf));
-    memset(&vc, 0, sizeof(vc));
+    struct v4l2_buffer     vbuf {};
+    struct v4l2_requestbuffers vrbuf {};
+    struct v4l2_control    vc {};
 
     vc.id = V4L2_CID_AUDIO_MUTE;
     vc.value = 0;
@@ -1303,10 +1290,9 @@ void NuppelVideoRecorder::DoV4L2(void)
 
     if (m_go7007)
     {
-        struct go7007_comp_params comp;
-        struct go7007_mpeg_params mpeg;
+        struct go7007_comp_params comp {};
+        struct go7007_mpeg_params mpeg {};
 
-        memset(&comp, 0, sizeof(comp));
         comp.gop_size = m_keyframedist;
         comp.max_b_frames = 0;
 
@@ -1336,8 +1322,6 @@ void NuppelVideoRecorder::DoV4L2(void)
             LOG(VB_GENERAL, LOG_ERR, LOC + m_error);
             return;
         }
-
-        memset(&mpeg, 0, sizeof(mpeg));
 
         if (m_videocodec == "mpeg2video")
             mpeg.mpeg_video_standard = GO7007_MPEG_VIDEO_MPEG2;
@@ -1434,7 +1418,7 @@ void NuppelVideoRecorder::DoV4L2(void)
         LOG(VB_GENERAL, LOG_ERR, LOC + "unable to start capture (VIDIOC_STREAMON failed) " + ENO);
 
     struct timeval tv;
-    fd_set rdset;
+    fd_set rdset {};
     int frame = 0;
     bool forcekey = false;
 
@@ -1809,7 +1793,7 @@ void NuppelVideoRecorder::BufferIt(unsigned char *buf, int len, bool forcekey)
 {
     int act;
     long tcres;
-    struct timeval now;
+    struct timeval now {};
 
     act = m_act_video_buffer;
 
@@ -1886,8 +1870,7 @@ void NuppelVideoRecorder::SetNewVideoParams(double newaspect)
 
     m_video_aspect = newaspect;
 
-    struct rtframeheader frameheader;
-    memset(&frameheader, 0, sizeof(frameheader));
+    struct rtframeheader frameheader {};
 
     frameheader.frametype = 'S';
     frameheader.comptype = 'M';
@@ -1900,11 +1883,10 @@ void NuppelVideoRecorder::SetNewVideoParams(double newaspect)
 
 void NuppelVideoRecorder::WriteFileHeader(void)
 {
-    struct rtfileheader fileheader;
+    struct rtfileheader fileheader {};
     static const char finfo[12] = "MythTVVideo";
     static const char vers[5]   = "0.07";
 
-    memset(&fileheader, 0, sizeof(fileheader));
     memcpy(fileheader.finfo, finfo, sizeof(fileheader.finfo));
     memcpy(fileheader.version, vers, sizeof(fileheader.version));
     fileheader.width  = m_w_out;
@@ -1937,11 +1919,10 @@ void NuppelVideoRecorder::WriteFileHeader(void)
 
 void NuppelVideoRecorder::WriteHeader(void)
 {
-    struct rtframeheader frameheader;
+    struct rtframeheader frameheader {};
 
     WriteFileHeader();
 
-    memset(&frameheader, 0, sizeof(frameheader));
     frameheader.frametype = 'D'; // compressor data
 
     if (m_useavcodec)
@@ -1973,8 +1954,7 @@ void NuppelVideoRecorder::WriteHeader(void)
     // extended data header
     WriteFrameheader(&frameheader);
 
-    struct extendeddata moredata;
-    memset(&moredata, 0, sizeof(extendeddata));
+    struct extendeddata moredata {};
 
     moredata.version = 1;
     if (m_useavcodec)
@@ -2057,8 +2037,7 @@ void NuppelVideoRecorder::WriteSeekTable(void)
 {
     int numentries = m_seektable->size();
 
-    struct rtframeheader frameheader;
-    memset(&frameheader, 0, sizeof(frameheader));
+    struct rtframeheader frameheader {};
     frameheader.frametype = 'Q'; // SeekTable
     frameheader.packetlength = sizeof(struct seektable_entry) * numentries;
 
@@ -2095,8 +2074,7 @@ void NuppelVideoRecorder::WriteKeyFrameAdjustTable(
 {
     int numentries = kfa_table.size();
 
-    struct rtframeheader frameheader;
-    memset(&frameheader, 0, sizeof(frameheader));
+    struct rtframeheader frameheader {};
     frameheader.frametype = 'K'; // KFA Table
     frameheader.packetlength = sizeof(struct kfatable_entry) * numentries;
 
@@ -2132,9 +2110,7 @@ void NuppelVideoRecorder::WriteKeyFrameAdjustTable(
 void NuppelVideoRecorder::UpdateSeekTable(int frame_num, long offset)
 {
     long long position = m_ringBuffer->GetWritePosition() + offset;
-    struct seektable_entry ste;
-    ste.file_offset = position;
-    ste.keyframe_number = frame_num;
+    struct seektable_entry ste { position, frame_num};
     m_seektable->push_back(ste);
 
     m_positionMapLock.lock();
@@ -2240,7 +2216,7 @@ void NuppelVideoRecorder::doAudioThread(void)
         return;
     }
 
-    struct timeval anow;
+    struct timeval anow {};
     unsigned char *buffer = new unsigned char[m_audio_buffer_size];
     int act = 0, lastread = 0;
     m_audio_bytes_per_sample = m_audio_channels * m_audio_bits / 8;
@@ -2329,7 +2305,7 @@ void NuppelVideoRecorder::doAudioThread(void)
 #ifdef USING_V4L2
 void NuppelVideoRecorder::FormatTT(struct VBIData *vbidata)
 {
-    struct timeval tnow;
+    struct timeval tnow {};
     gettimeofday(&tnow, &m_tzone);
 
     int act = m_act_text_buffer;
@@ -2350,8 +2326,7 @@ void NuppelVideoRecorder::FormatTT(struct VBIData *vbidata)
     unsigned char *inpos = vbidata->teletextpage.data[0];
     unsigned char *outpos = textbuffer[act]->buffer;
     *outpos = 0;
-    struct teletextsubtitle st;
-    memset(&st, 0, sizeof(struct teletextsubtitle));
+    struct teletextsubtitle st {};
     unsigned char linebuf[VT_WIDTH + 1];
     unsigned char *linebufpos = linebuf;
 
@@ -2504,7 +2479,7 @@ void NuppelVideoRecorder::FormatTT(struct VBIData*) {}
 
 void NuppelVideoRecorder::FormatCC(uint code1, uint code2)
 {
-    struct timeval tnow;
+    struct timeval tnow {};
     gettimeofday (&tnow, &m_tzone);
 
     // calculate timecode:
@@ -2707,7 +2682,7 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
 {
     int tmp = 0;
     lzo_uint out_len = OUT_LEN;
-    struct rtframeheader frameheader;
+    struct rtframeheader frameheader {};
     int raw = 0, compressthis = m_compression;
     // cppcheck-suppress variableScope
     uint8_t *planes[3] = {
@@ -2716,8 +2691,6 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
         frame->buf + frame->offsets[2] };
     int fnum = frame->frameNumber;
     long long timecode = frame->timecode;
-
-    memset(&frameheader, 0, sizeof(frameheader));
 
     if (m_lf == 0)
     {   // this will be triggered every new file
@@ -2932,7 +2905,7 @@ static void bswap_16_buf(short int *buf, int buf_cnt, int audio_channels)
 
 void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
 {
-    struct rtframeheader frameheader;
+    struct rtframeheader frameheader {};
 
     if (m_last_block == 0)
     {
@@ -3065,7 +3038,7 @@ void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
 void NuppelVideoRecorder::WriteText(unsigned char *buf, int len, int timecode,
                                     int pagenr)
 {
-    struct rtframeheader frameheader;
+    struct rtframeheader frameheader {};
 
     frameheader.frametype = 'T'; // text frame
     frameheader.timecode = timecode;
@@ -3078,7 +3051,7 @@ void NuppelVideoRecorder::WriteText(unsigned char *buf, int len, int timecode,
         union page_t {
             int32_t val32;
             struct { int8_t a,b,c,d; } val8;
-        } v;
+        } v {};
         v.val32 = pagenr;
         m_ringBuffer->Write(&v.val8.d, sizeof(int8_t));
         m_ringBuffer->Write(&v.val8.c, sizeof(int8_t));

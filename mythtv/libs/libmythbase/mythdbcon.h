@@ -28,7 +28,7 @@ class MSqlDatabase
   friend class MDBManager;
   friend class MSqlQuery;
   public:
-    explicit MSqlDatabase(const QString &name);
+    explicit MSqlDatabase(QString name);
    ~MSqlDatabase(void);
 
     bool OpenDatabase(bool skipdb = false);

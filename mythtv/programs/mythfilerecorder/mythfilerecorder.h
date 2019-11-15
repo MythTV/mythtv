@@ -22,7 +22,7 @@ class Streamer : public QObject
     void SendBytes(void);
 
   public:
-    Streamer(Commands *parent, const QString &fname, int data_rate,
+    Streamer(Commands *parent, QString fname, int data_rate,
              bool loopinput);
     virtual ~Streamer(void);
     void BlockSize(int val) { m_blockSize = val; }

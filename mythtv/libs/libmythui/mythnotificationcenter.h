@@ -74,12 +74,12 @@ public:
      * Return when the given screen is going to expire
      * will return an invalid QDateTime if screen isn't a MythNotificationScreen
      */
-    QDateTime ScreenExpiryTime(const MythScreenType *screen);
+    static QDateTime ScreenExpiryTime(const MythScreenType *screen);
     /**
      * Return true if \::Create() has been called on screen.
      * will always return true should screen not be a MythNotificationScreen
      */
-    bool ScreenCreated(const MythScreenType *screen);
+    static bool ScreenCreated(const MythScreenType *screen);
     /**
      * Return the list of notification screens being currently displayed.
      * The list contains pointer of existing screen's copies, with \::Create()
@@ -90,7 +90,7 @@ public:
      * Will call \::doInit() if the screen is a MythNotificationScreen and
      * \::Create() has been called for it already
      */
-    void UpdateScreen(MythScreenType *screen);
+    static void UpdateScreen(MythScreenType *screen);
     /**
      * Returns number of notifications currently displayed
      */

@@ -1,7 +1,7 @@
 // qt
-#include <QString>
-#include <QFile>
 #include <QDir>
+#include <QFile>
+#include <QString>
 
 #include "mythdate.h"
 #include "mythdirs.h"
@@ -107,18 +107,20 @@ void RSSManager::slotRSSRetrieved(RSSSite *site)
 }
 
 
-RSSSite::RSSSite(const QString& title,
-                  const QString& sortTitle,
-                  const QString& image,
+RSSSite::RSSSite( QString  title,
+                  QString  sortTitle,
+                  QString  image,
                   const ArticleType& type,
-                  const QString& description,
-                  const QString& url,
-                  const QString& author,
+                  QString  description,
+                  QString  url,
+                  QString  author,
                   const bool& download,
-                  const QDateTime& updated) :
-    m_title(title), m_sortTitle(sortTitle), m_image(image), m_type(type),
-    m_description(description), m_url(url), m_author(author),
-    m_download(download), m_updated(updated)
+                  QDateTime  updated) :
+    m_title(std::move(title)), m_sortTitle(std::move(sortTitle)),
+    m_image(std::move(image)), m_type(type),
+    m_description(std::move(description)), m_url(std::move(url)),
+    m_author(std::move(author)),
+    m_download(download), m_updated(std::move(updated))
 {
     std::shared_ptr<MythSortHelper>sh = getMythSortHelper();
     if (m_sortTitle.isEmpty() and not m_title.isEmpty())
@@ -154,7 +156,7 @@ void RSSSite::retrieve(void)
 }
 
 QUrl RSSSite::redirectUrl(const QUrl& possibleRedirectUrl,
-                               const QUrl& oldRedirectUrl) const
+                               const QUrl& oldRedirectUrl)
 {
     QUrl redirectUrl;
     if(!possibleRedirectUrl.isEmpty() && possibleRedirectUrl != oldRedirectUrl)

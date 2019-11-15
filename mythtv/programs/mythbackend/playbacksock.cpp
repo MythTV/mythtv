@@ -29,10 +29,7 @@ PlaybackSock::PlaybackSock(
     m_eventsMode = eventsMode;
     m_ip = "";
 
-    if (m_hostname == localhostname)
-        m_local = true;
-    else
-        m_local = false;
+    m_local = (m_hostname == localhostname);
 }
 
 PlaybackSock::~PlaybackSock()

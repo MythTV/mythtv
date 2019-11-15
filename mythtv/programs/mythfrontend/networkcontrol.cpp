@@ -499,7 +499,7 @@ QString NetworkControl::processKey(NetworkCommand *nc)
             if (keyTextMap.contains(keyCode))
                 keyText = keyTextMap[keyCode];
 
-            GetMythUI()->ResetScreensaver();
+            MythUIHelper::ResetScreensaver();
 
             event = new QKeyEvent(QEvent::KeyPress, keyCode, Qt::NoModifier,
                                   keyText);
@@ -543,7 +543,7 @@ QString NetworkControl::processKey(NetworkCommand *nc)
                     modifiers = Qt::ShiftModifier;
             }
 
-            GetMythUI()->ResetScreensaver();
+            MythUIHelper::ResetScreensaver();
 
             event = new QKeyEvent(QEvent::KeyPress, keyCode, modifiers,
                                   nc->getArg(curToken));
@@ -628,7 +628,7 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
 
             timer.start();
             while ((timer.elapsed() < 10000) &&
-                   (!GetMythUI()->IsTopScreenInitialized()))
+                   (!MythUIHelper::IsTopScreenInitialized()))
                 std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
 
@@ -961,7 +961,7 @@ QString NetworkControl::processQuery(NetworkCommand *nc)
     else if (is_abbrev("uptime", nc->getArg(1)))
     {
         QString str;
-        time_t  uptime;
+        time_t  uptime = 0;
 
         if (getUptime(uptime))
             str = QString::number(uptime);
@@ -987,7 +987,7 @@ QString NetworkControl::processQuery(NetworkCommand *nc)
     else if (is_abbrev("memstats", nc->getArg(1)))
     {
         QString str;
-        int     totalMB, freeMB, totalVM, freeVM;
+        int     totalMB = 0, freeMB = 0, totalVM = 0, freeVM = 0;
 
         if (getMemStats(totalMB, freeMB, totalVM, freeVM))
             str = QString("%1 %2 %3 %4")
@@ -1581,7 +1581,6 @@ void NetworkControl::customEvent(QEvent *e)
     }
     else if (e->type() == kNetworkControlDataReadyEvent)
     {
-        NetworkCommand *nc;
         QString reply;
 
         QMutexLocker locker(&clientLock);
@@ -1589,7 +1588,7 @@ void NetworkControl::customEvent(QEvent *e)
 
         while (!networkControlReplies.isEmpty())
         {
-            nc = networkControlReplies.front();
+            NetworkCommand *nc = networkControlReplies.front();
             networkControlReplies.pop_front();
 
             reply = nc->getCommand();
@@ -1621,7 +1620,7 @@ void NetworkControl::customEvent(QEvent *e)
     }
 }
 
-QString NetworkControl::listSchedule(const QString& chanID) const
+QString NetworkControl::listSchedule(const QString& chanID)
 {
     QString result("");
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1726,21 +1725,20 @@ QString NetworkControl::listRecordings(const QString& chanid, const QString& sta
     return result;
 }
 
-QString NetworkControl::listChannels(const uint start, const uint limit) const
+QString NetworkControl::listChannels(const uint start, const uint limit)
 {
     QString result;
     MSqlQuery query(MSqlQuery::InitCon());
     QString queryStr;
-    uint cnt;
-    uint maxcnt;
     uint sqlStart = start;
 
     // sql starts at zero, we want to start at 1
     if (sqlStart > 0)
         sqlStart--;
 
-    queryStr = "select chanid, callsign, name from channel where visible=1";
-    queryStr += " ORDER BY callsign";
+    queryStr = "select chanid, callsign, name from channel "
+        "where deleted IS NULL and visible = 1 "
+        "ORDER BY callsign";
 
     if (limit > 0)  // only if a limit is specified, we limit the results
     {
@@ -1755,8 +1753,8 @@ QString NetworkControl::listChannels(const uint start, const uint limit) const
         return result;
     }
 
-    maxcnt = query.size();
-    cnt = 0;
+    uint maxcnt = query.size();
+    uint cnt = 0;
     if (maxcnt == 0)    // Feedback we have no usefull information
     {
         result += QString("0:0 0 \"Invalid\" \"Invalid\"");

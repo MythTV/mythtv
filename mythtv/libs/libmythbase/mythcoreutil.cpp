@@ -40,8 +40,7 @@
 int64_t getDiskSpace(const QString &file_on_disk,
                      int64_t &total, int64_t &used)
 {
-    struct statfs statbuf;
-    memset(&statbuf, 0, sizeof(statbuf));
+    struct statfs statbuf {};
     int64_t freespace = -1;
     QByteArray cstr = file_on_disk.toLocal8Bit();
 

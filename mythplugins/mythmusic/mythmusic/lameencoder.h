@@ -53,7 +53,7 @@ class LameEncoder : public Encoder
 
   private:
     int init_encoder(lame_global_flags *gf, int quality, bool vbr);
-    void init_id3tags(lame_global_flags *gf);
+    static void init_id3tags(lame_global_flags *gf);
 
     int m_bits                {16};
     int m_channels            {2};

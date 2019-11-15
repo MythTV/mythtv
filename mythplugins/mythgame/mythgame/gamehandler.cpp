@@ -818,7 +818,7 @@ GameHandler* GameHandler::GetHandlerByName(const QString& systemname)
 
 void GameHandler::Launchgame(RomInfo *romdata, const QString& systemname)
 {
-    GameHandler *handler;
+    GameHandler *handler = nullptr;
 
     if (!systemname.isEmpty() && !systemname.isNull())
     {
@@ -938,10 +938,8 @@ void GameHandler::registerHandler(GameHandler *handler)
 
 void GameHandler::customEvent(QEvent *event)
 {
-    if (event->type() == DialogCompletionEvent::kEventType)
+    if (auto dce = dynamic_cast<DialogCompletionEvent*>(event))
     {
-        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
-
         QString resultid   = dce->GetId();
         QString resulttext = dce->GetResultText();
 

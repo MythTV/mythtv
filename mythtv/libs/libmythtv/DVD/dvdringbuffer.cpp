@@ -98,7 +98,7 @@ void DVDInfo::GetNameAndSerialNum(dvdnav_t* nav,
 
     if (name.isEmpty() && serialnum.isEmpty())
     {
-        struct stat stat;
+        struct stat stat {};
         if ((mythfile_stat(filename.toLocal8Bit(), &stat) == 0) && S_ISDIR(stat.st_mode))
         {
             // Name and serial number are empty because we're reading
@@ -206,11 +206,6 @@ uint32_t MythDVDContext::GetLBAPrevVideoFrame() const
 DVDRingBuffer::DVDRingBuffer(const QString &lfilename) :
     RingBuffer(kRingBuffer_DVD)
 {
-    memset(&m_dvdMenuButton, 0, sizeof(AVSubtitle));
-    memset(m_dvdBlockWriteBuf, 0, sizeof(char) * DVD_BLOCK_SIZE);
-    memset(m_clut, 0, sizeof(uint32_t) * 16);
-    memset(m_button_color, 0, sizeof(uint8_t) * 4);
-    memset(m_button_alpha, 0, sizeof(uint8_t) * 4);
     uint def[8] = { 3, 5, 10, 20, 30, 60, 120, 180 };
     uint seekValues[8] = { 1, 2, 4, 8, 10, 15, 20, 60 };
 
@@ -989,10 +984,10 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
                             if (m_inMenu)
                             {
                                 m_autoselectsubtitle = true;
-                                GetMythUI()->RestoreScreensaver();
+                                MythUIHelper::RestoreScreensaver();
                             }
                             else
-                                GetMythUI()->DisableScreensaver();
+                                MythUIHelper::DisableScreensaver();
                         }
 
                         // if we are in a looping menu, we don't want to reset the
@@ -2051,10 +2046,7 @@ void DVDRingBuffer::SetTrack(uint type, int trackNo)
     if (type == kTrackTypeSubtitle)
     {
         m_curSubtitleTrack = trackNo;
-        if (trackNo < 0)
-            m_autoselectsubtitle = true;
-        else
-            m_autoselectsubtitle = false;
+        m_autoselectsubtitle = (trackNo < 0);
     }
     else if (type == kTrackTypeAudio)
     {

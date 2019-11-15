@@ -1126,7 +1126,7 @@ void BackendSettings::Save(void)
     if (m_isMasterBackend->boolValue())
     {
         QString addr = m_backendServerAddr->getValue();
-        QString ip = gCoreContext->resolveAddress(addr);
+        QString ip = MythCoreContext::resolveAddress(addr);
         m_masterServerIP->setValue(ip);
         m_masterServerPort->setValue(m_localServerPort->getValue());
     }
@@ -1140,9 +1140,9 @@ void BackendSettings::Save(void)
         // initialize them to localhost values
         m_ipAddressSettings->localServerIP->setValue(0);
         m_ipAddressSettings->localServerIP6->setValue(0);
-        QString ip4 = gCoreContext->resolveAddress
+        QString ip4 = MythCoreContext::resolveAddress
             (bea,MythCoreContext::ResolveIPv4);
-        QString ip6 = gCoreContext->resolveAddress
+        QString ip6 = MythCoreContext::resolveAddress
             (bea,MythCoreContext::ResolveIPv6);
         // the setValue calls below only set the value if it is in the list.
         m_ipAddressSettings->localServerIP->setValue(ip4);

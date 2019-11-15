@@ -108,7 +108,7 @@ static int CheckJobQueue()
 }
 
 static int QueueTranscodeJob(ProgramInfo *pginfo, const QString& profile,
-                            QString hostname, bool usecutlist)
+                            const QString& hostname, bool usecutlist)
 {
     RecordingInfo recinfo(*pginfo);
     if (!profile.isEmpty())
@@ -116,7 +116,7 @@ static int QueueTranscodeJob(ProgramInfo *pginfo, const QString& profile,
 
     if (JobQueue::QueueJob(JOB_TRANSCODE, pginfo->GetChanID(),
                            pginfo->GetRecordingStartTime(),
-                           std::move(hostname), "", "",
+                           hostname, "", "",
                            usecutlist ? JOB_USE_CUTLIST : 0))
     {
         LOG(VB_GENERAL, LOG_NOTICE,
@@ -185,7 +185,7 @@ int main(int argc, char *argv[])
 
     if (cmdline.toBool("showversion"))
     {
-        cmdline.PrintVersion();
+        MythTranscodeCommandLineParser::PrintVersion();
         return GENERIC_EXIT_OK;
     }
 
@@ -200,10 +200,10 @@ int main(int argc, char *argv[])
 
     bool showprogress = cmdline.toBool("showprogress");
 
-    int retval;
     QString mask("general");
     bool quiet = (outfile == "-") || showprogress;
-    if ((retval = cmdline.ConfigureLogging(mask, quiet)) != GENERIC_EXIT_OK)
+    int retval = cmdline.ConfigureLogging(mask, quiet);
+    if (retval != GENERIC_EXIT_OK)
         return retval;
 
     if (cmdline.toBool("starttime"))
@@ -240,17 +240,16 @@ int main(int argc, char *argv[])
                 return GENERIC_EXIT_INVALID_CMDLINE;
             }
 
-            uint64_t last = 0, start, end;
+            uint64_t last = 0;
             QStringList cutlist = cmdline.toStringList("usecutlist", " ");
-            QStringList::iterator it;
-            for (it = cutlist.begin(); it != cutlist.end(); ++it)
+            for (auto it = cutlist.begin(); it != cutlist.end(); ++it)
             {
                 QStringList startend =
                     (*it).split("-", QString::SkipEmptyParts);
                 if (startend.size() == 2)
                 {
-                    start = startend.first().toULongLong();
-                    end = startend.last().toULongLong();
+                    uint64_t start = startend.first().toULongLong();
+                    uint64_t end = startend.last().toULongLong();
 
                     if (cmdline.toBool("inversecut"))
                     {
@@ -751,8 +750,8 @@ static int transUnlink(const QString& filename, ProgramInfo *pginfo)
     {
         int port = gCoreContext->GetBackendServerPort(hostname);
         QString basename = filename.section('/', -1);
-        QString uri = gCoreContext->GenMythURL(hostname, port, basename,
-                                               pginfo->GetStorageGroup());
+        QString uri = MythCoreContext::GenMythURL(hostname, port, basename,
+                                                  pginfo->GetStorageGroup());
 
         LOG(VB_GENERAL, LOG_NOTICE, QString("Requesting delete for file '%1'.")
                 .arg(uri));
@@ -944,7 +943,6 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
 
         if (!gCoreContext->GetBoolSetting("SaveTranscoding", false) || forceDelete)
         {
-            int err;
             bool followLinks =
                 gCoreContext->GetBoolSetting("DeletesFollowLinks", false);
 
@@ -957,7 +955,7 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
             {
                 QString link = getSymlinkTarget(oldfile);
                 QByteArray alink = link.toLocal8Bit();
-                err = transUnlink(alink.constData(), pginfo);
+                int err = transUnlink(alink.constData(), pginfo);
                 if (err)
                 {
                     LOG(VB_GENERAL, LOG_ERR,
@@ -979,7 +977,7 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
             }
             else
             {
-                err = transUnlink(aoldfile.constData(), pginfo);
+                int err = transUnlink(aoldfile.constData(), pginfo);
                 if (err)
                     LOG(VB_GENERAL, LOG_ERR,
                         QString("mythtranscode: Error deleting '%1': ")

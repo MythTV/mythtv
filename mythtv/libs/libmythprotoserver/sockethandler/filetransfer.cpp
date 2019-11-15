@@ -167,9 +167,7 @@ int FileTransfer::WriteBlock(int size)
     while (tot < size)
     {
         int request = size - tot;
-        int received;
-
-        received = GetSocket()->Read(buf, (uint)request, 200 /*ms */);
+        int received = GetSocket()->Read(buf, (uint)request, 200 /*ms */);
 
         if (received != request)
         {

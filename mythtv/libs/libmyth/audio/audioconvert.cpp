@@ -687,7 +687,7 @@ int AudioConvert::Process(void* out, const void* in, int bytes, bool noclip)
 
         while (left > 0)
         {
-            int s;
+            int s = 0;
 
             if (left >= 65536)
             {

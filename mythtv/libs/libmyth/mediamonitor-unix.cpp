@@ -249,7 +249,7 @@ bool MediaMonitorUnix::CheckMountable(void)
                 if (dev.startsWith("/dev/fd"))
                     continue;
 
-                MythMediaDevice* pDevice;
+                MythMediaDevice* pDevice = nullptr;
                 if (DeviceProperty(*it, "DeviceIsRemovable").toBool())
                     pDevice = MythCDROM::get(this, dev.toLatin1(), false, m_AllowEject);
                 else
@@ -576,15 +576,13 @@ bool MediaMonitorUnix::AddDevice(MythMediaDevice* pDevice)
         return false;
     }
 
-    dev_t new_rdev;
-    struct stat sb;
-
+    struct stat sb {};
     if (stat(path.toLocal8Bit().constData(), &sb) < 0)
     {
         statError(":AddDevice()", path);
         return false;
     }
-    new_rdev = sb.st_rdev;
+    dev_t new_rdev = sb.st_rdev;
 
     //
     // Check if this is a duplicate of a device we have already added
@@ -635,7 +633,7 @@ bool MediaMonitorUnix::AddDevice(struct fstab * mep)
 #endif
 
     MythMediaDevice* pDevice = nullptr;
-    struct stat sbuf;
+    struct stat sbuf {};
 
     bool is_supermount = false;
     bool is_cdrom = false;
@@ -731,7 +729,7 @@ void MediaMonitorUnix::deviceAdded( const QDBusObjectPath& o)
     {
         QString dev = DeviceProperty(o, "DeviceFile").toString();
 
-        MythMediaDevice* pDevice;
+        MythMediaDevice* pDevice = nullptr;
         if (DeviceProperty(o, "DeviceIsRemovable").toBool())
             pDevice = MythCDROM::get(this, dev.toLatin1(), false, m_AllowEject);
         else

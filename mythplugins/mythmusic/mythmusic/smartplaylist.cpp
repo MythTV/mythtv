@@ -146,7 +146,7 @@ static QString evaluateDateValue(QString sDate)
     return sDate;
 }
 
-QString getCriteriaSQL(const QString& fieldName, QString operatorName,
+QString getCriteriaSQL(const QString& fieldName, const QString &operatorName,
                        QString value1, QString value2)
 {
     QString result;
@@ -154,8 +154,7 @@ QString getCriteriaSQL(const QString& fieldName, QString operatorName,
     if (fieldName.isEmpty())
         return result;
 
-    SmartPLField *Field;
-    Field = lookupField(fieldName);
+    SmartPLField *Field = lookupField(fieldName);
     if (!Field)
     {
         return "";
@@ -163,8 +162,7 @@ QString getCriteriaSQL(const QString& fieldName, QString operatorName,
 
     result = Field->sqlName;
 
-    SmartPLOperator *Operator;
-    Operator = lookupOperator(std::move(operatorName));
+    SmartPLOperator *Operator = lookupOperator(operatorName);
     if (!Operator)
     {
         return QString();
@@ -251,8 +249,7 @@ QString getOrderBySQL(const QString& orderByFields)
     for (int x = 0; x < list.count(); x++)
     {
         fieldName = list[x].trimmed();
-        SmartPLField *Field;
-        Field = lookupField(fieldName.left(fieldName.length() - 4));
+        SmartPLField *Field = lookupField(fieldName.left(fieldName.length() - 4));
         if (Field)
         {
             if (fieldName.right(3) == "(D)")
@@ -273,10 +270,9 @@ QString getOrderBySQL(const QString& orderByFields)
     return result;
 }
 
-QString getSQLFieldName(QString fieldName)
+QString getSQLFieldName(const QString &fieldName)
 {
-    SmartPLField *Field;
-    Field = lookupField(std::move(fieldName));
+    SmartPLField *Field = lookupField(fieldName);
     if (!Field)
     {
         return "";
@@ -458,10 +454,8 @@ bool SmartPlaylistEditor::keyPressEvent(QKeyEvent *event)
 
 void SmartPlaylistEditor::customEvent(QEvent *event)
 {
-    if (event->type() == DialogCompletionEvent::kEventType)
+    if (auto dce = dynamic_cast<DialogCompletionEvent*>(event))
     {
-        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
-
         // make sure the user didn't ESCAPE out of the menu
         if (dce->GetResult() < 0)
             return;
@@ -757,7 +751,7 @@ void SmartPlaylistEditor::saveClicked(void)
     }
 
     // get smartplaylistid
-    int ID;
+    int ID = -1;
     query.prepare("SELECT smartplaylistid FROM music_smartplaylists "
                   "WHERE categoryid = :CATEGORYID AND name = :NAME;");
     query.bindValue(":CATEGORYID", categoryid);
@@ -818,7 +812,7 @@ void SmartPlaylistEditor::loadFromDatabase(const QString& category, const QStrin
     int categoryid = SmartPlaylistEditor::lookupCategoryID(category);
 
     MSqlQuery query(MSqlQuery::InitCon());
-    int ID;
+    int ID = -1;
 
     query.prepare("SELECT smartplaylistid, name, categoryid, matchtype, orderby, limitto "
                   "FROM music_smartplaylists WHERE name = :NAME AND categoryid = :CATEGORYID;");
@@ -1083,15 +1077,15 @@ void SmartPlaylistEditor::getSmartPlaylistCategories(void)
 }
 
 // static function to delete a smartplaylist and any associated smartplaylist items
-bool SmartPlaylistEditor::deleteSmartPlaylist(QString category, const QString& name)
+bool SmartPlaylistEditor::deleteSmartPlaylist(const QString &category, const QString& name)
 {
     // get categoryid
-    int categoryid = SmartPlaylistEditor::lookupCategoryID(std::move(category));
+    int categoryid = SmartPlaylistEditor::lookupCategoryID(category);
 
     MSqlQuery query(MSqlQuery::InitCon());
 
     // get playlist ID
-    int ID;
+    int ID = -1;
     query.prepare("SELECT smartplaylistid FROM music_smartplaylists WHERE name = :NAME "
                   "AND categoryid = :CATEGORYID;");
     query.bindValue(":NAME", name);
@@ -1168,7 +1162,7 @@ bool SmartPlaylistEditor::deleteCategory(const QString& category)
 // static function to lookup the categoryid given its name
 int SmartPlaylistEditor::lookupCategoryID(const QString& category)
 {
-    int ID;
+    int ID = -1;
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT categoryid FROM music_smartplaylist_categories "
                   "WHERE name = :CATEGORY;");
@@ -1302,8 +1296,7 @@ void CriteriaRowEditor::updateValues(void)
 
 void CriteriaRowEditor::saveClicked()
 {
-    SmartPLField *Field;
-    Field = lookupField(m_fieldSelector->GetValue());
+    SmartPLField *Field = lookupField(m_fieldSelector->GetValue());
     if (!Field)
         return;
 
@@ -1326,6 +1319,7 @@ void CriteriaRowEditor::saveClicked()
         m_criteriaRow->m_value2 = m_value2Edit->GetText();
     }
 
+    // NOLINTNEXTLINE(readability-misleading-indentation)
     emit criteriaChanged();
 
     Close();
@@ -1335,11 +1329,9 @@ void CriteriaRowEditor::enableSaveButton()
 {
     bool enabled = false;
 
-    SmartPLField *Field;
-    Field = lookupField(m_fieldSelector->GetValue());
+    SmartPLField *Field = lookupField(m_fieldSelector->GetValue());
 
-    SmartPLOperator *Operator;
-    Operator = lookupOperator(m_operatorSelector->GetValue());
+    SmartPLOperator *Operator = lookupOperator(m_operatorSelector->GetValue());
 
     if (Field && Operator)
     {
@@ -1372,8 +1364,7 @@ void CriteriaRowEditor::enableSaveButton()
 
 void CriteriaRowEditor::fieldChanged(void)
 {
-    SmartPLField *Field;
-    Field = lookupField(m_fieldSelector->GetValue());
+    SmartPLField *Field = lookupField(m_fieldSelector->GetValue());
     if (!Field)
         return;
 
@@ -1424,13 +1415,11 @@ void CriteriaRowEditor::fieldChanged(void)
 
 void CriteriaRowEditor::operatorChanged(void)
 {
-    SmartPLField *Field;
-    Field = lookupField(m_fieldSelector->GetValue());
+    SmartPLField *Field = lookupField(m_fieldSelector->GetValue());
     if (!Field)
         return;
 
-    SmartPLOperator *Operator;
-    Operator = lookupOperator(m_operatorSelector->GetValue());
+    SmartPLOperator *Operator = lookupOperator(m_operatorSelector->GetValue());
     if (!Operator)
         return;
 

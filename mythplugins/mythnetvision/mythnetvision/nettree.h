@@ -73,7 +73,7 @@ class NetTree : public NetBase
 
     void SwitchView(void);
 
-    void SetSubfolderData(MythGenericTree *folder);
+    static void SetSubfolderData(MythGenericTree *folder);
     void UpdateResultItem(ResultItem *item);
     void UpdateSiteItem(RSSSite *site);
     void UpdateCurrentItem(void);

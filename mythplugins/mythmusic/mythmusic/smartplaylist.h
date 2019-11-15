@@ -27,10 +27,10 @@ enum SmartPLFieldType
 };
 
 // used by playlist.cpp
-QString getCriteriaSQL(const QString& fieldName, QString operatorName,
+QString getCriteriaSQL(const QString& fieldName, const QString &operatorName,
                        QString value1, QString value2);
 
-QString getSQLFieldName(QString fieldName);
+QString getSQLFieldName(const QString &fieldName);
 QString getOrderBySQL(const QString& orderByFields);
 
 // used by playbackbox.cpp
@@ -88,7 +88,7 @@ class SmartPlaylistEditor : public MythScreenType
     void getCategoryAndName(QString &category, QString &name);
     void newSmartPlaylist(const QString& category);
     void editSmartPlaylist(const QString& category, const QString& name);
-    static bool deleteSmartPlaylist(QString category, const QString& name);
+    static bool deleteSmartPlaylist(const QString &category, const QString& name);
     static bool deleteCategory(const QString& category);
     static int  lookupCategoryID(const QString& category);
 
@@ -224,7 +224,7 @@ class SmartPLResultViewer : public MythScreenType
     void setSQL(const QString& sql);
 
   private slots:
-    void trackVisible(MythUIButtonListItem *item);
+    static void trackVisible(MythUIButtonListItem *item);
     void trackSelected(MythUIButtonListItem *item);
 
   private:

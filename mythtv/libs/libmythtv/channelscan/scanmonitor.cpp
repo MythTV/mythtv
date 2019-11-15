@@ -162,7 +162,8 @@ void ScanMonitor::customEvent(QEvent *e)
 {
     if (m_channelScanner)
     {
-        ScannerEvent *scanEvent = (ScannerEvent*) e;
-        m_channelScanner->HandleEvent(scanEvent);
+        ScannerEvent *scanEvent = dynamic_cast<ScannerEvent*>(e);
+        if (scanEvent != nullptr)
+            m_channelScanner->HandleEvent(scanEvent);
     }
 }

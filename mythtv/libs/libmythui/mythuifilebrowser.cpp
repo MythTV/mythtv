@@ -22,9 +22,9 @@
 #include "mythcorecontext.h"
 
 /////////////////////////////////////////////////////////////////////
-MFileInfo::MFileInfo(QString fileName, QString sgDir, bool isDir, qint64 size)
+MFileInfo::MFileInfo(const QString& fileName, QString sgDir, bool isDir, qint64 size)
 {
-    init(std::move(fileName), std::move(sgDir), isDir, size);
+    init(fileName, std::move(sgDir), isDir, size);
 }
 
 void MFileInfo::init(const QString& fileName, QString sgDir, bool isDir,
@@ -159,10 +159,10 @@ void MythUIFileBrowser::SetPath(const QString &startPath)
         if (!qurl.path().isEmpty())
         {
             // Force browing of remote SG's to start at their root
-            m_baseDirectory = gCoreContext->GenMythURL(qurl.host(),
-                                                       0,
-                                                       "",
-                                                       qurl.userName());
+            m_baseDirectory = MythCoreContext::GenMythURL(qurl.host(),
+                                                          0,
+                                                          "",
+                                                          qurl.userName());
 
         }
         else
@@ -617,11 +617,10 @@ void MythUIFileBrowser::updateLocalFileList()
     else
     {
         QFileInfoList::const_iterator it = list.begin();
-        const QFileInfo *fi;
 
         while (it != list.end())
         {
-            fi = &(*it);
+            const QFileInfo *fi = &(*it);
             MFileInfo finfo(fi->filePath());
 
             if (finfo.fileName() == ".")

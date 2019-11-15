@@ -27,7 +27,7 @@ public:
 
 private:
     int getTrackLength(const QString &filename) override; // MetaIO
-    int getTrackLength(AVFormatContext* pContext);
+    static int getTrackLength(AVFormatContext* pContext);
 };
 
 #endif

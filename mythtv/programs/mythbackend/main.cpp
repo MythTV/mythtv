@@ -78,7 +78,7 @@ int main(int argc, char **argv)
 
     if (cmdline.toBool("showversion"))
     {
-        cmdline.PrintVersion();
+        MythBackendCommandLineParser::PrintVersion();
         return GENERIC_EXIT_OK;
     }
 

@@ -172,12 +172,12 @@ void NetBase::ShowWebVideo()
 void NetBase::RunCmdWithoutScreensaver(const QString &cmd)
 {
     GetMythMainWindow()->PauseIdleTimer(true);
-    GetMythUI()->DisableScreensaver();
+    MythUIHelper::DisableScreensaver();
     GetMythMainWindow()->AllowInput(false);
     myth_system(cmd, kMSDontDisableDrawing);
     GetMythMainWindow()->AllowInput(true);
     GetMythMainWindow()->PauseIdleTimer(false);
-    GetMythUI()->RestoreScreensaver();
+    MythUIHelper::RestoreScreensaver();
 }
 
 void NetBase::SlotDeleteVideo()
@@ -223,7 +223,9 @@ void NetBase::customEvent(QEvent *event)
 {
     if (event->type() == MythEvent::MythEventMessage)
     {
-        MythEvent *me = static_cast<MythEvent *>(event);
+        MythEvent *me = dynamic_cast<MythEvent *>(event);
+        if (me == nullptr)
+            return;
         QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);
 
         if (tokens.isEmpty())

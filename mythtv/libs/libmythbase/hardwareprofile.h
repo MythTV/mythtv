@@ -22,14 +22,14 @@ class MBASE_PUBLIC HardwareProfile : public QObject
    ~HardwareProfile(void) = default;
 
     void Enable(void);
-    void Disable(void);
+    static void Disable(void);
 
     void GenerateUUIDs(void);
 
-    QString GetPrivateUUIDFromFile(void) const;
-    bool WritePrivateUUIDToFile(const QString &uuid);
+    static QString GetPrivateUUIDFromFile(void) ;
+    static bool WritePrivateUUIDToFile(const QString &uuid);
     QString GetPublicUUIDFromFile(void) const;
-    QString GetAdminPasswordFromFile(void) const;
+    static QString GetAdminPasswordFromFile(void) ;
 
     bool NeedsUpdate(void) const;
     bool SubmitProfile(bool updateTime=true);
@@ -39,7 +39,7 @@ class MBASE_PUBLIC HardwareProfile : public QObject
     QString   GetPrivateUUID(void) const { return m_uuid; };
     QDateTime GetLastUpdate(void) const { return m_lastUpdate; };
     QString   GetProfileURL(void) const;
-    QString   GetHardwareProfile(void) const;
+    static QString   GetHardwareProfile(void) ;
 
   private:
     bool      m_enabled {false};

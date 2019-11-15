@@ -91,7 +91,7 @@ class MPUBLIC MediaMonitor : public QObject
     MediaMonitor(QObject *par, unsigned long interval, bool allowEject);
     virtual ~MediaMonitor() = default;
 
-    void AttemptEject(MythMediaDevice *device);
+    static void AttemptEject(MythMediaDevice *device);
     void CheckDevices(void);
     virtual void CheckDeviceNotifications(void) {};
     virtual bool AddDevice(MythMediaDevice* pDevice) = 0;

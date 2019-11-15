@@ -252,7 +252,7 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
                     double lastplaydbl = mdata->LastPlay().toSecsSinceEpoch();
 #endif
                     double ratingValue = (double)(rating) / 10;
-                    double playcountValue, lastplayValue;
+                    double playcountValue = NAN, lastplayValue = NAN;
 
                     if (playcountMax == playcountMin)
                         playcountValue = 0;
@@ -370,7 +370,7 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
                 MusicMetadata *mdata = getRawSongAt(x);
                 if (mdata)
                 {
-                    uint32_t album_order;
+                    uint32_t album_order = 1;
                     album = album = mdata->Album() + " ~ " + QString("%1").arg(mdata->getAlbumId());;
                     if ((Ialbum = album_map.find(album)) == album_map.end())
                     {
@@ -438,7 +438,7 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
                 MusicMetadata *mdata = getRawSongAt(x);
                 if (mdata)
                 {
-                    uint32_t artist_order;
+                    uint32_t artist_order = 1;
                     artist = mdata->Artist() + " ~ " + mdata->Title();
                     if ((Iartist = artist_map.find(artist)) == artist_map.end())
                     {
@@ -644,14 +644,13 @@ void Playlist::resync(void)
 
 void Playlist::fillSongsFromSonglist(const QString& songList)
 {
-    MusicMetadata::IdType id;
     bool badTrack = false;
 
     QStringList list = songList.split(",", QString::SkipEmptyParts);
     QStringList::iterator it = list.begin();
     for (; it != list.end(); ++it)
     {
-        id = (*it).toUInt();
+        MusicMetadata::IdType id = (*it).toUInt();
         int repo = ID_TO_REPO(id);
         if (repo == RT_Radio)
         {
@@ -912,10 +911,10 @@ void Playlist::fillSonglistFromSmartPlaylist(const QString& category, const QStr
     }
 
     // find smartplaylist
-    int ID;
+    int ID = 0;
     QString matchType;
     QString orderBy;
-    int limitTo;
+    int limitTo = 0;
 
     query.prepare("SELECT smartplaylistid, matchtype, orderby, limitto "
                   "FROM music_smartplaylists "

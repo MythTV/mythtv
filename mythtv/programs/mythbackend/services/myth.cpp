@@ -269,7 +269,7 @@ DTC::StorageGroupDirList *Myth::GetStorageGroupDirs( const QString &sGroupName,
     {
         DTC::StorageGroupDir *pStorageGroupDir = pList->AddNewStorageGroupDir();
         QFileInfo fi(query.value(3).toString());
-        int64_t free, total, used;
+        int64_t free = 0, total = 0, used = 0;
 
         free = getDiskSpace(query.value(3).toString(), total, used);
 
@@ -409,11 +409,9 @@ DTC::TimeZoneInfo *Myth::GetTimeZone(  )
 
 QString Myth::GetFormatDate(const QDateTime Date, bool ShortDate)
 {
-    uint dateFormat;
+    uint dateFormat = MythDate::kDateFull | MythDate::kSimplify | MythDate::kAutoYear;
     if (ShortDate)
         dateFormat = MythDate::kDateShort | MythDate::kSimplify | MythDate::kAutoYear;
-    else
-        dateFormat = MythDate::kDateFull | MythDate::kSimplify | MythDate::kAutoYear;
 
     return MythDate::toString(Date, dateFormat);
 }
@@ -424,11 +422,9 @@ QString Myth::GetFormatDate(const QDateTime Date, bool ShortDate)
 
 QString Myth::GetFormatDateTime(const QDateTime DateTime, bool ShortDate)
 {
-    uint dateFormat;
+    uint dateFormat = MythDate::kDateTimeFull | MythDate::kSimplify | MythDate::kAutoYear;
     if (ShortDate)
         dateFormat = MythDate::kDateTimeShort | MythDate::kSimplify | MythDate::kAutoYear;
-    else
-        dateFormat = MythDate::kDateTimeFull | MythDate::kSimplify | MythDate::kAutoYear;
 
     return MythDate::toString(DateTime, dateFormat);
 }
@@ -909,7 +905,7 @@ bool Myth::BackupDatabase(void)
 
     LOG(VB_GENERAL, LOG_NOTICE, "Performing API invoked DB Backup.");
 
-    status = dbutil.BackupDB(filename);
+    status = DBUtil::BackupDB(filename);
 
     if (status == kDB_Backup_Completed)
     {
@@ -1023,7 +1019,7 @@ QString Myth::ProfileText()
     QString sProfileText;
 
     HardwareProfile profile;
-    sProfileText = profile.GetHardwareProfile();
+    sProfileText = HardwareProfile::GetHardwareProfile();
 
     return sProfileText;
 }
@@ -1073,7 +1069,7 @@ bool Myth::ManageDigestUser( const QString &sAction,
                              const QString &sAdminPassword )
 {
 
-    DigestUserActions sessionAction;
+    DigestUserActions sessionAction = DIGEST_USER_ADD;
 
     if (sAction == "Add")
         sessionAction = DIGEST_USER_ADD;
@@ -1089,11 +1085,9 @@ bool Myth::ManageDigestUser( const QString &sAction,
         return false;
     }
 
-    return gCoreContext->GetSessionManager()->ManageDigestUser(sessionAction,
-                                                               sUserName,
-                                                               sPassword,
-                                                               sNewPassword,
-                                                               sAdminPassword);
+    return MythSessionManager::ManageDigestUser(sessionAction, sUserName,
+                                                sPassword, sNewPassword,
+                                                sAdminPassword);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1103,10 +1097,7 @@ bool Myth::ManageDigestUser( const QString &sAction,
 bool Myth::ManageUrlProtection( const QString &sServices,
                                 const QString &sAdminPassword )
 {
-
-    MythSessionManager *sessionManager =  gCoreContext->GetSessionManager();
-
-    if (!sessionManager->IsValidUser("admin"))
+    if (!MythSessionManager::IsValidUser("admin"))
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Backend has no '%1' user!")
                                          .arg("admin"));
@@ -1114,7 +1105,7 @@ bool Myth::ManageUrlProtection( const QString &sServices,
     }
 
     if (MythSessionManager::CreateDigest("admin", sAdminPassword) !=
-            sessionManager->GetPasswordDigest("admin"))
+        MythSessionManager::GetPasswordDigest("admin"))
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Incorrect password for user: %1")
                                          .arg("admin"));

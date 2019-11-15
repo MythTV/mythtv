@@ -106,7 +106,7 @@ class MBASE_PUBLIC TransientStorage : public Storage
 class MBASE_PUBLIC HostDBStorage : public SimpleDBStorage
 {
   public:
-    HostDBStorage(StorageUser *_user, const QString &name);
+    HostDBStorage(StorageUser *_user, QString name);
     using SimpleDBStorage::Save; // prevent compiler warning
     void Save(void) override; // SimpleDBStorage
 
@@ -121,7 +121,7 @@ class MBASE_PUBLIC HostDBStorage : public SimpleDBStorage
 class MBASE_PUBLIC GlobalDBStorage : public SimpleDBStorage
 {
   public:
-    GlobalDBStorage(StorageUser *_user, const QString &name);
+    GlobalDBStorage(StorageUser *_user, QString name);
     using SimpleDBStorage::Save; // prevent compiler warning
     void Save(void) override; // SimpleDBStorage
 

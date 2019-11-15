@@ -14,10 +14,8 @@
 unsigned char
 quick_select(unsigned char *arr, int nelems, int select)
 {
-    int low, high;
-
-    low = 0;
-    high = nelems - 1;
+    int low = 0;
+    int high = nelems - 1;
 
     for (;;) {
         if (high <= low) /* One element only */
@@ -75,10 +73,8 @@ quick_select_median(unsigned char *arr, int nelems)
 unsigned short
 quick_select_ushort(unsigned short *arr, int nelems, int select)
 {
-    int low, high;
-
-    low = 0;
-    high = nelems - 1;
+    int low = 0;
+    int high = nelems - 1;
 
     for (;;) {
         if (high <= low) /* One element only */
@@ -136,10 +132,8 @@ quick_select_median_ushort(unsigned short *arr, int nelems)
 float
 quick_select_float(float *arr, int nelems, int select)
 {
-    int low, high;
-
-    low = 0;
-    high = nelems - 1;
+    int low = 0;
+    int high = nelems - 1;
 
     for (;;) {
         if (high <= low) /* One element only */

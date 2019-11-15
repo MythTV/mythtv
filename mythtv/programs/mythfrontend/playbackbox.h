@@ -298,7 +298,7 @@ class PlaybackBox : public ScheduleCommon
     void RemoveProgram(uint recordingID,
                        bool forgetHistory, bool forceMetadataDelete);
     void ShowDeletePopup(DeletePopupType);
-    void ShowAvailabilityPopup(const ProgramInfo&);
+    static void ShowAvailabilityPopup(const ProgramInfo&);
     void ShowActionPopup(const ProgramInfo&);
 
     QString getRecGroupPassword(const QString &recGroup);
@@ -331,7 +331,7 @@ class PlaybackBox : public ScheduleCommon
     //    { return CreatePopupMenu(title + CreateProgramInfoString(pginfo)); }
     bool CreatePopupMenuPlaylist(void);
 
-    QString CreateProgramInfoString(const ProgramInfo &pginfo) const;
+    static QString CreateProgramInfoString(const ProgramInfo &pginfo) ;
 
     QString extract_job_state(const ProgramInfo &pginfo);
     QString extract_commflag_state(const ProgramInfo &pginfo);

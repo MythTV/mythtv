@@ -26,6 +26,6 @@ class TestAvcInfo : public QObject
 
   private slots:
     void initTestCase();
-    void test_guids(void);
+    static void test_guids(void);
     void cleanupTestCase();
 };

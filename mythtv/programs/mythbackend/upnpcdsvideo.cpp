@@ -49,7 +49,6 @@ void UPnpCDSVideo::CreateRoot()
                                          m_sName,
                                          "0");
 
-    CDSObject* pContainer;
     QString containerId = m_sExtensionId + "/%1";
 
     // HACK: I'm not entirely happy with this solution, but it's at least
@@ -64,7 +63,7 @@ void UPnpCDSVideo::CreateRoot()
     // -----------------------------------------------------------------------
     // All Videos
     // -----------------------------------------------------------------------
-    pContainer = CDSObject::CreateContainer ( containerId.arg("Video"),
+    CDSObject* pContainer = CDSObject::CreateContainer ( containerId.arg("Video"),
                                               QObject::tr("All Videos"),
                                               m_sExtensionId, // Parent Id
                                               nullptr );
@@ -256,7 +255,7 @@ bool UPnpCDSVideo::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
 
 bool UPnpCDSVideo::LoadMetadata(const UPnpCDSRequest* pRequest,
                                  UPnpCDSExtensionResults* pResults,
-                                 IDTokenMap tokens, QString currentToken)
+                                 const IDTokenMap& tokens, const QString& currentToken)
 {
     if (currentToken.isEmpty())
     {
@@ -320,7 +319,7 @@ bool UPnpCDSVideo::LoadMetadata(const UPnpCDSRequest* pRequest,
 
 bool UPnpCDSVideo::LoadChildren(const UPnpCDSRequest* pRequest,
                                 UPnpCDSExtensionResults* pResults,
-                                IDTokenMap tokens, QString currentToken)
+                                const IDTokenMap& tokens, const QString& currentToken)
 {
     if (currentToken.isEmpty() || currentToken == m_sExtensionId.toLower())
     {
@@ -721,7 +720,7 @@ bool UPnpCDSVideo::LoadVideos(const UPnpCDSRequest* pRequest,
         URIBase.setHost(m_mapBackendIp[sHostName]);
         URIBase.setPort(m_mapBackendPort[sHostName]);
 
-        CDSObject *pItem;
+        CDSObject *pItem = nullptr;
         if (sContentType == "MOVIE")
         {
             pItem = CDSObject::CreateMovie( CreateIDString(sRequestId, "Video", nVidID),

@@ -154,8 +154,7 @@ public:
     //  adaption_rate [0..1] determines how fast the steering gets adapted, 1=instantaneous, 0.1 = very slow adaption
     void decode(float center_width, float dimension, float adaption_rate) {
         // process first part
-        int index;
-        index = current_buf*halfN;
+        int index = current_buf*halfN;
         float *in_second[2] = {&inbuf[0][index],&inbuf[1][index]};
         current_buf ^= 1;
         index = current_buf*halfN;
@@ -378,7 +377,7 @@ private:
 
 #define FASTER_CALC
     // map from amplitude difference and phase difference to yfs
-    inline double get_yfs(double ampDiff, double phaseDiff) {
+    static inline double get_yfs(double ampDiff, double phaseDiff) {
         double x = 1-(((1-sqr(ampDiff))*phaseDiff)/PI*2);
 #ifdef FASTER_CALC
         double tanX = tan(x);
@@ -391,7 +390,7 @@ private:
     }
 
     // map from amplitude difference and yfs to xfs
-    inline double get_xfs(double ampDiff, double yfs) {
+    static inline double get_xfs(double ampDiff, double yfs) {
         double x=ampDiff,y=yfs;
 #ifdef FASTER_CALC
         double tanX = tan(x);
@@ -427,8 +426,7 @@ private:
     // filter the complex source signal and add it to target
     void apply_filter(cfloat *signal, const float *flt, float *target) {
         // filter the signal
-        unsigned f;
-        for (f=0;f<=halfN;f++) {
+        for (unsigned f=0;f<=halfN;f++) {
             src[f][0] = signal[f].real() * flt[f];
             src[f][1] = signal[f].imag() * flt[f];
         }
@@ -452,7 +450,7 @@ private:
         }
 #else
         // enforce odd symmetry
-        for (f=1;f<halfN;f++) {
+        for (unsigned f=1;f<halfN;f++) {
             src[N-f][0] = src[f][0];
             src[N-f][1] = -src[f][1];   // complex conjugate
         }

@@ -135,7 +135,7 @@ void ExitPrompter::quit()
     else
     {
         // No need to run this if the backend has just restarted
-        if (gCoreContext->BackendIsRunning())
+        if (MythCoreContext::BackendIsRunning())
         {
             gCoreContext->SendMessage("CLEAR_SETTINGS_CACHE");
         }

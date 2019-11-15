@@ -112,9 +112,9 @@ class NetworkControl : public ServerPool, public QRunnable
     QString processLiveTV(NetworkCommand *nc);
     QString processPlay(NetworkCommand *nc, int clientID);
     QString processQuery(NetworkCommand *nc);
-    QString processSet(NetworkCommand *nc);
-    QString processMessage(NetworkCommand *nc);
-    QString processNotification(NetworkCommand *nc);
+    static QString processSet(NetworkCommand *nc);
+    static QString processMessage(NetworkCommand *nc);
+    static QString processNotification(NetworkCommand *nc);
     QString processTheme(NetworkCommand *nc);
     QString processHelp(NetworkCommand *nc);
 
@@ -122,16 +122,16 @@ class NetworkControl : public ServerPool, public QRunnable
     void sendReplyToClient(NetworkControlClient *ncc, QString &reply);
     void customEvent(QEvent *e) override; // QObject
 
-    QString listRecordings(const QString& chanid = "", const QString& starttime = "");
-    QString listSchedule(const QString& chanID = "") const;
-    QString listChannels(const uint start, const uint limit) const;
-    QString saveScreenshot(NetworkCommand *nc);
+    static QString listRecordings(const QString& chanid = "", const QString& starttime = "");
+    static QString listSchedule(const QString& chanID = "") ;
+    static QString listChannels(const uint start, const uint limit) ;
+    static QString saveScreenshot(NetworkCommand *nc);
 
     void processNetworkControlCommand(NetworkCommand *nc);
 
     void deleteClient(NetworkControlClient *ncc);
 
-    QString getWidgetType(MythUIType *type);
+    static QString getWidgetType(MythUIType *type);
 
     QString prompt             {"# "};
     bool    gotAnswer          {false};

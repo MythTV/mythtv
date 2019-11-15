@@ -31,7 +31,7 @@ class FileAssocDialog : public MythScreenType
     void OnDeletePressed();
     void OnNewExtensionPressed();
 
-    void OnNewExtensionComplete(QString newExtension);
+    void OnNewExtensionComplete(const QString& newExtension);
 
   private:
     void UpdateScreen(bool useSelectionOverride = false);

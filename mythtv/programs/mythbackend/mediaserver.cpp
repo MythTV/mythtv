@@ -130,8 +130,8 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
 
     LOG(VB_UPNP, LOG_INFO, "MediaServer: Registering Http Server Extensions.");
 
-    HtmlServerExtension *pHtmlServer;
-    pHtmlServer = new HtmlServerExtension(m_sSharePath + "html", "backend_");
+    HtmlServerExtension *pHtmlServer =
+        new HtmlServerExtension(m_sSharePath + "html", "backend_");
     pHttpServer->RegisterExtension( pHtmlServer );
     pHttpServer->RegisterExtension( new HttpConfig() );
     pHttpServer->RegisterExtension( new InternetContent   ( m_sSharePath ));

@@ -78,14 +78,17 @@ struct VideoPlayProc
 class VideoPlayHandleMedia : public VideoPlayProc
 {
   private:
-    VideoPlayHandleMedia(const QString &handler, const QString &mrl,
-            const QString &plot, const QString &title, const QString &subtitle,
-            const QString &director, int season, int episode, const QString &inetref,
-            int length, const QString &year, const QString &id) :
-        m_handler(handler), m_mrl(mrl), m_plot(plot), m_title(title),
-        m_subtitle(subtitle), m_director(director), m_season(season),
-        m_episode(episode), m_inetref(inetref), m_length(length), m_year(year),
-        m_id(id)
+    VideoPlayHandleMedia(QString handler, QString mrl,
+            QString plot, QString title, QString subtitle,
+            QString director, int season, int episode, QString inetref,
+            int length, QString year, QString id) :
+        m_handler(std::move(handler)), m_mrl(std::move(mrl)),
+        m_plot(std::move(plot)), m_title(std::move(title)),
+        m_subtitle(std::move(subtitle)),
+        m_director(std::move(director)), m_season(season),
+        m_episode(episode), m_inetref(std::move(inetref)),
+        m_length(length), m_year(std::move(year)),
+        m_id(std::move(id))
     {
     }
 
@@ -137,9 +140,9 @@ class VideoPlayHandleMedia : public VideoPlayProc
 class VideoPlayMythSystem : public VideoPlayProc
 {
   private:
-    VideoPlayMythSystem(const QString &disp_command,
-            const QString &play_command) :
-        m_display_command(disp_command), m_play_command(play_command)
+    VideoPlayMythSystem(QString disp_command,
+            QString play_command) :
+        m_display_command(std::move(disp_command)), m_play_command(std::move(play_command))
     {
     }
 

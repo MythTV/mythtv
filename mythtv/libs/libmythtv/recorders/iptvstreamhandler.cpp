@@ -109,8 +109,6 @@ IPTVStreamHandler::IPTVStreamHandler(const IPTVTuningData &tuning, int inputid)
     : StreamHandler(tuning.GetDeviceKey(), inputid)
     , m_tuning(tuning)
 {
-    memset(m_sockets, 0, sizeof(m_sockets));
-    memset(m_read_helpers, 0, sizeof(m_read_helpers));
     m_use_rtp_streaming = m_tuning.IsRTP();
 }
 

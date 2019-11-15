@@ -98,7 +98,7 @@ class HLSRecStream
   private:
     QString     m_keypath;              // URL path of the encrypted key
     bool        m_ivloaded       {false};
-    uint8_t     m_AESIV[AES_BLOCK_SIZE];// IV used when decypher the block
+    uint8_t     m_AESIV[AES_BLOCK_SIZE] {0};// IV used when decypher the block
     AESKeyMap   m_aeskeys;       // AES-128 keys by path
 #endif // USING_LIBCRYPTO
 };

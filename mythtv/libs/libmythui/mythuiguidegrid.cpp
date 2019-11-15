@@ -28,13 +28,6 @@ using namespace std;
 MythUIGuideGrid::MythUIGuideGrid(MythUIType *parent, const QString &name)
     : MythUIType(parent, name)
 {
-    // themeable setting defaults
-    for (uint x = 0; x < RECSTATUSSIZE; x++)
-        m_recImages[x] = nullptr;
-
-    for (uint x = 0; x < ARROWIMAGESIZE; x++)
-        m_arrowImages[x] = nullptr;
-
     m_font = new MythFontProperties();
 
     QMap<QString, QString> catColors;

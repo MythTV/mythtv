@@ -89,7 +89,7 @@ static QString relative_URI(const QString &surl, const QString &spath)
 
 static uint64_t mdate(void)
 {
-    timeval  t;
+    timeval  t {};
     gettimeofday(&t, nullptr);
     return t.tv_sec * 1000000ULL + t.tv_usec;
 }
@@ -126,7 +126,6 @@ public:
         m_title         = title;
 #ifdef USING_LIBCRYPTO
         m_psz_key_path  = current_key_path;
-        memset(&m_aeskey, 0, sizeof(m_aeskey));
 #else
         Q_UNUSED(current_key_path);
 #endif
@@ -372,14 +371,14 @@ public:
         m_keyloaded = segment.m_keyloaded;
     }
 private:
-    AES_KEY     m_aeskey;       // AES-128 key
+    AES_KEY     m_aeskey    {}; // AES-128 key
     bool        m_keyloaded {false};
     QString     m_psz_key_path; // URL key path
 #endif
 
 private:
     int         m_id;           // unique sequence number
-    int         m_duration;     // segment duration (seconds)
+    int         m_duration {0}; // segment duration (seconds)
     uint64_t    m_bitrate {0};  // bitrate of segment's content (bits per second)
     QString     m_title;        // human-readable informative title of the media segment
 
@@ -852,7 +851,7 @@ public:
 private:
     QString     m_keypath;              // URL path of the encrypted key
     bool        m_ivloaded       {false};
-    uint8_t     m_AESIV[AES_BLOCK_SIZE];// IV used when decypher the block
+    uint8_t     m_AESIV[AES_BLOCK_SIZE]{0};// IV used when decypher the block
 #endif
 
 private:

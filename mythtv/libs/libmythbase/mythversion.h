@@ -75,7 +75,7 @@
  *      mythtv/bindings/php/MythBackend.php
  */
 
-#define MYTH_DATABASE_VERSION "1352"
+#define MYTH_DATABASE_VERSION "1355"
 
 
  MBASE_PUBLIC  const char *GetMythSourceVersion();

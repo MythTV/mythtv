@@ -78,7 +78,7 @@ class PlaylistEditorView : public MusicCommon
 
   private slots:
     void treeItemClicked(MythUIButtonListItem *item);
-    void treeItemVisible(MythUIButtonListItem *item);
+    static void treeItemVisible(MythUIButtonListItem *item);
     void treeNodeChanged(MythGenericTree *node);
     void smartPLChanged(const QString &category, const QString &name);
     void deleteSmartPlaylist(bool ok);
@@ -87,14 +87,14 @@ class PlaylistEditorView : public MusicCommon
   private:
     void filterTracks(MusicGenericTree *node);
 
-    void getPlaylists(MusicGenericTree *node);
-    void getPlaylistTracks(MusicGenericTree *node, int playlistID);
+    static void getPlaylists(MusicGenericTree *node);
+    static void getPlaylistTracks(MusicGenericTree *node, int playlistID);
 
-    void getSmartPlaylistCategories(MusicGenericTree *node);
-    void getSmartPlaylists(MusicGenericTree *node);
-    void getSmartPlaylistTracks(MusicGenericTree *node, int playlistID);
+    static void getSmartPlaylistCategories(MusicGenericTree *node);
+    static void getSmartPlaylists(MusicGenericTree *node);
+    static void getSmartPlaylistTracks(MusicGenericTree *node, int playlistID);
 
-    void getCDTracks(MusicGenericTree *node);
+    static void getCDTracks(MusicGenericTree *node);
 
     void updateSelectedTracks(void);
     void updateSelectedTracks(MusicGenericTree *node);

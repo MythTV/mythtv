@@ -115,6 +115,7 @@ bool CleanupTask::DoRun(void)
     CleanupInUsePrograms();
     CleanupOrphanedLiveTV();
     CleanupRecordedTables();
+    CleanupChannelTables();
     CleanupProgramListings();
     return true;
 }
@@ -275,6 +276,36 @@ void CleanupTask::CleanupRecordedTables(void)
     if (!query.exec("DROP TABLE temprecordedcleanup;"))
         MythDB::DBError("CleanupTask::CleanupRecordedTables"
                                 "(deleting temporary table)", query);
+}
+
+void CleanupTask::CleanupChannelTables(void)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    MSqlQuery deleteQuery(MSqlQuery::InitCon());
+
+    query.prepare(QString("DELETE channel "
+                          "FROM channel "
+                          "LEFT JOIN recorded r "
+                          "    ON r.chanid = channel.chanid "
+                          "LEFT JOIN oldrecorded o "
+                          "    ON o.chanid = channel.chanid "
+                          "WHERE channel.deleted IS NOT NULL "
+                          "      AND channel.deleted < "
+                          "          DATE_SUB(NOW(), INTERVAL 1 DAY) "
+                          "      AND r.chanid IS NULL "
+                          "      AND o.chanid IS NULL"));
+    if (!query.exec())
+        MythDB::DBError("CleanupTask::CleanupChannelTables "
+                        "(channel table)", query);
+
+    query.prepare(QString("DELETE dtv_multiplex "
+                          "FROM dtv_multiplex "
+                          "LEFT JOIN channel c "
+                          "    ON c.mplexid = dtv_multiplex.mplexid "
+                          "WHERE c.chanid IS NULL"));
+    if (!query.exec())
+        MythDB::DBError("CleanupTask::CleanupChannelTables "
+                        "(dtv_multiplex table)", query);
 }
 
 void CleanupTask::CleanupProgramListings(void)

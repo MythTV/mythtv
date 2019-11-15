@@ -307,7 +307,7 @@ void Dsmcc::ProcessDownloadInfoIndication(const unsigned char *data,
 void Dsmcc::ProcessSectionIndication(const unsigned char *data,
                                      int length, unsigned short streamTag)
 {
-    DsmccSectionHeader section;
+    DsmccSectionHeader section {};
     if (!ProcessSectionHeader(&section, data + DSMCC_SECTION_OFFSET, length))
         return;
 
@@ -379,7 +379,7 @@ void Dsmcc::ProcessSectionIndication(const unsigned char *data,
 // DDB Message.
 void Dsmcc::ProcessSectionData(const unsigned char *data, int length)
 {
-    DsmccSectionHeader section;
+    DsmccSectionHeader section {};
     if (!ProcessSectionHeader(&section, data + DSMCC_SECTION_OFFSET, length))
         return;
 
@@ -437,7 +437,7 @@ void Dsmcc::ProcessSectionData(const unsigned char *data, int length)
 
 void Dsmcc::ProcessSectionDesc(const unsigned char *data, int length)
 {
-    DsmccSectionHeader section;
+    DsmccSectionHeader section {};
     ProcessSectionHeader(&section, data + DSMCC_SECTION_OFFSET, length);
 
     /* TODO */

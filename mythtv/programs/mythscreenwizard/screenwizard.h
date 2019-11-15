@@ -74,7 +74,7 @@ class ScreenWizard : public MythScreenType
 
     void slotSaveSettings();
     void slotChangeCoarseFine();
-    void slotResetSettings();
+    static void slotResetSettings();
 };
 
 #endif

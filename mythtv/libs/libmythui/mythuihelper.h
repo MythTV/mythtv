@@ -64,7 +64,7 @@ class MUI_PUBLIC MythUIHelper
     void ExcludeFromCacheSize(MythImage *im);
 
     bool IsScreenSetup(void);
-    bool IsTopScreenInitialized(void);
+    static bool IsTopScreenInitialized(void);
 
     // which the user may have set to be different from the raw screen size
     void GetScreenSettings(float &wmult, float &hmult);
@@ -78,7 +78,7 @@ class MUI_PUBLIC MythUIHelper
 
     // Parse an X11 style command line (-geometry) string
     static void ParseGeometryOverride(const QString &geometry);
-    bool IsGeometryOverridden(void);
+    static bool IsGeometryOverridden(void);
 
     /// Returns a reference counted image from the cache.
     /// \note The reference count is set for one use call DecrRef() to delete.
@@ -96,16 +96,16 @@ class MUI_PUBLIC MythUIHelper
 
     bool FindThemeFile(QString &path);
 
-    QFont GetBigFont(void);
-    QFont GetMediumFont(void);
-    QFont GetSmallFont(void);
+    static QFont GetBigFont(void);
+    static QFont GetMediumFont(void);
+    static QFont GetSmallFont(void);
 
     // event wrappers
-    void DisableScreensaver(void);
-    void RestoreScreensaver(void);
+    static void DisableScreensaver(void);
+    static void RestoreScreensaver(void);
     // Reset screensaver idle time, for input events that X doesn't see
     // (e.g., lirc)
-    void ResetScreensaver(void);
+    static void ResetScreensaver(void);
 
     // actually do it
     void DoDisableScreensaver(void);
@@ -145,7 +145,7 @@ class MUI_PUBLIC MythUIHelper
 
     void ClearOldImageCache(void);
     void RemoveCacheDir(const QString &dirname);
-    void PruneCacheDir(const QString& dirname);
+    static void PruneCacheDir(const QString& dirname);
 
     MythUIHelperPrivate *d {nullptr};
 

@@ -102,8 +102,8 @@ class IPTVStreamHandler : public StreamHandler
 
   protected:
     IPTVTuningData                m_tuning;
-    QUdpSocket                   *m_sockets[IPTV_SOCKET_COUNT];
-    IPTVStreamHandlerReadHelper  *m_read_helpers[IPTV_SOCKET_COUNT];
+    QUdpSocket                   *m_sockets[IPTV_SOCKET_COUNT] {};
+    IPTVStreamHandlerReadHelper  *m_read_helpers[IPTV_SOCKET_COUNT] {};
     QHostAddress                  m_sender[IPTV_SOCKET_COUNT];
     IPTVStreamHandlerWriteHelper *m_write_helper      {nullptr};
     PacketBuffer                 *m_buffer            {nullptr};

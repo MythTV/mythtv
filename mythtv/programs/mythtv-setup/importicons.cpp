@@ -23,9 +23,9 @@
 #include "mythprogressdialog.h"
 
 ImportIconsWizard::ImportIconsWizard(MythScreenStack *parent, bool fRefresh,
-                                     const QString &channelname)
+                                     QString channelname)
                   :MythScreenType(parent, "ChannelIconImporter"),
-    m_strChannelname(channelname), m_fRefresh(fRefresh)
+    m_strChannelname(std::move(channelname)), m_fRefresh(fRefresh)
 {
     if (!m_strChannelname.isEmpty())
         LOG(VB_GENERAL, LOG_INFO,
@@ -287,7 +287,7 @@ bool ImportIconsWizard::initialLoad(const QString& name)
                         "dtv_multiplex.mplexid, channel.icon, channel.visible "
                         "FROM channel LEFT JOIN dtv_multiplex "
                         "ON channel.mplexid = dtv_multiplex.mplexid "
-                        "WHERE ");
+                        "WHERE deleted IS NULL AND ");
     if (!name.isEmpty())
         querystring.append("name=\"" + name + "\"");
     else
@@ -697,7 +697,7 @@ bool ImportIconsWizard::search(const QString& strParam)
                 entry.strLogo = ret[2];
                 m_listSearch.append(entry);
 
-                MythUIButtonListItem *item;
+                MythUIButtonListItem *item = nullptr;
                 if (prevIconName == entry.strName)
                 {
                     QString newname = QString("%1 (%2)").arg(entry.strName)

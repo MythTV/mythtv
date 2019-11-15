@@ -299,10 +299,10 @@ signals:
     void sendToServer(const QString &someText);
 
   private:
-    bool startLCDServer(void);
+    static bool startLCDServer(void);
     void init();
     void handleKeyPress(const QString &keyPressed);
-    QString quotedString(const QString &string);
+    static QString quotedString(const QString &string);
     void describeServer();
 
   private slots:

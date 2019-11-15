@@ -312,35 +312,35 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
 
   protected:
     int                       _cardid;
-    QString                   _sistandard;
+    QString                   _sistandard                   {"mpeg"};
 
-    bool                      _have_CRC_bug;
+    bool                      _have_CRC_bug {false};
 
     mutable QMutex            _si_time_lock;
-    uint                      _si_time_offset_cnt;
-    uint                      _si_time_offset_indx;
-    double                    _si_time_offsets[16];
+    uint                      _si_time_offset_cnt           {0};
+    uint                      _si_time_offset_indx          {0};
+    double                    _si_time_offsets[16]          {0.0};
 
     // Generic EIT stuff used for ATSC and DVB
-    EITHelper                *_eit_helper;
-    float                     _eit_rate;
+    EITHelper                *_eit_helper                   {nullptr};
+    float                     _eit_rate                     {0.0F};
 
     // Listening
     pid_map_t                 _pids_listening;
     pid_map_t                 _pids_notlistening;
     pid_map_t                 _pids_writing;
     pid_map_t                 _pids_audio;
-    bool                      _listening_disabled;
+    bool                      _listening_disabled           {false};
 
     // Encryption monitoring
-    mutable QMutex            _encryption_lock;
+    mutable QMutex            _encryption_lock              {QMutex::Recursive};
     QMap<uint, CryptInfo>     _encryption_pid_to_info;
     QMap<uint, uint_vec_t>    _encryption_pnum_to_pids;
     QMap<uint, uint_vec_t>    _encryption_pid_to_pnums;
     QMap<uint, CryptStatus>   _encryption_pnum_to_status;
 
     // Signals
-    mutable QMutex            _listener_lock;
+    mutable QMutex            _listener_lock                {QMutex::Recursive};
     mpeg_listener_vec_t       _mpeg_listeners;
     mpeg_sp_listener_vec_t    _mpeg_sp_listeners;
     ts_listener_vec_t         _ts_writing_listeners;
@@ -357,7 +357,7 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
 
     // Caching
     bool                             _cache_tables;
-    mutable QMutex                   _cache_lock;
+    mutable QMutex                   _cache_lock            {QMutex::Recursive};
     mutable pat_cache_t              _cached_pats;
     mutable cat_cache_t              _cached_cats;
     mutable pmt_cache_t              _cached_pmts;
@@ -366,20 +366,20 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
 
     // Single program variables
     int                       _desired_program;
-    QString                   _recording_type;
-    bool                      _strip_pmt_descriptors;
-    bool                      _normalize_stream_type;
-    uint                      _pid_video_single_program;
-    uint                      _pid_pmt_single_program;
-    uint                      _pmt_single_program_num_video;
-    uint                      _pmt_single_program_num_audio;
-    ProgramAssociationTable  *_pat_single_program;
-    ProgramMapTable          *_pmt_single_program;
+    QString                   _recording_type               {"all"};
+    bool                      _strip_pmt_descriptors        {false};
+    bool                      _normalize_stream_type        {true};
+    uint                      _pid_video_single_program     {0xffffffff};
+    uint                      _pid_pmt_single_program       {0xffffffff};
+    uint                      _pmt_single_program_num_video {1};
+    uint                      _pmt_single_program_num_audio {0};
+    ProgramAssociationTable  *_pat_single_program           {nullptr};
+    ProgramMapTable          *_pmt_single_program           {nullptr};
 
   // PAT Timeout handling.
   private:
-    bool                      _invalid_pat_seen;
-    bool                      _invalid_pat_warning;
+    bool                      _invalid_pat_seen             {false};
+    bool                      _invalid_pat_warning          {false};
     MythTimer                 _invalid_pat_timer;
 };
 

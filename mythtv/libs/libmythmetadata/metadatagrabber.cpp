@@ -309,9 +309,8 @@ QString MetaGrabberScript::CleanedInetref(const QString &inetref)
     return inetref;
 }
 
-MetaGrabberScript::MetaGrabberScript(const QString &path,
-                                     const QDomElement &dom) :
-    m_fullcommand(path)
+MetaGrabberScript::MetaGrabberScript(QString path, const QDomElement &dom) :
+    m_fullcommand(std::move(path))
 {
     ParseGrabberVersion(dom);
 }

@@ -35,7 +35,7 @@ StartPrompter::~StartPrompter()
 void StartPrompter::handleStart()
 {
     // Offer to stop the backend if sensible
-    if (gCoreContext->BackendIsRunning() && gCoreContext->IsMasterHost())
+    if (MythCoreContext::BackendIsRunning() && gCoreContext->IsMasterHost())
     {
         backendRunningPrompt();
     }    

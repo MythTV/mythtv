@@ -242,12 +242,11 @@ static QString getSystemTimeZoneID(void)
             // least get the zone name/abbreviation (as opposed to the
             // identifier for the set of rules governing the zone)
             char name[64];
-            time_t t;
             struct tm *result = (struct tm *)malloc(sizeof(*result));
 
             if (result != nullptr)
             {
-                t = time(nullptr);
+                time_t t = time(nullptr);
                 localtime_r(&t, result);
                 if (result != nullptr)
                 {

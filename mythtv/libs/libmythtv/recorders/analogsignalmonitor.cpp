@@ -38,7 +38,7 @@ AnalogSignalMonitor::AnalogSignalMonitor(int db_cardnum,
 
 bool AnalogSignalMonitor::VerifyHDPVRaudio(int videofd)
 {
-    struct v4l2_queryctrl qctrl;
+    struct v4l2_queryctrl qctrl {};
     qctrl.id = V4L2_CID_MPEG_AUDIO_ENCODING;
 
     int audtype = V4L2_MPEG_AUDIO_ENCODING_AC3;
@@ -52,10 +52,9 @@ bool AnalogSignalMonitor::VerifyHDPVRaudio(int videofd)
 
     int  current_audio;
 
-    struct v4l2_ext_control  ext_ctrl;
-    struct v4l2_ext_controls ext_ctrls;
+    struct v4l2_ext_control  ext_ctrl {};
+    struct v4l2_ext_controls ext_ctrls {};
 
-    memset(&ext_ctrl, 0, sizeof(struct v4l2_ext_control));
     ext_ctrl.id = V4L2_CID_MPEG_AUDIO_ENCODING;
 
     ext_ctrls.reserved[0] = ext_ctrls.reserved[1] = 0;
@@ -115,8 +114,7 @@ bool AnalogSignalMonitor::VerifyHDPVRaudio(int videofd)
  */
 bool AnalogSignalMonitor::handleHDPVR(int videofd)
 {
-    struct v4l2_format vfmt;
-    memset(&vfmt, 0, sizeof(vfmt));
+    struct v4l2_format vfmt {};
     vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
     if ((ioctl(videofd, VIDIOC_G_FMT, &vfmt) == 0) &&
@@ -183,8 +181,7 @@ void AnalogSignalMonitor::UpdateValues(void)
             isLocked = handleHDPVR(videofd);
         else
         {
-            struct v4l2_tuner tuner;
-            memset(&tuner, 0, sizeof(tuner));
+            struct v4l2_tuner tuner {};
 
             if (ioctl(videofd, VIDIOC_G_TUNER, &tuner, 0) < 0)
             {

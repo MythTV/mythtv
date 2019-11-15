@@ -28,25 +28,25 @@ class TestEITFixups : public QObject
     Q_OBJECT
 
   private slots:
-    void testUKFixups1(void);
-    void testUKFixups2(void);
-    void testUKFixups3(void);
-    void testUKFixups4(void);
-    void testUKFixups5(void);
-    void testUKFixups6(void);
-    void testUKFixups7(void);
-    void testUKFixups8(void);
-    void testUKFixups9(void);
-    void testUKLawAndOrder(void);
-    void testUKMarvel(void);
-    void testUKXFiles(void);
-    void testDEPro7Sat1(void);
-    void testHTMLFixup(void);
-    void testSkyEpisodes(void);
-    void testUnitymedia(void);
-    void testDeDisneyChannel(void);
-    void testATV(void);
-    void test64BitEnum(void);
+    static void testUKFixups1(void);
+    static void testUKFixups2(void);
+    static void testUKFixups3(void);
+    static void testUKFixups4(void);
+    static void testUKFixups5(void);
+    static void testUKFixups6(void);
+    static void testUKFixups7(void);
+    static void testUKFixups8(void);
+    static void testUKFixups9(void);
+    static void testUKLawAndOrder(void);
+    static void testUKMarvel(void);
+    static void testUKXFiles(void);
+    static void testDEPro7Sat1(void);
+    static void testHTMLFixup(void);
+    static void testSkyEpisodes(void);
+    static void testUnitymedia(void);
+    static void testDeDisneyChannel(void);
+    static void testATV(void);
+    static void test64BitEnum(void);
 
   private:
     static DBEventEIT *SimpleDBEventEIT (FixupValue fix, const QString& title, const QString& subtitle, const QString& description);

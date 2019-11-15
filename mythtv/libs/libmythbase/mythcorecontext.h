@@ -83,8 +83,9 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
                            uint timeout_ms = kMythSocketLongTimeout,
                            bool error_dialog_desired = false);
 
-    QString GenMythURL(const QString& host = QString(), int port = 0,
-                       QString path = QString(), const QString& storageGroup = QString());
+    static QString GenMythURL(const QString& host = QString(), int port = 0,
+                              QString path = QString(),
+                              const QString& storageGroup = QString());
 
     QString GetMasterHostPrefix(const QString &storageGroup = QString(),
                                 const QString &path = QString());
@@ -102,7 +103,7 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     bool IsMasterHost(void);     ///< is this the same host as the master
     bool IsMasterHost(const QString &host); ///< is specified host the master
     bool IsMasterBackend(void);  ///< is this the actual MBE process
-    bool BackendIsRunning(void); ///< a backend process is running on this host
+    static bool BackendIsRunning(void); ///< a backend process is running on this host
 
     bool IsThisBackend(const QString &addr);    ///< is this address mapped to this backend host
     bool IsThisHost(const QString &addr); ///< is this address mapped to this host
@@ -177,7 +178,7 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     QString GetBackendServerIP6(void);
     QString GetBackendServerIP6(const QString &host);
     QString GetMasterServerIP(void);
-    int GetMasterServerPort(void);
+    static int GetMasterServerPort(void);
     int GetMasterServerStatusPort(void);
     int GetBackendServerPort(void);
     int GetBackendServerPort(const QString &host);
@@ -192,9 +193,9 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
                                   const QString &host = QString(),
                                   ResolveType type = ResolveAny,
                                   bool keepscope = false);
-    QString resolveAddress(const QString &host,
-                           ResolveType = ResolveAny,
-                           bool keepscope = false) const;
+    static QString resolveAddress(const QString &host,
+                                  ResolveType = ResolveAny,
+                                  bool keepscope = false) ;
     bool CheckSubnet(const QAbstractSocket *socket);
     bool CheckSubnet(const QHostAddress &peer);
 
@@ -224,7 +225,7 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     MythSessionManager *GetSessionManager(void);
 
     // Plugin related methods
-    bool TestPluginVersion(const QString &name, const QString &libversion,
+    static bool TestPluginVersion(const QString &name, const QString &libversion,
                           const QString &pluginversion);
 
     void SetPluginManager(MythPluginManager *pmanager);

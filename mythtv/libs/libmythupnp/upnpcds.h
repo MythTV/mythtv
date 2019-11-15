@@ -186,7 +186,7 @@ class UPNP_PUBLIC UPnPShortcutFeature : public UPnPFeature
     QString CreateXML() override; // UPnPFeature
 
   private:
-    QString TypeToName(ShortCutType type);
+    static QString TypeToName(ShortCutType type);
     QMap<ShortCutType, QString> m_shortcuts;
 };
 
@@ -209,7 +209,7 @@ class UPNP_PUBLIC UPnpCDSExtension
 
     protected:
 
-        QString RemoveToken ( const QString &sToken, const QString &sStr, int num );
+        static QString RemoveToken ( const QString &sToken, const QString &sStr, int num );
 
         // ------------------------------------------------------------------
 
@@ -225,23 +225,23 @@ class UPNP_PUBLIC UPnpCDSExtension
         virtual void CreateRoot ( );
 
         virtual bool LoadMetadata ( const UPnpCDSRequest *pRequest,
-                                     UPnpCDSExtensionResults *pResults,
-                                     IDTokenMap tokens,
-                                     QString currentToken );
+                                    UPnpCDSExtensionResults *pResults,
+                                    const IDTokenMap& tokens,
+                                    const QString& currentToken );
         virtual bool LoadChildren ( const UPnpCDSRequest *pRequest,
                                     UPnpCDSExtensionResults *pResults,
-                                    IDTokenMap tokens,
-                                    QString currentToken );
+                                    const IDTokenMap& tokens,
+                                    const QString& currentToken );
 
-        IDTokenMap TokenizeIDString ( const QString &Id ) const;
-        IDToken    GetCurrentToken  ( const QString &Id ) const;
+        static IDTokenMap TokenizeIDString ( const QString &Id ) ;
+        static IDToken    GetCurrentToken  ( const QString &Id ) ;
 
-        QString    CreateIDString   ( const QString &RequestId,
-                                      const QString &Name,
-                                      int Value );
-        QString    CreateIDString   ( const QString &RequestId,
-                                      const QString &Name,
-                                      const QString &Value );
+        static QString    CreateIDString   ( const QString &RequestId,
+                                             const QString &Name,
+                                             int Value );
+        static QString CreateIDString ( const QString &RequestId,
+                                        const QString &Name,
+                                        const QString &Value );
 
         CDSObject *m_pRoot {nullptr};
 
@@ -293,17 +293,17 @@ class UPNP_PUBLIC UPnpCDS : public Eventing
 
     private:
 
-        UPnpCDSMethod       GetMethod              ( const QString &sURI  );
-        UPnpCDSBrowseFlag   GetBrowseFlag          ( const QString &sFlag );
+        static UPnpCDSMethod       GetMethod              ( const QString &sURI  );
+        static UPnpCDSBrowseFlag   GetBrowseFlag          ( const QString &sFlag );
 
         void            HandleBrowse               ( HTTPRequest *pRequest );
         void            HandleSearch               ( HTTPRequest *pRequest );
-        void            HandleGetSearchCapabilities( HTTPRequest *pRequest );
-        void            HandleGetSortCapabilities  ( HTTPRequest *pRequest );
+        static void     HandleGetSearchCapabilities( HTTPRequest *pRequest );
+        static void     HandleGetSortCapabilities  ( HTTPRequest *pRequest );
         void            HandleGetSystemUpdateID    ( HTTPRequest *pRequest );
         void            HandleGetFeatureList       ( HTTPRequest *pRequest );
         void            HandleGetServiceResetToken ( HTTPRequest *pRequest );
-        void            DetermineClient            ( HTTPRequest *pRequest, UPnpCDSRequest *pCDSRequest );
+        static void     DetermineClient            ( HTTPRequest *pRequest, UPnpCDSRequest *pCDSRequest );
 
     protected:
 

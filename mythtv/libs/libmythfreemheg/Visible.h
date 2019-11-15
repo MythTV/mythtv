@@ -83,7 +83,7 @@ class MHVisible : public MHPresentable
     MHObjectRef m_PaletteRef;
 
     // Return the colour, looking up in the palette if necessary.
-    MHRgba GetColour(const MHColour &colour);
+    static MHRgba GetColour(const MHColour &colour);
 };
 
 class MHLineArt : public MHVisible  

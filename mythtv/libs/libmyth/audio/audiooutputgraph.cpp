@@ -31,7 +31,7 @@ public:
     void SetMaxSamples(unsigned samples) { m_maxSamples = samples; }
     void SetSampleRate(unsigned sample_rate) { m_sample_rate = sample_rate; }
 
-    inline int BitsPerChannel() const { return sizeof(short) * CHAR_BIT; }
+    static inline int BitsPerChannel() { return sizeof(short) * CHAR_BIT; }
     inline int Channels() const { return m_channels; }
 
     inline int64_t Next() const { return m_tcNext; }
@@ -272,7 +272,7 @@ MythImage *AudioOutputGraph::GetImage(int64_t timecode) const
     if (width <= 0)
         return nullptr;
 
-    const unsigned range = 1U << m_buffer->BitsPerChannel();
+    const unsigned range = 1U << AudioOutputGraph::Buffer::BitsPerChannel();
     const double threshold = 20 * log10(1.0 / range); // 16bit=-96.3296dB => ~6dB/bit
     const int height = (int)-ceil(threshold); // 96
     if (height <= 0)

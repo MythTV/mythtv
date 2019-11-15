@@ -25,25 +25,25 @@ class PROTOSERVER_PUBLIC FileServerHandler : public SocketRequestHandler
                              QStringList &slist) override; // SocketRequestHandler
     void connectionClosed(MythSocket *socket) override; // SocketRequestHandler
 
-    bool DeleteFile(QString filename, QString storagegroup);
+    static bool DeleteFile(const QString& filename, const QString& storagegroup);
 
-    QList<FileSystemInfo> QueryFileSystems(void);
+    static QList<FileSystemInfo> QueryFileSystems(void);
     QList<FileSystemInfo> QueryAllFileSystems(void);
 
   private:
-    bool HandleQueryFreeSpace(SocketHandler *socket);
+    static bool HandleQueryFreeSpace(SocketHandler *socket);
     bool HandleQueryFreeSpaceList(SocketHandler *socket);
     bool HandleQueryFreeSpaceSummary(SocketHandler *socket);
 
-    bool HandleQueryCheckFile(SocketHandler *socket, QStringList &slist);
-    bool HandleQueryFileExists(SocketHandler *socket, QStringList &slist);
+    static bool HandleQueryCheckFile(SocketHandler *socket, QStringList &slist);
+    static bool HandleQueryFileExists(SocketHandler *socket, QStringList &slist);
     bool HandleQueryFileHash(SocketHandler *socket, QStringList &slist);
 
-    bool HandleDeleteFile(SocketHandler *socket, QStringList &slist);
-    bool HandleDeleteFile(SocketHandler *socket, const QString& filename,
-                          const QString& storagegroup);
+    static bool HandleDeleteFile(SocketHandler *socket, QStringList &slist);
+    static bool HandleDeleteFile(SocketHandler *socket, const QString& filename,
+                                 const QString& storagegroup);
     bool HandleDeleteFile(QString filename, QString storagegroup);
-    bool HandleDeleteFile(DeleteHandler *handler);
+    static bool HandleDeleteFile(DeleteHandler *handler);
     
     bool HandleGetFileList(SocketHandler *socket, QStringList &slist);
     bool HandleFileQuery(SocketHandler *socket, QStringList &slist);
@@ -51,8 +51,8 @@ class PROTOSERVER_PUBLIC FileServerHandler : public SocketRequestHandler
                                  QStringList &slist);
     bool HandleDownloadFile(SocketHandler *socket, QStringList &slist);
 
-    QString LocalFilePath(const QString &path, const QString &wantgroup);
-    void RunDeleteThread(void);
+    static QString LocalFilePath(const QString &path, const QString &wantgroup);
+    static void RunDeleteThread(void);
 
     QMap<int, FileTransfer*>        m_ftMap;
     QReadWriteLock                  m_ftLock;

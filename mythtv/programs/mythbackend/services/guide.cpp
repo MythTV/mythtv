@@ -224,6 +224,8 @@ DTC::ProgramList* Guide::GetProgramList(int              nStartIndex,
                 + sSQL
                 + "oldprogram.oldtitle IS NULL AND ";
 
+    sSQL += "deleted IS NULL AND ";
+
     if (!bWithInvisible)
         sSQL += "visible != 0 AND ";
 

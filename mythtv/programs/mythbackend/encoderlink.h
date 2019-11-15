@@ -116,7 +116,7 @@ class EncoderLink
     void SetNextLiveTVDir(const QString& dir);
     QString GetInput(void) const;
     QString SetInput(QString);
-    void ToggleChannelFavorite(QString);
+    void ToggleChannelFavorite(const QString&);
     void ChangeChannel(ChannelChangeDirection channeldirection);
     void SetChannel(const QString &name);
     int  GetPictureAttribute(PictureAttribute attr);
@@ -136,9 +136,9 @@ class EncoderLink
                         QString &callsign, QString &channum,
                         QString &channame, QString &xmltv) const;
     bool SetChannelInfo(uint chanid, uint sourceid,
-                        QString oldchannum,
-                        QString callsign, QString channum,
-                        QString channame, QString xmltv);
+                        const QString& oldchannum,
+                        const QString& callsign, const QString& channum,
+                        const QString& channame, const QString& xmltv);
 
     bool AddChildInput(uint childid);
 

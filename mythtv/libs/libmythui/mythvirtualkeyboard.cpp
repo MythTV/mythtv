@@ -102,8 +102,8 @@ bool MythUIVirtualKeyboard::Create()
     loadKeyDefinitions(gCoreContext->GetLanguageAndVariant());
     updateKeys(true);
 
-    int screenWidth, screenHeight;
-    float xmult, ymult;
+    int screenWidth = 0, screenHeight = 0;
+    float xmult = 0, ymult = 0;
     GetMythUI()->GetScreenSettings(screenWidth, xmult, screenHeight, ymult);
     MythRect editArea = m_parentEdit->GetArea();
     MythRect area = GetArea();
@@ -584,7 +584,7 @@ QString MythUIVirtualKeyboard::decodeChar(QString c)
         if (c.startsWith("0x"))
         {
             QString sCode = c.left(6);
-            bool bOK;
+            bool bOK = false;
             short nCode = sCode.toShort(&bOK, 16);
 
             c = c.mid(6);
@@ -626,7 +626,7 @@ QString MythUIVirtualKeyboard::getKeyText(const KeyDefinition& key)
 
 void MythUIVirtualKeyboard::loadEventKeyDefinitions(KeyEventDefinition *keyDef, const QString &action)
 {
-    QString keylist = GetMythMainWindow()->GetKey("Global", action);
+    QString keylist = MythMainWindow::GetKey("Global", action);
     QStringList keys = keylist.split(',', QString::SkipEmptyParts);
     if (keys.empty())
         return;

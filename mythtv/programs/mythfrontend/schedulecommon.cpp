@@ -52,7 +52,7 @@ void ScheduleCommon::ShowDetails(void) const
 *  \brief Show the upcoming recordings for this title
 */
 void ScheduleCommon::ShowUpcoming(const QString &title,
-                                  const QString &seriesid) const
+                                  const QString &seriesid)
 {
     if (title.isEmpty())
         return;
@@ -93,9 +93,9 @@ void ScheduleCommon::ShowUpcomingScheduled(void) const
         return;
 
     RecordingInfo ri(*pginfo);
-    uint id;
 
-    if ((id = ri.GetRecordingRuleID()) == 0)
+    uint id = ri.GetRecordingRuleID();
+    if (id == 0)
         return ShowUpcoming(pginfo->GetTitle(), pginfo->GetSeriesID());
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
@@ -549,7 +549,7 @@ void ScheduleCommon::customEvent(QEvent *event)
 *  \brief Returns true if a search should be employed to find a matching
 *         program.
 */
-bool ScheduleCommon::IsFindApplicable(const RecordingInfo& recInfo) const
+bool ScheduleCommon::IsFindApplicable(const RecordingInfo& recInfo)
 {
     return recInfo.GetRecordingRuleType() == kDailyRecord ||
            recInfo.GetRecordingRuleType() == kWeeklyRecord;

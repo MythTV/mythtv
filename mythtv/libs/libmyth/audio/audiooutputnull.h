@@ -45,7 +45,7 @@ class AudioOutputNULL : public AudioOutputBase
 
   private:
     QMutex        m_pcm_output_buffer_mutex {QMutex::NonRecursive};
-    unsigned char m_pcm_output_buffer[NULLAUDIO_OUTPUT_BUFFER_SIZE];
+    unsigned char m_pcm_output_buffer[NULLAUDIO_OUTPUT_BUFFER_SIZE] {0};
     int           m_current_buffer_size     {0};
 };
 

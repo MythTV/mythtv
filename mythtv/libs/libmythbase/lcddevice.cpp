@@ -72,7 +72,6 @@ LCD *LCD::Get(void)
 void LCD::SetupLCD (void)
 {
     QString lcd_host;
-    int lcd_port;
 
     if (m_lcd)
     {
@@ -82,7 +81,7 @@ void LCD::SetupLCD (void)
     }
 
     lcd_host = GetMythDB()->GetSetting("LCDServerHost", "localhost");
-    lcd_port = GetMythDB()->GetNumSetting("LCDServerPort", 6545);
+    int lcd_port = GetMythDB()->GetNumSetting("LCDServerPort", 6545);
     m_enabled = GetMythDB()->GetBoolSetting("LCDEnable", false);
 
     // workaround a problem with Ubuntu not resolving localhost properly
@@ -288,7 +287,7 @@ void LCD::ReadyRead(void)
                                            "CONNECTED response from LCDServer");
         }
 
-        bool bOK;
+        bool bOK = false;
         m_lcdWidth = aList[1].toInt(&bOK);
         if (!bOK)
         {

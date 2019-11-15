@@ -91,8 +91,8 @@ class META_PUBLIC meta_dir_node : public meta_node
   public:
     meta_dir_node(const QString &path, const QString &name = "",
                   meta_dir_node *parent = nullptr, bool is_path_root = false,
-                  const QString &host = "", const QString &prefix = "",
-                  const QVariant &data = QVariant());
+                  QString host = "", QString prefix = "",
+                  QVariant data = QVariant());
     meta_dir_node() : meta_node(nullptr) { }
 
     void ensureSortFields();

@@ -50,8 +50,8 @@ class MTV_PUBLIC ProfileItem
     QMap<QString,QString> GetAll(void) const;
 
     // Other
-    bool CheckRange(QString Key, float Value, bool *Ok = nullptr) const;
-    bool CheckRange(QString Key, int Value, bool *Ok = nullptr) const;
+    bool CheckRange(const QString Key, float Value, bool *Ok = nullptr) const;
+    bool CheckRange(const QString Key, int Value, bool *Ok = nullptr) const;
     bool CheckRange(const QString& Key, float FValue, int IValue, bool IsFloat, bool *Ok = nullptr) const;
     bool IsMatch(const QSize &Size, float Framerate, const QString &CodecName) const;
     bool IsValid(QString *Reason = nullptr) const;

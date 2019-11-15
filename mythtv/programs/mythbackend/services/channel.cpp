@@ -217,7 +217,7 @@ DTC::VideoSourceList* Channel::GetVideoSourceList()
 
     query.prepare("SELECT sourceid, name, xmltvgrabber, userid, "
                   "freqtable, lineupid, password, useeit, configpath, "
-                  "dvb_nit_id, bouquet_id, region_id FROM videosource "
+                  "dvb_nit_id, bouquet_id, region_id, scanfrequency FROM videosource "
                   "ORDER BY sourceid" );
 
     if (!query.exec())
@@ -248,8 +248,9 @@ DTC::VideoSourceList* Channel::GetVideoSourceList()
         pVideoSource->setUseEIT        ( query.value(7).toBool()      );
         pVideoSource->setConfigPath    ( query.value(8).toString()    );
         pVideoSource->setNITId         ( query.value(9).toInt()       );
-        pVideoSource->setBouquetId     ( query.value(10).toInt()      );
-        pVideoSource->setRegionId      ( query.value(11).toInt()      );
+        pVideoSource->setBouquetId     ( query.value(10).toUInt()     );
+        pVideoSource->setRegionId      ( query.value(11).toUInt()     );
+        pVideoSource->setScanFrequency ( query.value(12).toUInt()     );
     }
 
     pList->setAsOf          ( MythDate::current() );
@@ -273,7 +274,8 @@ DTC::VideoSource* Channel::GetVideoSource( uint nSourceID )
 
     query.prepare("SELECT name, xmltvgrabber, userid, "
                   "freqtable, lineupid, password, useeit, configpath, "
-                  "dvb_nit_id FROM videosource WHERE sourceid = :SOURCEID "
+                  "dvb_nit_id, bouquet_id, region_id, scanfrequency "
+                  "FROM videosource WHERE sourceid = :SOURCEID "
                   "ORDER BY sourceid" );
     query.bindValue(":SOURCEID", nSourceID);
 
@@ -302,6 +304,9 @@ DTC::VideoSource* Channel::GetVideoSource( uint nSourceID )
         pVideoSource->setUseEIT        ( query.value(6).toBool()      );
         pVideoSource->setConfigPath    ( query.value(7).toString()    );
         pVideoSource->setNITId         ( query.value(8).toInt()       );
+        pVideoSource->setBouquetId     ( query.value(9).toUInt()      );
+        pVideoSource->setRegionId      ( query.value(10).toUInt()     );
+        pVideoSource->setScanFrequency ( query.value(11).toUInt()     );
     }
 
     return pVideoSource;
@@ -322,11 +327,12 @@ bool Channel::UpdateVideoSource( uint nSourceId,
                                  const QString &sConfigPath,
                                  int           nNITId,
                                  uint          nBouquetId,
-                                 uint          nRegionId )
+                                 uint          nRegionId,
+                                 uint          nScanFrequency )
 {
     bool bResult = SourceUtil::UpdateSource(nSourceId, sSourceName, sGrabber, sUserId, sFreqTable,
                                        sLineupId, sPassword, bUseEIT, sConfigPath,
-                                       nNITId, nBouquetId, nRegionId);
+                                       nNITId, nBouquetId, nRegionId, nScanFrequency);
 
     return bResult;
 }
@@ -345,11 +351,12 @@ int  Channel::AddVideoSource( const QString &sSourceName,
                               const QString &sConfigPath,
                               int           nNITId,
                               uint          nBouquetId,
-                              uint          nRegionId )
+                              uint          nRegionId,
+                              uint          nScanFrequency )
 {
     int nResult = SourceUtil::CreateSource(sSourceName, sGrabber, sUserId, sFreqTable,
                                        sLineupId, sPassword, bUseEIT, sConfigPath,
-                                       nNITId, nBouquetId, nRegionId);
+                                       nNITId, nBouquetId, nRegionId, nScanFrequency);
 
     return nResult;
 }

@@ -107,10 +107,9 @@ bool PulseHandler::Suspend(enum PulseAction action)
         }
     }
 
-    bool result;
     // enable processing of incoming callbacks
     g_pulseHandlerActive = true;
-    result = g_pulseHandler->SuspendInternal(kPulseSuspend == action);
+    bool result = g_pulseHandler->SuspendInternal(kPulseSuspend == action);
     // disable processing of incoming callbacks in case we delete/recreate our
     // instance due to a termination or other failure
     g_pulseHandlerActive = false;

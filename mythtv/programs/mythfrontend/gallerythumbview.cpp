@@ -58,9 +58,9 @@ public:
     typedef QMap<ImagePtrK, QString> TransferMap;
     typedef QSet<ImagePtrK> ImageSet;
 
-    TransferThread(const TransferMap &files, bool move, MythUIProgressDialog *dialog)
+    TransferThread(TransferMap files, bool move, MythUIProgressDialog *dialog)
         : MThread("FileTransfer"),
-          m_move(move), m_files(files), m_dialog(dialog) {}
+          m_move(move), m_files(std::move(files)), m_dialog(dialog) {}
 
     ImageSet GetResult(void) { return m_failed; }
 
@@ -205,7 +205,7 @@ bool GalleryThumbView::Create()
     // Determine zoom levels supported by theme
     // images0 must exist; images1, images2 etc. are optional and enable zoom
     int               zoom = 0;
-    MythUIButtonList *widget;
+    MythUIButtonList *widget = nullptr;
     do
     {
         QString name = QString("images%1").arg(zoom++);
@@ -584,7 +584,7 @@ void GalleryThumbView::Start()
 {
     // Detect any running BE scans
     // Expects OK, scanner id, current#, total#
-    QStringList message = m_mgr.ScanQuery();
+    QStringList message = ImageManagerFe::ScanQuery();
     if (message.size() == 4 && message[0] == "OK")
     {
         UpdateScanProgress(message[1], message[2].toInt(), message[3].toInt());
@@ -962,7 +962,7 @@ void GalleryThumbView::SetUiSelection(MythUIButtonListItem *item)
             if (im->m_id != GALLERY_DB_ID)
             {
                 if (im->IsFile() || im->IsDevice())
-                    text << m_mgr.LongDateOf(im);
+                    text << ImageManagerFe::LongDateOf(im);
 
                 if (!im->m_comment.isEmpty())
                     text << im->m_comment;
@@ -1163,7 +1163,7 @@ void GalleryThumbView::MenuTransform(MythMenu *mainMenu)
 */
 void GalleryThumbView::MenuAction(MythMenu *mainMenu)
 {
-    MythMenu *menu;
+    MythMenu *menu = nullptr;
     ImagePtrK selected = m_menuState.m_selected;
 
     // Operate on current marked files, if any
@@ -1650,7 +1650,7 @@ void GalleryThumbView::ShowSettings()
         // Request rescan
         QString exclusions = gCoreContext->GetSetting("GalleryIgnoreFilter");
         m_view->ClearCache();
-        m_mgr.IgnoreDirs(exclusions);
+        ImageManagerFe::IgnoreDirs(exclusions);
     });
 }
 

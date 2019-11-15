@@ -154,7 +154,7 @@ class MainServer : public QObject, public MythSocketCBs
   protected slots:
     void reconnectTimeout(void);
     void deferredDeleteSlot(void);
-    void autoexpireUpdate(void);
+    static void autoexpireUpdate(void);
 
   private slots:
     void NewConnection(qt_socket_fd_t socketDescriptor);
@@ -271,10 +271,10 @@ class MainServer : public QObject, public MythSocketCBs
     void SendResponse(MythSocket *sock, QStringList &commands);
     void SendErrorResponse(MythSocket *sock, const QString &error);
     void SendErrorResponse(PlaybackSock *pbs, const QString &error);
-    void SendSlaveDisconnectedEvent(const QList<uint> &offlineEncoderIDs,
+    static void SendSlaveDisconnectedEvent(const QList<uint> &offlineEncoderIDs,
                                     bool needsReschedule);
 
-    void getGuideDataThrough(QDateTime &GuideDataThrough);
+    static void getGuideDataThrough(QDateTime &GuideDataThrough);
 
     PlaybackSock *GetSlaveByHostname(const QString &hostname);
     PlaybackSock *GetMediaServerByHostname(const QString &hostname);
@@ -282,14 +282,14 @@ class MainServer : public QObject, public MythSocketCBs
     FileTransfer *GetFileTransferByID(int id);
     FileTransfer *GetFileTransferBySock(MythSocket *socket);
 
-    QString LocalFilePath(const QString &path, const QString &wantgroup);
+    static QString LocalFilePath(const QString &path, const QString &wantgroup);
 
     int GetfsID(const QList<FileSystemInfo>::iterator& fsInfo);
 
     void DoTruncateThread(DeleteStruct *ds);
     void DoDeleteThread(DeleteStruct *ds);
-    void DeleteRecordedFiles(DeleteStruct *ds);
-    void DoDeleteInDB(DeleteStruct *ds);
+    static void DeleteRecordedFiles(DeleteStruct *ds);
+    static void DoDeleteInDB(DeleteStruct *ds);
 
     LiveTVChain *GetExistingChain(const QString &id);
     LiveTVChain *GetExistingChain(const MythSocket *sock);

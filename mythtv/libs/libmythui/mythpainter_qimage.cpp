@@ -38,7 +38,7 @@ void MythQImagePainter::CheckPaintMode(const QRect &area)
     if (!m_painter)
         return;
 
-    bool intersects;
+    bool intersects = false;
 
     if (m_paintedRegion.isEmpty())
     {

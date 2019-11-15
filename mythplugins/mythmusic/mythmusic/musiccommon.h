@@ -66,16 +66,16 @@ class MPUBLIC MusicCommon : public MythScreenType
   protected slots:
     void viewExited(void);
 
-    void play(void);
+    static void play(void);
     void stop(void);
-    void pause(void);
+    static void pause(void);
     void previous(void);
     void next(void);
     void seekforward(void);
     void seekback(void);
     void seek(int);
     void stopAll(void);
-    void changeRating(bool increase);
+    static void changeRating(bool increase);
 
     void searchButtonList(void);
     MythMenu* createMainMenu(void);
@@ -89,7 +89,7 @@ class MPUBLIC MusicCommon : public MythScreenType
     MythMenu* createPlaylistOptionsMenu(void);
 
     void playlistItemClicked(MythUIButtonListItem *item);
-    void playlistItemVisible(MythUIButtonListItem *item);
+    static void playlistItemVisible(MythUIButtonListItem *item);
 
     void fromCD(void);
     void allTracks(void);
@@ -106,12 +106,12 @@ class MPUBLIC MusicCommon : public MythScreenType
 
   protected:
     void init(bool startPlayback = true);
-    QString getTimeString(int exTime, int maxTime);
+    static QString getTimeString(int exTime, int maxTime);
     void updateProgressBar(void);
-    void setTrackOnLCD(MusicMetadata *mdata);
-    void editTrackInfo(MusicMetadata *mdata);
+    static void setTrackOnLCD(MusicMetadata *mdata);
+    static void editTrackInfo(MusicMetadata *mdata);
     void updateTrackInfo(MusicMetadata *mdata);
-    void showTrackInfo(MusicMetadata *mdata);
+    static void showTrackInfo(MusicMetadata *mdata);
     void updateUIPlaylist(void);
     void updatePlaylistStats(void);
     void updateUIPlayedList(void);    // for streaming
@@ -119,12 +119,12 @@ class MPUBLIC MusicCommon : public MythScreenType
     void updateShuffleMode(bool updateUIList = false);
 
     void changeVolume(bool up);
-    void changeSpeed(bool up);
+    static void changeSpeed(bool up);
     void toggleMute(void);
-    void toggleUpmix(void);
-    void showVolume(void);
+    static void toggleUpmix(void);
+    static void showVolume(void);
     void updateVolume(void);
-    void showSpeed(bool show);
+    static void showSpeed(bool show);
 
     void startVisualizer(void);
     void stopVisualizer(void);
@@ -132,7 +132,7 @@ class MPUBLIC MusicCommon : public MythScreenType
     void switchVisualizer(const QString &visual);
     void switchVisualizer(int visual);
 
-    void playFirstTrack();
+    static void playFirstTrack();
     bool restorePosition(int trackID);
 
     MythScreenType        *m_parentScreen       {nullptr};
@@ -161,7 +161,7 @@ class MPUBLIC MusicCommon : public MythScreenType
     uint                   m_playlistMaxTime    {0};
 
     // for quick playlists
-    PlaylistOptions        m_playlistOptions;
+    PlaylistOptions        m_playlistOptions    {PL_REPLACE, PL_CURRENT};
     QString                m_whereClause;
 
     // for adding tracks from playlist editor

@@ -125,7 +125,7 @@ class Playlist : public QObject
 
   private:
     MusicMetadata* getRawSongAt(int pos) const;
-    QString removeDuplicateTracks(const QString &orig_songlist, const QString &new_songlist);
+    static QString removeDuplicateTracks(const QString &orig_songlist, const QString &new_songlist);
 
     int                   m_playlistid  {0};
     QString               m_name;

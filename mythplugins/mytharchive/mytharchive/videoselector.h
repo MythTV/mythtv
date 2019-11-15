@@ -69,7 +69,7 @@ class VideoSelector : public MythScreenType
     void updateSelectedList(void);
     void getVideoList(void);
     void wireUpTheme(void);
-    std::vector<VideoInfo *> *getVideoListFromDB(void);
+    static std::vector<VideoInfo *> *getVideoListFromDB(void);
     void setParentalLevel(ParentalLevel::Level level);
 
     ParentalLevelChangeChecker *m_parentalLevelChecker {nullptr};

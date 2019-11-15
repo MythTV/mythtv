@@ -24,38 +24,6 @@ CC608Decoder::CC608Decoder(CC608Input *ccr)
     : m_reader(ccr),
       m_rbuf(new unsigned char[sizeof(ccsubtitle)+255])
 {
-    memset(m_last_seen, 0, sizeof(m_last_seen));
-    for (uint i = 0; i < 2; i++)
-    {
-        m_badvbi[i]      =  0;
-        m_lasttc[i]      =  0;
-        m_lastcode[i]    = -1;
-        m_lastcodetc[i]  =  0;
-        m_ccmode[i]      = -1;
-        m_xds[i]         =  0;
-        m_txtmode[i*2+0] =  0;
-        m_txtmode[i*2+1] =  0;
-        m_last_format_tc[i]   = 0;
-        m_last_format_data[i] = 0;
-    }
-
-    // The following are not bzero() because MS Windows doesn't like it.
-    memset(m_lastrow,    0, sizeof(m_lastrow));
-    memset(m_newrow,     0, sizeof(m_newrow));
-    memset(m_newcol,     0, sizeof(m_newcol));
-    memset(m_newattr,    0, sizeof(m_newattr));
-    memset(m_timecode,   0, sizeof(m_timecode));
-    memset(m_row,        0, sizeof(m_row));
-    memset(m_col,        0, sizeof(m_col));
-    memset(m_rowcount,   0, sizeof(m_rowcount));
-    memset(m_style,      0, sizeof(m_style));
-    memset(m_linecont,   0, sizeof(m_linecont));
-    memset(m_resumetext, 0, sizeof(m_resumetext));
-    memset(m_lastclr,    0, sizeof(m_lastclr));
-
-    for (uint i = 0; i < 8; i++)
-        m_ccbuf[i] = "";
-
     // fill translation table
     for (uint i = 0; i < 128; i++)
         m_stdchar[i] = QChar(i);
@@ -69,18 +37,6 @@ CC608Decoder::CC608Decoder(CC608Input *ccr)
     m_stdchar[125] = QLatin1Char(0xD1); // Ñ
     m_stdchar[126] = QLatin1Char(0xF1); // ñ
     m_stdchar[127] = 0x2588; /* full block */
-
-    // VPS data (MS Windows doesn't like bzero())
-    memset(m_vps_pr_label, 0, sizeof(m_vps_pr_label));
-    memset(m_vps_label,    0, sizeof(m_vps_label));
-
-    // XDS data
-    memset(m_xds_rating, 0, sizeof(uint) * 2 * 4);
-    for (uint i = 0; i < 2; i++)
-    {
-        m_xds_rating_systems[i] = 0;
-        m_xds_program_name[i].clear();
-    }
 
     init_xds_program_type(m_xds_program_type_string);
 }

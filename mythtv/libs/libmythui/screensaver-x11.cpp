@@ -49,7 +49,7 @@ class ScreenSaverX11Private
         m_display = OpenMythXDisplay();
         if (m_display)
         {
-            int dummy0, dummy1;
+            int dummy0 = 0, dummy1 = 0;
             m_dpmsaware = DPMSQueryExtension(m_display->GetDisplay(),
                                             &dummy0, &dummy1);
         }
@@ -61,7 +61,7 @@ class ScreenSaverX11Private
 
         if (m_dpmsaware)
         {
-            CARD16 power_level;
+            CARD16 power_level = 0;
 
             /* If someone runs into X server weirdness that goes away when
              * they externally disable DPMS, then the 'dpmsenabled' test should
@@ -310,7 +310,7 @@ bool ScreenSaverX11::Asleep(void)
     if (d->DeactivatedDPMS())
         return false;
 
-    BOOL on;
+    BOOL on = false;
     CARD16 power_level = DPMSModeOn;
 
     if (d->m_display)

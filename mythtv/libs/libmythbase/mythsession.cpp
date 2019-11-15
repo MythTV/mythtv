@@ -411,8 +411,6 @@ bool MythSessionManager::AddDigestUser(const QString& username,
                                        const QString& password,
                                        const QString& adminPassword)
 {
-    bool bResult;
-
     if (adminPassword.isEmpty())
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Admin password is missing."));
@@ -440,8 +438,7 @@ bool MythSessionManager::AddDigestUser(const QString& username,
     insert.bindValue(":USER_NAME", username);
     insert.bindValue(":PASSWORD_DIGEST", CreateDigest(username, password));
 
-    bResult = insert.exec();
-
+    bool bResult = insert.exec();
     if (!bResult)
         MythDB::DBError("Error adding digest user to database", insert);
 
@@ -454,8 +451,6 @@ bool MythSessionManager::AddDigestUser(const QString& username,
 bool MythSessionManager::RemoveDigestUser(const QString& username,
                                           const QString& password)
 {
-    bool bResult;
-
     if (!IsValidUser(username))
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Tried to remove a non-existing "
@@ -481,8 +476,7 @@ bool MythSessionManager::RemoveDigestUser(const QString& username,
     deleteQuery.prepare("DELETE FROM users WHERE " "username = :USER_NAME ");
     deleteQuery.bindValue(":USER_NAME", username);
 
-    bResult = deleteQuery.exec();
-
+    bool bResult = deleteQuery.exec();
     if (!bResult)
         MythDB::DBError("Error removing digest user from database",
                         deleteQuery);
@@ -497,8 +491,6 @@ bool MythSessionManager::ChangeDigestUserPassword(const QString& username,
                                                   const QString& oldPassword,
                                                   const QString& newPassword)
 {
-    bool bResult;
-
     if (newPassword.isEmpty())
     {
         LOG(VB_GENERAL, LOG_ERR, QString("New password is missing."));
@@ -531,8 +523,7 @@ bool MythSessionManager::ChangeDigestUserPassword(const QString& username,
     update.bindValue(":USER_NAME", username);
     update.bindValue(":OLD_PASSWORD_DIGEST", oldPasswordDigest);
 
-    bResult = update.exec();
-
+    bool bResult = update.exec();
     if (!bResult)
         MythDB::DBError("Error updating digest user in database", update);
 

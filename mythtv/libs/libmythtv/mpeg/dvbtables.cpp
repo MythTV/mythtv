@@ -6,6 +6,17 @@
 #include "dvbtables.h"
 #include "dvbdescriptors.h"
 
+static uint GetPrivateDataSpecifier(const unsigned char *desc, uint priv_dsid)
+{
+    if (desc[0] == DescriptorID::private_data_specifier)
+    {
+        PrivateDataSpecifierDescriptor pd(desc);
+        if (pd.IsValid())
+            priv_dsid = pd.PrivateDataSpecifier();
+    }
+    return priv_dsid;
+}
+
 void NetworkInformationTable::Parse(void) const
 {
     _tsc_ptr = pesdata() + 10 + NetworkDescriptorsLength();
@@ -30,9 +41,13 @@ QString NetworkInformationTable::toString(void) const
         vector<const unsigned char*> desc =
             MPEGDescriptor::Parse(NetworkDescriptors(),
                                   NetworkDescriptorsLength());
+        uint priv_dsid = 0;
         for (size_t i = 0; i < desc.size(); i++)
+        {
+            priv_dsid = GetPrivateDataSpecifier(desc[i], priv_dsid);
             str.append(QString("  %1\n")
-                       .arg(MPEGDescriptor(desc[i]).toString()));
+                       .arg(MPEGDescriptor(desc[i]).toStringPD(priv_dsid)));
+        }
     }
 
     for (uint i = 0; i < TransportStreamCount(); i++)
@@ -50,9 +65,13 @@ QString NetworkInformationTable::toString(void) const
             vector<const unsigned char*> desc =
                 MPEGDescriptor::Parse(TransportDescriptors(i),
                                       TransportDescriptorsLength(i));
+            uint priv_dsid = 0;
             for (size_t j = 0; j < desc.size(); j++)
+            {
+                priv_dsid = GetPrivateDataSpecifier(desc[j], priv_dsid);
                 str.append(QString("    %1\n")
-                           .arg(MPEGDescriptor(desc[j]).toString()));
+                           .arg(MPEGDescriptor(desc[j]).toStringPD(priv_dsid)));
+            }
         }
     }
     return str;
@@ -130,29 +149,12 @@ QString ServiceDescriptionTable::toString(void) const
             vector<const unsigned char*> desc =
                 MPEGDescriptor::Parse(ServiceDescriptors(i),
                                       ServiceDescriptorsLength(i));
+            uint priv_dsid = 0;
             for (size_t j = 0; j < desc.size(); j++)
             {
-                // Descriptors 0x80 to 0xFE are user defined, see
-                // Final draft ETSI EN 300 468 v1.13.1 (2012-04)
-                // Table 12: "Possible location of descriptors", page 33)
-                if (MPEGDescriptor(desc[j]).DescriptorTag() < 0x80 ||
-                    MPEGDescriptor(desc[j]).DescriptorTag() == PrivateDescriptorID::freesat_callsign)
-                {
-                    str.append(QString("    %1\n")
-                               .arg(MPEGDescriptor(desc[j]).toString()));
-                }
-                else
-                {
-                    QString udd = "Invalid Descriptor";
-                    if (MPEGDescriptor(desc[j]).IsValid())
-                    {
-                        udd = QString("User Defined Descriptor (0x%1) length(%2). Dumping\n")
-                            .arg(MPEGDescriptor(desc[j]).DescriptorTag(),2,16,QChar('0'))
-                            .arg(MPEGDescriptor(desc[j]).DescriptorLength());
-                        udd.append(MPEGDescriptor(desc[j]).hexdump());
-                    }
-                    str.append(QString("    %1\n").arg(udd));
-                }
+                priv_dsid = GetPrivateDataSpecifier(desc[j], priv_dsid);
+                str.append(QString("    %1\n")
+                            .arg(MPEGDescriptor(desc[j]).toStringPD(priv_dsid)));
             }
         }
     }
@@ -211,9 +213,13 @@ QString BouquetAssociationTable::toString(void) const
         vector<const unsigned char*> desc =
             MPEGDescriptor::Parse(BouquetDescriptors(),
                                   BouquetDescriptorsLength());
+        uint priv_dsid = 0;
         for (size_t i = 0; i < desc.size(); i++)
+        {
+            priv_dsid = GetPrivateDataSpecifier(desc[i], priv_dsid);
             str.append(QString("  %1\n")
-                       .arg(MPEGDescriptor(desc[i]).toString()));
+                       .arg(MPEGDescriptor(desc[i]).toStringPD(priv_dsid)));
+        }
     }
 
     for (uint i = 0; i < TransportStreamCount(); i++)
@@ -231,13 +237,18 @@ QString BouquetAssociationTable::toString(void) const
             vector<const unsigned char*> desc =
                 MPEGDescriptor::Parse(TransportDescriptors(i),
                                       TransportDescriptorsLength(i));
+            uint priv_dsid = 0;
             for (size_t j = 0; j < desc.size(); j++)
+            {
+                priv_dsid = GetPrivateDataSpecifier(desc[j], priv_dsid);
                 str.append(QString("    %1\n")
-                           .arg(MPEGDescriptor(desc[j]).toString()));
+                           .arg(MPEGDescriptor(desc[j]).toStringPD(priv_dsid)));
+            }
         }
     }
     return str;
 }
+
 
 void DVBEventInformationTable::Parse(void) const
 {

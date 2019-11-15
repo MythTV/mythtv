@@ -35,12 +35,12 @@ class UPnpCDSMusic : public UPnpCDSExtension
 
         bool LoadMetadata( const UPnpCDSRequest *pRequest,
                             UPnpCDSExtensionResults *pResults,
-                            IDTokenMap tokens,
-                            QString currentToken ) override; // UPnpCDSExtension
+                            const IDTokenMap& tokens,
+                            const QString& currentToken ) override; // UPnpCDSExtension
         bool LoadChildren( const UPnpCDSRequest *pRequest,
                            UPnpCDSExtensionResults *pResults,
-                           IDTokenMap tokens,
-                           QString currentToken ) override; // UPnpCDSExtension
+                           const IDTokenMap& tokens,
+                           const QString& currentToken ) override; // UPnpCDSExtension
 
     private:
 
@@ -63,9 +63,9 @@ class UPnpCDSMusic : public UPnpCDSExtension
                                     const IDTokenMap& tokens);
 
         // Common code helpers
-        QString BuildWhereClause( QStringList clauses,
+        static QString BuildWhereClause( QStringList clauses,
                                   IDTokenMap tokens );
-        void    BindValues ( MSqlQuery &query,
+        static void    BindValues ( MSqlQuery &query,
                              IDTokenMap tokens );
 };
 

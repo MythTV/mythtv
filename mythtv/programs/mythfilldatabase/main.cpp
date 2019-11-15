@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
 
     if (cmdline.toBool("showversion"))
     {
-        cmdline.PrintVersion();
+        MythFillDatabaseCommandLineParser::PrintVersion();
         return GENERIC_EXIT_OK;
     }
 
@@ -78,8 +78,8 @@ int main(int argc, char *argv[])
 
     myth_nice(19);
 
-    int retval;
-    if ((retval = cmdline.ConfigureLogging()) != GENERIC_EXIT_OK)
+    int retval = cmdline.ConfigureLogging();
+    if (retval != GENERIC_EXIT_OK)
         return retval;
 
     if (cmdline.toBool("manual"))
@@ -192,7 +192,7 @@ int main(int argc, char *argv[])
                 fill_data.SetRefresh(FillData::kRefreshAll, enable);
             else if ((*i).contains("-"))
             {
-                bool ok;
+                bool ok = false;
                 QStringList r = (*i).split("-");
 
                 uint lower = r[0].toUInt(&ok);
@@ -220,7 +220,7 @@ int main(int argc, char *argv[])
             }
             else
             {
-                bool ok;
+                bool ok = false;
                 uint day = (*i).toUInt(&ok);
                 if (!ok)
                 {
@@ -290,8 +290,9 @@ int main(int argc, char *argv[])
         updateLastRunStatus(status);
 
         MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("SELECT MAX(endtime) FROM program p LEFT JOIN channel c "
-                      "ON p.chanid=c.chanid WHERE c.sourceid= :SRCID "
+        query.prepare("SELECT MAX(endtime) FROM program p "
+                      "LEFT JOIN channel c ON p.chanid=c.chanid "
+                      "WHERE c.deleted IS NULL AND c.sourceid= :SRCID "
                       "AND manualid = 0 AND c.xmltvid != '';");
         query.bindValue(":SRCID", fromfile_id);
 
@@ -309,8 +310,9 @@ int main(int argc, char *argv[])
 
         updateLastRunEnd();
 
-        query.prepare("SELECT MAX(endtime) FROM program p LEFT JOIN channel c "
-                      "ON p.chanid=c.chanid WHERE c.sourceid= :SRCID "
+        query.prepare("SELECT MAX(endtime) FROM program p "
+                      "LEFT JOIN channel c ON p.chanid=c.chanid "
+                      "WHERE c.deleted IS NULL AND c.sourceid= :SRCID "
                       "AND manualid = 0 AND c.xmltvid != '';");
         query.bindValue(":SRCID", fromfile_id);
 
@@ -440,11 +442,10 @@ int main(int argc, char *argv[])
         {
             QString orig_programid = sel.value(0).toString();
             QString new_programid = orig_programid.left(10);
-            int     partnum, parttotal;
             QString part;
 
-            partnum   = sel.value(1).toInt();
-            parttotal = sel.value(2).toInt();
+            int partnum   = sel.value(1).toInt();
+            int parttotal = sel.value(2).toInt();
 
             part.setNum(parttotal);
             new_programid.append(part.rightJustified(2, '0'));
@@ -554,6 +555,7 @@ int main(int argc, char *argv[])
                     "      FROM program p, channel c "
                     "      WHERE p.programid <> '' "
                     "            AND p.chanid = c.chanid "
+                    "            AND c.deleted IS NULL "
                     "            AND c.visible = 1 "
                     "      GROUP BY p.programid "
                     "     ) AS firsts "
@@ -570,6 +572,7 @@ int main(int argc, char *argv[])
                     "      FROM program p, channel c "
                     "      WHERE p.programid = '' "
                     "            AND p.chanid = c.chanid "
+                    "            AND c.deleted IS NULL "
                     "            AND c.visible = 1 "
                     "      GROUP BY p.title, p.subtitle, partdesc "
                     "     ) AS firsts "
@@ -590,6 +593,7 @@ int main(int argc, char *argv[])
                     "      FROM program p, channel c "
                     "      WHERE p.programid <> '' "
                     "            AND p.chanid = c.chanid "
+                    "            AND c.deleted IS NULL "
                     "            AND c.visible = 1 "
                     "      GROUP BY p.programid "
                     "     ) AS lasts "
@@ -606,6 +610,7 @@ int main(int argc, char *argv[])
                     "      FROM program p, channel c "
                     "      WHERE p.programid = '' "
                     "            AND p.chanid = c.chanid "
+                    "            AND c.deleted IS NULL "
                     "            AND c.visible = 1 "
                     "      GROUP BY p.title, p.subtitle, partdesc "
                     "     ) AS lasts "

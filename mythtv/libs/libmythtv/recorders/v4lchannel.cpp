@@ -401,8 +401,7 @@ bool V4LChannel::Tune(uint64_t frequency)
 
     // Video4Linux version 2 tuning
     bool isTunerCapLow = false;
-    struct v4l2_modulator mod;
-    memset(&mod, 0, sizeof(mod));
+    struct v4l2_modulator mod {};
     mod.index = 0;
     ioctlval = ioctl(m_videofd, VIDIOC_G_MODULATOR, &mod);
     if (ioctlval >= 0)
@@ -413,9 +412,7 @@ bool V4LChannel::Tune(uint64_t frequency)
         LOG(VB_CHANNEL, LOG_INFO, QString("CapLow: %1").arg(isTunerCapLow));
     }
 
-    struct v4l2_frequency vf;
-    memset(&vf, 0, sizeof(vf));
-
+    struct v4l2_frequency vf {};
     vf.tuner = 0; // use first tuner
     vf.frequency = (isTunerCapLow) ?
         ((int)(frequency / 62.5)) : (frequency / 62500);
@@ -450,9 +447,7 @@ bool V4LChannel::Tune(uint64_t frequency)
  */
 bool V4LChannel::Retune(void)
 {
-    struct v4l2_frequency vf;
-    memset(&vf, 0, sizeof(vf));
-
+    struct v4l2_frequency vf {};
     vf.tuner = 0; // use first tuner
     vf.type = V4L2_TUNER_ANALOG_TV;
 
@@ -481,7 +476,8 @@ QString V4LChannel::GetFormatForChannel(const QString& channum, const QString& i
     query.prepare(
         "SELECT tvformat "
         "FROM channel, capturecard "
-        "WHERE channum              = :CHANNUM   AND "
+        "WHERE deleted              IS NULL      AND "
+        "      channum              = :CHANNUM   AND "
         "      inputname            = :INPUTNAME AND "
         "      capturecard.cardid   = :INPUTID   AND "
         "      capturecard.sourceid = channel.sourceid");
@@ -508,7 +504,7 @@ bool V4LChannel::SetInputAndFormat(int inputNum, const QString& newFmt)
     QString msg =
         QString("SetInputAndFormat(%1, %2) ").arg(inputNum).arg(newFmt);
 
-    struct v4l2_input input;
+    struct v4l2_input input {};
     int ioctlval = ioctl(m_videofd, VIDIOC_G_INPUT, &input);
     bool input_switch = (0 != ioctlval || (uint)inputNumV4L != input.index);
 
@@ -614,10 +610,8 @@ bool V4LChannel::InitPictureAttribute(const QString &db_col_name)
     QString loc = LOC +
         QString("InitPictureAttribute(%1): ").arg(db_col_name, 10);
 
-    struct v4l2_control ctrl;
-    struct v4l2_queryctrl qctrl;
-    memset(&ctrl, 0, sizeof(ctrl));
-    memset(&qctrl, 0, sizeof(qctrl));
+    struct v4l2_control ctrl {};
+    struct v4l2_queryctrl qctrl {};
 
     ctrl.id = qctrl.id = v4l2_attrib;
     if (ioctl(m_videofd, VIDIOC_QUERYCTRL, &qctrl) < 0)
@@ -707,10 +701,8 @@ int V4LChannel::GetPictureAttribute(PictureAttribute attr) const
 
 static int get_v4l2_attribute_value(int videofd, int v4l2_attrib)
 {
-    struct v4l2_control ctrl;
-    struct v4l2_queryctrl qctrl;
-    memset(&ctrl, 0, sizeof(ctrl));
-    memset(&qctrl, 0, sizeof(qctrl));
+    struct v4l2_control ctrl {};
+    struct v4l2_queryctrl qctrl {};
 
     ctrl.id = qctrl.id = v4l2_attrib;
     if (ioctl(videofd, VIDIOC_QUERYCTRL, &qctrl) < 0)
@@ -733,10 +725,8 @@ static int get_v4l2_attribute_value(int videofd, int v4l2_attrib)
 
 static int set_v4l2_attribute_value(int videofd, int v4l2_attrib, int newvalue)
 {
-    struct v4l2_control ctrl;
-    struct v4l2_queryctrl qctrl;
-    memset(&ctrl, 0, sizeof(ctrl));
-    memset(&qctrl, 0, sizeof(qctrl));
+    struct v4l2_control ctrl {};
+    struct v4l2_queryctrl qctrl {};
 
     ctrl.id = qctrl.id = v4l2_attrib;
     if (ioctl(videofd, VIDIOC_QUERYCTRL, &qctrl) < 0)

@@ -257,7 +257,7 @@ class WebSocketWorker : public QObject
 
     void HandleCloseConnection(const QByteArray &payload);
 
-    QByteArray CreateFrame(WebSocketFrame::OpCode type, const QByteArray &payload);
+    static QByteArray CreateFrame(WebSocketFrame::OpCode type, const QByteArray &payload);
 
     bool SendFrame(const QByteArray &frame);
     bool SendPing(const QByteArray &payload);

@@ -6,7 +6,7 @@ typedef struct VideoFrame_ VideoFrame;
 class Histogram
 {
 public:
-    Histogram();
+    Histogram() = default;
     ~Histogram() = default;
 
     void generateFromImage(VideoFrame* frame, unsigned int frameWidth,
@@ -21,8 +21,10 @@ public:
     // do not override default copy constructor, as the default copy
     // constructor will do just fine.
 private:
-    int m_data[256];
-    unsigned int m_numberOfSamples;
+    int m_data[256] {0};
+
+    // prevent division by 0 in case a virgin histogram gets used.
+    unsigned int m_numberOfSamples {1};
 };
 
 #endif

@@ -6875,6 +6875,10 @@ if enabled gxx; then
         fi
         check_cxxflags -Wno-attributes
     fi
+    # GCC on centos7 doesn't handle the '{}' initializer properly.
+    if test $gxx_major_version -lt 5; then
+        check_cxxflags -Wno-missing-field-initializers
+    fi
     check_cxxflags -funit-at-a-time
     # Don't complain about over-aligned types
     check_cxxflags -faligned-new

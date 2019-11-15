@@ -22,6 +22,7 @@
 #endif
 
 #include <algorithm>
+#include <cfloat>
 #include <cstdint>
 using namespace std;
 
@@ -53,7 +54,7 @@ static void print(
 
 static float find_clock_diff(const QList<float> &list)
 {
-    float min_diff = INT32_MAX;
+    float min_diff = FLT_MAX;
     float max_diff = 0.0F;
     float avg_diff = 0.0F;
     for (uint i = 1; i < uint(list.size()); i++)
@@ -77,12 +78,6 @@ static float find_clock_diff(const QList<float> &list)
     }
 
     return avg_diff;
-}
-
-VBI608Extractor::VBI608Extractor()
-{
-    m_code[0] = UINT16_MAX;
-    m_code[1] = UINT16_MAX;
 }
 
 bool VBI608Extractor::FindClocks(const unsigned char *buf, uint width)

@@ -352,7 +352,7 @@ void BookmarkManager::slotBookmarkClicked(MythUIButtonListItem *item)
     {
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-        MythScreenType *mythbrowser;
+        MythScreenType *mythbrowser = nullptr;
         if (urls[0].startsWith("mythflash://"))
             mythbrowser = new MythFlashPlayer(mainStack, urls);
         else
@@ -431,10 +431,9 @@ void BookmarkManager::ReloadBookmarks(void)
     UpdateURLList();
 
     // try to set the current item to name
-    MythUIButtonListItem *item;
     for (int x = 0; x < m_bookmarkList->GetCount(); x++)
     {
-        item = m_bookmarkList->GetItemAt(x);
+        MythUIButtonListItem *item = m_bookmarkList->GetItemAt(x);
         if (item && item->GetData().isValid())
         {
             Bookmark *site = item->GetData().value<Bookmark*>();

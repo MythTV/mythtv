@@ -242,7 +242,7 @@ class CECAdapterPriv
         m_adapter = nullptr;
     }
 
-    int LogMessage(const cec_log_message &message)
+    static int LogMessage(const cec_log_message &message)
     {
         QString msg(message.message);
         LogLevel_t lvl = LOG_UNKNOWN;
@@ -258,7 +258,7 @@ class CECAdapterPriv
         return 1;
     }
 
-    void LogMessage(const cec_log_message* message)
+    static void LogMessage(const cec_log_message* message)
     {
         QString msg(message->message);
         LogLevel_t lvl = LOG_UNKNOWN;
@@ -664,7 +664,7 @@ class CECAdapterPriv
         if (0 == action)
             return 1;
 
-        GetMythUI()->ResetScreensaver();
+        MythUIHelper::ResetScreensaver();
         QKeyEvent* ke = new QKeyEvent(QEvent::KeyPress, action, modifier);
         qApp->postEvent(GetMythMainWindow(), (QEvent*)ke);
 
@@ -999,13 +999,13 @@ class CECAdapterPriv
         if (0 == action)
             return;
 
-        GetMythUI()->ResetScreensaver();
+        MythUIHelper::ResetScreensaver();
         QKeyEvent* ke = new QKeyEvent(QEvent::KeyPress, action, Qt::NoModifier);
         qApp->postEvent(GetMythMainWindow(), (QEvent*)ke);
     }
 
 #if CEC_LIB_VERSION_MAJOR >= 2
-    int HandleAlert(const libcec_alert alert, const libcec_parameter &data)
+    static int HandleAlert(const libcec_alert alert, const libcec_parameter &data)
     {
         // These aren't handled yet
         // Note that we *DON'T* want to just show these
@@ -1080,7 +1080,7 @@ class CECAdapterPriv
             .arg(activated ? "Activated" : "Deactivated"));
 
         if (activated)
-            GetMythUI()->ResetScreensaver();
+            MythUIHelper::ResetScreensaver();
     }
 #endif
 
@@ -1225,7 +1225,8 @@ static int CECCommandCallback(void *adapter, const cec_command CEC_CALLBACK_PARA
 #if CEC_LIB_VERSION_MAJOR >= 4
 static void CECLogMessageCallback(void *adapter, const cec_log_message* message)
 {
-    ((CECAdapterPriv*)adapter)->LogMessage(message);
+    Q_UNUSED(adapter);
+    CECAdapterPriv::LogMessage(message);
 }
 
 static void CECKeyPressCallback(void *adapter, const cec_keypress* keypress)
@@ -1250,7 +1251,8 @@ static int CECAlertCallback(void *adapter, const libcec_alert alert, const libce
 #if CEC_LIB_VERSION_MAJOR >= 4
 static void CECAlertCallback(void *adapter, const libcec_alert alert, const libcec_parameter data)
 {
-    ((CECAdapterPriv*)adapter)->HandleAlert(alert, data);
+    Q_UNUSED(adapter);
+    CECAdapterPriv::HandleAlert(alert, data);
 }
 #endif
 static void CECSourceActivatedCallback(void *adapter, const cec_logical_address address, const uint8_t activated)

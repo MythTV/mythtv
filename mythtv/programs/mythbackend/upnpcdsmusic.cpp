@@ -86,7 +86,6 @@ void UPnpCDSMusic::CreateRoot()
                                          m_sName,
                                          "0");
 
-    CDSObject* pContainer;
     QString containerId = m_sExtensionId + "/%1";
 
     // HACK: I'm not entirely happy with this solution, but it's at least
@@ -101,7 +100,7 @@ void UPnpCDSMusic::CreateRoot()
     // -----------------------------------------------------------------------
     // All Tracks
     // -----------------------------------------------------------------------
-    pContainer = CDSObject::CreateContainer ( containerId.arg("Track"),
+    CDSObject* pContainer = CDSObject::CreateContainer ( containerId.arg("Track"),
                                               QObject::tr("All Tracks"),
                                               m_sExtensionId, // Parent Id
                                               nullptr );
@@ -260,7 +259,7 @@ bool UPnpCDSMusic::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
 
 bool UPnpCDSMusic::LoadMetadata(const UPnpCDSRequest* pRequest,
                                  UPnpCDSExtensionResults* pResults,
-                                 IDTokenMap tokens, QString currentToken)
+                                 const IDTokenMap& tokens, const QString& currentToken)
 {
     if (currentToken.isEmpty())
     {
@@ -324,7 +323,7 @@ bool UPnpCDSMusic::LoadMetadata(const UPnpCDSRequest* pRequest,
 
 bool UPnpCDSMusic::LoadChildren(const UPnpCDSRequest* pRequest,
                                  UPnpCDSExtensionResults* pResults,
-                                 IDTokenMap tokens, QString currentToken)
+                                 const IDTokenMap& tokens, const QString& currentToken)
 {
     if (currentToken.isEmpty() || currentToken == m_sExtensionId.toLower())
     {

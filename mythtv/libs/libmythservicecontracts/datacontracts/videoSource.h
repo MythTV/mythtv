@@ -28,6 +28,7 @@ class SERVICE_PUBLIC VideoSource : public QObject
     Q_PROPERTY( int             NITId           READ NITId            WRITE setNITId          )
     Q_PROPERTY( uint            BouquetId       READ BouquetId        WRITE setBouquetId      )
     Q_PROPERTY( uint            RegionId        READ RegionId         WRITE setRegionId       )
+    Q_PROPERTY( uint            ScanFrequency   READ ScanFrequency    WRITE setScanFrequency  )
 
     PROPERTYIMP    ( int        , Id             )
     PROPERTYIMP    ( QString    , SourceName     )
@@ -41,6 +42,7 @@ class SERVICE_PUBLIC VideoSource : public QObject
     PROPERTYIMP    ( int        , NITId          )
     PROPERTYIMP    ( uint       , BouquetId      )
     PROPERTYIMP    ( uint       , RegionId       )
+    PROPERTYIMP    ( uint       , ScanFrequency  )
 
     public:
 
@@ -52,7 +54,8 @@ class SERVICE_PUBLIC VideoSource : public QObject
               m_UseEIT        ( false  ),
               m_NITId         ( 0      ),
               m_BouquetId     ( 0      ),
-              m_RegionId      ( 0      )
+              m_RegionId      ( 0      ),
+              m_ScanFrequency ( 0      )
         {
         }
 
@@ -70,6 +73,7 @@ class SERVICE_PUBLIC VideoSource : public QObject
             m_NITId         = src->m_NITId         ;
             m_BouquetId     = src->m_BouquetId     ;
             m_RegionId      = src->m_RegionId      ;
+            m_ScanFrequency = src->m_ScanFrequency ;
         }
 
     private:

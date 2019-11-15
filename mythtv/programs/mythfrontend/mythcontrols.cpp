@@ -451,7 +451,7 @@ uint MythControls::GetCurrentButton(void)
  */
 QString MythControls::GetCurrentKey(void)
 {
-    MythUIButtonListItem* currentButton;
+    MythUIButtonListItem* currentButton = nullptr;
     if (m_leftListType == kKeyList &&
         (currentButton = m_leftList->GetItemCurrent()))
     {
@@ -643,7 +643,7 @@ void MythControls::AddKeyToAction(const QString& key, bool ignoreconflict)
     if (!ignoreconflict)
     {
         // Check for first of the potential conflicts.
-        int err_level;
+        int err_level = 0;
         ActionID *conflict = m_bindings->GetConflict(context, key, err_level);
         if (conflict)
         {

@@ -369,13 +369,13 @@ static void handle_transport_desc(vector<uint> &muxes,
     }
 }
 
-uint ChannelUtil::CreateMultiplex(int  sourceid,      QString sistandard,
-                                  uint64_t frequency, QString modulation,
-                                  int  transport_id,  int     network_id)
+uint ChannelUtil::CreateMultiplex(int      sourceid,     const QString& sistandard,
+                                  uint64_t frequency,    const QString& modulation,
+                                  int      transport_id, int            network_id)
 {
     return CreateMultiplex(
-        sourceid,           std::move(sistandard),
-        frequency,          std::move(modulation),
+        sourceid,           sistandard,
+        frequency,          modulation,
         transport_id,       network_id,
         -1,                 -1,
         -1,                 -1,
@@ -387,30 +387,30 @@ uint ChannelUtil::CreateMultiplex(int  sourceid,      QString sistandard,
 }
 
 uint ChannelUtil::CreateMultiplex(
-    int         sourceid,     QString     sistandard,
-    uint64_t    freq,         QString     modulation,
+    int            sourceid,     const QString& sistandard,
+    uint64_t       freq,         const QString& modulation,
     // DVB specific
-    int         transport_id, int         network_id,
-    int         symbol_rate,  signed char bandwidth,
-    signed char polarity,     signed char inversion,
-    signed char trans_mode,
-    QString     inner_FEC,    QString     constellation,
-    signed char hierarchy,    QString     hp_code_rate,
-    QString     lp_code_rate, QString     guard_interval,
-    QString     mod_sys,      QString     rolloff)
+    int            transport_id, int            network_id,
+    int            symbol_rate,  signed char    bandwidth,
+    signed char    polarity,     signed char    inversion,
+    signed char    trans_mode,
+    const QString& inner_FEC,    const QString& constellation,
+    signed char    hierarchy,    const QString& hp_code_rate,
+    const QString& lp_code_rate, const QString& guard_interval,
+    const QString& mod_sys,      const QString& rolloff)
 {
     return insert_dtv_multiplex(
-        sourceid,           std::move(sistandard),
-        freq,               std::move(modulation),
+        sourceid,           sistandard,
+        freq,               modulation,
         // DVB specific
         transport_id,       network_id,
         symbol_rate,        bandwidth,
         polarity,           inversion,
         trans_mode,
-        std::move(inner_FEC),    std::move(constellation),
-        hierarchy,               std::move(hp_code_rate),
-        std::move(lp_code_rate), std::move(guard_interval),
-        std::move(mod_sys),      std::move(rolloff));
+        inner_FEC,          constellation,
+        hierarchy,          hp_code_rate,
+        lp_code_rate,       guard_interval,
+        mod_sys,            rolloff);
 }
 
 uint ChannelUtil::CreateMultiplex(uint sourceid, const DTVMultiplex &mux,
@@ -466,7 +466,8 @@ uint ChannelUtil::GetMplexID(uint sourceid, const QString &channum)
     query.prepare(
         "SELECT mplexid "
         "FROM channel "
-        "WHERE sourceid  = :SOURCEID  AND "
+        "WHERE deleted   IS NULL AND "
+        "      sourceid  = :SOURCEID  AND "
         "      channum   = :CHANNUM");
 
     query.bindValue(":SOURCEID",  sourceid);
@@ -955,7 +956,8 @@ QString ChannelUtil::GetChannelValueStr(const QString &channel_field,
         QString(
             "SELECT channel.%1 "
             "FROM channel "
-            "WHERE channum  = :CHANNUM AND "
+            "WHERE deleted  IS NULL AND "
+            "      channum  = :CHANNUM AND "
             "      sourceid = :SOURCEID")
         .arg(channel_field));
 
@@ -1059,7 +1061,8 @@ static QStringList get_valid_recorder_list(const QString &channum)
         "SELECT capturecard.cardid "
         "FROM channel "
         "LEFT JOIN capturecard ON channel.sourceid = capturecard.sourceid "
-        "WHERE channel.channum = :CHANNUM AND "
+        "WHERE channel.deleted IS NULL AND "
+        "      channel.channum = :CHANNUM AND "
         "      capturecard.livetvorder > 0 "
         "ORDER BY capturecard.livetvorder, capturecard.cardid");
     query.bindValue(":CHANNUM", channum);
@@ -1103,7 +1106,8 @@ vector<uint> ChannelUtil::GetConflicting(const QString &channum, uint sourceid)
     {
         query.prepare(
             "SELECT chanid from channel "
-            "WHERE sourceid = :SOURCEID AND "
+            "WHERE deleted  IS NULL AND "
+            "      sourceid = :SOURCEID AND "
             "      channum  = :CHANNUM");
         query.bindValue(":SOURCEID", sourceid);
     }
@@ -1111,7 +1115,8 @@ vector<uint> ChannelUtil::GetConflicting(const QString &channum, uint sourceid)
     {
         query.prepare(
             "SELECT chanid from channel "
-            "WHERE channum = :CHANNUM");
+            "WHERE deleted IS NULL AND "
+            "      channum = :CHANNUM");
     }
 
     query.bindValue(":CHANNUM",  channum);
@@ -1183,7 +1188,8 @@ QString ChannelUtil::GetDefaultAuthority(uint chanid)
                 "SELECT chanid, m.default_authority "
                 "FROM channel c "
                 "LEFT JOIN dtv_multiplex m "
-                "ON (c.mplexid = m.mplexid)");
+                "ON (c.mplexid = m.mplexid) "
+                "WHERE deleted IS NULL");
             if (query.exec())
             {
                 while (query.next())
@@ -1203,7 +1209,8 @@ QString ChannelUtil::GetDefaultAuthority(uint chanid)
 
             query.prepare(
                 "SELECT chanid, default_authority "
-                "FROM channel");
+                "FROM channel "
+                "WHERE deleted IS NULL");
             if (query.exec())
             {
                 while (query.next())
@@ -1321,7 +1328,8 @@ int ChannelUtil::GetChanID(int mplexid,       int service_transport_id,
 
     // find a proper ATSC channel
     query.prepare("SELECT chanid FROM channel,dtv_multiplex "
-                  "WHERE channel.sourceid          = :SOURCEID AND "
+                  "WHERE channel.deleted           IS NULL AND "
+                  "      channel.sourceid          = :SOURCEID AND "
                   "      atsc_major_chan           = :MAJORCHAN AND "
                   "      atsc_minor_chan           = :MINORCHAN AND "
                   "      dtv_multiplex.transportid = :TRANSPORTID AND "
@@ -1341,7 +1349,8 @@ int ChannelUtil::GetChanID(int mplexid,       int service_transport_id,
     // Find manually inserted/edited channels in order of scariness.
     // find renamed channel, where atsc is valid
     query.prepare("SELECT chanid FROM channel "
-                  "WHERE sourceid = :SOURCEID AND "
+                  "WHERE deleted IS NULL AND "
+                  "sourceid = :SOURCEID AND "
                   "atsc_major_chan = :MAJORCHAN AND "
                   "atsc_minor_chan = :MINORCHAN");
 
@@ -1354,7 +1363,8 @@ int ChannelUtil::GetChanID(int mplexid,       int service_transport_id,
 
         // find based on mpeg program number and mplexid alone
     query.prepare("SELECT chanid FROM channel "
-                  "WHERE sourceid = :SOURCEID AND "
+                  "WHERE deleted IS NULL AND "
+                  "sourceid = :SOURCEID AND "
                   "serviceID = :SERVICEID AND "
                   "mplexid = :MPLEXID");
 
@@ -1373,7 +1383,8 @@ uint ChannelUtil::FindChannel(uint sourceid, const QString &freqid)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT chanid "
                   "FROM channel "
-                  "WHERE sourceid = :SOURCEID AND "
+                  "WHERE deleted  IS NULL AND "
+                  "      sourceid = :SOURCEID AND "
                   "      freqid   = :FREQID");
 
     query.bindValue(":SOURCEID", sourceid);
@@ -1479,10 +1490,10 @@ bool ChannelUtil::CreateChannel(uint db_mplexid,
                                 bool hidden,
                                 bool hidden_in_guide,
                                 const QString &freqid,
-                                QString icon,
+                                const QString& icon,
                                 QString format,
-                                QString xmltvid,
-                                QString default_authority,
+                                const QString& xmltvid,
+                                const QString& default_authority,
                                 uint service_type)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1754,7 +1765,8 @@ bool ChannelUtil::DeleteChannel(uint channel_id)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
-        "DELETE FROM channel "
+        "UPDATE channel "
+        "SET deleted = NOW() "
         "WHERE chanid = :ID");
     query.bindValue(":ID", channel_id);
 
@@ -1847,7 +1859,8 @@ bool ChannelUtil::GetATSCChannel(uint sourceid, const QString &channum,
     query.prepare(
         "SELECT atsc_major_chan, atsc_minor_chan "
         "FROM channel "
-        "WHERE channum  = :CHANNUM AND "
+        "WHERE deleted  IS NULL AND "
+        "      channum  = :CHANNUM AND "
         "      sourceid = :SOURCEID");
 
     query.bindValue(":SOURCEID", sourceid);
@@ -1898,7 +1911,8 @@ bool ChannelUtil::GetChannelData(
         "       atsc_major_chan, atsc_minor_chan, serviceid, "
         "       chanid,  visible "
         "FROM channel, videosource "
-        "WHERE videosource.sourceid = channel.sourceid AND "
+        "WHERE channel.deleted      IS NULL            AND "
+        "      videosource.sourceid = channel.sourceid AND "
         "      channum              = :CHANNUM         AND "
         "      channel.sourceid     = :SOURCEID "
         "ORDER BY channel.visible DESC, channel.chanid ");
@@ -2055,27 +2069,17 @@ ChannelInfoList ChannelUtil::GetChannelsInternal(
         " %1  JOIN capturecard  ON capturecard.sourceid = channel.sourceid ")
         .arg((include_disconnected) ? "LEFT" : "");
 
-    QString cond = " WHERE ";
+    qstr += "WHERE deleted IS NULL ";
 
     if (sourceid)
-    {
-        qstr += QString("WHERE channel.sourceid='%1' ").arg(sourceid);
-        cond = " AND ";
-    }
+        qstr += QString("AND channel.sourceid='%1' ").arg(sourceid);
 
     // Select only channels from the specified channel group
     if (channel_groupid > 0)
-    {
-        qstr += QString("%1 channelgroup.grpid = '%2' ")
-            .arg(cond).arg(channel_groupid);
-        cond = " AND ";
-    }
+        qstr += QString("AND channelgroup.grpid = '%1' ").arg(channel_groupid);
 
     if (visible_only)
-    {
-        qstr += QString("%1 visible=1 ").arg(cond);
-        cond = " AND ";
-    }
+        qstr += QString("AND visible = 1 ");
 
     qstr += " GROUP BY chanid";
 
@@ -2129,23 +2133,19 @@ vector<uint> ChannelUtil::GetChanIDs(int sourceid, bool onlyVisible)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    QString select = "SELECT chanid FROM channel ";
+    QString select = "SELECT chanid FROM channel WHERE deleted IS NULL ";
     // Yes, this a little ugly
     if (onlyVisible || sourceid > 0)
     {
-        select += "WHERE ";
         if (onlyVisible)
-            select += "visible = 1 ";
+            select += "AND visible = 1 ";
         if (sourceid > 0)
-        {
-            if (onlyVisible)
-                select += "AND ";
-            select += "sourceid=" + QString::number(sourceid);
-        }
+            select += "AND sourceid=" + QString::number(sourceid);
     }
 
     vector<uint> list;
-    if (!query.exec(select))
+    query.prepare(select);
+    if (!query.exec())
     {
         MythDB::DBError("SourceUtil::GetChanIDs()", query);
         return list;
@@ -2256,9 +2256,9 @@ uint ChannelUtil::GetChannelCount(int sourceid)
     QString   select;
 
 
-    select = "SELECT chanid FROM channel";
+    select = "SELECT chanid FROM channel WHERE deleted IS NULL ";
     if (sourceid >= 0)
-        select += " WHERE sourceid=" + QString::number(sourceid);
+        select += "AND sourceid=" + QString::number(sourceid);
     select += ';';
 
     query.prepare(select);
@@ -2429,21 +2429,18 @@ ChannelInfoList ChannelUtil::LoadChannels(uint startIndex, uint count,
     sql += QString("%1 JOIN capturecard ON capturecard.sourceid = channel.sourceid ")
                    .arg(ignoreUntunable ? "INNER" : "LEFT");
 
-    QStringList cond;
+    sql += "WHERE channel.deleted IS NULL ";
     if (ignoreHidden)
-        cond << "channel.visible = :VISIBLE ";
+        sql += "AND channel.visible = 1 ";
 
     if (channelGroupID > 0)
-        cond << "channelgroup.grpid = :CHANGROUPID ";
+        sql += "AND channelgroup.grpid = :CHANGROUPID ";
 
     if (sourceID > 0)
-        cond << "channel.sourceid = :SOURCEID ";
+        sql += "AND channel.sourceid = :SOURCEID ";
 
     if (liveTVOnly)
-        cond << "capturecard.livetvorder > 0 ";
-
-    if (!cond.isEmpty())
-        sql += QString("WHERE %1").arg(cond.join("AND "));
+        sql += "AND capturecard.livetvorder > 0 ";
 
     if (groupBy == kChanGroupByCallsign)
         sql += "GROUP BY channel.callsign ";
@@ -2480,9 +2477,6 @@ ChannelInfoList ChannelUtil::LoadChannels(uint startIndex, uint count,
         sql = sql.arg(""); // remove place holder
 
     query.prepare(sql);
-
-    if (ignoreHidden)
-        query.bindValue(":VISIBLE", 1);
 
     if (channelGroupID > 0)
         query.bindValue(":CHANGROUPID", channelGroupID);

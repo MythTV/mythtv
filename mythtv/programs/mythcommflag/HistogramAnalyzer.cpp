@@ -29,18 +29,18 @@ readData(const QString& filename, float *mean, unsigned char *median, float *std
         HistogramAnalyzer::Histogram *histogram, unsigned char *monochromatic,
         long long nframes)
 {
-    FILE            *fp;
-    long long       frameno;
     quint32         counter[UCHAR_MAX + 1];
 
     QByteArray fname = filename.toLocal8Bit();
-    if (!(fp = fopen(fname.constData(), "r")))
+    FILE *fp = fopen(fname.constData(), "r");
+    if (fp == nullptr)
         return false;
 
-    for (frameno = 0; frameno < nframes; frameno++)
+    for (long long frameno = 0; frameno < nframes; frameno++)
     {
-        int monochromaticval, medianval, widthval, heightval, colval, rowval;
-        float meanval, stddevval;
+        int monochromaticval = 0, medianval = 0, widthval = 0;
+        int heightval = 0, colval = 0, rowval = 0;
+        float meanval = NAN, stddevval = NAN;
         int nitems = fscanf(fp, "%20d %20f %20d %20f %20d %20d %20d %20d",
                 &monochromaticval, &meanval, &medianval, &stddevval,
                 &widthval, &heightval, &colval, &rowval);
@@ -110,13 +110,11 @@ writeData(const QString& filename, float *mean, unsigned char *median, float *st
         HistogramAnalyzer::Histogram *histogram, unsigned char *monochromatic,
         long long nframes)
 {
-    FILE            *fp;
-    long long       frameno;
-
     QByteArray fname = filename.toLocal8Bit();
-    if (!(fp = fopen(fname, "w")))
+    FILE *fp = fopen(fname, "w");
+    if (fp == nullptr)
         return false;
-    for (frameno = 0; frameno < nframes; frameno++)
+    for (long long frameno = 0; frameno < nframes; frameno++)
     {
         (void)fprintf(fp, "%3u %10.6f %3u %10.6f %5d %5d %5d %5d",
                       monochromatic[frameno],
@@ -146,9 +144,6 @@ HistogramAnalyzer::HistogramAnalyzer(PGMConverter *pgmc, BorderDetector *bd,
     , m_debugdata(debugdir + "/HistogramAnalyzer-yuv.txt")
 #endif /* !PGM_CONVERT_GREYSCALE */
 {
-    memset(m_histval, 0, sizeof(int) * (UCHAR_MAX + 1));
-    memset(&m_analyze_time, 0, sizeof(m_analyze_time));
-
     /*
      * debugLevel:
      *      0: no debugging
@@ -277,20 +272,20 @@ HistogramAnalyzer::analyzeFrame(const VideoFrame *frame, long long frameno)
     static const int    CINC = 4;
 #define ROUNDUP(a,b)    (((a) + (b) - 1) / (b) * (b))
 
-    const AVFrame     *pgm;
-    int                 pgmwidth, pgmheight;
-    bool                ismonochromatic;
-    int                 croprow, cropcol, cropwidth, cropheight;
-    unsigned int        borderpixels, livepixels, npixels, halfnpixels;
-    unsigned char       *pp, bordercolor;
-    unsigned long long  sumval, sumsquares;
-    int                 rr, cc, rr1, cc1, rr2, cc2, rr3, cc3;
-    struct timeval      start, end, elapsed;
+    int                 pgmwidth = 0, pgmheight = 0;
+    bool                ismonochromatic = false;
+    int                 croprow = 0, cropcol = 0, cropwidth = 0, cropheight = 0;
+    unsigned int        borderpixels = 0, livepixels = 0, npixels = 0, halfnpixels = 0;
+    unsigned char       *pp = nullptr, bordercolor = 0;
+    unsigned long long  sumval = 0, sumsquares = 0;
+    int                 rr1 = 0, cc1 = 0, rr2 = 0, cc2 = 0, rr3 = 0, cc3 = 0;
+    struct timeval      start {}, end {}, elapsed {};
 
     if (m_lastframeno != UNCACHED && m_lastframeno == frameno)
         return FrameAnalyzer::ANALYZE_OK;
 
-    if (!(pgm = m_pgmConverter->getImage(frame, frameno, &pgmwidth, &pgmheight)))
+    const AVFrame *pgm = m_pgmConverter->getImage(frame, frameno, &pgmwidth, &pgmheight);
+    if (pgm == nullptr)
         goto error;
 
     ismonochromatic = m_borderDetector->getDimensions(pgm, pgmheight, frameno,
@@ -324,17 +319,14 @@ HistogramAnalyzer::analyzeFrame(const VideoFrame *frame, long long frameno)
         ((rr2 - rr1) / RINC) * ((cc3 - cc2) / CINC) +   /* right */
         ((rr3 - rr2) / RINC) * (cc3 / CINC);            /* bottom */
 
-    sumval = 0;
-    sumsquares = 0;
-    livepixels = 0;
     pp = &m_buf[borderpixels];
     memset(m_histval, 0, sizeof(m_histval));
     m_histval[DEFAULT_COLOR] += borderpixels;
-    for (rr = rr1; rr < rr2; rr += RINC)
+    for (int rr = rr1; rr < rr2; rr += RINC)
     {
         int rroffset = rr * pgmwidth;
 
-        for (cc = cc1; cc < cc2; cc += CINC)
+        for (int cc = cc1; cc < cc2; cc += CINC)
         {
             if (m_logo && rr >= m_logorr1 && rr <= m_logorr2 &&
                     cc >= m_logocc1 && cc <= m_logocc2)

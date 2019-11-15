@@ -492,7 +492,8 @@ int ChannelBase::GetChanID(void) const
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT chanid,visible FROM channel "
-                  "WHERE channum  = :CHANNUM AND "
+                  "WHERE deleted  IS NULL AND "
+                  "      channum  = :CHANNUM AND "
                   "      sourceid = :SOURCEID");
     query.bindValueNoNull(":CHANNUM", m_curchannelname);
     query.bindValue(":SOURCEID", m_sourceid);
@@ -660,7 +661,8 @@ bool ChannelBase::CheckChannel(const QString &channum) const
     query.prepare(
         "SELECT channel.chanid "
         "FROM channel, capturecard "
-        "WHERE channel.channum       = :CHANNUM             AND "
+        "WHERE channel.deleted       IS NULL                AND "
+        "      channel.channum       = :CHANNUM             AND "
         "      channel.sourceid      = capturecard.sourceid AND "
         "      capturecard.cardid    = :INPUTID             AND "
         "      capturecard.hostname  = :HOSTNAME");
@@ -698,8 +700,9 @@ ChannelBase *ChannelBase::CreateChannel(
     {
 #ifdef USING_DVB
         channel = new DVBChannel(genOpt.videodev, tvrec);
-        static_cast<DVBChannel*>(channel)->SetSlowTuning(
-            dvbOpt.dvb_tuning_delay);
+        DVBChannel *dvbchannel = dynamic_cast<DVBChannel*>(channel);
+        if (dvbchannel != nullptr)
+            dvbchannel->SetSlowTuning(dvbOpt.dvb_tuning_delay);
 #endif
     }
     else if (genOpt.inputtype == "FIREWIRE")

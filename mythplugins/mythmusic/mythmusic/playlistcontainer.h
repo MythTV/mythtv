@@ -49,8 +49,8 @@ class PlaylistContainer
 
     void            save();
 
-    void            createNewPlaylist(QString name);
-    void            copyNewPlaylist(QString name);
+    void            createNewPlaylist(const QString &name);
+    void            copyNewPlaylist(const QString &name);
     void            copyToActive(int index);
 
     QString         getPlaylistName(int index, bool &reference);

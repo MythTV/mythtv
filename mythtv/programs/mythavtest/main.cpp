@@ -3,10 +3,10 @@
 
 using namespace std;
 
-#include <QString>
-#include <QRegExp>
-#include <QDir>
 #include <QApplication>
+#include <QDir>
+#include <QRegExp>
+#include <QString>
 #include <QTime>
 #include <QSurfaceFormat>
 
@@ -214,7 +214,7 @@ int main(int argc, char *argv[])
 
     if (cmdline.toBool("showversion"))
     {
-        cmdline.PrintVersion();
+        MythAVTestCommandLineParser::PrintVersion();
         return GENERIC_EXIT_OK;
     }
 
@@ -244,8 +244,8 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHAVTEST);
 
-    int retval;
-    if ((retval = cmdline.ConfigureLogging()) != GENERIC_EXIT_OK)
+    int retval = cmdline.ConfigureLogging();
+    if (retval != GENERIC_EXIT_OK)
         return retval;
 
     if (!cmdline.toString("display").isEmpty())

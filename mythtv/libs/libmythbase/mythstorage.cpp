@@ -2,6 +2,7 @@
 
 // Myth headers
 #include "mythstorage.h"
+
 #include "mythdb.h"
 #include "mythcorecontext.h"
 
@@ -127,8 +128,8 @@ QString GenericDBStorage::GetSetClause(MSqlBindings &bindings) const
 
 //////////////////////////////////////////////////////////////////////
 
-HostDBStorage::HostDBStorage(StorageUser *_user, const QString &name) :
-    SimpleDBStorage(_user, "settings", "data"), m_settingname(name)
+HostDBStorage::HostDBStorage(StorageUser *_user, QString name) :
+    SimpleDBStorage(_user, "settings", "data"), m_settingname(std::move(name))
 {
 }
 
@@ -174,8 +175,8 @@ void HostDBStorage::Save(void)
 //////////////////////////////////////////////////////////////////////
 
 GlobalDBStorage::GlobalDBStorage(
-    StorageUser *_user, const QString &name) :
-    SimpleDBStorage(_user, "settings", "data"), m_settingname(name)
+    StorageUser *_user, QString name) :
+    SimpleDBStorage(_user, "settings", "data"), m_settingname(std::move(name))
 {
 }
 

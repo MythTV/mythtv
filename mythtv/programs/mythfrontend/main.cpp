@@ -631,7 +631,7 @@ static void startTVNormal(void)
         "DefaultChanKeys", gCoreContext->GetHostName()).split("[]:[]");
     while (keylist.size() < 2)
         keylist << "";
-    uint dummy;
+    uint dummy = 0;
     ChannelInfoList livetvchannels = ChannelUtil::LoadChannels(
         0,                      // startIndex
         0,                      // count
@@ -1758,7 +1758,7 @@ static bool WasAutomaticStart(void)
 
     // Is backend running?
     //
-    if( gCoreContext->BackendIsRunning() )
+    if( MythCoreContext::BackendIsRunning() )
     {
         QDateTime startupTime = QDateTime();
 
@@ -1806,7 +1806,7 @@ static bool WasAutomaticStart(void)
             if (!wakeupCmd.isEmpty())
             {
                 ProgramList progList;
-                bool        bConflicts;
+                bool        bConflicts = false;
                 QDateTime   nextRecordingStart;
 
                 if (LoadFromScheduler(progList, bConflicts))
@@ -1884,7 +1884,7 @@ int main(int argc, char **argv)
 
     if (cmdline.toBool("showversion"))
     {
-        cmdline.PrintVersion();
+        MythFrontendCommandLineParser::PrintVersion();
         return GENERIC_EXIT_OK;
     }
 
@@ -1960,8 +1960,8 @@ int main(int argc, char **argv)
     SignalHandler::SetHandler(SIGHUP, logSigHup);
 #endif
 
-    int retval;
-    if ((retval = cmdline.ConfigureLogging()) != GENERIC_EXIT_OK)
+    int retval = cmdline.ConfigureLogging();
+    if (retval != GENERIC_EXIT_OK)
         return retval;
 
     bool ResetSettings = false;

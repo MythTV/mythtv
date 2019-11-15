@@ -1,5 +1,5 @@
-#include <QStringList>
 #include <QMetaType>
+#include <QStringList>
 #include <QTimer>
 
 #include <mythcontext.h>
@@ -26,9 +26,9 @@ static const QString _Location = "MythGame";
 class GameTreeInfo
 {
   public:
-    GameTreeInfo(const QString& levels, const QString& filter)
+    GameTreeInfo(const QString& levels, QString  filter)
       : m_levels(levels.split(" "))
-      , m_filter(filter)
+      , m_filter(std::move(filter))
     {
     }
 
@@ -501,8 +501,9 @@ void GameUI::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
-
+        auto dce = dynamic_cast<DialogCompletionEvent*>(event);
+        if (dce == nullptr)
+            return;
         QString resultid   = dce->GetId();
         QString resulttext = dce->GetResultText();
 
@@ -560,8 +561,9 @@ void GameUI::customEvent(QEvent *event)
     }
     if (event->type() == MetadataLookupEvent::kEventType)
     {
-        MetadataLookupEvent *lue = (MetadataLookupEvent *)event;
-
+        auto lue = dynamic_cast<MetadataLookupEvent *>(event);
+        if (lue == nullptr)
+            return;
         MetadataLookupList lul = lue->m_lookupList;
 
         if (m_busyPopup)
@@ -592,8 +594,9 @@ void GameUI::customEvent(QEvent *event)
     }
     else if (event->type() == MetadataLookupFailure::kEventType)
     {
-        MetadataLookupFailure *luf = (MetadataLookupFailure *)event;
-
+        auto luf = dynamic_cast<MetadataLookupFailure *>(event);
+        if (luf == nullptr)
+            return;
         MetadataLookupList lul = luf->m_lookupList;
 
         if (m_busyPopup)
@@ -619,8 +622,9 @@ void GameUI::customEvent(QEvent *event)
     }
     else if (event->type() == ImageDLEvent::kEventType)
     {
-        ImageDLEvent *ide = (ImageDLEvent *)event;
-
+        ImageDLEvent *ide = dynamic_cast<ImageDLEvent *>(event);
+        if (ide == nullptr)
+            return;
         MetadataLookup *lookup = ide->m_item;
 
         if (!lookup)
@@ -758,7 +762,7 @@ QString GameUI::getFillSql(MythGenericTree *node) const
     return sql;
 }
 
-QString GameUI::getChildLevelString(MythGenericTree *node) const
+QString GameUI::getChildLevelString(MythGenericTree *node)
 {
     unsigned this_level = node->getInt();
     while (node->getInt() != 1)
@@ -768,7 +772,7 @@ QString GameUI::getChildLevelString(MythGenericTree *node) const
     return gi->getLevel(this_level - 1);
 }
 
-QString GameUI::getFilter(MythGenericTree *node) const
+QString GameUI::getFilter(MythGenericTree *node)
 {
     while (node->getInt() != 1)
         node = node->getParent();
@@ -776,7 +780,7 @@ QString GameUI::getFilter(MythGenericTree *node) const
     return gi->getFilter();
 }
 
-int GameUI::getLevelsOnThisBranch(MythGenericTree *node) const
+int GameUI::getLevelsOnThisBranch(MythGenericTree *node)
 {
     while (node->getInt() != 1)
         node = node->getParent();
@@ -785,7 +789,7 @@ int GameUI::getLevelsOnThisBranch(MythGenericTree *node) const
     return gi->getDepth();
 }
 
-bool GameUI::isLeaf(MythGenericTree *node) const
+bool GameUI::isLeaf(MythGenericTree *node)
 {
   return (node->getInt() - 1) == getLevelsOnThisBranch(node);
 }
@@ -835,11 +839,10 @@ void GameUI::fillNode(MythGenericTree *node)
             }
             else
             {
-                RomInfo *newRomInfo;
+                RomInfo *newRomInfo = nullptr;
                 if (node->getInt() > 1)
                 {
-                    RomInfo *currentRomInfo;
-                    currentRomInfo = node->GetData().value<RomInfo *>();
+                    RomInfo *currentRomInfo = node->GetData().value<RomInfo *>();
                     newRomInfo = new RomInfo(*currentRomInfo);
                 }
                 else

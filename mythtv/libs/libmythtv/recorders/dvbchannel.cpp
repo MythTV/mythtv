@@ -249,8 +249,7 @@ bool DVBChannel::Open(DVBChannel *who)
         usleep(50000);
     }
 
-    dvb_frontend_info info;
-    memset(&info, 0, sizeof(info));
+    dvb_frontend_info info {};
     if (ioctl(m_fd_frontend, FE_GET_INFO, &info) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -875,7 +874,7 @@ bool DVBChannel::IsTuningParamsProbeSupported(void) const
         return false;
     }
 
-    dvb_frontend_parameters params;
+    dvb_frontend_parameters params {};
 
     int res = ioctl(m_fd_frontend, FE_GET_FRONTEND, &params);
     if (res < 0)
@@ -927,7 +926,7 @@ bool DVBChannel::ProbeTuningParams(DTVMultiplex &tuning) const
         return false;
     }
 
-    dvb_frontend_parameters params;
+    dvb_frontend_parameters params {};
     if (ioctl(m_fd_frontend, FE_GET_FRONTEND, &params) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -959,7 +958,8 @@ int DVBChannel::GetChanID() const
 
     query.prepare("SELECT chanid,visible "
                   "FROM channel, capturecard "
-                  "WHERE capturecard.sourceid = channel.sourceid AND "
+                  "WHERE channel.deleted IS NULL AND "
+                  "      capturecard.sourceid = channel.sourceid AND "
                   "      channel.channum = :CHANNUM AND "
                   "      capturecard.cardid = :INPUTID");
 
@@ -1400,7 +1400,7 @@ bool DVBChannel::IsMaster(void) const
  */
 static void drain_dvb_events(int fd)
 {
-    struct dvb_frontend_event event;
+    struct dvb_frontend_event event {};
     int ret = 0;
     while ((ret = ioctl(fd, FE_GET_EVENT, &event)) == 0);
     if ((ret < 0) && (EAGAIN != errno))
@@ -1475,8 +1475,7 @@ static struct dvb_frontend_parameters dtvmultiplex_to_dvbparams(
     DTVTunerType tuner_type, const DTVMultiplex &tuning,
     int intermediate_freq, bool can_fec_auto)
 {
-    dvb_frontend_parameters params;
-    memset(&params, 0, sizeof(params));
+    dvb_frontend_parameters params {};
 
     params.frequency = tuning.m_frequency;
     params.inversion = (fe_spectral_inversion_t) (int) tuning.m_inversion;

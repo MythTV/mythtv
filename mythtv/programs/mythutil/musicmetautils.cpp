@@ -339,12 +339,13 @@ static int CalcTrackLength(const MythUtilCommandLineParser &cmdline)
     return GENERIC_EXIT_OK;
 }
 
-typedef struct
+class LyricsGrabber
 {
+public:
     QString name;
     QString filename;
-    int priority;
-} LyricsGrabber;
+    int     priority {99};
+};
 
 static int FindLyrics(const MythUtilCommandLineParser &cmdline)
 {
@@ -496,7 +497,7 @@ static int FindLyrics(const MythUtilCommandLineParser &cmdline)
 
         QDomDocument domDoc;
         QString errorMsg;
-        int errorLine, errorColumn;
+        int errorLine = 0, errorColumn = 0;
 
         if (!domDoc.setContent(result, false, &errorMsg, &errorLine, &errorColumn))
         {

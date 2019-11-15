@@ -217,9 +217,7 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
                                                long long &framesProcessed,
                                              QTime &flagTime, bool findLast)
 {
-    float flagFPS;
     int requiredBuffer = 30;
-    long long currentFrameNumber;
     int prevpercent = -1;
 
     if(startFrame > 0)
@@ -232,7 +230,7 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
     long long tmpStartFrame = startFrame;
     VideoFrame* f = m_player->GetRawVideoFrame(tmpStartFrame);
     float aspect = m_player->GetVideoAspect();
-    currentFrameNumber = f->frameNumber;
+    long long currentFrameNumber = f->frameNumber;
     LOG(VB_COMMFLAG, LOG_INFO, QString("Starting with frame %1")
             .arg(currentFrameNumber));
     m_player->DiscardVideoFrame(f);
@@ -241,7 +239,7 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
 
     while (m_player->GetEof() == kEofStateNone)
     {
-        struct timeval startTime;
+        struct timeval startTime {};
         if (m_stillRecording)
             gettimeofday(&startTime, nullptr);
 
@@ -295,17 +293,13 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
         {
             float elapsed = flagTime.elapsed() / 1000.0;
 
+            float flagFPS = 0.0F;
             if (elapsed)
                 flagFPS = framesProcessed / elapsed;
-            else
-                flagFPS = 0.0;
 
-            int percentage;
+            int percentage = 0;
             if (stopFrame)
                 percentage = framesProcessed * 100 / totalFrames;
-            else
-                percentage = 0;
-
             if (percentage > 100)
                 percentage = 100;
 
@@ -361,7 +355,7 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
             int secondsBehind = secondsRecorded - secondsFlagged;
             long usecPerFrame = (long)(1.0F / m_player->GetFrameRate() * 1000000);
 
-            struct timeval endTime;
+            struct timeval endTime {};
             gettimeofday(&endTime, nullptr);
 
             long long usecSleep =

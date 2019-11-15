@@ -95,9 +95,9 @@ class MUI_PUBLIC MythThemedMenu : public MythThemedMenuState
                    const QString &description, const QString &password);
 
     bool handleAction(const QString &action, const QString &password = QString());
-    bool findDepends(const QString &fileList);
-    bool findDependsExec(const QString &filename);
-    QString findMenuFile(const QString &menuname);
+    static bool findDepends(const QString &fileList);
+    static bool findDependsExec(const QString &filename);
+    static QString findMenuFile(const QString &menuname);
 
     bool checkPinCode(const QString &password_setting);
 

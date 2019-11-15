@@ -18,7 +18,7 @@ class ExitPrompter : public QObject
   public slots:
     void masterPromptExit(void);
     void handleExit(void);
-    void quit(void);
+    static void quit(void);
     
   private:
     ExitPrompter(const ExitPrompter &);

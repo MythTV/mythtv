@@ -183,8 +183,7 @@ void LyricsData::customEvent(QEvent *event)
 {
     if (event->type() == MythEvent::MythEventMessage)
     {
-        MythEvent *me = static_cast<MythEvent*>(event);
-
+        MythEvent *me = dynamic_cast<MythEvent*>(event);
         if (!me)
             return;
 
@@ -231,7 +230,7 @@ void LyricsData::loadLyrics(const QString &xmlData)
 {
     QDomDocument domDoc;
     QString errorMsg;
-    int errorLine, errorColumn;
+    int errorLine = 0, errorColumn = 0;
 
     if (!domDoc.setContent(xmlData, false, &errorMsg, &errorLine, &errorColumn))
     {

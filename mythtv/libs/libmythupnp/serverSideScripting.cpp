@@ -489,7 +489,7 @@ QString ServerSideScripting::CreateMethodFromFile( const QString &sFileName ) co
 //
 //////////////////////////////////////////////////////////////////////////////
 
-QString ServerSideScripting::ReadFileContents( const QString &sFileName ) const
+QString ServerSideScripting::ReadFileContents( const QString &sFileName )
 {
     QString  sCode;
     QFile    scriptFile( sFileName );

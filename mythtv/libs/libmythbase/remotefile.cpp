@@ -1,9 +1,9 @@
 #include <iostream>
 using namespace std;
 
-#include <QUrl>
 #include <QFile>
 #include <QFileInfo>
+#include <QUrl>
 
 // POSIX C headers
 #include <unistd.h>
@@ -69,10 +69,10 @@ static bool RemoteSendReceiveStringList(const QString &host, QStringList &strlis
     return ok;
 }
 
-RemoteFile::RemoteFile(const QString &url, bool write, bool usereadahead,
+RemoteFile::RemoteFile(QString url, bool write, bool usereadahead,
                        int timeout_ms,
                        const QStringList *possibleAuxiliaryFiles) :
-    m_path(url),
+    m_path(std::move(url)),
     m_usereadahead(usereadahead),  m_timeout_ms(timeout_ms),
     m_writemode(write)
 {
@@ -454,7 +454,7 @@ bool RemoteFile::Exists(const QString &url)
     if (url.isEmpty())
         return false;
 
-    struct stat fileinfo;
+    struct stat fileinfo {};
     return Exists(url, &fileinfo);
 }
 
@@ -637,7 +637,7 @@ bool RemoteFile::CopyFile (const QString& src, const QString& dst,
     dstFile.SetBlocking(true);
 
     bool success = true;
-    int srcLen;
+    int srcLen = 0;
 
     while ((srcLen = srcFile.Read(buf, readSize)) > 0)
     {
@@ -658,7 +658,7 @@ bool RemoteFile::CopyFile (const QString& src, const QString& dst,
     if (success && verify)
     {
         // Check written file is correct size
-        struct stat fileinfo;
+        struct stat fileinfo {};
         long long dstSize = Exists(dst, &fileinfo) ? fileinfo.st_size : -1;
         long long srcSize = srcFile.GetFileSize();
         if (dstSize != srcSize)
@@ -1134,7 +1134,7 @@ long long RemoteFile::GetRealFileSize(void)
     if (!CheckConnection())
     {
         // Can't establish a new connection, using system one
-        struct stat fileinfo;
+        struct stat fileinfo {};
 
         if (Exists(m_path, &fileinfo))
         {
@@ -1150,7 +1150,7 @@ long long RemoteFile::GetRealFileSize(void)
 
     if (ok && !strlist.isEmpty())
     {
-        bool validate;
+        bool validate = false;
         long long size = strlist[0].toLongLong(&validate);
 
         if (validate)
@@ -1163,7 +1163,7 @@ long long RemoteFile::GetRealFileSize(void)
         }
         else
         {
-            struct stat fileinfo;
+            struct stat fileinfo {};
 
             if (Exists(m_path, &fileinfo))
             {
@@ -1345,18 +1345,18 @@ QStringList RemoteFile::FindFileList(const QString& filename, const QString& hos
             QStringList filteredFiles = files.filter(QRegExp(fi.fileName()));
             for (int x = 0; x < filteredFiles.size(); x++)
             {
-                strList << gCoreContext->GenMythURL(gCoreContext->GetHostName(),
-                                                    gCoreContext->GetBackendServerPort(),
-                                                    fi.path() + '/' + filteredFiles[x],
-                                                    storageGroup);
+                strList << MythCoreContext::GenMythURL(gCoreContext->GetHostName(),
+                                                       gCoreContext->GetBackendServerPort(),
+                                                       fi.path() + '/' + filteredFiles[x],
+                                                       storageGroup);
             }
         }
         else
         {
             if (!sgroup.FindFile(filename).isEmpty())
-                strList << gCoreContext->GenMythURL(hostName,
-                                                    gCoreContext->GetBackendServerPort(hostName),
-                                                    filename, storageGroup);
+                strList << MythCoreContext::GenMythURL(hostName,
+                                                       gCoreContext->GetBackendServerPort(hostName),
+                                                       filename, storageGroup);
         }
 
         if (!strList.isEmpty() || !allowFallback)

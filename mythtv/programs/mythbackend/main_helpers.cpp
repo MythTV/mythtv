@@ -445,7 +445,7 @@ int connect_to_master(void)
     MythSocket *tempMonitorConnection = new MythSocket();
     if (tempMonitorConnection->ConnectToHost(
             gCoreContext->GetMasterServerIP(),
-            gCoreContext->GetMasterServerPort()))
+            MythCoreContext::GetMasterServerPort()))
     {
         if (!gCoreContext->CheckProtoVersion(tempMonitorConnection))
         {

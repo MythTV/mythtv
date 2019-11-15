@@ -38,7 +38,7 @@ class MUI_PUBLIC MythScreenStack : public QObject
 
     QString GetLocation(bool fullPath) const;
 
-    MythPainter *GetPainter(void);
+    static MythPainter *GetPainter(void);
 
   signals:
     void topScreenChanged(MythScreenType *screen);

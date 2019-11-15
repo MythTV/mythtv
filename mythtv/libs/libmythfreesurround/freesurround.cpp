@@ -324,7 +324,6 @@ uint FreeSurround::putFrames(void* buffer, uint numFrames, uint numChannels)
 
 uint FreeSurround::receiveFrames(void *buffer, uint maxFrames)
 {
-    uint i;
     uint oc = out_count;
     if (maxFrames > oc) maxFrames = oc;
     uint outindex = processed_size - oc;
@@ -339,7 +338,7 @@ uint FreeSurround::receiveFrames(void *buffer, uint maxFrames)
         float *lfe = &bufs->lfe[outindex];
         float *rls = &bufs->rls[outindex];
         float *rrs = &bufs->rrs[outindex];
-        for (i = 0; i < maxFrames; i++)
+        for (uint i = 0; i < maxFrames; i++)
         {
 //            printf("1:%f 2:%f 3:%f 4:%f 5:%f 6:%f 7:%f 8:%f\n",
 //                   *l, *r, *c, *lfe, *rls, *rrs, *ls, *rs);
@@ -367,7 +366,7 @@ uint FreeSurround::receiveFrames(void *buffer, uint maxFrames)
             float *ls  = &outputs[3][outindex];
             float *rs  = &outputs[4][outindex];
             float *lfe = &outputs[5][outindex];
-            for (i = 0; i < maxFrames; i++)
+            for (uint i = 0; i < maxFrames; i++)
             {
                 *output++ = *l++;
                 *output++ = *r++;
@@ -386,7 +385,7 @@ uint FreeSurround::receiveFrames(void *buffer, uint maxFrames)
             float *ls  = &bufs->ls[outindex];
             float *rs  = &bufs->rs[outindex];
             float *lfe = &bufs->lfe[outindex];
-            for (i = 0; i < maxFrames; i++)
+            for (uint i = 0; i < maxFrames; i++)
             {
                 *output++ = *l++;
                 *output++ = *r++;

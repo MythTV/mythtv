@@ -375,7 +375,7 @@ void CDRipperThread::run(void)
                 encoder.reset();
 
                 // copy track to the BE
-                destFile = gCoreContext->GenMythURL(url.host(), 0, destFile, "Music");
+                destFile = MythCoreContext::GenMythURL(url.host(), 0, destFile, "Music");
 
                 QApplication::postEvent(m_parent, new RipStatusEvent(RipStatusEvent::kCopyStartEvent, 0));
                 RemoteFile::CopyFile(saveDir + outfile, destFile, true);
@@ -757,7 +757,6 @@ void Ripper::ScanFinished()
 
     if (m_decoder)
     {
-        MusicMetadata *metadata;
         bool isCompilation = false;
 
         m_artistName.clear();
@@ -769,7 +768,7 @@ void Ripper::ScanFinished()
         {
             RipTrack *ripTrack = new RipTrack;
 
-            metadata = m_decoder->getMetadata(trackno + 1);
+            MusicMetadata *metadata = m_decoder->getMetadata(trackno + 1);
             if (metadata)
             {
                 ripTrack->metadata = metadata;
@@ -842,8 +841,7 @@ void Ripper::scanCD(void)
 
 void Ripper::deleteAllExistingTracks(void)
 {
-    QVector<RipTrack*>::iterator it;
-    for (it = m_tracks->begin(); it < m_tracks->end(); ++it)
+    for (auto it = m_tracks->begin(); it < m_tracks->end(); ++it)
     {
         RipTrack *track = (*it);
         if (track && !track->isNew)
@@ -909,7 +907,7 @@ bool Ripper::deleteExistingTrack(RipTrack *track)
         int trackID = query.value(0).toInt();
         QString filename = query.value(1).toString();
         QUrl url(m_musicStorageDir);
-        filename = gCoreContext->GenMythURL(url.host(), 0, filename, "Music");
+        filename = MythCoreContext::GenMythURL(url.host(), 0, filename, "Music");
 
         // delete file
         // FIXME: RemoteFile::DeleteFile will only work with files on the master BE
@@ -1050,8 +1048,7 @@ void Ripper::compilationChanged(bool state)
             // Update artist MetaData of each track on the album...
             for (int trackno = 0; trackno < m_tracks->size(); ++trackno)
             {
-                MusicMetadata *data;
-                data = m_tracks->at(trackno)->metadata;
+                MusicMetadata *data = m_tracks->at(trackno)->metadata;
 
                 if (data)
                 {
@@ -1073,15 +1070,13 @@ void Ripper::switchTitlesAndArtists()
     if (!m_compilationCheck->GetBooleanCheckState())
         return;
 
-    MusicMetadata *data;
-
     // Switch title and artist for each track
     QString tmp;
     if (!m_tracks->empty())
     {
         for (int track = 0; track < m_tracks->size(); ++track)
         {
-            data = m_tracks->at(track)->metadata;
+            MusicMetadata *data = m_tracks->at(track)->metadata;
 
             if (data)
             {
@@ -1195,8 +1190,7 @@ void Ripper::updateTrackList(void)
     {
         m_trackList->Reset();
 
-        int i;
-        for (i = 0; i < m_tracks->size(); i++)
+        for (int i = 0; i < m_tracks->size(); i++)
         {
             if (i >= m_tracks->size())
                 break;
@@ -1227,9 +1221,8 @@ void Ripper::updateTrackList(void)
             int length = track->length / 1000;
             if (length > 0)
             {
-                int min, sec;
-                min = length / 60;
-                sec = length % 60;
+                int min = length / 60;
+                int sec = length % 60;
                 QString s;
                 s.sprintf("%02d:%02d", min, sec);
                 item->SetText(s, "length");
@@ -1419,10 +1412,9 @@ void Ripper::ShowConflictMenu(RipTrack* track)
 
 void Ripper::updateTrackLengths()
 {
-    QVector<RipTrack*>::iterator it;
     int length = 0;
 
-    for (it = m_tracks->end() - 1; it == m_tracks->begin(); --it)
+    for (auto it = m_tracks->end() - 1; it == m_tracks->begin(); --it)
     {
         RipTrack *track = *it;
         if (track->active)
@@ -1442,8 +1434,9 @@ void Ripper::customEvent(QEvent* event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = static_cast<DialogCompletionEvent *>(event);
-
+        auto dce = dynamic_cast<DialogCompletionEvent *>(event);
+        if (dce == nullptr)
+            return;
         if (dce->GetId() == "conflictmenu")
         {
             int buttonNum = dce->GetResult();
@@ -1543,8 +1536,9 @@ void RipStatus::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = static_cast<DialogCompletionEvent *>(event);
-
+        DialogCompletionEvent *dce = dynamic_cast<DialogCompletionEvent *>(event);
+        if (dce == nullptr)
+            return;
         if (dce->GetId() == "stop_ripping" && dce->GetResult())
         {
             m_ripperThread->cancel();
@@ -1556,7 +1550,6 @@ void RipStatus::customEvent(QEvent *event)
     }
 
     RipStatusEvent *rse = dynamic_cast<RipStatusEvent *> (event);
-
     if (!rse)
         return;
 

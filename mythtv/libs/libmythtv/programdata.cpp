@@ -1474,7 +1474,8 @@ void ProgramData::HandlePrograms(
         query.prepare(
             "SELECT chanid "
             "FROM channel "
-            "WHERE sourceid = :ID AND "
+            "WHERE deleted  IS NULL AND "
+            "      sourceid = :ID AND "
             "      xmltvid  = :XMLTVID");
         query.bindValue(":ID",      sourceid);
         query.bindValue(":XMLTVID", mapiter.key());

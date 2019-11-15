@@ -55,7 +55,7 @@ void MHVisible::Initialise(MHParseNode *p, MHEngine *engine)
 
     if (! pOriginalBox)
     {
-        p->Failure("OriginalBoxSize missing");
+        MHParseNode::Failure("OriginalBoxSize missing");
     }
     else
     {
@@ -803,16 +803,9 @@ void MHSlider::Display(MHEngine *engine)
         colour = GetColour(m_sliderRefColour);
     }
 
-    int major; // Direction of change.
-
+    int major = m_nBoxHeight; // Direction of change.
     if (m_orientation == SliderLeft || m_orientation == SliderRight)
-    {
         major = m_nBoxWidth;
-    }
-    else
-    {
-        major = m_nBoxHeight;
-    }
 
     if (m_max_value <= m_min_value)
     {

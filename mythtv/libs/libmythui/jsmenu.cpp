@@ -71,8 +71,6 @@ JoystickMenuThread::~JoystickMenuThread()
  */
 bool JoystickMenuThread::Init(QString &config_file)
 {
-    int rc;
-
     /*------------------------------------------------------------------------
     ** Read the config file
     **----------------------------------------------------------------------*/
@@ -91,7 +89,7 @@ bool JoystickMenuThread::Init(QString &config_file)
         return false;
     }
 
-    rc = ioctl(m_fd, JSIOCGAXES, &m_axesCount);
+    int rc = ioctl(m_fd, JSIOCGAXES, &m_axesCount);
     if (rc == -1)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -137,15 +135,13 @@ bool JoystickMenuThread::Init(QString &config_file)
  */
 bool JoystickMenuThread::ReadConfig(const QString& config_file)
 {
-    FILE *fp;
-
     if (!QFile::exists(config_file))
     {
         LOG(VB_GENERAL, LOG_INFO, "No joystick configuration found, not enabling joystick control");
         return false;
     }
 
-    fp = fopen(qPrintable(config_file), "r");
+    FILE *fp = fopen(qPrintable(config_file), "r");
     if (!fp)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -196,8 +192,8 @@ void JoystickMenuThread::run(void)
     RunProlog();
 
     fd_set readfds;
-    struct js_event js;
-    struct timeval timeout;
+    struct js_event js {};
+    struct timeval timeout {};
 
     while (!m_bStop)
     {

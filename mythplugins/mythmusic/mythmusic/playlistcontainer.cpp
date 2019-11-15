@@ -185,24 +185,24 @@ void PlaylistContainer::save(void)
     m_streamPlaylist->savePlaylist(DEFAULT_STREAMLIST_NAME, m_myHost);
 }
 
-void PlaylistContainer::createNewPlaylist(QString name)
+void PlaylistContainer::createNewPlaylist(const QString &name)
 {
     Playlist *new_list = new Playlist();
     new_list->setParent(this);
 
     //  Need to touch the database to get persistent ID
-    new_list->savePlaylist(std::move(name), m_myHost);
+    new_list->savePlaylist(name, m_myHost);
 
     m_allPlaylists->push_back(new_list);
 }
 
-void PlaylistContainer::copyNewPlaylist(QString name)
+void PlaylistContainer::copyNewPlaylist(const QString &name)
 {
     Playlist *new_list = new Playlist();
     new_list->setParent(this);
 
     //  Need to touch the database to get persistent ID
-    new_list->savePlaylist(std::move(name), m_myHost);
+    new_list->savePlaylist(name, m_myHost);
 
     m_allPlaylists->push_back(new_list);
     m_activePlaylist->copyTracks(new_list, false);

@@ -385,6 +385,7 @@ class MTV_PUBLIC CardUtil
     static DTVTunerType GetTunerType(uint inputid);
     static DTVTunerType ProbeTunerType(int fd_frontend);
     static DTVTunerType ProbeTunerType(const QString &device);
+    static DTVTunerType GetTunerTypeFromMultiplex(uint mplexid);
     static DTVModulationSystem GetDeliverySystem(uint inputid);
     static DTVModulationSystem ProbeCurrentDeliverySystem(const QString &device);
     static DTVModulationSystem ProbeCurrentDeliverySystem(int fd_frontend);

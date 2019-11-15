@@ -26,7 +26,6 @@ const QString MetaIO::ValidFileExtensions(".mp3|.mp2|.ogg|.oga|.flac|.wma|.wav|.
 MetaIO::MetaIO()
 {
     m_filenameFormat = gCoreContext->GetSetting("NonID3FileNameFormat").toUpper();
-    memset(&m_fileinfo, 0, sizeof(m_fileinfo));
 }
 
 // static
@@ -226,10 +225,7 @@ void MetaIO::saveTimeStamps(void)
 
 void MetaIO::restoreTimeStamps(void)
 {
-    struct utimbuf new_times;
-
-    new_times.actime = m_fileinfo.st_atime;
-    new_times.modtime = m_fileinfo.st_mtime;
+    struct utimbuf new_times {m_fileinfo.st_atime, m_fileinfo.st_mtime};
 
     if (utime(m_filename.toLocal8Bit().constData(), &new_times) < 0)
     {

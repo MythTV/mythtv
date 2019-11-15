@@ -825,7 +825,7 @@ QRegion OSD::Draw(MythPainter* painter, QPaintDevice *device, QSize size,
     QList<MythScreenType*>::iterator it2 = notifications.begin();
     while (it2 != notifications.end())
     {
-        if (!GetNotificationCenter()->ScreenCreated(*it2))
+        if (!MythNotificationCenter::ScreenCreated(*it2))
         {
             if (!m_UIScaleOverride)
             {
@@ -1292,7 +1292,7 @@ TeletextScreen* OSD::InitTeletext(void)
     TeletextScreen *tt = nullptr;
     if (m_Children.contains(OSD_WIN_TELETEXT))
     {
-        tt = (TeletextScreen*)m_Children.value(OSD_WIN_TELETEXT);
+        tt = dynamic_cast<TeletextScreen*>(m_Children.value(OSD_WIN_TELETEXT));
     }
     else
     {
@@ -1347,7 +1347,7 @@ bool OSD::TeletextAction(const QString &action)
     if (!HasWindow(OSD_WIN_TELETEXT))
         return false;
 
-    TeletextScreen* tt = (TeletextScreen*)m_Children.value(OSD_WIN_TELETEXT);
+    TeletextScreen* tt = dynamic_cast<TeletextScreen*>(m_Children.value(OSD_WIN_TELETEXT));
     if (tt)
         return tt->KeyPress(action);
     return false;
@@ -1368,7 +1368,7 @@ void OSD::TeletextClear(void)
     if (!HasWindow(OSD_WIN_TELETEXT))
         return;
 
-    TeletextScreen* tt = (TeletextScreen*)m_Children.value(OSD_WIN_TELETEXT);
+    TeletextScreen* tt = dynamic_cast<TeletextScreen*>(m_Children.value(OSD_WIN_TELETEXT));
     if (tt)
         tt->ClearScreen();
 }
@@ -1378,7 +1378,7 @@ SubtitleScreen* OSD::InitSubtitles(void)
     SubtitleScreen *sub = nullptr;
     if (m_Children.contains(OSD_WIN_SUBTITLE))
     {
-        sub = (SubtitleScreen*)m_Children.value(OSD_WIN_SUBTITLE);
+        sub = dynamic_cast<SubtitleScreen*>(m_Children.value(OSD_WIN_SUBTITLE));
     }
     else
     {
@@ -1450,7 +1450,7 @@ void OSD::DisplayBDOverlay(BDOverlay* overlay)
     if (!overlay)
         return;
 
-    BDOverlayScreen* bd = (BDOverlayScreen*)GetWindow(OSD_WIN_BDOVERLAY);
+    BDOverlayScreen* bd = dynamic_cast<BDOverlayScreen*>(GetWindow(OSD_WIN_BDOVERLAY));
     if (bd)
         bd->DisplayBDOverlay(overlay);
 }

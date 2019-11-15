@@ -24,9 +24,9 @@ class META_PUBLIC MetaIOMP4 : public MetaIO
 
   private:
     int getTrackLength(const QString &filename) override; // MetaIO
-    int getTrackLength(AVFormatContext* pContext);
-    QString getFieldValue(AVFormatContext* context, const char* tagname);
-    void metadataSanityCheck(QString *artist, QString *album, QString *title, QString *genre);
+    static int getTrackLength(AVFormatContext* pContext);
+    static QString getFieldValue(AVFormatContext* context, const char* tagname);
+    static void metadataSanityCheck(QString *artist, QString *album, QString *title, QString *genre);
 };
 
 #endif

@@ -70,11 +70,8 @@ void WeatherScreen::setValue(const QString &key, const QString &value)
         m_dataValueMap[key] = prepareDataItem(key, value);
 }
 
-void WeatherScreen::newData(QString loc, units_t units, DataMap data)
+void WeatherScreen::newData(const QString& /*loc*/, units_t /*units*/, DataMap data)
 {
-    (void) loc;
-    (void) units;
-
     DataMap::iterator itr = data.begin();
     while (itr != data.end())
     {
@@ -131,14 +128,14 @@ bool WeatherScreen::prepareScreen(bool checkOnly)
             continue;
         }
 
-        if (dynamic_cast<MythUIText *>(widget))
+        if (auto w2 = dynamic_cast<MythUIText *>(widget))
         {
-            ((MythUIText *) widget)->SetText(itr.value());
+            w2->SetText(itr.value());
         }
-        else if (dynamic_cast<MythUIImage *>(widget))
+        else if (auto w3 = dynamic_cast<MythUIImage *>(widget))
         {
-            ((MythUIImage *) widget)->SetFilename(itr.value());
-            ((MythUIImage *) widget)->Load();
+            w3->SetFilename(itr.value());
+            w3->Load();
         }
 
         prepareWidget(widget);
@@ -151,12 +148,12 @@ bool WeatherScreen::prepareScreen(bool checkOnly)
 
 void WeatherScreen::prepareWidget(MythUIType *widget)
 {
-    MythUIImage *img;
     /*
      * Basically so we don't do it twice since some screens (Static Map) mess
      * with image dimensions
      */
-    if ((img = dynamic_cast<MythUIImage *>(widget)))
+    MythUIImage *img = dynamic_cast<MythUIImage *>(widget);
+    if (img != nullptr)
     {
         img->Load();
     }
@@ -192,7 +189,7 @@ QString WeatherScreen::formatDataItem(const QString &key, const QString &value)
      the enum DaysOfWeek.*/
     if (key.startsWith("date"))
     {
-        bool isNumber;
+        bool isNumber = false;
         (void)value.toInt( &isNumber);
 
         if (isNumber)

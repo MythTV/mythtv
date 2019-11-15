@@ -14,8 +14,8 @@
 #include <cmath>
 #include <iostream>
 
-#include <queue>
 #include <algorithm>
+#include <queue>
 #include <thread>
 
 using namespace std;
@@ -95,10 +95,10 @@ class MythContextPrivate : public QObject
     bool    UPnPconnect(const DeviceLocation *backend, const QString &PIN);
     void    ShowGuiStartup(void);
     bool    checkPort(QString &host, int port, int timeLimit);
-    void    processEvents(void);
+    static void processEvents(void);
     bool    saveSettingsCache(void);
     void    loadSettingsCacheOverride(void);
-    void    clearSettingsCacheOverride(void);
+    static void clearSettingsCacheOverride(void);
 
 
   protected:
@@ -153,7 +153,7 @@ static void exec_program_tv_cb(const QString &cmd)
     QStringList tokens = cmd.simplified().split(" ");
     QStringList strlist;
 
-    bool cardidok;
+    bool cardidok = false;
     int wantcardid = tokens[0].toInt(&cardidok, 10);
 
     if (cardidok && wantcardid > 0)
@@ -382,7 +382,7 @@ bool MythContextPrivate::Init(const bool gui,
 
     if (gui)
     {
-        MythUIMenuCallbacks cbs;
+        MythUIMenuCallbacks cbs {};
         cbs.exec_program = exec_program_cb;
         cbs.exec_program_tv = exec_program_tv_cb;
         cbs.configplugin = configplugin_cb;
@@ -970,7 +970,7 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
                     ("MasterServerName");
                 backendIP = gCoreContext->GetSettingOnHost
                     ("BackendServerAddr", masterserver);
-                backendPort = gCoreContext->GetMasterServerPort();
+                backendPort = MythCoreContext::GetMasterServerPort();
                 [[clang::fallthrough]];
             case st_beWOL:
                 if (!beWOLCmd.isEmpty()) {
@@ -1362,7 +1362,10 @@ bool MythContextPrivate::event(QEvent *e)
             m_registration = GetNotificationCenter()->Register(this);
         }
 
-        MythEvent *me = static_cast<MythEvent*>(e);
+        MythEvent *me = dynamic_cast<MythEvent*>(e);
+        if (me == nullptr)
+            return true;
+
         if (me->Message() == "VERSION_MISMATCH" && (1 == me->ExtraDataCount()))
             ShowVersionMismatchPopup(me->ExtraData(0).toUInt());
         else if (me->Message() == "CONNECTION_FAILURE")
@@ -1541,8 +1544,8 @@ void MythContextSlotHandler::VersionMismatchPopupClosed(void)
     qApp->exit(GENERIC_EXIT_SOCKET_ERROR);
 }
 
-MythContext::MythContext(const QString &binversion, bool needsBackend)
-    : m_app_binary_version(binversion)
+MythContext::MythContext(QString binversion, bool needsBackend)
+    : m_app_binary_version(std::move(binversion))
 {
 #ifdef _WIN32
     static bool WSAStarted = false;

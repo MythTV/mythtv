@@ -46,8 +46,8 @@ namespace
             m_fa.extension = new_extension;
         }
 
-        explicit FileAssociationWrap(const FileAssociations::file_association &fa) :
-            m_fa(fa) {}
+        explicit FileAssociationWrap(FileAssociations::file_association fa) :
+            m_fa(std::move(fa)) {}
 
         unsigned int GetIDx(void) const { return m_fa.id; }
         QString GetExtension(void) const { return m_fa.extension; }
@@ -235,7 +235,7 @@ class FileAssocDialogPrivate
         return ret;
     }
 
-    FileAssociationWrap *GetCurrentFA(MythUIButtonList *buttonList)
+    static FileAssociationWrap *GetCurrentFA(MythUIButtonList *buttonList)
     {
         MythUIButtonListItem *item = buttonList->GetItemCurrent();
         if (item)
@@ -453,10 +453,10 @@ void FileAssocDialog::OnNewExtensionPressed()
             SLOT(OnNewExtensionComplete(QString)));
 }
 
-void FileAssocDialog::OnNewExtensionComplete(QString newExtension)
+void FileAssocDialog::OnNewExtensionComplete(const QString& newExtension)
 {
     UIDToFAPair::UID_type new_sel = 0;
-    if (m_private->AddExtension(std::move(newExtension), new_sel))
+    if (m_private->AddExtension(newExtension, new_sel))
     {
         m_private->SetSelectionOverride(new_sel);
         UpdateScreen(true);

@@ -56,10 +56,10 @@ class UPNP_PUBLIC UPnpCMGR : public Eventing
 
         UPnPFeatureList m_features;
 
-        UPnpCMGRMethod  GetMethod                     ( const QString &sURI );
+        static UPnpCMGRMethod  GetMethod                     ( const QString &sURI );
 
         void            HandleGetProtocolInfo         ( HTTPRequest *pRequest );
-        void            HandleGetCurrentConnectionInfo( HTTPRequest *pRequest );
+        static void            HandleGetCurrentConnectionInfo( HTTPRequest *pRequest );
         void            HandleGetCurrentConnectionIDs ( HTTPRequest *pRequest );
         void            HandleGetFeatureList          ( HTTPRequest *pRequest );
 

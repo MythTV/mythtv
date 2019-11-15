@@ -60,13 +60,13 @@ class UPNP_PUBLIC XmlSerializer : public Serializer
         void    RenderList      ( const QString &sName, const QVariantList &list );
         void    RenderMap       ( const QString &sName, const QVariantMap  &map  );
 
-        QString GetItemName     ( const QString &sName );
+        static QString GetItemName     ( const QString &sName );
 
-        QString GetContentName  ( const QString        &sName,
-                                  const QMetaObject   *pMetaObject,
-                                  const QMetaProperty *pMetaProp );
+        static QString GetContentName  ( const QString        &sName,
+                                         const QMetaObject   *pMetaObject,
+                                         const QMetaProperty *pMetaProp );
 
-        QString FindOptionValue ( const QStringList &sOptions, 
+        static QString FindOptionValue ( const QStringList &sOptions, 
                                   const QString &sName );
 
     public:

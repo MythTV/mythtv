@@ -108,7 +108,7 @@ class ImportMusicDialog : public MythScreenType
     void fillWidgets();
     void scanDirectory(QString &directory, vector<TrackInfo*> *tracks);
     void showImportCoverArtDialog();
-    bool copyFile(const QString &src, const QString &dst);
+    static bool copyFile(const QString &src, const QString &dst);
 
     QString              m_musicStorageDir;
     bool                 m_somethingWasImported {false};

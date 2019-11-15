@@ -187,6 +187,9 @@ class PrivateDescriptorID
         dvb_logical_channel_descriptor = 0x83, /* implemented */
         dvb_simulcast_channel_descriptor = 0x88, /* implemented */
 
+        // Private -- NL Casema
+        casema_video_on_demand         = 0x87,
+
         // Private -- Dish Network
         dish_event_rights              = 0x87,
         dish_event_mpaa                = 0x89, /* implemented */
@@ -200,7 +203,7 @@ class PrivateDescriptorID
         upc_event_episode_title        = 0xA7,
 
         // Private -- BSkyB Astra-2 28.2E
-        bskyb_lcn_table                = 0xb1,  /* todo */
+        bskyb_lcn_table                = 0xb1,  /* implemented */
 
         // Private -- FreeSat Astra-2 28.2E
         freesat_lcn_table              = 0xd3,  /* implemented */
@@ -226,9 +229,13 @@ class PrivateDataSpecifierID
   public:
     enum
     {
-        UPC1 = 0x00000600,      // UPC Cablecom
-        BSB1 = 0x00000002,      // UK BSkyB on Astra 28.2E
-        FSAT = 0x46534154,      // UK BBC FreeSat on Astra 28.2E
+        BSB1   = 0x00000002,    // UK BSkyB on Astra 28.2E
+        CASEMA = 0x00000016,    // NL Casema
+        EACEM  = 0x00000028,    // NL Ziggo
+        NORDIG = 0x00000029,    // EU Nordig
+        UPC1   = 0x00000600,    // UPC Cablecom
+        ITC    = 0x0000233A,    // Independent Television Commission
+        FSAT   = 0x46534154,    // UK BBC FreeSat on Astra 28.2E
     };
 };
 
@@ -285,6 +292,7 @@ class MTV_PUBLIC MPEGDescriptor
     uint DescriptorLength(void) const { return _data[1]; }
 
     virtual QString toString(void) const;
+    virtual QString toStringPD(uint priv_dsid) const;
     virtual QString toStringXML(uint indent_level) const;
     
     static desc_list_t Parse(const unsigned char *data, uint len);
@@ -306,6 +314,7 @@ class MTV_PUBLIC MPEGDescriptor
 
   public:
     QString hexdump(void) const;
+    QString descrDump(QString name) const;
 };
 
 // a_52a.pdf p119, Table A1

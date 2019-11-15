@@ -99,10 +99,10 @@ class MUI_PUBLIC MythPainter
     void SetMaximumCacheSizes(int hardware, int software);
 
   protected:
-    void DrawTextPriv(MythImage *im, const QString &msg, int flags,
-                      const QRect &r, const MythFontProperties &font);
-    void DrawRectPriv(MythImage *im, const QRect &area, int radius, int ellipse,
-                      const QBrush &fillBrush, const QPen &linePen);
+    static void DrawTextPriv(MythImage *im, const QString &msg, int flags,
+                             const QRect &r, const MythFontProperties &font);
+    static void DrawRectPriv(MythImage *im, const QRect &area, int radius, int ellipse,
+                             const QBrush &fillBrush, const QPen &linePen);
 
     MythImage *GetImageFromString(const QString &msg, int flags, const QRect &r,
                                   const MythFontProperties &font);
@@ -127,11 +127,11 @@ class MUI_PUBLIC MythPainter
 
     QPaintDevice *m_Parent      {nullptr};
     int m_HardwareCacheSize     {0};
-    int m_MaxHardwareCacheSize;
+    int m_MaxHardwareCacheSize  {0};
 
   private:
     int64_t m_SoftwareCacheSize {0};
-    int64_t m_MaxSoftwareCacheSize;
+    int64_t m_MaxSoftwareCacheSize {1024 * 1024 * 48};
 
     QMutex           m_allocationLock;
     QSet<MythImage*> m_allocatedImages;

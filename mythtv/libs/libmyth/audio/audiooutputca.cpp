@@ -1380,7 +1380,7 @@ bool CoreAudioData::OpenSPDIF()
 {
     OSStatus       err;
     AudioStreamID  *streams;
-    AudioStreamBasicDescription outputFormat = {0};
+    AudioStreamBasicDescription outputFormat {};
 
     Debug("OpenSPDIF: Entering");
 

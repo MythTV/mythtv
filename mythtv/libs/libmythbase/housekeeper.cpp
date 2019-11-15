@@ -218,7 +218,7 @@ void HouseKeeperTask::QueryLast(void)
     m_lastUpdate = MythDate::current();
 }
 
-QDateTime HouseKeeperTask::UpdateLastRun(QDateTime last, bool successful)
+QDateTime HouseKeeperTask::UpdateLastRun(const QDateTime& last, bool successful)
 {
     m_lastRun = last;
     if (successful)
@@ -295,7 +295,7 @@ QDateTime HouseKeeperTask::UpdateLastRun(QDateTime last, bool successful)
     return last;
 }
 
-void HouseKeeperTask::SetLastRun(QDateTime last, bool successful)
+void HouseKeeperTask::SetLastRun(const QDateTime &last, bool successful)
 {
     m_lastRun = last;
     if (successful)
@@ -349,7 +349,7 @@ void PeriodicHouseKeeperTask::SetWindow(float min, float max)
     CalculateWindow();
 }
 
-QDateTime PeriodicHouseKeeperTask::UpdateLastRun(QDateTime last,
+QDateTime PeriodicHouseKeeperTask::UpdateLastRun(const QDateTime& last,
                                                  bool successful)
 {
     QDateTime res = HouseKeeperTask::UpdateLastRun(last, successful);
@@ -358,7 +358,7 @@ QDateTime PeriodicHouseKeeperTask::UpdateLastRun(QDateTime last,
     return res;
 }
 
-void PeriodicHouseKeeperTask::SetLastRun(QDateTime last, bool successful)
+void PeriodicHouseKeeperTask::SetLastRun(const QDateTime& last, bool successful)
 {
     HouseKeeperTask::SetLastRun(last, successful);
     CalculateWindow();
@@ -395,7 +395,7 @@ bool PeriodicHouseKeeperTask::DoCheckRun(QDateTime now)
     // remember, this is computing the probability that up to this point, one
     //      of these tests has returned positive, so each individual test has
     //      a necessarily low probability
-    bool res = (rand() > (int)(prob2 * RAND_MAX));
+    bool res = (rand() > (int)(prob2 * static_cast<float>(RAND_MAX)));
     m_currentProb = prob;
 //  if (res)
 //      LOG(VB_GENERAL, LOG_DEBUG, QString("%1 will run: this=%2; total=%3")
@@ -406,7 +406,7 @@ bool PeriodicHouseKeeperTask::DoCheckRun(QDateTime now)
     return res;
 }
 
-bool PeriodicHouseKeeperTask::InWindow(QDateTime now)
+bool PeriodicHouseKeeperTask::InWindow(const QDateTime& now)
 {
     int elapsed = GetLastRun().secsTo(now);
 
@@ -418,7 +418,7 @@ bool PeriodicHouseKeeperTask::InWindow(QDateTime now)
            (elapsed < m_windowElapsed.second);
 }
 
-bool PeriodicHouseKeeperTask::PastWindow(QDateTime now)
+bool PeriodicHouseKeeperTask::PastWindow(const QDateTime &now)
 {
     return GetLastRun().secsTo(now) > m_windowElapsed.second;
 }
@@ -478,7 +478,7 @@ void DailyHouseKeeperTask::SetHourWindow(int min, int max)
     CalculateWindow();
 }
 
-bool DailyHouseKeeperTask::InWindow(QDateTime now)
+bool DailyHouseKeeperTask::InWindow(const QDateTime& now)
 {
     if (PeriodicHouseKeeperTask::InWindow(now))
         // parent says we're in the window
@@ -823,7 +823,9 @@ void HouseKeeper::customEvent(QEvent *e)
 {
     if (e->type() == MythEvent::MythEventMessage)
     {
-        MythEvent *me = static_cast<MythEvent*>(e);
+        MythEvent *me = dynamic_cast<MythEvent*>(e);
+        if (me == nullptr)
+            return;
         if ((me->Message().left(20) == "HOUSE_KEEPER_RUNNING") ||
             (me->Message().left(23) == "HOUSE_KEEPER_SUCCESSFUL"))
         {

@@ -331,7 +331,7 @@ static int SetMarkup(const MythUtilCommandLineParser &cmdline)
         {
             QDomElement e = n.toElement();
             QString tagName = e.tagName();
-            bool isMark;
+            bool isMark = false;
             if (tagName == "mark")
                 isMark = true;
             else if (tagName == "seek")

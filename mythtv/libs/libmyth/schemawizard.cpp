@@ -23,12 +23,12 @@ using std::endl;
 static SchemaUpgradeWizard * c_wizard = nullptr;
 
 
-SchemaUpgradeWizard::SchemaUpgradeWizard(const QString &DBSchemaSetting,
-                                         const QString &appName,
-                                         const QString &upgradeSchemaVal)
-    : m_schemaSetting(DBSchemaSetting),
-      m_schemaName(appName),
-      m_newSchemaVer(upgradeSchemaVal)
+SchemaUpgradeWizard::SchemaUpgradeWizard(QString DBSchemaSetting,
+                                         QString appName,
+                                         QString upgradeSchemaVal)
+    : m_schemaSetting(std::move(DBSchemaSetting)),
+      m_schemaName(std::move(appName)),
+      m_newSchemaVer(std::move(upgradeSchemaVal))
 {
     c_wizard = this;
 
@@ -128,7 +128,7 @@ int SchemaUpgradeWizard::Compare(void)
     else
     {
         // Branch DB versions may not be integer version numbers.
-        bool new_ok, old_ok;
+        bool new_ok = false, old_ok = false;
         int new_version = m_newSchemaVer.toInt(&new_ok);
         int old_version = m_DBver.toInt(&old_ok);
         if (new_ok && old_ok)
@@ -223,10 +223,10 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
                                       const int  minDBMSminor,
                                       const int  minDBMSpoint)
 {
-    bool     connections;   // Are (other) FE/BEs connected?
-    bool     gui;           // Was gContext Init'ed gui=true?
-    bool     upgradable;    // Can/should we upgrade?
-    bool     validDBMS;     // Do we measure up to minDBMS* ?
+    bool     connections = false;   // Are (other) FE/BEs connected?
+    bool     gui = false;           // Was gContext Init'ed gui=true?
+    bool     upgradable = false;    // Can/should we upgrade?
+    bool     validDBMS = false;     // Do we measure up to minDBMS* ?
     QString  warnOldDBMS;
     QString  warnOtherCl;
 

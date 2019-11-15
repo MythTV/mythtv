@@ -98,16 +98,15 @@ void BumpScope::generate_cmap(unsigned int color)
 
         for (uint i = 255; i > 0; i--)
         {
-             uint r, g, b;
-             r = (unsigned int)((100 * static_cast<double>(red) / 255)
+             uint r = (unsigned int)((100 * static_cast<double>(red) / 255)
                                 * m_intense1[i] + m_intense2[i]);
              if (r > 255)
                  r = 255;
-             g = (unsigned int)((100 * static_cast<double>(green) / 255)
+             uint g = (unsigned int)((100 * static_cast<double>(green) / 255)
                                 * m_intense1[i] + m_intense2[i]);
              if (g > 255)
                  g = 255;
-             b = (unsigned int)((100 * static_cast<double>(blue) / 255)
+             uint b = (unsigned int)((100 * static_cast<double>(blue) / 255)
                                 * m_intense1[i] + m_intense2[i]);
              if (b > 255)
                  b = 255;
@@ -121,17 +120,14 @@ void BumpScope::generate_cmap(unsigned int color)
 
 void BumpScope::generate_phongdat(void)
 {
-    unsigned int y, x;
-    double i, i2;
-
     unsigned int PHONGRES = m_phongrad * 2;
 
-    for (y = 0; y < m_phongrad; y++)
+    for (uint y = 0; y < m_phongrad; y++)
     {
-        for (x = 0; x < m_phongrad; x++)
+        for (uint x = 0; x < m_phongrad; x++)
         {
-            i = (double)x / ((double)m_phongrad) - 1;
-            i2 = (double)y / ((double)m_phongrad) - 1;
+            double i = (double)x / ((double)m_phongrad) - 1;
+            double i2 = (double)y / ((double)m_phongrad) - 1;
 
             //if (m_diamond)
                i = 1 - pow(i*i2,.75) - i*i - i2*i2;
@@ -219,13 +215,10 @@ void BumpScope::translate(int x, int y, int *xo, int *yo, int *xd, int *yd,
 inline void BumpScope::draw_vert_line(unsigned char *buffer, int x, int y1,
                                       int y2)
 {
-    int y;
-    unsigned char *p;
-
     if (y1 < y2)
     {
-        p = buffer + ((y1 + 1) * m_bpl) + x + 1;
-        for (y = y1; y <= y2; y++)
+        uchar *p = buffer + ((y1 + 1) * m_bpl) + x + 1;
+        for (int y = y1; y <= y2; y++)
         {
             *p = 0xff;
             p += m_bpl;
@@ -233,8 +226,8 @@ inline void BumpScope::draw_vert_line(unsigned char *buffer, int x, int y1,
     }
     else if (y2 < y1)
     {
-        p = buffer + ((y2 + 1) * m_bpl) + x + 1;
-        for (y = y2; y <= y1; y++)
+        uchar *p = buffer + ((y2 + 1) * m_bpl) + x + 1;
+        for (int y = y2; y <= y1; y++)
         {
             *p = 0xff;
             p += m_bpl;
@@ -246,12 +239,12 @@ inline void BumpScope::draw_vert_line(unsigned char *buffer, int x, int y1,
 
 void BumpScope::render_light(int lx, int ly)
 {
-    int prev_y, out_y, dy, dx, xp, yp;
+    int dx = 0, dy = 0;
     unsigned int PHONGRES = m_phongrad * 2;
-    unsigned int i, j;
+    unsigned int i = 0, j = 0;
 
-    prev_y = m_bpl + 1;
-    out_y = 0;
+    int prev_y = m_bpl + 1;
+    int out_y = 0;
     unsigned char *outputbuf = m_image->bits();
 
     for (dy = (-ly) + (PHONGRES / 2), j = 0; j < m_height; j++, dy++,
@@ -260,8 +253,8 @@ void BumpScope::render_light(int lx, int ly)
         for (dx = (-lx) + (PHONGRES / 2), i = 0; i < m_width; i++, dx++,
              prev_y++, out_y++)
         {
-            xp = (m_rgb_buf[prev_y - 1] - m_rgb_buf[prev_y + 1]) + dx;
-            yp = (m_rgb_buf[prev_y - m_bpl] - m_rgb_buf[prev_y + m_bpl]) + dy;
+            int xp = (m_rgb_buf[prev_y - 1] - m_rgb_buf[prev_y + 1]) + dx;
+            int yp = (m_rgb_buf[prev_y - m_bpl] - m_rgb_buf[prev_y + m_bpl]) + dy;
 
             if (yp < 0 || yp >= (int)PHONGRES ||
                 xp < 0 || xp >= (int)PHONGRES)
@@ -311,7 +304,7 @@ void BumpScope::rgb_to_hsv(unsigned int color, double *h, double *s, double *v)
 
 void BumpScope::hsv_to_rgb(double h, double s, double v, unsigned int *color)
 {
-  double r, g, b;
+  double r = NAN, g = NAN, b = NAN;
 
   if (s == 0.0)
     s = 0.000001;

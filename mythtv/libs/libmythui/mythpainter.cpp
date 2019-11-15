@@ -204,13 +204,13 @@ void MythPainter::DrawTextPriv(MythImage *im, const QString &msg, int flags,
 
     QColor outlineColor;
     int outlineSize = 0;
-    int outlineAlpha;
+    int outlineAlpha = 255;
     if (font.hasOutline())
         font.GetOutline(outlineColor, outlineSize, outlineAlpha);
 
     QPoint shadowOffset(0, 0);
     QColor shadowColor;
-    int shadowAlpha;
+    int shadowAlpha = 255;
     if (font.hasShadow())
         font.GetShadow(shadowOffset, shadowColor, shadowAlpha);
 
@@ -382,8 +382,6 @@ MythImage *MythPainter::GetImageFromTextLayout(const LayoutVector &layouts,
                                                const MythFontProperties &font,
                                                QRect &canvas, QRect &dest)
 {
-    LayoutVector::const_iterator Ipara;
-
     QString incoming = QString::number(canvas.x()) +
                        QString::number(canvas.y()) +
                        QString::number(canvas.width()) +
@@ -392,7 +390,7 @@ MythImage *MythPainter::GetImageFromTextLayout(const LayoutVector &layouts,
                        QString::number(dest.height()) +
                        font.GetHash();
 
-    for (Ipara = layouts.begin(); Ipara != layouts.end(); ++Ipara)
+    for (auto Ipara = layouts.begin(); Ipara != layouts.end(); ++Ipara)
         incoming += (*Ipara)->text();
 
     MythImage *im = nullptr;
@@ -433,7 +431,7 @@ MythImage *MythPainter::GetImageFromTextLayout(const LayoutVector &layouts,
             QRect  shadowRect;
             QPoint shadowOffset;
             QColor shadowColor;
-            int    shadowAlpha;
+            int    shadowAlpha = 255;
 
             font.GetShadow(shadowOffset, shadowColor, shadowAlpha);
             shadowColor.setAlpha(shadowAlpha);
@@ -445,12 +443,12 @@ MythImage *MythPainter::GetImageFromTextLayout(const LayoutVector &layouts,
             shadowRect.translate(shadow.x(), shadow.y());
 
             painter.setPen(shadowColor);
-            for (Ipara = layouts.begin(); Ipara != layouts.end(); ++Ipara)
+            for (auto Ipara = layouts.begin(); Ipara != layouts.end(); ++Ipara)
                 (*Ipara)->draw(&painter, shadowRect.topLeft(), formats, clip);
         }
 
         painter.setPen(QPen(font.GetBrush(), 0));
-        for (Ipara = layouts.begin(); Ipara != layouts.end(); ++Ipara)
+        for (auto Ipara = layouts.begin(); Ipara != layouts.end(); ++Ipara)
         {
 #if QT_VERSION >= QT_VERSION_CHECK(5,6,0)
             (*Ipara)->draw(&painter, canvas.topLeft(),

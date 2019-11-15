@@ -217,7 +217,8 @@ class ChannelScanSM : public MPEGStreamListener,
     bool              m_testDecryption;
     bool              m_extendScanList    {false};
 
-    // Freesat and BSkyB
+    // Scanning parameters
+    uint              m_frequency         {0};
     uint              m_bouquet_id        {0};
     uint              m_region_id         {0};
 
@@ -244,7 +245,7 @@ class ChannelScanSM : public MPEGStreamListener,
     QMap<uint, uint>            m_currentEncryptionStatus;
     QMap<uint, bool>            m_currentEncryptionStatusChecked;
     QMap<uint64_t, QString>     m_defAuthorities;
-    bool                        m_dvbt2Tried;
+    bool                        m_dvbt2Tried {false};
 
     /// Found Channel Info
     ChannelList          m_channelList;
