@@ -105,6 +105,8 @@ class ChannelDBStorage : public SimpleDBStorage
 class OnAirGuide;
 class XmltvID;
 class Freqid;
+class TransportID;
+class Frequency;
 
 class MTV_PUBLIC ChannelOptionsCommon: public GroupSetting
 {
@@ -119,9 +121,11 @@ class MTV_PUBLIC ChannelOptionsCommon: public GroupSetting
     void sourceChanged(const QString&);
 
   protected:
-    OnAirGuide *m_onairguide {nullptr};
-    XmltvID    *m_xmltvID    {nullptr};
-    Freqid     *m_freqid     {nullptr};
+    OnAirGuide *m_onairguide   {nullptr};
+    XmltvID    *m_xmltvID      {nullptr};
+    Freqid     *m_freqid       {nullptr};
+    TransportID *m_transportid {nullptr};
+    Frequency   *m_frequency   {nullptr};
 };
 
 class MTV_PUBLIC ChannelOptionsFilters: public GroupSetting

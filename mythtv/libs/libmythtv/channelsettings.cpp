@@ -70,6 +70,10 @@ class Source : public MythUIComboBoxSetting
         default_sourceid(_default_sourceid)
     {
         setLabel(QCoreApplication::translate("(Common)", "Video Source"));
+        setHelpText(QCoreApplication::translate("(Common)",
+        "It is NOT a good idea to change this value as it only changes "
+        "the sourceid in table channel but not in dtv_multiplex. "
+        "The sourceid in dtv_multiplex cannot and should not be changed."));
     }
 
     void Load(void) override // StandardSetting
@@ -309,7 +313,7 @@ class ServiceID : public MythUISpinBoxSetting
         : MythUISpinBoxSetting(new ChannelDBStorage(this, id, "serviceid"),
                                -1, UINT16_MAX, 1, 1, "NULL")
     {
-        setLabel(QCoreApplication::translate("(ChannelSettings)", "ServiceID"));
+        setLabel(QCoreApplication::translate("(ChannelSettings)", "Service ID"));
 
         setHelpText(QCoreApplication::translate("(ChannelSettings)",
                 "Service ID (Program Number) of desired channel within the transport stream. "
@@ -329,6 +333,30 @@ class ServiceID : public MythUISpinBoxSetting
         if (StandardSetting::getValue().toInt() == -1)
             return QString();
         return StandardSetting::getValue();
+    }
+};
+
+class TransportID : public GroupSetting
+{
+  public:
+    TransportID(void)
+    {
+        setLabel(QObject::tr("Transport ID"));
+        setHelpText(
+            QObject::tr("The transport stream ID (tid) can be used to identify "
+                "the transport of this channel in the Transport Editor."));
+    }
+};
+
+class Frequency : public GroupSetting
+{
+  public:
+    Frequency(void)
+    {
+        setLabel(QObject::tr("Frequency"));
+        setHelpText(
+            QObject::tr("Frequency of the transport of this channel in Hz "
+                "(for DVB-T/T2 and DVB-C) or in kHz (for DVB-S/S2)."));
     }
 };
 
@@ -398,6 +426,7 @@ class Freqid : public MythUITextEditSetting
         setLabel(QCoreApplication::translate("(ChannelSettings)",
                                              "Freq/Channel"));
         setHelpText(QCoreApplication::translate("(ChannelSettings)",
+            "N.B. This setting is only used for analog channels. "
             "Depending on the tuner type, specify either the exact "
             "frequency (in kHz) or a valid channel "
             "number that will be understood by your tuners."));
@@ -491,6 +520,9 @@ ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID &id,
     addChild(new Visible(id));
     addChild(new ServiceID(id));
 
+    addChild(m_transportid = new TransportID());
+    addChild(m_frequency = new Frequency());
+
     addChild(source);
     addChild(new ChannelTVFormat(id));
     addChild(new Priority(id));
@@ -506,6 +538,23 @@ ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID &id,
             this,       SLOT(  onAirGuideChanged(bool)));
     connect(source,     SIGNAL(valueChanged( const QString&)),
             this,       SLOT(  sourceChanged(const QString&)));
+
+    // Transport stream ID and frequency from dtv_multiplex
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT transportid, frequency FROM dtv_multiplex "
+        "JOIN channel ON channel.mplexid = dtv_multiplex.mplexid "
+        "WHERE channel.chanid = :CHANID");
+
+    query.bindValue(":CHANID", id.getValue().toUInt());
+
+    if (!query.exec())
+        MythDB::DBError("ChannelOptionsCommon::ChannelOptionsCommon", query);
+    else if (query.next())
+    {
+        m_transportid->setValue(query.value(0).toString());
+        m_frequency->setValue(query.value(1).toString());
+    }
 };
 
 void ChannelOptionsCommon::onAirGuideChanged(bool fValue)
