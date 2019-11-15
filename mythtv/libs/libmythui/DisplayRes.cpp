@@ -33,7 +33,8 @@ DisplayRes * DisplayRes::GetDisplayRes(bool lock)
     if (!s_instance)
     {
 #ifdef USING_XRANDR
-        s_instance = new DisplayResX();
+        if (DisplayResX::IsAvailable())
+            s_instance = new DisplayResX();
 #elif CONFIG_DARWIN
         s_instance = new DisplayResOSX();
 #endif

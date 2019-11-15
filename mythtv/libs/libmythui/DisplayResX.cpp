@@ -1,9 +1,5 @@
-
+// MythTV
 #include "config.h"
-#include "DisplayResX.h"
-
-#include <cmath>
-
 #include "mythlogging.h"
 #include "mythdb.h"
 #include "mythdisplay.h"
@@ -11,36 +7,57 @@
 #ifdef CONFIG_XNVCTRL
 #include "util-nvctrl.h"
 #endif
+#include "DisplayResX.h"
+
+// Std
+#include <cmath>
 
 #include <X11/extensions/Xrandr.h> // this has to be after util-x11.h (Qt bug)
 
+#define LOC QString("DispResX: ")
+
 static XRRScreenConfiguration *GetScreenConfig(MythXDisplay*& display);
 
+bool DisplayResX::IsAvailable(void)
+{
+    static bool checked = false;
+    static bool available = false;
+    if (!checked)
+    {
+        checked = true;
+        MythXDisplay display;
+        available = display.Open();
+    }
+    return available;
+}
+
 DisplayResX::DisplayResX(void)
+  : DisplayRes()
 {
     Initialize();
 }
 
-bool DisplayResX::GetDisplayInfo(int &w_pix, int &h_pix, int &w_mm,
-                                 int &h_mm, double &rate, double &par) const
+bool DisplayResX::GetDisplayInfo(int &WidthPixels, int &HeightPixels, int &WidthMM,
+                                 int &HeightMM, double &RefreshRate, double &PixelAspectRatio) const
 {
     DisplayInfo info = MythDisplay::GetDisplayInfo();
-    w_mm   = info.m_size.width();
-    h_mm   = info.m_size.height();
-    w_pix  = info.m_res.width();
-    h_pix  = info.m_res.height();
-    rate   = 1000000.0F / info.m_rate;
-    par    = 1.0;
+    WidthMM          = info.m_size.width();
+    HeightMM         = info.m_size.height();
+    WidthPixels      = info.m_res.width();
+    HeightPixels     = info.m_res.height();
+    RefreshRate      = 1000000.0 / static_cast<double>(info.m_rate);
+    PixelAspectRatio = 1.0;
 
-    if (w_mm > 0 && h_mm > 0 && w_pix > 0 && h_pix > 0)
-        par = ((double)w_mm  / (double)w_pix) / ((double)h_mm / (double)h_pix);
+    if (WidthMM > 0 && HeightMM > 0 && WidthPixels > 0 && HeightPixels > 0)
+        PixelAspectRatio = (static_cast<double>(WidthMM) / static_cast<double>(WidthPixels)) /
+                           (static_cast<double>(HeightMM) / static_cast<double>(HeightPixels));
 
     return true;
 }
 
 bool DisplayResX::SwitchToVideoMode(int width, int height, double desired_rate)
 {
-    double rate = NAN;
+    double rate = static_cast<double>(NAN);
     DisplayResScreen desired_screen(width, height, 0, 0, -1.0, desired_rate);
     int idx = DisplayResScreen::FindBestMatch(m_videoModesUnsorted,
               desired_screen, rate);
@@ -58,7 +75,7 @@ bool DisplayResX::SwitchToVideoMode(int width, int height, double desired_rate)
         XRRConfigCurrentConfiguration(cfg, &rot);
 
         // Search real xrandr rate for desired_rate
-        short finalrate = (short) rate;
+        short finalrate = static_cast<short>(rate);
 
         for (size_t i = 0; i < m_videoModes.size(); i++)
         {
@@ -68,7 +85,7 @@ bool DisplayResX::SwitchToVideoMode(int width, int height, double desired_rate)
                 if (m_videoModes[i].Custom())
                 {
                     finalrate = m_videoModes[i].realRates[rate];
-                    LOG(VB_PLAYBACK, LOG_INFO,
+                    LOG(VB_PLAYBACK, LOG_INFO, LOC +
                         QString("Dynamic TwinView rate found, set %1Hz as "
                                 "XRandR %2") .arg(rate) .arg(finalrate));
                 }
@@ -95,13 +112,13 @@ bool DisplayResX::SwitchToVideoMode(int width, int height, double desired_rate)
         delete display;
 
         if (RRSetConfigSuccess != status)
-            LOG(VB_GENERAL, LOG_ERR,
+            LOG(VB_GENERAL, LOG_ERR, LOC +
                 "XRRSetScreenConfigAndRate() call failed.");
 
         return RRSetConfigSuccess == status;
     }
 
-    LOG(VB_GENERAL, LOG_ERR, "Desired Resolution and FrameRate not found.");
+    LOG(VB_GENERAL, LOG_ERR, LOC + "Desired resolution and frame rate not found.");
 
     return false;
 }
@@ -150,7 +167,7 @@ void DisplayResX::DebugModes(const QString &Message) const
     // This is intentionally formatted to match the output of xrandr for comparison
     if (VERBOSE_LEVEL_CHECK(VB_PLAYBACK, LOG_INFO))
     {
-        LOG(VB_PLAYBACK, LOG_INFO, Message + ":");
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + Message + ":");
         std::vector<DisplayResScreen>::const_iterator it = m_videoModes.cbegin();
         for ( ; it != m_videoModes.cend(); ++it)
         {
@@ -168,12 +185,8 @@ void DisplayResX::DebugModes(const QString &Message) const
 static XRRScreenConfiguration *GetScreenConfig(MythXDisplay*& display)
 {
     display = OpenMythXDisplay();
-
     if (!display)
-    {
-        LOG(VB_GENERAL, LOG_ERR, "DisplaResX: MythXOpenDisplay call failed");
         return nullptr;
-    }
 
     Window root = RootWindow(display->GetDisplay(), display->GetScreen());
 
@@ -187,7 +200,7 @@ static XRRScreenConfiguration *GetScreenConfig(MythXDisplay*& display)
     {
         delete display;
         display = nullptr;
-        LOG(VB_GENERAL, LOG_ERR, "DisplaResX: Unable to XRRgetScreenInfo");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Unable to XRRgetScreenInfo");
     }
 
     return cfg;

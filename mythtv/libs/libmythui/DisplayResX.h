@@ -1,20 +1,23 @@
-#ifndef _DISPLAYRESX_H_
-#define _DISPLAYRESX_H_
+#ifndef DISPLAYRESX_H_
+#define DISPLAYRESX_H_
 
+// MythTV
 #include "DisplayRes.h"
 
 class DisplayResX : public DisplayRes
 {
   public:
     DisplayResX(void);
-    ~DisplayResX(void) = default;
+   ~DisplayResX(void) override = default;
 
-    const std::vector<DisplayResScreen>& GetVideoModes(void) const override; // DisplayRes
+    static bool IsAvailable(void);
+    const std::vector<DisplayResScreen>& GetVideoModes(void) const override;
 
   protected:
-    bool GetDisplayInfo(int &w_pix, int &h_pix, int &w_mm,
-                        int &h_mm, double &rate, double &par) const override; // DisplayRes
-    bool SwitchToVideoMode(int width, int height, double desired_rate) override; // DisplayRes
+    bool GetDisplayInfo(int &WidthPixels, int &HeightPixels,
+                        int &WidthMM, int &HeightMM,
+                        double &RefreshRate, double &PixelAspectRatio) const override;
+    bool SwitchToVideoMode(int width, int height, double desired_rate) override;
 
   private:
     void DebugModes(const QString& Message) const;
@@ -22,4 +25,4 @@ class DisplayResX : public DisplayRes
     mutable std::vector<DisplayResScreen> m_videoModesUnsorted;
 };
 
-#endif // _DISPLAYRESX_H_
+#endif // DISPLAYRESX_H_
