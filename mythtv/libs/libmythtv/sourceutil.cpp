@@ -409,14 +409,15 @@ bool SourceUtil::UpdateSource( uint sourceid, const QString& sourcename,
                                const QString& freqtable, const QString& lineupid,
                                const QString& password, bool useeit,
                                const QString& configpath, int nitid,
-                               uint bouquetid, uint regionid)
+                               uint bouquetid, uint regionid, uint scanfrequency)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("UPDATE videosource SET name = :NAME, xmltvgrabber = :XMLTVGRABBER, "
                   "userid = :USERID, freqtable = :FREQTABLE, lineupid = :LINEUPID,"
                   "password = :PASSWORD, useeit = :USEEIT, configpath = :CONFIGPATH, "
-                  "dvb_nit_id = :NITID, bouquet_id = :BOUQUETID, region_id = :REGIONID "
+                  "dvb_nit_id = :NITID, bouquet_id = :BOUQUETID, region_id = :REGIONID, "
+                  "scanfrequency = :SCANFREQUENCY "
                   "WHERE sourceid = :SOURCEID");
 
     query.bindValue(":NAME", sourcename);
@@ -431,6 +432,7 @@ bool SourceUtil::UpdateSource( uint sourceid, const QString& sourcename,
     query.bindValue(":BOUQUETID", bouquetid);
     query.bindValue(":REGIONID", regionid);
     query.bindValue(":SOURCEID", sourceid);
+    query.bindValue(":SCANFREQUENCY", scanfrequency);
 
     if (!query.exec() || !query.isActive())
     {
@@ -446,14 +448,14 @@ int SourceUtil::CreateSource( const QString& sourcename,
                                const QString& freqtable, const QString& lineupid,
                                const QString& password, bool useeit,
                                const QString& configpath, int nitid,
-                               uint bouquetid, uint regionid)
+                               uint bouquetid, uint regionid, uint scanfrequency)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("INSERT INTO videosource (name,xmltvgrabber,userid,freqtable,lineupid,"
-                  "password,useeit,configpath,dvb_nit_id,bouquet_id,region_id) "
+                  "password,useeit,configpath,dvb_nit_id,bouquet_id,region_id, scanfrequency) "
                   "VALUES (:NAME, :XMLTVGRABBER, :USERID, :FREQTABLE, :LINEUPID, :PASSWORD, "
-                  ":USEEIT, :CONFIGPATH, :NITID, :BOUQUETID, :REGIONID)");
+                  ":USEEIT, :CONFIGPATH, :NITID, :BOUQUETID, :REGIONID, :SCANFREQUENCY)");
 
     query.bindValue(":NAME", sourcename);
     query.bindValue(":XMLTVGRABBER", grabber);
@@ -466,6 +468,7 @@ int SourceUtil::CreateSource( const QString& sourcename,
     query.bindValue(":NITID", nitid);
     query.bindValue(":BOUQUETID", bouquetid);
     query.bindValue(":REGIONID", regionid);
+    query.bindValue(":SCANFREQUENCY", scanfrequency);
 
     if (!query.exec() || !query.isActive())
     {
