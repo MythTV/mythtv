@@ -49,7 +49,7 @@ unsigned int block_size = default_block_size;
 
 struct buffers
 {
-    buffers(unsigned int s):
+    explicit buffers(unsigned int s):
         m_l(s),m_r(s),m_c(s),m_ls(s),m_rs(s),m_lfe(s), m_rls(s), m_rrs(s) { }
     void resize(unsigned int s)
     {

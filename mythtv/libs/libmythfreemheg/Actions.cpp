@@ -44,7 +44,7 @@
 class MHUnimplementedAction: public MHElemAction
 {
   public:
-    MHUnimplementedAction(int nTag): MHElemAction(""), m_nTag(nTag)
+    explicit MHUnimplementedAction(int nTag): MHElemAction(""), m_nTag(nTag)
     {
         MHLOG(MHLogWarning, QString("WARN Unimplemented action %1").arg(m_nTag) );
     }

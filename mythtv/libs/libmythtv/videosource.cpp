@@ -132,7 +132,7 @@ void VideoSourceSelector::Load(void)
 class InstanceCount : public MythUISpinBoxSetting
 {
   public:
-    InstanceCount(const CardInput &parent) :
+    explicit InstanceCount(const CardInput &parent) :
         MythUISpinBoxSetting(new CardInputDBStorage(this, parent, "reclimit"),
                              1, 10, 1)
     {
@@ -353,7 +353,7 @@ class CaptureCardTextEditSetting : public MythUITextEditSetting
 class ScanFrequency : public MythUITextEditSetting
 {
   public:
-    ScanFrequency(const VideoSource &parent) :
+    explicit ScanFrequency(const VideoSource &parent) :
         MythUITextEditSetting(new VideoSourceDBStorage(this, parent, "scanfrequency"))
     {
        setLabel(QObject::tr("Scan Frequency"));
@@ -706,7 +706,7 @@ void VideoSource::loadByID(int sourceid)
 class VideoDevice : public CaptureCardComboBoxSetting
 {
   public:
-    VideoDevice(const CaptureCard &parent,
+    explicit VideoDevice(const CaptureCard &parent,
                 uint    minor_min = 0,
                 uint    minor_max = UINT_MAX,
                 const QString& card      = QString(),
