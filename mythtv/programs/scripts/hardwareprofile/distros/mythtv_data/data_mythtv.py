@@ -19,27 +19,30 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 
 
+from __future__ import division
+from __future__ import print_function
+from builtins import range
+from builtins import object
+from past.utils import old_div
 import os
 import re
-import statvfs
 from i18n import _
 from datetime import timedelta
 
-from orddict import OrdDict
-from uuiddb import UuidDb
+from distros.mythtv_data.orddict import OrdDict
+from distros.mythtv_data.uuiddb import UuidDb
 
 import MythTV
-from user import home
 
 _DB = MythTV.MythDB()
 _BE = MythTV.MythBE(db=_DB)
 _SETTINGS = _DB.settings[_DB.gethostname()]
 prefix = 'mythtv'
 
-class _Mythtv_data:
+class _Mythtv_data(object):
     def __init__(self, gate):
         self.get_data(gate)
-        
+
     def isBackend(self):
         return (_SETTINGS.BackendServerIP is not None)
 
@@ -68,7 +71,7 @@ class _Mythtv_data:
                 'Library API'     : 'libapi',
                 'QT Version'      : 'qtversion'}
 
-        for line in res.split('\n'):
+        for line in res.decode().split('\n'):
             try:
                 prop, val = line.split(':')
                 data[names[prop.strip()]] = val.strip()
@@ -181,10 +184,13 @@ class _Mythtv_data:
             free  = 0
 
             for path in paths:
-                stat = os.statvfs(path)
-                bsize = stat[statvfs.F_FRSIZE]
-                total += stat[statvfs.F_BLOCKS]*bsize
-                free  += stat[statvfs.F_BFREE]*bsize
+                try:
+                    stat = os.statvfs(path)
+                    bsize = stat.f_frsize
+                    total += stat.f_blocks*bsize
+                    free  += stat.f_bfree*bsize
+                except OSError:
+                    pass
 
             return (total, free)
 
@@ -229,22 +235,22 @@ class _Mythtv_data:
             except:
                 pass
             return firstline
-             
-            
+
+
         def _oss_alsa():
             snd_type = "unknown"
             version = "unknown"
             alsasnd = "/proc/asound/version"
             osssnd = "/dev/sndstat"
-            
+
             if os.path.exists(alsasnd):
                 snd_type = "ALSA"
                 version = _read_file(alsasnd)[-1].rstrip(".")
-                
+
             elif os.path.exists(osssnd):
                 version = _read_file(osssnd)[1]
                 snd_type = "OSS"
-                
+
             return snd_type , version
 
         def _process_search(processname):
@@ -295,7 +301,7 @@ class _Mythtv_data:
         data.jack             = _jack()
         data.pulse            = _pulse()
         data.audio_sys, data.audio_sys_version    = _oss_alsa()
-        
+
         return {'audio': data}
 
     def ProcessVideoProfile(self):
@@ -371,8 +377,8 @@ class _Mythtv_data:
 
     def ProcessScheduler(self):
         def stddev(data):
-            avg = sum(data)/len(data)
-            return avg, (sum([(d-avg)**2 for d in data])/len(data))**.5
+            avg = old_div(sum(data),len(data))
+            return avg, (old_div(sum([(d-avg)**2 for d in data]),len(data)))**.5
 
         data = OrdDict()
         data.count = 0
@@ -405,7 +411,7 @@ class _Mythtv_data:
         match = [float(r[1]) for r in runs]
         place = [float(r[2]) for r in runs]
 
-        data.count = int(sum(count)/len(count))
+        data.count = int(old_div(sum(count),len(count)))
         data.match_avg, data.match_stddev = stddev(match)
         data.place_avg, data.place_stddev = stddev(place)
 
@@ -432,13 +438,13 @@ class _Mythtv_data:
                 else:
                     virtual[1] += isvirt
 
-        data = {'tuners':dict([(k,len(v)) for k,v in cardtypes.items()])}
+        data = {'tuners':dict([(k,len(v)) for k,v in list(cardtypes.items())])}
         if virtual[0]:
-            data['vtpertuner'] = sum(virtual)/float(virtual[0])
+            data['vtpertuner'] = old_div(sum(virtual),float(virtual[0]))
         return data
 
     def ProcessSmoltInfo(self):
-        smoltfile=home+"/.mythtv/smolt.info"
+        smoltfile=os.path.expanduser('~') +"/.mythtv/smolt.info"
         config = {}
         try:
             config_file= open(smoltfile)
@@ -466,7 +472,7 @@ class _Mythtv_data:
     def ProcessLogUrgency(self):
         c = _DB.cursor()
         c.execute("""SELECT level,count(level) FROM logging GROUP BY level""")
-        levels = ('EMERG', 'ALERT', 'CRIT', 'ERR', 
+        levels = ('EMERG', 'ALERT', 'CRIT', 'ERR',
                   'WARNING', 'NOTICE', 'INFO') # ignore debugging from totals
         counts = {}
         total = 0.
@@ -474,8 +480,8 @@ class _Mythtv_data:
             if level in range(len(levels)):
                 counts[levels[level]] = count
                 total += count
-        for k,v in counts.items():
-            counts[k] = v/total
+        for k,v in list(counts.items()):
+            counts[k] = old_div(v,total)
         return {'logurgency':counts}
 
     def get_data(self,gate):
@@ -496,7 +502,7 @@ class _Mythtv_data:
                 self._data.update(func())
             except:
                 pass
-        
+
         self._data.theme          = _SETTINGS.Theme
         if _DB.settings.NULL.country is not None:
             self._data.country          = _DB.settings.NULL.country
@@ -516,8 +522,8 @@ class _Mythtv_data:
             _DB.settings.NULL.SystemUUID = UuidDb().gen_uuid()
         self._data.uuid           = _DB.settings.NULL.SystemUUID
 
-        
-        
+
+
 
     def serialize(self):
         res = self._data
@@ -527,7 +533,7 @@ class _Mythtv_data:
         lines.append(title)
         for k,v in sorted(data.items()):
             lines.append('- %s:\n      %s \n' %(k,v))
-            
+
         if line_break:
             lines.append('')
 
@@ -541,13 +547,13 @@ class _Mythtv_data:
     def _dump(self):
         lines = []
         self.dump_rst(lines)
-        print '\n'.join(lines)
-        print
+        print('\n'.join(lines))
+        print()
 
 
 def create_mythtv_data(gate):
     return _Mythtv_data(gate)
-    
+
 
 
 if __name__ == '__main__':

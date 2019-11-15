@@ -19,6 +19,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 
+from builtins import object
 import os
 from hwdata import DeviceMap
 
@@ -92,8 +93,8 @@ DATA_LIST = [   'vendor',
                 'subsystem_vendor',
                 'subsystem_device']
 
-def cat(file):
-    fd = open(file, 'r')
+def cat(file_name):
+    fd = open(file_name, 'r')
     results = fd.readlines()
     fd.close()
     return results
@@ -160,7 +161,7 @@ class USBDevice( Device ):
             desc                =     cat(PATH +          'product')[0].strip().decode('ASCII',  errors='ignore')
         except:
             #The fedora python pkg is broken and doesn't like decode with options, so this is a fallback
-            desc                =     cat(PATH +          'product')[0].strip().decode()
+            desc                =     cat(PATH +          'product')[0].strip()
         self.description    = usb.device(self.vendorid,
                                          self.deviceid,
                                          alt=desc)

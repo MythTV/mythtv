@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+### This module isn't used anywhere in the MythTV repository.
+
 # smolt - Fedora hardware profiler
 #
 # Copyright (C) 2008 Yaakov M. Nemoy <loupgaroublond@gmail.com>
@@ -19,10 +21,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 
+from __future__ import print_function
 import sys
 from optparse import OptionParser
-from urlparse import urljoin
-import urlgrabber.grabber
+import requests
 import json
 
 sys.path.append('/usr/share/smolt/client')
@@ -65,23 +67,33 @@ parser.add_option('--uuidFile',
 def main():
     from gate import create_default_gate
     profile = smolt.create_profile(create_default_gate(), smolt.read_uuid())
-    grabber = urlgrabber.grabber.URLGrabber(user_agent=opts.user_agent, timeout=opts.timeout)
+    session = requests.Session()
+    session.headers.update({'USER-AGENT': opts.user_agent})
+
+    o = session.post(opts.smoonURL + '', timeout=opts.timeout)
+
+    exceptions = (requests.exceptions.HTTPError,
+                  requests.exceptions.URLRequired,
+                  requests.exceptions.Timeout,
+                  requests.exceptions.ConnectionError,
+                  requests.exceptions.InvalidURL)
+
     #first find out the server desired protocol
     try:
         #fli is a file like item
-        pub_uuid_fli = grabber.urlopen(urljoin(opts.smoonURL + "/", '/client/pub_uuid?uuid=%s' % profile.host.UUID, False))
-    except urlgrabber.grabber.URLGrabError, e:
+        pub_uuid_fli = opts.smoonURL + 'client/pub_uuid?uuid=%s' % profile.host.UUID
+        pub_uuid_fli = session.get(pub_uuid_fli, timeout=opts.timeout)
+    except exceptions as e:
         error(_('Error contacting Server: %s') % e)
         return 1
-    pub_uuid_str = pub_uuid_fli.read()
     try:
+        pub_uuid_obj = pub_uuid_fli.json()
         try:
-            pub_uuid_obj = json.loads(pub_uuid_str)
-            print _('To view your profile visit: %s') % smolt.get_profile_link(opts.smoonURL, pub_uuid_obj["pub_uuid"])
-        except ValueError, e:
+            print(_('To view your profile visit: %s') % smolt.get_profile_link(opts.smoonURL, pub_uuid_obj["pub_uuid"]))
+        except ValueError as e:
             error(_('Something went wrong fetching the public UUID'))
     finally:
-        pub_uuid_fli.close()
-        
+        session.close()
+
 if __name__ == '__main__':
-    main() 
+    main()
