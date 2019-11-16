@@ -958,7 +958,7 @@ class Tvdb:
         banners = {}
         for cur_banner in bannersEt.keys():
             banners_info = self._getetsrc(self.config['url_seriesBannerInfo'] % (sid, cur_banner))
-            if banner_info is not None:
+            if banners_info is not None:
                 for banner_info in banners_info:
                     bid = banner_info.get('id')
                     btype = banner_info.get('keyType')
