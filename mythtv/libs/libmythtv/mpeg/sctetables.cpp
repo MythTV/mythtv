@@ -126,7 +126,7 @@ QString ModulationModeSubtable::ModulationFormatString(void) const
     }
 }
 
-QString ModulationModeSubtable::toString(void) const
+QString ModulationModeSubtable::toString(void)
 {
     return "ModulationMode";
 }

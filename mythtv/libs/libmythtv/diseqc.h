@@ -50,8 +50,8 @@ class DiSEqCDevSettings
 class DiSEqCDev
 {
   public:
-    DiSEqCDevTree* FindTree(uint cardid);
-    void           InvalidateTrees(void);
+    static DiSEqCDevTree* FindTree(uint cardid);
+    static void           InvalidateTrees(void);
 
   protected:
     static DiSEqCDevTrees s_trees;
@@ -345,7 +345,7 @@ class DiSEqCDevRotor : public DiSEqCDevDevice
                         double angle);
     void   StartRotorPositionTracking(double azimuth);
 
-    double CalculateAzimuth(double angle) const;
+    static double CalculateAzimuth(double angle);
     double GetApproxAzimuth(void) const;
 
   private:

@@ -43,7 +43,7 @@ class SubtitleReader
     bool AddAVSubtitle(const AVSubtitle& subtitle, bool fix_position,
                        bool allow_forced);
     void ClearAVSubtitles(void);
-    void FreeAVSubtitle(const AVSubtitle &sub);
+    static void FreeAVSubtitle(const AVSubtitle &sub);
 
     TextSubtitles* GetTextSubtitles(void) { return &m_TextSubtitles; }
     bool HasTextSubtitles(void);

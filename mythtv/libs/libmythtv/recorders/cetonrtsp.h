@@ -47,7 +47,7 @@ protected:
                         const QString &alternative = QString());
 
   private:
-    QStringList splitLines(const QByteArray &lines);
+    static QStringList splitLines(const QByteArray &lines);
     QString readParameters(const QString &key, Params &parameters);
     QUrl GetBaseUrl(void);
     void timerEvent(QTimerEvent*) override; // QObject

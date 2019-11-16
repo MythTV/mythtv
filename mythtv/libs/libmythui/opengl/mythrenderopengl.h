@@ -119,12 +119,12 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
 
     MythGLTexture* CreateTextureFromQImage(QImage *Image);
     QSize GetTextureSize(const QSize &size, bool Normalised);
-    int   GetTextureDataSize(MythGLTexture *Texture);
+    static int GetTextureDataSize(MythGLTexture *Texture);
     void  SetTextureFilters(MythGLTexture *Texture, QOpenGLTexture::Filter Filter,
                             QOpenGLTexture::WrapMode Wrap = QOpenGLTexture::ClampToEdge);
     void  ActiveTexture(GLuint ActiveTex);
     void  DeleteTexture(MythGLTexture *Texture);
-    int   GetBufferSize(QSize Size, QOpenGLTexture::PixelFormat Format, QOpenGLTexture::PixelType Type);
+    static int GetBufferSize(QSize Size, QOpenGLTexture::PixelFormat Format, QOpenGLTexture::PixelType Type);
 
     QOpenGLFramebufferObject* CreateFramebuffer(QSize &Size, GLenum InternalFormat = 0);
     MythGLTexture* CreateFramebufferTexture(QOpenGLFramebufferObject *Framebuffer);
@@ -162,8 +162,8 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     void  Init2DState(void);
     void  SetMatrixView(void);
     void  DeleteFramebuffers(void);
-    bool  UpdateTextureVertices(MythGLTexture *Texture, const QRect &Source,
-                                const QRect &Destination, int Rotation);
+    static bool UpdateTextureVertices(MythGLTexture *Texture, const QRect &Source,
+                                      const QRect &Destination, int Rotation);
     GLfloat* GetCachedVertices(GLuint Type, const QRect &Area);
     void  ExpireVertices(int Max = 0);
     void  GetCachedVBO(GLuint Type, const QRect &Area);

@@ -370,7 +370,7 @@ vector<CC708String*> CC708Window::GetStrings(void) const
     return list;
 }
 
-void CC708Window::DisposeStrings(vector<CC708String*> &strings) const
+void CC708Window::DisposeStrings(vector<CC708String*> &strings)
 {
     while (!strings.empty())
     {

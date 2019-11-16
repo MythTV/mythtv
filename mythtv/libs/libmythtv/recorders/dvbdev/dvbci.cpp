@@ -749,8 +749,8 @@ private:
   int resourceId;
   cCiTransportConnection *m_tc;
 protected:
-  int GetTag(int &Length, const uint8_t **Data);
-  const uint8_t *GetData(const uint8_t *Data, int &Length);
+  static int GetTag(int &Length, const uint8_t **Data);
+  static const uint8_t *GetData(const uint8_t *Data, int &Length);
   int SendData(int Tag, int Length = 0, const uint8_t *Data = nullptr);
 public:
   cCiSession(int SessionId, int ResourceId, cCiTransportConnection *Tc);
@@ -1851,7 +1851,7 @@ bool cLlCiHandler::Reset(int Slot)
   return m_tpl->ResetSlot(Slot);
 }
 
-bool cLlCiHandler::connected() const
+bool cLlCiHandler::connected()
 {
   return _connected;
 }

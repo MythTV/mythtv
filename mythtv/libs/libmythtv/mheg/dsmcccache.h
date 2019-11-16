@@ -102,9 +102,9 @@ class DSMCCCache
     // Create a new directory.
     DSMCCCacheDir *Directory(const DSMCCCacheReference &ref);
     // Add a file to the directory or gateway.
-    void AddFileInfo(DSMCCCacheDir *dir, const BiopBinding *);
+    static void AddFileInfo(DSMCCCacheDir *dir, const BiopBinding *);
     // Add a directory to the directory or gateway.
-    void AddDirInfo(DSMCCCacheDir *dir, const BiopBinding *);
+    static void AddDirInfo(DSMCCCacheDir *dir, const BiopBinding *);
 
     // Add the contents of a file.
     void CacheFileData(const DSMCCCacheReference &ref, const QByteArray &data);

@@ -172,8 +172,8 @@ class DTVDeviceConfigGroup : public GroupSetting
     void AddNodes(StandardSetting *group, const QString &trigger,
                   DiSEqCDevDevice *node);
 
-    void AddChild(StandardSetting *group, const QString &trigger,
-                  StandardSetting *setting);
+    static void AddChild(StandardSetting *group, const QString &trigger,
+                         StandardSetting *setting);
 
   private:
     DiSEqCDevTree       m_tree;

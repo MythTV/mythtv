@@ -168,7 +168,7 @@ private:
   cCiSession             *m_sessions[MAX_CI_SESSION] {};
   cCiTransportLayer      *m_tpl          {nullptr};
   cCiTransportConnection *m_tc           {nullptr};
-  int ResourceIdToInt(const uint8_t *Data);
+  static int ResourceIdToInt(const uint8_t *Data);
   bool Send(uint8_t Tag, int SessionId, int ResourceId = 0, int Status = -1);
   cCiSession *GetSessionBySessionId(int SessionId);
   cCiSession *GetSessionByResourceId(int ResourceId, int Slot);
@@ -196,7 +196,7 @@ public:
   bool SetCaPmt(cCiCaPmt &CaPmt, int Slot) override; // cCiHandler
   void SetTimeOffset(double offset_in_seconds) override; // cCiHandler
   bool Reset(int Slot);
-  bool connected() const;
+  static bool connected();
   };
 
 class cHlCiHandler : public cCiHandler {

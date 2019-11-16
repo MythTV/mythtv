@@ -63,8 +63,8 @@ class VideoColourSpace : public QObject, public QMatrix4x4, public ReferenceCoun
     void  Update(void);
     void  Debug(void);
     QMatrix4x4 GetPrimaryConversion(int Source, int Dest);
-    void  GetPrimaries(int Primary, ColourPrimaries &Out, float &Gamma);
-    QMatrix4x4 RGBtoXYZ(ColourPrimaries Primaries);
+    static void GetPrimaries(int Primary, ColourPrimaries &Out, float &Gamma);
+    static QMatrix4x4 RGBtoXYZ(ColourPrimaries Primaries);
 
   private:
     PictureAttributeSupported  m_supportedAttributes;

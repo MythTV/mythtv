@@ -1266,7 +1266,7 @@ QString SpliceTimeView::toStringXML(
 
 /// \brief Returns decrypted version of this packet.
 SpliceInformationTable *SpliceInformationTable::GetDecrypted(
-    const QString &/*codeWord*/) const
+    const QString &/*codeWord*/)
 {
     // TODO
     return nullptr;

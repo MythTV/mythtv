@@ -132,7 +132,7 @@ class MTV_PUBLIC MythCCExtractorPlayer : public MythPlayer
 
   private:
     void IngestSubtitle(QList<OneSubtitle>&, const QStringList&);
-    void IngestSubtitle(QList<OneSubtitle>&, const OneSubtitle&);
+    static void IngestSubtitle(QList<OneSubtitle>&, const OneSubtitle&);
 
     enum { kProcessNormal = 0, kProcessFinalize = 1 };
     void Ingest608Captions(void);

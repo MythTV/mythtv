@@ -1429,7 +1429,7 @@ private:
         return RET_OK;
     }
 
-    int UpdatePlaylist(HLSStream *hls_new, HLSStream *hls)
+    static int UpdatePlaylist(HLSStream *hls_new, HLSStream *hls)
     {
         int count = hls_new->NumSegments();
 
@@ -1749,7 +1749,7 @@ bool HLSRingBuffer::TestForHTTPLiveStreaming(const QString &filename)
 }
 
 /* Parsing */
-QString HLSRingBuffer::ParseAttributes(const QString &line, const char *attr) const
+QString HLSRingBuffer::ParseAttributes(const QString &line, const char *attr)
 {
     int p = line.indexOf(QLatin1String(":"));
     if (p < 0)
@@ -1775,7 +1775,7 @@ QString HLSRingBuffer::ParseAttributes(const QString &line, const char *attr) co
  * Return the decimal argument in a line of type: blah:\<decimal\>
  * presence of value \<decimal\> is compulsory or it will return RET_ERROR
  */
-int HLSRingBuffer::ParseDecimalValue(const QString &line, int &target) const
+int HLSRingBuffer::ParseDecimalValue(const QString &line, int &target)
 {
     int p = line.indexOf(QLatin1String(":"));
     if (p < 0)
@@ -1789,7 +1789,7 @@ int HLSRingBuffer::ParseDecimalValue(const QString &line, int &target) const
 }
 
 int HLSRingBuffer::ParseSegmentInformation(const HLSStream *hls, const QString &line,
-                                           int &duration, QString &title) const
+                                           int &duration, QString &title)
 {
     /*
      * #EXTINF:<duration>,<title>
@@ -1846,7 +1846,7 @@ int HLSRingBuffer::ParseSegmentInformation(const HLSStream *hls, const QString &
     return RET_OK;
 }
 
-int HLSRingBuffer::ParseTargetDuration(HLSStream *hls, const QString &line) const
+int HLSRingBuffer::ParseTargetDuration(HLSStream *hls, const QString &line)
 {
     /*
      * #EXT-X-TARGETDURATION:<s>
@@ -1908,7 +1908,7 @@ HLSStream *HLSRingBuffer::ParseStreamInformation(const QString &line, const QStr
     return new HLSStream(id, bw, psz_uri);
 }
 
-int HLSRingBuffer::ParseMediaSequence(HLSStream *hls, const QString &line) const
+int HLSRingBuffer::ParseMediaSequence(HLSStream *hls, const QString &line)
 {
     /*
      * #EXT-X-MEDIA-SEQUENCE:<number>
@@ -2021,7 +2021,7 @@ int HLSRingBuffer::ParseKey(HLSStream *hls, const QString &line)
     return err;
 }
 
-int HLSRingBuffer::ParseProgramDateTime(HLSStream */*hls*/, const QString &line) const
+int HLSRingBuffer::ParseProgramDateTime(HLSStream */*hls*/, const QString &line)
 {
     /*
      * #EXT-X-PROGRAM-DATE-TIME:<YYYY-MM-DDThh:mm:ssZ>
@@ -2032,7 +2032,7 @@ int HLSRingBuffer::ParseProgramDateTime(HLSStream */*hls*/, const QString &line)
     return RET_OK;
 }
 
-int HLSRingBuffer::ParseAllowCache(HLSStream *hls, const QString &line) const
+int HLSRingBuffer::ParseAllowCache(HLSStream *hls, const QString &line)
 {
     /*
      * The EXT-X-ALLOW-CACHE tag indicates whether the client MAY or MUST
@@ -2056,7 +2056,7 @@ int HLSRingBuffer::ParseAllowCache(HLSStream *hls, const QString &line) const
     return RET_OK;
 }
 
-int HLSRingBuffer::ParseVersion(const QString &line, int &version) const
+int HLSRingBuffer::ParseVersion(const QString &line, int &version)
 {
     /*
      * The EXT-X-VERSION tag indicates the compatibility version of the
@@ -2087,7 +2087,7 @@ int HLSRingBuffer::ParseVersion(const QString &line, int &version) const
     return RET_OK;
 }
 
-int HLSRingBuffer::ParseEndList(HLSStream *hls) const
+int HLSRingBuffer::ParseEndList(HLSStream *hls)
 {
     /*
      * The EXT-X-ENDLIST tag indicates that no more media files will be
@@ -2099,7 +2099,7 @@ int HLSRingBuffer::ParseEndList(HLSStream *hls) const
     return RET_OK;
 }
 
-int HLSRingBuffer::ParseDiscontinuity(HLSStream */*hls*/, const QString &line) const
+int HLSRingBuffer::ParseDiscontinuity(HLSStream */*hls*/, const QString &line)
 {
     /* Not handled, never seen so far */
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("#EXT-X-DISCONTINUITY %1").arg(line));

@@ -120,8 +120,8 @@ class EITHelper
 #endif // !USING_BACKEND
 
     // EIT cache handling
-    void PruneEITCache(uint timestamp);
-    void WriteEITCache(void);
+    static void PruneEITCache(uint timestamp);
+    static void WriteEITCache(void);
 
   private:
     // only ATSC

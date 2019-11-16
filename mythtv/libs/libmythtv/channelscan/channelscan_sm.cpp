@@ -357,7 +357,7 @@ bool ChannelScanSM::ScanExistingTransports(uint sourceid, bool follow_nit)
     return m_scanning;
 }
 
-void ChannelScanSM::LogLines(const QString& string) const
+void ChannelScanSM::LogLines(const QString& string)
 {
     QStringList lines = string.split('\n');
     for (int i = 0; i < lines.size(); ++i)

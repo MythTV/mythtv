@@ -1590,7 +1590,7 @@ void TV::GetStatus(void)
 /**
  * \brief get tv state of active player context
  */
-TVState TV::GetState(const PlayerContext *actx) const
+TVState TV::GetState(const PlayerContext *actx)
 {
     TVState ret = kState_ChangingState;
     if (!actx->InStateChange())
@@ -6898,7 +6898,7 @@ void TV::DoQueueTranscode(PlayerContext *ctx, const QString& profile)
     ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 }
 
-int TV::GetNumChapters(const PlayerContext *ctx) const
+int TV::GetNumChapters(const PlayerContext *ctx)
 {
     int num_chapters = 0;
     ctx->LockDeletePlayer(__FILE__, __LINE__);
@@ -6908,7 +6908,7 @@ int TV::GetNumChapters(const PlayerContext *ctx) const
     return num_chapters;
 }
 
-void TV::GetChapterTimes(const PlayerContext *ctx, QList<long long> &times) const
+void TV::GetChapterTimes(const PlayerContext *ctx, QList<long long> &times)
 {
     ctx->LockDeletePlayer(__FILE__, __LINE__);
     if (ctx->m_player)
@@ -6916,7 +6916,7 @@ void TV::GetChapterTimes(const PlayerContext *ctx, QList<long long> &times) cons
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 }
 
-int TV::GetCurrentChapter(const PlayerContext *ctx) const
+int TV::GetCurrentChapter(const PlayerContext *ctx)
 {
     int chapter = 0;
     ctx->LockDeletePlayer(__FILE__, __LINE__);
@@ -6942,7 +6942,7 @@ void TV::DoJumpChapter(PlayerContext *ctx, int chapter)
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 }
 
-int TV::GetNumTitles(const PlayerContext *ctx) const
+int TV::GetNumTitles(const PlayerContext *ctx)
 {
     int num_titles = 0;
     ctx->LockDeletePlayer(__FILE__, __LINE__);
@@ -6952,7 +6952,7 @@ int TV::GetNumTitles(const PlayerContext *ctx) const
     return num_titles;
 }
 
-int TV::GetCurrentTitle(const PlayerContext *ctx) const
+int TV::GetCurrentTitle(const PlayerContext *ctx)
 {
     int currentTitle = 0;
     ctx->LockDeletePlayer(__FILE__, __LINE__);
@@ -6962,7 +6962,7 @@ int TV::GetCurrentTitle(const PlayerContext *ctx) const
     return currentTitle;
 }
 
-int TV::GetNumAngles(const PlayerContext *ctx) const
+int TV::GetNumAngles(const PlayerContext *ctx)
 {
     int num_angles = 0;
     ctx->LockDeletePlayer(__FILE__, __LINE__);
@@ -6972,7 +6972,7 @@ int TV::GetNumAngles(const PlayerContext *ctx) const
     return num_angles;
 }
 
-int TV::GetCurrentAngle(const PlayerContext *ctx) const
+int TV::GetCurrentAngle(const PlayerContext *ctx)
 {
     int currentAngle = 0;
     ctx->LockDeletePlayer(__FILE__, __LINE__);
@@ -6982,7 +6982,7 @@ int TV::GetCurrentAngle(const PlayerContext *ctx) const
     return currentAngle;
 }
 
-QString TV::GetAngleName(const PlayerContext *ctx, int angle) const
+QString TV::GetAngleName(const PlayerContext *ctx, int angle)
 {
     QString name;
     ctx->LockDeletePlayer(__FILE__, __LINE__);
@@ -6992,7 +6992,7 @@ QString TV::GetAngleName(const PlayerContext *ctx, int angle) const
     return name;
 }
 
-int TV::GetTitleDuration(const PlayerContext *ctx, int title) const
+int TV::GetTitleDuration(const PlayerContext *ctx, int title)
 {
     int seconds = 0;
     ctx->LockDeletePlayer(__FILE__, __LINE__);
@@ -7003,7 +7003,7 @@ int TV::GetTitleDuration(const PlayerContext *ctx, int title) const
 }
 
 
-QString TV::GetTitleName(const PlayerContext *ctx, int title) const
+QString TV::GetTitleName(const PlayerContext *ctx, int title)
 {
     QString name;
     ctx->LockDeletePlayer(__FILE__, __LINE__);
@@ -10314,7 +10314,7 @@ bool TV::HandleOSDChannelEdit(PlayerContext *ctx, const QString& action)
 /** \fn TV::ChannelEditAutoFill(const PlayerContext*,InfoMap&) const
  *  \brief Automatically fills in as much information as possible.
  */
-void TV::ChannelEditAutoFill(const PlayerContext *ctx, InfoMap &infoMap) const
+void TV::ChannelEditAutoFill(const PlayerContext *ctx, InfoMap &infoMap)
 {
 #if 0
     const QString keys[4] = { "XMLTV", "callsign", "channame", "channum", };
@@ -10324,7 +10324,7 @@ void TV::ChannelEditAutoFill(const PlayerContext *ctx, InfoMap &infoMap) const
     ChannelEditXDSFill(ctx, infoMap);
 }
 
-void TV::ChannelEditXDSFill(const PlayerContext *ctx, InfoMap &infoMap) const
+void TV::ChannelEditXDSFill(const PlayerContext *ctx, InfoMap &infoMap)
 {
     QMap<QString,bool> modifiable;
     if (!(modifiable["callsign"] = infoMap["callsign"].isEmpty()))
@@ -12048,7 +12048,7 @@ void TV::PlaybackMenuShow(const MenuBase &menu,
     PlaybackMenuDeinit(menu);
 }
 
-void TV::MenuStrings(void) const
+void TV::MenuStrings(void)
 {
     // Playback menu
     (void)tr("Playback Menu");
@@ -12747,7 +12747,7 @@ void TV::DVDJumpForward(PlayerContext *ctx)
 /* \fn TV::IsBookmarkAllowed(const PlayerContext*) const
  * \brief Returns true if bookmarks are allowed for the current player.
  */
-bool TV::IsBookmarkAllowed(const PlayerContext *ctx) const
+bool TV::IsBookmarkAllowed(const PlayerContext *ctx)
 {
     ctx->LockPlayingInfo(__FILE__, __LINE__);
 
@@ -12773,7 +12773,7 @@ bool TV::IsBookmarkAllowed(const PlayerContext *ctx) const
 /* \fn TV::IsDeleteAllowed(const PlayerContext*) const
  * \brief Returns true if the delete menu option should be offered.
  */
-bool TV::IsDeleteAllowed(const PlayerContext *ctx) const
+bool TV::IsDeleteAllowed(const PlayerContext *ctx)
 {
     bool allowed = false;
 
@@ -13282,7 +13282,7 @@ void TV::ReturnPlayerLock(const PlayerContext *&ctx) const
     ctx = nullptr;
 }
 
-QString TV::GetLiveTVIndex(const PlayerContext *ctx) const
+QString TV::GetLiveTVIndex(const PlayerContext *ctx)
 {
 #ifdef DEBUG_LIVETV_TRANSITION
     return (ctx->m_tvchain ?

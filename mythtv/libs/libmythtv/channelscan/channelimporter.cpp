@@ -885,7 +885,7 @@ void ChannelImporter::AddChanToCopy(
     transport_copy.m_channels.push_back(chan);
 }
 
-void ChannelImporter::CleanupDuplicates(ScanDTVTransportList &transports) const
+void ChannelImporter::CleanupDuplicates(ScanDTVTransportList &transports)
 {
     ScanDTVTransportList no_dups;
 

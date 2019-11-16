@@ -2067,7 +2067,7 @@ bool DiSEqCDevRotor::ExecuteUSALS(const DiSEqCDevSettings& /*settings*/,
                               m_repeat, 2, cmd);
 }
 
-double DiSEqCDevRotor::CalculateAzimuth(double angle) const
+double DiSEqCDevRotor::CalculateAzimuth(double angle)
 {
     // Azimuth Calculation references:
     // http://engr.nmsu.edu/~etti/3_2/3_2e.html

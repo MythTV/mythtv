@@ -68,7 +68,7 @@ class MTV_PUBLIC HTTPLiveStream
     bool UpdateStatusMessage(const QString& message);
     bool UpdatePercentComplete(int percent);
 
-    QString StatusToString(HTTPLiveStreamStatus status);
+    static QString StatusToString(HTTPLiveStreamStatus status);
 
     bool CheckStop(void);
 

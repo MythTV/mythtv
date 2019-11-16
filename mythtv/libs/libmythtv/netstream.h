@@ -137,7 +137,7 @@ protected:
     void run() override; // QThread
     bool NewRequest(QEvent *);
     bool StartRequest(NetStreamRequest *);
-    bool AbortRequest(NetStreamAbort *);
+    static bool AbortRequest(NetStreamAbort *);
 
 private slots:
     void quit();

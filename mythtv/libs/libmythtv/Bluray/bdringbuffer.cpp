@@ -1481,7 +1481,7 @@ bool BDRingBuffer::IsInStillFrame(void) const
  * \param streamCount   Number of streams in the array
  * \return Pointer to the matching stream if found, otherwise nullptr.
  */
-const BLURAY_STREAM_INFO* BDRingBuffer::FindStream(int streamid, BLURAY_STREAM_INFO* streams, int streamCount) const
+const BLURAY_STREAM_INFO* BDRingBuffer::FindStream(int streamid, BLURAY_STREAM_INFO* streams, int streamCount)
 {
     const BLURAY_STREAM_INFO* stream = nullptr;
 

@@ -68,7 +68,7 @@ class NuppelDecoder : public DecoderBase
 
     bool DecodeFrame(struct rtframeheader *frameheader,
                      unsigned char *lstrm, VideoFrame *frame);
-    bool isValidFrametype(char type);
+    static bool isValidFrametype(char type);
 
     bool InitAVCodecVideo(int codec);
     void CloseAVCodecVideo(void);

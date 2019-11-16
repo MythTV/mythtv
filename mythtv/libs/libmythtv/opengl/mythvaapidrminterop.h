@@ -24,7 +24,7 @@ class MythVAAPIInteropDRM : public MythVAAPIInterop, public MythEGLDMABUF
     void           PostInitDeinterlacer(void) override;
 
   private:
-    VideoFrameType VATypeToMythType(uint32_t Fourcc);
+    static VideoFrameType VATypeToMythType(uint32_t Fourcc);
     void           CleanupReferenceFrames(void);
     void           RotateReferenceFrames(AVBufferRef *Buffer);
     vector<MythVideoTexture*> GetReferenceFrames(void);

@@ -99,7 +99,7 @@ class VideoOutWindow : public QObject
     void ApplyLetterboxing       (void);
     void PrintMoveResizeDebug    (void);
     void SetVideoAspectRatio     (float Aspect);
-    QSize Fix1088                (QSize Dimensions);
+    static QSize Fix1088         (QSize Dimensions);
     void Rotate                  (void);
 
   private:

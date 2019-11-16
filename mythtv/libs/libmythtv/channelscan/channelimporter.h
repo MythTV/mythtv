@@ -138,9 +138,9 @@ class MTV_PUBLIC ChannelImporter
         kChannelTypeLast = kChannelTypeConflictingLast,
     } ChannelType;
 
-    QString toString(ChannelType type);
+    static QString toString(ChannelType type);
 
-    void CleanupDuplicates(ScanDTVTransportList &transports) const;
+    static void CleanupDuplicates(ScanDTVTransportList &transports);
     void FilterServices(ScanDTVTransportList &transports) const;
     ScanDTVTransportList GetDBTransports(
         uint sourceid, ScanDTVTransportList&) const;

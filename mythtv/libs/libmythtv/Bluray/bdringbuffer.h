@@ -161,7 +161,7 @@ class MTV_PUBLIC BDRingBuffer : public RingBuffer
     bool HandleBDEvents(void);
     void HandleBDEvent(BD_EVENT &event);
 
-    const BLURAY_STREAM_INFO* FindStream(int streamid, BLURAY_STREAM_INFO* streams, int streamCount) const;
+    static const BLURAY_STREAM_INFO* FindStream(int streamid, BLURAY_STREAM_INFO* streams, int streamCount);
 
 
     typedef enum

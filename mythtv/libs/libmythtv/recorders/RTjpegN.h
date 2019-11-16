@@ -78,11 +78,11 @@ class RTjpeg
     void SetNextKey(void);
 
 private:
-    int b2s(const int16_t *data, int8_t *strm, uint8_t bt8);
-    int s2b(int16_t *data, const int8_t *strm, uint8_t bt8, int32_t *qtbla);
+    static int b2s(const int16_t *data, int8_t *strm, uint8_t bt8);
+    static int s2b(int16_t *data, const int8_t *strm, uint8_t bt8, int32_t *qtbla);
 
     void QuantInit(void);
-    void Quant(int16_t *block, int32_t *qtbl);
+    static void Quant(int16_t *block, int32_t *qtbl);
    
     void DctInit(void);
     void DctY(uint8_t *idata, int rskip);
@@ -105,9 +105,9 @@ private:
     void decompress8(int8_t *sp, uint8_t **planes);
 
 #ifdef MMX
-    int bcomp(int16_t *rblock, int16_t *old, mmx_t *mask);
+    static int bcomp(int16_t *rblock, int16_t *old, mmx_t *mask);
 #else
-    int bcomp(int16_t *rblock, int16_t *old, uint16_t *mask);
+    static int bcomp(int16_t *rblock, int16_t *old, uint16_t *mask);
 #endif
     
     int16_t  block[64] MALIGN32 {0};

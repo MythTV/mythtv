@@ -121,7 +121,7 @@ class MTV_PUBLIC VideoBuffers
     frame_queue_t       *Queue(BufferType Type);
     const frame_queue_t *Queue(BufferType Type) const;
     VideoFrame          *GetNextFreeFrameInternal(BufferType EnqueueTo);
-    void                 ReleaseDecoderResources(VideoFrame *Frame);
+    static void          ReleaseDecoderResources(VideoFrame *Frame);
     static void          SetDeinterlacingFlags(VideoFrame &Frame, MythDeintType Single,
                                                MythDeintType Double, MythCodecID CodecID);
 

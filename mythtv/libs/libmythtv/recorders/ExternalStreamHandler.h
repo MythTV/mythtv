@@ -34,7 +34,7 @@ class ExternIO
     QString ErrorString(void) const { return m_error; }
     void ClearError(void) { m_error.clear(); }
 
-    bool KillIfRunning(const QString & cmd);
+    static bool KillIfRunning(const QString & cmd);
 
   private:
     void Fork(void);

@@ -47,18 +47,18 @@ class UPnpCDSTv : public UPnpCDSExtension
         bool  LoadTitles     ( const UPnpCDSRequest *pRequest,
                                UPnpCDSExtensionResults *pResults,
                                const IDTokenMap& tokens );
-        bool  LoadDates      ( const UPnpCDSRequest *pRequest,
-                               UPnpCDSExtensionResults *pResults,
-                               const IDTokenMap& tokens );
-        bool  LoadGenres     ( const UPnpCDSRequest *pRequest,
-                               UPnpCDSExtensionResults *pResults,
-                               const IDTokenMap& tokens );
-        bool  LoadChannels   ( const UPnpCDSRequest *pRequest,
-                               UPnpCDSExtensionResults *pResults,
-                               const IDTokenMap& tokens );
-        bool  LoadRecGroups  ( const UPnpCDSRequest *pRequest,
-                               UPnpCDSExtensionResults *pResults,
-                               const IDTokenMap& tokens );
+        static bool  LoadDates     ( const UPnpCDSRequest *pRequest,
+                                     UPnpCDSExtensionResults *pResults,
+                                     const IDTokenMap& tokens );
+        static bool  LoadGenres    ( const UPnpCDSRequest *pRequest,
+                                     UPnpCDSExtensionResults *pResults,
+                                     const IDTokenMap& tokens );
+        static bool  LoadChannels  ( const UPnpCDSRequest *pRequest,
+                                     UPnpCDSExtensionResults *pResults,
+                                     const IDTokenMap& tokens );
+        static bool  LoadRecGroups ( const UPnpCDSRequest *pRequest,
+                                     UPnpCDSExtensionResults *pResults,
+                                     const IDTokenMap& tokens );
         bool  LoadMovies     ( const UPnpCDSRequest *pRequest,
                                UPnpCDSExtensionResults *pResults,
                                IDTokenMap tokens );

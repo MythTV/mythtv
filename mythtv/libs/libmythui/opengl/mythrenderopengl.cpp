@@ -241,6 +241,8 @@ void MythRenderOpenGL:: logDebugMarker(const QString &Message)
     }
 }
 
+// Can't be static because its connected to a signal and passed "this".
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 void MythRenderOpenGL::contextToBeDestroyed(void)
 {
     LOG(VB_GENERAL, LOG_WARNING, LOC + "Context about to be destroyed");

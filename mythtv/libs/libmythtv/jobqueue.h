@@ -233,8 +233,8 @@ class MTV_PUBLIC JobQueue : public QObject, public QRunnable
 
     void StartChildJob(void *(*ChildThreadRoutine)(void *), int jobID);
 
-    QString GetJobDescription(int jobType);
-    QString GetJobCommand(int id, int jobType, ProgramInfo *tmpInfo);
+    static QString GetJobDescription(int jobType);
+    static QString GetJobCommand(int id, int jobType, ProgramInfo *tmpInfo);
     void RemoveRunningJob(int id);
 
     static QString PrettyPrint(off_t bytes);

@@ -308,8 +308,8 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
 
     void HandleStateChange(void);
     void ChangeState(TVState nextState);
-    bool StateIsRecording(TVState state);
-    bool StateIsPlaying(TVState state);
+    static bool StateIsRecording(TVState state);
+    static bool StateIsPlaying(TVState state);
     TVState RemovePlaying(TVState state);
     TVState RemoveRecording(TVState state);
 

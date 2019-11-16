@@ -1139,7 +1139,7 @@ void EITFixUp::FixUK(DBEventEIT &event) const
 /** \fn EITFixUp::FixPBS(DBEventEIT&) const
  *  \brief Use this to standardize PBS ATSC guide in the USA.
  */
-void EITFixUp::FixPBS(DBEventEIT &event) const
+void EITFixUp::FixPBS(DBEventEIT &event)
 {
     /* Used for PBS ATSC Subtitles are separated by a colon */
     int position = event.m_description.indexOf(':');
@@ -1396,7 +1396,7 @@ void EITFixUp::FixComHem(DBEventEIT &event, bool process_subtitle) const
 /** \fn EITFixUp::FixAUStar(DBEventEIT&) const
  *  \brief Use this to standardize DVB-S guide in Australia.
  */
-void EITFixUp::FixAUStar(DBEventEIT &event) const
+void EITFixUp::FixAUStar(DBEventEIT &event)
 {
     event.m_category = event.m_subtitle;
     /* Used for DVB-S Subtitles are separated by a colon */
@@ -1412,7 +1412,7 @@ void EITFixUp::FixAUStar(DBEventEIT &event) const
 /** \fn EITFixUp::FixAUDescription(DBEventEIT&) const
  *  \brief Use this to standardize DVB-T guide in Australia. (fix common annoyances common to most networks)
  */
-void EITFixUp::FixAUDescription(DBEventEIT &event) const
+void EITFixUp::FixAUDescription(DBEventEIT &event)
 {
     if (event.m_description.startsWith("[Program data ") || event.m_description.startsWith("[Program info "))//TEN
     {
@@ -1437,7 +1437,7 @@ void EITFixUp::FixAUDescription(DBEventEIT &event) const
 /** \fn EITFixUp::FixAUNine(DBEventEIT&) const
  *  \brief Use this to standardize DVB-T guide in Australia. (Nine network)
  */
-void EITFixUp::FixAUNine(DBEventEIT &event) const
+void EITFixUp::FixAUNine(DBEventEIT &event)
 {
     QRegExp rating("\\((G|PG|M|MA)\\)");
     if (rating.indexIn(event.m_description) == 0)
@@ -1468,7 +1468,7 @@ void EITFixUp::FixAUNine(DBEventEIT &event) const
 /** \fn EITFixUp::FixAUSeven(DBEventEIT&) const
  *  \brief Use this to standardize DVB-T guide in Australia. (Seven network)
  */
-void EITFixUp::FixAUSeven(DBEventEIT &event) const
+void EITFixUp::FixAUSeven(DBEventEIT &event)
 {
     if (event.m_description.endsWith(" Rpt"))
     {
@@ -2253,7 +2253,7 @@ void EITFixUp::FixNL(DBEventEIT &event) const
 
 }
 
-void EITFixUp::FixCategory(DBEventEIT &event) const
+void EITFixUp::FixCategory(DBEventEIT &event)
 {
     // remove category movie from short events
     if (event.m_categoryType == ProgramInfo::kCategoryMovie &&
@@ -2553,7 +2553,7 @@ void EITFixUp::FixStripHTML(DBEventEIT &event) const
 // as more description field. All the sort-out will happen in the description
 // field. Also, sometimes the description is just a repeat of the title. If so,
 // we remove it.
-void EITFixUp::FixGreekSubtitle(DBEventEIT &event) const
+void EITFixUp::FixGreekSubtitle(DBEventEIT &event)
 {
     if (event.m_title == event.m_description)
     {

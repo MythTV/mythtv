@@ -40,7 +40,7 @@ class MTV_PUBLIC AVFormatWriter : public FileWriterBase
     void Cleanup(void);
 
     AVRational GetCodecTimeBase(void);
-    bool FindAudioFormat(AVCodecContext *ctx, AVCodec *c, AVSampleFormat format);
+    static bool FindAudioFormat(AVCodecContext *ctx, AVCodec *c, AVSampleFormat format);
 
     AVFRingBuffer         *m_avfRingBuffer {nullptr};
     RingBuffer            *m_ringBuffer    {nullptr};

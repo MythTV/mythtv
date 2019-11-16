@@ -40,14 +40,14 @@ class VBox
         REQUEST_ABOTRED = 8
     };
 
-    bool sendQuery(const QString &query, QDomDocument *xmlDoc);
+    static bool sendQuery(const QString &query, QDomDocument *xmlDoc);
 
     QString m_url;
 
   private:
     static QStringList doUPNPSearch(void);
-    QString getFirstText(QDomElement &element);
-    QString getStrValue(QDomElement &element, const QString &name, int index = 0);
-    int getIntValue(QDomElement &element, const QString &name, int index = 0);
+    static QString getFirstText(QDomElement &element);
+    static QString getStrValue(QDomElement &element, const QString &name, int index = 0);
+    static int getIntValue(QDomElement &element, const QString &name, int index = 0);
 };
 #endif // _VBOX_UTILS_H_
