@@ -18,6 +18,9 @@
  *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+// C/C++ includes
+#include <utility>
+
 // Qt includes
 #include <QString>
 
@@ -28,9 +31,9 @@
 #define LOC QString("ExternalRec[%1](%2): ").arg(m_cardid).arg(m_command)
 
 ExternalRecChannelFetcher::ExternalRecChannelFetcher(int cardid,
-                                                     const QString & cmd)
+                                                     QString cmd)
     : m_cardid(cardid)
-    , m_command(cmd)
+    , m_command(std::move(cmd))
 {
     m_stream_handler = ExternalStreamHandler::Get(m_command, m_cardid, m_cardid);
 }

@@ -34,6 +34,7 @@
 // POSIX headers
 #include <fcntl.h>
 #include <unistd.h>
+#include <utility>
 #include <sys/poll.h>
 #include <sys/select.h>
 #include <sys/time.h>
@@ -72,8 +73,8 @@ QDateTime DVBChannel::s_last_tuning = QDateTime::currentDateTime();
  *
  *  \bug Only supports single input cards.
  */
-DVBChannel::DVBChannel(const QString &aDevice, TVRec *parent)
-    : DTVChannel(parent), m_device(aDevice)
+DVBChannel::DVBChannel(QString aDevice, TVRec *parent)
+    : DTVChannel(parent), m_device(std::move(aDevice))
 {
     s_master_map_lock.lockForWrite();
     QString key = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, m_device);

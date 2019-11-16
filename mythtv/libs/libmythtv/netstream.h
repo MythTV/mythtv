@@ -34,7 +34,7 @@ class NetStream : public QObject
 public:
     enum EMode { kNeverCache, kPreferCache, kAlwaysCache };
     NetStream(const QUrl &, EMode mode = kPreferCache,
-              const QByteArray &cert = QByteArray());
+              QByteArray cert = QByteArray());
     virtual ~NetStream();
 
 public:

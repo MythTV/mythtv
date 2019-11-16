@@ -7,6 +7,9 @@
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
+// C++ headers
+#include <utility>
+
 // Qt headers
 #include <QUrl>
 
@@ -21,8 +24,8 @@
 
 #define LOC QString("IPTVChan[%1]: ").arg(m_inputid)
 
-IPTVChannel::IPTVChannel(TVRec *rec, const QString &videodev) :
-    DTVChannel(rec), m_videodev(videodev)
+IPTVChannel::IPTVChannel(TVRec *rec, QString videodev) :
+    DTVChannel(rec), m_videodev(std::move(videodev))
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
 }

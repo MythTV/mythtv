@@ -3,6 +3,7 @@
 // Std C headers
 #include <cmath>
 #include <unistd.h>
+#include <utility>
 
 // Qt headers
 #include <QFile>
@@ -31,10 +32,10 @@ static bool parse_extinf(const QString &line,
                          int           &nextChanNum);
 
 IPTVChannelFetcher::IPTVChannelFetcher(
-    uint cardid, const QString &inputname, uint sourceid,
+    uint cardid, QString inputname, uint sourceid,
     bool is_mpts, ScanMonitor *monitor) :
     m_scan_monitor(monitor),
-    m_cardid(cardid),       m_inputname(inputname),
+    m_cardid(cardid),       m_inputname(std::move(inputname)),
     m_sourceid(sourceid),   m_is_mpts(is_mpts),
     m_thread(new MThread("IPTVChannelFetcher", this))
 {

@@ -13,10 +13,10 @@ class HLSRecSegment
 
     HLSRecSegment(void);
     HLSRecSegment(const HLSRecSegment& rhs);
-    HLSRecSegment(int seq, int duration, const QString& title,
-		  const QUrl& uri);
-    HLSRecSegment(int seq, int duration, const QString& title,
-	       const QUrl& uri, const QString& current_key_path);
+    HLSRecSegment(int seq, int duration, QString title,
+		  QUrl uri);
+    HLSRecSegment(int seq, int duration, QString title,
+                  QUrl uri, const QString& current_key_path);
     ~HLSRecSegment();
 
     HLSRecSegment& operator=(const HLSRecSegment& rhs);

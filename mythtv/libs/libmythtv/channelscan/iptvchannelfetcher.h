@@ -64,7 +64,7 @@ class IPTVChannelFetcher : public QRunnable
     Q_DECLARE_TR_FUNCTIONS(IPTVChannelFetcher);
 
   public:
-    IPTVChannelFetcher(uint cardid, const QString &inputname, uint sourceid,
+    IPTVChannelFetcher(uint cardid, QString inputname, uint sourceid,
                        bool is_mpts, ScanMonitor *monitor = nullptr);
     ~IPTVChannelFetcher();
 

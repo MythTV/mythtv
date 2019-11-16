@@ -1,5 +1,6 @@
 #include <unistd.h>
 #include <iostream>
+#include <utility>
 
 using namespace std;
 
@@ -7,8 +8,8 @@ using namespace std;
 #include <QDir>
 #include <QRegExp>
 #include <QString>
-#include <QTime>
 #include <QSurfaceFormat>
+#include <QTime>
 
 #include "tv_play.h"
 #include "programinfo.h"
@@ -34,9 +35,9 @@ using namespace std;
 class VideoPerformanceTest
 {
   public:
-    VideoPerformanceTest(const QString &filename, bool decodeno, bool onlydecode,
+    VideoPerformanceTest(QString filename, bool decodeno, bool onlydecode,
                          int runfor, bool deint, bool gpu)
-      : m_file(filename),
+      : m_file(std::move(filename)),
         m_noDecode(decodeno),
         m_decodeOnly(onlydecode),
         m_secondsToRun(runfor),

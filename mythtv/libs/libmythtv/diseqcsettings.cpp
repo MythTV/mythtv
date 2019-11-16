@@ -6,6 +6,7 @@
 
 // Std C headers
 #include <cmath>
+#include <utility>
 
 // MythTV headers
 #include "mythdbcon.h"
@@ -669,10 +670,10 @@ SCRConfig::SCRConfig(DiSEqCDevSCR &scr, StandardSetting *parent) : m_scr(scr)
 class lnb_preset
 {
   public:
-    lnb_preset(const QString &_name, DiSEqCDevLNB::dvbdev_lnb_t _type,
+    lnb_preset(QString _name, DiSEqCDevLNB::dvbdev_lnb_t _type,
                uint _lof_sw = 0, uint _lof_lo = 0,
                uint _lof_hi = 0, bool _pol_inv = false) :
-        name(_name),     type(_type),
+        name(std::move(_name)), type(_type),
         lof_sw(_lof_sw), lof_lo(_lof_lo),
         lof_hi(_lof_hi), pol_inv(_pol_inv) {}
 

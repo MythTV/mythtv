@@ -119,7 +119,7 @@ class MTV_PUBLIC MythCCExtractorPlayer : public MythPlayer
 {
   public:
     MythCCExtractorPlayer(PlayerFlags flags, bool showProgress,
-                          const QString &fileName, const QString & destdir);
+                          QString fileName, const QString & destdir);
     MythCCExtractorPlayer(const MythCCExtractorPlayer& rhs);
     ~MythCCExtractorPlayer() = default;
 

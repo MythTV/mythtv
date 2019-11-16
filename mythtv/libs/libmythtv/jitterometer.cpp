@@ -3,8 +3,9 @@
 #include "jitterometer.h"
 
 // Std
-#include <cstdlib>
 #include <cmath>
+#include <cstdlib>
+#include <utility>
 
 #define UNIX_PROC_STAT "/proc/stat"
 #define MAX_CORES 8
@@ -16,8 +17,8 @@
 #include <mach/vm_map.h>
 #endif
 
-Jitterometer::Jitterometer(const QString &nname, int ncycles)
-  : m_num_cycles(ncycles), m_name(nname)
+Jitterometer::Jitterometer(QString nname, int ncycles)
+  : m_num_cycles(ncycles), m_name(std::move(nname))
 {
     m_times.resize(m_num_cycles);
 

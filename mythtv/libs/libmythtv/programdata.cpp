@@ -3,6 +3,8 @@
 // C++ includes
 #include <algorithm>
 #include <climits>
+#include <utility>
+
 using namespace std;
 
 // Qt includes
@@ -63,14 +65,14 @@ DBPerson::DBPerson(const DBPerson &other) :
     m_name.squeeze();
 }
 
-DBPerson::DBPerson(Role role, const QString &name) :
-    m_role(role), m_name(name)
+DBPerson::DBPerson(Role role, QString name) :
+    m_role(role), m_name(std::move(name))
 {
     m_name.squeeze();
 }
 
-DBPerson::DBPerson(const QString &role, const QString &name) :
-    m_role(kUnknown), m_name(name)
+DBPerson::DBPerson(const QString &role, QString name) :
+    m_role(kUnknown), m_name(std::move(name))
 {
     if (!role.isEmpty())
     {

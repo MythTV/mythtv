@@ -33,11 +33,13 @@
  *
  */
 
-#include <iostream>
-#include <vector>
-#include <map>
-#include <cstdlib>
 #include <cstdio>
+#include <cstdlib>
+#include <iostream>
+#include <map>
+#include <utility>
+#include <vector>
+
 using namespace std;
 
 #include <fcntl.h>
@@ -59,8 +61,8 @@ using namespace std;
 
 #define LOC QString("DVB#%1 CA: ").arg(m_device)
 
-DVBCam::DVBCam(const QString &aDevice)
-    : m_device(aDevice)
+DVBCam::DVBCam(QString aDevice)
+    : m_device(std::move(aDevice))
 {
     QString dvbdev = CardUtil::GetDeviceName(DVB_DEV_CA, m_device);
     QByteArray dev = dvbdev.toLatin1();

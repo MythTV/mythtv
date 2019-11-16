@@ -1,3 +1,6 @@
+// C/C++
+#include <utility>
+
 // MythTV
 #include "mythcontext.h"
 #include "mythmainwindow.h"
@@ -89,14 +92,14 @@ void MythVideoOutputOpenGL::GetRenderOptions(RenderOptions &Options)
 #endif
 }
 
-MythVideoOutputOpenGL::MythVideoOutputOpenGL(const QString &Profile)
+MythVideoOutputOpenGL::MythVideoOutputOpenGL(QString Profile)
   : MythVideoOutput(),
     m_render(nullptr),
     m_isGLES2(false),
     m_openGLVideo(nullptr),
     m_openGLVideoPiPActive(nullptr),
     m_openGLPainter(nullptr),
-    m_videoProfile(Profile),
+    m_videoProfile(std::move(Profile)),
     m_newCodecId(kCodec_NONE),
     m_newVideoDim(),
     m_newVideoDispDim(),

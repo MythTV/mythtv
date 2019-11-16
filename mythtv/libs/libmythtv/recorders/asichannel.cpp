@@ -2,6 +2,9 @@
  *  Class ASIChannel
  */
 
+// C/C++ includes
+#include <utility>
+
 // MythTV includes
 #include "mythlogging.h"
 #include "mpegtables.h"
@@ -9,8 +12,8 @@
 
 #define LOC     QString("ASIChan[%1](%2): ").arg(GetInputID()).arg(ASIChannel::GetDevice())
 
-ASIChannel::ASIChannel(TVRec *parent, const QString &device) :
-    DTVChannel(parent), m_device(device)
+ASIChannel::ASIChannel(TVRec *parent, QString device) :
+    DTVChannel(parent), m_device(std::move(device))
 {
     m_tuner_types.emplace_back(DTVTunerType::kTunerTypeASI);
 }

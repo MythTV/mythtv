@@ -58,9 +58,9 @@ class VideoSourceSelector : public TransMythUIComboBoxSetting
     Q_OBJECT
 
   public:
-    VideoSourceSelector(uint           _initial_sourceid,
-                        const QString &_card_types,
-                        bool           _must_have_mplexid);
+    VideoSourceSelector(uint    _initial_sourceid,
+                        QString _card_types,
+                        bool    _must_have_mplexid);
 
     void Load(void) override; // StandardSetting
 

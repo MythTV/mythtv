@@ -28,14 +28,17 @@
  */
 
 #include "inputselectorsetting.h"
+
+#include <utility>
+
 #include "cardutil.h"
 #include "mythcorecontext.h"
 #include "mythdb.h"
 
 InputSelector::InputSelector(uint default_cardid,
-                             const QString &default_inputname) :
+                             QString default_inputname) :
     m_default_cardid(default_cardid),
-    m_default_inputname(default_inputname)
+    m_default_inputname(std::move(default_inputname))
 {
     setLabel(tr("Input"));
     setHelpText(

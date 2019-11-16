@@ -1,4 +1,6 @@
 #include <algorithm>
+#include <utility>
+
 using namespace std;
 
 #include "signalmonitorvalue.h"
@@ -32,14 +34,14 @@ void SignalMonitorValue::Init()
     }
 }
 
-SignalMonitorValue::SignalMonitorValue(const QString& _name,
-                                       const QString& _noSpaceName,
+SignalMonitorValue::SignalMonitorValue(QString _name,
+                                       QString _noSpaceName,
                                        int _threshold,
                                        bool _high_threshold,
                                        int _min, int _max,
                                        int _timeout) :
-    m_name(_name),
-    m_noSpaceName(_noSpaceName),
+    m_name(std::move(_name)),
+    m_noSpaceName(std::move(_noSpaceName)),
     m_value(0),
     m_threshold(_threshold),
     m_minVal(_min), m_maxVal(_max), m_timeout(_timeout),
@@ -55,14 +57,14 @@ SignalMonitorValue::SignalMonitorValue(const QString& _name,
 #endif
 }
 
-SignalMonitorValue::SignalMonitorValue(const QString& _name,
-                                       const QString& _noSpaceName,
+SignalMonitorValue::SignalMonitorValue(QString _name,
+                                       QString _noSpaceName,
                                        int _value, int _threshold,
                                        bool _high_threshold,
                                        int _min, int _max,
                                        int _timeout, bool _set) :
-    m_name(_name),
-    m_noSpaceName(_noSpaceName),
+    m_name(std::move(_name)),
+    m_noSpaceName(std::move(_noSpaceName)),
     m_value(_value),
     m_threshold(_threshold),
     m_minVal(_min), m_maxVal(_max), m_timeout(_timeout),

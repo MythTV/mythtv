@@ -1,7 +1,10 @@
+// C/C++ headers
+#include <utility>
+
 // Qt headers
-#include <QWidget>
-#include <QFile>
 #include <QCoreApplication>
+#include <QFile>
+#include <QWidget>
 
 // MythTV headers
 #include "channelsettings.h"
@@ -247,9 +250,9 @@ class OutputFilters : public MythUITextEditSetting
 class XmltvID : public MythUIComboBoxSetting
 {
   public:
-    XmltvID(const ChannelID &id, const QString &_sourceName) :
+    XmltvID(const ChannelID &id, QString _sourceName) :
         MythUIComboBoxSetting(new ChannelDBStorage(this, id, "xmltvid"), true),
-        sourceName(_sourceName)
+        sourceName(std::move(_sourceName))
     {
         setLabel(QCoreApplication::translate("(Common)", "XMLTV ID"));
 

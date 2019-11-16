@@ -21,6 +21,8 @@
  */
 
 #include <iostream>
+#include <utility>
+
 using namespace std;
 
 #include <QFileInfo>
@@ -50,13 +52,13 @@ TeletextStuff::~TeletextStuff() { delete reader; }
 DVBSubStuff::~DVBSubStuff() { delete reader; }
 
 MythCCExtractorPlayer::MythCCExtractorPlayer(PlayerFlags flags, bool showProgress,
-                                             const QString &fileName,
+                                             QString fileName,
                                              const QString &destdir) :
     MythPlayer(flags),
     m_curTime(0),
     m_myFramesPlayed(0),
     m_showProgress(showProgress),
-    m_fileName(fileName)
+    m_fileName(std::move(fileName))
 {
     // Determine where we will put extracted info.
     QStringList comps = QFileInfo(m_fileName).fileName().split(".");

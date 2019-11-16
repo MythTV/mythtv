@@ -41,8 +41,8 @@ class MTV_PUBLIC DBPerson
     } Role;
 
     DBPerson(const DBPerson&);
-    DBPerson(Role _role, const QString &_name);
-    DBPerson(const QString &_role, const QString &_name);
+    DBPerson(Role _role, QString _name);
+    DBPerson(const QString &_role, QString _name);
 
     QString GetRole(void) const;
 

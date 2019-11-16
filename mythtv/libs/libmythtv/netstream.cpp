@@ -8,29 +8,30 @@
 using std::getenv;
 #include <cstddef>
 #include <cstdio>
+#include <utility>
 
 // Qt
+#include <QAtomicInt>
+#include <QCoreApplication>
+#include <QDesktopServices>
+#include <QEvent>
+#include <QFile>
+#include <QMetaType> // qRegisterMetaType
+#include <QMutexLocker>
 #include <QNetworkAccessManager>
-#include <QNetworkRequest>
-#include <QNetworkReply>
-#include <QNetworkProxy>
 #include <QNetworkDiskCache>
+#include <QNetworkProxy>
+#include <QNetworkReply>
+#include <QNetworkRequest>
+#include <QScopedPointer>
+#include <QThread>
+#include <QUrl>
 #ifndef QT_NO_OPENSSL
 #include <QSslConfiguration>
 #include <QSslError>
 #include <QSslSocket>
 #include <QSslKey>
 #endif
-#include <QFile>
-#include <QUrl>
-#include <QThread>
-#include <QMutexLocker>
-#include <QEvent>
-#include <QCoreApplication>
-#include <QAtomicInt>
-#include <QMetaType> // qRegisterMetaType
-#include <QDesktopServices>
-#include <QScopedPointer>
 
 // Myth
 #include "mythlogging.h"
@@ -93,7 +94,7 @@ public:
  * Network streaming request
  */
 NetStream::NetStream(const QUrl &url, EMode mode /*= kPreferCache*/,
-        const QByteArray &cert) :
+        QByteArray cert) :
     m_id(s_nRequest.fetchAndAddRelaxed(1)),
     m_url(url),
     m_state(kClosed),
@@ -102,7 +103,7 @@ NetStream::NetStream(const QUrl &url, EMode mode /*= kPreferCache*/,
     m_nRedirections(0),
     m_size(-1),
     m_pos(0),
-    m_cert(cert)
+    m_cert(std::move(cert))
 {
     setObjectName("NetStream " + url.toString());
 

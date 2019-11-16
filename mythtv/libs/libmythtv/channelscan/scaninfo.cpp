@@ -1,5 +1,6 @@
 // C++ headers
 #include <cstdint>
+#include <utility>
 
 // Qt headers
 #include <QString>
@@ -12,9 +13,9 @@
 #include "mythlogging.h"
 
 ScanInfo::ScanInfo(uint scanid, uint cardid, uint sourceid,
-                   bool processed, const QDateTime &scandate) :
+                   bool processed, QDateTime scandate) :
     m_scanid(scanid), m_cardid(cardid), m_sourceid(sourceid),
-    m_processed(processed), m_scandate(scandate)
+    m_processed(processed), m_scandate(std::move(scandate))
 {
 }
 

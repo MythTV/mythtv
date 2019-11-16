@@ -5,6 +5,9 @@
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
+// C/C++ includes
+#include <utility>
+
 #include "mythlogging.h"
 #include "tv_rec.h"
 #include "linuxfirewiredevice.h"
@@ -15,11 +18,11 @@
 
 #define LOC QString("FireChan[%1](%2): ").arg(m_inputid).arg(FirewireChannel::GetDevice())
 
-FirewireChannel::FirewireChannel(TVRec *parent, const QString &_videodevice,
-                                 const FireWireDBOptions &firewire_opts) :
+FirewireChannel::FirewireChannel(TVRec *parent, QString _videodevice,
+                                 FireWireDBOptions firewire_opts) :
     DTVChannel(parent),
-    m_videodevice(_videodevice),
-    m_fw_opts(firewire_opts)
+    m_videodevice(std::move(_videodevice)),
+    m_fw_opts(std::move(firewire_opts))
 {
     uint64_t guid = string_to_guid(m_videodevice);
     uint subunitid = 0; // we only support first tuner on STB...

@@ -48,7 +48,7 @@ class MTV_PUBLIC PreviewGenerator : public QObject, public MThread
 
   public:
     PreviewGenerator(const ProgramInfo *pginfo,
-                     const QString     &token,
+                     QString            token,
                      Mode               mode = kLocal);
 
     void SetPreviewTime(long long time, bool in_seconds)

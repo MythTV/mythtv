@@ -32,11 +32,13 @@
 
 // C++ includes
 #include <algorithm>
+#include <utility>
+
 using namespace std;
 
 // Qt includes
-#include <QObject>
 #include <QMutexLocker>
+#include <QObject>
 
 // MythTV includes - General
 #include "channelscan_sm.h"
@@ -144,7 +146,7 @@ class ScannedChannelInfo
 ChannelScanSM::ChannelScanSM(ScanMonitor *_scan_monitor,
                              const QString &_cardtype, ChannelBase *_channel,
                              int _sourceID, uint signal_timeout,
-                             uint channel_timeout, const QString &_inputname,
+                             uint channel_timeout, QString _inputname,
                              bool test_decryption)
     : // Set in constructor
       m_scanMonitor(_scan_monitor),
@@ -154,7 +156,7 @@ ChannelScanSM::ChannelScanSM(ScanMonitor *_scan_monitor,
       m_sourceID(_sourceID),
       m_signalTimeout(signal_timeout),
       m_channelTimeout(channel_timeout),
-      m_inputName(_inputname),
+      m_inputName(std::move(_inputname)),
       m_testDecryption(test_decryption),
       // Misc
       m_analogSignalHandler(new AnalogSignalHandler(this))

@@ -1,3 +1,6 @@
+// C/C++
+#include <utility>
+
 // MythTV
 #include "mythcontext.h"
 #include "tv.h"
@@ -25,7 +28,7 @@ MythOpenGLVideo::MythOpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *Col
                                  bool  ViewportControl, QString Profile)
   : QObject(),
     m_valid(false),
-    m_profile(Profile),
+    m_profile(std::move(Profile)),
     m_inputType(FMT_NONE),
     m_outputType(FMT_NONE),
     m_render(Render),

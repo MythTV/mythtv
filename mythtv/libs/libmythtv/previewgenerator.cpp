@@ -1,5 +1,6 @@
 // C headers
 #include <cmath>
+#include <utility>
 
 // POSIX headers
 #include <sys/types.h> // for utime
@@ -8,14 +9,14 @@
 #include <utime.h>     // for utime
 
 // Qt headers
-#include <QCoreApplication>
-#include <QTemporaryFile>
-#include <QFileInfo>
-#include <QMetaType>
-#include <QImage>
-#include <QDir>
-#include <QUrl>
 #include <QApplication>
+#include <QCoreApplication>
+#include <QDir>
+#include <QFileInfo>
+#include <QImage>
+#include <QMetaType>
+#include <QTemporaryFile>
+#include <QUrl>
 
 // MythTV headers
 #include "mythconfig.h"
@@ -70,12 +71,12 @@
  *                    in order to be processed.
  */
 PreviewGenerator::PreviewGenerator(const ProgramInfo *pginfo,
-                                   const QString     &token,
+                                   QString            token,
                                    PreviewGenerator::Mode mode)
     : MThread("PreviewGenerator"),
       m_programInfo(*pginfo), m_mode(mode),
       m_pathname(pginfo->GetPathname()),
-      m_token(token)
+      m_token(std::move(token))
 {
     // Qt requires that a receiver have the same thread affinity as the QThread
     // sending the event, which is used to dispatch MythEvents sent by

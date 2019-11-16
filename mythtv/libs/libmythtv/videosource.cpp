@@ -61,11 +61,11 @@ using namespace std;
 #include HDHOMERUN_HEADERFILE
 #endif
 
-VideoSourceSelector::VideoSourceSelector(uint           _initial_sourceid,
-                                         const QString &_card_types,
-                                         bool           _must_have_mplexid) :
+VideoSourceSelector::VideoSourceSelector(uint    _initial_sourceid,
+                                         QString _card_types,
+                                         bool    _must_have_mplexid) :
     m_initialSourceId(_initial_sourceid),
-    m_cardTypes(_card_types),
+    m_cardTypes(std::move(_card_types)),
     m_mustHaveMplexId(_must_have_mplexid)
 {
     setLabel(tr("Video Source"));
