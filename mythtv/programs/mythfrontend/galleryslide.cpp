@@ -163,9 +163,7 @@ void SequentialAnimation::Start(bool forwards, float speed)
     m_current = forwards ? 0 : m_group.size() - 1;
 
     // Start group, then first child
-    // Parent function explicitly set to zero. Have to call
-    // grandparent directly to get work done.
-    AbstractAnimation::Start(forwards, speed);
+    GroupAnimation::Start(forwards, speed);
     m_group.at(m_current)->Start(m_forwards, m_speed);
 }
 
@@ -177,9 +175,7 @@ void SequentialAnimation::Start(bool forwards, float speed)
 void SequentialAnimation::SetSpeed(float speed)
 {
     // Set group speed for subsequent children
-    // Parent function explicitly set to zero. Have to call
-    // grandparent directly to get work done.
-    AbstractAnimation::SetSpeed(speed);
+    GroupAnimation::SetSpeed(speed);
 
     // Set active child
     if (!m_running || m_current < 0 || m_current >= m_group.size())
@@ -230,9 +226,7 @@ void ParallelAnimation::Start(bool forwards, float speed)
     m_finished = m_group.size();
 
     // Start group, then all children
-    // Parent function explicitly set to zero. Have to call
-    // grandparent directly to get work done.
-    AbstractAnimation::Start(forwards, speed);
+    GroupAnimation::Start(forwards, speed);
     foreach(AbstractAnimation *animation, m_group)
         animation->Start(m_forwards, m_speed);
 }
@@ -245,9 +239,7 @@ void ParallelAnimation::Start(bool forwards, float speed)
 void ParallelAnimation::SetSpeed(float speed)
 {
     // Set group speed, then all children
-    // Parent function explicitly set to zero. Have to call
-    // grandparent directly to get work done.
-    AbstractAnimation::SetSpeed(speed);
+    GroupAnimation::SetSpeed(speed);
     foreach(AbstractAnimation *animation, m_group)
         animation->SetSpeed(m_speed);
 }
