@@ -1904,7 +1904,7 @@ void SubtitleScreen::DisplayAVSubtitles(void)
             }
 #endif
         }
-        m_subreader->FreeAVSubtitle(subtitle);
+        SubtitleReader::FreeAVSubtitle(subtitle);
     }
 #ifdef USING_LIBASS
     RenderAssTrack(currentFrame->timecode);
@@ -2262,7 +2262,7 @@ void SubtitleScreen::DisplayCC708Subtitles(void)
                                              this, video_aspect);
             addList.append(fsub);
         }
-        win.DisposeStrings(list);
+        CC708Window::DisposeStrings(list);
     }
     if (clearMask)
     {

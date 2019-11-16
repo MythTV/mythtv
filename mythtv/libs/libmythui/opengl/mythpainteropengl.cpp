@@ -64,7 +64,7 @@ void MythOpenGLPainter::DeleteTextures(void)
     while (!m_textureDeleteList.empty())
     {
         MythGLTexture *texture = m_textureDeleteList.front();
-        m_HardwareCacheSize -= m_render->GetTextureDataSize(texture);
+        m_HardwareCacheSize -= MythRenderOpenGL::GetTextureDataSize(texture);
         m_render->DeleteTexture(texture);
         m_textureDeleteList.pop_front();
     }
@@ -203,7 +203,7 @@ MythGLTexture* MythOpenGLPainter::GetTextureFromCache(MythImage *Image)
     }
 
     CheckFormatImage(Image);
-    m_HardwareCacheSize += m_render->GetTextureDataSize(texture);
+    m_HardwareCacheSize += MythRenderOpenGL::GetTextureDataSize(texture);
     m_imageToTextureMap[Image] = texture;
     m_ImageExpireList.push_back(Image);
 

@@ -1223,7 +1223,7 @@ uint GuideGrid::GetAlternateChannelIndex(
         if (with_same_channum != same_channum)
             continue;
 
-        if (!m_player->IsTunable(ctx, ciinfo->m_chanid))
+        if (!TV::IsTunable(ctx, ciinfo->m_chanid))
             continue;
 
         if (with_same_channum)
@@ -2093,7 +2093,7 @@ void GuideGrid::updateChannelsNonUI(QVector<ChannelInfo *> &chinfos,
             const PlayerContext *ctx = m_player->GetPlayerReadLock(
                 -1, __FILE__, __LINE__);
             if (ctx && chinfo)
-                try_alt = !m_player->IsTunable(ctx, chinfo->m_chanid);
+                try_alt = !TV::IsTunable(ctx, chinfo->m_chanid);
             m_player->ReturnPlayerLock(ctx);
         }
 

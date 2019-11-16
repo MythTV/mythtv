@@ -2102,8 +2102,7 @@ bool CardUtil::GetTimeouts(uint inputid,
 
 bool CardUtil::IsInNeedOfExternalInputConf(uint inputid)
 {
-    DiSEqCDev dev;
-    DiSEqCDevTree *diseqc_tree = dev.FindTree(inputid);
+    DiSEqCDevTree *diseqc_tree = DiSEqCDev::FindTree(inputid);
 
     bool needsConf = false;
     if (diseqc_tree)

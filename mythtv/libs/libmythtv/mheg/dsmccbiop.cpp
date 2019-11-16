@@ -263,9 +263,9 @@ bool BiopMessage::ProcessDir(
         if (pDir && binding.m_name.m_comp_count >= 1)
         {
             if (strcmp("fil", binding.m_name.m_comps[0].m_kind) == 0)
-                filecache->AddFileInfo(pDir, &binding);
+                DSMCCCache::AddFileInfo(pDir, &binding);
             else if (strcmp("dir", binding.m_name.m_comps[0].m_kind) == 0)
-                filecache->AddDirInfo(pDir, &binding);
+                DSMCCCache::AddDirInfo(pDir, &binding);
             else
                 LOG(VB_DSMCC, LOG_WARNING, QString("[biop] ProcessDir unknown kind %1")
                     .arg(binding.m_name.m_comps[0].m_kind));

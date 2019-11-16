@@ -831,7 +831,7 @@ void MythRenderOpenGL::DrawBitmap(MythGLTexture *Texture, QOpenGLFramebufferObje
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glDisableVertexAttribArray(TEXTURE_INDEX);
     glDisableVertexAttribArray(VERTEX_INDEX);
-    buffer->release(QOpenGLBuffer::VertexBuffer);
+    QOpenGLBuffer::release(QOpenGLBuffer::VertexBuffer);
     doneCurrent();
 }
 
@@ -895,7 +895,7 @@ void MythRenderOpenGL::DrawBitmap(MythGLTexture **Textures, uint TextureCount,
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glDisableVertexAttribArray(TEXTURE_INDEX);
     glDisableVertexAttribArray(VERTEX_INDEX);
-    buffer->release(QOpenGLBuffer::VertexBuffer);
+    QOpenGLBuffer::release(QOpenGLBuffer::VertexBuffer);
     doneCurrent();
 }
 
@@ -1204,7 +1204,7 @@ QOpenGLBuffer* MythRenderOpenGL::CreateVBO(int Size, bool Release /*=true*/)
         buffer->bind();
         buffer->allocate(Size);
         if (Release)
-            buffer->release(QOpenGLBuffer::VertexBuffer);
+            QOpenGLBuffer::release(QOpenGLBuffer::VertexBuffer);
         return buffer;
     }
     delete buffer;

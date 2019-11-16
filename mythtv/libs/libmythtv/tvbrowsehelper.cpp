@@ -515,7 +515,7 @@ void TVBrowseHelper::run()
                 {
                     for (size_t i = 0; i < chanids.size(); i++)
                     {
-                        if (m_tv->IsTunable(ctx, chanids[i]))
+                        if (TV::IsTunable(ctx, chanids[i]))
                         {
                             infoMap["chanid"] = QString::number(chanids[i]);
                             GetNextProgramDB(direction, infoMap);
@@ -527,7 +527,7 @@ void TVBrowseHelper::run()
                 {
                     uint orig_chanid = infoMap["chanid"].toUInt();
                     GetNextProgramDB(direction, infoMap);
-                    while (!m_tv->IsTunable(ctx, infoMap["chanid"].toUInt()) &&
+                    while (!TV::IsTunable(ctx, infoMap["chanid"].toUInt()) &&
                            (infoMap["chanid"].toUInt() != orig_chanid))
                     {
                         GetNextProgramDB(direction, infoMap);

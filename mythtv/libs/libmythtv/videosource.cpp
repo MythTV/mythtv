@@ -3925,6 +3925,5 @@ void DVBConfigurationGroup::Save(void)
 {
     GroupSetting::Save();
     m_diseqcTree->Store(m_parent.getCardID(), m_cardNum->getValue());
-    DiSEqCDev trees;
-    trees.InvalidateTrees();
+    DiSEqCDev::InvalidateTrees();
 }

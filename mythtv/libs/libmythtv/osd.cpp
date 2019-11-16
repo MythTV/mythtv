@@ -698,7 +698,7 @@ bool OSD::DrawDirect(MythPainter* painter, QSize size, bool repaint)
     QList<MythScreenType*>::iterator it2 = notifications.begin();
     while (it2 != notifications.end())
     {
-        if (!nc->ScreenCreated(*it2))
+        if (!MythNotificationCenter::ScreenCreated(*it2))
         {
             LOG(VB_GUI, LOG_DEBUG, LOC + "Creating OSD Notification");
 
@@ -722,11 +722,11 @@ bool OSD::DrawDirect(MythPainter* painter, QSize size, bool repaint)
 
             (*it2)->SetPainter(m_CurrentPainter);
 
-            nc->UpdateScreen(*it2);
+            MythNotificationCenter::UpdateScreen(*it2);
 
             visible = true;
             (*it2)->Pulse();
-            QTime expires = nc->ScreenExpiryTime(*it2).time();
+            QTime expires = MythNotificationCenter::ScreenExpiryTime(*it2).time();
             int left = now.msecsTo(expires);
             if (left < 0)
                 left = 0;
@@ -844,7 +844,7 @@ QRegion OSD::Draw(MythPainter* painter, QPaintDevice *device, QSize size,
             {
                 OverrideUIScale(false);
             }
-            nc->UpdateScreen(*it2);
+            MythNotificationCenter::UpdateScreen(*it2);
 
             QRect vis = (*it2)->GetArea().toQRect();
             if (visible.isEmpty())
@@ -853,7 +853,7 @@ QRegion OSD::Draw(MythPainter* painter, QPaintDevice *device, QSize size,
                 visible = visible.united(vis);
 
             (*it2)->Pulse();
-            QTime expires = nc->ScreenExpiryTime(*it2).time();
+            QTime expires = MythNotificationCenter::ScreenExpiryTime(*it2).time();
             int left = now.msecsTo(expires);
             if (expires.isValid() && left < m_FadeTime)
                 (*it2)->SetAlpha((255 * left) / m_FadeTime);

@@ -427,7 +427,7 @@ void MythCCExtractorPlayer::Ingest708Captions(void)
                         Ingest708Caption(it.key(), serviceIdx, windowIdx,
                                          win.m_pen.m_row, win.m_pen.m_column,
                                          win, strings);
-                        win.DisposeStrings(strings);
+                        CC708Window::DisposeStrings(strings);
                     }
                     service->m_windows[windowIdx].ResetChanged();
                 }
@@ -711,7 +711,7 @@ void MythCCExtractorPlayer::IngestDVBSubtitles(void)
             sub.length =
                 subtitle.end_display_time - subtitle.start_display_time;
 
-            (*subit).reader->FreeAVSubtitle(subtitle);
+            SubtitleReader::FreeAVSubtitle(subtitle);
 
             if (min_x < max_x && min_y < max_y)
             {

@@ -279,7 +279,7 @@ bool DVBChannel::Open(DVBChannel *who)
     if (m_tunerType.IsDiSEqCSupported())
     {
 
-        m_diseqc_tree = m_diseqc_dev.FindTree(m_inputid);
+        m_diseqc_tree = DiSEqCDev::FindTree(m_inputid);
         if (m_diseqc_tree)
         {
             bool is_SCR = false;

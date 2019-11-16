@@ -2162,7 +2162,7 @@ void MythPlayer::RefreshPauseFrame(void)
             {
                 osdLock.lock();
                 if (osd)
-                    deleteMap.UpdateOSD(GetLatestVideoTimecode(), osd);
+                    DeleteMap::UpdateOSD(GetLatestVideoTimecode(), osd);
                 osdLock.unlock();
             }
         }

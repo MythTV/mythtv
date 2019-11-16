@@ -424,7 +424,7 @@ MythVideoTexture* MythVideoTexture::CreateTexture(MythRenderOpenGL *Context,
 
     OpenGLLocker locker(Context);
 
-    int datasize = Context->GetBufferSize(Size, PixelFormat, PixelType);
+    int datasize = MythRenderOpenGL::GetBufferSize(Size, PixelFormat, PixelType);
     if (!datasize)
         return nullptr;
 

@@ -131,7 +131,7 @@ void EITScanner::run(void)
 
             if (!(*m_activeScanNextChan).isEmpty())
             {
-                m_eitHelper->WriteEITCache();
+                EITHelper::WriteEITCache();
                 if (rec->QueueEITChannelChange(*m_activeScanNextChan))
                 {
                     m_eitHelper->SetChannelID(ChannelUtil::GetChanID(
@@ -154,9 +154,9 @@ void EITScanner::run(void)
 
             // 24 hours ago
 #if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-            m_eitHelper->PruneEITCache(m_activeScanNextTrig.toTime_t() - 86400);
+            EITHelper::PruneEITCache(m_activeScanNextTrig.toTime_t() - 86400);
 #else
-            m_eitHelper->PruneEITCache(m_activeScanNextTrig.toSecsSinceEpoch() - 86400);
+            EITHelper::PruneEITCache(m_activeScanNextTrig.toSecsSinceEpoch() - 86400);
 #endif
         }
 
@@ -226,7 +226,7 @@ void EITScanner::StopPassiveScan(void)
     }
     m_channel = nullptr;
 
-    m_eitHelper->WriteEITCache();
+    EITHelper::WriteEITCache();
     m_eitHelper->SetChannelID(0);
     m_eitHelper->SetSourceID(0);
 }

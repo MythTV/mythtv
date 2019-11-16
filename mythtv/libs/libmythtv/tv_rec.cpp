@@ -2664,7 +2664,7 @@ void TVRec::SpawnLiveTV(LiveTVChain *newchain, bool pip, QString startchan)
     m_tvChain->IncrRef(); // mark it for TVRec use
     m_tvChain->ReloadAll();
 
-    QString hostprefix = gCoreContext->GenMythURL(
+    QString hostprefix = MythCoreContext::GenMythURL(
                     gCoreContext->GetHostName(),
                     gCoreContext->GetBackendServerPort());
 
