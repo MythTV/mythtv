@@ -94,8 +94,10 @@ public:
     GroupAnimation() : AbstractAnimation()            {}
     virtual ~GroupAnimation()                         { GroupAnimation::Clear(); }
     void Pulse(int interval) override                     = 0; // AbstractAnimation
-    void Start(bool forwards, float speed = 1.0) override = 0; // AbstractAnimation
-    void SetSpeed(float speed) override                   = 0; // AbstractAnimation
+    void Start(bool forwards, float speed = 1.0) override      // AbstractAnimation
+        { AbstractAnimation::Start(forwards, speed); }
+    void SetSpeed(float speed) override                        // AbstractAnimation
+        { AbstractAnimation::SetSpeed(speed); }
     virtual void Add(AbstractAnimation *child);
     void Clear() override; // AbstractAnimation
 
