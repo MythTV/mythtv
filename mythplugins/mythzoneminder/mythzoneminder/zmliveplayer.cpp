@@ -297,6 +297,7 @@ void ZMLivePlayer::customEvent(QEvent *event)
             }
         }
     }
+    MythUIType::customEvent(event);
 }
 
 void ZMLivePlayer::changeView(void)
