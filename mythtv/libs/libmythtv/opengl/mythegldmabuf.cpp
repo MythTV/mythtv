@@ -235,8 +235,7 @@ vector<MythVideoTexture*> MythEGLDMABUF::CreateTextures(AVDRMFrameDescriptor* De
     if (numlayers == 1)
         return CreateComposed(Desc, Context, Frame);
     // X layers with one plane each
-    else
-        return CreateSeparate(Desc, Context, Frame);
+    return CreateSeparate(Desc, Context, Frame);
 
     LOG(VB_PLAYBACK, LOG_ERR, LOC + "Unknown DRM frame format");
     return result;

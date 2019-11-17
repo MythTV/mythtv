@@ -521,7 +521,7 @@ void MythVAAPIContext::InitVideoCodec(AVCodecContext *Context, bool SelectedStre
         Context->get_format  = MythVAAPIContext::GetFormat;
         return;
     }
-    else if (codec_is_vaapi_dec(m_codecID))
+    if (codec_is_vaapi_dec(m_codecID))
     {
         Context->get_format = MythVAAPIContext::GetFormat2;
         DirectRendering = false;
@@ -625,8 +625,8 @@ void MythVAAPIContext::PostProcessFrame(AVCodecContext* Context, VideoFrame *Fra
         Frame->deinterlace_allowed = Frame->deinterlace_allowed & ~DEINT_DRIVER;
         return;
     }
-    else if (kCodec_HEVC_VAAPI_DEC == m_codecID || kCodec_VP9_VAAPI_DEC == m_codecID ||
-             kCodec_VP8_VAAPI_DEC == m_codecID)
+    if (kCodec_HEVC_VAAPI_DEC == m_codecID || kCodec_VP9_VAAPI_DEC == m_codecID ||
+        kCodec_VP8_VAAPI_DEC == m_codecID)
     {
         // enabling VPP deinterlacing with these codecs breaks decoding for some reason.
         // HEVC interlacing is not currently detected by FFmpeg and I can't find

@@ -46,9 +46,9 @@ MythOpenGLInterop::Type MythVAAPIInterop::GetInteropType(MythCodecID CodecId,
     // best first
     if (egl && MythVAAPIInteropDRM::IsSupported(Context)) // zero copy
         return VAAPIEGLDRM;
-    else if (!egl && !wayland && MythVAAPIInteropGLXPixmap::IsSupported(Context)) // copy
+    if (!egl && !wayland && MythVAAPIInteropGLXPixmap::IsSupported(Context)) // copy
         return VAAPIGLXPIX;
-    else if (!egl && !opengles && !wayland) // 2 * copy
+    if (!egl && !opengles && !wayland) // 2 * copy
         return VAAPIGLXCOPY;
     return Unsupported;
 }
@@ -440,7 +440,7 @@ VASurfaceID MythVAAPIInterop::Deinterlace(VideoFrame *Frame, VASurfaceID Current
                         m_firstField = true;
                         break;
                     }
-                    else if (ret != AVERROR(EAGAIN))
+                    if (ret != AVERROR(EAGAIN))
                         break;
                 }
 

@@ -253,8 +253,7 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context
     {
         if (needreferenceframes)
             return GetReferenceFrames();
-        else
-            return m_openglTextures[id];
+        return m_openglTextures[id];
     }
 
     OpenGLLocker locker(m_context);

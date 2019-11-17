@@ -248,7 +248,7 @@ void MythVDPAUContext::InitVideoCodec(AVCodecContext *Context, bool SelectedStre
         Context->slice_flags = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
         return;
     }
-    else if (codec_is_vdpau_dechw(m_codecID))
+    if (codec_is_vdpau_dechw(m_codecID))
     {
         Context->get_format   = MythVDPAUContext::GetFormat2;
         Context->slice_flags  = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;

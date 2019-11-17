@@ -223,7 +223,7 @@ int MythNVDECContext::HwDecoderInit(AVCodecContext *Context)
         return MythCodecContext::InitialiseDecoder2(Context, MythNVDECContext::InitialiseDecoder,
                                                  "Create NVDEC decoder");
     }
-    else if (codec_is_nvdec_dec(m_codecID))
+    if (codec_is_nvdec_dec(m_codecID))
     {
         AVBufferRef *context = MythCodecContext::CreateDevice(AV_HWDEVICE_TYPE_CUDA, nullptr,
                                                            gCoreContext->GetSetting("NVDECDevice"));
@@ -387,7 +387,7 @@ bool MythNVDECContext::RetrieveFrame(AVCodecContext *Context, VideoFrame *Frame,
         return false;
     if (codec_is_nvdec_dec(m_codecID))
         return RetrieveHWFrame(Frame, AvFrame);
-    else if (codec_is_nvdec(m_codecID))
+    if (codec_is_nvdec(m_codecID))
         return GetBuffer(Context, Frame, AvFrame, 0);
     return false;
 }

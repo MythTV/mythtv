@@ -533,14 +533,12 @@ static bool parse_extinf(const QString &line,
                 nextChanNum = channel_number + 1;
             return true;
         }
-        else
-        {
-            // no valid channel number found use the default next one
-            LOG(VB_GENERAL, LOG_ERR, QString("No channel number found, using next available: %1 for channel: %2").arg(nextChanNum).arg(name));
-            channum = QString::number(nextChanNum);
-            nextChanNum++;
-            return true;
-        }
+
+        // no valid channel number found use the default next one
+        LOG(VB_GENERAL, LOG_ERR, QString("No channel number found, using next available: %1 for channel: %2").arg(nextChanNum).arg(name));
+        channum = QString::number(nextChanNum);
+        nextChanNum++;
+        return true;
     }
 
     // not one of the formats we support

@@ -293,10 +293,7 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
             result.push_back(tex);
         return result;
     }
-    else
-    {
-        m_referenceFrames.clear();
-    }
+    m_referenceFrames.clear();
     m_discontinuityCounter = Frame->frameCounter;
 
     return result;

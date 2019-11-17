@@ -211,16 +211,12 @@ uint ChannelImporter::DeleteChannels(
     }
 
     if (off_air_list.empty())
-    {
         return 0;
-    }
-    else
-    {
-        // List of off-air channels (in database but not in the scan)
-        cout << endl << "Off-air channels (" << SimpleCountChannels(off_air_transports) << "):" << endl;
-        ChannelImporterBasicStats infoA = CollectStats(off_air_transports);
-        cout << FormatChannels(off_air_transports, &infoA).toLatin1().constData() << endl;
-    }
+
+    // List of off-air channels (in database but not in the scan)
+    cout << endl << "Off-air channels (" << SimpleCountChannels(off_air_transports) << "):" << endl;
+    ChannelImporterBasicStats infoA = CollectStats(off_air_transports);
+    cout << FormatChannels(off_air_transports, &infoA).toLatin1().constData() << endl;
 
     // Ask user whether to delete all or some of these stale channels
     // if some is selected ask about each individually

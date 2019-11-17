@@ -134,11 +134,8 @@ bool MythVDPAUInterop::InitNV(AVVDPAUDeviceContext* DeviceContext)
             LOG(VB_PLAYBACK, LOG_INFO, LOC + "Ready");
             return true;
         }
-        else
-        {
-            delete m_helper;
-            m_helper = nullptr;
-        }
+        delete m_helper;
+        m_helper = nullptr;
     }
 
     LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to retrieve procs");
