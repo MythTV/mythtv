@@ -125,7 +125,7 @@ vector<MythVideoTexture*> MythDRMPRIMEInterop::Acquire(MythRenderOpenGL *Context
         result = m_openglTextures[id];
     }
 
-    if (result.size() > 0 ? format_is_yuv(result[0]->m_frameType) : false)
+    if (!result.empty() ? format_is_yuv(result[0]->m_frameType) : false)
     {
         // YUV frame - enable picture attributes
         if (firstpass)

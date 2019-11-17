@@ -89,7 +89,7 @@ void MythVDPAUInterop::RotateReferenceFrames(AVBufferRef *Buffer)
         return;
 
     // don't retain twice for double rate
-    if ((m_referenceFrames.size() > 0) &&
+    if (!m_referenceFrames.empty() &&
             (static_cast<VdpVideoSurface>(reinterpret_cast<uintptr_t>(m_referenceFrames[0]->data)) ==
              static_cast<VdpVideoSurface>(reinterpret_cast<uintptr_t>(Buffer->data))))
     {

@@ -206,7 +206,7 @@ uint ChannelImporter::DeleteChannels(
                 AddChanToCopy(transport_copy, transports[i], chan);
             }
         }
-        if (transport_copy.m_channels.size() > 0)
+        if (!transport_copy.m_channels.empty())
             off_air_transports.push_back(transport_copy);
     }
 
@@ -413,29 +413,29 @@ void ChannelImporter::InsertChannels(
     }
 
     // List what has been done with each channel
-    if (updated.size() > 0)
+    if (!updated.empty())
     {
         cout << endl << "Updated old channels (" << SimpleCountChannels(updated) << "):" << endl;
         cout << FormatChannels(updated).toLatin1().constData() << endl;
     }
-    if (skipped_updates.size() > 0)
+    if (!skipped_updates.empty())
     {
         cout << endl << "Skipped old channels (" << SimpleCountChannels(skipped_updates) << "):" << endl;
         cout << FormatChannels(skipped_updates).toLatin1().constData() << endl;
     }
-    if (inserted.size() > 0)
+    if (!inserted.empty())
     {
         cout << endl << "Inserted new channels (" << SimpleCountChannels(inserted) << "):" << endl;
         cout << FormatChannels(inserted).toLatin1().constData() << endl;
     }
-    if (skipped_inserts.size() > 0)
+    if (!skipped_inserts.empty())
     {
         cout << endl << "Skipped new channels (" << SimpleCountChannels(skipped_inserts) << "):" << endl;
         cout << FormatChannels(skipped_inserts).toLatin1().constData() << endl;
     }
 
     // Remaining channels and sum uniques again
-    if (list.size() > 0)
+    if (!list.empty())
     {
         ChannelImporterBasicStats      ninfo  = CollectStats(list);
         ChannelImporterUniquenessStats nstats = CollectUniquenessStats(list, ninfo);
@@ -680,13 +680,13 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
             }
         }
 
-        if (new_transport.m_channels.size() > 0)
+        if (!new_transport.m_channels.empty())
             next_list.push_back(new_transport);
 
-        if (skipped_transport.m_channels.size() > 0)
+        if (!skipped_transport.m_channels.empty())
             skipped_list.push_back(skipped_transport);
 
-        if (inserted_transport.m_channels.size() > 0)
+        if (!inserted_transport.m_channels.empty())
             inserted_list.push_back(inserted_transport);
     }
 
@@ -845,13 +845,13 @@ ScanDTVTransportList ChannelImporter::UpdateChannels(
             }
         }
 
-        if (new_transport.m_channels.size() > 0)
+        if (!new_transport.m_channels.empty())
             next_list.push_back(new_transport);
 
-        if (skipped_transport.m_channels.size() > 0)
+        if (!skipped_transport.m_channels.empty())
             skipped_list.push_back(skipped_transport);
 
-        if (updated_transport.m_channels.size() > 0)
+        if (!updated_transport.m_channels.empty())
             updated_list.push_back(updated_transport);
     }
 
@@ -873,7 +873,7 @@ void ChannelImporter::AddChanToCopy(
     const ChannelInsertInfo &chan
 )
 {
-    if (transport_copy.m_channels.size() == 0)
+    if (transport_copy.m_channels.empty())
     {
         transport_copy = transport;
         transport_copy.m_channels.clear();

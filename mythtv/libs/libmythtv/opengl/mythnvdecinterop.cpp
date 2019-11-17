@@ -379,7 +379,7 @@ void MythNVDECInterop::RotateReferenceFrames(CUdeviceptr Buffer)
         return;
 
     // don't retain twice for double rate
-    if ((m_referenceFrames.size() > 0) && (m_referenceFrames[0] == Buffer))
+    if (!m_referenceFrames.empty() && (m_referenceFrames[0] == Buffer))
         return;
 
     m_referenceFrames.push_front(Buffer);

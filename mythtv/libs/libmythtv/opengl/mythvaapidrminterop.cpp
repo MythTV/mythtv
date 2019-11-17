@@ -121,7 +121,7 @@ void MythVAAPIInteropDRM::RotateReferenceFrames(AVBufferRef *Buffer)
         return;
 
     // don't retain twice for double rate
-    if ((m_referenceFrames.size() > 0) &&
+    if (!m_referenceFrames.empty() &&
             (static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(m_referenceFrames[0]->data)) ==
              static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(Buffer->data))))
     {
@@ -478,7 +478,7 @@ bool MythVAAPIInteropDRM::TestPrimeInterop(void)
             VADRMtoPRIME(&vadesc, &drmdesc);
             vector<MythVideoTexture*> textures = CreateTextures(&drmdesc, m_context, &frame);
 
-            if (textures.size() > 0)
+            if (!textures.empty())
             {
                 s_supported = true;
                 vector<MythVideoTexture*>::iterator it = textures.begin();
