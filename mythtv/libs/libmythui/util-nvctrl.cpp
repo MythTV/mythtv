@@ -101,7 +101,7 @@ bool MythNVControl::GetNvidiaRates(MythXDisplay *MythDisplay, std::vector<Displa
     if (!major)
     {
         LOG(VB_PLAYBACK, LOG_ERR, LOC + "Dynamic Twinview not enabled, ignoring");
-        return 0;
+        return false;
     }
 
     // Query the enabled displays on this screen, print basic information about each display
