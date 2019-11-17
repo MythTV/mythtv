@@ -346,6 +346,9 @@ class TransportID : public GroupSetting
             QObject::tr("The transport stream ID (tid) can be used to identify "
                 "the transport of this channel in the Transport Editor."));
     }
+    void Load(void) override // StandardSetting
+    {
+    }
 };
 
 class Frequency : public GroupSetting
@@ -357,6 +360,9 @@ class Frequency : public GroupSetting
         setHelpText(
             QObject::tr("Frequency of the transport of this channel in Hz "
                 "(for DVB-T/T2 and DVB-C) or in kHz (for DVB-S/S2)."));
+    }
+    void Load(void) override // StandardSetting
+    {
     }
 };
 
