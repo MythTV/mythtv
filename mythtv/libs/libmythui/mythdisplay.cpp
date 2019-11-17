@@ -22,13 +22,13 @@
 
 static float fix_rate(int video_rate)
 {
-    static const float default_rate = 1000000.0F / 60.0F;
-    float fixed = default_rate;
+    static constexpr float kDefaultRate = 1000000.0F / 60.0F;
+    float fixed = kDefaultRate;
     if (video_rate > 0)
     {
         fixed = static_cast<float>(video_rate) / 2.0F;
-        if (fixed < default_rate)
-            fixed = default_rate;
+        if (fixed < kDefaultRate)
+            fixed = kDefaultRate;
     }
     return fixed;
 }

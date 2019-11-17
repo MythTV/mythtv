@@ -175,7 +175,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(
 {
     // Crappy, but cached.  Move to GlobalFontMap?
 
-    static bool show_available = true;
+    static bool s_showAvailable = true;
     bool fromBase = false;
     MythFontProperties *newFont = new MythFontProperties();
     newFont->Freeze();
@@ -438,7 +438,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(
                     QString("Failed to load '%1', got '%2' instead")
             .arg(newFont->m_face.family()).arg(fi.family()));
 
-        if (show_available)
+        if (s_showAvailable)
         {
             LOG(VB_GUI, LOG_DEBUG, "Available fonts:");
 
@@ -468,7 +468,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(
                 }
                 LOG(VB_GUI, LOG_DEBUG, family_styles.join(" "));
             }
-            show_available = false;
+            s_showAvailable = false;
         }
     }
     else

@@ -39,9 +39,9 @@
 
 struct MimeType
 {
-    QString mimeType;
-    QString extension;
-    bool    isVideo;
+    QString m_mimeType;
+    QString m_extension;
+    bool    m_isVideo;
 };
 
 static MimeType SupportedMimeTypes[] =
@@ -712,8 +712,8 @@ QString MythWebView::getExtensionForMimetype(const QString &mimetype)
 {
     for (int x = 0; x < SupportedMimeTypesCount; x++)
     {
-        if (!mimetype.isEmpty() && mimetype == SupportedMimeTypes[x].mimeType)
-            return SupportedMimeTypes[x].extension;
+        if (!mimetype.isEmpty() && mimetype == SupportedMimeTypes[x].m_mimeType)
+            return SupportedMimeTypes[x].m_extension;
     }
 
     return QString("");
@@ -723,14 +723,14 @@ bool MythWebView::isMusicFile(const QString &extension, const QString &mimetype)
 {
     for (int x = 0; x < SupportedMimeTypesCount; x++)
     {
-        if (!SupportedMimeTypes[x].isVideo)
+        if (!SupportedMimeTypes[x].m_isVideo)
         {
             if (!mimetype.isEmpty() &&
-                mimetype == SupportedMimeTypes[x].mimeType)
+                mimetype == SupportedMimeTypes[x].m_mimeType)
                 return true;
 
             if (!extension.isEmpty() &&
-                extension.toLower() == SupportedMimeTypes[x].extension)
+                extension.toLower() == SupportedMimeTypes[x].m_extension)
                 return true;
         }
     }
@@ -742,14 +742,14 @@ bool MythWebView::isVideoFile(const QString &extension, const QString &mimetype)
 {
     for (int x = 0; x < SupportedMimeTypesCount; x++)
     {
-        if (SupportedMimeTypes[x].isVideo)
+        if (SupportedMimeTypes[x].m_isVideo)
         {
             if (!mimetype.isEmpty() &&
-                mimetype == SupportedMimeTypes[x].mimeType)
+                mimetype == SupportedMimeTypes[x].m_mimeType)
                 return true;
 
             if (!extension.isEmpty() &&
-                extension.toLower() == SupportedMimeTypes[x].extension)
+                extension.toLower() == SupportedMimeTypes[x].m_extension)
                 return true;
         }
     }

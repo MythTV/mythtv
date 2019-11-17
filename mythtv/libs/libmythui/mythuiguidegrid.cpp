@@ -505,8 +505,8 @@ void MythUIGuideGrid::drawBox(MythPainter *p, int xoffset, int yoffset, UIGTCon 
     area.translate(xoffset, yoffset);		// Convert to global coordinates
     area.adjust(breakin, breakin, -breakin, -breakin);
 
-    static const QPen nopen(Qt::NoPen);
-    p->DrawRect(area, QBrush(calcColor(color, m_categoryAlpha)), nopen, alphaMod);
+    static const QPen kNoPen(Qt::NoPen);
+    p->DrawRect(area, QBrush(calcColor(color, m_categoryAlpha)), kNoPen, alphaMod);
 }
 
 /** \fn MythUIGuideGrid::drawBackground(MythPainter *, int, int, UIGTCon *, int)
@@ -602,13 +602,13 @@ void MythUIGuideGrid::drawBackground(MythPainter *p, int xoffset, int yoffset, U
     if (area.height() <= 1)
         area.setHeight(2);
 
-    static const QPen nopen(Qt::NoPen);
+    static const QPen kNoPen(Qt::NoPen);
     area.translate(xoffset, yoffset);		// Convert to global coordinates
-    p->DrawRect(area, QBrush(fillColor), nopen, alphaMod);
+    p->DrawRect(area, QBrush(fillColor), kNoPen, alphaMod);
 
     if (overArea.width() > 0) {
         overArea.translate(xoffset, yoffset);	// Convert to global coordinates
-        p->DrawRect(overArea, QBrush(overColor), nopen, alphaMod);
+        p->DrawRect(overArea, QBrush(overColor), kNoPen, alphaMod);
     }
 }
 

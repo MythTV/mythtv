@@ -20,15 +20,15 @@ static XRRScreenConfiguration *GetScreenConfig(MythXDisplay*& display);
 
 bool DisplayResX::IsAvailable(void)
 {
-    static bool checked = false;
-    static bool available = false;
-    if (!checked)
+    static bool s_checked = false;
+    static bool s_available = false;
+    if (!s_checked)
     {
-        checked = true;
+        s_checked = true;
         MythXDisplay display;
-        available = display.Open();
+        s_available = display.Open();
     }
-    return available;
+    return s_available;
 }
 
 DisplayResX::DisplayResX(void)

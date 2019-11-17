@@ -111,16 +111,16 @@ class KeyContext
 
 struct JumpData
 {
-    void (*callback)(void);
-    QString destination;
-    QString description;
-    bool exittomain;
-    QString localAction;
+    void (*m_callback)(void);
+    QString m_destination;
+    QString m_description;
+    bool    m_exittomain;
+    QString m_localAction;
 };
 
 struct MPData {
-    QString description;
-    MediaPlayCallback playFn;
+    QString           m_description;
+    MediaPlayCallback m_playFn;
 };
 
 class MythMainWindowPrivate
@@ -143,10 +143,10 @@ class MythMainWindowPrivate
 
     int                  m_xbase                {0};
     int                  m_ybase                {0};
-    bool                 m_does_fill_screen     {false};
+    bool                 m_doesFillScreen       {false};
 
-    bool                 m_ignore_lirc_keys     {false};
-    bool                 m_ignore_joystick_keys {false};
+    bool                 m_ignoreLircKeys       {false};
+    bool                 m_ignoreJoystickKeys   {false};
 
     LIRC                *m_lircThread           {nullptr};
 
@@ -175,10 +175,10 @@ class MythMainWindowPrivate
     QMap<QString, MPData> m_mediaPluginMap;
     QHash<QString, QHash<QString, QString> > m_actionText;
 
-    void (*exitmenucallback)(void) {nullptr};
+    void (*m_exitMenuCallback)(void) {nullptr};
 
-    void (*exitmenumediadevicecallback)(MythMediaDevice* mediadevice) {nullptr};
-    MythMediaDevice * mediadeviceforcallback {nullptr};
+    void (*m_exitMenuMediaDeviceCallback)(MythMediaDevice* mediadevice) {nullptr};
+    MythMediaDevice * m_mediaDeviceForCallback {nullptr};
 
     int      m_escapekey                 {0};
 
@@ -192,7 +192,7 @@ class MythMainWindowPrivate
     MythPainter     *m_painter           {nullptr};
     MythRender      *m_render            {nullptr};
 
-    bool             m_AllowInput        {true};
+    bool             m_allowInput        {true};
 
     QRegion          m_repaintRegion;
 
@@ -224,7 +224,7 @@ class MythMainWindowPrivate
     bool             m_standby           {false};
     bool             m_enteringStandby   {false};
     bool             m_disableIdle       {false};
-    MythNotificationCenter *m_NC         {nullptr};
+    MythNotificationCenter *m_nc         {nullptr};
         // window aspect
     bool             m_firstinit         {true};
     bool             m_bSavedPOS         {false};
@@ -408,7 +408,7 @@ MythMainWindow::MythMainWindow(const bool useDB)
 
     setObjectName("mainwindow");
 
-    d->m_AllowInput = false;
+    d->m_allowInput = false;
 
     // This prevents database errors from RegisterKey() when there is no DB:
     d->m_useDB = useDB;
@@ -420,13 +420,13 @@ MythMainWindow::MythMainWindow(const bool useDB)
 
     //Init();
 
-    d->m_ignore_lirc_keys = false;
-    d->m_ignore_joystick_keys = false;
+    d->m_ignoreLircKeys = false;
+    d->m_ignoreJoystickKeys = false;
     d->m_exitingtomain = false;
     d->m_popwindows = true;
-    d->exitmenucallback = nullptr;
-    d->exitmenumediadevicecallback = nullptr;
-    d->mediadeviceforcallback = nullptr;
+    d->m_exitMenuCallback = nullptr;
+    d->m_exitMenuMediaDeviceCallback = nullptr;
+    d->m_mediaDeviceForCallback = nullptr;
     d->m_escapekey = Qt::Key_Escape;
     d->m_mainStack = nullptr;
     d->m_sysEventHandler = nullptr;
@@ -437,7 +437,7 @@ MythMainWindow::MythMainWindow(const bool useDB)
     StartLIRC();
 
 #ifdef USE_JOYSTICK_MENU
-    d->m_ignore_joystick_keys = false;
+    d->m_ignoreJoystickKeys = false;
 
     QString joy_config_file = GetConfDir() + "/joystickmenurc";
 
@@ -490,7 +490,7 @@ MythMainWindow::MythMainWindow(const bool useDB)
     d->m_drawTimer = new MythSignalingTimer(this, SLOT(animate()));
     d->m_drawTimer->start(d->m_drawInterval);
 
-    d->m_AllowInput = true;
+    d->m_allowInput = true;
 
     d->m_repaintRegion = QRegion(QRect(0,0,0,0));
 
@@ -581,7 +581,7 @@ MythMainWindow::~MythMainWindow()
     delete d->m_cecAdapter;
 #endif
 
-    delete d->m_NC;
+    delete d->m_nc;
 
     delete d->m_painter;
     // Don't delete. If the app is closing down it causes intermittent segfaults
@@ -598,7 +598,7 @@ MythPainter *MythMainWindow::GetCurrentPainter(void)
 
 MythNotificationCenter *MythMainWindow::GetCurrentNotificationCenter(void)
 {
-    return d->m_NC;
+    return d->m_nc;
 }
 
 QWidget *MythMainWindow::GetPaintWindow(void)
@@ -984,7 +984,7 @@ void MythMainWindow::Init(const QString& forcedpainter, bool mayReInit)
     GetMythUI()->GetScreenSettings(d->m_xbase, d->m_screenwidth, d->m_wmult,
                                    d->m_ybase, d->m_screenheight, d->m_hmult);
 
-    d->m_does_fill_screen =
+    d->m_doesFillScreen =
         (GetMythDB()->GetNumSetting("GuiOffsetX") == 0 &&
          GetMythDB()->GetNumSetting("GuiWidth")   == 0 &&
          GetMythDB()->GetNumSetting("GuiOffsetY") == 0 &&
@@ -994,7 +994,7 @@ void MythMainWindow::Init(const QString& forcedpainter, bool mayReInit)
     Qt::WindowFlags flags = Qt::Window;
 
     bool inwindow = GetMythDB()->GetBoolSetting("RunFrontendInWindow", false);
-    bool fullscreen = d->m_does_fill_screen && !MythUIHelper::IsGeometryOverridden();
+    bool fullscreen = d->m_doesFillScreen && !MythUIHelper::IsGeometryOverridden();
 
     // On Compiz/Unit, when the window is fullscreen and frameless changing
     // screen position ends up stuck. Adding a border temporarily prevents this
@@ -1173,9 +1173,9 @@ void MythMainWindow::Init(const QString& forcedpainter, bool mayReInit)
     else
         d->m_themeBase = new MythThemeBase();
 
-    if (!d->m_NC)
+    if (!d->m_nc)
     {
-        d->m_NC = new MythNotificationCenter();
+        d->m_nc = new MythNotificationCenter();
     }
 }
 
@@ -1379,7 +1379,7 @@ void MythMainWindow::ReinitDone(void)
 void MythMainWindow::Show(void)
 {
     bool inwindow = GetMythDB()->GetBoolSetting("RunFrontendInWindow", false);
-    bool fullscreen = d->m_does_fill_screen && !MythUIHelper::IsGeometryOverridden();
+    bool fullscreen = d->m_doesFillScreen && !MythUIHelper::IsGeometryOverridden();
 
     if (fullscreen && !inwindow && !d->m_firstinit)
     {
@@ -1392,7 +1392,7 @@ void MythMainWindow::Show(void)
     d->m_firstinit = false;
 
 #ifdef Q_WS_MACX_OLDQT
-    if (d->m_does_fill_screen)
+    if (d->m_doesFillScreen)
         HideMenuBar();
     else
         ShowMenuBar();
@@ -1518,17 +1518,17 @@ void MythMainWindow::ExitToMainMenu(void)
     {
         d->m_exitingtomain = false;
         d->m_popwindows = true;
-        if (d->exitmenucallback)
+        if (d->m_exitMenuCallback)
         {
-            void (*callback)(void) = d->exitmenucallback;
-            d->exitmenucallback = nullptr;
+            void (*callback)(void) = d->m_exitMenuCallback;
+            d->m_exitMenuCallback = nullptr;
             callback();
         }
-        else if (d->exitmenumediadevicecallback)
+        else if (d->m_exitMenuMediaDeviceCallback)
         {
-            void (*callback)(MythMediaDevice*) = d->exitmenumediadevicecallback;
-            MythMediaDevice * mediadevice = d->mediadeviceforcallback;
-            d->mediadeviceforcallback = nullptr;
+            void (*callback)(MythMediaDevice*) = d->m_exitMenuMediaDeviceCallback;
+            MythMediaDevice * mediadevice = d->m_mediaDeviceForCallback;
+            d->m_mediaDeviceForCallback = nullptr;
             callback(mediadevice);
         }
     }
@@ -1581,27 +1581,27 @@ bool MythMainWindow::TranslateKeyPress(const QString &context,
 
     QStringList localActions;
     if (allowJumps && (d->m_jumpMap.count(keynum) > 0) &&
-        (!d->m_jumpMap[keynum]->localAction.isEmpty()) &&
+        (!d->m_jumpMap[keynum]->m_localAction.isEmpty()) &&
         (d->m_keyContexts.value(context)) &&
         (d->m_keyContexts.value(context)->GetMapping(keynum, localActions)))
     {
-        if (localActions.contains(d->m_jumpMap[keynum]->localAction))
+        if (localActions.contains(d->m_jumpMap[keynum]->m_localAction))
             allowJumps = false;
     }
 
     if (allowJumps && d->m_jumpMap.count(keynum) > 0 &&
-            !d->m_jumpMap[keynum]->exittomain && d->exitmenucallback == nullptr)
+            !d->m_jumpMap[keynum]->m_exittomain && d->m_exitMenuCallback == nullptr)
     {
-        void (*callback)(void) = d->m_jumpMap[keynum]->callback;
+        void (*callback)(void) = d->m_jumpMap[keynum]->m_callback;
         callback();
         return true;
     }
 
     if (allowJumps &&
-        d->m_jumpMap.count(keynum) > 0 && d->exitmenucallback == nullptr)
+        d->m_jumpMap.count(keynum) > 0 && d->m_exitMenuCallback == nullptr)
     {
         d->m_exitingtomain = true;
-        d->exitmenucallback = d->m_jumpMap[keynum]->callback;
+        d->m_exitMenuCallback = d->m_jumpMap[keynum]->m_callback;
         QCoreApplication::postEvent(
             this, new QEvent(MythEvent::kExitToMainMenuEventType));
         return true;
@@ -1790,7 +1790,7 @@ void MythMainWindow::ClearJump(const QString &destination)
     {
         it.next();
         JumpData *jd = it.value();
-        if (jd->destination == destination)
+        if (jd->m_destination == destination)
             it.remove();
     }
 }
@@ -1890,11 +1890,11 @@ void MythMainWindow::ClearAllJumps()
 
 void MythMainWindow::JumpTo(const QString& destination, bool pop)
 {
-    if (d->m_destinationMap.count(destination) > 0 && d->exitmenucallback == nullptr)
+    if (d->m_destinationMap.count(destination) > 0 && d->m_exitMenuCallback == nullptr)
     {
         d->m_exitingtomain = true;
         d->m_popwindows = pop;
-        d->exitmenucallback = d->m_destinationMap[destination].callback;
+        d->m_exitMenuCallback = d->m_destinationMap[destination].m_callback;
         QCoreApplication::postEvent(
             this, new QEvent(MythEvent::kExitToMainMenuEventType));
         return;
@@ -1945,7 +1945,7 @@ bool MythMainWindow::HandleMedia(const QString &handler, const QString &mrl,
     // Let's see if we have a plugin that matches the handler name...
     if (d->m_mediaPluginMap.count(lhandler))
     {
-        d->m_mediaPluginMap[lhandler].playFn(mrl, plot, title, subtitle,
+        d->m_mediaPluginMap[lhandler].m_playFn(mrl, plot, title, subtitle,
                                            director, season, episode,
                                            inetref, lenMins, year, id,
                                            useBookmarks);
@@ -1994,7 +1994,7 @@ void MythMainWindow::HandleCallback(const QString &Debug, MythCallbackEvent::Cal
 
 void MythMainWindow::AllowInput(bool allow)
 {
-    d->m_AllowInput = allow;
+    d->m_allowInput = allow;
 }
 
 void MythMainWindow::mouseTimeout(void)
@@ -2116,7 +2116,7 @@ bool MythMainWindow::keyLongPressFilter(QEvent **e,
 bool MythMainWindow::eventFilter(QObject * /*watched*/, QEvent *e)
 {
     /* Don't let anything through if input is disallowed. */
-    if (!d->m_AllowInput)
+    if (!d->m_allowInput)
         return true;
 
     QScopedPointer<QEvent> sNewEvent(nullptr);
@@ -2415,7 +2415,7 @@ void MythMainWindow::customEvent(QEvent *ce)
     }
 #if defined(USE_LIRC) || defined(USING_APPLEREMOTE)
     else if (ce->type() == LircKeycodeEvent::kEventType &&
-             !d->m_ignore_lirc_keys)
+             !d->m_ignoreLircKeys)
     {
         LircKeycodeEvent *lke = static_cast<LircKeycodeEvent *>(ce);
 
@@ -2445,7 +2445,7 @@ void MythMainWindow::customEvent(QEvent *ce)
 #endif
 #ifdef USE_JOYSTICK_MENU
     else if (ce->type() == JoystickKeycodeEvent::kEventType &&
-             !d->m_ignore_joystick_keys)
+             !d->m_ignoreJoystickKeys)
     {
         JoystickKeycodeEvent *jke = static_cast<JoystickKeycodeEvent *>(ce);
         int keycode = jke->getKeycode();
@@ -2837,11 +2837,11 @@ void MythMainWindow::LockInputDevices( bool locked )
         LOG(VB_GENERAL, LOG_INFO, "Unlocking input devices");
 
 #ifdef USE_LIRC
-    d->m_ignore_lirc_keys = locked;
+    d->m_ignoreLircKeys = locked;
 #endif
 
 #ifdef USE_JOYSTICK_MENU
-    d->m_ignore_joystick_keys = locked;
+    d->m_ignoreJoystickKeys = locked;
 #endif
 }
 

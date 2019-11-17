@@ -19,14 +19,14 @@ class MythQtImage : public MythImage
         MythImage(parent, "MythQtImage") { }
 
     void SetChanged(bool change = true) override; // MythImage
-    QPixmap *GetPixmap(void) { return m_Pixmap; }
-    void SetPixmap(QPixmap *p) { m_Pixmap = p; }
+    QPixmap *GetPixmap(void) { return m_pixmap; }
+    void SetPixmap(QPixmap *p) { m_pixmap = p; }
 
     bool NeedsRegen(void) { return m_bRegenPixmap; }
     void RegeneratePixmap(void);
 
   protected:
-    QPixmap *m_Pixmap   {nullptr};
+    QPixmap *m_pixmap   {nullptr};
     bool m_bRegenPixmap {false};
 };
 
@@ -42,12 +42,12 @@ void MythQtImage::RegeneratePixmap(void)
 {
     // We allocate the pixmap here so it is done in the UI
     // thread since QPixmap uses non-reentrant X calls.
-    if (!m_Pixmap)
-        m_Pixmap = new QPixmap;
+    if (!m_pixmap)
+        m_pixmap = new QPixmap;
 
-    if (m_Pixmap)
+    if (m_pixmap)
     {
-        *m_Pixmap = QPixmap::fromImage(*((QImage *)this));
+        *m_pixmap = QPixmap::fromImage(*((QImage *)this));
         m_bRegenPixmap = false;
     }
 }

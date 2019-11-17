@@ -95,7 +95,7 @@ public:
     explicit MythUIHelperPrivate(MythUIHelper *p)
     : m_cacheLock(new QMutex(QMutex::Recursive)),
       m_imageThreadPool(new MThreadPool("MythUIHelper")),
-      parent(p) {}
+      m_parent(p) {}
     ~MythUIHelperPrivate();
 
     void Init();
@@ -168,14 +168,14 @@ public:
     ScreenSaverControl *m_screensaver        {nullptr};
     bool                m_screensaverEnabled {false};
 
-    DisplayRes  *m_display_res               {nullptr};
+    DisplayRes  *m_displayRes                {nullptr};
     bool         m_screenSetup               {false};
 
     MThreadPool *m_imageThreadPool           {nullptr};
 
-    MythUIMenuCallbacks callbacks            {nullptr,nullptr,nullptr,nullptr,nullptr};
+    MythUIMenuCallbacks m_callbacks          {nullptr,nullptr,nullptr,nullptr,nullptr};
 
-    MythUIHelper *parent                     {nullptr};
+    MythUIHelper *m_parent                   {nullptr};
 
     int m_fontStretch                        {100};
 
@@ -205,7 +205,7 @@ MythUIHelperPrivate::~MythUIHelperPrivate()
     delete m_imageThreadPool;
     delete m_screensaver;
 
-    if (m_display_res)
+    if (m_displayRes)
         DisplayRes::SwitchToDesktop();
 }
 
@@ -362,7 +362,7 @@ double MythUIHelperPrivate::GetPixelAspectRatio(void)
 {
     if (m_pixelAspectRatio < 0)
     {
-        if (!m_display_res)
+        if (!m_displayRes)
         {
             DisplayRes *dispRes = DisplayRes::GetDisplayRes(); // create singleton
 
@@ -372,7 +372,7 @@ double MythUIHelperPrivate::GetPixelAspectRatio(void)
                 m_pixelAspectRatio = 1.0;
         }
         else
-            m_pixelAspectRatio = m_display_res->GetPixelAspectRatio();
+            m_pixelAspectRatio = m_displayRes->GetPixelAspectRatio();
     }
 
     return m_pixelAspectRatio;
@@ -409,7 +409,7 @@ MythUIHelper::~MythUIHelper()
 void MythUIHelper::Init(MythUIMenuCallbacks &cbs)
 {
     d->Init();
-    d->callbacks = cbs;
+    d->m_callbacks = cbs;
 
     d->m_maxCacheSize.fetchAndStoreRelease(
         GetMythDB()->GetNumSetting("UIImageCacheSize", 30) * 1024 * 1024);
@@ -430,7 +430,7 @@ void MythUIHelper::Init(void)
 
 MythUIMenuCallbacks *MythUIHelper::GetMenuCBs(void)
 {
-    return &(d->callbacks);
+    return &(d->m_callbacks);
 }
 
 bool MythUIHelper::IsScreenSetup(void)
@@ -454,11 +454,11 @@ void MythUIHelper::LoadQtConfig(void)
 
         if (dispRes)
         {
-            d->m_display_res = dispRes;
+            d->m_displayRes = dispRes;
             // Make sure DisplayRes has current context info
-            d->m_display_res->Initialize();
+            d->m_displayRes->Initialize();
             // Switch to desired GUI resolution
-            if (d->m_display_res->SwitchToGUI())
+            if (d->m_displayRes->SwitchToGUI())
             {
                 d->WaitForScreenChange();
             }
@@ -762,19 +762,19 @@ bool MythUIHelper::IsImageInCache(const QString &url)
 
 QString MythUIHelper::GetThemeCacheDir(void)
 {
-    static QString oldcachedir;
+    static QString s_oldcachedir;
     QString tmpcachedir = GetThemeBaseCacheDir() + "/" +
                           GetMythDB()->GetSetting("Theme", DEFAULT_UI_THEME) +
                           "." + QString::number(d->m_screenwidth) +
                           "." + QString::number(d->m_screenheight);
 
-    if (tmpcachedir != oldcachedir)
+    if (tmpcachedir != s_oldcachedir)
     {
         LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +
             QString("Creating cache dir: %1").arg(tmpcachedir));
         QDir dir;
         dir.mkdir(tmpcachedir);
-        oldcachedir = tmpcachedir;
+        s_oldcachedir = tmpcachedir;
     }
     return tmpcachedir;
 }

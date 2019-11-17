@@ -406,10 +406,10 @@ bool MythRenderOpenGL::Init(void)
 
 void MythRenderOpenGL::DebugFeatures(void)
 {
-    static bool debugged = false;
-    if (debugged)
+    static bool s_debugged = false;
+    if (s_debugged)
         return;
-    debugged = true;
+    s_debugged = true;
     QSurfaceFormat fmt = format();
     QString qtglversion = QString("OpenGL%1 %2.%3")
             .arg(fmt.renderableType() == QSurfaceFormat::OpenGLES ? "ES" : "")
@@ -1181,11 +1181,11 @@ void MythRenderOpenGL::Init2DState(void)
 
 QFunctionPointer MythRenderOpenGL::GetProcAddress(const QString &Proc) const
 {
-    static const QString exts[4] = { "", "ARB", "EXT", "OES" };
+    static const QString kExts[4] = { "", "ARB", "EXT", "OES" };
     QFunctionPointer result = nullptr;
     for (int i = 0; i < 4; i++)
     {
-        result = getProcAddress((Proc + exts[i]).toLocal8Bit().constData());
+        result = getProcAddress((Proc + kExts[i]).toLocal8Bit().constData());
         if (result)
             break;
     }
