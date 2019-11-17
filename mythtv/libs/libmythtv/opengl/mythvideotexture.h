@@ -40,7 +40,7 @@ class MythVideoTexture : public MythGLTexture
                                            QOpenGLTexture::TextureFormat Format = QOpenGLTexture::NoFormat,
                                            QOpenGLTexture::Filter Filter = QOpenGLTexture::Linear,
                                            QOpenGLTexture::WrapMode Wrap = QOpenGLTexture::ClampToEdge);
-   ~MythVideoTexture();
+   ~MythVideoTexture() = default;
 
   public:
     bool           m_valid          { false };

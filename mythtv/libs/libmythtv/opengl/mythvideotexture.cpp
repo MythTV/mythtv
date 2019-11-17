@@ -14,10 +14,6 @@ MythVideoTexture::MythVideoTexture(GLuint Texture)
 {
 }
 
-MythVideoTexture::~MythVideoTexture()
-{
-}
-
 void MythVideoTexture::DeleteTexture(MythRenderOpenGL *Context, MythVideoTexture *Texture)
 {
     if (!Context || !Texture)
