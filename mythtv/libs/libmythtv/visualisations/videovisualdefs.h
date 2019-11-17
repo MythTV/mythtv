@@ -14,8 +14,7 @@ class LogScale
 
    ~LogScale()
     {
-        if (indices)
-            delete [] indices;
+        delete [] indices;
     }
 
     int scale() const { return s; }
@@ -29,8 +28,7 @@ class LogScale
         s = maxscale;
         r = maxrange;
 
-        if (indices)
-            delete [] indices;
+        delete [] indices;
 
         double alpha;
         long double domain = (long double) maxscale;

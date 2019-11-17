@@ -20,14 +20,10 @@ void MythVideoTexture::DeleteTexture(MythRenderOpenGL *Context, MythVideoTexture
         return;
 
      OpenGLLocker locker(Context);
-     if (Texture->m_copyContext)
-         delete Texture->m_copyContext;
-     if (Texture->m_texture)
-         delete Texture->m_texture;
-     if (Texture->m_data)
-         delete [] Texture->m_data;
-     if (Texture->m_vbo)
-         delete Texture->m_vbo;
+     delete Texture->m_copyContext;
+     delete Texture->m_texture;
+     delete [] Texture->m_data;
+     delete Texture->m_vbo;
 
      delete Texture;
 }

@@ -35,8 +35,7 @@ class DecoderEvent : public MythEvent
 
     ~DecoderEvent()
     {
-        if (m_error_msg)
-            delete m_error_msg;
+        delete m_error_msg;
     }
 
     const QString *errorMessage() const { return m_error_msg; }

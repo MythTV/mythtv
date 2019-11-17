@@ -179,8 +179,7 @@ MythVideoOutputOpenGL::~MythVideoOutputOpenGL()
     m_openGLVideoPiPsReady.clear();
     if (m_openGLPainter)
         m_openGLPainter->SetSwapControl(true);
-    if (m_openGLVideo)
-        delete m_openGLVideo;
+    delete m_openGLVideo;
     if (m_render)
     {
         m_render->makeCurrent();

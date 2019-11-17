@@ -217,8 +217,7 @@ class UPNP_PUBLIC DeviceLocation : public ReferenceCounter
             // Should be atomic decrement
             g_nAllocated--;
 
-            if (m_pDeviceDesc != nullptr)
-                delete m_pDeviceDesc;
+            delete m_pDeviceDesc;
         }
 
         UPnpDeviceDesc *m_pDeviceDesc;  // We take ownership of this pointer.

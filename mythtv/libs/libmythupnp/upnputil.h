@@ -117,11 +117,8 @@ inline NameValue& NameValue::operator=(const NameValue &nv)
 
 inline NameValue::~NameValue()
 {
-    if (m_pAttributes)
-    {
-        delete m_pAttributes;
-        m_pAttributes = nullptr;
-    }
+    delete m_pAttributes;
+    m_pAttributes = nullptr;
 }
 
 inline void NameValue::AddAttribute(const QString &name, const QString &value,

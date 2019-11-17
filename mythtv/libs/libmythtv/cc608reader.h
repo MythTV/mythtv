@@ -43,8 +43,7 @@ class CC608Buffer
         for (; i != buffers.end(); ++i)
         {
             CC608Text *cc = (*i);
-            if (cc)
-                delete cc;
+            delete cc;
         }
         buffers.clear();
         lock.unlock();

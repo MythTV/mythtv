@@ -387,15 +387,13 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
 
 inline void MPEGStreamData::SetPATSingleProgram(ProgramAssociationTable* pat)
 {
-    if (_pat_single_program)
-        delete _pat_single_program;
+    delete _pat_single_program;
     _pat_single_program = pat;
 }
 
 inline void MPEGStreamData::SetPMTSingleProgram(ProgramMapTable* pmt)
 {
-    if (_pmt_single_program)
-        delete _pmt_single_program;
+    delete _pmt_single_program;
     _pmt_single_program = pmt;
 }
 

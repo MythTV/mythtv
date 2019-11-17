@@ -700,12 +700,9 @@ void MythRenderOpenGL::DeleteTexture(MythGLTexture *Texture)
 
     makeCurrent();
     // N.B. Don't delete m_textureId - it is owned externally
-    if (Texture->m_texture)
-        delete Texture->m_texture;
-    if (Texture->m_data)
-        delete [] Texture->m_data;
-    if (Texture->m_vbo)
-        delete Texture->m_vbo;
+    delete Texture->m_texture;
+    delete [] Texture->m_data;
+    delete Texture->m_vbo;
     delete Texture;
     Flush();
     doneCurrent();
@@ -1227,8 +1224,7 @@ void MythRenderOpenGL::ReleaseResources(void)
     }
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         logDebugMarker("RENDER_RELEASE_END");
-    if (m_openglDebugger)
-        delete m_openglDebugger;
+    delete m_openglDebugger;
     m_openglDebugger = nullptr;
     Flush();
 
@@ -1524,8 +1520,7 @@ QOpenGLShaderProgram *MythRenderOpenGL::CreateShaderProgram(const QString &Verte
 void MythRenderOpenGL::DeleteShaderProgram(QOpenGLShaderProgram *Program)
 {
     makeCurrent();
-    if (Program)
-        delete Program;
+    delete Program;
     m_cachedMatrixUniforms.clear();
     m_activeProgram = nullptr;
     m_cachedUniformLocations.remove(Program);
