@@ -61,7 +61,7 @@ inline vector<MythVideoTexture*> MythEGLDMABUF::CreateComposed(AVDRMFrameDescrip
                                                                VideoFrame *Frame)
 {
     vector<QSize> sizes;
-    sizes.push_back(QSize(Frame->width, Frame->height));
+    sizes.emplace_back(QSize(Frame->width, Frame->height));
     vector<MythVideoTexture*> textures =
             MythVideoTexture::CreateTextures(Context, Frame->codec, FMT_RGBA32, sizes,
                                              m_gltwo ? GL_TEXTURE_EXTERNAL_OES : QOpenGLTexture::Target2D);
@@ -154,7 +154,7 @@ inline vector<MythVideoTexture*> MythEGLDMABUF::CreateSeparate(AVDRMFrameDescrip
     {
         int width = Frame->width >> ((plane > 0) ? 1 : 0);
         int height = Frame->height >> ((plane > 0) ? 1 : 0);
-        sizes.push_back(QSize(width, height));
+        sizes.emplace_back(QSize(width, height));
     }
 
     VideoFrameType format = PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->sw_pix_fmt));

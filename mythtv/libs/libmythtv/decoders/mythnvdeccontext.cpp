@@ -562,7 +562,7 @@ void MythNVDECContext::NVDECCheck(void)
                         if (cuvid->cuvidGetDecoderCaps && (cuvid->cuvidGetDecoderCaps(&caps) == CUDA_SUCCESS) &&
                             caps.bIsSupported)
                         {
-                            s_NVDECDecoderCaps.push_back(
+                            s_NVDECDecoderCaps.emplace_back(
                                     MythNVDECCaps(cudacodec, depth, cudaformat,
                                         QSize(caps.nMinWidth, caps.nMinHeight),
                                         QSize(static_cast<int>(caps.nMaxWidth), static_cast<int>(caps.nMaxHeight)),
@@ -577,7 +577,7 @@ void MythNVDECContext::NVDECCheck(void)
                         else if (!cuvid->cuvidGetDecoderCaps)
                         {
                             // dummy - just support everything:)
-                            s_NVDECDecoderCaps.push_back(MythNVDECCaps(cudacodec, depth, cudaformat,
+                            s_NVDECDecoderCaps.emplace_back(MythNVDECCaps(cudacodec, depth, cudaformat,
                                                                        QSize(32, 32), QSize(8192, 8192),
                                                                        (8192 * 8192) / 256));
                         }

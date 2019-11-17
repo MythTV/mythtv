@@ -254,7 +254,7 @@ bool MythOpenGLVideo::AddDeinterlacer(const VideoFrame *Frame, FrameScanType Sca
     if (refstocreate)
     {
         vector<QSize> sizes;
-        sizes.push_back(QSize(m_videoDim));
+        sizes.emplace_back(QSize(m_videoDim));
         m_prevTextures = MythVideoTexture::CreateTextures(m_render, m_inputType, m_outputType, sizes);
         m_nextTextures = MythVideoTexture::CreateTextures(m_render, m_inputType, m_outputType, sizes);
     }
