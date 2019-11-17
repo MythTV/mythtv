@@ -603,7 +603,7 @@ void MythRenderOpenGL::SetBackground(int r, int g, int b, int a)
 
     m_background = tmp;
     makeCurrent();
-    glClearColor(r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f);
+    glClearColor(r / 255.0F, g / 255.0F, b / 255.0F, a / 255.0F);
     doneCurrent();
 }
 
@@ -826,7 +826,7 @@ void MythRenderOpenGL::DrawBitmap(MythGLTexture *Texture, QOpenGLFramebufferObje
     glEnableVertexAttribArray(VERTEX_INDEX);
     glEnableVertexAttribArray(TEXTURE_INDEX);
     glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(GLfloat), kVertexOffset);
-    glVertexAttrib4f(COLOR_INDEX, 1.0f, 1.0f, 1.0f, Alpha / 255.0f);
+    glVertexAttrib4f(COLOR_INDEX, 1.0F, 1.0F, 1.0F, Alpha / 255.0F);
     glVertexAttribPointerI(TEXTURE_INDEX, TEXTURE_SIZE, GL_FLOAT, GL_FALSE, TEXTURE_SIZE * sizeof(GLfloat), kTextureOffset);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glDisableVertexAttribArray(TEXTURE_INDEX);
@@ -899,8 +899,8 @@ void MythRenderOpenGL::DrawBitmap(MythGLTexture **Textures, uint TextureCount,
     doneCurrent();
 }
 
-static const float kLimitedRangeOffset = (16.0f / 255.0f);
-static const float kLimitedRangeScale  = (219.0f / 255.0f);
+static const float kLimitedRangeOffset = (16.0F / 255.0F);
+static const float kLimitedRangeScale  = (219.0F / 255.0F);
 
 /// \brief An optimised method to clear a QRect to the given color
 void MythRenderOpenGL::ClearRect(QOpenGLFramebufferObject *Target, const QRect &Area, int Color)
@@ -910,8 +910,8 @@ void MythRenderOpenGL::ClearRect(QOpenGLFramebufferObject *Target, const QRect &
     glEnableVertexAttribArray(VERTEX_INDEX);
 
     // Set the fill color
-    float color = m_fullRange ? Color / 255.0f : (Color * kLimitedRangeScale) + kLimitedRangeOffset;
-    glVertexAttrib4f(COLOR_INDEX, color, color, color, 255.0f);
+    float color = m_fullRange ? Color / 255.0F : (Color * kLimitedRangeScale) + kLimitedRangeOffset;
+    glVertexAttrib4f(COLOR_INDEX, color, color, color, 255.0F);
 
     SetShaderProgramParams(m_defaultPrograms[kShaderSimple], m_projection, "u_projection");
     SetShaderProgramParams(m_defaultPrograms[kShaderSimple], m_transforms.top(), "u_transform");
@@ -970,10 +970,10 @@ void MythRenderOpenGL::DrawRoundRect(QOpenGLFramebufferObject *Target,
         if (m_fullRange)
         {
             glVertexAttrib4f(COLOR_INDEX,
-                               FillBrush.color().red() / 255.0f,
-                               FillBrush.color().green() / 255.0f,
-                               FillBrush.color().blue() / 255.0f,
-                              (FillBrush.color().alpha() / 255.0f) * (Alpha / 255.0f));
+                               FillBrush.color().red() / 255.0F,
+                               FillBrush.color().green() / 255.0F,
+                               FillBrush.color().blue() / 255.0F,
+                              (FillBrush.color().alpha() / 255.0F) * (Alpha / 255.0F));
         }
         else
         {
@@ -981,12 +981,12 @@ void MythRenderOpenGL::DrawRoundRect(QOpenGLFramebufferObject *Target,
                               (FillBrush.color().red() * kLimitedRangeScale) + kLimitedRangeOffset,
                               (FillBrush.color().blue() * kLimitedRangeScale) + kLimitedRangeOffset,
                               (FillBrush.color().green() * kLimitedRangeScale) + kLimitedRangeOffset,
-                              (FillBrush.color().alpha() / 255.0f) * (Alpha / 255.0f));
+                              (FillBrush.color().alpha() / 255.0F) * (Alpha / 255.0F));
         }
 
         // Set the radius
         m_parameters(2,0) = rad;
-        m_parameters(3,0) = rad - 1.0f;
+        m_parameters(3,0) = rad - 1.0F;
 
         // Enable the Circle shader
         SetShaderProgramParams(elip, m_projection, "u_projection");
@@ -1056,10 +1056,10 @@ void MythRenderOpenGL::DrawRoundRect(QOpenGLFramebufferObject *Target,
         if (m_fullRange)
         {
             glVertexAttrib4f(COLOR_INDEX,
-                               LinePen.color().red() / 255.0f,
-                               LinePen.color().green() / 255.0f,
-                               LinePen.color().blue() / 255.0f,
-                              (LinePen.color().alpha() / 255.0f) * (Alpha / 255.0f));
+                               LinePen.color().red() / 255.0F,
+                               LinePen.color().green() / 255.0F,
+                               LinePen.color().blue() / 255.0F,
+                              (LinePen.color().alpha() / 255.0F) * (Alpha / 255.0F));
         }
         else
         {
@@ -1067,12 +1067,12 @@ void MythRenderOpenGL::DrawRoundRect(QOpenGLFramebufferObject *Target,
                               (LinePen.color().red() * kLimitedRangeScale) + kLimitedRangeOffset,
                               (LinePen.color().blue() * kLimitedRangeScale) + kLimitedRangeOffset,
                               (LinePen.color().green() * kLimitedRangeScale) + kLimitedRangeOffset,
-                              (FillBrush.color().alpha() / 255.0f) * (Alpha / 255.0f));
+                              (FillBrush.color().alpha() / 255.0F) * (Alpha / 255.0F));
         }
 
         // Set the radius and width
-        m_parameters(2,0) = rad - lineWidth / 2.0f;
-        m_parameters(3,0) = lineWidth / 2.0f;
+        m_parameters(2,0) = rad - lineWidth / 2.0F;
+        m_parameters(3,0) = lineWidth / 2.0F;
 
         // Enable the edge shader
         SetShaderProgramParams(edge, m_projection, "u_projection");
@@ -1114,7 +1114,7 @@ void MythRenderOpenGL::DrawRoundRect(QOpenGLFramebufferObject *Target,
         SetShaderProgramParams(vline, m_projection, "u_projection");
         SetShaderProgramParams(vline, m_transforms.top(), "u_transform");
 
-        m_parameters(1,0) = lineWidth / 2.0f;
+        m_parameters(1,0) = lineWidth / 2.0F;
         QRect vl(r.left(), r.top() + rad, lineWidth, r.height() - dia);
 
         // Draw the left line segment
@@ -1174,7 +1174,7 @@ void MythRenderOpenGL::Init2DState(void)
     glDisable(GL_DEPTH_TEST);
     glDepthMask(GL_FALSE);
     glDisable(GL_CULL_FACE);
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClearColor(0.0F, 0.0F, 0.0F, 0.0F);
     glClear(GL_COLOR_BUFFER_BIT);
     Flush();
 }
@@ -1464,7 +1464,7 @@ int MythRenderOpenGL::GetBufferSize(QSize Size, QOpenGLTexture::PixelFormat Form
 void MythRenderOpenGL::PushTransformation(const UIEffects &fx, QPointF &center)
 {
     QMatrix4x4 newtop = m_transforms.top();
-    if (fx.m_hzoom != 1.0f || fx.m_vzoom != 1.0f || fx.m_angle != 0.0f)
+    if (fx.m_hzoom != 1.0F || fx.m_vzoom != 1.0F || fx.m_angle != 0.0F)
     {
         newtop.translate(static_cast<GLfloat>(center.x()), static_cast<GLfloat>(center.y()));
         newtop.scale(fx.m_hzoom, fx.m_vzoom);

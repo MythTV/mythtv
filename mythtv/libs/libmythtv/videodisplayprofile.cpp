@@ -395,7 +395,7 @@ void VideoDisplayProfile::SetInput(const QSize &Size, float Framerate, const QSt
         m_lastSize = Size;
         change = true;
     }
-    if (Framerate > 0.0F && !qFuzzyCompare(Framerate + 1.0f, m_lastRate + 1.0f))
+    if (Framerate > 0.0F && !qFuzzyCompare(Framerate + 1.0F, m_lastRate + 1.0F))
     {
         m_lastRate = Framerate;
         change = true;
@@ -412,7 +412,7 @@ void VideoDisplayProfile::SetInput(const QSize &Size, float Framerate, const QSt
 void VideoDisplayProfile::SetOutput(float Framerate)
 {
     QMutexLocker locker(&m_lock);
-    if (!qFuzzyCompare(Framerate + 1.0f, m_lastRate + 1.0f))
+    if (!qFuzzyCompare(Framerate + 1.0F, m_lastRate + 1.0F))
     {
         m_lastRate = Framerate;
         LoadBestPreferences(m_lastSize, m_lastRate, m_lastCodecName);

@@ -103,7 +103,7 @@ MythVideoOutputOpenGL::MythVideoOutputOpenGL(QString Profile)
     m_newCodecId(kCodec_NONE),
     m_newVideoDim(),
     m_newVideoDispDim(),
-    m_newAspect(0.0f),
+    m_newAspect(0.0F),
     m_buffersCreated(false),
     m_openGLPerf(nullptr)
 {
@@ -442,7 +442,7 @@ void MythVideoOutputOpenGL::ProcessFrame(VideoFrame *Frame, OSD */*osd*/,
         m_newCodecId = kCodec_NONE;
         m_newVideoDim = QSize();
         m_newVideoDispDim = QSize();
-        m_newAspect = 0.0f;
+        m_newAspect = 0.0F;
 
         if (wasembedding && ok)
             EmbedInWidget(oldrect);
@@ -840,7 +840,7 @@ void MythVideoOutputOpenGL::ShowPIP(VideoFrame*, MythPlayer *PiPPlayer, PIPLocat
     const QSize pipvideodim  = PiPPlayer->GetVideoBufferSize();
     QRect       pipvideorect = QRect(QPoint(0, 0), pipvideodim);
 
-    if ((PiPPlayer->GetVideoAspect() <= 0.0f) || !pipimage || !pipimage->buf ||
+    if ((PiPPlayer->GetVideoAspect() <= 0.0F) || !pipimage || !pipimage->buf ||
         (pipimage->codec != FMT_YV12) || !PiPPlayer->IsPIPVisible())
     {
         PiPPlayer->ReleaseCurrentFrame(pipimage);

@@ -983,7 +983,7 @@ QString VideoBuffers::GetStatus(uint Num) const
         unsigned long long x = to_bitmap(m_decode, count);
         for (uint i = 0; i < Num; i++)
         {
-            unsigned long long mask = 1Ull << i;
+            unsigned long long mask = 1ULL << i;
             QString tmp("");
             if (a & mask)
                 tmp += (x & mask) ? "a" : "A";

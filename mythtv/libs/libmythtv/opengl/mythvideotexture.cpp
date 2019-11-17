@@ -576,7 +576,7 @@ MythVideoTexture* MythVideoTexture::CreateHelperTexture(MythRenderOpenGL *Contex
 
     for (int i = 0; i < width; i++)
     {
-        float x = (i + 0.5f) / static_cast<float>(width);
+        float x = (i + 0.5F) / static_cast<float>(width);
         StoreBicubicWeights(x, ref);
         ref += 4;
     }

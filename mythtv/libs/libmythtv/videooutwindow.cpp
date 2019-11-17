@@ -193,7 +193,7 @@ void VideoOutWindow::Rotate(void)
     m_manualHorizScale = m_manualVertScale;
     m_manualVertScale = temp;
     m_manualMove = QPoint(m_manualMove.y(), m_manualMove.x());
-    m_displayAspect = 1.0f / m_displayAspect;
+    m_displayAspect = 1.0F / m_displayAspect;
 
     m_displayVisibleRect = QRect(QPoint(m_displayVisibleRect.top(), m_displayVisibleRect.left()),
                                         QSize(m_displayVisibleRect.height(), m_displayVisibleRect.width()));
@@ -566,7 +566,7 @@ void VideoOutWindow::InputChanged(const QSize &VideoDim, const QSize &VideoDispD
     QSize newvideodispdim = Fix1088(VideoDispDim);
 
     if (!((VideoDim == m_videoDim) && (newvideodispdim == m_videoDispDim) &&
-          qFuzzyCompare(Aspect + 100.0f, m_videoAspect + 100.0f)))
+          qFuzzyCompare(Aspect + 100.0F, m_videoAspect + 100.0F)))
     {
         m_videoDispDim = newvideodispdim;
         m_videoDim     = VideoDim;
@@ -636,8 +636,8 @@ void VideoOutWindow::SetVideoScalingAllowed(bool Change)
         m_dbScalingAllowed = false;
     }
 
-    if (!(qFuzzyCompare(oldvert + 100.0f, m_dbVertScale + 100.0f) &&
-          qFuzzyCompare(oldhoriz + 100.0f, m_dbHorizScale + 100.0f)))
+    if (!(qFuzzyCompare(oldvert + 100.0F, m_dbVertScale + 100.0F) &&
+          qFuzzyCompare(oldhoriz + 100.0F, m_dbHorizScale + 100.0F)))
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Over/underscan. V: %1, H: %2")
             .arg(static_cast<double>(m_dbVertScale)).arg(static_cast<double>(m_dbHorizScale)));
@@ -647,7 +647,7 @@ void VideoOutWindow::SetVideoScalingAllowed(bool Change)
 
 void VideoOutWindow::SetDisplayProperties(QSize DisplayDim, float DisplayAspect)
 {
-    if (DisplayDim != m_displayDimensions || !qFuzzyCompare(DisplayAspect + 10.0f, m_displayAspect + 10.0f))
+    if (DisplayDim != m_displayDimensions || !qFuzzyCompare(DisplayAspect + 10.0F, m_displayAspect + 10.0F))
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("New display properties: %1mmx%2mm Aspect %3")
             .arg(DisplayDim.width()).arg(DisplayDim.height())
@@ -925,7 +925,7 @@ void VideoOutWindow::Zoom(ZoomDirection Direction)
     float oldhorizscale = m_manualHorizScale;
     QPoint oldmove = m_manualMove;
 
-    const float zf = 0.02f;
+    const float zf = 0.02F;
     if (kZoomHome == Direction)
     {
         m_manualVertScale = 1.0F;
@@ -1000,8 +1000,8 @@ void VideoOutWindow::Zoom(ZoomDirection Direction)
     m_manualVertScale = snap(m_manualVertScale, 1.0F, zf / 2);
     m_manualHorizScale = snap(m_manualHorizScale, 1.0F, zf / 2);
 
-    if (!((oldmove == m_manualMove) && qFuzzyCompare(m_manualVertScale + 100.0f, oldvertscale + 100.0f) &&
-          qFuzzyCompare(m_manualHorizScale + 100.0f, oldhorizscale + 100.0f)))
+    if (!((oldmove == m_manualMove) && qFuzzyCompare(m_manualVertScale + 100.0F, oldvertscale + 100.0F) &&
+          qFuzzyCompare(m_manualHorizScale + 100.0F, oldhorizscale + 100.0F)))
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("New zoom: Offset %1x%2 HScale %3 VScale %4")
             .arg(m_manualMove.x()).arg(m_manualMove.y())
@@ -1037,8 +1037,8 @@ void VideoOutWindow::ToggleMoveBottomLine(void)
         m_bottomLine = true;
     }
 
-    if (!((oldmove == m_manualMove) && qFuzzyCompare(m_manualVertScale + 100.0f, oldvertscale + 100.0f) &&
-          qFuzzyCompare(m_manualHorizScale + 100.0f, oldhorizscale + 100.0f)))
+    if (!((oldmove == m_manualMove) && qFuzzyCompare(m_manualVertScale + 100.0F, oldvertscale + 100.0F) &&
+          qFuzzyCompare(m_manualHorizScale + 100.0F, oldhorizscale + 100.0F)))
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("New custom zoom: Offset %1x%2 HScale %3 VScale %4")
             .arg(m_manualMove.x()).arg(m_manualMove.y())

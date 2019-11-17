@@ -14,13 +14,13 @@ extern "C" {
 #include <cmath>
 
 const VideoColourSpace::ColourPrimaries VideoColourSpace::BT709 =
-    {{{0.640f, 0.330f}, {0.300f, 0.600f}, {0.150f, 0.060f}}, {0.3127f, 0.3290f}};
+    {{{0.640F, 0.330F}, {0.300F, 0.600F}, {0.150F, 0.060F}}, {0.3127F, 0.3290F}};
 const VideoColourSpace::ColourPrimaries VideoColourSpace::BT610_525 =
-    {{{0.640f, 0.340f}, {0.310f, 0.595f}, {0.155f, 0.070f}}, {0.3127f, 0.3290f}};
+    {{{0.640F, 0.340F}, {0.310F, 0.595F}, {0.155F, 0.070F}}, {0.3127F, 0.3290F}};
 const VideoColourSpace::ColourPrimaries VideoColourSpace::BT610_625 =
-    {{{0.640f, 0.330f}, {0.290f, 0.600f}, {0.150f, 0.060f}}, {0.3127f, 0.3290f}};
+    {{{0.640F, 0.330F}, {0.290F, 0.600F}, {0.150F, 0.060F}}, {0.3127F, 0.3290F}};
 const VideoColourSpace::ColourPrimaries VideoColourSpace::BT2020 =
-    {{{0.708f, 0.292f}, {0.170f, 0.797f}, {0.131f, 0.046f}}, {0.3127f, 0.3290f}};
+    {{{0.708F, 0.292F}, {0.170F, 0.797F}, {0.131F, 0.046F}}, {0.3127F, 0.3290F}};
 
 #define LOC QString("ColourSpace: ")
 
@@ -72,10 +72,10 @@ VideoColourSpace::VideoColourSpace(VideoColourSpace *Parent)
     m_primariesMode(PrimariesAuto),
     m_colourPrimaries(AVCOL_PRI_BT709),
     m_displayPrimaries(AVCOL_PRI_BT709),
-    m_colourGamma(2.2f),
-    m_displayGamma(2.2f),
+    m_colourGamma(2.2F),
+    m_displayGamma(2.2F),
     m_primaryMatrix(),
-    m_customDisplayGamma(2.2f),
+    m_customDisplayGamma(2.2F),
     m_customDisplayPrimaries(nullptr),
     m_parent(Parent)
 {
@@ -269,7 +269,7 @@ void VideoColourSpace::Update(void)
     // Works for NVDEC and VAAPI. VideoToolBox untested.
     if ((m_colourSpaceDepth > 8) && !m_colourShifted)
     {
-        float scaler = 65535.0f / ((1 << m_colourSpaceDepth) -1);
+        float scaler = 65535.0F / ((1 << m_colourSpaceDepth) -1);
         scale(scaler);
     }
     static_cast<QMatrix4x4*>(this)->operator = (this->transposed());
@@ -413,7 +413,7 @@ void VideoColourSpace::SetContrast(int Value)
 
 void VideoColourSpace::SetHue(int Value)
 {
-    m_hue = Value * -3.6f;
+    m_hue = Value * -3.6F;
     Update();
 }
 
@@ -425,7 +425,7 @@ void VideoColourSpace::SetSaturation(int Value)
 
 void VideoColourSpace::SetAlpha(int Value)
 {
-    m_alpha = 100.0f / Value;
+    m_alpha = 100.0F / Value;
     Update();
 }
 
@@ -505,7 +505,7 @@ QMatrix4x4 VideoColourSpace::GetPrimaryConversion(int Source, int Dest)
     // and destination. Most people will not notice the difference bt709 and bt610 etc
     // and we avoid extra GPU processing.
     // BT2020 is currently the main target - which is easily differentiated by its gamma.
-    if ((m_primariesMode == PrimariesAuto) && qFuzzyCompare(m_colourGamma + 1.0f, m_displayGamma + 1.0f))
+    if ((m_primariesMode == PrimariesAuto) && qFuzzyCompare(m_colourGamma + 1.0F, m_displayGamma + 1.0F))
         return result;
 
     // N.B. Custom primaries are not yet implemented but will, some day soon,
@@ -522,14 +522,14 @@ QMatrix4x4 VideoColourSpace::GetPrimaryConversion(int Source, int Dest)
 void VideoColourSpace::GetPrimaries(int Primary, ColourPrimaries &Out, float &Gamma)
 {
     AVColorPrimaries primary = static_cast<AVColorPrimaries>(Primary);
-    Gamma = 2.2f;
+    Gamma = 2.2F;
     switch (primary)
     {
         case AVCOL_PRI_BT470BG:
         case AVCOL_PRI_BT470M:    Out = BT610_625; return;
         case AVCOL_PRI_SMPTE170M:
         case AVCOL_PRI_SMPTE240M: Out = BT610_525; return;
-        case AVCOL_PRI_BT2020:    Out = BT2020; Gamma = 2.4f; return;
+        case AVCOL_PRI_BT2020:    Out = BT2020; Gamma = 2.4F; return;
         default: Out = BT709; return;
     }
 }
@@ -552,7 +552,7 @@ inline float CalcGy(const float p[3][2], const float w[2], const float By)
 
 inline float CalcRy(const float By, const float Gy)
 {
-    return 1.0f - Gy - By;
+    return 1.0F - Gy - By;
 }
 
 /*! \brief Create a conversion matrix for RGB to XYZ with the given primaries
@@ -578,7 +578,7 @@ QMatrix4x4 VideoColourSpace::RGBtoXYZ(ColourPrimaries Primaries)
     temp[2][0] = Ry / Primaries.primaries[0][1] * (1- Primaries.primaries[0][0] - Primaries.primaries[0][1]);
     temp[2][1] = Gy / Primaries.primaries[1][1] * (1- Primaries.primaries[1][0] - Primaries.primaries[1][1]);
     temp[2][2] = By / Primaries.primaries[2][1] * (1- Primaries.primaries[2][0] - Primaries.primaries[2][1]);
-    temp[0][3] = temp[1][3] = temp[2][3] = temp[3][0] = temp[3][1] = temp[3][2] = 0.0f;
-    temp[3][3] = 1.0f;
+    temp[0][3] = temp[1][3] = temp[2][3] = temp[3][0] = temp[3][1] = temp[3][2] = 0.0F;
+    temp[3][3] = 1.0F;
     return QMatrix4x4(temp[0]);
 }

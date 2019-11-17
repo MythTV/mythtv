@@ -483,7 +483,7 @@ QRect MythVideoOutput::GetVisibleOSDBounds(float &VisibleAspect,
     float ova = m_window.GetOverridenVideoAspect();
     QRect vr = m_window.GetVideoRect();
     float vs = vr.height() ? static_cast<float>(vr.width()) / vr.height() : 1.0F;
-    VisibleAspect = ThemeAspect * (ova > 0.0f ? vs / ova : 1.F) * dispPixelAdj;
+    VisibleAspect = ThemeAspect * (ova > 0.0F ? vs / ova : 1.F) * dispPixelAdj;
 
     FontScaling   = 1.0F;
     return { QPoint(0,0), dvr.size() };
@@ -965,7 +965,7 @@ void MythVideoOutput::ResizeForVideo(int Width, int Height)
             return;
     }
 
-    float rate = m_dbDisplayProfile ? m_dbDisplayProfile->GetOutput() : 0.0f;
+    float rate = m_dbDisplayProfile ? m_dbDisplayProfile->GetOutput() : 0.0F;
     if (m_displayRes && m_displayRes->SwitchToVideo(Width, Height, static_cast<double>(rate)))
     {
         // Switching to custom display resolution succeeded

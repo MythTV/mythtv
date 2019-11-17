@@ -2403,13 +2403,13 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         if (tvformat == "ntsc" || tvformat == "ntsc-jp" ||
             tvformat == "pal-m" || tvformat == "atsc")
         {
-            m_fps = 29.97f;
-            m_parent->SetVideoParams(-1, -1, 29.97, 1.0f, false, 16);
+            m_fps = 29.97F;
+            m_parent->SetVideoParams(-1, -1, 29.97, 1.0F, false, 16);
         }
         else
         {
-            m_fps = 25.0;
-            m_parent->SetVideoParams(-1, -1, 25.0, 1.0f, false, 16);
+            m_fps = 25.0F;
+            m_parent->SetVideoParams(-1, -1, 25.0, 1.0F, false, 16);
         }
     }
 
@@ -3067,7 +3067,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
 
             // some hardware decoders (e.g. VAAPI MPEG2) will reset when the aspect
             // ratio changes
-            bool forceaspectchange = !qFuzzyCompare(m_current_aspect + 10.0f, aspect + 10.0f) &&
+            bool forceaspectchange = !qFuzzyCompare(m_current_aspect + 10.0F, aspect + 10.0F) &&
                                       m_mythcodecctx && m_mythcodecctx->DecoderWillResetOnAspect();
 
             m_current_aspect = aspect;
@@ -3179,7 +3179,7 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
         bool res_changed = ((width  != m_current_width) || (height != m_current_height));
         bool fps_changed = (seqFPS > 0.0) && ((seqFPS > static_cast<double>(m_fps) + 0.01) ||
                                               (seqFPS < static_cast<double>(m_fps) - 0.01));
-        bool forcechange = !qFuzzyCompare(aspect + 10.0f, m_current_aspect) &&
+        bool forcechange = !qFuzzyCompare(aspect + 10.0F, m_current_aspect) &&
                             m_mythcodecctx && m_mythcodecctx->DecoderWillResetOnAspect();
         m_current_aspect = aspect;
 

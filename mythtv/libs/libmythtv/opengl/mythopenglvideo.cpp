@@ -106,7 +106,7 @@ void MythOpenGLVideo::UpdateColourSpace(bool PrimariesChanged)
     }
 
     float colourgamma  = m_videoColourSpace->GetColourGamma();
-    float displaygamma = 1.0f / m_videoColourSpace->GetDisplayGamma();
+    float displaygamma = 1.0F / m_videoColourSpace->GetDisplayGamma();
     QMatrix4x4 primary = m_videoColourSpace->GetPrimaryMatrix();
     for (int i = Progressive; i < ShaderCount; ++i)
     {
@@ -127,9 +127,9 @@ void MythOpenGLVideo::UpdateShaderParameters(void)
 
     OpenGLLocker locker(m_render);
     bool rect = m_textureTarget == QOpenGLTexture::TargetRectangle;
-    GLfloat lineheight = rect ? 1.0f : 1.0f / m_inputTextureSize.height();
+    GLfloat lineheight = rect ? 1.0F : 1.0F / m_inputTextureSize.height();
     GLfloat maxheight  = rect ? m_videoDispDim.height() : m_videoDispDim.height() / static_cast<GLfloat>(m_inputTextureSize.height());
-    GLfloat fieldsize  = rect ? 0.5f : m_inputTextureSize.height() / 2.0f;
+    GLfloat fieldsize  = rect ? 0.5F : m_inputTextureSize.height() / 2.0F;
     QVector4D parameters(lineheight,                                       /* lineheight */
                          static_cast<GLfloat>(m_inputTextureSize.width()), /* 'Y' select */
                          maxheight - lineheight,                           /* maxheight  */

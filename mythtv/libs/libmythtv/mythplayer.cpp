@@ -654,7 +654,7 @@ void MythPlayer::SetVideoParams(int width, int height, double fps,
     {
         paramsChanged  = true;
         video_dim      = video_disp_dim = QSize(width, height);
-        video_aspect   = aspect > 0.0f ? aspect : static_cast<float>(width) / height;
+        video_aspect   = aspect > 0.0F ? aspect : static_cast<float>(width) / height;
     }
 
     if (!qIsNaN(fps) && fps > 0.0 && fps < 121.0)
@@ -731,7 +731,7 @@ void MythPlayer::OpenDummy(void)
     if (!videoOutput)
     {
         SetKeyframeDistance(15);
-        SetVideoParams(720, 576, 25.00, 1.25f, false, 2);
+        SetVideoParams(720, 576, 25.00, 1.25F, false, 2);
     }
 
     player_ctx->LockPlayingInfo(__FILE__, __LINE__);
@@ -1936,7 +1936,7 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
     int64_t audio_adjustment = 0;
     int64_t unow = 0;
     int64_t lateness = 0;
-    int64_t playspeed1000 = static_cast<int64_t>(1000.0f / play_speed);
+    int64_t playspeed1000 = static_cast<int64_t>(1000.0F / play_speed);
     bool reset = false;
 
     while (framedue == 0)
