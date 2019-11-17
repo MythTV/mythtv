@@ -1402,7 +1402,6 @@ void MythRenderOpenGL::GetCachedVBO(GLuint Type, const QRect &Area)
         vbo->write(0, vertices, kTextureOffset);
     }
     ExpireVBOS(MAX_VERTEX_CACHE);
-    return;
 }
 
 void MythRenderOpenGL::ExpireVBOS(int Max)
