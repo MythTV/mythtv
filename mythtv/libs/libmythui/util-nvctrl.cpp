@@ -294,7 +294,7 @@ bool MythNVControl::GetNvidiaRates(MythXDisplay *MythDisplay, std::vector<Displa
                 break;
             }
         }
-    } while (erased == true);
+    } while (erased);
 
     // Update refresh rates
     for (size_t i = 0; i < VideoModes.size(); i++)
