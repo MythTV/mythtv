@@ -822,9 +822,9 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
     if (DrawBorder)
     {
         QRect piprect = m_displayVideoRect.adjusted(-10, -10, +10, +10);
-        static const QPen nopen(Qt::NoPen);
-        static const QBrush redbrush(QBrush(QColor(127, 0, 0, 255)));
-        m_render->DrawRect(nullptr, piprect, redbrush, nopen, 255);
+        static const QPen kNopen(Qt::NoPen);
+        static const QBrush kRedBrush(QBrush(QColor(127, 0, 0, 255)));
+        m_render->DrawRect(nullptr, piprect, kRedBrush, kNopen, 255);
     }
 
     // bind correct textures

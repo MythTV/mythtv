@@ -467,15 +467,15 @@ MythNVDECContext::MythNVDECCaps::MythNVDECCaps(cudaVideoCodec Codec, uint Depth,
 bool MythNVDECContext::HaveNVDEC(void)
 {
     QMutexLocker locker(s_NVDECLock);
-    static bool checked = false;
-    if (!checked)
+    static bool s_checked = false;
+    if (!s_checked)
     {
         if (gCoreContext->IsUIThread())
             NVDECCheck();
         else
             MythMainWindow::HandleCallback("NVDEC support check", MythNVDECContext::NVDECCheckCallback, nullptr, nullptr);
     }
-    checked = true;
+    s_checked = true;
     return s_NVDECAvailable;
 }
 

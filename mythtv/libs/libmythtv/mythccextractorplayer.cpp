@@ -108,8 +108,8 @@ static QString progress_string(
             .arg(m_myFramesPlayed,7);
     }
 
-    static char const spin_chars[] = "/-\\|";
-    static uint spin_cnt = 0;
+    static constexpr char kSpinChars[] = "/-\\|";
+    static uint s_spinCnt = 0;
 
     double elapsed = flagTime.elapsed() * 0.001;
     double flagFPS = (elapsed > 0.0) ? (m_myFramesPlayed / elapsed) : 0;
@@ -123,7 +123,7 @@ static QString progress_string(
           .arg(flagFPS,4,'f', (flagFPS < 10.0 ? 1 : 0)).arg(percentage,4,'f',1);
     return QString("%1 fps %2      \r")
         .arg(flagFPS,4,'f', (flagFPS < 10.0 ? 1 : 0))
-        .arg(spin_chars[++spin_cnt % 4]);
+        .arg(kSpinChars[++s_spinCnt % 4]);
 }
 
 bool MythCCExtractorPlayer::run(void)
@@ -296,7 +296,7 @@ void MythCCExtractorPlayer::IngestSubtitle(
 
 void MythCCExtractorPlayer::Ingest608Captions(void)
 {
-    static const int ccIndexTbl[7] =
+    static constexpr int kCcIndexTbl[7] =
     {
         0, // CC_CC1
         1, // CC_CC2
@@ -326,7 +326,7 @@ void MythCCExtractorPlayer::Ingest608Captions(void)
 
             textlist->lock.lock();
 
-            const int ccIdx = ccIndexTbl[min(streamRawIdx,6)];
+            const int ccIdx = kCcIndexTbl[min(streamRawIdx,6)];
 
             if (ccIdx >= 4)
             {

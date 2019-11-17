@@ -125,7 +125,7 @@ public:
         m_url           = uri;
         m_title         = title;
 #ifdef USING_LIBCRYPTO
-        m_psz_key_path  = current_key_path;
+        m_pszKeyPath    = current_key_path;
 #else
         Q_UNUSED(current_key_path);
 #endif
@@ -151,7 +151,7 @@ public:
         // m_played     = m_played;
         m_title         = rhs.m_title;
 #ifdef USING_LIBCRYPTO
-        m_psz_key_path  = rhs.m_psz_key_path;
+        m_pszKeyPath    = rhs.m_pszKeyPath;
         memcpy(&m_aeskey, &(rhs.m_aeskey), sizeof(m_aeskey));
         m_keyloaded     = rhs.m_keyloaded;
 #endif
@@ -278,7 +278,7 @@ public:
         if (m_keyloaded)
             return RET_OK;
         QByteArray key;
-        bool ret = downloadURL(m_psz_key_path, &key);
+        bool ret = downloadURL(m_pszKeyPath, &key);
         if (!ret || key.size() != AES_BLOCK_SIZE)
         {
             if (ret)
@@ -347,7 +347,7 @@ public:
 
     bool HasKeyPath(void) const
     {
-        return !m_psz_key_path.isEmpty();
+        return !m_pszKeyPath.isEmpty();
     }
 
     bool KeyLoaded(void) const
@@ -357,12 +357,12 @@ public:
 
     QString KeyPath(void) const
     {
-        return m_psz_key_path;
+        return m_pszKeyPath;
     }
 
     void SetKeyPath(const QString &path)
     {
-        m_psz_key_path = path;
+        m_pszKeyPath = path;
     }
 
     void CopyAESKey(const HLSSegment &segment)
@@ -373,7 +373,7 @@ public:
 private:
     AES_KEY     m_aeskey    {}; // AES-128 key
     bool        m_keyloaded {false};
-    QString     m_psz_key_path; // URL key path
+    QString     m_pszKeyPath; // URL key path
 #endif
 
 private:
@@ -400,7 +400,7 @@ public:
         m_bitrate       = bitrate;
         m_url           = uri;
 #ifdef USING_LIBCRYPTO
-        memset(m_AESIV, 0, sizeof(m_AESIV));
+        memset(m_aesIv, 0, sizeof(m_aesIv));
 #endif
     }
 
@@ -446,7 +446,7 @@ public:
 #ifdef USING_LIBCRYPTO
         m_keypath       = rhs.m_keypath;
         m_ivloaded      = rhs.m_ivloaded;
-        memcpy(m_AESIV, rhs.m_AESIV, sizeof(m_AESIV));
+        memcpy(m_aesIv, rhs.m_aesIv, sizeof(m_aesIv));
 #endif
         return *this;
     }
@@ -681,7 +681,7 @@ public:
                     return RET_OK;
                 }
             }
-            if (segment->DecodeData(m_ivloaded ? m_AESIV : nullptr) != RET_OK)
+            if (segment->DecodeData(m_ivloaded ? m_aesIv : nullptr) != RET_OK)
             {
                 segment->Unlock();
                 return RET_ERROR;
@@ -835,13 +835,13 @@ public:
         int padding = max(0, AES_BLOCK_SIZE - (line.size() - 2));
         QByteArray ba = QByteArray(padding, 0x0);
         ba.append(QByteArray::fromHex(QByteArray(line.toLatin1().constData() + 2)));
-        memcpy(m_AESIV, ba.constData(), ba.size());
+        memcpy(m_aesIv, ba.constData(), ba.size());
         m_ivloaded = true;
         return true;
     }
     uint8_t *AESIV(void)
     {
-        return m_AESIV;
+        return m_aesIv;
     }
     void SetKeyPath(const QString &x)
     {
@@ -851,7 +851,7 @@ public:
 private:
     QString     m_keypath;              // URL path of the encrypted key
     bool        m_ivloaded       {false};
-    uint8_t     m_AESIV[AES_BLOCK_SIZE]{0};// IV used when decypher the block
+    uint8_t     m_aesIv[AES_BLOCK_SIZE]{0};// IV used when decypher the block
 #endif
 
 private:

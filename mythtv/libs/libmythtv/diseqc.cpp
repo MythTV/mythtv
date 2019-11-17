@@ -1386,10 +1386,10 @@ bool DiSEqCDevSwitch::ExecuteLegacy(const DiSEqCDevSettings &settings,
     (void) pos;
 
 #if defined(USING_DVB) && defined(FE_DISHNETWORK_SEND_LEGACY_CMD)
-    static const unsigned char sw21_cmds[]   = { 0x34, 0x65, };
-    static const unsigned char sw42_cmds[]   = { 0x46, 0x17, };
-    static const unsigned char sw64_v_cmds[] = { 0x39, 0x4b, 0x0d, };
-    static const unsigned char sw64_h_cmds[] = { 0x1a, 0x5c, 0x2e, };
+    static const unsigned char kSw21Cmds[]  = { 0x34, 0x65, };
+    static const unsigned char kSw42Cmds[]  = { 0x46, 0x17, };
+    static const unsigned char kSw64VCmds[] = { 0x39, 0x4b, 0x0d, };
+    static const unsigned char kSw64HCmds[] = { 0x1a, 0x5c, 0x2e, };
 
     const unsigned char *cmds = nullptr;
     unsigned char horizcmd = 0x00;
@@ -1405,20 +1405,20 @@ bool DiSEqCDevSwitch::ExecuteLegacy(const DiSEqCDevSettings &settings,
     switch (m_type)
     {
         case kTypeLegacySW21:
-            cmds = sw21_cmds;
+            cmds = kSw21Cmds;
             num_ports = 2;
             if (horizontal)
                 horizcmd = 0x80;
             break;
         case kTypeLegacySW42:
-            cmds = sw42_cmds;
+            cmds = kSw42Cmds;
             num_ports = 2;
             break;
         case kTypeLegacySW64:
             if (horizontal)
-                cmds = sw64_h_cmds;
+                cmds = kSw64HCmds;
             else
-                cmds = sw64_v_cmds;
+                cmds = kSw64VCmds;
             num_ports = 3;
             break;
         default:

@@ -1465,8 +1465,8 @@ void MythRAOPConnection::FinishResponse(_NetStream *stream, QTcpSocket *socket,
  */
 RSA *MythRAOPConnection::LoadKey(void)
 {
-    static QMutex lock;
-    QMutexLocker locker(&lock);
+    static QMutex s_lock;
+    QMutexLocker locker(&s_lock);
 
     if (g_rsa)
         return g_rsa;

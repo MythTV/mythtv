@@ -361,36 +361,36 @@ class MuxDBStorage : public SimpleDBStorage
 {
   protected:
     MuxDBStorage(StorageUser *_setting, const MultiplexID *_id, const QString& _name) :
-        SimpleDBStorage(_setting, "dtv_multiplex", _name), mplexid(_id)
+        SimpleDBStorage(_setting, "dtv_multiplex", _name), m_mplexId(_id)
     {
     }
 
     QString GetSetClause(MSqlBindings &bindings) const override; // SimpleDBStorage
     QString GetWhereClause(MSqlBindings &bindings) const override; // SimpleDBStorage
 
-    const MultiplexID *mplexid;
+    const MultiplexID *m_mplexId;
 };
 
 QString MuxDBStorage::GetWhereClause(MSqlBindings &bindings) const
 {
-    QString muxTag = ":WHERE" + mplexid->GetColumnName().toUpper();
+    QString muxTag = ":WHERE" + m_mplexId->GetColumnName().toUpper();
 
-    bindings.insert(muxTag, mplexid->getValue());
+    bindings.insert(muxTag, m_mplexId->getValue());
 
     // return query
-    return mplexid->GetColumnName() + " = " + muxTag;
+    return m_mplexId->GetColumnName() + " = " + muxTag;
 }
 
 QString MuxDBStorage::GetSetClause(MSqlBindings &bindings) const
 {
-    QString muxTag  = ":SET" + mplexid->GetColumnName().toUpper();
+    QString muxTag  = ":SET" + m_mplexId->GetColumnName().toUpper();
     QString nameTag = ":SET" + GetColumnName().toUpper();
 
-    bindings.insert(muxTag,  mplexid->getValue());
+    bindings.insert(muxTag,  m_mplexId->getValue());
     bindings.insert(nameTag, m_user->GetDBValue());
 
     // return query
-    return (mplexid->GetColumnName() + " = " + muxTag + ", " +
+    return (m_mplexId->GetColumnName() + " = " + muxTag + ", " +
             GetColumnName()   + " = " + nameTag);
 }
 

@@ -57,35 +57,34 @@ class LFDPriv
             delete (*it);
         m_devices.clear();
 
-        if (m_port_handler_thread)
+        if (m_portHandlerThread)
         {
-            m_port_handler_thread->wait();
-            delete m_port_handler_thread;
+            m_portHandlerThread->wait();
+            delete m_portHandlerThread;
         }
     }
 
     uint             m_generation              {0};
-    bool             m_reset_timer_on          {false};
-    MythTimer        m_reset_timer;
+    bool             m_resetTimerOn            {false};
+    MythTimer        m_resetTimer;
 
-    bool             m_run_port_handler        {false};
-    bool             m_is_port_handler_running {false};
-    QWaitCondition   m_port_handler_wait;
-    QMutex           m_start_stop_port_handler_lock;
+    bool             m_runPortHandler          {false};
+    bool             m_isPortHandlerRunning    {false};
+    QWaitCondition   m_portHandlerWait;
+    QMutex           m_startStopPortHandlerLock;
 
     iec61883_mpeg2_t m_avstream                {nullptr};
     int              m_channel                 {-1};
-    int              m_output_plug             {-1};
-    int              m_input_plug              {-1};
+    int              m_outputPlug              {-1};
+    int              m_inputPlug               {-1};
     int              m_bandwidth               {0};
-    uint             m_no_data_cnt             {0};
+    uint             m_noDataCnt               {0};
 
-    bool             m_is_p2p_node_open        {false};
-    bool             m_is_bcast_node_open      {false};
-    bool             m_is_streaming            {false};
+    bool             m_isP2pNodeOpen           {false};
+    bool             m_isBcastNodeOpen         {false};
+    bool             m_isStreaming             {false};
 
-    QDateTime        m_stop_streaming_timer;
-    MThread         *m_port_handler_thread     {nullptr};
+    MThread         *m_portHandlerThread       {nullptr};
 
     avcinfo_list_t   m_devices;
 
@@ -168,8 +167,8 @@ void LinuxFirewireDevice::SignalReset(uint generation)
     UpdateDeviceList();
     LOG(VB_GENERAL, LOG_INFO, loc + ": Updating device list -- end");
 
-    m_priv->m_reset_timer_on = true;
-    m_priv->m_reset_timer.start();
+    m_priv->m_resetTimerOn = true;
+    m_priv->m_resetTimer.start();
 }
 
 void LinuxFirewireDevice::HandleBusReset(void)
@@ -179,7 +178,7 @@ void LinuxFirewireDevice::HandleBusReset(void)
     if (!GetInfoPtr() || !GetInfoPtr()->m_fw_handle)
         return;
 
-    if (m_priv->m_is_p2p_node_open)
+    if (m_priv->m_isP2pNodeOpen)
     {
         LOG(VB_GENERAL, LOG_INFO, loc + ": Reconnecting P2P connection");
         nodeid_t output = GetInfoPtr()->GetNode() | 0xffc0;
@@ -187,8 +186,8 @@ void LinuxFirewireDevice::HandleBusReset(void)
 
         int fwchan = iec61883_cmp_reconnect(
             GetInfoPtr()->m_fw_handle,
-            output, &m_priv->m_output_plug,
-            input,  &m_priv->m_input_plug,
+            output, &m_priv->m_outputPlug,
+            input,  &m_priv->m_inputPlug,
             &m_priv->m_bandwidth, m_priv->m_channel);
 
         if (fwchan < 0)
@@ -208,7 +207,7 @@ void LinuxFirewireDevice::HandleBusReset(void)
                 .arg(fwchan).arg(output,0,16).arg(input,0,16));
     }
 
-    if (m_priv->m_is_bcast_node_open)
+    if (m_priv->m_isBcastNodeOpen)
     {
         nodeid_t output = GetInfoPtr()->GetNode() | 0xffc0;
 
@@ -218,7 +217,7 @@ void LinuxFirewireDevice::HandleBusReset(void)
 
         int err = iec61883_cmp_create_bcast_output(
             GetInfoPtr()->m_fw_handle,
-            output, m_priv->m_output_plug,
+            output, m_priv->m_outputPlug,
             m_priv->m_channel, m_speed);
 
         if (err < 0)
@@ -231,7 +230,7 @@ void LinuxFirewireDevice::HandleBusReset(void)
 bool LinuxFirewireDevice::OpenPort(void)
 {
     LOG(VB_RECORD, LOG_INFO, LOC + "Starting Port Handler Thread");
-    QMutexLocker locker(&m_priv->m_start_stop_port_handler_lock);
+    QMutexLocker locker(&m_priv->m_startStopPortHandlerLock);
     LOG(VB_RECORD, LOG_INFO, LOC + "Starting Port Handler Thread -- locked");
 
     LOG(VB_RECORD, LOG_INFO, LOC + "OpenPort()");
@@ -272,14 +271,14 @@ bool LinuxFirewireDevice::OpenPort(void)
         return false;
     }
 
-    m_priv->m_run_port_handler = true;
+    m_priv->m_runPortHandler = true;
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Starting port handler thread");
-    m_priv->m_port_handler_thread = new MThread("LinuxController", this);
-    m_priv->m_port_handler_thread->start();
+    m_priv->m_portHandlerThread = new MThread("LinuxController", this);
+    m_priv->m_portHandlerThread->start();
 
-    while (!m_priv->m_is_port_handler_running)
-        m_priv->m_port_handler_wait.wait(mlocker.mutex(), 100);
+    while (!m_priv->m_isPortHandlerRunning)
+        m_priv->m_portHandlerWait.wait(mlocker.mutex(), 100);
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Port handler thread started");
 
@@ -291,7 +290,7 @@ bool LinuxFirewireDevice::OpenPort(void)
 bool LinuxFirewireDevice::ClosePort(void)
 {
     LOG(VB_RECORD, LOG_INFO, LOC + "Stopping Port Handler Thread");
-    QMutexLocker locker(&m_priv->m_start_stop_port_handler_lock);
+    QMutexLocker locker(&m_priv->m_startStopPortHandlerLock);
     LOG(VB_RECORD, LOG_INFO, LOC + "Stopping Port Handler Thread -- locked");
 
     QMutexLocker mlocker(&m_lock);
@@ -316,15 +315,15 @@ bool LinuxFirewireDevice::ClosePort(void)
 
         LOG(VB_RECORD, LOG_INFO,
             LOC + "Waiting for port handler thread to stop");
-        m_priv->m_run_port_handler = false;
-        m_priv->m_port_handler_wait.wakeAll();
+        m_priv->m_runPortHandler = false;
+        m_priv->m_portHandlerWait.wakeAll();
 
         mlocker.unlock();
-        m_priv->m_port_handler_thread->wait();
+        m_priv->m_portHandlerThread->wait();
         mlocker.relock();
 
-        delete m_priv->m_port_handler_thread;
-        m_priv->m_port_handler_thread = nullptr;
+        delete m_priv->m_portHandlerThread;
+        m_priv->m_portHandlerThread = nullptr;
 
         LOG(VB_RECORD, LOG_INFO, LOC + "Joined port handler thread");
 
@@ -395,10 +394,10 @@ bool LinuxFirewireDevice::OpenNode(void)
 
 bool LinuxFirewireDevice::CloseNode(void)
 {
-    if (m_priv->m_is_p2p_node_open)
+    if (m_priv->m_isP2pNodeOpen)
         return CloseP2PNode();
 
-    if (m_priv->m_is_bcast_node_open)
+    if (m_priv->m_isBcastNodeOpen)
         return CloseBroadcastNode();
 
     return true;
@@ -408,22 +407,22 @@ bool LinuxFirewireDevice::CloseNode(void)
 // a P2P connection first.
 bool LinuxFirewireDevice::OpenP2PNode(void)
 {
-    if (m_priv->m_is_bcast_node_open)
+    if (m_priv->m_isBcastNodeOpen)
         return false;
 
-    if (m_priv->m_is_p2p_node_open)
+    if (m_priv->m_isP2pNodeOpen)
         return true;
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Opening P2P connection");
 
     m_priv->m_bandwidth   = +1; // +1 == allocate bandwidth
-    m_priv->m_output_plug = -1; // -1 == find first online plug
-    m_priv->m_input_plug  = -1; // -1 == find first online plug
+    m_priv->m_outputPlug  = -1; // -1 == find first online plug
+    m_priv->m_inputPlug   = -1; // -1 == find first online plug
     nodeid_t output     = GetInfoPtr()->GetNode() | 0xffc0;
     nodeid_t input      = raw1394_get_local_id(GetInfoPtr()->m_fw_handle);
     m_priv->m_channel     = iec61883_cmp_connect(GetInfoPtr()->m_fw_handle,
-                                                 output, &m_priv->m_output_plug,
-                                                 input,  &m_priv->m_input_plug,
+                                                 output, &m_priv->m_outputPlug,
+                                                 input,  &m_priv->m_inputPlug,
                                                  &m_priv->m_bandwidth);
 
     if (m_priv->m_channel < 0)
@@ -435,14 +434,14 @@ bool LinuxFirewireDevice::OpenP2PNode(void)
         return false;
     }
 
-    m_priv->m_is_p2p_node_open = true;
+    m_priv->m_isP2pNodeOpen = true;
 
     return true;
 }
 
 bool LinuxFirewireDevice::CloseP2PNode(void)
 {
-    if (m_priv->m_is_p2p_node_open && (m_priv->m_channel >= 0))
+    if (m_priv->m_isP2pNodeOpen && (m_priv->m_channel >= 0))
     {
         LOG(VB_RECORD, LOG_INFO, LOC + "Closing P2P connection");
 
@@ -453,14 +452,14 @@ bool LinuxFirewireDevice::CloseP2PNode(void)
         nodeid_t input      = raw1394_get_local_id(GetInfoPtr()->m_fw_handle);
 
         iec61883_cmp_disconnect(GetInfoPtr()->m_fw_handle,
-                                output, m_priv->m_output_plug,
-                                input,  m_priv->m_input_plug,
+                                output, m_priv->m_outputPlug,
+                                input,  m_priv->m_inputPlug,
                                 m_priv->m_channel, m_priv->m_bandwidth);
 
         m_priv->m_channel     = -1;
-        m_priv->m_output_plug = -1;
-        m_priv->m_input_plug  = -1;
-        m_priv->m_is_p2p_node_open = false;
+        m_priv->m_outputPlug  = -1;
+        m_priv->m_inputPlug   = -1;
+        m_priv->m_isP2pNodeOpen = false;
     }
 
     return true;
@@ -468,18 +467,18 @@ bool LinuxFirewireDevice::CloseP2PNode(void)
 
 bool LinuxFirewireDevice::OpenBroadcastNode(void)
 {
-    if (m_priv->m_is_p2p_node_open)
+    if (m_priv->m_isP2pNodeOpen)
         return false;
 
-    if (m_priv->m_is_bcast_node_open)
+    if (m_priv->m_isBcastNodeOpen)
         return true;
 
     if (m_priv->m_avstream)
         CloseAVStream();
 
     m_priv->m_channel     = kBroadcastChannel - GetInfoPtr()->GetNode();
-    m_priv->m_output_plug = 0;
-    m_priv->m_input_plug  = 0;
+    m_priv->m_outputPlug  = 0;
+    m_priv->m_inputPlug   = 0;
     nodeid_t output     = GetInfoPtr()->GetNode() | 0xffc0;
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Opening broadcast connection on " +
@@ -488,7 +487,7 @@ bool LinuxFirewireDevice::OpenBroadcastNode(void)
 
     int err = iec61883_cmp_create_bcast_output(
         GetInfoPtr()->m_fw_handle,
-        output, m_priv->m_output_plug,
+        output, m_priv->m_outputPlug,
         m_priv->m_channel, m_speed);
 
     if (err != 0)
@@ -496,27 +495,27 @@ bool LinuxFirewireDevice::OpenBroadcastNode(void)
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create Broadcast connection");
 
         m_priv->m_channel     = -1;
-        m_priv->m_output_plug = -1;
-        m_priv->m_input_plug  = -1;
+        m_priv->m_outputPlug  = -1;
+        m_priv->m_inputPlug   = -1;
 
         return false;
     }
 
-    m_priv->m_is_bcast_node_open = true;
+    m_priv->m_isBcastNodeOpen = true;
 
     return true;
 }
 
 bool LinuxFirewireDevice::CloseBroadcastNode(void)
 {
-    if (m_priv->m_is_bcast_node_open)
+    if (m_priv->m_isBcastNodeOpen)
     {
         LOG(VB_RECORD, LOG_INFO, LOC + "Closing broadcast connection");
 
         m_priv->m_channel     = -1;
-        m_priv->m_output_plug = -1;
-        m_priv->m_input_plug  = -1;
-        m_priv->m_is_bcast_node_open = false;
+        m_priv->m_outputPlug  = -1;
+        m_priv->m_inputPlug   = -1;
+        m_priv->m_isBcastNodeOpen = false;
     }
     return true;
 }
@@ -569,7 +568,7 @@ bool LinuxFirewireDevice::CloseAVStream(void)
     while (!m_listeners.empty())
         FirewireDevice::RemoveListener(m_listeners[m_listeners.size() - 1]);
 
-    if (m_priv->m_is_streaming)
+    if (m_priv->m_isStreaming)
         StopStreaming();
 
     iec61883_mpeg2_close(m_priv->m_avstream);
@@ -583,31 +582,31 @@ void LinuxFirewireDevice::run(void)
     LOG(VB_RECORD, LOG_INFO, LOC + "RunPortHandler -- start");
     m_lock.lock();
     LOG(VB_RECORD, LOG_INFO, LOC + "RunPortHandler -- got first lock");
-    m_priv->m_is_port_handler_running = true;
-    m_priv->m_port_handler_wait.wakeAll();
+    m_priv->m_isPortHandlerRunning = true;
+    m_priv->m_portHandlerWait.wakeAll();
     // we need to unlock & sleep to allow wakeAll to wake other threads.
     m_lock.unlock();
     std::this_thread::sleep_for(std::chrono::microseconds(2500));
     m_lock.lock();
 
-    m_priv->m_no_data_cnt = 0;
-    while (m_priv->m_run_port_handler)
+    m_priv->m_noDataCnt = 0;
+    while (m_priv->m_runPortHandler)
     {
         LFDPriv::s_lock.lock();
-        bool reset_timer_on = m_priv->m_reset_timer_on;
+        bool reset_timer_on = m_priv->m_resetTimerOn;
         bool handle_reset = reset_timer_on &&
-            (m_priv->m_reset_timer.elapsed() > 100);
+            (m_priv->m_resetTimer.elapsed() > 100);
         if (handle_reset)
-            m_priv->m_reset_timer_on = false;
+            m_priv->m_resetTimerOn = false;
         LFDPriv::s_lock.unlock();
 
         if (handle_reset)
             HandleBusReset();
 
-        if (!reset_timer_on && m_priv->m_is_streaming &&
-            (m_priv->m_no_data_cnt > (kResetTimeout / kNoDataTimeout)))
+        if (!reset_timer_on && m_priv->m_isStreaming &&
+            (m_priv->m_noDataCnt > (kResetTimeout / kNoDataTimeout)))
         {
-            m_priv->m_no_data_cnt = 0;
+            m_priv->m_noDataCnt = 0;
             ResetBus();
         }
 
@@ -616,9 +615,9 @@ void LinuxFirewireDevice::run(void)
         {
             // We unlock here because this can take a long time
             // and we don't want to block other actions.
-            m_priv->m_port_handler_wait.wait(&m_lock, kNoDataTimeout);
+            m_priv->m_portHandlerWait.wait(&m_lock, kNoDataTimeout);
 
-            m_priv->m_no_data_cnt += (m_priv->m_is_streaming) ? 1 : 0;
+            m_priv->m_noDataCnt += (m_priv->m_isStreaming) ? 1 : 0;
             continue;
         }
 
@@ -630,12 +629,12 @@ void LinuxFirewireDevice::run(void)
         bool ready = has_data(fwfd, kNoDataTimeout);
         m_lock.lock();
 
-        if (!ready && m_priv->m_is_streaming)
+        if (!ready && m_priv->m_isStreaming)
         {
-            m_priv->m_no_data_cnt++;
+            m_priv->m_noDataCnt++;
 
             LOG(VB_GENERAL, LOG_WARNING, LOC + QString("No Input in %1 msec...")
-                    .arg(m_priv->m_no_data_cnt * kNoDataTimeout));
+                    .arg(m_priv->m_noDataCnt * kNoDataTimeout));
         }
 
         // Confirm that we won't block, now that we have the lock...
@@ -654,16 +653,16 @@ void LinuxFirewireDevice::run(void)
         }
     }
 
-    m_priv->m_is_port_handler_running = false;
-    m_priv->m_port_handler_wait.wakeAll();
+    m_priv->m_isPortHandlerRunning = false;
+    m_priv->m_portHandlerWait.wakeAll();
     m_lock.unlock();
     LOG(VB_RECORD, LOG_INFO, LOC + "RunPortHandler -- end");
 }
 
 bool LinuxFirewireDevice::StartStreaming(void)
 {
-    if (m_priv->m_is_streaming)
-        return m_priv->m_is_streaming;
+    if (m_priv->m_isStreaming)
+        return m_priv->m_isStreaming;
 
     if (!IsAVStreamOpen() && !OpenAVStream())
         return false;
@@ -678,7 +677,7 @@ bool LinuxFirewireDevice::StartStreaming(void)
 
     if (iec61883_mpeg2_recv_start(m_priv->m_avstream, m_priv->m_channel) == 0)
     {
-        m_priv->m_is_streaming = true;
+        m_priv->m_isStreaming = true;
     }
     else
     {
@@ -687,16 +686,16 @@ bool LinuxFirewireDevice::StartStreaming(void)
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Starting A/V streaming -- done");
 
-    return m_priv->m_is_streaming;
+    return m_priv->m_isStreaming;
 }
 
 bool LinuxFirewireDevice::StopStreaming(void)
 {
-    if (m_priv->m_is_streaming)
+    if (m_priv->m_isStreaming)
     {
         LOG(VB_RECORD, LOG_INFO, LOC + "Stopping A/V streaming -- really");
 
-        m_priv->m_is_streaming = false;
+        m_priv->m_isStreaming = false;
 
         iec61883_mpeg2_recv_stop(m_priv->m_avstream);
 
@@ -757,7 +756,7 @@ bool LinuxFirewireDevice::SetAVStreamSpeed(uint speed)
 
 bool LinuxFirewireDevice::IsNodeOpen(void) const
 {
-    return m_priv->m_is_p2p_node_open || m_priv->m_is_bcast_node_open;
+    return m_priv->m_isP2pNodeOpen || m_priv->m_isBcastNodeOpen;
 }
 
 bool LinuxFirewireDevice::IsAVStreamOpen(void) const
@@ -841,17 +840,17 @@ vector<AVCInfo> LinuxFirewireDevice::GetSTBListPrivate(void)
 
 typedef struct
 {
-    raw1394handle_t handle;
-    int port;
-    int node;
+    raw1394handle_t m_handle;
+    int             m_port;
+    int             m_node;
 } dev_item;
 
 bool LinuxFirewireDevice::UpdateDeviceList(void)
 {
     dev_item item;
 
-    item.handle = raw1394_new_handle();
-    if (!item.handle)
+    item.m_handle = raw1394_new_handle();
+    if (!item.m_handle)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("LinuxFirewireDevice: ") +
                 "Couldn't get handle" + ENO);
@@ -859,57 +858,57 @@ bool LinuxFirewireDevice::UpdateDeviceList(void)
     }
 
     struct raw1394_portinfo port_info[16];
-    int numcards = raw1394_get_port_info(item.handle, port_info, 16);
+    int numcards = raw1394_get_port_info(item.m_handle, port_info, 16);
     if (numcards < 1)
     {
-        raw1394_destroy_handle(item.handle);
+        raw1394_destroy_handle(item.m_handle);
         return true;
     }
 
     map<uint64_t,bool> guid_online;
     for (int port = 0; port < numcards; port++)
     {
-        if (raw1394_set_port(item.handle, port) < 0)
+        if (raw1394_set_port(item.m_handle, port) < 0)
         {
             LOG(VB_GENERAL, LOG_ERR, QString("LinuxFirewireDevice: "
                     "Couldn't set port to %1").arg(port));
             continue;
         }
 
-        for (int node = 0; node < raw1394_get_nodecount(item.handle); node++)
+        for (int node = 0; node < raw1394_get_nodecount(item.m_handle); node++)
         {
             uint64_t guid;
 
-            guid = rom1394_get_guid(item.handle, node);
-            item.port = port;
-            item.node = node;
+            guid = rom1394_get_guid(item.m_handle, node);
+            item.m_port = port;
+            item.m_node = node;
             UpdateDeviceListItem(guid, &item);
             guid_online[guid] = true;
         }
 
-        raw1394_destroy_handle(item.handle);
+        raw1394_destroy_handle(item.m_handle);
 
-        item.handle = raw1394_new_handle();
-        if (!item.handle)
+        item.m_handle = raw1394_new_handle();
+        if (!item.m_handle)
         {
             LOG(VB_GENERAL, LOG_ERR, QString("LinuxFirewireDevice: ") +
                     "Couldn't get handle " +
                 QString("(after setting port %1").arg(port) + ENO);
-            item.handle = nullptr;
+            item.m_handle = nullptr;
             break;
         }
 
-        numcards = raw1394_get_port_info(item.handle, port_info, 16);
+        numcards = raw1394_get_port_info(item.m_handle, port_info, 16);
     }
 
-    if (item.handle)
+    if (item.m_handle)
     {
-        raw1394_destroy_handle(item.handle);
-        item.handle = nullptr;
+        raw1394_destroy_handle(item.m_handle);
+        item.m_handle = nullptr;
     }
 
-    item.port = -1;
-    item.node = -1;
+    item.m_port = -1;
+    item.m_node = -1;
     avcinfo_list_t::iterator it = m_priv->m_devices.begin();
     for (; it != m_priv->m_devices.end(); ++it)
     {
@@ -939,9 +938,9 @@ void LinuxFirewireDevice::UpdateDeviceListItem(uint64_t guid, void *pitem)
         dev_item &item = *((dev_item*) pitem);
         LOG(VB_RECORD, LOG_INFO,
             LOC + QString("Updating 0x%1 port: %2 node: %3")
-                .arg(guid,0,16).arg(item.port).arg(item.node));
+                .arg(guid,0,16).arg(item.m_port).arg(item.m_node));
 
-        (*it)->Update(guid, item.handle, item.port, item.node);
+        (*it)->Update(guid, item.m_handle, item.m_port, item.m_node);
     }
 }
 
@@ -1004,8 +1003,8 @@ static QString speed_to_string(uint speed)
     if (speed > 3)
         return QString("Invalid Speed (%1)").arg(speed);
 
-    static const uint speeds[] = { 100, 200, 400, 800 };
-    return QString("%1Mbps").arg(speeds[speed]);
+    static constexpr uint kSpeeds[] = { 100, 200, 400, 800 };
+    return QString("%1Mbps").arg(kSpeeds[speed]);
 }
 
 static int linux_firewire_device_bus_reset_handler(

@@ -117,26 +117,26 @@ typedef struct Fractal_Struct FRACTAL;
 struct Similitude_Struct
 {
 
-	DBL     c_x, c_y;
-	DBL     r, r2, A, A2;
-	F_PT    Ct, St, Ct2, St2;
-	F_PT    Cx, Cy;
-	F_PT    R, R2;
+	DBL     m_dCx, m_dCy;
+	DBL     m_dR, m_dR2, m_dA, m_dA2;
+	F_PT    m_fCt, m_fSt, m_fCt2, m_fSt2;
+	F_PT    m_fCx, m_fCy;
+	F_PT    m_fR, m_fR2;
 };
 
 
 struct Fractal_Struct
 {
 
-	int     Nb_Simi;
-	SIMI    Components[5 * MAX_SIMI];
-	int     Depth, Col;
-	int     Count, Speed;
-	int     Width, Height, Lx, Ly;
-	DBL     r_mean, dr_mean, dr2_mean;
-	int     Cur_Pt, Max_Pt;
+	int     m_nbSimi;
+	SIMI    m_components[5 * MAX_SIMI];
+	int     m_depth, m_col;
+	int     m_count, m_speed;
+	int     m_width, m_height, m_lx, m_ly;
+	DBL     m_rMean, m_drMean, m_dr2Mean;
+	int     m_curPt, m_maxPt;
 
-	IFSPoint *Buffer1, *Buffer2;
+	IFSPoint *m_buffer1, *m_buffer2;
 //      Pixmap      dbuf;
 //      GC          dbuf_gc;
 };
@@ -175,12 +175,12 @@ static void
 Random_Simis (FRACTAL * F, SIMI * Cur, int i)
 {
 	while (i--) {
-		Cur->c_x = Gauss_Rand (0.0, .8, 4.0);
-		Cur->c_y = Gauss_Rand (0.0, .8, 4.0);
-		Cur->r = Gauss_Rand (F->r_mean, F->dr_mean, 3.0);
-		Cur->r2 = Half_Gauss_Rand (0.0, F->dr2_mean, 2.0);
-		Cur->A = Gauss_Rand (0.0, 360.0, 4.0) * (M_PI / 180.0);
-		Cur->A2 = Gauss_Rand (0.0, 360.0, 4.0) * (M_PI / 180.0);
+		Cur->m_dCx = Gauss_Rand (0.0, .8, 4.0);
+		Cur->m_dCy = Gauss_Rand (0.0, .8, 4.0);
+		Cur->m_dR = Gauss_Rand (F->m_rMean, F->m_drMean, 3.0);
+		Cur->m_dR2 = Half_Gauss_Rand (0.0, F->m_dr2Mean, 2.0);
+		Cur->m_dA = Gauss_Rand (0.0, 360.0, 4.0) * (M_PI / 180.0);
+		Cur->m_dA2 = Gauss_Rand (0.0, 360.0, 4.0) * (M_PI / 180.0);
 		Cur++;
 	}
 }
@@ -188,13 +188,13 @@ Random_Simis (FRACTAL * F, SIMI * Cur, int i)
 static void
 free_ifs_buffers (FRACTAL * Fractal)
 {
-	if (Fractal->Buffer1 != NULL) {
-		(void) free ((void *) Fractal->Buffer1);
-		Fractal->Buffer1 = (IFSPoint *) NULL;
+	if (Fractal->m_buffer1 != NULL) {
+		(void) free ((void *) Fractal->m_buffer1);
+		Fractal->m_buffer1 = (IFSPoint *) NULL;
 	}
-	if (Fractal->Buffer2 != NULL) {
-		(void) free ((void *) Fractal->Buffer2);
-		Fractal->Buffer2 = (IFSPoint *) NULL;
+	if (Fractal->m_buffer2 != NULL) {
+		(void) free ((void *) Fractal->m_buffer2);
+		Fractal->m_buffer2 = (IFSPoint *) NULL;
 	}
 }
 
@@ -219,8 +219,8 @@ init_ifs (int width, int height)
 		Root = (FRACTAL *) malloc (sizeof (FRACTAL));
 		if (Root == NULL)
 			return;
-		Root->Buffer1 = (IFSPoint *) NULL;
-		Root->Buffer2 = (IFSPoint *) NULL;
+		Root->m_buffer1 = (IFSPoint *) NULL;
+		Root->m_buffer2 = (IFSPoint *) NULL;
 	}
 	Fractal = Root;
 
@@ -231,69 +231,69 @@ init_ifs (int width, int height)
 	i = (NRAND (4)) + 2;					/* Number of centers */
 	switch (i) {
 	case 3:
-		Fractal->Depth = MAX_DEPTH_3;
-		Fractal->r_mean = .6;
-		Fractal->dr_mean = .4;
-		Fractal->dr2_mean = .3;
+		Fractal->m_depth = MAX_DEPTH_3;
+		Fractal->m_rMean = .6;
+		Fractal->m_drMean = .4;
+		Fractal->m_dr2Mean = .3;
 		break;
 
 	case 4:
-		Fractal->Depth = MAX_DEPTH_4;
-		Fractal->r_mean = .5;
-		Fractal->dr_mean = .4;
-		Fractal->dr2_mean = .3;
+		Fractal->m_depth = MAX_DEPTH_4;
+		Fractal->m_rMean = .5;
+		Fractal->m_drMean = .4;
+		Fractal->m_dr2Mean = .3;
 		break;
 
 	case 5:
-		Fractal->Depth = MAX_DEPTH_5;
-		Fractal->r_mean = .5;
-		Fractal->dr_mean = .4;
-		Fractal->dr2_mean = .3;
+		Fractal->m_depth = MAX_DEPTH_5;
+		Fractal->m_rMean = .5;
+		Fractal->m_drMean = .4;
+		Fractal->m_dr2Mean = .3;
 		break;
 
 	default:
 	case 2:
-		Fractal->Depth = MAX_DEPTH_2;
-		Fractal->r_mean = .7;
-		Fractal->dr_mean = .3;
-		Fractal->dr2_mean = .4;
+		Fractal->m_depth = MAX_DEPTH_2;
+		Fractal->m_rMean = .7;
+		Fractal->m_drMean = .3;
+		Fractal->m_dr2Mean = .4;
 		break;
 	}
 //      fprintf( stderr, "N=%d\n", i );
-	Fractal->Nb_Simi = i;
-	Fractal->Max_Pt = Fractal->Nb_Simi - 1;
-	for (i = 0; i <= Fractal->Depth + 2; ++i)
-		Fractal->Max_Pt *= Fractal->Nb_Simi;
+	Fractal->m_nbSimi = i;
+	Fractal->m_maxPt = Fractal->m_nbSimi - 1;
+	for (i = 0; i <= Fractal->m_depth + 2; ++i)
+		Fractal->m_maxPt *= Fractal->m_nbSimi;
 
-	if ((Fractal->Buffer1 = (IFSPoint *) calloc (Fractal->Max_Pt,
+	if ((Fractal->m_buffer1 = (IFSPoint *) calloc (Fractal->m_maxPt,
 																							 sizeof (IFSPoint))) == NULL) {
 		free_ifs (Fractal);
 		return;
 	}
-	if ((Fractal->Buffer2 = (IFSPoint *) calloc (Fractal->Max_Pt,
+	if ((Fractal->m_buffer2 = (IFSPoint *) calloc (Fractal->m_maxPt,
 																							 sizeof (IFSPoint))) == NULL) {
 		free_ifs (Fractal);
 		return;
 	}
 
 //      printf ("--ifs setting params\n");
-	Fractal->Speed = 6;
-	Fractal->Width = width;				/* modif by JeKo */
-	Fractal->Height = height;			/* modif by JeKo */
-	Fractal->Cur_Pt = 0;
-	Fractal->Count = 0;
-	Fractal->Lx = (Fractal->Width - 1) / 2;
-	Fractal->Ly = (Fractal->Height - 1) / 2;
-	Fractal->Col = rand () % (width * height);	/* modif by JeKo */
+	Fractal->m_speed = 6;
+	Fractal->m_width = width;			/* modif by JeKo */
+	Fractal->m_height = height;			/* modif by JeKo */
+	Fractal->m_curPt = 0;
+	Fractal->m_count = 0;
+	Fractal->m_lx = (Fractal->m_width - 1) / 2;
+	Fractal->m_ly = (Fractal->m_height - 1) / 2;
+	Fractal->m_col = rand () % (width * height);	/* modif by JeKo */
 
-	Random_Simis (Fractal, Fractal->Components, 5 * MAX_SIMI);
+	Random_Simis (Fractal, Fractal->m_components, 5 * MAX_SIMI);
 
 	/* 
 	 * #ifndef NO_DBUF
 	 * if (Fractal->dbuf != None)
 	 * XFreePixmap(display, Fractal->dbuf);
 	 * Fractal->dbuf = XCreatePixmap(display, window,
-	 * Fractal->Width, Fractal->Height, 1);
+	 * Fractal->m_width, Fractal->m_height, 1);
 	 * * Allocation checked *
 	 * if (Fractal->dbuf != None) {
 	 * XGCValues   gcv;
@@ -312,7 +312,7 @@ init_ifs (int width, int height)
 	 * Fractal->dbuf = None;
 	 * } else {
 	 * XFillRectangle(display, Fractal->dbuf,
-	 * Fractal->dbuf_gc, 0, 0, Fractal->Width, Fractal->Height);
+	 * Fractal->dbuf_gc, 0, 0, Fractal->m_width, Fractal->m_height);
 	 * XSetBackground(display, gc, MI_BLACK_PIXEL(mi));
 	 * XSetFunction(display, gc, GXcopy);
 	 * }
@@ -339,20 +339,20 @@ Transform (SIMI * Simi, F_PT xo, F_PT yo, F_PT * x, F_PT * y)
 {
 	F_PT    xx, yy;
 
-	xo = xo - Simi->Cx;
-	xo = (xo * Simi->R) / UNIT;
-	yo = yo - Simi->Cy;
-	yo = (yo * Simi->R) / UNIT;
+	xo = xo - Simi->m_fCx;
+	xo = (xo * Simi->m_fR) / UNIT;
+	yo = yo - Simi->m_fCy;
+	yo = (yo * Simi->m_fR) / UNIT;
 
-	xx = xo - Simi->Cx;
-	xx = (xx * Simi->R2) / UNIT;
-	yy = -yo - Simi->Cy;
-	yy = (yy * Simi->R2) / UNIT;
+	xx = xo - Simi->m_fCx;
+	xx = (xx * Simi->m_fR2) / UNIT;
+	yy = -yo - Simi->m_fCy;
+	yy = (yy * Simi->m_fR2) / UNIT;
 
 	*x =
-		((xo * Simi->Ct - yo * Simi->St + xx * Simi->Ct2 - yy * Simi->St2) / UNIT ) + Simi->Cx;
+		((xo * Simi->m_fCt - yo * Simi->m_fSt + xx * Simi->m_fCt2 - yy * Simi->m_fSt2) / UNIT ) + Simi->m_fCx;
 	*y =
-		((xo * Simi->St + yo * Simi->Ct + xx * Simi->St2 + yy * Simi->Ct2) / UNIT ) + Simi->Cy;
+		((xo * Simi->m_fSt + yo * Simi->m_fCt + xx * Simi->m_fSt2 + yy * Simi->m_fCt2) / UNIT ) + Simi->m_fCy;
 }
 
 /***************************************************************/
@@ -363,20 +363,20 @@ Trace (FRACTAL * F, F_PT xo, F_PT yo)
 	F_PT    x, y, i;
 	SIMI   *Cur;
 
-	Cur = Cur_F->Components;
-	for (i = Cur_F->Nb_Simi; i; --i, Cur++) {
+	Cur = Cur_F->m_components;
+	for (i = Cur_F->m_nbSimi; i; --i, Cur++) {
 		Transform (Cur, xo, yo, &x, &y);
 
-		Buf->x = F->Lx + ((x * F->Lx) / (UNIT*2) );
-		Buf->y = F->Ly - ((y * F->Ly) / (UNIT*2) );
+		Buf->x = F->m_lx + ((x * F->m_lx) / (UNIT*2) );
+		Buf->y = F->m_ly - ((y * F->m_ly) / (UNIT*2) );
 		Buf++;
 
 		Cur_Pt++;
 
-		if (F->Depth && ((x - xo) / 16) && ((y - yo) / 16)) {
-			F->Depth--;
+		if (F->m_depth && ((x - xo) / 16) && ((y - yo) / 16)) {
+			F->m_depth--;
 			Trace (F, x, y);
-			F->Depth++;
+			F->m_depth++;
 		}
 	}
 }
@@ -389,28 +389,28 @@ Draw_Fractal ( void /* ModeInfo * mi */ )
 	F_PT    x, y;
 	SIMI   *Cur, *Simi;
 
-	for (Cur = F->Components, i = F->Nb_Simi; i; --i, Cur++) {
-		Cur->Cx = DBL_To_F_PT (Cur->c_x);
-		Cur->Cy = DBL_To_F_PT (Cur->c_y);
+	for (Cur = F->m_components, i = F->m_nbSimi; i; --i, Cur++) {
+		Cur->m_fCx = DBL_To_F_PT (Cur->m_dCx);
+		Cur->m_fCy = DBL_To_F_PT (Cur->m_dCy);
 
-		Cur->Ct = DBL_To_F_PT (cos (Cur->A));
-		Cur->St = DBL_To_F_PT (sin (Cur->A));
-		Cur->Ct2 = DBL_To_F_PT (cos (Cur->A2));
-		Cur->St2 = DBL_To_F_PT (sin (Cur->A2));
+		Cur->m_fCt = DBL_To_F_PT (cos (Cur->m_dA));
+		Cur->m_fSt = DBL_To_F_PT (sin (Cur->m_dA));
+		Cur->m_fCt2 = DBL_To_F_PT (cos (Cur->m_dA2));
+		Cur->m_fSt2 = DBL_To_F_PT (sin (Cur->m_dA2));
 
-		Cur->R = DBL_To_F_PT (Cur->r);
-		Cur->R2 = DBL_To_F_PT (Cur->r2);
+		Cur->m_fR = DBL_To_F_PT (Cur->m_dR);
+		Cur->m_fR2 = DBL_To_F_PT (Cur->m_dR2);
 	}
 
 
 	Cur_Pt = 0;
 	Cur_F = F;
-	Buf = F->Buffer2;
-	for (Cur = F->Components, i = F->Nb_Simi; i; --i, Cur++) {
+	Buf = F->m_buffer2;
+	for (Cur = F->m_components, i = F->m_nbSimi; i; --i, Cur++) {
         F_PT xo, yo;
-		xo = Cur->Cx;
-		yo = Cur->Cy;
-		for (Simi = F->Components, j = F->Nb_Simi; j; --j, Simi++) {
+		xo = Cur->m_fCx;
+		yo = Cur->m_fCy;
+		for (Simi = F->m_components, j = F->m_nbSimi; j; --j, Simi++) {
 			if (Simi == Cur)
 				continue;
 			Transform (Simi, xo, yo, &x, &y);
@@ -420,17 +420,17 @@ Draw_Fractal ( void /* ModeInfo * mi */ )
 
 	/* Erase previous */
 
-/*	if (F->Cur_Pt) {
+/*	if (F->m_curPt) {
 		XSetForeground(display, gc, MI_BLACK_PIXEL(mi));
 		if (F->dbuf != None) {
 			XSetForeground(display, F->dbuf_gc, 0);
 */
-	/* XDrawPoints(display, F->dbuf, F->dbuf_gc, F->Buffer1, F->Cur_Pt, * * * * 
+	/* XDrawPoints(display, F->dbuf, F->dbuf_gc, F->m_buffer1, F->m_curPt, * * * * 
 	 * CoordModeOrigin); */
 /*			XFillRectangle(display, F->dbuf, F->dbuf_gc, 0, 0,
-				       F->Width, F->Height);
+				       F->m_width, F->m_height);
 		} else
-			XDrawPoints(display, window, gc, F->Buffer1, F->Cur_Pt, CoordModeOrigin);
+			XDrawPoints(display, window, gc, F->m_buffer1, F->m_curPt, CoordModeOrigin);
 	}
 	if (MI_NPIXELS(mi) < 2)
 		XSetForeground(display, gc, MI_WHITE_PIXEL(mi));
@@ -439,19 +439,19 @@ Draw_Fractal ( void /* ModeInfo * mi */ )
 	if (Cur_Pt) {
 		if (F->dbuf != None) {
 			XSetForeground(display, F->dbuf_gc, 1);
-			XDrawPoints(display, F->dbuf, F->dbuf_gc, F->Buffer2, Cur_Pt,
+			XDrawPoints(display, F->dbuf, F->dbuf_gc, F->m_buffer2, Cur_Pt,
 				    CoordModeOrigin);
 		} else
-			XDrawPoints(display, window, gc, F->Buffer2, Cur_Pt, CoordModeOrigin);
+			XDrawPoints(display, window, gc, F->m_buffer2, Cur_Pt, CoordModeOrigin);
 	}
 	if (F->dbuf != None)
-		XCopyPlane(display, F->dbuf, window, gc, 0, 0, F->Width, F->Height, 0, 0, 1);
+		XCopyPlane(display, F->dbuf, window, gc, 0, 0, F->m_width, F->m_height, 0, 0, 1);
 */
 
-	F->Cur_Pt = Cur_Pt;
-	Buf = F->Buffer1;
-	F->Buffer1 = F->Buffer2;
-	F->Buffer2 = Buf;
+	F->m_curPt = Cur_Pt;
+	Buf = F->m_buffer1;
+	F->m_buffer1 = F->m_buffer2;
+	F->m_buffer2 = Buf;
 }
 
 
@@ -466,10 +466,10 @@ draw_ifs ( /* ModeInfo * mi */ int *nbPoints)
 	if (Root == NULL)
 		return NULL;
 	F = Root;											// [/*MI_SCREEN(mi)*/0];
-	if (F->Buffer1 == NULL)
+	if (F->m_buffer1 == NULL)
 		return NULL;
 
-	u = (DBL) (F->Count) * (DBL) (F->Speed) / 1000.0;
+	u = (DBL) (F->m_count) * (DBL) (F->m_speed) / 1000.0;
 	uu = u * u;
 	v = 1.0 - u;
 	vv = v * v;
@@ -478,56 +478,56 @@ draw_ifs ( /* ModeInfo * mi */ int *nbPoints)
 	u2 = 3.0 * v * uu;
 	u3 = u * uu;
 
-	S = F->Components;
-	S1 = S + F->Nb_Simi;
-	S2 = S1 + F->Nb_Simi;
-	S3 = S2 + F->Nb_Simi;
-	S4 = S3 + F->Nb_Simi;
+	S = F->m_components;
+	S1 = S + F->m_nbSimi;
+	S2 = S1 + F->m_nbSimi;
+	S3 = S2 + F->m_nbSimi;
+	S4 = S3 + F->m_nbSimi;
 
-	for (i = F->Nb_Simi; i; --i, S++, S1++, S2++, S3++, S4++) {
-		S->c_x = u0 * S1->c_x + u1 * S2->c_x + u2 * S3->c_x + u3 * S4->c_x;
-		S->c_y = u0 * S1->c_y + u1 * S2->c_y + u2 * S3->c_y + u3 * S4->c_y;
-		S->r = u0 * S1->r + u1 * S2->r + u2 * S3->r + u3 * S4->r;
-		S->r2 = u0 * S1->r2 + u1 * S2->r2 + u2 * S3->r2 + u3 * S4->r2;
-		S->A = u0 * S1->A + u1 * S2->A + u2 * S3->A + u3 * S4->A;
-		S->A2 = u0 * S1->A2 + u1 * S2->A2 + u2 * S3->A2 + u3 * S4->A2;
+	for (i = F->m_nbSimi; i; --i, S++, S1++, S2++, S3++, S4++) {
+		S->m_dCx = u0 * S1->m_dCx + u1 * S2->m_dCx + u2 * S3->m_dCx + u3 * S4->m_dCx;
+		S->m_dCy = u0 * S1->m_dCy + u1 * S2->m_dCy + u2 * S3->m_dCy + u3 * S4->m_dCy;
+		S->m_dR  = u0 * S1->m_dR  + u1 * S2->m_dR  + u2 * S3->m_dR  + u3 * S4->m_dR;
+		S->m_dR2 = u0 * S1->m_dR2 + u1 * S2->m_dR2 + u2 * S3->m_dR2 + u3 * S4->m_dR2;
+		S->m_dA  = u0 * S1->m_dA  + u1 * S2->m_dA  + u2 * S3->m_dA  + u3 * S4->m_dA;
+		S->m_dA2 = u0 * S1->m_dA2 + u1 * S2->m_dA2 + u2 * S3->m_dA2 + u3 * S4->m_dA2;
 	}
 
 	// MI_IS_DRAWN(mi) = True;
 
 	Draw_Fractal ( /* mi */ );
 
-	if (F->Count >= 1000 / F->Speed) {
-		S = F->Components;
-		S1 = S + F->Nb_Simi;
-		S2 = S1 + F->Nb_Simi;
-		S3 = S2 + F->Nb_Simi;
-		S4 = S3 + F->Nb_Simi;
+	if (F->m_count >= 1000 / F->m_speed) {
+		S = F->m_components;
+		S1 = S + F->m_nbSimi;
+		S2 = S1 + F->m_nbSimi;
+		S3 = S2 + F->m_nbSimi;
+		S4 = S3 + F->m_nbSimi;
 
-		for (i = F->Nb_Simi; i; --i, S++, S1++, S2++, S3++, S4++) {
-			S2->c_x = 2.0 * S4->c_x - S3->c_x;
-			S2->c_y = 2.0 * S4->c_y - S3->c_y;
-			S2->r = 2.0 * S4->r - S3->r;
-			S2->r2 = 2.0 * S4->r2 - S3->r2;
-			S2->A = 2.0 * S4->A - S3->A;
-			S2->A2 = 2.0 * S4->A2 - S3->A2;
+		for (i = F->m_nbSimi; i; --i, S++, S1++, S2++, S3++, S4++) {
+			S2->m_dCx = 2.0 * S4->m_dCx - S3->m_dCx;
+			S2->m_dCy = 2.0 * S4->m_dCy - S3->m_dCy;
+			S2->m_dR  = 2.0 * S4->m_dR  - S3->m_dR;
+			S2->m_dR2 = 2.0 * S4->m_dR2 - S3->m_dR2;
+			S2->m_dA  = 2.0 * S4->m_dA  - S3->m_dA;
+			S2->m_dA2 = 2.0 * S4->m_dA2 - S3->m_dA2;
 
 			*S1 = *S4;
 		}
-		Random_Simis (F, F->Components + 3 * F->Nb_Simi, F->Nb_Simi);
+		Random_Simis (F, F->m_components + 3 * F->m_nbSimi, F->m_nbSimi);
 
-		Random_Simis (F, F->Components + 4 * F->Nb_Simi, F->Nb_Simi);
+		Random_Simis (F, F->m_components + 4 * F->m_nbSimi, F->m_nbSimi);
 
-		F->Count = 0;
+		F->m_count = 0;
 	}
 	else
-		F->Count++;
+		F->m_count++;
 
-	F->Col++;
+	F->m_col++;
 
 	/* #1 code added by JeKo */
 	(*nbPoints) = Cur_Pt;
-	return F->Buffer2;
+	return F->m_buffer2;
 	/* #1 end */
 }
 

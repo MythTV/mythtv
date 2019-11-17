@@ -841,26 +841,26 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
 
     // Figure out if this was already done for this recording
     bool was_finished = false;
-    static QMutex finRecLock;
-    static QHash<QString,QDateTime> finRecMap;
+    static QMutex s_finRecLock;
+    static QHash<QString,QDateTime> s_finRecMap;
     {
-        QMutexLocker locker(&finRecLock);
+        QMutexLocker locker(&s_finRecLock);
         QDateTime now = MythDate::current();
         QDateTime expired = now.addSecs(-60*5);
-        QHash<QString,QDateTime>::iterator it = finRecMap.begin();
-        while (it != finRecMap.end())
+        QHash<QString,QDateTime>::iterator it = s_finRecMap.begin();
+        while (it != s_finRecMap.end())
         {
             if ((*it) < expired)
-                it = finRecMap.erase(it);
+                it = s_finRecMap.erase(it);
             else
                 ++it;
         }
         QString key = curRec->MakeUniqueKey();
-        it = finRecMap.find(key);
-        if (it != finRecMap.end())
+        it = s_finRecMap.find(key);
+        if (it != s_finRecMap.end())
             was_finished = true;
         else
-            finRecMap[key] = now;
+            s_finRecMap[key] = now;
     }
 
     // Print something informative to the log
@@ -2321,7 +2321,7 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
 #endif
 
     static const uint kSpacerListSize = 5;
-    static const char* spacers[kSpacerListSize] = { "", "_", "-", "#", "." };
+    static const char* s_spacers[kSpacerListSize] = { "", "_", "-", "#", "." };
 
     MSqlQuery query(MSqlQuery::InitCon());
     QString basequery = QString(
@@ -2347,7 +2347,7 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
         for (uint j = 0; j < kSpacerListSize; j++)
         {
             QString qprefix = add_spacer(
-                prefix, (QString(spacers[j]) == "_") ? "\\_" : spacers[j]);
+                prefix, (QString(s_spacers[j]) == "_") ? "\\_" : s_spacers[j]);
             query.prepare(basequery.arg(qprefix) + inputquery[i]);
 
             if (!query.exec() || !query.isActive())
@@ -2361,7 +2361,7 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
                     fchanid.push_back(query.value(0).toUInt());
                     fchannum.push_back(query.value(1).toString());
                     finputid.push_back(query.value(2).toUInt());
-                    fspacer.emplace_back(spacers[j]);
+                    fspacer.emplace_back(s_spacers[j]);
 #if DEBUG_CHANNEL_PREFIX
                     LOG(VB_GENERAL, LOG_DEBUG,
                         QString("(%1,%2) Adding %3 rec %4")

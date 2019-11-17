@@ -443,13 +443,13 @@ void MythVAAPIInteropDRM::CleanupDRMPRIME(void)
 
 bool MythVAAPIInteropDRM::TestPrimeInterop(void)
 {
-    static bool supported = false;
+    static bool s_supported = false;
 #if VA_CHECK_VERSION(1, 1, 0)
-    static bool checked = false;
+    static bool s_checked = false;
 
-    if (checked)
-        return supported;
-    checked = true;
+    if (s_checked)
+        return s_supported;
+    s_checked = true;
 
     OpenGLLocker locker(m_context);
 
@@ -481,11 +481,11 @@ bool MythVAAPIInteropDRM::TestPrimeInterop(void)
 
             if (textures.size() > 0)
             {
-                supported = true;
+                s_supported = true;
                 vector<MythVideoTexture*>::iterator it = textures.begin();
                 for ( ; it != textures.end(); ++it)
                 {
-                    supported &= (*it)->m_data && (*it)->m_textureId;
+                    s_supported &= (*it)->m_data && (*it)->m_textureId;
                     if ((*it)->m_data)
                         m_context->eglDestroyImageKHR(m_context->GetEGLDisplay(), (*it)->m_data);
                     (*it)->m_data = nullptr;
@@ -502,6 +502,6 @@ bool MythVAAPIInteropDRM::TestPrimeInterop(void)
     }
 #endif
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("VAAPI DRM PRIME interop is %1supported")
-        .arg(supported ? "" : "not "));
-    return supported;
+        .arg(s_supported ? "" : "not "));
+    return s_supported;
 }

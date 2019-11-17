@@ -358,11 +358,11 @@ VASurfaceID MythVAAPIInterop::Deinterlace(VideoFrame *Frame, VASurfaceID Current
 
             m_filterWidth = srcframes->width;
             m_filterHeight = srcframes->height;
-            static const int vpppoolsize = 2; // seems to be enough
+            static constexpr int kVppPoolSize = 2; // seems to be enough
             dstframes->sw_format = srcframes->sw_format;
             dstframes->width = m_filterWidth;
             dstframes->height = m_filterHeight;
-            dstframes->initial_pool_size = vpppoolsize;
+            dstframes->initial_pool_size = kVppPoolSize;
             dstframes->format = AV_PIX_FMT_VAAPI;
             dstframes->free = [](AVHWFramesContext*) { LOG(VB_PLAYBACK, LOG_INFO, LOC + "VAAPI VPP frames context finished"); };
 
@@ -376,7 +376,7 @@ VASurfaceID MythVAAPIInterop::Deinterlace(VideoFrame *Frame, VASurfaceID Current
 
             m_vppFramesContext = newframes;
             LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("New VAAPI frame pool with %1 %2x%3 surfaces")
-                .arg(vpppoolsize).arg(m_filterWidth).arg(m_filterHeight));
+                .arg(kVppPoolSize).arg(m_filterWidth).arg(m_filterHeight));
             av_buffer_unref(&hwdeviceref);
 
             if (!MythVAAPIInterop::SetupDeinterlacer(deinterlacer, doublerate, m_vppFramesContext,

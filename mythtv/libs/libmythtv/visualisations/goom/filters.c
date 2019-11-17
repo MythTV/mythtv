@@ -49,8 +49,8 @@ static int zf_use_xmmx = 0;
 static int zf_use_mmx = 0;
 
 static void select_zoom_filter (void) {
-	static int firsttime = 1;
-	if (firsttime){
+	static int s_firsttime = 1;
+	if (s_firsttime){
 		if (zoom_filter_xmmx_supported()) {
 			zf_use_xmmx = 1;
 			printf ("Extended MMX detected. Using the fastest method !\n");
@@ -62,7 +62,7 @@ static void select_zoom_filter (void) {
 		else {
 			printf ("Too bad ! No MMX detected.\n");
 		}
-		firsttime = 0;
+		s_firsttime = 0;
 	}
 }
 
@@ -154,12 +154,12 @@ void getPixelRGB_ (const Uint * buffer, Uint x, Color * c);
 void
 generatePrecalCoef ()
 {
-	static int firstime = 1;
+	static int s_firstime = 1;
 
-	if (firstime) {
+	if (s_firstime) {
 		int     coefh, coefv;
 
-		firstime = 0;
+		s_firstime = 0;
 
 		for (coefh = 0; coefh < 16; coefh++) {
 
@@ -208,28 +208,28 @@ generatePrecalCoef ()
 calculatePXandPY (int x, int y, int *px, int *py)
 {
 	if (theMode == WATER_MODE) {
-		static int wave = 0;
-		static int wavesp = 0;
+		static int s_wave = 0;
+		static int s_wavesp = 0;
 		int     yy;
 
-		yy = y + RAND () % 4 - RAND () % 4 + wave / 10;
+		yy = y + RAND () % 4 - RAND () % 4 + s_wave / 10;
 		if (yy < 0)
 			yy = 0;
 		if (yy >= (int)c_resoly)
 			yy = c_resoly - 1;
 
-		*px = (x << 4) + firedec[yy] + (wave / 10);
+		*px = (x << 4) + firedec[yy] + (s_wave / 10);
 		*py = (y << 4) + 132 - ((vitesse < 131) ? vitesse : 130);
 
 		// NOLINTNEXTLINE(misc-redundant-expression)
-		wavesp += RAND () % 3 - RAND () % 3;
-		if (wave < -10)
-			wavesp += 2;
-		if (wave > 10)
-			wavesp -= 2;
-		wave += (wavesp / 10) + RAND () % 3 - RAND () % 3;
-		if (wavesp > 100)
-			wavesp = (wavesp * 9) / 10;
+		s_wavesp += RAND () % 3 - RAND () % 3;
+		if (s_wave < -10)
+			s_wavesp += 2;
+		if (s_wave > 10)
+			s_wavesp -= 2;
+		s_wave += (s_wavesp / 10) + RAND () % 3 - RAND () % 3;
+		if (s_wavesp > 100)
+			s_wavesp = (s_wavesp * 9) / 10;
 	}
 	else {
 		int     dist = 0, vx9, vy9;
@@ -507,13 +507,13 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 {
 	register Uint x, y;
 
-	static unsigned char pertedec = 8;
-	static char firstTime = 1;
+	static unsigned char s_pertedec = 8;
+	static char s_firstTime = 1;
 
 #define INTERLACE_INCR 16
 #define INTERLACE_ADD 9
 #define INTERLACE_AND 0xf
-	static int interlace_start = -2;
+	static int s_interlaceStart = -2;
 
 	expix1 = pix1;
 	expix2 = pix2;
@@ -535,23 +535,23 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 
 		middleX = resx / 2;
 		middleY = resy - 1;
-		firstTime = 1;
+		s_firstTime = 1;
 		if (firedec)
 			free (firedec);
 		firedec = 0;
 	}
 
-	if (interlace_start != -2)
+	if (s_interlaceStart != -2)
 		zf = NULL;
 
 	/** changement de config **/
 	if (zf) {
-                static char reverse = 0;			// vitesse inversé..(zoom out)
-		reverse = zf->reverse;
+		static char s_reverse = 0;			// vitesse inversé..(zoom out)
+		s_reverse = zf->reverse;
 		vitesse = zf->vitesse;
-		if (reverse)
+		if (s_reverse)
 			vitesse = 256 - vitesse;
-		pertedec = zf->pertedec;
+		s_pertedec = zf->pertedec;
 		middleX = zf->middleX;
 		middleY = zf->middleY;
 		theMode = zf->mode;
@@ -563,16 +563,16 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 	}
 
 	/* Silence a gcc warning */
-	(void)pertedec;
+	(void)s_pertedec;
 
 	/** generation d'un effet **/
-	if (firstTime || zf) {
+	if (s_firstTime || zf) {
 
 		// generation d'une table de sinus
-		if (firstTime) {
+		if (s_firstTime) {
 			unsigned short us;
 
-			firstTime = 0;
+			s_firstTime = 0;
 			generatePrecalCoef ();
 			select_zoom_filter ();
 
@@ -613,49 +613,49 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 				firedec = (int *) malloc (prevY * sizeof (int));
 
 				for (loopv = prevY; loopv != 0;) {
-					static int decc = 0;
-					static int spdc = 0;
-					static int accel = 0;
+					static int s_decc = 0;
+					static int s_spdc = 0;
+					static int s_accel = 0;
 
 					loopv--;
-					firedec[loopv] = decc;
-					decc += spdc / 10;
+					firedec[loopv] = s_decc;
+					s_decc += s_spdc / 10;
                                         // NOLINTNEXTLINE(misc-redundant-expression)
-					spdc += RAND () % 3 - RAND () % 3;
+					s_spdc += RAND () % 3 - RAND () % 3;
 
-					if (decc > 4)
-						spdc -= 1;
-					if (decc < -4)
-						spdc += 1;
+					if (s_decc > 4)
+						s_spdc -= 1;
+					if (s_decc < -4)
+						s_spdc += 1;
 
-					if (spdc > 30)
-						spdc = spdc - RAND () % 3 + accel / 10;
-					if (spdc < -30)
-						spdc = spdc + RAND () % 3 + accel / 10;
+					if (s_spdc > 30)
+						s_spdc = s_spdc - RAND () % 3 + s_accel / 10;
+					if (s_spdc < -30)
+						s_spdc = s_spdc + RAND () % 3 + s_accel / 10;
 
-					if (decc > 8 && spdc > 1)
-						spdc -= RAND () % 3 - 2;
+					if (s_decc > 8 && s_spdc > 1)
+						s_spdc -= RAND () % 3 - 2;
 
-					if (decc < -8 && spdc < -1)
-						spdc += RAND () % 3 + 2;
+					if (s_decc < -8 && s_spdc < -1)
+						s_spdc += RAND () % 3 + 2;
 
-					if (decc > 8 || decc < -8)
-						decc = decc * 8 / 9;
+					if (s_decc > 8 || s_decc < -8)
+						s_decc = s_decc * 8 / 9;
 
                                         // NOLINTNEXTLINE(misc-redundant-expression)
-					accel += RAND () % 2 - RAND () % 2;
-					if (accel > 20)
-						accel -= 2;
-					if (accel < -20)
-						accel += 2;
+					s_accel += RAND () % 2 - RAND () % 2;
+					if (s_accel > 20)
+						s_accel -= 2;
+					if (s_accel < -20)
+						s_accel += 2;
 				}
 			}
 		}
 
-        interlace_start = 0;
+        s_interlaceStart = 0;
         }
 		// generation du buffer de trans
-        if (interlace_start==-1) {
+        if (s_interlaceStart==-1) {
 
 			/* sauvegarde de l'etat actuel dans la nouvelle source */
 
@@ -674,7 +674,7 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 			buffratio = 0;
         }
 	
-        if (interlace_start==-1) {
+        if (s_interlaceStart==-1) {
             signed int * tmp;
             tmp = brutD;
             brutD=brutT;
@@ -682,13 +682,13 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
             tmp = freebrutD;
             freebrutD=freebrutT;
             freebrutT=tmp;
-            interlace_start = -2;
+            s_interlaceStart = -2;
         }
 
-	if (interlace_start>=0) {
-            int maxEnd = (interlace_start+INTERLACE_INCR);
+	if (s_interlaceStart>=0) {
+            int maxEnd = (s_interlaceStart+INTERLACE_INCR);
 		/* creation de la nouvelle destination */
-		for (y = (Uint)interlace_start; (y < (Uint)prevY) && (y < (Uint)maxEnd); y++) {
+		for (y = (Uint)s_interlaceStart; (y < (Uint)prevY) && (y < (Uint)maxEnd); y++) {
 			Uint premul_y_prevX = y * prevX * 2;
 			for (x = 0; x < prevX; x++) {
 				int     px, py;
@@ -700,8 +700,8 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 				premul_y_prevX += 2;
 			}
 		}
-		interlace_start += INTERLACE_INCR;
-		if (y >= prevY-1) interlace_start = -1;
+		s_interlaceStart += INTERLACE_INCR;
+		if (y >= prevY-1) s_interlaceStart = -1;
 	}
 
 	if (switchIncr != 0) {

@@ -319,13 +319,13 @@ void OSD::HideAll(bool keepsubs, MythScreenType* except, bool dropnotification)
 
 void OSD::LoadWindows(void)
 {
-    static const char* default_windows[7] = {
+    static const char* s_defaultWindows[7] = {
         "osd_message", "osd_input", "program_info", "browse_info", "osd_status",
         "osd_program_editor", "osd_debug"};
 
     for (int i = 0; i < 7; i++)
     {
-        const char* window = default_windows[i];
+        const char* window = s_defaultWindows[i];
         MythOSDWindow *win = new MythOSDWindow(nullptr, window, true);
 
         win->SetPainter(m_CurrentPainter);

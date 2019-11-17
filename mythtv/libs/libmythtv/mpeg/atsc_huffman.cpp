@@ -7,9 +7,9 @@
  *------------------------------------------------------------------------*/
 
 struct huffman_table {
-    unsigned int  encoded_sequence;
-    unsigned char character;
-    unsigned char number_of_bits;
+    unsigned int  m_encodedSequence;
+    unsigned char m_character;
+    unsigned char m_numberOfBits;
 };
 
 unsigned char ATSC_C5[] =
@@ -2308,9 +2308,9 @@ QString atsc_huffman2_to_string(const unsigned char *compressed,
         while (cur_size < max_size)
         {
             uint key = lookup[bits];
-            if (key && (ptrTable[key].number_of_bits == cur_size))
+            if (key && (ptrTable[key].m_numberOfBits == cur_size))
             {
-                decompressed += ptrTable[key].character;
+                decompressed += ptrTable[key].m_character;
                 current_bit += cur_size;
                 break;
             }

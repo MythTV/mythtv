@@ -1188,17 +1188,17 @@ class FirewireGUID : public CaptureCardComboBoxSetting
         for (size_t i = 0; i < list.size(); i++)
         {
             QString guid = list[i].GetGUIDString();
-            guid_to_avcinfo[guid] = list[i];
+            m_guidToAvcInfo[guid] = list[i];
             addSelection(guid);
         }
 #endif // USING_FIREWIRE
     }
 
     AVCInfo GetAVCInfo(const QString &guid) const
-        { return guid_to_avcinfo[guid]; }
+        { return m_guidToAvcInfo[guid]; }
 
   private:
-    QMap<QString,AVCInfo> guid_to_avcinfo;
+    QMap<QString,AVCInfo> m_guidToAvcInfo;
 };
 
 FirewireModel::FirewireModel(const CaptureCard  &parent,

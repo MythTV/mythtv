@@ -95,97 +95,97 @@ int evolutecolor (unsigned int src,unsigned int dest, unsigned int mask, unsigne
 }
 
 static void pretty_move (float lcycle, float *dist,float *dist2, float *rotangle) {
-	static float distt = 10.0F;
-	static float distt2 = 0.0F;
-	static float rot = 0.0F; // entre 0 et 2 * M_PI
-	static int happens = 0;
+	static float s_distT = 10.0F;
+	static float s_distT2 = 0.0F;
+	static float s_rot = 0.0F; // entre 0 et 2 * M_PI
+	static int s_happens = 0;
 	float tmp;
-        static int rotation = 0;
-	static int lock = 0;
+        static int s_rotation = 0;
+	static int s_lock = 0;
 
-	if (happens)
-		happens -= 1;
-	else if (lock == 0) {
-		happens = iRAND(200)?0:100+iRAND(60);
-		lock = happens * 3 / 2;
+	if (s_happens)
+		s_happens -= 1;
+	else if (s_lock == 0) {
+		s_happens = iRAND(200)?0:100+iRAND(60);
+		s_lock = s_happens * 3 / 2;
 	}
-	else lock --;
+	else s_lock --;
 //	happens = 1;
 	
-	tmp = happens?8.0F:0;
-	*dist2 = distt2 = (tmp + 15.0F*distt2)/16.0F;
+	tmp = s_happens?8.0F:0;
+	*dist2 = s_distT2 = (tmp + 15.0F*s_distT2)/16.0F;
 
 	tmp = 30+D-90.0F*(1.0F+sinf(lcycle*19/20));
-	if (happens)
+	if (s_happens)
 		tmp *= 0.6F;
 
-	*dist = distt = (tmp + 3.0F*distt)/4.0F;
+	*dist = s_distT = (tmp + 3.0F*s_distT)/4.0F;
 
-	if (!happens){
+	if (!s_happens){
 		tmp = M_PI_F*sinf(lcycle)/32+3*M_PI_F/2;
 	}
 	else {
-		rotation = iRAND(500)?rotation:iRAND(2);
-		if (rotation)
+		s_rotation = iRAND(500)?s_rotation:iRAND(2);
+		if (s_rotation)
 			lcycle *= 2.0F*M_PI_F;
 		else
 			lcycle *= -1.0F*M_PI_F;
 		tmp = lcycle - (M_PI_F*2.0F) * floorf(lcycle/(M_PI_F*2.0F));
 	}
 	
-	if (fabsf(tmp-rot) > fabsf(tmp-(rot+2.0F*M_PI_F))) {
-		rot = (tmp + 15.0F*(rot+2*M_PI_F)) / 16.0F;
-		if (rot>2.0F*M_PI_F)
-			rot -= 2.0F*M_PI_F;
-		*rotangle = rot;
+	if (fabsf(tmp-s_rot) > fabsf(tmp-(s_rot+2.0F*M_PI_F))) {
+		s_rot = (tmp + 15.0F*(s_rot+2*M_PI_F)) / 16.0F;
+		if (s_rot>2.0F*M_PI_F)
+			s_rot -= 2.0F*M_PI_F;
+		*rotangle = s_rot;
 	}
-	else if (fabsf(tmp-rot) > fabsf(tmp-(rot-2.0F*M_PI_F))) {
-		rot = (tmp + 15.0F*(rot-2.0F*M_PI_F)) / 16.0F;
-		if (rot<0.0F)
-			rot += 2.0F*M_PI_F;
-		*rotangle = rot;
+	else if (fabsf(tmp-s_rot) > fabsf(tmp-(s_rot-2.0F*M_PI_F))) {
+		s_rot = (tmp + 15.0F*(s_rot-2.0F*M_PI_F)) / 16.0F;
+		if (s_rot<0.0F)
+			s_rot += 2.0F*M_PI_F;
+		*rotangle = s_rot;
 	}
 	else
-		*rotangle = rot = (tmp + 15.0F*rot) / 16.0F;
+		*rotangle = s_rot = (tmp + 15.0F*s_rot) / 16.0F;
 }
 
 void tentacle_update(int *buf, int *back, int W, int H, short data[2][512], float rapport, int drawit) {
-	static int colors[] = {
+	static int s_colors[] = {
 		(0x18<<(ROUGE*8))|(0x4c<<(VERT*8))|(0x2f<<(BLEU*8)),
 		(0x48<<(ROUGE*8))|(0x2c<<(VERT*8))|(0x6f<<(BLEU*8)),
 		(0x58<<(ROUGE*8))|(0x3c<<(VERT*8))|(0x0f<<(BLEU*8))};
 	
-	static int col = (0x28<<(ROUGE*8))|(0x2c<<(VERT*8))|(0x5f<<(BLEU*8));
-	static int dstcol = 0;
-	static float lig = 1.15F;
-	static float ligs = 0.1F;
+	static int s_col = (0x28<<(ROUGE*8))|(0x2c<<(VERT*8))|(0x5f<<(BLEU*8));
+	static int s_dstCol = 0;
+	static float s_lig = 1.15F;
+	static float s_ligs = 0.1F;
 
 	int color;
 	int colorlow;
 
 	float dist,dist2,rotangle;
 
-	if ((!drawit) && (ligs>0.0F))
-		ligs = -ligs;
+	if ((!drawit) && (s_ligs>0.0F))
+		s_ligs = -s_ligs;
 
-	lig += ligs;
+	s_lig += s_ligs;
 
-	if (lig > 1.01F) {
-		if ((lig>10.0F) | (lig<1.1F)) ligs = -ligs;
+	if (s_lig > 1.01F) {
+		if ((s_lig>10.0F) | (s_lig<1.1F)) s_ligs = -s_ligs;
 		
-		if ((lig<6.3F)&&(iRAND(30)==0))
-			dstcol=iRAND(3);
+		if ((s_lig<6.3F)&&(iRAND(30)==0))
+			s_dstCol=iRAND(3);
 
-		col = evolutecolor(col,colors[dstcol],0xff,0x01);
-		col = evolutecolor(col,colors[dstcol],0xff00,0x0100);
-		col = evolutecolor(col,colors[dstcol],0xff0000,0x010000);
-		col = evolutecolor(col,colors[dstcol],0xff000000,0x01000000);
+		s_col = evolutecolor(s_col,s_colors[s_dstCol],0xff,0x01);
+		s_col = evolutecolor(s_col,s_colors[s_dstCol],0xff00,0x0100);
+		s_col = evolutecolor(s_col,s_colors[s_dstCol],0xff0000,0x010000);
+		s_col = evolutecolor(s_col,s_colors[s_dstCol],0xff000000,0x01000000);
 		
-		color = col;
-		colorlow = col;
+		color = s_col;
+		colorlow = s_col;
 		
-		lightencolor(&color,lig * 2.0F + 2.0F);
-		lightencolor(&colorlow,(lig/3.0F)+0.67F);
+		lightencolor(&color,s_lig * 2.0F + 2.0F);
+		lightencolor(&colorlow,(s_lig/3.0F)+0.67F);
 
 		rapport = 1.0F + 2.0F * (rapport - 1.0F);
                 rapport *= 1.2F;
@@ -207,9 +207,9 @@ void tentacle_update(int *buf, int *back, int W, int H, short data[2][512], floa
 			grid3d_draw (grille[tmp],color,colorlow,dist,buf,back,W,H);
 	}
 	else {
-		lig = 1.05F;
-		if (ligs < 0.0F)
-			ligs = -ligs;
+		s_lig = 1.05F;
+		if (s_ligs < 0.0F)
+			s_ligs = -s_ligs;
 		pretty_move (cycle,&dist,&dist2,&rotangle);
 		cycle+=0.1F;
 		if (cycle > 1000)

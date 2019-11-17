@@ -617,14 +617,14 @@ bool ProgramMapTable::IsStreamEncrypted(uint pid) const
 
 bool ProgramMapTable::IsStillPicture(const QString& sistandard) const
 {
-    static const unsigned char STILL_PICTURE_FLAG = 0x01;
+    static constexpr unsigned char kStillPictureFlag = 0x01;
 
     for (uint i = 0; i < StreamCount(); i++)
     {
         if (IsVideo(i, sistandard))
         {
             return StreamInfoLength(i) > 2 &&
-                   ((StreamInfo(i)[2] & STILL_PICTURE_FLAG) != 0);
+                   ((StreamInfo(i)[2] & kStillPictureFlag) != 0);
         }
     }
     return false;

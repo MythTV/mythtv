@@ -135,8 +135,8 @@ void VideoVisualSpectrum::prepare(void)
 
 void VideoVisualSpectrum::DrawPriv(MythPainter *painter, QPaintDevice* device)
 {
-    static const QBrush brush(QColor(0, 0, 200, 180));
-    static const QPen   pen(QColor(255, 255, 255, 255));
+    static const QBrush kBrush(QColor(0, 0, 200, 180));
+    static const QPen   kPen(QColor(255, 255, 255, 255));
     double range = m_area.height() / 2.0;
     int count = m_scale.range();
     painter->Begin(device);
@@ -145,7 +145,7 @@ void VideoVisualSpectrum::DrawPriv(MythPainter *painter, QPaintDevice* device)
         m_rects[i].setTop(range - int(m_magnitudes[i]));
         m_rects[i].setBottom(range + int(m_magnitudes[i + count]));
         if (m_rects[i].height() > 4)
-            painter->DrawRect(m_rects[i], brush, pen, 255);
+            painter->DrawRect(m_rects[i], kBrush, kPen, 255);
     }
     painter->End();
 }
@@ -190,8 +190,8 @@ static class VideoVisualSpectrumFactory : public VideoVisualFactory
   public:
     const QString &name(void) const override // VideoVisualFactory
     {
-        static QString name("Spectrum");
-        return name;
+        static QString s_name("Spectrum");
+        return s_name;
     }
 
     VideoVisual *Create(AudioPlayer *audio,

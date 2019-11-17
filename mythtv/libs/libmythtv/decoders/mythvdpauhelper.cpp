@@ -32,13 +32,13 @@ status = m_vdpGetProcAddress(m_device, FUNC_ID, reinterpret_cast<void **>(&(PROC
 bool MythVDPAUHelper::HaveVDPAU(void)
 {
     QMutexLocker locker(&gVDPAULock);
-    static bool checked = false;
-    if (checked)
+    static bool s_checked = false;
+    if (s_checked)
         return gVDPAUAvailable;
 
     MythVDPAUHelper vdpau;
     gVDPAUAvailable = vdpau.IsValid();
-    checked = true;
+    s_checked = true;
     if (gVDPAUAvailable)
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + "VDPAU is available");
@@ -83,8 +83,8 @@ MythVDPAUHelper::MythVDPAUHelper(AVVDPAUDeviceContext* Context)
 
 static const char* DummyGetError(VdpStatus)
 {
-    static const char dummy[] = "Unknown";
-    return &dummy[0];
+    static constexpr char kDummy[] = "Unknown";
+    return &kDummy[0];
 }
 
 MythVDPAUHelper::MythVDPAUHelper(void)

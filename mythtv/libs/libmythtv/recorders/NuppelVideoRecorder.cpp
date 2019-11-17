@@ -1884,11 +1884,11 @@ void NuppelVideoRecorder::SetNewVideoParams(double newaspect)
 void NuppelVideoRecorder::WriteFileHeader(void)
 {
     struct rtfileheader fileheader {};
-    static const char finfo[12] = "MythTVVideo";
-    static const char vers[5]   = "0.07";
+    static constexpr char kFinfo[12] = "MythTVVideo";
+    static constexpr char kVers[5]   = "0.07";
 
-    memcpy(fileheader.finfo, finfo, sizeof(fileheader.finfo));
-    memcpy(fileheader.version, vers, sizeof(fileheader.version));
+    memcpy(fileheader.finfo, kFinfo, sizeof(fileheader.finfo));
+    memcpy(fileheader.version, kVers, sizeof(fileheader.version));
     fileheader.width  = m_w_out;
     fileheader.height = (int)(m_h_out * m_height_multiplier);
     fileheader.desiredwidth  = 0;
@@ -1935,16 +1935,16 @@ void NuppelVideoRecorder::WriteHeader(void)
     }
     else
     {
-        static unsigned long int tbls[128];
+        static unsigned long int s_tbls[128];
 
         frameheader.comptype = 'R'; // compressor data for RTjpeg
-        frameheader.packetlength = sizeof(tbls);
+        frameheader.packetlength = sizeof(s_tbls);
 
         // compression configuration header
         WriteFrameheader(&frameheader);
 
-        memset(tbls, 0, sizeof(tbls));
-        m_ringBuffer->Write(tbls, sizeof(tbls));
+        memset(s_tbls, 0, sizeof(s_tbls));
+        m_ringBuffer->Write(s_tbls, sizeof(s_tbls));
     }
 
     memset(&frameheader, 0, sizeof(frameheader));
@@ -3049,14 +3049,14 @@ void NuppelVideoRecorder::WriteText(unsigned char *buf, int len, int timecode,
         frameheader.packetlength = len + 4;
         WriteFrameheader(&frameheader);
         union page_t {
-            int32_t val32;
-            struct { int8_t a,b,c,d; } val8;
+            int32_t m_val32;
+            struct { int8_t m_a,m_b,m_c,m_d; } m_val8;
         } v {};
-        v.val32 = pagenr;
-        m_ringBuffer->Write(&v.val8.d, sizeof(int8_t));
-        m_ringBuffer->Write(&v.val8.c, sizeof(int8_t));
-        m_ringBuffer->Write(&v.val8.b, sizeof(int8_t));
-        m_ringBuffer->Write(&v.val8.a, sizeof(int8_t));
+        v.m_val32 = pagenr;
+        m_ringBuffer->Write(&v.m_val8.m_d, sizeof(int8_t));
+        m_ringBuffer->Write(&v.m_val8.m_c, sizeof(int8_t));
+        m_ringBuffer->Write(&v.m_val8.m_b, sizeof(int8_t));
+        m_ringBuffer->Write(&v.m_val8.m_a, sizeof(int8_t));
         m_ringBuffer->Write(buf, len);
     }
     else if (VBIMode::NTSC_CC == m_vbimode)

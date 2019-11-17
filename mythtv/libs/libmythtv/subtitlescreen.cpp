@@ -379,7 +379,7 @@ void SubtitleFormat::CreateProviderDefault(const QString &family,
     }
     else if (family == kSubFamily708)
     {
-        static const char *cc708Fonts[] = {
+        static const char *s_cc708Fonts[] = {
             "FreeMono",        // default
             "FreeMono",        // mono serif
             "Droid Serif",     // prop serif
@@ -389,7 +389,7 @@ void SubtitleFormat::CreateProviderDefault(const QString &family,
             "TeX Gyre Chorus", // cursive
             "Droid Serif"      // small caps, QFont::SmallCaps will be applied
         };
-        font->GetFace()->setFamily(cc708Fonts[attr.m_font_tag & 0x7]);
+        font->GetFace()->setFamily(s_cc708Fonts[attr.m_font_tag & 0x7]);
     }
     else if (family == kSubFamilyText)
     {
@@ -1212,7 +1212,7 @@ void FormattedTextSubtitle608::Layout(void)
 
 void FormattedTextSubtitle608::Init(const vector<CC608Text*> &buffers)
 {
-    static const QColor clr[8] =
+    static const QColor kClr[8] =
     {
         Qt::white,   Qt::green,   Qt::blue,    Qt::cyan,
         Qt::red,     Qt::yellow,  Qt::magenta, Qt::white,
@@ -1231,7 +1231,7 @@ void FormattedTextSubtitle608::Init(const vector<CC608Text*> &buffers)
     {
         zoom = m_subScreen->GetZoom();
         m_subScreen->SetFontSize(pixelSize);
-        CC708CharacterAttribute def_attr(false, false, false, clr[0]);
+        CC708CharacterAttribute def_attr(false, false, false, kClr[0]);
         QFont *font = m_subScreen->GetFont(def_attr)->GetFace();
         QFontMetrics fm(*font);
         fontwidth = fm.averageCharWidth();
@@ -1278,7 +1278,7 @@ void FormattedTextSubtitle608::Init(const vector<CC608Text*> &buffers)
             QString captionText =
                 extract_cc608(text, color, isItalic, isUnderline);
             CC708CharacterAttribute attr(isItalic, isBold, isUnderline,
-                                         clr[min(max(0, color), 7)]);
+                                         kClr[min(max(0, color), 7)]);
             FormattedTextChunk chunk(captionText, attr, m_subScreen);
             line.chunks += chunk;
             LOG(VB_VBI, LOG_INFO,
@@ -2335,8 +2335,8 @@ static void myth_libass_log(int level, const char *fmt, va_list vl, void */*ctx*
     if (!VERBOSE_LEVEL_CHECK(verbose_mask, verbose_level))
         return;
 
-    static QMutex string_lock;
-    string_lock.lock();
+    static QMutex s_stringLock;
+    s_stringLock.lock();
 
     char str[1024];
     int bytes = vsnprintf(str, sizeof str, fmt, vl);
@@ -2350,7 +2350,7 @@ static void myth_libass_log(int level, const char *fmt, va_list vl, void */*ctx*
     }
 
     LOG(verbose_mask, verbose_level, QString("libass: %1").arg(str));
-    string_lock.unlock();
+    s_stringLock.unlock();
 }
 
 bool SubtitleScreen::InitialiseAssLibrary(void)

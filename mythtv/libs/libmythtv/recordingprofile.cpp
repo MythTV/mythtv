@@ -25,7 +25,7 @@ class CodecParamStorage : public SimpleDBStorage
                       const RecordingProfile &parentProfile,
                       const QString& name) :
         SimpleDBStorage(_setting, "codecparams", "value"),
-        m_parent(parentProfile), codecname(name)
+        m_parent(parentProfile), m_codecName(name)
     {
         _setting->setName(name);
     }
@@ -34,7 +34,7 @@ class CodecParamStorage : public SimpleDBStorage
     QString GetWhereClause(MSqlBindings &bindings) const override; // SimpleDBStorage
 
     const RecordingProfile &m_parent;
-    QString codecname;
+    QString m_codecName;
 };
 
 QString CodecParamStorage::GetSetClause(MSqlBindings &bindings) const
@@ -47,7 +47,7 @@ QString CodecParamStorage::GetSetClause(MSqlBindings &bindings) const
             + ", value = " + valueTag);
 
     bindings.insert(profileTag, m_parent.getProfileNum());
-    bindings.insert(nameTag, codecname);
+    bindings.insert(nameTag, m_codecName);
     bindings.insert(valueTag, m_user->GetDBValue());
 
     return query;
@@ -61,7 +61,7 @@ QString CodecParamStorage::GetWhereClause(MSqlBindings &bindings) const
     QString query("profile = " + profileTag + " AND name = " + nameTag);
 
     bindings.insert(profileTag, m_parent.getProfileNum());
-    bindings.insert(nameTag, codecname);
+    bindings.insert(nameTag, m_codecName);
 
     return query;
 }
@@ -117,13 +117,13 @@ class SampleRate : public MythUIComboBoxSetting, public CodecParamStorage
                     "Ensure that you choose a sampling rate appropriate "
                     "for your device.  btaudio may only allow 32000."));
 
-        rates.push_back(32000);
-        rates.push_back(44100);
-        rates.push_back(48000);
+        m_rates.push_back(32000);
+        m_rates.push_back(44100);
+        m_rates.push_back(48000);
 
-        allowed_rate[48000] = true;
-        for (uint i = 0; analog && (i < rates.size()); i++)
-            allowed_rate[rates[i]] = true;
+        m_allowedRate[48000] = true;
+        for (uint i = 0; analog && (i < m_rates.size()); i++)
+            m_allowedRate[m_rates[i]] = true;
 
     };
 
@@ -133,16 +133,16 @@ class SampleRate : public MythUIComboBoxSetting, public CodecParamStorage
         QString val = getValue();
 
         clearSelections();
-        for (size_t i = 0; i < rates.size(); i++)
+        for (size_t i = 0; i < m_rates.size(); i++)
         {
-            if (allowed_rate[rates[i]])
-                addSelection(QString::number(rates[i]));
+            if (m_allowedRate[m_rates[i]])
+                addSelection(QString::number(m_rates[i]));
         }
 
         int which = getValueIndex(val);
         setValue(max(which,0));
 
-        if (allowed_rate.size() <= 1)
+        if (m_allowedRate.size() <= 1)
             setEnabled(false);
     }
 
@@ -152,7 +152,7 @@ class SampleRate : public MythUIComboBoxSetting, public CodecParamStorage
     {
         QString val = value.isEmpty() ? label : value;
         uint rate = val.toUInt();
-        if (allowed_rate[rate])
+        if (m_allowedRate[rate])
         {
             MythUIComboBoxSetting::addSelection(label, value, select);
         }
@@ -164,8 +164,8 @@ class SampleRate : public MythUIComboBoxSetting, public CodecParamStorage
         }
     }
 
-    vector<uint>    rates;
-    QMap<uint,bool> allowed_rate;
+    vector<uint>    m_rates;
+    QMap<uint,bool> m_allowedRate;
 };
 
 class MPEG2audType : public MythUIComboBoxSetting, public CodecParamStorage
@@ -174,21 +174,21 @@ class MPEG2audType : public MythUIComboBoxSetting, public CodecParamStorage
     MPEG2audType(const RecordingProfile &parent,
                  bool layer1, bool layer2, bool layer3) :
         MythUIComboBoxSetting(this), CodecParamStorage(this, parent, "mpeg2audtype"),
-        allow_layer1(layer1), allow_layer2(layer2), allow_layer3(layer3)
+        m_allowLayer1(layer1), m_allowLayer2(layer2), m_allowLayer3(layer3)
     {
         setLabel(QObject::tr("Type"));
 
-        if (allow_layer1)
+        if (m_allowLayer1)
             addSelection("Layer I");
-        if (allow_layer2)
+        if (m_allowLayer2)
             addSelection("Layer II");
-        if (allow_layer3)
+        if (m_allowLayer3)
             addSelection("Layer III");
 
         uint allowed_cnt = 0;
-        allowed_cnt += ((allow_layer1) ? 1 : 0);
-        allowed_cnt += ((allow_layer2) ? 1 : 0);
-        allowed_cnt += ((allow_layer3) ? 1 : 0);
+        allowed_cnt += ((m_allowLayer1) ? 1 : 0);
+        allowed_cnt += ((m_allowLayer2) ? 1 : 0);
+        allowed_cnt += ((m_allowLayer3) ? 1 : 0);
 
         if (1 == allowed_cnt)
             setEnabled(false);
@@ -201,22 +201,22 @@ class MPEG2audType : public MythUIComboBoxSetting, public CodecParamStorage
         CodecParamStorage::Load();
         QString val = getValue();
 
-        if ((val == "Layer I") && !allow_layer1)
+        if ((val == "Layer I") && !m_allowLayer1)
         {
-            val = (allow_layer2) ? "Layer II" :
-                ((allow_layer3) ? "Layer III" : val);
+            val = (m_allowLayer2) ? "Layer II" :
+                ((m_allowLayer3) ? "Layer III" : val);
         }
 
-        if ((val == "Layer II") && !allow_layer2)
+        if ((val == "Layer II") && !m_allowLayer2)
         {
-            val = (allow_layer3) ? "Layer III" :
-                ((allow_layer1) ? "Layer I" : val);
+            val = (m_allowLayer3) ? "Layer III" :
+                ((m_allowLayer1) ? "Layer I" : val);
         }
 
-        if ((val == "Layer III") && !allow_layer3)
+        if ((val == "Layer III") && !m_allowLayer3)
         {
-            val = (allow_layer2) ? "Layer II" :
-                ((allow_layer1) ? "Layer I" : val);
+            val = (m_allowLayer2) ? "Layer II" :
+                ((m_allowLayer1) ? "Layer I" : val);
         }
 
         if (getValue() != val)
@@ -228,9 +228,9 @@ class MPEG2audType : public MythUIComboBoxSetting, public CodecParamStorage
     }
 
   private:
-    bool allow_layer1;
-    bool allow_layer2;
-    bool allow_layer3;
+    bool m_allowLayer1;
+    bool m_allowLayer2;
+    bool m_allowLayer3;
 };
 
 class MPEG2audBitrateL1 : public MythUIComboBoxSetting, public CodecParamStorage

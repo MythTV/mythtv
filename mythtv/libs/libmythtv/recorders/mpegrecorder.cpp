@@ -684,30 +684,30 @@ static void add_ext_ctrl(vector<struct v4l2_ext_control> &ctrl_list,
 
 static void set_ctrls(int fd, vector<struct v4l2_ext_control> &ext_ctrls)
 {
-    static QMutex control_description_lock;
-    static QMap<uint32_t,QString> control_description;
+    static QMutex s_controlDescriptionLock;
+    static QMap<uint32_t,QString> s_controlDescription;
 
-    control_description_lock.lock();
-    if (control_description.isEmpty())
+    s_controlDescriptionLock.lock();
+    if (s_controlDescription.isEmpty())
     {
-        control_description[V4L2_CID_MPEG_AUDIO_SAMPLING_FREQ] =
+        s_controlDescription[V4L2_CID_MPEG_AUDIO_SAMPLING_FREQ] =
             "Audio Sampling Frequency";
-        control_description[V4L2_CID_MPEG_VIDEO_ASPECT] =
+        s_controlDescription[V4L2_CID_MPEG_VIDEO_ASPECT] =
             "Video Aspect ratio";
-        control_description[V4L2_CID_MPEG_AUDIO_ENCODING] =
+        s_controlDescription[V4L2_CID_MPEG_AUDIO_ENCODING] =
             "Audio Encoding";
-        control_description[V4L2_CID_MPEG_AUDIO_L2_BITRATE] =
+        s_controlDescription[V4L2_CID_MPEG_AUDIO_L2_BITRATE] =
             "Audio L2 Bitrate";
-        control_description[V4L2_CID_MPEG_VIDEO_BITRATE_PEAK] =
+        s_controlDescription[V4L2_CID_MPEG_VIDEO_BITRATE_PEAK] =
             "Video Peak Bitrate";
-        control_description[V4L2_CID_MPEG_VIDEO_BITRATE] =
+        s_controlDescription[V4L2_CID_MPEG_VIDEO_BITRATE] =
             "Video Average Bitrate";
-        control_description[V4L2_CID_MPEG_STREAM_TYPE] =
+        s_controlDescription[V4L2_CID_MPEG_STREAM_TYPE] =
             "MPEG Stream type";
-        control_description[V4L2_CID_MPEG_VIDEO_BITRATE_MODE] =
+        s_controlDescription[V4L2_CID_MPEG_VIDEO_BITRATE_MODE] =
             "MPEG Bitrate mode";
     }
-    control_description_lock.unlock();
+    s_controlDescriptionLock.unlock();
 
     for (size_t i = 0; i < ext_ctrls.size(); i++)
     {
@@ -721,10 +721,10 @@ static void set_ctrls(int fd, vector<struct v4l2_ext_control> &ext_ctrls)
 
         if (ioctl(fd, VIDIOC_S_EXT_CTRLS, &ctrls) < 0)
         {
-            QMutexLocker locker(&control_description_lock);
+            QMutexLocker locker(&s_controlDescriptionLock);
             LOG(VB_GENERAL, LOG_ERR, QString("mpegrecorder.cpp:set_ctrls(): ") +
                 QString("Could not set %1 to %2")
-                    .arg(control_description[ext_ctrls[i].id]).arg(value) +
+                    .arg(s_controlDescription[ext_ctrls[i].id]).arg(value) +
                     ENO);
         }
     }

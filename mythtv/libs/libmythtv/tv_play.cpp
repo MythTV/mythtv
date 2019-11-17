@@ -8277,17 +8277,17 @@ void TV::UpdateOSDTimeoutMessage(PlayerContext *ctx)
     }
 
     // create dialog...
-    static QString chan_up   = GET_KEY("TV Playback", ACTION_CHANNELUP);
-    static QString chan_down = GET_KEY("TV Playback", ACTION_CHANNELDOWN);
-    static QString next_src  = GET_KEY("TV Playback", "NEXTSOURCE");
-    static QString tog_cards = GET_KEY("TV Playback", "NEXTINPUT");
+    static QString s_chanUp   = GET_KEY("TV Playback", ACTION_CHANNELUP);
+    static QString s_chanDown = GET_KEY("TV Playback", ACTION_CHANNELDOWN);
+    static QString s_nextSrc  = GET_KEY("TV Playback", "NEXTSOURCE");
+    static QString s_togCards = GET_KEY("TV Playback", "NEXTINPUT");
 
     QString message = tr(
         "You should have received a channel lock by now. "
         "You can continue to wait for a signal, or you "
         "can change the channel with %1 or %2, change "
         "video source (%3), inputs (%4), etc.")
-        .arg(chan_up).arg(chan_down).arg(next_src).arg(tog_cards);
+        .arg(s_chanUp).arg(s_chanDown).arg(s_nextSrc).arg(s_togCards);
 
     osd->DialogShow(OSD_DLG_INFO, message);
     QString action = "DIALOG_INFO_CHANNELLOCK_0";
@@ -11325,10 +11325,10 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
     else if (matchesGroup(actionName, "ADJUSTSTRETCH", category, prefix))
     {
         static struct {
-            int speedX100;
-            QString suffix;
-            QString trans;
-        } speeds[] = {
+            int     m_speedX100;
+            QString m_suffix;
+            QString m_trans;
+        } s_speeds[] = {
             {  0, "",    tr("Adjust")},
             { 50, "0.5", tr("0.5x")},
             { 90, "0.9", tr("0.9x")},
@@ -11339,11 +11339,11 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
             {140, "1.4", tr("1.4x")},
             {150, "1.5", tr("1.5x")},
         };
-        for (size_t i = 0; i < sizeof(speeds) / sizeof(*speeds); ++i)
+        for (size_t i = 0; i < sizeof(s_speeds) / sizeof(*s_speeds); ++i)
         {
-            QString action = prefix + speeds[i].suffix;
-            active = (m_tvmSpeedX100 == speeds[i].speedX100);
-            BUTTON(action, speeds[i].trans);
+            QString action = prefix + s_speeds[i].m_suffix;
+            active = (m_tvmSpeedX100 == s_speeds[i].m_speedX100);
+            BUTTON(action, s_speeds[i].m_trans);
         }
     }
     else if (matchesGroup(actionName, "TOGGLESLEEP", category, prefix))
@@ -11376,13 +11376,13 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
     {
         if (m_tvmIsRecording || m_tvmIsRecorded)
         {
-            static uint cas_ord[] = { 0, 2, 1 };
-            for (size_t i = 0; i < sizeof(cas_ord)/sizeof(cas_ord[0]); i++)
+            static constexpr uint s_casOrd[] = { 0, 2, 1 };
+            for (size_t i = 0; i < sizeof(s_casOrd)/sizeof(s_casOrd[0]); i++)
             {
-                const CommSkipMode mode = (CommSkipMode) cas_ord[i];
-                QString action = prefix + QString::number(cas_ord[i]);
+                const CommSkipMode mode = (CommSkipMode) s_casOrd[i];
+                QString action = prefix + QString::number(s_casOrd[i]);
                 active = (mode == m_tvmCurSkip);
-                BUTTON(action, toString((CommSkipMode) cas_ord[i]));
+                BUTTON(action, toString((CommSkipMode) s_casOrd[i]));
             }
         }
     }

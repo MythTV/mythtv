@@ -733,7 +733,7 @@ void MythVideoOutputOpenGL::DiscardFrames(bool KeyFrame, bool Flushed)
 
 VideoFrameType* MythVideoOutputOpenGL::DirectRenderFormats(void)
 {
-    static VideoFrameType openglformats[] =
+    static VideoFrameType s_openglFormats[] =
         { FMT_YV12,     FMT_NV12,      FMT_YUY2,      FMT_YUV422P,   FMT_YUV444P,
           FMT_YUV420P9, FMT_YUV420P10, FMT_YUV420P12, FMT_YUV420P14, FMT_YUV420P16,
           FMT_YUV422P9, FMT_YUV422P10, FMT_YUV422P12, FMT_YUV422P14, FMT_YUV422P16,
@@ -741,9 +741,9 @@ VideoFrameType* MythVideoOutputOpenGL::DirectRenderFormats(void)
           FMT_P010, FMT_P016,
           FMT_NONE };
     // OpenGLES2 only allows luminance textures - no RG etc
-    static VideoFrameType opengles2formats[] =
+    static VideoFrameType s_opengles2Formats[] =
         { FMT_YV12, FMT_YUY2, FMT_YUV422P, FMT_YUV444P, FMT_NONE };
-    return m_isGLES2 ? &opengles2formats[0] : &openglformats[0];
+    return m_isGLES2 ? &s_opengles2Formats[0] : &s_openglFormats[0];
 }
 
 void MythVideoOutputOpenGL::WindowResized(const QSize &Size)

@@ -1655,9 +1655,9 @@ uint64_t RingBuffer::UpdateDecoderRate(uint64_t latest)
         return 0;
 
     // TODO use QDateTime once we've moved to Qt 4.7
-    static QTime midnight = QTime(0, 0, 0);
+    static QTime s_midnight = QTime(0, 0, 0);
     QTime now = QTime::currentTime();
-    qint64 age = midnight.msecsTo(now);
+    qint64 age = s_midnight.msecsTo(now);
     qint64 oldest = age - 1000;
 
     m_decoderReadLock.lock();
@@ -1689,9 +1689,9 @@ uint64_t RingBuffer::UpdateStorageRate(uint64_t latest)
         return 0;
 
     // TODO use QDateTime once we've moved to Qt 4.7
-    static QTime midnight = QTime(0, 0, 0);
+    static QTime s_midnight = QTime(0, 0, 0);
     QTime now = QTime::currentTime();
-    qint64 age = midnight.msecsTo(now);
+    qint64 age = s_midnight.msecsTo(now);
     qint64 oldest = age - 1000;
 
     m_storageReadLock.lock();

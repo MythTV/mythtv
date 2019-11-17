@@ -104,11 +104,11 @@ void ChannelScannerCLI::HandleEvent(const ScannerEvent *scanEvent)
 
     if (VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_INFO))
     {
-        static QString old_msg;
-        if (msg != old_msg)
+        static QString s_oldMsg;
+        if (msg != s_oldMsg)
         {
             LOG(VB_CHANSCAN, LOG_INFO, LOC + msg);
-            old_msg = msg;
+            s_oldMsg = msg;
         }
     }
     else if (VERBOSE_LEVEL_NONE)

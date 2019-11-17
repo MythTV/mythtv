@@ -1,9 +1,9 @@
 #include "freesat_huffman.h"
 
 struct fsattab {
-    unsigned int value;
-    short bits;
-    char next;
+    unsigned int m_value;
+    short m_bits;
+    char m_next;
 };
 
 #define START   '\0'
@@ -63,15 +63,15 @@ QString freesat_huffman_to_string(const unsigned char *compressed, uint size)
                 for (unsigned j = fsat_index[indx]; j < fsat_index[indx+1]; j++)
                 {
                     unsigned mask = 0, maskbit = 0x80000000;
-                    for (short kk = 0; kk < fsat_table[j].bits; kk++)
+                    for (short kk = 0; kk < fsat_table[j].m_bits; kk++)
                     {
                         mask |= maskbit;
                         maskbit >>= 1;
                     }
-                    if ((value & mask) == fsat_table[j].value)
+                    if ((value & mask) == fsat_table[j].m_value)
                     {
-                        nextCh = fsat_table[j].next;
-                        bitShift = fsat_table[j].bits;
+                        nextCh = fsat_table[j].m_next;
+                        bitShift = fsat_table[j].m_bits;
                         found = true;
                         lastch = nextCh;
                         break;

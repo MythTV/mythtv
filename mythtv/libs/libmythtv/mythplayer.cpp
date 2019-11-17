@@ -913,10 +913,10 @@ int MythPlayer::GetFreeVideoFrames(void) const
 /// \brief Return a list of frame types that can be rendered directly.
 VideoFrameType* MythPlayer::DirectRenderFormats(void)
 {
-    static VideoFrameType defaultformats[] = { FMT_YV12, FMT_NONE };
+    static VideoFrameType s_defaultFormats[] = { FMT_YV12, FMT_NONE };
     if (videoOutput)
         return videoOutput->DirectRenderFormats();
-    return &defaultformats[0];
+    return &s_defaultFormats[0];
 }
 
 /**
@@ -5828,16 +5828,16 @@ void MythPlayer::ForceSetupAudioStream(void)
 
 static unsigned dbg_ident(const MythPlayer *player)
 {
-    static QMutex   dbg_lock;
-    static unsigned dbg_next_ident = 0;
+    static QMutex   s_dbgLock;
+    static unsigned s_dbgNextIdent = 0;
     typedef QMap<const MythPlayer*, unsigned> DbgMapType;
-    static DbgMapType dbg_ident;
+    static DbgMapType s_dbgIdent;
 
-    QMutexLocker locker(&dbg_lock);
-    DbgMapType::iterator it = dbg_ident.find(player);
-    if (it != dbg_ident.end())
+    QMutexLocker locker(&s_dbgLock);
+    DbgMapType::iterator it = s_dbgIdent.find(player);
+    if (it != s_dbgIdent.end())
         return *it;
-    return dbg_ident[player] = dbg_next_ident++;
+    return s_dbgIdent[player] = s_dbgNextIdent++;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

@@ -607,14 +607,14 @@ void CC708Window::LimitPenLocation(void)
 
 void CC708Pen::SetPenStyle(uint style)
 {
-    static const uint style2font[] = { 0, 0, 1, 2, 3, 4, 3, 4 };
+    static const uint kStyle2Font[] = { 0, 0, 1, 2, 3, 4, 3, 4 };
 
     if ((style < 1) || (style > 7))
         return;
 
     attr.m_pen_size   = k708AttrSizeStandard;
     attr.m_offset     = k708AttrOffsetNormal;
-    attr.m_font_tag   = style2font[style];
+    attr.m_font_tag   = kStyle2Font[style];
     attr.m_italics    = false;
     attr.m_underline  = false;
     attr.m_boldface   = false;
@@ -656,6 +656,6 @@ QColor CC708CharacterAttribute::ConvertToQColor(uint eia708color)
     // U.S. ATSC programs seem to use just the higher-order bit,
     // i.e. values 0 and 2, so the last two elements of X[] are both
     // set to the maximum 255, otherwise font colors are dim.
-    static int X[] = {0, 96, 255, 255};
-    return {X[(eia708color>>4)&3], X[(eia708color>>2)&3], X[eia708color&3]};
+    static constexpr int s_x[] = {0, 96, 255, 255};
+    return {s_x[(eia708color>>4)&3], s_x[(eia708color>>2)&3], s_x[eia708color&3]};
 }

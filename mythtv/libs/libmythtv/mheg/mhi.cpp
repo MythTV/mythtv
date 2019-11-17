@@ -617,8 +617,8 @@ MHKeyLookup::MHKeyLookup()
 // and return true otherwise we return false.
 bool MHIContext::OfferKey(const QString& key)
 {
-    static const MHKeyLookup s_keymap;
-    int action = s_keymap.Find(key, m_keyProfile);
+    static const MHKeyLookup kKeymap;
+    int action = kKeymap.Find(key, m_keyProfile);
     if (action == 0)
         return false;
 
@@ -1712,7 +1712,7 @@ void MHIDLA::DrawArcSector(int /*x*/, int /*y*/, int /*width*/, int /*height*/,
 // The UK profile says that MHEG should not contain concave or
 // self-crossing polygons but we can get the former at least as
 // a result of rounding when drawing ellipses.
-typedef struct { int yBottom, yTop, xBottom; float slope; } lineSeg;
+typedef struct { int m_yBottom, m_yTop, m_xBottom; float m_slope; } lineSeg;
 
 void MHIDLA::DrawPoly(bool isFilled, int nPoints, const int *xArray, const int *yArray)
 {
@@ -1737,17 +1737,17 @@ void MHIDLA::DrawPoly(bool isFilled, int nPoints, const int *xArray, const int *
             {
                 if (lastY > thisY)
                 {
-                    lineArray[nLines].yBottom = thisY;
-                    lineArray[nLines].yTop = lastY;
-                    lineArray[nLines].xBottom = thisX;
+                    lineArray[nLines].m_yBottom = thisY;
+                    lineArray[nLines].m_yTop = lastY;
+                    lineArray[nLines].m_xBottom = thisX;
                 }
                 else
                 {
-                    lineArray[nLines].yBottom = lastY;
-                    lineArray[nLines].yTop = thisY;
-                    lineArray[nLines].xBottom = lastX;
+                    lineArray[nLines].m_yBottom = lastY;
+                    lineArray[nLines].m_yTop = thisY;
+                    lineArray[nLines].m_xBottom = lastX;
                 }
-                lineArray[nLines++].slope =
+                lineArray[nLines++].m_slope =
                     (float)(thisX-lastX) / (float)(thisY-lastY);
             }
             if (thisY < yMin)
@@ -1768,10 +1768,10 @@ void MHIDLA::DrawPoly(bool isFilled, int nPoints, const int *xArray, const int *
             int crossings = 0, xMin = 0, xMax = 0;
             for (int l = 0; l < nLines; l++)
             {
-                if (y >= lineArray[l].yBottom && y < lineArray[l].yTop)
+                if (y >= lineArray[l].m_yBottom && y < lineArray[l].m_yTop)
                 {
-                    int x = (int)round((float)(y - lineArray[l].yBottom) *
-                        lineArray[l].slope) + lineArray[l].xBottom;
+                    int x = (int)round((float)(y - lineArray[l].m_yBottom) *
+                        lineArray[l].m_slope) + lineArray[l].m_xBottom;
                     if (crossings == 0 || x < xMin)
                         xMin = x;
                     if (crossings == 0 || x > xMax)

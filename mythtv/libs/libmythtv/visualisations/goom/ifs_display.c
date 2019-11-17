@@ -11,31 +11,31 @@ void
 ifs_update (guint32 * data, const guint32 * back, int width, int height,
 						int increment)
 {
-	static int couleur = 0xc0c0c0c0;
-	static int v[4] = { 2, 4, 3, 2 };
-	static int col[4] = { 2, 4, 3, 2 };
+	static int s_couleur = 0xc0c0c0c0;
+	static int s_v[4] = { 2, 4, 3, 2 };
+	static int s_col[4] = { 2, 4, 3, 2 };
 
 #define MOD_MER 0
 #define MOD_FEU 1
 #define MOD_MERVER 2
-	static int mode = MOD_MERVER;
-	static int justChanged = 0;
-	static int cycle = 0;
+	static int s_mode = MOD_MERVER;
+	static int s_justChanged = 0;
+	static int s_cycle = 0;
 	int     cycle10;
 
 	int     nbpt;
 	IFSPoint *points;
 
-	int     couleursl = couleur;
+	int     couleursl = s_couleur;
 
-	cycle++;
-	if (cycle >= 80)
-		cycle = 0;
+	s_cycle++;
+	if (s_cycle >= 80)
+		s_cycle = 0;
 
-	if (cycle < 40)
-		cycle10 = cycle / 10;
+	if (s_cycle < 40)
+		cycle10 = s_cycle / 10;
 	else
-		cycle10 = 7 - cycle / 10;
+		cycle10 = 7 - s_cycle / 10;
 
 	{
 		unsigned char *tmp = (unsigned char *) &couleursl;
@@ -89,179 +89,179 @@ ifs_update (guint32 * data, const guint32 * back, int width, int height,
 		}
 	}
 #endif /*MMX*/
-		justChanged--;
+		s_justChanged--;
 
-	col[ALPHA] = couleur >> (ALPHA * 8) & 0xff;
-	col[BLEU] = couleur >> (BLEU * 8) & 0xff;
-	col[VERT] = couleur >> (VERT * 8) & 0xff;
-	col[ROUGE] = couleur >> (ROUGE * 8) & 0xff;
+	s_col[ALPHA] = s_couleur >> (ALPHA * 8) & 0xff;
+	s_col[BLEU]  = s_couleur >> (BLEU * 8)  & 0xff;
+	s_col[VERT]  = s_couleur >> (VERT * 8)  & 0xff;
+	s_col[ROUGE] = s_couleur >> (ROUGE * 8) & 0xff;
 
-	if (mode == MOD_MER) {
-		col[BLEU] += v[BLEU];
-		if (col[BLEU] > 255) {
-			col[BLEU] = 255;
-			v[BLEU] = -(RAND() % 4) - 1;
+	if (s_mode == MOD_MER) {
+		s_col[BLEU] += s_v[BLEU];
+		if (s_col[BLEU] > 255) {
+			s_col[BLEU] = 255;
+			s_v[BLEU] = -(RAND() % 4) - 1;
 		}
-		if (col[BLEU] < 32) {
-			col[BLEU] = 32;
-			v[BLEU] = (RAND() % 4) + 1;
-		}
-
-		col[VERT] += v[VERT];
-		if (col[VERT] > 200) {
-			col[VERT] = 200;
-			v[VERT] = -(RAND() % 3) - 2;
-		}
-		if (col[VERT] > col[BLEU]) {
-			col[VERT] = col[BLEU];
-			v[VERT] = v[BLEU];
-		}
-		if (col[VERT] < 32) {
-			col[VERT] = 32;
-			v[VERT] = (RAND() % 3) + 2;
+		if (s_col[BLEU] < 32) {
+			s_col[BLEU] = 32;
+			s_v[BLEU] = (RAND() % 4) + 1;
 		}
 
-		col[ROUGE] += v[ROUGE];
-		if (col[ROUGE] > 64) {
-			col[ROUGE] = 64;
-			v[ROUGE] = -(RAND () % 4) - 1;
+		s_col[VERT] += s_v[VERT];
+		if (s_col[VERT] > 200) {
+			s_col[VERT] = 200;
+			s_v[VERT] = -(RAND() % 3) - 2;
 		}
-		if (col[ROUGE] < 0) {
-			col[ROUGE] = 0;
-			v[ROUGE] = (RAND () % 4) + 1;
+		if (s_col[VERT] > s_col[BLEU]) {
+			s_col[VERT] = s_col[BLEU];
+			s_v[VERT] = s_v[BLEU];
 		}
-
-		col[ALPHA] += v[ALPHA];
-		if (col[ALPHA] > 0) {
-			col[ALPHA] = 0;
-			v[ALPHA] = -(RAND () % 4) - 1;
-		}
-		if (col[ALPHA] < 0) {
-			col[ALPHA] = 0;
-			v[ALPHA] = (RAND () % 4) + 1;
+		if (s_col[VERT] < 32) {
+			s_col[VERT] = 32;
+			s_v[VERT] = (RAND() % 3) + 2;
 		}
 
-		if (((col[VERT] > 32) && (col[ROUGE] < col[VERT] + 40)
-				 && (col[VERT] < col[ROUGE] + 20) && (col[BLEU] < 64)
-				 && (RAND () % 20 == 0)) && (justChanged < 0)) {
-			mode = (RAND () % 3) ? MOD_FEU : MOD_MERVER;
-			justChanged = 250;
+		s_col[ROUGE] += s_v[ROUGE];
+		if (s_col[ROUGE] > 64) {
+			s_col[ROUGE] = 64;
+			s_v[ROUGE] = -(RAND () % 4) - 1;
+		}
+		if (s_col[ROUGE] < 0) {
+			s_col[ROUGE] = 0;
+			s_v[ROUGE] = (RAND () % 4) + 1;
+		}
+
+		s_col[ALPHA] += s_v[ALPHA];
+		if (s_col[ALPHA] > 0) {
+			s_col[ALPHA] = 0;
+			s_v[ALPHA] = -(RAND () % 4) - 1;
+		}
+		if (s_col[ALPHA] < 0) {
+			s_col[ALPHA] = 0;
+			s_v[ALPHA] = (RAND () % 4) + 1;
+		}
+
+		if (((s_col[VERT] > 32) && (s_col[ROUGE] < s_col[VERT] + 40)
+				 && (s_col[VERT] < s_col[ROUGE] + 20) && (s_col[BLEU] < 64)
+				 && (RAND () % 20 == 0)) && (s_justChanged < 0)) {
+			s_mode = (RAND () % 3) ? MOD_FEU : MOD_MERVER;
+			s_justChanged = 250;
 		}
 	}
-	else if (mode == MOD_MERVER) {
-		col[BLEU] += v[BLEU];
-		if (col[BLEU] > 128) {
-			col[BLEU] = 128;
-			v[BLEU] = -(RAND () % 4) - 1;
+	else if (s_mode == MOD_MERVER) {
+		s_col[BLEU] += s_v[BLEU];
+		if (s_col[BLEU] > 128) {
+			s_col[BLEU] = 128;
+			s_v[BLEU] = -(RAND () % 4) - 1;
 		}
-		if (col[BLEU] < 16) {
-			col[BLEU] = 16;
-			v[BLEU] = (RAND () % 4) + 1;
-		}
-
-		col[VERT] += v[VERT];
-		if (col[VERT] > 200) {
-			col[VERT] = 200;
-			v[VERT] = -(RAND () % 3) - 2;
-		}
-		if (col[VERT] > col[ALPHA]) {
-			col[VERT] = col[ALPHA];
-			v[VERT] = v[ALPHA];
-		}
-		if (col[VERT] < 32) {
-			col[VERT] = 32;
-			v[VERT] = (RAND () % 3) + 2;
+		if (s_col[BLEU] < 16) {
+			s_col[BLEU] = 16;
+			s_v[BLEU] = (RAND () % 4) + 1;
 		}
 
-		col[ROUGE] += v[ROUGE];
-		if (col[ROUGE] > 128) {
-			col[ROUGE] = 128;
-			v[ROUGE] = -(RAND () % 4) - 1;
+		s_col[VERT] += s_v[VERT];
+		if (s_col[VERT] > 200) {
+			s_col[VERT] = 200;
+			s_v[VERT] = -(RAND () % 3) - 2;
 		}
-		if (col[ROUGE] < 0) {
-			col[ROUGE] = 0;
-			v[ROUGE] = (RAND () % 4) + 1;
+		if (s_col[VERT] > s_col[ALPHA]) {
+			s_col[VERT] = s_col[ALPHA];
+			s_v[VERT] = s_v[ALPHA];
 		}
-
-		col[ALPHA] += v[ALPHA];
-		if (col[ALPHA] > 255) {
-			col[ALPHA] = 255;
-			v[ALPHA] = -(RAND () % 4) - 1;
-		}
-		if (col[ALPHA] < 0) {
-			col[ALPHA] = 0;
-			v[ALPHA] = (RAND () % 4) + 1;
+		if (s_col[VERT] < 32) {
+			s_col[VERT] = 32;
+			s_v[VERT] = (RAND () % 3) + 2;
 		}
 
-		if (((col[VERT] > 32) && (col[ROUGE] < col[VERT] + 40)
-				 && (col[VERT] < col[ROUGE] + 20) && (col[BLEU] < 64)
-				 && (RAND () % 20 == 0)) && (justChanged < 0)) {
-			mode = (RAND () % 3) ? MOD_FEU : MOD_MER;
-			justChanged = 250;
+		s_col[ROUGE] += s_v[ROUGE];
+		if (s_col[ROUGE] > 128) {
+			s_col[ROUGE] = 128;
+			s_v[ROUGE] = -(RAND () % 4) - 1;
+		}
+		if (s_col[ROUGE] < 0) {
+			s_col[ROUGE] = 0;
+			s_v[ROUGE] = (RAND () % 4) + 1;
+		}
+
+		s_col[ALPHA] += s_v[ALPHA];
+		if (s_col[ALPHA] > 255) {
+			s_col[ALPHA] = 255;
+			s_v[ALPHA] = -(RAND () % 4) - 1;
+		}
+		if (s_col[ALPHA] < 0) {
+			s_col[ALPHA] = 0;
+			s_v[ALPHA] = (RAND () % 4) + 1;
+		}
+
+		if (((s_col[VERT] > 32) && (s_col[ROUGE] < s_col[VERT] + 40)
+				 && (s_col[VERT] < s_col[ROUGE] + 20) && (s_col[BLEU] < 64)
+				 && (RAND () % 20 == 0)) && (s_justChanged < 0)) {
+			s_mode = (RAND () % 3) ? MOD_FEU : MOD_MER;
+			s_justChanged = 250;
 		}
 	}
-	else if (mode == MOD_FEU) {
+	else if (s_mode == MOD_FEU) {
 
-		col[BLEU] += v[BLEU];
-		if (col[BLEU] > 64) {
-			col[BLEU] = 64;
-			v[BLEU] = -(RAND () % 4) - 1;
+		s_col[BLEU] += s_v[BLEU];
+		if (s_col[BLEU] > 64) {
+			s_col[BLEU] = 64;
+			s_v[BLEU] = -(RAND () % 4) - 1;
 		}
-		if (col[BLEU] < 0) {
-			col[BLEU] = 0;
-			v[BLEU] = (RAND () % 4) + 1;
-		}
-
-		col[VERT] += v[VERT];
-		if (col[VERT] > 200) {
-			col[VERT] = 200;
-			v[VERT] = -(RAND () % 3) - 2;
-		}
-		if (col[VERT] > col[ROUGE] + 20) {
-			col[VERT] = col[ROUGE] + 20;
-			v[VERT] = -(RAND () % 3) - 2;
-			v[ROUGE] = (RAND () % 4) + 1;
-			v[BLEU] = (RAND () % 4) + 1;
-		}
-		if (col[VERT] < 0) {
-			col[VERT] = 0;
-			v[VERT] = (RAND () % 3) + 2;
+		if (s_col[BLEU] < 0) {
+			s_col[BLEU] = 0;
+			s_v[BLEU] = (RAND () % 4) + 1;
 		}
 
-		col[ROUGE] += v[ROUGE];
-		if (col[ROUGE] > 255) {
-			col[ROUGE] = 255;
-			v[ROUGE] = -(RAND () % 4) - 1;
+		s_col[VERT] += s_v[VERT];
+		if (s_col[VERT] > 200) {
+			s_col[VERT] = 200;
+			s_v[VERT] = -(RAND () % 3) - 2;
 		}
-		if (col[ROUGE] > col[VERT] + 40) {
-			col[ROUGE] = col[VERT] + 40;
-			v[ROUGE] = -(RAND () % 4) - 1;
+		if (s_col[VERT] > s_col[ROUGE] + 20) {
+			s_col[VERT] = s_col[ROUGE] + 20;
+			s_v[VERT] = -(RAND () % 3) - 2;
+			s_v[ROUGE] = (RAND () % 4) + 1;
+			s_v[BLEU] = (RAND () % 4) + 1;
 		}
-		if (col[ROUGE] < 0) {
-			col[ROUGE] = 0;
-			v[ROUGE] = (RAND () % 4) + 1;
-		}
-
-		col[ALPHA] += v[ALPHA];
-		if (col[ALPHA] > 0) {
-			col[ALPHA] = 0;
-			v[ALPHA] = -(RAND () % 4) - 1;
-		}
-		if (col[ALPHA] < 0) {
-			col[ALPHA] = 0;
-			v[ALPHA] = (RAND () % 4) + 1;
+		if (s_col[VERT] < 0) {
+			s_col[VERT] = 0;
+			s_v[VERT] = (RAND () % 3) + 2;
 		}
 
-		if (((col[ROUGE] < 64) && (col[VERT] > 32) && (col[VERT] < col[BLEU])
-				 && (col[BLEU] > 32)
-				 && (RAND () % 20 == 0)) && (justChanged < 0)) {
-			mode = (RAND () % 2) ? MOD_MER : MOD_MERVER;
-			justChanged = 250;
+		s_col[ROUGE] += s_v[ROUGE];
+		if (s_col[ROUGE] > 255) {
+			s_col[ROUGE] = 255;
+			s_v[ROUGE] = -(RAND () % 4) - 1;
+		}
+		if (s_col[ROUGE] > s_col[VERT] + 40) {
+			s_col[ROUGE] = s_col[VERT] + 40;
+			s_v[ROUGE] = -(RAND () % 4) - 1;
+		}
+		if (s_col[ROUGE] < 0) {
+			s_col[ROUGE] = 0;
+			s_v[ROUGE] = (RAND () % 4) + 1;
+		}
+
+		s_col[ALPHA] += s_v[ALPHA];
+		if (s_col[ALPHA] > 0) {
+			s_col[ALPHA] = 0;
+			s_v[ALPHA] = -(RAND () % 4) - 1;
+		}
+		if (s_col[ALPHA] < 0) {
+			s_col[ALPHA] = 0;
+			s_v[ALPHA] = (RAND () % 4) + 1;
+		}
+
+		if (((s_col[ROUGE] < 64) && (s_col[VERT] > 32) && (s_col[VERT] < s_col[BLEU])
+				 && (s_col[BLEU] > 32)
+				 && (RAND () % 20 == 0)) && (s_justChanged < 0)) {
+			s_mode = (RAND () % 2) ? MOD_MER : MOD_MERVER;
+			s_justChanged = 250;
 		}
 	}
 
-	couleur = (col[ALPHA] << (ALPHA * 8))
-		| (col[BLEU] << (BLEU * 8))
-		| (col[VERT] << (VERT * 8))
-		| (col[ROUGE] << (ROUGE * 8));
+	s_couleur = (s_col[ALPHA] << (ALPHA * 8))
+		| (s_col[BLEU] << (BLEU * 8))
+		| (s_col[VERT] << (VERT * 8))
+		| (s_col[ROUGE] << (ROUGE * 8));
 }

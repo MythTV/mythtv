@@ -117,7 +117,7 @@ static QString decode_text(const unsigned char *buf, uint length)
 {
     // Only some of the QTextCodec calls are reentrant.
     // If you use this please verify that you are using a reentrant call.
-    static const QTextCodec *iso8859_codecs[16] =
+    static const QTextCodec *s_iso8859Codecs[16] =
     {
         QTextCodec::codecForName("Latin1"),
         QTextCodec::codecForName("ISO8859-1"),  // Western
@@ -144,7 +144,7 @@ static QString decode_text(const unsigned char *buf, uint length)
     }
     if ((buf[0] >= 0x01) && (buf[0] <= 0x0B))
     {
-        return iso8859_codecs[4 + buf[0]]->toUnicode((char*)(buf + 1), length - 1);
+        return s_iso8859Codecs[4 + buf[0]]->toUnicode((char*)(buf + 1), length - 1);
     }
     if (buf[0] == 0x10)
     {
@@ -156,7 +156,7 @@ static QString decode_text(const unsigned char *buf, uint length)
 
         uint code = buf[1] << 8 | buf[2];
         if (code <= 15)
-            return iso8859_codecs[code]->toUnicode((char*)(buf + 3), length - 3);
+            return s_iso8859Codecs[code]->toUnicode((char*)(buf + 3), length - 3);
         return QString::fromLocal8Bit((char*)(buf + 3), length - 3);
     }
     if (buf[0] == 0x15) // Already Unicode

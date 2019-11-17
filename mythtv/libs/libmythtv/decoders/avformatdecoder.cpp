@@ -124,11 +124,11 @@ static float get_aspect(const AVCodecContext &ctx)
 }
 static float get_aspect(H264Parser &p)
 {
-    static const float default_aspect = 4.0F / 3.0F;
+    static constexpr float kDefaultAspect = 4.0F / 3.0F;
     int asp = p.aspectRatio();
     switch (asp)
     {
-        case 0: return default_aspect;
+        case 0: return kDefaultAspect;
         case 2: return 4.0F / 3.0F;
         case 3: return 16.0F / 9.0F;
         case 4: return 2.21F;
@@ -145,7 +145,7 @@ static float get_aspect(H264Parser &p)
         }
         else
         {
-            aspect_ratio = default_aspect;
+            aspect_ratio = kDefaultAspect;
         }
     }
     return aspect_ratio;
@@ -239,9 +239,9 @@ static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
     if (VERBOSE_LEVEL_NONE)
         return;
 
-    static QString full_line("");
-    static const int msg_len = 255;
-    static QMutex string_lock;
+    static QString s_fullLine("");
+    static constexpr int kMsgLen = 255;
+    static QMutex s_stringLock;
     uint64_t   verbose_mask  = VB_LIBAV;
     LogLevel_t verbose_level = LOG_EMERG;
 
@@ -277,33 +277,33 @@ static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
     if (!VERBOSE_LEVEL_CHECK(verbose_mask, verbose_level))
         return;
 
-    string_lock.lock();
-    if (full_line.isEmpty() && ptr) {
+    s_stringLock.lock();
+    if (s_fullLine.isEmpty() && ptr) {
         AVClass* avc = *(AVClass**)ptr;
-        full_line = QString("[%1 @ %2] ")
+        s_fullLine = QString("[%1 @ %2] ")
             .arg(avc->item_name(ptr))
             .arg((quintptr)avc, QT_POINTER_SIZE * 2, 16, QChar('0'));
     }
 
-    char str[msg_len+1];
-    int bytes = vsnprintf(str, msg_len+1, fmt, vl);
+    char str[kMsgLen+1];
+    int bytes = vsnprintf(str, kMsgLen+1, fmt, vl);
 
     // check for truncated messages and fix them
-    if (bytes > msg_len)
+    if (bytes > kMsgLen)
     {
         LOG(VB_GENERAL, LOG_WARNING,
             QString("Libav log output truncated %1 of %2 bytes written")
-                .arg(msg_len).arg(bytes));
-        str[msg_len-1] = '\n';
+                .arg(kMsgLen).arg(bytes));
+        str[kMsgLen-1] = '\n';
     }
 
-    full_line += QString(str);
-    if (full_line.endsWith("\n"))
+    s_fullLine += QString(str);
+    if (s_fullLine.endsWith("\n"))
     {
-        LOG(verbose_mask, verbose_level, full_line.trimmed());
-        full_line.truncate(0);
+        LOG(verbose_mask, verbose_level, s_fullLine.trimmed());
+        s_fullLine.truncate(0);
     }
-    string_lock.unlock();
+    s_stringLock.unlock();
 }
 
 static int get_canonical_lang(const char *lang_cstr)
@@ -3736,13 +3736,13 @@ void AvFormatDecoder::ProcessVBIDataPacket(
         return;
     }
 
-    static const uint min_blank = 6;
+    static constexpr uint kMinBlank = 6;
     for (uint i = 0; i < 36; i++)
     {
         if (!((linemask >> i) & 0x1))
             continue;
 
-        const uint line  = ((i < 18) ? i : i-18) + min_blank;
+        const uint line  = ((i < 18) ? i : i-18) + kMinBlank;
         const uint field = (i<18) ? 0 : 1;
         const uint id2 = *buf & 0xf;
         switch (id2)

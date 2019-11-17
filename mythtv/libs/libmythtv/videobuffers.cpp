@@ -244,33 +244,33 @@ void VideoBuffers::SetDeinterlacing(MythDeintType Single, MythDeintType Double,
 void VideoBuffers::SetDeinterlacingFlags(VideoFrame &Frame, MythDeintType Single,
                                          MythDeintType Double, MythCodecID CodecID)
 {
-    static const MythDeintType driver   = DEINT_ALL & ~(DEINT_CPU | DEINT_SHADER);
-    static const MythDeintType shader   = DEINT_ALL & ~(DEINT_CPU | DEINT_DRIVER);
-    static const MythDeintType software = DEINT_ALL & ~(DEINT_SHADER | DEINT_DRIVER);
+    static const MythDeintType kDriver   = DEINT_ALL & ~(DEINT_CPU | DEINT_SHADER);
+    static const MythDeintType kShader   = DEINT_ALL & ~(DEINT_CPU | DEINT_DRIVER);
+    static const MythDeintType kSoftware = DEINT_ALL & ~(DEINT_SHADER | DEINT_DRIVER);
     Frame.deinterlace_single  = Single;
     Frame.deinterlace_double  = Double;
 
     if (codec_is_copyback(CodecID))
     {
         if (codec_is_vaapi_dec(CodecID) || codec_is_nvdec_dec(CodecID))
-            Frame.deinterlace_allowed = software | shader | driver;
+            Frame.deinterlace_allowed = kSoftware | kShader | kDriver;
         else // VideoToolBox, MediaCodec and VDPAU copyback
-            Frame.deinterlace_allowed = software | shader;
+            Frame.deinterlace_allowed = kSoftware | kShader;
     }
     else if (FMT_DRMPRIME == Frame.codec)
-        Frame.deinterlace_allowed = shader; // No driver deint - if RGBA frames are returned, shaders will be disabled
+        Frame.deinterlace_allowed = kShader; // No driver deint - if RGBA frames are returned, shaders will be disabled
     else if (FMT_MMAL == Frame.codec)
-        Frame.deinterlace_allowed = shader; // No driver deint yet (TODO) and YUV frames returned
+        Frame.deinterlace_allowed = kShader; // No driver deint yet (TODO) and YUV frames returned
     else if (FMT_VTB == Frame.codec)
-        Frame.deinterlace_allowed = shader; // No driver deint and YUV frames returned
+        Frame.deinterlace_allowed = kShader; // No driver deint and YUV frames returned
     else if (FMT_NVDEC == Frame.codec)
-        Frame.deinterlace_allowed = shader | driver; // YUV frames and decoder deint
+        Frame.deinterlace_allowed = kShader | kDriver; // YUV frames and decoder deint
     else if (FMT_VDPAU == Frame.codec)
-        Frame.deinterlace_allowed = driver; // No YUV frames for shaders
+        Frame.deinterlace_allowed = kDriver; // No YUV frames for shaders
     else if (FMT_VAAPI == Frame.codec)
-        Frame.deinterlace_allowed = driver; // DRM will allow shader if no VPP
+        Frame.deinterlace_allowed = kDriver; // DRM will allow shader if no VPP
     else
-        Frame.deinterlace_allowed = software | shader;
+        Frame.deinterlace_allowed = kSoftware | kShader;
 }
 
 /**

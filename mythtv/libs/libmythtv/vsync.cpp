@@ -166,21 +166,21 @@ int VideoSync::CalcDelay(int nominal_frame_interval)
 #define DRM_VBLANK_RELATIVE 0x1;
 
 struct drm_wait_vblank_request {
-    int type;
-    unsigned int sequence;
-    unsigned long signal;
+    int           m_type;
+    unsigned int  m_sequence;
+    unsigned long m_signal;
 };
 
 struct drm_wait_vblank_reply {
-    int type;
-    unsigned int sequence;
-    long tval_sec;
-    long tval_usec;
+    int          m_type;
+    unsigned int m_sequence;
+    long         m_tvalSec;
+    long         m_tvalUsec;
 };
 
 typedef union drm_wait_vblank {
-    struct drm_wait_vblank_request request;
-    struct drm_wait_vblank_reply reply;
+    struct drm_wait_vblank_request m_request;
+    struct drm_wait_vblank_reply   m_reply;
 } drm_wait_vblank_t;
 
 #define DRM_IOCTL_BASE                  'd'
@@ -194,7 +194,7 @@ static int drmWaitVBlank(int fd, drm_wait_vblank_t *vbl)
 
     do {
        ret = ioctl(fd, DRM_IOCTL_WAIT_VBLANK, vbl);
-       vbl->request.type &= ~DRM_VBLANK_RELATIVE;
+       vbl->m_request.m_type &= ~DRM_VBLANK_RELATIVE;
     } while (ret && errno == EINTR);
 
     return ret;
@@ -228,8 +228,8 @@ bool DRMVideoSync::TryInit(void)
         return false; // couldn't open device
     }
 
-    blank.request.type = DRM_VBLANK_RELATIVE;
-    blank.request.sequence = 1;
+    blank.m_request.m_type = DRM_VBLANK_RELATIVE;
+    blank.m_request.m_sequence = 1;
     if (drmWaitVBlank(m_dri_fd, &blank))
     {
         LOG(VB_PLAYBACK, LOG_ERR, LOC +
@@ -245,8 +245,8 @@ void DRMVideoSync::Start(void)
 {
     // Wait for a refresh so we start out synched
     drm_wait_vblank_t blank;
-    blank.request.type = DRM_VBLANK_RELATIVE;
-    blank.request.sequence = 1;
+    blank.m_request.m_type = DRM_VBLANK_RELATIVE;
+    blank.m_request.m_sequence = 1;
     drmWaitVBlank(m_dri_fd, &blank);
     VideoSync::Start();
 }
@@ -265,8 +265,8 @@ int DRMVideoSync::WaitForFrame(int nominal_frame_interval, int extra_delay)
     if (m_delay > -(m_refresh_interval/2))
     {
         drm_wait_vblank_t blank;
-        blank.request.type = DRM_VBLANK_RELATIVE;
-        blank.request.sequence = 1;
+        blank.m_request.m_type = DRM_VBLANK_RELATIVE;
+        blank.m_request.m_sequence = 1;
         drmWaitVBlank(m_dri_fd, &blank);
         m_delay = CalcDelay(nominal_frame_interval);
 #if 0
@@ -280,8 +280,8 @@ int DRMVideoSync::WaitForFrame(int nominal_frame_interval, int extra_delay)
         int n = (m_delay + m_refresh_interval - 1) / m_refresh_interval;
 
         drm_wait_vblank_t blank;
-        blank.request.type = DRM_VBLANK_RELATIVE;
-        blank.request.sequence = n;
+        blank.m_request.m_type = DRM_VBLANK_RELATIVE;
+        blank.m_request.m_sequence = n;
         drmWaitVBlank(m_dri_fd, &blank);
         m_delay = CalcDelay(nominal_frame_interval);
 #if 0

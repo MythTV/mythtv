@@ -510,7 +510,7 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
             }
             else if (EITFixUp::kFixAUDescription & fix)//AU Freeview assigned genres
             {
-                static const char *AUGenres[] =
+                static const char *s_auGenres[] =
                     {/* 0*/"Unknown", "Movie", "News", "Entertainment",
                      /* 4*/"Sport", "Children", "Music", "Arts/Culture",
                      /* 8*/"Current Affairs", "Education", "Infotainment",
@@ -519,13 +519,13 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
                 ContentDescriptor content(content_data);
                 if (content.IsValid())
                 {
-                    category = AUGenres[content.Nibble1(0)];
+                    category = s_auGenres[content.Nibble1(0)];
                     category_type = content.GetMythCategory(0);
                 }
             }
             else if (EITFixUp::kFixGreekEIT & fix)//Greek
             {
-                static const char *GrGenres[] =
+                static const char *s_grGenres[] =
                     {/* 0*/"Unknown",  "Ταινία", "Ενημερωτικό", "Unknown",
                      /* 4*/"Αθλητικό", "Παιδικό", "Unknown", "Unknown",
                      /* 8*/"Unknown", "Ντοκιμαντέρ", "Unknown", "Unknown",
@@ -533,7 +533,7 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
                 ContentDescriptor content(content_data);
                 if (content.IsValid())
                 {
-                    category = GrGenres[content.Nibble2(0)];
+                    category = s_grGenres[content.Nibble2(0)];
                     category_type = content.GetMythCategory(2);
                 }
             }

@@ -518,17 +518,17 @@ int RTjpeg::s2b(int16_t *data, const int8_t *strm, uint8_t bt8, uint32_t *qtbla)
 void RTjpeg::QuantInit(void)
 {
  int i;
- typedef union { int16_t *int16; int32_t *int32; } P16_32;
+ typedef union { int16_t *m_int16; int32_t *m_int32; } P16_32;
  P16_32 qtbl;
 
- qtbl.int32 = lqt;
+ qtbl.m_int32 = lqt;
  for (i = 0; i < 64; i++)
-     qtbl.int16[i] = static_cast<int16_t>(lqt[i]);
+     qtbl.m_int16[i] = static_cast<int16_t>(lqt[i]);
 
  // cppcheck-suppress unreadVariable
- qtbl.int32 = cqt;
+ qtbl.m_int32 = cqt;
  for (i = 0; i < 64; i++)
-    qtbl.int16[i] = static_cast<int16_t>(cqt[i]);
+    qtbl.m_int16[i] = static_cast<int16_t>(cqt[i]);
 }
 
 void RTjpeg::Quant(int16_t *_block, int32_t *qtbl)
@@ -1540,11 +1540,11 @@ void RTjpeg::Idct(uint8_t *odata, int16_t *data, int rskip)
 {
 #ifdef MMX
 
-static mmx_t fix_141;         fix_141.q = 0x5a825a825a825a82LL;
-static mmx_t fix_184n261; fix_184n261.q = 0xcf04cf04cf04cf04LL;
-static mmx_t fix_184;         fix_184.q = 0x7641764176417641LL;
-static mmx_t fix_n184;       fix_n184.q = 0x896f896f896f896fLL;
-static mmx_t fix_108n184; fix_108n184.q = 0xcf04cf04cf04cf04LL;
+static mmx_t s_fix141;         s_fix141.q = 0x5a825a825a825a82LL;
+static mmx_t s_fix184n261; s_fix184n261.q = 0xcf04cf04cf04cf04LL;
+static mmx_t s_fix184;         s_fix184.q = 0x7641764176417641LL;
+static mmx_t s_fixN184;       s_fixN184.q = 0x896f896f896f896fLL;
+static mmx_t s_fix108n184; s_fix108n184.q = 0xcf04cf04cf04cf04LL;
 
   mmx_t *wsptr = (mmx_t *)ws;
   mmx_t *dataptr = (mmx_t *)odata;
@@ -1574,10 +1574,10 @@ static mmx_t fix_108n184; fix_108n184.q = 0xcf04cf04cf04cf04LL;
         psllw_i2r(2, mm2);                              // shift z10
         movq_r2r(mm2, mm0);                             // copy z10
 
-        pmulhw_m2r(fix_184n261, mm2);   // MULTIPLY( z12, FIX_1_847759065); /* 2*c2 */
+        pmulhw_m2r(s_fix184n261, mm2);   // MULTIPLY( z12, FIX_1_847759065); /* 2*c2 */
         movq_r2r(mm3, mm5);                             // copy tmp4
 
-        pmulhw_m2r(fix_n184, mm0);              // MULTIPLY(z10, -FIX_1_847759065); /* 2*c2 */
+        pmulhw_m2r(s_fixN184, mm0);              // MULTIPLY(z10, -FIX_1_847759065); /* 2*c2 */
         paddw_r2r(mm4, mm3);                            // z11 = tmp4 + tmp7;
 
         movq_r2r(mm3, mm6);                             // copy z11                     /* phase 5 */
@@ -1589,13 +1589,13 @@ static mmx_t fix_108n184; fix_108n184.q = 0xcf04cf04cf04cf04LL;
         movq_m2r(*(idata+12), mm4);     // load idata[DCTSIZE*6], even part
         movq_r2r(mm5, mm7);                             //      copy z12
 
-        pmulhw_m2r(fix_108n184, mm5); //        MULT(z12, (FIX_1_08-FIX_1_84)) //- z5; /* 2*(c2-c6) */ even part
+        pmulhw_m2r(s_fix108n184, mm5); //        MULT(z12, (FIX_1_08-FIX_1_84)) //- z5; /* 2*(c2-c6) */ even part
         paddw_r2r(mm1, mm3);                            // tmp7 = z11 + z13;
 
         //ok
 
     /* Even part */
-        pmulhw_m2r(fix_184, mm7);               // MULTIPLY(z10,(FIX_1_847759065 - FIX_2_613125930)) //+ z5; /* -2*(c2+c6) */
+        pmulhw_m2r(s_fix184, mm7);               // MULTIPLY(z10,(FIX_1_847759065 - FIX_2_613125930)) //+ z5; /* -2*(c2+c6) */
         psllw_i2r(2, mm6);
 
         movq_m2r(*(idata+4), mm1);              // load idata[DCTSIZE*2]
@@ -1604,7 +1604,7 @@ static mmx_t fix_108n184; fix_108n184.q = 0xcf04cf04cf04cf04LL;
 
         paddw_r2r(mm7, mm2);                            // tmp12
 
-        pmulhw_m2r(fix_141, mm6);               // tmp11 = MULTIPLY(z11 - z13, FIX_1_414213562); /* 2*c4 */
+        pmulhw_m2r(s_fix141, mm6);               // tmp11 = MULTIPLY(z11 - z13, FIX_1_414213562); /* 2*c4 */
         psubw_r2r(mm3, mm2);                            // tmp6 = tmp12 - tmp7
 
         movq_r2r(mm1, mm5);                             // copy tmp1
@@ -1618,7 +1618,7 @@ static mmx_t fix_108n184; fix_108n184.q = 0xcf04cf04cf04cf04LL;
 
         movq_m2r(*(idata), mm7);                // load idata[DCTSIZE*0]
 
-        pmulhw_m2r(fix_141, mm5);               // MULTIPLY(tmp1 - tmp3, FIX_1_414213562)
+        pmulhw_m2r(s_fix141, mm5);               // MULTIPLY(tmp1 - tmp3, FIX_1_414213562)
         paddw_r2r(mm6, mm0);                            // tmp4 = tmp10 + tmp5;
 
         movq_m2r(*(idata+8), mm4);      // load idata[DCTSIZE*4]
@@ -1701,10 +1701,10 @@ static mmx_t fix_108n184; fix_108n184.q = 0xcf04cf04cf04cf04LL;
         psllw_i2r(2, mm2);                              //      shift z10
         movq_r2r(mm2, mm0);                             //      copy z10
 
-        pmulhw_m2r(fix_184n261, mm2);   // MULTIPLY( z12, FIX_1_847759065); /* 2*c2 */
+        pmulhw_m2r(s_fix184n261, mm2);   // MULTIPLY( z12, FIX_1_847759065); /* 2*c2 */
         movq_r2r(mm3, mm5);                             //      copy tmp4
 
-        pmulhw_m2r(fix_n184, mm0);              // MULTIPLY(z10, -FIX_1_847759065); /* 2*c2 */
+        pmulhw_m2r(s_fixN184, mm0);              // MULTIPLY(z10, -FIX_1_847759065); /* 2*c2 */
         paddw_r2r(mm4, mm3);                            // z11 = tmp4 + tmp7;
 
         movq_r2r(mm3, mm6);                             // copy z11                     /* phase 5 */
@@ -1716,13 +1716,13 @@ static mmx_t fix_108n184; fix_108n184.q = 0xcf04cf04cf04cf04LL;
         movq_m2r(*(idata+12), mm4);     // load idata[DCTSIZE*6], even part
         movq_r2r(mm5, mm7);                             // copy z12
 
-        pmulhw_m2r(fix_108n184, mm5);   // MULT(z12, (FIX_1_08-FIX_1_84)) //- z5; /* 2*(c2-c6) */ even part
+        pmulhw_m2r(s_fix108n184, mm5);   // MULT(z12, (FIX_1_08-FIX_1_84)) //- z5; /* 2*(c2-c6) */ even part
         paddw_r2r(mm1, mm3);                            // tmp7 = z11 + z13;
 
         //ok
 
     /* Even part */
-        pmulhw_m2r(fix_184, mm7);               // MULTIPLY(z10,(FIX_1_847759065 - FIX_2_613125930)) //+ z5; /* -2*(c2+c6) */
+        pmulhw_m2r(s_fix184, mm7);               // MULTIPLY(z10,(FIX_1_847759065 - FIX_2_613125930)) //+ z5; /* -2*(c2+c6) */
         psllw_i2r(2, mm6);
 
         movq_m2r(*(idata+4), mm1);              // load idata[DCTSIZE*2]
@@ -1731,7 +1731,7 @@ static mmx_t fix_108n184; fix_108n184.q = 0xcf04cf04cf04cf04LL;
 
         paddw_r2r(mm7, mm2);                            // tmp12
 
-        pmulhw_m2r(fix_141, mm6);               // tmp11 = MULTIPLY(z11 - z13, FIX_1_414213562); /* 2*c4 */
+        pmulhw_m2r(s_fix141, mm6);               // tmp11 = MULTIPLY(z11 - z13, FIX_1_414213562); /* 2*c4 */
         psubw_r2r(mm3, mm2);                            // tmp6 = tmp12 - tmp7
 
         movq_r2r(mm1, mm5);                             // copy tmp1
@@ -1746,7 +1746,7 @@ static mmx_t fix_108n184; fix_108n184.q = 0xcf04cf04cf04cf04LL;
         movq_m2r(*(idata), mm7);                // load idata[DCTSIZE*0]
         paddw_r2r(mm6, mm0);                            // tmp4 = tmp10 + tmp5;
 
-        pmulhw_m2r(fix_141, mm5);               // MULTIPLY(tmp1 - tmp3, FIX_1_414213562)
+        pmulhw_m2r(s_fix141, mm5);               // MULTIPLY(tmp1 - tmp3, FIX_1_414213562)
 
         movq_m2r(*(idata+8), mm4);    // load idata[DCTSIZE*4]
 
@@ -1888,7 +1888,7 @@ static mmx_t fix_108n184; fix_108n184.q = 0xcf04cf04cf04cf04LL;
         punpckldq_r2r(mm4, mm1);                // wsptr[0,tmp11],[1,tmp11],[2,tmp11],[3,tmp11]
         psllw_i2r(2, mm6);
 
-        pmulhw_m2r(fix_141, mm6);
+        pmulhw_m2r(s_fix141, mm6);
         punpckldq_r2r(mm3, mm0);                // wsptr[0,tmp10],[1,tmp10],[2,tmp10],[3,tmp10]
 
         punpckhdq_r2r(mm3, mm2);                // wsptr[0,tmp13],[1,tmp13],[2,tmp13],[3,tmp13]
@@ -2021,26 +2021,26 @@ static mmx_t fix_108n184; fix_108n184.q = 0xcf04cf04cf04cf04LL;
 
         psllw_i2r(2, mm0);
 
-        pmulhw_m2r(fix_141, mm1);               // tmp21
+        pmulhw_m2r(s_fix141, mm1);               // tmp21
 //    tmp20 = MULTIPLY(z12, (FIX_1_082392200- FIX_1_847759065))  /* 2*(c2-c6) */
 //                      + MULTIPLY(z10, - FIX_1_847759065); /* 2*c2 */
         psllw_i2r(2, mm3);
         movq_r2r(mm0, mm7);
 
-        pmulhw_m2r(fix_n184, mm7);
+        pmulhw_m2r(s_fixN184, mm7);
         movq_r2r(mm3, mm6);
 
         movq_m2r(*(wsptr), mm2);                // tmp0,final1
 
-        pmulhw_m2r(fix_108n184, mm6);
+        pmulhw_m2r(s_fix108n184, mm6);
 //       tmp22 = MULTIPLY(z10,(FIX_1_847759065 - FIX_2_613125930)) /* -2*(c2+c6) */
 //                      + MULTIPLY(z12, FIX_1_847759065); /* 2*c2 */
         movq_r2r(mm2, mm4);                             // final1
 
-        pmulhw_m2r(fix_184n261, mm0);
+        pmulhw_m2r(s_fix184n261, mm0);
         paddw_r2r(mm5, mm2);                            // tmp0+tmp7,final1
 
-        pmulhw_m2r(fix_184, mm3);
+        pmulhw_m2r(s_fix184, mm3);
         psubw_r2r(mm5, mm4);                            // tmp0-tmp7,final1
 
 //    tmp6 = tmp22 - tmp7;      /* phase 2 */
@@ -2248,7 +2248,7 @@ static mmx_t fix_108n184; fix_108n184.q = 0xcf04cf04cf04cf04LL;
         punpckldq_r2r(mm4, mm1);                // wsptr[0,tmp11],[1,tmp11],[2,tmp11],[3,tmp11]
         psllw_i2r(2, mm6);
 
-        pmulhw_m2r(fix_141, mm6);
+        pmulhw_m2r(s_fix141, mm6);
         punpckldq_r2r(mm3, mm0);                // wsptr[0,tmp10],[1,tmp10],[2,tmp10],[3,tmp10]
 
         punpckhdq_r2r(mm3, mm2);                // wsptr[0,tmp13],[1,tmp13],[2,tmp13],[3,tmp13]
@@ -2382,26 +2382,26 @@ static mmx_t fix_108n184; fix_108n184.q = 0xcf04cf04cf04cf04LL;
 
         psllw_i2r(2, mm0);
 
-        pmulhw_m2r(fix_141, mm1);               // tmp21
+        pmulhw_m2r(s_fix141, mm1);               // tmp21
 //    tmp20 = MULTIPLY(z12, (FIX_1_082392200- FIX_1_847759065))  /* 2*(c2-c6) */
 //                      + MULTIPLY(z10, - FIX_1_847759065); /* 2*c2 */
         psllw_i2r(2, mm3);
         movq_r2r(mm0, mm7);
 
-        pmulhw_m2r(fix_n184, mm7);
+        pmulhw_m2r(s_fixN184, mm7);
         movq_r2r(mm3, mm6);
 
         movq_m2r(*(wsptr), mm2);                // tmp0,final1
 
-        pmulhw_m2r(fix_108n184, mm6);
+        pmulhw_m2r(s_fix108n184, mm6);
 //       tmp22 = MULTIPLY(z10,(FIX_1_847759065 - FIX_2_613125930)) /* -2*(c2+c6) */
 //                      + MULTIPLY(z12, FIX_1_847759065); /* 2*c2 */
         movq_r2r(mm2, mm4);                             // final1
 
-        pmulhw_m2r(fix_184n261, mm0);
+        pmulhw_m2r(s_fix184n261, mm0);
         paddw_r2r(mm5, mm2);                            // tmp0+tmp7,final1
 
-        pmulhw_m2r(fix_184, mm3);
+        pmulhw_m2r(s_fix184, mm3);
         psubw_r2r(mm5, mm4);                            // tmp0-tmp7,final1
 
 //    tmp6 = tmp22 - tmp7;      /* phase 2 */
@@ -3079,10 +3079,10 @@ int RTjpeg::bcomp(int16_t *rblock, int16_t *_old, mmx_t *mask)
  mmx_t *mold=(mmx_t *)_old;
  mmx_t *mblock=(mmx_t *)rblock;
  volatile mmx_t result;
- static mmx_t neg= { 0xffffffffffffffffULL };
+ static mmx_t s_neg= { 0xffffffffffffffffULL };
 
  movq_m2r(*mask, mm7);
- movq_m2r(neg, mm6);
+ movq_m2r(s_neg, mm6);
  pxor_r2r(mm5, mm5);
 
  for(i=0; i<8; i++)

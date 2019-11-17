@@ -683,9 +683,9 @@ void TeletextScreen::DrawStatus(void)
 
 bool TeletextScreen::InitialiseFont()
 {
-    static bool initialised = false;
+    static bool s_initialised = false;
     //QString font = gCoreContext->GetSetting("DefaultSubtitleFont", "FreeMono");
-    if (initialised)
+    if (s_initialised)
     {
         return true;
 #if 0
@@ -708,7 +708,7 @@ bool TeletextScreen::InitialiseFont()
 
     gTTBackgroundAlpha = SubtitleScreen::GetTeletextBackgroundAlpha();
 
-    initialised = true;
+    s_initialised = true;
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Loaded main subtitle font '%1'")
         .arg(font));
     return true;

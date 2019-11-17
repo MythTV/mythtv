@@ -855,11 +855,11 @@ QRect MythVideoOutput::GetImageRect(const QRect &Rect, QRect *DisplayRect)
  */
 QRect MythVideoOutput::GetSafeRect(void)
 {
-    static const float safeMargin = 0.05F;
+    static constexpr float kSafeMargin = 0.05F;
     float dummy;
     QRect result = GetVisibleOSDBounds(dummy, dummy, 1.0F);
-    int safex = static_cast<int>(static_cast<float>(result.width())  * safeMargin);
-    int safey = static_cast<int>(static_cast<float>(result.height()) * safeMargin);
+    int safex = static_cast<int>(static_cast<float>(result.width())  * kSafeMargin);
+    int safey = static_cast<int>(static_cast<float>(result.height()) * kSafeMargin);
     return { result.left() + safex, result.top() + safey,
              result.width() - (2 * safex), result.height() - (2 * safey) };
 }
@@ -871,8 +871,8 @@ void MythVideoOutput::SetPIPState(PIPState Setting)
 
 VideoFrameType* MythVideoOutput::DirectRenderFormats(void)
 {
-    static VideoFrameType defaultformats[] = { FMT_YV12, FMT_NONE };
-    return &defaultformats[0];
+    static VideoFrameType s_defaultFormats[] = { FMT_YV12, FMT_NONE };
+    return &s_defaultFormats[0];
 }
 
 /**

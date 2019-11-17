@@ -301,28 +301,28 @@ volatile bool      DishContentDescriptor::dishCategoryDescExists = false;
 QString dish_theme_type_to_string(uint theme_type)
 {
     // cppcheck-suppress variableScope
-    static const char *themes[kThemeLast] =
+    static const char *s_themes[kThemeLast] =
     {
         "", "Movie", "Sports", "News/Business", "Family/Children", "Education",
         "Series/Special", "Music/Art", "Religious", "Off-Air"
     };
 
     if ((theme_type > kThemeNone) && (theme_type < kThemeLast))
-        return QString(themes[theme_type]);
+        return QString(s_themes[theme_type]);
 
     return "";
 }
 
 DishThemeType string_to_dish_theme_type(const QString &theme_type)
 {
-    static const char *themes[kThemeLast] =
+    static const char *s_themes[kThemeLast] =
     {
         "", "Movie", "Sports", "News/Business", "Family/Children", "Education",
         "Series/Special", "Music/Art", "Religious", "Off-Air"
     };
 
     for (uint i = 1; i < 10; i++)
-        if (theme_type == themes[i])
+        if (theme_type == s_themes[i])
             return (DishThemeType) i;
 
     return kThemeNone;

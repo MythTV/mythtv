@@ -728,9 +728,9 @@ NAMThread & NAMThread::manager()
     QMutexLocker locker(&s_mtx);
 
     // Singleton
-    static NAMThread thread;
-    thread.start();
-    return thread;
+    static NAMThread s_thread;
+    s_thread.start();
+    return s_thread;
 }
 
 NAMThread::NAMThread() : m_bQuit(false), m_mutexNAM(QMutex::Recursive), m_nam(nullptr)
@@ -959,7 +959,7 @@ QDateTime NAMThread::GetLastModified(const QUrl &url)
     Q_FOREACH(const QNetworkCacheMetaData::RawHeader &h, headers)
     {
         // RFC 1123 date format: Thu, 01 Dec 1994 16:00:00 GMT
-        static const char kszFormat[] = "ddd, dd MMM yyyy HH:mm:ss 'GMT'";
+        static constexpr char kSzFormat[] = "ddd, dd MMM yyyy HH:mm:ss 'GMT'";
 
         QString const first(h.first.toLower());
         if (first == "cache-control")
@@ -976,7 +976,7 @@ QDateTime NAMThread::GetLastModified(const QUrl &url)
         }
         else if (first == "date")
         {
-            QDateTime d = QDateTime::fromString(h.second, kszFormat);
+            QDateTime d = QDateTime::fromString(h.second, kSzFormat);
             if (!d.isValid())
             {
                 LOG(VB_GENERAL, LOG_WARNING, LOC +

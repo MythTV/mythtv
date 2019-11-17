@@ -70,7 +70,7 @@ class Source : public MythUIComboBoxSetting
   public:
     Source(const ChannelID &id, uint _default_sourceid) :
         MythUIComboBoxSetting(new ChannelDBStorage(this, id, "sourceid")),
-        default_sourceid(_default_sourceid)
+        m_defaultSourceId(_default_sourceid)
     {
         setLabel(QCoreApplication::translate("(Common)", "Video Source"));
     }
@@ -80,9 +80,9 @@ class Source : public MythUIComboBoxSetting
         fillSelections();
         StandardSetting::Load();
 
-        if (default_sourceid && (getValue().toUInt() == 0U))
+        if (m_defaultSourceId && (getValue().toUInt() == 0U))
         {
-            uint which = sourceid_to_index[default_sourceid];
+            uint which = m_sourceIdToIndex[m_defaultSourceId];
             if (which)
                 setValue(which);
         }
@@ -106,18 +106,18 @@ class Source : public MythUIComboBoxSetting
         {
             for (uint i = 1; query.next(); i++)
             {
-                sourceid_to_index[query.value(1).toUInt()] = i;
+                m_sourceIdToIndex[query.value(1).toUInt()] = i;
                 addSelection(query.value(0).toString(),
                              query.value(1).toString());
             }
         }
 
-        sourceid_to_index[0] = 0; // Not selected entry.
+        m_sourceIdToIndex[0] = 0; // Not selected entry.
     }
 
   private:
-    uint            default_sourceid;
-    QMap<uint,uint> sourceid_to_index;
+    uint            m_defaultSourceId;
+    QMap<uint,uint> m_sourceIdToIndex;
 };
 
 class Callsign : public MythUITextEditSetting
@@ -252,7 +252,7 @@ class XmltvID : public MythUIComboBoxSetting
   public:
     XmltvID(const ChannelID &id, QString _sourceName) :
         MythUIComboBoxSetting(new ChannelDBStorage(this, id, "xmltvid"), true),
-        sourceName(std::move(_sourceName))
+        m_sourceName(std::move(_sourceName))
     {
         setLabel(QCoreApplication::translate("(Common)", "XMLTV ID"));
 
@@ -273,7 +273,7 @@ class XmltvID : public MythUIComboBoxSetting
     {
         clearSelections();
 
-        QString xmltvFile = GetConfDir() + '/' + sourceName + ".xmltv";
+        QString xmltvFile = GetConfDir() + '/' + m_sourceName + ".xmltv";
 
         if (QFile::exists(xmltvFile))
         {
@@ -302,7 +302,7 @@ class XmltvID : public MythUIComboBoxSetting
     }
 
   private:
-    QString sourceName;
+    QString m_sourceName;
 };
 
 class ServiceID : public MythUISpinBoxSetting

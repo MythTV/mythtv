@@ -1877,10 +1877,10 @@ QString JobQueue::PrettyPrint(off_t bytes)
     // Pretty print "bytes" as KB, MB, GB, TB, etc., subject to the desired
     // number of units
     static const struct {
-        const char      *suffix;
-        unsigned int    max;
-        int         precision;
-    } pptab[] = {
+        const char   *m_suffix;
+        unsigned int  m_max;
+        int           m_precision;
+    } kPpTab[] = {
         { "bytes", 9999, 0 },
         { "kB", 999, 0 },
         { "MB", 999, 1 },
@@ -1895,14 +1895,14 @@ QString JobQueue::PrettyPrint(off_t bytes)
     float           fbytes = bytes;
 
     ii = 0;
-    while (pptab[ii].max && fbytes > pptab[ii].max) {
+    while (kPpTab[ii].m_max && fbytes > kPpTab[ii].m_max) {
         fbytes /= 1024;
         ii++;
     }
 
     return QString("%1 %2")
-        .arg(fbytes, 0, 'f', pptab[ii].precision)
-        .arg(pptab[ii].suffix);
+        .arg(fbytes, 0, 'f', kPpTab[ii].m_precision)
+        .arg(kPpTab[ii].m_suffix);
 }
 
 void *JobQueue::TranscodeThread(void *param)

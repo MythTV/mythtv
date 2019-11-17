@@ -481,11 +481,11 @@ int MythVAAPIContext::InitialiseContext2(AVCodecContext *Context)
 */
 bool MythVAAPIContext::HaveVAAPI(bool ReCheck /*= false*/)
 {
-    static bool havevaapi = false;
-    static bool checked   = false;
-    if (checked && !ReCheck)
-        return havevaapi;
-    checked = true;
+    static bool s_haveVaapi = false;
+    static bool s_checked   = false;
+    if (s_checked && !ReCheck)
+        return s_haveVaapi;
+    s_checked = true;
 
     AVBufferRef *context = MythCodecContext::CreateDevice(AV_HWDEVICE_TYPE_VAAPI, nullptr,
                                                           gCoreContext->GetSetting("VAAPIDevice"));
@@ -501,7 +501,7 @@ bool MythVAAPIContext::HaveVAAPI(bool ReCheck /*= false*/)
         else
         {
             LOG(VB_GENERAL, LOG_INFO, LOC + "VAAPI is available");
-            havevaapi = true;
+            s_haveVaapi = true;
         }
         av_buffer_unref(&context);
     }
@@ -510,7 +510,7 @@ bool MythVAAPIContext::HaveVAAPI(bool ReCheck /*= false*/)
         LOG(VB_GENERAL, LOG_INFO, LOC + "VAAPI functionality checked failed");
     }
 
-    return havevaapi;
+    return s_haveVaapi;
 }
 
 void MythVAAPIContext::InitVideoCodec(AVCodecContext *Context, bool SelectedStream, bool &DirectRendering)

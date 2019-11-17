@@ -65,8 +65,8 @@ void EITScanner::TeardownAll(void)
  */
 void EITScanner::run(void)
 {
-    static const uint  sz[] = { 2000, 1800, 1600, 1400, 1200, };
-    static const float rt[] = { 0.0F, 0.2F, 0.4F, 0.6F, 0.8F, };
+    static constexpr uint  kSz[] = { 2000, 1800, 1600, 1400, 1200, };
+    static constexpr float kRt[] = { 0.0F, 0.2F, 0.4F, 0.6F, 0.8F, };
 
     m_lock.lock();
 
@@ -81,9 +81,9 @@ void EITScanner::run(void)
         float rate = 1.0F;
         for (uint i = 0; i < 5; i++)
         {
-            if (list_size >= sz[i])
+            if (list_size >= kSz[i])
             {
-                rate = rt[i];
+                rate = kRt[i];
                 break;
             }
         }

@@ -1560,8 +1560,8 @@ int ChannelImporter::SimpleCountChannels(
 QString ChannelImporter::ComputeSuggestedChannelNum(
     const ChannelInsertInfo         &chan)
 {
-    static QMutex          last_free_lock;
-    static QMap<uint,uint> last_free_chan_num_map;
+    static QMutex          s_lastFreeLock;
+    static QMap<uint,uint> s_lastFreeChanNumMap;
 
     // Suggest existing channel number if non-conflicting
     if (!ChannelUtil::IsConflicting(chan.m_chan_num, chan.m_source_id))
@@ -1612,8 +1612,8 @@ QString ChannelImporter::ComputeSuggestedChannelNum(
     }
 
     // Find unused channel number
-    QMutexLocker locker(&last_free_lock);
-    uint last_free_chan_num = last_free_chan_num_map[chan.m_source_id];
+    QMutexLocker locker(&s_lastFreeLock);
+    uint last_free_chan_num = s_lastFreeChanNumMap[chan.m_source_id];
     for (last_free_chan_num++; ; ++last_free_chan_num)
     {
         chan_num = QString::number(last_free_chan_num);
@@ -1621,7 +1621,7 @@ QString ChannelImporter::ComputeSuggestedChannelNum(
             break;
     }
     // cppcheck-suppress unreadVariable
-    last_free_chan_num_map[chan.m_source_id] = last_free_chan_num;
+    s_lastFreeChanNumMap[chan.m_source_id] = last_free_chan_num;
 
     return chan_num;
 }

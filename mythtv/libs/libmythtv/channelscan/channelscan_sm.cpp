@@ -98,7 +98,7 @@ class ScannedChannelInfo
     bool IsEmpty() const
     {
         return m_pats.empty()  && m_pmts.empty()     &&
-               m_program_encryption_status.isEmpty() &&
+               m_programEncryptionStatus.isEmpty()   &&
                !m_mgt          && m_cvcts.empty()    &&
                m_tvcts.empty() && m_nits.empty()     &&
                m_sdts.empty()  && m_bats.empty();
@@ -107,7 +107,7 @@ class ScannedChannelInfo
     // MPEG
     pat_map_t               m_pats;
     pmt_vec_t               m_pmts;
-    QMap<uint,uint>         m_program_encryption_status; // pnum->enc_status
+    QMap<uint,uint>         m_programEncryptionStatus; // pnum->enc_status
 
     // ATSC
     const MasterGuideTable *m_mgt {nullptr};
@@ -949,7 +949,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
         QMap<uint, uint>::const_iterator it = m_currentEncryptionStatus.begin();
         for (; it != m_currentEncryptionStatus.end(); ++it)
         {
-            m_currentInfo->m_program_encryption_status[it.key()] = *it;
+            m_currentInfo->m_programEncryptionStatus[it.key()] = *it;
 
             if (m_testDecryption)
             {
@@ -1689,7 +1689,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
     {
         uint pnum = dbchan_it.key();
         ChannelInsertInfo &info = *dbchan_it;
-        info.m_decryption_status = scan_info->m_program_encryption_status[pnum];
+        info.m_decryption_status = scan_info->m_programEncryptionStatus[pnum];
     }
 
     return pnum_to_dbchan;
