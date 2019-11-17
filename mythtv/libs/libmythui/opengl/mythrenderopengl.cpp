@@ -276,7 +276,7 @@ bool MythRenderOpenGL::Init(void)
             m_openglDebugger->startLogging(mode);
             if (mode == QOpenGLDebugLogger::AsynchronousLogging)
                 LOG(VB_GENERAL, LOG_INFO, LOC + "GPU debug logging started (async)");
-             else
+            else
                 LOG(VB_GENERAL, LOG_INFO, LOC + "Started synchronous GPU debug logging (will hurt performance)");
 
             // filter messages. Some drivers can be extremely verbose for certain issues.
