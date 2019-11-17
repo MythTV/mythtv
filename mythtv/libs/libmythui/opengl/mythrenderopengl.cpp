@@ -646,7 +646,7 @@ QSize MythRenderOpenGL::GetTextureSize(const QSize &size, bool Normalised)
         w *= 2;
     while (h < size.height())
         h *= 2;
-    return QSize(w, h);
+    return {w, h};
 }
 
 int MythRenderOpenGL::GetTextureDataSize(MythGLTexture *Texture)

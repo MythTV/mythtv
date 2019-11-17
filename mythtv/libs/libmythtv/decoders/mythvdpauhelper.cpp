@@ -486,5 +486,5 @@ QSize MythVDPAUHelper::GetSurfaceParameters(VdpVideoSurface Surface, VdpChromaTy
     status = m_vdpVideoSurfaceGetParameters(Surface, &Chroma, &width, &height);
     CHECK_ST
 
-    return QSize(static_cast<int>(width), static_cast<int>(height));
+    return {static_cast<int>(width), static_cast<int>(height)};
 }
