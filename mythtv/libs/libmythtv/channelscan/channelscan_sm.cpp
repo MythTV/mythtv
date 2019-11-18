@@ -746,7 +746,7 @@ void ChannelScanSM::UpdateScanTransports(const NetworkInformationTable *nit)
                 case DescriptorID::satellite_delivery_system:
                 {
                     const SatelliteDeliverySystemDescriptor cd(desc);
-                    frequency = cd.FrequencyHz()/1000;
+                    frequency = cd.FrequencykHz();
                     tt = DTVTunerType::kTunerTypeDVBS1;
                     break;
                 }
