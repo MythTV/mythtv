@@ -128,7 +128,7 @@ inline AVPixelFormat MythVAAPIContext::FramesFormat(AVPixelFormat Format)
 /*! \brief Confirm whether VAAPI support is available given Decoder and Context
 */
 MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext **Context,
-                                                AVCodec **,
+                                                AVCodec ** /*Codec*/,
                                                 const QString &Decoder,
                                                 uint StreamType)
 {
@@ -531,7 +531,7 @@ void MythVAAPIContext::InitVideoCodec(AVCodecContext *Context, bool SelectedStre
     MythCodecContext::InitVideoCodec(Context, SelectedStream, DirectRendering);
 }
 
-bool MythVAAPIContext::RetrieveFrame(AVCodecContext*, VideoFrame *Frame, AVFrame *AvFrame)
+bool MythVAAPIContext::RetrieveFrame(AVCodecContext* /*unused*/, VideoFrame *Frame, AVFrame *AvFrame)
 {
     if (AvFrame->format != AV_PIX_FMT_VAAPI)
         return false;

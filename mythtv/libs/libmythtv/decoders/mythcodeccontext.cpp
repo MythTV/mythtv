@@ -297,7 +297,7 @@ int MythCodecContext::GetBuffer(struct AVCodecContext *Context, AVFrame *Frame, 
 
 /// \brief A generic hardware buffer initialisation method when AVHWFramesContext is NOT used.
 bool MythCodecContext::GetBuffer2(struct AVCodecContext *Context, VideoFrame* Frame,
-                                 AVFrame *AvFrame, int)
+                                 AVFrame *AvFrame, int /*Flags*/)
 {
     if (!AvFrame || !Context || !Frame)
         return false;
@@ -344,7 +344,7 @@ void MythCodecContext::ReleaseBuffer(void *Opaque, uint8_t *Data)
         decoder->GetPlayer()->DeLimboFrame(frame);
 }
 
-void MythCodecContext::DestroyInteropCallback(void *Wait, void *Interop, void*)
+void MythCodecContext::DestroyInteropCallback(void *Wait, void *Interop, void* /*unused*/)
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "Destroy interop callback");
     QWaitCondition *wait = reinterpret_cast<QWaitCondition*>(Wait);
@@ -549,7 +549,7 @@ bool MythCodecContext::RetrieveHWFrame(VideoFrame *Frame, AVFrame *AvFrame)
 
                 // Dummy release method - we do not want to free the buffer
                 temp->buf[0] = av_buffer_create(reinterpret_cast<uint8_t*>(Frame), 0,
-                                                [](void*, uint8_t*){}, this, 0);
+                                                [](void* /*unused*/, uint8_t* /*unused*/){}, this, 0);
                 temp->width = AvFrame->width;
                 temp->height = AvFrame->height;
             }

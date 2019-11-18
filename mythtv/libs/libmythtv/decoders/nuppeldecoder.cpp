@@ -1025,7 +1025,7 @@ void NuppelDecoder::ClearStoredData()
     }
 }
 
-bool NuppelDecoder::GetFrame(DecodeType decodetype, bool&)
+bool NuppelDecoder::GetFrame(DecodeType decodetype, bool& /*Retry*/)
 {
     bool gotvideo = false;
     int seeklen = 0;

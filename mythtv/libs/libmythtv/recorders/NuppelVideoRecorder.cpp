@@ -361,7 +361,7 @@ bool NuppelVideoRecorder::IsPaused(bool holding_lock) const
     return ret;
 }
 
-void NuppelVideoRecorder::SetVideoFilters(QString&)
+void NuppelVideoRecorder::SetVideoFilters(QString& /*filters*/)
 {
 }
 

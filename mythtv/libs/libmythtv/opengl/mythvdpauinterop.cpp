@@ -355,7 +355,7 @@ vector<MythVideoTexture*> MythVDPAUInterop::Acquire(MythRenderOpenGL *Context,
     return m_openglTextures[DUMMY_INTEROP_ID];
 }
 
-void MythVDPAUInterop::UpdateColourSpace(bool)
+void MythVDPAUInterop::UpdateColourSpace(bool /*PrimariesChanged*/)
 {
     if (!m_mixer || !m_context || !m_colourSpace || !m_helper)
         return;

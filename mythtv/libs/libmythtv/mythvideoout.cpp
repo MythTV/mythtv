@@ -413,8 +413,8 @@ void MythVideoOutput::VideoAspectRatioChanged(float VideoAspect)
  */
 bool MythVideoOutput::InputChanged(const QSize &VideoDim, const QSize &VideoDispDim,
                                    float VideoAspect, MythCodecID  CodecID,
-                                   bool  &/*AspectOnly*/, MythMultiLocker*,
-                                   int   ReferenceFrames, bool)
+                                   bool  &/*AspectOnly*/, MythMultiLocker* /*Locks*/,
+                                   int   ReferenceFrames, bool /*ForceChange*/)
 {
     m_window.InputChanged(VideoDim, VideoDispDim, VideoAspect);
     m_maxReferenceFrames = ReferenceFrames;
@@ -925,7 +925,7 @@ void MythVideoOutput::DiscardFrame(VideoFrame *Frame)
 
 /// \brief Releases all frames not being actively displayed from any queue
 ///        onto the queue of frames ready for decoding onto.
-void MythVideoOutput::DiscardFrames(bool KeyFrame, bool)
+void MythVideoOutput::DiscardFrames(bool KeyFrame, bool /*unused*/)
 {
     m_videoBuffers.DiscardFrames(KeyFrame);
 }

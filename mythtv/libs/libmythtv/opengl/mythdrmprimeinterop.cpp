@@ -101,7 +101,7 @@ AVDRMFrameDescriptor* MythDRMPRIMEInterop::VerifyBuffer(MythRenderOpenGL *Contex
 
 vector<MythVideoTexture*> MythDRMPRIMEInterop::Acquire(MythRenderOpenGL *Context,
                                                        VideoColourSpace *ColourSpace,
-                                                       VideoFrame *Frame, FrameScanType)
+                                                       VideoFrame *Frame, FrameScanType /*Scan*/)
 {
     vector<MythVideoTexture*> result;
     if (!Frame)

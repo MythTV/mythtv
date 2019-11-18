@@ -199,7 +199,7 @@ void MythVideoOutputOpenGL::DestroyBuffers(void)
 }
 
 bool MythVideoOutputOpenGL::Init(const QSize &VideoDim, const QSize &VideoDispDim, float Aspect,
-                                 WId, const QRect &DisplayVisibleRect, MythCodecID CodecId)
+                                 WId /*WinID*/, const QRect &DisplayVisibleRect, MythCodecID CodecId)
 {
     if (!m_render || !m_openGLPainter || !m_openGLVideo)
         return false;
@@ -789,7 +789,7 @@ void MythVideoOutputOpenGL::ClearAfterSeek(void)
  * filtering, we allow the OpenGL video code to fallback to a supported, reasonable
  * alternative.
 */
-QStringList MythVideoOutputOpenGL::GetAllowedRenderers(MythCodecID CodecId, const QSize&)
+QStringList MythVideoOutputOpenGL::GetAllowedRenderers(MythCodecID CodecId, const QSize& /*VideoDim*/)
 {
     QStringList allowed;
     if (getenv("NO_OPENGL"))
@@ -829,7 +829,7 @@ void MythVideoOutputOpenGL::InitPictureAttributes(void)
     m_videoColourSpace.SetSupportedAttributes(ALL_PICTURE_ATTRIBUTES);
 }
 
-void MythVideoOutputOpenGL::ShowPIP(VideoFrame*, MythPlayer *PiPPlayer, PIPLocation Location)
+void MythVideoOutputOpenGL::ShowPIP(VideoFrame* /*Frame*/, MythPlayer *PiPPlayer, PIPLocation Location)
 {
     if (!PiPPlayer)
         return;
@@ -923,12 +923,12 @@ MythPainter *MythVideoOutputOpenGL::GetOSDPainter(void)
     return m_openGLPainter;
 }
 
-bool MythVideoOutputOpenGL::CanVisualise(AudioPlayer *Audio, MythRender*)
+bool MythVideoOutputOpenGL::CanVisualise(AudioPlayer *Audio, MythRender* /*Render*/)
 {
     return MythVideoOutput::CanVisualise(Audio, m_render);
 }
 
-bool MythVideoOutputOpenGL::SetupVisualisation(AudioPlayer *Audio, MythRender*, const QString &Name)
+bool MythVideoOutputOpenGL::SetupVisualisation(AudioPlayer *Audio, MythRender* /*Render*/, const QString &Name)
 {
     return MythVideoOutput::SetupVisualisation(Audio, m_render, Name);
 }

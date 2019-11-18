@@ -333,7 +333,7 @@ VASurfaceID MythVAAPIInterop::Deinterlace(VideoFrame *Frame, VASurfaceID Current
                 break;
 
             AVHWDeviceContext* hwdevicecontext  = reinterpret_cast<AVHWDeviceContext*>(hwdeviceref->data);
-            hwdevicecontext->free = [](AVHWDeviceContext*) { LOG(VB_PLAYBACK, LOG_INFO, LOC + "VAAPI VPP device context finished"); };
+            hwdevicecontext->free = [](AVHWDeviceContext* /*unused*/) { LOG(VB_PLAYBACK, LOG_INFO, LOC + "VAAPI VPP device context finished"); };
 
             AVVAAPIDeviceContext *vaapidevicectx = reinterpret_cast<AVVAAPIDeviceContext*>(hwdevicecontext->hwctx);
             vaapidevicectx->display = m_vaDisplay; // re-use the existing display
@@ -364,7 +364,7 @@ VASurfaceID MythVAAPIInterop::Deinterlace(VideoFrame *Frame, VASurfaceID Current
             dstframes->height = m_filterHeight;
             dstframes->initial_pool_size = kVppPoolSize;
             dstframes->format = AV_PIX_FMT_VAAPI;
-            dstframes->free = [](AVHWFramesContext*) { LOG(VB_PLAYBACK, LOG_INFO, LOC + "VAAPI VPP frames context finished"); };
+            dstframes->free = [](AVHWFramesContext* /*unused*/) { LOG(VB_PLAYBACK, LOG_INFO, LOC + "VAAPI VPP frames context finished"); };
 
             if (av_hwframe_ctx_init(newframes) < 0)
             {

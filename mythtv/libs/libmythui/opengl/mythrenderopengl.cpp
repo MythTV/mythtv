@@ -76,7 +76,7 @@ MythRenderOpenGL* MythRenderOpenGL::GetOpenGLRender(void)
     return nullptr;
 }
 
-MythRenderOpenGL* MythRenderOpenGL::Create(const QString&, QPaintDevice* Device)
+MythRenderOpenGL* MythRenderOpenGL::Create(const QString& /*Painter*/, QPaintDevice* Device)
 {
     QString display = getenv("DISPLAY");
     // Determine if we are running a remote X11 session

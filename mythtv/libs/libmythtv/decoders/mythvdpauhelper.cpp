@@ -56,7 +56,7 @@ bool MythVDPAUHelper::HaveMPEG4Decode(void)
     return gVDPAUMPEG4Available;
 }
 
-static void vdpau_preemption_callback(VdpDevice, void* Opaque)
+static void vdpau_preemption_callback(VdpDevice /*unused*/, void* Opaque)
 {
     MythVDPAUHelper* helper = static_cast<MythVDPAUHelper*>(Opaque);
     if (helper)
@@ -81,7 +81,7 @@ MythVDPAUHelper::MythVDPAUHelper(AVVDPAUDeviceContext* Context)
     }
 }
 
-static const char* DummyGetError(VdpStatus)
+static const char* DummyGetError(VdpStatus /*status*/)
 {
     static constexpr char kDummy[] = "Unknown";
     return &kDummy[0];

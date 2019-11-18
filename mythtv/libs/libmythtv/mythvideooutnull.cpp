@@ -248,7 +248,8 @@ void MythVideoOutputNull::UpdatePauseFrame(int64_t &disp_timecode)
     disp_timecode = av_pause_frame.disp_timecode;
 }
 
-void MythVideoOutputNull::ProcessFrame(VideoFrame *Frame, OSD*, const PIPMap &, FrameScanType Scan)
+void MythVideoOutputNull::ProcessFrame(VideoFrame *Frame, OSD* /*Osd*/,
+                                       const PIPMap & /*PipPlayers*/, FrameScanType Scan)
 {
     if (Frame && !Frame->dummy)
         m_deinterlacer.Filter(Frame, Scan);

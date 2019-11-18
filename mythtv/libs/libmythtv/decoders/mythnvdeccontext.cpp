@@ -346,7 +346,7 @@ void MythNVDECContext::SetDeinterlacing(AVCodecContext *Context,
     }
 }
 
-void MythNVDECContext::PostProcessFrame(AVCodecContext*, VideoFrame *Frame)
+void MythNVDECContext::PostProcessFrame(AVCodecContext* /*Context*/, VideoFrame *Frame)
 {
     // Remove interlacing flags and set deinterlacer if necessary
     if (Frame && m_deinterlacer)
@@ -359,7 +359,7 @@ void MythNVDECContext::PostProcessFrame(AVCodecContext*, VideoFrame *Frame)
     }
 }
 
-bool MythNVDECContext::IsDeinterlacing(bool &DoubleRate, bool)
+bool MythNVDECContext::IsDeinterlacing(bool &DoubleRate, bool /*unused*/)
 {
     if (m_deinterlacer != DEINT_NONE)
     {
@@ -370,7 +370,7 @@ bool MythNVDECContext::IsDeinterlacing(bool &DoubleRate, bool)
     return false;
 }
 
-enum AVPixelFormat MythNVDECContext::GetFormat(AVCodecContext*, const AVPixelFormat *PixFmt)
+enum AVPixelFormat MythNVDECContext::GetFormat(AVCodecContext* /*Contextconst*/, const AVPixelFormat *PixFmt)
 {
     while (*PixFmt != AV_PIX_FMT_NONE)
     {
@@ -398,7 +398,7 @@ bool MythNVDECContext::RetrieveFrame(AVCodecContext *Context, VideoFrame *Frame,
  * frame held in device (GPU) memory. There is no need to call avcodec_default_get_buffer2.
 */
 bool MythNVDECContext::GetBuffer(struct AVCodecContext *Context, VideoFrame *Frame,
-                                 AVFrame *AvFrame, int)
+                                 AVFrame *AvFrame, int /*Flags*/)
 {
     if ((AvFrame->format != AV_PIX_FMT_CUDA) || !AvFrame->data[0])
     {
@@ -479,7 +479,7 @@ bool MythNVDECContext::HaveNVDEC(void)
     return s_NVDECAvailable;
 }
 
-void MythNVDECContext::NVDECCheckCallback(void *Wait, void*, void*)
+void MythNVDECContext::NVDECCheckCallback(void *Wait, void* /*unused*/, void* /*unused*/)
 {
     QWaitCondition *wait = reinterpret_cast<QWaitCondition*>(Wait);
     NVDECCheck();

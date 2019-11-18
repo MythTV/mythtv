@@ -199,8 +199,9 @@ MythOpenGLInterop* MythOpenGLInterop::CreateDummy(void)
     return new MythOpenGLInterop(nullptr, DUMMY);
 }
 
-vector<MythVideoTexture*> MythOpenGLInterop::Acquire(MythRenderOpenGL*, VideoColourSpace*,
-                                                     VideoFrame*, FrameScanType)
+vector<MythVideoTexture*> MythOpenGLInterop::Acquire(MythRenderOpenGL* /*Context*/,
+                                                     VideoColourSpace* /*ColourSpace*/,
+                                                     VideoFrame* /*Frame*/, FrameScanType /*Scan*/)
 {
     return vector<MythVideoTexture*>();
 }

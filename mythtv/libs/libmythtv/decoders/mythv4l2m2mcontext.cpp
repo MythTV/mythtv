@@ -157,7 +157,7 @@ void MythV4L2M2MContext::SetDecoderOptions(AVCodecContext* Context, AVCodec* Cod
  * AvFormatDecoder but we copy the data from the AVFrame rather than providing
  * our own buffer (the codec does not support direct rendering).
 */
-bool MythV4L2M2MContext::GetBuffer(AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame, int)
+bool MythV4L2M2MContext::GetBuffer(AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame, int /*Flags*/)
 {
     // Sanity checks
     if (!Context || !AvFrame || !Frame)
@@ -196,7 +196,7 @@ bool MythV4L2M2MContext::GetBuffer(AVCodecContext *Context, VideoFrame *Frame, A
     return true;
 }
 
-bool MythV4L2M2MContext::GetDRMBuffer(AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame, int)
+bool MythV4L2M2MContext::GetDRMBuffer(AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame, int /*unused*/)
 {
     if (!Context || !AvFrame || !Frame)
         return false;
@@ -227,7 +227,7 @@ bool MythV4L2M2MContext::GetDRMBuffer(AVCodecContext *Context, VideoFrame *Frame
     return true;
 }
 
-AVPixelFormat MythV4L2M2MContext::GetFormat(AVCodecContext*, const AVPixelFormat *PixFmt)
+AVPixelFormat MythV4L2M2MContext::GetFormat(AVCodecContext* /*unused*/, const AVPixelFormat *PixFmt)
 {
     while (*PixFmt != AV_PIX_FMT_NONE)
     {

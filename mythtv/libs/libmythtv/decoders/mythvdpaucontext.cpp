@@ -113,7 +113,7 @@ int MythVDPAUContext::InitialiseContext(AVCodecContext* Context)
 }
 
 MythCodecID MythVDPAUContext::GetSupportedCodec(AVCodecContext **Context,
-                                                AVCodec **,
+                                                AVCodec ** /*Codec*/,
                                                 const QString &Decoder,
                                                 uint StreamType)
 {
@@ -189,7 +189,7 @@ enum AVPixelFormat MythVDPAUContext::GetFormat2(struct AVCodecContext* Context, 
     return AV_PIX_FMT_NONE;
 }
 
-bool MythVDPAUContext::RetrieveFrame(AVCodecContext*, VideoFrame *Frame, AVFrame *AvFrame)
+bool MythVDPAUContext::RetrieveFrame(AVCodecContext* /*unused*/, VideoFrame *Frame, AVFrame *AvFrame)
 {
     if (AvFrame->format != AV_PIX_FMT_VDPAU)
         return false;
