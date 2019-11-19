@@ -745,6 +745,7 @@ class Tvdb:
         self.config['api_url'] = "https://api.thetvdb.com"
 
         self.config['url_getSeries'] = u"%(api_url)s/search/series?name=%%s" % self.config
+        self.config['url_getSeriesById'] = u"%(api_url)s/search/series?id=%%s" % self.config
 
         self.config['url_epInfo'] = u"%(api_url)s/series/%%s/episodes" % self.config
         self.config['url_epDetail'] = u"%(api_url)s/episodes/%%s" % self.config
@@ -892,13 +893,16 @@ class Tvdb:
             self.shows[sid] = Show()
         self.shows[sid].data[key] = value
 
-    def search(self, series):
+    def search(self, series, by_id=False):
         """This searches TheTVDB.com for the series name
         and returns the result list
         """
         series = url_quote(series.encode("utf-8"))
         log().debug("Searching for show %s" % series)
-        seriesEt = self._getetsrc(self.config['url_getSeries'] % (series))
+        if by_id:
+            seriesEt = self._getetsrc(self.config['url_getSeriesById'] % (series))
+        else:
+            seriesEt = self._getetsrc(self.config['url_getSeries'] % (series))
         if not seriesEt:
             log().debug('Series result returned zero')
             raise tvdb_shownotfound("Show-name search returned zero results (cannot find show on TVDB)")
@@ -912,7 +916,7 @@ class Tvdb:
 
         return allSeries
 
-    def _getSeries(self, series):
+    def _getSeries(self, series, by_id=False):
         """This searches TheTVDB.com for the series name,
         If a custom_ui UI is configured, it uses this to select the correct
         series. If not, and interactive == True, ConsoleUI is used, if not
