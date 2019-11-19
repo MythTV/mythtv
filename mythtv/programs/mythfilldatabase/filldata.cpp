@@ -92,7 +92,6 @@ bool FillData::GrabDataFromFile(int id, QString &filename)
     ChannelInfoList chanlist;
     QMap<QString, QList<ProgInfo> > proglist;
 
-    m_xmltv_parser.lateInit();
     if (!m_xmltv_parser.parseFile(filename, &chanlist, &proglist))
         return false;
 

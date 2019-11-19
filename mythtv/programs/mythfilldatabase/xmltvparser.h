@@ -17,7 +17,6 @@ class XMLTVParser
 {
   public:
     XMLTVParser();
-    void lateInit();
 
     static ChannelInfo *parseChannel(QDomElement &element, QUrl &baseUrl);
     ProgInfo *parseProgram(QDomElement &element);
