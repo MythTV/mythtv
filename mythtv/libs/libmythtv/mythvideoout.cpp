@@ -324,13 +324,6 @@ bool MythVideoOutput::Init(const QSize &VideoDim, const QSize &VideoDispDim,
     return mainSuccess;
 }
 
-QString MythVideoOutput::GetFilters(void) const
-{
-    if (m_dbDisplayProfile)
-        return m_dbDisplayProfile->GetFilters();
-    return QString();
-}
-
 void MythVideoOutput::SetVideoFrameRate(float playback_fps)
 {
     if (m_dbDisplayProfile)

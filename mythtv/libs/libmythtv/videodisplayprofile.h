@@ -80,7 +80,6 @@ class MTV_PUBLIC VideoDisplayProfile
     bool    IsSkipLoopEnabled(void) const;
     QString GetVideoRenderer(void) const;
     QString GetActualVideoRenderer(void) const;
-    QString GetFilters(void) const;
     QString toString(void) const;
     QString GetSingleRatePreferences(void) const;
     QString GetDoubleRatePreferences(void) const;
@@ -101,7 +100,7 @@ class MTV_PUBLIC VideoDisplayProfile
     static void        CreateProfile(uint GroupId, uint Priority,
                                      const QString& Width, const QString& Height, const QString& Codecs,
                                      const QString& Decoder, uint MaxCpus, bool SkipLoop, const QString& VideoRenderer,
-                                     const QString& Deint1, const QString& Deint2, const QString& Filters);
+                                     const QString& Deint1, const QString& Deint2);
     static void        DeleteProfiles(const QString &HostName);
     static void        CreateProfiles(const QString &HostName);
     static QStringList GetVideoRenderers(const QString &Decoder);

@@ -734,7 +734,6 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
     m_doubleDeint  = new TransMythUIComboBoxSetting();
     m_doubleShader = new TransMythUICheckBoxSetting();
     m_doubleDriver = new TransMythUICheckBoxSetting();
-    m_filters      = new TransTextEditSetting();
 
     const QString rangeHelp(tr(" Valid formats for the setting are "
         "[nnnn - nnnn], [> nnnn], [>= nnnn], [< nnnn], "
@@ -813,17 +812,12 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
         m_doubleDeint->addSelection(it->second, it->first);
     }
 
-    m_filters->setLabel(tr("Custom filters"));
-
     m_max_cpus->setHelpText(
         tr("Maximum number of CPU cores used for video decoding and filtering.") +
         (HAVE_THREADS ? "" :
          tr(" Multithreaded decoding disabled-only one CPU "
             "will be used, please recompile with "
             "--enable-ffmpeg-pthreads to enable.")));
-
-    m_filters->setHelpText(
-        tr("Example custom filter list: 'ivtc,denoise3d'"));
 
     m_skiploop->setHelpText(
         tr("When unchecked the deblocking loopfilter will be disabled. ") + "\n" +
@@ -845,7 +839,6 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
     addChild(m_doubleDeint);
     addChild(m_doubleShader);
     addChild(m_doubleDriver);
-    addChild(m_filters);
 
     connect(m_width_range, SIGNAL(valueChanged(const QString&)),
             this,    SLOT(widthChanged(const QString&)));
@@ -921,7 +914,6 @@ void PlaybackProfileItemConfig::Load(void)
     QString prenderer = m_item.Get("pref_videorenderer");
     QString psingledeint = m_item.Get("pref_deint0");
     QString pdoubledeint = m_item.Get("pref_deint1");
-    QString pfilter   = m_item.Get("pref_filters");
     bool    found     = false;
 
     QString     dech = VideoDisplayProfile::GetDecoderHelp();
@@ -951,9 +943,6 @@ void PlaybackProfileItemConfig::Load(void)
     LoadQuality(m_singleDeint, m_singleShader, m_singleDriver, psingledeint);
     LoadQuality(m_doubleDeint, m_doubleShader, m_doubleDriver, pdoubledeint);
 
-    if (!pfilter.isEmpty())
-        m_filters->setValue(pfilter);
-
     GroupSetting::Load();
 }
 
@@ -971,10 +960,6 @@ void PlaybackProfileItemConfig::Save(void)
     m_item.Set("pref_videorenderer", m_vidrend->getValue());
     m_item.Set("pref_deint0", GetQuality(m_singleDeint, m_singleShader, m_singleDriver));
     m_item.Set("pref_deint1", GetQuality(m_doubleDeint, m_doubleShader, m_doubleDriver));
-    QString tmp0 = m_filters->getValue();
-    QString tmp1 = m_vidrend->getValue();
-    QString tmp3 = VideoDisplayProfile::IsFilterAllowed(tmp1) ? tmp0 : "";
-    m_item.Set("pref_filters", tmp3);
 }
 
 void PlaybackProfileItemConfig::widthChanged(const QString &val)
@@ -1048,7 +1033,6 @@ void PlaybackProfileItemConfig::decoderChanged(const QString &dec)
 
 void PlaybackProfileItemConfig::vrenderChanged(const QString &renderer)
 {
-    m_filters->setEnabled(VideoDisplayProfile::IsFilterAllowed(renderer));
     m_vidrend->setHelpText(VideoDisplayProfile::GetVideoRendererHelp(renderer));
     InitLabel();
 }
