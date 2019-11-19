@@ -984,8 +984,8 @@ class Tvdb:
                             new_url = self.config['url_artworkPrefix'] % v
                             banners[btype][btype2][bid][new_key] = new_url
 
-            banners[btype]['raw'] = banners_info
-            self._setShowData(sid, "_banners", banners)
+                banners[btype]['raw'] = banners_info
+        self._setShowData(sid, "_banners", banners)
 
     def _parseActors(self, sid):
         """Parsers actors XML, from
@@ -1052,15 +1052,16 @@ class Tvdb:
         seriesInfoEt = self._getetsrc(
             self.config['url_seriesInfo'] % sid
         )
-        for curInfo in seriesInfoEt.keys():
-            tag = curInfo
-            value = seriesInfoEt[curInfo]
+        if seriesInfoEt is not None:
+            for curInfo in seriesInfoEt.keys():
+                tag = curInfo
+                value = seriesInfoEt[curInfo]
 
-            if value is not None:
-                if tag in ['banner', 'fanart', 'poster']:
-                    value = self.config['url_artworkPrefix'] % (value)
+                if value is not None:
+                    if tag in ['banner', 'fanart', 'poster']:
+                        value = self.config['url_artworkPrefix'] % (value)
 
-            self._setShowData(sid, tag, value)
+                self._setShowData(sid, tag, value)
         # set language
         if language == None:
             language = self.config['language']
