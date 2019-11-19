@@ -3510,6 +3510,18 @@ nullptr
             return false;
     }
 
+    if (dbver == "1356")
+    {
+        const char *updates[] = {
+            "REPLACE INTO recordfilter (filterid, description, clause, "
+            "                          newruledefault) "
+            "  VALUES (12, 'Priority channel', 'channel.recpriority > 0', 0)",
+            nullptr
+        };
+        if (!performActualUpdate(updates, "1357", dbver))
+            return false;
+    }
+
     return true;
 }
 
