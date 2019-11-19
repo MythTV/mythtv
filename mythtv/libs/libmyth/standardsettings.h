@@ -32,7 +32,7 @@ class MPUBLIC StandardSetting : public QObject, public StorageUser
     virtual void setLabel(QString str) { m_label = str; }
     QString getLabel(void) const { return m_label; }
 
-    virtual void setHelpText(const QString &str) { m_helptext = str; }
+    virtual void setHelpText(const QString &str) { m_helptext = str; emit helpTextChanged(m_helptext); }
     QString getHelpText(void) const { return m_helptext; }
 
     virtual void setName(const QString &name);
@@ -97,6 +97,7 @@ class MPUBLIC StandardSetting : public QObject, public StorageUser
     void ShouldRedraw(StandardSetting *);
     void settingsChanged(StandardSetting *selectedSetting = nullptr);
     void ChangeSaved();
+    void helpTextChanged(const QString &);
 
   protected:
     explicit StandardSetting(Storage *_storage = nullptr)
