@@ -102,7 +102,6 @@ class MTV_PUBLIC VideoDisplayProfile
                                      const QString& Width, const QString& Height, const QString& Codecs,
                                      const QString& Decoder, uint MaxCpus, bool SkipLoop, const QString& VideoRenderer,
                                      const QString& Deint1, const QString& Deint2);
-    static void        DeleteProfiles(const QString &HostName);
     static void        CreateProfiles(const QString &HostName);
     static QStringList GetVideoRenderers(const QString &Decoder);
     static QString     GetVideoRendererHelp(const QString &Renderer);

@@ -327,7 +327,7 @@ QString ProfileItem::toString(void) const
         .arg(cmp0).arg(QString(cmp1.isEmpty() ? "" : ",") + cmp1)
         .arg(decoder).arg(max_cpus).arg((skiploop) ? "enabled" : "disabled").arg(renderer)
         .arg(cond);
-    str += QString("deint(%1,%2) filt(%3)").arg(deint0).arg(deint1);
+    str += QString("deint(%1,%2)").arg(deint0).arg(deint1);
 
     return str;
 }
@@ -968,34 +968,6 @@ uint VideoDisplayProfile::GetProfileGroupID(const QString &ProfileName,
         return query.value(0).toUInt();
 
     return 0;
-}
-
-void VideoDisplayProfile::DeleteProfiles(const QString &HostName)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-    MSqlQuery query2(MSqlQuery::InitCon());
-    query.prepare(
-        "SELECT profilegroupid "
-        "FROM displayprofilegroups "
-        "WHERE hostname = :HOST ");
-    query.bindValue(":HOST", HostName);
-    if (!query.exec() || !query.isActive())
-        MythDB::DBError("delete_profiles 1", query);
-    else
-    {
-        while (query.next())
-        {
-            query2.prepare("DELETE FROM displayprofiles "
-                           "WHERE profilegroupid = :PROFID");
-            query2.bindValue(":PROFID", query.value(0).toUInt());
-            if (!query2.exec())
-                MythDB::DBError("delete_profiles 2", query2);
-        }
-    }
-    query.prepare("DELETE FROM displayprofilegroups WHERE hostname = :HOST");
-    query.bindValue(":HOST", HostName);
-    if (!query.exec() || !query.isActive())
-        MythDB::DBError("delete_profiles 3", query);
 }
 
 void VideoDisplayProfile::CreateProfile(uint GroupId, uint Priority,
