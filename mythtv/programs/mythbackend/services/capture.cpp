@@ -334,6 +334,9 @@ int Capture::AddCardInput       ( const uint nCardId,
         throw( QString( "This API requires at least a card ID, a source ID, "
                         "and an input name." ));
 
+    if ( !CardUtil::IsUniqueDisplayName(sDisplayName, 0 ))
+        throw QString(" DisplayName is not set or is not unique.");
+
     int nResult = CardUtil::CreateCardInput(nCardId, nSourceId, sInputName,
                       sExternalCommand, sChangerDevice, sChangerModel,
                       sHostName, sTuneChan, sStartChan, sDisplayName,

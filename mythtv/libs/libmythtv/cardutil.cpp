@@ -1663,10 +1663,6 @@ bool CardUtil::GetInputInfo(InputInfo &input, vector<uint> *groupids)
     input.m_recPriority   = query.value(5).toInt();
     input.m_quickTune     = query.value(6).toBool();
 
-    if (input.m_displayName.isEmpty())
-        input.m_displayName = QObject::tr("Input %1:%2")
-            .arg(input.m_inputid).arg(input.m_name);
-
     if (groupids)
         *groupids = GetInputGroups(input.m_inputid);
 
@@ -1736,7 +1732,7 @@ QString CardUtil::GetDisplayName(uint inputid)
         return QString();
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT displayname, cardid, inputname "
+    query.prepare("SELECT displayname "
                   "FROM capturecard "
                   "WHERE cardid = :INPUTID");
     query.bindValue(":INPUTID", inputid);
@@ -1746,13 +1742,34 @@ QString CardUtil::GetDisplayName(uint inputid)
     else if (query.next())
     {
         QString result = query.value(0).toString();
-        if (result.isEmpty())
-            result = QString("%1: %2").arg(query.value(1).toInt())
-                .arg(query.value(2).toString());
         return result;
     }
 
     return QString();
+}
+
+bool CardUtil::IsUniqueDisplayName(const QString &name, uint exclude_inputid)
+{
+    if (name.isEmpty())
+        return false;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT cardid "
+                  "FROM capturecard "
+                  "WHERE parentid = 0 "
+                  "      AND cardid <> :INPUTID "
+                  "      AND right(displayname, 2) = :NAME");
+    query.bindValue(":NAME", name.right(2));
+    query.bindValue(":INPUTID", exclude_inputid);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("CardUtil::IsUniqueDisplayName()", query);
+        return false;
+    }
+
+    // Any result means it's not unique.
+    return !query.next();
 }
 
 uint CardUtil::GetSourceID(uint inputid)

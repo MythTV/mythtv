@@ -3498,6 +3498,18 @@ nullptr
             return false;
     }
 
+    if (dbver == "1355")
+    {
+        const char *updates[] = {
+            "UPDATE capturecard "
+            "SET displayname = CONCAT('Input ', cardid) "
+            "WHERE displayname = ''",
+            nullptr
+        };
+        if (!performActualUpdate(updates, "1356", dbver))
+            return false;
+    }
+
     return true;
 }
 
