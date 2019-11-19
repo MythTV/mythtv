@@ -91,6 +91,7 @@ class MTV_PUBLIC VideoDisplayProfile
     static QStringList GetDecoderNames(void);
     static QString     GetDecoderName(const QString &Decoder);
     static QString     GetDecoderHelp(const QString &Decoder = QString());
+    static QString     GetVideoRendererName(const QString &Renderer);
     static QString     GetDefaultProfileName(const QString &HostName);
     static void        SetDefaultProfileName(const QString &ProfileName, const QString &HostName);
     static uint        GetProfileGroupID(const QString &ProfileName, const QString &HostName);
@@ -137,6 +138,7 @@ class MTV_PUBLIC VideoDisplayProfile
     static QStringList               s_safe_custom;
     static QMap<QString,uint>        s_safe_renderer_priority;
     static QMap<QString,QString>     s_dec_name;
+    static QMap<QString,QString>     s_rend_name;
     static QStringList               s_safe_decoders;
     static QList<QPair<QString,QString> > s_deinterlacer_options;
 };

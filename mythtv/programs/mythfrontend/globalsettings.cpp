@@ -1018,16 +1018,13 @@ void PlaybackProfileItemConfig::decoderChanged(const QString &dec)
 
     m_vidrend->clearSelections();
     for (it = renderers.begin(); it != renderers.end(); ++it)
-    {
-        if ((*it != "null") && (*it != "nullvaapi") && (*it != "nullvdpau"))
-            m_vidrend->addSelection(*it, *it, (*it == prenderer));
-    }
-
-    m_decoder->setHelpText(VideoDisplayProfile::GetDecoderHelp(dec));
-
+        if ((!(*it).contains("null")))
+            m_vidrend->addSelection(VideoDisplayProfile::GetVideoRendererName(*it),
+                                    *it, (*it == prenderer));
     QString vrenderer2 = m_vidrend->getValue();
     vrenderChanged(vrenderer2);
 
+    m_decoder->setHelpText(VideoDisplayProfile::GetDecoderHelp(dec));
     InitLabel();
 }
 
@@ -1192,15 +1189,9 @@ void PlaybackProfileItemConfig::InitLabel(void)
         str += " " + tr("framerate") + " " + framerateval;
 
     str += " -> ";
-    str += m_decoder->getValue();
+    str += VideoDisplayProfile::GetDecoderName(m_decoder->getValue());
     str += " " + andStr + ' ';
-    str += m_vidrend->getValue();
-    str.replace("-blit", "");
-    str.replace("ivtv " + andStr + " ivtv", "ivtv");
-    str.replace("xvmc " + andStr + " xvmc", "xvmc");
-    str.replace("xvmc", "XvMC");
-    str.replace("xv", "XVideo");
-
+    str += VideoDisplayProfile::GetVideoRendererName(m_vidrend->getValue());
     setLabel(str);
 }
 

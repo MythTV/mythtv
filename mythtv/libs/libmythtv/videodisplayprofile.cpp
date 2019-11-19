@@ -344,6 +344,7 @@ QMap<QString,QStringList> VideoDisplayProfile::s_safe_equiv_dec;
 QStringList               VideoDisplayProfile::s_safe_custom;
 QMap<QString,uint>        VideoDisplayProfile::s_safe_renderer_priority;
 QMap<QString,QString>     VideoDisplayProfile::s_dec_name;
+QMap<QString,QString>     VideoDisplayProfile::s_rend_name;
 QStringList               VideoDisplayProfile::s_safe_decoders;
 QList<QPair<QString,QString> > VideoDisplayProfile::s_deinterlacer_options;
 
@@ -804,6 +805,12 @@ QString VideoDisplayProfile::GetDecoderName(const QString &Decoder)
         s_dec_name["mediacodec-dec"] = QObject::tr("Android MediaCodec acceleration (decode only)");
         s_dec_name["nvdec"]          = QObject::tr("NVIDIA NVDEC acceleration");
         s_dec_name["nvdec-dec"]      = QObject::tr("NVIDIA NVDEC acceleration (decode only)");
+        s_dec_name["vtb"]            = QObject::tr("VideoToolbox acceleration");
+        s_dec_name["vtb-dec"]        = QObject::tr("VideoToolbox acceleration (decode only)");
+        s_dec_name["v4l2"]           = QObject::tr("V4L2 acceleration");
+        s_dec_name["v4l2-dec"]       = QObject::tr("V4L2 acceleration (decode only)");
+        s_dec_name["mmal"]           = QObject::tr("MMAL acceleration");
+        s_dec_name["mmal-dec"]       = QObject::tr("MMAL acceleration (decode only)");
     }
 
     QString ret = Decoder;
@@ -824,39 +831,72 @@ QString VideoDisplayProfile::GetDecoderHelp(const QString& Decoder)
     msg += "\n";
 
     if (Decoder == "ffmpeg")
-        msg += QObject::tr("Standard will use ffmpeg library.");
+        msg += QObject::tr("Standard will use the FFmpeg library for software decoding.");
 
-    if (Decoder == "vdpau")
+    if (Decoder.startsWith("vdpau"))
         msg += QObject::tr(
             "VDPAU will attempt to use the graphics hardware to "
-            "accelerate video decoding and playback.");
+            "accelerate video decoding.");
 
-    if (Decoder == "vaapi")
+    if (Decoder.startsWith("vaapi"))
         msg += QObject::tr(
             "VAAPI will attempt to use the graphics hardware to "
             "accelerate video decoding and playback.");
 
-    if (Decoder == "vaapi-dec")
-        msg += QObject::tr(
-            "Will attempt to use the graphics hardware to "
-            "accelerate video decoding only.");
-
-    if (Decoder == "dxva2")
+    if (Decoder.startsWith("dxva2"))
         msg += QObject::tr(
             "DXVA2 will use the graphics hardware to "
             "accelerate video decoding and playback. ");
 
-    if (Decoder == "mediacodec-dec")
+    if (Decoder.startsWith("mediacodec"))
         msg += QObject::tr(
-            "Mediacodec will use the graphics hardware to "
-            "accelerate video decoding on Android. ");
+            "Mediacodec will use Android graphics hardware to "
+            "accelerate video decoding and playback. ");
 
-    if (Decoder == "nvdec-dec")
+    if (Decoder.startsWith("nvdec"))
         msg += QObject::tr(
-            "Nvdec uses the new NVDEC API to "
-            "accelerate video decoding on NVIDIA Graphics Adapters. ");
+            "Nvdec uses the NVDEC API to "
+            "accelerate video decoding and playback with NVIDIA Graphics Adapters. ");
 
+    if (Decoder.startsWith("vtb"))
+        msg += QObject::tr(
+            "The VideoToolbox library is used to accelerate video decoding. ");
+
+    if (Decoder.startsWith("mmal"))
+        msg += QObject::tr(
+            "MMAL is used to accelerated video decoding (Raspberry Pi only). ");
+
+    if (Decoder == "v4l2")
+        msg += "Highly experimental: ";
+
+    if (Decoder.startsWith("v4l2"))
+        msg += QObject::tr(
+            "Video4Linux codecs are used to accelerate video decoding on "
+            "on supported platforms. ");
+
+    if (Decoder.endsWith("-dec"))
+        msg += QObject::tr("The decoder will transfer frames back to system memory "
+                           "which will significantly reduce performance but may allow "
+                           "other functionality to be used (such as automatic "
+                           "letterbox detection). ");
     return msg;
+}
+
+QString VideoDisplayProfile::GetVideoRendererName(const QString &Renderer)
+{
+    QMutexLocker locker(&s_safe_lock);
+    if (s_rend_name.empty())
+    {
+        s_rend_name["opengl"]         = QObject::tr("OpenGL");
+        s_rend_name["opengl-yv12"]    = QObject::tr("OpenGL YV12");
+        s_rend_name["opengl-hw"]      = QObject::tr("OpenGL Hardware");
+    }
+
+    QString ret = Renderer;
+    QMap<QString,QString>::const_iterator it = s_rend_name.find(Renderer);
+    if (it != s_rend_name.end())
+        ret = *it;
+    return ret;
 }
 
 QStringList VideoDisplayProfile::GetProfiles(const QString &HostName)
@@ -1112,7 +1152,7 @@ void VideoDisplayProfile::CreateProfiles(const QString &HostName)
                            "Sample: OpenGL high quality");
         groupid = CreateProfileGroup("OpenGL High Quality", HostName);
         CreateProfile(groupid, 1, "", "", "",
-                      "ffmpeg", 2, true, "opengl",
+                      "ffmpeg", 2, true, "opengl-yv12",
                       "shader:high", "shader:high");
     }
 
@@ -1121,7 +1161,7 @@ void VideoDisplayProfile::CreateProfiles(const QString &HostName)
         (void) QObject::tr("OpenGL Normal", "Sample: OpenGL medium quality");
         groupid = CreateProfileGroup("OpenGL Normal", HostName);
         CreateProfile(groupid, 1, "", "", "",
-                      "ffmpeg", 2, true, "opengl",
+                      "ffmpeg", 2, true, "opengl-yv12",
                       "shader:medium", "shader:medium");
     }
 
@@ -1144,7 +1184,7 @@ void VideoDisplayProfile::CreateProfiles(const QString &HostName)
                       "vaapi", 2, true, "opengl-hw",
                       "shader:driver:high", "shader:driver:high");
         CreateProfile(groupid, 1, "", "", "",
-                      "ffmpeg", 1, true, "opengl",
+                      "ffmpeg", 1, true, "opengl-yv12",
                       "shader:high", "shader:high");
     }
 #endif
@@ -1167,7 +1207,7 @@ void VideoDisplayProfile::CreateProfiles(const QString &HostName)
                            "Sample: MediaCodec Normal");
         groupid = CreateProfileGroup("MediaCodec Normal", hostname);
         CreateProfile(groupid, 1, "", "", "",
-                      "mediacodec-dec", 4, true, "opengl",
+                      "mediacodec-dec", 4, true, "opengl-yv12",
                       "shader:driver:medium", "shader:driver:medium");
     }
 #endif
@@ -1210,7 +1250,7 @@ void VideoDisplayProfile::CreateProfiles(const QString &HostName)
         (void) QObject::tr("V4L2 Codecs", "Sample: V4L2");
         groupid = CreateProfileGroup("V4L2 Codecs", HostName);
         CreateProfile(groupid, 1, "", "", "",
-                      "v4l2-dec", 1, true, "opengl",
+                      "v4l2-dec", 1, true, "opengl-yv12",
                       "shader:driver:medium", "shader:driver:medium");
         CreateProfile(groupid, 2, "", "", "",
                       "v4l2", 1, true, "opengl-hw",
@@ -1261,7 +1301,7 @@ QString VideoDisplayProfile::GetVideoRendererHelp(const QString &Renderer)
     {
         msg = QObject::tr(
             "OpenGL is used for all color conversion, scaling, picture "
-            "controls and optionally deinterlacing. CPU load is low but a more "
+            "controls and optionally deinterlacing. CPU load is low but a slightly more "
             "powerful GPU is needed for deinterlacing.");
     }
 
