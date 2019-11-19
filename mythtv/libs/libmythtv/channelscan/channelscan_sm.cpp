@@ -731,8 +731,8 @@ void ChannelScanSM::UpdateScanTransports(const NetworkInformationTable *nit)
 
             DTVTunerType tt(DTVTunerType::kTunerTypeUnknown);
 
-            LOG(VB_CHANSCAN, LOG_DEBUG, LOC + QString("ts-loop j:%1 tag:%2 %3 length:%4")
-                .arg(j).arg(tag).arg(tagString).arg(length));
+            LOG(VB_CHANSCAN, LOG_DEBUG, LOC + QString("NIT ts-loop j:%1 tag:%2 (0x%3) '%4' length:%5")
+                .arg(j).arg(tag).arg(tag,0,16).arg(tagString).arg(length));
 
             switch (tag)
             {
@@ -743,12 +743,22 @@ void ChannelScanSM::UpdateScanTransports(const NetworkInformationTable *nit)
                     tt = DTVTunerType::kTunerTypeDVBT;
                     break;
                 }
+                case DescriptorID::t2_terrestrial_delivery_system:
+                {
+                    // Additional info in the T2 descriptor not yet used
+                    continue;
+                }
                 case DescriptorID::satellite_delivery_system:
                 {
                     const SatelliteDeliverySystemDescriptor cd(desc);
                     frequency = cd.FrequencykHz();
                     tt = DTVTunerType::kTunerTypeDVBS1;
                     break;
+                }
+                case DescriptorID::s2_satellite_delivery_system:
+                {
+                    // Additional info in the S2 descriptor not yet used
+                    continue;
                 }
                 case DescriptorID::cable_delivery_system:
                 {
@@ -758,8 +768,9 @@ void ChannelScanSM::UpdateScanTransports(const NetworkInformationTable *nit)
                     break;
                 }
                 default:
-                    LOG(VB_CHANSCAN, LOG_ERR, LOC +
-                        "unknown delivery system descriptor");
+                    LOG(VB_CHANSCAN, LOG_DEBUG, LOC +
+                        QString("Descriptor %1 (0x%2) '%3' ignored")
+                            .arg(tag).arg(tag,0,16).arg(tagString));
                     continue;
             }
 
