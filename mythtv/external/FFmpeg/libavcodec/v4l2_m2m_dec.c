@@ -256,19 +256,10 @@ static void v4l2_flush(AVCodecContext *avctx)
 {
     V4L2m2mPriv *priv = avctx->priv_data;
     V4L2m2mContext* s = priv->context;
-    int ret;
 
     /* wait for pending buffer references */
     if (atomic_load(&s->refcount))
         while(sem_wait(&s->refsync) == -1 && errno == EINTR);
-
-    ret = ff_v4l2_context_set_status(&s->output, VIDIOC_STREAMOFF);
-    if (ret)
-        av_log(avctx, AV_LOG_ERROR, "VIDIOC_STREAMOFF %s\n", s->output.name);
-
-    ret = ff_v4l2_context_set_status(&s->capture, VIDIOC_STREAMOFF);
-    if (ret)
-        av_log(avctx, AV_LOG_ERROR, "VIDIOC_STREAMOFF %s\n", s->capture.name);
 }
 
 #define OFFSET(x) offsetof(V4L2m2mPriv, x)

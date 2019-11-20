@@ -121,6 +121,11 @@ void MythDRMPRIMEContext::InitVideoCodec(AVCodecContext *Context, bool SelectedS
     MythCodecContext::InitVideoCodec(Context, SelectedStream, DirectRendering);
 }
 
+bool MythDRMPRIMEContext::DecoderWillResetOnFlush(void)
+{
+    return true;
+}
+
 bool MythDRMPRIMEContext::RetrieveFrame(AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame)
 {
     // Hrm - Context doesn't have the correct pix_fmt here (v4l2 at least). Bug? Use AvFrame

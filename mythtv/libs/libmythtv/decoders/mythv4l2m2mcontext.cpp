@@ -52,6 +52,11 @@ inline uint32_t V4L2CodecType(AVCodecID Id)
     return 0;
 }
 
+bool MythV4L2M2MContext::DecoderWillResetOnFlush(void)
+{
+    return codec_is_v4l2(m_codecID);
+}
+
 MythCodecID MythV4L2M2MContext::GetSupportedCodec(AVCodecContext **Context,
                                                   AVCodec **Codec,
                                                   const QString &Decoder,
