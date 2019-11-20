@@ -258,14 +258,14 @@ bool FileRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
                     {
 #ifndef _MSC_VER
                         if (posix_fadvise(m_fd2, 0, 0,
-                                          POSIX_FADV_SEQUENTIAL) < 0)
+                                          POSIX_FADV_SEQUENTIAL) != 0)
                         {
                             LOG(VB_FILE, LOG_DEBUG, LOC +
                                 QString("OpenFile(): fadvise sequential "
                                         "failed: ") + ENO);
                         }
                         if (posix_fadvise(m_fd2, 0, 128*1024,
-                                          POSIX_FADV_WILLNEED) < 0)
+                                          POSIX_FADV_WILLNEED) != 0)
                         {
                             LOG(VB_FILE, LOG_DEBUG, LOC +
                                 QString("OpenFile(): fadvise willneed "
@@ -712,7 +712,7 @@ long long FileRingBuffer::SeekInternal(long long pos, int whence)
                     ret = lseek64(m_fd2, m_internalReadPos, SEEK_SET);
 #ifndef _MSC_VER
                     if (posix_fadvise(m_fd2, m_internalReadPos,
-                                  128*1024, POSIX_FADV_WILLNEED) < 0)
+                                  128*1024, POSIX_FADV_WILLNEED) != 0)
                     {
                         LOG(VB_FILE, LOG_DEBUG, LOC +
                             QString("Seek(): fadvise willneed "
