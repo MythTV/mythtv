@@ -208,50 +208,17 @@ QString toString(MythCodecID codecid)
     return QString("Unknown(%1)").arg(codecid);
 }
 
-AVCodecID myth2av_codecid(MythCodecID codec_id, bool &vdpau)
+AVCodecID myth2av_codecid(MythCodecID codec_id)
 {
-    vdpau = false;
     switch (codec_id)
     {
         case kCodec_NONE:
         case kCodec_NUV_MPEG4:
         case kCodec_NUV_RTjpeg: return AV_CODEC_ID_NONE;
 
+        case kCodec_MPEG1:
         case kCodec_MPEG1_VDPAU:
         case kCodec_MPEG1_VDPAU_DEC:
-            vdpau = true;
-            return AV_CODEC_ID_MPEG1VIDEO;
-        case kCodec_MPEG2_VDPAU:
-        case kCodec_MPEG2_VDPAU_DEC:
-            vdpau = true;
-            return AV_CODEC_ID_MPEG2VIDEO;
-        case kCodec_H263_VDPAU:
-        case kCodec_H263_VDPAU_DEC:
-            LOG(VB_GENERAL, LOG_ERR, "Error: VDPAU H.263 not supported by ffmpeg");
-            return AV_CODEC_ID_NONE;
-        case kCodec_MPEG4_VDPAU:
-        case kCodec_MPEG4_VDPAU_DEC:
-            return AV_CODEC_ID_MPEG4;
-        case kCodec_H264_VDPAU:
-        case kCodec_H264_VDPAU_DEC:
-            vdpau = true;
-            return AV_CODEC_ID_H264;
-        case kCodec_VC1_VDPAU:
-        case kCodec_VC1_VDPAU_DEC:
-            vdpau = true;
-            return AV_CODEC_ID_VC1;
-        case kCodec_WMV3_VDPAU:
-        case kCodec_WMV3_VDPAU_DEC:
-            vdpau = true;
-            return AV_CODEC_ID_WMV3;
-        case kCodec_VP8_VDPAU:
-        case kCodec_VP8_VDPAU_DEC:  return AV_CODEC_ID_VP8;
-        case kCodec_VP9_VDPAU:
-        case kCodec_VP9_VDPAU_DEC:  return AV_CODEC_ID_VP9;
-        case kCodec_HEVC_VDPAU:
-        case kCodec_HEVC_VDPAU_DEC: return AV_CODEC_ID_HEVC;
-
-        case kCodec_MPEG1:
         case kCodec_MPEG1_VAAPI:
         case kCodec_MPEG1_VAAPI_DEC:
         case kCodec_MPEG1_DXVA2:
@@ -268,6 +235,8 @@ AVCodecID myth2av_codecid(MythCodecID codec_id, bool &vdpau)
         case kCodec_MPEG1_V4L2_DEC: return AV_CODEC_ID_MPEG1VIDEO;
 
         case kCodec_MPEG2:
+        case kCodec_MPEG2_VDPAU:
+        case kCodec_MPEG2_VDPAU_DEC:
         case kCodec_MPEG2_VAAPI:
         case kCodec_MPEG2_VAAPI_DEC:
         case kCodec_MPEG2_DXVA2:
@@ -284,6 +253,8 @@ AVCodecID myth2av_codecid(MythCodecID codec_id, bool &vdpau)
         case kCodec_MPEG2_V4L2_DEC: return AV_CODEC_ID_MPEG2VIDEO;
 
         case kCodec_H263:
+        case kCodec_H263_VDPAU:
+        case kCodec_H263_VDPAU_DEC:
         case kCodec_H263_VAAPI:
         case kCodec_H263_VAAPI_DEC:
         case kCodec_H263_DXVA2:
@@ -300,6 +271,8 @@ AVCodecID myth2av_codecid(MythCodecID codec_id, bool &vdpau)
         case kCodec_H263_V4L2_DEC: return AV_CODEC_ID_H263;
 
         case kCodec_MPEG4:
+        case kCodec_MPEG4_VDPAU:
+        case kCodec_MPEG4_VDPAU_DEC:
         case kCodec_MPEG4_VAAPI:
         case kCodec_MPEG4_VAAPI_DEC:
         case kCodec_MPEG4_DXVA2:
@@ -316,6 +289,8 @@ AVCodecID myth2av_codecid(MythCodecID codec_id, bool &vdpau)
         case kCodec_MPEG4_V4L2_DEC: return AV_CODEC_ID_MPEG4;
 
         case kCodec_H264:
+        case kCodec_H264_VDPAU:
+        case kCodec_H264_VDPAU_DEC:
         case kCodec_H264_VAAPI:
         case kCodec_H264_VAAPI_DEC:
         case kCodec_H264_DXVA2:
@@ -332,6 +307,8 @@ AVCodecID myth2av_codecid(MythCodecID codec_id, bool &vdpau)
         case kCodec_H264_V4L2_DEC: return AV_CODEC_ID_H264;
 
         case kCodec_VC1:
+        case kCodec_VC1_VDPAU:
+        case kCodec_VC1_VDPAU_DEC:
         case kCodec_VC1_VAAPI:
         case kCodec_VC1_VAAPI_DEC:
         case kCodec_VC1_DXVA2:
@@ -348,6 +325,8 @@ AVCodecID myth2av_codecid(MythCodecID codec_id, bool &vdpau)
         case kCodec_VC1_V4L2_DEC: return AV_CODEC_ID_VC1;
 
         case kCodec_WMV3:
+        case kCodec_WMV3_VDPAU:
+        case kCodec_WMV3_VDPAU_DEC:
         case kCodec_WMV3_VAAPI:
         case kCodec_WMV3_VAAPI_DEC:
         case kCodec_WMV3_DXVA2:
@@ -364,6 +343,8 @@ AVCodecID myth2av_codecid(MythCodecID codec_id, bool &vdpau)
         case kCodec_WMV3_V4L2_DEC: return AV_CODEC_ID_WMV3;
 
         case kCodec_VP8:
+        case kCodec_VP8_VDPAU:
+        case kCodec_VP8_VDPAU_DEC:
         case kCodec_VP8_VAAPI:
         case kCodec_VP8_VAAPI_DEC:
         case kCodec_VP8_DXVA2:
@@ -380,6 +361,8 @@ AVCodecID myth2av_codecid(MythCodecID codec_id, bool &vdpau)
         case kCodec_VP8_V4L2_DEC: return AV_CODEC_ID_VP8;
 
         case kCodec_VP9:
+        case kCodec_VP9_VDPAU:
+        case kCodec_VP9_VDPAU_DEC:
         case kCodec_VP9_VAAPI:
         case kCodec_VP9_VAAPI_DEC:
         case kCodec_VP9_DXVA2:
@@ -396,6 +379,8 @@ AVCodecID myth2av_codecid(MythCodecID codec_id, bool &vdpau)
         case kCodec_VP9_V4L2_DEC: return AV_CODEC_ID_VP9;
 
         case kCodec_HEVC:
+        case kCodec_HEVC_VDPAU:
+        case kCodec_HEVC_VDPAU_DEC:
         case kCodec_HEVC_VAAPI:
         case kCodec_HEVC_VAAPI_DEC:
         case kCodec_HEVC_DXVA2:

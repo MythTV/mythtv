@@ -334,12 +334,7 @@ typedef enum
 QString get_encoding_type(MythCodecID codecid);
 QString get_decoder_name(MythCodecID codec_id);
 QString toString(MythCodecID codecid);
-AVCodecID myth2av_codecid(MythCodecID codec_id, bool &vdpau);
-inline AVCodecID myth2av_codecid(MythCodecID codec_id)
-{
-    bool vdpau;
-    return myth2av_codecid(codec_id, vdpau);
-}
+AVCodecID myth2av_codecid(MythCodecID codec_id);
 
 // AV codec id convenience functions
 uint mpeg_version(int codec_id);
