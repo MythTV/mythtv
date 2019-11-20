@@ -53,12 +53,12 @@ struct DTVParamHelperStruct
 class DTVParamHelper
 {
   public:
-    explicit DTVParamHelper(int _value) : value(_value) { }
-    DTVParamHelper &operator=(int _value) { value = _value; return *this; }
+    explicit DTVParamHelper(int _value) : m_value(_value) { }
+    DTVParamHelper &operator=(int _value) { m_value = _value; return *this; }
 
-    operator int()                const { return value;          }
-    bool operator==(const int& v) const { return value == v;     }
-    bool operator!=(const int& v) const { return value != v;     }
+    operator int()                const { return m_value;        }
+    bool operator==(const int& v) const { return m_value == v;   }
+    bool operator!=(const int& v) const { return m_value != v;   }
 
   protected:
     static bool ParseParam(const QString &symbol, int &value,
@@ -68,7 +68,7 @@ class DTVParamHelper
                             uint strings_size);
 
   protected:
-    int value;
+    int m_value;
 };
 
 class DTVTunerType : public DTVParamHelper
@@ -124,32 +124,32 @@ class DTVTunerType : public DTVParamHelper
 
     explicit DTVTunerType(int _default = kTunerTypeUnknown)
         : DTVParamHelper(_default) { initStr(); }
-    DTVTunerType& operator=(int type) { value = type; return *this; }
+    DTVTunerType& operator=(int type) { m_value = type; return *this; }
 
     bool Parse(const QString &_value)
-        { return ParseParam(_value, value, s_parseTable); }
+        { return ParseParam(_value, m_value, s_parseTable); }
 
     bool IsFECVariable(void) const
     {
-        return ((kTunerTypeDVBC  == value) ||
-                (kTunerTypeDVBS1 == value) ||
-                (kTunerTypeDVBS2 == value));
+        return ((kTunerTypeDVBC  == m_value) ||
+                (kTunerTypeDVBS1 == m_value) ||
+                (kTunerTypeDVBS2 == m_value));
     }
 
     bool IsModulationVariable(void) const
     {
-        return ((kTunerTypeDVBC  == value) ||
-                (kTunerTypeATSC  == value) ||
-                (kTunerTypeDVBS2 == value));
+        return ((kTunerTypeDVBC  == m_value) ||
+                (kTunerTypeATSC  == m_value) ||
+                (kTunerTypeDVBS2 == m_value));
     }
 
     bool IsDiSEqCSupported(void) const
     {
-        return ((kTunerTypeDVBS1 == value) ||
-                (kTunerTypeDVBS2 == value));
+        return ((kTunerTypeDVBS1 == m_value) ||
+                (kTunerTypeDVBS2 == m_value));
     }
 
-    QString toString() const { return toString(value); }
+    QString toString() const { return toString(m_value); }
 
     static void initStr(void);
     static QString toString(int _value);
@@ -180,25 +180,25 @@ class DTVInversion : public DTVParamHelper
     explicit DTVInversion(Types _default = kInversionAuto)
         : DTVParamHelper(_default) { }
     DTVInversion& operator=(const Types _value)
-        { value = _value; return *this; }
+        { m_value = _value; return *this; }
 #ifdef USING_DVB
     DTVInversion& operator=(const fe_spectral_inversion_t type)
-        { value = type; return *this; }
+        { m_value = type; return *this; }
 #endif
 
     bool IsCompatible(const DTVInversion &other) const
-        { return value == other.value || value == kInversionAuto ||
-                other.value == kInversionAuto;
+        { return m_value == other.m_value || m_value == kInversionAuto ||
+                other.m_value == kInversionAuto;
         }
 
     bool ParseConf(const QString &_value)
-       { return ParseParam(_value, value, s_confTable); }
+       { return ParseParam(_value, m_value, s_confTable); }
     bool ParseVDR(const QString &_value)
-       { return ParseParam(_value, value, s_vdrTable); }
+       { return ParseParam(_value, m_value, s_vdrTable); }
     bool Parse(const QString &_value)
-       { return ParseParam(_value, value, s_parseTable); }
+       { return ParseParam(_value, m_value, s_parseTable); }
 
-    QString toString() const { return toString(value); }
+    QString toString() const { return toString(m_value); }
     QChar   toChar() const
         { if (toString().length() > 0)
               return toString()[0]; else return QChar(0); }
@@ -233,25 +233,25 @@ class DTVBandwidth : public DTVParamHelper
     explicit DTVBandwidth(Types _default = kBandwidthAuto)
         : DTVParamHelper(_default) { }
     DTVBandwidth& operator=(const Types _value)
-        { value = _value; return *this; }
+        { m_value = _value; return *this; }
 #ifdef USING_DVB
     DTVBandwidth& operator=(const fe_bandwidth_t bwidth)
-        { value = bwidth; return *this; }
+        { m_value = bwidth; return *this; }
 #endif
 
     bool IsCompatible(const DTVBandwidth &other) const
-        { return value == other.value || value == kBandwidthAuto ||
-                other.value == kBandwidthAuto;
+        { return m_value == other.m_value || m_value == kBandwidthAuto ||
+                other.m_value == kBandwidthAuto;
         }
 
     bool ParseConf(const QString &_value)
-       { return ParseParam(_value, value, s_confTable); }
+       { return ParseParam(_value, m_value, s_confTable); }
     bool ParseVDR(const QString &_value)
-       { return ParseParam(_value, value, s_vdrTable); }
+       { return ParseParam(_value, m_value, s_vdrTable); }
     bool Parse(const QString &_value)
-       { return ParseParam(_value, value, s_parseTable); }
+       { return ParseParam(_value, m_value, s_parseTable); }
 
-    QString toString() const { return toString(value); }
+    QString toString() const { return toString(m_value); }
     QChar   toChar() const
         { if (toString().length() > 0)
               return toString()[0]; else return QChar(0); }
@@ -294,25 +294,25 @@ class DTVCodeRate : public DTVParamHelper
     explicit DTVCodeRate(Types _default = kFECAuto)
         : DTVParamHelper(_default) { }
     DTVCodeRate& operator=(const Types _value)
-        { value = _value; return *this; }
+        { m_value = _value; return *this; }
 #ifdef USING_DVB
     DTVCodeRate& operator=(const fe_code_rate_t rate)
-        { value = rate; return *this; }
+        { m_value = rate; return *this; }
 #endif
 
     bool IsCompatible(const DTVCodeRate &other) const
-        { return value == other.value || value == kFECAuto ||
-                other.value == kFECAuto;
+        { return m_value == other.m_value || m_value == kFECAuto ||
+                other.m_value == kFECAuto;
         }
 
     bool ParseConf(const QString &_value)
-       { return ParseParam(_value, value, s_confTable); }
+       { return ParseParam(_value, m_value, s_confTable); }
     bool ParseVDR(const QString &_value)
-       { return ParseParam(_value, value, s_vdrTable); }
+       { return ParseParam(_value, m_value, s_vdrTable); }
     bool Parse(const QString &_value)
-       { return ParseParam(_value, value, s_parseTable); }
+       { return ParseParam(_value, m_value, s_parseTable); }
 
-    QString toString() const { return toString(value); }
+    QString toString() const { return toString(m_value); }
 
     static QString toString(int _value)
         { return DTVParamHelper::toString(s_dbStr, _value, kDBStrCnt); }
@@ -355,25 +355,25 @@ class DTVModulation : public DTVParamHelper
     explicit DTVModulation(Types _default = kModulationQAMAuto)
         : DTVParamHelper(_default) { }
     DTVModulation& operator=(const Types _value)
-        { value = _value; return *this; }
+        { m_value = _value; return *this; }
 #ifdef USING_DVB
     DTVModulation& operator=(const fe_modulation_t modulation)
-        { value = modulation; return *this; }
+        { m_value = modulation; return *this; }
 #endif
 
     bool IsCompatible(const DTVModulation &other) const
-        { return value == other.value || value == kModulationQAMAuto ||
-                other.value == kModulationQAMAuto;
+        { return m_value == other.m_value || m_value == kModulationQAMAuto ||
+                other.m_value == kModulationQAMAuto;
         }
 
     bool ParseConf(const QString &_value)
-       { return ParseParam(_value, value, s_confTable); }
+       { return ParseParam(_value, m_value, s_confTable); }
     bool ParseVDR(const QString &_value)
-       { return ParseParam(_value, value, s_vdrTable); }
+       { return ParseParam(_value, m_value, s_vdrTable); }
     bool Parse(const QString &_value)
-       { return ParseParam(_value, value, s_parseTable); }
+       { return ParseParam(_value, m_value, s_parseTable); }
 
-    QString toString() const { return toString(value); }
+    QString toString() const { return toString(m_value); }
 
     static QString toString(int _value)
     {
@@ -410,25 +410,25 @@ class DTVTransmitMode : public DTVParamHelper
     explicit DTVTransmitMode(Types _default = kTransmissionModeAuto)
         : DTVParamHelper(_default) { }
     DTVTransmitMode& operator=(const Types _value)
-        { value = _value; return *this; }
+        { m_value = _value; return *this; }
 #ifdef USING_DVB
     DTVTransmitMode& operator=(const fe_transmit_mode_t mode)
-        { value = mode; return *this; }
+        { m_value = mode; return *this; }
 #endif
 
     bool IsCompatible(const DTVTransmitMode &other) const
-        { return value == other.value || value == kTransmissionModeAuto ||
-                other.value == kTransmissionModeAuto;
+        { return m_value == other.m_value || m_value == kTransmissionModeAuto ||
+                other.m_value == kTransmissionModeAuto;
         }
 
     bool ParseConf(const QString &_value)
-       { return ParseParam(_value, value, s_confTable); }
+       { return ParseParam(_value, m_value, s_confTable); }
     bool ParseVDR(const QString &_value)
-       { return ParseParam(_value, value, s_vdrTable); }
+       { return ParseParam(_value, m_value, s_vdrTable); }
     bool Parse(const QString &_value)
-       { return ParseParam(_value, value, s_parseTable); }
+       { return ParseParam(_value, m_value, s_parseTable); }
 
-    QString toString() const { return toString(value); }
+    QString toString() const { return toString(m_value); }
     QChar   toChar() const
         { if (toString().length() > 0)
               return toString()[0]; else return QChar(0); }
@@ -464,25 +464,25 @@ class DTVGuardInterval : public DTVParamHelper
     explicit DTVGuardInterval(Types _default = kGuardIntervalAuto)
         : DTVParamHelper(_default) { }
     DTVGuardInterval& operator=(const Types _value)
-        { value = _value; return *this; }
+        { m_value = _value; return *this; }
 #ifdef USING_DVB
     DTVGuardInterval& operator=(const fe_guard_interval_t interval)
-        { value = interval; return *this; }
+        { m_value = interval; return *this; }
 #endif
 
     bool IsCompatible(const DTVGuardInterval &other) const
-        { return value == other.value || value == kGuardIntervalAuto ||
-                other.value == kGuardIntervalAuto;
+        { return m_value == other.m_value || m_value == kGuardIntervalAuto ||
+                other.m_value == kGuardIntervalAuto;
         }
 
     bool ParseConf(const QString &_value)
-       { return ParseParam(_value, value, s_confTable); }
+       { return ParseParam(_value, m_value, s_confTable); }
     bool ParseVDR(const QString &_value)
-       { return ParseParam(_value, value, s_vdrTable); }
+       { return ParseParam(_value, m_value, s_vdrTable); }
     bool Parse(const QString &_value)
-       { return ParseParam(_value, value, s_parseTable); }
+       { return ParseParam(_value, m_value, s_parseTable); }
 
-    QString toString() const { return toString(value); }
+    QString toString() const { return toString(m_value); }
 
     static QString toString(int _value)
         { return DTVParamHelper::toString(s_dbStr, _value, kDBStrCnt); }
@@ -515,25 +515,25 @@ class DTVHierarchy : public DTVParamHelper
     explicit DTVHierarchy(Types _default = kHierarchyAuto)
         : DTVParamHelper(_default) { }
     DTVHierarchy& operator=(const Types _value)
-        { value = _value; return *this; }
+        { m_value = _value; return *this; }
 #ifdef USING_DVB
     DTVHierarchy& operator=(const fe_hierarchy_t hierarchy)
-        { value = hierarchy; return *this; }
+        { m_value = hierarchy; return *this; }
 #endif
 
     bool IsCompatible(const DTVHierarchy &other) const
-        { return value == other.value || value == kHierarchyAuto ||
-                other.value == kHierarchyAuto;
+        { return m_value == other.m_value || m_value == kHierarchyAuto ||
+                other.m_value == kHierarchyAuto;
         }
 
     bool ParseConf(const QString &_value)
-       { return ParseParam(_value, value, s_confTable); }
+       { return ParseParam(_value, m_value, s_confTable); }
     bool ParseVDR(const QString &_value)
-       { return ParseParam(_value, value, s_vdrTable); }
+       { return ParseParam(_value, m_value, s_vdrTable); }
     bool Parse(const QString &_value)
-       { return ParseParam(_value, value, s_parseTable); }
+       { return ParseParam(_value, m_value, s_parseTable); }
 
-    QString toString() const { return toString(value); }
+    QString toString() const { return toString(m_value); }
     QChar   toChar() const
         { if (toString().length() > 0)
               return toString()[0]; else return QChar(0); }
@@ -561,16 +561,16 @@ class DTVPolarity : public DTVParamHelper
     explicit DTVPolarity(PolarityValues _default = kPolarityVertical)
         : DTVParamHelper(_default) { }
     DTVPolarity& operator=(const PolarityValues _value)
-        { value = _value; return *this; }
+        { m_value = _value; return *this; }
 
     bool ParseConf(const QString &_value)
-       { return ParseParam(_value, value, s_parseTable); }
+       { return ParseParam(_value, m_value, s_parseTable); }
     bool ParseVDR(const QString &_value)
-       { return ParseParam(_value, value, s_parseTable); }
+       { return ParseParam(_value, m_value, s_parseTable); }
     bool Parse(const QString &_value)
-       { return ParseParam(_value, value, s_parseTable); }
+       { return ParseParam(_value, m_value, s_parseTable); }
 
-    QString toString() const { return toString(value); }
+    QString toString() const { return toString(m_value); }
     QChar   toChar() const
         { if (toString().length() > 0)
               return toString()[0]; else return QChar(0); }
@@ -621,26 +621,26 @@ class DTVModulationSystem : public DTVParamHelper
     explicit DTVModulationSystem(Types _default = kModulationSystem_UNDEFINED)
         : DTVParamHelper(_default) { }
     DTVModulationSystem& operator=(const Types _value)
-        { value = _value; return *this; }
+        { m_value = _value; return *this; }
 #ifdef USING_DVB
     DTVModulationSystem& operator=(fe_delivery_system_t type)
-        { value = type; return *this; }
+        { m_value = type; return *this; }
 #endif
     bool IsCompatible(const DTVModulationSystem &other) const
         { return
-            (value == other.value) || 
-            (value == kModulationSystem_DVBT  && other.value == kModulationSystem_DVBT2) ||
-            (value == kModulationSystem_DVBT2 && other.value == kModulationSystem_DVBT);
+            (m_value == other.m_value) ||
+            (m_value == kModulationSystem_DVBT  && other.m_value == kModulationSystem_DVBT2) ||
+            (m_value == kModulationSystem_DVBT2 && other.m_value == kModulationSystem_DVBT);
         }
 
     bool ParseConf(const QString &_value)
-       { return ParseParam(_value, value, s_confTable); }
+       { return ParseParam(_value, m_value, s_confTable); }
     bool ParseVDR(const QString &_value)
-       { return ParseParam(_value, value, s_vdrTable); }
+       { return ParseParam(_value, m_value, s_vdrTable); }
     bool Parse(const QString &_value)
-       { return ParseParam(_value, value, s_parseTable); }
+       { return ParseParam(_value, m_value, s_parseTable); }
 
-    QString toString() const { return toString(value); }
+    QString toString() const { return toString(m_value); }
 
     static QString toString(int _value)
         { return DTVParamHelper::toString(s_dbStr, _value, kDBStrCnt); }
@@ -672,25 +672,25 @@ class DTVRollOff : public DTVParamHelper
     explicit DTVRollOff(Types _default = kRollOff_35)
         : DTVParamHelper(_default) { }
     DTVRollOff& operator=(const Types _value)
-        { value = _value; return *this; }
+        { m_value = _value; return *this; }
 #ifdef USING_DVB
     DTVRollOff& operator=(fe_rolloff_t type)
-        { value = type; return *this; }
+        { m_value = type; return *this; }
 #endif
 
     bool IsCompatible(const DTVRollOff &other) const
-        { return value == other.value || value == kRollOff_Auto ||
-                other.value == kRollOff_Auto;
+        { return m_value == other.m_value || m_value == kRollOff_Auto ||
+                other.m_value == kRollOff_Auto;
         }
 
     bool ParseConf(const QString &_value)
-       { return ParseParam(_value, value, s_confTable); }
+       { return ParseParam(_value, m_value, s_confTable); }
     bool ParseVDR(const QString &_value)
-       { return ParseParam(_value, value, s_vdrTable); }
+       { return ParseParam(_value, m_value, s_vdrTable); }
     bool Parse(const QString &_value)
-       { return ParseParam(_value, value, s_parseTable); }
+       { return ParseParam(_value, m_value, s_parseTable); }
 
-    QString toString() const { return toString(value); }
+    QString toString() const { return toString(m_value); }
 
     static QString toString(int _value)
         { return DTVParamHelper::toString(s_dbStr, _value, kDBStrCnt); }

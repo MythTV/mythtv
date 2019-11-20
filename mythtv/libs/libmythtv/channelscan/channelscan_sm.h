@@ -70,7 +70,7 @@ class ChannelScanSM;
 class AnalogSignalHandler : public SignalMonitorListener
 {
   public:
-    explicit AnalogSignalHandler(ChannelScanSM *_siscan) : siscan(_siscan) { }
+    explicit AnalogSignalHandler(ChannelScanSM *_siscan) : m_siScan(_siscan) { }
 
   public:
     inline void AllGood(void) override; // SignalMonitorListener
@@ -79,7 +79,7 @@ class AnalogSignalHandler : public SignalMonitorListener
     void StatusSignalStrength(const SignalMonitorValue&) override { } // SignalMonitorListener
 
   private:
-    ChannelScanSM *siscan;
+    ChannelScanSM *m_siScan;
 };
 
 class ChannelScanSM : public MPEGStreamListener,
@@ -269,7 +269,7 @@ inline void ChannelScanSM::UpdateScanPercentCompleted(void)
 
 void AnalogSignalHandler::AllGood(void)
 {
-    siscan->HandleAllGood();
+    m_siScan->HandleAllGood();
 }
 
 #endif // SISCAN_H

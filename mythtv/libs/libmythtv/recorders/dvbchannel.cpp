@@ -396,13 +396,13 @@ void DVBChannel::CheckOptions(DTVMultiplex &tuning) const
 
     // Check OFDM Tuning params
 
-    if (!CheckCodeRate(tuning.m_hp_code_rate))
+    if (!CheckCodeRate(tuning.m_hpCodeRate))
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             "Selected code_rate_hp parameter unsupported by this driver.");
     }
 
-    if (!CheckCodeRate(tuning.m_lp_code_rate))
+    if (!CheckCodeRate(tuning.m_lpCodeRate))
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             "Selected code_rate_lp parameter unsupported by this driver.");
@@ -415,14 +415,14 @@ void DVBChannel::CheckOptions(DTVMultiplex &tuning) const
             "'Auto' bandwidth parameter unsupported by this driver.");
     }
 
-    if ((tuning.m_trans_mode == DTVTransmitMode::kTransmissionModeAuto) &&
+    if ((tuning.m_transMode == DTVTransmitMode::kTransmissionModeAuto) &&
         ((m_capabilities & FE_CAN_TRANSMISSION_MODE_AUTO) == 0U))
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             "'Auto' transmission_mode parameter unsupported by this driver.");
     }
 
-    if ((tuning.m_guard_interval == DTVGuardInterval::kGuardIntervalAuto) &&
+    if ((tuning.m_guardInterval == DTVGuardInterval::kGuardIntervalAuto) &&
         ((m_capabilities & FE_CAN_GUARD_INTERVAL_AUTO) == 0U))
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC +
@@ -538,7 +538,7 @@ static struct dtv_properties *dtvmultiplex_to_dtvproperties(
         return nullptr;
     }
 
-    LOG(VB_CHANNEL, LOG_DEBUG, "DVBChan: modsys " + tuning.m_mod_sys.toString());
+    LOG(VB_CHANNEL, LOG_DEBUG, "DVBChan: modsys " + tuning.m_modSys.toString());
 
     cmdseq = (struct dtv_properties*) calloc(1, sizeof(*cmdseq));
     if (!cmdseq)
@@ -553,7 +553,7 @@ static struct dtv_properties *dtvmultiplex_to_dtvproperties(
 
     // The cx24116 DVB-S2 demod anounce FE_CAN_FEC_AUTO but has apparently
     // trouble with FEC_AUTO on DVB-S2 transponders
-    if (tuning.m_mod_sys == DTVModulationSystem::kModulationSystem_DVBS2)
+    if (tuning.m_modSys == DTVModulationSystem::kModulationSystem_DVBS2)
         can_fec_auto = false;
 
     if (tuner_type == DTVTunerType::kTunerTypeDVBS2 ||
@@ -561,7 +561,7 @@ static struct dtv_properties *dtvmultiplex_to_dtvproperties(
         tuner_type == DTVTunerType::kTunerTypeDVBT2)
     {
         cmdseq->props[c].cmd      = DTV_DELIVERY_SYSTEM;
-        cmdseq->props[c++].u.data = tuning.m_mod_sys;
+        cmdseq->props[c++].u.data = tuning.m_modSys;
     }
 
     cmdseq->props[c].cmd      = DTV_FREQUENCY;
@@ -592,25 +592,25 @@ static struct dtv_properties *dtvmultiplex_to_dtvproperties(
         cmdseq->props[c].cmd      = DTV_BANDWIDTH_HZ;
         cmdseq->props[c++].u.data = (8-tuning.m_bandwidth) * 1000000;
         cmdseq->props[c].cmd      = DTV_CODE_RATE_HP;
-        cmdseq->props[c++].u.data = tuning.m_hp_code_rate;
+        cmdseq->props[c++].u.data = tuning.m_hpCodeRate;
         cmdseq->props[c].cmd      = DTV_CODE_RATE_LP;
-        cmdseq->props[c++].u.data = tuning.m_lp_code_rate;
+        cmdseq->props[c++].u.data = tuning.m_lpCodeRate;
         cmdseq->props[c].cmd      = DTV_TRANSMISSION_MODE;
-        cmdseq->props[c++].u.data = tuning.m_trans_mode;
+        cmdseq->props[c++].u.data = tuning.m_transMode;
         cmdseq->props[c].cmd      = DTV_GUARD_INTERVAL;
-        cmdseq->props[c++].u.data = tuning.m_guard_interval;
+        cmdseq->props[c++].u.data = tuning.m_guardInterval;
         cmdseq->props[c].cmd      = DTV_HIERARCHY;
         cmdseq->props[c++].u.data = tuning.m_hierarchy;
     }
 
-    if (tuning.m_mod_sys == DTVModulationSystem::kModulationSystem_DVBS2)
+    if (tuning.m_modSys == DTVModulationSystem::kModulationSystem_DVBS2)
     {
         cmdseq->props[c].cmd      = DTV_PILOT;
         cmdseq->props[c++].u.data = PILOT_AUTO;
         cmdseq->props[c].cmd      = DTV_ROLLOFF;
         cmdseq->props[c++].u.data = tuning.m_rolloff;
     }
-    else if (tuning.m_mod_sys == DTVModulationSystem::kModulationSystem_DVBS)
+    else if (tuning.m_modSys == DTVModulationSystem::kModulationSystem_DVBS)
     {
         cmdseq->props[c].cmd      = DTV_ROLLOFF;
         cmdseq->props[c++].u.data = DTVRollOff::kRollOff_35;
@@ -1483,7 +1483,7 @@ static struct dvb_frontend_parameters dtvmultiplex_to_dvbparams(
 
     if (DTVTunerType::kTunerTypeDVBS1 == tuner_type)
     {
-        if (tuning.m_mod_sys == DTVModulationSystem::kModulationSystem_DVBS2)
+        if (tuning.m_modSys == DTVModulationSystem::kModulationSystem_DVBS2)
             LOG(VB_GENERAL, LOG_ERR,
                 "DVBChan: Error, Tuning of a DVB-S2 transport "
                 "with a DVB-S card will fail.");
@@ -1514,15 +1514,15 @@ static struct dvb_frontend_parameters dtvmultiplex_to_dvbparams(
         params.u.ofdm.bandwidth             =
             (fe_bandwidth_t) (int) tuning.m_bandwidth;
         params.u.ofdm.code_rate_HP          =
-            (fe_code_rate_t) (int) tuning.m_hp_code_rate;
+            (fe_code_rate_t) (int) tuning.m_hpCodeRate;
         params.u.ofdm.code_rate_LP          =
-            (fe_code_rate_t) (int) tuning.m_lp_code_rate;
+            (fe_code_rate_t) (int) tuning.m_lpCodeRate;
         params.u.ofdm.constellation         =
             (fe_modulation_t) (int) tuning.m_modulation;
         params.u.ofdm.transmission_mode     =
-            (fe_transmit_mode_t) (int) tuning.m_trans_mode;
+            (fe_transmit_mode_t) (int) tuning.m_transMode;
         params.u.ofdm.guard_interval        =
-            (fe_guard_interval_t) (int) tuning.m_guard_interval;
+            (fe_guard_interval_t) (int) tuning.m_guardInterval;
         params.u.ofdm.hierarchy_information =
             (fe_hierarchy_t) (int) tuning.m_hierarchy;
     }
@@ -1562,11 +1562,11 @@ static DTVMultiplex dvbparams_to_dtvmultiplex(
         DTVTunerType::kTunerTypeDVBT2  == tuner_type)
     {
         tuning.m_bandwidth      = params.u.ofdm.bandwidth;
-        tuning.m_hp_code_rate   = params.u.ofdm.code_rate_HP;
-        tuning.m_lp_code_rate   = params.u.ofdm.code_rate_LP;
+        tuning.m_hpCodeRate     = params.u.ofdm.code_rate_HP;
+        tuning.m_lpCodeRate     = params.u.ofdm.code_rate_LP;
         tuning.m_modulation     = params.u.ofdm.constellation;
-        tuning.m_trans_mode     = params.u.ofdm.transmission_mode;
-        tuning.m_guard_interval = params.u.ofdm.guard_interval;
+        tuning.m_transMode      = params.u.ofdm.transmission_mode;
+        tuning.m_guardInterval  = params.u.ofdm.guard_interval;
         tuning.m_hierarchy      = params.u.ofdm.hierarchy_information;
     }
 

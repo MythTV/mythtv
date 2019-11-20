@@ -924,14 +924,14 @@ LNBConfig::LNBConfig(DiSEqCDevLNB &lnb, StandardSetting *parent)
     parent->addChild(m_preset);
     m_type = new LNBTypeSetting(lnb);
     parent->addChild(m_type);
-    m_lof_switch = new LNBLOFSwitchSetting(lnb);
-    parent->addChild(m_lof_switch);
-    m_lof_lo = new LNBLOFLowSetting(lnb);
-    parent->addChild(m_lof_lo);
-    m_lof_hi = new LNBLOFHighSetting(lnb);
-    parent->addChild(m_lof_hi);
-    m_pol_inv = new LNBPolarityInvertedSetting(lnb);
-    parent->addChild(m_pol_inv);
+    m_lofSwitch = new LNBLOFSwitchSetting(lnb);
+    parent->addChild(m_lofSwitch);
+    m_lofLo = new LNBLOFLowSetting(lnb);
+    parent->addChild(m_lofLo);
+    m_lofHi = new LNBLOFHighSetting(lnb);
+    parent->addChild(m_lofHi);
+    m_polInv = new LNBPolarityInvertedSetting(lnb);
+    parent->addChild(m_polInv);
     connect(m_type, SIGNAL(valueChanged(const QString&)),
             this,   SLOT(  UpdateType(  void)));
     connect(m_preset, SIGNAL(valueChanged(const QString&)),
@@ -962,15 +962,15 @@ void LNBConfig::SetPreset(const QString &value)
     {
         m_type->setValue(m_type->getValueIndex(
                              QString::number((uint)preset.m_type)));
-        m_lof_switch->setValue(QString::number(preset.m_lofSw / 1000));
-        m_lof_lo->setValue(QString::number(preset.m_lofLo / 1000));
-        m_lof_hi->setValue(QString::number(preset.m_lofHi / 1000));
-        m_pol_inv->setValue(preset.m_polInv);
+        m_lofSwitch->setValue(QString::number(preset.m_lofSw / 1000));
+        m_lofLo->setValue(QString::number(preset.m_lofLo / 1000));
+        m_lofHi->setValue(QString::number(preset.m_lofHi / 1000));
+        m_polInv->setValue(preset.m_polInv);
         m_type->setEnabled(false);
-        m_lof_switch->setEnabled(false);
-        m_lof_hi->setEnabled(false);
-        m_lof_lo->setEnabled(false);
-        m_pol_inv->setEnabled(false);
+        m_lofSwitch->setEnabled(false);
+        m_lofHi->setEnabled(false);
+        m_lofLo->setEnabled(false);
+        m_polInv->setEnabled(false);
     }
 }
 
@@ -983,22 +983,22 @@ void LNBConfig::UpdateType(void)
     {
         case DiSEqCDevLNB::kTypeFixed:
         case DiSEqCDevLNB::kTypeVoltageControl:
-            m_lof_switch->setEnabled(false);
-            m_lof_hi->setEnabled(false);
-            m_lof_lo->setEnabled(true);
-            m_pol_inv->setEnabled(true);
+            m_lofSwitch->setEnabled(false);
+            m_lofHi->setEnabled(false);
+            m_lofLo->setEnabled(true);
+            m_polInv->setEnabled(true);
             break;
         case DiSEqCDevLNB::kTypeVoltageAndToneControl:
-            m_lof_switch->setEnabled(true);
-            m_lof_hi->setEnabled(true);
-            m_lof_lo->setEnabled(true);
-            m_pol_inv->setEnabled(true);
+            m_lofSwitch->setEnabled(true);
+            m_lofHi->setEnabled(true);
+            m_lofLo->setEnabled(true);
+            m_polInv->setEnabled(true);
             break;
         case DiSEqCDevLNB::kTypeBandstacked:
-            m_lof_switch->setEnabled(false);
-            m_lof_hi->setEnabled(true);
-            m_lof_lo->setEnabled(true);
-            m_pol_inv->setEnabled(true);
+            m_lofSwitch->setEnabled(false);
+            m_lofHi->setEnabled(true);
+            m_lofLo->setEnabled(true);
+            m_polInv->setEnabled(true);
             break;
     }
 }
@@ -1354,7 +1354,7 @@ class SCRPositionSetting : public MythUIComboBoxSetting
 
 DTVDeviceConfigGroup::DTVDeviceConfigGroup(
     DiSEqCDevSettings &settings, uint cardid, bool switches_enabled) :
-    m_settings(settings), m_switches_enabled(switches_enabled)
+    m_settings(settings), m_switchesEnabled(switches_enabled)
 {
     setLabel(DeviceTree::tr("DTV Device Configuration"));
 
@@ -1376,7 +1376,7 @@ void DTVDeviceConfigGroup::AddNodes(
     {
         case DiSEqCDevDevice::kTypeSwitch:
             setting = new SwitchSetting(*node, m_settings);
-            setting->setEnabled(m_switches_enabled);
+            setting->setEnabled(m_switchesEnabled);
             break;
         case DiSEqCDevDevice::kTypeRotor:
         {

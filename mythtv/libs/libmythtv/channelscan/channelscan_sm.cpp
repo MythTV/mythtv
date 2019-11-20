@@ -1010,14 +1010,14 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
 
             LOG(VB_CHANSCAN, LOG_DEBUG, LOC +
                 QString("%1(%2) m_inputName: %3 ").arg(__FUNCTION__).arg(__LINE__).arg(m_inputName) +
-                QString("m_mod_sys:%1 %2").arg(item.m_tuning.m_mod_sys).arg(item.m_tuning.m_mod_sys.toString()));
+                QString("m_mod_sys:%1 %2").arg(item.m_tuning.m_modSys).arg(item.m_tuning.m_modSys.toString()));
 
             if (m_scanDTVTunerType == DTVTunerType::kTunerTypeDVBT2)
             {
                 if (m_dvbt2Tried)
-                    item.m_tuning.m_mod_sys = DTVModulationSystem::kModulationSystem_DVBT2;
+                    item.m_tuning.m_modSys = DTVModulationSystem::kModulationSystem_DVBT2;
                 else
-                    item.m_tuning.m_mod_sys = DTVModulationSystem::kModulationSystem_DVBT;
+                    item.m_tuning.m_modSys = DTVModulationSystem::kModulationSystem_DVBT;
             }
 
             m_channelList << ChannelListItem(m_current, m_currentInfo);
@@ -1711,7 +1711,7 @@ ScanDTVTransportList ChannelScanSM::GetChannelList(bool addFullTS) const
             GetChannelList(it->first, it->second);
 
         ScanDTVTransport item((*it->first).m_tuning, tuner_type, cardid);
-        item.m_iptv_tuning = (*(it->first)).m_iptvTuning;
+        item.m_iptvTuning = (*(it->first)).m_iptvTuning;
 
         QMap<uint,ChannelInsertInfo>::iterator dbchan_it;
         for (dbchan_it = pnum_to_dbchan.begin();
@@ -2050,14 +2050,14 @@ bool ChannelScanSM::Tune(const transport_scan_items_it_t &transport)
 
     if (m_scanDTVTunerType == DTVTunerType::kTunerTypeDVBT)
     {
-        tuning.m_mod_sys = DTVModulationSystem::kModulationSystem_DVBT;
+        tuning.m_modSys = DTVModulationSystem::kModulationSystem_DVBT;
     }
     if (m_scanDTVTunerType == DTVTunerType::kTunerTypeDVBT2)
     {
         if (m_dvbt2Tried)
-            tuning.m_mod_sys = DTVModulationSystem::kModulationSystem_DVBT2;
+            tuning.m_modSys = DTVModulationSystem::kModulationSystem_DVBT2;
         else
-            tuning.m_mod_sys = DTVModulationSystem::kModulationSystem_DVBT;
+            tuning.m_modSys = DTVModulationSystem::kModulationSystem_DVBT;
     }
 
     return GetDTVChannel()->Tune(tuning);

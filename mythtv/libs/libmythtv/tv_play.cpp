@@ -11376,13 +11376,13 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
     {
         if (m_tvmIsRecording || m_tvmIsRecorded)
         {
-            static constexpr uint s_casOrd[] = { 0, 2, 1 };
-            for (size_t i = 0; i < sizeof(s_casOrd)/sizeof(s_casOrd[0]); i++)
+            static constexpr uint kCasOrd[] = { 0, 2, 1 };
+            for (size_t i = 0; i < sizeof(kCasOrd)/sizeof(kCasOrd[0]); i++)
             {
-                const CommSkipMode mode = (CommSkipMode) s_casOrd[i];
-                QString action = prefix + QString::number(s_casOrd[i]);
+                const CommSkipMode mode = (CommSkipMode) kCasOrd[i];
+                QString action = prefix + QString::number(kCasOrd[i]);
                 active = (mode == m_tvmCurSkip);
-                BUTTON(action, toString((CommSkipMode) s_casOrd[i]));
+                BUTTON(action, toString((CommSkipMode) kCasOrd[i]));
             }
         }
     }

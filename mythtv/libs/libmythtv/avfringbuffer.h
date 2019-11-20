@@ -38,7 +38,7 @@ public:
 private:
     RingBuffer         *m_rbuffer {nullptr};
     bool                m_initState {true};
-    static bool         s_avrprotocol_initialised;
+    static bool         s_avfrProtocolInitialised;
     static URLProtocol  s_avfrURL;
 };
 

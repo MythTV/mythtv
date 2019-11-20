@@ -1,7 +1,7 @@
 #include "avfringbuffer.h"
 #include "mythcorecontext.h"
 
-bool AVFRingBuffer::s_avrprotocol_initialised = false;
+bool AVFRingBuffer::s_avfrProtocolInitialised = false;
 URLProtocol AVFRingBuffer::s_avfrURL;
 
 int AVFRingBuffer::AVF_Open(URLContext *h, const char *filename, int flags)
@@ -86,7 +86,7 @@ int64_t AVFRingBuffer::AVF_Seek_Packet(void *opaque, int64_t offset, int whence)
 URLProtocol *AVFRingBuffer::GetRingBufferURLProtocol(void)
 {
     QMutexLocker lock(avcodeclock);
-    if (!s_avrprotocol_initialised)
+    if (!s_avfrProtocolInitialised)
     {
         // just in case URLProtocol's members do not have default constructor
         memset((void *)&s_avfrURL, 0, sizeof(s_avfrURL));
@@ -98,7 +98,7 @@ URLProtocol *AVFRingBuffer::GetRingBufferURLProtocol(void)
         s_avfrURL.url_close         = AVF_Close;
         s_avfrURL.priv_data_size    = 0;
         s_avfrURL.flags             = URL_PROTOCOL_FLAG_NETWORK;
-        s_avrprotocol_initialised   = true;
+        s_avfrProtocolInitialised   = true;
     }
     return &s_avfrURL;
 }

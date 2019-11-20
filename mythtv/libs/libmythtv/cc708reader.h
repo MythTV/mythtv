@@ -19,8 +19,8 @@ class CC708Reader
     explicit CC708Reader(MythPlayer *owner);
     virtual ~CC708Reader();
 
-    void SetCurrentService(int service) { m_currentservice = service; }
-    CC708Service* GetCurrentService(void) { return &CC708services[m_currentservice]; }
+    void SetCurrentService(int service) { m_currentService = service; }
+    CC708Service* GetCurrentService(void) { return &CC708services[m_currentService]; }
     void SetEnabled(bool enable) { m_enabled = enable; }
     void ClearBuffers(void);
 
@@ -29,7 +29,7 @@ class CC708Reader
     CC708Window &GetCCWin(uint service_num, uint window_id)
         { return CC708services[service_num].m_windows[window_id]; }
     CC708Window &GetCCWin(uint svc_num)
-        { return GetCCWin(svc_num, CC708services[svc_num].m_current_window); }
+        { return GetCCWin(svc_num, CC708services[svc_num].m_currentWindow); }
 
     // Window settings
     virtual void SetCurrentWindow(uint service_num, int window_id);
@@ -76,22 +76,17 @@ class CC708Reader
 
     // Data
     unsigned char *m_buf[k708MaxServices];
-    uint           m_buf_alloc[k708MaxServices];
-    uint           m_buf_size[k708MaxServices];
+    uint           m_bufAlloc[k708MaxServices];
+    uint           m_bufSize[k708MaxServices];
     bool           m_delayed[k708MaxServices];
 
-    short         *m_temp_str[k708MaxServices];
-    int            m_temp_str_alloc[k708MaxServices];
-    int            m_temp_str_size[k708MaxServices];
+    short         *m_tempStr[k708MaxServices];
+    int            m_tempStrAlloc[k708MaxServices];
+    int            m_tempStrSize[k708MaxServices];
 
-    int            m_currentservice {1};
+    int            m_currentService {1};
     CC708Service   CC708services[k708MaxServices];
     int            CC708DelayedDeletes[k708MaxServices];
-    QString        m_osdfontname;
-    QString        m_osdccfontname;
-    QString        m_osd708fontnames[20];
-    QString        m_osdprefix;
-    QString        m_osdtheme;
 
     MythPlayer    *m_parent  {nullptr};
     bool           m_enabled {false};

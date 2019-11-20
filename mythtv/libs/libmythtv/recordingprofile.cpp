@@ -1017,7 +1017,7 @@ class VideoCompressionSettings : public GroupSetting
                                              new MPEG2streamType(m_parent,
                                                      (*Iopt).m_minimum,
                                                      (*Iopt).m_maximum,
-                                                     (*Iopt).m_default_value));
+                                                     (*Iopt).m_defaultValue));
                         }
                         else if ((*Iopt).m_category == DriverOption::VIDEO_ASPECT)
                         {
@@ -1025,7 +1025,7 @@ class VideoCompressionSettings : public GroupSetting
                                              new MPEG2aspectRatio(m_parent,
                                              (*Iopt).m_minimum,
                                              (*Iopt).m_maximum,
-                                             (*Iopt).m_default_value));
+                                             (*Iopt).m_defaultValue));
                         }
                         else if ((*Iopt).m_category ==
                                  DriverOption::VIDEO_BITRATE_MODE)
@@ -1051,7 +1051,7 @@ class VideoCompressionSettings : public GroupSetting
                                              "low_mpegavgbitrate",
                                              (*Iopt).m_minimum / 1000,
                                              (*Iopt).m_maximum / 1000,
-                                             (*Iopt).m_default_value / 1000,
+                                             (*Iopt).m_defaultValue / 1000,
                                              (*Iopt).m_step / 1000));
 
                                 bit_medium->setLabel(QObject::
@@ -1060,7 +1060,7 @@ class VideoCompressionSettings : public GroupSetting
                                              "medium_mpegavgbitrate",
                                              (*Iopt).m_minimum / 1000,
                                              (*Iopt).m_maximum / 1000,
-                                             (*Iopt).m_default_value / 1000,
+                                             (*Iopt).m_defaultValue / 1000,
                                              (*Iopt).m_step / 1000));
 
                                 bit_high->setLabel(QObject::
@@ -1069,7 +1069,7 @@ class VideoCompressionSettings : public GroupSetting
                                              "high_mpegavgbitrate",
                                              (*Iopt).m_minimum / 1000,
                                              (*Iopt).m_maximum / 1000,
-                                             (*Iopt).m_default_value / 1000,
+                                             (*Iopt).m_defaultValue / 1000,
                                              (*Iopt).m_step / 1000));
                             }
                             else
@@ -1079,7 +1079,7 @@ class VideoCompressionSettings : public GroupSetting
                                              "mpeg2bitrate",
                                              (*Iopt).m_minimum / 1000,
                                              (*Iopt).m_maximum / 1000,
-                                             (*Iopt).m_default_value / 1000,
+                                             (*Iopt).m_defaultValue / 1000,
                                              (*Iopt).m_step / 1000));
                             }
                         }
@@ -1092,19 +1092,19 @@ class VideoCompressionSettings : public GroupSetting
                                              "low_mpegpeakbitrate",
                                              (*Iopt).m_minimum / 1000,
                                              (*Iopt).m_maximum / 1000,
-                                             (*Iopt).m_default_value / 1000,
+                                             (*Iopt).m_defaultValue / 1000,
                                              (*Iopt).m_step / 1000));
                                 bit_medium->addChild(new PeakBitrate(m_parent,
                                              "medium_mpegpeakbitrate",
                                              (*Iopt).m_minimum / 1000,
                                              (*Iopt).m_maximum / 1000,
-                                             (*Iopt).m_default_value / 1000,
+                                             (*Iopt).m_defaultValue / 1000,
                                              (*Iopt).m_step / 1000));
                                 bit_high->addChild(new PeakBitrate(m_parent,
                                              "high_mpegpeakbitrate",
                                              (*Iopt).m_minimum / 1000,
                                              (*Iopt).m_maximum / 1000,
-                                             (*Iopt).m_default_value / 1000,
+                                             (*Iopt).m_defaultValue / 1000,
                                              (*Iopt).m_step / 1000));
                             }
                             else
@@ -1112,7 +1112,7 @@ class VideoCompressionSettings : public GroupSetting
                                              "mpeg2maxbitrate",
                                              (*Iopt).m_minimum / 1000,
                                              (*Iopt).m_maximum / 1000,
-                                             (*Iopt).m_default_value / 1000,
+                                             (*Iopt).m_defaultValue / 1000,
                                              (*Iopt).m_step / 1000));
                         }
                     }

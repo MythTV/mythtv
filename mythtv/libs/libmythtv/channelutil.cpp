@@ -423,11 +423,11 @@ uint ChannelUtil::CreateMultiplex(uint sourceid, const DTVMultiplex &mux,
         transport_id,                        network_id,
         mux.m_symbolrate,                    mux.m_bandwidth.toChar().toLatin1(),
         mux.m_polarity.toChar().toLatin1(),  mux.m_inversion.toChar().toLatin1(),
-        mux.m_trans_mode.toChar().toLatin1(),
+        mux.m_transMode.toChar().toLatin1(),
         mux.m_fec.toString(),                mux.m_modulation.toString(),
-        mux.m_hierarchy.toChar().toLatin1(), mux.m_hp_code_rate.toString(),
-        mux.m_lp_code_rate.toString(),       mux.m_guard_interval.toString(),
-        mux.m_mod_sys.toString(),            mux.m_rolloff.toString());
+        mux.m_hierarchy.toChar().toLatin1(), mux.m_hpCodeRate.toString(),
+        mux.m_lpCodeRate.toString(),         mux.m_guardInterval.toString(),
+        mux.m_modSys.toString(),             mux.m_rolloff.toString());
 }
 
 

@@ -324,20 +324,20 @@ void MythCCExtractorPlayer::Ingest608Captions(void)
             if (streamRawIdx < 0)
                 continue;
 
-            textlist->lock.lock();
+            textlist->m_lock.lock();
 
             const int ccIdx = kCcIndexTbl[min(streamRawIdx,6)];
 
             if (ccIdx >= 4)
             {
-                textlist->lock.unlock();
+                textlist->m_lock.unlock();
                 continue;
             }
 
-            FormattedTextSubtitle608 fsub(textlist->buffers);
+            FormattedTextSubtitle608 fsub(textlist->m_buffers);
             QStringList content = fsub.ToSRT();
 
-            textlist->lock.unlock();
+            textlist->m_lock.unlock();
 
             IngestSubtitle((*it).subs[ccIdx], content);
         }

@@ -350,7 +350,7 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
 
     av_log_set_callback(myth_av_log);
 
-    m_audioIn.sample_size = -32; // force SetupAudioStream to run once
+    m_audioIn.m_sampleSize = -32;// force SetupAudioStream to run once
     m_itv = m_parent->GetInteractiveTV();
 
     cc608_build_parity_table(m_cc608_parity_table);
@@ -4482,13 +4482,13 @@ static void extract_mono_channel(uint channel, AudioInfo *audioInfo,
                                  char *buffer, int bufsize)
 {
     // Only stereo -> mono (left or right) is supported
-    if (audioInfo->channels != 2)
+    if (audioInfo->m_channels != 2)
         return;
 
-    if (channel >= (uint)audioInfo->channels)
+    if (channel >= (uint)audioInfo->m_channels)
         return;
 
-    const uint samplesize = audioInfo->sample_size;
+    const uint samplesize = audioInfo->m_sampleSize;
     const uint samples    = bufsize / samplesize;
     const uint halfsample = samplesize >> 1;
 
@@ -4614,16 +4614,16 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
         data_size = 0;
 
         // Check if the number of channels or sampling rate have changed
-        if (ctx->sample_rate != m_audioOut.sample_rate ||
-            ctx->channels    != m_audioOut.channels ||
+        if (ctx->sample_rate != m_audioOut.m_sampleRate ||
+            ctx->channels    != m_audioOut.m_channels ||
             AudioOutputSettings::AVSampleFormatToFormat(ctx->sample_fmt,
                                                         ctx->bits_per_raw_sample) != m_audioOut.format)
         {
             LOG(VB_GENERAL, LOG_INFO, LOC + "Audio stream changed");
-            if (ctx->channels != m_audioOut.channels)
+            if (ctx->channels != m_audioOut.m_channels)
             {
                 LOG(VB_GENERAL, LOG_INFO, LOC + QString("Number of audio channels changed from %1 to %2")
-                    .arg(m_audioOut.channels).arg(ctx->channels));
+                    .arg(m_audioOut.m_channels).arg(ctx->channels));
             }
             m_currentTrack[kTrackTypeAudio] = -1;
             m_selectedTrack[kTrackTypeAudio].m_av_stream_index = -1;
@@ -4631,7 +4631,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
             AutoSelectAudioTrack();
         }
 
-        if (m_audioOut.do_passthru)
+        if (m_audioOut.m_doPassthru)
         {
             if (!already_decoded)
             {
@@ -4685,7 +4685,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
 
         long long temppts = m_lastapts;
 
-        if (audSubIdx != -1 && !m_audioOut.do_passthru)
+        if (audSubIdx != -1 && !m_audioOut.m_doPassthru)
             extract_mono_channel(audSubIdx, &m_audioOut,
                                  (char *)m_audioSamples, data_size);
 
@@ -4693,7 +4693,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
         int frames = (ctx->channels <= 0 || decoded_size < 0 || !samplesize) ? -1 :
             decoded_size / (ctx->channels * samplesize);
         m_audio->AddAudioData((char *)m_audioSamples, data_size, temppts, frames);
-        if (m_audioOut.do_passthru && !m_audio->NeedDecodingBeforePassthrough())
+        if (m_audioOut.m_doPassthru && !m_audio->NeedDecodingBeforePassthrough())
         {
             m_lastapts += m_audio->LengthLastData();
         }
@@ -5285,8 +5285,8 @@ bool AvFormatDecoder::SetupAudioStream(void)
 
     m_audio->SetAudioParams(m_audioOut.format, ctx->channels,
                             requested_channels,
-                            m_audioOut.codec_id, m_audioOut.sample_rate,
-                            m_audioOut.do_passthru, m_audioOut.codec_profile);
+                            m_audioOut.m_codecId, m_audioOut.m_sampleRate,
+                            m_audioOut.m_doPassthru, m_audioOut.m_codecProfile);
     m_audio->ReinitAudio();
     AudioOutput *audioOutput = m_audio->GetAudioOutput();
     if (audioOutput)
@@ -5326,12 +5326,12 @@ bool AvFormatDecoder::SetupAudioStream(void)
 
         lcd->setAudioFormatLEDs(audio_format, true);
 
-        if (m_audioOut.do_passthru)
+        if (m_audioOut.m_doPassthru)
             lcd->setVariousLEDs(VARIOUS_SPDIF, true);
         else
             lcd->setVariousLEDs(VARIOUS_SPDIF, false);
 
-        switch (m_audioIn.channels)
+        switch (m_audioIn.m_channels)
         {
             case 0:
             /* nb: aac and mp3 seem to be coming up 0 here, may point to an

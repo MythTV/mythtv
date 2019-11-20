@@ -565,11 +565,11 @@ void ScanOptionalConfig::SetTuningPaneValues(uint frequency, const DTVMultiplex 
         {
             pane->setInversion(mpx.m_inversion.toString());
             pane->setBandwidth(mpx.m_bandwidth.toString());
-            pane->setCodeRateHP(mpx.m_hp_code_rate.toString());
-            pane->setCodeRateLP(mpx.m_lp_code_rate.toString());
+            pane->setCodeRateHP(mpx.m_hpCodeRate.toString());
+            pane->setCodeRateLP(mpx.m_lpCodeRate.toString());
             pane->setConstellation(mpx.m_modulation.toString());
-            pane->setTransmode(mpx.m_trans_mode.toString());
-            pane->setGuardInterval(mpx.m_guard_interval.toString());
+            pane->setTransmode(mpx.m_transMode.toString());
+            pane->setGuardInterval(mpx.m_guardInterval.toString());
             pane->setHierarchy(mpx.m_hierarchy.toString());
         }
     }
@@ -583,13 +583,13 @@ void ScanOptionalConfig::SetTuningPaneValues(uint frequency, const DTVMultiplex 
         {
             pane->setInversion(mpx.m_inversion.toString());
             pane->setBandwidth(mpx.m_bandwidth.toString());
-            pane->setCodeRateHP(mpx.m_hp_code_rate.toString());
-            pane->setCodeRateLP(mpx.m_lp_code_rate.toString());
+            pane->setCodeRateHP(mpx.m_hpCodeRate.toString());
+            pane->setCodeRateLP(mpx.m_lpCodeRate.toString());
             pane->setConstellation(mpx.m_modulation.toString());
-            pane->setTransmode(mpx.m_trans_mode.toString());
-            pane->setGuardInterval(mpx.m_guard_interval.toString());
+            pane->setTransmode(mpx.m_transMode.toString());
+            pane->setGuardInterval(mpx.m_guardInterval.toString());
             pane->setHierarchy(mpx.m_hierarchy.toString());
-            pane->setModsys(mpx.m_mod_sys.toString());
+            pane->setModsys(mpx.m_modSys.toString());
         }
     }
     else if (st == ScanTypeSetting::FullScan_DVBC  ||
@@ -631,7 +631,7 @@ void ScanOptionalConfig::SetTuningPaneValues(uint frequency, const DTVMultiplex 
             pane->setFec(mpx.m_fec.toString());
             pane->setPolarity(mpx.m_polarity.toString());
             pane->setModulation(mpx.m_modulation.toString());
-            pane->setModsys(mpx.m_mod_sys.toString());
+            pane->setModsys(mpx.m_modSys.toString());
             pane->setRolloff(mpx.m_rolloff.toString());
         }
     }

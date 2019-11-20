@@ -119,10 +119,10 @@ class LNBConfig : public DiseqcConfigBase
   private:
     LNBPresetSetting           *m_preset     {nullptr};
     LNBTypeSetting             *m_type       {nullptr};
-    LNBLOFSwitchSetting        *m_lof_switch {nullptr};
-    LNBLOFLowSetting           *m_lof_lo     {nullptr};
-    LNBLOFHighSetting          *m_lof_hi     {nullptr};
-    LNBPolarityInvertedSetting *m_pol_inv    {nullptr};
+    LNBLOFSwitchSetting        *m_lofSwitch  {nullptr};
+    LNBLOFLowSetting           *m_lofLo      {nullptr};
+    LNBLOFHighSetting          *m_lofHi      {nullptr};
+    LNBPolarityInvertedSetting *m_polInv     {nullptr};
 };
 
 class DeviceTypeSetting;
@@ -179,7 +179,7 @@ class DTVDeviceConfigGroup : public GroupSetting
     DiSEqCDevTree       m_tree;
     DiSEqCDevSettings  &m_settings;
     devid_to_setting_t  m_devs;
-    bool                m_switches_enabled;
+    bool                m_switchesEnabled;
 };
 
 #endif // _DISEQCSETTINGS_H_

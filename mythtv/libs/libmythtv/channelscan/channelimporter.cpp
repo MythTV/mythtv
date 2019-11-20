@@ -656,9 +656,9 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
                         chan.m_default_authority,
                         chan.m_service_type);
 
-                    if (!transports[i].m_iptv_tuning.GetDataURL().isEmpty())
+                    if (!transports[i].m_iptvTuning.GetDataURL().isEmpty())
                         ChannelUtil::CreateIPTVTuningData(chan.m_channel_id,
-                                          transports[i].m_iptv_tuning);
+                                          transports[i].m_iptvTuning);
                 }
             }
 

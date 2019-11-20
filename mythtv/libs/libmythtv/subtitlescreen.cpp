@@ -248,9 +248,9 @@ SubtitleFormat::GetFont(const QString &family,
 {
     int origPixelSize = pixelSize;
     float scale = zoom / 100.0;
-    if ((attr.m_pen_size & 0x3) == k708AttrSizeSmall)
+    if ((attr.m_penSize & 0x3) == k708AttrSizeSmall)
         scale = scale * 32 / 42;
-    else if ((attr.m_pen_size & 0x3) == k708AttrSizeLarge)
+    else if ((attr.m_penSize & 0x3) == k708AttrSizeLarge)
         scale = scale * 42 / 32;
 
     QString prefix = MakePrefix(family, attr);
@@ -288,12 +288,12 @@ SubtitleFormat::GetFont(const QString &family,
     {
         int off = lroundf(scale * pixelSize / 20);
         offset = QPoint(off, off);
-        if (attr.m_edge_type == k708AttrEdgeLeftDropShadow)
+        if (attr.m_edgeType == k708AttrEdgeLeftDropShadow)
         {
             shadow = true;
             offset.setX(-off);
         }
-        else if (attr.m_edge_type == k708AttrEdgeRightDropShadow)
+        else if (attr.m_edgeType == k708AttrEdgeRightDropShadow)
             shadow = true;
         else
             shadow = false;
@@ -316,9 +316,9 @@ SubtitleFormat::GetFont(const QString &family,
         alpha = attr.GetFGAlpha();
     if (IsUnlocked(prefix, kSubAttrOutlinesize))
     {
-        if (attr.m_edge_type == k708AttrEdgeUniform ||
-            attr.m_edge_type == k708AttrEdgeRaised  ||
-            attr.m_edge_type == k708AttrEdgeDepressed)
+        if (attr.m_edgeType == k708AttrEdgeUniform ||
+            attr.m_edgeType == k708AttrEdgeRaised  ||
+            attr.m_edgeType == k708AttrEdgeDepressed)
         {
             outline = true;
             off = lroundf(scale * pixelSize / 20);
@@ -357,7 +357,7 @@ QString SubtitleFormat::MakePrefix(const QString &family,
                                    const CC708CharacterAttribute &attr)
 {
     if (family == kSubFamily708)
-        return family + "_" + QString::number(attr.m_font_tag & 0x7);
+        return family + "_" + QString::number(attr.m_fontTag & 0x7);
     return family;
 }
 
@@ -389,7 +389,7 @@ void SubtitleFormat::CreateProviderDefault(const QString &family,
             "TeX Gyre Chorus", // cursive
             "Droid Serif"      // small caps, QFont::SmallCaps will be applied
         };
-        font->GetFace()->setFamily(s_cc708Fonts[attr.m_font_tag & 0x7]);
+        font->GetFace()->setFamily(s_cc708Fonts[attr.m_fontTag & 0x7]);
     }
     else if (family == kSubFamilyText)
     {
@@ -496,7 +496,7 @@ void SubtitleFormat::Load(const QString &family,
     if (!testBG)
         testBG = negBG;
     if (family == kSubFamily708 &&
-        (attr.m_font_tag & 0x7) == k708AttrFontSmallCaps)
+        (attr.m_fontTag & 0x7) == k708AttrFontSmallCaps)
         resultFont->GetFace()->setCapitalization(QFont::SmallCaps);
     m_fontMap[prefix] = resultFont;
     m_shapeMap[prefix] = resultBG;
@@ -681,15 +681,15 @@ QString FormattedTextChunk::ToLogString(void) const
         .arg(m_format.GetBGAlpha());
     str += QString("edge=%1.%2 ")
         .arg(srtColorString(m_format.GetEdgeColor()))
-        .arg(m_format.m_edge_type);
+        .arg(m_format.m_edgeType);
     str += QString("off=%1 pensize=%2 ")
         .arg(m_format.m_offset)
-        .arg(m_format.m_pen_size);
+        .arg(m_format.m_penSize);
     str += QString("it=%1 ul=%2 bf=%3 ")
         .arg(m_format.m_italics)
         .arg(m_format.m_underline)
         .arg(m_format.m_boldface);
-    str += QString("font=%1 ").arg(m_format.m_font_tag);
+    str += QString("font=%1 ").arg(m_format.m_fontTag);
     str += QString(" text='%1'").arg(m_text);
     return str;
 }
@@ -1247,9 +1247,9 @@ void FormattedTextSubtitle608::Init(const vector<CC608Text*> &buffers)
         int color = 0;
         bool isItalic = false, isUnderline = false;
         const bool isBold = false;
-        QString text(cc->text);
+        QString text(cc->m_text);
 
-        int orig_x = cc->x;
+        int orig_x = cc->m_x;
         // position as if we use a fixed size font
         // - font size already has zoom factor applied
 
@@ -1261,7 +1261,7 @@ void FormattedTextSubtitle608::Init(const vector<CC608Text*> &buffers)
             // fallback
             x = (orig_x + 3) * m_safeArea.width() / xscale;
 
-        int orig_y = cc->y;
+        int orig_y = cc->m_y;
         int y;
         if (orig_y < yscale / 2)
             // top half -- anchor up
@@ -1283,7 +1283,7 @@ void FormattedTextSubtitle608::Init(const vector<CC608Text*> &buffers)
             line.chunks += chunk;
             LOG(VB_VBI, LOG_INFO,
                 QString("Adding cc608 chunk (%1,%2): %3")
-                .arg(cc->x).arg(cc->y).arg(chunk.ToLogString()));
+                .arg(cc->m_x).arg(cc->m_y).arg(chunk.ToLogString()));
         }
         m_lines += line;
     }
@@ -1334,12 +1334,12 @@ void FormattedTextSubtitle708::Init(const CC708Window &win,
 
     for (size_t i = 0; i < list.size(); i++)
     {
-        if (list[i]->y >= (uint)m_lines.size())
-            m_lines.resize(list[i]->y + 1);
-        FormattedTextChunk chunk(list[i]->str, list[i]->attr, m_subScreen);
-        m_lines[list[i]->y].chunks += chunk;
+        if (list[i]->m_y >= (uint)m_lines.size())
+            m_lines.resize(list[i]->m_y + 1);
+        FormattedTextChunk chunk(list[i]->m_str, list[i]->m_attr, m_subScreen);
+        m_lines[list[i]->m_y].chunks += chunk;
         LOG(VB_VBI, LOG_INFO, QString("Adding cc708 chunk: win %1 row %2: %3")
-            .arg(m_num).arg(list[i]->y).arg(chunk.ToLogString()));
+            .arg(m_num).arg(list[i]->m_y).arg(chunk.ToLogString()));
     }
 }
 
@@ -2210,13 +2210,13 @@ void SubtitleScreen::DisplayCC608Subtitles(void)
     if (!textlist)
         return;
 
-    QMutexLocker locker(&textlist->lock);
+    QMutexLocker locker(&textlist->m_lock);
 
-    if (textlist->buffers.empty())
+    if (textlist->m_buffers.empty())
         return;
 
     FormattedTextSubtitle608 *fsub =
-        new FormattedTextSubtitle608(textlist->buffers, m_family,
+        new FormattedTextSubtitle608(textlist->m_buffers, m_family,
                                      m_safeArea, this/*, m_textFontZoom*/);
     m_qInited.append(fsub);
 }

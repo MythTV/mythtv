@@ -48,22 +48,22 @@ class MTV_PUBLIC AudioPlayer
     void  SetEffDsp(int dsprate);
 
     void  CheckFormat(void);
-    void  SetNoAudio(void)           { m_no_audio_out = true;    }
-    bool  HasAudioIn(void) const     { return !m_no_audio_in;    }
-    bool  HasAudioOut(void) const    { return !m_no_audio_out;   }
-    bool  ControlsVolume(void) const { return m_controls_volume; }
+    void  SetNoAudio(void)           { m_noAudioOut = true;      }
+    bool  HasAudioIn(void) const     { return !m_noAudioIn;      }
+    bool  HasAudioOut(void) const    { return !m_noAudioOut;     }
+    bool  ControlsVolume(void) const { return m_controlsVolume;  }
 
     bool  Pause(bool pause);
     bool  IsPaused(void);
     void  PauseAudioUntilBuffered(void);
     AVCodecID GetCodec(void)    const { return m_codec;         }
     int   GetNumChannels(void)  const { return m_channels;      }
-    int   GetOrigChannels(void) const { return m_orig_channels; }
-    int   GetSampleRate(void)   const { return m_samplerate;    }
+    int   GetOrigChannels(void) const { return m_origChannels;  }
+    int   GetSampleRate(void)   const { return m_sampleRate;    }
     uint  GetVolume(void);
     uint  AdjustVolume(int change);
     uint  SetVolume(int newvolume);
-    float GetStretchFactor(void) const { return m_stretchfactor; }
+    float GetStretchFactor(void) const { return m_stretchFactor; }
     void  SetStretchFactor(float factor);
     bool  IsUpmixing(void);
     bool  EnableUpmix(bool enable, bool toggle = false);
@@ -112,20 +112,20 @@ class MTV_PUBLIC AudioPlayer
     MythPlayer  *m_parent            {nullptr};
     AudioOutput *m_audioOutput       {nullptr};
     int          m_channels          {-1};
-    int          m_orig_channels     {-1};
+    int          m_origChannels      {-1};
     AVCodecID    m_codec             {AV_CODEC_ID_NONE};
     AudioFormat  m_format            {FORMAT_NONE};
-    int          m_samplerate        {44100};
-    int          m_codec_profile     {0};
-    float        m_stretchfactor     {1.0F};
+    int          m_sampleRate        {44100};
+    int          m_codecProfile      {0};
+    float        m_stretchFactor     {1.0F};
     bool         m_passthru          {false};
     QMutex       m_lock              {QMutex::Recursive};
-    bool         m_muted_on_creation;
-    QString      m_main_device;
-    QString      m_passthru_device;
-    bool         m_no_audio_in       {false};
-    bool         m_no_audio_out      {true};
-    bool         m_controls_volume   {true};
+    bool         m_mutedOnCreation   {false};
+    QString      m_mainDevice;
+    QString      m_passthruDevice;
+    bool         m_noAudioIn         {false};
+    bool         m_noAudioOut        {true};
+    bool         m_controlsVolume    {true};
     vector<MythTV::Visual*> m_visuals;
 };
 
