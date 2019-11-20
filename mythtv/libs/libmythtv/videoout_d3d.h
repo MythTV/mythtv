@@ -72,26 +72,26 @@ class VideoOutputD3D : public MythVideoOutput
 
   private:
     VideoFrame              m_pauseFrame;
-    QMutex                  m_lock;
-    HWND                    m_hWnd;
-    HWND                    m_hEmbedWnd;
-    MythRenderD3D9         *m_render;
-    D3D9Image              *m_video;
-    bool                    m_render_valid;
-    bool                    m_render_reset;
+    QMutex                  m_lock           {QMutex::Recursive};
+    HWND                    m_hWnd           {nullptr};
+    HWND                    m_hEmbedWnd      {nullptr};
+    MythRenderD3D9         *m_render         {nullptr};
+    D3D9Image              *m_video          {nullptr};
+    bool                    m_renderValid    {false};
+    bool                    m_renderReset    {false};
 
     QMap<MythPlayer*,D3D9Image*> m_pips;
-    QMap<MythPlayer*,bool>       m_pip_ready;
-    D3D9Image                   *m_pip_active;
+    QMap<MythPlayer*,bool>       m_pipReady  {nullptr};
+    D3D9Image                   *m_pipActive {nullptr};
 
-    MythD3D9Painter        *m_osd_painter;
+    MythD3D9Painter        *m_osdPainter     {nullptr};
 
     bool CreateDecoder(void);
     void DeleteDecoder(void);
 #ifdef USING_DXVA2
-    DXVA2Decoder *m_decoder;
+    DXVA2Decoder *m_decoder      {nullptr};
 #endif
-    void         *m_pause_surface;
+    void         *m_pauseSurface {nullptr};
 };
 
 #endif

@@ -57,7 +57,7 @@ class EITScanner : public QRunnable
     volatile bool         m_exitThread              {false};
     QWaitCondition        m_exitThreadCond; // protected by lock
 
-    TVRec                *rec                       {nullptr};
+    TVRec                *m_rec                     {nullptr};
     volatile bool         m_activeScan              {false};
     volatile bool         m_activeScanStopped       {true}; // protected by lock
     QWaitCondition        m_activeScanCond; // protected by lock

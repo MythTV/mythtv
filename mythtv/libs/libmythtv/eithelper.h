@@ -16,6 +16,7 @@
 
 // MythTV includes
 #include "mythdeque.h"
+#include "mpegtables.h" // for GPS_LEAP_SECONDS
 
 class MSqlQuery;
 
@@ -96,10 +97,10 @@ class EITHelper
     uint GetListSize(void) const;
     uint ProcessEvents(void);
 
-    uint GetGPSOffset(void) const { return (uint) (0 - gps_offset); }
+    uint GetGPSOffset(void) const { return (uint) (0 - m_gpsOffset); }
 
     void SetChannelID(uint _channelid);
-    void SetGPSOffset(uint _gps_offset) { gps_offset = 0 - _gps_offset; }
+    void SetGPSOffset(uint _gps_offset) { m_gpsOffset = 0 - _gps_offset; }
     void SetFixup(uint atsc_major, uint atsc_minor, FixupValue eitfixup);
     void SetLanguagePreferences(const QStringList &langPref);
     void SetSourceID(uint _sourceid);
@@ -135,27 +136,27 @@ class EITHelper
                        const ATSCEvent &event,
                        const QString   &ett);
 
-        //QListList_Events  eitList;      ///< Event Information Tables List
-    mutable QMutex    eitList_lock; ///< EIT List lock
-    mutable ServiceToChanID srv_to_chanid;
+        //QListList_Events  m_eitList;     ///< Event Information Tables List
+    mutable QMutex          m_eitListLock; ///< EIT List lock
+    mutable ServiceToChanID m_srvToChanid;
 
-    EITFixUp               *eitfixup;
-    static EITCache        *s_eitcache;
+    EITFixUp               *m_eitFixup     {nullptr};
+    static EITCache        *s_eitCache;
 
-    int                     gps_offset;
+    int                     m_gpsOffset    {-1 * GPS_LEAP_SECONDS};
 
     /* carry some values to optimize channel lookup and reschedules */
-    uint                    sourceid;            ///< id of the video source
-    uint                    channelid;           ///< id of the channel
-    QDateTime               maxStarttime;        ///< latest starttime of changed events
-    bool                    seenEITother;        ///< if false we only reschedule the active mplex
+    uint                    m_sourceid     {0};    ///< id of the video source
+    uint                    m_channelid    {0};    ///< id of the channel
+    QDateTime               m_maxStarttime;        ///< latest starttime of changed events
+    bool                    m_seenEITother {false};///< if false we only reschedule the active mplex
 
-    FixupMap fixup;
-    ATSCSRCToEvents         incomplete_events;
+    FixupMap                m_fixup;
+    ATSCSRCToEvents         m_incompleteEvents;
 
-    MythDeque<DBEventEIT*>     db_events;
+    MythDeque<DBEventEIT*>  m_dbEvents;
 
-    QMap<uint,uint>         languagePreferences;
+    QMap<uint,uint>         m_languagePreferences;
 
     /// Maximum number of DB inserts per ProcessEvents call.
     static const uint kChunkSize;

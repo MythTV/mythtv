@@ -97,12 +97,6 @@ NetStream::NetStream(const QUrl &url, EMode mode /*= kPreferCache*/,
         QByteArray cert) :
     m_id(s_nRequest.fetchAndAddRelaxed(1)),
     m_url(url),
-    m_state(kClosed),
-    m_pending(nullptr),
-    m_reply(nullptr),
-    m_nRedirections(0),
-    m_size(-1),
-    m_pos(0),
     m_cert(std::move(cert))
 {
     setObjectName("NetStream " + url.toString());
@@ -733,7 +727,7 @@ NAMThread & NAMThread::manager()
     return s_thread;
 }
 
-NAMThread::NAMThread() : m_bQuit(false), m_mutexNAM(QMutex::Recursive), m_nam(nullptr)
+NAMThread::NAMThread()
 {
     setObjectName("NAMThread");
 

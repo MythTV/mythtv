@@ -165,8 +165,8 @@ class RecordingProfileEditor :
     void CreateNewProfile(const QString&);
 
   protected:
-    int             group;
-    QString         labelName;
+    int             m_group;
+    QString         m_labelName;
 };
 
 #endif

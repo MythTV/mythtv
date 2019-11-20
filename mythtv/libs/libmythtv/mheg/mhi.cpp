@@ -72,18 +72,9 @@ class MHIImageData
     bool   m_bUnder;
 };
 
-// Special value for the NetworkBootInfo version.  Real values are a byte.
-#define NBI_VERSION_UNSET       257
-
 MHIContext::MHIContext(InteractiveTV *parent)
     : m_parent(parent),     m_dsmcc(new Dsmcc()),
-      m_notify(nullptr),    m_keyProfile(0),
-      m_engine(MHCreateEngine(this)), m_stop(false),
-      m_updated(false),     m_face(nullptr),
-      m_face_loaded(false), m_engineThread(nullptr), m_currentChannel(-1),
-      m_currentStream(-1),  m_isLive(false),      m_currentSource(-1),
-      m_audioTag(-1),       m_videoTag(-1),
-      m_lastNbiVersion(NBI_VERSION_UNSET)
+      m_engine(MHCreateEngine(this))
 {
     if (!ft_loaded)
     {
@@ -1244,15 +1235,6 @@ void MHIContext::DrawBackground(const QRegion &reg)
              MHRgba(0, 0, 0, 255)/* black. */);
 }
 
-MHIText::MHIText(MHIContext *parent): m_parent(parent)
-{
-    m_fontsize = 12;
-    m_fontItalic = false;
-    m_fontBold = false;
-    m_width = 0;
-    m_height = 0;
-}
-
 void MHIText::Draw(int x, int y)
 {
     m_parent->DrawImage(x, y, QRect(x, y, m_width, m_height), m_image);
@@ -1806,7 +1788,7 @@ void MHIDLA::DrawPoly(bool isFilled, int nPoints, const int *xArray, const int *
 }
 
 MHIBitmap::MHIBitmap(MHIContext *parent, bool tiled)
-    : m_parent(parent), m_tiled(tiled), m_opaque(false),
+    : m_parent(parent), m_tiled(tiled),
       m_copyCtx(new MythAVCopy(false))
 {
 }

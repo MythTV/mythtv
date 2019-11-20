@@ -93,17 +93,17 @@ private:
     const int m_id; // Unique request ID
     const QUrl m_url;
 
-    mutable QMutex m_mutex; // Protects r/w access to the following data
-    QNetworkRequest m_request;
-    enum { kClosed, kPending, kStarted, kReady, kFinished } m_state;
-    NetStreamRequest* m_pending;
-    QNetworkReply* m_reply;
-    int m_nRedirections;
-    qlonglong m_size;
-    qlonglong m_pos;
-    QByteArray m_cert;
-    QWaitCondition m_ready;
-    QWaitCondition m_finished;
+    mutable QMutex    m_mutex; // Protects r/w access to the following data
+    QNetworkRequest   m_request;
+    enum { kClosed, kPending, kStarted, kReady, kFinished } m_state {kClosed};
+    NetStreamRequest* m_pending       {nullptr};
+    QNetworkReply*    m_reply         {nullptr};
+    int               m_nRedirections {0};
+    qlonglong         m_size          {-1};
+    qlonglong         m_pos           {0};
+    QByteArray        m_cert;
+    QWaitCondition    m_ready;
+    QWaitCondition    m_finished;
 };
 
 
@@ -145,13 +145,13 @@ private slots:
 private:
     Q_DISABLE_COPY(NAMThread)
 
-    volatile bool m_bQuit;
-    QSemaphore m_running;
-    mutable QMutex m_mutexNAM; // Provides recursive access to m_nam
-    QNetworkAccessManager *m_nam;
-    mutable QMutex m_mutex; // Protects r/w access to the following data
-    QQueue< QEvent * > m_workQ;
-    QWaitCondition m_work;
+    volatile bool          m_bQuit    {false};
+    QSemaphore             m_running;
+    mutable QMutex         m_mutexNAM {QMutex::Recursive}; // Provides recursive access to m_nam
+    QNetworkAccessManager *m_nam      {nullptr};
+    mutable QMutex         m_mutex; // Protects r/w access to the following data
+    QQueue< QEvent * >     m_workQ;
+    QWaitCondition         m_work;
 };
 
 #endif /* ndef NETSTREAM_H */

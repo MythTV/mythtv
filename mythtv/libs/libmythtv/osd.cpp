@@ -33,16 +33,6 @@
 QEvent::Type OSDHideEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
-ChannelEditor::ChannelEditor(QObject *retobject, const char *name)
-  : MythScreenType((MythScreenType*)nullptr, name)
-{
-    m_retObject    = retobject;
-    m_callsignEdit = nullptr;
-    m_channumEdit  = nullptr;
-    m_channameEdit = nullptr;
-    m_xmltvidEdit  = nullptr;
-}
-
 bool ChannelEditor::Create(void)
 {
     if (!XMLParseBase::LoadWindowFromXML("osd.xml", "ChannelEditor", this))
@@ -149,18 +139,6 @@ void ChannelEditor::sendResult(int result)
     DialogCompletionEvent *dce = new DialogCompletionEvent("", result,
                                                            "", message);
     QCoreApplication::postEvent(m_retObject, dce);
-}
-
-OSD::OSD(MythPlayer *player, QObject *parent, MythPainter *painter)
-  : m_parent(player), m_ParentObject(parent), m_CurrentPainter(painter),
-    m_Rect(QRect()), m_FadeTime(kOSDFadeTime), m_Dialog(nullptr),
-    m_PulsedDialogText(QString()), m_NextPulseUpdate(QDateTime()),
-    m_Refresh(false), m_Visible(false), m_UIScaleOverride(false),
-    m_SavedWMult(1.0F), m_SavedHMult(1.0F),   m_SavedUIRect(QRect()),
-    m_fontStretch(100), m_savedFontStretch(100),
-    m_FunctionalType(kOSDFunctionalType_Default), m_FunctionalWindow(QString())
-{
-    SetTimeouts(3000, 5000, 13000);
 }
 
 OSD::~OSD()
@@ -1453,23 +1431,6 @@ void OSD::DisplayBDOverlay(BDOverlay* overlay)
     BDOverlayScreen* bd = dynamic_cast<BDOverlayScreen*>(GetWindow(OSD_WIN_BDOVERLAY));
     if (bd)
         bd->DisplayBDOverlay(overlay);
-}
-
-OsdNavigation::OsdNavigation(QObject *retobject, const QString &name, OSD *osd)
-  : MythScreenType((MythScreenType*)nullptr, name),
-    m_retObject(retobject),
-    m_osd(osd),
-    m_playButton(nullptr),
-    m_pauseButton(nullptr),
-    m_muteButton(nullptr),
-    m_unMuteButton(nullptr),
-    m_paused('X'),
-    m_muted('X'),
-    m_visibleGroup(0),
-    m_maxGroupNum(-1),
-    m_IsVolumeControl(true)
-{
-    m_retObject    = retobject;
 }
 
 bool OsdNavigation::Create(void)

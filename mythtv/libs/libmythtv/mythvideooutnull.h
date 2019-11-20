@@ -40,7 +40,7 @@ class MythVideoOutputNull : public MythVideoOutput
         { return false; }
 
   private:
-    QMutex     global_lock;
-    VideoFrame av_pause_frame;
+    QMutex     m_globalLock   {QMutex::Recursive};
+    VideoFrame m_avPauseFrame;
 };
 #endif

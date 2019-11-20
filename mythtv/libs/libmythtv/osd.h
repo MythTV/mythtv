@@ -84,7 +84,9 @@ class ChannelEditor : public MythScreenType
     Q_OBJECT
 
   public:
-    ChannelEditor(QObject *retobject, const char * name);
+    ChannelEditor(QObject *retobject, const char *name)
+        : MythScreenType((MythScreenType*)nullptr, name),
+          m_retObject(retobject) {}
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
@@ -93,12 +95,12 @@ class ChannelEditor : public MythScreenType
     void GetText(InfoMap &map);
 
   protected:
-    MythUITextEdit *m_callsignEdit;
-    MythUITextEdit *m_channumEdit;
-    MythUITextEdit *m_channameEdit;
-    MythUITextEdit *m_xmltvidEdit;
+    MythUITextEdit *m_callsignEdit {nullptr};
+    MythUITextEdit *m_channumEdit  {nullptr};
+    MythUITextEdit *m_channameEdit {nullptr};
+    MythUITextEdit *m_xmltvidEdit  {nullptr};
 
-    QObject *m_retObject;
+    QObject        *m_retObject    {nullptr};
 
     void sendResult(int result);
 
@@ -134,7 +136,8 @@ class OSD
     Q_DECLARE_TR_FUNCTIONS(OSD)
 
   public:
-    OSD(MythPlayer *player, QObject *parent, MythPainter *painter);
+    OSD(MythPlayer *player, QObject *parent, MythPainter *painter)
+        : m_parent(player), m_ParentObject(parent), m_CurrentPainter(painter) {}
    ~OSD();
 
     bool    Init(const QRect &rect, float font_aspect);
@@ -213,26 +216,26 @@ class OSD
                       int custom_timeout);
 
   private:
-    MythPlayer     *m_parent;
-    QObject        *m_ParentObject;
-    MythPainter    *m_CurrentPainter;
+    MythPlayer     *m_parent           {nullptr};
+    QObject        *m_ParentObject     {nullptr};
+    MythPainter    *m_CurrentPainter   {nullptr};
     QRect           m_Rect;
-    int             m_FadeTime;
-    MythScreenType *m_Dialog;
+    int             m_FadeTime         {kOSDFadeTime};
+    MythScreenType *m_Dialog           {nullptr};
     QString         m_PulsedDialogText;
     QDateTime       m_NextPulseUpdate;
-    bool            m_Refresh;
-    bool            m_Visible;
-    int             m_Timeouts[4];
+    bool            m_Refresh          {false};
+    bool            m_Visible          {false};
+    int             m_Timeouts[4]      {-1,3000,5000,13000};
 
-    bool            m_UIScaleOverride;
-    float           m_SavedWMult;
-    float           m_SavedHMult;
+    bool            m_UIScaleOverride  {false};
+    float           m_SavedWMult       {1.0F};
+    float           m_SavedHMult       {1.0F};
     QRect           m_SavedUIRect;
-    int             m_fontStretch;
-    int             m_savedFontStretch;
+    int             m_fontStretch      {100};
+    int             m_savedFontStretch {100};
 
-    enum OSDFunctionalType m_FunctionalType;
+    enum OSDFunctionalType m_FunctionalType {kOSDFunctionalType_Default};
     QString                m_FunctionalWindow;
 
     QMap<QString, MythScreenType*>    m_Children;
@@ -244,7 +247,10 @@ class OsdNavigation : public MythScreenType
     Q_OBJECT
 
   public:
-    OsdNavigation(QObject *retobject, const QString &name, OSD *osd);
+    OsdNavigation(QObject *retobject, const QString &name, OSD *osd)
+        : MythScreenType((MythScreenType*)nullptr, name),
+          m_retObject(retobject), m_osd(osd) {}
+
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
     void SetTextFromMap(const InfoMap &infoMap) override; // MythUIComposite
@@ -254,17 +260,17 @@ class OsdNavigation : public MythScreenType
 
   protected:
 
-    QObject *m_retObject;
-    OSD *m_osd;
-    MythUIButton *m_playButton;
-    MythUIButton *m_pauseButton;
-    MythUIButton *m_muteButton;
-    MythUIButton *m_unMuteButton;
-    char m_paused;
-    char m_muted;
-    int m_visibleGroup;
-    int m_maxGroupNum;
-    bool m_IsVolumeControl;
+    QObject      *m_retObject       {nullptr};
+    OSD          *m_osd             {nullptr};
+    MythUIButton *m_playButton      {nullptr};
+    MythUIButton *m_pauseButton     {nullptr};
+    MythUIButton *m_muteButton      {nullptr};
+    MythUIButton *m_unMuteButton    {nullptr};
+    char          m_paused          {'X'};
+    char          m_muted           {'X'};
+    int           m_visibleGroup    {0};
+    int           m_maxGroupNum     {-1};
+    bool          m_IsVolumeControl {true};
 
     void sendResult(int result, const QString& action);
 

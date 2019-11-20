@@ -53,30 +53,7 @@ const VideoColourSpace::ColourPrimaries VideoColourSpace::BT2020 =
  * using an HDR display. Futher work is required.
 */
 VideoColourSpace::VideoColourSpace(VideoColourSpace *Parent)
-  : QObject(),
-    QMatrix4x4(),
-    ReferenceCounter("Colour"),
-    m_supportedAttributes(kPictureAttributeSupported_None),
-    m_fullRange(true),
-    m_brightness(0.0F),
-    m_contrast(1.0F),
-    m_saturation(1.0F),
-    m_hue(0.0F),
-    m_alpha(1.0F),
-    m_colourSpace(AVCOL_SPC_UNSPECIFIED),
-    m_colourSpaceDepth(8),
-    m_range(AVCOL_RANGE_MPEG),
-    m_updatesDisabled(true),
-    m_colourShifted(0),
-    m_colourTransfer(AVCOL_TRC_BT709),
-    m_primariesMode(PrimariesAuto),
-    m_colourPrimaries(AVCOL_PRI_BT709),
-    m_displayPrimaries(AVCOL_PRI_BT709),
-    m_colourGamma(2.2F),
-    m_displayGamma(2.2F),
-    m_primaryMatrix(),
-    m_customDisplayGamma(2.2F),
-    m_customDisplayPrimaries(nullptr),
+  : ReferenceCounter("Colour"),
     m_parent(Parent)
 {
     if (m_parent)

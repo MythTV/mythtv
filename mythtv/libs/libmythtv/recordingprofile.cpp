@@ -1654,10 +1654,10 @@ void RecordingProfile::setCodecTypes()
 }
 
 RecordingProfileEditor::RecordingProfileEditor(int id, QString profName) :
-    group(id), labelName(std::move(profName))
+    m_group(id), m_labelName(std::move(profName))
 {
-    if (!labelName.isEmpty())
-        setLabel(labelName);
+    if (!m_labelName.isEmpty())
+        setLabel(m_labelName);
 }
 
 void RecordingProfileEditor::Load(void)
@@ -1667,7 +1667,7 @@ void RecordingProfileEditor::Load(void)
         new ButtonStandardSetting(tr("(Create new profile)"));
     connect(newProfile, SIGNAL(clicked()), SLOT(ShowNewProfileDialog()));
     addChild(newProfile);
-    RecordingProfile::fillSelections(this, group);
+    RecordingProfile::fillSelections(this, m_group);
     StandardSetting::Load();
 }
 
@@ -1701,7 +1701,7 @@ void RecordingProfileEditor::CreateNewProfile(const QString& profName)
    query.bindValue(":NAME", profName);
    query.bindValue(":VIDEOCODEC", "MPEG-4");
    query.bindValue(":AUDIOCODEC", "MP3");
-   query.bindValue(":PROFILEGROUP", group);
+   query.bindValue(":PROFILEGROUP", m_group);
    if (!query.exec())
    {
        MythDB::DBError("RecordingProfileEditor::open", query);
@@ -1713,7 +1713,7 @@ void RecordingProfileEditor::CreateNewProfile(const QString& profName)
              "FROM recordingprofiles "
              "WHERE name = :NAME AND profilegroup = :PROFILEGROUP;");
        query.bindValue(":NAME", profName);
-       query.bindValue(":PROFILEGROUP", group);
+       query.bindValue(":PROFILEGROUP", m_group);
        if (!query.exec())
        {
            MythDB::DBError("RecordingProfileEditor::open", query);

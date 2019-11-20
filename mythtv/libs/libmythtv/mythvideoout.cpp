@@ -254,21 +254,6 @@ MythVideoOutput *MythVideoOutput::Create(const QString &Decoder,    MythCodecID 
  *        Init(int,int,float,WId,int,int,int,int,WId) call.
  */
 MythVideoOutput::MythVideoOutput()
-  : m_dbDisplayDimensionsMM(0,0),
-    m_dbAspectOverride(kAspect_Off),
-    m_dbAdjustFill(kAdjustFill_Off),
-    m_dbLetterboxColour(kLetterBoxColour_Black),
-    m_videoCodecID(kCodec_NONE),
-    m_maxReferenceFrames(16),
-    m_dbDisplayProfile(nullptr),
-    m_errorState(kError_None),
-    m_framesPlayed(0),
-    m_displayRes(nullptr),
-    m_monitorSize(640,480),
-    m_monitorDimensions(400,300),
-    m_visual(nullptr),
-    m_stereo(kStereoscopicModeNone),
-    m_deinterlacer()
 {
     m_dbDisplayDimensionsMM = QSize(gCoreContext->GetNumSetting("DisplaySizeWidth",  0),
                                     gCoreContext->GetNumSetting("DisplaySizeHeight", 0));

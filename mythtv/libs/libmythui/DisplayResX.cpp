@@ -32,7 +32,6 @@ bool DisplayResX::IsAvailable(void)
 }
 
 DisplayResX::DisplayResX(void)
-  : DisplayRes()
 {
     Initialize();
 }

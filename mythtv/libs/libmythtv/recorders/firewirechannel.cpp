@@ -29,12 +29,12 @@ FirewireChannel::FirewireChannel(TVRec *parent, QString _videodevice,
 
 #ifdef USING_LINUX_FIREWIRE
     m_device = new LinuxFirewireDevice(
-        guid, subunitid, m_fw_opts.speed,
-        LinuxFirewireDevice::kConnectionP2P == (uint) m_fw_opts.connection);
+        guid, subunitid, m_fw_opts.m_speed,
+        LinuxFirewireDevice::kConnectionP2P == (uint) m_fw_opts.m_connection);
 #endif // USING_LINUX_FIREWIRE
 
 #ifdef USING_OSX_FIREWIRE
-    m_device = new DarwinFirewireDevice(guid, subunitid, m_fw_opts.speed);
+    m_device = new DarwinFirewireDevice(guid, subunitid, m_fw_opts.m_speed);
 #endif // USING_OSX_FIREWIRE
 }
 
@@ -60,11 +60,11 @@ bool FirewireChannel::Open(void)
     if (!m_inputid)
         return false;
 
-    if (!FirewireDevice::IsSTBSupported(m_fw_opts.model) &&
+    if (!FirewireDevice::IsSTBSupported(m_fw_opts.m_model) &&
         !IsExternalChannelChangeInUse())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("Model: '%1' is not supported.").arg(m_fw_opts.model));
+            QString("Model: '%1' is not supported.").arg(m_fw_opts.m_model));
 
         return false;
     }
@@ -156,7 +156,7 @@ bool FirewireChannel::Tune(const QString &freqid, int /*finetune*/)
         return true; // signal monitor will call retune later...
     }
 
-    if (!m_device->SetChannel(m_fw_opts.model, 0, channel))
+    if (!m_device->SetChannel(m_fw_opts.m_model, 0, channel))
         return false;
 
     m_current_channel = channel;

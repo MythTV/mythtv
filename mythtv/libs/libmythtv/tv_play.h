@@ -115,21 +115,16 @@ enum {
 class AskProgramInfo
 {
   public:
-    AskProgramInfo() :
-        has_rec(false),                has_later(false),
-        is_in_same_input_group(false), is_conflicting(false),
-        info(nullptr) {}
+    AskProgramInfo() = default;
     AskProgramInfo(const QDateTime &e, bool r, bool l, ProgramInfo *i) :
-        expiry(e), has_rec(r), has_later(l),
-        is_in_same_input_group(false), is_conflicting(false),
-        info(i) {}
+        m_expiry(e), m_hasRec(r), m_hasLater(l), m_info(i) {}
 
-    QDateTime    expiry;
-    bool         has_rec;
-    bool         has_later;
-    bool         is_in_same_input_group;
-    bool         is_conflicting;
-    ProgramInfo *info;
+    QDateTime    m_expiry;
+    bool         m_hasRec             {false};
+    bool         m_hasLater           {false};
+    bool         m_isInSameInputGroup {false};
+    bool         m_isConflicting      {false};
+    ProgramInfo *m_info               {nullptr};
 };
 
 enum MenuCategory {
@@ -222,7 +217,7 @@ public:
 class MenuBase
 {
 public:
-    MenuBase() : m_document(nullptr), m_translationContext("") {}
+    MenuBase() = default;
     ~MenuBase();
     bool        LoadFromFile(const QString &filename,
                              const QString &menuname,
@@ -257,8 +252,8 @@ private:
                           const QString &keyBindingContext,
                           int includeLevel);
     void ProcessIncludes(QDomElement &root, int includeLevel);
-    QDomDocument *m_document;
-    const char   *m_translationContext;
+    QDomDocument *m_document           {nullptr};
+    const char   *m_translationContext {""};
     QString       m_menuName;
     QString       m_keyBindingContext;
 };

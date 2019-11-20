@@ -132,10 +132,10 @@ void EITScanner::run(void)
             if (!(*m_activeScanNextChan).isEmpty())
             {
                 EITHelper::WriteEITCache();
-                if (rec->QueueEITChannelChange(*m_activeScanNextChan))
+                if (m_rec->QueueEITChannelChange(*m_activeScanNextChan))
                 {
                     m_eitHelper->SetChannelID(ChannelUtil::GetChanID(
-                        rec->GetSourceID(), *m_activeScanNextChan));
+                        m_rec->GetSourceID(), *m_activeScanNextChan));
                     LOG(VB_EIT, LOG_INFO,
                         LOC_ID + QString("Now looking for EIT data on "
                                          "multiplex of channel %1")
@@ -233,7 +233,7 @@ void EITScanner::StopPassiveScan(void)
 
 void EITScanner::StartActiveScan(TVRec *_rec, uint max_seconds_per_source)
 {
-    rec = _rec;
+    m_rec = _rec;
 
     if (m_activeScanChannels.isEmpty())
     {
@@ -254,7 +254,7 @@ void EITScanner::StartActiveScan(TVRec *_rec, uint max_seconds_per_source)
             "GROUP BY mplexid "
             "ORDER BY capturecard.sourceid, mplexid, "
             "         atsc_major_chan, atsc_minor_chan ");
-        query.bindValue(":CARDID", rec->GetInputId());
+        query.bindValue(":CARDID", m_rec->GetInputId());
 
         if (!query.exec() || !query.isActive())
         {
@@ -311,5 +311,5 @@ void EITScanner::StopActiveScan(void)
     while (!m_activeScan && !m_activeScanStopped)
         m_activeScanCond.wait(&m_lock, 100);
 
-    rec = nullptr;
+    m_rec = nullptr;
 }

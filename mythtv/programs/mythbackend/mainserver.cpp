@@ -4328,8 +4328,8 @@ void MainServer::HandleFreeTuner(int cardid, PlaybackSock *pbs)
 
 static bool comp_livetvorder(const InputInfo &a, const InputInfo &b)
 {
-    if (a.m_livetvorder != b.m_livetvorder)
-        return a.m_livetvorder < b.m_livetvorder;
+    if (a.m_liveTvOrder != b.m_liveTvOrder)
+        return a.m_liveTvOrder < b.m_liveTvOrder;
     return a.m_inputid < b.m_inputid;
 }
 
@@ -4377,7 +4377,7 @@ void MainServer::HandleGetFreeInputInfo(PlaybackSock *pbs,
             info.m_mplexid = busyinfo.m_mplexid;
             busyinputs.push_back(info);
         }
-        else if (info.m_livetvorder)
+        else if (info.m_liveTvOrder)
         {
             LOG(VB_CHANNEL, LOG_DEBUG,
                 LOC + QString("Input %1 is free")

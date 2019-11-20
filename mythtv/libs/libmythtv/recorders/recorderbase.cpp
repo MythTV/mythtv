@@ -847,94 +847,94 @@ RecorderBase *RecorderBase::CreateRecorder(
         return nullptr;
 
     RecorderBase *recorder = nullptr;
-    if (genOpt.inputtype == "MPEG")
+    if (genOpt.m_inputType == "MPEG")
     {
 #ifdef USING_IVTV
         recorder = new MpegRecorder(tvrec);
 #endif // USING_IVTV
     }
-    else if (genOpt.inputtype == "HDPVR")
+    else if (genOpt.m_inputType == "HDPVR")
     {
 #ifdef USING_HDPVR
         recorder = new MpegRecorder(tvrec);
 #endif // USING_HDPVR
     }
-    else if (genOpt.inputtype == "V4L2ENC")
+    else if (genOpt.m_inputType == "V4L2ENC")
     {
 #ifdef USING_V4L2
         if (dynamic_cast<V4LChannel*>(channel))
             recorder = new V4L2encRecorder(tvrec, dynamic_cast<V4LChannel*>(channel));
 #endif
     }
-    else if (genOpt.inputtype == "FIREWIRE")
+    else if (genOpt.m_inputType == "FIREWIRE")
     {
 #ifdef USING_FIREWIRE
         if (dynamic_cast<FirewireChannel*>(channel))
             recorder = new FirewireRecorder(tvrec, dynamic_cast<FirewireChannel*>(channel));
 #endif // USING_FIREWIRE
     }
-    else if (genOpt.inputtype == "HDHOMERUN")
+    else if (genOpt.m_inputType == "HDHOMERUN")
     {
 #ifdef USING_HDHOMERUN
         if (dynamic_cast<HDHRChannel*>(channel))
         {
             recorder = new HDHRRecorder(tvrec, dynamic_cast<HDHRChannel*>(channel));
-            recorder->SetBoolOption("wait_for_seqstart", genOpt.wait_for_seqstart);
+            recorder->SetBoolOption("wait_for_seqstart", genOpt.m_waitForSeqstart);
         }
 #endif // USING_HDHOMERUN
     }
-    else if (genOpt.inputtype == "CETON")
+    else if (genOpt.m_inputType == "CETON")
     {
 #ifdef USING_CETON
         if (dynamic_cast<CetonChannel*>(channel))
         {
             recorder = new CetonRecorder(tvrec, dynamic_cast<CetonChannel*>(channel));
-            recorder->SetBoolOption("wait_for_seqstart", genOpt.wait_for_seqstart);
+            recorder->SetBoolOption("wait_for_seqstart", genOpt.m_waitForSeqstart);
         }
 #endif // USING_CETON
     }
-    else if (genOpt.inputtype == "DVB")
+    else if (genOpt.m_inputType == "DVB")
     {
 #ifdef USING_DVB
         if (dynamic_cast<DVBChannel*>(channel))
         {
             recorder = new DVBRecorder(tvrec, dynamic_cast<DVBChannel*>(channel));
-            recorder->SetBoolOption("wait_for_seqstart", genOpt.wait_for_seqstart);
+            recorder->SetBoolOption("wait_for_seqstart", genOpt.m_waitForSeqstart);
         }
 #endif // USING_DVB
     }
-    else if (genOpt.inputtype == "FREEBOX")
+    else if (genOpt.m_inputType == "FREEBOX")
     {
 #ifdef USING_IPTV
         if (dynamic_cast<IPTVChannel*>(channel))
         {
             recorder = new IPTVRecorder(tvrec, dynamic_cast<IPTVChannel*>(channel));
-            recorder->SetOption("mrl", genOpt.videodev);
+            recorder->SetOption("mrl", genOpt.m_videoDev);
         }
 #endif // USING_IPTV
     }
-    else if (genOpt.inputtype == "VBOX")
+    else if (genOpt.m_inputType == "VBOX")
     {
 #ifdef USING_VBOX
         if (dynamic_cast<IPTVChannel*>(channel))
             recorder = new IPTVRecorder(tvrec, dynamic_cast<IPTVChannel*>(channel));
 #endif // USING_VBOX
     }
-    else if (genOpt.inputtype == "ASI")
+    else if (genOpt.m_inputType == "ASI")
     {
 #ifdef USING_ASI
         if (dynamic_cast<ASIChannel*>(channel))
         {
             recorder = new ASIRecorder(tvrec, dynamic_cast<ASIChannel*>(channel));
-            recorder->SetBoolOption("wait_for_seqstart", genOpt.wait_for_seqstart);
+            recorder->SetBoolOption("wait_for_seqstart", genOpt.m_waitForSeqstart);
         }
 #endif // USING_ASI
     }
-    else if (genOpt.inputtype == "IMPORT")
+    else if (genOpt.m_inputType == "IMPORT")
     {
         recorder = new ImportRecorder(tvrec);
     }
-    else if (genOpt.inputtype == "DEMO")
+    else if (genOpt.m_inputType == "DEMO")
     {
 #ifdef USING_IVTV
         recorder = new MpegRecorder(tvrec);
@@ -942,15 +942,15 @@ RecorderBase *RecorderBase::CreateRecorder(
         recorder = new ImportRecorder(tvrec);
 #endif
     }
-    else if (CardUtil::IsV4L(genOpt.inputtype))
+    else if (CardUtil::IsV4L(genOpt.m_inputType))
     {
 #if CONFIG_LIBMP3LAME && defined(USING_V4L2)
         // V4L/MJPEG/GO7007 from here on
         recorder = new NuppelVideoRecorder(tvrec, channel);
-        recorder->SetBoolOption("skipbtaudio", genOpt.skip_btaudio);
+        recorder->SetBoolOption("skipbtaudio", genOpt.m_skipBtAudio);
 #endif // USING_V4L2
     }
-    else if (genOpt.inputtype == "EXTERNAL")
+    else if (genOpt.m_inputType == "EXTERNAL")
     {
         if (dynamic_cast<ExternalChannel*>(channel))
             recorder = new ExternalRecorder(tvrec, dynamic_cast<ExternalChannel*>(channel));
@@ -960,16 +960,16 @@ RecorderBase *RecorderBase::CreateRecorder(
     {
         recorder->SetOptionsFromProfile(
             const_cast<RecordingProfile*>(&profile),
-            genOpt.videodev, genOpt.audiodev, genOpt.vbidev);
+            genOpt.m_videoDev, genOpt.m_audioDev, genOpt.m_vbiDev);
         // Override the samplerate defined in the profile if this card
         // was configured with a fixed rate.
-        if (genOpt.audiosamplerate)
-            recorder->SetOption("samplerate", genOpt.audiosamplerate);
+        if (genOpt.m_audioSampleRate)
+            recorder->SetOption("samplerate", genOpt.m_audioSampleRate);
     }
     else
     {
         QString msg = "Need %1 recorder, but compiled without %2 support!";
-        msg = msg.arg(genOpt.inputtype).arg(genOpt.inputtype);
+        msg = msg.arg(genOpt.m_inputType).arg(genOpt.m_inputType);
         LOG(VB_GENERAL, LOG_ERR,
             "RecorderBase::CreateRecorder() Error, " + msg);
     }

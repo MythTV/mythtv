@@ -41,6 +41,9 @@ class MHStream;
 class MThread;
 class QByteArray;
 
+// Special value for the NetworkBootInfo version.  Real values are a byte.
+#define NBI_VERSION_UNSET       257
+
 /** \class MHIContext
  *  \brief Contains various utility functions for interactive television.
  */
@@ -175,44 +178,45 @@ class MHIContext : public MHContext, public QRunnable
     bool GetDSMCCObject(const QString &objectPath, QByteArray &result);
     bool CheckAccess(const QString &objectPath, QByteArray &cert);
 
-    InteractiveTV   *m_parent;
+    InteractiveTV   *m_parent         {nullptr};
 
-    Dsmcc           *m_dsmcc;  // Pointer to the DSMCC object carousel.
+    // Pointer to the DSMCC object carousel.
+    Dsmcc           *m_dsmcc          {nullptr};
     QMutex           m_dsmccLock;
     MythDeque<DSMCCPacket*> m_dsmccQueue;
 
     MHInteractionChannel m_ic;  // Interaction channel
-    MHStream        *m_notify;
+    MHStream        *m_notify         {nullptr};
 
     QMutex           m_keyLock;
     MythDeque<int>   m_keyQueue;
-    int              m_keyProfile;
+    int              m_keyProfile     {0};
 
     MHEG            *m_engine; // Pointer to the MHEG engine
 
     mutable QMutex   m_runLock;
     QWaitCondition   m_engine_wait; // protected by m_runLock
-    bool             m_stop;        // protected by m_runLock
+    bool             m_stop           {false}; // protected by m_runLock
     QMutex           m_display_lock;
-    bool             m_updated;
+    bool             m_updated        {false};
 
     list<MHIImageData*> m_display; // List of items to display
 
-    FT_Face          m_face;
-    bool             m_face_loaded;
+    FT_Face          m_face           {nullptr};
+    bool             m_face_loaded    {false};
 
-    MThread         *m_engineThread;
+    MThread         *m_engineThread   {nullptr};
 
-    int              m_currentChannel;
-    int              m_currentStream;
-    bool             m_isLive;
-    int              m_currentSource;
+    int              m_currentChannel {-1};
+    int              m_currentStream  {-1};
+    bool             m_isLive         {false};
+    int              m_currentSource  {-1};
 
-    int              m_audioTag;
-    int              m_videoTag;
+    int              m_audioTag       {-1};
+    int              m_videoTag       {-1};
     QList<int>       m_tuneinfo;
 
-    uint             m_lastNbiVersion;
+    uint             m_lastNbiVersion {NBI_VERSION_UNSET};
     vector<unsigned char> m_nbiData;
 
     QRect            m_videoRect, m_videoDisplayRect;
@@ -234,7 +238,8 @@ class MHIContext : public MHContext, public QRunnable
 class MHIText : public MHTextDisplay
 {
   public:
-    explicit MHIText(MHIContext *parent);
+    explicit MHIText(MHIContext *parent)
+        : m_parent(parent) {}
     virtual ~MHIText() = default;
 
     void Draw(int x, int y) override; // MHTextDisplay
@@ -247,13 +252,13 @@ class MHIText : public MHTextDisplay
     QRect GetBounds(const QString &str, int &strLen, int maxSize = -1) override; // MHTextDisplay
 
   public:
-    MHIContext *m_parent;
+    MHIContext *m_parent     {nullptr};
     QImage      m_image;
-    int         m_fontsize;
-    bool        m_fontItalic;
-    bool        m_fontBold;
-    int         m_width;
-    int         m_height;
+    int         m_fontsize   {12};
+    bool        m_fontItalic {false};
+    bool        m_fontBold   {false};
+    int         m_width      {0};
+    int         m_height     {0};
 };
 
 /** \class MHIBitmap
@@ -297,11 +302,11 @@ class MHIBitmap : public MHBitmapDisplay
     bool IsOpaque(void) override { return !m_image.isNull() && m_opaque; } // MHBitmapDisplay
 
   public:
-    MHIContext *m_parent;
+    MHIContext *m_parent  {nullptr};
     bool        m_tiled;
     QImage      m_image;
-    bool        m_opaque;
-    MythAVCopy *m_copyCtx;
+    bool        m_opaque  {false};
+    MythAVCopy *m_copyCtx {nullptr};
 };
 
 /** \class MHIDLA
@@ -312,10 +317,8 @@ class MHIDLA : public MHDLADisplay
   public:
     MHIDLA(MHIContext *parent, bool isBoxed,
            MHRgba lineColour, MHRgba fillColour)
-        : m_parent(parent),            m_width(0),
-          m_height(0),                 m_boxed(isBoxed),
-          m_boxLineColour(lineColour), m_boxFillColour(fillColour),
-          m_lineWidth(0) {}
+        : m_parent(parent),            m_boxed(isBoxed),
+          m_boxLineColour(lineColour), m_boxFillColour(fillColour) {}
     /// Draw the completed drawing onto the display.
     void Draw(int x, int y) override; // MHDLADisplay
     /// Set the box size.  Also clears the drawing.
@@ -348,16 +351,16 @@ class MHIDLA : public MHDLADisplay
     void DrawLineSub(int x1, int y1, int x2, int y2, bool swapped);
 
   protected:
-    MHIContext *m_parent;
+    MHIContext *m_parent        {nullptr};
     QImage      m_image;
-    int         m_width;         ///< Width of the drawing
-    int         m_height;        ///< Height of the drawing
-    bool        m_boxed;         ///< Does it have a border?
-    MHRgba      m_boxLineColour; ///< Line colour for the background
-    MHRgba      m_boxFillColour; ///< Fill colour for the background
-    MHRgba      m_lineColour;    ///< Current line colour.
-    MHRgba      m_fillColour;    ///< Current fill colour.
-    int         m_lineWidth;     ///< Current line width.
+    int         m_width         {0}; ///< Width of the drawing
+    int         m_height        {0}; ///< Height of the drawing
+    bool        m_boxed;             ///< Does it have a border?
+    MHRgba      m_boxLineColour;     ///< Line colour for the background
+    MHRgba      m_boxFillColour;     ///< Fill colour for the background
+    MHRgba      m_lineColour;        ///< Current line colour.
+    MHRgba      m_fillColour;        ///< Current fill colour.
+    int         m_lineWidth     {0}; ///< Current line width.
 };
 
 /** \class DSMCCPacket
@@ -380,7 +383,7 @@ class DSMCCPacket
     }
 
   public:
-    unsigned char *m_data;
+    unsigned char *m_data            {nullptr};
     int            m_length;
     int            m_componentTag;
     unsigned       m_carouselId;

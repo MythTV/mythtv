@@ -49,45 +49,6 @@ const float VideoOutWindow::kManualZoomMinVerticalZoom   = 0.25F;
 const int   VideoOutWindow::kManualZoomMaxMove           = 50;
 
 VideoOutWindow::VideoOutWindow()
-  : // DB settings
-    m_dbMove(0, 0),
-    m_dbHorizScale(0.0F),
-    m_dbVertScale(0.0F),
-    m_dbPipSize(26),
-    m_dbScalingAllowed(true),
-    m_usingXinerama(false),
-    m_screenGeometry(0, 0, 1024, 768),
-    // Manual Zoom
-    m_manualVertScale(1.0F),
-    m_manualHorizScale(1.0F),
-    m_manualMove(0, 0),
-    // Physical dimensions
-    m_displayDimensions(400, 300),
-    m_displayAspect(1.3333F),
-    // Video dimensions
-    m_videoDim(640, 480),
-    m_videoDispDim(640, 480),
-    m_videoAspect(1.3333F),
-    // Aspect override
-    m_videoAspectOverride(1.3333F),
-    m_videoAspectOverrideMode(kAspect_Off),
-    // Adjust Fill
-    m_adjustFill(kAdjustFill_Off),
-    m_rotation(0),
-    // Screen settings
-    m_videoRect(0, 0, 0, 0),
-    m_displayVideoRect(0, 0, 0, 0),
-    m_displayVisibleRect(0, 0, 0, 0),
-    m_windowRect(0, 0, 0, 0),
-    m_tmpDisplayVisibleRect(0, 0, 0, 0),
-    m_embeddingRect(QRect()),
-    // ITV resizing
-    m_itvResizing(false),
-    m_itvDisplayVideoRect(),
-    // Various state variables
-    m_embedding(false),
-    m_bottomLine(false),
-    m_pipState(kPIPOff)
 {
     m_dbPipSize = gCoreContext->GetNumSetting("PIPSize", 26);
 

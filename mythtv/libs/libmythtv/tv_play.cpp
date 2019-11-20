@@ -1742,7 +1742,7 @@ void TV::AskAllowRecording(PlayerContext *ctx,
         QMap<QString,AskProgramInfo>::iterator it = m_askAllowPrograms.find(key);
         if (it != m_askAllowPrograms.end())
         {
-            delete (*it).info;
+            delete (*it).m_info;
             m_askAllowPrograms.erase(it);
         }
         delete info;
@@ -1778,13 +1778,13 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
     while (it != m_askAllowPrograms.end())
     {
         next = it; ++next;
-        if ((*it).expiry <= timeNow)
+        if ((*it).m_expiry <= timeNow)
         {
 #if 0
             LOG(VB_GENERAL, LOG_DEBUG, LOC + "-- " +
                 QString("removing '%1'").arg((*it).info->m_title));
 #endif
-            delete (*it).info;
+            delete (*it).m_info;
             m_askAllowPrograms.erase(it);
         }
         it = next;
@@ -1794,9 +1794,9 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
     uint conflict_count = m_askAllowPrograms.size();
 
     it = m_askAllowPrograms.begin();
-    if ((1 == m_askAllowPrograms.size()) && ((*it).info->GetInputID() == cardid))
+    if ((1 == m_askAllowPrograms.size()) && ((*it).m_info->GetInputID() == cardid))
     {
-        (*it).is_in_same_input_group = (*it).is_conflicting = true;
+        (*it).m_isInSameInputGroup = (*it).m_isConflicting = true;
     }
     else if (!m_askAllowPrograms.empty())
     {
@@ -1810,10 +1810,10 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
         it = m_askAllowPrograms.begin();
         for (; it != m_askAllowPrograms.end(); ++it)
         {
-            (*it).is_in_same_input_group =
-                (cardid == (*it).info->GetInputID());
+            (*it).m_isInSameInputGroup =
+                (cardid == (*it).m_info->GetInputID());
 
-            if ((*it).is_in_same_input_group)
+            if ((*it).m_isInSameInputGroup)
                 continue;
 
             // is busy_input in same input group as recording
@@ -1824,14 +1824,14 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
             }
 
             vector<uint> input_grps =
-                CardUtil::GetInputGroups((*it).info->GetInputID());
+                CardUtil::GetInputGroups((*it).m_info->GetInputID());
 
             for (size_t i = 0; i < input_grps.size(); i++)
             {
                 if (find(busy_input_grps.begin(), busy_input_grps.end(),
                          input_grps[i]) !=  busy_input_grps.end())
                 {
-                    (*it).is_in_same_input_group = true;
+                    (*it).m_isInSameInputGroup = true;
                     break;
                 }
             }
@@ -1842,26 +1842,26 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
         it = m_askAllowPrograms.begin();
         for (; it != m_askAllowPrograms.end(); ++it)
         {
-            if (!(*it).is_in_same_input_group)
-                (*it).is_conflicting = false;
-            else if (cardid == (*it).info->GetInputID())
-                (*it).is_conflicting = true;
-            else if (!CardUtil::IsTunerShared(cardid, (*it).info->GetInputID()))
-                (*it).is_conflicting = true;
+            if (!(*it).m_isInSameInputGroup)
+                (*it).m_isConflicting = false;
+            else if (cardid == (*it).m_info->GetInputID())
+                (*it).m_isConflicting = true;
+            else if (!CardUtil::IsTunerShared(cardid, (*it).m_info->GetInputID()))
+                (*it).m_isConflicting = true;
             else if ((busy_input.m_mplexid &&
-                      (busy_input.m_mplexid  == (*it).info->QueryMplexID())) ||
+                      (busy_input.m_mplexid  == (*it).m_info->QueryMplexID())) ||
                      (!busy_input.m_mplexid &&
-                      (busy_input.m_chanid == (*it).info->GetChanID())))
-                (*it).is_conflicting = false;
+                      (busy_input.m_chanid == (*it).m_info->GetChanID())))
+                (*it).m_isConflicting = false;
             else
-                (*it).is_conflicting = true;
+                (*it).m_isConflicting = true;
 
-            conflict_count += (*it).is_conflicting ? 1 : 0;
+            conflict_count += (*it).m_isConflicting ? 1 : 0;
         }
     }
 
     it = m_askAllowPrograms.begin();
-    for (; it != m_askAllowPrograms.end() && !(*it).is_conflicting; ++it);
+    for (; it != m_askAllowPrograms.end() && !(*it).m_isConflicting; ++it);
 
     if (conflict_count == 0)
     {
@@ -1870,7 +1870,7 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
         // TODO take down mplexid and inform user of problem
         // on channel changes.
     }
-    else if (conflict_count == 1 && ((*it).info->GetInputID() == cardid))
+    else if (conflict_count == 1 && ((*it).m_info->GetInputID() == cardid))
     {
 #if 0
         LOG(VB_GENERAL, LOG_DEBUG, LOC + "UpdateOSDAskAllowDialog -- " +
@@ -1881,24 +1881,24 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
 
         QString channel = m_dbChannelFormat;
         channel
-            .replace("<num>",  (*it).info->GetChanNum())
-            .replace("<sign>", (*it).info->GetChannelSchedulingID())
-            .replace("<name>", (*it).info->GetChannelName());
+            .replace("<num>",  (*it).m_info->GetChanNum())
+            .replace("<sign>", (*it).m_info->GetChannelSchedulingID())
+            .replace("<name>", (*it).m_info->GetChannelName());
 
-        message = single_rec.arg((*it).info->GetTitle()).arg(channel);
+        message = single_rec.arg((*it).m_info->GetTitle()).arg(channel);
 
         OSD *osd = GetOSDLock(ctx);
         if (osd)
         {
             m_browseHelper->BrowseEnd(ctx, false);
-            timeuntil = MythDate::current().secsTo((*it).expiry) * 1000;
+            timeuntil = MythDate::current().secsTo((*it).m_expiry) * 1000;
             osd->DialogShow(OSD_DLG_ASKALLOW, message, timeuntil);
             osd->DialogAddButton(record_watch, "DIALOG_ASKALLOW_WATCH_0",
-                                 false, !((*it).has_rec));
+                                 false, !((*it).m_hasRec));
             osd->DialogAddButton(let_record1, "DIALOG_ASKALLOW_EXIT_0");
-            osd->DialogAddButton(((*it).has_later) ? record_later1 : do_not_record1,
+            osd->DialogAddButton(((*it).m_hasLater) ? record_later1 : do_not_record1,
                                  "DIALOG_ASKALLOW_CANCELRECORDING_0",
-                                 false, ((*it).has_rec));
+                                 false, ((*it).m_hasRec));
         }
         ReturnOSDLock(ctx, osd);
     }
@@ -1915,20 +1915,20 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
         it = m_askAllowPrograms.begin();
         for (; it != m_askAllowPrograms.end(); ++it)
         {
-            if (!(*it).is_conflicting)
+            if (!(*it).m_isConflicting)
                 continue;
 
-            QString title = (*it).info->GetTitle();
-            if ((title.length() < 10) && !(*it).info->GetSubtitle().isEmpty())
-                title += ": " + (*it).info->GetSubtitle();
+            QString title = (*it).m_info->GetTitle();
+            if ((title.length() < 10) && !(*it).m_info->GetSubtitle().isEmpty())
+                title += ": " + (*it).m_info->GetSubtitle();
             if (title.length() > 20)
                 title = title.left(17) + "...";
 
             QString channel = m_dbChannelFormat;
             channel
-                .replace("<num>",  (*it).info->GetChanNum())
-                .replace("<sign>", (*it).info->GetChannelSchedulingID())
-                .replace("<name>", (*it).info->GetChannelName());
+                .replace("<num>",  (*it).m_info->GetChanNum())
+                .replace("<sign>", (*it).m_info->GetChannelSchedulingID())
+                .replace("<name>", (*it).m_info->GetChannelName());
 
             if (conflict_count > 1)
             {
@@ -1937,8 +1937,8 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
             }
             else
             {
-                message = single_rec.arg((*it).info->GetTitle()).arg(channel);
-                has_rec = (*it).has_rec;
+                message = single_rec.arg((*it).m_info->GetTitle()).arg(channel);
+                has_rec = (*it).m_hasRec;
             }
         }
 
@@ -1953,10 +1953,10 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
         it = m_askAllowPrograms.begin();
         for (; it != m_askAllowPrograms.end(); ++it)
         {
-            if ((*it).is_conflicting)
+            if ((*it).m_isConflicting)
             {
-                all_have_later &= (*it).has_later;
-                int tmp = MythDate::current().secsTo((*it).expiry);
+                all_have_later &= (*it).m_hasLater;
+                int tmp = MythDate::current().secsTo((*it).m_expiry);
                 tmp *= 1000;
                 timeuntil = min(timeuntil, max(tmp, 0));
             }
@@ -2009,8 +2009,8 @@ void TV::HandleOSDAskAllow(PlayerContext *ctx, const QString& action)
             m_askAllowPrograms.begin();
         for (; it != m_askAllowPrograms.end(); ++it)
         {
-            if ((*it).is_conflicting)
-                RemoteCancelNextRecording((*it).info->GetInputID(), true);
+            if ((*it).m_isConflicting)
+                RemoteCancelNextRecording((*it).m_info->GetInputID(), true);
         }
     }
     else if (action == "WATCH")
