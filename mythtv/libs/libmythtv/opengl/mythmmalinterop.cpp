@@ -22,18 +22,17 @@ MythMMALInterop::~MythMMALInterop()
     LOG(VB_GENERAL, LOG_INFO, LOC + "Destructor");
 }
 
-MythOpenGLInterop::Type MythMMALInterop::GetInteropType(MythCodecID CodecId, MythRenderOpenGL *Context)
+MythOpenGLInterop::Type MythMMALInterop::GetInteropType(VideoFrameType Format)
 {
-    if (!codec_is_mmal(CodecId))
+    if (FMT_MMAL != Format)
         return Unsupported;
 
-    if (!Context)
-        Context = MythRenderOpenGL::GetOpenGLRender();
-    if (!Context)
+    MythRenderOpenGL* context = MythRenderOpenGL::GetOpenGLRender();
+    if (!context)
         return Unsupported;
 
-    OpenGLLocker locker(Context);
-    if (!Context->IsEGL())
+    OpenGLLocker locker(context);
+    if (!context->IsEGL())
         return Unsupported;
 
     // MMAL interop only works with the closed source driver
@@ -46,7 +45,7 @@ MythOpenGLInterop::Type MythMMALInterop::GetInteropType(MythCodecID CodecId, Myt
         return Unsupported;
     }
 
-    return Context->hasExtension("GL_OES_EGL_image") ? MMAL : Unsupported;
+    return context->hasExtension("GL_OES_EGL_image") ? MMAL : Unsupported;
 }
 
 MythMMALInterop* MythMMALInterop::Create(MythRenderOpenGL *Context, Type InteropType)

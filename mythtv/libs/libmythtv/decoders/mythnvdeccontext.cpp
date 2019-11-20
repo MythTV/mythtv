@@ -161,9 +161,7 @@ int MythNVDECContext::InitialiseDecoder(AVCodecContext *Context)
     // Lock
     OpenGLLocker locker(render);
 
-    MythCodecID codecid = static_cast<MythCodecID>(kCodec_MPEG1_NVDEC + (mpeg_version(Context->codec_id) - 1));
-    MythOpenGLInterop::Type type = MythNVDECInterop::GetInteropType(codecid, render);
-    if (type == MythOpenGLInterop::Unsupported)
+    if (MythOpenGLInterop::GetInteropType(FMT_NVDEC) == MythOpenGLInterop::Unsupported)
         return -1;
 
     // Create interop (and CUDA context)

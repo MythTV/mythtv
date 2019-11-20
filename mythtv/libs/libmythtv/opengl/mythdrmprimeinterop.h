@@ -9,17 +9,19 @@ struct AVDRMFrameDescriptor;
 
 class MythDRMPRIMEInterop : public MythOpenGLInterop, public MythEGLDMABUF
 {
+    friend class MythOpenGLInterop;
+
   public:
     static MythDRMPRIMEInterop* Create(MythRenderOpenGL *Context, Type InteropType);
-    static Type GetInteropType(MythCodecID CodecId, MythRenderOpenGL *Context = nullptr);
-
-    MythDRMPRIMEInterop(MythRenderOpenGL *Context);
-    virtual ~MythDRMPRIMEInterop() override;
-
     void DeleteTextures(void) override;
     vector<MythVideoTexture*> Acquire(MythRenderOpenGL *Context,
                                       VideoColourSpace *ColourSpace,
                                       VideoFrame *Frame, FrameScanType Scan) override;
+
+  protected:
+    MythDRMPRIMEInterop(MythRenderOpenGL *Context);
+    virtual ~MythDRMPRIMEInterop() override;
+    static Type GetInteropType(VideoFrameType Format);
 
   private:
     AVDRMFrameDescriptor*     VerifyBuffer(MythRenderOpenGL *Context, VideoFrame *Frame);

@@ -269,7 +269,7 @@ bool MythVideoOutputOpenGL::Init(const QSize &VideoDim, const QSize &VideoDispDi
 
 bool MythVideoOutputOpenGL::InputChanged(const QSize &VideoDim, const QSize &VideoDispDim,
                                          float Aspect, MythCodecID CodecId, bool &AspectOnly,
-                                         MythMultiLocker* Locks, int ReferenceFrames,
+                                         MythMultiLocker*, int ReferenceFrames,
                                          bool ForceChange)
 {
     QSize currentvideodim     = m_window.GetVideoDim();
@@ -307,20 +307,10 @@ bool MythVideoOutputOpenGL::InputChanged(const QSize &VideoDim, const QSize &Vid
         return true;
     }
 
-    // fail fast if we don't know how to display the codec
-    if (!codec_sw_copy(CodecId))
-    {
-        // MythOpenGLInterop::GetInteropType will block if we don't release our current locks
-        Locks->Unlock();
-        MythOpenGLInterop::Type support = MythOpenGLInterop::GetInteropType(CodecId);
-        Locks->Relock();
-        if (support == MythOpenGLInterop::Unsupported)
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC + "New video codec is not supported.");
-            m_errorState = kError_Unknown;
-            return false;
-        }
-    }
+    // N.B. We no longer check for interop support for the new codec as it is a
+    // poor substitute for a full check of decoder capabilities etc. Better to let
+    // hardware decoding fail if necessary - which should at least fallback to
+    // software decoding rather than bailing out here.
 
     // delete and recreate the buffers and flag that the input has changed
     m_maxReferenceFrames = ReferenceFrames;
@@ -803,7 +793,26 @@ QStringList MythVideoOutputOpenGL::GetAllowedRenderers(MythCodecID CodecId, cons
         return allowed;
     }
 
-    allowed += MythOpenGLInterop::GetAllowedRenderers(CodecId);
+    VideoFrameType format = FMT_NONE;
+    if (codec_is_vaapi(CodecId))
+        format = FMT_VAAPI;
+    else if (codec_is_vdpau(CodecId))
+        format = FMT_VDPAU;
+    else if (codec_is_nvdec(CodecId))
+        format = FMT_NVDEC;
+    else if (codec_is_vtb(CodecId))
+        format = FMT_VTB;
+    else if (codec_is_mmal(CodecId))
+        format = FMT_MMAL;
+    else if (codec_is_v4l2(CodecId) || codec_is_drmprime(CodecId))
+        format = FMT_DRMPRIME;
+    else if (codec_is_mediacodec(CodecId))
+        format = FMT_MEDIACODEC;
+
+    if (FMT_NONE == format)
+        return allowed;
+
+    allowed += MythOpenGLInterop::GetAllowedRenderers(format);
     return allowed;
 }
 

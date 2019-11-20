@@ -5,6 +5,7 @@
 #include <QObject>
 
 // MythTV
+#include "mythcodecid.h"
 #include "mythopenglinterop.h"
 
 // FFmpeg
@@ -25,12 +26,10 @@ class MythVDPAUInterop : public MythOpenGLInterop
 {
     Q_OBJECT
 
+    friend class MythOpenGLInterop;
+
   public:
     static MythVDPAUInterop* Create(MythRenderOpenGL *Context, MythCodecID CodecId);
-    static Type GetInteropType(MythCodecID CodecId, MythRenderOpenGL *Context = nullptr);
-
-    virtual ~MythVDPAUInterop() override;
-
     vector<MythVideoTexture*> Acquire(MythRenderOpenGL *Context, VideoColourSpace *ColourSpace,
                                       VideoFrame *Frame, FrameScanType Scan) override;
 
@@ -40,7 +39,9 @@ class MythVDPAUInterop : public MythOpenGLInterop
     bool  IsPreempted(void);
 
   protected:
+    static Type GetInteropType(VideoFrameType Format);
     MythVDPAUInterop(MythRenderOpenGL *Context, MythCodecID CodecID);
+    virtual ~MythVDPAUInterop() override;
 
   private:
     bool  InitNV(AVVDPAUDeviceContext* DeviceContext);

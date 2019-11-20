@@ -153,7 +153,7 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext **Context,
     }
 
     // direct rendering needs interop support
-    if (!decodeonly && (MythOpenGLInterop::GetInteropType(success) == MythOpenGLInterop::Unsupported))
+    if (!decodeonly && (MythOpenGLInterop::GetInteropType(FMT_VAAPI) == MythOpenGLInterop::Unsupported))
         return failure;
 
     // check for actual decoder support
@@ -312,8 +312,7 @@ int MythVAAPIContext::InitialiseContext(AVCodecContext *Context)
     if (!Context || !gCoreContext->IsUIThread())
         return -1;
 
-    MythCodecID vaapiid = static_cast<MythCodecID>(kCodec_MPEG1_VAAPI + (mpeg_version(Context->codec_id) - 1));
-    MythOpenGLInterop::Type type = MythOpenGLInterop::GetInteropType(vaapiid);
+    MythOpenGLInterop::Type type = MythOpenGLInterop::GetInteropType(FMT_VAAPI);
     if (type == MythOpenGLInterop::Unsupported)
         return -1;
 
@@ -386,6 +385,7 @@ int MythVAAPIContext::InitialiseContext(AVCodecContext *Context)
 
     if (format != VA_FOURCC_NV12)
     {
+        MythCodecID vaapiid = static_cast<MythCodecID>(kCodec_MPEG1_VAAPI + (mpeg_version(Context->codec_id) - 1));
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Forcing surface format for %1 and %2 with driver '%3'")
             .arg(toString(vaapiid)).arg(MythOpenGLInterop::TypeToString(type)).arg(vendor));
     }

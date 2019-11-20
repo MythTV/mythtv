@@ -9,17 +9,19 @@
 
 class MythVTBInterop : public MythOpenGLInterop
 {
+    friend class MythOpenGLInterop;
+
   public:
     static MythVTBInterop* Create(MythRenderOpenGL *Context, MythOpenGLInterop::Type Type);
-    static Type GetInteropType(MythCodecID CodecId, MythRenderOpenGL *Context = nullptr);
-
-    MythVTBInterop(MythRenderOpenGL *Context, MythOpenGLInterop::Type Type);
-   ~MythVTBInterop() override;
-
     vector<MythVideoTexture*> Acquire(MythRenderOpenGL *Context,
                                       VideoColourSpace *ColourSpace,
                                       VideoFrame       *Frame,
                                       FrameScanType    Scan) override;
+
+  protected:
+    static Type GetInteropType(VideoFrameType Format);
+    MythVTBInterop(MythRenderOpenGL *Context, MythOpenGLInterop::Type Type);
+   ~MythVTBInterop() override;
 };
 
 class MythVTBSurfaceInterop : public MythVTBInterop

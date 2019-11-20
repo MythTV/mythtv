@@ -15,7 +15,7 @@ class MythMediaCodecInterop : public MythOpenGLInterop
 {
   public:
     static MythMediaCodecInterop* Create(MythRenderOpenGL *Context, QSize Size);
-   ~MythMediaCodecInterop() override;
+
     virtual vector<MythVideoTexture*> Acquire (MythRenderOpenGL *Context,
                                                VideoColourSpace *ColourSpace,
                                                VideoFrame *Frame, FrameScanType Scan) override;
@@ -23,6 +23,7 @@ class MythMediaCodecInterop : public MythOpenGLInterop
 
   protected:
     MythMediaCodecInterop(MythRenderOpenGL *Context);
+   ~MythMediaCodecInterop() override;
     bool Initialise(QSize Size);
 
   private:

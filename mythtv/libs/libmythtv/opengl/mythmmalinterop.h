@@ -12,16 +12,19 @@ extern "C" {
 
 class MythMMALInterop : public MythOpenGLInterop
 {
+    friend class MythOpenGLInterop;
+
   public:
     static MythMMALInterop* Create(MythRenderOpenGL *Context, Type InteropType);
-    static Type GetInteropType(MythCodecID CodecId, MythRenderOpenGL *Context = nullptr);
-
-    MythMMALInterop(MythRenderOpenGL *Context);
-    virtual ~MythMMALInterop() override;
-
     virtual vector<MythVideoTexture*> Acquire(MythRenderOpenGL *Context,
                                               VideoColourSpace *ColourSpace,
                                               VideoFrame *Frame, FrameScanType Scan) override;
+
+  protected:
+    static Type GetInteropType(VideoFrameType Format);
+
+    MythMMALInterop(MythRenderOpenGL *Context);
+    virtual ~MythMMALInterop() override;
 
   private:
     MMAL_BUFFER_HEADER_T* VerifyBuffer(MythRenderOpenGL *Context, VideoFrame *Frame);

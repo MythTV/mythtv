@@ -82,13 +82,12 @@ MythNVDECInterop* MythNVDECInterop::Create(MythRenderOpenGL *Context)
     return nullptr;
 }
 
-MythOpenGLInterop::Type MythNVDECInterop::GetInteropType(MythCodecID CodecId, MythRenderOpenGL *Context)
+MythOpenGLInterop::Type MythNVDECInterop::GetInteropType(VideoFrameType Format)
 {
-    if (!codec_is_nvdec(CodecId) || !gCoreContext->IsUIThread())
+    if ((FMT_NVDEC != Format) || !gCoreContext->IsUIThread())
         return Unsupported;
-    if (!Context)
-        Context = MythRenderOpenGL::GetOpenGLRender();
-    if (!Context)
+
+    if (!MythRenderOpenGL::GetOpenGLRender())
         return Unsupported;
     return NVDEC;
 }

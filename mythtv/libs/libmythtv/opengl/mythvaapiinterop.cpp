@@ -28,25 +28,23 @@ extern "C" {
  * additional render to texture via a FramebufferObject. As it is less performant
  * and less widely available than GLX Pixmap, it may be removed in the future.
 */
-MythOpenGLInterop::Type MythVAAPIInterop::GetInteropType(MythCodecID CodecId,
-                                                         MythRenderOpenGL *Context)
+MythOpenGLInterop::Type MythVAAPIInterop::GetInteropType(VideoFrameType Format)
 {
-    if (!codec_is_vaapi(CodecId) || getenv("NO_VAAPI"))
+    if ((FMT_VAAPI != Format) || getenv("NO_VAAPI"))
         return Unsupported;
 
-    if (!Context)
-        Context = MythRenderOpenGL::GetOpenGLRender();
-    if (!Context)
+    MythRenderOpenGL *context = MythRenderOpenGL::GetOpenGLRender();
+    if (!context)
         return Unsupported;
 
-    OpenGLLocker locker(Context);
-    bool egl = Context->IsEGL();
-    bool opengles = Context->isOpenGLES();
+    OpenGLLocker locker(context);
+    bool egl = context->IsEGL();
+    bool opengles = context->isOpenGLES();
     bool wayland = qgetenv("XDG_SESSION_TYPE").contains("wayland");
     // best first
-    if (egl && MythVAAPIInteropDRM::IsSupported(Context)) // zero copy
+    if (egl && MythVAAPIInteropDRM::IsSupported(context)) // zero copy
         return VAAPIEGLDRM;
-    else if (!egl && !wayland && MythVAAPIInteropGLXPixmap::IsSupported(Context)) // copy
+    else if (!egl && !wayland && MythVAAPIInteropGLXPixmap::IsSupported(context)) // copy
         return VAAPIGLXPIX;
     else if (!egl && !opengles && !wayland) // 2 * copy
         return VAAPIGLXCOPY;

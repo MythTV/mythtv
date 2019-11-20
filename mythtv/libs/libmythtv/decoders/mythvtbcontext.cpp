@@ -145,8 +145,7 @@ int MythVTBContext::InitialiseDecoder(AVCodecContext *Context)
     // Lock
     OpenGLLocker locker(render);
 
-    MythCodecID vtbid = static_cast<MythCodecID>(kCodec_MPEG1_VTB + (mpeg_version(Context->codec_id) - 1));
-    MythVTBInterop::Type type = MythVTBInterop::GetInteropType(vtbid, render);
+    MythVTBInterop::Type type = MythOpenGLInterop::GetInteropType(FMT_VTB, render);
     if (type == MythOpenGLInterop::Unsupported)
         return -1;
 

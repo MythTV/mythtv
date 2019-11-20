@@ -13,18 +13,16 @@ MythVDPAUInterop* MythVDPAUInterop::Create(MythRenderOpenGL *Context, MythCodecI
     return nullptr;
 }
 
-MythOpenGLInterop::Type MythVDPAUInterop::GetInteropType(MythCodecID CodecId,
-                                                         MythRenderOpenGL *Context)
+MythOpenGLInterop::Type MythVDPAUInterop::GetInteropType(VideoFrameType Format)
 {
-    if (!codec_is_vdpau_hw(CodecId) || !gCoreContext->IsUIThread())
+    if ((FMT_VDPAU != Format) || !gCoreContext->IsUIThread())
         return Unsupported;
 
-    if (!Context)
-        Context = MythRenderOpenGL::GetOpenGLRender();
-    if (!Context)
+    MythRenderOpenGL* context = MythRenderOpenGL::GetOpenGLRender();
+    if (!context)
         return Unsupported;
 
-    if (Context->hasExtension("GL_NV_vdpau_interop") && MythVDPAUHelper::HaveVDPAU())
+    if (context->hasExtension("GL_NV_vdpau_interop") && MythVDPAUHelper::HaveVDPAU())
         return VDPAU;
     return Unsupported;
 }
