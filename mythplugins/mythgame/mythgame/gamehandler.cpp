@@ -300,7 +300,7 @@ static void UpdateGameCounts(QStringList updatelist)
         LOG(VB_GENERAL, LOG_NOTICE,
             LOC + QString("Update gametype %1").arg(GameType));
 
-        query.prepare("SELECT romname,system,spandisks,gamename FROM "
+        query.prepare("SELECT romname,`system`,spandisks,gamename FROM "
               "gamemetadata,gameplayers WHERE "
               "gamemetadata.gametype = :GAMETYPE AND "
               "playername = system ORDER BY romname");
