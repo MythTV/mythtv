@@ -106,7 +106,7 @@ MythOpenGLInterop::Type MythOpenGLInterop::GetInteropType(MythCodecID CodecId)
         supported = MythMMALInterop::GetInteropType(CodecId);
 #endif
 #ifdef USING_EGL
-    if (codec_is_v4l2(CodecId))
+    if (codec_is_v4l2(CodecId) || codec_is_drmprime(CodecId))
         supported = MythDRMPRIMEInterop::GetInteropType(CodecId);
 #endif
 

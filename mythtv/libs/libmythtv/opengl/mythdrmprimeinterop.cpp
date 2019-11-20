@@ -61,7 +61,7 @@ MythOpenGLInterop::Type MythDRMPRIMEInterop::GetInteropType(MythCodecID CodecId,
 {
     // TODO - this should be tied to pix_fmt (i.e. AV_PIX_FMT_DRM_PRIME) not codec.
     // Probably applies to all interops
-    if (!codec_is_v4l2(CodecId))
+    if (!(codec_is_v4l2(CodecId) || codec_is_drmprime(CodecId)))
         return Unsupported;
     return HaveDMABuf(Context) ? DRMPRIME : Unsupported;
 }

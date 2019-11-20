@@ -53,7 +53,7 @@ void MythVideoOutputOpenGL::GetRenderOptions(RenderOptions &Options)
     Options.renderers->append("opengl-yv12");
     Options.priorities->insert("opengl-yv12", 65);
 
-#if defined(USING_VAAPI) || defined (USING_VTB) || defined (USING_MEDIACODEC) || defined (USING_VDPAU) || defined (USING_NVDEC) || defined (USING_MMAL) || defined (USING_V4L2PRIME)
+#if defined(USING_VAAPI) || defined (USING_VTB) || defined (USING_MEDIACODEC) || defined (USING_VDPAU) || defined (USING_NVDEC) || defined (USING_MMAL) || defined (USING_V4L2PRIME) || defined (USING_EGL)
     Options.renderers->append("opengl-hw");
     (*Options.safe_renderers)["dummy"].append("opengl-hw");
     (*Options.safe_renderers)["nuppel"].append("opengl-hw");
@@ -86,6 +86,10 @@ void MythVideoOutputOpenGL::GetRenderOptions(RenderOptions &Options)
 #ifdef USING_V4L2PRIME
     if (Options.decoders->contains("v4l2"))
         (*Options.safe_renderers)["v4l2"].append("opengl-hw");
+#endif
+#ifdef USING_EGL
+    if (Options.decoders->contains("drmprime"))
+        (*Options.safe_renderers)["drmprime"].append("opengl-hw");
 #endif
 }
 
@@ -387,7 +391,7 @@ bool MythVideoOutputOpenGL::CreateBuffers(MythCodecID CodecID, QSize Size)
         return m_videoBuffers.CreateBuffers(FMT_NVDEC, Size, false, 2, 1, 4);
     else if (codec_is_mmal(CodecID))
         return m_videoBuffers.CreateBuffers(FMT_MMAL, Size, false, 2, 1, 4);
-    else if (codec_is_v4l2(CodecID))
+    else if (codec_is_v4l2(CodecID) || codec_is_drmprime(CodecID))
         return m_videoBuffers.CreateBuffers(FMT_DRMPRIME, Size, false, 2, 1, 4);
 
     return m_videoBuffers.CreateBuffers(FMT_YV12, Size, false, 1, 8, 4, m_maxReferenceFrames);

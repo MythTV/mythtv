@@ -811,6 +811,7 @@ QString VideoDisplayProfile::GetDecoderName(const QString &Decoder)
         s_dec_name["v4l2-dec"]       = QObject::tr("V4L2 acceleration (decode only)");
         s_dec_name["mmal"]           = QObject::tr("MMAL acceleration");
         s_dec_name["mmal-dec"]       = QObject::tr("MMAL acceleration (decode only)");
+        s_dec_name["drmprime"]       = QObject::tr("DRM PRIME acceleration");
     }
 
     QString ret = Decoder;
@@ -872,7 +873,12 @@ QString VideoDisplayProfile::GetDecoderHelp(const QString& Decoder)
     if (Decoder.startsWith("v4l2"))
         msg += QObject::tr(
             "Video4Linux codecs are used to accelerate video decoding on "
-            "on supported platforms. ");
+            "supported platforms. ");
+
+    if (Decoder == "drmprime")
+        msg += QObject::tr(
+            "DRM-PRIME decoders are used to accelerate video decoding on "
+            "supported platforms. ");
 
     if (Decoder.endsWith("-dec"))
         msg += QObject::tr("The decoder will transfer frames back to system memory "
