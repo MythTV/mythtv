@@ -53,19 +53,7 @@ static uint ELFHash(const QByteArray &ba)
 
     return h;
 }
-/*
-static QString getFirstText(const QDomElement& element)
-{
-    for (QDomNode dname = element.firstChild(); !dname.isNull();
-         dname = dname.nextSibling())
-    {
-        QDomText t = dname.toText();
-        if (!t.isNull())
-            return t.data();
-    }
-    return QString();
-}
-*/
+
 static void fromXMLTVDate(QString &timestr, QDateTime &dt)
 {
     // The XMLTV spec requires dates to either be in UTC/GMT or to specify a
@@ -186,6 +174,16 @@ static void fromXMLTVDate(QString &timestr, QDateTime &dt)
     timestr = MythDate::toString(dt, MythDate::kFilename);
 }
 
+static int readNextWithErrorCheck(QXmlStreamReader &xml)
+{
+    xml.readNext();
+    if (xml.hasError()) {
+        LOG(VB_GENERAL, LOG_ERR, QString("Malformed XML file at line %1, %2").arg(xml.lineNumber()).arg(xml.errorString()));
+        return false;
+    }
+    return true;
+}
+
 bool XMLTVParser::parseFile(
     const QString& filename, ChannelInfoList *chanlist,
     QMap<QString, QList<ProgInfo> > *proglist)
@@ -200,45 +198,29 @@ bool XMLTVParser::parseFile(
         return false;
     }
 
-    //QString errorMsg = "unknown";
-    //int errorLine = 0;
-
     QXmlStreamReader xml(&f);
     QUrl baseUrl;
     QUrl sourceUrl;
     QString aggregatedTitle;
     QString aggregatedDesc;
-/////////////////////////playground
-    /*QXmlStreamReader xml2(&f);
-    while (!xml2.atEnd()) {
-        if (xml2.readNextStartElement())
-            std::cout << qPrintable(xml2.name().toString()) << std::endl;
-    }*/
-/////////////////////////end of playground
-    while (!xml.atEnd()) {
+    while (!xml.atEnd() && !xml.hasError()) {
         if (xml.readNextStartElement()) {
-            //LOG(VB_GENERAL, LOG_ERR, QString("DINGO MAIN LOOP %1: tagName=%2,Text=%3,isCharacters=%4").arg(xml.lineNumber()).arg(xml.name()).arg(xml.text()).arg(xml.isCharacters()));
             if (xml.name() == "tv") {
-                //sourceUrl = QUrl(getAttributeValue(xml.attributes(), "source-info-url"));
                 sourceUrl = QUrl(xml.attributes().value("source-info-url").toString());
                 baseUrl = QUrl(xml.attributes().value("source-data-url").toString());
-                //LOG(VB_GENERAL, LOG_ERR, QString("DINGOOOOOooooooooooooooooo %1: sourceUrl:%2.").arg(xml.lineNumber()).arg(sourceUrl.toString()));
             }
             if (xml.name() == "channel") {
-                //LOG(VB_GENERAL, LOG_ERR, QString("DINGO channel element %1: tagName=%2,Text=%3,isCharacters=%4").arg(xml.lineNumber()).arg(xml.name()).arg(xml.text()).arg(xml.isCharacters()));
                 //get id attribute
                 QString xmltvid;
                 xmltvid = xml.attributes().value( "id").toString();
-                //LOG(VB_GENERAL, LOG_ERR, QString("DINGOOOOOooooooooooooooooo %1: attributes%2.").arg(xml.lineNumber()).arg(xmltvid));
-                ///////////////parseChannel
                 ChannelInfo *chaninfo = new ChannelInfo;
                 chaninfo->m_xmltvid = xmltvid;
                 chaninfo->m_tvformat = "Default";
 
                 //readNextStartElement says it reads for the next start element WITHIN the current element; but it doesnt; so we use readNext()
                 do {
-                    xml.readNext();
-                    //LOG(VB_GENERAL, LOG_ERR, QString("DINGO loop for reading icons and display names %1: type=%2,tagName=%3,Text=%4,isCharacters=%5").arg(xml.lineNumber()).arg(i2).arg(xml.name()).arg(xml.text()).arg(xml.isCharacters()));
+                    if (!readNextWithErrorCheck(xml))
+                        return false;
                     if (xml.name() == "icon") {
                         if (chaninfo->m_icon.isEmpty()) {
                             QString path = xml.attributes().value("src").toString();
@@ -255,11 +237,9 @@ bool XMLTVParser::parseFile(
                         }
                     }
                     else if (xml.name() == "display-name") {
-                        //LOG(VB_GENERAL, LOG_ERR, QString("DINGO display element %1: type=%2,tagName=%3,Text=%4,isCharacters=%5").arg(xml.lineNumber()).arg(i).arg(xml.name()).arg(xml.text()).arg(xml.isCharacters()));
                         //now get text
                         QString text;
                         text = xml.readElementText(QXmlStreamReader::SkipChildElements);
-                        //LOG(VB_GENERAL, LOG_ERR, QString("DINGO DISPLAY display-name=%1.").arg(text));
                         if (!text.isEmpty()) {
                             if (chaninfo->m_name.isEmpty()) {
                                 chaninfo->m_name = text;
@@ -275,14 +255,12 @@ bool XMLTVParser::parseFile(
                 }
                 while (! (xml.isEndElement() && xml.name() == "channel"));
                 chaninfo->m_freqid = chaninfo->m_channum;
-                ///////////////////////////end of parseChannel
                 //TODO optimize this, no use to do al this parsing if xmltvid is empty; but make sure you will read until the next channel!!
                 if (!chaninfo->m_xmltvid.isEmpty())
                     chanlist->push_back(*chaninfo);
                 delete chaninfo;
             }//channel
             else if (xml.name() == "programme") {
-                ///////////////////////////parseProgram//////////////////////////////////
                 QString programid, season, episode, totalepisodes;
                 ProgInfo *pginfo = new ProgInfo();
 
@@ -306,7 +284,8 @@ bool XMLTVParser::parseFile(
                 }
 
                 do {
-                    xml.readNext();
+                    if (!readNextWithErrorCheck(xml))
+                        return false;
                     if (xml.name() == "title") {
                         QString text2=xml.readElementText(QXmlStreamReader::SkipChildElements);
                         if (xml.attributes().value("lang").toString() == "ja_JP") {
@@ -375,34 +354,22 @@ bool XMLTVParser::parseFile(
                         // 0 signals no rating!
                         // See http://xmltv.cvs.sourceforge.net/viewvc/xmltv/xmltv/xmltv.dtd?revision=1.47&view=markup#l539
                         stars = "0"; //no rating
-
                         do {
-                            xml.readNext();
+                            if (!readNextWithErrorCheck(xml))
+                                return false;
                             if (xml.isStartElement()) {
                                 if (xml.name() == "value") {
                                     stars=xml.readElementText(QXmlStreamReader::SkipChildElements);
                                 }
                             }
                         }
-                        while (! (xml.isEndElement() && xml.name() == "star-rating") && !xml.hasError());
-                        if (xml.hasError()) {
-                            //TODO expand this to all while loops !!
-                            xml.raiseError(QString("ERROR malformed XML file at line %1").arg(xml.lineNumber()));
-                            //qDebug() << errorString();
-                            LOG(VB_GENERAL, LOG_ERR, QString("ERROR malformed XML file at line %1").arg(xml.lineNumber()));
-                            return false;
-                        }
-
-                        //LOG(VB_GENERAL, LOG_ERR, QString("DINGO stars=%1.").arg(stars));
-
+                        while (! (xml.isEndElement() && xml.name() == "star-rating"));
                         if (pginfo->m_stars == 0.0F) {
                             float num = stars.section('/', 0, 0).toFloat() + 1;
                             float den = stars.section('/', 1, 1).toFloat() + 1;
                             if (0.0F < den)
                                 rating = num/den;
                         }
-                        //LOG(VB_GENERAL, LOG_ERR, QString("DINGO star-rating=%1.").arg(rating));
-
                         pginfo->m_stars = rating;
                     }
                     else if (xml.name() == "rating") {
@@ -411,7 +378,8 @@ bool XMLTVParser::parseFile(
                         QString rat;
                         QString rating_system = xml.attributes().value("system").toString();
                         do {
-                            xml.readNext();
+                            if (!readNextWithErrorCheck(xml))
+                                return false;
                             if (xml.isStartElement()) {
                                 if (xml.name() == "value") {
                                     rat=xml.readElementText(QXmlStreamReader::SkipChildElements);
@@ -419,7 +387,6 @@ bool XMLTVParser::parseFile(
                             }
                         }
                         while (! (xml.isEndElement() && xml.name() == "rating"));
-                        //LOG(VB_GENERAL, LOG_ERR, QString("DINGO rat=%1.").arg(rat));
 
                         if (!rat.isEmpty()) {
                             EventRating rating;
@@ -439,19 +406,20 @@ bool XMLTVParser::parseFile(
                     }
                     else if (xml.name() == "credits") {
                         do {
-                            xml.readNext();
+                            if (!readNextWithErrorCheck(xml))
+                                return false;
                             if (xml.isStartElement()) {
                                 QString tagname=xml.name().toString();
                                 QString text2=xml.readElementText(QXmlStreamReader::SkipChildElements);
                                 pginfo->AddPerson(tagname, text2);
-                                //LOG(VB_GENERAL, LOG_ERR, QString("DINGO tagname=%1,text=%2").arg(tagname).arg(text2));
                             }
                         }
                         while (! (xml.isEndElement() && xml.name() == "credits"));
                     }
                     else if (xml.name() == "audio") {
                         do {
-                            xml.readNext();
+                            if (!readNextWithErrorCheck(xml))
+                                return false;
                             if (xml.isStartElement()) {
                                 if (xml.name() == "stereo") {
                                     QString text2=xml.readElementText(QXmlStreamReader::SkipChildElements);
@@ -474,7 +442,8 @@ bool XMLTVParser::parseFile(
                     }
                     else if (xml.name() == "video") {
                         do {
-                            xml.readNext();
+                            if (!readNextWithErrorCheck(xml))
+                                return false;
                             if (xml.isStartElement()) {
                                 if (xml.name() == "quality") {
                                     if (xml.readElementText(QXmlStreamReader::SkipChildElements) == "HDTV")
@@ -492,7 +461,6 @@ bool XMLTVParser::parseFile(
                         QString system = xml.attributes().value( "system").toString();
                         if (system == "dd_progid") {
                             QString episodenum(xml.readElementText(QXmlStreamReader::SkipChildElements));
-                            //LOG(VB_GENERAL, LOG_ERR, QString("DINGO episodenum=%1").arg(episodenum));
                             // if this field includes a dot, strip it out
                             int idx = episodenum.indexOf('.');
                             if (idx != -1)
@@ -621,7 +589,6 @@ bool XMLTVParser::parseFile(
                     }
                 }
                 pginfo->m_programId = programid;
-                ///////////////////////////endofparseProgram//////////////////////////////////
                 if (!(pginfo->m_starttime.isValid())) {
                     LOG(VB_GENERAL, LOG_WARNING, QString("Invalid programme (%1), " "invalid start time, " "skipping").arg(pginfo->m_title));
                 }
@@ -661,13 +628,8 @@ bool XMLTVParser::parseFile(
             }//if programme
         }//if readNextStartElement
     }//while loop
-    /*if (xml.hasError()) {
-    xml.raiseError();
-    qDebug() << errorString();
-    }
-    //TODO add code for adding data on the run*/
+    //TODO add code for adding data on the run
     f.close();
-//The functions errorString(), lineNumber(), columnNumber(), and characterOffset() are for constructing an appropriate error or warning message. To simplify application code, QXmlStreamReader contains a raiseError() mechanism that lets you raise custom errors that trigger the same error handling described.
 
     return true;
 }
