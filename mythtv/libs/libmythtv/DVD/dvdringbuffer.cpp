@@ -50,12 +50,12 @@ DVDInfo::DVDInfo(const QString &filename)
 {
     LOG(VB_PLAYBACK, LOG_INFO, QString("DVDInfo: Trying %1").arg(filename));
     QString name = filename;
-    if (name.startsWith("dvd://"))
-        name.remove(0,5);
-    else if (name.startsWith("dvd:/"))
+    if (name.startsWith("dvd:"))
+    {
         name.remove(0,4);
-    else if (name.startsWith("dvd:"))
-        name.remove(0,4);
+        while (name.startsWith("//"))
+            name.remove(0,1);
+    }
 
     QByteArray fname = name.toLocal8Bit();
     dvdnav_status_t res = dvdnav_open(&m_nav, fname.constData());
