@@ -2284,10 +2284,11 @@ static HostComboBoxSetting *GuiVidModeResolution()
     gc->setHelpText(VideoModeSettings::tr("Resolution of screen when not "
                                           "watching a video."));
 
-    const vector<DisplayResScreen> scr = GetVideoModes();
-    for (size_t i=0; i<scr.size(); ++i)
+    vector<DisplayResScreen> scr = DisplayRes::GetModes();
+    for (size_t i = 0; i< scr.size(); ++i)
     {
-        int w = scr[i].Width(), h = scr[i].Height();
+        int w = scr[i].Width();
+        int h = scr[i].Height();
         QString sel = QString("%1x%2").arg(w).arg(h);
         gc->addSelection(sel, sel);
     }
@@ -2298,12 +2299,15 @@ static HostComboBoxSetting *GuiVidModeResolution()
         int w = 0, h = 0;
         gCoreContext->GetResolutionSetting("GuiVidMode", w, h);
         if ((w <= 0) || (h <= 0))
-            (w = 640), (h = 480);
+        {
+            w = 640;
+            h = 480;
+        }
 
         DisplayResScreen dscr(w, h, -1, -1, -1.0, 0);
         double rate = -1.0;
         int i = DisplayResScreen::FindBestMatch(scr, dscr, rate);
-        gc->setValue((i >= 0) ? i : scr.size()-1);
+        gc->setValue((i >= 0) ? i : scr.size() - 1);
     }
 
     return gc;
@@ -2327,9 +2331,8 @@ static HostComboBoxSetting *TVVidModeResolution(int idx=-1)
 
     gc->setHelpText(hstr);
 
-    const vector<DisplayResScreen> scr = GetVideoModes();
-
-    for (size_t i=0; i<scr.size(); ++i)
+    vector<DisplayResScreen> scr = DisplayRes::GetModes();
+    for (size_t i = 0; i < scr.size(); ++i)
     {
         QString sel = QString("%1x%2").arg(scr[i].Width()).arg(scr[i].Height());
         gc->addSelection(sel, sel);
@@ -2384,12 +2387,18 @@ vector<double> HostRefreshRateComboBoxSetting::GetRefreshRates(
         h = slist[1].toInt(&ok1);
     }
 
-    DisplayRes *display_res = DisplayRes::GetDisplayRes();
-    if (display_res && ok0 && ok1)
-        return display_res->GetRefreshRates(w, h);
+    vector<double> result;
+    if (ok0 && ok1)
+    {
+        DisplayRes *display_res = DisplayRes::AcquireRelease();
+        if (display_res)
+        {
+            result = display_res->GetRefreshRates(w, h);
+            DisplayRes::AcquireRelease(false);
+        }
+    }
 
-    vector<double> list;
-    return list;
+    return result;
 }
 
 static HostRefreshRateComboBoxSetting *TVVidModeRefreshRate(int idx=-1)
@@ -4594,7 +4603,7 @@ AppearanceSettings::AppearanceSettings()
 #endif
 
 #if defined(USING_XRANDR) || CONFIG_DARWIN
-    const vector<DisplayResScreen> scr = GetVideoModes();
+    vector<DisplayResScreen> scr = DisplayRes::GetModes();
     if (!scr.empty())
         addChild(UseVideoModes());
 #endif

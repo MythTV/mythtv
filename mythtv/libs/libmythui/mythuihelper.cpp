@@ -206,7 +206,10 @@ MythUIHelperPrivate::~MythUIHelperPrivate()
     delete m_screensaver;
 
     if (m_display_res)
-        DisplayRes::SwitchToDesktop();
+    {
+        m_display_res->SwitchToDesktop();
+        DisplayRes::AcquireRelease(false); // release
+    }
 }
 
 void MythUIHelperPrivate::Init(void)
@@ -363,19 +366,13 @@ double MythUIHelperPrivate::GetPixelAspectRatio(void)
     if (m_pixelAspectRatio < 0)
     {
         if (!m_display_res)
-        {
-            DisplayRes *dispRes = DisplayRes::GetDisplayRes(); // create singleton
-
-            if (dispRes)
-                m_pixelAspectRatio = dispRes->GetPixelAspectRatio();
-            else
-                m_pixelAspectRatio = 1.0;
-        }
+            m_display_res = DisplayRes::AcquireRelease();
+        if (m_display_res)
+            m_pixelAspectRatio = static_cast<float>(m_display_res->GetPixelAspectRatio());
         else
-            m_pixelAspectRatio = m_display_res->GetPixelAspectRatio();
+            m_pixelAspectRatio = 1.0;
     }
-
-    return m_pixelAspectRatio;
+    return static_cast<double>(m_pixelAspectRatio);
 }
 
 void MythUIHelperPrivate::WaitForScreenChange(void)
@@ -450,18 +447,16 @@ void MythUIHelper::LoadQtConfig(void)
 
     if (GetMythDB()->GetBoolSetting("UseVideoModes", false))
     {
-        DisplayRes *dispRes = DisplayRes::GetDisplayRes(); // create singleton
+        if (!d->m_display_res)
+            d->m_display_res = DisplayRes::AcquireRelease();
 
-        if (dispRes)
+        if (d->m_display_res)
         {
-            d->m_display_res = dispRes;
             // Make sure DisplayRes has current context info
             d->m_display_res->Initialize();
             // Switch to desired GUI resolution
             if (d->m_display_res->SwitchToGUI())
-            {
                 d->WaitForScreenChange();
-            }
         }
     }
 

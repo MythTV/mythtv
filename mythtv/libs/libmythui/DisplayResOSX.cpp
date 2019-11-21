@@ -1,4 +1,5 @@
 
+#include "mythlogging.h"
 #include "DisplayResOSX.h"
 
 #import <IOKit/graphics/IOGraphicsLib.h> // for IODisplayCreateInfoDictionary()
@@ -7,9 +8,17 @@
 #include "util-osx.h"
 #include "util-osx-cocoa.h"
 
+#define LOC QString("DisplResOSX: ")
+
 DisplayResOSX::DisplayResOSX(void)
 {
+    LOG(VB_GENERAL, LOG_INFO, LOC + "Created");
     Initialize();
+}
+
+DisplayResOSX::~DisplayResOSX()
+{
+    LOG(VB_GENERAL, LOG_INFO, LOC + "Deleted");
 }
 
 bool DisplayResOSX::GetDisplayInfo(int &w_pix, int &h_pix, int &w_mm,
@@ -20,7 +29,7 @@ bool DisplayResOSX::GetDisplayInfo(int &w_pix, int &h_pix, int &w_mm,
     h_mm   = info.m_size.height();
     w_pix  = info.m_res.width();
     h_pix  = info.m_res.height();
-    rate   = 1000000.0F / info.m_rate;
+    rate   = static_cast<double>(1000000.0F / info.m_rate);
     par    = 1.0;
     return true;
 }

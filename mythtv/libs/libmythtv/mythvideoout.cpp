@@ -286,7 +286,7 @@ MythVideoOutput::~MythVideoOutput()
     delete m_dbDisplayProfile;
     ResizeForGui();
     if (m_displayRes)
-        DisplayRes::Unlock();
+        DisplayRes::AcquireRelease(false);
 }
 
 /**

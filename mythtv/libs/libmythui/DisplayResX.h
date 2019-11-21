@@ -8,7 +8,7 @@ class DisplayResX : public DisplayRes
 {
   public:
     DisplayResX(void);
-   ~DisplayResX(void) override = default;
+   ~DisplayResX(void) override;
 
     static bool IsAvailable(void);
     const std::vector<DisplayResScreen>& GetVideoModes(void) const override;

@@ -110,7 +110,7 @@ MythVideoOutputOpenGL::MythVideoOutputOpenGL(const QString &Profile)
 {
     // Setup display switching
     if (gCoreContext->GetBoolSetting("UseVideoModes", false))
-        m_displayRes = DisplayRes::GetDisplayRes(true);
+        m_displayRes = DisplayRes::AcquireRelease();
 
     // Retrieve render context
     m_render = MythRenderOpenGL::GetOpenGLRender();

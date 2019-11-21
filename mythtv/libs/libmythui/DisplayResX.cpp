@@ -34,7 +34,13 @@ bool DisplayResX::IsAvailable(void)
 DisplayResX::DisplayResX(void)
   : DisplayRes()
 {
+    LOG(VB_GENERAL, LOG_INFO, LOC + "Created");
     Initialize();
+}
+
+DisplayResX::~DisplayResX()
+{
+    LOG(VB_GENERAL, LOG_INFO, LOC + "Deleted");
 }
 
 bool DisplayResX::GetDisplayInfo(int &WidthPixels, int &HeightPixels, int &WidthMM,
