@@ -640,11 +640,11 @@ void MythVideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, 
     {
         if (twopass)
             m_render->SetViewPort(first, true);
-        Osd->DrawDirect(m_openGLPainter, GetTotalOSDBounds().size(), true);
+        Osd->Draw(m_openGLPainter, GetTotalOSDBounds().size(), true);
         if (twopass)
         {
             m_render->SetViewPort(second, true);
-            Osd->DrawDirect(m_openGLPainter, GetTotalOSDBounds().size(), true);
+            Osd->Draw(m_openGLPainter, GetTotalOSDBounds().size(), true);
             m_render->SetViewPort(main);
         }
     }

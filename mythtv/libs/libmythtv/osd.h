@@ -152,9 +152,7 @@ class OSD
     void    ResetWindow(const QString &Window);
     void    PositionWindow(MythScreenType *Window);
     void    RemoveWindow(const QString &Window);
-    bool    DrawDirect(MythPainter* Painter, QSize Size, bool Repaint = false);
-    QRegion Draw(MythPainter* Painter, QPaintDevice *Device, QSize Size,
-                 QRegion &Changed, int AlignX = 0, int AlignY = 0);
+    bool    Draw(MythPainter* Painter, QSize Size, bool Repaint = false);
 
     void SetValues(const QString &Window, const QHash<QString,int> &Map, OSDTimeout Timeout);
     void SetValues(const QString &Window, const QHash<QString,float> &Map, OSDTimeout Timeout);
