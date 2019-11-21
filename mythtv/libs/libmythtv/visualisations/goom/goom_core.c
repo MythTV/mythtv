@@ -252,16 +252,16 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
                                      ((pointHeight - 6.0F) * largfactor + 5.0F),
                                      i * 152.0F, 128.0F, s_loopVar + i * 2032);
 			pointFilter (p1 + c_offset, ORANGE,
-                                     ((pointWidth / 2) * largfactor) / i + 10.0F * i,
-                                     ((pointHeight / 2) * largfactor) / i + 10.0F * i,
+                                     ((pointWidth  / 2.0F) * largfactor) / i + 10.0F * i,
+                                     ((pointHeight / 2.0F) * largfactor) / i + 10.0F * i,
                                      96.0F, i * 80.0F, s_loopVar / i);
 			pointFilter (p1 + c_offset, VIOLET,
-                                     ((pointHeight / 3 + 5.0F) * largfactor) / i + 10.0F * i,
-                                     ((pointHeight / 3 + 5.0F) * largfactor) / i + 10.0F * i,
+                                     ((pointHeight / 3.0F + 5.0F) * largfactor) / i + 10.0F * i,
+                                     ((pointHeight / 3.0F + 5.0F) * largfactor) / i + 10.0F * i,
                                      i + 122.0F, 134.0F, s_loopVar / i);
 			pointFilter (p1 + c_offset, BLACK,
-                                     ((pointHeight / 3) * largfactor + 20.0F),
-                                     ((pointHeight / 3) * largfactor + 20.0F),
+                                     ((pointHeight / 3.0F) * largfactor + 20.0F),
+                                     ((pointHeight / 3.0F) * largfactor + 20.0F),
                                      58.0F, i * 66.0F, s_loopVar / i);
 			pointFilter (p1 + c_offset, WHITE,
                                      (pointHeight * largfactor + 10.0F * i) / i,
@@ -887,7 +887,7 @@ void choose_a_goom_line (float *param1, float *param2, int *couleur, int *mode, 
 		break;
 	case GML_HLINE:
 		if (iRAND (4) || far) {
-			*param1 = c_resoly / 7;
+			*param1 = c_resoly / 7.0F;
 			*param2 = 6.0F * c_resoly / 7.0F;
 		}
 		else {
