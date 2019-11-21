@@ -624,7 +624,7 @@ uint MpegRecorder::GetFilteredAudioSampleRate(void) const
     {
         case 32000: return V4L2_MPEG_AUDIO_SAMPLING_FREQ_32000;
         case 44100: return V4L2_MPEG_AUDIO_SAMPLING_FREQ_44100;
-        case 48000: return V4L2_MPEG_AUDIO_SAMPLING_FREQ_48000;
+        case 48000:
         default:    return V4L2_MPEG_AUDIO_SAMPLING_FREQ_48000;
     }
 }
@@ -661,14 +661,16 @@ static int streamtype_ivtv_to_v4l2(int st)
         case 0:  return V4L2_MPEG_STREAM_TYPE_MPEG2_PS;
         case 1:  return V4L2_MPEG_STREAM_TYPE_MPEG2_TS;
         case 2:  return V4L2_MPEG_STREAM_TYPE_MPEG1_VCD;
-        case 3:  return V4L2_MPEG_STREAM_TYPE_MPEG2_PS;  /* PES A/V    */
-        case 5:  return V4L2_MPEG_STREAM_TYPE_MPEG2_PS;  /* PES V      */
-        case 7:  return V4L2_MPEG_STREAM_TYPE_MPEG2_PS;  /* PES A      */
+        case 3:                                          /* PES A/V    */
+        case 5:                                          /* PES V      */
+        case 7:                                          /* PES A      */
+          return V4L2_MPEG_STREAM_TYPE_MPEG2_PS;
         case 10: return V4L2_MPEG_STREAM_TYPE_MPEG2_DVD;
         case 11: return V4L2_MPEG_STREAM_TYPE_MPEG1_VCD; /* VCD */
         case 12: return V4L2_MPEG_STREAM_TYPE_MPEG2_SVCD;
-        case 13: return V4L2_MPEG_STREAM_TYPE_MPEG2_DVD; /* DVD-Special 1 */
-        case 14: return V4L2_MPEG_STREAM_TYPE_MPEG2_DVD; /* DVD-Special 2 */
+        case 13:                                         /* DVD-Special 1 */
+        case 14:                                         /* DVD-Special 2 */
+            return V4L2_MPEG_STREAM_TYPE_MPEG2_DVD;
         default: return V4L2_MPEG_STREAM_TYPE_MPEG2_TS;
     }
 }

@@ -391,9 +391,8 @@ bool PTSListener::ProcessTSPacket(const TSPacket &tspacket)
                 m_ptsLast[stream_id] = pts;
                 if (m_ptsCount[stream_id] < 30)
                 {
-                    if (!m_ptsCount[stream_id])
-                        m_ptsFirst[stream_id] = pts;
-                    else if (pts < m_ptsFirst[stream_id])
+                    if ((!m_ptsCount[stream_id]) ||
+                        (pts < m_ptsFirst[stream_id]))
                         m_ptsFirst[stream_id] = pts;
                 }
                 m_ptsCount[stream_id]++;

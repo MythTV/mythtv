@@ -408,9 +408,8 @@ bool FileRingBuffer::ReOpen(QString newFilename)
 
     m_rwLock.lockForWrite();
 
-    if (m_tfw && m_tfw->ReOpen(newFilename))
-        result = true;
-    else if (m_remotefile && m_remotefile->ReOpen(newFilename))
+    if ((m_tfw && m_tfw->ReOpen(newFilename)) ||
+        (m_remotefile && m_remotefile->ReOpen(newFilename)))
         result = true;
 
     if (result)

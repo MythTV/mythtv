@@ -647,12 +647,7 @@ void DTVRecorder::HandleTimestamps(int stream_id, int64_t pts, int64_t dts)
 
     if (m_ts_count[stream_id] < 30)
     {
-        if (!m_ts_count[stream_id])
-        {
-            m_ts_first[stream_id] = ts;
-            m_ts_first_dt[stream_id] = MythDate::current();
-        }
-        else if (ts < m_ts_first[stream_id])
+        if (!m_ts_count[stream_id] || (ts < m_ts_first[stream_id]))
         {
             m_ts_first[stream_id] = ts;
             m_ts_first_dt[stream_id] = MythDate::current();
@@ -1356,11 +1351,9 @@ void DTVRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt, bool insert)
             bestAudioCodec = pmt->StreamType(i);
             switch (pmt->StreamType(i))
             {
-                case StreamID::MPEG1Audio:
-                    m_primaryAudioCodec = AV_CODEC_ID_MP2; // MPEG-1 Layer 2 (MP2)
-                    break;
-                case StreamID::MPEG2Audio:
-                    m_primaryAudioCodec = AV_CODEC_ID_MP2; // MPEG-2 Part 3 (MP2 Multichannel)
+                case StreamID::MPEG1Audio: // MPEG-1 Layer 2 (MP2)
+                case StreamID::MPEG2Audio: // MPEG-2 Part 3 (MP2 Multichannel)
+                    m_primaryAudioCodec = AV_CODEC_ID_MP2;
                     break;
                 case StreamID::MPEG2AACAudio:
                     m_primaryAudioCodec = AV_CODEC_ID_AAC;

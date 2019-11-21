@@ -837,9 +837,8 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
                  if (!m_commDetectBlankCanHaveLogo)
                      checkPixel = true;
 
-                 if (!m_logoInfoAvailable)
-                     checkPixel = true;
-                 else if (!m_logoDetector->pixelInsideLogo(x,y))
+                 if (!m_logoInfoAvailable ||
+                     !m_logoDetector->pixelInsideLogo(x,y))
                      checkPixel=true;
 
                  if (checkPixel)

@@ -622,8 +622,6 @@ void AudioOutputPulseAudio::ContextStateCallback(pa_context *c, void *arg)
     switch (pa_context_get_state(c))
     {
         case PA_CONTEXT_READY:
-            pa_threaded_mainloop_signal(audoutP->m_mainloop, 0);
-            break;
         case PA_CONTEXT_TERMINATED:
         case PA_CONTEXT_FAILED:
             pa_threaded_mainloop_signal(audoutP->m_mainloop, 0);

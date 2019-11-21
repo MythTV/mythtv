@@ -1687,7 +1687,7 @@ bool PlaybackBox::UpdateUILists(void)
             // Optionally ignore LiveTV programs if not viewing LiveTV group
             else if (!(m_viewMask & VIEW_LIVETVGRP) &&
                      !isLiveTvGroup && isLiveTVProg)
-            {
+            {   // NOLINT(bugprone-branch-clone)
                 continue;
             }
             // Optionally ignore watched

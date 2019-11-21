@@ -1843,9 +1843,9 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
         for (; it != m_askAllowPrograms.end(); ++it)
         {
             if (!(*it).m_isInSameInputGroup)
-                (*it).m_isConflicting = false;
+                (*it).m_isConflicting = false;    // NOLINT(bugprone-branch-clone)
             else if (cardid == (*it).m_info->GetInputID())
-                (*it).m_isConflicting = true;
+                (*it).m_isConflicting = true;    // NOLINT(bugprone-branch-clone)
             else if (!CardUtil::IsTunerShared(cardid, (*it).m_info->GetInputID()))
                 (*it).m_isConflicting = true;
             else if ((busy_input.m_mplexid &&
@@ -2283,10 +2283,6 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
         if ((mctx != ctx) && (GetPlayer(ctx,-1) == ctx))
             SetActive(mctx, 0, true);
     }
-    else if (TRANSITION(kState_WatchingRecording, kState_WatchingPreRecorded))
-    {
-        SET_NEXT();
-    }
     else if (TRANSITION(kState_None, kState_WatchingPreRecorded) ||
              TRANSITION(kState_None, kState_WatchingVideo) ||
              TRANSITION(kState_None, kState_WatchingDVD)   ||
@@ -2382,7 +2378,8 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
         if ((mctx != ctx) && (GetPlayer(ctx,-1) == ctx))
             SetActive(mctx, 0, true);
     }
-    else if (TRANSITION(kState_None, kState_None))
+    else if (TRANSITION(kState_WatchingRecording, kState_WatchingPreRecorded) ||
+             TRANSITION(kState_None, kState_None))
     {
         SET_NEXT();
     }
@@ -4152,21 +4149,35 @@ bool TV::ManualZoomHandleAction(PlayerContext *actx, const QStringList &actions)
     bool handled = true;
     bool updateOSD = true;
     ZoomDirection zoom = kZoom_END;
-    if (has_action(ACTION_ZOOMUP, actions))
+    if (has_action(ACTION_ZOOMUP, actions) ||
+        has_action(ACTION_UP, actions)     ||
+        has_action(ACTION_CHANNELUP, actions))
+    {
         zoom = kZoomUp;
-    else if (has_action(ACTION_ZOOMDOWN, actions))
+    }
+    else if (has_action(ACTION_ZOOMDOWN, actions) ||
+             has_action(ACTION_DOWN, actions)     ||
+             has_action(ACTION_CHANNELDOWN, actions))
+    {
         zoom = kZoomDown;
-    else if (has_action(ACTION_ZOOMLEFT, actions))
+    }
+    else if (has_action(ACTION_ZOOMLEFT, actions) ||
+             has_action(ACTION_LEFT, actions))
         zoom = kZoomLeft;
-    else if (has_action(ACTION_ZOOMRIGHT, actions))
+    else if (has_action(ACTION_ZOOMRIGHT, actions) ||
+             has_action(ACTION_RIGHT, actions))
         zoom = kZoomRight;
-    else if (has_action(ACTION_ZOOMASPECTUP, actions))
+    else if (has_action(ACTION_ZOOMASPECTUP, actions) ||
+             has_action(ACTION_VOLUMEUP, actions))
         zoom = kZoomAspectUp;
-    else if (has_action(ACTION_ZOOMASPECTDOWN, actions))
+    else if (has_action(ACTION_ZOOMASPECTDOWN, actions) ||
+             has_action(ACTION_VOLUMEDOWN, actions))
         zoom = kZoomAspectDown;
-    else if (has_action(ACTION_ZOOMIN, actions))
+    else if (has_action(ACTION_ZOOMIN, actions) ||
+             has_action(ACTION_JUMPFFWD, actions))
         zoom = kZoomIn;
-    else if (has_action(ACTION_ZOOMOUT, actions))
+    else if (has_action(ACTION_ZOOMOUT, actions) ||
+             has_action(ACTION_JUMPRWND, actions))
         zoom = kZoomOut;
     else if (has_action(ACTION_ZOOMVERTICALIN, actions))
         zoom = kZoomVerticalIn;
@@ -4176,49 +4187,19 @@ bool TV::ManualZoomHandleAction(PlayerContext *actx, const QStringList &actions)
         zoom = kZoomHorizontalIn;
     else if (has_action(ACTION_ZOOMHORIZONTALOUT, actions))
         zoom = kZoomHorizontalOut;
-    else if (has_action(ACTION_ZOOMQUIT, actions))
-    {
-        zoom = kZoomHome;
-        end_manual_zoom = true;
-    }
-    else if (has_action(ACTION_ZOOMCOMMIT, actions))
-    {
-        end_manual_zoom = true;
-        SetManualZoom(actx, false, tr("Zoom Committed"));
-    }
-    else if (has_action(ACTION_UP, actions) ||
-        has_action(ACTION_CHANNELUP, actions))
-    {
-        zoom = kZoomUp;
-    }
-    else if (has_action(ACTION_DOWN, actions) ||
-             has_action(ACTION_CHANNELDOWN, actions))
-    {
-        zoom = kZoomDown;
-    }
-    else if (has_action(ACTION_LEFT, actions))
-        zoom = kZoomLeft;
-    else if (has_action(ACTION_RIGHT, actions))
-        zoom = kZoomRight;
-    else if (has_action(ACTION_VOLUMEUP, actions))
-        zoom = kZoomAspectUp;
-    else if (has_action(ACTION_VOLUMEDOWN, actions))
-        zoom = kZoomAspectDown;
-    else if (has_action("ESCAPE", actions) ||
+    else if (has_action(ACTION_ZOOMQUIT, actions) ||
+             has_action("ESCAPE", actions)        ||
              has_action("BACK", actions))
     {
         zoom = kZoomHome;
         end_manual_zoom = true;
     }
-    else if (has_action(ACTION_SELECT, actions))
+    else if (has_action(ACTION_ZOOMCOMMIT, actions) ||
+             has_action(ACTION_SELECT, actions))
     {
         end_manual_zoom = true;
         SetManualZoom(actx, false, tr("Zoom Committed"));
     }
-    else if (has_action(ACTION_JUMPFFWD, actions))
-        zoom = kZoomIn;
-    else if (has_action(ACTION_JUMPRWND, actions))
-        zoom = kZoomOut;
     else
     {
         updateOSD = false;
@@ -4315,9 +4296,8 @@ bool TV::AudioSyncHandleAction(PlayerContext *ctx,
         ChangeAudioSync(ctx, 10);
     else if (has_action(ACTION_DOWN, actions))
         ChangeAudioSync(ctx, -10);
-    else if (has_action(ACTION_TOGGELAUDIOSYNC, actions))
-        ClearOSD(ctx);
-    else if (has_action(ACTION_SELECT, actions))
+    else if (has_action(ACTION_TOGGELAUDIOSYNC, actions) ||
+             has_action(ACTION_SELECT, actions))
         ClearOSD(ctx);
     else
         handled = false;
@@ -4341,9 +4321,8 @@ bool TV::SubtitleZoomHandleAction(PlayerContext *ctx,
         ChangeSubtitleZoom(ctx, 10);
     else if (has_action(ACTION_DOWN, actions))
         ChangeSubtitleZoom(ctx, -10);
-    else if (has_action(ACTION_TOGGLESUBTITLEZOOM, actions))
-        ClearOSD(ctx);
-    else if (has_action(ACTION_SELECT, actions))
+    else if (has_action(ACTION_TOGGLESUBTITLEZOOM, actions) ||
+             has_action(ACTION_SELECT, actions))
         ClearOSD(ctx);
     else
         handled = false;
@@ -4367,9 +4346,8 @@ bool TV::SubtitleDelayHandleAction(PlayerContext *ctx,
         ChangeSubtitleDelay(ctx, 25);
     else if (has_action(ACTION_DOWN, actions))
         ChangeSubtitleDelay(ctx, -25);
-    else if (has_action(ACTION_TOGGLESUBTITLEDELAY, actions))
-        ClearOSD(ctx);
-    else if (has_action(ACTION_SELECT, actions))
+    else if (has_action(ACTION_TOGGLESUBTITLEDELAY, actions) ||
+             has_action(ACTION_SELECT, actions))
         ClearOSD(ctx);
     else
         handled = false;
@@ -4524,7 +4502,7 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
     else if (has_action(ACTION_VIEWSCHEDULED, actions))
         EditSchedule(ctx, kViewSchedule);
     else if (HandleJumpToProgramAction(ctx, actions))
-    {
+    { // NOLINT(bugprone-branch-clone)
     }
     else if (has_action(ACTION_SIGNALMON, actions))
     {
@@ -6855,9 +6833,8 @@ void TV::DoQueueTranscode(PlayerContext *ctx, const QString& profile)
     if (ctx->GetState() == kState_WatchingPreRecorded)
     {
         bool stop = false;
-        if (m_queuedTranscode)
-            stop = true;
-        else if (JobQueue::IsJobQueuedOrRunning(
+        if (m_queuedTranscode ||
+            JobQueue::IsJobQueuedOrRunning(
                      JOB_TRANSCODE,
                      ctx->m_playingInfo->GetChanID(),
                      ctx->m_playingInfo->GetRecordingStartTime()))
@@ -9909,14 +9886,8 @@ PictureAttribute TV::NextPictureAdjustType(
         if (mp->HasAudioOut() && mp->PlayerControlsVolume())
             sup |= kPictureAttributeSupported_Volume;
     }
-    else if (kAdjustingPicture_Channel == type)
-    {
-        sup = (kPictureAttributeSupported_Brightness |
-               kPictureAttributeSupported_Contrast |
-               kPictureAttributeSupported_Colour |
-               kPictureAttributeSupported_Hue);
-    }
-    else if (kAdjustingPicture_Recording == type)
+    else if ((kAdjustingPicture_Channel == type) ||
+             (kAdjustingPicture_Recording == type))
     {
         sup = (kPictureAttributeSupported_Brightness |
                kPictureAttributeSupported_Contrast |
@@ -10415,15 +10386,13 @@ void TV::OSDDialogEvent(int result, const QString& text, QString action)
         {
             hide = HandleOSDCutpoint(actx, desc[1]);
         }
-        else if (valid && desc[0] == "DELETE")
+        else if ((valid && desc[0] == "DELETE") ||
+                 (valid && desc[0] == "CONFIRM"))
         {
         }
         else if (valid && desc[0] == ACTION_PLAY)
         {
             DoPlay(actx);
-        }
-        else if (valid && desc[0] == "CONFIRM")
-        {
         }
         else
         {
@@ -10431,7 +10400,7 @@ void TV::OSDDialogEvent(int result, const QString& text, QString action)
         }
     }
     else if (result < 0)
-        ; // exit dialog
+        ; // exit dialog // NOLINT(bugprone-branch-clone)
     else if (HandleTrackAction(actx, action))
         ;
     else if (action == ACTION_PAUSE)

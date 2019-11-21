@@ -176,25 +176,15 @@ bool PlaylistEditorView::Create(void)
 
 void PlaylistEditorView::customEvent(QEvent *event)
 {
-    if (event->type() == MusicPlayerEvent::MetadataChangedEvent)
-    {
+    if ((event->type() == MusicPlayerEvent::MetadataChangedEvent) ||
+        (event->type() == MusicPlayerEvent::AlbumArtChangedEvent))
+    { // NOLINT(bugprone-branch-clone)
         // TODO: this could be more efficient
         reloadTree();
     }
-    else if (event->type() == MusicPlayerEvent::AlbumArtChangedEvent)
-    {
-        // TODO: this could be more efficient
-        reloadTree();
-    }
-    else if (event->type() == MusicPlayerEvent::TrackRemovedEvent)
-    {
-        updateSelectedTracks();
-    }
-    else if (event->type() == MusicPlayerEvent::TrackAddedEvent)
-    {
-        updateSelectedTracks();
-    }
-    else if (event->type() == MusicPlayerEvent::AllTracksRemovedEvent)
+    else if ((event->type() == MusicPlayerEvent::TrackRemovedEvent) ||
+             (event->type() == MusicPlayerEvent::TrackAddedEvent)   ||
+             (event->type() == MusicPlayerEvent::AllTracksRemovedEvent))
     {
         updateSelectedTracks();
     }
@@ -536,7 +526,7 @@ void PlaylistEditorView::updateSonglist(MusicGenericTree *node)
     if (node->getAction() == "playlists" ||
         node->getAction() == "smartplaylists" ||
         node->getAction() == "smartplaylistcategory")
-    {
+    { // NOLINT(bugprone-branch-clone)
     }
     else if (node->getAction() == "trackid" || node->getAction() == "cdtrack")
     {
@@ -651,10 +641,8 @@ void PlaylistEditorView::ShowMenu(void)
             {
                 menu = createPlaylistMenu();
             }
-            else if (mnode->getAction() == "trackid")
-            {
-            }
-            else if (mnode->getAction() == "error")
+            else if ((mnode->getAction() == "trackid") ||
+                     (mnode->getAction() == "error"))
             {
             }
             else

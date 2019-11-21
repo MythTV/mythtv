@@ -1443,13 +1443,10 @@ bool MythUIText::ParseElement(
             m_Message = qApp->translate("ThemeUI",
                                         parseText(element).toUtf8());
         }
-        else if (element.attribute("lang", "").toLower() ==
-                 gCoreContext->GetLanguageAndVariant())
-        {
-            m_Message = parseText(element);
-        }
-        else if (element.attribute("lang", "").toLower() ==
-                 gCoreContext->GetLanguage())
+        else if ((element.attribute("lang", "").toLower() ==
+                  gCoreContext->GetLanguageAndVariant()) ||
+                 (element.attribute("lang", "").toLower() ==
+                  gCoreContext->GetLanguage()))
         {
             m_Message = parseText(element);
         }

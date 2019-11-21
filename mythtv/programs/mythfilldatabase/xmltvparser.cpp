@@ -348,7 +348,7 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
             if (info.tagName() == "title")
             {
                 if (info.attribute("lang") == "ja_JP")
-                {
+                {   // NOLINT(bugprone-branch-clone)
                     pginfo->m_title = getFirstText(info);
                 }
                 else if (info.attribute("lang") == "ja_JP@kana")

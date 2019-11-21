@@ -3650,9 +3650,8 @@ static QString remove_chaff(const QString &name)
         short_name = "pcHDTV HD-3000";
     else if (short_name.startsWith("bcm3510", Qt::CaseInsensitive))
         short_name = "Air2PC v1";
-    else if (short_name.startsWith("nxt2002", Qt::CaseInsensitive))
-        short_name = "Air2PC v2";
-    else if (short_name.startsWith("nxt200x", Qt::CaseInsensitive))
+    else if (short_name.startsWith("nxt2002", Qt::CaseInsensitive) ||
+             short_name.startsWith("nxt200x", Qt::CaseInsensitive))
         short_name = "Air2PC v2";
     else if (short_name.startsWith("lgdt3302", Qt::CaseInsensitive))
         short_name = "DViCO HDTV3";

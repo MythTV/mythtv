@@ -252,7 +252,7 @@ MPEG2fixup::MPEG2fixup(const QString &inf, const QString &outf,
             uint64_t mark = it.key();
             if (mark > 0)
             {
-                if (it.value() == MARK_CUT_START)
+                if (it.value() == MARK_CUT_START) // NOLINT(bugprone-branch-clone)
                     mark += 1; // +2 looks good, but keyframes are hit with +1
                 else
                     mark += 1;

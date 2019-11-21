@@ -837,7 +837,6 @@ static void handleDVDMedia(MythMediaDevice *dvd)
     switch (gCoreContext->GetNumSetting("DVDOnInsertDVD", 1))
     {
         case 0 : // Do nothing
-            break;
         case 1 : // Display menu (mythdvd)*/
             break;
         case 2 : // play DVD or Blu-ray

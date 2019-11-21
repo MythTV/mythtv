@@ -54,17 +54,9 @@ QString RecStatus::toString(RecStatus::Type recstatus, const QString &name)
             ret = QObject::tr("R", "RecStatusChar RecStatus::Recorded");
             break;
         case RecStatus::Recording:
-            ret = name;
-            break;
         case RecStatus::Tuning:
-            ret = name;
-            break;
         case RecStatus::Failing:
-            ret = name;
-            break;
         case RecStatus::WillRecord:
-            ret = name;
-            break;
         case RecStatus::Pending:
             ret = name;
             break;

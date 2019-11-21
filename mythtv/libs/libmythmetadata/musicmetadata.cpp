@@ -1243,7 +1243,7 @@ QString MusicMetadata::getAlbumArtFile(void)
     QString res;
 
     if ((albumart_image = m_albumArt->getImage(IT_FRONTCOVER)))
-        res = albumart_image->m_filename;
+        res = albumart_image->m_filename; // NOLINT(bugprone-branch-clone)
     else if ((albumart_image = m_albumArt->getImage(IT_UNKNOWN)))
         res = albumart_image->m_filename;
     else if ((albumart_image = m_albumArt->getImage(IT_BACKCOVER)))
@@ -2164,7 +2164,9 @@ ImageType AlbumArtImages::guessImageType(const QString &filename)
     ImageType type = IT_FRONTCOVER;
 
     if (filename.contains("front", Qt::CaseInsensitive) ||
-             filename.contains(tr("front"), Qt::CaseInsensitive))
+             filename.contains(tr("front"), Qt::CaseInsensitive) ||
+             filename.contains("cover", Qt::CaseInsensitive) ||
+             filename.contains(tr("cover"), Qt::CaseInsensitive))
         type = IT_FRONTCOVER;
     else if (filename.contains("back", Qt::CaseInsensitive) ||
              filename.contains(tr("back"),  Qt::CaseInsensitive))
@@ -2175,9 +2177,6 @@ ImageType AlbumArtImages::guessImageType(const QString &filename)
     else if (filename.contains("cd", Qt::CaseInsensitive) ||
              filename.contains(tr("cd"), Qt::CaseInsensitive))
         type = IT_CD;
-    else if (filename.contains("cover", Qt::CaseInsensitive) ||
-             filename.contains(tr("cover"), Qt::CaseInsensitive))
-        type = IT_FRONTCOVER;
 
     return type;
 }

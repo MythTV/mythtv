@@ -500,7 +500,7 @@ int main(int argc, char *argv[])
 
             int scantype = ScanTypeSetting::FullScan_ATSC;
             if (frequencyStandard == "atsc")
-                scantype = ScanTypeSetting::FullScan_ATSC;
+                scantype = ScanTypeSetting::FullScan_ATSC; // NOLINT(bugprone-branch-clone)
             else if (frequencyStandard == "dvbt")
                 scantype = ScanTypeSetting::FullScan_DVBT;
             else if (frequencyStandard == "mpeg")

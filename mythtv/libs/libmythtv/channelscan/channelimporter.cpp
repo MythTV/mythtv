@@ -1895,6 +1895,7 @@ OkCancelType ChannelImporter::ShowManualChannelPopup(
     OkCancelType rval = kOCTCancel;
     switch (dc) {
         case 0: rval = kOCTOk;        break;
+        // NOLINTNEXTLINE(bugprone-branch-clone)
         case 1: rval = kOCTCancel;    break;    // "Edit" is done already
         case 2: rval = kOCTCancel;    break;
         case 3: rval = kOCTCancelAll; break;
@@ -1965,6 +1966,7 @@ OkCancelType ChannelImporter::ShowResolveChannelPopup(
     switch (dc) {
         case 0: rval = kOCTOk;        break;
         case 1: rval = kOCTOkAll;     break;
+        // NOLINTNEXTLINE(bugprone-branch-clone)
         case 2: rval = kOCTCancel;    break;    // "Edit" is done already
         case 3: rval = kOCTCancel;    break;
         case 4: rval = kOCTCancelAll; break;

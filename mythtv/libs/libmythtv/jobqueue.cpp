@@ -1183,7 +1183,7 @@ bool JobQueue::InJobRunWindow(int orStartsWithinMins)
                     .arg(queueStartTimeStr).arg(queueEndTimeStr));
 
     if ((queueStartTime <= curTime) && (curTime < queueEndTime))
-    {
+    {   // NOLINT(bugprone-branch-clone)
         inTimeWindow = true;
     }
     else if ((queueStartTime > queueEndTime) &&

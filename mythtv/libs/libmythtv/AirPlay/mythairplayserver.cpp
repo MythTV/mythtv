@@ -877,11 +877,8 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + "Ignoring authorize request.");
     }
-    else if (req->GetURI() == "/setProperty")
-    {
-        status = HTTP_STATUS_NOT_FOUND;
-    }
-    else if (req->GetURI() == "/getProperty")
+    else if ((req->GetURI() == "/setProperty") ||
+             (req->GetURI() == "/getProperty"))
     {
         status = HTTP_STATUS_NOT_FOUND;
     }

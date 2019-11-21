@@ -1197,12 +1197,10 @@ void CC608Decoder::XDSPacketParse(const vector<unsigned char> &xds_buf)
         handled = XDSPacketParseProgram(xds_buf, (xds_class == 0x03));
     else if (xds_class == 0x05) // cont code: 0x06
         handled = XDSPacketParseChannel(xds_buf);
-    else if (xds_class == 0x07) // cont code: 0x08
-        ; // misc.
-    else if (xds_class == 0x09) // cont code: 0x0a
-        ; // public (aka weather)
-    else if (xds_class == 0x0b) // cont code: 0x0c
-        ; // reserved
+    else if ((xds_class == 0x07) || // cont code: 0x08 // misc.
+             (xds_class == 0x09) || // cont code: 0x0a // public (aka weather)
+             (xds_class == 0x0b))   // cont code: 0x0c // reserved
+        ;
     else if (xds_class == 0x0d) // cont code: 0x0e
         handled = true; // undefined
 

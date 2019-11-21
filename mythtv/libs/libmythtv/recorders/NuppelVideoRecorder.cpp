@@ -1968,7 +1968,7 @@ void NuppelVideoRecorder::WriteHeader(void)
             case AV_CODEC_ID_MSMPEG4V2:  vidfcc = FOURCC_MP42; break;
             case AV_CODEC_ID_MSMPEG4V1:  vidfcc = FOURCC_MPG4; break;
             case AV_CODEC_ID_MJPEG:      vidfcc = FOURCC_MJPG; break;
-            case AV_CODEC_ID_H263:       vidfcc = FOURCC_H263; break;
+            case AV_CODEC_ID_H263:
             case AV_CODEC_ID_H263P:      vidfcc = FOURCC_H263; break;
             case AV_CODEC_ID_H263I:      vidfcc = FOURCC_I263; break;
             case AV_CODEC_ID_MPEG1VIDEO: vidfcc = FOURCC_MPEG; break;
@@ -2356,7 +2356,6 @@ void NuppelVideoRecorder::FormatTT(struct VBIData *vbidata)
                     hid = 0;
                     goto ctrl;
                 case 0x08:              /* flash */
-                    goto ctrl;
                 case 0x09:              /* steady */
                     goto ctrl;
                 case 0x0a:              /* end box */
@@ -2402,9 +2401,7 @@ void NuppelVideoRecorder::FormatTT(struct VBIData *vbidata)
                     hold = 0;
                     goto ctrl;
                 case 0x0e:              /* SO */
-                    goto ctrl;
                 case 0x0f:              /* SI */
-                    goto ctrl;
                 case 0x1b:              /* ESC */
                     goto ctrl;
 
@@ -2708,9 +2705,8 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
 
     bool writesync = false;
 
-    if (!m_go7007 && (((fnum-m_startnum)>>1) % m_keyframedist == 0 && !skipsync))
-        writesync = true;
-    else if (m_go7007 && frame->forcekey)
+    if ((!m_go7007 && (((fnum-m_startnum)>>1) % m_keyframedist == 0 && !skipsync)) ||
+        (m_go7007 && frame->forcekey))
         writesync = true;
 
     if (writesync)

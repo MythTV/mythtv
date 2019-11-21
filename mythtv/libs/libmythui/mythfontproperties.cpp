@@ -349,7 +349,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(
                     newFont->m_face.setWeight(QFont::Light);
                 else if (weight == "normal" ||
                          weight == "3")
-                    newFont->m_face.setWeight(QFont::Normal);
+                    newFont->m_face.setWeight(QFont::Normal);    // NOLINT(bugprone-branch-clone)
                 else if (weight == "demibold" ||
                          weight == "4")
                     newFont->m_face.setWeight(QFont::DemiBold);
@@ -383,7 +383,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(
                     newFont->m_stretch = QFont::SemiCondensed;
                 else if (stretch == "unstretched" ||
                          stretch == "5")
-                    newFont->m_stretch = QFont::Unstretched;
+                    newFont->m_stretch = QFont::Unstretched;    // NOLINT(bugprone-branch-clone)
                 else if (stretch == "semiexpanded" ||
                          stretch == "6")
                     newFont->m_stretch = QFont::SemiExpanded;

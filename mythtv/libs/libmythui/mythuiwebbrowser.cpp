@@ -1609,15 +1609,9 @@ bool MythUIWebBrowser::keyPressEvent(QKeyEvent *event)
         {
             Scroll(m_actualBrowserArea.width(), 0);
         }
-        else if (action == "NEXTLINK")
-        {
-            m_browser->keyPressEvent(event);
-        }
-        else if (action == "PREVIOUSLINK")
-        {
-            m_browser->keyPressEvent(event);
-        }
-        else if (action == "FOLLOWLINK")
+        else if ((action == "NEXTLINK")     ||
+                 (action == "PREVIOUSLINK") ||
+                 (action == "FOLLOWLINK"))
         {
             m_browser->keyPressEvent(event);
         }

@@ -1339,22 +1339,18 @@ void CriteriaRowEditor::enableSaveButton()
             enabled = true;
         else if (Field->m_type == ftDate)
         {
-            if (Operator->m_noOfArguments == 0)
-                enabled = true;
-            else if (Operator->m_noOfArguments == 1 && !m_value1Selector->GetValue().isEmpty())
-                enabled = true;
-            else if (Operator->m_noOfArguments == 2 && !m_value1Selector->GetValue().isEmpty()
-                                                  && !m_value2Selector->GetValue().isEmpty())
+            if ((Operator->m_noOfArguments == 0) ||
+                (Operator->m_noOfArguments == 1 && !m_value1Selector->GetValue().isEmpty()) ||
+                (Operator->m_noOfArguments == 2 && !m_value1Selector->GetValue().isEmpty()
+                                                  && !m_value2Selector->GetValue().isEmpty()))
                 enabled = true;
         }
         else // ftString
         {
-            if (Operator->m_noOfArguments == 0)
-                enabled = true;
-            else if (Operator->m_noOfArguments == 1 && !m_value1Edit->GetText().isEmpty())
-                enabled = true;
-            else if (Operator->m_noOfArguments == 2 && !m_value1Edit->GetText().isEmpty()
-                                                  && !m_value2Edit->GetText().isEmpty())
+            if ((Operator->m_noOfArguments == 0) ||
+                (Operator->m_noOfArguments == 1 && !m_value1Edit->GetText().isEmpty()) ||
+                (Operator->m_noOfArguments == 2 && !m_value1Edit->GetText().isEmpty()
+                                                  && !m_value2Edit->GetText().isEmpty()))
                 enabled = true;
         }
     }
@@ -1547,12 +1543,8 @@ void CriteriaRowEditor::valueButtonClicked(void)
         msg = tr("Select a Title");
         searchList = MusicMetadata::fillFieldList("title");
     }
-    else if (m_fieldSelector->GetValue() == "Last Play")
-    {
-        editDate();
-        return;
-    }
-    else if (m_fieldSelector->GetValue() == "Date Imported")
+    else if ((m_fieldSelector->GetValue() == "Last Play") ||
+             (m_fieldSelector->GetValue() == "Date Imported"))
     {
         editDate();
         return;

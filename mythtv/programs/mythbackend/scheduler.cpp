@@ -2453,7 +2453,7 @@ bool Scheduler::HandleReschedule(void)
         if (p->GetRecordingStatus() != p->m_oldrecstatus)
         {
             if (p->GetRecordingEndTime() < m_schedTime)
-                p->AddHistory(false, false, false);
+                p->AddHistory(false, false, false); // NOLINT(bugprone-branch-clone)
             else if (p->GetRecordingStartTime() < m_schedTime &&
                      p->GetRecordingStatus() != RecStatus::WillRecord &&
                      p->GetRecordingStatus() != RecStatus::Pending)

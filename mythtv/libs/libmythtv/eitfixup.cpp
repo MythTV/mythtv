@@ -1841,11 +1841,8 @@ void EITFixUp::FixPRO7(DBEventEIT &event) const
                 {
                     role = DBPerson::kDirector;
                 }
-                else if (QString::compare (tmpOne.cap(1), "Drehbuch") == 0)
-                {
-                    role = DBPerson::kWriter;
-                }
-                else if (QString::compare (tmpOne.cap(1), "Autor") == 0)
+                else if ((QString::compare (tmpOne.cap(1), "Drehbuch") == 0) ||
+                         (QString::compare (tmpOne.cap(1), "Autor") == 0))
                 {
                     role = DBPerson::kWriter;
                 }
@@ -3037,7 +3034,8 @@ void EITFixUp::FixUnitymedia(DBEventEIT &event) const
     QMap<QString,QString>::iterator i = event.m_items.begin();
     while (i != event.m_items.end())
     {
-        if (QString::compare (i.key(), "Role Player") == 0)
+        if ((QString::compare (i.key(), "Role Player") == 0) ||
+            (QString::compare (i.key(), "Performing Artist") == 0))
         {
             event.AddPerson (DBPerson::kActor, i.value());
             i = event.m_items.erase (i);
@@ -3050,11 +3048,6 @@ void EITFixUp::FixUnitymedia(DBEventEIT &event) const
         else if (QString::compare (i.key(), "Commentary or Commentator") == 0)
         {
             event.AddPerson (DBPerson::kCommentator, i.value());
-            i = event.m_items.erase (i);
-        }
-        else if (QString::compare (i.key(), "Performing Artist") == 0)
-        {
-            event.AddPerson (DBPerson::kActor, i.value());
             i = event.m_items.erase (i);
         }
         else if (QString::compare (i.key(), "Presenter") == 0)

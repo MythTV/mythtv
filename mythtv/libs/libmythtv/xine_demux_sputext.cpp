@@ -352,7 +352,7 @@ static subtitle_t *sub_read_line_subrip(demux_sputext_t *demuxstr,subtitle_t *cu
             temp_line[temp_index++]='i';
             temp_line[temp_index++]='>';
 #else
-          if(strncmp(p,"{\\i1}",5) == 0) {
+          if(strncmp(p,"{\\i1}",5) == 0) { // NOLINT(bugprone-branch-clone)
 #endif
             p+=4;
           }

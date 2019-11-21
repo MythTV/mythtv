@@ -151,7 +151,7 @@ uint VideoBuffers::GetNumBuffers(int PixelFormat, int MaxReferenceFrames, bool D
         case FMT_VDPAU: return refs + 12;
         // Copyback of hardware frames. These decoders are buffering internally
         // already - so no need for a large presentation buffer
-        case FMT_NONE:  return 8;
+        case FMT_NONE:  return 8; // NOLINT(bugprone-branch-clone)
         // As for copyback, these decoders buffer internally
         case FMT_NVDEC: return 8;
         case FMT_MEDIACODEC: return 8;
@@ -258,6 +258,7 @@ void VideoBuffers::SetDeinterlacingFlags(VideoFrame &Frame, MythDeintType Single
             Frame.deinterlace_allowed = kSoftware | kShader;
     }
     else if (FMT_DRMPRIME == Frame.codec)
+        // NOLINTNEXTLINE(bugprone-branch-clone)
         Frame.deinterlace_allowed = kShader; // No driver deint - if RGBA frames are returned, shaders will be disabled
     else if (FMT_MMAL == Frame.codec)
         Frame.deinterlace_allowed = kShader; // No driver deint yet (TODO) and YUV frames returned
@@ -266,6 +267,7 @@ void VideoBuffers::SetDeinterlacingFlags(VideoFrame &Frame, MythDeintType Single
     else if (FMT_NVDEC == Frame.codec)
         Frame.deinterlace_allowed = kShader | kDriver; // YUV frames and decoder deint
     else if (FMT_VDPAU == Frame.codec)
+        // NOLINTNEXTLINE(bugprone-branch-clone)
         Frame.deinterlace_allowed = kDriver; // No YUV frames for shaders
     else if (FMT_VAAPI == Frame.codec)
         Frame.deinterlace_allowed = kDriver; // DRM will allow shader if no VPP
