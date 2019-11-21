@@ -16,7 +16,7 @@ import tempfile
 import warnings
 import logging
 import datetime
-from fuzzywuzzy import process
+from MythTV.utility import levenshtein
 
 
 """Simple-to-use Python interface to The TVDB's API (thetvdb.com)
@@ -945,14 +945,10 @@ class Tvdb:
                 ui = ConsoleUI(config=self.config)
 
         if self.config['sort_series']:
-            lookup = dict()
-            choices = list()
-            for i, s in enumerate(allSeries):
-                lookup[s[u'seriesName']] = i
-                choices.append(s[u'seriesName'])
-            seriesList2 = process.extract(series, choices)
-            allSeries2 = [allSeries[lookup[si[0]]] for si in seriesList2]
-            return ui.selectSeries(allSeries2)
+            series_lowercase = series.lower()
+            for s in allSeries:
+                s[u'match_similarity'] = levenshtein(series_lowercase, s[u'seriesName'].lower())
+            allSeries.sort(key=lambda s: s[u'match_similarity'])
 
         return ui.selectSeries(allSeries)
 
