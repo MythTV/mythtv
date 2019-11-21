@@ -1521,7 +1521,11 @@ def searchseries(t, opts, series_season_ep):
     series_name=''
     key = series_season_ep[0].lower()
     if opts.configure != "" and key in override:
-        series_name=override[key][0] # Override series name
+        if override[key][2]:
+            series_name=override[key][2] # Override series name
+            SID = True
+        else:
+            series_name=override[key][0] # Override series name
     else:
         series_name=series_season_ep[0] # Leave the series name alone
     try:
@@ -1880,9 +1884,14 @@ def Getseries_episode_numbers(t, opts, series_season_ep):
     global xmlFlag
     series_name=''
     ep_name=''
+    series_sid = None
     key = series_season_ep[0].lower()
     if opts.configure != "" and key in override:
-        series_name=override[key][0] # Override series name
+        if override[key][2]:
+            series_sid=override[key][2] # Override series name
+            SID = True
+        else:
+            series_name=override[key][0] # Override series name
         ep_name=series_season_ep[1]
         if len(override[series_season_ep[0].lower()][1]) != 0: # Are there search-replace strings?
             ep_name=massageEpisode_name(ep_name, series_season_ep)
@@ -1890,7 +1899,10 @@ def Getseries_episode_numbers(t, opts, series_season_ep):
         series_name=series_season_ep[0] # Leave the series name alone
         ep_name=series_season_ep[1] # Leave the episode name alone
 
-    series = search_for_series(t, series_name, opts.language)
+    if series_sid:
+        series = search_for_series(t, series_sid, opts.language)
+    else:
+        series = search_for_series(t, series_name, opts.language)
     season_ep_num = series.fuzzysearch(ep_name, 'episodename')
     if len(season_ep_num) != 0:
         for episode in sorted(season_ep_num, key=lambda ep: _episode_sort(ep), reverse=True):
@@ -1936,6 +1948,7 @@ def initialize_override_dictionary(useroptions, language):
         sys.exit(1)
     massage = {}
     overrides = {}
+    overrides_id = {}
     cfg = ConfigParser.SafeConfigParser()
     cfg.read(useroptions)
 
@@ -1991,16 +2004,17 @@ def initialize_override_dictionary(useroptions, language):
                     sys.stdout.write("! Invalid Series (no matches found in thetvdb,com) (%s) sid (%s) in config file\n" % (key, sid))
                     sys.exit(1)
                 overrides[key]=unicode(series_name_sid.data[u'seriesName'])   #.encode('utf-8')
+                overrides_id[key] = sid
             continue
 
     for key in overrides.keys():
-        override[key] = [overrides[key],[]]
+        override[key] = [overrides[key],[],overrides_id[key]]
 
     for key in massage.keys():
         if key in override:
             override[key][1]=massage[key]
         else:
-            override[key]=[key, massage[key]]
+            override[key]=[key, massage[key], None]
     return
 # END initialize_override_dictionary
 
@@ -2435,7 +2449,10 @@ def main():
         try:
             key = series_season_ep[0].lower()
             if opts.configure != "" and key in override:
-                allSeries = t._getSeries(override[key][0])
+                if override[key][2]:
+                    allSeries = t._getSeries(override[key][2], True)
+                else:
+                    allSeries = t._getSeries(override[key][0])
             else:
                 allSeries=t._getSeries(series_season_ep[0])
         except tvdb_shownotfound:

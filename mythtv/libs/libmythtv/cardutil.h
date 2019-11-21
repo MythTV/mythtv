@@ -320,6 +320,8 @@ class MTV_PUBLIC CardUtil
     static QString      GetInputName(uint inputid);
     static QString      GetStartingChannel(uint inputid);
     static QString      GetDisplayName(uint inputid);
+    static bool         IsUniqueDisplayName(const QString &name,
+                                            uint exclude_inputid);
     static uint         GetSourceID(uint inputid);
 
     // Input Groups

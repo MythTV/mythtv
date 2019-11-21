@@ -11,10 +11,11 @@ from datetime import datetime as _pydatetime, \
                      tzinfo as _pytzinfo, \
                      timedelta
 from collections import namedtuple
+from future.utils import with_metaclass
 import os
 import re
 import time
-from . import singleton
+from .singleton import InputSingleton
 time.tzset()
 
 class basetzinfo( _pytzinfo ):
@@ -116,12 +117,11 @@ class basetzinfo( _pytzinfo ):
 #    database.
 #    """
 
-class posixtzinfo( basetzinfo ):
+class posixtzinfo( with_metaclass(InputSingleton, basetzinfo) ):
     """
     Customized timezone class that can import timezone data from the local
     POSIX zoneinfo files.
     """
-    __metaclass__ = singleton.InputSingleton
     _Count = namedtuple('Count', \
                         'gmt_indicators std_indicators leap_seconds '+\
                         'transitions types abbrevs')
@@ -129,7 +129,7 @@ class posixtzinfo( basetzinfo ):
     @staticmethod
     def _get_version(fd):
         """Confirm zoneinfo file magic string, and return version number."""
-        if fd.read(4) != 'TZif':
+        if fd.read(4) != b'TZif':
             raise MythTZError(MythTZError.TZ_INVALID_FILE)
         version = fd.read(1) # read version number
         fd.seek(15, 1) # skip reserved bytes
@@ -163,6 +163,7 @@ class posixtzinfo( basetzinfo ):
         # files have massively negative leading entries for e.g. the
         # big bang which gmtime() cannot cope with.
         first_modern_transition = None
+        i = 0   # assign i, in case the for-loop is not executed:
         for i in range(counts.transitions):  # read in epoch time data
             t = unpack(ttmfmt, fd.read(calcsize(ttmfmt)))[0]
 
@@ -171,11 +172,15 @@ class posixtzinfo( basetzinfo ):
                 transitions[i] = ([t, tt, None, None, None, None])
                 if first_modern_transition is None:
                     first_modern_transition = i
-            except ValueError as e:
+            except (ValueError, OSError) as e:
                 # ValueError is only accepted until we have seen a modern
                 # transition.
                 if first_modern_transition is not None:
                     raise e
+
+        # Special case if there are no modern transitions, like e.g. UTC timezone:
+        if ( (i == 0) and first_modern_transition is None ):
+            first_modern_transition = counts.transitions
 
         # read in transition type indexes
         types = [None]*counts.transitions
@@ -197,7 +202,7 @@ class posixtzinfo( basetzinfo ):
             transitions[i][5] = isdst
 
         # read in type names
-        for i, name in enumerate(fd.read(counts.abbrevs)[:-1].split('\0')):
+        for i, name in enumerate(fd.read(counts.abbrevs)[:-1].split(b'\0')):
             for j in range(first_modern_transition, counts.transitions):
                 if types[j] == i:
                     transitions[j][4] = name
@@ -217,17 +222,18 @@ class posixtzinfo( basetzinfo ):
 
     def __init__(self, name=None):
         if name:
-            fd = open('/usr/share/zoneinfo/' + name)
+            fd = open('/usr/share/zoneinfo/' + name, 'rb')
         elif os.getenv('TZ'):
-            fd = open('/usr/share/zoneinfo/' + os.getenv('TZ'))
+            fd = open('/usr/share/zoneinfo/' + os.getenv('TZ'), 'rb')
         else:
-            fd = open('/etc/localtime')
+            fd = open('/etc/localtime', 'rb')
 
         version = self._get_version(fd)
         if version == 2:
             self._process(fd, skip=True)
             self._get_version(fd)
         self._process(fd, version)
+        fd.close()
 
 class offsettzinfo( _pytzinfo ):
     """Customized timezone class that provides a simple static offset."""
@@ -425,7 +431,7 @@ class datetime( _pydatetime ):
             tz = cls.localTZ()
         dt.append(tz)
 
-        return cls(*tz)
+        return cls(*dt)
 
     @classmethod
     def duck(cls, t):
@@ -469,7 +475,10 @@ class datetime( _pydatetime ):
         return self.astimezone(self.UTCTZ()).strftime('%Y%m%d%H%M%S')
 
     def timestamp(self):
-        return time.mktime(self.timetuple()) + self.microsecond/1000000.
+         # utc time = local time - utc offset
+         utc_naive = self.replace(tzinfo=None) - self.utcoffset()
+         utc_epoch = self.utcfromtimestamp(0).replace(tzinfo=None)
+         return ((utc_naive - utc_epoch).total_seconds())
 
     def rfcformat(self):
         return self.strftime('%a, %d %b %Y %H:%M:%S %z')

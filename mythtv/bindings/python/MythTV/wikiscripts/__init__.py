@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from wikiscripts import *
+from .wikiscripts import *
 
 
 if __name__ == '__main__':

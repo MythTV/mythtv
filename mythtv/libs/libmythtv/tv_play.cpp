@@ -8060,20 +8060,14 @@ void TV::UpdateOSDSeekMessage(const PlayerContext *ctx,
     }
 }
 
-void TV::UpdateOSDInput(const PlayerContext *ctx, QString inputname)
+void TV::UpdateOSDInput(const PlayerContext *ctx)
 {
     if (!ctx->m_recorder || !ctx->m_tvchain)
         return;
 
     int cardid = ctx->GetCardID();
 
-    if (inputname.isEmpty())
-        inputname = ctx->m_tvchain->GetInputName(-1);
-
     QString displayName = CardUtil::GetDisplayName(cardid);
-    // If a display name doesn't exist use cardid and inputname
-    if (displayName.isEmpty())
-        displayName = QString("%1: %2").arg(cardid).arg(inputname);
 
     SetOSDMessage(ctx, displayName);
 }

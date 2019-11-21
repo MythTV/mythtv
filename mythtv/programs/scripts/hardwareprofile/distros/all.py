@@ -17,7 +17,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 
 #from gentoo.main import create_gentoo
-from mythtv_data.main import create_mythtv
+from distros.mythtv_data.main import create_mythtv
 
 def get():
     #res = [create_gentoo(),create_mythtv()]

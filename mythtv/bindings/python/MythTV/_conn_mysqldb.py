@@ -34,12 +34,12 @@ class LoggedCursor( MySQLdb.cursors.Cursor ):
         super(LoggedCursor, self).__init__(connection)
         self.log = None
         self.ping = ref(self._ping121)
-        if MySQLdb.version_info >= ('1','2','2'):
+        if MySQLdb.version_info >= (1, 2, 2):
             self.ping = ref(self._ping122)
         self.ping()
 
-    def _ping121(self): self._get_db().ping(True)
-    def _ping122(self): self._get_db().ping()
+    def _ping121(self): self._get_db().ping()
+    def _ping122(self): self._get_db().ping(True)
 
     def _sanitize(self, query): return query.replace('?', '%s')
 

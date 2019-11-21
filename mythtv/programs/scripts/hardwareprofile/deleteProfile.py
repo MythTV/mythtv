@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2
 
 # smolt - Fedora hardware profiler
 #
@@ -19,10 +19,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 
+from __future__ import print_function
+from builtins import str
 import sys
-import urlgrabber.grabber
+import requests
 from optparse import OptionParser
-from urlparse import urljoin
 
 
 def main():
@@ -36,7 +37,7 @@ def main():
     def serverMessage(page):
         for line in page.split("\n"):
             if 'ServerMessage:' in line:
-                error(_('Server Message: "%s"') % line.split('ServerMessage: ')[1])
+                error(_('Server Message: "%s"' % line.split('ServerMessage: ')[1]))
                 if 'Critical' in line:
                     sys.exit(3)
 
@@ -78,10 +79,13 @@ def main():
     smolt.DEBUG = opts.DEBUG
     smolt.hw_uuid_file = opts.uuidFile
 
-    grabber = urlgrabber.grabber.URLGrabber(user_agent=opts.user_agent, timeout=opts.timeout)
-
     uuid = smolt.read_uuid()
     delHostString = 'uuid=%s' % uuid
+
+    session = requests.Session()
+    session.headers.update({'USER-AGENT': opts.user_agent})
+    session.headers.update({'Content-type': 'application/x-www-form-urlencoded'})
+    session.headers.update({'Content-length': '%i' % len(delHostString)})
 
     # Try retrieving current pub_uuid  (from cache or remotely if necessary)
     pub_uuid = None
@@ -90,25 +94,29 @@ def main():
     except PubUUIDError:
         pass
 
+    exceptions = (requests.exceptions.HTTPError,
+                  requests.exceptions.URLRequired,
+                  requests.exceptions.Timeout,
+                  requests.exceptions.ConnectionError,
+                  requests.exceptions.InvalidURL)
 
     try:
-        o=grabber.urlopen(urljoin(opts.smoonURL + '/', '/client/delete'), data=delHostString, http_headers=(
-                        ('Content-length', '%i' % len(delHostString)),
-                        ('Content-type', 'application/x-www-form-urlencoded')))
-    except urlgrabber.grabber.URLGrabError, e:
+        o = session.post(opts.smoonURL + 'client/delete', data=delHostString,
+                         timeout=opts.timeout)
+    except exceptions as e:
         sys.stderr.write(_('Error contacting Server:'))
         sys.stderr.write(str(e))
         sys.stderr.write('\n')
         sys.exit(1)
     else:
-        serverMessage(o.read())
-        o.close()
+        serverMessage(o.text)
+        session.close()
 
     if pub_uuid is None:
-        profile_url = urljoin(opts.smoonURL + '/', '/client/show?%s' % delHostString)
+        profile_url = opts.smoonURL + 'client/show?%s' % delHostString
     else:
         profile_url = get_profile_link(opts.smoonURL, pub_uuid)
-    print _('Profile removed, please verify at'), profile_url
+    print((_('Profile removed, please verify at'), profile_url))
 
 
 if __name__ == '__main__':

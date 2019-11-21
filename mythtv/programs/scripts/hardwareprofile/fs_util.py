@@ -2,7 +2,7 @@
 # fs_util.py - misc. routines not categorized in other modules
 #
 # Copyright 2008 Mike McGrath
-# This file incorporates work covered by the following copyright 
+# This file incorporates work covered by the following copyright
 # Copyright 2006-2007 Red Hat, Inc.
 #
 # This copyrighted material is made available to anyone wishing to use, modify,
@@ -17,12 +17,13 @@
 # Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  Any Red Hat
 # trademarks that are incorporated in the source code or documentation are not
 # subject to the GNU General Public License and may only be used or replicated
-# with the express permission of Red Hat, Inc. 
+# with the express permission of Red Hat, Inc.
 #
 
+from builtins import object
 import os
 
-# We cache the contents of /etc/mtab ... the following variables are used 
+# We cache the contents of /etc/mtab ... the following variables are used
 # to keep our cache in sync
 mtab_mtime = None
 mtab_map = []
@@ -46,7 +47,7 @@ class MntEntObj(object):
     def __str__(self):
         return "%s %s %s %s %s %s" % (self.mnt_fsname, self.mnt_dir, self.mnt_type, \
                                       self.mnt_opts, self.mnt_freq, self.mnt_passno)
-        
+
 class FileSystem(object):
     def __init__(self, mntent):
         self.mnt_dev = mntent.mnt_fsname
@@ -65,7 +66,7 @@ class FileSystem(object):
             self.f_files = stat_res.f_files
             self.f_ffree = stat_res.f_ffree
             self.f_favail = stat_res.f_favail
-        
+
     def to_dict(self):
         return dict(mnt_pnt=self.mnt_pnt, fs_type=self.fs_type, f_favail=self.f_favail,
                     f_bsize=self.f_bsize, f_frsize=self.f_frsize, f_blocks=self.f_blocks,
@@ -74,12 +75,12 @@ class FileSystem(object):
 
     def __str__(self):
         return "%s %s %s %s %s %s %s %s %s %s %s" % \
-            (self.mnt_dev, self.mnt_pnt, self.fs_type, 
+            (self.mnt_dev, self.mnt_pnt, self.fs_type,
              self.f_bsize, self.f_frsize, self.f_blocks,
              self.f_bfree, self.f_bavail, self.f_files,
              self.f_ffree, self.f_favail)
 
-        
+
 
 def get_mtab(mtab="/proc/mounts", vfstype=None):
     global mtab_mtime, mtab_map
@@ -129,10 +130,10 @@ def get_file_device_path(fname):
 
     # find a best match
     fdir = os.path.dirname(fname)
-    match = mtab_dict.has_key(fdir)
+    match = fdir in mtab_dict
     while not match:
         fdir = os.path.realpath(os.path.join(fdir, os.path.pardir))
-        match = mtab_dict.has_key(fdir)
+        match = fdir in mtab_dict
 
     # construct file path relative to device
     if fdir != os.path.sep:

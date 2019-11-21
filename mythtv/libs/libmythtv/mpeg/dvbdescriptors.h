@@ -805,7 +805,7 @@ class SatelliteDeliverySystemDescriptor : public MPEGDescriptor
         return ((_data[2]<<24) | (_data[3]<<16) |
                 (_data[4]<<8)  | (_data[5]));
     }
-    unsigned long long FrequencyHz(void) const
+    unsigned long long FrequencykHz(void) const
     {
         return byte4BCD2int(_data[2], _data[3], _data[4], _data[5]) * 10;
     }

@@ -17,17 +17,20 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 
+from __future__ import print_function
+from future import standard_library
+standard_library.install_aliases()
 import smolt
-import json, urllib
+import json, urllib.request, urllib.parse, urllib.error
 from i18n import _
 from smolt_config import get_config_attr
 
 def rating(profile, smoonURL, gate):
-    print ""
-    print _("Current rating for vendor/model.")
-    print ""
-    scanURL='%s/client/host_rating?vendor=%s&system=%s' % (smoonURL, urllib.quote(profile.host.systemVendor), urllib.quote(profile.host.systemModel))
-    r = json.load(urllib.urlopen(scanURL))['ratings']
+    print("")
+    print(_("Current rating for vendor/model."))
+    print("")
+    scanURL='%s/client/host_rating?vendor=%s&system=%s' % (smoonURL, urllib.parse.quote(profile.host.systemVendor), urllib.parse.quote(profile.host.systemModel))
+    r = json.load(urllib.request.urlopen(scanURL))['ratings']
     rating_system = { '0' : _('Unrated/Unknown'),
                       '1' : _('Non-working'),
                       '2' : _('Partially-working'),
@@ -35,13 +38,13 @@ def rating(profile, smoonURL, gate):
                       '4' : _('Works, needs additional configuration'),
                       '5' : _('Works out of the box')
                     }
-    print "\tCount\tRating"
-    print "\t-----------------"
+    print("\tCount\tRating")
+    print("\t-----------------")
     for rate in r:
-        print "\t%s\t%s" % (r[rate], rating_system[rate])
+        print("\t%s\t%s" % (r[rate], rating_system[rate]))
 
 def scan(profile, smoonURL, gate):
-    print _("Scanning %s for known errata.\n" % smoonURL)
+    print(_("Scanning %s for known errata.\n" % smoonURL))
     devices = []
     for VendorID, DeviceID, SubsysVendorID, SubsysDeviceID, Bus, Driver, Type, Description in profile.deviceIter():
         if VendorID:
@@ -51,15 +54,15 @@ def scan(profile, smoonURL, gate):
                                              int(SubsysVendorID or 0),
                                              int(SubsysDeviceID or 0)) )
     searchDevices = 'NULLPAGE'
-    devices.append('System/%s/%s' % ( urllib.quote(profile.host.systemVendor), urllib.quote(profile.host.systemModel) ))
+    devices.append('System/%s/%s' % ( urllib.parse.quote(profile.host.systemVendor), urllib.parse.quote(profile.host.systemModel) ))
     for dev in devices:
         searchDevices = "%s|%s" % (searchDevices, dev)
-    scanURL='%s/smolt-w/api.php' % smoonURL
+    scanURL='%ssmolt-w/api.php' % smoonURL
     scanData = 'action=query&titles=%s&format=json' % searchDevices
     try:
-         r = json.load(urllib.urlopen(scanURL, scanData))
+         r = json.load(urllib.request.urlopen(scanURL, bytes(scanData, 'latin1')))
     except ValueError:
-        print "Could not wiki for errata!"
+        print("Could not wiki for errata!")
         return
     found = []
 
@@ -71,14 +74,14 @@ def scan(profile, smoonURL, gate):
             pass
 
     if found:
-        print _("\tErrata Found!")
-        for f in found: print "\t%s" % f
+        print(_("\tErrata Found!"))
+        for f in found: print("\t%s" % f)
     else:
-        print _("\tNo errata found, if this machine is having issues please go to")
-        print _("\tyour profile and create a wiki page for the device so others can")
-        print _("\tbenefit")
-      
-if __name__ == "__main__":  
+        print(_("\tNo errata found, if this machine is having issues please go to"))
+        print(_("\tyour profile and create a wiki page for the device so others can"))
+        print(_("\tbenefit"))
+
+if __name__ == "__main__":
     from gate import create_passing_gate
     gate = create_passing_gate()
     smoonURL = get_config_attr("SMOON_URL", "http://smolts.org/")

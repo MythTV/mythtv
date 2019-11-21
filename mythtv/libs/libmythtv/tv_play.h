@@ -628,8 +628,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
 
     void UpdateOSDSeekMessage(const PlayerContext*,
                               const QString &mesg, enum OSDTimeout timeout);
-    void UpdateOSDInput(const PlayerContext*,
-                        QString inputname = QString());
+    void UpdateOSDInput(const PlayerContext*);
     void UpdateOSDSignal(const PlayerContext*, const QStringList &strlist);
     void UpdateOSDTimeoutMessage(PlayerContext*);
     void UpdateOSDAskAllowDialog(PlayerContext*);
