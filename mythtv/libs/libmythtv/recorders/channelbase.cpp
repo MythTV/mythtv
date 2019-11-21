@@ -727,30 +727,30 @@ ChannelBase *ChannelBase::CreateChannel(
         channel = new DummyChannel(tvrec);
         rbFileExt = "mpg";
     }
-    else if (genOpt.m_inputType == "FREEBOX") // IPTV
-    {
 #ifdef USING_IPTV
+    else if (genOpt.m_inputType == "FREEBOX") // IPTV
+    {   // NOLINTNEXTLINE(bugprone-branch-clone)
         channel = new IPTVChannel(tvrec, genOpt.m_videoDev);
-#endif
     }
+#endif
+#ifdef USING_VBOX
     else if (genOpt.m_inputType == "VBOX")
     {
-#ifdef USING_VBOX
         channel = new IPTVChannel(tvrec, genOpt.m_videoDev);
-#endif
     }
+#endif
+#ifdef USING_ASI
     else if (genOpt.m_inputType == "ASI")
     {
-#ifdef USING_ASI
         channel = new ASIChannel(tvrec, genOpt.m_videoDev);
-#endif
     }
+#endif
+#ifdef USING_CETON
     else if (genOpt.m_inputType == "CETON")
     {
-#ifdef USING_CETON
         channel = new CetonChannel(tvrec, genOpt.m_videoDev);
-#endif
     }
+#endif
     else if (genOpt.m_inputType == "V4L2ENC")
     {
 #ifdef USING_V4L2
