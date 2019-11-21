@@ -197,8 +197,6 @@ do_enhancements(struct enhance *eh, struct vt_page *vtp)
                switch (mode)
                {
                    case 1: // full row color
-                       row = adr;
-                       break;
                    case 4: // set active position
                        row = adr;
                        break;

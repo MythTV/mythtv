@@ -41,9 +41,8 @@ void CommBreakMap::SetAutoCommercialSkip(CommSkipMode autoskip, uint64_t framesp
 void CommBreakMap::SkipCommercials(int direction)
 {
     m_commBreakMapLock.lock();
-    if (m_skipcommercials == 0 && direction != 0)
-        m_skipcommercials = direction;
-    else if (m_skipcommercials != 0 && direction == 0)
+    if ((m_skipcommercials == 0 && direction != 0) ||
+        (m_skipcommercials != 0 && direction == 0))
         m_skipcommercials = direction;
     m_commBreakMapLock.unlock();
 }

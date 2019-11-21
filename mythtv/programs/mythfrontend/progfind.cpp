@@ -652,13 +652,11 @@ bool ProgFinder::formatSelectedData(QString& data, int charNum)
 
     if (charNum == 29 || charNum == 10)
     {
-        if (data.startsWith("The T") && charNum == 29)
+        if ((data.startsWith("The T") && charNum == 29) ||
+            (data.startsWith("The A") && charNum == 10))
             data = data.mid(4) + ", The";
-        else if (data.startsWith("The A") && charNum == 10)
-            data = data.mid(4) + ", The";
-        else if (data.startsWith("A T") && charNum == 29)
-            data = data.mid(2) + ", A";
-        else if (data.startsWith("A A") && charNum == 10)
+        else if ((data.startsWith("A T") && charNum == 29) ||
+                 (data.startsWith("A A") && charNum == 10))
             data = data.mid(2) + ", A";
         else if (data.startsWith("An A") && charNum == 10)
              data = data.mid(3) + ", An";

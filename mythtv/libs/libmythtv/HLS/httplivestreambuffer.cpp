@@ -1154,7 +1154,7 @@ protected:
                     usleep(500000);     // sleep 0.5s
                     if (retries == 2)   // and retry once again
                         continue;
-                    if (!m_parent->m_meta)
+                    if (!m_parent->m_meta) // NOLINT(bugprone-branch-clone)
                     {
                         // no other stream to default to, skip packet
                         retries = 0;

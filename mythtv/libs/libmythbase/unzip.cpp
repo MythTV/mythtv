@@ -395,7 +395,6 @@ UnZip::ErrorCode UnZip::extractAll(const QDir& dir, ExtractionOptions options)
 				end = true;
 			break;
 		case CreateDirFailed:
-			break;
 		case Skip:
 			break;
 		case SkipAll:

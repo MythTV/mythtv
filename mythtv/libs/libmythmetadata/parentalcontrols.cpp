@@ -26,12 +26,14 @@ namespace
         switch (cpl)
         {
             case ParentalLevel::plNone:
-            { rpl = ParentalLevel::plLowest; break; }
-            case ParentalLevel::plLowest: { rpl = ParentalLevel::plLow; break; }
-            case ParentalLevel::plLow: { rpl = ParentalLevel::plMedium; break; }
+                rpl = ParentalLevel::plLowest; break;
+            case ParentalLevel::plLowest:
+                rpl = ParentalLevel::plLow; break;
+            case ParentalLevel::plLow:
+                rpl = ParentalLevel::plMedium; break;
             case ParentalLevel::plMedium:
-            { rpl = ParentalLevel::plHigh; break; }
-            case ParentalLevel::plHigh: { rpl = ParentalLevel::plHigh; break; }
+            case ParentalLevel::plHigh:
+                rpl = ParentalLevel::plHigh; break;
         }
 
         return boundedParentalLevel(rpl);
@@ -42,13 +44,15 @@ namespace
         ParentalLevel::Level rpl(cpl);
         switch (cpl)
         {
-            case ParentalLevel::plNone: { rpl = ParentalLevel::plNone; break; }
+            case ParentalLevel::plNone:
+                rpl = ParentalLevel::plNone; break;
             case ParentalLevel::plLowest:
-            { rpl = ParentalLevel::plLowest; break; }
-            case ParentalLevel::plLow: { rpl = ParentalLevel::plLowest; break; }
-            case ParentalLevel::plMedium: { rpl = ParentalLevel::plLow; break; }
+            case ParentalLevel::plLow:
+                rpl = ParentalLevel::plLowest; break;
+            case ParentalLevel::plMedium:
+                rpl = ParentalLevel::plLow; break;
             case ParentalLevel::plHigh:
-            { rpl = ParentalLevel::plMedium; break; }
+                rpl = ParentalLevel::plMedium; break;
         }
 
         return boundedParentalLevel(rpl);

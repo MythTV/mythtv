@@ -312,9 +312,7 @@ static int handle_cc_c0_ext1_p16(CC708Reader* cc, uint service_num, int i)
             append_character(cc, service_num, 0x08);
         else if (FF==code)
             append_character(cc, service_num, 0x0c);
-        else if (CR==code)
-            append_character(cc, service_num, 0x0d);
-        else if (HCR==code)
+        else if ((CR==code) || (HCR==code))
             append_character(cc, service_num, 0x0d);
         i++;
     }

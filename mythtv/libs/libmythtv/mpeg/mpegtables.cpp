@@ -99,7 +99,7 @@ bool PSIPTable::HasCRC(void) const
     switch (TableID())
     {
         // MPEG
-        case TableID::PAT:
+        case TableID::PAT: // NOLINT(bugprone-branch-clone)
         case TableID::CAT:
         case TableID::PMT:
             has_crc = true;
@@ -138,7 +138,7 @@ bool PSIPTable::HasCRC(void) const
         case TableID::DIT:
             has_crc = false;
             break;
-        case TableID::SIT:
+        case TableID::SIT: // NOLINT(bugprone-branch-clone)
             has_crc = true;
             break;
 

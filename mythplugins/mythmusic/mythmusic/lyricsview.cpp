@@ -96,11 +96,8 @@ void LyricsView::customEvent(QEvent *event)
 {
     bool handled = false;
 
-    if (event->type() == MusicPlayerEvent::TrackChangeEvent)
-    {
-        findLyrics();
-    }
-    else if (event->type() == MusicPlayerEvent::PlayedTracksChangedEvent)
+    if ((event->type() == MusicPlayerEvent::TrackChangeEvent) ||
+        (event->type() == MusicPlayerEvent::PlayedTracksChangedEvent))
     {
         findLyrics();
     }
@@ -154,11 +151,8 @@ void LyricsView::customEvent(QEvent *event)
             {
                 saveLyrics();
             }
-            else if (resulttext == tr("Edit Lyrics"))
-            {
-                editLyrics();
-            }
-            else if (resulttext == tr("Add Lyrics"))
+            else if ((resulttext == tr("Edit Lyrics")) ||
+                     (resulttext == tr("Add Lyrics")))
             {
                 editLyrics();
             }

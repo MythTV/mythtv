@@ -1407,10 +1407,10 @@ float AvFormatDecoder::normalized_fps(AVStream *stream, AVCodecContext *enc)
     if ((QString(m_ic->iformat->name).contains("matroska") ||
         QString(m_ic->iformat->name).contains("mov")) &&
         avg_fps < 121.0F && avg_fps > 3.0F)
-        fps = avg_fps;
+        fps = avg_fps; // NOLINT(bugprone-branch-clone)
     else if (QString(m_ic->iformat->name).contains("avi") &&
         container_fps < 121.0F && container_fps > 3.0F)
-        fps = container_fps; // avi uses container fps for timestamps
+        fps = container_fps; // avi uses container fps for timestamps // NOLINT(bugprone-branch-clone)
     else if (codec_fps < 121.0F && codec_fps > 3.0F)
         fps = codec_fps;
     else if (container_fps < 121.0F && container_fps > 3.0F)
@@ -1958,7 +1958,7 @@ void AvFormatDecoder::UpdateATSCCaptionTracks(void)
         bool isp = true; // if true use m_pmt_tracks next, else stream_tracks
 
         if (pofr && !sofr)
-            isp = false;
+            isp = false; // NOLINT(bugprone-branch-clone)
         else if (!pofr && sofr)
             isp = true;
         else if (m_stream_tracks[sidx] < m_pmt_tracks[pidx])
@@ -3873,13 +3873,7 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
             // the DTS timestamp is missing. Also use fixups for missing PTS instead of
             // DTS to avoid oscillating between PTS and DTS. Only select DTS if PTS is
             // more faulty or never detected.
-            if (m_force_dts_timestamps)
-            {
-                if (pkt->dts != AV_NOPTS_VALUE)
-                    pts = pkt->dts;
-                m_pts_selected = false;
-            }
-            else if (ringBuffer->IsDVD())
+            if (m_force_dts_timestamps || ringBuffer->IsDVD())
             {
                 if (pkt->dts != AV_NOPTS_VALUE)
                     pts = pkt->dts;

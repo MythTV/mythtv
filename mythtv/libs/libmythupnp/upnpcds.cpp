@@ -1225,9 +1225,6 @@ QString UPnPShortcutFeature::TypeToName(ShortCutType type)
           str = "VIDEOS_ALL";
           break;
        case VIDEOS_FOLDER_STRUCTURE :
-          str = "VIDEOS_FOLDER_STRUCTURE";
-          break;
-
        case FOLDER_STRUCTURE :
           str = "VIDEOS_FOLDER_STRUCTURE";
           break;

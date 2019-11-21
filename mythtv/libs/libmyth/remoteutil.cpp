@@ -121,9 +121,8 @@ bool RemoteDeleteRecording(uint recordingID, bool forceMetadataDelete,
         .arg(forgetHistory ? "FORGET" : "NO_FORGET");
     QStringList strlist(cmd);
 
-    if (!gCoreContext->SendReceiveStringList(strlist) || strlist.isEmpty())
-        result = false;
-    else if (strlist[0].toInt() == -2)
+    if ((!gCoreContext->SendReceiveStringList(strlist) || strlist.isEmpty()) ||
+        (strlist[0].toInt() == -2))
         result = false;
 
     if (!result)

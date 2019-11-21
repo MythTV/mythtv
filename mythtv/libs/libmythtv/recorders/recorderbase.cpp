@@ -160,7 +160,7 @@ void RecorderBase::SetOption(const QString &name, const QString &value)
     {
         m_ntsc = false;
         if (value.toLower() == "ntsc" || value.toLower() == "ntsc-jp")
-        {
+        {    // NOLINT(bugprone-branch-clone)
             m_ntsc = true;
             SetFrameRate(29.97);
         }
@@ -523,9 +523,8 @@ long long RecorderBase::GetKeyframePosition(long long desired) const
     frm_pos_map_t::const_iterator it = m_positionMap.lowerBound(desired);
     if (it == m_positionMap.end())
         ret = *m_positionMap.begin();
-    else if (it.key() == desired)
-        ret = *it;
-    else if (--it != m_positionMap.end())
+    else if ((it.key() == desired) ||
+             (--it != m_positionMap.end()))
         ret = *it;
 
     return ret;
@@ -848,7 +847,7 @@ RecorderBase *RecorderBase::CreateRecorder(
 
     RecorderBase *recorder = nullptr;
     if (genOpt.inputtype == "MPEG")
-    {
+    { // NOLINTNEXTLINE(bugprone-branch-clone)
 #ifdef USING_IVTV
         recorder = new MpegRecorder(tvrec);
 #endif // USING_IVTV

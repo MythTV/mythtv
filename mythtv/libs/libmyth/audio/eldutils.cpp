@@ -213,17 +213,9 @@ void ELD::update_sad(int index,
             break;
 
         case TYPE_SACD:
-            break;
-
         case TYPE_EAC3:
-            break;
-
         case TYPE_DTS_HD:
-            break;
-
         case TYPE_MLP:
-            break;
-
         case TYPE_DST:
             break;
 
