@@ -518,8 +518,8 @@ void OSD::SetText(const QString &Window, const InfoMap &Map, OSDTimeout Timeout)
     if (bar)
     {
 #if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-        int startts = map["startts"].toInt();
-        int endts   = map["endts"].toInt();
+        int startts = Map["startts"].toInt();
+        int endts   = Map["endts"].toInt();
         int nowts   = MythDate::current().toTime_t();
 #else
         qint64 startts = Map["startts"].toLongLong();
@@ -1412,10 +1412,10 @@ void OsdNavigation::More(void)
     group->SetVisible (true);
 }
 
-void OsdNavigation::SetTextFromMap(const InfoMap &InfoMap)
+void OsdNavigation::SetTextFromMap(const InfoMap &Map)
 {
 
-    char paused = InfoMap.value("paused", "X").toLocal8Bit().at(0);
+    char paused = Map.value("paused", "X").toLocal8Bit().at(0);
     if (paused != 'X')
     {
         if (m_playButton && m_pauseButton && paused != m_paused)
@@ -1435,7 +1435,7 @@ void OsdNavigation::SetTextFromMap(const InfoMap &InfoMap)
         }
     }
 
-    char muted = InfoMap.value("muted","X").toLocal8Bit().at(0);
+    char muted = Map.value("muted","X").toLocal8Bit().at(0);
     if (m_IsVolumeControl && muted != 'X')
     {
         if (m_muteButton && m_unMuteButton && muted != m_muted)
@@ -1452,5 +1452,5 @@ void OsdNavigation::SetTextFromMap(const InfoMap &InfoMap)
         }
     }
 
-    MythScreenType::SetTextFromMap(InfoMap);
+    MythScreenType::SetTextFromMap(Map);
 }

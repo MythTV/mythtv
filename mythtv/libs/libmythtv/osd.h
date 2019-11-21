@@ -226,7 +226,7 @@ class OsdNavigation : public MythScreenType
     OsdNavigation(QObject *RetObject, const QString &Name, OSD *Osd);
     bool Create(void) override;
     bool keyPressEvent(QKeyEvent *Event) override;
-    void SetTextFromMap(const InfoMap &InfoMap) override;
+    void SetTextFromMap(const InfoMap &Map) override;
     void ShowMenu(void) override;
 
     int getVisibleGroup() { return m_visibleGroup; }
