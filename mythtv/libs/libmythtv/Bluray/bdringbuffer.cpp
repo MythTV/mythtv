@@ -146,12 +146,12 @@ BDInfo::BDInfo(const QString &filename)
     LOG(VB_PLAYBACK, LOG_INFO, QString("BDInfo: Trying %1").arg(filename));
     QString name = filename;
 
-    if (name.startsWith("bd://"))
-        name.remove(0,4);
-    else if (name.startsWith("bd:/"))
+    if (name.startsWith("bd:"))
+    {
         name.remove(0,3);
-    else if (name.startsWith("bd:"))
-        name.remove(0,3);
+        while (name.startsWith("//"))
+            name.remove(0,1);
+    }
 
     // clean path filename
     name = QDir(QDir::cleanPath(name)).canonicalPath();
