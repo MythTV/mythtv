@@ -346,7 +346,7 @@ VideoFrameType MythVAAPIInteropDRM::VATypeToMythType(uint32_t Fourcc)
         case VA_FOURCC_IYUV:
         case VA_FOURCC_I420: return FMT_YV12;
         case VA_FOURCC_NV12: return FMT_NV12;
-        case VA_FOURCC_YUY2: return FMT_YUY2;
+        case VA_FOURCC_YUY2: return FMT_YUY2; // NOLINT(bugprone-branch-clone)
         case VA_FOURCC_UYVY: return FMT_YUY2; // ?
         case VA_FOURCC_P010: return FMT_P010;
         case VA_FOURCC_P016: return FMT_P016;

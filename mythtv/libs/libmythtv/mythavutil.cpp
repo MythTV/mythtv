@@ -47,7 +47,7 @@ AVPixelFormat FrameTypeToPixelFormat(VideoFrameType type)
         case FMT_YUV444P14:  return AV_PIX_FMT_YUV444P14;
         case FMT_YUV444P16:  return AV_PIX_FMT_YUV444P16;
         case FMT_RGB24:      return AV_PIX_FMT_RGB24;
-        case FMT_BGRA:       return AV_PIX_FMT_BGRA;
+        case FMT_BGRA:       return AV_PIX_FMT_BGRA; // NOLINT(bugprone-branch-clone)
         case FMT_RGB32:      return AV_PIX_FMT_RGB32;
         case FMT_ARGB32:     return AV_PIX_FMT_ARGB;
         case FMT_RGBA32:     return AV_PIX_FMT_RGBA;
