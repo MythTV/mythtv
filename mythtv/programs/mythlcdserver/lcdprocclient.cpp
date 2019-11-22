@@ -1283,17 +1283,7 @@ void LCDProcClient::startMenu(QList<LCDMenuItem> *menuItems, QString app_name,
                     aString  = "widget_set Menu menuWidget1 1 1 \"";
                 }
 
-                if (lcdStartCol == 1)  // small display -> don't waste space for additional spaces
-                {
-                    switch (curItem->isChecked())
-                    {
-                        case CHECKED: aString += "X "; break;
-                        case UNCHECKED: aString += "O "; break;
-                        case NOTCHECKABLE: aString += "  "; break;
-                        default: break;
-                    }
-                }
-                else if (lcdStartCol != 0)
+                if (lcdStartCol != 0)
                 {
                     switch (curItem->isChecked())
                     {
