@@ -243,7 +243,7 @@ static void updateDisplayRom(QString romname, int display, QString Systemname)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("UPDATE gamemetadata SET display = :DISPLAY "
-                  "WHERE romname = :ROMNAME AND system = :SYSTEM");
+                  "WHERE romname = :ROMNAME AND `system` = :SYSTEM");
 
     query.bindValue(":DISPLAY", display);
     query.bindValue(":ROMNAME", romname);
@@ -273,7 +273,7 @@ static void updateGameName(QString romname, QString GameName, QString Systemname
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("UPDATE gamemetadata SET GameName = :GAMENAME "
-                  "WHERE romname = :ROMNAME AND system = :SYSTEM ");
+                  "WHERE romname = :ROMNAME AND `system` = :SYSTEM ");
 
     query.bindValue(":GAMENAME", GameName);
     query.bindValue(":ROMNAME", romname);
@@ -300,10 +300,10 @@ static void UpdateGameCounts(QStringList updatelist)
         LOG(VB_GENERAL, LOG_NOTICE,
             LOC + QString("Update gametype %1").arg(GameType));
 
-        query.prepare("SELECT romname,system,spandisks,gamename FROM "
+        query.prepare("SELECT romname,`system`,spandisks,gamename FROM "
               "gamemetadata,gameplayers WHERE "
               "gamemetadata.gametype = :GAMETYPE AND "
-              "playername = system ORDER BY romname");
+              "playername = `system` ORDER BY romname");
 
         query.bindValue(":GAMETYPE",GameType);
 
@@ -450,7 +450,7 @@ void GameHandler::UpdateGameDB(GameHandler *handler)
 #endif
 
             query.prepare("INSERT INTO gamemetadata "
-                          "(system, romname, gamename, genre, year, gametype, "
+                          "(`system`, romname, gamename, genre, year, gametype, "
                           "rompath, country, crc_value, diskcount, display, plot, "
                           "publisher, version, fanart, boxart, screenshot) "
                           "VALUES (:SYSTEM, :ROMNAME, :GAMENAME, :GENRE, :YEAR, "
@@ -501,7 +501,7 @@ void GameHandler::VerifyGameDB(GameHandler *handler)
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT romname,rompath,gamename FROM gamemetadata "
-                  "WHERE system = :SYSTEM");
+                  "WHERE `system` = :SYSTEM");
 
     query.bindValue(":SYSTEM",handler->SystemName());
 

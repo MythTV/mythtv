@@ -46,7 +46,7 @@ QString ProgDetails::getRatings(bool recorded, uint chanid, QDateTime startts)
 {
     QString table = (recorded) ? "recordedrating" : "programrating";
     QString sel = QString(
-        "SELECT system, rating FROM %1 "
+        "SELECT `system`, rating FROM %1 "
         "WHERE chanid  = :CHANID "
         "AND starttime = :STARTTIME").arg(table);
 
