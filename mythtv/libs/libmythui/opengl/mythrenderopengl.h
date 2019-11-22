@@ -90,7 +90,6 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     MythRenderOpenGL(const QSurfaceFormat &Format, QPaintDevice* Device, RenderType Type = kRenderOpenGL);
 
     // MythRender
-    void  Release(void) override;
     void  ReleaseResources(void) override;
 
     void  makeCurrent();
