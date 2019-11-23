@@ -258,7 +258,7 @@ HistogramAnalyzer::analyzeFrame(const VideoFrame *frame, long long frameno)
      * Various statistical computations over pixel values: mean, median,
      * (running) standard deviation over sample population.
      */
-    static const int    DEFAULT_COLOR = 0;
+    static constexpr int kDefaultColor = 0;
 
     /*
      * TUNABLE:
@@ -268,8 +268,8 @@ HistogramAnalyzer::analyzeFrame(const VideoFrame *frame, long long frameno)
      * values will examine more pixels (higher resolution), but will run
      * slower.
      */
-    static const int    RINC = 4;
-    static const int    CINC = 4;
+    static constexpr int kRInc = 4;
+    static constexpr int kCInc = 4;
 #define ROUNDUP(a,b)    (((a) + (b) - 1) / (b) * (b))
 
     int                 pgmwidth = 0, pgmheight = 0;
@@ -307,26 +307,26 @@ HistogramAnalyzer::analyzeFrame(const VideoFrame *frame, long long frameno)
         cropwidth = pgmwidth / 4;
     }
 
-    rr1 = ROUNDUP(croprow, RINC);
-    cc1 = ROUNDUP(cropcol, CINC);
-    rr2 = ROUNDUP(croprow + cropheight, RINC);
-    cc2 = ROUNDUP(cropcol + cropwidth, CINC);
-    rr3 = ROUNDUP(pgmheight, RINC);
-    cc3 = ROUNDUP(pgmwidth, CINC);
+    rr1 = ROUNDUP(croprow, kRInc);
+    cc1 = ROUNDUP(cropcol, kCInc);
+    rr2 = ROUNDUP(croprow + cropheight, kRInc);
+    cc2 = ROUNDUP(cropcol + cropwidth, kCInc);
+    rr3 = ROUNDUP(pgmheight, kRInc);
+    cc3 = ROUNDUP(pgmwidth, kCInc);
 
-    borderpixels = (rr1 / RINC) * (cc3 / CINC) +        /* top */
-        ((rr2 - rr1) / RINC) * (cc1 / CINC) +           /* left */
-        ((rr2 - rr1) / RINC) * ((cc3 - cc2) / CINC) +   /* right */
-        ((rr3 - rr2) / RINC) * (cc3 / CINC);            /* bottom */
+    borderpixels = (rr1 / kRInc) * (cc3 / kCInc) +        /* top */
+        ((rr2 - rr1) / kRInc) * (cc1 / kCInc) +           /* left */
+        ((rr2 - rr1) / kRInc) * ((cc3 - cc2) / kCInc) +   /* right */
+        ((rr3 - rr2) / kRInc) * (cc3 / kCInc);            /* bottom */
 
     pp = &m_buf[borderpixels];
     memset(m_histval, 0, sizeof(m_histval));
-    m_histval[DEFAULT_COLOR] += borderpixels;
-    for (int rr = rr1; rr < rr2; rr += RINC)
+    m_histval[kDefaultColor] += borderpixels;
+    for (int rr = rr1; rr < rr2; rr += kRInc)
     {
         int rroffset = rr * pgmwidth;
 
-        for (int cc = cc1; cc < cc2; cc += CINC)
+        for (int cc = cc1; cc < cc2; cc += kCInc)
         {
             if (m_logo && rr >= m_logorr1 && rr <= m_logorr2 &&
                     cc >= m_logocc1 && cc <= m_logocc2)

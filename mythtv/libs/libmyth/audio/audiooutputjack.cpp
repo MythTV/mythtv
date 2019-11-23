@@ -447,7 +447,7 @@ int AudioOutputJACK::JackXRunCallback(void)
     // All we want to do is chuck away some audio from the ring buffer
     // to keep our audio output roughly where it should be if we didn't xrun
     int fragments = (int)ceilf( ((delay / 1000000.0F) * m_samplerate )
-                            / (float)(m_fragment_size / m_output_bytes_per_frame) );
+                            / ((float)m_fragment_size / m_output_bytes_per_frame) );
     m_jack_xruns += fragments; //should be at least 1...
     VBERROR(QString("Jack XRun Callback: %1 usecs delayed, xruns now %2")
                         .arg(delay).arg(m_jack_xruns) );

@@ -738,7 +738,7 @@ void ScheduleEditor::ShowPreviousView(void)
 
     if (m_view == kMainView && !m_recordingRule->m_isTemplate)
         ShowMetadataOptions();
-    else if (m_view == kMainView)
+    else if ((m_view == kMainView) || (m_view == kMetadataView))
         ShowPostProc();
     else if (m_view == kSchedOptView)
         m_child->Close();
@@ -748,8 +748,6 @@ void ScheduleEditor::ShowPreviousView(void)
         ShowFilters();
     else if (m_view == kPostProcView)
         ShowStoreOpt();
-    else if (m_view == kMetadataView)
-        ShowPostProc();
 }
 
 void ScheduleEditor::ShowNextView(void)
@@ -768,9 +766,7 @@ void ScheduleEditor::ShowNextView(void)
         ShowPostProc();
     else if (m_view == kPostProcView && !m_recordingRule->m_isTemplate)
         ShowMetadataOptions();
-    else if (m_view == kPostProcView)
-        m_child->Close();
-    else if (m_view == kMetadataView)
+    else if ((m_view == kPostProcView) || (m_view == kMetadataView))
         m_child->Close();
 }
 

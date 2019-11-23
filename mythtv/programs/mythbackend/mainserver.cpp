@@ -719,11 +719,8 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
         else
             HandleRecorderQuery(listline, tokens, pbs);
     }
-    else if (command == "QUERY_RECORDING_DEVICE")
-    {
-        // TODO
-    }
-    else if (command == "QUERY_RECORDING_DEVICES")
+    else if ((command == "QUERY_RECORDING_DEVICE") ||
+             (command == "QUERY_RECORDING_DEVICES"))
     {
         // TODO
     }

@@ -463,13 +463,10 @@ void MythThemedMenu::parseThemeButton(QDomElement &element)
                     text = qApp->translate("ThemeUI",
                                            parseText(info).toUtf8() );
                 }
-                else if (info.attribute("lang","").toLower() ==
-                         gCoreContext->GetLanguageAndVariant())
-                {
-                    text = parseText(info);
-                }
-                else if (info.attribute("lang","").toLower() ==
-                         gCoreContext->GetLanguage())
+                else if ((info.attribute("lang","").toLower() ==
+                          gCoreContext->GetLanguageAndVariant()) ||
+                         (info.attribute("lang","").toLower() ==
+                          gCoreContext->GetLanguage()))
                 {
                     text = parseText(info);
                 }
@@ -482,13 +479,10 @@ void MythThemedMenu::parseThemeButton(QDomElement &element)
                     alttext = qApp->translate("ThemeUI",
                                               parseText(info).toUtf8());
                 }
-                else if (info.attribute("lang","").toLower() ==
-                         gCoreContext->GetLanguageAndVariant())
-                {
-                    alttext = parseText(info);
-                }
-                else if (info.attribute("lang","").toLower() ==
-                         gCoreContext->GetLanguage())
+                else if ((info.attribute("lang","").toLower() ==
+                          gCoreContext->GetLanguageAndVariant()) ||
+                         (info.attribute("lang","").toLower() ==
+                          gCoreContext->GetLanguage()))
                 {
                     alttext = parseText(info);
                 }
@@ -531,13 +525,10 @@ void MythThemedMenu::parseThemeButton(QDomElement &element)
                     description = qApp->translate("ThemeUI",
                                                   getFirstText(info).toUtf8());
                 }
-                else if (info.attribute("lang","").toLower() ==
-                         gCoreContext->GetLanguageAndVariant())
-                {
-                    description = getFirstText(info);
-                }
-                else if (info.attribute("lang","").toLower() ==
-                         gCoreContext->GetLanguage())
+                else if ((info.attribute("lang","").toLower() ==
+                          gCoreContext->GetLanguageAndVariant()) ||
+                         (info.attribute("lang","").toLower() ==
+                          gCoreContext->GetLanguage()))
                 {
                     description = getFirstText(info);
                 }
@@ -967,10 +958,8 @@ void MythThemedMenu::mediaEvent(MythMediaEvent* event)
     switch (type)
     {
         case MEDIATYPE_DVD :
-            // DVD Available
-            break;
         case MEDIATYPE_BD :
-            // Blu-ray Available
+            // DVD or Blu-ray Available
             break;
         default :
             return;

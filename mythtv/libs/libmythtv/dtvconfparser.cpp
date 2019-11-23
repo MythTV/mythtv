@@ -104,11 +104,9 @@ DTVConfParser::return_t DTVConfParser::Parse(void)
 
         if ((str == "T") || (str == "C") || (str == "S"))
         {
-            if ((m_type == OFDM) && (str == "T"))
-                ok &= ParseVDR(list, channelNo);
-            else if ((m_type == QPSK || m_type == DVBS2) && (str == "S"))
-                ok &= ParseVDR(list, channelNo);
-            else if ((m_type == QAM) && (str == "C"))
+            if (((m_type == OFDM) && (str == "T")) ||
+                ((m_type == QPSK || m_type == DVBS2) && (str == "S")) ||
+                ((m_type == QAM) && (str == "C")))
                 ok &= ParseVDR(list, channelNo);
         }
         else if (m_type == OFDM)

@@ -21,19 +21,19 @@
 
 typedef struct ThisFilter
 {
-    VideoFilter vf;
+    VideoFilter m_vf;
 
-    pp_mode *mode;
-    pp_context *context;
-    int width;
-    int height;
-    int ysize;
-    int csize;
-    unsigned char *src[3];
-    unsigned char *dst[3];
-    int srcStride[3];
-    int dstStride[3];
-    int eprint;
+    pp_mode       *m_mode;
+    pp_context    *m_context;
+    int            m_width;
+    int            m_height;
+    int            m_ySize;
+    int            m_cSize;
+    unsigned char *m_src[3];
+    unsigned char *m_dst[3];
+    int            m_srcStride[3];
+    int            m_dstStride[3];
+    int            m_eprint;
     TF_STRUCT;
 } ThisFilter;
 
@@ -46,32 +46,32 @@ static int pp(VideoFilter *vf, VideoFrame *frame, int field)
 
     TF_START;
 
-    tf->src[0] = tf->dst[0] = frame->buf;
-    tf->src[1] = tf->dst[1] = frame->buf + tf->ysize;
-    tf->src[2] = tf->dst[2] = frame->buf + tf->ysize + tf->csize;
+    tf->m_src[0] = tf->m_dst[0] = frame->buf;
+    tf->m_src[1] = tf->m_dst[1] = frame->buf + tf->m_ySize;
+    tf->m_src[2] = tf->m_dst[2] = frame->buf + tf->m_ySize + tf->m_cSize;
 
     if (frame->qscale_table == NULL)
         frame->qstride = 0;
 
-    tf->ysize = (frame->width) * (frame->height);
-    tf->csize = tf->ysize / 4;
+    tf->m_ySize = (frame->width) * (frame->height);
+    tf->m_cSize = tf->m_ySize / 4;
 
-    tf->width = frame->width;
-    tf->height = frame->height;
+    tf->m_width = frame->width;
+    tf->m_height = frame->height;
 
-    tf->srcStride[0] = tf->ysize / (tf->height);
-    tf->srcStride[1] = tf->csize / (tf->height) * 2;
-    tf->srcStride[2] = tf->csize / (tf->height) * 2;
+    tf->m_srcStride[0] = tf->m_ySize / (tf->m_height);
+    tf->m_srcStride[1] = tf->m_cSize / (tf->m_height) * 2;
+    tf->m_srcStride[2] = tf->m_cSize / (tf->m_height) * 2;
 
-    tf->dstStride[0] = tf->ysize / (tf->height);
-    tf->dstStride[1] = tf->csize / (tf->height) * 2;
-    tf->dstStride[2] = tf->csize / (tf->height) * 2;
+    tf->m_dstStride[0] = tf->m_ySize / (tf->m_height);
+    tf->m_dstStride[1] = tf->m_cSize / (tf->m_height) * 2;
+    tf->m_dstStride[2] = tf->m_cSize / (tf->m_height) * 2;
 
-    pp_postprocess( (const uint8_t**)tf->src, tf->srcStride,
-                    tf->dst, tf->dstStride,
+    pp_postprocess( (const uint8_t**)tf->m_src, tf->m_srcStride,
+                    tf->m_dst, tf->m_dstStride,
                     frame->width, frame->height,
                     (signed char *)(frame->qscale_table), frame->qstride,
-                    tf->mode, tf->context, PP_FORMAT_420);
+                    tf->m_mode, tf->m_context, PP_FORMAT_420);
 
     TF_END(tf, "PostProcess: ");
     return 0;
@@ -79,8 +79,8 @@ static int pp(VideoFilter *vf, VideoFrame *frame, int field)
 
 static void cleanup(VideoFilter *filter)
 {
-    pp_free_context(((ThisFilter*)filter)->context);
-    pp_free_mode(((ThisFilter*)filter)->mode);
+    pp_free_context(((ThisFilter*)filter)->m_context);
+    pp_free_mode(((ThisFilter*)filter)->m_mode);
 }
 
 static VideoFilter *new_filter(VideoFrameType inpixfmt,
@@ -100,9 +100,9 @@ static VideoFilter *new_filter(VideoFrameType inpixfmt,
         return NULL;
     }
 
-    filter->context = pp_get_context(*width, *height,
+    filter->m_context = pp_get_context(*width, *height,
                             PP_CPU_CAPS_MMX|PP_CPU_CAPS_MMX2|PP_CPU_CAPS_3DNOW);
-    if (filter->context == NULL)
+    if (filter->m_context == NULL)
     {
         fprintf(stderr,"PostProc: failed to get PP context\n");
         free(filter);
@@ -110,18 +110,18 @@ static VideoFilter *new_filter(VideoFrameType inpixfmt,
     }
 
     printf("Filteroptions: %s\n", options);
-    filter->mode = pp_get_mode_by_name_and_quality(options, PP_QUALITY_MAX);
-    if (filter->mode == NULL)
+    filter->m_mode = pp_get_mode_by_name_and_quality(options, PP_QUALITY_MAX);
+    if (filter->m_mode == NULL)
     {
         printf("%s", pp_help);
         free(filter);
         return NULL;
     }
 
-    filter->eprint = 0;
+    filter->m_eprint = 0;
 
-    filter->vf.filter = &pp;
-    filter->vf.cleanup = &cleanup;
+    filter->m_vf.filter = &pp;
+    filter->m_vf.cleanup = &cleanup;
     TF_INIT(filter);
     return (VideoFilter *)filter;
 }

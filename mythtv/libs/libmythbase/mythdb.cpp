@@ -55,9 +55,9 @@ void DestroyMythDB(void)
 
 struct SingleSetting
 {
-    QString key;
-    QString value;
-    QString host;
+    QString m_key;
+    QString m_value;
+    QString m_host;
 };
 
 typedef QHash<QString,QString> SettingsMap;
@@ -68,7 +68,7 @@ class MythDBPrivate
     MythDBPrivate();
    ~MythDBPrivate();
 
-    DatabaseParams  m_DBparams;  ///< Current database host & WOL details
+    DatabaseParams  m_dbParams;  ///< Current database host & WOL details
     QString m_localhostname;
     MDBManager m_dbmanager;
 
@@ -198,12 +198,12 @@ QString MythDB::DBErrorMessage(const QSqlError& err)
 
 DatabaseParams MythDB::GetDatabaseParams(void) const
 {
-    return d->m_DBparams;
+    return d->m_dbParams;
 }
 
 void MythDB::SetDatabaseParams(const DatabaseParams &params)
 {
-    d->m_DBparams = params;
+    d->m_dbParams = params;
 }
 
 void MythDB::SetLocalHostname(const QString &name)
@@ -283,9 +283,9 @@ bool MythDB::SaveSettingOnHost(const QString &key,
         if (!d->m_suppressDBMessages)
             LOG(VB_GENERAL, LOG_ERR, loc + "- No database yet");
         SingleSetting setting;
-        setting.host = host;
-        setting.key = key;
-        setting.value = newValue;
+        setting.m_host = host;
+        setting.m_key = key;
+        setting.m_value = newValue;
         d->m_delayedSettings.append(setting);
         return false;
     }
@@ -906,7 +906,7 @@ void MythDB::WriteDelayedSettings(void)
     while (!d->m_delayedSettings.isEmpty())
     {
         SingleSetting setting = d->m_delayedSettings.takeFirst();
-        SaveSettingOnHost(setting.key, setting.value, setting.host);
+        SaveSettingOnHost(setting.m_key, setting.m_value, setting.m_host);
     }
 }
 

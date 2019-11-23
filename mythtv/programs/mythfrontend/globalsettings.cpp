@@ -4075,26 +4075,26 @@ class PlayBackScaling : public GroupSetting
     void childChanged(StandardSetting * /*setting*/) override; // StandardSetting
 
   private:
-    StandardSetting *m_VertScan  {nullptr};
-    StandardSetting *m_HorizScan {nullptr};
-    StandardSetting *m_XScan     {nullptr};
-    StandardSetting *m_YScan     {nullptr};
+    StandardSetting *m_vertScan  {nullptr};
+    StandardSetting *m_horizScan {nullptr};
+    StandardSetting *m_xScan     {nullptr};
+    StandardSetting *m_yScan     {nullptr};
 };
 
 PlayBackScaling::PlayBackScaling()
 {
     setLabel(tr("Scaling"));
-    addChild(m_VertScan = VertScanPercentage());
-    addChild(m_YScan = YScanDisplacement());
-    addChild(m_HorizScan = HorizScanPercentage());
-    addChild(m_XScan = XScanDisplacement());
-    connect(m_VertScan, SIGNAL(valueChanged(StandardSetting *)),
+    addChild(m_vertScan = VertScanPercentage());
+    addChild(m_yScan = YScanDisplacement());
+    addChild(m_horizScan = HorizScanPercentage());
+    addChild(m_xScan = XScanDisplacement());
+    connect(m_vertScan, SIGNAL(valueChanged(StandardSetting *)),
             this, SLOT(childChanged(StandardSetting *)));
-    connect(m_YScan, SIGNAL(valueChanged(StandardSetting *)),
+    connect(m_yScan, SIGNAL(valueChanged(StandardSetting *)),
             this, SLOT(childChanged(StandardSetting *)));
-    connect(m_HorizScan, SIGNAL(valueChanged(StandardSetting *)),
+    connect(m_horizScan, SIGNAL(valueChanged(StandardSetting *)),
             this, SLOT(childChanged(StandardSetting *)));
-    connect(m_XScan,SIGNAL(valueChanged(StandardSetting *)),
+    connect(m_xScan,SIGNAL(valueChanged(StandardSetting *)),
             this, SLOT(childChanged(StandardSetting *)));
 }
 
@@ -4102,17 +4102,17 @@ PlayBackScaling::PlayBackScaling()
 void PlayBackScaling::updateButton(MythUIButtonListItem *item)
 {
     GroupSetting::updateButton(item);
-    if (m_VertScan->getValue() == "0" &&
-        m_HorizScan->getValue() == "0" &&
-        m_YScan->getValue() == "0" &&
-        m_XScan->getValue() == "0")
+    if (m_vertScan->getValue() == "0" &&
+        m_horizScan->getValue() == "0" &&
+        m_yScan->getValue() == "0" &&
+        m_xScan->getValue() == "0")
         item->SetText(tr("No scaling"),"value");
     else
         item->SetText(QString("%1%x%2%+%3%+%4%")
-                .arg(m_HorizScan->getValue())
-                .arg(m_VertScan->getValue())
-                .arg(m_XScan->getValue())
-                .arg(m_YScan->getValue()), "value");
+                .arg(m_horizScan->getValue())
+                .arg(m_vertScan->getValue())
+                .arg(m_xScan->getValue())
+                .arg(m_yScan->getValue()), "value");
 }
 
 void PlayBackScaling::childChanged(StandardSetting * /*setting*/)

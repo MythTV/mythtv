@@ -145,8 +145,8 @@ bounding_box(const AVFrame *img, int imgheight,
      * Maximum logo size, expressed as a percentage of the content area
      * (adjusting for letterboxing and pillarboxing).
      */
-    static const int    MAXWIDTHPCT = 20;
-    static const int    MAXHEIGHTPCT = 20;
+    static constexpr int kMaxWidthPct = 20;
+    static constexpr int kMaxHeightPct = 20;
 
     /*
      * TUNABLE:
@@ -158,8 +158,8 @@ bounding_box(const AVFrame *img, int imgheight,
     const int           VERTSLOP = max(4, imgheight * 1 / 15);
     const int           HORIZSLOP = max(4, imgwidth * 1 / 20);
 
-    int maxwidth = (maxcol1 - mincol) * MAXWIDTHPCT / 100;
-    int maxheight = (maxrow1 - minrow) * MAXHEIGHTPCT / 100;
+    int maxwidth = (maxcol1 - mincol) * kMaxWidthPct / 100;
+    int maxheight = (maxrow1 - minrow) * kMaxHeightPct / 100;
 
     int row = minrow;
     int col = mincol;
@@ -449,7 +449,7 @@ template_alloc(const unsigned int *scores, int width, int height,
      * Lower values allow more pixels to be included as part of the template,
      * but strong non-template pixels might be included.
      */
-    static const float      MINSCOREPCTILE = 0.998;
+    static constexpr float kMinScorePctile = 0.998;
 
     const int               nn = width * height;
     int                     ii = 0, first = 0, last = 0;
@@ -480,7 +480,7 @@ template_alloc(const unsigned int *scores, int width, int height,
 
     /* Threshold the edge frequences. */
 
-    ii = (int)roundf(nn * MINSCOREPCTILE);
+    ii = (int)roundf(nn * kMinScorePctile);
     threshscore = sortedscores[ii];
     for (first = ii; first > 0 && sortedscores[first] == threshscore; first--)
         ;
@@ -492,7 +492,7 @@ template_alloc(const unsigned int *scores, int width, int height,
         last--;
 
     LOG(VB_COMMFLAG, LOG_INFO, QString("template_alloc wanted %1, got %2-%3")
-            .arg(MINSCOREPCTILE, 0, 'f', 6)
+            .arg(kMinScorePctile, 0, 'f', 6)
             .arg((float)first / nn, 0, 'f', 6)
             .arg((float)last / nn, 0, 'f', 6));
 
@@ -569,14 +569,14 @@ analyzeFrameDebug(long long frameno, const AVFrame *pgm, int pgmheight,
         const AVFrame *cropped, const AVFrame *edges, int cropheight,
         int croprow, int cropcol, bool debug_frames, const QString& debugdir)
 {
-    static const int    delta = 24;
-    static int          lastrow, lastcol, lastwidth, lastheight;
+    static constexpr int kDelta = 24;
+    static int          s_lastrow, s_lastcol, s_lastwidth, s_lastheight;
     const int           cropwidth = cropped->linesize[0];
 
-    int rowsame = abs(lastrow - croprow) <= delta ? 1 : 0;
-    int colsame = abs(lastcol - cropcol) <= delta ? 1 : 0;
-    int widthsame = abs(lastwidth - cropwidth) <= delta ? 1 : 0;
-    int heightsame = abs(lastheight - cropheight) <= delta ? 1 : 0;
+    int rowsame    = abs(s_lastrow - croprow) <= kDelta ? 1 : 0;
+    int colsame    = abs(s_lastcol - cropcol) <= kDelta ? 1 : 0;
+    int widthsame  = abs(s_lastwidth - cropwidth) <= kDelta ? 1 : 0;
+    int heightsame = abs(s_lastheight - cropheight) <= kDelta ? 1 : 0;
 
     if (frameno > 0 && rowsame + colsame + widthsame + heightsame >= 3)
         return true;
@@ -587,10 +587,10 @@ analyzeFrameDebug(long long frameno, const AVFrame *pgm, int pgmheight,
             .arg(cropwidth).arg(cropheight)
             .arg(cropcol).arg(croprow));
 
-    lastrow = croprow;
-    lastcol = cropcol;
-    lastwidth = cropwidth;
-    lastheight = cropheight;
+    s_lastrow    = croprow;
+    s_lastcol    = cropcol;
+    s_lastwidth  = cropwidth;
+    s_lastheight = cropheight;
 
     if (debug_frames)
     {
@@ -877,8 +877,8 @@ TemplateFinder::analyzeFrame(const VideoFrame *frame, long long frameno,
      * This has a nice side-effect of reducing the area to be examined (speed
      * optimization).
      */
-    static const float  EXCLUDEWIDTH = 0.5;
-    static const float  EXCLUDEHEIGHT = 0.5;
+    static constexpr float kExcludeWidth = 0.5;
+    static constexpr float kExcludeHeight = 0.5;
 
     int                 pgmwidth= 0, pgmheight = 0;
     int                 croprow= 0, cropcol = 0, cropwidth = 0, cropheight = 0;
@@ -924,8 +924,8 @@ TemplateFinder::analyzeFrame(const VideoFrame *frame, long long frameno,
          * Translate the excluded area of the screen into "cropped"
          * coordinates.
          */
-        int excludewidth = (int)(pgmwidth * EXCLUDEWIDTH);
-        int excludeheight = (int)(pgmheight * EXCLUDEHEIGHT);
+        int excludewidth  = (int)(pgmwidth * kExcludeWidth);
+        int excludeheight = (int)(pgmheight * kExcludeHeight);
         int excluderow = (pgmheight - excludeheight) / 2 - croprow;
         int excludecol = (pgmwidth - excludewidth) / 2 - cropcol;
         (void)m_edgeDetector->setExcludeArea(excluderow, excludecol,

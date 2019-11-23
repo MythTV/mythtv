@@ -25,11 +25,11 @@
 
 typedef struct LBFilter
 {
-    VideoFilter vf;
+    VideoFilter m_vf;
 
     /* functions and variables below here considered "private" */
-    int mm_flags;
-    void (*subfilter)(unsigned char *, int);
+    int m_mmFlags;
+    void (*m_subfilter)(unsigned char *, int);
     TF_STRUCT;
 } LBFilter;
 
@@ -182,7 +182,7 @@ int linearBlendFilterAltivec(VideoFilter *f, VideoFrame *frame, int field)
             for (x = 0; x < stride; x += 8)
             {
                 src = yptr + x + y * stride;  
-                linearBlend(src, stride);  
+                linearBlend(src, stride);
             }
         }
     }
@@ -301,7 +301,7 @@ static int linearBlendFilter(VideoFilter *f, VideoFrame *frame, int  field)
         for (int x = 0; x < stride; x+=8)
         {
             unsigned char *src = yptr + x + y * stride;
-            (vf->subfilter)(src, stride);  
+            (vf->m_subfilter)(src, stride);  
         }
     }
  
@@ -313,15 +313,15 @@ static int linearBlendFilter(VideoFilter *f, VideoFrame *frame, int  field)
         for (int x = 0; x < stride; x += 8)
         {
             unsigned char *src = uoff + x + y * stride;
-            (vf->subfilter)(src, stride);
+            (vf->m_subfilter)(src, stride);
        
             src = voff + x + y * stride;
-            (vf->subfilter)(src, stride);
+            (vf->m_subfilter)(src, stride);
         }
     }
 
 #if HAVE_MMX || HAVE_AMD3DNOW
-    if ((vf->mm_flags & AV_CPU_FLAG_MMX2) || (vf->mm_flags & AV_CPU_FLAG_3DNOW))
+    if ((vf->m_mmFlags & AV_CPU_FLAG_MMX2) || (vf->m_mmFlags & AV_CPU_FLAG_3DNOW))
         emms();
 #endif
 
@@ -348,17 +348,17 @@ static VideoFilter *new_filter(VideoFrameType inpixfmt,
         return NULL;
     }
 
-    filter->vf.filter = &linearBlendFilter;
-    filter->subfilter = &linearBlend;    /* Default, non accellerated */
-    filter->mm_flags = av_get_cpu_flags();
-    if (HAVE_MMX && filter->mm_flags & AV_CPU_FLAG_MMX2)
-        filter->subfilter = &linearBlendMMX;
-    else if (HAVE_AMD3DNOW && filter->mm_flags & AV_CPU_FLAG_3DNOW)
-        filter->subfilter = &linearBlend3DNow;
-    else if (HAVE_ALTIVEC && filter->mm_flags & AV_CPU_FLAG_ALTIVEC)
-        filter->vf.filter = &linearBlendFilterAltivec;
+    filter->m_vf.filter = &linearBlendFilter;
+    filter->m_subfilter = &linearBlend;    /* Default, non accellerated */
+    filter->m_mmFlags = av_get_cpu_flags();
+    if (HAVE_MMX && filter->m_mmFlags & AV_CPU_FLAG_MMX2)
+        filter->m_subfilter = &linearBlendMMX;
+    else if (HAVE_AMD3DNOW && filter->m_mmFlags & AV_CPU_FLAG_3DNOW)
+        filter->m_subfilter = &linearBlend3DNow;
+    else if (HAVE_ALTIVEC && filter->m_mmFlags & AV_CPU_FLAG_ALTIVEC)
+        filter->m_vf.filter = &linearBlendFilterAltivec;
 
-    filter->vf.cleanup = NULL;
+    filter->m_vf.cleanup = NULL;
     TF_INIT(filter);
     return (VideoFilter *)filter;
 }

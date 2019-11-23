@@ -39,73 +39,73 @@ typedef struct cdrom_generic_command CDROMgenericCmd;
 // It is the joining of a struct event_header and a struct media_event_desc
 typedef struct
 {
-    uint16_t data_len[2];
+    uint16_t m_dataLen[2];
 #if HAVE_BIGENDIAN
-    uint8_t  nea                : 1;
-    uint8_t  reserved1          : 4;
-    uint8_t  notification_class : 3;
+    uint8_t  m_nea               : 1;
+    uint8_t  m_reserved1         : 4;
+    uint8_t  m_notificationClass : 3;
 #else
-    uint8_t  notification_class : 3;
-    uint8_t  reserved1          : 4;
-    uint8_t  nea                : 1;
+    uint8_t  m_notificationClass : 3;
+    uint8_t  m_reserved1         : 4;
+    uint8_t  m_nea               : 1;
 #endif
-    uint8_t  supp_event_class;
+    uint8_t  m_suppEventClass;
 #if HAVE_BIGENDIAN
-    uint8_t  reserved2          : 4;
-    uint8_t  media_event_code   : 4;
-    uint8_t  reserved3          : 6;
-    uint8_t  media_present      : 1;
-    uint8_t  door_open          : 1;
+    uint8_t  m_reserved2         : 4;
+    uint8_t  m_mediaEventCode    : 4;
+    uint8_t  m_reserved3         : 6;
+    uint8_t  m_mediaPresent      : 1;
+    uint8_t  m_doorOpen          : 1;
 #else
-    uint8_t  media_event_code   : 4;
-    uint8_t  reserved2          : 4;
-    uint8_t  door_open          : 1;
-    uint8_t  media_present      : 1;
-    uint8_t  reserved3          : 6;
+    uint8_t  m_mediaEventCode    : 4;
+    uint8_t  m_reserved2         : 4;
+    uint8_t  m_doorOpen          : 1;
+    uint8_t  m_mediaPresent      : 1;
+    uint8_t  m_reserved3         : 6;
 #endif
-    uint8_t  start_slot;
-    uint8_t  end_slot;
+    uint8_t  m_startSlot;
+    uint8_t  m_endSlot;
 } CDROMeventStatus;
 
 // and this is returned by GPCMD_READ_DISC_INFO
 typedef struct {
-    uint16_t disc_information_length;
+    uint16_t m_discInformationLength;
 #if HAVE_BIGENDIAN
-    uint8_t  reserved1          : 3;
-    uint8_t  erasable           : 1;
-    uint8_t  border_status      : 2;
-    uint8_t  disc_status        : 2;
+    uint8_t  m_reserved1         : 3;
+    uint8_t  m_erasable          : 1;
+    uint8_t  m_borderStatus      : 2;
+    uint8_t  m_discStatus        : 2;
 #else
-    uint8_t  disc_status        : 2;
-    uint8_t  border_status      : 2;
-    uint8_t  erasable           : 1;
-    uint8_t  reserved1          : 3;
+    uint8_t  m_discStatus        : 2;
+    uint8_t  m_borderStatus      : 2;
+    uint8_t  m_erasable          : 1;
+    uint8_t  m_reserved1         : 3;
 #endif
-    uint8_t  n_first_track;
-    uint8_t  n_sessions_lsb;
-    uint8_t  first_track_lsb;
-    uint8_t  last_track_lsb;
+    uint8_t  m_nFirstTrack;
+    uint8_t  m_nSessionsLsb;
+    uint8_t  m_firstTrackLsb;
+    uint8_t  m_lastTrackLsb;
 #if HAVE_BIGENDIAN
-    uint8_t  did_v              : 1;
-    uint8_t  dbc_v              : 1;
-    uint8_t  uru                : 1;
-    uint8_t  reserved2          : 5;
+    uint8_t  m_didV              : 1;
+    uint8_t  m_dbcV              : 1;
+    uint8_t  m_uru               : 1;
+    uint8_t  m_reserved2         : 5;
 #else
-    uint8_t  reserved2          : 5;
-    uint8_t  uru                : 1;
-    uint8_t  dbc_v              : 1;
-    uint8_t  did_v              : 1;
+    uint8_t  m_reserved2         : 5;
+    uint8_t  m_uru               : 1;
+    uint8_t  m_dbcV              : 1;
+    uint8_t  m_didV              : 1;
 #endif
-    uint8_t  disc_type;
-    uint8_t  n_sessions_msb;
-    uint8_t  first_track_msb;
-    uint8_t  last_track_msb;
-    uint32_t disc_id;
-    uint32_t lead_in;
-    uint32_t lead_out;
-    uint8_t  disc_bar_code[8];
-    uint8_t  reserved3;
-    uint8_t  n_opc;
+    uint8_t  m_discType;
+    uint8_t  m_nSessionsMsb;
+    uint8_t  m_firstTrackMsb;
+    uint8_t  m_lastTrackMsb;
+    uint32_t m_discId;
+    uint32_t m_leadIn;
+    uint32_t m_leadOut;
+    uint8_t  m_discBarCode[8];
+    uint8_t  m_reserved3;
+    uint8_t  m_nOpc;
 } CDROMdiscInfo;
 
 enum CDROMdiscStatus
@@ -208,7 +208,7 @@ bool MythCDROMLinux::hasWritableMedia()
     }
 
     CDROMdiscInfo *di = (CDROMdiscInfo *) buffer;
-    switch (di->disc_status)
+    switch (di->m_discStatus)
     {
         case MEDIA_IS_EMPTY:
             return true;
@@ -218,7 +218,7 @@ bool MythCDROMLinux::hasWritableMedia()
             // writing, so we treat it just like a finished disc:
 
         case MEDIA_IS_COMPLETE:
-            return di->erasable;
+            return di->m_erasable;
 
         case MEDIA_IS_OTHER:
             ;
@@ -255,22 +255,22 @@ int MythCDROMLinux::SCSIstatus()
     CDROMeventStatus *es = (CDROMeventStatus *) buffer;
 
     if ((ioctl(m_DeviceHandle, CDROM_SEND_PACKET, &cgc) < 0)
-        || es->nea                           // drive does not support request
-        || (es->notification_class != 0x4))  // notification class mismatch
+        || es->m_nea                         // drive does not support request
+        || (es->m_notificationClass != 0x4)) // notification class mismatch
     {
         LOG(VB_MEDIA, LOG_ERR, LOC +
             ":SCSIstatus() - failed to send SCSI packet to " + m_DevicePath + ENO);
         return CDS_TRAY_OPEN;
     }
 
-    if (es->media_present)
+    if (es->m_mediaPresent)
     {
         LOG(VB_MEDIA, LOG_DEBUG, LOC +
             ":SCSIstatus() - ioctl said tray was open, "
             "but drive is actually closed with a disc");
         return CDS_DISC_OK;
     }
-    if (es->door_open)
+    if (es->m_doorOpen)
     {
         LOG(VB_MEDIA, LOG_DEBUG, LOC +
             ":SCSIstatus() - tray is definitely open");
@@ -329,7 +329,7 @@ struct StHandle {
     const int m_fd;
     explicit StHandle(const char *dev) : m_fd(open(dev, O_RDWR | O_NONBLOCK)) { }
     ~StHandle() { close(m_fd); }
-    operator int() const { return m_fd; }
+    operator int() const { return m_fd; } // NOLINT(google-explicit-constructor)
 };
 
 // This is copied from eject.c by Jeff Tranter (tranter@pobox.com)

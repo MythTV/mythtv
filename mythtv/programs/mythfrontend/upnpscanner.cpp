@@ -88,7 +88,7 @@ class MediaServer : public MediaServerItem
     }
     explicit MediaServer(QUrl URL)
      : MediaServerItem(QString("0"), QString(), QString(), QString()),
-       m_URL(std::move(URL)), m_controlURL(QUrl()),
+       m_url(std::move(URL)), m_controlURL(QUrl()),
        m_eventSubURL(QUrl()), m_eventSubPath(QString()),
        m_friendlyName(QString("Unknown"))
     {
@@ -106,7 +106,7 @@ class MediaServer : public MediaServerItem
         return result;
     }
 
-    QUrl    m_URL;
+    QUrl    m_url;
     int     m_connectionAttempts {0};
     QUrl    m_controlURL;
     QUrl    m_eventSubURL;
@@ -525,7 +525,7 @@ void UPNPScanner::Update(void)
             (it.value()->m_controlURL.isEmpty()))
         {
             bool sent = false;
-            QUrl url = it.value()->m_URL;
+            QUrl url = it.value()->m_url;
             if (!m_descriptionRequests.contains(url) &&
                 (m_descriptionRequests.empty()) &&
                 url.isValid())
@@ -567,7 +567,7 @@ void UPNPScanner::CheckStatus(void)
         {
             LOG(VB_UPNP, LOG_INFO, LOC +
                 QString("%1 no longer in SSDP cache. Removing")
-                    .arg(it.value()->m_URL.toString()));
+                    .arg(it.value()->m_url.toString()));
             MediaServer* last = it.value();
             it.remove();
             delete last;
@@ -771,7 +771,7 @@ void UPNPScanner::CheckFailure(const QUrl &url)
     while (it.hasNext())
     {
         it.next();
-        if (it.value()->m_URL == url &&
+        if (it.value()->m_url == url &&
             it.value()->m_connectionAttempts == MAX_ATTEMPTS)
         {
             Debug();
@@ -1297,7 +1297,7 @@ bool UPNPScanner::ParseDescription(const QUrl &url, QNetworkReply *reply)
     while (it.hasNext())
     {
         it.next();
-        if (it.value()->m_URL == url)
+        if (it.value()->m_url == url)
         {
             usn = it.key();
             QUrl qcontrolurl(controlURL);

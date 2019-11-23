@@ -160,7 +160,7 @@ void RecorderBase::SetOption(const QString &name, const QString &value)
     {
         m_ntsc = false;
         if (value.toLower() == "ntsc" || value.toLower() == "ntsc-jp")
-        {
+        {    // NOLINT(bugprone-branch-clone)
             m_ntsc = true;
             SetFrameRate(29.97);
         }
@@ -523,9 +523,8 @@ long long RecorderBase::GetKeyframePosition(long long desired) const
     frm_pos_map_t::const_iterator it = m_positionMap.lowerBound(desired);
     if (it == m_positionMap.end())
         ret = *m_positionMap.begin();
-    else if (it.key() == desired)
-        ret = *it;
-    else if (--it != m_positionMap.end())
+    else if ((it.key() == desired) ||
+             (--it != m_positionMap.end()))
         ret = *it;
 
     return ret;
@@ -848,88 +847,88 @@ RecorderBase *RecorderBase::CreateRecorder(
 
     RecorderBase *recorder = nullptr;
     if (genOpt.inputtype == "MPEG")
-    {
+    { // NOLINTNEXTLINE(bugprone-branch-clone)
 #ifdef USING_IVTV
         recorder = new MpegRecorder(tvrec);
 #endif // USING_IVTV
     }
+#ifdef USING_HDPVR
     else if (genOpt.inputtype == "HDPVR")
     {
-#ifdef USING_HDPVR
         recorder = new MpegRecorder(tvrec);
-#endif // USING_HDPVR
     }
+#endif // USING_HDPVR
+#ifdef USING_V4L2
     else if (genOpt.inputtype == "V4L2ENC")
     {
-#ifdef USING_V4L2
         if (dynamic_cast<V4LChannel*>(channel))
             recorder = new V4L2encRecorder(tvrec, dynamic_cast<V4LChannel*>(channel));
-#endif
     }
+#endif
+#ifdef USING_FIREWIRE
     else if (genOpt.inputtype == "FIREWIRE")
     {
-#ifdef USING_FIREWIRE
         if (dynamic_cast<FirewireChannel*>(channel))
             recorder = new FirewireRecorder(tvrec, dynamic_cast<FirewireChannel*>(channel));
-#endif // USING_FIREWIRE
     }
+#endif // USING_FIREWIRE
+#ifdef USING_HDHOMERUN
     else if (genOpt.inputtype == "HDHOMERUN")
     {
-#ifdef USING_HDHOMERUN
         if (dynamic_cast<HDHRChannel*>(channel))
         {
             recorder = new HDHRRecorder(tvrec, dynamic_cast<HDHRChannel*>(channel));
             recorder->SetBoolOption("wait_for_seqstart", genOpt.wait_for_seqstart);
         }
-#endif // USING_HDHOMERUN
     }
+#endif // USING_HDHOMERUN
+#ifdef USING_CETON
     else if (genOpt.inputtype == "CETON")
     {
-#ifdef USING_CETON
         if (dynamic_cast<CetonChannel*>(channel))
         {
             recorder = new CetonRecorder(tvrec, dynamic_cast<CetonChannel*>(channel));
             recorder->SetBoolOption("wait_for_seqstart", genOpt.wait_for_seqstart);
         }
-#endif // USING_CETON
     }
+#endif // USING_CETON
+#ifdef USING_DVB
     else if (genOpt.inputtype == "DVB")
     {
-#ifdef USING_DVB
         if (dynamic_cast<DVBChannel*>(channel))
         {
             recorder = new DVBRecorder(tvrec, dynamic_cast<DVBChannel*>(channel));
             recorder->SetBoolOption("wait_for_seqstart", genOpt.wait_for_seqstart);
         }
-#endif // USING_DVB
     }
+#endif // USING_DVB
+#ifdef USING_IPTV
     else if (genOpt.inputtype == "FREEBOX")
     {
-#ifdef USING_IPTV
         if (dynamic_cast<IPTVChannel*>(channel))
         {
             recorder = new IPTVRecorder(tvrec, dynamic_cast<IPTVChannel*>(channel));
             recorder->SetOption("mrl", genOpt.videodev);
         }
-#endif // USING_IPTV
     }
+#endif // USING_IPTV
+#ifdef USING_VBOX
     else if (genOpt.inputtype == "VBOX")
     {
-#ifdef USING_VBOX
         if (dynamic_cast<IPTVChannel*>(channel))
             recorder = new IPTVRecorder(tvrec, dynamic_cast<IPTVChannel*>(channel));
-#endif // USING_VBOX
     }
+#endif // USING_VBOX
+#ifdef USING_ASI
     else if (genOpt.inputtype == "ASI")
     {
-#ifdef USING_ASI
         if (dynamic_cast<ASIChannel*>(channel))
         {
             recorder = new ASIRecorder(tvrec, dynamic_cast<ASIChannel*>(channel));
             recorder->SetBoolOption("wait_for_seqstart", genOpt.wait_for_seqstart);
         }
-#endif // USING_ASI
     }
+#endif // USING_ASI
     else if (genOpt.inputtype == "IMPORT")
     {
         recorder = new ImportRecorder(tvrec);
@@ -942,14 +941,14 @@ RecorderBase *RecorderBase::CreateRecorder(
         recorder = new ImportRecorder(tvrec);
 #endif
     }
+#if CONFIG_LIBMP3LAME && defined(USING_V4L2)
     else if (CardUtil::IsV4L(genOpt.inputtype))
     {
-#if CONFIG_LIBMP3LAME && defined(USING_V4L2)
         // V4L/MJPEG/GO7007 from here on
         recorder = new NuppelVideoRecorder(tvrec, channel);
         recorder->SetBoolOption("skipbtaudio", genOpt.skip_btaudio);
-#endif // USING_V4L2
     }
+#endif // USING_V4L2
     else if (genOpt.inputtype == "EXTERNAL")
     {
         if (dynamic_cast<ExternalChannel*>(channel))

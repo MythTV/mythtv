@@ -265,7 +265,7 @@ bool H264Parser::new_AU(void)
         // Need previous slice information for comparison
 
         if (nal_unit_type != SLICE_IDR && frame_num != prev_frame_num)
-            result = true;
+            result = true; // NOLINT(bugprone-branch-clone)
         else if (prev_pic_parameter_set_id != -1 &&
                  pic_parameter_set_id != prev_pic_parameter_set_id)
             result = true;
@@ -1165,7 +1165,7 @@ void H264Parser::vui_parameters(GetBitContext * gb)
 
         switch (aspect_ratio_idc)
         {
-          case 0:
+          case 0: // NOLINT(bugprone-branch-clone)
             // Unspecified
             break;
           case 1:
@@ -1323,11 +1323,8 @@ uint H264Parser::aspectRatio(void) const
 
     switch (aspect_ratio_idc)
     {
-        case 0:
-            // Unspecified
-            break;
-        case 1:
-            // 1:1
+        case 0: // Unspecified
+        case 1: // 1:1
             break;
         case 2:
             // 12:11

@@ -16,10 +16,10 @@ struct ExitPrompterPrivate
 {
     ExitPrompterPrivate()
     {
-        stk = GetMythMainWindow()->GetStack("popup stack");
+        m_stk = GetMythMainWindow()->GetStack("popup stack");
     }
 
-    MythScreenStack *stk;
+    MythScreenStack *m_stk;
 };
 
 ExitPrompter::ExitPrompter()
@@ -41,7 +41,7 @@ void ExitPrompter::masterPromptExit()
                            " master backend to populate the"
                            " database with guide information.");
 
-        MythConfirmationDialog *dia = new MythConfirmationDialog(m_d->stk,
+        MythConfirmationDialog *dia = new MythConfirmationDialog(m_d->m_stk,
                                                                  label,
                                                                  false);
         if (!dia->Create())
@@ -53,7 +53,7 @@ void ExitPrompter::masterPromptExit()
         else
         {
             dia->SetReturnEvent(this, "mythfillprompt");
-            m_d->stk->AddScreen(dia);
+            m_d->m_stk->AddScreen(dia);
         }
     }
     else
@@ -72,7 +72,7 @@ void ExitPrompter::handleExit()
                               "problem(s)?", nullptr, problems.size()));
 
         MythDialogBox *dia = new MythDialogBox(problems.join("\n"),
-                                                m_d->stk, "exit prompt");
+                                                m_d->m_stk, "exit prompt");
         if (!dia->Create())
         {
             LOG(VB_GENERAL, LOG_ERR, "Can't create Exit Prompt dialog?");
@@ -87,7 +87,7 @@ void ExitPrompter::handleExit()
         dia->AddButton(tr("No, I know what I am doing"),
                 SLOT(masterPromptExit()));
                 
-        m_d->stk->AddScreen(dia);
+        m_d->m_stk->AddScreen(dia);
     }
     else
         masterPromptExit();

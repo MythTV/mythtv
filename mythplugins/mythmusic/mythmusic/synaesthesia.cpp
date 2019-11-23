@@ -619,9 +619,9 @@ static class SynaesthesiaFactory : public VisFactory
   public:
     const QString &name(void) const override // VisFactory
     {
-        static QString name = QCoreApplication::translate("Visualizers",
-                                                          "Synaesthesia");
-        return name;
+        static QString s_name = QCoreApplication::translate("Visualizers",
+                                                            "Synaesthesia");
+        return s_name;
     }
 
     uint plugins(QStringList *list) const override // VisFactory

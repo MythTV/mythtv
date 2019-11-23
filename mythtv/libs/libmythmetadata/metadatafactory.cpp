@@ -642,7 +642,7 @@ LookupType GuessLookupType(ProgramInfo *pginfo)
     if ((!pginfo->GetSubtitle().isEmpty() || pginfo->GetEpisode() > 0) &&
        (catType == ProgramInfo::kCategorySeries ||
         catType == ProgramInfo::kCategoryTVShow))
-        ret = kProbableTelevision;
+        ret = kProbableTelevision; // NOLINT(bugprone-branch-clone)
     else if (catType == ProgramInfo::kCategoryMovie)
         ret = kProbableMovie;
     else if (pginfo->GetSeason() > 0 || pginfo->GetEpisode() > 0 ||

@@ -66,10 +66,10 @@ class ShoutCastMetaParser
     ShoutCastMetaMap parseMeta(const QString &mdata);
 
   private:
-    QString m_meta_format;
-    int m_meta_artist_pos {-1};
-    int m_meta_title_pos {-1};
-    int m_meta_album_pos {-1};
+    QString m_metaFormat;
+    int     m_metaArtistPos {-1};
+    int     m_metaTitlePos  {-1};
+    int     m_metaAlbumPos  {-1};
 };
 
 void ShoutCastMetaParser::setMetaFormat(const QString &metaformat)
@@ -81,24 +81,24 @@ void ShoutCastMetaParser::setMetaFormat(const QString &metaformat)
   %b - album
   %r - random bytes
  */
-    m_meta_format = metaformat;
+    m_metaFormat = metaformat;
 
-    m_meta_artist_pos = 0;
-    m_meta_title_pos = 0;
-    m_meta_album_pos = 0;
+    m_metaArtistPos = 0;
+    m_metaTitlePos  = 0;
+    m_metaAlbumPos  = 0;
 
     int assign_index = 1;
     int pos = 0;
 
-    pos = m_meta_format.indexOf("%", pos);
+    pos = m_metaFormat.indexOf("%", pos);
     while (pos >= 0)
     {
         pos++;
 
         QChar ch;
 
-        if (pos < m_meta_format.length())
-            ch = m_meta_format.at(pos);
+        if (pos < m_metaFormat.length())
+            ch = m_metaFormat.at(pos);
 
         if (!ch.isNull() && ch == '%')
         {
@@ -107,29 +107,29 @@ void ShoutCastMetaParser::setMetaFormat(const QString &metaformat)
         else if (!ch.isNull() && (ch == 'r' || ch == 'a' || ch == 'b' || ch == 't'))
         {
             if (ch == 'a')
-                m_meta_artist_pos = assign_index;
+                m_metaArtistPos = assign_index;
 
             if (ch == 'b')
-                m_meta_album_pos = assign_index;
+                m_metaAlbumPos = assign_index;
 
             if (ch == 't')
-                m_meta_title_pos = assign_index;
+                m_metaTitlePos = assign_index;
 
             assign_index++;
         }
         else
             LOG(VB_GENERAL, LOG_ERR,
                 QString("ShoutCastMetaParser: malformed metaformat '%1'")
-                    .arg(m_meta_format));
+                    .arg(m_metaFormat));
 
-        pos = m_meta_format.indexOf("%", pos);
+        pos = m_metaFormat.indexOf("%", pos);
     }
 
-    m_meta_format.replace("%a", "(.*)");
-    m_meta_format.replace("%t", "(.*)");
-    m_meta_format.replace("%b", "(.*)");
-    m_meta_format.replace("%r", "(.*)");
-    m_meta_format.replace("%%", "%");
+    m_metaFormat.replace("%a", "(.*)");
+    m_metaFormat.replace("%t", "(.*)");
+    m_metaFormat.replace("%b", "(.*)");
+    m_metaFormat.replace("%r", "(.*)");
+    m_metaFormat.replace("%%", "%");
 }
 
 ShoutCastMetaMap ShoutCastMetaParser::parseMeta(const QString &mdata)
@@ -143,24 +143,24 @@ ShoutCastMetaMap ShoutCastMetaParser::parseMeta(const QString &mdata)
         int title_end_pos = mdata.indexOf("';", title_begin_pos);
         QString title = mdata.mid(title_begin_pos, title_end_pos - title_begin_pos);
         QRegExp rx;
-        rx.setPattern(m_meta_format);
+        rx.setPattern(m_metaFormat);
         if (rx.indexIn(title) != -1)
         {
             LOG(VB_PLAYBACK, LOG_INFO, QString("ShoutCast: Meta     : '%1'")
                     .arg(mdata));
             LOG(VB_PLAYBACK, LOG_INFO,
                 QString("ShoutCast: Parsed as: '%1' by '%2'")
-                    .arg(rx.cap(m_meta_title_pos))
-                    .arg(rx.cap(m_meta_artist_pos)));
+                    .arg(rx.cap(m_metaTitlePos))
+                    .arg(rx.cap(m_metaArtistPos)));
 
-            if (m_meta_title_pos > 0)
-                result["title"] = rx.cap(m_meta_title_pos);
+            if (m_metaTitlePos > 0)
+                result["title"] = rx.cap(m_metaTitlePos);
 
-            if (m_meta_artist_pos > 0)
-                result["artist"] = rx.cap(m_meta_artist_pos);
+            if (m_metaArtistPos > 0)
+                result["artist"] = rx.cap(m_metaArtistPos);
 
-            if (m_meta_album_pos > 0)
-                result["album"] = rx.cap(m_meta_album_pos);
+            if (m_metaAlbumPos > 0)
+                result["album"] = rx.cap(m_metaAlbumPos);
         }
     }
 
@@ -172,9 +172,9 @@ static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
     if (VERBOSE_LEVEL_NONE)
         return;
 
-    static QString full_line("");
-    static const int msg_len = 255;
-    static QMutex string_lock;
+    static QString   s_fullLine("");
+    static constexpr int kMsgLen = 255;
+    static QMutex    s_stringLock;
     uint64_t   verbose_mask  = VB_GENERAL;
     LogLevel_t verbose_level = LOG_DEBUG;
 
@@ -207,31 +207,31 @@ static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
     if (!VERBOSE_LEVEL_CHECK(verbose_mask, verbose_level))
         return;
 
-    string_lock.lock();
-    if (full_line.isEmpty() && ptr) {
+    s_stringLock.lock();
+    if (s_fullLine.isEmpty() && ptr) {
         AVClass* avc = *(AVClass**)ptr;
-        full_line.sprintf("[%s @ %p] ", avc->item_name(ptr), avc);
+        s_fullLine.sprintf("[%s @ %p] ", avc->item_name(ptr), avc);
     }
 
-    char str[msg_len+1];
-    int bytes = vsnprintf(str, msg_len+1, fmt, vl);
+    char str[kMsgLen+1];
+    int bytes = vsnprintf(str, kMsgLen+1, fmt, vl);
 
     // check for truncated messages and fix them
-    if (bytes > msg_len)
+    if (bytes > kMsgLen)
     {
         LOG(VB_GENERAL, LOG_WARNING,
             QString("Libav log output truncated %1 of %2 bytes written")
-                .arg(msg_len).arg(bytes));
-        str[msg_len-1] = '\n';
+                .arg(kMsgLen).arg(bytes));
+        str[kMsgLen-1] = '\n';
     }
 
-    full_line += QString(str);
-    if (full_line.endsWith("\n"))
+    s_fullLine += QString(str);
+    if (s_fullLine.endsWith("\n"))
     {
-        LOG(verbose_mask, verbose_level, full_line.trimmed());
-        full_line.truncate(0);
+        LOG(verbose_mask, verbose_level, s_fullLine.trimmed());
+        s_fullLine.truncate(0);
     }
-    string_lock.unlock();
+    s_stringLock.unlock();
 }
 
 avfDecoder::avfDecoder(const QString &file, DecoderFactory *d, AudioOutput *o) :
@@ -606,8 +606,8 @@ const QString &avfDecoderFactory::extension() const
 
 const QString &avfDecoderFactory::description() const
 {
-    static QString desc(tr("Internal Decoder"));
-    return desc;
+    static QString s_desc(tr("Internal Decoder"));
+    return s_desc;
 }
 
 Decoder *avfDecoderFactory::create(const QString &file, AudioOutput *output, bool deletable)
@@ -615,15 +615,15 @@ Decoder *avfDecoderFactory::create(const QString &file, AudioOutput *output, boo
     if (deletable)
         return new avfDecoder(file, this, output);
 
-    static avfDecoder *decoder = nullptr;
-    if (!decoder)
+    static avfDecoder *s_decoder = nullptr;
+    if (!s_decoder)
     {
-        decoder = new avfDecoder(file, this, output);
+        s_decoder = new avfDecoder(file, this, output);
     }
     else
     {
-        decoder->setOutput(output);
+        s_decoder->setOutput(output);
     }
 
-    return decoder;
+    return s_decoder;
 }

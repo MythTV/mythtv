@@ -85,7 +85,7 @@ edge_mark(AVFrame *dst, int dstheight,
      * yields something lower (degenerate cases), pick the next unique
      * intensity, to try to salvage useful data.
      */
-    static const int    MINTHRESHOLDPCT = 95;
+    static constexpr int kMinThresholdPct = 95;
 
     const int           dstwidth = dst->linesize[0];
     const int           padded_width = extraleft + dstwidth + extraright;
@@ -141,7 +141,7 @@ edge_mark(AVFrame *dst, int dstheight,
     for (first = ii; first > 0 && sgmsorted[first] == thresholdval; first--) ;
     if (sgmsorted[first] != thresholdval)
         first++;
-    if (first * 100 / nn < MINTHRESHOLDPCT)
+    if (first * 100 / nn < kMinThresholdPct)
     {
         int last = ii, last2 = nn - 1;
         for (last = ii; last < last2 && sgmsorted[last] == thresholdval;

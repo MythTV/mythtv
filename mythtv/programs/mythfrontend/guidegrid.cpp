@@ -206,7 +206,7 @@ public:
                 QDateTime firstTime, QDateTime lastTime)
         : m_firstRow(firstRow), m_numRows(numRows),
           m_channums(std::move(channums)),
-          m_gg_programRect(gg_programRect), m_gg_channelCount(gg_channelCount),
+          m_ggProgramRect(gg_programRect), m_ggChannelCount(gg_channelCount),
           m_currentStartTime(std::move(currentStartTime)),
           m_currentEndTime(std::move(currentEndTime)),
           m_currentStartChannel(currentStartChannel), m_currentRow(currentRow),
@@ -215,8 +215,8 @@ public:
           m_firstTime(std::move(firstTime)), m_lastTime(std::move(lastTime)) {}
     const unsigned int m_firstRow, m_numRows;
     const QVector<int> m_channums;
-    const MythRect m_gg_programRect;
-    const int m_gg_channelCount;
+    const MythRect m_ggProgramRect;
+    const int m_ggChannelCount;
     const QDateTime m_currentStartTime, m_currentEndTime;
     const uint m_currentStartChannel;
     const int m_currentRow, m_currentCol;
@@ -252,8 +252,8 @@ public:
           m_firstRow(gs.m_firstRow),
           m_numRows(gs.m_numRows),
           m_channums(gs.m_channums),
-          m_gg_programRect(gs.m_gg_programRect),
-          m_gg_channelCount(gs.m_gg_channelCount),
+          m_ggProgramRect(gs.m_ggProgramRect),
+          m_ggChannelCount(gs.m_ggChannelCount),
           m_currentStartTime(gs.m_currentStartTime),
           m_currentEndTime(gs.m_currentEndTime),
           m_currentStartChannel(gs.m_currentStartChannel),
@@ -303,8 +303,8 @@ private:
     const unsigned int m_firstRow;
     const unsigned int m_numRows;
     const QVector<int> m_channums;
-    const MythRect m_gg_programRect;
-    const int m_gg_channelCount;
+    const MythRect m_ggProgramRect;
+    const int m_ggChannelCount;
     const QDateTime m_currentStartTime;
     const QDateTime m_currentEndTime;
     const uint m_currentStartChannel;
@@ -1423,8 +1423,8 @@ void GuideGrid::fillChannelInfos(bool gotostartchannel)
 int GuideGrid::FindChannel(uint chanid, const QString &channum,
                            bool exact) const
 {
-    static QMutex chanSepRegExpLock;
-    static QRegExp chanSepRegExp(ChannelUtil::kATSCSeparators);
+    static QMutex s_chanSepRegExpLock;
+    static QRegExp s_chanSepRegExp(ChannelUtil::kATSCSeparators);
 
     // first check chanid
     uint i = (chanid) ? 0 : GetChannelCount();
@@ -1702,7 +1702,7 @@ void GuideUpdateProgramRow::fillProgramRowInfosWith(int row,
     for (; it != unknownlist.end(); ++it)
         proglist->push_back(*it);
 
-    MythRect programRect = m_gg_programRect;
+    MythRect programRect = m_ggProgramRect;
 
     /// use doubles to avoid large gaps at end..
     double ydifference = 0.0, xdifference = 0.0;
@@ -1710,14 +1710,14 @@ void GuideUpdateProgramRow::fillProgramRowInfosWith(int row,
     if (m_verticalLayout)
     {
         ydifference = programRect.width() /
-            (double) m_gg_channelCount;
+            (double) m_ggChannelCount;
         xdifference = programRect.height() /
             (double) m_timeCount;
     }
     else
     {
         ydifference = programRect.height() /
-            (double) m_gg_channelCount;
+            (double) m_ggChannelCount;
         xdifference = programRect.width() /
             (double) m_timeCount;
     }

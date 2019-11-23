@@ -313,7 +313,7 @@ namespace
                     m_fanartTimer.stop();
 
                 image->Reset();
-                itemsPast++;
+                m_itemsPast++;
             }
             else
             {
@@ -324,7 +324,7 @@ namespace
                     if (wasActive)
                         m_fanartTimer.stop();
 
-                    if (itemsPast > 2)
+                    if (m_itemsPast > 2)
                         m_fanart->Reset();
 
                     m_fanart->SetFilename(filename);
@@ -332,12 +332,12 @@ namespace
                     m_fanartTimer.start(300);
 
                     if (wasActive)
-                        itemsPast++;
+                        m_itemsPast++;
                     else
-                        itemsPast = 0;
+                        m_itemsPast = 0;
                 }
                 else
-                    itemsPast = 0;
+                    m_itemsPast = 0;
             }
         }
 
@@ -349,7 +349,7 @@ namespace
         }
 
       private:
-        int             itemsPast    {0};
+        int             m_itemsPast    {0};
         QMutex          m_fanartLock;
         MythUIImage    *m_fanart     {nullptr};
         QTimer          m_fanartTimer;
@@ -701,11 +701,11 @@ class VideoDialogPrivate
                 for (QStringList::const_iterator p = ratings.begin();
                     p != ratings.end(); ++p)
                 {
-                    m_rating_to_pl.push_back(
+                    m_ratingToPl.push_back(
                         parental_level_map::value_type(*p, sl.GetLevel()));
                 }
             }
-            m_rating_to_pl.sort(std::not2(rating_to_pl_less()));
+            m_ratingToPl.sort(std::not2(rating_to_pl_less()));
         }
 
         m_rememberPosition =
@@ -738,11 +738,11 @@ class VideoDialogPrivate
 
     void AutomaticParentalAdjustment(VideoMetadata *metadata)
     {
-        if (metadata && !m_rating_to_pl.empty())
+        if (metadata && !m_ratingToPl.empty())
         {
             QString rating = metadata->GetRating();
-            for (parental_level_map::const_iterator p = m_rating_to_pl.begin();
-                    !rating.isEmpty() && p != m_rating_to_pl.end(); ++p)
+            for (parental_level_map::const_iterator p = m_ratingToPl.begin();
+                    !rating.isEmpty() && p != m_ratingToPl.end(); ++p)
             {
                 if (rating.indexOf(p->first) != -1)
                 {
@@ -794,7 +794,7 @@ class VideoDialogPrivate
     QMap<QString, int> m_notifications;
 
   private:
-    parental_level_map m_rating_to_pl;
+    parental_level_map m_ratingToPl;
 };
 
 VideoDialog::VideoListDeathDelayPtr VideoDialogPrivate::m_savedPtr;

@@ -327,32 +327,24 @@ void ModuleDescriptorData::Process(const unsigned char *data, int length)
         unsigned char tag = *data++;
         unsigned char len = *data++;
         length -= 2;
-        switch (tag)
+
+        // Tags:
+        //   case 0x01: // Type
+        //   case 0x02: // Name
+        //   case 0x03: // Info
+        //   case 0x04: // Modlink
+        //   case 0x05: // CRC
+        //   case 0x06: // Location
+        //   case 0x07: // DLtime
+        //   case 0x08: // Grouplink
+        //   case 0x09: // Compressed.
+        if (tag == 0x09)
         {
-            case 0x01: // Type
-                break;
-            case 0x02: // Name
-                break;
-            case 0x03: // Info
-                break;
-            case 0x04: // Modlink
-                break;
-            case 0x05: // CRC
-                break;
-            case 0x06: // Location
-                break;
-            case 0x07: // DLtime
-                break;
-            case 0x08: // Grouplink
-                break;
-            case 0x09: // Compressed.
                 // Skip the method.
                 m_isCompressed = true;
                 m_originalSize = COMBINE32(data, 1);
-                break;
-            default:
-                break;
         }
+
         length -= len;
         data += len;
     }

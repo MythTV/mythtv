@@ -640,6 +640,7 @@ AudioOutputSettings* AudioOutputOMX::GetOutputSettings(bool /*passthrough*/)
 
     AudioOutputSettings *settings = new AudioOutputSettings();
 
+    // NOLINTNEXTLINE(bugprone-infinite-loop)
     while (int rate = settings->GetNextRate())
     {
         pcm.nSamplingRate = rate;

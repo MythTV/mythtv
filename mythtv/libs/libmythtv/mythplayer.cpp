@@ -559,9 +559,8 @@ FrameScanType MythPlayer::detectInterlace(FrameScanType newScan,
         // isn't, we have to guess.
 
         scan = kScan_Interlaced; // default to interlaced
-        if (720 == video_height) // ATSC 720p
-            scan = kScan_Progressive;
-        else if (fps > 45) // software deinterlacing
+        if ((720 == video_height) || // ATSC 720p
+            (fps > 45))              // software deinterlacing
             scan = kScan_Progressive;
 
         if (kScan_Detect != newScan)
