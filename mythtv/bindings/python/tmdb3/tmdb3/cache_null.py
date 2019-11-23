@@ -7,7 +7,7 @@
 # Purpose: Null caching engine for debugging purposes
 #-----------------------
 
-from cache_engine import CacheEngine
+from .cache_engine import CacheEngine
 
 
 class NullEngine(CacheEngine):

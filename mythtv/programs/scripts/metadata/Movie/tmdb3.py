@@ -26,10 +26,19 @@ __version__ = "0.3.7"
 #       resolved upstream.
 # 0.3.7 Add handling for TMDB site returning insufficient results from a
 #       query
+# 0.3.7.a : Added compatibiliy to python3, tested with python 3.6 and 2.7
 
 from optparse import OptionParser
 import sys
 import signal
+
+def print_etree(etostr):
+    """lxml.etree.tostring is a bytes object in python3, and a str in python2.
+    """
+    if sys.version_info[0] == 2:
+        sys.stdout.write(etostr)
+    else:
+        sys.stdout.write(etostr.decode())
 
 def timeouthandler(signal, frame):
     raise RuntimeError("Timed out")
@@ -58,14 +67,14 @@ def buildSingle(inetref, opts):
             if getattr(movie, j):
                 setattr(m, i, getattr(movie, j))
         except TMDBRequestInvalid:
-            sys.stdout.write(etree.tostring(tree, encoding='UTF-8', pretty_print=True,
+            print_etree(etree.tostring(tree, encoding='UTF-8', pretty_print=True,
                                             xml_declaration=True))
             sys.exit()
 
     if movie.title:
         m.title = movie.title
 
-    releases = movie.releases.items()
+    releases = list(movie.releases.items())
 
 # get the release date for the wanted country
 # TODO if that is not part of the reply use the primary release date (Primary=true)
@@ -73,14 +82,14 @@ def buildSingle(inetref, opts):
 # if there is not a single release date in the reply, then leave it empty
     if len(releases) > 0:
         if opts.country:
-            # resort releases with selected country at top to ensure it 
-            # is selected by the metadata libraries 
-            r = zip(*releases) 
-            if opts.country in r[0]: 
-                index = r[0].index(opts.country) 
-                releases.insert(0, releases.pop(index)) 
+            # resort releases with selected country at top to ensure it
+            # is selected by the metadata libraries
+            r = list(zip(*releases))
+            if opts.country in r[0]:
+                index = r[0].index(opts.country)
+                releases.insert(0, releases.pop(index))
 
-        m.releasedate = releases[0][1].releasedate 
+        m.releasedate = releases[0][1].releasedate
 
     m.inetref = str(movie.id)
     if movie.collection:
@@ -117,7 +126,7 @@ def buildSingle(inetref, opts):
                         'height':str(poster.height),
                         'width':str(poster.width)})
     tree.append(m.toXML())
-    sys.stdout.write(etree.tostring(tree, encoding='UTF-8', pretty_print=True,
+    print_etree(etree.tostring(tree, encoding='UTF-8', pretty_print=True,
                                     xml_declaration=True))
     sys.exit()
 
@@ -140,7 +149,7 @@ def buildList(query, opts):
     count = 0
     while True:
         try:
-            res = results.next()
+            res = next(results)
         except StopIteration:
             # end of results
             break
@@ -182,7 +191,7 @@ def buildList(query, opts):
             # page limiter, dont want to overload the server
             break
 
-    sys.stdout.write(etree.tostring(tree, encoding='UTF-8', pretty_print=True,
+    print_etree(etree.tostring(tree, encoding='UTF-8', pretty_print=True,
                                     xml_declaration=True))
     sys.exit(0)
 
@@ -198,7 +207,7 @@ def buildCollection(inetref, opts):
     try:
         m.title = collection.name
     except TMDBRequestInvalid:
-        sys.stdout.write(etree.tostring(tree, encoding='UTF-8', pretty_print=True,
+        print_etree(etree.tostring(tree, encoding='UTF-8', pretty_print=True,
                                         xml_declaration=True))
         sys.exit()
     if collection.backdrop:
@@ -210,7 +219,7 @@ def buildCollection(inetref, opts):
         m.images.append({'type':'coverart', 'url':p.geturl(),
                   'thumb':p.geturl(p.sizes()[0])})
     tree.append(m.toXML())
-    sys.stdout.write(etree.tostring(tree, encoding='UTF-8', pretty_print=True,
+    print_etree(etree.tostring(tree, encoding='UTF-8', pretty_print=True,
                                     xml_declaration=True))
     sys.exit()
 
@@ -227,7 +236,7 @@ def buildVersion():
     etree.SubElement(version, "version").text = __version__
     etree.SubElement(version, "accepts").text = 'tmdb.py'
     etree.SubElement(version, "accepts").text = 'tmdb.pl'
-    sys.stdout.write(etree.tostring(version, encoding='UTF-8', pretty_print=True,
+    print_etree(etree.tostring(version, encoding='UTF-8', pretty_print=True,
                                     xml_declaration=True))
     sys.exit(0)
 
@@ -250,10 +259,10 @@ def performSelfTest():
         import lxml
     except:
         err = 1
-        print "Failed to import python lxml library."
+        print ("Failed to import python lxml library.")
 
     if not err:
-        print "Everything appears in order."
+        print ("Everything appears in order.")
     sys.exit(err)
 
 def main():
@@ -301,7 +310,7 @@ def main():
         if (not confdir) or (confdir == '/'):
             confdir = os.environ.get('HOME', '')
             if (not confdir) or (confdir == '/'):
-                print "Unable to find MythTV directory for metadata cache."
+                print ("Unable to find MythTV directory for metadata cache.")
                 sys.exit(1)
             confdir = os.path.join(confdir, '.mythtv')
         cachedir = os.path.join(confdir, 'cache')
@@ -328,7 +337,7 @@ def main():
 
         if opts.collectiondata:
             buildCollection(args[0], opts)
-    except RuntimeError, exc:
+    except RuntimeError as exc:
         sys.stdout.write('ERROR: ' + str(exc) + ' exception')
         sys.exit(1)
 

@@ -242,7 +242,8 @@ void EITScanner::StartActiveScan(TVRec *_rec, uint max_seconds_per_source)
         query.prepare(
             "SELECT channum, MIN(chanid) "
             "FROM channel, capturecard, videosource "
-            "WHERE capturecard.sourceid = channel.sourceid AND "
+            "WHERE deleted              IS NULL            AND "
+            "      capturecard.sourceid = channel.sourceid AND "
             "      videosource.sourceid = channel.sourceid AND "
             "      channel.mplexid        IS NOT NULL      AND "
             "      visible              = 1                AND "

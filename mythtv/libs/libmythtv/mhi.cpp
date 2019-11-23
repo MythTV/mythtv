@@ -881,7 +881,8 @@ bool MHIContext::LoadChannelCache()
     query.prepare(
         "SELECT networkid, serviceid, transportid, chanid "
         "FROM channel, dtv_multiplex "
-        "WHERE channel.mplexid  = dtv_multiplex.mplexid "
+        "WHERE channel.deleted  IS NULL "
+        "  AND channel.mplexid  = dtv_multiplex.mplexid "
         "  AND channel.sourceid = dtv_multiplex.sourceid "
         "  AND channel.sourceid = :SOURCEID ;" );
     query.bindValue(":SOURCEID", m_currentSource);
@@ -963,7 +964,8 @@ int MHIContext::GetChannelIndex(const QString &str)
             MSqlQuery query(MSqlQuery::InitCon());
             query.prepare("SELECT chanid "
                           "FROM channel "
-                          "WHERE channum = :CHAN AND "
+                          "WHERE deleted IS NULL AND "
+                          "      channum = :CHAN AND "
                           "      channel.sourceid = :SOURCEID");
             query.bindValue(":CHAN", channelNo);
             query.bindValue(":SOURCEID", m_currentSource);

@@ -8088,7 +8088,8 @@ QString MainServer::LocalFilePath(const QString &path, const QString &wantgroup)
         lpath = "";
 
         MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("SELECT icon FROM channel WHERE icon LIKE :FILENAME ;");
+        query.prepare("SELECT icon FROM channel "
+                      "WHERE deleted IS NULL AND icon LIKE :FILENAME ;");
         query.bindValue(":FILENAME", QString("%/") + file);
 
         if (query.exec() && query.next())

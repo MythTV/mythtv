@@ -246,7 +246,7 @@ class MTV_PUBLIC TableID
         PMT      = 0x02,
         TSDT     = 0x03, // always on pid 0x02
 
-        // DVB manditory
+        // DVB mandatory
         NIT      = 0x40, // always on pid 0x10
         SDT      = 0x42, // always on pid 0x11
         PF_EIT   = 0x4e, // always on pid 0x12
@@ -746,7 +746,7 @@ class MTV_PUBLIC ProgramMapTable : public PSIPTable
     /// Returns a better (and more expensive) string representation
     /// of type at stream index i than StreamTypeString(uint)
     QString StreamDescription(uint i, const QString& sistandard) const;
-    /// Returns the cannonical language if we find the iso639 descriptor
+    /// Returns the canonical language if we find the iso639 descriptor
     QString GetLanguage(uint i) const;
     /// Returns the audio type from the iso 639 descriptor
     uint GetAudioType(uint i) const;

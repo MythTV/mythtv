@@ -6991,11 +6991,12 @@ fi
 
 # Check for python dependencies
 if enabled bindings_python; then
-    is_python3                 && python=python2
-    check_python               || disable_bindings_python "Python 2.6"
+    check_python               || disable_bindings_python "Python 2.6 or greater"
     check_py_lib MySQLdb       || disable_bindings_python "MySQLdb"
     check_py_lib lxml          || disable_bindings_python "lxml"
-    check_py_lib urlgrabber    || disable_bindings_python "urlgrabber"
+    check_py_lib requests      || disable_bindings_python "requests"
+    check_py_lib simplejson    || disable_bindings_python "simplejson"
+    check_py_lib future        || disable_bindings_python "future"
 fi
 
 # Check for perl dependencies

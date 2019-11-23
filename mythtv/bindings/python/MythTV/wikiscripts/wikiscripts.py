@@ -2,18 +2,33 @@
 # -*- coding: UTF-8 -*-
 #----------------------
 
-from urllib import urlopen
+try:
+    from urllib import urlopen
+except ImportError:
+    from urllib.request import urlopen
 from time import time
-from thread import start_new_thread, allocate_lock
+try:
+    from thread import start_new_thread, allocate_lock
+except ImportError:
+    from _thread import start_new_thread, allocate_lock
 from time import sleep, time
-from MythTV import OrdDict
 import threading
-import cPickle
-import Queue
+try:
+    import cPickle as pickle
+except:
+    import pickle
+from MythTV import OrdDict
+try:
+    import Queue
+except ImportError:
+    import queue as Queue
 import lxml
 import lxml.html
 import os
+import sys
 import stat
+
+from builtins import input
 
 BASEURL = 'https://www.mythtv.org/wiki'
 
@@ -22,7 +37,7 @@ def getScripts():
 
 def getPage(**kwargs):
     url = "{0}?{1}".format(BASEURL,
-            '&'.join(['{0}={1}'.format(k,v) for k,v in kwargs.items()]))
+            '&'.join(['{0}={1}'.format(k,v) for k,v in list(kwargs.items())]))
     return lxml.html.parse(urlopen(url)).getroot()
 
 def getWhatLinksHere(page):
@@ -38,7 +53,7 @@ class Script( object ):
     _queue   = Queue.Queue()
     _pool    = []
     _running = True
-    
+
 
     _valid = False
     _xp_info = lxml.etree.XPath("//span[@id='script-info']/text()")
@@ -59,7 +74,8 @@ class Script( object ):
             return []
         cls._dumpCache()
         scripts = [s for s in scripts if s.isValid()]
-        scripts.sort()
+        #scripts.sort()   ### does not work in python3
+        scripts.sort(key=lambda s: s.url)
         return scripts
 
     @classmethod
@@ -107,7 +123,7 @@ class Script( object ):
                 t = threading.Thread(target=self.processQueue)
                 t.start()
                 self._pool.append(t)
-        
+
     def isValid(self): return self._valid
 
     def processPage(self):
@@ -123,7 +139,7 @@ class Script( object ):
 
     def getInfo(self, etree):
         text = self._xp_info(etree)[0].strip().split('\n')
-        for i in reversed(range(len(text))):
+        for i in reversed(list(range(len(text)))):
             if '=' not in text[i]:
                 text[i-1] += text.pop(i)
         self.info = OrdDict([a.split('=') for a in text])
@@ -144,14 +160,14 @@ class Script( object ):
             code = self._xp_code(etree)
             name = ''
             size = 0
-            for i in range(len(code)):
+            for i in list(range(len(code))):
                 names[i] = str(names[i])
                 if size < len(code[i]):
                     size = len(code[i])
                     name = names[i]
                 code[i] = code[i].lstrip()
                 code[i] = code[i].replace(u'\xa0',' ')
-            self.code = dict(zip(names,code))
+            self.code = dict(list(zip(names,code)))
             if self.info.name == 'unnamed':
                 self.info.name = name
 
@@ -187,12 +203,16 @@ class Script( object ):
         if refresh:
             cls._cache = {}
             return
-
-        path = '/tmp/mythwikiscripts.pickle'
+        if (sys.version_info[0] == 2):
+            path = '/tmp/mythwikiscripts.pickle'
+            fmode = 'r'
+        else:
+            path = '/tmp/mythwikiscripts.pickle3'
+            fmode = 'rb'
         if os.access(path, os.F_OK):
             try:
-                fd = open(path,'r')
-                cls._cache = cPickle.load(fd)
+                fd = open(path, fmode)
+                cls._cache = pickle.load(fd)
                 fd.close()
             except:
                 os.remove(path)
@@ -202,10 +222,16 @@ class Script( object ):
 
     @classmethod
     def _dumpCache(cls):
-        path = '/tmp/mythwikiscripts.pickle'
+        ### XXX ToDo allign pickle protocol versions
         try:
-            fd = open(path,'w')
-            cls._cache = cPickle.dump(cls._cache,fd)
+            if (sys.version_info[0] == 2):
+                path = '/tmp/mythwikiscripts.pickle'
+                fd = open(path,'w')
+                cls._cache = pickle.dump(cls._cache,fd)
+            else:
+                path = '/tmp/mythwikiscripts.pickle3'
+                fd = open(path,'wb')
+                cls._cache = pickle.dump(cls._cache,fd,  protocol=1)
             fd.close()
         except:
             os.remove(path)

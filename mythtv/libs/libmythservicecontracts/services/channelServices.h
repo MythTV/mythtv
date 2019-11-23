@@ -41,7 +41,7 @@
 class SERVICE_PUBLIC ChannelServices : public Service
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.7" );
+    Q_CLASSINFO( "version"    , "1.8" );
     Q_CLASSINFO( "AddDBChannel_Method",              "POST" )
     Q_CLASSINFO( "UpdateDBChannel_Method",           "POST" )
     Q_CLASSINFO( "RemoveDBChannel_Method",           "POST" )
@@ -135,7 +135,8 @@ class SERVICE_PUBLIC ChannelServices : public Service
                                                                    const QString &ConfigPath,
                                                                    int           NITId,
                                                                    uint          BouquetId,
-                                                                   uint          RegionId ) = 0;
+                                                                   uint          RegionId,
+                                                                   uint          ScanFrequency ) = 0;
 
         virtual bool                      RemoveVideoSource      ( uint          SourceID ) = 0;
 
@@ -150,7 +151,8 @@ class SERVICE_PUBLIC ChannelServices : public Service
                                                                    const QString &ConfigPath,
                                                                    int           NITId,
                                                                    uint          BouquetId,
-                                                                   uint          RegionId ) = 0;
+                                                                   uint          RegionId,
+                                                                   uint          ScanFrequency ) = 0;
 
         virtual DTC::LineupList*          GetDDLineupList        ( const QString &Source,
                                                                    const QString &UserId,

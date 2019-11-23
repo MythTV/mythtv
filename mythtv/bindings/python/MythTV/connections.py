@@ -83,7 +83,7 @@ class _Connection_Pool( object ):
         for i in range(self._poolsize):
             self._pool.append(self._connect())
 
-    def __del__(self):
+    def _cleanup(self):
         for conn in self._pool:
             conn.close()
         for id,conn in self._inuse.items():
@@ -313,7 +313,7 @@ class BEConnection( object ):
 
                 # convert to unicode
                 try:
-                    res = str(''.join([res]), 'utf8')
+                    res = str(b''.join([res]), 'utf-8')
                 except:
                     res = u''.join([res])
 
@@ -396,7 +396,7 @@ class BEEventConnection( BEConnection ):
                     event = self.socket.recvheader(deadline=0.0)
 
                     try:
-                        event = str(''.join([event]), 'utf8')
+                        event = str(b''.join([event]), 'utf-8')
                     except:
                         event = u''.join([event])
 
@@ -458,10 +458,10 @@ class FEConnection( object ):
                     'key':   lambda r: r=='OK',
                     'query': lambda r: r,
                     'play':  lambda r: r=='OK'}
-    _res_help = {'jump':  re.compile('(\w+)[ ]+- ([\w /,]+)'),
+    _res_help = {'jump':  re.compile(r'(\w+)[ ]+- ([\w /,]+)'),
                  'key':   lambda r: r.split('\r\n')[4].split(', '),
-                 'query': re.compile('query ([\w ]*\w+)[ \r\n]+- ([\w /,]+)'),
-                 'play':  re.compile('play ([\w -:]*\w+)[ \r\n]+- ([\w /:,\(\)]+)')}
+                 'query': re.compile(r'query ([\w ]*\w+)[ \r\n]+- ([\w /,]+)'),
+                 'play':  re.compile(r'play ([\w -:]*\w+)[ \r\n]+- ([\w /:,\(\)]+)')}
 
     def __init__(self, host, port, deadline=10.0, test=True):
         self.isConnected = False
@@ -473,7 +473,7 @@ class FEConnection( object ):
 
     @classmethod
     def fromUPNP(cls, timeout=5):
-        reLOC = re.compile('http://(?P<ip>[0-9\.]+):(?P<port>[0-9]+)/.*')
+        reLOC = re.compile(r'http://(?P<ip>[0-9\.]+):(?P<port>[0-9]+)/.*')
         msearch = MSearch()
         for res in msearch.searchMythFE(timeout):
             ip, port = reLOC.match(res['location']).group(1,2)
@@ -526,7 +526,7 @@ class FEConnection( object ):
     def disconnect(self):
         if not self.isConnected:
             return
-        self.socket.send("exit")
+        self.socket.send(b"exit")
         self.socket.close()
         self.socket = None
         self.isConnected = False
@@ -542,25 +542,25 @@ class FEConnection( object ):
         if not self.isConnected:
             self.connect()
         if command is None:
-            self.socket.send("help %s\n" % mode)
+            self.socket.send(("help %s\n" % mode).encode('utf-8'))
             res = self.recv()
             try:
                 return self._res_help[mode].findall(res)
             except:
                 return self._res_help[mode](res)
         else:
-            self.socket.send("%s %s\n" % (mode, command))
+            self.socket.send((u"%s %s\n" % (mode, command)).encode('utf-8'))
             return self._res_handler[mode](self.recv())
 
     def recv(self, deadline=None):
-        prompt = re.compile('([\r\n.]*)\r\n# ')
+        prompt = re.compile(b'([\r\n.]*)\r\n# ')
         try:
             res = self.socket.dlexpect(prompt, deadline=deadline)
         except socket.error:
             raise MythFEError(MythError.FE_CONNECTION, self.host, self.port)
         except KeyboardInterrupt:
             raise
-        return prompt.split(res)[0]
+        return prompt.split(res)[0].decode('utf-8')
 
 class XMLConnection( object ):
     """
@@ -601,7 +601,7 @@ class XMLConnection( object ):
 
     @classmethod
     def fromUPNP(cls, timeout=5.0):
-        reLOC = re.compile('http://(?P<ip>[0-9\.]+):(?P<port>[0-9]+)/.*')
+        reLOC = re.compile(r'http://(?P<ip>[0-9\.]+):(?P<port>[0-9]+)/.*')
         msearch = MSearch()
         for res in msearch.searchMythBE(timeout):
             ip, port = reLOC.match(res['location']).group(1,2)

@@ -31,21 +31,26 @@
 # Find out what we're not getting
 #
 
-from i18n import _
-
+from __future__ import print_function
 #import dbus
+from i18n import _
 import platform
 import software
-import commands
-import urlgrabber.grabber
+import subprocess
+import requests
 import sys
 import os
-from urlparse import urljoin
-from urlparse import urlparse
-from urllib import urlencode
-import urllib
+try:
+    from urllib.request import build_opener
+except ImportError:
+    from urllib2 import build_opener
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    from urlparse import urlparse
 import json
 from json import JSONEncoder
+from simplejson import errors as sje
 import datetime
 import logging
 
@@ -59,19 +64,27 @@ import logging
 from logging.handlers import RotatingFileHandler
 import codecs
 import MultipartPostHandler
-import urllib2
 
 try:
     import subprocess
-except ImportError, e:
+except ImportError as e:
     pass
 
+try:
+    long()
+except NameError:
+    long = int
 
 WITHHELD_MAGIC_STRING = 'WITHHELD'
 SELINUX_ENABLED = 1
 SELINUX_DISABLED = 0
 SELINUX_WITHHELD = -1
 
+EXCEPTIONS = (requests.exceptions.HTTPError,
+              requests.exceptions.URLRequired,
+              requests.exceptions.Timeout,
+              requests.exceptions.ConnectionError,
+              requests.exceptions.InvalidURL)
 
 fs_types = get_config_attr("FS_TYPES", ["ext2", "ext3", "xfs", "reiserfs"])
 fs_mounts = dict.fromkeys(get_config_attr("FS_MOUNTS", ["/", "/home", "/etc", "/var", "/boot"]), True)
@@ -88,7 +101,7 @@ smoltProtocol = '0.97'
 supported_protocols = ['0.97',]
 user_agent = 'smolt/%s' % smoltProtocol
 timeout = 120.0
-proxies = None
+proxies = dict()
 DEBUG = False
 
 
@@ -190,6 +203,8 @@ FORMFACTOR_LIST = [ "Unknown",
     ]
 
 def to_ascii(o, current_encoding='utf-8'):
+    ''' This shouldn't even be required in python3 '''
+    return o
     if not isinstance(o, basestring):
         return o
 
@@ -217,20 +232,26 @@ class Host:
         self.numCpus = gate.process('cpu', cpuInfo.get('count', 0), 0)
         self.cpuSpeed = gate.process('cpu', cpuInfo.get('speed', 0), 0)
 
-        self.systemMemory = gate.process('ram_size', memory['ram'], 0)
-        self.systemSwap = gate.process('swap_size', memory['swap'], 0)
+        try: #  These fail on the one *buntu 19.04 host tested, see get_sendable_host()
+            self.systemMemory = gate.process('ram_size', memory['ram'], 0)
+            self.systemSwap = gate.process('swap_size', memory['swap'], 0)
+        except TypeError:
+            self.systemMemory = 0
+            self.systemSwap = 0
+
         self.kernelVersion = gate.process('kernel', os.uname()[2], WITHHELD_MAGIC_STRING)
         if gate.grants('language'):
             try:
                 self.language = os.environ['LANG']
             except KeyError:
                 try:
-                    status, lang = commands.getstatusoutput("grep LANG /etc/sysconfig/i18n")
-                    if status == 0:
-                        self.language = lang.split('"')[1]
+                    lang = subprocess.run(['grep', 'LANG', '/etc/sysconfig/i18n'],
+                                          stdout=subprocess.PIPE)
+                    if lang.returncode == 0:
+                        self.language = lang.stdout.strip().split(b'"')[1]
                     else:
                         self.language = 'Unknown'
-                except:
+                except subprocess.CalledProcessError:
                     self.language = 'Unknown'
         else:
             self.language = WITHHELD_MAGIC_STRING
@@ -272,26 +293,27 @@ class Host:
             self.formfactor = WITHHELD_MAGIC_STRING
 
         if tempform == 'ppc64':
-            if hostInfo.get('openfirmware.model'):
-                if hostInfo['openfirmware.model'][:3] == 'IBM':
-                    self.systemVendor = 'IBM'
-                model = hostInfo['openfirmware.model'][4:8]
+            pass
+            # if hostInfo.get('openfirmware.model'):
+            #     if hostInfo['openfirmware.model'][:3] == 'IBM':
+            #         self.systemVendor = 'IBM'
+            #     model = hostInfo['openfirmware.model'][4:8]
 
-                model_map = {
-                    '8842':'JS20',
-                    '6779':'JS21',
-                    '6778':'JS21',
-                    '7988':'JS21',
-                    '8844':'JS21',
-                    '0200':'QS20',
-                    '0792':'QS21',
-                }
-                try:
-                    model_name = model_map[model]
-                    self.systemModel = gate.process('model', model_name)
-                    self.formfactor = gate.process('form_factor', 'Blade')
-                except KeyError:
-                    pass
+            #     model_map = {
+            #         '8842':'JS20',
+            #         '6779':'JS21',
+            #         '6778':'JS21',
+            #         '7988':'JS21',
+            #         '8844':'JS21',
+            #         '0200':'QS20',
+            #         '0792':'QS21',
+            #     }
+            #     try:
+            #         model_name = model_map[model]
+            #         self.systemModel = gate.process('model', model_name)
+            #         self.formfactor = gate.process('form_factor', 'Blade')
+            #     except KeyError:
+            #         pass
 
         if gate.grants('selinux'):
             try:
@@ -377,21 +399,22 @@ class ServerError(Exception):
         return repr(self.value)
 
 def serverMessage(page):
-    for line in page.split("\n"):
-        if 'UUID:' in line:
+    for line in page.split(b"\n"):
+        if b'UUID:' in line:
             return line.strip()[6:]
-        if 'ServerMessage:' in line:
-            if 'Critical' in line:
-                raise ServerError, line.split('ServerMessage: ')[1]
+        if b'ServerMessage:' in line:
+            if b'Critical' in line:
+                raise ServerError(line.split('ServerMessage: ')[1])
             else:
-                print _('Server Message: "%s"') % line.split('ServerMessage: ')[1]
+                print(_('Server Message: "%s"') % line.split(b'ServerMessage: ')[1])
 
 def error(message):
-    print >> sys.stderr, message
+    print(message)
+    #print(message, file=sys.stderr)
 
 def debug(message):
     if DEBUG:
-        print message
+        print(message)
 
 def reset_resolver():
     '''Attempt to reset the system hostname resolver.
@@ -402,7 +425,7 @@ def reset_resolver():
             resolv = ctypes.CDLL("libresolv.so.2")
             r = resolv.__res_init()
         except (OSError, AttributeError):
-            print "Warning: could not find __res_init in libresolv.so.2"
+            print("Warning: could not find __res_init in libresolv.so.2")
             r = -1
         return r
     except ImportError:
@@ -449,6 +472,7 @@ class _HardwareProfile:
 #        self.systemBus = systemBus
 
         if gate.grants('devices'):
+                self.host = Host(gate, uuid)
                 self.devices = get_device_list()
 #        for udi in all_dev_lst:
 #            props = self.get_properties_for_udi (udi)
@@ -510,19 +534,20 @@ class _HardwareProfile:
 #                        elif boardproduct is not None and boardproduct is not None:
 #                            props['system.vendor'] = boardvendor
 #                            props['system.product'] = boardproduct
-                self.host = Host(gate, uuid)
 
         self.fss = get_file_systems(gate)
 
         self.distro_specific = self.get_distro_specific_data(gate)
+        self.session = requests.Session()
+        self.session.headers.update({'USER-AGENT': user_agent})
 
     def get_distro_specific_data(self, gate):
         dist_dict = {}
         try:
             import distros.all
-        except:
+        except ImportError:
             return dist_dict
-            
+
         for d in distros.all.get():
             key = d.key()
             if d.detected():
@@ -615,17 +640,18 @@ class _HardwareProfile:
             return
 
         try:
-            uuiddb.set_pub_uuid(uuid, smoonURLparsed[1], pub_uuid)
-        except Exception, e:
+            uuiddb.set_pub_uuid(uuid, smoonURLparsed.netloc, pub_uuid)
+        except Exception as e:
             sys.stderr.write(_('\tYour pub_uuid could not be written.\n\n'))
         return
 
     def write_admin_token(self,smoonURL,admin,admin_token_file):
         smoonURLparsed=urlparse(smoonURL)
-        admin_token_file += ("-"+smoonURLparsed[1])
+        admin_token_file += ("-"+smoonURLparsed.netloc)
         try:
-            file(admin_token_file, 'w').write(admin)
-        except Exception, e:
+            with open(admin_token_file, 'w') as at_file:
+                at_file.write(admin)
+        except Exception as e:
             sys.stderr.write(_('\tYour admin token  could not be cached: %s\n' % e))
         return
 
@@ -662,28 +688,28 @@ class _HardwareProfile:
             return JSONEncoder(indent=indent, sort_keys=sort_keys).encode(object)
 
         reset_resolver()
-        grabber = urlgrabber.grabber.URLGrabber(user_agent=user_agent, timeout=timeout, proxies=proxies)
+
         #first find out the server desired protocol
         try:
-            token = grabber.urlopen(urljoin(smoonURL + "/", '/tokens/token_json?uuid=%s' % self.host.UUID, False))
-        except urlgrabber.grabber.URLGrabError, e:
-            error(_('Error contacting Server: %s') % e)
+            current_url = smoonURL + 'tokens/token_json?uuid=%s' % self.host.UUID
+            token = self.session.post(current_url, proxies=proxies, timeout=timeout)
+        except EXCEPTIONS as e:
+            error(_('Error contacting Server (tokens): {}'.format(e)))
+            self.session.close()
             return (1, None, None)
-        tok_str = token.read()
+        tok_obj = token.json()
         try:
-            try:
-                tok_obj = json.loads(tok_str)
-                if tok_obj['prefered_protocol'] in supported_protocols:
-                    prefered_protocol = tok_obj['prefered_protocol']
-                else:
-                    error(_('Wrong version, server incapable of handling your client'))
-                    return (1, None, None)
-                tok = tok_obj['token']
+            if tok_obj['prefered_protocol'] in supported_protocols:
+                prefered_protocol = tok_obj['prefered_protocol']
+            else:
+                self.session.close()
+                error(_('Wrong version, server incapable of handling your client'))
+                return (1, None, None)
+            tok = tok_obj['token']
 
-            except ValueError, e:
-                error(_('Something went wrong fetching a token'))
-        finally:
-            token.close()
+        except ValueError as e:
+            self.session.close()
+            error(_('Something went wrong fetching a token'))
 
         send_host_obj = self.get_submission_data(prefered_protocol)
 
@@ -701,7 +727,7 @@ class _HardwareProfile:
         logdir = os.path.expanduser('~/.smolt/')
         try:
             if not os.path.exists(logdir):
-                os.mkdir(logdir, 0700)
+                os.mkdir(logdir, 0o0700)
 
             for k, v in log_matrix.items():
                 filename = os.path.expanduser(os.path.join(
@@ -722,28 +748,29 @@ class _HardwareProfile:
         debug('Sending Host')
 
         if batch:
-            entry_point = "/client/batch_add_json"
+            entry_point = "client/batch_add_json"
             logging.debug('Submitting in asynchronous mode')
         else:
-            entry_point = "/client/add_json"
+            entry_point = "client/add_json"
             logging.debug('Submitting in synchronous mode')
-        request_url = urljoin(smoonURL + "/", entry_point, False)
+        request_url = smoonURL + entry_point
         logging.debug('Sending request to %s' % request_url)
         try:
-            opener = urllib2.build_opener(MultipartPostHandler.MultipartPostHandler)
+            opener = build_opener(MultipartPostHandler.MultipartPostHandler)
             params = {  'uuid':self.host.UUID,
                         'host':serialized_host_obj_machine,
                         'token':tok,
                         'smolt_protocol':smoltProtocol}
             o = opener.open(request_url, params)
 
-        except Exception, e:
-            error(_('Error contacting Server: %s') % e)
+        except Exception as e:
+            error(_('Error contacting Server ([batch_]add_json): {}'.format(e)))
             return (1, None, None)
         else:
             try:
                 server_response = serverMessage(o.read())
-            except ServerError, e:
+            except ServerError as e:
+                self.session.close()
                 error(_('Error contacting server: %s') % e)
                 return (1, None, None)
 
@@ -751,45 +778,59 @@ class _HardwareProfile:
             if batch:
                 pub_uuid = None
             else:
-                pub_uuid = server_response
+                pub_uuid = server_response.decode('latin1')
             self.write_pub_uuid(uuiddb, smoonURL, pub_uuid, uuid)
 
             try:
-                admin_token = grabber.urlopen(urljoin(smoonURL + "/", '/tokens/admin_token_json?uuid=%s' % self.host.UUID, False))
-            except urlgrabber.grabber.URLGrabError, e:
+                admin_token = self.session.get(smoonURL + 'tokens/admin_token_json?uuid=%s' % self.host.UUID,
+                                               proxies=proxies, timeout=timeout)
+            except EXCEPTIONS as e:
+                self.session.close()
                 error(_('An error has occured while contacting the server: %s' % e))
                 sys.exit(1)
-            admin_str = admin_token.read()
-            admin_obj = json.loads(admin_str)
+
+            try:
+                admin_obj = admin_token.json()
+            except sje.JSONDecodeError:
+                self.session.close()
+                error(_('Incorrect server response. Expected a JSON string'))
+                return (1, None, None)
+
             if admin_obj['prefered_protocol'] in supported_protocols:
                 prefered_protocol = admin_obj['prefered_protocol']
             else:
+                self.session.close()
                 error(_('Wrong version, server incapable of handling your client'))
                 return (1, None, None)
             admin = admin_obj['token']
 
             if  not admin_token_file == '' :
                 self.write_admin_token(smoonURL,admin,admin_token_file)
+
         return (0, pub_uuid, admin)
 
-    def regenerate_pub_uuid(self, uuiddb, uuid, user_agent=user_agent, smoonURL=smoonURL, timeout=timeout):
-        grabber = urlgrabber.grabber.URLGrabber(user_agent=user_agent, timeout=timeout)
-        try:
-            new_uuid = grabber.urlopen(urljoin(smoonURL + "/", '/client/regenerate_pub_uuid?uuid=%s' % self.host.UUID))
-        except urlgrabber.grabber.URLGrabError, e:
-            raise ServerError, str(e)
+# end of _HardwareProfile.send()
 
-        response = new_uuid.read()  # Either JSON or an error page in (X)HTML
+
+    def regenerate_pub_uuid(self, uuiddb, uuid, user_agent=user_agent, smoonURL=smoonURL, timeout=timeout):
         try:
-            response_dict = json.loads(response)
-        except Exception, e:
-            serverMessage(response)
-            raise ServerError, _('Reply from server could not be interpreted')
+            new_uuid = self.session.get(smoonURL + 'client/regenerate_pub_uuid?uuid=%s' % self.host.UUID,
+                                        proxies=proxies, timeout=timeout)
+        except EXCEPTIONS as e:
+            raise ServerError(str(e))
+
+        try:
+            response_dict = new_uuid.json()  # Either JSON or an error page in (X)HTML
+        except Exception as e:
+            self.session.close()
+            serverMessage(new_uuid.text)
+            raise ServerError(_('Reply from server could not be interpreted'))
         else:
             try:
                 pub_uuid = response_dict['pub_uuid']
             except KeyError:
-                raise ServerError, _('Reply from server could not be interpreted')
+                self.session.close()
+                raise ServerError(_('Reply from server could not be interpreted'))
             self.write_pub_uuid(uuiddb, smoonURL, pub_uuid, uuid)
             return pub_uuid
 
@@ -926,7 +967,7 @@ class _HardwareProfile:
 def read_cpuinfo():
     def get_entry(a, entry):
         e = entry.lower()
-        if not a.has_key(e):
+        if e not in a:
             return ""
         return a[e]
 
@@ -1120,7 +1161,8 @@ def read_cpuinfo():
         if not os.access("/proc/openprom/banner-name", os.R_OK):
             system = 'Unknown'
         if os.access("/proc/openprom/banner-name", os.R_OK):
-            system = open("/proc/openprom/banner-name", "r").read()
+            with open("/proc/openprom/banner-name", "r") as banner_name:
+                banner_name.read()
         hwdict['platform'] = uname
         hwdict['count'] = get_entry(tmpdict, 'ncpus probed')
         hwdict['model'] = get_entry(tmpdict, 'cpu')
@@ -1166,7 +1208,8 @@ def read_cpuinfo():
     # assume that the rest of the CPUs are the same.
 
     if os.path.exists('/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq'):
-        hwdict['speed'] = int(file('/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq').read().strip()) / 1000
+        with open('/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq') as cpu_m_freq:
+            hwdict['speed'] = int(cpu_m_freq.read().strip()) / 1000
 
     # This whole things hurts a lot.
     return hwdict
@@ -1191,13 +1234,14 @@ def read_memory_2_4():
     if not os.access("/proc/meminfo", os.R_OK):
         return {}
 
-    meminfo = open("/proc/meminfo", "r").read()
+    with open("/proc/meminfo", "r") as m_info:
+        meminfo = m_info.read()
     lines = meminfo.split("\n")
     curline = lines[1]
     memlist = curline.split()
     memdict = {}
     memdict['class'] = "MEMORY"
-    megs = int(long(memlist[1])/(1024*1024))
+    megs = long(memlist[1])/(1024*1024)
     if megs < 32:
         megs = megs + (4 - (megs % 4))
     else:
@@ -1206,14 +1250,15 @@ def read_memory_2_4():
     curline = lines[2]
     memlist = curline.split()
     # otherwise, it breaks on > ~4gigs of swap
-    megs = int(long(memlist[1])/(1024*1024))
+    megs = long(memlist[1])/(1024*1024)
     memdict['swap'] = str(megs)
     return memdict
 
 def read_memory_2_6():
     if not os.access("/proc/meminfo", os.R_OK):
         return {}
-    meminfo = open("/proc/meminfo", "r").read()
+    with open("/proc/meminfo", "r") as m_info:
+        meminfo = m_info.read()
     lines = meminfo.split("\n")
     dict = {}
     for line in lines:
@@ -1253,7 +1298,7 @@ def create_profile_nocatch(gate, uuid):
 def create_profile(gate, uuid):
     try:
         return create_profile_nocatch(gate, uuid)
-    except SystemBusError, e:
+    except SystemBusError as e:
         error(_('Error:') + ' ' + e.msg)
         if e.hint is not None:
             error('\t' + _('Hint:') + ' ' + e.hint)
@@ -1261,39 +1306,37 @@ def create_profile(gate, uuid):
 
 ##This is another
 def get_profile_link(smoonURL, pub_uuid):
-    return urljoin(smoonURL, '/client/show/%s' % pub_uuid)
+    return smoonURL + 'client/show/%s' % pub_uuid
 
 def read_uuid():
     try:
-        UUID = file(hw_uuid_file).read().strip()
+        with open(hw_uuid_file) as hw_uuid:
+            UUID = hw_uuid.read().strip()
     except IOError:
         try:
-            UUID = file('/proc/sys/kernel/random/uuid').read().strip()
-            try:
-                file(hw_uuid_file, 'w').write(UUID)
-            except Exception, e:
-                raise UUIDError, 'Unable to save UUID to %s.  Please run once as root.' % hw_uuid_file
+            with open('/proc/sys/kernel/random/uuid') as rand_uuid:
+                UUID = rand_uuid.read().strip()
+                rand_uuid.write(UUID)
         except IOError:
             sys.stderr.write(_('Unable to determine UUID of system!\n'))
-            raise UUIDError, 'Could not determine UUID of system!\n'
+            raise UUIDError('Unable to get/save UUID. file = %s.  Please run once as root.' % hw_uuid_file)
     return UUID
 
 def read_pub_uuid(uuiddb, uuid, user_agent=user_agent, smoonURL=smoonURL, timeout=timeout, silent=False):
-	smoonURLparsed=urlparse(smoonURL)
-	res = uuiddb.get_pub_uuid(uuid, smoonURLparsed[1])
-	if res:
-		return res
+    smoonURLparsed=urlparse(smoonURL)
+    res = uuiddb.get_pub_uuid(uuid, smoonURLparsed.netloc)
+    if res:
+        return res
 
-	grabber = urlgrabber.grabber.URLGrabber(user_agent=user_agent, timeout=timeout, proxies=proxies)
-	try:
-		o = grabber.urlopen(urljoin(smoonURL + "/", '/client/pub_uuid/%s' % uuid))
-		pudict = json.loads(o.read())
-		o.close()
-		uuiddb.set_pub_uuid(uuid, smoonURLparsed[1], pudict["pub_uuid"])
-		return pudict["pub_uuid"]
-	except Exception, e:
-		if not silent:
-			error(_('Error determining public UUID: %s') % e)
-			sys.stderr.write(_("Unable to determine Public UUID!  This could be a network error or you've\n"))
-			sys.stderr.write(_("not submitted your profile yet.\n"))
-		raise PubUUIDError, 'Could not determine Public UUID!\n'
+    try:
+        o = requests.get(smoonURL + 'client/pub_uuid?uuid=%s' % uuid,
+                             proxies=proxies, timeout=timeout)
+        pudict = o.json()
+        uuiddb.set_pub_uuid(uuid, smoonURLparsed.netloc, pudict["pub_uuid"])
+        return pudict["pub_uuid"]
+    except Exception as e:
+        if not silent:
+            error(_('Error determining public UUID: %s') % e)
+            sys.stderr.write(_("Unable to determine Public UUID!  This could be a network error or you've\n"))
+            sys.stderr.write(_("not submitted your profile yet.\n"))
+            raise PubUUIDError('Could not determine Public UUID!\n')

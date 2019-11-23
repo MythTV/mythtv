@@ -4,6 +4,7 @@
 #include "mpeg/dvbdescriptors.h"
 #include "mythdb.h"
 #include "mythlogging.h"
+#include "cardutil.h"
 #include <utility>
 
 #define LOC      QString("DTVMux: ")
@@ -510,7 +511,7 @@ bool DTVMultiplex::FillFromDeliverySystemDesc(DTVTunerType type,
                 }
 
                 return ParseDVB_S_and_C(
-                    QString::number(cd.FrequencyHz()),  "a",
+                    QString::number(cd.FrequencykHz()),  "a",
                     QString::number(cd.SymbolRateHz()), cd.FECInnerString(),
                     cd.ModulationString(),
                     cd.PolarizationString());
@@ -519,7 +520,7 @@ bool DTVMultiplex::FillFromDeliverySystemDesc(DTVTunerType type,
             if (type == DTVTunerType::kTunerTypeDVBS2)
             {
                 return ParseDVB_S2(
-                    QString::number(cd.FrequencyHz()),  "a",
+                    QString::number(cd.FrequencykHz()),  "a",
                     QString::number(cd.SymbolRateHz()), cd.FECInnerString(),
                     cd.ModulationString(),
                     cd.PolarizationString(),
@@ -572,7 +573,8 @@ bool ScanDTVTransport::FillFromDB(DTVTunerType type, uint mplexid)
         "       d.transportid,   d.networkid,       c.default_authority,"
         "       c.service_type "
         "FROM channel AS c, dtv_multiplex AS d "
-        "WHERE c.mplexid = :MPLEXID AND"
+        "WHERE c.deleted IS NULL AND "
+        "      c.mplexid = :MPLEXID AND"
         "      c.mplexid = d.mplexid");
     query.bindValue(":MPLEXID", mplexid);
 

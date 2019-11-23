@@ -110,24 +110,24 @@ class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
     @classmethod
     def _parseinput(cls):
         args = iter(argv)
-        args.next()
+        next(args)
         try:
             while True:
-                arg = args.next()
+                arg = next(args)
                 if arg == '--quiet':
                     cls._QUIET += 1
                 elif arg == '--nodblog':
                     cls._DBLOG = False
                 elif arg == '--loglevel':
-                    cls._setlevel(args.next())
+                    cls._setlevel(next(args))
                 elif arg == '--verbose':
-                    cls._setmask(args.next())
+                    cls._setmask(next(args))
                 elif arg == '--logfile':
-                    cls._setfile(args.next())
+                    cls._setfile(next(args))
                 elif arg == '--logpath':
-                    cls._setpath(args.next())
+                    cls._setpath(next(args))
                 elif arg == '--syslog':
-                    cls._setsyslog(args.next())
+                    cls._setsyslog(next(args))
                 elif arg == '--':
                     break
 

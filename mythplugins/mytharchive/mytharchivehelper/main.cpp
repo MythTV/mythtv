@@ -524,7 +524,7 @@ int NativeArchive::exportRecording(QDomElement   &itemNode,
     }
 
     // add any rating
-    query.prepare("SELECT system, rating FROM recordedrating "
+    query.prepare("SELECT `system`, rating FROM recordedrating "
             "WHERE chanid = :CHANID AND starttime = :STARTTIME;");
     query.bindValue(":CHANID", chanID);
     query.bindValue(":STARTTIME", startTime);

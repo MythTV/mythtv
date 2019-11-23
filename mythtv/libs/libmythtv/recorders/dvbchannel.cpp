@@ -958,7 +958,8 @@ int DVBChannel::GetChanID() const
 
     query.prepare("SELECT chanid,visible "
                   "FROM channel, capturecard "
-                  "WHERE capturecard.sourceid = channel.sourceid AND "
+                  "WHERE channel.deleted IS NULL AND "
+                  "      capturecard.sourceid = channel.sourceid AND "
                   "      channel.channum = :CHANNUM AND "
                   "      capturecard.cardid = :INPUTID");
 

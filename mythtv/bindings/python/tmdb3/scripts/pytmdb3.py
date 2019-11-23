@@ -23,10 +23,10 @@ if __name__ == '__main__':
 
     if opts.version:
         from tmdb3.tmdb_api import __title__, __purpose__, __version__, __author__
-        print __title__
-        print ""
-        print __purpose__
-        print "Version: "+__version__
+        print (__title__)
+        print ("")
+        print (__purpose__)
+        print ("Version: "+__version__)
         sys.exit(0)
 
     if opts.nocache:

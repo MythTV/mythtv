@@ -258,9 +258,11 @@ bool FillData::Run(SourceList &sourcelist)
             continue;
         }
 
-        query.prepare("SELECT MAX(endtime) FROM program p LEFT JOIN channel c "
-                      "ON p.chanid=c.chanid WHERE c.sourceid= :SRCID "
-                      "AND manualid = 0 AND c.xmltvid != '';");
+        query.prepare("SELECT MAX(endtime) "
+                      "FROM program p "
+                      "LEFT JOIN channel c ON p.chanid=c.chanid "
+                      "WHERE c.deleted IS NULL AND c.sourceid= :SRCID "
+                      "      AND manualid = 0 AND c.xmltvid != '';");
         query.bindValue(":SRCID", (*it).id);
 
         if (query.exec() && query.next())
@@ -303,8 +305,9 @@ bool FillData::Run(SourceList &sourcelist)
                                   .arg(xmltv_grabber));
 
         query.prepare(
-            "SELECT COUNT(chanid) FROM channel WHERE sourceid = "
-             ":SRCID AND xmltvid != ''");
+            "SELECT COUNT(chanid) FROM channel "
+            "WHERE deleted IS NULL AND "
+            "      sourceid = :SRCID AND xmltvid != ''");
         query.bindValue(":SRCID", (*it).id);
 
         if (query.exec() && query.next())
@@ -479,7 +482,7 @@ bool FillData::Run(SourceList &sourcelist)
                                    "INTERVAL '%1' DAY), INTERVAL '20' HOUR) "
                                "  AND starttime < DATE_ADD(CURRENT_DATE(), "
                                    "INTERVAL '%2' DAY) "
-                               "WHERE c.sourceid = %3 AND c.xmltvid != '' "
+                               "WHERE c.deleted IS NULL AND c.sourceid = %3 AND c.xmltvid != '' "
                                "GROUP BY c.chanid;";
 
                     if (query.exec(querystr.arg(i-1).arg(i).arg((*it).id)) &&
@@ -648,8 +651,9 @@ bool FillData::Run(SourceList &sourcelist)
             break;
         }
 
-        query.prepare("SELECT MAX(endtime) FROM program p LEFT JOIN channel c "
-                      "ON p.chanid=c.chanid WHERE c.sourceid= :SRCID "
+        query.prepare("SELECT MAX(endtime) FROM program p "
+                      "LEFT JOIN channel c ON p.chanid=c.chanid "
+                      "WHERE c.deleted IS NULL AND c.sourceid= :SRCID "
                       "AND manualid = 0 AND c.xmltvid != '';");
         query.bindValue(":SRCID", (*it).id);
 

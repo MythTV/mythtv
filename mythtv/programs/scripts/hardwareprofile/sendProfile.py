@@ -20,6 +20,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 
+from __future__ import print_function
+from builtins import str
+from builtins import input
 import sys
 import time
 import os
@@ -162,7 +165,7 @@ def make_display_excerpts(profile):
 
 
 def dump_excerpts(excerpts):
-    print """\
+    print("""\
 =====================================================
 %(label_intro)s
 
@@ -183,7 +186,7 @@ def dump_excerpts(excerpts):
 %(label_question_view)s
 %(label_question_send)s
 %(label_question_quit)s
-""" % excerpts
+""" % excerpts)
 
 
 def present_and_require_confirmation(profile):
@@ -201,24 +204,24 @@ def present_and_require_confirmation(profile):
         dump_excerpts(excerpts)
 
         try:
-            choice = raw_input(_('Your choice (s)end (v)iew (q)uit: ')).strip()
+            choice = input(_('Your choice (s)end (v)iew (q)uit: ')).strip()
         except KeyboardInterrupt:
             error(_('Exiting...'))
             sys.exit(4)
         if choice in (_('s|y|yes')).split('|'):
             submit = True
-            print '\n\n'
+            print('\n\n')
         elif choice in (_('q|n|no')).split('|'):
             sys.exit(0)
         elif choice in (_('v')).split('|'):
-            f = NamedTemporaryFile()
+            f = NamedTemporaryFile(suffix=b'')
             for line in profile.getProfile():
                 try:
-                    f.write(line + '\n')
+                    f.write(bytes(line + '\n', 'latin1'))
                 except UnicodeEncodeError:
                     pass
             f.flush()
-            os.chmod(f.name, 0400)
+            os.chmod(f.name, 0o400)
             try:
                 pager_command = os.environ['PAGER']
             except KeyError:
@@ -234,7 +237,7 @@ def present_and_require_confirmation(profile):
             except NameError:
                 os.system(' '.join([pager_command, f.name]))
             f.close()
-            print '\n\n'
+            print('\n\n')
         else:
             error(_('Exiting...'))
             sys.exit(4)
@@ -264,7 +267,7 @@ def send_profile(uuiddb, uuid, profile, opts, proxies):
     else:
         (error_code, pub_uuid, admin) = do_send_profile(uuiddb, uuid, profile, opts, proxies)
         if error_code:
-            print _('Could not send - Exiting')
+            print(_('Could not send - Exiting'))
             sys.exit(1)
 
     return (error_code, pub_uuid, admin)
@@ -276,15 +279,15 @@ def mention_profile_web_view(opts, pub_uuid, admin):
     from i18n import _
 
     pubUrl = smolt.get_profile_link(opts.smoonURL, pub_uuid)
-    print
-    print _('To share your profile: \n\t%s (public)') % pubUrl
+    print()
+    print(_('To share your profile: \n\t%s (public)') % pubUrl)
     if not smolt.secure:
-        print _('\tAdmin Password: %s') % admin
+        print(_('\tAdmin Password: %s') % admin)
 
 
 def get_proxies(opts):
     if opts.httpproxy == None:
-        proxies = None
+        proxies = dict()
     else:
         proxies = {'http':opts.httpproxy}
     return proxies
@@ -297,13 +300,13 @@ def read_profile(gate, uuid):
 
     try:
         profile = smolt.create_profile(gate, uuid)
-    except smolt.UUIDError, e:
+    except smolt.UUIDError as e:
         sys.stderr.write(_('%s\n' % e))
         sys.exit(9)
     return profile
 
 
-def register_with_fedora_account_system(opts):
+def register_with_fedora_account_system(opts, profile):
     ensure_code_reachability()
     from i18n import _
 
@@ -313,7 +316,7 @@ def register_with_fedora_account_system(opts):
         password = opts.password
 
     if profile.register(userName=opts.userName, password=password, user_agent=opts.user_agent, smoonURL=opts.smoonURL, timeout=opts.timeout):
-        print _('Registration Failed, Try again')
+        print(_('Registration Failed, Try again'))
 
 
 def do_scan_remote(profile, opts, gate):
@@ -324,14 +327,14 @@ def do_scan_remote(profile, opts, gate):
     try:
         rating(profile, opts.smoonURL, gate)
     except ValueError:
-        print "Could not get rating!"
+        print("Could not get rating!")
 
 
 def mention_missing_uuid():
     ensure_code_reachability()
     from i18n import _
-    print
-    print _('No Public UUID found!  Please re-run with -n to generate a new public uuid')
+    print()
+    print(_('No Public UUID found!  Please re-run with -n to generate a new public uuid'))
 
 
 def main_request_new_public_uuid(uuiddb, uuid, profile, opts):
@@ -343,11 +346,11 @@ def main_request_new_public_uuid(uuiddb, uuid, profile, opts):
         pub_uuid = profile.regenerate_pub_uuid(uuiddb, uuid, user_agent=opts.user_agent,
                             smoonURL=opts.smoonURL,
                             timeout=opts.timeout)
-    except ServerError, e:
+    except ServerError as e:
         error(_('Error contacting server: %s') % str(e))
         sys.exit(1)
 
-    print _('Success!  Your new public UUID is: %s' % pub_uuid)
+    print(_('Success!  Your new public UUID is: %s' % pub_uuid))
     sys.exit(0)
 
 
@@ -359,7 +362,7 @@ def main_scan_only(profile, opts, gate):
 def main_print_only(profile):
     for line in profile.getProfile():
         if not line.startswith('#'):
-            print line.encode('utf-8')
+            print(line)
     sys.exit(0)
 
 
@@ -372,7 +375,7 @@ def main_send_profile(uuiddb, uuid, profile, opts, gate):
     (error_code, pub_uuid, admin) = send_profile(uuiddb, uuid, profile, opts, proxies)
 
     if opts.userName:
-        register_with_fedora_account_system(opts)
+        register_with_fedora_account_system(opts, profile)
 
     if opts.scan_remote and not opts.cron_mode:
         do_scan_remote(profile, opts, gate)
@@ -407,7 +410,7 @@ def main():
         uuid = smolt.read_uuid()
         main_request_new_public_uuid(uuiddb, uuid, profile, opts)
     elif not opts.send_profile:
-        main_scan_only(profile, opts)
+        main_scan_only(profile, opts, gate)
     elif opts.printOnly and not opts.autoSend:
         main_print_only(profile)
     else:

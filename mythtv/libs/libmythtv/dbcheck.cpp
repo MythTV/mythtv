@@ -3478,6 +3478,50 @@ nullptr
             return false;
     }
 
+    if (dbver == "1353")
+    {
+        const char *updates[] = {
+            "ALTER TABLE channel ADD COLUMN deleted TIMESTAMP NULL",
+            nullptr
+        };
+        if (!performActualUpdate(updates, "1354", dbver))
+            return false;
+    }
+
+    if (dbver == "1354")
+    {
+        const char *updates[] = {
+            "ALTER TABLE videosource ADD COLUMN scanfrequency INT UNSIGNED DEFAULT 0;",
+            nullptr
+        };
+        if (!performActualUpdate(updates, "1355", dbver))
+            return false;
+    }
+
+    if (dbver == "1355")
+    {
+        const char *updates[] = {
+            "UPDATE capturecard "
+            "SET displayname = CONCAT('Input ', cardid) "
+            "WHERE displayname = ''",
+            nullptr
+        };
+        if (!performActualUpdate(updates, "1356", dbver))
+            return false;
+    }
+
+    if (dbver == "1356")
+    {
+        const char *updates[] = {
+            "REPLACE INTO recordfilter (filterid, description, clause, "
+            "                          newruledefault) "
+            "  VALUES (12, 'Priority channel', 'channel.recpriority > 0', 0)",
+            nullptr
+        };
+        if (!performActualUpdate(updates, "1357", dbver))
+            return false;
+    }
+
     return true;
 }
 
@@ -4154,10 +4198,10 @@ bool InitializeMythSchema(void)
 "CREATE TABLE programrating ("
 "  chanid int(10) unsigned NOT NULL DEFAULT '0',"
 "  starttime datetime NOT NULL DEFAULT '0000-00-00 00:00:00',"
-"  system varchar(8) DEFAULT NULL,"
+"  `system` varchar(8) DEFAULT NULL,"
 "  rating varchar(16) DEFAULT NULL,"
-"  UNIQUE KEY chanid (chanid,starttime,system,rating),"
-"  KEY starttime (starttime,system)"
+"  UNIQUE KEY chanid (chanid,starttime,`system`,rating),"
+"  KEY starttime (starttime,`system`)"
 ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 "CREATE TABLE recgrouppassword ("
 "  recgroup varchar(32) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '',"
@@ -4364,10 +4408,10 @@ bool InitializeMythSchema(void)
 "CREATE TABLE recordedrating ("
 "  chanid int(10) unsigned NOT NULL DEFAULT '0',"
 "  starttime datetime NOT NULL DEFAULT '0000-00-00 00:00:00',"
-"  system varchar(8) DEFAULT NULL,"
+"  `system` varchar(8) DEFAULT NULL,"
 "  rating varchar(16) DEFAULT NULL,"
-"  UNIQUE KEY chanid (chanid,starttime,system,rating),"
-"  KEY starttime (starttime,system)"
+"  UNIQUE KEY chanid (chanid,starttime,`system`,rating),"
+"  KEY starttime (starttime,`system`)"
 ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 "CREATE TABLE recordedseek ("
 "  chanid int(10) unsigned NOT NULL DEFAULT '0',"

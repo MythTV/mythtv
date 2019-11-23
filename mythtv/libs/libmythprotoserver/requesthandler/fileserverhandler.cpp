@@ -75,7 +75,8 @@ QString FileServerHandler::LocalFilePath(const QString &path,
         lpath = "";
 
         MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("SELECT icon FROM channel WHERE icon LIKE :FILENAME ;");
+        query.prepare("SELECT icon FROM channel "
+                      "WHERE icon LIKE :FILENAME ;");
         query.bindValue(":FILENAME", QString("%/") + file);
 
         if (query.exec() && query.next())

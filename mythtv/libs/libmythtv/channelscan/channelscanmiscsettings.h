@@ -208,7 +208,7 @@ class ScanFrequencykHz: public TransTextEditSetting
     {
         setLabel(QObject::tr("Frequency"));
         setHelpText(QObject::tr("Frequency (Option has no default)\n"
-                                "The frequency for this channel in kHz."));
+                                "The frequency for this transport (multiplex) in kHz."));
     };
 };
 
@@ -219,7 +219,7 @@ class ScanFrequency: public TransTextEditSetting
     {
         setLabel(QObject::tr("Frequency"));
         setHelpText(QObject::tr("Frequency (Option has no default)\n"
-                                "The frequency for this channel in Hz."));
+                                "The frequency for this transport (multiplex) in Hz."));
     };
 };
 

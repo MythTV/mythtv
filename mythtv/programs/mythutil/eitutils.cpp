@@ -32,7 +32,10 @@ static int ClearEIT(const MythUtilCommandLineParser &cmdline)
 
         // delete program for all channels that use EIT on sources that use EIT
         sql = "DELETE FROM program WHERE chanid IN ("
-              "SELECT chanid FROM channel WHERE useonairguide=1 AND sourceid IN ("
+              "SELECT chanid FROM channel "
+              "WHERE deleted IS NULL AND "
+              "      useonairguide = 1 AND "
+              "      sourceid IN ("
               "SELECT sourceid FROM videosource WHERE useeit=1";
         if (-1 != sourceid)
         {
@@ -54,7 +57,10 @@ static int ClearEIT(const MythUtilCommandLineParser &cmdline)
 
         // delete programrating for all channels that use EIT on sources that use EIT
         sql = "DELETE FROM programrating WHERE chanid IN ("
-              "SELECT chanid FROM channel WHERE useonairguide=1 AND sourceid IN ("
+              "SELECT chanid FROM channel "
+              "WHERE deleted IS NULL AND "
+              "      useonairguide = 1 AND "
+              "      sourceid IN ("
               "SELECT sourceid FROM videosource WHERE useeit=1";
         if (-1 != sourceid)
         {
@@ -76,7 +82,10 @@ static int ClearEIT(const MythUtilCommandLineParser &cmdline)
 
         // delete credits for all channels that use EIT on sources that use EIT
         sql = "DELETE FROM credits WHERE chanid IN ("
-              "SELECT chanid FROM channel WHERE useonairguide=1 AND sourceid IN ("
+              "SELECT chanid FROM channel "
+              "WHERE deleted IS NULL AND "
+              "      useonairguide = 1 AND "
+              "      sourceid IN ("
               "SELECT sourceid FROM videosource WHERE useeit=1";
         if (-1 != sourceid)
         {
@@ -98,7 +107,10 @@ static int ClearEIT(const MythUtilCommandLineParser &cmdline)
 
         // delete program genres for all channels that use EIT on sources that use EIT
         sql = "DELETE FROM programgenres WHERE chanid IN ("
-              "SELECT chanid FROM channel WHERE useonairguide=1 AND sourceid IN ("
+              "SELECT chanid FROM channel "
+              "WHERE deleted IS NULL AND "
+              "      useonairguide = 1 AND "
+              "      sourceid IN ("
               "SELECT sourceid FROM videosource WHERE useeit=1";
         if (-1 != sourceid)
         {

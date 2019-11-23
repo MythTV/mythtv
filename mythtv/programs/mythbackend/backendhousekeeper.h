@@ -23,6 +23,7 @@ class CleanupTask : public DailyHouseKeeperTask
     static void CleanupInUsePrograms(void);
     static void CleanupOrphanedLiveTV(void);
     static void CleanupRecordedTables(void);
+    static void CleanupChannelTables(void);
     static void CleanupProgramListings(void);
 };
 

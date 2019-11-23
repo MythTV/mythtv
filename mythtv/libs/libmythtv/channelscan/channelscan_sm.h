@@ -217,7 +217,8 @@ class ChannelScanSM : public MPEGStreamListener,
     bool              m_testDecryption;
     bool              m_extendScanList    {false};
 
-    // Freesat and BSkyB
+    // Scanning parameters
+    uint              m_frequency         {0};
     uint              m_bouquet_id        {0};
     uint              m_region_id         {0};
 

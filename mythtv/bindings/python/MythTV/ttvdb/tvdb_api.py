@@ -16,6 +16,8 @@ import tempfile
 import warnings
 import logging
 import datetime
+from MythTV.utility import levenshtein
+
 
 """Simple-to-use Python interface to The TVDB's API (thetvdb.com)
 
@@ -549,7 +551,8 @@ class Tvdb:
                  username=None,
                  userkey=None,
                  forceConnect=False,
-                 dvdorder=False):
+                 dvdorder=False,
+                 sort_series=True):
 
         """interactive (True/False):
             When True, uses built-in console UI is used to select the correct show.
@@ -632,6 +635,10 @@ class Tvdb:
             recently timed out. By default it will wait one minute before
             trying again, and any requests within that one minute window will
             return an exception immediately.
+        sort_series (bool):
+            If true, sort the series list for best match to search term.
+            If false, use the sort order returned by theTVDB.com
+            The default is true.
         """
 
         global lastTimeout
@@ -669,6 +676,8 @@ class Tvdb:
         self.config['search_all_languages'] = search_all_languages
 
         self.config['dvdorder'] = dvdorder
+
+        self.config['sort_series'] = sort_series
 
         if cache is True:
             self.session = requests_cache.CachedSession(
@@ -745,6 +754,7 @@ class Tvdb:
         self.config['api_url'] = "https://api.thetvdb.com"
 
         self.config['url_getSeries'] = u"%(api_url)s/search/series?name=%%s" % self.config
+        self.config['url_getSeriesById'] = u"%(api_url)s/search/series?id=%%s" % self.config
 
         self.config['url_epInfo'] = u"%(api_url)s/series/%%s/episodes" % self.config
         self.config['url_epDetail'] = u"%(api_url)s/episodes/%%s" % self.config
@@ -892,13 +902,16 @@ class Tvdb:
             self.shows[sid] = Show()
         self.shows[sid].data[key] = value
 
-    def search(self, series):
+    def search(self, series, by_id=False):
         """This searches TheTVDB.com for the series name
         and returns the result list
         """
         series = url_quote(series.encode("utf-8"))
         log().debug("Searching for show %s" % series)
-        seriesEt = self._getetsrc(self.config['url_getSeries'] % (series))
+        if by_id:
+            seriesEt = self._getetsrc(self.config['url_getSeriesById'] % (series))
+        else:
+            seriesEt = self._getetsrc(self.config['url_getSeries'] % (series))
         if not seriesEt:
             log().debug('Series result returned zero')
             raise tvdb_shownotfound("Show-name search returned zero results (cannot find show on TVDB)")
@@ -912,7 +925,7 @@ class Tvdb:
 
         return allSeries
 
-    def _getSeries(self, series):
+    def _getSeries(self, series, by_id=False):
         """This searches TheTVDB.com for the series name,
         If a custom_ui UI is configured, it uses this to select the correct
         series. If not, and interactive == True, ConsoleUI is used, if not
@@ -930,6 +943,12 @@ class Tvdb:
             else:
                 log().debug('Interactively selecting show using ConsoleUI')
                 ui = ConsoleUI(config=self.config)
+
+        if self.config['sort_series']:
+            series_lowercase = series.lower()
+            for s in allSeries:
+                s[u'match_similarity'] = levenshtein(series_lowercase, s[u'seriesName'].lower())
+            allSeries.sort(key=lambda s: s[u'match_similarity'])
 
         return ui.selectSeries(allSeries)
 
@@ -958,33 +977,34 @@ class Tvdb:
         banners = {}
         for cur_banner in bannersEt.keys():
             banners_info = self._getetsrc(self.config['url_seriesBannerInfo'] % (sid, cur_banner))
-            for banner_info in banners_info:
-                bid = banner_info.get('id')
-                btype = banner_info.get('keyType')
-                btype2 = banner_info.get('resolution')
-                if btype is None or btype2 is None:
-                    continue
+            if banners_info is not None:
+                for banner_info in banners_info:
+                    bid = banner_info.get('id')
+                    btype = banner_info.get('keyType')
+                    btype2 = banner_info.get('resolution')
+                    if btype is None or btype2 is None:
+                        continue
 
-                if btype not in banners:
-                    banners[btype] = {}
-                if btype2 not in banners[btype]:
-                    banners[btype][btype2] = {}
-                if bid not in banners[btype][btype2]:
-                    banners[btype][btype2][bid] = {}
+                    if btype not in banners:
+                        banners[btype] = {}
+                    if btype2 not in banners[btype]:
+                        banners[btype][btype2] = {}
+                    if bid not in banners[btype][btype2]:
+                        banners[btype][btype2][bid] = {}
 
-                banners[btype][btype2][bid]['bannerpath'] = banner_info['fileName']
-                banners[btype][btype2][bid]['resolution'] = banner_info['resolution']
-                banners[btype][btype2][bid]['subKey'] = banner_info['subKey']
+                    banners[btype][btype2][bid]['bannerpath'] = banner_info['fileName']
+                    banners[btype][btype2][bid]['resolution'] = banner_info['resolution']
+                    banners[btype][btype2][bid]['subKey'] = banner_info['subKey']
 
-                for k, v in list(banners[btype][btype2][bid].items()):
-                    if k.endswith("path"):
-                        new_key = "_%s" % k
-                        log().debug("Transforming %s to %s" % (k, new_key))
-                        new_url = self.config['url_artworkPrefix'] % v
-                        banners[btype][btype2][bid][new_key] = new_url
+                    for k, v in list(banners[btype][btype2][bid].items()):
+                        if k.endswith("path"):
+                            new_key = "_%s" % k
+                            log().debug("Transforming %s to %s" % (k, new_key))
+                            new_url = self.config['url_artworkPrefix'] % v
+                            banners[btype][btype2][bid][new_key] = new_url
 
-            banners[btype]['raw'] = banners_info
-            self._setShowData(sid, "_banners", banners)
+                banners[btype]['raw'] = banners_info
+        self._setShowData(sid, "_banners", banners)
 
     def _parseActors(self, sid):
         """Parsers actors XML, from
@@ -1051,15 +1071,16 @@ class Tvdb:
         seriesInfoEt = self._getetsrc(
             self.config['url_seriesInfo'] % sid
         )
-        for curInfo in seriesInfoEt.keys():
-            tag = curInfo
-            value = seriesInfoEt[curInfo]
+        if seriesInfoEt is not None:
+            for curInfo in seriesInfoEt.keys():
+                tag = curInfo
+                value = seriesInfoEt[curInfo]
 
-            if value is not None:
-                if tag in ['banner', 'fanart', 'poster']:
-                    value = self.config['url_artworkPrefix'] % (value)
+                if value is not None:
+                    if tag in ['banner', 'fanart', 'poster']:
+                        value = self.config['url_artworkPrefix'] % (value)
 
-            self._setShowData(sid, tag, value)
+                self._setShowData(sid, tag, value)
         # set language
         if language == None:
             language = self.config['language']

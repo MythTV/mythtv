@@ -7,7 +7,7 @@ Provides base classes for managing system calls.
 from MythTV.exceptions import MythError, MythDBError, MythFileError
 from MythTV.logging import MythLog
 from MythTV.altdict import DictData, OrdDict
-from MythTV.utility import levenshtein, DequeBuffer
+from MythTV.utility import levenshtein, DequeBuffer, py23_repr
 from MythTV.database import DBCache
 
 from subprocess import Popen
@@ -53,7 +53,7 @@ class System( DBCache ):
 
     @classmethod
     def system(cls, command, db=None):
-        command = command.lsplit(' ',1)
+        command = command.split(' ',1)
         path = command[0]
         args = ''
         if len(command) > 1:
@@ -63,10 +63,10 @@ class System( DBCache ):
             s = cls(path, db=db)
             res = s(args)
             if len(res):
-                s.log(MythLog.SYSTEM, MythLog.DEBUG, '---- Output ----', res)
+                s.log(MythLog.SYSTEM, MythLog.DEBUG, '---- Output ----', res.decode('utf-8'))
             if len(s.stderr):
                 s.log(MythLog.SYSTEM, MythLog.DEBUG,
-                                               '---- Error  ----', s.stderr)
+                                               '---- Error  ----', s.stderr.decode('utf-8'))
             return 0
         except (MythDBError,MythFileError):
             return -1
@@ -114,7 +114,7 @@ class System( DBCache ):
                     break
             else:
                 raise MythFileError('Defined executable path does not exist.')
-                
+
         self.returncode = 0
         self.stderr = ''
         self.useshell = useshell
@@ -153,7 +153,7 @@ class System( DBCache ):
                     self.path, hex(id(self)))
 
     def __repr__(self):
-        return str(self).encode('utf-8')
+        return py23_repr(str(self))
 
     def append(self, *args):
         """
@@ -349,13 +349,13 @@ class Grabber( System ):
 
     def command(self, *args):
         return self._processMetadata(super(Grabber, self).command(*args))
- 
+
     def search(self, phrase, subtitle=None, tolerance=None, func=None):
         """
         obj.search(phrase, subtitle=None, tolerance=None) -> result generator
 
             Returns a generator of results matching the given search
-                phrase.  A secondary phrase can be given through the 
+                phrase.  A secondary phrase can be given through the
                 'subtitle' parameter, and an optional levenshtein
                 tolerance value can be given for filtering results.
         """
@@ -384,7 +384,7 @@ class Grabber( System ):
 
     def sortedSearch(self, phrase, subtitle=None, tolerance=None):
         """
-        Behaves like obj.search(), but sorts results based off 
+        Behaves like obj.search(), but sorts results based off
             levenshtein distance.
         """
         return sorted(self.search(phrase, subtitle, tolerance), \
@@ -408,7 +408,10 @@ class Grabber( System ):
                 args = (inetref, season, episode)
             else:
                 args = (inetref,)
-        return self.command('-D', *args).next()
+        # inetref may expand to "my_grabber_script.xyz_1234" or "9876"
+        args = list(args)
+        args[0] = args[0].split("_")[-1]
+        return next(self.command('-D', *args))
 
 class SystemEvent( System ):
     """
@@ -445,5 +448,5 @@ class SystemEvent( System ):
             cmd = eventdata['program'].formatJob(cmd)
         for a in ('sender','cardid','secs'):
             if a in eventdata:
-                cmd = cmd.replace('%%%s%%' % a, eventdata[a])
+                cmd = cmd.replace('%%%s%%' % a.upper(), eventdata[a])
         return self._runcmd(cmd)

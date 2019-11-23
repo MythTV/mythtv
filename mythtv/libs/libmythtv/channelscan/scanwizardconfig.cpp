@@ -3,6 +3,7 @@
 #include "videosource.h"
 #include "cardutil.h"
 #include "frequencytablesetting.h"
+#include "channelutil.h"
 
 #include "channelscanmiscsettings.h"
 #include "inputselectorsetting.h"
@@ -63,6 +64,10 @@ void ScanWizard::SetupConfig(
 
     connect(m_input,       SIGNAL(valueChanged(const QString&)),
             this,          SLOT(  SetInput(    const QString&)));
+
+    connect(m_input,       SIGNAL(valueChanged(const QString&)),
+            this,          SLOT(  SetPaneDefaults(const QString)));
+
 }
 
 uint ScanWizard::GetSourceID(void) const
@@ -103,6 +108,58 @@ bool ScanWizard::DoAddFullTS(void) const
 bool ScanWizard::DoTestDecryption(void) const
 {
     return m_trustEncSI->boolValue();
+}
+
+void ScanWizard::SetPaneDefaults(const QString &cardid_inputname)
+{
+    const int sourceid = m_videoSource->getValue().toInt();
+    uint scanfrequency = 0;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+            "SELECT scanfrequency "
+            "FROM videosource "
+            "WHERE videosource.sourceid = :SOURCEID ;");
+    query.bindValue(":SOURCEID", sourceid);
+    if (!query.exec() || !query.isActive())
+    {
+        MythDB::DBError("ScanOptionalConfig::SetPaneDefaults", query);
+    }
+    else if (query.next())
+    {
+        scanfrequency = query.value(0).toUInt();
+        LOG(VB_CHANSCAN, LOG_DEBUG,
+            QString("SetPaneDefaults cardid_inputname:%1 sourceid:%2 frequency:%3")
+                .arg(cardid_inputname).arg(sourceid).arg(scanfrequency));
+    }
+
+    // Set defaults only when a frequency has been entered.
+    if (scanfrequency == 0)
+        return;
+
+    // If we have only a frequency set that as default; if there is a multiplex
+    // already at that frequency then use the values of that multiplex as
+    // default values for scanning.
+    int mplexid = 0;
+    mplexid = ChannelUtil::GetMplexID(sourceid, scanfrequency);
+    LOG(VB_CHANSCAN, LOG_DEBUG,
+        QString("SetPaneDefaults sourceid:%1 frequency:%2 mplexid:%3")
+            .arg(sourceid).arg(scanfrequency).arg(mplexid));
+
+    DTVMultiplex mpx;
+    if (mplexid > 0)
+    {
+        DTVTunerType tuner_type = CardUtil::GetTunerTypeFromMultiplex(mplexid);
+
+        mpx.FillFromDB(tuner_type, mplexid);
+
+        LOG(VB_CHANSCAN, LOG_DEBUG,
+            QString("SetPaneDefaults sourceid:%1 frequency:%2 mplexid:%3 tuner_type:%4 mpx:%5")
+                .arg(sourceid).arg(scanfrequency).arg(mplexid)
+                .arg(tuner_type.toString()).arg(mpx.toString()));
+    }
+
+    m_scanConfig->SetTuningPaneValues(scanfrequency, mpx);
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -492,4 +549,90 @@ QMap<QString,QString> ScanOptionalConfig::GetStartChan(void) const
     }
 
     return startChan;
+}
+
+void ScanOptionalConfig::SetTuningPaneValues(uint frequency, const DTVMultiplex &mpx)
+{
+    const int st =  m_scanType->getValue().toInt();
+
+    if (st == ScanTypeSetting::FullScan_DVBT  ||
+        st == ScanTypeSetting::NITAddScan_DVBT )
+    {
+        PaneDVBT *pane = m_paneDVBT;
+
+        pane->setFrequency(frequency);
+        if (frequency == mpx.m_frequency)
+        {
+            pane->setInversion(mpx.m_inversion.toString());
+            pane->setBandwidth(mpx.m_bandwidth.toString());
+            pane->setCodeRateHP(mpx.m_hp_code_rate.toString());
+            pane->setCodeRateLP(mpx.m_lp_code_rate.toString());
+            pane->setConstellation(mpx.m_modulation.toString());
+            pane->setTransmode(mpx.m_trans_mode.toString());
+            pane->setGuardInterval(mpx.m_guard_interval.toString());
+            pane->setHierarchy(mpx.m_hierarchy.toString());
+        }
+    }
+    else if (st == ScanTypeSetting::FullScan_DVBT2  ||
+             st == ScanTypeSetting::NITAddScan_DVBT2 )
+    {
+        PaneDVBT2 *pane = m_paneDVBT2;
+
+        pane->setFrequency(frequency);
+        if (frequency == mpx.m_frequency)
+        {
+            pane->setInversion(mpx.m_inversion.toString());
+            pane->setBandwidth(mpx.m_bandwidth.toString());
+            pane->setCodeRateHP(mpx.m_hp_code_rate.toString());
+            pane->setCodeRateLP(mpx.m_lp_code_rate.toString());
+            pane->setConstellation(mpx.m_modulation.toString());
+            pane->setTransmode(mpx.m_trans_mode.toString());
+            pane->setGuardInterval(mpx.m_guard_interval.toString());
+            pane->setHierarchy(mpx.m_hierarchy.toString());
+            pane->setModsys(mpx.m_mod_sys.toString());
+        }
+    }
+    else if (st == ScanTypeSetting::FullScan_DVBC  ||
+             st == ScanTypeSetting::NITAddScan_DVBC )
+    {
+        PaneDVBC *pane = m_paneDVBC;
+
+        pane->setFrequency(frequency);
+        if (frequency == mpx.m_frequency)
+        {
+            pane->setInversion(mpx.m_inversion.toString());
+            pane->setSymbolrate(QString("%1").arg(mpx.m_symbolrate));
+            pane->setFec(mpx.m_fec.toString());
+            pane->setModulation(mpx.m_modulation.toString());
+        }
+    }
+    else if (st == ScanTypeSetting::NITAddScan_DVBS)
+    {
+        PaneDVBS *pane = m_paneDVBS;
+
+        pane->setFrequency(frequency);
+        if (frequency == mpx.m_frequency)
+        {
+            pane->setSymbolrate(QString("%1").arg(mpx.m_symbolrate));
+            pane->setInversion(mpx.m_inversion.toString());
+            pane->setFec(mpx.m_fec.toString());
+            pane->setPolarity(mpx.m_polarity.toString());
+        }
+    }
+    else if (st == ScanTypeSetting::NITAddScan_DVBS2)
+    {
+        PaneDVBS2 *pane = m_paneDVBS2;
+
+        pane->setFrequency(frequency);
+        if (frequency == mpx.m_frequency)
+        {
+            pane->setSymbolrate(QString("%1").arg(mpx.m_symbolrate));
+            pane->setInversion(mpx.m_inversion.toString());
+            pane->setFec(mpx.m_fec.toString());
+            pane->setPolarity(mpx.m_polarity.toString());
+            pane->setModulation(mpx.m_modulation.toString());
+            pane->setModsys(mpx.m_mod_sys.toString());
+            pane->setRolloff(mpx.m_rolloff.toString());
+        }
+    }
 }

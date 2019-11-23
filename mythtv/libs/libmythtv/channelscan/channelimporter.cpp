@@ -9,6 +9,7 @@
 // C++ includes
 #include <iostream>
 #include <utility>
+#include <algorithm>
 
 // Qt includes
 #include <QTextStream>
@@ -1398,10 +1399,7 @@ QString ChannelImporter::FormatTransport(
 {
     QString msg;
     QTextStream ssMsg(&msg);
-
-    ssMsg << transport.m_modulation.toString().toLatin1().constData() << ":";
-    ssMsg << transport.m_frequency;
-
+    ssMsg << transport.toString();
     return msg;
 }
 
@@ -1566,35 +1564,51 @@ QString ChannelImporter::ComputeSuggestedChannelNum(
     if (!ChannelUtil::IsConflicting(chan.m_chan_num, chan.m_source_id))
         return chan.m_chan_num;
 
+    // ATSC major-minor channel number
     QString channelFormat = "%1_%2";
     QString chan_num = channelFormat
         .arg(chan.m_atsc_major_channel)
         .arg(chan.m_atsc_minor_channel);
-
-    if (!chan.m_atsc_minor_channel)
+    if (chan.m_atsc_minor_channel)
     {
-        if (chan.m_si_standard == "dvb")
-        {
-            chan_num = QString("%1")
-                          .arg(chan.m_service_id);
-        }
-        else if (chan.m_freqid.isEmpty())
-        {
-            chan_num = QString("%1-%2")
-                          .arg(chan.m_source_id)
-                          .arg(chan.m_service_id);
-        }
-        else
+        if (!ChannelUtil::IsConflicting(chan_num, chan.m_source_id))
+            return chan_num;
+    }
+
+    // DVB
+    if (chan.m_si_standard == "dvb")
+    {
+        // Service ID
+        chan_num = QString("%1").arg(chan.m_service_id);
+        if (!ChannelUtil::IsConflicting(chan_num, chan.m_source_id))
+            return chan_num;
+
+        // Frequency ID (channel) - Service ID
+        if (!chan.m_freqid.isEmpty())
         {
             chan_num = QString("%1-%2")
                           .arg(chan.m_freqid)
                           .arg(chan.m_service_id);
+            if (!ChannelUtil::IsConflicting(chan_num, chan.m_source_id))
+                return chan_num;
         }
+
+        // Service ID - Network ID
+        chan_num = QString("%1-%2")
+                        .arg(chan.m_service_id)
+                        .arg(chan.m_netid);
+        if (!ChannelUtil::IsConflicting(chan_num, chan.m_source_id))
+            return chan_num;
+
+        // Service ID - Transport ID
+        chan_num = QString("%1-%2")
+                        .arg(chan.m_service_id)
+                        .arg(chan.m_pat_tsid);
+        if (!ChannelUtil::IsConflicting(chan_num, chan.m_source_id))
+            return chan_num;
     }
 
-    if (!ChannelUtil::IsConflicting(chan_num, chan.m_source_id))
-        return chan_num;
-
+    // Find unused channel number
     QMutexLocker locker(&last_free_lock);
     uint last_free_chan_num = last_free_chan_num_map[chan.m_source_id];
     for (last_free_chan_num++; ; ++last_free_chan_num)

@@ -1745,7 +1745,8 @@ QString TVRec::GetStartChannel(uint inputid)
     query.prepare(
         "SELECT channum "
         "FROM capturecard, channel "
-        "WHERE channel.sourceid   = capturecard.sourceid AND "
+        "WHERE deleted            IS NULL AND "
+        "      channel.sourceid   = capturecard.sourceid AND "
         "      capturecard.cardid = :INPUTID");
     query.bindValue(":INPUTID",    inputid);
 
@@ -1769,7 +1770,8 @@ QString TVRec::GetStartChannel(uint inputid)
     query.prepare(
         "SELECT channum, inputname "
         "FROM capturecard, channel "
-        "WHERE channel.sourceid   = capturecard.sourceid AND "
+        "WHERE deleted            IS NULL AND "
+        "      channel.sourceid   = capturecard.sourceid AND "
         "      capturecard.cardid = :INPUTID");
     query.bindValue(":INPUTID", inputid);
 
@@ -2197,7 +2199,8 @@ bool TVRec::ShouldSwitchToAnotherInput(const QString& chanid)
     query.prepare(
         "SELECT channel.channum "
         "FROM channel, capturecard "
-        "WHERE ( channel.chanid = :CHANID OR             "
+        "WHERE deleted IS NULL AND "
+        "      ( channel.chanid = :CHANID OR             "
         "        ( channel.channum  = :CHANNUM AND       "
         "          channel.callsign = :CALLSIGN    )     "
         "      )                                     AND "
@@ -2223,7 +2226,8 @@ bool TVRec::ShouldSwitchToAnotherInput(const QString& chanid)
     query.prepare(
         "SELECT channel.channum, capturecard.cardid "
         "FROM channel, capturecard "
-        "WHERE ( channel.chanid = :CHANID OR              "
+        "WHERE deleted IS NULL AND "
+        "      ( channel.chanid = :CHANID OR              "
         "        ( channel.channum  = :CHANNUM AND        "
         "          channel.callsign = :CALLSIGN    )      "
         "      )                                      AND "
@@ -2323,7 +2327,8 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
     QString basequery = QString(
         "SELECT channel.chanid, channel.channum, capturecard.cardid "
         "FROM channel, capturecard "
-        "WHERE channel.channum LIKE '%1%'            AND "
+        "WHERE deleted IS NULL AND "
+        "      channel.channum LIKE '%1%'            AND "
         "      channel.sourceid = capturecard.sourceid");
 
     QString inputquery[2] =
