@@ -881,7 +881,7 @@ void DataDirectProcessor::DataDirectProgramUpdate(void)
 #endif
 
     if (!query.exec("INSERT IGNORE INTO programrating (chanid, starttime, "
-                    "system, rating) SELECT dd_v_program.chanid, "
+                    "`system`, rating) SELECT dd_v_program.chanid, "
                     "DATE_ADD(starttime, INTERVAL channel.tmoffset MINUTE), "
                     " 'MPAA', "
                     "mpaarating FROM dd_v_program, channel WHERE "
@@ -890,7 +890,7 @@ void DataDirectProcessor::DataDirectProgramUpdate(void)
         MythDB::DBError("Inserting into programrating table", query);
 
     if (!query.exec("INSERT IGNORE INTO programrating (chanid, starttime, "
-                    "system, rating) SELECT dd_v_program.chanid, "
+                    "`system`, rating) SELECT dd_v_program.chanid, "
                     "DATE_ADD(starttime, INTERVAL channel.tmoffset MINUTE), "
                     "'VCHIP', "
                     "tvrating FROM dd_v_program, channel WHERE tvrating != ''"
