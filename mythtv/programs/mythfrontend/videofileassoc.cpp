@@ -131,7 +131,7 @@ namespace
         }
 
       private:
-        typedef std::vector<QObject *> list_type;
+        using list_type = std::vector<QObject *>;
 
       private:
         list_type m_objects;
@@ -139,7 +139,7 @@ namespace
 
     struct UIDToFAPair
     {
-        typedef unsigned int UID_type;
+        using UID_type = unsigned int;
 
         UIDToFAPair() = default;
 
@@ -166,7 +166,7 @@ namespace
 class FileAssocDialogPrivate
 {
   public:
-    typedef std::vector<UIDToFAPair> UIReadyList_type;
+    using UIReadyList_type = std::vector<UIDToFAPair>;
 
   public:
     FileAssocDialogPrivate()
@@ -261,8 +261,7 @@ class FileAssocDialogPrivate
     }
 
   private:
-    typedef std::map<UIDToFAPair::UID_type, FileAssociationWrap *>
-            FA_collection;
+    using FA_collection = std::map<UIDToFAPair::UID_type, FileAssociationWrap *>;
 
   private:
     struct fa_col_ent_2_UIDFAPair
@@ -285,7 +284,7 @@ class FileAssocDialogPrivate
 
     void LoadFileAssociations()
     {
-        typedef std::vector<UIDToFAPair> tmp_fa_list;
+        using tmp_fa_list = std::vector<UIDToFAPair>;
 
         const FileAssociations::association_list &fa_list =
                 FileAssociations::getFileAssociation().getList();

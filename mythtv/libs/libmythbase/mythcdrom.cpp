@@ -136,11 +136,11 @@ void MythCDROM::setDeviceSpeed(const char *devicePath, int speed)
         .arg(devicePath).arg(speed));
 }
 
-typedef struct
+struct blockInput_t
 {
     udfread_block_input m_input;  /* This *must* be the first entry in the struct */
     RemoteFile*         m_file;
-} blockInput_t;
+};
 
 static int _def_close(udfread_block_input *p_gen)
 {

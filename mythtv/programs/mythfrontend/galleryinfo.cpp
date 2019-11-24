@@ -269,7 +269,7 @@ void InfoList::Display(ImageItemK &im, const QStringList &tagStrings)
         foreach (const QString &group, tags.uniqueKeys())
         {
             // Iterate earliest->latest to preserve tag order
-            typedef QList<QStringList> TagList;
+            using TagList = QList<QStringList>;
             TagList tagList = tags.values(group);
             TagList::const_iterator i = tagList.constEnd();
 

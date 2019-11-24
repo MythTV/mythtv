@@ -178,10 +178,10 @@ struct drm_wait_vblank_reply {
     long         m_tvalUsec;
 };
 
-typedef union drm_wait_vblank {
+using drm_wait_vblank_t = union drm_wait_vblank {
     struct drm_wait_vblank_request m_request;
     struct drm_wait_vblank_reply   m_reply;
-} drm_wait_vblank_t;
+};
 
 #define DRM_IOCTL_BASE                  'd'
 #define DRM_IOWR(nr,type)               _IOWR(DRM_IOCTL_BASE,nr,type)

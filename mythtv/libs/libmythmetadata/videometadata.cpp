@@ -26,9 +26,9 @@ using namespace std;
 class VideoMetadataImp
 {
   public:
-    typedef VideoMetadata::genre_list genre_list;
-    typedef VideoMetadata::country_list country_list;
-    typedef VideoMetadata::cast_list cast_list;
+    using genre_list = VideoMetadata::genre_list;
+    using country_list = VideoMetadata::country_list;
+    using cast_list = VideoMetadata::cast_list;
 
   public:
     VideoMetadataImp(QString filename, QString sortFilename,

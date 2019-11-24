@@ -102,11 +102,11 @@ static QMap<QString,SkipTypes> *init_skip_types(void)
     return tmp;
 }
 
-typedef enum
+enum OutputMethod
 {
     kOutputMethodEssentials = 1,
     kOutputMethodFull,
-} OutputMethod;
+};
 OutputMethod outputMethod = kOutputMethodEssentials;
 
 static QMap<QString,OutputMethod> *init_output_types();

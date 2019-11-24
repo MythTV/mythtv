@@ -15,8 +15,8 @@ extern "C" {
 #include <X11/extensions/Xinerama.h>
 #include <X11/extensions/xf86vmode.h>
 }
-typedef int (*XErrorCallbackType)(Display *, XErrorEvent *);
-typedef std::vector<XErrorEvent>       XErrorVectorType;
+using XErrorCallbackType = int (*)(Display *, XErrorEvent *);
+using XErrorVectorType = std::vector<XErrorEvent>;
 std::map<Display*, XErrorVectorType>   xerrors;
 std::map<Display*, XErrorCallbackType> xerror_handlers;
 std::map<Display*, MythXDisplay*>      xdisplays;

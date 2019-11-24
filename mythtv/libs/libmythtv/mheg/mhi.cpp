@@ -510,7 +510,7 @@ bool MHIContext::GetCarouselData(QString objectPath, QByteArray &result)
 // Mapping from key name & UserInput register to UserInput EventData
 class MHKeyLookup
 {
-    typedef QPair< QString, int /*UserInput register*/ > key_t;
+    using key_t = QPair< QString, int /*UserInput register*/ >;
 
 public:
     MHKeyLookup();
@@ -1694,7 +1694,7 @@ void MHIDLA::DrawArcSector(int /*x*/, int /*y*/, int /*width*/, int /*height*/,
 // The UK profile says that MHEG should not contain concave or
 // self-crossing polygons but we can get the former at least as
 // a result of rounding when drawing ellipses.
-typedef struct { int m_yBottom, m_yTop, m_xBottom; float m_slope; } lineSeg;
+struct lineSeg { int m_yBottom, m_yTop, m_xBottom; float m_slope; };
 
 void MHIDLA::DrawPoly(bool isFilled, int nPoints, const int *xArray, const int *yArray)
 {

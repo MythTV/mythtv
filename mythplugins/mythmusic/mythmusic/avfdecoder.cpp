@@ -54,7 +54,7 @@ extern "C" {
 
 /****************************************************************************/
 
-typedef QMap<QString,QString> ShoutCastMetaMap;
+using ShoutCastMetaMap = QMap<QString,QString>;
 
 class ShoutCastMetaParser
 {

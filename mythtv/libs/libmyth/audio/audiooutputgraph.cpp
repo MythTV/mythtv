@@ -37,7 +37,7 @@ public:
     inline int64_t Next() const { return m_tcNext; }
     inline int64_t First() const { return m_tcFirst; }
 
-    typedef QPair<int64_t, int64_t> range_t;
+    using range_t = QPair<int64_t, int64_t>;
     range_t Avail(int64_t timecode) const
     {
         if (timecode == 0 || timecode == -1)

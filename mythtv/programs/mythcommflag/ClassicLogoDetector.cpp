@@ -12,15 +12,14 @@
 #include "ClassicLogoDetector.h"
 #include "ClassicCommDetector.h"
 
-typedef struct edgemaskentry
+struct EdgeMaskEntry
 {
     int m_isEdge;
     int m_horiz;
     int m_vert;
     int m_rdiag;
     int m_ldiag;
-}
-EdgeMaskEntry;
+};
 
 
 ClassicLogoDetector::ClassicLogoDetector(ClassicCommDetector* commdetector,

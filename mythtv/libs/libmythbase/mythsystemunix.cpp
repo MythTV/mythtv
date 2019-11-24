@@ -43,12 +43,12 @@ if( (x) >= 0 ) { \
     (x) = -1; \
 }
 
-typedef struct
+struct FDType_t
 {
     MythSystemLegacyUnix *m_ms;
     int                   m_type;
-} FDType_t;
-typedef QMap<int, FDType_t*> FDMap_t;
+};
+using FDMap_t = QMap<int, FDType_t*>;
 
 /**********************************
  * MythSystemLegacyManager method defines

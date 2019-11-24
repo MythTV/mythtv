@@ -75,7 +75,7 @@ namespace
         }
 
       private:
-        typedef std::set<QString> image_ext;
+        using image_ext = std::set<QString>;
         image_ext    m_imageExt;
         DirListType &m_videoFiles;
     };

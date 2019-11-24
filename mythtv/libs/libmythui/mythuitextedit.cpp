@@ -382,7 +382,7 @@ void MythUITextEdit::PasteTextFromClipboard(QClipboard::Mode mode)
     InsertText(clipboard->text(mode));
 }
 
-typedef QPair<int, int> keyCombo;
+using keyCombo = QPair<int, int>;
 static QMap<keyCombo, int> gDeadKeyMap;
 
 static void LoadDeadKeys(QMap<QPair<int, int>, int> &map)

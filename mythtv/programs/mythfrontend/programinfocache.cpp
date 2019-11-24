@@ -16,7 +16,7 @@
 
 #include <algorithm>
 
-typedef vector<ProgramInfo*> *VPI_ptr;
+using VPI_ptr = vector<ProgramInfo *> *;
 static void free_vec(VPI_ptr &v)
 {
     if (v)

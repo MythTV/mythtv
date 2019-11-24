@@ -246,7 +246,7 @@ HostCheckBoxSetting *RatingsToPL()
                                                "matching the rating "
                                                "below."));
 
-    typedef std::map<ParentalLevel::Level, QString> r2pl_map;
+    using r2pl_map = std::map<ParentalLevel::Level, QString>;
 
     r2pl_map r2pl_defaults;
 

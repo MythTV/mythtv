@@ -7,12 +7,12 @@
 class VideoMetadataListManagerImp
 {
   public:
-    typedef VideoMetadataListManager::VideoMetadataPtr VideoMetadataPtr;
-    typedef VideoMetadataListManager::metadata_list metadata_list;
+    using VideoMetadataPtr = VideoMetadataListManager::VideoMetadataPtr;
+    using metadata_list = VideoMetadataListManager::metadata_list;
 
   private:
-    typedef std::map<unsigned int, metadata_list::iterator> int_to_meta;
-    typedef std::map<QString, metadata_list::iterator> string_to_meta;
+    using int_to_meta = std::map<unsigned int, metadata_list::iterator>;
+    using string_to_meta = std::map<QString, metadata_list::iterator>;
 
   public:
     void setList(metadata_list &list)

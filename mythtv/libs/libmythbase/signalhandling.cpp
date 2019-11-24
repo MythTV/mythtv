@@ -194,13 +194,13 @@ void SignalHandler::SetHandlerPrivate(int signum, SigHandlerFunc handler)
 #endif
 }
 
-typedef struct {
+struct SignalInfo {
     int      m_signum;
     int      m_code;
     int      m_pid;
     int      m_uid;
     uint64_t m_value;
-} SignalInfo;
+};
 
 void SignalHandler::signalHandler(int signum, siginfo_t *info, void *context)
 {

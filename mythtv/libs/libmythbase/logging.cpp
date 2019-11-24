@@ -77,13 +77,13 @@ static QHash<uint64_t, int64_t> logThreadTidHash;
 static bool                    logThreadFinished = false;
 static bool                    debugRegistration = false;
 
-typedef struct {
+struct LogPropagateOpts {
     bool    m_propagate;
     int     m_quiet;
     int     m_facility;
     bool    m_dblog;
     QString m_path;
-} LogPropagateOpts;
+};
 
 LogPropagateOpts        logPropagateOpts {false, 0, 0, true, ""};
 QString                 logPropagateArgs;

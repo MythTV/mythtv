@@ -552,7 +552,7 @@ void MythCCExtractorPlayer::IngestTeletext(void)
     TeletextInfo::iterator ttxit = m_ttx_info.begin();
     for (; ttxit != m_ttx_info.end(); ++ttxit)
     {
-        typedef QPair<int, int> qpii;
+        using qpii = QPair<int, int>;
         QSet<qpii> updatedPages = (*ttxit).reader->GetUpdatedPages();
         if (updatedPages.isEmpty())
             continue;

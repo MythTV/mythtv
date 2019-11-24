@@ -363,7 +363,7 @@ void EditMetadataDialog::fillWidgets()
 
     // TODO: maybe make the title list have the same sort order
     // as elsewhere.
-    typedef std::vector<std::pair<unsigned int, QString> > title_list;
+    using title_list = std::vector<std::pair<unsigned int, QString> >;
     const VideoMetadataListManager::metadata_list &mdl = m_metaCache.getList();
     title_list tc;
     tc.reserve(mdl.size());

@@ -11,7 +11,7 @@
 #include "mythdirs.h"
 #include "mythcorecontext.h"
 
-typedef QMap<QString, QTranslator*> TransMap;
+using TransMap = QMap<QString, QTranslator*>;
 
 class MythTranslationPrivate
 {

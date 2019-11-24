@@ -354,7 +354,7 @@ class VideoPlayerCommandPrivate
     }
 
   private:
-    typedef std::vector<VideoPlayProc *> player_list;
+    using player_list = std::vector<VideoPlayProc *>;
     player_list m_playerProcs;
 };
 

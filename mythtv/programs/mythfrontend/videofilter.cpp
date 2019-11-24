@@ -553,7 +553,7 @@ void VideoFilterDialog::fillWidgets()
     bool have_unknown_year = false;
     bool have_unknown_runtime = false;
 
-    typedef std::set<int> int_list;
+    using int_list = std::set<int>;
     int_list years;
     int_list runtimes;
     int_list user_ratings;

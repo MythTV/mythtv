@@ -18,13 +18,13 @@
 #define DEBUG_CC_DECODE        0
 #define DEBUG_CC_PARSE         0
 
-typedef enum
+enum kCCTypes
 {
     NTSC_CC_f1         = 0,
     NTSC_CC_f2         = 1,
     DTVCC_PACKET_DATA  = 2,
     DTVCC_PACKET_START = 3,
-} kCCTypes;
+};
 
 const char* cc_types[4] =
 {
@@ -83,7 +83,7 @@ void CC708Decoder::services(uint seconds, bool seen[64]) const
         seen[i] = (m_lastSeen[i] >= then);
 }
 
-typedef enum
+enum C0
 {
     NUL  = 0x00,
     ETX  = 0x03,
@@ -93,15 +93,15 @@ typedef enum
     HCR  = 0x0E,
     EXT1 = 0x10,
     P16  = 0x18,
-} C0;
+};
 
-typedef enum
+enum C1
 {
     CW0=0x80, CW1, CW2, CW3, CW4, CW5, CW6, CW7,
     CLW,      DSW, HDW, TGW, DLW, DLY, DLC, RST,
     SPA=0x90, SPC, SPL,                     SWA=0x97,
     DF0,      DF1, DF2, DF3, DF4, DF5, DF6, DF7,
-} C1;
+};
 
 extern ushort CCtableG0[0x60];
 extern ushort CCtableG1[0x60];

@@ -55,8 +55,8 @@ class TransferThread : public MThread
 {
     Q_DECLARE_TR_FUNCTIONS(FileTransferWorker);
 public:
-    typedef QMap<ImagePtrK, QString> TransferMap;
-    typedef QSet<ImagePtrK> ImageSet;
+    using TransferMap = QMap<ImagePtrK, QString>;
+    using ImageSet = QSet<ImagePtrK>;
 
     TransferThread(TransferMap files, bool move, MythUIProgressDialog *dialog)
         : MThread("FileTransfer"),

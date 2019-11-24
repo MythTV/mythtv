@@ -17,7 +17,7 @@ namespace
     class ext_lookup
     {
       private:
-        typedef std::map<QString, bool> ext_map;
+        using ext_map = std::map<QString, bool>;
         ext_map m_extensions;
         bool m_listUnknown;
 

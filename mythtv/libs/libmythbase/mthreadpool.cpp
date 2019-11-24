@@ -96,9 +96,9 @@ using namespace std;
 #include "mthread.h"
 #include "mythdb.h"
 
-typedef QPair<QRunnable*,QString> MPoolEntry;
-typedef QList<MPoolEntry> MPoolQueue;
-typedef QMap<int, MPoolQueue> MPoolQueues;
+using MPoolEntry = QPair<QRunnable*,QString>;
+using MPoolQueue = QList<MPoolEntry>;
+using MPoolQueues = QMap<int, MPoolQueue>;
 
 class MPoolThread : public MThread
 {

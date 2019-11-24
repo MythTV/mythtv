@@ -11,7 +11,7 @@
 #define LOC QString("DTVChan[%1](%2): ").arg(m_inputid).arg(GetDevice())
 
 QReadWriteLock DTVChannel::s_master_map_lock(QReadWriteLock::Recursive);
-typedef QMap<QString,QList<DTVChannel*> > MasterMap;
+using MasterMap = QMap<QString,QList<DTVChannel*> >;
 MasterMap DTVChannel::s_master_map;
 
 DTVChannel::~DTVChannel()

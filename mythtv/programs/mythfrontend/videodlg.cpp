@@ -141,7 +141,7 @@ namespace
         const QString base_name = qfi.completeBaseName();
         QList<QByteArray> image_types = QImageReader::supportedImageFormats();
 
-        typedef std::set<QString> image_type_list;
+        using image_type_list = std::set<QString>;
         image_type_list image_exts;
 
         QString suffix;
@@ -439,7 +439,7 @@ namespace
     void CopyMetadataToUI(const VideoMetadata *metadata,
             CopyMetadataDestination &dest)
     {
-        typedef std::map<QString, QString> valuelist;
+        using valuelist = std::map<QString, QString>;
         valuelist tmp;
 
         if (metadata)
@@ -666,8 +666,7 @@ const char * const ItemDetailPopup::WINDOW_NAME = "itemdetailpopup";
 class VideoDialogPrivate
 {
   private:
-    typedef std::list<std::pair<QString, ParentalLevel::Level> >
-            parental_level_map;
+    using parental_level_map = std::list<std::pair<QString, ParentalLevel::Level> >;
 
     struct rating_to_pl_less :
         public std::binary_function<parental_level_map::value_type,
@@ -680,7 +679,7 @@ class VideoDialogPrivate
         }
     };
 
-    typedef VideoDialog::VideoListPtr VideoListPtr;
+    using VideoListPtr = VideoDialog::VideoListPtr;
 
   public:
     VideoDialogPrivate(const VideoListPtr& videoList, VideoDialog::DialogType type,
@@ -1186,7 +1185,7 @@ void VideoDialog::loadData()
             }
         }
 
-        typedef QList<MythGenericTree *> MGTreeChildList;
+        using MGTreeChildList = QList<MythGenericTree *>;
         MGTreeChildList *lchildren = m_d->m_currentNode->getAllChildren();
 
         for (MGTreeChildList::const_iterator p = lchildren->begin();
@@ -3447,7 +3446,7 @@ void VideoDialog::VideoAutoSearch(MythGenericTree *node)
 {
     if (!node)
         node = m_d->m_rootNode;
-    typedef QList<MythGenericTree *> MGTreeChildList;
+    using MGTreeChildList = QList<MythGenericTree *>;
     MGTreeChildList *lchildren = node->getAllChildren();
 
     LOG(VB_GENERAL, LOG_DEBUG,

@@ -5829,7 +5829,7 @@ static unsigned dbg_ident(const MythPlayer *player)
 {
     static QMutex   s_dbgLock;
     static unsigned s_dbgNextIdent = 0;
-    typedef QMap<const MythPlayer*, unsigned> DbgMapType;
+    using DbgMapType = QMap<const MythPlayer*, unsigned>;
     static DbgMapType s_dbgIdent;
 
     QMutexLocker locker(&s_dbgLock);

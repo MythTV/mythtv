@@ -43,7 +43,7 @@ using namespace std;
 #define kNoDataTimeout            50   /* msec */
 #define kResetTimeout             1000 /* msec */
 
-typedef QMap<raw1394handle_t,LinuxFirewireDevice*> handle_to_lfd_t;
+using handle_to_lfd_t = QMap<raw1394handle_t,LinuxFirewireDevice*>;
 
 class LFDPriv
 {
@@ -838,12 +838,12 @@ vector<AVCInfo> LinuxFirewireDevice::GetSTBListPrivate(void)
     return list;
 }
 
-typedef struct
+struct dev_item
 {
     raw1394handle_t m_handle;
     int             m_port;
     int             m_node;
-} dev_item;
+};
 
 bool LinuxFirewireDevice::UpdateDeviceList(void)
 {

@@ -21,11 +21,11 @@ using namespace std;
 #include "mythdialogbox.h"
 #include "mythmainwindow.h"
 
-typedef struct RecPriorityInfo
+struct RecPriorityInfo
 {
     ChannelInfo *m_chan;
     int          m_cnt;
-} RecPriorityInfo;
+};
 
 class channelSort
 {

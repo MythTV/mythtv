@@ -6,7 +6,7 @@
 class CleanupHooksImp
 {
   private:
-    typedef std::list<CleanupProc *> clean_list;
+    using clean_list = std::list<CleanupProc *>;
 
   private:
     clean_list m_cleanList;

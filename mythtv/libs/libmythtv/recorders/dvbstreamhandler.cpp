@@ -354,7 +354,7 @@ void DVBStreamHandler::RunSR(void)
     LOG(VB_RECORD, LOG_DEBUG, LOC + "RunSR(): " + "end");
 }
 
-typedef vector<uint> pid_list_t;
+using pid_list_t = vector<uint>;
 
 static pid_list_t::iterator find(
     const PIDInfoMap &map,

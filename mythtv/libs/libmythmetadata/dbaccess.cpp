@@ -26,11 +26,11 @@ namespace
 class SingleValueImp
 {
   public:
-    typedef SingleValue::entry entry;
-    typedef std::vector<entry> entry_list;
+    using entry = SingleValue::entry;
+    using entry_list = std::vector<entry>;
 
   private:
-    typedef std::map<int, QString> entry_map;
+    using entry_map = std::map<int, QString>;
 
   public:
     SingleValueImp(QString table_name, QString id_name, QString value_name)
@@ -253,10 +253,10 @@ void SingleValue::load_data()
 class MultiValueImp
 {
   public:
-    typedef MultiValue::entry entry;
+    using entry = MultiValue::entry;
 
   private:
-    typedef std::map<int, entry> id_map;
+    using id_map = std::map<int, entry>;
 
   public:
     MultiValueImp(QString table_name, QString id_name,
@@ -586,9 +586,9 @@ VideoCastMap &VideoCastMap::getCastMap()
 class FileAssociationsImp
 {
   public:
-    typedef FileAssociations::file_association file_association;
-    typedef FileAssociations::association_list association_list;
-    typedef FileAssociations::ext_ignore_list ext_ignore_list;
+    using file_association = FileAssociations::file_association;
+    using association_list = FileAssociations::association_list;
+    using ext_ignore_list = FileAssociations::ext_ignore_list;
 
   public:
     FileAssociationsImp() = default;

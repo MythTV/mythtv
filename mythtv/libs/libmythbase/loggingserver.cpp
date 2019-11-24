@@ -62,16 +62,16 @@ static QMap<QString, LoggerBase *> loggerMap;
 
 LogForwardThread                   *logForwardThread = nullptr;
 
-typedef QList<LoggerBase *> LoggerList;
+using LoggerList = QList<LoggerBase *>;
 
-typedef struct {
+struct LoggerListItem {
     LoggerList *m_itemList;
     qlonglong   m_itemEpoch;
-} LoggerListItem;
-typedef QMap<QString, LoggerListItem *> ClientMap;
+};
+using  ClientMap = QMap<QString, LoggerListItem *>;
 
-typedef QList<QString> ClientList;
-typedef QMap<LoggerBase *, ClientList *> RevClientMap;
+using ClientList = QList<QString>;
+using  RevClientMap = QMap<LoggerBase *, ClientList *>;
 
 static QMutex                       logClientMapMutex;
 static ClientMap                    logClientMap;

@@ -165,7 +165,7 @@ namespace
     class PasswordManager
     {
       private:
-        typedef std::map<ParentalLevel::Level, QString> pws;
+        using pws = std::map<ParentalLevel::Level, QString>;
 
       public:
         void Add(ParentalLevel::Level level, const QString &password)

@@ -47,7 +47,7 @@ private:
     static void CachePut(const Cddb::Album& album);
 
     // DiscID to album info cache
-    typedef QMap< Cddb::discid_t, Cddb::Album > cache_t; 
+    using cache_t = QMap< Cddb::discid_t, Cddb::Album >;
     static cache_t s_cache;
 
     static const QString& GetDB();

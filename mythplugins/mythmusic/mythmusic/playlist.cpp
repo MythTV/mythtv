@@ -337,7 +337,7 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
         {
             // "intellegent/album" order
 
-            typedef map<QString, uint32_t> AlbumMap;
+            using AlbumMap = map<QString, uint32_t>;
             AlbumMap                       album_map;
             AlbumMap::iterator             Ialbum;
             QString                        album;
@@ -405,7 +405,7 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
         {
             // "intellegent/album" order
 
-            typedef map<QString, uint32_t> ArtistMap;
+            using ArtistMap = map<QString, uint32_t>;
             ArtistMap                      artist_map;
             ArtistMap::iterator            Iartist;
             QString                        artist;

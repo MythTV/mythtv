@@ -329,7 +329,7 @@ static int AddFileNode(MythGenericTree *where_to_add, const QString& name,
 class VideoListImp
 {
   public:
-    typedef vector<VideoMetadata *> metadata_view_list;
+    using metadata_view_list = vector<VideoMetadata *>;
 
   private:
     enum metadata_list_type { ltNone, ltFileSystem, ltDBMetadata,
@@ -338,8 +338,8 @@ class VideoListImp
                               ltDBStudioGroup, ltDBCastGroup,
                               ltDBUserRatingGroup, ltDBInsertDateGroup,
                               ltTVMetadata};
-    typedef VideoMetadataListManager::metadata_list metadata_list;
-    typedef VideoMetadataListManager::VideoMetadataPtr MetadataPtr;
+    using metadata_list = VideoMetadataListManager::metadata_list;
+    using MetadataPtr = VideoMetadataListManager::VideoMetadataPtr;
 
   public:
     VideoListImp();
@@ -797,7 +797,7 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
     metadata_path_sort mps = metadata_path_sort();
     sort(mlist.begin(), mlist.end(), mps);
 
-    typedef map<QString, meta_dir_node *> group_to_node_map;
+    using group_to_node_map = map<QString, meta_dir_node *>;
     group_to_node_map gtnm;
 
     meta_dir_node *video_root = &m_metadataTree;
@@ -977,7 +977,7 @@ void VideoListImp::buildDbList()
     sort(mlist.begin(), mlist.end(), mps);
 
     // TODO: break out the prefix in the DB so this isn't needed
-    typedef map<QString, meta_dir_node *> prefix_to_node_map;
+    using prefix_to_node_map = map<QString, meta_dir_node *>;
     prefix_to_node_map ptnm;
 
     QStringList dirs = GetVideoDirs();
@@ -1010,7 +1010,7 @@ void VideoListImp::buildFsysList()
     //  Fill metadata from directory structure
     //
 
-    typedef vector<pair<QString, QString> > node_to_path_list;
+    using node_to_path_list = vector<pair<QString, QString> >;
 
     node_to_path_list node_paths;
 
@@ -1163,7 +1163,7 @@ void VideoListImp::update_meta_view(bool flat_list)
 class dirhandler : public DirectoryHandler
 {
   public:
-    typedef list<simple_ref_ptr<DirectoryHandler> > free_list;
+    using free_list = list<simple_ref_ptr<DirectoryHandler> >;
 
   public:
     dirhandler(smart_dir_node &directory, const QString &prefix,

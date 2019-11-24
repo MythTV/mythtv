@@ -1358,7 +1358,7 @@ void GuideGrid::fillChannelInfos(bool gotostartchannel)
                                          0,
                                          (m_changrpid < 0) ? 0 : m_changrpid);
 
-    typedef vector<uint> uint_list_t;
+    using uint_list_t = vector<uint>;
     QMap<QString,uint_list_t> channum_to_index_map;
     QMap<QString,uint_list_t> callsign_to_index_map;
 

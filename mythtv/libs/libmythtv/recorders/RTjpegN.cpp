@@ -518,7 +518,7 @@ int RTjpeg::s2b(int16_t *data, const int8_t *strm, uint8_t bt8, uint32_t *qtbla)
 void RTjpeg::QuantInit(void)
 {
  int i;
- typedef union { int16_t *m_int16; int32_t *m_int32; } P16_32;
+ using P16_32 = union { int16_t *m_int16; int32_t *m_int32; };
  P16_32 qtbl;
 
  qtbl.m_int32 = lqt;
