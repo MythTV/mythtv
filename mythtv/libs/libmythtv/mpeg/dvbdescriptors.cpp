@@ -590,7 +590,7 @@ QString DVBLogicalChannelDescriptor::toString() const
     for (uint i = 0; i < ChannelCount(); i++)
     {
         ret += QString("%1->%2").arg(ServiceID(i)).arg(ChannelNumber(i));
-        ret += (i+1<ChannelCount()) ? ", " : "";
+        ret += (i+1 < ChannelCount()) ? (i+3)%10 ? ", " : ",\n      " : "";
     }
     return ret;
 }
@@ -601,7 +601,7 @@ QString DVBSimulcastChannelDescriptor::toString() const
     for (uint i = 0; i < ChannelCount(); i++)
     {
         ret += QString("%1->%2").arg(ServiceID(i)).arg(ChannelNumber(i));
-        ret += (i+1<ChannelCount()) ? ", " : "";
+        ret += (i+1 < ChannelCount()) ? (i+3)%10 ? ", " : ",\n      " : "";
     }
     return ret;
 }
