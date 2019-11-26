@@ -53,7 +53,7 @@ class TestCopyFrames: public QObject
         VideoFrame src, dst;
         int ALIGN = 64;
         int ALIGNDST = 0;
-        int sizesrc = buffersize(FMT_YV12, WIDTH, HEIGHT, ALIGN);
+        int sizesrc = GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGN);
         unsigned char* bufsrc = (unsigned char*)av_malloc(sizesrc);
 
         init(&src, FMT_YV12, bufsrc, WIDTH, HEIGHT, sizesrc,
@@ -78,7 +78,7 @@ class TestCopyFrames: public QObject
             memset(src.buf + src.offsets[2] + src.pitches[2] * i, i % 255, WIDTH / 2);
         }
 
-        int sizedst = buffersize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST);
+        int sizedst = GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST);
         unsigned char* bufdst = (unsigned char*)av_malloc(sizedst);
 
         init(&dst, FMT_YV12, bufdst, WIDTH, HEIGHT, sizedst,
@@ -142,7 +142,7 @@ class TestCopyFrames: public QObject
         int ALIGN = 64;
         int ALIGNDST = 0;
         VideoFrame src, dst;
-        int sizesrc = buffersize(FMT_NV12, WIDTH, HEIGHT, ALIGN);
+        int sizesrc = GetBufferSize(FMT_NV12, WIDTH, HEIGHT, ALIGN);
         unsigned char* bufsrc = (unsigned char*)av_malloc(sizesrc);
 
         init(&src, FMT_NV12, bufsrc, WIDTH, HEIGHT, sizesrc,
@@ -164,7 +164,7 @@ class TestCopyFrames: public QObject
             }
         }
 
-        int sizedst = buffersize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST);
+        int sizedst = GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST);
         unsigned char* bufdst = (unsigned char*)av_malloc(sizedst);
         init(&dst, FMT_YV12, bufdst, WIDTH, HEIGHT, sizedst,
              nullptr, nullptr, 0, 0, ALIGNDST);
@@ -218,7 +218,7 @@ class TestCopyFrames: public QObject
         QFETCH(int, ALIGN);
         const int ALIGNDST = 0;
         VideoFrame src, dst;
-        int sizesrc = buffersize(FMT_NV12, WIDTH, HEIGHT, ALIGN);
+        int sizesrc = GetBufferSize(FMT_NV12, WIDTH, HEIGHT, ALIGN);
         unsigned char* bufsrc = (unsigned char*)av_malloc(sizesrc);
 
         init(&src, FMT_NV12, bufsrc, WIDTH, HEIGHT, sizesrc,
@@ -240,7 +240,7 @@ class TestCopyFrames: public QObject
             }
         }
 
-        int sizedst = buffersize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST);
+        int sizedst = GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST);
         unsigned char* bufdst = (unsigned char*)av_malloc(sizedst);
         init(&dst, FMT_YV12, bufdst, WIDTH, HEIGHT, sizedst,
              nullptr, nullptr, 0, 0, ALIGNDST);
@@ -299,9 +299,9 @@ class TestCopyFrames: public QObject
         const int ALIGN = 0;
         VideoFrame src, dst;
         unsigned char* bufsrc =
-            (unsigned char*)av_malloc(buffersize(FMT_NV12, WIDTH, HEIGHT, ALIGN));
+            (unsigned char*)av_malloc(GetBufferSize(FMT_NV12, WIDTH, HEIGHT, ALIGN));
 
-        init(&src, FMT_NV12, bufsrc, WIDTH, HEIGHT, buffersize(FMT_YV12, WIDTH, HEIGHT, ALIGN),
+        init(&src, FMT_NV12, bufsrc, WIDTH, HEIGHT, GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGN),
              nullptr, nullptr, 0, 0, ALIGN);
         int stride = ALIGN ? (WIDTH + ALIGN - 1) & ~(ALIGN -1) : WIDTH;
         QCOMPARE(stride, src.pitches[0]);
@@ -320,7 +320,7 @@ class TestCopyFrames: public QObject
             }
         }
 
-        int sizedst = buffersize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST);
+        int sizedst = GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST);
         unsigned char* bufdst = (unsigned char*)av_malloc(sizedst);
         init(&dst, FMT_YV12, bufdst, WIDTH, HEIGHT, sizedst,
              nullptr, nullptr, 0, 0, ALIGNDST);
@@ -380,9 +380,9 @@ class TestCopyFrames: public QObject
         const int ALIGNDST = 0;
         VideoFrame src, dst;
         unsigned char* bufsrc =
-            (unsigned char*)av_malloc(buffersize(FMT_NV12, WIDTH, HEIGHT, ALIGN));
+            (unsigned char*)av_malloc(GetBufferSize(FMT_NV12, WIDTH, HEIGHT, ALIGN));
 
-        init(&src, FMT_NV12, bufsrc + 1, WIDTH, HEIGHT, buffersize(FMT_YV12, WIDTH, HEIGHT, ALIGN),
+        init(&src, FMT_NV12, bufsrc + 1, WIDTH, HEIGHT, GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGN),
              nullptr, nullptr, 0, 0, ALIGN);
         QCOMPARE(ALIGN ? (WIDTH + ALIGN - 1) & ~(ALIGN -1) : WIDTH , src.pitches[0]);
         QCOMPARE(ALIGN ? (WIDTH + ALIGN - 1) & ~(ALIGN -1) : WIDTH , src.pitches[1]);
@@ -401,9 +401,9 @@ class TestCopyFrames: public QObject
         }
 
         unsigned char* bufdst =
-            (unsigned char*)av_malloc(buffersize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST));
+            (unsigned char*)av_malloc(GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST));
 
-        init(&dst, FMT_YV12, bufdst, WIDTH, HEIGHT, buffersize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST),
+        init(&dst, FMT_YV12, bufdst, WIDTH, HEIGHT, GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST),
              nullptr, nullptr, 0, 0, ALIGNDST /* align */);
         int stride = ALIGNDST ? (WIDTH + ALIGNDST - 1) & ~(ALIGNDST -1) : WIDTH;
         QCOMPARE(stride, dst.pitches[0]);
@@ -460,9 +460,9 @@ class TestCopyFrames: public QObject
         const int ALIGN = 0;
         VideoFrame src, dst;
         unsigned char* bufsrc =
-            (unsigned char*)av_malloc(buffersize(FMT_NV12, WIDTH, HEIGHT, ALIGN));
+            (unsigned char*)av_malloc(GetBufferSize(FMT_NV12, WIDTH, HEIGHT, ALIGN));
 
-        init(&src, FMT_NV12, bufsrc, WIDTH, HEIGHT, buffersize(FMT_YV12, WIDTH, HEIGHT, ALIGN),
+        init(&src, FMT_NV12, bufsrc, WIDTH, HEIGHT, GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGN),
              nullptr, nullptr, 0, 0, ALIGN);
         QCOMPARE(ALIGN ? (WIDTH + ALIGN - 1) & ~(ALIGN -1) : WIDTH , src.pitches[0]);
         QCOMPARE(ALIGN ? (WIDTH + ALIGN - 1) & ~(ALIGN -1) : WIDTH , src.pitches[1]);
@@ -481,9 +481,9 @@ class TestCopyFrames: public QObject
         }
 
         unsigned char* bufdst =
-            (unsigned char*)av_malloc(buffersize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST));
+            (unsigned char*)av_malloc(GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST));
 
-        init(&dst, FMT_YV12, bufdst + 1, WIDTH, HEIGHT, buffersize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST),
+        init(&dst, FMT_YV12, bufdst + 1, WIDTH, HEIGHT, GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST),
              nullptr, nullptr, 0, 0, ALIGNDST);
 
         int stride = ALIGNDST ? (WIDTH + ALIGNDST - 1) & ~(ALIGNDST -1) : WIDTH;
@@ -542,9 +542,9 @@ class TestCopyFrames: public QObject
         const int ALIGN = 0;
         VideoFrame src, dst;
         unsigned char* bufsrc =
-            (unsigned char*)av_malloc(buffersize(FMT_NV12, WIDTH, HEIGHT, ALIGN));
+            (unsigned char*)av_malloc(GetBufferSize(FMT_NV12, WIDTH, HEIGHT, ALIGN));
 
-        init(&src, FMT_NV12, bufsrc + 1, WIDTH, HEIGHT, buffersize(FMT_YV12, WIDTH, HEIGHT, ALIGN),
+        init(&src, FMT_NV12, bufsrc + 1, WIDTH, HEIGHT, GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGN),
              nullptr, nullptr, 0, 0, ALIGN);
         QCOMPARE(ALIGN ? (WIDTH + ALIGN - 1) & ~(ALIGN -1) : WIDTH , src.pitches[0]);
         QCOMPARE(ALIGN ? (WIDTH + ALIGN - 1) & ~(ALIGN -1) : WIDTH , src.pitches[1]);
@@ -563,9 +563,9 @@ class TestCopyFrames: public QObject
         }
 
         unsigned char* bufdst =
-            (unsigned char*)av_malloc(buffersize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST));
+            (unsigned char*)av_malloc(GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST));
 
-        init(&dst, FMT_YV12, bufdst + 1, WIDTH, HEIGHT, buffersize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST),
+        init(&dst, FMT_YV12, bufdst + 1, WIDTH, HEIGHT, GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST),
              nullptr, nullptr, 0, 0, ALIGNDST);
 
         int stride = ALIGNDST ? (WIDTH + ALIGNDST - 1) & ~(ALIGNDST -1) : WIDTH;
@@ -624,7 +624,7 @@ class TestCopyFrames: public QObject
         int ALIGN = 64;
         int ALIGNDST = 0;
         VideoFrame src, dst;
-        int sizesrc = buffersize(FMT_NV12, width, HEIGHT, ALIGN);
+        int sizesrc = GetBufferSize(FMT_NV12, width, HEIGHT, ALIGN);
         unsigned char* bufsrc = (unsigned char*)av_malloc(sizesrc);
 
         init(&src, FMT_NV12, bufsrc, width, HEIGHT, sizesrc,
@@ -646,7 +646,7 @@ class TestCopyFrames: public QObject
             }
         }
 
-        int sizedst = buffersize(FMT_YV12, width, HEIGHT, ALIGNDST);
+        int sizedst = GetBufferSize(FMT_YV12, width, HEIGHT, ALIGNDST);
         unsigned char* bufdst = (unsigned char*)av_malloc(sizedst);
         init(&dst, FMT_YV12, bufdst, width, HEIGHT, sizedst,
              nullptr, nullptr, 0, 0, ALIGNDST);
@@ -693,7 +693,7 @@ class TestCopyFrames: public QObject
         mythcopy.setUSWC(true);
         int ALIGN = 64;
         int ALIGNDST = 0;
-        int sizesrc = buffersize(FMT_YV12, WIDTH, HEIGHT, ALIGN);
+        int sizesrc = GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGN);
         unsigned char* bufsrc = (unsigned char*)av_malloc(sizesrc);
 
         init(&src, FMT_YV12, bufsrc, WIDTH, HEIGHT, sizesrc,
@@ -718,7 +718,7 @@ class TestCopyFrames: public QObject
             memset(src.buf + src.offsets[2] + src.pitches[2] * i, i % 255, WIDTH / 2);
         }
 
-        int sizedst = buffersize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST);
+        int sizedst = GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST);
         unsigned char* bufdst = (unsigned char*)av_malloc(sizedst);
 
         init(&dst, FMT_YV12, bufdst, WIDTH, HEIGHT, sizedst,
@@ -785,7 +785,7 @@ class TestCopyFrames: public QObject
         VideoFrame src, dst;
         MythUSWCCopy mythcopy(WIDTH);
         mythcopy.setUSWC(true);
-        int sizesrc = buffersize(FMT_NV12, WIDTH, HEIGHT, ALIGN);
+        int sizesrc = GetBufferSize(FMT_NV12, WIDTH, HEIGHT, ALIGN);
         unsigned char* bufsrc = (unsigned char*)av_malloc(sizesrc);
 
         init(&src, FMT_NV12, bufsrc, WIDTH, HEIGHT, sizesrc,
@@ -807,7 +807,7 @@ class TestCopyFrames: public QObject
             }
         }
 
-        int sizedst = buffersize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST);
+        int sizedst = GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST);
         unsigned char* bufdst = (unsigned char*)av_malloc(sizedst);
         init(&dst, FMT_YV12, bufdst, WIDTH, HEIGHT, sizedst,
              nullptr, nullptr, 0, 0, ALIGNDST);
@@ -868,9 +868,9 @@ class TestCopyFrames: public QObject
         MythUSWCCopy mythcopy(WIDTH);
         mythcopy.setUSWC(true);
         unsigned char* bufsrc =
-            (unsigned char*)av_malloc(buffersize(FMT_NV12, WIDTH, HEIGHT, ALIGN));
+            (unsigned char*)av_malloc(GetBufferSize(FMT_NV12, WIDTH, HEIGHT, ALIGN));
 
-        init(&src, FMT_NV12, bufsrc, WIDTH, HEIGHT, buffersize(FMT_YV12, WIDTH, HEIGHT, ALIGN),
+        init(&src, FMT_NV12, bufsrc, WIDTH, HEIGHT, GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGN),
              nullptr, nullptr, 0, 0, ALIGN);
         int stride = ALIGN ? (WIDTH + ALIGN - 1) & ~(ALIGN -1) : WIDTH;
         QCOMPARE(stride, src.pitches[0]);
@@ -889,7 +889,7 @@ class TestCopyFrames: public QObject
             }
         }
 
-        int sizedst = buffersize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST);
+        int sizedst = GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST);
         unsigned char* bufdst = (unsigned char*)av_malloc(sizedst);
         init(&dst, FMT_YV12, bufdst, WIDTH, HEIGHT, sizedst,
              nullptr, nullptr, 0, 0, ALIGNDST);
@@ -951,9 +951,9 @@ class TestCopyFrames: public QObject
         MythUSWCCopy mythcopy(WIDTH);
         mythcopy.setUSWC(true);
         unsigned char* bufsrc =
-            (unsigned char*)av_malloc(buffersize(FMT_NV12, WIDTH, HEIGHT, ALIGN));
+            (unsigned char*)av_malloc(GetBufferSize(FMT_NV12, WIDTH, HEIGHT, ALIGN));
 
-        init(&src, FMT_NV12, bufsrc + 1, WIDTH, HEIGHT, buffersize(FMT_YV12, WIDTH, HEIGHT, ALIGN),
+        init(&src, FMT_NV12, bufsrc + 1, WIDTH, HEIGHT, GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGN),
              nullptr, nullptr, 0, 0, ALIGN);
         QCOMPARE(ALIGN ? (WIDTH + ALIGN - 1) & ~(ALIGN -1) : WIDTH , src.pitches[0]);
         QCOMPARE(ALIGN ? (WIDTH + ALIGN - 1) & ~(ALIGN -1) : WIDTH , src.pitches[1]);
@@ -972,9 +972,9 @@ class TestCopyFrames: public QObject
         }
 
         unsigned char* bufdst =
-            (unsigned char*)av_malloc(buffersize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST));
+            (unsigned char*)av_malloc(GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST));
 
-        init(&dst, FMT_YV12, bufdst, WIDTH, HEIGHT, buffersize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST),
+        init(&dst, FMT_YV12, bufdst, WIDTH, HEIGHT, GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST),
              nullptr, nullptr, 0, 0, ALIGNDST /* align */);
         int stride = ALIGNDST ? (WIDTH + ALIGNDST - 1) & ~(ALIGNDST -1) : WIDTH;
         QCOMPARE(stride, dst.pitches[0]);
@@ -1033,9 +1033,9 @@ class TestCopyFrames: public QObject
         MythUSWCCopy mythcopy(WIDTH);
         mythcopy.setUSWC(true);
         unsigned char* bufsrc =
-            (unsigned char*)av_malloc(buffersize(FMT_NV12, WIDTH, HEIGHT, ALIGN));
+            (unsigned char*)av_malloc(GetBufferSize(FMT_NV12, WIDTH, HEIGHT, ALIGN));
 
-        init(&src, FMT_NV12, bufsrc, WIDTH, HEIGHT, buffersize(FMT_YV12, WIDTH, HEIGHT, ALIGN),
+        init(&src, FMT_NV12, bufsrc, WIDTH, HEIGHT, GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGN),
              nullptr, nullptr, 0, 0, ALIGN);
         QCOMPARE(ALIGN ? (WIDTH + ALIGN - 1) & ~(ALIGN -1) : WIDTH , src.pitches[0]);
         QCOMPARE(ALIGN ? (WIDTH + ALIGN - 1) & ~(ALIGN -1) : WIDTH , src.pitches[1]);
@@ -1054,9 +1054,9 @@ class TestCopyFrames: public QObject
         }
 
         unsigned char* bufdst =
-            (unsigned char*)av_malloc(buffersize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST));
+            (unsigned char*)av_malloc(GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST));
 
-        init(&dst, FMT_YV12, bufdst + 1, WIDTH, HEIGHT, buffersize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST),
+        init(&dst, FMT_YV12, bufdst + 1, WIDTH, HEIGHT, GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST),
              nullptr, nullptr, 0, 0, ALIGNDST);
 
         int stride = ALIGNDST ? (WIDTH + ALIGNDST - 1) & ~(ALIGNDST -1) : WIDTH;
@@ -1117,9 +1117,9 @@ class TestCopyFrames: public QObject
         MythUSWCCopy mythcopy(WIDTH);
         mythcopy.setUSWC(true);
         unsigned char* bufsrc =
-            (unsigned char*)av_malloc(buffersize(FMT_NV12, WIDTH, HEIGHT, ALIGN));
+            (unsigned char*)av_malloc(GetBufferSize(FMT_NV12, WIDTH, HEIGHT, ALIGN));
 
-        init(&src, FMT_NV12, bufsrc + 1, WIDTH, HEIGHT, buffersize(FMT_YV12, WIDTH, HEIGHT, ALIGN),
+        init(&src, FMT_NV12, bufsrc + 1, WIDTH, HEIGHT, GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGN),
              nullptr, nullptr, 0, 0, ALIGN);
         QCOMPARE(ALIGN ? (WIDTH + ALIGN - 1) & ~(ALIGN -1) : WIDTH , src.pitches[0]);
         QCOMPARE(ALIGN ? (WIDTH + ALIGN - 1) & ~(ALIGN -1) : WIDTH , src.pitches[1]);
@@ -1138,9 +1138,9 @@ class TestCopyFrames: public QObject
         }
 
         unsigned char* bufdst =
-            (unsigned char*)av_malloc(buffersize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST));
+            (unsigned char*)av_malloc(GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST));
 
-        init(&dst, FMT_YV12, bufdst + 1, WIDTH, HEIGHT, buffersize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST),
+        init(&dst, FMT_YV12, bufdst + 1, WIDTH, HEIGHT, GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST),
              nullptr, nullptr, 0, 0, ALIGNDST);
 
         int stride = ALIGNDST ? (WIDTH + ALIGNDST - 1) & ~(ALIGNDST -1) : WIDTH;
@@ -1201,7 +1201,7 @@ class TestCopyFrames: public QObject
         VideoFrame src, dst;
         MythUSWCCopy mythcopy(WIDTH);
         mythcopy.setUSWC(true);
-        int sizesrc = buffersize(FMT_NV12, width, HEIGHT, ALIGN);
+        int sizesrc = GetBufferSize(FMT_NV12, width, HEIGHT, ALIGN);
         unsigned char* bufsrc = (unsigned char*)av_malloc(sizesrc);
 
         init(&src, FMT_NV12, bufsrc, width, HEIGHT, sizesrc,
@@ -1223,7 +1223,7 @@ class TestCopyFrames: public QObject
             }
         }
 
-        int sizedst = buffersize(FMT_YV12, width, HEIGHT, ALIGNDST);
+        int sizedst = GetBufferSize(FMT_YV12, width, HEIGHT, ALIGNDST);
         unsigned char* bufdst = (unsigned char*)av_malloc(sizedst);
         init(&dst, FMT_YV12, bufdst, width, HEIGHT, sizedst,
              nullptr, nullptr, 0, 0, ALIGNDST);
