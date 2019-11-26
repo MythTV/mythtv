@@ -4742,10 +4742,7 @@ char *MythPlayer::GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
             break;
         }
 
-        int widthaligned  = (video_dim.width() + 63) & ~(63);
-        int heightaligned = (video_dim.height() + 15) & ~(15);
-        size_t len = static_cast<size_t>(widthaligned * heightaligned * 4);
-        outputbuf = static_cast<unsigned char *>(av_malloc(len));
+        outputbuf = CreateBuffer(FMT_RGB32, video_dim.width(), video_dim.height());
         copyCtx.Copy(&retbuf, frame, outputbuf, AV_PIX_FMT_RGB32);
         vw = video_disp_dim.width();
         vh = video_disp_dim.height();

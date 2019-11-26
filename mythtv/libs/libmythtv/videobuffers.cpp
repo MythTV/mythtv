@@ -881,19 +881,22 @@ bool VideoBuffers::CreateBuffers(VideoFrameType Type, int Width, int Height, vec
     if ((FMT_YV12 != Type) && (FMT_YUY2 != Type))
         return false;
 
-    uint bufsize = buffersize(Type, Width, Height);
+    size_t bufsize = GetBufferSize(Type, Width, Height);
     while (YUVInfos.size() < Size())
         YUVInfos.emplace_back(Width, Height, bufsize, nullptr, nullptr);
 
     bool ok = true;
     for (uint i = 0; i < Size(); i++)
     {
-        uint size = std::max(bufsize, YUVInfos[i].m_size);
-        unsigned char *data = static_cast<unsigned char*>(av_malloc(size + 64));
+        size_t size = std::max(bufsize, static_cast<size_t>(YUVInfos[i].m_size));
+        // NB VideoFrame init will clear buffer to sensible values
+        unsigned char *data = GetAlignedBuffer(bufsize);
         if (!data)
             LOG(VB_GENERAL, LOG_CRIT, "Failed to allocate video buffer memory");
-        init(&m_buffers[i], Type, data, YUVInfos[i].m_width, YUVInfos[i].m_height, size,
-             (const int*) YUVInfos[i].m_pitches, (const int*) YUVInfos[i].m_offsets);
+        init(&m_buffers[i], Type, data,
+             static_cast<int>(YUVInfos[i].m_width), static_cast<int>(YUVInfos[i].m_height),
+             static_cast<int>(size), reinterpret_cast<int*>(YUVInfos[i].m_pitches),
+             reinterpret_cast<int*>(YUVInfos[i].m_offsets));
         ok &= (m_buffers[i].buf != nullptr);
     }
 
@@ -932,17 +935,17 @@ bool VideoBuffers::ReinitBuffer(VideoFrame *Frame, VideoFrameType Type, MythCode
 
     // Find the frame
     VideoFrameType old = Frame->codec;
-    int size = static_cast<int>(buffersize(Type, Width, Height));
+    size_t size = GetBufferSize(Type, Width, Height);
     unsigned char *buf = Frame->buf;
     bool newbuf = false;
-    if ((Frame->size != size) || !buf)
+    if ((Frame->size != static_cast<int>(size)) || !buf)
     {
         // Free existing buffer
         av_freep(&buf);
         Frame->buf = nullptr;
 
         // Initialise new
-        buf = static_cast<unsigned char*>(av_malloc(static_cast<size_t>(size + 64)));
+        buf = GetAlignedBuffer(size);
         if (!buf)
         {
             LOG(VB_GENERAL, LOG_ERR, "Failed to reallocate frame buffer");
@@ -957,7 +960,7 @@ bool VideoBuffers::ReinitBuffer(VideoFrame *Frame, VideoFrameType Type, MythCode
         .arg(newbuf));
     MythDeintType singler = Frame->deinterlace_single;
     MythDeintType doubler = Frame->deinterlace_double;
-    init(Frame, Type, buf, Width, Height, size);
+    init(Frame, Type, buf, Width, Height, static_cast<int>(size));
     // retain deinterlacer settings and update restrictions based on new frame type
     SetDeinterlacingFlags(*Frame, singler, doubler, CodecID);
     clear(Frame);

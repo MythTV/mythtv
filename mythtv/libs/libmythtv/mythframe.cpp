@@ -30,10 +30,6 @@
 #include "mythcorecontext.h"
 #include "mythlogging.h"
 
-extern "C" {
-#include "libavcodec/avcodec.h"
-}
-
 const char* format_description(VideoFrameType Type)
 {
     switch (Type)
