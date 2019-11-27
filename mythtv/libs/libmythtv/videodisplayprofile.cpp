@@ -266,7 +266,6 @@ bool ProfileItem::IsValid(QString *Reason) const
     {
         if (Reason)
             *Reason = "Need a decoder and renderer";
-
         return false;
     }
 
@@ -274,11 +273,7 @@ bool ProfileItem::IsValid(QString *Reason) const
     if (!decoders.contains(decoder))
     {
         if (Reason)
-        {
-            *Reason = QString("decoder %1 is not supported (supported: %2)")
-                .arg(decoder).arg(toCommaList(decoders));
-        }
-
+            *Reason = QString("decoder %1 is not available").arg(decoder);
         return false;
     }
 
@@ -286,12 +281,8 @@ bool ProfileItem::IsValid(QString *Reason) const
     if (!renderers.contains(renderer))
     {
         if (Reason)
-        {
-            *Reason = QString("renderer %1 is not supported "
-                       "w/decoder %2 (supported: %3)")
-                .arg(renderer).arg(decoder).arg(toCommaList(renderers));
-        }
-
+            *Reason = QString("renderer %1 is not supported with decoder %2")
+                .arg(renderer).arg(decoder);
         return false;
     }
 
@@ -581,8 +572,7 @@ vector<ProfileItem> VideoDisplayProfile::LoadDB(uint GroupId)
                 if (valid)
                     list.push_back(tmp);
                 else
-                    LOG(VB_PLAYBACK, LOG_NOTICE, LOC +
-                        QString("Ignoring profile item %1 (%2)")
+                    LOG(VB_PLAYBACK, LOG_NOTICE, LOC + QString("Ignoring profile %1 (%2)")
                             .arg(profileid).arg(error));
             }
             tmp.Clear();
@@ -598,8 +588,7 @@ vector<ProfileItem> VideoDisplayProfile::LoadDB(uint GroupId)
         if (valid)
             list.push_back(tmp);
         else
-            LOG(VB_PLAYBACK, LOG_NOTICE, LOC +
-                QString("Ignoring profile item %1 (%2)")
+            LOG(VB_PLAYBACK, LOG_NOTICE, LOC + QString("Ignoring profile %1 (%2)")
                 .arg(profileid).arg(error));
     }
 
