@@ -57,7 +57,7 @@ void MultiplexSetting::Load(void)
         {
             QString ChannelNumber =
                 QString("Freq %1").arg(query.value(3).toInt());
-            struct CHANLIST* curList = chanlists[0].list;
+            CHANLIST* curList = chanlists[0].list;
             int totalChannels = chanlists[0].count;
             int findFrequency = (query.value(3).toInt() / 1000) - 1750;
             for (int x = 0 ; x < totalChannels ; ++x)

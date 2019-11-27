@@ -694,7 +694,7 @@ static void init_freq_tables(freq_table_map_t &fmap)
     }
 
     // create old school frequency tables...
-    for (struct CHANLISTS *ptr = chanlists; ptr->name ; ptr++)
+    for (CHANLISTS *ptr = chanlists; ptr->name ; ptr++)
     {
         QString tbl_name = ptr->name;
         for (uint i = 0; i < (uint)ptr->count; i++)

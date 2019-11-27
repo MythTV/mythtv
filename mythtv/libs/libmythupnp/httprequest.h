@@ -80,12 +80,12 @@ enum HttpResponseType
     ResponseTypeHeader   =  9
 };
 
-typedef struct
+struct MIMETypes
 {
     const char *pszExtension;
     const char *pszType;
 
-} MIMETypes;
+};
 
 /////////////////////////////////////////////////////////////////////////////
 

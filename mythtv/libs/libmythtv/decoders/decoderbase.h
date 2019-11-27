@@ -282,12 +282,12 @@ class DecoderBase
     long long GetLastFrameInPosMap(void) const;
     unsigned long GetPositionMapSize(void) const;
 
-    typedef struct posmapentry
+    struct PosMapEntry
     {
         long long index;    // frame or keyframe number
         long long adjFrame; // keyFrameAdjustTable adjusted frame number
         long long pos;      // position in stream
-    } PosMapEntry;
+    };
     long long GetKey(const PosMapEntry &entry) const;
 
     MythPlayer          *m_parent                  {nullptr};

@@ -203,7 +203,7 @@ class DiSEqCDevDevice
     uint             m_ordinal  {0};
     uint             m_repeat   {1};
 
-    typedef struct { QString name; uint value; } TypeTable;
+    struct TypeTable { QString name; uint value; };
     static QString TableToString(uint type, const TypeTable *table);
     static uint    TableFromString(const QString   &type,
                                    const TypeTable *table);

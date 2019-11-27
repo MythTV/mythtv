@@ -9,7 +9,6 @@
 
 #include "FrameAnalyzer.h"
 
-typedef struct AVFrame AVFrame;
 class PGMConverter;
 class BorderDetector;
 class TemplateFinder;

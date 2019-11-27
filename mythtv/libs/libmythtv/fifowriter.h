@@ -42,15 +42,15 @@ class MTV_PUBLIC FIFOWriter
   private:
     void FIFOWriteThread(int id);
 
-    typedef struct fifo_buf
+    struct fifo_buf
     {
         struct fifo_buf *next;
         unsigned char *data;
         long blksize;
-    } fifo_buf_t;
-    fifo_buf_t     **m_fifo_buf   {nullptr};
-    fifo_buf_t     **m_fb_inptr   {nullptr};
-    fifo_buf_t     **m_fb_outptr  {nullptr};
+    };
+    fifo_buf       **m_fifo_buf   {nullptr};
+    fifo_buf       **m_fb_inptr   {nullptr};
+    fifo_buf       **m_fb_outptr  {nullptr};
 
     FIFOThread      *m_fifothrds  {nullptr};
     QMutex          *m_fifo_lock  {nullptr};

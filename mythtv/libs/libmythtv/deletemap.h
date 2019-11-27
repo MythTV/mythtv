@@ -9,15 +9,14 @@
 class OSD;
 class PlayerContext;
 
-typedef struct DeleteMapUndoEntry
+struct DeleteMapUndoEntry
 {
     frm_dir_map_t m_deleteMap;
     QString       m_message; // how we got from previous map to this map
     DeleteMapUndoEntry(const frm_dir_map_t &dm, const QString &msg)
         : m_deleteMap(dm), m_message(msg) { }
     DeleteMapUndoEntry(void) = default;
-
-} DeleteMapUndoEntry;
+};
 
 class MTV_PUBLIC DeleteMap
 {

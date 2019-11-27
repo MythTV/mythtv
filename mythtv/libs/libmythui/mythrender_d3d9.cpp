@@ -40,7 +40,7 @@ class MythD3DSurface
     D3DFORMAT m_fmt;
 };
 
-typedef struct
+struct TEXTUREVERTEX
 {
     FLOAT       x;
     FLOAT       y;
@@ -51,16 +51,16 @@ typedef struct
     FLOAT       t1v;
     FLOAT       t2u;
     FLOAT       t2v;
-} TEXTUREVERTEX;
+};
 
-typedef struct
+struct VERTEX
 {
     FLOAT       x;
     FLOAT       y;
     FLOAT       z;
     FLOAT       rhw;
     D3DCOLOR    diffuse;
-} VERTEX;
+};
 
 D3D9Image::D3D9Image(MythRenderD3D9 *render, QSize size, bool video)
   : m_size(size), m_render(render)

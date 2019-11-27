@@ -23,7 +23,7 @@ class MythUIButton;
 class MythUIButtonList;
 class MythUIButtonListItem;
 
-typedef struct
+struct VideoInfo
 {
     int     id;
     QString title;
@@ -33,7 +33,7 @@ typedef struct
     QString coverfile;
     int     parentalLevel;
     uint64_t size;
-} VideoInfo;
+};
 
 class VideoSelector : public MythScreenType
 {

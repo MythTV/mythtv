@@ -9,7 +9,7 @@
 #define MYTH_PACKED
 #endif
 
-typedef struct rtfileheader
+struct rtfileheader
 {
   char finfo[12];     // "NuppelVideo" + \0
   char version[5];    // "0.05" + \0
@@ -25,9 +25,9 @@ typedef struct rtfileheader
   int audioblocks;   // count of audio-blocks -1 .. unknown   0 .. no audio
   int textsblocks;   // count of text-blocks  -1 .. unknown   0 .. no text
   int keyframedist;
-} rtfileheader;
+};
 
-typedef struct rtframeheader
+struct rtframeheader
 {
    char frametype;	// A .. Audio, V .. Video, S .. Sync, T .. Text
    			// R .. Seekpoint: String RTjjjjjjjj (use full packet)
@@ -83,13 +83,13 @@ typedef struct rtframeheader
    int  packetlength;   // V,A,T: length of following data in stream
    			// S:     length of packet correl. information [NI]
    			// R:     do not use here! (fixed 'RTjjjjjjjjjjjjjj')
-} MYTH_PACKED rtframeheader;
+} MYTH_PACKED;
 
 // The fourcc's here are for the most part taken from libavcodec.
 // As to their correctness, I have no idea.  The audio ones are surely wrong,
 // but I suppose it doesn't really matter as long as I'm consistant.
 
-typedef struct extendeddata
+struct extendeddata
 {
    int version;            // yes, this is repeated from the file header
    int video_fourcc;       // video encoding method used 
@@ -118,25 +118,25 @@ typedef struct extendeddata
    // unused for later -- total size of 128 integers.
    // new fields must be added at the end, above this comment.
    int expansion[109];
-} MYTH_PACKED extendeddata;
+} MYTH_PACKED;
 
-typedef struct seektable_entry
+struct seektable_entry
 {
    long long file_offset;
    int keyframe_number; 
-} MYTH_PACKED seektable_entry;
+} MYTH_PACKED;
 
-typedef struct kfatable_entry
+struct kfatable_entry
 {
    int adjust;
    int keyframe_number;
-} MYTH_PACKED kfatable_entry;
+} MYTH_PACKED;
 
 #define FRAMEHEADERSIZE sizeof(rtframeheader)
 #define FILEHEADERSIZE  sizeof(rtfileheader)
 #define EXTENDEDSIZE sizeof(extendeddata)
 
-typedef struct vidbuffertype
+struct vidbuffertype
 {
     int sample;
     int timecode;
@@ -145,18 +145,18 @@ typedef struct vidbuffertype
     unsigned char *buffer;
     int bufferlen;
     int forcekey;
-} vidbuffertyp;
+};
 
-typedef struct audbuffertype
+struct audbuffertype
 {
     int sample;
     int timecode;
     int freeToEncode;
     int freeToBuffer;
     unsigned char *buffer;
-} audbuffertyp;
+};
 
-typedef struct txtbuffertype
+struct txtbuffertype
 {
     int timecode;
     int pagenr;
@@ -164,9 +164,9 @@ typedef struct txtbuffertype
     int freeToBuffer;
     unsigned char *buffer;
     int bufferlen;
-} txtbuffertyp;
+};
 
-typedef struct teletextsubtitle
+struct teletextsubtitle
 {
     unsigned char row;
     unsigned char col;
@@ -174,9 +174,9 @@ typedef struct teletextsubtitle
     unsigned char fg;
     unsigned char bg;
     unsigned char len;
-} teletextsubtitle;
+};
 
-typedef struct ccsubtitle
+struct ccsubtitle
 {
     unsigned char row;
     unsigned char rowcount;
@@ -184,7 +184,7 @@ typedef struct ccsubtitle
     unsigned char resumetext;
     unsigned char clr; // clear the display
     unsigned char len; //length of string to follow
-} ccsubtitle;
+};
 
 // resumedirect codes
 #define CC_STYLE_POPUP   0x00

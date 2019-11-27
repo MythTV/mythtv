@@ -4,7 +4,6 @@
 #include "LogoDetectorBase.h"
 
 struct EdgeMaskEntry;
-typedef struct VideoFrame_ VideoFrame;
 class ClassicCommDetector;
 
 class ClassicLogoDetector : public LogoDetectorBase

@@ -11,7 +11,6 @@ extern "C" {
 #include "libavcodec/avcodec.h"    /* AVFrame */
 }
 
-typedef struct VideoFrame_ VideoFrame;
 class MythPlayer;
 class MythAVCopy;
 

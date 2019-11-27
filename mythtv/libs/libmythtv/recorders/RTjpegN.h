@@ -140,7 +140,7 @@ private:
     int       key_rate          {0};
 };
 
-typedef struct {
+struct RTjpeg_frameheader {
 	uint32_t framesize;
 	uint8_t headersize;
 	uint8_t version;
@@ -149,6 +149,6 @@ typedef struct {
 	uint8_t quality;
 	uint8_t key;
 	uint8_t data;
-} RTjpeg_frameheader;
+};
 
 #endif

@@ -127,7 +127,7 @@ inline MythDeintType operator| (MythDeintType a, MythDeintType b) { return stati
 inline MythDeintType operator& (MythDeintType a, MythDeintType b) { return static_cast<MythDeintType>(static_cast<int>(a) & static_cast<int>(b)); }
 inline MythDeintType operator~ (MythDeintType a) { return static_cast<MythDeintType>(~(static_cast<int>(a))); }
 
-typedef struct VideoFrame_
+struct VideoFrame
 {
     VideoFrameType codec;
     unsigned char *buf;
@@ -168,7 +168,7 @@ typedef struct VideoFrame_
     MythDeintType deinterlace_allowed;
     MythDeintType deinterlace_inuse;
     int           deinterlace_inuse2x;
-} VideoFrame;
+};
 
 #ifdef __cplusplus
 }

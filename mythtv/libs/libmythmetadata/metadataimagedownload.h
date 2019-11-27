@@ -9,11 +9,11 @@
 #include "mythmetaexp.h"
 #include "metadatacommon.h"
 
-typedef struct {
+struct ThumbnailData {
     QString title;
     QVariant data;
     QString url;
-} ThumbnailData;
+};
 
 class META_PUBLIC ImageDLEvent : public QEvent
 {

@@ -73,7 +73,7 @@ class ClassicCommDetector : public CommDetectorBase
         virtual ~ClassicCommDetector() = default;
 
     private:
-        typedef struct frameblock
+        struct FrameBlock
         {
             long start;
             long end;
@@ -87,8 +87,7 @@ class ClassicCommDetector : public CommDetectorBase
             int formatMatch;
             int aspectMatch;
             int score;
-        }
-        FrameBlock;
+        };
 
         void ClearAllMaps(void);
         void GetBlankCommMap(frm_dir_map_t &comms);

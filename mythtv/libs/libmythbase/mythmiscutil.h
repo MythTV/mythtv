@@ -95,10 +95,10 @@ inline void rdtsc(uint64_t &x)
     QueryPerformanceCounter((LARGE_INTEGER*)(&x));
 }
 #else
-typedef struct {
+struct timing_ab_t {
     uint a;
     uint b;
-} timing_ab_t;
+};
 inline void rdtsc(uint64_t &x)
 {
     timing_ab_t &y = (timing_ab_t&) x;

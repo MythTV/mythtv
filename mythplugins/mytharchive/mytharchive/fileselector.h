@@ -14,13 +14,13 @@
 // mytharchive
 #include "archiveutil.h"
 
-typedef struct
+struct FileData
 {
     bool directory;
     bool selected;
     QString filename;
     int64_t size;
-} FileData;
+};
 
 enum FSTYPE
 {

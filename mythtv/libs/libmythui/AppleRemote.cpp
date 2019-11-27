@@ -33,14 +33,14 @@ AppleRemote*    AppleRemote::_instance = nullptr;
 
 #define LOC QString("AppleRemote::")
 
-typedef struct _ATV_IR_EVENT
+struct ATV_IR_EVENT
 {
     UInt32  time_ms32;
     UInt32  time_ls32;  // units of microsecond
     UInt32  unknown1;
     UInt32  keycode;
     UInt32  unknown2;
-} ATV_IR_EVENT;
+};
 
 static io_object_t _findAppleRemoteDevice(const char *devName);
 

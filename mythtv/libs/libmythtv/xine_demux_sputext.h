@@ -9,7 +9,7 @@
 
 #define DEBUG_XINE_DEMUX_SPUTEXT 0
 
-typedef struct {
+struct subtitle_t {
 
     int lines; ///< Count of text lines in this subtitle set.
 
@@ -17,9 +17,9 @@ typedef struct {
     long end;   ///< Ending time in msec or starting frame
 
     char *text[SUB_MAX_TEXT]; ///< The subtitle text lines.
-} subtitle_t;
+};
 
-typedef struct {
+struct demux_sputext_t {
 
   char              *rbuffer_text;
   off_t              rbuffer_len;
@@ -41,7 +41,7 @@ typedef struct {
   int                format;         /* constants see below        */
   char               next_line[SUB_BUFSIZE]; /* a buffer for next line read from file */
 
-} demux_sputext_t;
+};
 
 
 subtitle_t *sub_read_file (demux_sputext_t*);

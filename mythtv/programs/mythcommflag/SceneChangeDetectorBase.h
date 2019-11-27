@@ -2,8 +2,7 @@
 #define _SCENECHANGEDETECTORBASE_H_
 
 #include <QObject>
-
-typedef struct VideoFrame_ VideoFrame;
+#include "mythframe.h"
 
 class SceneChangeDetectorBase : public QObject
 {

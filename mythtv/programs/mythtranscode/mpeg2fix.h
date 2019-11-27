@@ -60,12 +60,12 @@ class MPEG2frame
     mpeg2_picture_t   m_mpeg2_pic;
 };
 
-typedef struct {
+struct poq_idx_t {
     int64_t newPTS;
     int64_t pos_pts;
     int framenum;
     bool type;
-} poq_idx_t;
+};
 
 class PTSOffsetQueue
 {

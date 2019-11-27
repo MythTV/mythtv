@@ -15,20 +15,20 @@
 // MythTV headers
 #include "mthread.h"
 
-typedef struct
+struct buttonMapType
 {
     int button;
     QString keystring;
     int chord;
-}  buttonMapType;
+};
 
-typedef struct
+struct axisMapType
 {
     int axis;
     int from;
     int to;
     QString keystring;
-} axisMapType;
+};
 
 /**
  *  \class JoystickMap

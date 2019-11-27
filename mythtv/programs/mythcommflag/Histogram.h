@@ -1,7 +1,7 @@
 #ifndef _HISTOGRAM_H_
 #define _HISTOGRAM_H_
 
-typedef struct VideoFrame_ VideoFrame;
+#include "mythframe.h"
 
 class Histogram
 {

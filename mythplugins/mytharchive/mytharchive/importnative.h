@@ -17,15 +17,15 @@
 // mytharchive
 #include "fileselector.h"
 
-typedef struct
+struct FileInfo
 {
     bool directory;
     bool selected;
     QString filename;
     int64_t size;
-} FileInfo;
+};
 
-typedef struct
+struct FileDetails
 {
     QString title;
     QString subtitle;
@@ -35,7 +35,7 @@ typedef struct
     QString chanNo;
     QString chanName;
     QString callsign;
-} FileDetails;
+};
 
 
 class MythUIText;

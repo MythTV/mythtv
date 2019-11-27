@@ -12,11 +12,11 @@
 
 #ifndef __CC_CALLBACKS_H__
 /** EIA-708-A closed caption packet */
-typedef struct CaptionPacket
+struct CaptionPacket
 {
     unsigned char data[128+16];
     int size;
-} CaptionPacket;
+};
 #endif
 
 class CC708Reader;

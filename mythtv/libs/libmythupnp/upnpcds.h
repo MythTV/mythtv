@@ -55,12 +55,12 @@ enum UPnpCDSClient
     CDS_ClientSonyDB          = 5,      // Sony Blu-ray players
 };
 
-typedef struct
+struct UPnpCDSClientException
 {
     UPnpCDSClient   nClientType;
     QString         sHeaderKey;
     QString         sHeaderValue;
-} UPnpCDSClientException;
+};
 
 //////////////////////////////////////////////////////////////////////////////
 

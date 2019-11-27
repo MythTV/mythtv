@@ -89,11 +89,11 @@ enum State
 };
 
 // event frame details
-typedef struct
+struct Frame
 {
     QString type;
     double delta;
-} Frame;
+};
 
 class Monitor
 {
