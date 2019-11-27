@@ -66,19 +66,19 @@ static void my_av_print(void *ptr, int level, const char* fmt, va_list vl)
 {
     (void) ptr;
 
-    static QString full_line("");
+    static QString s_fullLine("");
     char str[256];
 
     if (level > AV_LOG_INFO)
         return;
     vsprintf(str, fmt, vl);
 
-    full_line += QString(str);
-    if (full_line.endsWith("\n"))
+    s_fullLine += QString(str);
+    if (s_fullLine.endsWith("\n"))
     {
-        full_line.truncate(full_line.length() - 1);
-        LOG(VB_GENERAL, LOG_INFO, full_line);
-        full_line = QString("");
+        s_fullLine.truncate(s_fullLine.length() - 1);
+        LOG(VB_GENERAL, LOG_INFO, s_fullLine);
+        s_fullLine = QString("");
     }
 }
 
@@ -252,7 +252,7 @@ MPEG2fixup::MPEG2fixup(const QString &inf, const QString &outf,
             uint64_t mark = it.key();
             if (mark > 0)
             {
-                if (it.value() == MARK_CUT_START)
+                if (it.value() == MARK_CUT_START) // NOLINT(bugprone-branch-clone)
                     mark += 1; // +2 looks good, but keyframes are hit with +1
                 else
                     mark += 1;
@@ -347,23 +347,23 @@ MPEG2fixup::~MPEG2fixup()
 
 static void SETBITS(unsigned char *ptr, long value, int num)
 {
-    static int sb_pos = 0;
-    static unsigned char *sb_ptr = nullptr;
+    static int s_sbPos = 0;
+    static unsigned char *s_sbPtr = nullptr;
 
     if (ptr != nullptr)
     {
-        sb_ptr = ptr;
-        sb_pos = 0;
+        s_sbPtr = ptr;
+        s_sbPos = 0;
     }
 
-    int offset = sb_pos >> 3;
-    int offset_r = sb_pos & 0x07;
+    int offset = s_sbPos >> 3;
+    int offset_r = s_sbPos & 0x07;
     int offset_b = 32 - offset_r;
     uint32_t mask = ~(((1 << num) - 1) << (offset_b - num));
-    uint32_t sb_long = ntohl(*((uint32_t *) (sb_ptr + offset)));
+    uint32_t sb_long = ntohl(*((uint32_t *) (s_sbPtr + offset)));
     value = value << (offset_b - num);
     sb_long = (sb_long & mask) + value;
-    *((uint32_t *)(sb_ptr + offset)) = htonl(sb_long);
+    *((uint32_t *)(s_sbPtr + offset)) = htonl(sb_long);
 }
 
 void MPEG2fixup::dec2x33(int64_t *pts1, int64_t pts2)
@@ -1297,14 +1297,14 @@ MPEG2frame *MPEG2fixup::GetPoolFrame(AVPacket *pkt)
 
     if (m_framePool.isEmpty())
     {
-        static int frame_count = 0;
-        if (frame_count >= MAX_FRAMES)
+        static int s_frameCount = 0;
+        if (s_frameCount >= MAX_FRAMES)
         {
             LOG(VB_GENERAL, LOG_ERR, "No more queue slots!");
             return nullptr;
         }
         f = new MPEG2frame(pkt->size);
-        frame_count++;
+        s_frameCount++;
     }
     else
         f = m_framePool.dequeue();

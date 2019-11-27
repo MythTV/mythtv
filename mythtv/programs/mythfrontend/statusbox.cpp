@@ -29,12 +29,12 @@ using namespace std;
 #include "mythdialogbox.h"
 
 struct LogLine {
-    QString line;
-    QString detail;
-    QString help;
-    QString helpdetail;
-    QString data;
-    QString state;
+    QString m_line;
+    QString m_detail;
+    QString m_help;
+    QString m_helpdetail;
+    QString m_data;
+    QString m_state;
 };
 
 
@@ -138,34 +138,34 @@ void StatusBox::AddLogLine(const QString & line,
                                             const QString & data)
 {
     LogLine logline;
-    logline.line = line;
+    logline.m_line = line;
 
     if (detail.isEmpty())
-        logline.detail = line;
+        logline.m_detail = line;
     else
-        logline.detail = detail;
+        logline.m_detail = detail;
 
     if (help.isEmpty())
-        logline.help = logline.detail;
+        logline.m_help = logline.m_detail;
     else
-        logline.help = help;
+        logline.m_help = help;
 
     if (helpdetail.isEmpty())
-        logline.helpdetail = logline.detail;
+        logline.m_helpdetail = logline.m_detail;
     else
-        logline.helpdetail = helpdetail;
+        logline.m_helpdetail = helpdetail;
 
-    logline.state = state;
-    logline.data = data;
+    logline.m_state = state;
+    logline.m_data = data;
 
     MythUIButtonListItem *item = new MythUIButtonListItem(m_logList, line,
                                                 qVariantFromValue(logline));
-    if (logline.state.isEmpty())
-        logline.state = "normal";
+    if (logline.m_state.isEmpty())
+        logline.m_state = "normal";
 
-    item->SetFontState(logline.state);
-    item->DisplayState(logline.state, "status");
-    item->SetText(logline.detail, "detail");
+    item->SetFontState(logline.m_state);
+    item->DisplayState(logline.m_state, "status");
+    item->SetText(logline.m_detail, "detail");
 }
 
 bool StatusBox::keyPressEvent(QKeyEvent *event)
@@ -233,9 +233,9 @@ void StatusBox::setHelpText(MythUIButtonListItem *item)
 
     LogLine logline = item->GetData().value<LogLine>();
     if (m_helpText)
-        m_helpText->SetText(logline.helpdetail);
+        m_helpText->SetText(logline.m_helpdetail);
     if (m_justHelpText)
-        m_justHelpText->SetText(logline.help);
+        m_justHelpText->SetText(logline.m_help);
 }
 
 void StatusBox::updateLogList(MythUIButtonListItem *item)
@@ -273,7 +273,7 @@ void StatusBox::clicked(MythUIButtonListItem *item)
                 new MythConfirmationDialog(m_popupStack, message);
 
         confirmPopup->SetReturnEvent(this, "LogAck");
-        confirmPopup->SetData(logline.data);
+        confirmPopup->SetData(logline.m_data);
 
         if (confirmPopup->Create())
             m_popupStack->AddScreen(confirmPopup, false);
@@ -281,7 +281,7 @@ void StatusBox::clicked(MythUIButtonListItem *item)
     else if (currentItem == tr("Job Queue"))
     {
         QStringList msgs;
-        int jobStatus = JobQueue::GetJobStatus(logline.data.toInt());
+        int jobStatus = JobQueue::GetJobStatus(logline.m_data.toInt());
 
         if (jobStatus == JOB_QUEUED)
         {
@@ -291,7 +291,7 @@ void StatusBox::clicked(MythUIButtonListItem *item)
                     new MythConfirmationDialog(m_popupStack, message);
 
             confirmPopup->SetReturnEvent(this, "JobDelete");
-            confirmPopup->SetData(logline.data);
+            confirmPopup->SetData(logline.m_data);
 
             if (confirmPopup->Create())
                 m_popupStack->AddScreen(confirmPopup, false);
@@ -311,7 +311,7 @@ void StatusBox::clicked(MythUIButtonListItem *item)
 
             menuPopup->SetReturnEvent(this, "JobModify");
 
-            QVariant data = qVariantFromValue(logline.data);
+            QVariant data = qVariantFromValue(logline.m_data);
 
             if (jobStatus == JOB_PAUSED)
                 menuPopup->AddButton(tr("Resume"), data);
@@ -328,7 +328,7 @@ void StatusBox::clicked(MythUIButtonListItem *item)
                     new MythConfirmationDialog(m_popupStack, message);
 
             confirmPopup->SetReturnEvent(this, "JobRequeue");
-            confirmPopup->SetData(logline.data);
+            confirmPopup->SetData(logline.m_data);
 
             if (confirmPopup->Create())
                 m_popupStack->AddScreen(confirmPopup, false);
@@ -792,16 +792,16 @@ void StatusBox::doTunerStatus()
 {
     struct info
     {
-        int inputid;
-        bool schedgroup;
-        QString displayname;
-        int errored;
-        int unavailable;
-        int sleeping;
-        int recording;
-        int livetv;
-        int available;
-        QStringList recordings;
+        int         m_inputid;
+        bool        m_schedgroup;
+        QString     m_displayname;
+        int         m_errored;
+        int         m_unavailable;
+        int         m_sleeping;
+        int         m_recording;
+        int         m_livetv;
+        int         m_available;
+        QStringList m_recordings;
     };
     QMap<int, struct info> info;
     QList<int> inputids;
@@ -836,13 +836,13 @@ void StatusBox::doTunerStatus()
         // If this is a schedgroup child, attribute all status to the
         // parent.
         int infoid = inputid;
-        if (parentid && info[parentid].schedgroup)
+        if (parentid && info[parentid].m_schedgroup)
             infoid = parentid;
         else
         {
-            info[infoid].inputid = inputid;
-            info[infoid].schedgroup = query.value(2).toBool();
-            info[infoid].displayname = query.value(3).toString();
+            info[infoid].m_inputid = inputid;
+            info[infoid].m_schedgroup = query.value(2).toBool();
+            info[infoid].m_displayname = query.value(3).toString();
             inputids.append(inputid);
         }
 
@@ -865,19 +865,19 @@ void StatusBox::doTunerStatus()
             int sleepState = strlist[0].toInt();
 
             if (sleepState == -1)
-                info[infoid].errored += 1;
+                info[infoid].m_errored += 1;
             else if (sleepState == sStatus_Undefined)
-                info[infoid].unavailable += 1;
+                info[infoid].m_unavailable += 1;
             else
-                info[infoid].sleeping += 1;
+                info[infoid].m_sleeping += 1;
         }
         else if (state == kState_RecordingOnly ||
                  state == kState_WatchingRecording)
-            info[infoid].recording += 1;
+            info[infoid].m_recording += 1;
         else if (state == kState_WatchingLiveTV)
-            info[infoid].livetv += 1;
+            info[infoid].m_livetv += 1;
         else
-            info[infoid].available += 1;
+            info[infoid].m_available += 1;
 
         if (state == kState_RecordingOnly ||
             state == kState_WatchingRecording ||
@@ -892,7 +892,7 @@ void StatusBox::doTunerStatus()
                 QString titlesub = pginfo.GetTitle();
                 if (!pginfo.GetSubtitle().isEmpty())
                     titlesub += QString(" - ") + pginfo.GetSubtitle();
-                info[infoid].recordings += titlesub;
+                info[infoid].m_recordings += titlesub;
             }
         }
     }
@@ -903,30 +903,30 @@ void StatusBox::doTunerStatus()
         int inputid = *it;
 
         QStringList statuslist;
-        if (info[inputid].errored)
-            statuslist << tr("%1 errored").arg(info[inputid].errored);
-        if (info[inputid].unavailable)
-            statuslist << tr("%1 unavailable").arg(info[inputid].unavailable);
-        if (info[inputid].sleeping)
-            statuslist << tr("%1 sleeping").arg(info[inputid].sleeping);
-        if (info[inputid].recording)
-            statuslist << tr("%1 recording").arg(info[inputid].recording);
-        if (info[inputid].livetv)
-            statuslist << tr("%1 live television").arg(info[inputid].livetv);
-        if (info[inputid].available)
-            statuslist << tr("%1 available").arg(info[inputid].available);
+        if (info[inputid].m_errored)
+            statuslist << tr("%1 errored").arg(info[inputid].m_errored);
+        if (info[inputid].m_unavailable)
+            statuslist << tr("%1 unavailable").arg(info[inputid].m_unavailable);
+        if (info[inputid].m_sleeping)
+            statuslist << tr("%1 sleeping").arg(info[inputid].m_sleeping);
+        if (info[inputid].m_recording)
+            statuslist << tr("%1 recording").arg(info[inputid].m_recording);
+        if (info[inputid].m_livetv)
+            statuslist << tr("%1 live television").arg(info[inputid].m_livetv);
+        if (info[inputid].m_available)
+            statuslist << tr("%1 available").arg(info[inputid].m_available);
 
         QString fontstate;
-        if (info[inputid].errored)
+        if (info[inputid].m_errored)
             fontstate = "error";
-        else if (info[inputid].unavailable || info[inputid].sleeping)
+        else if (info[inputid].m_unavailable || info[inputid].m_sleeping)
             fontstate = "warning";
 
         QString shortstatus = tr("Input %1 %2: %3")
-            .arg(inputid).arg(info[inputid].displayname)
+            .arg(inputid).arg(info[inputid].m_displayname)
             .arg(statuslist.join(tr(", ")));
         QString longstatus = shortstatus + "\n" +
-            info[inputid].recordings.join("\n");
+            info[inputid].m_recordings.join("\n");
 
         AddLogLine(shortstatus, helpmsg, longstatus, longstatus, fontstate);
     }

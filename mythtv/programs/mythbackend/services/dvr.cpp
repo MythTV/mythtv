@@ -215,7 +215,7 @@ DTC::ProgramList* Dvr::GetOldRecordedList( bool             bDescending,
     }
 
     if (sSort == "starttime")
-        sSQL += "ORDER BY starttime ";
+        sSQL += "ORDER BY starttime ";    // NOLINT(bugprone-branch-clone)
     else if (sSort == "title")
         sSQL += "ORDER BY title ";
     else
@@ -971,7 +971,7 @@ DTC::ProgramList* Dvr::GetUpcomingList( int  nStartIndex,
                           ((*it)->GetRecordingStatus() == RecStatus::Recorded) ||
                           ((*it)->GetRecordingStatus() == RecStatus::Conflict)) &&
             ((*it)->GetRecordingEndTime() > MythDate::current()))
-        {
+        {   // NOLINT(bugprone-branch-clone)
             recordingList.push_back(new RecordingInfo(**it));
         }
         else if (bShowAll &&
@@ -1434,7 +1434,7 @@ DTC::RecRuleList* Dvr::GetRecordScheduleList( int nStartIndex,
     else if (Sort.toLower() == "nextrecording")
         sortingColumn = Scheduler::kSortNextRecording;
     else if (Sort.toLower() == "title")
-        sortingColumn = Scheduler::kSortTitle;
+        sortingColumn = Scheduler::kSortTitle;    // NOLINT(bugprone-branch-clone)
     else if (Sort.toLower() == "priority")
         sortingColumn = Scheduler::kSortPriority;
     else if (Sort.toLower() == "type")

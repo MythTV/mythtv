@@ -357,17 +357,17 @@ class VideoListImp
 
     unsigned int count(void) const
     {
-        return m_metadata_view_flat.size();
+        return m_metadataViewFlat.size();
     }
 
     const VideoFilterSettings &getCurrentVideoFilter() const
     {
-        return m_video_filter;
+        return m_videoFilter;
     }
 
     void setCurrentVideoFilter(const VideoFilterSettings &filter)
     {
-        m_video_filter = filter;
+        m_videoFilter = filter;
     }
 
     int TryFilter(const VideoFilterSettings &filter) const
@@ -388,7 +388,7 @@ class VideoListImp
 
     unsigned int getFilterChangedState(void)
     {
-        return m_video_filter.getChangedState();
+        return m_videoFilter.getChangedState();
     }
 
     bool Delete(unsigned int video_id, VideoList &/*dummy*/)
@@ -402,7 +402,7 @@ class VideoListImp
             {
                 ret = m_metadata.purgeByID(video_id);
                 // Force refresh
-                m_metadata_list_type = VideoListImp::ltNone;
+                m_metadataListType = VideoListImp::ltNone;
             }
         }
 
@@ -411,13 +411,13 @@ class VideoListImp
 
     MythGenericTree *GetTreeRoot(void)
     {
-        return video_tree_root.data();
+        return m_videoTreeRoot.data();
     }
 
     void InvalidateCache() {
         // Set the type to none to avoid refreshList thinking it doesn't
         // need to.
-        m_metadata_list_type = VideoListImp::ltNone;
+        m_metadataListType = VideoListImp::ltNone;
 
         metadata_list ml;
         VideoMetadataListManager::loadAllFromDatabase(ml);
@@ -438,20 +438,20 @@ class VideoListImp
     void update_meta_view(bool flat_list);
 
   private:
-    bool m_ListUnknown                      {false};
-    bool m_LoadMetaData                     {false};
+    bool m_listUnknown                      {false};
+    bool m_loadMetaData                     {false};
 
-    QScopedPointer <MythGenericTree> video_tree_root;
+    QScopedPointer <MythGenericTree> m_videoTreeRoot;
 
     VideoMetadataListManager m_metadata;
-    meta_dir_node m_metadata_tree; // master list for tree views
+    meta_dir_node m_metadataTree; // master list for tree views
 
-    metadata_view_list m_metadata_view_flat;
-    meta_dir_node m_metadata_view_tree;
+    metadata_view_list m_metadataViewFlat;
+    meta_dir_node m_metadataViewTree;
 
-    metadata_list_type m_metadata_list_type {ltNone};
+    metadata_list_type m_metadataListType {ltNone};
 
-    VideoFilterSettings m_video_filter;
+    VideoFilterSettings m_videoFilter;
 };
 
 VideoList::VideoList()
@@ -533,11 +533,11 @@ void VideoList::InvalidateCache(void)
 //////////////////////////////
 // VideoListImp
 //////////////////////////////
-VideoListImp::VideoListImp() : m_metadata_view_tree("", "top")
+VideoListImp::VideoListImp() : m_metadataViewTree("", "top")
 {
-    m_ListUnknown = gCoreContext->GetBoolSetting("VideoListUnknownFileTypes", false);
+    m_listUnknown = gCoreContext->GetBoolSetting("VideoListUnknownFileTypes", false);
 
-    m_LoadMetaData = gCoreContext->GetBoolSetting("VideoTreeLoadMetaData", false);
+    m_loadMetaData = gCoreContext->GetBoolSetting("VideoTreeLoadMetaData", false);
 }
 
 void VideoListImp::build_generic_tree(MythGenericTree *dst, meta_dir_node *src,
@@ -627,21 +627,21 @@ MythGenericTree *VideoListImp::buildVideoList(
 {
     refreshList(filebrowser, parental_level, flatlist, group_type);
 
-    video_tree_root.reset(new MythGenericTree(QObject::tr("Video Home"),
+    m_videoTreeRoot.reset(new MythGenericTree(QObject::tr("Video Home"),
                                               kRootNode, false));
 
-    build_generic_tree(video_tree_root.data(), &m_metadata_view_tree,
+    build_generic_tree(m_videoTreeRoot.data(), &m_metadataViewTree,
                        include_updirs);
 
-    if (m_metadata_view_flat.empty())
+    if (m_metadataViewFlat.empty())
     {
-        video_tree_root.reset(new MythGenericTree(QObject::tr("Video Home"),
+        m_videoTreeRoot.reset(new MythGenericTree(QObject::tr("Video Home"),
                                                   kRootNode, false));
-        video_tree_root.data()->addNode(QObject::tr("No files found"),
+        m_videoTreeRoot.data()->addNode(QObject::tr("No files found"),
                                         kNoFilesFound, false);
     }
 
-    return video_tree_root.data();
+    return m_videoTreeRoot.data();
 }
 
 bool VideoListImp::refreshNode(MythGenericTree *node)
@@ -660,7 +660,7 @@ bool VideoListImp::refreshNode(MythGenericTree *node)
     if (UPNPScanner::Instance() && UPNPScanner::Instance()->GetMetadata(data))
     {
         // force a refresh
-        m_metadata_list_type = VideoListImp::ltNone;
+        m_metadataListType = VideoListImp::ltNone;
         return true;
     }
 
@@ -672,7 +672,7 @@ void VideoListImp::refreshList(bool filebrowser,
                                bool flat_list, int group_type)
 {
 
-    m_video_filter.setParentalLevel(parental_level.GetLevel());
+    m_videoFilter.setParentalLevel(parental_level.GetLevel());
 
     if (filebrowser)
     {
@@ -734,25 +734,25 @@ void VideoListImp::sort_view_data(bool flat_list)
 {
     if (flat_list)
     {
-        sort(m_metadata_view_flat.begin(), m_metadata_view_flat.end(),
-             metadata_sort(m_video_filter));
+        sort(m_metadataViewFlat.begin(), m_metadataViewFlat.end(),
+             metadata_sort(m_videoFilter));
     }
     else
     {
-        m_metadata_view_tree.sort(metadata_path_sort(),
-                                  metadata_sort(m_video_filter));
+        m_metadataViewTree.sort(metadata_path_sort(),
+                                  metadata_sort(m_videoFilter));
     }
 }
 
 void VideoListImp::fillMetadata(metadata_list_type whence)
 {
-    if (m_metadata_list_type != whence)
+    if (m_metadataListType != whence)
     {
-        m_metadata_list_type = whence;
+        m_metadataListType = whence;
         // flush existing data
         metadata_list ml;
         m_metadata.setList(ml);
-        m_metadata_tree.clear();
+        m_metadataTree.clear();
 
         switch (whence)
         {
@@ -800,7 +800,7 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
     typedef map<QString, meta_dir_node *> group_to_node_map;
     group_to_node_map gtnm;
 
-    meta_dir_node *video_root = &m_metadata_tree;
+    meta_dir_node *video_root = &m_metadataTree;
 
     smart_dir_node sdn1 = video_root->addSubDir("All");
     meta_dir_node* all_group_node = sdn1.get();
@@ -930,7 +930,7 @@ void VideoListImp::buildTVList(void)
     metadata_path_sort mps = metadata_path_sort();
     sort(mlist.begin(), mlist.end(), mps);
 
-    meta_dir_node *video_root = &m_metadata_tree;
+    meta_dir_node *video_root = &m_metadataTree;
 
     smart_dir_node sdn1 = video_root->addSubDir(QObject::tr("Television"));
     meta_dir_node* television_node = sdn1.get();
@@ -987,7 +987,7 @@ void VideoListImp::buildDbList()
 
     QString test_prefix(dirs[0]);
 
-    meta_dir_node *video_root = &m_metadata_tree;
+    meta_dir_node *video_root = &m_metadataTree;
     if (dirs.size() == 1)
     {
         video_root->setPathRoot();
@@ -1001,7 +1001,7 @@ void VideoListImp::buildDbList()
         AddMetadataToDir(*p, video_root);
     }
 
-//    print_dir_tree(m_metadata_tree); // AEW DEBUG
+//    print_dir_tree(m_metadataTree); // AEW DEBUG
 }
 
 void VideoListImp::buildFsysList()
@@ -1038,7 +1038,7 @@ void VideoListImp::buildFsysList()
     for (node_to_path_list::iterator p = node_paths.begin();
          p != node_paths.end(); ++p)
     {
-        smart_dir_node root = m_metadata_tree.addSubDir(p->second, p->first);
+        smart_dir_node root = m_metadataTree.addSubDir(p->second, p->first);
         root->setPathRoot();
 
         buildFileList(root, ml, p->second);
@@ -1046,10 +1046,10 @@ void VideoListImp::buildFsysList()
 
     // retrieve any MediaServer data that may be available
     if (UPNPScanner::Instance())
-        UPNPScanner::Instance()->GetInitialMetadata(&ml, &m_metadata_tree);
+        UPNPScanner::Instance()->GetInitialMetadata(&ml, &m_metadataTree);
 
     // See if we can find this filename in DB
-    if (m_LoadMetaData)
+    if (m_loadMetaData)
     {
         // Load the DB data so metadata lookups work
         // TODO: ugly, pass the list
@@ -1123,40 +1123,40 @@ void tree_view_to_flat(meta_dir_node &tree,
 
 void VideoListImp::update_meta_view(bool flat_list)
 {
-    m_metadata_view_flat.clear();
-    m_metadata_view_flat.reserve(m_metadata.getList().size());
+    m_metadataViewFlat.clear();
+    m_metadataViewFlat.reserve(m_metadata.getList().size());
 
-    m_metadata_view_tree.clear();
+    m_metadataViewTree.clear();
 
     if (flat_list)
     {
         for (metadata_list::const_iterator p = m_metadata.getList().begin();
              p != m_metadata.getList().end(); ++p)
         {
-            if (m_video_filter.matches_filter(*(*p)))
+            if (m_videoFilter.matches_filter(*(*p)))
             {
-                m_metadata_view_flat.push_back(p->get());
+                m_metadataViewFlat.push_back(p->get());
             }
         }
 
         sort_view_data(flat_list);
 
-        for (metadata_view_list::iterator p = m_metadata_view_flat.begin();
-             p != m_metadata_view_flat.end(); ++p)
+        for (metadata_view_list::iterator p = m_metadataViewFlat.begin();
+             p != m_metadataViewFlat.end(); ++p)
         {
-            m_metadata_view_tree.addEntry(new meta_data_node(*p));
+            m_metadataViewTree.addEntry(new meta_data_node(*p));
         }
     }
     else
     {
-        m_metadata_view_tree.setPath(m_metadata_tree.getPath());
-        m_metadata_view_tree.setName(m_metadata_tree.getName());
-        copy_filtered_tree(m_metadata_view_tree, m_metadata_tree,
-                           m_video_filter);
+        m_metadataViewTree.setPath(m_metadataTree.getPath());
+        m_metadataViewTree.setName(m_metadataTree.getName());
+        copy_filtered_tree(m_metadataViewTree, m_metadataTree,
+                           m_videoFilter);
 
         sort_view_data(flat_list);
 
-        tree_view_to_flat(m_metadata_view_tree, m_metadata_view_flat);
+        tree_view_to_flat(m_metadataViewTree, m_metadataViewFlat);
     }
 }
 
@@ -1170,7 +1170,7 @@ class dirhandler : public DirectoryHandler
                VideoMetadataListManager::metadata_list &metalist,
                free_list &dh_free_list, bool infer_title) :
         m_directory(directory), m_prefix(prefix), m_metalist(metalist),
-        m_dh_free_list(dh_free_list), m_infer_title(infer_title)
+        m_dhFreeList(dh_free_list), m_inferTitle(infer_title)
     {
     }
 
@@ -1180,9 +1180,9 @@ class dirhandler : public DirectoryHandler
         (void) fq_dir_name;
         smart_dir_node dir = m_directory->addSubDir(dir_name);
         DirectoryHandler *dh = new dirhandler(dir, m_prefix, m_metalist,
-                                              m_dh_free_list,
-                                              m_infer_title);
-        m_dh_free_list.push_back(dh);
+                                              m_dhFreeList,
+                                              m_inferTitle);
+        m_dhFreeList.push_back(dh);
         return dh;
     }
 
@@ -1206,7 +1206,7 @@ class dirhandler : public DirectoryHandler
             new VideoMetadata(file_string));
         QFileInfo qfi(file_string);
         QString title = qfi.completeBaseName();
-        if (m_infer_title)
+        if (m_inferTitle)
         {
             QString tmptitle(VideoMetadata::FilenameToMeta(file_string, 1));
             if (tmptitle.length())
@@ -1225,8 +1225,8 @@ class dirhandler : public DirectoryHandler
     smart_dir_node m_directory;
     const QString &m_prefix;
     VideoMetadataListManager::metadata_list &m_metalist;
-    free_list &m_dh_free_list;
-    const bool m_infer_title;
+    free_list &m_dhFreeList;
+    const bool m_inferTitle;
 };
 
 void VideoListImp::buildFileList(
@@ -1238,5 +1238,5 @@ void VideoListImp::buildFileList(
     dirhandler::free_list fl;
     dirhandler dh(directory, prefix, metalist, fl, false);
     (void) ScanVideoDirectory(
-        directory->getFQPath(), &dh, ext_list, m_ListUnknown);
+        directory->getFQPath(), &dh, ext_list, m_listUnknown);
 }

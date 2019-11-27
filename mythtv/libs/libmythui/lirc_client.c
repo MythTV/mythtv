@@ -1016,13 +1016,9 @@ static int lirc_readconfig_only_internal(const struct lirc_state *state,
 		if(eq==NULL)
 		{
 			token=strtok_r(string," \t",&strtok_state);
-			if(token==NULL)
+			if ((token==NULL) || (token[0]=='#'))
 			{
-				/* ignore empty line */
-			}
-			else if(token[0]=='#')
-			{
-				/* ignore comment */
+				/* ignore empty line or comment */
 			}
 			else if(strcasecmp(token, "include") == 0)
 			{

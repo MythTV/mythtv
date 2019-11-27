@@ -24,8 +24,8 @@
 class MythNewsConfigPriv
 {
   public:
-    NewsCategory::List categoryList;
-    QStringList selectedSitesList;
+    NewsCategory::List m_categoryList;
+    QStringList        m_selectedSitesList;
 };
 
 // ---------------------------------------------------
@@ -75,7 +75,7 @@ void MythNewsConfig::populateSites(void)
         return;
     }
 
-    m_priv->categoryList.clear();
+    m_priv->m_categoryList.clear();
 
     QDomNodeList catList =
         domDoc.elementsByTagName(QString::fromUtf8("category"));
@@ -106,7 +106,7 @@ void MythNewsConfig::populateSites(void)
             cat.m_siteList.push_back(site);
         }
 
-        m_priv->categoryList.push_back(cat);
+        m_priv->m_categoryList.push_back(cat);
     }
 
     xmlFile.close();
@@ -151,8 +151,8 @@ void MythNewsConfig::loadData(void)
 {
     QMutexLocker locker(&m_lock);
 
-    NewsCategory::List::iterator it = m_priv->categoryList.begin();
-    for (; it != m_priv->categoryList.end(); ++it)
+    NewsCategory::List::iterator it = m_priv->m_categoryList.begin();
+    for (; it != m_priv->m_categoryList.end(); ++it)
     {
         MythUIButtonListItem *item =
             new MythUIButtonListItem(m_categoriesList, (*it).m_name);

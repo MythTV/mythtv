@@ -16,10 +16,10 @@ struct StartPrompterPrivate
 {
     StartPrompterPrivate()
     {
-        stk = GetMythMainWindow()->GetStack("popup stack");
+        m_stk = GetMythMainWindow()->GetStack("popup stack");
     }
 
-    MythScreenStack *stk;
+    MythScreenStack *m_stk;
 };
 
 StartPrompter::StartPrompter()
@@ -82,7 +82,7 @@ void StartPrompter::backendRunningPrompt(void)
         warning += tr("Recording Status: None.");
     }
 
-    MythDialogBox *dia = new MythDialogBox(warning, m_d->stk, "actionmenu");
+    MythDialogBox *dia = new MythDialogBox(warning, m_d->m_stk, "actionmenu");
 
     if (!dia->Create())
     {
@@ -95,7 +95,7 @@ void StartPrompter::backendRunningPrompt(void)
     // This is a hack so that the button clicks target the correct slot:
     dia->SetReturnEvent(this, QString());
 
-    m_d->stk->AddScreen(dia);
+    m_d->m_stk->AddScreen(dia);
 
     QString commandString = gCoreContext->GetSetting("BackendStopCommand");
     if (!commandString.isEmpty())

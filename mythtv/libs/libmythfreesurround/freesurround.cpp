@@ -49,22 +49,22 @@ unsigned int block_size = default_block_size;
 
 struct buffers
 {
-    buffers(unsigned int s):
-        l(s),r(s),c(s),ls(s),rs(s),lfe(s), rls(s), rrs(s) { }
+    explicit buffers(unsigned int s):
+        m_l(s),m_r(s),m_c(s),m_ls(s),m_rs(s),m_lfe(s), m_rls(s), m_rrs(s) { }
     void resize(unsigned int s)
     {
-        l.resize(s); r.resize(s); lfe.resize(s);
-        ls.resize(s); rs.resize(s); c.resize(s);
-        rls.resize(s); rrs.resize(s);
+        m_l.resize(s);   m_r.resize(s);  m_lfe.resize(s);
+        m_ls.resize(s);  m_rs.resize(s); m_c.resize(s);
+        m_rls.resize(s); m_rrs.resize(s);
     }
     void clear()
     {
-        l.clear(); r.clear(); lfe.clear();
-        ls.clear(); rs.clear(); c.clear();
-        rls.clear(); rrs.clear();
+        m_l.clear();   m_r.clear();  m_lfe.clear();
+        m_ls.clear();  m_rs.clear(); m_c.clear();
+        m_rls.clear(); m_rrs.clear();
     }
-    std::vector<float> l,r,c,ls,rs,lfe,cs,lcs,rcs,
-                       rls, rrs;       // for demultiplexing
+    std::vector<float> m_l,m_r,m_c,m_ls,m_rs,m_lfe,m_cs,m_lcs,m_rcs,
+                       m_rls, m_rrs;       // for demultiplexing
 };
 
 //#define SPEAKERTEST
@@ -186,8 +186,8 @@ uint FreeSurround::putFrames(void* buffer, uint numFrames, uint numChannels)
                     {
                         // should be -7dB to keep power level the same
                         // but we bump the level a tad.
-                        bufs->c[ic] = bufs->l[ic] = bufs->r[ic] = samples[i] * m6db;
-                        bufs->ls[ic] = bufs->rs[ic] = bufs->c[ic];
+                        bufs->m_c[ic]  = bufs->m_l[ic]  = bufs->m_r[ic] = samples[i] * m6db;
+                        bufs->m_ls[ic] = bufs->m_rs[ic] = bufs->m_c[ic];
                     }
                     process = false;
                     break;
@@ -208,12 +208,12 @@ uint FreeSurround::putFrames(void* buffer, uint numFrames, uint numChannels)
                     {
                         float lt      = *samples++;
                         float rt      = *samples++;
-                        bufs->l[ic]   = lt;
-                        bufs->lfe[ic] = bufs->c[ic] = (lt+rt) * m3db;
-                        bufs->r[ic]   = rt;
+                        bufs->m_l[ic]   = lt;
+                        bufs->m_lfe[ic] = bufs->m_c[ic] = (lt+rt) * m3db;
+                        bufs->m_r[ic]   = rt;
                         // surround channels receive out-of-phase
-                        bufs->ls[ic]  = (rt-lt) * 0.5;
-                        bufs->rs[ic]  = (lt-rt) * 0.5;
+                        bufs->m_ls[ic]  = (rt-lt) * 0.5;
+                        bufs->m_rs[ic]  = (lt-rt) * 0.5;
                     }
                     process = false;
                     break;
@@ -222,11 +222,11 @@ uint FreeSurround::putFrames(void* buffer, uint numFrames, uint numChannels)
                     {
                         float lt      = *samples++;
                         float rt      = *samples++;
-                        bufs->l[ic]   = lt * m3db;
-                        bufs->lfe[ic] = bufs->c[ic] = (lt+rt) * m3db;
-                        bufs->r[ic]   = rt * m3db;
-                        bufs->ls[ic]  = bufs->l[ic];
-                        bufs->rs[ic]  = bufs->r[ic];
+                        bufs->m_l[ic]   = lt * m3db;
+                        bufs->m_lfe[ic] = bufs->m_c[ic] = (lt+rt) * m3db;
+                        bufs->m_r[ic]   = rt * m3db;
+                        bufs->m_ls[ic]  = bufs->m_l[ic];
+                        bufs->m_rs[ic]  = bufs->m_r[ic];
                     }
                     process = false;
                     break;
@@ -250,12 +250,12 @@ uint FreeSurround::putFrames(void* buffer, uint numFrames, uint numChannels)
                 float c       = *samples++;
                 float ls      = *samples++;
                 float rs      = *samples++;
-                bufs->l[ic]   = lt;
-                bufs->lfe[ic] = 0.0F;
-                bufs->c[ic]   = c;
-                bufs->r[ic]   = rt;
-                bufs->ls[ic]  = ls;
-                bufs->rs[ic]  = rs;
+                bufs->m_l[ic]   = lt;
+                bufs->m_lfe[ic] = 0.0F;
+                bufs->m_c[ic]   = c;
+                bufs->m_r[ic]   = rt;
+                bufs->m_ls[ic]  = ls;
+                bufs->m_rs[ic]  = rs;
             }
             process = false;
             channels = 6;
@@ -272,13 +272,13 @@ uint FreeSurround::putFrames(void* buffer, uint numFrames, uint numChannels)
                 float cs      = *samples++;
                 float ls      = *samples++;
                 float rs      = *samples++;
-                bufs->l[ic]   = lt;
-                bufs->lfe[ic] = lfe;
-                bufs->c[ic]   = c;
-                bufs->r[ic]   = rt;
-                bufs->ls[ic]  = ls;
-                bufs->rs[ic]  = rs;
-                bufs->rls[ic]  = bufs->rrs[ic]  = cs * m3db;
+                bufs->m_l[ic]   = lt;
+                bufs->m_lfe[ic] = lfe;
+                bufs->m_c[ic]   = c;
+                bufs->m_r[ic]   = rt;
+                bufs->m_ls[ic]  = ls;
+                bufs->m_rs[ic]  = rs;
+                bufs->m_rls[ic]  = bufs->m_rrs[ic]  = cs * m3db;
             }
             process = false;
             channels = 8;
@@ -330,14 +330,14 @@ uint FreeSurround::receiveFrames(void *buffer, uint maxFrames)
     float *output = (float *)buffer;
     if (channels == 8)
     {
-        float *l   = &bufs->l[outindex];
-        float *c   = &bufs->c[outindex];
-        float *r   = &bufs->r[outindex];
-        float *ls  = &bufs->ls[outindex];
-        float *rs  = &bufs->rs[outindex];
-        float *lfe = &bufs->lfe[outindex];
-        float *rls = &bufs->rls[outindex];
-        float *rrs = &bufs->rrs[outindex];
+        float *l   = &bufs->m_l[outindex];
+        float *c   = &bufs->m_c[outindex];
+        float *r   = &bufs->m_r[outindex];
+        float *ls  = &bufs->m_ls[outindex];
+        float *rs  = &bufs->m_rs[outindex];
+        float *lfe = &bufs->m_lfe[outindex];
+        float *rls = &bufs->m_rls[outindex];
+        float *rrs = &bufs->m_rrs[outindex];
         for (uint i = 0; i < maxFrames; i++)
         {
 //            printf("1:%f 2:%f 3:%f 4:%f 5:%f 6:%f 7:%f 8:%f\n",
@@ -379,12 +379,12 @@ uint FreeSurround::receiveFrames(void *buffer, uint maxFrames)
         }
         else
         {
-            float *l   = &bufs->l[outindex];
-            float *c   = &bufs->c[outindex];
-            float *r   = &bufs->r[outindex];
-            float *ls  = &bufs->ls[outindex];
-            float *rs  = &bufs->rs[outindex];
-            float *lfe = &bufs->lfe[outindex];
+            float *l   = &bufs->m_l[outindex];
+            float *c   = &bufs->m_c[outindex];
+            float *r   = &bufs->m_r[outindex];
+            float *ls  = &bufs->m_ls[outindex];
+            float *rs  = &bufs->m_rs[outindex];
+            float *lfe = &bufs->m_lfe[outindex];
             for (uint i = 0; i < maxFrames; i++)
             {
                 *output++ = *l++;

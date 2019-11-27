@@ -238,12 +238,12 @@ unsigned short pick_mintmpledges(const unsigned short *matches,
      * of the point to be greater than some (larger) area to the right
      * of the point.
      */
-    static const float  LEFTWIDTH = 0.04;
-    static const float  MIDDLEWIDTH = 0.04;
-    static const float  RIGHTWIDTH = 0.04;
+    static constexpr float  kLeftWidth = 0.04;
+    static constexpr float  kMiddleWidth = 0.04;
+    static constexpr float  kRightWidth = 0.04;
 
-    static const float  MATCHSTART = 0.20;
-    static const float  MATCHEND = 0.80;
+    static constexpr float  kMatchStart = 0.20;
+    static constexpr float  kMatchEnd = 0.80;
 
     ushort *sorted = new unsigned short[nframes];
     memcpy(sorted, matches, nframes * sizeof(*matches));
@@ -253,9 +253,9 @@ unsigned short pick_mintmpledges(const unsigned short *matches,
     ushort matchrange = maxmatch - minmatch;
     /* degenerate minmatch==maxmatch case is gracefully handled */
 
-    ushort leftwidth = (unsigned short)(LEFTWIDTH * matchrange);
-    ushort middlewidth = (unsigned short)(MIDDLEWIDTH * matchrange);
-    ushort rightwidth = (unsigned short)(RIGHTWIDTH * matchrange);
+    ushort leftwidth = (unsigned short)(kLeftWidth * matchrange);
+    ushort middlewidth = (unsigned short)(kMiddleWidth * matchrange);
+    ushort rightwidth = (unsigned short)(kRightWidth * matchrange);
 
     int nfreq = maxmatch + 1;
     ushort *freq = new unsigned short[nfreq];
@@ -263,8 +263,8 @@ unsigned short pick_mintmpledges(const unsigned short *matches,
     for (long long frameno = 0; frameno < nframes; frameno++)
         freq[matches[frameno]]++;   /* freq[<matchcnt>] = <framecnt> */
 
-    ushort matchstart = minmatch + (unsigned short)(MATCHSTART * matchrange);
-    ushort matchend = minmatch + (unsigned short)(MATCHEND * matchrange);
+    ushort matchstart = minmatch + (unsigned short)(kMatchStart * matchrange);
+    ushort matchend = minmatch + (unsigned short)(kMatchEnd * matchrange);
 
     int local_minimum = matchstart;
     uint maxdelta = 0;

@@ -670,7 +670,7 @@ void MythDownloadManager::downloadQNetworkRequest(MythDownloadInfo *dlInfo)
     if (!dlInfo)
         return;
 
-    static const char dateFormat[] = "ddd, dd MMM yyyy hh:mm:ss 'GMT'";
+    static constexpr char kDateFormat[] = "ddd, dd MMM yyyy hh:mm:ss 'GMT'";
     QUrl qurl(dlInfo->m_url);
     QNetworkRequest request;
 
@@ -725,7 +725,7 @@ void MythDownloadManager::downloadQNetworkRequest(MythDownloadInfo *dlInfo)
             if (!dateString.isNull())
             {
                 QDateTime loadDate =
-                    MythDate::fromString(dateString, dateFormat);
+                    MythDate::fromString(dateString, kDateFormat);
                 loadDate.setTimeSpec(Qt::UTC);
                 if (loadDate.secsTo(now) <= 720)
                 {
@@ -1219,7 +1219,7 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
         return;
 
     int statusCode = -1;
-    static const char dateFormat[] = "ddd, dd MMM yyyy hh:mm:ss 'GMT'";
+    static constexpr char kDateFormat[] = "ddd, dd MMM yyyy hh:mm:ss 'GMT'";
     QNetworkReply *reply = dlInfo->m_reply;
 
     if (reply)
@@ -1330,7 +1330,7 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
             QNetworkCacheMetaData::RawHeader newheader;
             QDateTime now = MythDate::current();
             newheader = QNetworkCacheMetaData::RawHeader("Date",
-                                        now.toString(dateFormat).toLatin1());
+                                        now.toString(kDateFormat).toLatin1());
             headers.append(newheader);
             urlData.setRawHeaders(headers);
             m_infoLock->lock();
@@ -1553,7 +1553,7 @@ QDateTime MythDownloadManager::GetLastModified(const QString &url)
     // the cache object is less than 20 minutes old,
     // then use the cached header otherwise redownload the header
 
-    static const char dateFormat[] = "ddd, dd MMM yyyy hh:mm:ss 'GMT'";
+    static constexpr char kDateFormat[] = "ddd, dd MMM yyyy hh:mm:ss 'GMT'";
     LOG(VB_FILE, LOG_DEBUG, LOC + QString("GetLastModified('%1')").arg(url));
     QDateTime result;
 
@@ -1595,7 +1595,7 @@ QDateTime MythDownloadManager::GetLastModified(const QString &url)
             if (!date.isNull())
             {
                 QDateTime loadDate =
-                    MythDate::fromString(date, dateFormat);
+                    MythDate::fromString(date, kDateFormat);
                 loadDate.setTimeSpec(Qt::UTC);
                 if (loadDate.secsTo(now) <= 1200) // 20 Minutes
                 {

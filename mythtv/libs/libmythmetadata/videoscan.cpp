@@ -39,12 +39,12 @@ namespace
       public:
         dirhandler(DirListType &video_files,
                    const QStringList &image_extensions) :
-            m_video_files(video_files)
+            m_videoFiles(video_files)
         {
             for (QStringList::const_iterator p = image_extensions.begin();
                  p != image_extensions.end(); ++p)
             {
-                m_image_ext.insert((*p).toLower());
+                m_imageExt.insert((*p).toLower());
             }
         }
 
@@ -67,17 +67,17 @@ namespace
                 QString("handleFile: %1 :: %2").arg(fq_file_name).arg(host));
 #endif
             (void) file_name;
-            if (m_image_ext.find(extension.toLower()) == m_image_ext.end())
+            if (m_imageExt.find(extension.toLower()) == m_imageExt.end())
             {
-                m_video_files[fq_file_name].check = false;
-                m_video_files[fq_file_name].host = host;
+                m_videoFiles[fq_file_name].check = false;
+                m_videoFiles[fq_file_name].host = host;
             }
         }
 
       private:
         typedef std::set<QString> image_ext;
-        image_ext m_image_ext;
-        DirListType &m_video_files;
+        image_ext    m_imageExt;
+        DirListType &m_videoFiles;
     };
 }
 

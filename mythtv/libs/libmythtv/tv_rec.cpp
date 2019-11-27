@@ -2640,6 +2640,7 @@ long long TVRec::GetMaxBitrate(void) const
 {
     long long bitrate;
     if (m_genOpt.inputtype == "MPEG")
+        // NOLINTNEXTLINE(bugprone-branch-clone)
         bitrate = 10080000LL; // use DVD max bit rate
     else if (m_genOpt.inputtype == "HDPVR")
         bitrate = 20200000LL; // Peek bit rate for HD-PVR

@@ -821,7 +821,7 @@ uint DBEvent::UpdateDB(
     {
         query.prepare(
             "INSERT IGNORE INTO programrating "
-            "       ( chanid, starttime, system, rating) "
+            "       ( chanid, starttime, `system`, rating) "
             "VALUES (:CHANID, :START,    :SYS,  :RATING)");
         query.bindValue(":CHANID", chanid);
         query.bindValue(":START",  m_starttime);
@@ -1124,7 +1124,7 @@ uint DBEvent::InsertDB(MSqlQuery &query, uint chanid) const
     {
         query.prepare(
             "INSERT IGNORE INTO programrating "
-            "       ( chanid, starttime, system, rating) "
+            "       ( chanid, starttime, `system`, rating) "
             "VALUES (:CHANID, :START,    :SYS,  :RATING)");
         query.bindValue(":CHANID", chanid);
         query.bindValue(":START",  m_starttime);
@@ -1293,7 +1293,7 @@ uint ProgInfo::InsertDB(MSqlQuery &query, uint chanid) const
     {
         query.prepare(
             "INSERT IGNORE INTO programrating "
-            "       ( chanid, starttime, system, rating) "
+            "       ( chanid, starttime, `system`, rating) "
             "VALUES (:CHANID, :START,    :SYS,  :RATING)");
         query.bindValue(":CHANID", chanid);
         query.bindValue(":START",  m_starttime);
@@ -1412,9 +1412,9 @@ void ProgramData::FixProgramList(QList<ProgInfo*> &fixlist)
             QList<ProgInfo*>::iterator tokeep, todelete;
 
             if ((*cur)->m_endtime <= (*cur)->m_starttime)
-                tokeep = it, todelete = cur;
+                tokeep = it, todelete = cur;    // NOLINT(bugprone-branch-clone)
             else if ((*it)->m_endtime <= (*it)->m_starttime)
-                tokeep = cur, todelete = it;
+                tokeep = cur, todelete = it;    // NOLINT(bugprone-branch-clone)
             else if (!(*cur)->m_subtitle.isEmpty() &&
                      (*it)->m_subtitle.isEmpty())
                 tokeep = cur, todelete = it;

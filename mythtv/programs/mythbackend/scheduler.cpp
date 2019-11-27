@@ -2453,7 +2453,7 @@ bool Scheduler::HandleReschedule(void)
         if (p->GetRecordingStatus() != p->m_oldrecstatus)
         {
             if (p->GetRecordingEndTime() < m_schedTime)
-                p->AddHistory(false, false, false);
+                p->AddHistory(false, false, false); // NOLINT(bugprone-branch-clone)
             else if (p->GetRecordingStartTime() < m_schedTime &&
                      p->GetRecordingStatus() != RecStatus::WillRecord &&
                      p->GetRecordingStatus() != RecStatus::Pending)
@@ -2528,7 +2528,7 @@ bool Scheduler::HandleRunSchedulerStartup(
 // If a recording is about to start on a backend in a few minutes, wake it...
 void Scheduler::HandleWakeSlave(RecordingInfo &ri, int prerollseconds)
 {
-    static const int sysEventSecs[5] = { 120, 90, 60, 30, 0 };
+    static constexpr int kSysEventSecs[5] = { 120, 90, 60, 30, 0 };
 
     QDateTime curtime = MythDate::current();
     QDateTime nextrectime = ri.GetRecordingStartTime();
@@ -2544,9 +2544,9 @@ void Scheduler::HandleWakeSlave(RecordingInfo &ri, int prerollseconds)
 
     int i = 0;
     bool pendingEventSent = false;
-    while (sysEventSecs[i] != 0)
+    while (kSysEventSecs[i] != 0)
     {
-        if ((secsleft <= sysEventSecs[i]) &&
+        if ((secsleft <= kSysEventSecs[i]) &&
             (!m_sysEvents[i].contains(sysEventKey)))
         {
             if (!pendingEventSent)
@@ -2563,7 +2563,7 @@ void Scheduler::HandleWakeSlave(RecordingInfo &ri, int prerollseconds)
 
     // cleanup old sysEvents once in a while
     QSet<QString> keys;
-    for (i = 0; sysEventSecs[i] != 0; i++)
+    for (i = 0; kSysEventSecs[i] != 0; i++)
     {
         if (m_sysEvents[i].size() < 20)
             continue;

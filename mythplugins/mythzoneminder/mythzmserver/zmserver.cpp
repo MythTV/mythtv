@@ -1101,7 +1101,7 @@ void ZMServer::getMonitorStatus(const string &id, const string &type,
 
 void ZMServer::handleGetEventFrame(vector<string> tokens)
 {
-    static unsigned char buffer[MAX_IMAGE_SIZE];
+    static unsigned char s_buffer[MAX_IMAGE_SIZE];
 
     if (tokens.size() != 5)
     {
@@ -1159,7 +1159,7 @@ void ZMServer::handleGetEventFrame(vector<string> tokens)
     FILE *fd = fopen(filepath.c_str(), "r" );
     if (fd != nullptr)
     {
-        fileSize = fread(buffer, 1, sizeof(buffer), fd);
+        fileSize = fread(s_buffer, 1, sizeof(s_buffer), fd);
         fclose(fd);
     }
     else
@@ -1176,12 +1176,12 @@ void ZMServer::handleGetEventFrame(vector<string> tokens)
     ADD_INT(outStr, fileSize)
 
     // send the data
-    send(outStr, buffer, fileSize);
+    send(outStr, s_buffer, fileSize);
 }
 
 void ZMServer::handleGetAnalysisFrame(vector<string> tokens)
 {
-    static unsigned char buffer[MAX_IMAGE_SIZE];
+    static unsigned char s_buffer[MAX_IMAGE_SIZE];
     char str[100];
 
     if (tokens.size() != 5)
@@ -1305,7 +1305,7 @@ void ZMServer::handleGetAnalysisFrame(vector<string> tokens)
 
         if ((fd = fopen(frameFile.c_str(), "r" )))
         {
-            fileSize = fread(buffer, 1, sizeof(buffer), fd);
+            fileSize = fread(s_buffer, 1, sizeof(s_buffer), fd);
             fclose(fd);
 
             if (m_debug)
@@ -1315,7 +1315,7 @@ void ZMServer::handleGetAnalysisFrame(vector<string> tokens)
             ADD_INT(outStr, fileSize)
 
             // send the data
-            send(outStr, buffer, fileSize);
+            send(outStr, s_buffer, fileSize);
             return;
         }
     }
@@ -1326,7 +1326,7 @@ void ZMServer::handleGetAnalysisFrame(vector<string> tokens)
 
     if ((fd = fopen(frameFile.c_str(), "r" )))
     {
-        fileSize = fread(buffer, 1, sizeof(buffer), fd);
+        fileSize = fread(s_buffer, 1, sizeof(s_buffer), fd);
         fclose(fd);
     }
     else
@@ -1343,12 +1343,12 @@ void ZMServer::handleGetAnalysisFrame(vector<string> tokens)
     ADD_INT(outStr, fileSize)
 
     // send the data
-    send(outStr, buffer, fileSize);
+    send(outStr, s_buffer, fileSize);
 }
 
 void ZMServer::handleGetLiveFrame(vector<string> tokens)
 {
-    static unsigned char buffer[MAX_IMAGE_SIZE];
+    static unsigned char s_buffer[MAX_IMAGE_SIZE];
 
     // we need to periodically kick the DB connection here to make sure it
     // stays alive because the user may have left the frontend on the live
@@ -1390,7 +1390,7 @@ void ZMServer::handleGetLiveFrame(vector<string> tokens)
     }
 
     // read a frame from the shared memory
-    int dataSize = getFrame(buffer, sizeof(buffer), monitor);
+    int dataSize = getFrame(s_buffer, sizeof(s_buffer), monitor);
 
     if (m_debug)
         cout << "Frame size: " <<  dataSize << endl;
@@ -1411,7 +1411,7 @@ void ZMServer::handleGetLiveFrame(vector<string> tokens)
     ADD_INT(outStr, dataSize)
 
     // send the data
-    send(outStr, buffer, dataSize);
+    send(outStr, s_buffer, dataSize);
 }
 
 void ZMServer::handleGetFrameList(vector<string> tokens)

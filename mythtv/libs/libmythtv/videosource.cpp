@@ -132,7 +132,7 @@ void VideoSourceSelector::Load(void)
 class InstanceCount : public MythUISpinBoxSetting
 {
   public:
-    InstanceCount(const CardInput &parent) :
+    explicit InstanceCount(const CardInput &parent) :
         MythUISpinBoxSetting(new CardInputDBStorage(this, parent, "reclimit"),
                              1, 10, 1)
     {
@@ -706,7 +706,7 @@ void VideoSource::loadByID(int sourceid)
 class VideoDevice : public CaptureCardComboBoxSetting
 {
   public:
-    VideoDevice(const CaptureCard &parent,
+    explicit VideoDevice(const CaptureCard &parent,
                 uint    minor_min = 0,
                 uint    minor_max = UINT_MAX,
                 const QString& card      = QString(),
@@ -3656,9 +3656,8 @@ static QString remove_chaff(const QString &name)
         short_name = "pcHDTV HD-3000";
     else if (short_name.startsWith("bcm3510", Qt::CaseInsensitive))
         short_name = "Air2PC v1";
-    else if (short_name.startsWith("nxt2002", Qt::CaseInsensitive))
-        short_name = "Air2PC v2";
-    else if (short_name.startsWith("nxt200x", Qt::CaseInsensitive))
+    else if (short_name.startsWith("nxt2002", Qt::CaseInsensitive) ||
+             short_name.startsWith("nxt200x", Qt::CaseInsensitive))
         short_name = "Air2PC v2";
     else if (short_name.startsWith("lgdt3302", Qt::CaseInsensitive))
         short_name = "DViCO HDTV3";

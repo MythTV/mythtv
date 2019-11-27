@@ -1743,10 +1743,8 @@ Serializer *HTTPRequest::GetSerializer()
     {
         QString sAccept = GetRequestHeader( "Accept", "*/*" );
 
-        if (sAccept.contains( "application/json", Qt::CaseInsensitive ))
-            pSerializer = (Serializer *)new JSONSerializer(&m_response,
-                                                           m_sMethod);
-        else if (sAccept.contains( "text/javascript", Qt::CaseInsensitive ))
+        if (sAccept.contains( "application/json", Qt::CaseInsensitive ) ||
+            sAccept.contains( "text/javascript", Qt::CaseInsensitive ))
             pSerializer = (Serializer *)new JSONSerializer(&m_response,
                                                            m_sMethod);
         else if (sAccept.contains( "text/x-apple-plist+xml", Qt::CaseInsensitive ))

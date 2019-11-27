@@ -974,8 +974,9 @@ bool MythUIType::keyPressEvent(QKeyEvent * /*event*/)
 }
 
 
-void MythUIType::customEvent(QEvent * /*event*/)
+void MythUIType::customEvent(QEvent *event)
 {
+    QObject::customEvent(event);
 }
 
 /** \brief Mouse click/movement handler, receives mouse gesture events from the

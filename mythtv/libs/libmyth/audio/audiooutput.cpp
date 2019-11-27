@@ -369,7 +369,7 @@ AudioOutput::AudioDeviceConfig* AudioOutput::GetAudioDeviceConfig(
                 (aosettings.canAC3()  << 1) |
                 (aosettings.canDTS()  << 2);
             // cppcheck-suppress variableScope
-            static const char *type_names[] = { "LPCM", "AC3", "DTS" };
+            static const char *s_typeNames[] = { "LPCM", "AC3", "DTS" };
 
             if (mask != 0)
             {
@@ -381,7 +381,7 @@ AudioOutput::AudioDeviceConfig* AudioOutput::GetAudioDeviceConfig(
                     {
                         if (found_one)
                             capabilities += ", ";
-                        capabilities += type_names[i];
+                        capabilities += s_typeNames[i];
                         found_one = true;
                     }
                 }

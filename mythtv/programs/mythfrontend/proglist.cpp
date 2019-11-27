@@ -66,8 +66,8 @@ ProgLister::ProgLister(MythScreenStack *parent, ProgListType pltype,
         case plTitleSearch:   m_searchType = kTitleSearch;   break;
         case plKeywordSearch: m_searchType = kKeywordSearch; break;
         case plPeopleSearch:  m_searchType = kPeopleSearch;  break;
-        case plPowerSearch:   m_searchType = kPowerSearch;   break;
-        case plSQLSearch:     m_searchType = kPowerSearch;   break;
+        case plPowerSearch:
+        case plSQLSearch:
         case plStoredSearch:  m_searchType = kPowerSearch;   break;
         default:              m_searchType = kNoSearch;      break;
     }
@@ -143,7 +143,7 @@ bool ProgLister::Create()
         case plKeywordSearch:      value = tr("Keyword Search");   break;
         case plPeopleSearch:       value = tr("People Search");    break;
         case plStoredSearch:       value = tr("Stored Search");    break;
-        case plPowerSearch:        value = tr("Power Search");     break;
+        case plPowerSearch:
         case plSQLSearch:          value = tr("Power Search");     break;
         case plRecordid:           value = tr("Rule Search");      break;
         case plCategory:           value = tr("Category Search");  break;
@@ -534,7 +534,7 @@ bool ProgLister::PowerStringToSQL(
         return false;
     };
 
-    static const QString bindinglist[6] =
+    static const QString kBindingList[6] =
     {
         ":POWERTITLE",
         ":POWERSUB",
@@ -544,7 +544,7 @@ bool ProgLister::PowerStringToSQL(
         ":POWERCALLSIGN",
     };
 
-    static const QString outputlist[6] =
+    static const QString kOutputList[6] =
     {
         "program.title LIKE :POWERTITLE ",
         "program.subtitle LIKE :POWERSUB ",
@@ -562,9 +562,9 @@ bool ProgLister::PowerStringToSQL(
         if (!output.isEmpty())
             output += "\nAND ";
 
-        output += outputlist[i];
-        bindings[bindinglist[i]] =
-            (!outputlist[i].contains("=")) ?
+        output += kOutputList[i];
+        bindings[kBindingList[i]] =
+            (!kOutputList[i].contains("=")) ?
             QString('%') + field[i] + QString('%') : field[i];
     }
 

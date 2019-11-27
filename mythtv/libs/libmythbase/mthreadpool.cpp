@@ -104,7 +104,7 @@ class MPoolThread : public MThread
 {
   public:
     MPoolThread(MThreadPool &pool, int timeout) :
-        MThread("PT"), m_pool(pool), m_expiry_timeout(timeout)
+        MThread("PT"), m_pool(pool), m_expiryTimeout(timeout)
     {
         QMutexLocker locker(&s_lock);
         setObjectName(QString("PT%1").arg(s_thread_num));
@@ -120,12 +120,12 @@ class MPoolThread : public MThread
         QMutexLocker locker(&m_lock);
         while (true)
         {
-            if (m_do_run && !m_runnable)
-                m_wait.wait(locker.mutex(), m_expiry_timeout+1);
+            if (m_doRun && !m_runnable)
+                m_wait.wait(locker.mutex(), m_expiryTimeout+1);
 
             if (!m_runnable)
             {
-                m_do_run = false;
+                m_doRun = false;
 
                 locker.unlock();
                 m_pool.NotifyDone(this);
@@ -133,8 +133,8 @@ class MPoolThread : public MThread
                 break;
             }
 
-            if (!m_runnable_name.isEmpty())
-                loggingRegisterThread(m_runnable_name);
+            if (!m_runnableName.isEmpty())
+                loggingRegisterThread(m_runnableName);
 
             bool autodelete = m_runnable->autoDelete();
             m_runnable->run();
@@ -154,7 +154,7 @@ class MPoolThread : public MThread
 
             t.start();
 
-            if (m_do_run)
+            if (m_doRun)
             {
                 locker.unlock();
                 m_pool.NotifyAvailable(this);
@@ -176,10 +176,10 @@ class MPoolThread : public MThread
                      bool reserved)
     {
         QMutexLocker locker(&m_lock);
-        if (m_do_run && (m_runnable == nullptr))
+        if (m_doRun && (m_runnable == nullptr))
         {
             m_runnable = runnable;
-            m_runnable_name = std::move(runnableName);
+            m_runnableName = std::move(runnableName);
             m_reserved = reserved;
             m_wait.wakeAll();
             return true;
@@ -190,16 +190,16 @@ class MPoolThread : public MThread
     void Shutdown(void)
     {
         QMutexLocker locker(&m_lock);
-        m_do_run = false;
+        m_doRun = false;
         m_wait.wakeAll();
     }
 
     QMutex          m_lock;
     QWaitCondition  m_wait;
     MThreadPool    &m_pool;
-    int             m_expiry_timeout;
-    bool            m_do_run         {true};
-    QString         m_runnable_name;
+    int             m_expiryTimeout;
+    bool            m_doRun          {true};
+    QString         m_runnableName;
     bool            m_reserved       {false};
 
     static QMutex s_lock;
@@ -218,21 +218,21 @@ class MThreadPoolPrivate
 
     int GetRealMaxThread(void)
     {
-        return max(m_max_thread_count,1) + m_reserve_thread;
+        return max(m_maxThreadCount,1) + m_reserveThread;
     }
 
     mutable QMutex m_lock;
     QString m_name;
     QWaitCondition m_wait;
     bool m_running          {true};
-    int  m_expiry_timeout   {120 * 1000};
-    int  m_max_thread_count {QThread::idealThreadCount()};
-    int  m_reserve_thread   {0};
+    int  m_expiryTimeout    {120 * 1000};
+    int  m_maxThreadCount   {QThread::idealThreadCount()};
+    int  m_reserveThread    {0};
 
-    MPoolQueues m_run_queues;
-    QSet<MPoolThread*> m_avail_threads;
-    QSet<MPoolThread*> m_running_threads;
-    QList<MPoolThread*> m_delete_threads;
+    MPoolQueues         m_runQueues;
+    QSet<MPoolThread*>  m_availThreads;
+    QSet<MPoolThread*>  m_runningThreads;
+    QList<MPoolThread*> m_deleteThreads;
 
     static QMutex s_pool_lock;
     static MThreadPool *s_pool;
@@ -268,11 +268,11 @@ void MThreadPool::Stop(void)
 {
     QMutexLocker locker(&m_priv->m_lock);
     m_priv->m_running = false;
-    QSet<MPoolThread*>::iterator it = m_priv->m_avail_threads.begin();
-    for (; it != m_priv->m_avail_threads.end(); ++it)
+    QSet<MPoolThread*>::iterator it = m_priv->m_availThreads.begin();
+    for (; it != m_priv->m_availThreads.end(); ++it)
         (*it)->Shutdown();
-    it = m_priv->m_running_threads.begin();
-    for (; it != m_priv->m_running_threads.end(); ++it)
+    it = m_priv->m_runningThreads.begin();
+    for (; it != m_priv->m_runningThreads.end(); ++it)
         (*it)->Shutdown();
     m_priv->m_wait.wakeAll();
 }
@@ -282,26 +282,26 @@ void MThreadPool::DeletePoolThreads(void)
     waitForDone();
 
     QMutexLocker locker(&m_priv->m_lock);
-    QSet<MPoolThread*>::iterator it = m_priv->m_avail_threads.begin();
-    for (; it != m_priv->m_avail_threads.end(); ++it)
+    QSet<MPoolThread*>::iterator it = m_priv->m_availThreads.begin();
+    for (; it != m_priv->m_availThreads.end(); ++it)
     {
-        m_priv->m_delete_threads.push_front(*it);
+        m_priv->m_deleteThreads.push_front(*it);
     }
-    m_priv->m_avail_threads.clear();
+    m_priv->m_availThreads.clear();
 
-    while (!m_priv->m_delete_threads.empty())
+    while (!m_priv->m_deleteThreads.empty())
     {
-        MPoolThread *thread = m_priv->m_delete_threads.back();
+        MPoolThread *thread = m_priv->m_deleteThreads.back();
         locker.unlock();
 
         thread->wait();
 
         locker.relock();
         delete thread;
-        if (m_priv->m_delete_threads.back() == thread)
-            m_priv->m_delete_threads.pop_back();
+        if (m_priv->m_deleteThreads.back() == thread)
+            m_priv->m_deleteThreads.pop_back();
         else
-            m_priv->m_delete_threads.removeAll(thread);
+            m_priv->m_deleteThreads.removeAll(thread);
     }
 }
 
@@ -346,8 +346,8 @@ void MThreadPool::start(QRunnable *runnable, const QString& debugName, int prior
     if (TryStartInternal(runnable, debugName, false))
         return;
 
-    MPoolQueues::iterator it = m_priv->m_run_queues.find(priority);
-    if (it != m_priv->m_run_queues.end())
+    MPoolQueues::iterator it = m_priv->m_runQueues.find(priority);
+    if (it != m_priv->m_runQueues.end())
     {
         (*it).push_back(MPoolEntry(runnable,debugName));
     }
@@ -355,7 +355,7 @@ void MThreadPool::start(QRunnable *runnable, const QString& debugName, int prior
     {
         MPoolQueue list;
         list.push_back(MPoolEntry(runnable,debugName));
-        m_priv->m_run_queues[priority] = list;
+        m_priv->m_runQueues[priority] = list;
     }
 }
 
@@ -363,14 +363,14 @@ void MThreadPool::startReserved(
     QRunnable *runnable, const QString& debugName, int waitForAvailMS)
 {
     QMutexLocker locker(&m_priv->m_lock);
-    if (waitForAvailMS > 0 && m_priv->m_avail_threads.empty() &&
-        m_priv->m_running_threads.size() >= m_priv->m_max_thread_count)
+    if (waitForAvailMS > 0 && m_priv->m_availThreads.empty() &&
+        m_priv->m_runningThreads.size() >= m_priv->m_maxThreadCount)
     {
         MythTimer t;
         t.start();
         int left = waitForAvailMS - t.elapsed();
-        while (left > 0 && m_priv->m_avail_threads.empty() &&
-               m_priv->m_running_threads.size() >= m_priv->m_max_thread_count)
+        while (left > 0 && m_priv->m_availThreads.empty() &&
+               m_priv->m_runningThreads.size() >= m_priv->m_maxThreadCount)
         {
             m_priv->m_wait.wait(locker.mutex(), left);
             left = waitForAvailMS - t.elapsed();
@@ -392,39 +392,39 @@ bool MThreadPool::TryStartInternal(
     if (!m_priv->m_running)
         return false;
 
-    while (!m_priv->m_delete_threads.empty())
+    while (!m_priv->m_deleteThreads.empty())
     {
-        m_priv->m_delete_threads.back()->wait();
-        delete m_priv->m_delete_threads.back();
-        m_priv->m_delete_threads.pop_back();
+        m_priv->m_deleteThreads.back()->wait();
+        delete m_priv->m_deleteThreads.back();
+        m_priv->m_deleteThreads.pop_back();
     }
 
-    while (m_priv->m_avail_threads.begin() != m_priv->m_avail_threads.end())
+    while (m_priv->m_availThreads.begin() != m_priv->m_availThreads.end())
     {
-        MPoolThread *thread = *m_priv->m_avail_threads.begin();
-        m_priv->m_avail_threads.erase(m_priv->m_avail_threads.begin());
-        m_priv->m_running_threads.insert(thread);
+        MPoolThread *thread = *m_priv->m_availThreads.begin();
+        m_priv->m_availThreads.erase(m_priv->m_availThreads.begin());
+        m_priv->m_runningThreads.insert(thread);
         if (reserved)
-            m_priv->m_reserve_thread++;
+            m_priv->m_reserveThread++;
         if (thread->SetRunnable(runnable, debugName, reserved))
         {
             return true;
         }
 
         if (reserved)
-            m_priv->m_reserve_thread--;
+            m_priv->m_reserveThread--;
         thread->Shutdown();
-        m_priv->m_running_threads.remove(thread);
-        m_priv->m_delete_threads.push_front(thread);
+        m_priv->m_runningThreads.remove(thread);
+        m_priv->m_deleteThreads.push_front(thread);
     }
 
     if (reserved ||
-        m_priv->m_running_threads.size() < m_priv->GetRealMaxThread())
+        m_priv->m_runningThreads.size() < m_priv->GetRealMaxThread())
     {
         if (reserved)
-            m_priv->m_reserve_thread++;
-        MPoolThread *thread = new MPoolThread(*this, m_priv->m_expiry_timeout);
-        m_priv->m_running_threads.insert(thread);
+            m_priv->m_reserveThread++;
+        MPoolThread *thread = new MPoolThread(*this, m_priv->m_expiryTimeout);
+        m_priv->m_runningThreads.insert(thread);
         thread->SetRunnable(runnable, debugName, reserved);
         thread->start();
         if (thread->isRunning())
@@ -435,10 +435,10 @@ bool MThreadPool::TryStartInternal(
         // Thread failed to run, OOM?
         // QThread will print an error, so we don't have to
         if (reserved)
-            m_priv->m_reserve_thread--;
+            m_priv->m_reserveThread--;
         thread->Shutdown();
-        m_priv->m_running_threads.remove(thread);
-        m_priv->m_delete_threads.push_front(thread);
+        m_priv->m_runningThreads.remove(thread);
+        m_priv->m_deleteThreads.push_front(thread);
     }
 
     return false;
@@ -450,18 +450,18 @@ void MThreadPool::NotifyAvailable(MPoolThread *thread)
 
     if (!m_priv->m_running)
     {
-        m_priv->m_running_threads.remove(thread);
+        m_priv->m_runningThreads.remove(thread);
         thread->Shutdown();
-        m_priv->m_delete_threads.push_front(thread);
+        m_priv->m_deleteThreads.push_front(thread);
         m_priv->m_wait.wakeAll();
         return;
     }
 
-    MPoolQueues::iterator it = m_priv->m_run_queues.begin();
-    if (it == m_priv->m_run_queues.end())
+    MPoolQueues::iterator it = m_priv->m_runQueues.begin();
+    if (it == m_priv->m_runQueues.end())
     {
-        m_priv->m_running_threads.remove(thread);
-        m_priv->m_avail_threads.insert(thread);
+        m_priv->m_runningThreads.remove(thread);
+        m_priv->m_availThreads.insert(thread);
         m_priv->m_wait.wakeAll();
         return;
     }
@@ -469,83 +469,83 @@ void MThreadPool::NotifyAvailable(MPoolThread *thread)
     MPoolEntry e = (*it).front();
     if (!thread->SetRunnable(e.first, e.second, false))
     {
-        m_priv->m_running_threads.remove(thread);
+        m_priv->m_runningThreads.remove(thread);
         m_priv->m_wait.wakeAll();
         if (!TryStartInternal(e.first, e.second, false))
         {
             thread->Shutdown();
-            m_priv->m_delete_threads.push_front(thread);
+            m_priv->m_deleteThreads.push_front(thread);
             return;
         }
         thread->Shutdown();
-        m_priv->m_delete_threads.push_front(thread);
+        m_priv->m_deleteThreads.push_front(thread);
     }
 
     (*it).pop_front();
     if ((*it).empty())
-        m_priv->m_run_queues.erase(it);
+        m_priv->m_runQueues.erase(it);
 }
 
 void MThreadPool::NotifyDone(MPoolThread *thread)
 {
     QMutexLocker locker(&m_priv->m_lock);
-    m_priv->m_running_threads.remove(thread);
-    m_priv->m_avail_threads.remove(thread);
-    if (!m_priv->m_delete_threads.contains(thread))
-        m_priv->m_delete_threads.push_front(thread);
+    m_priv->m_runningThreads.remove(thread);
+    m_priv->m_availThreads.remove(thread);
+    if (!m_priv->m_deleteThreads.contains(thread))
+        m_priv->m_deleteThreads.push_front(thread);
     m_priv->m_wait.wakeAll();
 }
 
 int MThreadPool::expiryTimeout(void) const
 {
     QMutexLocker locker(&m_priv->m_lock);
-    return m_priv->m_expiry_timeout;
+    return m_priv->m_expiryTimeout;
 }
 
 void MThreadPool::setExpiryTimeout(int expiryTimeout)
 {
     QMutexLocker locker(&m_priv->m_lock);
-    m_priv->m_expiry_timeout = expiryTimeout;
+    m_priv->m_expiryTimeout = expiryTimeout;
 }
 
 int MThreadPool::maxThreadCount(void) const
 {
     QMutexLocker locker(&m_priv->m_lock);
-    return m_priv->m_max_thread_count;
+    return m_priv->m_maxThreadCount;
 }
 
 void MThreadPool::setMaxThreadCount(int maxThreadCount)
 {
     QMutexLocker locker(&m_priv->m_lock);
-    m_priv->m_max_thread_count = maxThreadCount;
+    m_priv->m_maxThreadCount = maxThreadCount;
 }
 
 int MThreadPool::activeThreadCount(void) const
 {
     QMutexLocker locker(&m_priv->m_lock);
-    return m_priv->m_avail_threads.size() + m_priv->m_running_threads.size();
+    return m_priv->m_availThreads.size() + m_priv->m_runningThreads.size();
 }
 
 /*
 void MThreadPool::reserveThread(void)
 {
     QMutexLocker locker(&m_priv->m_lock);
-    m_priv->m_reserve_thread++;
+    m_priv->m_reserveThread++;
 }
 
 void MThreadPool::releaseThread(void)
 {
     QMutexLocker locker(&m_priv->m_lock);
-    if (m_priv->m_reserve_thread > 0)
-        m_priv->m_reserve_thread--;
+    if (m_priv->m_reserveThread > 0)
+        m_priv->m_reserveThread--;
 }
 */
 
 void MThreadPool::ReleaseThread(void)
 {
     QMutexLocker locker(&m_priv->m_lock);
-    if (m_priv->m_reserve_thread > 0)
-        m_priv->m_reserve_thread--;
+    if (m_priv->m_reserveThread > 0)
+        m_priv->m_reserveThread--;
 }
 
 #if 0
@@ -567,21 +567,21 @@ void MThreadPool::waitForDone(void)
     QMutexLocker locker(&m_priv->m_lock);
     while (true)
     {
-        while (!m_priv->m_delete_threads.empty())
+        while (!m_priv->m_deleteThreads.empty())
         {
-            m_priv->m_delete_threads.back()->wait();
-            delete m_priv->m_delete_threads.back();
-            m_priv->m_delete_threads.pop_back();
+            m_priv->m_deleteThreads.back()->wait();
+            delete m_priv->m_deleteThreads.back();
+            m_priv->m_deleteThreads.pop_back();
         }
 
-        if (m_priv->m_running && !m_priv->m_run_queues.empty())
+        if (m_priv->m_running && !m_priv->m_runQueues.empty())
         {
             m_priv->m_wait.wait(locker.mutex());
             continue;
         }
 
-        QSet<MPoolThread*> working = m_priv->m_running_threads;
-        working = working.subtract(m_priv->m_avail_threads);
+        QSet<MPoolThread*> working = m_priv->m_runningThreads;
+        working = working.subtract(m_priv->m_availThreads);
         if (working.empty())
             break;
         m_priv->m_wait.wait(locker.mutex());

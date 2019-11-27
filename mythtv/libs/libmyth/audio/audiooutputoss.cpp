@@ -50,6 +50,7 @@ AudioOutputSettings* AudioOutputOSS::GetOutputSettings(bool /*digital*/)
         return nullptr;
     }
 
+    // NOLINTNEXTLINE(bugprone-infinite-loop)
     while (int rate = settings->GetNextRate())
     {
         int rate2 = rate;

@@ -1210,7 +1210,7 @@ PeopleMap ParsePeople(const QDomElement& people)
                 QString jobstring = person.attribute("job");
                 PeopleType type = kPersonActor;
                 if (jobstring.toLower() == "actor")
-                    type = kPersonActor;
+                    type = kPersonActor; // NOLINT(bugprone-branch-clone)
                 else if (jobstring.toLower() == "author")
                     type = kPersonAuthor;
                 else if (jobstring.toLower() == "producer")
@@ -1268,7 +1268,7 @@ ArtworkMap ParseArtwork(const QDomElement& artwork)
                 QString typestring = image.attribute("type");
                 VideoArtworkType type = kArtworkCoverart;
                 if (typestring.toLower() == "coverart")
-                    type = kArtworkCoverart;
+                    type = kArtworkCoverart; // NOLINT(bugprone-branch-clone)
                 else if (typestring.toLower() == "fanart")
                     type = kArtworkFanart;
                 else if (typestring.toLower() == "banner")

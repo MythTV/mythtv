@@ -87,7 +87,7 @@ public:
     explicit StCdioDevice(const QString& dev) : m_cdio(openCdio(dev)) { }
     ~StCdioDevice() { if (m_cdio) cdio_destroy(m_cdio); }
 
-    operator CdIo_t*() const { return m_cdio; }
+    operator CdIo_t*() const { return m_cdio; } // NOLINT(google-explicit-constructor)
 };
 
 
@@ -142,8 +142,8 @@ void CdDecoder::writeBlock()
 //static
 QMutex& CdDecoder::getCdioMutex()
 {
-    static QMutex mtx(QMutex::Recursive);
-    return mtx;
+    static QMutex s_mtx(QMutex::Recursive);
+    return s_mtx;
 }
 
 // pure virtual
@@ -766,15 +766,15 @@ bool CdDecoderFactory::supports(const QString &source) const
 // pure virtual
 const QString &CdDecoderFactory::extension() const
 {
-    static QString ext(CDEXT);
-    return ext;
+    static QString s_ext(CDEXT);
+    return s_ext;
 }
 
 // pure virtual
 const QString &CdDecoderFactory::description() const
 {
-    static QString desc(tr("Audio CD parser"));
-    return desc;
+    static QString s_desc(tr("Audio CD parser"));
+    return s_desc;
 }
 
 // pure virtual
@@ -783,17 +783,17 @@ Decoder *CdDecoderFactory::create(const QString &file, AudioOutput *output, bool
    if (deletable)
         return new CdDecoder(file, this, output);
 
-    static CdDecoder *decoder;
-    if (! decoder)
+    static CdDecoder *s_decoder;
+    if (! s_decoder)
     {
-        decoder = new CdDecoder(file, this, output);
+        s_decoder = new CdDecoder(file, this, output);
     }
     else
     {
-        decoder->setURL(file);
-        decoder->setOutput(output);
+        s_decoder->setURL(file);
+        s_decoder->setOutput(output);
     }
 
-    return decoder;
+    return s_decoder;
 }
 

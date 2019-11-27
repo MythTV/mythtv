@@ -515,9 +515,9 @@ static class StereoScopeFactory : public VisFactory
   public:
     const QString &name(void) const override // VisFactory
     {
-        static QString name = QCoreApplication::translate("Visualizers",
-                                                          "StereoScope");
-        return name;
+        static QString s_name = QCoreApplication::translate("Visualizers",
+                                                            "StereoScope");
+        return s_name;
     }
 
     uint plugins(QStringList *list) const override // VisFactory
@@ -541,9 +541,9 @@ static class MonoScopeFactory : public VisFactory
   public:
     const QString &name(void) const override // VisFactory
     {
-        static QString name = QCoreApplication::translate("Visualizers",
-                                                          "MonoScope");
-        return name;
+        static QString s_name = QCoreApplication::translate("Visualizers",
+                                                            "MonoScope");
+        return s_name;
     }
 
     uint plugins(QStringList *list) const override // VisFactory
@@ -776,9 +776,9 @@ static class SpectrumFactory : public VisFactory
   public:
     const QString &name(void) const override // VisFactory
     {
-        static QString name = QCoreApplication::translate("Visualizers",
-                                                          "Spectrum");
-        return name;
+        static QString s_name = QCoreApplication::translate("Visualizers",
+                                                            "Spectrum");
+        return s_name;
     }
 
     uint plugins(QStringList *list) const override // VisFactory
@@ -863,9 +863,9 @@ static class SquaresFactory : public VisFactory
   public:
     const QString &name(void) const override // VisFactory
     {
-        static QString name = QCoreApplication::translate("Visualizers",
-                                                          "Squares");
-        return name;
+        static QString s_name = QCoreApplication::translate("Visualizers",
+                                                            "Squares");
+        return s_name;
     }
 
     uint plugins(QStringList *list) const override // VisFactory
@@ -1310,9 +1310,9 @@ static class PianoFactory : public VisFactory
   public:
     const QString &name(void) const override // VisFactory
     {
-        static QString name = QCoreApplication::translate("Visualizers",
-                                                          "Piano");
-        return name;
+        static QString s_name = QCoreApplication::translate("Visualizers",
+                                                            "Piano");
+        return s_name;
     }
 
     uint plugins(QStringList *list) const override // VisFactory
@@ -1503,9 +1503,9 @@ static class AlbumArtFactory : public VisFactory
   public:
     const QString &name(void) const override // VisFactory
     {
-        static QString name = QCoreApplication::translate("Visualizers",
-                                                          "AlbumArt");
-        return name;
+        static QString s_name = QCoreApplication::translate("Visualizers",
+                                                            "AlbumArt");
+        return s_name;
     }
 
     uint plugins(QStringList *list) const override // VisFactory
@@ -1549,9 +1549,9 @@ static class BlankFactory : public VisFactory
   public:
     const QString &name(void) const override // VisFactory
     {
-        static QString name = QCoreApplication::translate("Visualizers",
-                                                          "Blank");
-        return name;
+        static QString s_name = QCoreApplication::translate("Visualizers",
+                                                            "Blank");
+        return s_name;
     }
 
     uint plugins(QStringList *list) const override // VisFactory

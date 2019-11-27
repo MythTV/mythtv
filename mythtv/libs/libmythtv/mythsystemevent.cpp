@@ -34,7 +34,7 @@ class SystemEventThread : public QRunnable
      *  \param cmd       Command line to run for this System Event
      *  \param eventName Optional System Event name for this command
      */
-    SystemEventThread(const QString &cmd, QString eventName = "")
+    explicit SystemEventThread(const QString &cmd, QString eventName = "")
       : m_command(cmd), m_event(std::move(eventName)) {};
 
     /** \fn SystemEventThread::run()

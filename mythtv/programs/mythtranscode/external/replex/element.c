@@ -703,7 +703,6 @@ int get_video_ext_info(ringbuffer *rbuf, sequence_t *s, int off, int le)
 		break;
 	}
 	case QUANT_MATRIX_EXTENSION:
-		break;
 	case PICTURE_DISPLAY_EXTENSION:
 		break;
 	}

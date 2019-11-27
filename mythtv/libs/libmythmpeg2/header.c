@@ -131,7 +131,7 @@ int mpeg2_header_sequence (mpeg2dec_t * mpeg2dec)
 {
     uint8_t * buffer = mpeg2dec->chunk_start;
     mpeg2_sequence_t * sequence = &(mpeg2dec->new_sequence);
-    static unsigned int frame_period[16] = {
+    static unsigned int s_framePeriod[16] = {
 	0, 1126125, 1125000, 1080000, 900900, 900000, 540000, 450450, 450000,
 	/* unofficial: xing 15 fps */
 	1800000,
@@ -156,7 +156,7 @@ int mpeg2_header_sequence (mpeg2dec_t * mpeg2dec)
 		       SEQ_VIDEO_FORMAT_UNSPECIFIED);
 
     sequence->pixel_width = buffer[3] >> 4;	/* aspect ratio */
-    sequence->frame_period = frame_period[buffer[3] & 15];
+    sequence->frame_period = s_framePeriod[buffer[3] & 15];
 
     sequence->byte_rate = (buffer[4]<<10) | (buffer[5]<<2) | (buffer[6]>>6);
 
@@ -335,8 +335,8 @@ int mpeg2_guess_aspect (const mpeg2_sequence_t * sequence,
 			unsigned int * pixel_height)
 {
     static struct {
-	unsigned int width, height;
-    } video_modes[] = {
+	unsigned int m_width, m_height;
+    } s_videoModes[] = {
 	{720, 576}, /* 625 lines, 13.5 MHz (D1, DV, DVB, DVD) */
 	{704, 576}, /* 625 lines, 13.5 MHz (1/1 D1, DVB, DVD, 4CIF) */
 	{544, 576}, /* 625 lines, 10.125 MHz (DVB, laserdisc) */
@@ -361,10 +361,10 @@ int mpeg2_guess_aspect (const mpeg2_sequence_t * sequence,
     *pixel_height = sequence->pixel_height;
     unsigned int width = sequence->picture_width;
     unsigned int height = sequence->picture_height;
-    for (i = 0; i < sizeof (video_modes) / sizeof (video_modes[0]); i++)
-	if (width == video_modes[i].width && height == video_modes[i].height)
+    for (i = 0; i < sizeof (s_videoModes) / sizeof (s_videoModes[0]); i++)
+	if (width == s_videoModes[i].m_width && height == s_videoModes[i].m_height)
 	    break;
-    if (i == sizeof (video_modes) / sizeof (video_modes[0]) ||
+    if (i == sizeof (s_videoModes) / sizeof (s_videoModes[0]) ||
 	(sequence->pixel_width == 1 && sequence->pixel_height == 1) ||
 	width != sequence->display_width || height != sequence->display_height)
 	return 0;
@@ -377,11 +377,11 @@ int mpeg2_guess_aspect (const mpeg2_sequence_t * sequence,
 
     unsigned int DAR_16_9 = 0;
     if (! (sequence->flags & SEQ_FLAG_MPEG2)) {
-	static unsigned int mpeg1_check[2][2] = {{11, 54}, {27, 45}};
+	static unsigned int s_mpeg1Check[2][2] = {{11, 54}, {27, 45}};
 	DAR_16_9 = (sequence->pixel_height == 27 ||
 		    sequence->pixel_height == 45);
 	if (width < 704 ||
-	    sequence->pixel_height != mpeg1_check[DAR_16_9][height == 576])
+	    sequence->pixel_height != s_mpeg1Check[DAR_16_9][height == 576])
 	    return 0;
     } else {
 	DAR_16_9 = (3 * sequence->picture_width * sequence->pixel_width >
@@ -816,7 +816,7 @@ static int quant_matrix_ext (mpeg2dec_t * mpeg2dec)
 
 int mpeg2_header_extension (mpeg2dec_t * mpeg2dec)
 {
-    static int (* parser[]) (mpeg2dec_t *) = {
+    static int (* s_parser[]) (mpeg2dec_t *) = {
 	0, sequence_ext, sequence_display_ext, quant_matrix_ext,
 	copyright_ext, 0, 0, picture_display_ext, picture_coding_ext
     };
@@ -827,7 +827,7 @@ int mpeg2_header_extension (mpeg2dec_t * mpeg2dec)
     if (!(mpeg2dec->ext_state & ext_bit))
 	return 0;	/* ignore illegal extensions */
     mpeg2dec->ext_state &= ~ext_bit;
-    return parser[ext] (mpeg2dec);
+    return s_parser[ext] (mpeg2dec);
 }
 
 int mpeg2_header_user_data (mpeg2dec_t * mpeg2dec)
@@ -840,7 +840,7 @@ int mpeg2_header_user_data (mpeg2dec_t * mpeg2dec)
 
 static void prescale (mpeg2dec_t * mpeg2dec, int index)
 {
-    static int non_linear_scale [] = {
+    static int s_nonLinearScale [] = {
 	 0,  1,  2,  3,  4,  5,   6,   7,
 	 8, 10, 12, 14, 16, 18,  20,  22,
 	24, 28, 32, 36, 40, 44,  48,  52,
@@ -851,7 +851,7 @@ static void prescale (mpeg2dec_t * mpeg2dec, int index)
     if (mpeg2dec->scaled[index] != mpeg2dec->q_scale_type) {
 	mpeg2dec->scaled[index] = mpeg2dec->q_scale_type;
 	for (int i = 0; i < 32; i++) {
-	    int k = mpeg2dec->q_scale_type ? non_linear_scale[i] : (i << 1);
+	    int k = mpeg2dec->q_scale_type ? s_nonLinearScale[i] : (i << 1);
 	    for (int j = 0; j < 64; j++)
 		decoder->quantizer_prescale[index][i][j] =
 		    k * mpeg2dec->quantizer_matrix[index][j];

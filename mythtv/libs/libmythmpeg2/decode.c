@@ -192,7 +192,7 @@ mpeg2_state_t mpeg2_parse (mpeg2dec_t * mpeg2dec)
 
 mpeg2_state_t mpeg2_parse_header (mpeg2dec_t * mpeg2dec)
 {
-    static int (* process_header[]) (mpeg2dec_t * mpeg2dec) = {
+    static int (* s_processHeader[]) (mpeg2dec_t * mpeg2dec) = {
 	mpeg2_header_picture, mpeg2_header_extension, mpeg2_header_user_data,
 	mpeg2_header_sequence, NULL, NULL, NULL, NULL, mpeg2_header_gop
     };
@@ -223,7 +223,7 @@ mpeg2_state_t mpeg2_parse_header (mpeg2dec_t * mpeg2dec)
 	}
 	mpeg2dec->bytes_since_tag += copied;
 
-	if (process_header[mpeg2dec->code & 0x0b] (mpeg2dec)) {
+	if (s_processHeader[mpeg2dec->code & 0x0b] (mpeg2dec)) {
 	    mpeg2dec->code = mpeg2dec->buf_start[-1];
 	    mpeg2dec->action = mpeg2_seek_header;
 	    return STATE_INVALID;
