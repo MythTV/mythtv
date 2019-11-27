@@ -44,7 +44,7 @@ class LinuxAVCInfo : public AVCInfo
   public:
     raw1394handle_t m_fw_handle;
 };
-typedef QMap<uint64_t,LinuxAVCInfo*> avcinfo_list_t;
+using avcinfo_list_t = QMap<uint64_t,LinuxAVCInfo*>;
 
 #endif // USING_LINUX_FIREWIRE
 

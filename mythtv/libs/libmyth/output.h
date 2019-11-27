@@ -90,7 +90,7 @@ class MPUBLIC OutputEvent : public MythEvent
     int            m_chan            {0};
 };
 
-typedef std::vector<MythTV::Visual*> Visuals;
+using Visuals = std::vector<MythTV::Visual*>;
 
 class MPUBLIC OutputListeners : public MythObservable
 {

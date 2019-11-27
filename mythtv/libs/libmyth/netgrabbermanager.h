@@ -43,7 +43,7 @@ class MPUBLIC GrabberScript : public QObject, public MThread
 
     void run(void) override; // MThread
 
-    typedef QList<GrabberScript *> scriptList;
+    using scriptList = QList<GrabberScript *>;
 
   signals:
 

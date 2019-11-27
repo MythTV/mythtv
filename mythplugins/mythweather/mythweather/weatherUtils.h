@@ -19,8 +19,8 @@
 
 class ScriptInfo;
 
-typedef unsigned char units_t;
-typedef QMap<QString, QString> DataMap;
+using units_t = unsigned char;
+using DataMap = QMap<QString, QString>;
 
 class TypeListInfo
 {
@@ -41,7 +41,7 @@ class TypeListInfo
     QString     m_location;
     ScriptInfo *m_src      {nullptr};
 };
-typedef QMultiHash<QString, TypeListInfo> TypeListMap;
+using TypeListMap = QMultiHash<QString, TypeListInfo>;
 
 class ScreenListInfo
 {
@@ -76,7 +76,7 @@ class ScreenListInfo
 
 Q_DECLARE_METATYPE(ScreenListInfo *);
 
-typedef QMap<QString, ScreenListInfo> ScreenListMap;
+using ScreenListMap = QMap<QString, ScreenListInfo>;
 
 ScreenListMap loadScreens();
 QStringList loadScreen(const QDomElement& ScreenListInfo);

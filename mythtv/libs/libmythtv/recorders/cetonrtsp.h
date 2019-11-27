@@ -19,7 +19,7 @@
 class QTcpSocket;
 class QUdpSocket;
 
-typedef QMap<QString, QString> Params;
+using Params = QMap<QString, QString>;
 
 class CetonRTSP : QObject
 {

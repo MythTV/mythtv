@@ -49,7 +49,7 @@ class GameScan
 
 Q_DECLARE_METATYPE(GameScan)
 
-typedef QMap<QString, GameScan> GameScanMap;
+using GameScanMap = QMap<QString, GameScan>;
 
 class MythUIProgressDialog;
 class GameHandler : public QObject

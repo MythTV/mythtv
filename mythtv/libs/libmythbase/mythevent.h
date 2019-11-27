@@ -122,7 +122,7 @@ class MBASE_PUBLIC MythInfoMapEvent : public MythEvent
 class MBASE_PUBLIC MythCallbackEvent : public QEvent
 {
   public:
-    typedef void (*Callback)(void*, void*, void*);
+    using Callback = void (*)(void*, void*, void*);
     MythCallbackEvent(Callback Function, void *Opaque1, void *Opaque2, void* Opaque3)
       : QEvent(kCallbackType),
         m_function(Function),

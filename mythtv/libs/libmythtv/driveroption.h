@@ -16,8 +16,8 @@ struct DriverOption
     enum type_t { UNKNOWN_TYPE, INTEGER, BOOLEAN, STRING, MENU,
                   BUTTON, BITMASK };
 
-    typedef QMap<int, QString> menu_t;
-    typedef QMap<category_t, DriverOption> Options;
+    using menu_t = QMap<int, QString>;
+    using Options = QMap<category_t, DriverOption>;
 
     DriverOption(void) = default;
     ~DriverOption(void) = default;

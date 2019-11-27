@@ -20,9 +20,9 @@
 
 class MythSystemLegacyWindows;
 
-typedef QMap<HANDLE, MythSystemLegacyWindows *> MSMap_t;
-typedef QMap<HANDLE, QBuffer *> PMap_t;
-typedef QList<MythSystemLegacyWindows *> MSList_t;
+using MSMap_t  = QMap<HANDLE, MythSystemLegacyWindows *>;
+using PMap_t   = QMap<HANDLE, QBuffer *>;
+using MSList_t = QList<MythSystemLegacyWindows *>;
 
 class MythSystemLegacyIOHandler: public MThread
 {

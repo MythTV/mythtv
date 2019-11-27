@@ -27,7 +27,7 @@ enum MRequestType {
     kRequestPost
 };
 
-typedef void (*AuthCallback)(QNetworkReply*, QAuthenticator*, void*);
+using AuthCallback = void (*)(QNetworkReply*, QAuthenticator*, void*);
 
 class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
 {

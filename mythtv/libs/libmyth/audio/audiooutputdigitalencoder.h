@@ -13,8 +13,8 @@ extern "C" {
 
 class AudioOutputDigitalEncoder
 {
-    typedef int16_t inbuf_t;
-    typedef int16_t outbuf_t;
+    using inbuf_t  = int16_t;
+    using outbuf_t = int16_t;
 
   public:
     AudioOutputDigitalEncoder(void);

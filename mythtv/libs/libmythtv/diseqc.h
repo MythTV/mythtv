@@ -27,10 +27,10 @@ class DiSEqCDevRotor;
 class DiSEqCDevLNB;
 class DiSEqCDevSCR;
 
-typedef QMap<uint, double>         uint_to_dbl_t;
-typedef QMap<double, uint>         dbl_to_uint_t;
-typedef QMap<uint, DiSEqCDevTree*> cardid_to_diseqc_tree_t;
-typedef vector<DiSEqCDevDevice*>   dvbdev_vec_t;
+using uint_to_dbl_t           = QMap<uint, double>;
+using dbl_to_uint_t           = QMap<double, uint>;
+using cardid_to_diseqc_tree_t = QMap<uint, DiSEqCDevTree*>;
+using dvbdev_vec_t            = vector<DiSEqCDevDevice*>;
 
 class DiSEqCDevSettings
 {

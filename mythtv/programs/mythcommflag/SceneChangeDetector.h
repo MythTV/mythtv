@@ -11,7 +11,7 @@
 
 #include "FrameAnalyzer.h"
 
-typedef struct AVFrame AVFrame;
+using AVFrame = struct AVFrame;
 class HistogramAnalyzer;
 
 class SceneChangeDetector : public FrameAnalyzer

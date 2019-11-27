@@ -18,7 +18,7 @@ class cCiHandler;
 class MThread;
 class DVBCam;
 
-typedef QMap<const ChannelBase*, ProgramMapTable*> pmt_list_t;
+using pmt_list_t = QMap<const ChannelBase*, ProgramMapTable*>;
 
 class DVBCam : public QRunnable
 {

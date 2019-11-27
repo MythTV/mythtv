@@ -8,7 +8,7 @@
 #ifdef USING_V4L2
 #include "videodev2.h" // needed for v4l2_std_id type
 #else
-typedef uint64_t v4l2_std_id;
+using v4l2_std_id = uint64_t;
 #endif
 
 using namespace std;
@@ -17,7 +17,7 @@ using namespace std;
 
 class TVRec;
 
-typedef QMap<int,v4l2_std_id> VidModV4L2;
+using VidModV4L2 = QMap<int,v4l2_std_id>;
 
 /** \class V4LChannel
  *  \brief Implements tuning for TV cards using the V4L driver API,

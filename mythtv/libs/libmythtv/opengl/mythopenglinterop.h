@@ -17,7 +17,7 @@
 using std::vector;
 
 class VideoColourSpace;
-typedef void (*FreeAVHWDeviceContext)(struct AVHWDeviceContext*);
+using FreeAVHWDeviceContext = void (*)(struct AVHWDeviceContext*);
 #define DUMMY_INTEROP_ID 1
 
 class MythOpenGLInterop : public QObject, public ReferenceCounter

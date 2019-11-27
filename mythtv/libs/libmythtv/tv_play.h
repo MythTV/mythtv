@@ -51,10 +51,10 @@ class TV;
 class TVBrowseHelper;
 struct osdInfo;
 
-typedef void (*EMBEDRETURNVOID) (void *, bool);
-typedef void (*EMBEDRETURNVOIDEPG) (uint, const QString &, const QDateTime, TV *, bool, bool, int);
-typedef void (*EMBEDRETURNVOIDFINDER) (TV *, bool, bool);
-typedef void (*EMBEDRETURNVOIDSCHEDIT) (const ProgramInfo *, void *);
+using EMBEDRETURNVOID        = void (*) (void *, bool);
+using EMBEDRETURNVOIDEPG     = void (*) (uint, const QString &, const QDateTime, TV *, bool, bool, int);
+using EMBEDRETURNVOIDFINDER  = void (*) (TV *, bool, bool);
+using EMBEDRETURNVOIDSCHEDIT = void (*) (const ProgramInfo *, void *);
 
 // Locking order
 //
@@ -945,8 +945,8 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     MythDeque<QString> networkControlCommands;
 
     // Timers
-    typedef QMap<int,PlayerContext*>       TimerContextMap;
-    typedef QMap<int,const PlayerContext*> TimerContextConstMap;
+    using TimerContextMap      = QMap<int,PlayerContext*>;
+    using TimerContextConstMap = QMap<int,const PlayerContext*>;
     mutable QMutex       m_timerIdLock;
     volatile int         m_lcdTimerId              {0};
     volatile int         m_lcdVolumeTimerId        {0};

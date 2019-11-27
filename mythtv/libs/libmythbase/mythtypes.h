@@ -12,7 +12,7 @@
 #include <QHash>
 #include "mythbaseexp.h"
 
-typedef QHash<QString,QString> InfoMap;
+using InfoMap = QHash<QString,QString>;
 
 QString InfoMapToString(const InfoMap &infoMap, const QString &sep="\n");
 

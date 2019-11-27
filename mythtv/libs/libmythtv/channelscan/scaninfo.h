@@ -3,7 +3,7 @@
 
 // C++ headers
 #include <cstdint>
-typedef unsigned uint;
+using uint = unsigned;
 #include <vector>
 using namespace std;
 

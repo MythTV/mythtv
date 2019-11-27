@@ -9,7 +9,7 @@ class NuppelVideoRecorder;
 class MythPlayer;
 class RingBuffer;
 
-typedef vector<struct kfatable_entry> KFATable;
+using KFATable = vector<struct kfatable_entry>;
 
 class Transcode : public QObject
 {

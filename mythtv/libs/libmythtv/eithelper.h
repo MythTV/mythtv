@@ -69,14 +69,14 @@ class ATSCEtt
     time_t m_scan_time;
 };
 
-typedef QMap<uint,ATSCEvent>               EventIDToATSCEvent;
-typedef QMap<uint,ATSCEtt>                 EventIDToETT;
-typedef QMap<uint,EventIDToATSCEvent>      ATSCSRCToEvents;
-typedef QMap<unsigned long long,uint>      ServiceToChanID;
+using EventIDToATSCEvent = QMap<uint,ATSCEvent> ;
+using EventIDToETT       = QMap<uint,ATSCEtt>;
+using ATSCSRCToEvents    = QMap<uint,EventIDToATSCEvent>;
+using ServiceToChanID    = QMap<unsigned long long,uint>;
 
-typedef uint64_t                           FixupKey;
-typedef uint64_t                           FixupValue;
-typedef QMap<FixupKey, FixupValue>         FixupMap;
+using FixupKey   = uint64_t;
+using FixupValue = uint64_t;
+using FixupMap   = QMap<FixupKey, FixupValue>;
 
 class DBEventEIT;
 class EITFixUp;

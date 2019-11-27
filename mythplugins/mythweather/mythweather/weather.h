@@ -15,7 +15,7 @@
 class SourceManager;
 class WeatherScreen;
 
-typedef QList<WeatherScreen*> ScreenList;
+using ScreenList = QList<WeatherScreen*>;
 
 class Weather : public MythScreenType
 {

@@ -11,7 +11,7 @@
 
 class V4L2encStreamHandler;
 
-typedef QMap<uint,int> FilterMap;
+using FilterMap = QMap<uint,int>;
 
 class V4L2encSignalMonitor: public DTVSignalMonitor
 {

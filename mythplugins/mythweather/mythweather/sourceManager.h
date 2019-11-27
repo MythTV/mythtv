@@ -13,7 +13,7 @@
 
 class WeatherScreen;
 class ScriptInfo;
-typedef QMultiMap<long, const WeatherSource*> SourceMap;
+using SourceMap = QMultiMap<long, const WeatherSource*>;
 
 class SourceManager : public QObject
 {

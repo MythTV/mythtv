@@ -43,7 +43,7 @@ class MBASE_PUBLIC MythLocale
     bool    m_defaultsLoaded {false};
     QLocale m_qtLocale;
 
-    typedef QMap<QString, QString> SettingsMap;
+    using SettingsMap = QMap<QString, QString>;
     SettingsMap m_globalSettings;
     SettingsMap m_hostSettings;
 };

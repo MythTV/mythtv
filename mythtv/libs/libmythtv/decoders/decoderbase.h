@@ -108,7 +108,7 @@ class StreamInfo
         return (this->m_stream_id < b.m_stream_id);
     }
 };
-typedef vector<StreamInfo> sinfo_vec_t;
+using sinfo_vec_t = vector<StreamInfo>;
 
 inline AVRational AVRationalInit(int num, int den = 1) {
     AVRational result;

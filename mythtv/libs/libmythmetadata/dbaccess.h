@@ -11,8 +11,8 @@ class SingleValueImp;
 class META_PUBLIC SingleValue
 {
   public:
-    typedef std::pair<int, QString> entry;
-    typedef std::vector<entry> entry_list;
+    using entry = std::pair<int, QString>;
+    using entry_list = std::vector<entry>;
 
   public:
     int add(const QString &name);
@@ -39,10 +39,10 @@ class META_PUBLIC MultiValue
     struct entry
     {
         int id;
-        typedef std::vector<long> values_type;
+        using values_type = std::vector<long>;
         values_type values;
     };
-    typedef std::vector<entry> entry_list;
+    using entry_list = std::vector<entry>;
 
   public:
     int add(int id, int value);
@@ -150,8 +150,8 @@ class META_PUBLIC FileAssociations
             : id(l_id), extension(ext), playcommand(playcmd),
               ignore(l_ignore), use_default(l_use_default) {}
     };
-    typedef std::vector<file_association> association_list;
-    typedef std::vector<std::pair<QString, bool> > ext_ignore_list;
+    using association_list = std::vector<file_association>;
+    using ext_ignore_list = std::vector<std::pair<QString, bool> >;
 
   public:
     static FileAssociations &getFileAssociation();

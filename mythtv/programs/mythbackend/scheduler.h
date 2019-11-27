@@ -286,8 +286,8 @@ class Scheduler : public MThread, public MythScheduler
     OpenEndType m_openEnd;
 
     // cache IsSameProgram()
-    typedef pair<const RecordingInfo*,const RecordingInfo*> IsSameKey;
-    typedef QMap<IsSameKey,bool> IsSameCacheType;
+    using IsSameKey = pair<const RecordingInfo*,const RecordingInfo*>;
+    using IsSameCacheType = QMap<IsSameKey,bool>;
     mutable IsSameCacheType m_cache_is_same_program;
     int m_tmLastLog                    {0};
 };

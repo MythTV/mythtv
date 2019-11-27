@@ -79,8 +79,8 @@ class META_PUBLIC VideoScannerThread : public MThread
         QString host;
     };
 
-    typedef std::vector<std::pair<unsigned int, QString> > PurgeList;
-    typedef std::map<QString, CheckStruct> FileCheckList;
+    using PurgeList = std::vector<std::pair<unsigned int, QString> >;
+    using FileCheckList = std::map<QString, CheckStruct>;
 
     void removeOrphans(unsigned int id, const QString &filename);
 

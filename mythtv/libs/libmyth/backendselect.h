@@ -25,7 +25,7 @@ const QString kDefaultMFE = "UPnP/MythFrontend/DefaultBackend/";
 const QString kDefaultPIN = kDefaultMFE + "SecurityPin";
 const QString kDefaultUSN = kDefaultMFE + "USN";
 
-typedef QMap <QString, DeviceLocation*> ItemMap;
+using ItemMap = QMap <QString, DeviceLocation*>;
 
 /**
  * \class BackendSelection

@@ -48,7 +48,7 @@ class ProgFinder : public ScheduleCommon
     void updateInfo(void);
 
   protected:
-    typedef QMap<QString,QString> ShowName;
+    using ShowName = QMap<QString,QString>;
 
     void Init(void) override; // MythScreenType
 

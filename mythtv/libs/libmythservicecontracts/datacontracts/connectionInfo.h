@@ -66,7 +66,7 @@ class SERVICE_PUBLIC ConnectionInfo : public QObject
         Q_DISABLE_COPY(ConnectionInfo);
 };
 
-typedef ConnectionInfo* ConnectionInfoPtr;
+using ConnectionInfoPtr = ConnectionInfo*;
 
 inline void ConnectionInfo::InitializeCustomTypes()
 {

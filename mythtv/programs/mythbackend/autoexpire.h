@@ -22,8 +22,8 @@ class EncoderLink;
 class FileSystemInfo;
 class MainServer;
 
-typedef vector<ProgramInfo*> pginfolist_t;
-typedef vector<EncoderLink*> enclinklist_t;
+using pginfolist_t  = vector<ProgramInfo*>;
+using enclinklist_t = vector<EncoderLink*>;
 
 enum ExpireMethodType {
     emOldestFirst           = 1,

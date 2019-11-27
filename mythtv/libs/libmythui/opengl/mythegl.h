@@ -7,9 +7,9 @@
 // MythTV
 #include "mythuiexp.h"
 
-typedef void  ( * MYTH_EGLIMAGETARGET)  (GLenum, void*);
-typedef void* ( * MYTH_EGLCREATEIMAGE)  (void*, void*, unsigned int, void*, const int32_t *);
-typedef void  ( * MYTH_EGLDESTROYIMAGE) (void*, void*);
+using MYTH_EGLIMAGETARGET  = void  (*)(GLenum, void*);
+using MYTH_EGLCREATEIMAGE  = void* (*)(void*, void*, unsigned int, void*, const int32_t *);
+using MYTH_EGLDESTROYIMAGE = void  (*)(void*, void*);
 
 class MythRenderOpenGL;
 

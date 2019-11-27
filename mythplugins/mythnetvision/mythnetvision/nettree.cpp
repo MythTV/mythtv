@@ -175,7 +175,7 @@ void NetTree::LoadData(void)
 
         MythGenericTree *selectedNode = m_currentNode->getSelectedChild();
 
-        typedef QList<MythGenericTree *> MGTreeChildList;
+        using MGTreeChildList = QList<MythGenericTree *>;
         MGTreeChildList *lchildren = m_currentNode->getAllChildren();
 
         for (MGTreeChildList::const_iterator p = lchildren->begin();

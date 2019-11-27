@@ -76,7 +76,7 @@ private:
 
     int Apply(int);
 
-    typedef QHash<int, QHash<int, int> > Matrix;
+    using Matrix = QHash<int, QHash<int, int> >;
 
     //! True when using Qt 5.4.1 with its deviant orientation behaviour
     static const bool krunningQt541;
@@ -112,7 +112,7 @@ public:
     static QStringList FromString(const QString &str)
     { return str.split(kSeparator); }
 
-    typedef QMap<QString, QStringList> TagMap;
+    using TagMap = QMap<QString, QStringList>;
     static TagMap ToMap(const QStringList &tags);
 
     virtual bool        IsValid()                                = 0;

@@ -15,7 +15,7 @@ class SignalMonitorValue
 {
     Q_DECLARE_TR_FUNCTIONS(SignalMonitorValue)
 
-    typedef vector<SignalMonitorValue> SignalMonitorList;
+    using SignalMonitorList = vector<SignalMonitorValue>;
   public:
     SignalMonitorValue(QString _name, QString _noSpaceName,
                        int _threshold, bool _high_threshold,
@@ -146,6 +146,6 @@ class SignalMonitorValue
     bool    m_set           {false}; // false until value initially set
 };
 
-typedef vector<SignalMonitorValue> SignalMonitorList;
+using SignalMonitorList = vector<SignalMonitorValue>;
 
 #endif // SIGNALMONITORVALUES_H

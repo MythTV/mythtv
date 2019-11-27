@@ -120,7 +120,7 @@ class TuningRequest
     uint           m_minorChan {0};
     int            m_progNum   {-1};
 };
-typedef MythDeque<TuningRequest> TuningQueue;
+using TuningQueue = MythDeque<TuningRequest>;
 inline TuningRequest myth_deque_init(const TuningRequest*) { return (TuningRequest)(0); }
 
 class PendingInfo
@@ -136,7 +136,7 @@ class PendingInfo
     bool         m_doNotAsk          {false};
     vector<uint> m_possibleConflicts;
 };
-typedef QMap<uint,PendingInfo> PendingMap;
+using PendingMap = QMap<uint,PendingInfo>;
 
 class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
 {

@@ -57,7 +57,7 @@ class IPTVChannelInfo
     uint           m_programNumber {0};
     IPTVTuningData m_tuning;
 };
-typedef QMap<QString,IPTVChannelInfo> fbox_chan_map_t;
+using fbox_chan_map_t = QMap<QString,IPTVChannelInfo>;
 
 class IPTVChannelFetcher : public QRunnable
 {

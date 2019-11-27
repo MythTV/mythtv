@@ -45,7 +45,7 @@ class PIDInfo
 // Please do not change this to hash or other unordered container.
 // HDHRStreamHandler::UpdateFilters() relies on the forward
 // iterator returning these in order of ascending pid number.
-typedef QMap<uint,PIDInfo*> PIDInfoMap;
+using PIDInfoMap = QMap<uint,PIDInfo*>;
 
 // locking order
 // _pid_lock -> _listener_lock
@@ -138,7 +138,7 @@ class StreamHandler : protected MThread, public DeviceReaderCB
     QString             m_mpts_base_file;
     QMutex              m_mpts_lock;
 
-    typedef QMap<MPEGStreamData*,QString> StreamDataList;
+    using StreamDataList = QMap<MPEGStreamData*,QString>;
     mutable QMutex      m_listener_lock         {QMutex::Recursive};
     StreamDataList      m_stream_data_list;
 };

@@ -53,7 +53,7 @@ class QThread;
 class QWidget;
 class RingBuffer;
 
-typedef  void (*StatusCallback)(int, void*);
+using StatusCallback = void (*)(int, void*);
 
 /// Timecode types
 enum TCTypes

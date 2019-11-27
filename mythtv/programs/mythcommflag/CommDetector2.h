@@ -31,8 +31,8 @@ QString strftimeval(const struct timeval *tv);
 
 };  /* namespace */
 
-typedef vector<FrameAnalyzer*>    FrameAnalyzerItem;
-typedef vector<FrameAnalyzerItem> FrameAnalyzerList;
+using FrameAnalyzerItem = vector<FrameAnalyzer*>;
+using FrameAnalyzerList = vector<FrameAnalyzerItem>;
 
 class CommDetector2 : public CommDetectorBase
 {

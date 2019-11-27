@@ -73,7 +73,7 @@ class SERVICE_PUBLIC DatabaseInfo : public QObject
         Q_DISABLE_COPY(DatabaseInfo);
 };
 
-typedef DatabaseInfo * DatabaseInfoPtr;
+using DatabaseInfoPtr = DatabaseInfo*;
 
 inline void DatabaseInfo::InitializeCustomTypes()
 {

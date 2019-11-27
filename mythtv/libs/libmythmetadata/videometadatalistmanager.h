@@ -10,8 +10,8 @@
 class META_PUBLIC VideoMetadataListManager
 {
   public:
-    typedef simple_ref_ptr<VideoMetadata> VideoMetadataPtr;
-    typedef std::list<VideoMetadataPtr> metadata_list;
+    using VideoMetadataPtr = simple_ref_ptr<VideoMetadata>;
+    using metadata_list = std::list<VideoMetadataPtr>;
 
   public:
     static VideoMetadataPtr loadOneFromDatabase(uint id);
@@ -73,20 +73,20 @@ class META_PUBLIC meta_data_node : public meta_node
 
 class meta_dir_node;
 
-typedef simple_ref_ptr<meta_dir_node> smart_dir_node;
-typedef simple_ref_ptr<meta_data_node> smart_meta_node;
+using smart_dir_node = simple_ref_ptr<meta_dir_node>;
+using smart_meta_node = simple_ref_ptr<meta_data_node>;
 
-typedef std::list<smart_dir_node> meta_dir_list;
-typedef std::list<smart_meta_node> meta_data_list;
+using meta_dir_list = std::list<smart_dir_node>;
+using meta_data_list = std::list<smart_meta_node>;
 
 class META_PUBLIC meta_dir_node : public meta_node
 {
   public:
-    typedef meta_dir_list::iterator dir_iterator;
-    typedef meta_dir_list::const_iterator const_dir_iterator;
+    using dir_iterator = meta_dir_list::iterator;
+    using const_dir_iterator = meta_dir_list::const_iterator;
 
-    typedef meta_data_list::iterator entry_iterator;
-    typedef meta_data_list::const_iterator const_entry_iterator;
+    using entry_iterator = meta_data_list::iterator;
+    using const_entry_iterator = meta_data_list::const_iterator;
 
   public:
     meta_dir_node(const QString &path, const QString &name = "",

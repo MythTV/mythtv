@@ -37,7 +37,7 @@ struct PlaylistOptions
     PlayPLOption playPLOption;
 };
 
-typedef QList<MusicMetadata::IdType> SongList;
+using SongList = QList<MusicMetadata::IdType>;
 
 class Playlist : public QObject
 {

@@ -25,7 +25,7 @@ using namespace std;
 class NewsSiteItem
 {
   public:
-    typedef vector<NewsSiteItem> List;
+    using List = vector<NewsSiteItem>;
 
     QString m_name;
     QString m_category;
@@ -39,7 +39,7 @@ Q_DECLARE_METATYPE(NewsSiteItem*)
 class NewsCategory
 {
   public:
-    typedef vector<NewsCategory> List;
+    using List = vector<NewsCategory>;
 
     QString             m_name;
     NewsSiteItem::List  m_siteList;

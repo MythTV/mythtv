@@ -27,7 +27,7 @@ class AudioOutput;
 class ServerPool;
 class _NetStream;
 
-typedef QHash<QString,QString> RawHash;
+using RawHash = QHash<QString,QString>;
 
 struct AudioData
 {

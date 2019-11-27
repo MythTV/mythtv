@@ -42,8 +42,8 @@ enum MythMediaError {
     MEDIAERR_UNSUPPORTED
 };
 
-typedef QMap<QString,uint> ext_cnt_t;
-typedef QMap<QString,uint> ext_to_media_t;
+using ext_cnt_t = QMap<QString,uint>;
+using ext_to_media_t = QMap<QString,uint>;
 
 class MBASE_PUBLIC MythMediaDevice : public QObject
 {

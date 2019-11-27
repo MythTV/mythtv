@@ -111,8 +111,8 @@ class MPUBLIC ResultItem
 
   public:
 
-    typedef QList<ResultItem *> resultList;
-    typedef std::vector<ResultItem> List;
+    using resultList = QList<ResultItem *>;
+    using List = std::vector<ResultItem>;
 
     ResultItem(const QString& title, const QString& sortTitle,
               const QString& subtitle, const QString& sortSubtitle,

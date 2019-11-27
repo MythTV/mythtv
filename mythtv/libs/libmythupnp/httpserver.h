@@ -42,7 +42,7 @@
 #include "upnputil.h"
 #include "compat.h"
 
-typedef struct timeval  TaskTime;
+using TaskTime = struct timeval;
 
 class HttpWorkerThread;
 class QScriptEngine;
@@ -99,7 +99,7 @@ class UPNP_PUBLIC HttpServerExtension : public QObject
         virtual int GetSocketTimeout() const { return m_nSocketTimeout; }// -1 = Use config value
 };
 
-typedef QList<QPointer<HttpServerExtension> > HttpServerExtensionList;
+using HttpServerExtensionList = QList<QPointer<HttpServerExtension> >;
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////

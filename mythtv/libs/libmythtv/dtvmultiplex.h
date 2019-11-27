@@ -138,6 +138,6 @@ class MTV_PUBLIC ScanDTVTransport : public DTVMultiplex
     uint                  m_cardid     {0};
     ChannelInsertInfoList m_channels;
 };
-typedef vector<ScanDTVTransport> ScanDTVTransportList;
+using ScanDTVTransportList = vector<ScanDTVTransport>;
 
 #endif // _DTVMULTIPLEX_H_

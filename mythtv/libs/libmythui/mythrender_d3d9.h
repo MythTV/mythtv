@@ -13,7 +13,7 @@
 #ifdef USING_DXVA2
 #include "dxva2api.h"
 #else
-typedef void* IDirect3DDeviceManager9;
+using IDirect3DDeviceManager9 = void*;
 #endif
 
 class MythD3DVertexBuffer;

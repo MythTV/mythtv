@@ -110,9 +110,9 @@ class MPEG2replex
     multiplex_t    *m_mplex                   {nullptr};
 };
 
-typedef QList<MPEG2frame *> FrameList;
-typedef QQueue<MPEG2frame *> FrameQueue;
-typedef QMap<int, FrameList *> FrameMap;
+using FrameList  = QList<MPEG2frame *>;
+using FrameQueue = QQueue<MPEG2frame *>;
+using FrameMap   = QMap<int, FrameList *>;
 
 class MPEG2fixup
 {

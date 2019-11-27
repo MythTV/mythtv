@@ -41,9 +41,9 @@ class MythDeque : public deque<T>
     /// \brief Adds item to the back of the list. O(1).
     void enqueue(T d) { deque<T>::push_back(d); }
 
-    typedef typename deque<T>::iterator iterator;
-    typedef typename deque<T>::const_iterator const_iterator;
-    typedef typename deque<T>::size_type size_type;
+    using iterator = typename deque<T>::iterator;
+    using const_iterator = typename deque<T>::const_iterator;
+    using size_type = typename deque<T>::size_type;
 
     /// \brief Finds an item in the list via linear search O(n).
     iterator find(T const item)

@@ -10,7 +10,7 @@
  */
 struct Cddb
 {
-    typedef unsigned long discid_t;
+    using discid_t = unsigned long;
     struct Album;
 
     // A CDDB query match
@@ -38,7 +38,7 @@ struct Cddb
     {
         discid_t discID; // discID of query
         bool isExact;
-        typedef QVector< Match > match_t;
+        using match_t = QVector< Match >;
         match_t matches;
 
         Matches() : discID(0), isExact(false) {}
@@ -49,7 +49,7 @@ struct Cddb
         int min, sec, frame;
         Msf(int m = 0, int s = 0, int f = 0) : min(m), sec(s), frame(f) {}
     };
-    typedef QVector< Msf > Toc;
+    using Toc = QVector< Msf >;
 
     struct Track
     {
@@ -69,10 +69,10 @@ struct Cddb
         QString submitter;
         int rev;
         bool isCompilation;
-        typedef QVector< Track > track_t;
+        using track_t = QVector< Track >;
         track_t tracks;
         QString extd;
-        typedef QVector< QString > ext_t;
+        using ext_t = QVector< QString >;
         ext_t ext;
         Toc toc;
 

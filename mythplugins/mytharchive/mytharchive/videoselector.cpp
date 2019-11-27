@@ -381,7 +381,7 @@ void VideoSelector::updateVideoList(void)
 vector<VideoInfo *> *VideoSelector::getVideoListFromDB(void)
 {
     // get a list of category's
-    typedef QMap<int, QString> CategoryMap;
+    using CategoryMap = QMap<int, QString>;
     CategoryMap categoryMap;
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT intid, category FROM videocategory");

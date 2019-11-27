@@ -326,7 +326,7 @@ class HDHomeRunDevice
     UseHDHomeRunDevice *checkbox;
 };
 
-typedef QMap<QString, HDHomeRunDevice> HDHomeRunDeviceList;
+using HDHomeRunDeviceList = QMap<QString, HDHomeRunDevice>;
 
 class HDHomeRunDeviceID;
 class HDHomeRunConfigurationGroup : public GroupSetting
@@ -378,7 +378,7 @@ class VBoxDevice
     bool    discovered;
 };
 
-typedef QMap<QString, VBoxDevice> VBoxDeviceList;
+using VBoxDeviceList = QMap<QString, VBoxDevice>;
 
 class VBoxDeviceIDList;
 class VBoxDeviceID;

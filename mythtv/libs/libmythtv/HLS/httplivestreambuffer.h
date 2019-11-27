@@ -38,7 +38,7 @@ class StreamWorker;
 class PlaylistWorker;
 class HLSPlayback;
 
-typedef QList<HLSStream*> StreamsList;
+using StreamsList = QList<HLSStream*>;
 
 class HLSRingBuffer : public RingBuffer
 {

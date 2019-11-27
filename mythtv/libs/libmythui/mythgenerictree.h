@@ -18,7 +18,7 @@ class SortableMythGenericTreeList;
 
 class MUI_PUBLIC MythGenericTree
 {
-    typedef QVector<int> IntVector;
+    using IntVector = QVector<int>;
 
   public:
     MythGenericTree(const QString &a_string = "", int an_int = 0,

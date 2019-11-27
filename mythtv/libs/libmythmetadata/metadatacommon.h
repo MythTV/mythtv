@@ -76,9 +76,8 @@ enum PeopleType {
     kPersonGuestStar = 11
 };
 
-typedef QMap< VideoArtworkType, ArtworkInfo > DownloadMap;
-
-typedef QMultiMap< PeopleType, PersonInfo > PeopleMap;
+using DownloadMap = QMap< VideoArtworkType, ArtworkInfo >;
+using PeopleMap   = QMultiMap< PeopleType, PersonInfo >;
 
 class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
 {
@@ -455,7 +454,7 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
     DownloadMap m_downloads;
 };
 
-typedef RefCountedList<MetadataLookup> MetadataLookupList;
+using MetadataLookupList = RefCountedList<MetadataLookup>;
 
 META_PUBLIC QDomDocument CreateMetadataXML(MetadataLookupList list);
 META_PUBLIC QDomDocument CreateMetadataXML(MetadataLookup *lookup);

@@ -48,7 +48,7 @@ struct FDType_t
     MythSystemLegacyWindows *ms;
     int                type;
 };
-typedef QMap<HANDLE, FDType_t*> FDMap_t;
+using FDMap_t = QMap<HANDLE, FDType_t*>;
 
 /**********************************
  * MythSystemLegacyManager method defines

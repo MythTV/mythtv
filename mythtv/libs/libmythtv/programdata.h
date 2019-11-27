@@ -59,7 +59,7 @@ class MTV_PUBLIC DBPerson
     Role    m_role;
     QString m_name;
 };
-typedef vector<DBPerson> DBCredits;
+using DBCredits = vector<DBPerson>;
 
 class MTV_PUBLIC EventRating
 {

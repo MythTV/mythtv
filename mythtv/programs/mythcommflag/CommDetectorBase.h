@@ -17,7 +17,7 @@ enum CommMapValue {
     MARK_PRESENT = 2,
 };
 
-typedef QMap<uint64_t, CommMapValue> show_map_t;
+using show_map_t = QMap<uint64_t, CommMapValue>;
 
 /** \class CommDetectorBase
  *  \brief Abstract base class for all CommDetectors.

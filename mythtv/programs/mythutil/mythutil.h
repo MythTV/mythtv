@@ -11,9 +11,8 @@
 // Local includes
 #include "commandlineparser.h"
 
-typedef int (*UtilFunc)(const MythUtilCommandLineParser &cmdline);
-
-typedef QMap<QString, UtilFunc> UtilMap;
+using UtilFunc = int (*)(const MythUtilCommandLineParser &cmdline);
+using UtilMap  = QMap<QString, UtilFunc>;
 
 bool GetProgramInfo(const MythUtilCommandLineParser &cmdline,
                     ProgramInfo &pginfo);

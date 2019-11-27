@@ -11,11 +11,11 @@ class AutoDeleteDeque
     explicit AutoDeleteDeque(bool auto_delete = true) : m_autodelete(auto_delete) {}
     ~AutoDeleteDeque() { clear(); }
 
-    typedef typename std::deque< T > List;
-    typedef typename List::iterator iterator;
-    typedef typename List::const_iterator const_iterator;
-    typedef typename List::reverse_iterator reverse_iterator;
-    typedef typename List::const_reverse_iterator const_reverse_iterator;
+    using List = typename std::deque< T >;
+    using iterator = typename List::iterator;
+    using const_iterator = typename List::const_iterator;
+    using reverse_iterator = typename List::reverse_iterator;
+    using const_reverse_iterator = typename List::const_reverse_iterator;
 
     T operator[](uint index)
     {

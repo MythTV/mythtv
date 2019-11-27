@@ -27,7 +27,7 @@
 #define NUMPROGRAMLINES 52
 
 class ProgramInfo;
-typedef AutoDeleteDeque<ProgramInfo*> ProgramList;
+using ProgramList = AutoDeleteDeque<ProgramInfo*>;
 
 /** \class ProgramInfo
  *  \brief Holds information on recordings and videos.

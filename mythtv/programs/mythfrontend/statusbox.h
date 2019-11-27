@@ -13,7 +13,7 @@ class MythUIButtonList;
 class MythUIButtonListItem;
 class MythUIStateType;
 
-typedef QMap<QString, unsigned int> recprof2bps_t;
+using recprof2bps_t = QMap<QString, unsigned int>;
 
 class StatusBox : public MythScreenType
 {

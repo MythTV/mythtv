@@ -8,7 +8,7 @@
 #include "mythuiexp.h"
 
 class MythFontReference;
-typedef QMultiHash<QString, MythFontReference*> FontPathToReference;
+using FontPathToReference = QMultiHash<QString, MythFontReference*>;
 
 class MUI_PUBLIC MythFontManager
 {

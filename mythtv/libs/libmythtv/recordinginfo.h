@@ -29,7 +29,7 @@ class RecordingRule;
 class RecordingInfo;
 class RecordingRule;
 
-typedef AutoDeleteDeque<RecordingInfo*> RecordingList;
+using RecordingList = AutoDeleteDeque<RecordingInfo*>;
 
 class MTV_PUBLIC RecordingInfo : public ProgramInfo
 {

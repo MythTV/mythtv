@@ -9,7 +9,7 @@
 #if defined(QT_OPENGL_ES_2)
 
 #ifndef GLuint64
-typedef uint64_t GLuint64;
+using GLuint64 = uint64_t;
 #endif
 
 class QOpenGLTimeMonitor

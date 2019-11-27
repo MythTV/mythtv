@@ -50,7 +50,7 @@ enum LoggingType {
 
 class LoggerThread;
 
-typedef struct tm tmType;
+using tmType = struct tm;
 
 #define SET_LOGGING_ARG(arg){ \
                                 free(arg); \

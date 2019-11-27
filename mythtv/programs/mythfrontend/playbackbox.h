@@ -46,8 +46,8 @@ class MythDialogBox;
 class MythMenu;
 class MythUIBusyDialog;
 
-typedef QMap<QString,ProgramList>       ProgramMap;
-typedef QMap<QString,QString>           Str2StrMap;
+using ProgramMap = QMap<QString,ProgramList>;
+using Str2StrMap = QMap<QString,QString>;
 
 enum {
     kArtworkFanTimeout    = 300,
@@ -391,7 +391,7 @@ class PlaybackBox : public ScheduleCommon
     bool                m_doToggleMenu        {true};
 
     // Recording Group popup support
-    typedef QPair<QString, QString> RecGroup;
+    using RecGroup = QPair<QString, QString>;
     QMap<QString,QString> m_recGroupType;
     QMap<QString,QString> m_recGroupPwCache;
 
@@ -464,7 +464,7 @@ class PlaybackBox : public ScheduleCommon
         void Update();
         QDateTime m_lastUpdated;
         // Maps <chanid, recstartts> to a set of JobQueueEntry values.
-        typedef QMultiMap<QPair<uint, QDateTime>, JobQueueEntry> MapType;
+        using MapType = QMultiMap<QPair<uint, QDateTime>, JobQueueEntry>;
         MapType m_jobs;
     } m_jobQueue;
 };

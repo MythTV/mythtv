@@ -60,11 +60,11 @@ class SignalMonitor;
 class DTVSignalMonitor;
 class DVBSignalMonitor;
 
-typedef vector<const ProgramMapTable*>  pmt_vec_t;
-typedef QMap<uint, pmt_vec_t>           pmt_map_t;
+using pmt_vec_t = vector<const ProgramMapTable*>;
+using pmt_map_t = QMap<uint, pmt_vec_t>;
 class ScannedChannelInfo;
-typedef QPair<transport_scan_items_it_t, ScannedChannelInfo*> ChannelListItem;
-typedef QList<ChannelListItem> ChannelList;
+using ChannelListItem = QPair<transport_scan_items_it_t, ScannedChannelInfo*>;
+using ChannelList = QList<ChannelListItem>;
 
 class ChannelScanSM;
 class AnalogSignalHandler : public SignalMonitorListener
@@ -129,7 +129,7 @@ class ChannelScanSM : public MPEGStreamListener,
     DTVSignalMonitor *GetDTVSignalMonitor(void);
     DVBSignalMonitor *GetDVBSignalMonitor(void);
 
-    typedef QMap<uint,ChannelInsertInfo> chan_info_map_t;
+    using chan_info_map_t = QMap<uint,ChannelInsertInfo>;
     chan_info_map_t GetChannelList(transport_scan_items_it_t trans_info,
                                    ScannedChannelInfo *scan_info) const;
     uint GetCurrentTransportInfo(QString &chan, QString &chan_tr) const;

@@ -21,7 +21,7 @@ class MythSocket;
 class QObject;
 class QEvent;
 
-typedef QMap<QString,QDateTime> FileTimeStampMap;
+using FileTimeStampMap = QMap<QString,QDateTime>;
 
 class MTV_PUBLIC PreviewGenerator : public QObject, public MThread
 {

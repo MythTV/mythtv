@@ -23,9 +23,9 @@
 
 class MythSystemLegacyUnix;
 
-typedef QMap<pid_t, QPointer<MythSystemLegacyUnix> > MSMap_t;
-typedef QMap<int, QBuffer *> PMap_t;
-typedef QList<QPointer<MythSystemLegacyUnix> > MSList_t;
+using MSMap_t  = QMap<pid_t, QPointer<MythSystemLegacyUnix> >;
+using PMap_t   = QMap<int, QBuffer *>;
+using MSList_t = QList<QPointer<MythSystemLegacyUnix> >;
 
 class MythSystemLegacyIOHandler: public MThread
 {

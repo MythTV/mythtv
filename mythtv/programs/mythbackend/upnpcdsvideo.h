@@ -14,7 +14,7 @@
 #include "mainserver.h"
 #include "upnpcds.h"
               
-typedef QMap<int, QString> IntMap;
+using IntMap = QMap<int, QString>;
 
 //////////////////////////////////////////////////////////////////////////////
 //

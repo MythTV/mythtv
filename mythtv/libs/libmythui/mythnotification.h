@@ -16,8 +16,8 @@
 #include "mythevent.h"
 #include "mythuiexp.h"
 
-typedef QMap<QString,QString> DMAP;
-typedef unsigned int    VNMask;
+using DMAP = QMap<QString,QString>;
+using VNMask = unsigned int;
 
 class MUI_PUBLIC MythNotification : public MythEvent
 {

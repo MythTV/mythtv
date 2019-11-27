@@ -27,7 +27,7 @@ class RecordingGap
     QDateTime m_start;
     QDateTime m_end;
 };
-typedef QList<RecordingGap> RecordingGaps;
+using RecordingGaps = QList<RecordingGap>;
 
 class MTV_PUBLIC RecordingQuality
 {

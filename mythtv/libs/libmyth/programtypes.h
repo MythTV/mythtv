@@ -43,7 +43,7 @@ MPUBLIC extern const char *kJobQueueInUseID;
 MPUBLIC extern const char *kCCExtractorInUseID;
 
 /// Frame # -> File offset map
-typedef QMap<long long, long long> frm_pos_map_t;
+using frm_pos_map_t = QMap<long long, long long>;
 
 enum MarkTypes {
     MARK_ALL           = -100,
@@ -78,7 +78,7 @@ enum MarkTypes {
 MPUBLIC QString toString(MarkTypes type);
 
 /// Frame # -> Mark map
-typedef QMap<uint64_t, MarkTypes> frm_dir_map_t;
+using frm_dir_map_t = QMap<uint64_t, MarkTypes>;
 
 enum CommFlagStatus {
     COMM_FLAG_NOT_FLAGGED = 0,

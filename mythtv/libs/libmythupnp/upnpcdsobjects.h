@@ -92,8 +92,8 @@ class Property
         QString  m_sValue;
 };
 
-typedef QMap<QString,Property*> Properties;
-typedef QList<CDSObject*>       CDSObjects;
+using Properties = QMap<QString,Property*>;
+using CDSObjects = QList<CDSObject*>;
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -124,7 +124,7 @@ class Resource
         }
 };
 
-typedef QList<Resource*> Resources;
+using Resources = QList<Resource*>;
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -150,7 +150,7 @@ class ContainerClass
         }
 };
 
-typedef QList<ContainerClass*> Classes;
+using Classes = QList<ContainerClass*>;
 
 /**
  * NOTE FilterMap contains a list of what should be included, not what should
@@ -176,7 +176,7 @@ typedef QList<ContainerClass*> Classes;
  *
  *      See UPnP MediaServer, ContentDirectory Service Section 2.3.18, 2013
  */
-typedef QStringList FilterMap;
+using FilterMap = QStringList;
 
 //////////////////////////////////////////////////////////////////////////////
 

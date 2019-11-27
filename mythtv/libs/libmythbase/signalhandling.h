@@ -16,10 +16,10 @@
 #ifdef _WIN32
 // Quick fix to let this compile for Windows:  we have it disabled on the
 // calling side for Windows anyways, IIRC.
-typedef void siginfo_t;
+using siginfo_t = void;
 #endif
 
-typedef void (*SigHandlerFunc)(void);
+using SigHandlerFunc = void (*)(void);
 
 /// \brief A container object to handle UNIX signals in the Qt space correctly
 class MBASE_PUBLIC SignalHandler: public QObject

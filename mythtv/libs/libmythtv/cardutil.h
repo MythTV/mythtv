@@ -18,7 +18,7 @@ using namespace std;
 
 class InputInfo;
 class CardInput;
-typedef QMap<int,QString> InputNames;
+using InputNames = QMap<int,QString>;
 
 MTV_PUBLIC QString get_on_input(const QString&, uint);
 
@@ -40,7 +40,7 @@ enum dvb_dev_type_t
 class MTV_PUBLIC CardUtil
 {
   public:
-    typedef QMap<QString, QString> InputTypes;
+    using InputTypes = QMap<QString, QString>;
 
     /// \brief all the different inputs
     enum INPUT_TYPES

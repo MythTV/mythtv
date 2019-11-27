@@ -30,7 +30,7 @@ DEFINE_GUID(IID_IDirectSoundNotify, 0xb0210783, 0x89cd, 0x11d0,
 #endif
 
 #ifndef _WAVEFORMATEXTENSIBLE_
-typedef struct {
+struct WAVEFORMATEXTENSIBLE {
     WAVEFORMATEX Format;
     union {
         WORD wValidBitsPerSample;       // bits of precision
@@ -39,7 +39,8 @@ typedef struct {
     } Samples;
     DWORD        dwChannelMask;         // which channels are present in stream
     GUID         SubFormat;
-} WAVEFORMATEXTENSIBLE, *PWAVEFORMATEXTENSIBLE;
+};
+using PWAVEFORMATEXTENSIBLE = WAVEFORMATEXTENSIBLE*;
 #endif
 
 DEFINE_GUID(_KSDATAFORMAT_SUBTYPE_IEEE_FLOAT, WAVE_FORMAT_IEEE_FLOAT,

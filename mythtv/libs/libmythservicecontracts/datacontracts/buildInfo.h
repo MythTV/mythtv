@@ -56,7 +56,7 @@ class SERVICE_PUBLIC BuildInfo : public QObject
         Q_DISABLE_COPY(BuildInfo);
 };
 
-typedef BuildInfo* BuildInfoPtr;
+using BuildInfoPtr = BuildInfo*;
 
 inline void BuildInfo::InitializeCustomTypes()
 {

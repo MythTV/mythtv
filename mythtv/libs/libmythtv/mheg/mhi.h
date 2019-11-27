@@ -223,9 +223,9 @@ class MHIContext : public MHContext, public QRunnable
     QRect            m_displayRect;
 
     // Channel index database cache
-    typedef QPair< int, int > Val_t; // transportid, chanid
-    typedef QPair< int, int > Key_t; // networkid, serviceid
-    typedef QMap< Key_t, Val_t > ChannelCache_t;
+    using Val_t = QPair< int, int >; // transportid, chanid
+    using Key_t = QPair< int, int >; // networkid, serviceid
+    using ChannelCache_t = QMap< Key_t, Val_t >;
     ChannelCache_t  m_channelCache;
     QMutex          m_channelMutex;
     static inline int Tid(ChannelCache_t::const_iterator it) { return it->first; }

@@ -188,12 +188,12 @@ class UPNP_PUBLIC UPnPShortcutFeature : public UPnPFeature
     QMap<ShortCutType, QString> m_shortcuts;
 };
 
-typedef QMap<UPnPShortcutFeature::ShortCutType, QString> CDSShortCutList;
+using CDSShortCutList = QMap<UPnPShortcutFeature::ShortCutType, QString>;
 
 //////////////////////////////////////////////////////////////////////////////
 
-typedef QMap<QString, QString> IDTokenMap;
-typedef QPair<QString, QString> IDToken;
+using IDTokenMap = QMap<QString, QString>;
+using IDToken = QPair<QString, QString>;
 
 class UPNP_PUBLIC UPnpCDSExtension
 {
@@ -266,7 +266,7 @@ class UPNP_PUBLIC UPnpCDSExtension
         virtual CDSShortCutList GetShortCuts         () { return m_shortcuts; }
 };
 
-typedef QList<UPnpCDSExtension*> UPnpCDSExtensionList;
+using UPnpCDSExtensionList = QList<UPnpCDSExtension*>;
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////

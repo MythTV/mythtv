@@ -13,7 +13,7 @@ class MythSettingBase
     virtual ~MythSettingBase() = default;
     virtual QString ToHTML(uint) const { return QString(); }
 };
-typedef QList<MythSettingBase*> MythSettingList;
+using MythSettingList = QList<MythSettingBase*>;
 
 class MythSettingGroup : public MythSettingBase
 {

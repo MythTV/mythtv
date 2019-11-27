@@ -40,7 +40,7 @@ public:
 
 
     /* 0-based frameno => nframes */
-    typedef QMap<long long, long long> FrameMap;
+    using FrameMap = QMap<long long, long long>;
 
     virtual enum analyzeFrameResult MythPlayerInited(
             MythPlayer *player, long long nframes) {

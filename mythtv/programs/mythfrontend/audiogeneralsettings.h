@@ -35,7 +35,7 @@ class AudioConfigSettings : public GroupSetting
     AudioConfigSettings();
     void Load() override; // StandardSetting
 
-    typedef QMap<QString,AudioOutput::AudioDeviceConfig> ADCMap;
+    using ADCMap = QMap<QString,AudioOutput::AudioDeviceConfig>;
 
     ADCMap &AudioDeviceMap(void) { return audiodevs; };
     AudioOutput::ADCVect &AudioDeviceVect(void) { return devices; };

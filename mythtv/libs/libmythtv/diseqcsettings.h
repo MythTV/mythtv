@@ -10,7 +10,7 @@
 #include "diseqc.h"
 #include "standardsettings.h"
 
-typedef QMap<uint, StandardSetting*> devid_to_setting_t;
+using devid_to_setting_t = QMap<uint, StandardSetting*>;
 
 class SwitchTypeSetting;
 class SwitchPortsSetting;

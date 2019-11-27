@@ -54,7 +54,7 @@ class VBoxChannelInfo
     uint           m_networkID   {0}; // Network ID from triplet
     uint           m_transportID {0}; // Transport ID from triplet
 };
-typedef QMap<QString,VBoxChannelInfo> vbox_chan_map_t;
+using vbox_chan_map_t = QMap<QString,VBoxChannelInfo>;
 
 class VBoxChannelFetcher : public QRunnable
 {

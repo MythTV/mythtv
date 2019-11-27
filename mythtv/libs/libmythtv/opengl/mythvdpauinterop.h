@@ -14,7 +14,7 @@ extern "C" {
 
 class MythVDPAUHelper;
 
-typedef GLintptr MythVDPAUSurfaceNV;
+using MythVDPAUSurfaceNV = GLintptr;
 typedef void (APIENTRY * MYTH_VDPAUINITNV)(const void*, const void*);
 typedef void (APIENTRY * MYTH_VDPAUFININV)(void);
 typedef MythVDPAUSurfaceNV (APIENTRY *  MYTH_VDPAUREGOUTSURFNV)(const void*, GLenum, GLsizei, const GLuint*);

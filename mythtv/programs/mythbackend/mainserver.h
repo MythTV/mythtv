@@ -362,7 +362,7 @@ class MainServer : public QObject, public MythSocketCBs
 
     int m_exitCode                           {GENERIC_EXIT_OK};
 
-    typedef QHash<QString,QString> RequestedBy;
+    using RequestedBy = QHash<QString,QString>;
     RequestedBy                m_previewRequestedBy;
 
     bool m_stopped                           {false};

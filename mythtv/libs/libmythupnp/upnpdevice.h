@@ -33,9 +33,9 @@ class QTextStream;
 // Typedefs
 /////////////////////////////////////////////////////////////////////////////
 
-typedef QList< UPnpDevice*  >  UPnpDeviceList;
-typedef QList< UPnpService* >  UPnpServiceList;
-typedef QList< UPnpIcon*    >  UPnpIconList;
+using UPnpDeviceList  = QList< UPnpDevice*  >;
+using UPnpServiceList = QList< UPnpService* >;
+using UPnpIconList    = QList< UPnpIcon*    >;
 
 /////////////////////////////////////////////////////////////////////////////
 //

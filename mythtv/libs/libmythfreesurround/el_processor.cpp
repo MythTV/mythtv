@@ -29,7 +29,7 @@ extern "C" {
 #include "libavcodec/avfft.h"
 #include "libavcodec/fft.h"
 }
-typedef FFTSample FFTComplexArray[2];
+using FFTComplexArray = FFTSample[2];
 #endif
 
 

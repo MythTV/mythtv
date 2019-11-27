@@ -12,7 +12,7 @@
 #ifndef __BORDERDETECTOR_H__
 #define __BORDERDETECTOR_H__
 
-typedef struct AVFrame AVFrame;
+using AVFrame = struct AVFrame;
 class MythPlayer;
 class TemplateFinder;
 

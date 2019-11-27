@@ -31,9 +31,9 @@ class QTimer;
 class MythUIButtonList;
 class MythUIGuideGrid;
 
-typedef vector<ChannelInfo>   db_chan_list_t;
-typedef vector<db_chan_list_t> db_chan_list_list_t;
-typedef ProgramInfo *ProgInfoGuideArray[MAX_DISPLAY_CHANS][MAX_DISPLAY_TIMES];
+using db_chan_list_t = vector<ChannelInfo>  ;
+using db_chan_list_list_t = vector<db_chan_list_t>;
+using ProgInfoGuideArray = ProgramInfo *[MAX_DISPLAY_CHANS][MAX_DISPLAY_TIMES];
 
 class JumpToChannel;
 class JumpToChannelListener

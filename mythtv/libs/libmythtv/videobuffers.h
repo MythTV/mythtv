@@ -17,9 +17,9 @@
 #include <map>
 using namespace std;
 
-typedef MythDeque<VideoFrame*>       frame_queue_t;
-typedef vector<VideoFrame>           frame_vector_t;
-typedef map<const VideoFrame*, uint> vbuffer_map_t;
+using frame_queue_t  = MythDeque<VideoFrame*> ;
+using frame_vector_t = vector<VideoFrame>;
+using vbuffer_map_t  = map<const VideoFrame*, uint>;
 
 const QString& DebugString(const VideoFrame *Frame, bool Short = false);
 const QString& DebugString(uint  FrameNum, bool Short = false);

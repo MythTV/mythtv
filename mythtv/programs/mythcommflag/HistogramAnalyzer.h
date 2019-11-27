@@ -31,7 +31,7 @@ public:
     int reportTime(void) const;
 
     /* Each color 0-255 gets a scaled frequency counter 0-255. */
-    typedef unsigned char   Histogram[UCHAR_MAX + 1];
+    using Histogram = unsigned char[UCHAR_MAX + 1];
 
     const float *getMeans(void) const { return m_mean; }
     const unsigned char *getMedians(void) const { return m_median; }

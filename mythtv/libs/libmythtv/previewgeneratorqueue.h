@@ -46,7 +46,7 @@ class PreviewGenState
     /// this preview.
     QSet<QString>     m_tokens;
 };
-typedef QMap<QString,PreviewGenState> PreviewMap;
+using PreviewMap = QMap<QString,PreviewGenState>;
 
 /**
  * This class implements a queue of preview generation requests.  It
