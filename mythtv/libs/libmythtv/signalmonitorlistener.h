@@ -7,7 +7,7 @@
 #include "mythtvexp.h"
 #include "signalmonitorvalue.h"
 
-typedef enum {
+enum SignalMonitorMessageType {
     kAllGood,
     kStatusChannelTuned,
     kStatusSignalLock,
@@ -16,7 +16,7 @@ typedef enum {
     kStatusBitErrorRate,
     kStatusUncorrectedBlocks,
     kStatusRotorPosition,
-} SignalMonitorMessageType;
+};
 
 class MTV_PUBLIC SignalMonitorListener
 {

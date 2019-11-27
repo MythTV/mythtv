@@ -913,7 +913,7 @@ void PlaybackBox::ItemLoaded(MythUIButtonListItem *item)
         videoFlags[VID_HDTV] = "hdtv";
         videoFlags[VID_WIDESCREEN] = "widescreen";
 
-        QMap<SubtitleTypes, QString> subtitleFlags;
+        QMap<SubtitleType, QString> subtitleFlags;
         subtitleFlags[SUB_SIGNED] = "deafsigned";
         subtitleFlags[SUB_ONSCREEN] = "onscreensub";
         subtitleFlags[SUB_NORMAL] = "subtitles";
@@ -962,7 +962,7 @@ void PlaybackBox::ItemLoaded(MythUIButtonListItem *item)
                 item->DisplayState(vit.value(), "videoprops");
         }
 
-        QMap<SubtitleTypes, QString>::iterator sit;
+        QMap<SubtitleType, QString>::iterator sit;
         for (sit = subtitleFlags.begin(); sit != subtitleFlags.end(); ++sit)
         {
             if (pginfo->GetSubtitleType() & sit.key())

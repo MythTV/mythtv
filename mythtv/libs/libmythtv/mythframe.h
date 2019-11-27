@@ -14,7 +14,7 @@
 extern "C" {
 #endif
 
-typedef enum FrameType_
+enum VideoFrameType
 {
     FMT_NONE = -1,
     // YV12 and variants
@@ -59,7 +59,7 @@ typedef enum FrameType_
     FMT_VTB,
     FMT_NVDEC,
     FMT_DRMPRIME
-} VideoFrameType;
+};
 
 const char* format_description(VideoFrameType Type);
 
@@ -111,7 +111,7 @@ static inline int format_is_yuv(VideoFrameType Type)
            format_is_nv12(Type) || format_is_packed(Type);
 }
 
-typedef enum MythDeintType
+enum MythDeintType
 {
     DEINT_NONE   = 0x0000,
     DEINT_BASIC  = 0x0001,
@@ -121,7 +121,7 @@ typedef enum MythDeintType
     DEINT_SHADER = 0x0020,
     DEINT_DRIVER = 0x0040,
     DEINT_ALL    = 0x0077
-} MythDeintType;
+};
 
 inline MythDeintType operator| (MythDeintType a, MythDeintType b) { return static_cast<MythDeintType>(static_cast<int>(a) | static_cast<int>(b)); }
 inline MythDeintType operator& (MythDeintType a, MythDeintType b) { return static_cast<MythDeintType>(static_cast<int>(a) & static_cast<int>(b)); }

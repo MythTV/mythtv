@@ -22,12 +22,12 @@ typedef struct
     int64_t size;
 } FileData;
 
-typedef enum
+enum FSTYPE
 {
     FSTYPE_FILELIST = 0,
     FSTYPE_FILE = 1,
     FSTYPE_DIRECTORY = 2
-} FSTYPE;
+};
 
 class MythUIText;
 class MythUITextEdit;

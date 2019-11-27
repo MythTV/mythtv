@@ -298,7 +298,7 @@ QString strftimeval(const struct timeval *tv)
 using namespace commDetector2;
 
 CommDetector2::CommDetector2(
-    enum SkipTypes     commDetectMethod_in,
+    SkipType           commDetectMethod_in,
     bool               showProgress_in,
     bool               fullSpeed_in,
     MythPlayer        *player_in,
@@ -308,7 +308,7 @@ CommDetector2::CommDetector2(
     QDateTime          recstartts_in,
     QDateTime          recendts_in,
     bool               useDB) :
-    m_commDetectMethod((enum SkipTypes)(commDetectMethod_in & ~COMM_DETECT_2)),
+    m_commDetectMethod((SkipType)(commDetectMethod_in & ~COMM_DETECT_2)),
     m_showProgress(showProgress_in),  m_fullSpeed(fullSpeed_in),
     m_player(player_in),
     m_startts(std::move(startts_in)),       m_endts(std::move(endts_in)),

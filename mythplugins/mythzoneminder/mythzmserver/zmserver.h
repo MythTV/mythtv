@@ -59,14 +59,14 @@ const string RESTART          = "restart";
 const string RELOAD           = "reload";
 const string RUNNING          = "running";
 
-typedef enum 
+enum State
 {
     IDLE,
     PREALARM,
     ALARM,
     ALERT,
     TAPE
-} State;
+};
 
 // shared data for ZM version 1.24.x and 1.25.x
 typedef struct
@@ -162,7 +162,7 @@ typedef struct
     char alarm_cause[256];
 } SharedData32;
 
-typedef enum { TRIGGER_CANCEL, TRIGGER_ON, TRIGGER_OFF } TriggerState;
+enum TriggerState { TRIGGER_CANCEL, TRIGGER_ON, TRIGGER_OFF };
 
 // Triggerdata for ZM version 1.24.x and 1.25.x
 typedef struct

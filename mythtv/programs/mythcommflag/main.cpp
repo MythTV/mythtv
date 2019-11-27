@@ -78,12 +78,12 @@ int recorderNum = -1;
 int jobID = -1;
 int lastCmd = -1;
 
-static QMap<QString,SkipTypes> *init_skip_types();
-QMap<QString,SkipTypes> *skipTypes = init_skip_types();
+static QMap<QString,SkipType> *init_skip_types();
+QMap<QString,SkipType> *skipTypes = init_skip_types();
 
-static QMap<QString,SkipTypes> *init_skip_types(void)
+static QMap<QString,SkipType> *init_skip_types(void)
 {
-    QMap<QString,SkipTypes> *tmp = new QMap<QString,SkipTypes>;
+    QMap<QString,SkipType> *tmp = new QMap<QString,SkipType>;
     (*tmp)["commfree"]    = COMM_DETECT_COMMFREE;
     (*tmp)["uninit"]      = COMM_DETECT_UNINIT;
     (*tmp)["off"]         = COMM_DETECT_OFF;
@@ -521,7 +521,7 @@ static void incomingCustomEvent(QEvent* e)
 static int DoFlagCommercials(
     ProgramInfo *program_info,
     bool showPercentage, bool fullSpeed, int jobid,
-    MythCommFlagPlayer* cfp, enum SkipTypes commDetectMethod,
+    MythCommFlagPlayer* cfp, SkipType commDetectMethod,
     const QString &outputfilename, bool useDB)
 {
     commDetector = CommDetectorFactory::makeCommDetector(
@@ -716,7 +716,7 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
     int breaksFound = 0;
 
     // configure commercial detection method
-    SkipTypes commDetectMethod = (SkipTypes)gCoreContext->GetNumSetting(
+    SkipType commDetectMethod = (SkipType)gCoreContext->GetNumSetting(
                                     "CommercialSkipMethod", COMM_DETECT_ALL);
 
     if (cmdline.toBool("commmethod"))
@@ -726,7 +726,7 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
 
         // assume definition as integer value
         bool ok = true;
-        commDetectMethod = (SkipTypes) commmethod.toInt(&ok);
+        commDetectMethod = (SkipType) commmethod.toInt(&ok);
         if (!ok)
         {
             // not an integer, attempt comma separated list
@@ -754,7 +754,7 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
                 if (commDetectMethod == COMM_DETECT_UNINIT) {
                     commDetectMethod = skipTypes->value(val);
                 } else {
-                    commDetectMethod = (SkipTypes) ((int)commDetectMethod
+                    commDetectMethod = (SkipType) ((int)commDetectMethod
                                                   | (int)skipTypes->value(val));
                 }
             }
@@ -780,12 +780,11 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
         }
         else if (query.next())
         {
-            commDetectMethod = (enum SkipTypes)query.value(0).toInt();
+            commDetectMethod = (SkipType)query.value(0).toInt();
             if (commDetectMethod == COMM_DETECT_COMMFREE)
             {
                 // if the channel is commercial free, drop to the default instead
-                commDetectMethod =
-                        (enum SkipTypes)gCoreContext->GetNumSetting(
+                commDetectMethod = (SkipType)gCoreContext->GetNumSetting(
                                     "CommercialSkipMethod", COMM_DETECT_ALL);
                 LOG(VB_COMMFLAG, LOG_INFO,
                         QString("Chanid %1 is marked as being Commercial Free, "
@@ -794,8 +793,7 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
             }
             else if (commDetectMethod == COMM_DETECT_UNINIT)
                 // no value set, so use the database default
-                commDetectMethod =
-                        (enum SkipTypes)gCoreContext->GetNumSetting(
+                commDetectMethod = (SkipType)gCoreContext->GetNumSetting(
                                      "CommercialSkipMethod", COMM_DETECT_ALL);
             LOG(VB_COMMFLAG, LOG_INFO,
                 QString("Using method: %1 from channel %2")

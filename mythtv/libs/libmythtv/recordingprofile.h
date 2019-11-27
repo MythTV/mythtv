@@ -102,7 +102,7 @@ class MTV_PUBLIC RecordingProfile : public GroupSetting
     static QString getName(int id);
 
     // Hardcoded DB group values
-    typedef enum RecProfileGroups
+    enum RecProfileGroup
     {
         AllGroups            =  0,
         SoftwareEncoderGroup =  1,
@@ -119,7 +119,7 @@ class MTV_PUBLIC RecordingProfile : public GroupSetting
         ASIGroup             = 15,
         OCURGroup            = 16,
         CetonGroup           = 17
-    } RecProfileGroup;
+    };
 
     static QMap<int, QString> GetProfiles(RecProfileGroup group = AllGroups);
     static QMap<int, QString> GetTranscodingProfiles();

@@ -96,12 +96,12 @@ enum scheduleEditTypes {
 /**
  * Type of message displayed in ShowNoRecorderDialog()
  */
-typedef enum
+enum NoRecorderMsg
 {
     kNoRecorders = 0,  ///< No free recorders
     kNoCurrRec = 1,    ///< No current recordings
     kNoTuners = 2,     ///< No capture cards configured
-} NoRecorderMsg;
+};
 
 enum {
     kStartTVNoFlags          = 0x00,

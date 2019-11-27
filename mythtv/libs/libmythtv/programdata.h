@@ -24,7 +24,7 @@ class MSqlQuery;
 class MTV_PUBLIC DBPerson
 {
   public:
-    typedef enum
+    enum Role
     {
         kUnknown = 0,
         kActor,
@@ -38,7 +38,7 @@ class MTV_PUBLIC DBPerson
         kPresenter,
         kCommentator,
         kGuest,
-    } Role;
+    };
 
     DBPerson(const DBPerson&);
     DBPerson(Role _role, QString _name);

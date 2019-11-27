@@ -53,12 +53,12 @@ typedef vector<TSPacketListenerAV*>     ts_av_listener_vec_t;
 typedef vector<MPEGSingleProgramStreamListener*> mpeg_sp_listener_vec_t;
 typedef vector<PSStreamListener*>       ps_listener_vec_t;
 
-typedef enum
+enum CryptStatus
 {
     kEncUnknown   = 0,
     kEncDecrypted = 1,
     kEncEncrypted = 2,
-} CryptStatus;
+};
 
 class MTV_PUBLIC CryptInfo
 {
@@ -78,13 +78,13 @@ class MTV_PUBLIC CryptInfo
     uint decrypted_min;
 };
 
-typedef enum
+enum PIDPriority
 {
     kPIDPriorityNone   = 0,
     kPIDPriorityLow    = 1,
     kPIDPriorityNormal = 2,
     kPIDPriorityHigh   = 3,
-} PIDPriority;
+};
 typedef QMap<uint, PIDPriority> pid_map_t;
 
 class MTV_PUBLIC MPEGStreamData : public EITSource

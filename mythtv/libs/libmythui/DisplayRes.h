@@ -19,7 +19,7 @@
  *  works for X (Linux/BSD/UNIX) and Mac OS X.
  */
 
-typedef enum
+enum tmode
 {
     GUI          = 0,
     VIDEO        = 1,
@@ -27,7 +27,7 @@ typedef enum
     CUSTOM_VIDEO = 3,
     DESKTOP      = 4,
     MAX_MODES    = 5,
-} tmode;
+};
 
 class MUI_PUBLIC DisplayRes
 {

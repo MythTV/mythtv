@@ -11,9 +11,9 @@ class QSqlDatabase;
 class MythContext;
 class QPainter;
 
-typedef enum {
+enum MythPluginType {
     kPluginType_Module = 0
-} MythPluginType;
+};
 
 class MythPlugin : public QLibrary
 {

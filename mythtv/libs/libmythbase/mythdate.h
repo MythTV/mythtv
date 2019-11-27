@@ -9,7 +9,7 @@
 namespace MythDate
 {
 
-typedef enum Formats
+enum Format
 {
     ISODate        = Qt::ISODate,   ///< Default UTC
     kFilename      = 0x000100,      ///< Default UTC, "yyyyMMddhhmmss"
@@ -27,7 +27,7 @@ typedef enum Formats
     kRFC822        = 0x020000,      ///< HTTP Date format
     kOverrideUTC   = 0x100000,      ///< Present date/time in UTC
     kOverrideLocal = 0x200000,      ///< Present date/time in localtime
-} Format;
+};
 
 /// Returns current Date and Time in UTC.
 /// \param stripped if true milliseconds are stripped

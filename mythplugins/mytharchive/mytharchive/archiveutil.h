@@ -13,13 +13,13 @@
 
 class ProgramInfo;
 
-typedef enum
+enum ARCHIVEDESTINATION
 {
     AD_DVD_SL = 0,
     AD_DVD_DL = 1,
     AD_DVD_RW = 2,
     AD_FILE   = 3
-} ARCHIVEDESTINATION;
+};
 
 Q_DECLARE_METATYPE (ARCHIVEDESTINATION);
 

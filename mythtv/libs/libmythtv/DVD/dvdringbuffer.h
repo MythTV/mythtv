@@ -199,12 +199,12 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     int safe_read(void *data, uint sz) override; //RingBuffer
     long long SeekInternal(long long pos, int whence) override; //RingBuffer
 
-    typedef enum
+    enum processState_t
     {
         PROCESS_NORMAL,
         PROCESS_REPROCESS,
         PROCESS_WAIT
-    }processState_t;
+    };
 
     dvdnav_t      *m_dvdnav                 {nullptr};
     unsigned char  m_dvdBlockWriteBuf[DVD_BLOCK_SIZE] {0};

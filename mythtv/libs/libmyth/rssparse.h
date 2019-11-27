@@ -17,12 +17,12 @@
 #include "mythexp.h"
 #include "mythtypes.h"
 
-typedef enum ArticleTypes {
+enum ArticleType {
     VIDEO_FILE = 0,
     VIDEO_PODCAST = 1,
     AUDIO_FILE = 2,
     AUDIO_PODCAST = 3
-} ArticleType;
+};
 
 /** Describes an enclosure associated with an item.
  */

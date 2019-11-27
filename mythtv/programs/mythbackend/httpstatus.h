@@ -18,13 +18,13 @@
 #include "httpserver.h"
 #include "programinfo.h"
 
-typedef enum 
+enum HttpStatusMethod
 {
     HSM_Unknown         =  0,
     HSM_GetStatusHTML   =  1,
     HSM_GetStatusXML    =  2
 
-} HttpStatusMethod;
+};
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////

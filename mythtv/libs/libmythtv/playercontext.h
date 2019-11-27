@@ -36,12 +36,12 @@ struct osdInfo
     QHash<QString,int>  values;
 };
 
-typedef enum
+enum PseudoState
 {
     kPseudoNormalLiveTV  = 0,
     kPseudoChangeChannel = 1,
     kPseudoRecording     = 2,
-} PseudoState;
+};
 
 typedef deque<QString>         StringDeque;
 

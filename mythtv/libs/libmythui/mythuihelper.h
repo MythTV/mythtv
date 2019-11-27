@@ -21,13 +21,13 @@ class QWidget;
 class QPixmap;
 class QSize;
 
-typedef enum ImageCacheMode
+enum ImageCacheMode
 {
     kCacheNormal          = 0x0,
     kCacheIgnoreDisk      = 0x1,
     kCacheCheckMemoryOnly = 0x2,
     kCacheForceStat       = 0x4,
-} ImageCacheMode;
+};
 
 struct MUI_PUBLIC MythUIMenuCallbacks
 {

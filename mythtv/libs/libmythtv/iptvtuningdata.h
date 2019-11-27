@@ -15,15 +15,15 @@
 class MTV_PUBLIC IPTVTuningData
 {
   public:
-    typedef enum FECType
+    enum FECType
     {
         kNone,
         kRFC2733,
         kRFC5109,
         kSMPTE2022,
-    } FECType;
+    };
 
-    typedef enum IPTVType
+    enum IPTVType
     {
         kData = 1,
         kRFC2733_1,
@@ -32,9 +32,9 @@ class MTV_PUBLIC IPTVTuningData
         kRFC5109_2,
         kSMPTE2022_1,
         kSMPTE2022_2,
-    } IPTVType;
+    };
 
-    typedef enum IPTVProtocol
+    enum IPTVProtocol
     {
         inValid = 0,
         udp,
@@ -42,7 +42,7 @@ class MTV_PUBLIC IPTVTuningData
         rtsp,
         http_ts,
         http_hls
-    } IPTVProtocol;
+    };
 
     IPTVTuningData()
     {

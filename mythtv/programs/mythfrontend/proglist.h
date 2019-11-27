@@ -83,7 +83,7 @@ class ProgLister : public ScheduleCommon
     void SwitchToPreviousView(void);
     void SwitchToNextView(void);
 
-    typedef enum { kTimeSort, kPrevTitleSort, kTitleSort, } SortBy;
+    enum SortBy { kTimeSort, kPrevTitleSort, kTitleSort, };
     SortBy GetSortBy(void) const;
     void SortList(SortBy sortby, bool reverseSort);
 

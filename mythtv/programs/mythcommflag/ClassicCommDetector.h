@@ -112,7 +112,7 @@ class ClassicCommDetector : public CommDetectorBase
         void CleanupFrameInfo(void);
         void GetLogoCommBreakMap(show_map_t &map);
 
-        enum SkipTypes m_commDetectMethod;
+        SkipType m_commDetectMethod;
         frm_dir_map_t m_lastSentCommBreakMap;
         bool m_commBreakMapUpdateRequested {false};
         bool m_sendCommBreakMapUpdates     {false};

@@ -53,12 +53,12 @@ class QSslCertificate;
 class QSslConfiguration;
 #endif
 
-typedef enum
+enum ContentProtection
 {
     cpLocalNoAuth = 0x00,  // Can only be accessed locally, but no authentication is required
     cpLocalAuth   = 0x01,  // Can only be accessed locally, authentication is required
     cpRemoteAuth  = 0x02   // Can be accessed remotely, authentication is required
-} ContentProtection;
+};
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////

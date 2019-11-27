@@ -14,12 +14,12 @@
 #include "mythexp.h"
 #include "audiooutputsettings.h"
 
-typedef enum {
+enum AudioOutputSource {
     AUDIOOUTPUT_UNKNOWN,
     AUDIOOUTPUT_VIDEO,
     AUDIOOUTPUT_MUSIC,
     AUDIOOUTPUT_TELEPHONY,
-} AudioOutputSource;
+};
 
 class MPUBLIC AudioSettings
 {

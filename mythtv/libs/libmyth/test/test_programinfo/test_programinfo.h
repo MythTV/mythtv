@@ -83,7 +83,7 @@ class TestProgramInfo : public QObject
 
             (uint) -1, /* record id */
 
-            RecordingDupInTypes::kDupsUnset, /* dupin */
+            RecordingDupInType::kDupsUnset, /* dupin */
             RecordingDupMethodType::kDupCheckUnset, /* dupmethod */
 
             (uint) -1, /* find id */

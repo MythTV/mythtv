@@ -25,7 +25,7 @@
 
 class UPnpCDS;
 
-typedef enum 
+enum UPnpCDSMethod
 {
     CDSM_Unknown                = 0,
     CDSM_GetServiceDescription  = 1,
@@ -36,18 +36,16 @@ typedef enum
     CDSM_GetSystemUpdateID      = 6,
     CDSM_GetFeatureList         = 7,
     CDSM_GetServiceResetToken   = 8
+};
 
-} UPnpCDSMethod;
-
-typedef enum
+enum UPnpCDSBrowseFlag
 {
     CDS_BrowseUnknown         = 0,
     CDS_BrowseMetadata        = 1,
     CDS_BrowseDirectChildren  = 2
+};
 
-} UPnpCDSBrowseFlag;
-
-typedef enum
+enum UPnpCDSClient
 {
     CDS_ClientDefault         = 0,      // (no special attention required)
     CDS_ClientWMP             = 1,      // Windows Media Player
@@ -55,7 +53,7 @@ typedef enum
     CDS_ClientMP101           = 3,      // Netgear MP101
     CDS_ClientXBox            = 4,      // XBox 360
     CDS_ClientSonyDB          = 5,      // Sony Blu-ray players
-} UPnpCDSClient;
+};
 
 typedef struct
 {

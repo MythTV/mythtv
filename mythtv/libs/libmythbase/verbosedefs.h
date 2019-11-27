@@ -71,7 +71,7 @@
 #endif
 
 #define LOGLEVEL_PREAMBLE \
-    typedef enum {
+    typedef enum { //NOLINT(modernize-use-using) included from C code
 #define LOGLEVEL_POSTAMBLE \
     } LogLevel_t;
 #define LOGLEVEL_MAP(name,value,shortname) \

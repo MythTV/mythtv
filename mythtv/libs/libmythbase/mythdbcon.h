@@ -212,11 +212,11 @@ class MBASE_PUBLIC MSqlQuery : private QSqlQuery
     /// \brief Checks DB connection + login (login info via Mythcontext)
     static bool testDBConnection();
 
-    typedef enum
+    enum ConnectionReuse
     {
         kDedicatedConnection,
         kNormalConnection,
-    } ConnectionReuse;
+    };
     /// \brief Only use this in combination with MSqlQuery constructor
     static MSqlQueryInfo InitCon(ConnectionReuse = kNormalConnection);
 

@@ -7,25 +7,25 @@
 #include <QObject>
 #include <QSize>
 
-typedef enum PIPState
+enum PIPState
 {
     kPIPOff = 0,
     kPIPonTV,
     kPIPStandAlone,
     kPBPLeft,
     kPBPRight,
-} PIPState;
+};
 
-typedef enum PIPLocation
+enum PIPLocation
 {
     kPIPTopLeft = 0,
     kPIPBottomLeft,
     kPIPTopRight,
     kPIPBottomRight,
     kPIP_END
-} PIPLocation;
+};
 
-typedef enum ZoomDirection
+enum ZoomDirection
 {
     kZoomHome = 0,
     kZoomIn,
@@ -41,9 +41,9 @@ typedef enum ZoomDirection
     kZoomAspectUp,
     kZoomAspectDown,
     kZoom_END
-} ZoomDirection;
+};
 
-typedef enum AspectOverrideMode
+enum AspectOverrideMode
 {
     kAspect_Toggle = -1,
     kAspect_Off = 0,
@@ -52,9 +52,9 @@ typedef enum AspectOverrideMode
     kAspect_14_9, // added after 16:9 so as not to upset existing setups.
     kAspect_2_35_1,
     kAspect_END
-} AspectOverrideMode;
+};
 
-typedef enum AdjustFillMode
+enum AdjustFillMode
 {
     kAdjustFill_Toggle = -1,
     kAdjustFill_Off = 0,
@@ -67,26 +67,26 @@ typedef enum AdjustFillMode
     kAdjustFill_END,
     kAdjustFill_AutoDetect_DefaultOff,
     kAdjustFill_AutoDetect_DefaultHalf,
-} AdjustFillMode;
+};
 
-typedef enum LetterBoxColour
+enum LetterBoxColour
 {
     kLetterBoxColour_Toggle = -1,
     kLetterBoxColour_Black = 0,
     kLetterBoxColour_Gray25,
     kLetterBoxColour_END
-} LetterBoxColour;
+};
 
-typedef enum FrameScanType
+enum FrameScanType
 {
     kScan_Ignore       = -1,
     kScan_Detect       =  0,
     kScan_Interlaced   =  1,
     kScan_Intr2ndField =  2,
     kScan_Progressive  =  3,
-} FrameScanType;
+};
 
-typedef enum PictureAttribute
+enum PictureAttribute
 {
     kPictureAttribute_None = 0,
     kPictureAttribute_MIN = 0,
@@ -97,9 +97,9 @@ typedef enum PictureAttribute
     kPictureAttribute_Range,
     kPictureAttribute_Volume,
     kPictureAttribute_MAX
-} PictureAttribute;
+};
 
-typedef enum PictureAttributeSupported
+enum PictureAttributeSupported
 {
     kPictureAttributeSupported_None       = 0x00,
     kPictureAttributeSupported_Brightness = 0x01,
@@ -108,7 +108,7 @@ typedef enum PictureAttributeSupported
     kPictureAttributeSupported_Hue        = 0x08,
     kPictureAttributeSupported_Range      = 0x10,
     kPictureAttributeSupported_Volume     = 0x20,
-} PictureAttributeSupported;
+};
 
 #define ALL_PICTURE_ATTRIBUTES static_cast<PictureAttributeSupported> \
     (kPictureAttributeSupported_Brightness | \
@@ -117,21 +117,21 @@ typedef enum PictureAttributeSupported
      kPictureAttributeSupported_Hue | \
      kPictureAttributeSupported_Range)
 
-typedef enum StereoscopicMode
+enum StereoscopicMode
 {
     kStereoscopicModeNone,
     kStereoscopicModeSideBySide,
     kStereoscopicModeSideBySideDiscard,
     kStereoscopicModeTopAndBottom,
     kStereoscopicModeTopAndBottomDiscard,
-} StereoscopicMode;
+};
 
-typedef enum PrimariesMode
+enum PrimariesMode
 {
     PrimariesDisabled = 0,
     PrimariesAuto,
     PrimariesAlways
-} PrimariesMode;
+};
 
 inline QString StereoscopictoString(StereoscopicMode mode)
 {
@@ -151,11 +151,11 @@ inline QString StereoscopictoString(StereoscopicMode mode)
     return QObject::tr("Unknown");
 }
 
-typedef enum VideoErrorState
+enum VideoErrorState
 {
     kError_None            = 0x00,
     kError_Unknown         = 0x01,
-} VideoErrorState;
+};
 
 inline bool is_interlaced(FrameScanType scan)
 {

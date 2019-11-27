@@ -72,12 +72,12 @@ class DecoderHandler : public QObject, public MythObservable
   Q_OBJECT
 
   public:
-    typedef enum 
+    enum State
     {
         ACTIVE,
         LOADING,
         STOPPED
-    } State;
+    };
 
     DecoderHandler(void) = default;
     virtual ~DecoderHandler(void);

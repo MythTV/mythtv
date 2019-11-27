@@ -62,7 +62,7 @@ class PlaybackBox : public ScheduleCommon
 
   public:
     // ViewType values cannot change; they are stored in the database.
-    typedef enum {
+    enum ViewType {
         TitlesOnly = 0,
         TitlesCategories = 1,
         TitlesCategoriesRecGroups = 2,
@@ -71,16 +71,16 @@ class PlaybackBox : public ScheduleCommon
         CategoriesRecGroups = 5,
         RecGroups = 6,
         ViewTypes,                  // placeholder value, not in database
-    } ViewType;
+    };
 
     // Sort function when TitlesOnly. Values are stored in database.
-    typedef enum {
+    enum ViewTitleSort {
         TitleSortAlphabetical = 0,
         TitleSortRecPriority = 1,
         TitleSortMethods,           // placeholder value, not in database
-    } ViewTitleSort;
+    };
 
-    typedef enum {
+    enum ViewMask {
         VIEW_NONE       =  0x0000,
         VIEW_TITLES     =  0x0001,
         VIEW_CATEGORIES =  0x0002,
@@ -90,30 +90,30 @@ class PlaybackBox : public ScheduleCommon
         VIEW_LIVETVGRP  =  0x0020,
         // insert new entries above here
         VIEW_WATCHED    =  0x8000
-    } ViewMask;
+    };
 
-    typedef enum
+    enum DeletePopupType
     {
         kDeleteRecording,
         kStopRecording,
         kForceDeleteRecording,
-    } DeletePopupType;
+    };
 
-    typedef enum
+    enum DeleteFlags
     {
         kNoFlags       = 0x00,
         kForgetHistory = 0x01,
         kForce         = 0x02,
         kIgnore        = 0x04,
         kAllRemaining  = 0x08,
-    } DeleteFlags;
+    };
 
-    typedef enum
+    enum killStateType
     {
         kNvpToPlay,
         kNvpToStop,
         kDone
-    } killStateType;
+    };
 
     PlaybackBox(MythScreenStack *parent, const QString& name,
                 TV *player = nullptr, bool showTV = false);

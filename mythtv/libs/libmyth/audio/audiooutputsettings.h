@@ -21,7 +21,7 @@ extern "C" {
 }
 #include "eldutils.h"
 
-typedef enum {
+enum AudioFormat {
     FORMAT_NONE = 0,
     FORMAT_U8,
     FORMAT_S16,
@@ -29,9 +29,9 @@ typedef enum {
     FORMAT_S24,
     FORMAT_S32,
     FORMAT_FLT
-} AudioFormat;
+};
 
-typedef enum {
+enum DigitalFeature {
     FEATURE_NONE   = 0,
     FEATURE_AC3    = 1 << 0,
     FEATURE_DTS    = 1 << 1,
@@ -40,7 +40,7 @@ typedef enum {
     FEATURE_TRUEHD = 1 << 4,
     FEATURE_DTSHD  = 1 << 5,
     FEATURE_AAC    = 1 << 6,
-} DigitalFeature;
+};
 
 static const int srs[] = { 5512, 8000,  11025, 16000, 22050, 32000,  44100,
                            48000, 88200, 96000, 176400, 192000 };

@@ -7,7 +7,7 @@ extern "C"
 #include "libavcodec/avcodec.h"
 }
 
-typedef enum
+enum MythCodecID
 {
 // if you add anything to this list please update
 // myth2av_codecid and get_encoding_type
@@ -255,7 +255,7 @@ typedef enum
     kCodec_HEVC_MMAL_DEC,
 
     kCodec_MMAL_DEC_END
-} MythCodecID;
+};
 
 // MythCodecID convenience functions
 #define codec_is_std(id)      (id < kCodec_NORMAL_END)

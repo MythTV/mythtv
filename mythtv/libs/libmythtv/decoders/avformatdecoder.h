@@ -180,7 +180,7 @@ class AvFormatDecoder : public DecoderBase
     // Stream language info
     virtual int GetTeletextLanguage(uint lang_idx) const;
     virtual int GetSubtitleLanguage(uint subtitle_index, uint stream_index);
-    virtual int GetCaptionLanguage(TrackTypes trackType, int service_num);
+    virtual int GetCaptionLanguage(TrackType trackType, int service_num);
     virtual int GetAudioLanguage(uint audio_index, uint stream_index);
     virtual AudioTrackType GetAudioTrackType(uint stream_index);
 

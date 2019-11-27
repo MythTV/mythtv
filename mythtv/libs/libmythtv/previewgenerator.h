@@ -36,7 +36,7 @@ class MTV_PUBLIC PreviewGenerator : public QObject, public MThread
     Q_OBJECT
 
   public:
-    typedef enum Mode
+    enum Mode
     {
         kNone           = 0x0,
         kLocal          = 0x1,
@@ -44,7 +44,7 @@ class MTV_PUBLIC PreviewGenerator : public QObject, public MThread
         kLocalAndRemote = 0x3,
         kForceLocal     = 0x5,
         kModeMask       = 0x7,
-    } Mode;
+    };
 
   public:
     PreviewGenerator(const ProgramInfo *pginfo,

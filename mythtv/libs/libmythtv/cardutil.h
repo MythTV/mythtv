@@ -24,7 +24,7 @@ MTV_PUBLIC QString get_on_input(const QString&, uint);
 
 MTV_PUBLIC bool set_on_input(const QString&, uint, const QString&);
 
-typedef enum
+enum dvb_dev_type_t
 {
     DVB_DEV_FRONTEND = 1,
     DVB_DEV_DVR,
@@ -32,7 +32,7 @@ typedef enum
     DVB_DEV_CA,
     DVB_DEV_AUDIO,
     DVB_DEV_VIDEO,
-} dvb_dev_type_t;
+};
 
 /** \class CardUtil
  *  \brief Collection of helper utilities for input DB use

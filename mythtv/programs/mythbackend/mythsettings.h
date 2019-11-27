@@ -34,14 +34,14 @@ class MythSettingGroup : public MythSettingBase
 class MythSetting : public MythSettingBase
 {
   public:
-    typedef enum {
+    enum SettingType {
         kFile,
         kHost,
         kGlobal,
         kInvalidSettingType,
-    } SettingType;
+    };
 
-    typedef enum {
+    enum DataType {
         kInteger,
         kUnsignedInteger,
         kIntegerRange,
@@ -57,7 +57,7 @@ class MythSetting : public MythSettingBase
         kTimeOfDay,
         kOther,
         kInvalidDataType,
-    } DataType;
+    };
 
     MythSetting(const QString& _value, const QString& _default_data,
                 SettingType _stype, const QString& _label,

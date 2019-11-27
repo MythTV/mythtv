@@ -2491,7 +2491,7 @@ int AvFormatDecoder::GetSubtitleLanguage(uint subtitle_index, uint stream_index)
 }
 
 /// Return ATSC Closed Caption Language
-int AvFormatDecoder::GetCaptionLanguage(TrackTypes trackType, int service_num)
+int AvFormatDecoder::GetCaptionLanguage(TrackType trackType, int service_num)
 {
     int ret = -1;
     for (uint i = 0; i < (uint) m_pmt_track_types.size(); i++)

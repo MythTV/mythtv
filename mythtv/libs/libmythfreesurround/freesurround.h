@@ -26,13 +26,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 class FreeSurround
 {
 public:
-    typedef enum 
+    enum SurroundMode
     {
         SurroundModePassive,
         SurroundModeActiveSimple,
         SurroundModeActiveLinear,
         SurroundModePassiveHall
-    } SurroundMode;
+    };
 public:
     FreeSurround(uint srate, bool moviemode, SurroundMode mode);
     ~FreeSurround();

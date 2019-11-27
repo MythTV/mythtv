@@ -15,12 +15,12 @@
 // Myth
 #include "mythexp.h"
 
-typedef enum PIAction {
+enum PIAction {
     kPIAdd,
     kPIDelete,
     kPIUpdate,
     kPIUpdateFileSize,
-} PIAction;
+};
 
 class MPUBLIC PIKeyAction
 {

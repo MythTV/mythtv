@@ -27,22 +27,20 @@
 #define SSDP_PORT       1900
 #define SSDP_SEARCHPORT 6549
 
-typedef enum
+enum SSDPMethod
 {
     SSDPM_Unknown         = 0,
     SSDPM_GetDeviceDesc   = 1,
     SSDPM_GetDeviceList   = 2
+};
 
-} SSDPMethod;
-
-typedef enum
+enum SSDPRequestType
 {
     SSDP_Unknown        = 0,
     SSDP_MSearch        = 1,
     SSDP_MSearchResp    = 2,
     SSDP_Notify         = 3
-
-} SSDPRequestType;
+};
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////

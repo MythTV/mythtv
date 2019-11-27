@@ -27,14 +27,14 @@
 #include "mythuianimation.h"
 #include "mythegl.h"
 
-typedef enum
+enum GLFeatures
 {
     kGLFeatNone    = 0x0000,
     kGLBufferMap   = 0x0001,
     kGLExtRects    = 0x0002,
     kGLExtRGBA16   = 0x0004,
     kGLExtSubimage = 0x0008
-} GLFeatures;
+};
 
 #define TEX_OFFSET 8
 
@@ -66,7 +66,7 @@ class MUI_PUBLIC MythGLTexture
     Q_DISABLE_COPY(MythGLTexture)
 };
 
-typedef enum
+enum DefaultShaders
 {
     kShaderSimple  = 0,
     kShaderDefault,
@@ -75,7 +75,7 @@ typedef enum
     kShaderVertLine,
     kShaderHorizLine,
     kShaderCount,
-} DefaultShaders;
+};
 
 class QWindow;
 class QPaintDevice;

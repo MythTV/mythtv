@@ -76,7 +76,7 @@ class META_PUBLIC MetaIOID3 : public MetaIOTagLib
 
     TagLib::File *m_file {nullptr};
 
-    typedef enum { kMPEG, kFLAC } TagType;
+    enum TagType { kMPEG, kFLAC };
     TagType m_fileType {kMPEG};
 };
 

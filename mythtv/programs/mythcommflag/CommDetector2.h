@@ -57,7 +57,7 @@ class CommDetector2 : public CommDetectorBase
     int computeBreaks(long long nframes);
 
   private:
-    enum SkipTypes               m_commDetectMethod;
+    SkipType                     m_commDetectMethod;
     bool                         m_showProgress            {false};
     bool                         m_fullSpeed               {false};
     MythPlayer                  *m_player                  {nullptr};

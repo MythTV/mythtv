@@ -12,14 +12,14 @@
 #include "eventing.h"
 #include "mythcontext.h"
 
-typedef enum 
+enum MythFEXMLMethod
 {
     MFEXML_Unknown = 0,
     MFEXML_GetServiceDescription,
     MFEXML_GetScreenShot,
     MFEXML_ActionListTest,
     MFEXML_GetRemote,
-} MythFEXMLMethod;
+};
 
 class MythFEXML : public Eventing
 {

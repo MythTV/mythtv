@@ -79,14 +79,14 @@ class Event
     QDateTime m_startTime;
 };
 
-typedef enum
+enum State
 {
     IDLE,
     PREALARM,
     ALARM,
     ALERT,
     TAPE
-} State;
+};
 
 // event frame details
 typedef struct

@@ -488,13 +488,13 @@ class MPUBLIC ProgramInfo
     uint GetAudioProperties(void) const
         { return (m_properties & kAudioPropertyMask) >> kAudioPropertyOffset; }
 
-    typedef enum
+    enum Verbosity
     {
         kLongDescription,
         kTitleSubtitle,
         kRecordingKey,
         kSchedulingKey,
-    } Verbosity;
+    };
     QString toString(Verbosity v = kLongDescription, const QString& sep = ":",
                      const QString& grp = "\"") const;
 

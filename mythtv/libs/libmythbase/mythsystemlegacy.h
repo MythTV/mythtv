@@ -48,7 +48,6 @@
 
 #include "exitcodes.h"  // included for GENERIC_EXIT_OK
 #include "mythsystem.h" // included for MythSystemFlag and MythSignal
-typedef MythSystemMask MythSystemFlag;
 
 #include <QStringList>
 #include <QSemaphore>

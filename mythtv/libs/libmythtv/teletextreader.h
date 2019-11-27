@@ -11,7 +11,7 @@
 
 using namespace std;
 
-typedef enum
+enum TTColor
 {
     kTTColorBlack       = 0,
     kTTColorRed         = 1,
@@ -22,7 +22,7 @@ typedef enum
     kTTColorCyan        = 6,
     kTTColorWhite       = 7,
     kTTColorTransparent = 8,
-} TTColor;
+};
 
 #define TP_SUPPRESS_HEADER  0x01
 #define TP_UPDATE_INDICATOR 0x02

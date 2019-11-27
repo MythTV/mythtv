@@ -16,7 +16,7 @@
 
 #include "mythexp.h"
 
-typedef enum RecordingTypes
+enum RecordingType
 {
     kNotRecording = 0,
     kSingleRecord = 1,
@@ -30,7 +30,7 @@ typedef enum RecordingTypes
     //kFindDailyRecord = 9, (Obsolete)
     //kFindWeeklyRecord = 10, (Obsolete)
     kTemplateRecord = 11
-} RecordingType; // note stored in uint8_t in ProgramInfo
+}; // note stored in uint8_t in ProgramInfo
 MPUBLIC QString toString(RecordingType);
 MPUBLIC QString toDescription(RecordingType);
 MPUBLIC QString toRawString(RecordingType);
@@ -39,20 +39,20 @@ MPUBLIC RecordingType recTypeFromString(const QString&);
 
 MPUBLIC int RecTypePrecedence(RecordingType rectype);
 
-typedef enum RecordingDupInTypes
+enum RecordingDupInType
 {
     kDupsUnset          = 0x00,
     kDupsInRecorded     = 0x01,
     kDupsInOldRecorded  = 0x02,
     kDupsInAll          = 0x0F,
     kDupsNewEpi         = 0x10
-} RecordingDupInType; // note stored in uint8_t in ProgramInfo
+}; // note stored in uint8_t in ProgramInfo
 MPUBLIC QString toString(RecordingDupInType);
 MPUBLIC QString toDescription(RecordingDupInType);
 MPUBLIC QString toRawString(RecordingDupInType);
 MPUBLIC RecordingDupInType dupInFromString(const QString&);
 
-typedef enum RecordingDupMethodType
+enum RecordingDupMethodType
 {
     kDupCheckUnset    = 0x00,
     kDupCheckNone     = 0x01,
@@ -60,13 +60,13 @@ typedef enum RecordingDupMethodType
     kDupCheckDesc     = 0x04,
     kDupCheckSubDesc  = 0x06,
     kDupCheckSubThenDesc = 0x08
-} RecordingDupMethodType; // note stored in uint8_t in ProgramInfo
+}; // note stored in uint8_t in ProgramInfo
 MPUBLIC QString toString(RecordingDupMethodType);
 MPUBLIC QString toDescription(RecordingDupMethodType);
 MPUBLIC QString toRawString(RecordingDupMethodType);
 MPUBLIC RecordingDupMethodType dupMethodFromString(const QString&);
 
-typedef enum RecSearchTypes
+enum RecSearchType
 {
     kNoSearch = 0,
     kPowerSearch,
@@ -74,7 +74,7 @@ typedef enum RecSearchTypes
     kKeywordSearch,
     kPeopleSearch,
     kManualSearch
-} RecSearchType;
+};
 MPUBLIC QString toString(RecSearchType);
 MPUBLIC QString toRawString(RecSearchType);
 MPUBLIC RecSearchType searchTypeFromString(const QString&);

@@ -39,12 +39,12 @@ class BackendSelection : public MythScreenType
     Q_OBJECT
 
   public:
-    typedef enum Decision
+    enum Decision
     {
         kManualConfigure = -1,
         kCancelConfigure = 0,
         kAcceptConfigure = +1,
-    } BackendDecision;
+    };
     static Decision Prompt(
         DatabaseParams *dbParams, Configuration *pConfig);
 
@@ -88,7 +88,7 @@ class BackendSelection : public MythScreenType
 
     QMutex            m_mutex;
 
-    BackendDecision   m_backendDecision {kCancelConfigure};
+    Decision          m_backendDecision {kCancelConfigure};
     QEventLoop       *m_loop            {nullptr};
 };
 

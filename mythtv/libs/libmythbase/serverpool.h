@@ -26,12 +26,12 @@
 
 class PrivUdpSocket;
 
-typedef enum PoolServerTypes
+enum PoolServerType
 {
     kTCPServer,
     kUDPServer,
     kSSLServer
-} PoolServerType;
+};
 
 // Making a 'Priv' server public is a contradiction, it was this or passing
 // through the server type in the newConnection signal which would have required
