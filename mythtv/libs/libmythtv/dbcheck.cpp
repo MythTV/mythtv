@@ -20,6 +20,7 @@ using namespace std;
 #include "recordingprofile.h"
 #include "recordinginfo.h"
 #include "cardutil.h"
+#include "videodisplayprofile.h"
 
 // TODO convert all dates to UTC
 
@@ -3519,6 +3520,162 @@ nullptr
             nullptr
         };
         if (!performActualUpdate(updates, "1357", dbver))
+            return false;
+    }
+
+    if (dbver == "1357")
+    {
+        // convert old VideoDisplayProfile settings to new format
+        ProfileItem temp;
+        vector<ProfileItem> profiles;
+
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("SELECT profileid, value, data FROM displayprofiles "
+                      "ORDER BY profileid");
+
+        for (;;)
+        {
+            if (!query.exec())
+                break;
+
+            uint currentprofile = 0;
+            while (query.next())
+            {
+                if (query.value(0).toUInt() != currentprofile)
+                {
+                    if (currentprofile)
+                    {
+                        temp.SetProfileID(currentprofile);
+                        profiles.push_back(temp);
+                    }
+                    temp.Clear();
+                    currentprofile = query.value(0).toUInt();
+                }
+                temp.Set(query.value(1).toString(), query.value(2).toString());
+            }
+
+            if (currentprofile)
+            {
+                temp.SetProfileID(currentprofile);
+                profiles.push_back(temp);
+            }
+
+            foreach(ProfileItem profile, profiles)
+            {
+                QString newdecoder;
+                QString newrender;
+                QString newdeint0;
+                QString newdeint1;
+
+                QString olddecoder = profile.Get("pref_decoder");
+                QString oldrender  = profile.Get("pref_videorenderer");
+                QString olddeint0  = profile.Get("pref_deint0");
+                QString olddeint1  = profile.Get("pref_deint1");
+
+                if (oldrender == "xv-blit")
+                {
+                    newdecoder = "ffmpeg";
+                    newrender  = "opengl-yv12";
+                }
+                if (olddecoder == "openmax" || oldrender == "openmax")
+                {
+                    newdecoder = "mmal-dec";
+                    newrender  = "opengl-yv12";
+                }
+                if ((olddecoder == "mediacodec") || (olddecoder == "nvdec") ||
+                    (olddecoder == "vda") || (olddecoder == "vaapi2") ||
+                    (olddecoder == "vaapi" && oldrender == "openglvaapi") ||
+                    (olddecoder == "vdpau" && oldrender == "vdpau"))
+                {
+                    if (oldrender != "opengl-hw")
+                        newrender = "opengl-hw";
+                }
+                if (olddecoder == "vda")
+                    newdecoder = "vtb";
+                if (olddecoder == "vaapi2")
+                    newdecoder = "vaapi";
+
+                auto UpdateDeinterlacer = [](QString Olddeint, QString &Newdeint, QString Decoder)
+                {
+                    if (Olddeint.isEmpty())
+                    {
+                        Newdeint = "none";
+                    }
+                    else if (Olddeint == "none" ||
+                             Olddeint.contains(DEINT_QUALITY_SHADER) ||
+                             Olddeint.contains(DEINT_QUALITY_DRIVER) ||
+                             Olddeint.contains(DEINT_QUALITY_LOW) ||
+                             Olddeint.contains(DEINT_QUALITY_MEDIUM) ||
+                             Olddeint.contains(DEINT_QUALITY_HIGH))
+                    {
+                        return;
+                    }
+
+                    QStringList newsettings;
+                    bool driver = (Decoder != "ffmpeg") &&
+                        (Olddeint.contains("vaapi") || Olddeint.contains("vdpau") ||
+                         Olddeint.contains("nvdec"));
+                    if (driver)
+                        newsettings << DEINT_QUALITY_DRIVER;
+                    if (Olddeint.contains("opengl") || driver)
+                        newsettings << DEINT_QUALITY_SHADER;
+
+                    if (Olddeint.contains("greedy") || Olddeint.contains("yadif") ||
+                        Olddeint.contains("kernel") || Olddeint.contains("advanced") ||
+                        Olddeint.contains("compensated") || Olddeint.contains("adaptive"))
+                    {
+                        newsettings << DEINT_QUALITY_HIGH;
+                    }
+                    else if (Olddeint.contains("bob") || Olddeint.contains("onefield") ||
+                             Olddeint.contains("linedouble"))
+                    {
+                        newsettings << DEINT_QUALITY_LOW;
+                    }
+                    else
+                    {
+                        newsettings << DEINT_QUALITY_MEDIUM;
+                    }
+                    Newdeint = newsettings.join(":");
+                };
+
+                QString decoder = newdecoder.isEmpty() ? olddecoder : newdecoder;
+                UpdateDeinterlacer(olddeint0, newdeint0, decoder);
+                UpdateDeinterlacer(olddeint1, newdeint1, decoder);
+
+                auto UpdateData = [](uint ProfileID, QString Value, QString Data)
+                {
+                    MSqlQuery update(MSqlQuery::InitCon());
+                    update.prepare(
+                        "UPDATE displayprofiles SET data = :DATA "
+                        "WHERE profileid = :PROFILEID AND value = :VALUE");
+                    update.bindValue(":PROFILEID", ProfileID);
+                    update.bindValue(":VALUE",     Value);
+                    update.bindValue(":DATA",      Data);
+                    if (!update.exec())
+                        LOG(VB_GENERAL, LOG_ERR,
+                            QString("Error updating display profile id %1").arg(ProfileID));
+                };
+
+                uint id = profile.GetProfileID();
+                if (!newdecoder.isEmpty())
+                    UpdateData(id, "pref_decoder", newdecoder);
+                if (!newrender.isEmpty())
+                    UpdateData(id, "pref_videorenderer", newrender);
+                if (!newdeint0.isEmpty())
+                    UpdateData(id, "pref_deint0", newdeint0);
+                if (!newdeint1.isEmpty())
+                    UpdateData(id, "pref_deint1", newdeint1);
+            }
+            break;
+        }
+
+        // remove old studio levels keybinding
+        const char *updates[] = {
+            "DELETE FROM keybindings WHERE action='TOGGLESTUDIOLEVELS'",
+            nullptr
+        };
+
+        if (!performActualUpdate(&updates[0], "1358", dbver))
             return false;
     }
 
