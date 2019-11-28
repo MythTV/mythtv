@@ -6634,7 +6634,7 @@ void TV::DoArbSeek(PlayerContext *ctx, ArbSeekWhence whence,
     if (!ok)
         return;
 
-    float time = ((seek / 100.0F) * 3600) + ((seek % 100) * 60);
+    float time = (int(seek / 100) * 3600) + ((seek % 100) * 60);
 
     if (whence == ARBSEEK_FORWARD)
         DoSeek(ctx, time, tr("Jump Ahead"),
