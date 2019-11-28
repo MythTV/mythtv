@@ -133,13 +133,23 @@ class EPGSettings : public GroupSetting
     EPGSettings();
 };
 
+class MythDisplay;
 class AppearanceSettings : public GroupSetting
 {
-    Q_DECLARE_TR_FUNCTIONS(AppearanceSettings);
+    Q_OBJECT
 
   public:
     AppearanceSettings();
+   ~AppearanceSettings() override;
     void applyChange() override; // GroupSetting
+
+  public slots:
+    void PopulateScreens(int Screens);
+
+  private:
+    HostComboBoxSetting *m_xineramaScreen { nullptr };
+    HostComboBoxSetting *m_xineramaAspect { nullptr };
+    MythDisplay         *m_display        { nullptr };
 };
 
 class HostRefreshRateComboBoxSetting : public HostComboBoxSetting

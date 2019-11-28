@@ -242,6 +242,8 @@ MythPlayer::~MythPlayer(void)
         delete detect_letter_box;
         detect_letter_box = nullptr;
     }
+
+    MythDisplay::AcquireRelease(false);
 }
 
 void MythPlayer::SetWatchingRecording(bool mode)
@@ -499,7 +501,7 @@ void MythPlayer::ReinitVideo(bool ForceUpdate)
         // the display refresh rate may have been changed by VideoOutput
         if (videosync)
         {
-            int ri = MythDisplay::GetDisplayInfo(frame_interval).Rate();
+            int ri = m_display->GetDisplayInfo(frame_interval).Rate();
             if (ri != videosync->getRefreshInterval())
             {
                 LOG(VB_PLAYBACK, LOG_INFO, LOC +
@@ -1565,7 +1567,7 @@ void MythPlayer::InitAVSync(void)
 
     repeat_delay = 0;
 
-    refreshrate = MythDisplay::GetDisplayInfo(frame_interval).Rate();
+    refreshrate = m_display->GetDisplayInfo(frame_interval).Rate();
 
     // Number of frames over which to average time divergence
     avsync_averaging=4;
@@ -2420,7 +2422,7 @@ bool MythPlayer::CanSupportDoubleRate(void)
     else
     {
         // used by the decoder before videosync is created
-        refreshinterval = MythDisplay::GetDisplayInfo(frame_interval).Rate();
+        refreshinterval = m_display->GetDisplayInfo(frame_interval).Rate();
     }
 
     // At this point we may not have the correct frame rate.
@@ -2512,7 +2514,7 @@ void MythPlayer::VideoStart(void)
 
     float temp_speed = (play_speed == 0.0F) ? audio.GetStretchFactor() : play_speed;
     int fr_int = (1000000.0 / video_frame_rate / static_cast<double>(temp_speed));
-    int rf_int = MythDisplay::GetDisplayInfo(fr_int).Rate();
+    int rf_int = m_display->GetDisplayInfo(fr_int).Rate();
 
     // Default to interlaced playback but set the tracker to progressive
     // Enable autodetection of interlaced/progressive from video stream

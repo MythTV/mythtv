@@ -9,6 +9,7 @@
 // Std
 #include <vector>
 
+class MythDisplay;
 class MUI_PUBLIC DisplayRes : public ReferenceCounter
 {
   public:
@@ -36,18 +37,13 @@ class MUI_PUBLIC DisplayRes : public ReferenceCounter
     int    GetPhysicalHeight(void) const;
     double GetRefreshRate(void) const;
     double GetAspectRatio(void) const;
-    double GetPixelAspectRatio(void) const;
     std::vector<double> GetRefreshRates(int Width, int Height) const;
 
     virtual const DisplayResVector& GetVideoModes() const = 0;
 
   protected:
     DisplayRes(void);
-    virtual ~DisplayRes(void) = default;
-
-    virtual bool GetDisplayInfo(int &WidthPixels, int &HeightPixels,
-                                int &WidthMM,     int &HeightMM,
-                                double &RefreshRate, double &PixelAspectRatio) const = 0;
+    virtual ~DisplayRes(void);
     virtual bool SwitchToVideoMode(int Width, int Height, double Framerate) = 0;
 
   private:
@@ -58,7 +54,7 @@ class MUI_PUBLIC DisplayRes : public ReferenceCounter
     DisplayResScreen m_mode[MAX_MODES]    { };
     DisplayResScreen m_last               { }; // mirror of mode[current_mode]
     DisplayResMap    m_inSizeToOutputMode { };
-    double m_pixelAspectRatio             { 1.0 };
+    MythDisplay*     m_display            { nullptr };
 };
 
 #endif

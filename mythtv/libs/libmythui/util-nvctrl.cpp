@@ -75,7 +75,7 @@ bool MythNVControl::GetNvidiaRates(MythXDisplay *MythDisplay, std::vector<Displa
 
     if (!XNVCTRLIsNvScreen(xdisplay, xscreen))
     {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("The NV-CONTROL X extension is not available on screen %1 of '%2'")
+        LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("The NV-CONTROL X extension is not available on screen %1 of '%2'")
                 .arg(xscreen).arg(MythDisplay->GetDisplayName()));
         return result;
     }
@@ -85,22 +85,22 @@ bool MythNVControl::GetNvidiaRates(MythXDisplay *MythDisplay, std::vector<Displa
     bool ret = (XNVCTRLQueryVersion(xdisplay, &major, &minor) != 0);
     if (!ret)
     {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("The NV-CONTROL X extension does not exist on '%1'.")
+        LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("The NV-CONTROL X extension does not exist on '%1'.")
                 .arg(MythDisplay->GetDisplayName()));
         return result;
     }
 
-    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("NV-CONTROL Version %1.%2").arg(major).arg(minor));
+    LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("NV-CONTROL Version %1.%2").arg(major).arg(minor));
     ret = (XNVCTRLQueryAttribute(xdisplay, xscreen, 0, NV_CTRL_DYNAMIC_TWINVIEW, &major) != 0);
     if (!ret)
     {
-        LOG(VB_PLAYBACK, LOG_ERR, LOC + "Failed to query if Dynamic Twinview is enabled");
+        LOG(VB_GENERAL, LOG_DEBUG, LOC + "Failed to query if Dynamic Twinview is enabled");
         return result;
     }
 
     if (!major)
     {
-        LOG(VB_PLAYBACK, LOG_ERR, LOC + "Dynamic Twinview not enabled, ignoring");
+        LOG(VB_GENERAL, LOG_DEBUG, LOC + "Dynamic Twinview not enabled, ignoring");
         return 0;
     }
 

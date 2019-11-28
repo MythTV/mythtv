@@ -168,6 +168,7 @@ public:
     ScreenSaverControl *m_screensaver        {nullptr};
     bool                m_screensaverEnabled {false};
 
+    MythDisplay *m_display                   {nullptr};
     DisplayRes  *m_display_res               {nullptr};
     bool         m_screenSetup               {false};
 
@@ -207,13 +208,19 @@ MythUIHelperPrivate::~MythUIHelperPrivate()
 
     if (m_display_res)
     {
-        m_display_res->SwitchToDesktop();
+        if (GetMythDB()->GetBoolSetting("UseVideoModes", false))
+            m_display_res->SwitchToDesktop();
         DisplayRes::AcquireRelease(false); // release
     }
+
+    if (m_display)
+        MythDisplay::AcquireRelease(false);
 }
 
 void MythUIHelperPrivate::Init(void)
 {
+    if (!m_display)
+        m_display = MythDisplay::AcquireRelease();
     m_screensaver = new ScreenSaverControl();
     GetScreenBounds();
     StoreGUIsettings();
@@ -247,7 +254,7 @@ void MythUIHelperPrivate::GetScreenBounds()
     LOG(VB_GUI, LOG_INFO, LOC +
         QString("Primary screen: %1.").arg(primary->name()));
 
-    int numScreens = MythDisplay::GetNumberOfScreens();
+    int numScreens = m_display->GetScreenCount();
     QSize dim = primary->virtualSize();
     LOG(VB_GUI, LOG_INFO, LOC +
         QString("Total desktop dim: %1x%2, over %3 screen[s].")
@@ -264,7 +271,7 @@ void MythUIHelperPrivate::GetScreenBounds()
     }
 
     QRect bounds;
-    QScreen *screen = MythDisplay::GetScreen();
+    QScreen *screen = m_display->GetCurrentScreen();
     if (GetMythDB()->GetBoolSetting("RunFrontendInWindow", false))
     {
         LOG(VB_GUI, LOG_INFO, LOC + "Running in a window");
@@ -365,12 +372,9 @@ double MythUIHelperPrivate::GetPixelAspectRatio(void)
 {
     if (m_pixelAspectRatio < 0)
     {
-        if (!m_display_res)
-            m_display_res = DisplayRes::AcquireRelease();
-        if (m_display_res)
-            m_pixelAspectRatio = static_cast<float>(m_display_res->GetPixelAspectRatio());
-        else
-            m_pixelAspectRatio = 1.0;
+        if (!m_display)
+            m_display = MythDisplay::AcquireRelease();
+        m_pixelAspectRatio = static_cast<float>(m_display->GetPixelAspectRatio());
     }
     return static_cast<double>(m_pixelAspectRatio);
 }
@@ -380,7 +384,8 @@ void MythUIHelperPrivate::WaitForScreenChange(void)
     // Wait for screen signal change, so we later get updated screen resolution
     QEventLoop loop;
     QTimer timer;
-    QScreen *screen = MythDisplay::GetScreen();
+    QScreen *screen = MythDisplay::AcquireRelease()->GetCurrentScreen();
+    MythDisplay::AcquireRelease(false);
 
     timer.setSingleShot(true);
     QObject::connect(&timer, SIGNAL(timeout()),
@@ -445,19 +450,15 @@ void MythUIHelper::LoadQtConfig(void)
     gCoreContext->ResetLanguage();
     d->m_themecachedir.clear();
 
-    if (GetMythDB()->GetBoolSetting("UseVideoModes", false))
-    {
-        if (!d->m_display_res)
-            d->m_display_res = DisplayRes::AcquireRelease();
+    if (!d->m_display_res)
+        d->m_display_res = DisplayRes::AcquireRelease();
 
-        if (d->m_display_res)
-        {
-            // Make sure DisplayRes has current context info
-            d->m_display_res->Initialize();
-            // Switch to desired GUI resolution
+    if (d->m_display_res)
+    {
+        // Switch to desired GUI resolution
+        if (GetMythDB()->GetBoolSetting("UseVideoModes", false))
             if (d->m_display_res->SwitchToGUI())
                 d->WaitForScreenChange();
-        }
     }
 
     // Note the possibly changed screen settings

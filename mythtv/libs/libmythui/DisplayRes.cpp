@@ -9,6 +9,7 @@
 #include "mythlogging.h"
 #include "mythdb.h"
 #include "mythcorecontext.h"
+#include "mythdisplay.h"
 
 #ifdef USING_XRANDR
 #include "DisplayResX.h"
@@ -90,8 +91,14 @@ std::vector<DisplayResScreen> DisplayRes::GetModes(void)
 }
 
 DisplayRes::DisplayRes()
-  : ReferenceCounter("DisplRes")
+  : ReferenceCounter("DisplRes"),
+    m_display(MythDisplay::AcquireRelease())
 {
+}
+
+DisplayRes::~DisplayRes()
+{
+    MythDisplay::AcquireRelease(false);
 }
 
 /// \brief Return the screen to the original desktop settings
@@ -102,17 +109,17 @@ void DisplayRes::SwitchToDesktop()
 
 bool DisplayRes::Initialize(void)
 {
-    int pixelwidth = 0;
-    int pixelheight = 0;
-    int mmwidth = 0;
-    int mmheight = 0;
-    double refreshrate = 0.0;
     m_last.Init();
     m_curMode = GUI;
-    m_pixelAspectRatio = 1.0;
 
     // Initialise DESKTOP mode
-    GetDisplayInfo(pixelwidth, pixelheight, mmwidth, mmheight, refreshrate, m_pixelAspectRatio);
+    DisplayInfo info = m_display->GetDisplayInfo();
+    int pixelwidth = info.m_res.width();
+    int pixelheight = info.m_res.height();
+    int mmwidth = info.m_size.width();
+    int mmheight = info.m_size.height();
+    double refreshrate = 1000000.0 / static_cast<double>(info.m_rate);
+
     m_mode[DESKTOP].Init();
     m_mode[DESKTOP] = DisplayResScreen(pixelwidth, pixelheight, mmwidth, mmheight, -1.0, refreshrate);
     LOG(VB_GENERAL, LOG_NOTICE, LOC + QString("Desktop video mode: %1x%2 %3 Hz")
@@ -329,11 +336,6 @@ double DisplayRes::GetRefreshRate(void) const
 double DisplayRes::GetAspectRatio(void) const
 {
     return m_last.AspectRatio();
-}
-
-double DisplayRes::GetPixelAspectRatio(void) const
-{
-    return m_pixelAspectRatio;
 }
 
 std::vector<double> DisplayRes::GetRefreshRates(int Width, int Height) const

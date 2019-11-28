@@ -1,176 +1,174 @@
+//Qt
+#include <QApplication>
+#include <QWindow>
+
+// MythTV
+#include <mythlogging.h>
 #include "compat.h"
 #include "mythcorecontext.h"
 #include "mythdisplay.h"
 #include "mythmainwindow.h"
 
-#include <QApplication>
-
-#if defined(Q_OS_MAC)
-#import "util-osx.h"
-#elif USING_X11
-#include "mythxdisplay.h"
-#endif
-
 #ifdef Q_OS_ANDROID
-#include <QtAndroidExtras>
+#include "mythdisplayandroid.h"
+#endif
+#if defined(Q_OS_MAC)
+#include "mythdisplayosx.h"
+#endif
+#ifdef USING_X11
+#include "mythdisplayx11.h"
+#endif
+#if defined(Q_OS_WIN)
+#include "mythdisplaywindows.h"
 #endif
 
-#include <mythlogging.h>
-#define LOC      QString("DispInfo: ")
+#define LOC QString("Display: ")
 
-#define VALID_RATE(rate) ((rate) > 20.0F && (rate) < 200.0F)
-
-static float fix_rate(int video_rate)
+/*! \class MythDisplay
+ *
+ * MythDisplay is a reference counted, singleton class.
+ *
+ * Retrieve a reference to the MythDisplay object by calling AcquireRelease().
+ *
+ * A valid pointer is always returned.
+ *
+ * Release the reference by calling AcquireRelease(false)
+ *
+ * \bug When using Xinerama/virtual screens, we get the correct screen at startup
+ * and we successfully move to another screen at the first attempt. Subsequently
+ * trying to move back to the original screen does not work. This appears to be
+ * an issue with MythMainWindow relying on MythUIHelper for screen coordinates
+ * that are not updated and/or subsequent window movements moving the window
+ * into the wrong screen. Much of the MythUIHelper code needs to move into MythDisplay.
+ *
+ * \todo Complete handling of screen changes. We need to handle several cases.
+ * Firstly, when the main window is moved (dragged) to a new screen. This generally
+ * works but need to check if all display details are updated (VideoOutWindow is
+ * currently hooked up to the CurrentScreenChanged signal - so video window sizing
+ * should work without issue). Various other parameters need updating though e.g.
+ * refresh rates, supported rates etc
+ * Secondly, when a new screen is added and the user has configured a multiscreen
+ * setup - in which case we might want to move the main window to the new screen.
+ * There are various complications here. Currently switching windows is triggered
+ * from the settings screens - which initiate a teardown of painter/render/UI etc.
+ * We cannot do that from random parts of the UI or during video playback.
+*/
+MythDisplay* MythDisplay::AcquireRelease(bool Acquire)
 {
-    static const float default_rate = 1000000.0F / 60.0F;
-    float fixed = default_rate;
-    if (video_rate > 0)
+    static QMutex s_lock(QMutex::Recursive);
+    static MythDisplay* s_display = nullptr;
+
+    QMutexLocker locker(&s_lock);
+
+    if (Acquire)
     {
-        fixed = static_cast<float>(video_rate) / 2.0F;
-        if (fixed < default_rate)
-            fixed = default_rate;
-    }
-    return fixed;
-}
-
-WId MythDisplay::GetWindowID(void)
-{
-    WId win = 0;
-    QWidget *main_widget = (QWidget*)MythMainWindow::getMainWindow();
-    if (main_widget)
-        win = main_widget->winId();
-    return win;
-}
-
-DisplayInfo MythDisplay::GetDisplayInfo(int video_rate)
-{
-    DisplayInfo ret;
-
-#if defined(Q_OS_MAC)
-    CGDirectDisplayID disp = GetOSXDisplay(GetWindowID());
-    if (!disp)
-        return ret;
-
-    CFDictionaryRef ref = CGDisplayCurrentMode(disp);
-    float rate = 0.0F;
-    if (ref)
-        rate = get_float_CF(ref, kCGDisplayRefreshRate);
-
-    if (VALID_RATE(rate))
-        ret.m_rate = 1000000.0F / rate;
-    else
-        ret.m_rate = fix_rate(video_rate);
-
-    CGSize size_in_mm = CGDisplayScreenSize(disp);
-    ret.m_size = QSize((uint) size_in_mm.width, (uint) size_in_mm.height);
-
-    uint width  = (uint)CGDisplayPixelsWide(disp);
-    uint height = (uint)CGDisplayPixelsHigh(disp);
-    ret.m_res   = QSize(width, height);
-
-#elif defined(Q_OS_WIN)
-    HDC hdc = GetDC((HWND)GetWindowID());
-    int rate = 0;
-    if (hdc)
-    {
-        rate       = GetDeviceCaps(hdc, VREFRESH);
-        int width  = GetDeviceCaps(hdc, HORZSIZE);
-        int height = GetDeviceCaps(hdc, VERTSIZE);
-        ret.m_size = QSize((uint)width, (uint)height);
-        width      = GetDeviceCaps(hdc, HORZRES);
-        height     = GetDeviceCaps(hdc, VERTRES);
-        ret.m_res  = QSize((uint)width, (uint)height);
-    }
-
-    if (VALID_RATE(rate))
-    {
-        // see http://support.microsoft.com/kb/2006076
-        switch (rate)
+        if (s_display)
         {
-            case 23:  ret.m_rate = 41708; break; // 23.976Hz
-            case 29:  ret.m_rate = 33367; break; // 29.970Hz
-            case 47:  ret.m_rate = 20854; break; // 47.952Hz
-            case 59:  ret.m_rate = 16683; break; // 59.940Hz
-            case 71:  ret.m_rate = 13903; break; // 71.928Hz
-            case 119: ret.m_rate = 8342;  break; // 119.880Hz
-            default:  ret.m_rate = 1000000.0F / (float)rate;
+            s_display->IncrRef();
+        }
+        else
+        {
+#ifdef USING_X11
+            if (MythDisplayX11::IsAvailable())
+                s_display = new MythDisplayX11();
+#endif
+#if defined(Q_OS_MAC)
+            if (!s_display)
+                s_display = new MythDisplayOSX();
+#endif
+#ifdef Q_OS_ANDROID
+            if (!s_display)
+                s_display = new MythDisplayAndroid();
+#endif
+#if defined(Q_OS_WIN)
+            if (!s_display)
+                s_display = new MythDisplayWindows();
+#endif
+            if (!s_display)
+                s_display = new MythDisplay();
         }
     }
     else
-        ret.m_rate = fix_rate(video_rate);
-
-#elif USING_X11
-    MythXDisplay *disp = OpenMythXDisplay();
-    if (!disp)
-        return ret;
-
-    float rate = disp->GetRefreshRate();
-    if (VALID_RATE(rate))
-        ret.m_rate = 1000000.0F / rate;
-    else
-        ret.m_rate = fix_rate(video_rate);
-    ret.m_res  = disp->GetDisplaySize();
-    ret.m_size = disp->GetDisplayDimensions();
-    delete disp;
-#elif defined(Q_OS_ANDROID)
-    QAndroidJniEnvironment env;
-    QAndroidJniObject activity = QtAndroid::androidActivity();
-    QAndroidJniObject windowManager =  activity.callObjectMethod("getWindowManager", "()Landroid/view/WindowManager;");
-    QAndroidJniObject display =  windowManager.callObjectMethod("getDefaultDisplay", "()Landroid/view/Display;");
-    QAndroidJniObject displayMetrics("android/util/DisplayMetrics");
-    display.callMethod<void>("getRealMetrics", "(Landroid/util/DisplayMetrics;)V", displayMetrics.object());
-    // check if passed or try a different method
-    if (env->ExceptionCheck())
     {
-        env->ExceptionClear();
-        display.callMethod<void>("getMetrics", "(Landroid/util/DisplayMetrics;)V", displayMetrics.object());
+        if (s_display)
+            if (s_display->DecrRef() == 0)
+                s_display = nullptr;
     }
-    float xdpi = displayMetrics.getField<jfloat>("xdpi");
-    float ydpi = displayMetrics.getField<jfloat>("ydpi");
-    int height = displayMetrics.getField<jint>("heightPixels");
-    int width = displayMetrics.getField<jint>("widthPixels");
-    float rate = display.callMethod<jfloat>("getRefreshRate");
-    LOG(VB_GENERAL, LOG_INFO, LOC +
-        QString("rate:%1 h:%2 w:%3 xdpi:%4 ydpi:%5")
-        .arg(rate).arg(height).arg(width)
-        .arg(xdpi).arg(ydpi)
-        );
-
-    if (VALID_RATE(rate))
-        ret.m_rate = 1000000.0F / rate;
-    else
-        ret.m_rate = fix_rate(video_rate);
-    ret.m_res = QSize((uint)width, (uint)height);
-    ret.m_size = QSize((uint)width, (uint)height);
-    if (xdpi > 0 && ydpi > 0)
-        ret.m_size = QSize((uint)width/xdpi*25.4F, (uint)height/ydpi*25.4F);
-#endif
-    return ret;
+    return s_display;
 }
 
-/**
- * \brief Return the number of available screens.
- *
- * This is the number of screens configured to be part of the users
- * desktop, at the time the call is made.  If the user closes the
- * laptop lid, or connects an external screen, this number may be
- * different the next time this function is called.
- */
-int MythDisplay::GetNumberOfScreens(void)
+MythDisplay::MythDisplay()
+  : QObject(),
+    ReferenceCounter("Display")
+{
+    m_screen = GetDesiredScreen();
+    DebugScreen(m_screen, "Using");
+
+    connect(qGuiApp, &QGuiApplication::screenRemoved, this, &MythDisplay::ScreenRemoved);
+    connect(qGuiApp, &QGuiApplication::screenAdded, this, &MythDisplay::ScreenAdded);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
+    connect(qGuiApp, &QGuiApplication::primaryScreenChanged, this, &MythDisplay::PrimaryScreenChanged);
+#endif
+}
+
+MythDisplay::~MythDisplay()
+{
+    LOG(VB_GENERAL, LOG_INFO, LOC + "Deleting");
+}
+
+void MythDisplay::SetWidget(QWidget *MainWindow)
+{
+    QMutexLocker locker(&m_screenLock);
+    QWidget* old = m_widget;
+    m_widget = MainWindow;
+
+    if (m_widget)
+    {
+        if (m_widget != old)
+            LOG(VB_GENERAL, LOG_INFO, LOC + "New main widget");
+        QWindow* window = m_widget->windowHandle();
+        if (window)
+        {
+            QScreen *desired = GetDesiredScreen();
+            if (desired && (desired != window->screen()))
+            {
+                DebugScreen(desired, "Moving to");
+                window->setScreen(desired);
+                if (desired->geometry() != desired->virtualGeometry())
+                    m_widget->move(desired->geometry().topLeft());
+            }
+            connect(window, &QWindow::screenChanged, this, &MythDisplay::ScreenChanged);
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_WARNING, LOC + "Widget does not have a window");
+        }
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Widget removed");
+    }
+}
+
+int MythDisplay::GetScreenCount(void)
 {
     return qGuiApp->screens().size();
 }
 
-/**
- * \brief Return true if the MythTV windows should span all screens.
- */
-bool MythDisplay::SpanAllScreens(void)
+double MythDisplay::GetPixelAspectRatio(void)
 {
-    return gCoreContext->GetSetting("XineramaScreen", nullptr) == "-1";
+    QMutexLocker locker(&m_screenLock);
+    DisplayInfo info = GetDisplayInfo();
+    if (info.m_size.width() > 0 && info.m_size.height() > 0 &&
+        info.m_res.width() > 0 && info.m_res.height() > 0)
+    {
+        return (info.m_size.width() / static_cast<double>(info.m_res.width())) /
+               (info.m_size.height() / static_cast<double>(info.m_res.height()));
+    }
+    return 1.0;
 }
 
-/**
- * \brief Return a pointer to the screen to use.
+/*! \brief Return a pointer to the screen to use.
  *
  * This function looks at the users screen preference, and will return
  * that screen if possible.  If not, i.e. the screen isn't plugged in,
@@ -181,58 +179,158 @@ bool MythDisplay::SpanAllScreens(void)
  * attributes.  The check for spanning screens must be made when the
  * screen size/geometry accessed, and the proper physical/virtual
  * size/geometry retrieved.
- */
-QScreen* MythDisplay::GetScreen(void)
+*/
+QScreen* MythDisplay::GetCurrentScreen(void)
 {
+    QMutexLocker locker(&m_screenLock);
+    return m_screen;
+}
+
+QScreen *MythDisplay::GetDesiredScreen(void)
+{
+    QMutexLocker locker(&m_screenLock);
+    QScreen* newscreen = nullptr;
+
     // Lookup by name
     QString name = gCoreContext->GetSetting("XineramaScreen", nullptr);
-    foreach (QScreen *qscreen, qGuiApp->screens())
+    foreach (QScreen *screen, qGuiApp->screens())
     {
-        if (!name.isEmpty() && name == qscreen->name())
+        if (!name.isEmpty() && name == screen->name())
         {
-            LOG(VB_GUI, LOG_INFO, LOC + QString("Found screen '%1'").arg(name));
-            return qscreen;
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Found screen '%1'").arg(name));
+            newscreen = screen;
         }
     }
 
     // No name match.  These were previously numbers.
-    bool ok = false;
-    int screen_num = name.toInt(&ok);
-    QList<QScreen *>screens = qGuiApp->screens();
-    if (ok && (screen_num >= 0) && (screen_num < screens.size()))
+    if (!newscreen)
     {
-        LOG(VB_GUI, LOG_INFO, LOC + QString("Found screen number %1 (%2)")
-            .arg(name).arg(screens[screen_num]->name()));
-        return screens[screen_num];
+        bool ok = false;
+        int screen_num = name.toInt(&ok);
+        QList<QScreen *>screens = qGuiApp->screens();
+        if (ok && (screen_num >= 0) && (screen_num < screens.size()))
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Found screen number %1 (%2)")
+                .arg(name).arg(screens[screen_num]->name()));
+            newscreen = screens[screen_num];
+        }
     }
 
     // For anything else, return the primary screen.
-    QScreen *primary = qGuiApp->primaryScreen();
-    if (name.isEmpty())
+    if (!newscreen)
     {
-        LOG(VB_GUI, LOG_INFO, QString("Defaulting to primary screen (%1)")
-            .arg(primary->name()));
+        QScreen *primary = qGuiApp->primaryScreen();
+        if (name.isEmpty())
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Defaulting to primary screen (%1)")
+                .arg(primary->name()));
+        }
+        else if (name != "-1")
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Screen '%1' not found, defaulting to primary screen (%2)")
+                .arg(name).arg(primary->name()));
+        }
+        newscreen = primary;
     }
-    else if (name != "-1")
-    {
-        LOG(VB_GUI, LOG_INFO, QString("Screen '%1' not found, defaulting to primary screen (%2)")
-            .arg(name).arg(primary->name()));
-    }
-    return primary;
+
+    return newscreen;
 }
 
-QString MythDisplay::GetExtraScreenInfo(QScreen *qscreen)
+/*! \brief The actual screen in use has changed. We must use it.
+*/
+void MythDisplay::ScreenChanged(QScreen *qScreen)
+{
+    QMutexLocker locker(&m_screenLock);
+    if (qScreen == m_screen)
+        return;
+    DebugScreen(qScreen, "Changed to");
+    m_screen = qScreen;
+    emit CurrentScreenChanged(qScreen);
+}
+
+void MythDisplay::PrimaryScreenChanged(QScreen* qScreen)
+{
+    DebugScreen(qScreen, "New primary");
+}
+
+void MythDisplay::ScreenAdded(QScreen* qScreen)
+{
+    DebugScreen(qScreen, "New");
+    emit ScreenCountChanged(qGuiApp->screens().size());
+}
+
+void MythDisplay::ScreenRemoved(QScreen* qScreen)
+{
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Screen '%1' removed").arg(qScreen->name()));
+    emit ScreenCountChanged(qGuiApp->screens().size());
+}
+
+float MythDisplay::SanitiseRefreshRate(int Rate)
+{
+    static const float default_rate = 1000000.0F / 60.0F;
+    float fixed = default_rate;
+    if (Rate > 0)
+    {
+        fixed = static_cast<float>(Rate) / 2.0F;
+        if (fixed < default_rate)
+            fixed = default_rate;
+    }
+    return fixed;
+}
+
+DisplayInfo MythDisplay::GetDisplayInfo(int)
+{
+    // This is the final fallback when no other platform specifics are available
+    // It is usually accurate apart from the refresh rate - which is often
+    // rounded down.
+    QMutexLocker locker(&m_screenLock);
+    QScreen *screen = GetCurrentScreen();
+    DisplayInfo ret;
+    ret.m_rate = 1000000.0F / static_cast<float>(screen->refreshRate());
+    ret.m_res  = screen->size();
+    ret.m_size = QSize(static_cast<int>(screen->physicalSize().width()),
+                       static_cast<int>(screen->physicalSize().height()));
+    return ret;
+}
+
+/// \brief Return true if the MythTV windows should span all screens.
+bool MythDisplay::SpanAllScreens(void)
+{
+    return gCoreContext->GetSetting("XineramaScreen", nullptr) == "-1";
+}
+
+QString MythDisplay::GetExtraScreenInfo(QScreen *qScreen)
 {
 #if QT_VERSION >= QT_VERSION_CHECK(5, 9, 0)
-    QString mfg = qscreen->manufacturer();
+    QString mfg = qScreen->manufacturer();
     if (mfg.isEmpty())
-        mfg = "unknown";
-    QString model = qscreen->model();
+        mfg = "Unknown";
+    QString model = qScreen->model();
     if (model.isEmpty())
-        model = "unknown";
+        model = "Unknown";
     return QString("(Make: %1 Model: %2)").arg(mfg).arg(model);
 #else
-    Q_UNUSED(qscreen);
+    Q_UNUSED(qScreen);
     return QString();
 #endif
+}
+
+void MythDisplay::DebugScreen(QScreen *qScreen, const QString &Message)
+{
+    QRect geom = qScreen->geometry();
+    QString extra = GetExtraScreenInfo(qScreen);
+
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("%1 screen '%2' %3")
+        .arg(Message).arg(qScreen->name()).arg(extra));
+
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Geometry %1x%2+%3+%4 Size %5mmx%6mm")
+        .arg(geom.width()).arg(geom.height()).arg(geom.left()).arg(geom.top())
+        .arg(qScreen->physicalSize().width()).arg(qScreen->physicalSize().height()));
+
+    if (qScreen->virtualGeometry() != geom)
+    {
+        geom = qScreen->virtualGeometry();
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Total virtual geometry: %1x%2+%3+%4")
+            .arg(geom.width()).arg(geom.height()).arg(geom.left()).arg(geom.top()));
+    }
 }

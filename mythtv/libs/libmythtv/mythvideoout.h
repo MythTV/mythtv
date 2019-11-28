@@ -158,6 +158,7 @@ class MythVideoOutput
 
     static void  CopyFrame(VideoFrame* To, const VideoFrame* From);
 
+    MythDisplay*         m_display;
     VideoOutWindow       m_window;
     QSize                m_dbDisplayDimensionsMM;
     VideoColourSpace     m_videoColourSpace;

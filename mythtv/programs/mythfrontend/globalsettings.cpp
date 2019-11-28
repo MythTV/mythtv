@@ -2034,19 +2034,8 @@ static HostTextEditSetting *SetupPinCode()
 static HostComboBoxSetting *XineramaScreen()
 {
     HostComboBoxSetting *gc = new HostComboBoxSetting("XineramaScreen", false);
-
-    foreach (QScreen *qscreen, qGuiApp->screens())
-    {
-        QString extra = MythDisplay::GetExtraScreenInfo(qscreen);
-        gc->addSelection(qscreen->name() + extra, qscreen->name());
-    }
-
-    gc->addSelection(AppearanceSettings::tr("All"), QString::number(-1));
-
     gc->setLabel(AppearanceSettings::tr("Display on screen"));
-
     gc->setValue(0);
-
     gc->setHelpText(AppearanceSettings::tr("Run on the specified screen or "
                                            "spanning all screens."));
     return gc;
@@ -4569,6 +4558,19 @@ void AppearanceSettings::applyChange()
     GetMythMainWindow()->JumpTo("Reload Theme");
 }
 
+void AppearanceSettings::PopulateScreens(int Screens)
+{
+    m_xineramaScreen->setEnabled(Screens > 1);
+    m_xineramaAspect->setEnabled(Screens > 1);
+    m_xineramaScreen->clearSelections();
+    foreach (QScreen *qscreen, qGuiApp->screens())
+    {
+        QString extra = MythDisplay::GetExtraScreenInfo(qscreen);
+        m_xineramaScreen->addSelection(qscreen->name() + extra, qscreen->name());
+    }
+    m_xineramaScreen->addSelection(AppearanceSettings::tr("All"), QString::number(-1));
+}
+
 AppearanceSettings::AppearanceSettings()
 {
     GroupSetting* screen = new GroupSetting();
@@ -4581,11 +4583,13 @@ AppearanceSettings::AppearanceSettings()
     screen->addChild(MenuTheme());
     screen->addChild(GUIRGBLevels());
 
-    if (MythDisplay::GetNumberOfScreens() > 1)
-    {
-        screen->addChild(XineramaScreen());
-        screen->addChild(XineramaMonitorAspectRatio());
-    }
+    m_display = MythDisplay::AcquireRelease();
+    m_xineramaScreen = XineramaScreen();
+    m_xineramaAspect = XineramaMonitorAspectRatio();
+    screen->addChild(m_xineramaScreen);
+    screen->addChild(m_xineramaAspect);
+    PopulateScreens(m_display->GetScreenCount());
+    connect(m_display, &MythDisplay::ScreenCountChanged, this, &AppearanceSettings::PopulateScreens);
 
 //    screen->addChild(DisplaySizeHeight());
 //    screen->addChild(DisplaySizeWidth());
@@ -4621,6 +4625,11 @@ AppearanceSettings::AppearanceSettings()
     addChild(dates);
 
     addChild(LCDEnable());
+}
+
+AppearanceSettings::~AppearanceSettings()
+{
+    MythDisplay::AcquireRelease(false);
 }
 
 /*******************************************************************************

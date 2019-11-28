@@ -34,31 +34,11 @@ bool DisplayResX::IsAvailable(void)
 DisplayResX::DisplayResX(void)
   : DisplayRes()
 {
-    LOG(VB_GENERAL, LOG_INFO, LOC + "Created");
     Initialize();
 }
 
 DisplayResX::~DisplayResX()
 {
-    LOG(VB_GENERAL, LOG_INFO, LOC + "Deleted");
-}
-
-bool DisplayResX::GetDisplayInfo(int &WidthPixels, int &HeightPixels, int &WidthMM,
-                                 int &HeightMM, double &RefreshRate, double &PixelAspectRatio) const
-{
-    DisplayInfo info = MythDisplay::GetDisplayInfo();
-    WidthMM          = info.m_size.width();
-    HeightMM         = info.m_size.height();
-    WidthPixels      = info.m_res.width();
-    HeightPixels     = info.m_res.height();
-    RefreshRate      = 1000000.0 / static_cast<double>(info.m_rate);
-    PixelAspectRatio = 1.0;
-
-    if (WidthMM > 0 && HeightMM > 0 && WidthPixels > 0 && HeightPixels > 0)
-        PixelAspectRatio = (static_cast<double>(WidthMM) / static_cast<double>(WidthPixels)) /
-                           (static_cast<double>(HeightMM) / static_cast<double>(HeightPixels));
-
-    return true;
 }
 
 bool DisplayResX::SwitchToVideoMode(int width, int height, double desired_rate)

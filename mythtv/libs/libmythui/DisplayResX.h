@@ -14,9 +14,6 @@ class DisplayResX : public DisplayRes
     const std::vector<DisplayResScreen>& GetVideoModes(void) const override;
 
   protected:
-    bool GetDisplayInfo(int &WidthPixels, int &HeightPixels,
-                        int &WidthMM, int &HeightMM,
-                        double &RefreshRate, double &PixelAspectRatio) const override;
     bool SwitchToVideoMode(int width, int height, double desired_rate) override;
 
   private:

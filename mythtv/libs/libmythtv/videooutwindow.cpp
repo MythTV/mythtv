@@ -49,7 +49,8 @@ const float VideoOutWindow::kManualZoomMinVerticalZoom   = 0.25F;
 const int   VideoOutWindow::kManualZoomMaxMove           = 50;
 
 VideoOutWindow::VideoOutWindow()
-  : // DB settings
+  : m_display(MythDisplay::AcquireRelease()),
+    // DB settings
     m_dbMove(0, 0),
     m_dbHorizScale(0.0F),
     m_dbVertScale(0.0F),
@@ -96,6 +97,18 @@ VideoOutWindow::VideoOutWindow()
     m_dbUseGUISize = gCoreContext->GetBoolSetting("GuiSizeForTV", false);
 
     PopulateGeometry();
+    connect(m_display, &MythDisplay::CurrentScreenChanged, this, &VideoOutWindow::ScreenChanged);
+}
+
+VideoOutWindow::~VideoOutWindow()
+{
+    MythDisplay::AcquireRelease(false);
+}
+
+void VideoOutWindow::ScreenChanged(QScreen*)
+{
+    PopulateGeometry();
+    MoveResize();
 }
 
 void VideoOutWindow::PopulateGeometry(void)
@@ -104,7 +117,7 @@ void VideoOutWindow::PopulateGeometry(void)
     if (not qobject_cast<QApplication*>(qApp))
         return;
 
-    QScreen *screen = MythDisplay::GetScreen();
+    QScreen *screen = m_display->GetCurrentScreen();
     if (MythDisplay::SpanAllScreens())
     {
         m_usingXinerama = true;

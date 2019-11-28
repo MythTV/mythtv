@@ -12,7 +12,7 @@ CONFIG += thread dll
 target.path = $${LIBDIR}
 INSTALLS = target
 
-DEPENDPATH  += ./opengl
+DEPENDPATH  += ./opengl ./platforms
 INCLUDEPATH += $$DEPENDPATH
 INCLUDEPATH += ../libmythbase
 INCLUDEPATH += ../.. ../
@@ -98,6 +98,8 @@ using_x11 {
     DEFINES += USING_X11
     HEADERS += screensaver-x11.h
     SOURCES += screensaver-x11.cpp
+    HEADERS += platforms/mythdisplayx11.h
+    SOURCES += platforms/mythdisplayx11.cpp
     using_xnvctrl {
         # Add nvidia XV-EXTENSION support
         HEADERS += util-nvctrl.h
@@ -120,6 +122,8 @@ using_qtdbus {
 macx {
     HEADERS += screensaver-osx.h   DisplayResOSX.h   util-osx.h
     SOURCES += screensaver-osx.cpp DisplayResOSX.cpp util-osx.cpp
+    HEADERS += platforms/mythdisplayosx.h
+    SOURCES += platforms/mythdisplayosx.cpp
     QMAKE_OBJECTIVE_CFLAGS += $$QMAKE_CXXFLAGS
     QMAKE_OBJECTIVE_CXXFLAGS += $$QMAKE_CXXFLAGS
     OBJECTIVE_HEADERS += util-osx-cocoa.h
@@ -135,8 +139,8 @@ macx {
 }
 
 android {
-    HEADERS += screensaver-android.h
-    SOURCES += screensaver-android.cpp
+    HEADERS += screensaver-android.h   platforms/mythdisplayandroid.h
+    SOURCES += screensaver-android.cpp platforms/mythdisplayandroid.cpp
 }
 
 using_joystick_menu {
@@ -169,6 +173,8 @@ mingw :DEFINES += USING_MINGW
 mingw | win32-msvc*{
     HEADERS += mythpainter_d3d9.h   mythrender_d3d9.h
     SOURCES += mythpainter_d3d9.cpp mythrender_d3d9.cpp
+    HEADERS += platforms/mythdisplaywindows.h
+    SOURCES += platforms/mythdisplaywindows.cpp
     DEFINES += NODRAWTEXT
     LIBS    += -lGdi32 -lUser32
 

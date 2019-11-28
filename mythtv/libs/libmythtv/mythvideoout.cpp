@@ -254,7 +254,8 @@ MythVideoOutput *MythVideoOutput::Create(const QString &Decoder,    MythCodecID 
  *        Init(int,int,float,WId,int,int,int,int,WId) call.
  */
 MythVideoOutput::MythVideoOutput()
-  : m_dbDisplayDimensionsMM(0,0),
+  : m_display(MythDisplay::AcquireRelease()),
+    m_dbDisplayDimensionsMM(0,0),
     m_dbAspectOverride(kAspect_Off),
     m_dbAdjustFill(kAdjustFill_Off),
     m_dbLetterboxColour(kLetterBoxColour_Black),
@@ -287,6 +288,7 @@ MythVideoOutput::~MythVideoOutput()
     ResizeForGui();
     if (m_displayRes)
         DisplayRes::AcquireRelease(false);
+    MythDisplay::AcquireRelease(false);
 }
 
 /**
@@ -994,7 +996,7 @@ void MythVideoOutput::ResizeForVideo(int Width, int Height)
  */
 void MythVideoOutput::InitDisplayMeasurements(void)
 {
-    DisplayInfo disp = MythDisplay::GetDisplayInfo();
+    DisplayInfo disp = m_display->GetDisplayInfo();
     QString     source = "Actual";
 
     // get the physical dimensions (in mm) of the display. If using

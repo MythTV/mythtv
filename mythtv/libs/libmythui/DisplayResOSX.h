@@ -12,8 +12,6 @@ class DisplayResOSX : public DisplayRes
     const std::vector<DisplayResScreen>& GetVideoModes() const override; // DisplayRes
 
   protected:
-    bool GetDisplayInfo(int &w_pix, int &h_pix, int &w_mm,
-                        int &h_mm, double &rate, double &par) const override; // DisplayRes
     bool SwitchToVideoMode(int width, int height, double framerate) override; // DisplayRes
 
   private:
