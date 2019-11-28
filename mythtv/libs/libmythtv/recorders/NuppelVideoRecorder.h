@@ -273,7 +273,9 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
 
     VideoFrameType      m_inpixfmt               {FMT_YV12};
     AVPixelFormat       m_picture_format         {AV_PIX_FMT_YUV420P};
+#ifdef USING_V4L2
     uint32_t            m_v4l2_pixelformat       {0};
+#endif
     int                 m_w_out                  {0};
     int                 m_h_out                  {0};
 
