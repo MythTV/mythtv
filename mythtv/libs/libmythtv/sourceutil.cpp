@@ -364,6 +364,25 @@ bool SourceUtil::IsAnySourceScanable(void)
     return false;
 }
 
+bool SourceUtil::IsSourceIDValid(uint sourceid)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT sourceid FROM videosource WHERE sourceid = :SOURCEID");
+    query.bindValue(":SOURCEID", sourceid);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythDB::DBError("SourceUtil::IsSourceIDValid", query);
+        return false;
+    }
+
+    if (!query.next())
+        return false;
+
+    return true;
+}
+
 bool SourceUtil::UpdateChannelsFromListings(uint sourceid, const QString& inputtype, bool wait)
 {
     if (wait)
@@ -427,7 +446,7 @@ bool SourceUtil::UpdateSource( uint sourceid, const QString& sourcename,
     query.bindValue(":LINEUPID", lineupid);
     query.bindValue(":PASSWORD", password);
     query.bindValue(":USEEIT", useeit);
-    query.bindValue(":CONFIGPATH", configpath);
+    query.bindValue(":CONFIGPATH", configpath.isEmpty() ? nullptr : configpath);
     query.bindValue(":NITID", nitid);
     query.bindValue(":BOUQUETID", bouquetid);
     query.bindValue(":REGIONID", regionid);
@@ -464,7 +483,7 @@ int SourceUtil::CreateSource( const QString& sourcename,
     query.bindValue(":LINEUPID", lineupid);
     query.bindValue(":PASSWORD", password);
     query.bindValue(":USEEIT", useeit);
-    query.bindValue(":CONFIGPATH", configpath);
+    query.bindValue(":CONFIGPATH", configpath.isEmpty() ? nullptr : configpath);
     query.bindValue(":NITID", nitid);
     query.bindValue(":BOUQUETID", bouquetid);
     query.bindValue(":REGIONID", regionid);

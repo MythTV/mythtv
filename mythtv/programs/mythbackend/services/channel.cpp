@@ -316,7 +316,7 @@ DTC::VideoSource* Channel::GetVideoSource( uint nSourceID )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool Channel::UpdateVideoSource( uint nSourceId,
+bool Channel::UpdateVideoSource( uint          nSourceId,
                                  const QString &sSourceName,
                                  const QString &sGrabber,
                                  const QString &sUserId,
@@ -330,11 +330,90 @@ bool Channel::UpdateVideoSource( uint nSourceId,
                                  uint          nRegionId,
                                  uint          nScanFrequency )
 {
-    bool bResult = SourceUtil::UpdateSource(nSourceId, sSourceName, sGrabber, sUserId, sFreqTable,
-                                       sLineupId, sPassword, bUseEIT, sConfigPath,
-                                       nNITId, nBouquetId, nRegionId, nScanFrequency);
 
-    return bResult;
+    if (!HAS_PARAM("sourceid"))
+    {
+        LOG(VB_GENERAL, LOG_ERR, "SourceId is required");
+        return false;
+    }
+
+    if (!SourceUtil::IsSourceIDValid(nSourceId))
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("SourceId %1 doesn't exist")
+            .arg(nSourceId));
+        return false;
+    }
+
+    if (m_parsedParams.size() < 2 )
+    {
+        LOG(VB_GENERAL, LOG_ERR, "No changable parameters were passed");
+        return false;
+    }
+
+    MSqlBindings bindings;
+    MSqlBindings::const_iterator it;
+    QString settings;
+
+    if ( HAS_PARAM("sourcename") )
+        ADD_SQL(settings, bindings, "name", "SourceName", sSourceName)
+
+    if ( HAS_PARAM("grabber") )
+        ADD_SQL(settings, bindings, "xmltvgrabber", "Grabber", sGrabber)
+
+    if ( HAS_PARAM("userid") )
+        ADD_SQL(settings, bindings, "userid", "UserId", sUserId)
+
+    if ( HAS_PARAM("freqtable") )
+        ADD_SQL(settings, bindings, "freqtable", "FreqTable", sFreqTable)
+
+    if ( HAS_PARAM("lineupid") )
+        ADD_SQL(settings, bindings, "lineupid", "LineupId", sLineupId)
+
+    if ( HAS_PARAM("password") )
+        ADD_SQL(settings, bindings, "password", "Password", sPassword)
+
+    if ( HAS_PARAM("useeit") )
+        ADD_SQL(settings, bindings, "useeit", "UseEIT", bUseEIT)
+
+    if (HAS_PARAM("configpath"))
+    {
+        if (sConfigPath.isEmpty())
+            settings += "configpath=NULL, "; // mythfilldatabase grabber requirement
+        else
+            ADD_SQL(settings, bindings, "configpath", "ConfigPath", sConfigPath)
+    }
+
+    if ( HAS_PARAM("nitid") )
+        ADD_SQL(settings, bindings, "dvb_nit_id", "NITId", nNITId)
+
+    if ( HAS_PARAM("bouquetid") )
+        ADD_SQL(settings, bindings, "bouquet_id", "BouquetId", nBouquetId)
+
+    if ( HAS_PARAM("regionid") )
+        ADD_SQL(settings, bindings, "region_id", "RegionId", nRegionId)
+
+    if ( HAS_PARAM("scanfrequency") )
+        ADD_SQL(settings, bindings, "scanfrequency", "ScanFrequency", nScanFrequency)
+
+    settings.chop(2);
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare(QString("UPDATE videosource SET %1 WHERE sourceid=:SOURCEID")
+                  .arg(settings));
+    bindings[":SOURCEID"] = nSourceId;
+
+    for (it = bindings.begin(); it != bindings.end(); ++it)
+        query.bindValue(it.key(), it.value());
+
+    if (!query.exec())
+    {
+        MythDB::DBError("MythAPI::UpdateVideoSource()", query);
+
+        throw( QString( "Database Error executing query." ));
+    }
+
+    return true;
 }
 
 /////////////////////////////////////////////////////////////////////////////
