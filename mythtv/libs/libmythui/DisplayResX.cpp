@@ -5,7 +5,7 @@
 #include "mythdisplay.h"
 #include "mythxdisplay.h"
 #ifdef CONFIG_XNVCTRL
-#include "util-nvctrl.h"
+#include "mythnvcontrol.h"
 #endif
 #include "DisplayResX.h"
 

@@ -2,7 +2,7 @@
 #include "mythlogging.h"
 #include "videocolourspace.h"
 #include "mythvdpauhelper.h"
-#include "mythxdisplay.h" // always last
+#include "platforms/mythxdisplay.h" // always last
 
 // Std
 #include <cmath>

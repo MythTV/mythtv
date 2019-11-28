@@ -7,7 +7,6 @@
 #include "mythlogging.h"
 #include "mythmainwindow.h"
 #include "mythuihelper.h"
-#include "mythxdisplay.h"
 #include "mythavutil.h"
 #include "mthreadpool.h"
 #include "mythcodeccontext.h"
