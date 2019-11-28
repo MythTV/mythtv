@@ -175,6 +175,12 @@ void loadZMConfig(const string &configfile)
     fclose(cfg);
 }
 
+#if !defined(MARIADB_BASE_VERSION) && MYSQL_VERSION_ID >= 80000
+using reconnect_t = int;
+#else
+using reconnect_t = my_bool;
+#endif
+
 void connectToDatabase(void)
 {
     if (!mysql_init(&g_dbConn))
@@ -183,7 +189,7 @@ void connectToDatabase(void)
         exit(mysql_errno(&g_dbConn));
     }
 
-    my_bool reconnect = 1;
+    reconnect_t reconnect = 1;
     mysql_options(&g_dbConn, MYSQL_OPT_RECONNECT, &reconnect);
 
     if (!mysql_real_connect(&g_dbConn, g_server.c_str(), g_user.c_str(),
