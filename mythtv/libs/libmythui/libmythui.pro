@@ -102,8 +102,8 @@ using_x11 {
     SOURCES += platforms/mythdisplayx11.cpp
     using_xnvctrl {
         # Add nvidia XV-EXTENSION support
-        HEADERS += util-nvctrl.h
-        SOURCES += util-nvctrl.cpp
+        HEADERS += platforms/mythnvcontrol.h
+        SOURCES += platforms/mythnvcontrol.cpp
         ! using_xnvctrl_external {
             INCLUDEPATH += ../../external/libXNVCtrl
             LIBS += -L../../external/libXNVCtrl -lmythXNVCtrl-$${LIBVERSION}

@@ -5,7 +5,7 @@
 #include "config.h"
 #include "mythlogging.h"
 #include "mythxdisplay.h"
-#include "util-nvctrl.h"
+#include "mythnvcontrol.h"
 
 #if CONFIG_XNVCTRL_EXTERNAL
 #include "NVCtrl/NVCtrl.h"
