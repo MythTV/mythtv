@@ -160,7 +160,7 @@ bool DXVA2Decoder::Init(MythRenderD3D9* render)
     return ok;
 }
 
-typedef HRESULT (__stdcall *DXVA2CreateVideoServicePtr)(IDirect3DDevice9* pDD,
+using DXVA2CreateVideoServicePtr = HRESULT (__stdcall *)(IDirect3DDevice9* pDD,
                                                         REFIID riid,
                                                         void** ppService);
 

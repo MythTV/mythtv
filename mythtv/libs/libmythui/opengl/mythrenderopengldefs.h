@@ -22,8 +22,6 @@
 #endif
 
 using MYTH_GLsizeiptr = ptrdiff_t;
-typedef GLvoid* (APIENTRY * MYTH_GLMAPBUFFERPROC)
-    (GLenum target, GLenum access);
-typedef GLboolean (APIENTRY * MYTH_GLUNMAPBUFFERPROC)
-    (GLenum target);
+using MYTH_GLMAPBUFFERPROC = GLvoid* (APIENTRY *) (GLenum target, GLenum access);
+using MYTH_GLUNMAPBUFFERPROC = GLboolean (APIENTRY *) (GLenum target);
 #endif

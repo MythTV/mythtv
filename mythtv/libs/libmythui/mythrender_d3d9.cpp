@@ -249,7 +249,7 @@ bool MythRenderD3D9::Create(QSize size, HWND window)
 {
     QMutexLocker locker(&m_lock);
 
-    typedef LPDIRECT3D9 (WINAPI *LPFND3DC)(UINT SDKVersion);
+    using LPFND3DC = LPDIRECT3D9 (WINAPI *)(UINT SDKVersion);
     static  LPFND3DC  OurDirect3DCreate9 = nullptr;
 
     OurDirect3DCreate9 = (LPFND3DC)ResolveAddress("D3D9","Direct3DCreate9");
@@ -1186,7 +1186,7 @@ void MythRenderD3D9::ReleaseDevice(void)
 }
 
 #ifdef USING_DXVA2
-typedef HRESULT (WINAPI *CreateDeviceManager9Ptr)(UINT *pResetToken,
+using CreateDeviceManager9Ptr = HRESULT (WINAPI *)(UINT *pResetToken,
                                                   IDirect3DDeviceManager9 **);
 #endif
 
