@@ -346,7 +346,8 @@ bool Channel::UpdateVideoSource( uint          nSourceId,
 
     if (m_parsedParams.size() < 2 )
     {
-        LOG(VB_GENERAL, LOG_ERR, "No changable parameters were passed");
+        LOG(VB_GENERAL, LOG_ERR, QString("SourceId=%1 was the only parameter")
+            .arg(nSourceId));
         return false;
     }
 
@@ -394,6 +395,12 @@ bool Channel::UpdateVideoSource( uint          nSourceId,
 
     if ( HAS_PARAM("scanfrequency") )
         ADD_SQL(settings, bindings, "scanfrequency", "ScanFrequency", nScanFrequency)
+
+    if ( settings.isEmpty() )
+    {
+        LOG(VB_GENERAL, LOG_ERR, "No valid parameters were passed");
+        return false;
+    }
 
     settings.chop(2);
 
