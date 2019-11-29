@@ -6,20 +6,19 @@
 
 #define LOC QString("VTBInterop: ")
 
-MythOpenGLInterop::Type MythVTBInterop::GetInteropType(MythCodecID CodecId, MythRenderOpenGL *Context)
+MythOpenGLInterop::Type MythVTBInterop::GetInteropType(VideoFrameType Format)
 {
-    if (!codec_is_vtb(CodecId) || !gCoreContext->IsUIThread())
+    if ((FMT_VTB != Format) || !gCoreContext->IsUIThread())
         return Unsupported;
 
-    if (!Context)
-        Context = MythRenderOpenGL::GetOpenGLRender();
-    if (!Context)
+    MythRenderOpenGL* context = MythRenderOpenGL::GetOpenGLRender();
+    if (!context)
         return Unsupported;
 
-    if (Context->isOpenGLES() || Context->IsEGL())
+    if (context->isOpenGLES() || context->IsEGL())
         return Unsupported;
 
-    if (Context->hasExtension("GL_ARB_texture_rg"))
+    if (context->hasExtension("GL_ARB_texture_rg"))
         return VTBSURFACE;
     return VTBOPENGL;
 }

@@ -184,6 +184,8 @@ TransportListEditor::TransportListEditor(uint sourceid) :
     setLabel(tr("Transport Editor"));
 
     addChild(m_videosource);
+    m_videosource->setEnabled(false);
+
     ButtonStandardSetting *newTransport =
         new ButtonStandardSetting("(" + tr("New Transport") + ")");
     connect(newTransport, SIGNAL(clicked()), SLOT(NewTransport(void)));
@@ -444,7 +446,7 @@ class Frequency : public MythUITextEditSetting, public MuxDBStorage
         setLabel(QObject::tr("Frequency") + " (" + hz + ")");
         setHelpText(QObject::tr(
                         "Frequency (Option has no default).\n"
-                        "The frequency for this channel in") + " " + hz + ".");
+                        "The frequency for this transport (multiplex) in") + " " + hz + ".");
     };
 };
 

@@ -1,3 +1,4 @@
+from __future__ import print_function
 # smolt - Fedora hardware profiler
 #
 # Copyright (C) 2009 Sebastian Pipping <sebastian@pipping.org>
@@ -35,8 +36,8 @@ class _Mythtv(Distro):
 
     def gather(self, gate, debug=False):
         def _stage(text):
-            print 'Processing %s' % (text)
-        from data_mythtv import create_mythtv_data
+            print('Processing %s' % (text))
+        from distros.mythtv_data.data_mythtv import create_mythtv_data
 
         _stage('MythTV Data')
         features = create_mythtv_data(gate)
@@ -89,4 +90,4 @@ if __name__ == '__main__':
     mythtv = create_mythtv()
     mythtv.gather(create_passing_gate(), debug=True)
 
-    print mythtv.rst()
+    print(mythtv.rst())

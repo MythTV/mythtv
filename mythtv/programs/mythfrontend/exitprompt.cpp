@@ -69,12 +69,21 @@ static bool DBusHalt(void)
         int_reply = hal.call("Shutdown");
 
     return void_reply.isValid() || int_reply.isValid();
-#endif
+#else
     return false;
+#endif
 }
 
-void ExitPrompter::halt()
+void ExitPrompter::confirmHalt()
 {
+    confirm(HALT);
+}
+
+void ExitPrompter::halt(bool Confirmed)
+{
+    if (!Confirmed)
+        return;
+
     QString halt_cmd = gCoreContext->GetSetting("HaltCommand","");
     int ret = -1;
 
@@ -130,12 +139,21 @@ static bool DBusReboot(void)
         int_reply = hal.call("Reboot");
 
     return void_reply.isValid() || int_reply.isValid();
-#endif
+#else
     return false;
+#endif
 }
 
-void ExitPrompter::reboot()
+void ExitPrompter::confirmReboot()
 {
+    confirm(REBOOT);
+}
+
+void ExitPrompter::reboot(bool Confirmed)
+{
+    if (!Confirmed)
+        return;
+
     QString reboot_cmd = gCoreContext->GetSetting("RebootCommand","");
     int ret = -1;
 
@@ -227,14 +245,41 @@ void ExitPrompter::handleExit()
     if (allowExit)
         dlg->AddButton(tr("Yes, Exit now"),          SLOT(quit()));
     if (allowReboot)
-        dlg->AddButton(tr("Yes, Exit and Reboot"),   SLOT(reboot()));
+    {
+        dlg->AddButton(tr("Yes, Exit and Reboot"),
+                       frontendOnly ? SLOT(reboot()) : SLOT(confirmReboot()));
+    }
     if (allowShutdown)
-        dlg->AddButton(tr("Yes, Exit and Shutdown"), SLOT(halt()));
+    {
+        dlg->AddButton(tr("Yes, Exit and Shutdown"),
+                       frontendOnly ? SLOT(halt()) : SLOT(confirmHalt()));
+    }
     if (allowStandby)
         dlg->AddButton(tr("Yes, Enter Standby Mode"), SLOT(standby()));
 
     // This is a hack so that the button clicks target the correct slot:
     dlg->SetReturnEvent(this, QString());
+
+    ss->AddScreen(dlg);
+}
+
+void ExitPrompter::confirm(int Action)
+{
+    MythScreenStack *ss = GetMythMainWindow()->GetStack("popup stack");
+    MythConfirmationDialog *dlg = new MythConfirmationDialog(ss,
+        tr("Mythbackend is running on this system. Are you sure you want to continue?"));
+
+    if (!dlg->Create())
+    {
+        delete dlg;
+        quit();
+        return;
+    }
+
+    if (Action == HALT)
+        connect(dlg, SIGNAL(haveResult(bool)), SLOT(halt(bool)));
+    else if (Action == REBOOT)
+        connect(dlg, SIGNAL(haveResult(bool)), SLOT(reboot(bool)));
 
     ss->AddScreen(dlg);
 }

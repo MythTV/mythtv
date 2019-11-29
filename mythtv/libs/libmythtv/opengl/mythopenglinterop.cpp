@@ -48,73 +48,103 @@ QString MythOpenGLInterop::TypeToString(Type InteropType)
     return "Unsupported";
 }
 
-QStringList MythOpenGLInterop::GetAllowedRenderers(MythCodecID CodecId)
+QStringList MythOpenGLInterop::GetAllowedRenderers(VideoFrameType Format)
 {
     QStringList result;
-    if (codec_sw_copy(CodecId))
-        return result;
-    if (GetInteropType(CodecId) != Unsupported)
+    if (GetInteropType(Format) != Unsupported)
         result << "opengl-hw";
     return result;
 }
 
-void MythOpenGLInterop::GetInteropTypeCallback(void *Wait, void *CodecId, void *Result)
+void MythOpenGLInterop::GetInteropTypeCallback(void *Wait, void *Format, void *Result)
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "Check interop callback");
     QWaitCondition *wait = reinterpret_cast<QWaitCondition*>(Wait);
-    MythCodecID *codecid = reinterpret_cast<MythCodecID*>(CodecId);
+    VideoFrameType *format = reinterpret_cast<VideoFrameType*>(Format);
     MythOpenGLInterop::Type *result = reinterpret_cast<MythOpenGLInterop::Type*>(Result);
 
-    if (codecid && result)
-        *result = MythOpenGLInterop::GetInteropType(*codecid);
+    if (format && result)
+        *result = MythOpenGLInterop::GetInteropType(*format);
     if (wait)
         wait->wakeAll();
 }
 
-MythOpenGLInterop::Type MythOpenGLInterop::GetInteropType(MythCodecID CodecId)
+/*! \brief Check whether we support direct rendering for the given VideoFrameType.
+ *
+ * \note GetInteropType is protected in all subclasses to ensure thread safety.
+ * The subclasses will fail this check if not called from the UI thread.
+*/
+MythOpenGLInterop::Type MythOpenGLInterop::GetInteropType(VideoFrameType Format)
 {
+    // cache supported formats to avoid potentially expensive callbacks
+    static QMutex s_lock(QMutex::Recursive);
+    static QHash<VideoFrameType,Type> s_supported;
+
     Type supported = Unsupported;
-    if (!gCoreContext->IsUIThread())
+    bool alreadychecked = false;
+
+    // have we checked this format already
+    s_lock.lock();
+    if (s_supported.contains(Format))
     {
-        MythMainWindow::HandleCallback("interop check", MythOpenGLInterop::GetInteropTypeCallback,
-                                       &CodecId, &supported);
-        return supported;
+        supported = s_supported.value(Format);
+        alreadychecked = true;
     }
+    s_lock.unlock();
+
+    // need to check
+    if (!alreadychecked)
+    {
+        if (!gCoreContext->IsUIThread())
+        {
+            MythMainWindow::HandleCallback("interop check", MythOpenGLInterop::GetInteropTypeCallback,
+                                           &Format, &supported);
+            return supported;
+        }
+
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Checking interop support for %1")
+            .arg(format_description(Format)));
 
 #ifdef USING_VTB
-    if (codec_is_vtb(CodecId))
-        supported = MythVTBInterop::GetInteropType(CodecId);
+        if (FMT_VTB == Format)
+            supported = MythVTBInterop::GetInteropType(Format);
 #endif
 #ifdef USING_VAAPI
-    if (codec_is_vaapi(CodecId))
-        supported = MythVAAPIInterop::GetInteropType(CodecId);
+        if (FMT_VAAPI == Format)
+            supported = MythVAAPIInterop::GetInteropType(Format);
 #endif
 #ifdef USING_MEDIACODEC
-    if (codec_is_mediacodec(CodecId))
-        supported = MEDIACODEC;
+        if (FMT_MEDIACODEC == Format)
+            supported = MEDIACODEC;
 #endif
 #ifdef USING_VDPAU
-    if (codec_is_vdpau_hw(CodecId))
-        supported = MythVDPAUInterop::GetInteropType(CodecId);
+        if (FMT_VDPAU == Format)
+            supported = MythVDPAUInterop::GetInteropType(Format);
 #endif
 #ifdef USING_NVDEC
-    if (codec_is_nvdec(CodecId))
-        supported = MythNVDECInterop::GetInteropType(CodecId);
+        if (FMT_NVDEC == Format)
+            supported = MythNVDECInterop::GetInteropType(Format);
 #endif
 #ifdef USING_MMAL
-    if (codec_is_mmal(CodecId))
-        supported = MythMMALInterop::GetInteropType(CodecId);
+        if (FMT_MMAL == Format)
+            supported = MythMMALInterop::GetInteropType(Format);
 #endif
 #ifdef USING_EGL
-    if (codec_is_v4l2(CodecId))
-        supported = MythDRMPRIMEInterop::GetInteropType(CodecId);
+        if (FMT_DRMPRIME == Format)
+            supported = MythDRMPRIMEInterop::GetInteropType(Format);
 #endif
+        // update supported formats
+        s_lock.lock();
+        s_supported.insert(Format, supported);
+        s_lock.unlock();
+    }
 
     if (Unsupported == supported)
-        LOG(VB_GENERAL, LOG_WARNING, LOC + QString("No render support for codec '%1'").arg(toString(CodecId)));
+        LOG(VB_GENERAL, LOG_WARNING, LOC + QString("No render support for frame type '%1'")
+            .arg(format_description(Format)));
     else
-        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Rendering supported for codec '%1' with %2")
-            .arg(toString(CodecId)).arg(TypeToString(supported)));
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Rendering supported for frame type '%1' with %2")
+            .arg(format_description(Format)).arg(TypeToString(supported)));
     return supported;
 }
 

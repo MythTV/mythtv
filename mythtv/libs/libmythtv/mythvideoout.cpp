@@ -271,7 +271,7 @@ MythVideoOutput::~MythVideoOutput()
     delete m_dbDisplayProfile;
     ResizeForGui();
     if (m_displayRes)
-        DisplayRes::Unlock();
+        DisplayRes::AcquireRelease(false);
 }
 
 /**
@@ -307,13 +307,6 @@ bool MythVideoOutput::Init(const QSize &VideoDim, const QSize &VideoDispDim,
     VideoAspectRatioChanged(VideoAspect); // apply aspect ratio and letterbox mode
 
     return mainSuccess;
-}
-
-QString MythVideoOutput::GetFilters(void) const
-{
-    if (m_dbDisplayProfile)
-        return m_dbDisplayProfile->GetFilters();
-    return QString();
 }
 
 void MythVideoOutput::SetVideoFrameRate(float playback_fps)

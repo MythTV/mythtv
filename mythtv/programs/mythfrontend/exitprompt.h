@@ -15,8 +15,11 @@ class ExitPrompter : public QObject
 
   public slots:
     static void quit(void);
-    static void halt(void);
-    static void reboot(void);
+    static void halt(bool Confirmed = true);
+    static void reboot(bool Confirmed = true);
     static void standby(void);
     void handleExit(void);
+    void confirmHalt(void);
+    void confirmReboot(void);
+    void confirm(int Action);
 };

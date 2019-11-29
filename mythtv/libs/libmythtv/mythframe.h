@@ -10,10 +10,16 @@
 #endif
 #include "mythtvexp.h" // for MTV_PUBLIC
 
+extern "C" {
+#include "libavcodec/avcodec.h"
+}
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+#define MYTH_WIDTH_ALIGNMENT 64
+#define MYTH_HEIGHT_ALIGNMENT 16
 enum VideoFrameType
 {
     FMT_NONE = -1,
@@ -215,7 +221,7 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
                         const int *p = nullptr,
                         const int *o = nullptr,
                         float _aspect = -1.0F, double _rate = -1.0F,
-                        int _aligned = 64);
+                        int _aligned = MYTH_WIDTH_ALIGNMENT);
 static inline void clear(VideoFrame *vf);
 static inline int  bitsperpixel(VideoFrameType type);
 static inline int  pitch_for_plane(VideoFrameType Type, int Width, uint Plane);
@@ -263,7 +269,7 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
     memset(vf->priv, 0, 4 * sizeof(unsigned char *));
 
     int width_aligned;
-    int height_aligned = (_height + 15) & ~0xf;
+    int height_aligned = (_height + MYTH_HEIGHT_ALIGNMENT - 1) & ~(MYTH_HEIGHT_ALIGNMENT -1);
     if (!_aligned)
         width_aligned = _width;
     else
@@ -646,10 +652,10 @@ static inline int bitsperpixel(VideoFrameType Type)
     return 8;
 }
 
-static inline uint buffersize(VideoFrameType type, int width, int height,
-                              int _aligned = 64)
+static inline size_t GetBufferSize(VideoFrameType Type, int Width, int Height,
+                                   int Aligned = MYTH_WIDTH_ALIGNMENT)
 {
-    int  type_bpp = bitsperpixel(type);
+    int  type_bpp = bitsperpixel(Type);
     int bpp = type_bpp / 4; /* bits per pixel div common factor */
     int bpb =  8 / 4; /* bits per byte div common factor */
 
@@ -659,12 +665,34 @@ static inline uint buffersize(VideoFrameType type, int width, int height,
     // If the buffer sizes are not 32 bytes aligned, adjust.
     // old versions of MythTV allowed people to set invalid
     // dimensions for MPEG-4 capture, no need to segfault..
-    int adj_w = _aligned ? ((width  + _aligned - 1) & ~(_aligned - 1)) : width;
-    int adj_h = (height + 15) & ~0xf;
+    int adj_w = Aligned ? ((Width  + Aligned - 1) & ~(Aligned - 1)) : Width;
+    int adj_h = (Height + MYTH_HEIGHT_ALIGNMENT - 1) & ~(MYTH_HEIGHT_ALIGNMENT - 1);
 
     // Calculate rounding as necessary.
     int remainder = (adj_w * adj_h * bpp) % bpb;
     return static_cast<uint>((adj_w * adj_h * bpp) / bpb + (remainder ? 1 : 0));
+}
+
+static inline unsigned char* GetAlignedBuffer(size_t Size)
+{
+    return static_cast<unsigned char*>(av_malloc(Size + 64));
+}
+
+static inline unsigned char* GetAlignedBufferZero(size_t Size)
+{
+    return static_cast<unsigned char*>(av_mallocz(Size + 64));
+}
+
+static inline unsigned char* CreateBuffer(VideoFrameType Type, int Width, int Height)
+{
+    size_t size = GetBufferSize(Type, Width, Height);
+    return GetAlignedBuffer(size);
+}
+
+static inline unsigned char* CreateBufferZero(VideoFrameType Type, int Width, int Height)
+{
+    size_t size = GetBufferSize(Type, Width, Height);
+    return GetAlignedBufferZero(size);
 }
 
 static inline void copybuffer(VideoFrame *dst, uint8_t *buffer,

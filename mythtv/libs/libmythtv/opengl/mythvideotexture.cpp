@@ -538,10 +538,9 @@ inline bool MythVideoTexture::CreateBuffer(MythVideoTexture *Texture, int Size)
     if (!Texture || Size < 1)
         return false;
 
-    unsigned char *scratch = new unsigned char[Size];
+    unsigned char *scratch = GetAlignedBufferZero(static_cast<size_t>(Size));
     if (scratch)
     {
-        memset(scratch, 0, static_cast<size_t>(Size));
         Texture->m_data = scratch;
         return true;
     }

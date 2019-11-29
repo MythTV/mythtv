@@ -8,18 +8,31 @@
 #          TMDb v3 API
 #-----------------------
 
-from tmdb_exceptions import *
-from locales import get_locale
-from cache import Cache
+from .tmdb_exceptions import *
+from .locales import get_locale
+from .cache import Cache
 
-from urllib import urlencode
-import urllib2
+# supports python2 and python3
+try:
+    from urllib  import urlencode
+    from urllib2 import Request   as _py23Request
+    from urllib2 import urlopen   as _py23urlopen
+    from urllib2 import HTTPError as _py23HTTPError
+
+except (NameError, ImportError):
+    from urllib.parse   import urlencode
+    from urllib.request import Request   as _py23Request
+    from urllib.request import urlopen   as _py23urlopen
+    from urllib.error   import HTTPError as _py23HTTPError
+    import urllib.error
+    import urllib.parse
+
 import json
 import os
 import time
 
 DEBUG = False
-cache = Cache(filename='pytmdb3.cache')
+cache = Cache(filename='pytmdb3.cache')  # split cache file into py2 and py3 ?
 
 #DEBUG = True
 #cache = Cache(engine='null')
@@ -44,7 +57,7 @@ def set_cache(engine=None, *args, **kwargs):
     cache.configure(engine, *args, **kwargs)
 
 
-class Request(urllib2.Request):
+class Request(_py23Request):
     _api_key = None
     _base_url = "http://api.themoviedb.org/3/"
 
@@ -62,17 +75,17 @@ class Request(urllib2.Request):
         """
         kwargs['api_key'] = self.api_key
         self._url = url.lstrip('/')
-        self._kwargs = dict([(kwa, kwv) for kwa, kwv in kwargs.items()
+        self._kwargs = dict([(kwa, kwv) for kwa, kwv in list(kwargs.items())
                                         if kwv is not None])
 
         locale = get_locale()
         kwargs = {}
-        for k, v in self._kwargs.items():
+        for k, v in list(self._kwargs.items()):
             kwargs[k] = locale.encode(v)
         url = '{0}{1}?{2}'\
                 .format(self._base_url, self._url, urlencode(kwargs))
 
-        urllib2.Request.__init__(self, url)
+        _py23Request.__init__(self, url)
         self.add_header('Accept', 'application/json')
         self.lifetime = 3600  # 1hr
 
@@ -81,7 +94,7 @@ class Request(urllib2.Request):
         Create a new instance of the request, with tweaked arguments.
         """
         args = dict(self._kwargs)
-        for k, v in kwargs.items():
+        for k, v in list(kwargs.items()):
             if v is None:
                 if k in args:
                     del args[k]
@@ -93,24 +106,24 @@ class Request(urllib2.Request):
 
     def add_data(self, data):
         """Provide data to be sent with POST."""
-        urllib2.Request.add_data(self, urlencode(data))
+        _py23Request.data = (self, urllib.parse.urlencode(data))
 
     def open(self):
         """Open a file object to the specified URL."""
         try:
             if DEBUG:
-                print 'loading '+self.get_full_url()
-                if self.has_data():
-                    print '  '+self.get_data()
-            return urllib2.urlopen(self)
-        except urllib2.HTTPError, e:
+                print('loading '+self.get_full_url())
+                if self.data:
+                    print('  '+self.data)
+            return _py23urlopen(self)
+        except _py23HTTPError as e:
             raise TMDBHTTPError(e)
 
     def read(self):
         """Return result from specified URL as a string."""
         return self.open().read()
 
-    @cache.cached(urllib2.Request.get_full_url)
+    @cache.cached(_py23Request.get_full_url)
     def readJSON(self):
         """Parse result from specified URL as JSON data."""
         url = self.get_full_url()
@@ -120,7 +133,7 @@ class Request(urllib2.Request):
                 # catch HTTP error from open()
                 data = json.load(self.open())
                 break
-            except TMDBHTTPError, e:
+            except TMDBHTTPError as e:
                 try:
                     # try to load whatever was returned
                     data = json.loads(e.response)
@@ -132,7 +145,7 @@ class Request(urllib2.Request):
                     if data.get('status_code', 1) ==25:
                         # Sleep and retry query.
                         if DEBUG:
-                            print 'Retry after {0} seconds'.format(max(float(e.headers['retry-after']),10))
+                            print('Retry after {0} seconds'.format(max(float(e.headers['retry-after']),10)))
                         time.sleep(max(float(e.headers['retry-after']),10))
                         continue
                     else:

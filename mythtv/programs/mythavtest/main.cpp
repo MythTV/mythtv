@@ -99,7 +99,6 @@ class VideoPerformanceTest
             LOG(VB_GENERAL, LOG_INFO, "No decode after startup - checking display performance");
         else if (m_decodeOnly)
             LOG(VB_GENERAL, LOG_INFO, "Decoding frames only - skipping display.");
-
         DecoderBase* dec = mp->GetDecoder();
         if (dec)
             LOG(VB_GENERAL, LOG_INFO, QString("Using decoder: %1").arg(dec->GetCodecDecoderName()));
@@ -166,12 +165,12 @@ class VideoPerformanceTest
     }
 
   private:
-    QString        m_file;
-    bool           m_noDecode;
-    bool           m_decodeOnly;
-    int            m_secondsToRun;
-    bool           m_deinterlace;
-    bool           m_allowGpu;
+    QString m_file;
+    bool    m_noDecode;
+    bool    m_decodeOnly;
+    int     m_secondsToRun;
+    bool    m_deinterlace;
+    bool    m_allowGpu;
     PlayerContext *m_ctx;
 };
 

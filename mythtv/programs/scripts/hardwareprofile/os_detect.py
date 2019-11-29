@@ -5,8 +5,8 @@
 #
 # Copyright (C) 2008 James Meyer <james.meyer@operamail.com>
 # Copyright (C) 2008 Yaakov M. Nemoy <loupgaroublond@gmail.com>
-# Copyright (C) 2009 Carlos Gonçalves <mail@cgoncalves.info>
-# Copyright (C) 2009 François Cami <fcami@fedoraproject.org>
+# Copyright (C) 2009 Carlos Goncalves <mail@cgoncalves.info>
+# Copyright (C) 2009 Francois Cami <fcami@fedoraproject.org>
 # Copyright (C) 2010 Mike McGrath <mmcgrath@redhat.com>
 # Copyright (C) 2012 Raymond Wagner <rwagner@mythtv.org>
 #
@@ -24,7 +24,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 
+from __future__ import print_function
+from builtins import object
 import os
+from future.utils import with_metaclass
 
 class OrderedType( type ):
     # provide global sequencing for OS class and subclasses to ensure
@@ -35,8 +38,7 @@ class OrderedType( type ):
         mcs.nextorder += 1
         return type.__new__(mcs, name, bases, attrs)
 
-class OS( object ):
-    __metaclass__ = OrderedType
+class OS( with_metaclass(OrderedType, object) ):
     _requires_func = True
     def __init__(self, ostype=-1, func=None, inst=None):
         if callable(ostype):
@@ -168,7 +170,7 @@ class OSFromUname( OS ):
 class OSInfoType( type ):
     def __new__(mcs, name, bases, attrs):
         OSs = []
-        for k,v in attrs.items():
+        for k,v in list(attrs.items()):
             if isinstance(v, OS):
                 # build list of stored OS types
                 OSs.append((v._order, k))
@@ -188,9 +190,7 @@ class OSInfoType( type ):
             # fall through to Unknown
             return 'Unknown'
 
-class get_os_info( object ):
-    __metaclass__ = OSInfoType
-
+class get_os_info( with_metaclass(OSInfoType, object) ):
     @OS('nt')
     def windows(self):
         win_version = {
@@ -284,10 +284,15 @@ class get_os_info( object ):
         p = Popen([fullpath, '--id', '--codename', '--release', '--short'],
                         stdout=PIPE, close_fds=True)
         p.wait()
-        return p.stdout.read().strip().replace('\n', ' ')
+        return p.stdout.read().decode().strip().replace('\n', ' ')
 
     @OSFromUname
     def Linux(self, OS, version):
         if OS == 'Linux':
             return 'Unknown Linux '+version
         return False
+
+
+if __name__ == '__main__':
+    results = get_os_info()
+    print('Test results="{}"'.format(results))

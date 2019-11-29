@@ -10,7 +10,8 @@ from MythTV.altdict import DictData, DictInvertCI
 from MythTV.database import *
 from MythTV.system import Grabber, InternetMetadata, VideoMetadata
 from MythTV.mythproto import ftopen, FileOps, Program
-from MythTV.utility import CMPRecord, CMPVideo, MARKUPLIST, datetime, ParseSet
+from MythTV.utility import CMPRecord, CMPVideo, MARKUPLIST, datetime, ParseSet,\
+                           py23_repr
 
 import re
 import locale
@@ -126,8 +127,9 @@ class Record( CMPRecord, DBDataWrite, RECTYPE ):
         db = DBCache(db)
         super(Record, cls)._setClassDefs(db)
         defaults = cls._template('Default', db=db)
-        for k,v in defaults.iteritems():
+        for k,v in list(defaults.items()):
             cls._defaults[k] = v
+
 
     _stored_templates = {}
     @classmethod
@@ -135,8 +137,8 @@ class Record( CMPRecord, DBDataWrite, RECTYPE ):
         if name not in cls._stored_templates:
             db = DBCache(db)
             cls._setClassDefs(db)
-            tmp = cls._fromQuery("WHERE title=?", (name + " (Template)",))\
-                                    .next().iteritems()
+            tmp = next(cls._fromQuery("WHERE title=?", (name + " (Template)",)))\
+                                    .iteritems()
             data = {}
             for k,v in tmp:
                 if k in ['type', 'category', 'profile', 'recpriority',
@@ -165,7 +167,7 @@ class Record( CMPRecord, DBDataWrite, RECTYPE ):
                                     % (self.title, self.type, hex(id(self)))
 
     def __repr__(self):
-        return str(self).encode('utf-8')
+        return py23_repr(str(self))
 
     def __init__(self, data=None, db=None, template=None):
         DBDataWrite.__init__(self, data, db)
@@ -333,7 +335,7 @@ class Recorded( CMPRecord, DBDataWrite ):
                 self.starttime.isoformat(' '), hex(id(self)))
 
     def __repr__(self):
-        return str(self).encode('utf-8')
+        return py23_repr(str(self))
 
     def __init__(self, data=None, db=None):
         if data is not None:
@@ -386,6 +388,10 @@ class Recorded( CMPRecord, DBDataWrite ):
         """Recorded.getProgram() -> Program object"""
         return Program.fromRecorded(self)
 
+    def getRecordedFile(self):
+        """Recorded.getRecordedFile() -> RecordedFile object"""
+        return RecordedFile.fromRecorded(self)
+
     def getRecordedProgram(self):
         """Recorded.getRecordedProgram() -> RecordedProgram object"""
         return RecordedProgram.fromRecorded(self)
@@ -428,7 +434,8 @@ class Recorded( CMPRecord, DBDataWrite ):
                                   ('a','%p'),('A','%p') ):
                 path = path.replace(pre+tag, self[data].strftime(format))
         if self.originalairdate is None:
-            airdate = date(1,1,1)
+            airdate = _default_datetime
+
         else:
             airdate = self.originalairdate
         for (tag, format) in (('y','%y'),('Y','%Y'),('n','%m'),('m','%m'),
@@ -548,6 +555,36 @@ class Recorded( CMPRecord, DBDataWrite ):
         return fe.send('play','program %d %s' % \
                     (self.chanid, self.starttime.isoformat()))
 
+class RecordedFile( CMPRecord, DBDataWrite ):
+    """
+    RecordedFile(data=None, db=None) -> RecordedFile object
+            'data' is a recordedid
+    """
+    _key   = ['recordedid']
+    _defaults = {'filesize':0,          'width':0,        'height':0,
+                 'fps':0.0,             'aspect':0.0,     'audio_sample_rate':0,
+                 'audio_channels':0,    'audio_codec':'', 'video_codec':'',
+                 'comment':u'',         'hostname':'',    'storagegroup':'',
+                 'container':'',        'total_bitrate':0,
+                 'video_avg_bitrate':0, 'video_max_bitrate':0,
+                 'audio_avg_bitrate':0, 'audio_max_bitrate':0}
+
+    def __str__(self):
+        if self._wheredat is None:
+            return u"<Uninitialized RecordedFile at %s>" % hex(id(self))
+        return u"<RecordedFile '%s','%d' at %s>" % (self.basename,
+                self.recordedid, hex(id(self)))
+
+    def __repr__(self):
+        return py23_repr(str(self))
+
+    def __init__(self, data=None, db=None):
+        DBDataWrite.__init__(self, data, db)
+
+    @classmethod
+    def fromRecorded(cls, recorded):
+        return cls((recorded.recordedid), recorded._db)
+
 class RecordedProgram( CMPRecord, DBDataWrite ):
 
     """
@@ -574,7 +611,7 @@ class RecordedProgram( CMPRecord, DBDataWrite ):
                 self.starttime.isoformat(' '), hex(id(self)))
 
     def __repr__(self):
-        return str(self).encode('utf-8')
+        return py23_repr(str(self))
 
     def __init__(self, data=None, db=None):
         if data is not None:
@@ -612,7 +649,7 @@ class OldRecorded( CMPRecord, DBDataWrite, RECSTATUS ):
                 self.starttime.isoformat(' '), hex(id(self)))
 
     def __repr__(self):
-        return str(self).encode('utf-8')
+        return py23_repr(str(self))
 
     def __init__(self, data=None, db=None):
         if data is not None:
@@ -656,7 +693,7 @@ class RecordedArtwork( DBDataWrite ):
                         (self.inetref, self.season, hex(id(self)))
 
     def __repr__(self):
-        return str(self).encode('utf-8')
+        return py23_repr(str(self))
 
     coverart = Artwork('coverart')
     fanart   = Artwork('fanart')
@@ -678,7 +715,7 @@ class Job( DBDataWrite, JOBTYPE, JOBCMD, JOBFLAG, JOBSTATUS ):
         return u"<Job '%s' at %s>" % (self.id, hex(id(self)))
 
     def __repr__(self):
-        return str(self).encode('utf-8')
+        return py23_repr(str(self))
 
     def setComment(self,comment):
         """Job.setComment(comment) -> None, updates comment"""
@@ -707,12 +744,12 @@ class Job( DBDataWrite, JOBTYPE, JOBCMD, JOBFLAG, JOBSTATUS ):
             job.args = args
         if flags:
             job.flags = flags
-        job.create()
+        return job.create()
 
     @classmethod
     def fromProgram(cls, prog, type, status=None, schedruntime=None,
                                 hostname=None, args=None, flags=None):
-        if prog.rectype != prog.rsRecorded:
+        if prog.recstatus != prog.rsRecorded:
             raise MythError('Invalid recording type for Job.')
         job = cls(db=prog._db)
         job.type = type
@@ -728,7 +765,7 @@ class Job( DBDataWrite, JOBTYPE, JOBCMD, JOBFLAG, JOBSTATUS ):
             job.args = args
         if flags:
             job.flags = flags
-        job.create()
+        return job.create()
 
 class Channel( DBDataWrite ):
     """Channel(chanid=None, db=None) -> Channel object"""
@@ -749,7 +786,7 @@ class Channel( DBDataWrite ):
                         (self.chanid, self.name, hex(id(self)))
 
     def __repr__(self):
-        return str(self).encode('utf-8')
+        return py23_repr(str(self))
 
 class Guide( CMPRecord, DBData ):
     """
@@ -766,7 +803,7 @@ class Guide( CMPRecord, DBData ):
                 self.starttime.isoformat(' '), hex(id(self)))
 
     def __repr__(self):
-        return str(self).encode('utf-8')
+        return py23_repr(str(self))
 
     def getRecStatus(self):
         be = FileOps(db=self._db)
@@ -994,17 +1031,17 @@ class Video( CMPVideo, VideoSchema, DBDataWrite ):
         for old in ('%20','_','.'):
             filename = filename.replace(old, ' ')
 
-        sep = '(?:\s?(?:-|/)?\s?)?'
+        sep = r'(?:\s?(?:-|/)?\s?)?'
         regex1 = re.compile(
-            sep.join(['^(.*[^s0-9])',
-                      '(?:s|(?:Season))?',
-                      '(\d{1,4})',
-                      '(?:[ex/]|Episode)',
-                      '(\d{1,3})',
-                      '(.*)$']), re.I)
+            sep.join([r'^(.*[^s0-9])',
+                      r'(?:s|(?:Season))?',
+                      r'(\d{1,4})',
+                      r'(?:[ex/]|Episode)',
+                      r'(\d{1,3})',
+                      r'(.*)$']), re.I)
 
-        regex2 = re.compile('(%s(?:Season%s\d*%s)*%s)$' \
-                            % (sep, sep, sep, sep), re.I)
+        title_pattern = r'(%s(?:Season%s\d*%s)*%s)$' % (sep, sep, sep, sep)
+        regex2 = re.compile(title_pattern, re.I)
 
         match1 = regex1.search(filename)
         if match1:

@@ -505,6 +505,9 @@ using_frontend {
             SOURCES += opengl/mythdrmprimeinterop.cpp
             SOURCES += opengl/mythegldmabuf.cpp
 
+            HEADERS += decoders/mythdrmprimecontext.h
+            SOURCES += decoders/mythdrmprimecontext.cpp
+
             using_mmal {
                 HEADERS += opengl/mythmmalinterop.h
                 SOURCES += opengl/mythmmalinterop.cpp

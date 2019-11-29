@@ -553,14 +553,6 @@ void MythRenderOpenGL::doneCurrent()
     m_lock.unlock();
 }
 
-void MythRenderOpenGL::Release(void)
-{
-#if !defined(Q_OS_WIN)
-    while (m_lockLevel > 0)
-        doneCurrent();
-#endif
-}
-
 void MythRenderOpenGL::SetViewPort(const QRect &rect, bool viewportonly)
 {
     if (rect == m_viewport)

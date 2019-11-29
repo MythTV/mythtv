@@ -1,3 +1,8 @@
+// Qt
+#include <QThread>
+#include <QApplication>
+#include <QElapsedTimer>
+
 // MythTV
 #include "DisplayRes.h"
 #include "config.h"
@@ -12,86 +17,125 @@
 #include "DisplayResOSX.h"
 #endif
 
-// Qt
-#include <QThread>
-#include <QApplication>
-#include <QElapsedTimer>
-
 // Std
 #include <cmath>
 
 #define LOC QString("DispRes: ")
 
-DisplayRes * DisplayRes::s_instance = nullptr;
-bool         DisplayRes::s_locked   = false;
+/** \class DisplayRes
+ *  \brief The DisplayRes module allows for the display resolution
+ * and refresh rate to be changed "on the fly".
+ *
+ * Resolution and refresh rate can be changed using an explicit call or based on
+ * the video resolution.
+ *
+ * The SwitchToVideoMode routine takes care of the actual work involved in
+ * changing the display mode. There are currently XRandR and OS X Carbon
+ * implementation so this works for X (Linux/BSD/UNIX) and Mac OS X.
+ *
+ * Currently, MythUIHelper holds the 'master' reference (i.e. it typically creates
+ * the first instance and releases it last).
+*/
 
-DisplayRes * DisplayRes::GetDisplayRes(bool lock)
+/*! \brief Retrieve a pointer to the DisplayRes singleton.
+ *
+* DisplaRes is a reference counted object with a single, static instance on
+* supported platforms.
+* Retrieve a pointer with AcquireRelease and release it with AcquireRelease(false).
+*
+* \return A pointer to the platform specific singleton or nullptr on unsupported
+* platforms.
+*/
+DisplayRes* DisplayRes::AcquireRelease(bool Acquire /*=true*/)
 {
-    if (lock && s_locked)
-        return nullptr;
+    static QMutex s_lock(QMutex::Recursive);
+    static DisplayRes* s_instance = nullptr;
 
-    if (!s_instance)
+    QMutexLocker locker(&s_lock);
+    if (Acquire)
     {
+        if (s_instance)
+        {
+            s_instance->IncrRef();
+        }
+        else
+        {
 #ifdef USING_XRANDR
-        if (DisplayResX::IsAvailable())
-            s_instance = new DisplayResX();
+            if (DisplayResX::IsAvailable())
+                s_instance = new DisplayResX();
 #elif CONFIG_DARWIN
-        s_instance = new DisplayResOSX();
+            s_instance = new DisplayResOSX();
 #endif
+        }
     }
-
-    if (s_instance && lock)
-        s_locked = true;
-
+    else
+    {
+        if (s_instance)
+            if (s_instance->DecrRef() == 0)
+                s_instance = nullptr;
+    }
     return s_instance;
 }
 
-void DisplayRes::Unlock(void)
+std::vector<DisplayResScreen> DisplayRes::GetModes(void)
 {
-    s_locked = false;
+    std::vector<DisplayResScreen> result;
+    DisplayRes *dispres = DisplayRes::AcquireRelease();
+    if (dispres)
+    {
+        result = dispres->GetVideoModes();
+        DisplayRes::AcquireRelease(false);
+    }
+    return result;
 }
 
+DisplayRes::DisplayRes()
+  : ReferenceCounter("DisplRes")
+{
+}
+
+/// \brief Return the screen to the original desktop settings
 void DisplayRes::SwitchToDesktop()
 {
-    if (s_instance)
-        s_instance->SwitchToGUI(DESKTOP);
+    SwitchToGUI(DESKTOP);
 }
 
 bool DisplayRes::Initialize(void)
 {
-    int tW = 0, tH = 0, tW_mm = 0, tH_mm = 0;
-    double tAspect = 0.0;
-    double tRate = 0.0;
-
+    int pixelwidth = 0;
+    int pixelheight = 0;
+    int mmwidth = 0;
+    int mmheight = 0;
+    double refreshrate = 0.0;
     m_last.Init();
     m_curMode = GUI;
     m_pixelAspectRatio = 1.0;
 
     // Initialise DESKTOP mode
-    GetDisplayInfo(tW, tH, tW_mm, tH_mm, tRate, m_pixelAspectRatio);
+    GetDisplayInfo(pixelwidth, pixelheight, mmwidth, mmheight, refreshrate, m_pixelAspectRatio);
     m_mode[DESKTOP].Init();
-    m_mode[DESKTOP] = DisplayResScreen(tW, tH, tW_mm, tH_mm, -1.0, tRate);
+    m_mode[DESKTOP] = DisplayResScreen(pixelwidth, pixelheight, mmwidth, mmheight, -1.0, refreshrate);
     LOG(VB_GENERAL, LOG_NOTICE, LOC + QString("Desktop video mode: %1x%2 %3 Hz")
-        .arg(tW).arg(tH).arg(tRate, 0, 'f', 3));
+        .arg(pixelwidth).arg(pixelheight).arg(refreshrate, 0, 'f', 3));
 
     // Initialize GUI mode
     m_mode[GUI].Init();
-    tW = tH = 0;
-    GetMythDB()->GetResolutionSetting("GuiVidMode", tW, tH, tAspect, tRate);
-    GetMythDB()->GetResolutionSetting("DisplaySize", tW_mm, tH_mm);
-    m_mode[GUI] = DisplayResScreen(tW, tH, tW_mm, tH_mm, -1.0, tRate);
+    pixelwidth = pixelheight = 0;
+    double aspectratio = 0.0;
+    GetMythDB()->GetResolutionSetting("GuiVidMode", pixelwidth, pixelheight, aspectratio, refreshrate);
+    GetMythDB()->GetResolutionSetting("DisplaySize", mmwidth, mmheight);
+    m_mode[GUI] = DisplayResScreen(pixelwidth, pixelheight, mmwidth, mmheight, -1.0, refreshrate);
 
-    if (m_mode[DESKTOP] == m_mode[GUI] && qFuzzyIsNull(tRate))
+    if (m_mode[DESKTOP] == m_mode[GUI] && qFuzzyIsNull(refreshrate))
     {
         // same resolution as current desktop
         m_last = m_mode[DESKTOP];
     }
 
     // Initialize default VIDEO mode
-    tW = tH = 0;
-    GetMythDB()->GetResolutionSetting("TVVidMode", tW, tH, tAspect, tRate);
-    m_mode[VIDEO] = DisplayResScreen(tW, tH, tW_mm, tH_mm, tAspect, tRate);
-
+    pixelwidth = pixelheight = 0;
+    GetMythDB()->GetResolutionSetting("TVVidMode", pixelwidth, pixelheight, aspectratio, refreshrate);
+    m_mode[VIDEO] = DisplayResScreen(pixelwidth, pixelheight, mmwidth, mmheight, aspectratio, refreshrate);
 
     // Initialize video override mode
     m_inSizeToOutputMode.clear();
@@ -113,7 +157,7 @@ bool DisplayRes::Initialize(void)
 
         uint64_t key = DisplayResScreen::CalcKey(iw, ih, irate);
 
-        DisplayResScreen scr(ow, oh, tW_mm, tH_mm, oaspect, orate);
+        DisplayResScreen scr(ow, oh, mmwidth, mmheight, oaspect, orate);
 
         m_inSizeToOutputMode[key] = scr;
     }
@@ -121,15 +165,18 @@ bool DisplayRes::Initialize(void)
     return true;
 }
 
-bool DisplayRes::SwitchToVideo(int iwidth, int iheight, double frate)
+/** \brief Switches to the resolution and refresh rate defined in the
+ * database for the specified video resolution and frame rate.
+*/
+bool DisplayRes::SwitchToVideo(int Width, int Height, double Rate)
 {
-    tmode next_mode = VIDEO; // default VIDEO mode
+    Mode next_mode = VIDEO; // default VIDEO mode
     DisplayResScreen next = m_mode[next_mode];
     double target_rate = 0.0;
 
     // try to find video override mode
     uint64_t key = DisplayResScreen::FindBestScreen(m_inSizeToOutputMode,
-                   iwidth, iheight, frate);
+                   Width, Height, Rate);
 
     if (key != 0)
     {
@@ -142,8 +189,8 @@ bool DisplayRes::SwitchToVideo(int iwidth, int iheight, double frate)
     if (qFuzzyIsNull(next.RefreshRate()))
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Trying to match best refresh rate %1Hz")
-            .arg(frate, 0, 'f', 3));
-        next.SetRefreshRate(frate);
+            .arg(Rate, 0, 'f', 3));
+        next.SetRefreshRate(Rate);
     }
 
     // need to change video mode?
@@ -162,7 +209,7 @@ bool DisplayRes::SwitchToVideo(int iwidth, int iheight, double frate)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("SwitchToVideo: Video size %1 x %2: "
                                                "xrandr failed for %3 x %4")
-            .arg(iwidth).arg(iheight).arg(next.Width()).arg(next.Height()));
+            .arg(Width).arg(Height).arg(next.Width()).arg(next.Height()));
         return false;
     }
 
@@ -172,7 +219,7 @@ bool DisplayRes::SwitchToVideo(int iwidth, int iheight, double frate)
     m_last.SetRefreshRate(target_rate);
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("SwitchToVideo: Video size %1x%2")
-        .arg(iwidth).arg(iheight));
+        .arg(Width).arg(Height));
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("%1 displaying resolution %2x%3, %4mmx%5mm")
         .arg((chg) ? "Switched to" : "Already")
         .arg(GetWidth()).arg(GetHeight())
@@ -184,9 +231,18 @@ bool DisplayRes::SwitchToVideo(int iwidth, int iheight, double frate)
     return chg;
 }
 
-bool DisplayRes::SwitchToGUI(tmode next_mode)
+/** \brief Switches to the GUI resolution specified.
+ *
+ * If which_gui is GUI then this switches to the resolution and refresh rate set
+ * in the database for the GUI. If which_gui is set to CUSTOM_GUI then we switch
+ * to the resolution and refresh rate specified in the last call to SwitchToCustomGUI.
+ *
+ * \param which_gui either regular GUI or CUSTOM_GUI
+ * \sa SwitchToCustomGUI
+ */
+bool DisplayRes::SwitchToGUI(Mode NextMode)
 {
-    DisplayResScreen next = m_mode[next_mode];
+    DisplayResScreen next = m_mode[NextMode];
     double target_rate = static_cast<double>(NAN);
 
     // need to change video mode?
@@ -213,7 +269,7 @@ bool DisplayRes::SwitchToGUI(tmode next_mode)
         return false;
     }
 
-    m_curMode = next_mode;
+    m_curMode = NextMode;
 
     m_last = next;
     m_last.SetRefreshRate(target_rate);
@@ -224,21 +280,68 @@ bool DisplayRes::SwitchToGUI(tmode next_mode)
     return chg;
 }
 
-bool DisplayRes::SwitchToCustomGUI(int width, int height, short rate)
+/** \brief Switches to the custom GUI resolution specified.
+ *
+ * This switches to the specified resolution, and refresh rate if specified. It
+ * also makes saves this resolution as the CUSTOM_GUI resolution, so that it can
+ * be recalled with SwitchToGUI(CUSTOM_GUI) in later calls.
+ *
+ * \sa SwitchToGUI
+*/
+bool DisplayRes::SwitchToCustomGUI(int Width, int Height, short Rate)
 {
-    m_mode[CUSTOM_GUI] = DisplayResScreen(width, height, m_mode[GUI].Width_mm(),
+    m_mode[CUSTOM_GUI] = DisplayResScreen(Width, Height, m_mode[GUI].Width_mm(),
                                           m_mode[GUI].Height_mm(), -1.0,
-                                          static_cast<double>(rate));
+                                          static_cast<double>(Rate));
     return SwitchToGUI(CUSTOM_GUI);
 }
 
-std::vector<double> DisplayRes::GetRefreshRates(int width,
-        int height) const
+int DisplayRes::GetWidth(void) const
+{
+    return m_last.Width();
+}
+
+int DisplayRes::GetHeight(void) const
+{
+    return m_last.Height();
+}
+
+int DisplayRes::GetPhysicalWidth(void) const
+{
+    return m_last.Width_mm();
+}
+
+int DisplayRes::GetPhysicalHeight(void) const
+{
+    return m_last.Height_mm();
+}
+
+double DisplayRes::GetRefreshRate(void) const
+{
+    return m_last.RefreshRate();
+}
+
+/** \brief Returns current screen aspect ratio.
+ *
+ * If there is an aspect overide in the database that aspect ratio is returned
+ * instead of the actual screen aspect ratio.
+*/
+double DisplayRes::GetAspectRatio(void) const
+{
+    return m_last.AspectRatio();
+}
+
+double DisplayRes::GetPixelAspectRatio(void) const
+{
+    return m_pixelAspectRatio;
+}
+
+std::vector<double> DisplayRes::GetRefreshRates(int Width, int Height) const
 {
     double tr = static_cast<double>(NAN);
     std::vector<double> empty;
 
-    const DisplayResScreen drs(width, height, 0, 0, -1.0, 0.0);
+    const DisplayResScreen drs(Width, Height, 0, 0, -1.0, 0.0);
     const DisplayResVector& drv = GetVideoModes();
     int t = DisplayResScreen::FindBestMatch(drv, drs, tr);
 
@@ -246,26 +349,6 @@ std::vector<double> DisplayRes::GetRefreshRates(int width,
         return empty;
 
     return drv[static_cast<size_t>(t)].RefreshRates();
-}
-
-/** \fn GetVideoModes(void)
- *  \relates DisplayRes
- *  \brief Returns all video modes available.
- *
- *   This is a conveniance class that instanciates a DisplayRes
- *   class if needed, and returns a copy of vector returned by
- *   DisplayRes::GetVideoModes(void).
- */
-DisplayResVector GetVideoModes(void)
-{
-    DisplayRes *display_res = DisplayRes::GetDisplayRes();
-
-    if (display_res)
-        return display_res->GetVideoModes();
-
-    DisplayResVector empty;
-
-    return empty;
 }
 
 void DisplayRes::PauseForModeSwitch(void)

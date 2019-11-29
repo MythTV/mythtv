@@ -35,12 +35,11 @@
 
 class MythVAAPIInterop : public MythOpenGLInterop
 {
+    friend class MythOpenGLInterop;
+
   public:
     static MythVAAPIInterop* Create(MythRenderOpenGL *Context, Type InteropType);
-    static Type GetInteropType(MythCodecID CodecId, MythRenderOpenGL *Context = nullptr);
 
-    MythVAAPIInterop(MythRenderOpenGL *Context, Type InteropType);
-    virtual ~MythVAAPIInterop() override;
     VASurfaceID VerifySurface(MythRenderOpenGL *Context, VideoFrame *Frame);
     VADisplay   GetDisplay   (void);
     QString     GetVendor    (void);
@@ -51,8 +50,12 @@ class MythVAAPIInterop : public MythOpenGLInterop
                                    AVFilterContext *&Sink);
 
   protected:
-    void InitaliseDisplay    (void);
-    VASurfaceID Deinterlace  (VideoFrame *Frame, VASurfaceID Current, FrameScanType Scan);
+    MythVAAPIInterop(MythRenderOpenGL *Context, Type InteropType);
+    virtual ~MythVAAPIInterop() override;
+
+    static Type GetInteropType       (VideoFrameType Format);
+    void        InitaliseDisplay     (void);
+    VASurfaceID Deinterlace          (VideoFrame *Frame, VASurfaceID Current, FrameScanType Scan);
     virtual void DestroyDeinterlacer (void);
     virtual void PostInitDeinterlacer(void) { }
 

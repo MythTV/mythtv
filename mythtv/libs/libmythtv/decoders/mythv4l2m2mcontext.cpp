@@ -6,7 +6,6 @@
 #include "v4l2util.h"
 #include "fourcc.h"
 #include "avformatdecoder.h"
-#include "mythdrmprimeinterop.h"
 #include "mythv4l2m2mcontext.h"
 
 // Sys
@@ -19,15 +18,20 @@ extern "C" {
 
 #define LOC QString("V4L2_M2M: ")
 
+/*! \class MythV4L2M2MContext
+ * \brief A handler for V4L2 Memory2Memory codecs.
+ *
+ * The bulk of the 'direct rendering' support is in MythDRMPRIMEContext. This
+ * sub-class handles v4l2 specific functionality checks and support for software
+ * frame formats.
+*/
 MythV4L2M2MContext::MythV4L2M2MContext(DecoderBase *Parent, MythCodecID CodecID)
-  : MythCodecContext(Parent, CodecID)
+  : MythDRMPRIMEContext(Parent, CodecID)
 {
 }
 
 MythV4L2M2MContext::~MythV4L2M2MContext()
 {
-    if (m_interop)
-        m_interop->DecrRef();
 }
 
 inline uint32_t V4L2CodecType(AVCodecID Id)
@@ -47,6 +51,12 @@ inline uint32_t V4L2CodecType(AVCodecID Id)
     }
     return 0;
 }
+
+bool MythV4L2M2MContext::DecoderWillResetOnFlush(void)
+{
+    return codec_is_v4l2(m_codecID);
+}
+
 MythCodecID MythV4L2M2MContext::GetSupportedCodec(AVCodecContext **Context,
                                                   AVCodec **Codec,
                                                   const QString &Decoder,
@@ -70,66 +80,35 @@ MythCodecID MythV4L2M2MContext::GetSupportedCodec(AVCodecContext **Context,
     if (!HaveV4L2Codecs((*Codec)->id))
         return failure;
 
-    // look for a decoder
-    QString name = QString((*Codec)->name) + "_v4l2m2m";
-    if (name == "mpeg2video_v4l2m2m")
-        name = "mpeg2_v4l2m2m";
-    AVCodec *codec = avcodec_find_decoder_by_name(name.toLocal8Bit());
-    if (!codec)
-    {
-        // this shouldn't happen!
-        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to find %1").arg(name));
-        return failure;
-    }
-
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Found V4L2/FFmpeg decoder '%1'").arg(name));
-    *Codec = codec;
-    gCodecMap->freeCodecContext(Stream);
-    *Context = gCodecMap->getCodecContext(Stream, *Codec);
-    (*Context)->pix_fmt = decodeonly ? (*Context)->pix_fmt : AV_PIX_FMT_DRM_PRIME;
-    return success;
+    return MythDRMPRIMEContext::GetPrimeCodec(Context, Codec, Stream,
+                                              success, failure, "v4l2m2m",
+                                              decodeonly ? (*Context)->pix_fmt : AV_PIX_FMT_DRM_PRIME);
 }
 
 int MythV4L2M2MContext::HwDecoderInit(AVCodecContext *Context)
 {
     if (!Context)
         return -1;
-
     if (codec_is_v4l2_dec(m_codecID))
         return 0;
-
-    if (!codec_is_v4l2(m_codecID) || Context->pix_fmt != AV_PIX_FMT_DRM_PRIME)
-        return -1;
-
-    MythRenderOpenGL *context = MythRenderOpenGL::GetOpenGLRender();
-    m_interop = MythDRMPRIMEInterop::Create(context, MythOpenGLInterop::DRMPRIME);
-    return m_interop ? 0 : -1;
+    return MythDRMPRIMEContext::HwDecoderInit(Context);
 }
 
 void MythV4L2M2MContext::InitVideoCodec(AVCodecContext *Context, bool SelectedStream, bool &DirectRendering)
 {
-    if (codec_is_v4l2(m_codecID))
-    {
-        DirectRendering = false;
-        Context->get_format = MythV4L2M2MContext::GetFormat;
-        return;
-    }
     if (codec_is_v4l2_dec(m_codecID))
     {
         DirectRendering = false;
         return;
     }
-
-    MythCodecContext::InitVideoCodec(Context, SelectedStream, DirectRendering);
+    return MythDRMPRIMEContext::InitVideoCodec(Context, SelectedStream, DirectRendering);
 }
 
 bool MythV4L2M2MContext::RetrieveFrame(AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame)
 {
-    if (codec_is_v4l2(m_codecID))
-        return GetDRMBuffer(Context, Frame, AvFrame, 0);
-    else if (codec_is_v4l2_dec(m_codecID))
+    if (codec_is_v4l2_dec(m_codecID))
         return GetBuffer(Context, Frame, AvFrame, 0);
-    return false;
+    return MythDRMPRIMEContext::RetrieveFrame(Context, Frame, AvFrame);
 }
 
 /*! \brief Reduce the number of capture buffers
@@ -196,48 +175,6 @@ bool MythV4L2M2MContext::GetBuffer(AVCodecContext *Context, VideoFrame *Frame, A
     return true;
 }
 
-bool MythV4L2M2MContext::GetDRMBuffer(AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame, int /*unused*/)
-{
-    if (!Context || !AvFrame || !Frame)
-        return false;
-
-    if (Frame->codec != FMT_DRMPRIME || static_cast<AVPixelFormat>(AvFrame->format) != AV_PIX_FMT_DRM_PRIME)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Not a DRM PRIME buffer");
-        return false;
-    }
-
-    Frame->width = AvFrame->width;
-    Frame->height = AvFrame->height;
-    Frame->pix_fmt = Context->pix_fmt;
-    Frame->sw_pix_fmt = Context->sw_pix_fmt;
-    Frame->directrendering = 1;
-    AvFrame->opaque = Frame;
-    AvFrame->reordered_opaque = Context->reordered_opaque;
-
-    // Frame->data[0] holds AVDRMFrameDescriptor
-    Frame->buf = AvFrame->data[0];
-    // Retain the buffer so it is not released before we display it
-    Frame->priv[0] = reinterpret_cast<unsigned char*>(av_buffer_ref(AvFrame->buf[0]));
-    // Add interop
-    Frame->priv[1] = reinterpret_cast<unsigned char*>(m_interop);
-    // Set the release method
-    AvFrame->buf[1] = av_buffer_create(reinterpret_cast<uint8_t*>(Frame), 0, MythCodecContext::ReleaseBuffer,
-                                       static_cast<AvFormatDecoder*>(Context->opaque), 0);
-    return true;
-}
-
-AVPixelFormat MythV4L2M2MContext::GetFormat(AVCodecContext* /*unused*/, const AVPixelFormat *PixFmt)
-{
-    while (*PixFmt != AV_PIX_FMT_NONE)
-    {
-        if (*PixFmt == AV_PIX_FMT_DRM_PRIME)
-            return AV_PIX_FMT_DRM_PRIME;
-        PixFmt++;
-    }
-    return AV_PIX_FMT_NONE;
-}
-
 bool MythV4L2M2MContext::HaveV4L2Codecs(AVCodecID Codec /* = AV_CODEC_ID_NONE */)
 {
     static QVector<AVCodecID> s_avcodecs({AV_CODEC_ID_MPEG1VIDEO, AV_CODEC_ID_MPEG2VIDEO,
@@ -246,11 +183,10 @@ bool MythV4L2M2MContext::HaveV4L2Codecs(AVCodecID Codec /* = AV_CODEC_ID_NONE */
                                           AV_CODEC_ID_VP8,        AV_CODEC_ID_VP9,
                                           AV_CODEC_ID_HEVC});
 
-    static QMutex s_lock(QMutex::Recursive);
     static bool s_needscheck = true;
     static QVector<AVCodecID> s_supportedV4L2Codecs;
 
-    QMutexLocker locker(&s_lock);
+    QMutexLocker locker(&s_drmPrimeLock);
 
     if (s_needscheck)
     {

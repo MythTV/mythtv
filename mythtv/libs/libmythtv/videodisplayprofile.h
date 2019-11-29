@@ -80,7 +80,6 @@ class MTV_PUBLIC VideoDisplayProfile
     bool    IsSkipLoopEnabled(void) const;
     QString GetVideoRenderer(void) const;
     QString GetActualVideoRenderer(void) const;
-    QString GetFilters(void) const;
     QString toString(void) const;
     QString GetSingleRatePreferences(void) const;
     QString GetDoubleRatePreferences(void) const;
@@ -92,6 +91,7 @@ class MTV_PUBLIC VideoDisplayProfile
     static QStringList GetDecoderNames(void);
     static QString     GetDecoderName(const QString &Decoder);
     static QString     GetDecoderHelp(const QString &Decoder = QString());
+    static QString     GetVideoRendererName(const QString &Renderer);
     static QString     GetDefaultProfileName(const QString &HostName);
     static void        SetDefaultProfileName(const QString &ProfileName, const QString &HostName);
     static uint        GetProfileGroupID(const QString &ProfileName, const QString &HostName);
@@ -101,8 +101,7 @@ class MTV_PUBLIC VideoDisplayProfile
     static void        CreateProfile(uint GroupId, uint Priority,
                                      const QString& Width, const QString& Height, const QString& Codecs,
                                      const QString& Decoder, uint MaxCpus, bool SkipLoop, const QString& VideoRenderer,
-                                     const QString& Deint1, const QString& Deint2, const QString& Filters);
-    static void        DeleteProfiles(const QString &HostName);
+                                     const QString& Deint1, const QString& Deint2);
     static void        CreateProfiles(const QString &HostName);
     static QStringList GetVideoRenderers(const QString &Decoder);
     static QString     GetVideoRendererHelp(const QString &Renderer);
@@ -138,6 +137,7 @@ class MTV_PUBLIC VideoDisplayProfile
     static QStringList               s_safe_custom;
     static QMap<QString,uint>        s_safe_renderer_priority;
     static QMap<QString,QString>     s_dec_name;
+    static QMap<QString,QString>     s_rend_name;
     static QStringList               s_safe_decoders;
     static QList<QPair<QString,QString> > s_deinterlacer_options;
 };

@@ -56,7 +56,7 @@ void MythVideoOutputOpenGL::GetRenderOptions(RenderOptions &Options)
     Options.renderers->append("opengl-yv12");
     Options.priorities->insert("opengl-yv12", 65);
 
-#if defined(USING_VAAPI) || defined (USING_VTB) || defined (USING_MEDIACODEC) || defined (USING_VDPAU) || defined (USING_NVDEC) || defined (USING_MMAL) || defined (USING_V4L2PRIME)
+#if defined(USING_VAAPI) || defined (USING_VTB) || defined (USING_MEDIACODEC) || defined (USING_VDPAU) || defined (USING_NVDEC) || defined (USING_MMAL) || defined (USING_V4L2PRIME) || defined (USING_EGL)
     Options.renderers->append("opengl-hw");
     (*Options.safe_renderers)["dummy"].append("opengl-hw");
     (*Options.safe_renderers)["nuppel"].append("opengl-hw");
@@ -90,6 +90,10 @@ void MythVideoOutputOpenGL::GetRenderOptions(RenderOptions &Options)
     if (Options.decoders->contains("v4l2"))
         (*Options.safe_renderers)["v4l2"].append("opengl-hw");
 #endif
+#ifdef USING_EGL
+    if (Options.decoders->contains("drmprime"))
+        (*Options.safe_renderers)["drmprime"].append("opengl-hw");
+#endif
 }
 
 MythVideoOutputOpenGL::MythVideoOutputOpenGL(QString Profile)
@@ -109,7 +113,7 @@ MythVideoOutputOpenGL::MythVideoOutputOpenGL(QString Profile)
 {
     // Setup display switching
     if (gCoreContext->GetBoolSetting("UseVideoModes", false))
-        m_displayRes = DisplayRes::GetDisplayRes(true);
+        m_displayRes = DisplayRes::AcquireRelease();
 
     // Retrieve render context
     m_render = MythRenderOpenGL::GetOpenGLRender();
@@ -267,7 +271,7 @@ bool MythVideoOutputOpenGL::Init(const QSize &VideoDim, const QSize &VideoDispDi
 
 bool MythVideoOutputOpenGL::InputChanged(const QSize &VideoDim, const QSize &VideoDispDim,
                                          float Aspect, MythCodecID CodecId, bool &AspectOnly,
-                                         MythMultiLocker* Locks, int ReferenceFrames,
+                                         MythMultiLocker*, int ReferenceFrames,
                                          bool ForceChange)
 {
     QSize currentvideodim     = m_window.GetVideoDim();
@@ -305,20 +309,10 @@ bool MythVideoOutputOpenGL::InputChanged(const QSize &VideoDim, const QSize &Vid
         return true;
     }
 
-    // fail fast if we don't know how to display the codec
-    if (!codec_sw_copy(CodecId))
-    {
-        // MythOpenGLInterop::GetInteropType will block if we don't release our current locks
-        Locks->Unlock();
-        MythOpenGLInterop::Type support = MythOpenGLInterop::GetInteropType(CodecId);
-        Locks->Relock();
-        if (support == MythOpenGLInterop::Unsupported)
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC + "New video codec is not supported.");
-            m_errorState = kError_Unknown;
-            return false;
-        }
-    }
+    // N.B. We no longer check for interop support for the new codec as it is a
+    // poor substitute for a full check of decoder capabilities etc. Better to let
+    // hardware decoding fail if necessary - which should at least fallback to
+    // software decoding rather than bailing out here.
 
     // delete and recreate the buffers and flag that the input has changed
     m_maxReferenceFrames = ReferenceFrames;
@@ -389,7 +383,7 @@ bool MythVideoOutputOpenGL::CreateBuffers(MythCodecID CodecID, QSize Size)
         return m_videoBuffers.CreateBuffers(FMT_NVDEC, Size, false, 2, 1, 4);
     if (codec_is_mmal(CodecID))
         return m_videoBuffers.CreateBuffers(FMT_MMAL, Size, false, 2, 1, 4);
-    if (codec_is_v4l2(CodecID))
+    if (codec_is_v4l2(CodecID) || codec_is_drmprime(CodecID))
         return m_videoBuffers.CreateBuffers(FMT_DRMPRIME, Size, false, 2, 1, 4);
 
     return m_videoBuffers.CreateBuffers(FMT_YV12, Size, false, 1, 8, 4, m_maxReferenceFrames);
@@ -648,11 +642,11 @@ void MythVideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, 
     {
         if (twopass)
             m_render->SetViewPort(first, true);
-        Osd->DrawDirect(m_openGLPainter, GetTotalOSDBounds().size(), true);
+        Osd->Draw(m_openGLPainter, GetTotalOSDBounds().size(), true);
         if (twopass)
         {
             m_render->SetViewPort(second, true);
-            Osd->DrawDirect(m_openGLPainter, GetTotalOSDBounds().size(), true);
+            Osd->Draw(m_openGLPainter, GetTotalOSDBounds().size(), true);
             m_render->SetViewPort(main);
         }
     }
@@ -801,7 +795,26 @@ QStringList MythVideoOutputOpenGL::GetAllowedRenderers(MythCodecID CodecId, cons
         return allowed;
     }
 
-    allowed += MythOpenGLInterop::GetAllowedRenderers(CodecId);
+    VideoFrameType format = FMT_NONE;
+    if (codec_is_vaapi(CodecId))
+        format = FMT_VAAPI;
+    else if (codec_is_vdpau(CodecId))
+        format = FMT_VDPAU;
+    else if (codec_is_nvdec(CodecId))
+        format = FMT_NVDEC;
+    else if (codec_is_vtb(CodecId))
+        format = FMT_VTB;
+    else if (codec_is_mmal(CodecId))
+        format = FMT_MMAL;
+    else if (codec_is_v4l2(CodecId) || codec_is_drmprime(CodecId))
+        format = FMT_DRMPRIME;
+    else if (codec_is_mediacodec(CodecId))
+        format = FMT_MEDIACODEC;
+
+    if (FMT_NONE == format)
+        return allowed;
+
+    allowed += MythOpenGLInterop::GetAllowedRenderers(format);
     return allowed;
 }
 

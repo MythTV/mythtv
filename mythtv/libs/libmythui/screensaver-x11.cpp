@@ -46,7 +46,7 @@ class ScreenSaverX11Private
                 LOG(VB_GENERAL, LOG_INFO, LOC + "XScreenSaver support enabled");
         }
 
-        m_display = OpenMythXDisplay();
+        m_display = OpenMythXDisplay(false);
         if (m_display)
         {
             int dummy0 = 0, dummy1 = 0;

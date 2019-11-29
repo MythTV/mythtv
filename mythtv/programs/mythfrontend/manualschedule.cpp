@@ -62,6 +62,7 @@ bool ManualSchedule::Create(void)
         return false;
     }
 
+    QString startchan = gCoreContext->GetSetting("DefaultTVChannel", "");
     QString chanorder = gCoreContext->GetSetting("ChannelOrdering", "channum");
     ChannelInfoList channels = ChannelUtil::GetChannels(0, true, "channum,callsign");
     ChannelUtil::SortChannels(channels, chanorder);
@@ -75,6 +76,11 @@ bool ManualSchedule::Create(void)
         InfoMap infomap;
         channels[i].ToMap(infomap);
         item->SetTextFromMap(infomap);
+        if (channels[i].m_channum == startchan)
+        {
+            m_channelList->SetItemCurrent(i);
+            startchan = "";
+        }
         m_chanids.push_back(channels[i].m_chanid);
     }
 

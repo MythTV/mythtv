@@ -2724,15 +2724,21 @@ class InputDisplayName : public MythUITextEditSetting
 {
   public:
     explicit InputDisplayName(const CardInput &parent) :
-        MythUITextEditSetting(new CardInputDBStorage(this, parent, "displayname"))
+        MythUITextEditSetting(new CardInputDBStorage(this, parent, "displayname")), m_parent(parent)
     {
-        setLabel(QObject::tr("Display name (optional)"));
+        setLabel(QObject::tr("Display name"));
         setHelpText(QObject::tr(
                         "This name is displayed on screen when Live TV begins "
-                        "and when changing the selected input or card. If you "
-                        "use this, make sure the information is unique for "
-                        "each input."));
+                        "and in various other places.  Make sure the last two "
+                        "characters are unique for each input."));
     };
+    void Load(void) override {
+        MythUITextEditSetting::Load();
+        if (getValue().isEmpty())
+            setValue(tr("Input %1").arg(m_parent.getInputID()));
+    }
+  private:
+    const CardInput &m_parent;
 };
 
 class CardInputComboBoxSetting : public MythUIComboBoxSetting

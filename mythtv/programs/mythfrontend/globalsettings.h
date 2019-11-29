@@ -239,7 +239,6 @@ class PlaybackProfileItemConfig : public GroupSetting
     TransMythUIComboBoxSetting *m_doubleDeint  {nullptr};
     TransMythUICheckBoxSetting *m_doubleShader {nullptr};
     TransMythUICheckBoxSetting *m_doubleDriver {nullptr};
-    TransTextEditSetting       *m_filters      {nullptr};
     PlaybackProfileConfig      *m_parentConfig {nullptr};
     uint                        m_index        {0};
 };

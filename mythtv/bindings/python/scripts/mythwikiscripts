@@ -7,14 +7,14 @@ import sys
 
 def get_input(comment, items):
     while True:
-        print '  0: Exit'
+        print('  0: Exit')
         for i,item in enumerate(items):
-            print '  {0}: {1}'.format(i+1, item)
-        print comment
+            print('  {0}: {1}'.format(i+1, item))
+        print(comment)
 
         while True:
             try:
-                i = raw_input('> ')
+                i = input('> ')
                 if i == 'list':
                     break
                 elif i in ('exit','0'):
@@ -23,17 +23,17 @@ def get_input(comment, items):
                 i = int(i)-1
                 if i in range(len(items)):
                     return i
-                print "Selection is outside range. Use 'list' to list options."
+                print("Selection is outside range. Use 'list' to list options.")
 
             except KeyboardInterrupt:
                 sys.exit()
             except EOFError:
                 sys.exit()
             except:
-                print 'This input only accepts integers.  Use Ctrl-C to exit'
+                print('This input only accepts integers.  Use Ctrl-C to exit')
 
 def selectCat(catlist):
-    keys = catlist.keys()
+    keys = list(catlist.keys())
     while True:
         inp = get_input('Please choose a category.', keys)
         if inp == -1:
@@ -49,18 +49,18 @@ def selectScript(scriptlist):
         saveScript(scriptlist[inp])
 
 def saveScript(script):
-    print 'Author:      '+script.info.author
-    print 'Description: '+script.info.long
-    print 'Webpage:     '+script.info.webpage
+    print('Author:      '+script.info.author)
+    print('Description: '+script.info.long)
+    print('Webpage:     '+script.info.webpage)
 
-    for name in script.code.keys():
+    for name in list(script.code.keys()):
         if name[0] in ('/', '~'):
             path = name
         else:
             path = '~/bin/'+name
 
         try:
-            inp = raw_input('Save to [{0}]:'.format(path))
+            inp = input('Save to [{0}]:'.format(path))
         except EOFError:
             sys.exit()
         except KeyboardInterrupt:
@@ -77,11 +77,11 @@ def saveScript(script):
         script.saveScript(name, os.path.expanduser(path))
 
 if __name__ == '__main__':
-    print "MythTV Interactive Script Downloader."
-    print "This script parses the wiki, and may take several minutes."
+    print("MythTV Interactive Script Downloader.")
+    print("This script parses the wiki, and may take several minutes.")
     tic = time()
     tmp = Script.getAll()
-    print 'Loading took %0.2f seconds' % (time()-tic)
+    print('Loading took %0.2f seconds' % (time()-tic))
 
     scripts = {}
     for script in tmp:

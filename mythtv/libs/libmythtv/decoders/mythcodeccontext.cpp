@@ -50,6 +50,9 @@
 #ifdef USING_MMAL
 #include "mythmmalcontext.h"
 #endif
+#ifdef USING_EGL
+#include "mythdrmprimecontext.h"
+#endif
 #include "mythcodeccontext.h"
 
 extern "C" {
@@ -96,6 +99,10 @@ MythCodecContext *MythCodecContext::CreateContext(DecoderBase *Parent, MythCodec
 #ifdef USING_MMAL
     if (codec_is_mmal_dec(Codec) || codec_is_mmal(Codec))
         mctx = new MythMMALContext(Parent, Codec);
+#endif
+#ifdef USING_EGL
+    if (codec_is_drmprime(Codec))
+        mctx = new MythDRMPRIMEContext(Parent, Codec);
 #endif
     Q_UNUSED(Codec);
 
@@ -164,10 +171,17 @@ void MythCodecContext::GetDecoders(RenderOptions &Opts)
         (*Opts.equiv_decoders)["v4l2-dec"].append("dummy");
     }
 #endif
+#ifdef USING_EGL
+    if (MythDRMPRIMEContext::HavePrimeDecoders())
+    {
+        Opts.decoders->append("drmprime");
+        (*Opts.equiv_decoders)["drmprime"].append("dummy");
+    }
+#endif
 #ifdef USING_MMAL
     Opts.decoders->append("mmal-dec");
     (*Opts.equiv_decoders)["mmal-dec"].append("dummy");
-    if (MythOpenGLInterop::GetInteropType(kCodec_H264_MMAL) != MythOpenGLInterop::Unsupported)
+    if (MythOpenGLInterop::GetInteropType(FMT_MMAL) != MythOpenGLInterop::Unsupported)
     {
         Opts.decoders->append("mmal");
         (*Opts.equiv_decoders)["mmal"].append("dummy");
@@ -219,6 +233,11 @@ MythCodecID MythCodecContext::FindDecoder(const QString &Decoder, AVStream *Stre
 #ifdef USING_MMAL
     result = MythMMALContext::GetSupportedCodec(Context, Codec, Decoder, Stream, streamtype);
     if (codec_is_mmal_dec(result) || codec_is_mmal(result))
+        return result;
+#endif
+#ifdef USING_EGL
+    result = MythDRMPRIMEContext::GetSupportedCodec(Context, Codec, Decoder, Stream, streamtype);
+    if (codec_is_drmprime(result))
         return result;
 #endif
 

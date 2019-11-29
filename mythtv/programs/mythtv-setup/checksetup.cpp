@@ -236,6 +236,42 @@ bool checkChannelPresets(QStringList &probs)
     return problemFound;
 }
 
+// Check that the display names for all parent inputs are set and that
+// the last two characters are unique.
+
+bool checkInputDisplayNames(QStringList &probs)
+{
+    bool problemFound = false;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("SELECT count(*) total, "
+                  "       count(distinct right(if(displayname<>'',"
+                  "                            displayname, NULL), 2)) uniq "
+                  "FROM capturecard "
+                  "WHERE parentid = 0");
+
+    if (!query.exec() || !query.next())
+    {
+        MythDB::DBError("checkInputDisplayNames", query);
+        return false;
+    }
+
+    int total = query.value(0).toInt();
+    int uniq = query.value(1).toInt();
+    if (uniq != total)
+    {
+        probs.push_back(QObject::tr(
+                            "The display names for one or more inputs are not "
+                            "sufficiently unique.  They must be set and the "
+                            "last two characters must be unique because some "
+                            "themes use them to identify the input."));
+        problemFound = true;
+    }
+
+    return problemFound;
+}
+
 /// Build up a string of common problems that the
 /// user should correct in the MythTV-Setup program
 
@@ -243,6 +279,7 @@ bool CheckSetup(QStringList &problems)
 {
     return checkStoragePaths(problems)
         || checkChannelPresets(problems)
+        || checkInputDisplayNames(problems)
         || checkImageStoragePaths(problems);
 }
 

@@ -8,6 +8,11 @@
 
 from collections import Sequence, Iterator
 
+try:
+    xrange
+except NameError:
+    xrange = range
+
 
 class PagedIterator(Iterator):
     def __init__(self, parent):
@@ -18,11 +23,13 @@ class PagedIterator(Iterator):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         self._index += 1
         if self._index == self._len:
             raise StopIteration
         return self._parent[self._index]
+
+    next = __next__  # for Python2
 
 
 class UnpagedData(object):

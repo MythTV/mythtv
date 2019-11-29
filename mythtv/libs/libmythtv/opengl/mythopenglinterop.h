@@ -8,7 +8,6 @@
 #include "opengl/mythrenderopengl.h"
 #include "referencecounter.h"
 #include "videoouttypes.h"
-#include "mythcodecid.h"
 #include "mythframe.h"
 #include "mythvideotexture.h"
 
@@ -42,9 +41,9 @@ class MythOpenGLInterop : public QObject, public ReferenceCounter
         DUMMY // used for default free/user_opaque storage
     };
 
-    static QStringList GetAllowedRenderers   (MythCodecID CodecId);
-    static Type        GetInteropType        (MythCodecID CodecId);
-    static void        GetInteropTypeCallback(void *Wait, void *CodecId, void* Result);
+    static QStringList GetAllowedRenderers   (VideoFrameType Format);
+    static Type        GetInteropType        (VideoFrameType Format);
+    static void        GetInteropTypeCallback(void *Wait, void *Format, void* Result);
     static vector<MythVideoTexture*> Retrieve(MythRenderOpenGL *Context,
                                               VideoColourSpace *ColourSpace,
                                               VideoFrame *Frame,

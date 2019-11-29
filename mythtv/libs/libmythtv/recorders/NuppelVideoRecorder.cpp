@@ -759,9 +759,9 @@ void NuppelVideoRecorder::InitBuffers(void)
 
     if (!m_video_buffer_size)
     {
-        m_video_buffer_size =
-            buffersize(m_picture_format == AV_PIX_FMT_YUV422P ? FMT_YUV422P : FMT_YV12,
-                       m_w_out, m_h_out);
+        m_video_buffer_size = static_cast<long>(
+            GetBufferSize(m_picture_format == AV_PIX_FMT_YUV422P ? FMT_YUV422P : FMT_YV12,
+                          m_w_out, m_h_out));
     }
 
     if (m_width >= 480 || m_height > 288)

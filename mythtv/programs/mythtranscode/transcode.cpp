@@ -898,13 +898,13 @@ int Transcode::TranscodeFile(const QString &inputname,
             // 1080i/p video is actually 1088 because of the 16x16 blocks so
             // we have to fudge the output size here.  nuvexport knows how to handle
             // this and as of right now it is the only app that uses the fifo ability.
-            newSize = buffersize(FMT_YV12, video_width, video_height == 1080 ? 1088 : video_height, 0 /* aligned */);
+            newSize = GetBufferSize(FMT_YV12, video_width, video_height == 1080 ? 1088 : video_height, 0 /* aligned */);
         }
         else
         {
-            newSize = buffersize(FMT_YV12, newWidth, newHeight);
+            newSize = GetBufferSize(FMT_YV12, newWidth, newHeight);
         }
-        unsigned char *newFrame = (unsigned char *)av_malloc(newSize);
+        unsigned char *newFrame = GetAlignedBuffer(newSize);
         if (!newFrame)
         {
             // OOM
@@ -914,12 +914,13 @@ int Transcode::TranscodeFile(const QString &inputname,
         if (nonAligned)
         {
             // Set a stride identical to actual width, to ease fifo post-conversion process.
-            init(&frame, FMT_YV12, newFrame, video_width, video_height, newSize, nullptr, nullptr, -1, -1, 0 /* aligned */);
+            init(&frame, FMT_YV12, newFrame, video_width, video_height,
+                 static_cast<int>(newSize), nullptr, nullptr, -1, -1, 0 /* aligned */);
         }
         else
         {
             // use default stride size.
-            init(&frame, FMT_YV12, newFrame, newWidth, newHeight, newSize);
+            init(&frame, FMT_YV12, newFrame, newWidth, newHeight, static_cast<int>(newSize));
         }
     }
 

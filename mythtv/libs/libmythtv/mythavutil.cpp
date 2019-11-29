@@ -206,7 +206,7 @@ int AVPictureFill(AVFrame *pic, const VideoFrame *frame, AVPixelFormat fmt)
     pic->linesize[0] = frame->pitches[0];
     pic->linesize[1] = frame->pitches[1];
     pic->linesize[2] = frame->pitches[2];
-    return (int)buffersize(frame->codec, frame->width, frame->height);
+    return static_cast<int>(GetBufferSize(frame->codec, frame->width, frame->height));
 }
 
 class MythAVCopyPrivate
@@ -351,8 +351,7 @@ int MythAVCopy::Copy(AVFrame *pic, const VideoFrame *frame,
                  unsigned char *buffer, AVPixelFormat fmt)
 {
     VideoFrameType type = PixelFormatToFrameType(fmt);
-    int size = buffersize(type, frame->width, frame->height, 0) + 16;
-    unsigned char *sbuf = buffer ? buffer : (unsigned char*)av_malloc(size);
+    unsigned char *sbuf = buffer ? buffer : CreateBuffer(type, frame->width, frame->height);
 
     if (!sbuf)
     {

@@ -266,7 +266,6 @@ bool ProfileItem::IsValid(QString *Reason) const
     {
         if (Reason)
             *Reason = "Need a decoder and renderer";
-
         return false;
     }
 
@@ -274,11 +273,7 @@ bool ProfileItem::IsValid(QString *Reason) const
     if (!decoders.contains(decoder))
     {
         if (Reason)
-        {
-            *Reason = QString("decoder %1 is not supported (supported: %2)")
-                .arg(decoder).arg(toCommaList(decoders));
-        }
-
+            *Reason = QString("decoder %1 is not available").arg(decoder);
         return false;
     }
 
@@ -286,24 +281,8 @@ bool ProfileItem::IsValid(QString *Reason) const
     if (!renderers.contains(renderer))
     {
         if (Reason)
-        {
-            *Reason = QString("renderer %1 is not supported "
-                       "w/decoder %2 (supported: %3)")
-                .arg(renderer).arg(decoder).arg(toCommaList(renderers));
-        }
-
-        return false;
-    }
-
-    QString     filter    = Get("pref_filters");
-    if (!filter.isEmpty() && !VideoDisplayProfile::IsFilterAllowed(renderer))
-    {
-        if (Reason)
-        {
-            *Reason = QString("Filter %1 is not supported w/renderer %2")
-                .arg(filter).arg(renderer);
-        }
-
+            *Reason = QString("renderer %1 is not supported with decoder %2")
+                .arg(renderer).arg(decoder);
         return false;
     }
 
@@ -332,7 +311,6 @@ QString ProfileItem::toString(void) const
     QString renderer  = Get("pref_videorenderer");
     QString deint0    = Get("pref_deint0");
     QString deint1    = Get("pref_deint1");
-    QString filter    = Get("pref_filters");
 
     QString cond = QString("w(%1) h(%2) framerate(%3) codecs(%4)")
         .arg(width).arg(height).arg(framerate).arg(codecs);
@@ -340,7 +318,7 @@ QString ProfileItem::toString(void) const
         .arg(cmp0).arg(QString(cmp1.isEmpty() ? "" : ",") + cmp1)
         .arg(decoder).arg(max_cpus).arg((skiploop) ? "enabled" : "disabled").arg(renderer)
         .arg(cond);
-    str += QString("deint(%1,%2) filt(%3)").arg(deint0).arg(deint1).arg(filter);
+    str += QString("deint(%1,%2)").arg(deint0).arg(deint1);
 
     return str;
 }
@@ -357,6 +335,7 @@ QMap<QString,QStringList> VideoDisplayProfile::s_safe_equiv_dec;
 QStringList               VideoDisplayProfile::s_safe_custom;
 QMap<QString,uint>        VideoDisplayProfile::s_safe_renderer_priority;
 QMap<QString,QString>     VideoDisplayProfile::s_dec_name;
+QMap<QString,QString>     VideoDisplayProfile::s_rend_name;
 QStringList               VideoDisplayProfile::s_safe_decoders;
 QList<QPair<QString,QString> > VideoDisplayProfile::s_deinterlacer_options;
 
@@ -459,11 +438,6 @@ QString VideoDisplayProfile::GetActualVideoRenderer(void) const
     return m_lastVideoRenderer;
 }
 
-QString VideoDisplayProfile::GetFilters(void) const
-{
-    return GetPreference("pref_filters");
-}
-
 void VideoDisplayProfile::SetVideoRenderer(const QString &VideoRenderer)
 {
     QMutexLocker locker(&m_lock);
@@ -483,7 +457,6 @@ void VideoDisplayProfile::SetVideoRenderer(const QString &VideoRenderer)
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "Old preferences: " + toString());
 
     SetPreference("pref_videorenderer", VideoRenderer);
-    SetPreference("pref_filters", "");
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "New preferences: " + toString());
 }
@@ -599,8 +572,7 @@ vector<ProfileItem> VideoDisplayProfile::LoadDB(uint GroupId)
                 if (valid)
                     list.push_back(tmp);
                 else
-                    LOG(VB_PLAYBACK, LOG_NOTICE, LOC +
-                        QString("Ignoring profile item %1 (%2)")
+                    LOG(VB_PLAYBACK, LOG_NOTICE, LOC + QString("Ignoring profile %1 (%2)")
                             .arg(profileid).arg(error));
             }
             tmp.Clear();
@@ -616,8 +588,7 @@ vector<ProfileItem> VideoDisplayProfile::LoadDB(uint GroupId)
         if (valid)
             list.push_back(tmp);
         else
-            LOG(VB_PLAYBACK, LOG_NOTICE, LOC +
-                QString("Ignoring profile item %1 (%2)")
+            LOG(VB_PLAYBACK, LOG_NOTICE, LOC + QString("Ignoring profile %1 (%2)")
                 .arg(profileid).arg(error));
     }
 
@@ -823,6 +794,13 @@ QString VideoDisplayProfile::GetDecoderName(const QString &Decoder)
         s_dec_name["mediacodec-dec"] = QObject::tr("Android MediaCodec acceleration (decode only)");
         s_dec_name["nvdec"]          = QObject::tr("NVIDIA NVDEC acceleration");
         s_dec_name["nvdec-dec"]      = QObject::tr("NVIDIA NVDEC acceleration (decode only)");
+        s_dec_name["vtb"]            = QObject::tr("VideoToolbox acceleration");
+        s_dec_name["vtb-dec"]        = QObject::tr("VideoToolbox acceleration (decode only)");
+        s_dec_name["v4l2"]           = QObject::tr("V4L2 acceleration");
+        s_dec_name["v4l2-dec"]       = QObject::tr("V4L2 acceleration (decode only)");
+        s_dec_name["mmal"]           = QObject::tr("MMAL acceleration");
+        s_dec_name["mmal-dec"]       = QObject::tr("MMAL acceleration (decode only)");
+        s_dec_name["drmprime"]       = QObject::tr("DRM PRIME acceleration");
     }
 
     QString ret = Decoder;
@@ -843,39 +821,77 @@ QString VideoDisplayProfile::GetDecoderHelp(const QString& Decoder)
     msg += "\n";
 
     if (Decoder == "ffmpeg")
-        msg += QObject::tr("Standard will use ffmpeg library.");
+        msg += QObject::tr("Standard will use the FFmpeg library for software decoding.");
 
-    if (Decoder == "vdpau")
+    if (Decoder.startsWith("vdpau"))
         msg += QObject::tr(
             "VDPAU will attempt to use the graphics hardware to "
-            "accelerate video decoding and playback.");
+            "accelerate video decoding.");
 
-    if (Decoder == "vaapi")
+    if (Decoder.startsWith("vaapi"))
         msg += QObject::tr(
             "VAAPI will attempt to use the graphics hardware to "
             "accelerate video decoding and playback.");
 
-    if (Decoder == "vaapi-dec")
-        msg += QObject::tr(
-            "Will attempt to use the graphics hardware to "
-            "accelerate video decoding only.");
-
-    if (Decoder == "dxva2")
+    if (Decoder.startsWith("dxva2"))
         msg += QObject::tr(
             "DXVA2 will use the graphics hardware to "
             "accelerate video decoding and playback. ");
 
-    if (Decoder == "mediacodec-dec")
+    if (Decoder.startsWith("mediacodec"))
         msg += QObject::tr(
-            "Mediacodec will use the graphics hardware to "
-            "accelerate video decoding on Android. ");
+            "Mediacodec will use Android graphics hardware to "
+            "accelerate video decoding and playback. ");
 
-    if (Decoder == "nvdec-dec")
+    if (Decoder.startsWith("nvdec"))
         msg += QObject::tr(
-            "Nvdec uses the new NVDEC API to "
-            "accelerate video decoding on NVIDIA Graphics Adapters. ");
+            "Nvdec uses the NVDEC API to "
+            "accelerate video decoding and playback with NVIDIA Graphics Adapters. ");
 
+    if (Decoder.startsWith("vtb"))
+        msg += QObject::tr(
+            "The VideoToolbox library is used to accelerate video decoding. ");
+
+    if (Decoder.startsWith("mmal"))
+        msg += QObject::tr(
+            "MMAL is used to accelerated video decoding (Raspberry Pi only). ");
+
+    if (Decoder == "v4l2")
+        msg += "Highly experimental: ";
+
+    if (Decoder.startsWith("v4l2"))
+        msg += QObject::tr(
+            "Video4Linux codecs are used to accelerate video decoding on "
+            "supported platforms. ");
+
+    if (Decoder == "drmprime")
+        msg += QObject::tr(
+            "DRM-PRIME decoders are used to accelerate video decoding on "
+            "supported platforms. ");
+
+    if (Decoder.endsWith("-dec"))
+        msg += QObject::tr("The decoder will transfer frames back to system memory "
+                           "which will significantly reduce performance but may allow "
+                           "other functionality to be used (such as automatic "
+                           "letterbox detection). ");
     return msg;
+}
+
+QString VideoDisplayProfile::GetVideoRendererName(const QString &Renderer)
+{
+    QMutexLocker locker(&s_safe_lock);
+    if (s_rend_name.empty())
+    {
+        s_rend_name["opengl"]         = QObject::tr("OpenGL");
+        s_rend_name["opengl-yv12"]    = QObject::tr("OpenGL YV12");
+        s_rend_name["opengl-hw"]      = QObject::tr("OpenGL Hardware");
+    }
+
+    QString ret = Renderer;
+    QMap<QString,QString>::const_iterator it = s_rend_name.find(Renderer);
+    if (it != s_rend_name.end())
+        ret = *it;
+    return ret;
 }
 
 QStringList VideoDisplayProfile::GetProfiles(const QString &HostName)
@@ -949,38 +965,10 @@ uint VideoDisplayProfile::GetProfileGroupID(const QString &ProfileName,
     return 0;
 }
 
-void VideoDisplayProfile::DeleteProfiles(const QString &HostName)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-    MSqlQuery query2(MSqlQuery::InitCon());
-    query.prepare(
-        "SELECT profilegroupid "
-        "FROM displayprofilegroups "
-        "WHERE hostname = :HOST ");
-    query.bindValue(":HOST", HostName);
-    if (!query.exec() || !query.isActive())
-        MythDB::DBError("delete_profiles 1", query);
-    else
-    {
-        while (query.next())
-        {
-            query2.prepare("DELETE FROM displayprofiles "
-                           "WHERE profilegroupid = :PROFID");
-            query2.bindValue(":PROFID", query.value(0).toUInt());
-            if (!query2.exec())
-                MythDB::DBError("delete_profiles 2", query2);
-        }
-    }
-    query.prepare("DELETE FROM displayprofilegroups WHERE hostname = :HOST");
-    query.bindValue(":HOST", HostName);
-    if (!query.exec() || !query.isActive())
-        MythDB::DBError("delete_profiles 3", query);
-}
-
 void VideoDisplayProfile::CreateProfile(uint GroupId, uint Priority,
     const QString& Width, const QString& Height, const QString& Codecs,
     const QString& Decoder, uint MaxCpus, bool SkipLoop, const QString& VideoRenderer,
-    const QString& Deint1, const QString& Deint2, const QString& Filters)
+    const QString& Deint1, const QString& Deint2)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -1029,9 +1017,6 @@ void VideoDisplayProfile::CreateProfile(uint GroupId, uint Priority,
 
     queryValue += "pref_deint1";
     queryData  += Deint2;
-
-    queryValue += "pref_filters";
-    queryData  += Filters;
 
     QStringList::const_iterator itV = queryValue.begin();
     QStringList::const_iterator itD = queryData.begin();
@@ -1128,73 +1113,80 @@ void VideoDisplayProfile::CreateProfiles(const QString &HostName)
     uint groupid;
 
 #ifdef USING_OPENGL
-    if (!profiles.contains("OpenGL High Quality")) {
+    if (!profiles.contains("OpenGL High Quality"))
+    {
         (void) QObject::tr("OpenGL High Quality",
                            "Sample: OpenGL high quality");
         groupid = CreateProfileGroup("OpenGL High Quality", HostName);
         CreateProfile(groupid, 1, "", "", "",
-                      "ffmpeg", 2, true, "opengl",
-                      "shader:high", "shader:high", "");
+                      "ffmpeg", 2, true, "opengl-yv12",
+                      "shader:high", "shader:high");
     }
 
-    if (!profiles.contains("OpenGL Normal")) {
+    if (!profiles.contains("OpenGL Normal"))
+    {
         (void) QObject::tr("OpenGL Normal", "Sample: OpenGL medium quality");
         groupid = CreateProfileGroup("OpenGL Normal", HostName);
         CreateProfile(groupid, 1, "", "", "",
-                      "ffmpeg", 2, true, "opengl",
-                      "shader:medium", "shader:medium", "");
+                      "ffmpeg", 2, true, "opengl-yv12",
+                      "shader:medium", "shader:medium");
     }
 
-    if (!profiles.contains("OpenGL Slim")) {
+    if (!profiles.contains("OpenGL Slim"))
+    {
         (void) QObject::tr("OpenGL Slim", "Sample: OpenGL low power GPU");
         groupid = CreateProfileGroup("OpenGL Slim", HostName);
         CreateProfile(groupid, 1, "", "", "",
                       "ffmpeg", 1, true, "opengl",
-                      "medium", "medium", "");
+                      "medium", "medium");
     }
 #endif
 
 #ifdef USING_VAAPI
-    if (!profiles.contains("VAAPI Normal")) {
+    if (!profiles.contains("VAAPI Normal"))
+    {
         (void) QObject::tr("VAAPI Normal", "Sample: VAAPI average quality");
         groupid = CreateProfileGroup("VAAPI Normal", HostName);
         CreateProfile(groupid, 1, "", "", "",
                       "vaapi", 2, true, "opengl-hw",
-                      "shader:driver:high", "shader:driver:high", "");
-        CreateProfile(groupid, 2, "", "", "",
-                      "ffmpeg", 2, true, "opengl",
-                      "shader:high", "shader:high", "");
+                      "shader:driver:high", "shader:driver:high");
+        CreateProfile(groupid, 1, "", "", "",
+                      "ffmpeg", 1, true, "opengl-yv12",
+                      "shader:high", "shader:high");
     }
 #endif
 
 #ifdef USING_VDPAU
-    if (!profiles.contains("VDPAU Normal")) {
+    if (!profiles.contains("VDPAU Normal"))
+    {
         (void) QObject::tr("VDPAU Normal", "Sample: VDPAU medium quality");
         groupid = CreateProfileGroup("VDPAU Normal", HostName);
         CreateProfile(groupid, 1, "", "", "",
-                      "vdpau", 2, true, "opengl-hw",
-                      "driver:medium", "driver:medium", "");
+                      "vdpau", 1, true, "opengl-hw",
+                      "driver:medium", "driver:medium");
     }
 #endif
 
 #ifdef USING_MEDIACODEC
-    if (!profiles.contains("MediaCodec Normal")) {
+    if (!profiles.contains("MediaCodec Normal"))
+    {
         (void) QObject::tr("MediaCodec Normal",
                            "Sample: MediaCodec Normal");
         groupid = CreateProfileGroup("MediaCodec Normal", hostname);
         CreateProfile(groupid, 1, "", "", "",
-                      "mediacodec-dec", 4, true, "opengl",
-                      "shader:driver:medium", "shader:driver:medium", "");
+                      "mediacodec-dec", 4, true, "opengl-yv12",
+                      "shader:driver:medium", "shader:driver:medium");
     }
 #endif
 
 #if defined(USING_NVDEC) && defined(USING_OPENGL)
-    if (!profiles.contains("NVDEC Normal")) {
+    if (!profiles.contains("NVDEC Normal"))
+    {
         (void) QObject::tr("NVDEC Normal", "Sample: NVDEC Normal");
         groupid = CreateProfileGroup("NVDEC Normal", HostName);
         CreateProfile(groupid, 1, "", "", "",
-                      "nvdec", 4, true, "opengl-hw",
-                      "shader:driver:high", "shader:driver:high", "");
+                      "nvdec", 1, true, "opengl-hw",
+                      "shader:driver:high", "shader:driver:high");
     }
 #endif
 
@@ -1203,11 +1195,35 @@ void VideoDisplayProfile::CreateProfiles(const QString &HostName)
         (void) QObject::tr("VideoToolBox Normal", "Sample: VideoToolBox Normal");
         groupid = CreateProfileGroup("VideoToolBox Normal", HostName);
         CreateProfile(groupid, 1, "", "", "",
-                      "vtb", 4, true, "opengl-hw",
-                      "shader:driver:medium", "shader:driver:medium", "");
+                      "vtb", 1, true, "opengl-hw",
+                      "shader:driver:medium", "shader:driver:medium");
     }
 #endif
 
+#if defined(USING_MMAL) && defined(USING_OPENGL)
+    if (!profiles.contains("MMAL"))
+    {
+        (void) QObject::tr("MMAL", "Sample: MMAL");
+        groupid = CreateProfileGroup("MMAL", HostName);
+        CreateProfile(groupid, 1, "", "", "",
+                      "mmal", 1, true, "opengl-hw",
+                      "shader:driver:medium", "shader:driver:medium");
+    }
+#endif
+
+#if defined(USING_V4L2)
+    if (!profiles.contains("V4L2 Codecs"))
+    {
+        (void) QObject::tr("V4L2 Codecs", "Sample: V4L2");
+        groupid = CreateProfileGroup("V4L2 Codecs", HostName);
+        CreateProfile(groupid, 1, "", "", "",
+                      "v4l2-dec", 1, true, "opengl-yv12",
+                      "shader:driver:medium", "shader:driver:medium");
+        CreateProfile(groupid, 2, "", "", "",
+                      "v4l2", 1, true, "opengl-hw",
+                      "shader:driver:medium", "shader:driver:medium");
+    }
+#endif
 }
 
 QStringList VideoDisplayProfile::GetVideoRenderers(const QString &Decoder)
@@ -1252,7 +1268,7 @@ QString VideoDisplayProfile::GetVideoRendererHelp(const QString &Renderer)
     {
         msg = QObject::tr(
             "OpenGL is used for all color conversion, scaling, picture "
-            "controls and optionally deinterlacing. CPU load is low but a more "
+            "controls and optionally deinterlacing. CPU load is low but a slightly more "
             "powerful GPU is needed for deinterlacing.");
     }
 
@@ -1319,9 +1335,8 @@ QString VideoDisplayProfile::toString(void) const
     QString osd       = GetPreference("pref_osdrenderer");
     QString deint0    = GetPreference("pref_deint0");
     QString deint1    = GetPreference("pref_deint1");
-    QString filter    = GetPreference("pref_filters");
     return QString("rend(%4) osd(%5) deint(%6,%7) filt(%8)")
-        .arg(renderer).arg(osd).arg(deint0).arg(deint1).arg(filter);
+        .arg(renderer).arg(osd).arg(deint0).arg(deint1);
 }
 
 QList<QPair<QString,QString> > VideoDisplayProfile::GetDeinterlacers(void)

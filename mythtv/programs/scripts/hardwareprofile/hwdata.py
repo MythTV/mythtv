@@ -19,6 +19,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
+from builtins import int
+from builtins import open
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 from smolt_config import get_config_attr
 
 class myVendor(object):
@@ -34,7 +43,7 @@ class myDevice(object):
         self.subvendors = {}
         self.vendor = ""
 
-class DeviceMap:
+class DeviceMap(object):
     vendors = {}
 
     def __init__(self, bus='pci'):
@@ -49,13 +58,14 @@ class DeviceMap:
             if os.path.isfile(fn + ".gz"):
                 import gzip
                 try:
-                    fo = gzip.open(fn + ".gz", 'r')
+                    # File isn't in the default python3 UTF-8, using latin1
+                    fo = gzip.open(fn + ".gz", 'rt', encoding='latin1')
                     break
                 except IOError:
                     pass
             else:
                 try:
-                    fo = open(fn, 'r')
+                    fo = open(fn, 'rt', encoding='latin1')
                     break
                 except IOError:
                     pass
@@ -99,7 +109,7 @@ class DeviceMap:
                     continue
                 subvend.name = ""
 
-                if not curdevice.subvendors.has_key(subvend.num):
+                if subvend.num not in curdevice.subvendors:
                     curdevice.subvendors[subvend.num] = subvend
                     subvend.devices[thisdev.num] = thisdev
                 else:
@@ -123,7 +133,7 @@ class DeviceMap:
                 curvendor.devices[curdevice.num] = curdevice
                 continue
             else:
-                print line
+                print(line)
                 continue
         fo.close()
         # This introduces a bug, will fix later.

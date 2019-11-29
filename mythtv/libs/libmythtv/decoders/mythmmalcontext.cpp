@@ -90,7 +90,7 @@ MythCodecID MythMMALContext::GetSupportedCodec(AVCodecContext **Context,
         return failure;
 
     // check interop
-    if (!decodeonly && (MythOpenGLInterop::GetInteropType(success) == MythOpenGLInterop::Unsupported))
+    if (!decodeonly && (MythOpenGLInterop::GetInteropType(FMT_MMAL) == MythOpenGLInterop::Unsupported))
         return failure;
 
     // look for a decoder

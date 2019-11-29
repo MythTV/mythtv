@@ -4,7 +4,7 @@
 # Name: tmdb_auth.py
 # Python Library
 # Author: Raymond Wagner
-# Purpose: Provide authentication and session services for 
+# Purpose: Provide authentication and session services for
 #          calls against the TMDB v3 API
 #-----------------------
 
@@ -65,8 +65,8 @@ class datetime(_pydatetime):
             dt.append(tz)
         return cls(*dt)
 
-from request import Request
-from tmdb_exceptions import *
+from .request import Request
+from .tmdb_exceptions import *
 
 syssession = None
 

@@ -823,7 +823,7 @@ uint DBEvent::UpdateDB(
     {
         query.prepare(
             "INSERT IGNORE INTO programrating "
-            "       ( chanid, starttime, system, rating) "
+            "       ( chanid, starttime, `system`, rating) "
             "VALUES (:CHANID, :START,    :SYS,  :RATING)");
         query.bindValue(":CHANID", chanid);
         query.bindValue(":START",  m_starttime);
@@ -1126,7 +1126,7 @@ uint DBEvent::InsertDB(MSqlQuery &query, uint chanid) const
     {
         query.prepare(
             "INSERT IGNORE INTO programrating "
-            "       ( chanid, starttime, system, rating) "
+            "       ( chanid, starttime, `system`, rating) "
             "VALUES (:CHANID, :START,    :SYS,  :RATING)");
         query.bindValue(":CHANID", chanid);
         query.bindValue(":START",  m_starttime);
@@ -1295,7 +1295,7 @@ uint ProgInfo::InsertDB(MSqlQuery &query, uint chanid) const
     {
         query.prepare(
             "INSERT IGNORE INTO programrating "
-            "       ( chanid, starttime, system, rating) "
+            "       ( chanid, starttime, `system`, rating) "
             "VALUES (:CHANID, :START,    :SYS,  :RATING)");
         query.bindValue(":CHANID", chanid);
         query.bindValue(":START",  m_starttime);

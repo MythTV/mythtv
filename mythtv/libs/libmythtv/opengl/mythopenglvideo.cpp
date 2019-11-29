@@ -602,6 +602,8 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
     // As a workaround, we always use the resize stage so the last displayed frame
     // should be retained in the Framebuffer used for resizing. If there is
     // nothing to display, then fallback to this framebuffer.
+    // N.B. this is now strictly necessary with v4l2 and DRM PRIME direct rendering
+    // but ignore now for performance reasons
     bool resize = Frame ? format_is_hwframes(Frame->codec) : format_is_hwframes(m_inputType);
 
     vector<MythVideoTexture*> inputtextures = m_inputTextures;

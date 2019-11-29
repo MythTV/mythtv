@@ -4741,10 +4741,8 @@ char *MythPlayer::GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
             break;
         }
 
-        bufflen = video_dim.width() * video_dim.height() * 4;
-        outputbuf = new unsigned char[bufflen];
+        outputbuf = CreateBuffer(FMT_RGB32, video_dim.width(), video_dim.height());
         copyCtx.Copy(&retbuf, frame, outputbuf, AV_PIX_FMT_RGB32);
-
         vw = video_disp_dim.width();
         vh = video_disp_dim.height();
         ar = frame->aspect;
@@ -4754,7 +4752,7 @@ char *MythPlayer::GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
     {
         DiscardVideoFrame(frame);
     }
-    return (char *)outputbuf;
+    return reinterpret_cast<char*>(outputbuf);
 }
 
 void MythPlayer::SeekForScreenGrab(uint64_t &number, uint64_t frameNum,

@@ -57,13 +57,14 @@ MythDRMPRIMEInterop* MythDRMPRIMEInterop::Create(MythRenderOpenGL *Context, Type
     return nullptr;
 }
 
-MythOpenGLInterop::Type MythDRMPRIMEInterop::GetInteropType(MythCodecID CodecId, MythRenderOpenGL *Context)
+MythOpenGLInterop::Type MythDRMPRIMEInterop::GetInteropType(VideoFrameType Format)
 {
-    // TODO - this should be tied to pix_fmt (i.e. AV_PIX_FMT_DRM_PRIME) not codec.
-    // Probably applies to all interops
-    if (!codec_is_v4l2(CodecId))
+    if (FMT_DRMPRIME != Format)
         return Unsupported;
-    return HaveDMABuf(Context) ? DRMPRIME : Unsupported;
+    MythRenderOpenGL* context = MythRenderOpenGL::GetOpenGLRender();
+    if (!context)
+        return Unsupported;
+    return HaveDMABuf(context) ? DRMPRIME : Unsupported;
 }
 
 AVDRMFrameDescriptor* MythDRMPRIMEInterop::VerifyBuffer(MythRenderOpenGL *Context, VideoFrame *Frame)

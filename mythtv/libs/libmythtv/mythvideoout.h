@@ -126,7 +126,6 @@ class MythVideoOutput
     virtual void SetPIPState(PIPState Setting);
     virtual MythPainter *GetOSDPainter(void) { return nullptr; }
 
-    QString      GetFilters(void) const;
     QRect        GetImageRect(const QRect &Rect, QRect *DisplayRect = nullptr);
     QRect        GetSafeRect(void);
 

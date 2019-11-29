@@ -1395,10 +1395,7 @@ QString ChannelImporter::FormatTransport(
 {
     QString msg;
     QTextStream ssMsg(&msg);
-
-    ssMsg << transport.m_modulation.toString().toLatin1().constData() << ":";
-    ssMsg << transport.m_frequency;
-
+    ssMsg << transport.toString();
     return msg;
 }
 

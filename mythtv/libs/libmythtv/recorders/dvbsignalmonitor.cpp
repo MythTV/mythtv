@@ -61,9 +61,26 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
       streamHandlerStarted(false),
       streamHandler(nullptr)
 {
-    // These two values should probably come from the database...
-    int wait = 3000; // timeout when waiting on signal
+    // This value should probably come from the database...
     int threshold = 0; // signal strength threshold
+
+    // Tuning timeout time for channel lock from database, minimum is 3000 ms
+    uint wait = 3000;                       // Minimum timeout time
+    uint signal_timeout = 0;                // Not used
+    uint tuning_timeout = 0;                // Maximum time for channel lock from card
+    CardUtil::GetTimeouts(db_cardnum, signal_timeout, tuning_timeout);
+    if (tuning_timeout < wait)
+    {
+        LOG(VB_CHANNEL, LOG_DEBUG, LOC +
+            QString("Tuning timeout from database: %1 ms is too small, using %2 ms")
+                .arg(tuning_timeout).arg(wait));
+    }
+    else
+    {
+        wait = tuning_timeout;              // Use value from database
+        LOG(VB_CHANNEL, LOG_DEBUG, LOC +
+            QString("Tuning timeout: %1 ms").arg(wait));
+    }
 
     m_signalLock.SetTimeout(wait);
     m_signalStrength.SetTimeout(wait);

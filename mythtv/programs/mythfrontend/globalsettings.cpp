@@ -734,7 +734,6 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
     m_doubleDeint  = new TransMythUIComboBoxSetting();
     m_doubleShader = new TransMythUICheckBoxSetting();
     m_doubleDriver = new TransMythUICheckBoxSetting();
-    m_filters      = new TransTextEditSetting();
 
     const QString rangeHelp(tr(" Valid formats for the setting are "
         "[nnnn - nnnn], [> nnnn], [>= nnnn], [< nnnn], "
@@ -813,17 +812,12 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
         m_doubleDeint->addSelection(it->second, it->first);
     }
 
-    m_filters->setLabel(tr("Custom filters"));
-
     m_max_cpus->setHelpText(
         tr("Maximum number of CPU cores used for video decoding and filtering.") +
         (HAVE_THREADS ? "" :
          tr(" Multithreaded decoding disabled-only one CPU "
             "will be used, please recompile with "
             "--enable-ffmpeg-pthreads to enable.")));
-
-    m_filters->setHelpText(
-        tr("Example custom filter list: 'ivtc,denoise3d'"));
 
     m_skiploop->setHelpText(
         tr("When unchecked the deblocking loopfilter will be disabled. ") + "\n" +
@@ -845,7 +839,6 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
     addChild(m_doubleDeint);
     addChild(m_doubleShader);
     addChild(m_doubleDriver);
-    addChild(m_filters);
 
     connect(m_width_range, SIGNAL(valueChanged(const QString&)),
             this,    SLOT(widthChanged(const QString&)));
@@ -921,7 +914,6 @@ void PlaybackProfileItemConfig::Load(void)
     QString prenderer = m_item.Get("pref_videorenderer");
     QString psingledeint = m_item.Get("pref_deint0");
     QString pdoubledeint = m_item.Get("pref_deint1");
-    QString pfilter   = m_item.Get("pref_filters");
     bool    found     = false;
 
     QString     dech = VideoDisplayProfile::GetDecoderHelp();
@@ -951,9 +943,6 @@ void PlaybackProfileItemConfig::Load(void)
     LoadQuality(m_singleDeint, m_singleShader, m_singleDriver, psingledeint);
     LoadQuality(m_doubleDeint, m_doubleShader, m_doubleDriver, pdoubledeint);
 
-    if (!pfilter.isEmpty())
-        m_filters->setValue(pfilter);
-
     GroupSetting::Load();
 }
 
@@ -971,10 +960,6 @@ void PlaybackProfileItemConfig::Save(void)
     m_item.Set("pref_videorenderer", m_vidrend->getValue());
     m_item.Set("pref_deint0", GetQuality(m_singleDeint, m_singleShader, m_singleDriver));
     m_item.Set("pref_deint1", GetQuality(m_doubleDeint, m_doubleShader, m_doubleDriver));
-    QString tmp0 = m_filters->getValue();
-    QString tmp1 = m_vidrend->getValue();
-    QString tmp3 = VideoDisplayProfile::IsFilterAllowed(tmp1) ? tmp0 : "";
-    m_item.Set("pref_filters", tmp3);
 }
 
 void PlaybackProfileItemConfig::widthChanged(const QString &val)
@@ -1033,22 +1018,18 @@ void PlaybackProfileItemConfig::decoderChanged(const QString &dec)
 
     m_vidrend->clearSelections();
     for (it = renderers.begin(); it != renderers.end(); ++it)
-    {
-        if ((*it != "null") && (*it != "nullvaapi") && (*it != "nullvdpau"))
-            m_vidrend->addSelection(*it, *it, (*it == prenderer));
-    }
-
-    m_decoder->setHelpText(VideoDisplayProfile::GetDecoderHelp(dec));
-
+        if ((!(*it).contains("null")))
+            m_vidrend->addSelection(VideoDisplayProfile::GetVideoRendererName(*it),
+                                    *it, (*it == prenderer));
     QString vrenderer2 = m_vidrend->getValue();
     vrenderChanged(vrenderer2);
 
+    m_decoder->setHelpText(VideoDisplayProfile::GetDecoderHelp(dec));
     InitLabel();
 }
 
 void PlaybackProfileItemConfig::vrenderChanged(const QString &renderer)
 {
-    m_filters->setEnabled(VideoDisplayProfile::IsFilterAllowed(renderer));
     m_vidrend->setHelpText(VideoDisplayProfile::GetVideoRendererHelp(renderer));
     InitLabel();
 }
@@ -1208,15 +1189,9 @@ void PlaybackProfileItemConfig::InitLabel(void)
         str += " " + tr("framerate") + " " + framerateval;
 
     str += " -> ";
-    str += m_decoder->getValue();
+    str += VideoDisplayProfile::GetDecoderName(m_decoder->getValue());
     str += " " + andStr + ' ';
-    str += m_vidrend->getValue();
-    str.replace("-blit", "");
-    str.replace("ivtv " + andStr + " ivtv", "ivtv");
-    str.replace("xvmc " + andStr + " xvmc", "xvmc");
-    str.replace("xvmc", "XvMC");
-    str.replace("xv", "XVideo");
-
+    str += VideoDisplayProfile::GetVideoRendererName(m_vidrend->getValue());
     setLabel(str);
 }
 
@@ -2309,10 +2284,11 @@ static HostComboBoxSetting *GuiVidModeResolution()
     gc->setHelpText(VideoModeSettings::tr("Resolution of screen when not "
                                           "watching a video."));
 
-    const vector<DisplayResScreen> scr = GetVideoModes();
-    for (size_t i=0; i<scr.size(); ++i)
+    vector<DisplayResScreen> scr = DisplayRes::GetModes();
+    for (size_t i = 0; i< scr.size(); ++i)
     {
-        int w = scr[i].Width(), h = scr[i].Height();
+        int w = scr[i].Width();
+        int h = scr[i].Height();
         QString sel = QString("%1x%2").arg(w).arg(h);
         gc->addSelection(sel, sel);
     }
@@ -2323,12 +2299,15 @@ static HostComboBoxSetting *GuiVidModeResolution()
         int w = 0, h = 0;
         gCoreContext->GetResolutionSetting("GuiVidMode", w, h);
         if ((w <= 0) || (h <= 0))
-            (w = 640), (h = 480);
+        {
+            w = 640;
+            h = 480;
+        }
 
         DisplayResScreen dscr(w, h, -1, -1, -1.0, 0);
         double rate = -1.0;
         int i = DisplayResScreen::FindBestMatch(scr, dscr, rate);
-        gc->setValue((i >= 0) ? i : scr.size()-1);
+        gc->setValue((i >= 0) ? i : scr.size() - 1);
     }
 
     return gc;
@@ -2352,9 +2331,8 @@ static HostComboBoxSetting *TVVidModeResolution(int idx=-1)
 
     gc->setHelpText(hstr);
 
-    const vector<DisplayResScreen> scr = GetVideoModes();
-
-    for (size_t i=0; i<scr.size(); ++i)
+    vector<DisplayResScreen> scr = DisplayRes::GetModes();
+    for (size_t i = 0; i < scr.size(); ++i)
     {
         QString sel = QString("%1x%2").arg(scr[i].Width()).arg(scr[i].Height());
         gc->addSelection(sel, sel);
@@ -2409,12 +2387,18 @@ vector<double> HostRefreshRateComboBoxSetting::GetRefreshRates(
         h = slist[1].toInt(&ok1);
     }
 
-    DisplayRes *display_res = DisplayRes::GetDisplayRes();
-    if (display_res && ok0 && ok1)
-        return display_res->GetRefreshRates(w, h);
+    vector<double> result;
+    if (ok0 && ok1)
+    {
+        DisplayRes *display_res = DisplayRes::AcquireRelease();
+        if (display_res)
+        {
+            result = display_res->GetRefreshRates(w, h);
+            DisplayRes::AcquireRelease(false);
+        }
+    }
 
-    vector<double> list;
-    return list;
+    return result;
 }
 
 static HostRefreshRateComboBoxSetting *TVVidModeRefreshRate(int idx=-1)
@@ -4619,7 +4603,7 @@ AppearanceSettings::AppearanceSettings()
 #endif
 
 #if defined(USING_XRANDR) || CONFIG_DARWIN
-    const vector<DisplayResScreen> scr = GetVideoModes();
+    vector<DisplayResScreen> scr = DisplayRes::GetModes();
     if (!scr.empty())
         addChild(UseVideoModes());
 #endif

@@ -59,20 +59,21 @@ __version__ = "v0.7.0"
 # 0.6.14 Add support for Lists
 # 0.6.15 Add ability to search Collections
 # 0.6.16 Make absent primary images return None (previously u'')
-# 0.6.17 Add userrating/votes to Image, add overview to Collection, remove 
+# 0.6.17 Add userrating/votes to Image, add overview to Collection, remove
 #           releasedate sorting from Collection Movies
 # 0.7.0  Add support for television series data
+# 0.7.0.a  Added compatibility to python3, tested with python 3.6 and 2.7
 
-from request import set_key, Request
-from util import Datapoint, Datalist, Datadict, Element, NameRepr, SearchRepr
-from pager import PagedRequest
-from locales import get_locale, set_locale
-from tmdb_auth import get_session, set_session
-from tmdb_exceptions import *
+from . import IS_PY2
+
+from .request import set_key, Request
+from .util import Datapoint, Datalist, Datadict, Element, NameRepr, SearchRepr, tmdb3_repr
+from .pager import PagedRequest
+from .locales import get_locale, set_locale
+from .tmdb_auth import get_session, set_session
+from .tmdb_exceptions import *
 
 import json
-import urllib
-import urllib2
 import datetime
 
 DEBUG = False
@@ -234,7 +235,7 @@ class Image(Element):
     width = Datapoint('width')
     language = Datapoint('iso_639_1')
     userrating = Datapoint('vote_average')
-    votes = Datapoint('vote_count') 
+    votes = Datapoint('vote_count')
 
     def sizes(self):
         return ['original']
@@ -265,10 +266,13 @@ class Image(Element):
         return self.filename == other.filename
 
     # special handling for boolean to see if exists
-    def __nonzero__(self):
+    def __bool__(self):
         if len(self.filename) == 0:
             return False
         return True
+
+    __nonzero__  = __bool__    # for  python2
+
 
     def __repr__(self):
         # BASE62 encoded filename, no need to worry about unicode
@@ -312,8 +316,8 @@ class AlternateTitle(Element):
         return self.country == other.country
 
     def __repr__(self):
-        return u"<{0.__class__.__name__} '{0.title}' ({0.country})>"\
-               .format(self).encode('utf-8')
+        return tmdb3_repr(u"<{0.__class__.__name__} '{0.title}' ({0.country})>"\
+               .format(self))
 
 
 class Person(Element):
@@ -330,8 +334,8 @@ class Person(Element):
     aliases = Datalist('also_known_as')
 
     def __repr__(self):
-        return u"<{0.__class__.__name__} '{0.name}'>"\
-                            .format(self).encode('utf-8')
+        return tmdb3_repr(u"<{0.__class__.__name__} '{0.name}'>"\
+                            .format(self))
 
     def _populate(self):
         return Request('person/{0}'.format(self.id))
@@ -354,8 +358,8 @@ class Cast(Person):
     order = Datapoint('order')
 
     def __repr__(self):
-        return u"<{0.__class__.__name__} '{0.name}' as '{0.character}'>"\
-               .format(self).encode('utf-8')
+        return tmdb3_repr(u"<{0.__class__.__name__} '{0.name}' as '{0.character}'>"\
+               .format(self))
 
 
 class Crew(Person):
@@ -363,8 +367,8 @@ class Crew(Person):
     department = Datapoint('department')
 
     def __repr__(self):
-        return u"<{0.__class__.__name__} '{0.name}','{0.job}'>"\
-               .format(self).encode('utf-8')
+        return tmdb3_repr(u"<{0.__class__.__name__} '{0.name}','{0.job}'>"\
+               .format(self))
 
 
 class Keyword(Element):
@@ -372,8 +376,7 @@ class Keyword(Element):
     name = Datapoint('name')
 
     def __repr__(self):
-        return u"<{0.__class__.__name__} {0.name}>"\
-               .format(self).encode('utf-8')
+        return tmdb3_repr(u"<{0.__class__.__name__} {0.name}>".format(self))
 
 
 class Release(Element):
@@ -381,8 +384,8 @@ class Release(Element):
     country = Datapoint('iso_3166_1')
     releasedate = Datapoint('release_date', handler=process_date)
     def __repr__(self):
-        return u"<{0.__class__.__name__} {0.country}, {0.releasedate}>"\
-               .format(self).encode('utf-8')
+        return tmdb3_repr(u"<{0.__class__.__name__} {0.country}, {0.releasedate}>"\
+               .format(self))
 
 
 class Trailer(Element):
@@ -405,7 +408,7 @@ class AppleTrailer(Element):
     sources = Datadict('sources', handler=Trailer, attr='size')
 
     def sizes(self):
-        return self.sources.keys()
+        return list(self.sources.keys())
 
     def geturl(self, size=None):
         if size is None:
@@ -425,8 +428,8 @@ class Translation(Element):
     englishname = Datapoint('english_name')
 
     def __repr__(self):
-        return u"<{0.__class__.__name__} '{0.name}' ({0.language})>"\
-               .format(self).encode('utf-8')
+        return tmdb3_repr(u"<{0.__class__.__name__} '{0.name}' ({0.language})>"\
+               .format(self))
 
 
 class Genre(NameRepr, Element):
@@ -454,7 +457,7 @@ class Genre(NameRepr, Element):
             def _populate(self):
                 return Request('genre/list', language=self._locale.language)
         return GenreList(locale=locale).genres
-        
+
 
 class Studio(NameRepr, Element):
     id = Datapoint('id', initarg=1)
@@ -714,16 +717,16 @@ class Movie(Element):
         return s
 
     def __repr__(self):
-        return u"<{0} {1}>".format(self.__class__.__name__,
-                                   self._printable_name()).encode('utf-8')
+        return tmdb3_repr(u"<{0} {1}>".format(self.__class__.__name__,
+                                   self._printable_name()))
 
 
 class ReverseCast( Movie ):
     character = Datapoint('character')
 
     def __repr__(self):
-        return (u"<{0.__class__.__name__} '{0.character}' on {1}>"
-                .format(self, self._printable_name()).encode('utf-8'))
+        return tmdb3_repr(u"<{0.__class__.__name__} '{0.character}' on {1}>"
+                .format(self, self._printable_name()))
 
 
 class ReverseCrew( Movie ):
@@ -731,8 +734,8 @@ class ReverseCrew( Movie ):
     job = Datapoint('job')
 
     def __repr__(self):
-        return (u"<{0.__class__.__name__} '{0.job}' for {1}>"
-                .format(self, self._printable_name()).encode('utf-8'))
+        return tmdb3_repr(u"<{0.__class__.__name__} '{0.job}' for {1}>"
+                .format(self, self._printable_name()))
 
 
 class Collection(NameRepr, Element):

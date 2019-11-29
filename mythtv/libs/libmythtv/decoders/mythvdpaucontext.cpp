@@ -39,12 +39,11 @@ int MythVDPAUContext::InitialiseContext(AVCodecContext* Context)
     // Lock
     OpenGLLocker locker(render);
 
-    MythCodecID vdpauid = static_cast<MythCodecID>(kCodec_MPEG1_VDPAU + (mpeg_version(Context->codec_id) - 1));
-    MythOpenGLInterop::Type type = MythVDPAUInterop::GetInteropType(vdpauid, render);
-    if (type == MythOpenGLInterop::Unsupported)
+    if (MythOpenGLInterop::GetInteropType(FMT_VDPAU) == MythOpenGLInterop::Unsupported)
         return -1;
 
     // Create interop
+    MythCodecID vdpauid = static_cast<MythCodecID>(kCodec_MPEG1_VDPAU + (mpeg_version(Context->codec_id) - 1));
     MythVDPAUInterop *interop = MythVDPAUInterop::Create(render, vdpauid);
     if (!interop)
         return -1;

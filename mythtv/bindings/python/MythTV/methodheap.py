@@ -16,12 +16,19 @@ from MythTV.dataheap import *
 
 from datetime import timedelta
 from weakref import proxy
+from collections import namedtuple
+
 try:
     from urllib import urlopen
 except ImportError:
     from urllib.request import urlopen
 
 import re
+
+try:
+    xrange
+except NameError:
+    xrange = range
 
 class CaptureCard( DBData ):
     pass
@@ -44,7 +51,7 @@ class MythBE( FileOps ):
         getLoad()                 - returns a tuple of load averages
         getRecordings()           - returns a list of all recordings
         getSGFile()               - returns information on a single file
-        getSGList()               - returns lists of directories, 
+        getSGList()               - returns lists of directories,
                                     files, and sizes
         getUptime()               - returns system uptime in seconds
         isActiveBackend()         - determines whether backend is
@@ -57,6 +64,11 @@ class MythBE( FileOps ):
     """
 
     locked_tuners = {}
+
+    # Prepare tuple for backend command 'GET_FREE_INPUT_INFO'
+    _i_info = ('name', 'sourceid', 'inputid', 'mplexid', 'chanid', 'displayName',
+               'recPriority', 'scheduleOrder', 'livetvorder', 'quickTune')
+    _InputInfo = namedtuple('InputInfo', _i_info)
 
     def __del__(self):
         self.freeTuner()
@@ -107,11 +119,41 @@ class MythBE( FileOps ):
 
     def getFreeRecorderList(self):
         """
-        Returns a list of free recorders, or an empty list if none.
+        Returns a list of free recorders in preferred live TV order,
+        or an empty list if none.
         """
-        res = self.backendCommand('GET_FREE_RECORDER_LIST').split(BACKEND_SEP)
-        recorders = [int(d) for d in res]
+        res = self.backendCommand('GET_FREE_INPUT_INFO 0').split(BACKEND_SEP)
+        # this maps the list of variable length ('res') to InputInfo tuples:
+        res_inputinfo = \
+            [self._InputInfo(*el) for el in zip(*[iter(res)]*len(self._i_info))]
+        recorders = [x.inputid for x in res_inputinfo]
         return recorders
+
+    def getFreeInputInfo(self):
+        """
+        Return a list of 'InputInfo' tuples of free recorders in preferred
+        live TV order.
+        Returns an empty list if no recorders are available.
+        Introduced in protocol 87, changed in protocols 89, 90, 91.
+
+        InputInfo is a named tuple containing:
+        ('InputInfo', ('name', 'sourceid', 'inputid', 'mplexid', 'chanid',
+                       'displayName', 'recPriority', 'scheduleOrder',
+                       'livetvorder', 'quickTune')).
+
+        See definition of InputInfo in inputinfo.h.
+
+        Usage examples:
+
+        MythBE.getFreeInputInfo()[3].displayName   ---> 'Eingang 13:MPEG2TS'
+
+        [x.inputid for x in getFreeInputInfo()]   --->  list of free recorders
+        """
+        res = self.backendCommand('GET_FREE_INPUT_INFO 0').split(BACKEND_SEP)
+        # this maps the list of variable length ('res') to InputInfo tuples:
+        res_inputinfo = \
+            [self._InputInfo(*el) for el in zip(*[iter(res)]*len(self._i_info))]
+        return res_inputinfo
 
     def lockTuner(self,id=None):
         """
@@ -257,7 +299,7 @@ class MythBE( FileOps ):
             command = 'QUERY_FREE_SPACE_LIST'
         res = self.backendCommand(command).split(BACKEND_SEP)
         l = len(FreeSpace._field_order)
-        for i in xrange(len(res)/l):
+        for i in xrange(len(res)//l):
             yield FreeSpace(res[i*l:i*l+l])
 
     def getFreeSpaceSummary(self):
@@ -290,17 +332,18 @@ class MythBE( FileOps ):
         """
         def walk(self, host, sg, root, path):
             res = self.getSGList(host, sg, root+path+'/')
-            if res < 0:
-                return {}
-            dlist = list(res[0])
-            res = [dlist, dict(zip(res[1], res[2]))]
-            if path == '':
-                res = {'/':res}
+            if isinstance(res, tuple):
+                dlist = list(res[0])
+                res = [dlist, dict(zip(res[1], res[2]))]
+                if path == '':
+                    res = {'/':res}
+                else:
+                    res = {path:res}
+                for d in dlist:
+                    res.update(walk(self, host, sg, root, path+'/'+d))
+                return res
             else:
-                res = {path:res}
-            for d in dlist:
-                res.update(walk(self, host, sg, root, path+'/'+d))
-            return res
+                return {}
 
         bases = self.getSGList(host, sg, '')
         if (top == '/') or (top is None): top = ''
@@ -315,7 +358,7 @@ class MythBE( FileOps ):
                     walked[d] = res[d]
 
         res = []
-        for key, val in walked.iteritems():
+        for key, val in list(walked.items()):
             res.append((key, tuple(val[0]), val[1]))
         res.sort()
         return res
@@ -408,17 +451,17 @@ class BEEventMonitor( BECache ):
 class MythSystemEvent( BECache ):
     class systemeventhandler( object ):
         # decorator class for system events
-        bs = BACKEND_SEP.replace('[','\[').replace(']','\]')
+        bs = BACKEND_SEP.replace('[',r'\[').replace(']',r'\]')
         re_process = re.compile(bs.join([
-                'BACKEND_MESSAGE',
-                'SYSTEM_EVENT (?P<event>[A-Z_]*)'
-                    '( HOSTNAME (?P<hostname>[a-zA-Z0-9_\.]*))?'
-                    '( SENDER (?P<sender>[a-zA-Z0-9_\.]*))?'
-                    '( CARDID (?P<cardid>[0-9]*))?'
-                    '( CHANID (?P<chanid>[0-9]*))?'
-                    '( STARTTIME (?P<starttime>[0-9-]*T[0-9-]))?'
-                    '( SECS (?P<secs>[0-9]*))?',
-                'empty']))
+                r'BACKEND_MESSAGE',
+                r'SYSTEM_EVENT (?P<event>[A-Z0-9_]*)'
+                    r'( HOSTNAME (?P<hostname>[a-zA-Z0-9_\.]*))?'
+                    r'( SENDER (?P<sender>[a-zA-Z0-9_\.]*))?'
+                    r'( CARDID (?P<cardid>[0-9]*))?'
+                    r'( CHANID (?P<chanid>[0-9]*))?'
+                    r'( STARTTIME (?P<starttime>[0-9-]*T[0-9-]))?'
+                    r'( SECS (?P<secs>[0-9]*))?',
+                r'empty']))
 
         def __init__(self, func):
             self.func = func
@@ -479,11 +522,11 @@ class MythSystemEvent( BECache ):
             self.registerevent(self._generic_handler)
 
     def _neweventconn(self):
-        return BEEventConnection(self.host, self.port, self.db.gethostname(), 3)
+        return BEEventConnection(self.host, self.port, self.db.gethostname(), level=3)
 
     @systemeventhandler
     def _generic_handler(self, event):
-        SystemEvent(event['event'], inst.db).command(event)
+        SystemEvent(event['event'], self.db).command(event)
 
 class Frontend( FEConnection ):
     _db = None
@@ -643,7 +686,7 @@ class MythDB( DBCache ):
             partnumber, parttotal,  seriesid,   showtype,   programid,
             manualid,   generic,    cast,       livetv,     basename,
             syndicatedepisodenumber,            olderthan,  newerthan,
-            inetref,    season,     episode
+            inetref,    season,     episode,    recordedid
 
         Multiple keywords can be chained as such:
             obj.searchRecorded(title='Title', commflagged=False)
@@ -672,7 +715,7 @@ class MythDB( DBCache ):
                         'category','hostname','autoexpire','commflagged',
                         'stars','recgroup','playgroup','duplicate',
                         'transcoded','watched','storagegroup','basename',
-                        'inetref','season','episode'):
+                        'inetref','season','episode', 'recordedid'):
             return ('recorded.%s=%%s' % key, value, 0)
 
         # time matches
@@ -1100,7 +1143,7 @@ class MythXML( XMLConnection ):
         if backend is None:
             # use master backend
             backend = self.db.settings.NULL.MasterServerIP
-        if re.match('(?:\d{1,3}\.){3}\d{1,3}',backend) or \
+        if re.match(r'(?:\d{1,3}\.){3}\d{1,3}',backend) or \
                     check_ipv6(backend):
             # process ip address
             host = self.db._gethostfromaddr(backend)
@@ -1136,7 +1179,7 @@ class MythXML( XMLConnection ):
         if default:
             args['Default'] = default
         return self._request('Myth/GetSetting', **args)\
-                         .readJSON()['SettingList']['Settings'][0]['Value']
+                                        .readJSON()['String']
 
     def getProgramGuide(self, starttime, endtime, startchan, numchan=None):
         """
@@ -1146,11 +1189,11 @@ class MythXML( XMLConnection ):
         endtime = datetime.duck(endtime)
         args = {'StartTime':starttime.utcisoformat().rsplit('.',1)[0],
                 'EndTime':endtime.utcisoformat().rsplit('.',1)[0],
-                'StartChanId':startchan, 'Details':1}
+                'StartChanId':startchan, 'Details':'1'}
         if numchan:
             args['NumOfChannels'] = numchan
         else:
-            args['NumOfChannels'] = 1
+            args['NumOfChannels'] = '1'
 
         dat = self._request('Guide/GetProgramGuide', **args).readJSON()
         for chan in dat['ProgramGuide']['Channels']:
@@ -1177,7 +1220,8 @@ class MythXML( XMLConnection ):
         """
         Returns a list of Program objects for recorded shows on the backend.
         """
-        for prog in self._request('Dvr/GetRecorded', Descending=descending)\
+        descendingstr = 'true' if descending else 'false'
+        for prog in self._request('Dvr/GetRecordedList', Descending=descendingstr)\
                     .readJSON()['ProgramList']['Programs']:
             yield Program.fromJSON(prog, self.db)
 

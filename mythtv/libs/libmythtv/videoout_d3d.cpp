@@ -368,7 +368,7 @@ void VideoOutputD3D::PrepareFrame(VideoFrame *buffer, FrameScanType t,
                     m_visual->Draw(GetTotalOSDBounds(), m_osdPainter, nullptr);
 
                 if (osd && m_osdPainter && !m_window.IsEmbedding())
-                    osd->DrawDirect(m_osdPainter, GetTotalOSDBounds().size(),
+                    osd->Draw(m_osdPainter, GetTotalOSDBounds().size(),
                                     true);
                 m_render->End();
             }

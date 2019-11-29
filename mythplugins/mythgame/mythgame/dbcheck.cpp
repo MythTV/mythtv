@@ -70,7 +70,7 @@ static bool InitializeDatabase(void)
 
     const QString updates[] = {
 "CREATE TABLE gamemetadata ("
-"  system varchar(128) NOT NULL default '',"
+"  `system` varchar(128) NOT NULL default '',"
 "  romname varchar(128) NOT NULL default '',"
 "  gamename varchar(128) NOT NULL default '',"
 "  genre varchar(128) NOT NULL default '',"
@@ -84,7 +84,7 @@ static bool InitializeDatabase(void)
 "  crc_value varchar(64) NOT NULL default '',"
 "  display tinyint(1) NOT NULL default '1',"
 "  version varchar(64) NOT NULL default '',"
-"  KEY system (system),"
+"  KEY `system` (`system`),"
 "  KEY year (year),"
 "  KEY romname (romname),"
 "  KEY gamename (gamename),"
@@ -295,7 +295,7 @@ bool UpgradeGameDatabaseSchema(void)
 QString("ALTER DATABASE %1 DEFAULT CHARACTER SET latin1;")
         .arg(gContext->GetDatabaseParams().dbName),
 "ALTER TABLE gamemetadata"
-"  MODIFY system varbinary(128) NOT NULL default '',"
+"  MODIFY `system` varbinary(128) NOT NULL default '',"
 "  MODIFY romname varbinary(128) NOT NULL default '',"
 "  MODIFY gamename varbinary(128) NOT NULL default '',"
 "  MODIFY genre varbinary(128) NOT NULL default '',"
@@ -342,7 +342,7 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
         .arg(gContext->GetDatabaseParams().dbName),
 "ALTER TABLE gamemetadata"
 "  DEFAULT CHARACTER SET default,"
-"  MODIFY system varchar(128) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY `system` varchar(128) CHARACTER SET utf8 NOT NULL default '',"
 "  MODIFY romname varchar(128) CHARACTER SET utf8 NOT NULL default '',"
 "  MODIFY gamename varchar(128) CHARACTER SET utf8 NOT NULL default '',"
 "  MODIFY genre varchar(128) CHARACTER SET utf8 NOT NULL default '',"

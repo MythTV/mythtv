@@ -254,13 +254,30 @@ enum MythCodecID
     kCodec_VP9_MMAL_DEC,
     kCodec_HEVC_MMAL_DEC,
 
-    kCodec_MMAL_DEC_END
+    kCodec_MMAL_DEC_END,
+
+    kCodec_DRMPRIME_BEGIN = kCodec_MMAL_DEC_END,
+
+    kCodec_MPEG1_DRMPRIME,
+    kCodec_MPEG2_DRMPRIME,
+    kCodec_H263_DRMPRIME,
+    kCodec_MPEG4_DRMPRIME,
+    kCodec_H264_DRMPRIME,
+    kCodec_VC1_DRMPRIME,
+    kCodec_WMV3_DRMPRIME,
+    kCodec_VP8_DRMPRIME,
+    kCodec_VP9_DRMPRIME,
+    kCodec_HEVC_DRMPRIME,
+
+    kCodec_DRMPRIME_END
 };
 
 // MythCodecID convenience functions
 #define codec_is_std(id)      (id < kCodec_NORMAL_END)
 #define codec_is_std_mpeg(id) (id == kCodec_MPEG1 || id == kCodec_MPEG2)
 
+#define codec_is_drmprime(id) ((id > kCodec_DRMPRIME_BEGIN) && \
+                               (id < kCodec_DRMPRIME_END))
 #define codec_is_vdpau(id)    ((id > kCodec_VDPAU_BEGIN) && \
                                (id < kCodec_VDPAU_END))
 #define codec_is_vdpau_hw(id) ((codec_is_vdpau(id) && \
@@ -317,12 +334,7 @@ enum MythCodecID
 QString get_encoding_type(MythCodecID codecid);
 QString get_decoder_name(MythCodecID codec_id);
 QString toString(MythCodecID codecid);
-AVCodecID myth2av_codecid(MythCodecID codec_id, bool &vdpau);
-inline AVCodecID myth2av_codecid(MythCodecID codec_id)
-{
-    bool vdpau;
-    return myth2av_codecid(codec_id, vdpau);
-}
+AVCodecID myth2av_codecid(MythCodecID codec_id);
 
 // AV codec id convenience functions
 uint mpeg_version(int codec_id);

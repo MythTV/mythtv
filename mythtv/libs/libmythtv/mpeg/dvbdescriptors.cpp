@@ -556,7 +556,7 @@ QString SatelliteDeliverySystemDescriptor::toString() const
 {
     QString str = QString("SatelliteDeliverySystemDescriptor: ");
 
-    str.append(QString("Frequency: %1, Type: %2\n").arg(FrequencyHz())
+    str.append(QString("Frequency: %1, Type: %2\n").arg(FrequencykHz())
         .arg(ModulationSystemString()));
     str.append(QString("      Mod=%1, SymbR=%2, FECInner=%3, Orbit=%4, Pol=%5")
         .arg(ModulationString())
@@ -590,7 +590,7 @@ QString DVBLogicalChannelDescriptor::toString() const
     for (uint i = 0; i < ChannelCount(); i++)
     {
         ret += QString("%1->%2").arg(ServiceID(i)).arg(ChannelNumber(i));
-        ret += (i+1<ChannelCount()) ? ", " : "";
+        ret += (i+1 < ChannelCount()) ? (i+3)%10 ? ", " : ",\n      " : "";
     }
     return ret;
 }
@@ -601,7 +601,7 @@ QString DVBSimulcastChannelDescriptor::toString() const
     for (uint i = 0; i < ChannelCount(); i++)
     {
         ret += QString("%1->%2").arg(ServiceID(i)).arg(ChannelNumber(i));
-        ret += (i+1<ChannelCount()) ? ", " : "";
+        ret += (i+1 < ChannelCount()) ? (i+3)%10 ? ", " : ",\n      " : "";
     }
     return ret;
 }
