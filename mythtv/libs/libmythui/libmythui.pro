@@ -33,7 +33,7 @@ HEADERS += mythuiclock.h mythuitextedit.h mythprogressdialog.h mythuispinbox.h
 HEADERS += mythuicheckbox.h mythuibuttonlist.h mythuigroup.h
 HEADERS += mythuiprogressbar.h mythuifilebrowser.h
 HEADERS += screensaver.h screensaver-null.h x11colors.h
-HEADERS += themeinfo.h platforms/mythxdisplay.h DisplayRes.h DisplayResScreen.h
+HEADERS += themeinfo.h platforms/mythxdisplay.h DisplayResScreen.h
 HEADERS += mythgenerictree.h mythuibuttontree.h mythuiutils.h
 HEADERS += mythvirtualkeyboard.h mythuishape.h mythuiguidegrid.h
 HEADERS += mythrender_base.h mythfontmanager.h mythuieditbar.h
@@ -54,7 +54,7 @@ SOURCES += mythuiclock.cpp mythuitextedit.cpp mythprogressdialog.cpp
 SOURCES += mythuispinbox.cpp mythuicheckbox.cpp mythuibuttonlist.cpp
 SOURCES += mythuigroup.cpp mythuiprogressbar.cpp
 SOURCES += screensaver.cpp screensaver-null.cpp x11colors.cpp
-SOURCES += themeinfo.cpp platforms/mythxdisplay.cpp DisplayRes.cpp DisplayResScreen.cpp
+SOURCES += themeinfo.cpp platforms/mythxdisplay.cpp DisplayResScreen.cpp
 SOURCES += mythgenerictree.cpp mythuibuttontree.cpp mythuiutils.cpp
 SOURCES += mythvirtualkeyboard.cpp mythuishape.cpp mythuiguidegrid.cpp
 SOURCES += mythfontmanager.cpp mythuieditbar.cpp
@@ -120,8 +120,8 @@ using_qtdbus {
 }
 
 macx {
-    HEADERS += screensaver-osx.h   DisplayResOSX.h   util-osx.h
-    SOURCES += screensaver-osx.cpp DisplayResOSX.cpp util-osx.cpp
+    HEADERS += screensaver-osx.h   util-osx.h
+    SOURCES += screensaver-osx.cpp util-osx.cpp
     HEADERS += platforms/mythdisplayosx.h
     SOURCES += platforms/mythdisplayosx.cpp
     QMAKE_OBJECTIVE_CFLAGS += $$QMAKE_CXXFLAGS
@@ -163,8 +163,6 @@ using_libcec {
 
 using_xrandr {
     DEFINES += USING_XRANDR
-    HEADERS += DisplayResX.h
-    SOURCES += DisplayResX.cpp
 }
 
 cygwin:DEFINES += _WIN32

@@ -9,6 +9,7 @@
 // MythTV
 #include "mythuiexp.h"
 #include "referencecounter.h"
+#include "DisplayResScreen.h"
 
 // Std
 #include <cmath>
@@ -41,6 +42,16 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
   public:
     static MythDisplay* AcquireRelease(bool Acquire = true);
 
+    typedef enum
+    {
+        GUI          = 0,
+        VIDEO        = 1,
+        CUSTOM_GUI   = 2,
+        CUSTOM_VIDEO = 3,
+        DESKTOP      = 4,
+        MAX_MODES    = 5,
+    } Mode;
+
     void     SetWidget        (QWidget *MainWindow);
     QScreen* GetCurrentScreen (void);
     int      GetScreenCount   (void);
@@ -49,6 +60,18 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
     virtual DisplayInfo GetDisplayInfo(int VideoRate = 0);
     static bool         SpanAllScreens(void);
     static QString      GetExtraScreenInfo(QScreen *qScreen);
+
+    virtual bool UsingVideoModes   (void) { return false; }
+    virtual const DisplayResVector& GetVideoModes(void);
+    void         SwitchToDesktop   (void);
+    bool         SwitchToGUI       (Mode NextMode = GUI);
+    bool         SwitchToVideo     (int Width, int Height, double Rate = 0.0);
+    QSize        GetResolution     (void);
+    QSize        GetPhysicalSize   (void);
+    double       GetRefreshRate    (void);
+    double       GetAspectRatio    (void);
+    std::vector<double> GetRefreshRates(int Width, int Height);
+
 
   public slots:
     void ScreenChanged        (QScreen *qScreen);
@@ -63,16 +86,26 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
   protected:
     MythDisplay();
     virtual ~MythDisplay();
+
     QScreen*     GetDesiredScreen   (void);
     static void  DebugScreen        (QScreen *qScreen, const QString &Message);
     static float SanitiseRefreshRate(int Rate);
 
-    QWidget* m_widget      { nullptr };
-    QScreen* m_screen      { nullptr };
-    QMutex   m_screenLock  { QMutex::Recursive };
+    void         InitialiseModes    (void);
+    virtual bool SwitchToVideoMode  (int Width, int Height, double Framerate);
+
+    QWidget* m_widget { nullptr };
+    QScreen* m_screen { nullptr };
+    mutable std::vector<DisplayResScreen> m_videoModes { };
 
   private:
     Q_DISABLE_COPY(MythDisplay)
+    void PauseForModeSwitch(void);
+
+    Mode             m_curMode            { GUI };
+    DisplayResScreen m_mode[MAX_MODES]    { };
+    DisplayResScreen m_last               { }; // mirror of mode[current_mode]
+    DisplayResMap    m_inSizeToOutputMode { };
 };
 
 #endif // MYTHDISPLAY_H

@@ -16,7 +16,6 @@
 #include "videoouttypes.h"
 #include "videooutwindow.h"
 #include "mythdisplay.h"
-#include "DisplayRes.h"
 #include "videodisplayprofile.h"
 #include "videocolourspace.h"
 #include "visualisations/videovisual.h"
@@ -171,7 +170,6 @@ class MythVideoOutput
     VideoBuffers         m_videoBuffers;
     VideoErrorState      m_errorState;
     long long            m_framesPlayed;
-    DisplayRes          *m_displayRes;
     QSize                m_monitorSize;
     QSize                m_monitorDimensions;
     VideoVisual         *m_visual;

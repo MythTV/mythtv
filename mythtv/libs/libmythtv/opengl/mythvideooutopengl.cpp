@@ -108,10 +108,6 @@ MythVideoOutputOpenGL::MythVideoOutputOpenGL(const QString &Profile)
     m_buffersCreated(false),
     m_openGLPerf(nullptr)
 {
-    // Setup display switching
-    if (gCoreContext->GetBoolSetting("UseVideoModes", false))
-        m_displayRes = DisplayRes::AcquireRelease();
-
     // Retrieve render context
     m_render = MythRenderOpenGL::GetOpenGLRender();
     if (!m_render)
@@ -235,7 +231,7 @@ bool MythVideoOutputOpenGL::Init(const QSize &VideoDim, const QSize &VideoDispDi
     QSize size = m_window.GetVideoDim();
 
     // Set the display mode if required
-    if (m_displayRes && !m_window.IsEmbedding())
+    if (m_display->UsingVideoModes() && !m_window.IsEmbedding())
         ResizeForVideo(size.width(), size.height());
     InitDisplayMeasurements();
 

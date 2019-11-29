@@ -32,7 +32,6 @@ using namespace std;
 #include "platforms/mythxdisplay.h"
 #include "mythevent.h"
 #include "dbutil.h"
-#include "DisplayRes.h"
 #include "mythmediamonitor.h"
 
 #include "mythdb.h"

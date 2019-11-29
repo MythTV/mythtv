@@ -31,7 +31,6 @@
 #include "globalsettings.h"
 #include "recordingprofile.h"
 #include "mythdisplay.h"
-#include "DisplayRes.h"
 #include "cardutil.h"
 #include "themeinfo.h"
 #include "mythdirs.h"
@@ -2273,7 +2272,9 @@ static HostComboBoxSetting *GuiVidModeResolution()
     gc->setHelpText(VideoModeSettings::tr("Resolution of screen when not "
                                           "watching a video."));
 
-    vector<DisplayResScreen> scr = DisplayRes::GetModes();
+    MythDisplay* display = MythDisplay::AcquireRelease();
+    vector<DisplayResScreen> scr = display->GetVideoModes();
+    MythDisplay::AcquireRelease(false);
     for (size_t i = 0; i< scr.size(); ++i)
     {
         int w = scr[i].Width();
@@ -2320,7 +2321,9 @@ static HostComboBoxSetting *TVVidModeResolution(int idx=-1)
 
     gc->setHelpText(hstr);
 
-    vector<DisplayResScreen> scr = DisplayRes::GetModes();
+    MythDisplay* display = MythDisplay::AcquireRelease();
+    vector<DisplayResScreen> scr = display->GetVideoModes();
+    MythDisplay::AcquireRelease(false);
     for (size_t i = 0; i < scr.size(); ++i)
     {
         QString sel = QString("%1x%2").arg(scr[i].Width()).arg(scr[i].Height());
@@ -2379,12 +2382,9 @@ vector<double> HostRefreshRateComboBoxSetting::GetRefreshRates(
     vector<double> result;
     if (ok0 && ok1)
     {
-        DisplayRes *display_res = DisplayRes::AcquireRelease();
-        if (display_res)
-        {
-            result = display_res->GetRefreshRates(w, h);
-            DisplayRes::AcquireRelease(false);
-        }
+        MythDisplay *display = MythDisplay::AcquireRelease();
+        result = display->GetRefreshRates(w, h);
+        MythDisplay::AcquireRelease(false);
     }
 
     return result;
@@ -4607,7 +4607,9 @@ AppearanceSettings::AppearanceSettings()
 #endif
 
 #if defined(USING_XRANDR) || CONFIG_DARWIN
-    vector<DisplayResScreen> scr = DisplayRes::GetModes();
+    MythDisplay* display = MythDisplay::AcquireRelease();
+    vector<DisplayResScreen> scr = display->GetVideoModes();
+    MythDisplay::AcquireRelease(false);
     if (!scr.empty())
         addChild(UseVideoModes());
 #endif

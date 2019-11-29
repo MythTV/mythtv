@@ -39,7 +39,6 @@
 #include "themeinfo.h"
 #include "x11colors.h"
 #include "mythdisplay.h"
-#include "DisplayRes.h"
 
 #define LOC      QString("MythUIHelper: ")
 
@@ -169,7 +168,6 @@ public:
     bool                m_screensaverEnabled {false};
 
     MythDisplay *m_display                   {nullptr};
-    DisplayRes  *m_display_res               {nullptr};
     bool         m_screenSetup               {false};
 
     MThreadPool *m_imageThreadPool           {nullptr};
@@ -206,15 +204,12 @@ MythUIHelperPrivate::~MythUIHelperPrivate()
     delete m_imageThreadPool;
     delete m_screensaver;
 
-    if (m_display_res)
-    {
-        if (GetMythDB()->GetBoolSetting("UseVideoModes", false))
-            m_display_res->SwitchToDesktop();
-        DisplayRes::AcquireRelease(false); // release
-    }
-
     if (m_display)
+    {
+        if (m_display->UsingVideoModes())
+            m_display->SwitchToDesktop();
         MythDisplay::AcquireRelease(false);
+    }
 }
 
 void MythUIHelperPrivate::Init(void)
@@ -450,15 +445,14 @@ void MythUIHelper::LoadQtConfig(void)
     gCoreContext->ResetLanguage();
     d->m_themecachedir.clear();
 
-    if (!d->m_display_res)
-        d->m_display_res = DisplayRes::AcquireRelease();
+    if (!d->m_display)
+        d->m_display = MythDisplay::AcquireRelease();
 
-    if (d->m_display_res)
+    // Switch to desired GUI resolution
+    if (d->m_display->UsingVideoModes())
     {
-        // Switch to desired GUI resolution
-        if (GetMythDB()->GetBoolSetting("UseVideoModes", false))
-            if (d->m_display_res->SwitchToGUI())
-                d->WaitForScreenChange();
+        if (d->m_display->SwitchToGUI())
+            d->WaitForScreenChange();
     }
 
     // Note the possibly changed screen settings
