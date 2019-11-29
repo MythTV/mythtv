@@ -2670,7 +2670,7 @@ ccache="yes"
 distcc="yes"
 qmake_default="qmake"
 qmakespecs_default=""
-python_default="python"
+python_default="python3"
 
 #Bluray
 bdj_type="j2se"
