@@ -227,6 +227,8 @@ static av_cold int v4l2_decode_init(AVCodecContext *avctx)
         ret = AVERROR(ENOMEM);
         return ret;
     }
+
+    s->avctx = avctx;
     ret = av_hwdevice_ctx_init(s->device_ref);
     if (ret < 0)
         return ret;
@@ -239,7 +241,6 @@ static av_cold int v4l2_decode_init(AVCodecContext *avctx)
 
         return ret;
     }
-    s->avctx = avctx;
 
     return v4l2_prepare_decoder(s);
 }
