@@ -87,7 +87,7 @@ bool RemoteGetMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
     return false;
 }
 
-bool RemoteCheckFile(const ProgramInfo *pginfo, bool checkSlaves)
+bool RemoteCheckFile(ProgramInfo *pginfo, bool checkSlaves)
 {
     QStringList strlist("QUERY_CHECKFILE");
     strlist << QString::number((int)checkSlaves);

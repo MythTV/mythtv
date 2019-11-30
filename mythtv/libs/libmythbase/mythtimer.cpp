@@ -87,7 +87,7 @@ void MythTimer::stop(void)
  * \note If addMSecs() has been called and the total offset applied
  *       is negative then this can return a negative number.
  */
-int MythTimer::elapsed(void) const
+int MythTimer::elapsed(void)
 {
     if (!m_timer.isValid())
     {
@@ -100,7 +100,7 @@ int MythTimer::elapsed(void) const
     qint64 e = m_timer.elapsed();
     if (!QElapsedTimer::isMonotonic() && (e > 86300000))
     {
-        const_cast<MythTimer*>(this)->start();
+        start();
         e = 0;
     }
 

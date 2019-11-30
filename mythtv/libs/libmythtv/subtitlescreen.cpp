@@ -1815,7 +1815,7 @@ void SubtitleScreen::DisplayAVSubtitles(void)
 
     while (!subs->m_buffers.empty())
     {
-        const AVSubtitle subtitle = subs->m_buffers.front();
+        AVSubtitle subtitle = subs->m_buffers.front();
         if (subtitle.start_display_time > currentFrame->timecode)
             break;
 

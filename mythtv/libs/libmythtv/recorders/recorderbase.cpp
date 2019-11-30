@@ -839,7 +839,7 @@ void RecorderBase::SetTotalFrames(uint64_t total_frames)
 RecorderBase *RecorderBase::CreateRecorder(
     TVRec                  *tvrec,
     ChannelBase            *channel,
-    const RecordingProfile &profile,
+    RecordingProfile       &profile,
     const GeneralDBOptions &genOpt)
 {
     if (!channel)
@@ -957,8 +957,7 @@ RecorderBase *RecorderBase::CreateRecorder(
 
     if (recorder)
     {
-        recorder->SetOptionsFromProfile(
-            const_cast<RecordingProfile*>(&profile),
+        recorder->SetOptionsFromProfile(&profile,
             genOpt.m_videoDev, genOpt.m_audioDev, genOpt.m_vbiDev);
         // Override the samplerate defined in the profile if this card
         // was configured with a fixed rate.

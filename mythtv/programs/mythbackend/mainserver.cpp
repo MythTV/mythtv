@@ -8015,7 +8015,7 @@ LiveTVChain *MainServer::GetExistingChain(const QString &id)
     return nullptr;
 }
 
-LiveTVChain *MainServer::GetExistingChain(const MythSocket *sock)
+LiveTVChain *MainServer::GetExistingChain(MythSocket *sock)
 {
     QMutexLocker lock(&m_liveTVChainsLock);
 

@@ -5066,7 +5066,7 @@ void MythPlayer::GetPlaybackData(InfoMap &infoMap)
     GetCodecDescription(infoMap);
 }
 
-int64_t MythPlayer::GetSecondsPlayed(bool honorCutList, int divisor) const
+int64_t MythPlayer::GetSecondsPlayed(bool honorCutList, int divisor)
 {
     int64_t pos = TranslatePositionFrameToMs(framesPlayed, honorCutList);
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC +

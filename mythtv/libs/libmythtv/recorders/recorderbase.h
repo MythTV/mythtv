@@ -245,7 +245,7 @@ class MTV_PUBLIC RecorderBase : public QRunnable
     static RecorderBase *CreateRecorder(
         TVRec                  *tvrec,
         ChannelBase            *channel,
-        const RecordingProfile &profile,
+        RecordingProfile       &profile,
         const GeneralDBOptions &genOpt);
 
   protected:

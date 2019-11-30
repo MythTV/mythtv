@@ -31,7 +31,7 @@ namespace {
     }
 }
 
-static int RunCCExtract(const ProgramInfo &program_info, const QString & destdir)
+static int RunCCExtract(ProgramInfo &program_info, const QString & destdir)
 {
     QString filename = program_info.GetPlaybackURL();
     if (filename.startsWith("myth://"))

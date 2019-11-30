@@ -8052,7 +8052,7 @@ void TV::UpdateOSDInput(const PlayerContext *ctx)
 /** \fn TV::UpdateOSDSignal(const PlayerContext*, const QStringList&)
  *  \brief Updates Signal portion of OSD...
  */
-void TV::UpdateOSDSignal(const PlayerContext *ctx, const QStringList &strlist)
+void TV::UpdateOSDSignal(PlayerContext *ctx, const QStringList &strlist)
 {
     OSD *osd = GetOSDLock(ctx);
     if (!osd || m_browseHelper->IsBrowsing() || !m_queuedChanNum.isEmpty())
@@ -8062,8 +8062,7 @@ void TV::UpdateOSDSignal(const PlayerContext *ctx, const QStringList &strlist)
         ReturnOSDLock(ctx, osd);
 
         QMutexLocker locker(&m_timerIdLock);
-        m_signalMonitorTimerId[StartTimer(1, __LINE__)] =
-            const_cast<PlayerContext*>(ctx);
+        m_signalMonitorTimerId[StartTimer(1, __LINE__)] = ctx;
         return;
     }
     ReturnOSDLock(ctx, osd);

@@ -339,14 +339,14 @@ bool LIRC::IsDoRunSet(void) const
     return doRun;
 }
 
-void LIRC::Process(const QByteArray &data)
+void LIRC::Process(QByteArray &data)
 {
     QMutexLocker static_lock(&lirclib_lock);
 
     // lirc_code2char will make code point to a static datafer..
     char *code = nullptr;
     int ret = lirc_code2char(
-        d->m_lircState, d->m_lircConfig, const_cast<char*>(data.constData()), &code);
+        d->m_lircState, d->m_lircConfig, data.data(), &code);
 
     while ((0 == ret) && code)
     {
@@ -401,7 +401,7 @@ void LIRC::Process(const QByteArray &data)
             QCoreApplication::postEvent(m_mainWindow, keyReleases[i]);
 
         ret = lirc_code2char(
-            d->m_lircState, d->m_lircConfig, const_cast<char*>(data.constData()), &code);
+            d->m_lircState, d->m_lircConfig, data.data(), &code);
     }
 }
 

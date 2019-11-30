@@ -3049,8 +3049,8 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
         {
             if (bufptr + 11 >= pkt->data + pkt->size)
                 continue; // not enough valid data...
-            SequenceHeader *seq = reinterpret_cast<SequenceHeader*>(
-                const_cast<uint8_t*>(bufptr));
+            const SequenceHeader *seq =
+                reinterpret_cast<const SequenceHeader*>(bufptr);
 
             int  width  = static_cast<int>(seq->width())  >> context->lowres;
             int  height = static_cast<int>(seq->height()) >> context->lowres;

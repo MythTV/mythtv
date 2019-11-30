@@ -57,7 +57,7 @@ class MBASE_PUBLIC MythSocket : public QObject, public ReferenceCounter
     bool WriteStringList(const QStringList &list);
 
     bool IsConnected(void) const;
-    bool IsDataAvailable(void) const;
+    bool IsDataAvailable(void);
 
     QHostAddress GetPeerAddress(void) const;
     int GetPeerPort(void) const;

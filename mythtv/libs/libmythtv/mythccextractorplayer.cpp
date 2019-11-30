@@ -663,7 +663,7 @@ void MythCCExtractorPlayer::IngestDVBSubtitles(void)
 
         while (!avsubtitles->m_buffers.empty())
         {
-            const AVSubtitle subtitle = avsubtitles->m_buffers.front();
+            AVSubtitle subtitle = avsubtitles->m_buffers.front();
             avsubtitles->m_buffers.pop_front();
 
             const QSize v_size =

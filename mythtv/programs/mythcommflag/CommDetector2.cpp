@@ -215,7 +215,7 @@ QString debugDirectory(int chanid, const QDateTime& recstartts)
         return "";
     }
 
-    const ProgramInfo pginfo(chanid, recstartts);
+    ProgramInfo pginfo(chanid, recstartts);
 
     if (!pginfo.GetChanID())
         return "";

@@ -23,7 +23,7 @@ void SubtitleReader::EnableRawTextSubtitles(bool enable)
     m_RawTextSubtitlesEnabled = enable;
 }
 
-bool SubtitleReader::AddAVSubtitle(const AVSubtitle &subtitle,
+bool SubtitleReader::AddAVSubtitle(AVSubtitle &subtitle,
                                    bool fix_position,
                                    bool allow_forced)
 {
@@ -79,9 +79,9 @@ void SubtitleReader::ClearAVSubtitles(void)
     m_AVSubtitles.m_lock.unlock();
 }
 
-void SubtitleReader::FreeAVSubtitle(const AVSubtitle &subtitle)
+void SubtitleReader::FreeAVSubtitle(AVSubtitle &subtitle)
 {
-    avsubtitle_free(const_cast<AVSubtitle*>(&subtitle));
+    avsubtitle_free(&subtitle);
 }
 
 void SubtitleReader::LoadExternalSubtitles(const QString &subtitleFileName,

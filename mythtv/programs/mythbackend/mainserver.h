@@ -292,7 +292,7 @@ class MainServer : public QObject, public MythSocketCBs
     static void DoDeleteInDB(DeleteStruct *ds);
 
     LiveTVChain *GetExistingChain(const QString &id);
-    LiveTVChain *GetExistingChain(const MythSocket *sock);
+    LiveTVChain *GetExistingChain(MythSocket *sock);
     LiveTVChain *GetChainWithRecording(const ProgramInfo &pginfo);
     void AddToChains(LiveTVChain *chain);
     void DeleteChain(LiveTVChain *chain);

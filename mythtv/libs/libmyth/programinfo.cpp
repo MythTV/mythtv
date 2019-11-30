@@ -2348,12 +2348,12 @@ static ProgramInfoType discover_program_info_type(
     return pit;
 }
 
-void ProgramInfo::SetPathname(const QString &pn) const
+void ProgramInfo::SetPathname(const QString &pn)
 {
     m_pathname = pn;
 
     ProgramInfoType pit = discover_program_info_type(m_chanid, m_pathname, false);
-    const_cast<ProgramInfo*>(this)->SetProgramInfoType(pit);
+    SetProgramInfoType(pit);
 }
 
 ProgramInfoType ProgramInfo::DiscoverProgramInfoType(void) const
@@ -2457,7 +2457,7 @@ QString ProgramInfo::QueryBasename(void) const
  *        call and so should not be called from the UI thread.
  */
 QString ProgramInfo::GetPlaybackURL(
-    bool checkMaster, bool forceCheckLocal) const
+    bool checkMaster, bool forceCheckLocal)
 {
         // return the original path if BD or DVD URI
     if (IsVideoBD() || IsVideoDVD())
@@ -4743,7 +4743,7 @@ void ProgramInfo::SaveInetRef(const QString &inet)
  *        call and so should not be called from the UI thread.
  *  \return true iff file is readable
  */
-bool ProgramInfo::IsFileReadable(void) const
+bool ProgramInfo::IsFileReadable(void)
 {
     if (IsLocal() && QFileInfo(m_pathname).isReadable())
         return true;
@@ -4813,7 +4813,7 @@ uint ProgramInfo::QueryTranscoderID(void) const
  *  \note This method sometimes initiates a QUERY_CHECKFILE MythProto
  *        call and so should not be called from the UI thread.
  */
-QString ProgramInfo::DiscoverRecordingDirectory(void) const
+QString ProgramInfo::DiscoverRecordingDirectory(void)
 {
     if (!IsLocal())
     {

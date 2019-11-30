@@ -85,7 +85,7 @@ class MTV_PUBLIC LiveTVChain : public ReferenceCounter
 
     // socket stuff
     void SetHostSocket(MythSocket *sock);
-    bool IsHostSocket(const MythSocket *sock) const;
+    bool IsHostSocket(MythSocket *sock);
     uint HostSocketCount(void) const;
     void DelHostSocket(MythSocket *sock);
  

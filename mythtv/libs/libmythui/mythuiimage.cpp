@@ -478,7 +478,7 @@ QEvent::Type ImageLoadEvent::kEventType =
 class ImageLoadThread : public QRunnable
 {
   public:
-    ImageLoadThread(const MythUIImage *parent, MythPainter *painter,
+    ImageLoadThread(MythUIImage *parent, MythPainter *painter,
                     const ImageProperties &imProps, QString basefile,
                     int number, ImageCacheMode mode) :
         m_parent(parent), m_painter(painter), m_imageProperties(imProps),
@@ -507,7 +507,7 @@ class ImageLoadThread : public QRunnable
                                                         m_basefile,
                                                         m_imageProperties.m_filename,
                                                         aborted);
-                QCoreApplication::postEvent(const_cast<MythUIImage*>(m_parent), le);
+                QCoreApplication::postEvent(m_parent, le);
 
                 return;
              }
@@ -522,11 +522,11 @@ class ImageLoadThread : public QRunnable
         ImageLoadEvent *le = new ImageLoadEvent(m_parent, image, m_basefile,
                                                 m_imageProperties.m_filename,
                                                 m_number, aborted);
-        QCoreApplication::postEvent(const_cast<MythUIImage*>(m_parent), le);
+        QCoreApplication::postEvent(m_parent, le);
     }
 
 private:
-    const MythUIImage *m_parent  {nullptr};
+    MythUIImage       *m_parent  {nullptr};
     MythPainter       *m_painter {nullptr};
     ImageProperties m_imageProperties;
     QString         m_basefile;
