@@ -104,7 +104,7 @@ VorbisEncoder::~VorbisEncoder()
 int VorbisEncoder::addSamples(int16_t * bytes, unsigned int length)
 {
     long realsamples = 0;
-    signed char *chars = (signed char *)bytes;
+    auto *chars = (signed char *)bytes;
 
     realsamples = length / 4;
 

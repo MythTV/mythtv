@@ -155,7 +155,7 @@ static void startPlayback(void)
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    PlaylistView *view = new PlaylistView(mainStack, nullptr);
+    auto *view = new PlaylistView(mainStack, nullptr);
 
     if (view->Create())
         mainStack->AddScreen(view);
@@ -169,7 +169,7 @@ static void startStreamPlayback(void)
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    StreamView *view = new StreamView(mainStack, nullptr);
+    auto *view = new StreamView(mainStack, nullptr);
 
     if (view->Create())
         mainStack->AddScreen(view);
@@ -187,7 +187,7 @@ static void startDatabaseTree(void)
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
     QString lastView = gCoreContext->GetSetting("MusicPlaylistEditorView", "tree");
-    PlaylistEditorView *view = new PlaylistEditorView(mainStack, nullptr, lastView);
+    auto *view = new PlaylistEditorView(mainStack, nullptr, lastView);
 
     if (view->Create())
         mainStack->AddScreen(view);
@@ -205,7 +205,7 @@ static void startRipper(void)
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    Ripper *rip = new Ripper(mainStack, chooseCD());
+    auto *rip = new Ripper(mainStack, chooseCD());
 
     if (rip->Create())
     {
@@ -243,7 +243,7 @@ static void startImport(void)
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    ImportMusicDialog *import = new ImportMusicDialog(mainStack);
+    auto *import = new ImportMusicDialog(mainStack);
 
     if (import->Create())
     {
@@ -286,7 +286,7 @@ static void MusicCallback(void *data, QString &selection)
     else if (sel == "settings_general")
      {
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-        GeneralSettings *gs = new GeneralSettings(mainStack, "general settings");
+        auto *gs = new GeneralSettings(mainStack, "general settings");
 
         if (gs->Create())
             mainStack->AddScreen(gs);
@@ -296,7 +296,7 @@ static void MusicCallback(void *data, QString &selection)
     else if (sel == "settings_player")
     {
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-        PlayerSettings *ps = new PlayerSettings(mainStack, "player settings");
+        auto *ps = new PlayerSettings(mainStack, "player settings");
 
         if (ps->Create())
             mainStack->AddScreen(ps);
@@ -306,7 +306,7 @@ static void MusicCallback(void *data, QString &selection)
     else if (sel == "settings_rating")
     {
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-        RatingSettings *rs = new RatingSettings(mainStack, "rating settings");
+        auto *rs = new RatingSettings(mainStack, "rating settings");
 
         if (rs->Create())
             mainStack->AddScreen(rs);
@@ -317,7 +317,7 @@ static void MusicCallback(void *data, QString &selection)
     {
 
        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-       VisualizationSettings *vs = new VisualizationSettings(mainStack, "visualization settings");
+       auto *vs = new VisualizationSettings(mainStack, "visualization settings");
 
        if (vs->Create())
            mainStack->AddScreen(vs);
@@ -327,7 +327,7 @@ static void MusicCallback(void *data, QString &selection)
     else if (sel == "settings_import")
     {
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-        ImportSettings *is = new ImportSettings(mainStack, "import settings");
+        auto *is = new ImportSettings(mainStack, "import settings");
 
         if (is->Create())
             mainStack->AddScreen(is);
@@ -353,7 +353,7 @@ static int runMenu(const QString& which_menu)
 
     while (parentObject)
     {
-        MythThemedMenu *menu = dynamic_cast<MythThemedMenu *>(parentObject);
+        auto *menu = dynamic_cast<MythThemedMenu *>(parentObject);
 
         if (menu && menu->objectName() == "mainmenu")
         {
@@ -364,9 +364,9 @@ static int runMenu(const QString& which_menu)
         parentObject = parentObject->parent();
     }
 
-    MythThemedMenu *diag = new MythThemedMenu(
-        themedir, which_menu, GetMythMainWindow()->GetMainStack(),
-        "music menu");
+    auto *diag = new MythThemedMenu(themedir, which_menu,
+                                    GetMythMainWindow()->GetMainStack(),
+                                    "music menu");
 
     // save the callback from the main menu
     if (mainMenu)
@@ -418,7 +418,7 @@ static void runRipCD(void)
 #if defined HAVE_CDIO
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    Ripper *rip = new Ripper(mainStack, chooseCD());
+    auto *rip = new Ripper(mainStack, chooseCD());
 
     if (rip->Create())
         mainStack->AddScreen(rip);
@@ -542,8 +542,7 @@ static void handleMedia(MythMediaDevice *cd)
 
     QString message = qApp->translate("(MythMusicMain)",
                                       "Searching for music files...");
-    MythUIBusyDialog *busy = new MythUIBusyDialog( message, popupStack,
-                                                    "musicscanbusydialog");
+    auto *busy = new MythUIBusyDialog( message, popupStack, "musicscanbusydialog");
     if (busy->Create())
         popupStack->AddScreen(busy, false);
     else
@@ -564,8 +563,8 @@ static void handleMedia(MythMediaDevice *cd)
         return;
 
     message = qApp->translate("(MythMusicMain)", "Loading music tracks");
-    MythUIProgressDialog *progress = new MythUIProgressDialog( message,
-                                        popupStack, "scalingprogressdialog");
+    auto *progress = new MythUIProgressDialog( message, popupStack,
+                                               "scalingprogressdialog");
     if (progress->Create())
     {
         popupStack->AddScreen(progress, false);
@@ -696,7 +695,7 @@ static void handleCDMedia(MythMediaDevice *cd)
     gMusicData->m_all_playlists->getActive()->removeAllCDTracks();
 
     // find any new cd tracks
-    CdDecoder *decoder = new CdDecoder("cda", nullptr, nullptr);
+    auto *decoder = new CdDecoder("cda", nullptr, nullptr);
     decoder->setDevice(newDevice);
 
     int tracks = decoder->getNumTracks();

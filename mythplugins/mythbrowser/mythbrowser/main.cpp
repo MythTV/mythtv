@@ -37,7 +37,7 @@ static int handleMedia(const QString &url, const QString &directory, const QStri
 
     if (urls[0].startsWith("mythflash://"))
     {
-        MythFlashPlayer *flashplayer = new MythFlashPlayer(mainStack, urls);
+        auto *flashplayer = new MythFlashPlayer(mainStack, urls);
         if (flashplayer->Create())
             mainStack->AddScreen(flashplayer);
         else
@@ -45,7 +45,7 @@ static int handleMedia(const QString &url, const QString &directory, const QStri
     }
     else
     {
-        MythBrowser *mythbrowser = new MythBrowser(mainStack, urls);
+        auto *mythbrowser = new MythBrowser(mainStack, urls);
 
         if (!directory.isEmpty())
             mythbrowser->setDefaultSaveDirectory(directory);
@@ -95,8 +95,7 @@ static void runHomepage()
         MythScreenStack *m_popupStack =
                 GetMythMainWindow()->GetStack("popup stack");
 
-        MythConfirmationDialog *okPopup =
-                new MythConfirmationDialog(m_popupStack, message, false);
+        auto *okPopup = new MythConfirmationDialog(m_popupStack, message, false);
 
         if (okPopup->Create())
             m_popupStack->AddScreen(okPopup);
@@ -146,7 +145,7 @@ int mythplugin_run(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    BookmarkManager *manager = new BookmarkManager(mainStack, "bookmarkmanager");
+    auto *manager = new BookmarkManager(mainStack, "bookmarkmanager");
 
     if (manager->Create())
     {
@@ -161,7 +160,7 @@ int mythplugin_config(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    BrowserConfig *config = new BrowserConfig(mainStack, "browserconfig");
+    auto *config = new BrowserConfig(mainStack, "browserconfig");
 
     if (config->Create())
     {

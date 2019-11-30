@@ -105,7 +105,7 @@ void LyricsView::customEvent(QEvent *event)
     {
         if (m_autoScroll)
         {
-            OutputEvent *oe = dynamic_cast<OutputEvent *>(event);
+            auto *oe = dynamic_cast<OutputEvent *>(event);
             MusicMetadata *curMeta = gPlayer->getCurrentMetadata();
 
             if (!oe || !curMeta)
@@ -124,7 +124,7 @@ void LyricsView::customEvent(QEvent *event)
             for (int x = 0; x < m_lyricsList->GetCount(); x++)
             {
                 MythUIButtonListItem * item = m_lyricsList->GetItemAt(x);
-                LyricsLine *lyric = item->GetData().value<LyricsLine*>();
+                auto *lyric = item->GetData().value<LyricsLine*>();
                 if (lyric)
                 {
                     if (lyric->m_time > 1000 && rs >= lyric->m_time)
@@ -177,7 +177,7 @@ void LyricsView::customEvent(QEvent *event)
     }
     else if (event->type() == DecoderHandlerEvent::OperationStart)
     {
-        DecoderHandlerEvent *dhe = dynamic_cast<DecoderHandlerEvent*>(event);
+        auto *dhe = dynamic_cast<DecoderHandlerEvent*>(event);
         if (!dhe)
             return;
         if (dhe->getMessage() && m_bufferStatus)
@@ -187,7 +187,7 @@ void LyricsView::customEvent(QEvent *event)
     }
     else if (event->type() == DecoderHandlerEvent::BufferStatus)
     {
-        DecoderHandlerEvent *dhe = dynamic_cast<DecoderHandlerEvent*>(event);
+        auto *dhe = dynamic_cast<DecoderHandlerEvent*>(event);
         if (!dhe)
             return;
 
@@ -220,7 +220,7 @@ void LyricsView::ShowMenu(void)
 {
     QString label = tr("Actions");
 
-    MythMenu *menu = new MythMenu(label, this, "actionmenu");
+    auto *menu = new MythMenu(label, this, "actionmenu");
 
     if (m_lyricData)
     {
@@ -245,7 +245,7 @@ void LyricsView::ShowMenu(void)
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    MythDialogBox *menuPopup = new MythDialogBox(menu, popupStack, "actionmenu");
+    auto *menuPopup = new MythDialogBox(menu, popupStack, "actionmenu");
 
     if (menuPopup->Create())
         popupStack->AddScreen(menuPopup);
@@ -257,7 +257,7 @@ MythMenu* LyricsView::createFindLyricsMenu(void)
 {
     QString label = tr("Find Lyrics");
 
-    MythMenu *menu = new MythMenu(label, this, "findlyricsmenu");
+    auto *menu = new MythMenu(label, this, "findlyricsmenu");
     menu->AddItem(tr("Search All Grabbers"), qVariantFromValue(QString("ALL")));
 
     QStringList strList("MUSIC_LYRICS_GETGRABBERS");
@@ -335,7 +335,7 @@ void LyricsView::setLyricTime(void)
         MythUIButtonListItem *item = m_lyricsList->GetItemCurrent();
         if (item)
         {
-            LyricsLine *lyric = item->GetData().value<LyricsLine*>();
+            auto *lyric = item->GetData().value<LyricsLine*>();
             if (lyric)
             {
                 lyric->m_time = gPlayer->getOutput()->GetAudiotime() - 750;
@@ -469,7 +469,7 @@ void LyricsView::editLyrics(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    EditLyricsDialog *editDialog = new EditLyricsDialog(mainStack, m_lyricData);
+    auto *editDialog = new EditLyricsDialog(mainStack, m_lyricData);
 
     if (!editDialog->Create())
     {

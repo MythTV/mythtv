@@ -259,7 +259,7 @@ unsigned char Synaesthesia::getPixel(int x, int y, int where)
 
 void Synaesthesia::fadeFade(void)
 {
-    uint32_t *ptr = (uint32_t *)output;
+    auto *ptr = (uint32_t *)output;
     int i = m_outWidth * m_outHeight * 2 / sizeof(uint32_t);
     do {
         uint32_t x = *ptr;
@@ -578,12 +578,12 @@ bool Synaesthesia::draw(QPainter *p, const QColor &back)
 
     (void)back;
 
-    uint32_t *ptrOutput = (uint32_t *)output;
+    auto *ptrOutput = (uint32_t *)output;
 
     for (int j = 0; j < m_outHeight * 2; j += 2) 
     {
-        uint32_t *ptrTop = (uint32_t *)(m_outputImage->scanLine(j));
-        uint32_t *ptrBot = (uint32_t *)(m_outputImage->scanLine(j+1));
+        auto *ptrTop = (uint32_t *)(m_outputImage->scanLine(j));
+        auto *ptrBot = (uint32_t *)(m_outputImage->scanLine(j+1));
 
         int i = m_outWidth / 4;
 

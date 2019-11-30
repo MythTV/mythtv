@@ -665,7 +665,7 @@ void Ripper::ShowMenu()
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    MythDialogBox *menu = new MythDialogBox("", popupStack, "ripmusicmenu");
+    auto *menu = new MythDialogBox("", popupStack, "ripmusicmenu");
 
     if (menu->Create())
         popupStack->AddScreen(menu);
@@ -713,7 +713,7 @@ void Ripper::chooseBackend(void)
     QString msg = tr("Select where to save tracks");
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythUISearchDialog *searchDlg = new MythUISearchDialog(popupStack, msg, hostList, false, "");
+    auto *searchDlg = new MythUISearchDialog(popupStack, msg, hostList, false, "");
 
     if (!searchDlg->Create())
     {
@@ -766,7 +766,7 @@ void Ripper::ScanFinished()
 
         for (int trackno = 0; trackno < m_decoder->getNumTracks(); trackno++)
         {
-            RipTrack *ripTrack = new RipTrack;
+            auto *ripTrack = new RipTrack;
 
             MusicMetadata *metadata = m_decoder->getMetadata(trackno + 1);
             if (metadata)
@@ -1102,8 +1102,7 @@ void Ripper::startRipper(void)
 
     int quality = m_qualityList->GetItemCurrent()->GetData().toInt();
 
-    RipStatus *statusDialog = new RipStatus(mainStack, m_CDdevice, m_tracks,
-                                            quality);
+    auto *statusDialog = new RipStatus(mainStack, m_CDdevice, m_tracks, quality);
 
     if (statusDialog->Create())
     {
@@ -1198,7 +1197,7 @@ void Ripper::updateTrackList(void)
             RipTrack *track = m_tracks->at(i);
             MusicMetadata *metadata = track->metadata;
 
-            MythUIButtonListItem *item = new MythUIButtonListItem(m_trackList,"");
+            auto *item = new MythUIButtonListItem(m_trackList,"");
 
             item->setCheckable(true);
 
@@ -1242,7 +1241,7 @@ void Ripper::searchArtist()
     QStringList searchList = MusicMetadata::fillFieldList("artist");
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythUISearchDialog *searchDlg = new MythUISearchDialog(popupStack, msg, searchList, false, "");
+    auto *searchDlg = new MythUISearchDialog(popupStack, msg, searchList, false, "");
 
     if (!searchDlg->Create())
     {
@@ -1266,7 +1265,7 @@ void Ripper::searchAlbum()
     QStringList searchList = MusicMetadata::fillFieldList("album");
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythUISearchDialog *searchDlg = new MythUISearchDialog(popupStack, msg, searchList, false, "");
+    auto *searchDlg = new MythUISearchDialog(popupStack, msg, searchList, false, "");
 
     if (!searchDlg->Create())
     {
@@ -1295,7 +1294,7 @@ void Ripper::searchGenre()
     m_searchList.sort();
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythUISearchDialog *searchDlg = new MythUISearchDialog(popupStack, msg, searchList, false, "");
+    auto *searchDlg = new MythUISearchDialog(popupStack, msg, searchList, false, "");
 
     if (!searchDlg->Create())
     {
@@ -1318,7 +1317,7 @@ void Ripper::showEditMetadataDialog(MythUIButtonListItem *item)
     if (!item || m_tracks->isEmpty())
         return;
 
-    RipTrack *track = item->GetData().value<RipTrack *>();
+    auto *track = item->GetData().value<RipTrack *>();
 
     if (!track)
         return;
@@ -1327,7 +1326,7 @@ void Ripper::showEditMetadataDialog(MythUIButtonListItem *item)
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    EditMetadataDialog *editDialog = new EditMetadataDialog(mainStack, editMeta);
+    auto *editDialog = new EditMetadataDialog(mainStack, editMeta);
     editDialog->setSaveMetadataOnly();
 
     if (!editDialog->Create())
@@ -1393,8 +1392,7 @@ void Ripper::ShowConflictMenu(RipTrack* track)
                      "present in the database.\n"
                      "Do you want to permanently delete the existing "
                      "file(s)?");
-    MythDialogBox *menu = new MythDialogBox(msg, popupStack, "conflictmenu",
-                                            true);
+    auto *menu = new MythDialogBox(msg, popupStack, "conflictmenu", true);
 
     if (menu->Create())
         popupStack->AddScreen(menu);
@@ -1440,7 +1438,7 @@ void Ripper::customEvent(QEvent* event)
         if (dce->GetId() == "conflictmenu")
         {
             int buttonNum = dce->GetResult();
-            RipTrack *track = dce->GetData().value<RipTrack *>();
+            auto *track = dce->GetData().value<RipTrack *>();
 
             switch (buttonNum)
             {
@@ -1536,7 +1534,7 @@ void RipStatus::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = dynamic_cast<DialogCompletionEvent *>(event);
+        auto *dce = dynamic_cast<DialogCompletionEvent *>(event);
         if (dce == nullptr)
             return;
         if (dce->GetId() == "stop_ripping" && dce->GetResult())
@@ -1549,7 +1547,7 @@ void RipStatus::customEvent(QEvent *event)
         return;
     }
 
-    RipStatusEvent *rse = dynamic_cast<RipStatusEvent *> (event);
+    auto *rse = dynamic_cast<RipStatusEvent *> (event);
     if (!rse)
         return;
 

@@ -94,8 +94,8 @@ void LogScale::setMax(int maxscale, int maxrange)
 
     delete [] m_indices;
 
-    long double domain = (long double) maxscale;
-    long double range  = (long double) maxrange;
+    auto domain = (long double) maxscale;
+    auto range  = (long double) maxrange;
     long double x  = 1.0;
     long double dx = 1.0;
     long double e4 = 1.0E-8;
@@ -159,7 +159,7 @@ bool StereoScope::process( VisualNode *node )
         double const step = (double)SAMPLES_DEFAULT_SIZE / m_size.width();
         for ( int i = 0; i < m_size.width(); i++)
         {
-            unsigned long indexTo = (unsigned long)(index + step);
+            auto indexTo = (unsigned long)(index + step);
             if (indexTo == (unsigned long)(index))
                 indexTo = (unsigned long)(index + 1);
 
@@ -193,7 +193,7 @@ bool StereoScope::process( VisualNode *node )
                 }
             }
 #endif
-            for (unsigned long s = (unsigned long)index; s < indexTo && s < node->m_length; s++)
+            for (auto s = (unsigned long)index; s < indexTo && s < node->m_length; s++)
             {
                 double adjHeight = static_cast<double>(m_size.height()) / 4.0;
                 double tmpL = ( ( node->m_left ? static_cast<double>(node->m_left[s]) : 0.) *
@@ -375,7 +375,7 @@ bool MonoScope::process( VisualNode *node )
         double const step = (double)SAMPLES_DEFAULT_SIZE / m_size.width();
         for (int i = 0; i < m_size.width(); i++)
         {
-            unsigned long indexTo = (unsigned long)(index + step);
+            auto indexTo = (unsigned long)(index + step);
             if (indexTo == (unsigned long)index)
                 indexTo = (unsigned long)(index + 1);
 
@@ -402,7 +402,7 @@ bool MonoScope::process( VisualNode *node )
                 }
             }
 #endif
-            for (unsigned long s = (unsigned long)index; s < indexTo && s < node->m_length; s++)
+            for (auto s = (unsigned long)index; s < indexTo && s < node->m_length; s++)
             {
                 double tmp = ( static_cast<double>(node->m_left[s]) +
                                (node->m_right ? static_cast<double>(node->m_right[s]) : 0.0) *
@@ -1455,7 +1455,7 @@ bool AlbumArt::draw(QPainter *p, const QColor &back)
 
         if (imageFilename.startsWith("myth://"))
         {
-            RemoteFile *rf = new RemoteFile(imageFilename, false, false, 0);
+            auto *rf = new RemoteFile(imageFilename, false, false, 0);
 
             QByteArray data;
             bool ret = rf->SaveAs(data);

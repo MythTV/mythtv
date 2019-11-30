@@ -45,7 +45,7 @@ DecoderHandlerEvent::~DecoderHandlerEvent(void)
 
 MythEvent* DecoderHandlerEvent::clone(void) const
 {
-    DecoderHandlerEvent *result = new DecoderHandlerEvent(*this);
+    auto *result = new DecoderHandlerEvent(*this);
 
     if (m_msg)
         result->m_msg = new QString(*m_msg);
@@ -116,7 +116,7 @@ void DecoderHandler::doStart(bool result)
 
 void DecoderHandler::error(const QString &e)
 {
-    QString *str = new QString(e);
+    auto *str = new QString(e);
     DecoderHandlerEvent ev(DecoderHandlerEvent::Error, str);
     dispatch(ev);
 }
@@ -205,14 +205,14 @@ void DecoderHandler::stop(void)
 
 void DecoderHandler::customEvent(QEvent *event)
 {
-    if (DecoderHandlerEvent *dhe = dynamic_cast<DecoderHandlerEvent*>(event))
+    if (auto *dhe = dynamic_cast<DecoderHandlerEvent*>(event))
     {
         // Proxy all DecoderHandlerEvents
         return dispatch(*dhe);
     }
     if (event->type() == MythEvent::MythEventMessage)
     {
-        MythEvent *me = dynamic_cast<MythEvent *>(event);
+        auto *me = dynamic_cast<MythEvent *>(event);
         if (me == nullptr)
             return;
         QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);
@@ -275,7 +275,7 @@ void DecoderHandler::createPlaylist(const QUrl &url)
 
 void DecoderHandler::createPlaylistForSingleFile(const QUrl &url)
 {
-    PlayListFileEntry *entry = new PlayListFileEntry;
+    auto *entry = new PlayListFileEntry;
 
     if (url.scheme() == "file" || QFileInfo(url.toString()).isAbsolute())
         entry->setFile(url.toLocalFile());

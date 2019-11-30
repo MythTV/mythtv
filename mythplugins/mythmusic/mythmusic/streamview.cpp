@@ -78,7 +78,7 @@ bool StreamView::Create(void)
 
 void StreamView::ShowMenu(void)
 {
-    MythMenu *menu = new MythMenu(tr("Stream Actions"), this, "mainmenu");
+    auto *menu = new MythMenu(tr("Stream Actions"), this, "mainmenu");
     menu->AddItem(tr("Add Stream"));
 
     if (m_streamList->GetItemCurrent())
@@ -94,7 +94,7 @@ void StreamView::ShowMenu(void)
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    MythDialogBox *menuPopup = new MythDialogBox(menu, popupStack, "actionmenu");
+    auto *menuPopup = new MythDialogBox(menu, popupStack, "actionmenu");
 
     if (menuPopup->Create())
         popupStack->AddScreen(menuPopup);
@@ -116,8 +116,8 @@ void StreamView::customEvent(QEvent *event)
         {
             MusicMetadata *mdata = gPlayer->getPlayedTracksList().last();
 
-            MythUIButtonListItem *item =
-                    new MythUIButtonListItem(m_playedTracksList, "", qVariantFromValue(mdata), 0);
+            auto *item = new MythUIButtonListItem(m_playedTracksList, "",
+                                                  qVariantFromValue(mdata), 0);
 
             InfoMap metadataMap;
             mdata->toMap(metadataMap);
@@ -131,7 +131,7 @@ void StreamView::customEvent(QEvent *event)
     }
     else if (event->type() == MusicPlayerEvent::TrackChangeEvent)
     {
-        MusicPlayerEvent *mpe = dynamic_cast<MusicPlayerEvent *>(event);
+        auto *mpe = dynamic_cast<MusicPlayerEvent *>(event);
 
         if (!mpe)
             return;
@@ -212,7 +212,7 @@ void StreamView::customEvent(QEvent *event)
     }
     else if (event->type() == MythEvent::MythEventMessage)
     {
-        MythEvent *me = dynamic_cast<MythEvent *>(event);
+        auto *me = dynamic_cast<MythEvent *>(event);
         if (me == nullptr)
             return;
         QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);
@@ -241,7 +241,7 @@ void StreamView::customEvent(QEvent *event)
                     for (int x = 0; x < m_streamList->GetCount(); x++)
                     {
                         MythUIButtonListItem *item = m_streamList->GetItemAt(x);
-                        MusicMetadata *mdata = item->GetData().value<MusicMetadata *>();
+                        auto *mdata = item->GetData().value<MusicMetadata *>();
                         if (mdata && mdata->LogoUrl() == url)
                             item->SetImage(filename);
                     }
@@ -251,7 +251,7 @@ void StreamView::customEvent(QEvent *event)
     }
     else if (event->type() == DecoderHandlerEvent::OperationStart)
     {
-        DecoderHandlerEvent *dhe = dynamic_cast<DecoderHandlerEvent*>(event);
+        auto *dhe = dynamic_cast<DecoderHandlerEvent*>(event);
         if (!dhe)
             return;
         if (dhe->getMessage() && m_bufferStatus)
@@ -261,7 +261,7 @@ void StreamView::customEvent(QEvent *event)
     }
     else if (event->type() == DecoderHandlerEvent::BufferStatus)
     {
-        DecoderHandlerEvent *dhe = dynamic_cast<DecoderHandlerEvent*>(event);
+        auto *dhe = dynamic_cast<DecoderHandlerEvent*>(event);
         if (!dhe)
             return;
 
@@ -377,7 +377,7 @@ void StreamView::editStream(void)
     MythUIButtonListItem *item = m_streamList->GetItemCurrent();
     if (item)
     {
-        MusicMetadata *mdata = item->GetData().value<MusicMetadata *>();
+        auto *mdata = item->GetData().value<MusicMetadata *>();
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
         MythScreenType *screen = new EditStreamMetadata(mainStack, this, mdata);
 
@@ -393,7 +393,7 @@ void StreamView::removeStream(void)
     MythUIButtonListItem *item = m_streamList->GetItemCurrent();
     if (item)
     {
-        MusicMetadata *mdata = item->GetData().value<MusicMetadata *>();
+        auto *mdata = item->GetData().value<MusicMetadata *>();
 
         if (mdata)
             ShowOkPopup(tr("Are you sure you want to delete this Stream?\n"
@@ -411,7 +411,7 @@ void StreamView::doRemoveStream(bool ok)
     MythUIButtonListItem *item = m_streamList->GetItemCurrent();
     if (item)
     {
-        MusicMetadata *mdata = item->GetData().value<MusicMetadata *>();
+        auto *mdata = item->GetData().value<MusicMetadata *>();
 
         if (mdata)
             deleteStream(mdata);
@@ -430,7 +430,8 @@ void StreamView::updateStreamList(void)
     for (int x = 0; x < gPlayer->getCurrentPlaylist()->getTrackCount(); x++)
     {
         MusicMetadata *mdata = gPlayer->getCurrentPlaylist()->getSongAt(x);
-        MythUIButtonListItem *item = new MythUIButtonListItem(m_streamList, "", qVariantFromValue(mdata));
+        auto *item = new MythUIButtonListItem(m_streamList, "",
+                                              qVariantFromValue(mdata));
         InfoMap metadataMap;
         if (mdata)
             mdata->toMap(metadataMap);
@@ -496,7 +497,7 @@ void  StreamView::streamItemVisible(MythUIButtonListItem *item)
     if (!item->GetText("imageloaded").isEmpty())
         return;
 
-    MusicMetadata *mdata = item->GetData().value<MusicMetadata *>();
+    auto *mdata = item->GetData().value<MusicMetadata *>();
     if (mdata)
     {
         if (!mdata->LogoUrl().isEmpty())
@@ -530,7 +531,7 @@ void StreamView::addStream(MusicMetadata *mdata)
     for (int x = 0; x < m_streamList->GetCount(); x++)
     {
         MythUIButtonListItem *item = m_streamList->GetItemAt(x);
-        MusicMetadata *itemsdata = item->GetData().value<MusicMetadata *>();
+        auto *itemsdata = item->GetData().value<MusicMetadata *>();
         if (itemsdata)
         {
             if (url == itemsdata->Url())
@@ -584,7 +585,7 @@ void StreamView::updateStream(MusicMetadata *mdata)
         for (int x = 0; x < m_playedTracksList->GetCount(); x++)
         {
             MythUIButtonListItem *item = m_playedTracksList->GetItemAt(x);
-            MusicMetadata *playedmdata = item->GetData().value<MusicMetadata *>();
+            auto *playedmdata = item->GetData().value<MusicMetadata *>();
 
             if (playedmdata && playedmdata->ID() == id)
             {
@@ -602,7 +603,7 @@ void StreamView::updateStream(MusicMetadata *mdata)
     for (int x = 0; x < m_streamList->GetCount(); x++)
     {
         MythUIButtonListItem *item = m_streamList->GetItemAt(x);
-        MusicMetadata *itemsdata = item->GetData().value<MusicMetadata *>();
+        auto *itemsdata = item->GetData().value<MusicMetadata *>();
         if (itemsdata)
         {
             if (mdata->ID() == itemsdata->ID())
@@ -1116,7 +1117,8 @@ void SearchStream::doUpdateStreams(void)
         mdata.setCountry(query.value(11).toString());
         mdata.setLanguage(query.value(12).toString());
 
-        MythUIButtonListItem *item = new MythUIButtonListItem(m_streamList, "", qVariantFromValue(mdata));
+        auto *item = new MythUIButtonListItem(m_streamList, "",
+                                              qVariantFromValue(mdata));
         InfoMap metadataMap;
         mdata.toMap(metadataMap);
 

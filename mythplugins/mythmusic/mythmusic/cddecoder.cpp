@@ -749,8 +749,8 @@ MusicMetadata *CdDecoder::getMetadata()
     if (title.isEmpty())
         title = tr("Track %1").arg(tracknum);
 
-    MusicMetadata *m = new MusicMetadata(getURL(), artist, compilation_artist,
-        album, title, genre, year, tracknum, length);
+    auto *m = new MusicMetadata(getURL(), artist, compilation_artist, album,
+                                title, genre, year, tracknum, length);
     if (m)
         m->setCompilation(isCompilation);
 

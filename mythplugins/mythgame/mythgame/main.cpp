@@ -20,7 +20,7 @@ struct GameData
 
 static void GameCallback(void *data, QString &selection)
 {
-    GameData *ddata = (GameData *)data;
+    auto *ddata = (GameData *)data;
     QString sel = selection.toLower();
 
     (void)ddata;
@@ -28,9 +28,8 @@ static void GameCallback(void *data, QString &selection)
     if (sel == "game_settings")
     {
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-        StandardSettingDialog *ssd =
-            new StandardSettingDialog(mainStack, "gamesettings",
-                                      new GameGeneralSettings());
+        auto *ssd = new StandardSettingDialog(mainStack, "gamesettings",
+                                              new GameGeneralSettings());
 
         if (ssd->Create())
             mainStack->AddScreen(ssd);
@@ -55,7 +54,7 @@ static void GameCallback(void *data, QString &selection)
     }
     if (sel == "clear_game_data")
     {
-        GameHandler *handler = new GameHandler();
+        auto *handler = new GameHandler();
         handler->clearAllGameData();
     }
 
@@ -65,8 +64,9 @@ static int runMenu(const QString& which_menu)
 {
     QString themedir = GetMythUI()->GetThemeDir();
 
-    MythThemedMenu *menu = new MythThemedMenu(
-        themedir, which_menu, GetMythMainWindow()->GetMainStack(), "game menu");
+    auto *menu = new MythThemedMenu(themedir, which_menu,
+                                    GetMythMainWindow()->GetMainStack(),
+                                    "game menu");
 
     GameData data;
 
@@ -91,7 +91,7 @@ static int runMenu(const QString& which_menu)
 static int RunGames(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    GameUI *game = new GameUI(mainStack);
+    auto *game = new GameUI(mainStack);
 
     if (game->Create())
     {

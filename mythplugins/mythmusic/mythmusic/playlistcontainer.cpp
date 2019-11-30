@@ -101,7 +101,7 @@ void PlaylistContainer::load()
     {
         while (query.next())
         {
-            Playlist *temp_playlist = new Playlist();
+            auto *temp_playlist = new Playlist();
             //  No, we don't destruct this ...
             temp_playlist->setParent(this);
             temp_playlist->loadPlaylistByID(query.value(0).toInt(), m_myHost);
@@ -187,7 +187,7 @@ void PlaylistContainer::save(void)
 
 void PlaylistContainer::createNewPlaylist(const QString &name)
 {
-    Playlist *new_list = new Playlist();
+    auto *new_list = new Playlist();
     new_list->setParent(this);
 
     //  Need to touch the database to get persistent ID
@@ -198,7 +198,7 @@ void PlaylistContainer::createNewPlaylist(const QString &name)
 
 void PlaylistContainer::copyNewPlaylist(const QString &name)
 {
-    Playlist *new_list = new Playlist();
+    auto *new_list = new Playlist();
     new_list->setParent(this);
 
     //  Need to touch the database to get persistent ID

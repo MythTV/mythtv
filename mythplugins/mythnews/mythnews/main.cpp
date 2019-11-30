@@ -23,7 +23,7 @@ static int RunNews(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    MythNews *mythnews = new MythNews(mainStack, "mythnews");
+    auto *mythnews = new MythNews(mainStack, "mythnews");
 
     if (mythnews->Create())
     {
@@ -82,7 +82,7 @@ int mythplugin_config(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    MythNewsConfig *mythnewsconfig = new MythNewsConfig(mainStack, "mythnewsconfig");
+    auto *mythnewsconfig = new MythNewsConfig(mainStack, "mythnewsconfig");
 
     if (mythnewsconfig->Create())
     {

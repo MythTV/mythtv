@@ -265,7 +265,7 @@ int GetSiteList(QList<Bookmark*>  &siteList)
         std::shared_ptr<MythSortHelper>sh = getMythSortHelper();
         while (query.next())
         {
-            Bookmark *site = new Bookmark();
+            auto *site = new Bookmark();
             site->m_category = query.value(0).toString();
             site->m_name = query.value(1).toString();
             site->m_sortName = sh->doTitle(site->m_name);

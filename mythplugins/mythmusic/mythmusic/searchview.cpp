@@ -85,7 +85,7 @@ void SearchView::customEvent(QEvent *event)
     if (event->type() == MusicPlayerEvent::TrackRemovedEvent ||
         event->type() == MusicPlayerEvent::TrackAddedEvent)
     {
-        MusicPlayerEvent *mpe = dynamic_cast<MusicPlayerEvent *>(event);
+        auto *mpe = dynamic_cast<MusicPlayerEvent *>(event);
 
         if (!mpe)
             return;
@@ -95,7 +95,7 @@ void SearchView::customEvent(QEvent *event)
         for (int x = 0; x < m_tracksList->GetCount(); x++)
         {
             MythUIButtonListItem *item = m_tracksList->GetItemAt(x);
-            MusicMetadata *mdata = item->GetData().value<MusicMetadata*>();
+            auto *mdata = item->GetData().value<MusicMetadata*>();
             if (mdata && (mdata->ID() == (MusicMetadata::IdType) trackID || trackID == -1))
             {
                 if (gPlayer->getCurrentPlaylist() && gPlayer->getCurrentPlaylist()->checkTrack(mdata->ID()))
@@ -132,7 +132,7 @@ void SearchView::customEvent(QEvent *event)
     }
     else if (event->type() == MusicPlayerEvent::MetadataChangedEvent)
     {
-        MusicPlayerEvent *mpe = dynamic_cast<MusicPlayerEvent *>(event);
+        auto *mpe = dynamic_cast<MusicPlayerEvent *>(event);
 
         if (!mpe)
             return;
@@ -142,7 +142,7 @@ void SearchView::customEvent(QEvent *event)
         for (int x = 0; x < m_tracksList->GetCount(); x++)
         {
             MythUIButtonListItem *item = m_tracksList->GetItemAt(x);
-            MusicMetadata *mdata = item->GetData().value<MusicMetadata*>();
+            auto *mdata = item->GetData().value<MusicMetadata*>();
             if (mdata && mdata->ID() == trackID)
             {
                 InfoMap metadataMap;
@@ -218,7 +218,7 @@ bool SearchView::keyPressEvent(QKeyEvent *event)
             {
                 if (m_tracksList->GetItemCurrent())
                 {
-                    MusicMetadata *mdata = m_tracksList->GetItemCurrent()->GetData().value<MusicMetadata*>();
+                    auto *mdata = m_tracksList->GetItemCurrent()->GetData().value<MusicMetadata*>();
                     if (mdata)
                     {
                         if (action == "INFO")
@@ -261,12 +261,12 @@ void SearchView::ShowMenu(void)
     {
         QString label = tr("Search Actions");
 
-        MythMenu *menu = new MythMenu(label, this, "searchviewmenu");
+        auto *menu = new MythMenu(label, this, "searchviewmenu");
 
         MythUIButtonListItem *item = m_tracksList->GetItemCurrent();
         if (item)
         {
-            MusicMetadata *mdata = item->GetData().value<MusicMetadata*>();
+            auto *mdata = item->GetData().value<MusicMetadata*>();
             if (mdata)
             {
                 if (gPlayer->getCurrentPlaylist() && gPlayer->getCurrentPlaylist()->checkTrack(mdata->ID()))
@@ -286,7 +286,7 @@ void SearchView::ShowMenu(void)
 
         MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-        MythDialogBox *menuPopup = new MythDialogBox(menu, popupStack, "actionmenu");
+        auto *menuPopup = new MythDialogBox(menu, popupStack, "actionmenu");
 
         if (menuPopup->Create())
             popupStack->AddScreen(menuPopup);
@@ -409,7 +409,7 @@ void SearchView::updateTracksList(void)
         MusicMetadata *mdata = gMusicData->m_all_music->getMetadata(trackid);
         if (mdata)
         {
-            MythUIButtonListItem *newitem = new MythUIButtonListItem(m_tracksList, "");
+            auto *newitem = new MythUIButtonListItem(m_tracksList, "");
             newitem->SetData(qVariantFromValue(mdata));
             InfoMap metadataMap;
             mdata->toMap(metadataMap);
@@ -435,7 +435,7 @@ void SearchView::trackClicked(MythUIButtonListItem *item)
     if (!gPlayer->getCurrentPlaylist())
         return;
 
-    MusicMetadata *mdata = item->GetData().value<MusicMetadata*>();
+    auto *mdata = item->GetData().value<MusicMetadata*>();
     if (mdata)
     {
         if (gPlayer->getCurrentPlaylist()->checkTrack(mdata->ID()))
@@ -453,7 +453,7 @@ void SearchView::trackVisible(MythUIButtonListItem *item)
 
     if (item->GetImageFilename().isEmpty())
     {
-        MusicMetadata *mdata = item->GetData().value<MusicMetadata*>();
+        auto *mdata = item->GetData().value<MusicMetadata*>();
         if (mdata)
         {
             QString artFile = mdata->getAlbumArtFile();
