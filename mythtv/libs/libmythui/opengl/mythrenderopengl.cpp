@@ -126,41 +126,9 @@ MythRenderOpenGL* MythRenderOpenGL::Create(const QString& /*Painter*/, QPaintDev
 
 MythRenderOpenGL::MythRenderOpenGL(const QSurfaceFormat& Format, QPaintDevice* Device,
                                    RenderType Type)
-  : QOpenGLContext(),
-    QOpenGLFunctions(),
-    MythEGL(this),
+  : MythEGL(this),
     MythRender(Type),
-    m_activeFramebuffer(nullptr),
-    m_fence(0),
-    m_activeProgram(nullptr),
-    m_cachedVertices(),
-    m_vertexExpiry(),
-    m_cachedVBOS(),
-    m_vboExpiry(),
-    m_lock(QMutex::Recursive),
-    m_lockLevel(0),
-    m_features(Multitexture),
-    m_extraFeatures(kGLFeatNone),
-    m_extraFeaturesUsed(kGLFeatNone),
-    m_maxTextureSize(0),
-    m_maxTextureUnits(0),
-    m_colorDepth(0),
-    m_coreProfile(false),
-    m_viewport(),
-    m_activeTexture(0),
-    m_blend(false),
-    m_background(0x00000000),
-    m_fullRange(gCoreContext->GetBoolSetting("GUIRGBLevels", true)),
-    m_projection(),
-    m_transforms(),
-    m_parameters(),
-    m_cachedMatrixUniforms(),
-    m_cachedUniformLocations(),
-    m_vao(0),
-    m_flushEnabled(true),
-    m_openglDebugger(nullptr),
-    m_openGLDebuggerFilter(QOpenGLDebugMessage::InvalidType),
-    m_window(nullptr)
+    m_fullRange(gCoreContext->GetBoolSetting("GUIRGBLevels", true))
 {
     memset(m_defaultPrograms, 0, sizeof(m_defaultPrograms));
     m_projection.fill(0);
@@ -402,7 +370,7 @@ bool MythRenderOpenGL::Init(void)
     return true;
 }
 
-#define GLYesNo(arg) (arg ? "Yes" : "No")
+#define GLYesNo(arg) ((arg) ? "Yes" : "No")
 
 void MythRenderOpenGL::DebugFeatures(void)
 {

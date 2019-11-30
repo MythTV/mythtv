@@ -3595,7 +3595,7 @@ nullptr
                 if (olddecoder == "vaapi2")
                     newdecoder = "vaapi";
 
-                auto UpdateDeinterlacer = [](QString Olddeint, QString &Newdeint, QString Decoder)
+                auto UpdateDeinterlacer = [](const QString &Olddeint, QString &Newdeint, const QString &Decoder)
                 {
                     if (Olddeint.isEmpty())
                     {
@@ -3642,7 +3642,7 @@ nullptr
                 UpdateDeinterlacer(olddeint0, newdeint0, decoder);
                 UpdateDeinterlacer(olddeint1, newdeint1, decoder);
 
-                auto UpdateData = [](uint ProfileID, QString Value, QString Data)
+                auto UpdateData = [](uint ProfileID, const QString &Value, const QString &Data)
                 {
                     MSqlQuery update(MSqlQuery::InitCon());
                     update.prepare(

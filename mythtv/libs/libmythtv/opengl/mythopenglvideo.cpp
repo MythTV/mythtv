@@ -26,35 +26,16 @@ MythOpenGLVideo::MythOpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *Col
                                  QSize VideoDim, QSize VideoDispDim,
                                  QRect DisplayVisibleRect, QRect DisplayVideoRect, QRect VideoRect,
                                  bool  ViewportControl, QString Profile)
-  : QObject(),
-    m_valid(false),
-    m_profile(std::move(Profile)),
-    m_inputType(FMT_NONE),
-    m_outputType(FMT_NONE),
+  : m_profile(std::move(Profile)),
     m_render(Render),
     m_videoDispDim(VideoDispDim),
     m_videoDim(VideoDim),
     m_masterViewportSize(DisplayVisibleRect.size()),
     m_displayVideoRect(DisplayVideoRect),
     m_videoRect(VideoRect),
-    m_deinterlacer(MythDeintType::DEINT_NONE),
-    m_deinterlacer2x(false),
-    m_fallbackDeinterlacer(MythDeintType::DEINT_NONE),
     m_videoColourSpace(ColourSpace),
     m_viewportControl(ViewportControl),
-    m_inputTextures(),
-    m_prevTextures(),
-    m_nextTextures(),
-    m_frameBuffer(nullptr),
-    m_frameBufferTexture(nullptr),
-    m_inputTextureSize(m_videoDim),
-    m_features(),
-    m_extraFeatures(0),
-    m_resizing(false),
-    m_textureTarget(QOpenGLTexture::Target2D),
-    m_discontinuityCounter(0),
-    m_lastRotation(0),
-    m_chromaUpsamplingFilter(false)
+    m_inputTextureSize(m_videoDim)
 {
     if (!m_render || !m_videoColourSpace)
         return;

@@ -8,19 +8,17 @@
 
 #define CUDA_CHECK(CUDA_FUNCS, CUDA_CALL) \
 { \
-    CUresult res = CUDA_FUNCS->CUDA_CALL; \
+    CUresult res = (CUDA_FUNCS)->CUDA_CALL;          \
     if (res != CUDA_SUCCESS) { \
         const char * desc; \
-        CUDA_FUNCS->cuGetErrorString(res, &desc); \
+        (CUDA_FUNCS)->cuGetErrorString(res, &desc);                      \
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("CUDA error %1 (%2)").arg(res).arg(desc)); \
     } \
 }
 
 MythNVDECInterop::MythNVDECInterop(MythRenderOpenGL *Context)
   : MythOpenGLInterop(Context, NVDEC),
-    m_cudaContext(),
-    m_cudaFuncs(nullptr),
-    m_referenceFrames()
+    m_cudaContext()
 {
     InitialiseCuda();
 }

@@ -199,15 +199,10 @@ vector<MythVideoTexture*> MythOpenGLInterop::Retrieve(MythRenderOpenGL *Context,
 }
 
 MythOpenGLInterop::MythOpenGLInterop(MythRenderOpenGL *Context, Type InteropType)
-  : QObject(),
-    ReferenceCounter("GLInterop", true),
+  : ReferenceCounter("GLInterop", true),
     m_context(Context),
     m_type(InteropType),
-    m_openglTextures(),
-    m_openglTextureSize(),
-    m_discontinuityCounter(0),
-    m_defaultFree(nullptr),
-    m_defaultUserOpaque(nullptr)
+    m_openglTextureSize()
 {
     if (m_context)
         m_context->IncrRef();

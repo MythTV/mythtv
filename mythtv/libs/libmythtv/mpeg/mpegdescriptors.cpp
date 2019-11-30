@@ -387,7 +387,7 @@ QString MPEGDescriptor::DescriptorTagString(void) const
     if (IsValid()) { DESC_NAME d(_data, DescriptorLength()+2); \
     if (d.IsValid()) str = d.toString(); } } while (false)
 
-QString MPEGDescriptor::descrDump(QString name) const
+QString MPEGDescriptor::descrDump(const QString &name) const
 {
     QString str;
     str = QString("%1 Descriptor (0x%2) length(%3). Dumping\n")

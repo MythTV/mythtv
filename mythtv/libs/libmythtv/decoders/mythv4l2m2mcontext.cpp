@@ -30,10 +30,6 @@ MythV4L2M2MContext::MythV4L2M2MContext(DecoderBase *Parent, MythCodecID CodecID)
 {
 }
 
-MythV4L2M2MContext::~MythV4L2M2MContext()
-{
-}
-
 inline uint32_t V4L2CodecType(AVCodecID Id)
 {
     switch (Id)

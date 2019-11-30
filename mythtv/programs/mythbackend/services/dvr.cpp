@@ -484,9 +484,8 @@ long Dvr::GetSavedBookmark( int RecordedId,
     if (offsettype.toLower() == "duration"){
         if (ri.QueryKeyFrameDuration(&offset, position, isend))
             return offset;
-        else
-            // If bookmark cannot be converted to a duration return -1
-            return -1;
+        // If bookmark cannot be converted to a duration return -1
+        return -1;
     }
     return position;
 }

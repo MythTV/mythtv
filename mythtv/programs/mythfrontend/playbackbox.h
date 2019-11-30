@@ -348,8 +348,9 @@ class PlaybackBox : public ScheduleCommon
     MythUIImage *m_previewImage               {nullptr};
 
     QString      m_artHostOverride;
-    MythUIImage *m_artImage[3];
-    QTimer      *m_artTimer[3];
+    constexpr static int kNumArtImages = 3;
+    MythUIImage *m_artImage[kNumArtImages];
+    QTimer      *m_artTimer[kNumArtImages];
 
     InfoMap m_currentMap;
 

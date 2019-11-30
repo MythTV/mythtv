@@ -54,8 +54,6 @@ enum SSDPRequestType
 #define SocketIdx_Multicast  1
 #define SocketIdx_Broadcast  2
 
-#define NumberOfSockets     (sizeof( m_Sockets ) / sizeof( MSocketDevice * ))
-
 class UPNP_PUBLIC SSDP : public MThread
 {
     private:
@@ -63,7 +61,8 @@ class UPNP_PUBLIC SSDP : public MThread
         static SSDP*        g_pSSDP;  
 
         QRegExp             m_procReqLineExp        {"[ \r\n][ \r\n]*"};
-        MSocketDevice      *m_Sockets[3]            {nullptr,nullptr,nullptr};
+        constexpr static int kNumberOfSockets = 3;
+        MSocketDevice      *m_Sockets[kNumberOfSockets] {nullptr,nullptr,nullptr};
 
         int                 m_nPort                 {SSDP_PORT};
         int                 m_nSearchPort           {SSDP_SEARCHPORT};

@@ -53,14 +53,14 @@ uint ProfileItem::GetPriority(void) const
 // If string is blank then assumes a match.
 // If value is 0 or negative assume a match (i.e. value unknown assumes a match)
 // float values must be no more than 3 decimals.
-bool ProfileItem::CheckRange(const QString Key, float Value, bool *Ok) const
+bool ProfileItem::CheckRange(const QString &Key, float Value, bool *Ok) const
 {
-    return CheckRange(std::move(Key), Value, 0, true, Ok);
+    return CheckRange(Key, Value, 0, true, Ok);
 }
 
-bool ProfileItem::CheckRange(const QString Key, int Value, bool *Ok) const
+bool ProfileItem::CheckRange(const QString &Key, int Value, bool *Ok) const
 {
-    return CheckRange(std::move(Key), 0.0, Value, false, Ok);
+    return CheckRange(Key, 0.0, Value, false, Ok);
 }
 
 bool ProfileItem::CheckRange(const QString& Key,

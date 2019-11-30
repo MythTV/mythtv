@@ -688,7 +688,7 @@ QString get_decoder_name(MythCodecID codec_id)
         return "mmal";
     if (codec_is_mmal_dec(codec_id))
         return "mmal-dec";
-    else if (codec_is_drmprime(codec_id))
+    if (codec_is_drmprime(codec_id))
         return "drmprime";
     return "ffmpeg";
 }

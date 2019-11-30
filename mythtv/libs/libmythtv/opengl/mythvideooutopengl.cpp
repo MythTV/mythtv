@@ -97,19 +97,7 @@ void MythVideoOutputOpenGL::GetRenderOptions(RenderOptions &Options)
 }
 
 MythVideoOutputOpenGL::MythVideoOutputOpenGL(QString Profile)
-  : MythVideoOutput(),
-    m_render(nullptr),
-    m_isGLES2(false),
-    m_openGLVideo(nullptr),
-    m_openGLVideoPiPActive(nullptr),
-    m_openGLPainter(nullptr),
-    m_videoProfile(std::move(Profile)),
-    m_newCodecId(kCodec_NONE),
-    m_newVideoDim(),
-    m_newVideoDispDim(),
-    m_newAspect(0.0F),
-    m_buffersCreated(false),
-    m_openGLPerf(nullptr)
+  : m_videoProfile(std::move(Profile))
 {
     // Setup display switching
     if (gCoreContext->GetBoolSetting("UseVideoModes", false))
@@ -271,7 +259,7 @@ bool MythVideoOutputOpenGL::Init(const QSize &VideoDim, const QSize &VideoDispDi
 
 bool MythVideoOutputOpenGL::InputChanged(const QSize &VideoDim, const QSize &VideoDispDim,
                                          float Aspect, MythCodecID CodecId, bool &AspectOnly,
-                                         MythMultiLocker*, int ReferenceFrames,
+                                         MythMultiLocker* /*Locks*/, int ReferenceFrames,
                                          bool ForceChange)
 {
     QSize currentvideodim     = m_window.GetVideoDim();

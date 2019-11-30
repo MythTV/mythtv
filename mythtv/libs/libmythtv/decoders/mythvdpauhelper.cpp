@@ -478,7 +478,7 @@ bool MythVDPAUHelper::IsFeatureAvailable(uint Feature)
 QSize MythVDPAUHelper::GetSurfaceParameters(VdpVideoSurface Surface, VdpChromaType &Chroma)
 {
     if (!Surface)
-        return QSize();
+        return {};
 
     uint width = 0;
     uint height = 0;

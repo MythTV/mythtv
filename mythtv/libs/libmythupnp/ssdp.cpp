@@ -127,7 +127,7 @@ SSDP::~SSDP()
         m_pNotifyTask = nullptr;
     }
 
-    for (int nIdx = 0; nIdx < (int)NumberOfSockets; nIdx++ )
+    for (int nIdx = 0; nIdx < kNumberOfSockets; nIdx++ )
     {
         if (m_Sockets[ nIdx ] != nullptr )
         {
@@ -266,7 +266,7 @@ void SSDP::run()
 
         FD_ZERO( &read_set );
 
-        for (size_t nIdx = 0; nIdx < NumberOfSockets; nIdx++ )
+        for (size_t nIdx = 0; nIdx < kNumberOfSockets; nIdx++ )
         {
             if (m_Sockets[nIdx] != nullptr && m_Sockets[nIdx]->socket() >= 0)
             {
@@ -290,7 +290,7 @@ void SSDP::run()
 
         int count = select(nMaxSocket + 1, &read_set, nullptr, nullptr, &timeout);
 
-        for (int nIdx = 0; count && nIdx < (int)NumberOfSockets; nIdx++ )
+        for (int nIdx = 0; count && nIdx < kNumberOfSockets; nIdx++ )
         {
             bool cond1 = m_Sockets[nIdx] != nullptr;
             bool cond2 = cond1 && m_Sockets[nIdx]->socket() >= 0;

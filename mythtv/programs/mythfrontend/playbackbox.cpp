@@ -395,7 +395,7 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, const QString& name,
       // Other
       m_helper(this)
 {
-    for (size_t i = 0; i < sizeof(m_artImage) / sizeof(MythUIImage*); i++)
+    for (size_t i = 0; i < kNumArtImages; i++)
     {
         m_artImage[i] = nullptr;
         m_artTimer[i] = new QTimer(this);
@@ -473,7 +473,7 @@ PlaybackBox::~PlaybackBox(void)
     gCoreContext->removeListener(this);
     PreviewGeneratorQueue::RemoveListener(this);
 
-    for (size_t i = 0; i < sizeof(m_artImage) / sizeof(MythUIImage*); i++)
+    for (size_t i = 0; i < kNumArtImages; i++)
     {
         m_artTimer[i]->disconnect(this);
         m_artTimer[i] = nullptr;
@@ -865,7 +865,7 @@ void PlaybackBox::UpdateUIListItem(MythUIButtonListItem *item,
 
         // Handle artwork
         QString arthost;
-        for (size_t i = 0; i < sizeof(m_artImage) / sizeof(MythUIImage*); i++)
+        for (size_t i = 0; i < kNumArtImages; i++)
         {
             if (!m_artImage[i])
                 continue;
@@ -2491,7 +2491,7 @@ bool PlaybackBox::Play(
         return false;
     }
 
-    for (size_t i = 0; i < sizeof(m_artImage) / sizeof(MythUIImage*); i++)
+    for (size_t i = 0; i < kNumArtImages; i++)
     {
         if (!m_artImage[i])
             continue;

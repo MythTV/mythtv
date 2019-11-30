@@ -13,16 +13,8 @@
 using namespace std;
 
 MythOpenGLPainter::MythOpenGLPainter(MythRenderOpenGL *Render, QWidget *Parent)
-  : MythPainter(),
-    m_parent(Parent),
-    m_render(Render),
-    m_target(nullptr),
-    m_swapControl(true),
-    m_imageToTextureMap(),
-    m_ImageExpireList(),
-    m_textureDeleteList(),
-    m_textureDeleteLock(),
-    m_mappedTextures()
+  : m_parent(Parent),
+    m_render(Render)
 {
     m_mappedTextures.reserve(MAX_BUFFER_POOL);
 }

@@ -12,8 +12,7 @@
 MythOpenGLPerf::MythOpenGLPerf(QString Name,
                                QVector<QString> Names,
                                int SampleCount)
-  : QOpenGLTimeMonitor(),
-    m_name(std::move(Name)),
+  : m_name(std::move(Name)),
     m_totalSamples(SampleCount),
     m_timerNames(std::move(Names))
 {

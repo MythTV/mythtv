@@ -58,9 +58,9 @@ MythVAAPIInterop* MythVAAPIInterop::Create(MythRenderOpenGL *Context, Type Inter
 
     if (InteropType == VAAPIEGLDRM)
         return new MythVAAPIInteropDRM(Context);
-    else if (InteropType == VAAPIGLXPIX)
+    if (InteropType == VAAPIGLXPIX)
         return new MythVAAPIInteropGLXPixmap(Context);
-    else if (InteropType == VAAPIGLXCOPY)
+    if (InteropType == VAAPIGLXCOPY)
         return new MythVAAPIInteropGLXCopy(Context);
     return nullptr;
 }
