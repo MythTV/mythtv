@@ -860,7 +860,7 @@ void ATSCStreamData::CacheCVCT(uint pid, CableVirtualChannelTable* cvct)
     _cached_cvcts[pid] = cvct;
 }
 
-bool ATSCStreamData::DeleteCachedTable(PSIPTable *psip) const
+bool ATSCStreamData::DeleteCachedTable(const PSIPTable *psip) const
 {
     if (!psip)
         return false;

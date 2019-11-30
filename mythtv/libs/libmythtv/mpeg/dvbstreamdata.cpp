@@ -911,7 +911,7 @@ void DVBStreamData::ReturnCachedSDTTables(sdt_vec_t &sdts) const
     sdts.clear();
 }
 
-bool DVBStreamData::DeleteCachedTable(PSIPTable *psip) const
+bool DVBStreamData::DeleteCachedTable(const PSIPTable *psip) const
 {
     if (!psip)
         return false;

@@ -305,7 +305,7 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
 
     // Caching
     void IncrementRefCnt(const PSIPTable *psip) const;
-    virtual bool DeleteCachedTable(PSIPTable *psip) const;
+    virtual bool DeleteCachedTable(const PSIPTable *psip) const;
     void CachePAT(const ProgramAssociationTable *pat);
     void CacheCAT(const ConditionalAccessTable *_cat);
     void CachePMT(const ProgramMapTable *pmt);
