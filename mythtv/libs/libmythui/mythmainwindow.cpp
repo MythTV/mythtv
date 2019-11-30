@@ -192,8 +192,6 @@ class MythMainWindowPrivate
     MythPainter     *m_painter           {nullptr};
     MythRender      *m_render            {nullptr};
 
-    bool             m_allowInput        {true};
-
     QRegion          m_repaintRegion;
 
     MythGesture      m_gesture;
@@ -217,14 +215,17 @@ class MythMainWindowPrivate
     MythThemeBase   *m_themeBase         {nullptr};
     MythUDPListener *m_udpListener       {nullptr};
 
-    bool             m_pendingUpdate     {false};
-
+    MythNotificationCenter *m_nc         {nullptr};
     QTimer          *m_idleTimer         {nullptr};
     int              m_idleTime          {0};
     bool             m_standby           {false};
     bool             m_enteringStandby   {false};
     bool             m_disableIdle       {false};
-    MythNotificationCenter *m_nc         {nullptr};
+
+    bool             m_allowInput        {true};
+
+    bool             m_pendingUpdate     {false};
+
         // window aspect
     bool             m_firstinit         {true};
     bool             m_bSavedPOS         {false};
