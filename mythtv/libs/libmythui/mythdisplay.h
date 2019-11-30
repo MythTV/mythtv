@@ -39,6 +39,8 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
 {
     Q_OBJECT
 
+    friend class MythMainWindow;
+
   public:
     static MythDisplay* AcquireRelease(bool Acquire = true);
 
@@ -52,7 +54,6 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
         MAX_MODES    = 5,
     } Mode;
 
-    void     SetWidget        (QWidget *MainWindow);
     QScreen* GetCurrentScreen (void);
     int      GetScreenCount   (void);
     double   GetPixelAspectRatio(void);
@@ -87,6 +88,7 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
     MythDisplay();
     virtual ~MythDisplay();
 
+    void         SetWidget          (QWidget *MainWindow);
     QScreen*     GetDesiredScreen   (void);
     static void  DebugScreen        (QScreen *qScreen, const QString &Message);
     static float SanitiseRefreshRate(int Rate);

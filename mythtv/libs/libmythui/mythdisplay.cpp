@@ -126,31 +126,39 @@ void MythDisplay::SetWidget(QWidget *MainWindow)
     QWidget* old = m_widget;
     m_widget = MainWindow;
 
-    if (m_widget)
+    if (!m_widget)
     {
-        if (m_widget != old)
-            LOG(VB_GENERAL, LOG_INFO, LOC + "New main widget");
-        QWindow* window = m_widget->windowHandle();
-        if (window)
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Widget removed");
+        return;
+    }
+
+    if (m_widget != old)
+        LOG(VB_GENERAL, LOG_INFO, LOC + "New main widget");
+    QWindow* window = m_widget->windowHandle();
+    if (window)
+    {
+        QScreen *desired = GetDesiredScreen();
+        if (desired && (desired != window->screen()))
         {
-            QScreen *desired = GetDesiredScreen();
-            if (desired && (desired != window->screen()))
-            {
-                DebugScreen(desired, "Moving to");
+            DebugScreen(desired, "Moving to");
+
+            // If this is a virtual desktop, move the window into the screen,
+            // otherwise just set the screen - both of which should trigger a
+            // screenChanged event.
+            // TODO Confirm this check for non-virtual screens (OSX?)
+            // TODO If the screens are non-virtual - can we actually safely move?
+            // (SetWidget is only called from MythMainWindow before the render
+            // device is created - so should be safe).
+            if (desired->geometry() == desired->virtualGeometry())
                 window->setScreen(desired);
-                if (desired->geometry() != desired->virtualGeometry())
-                    m_widget->move(desired->geometry().topLeft());
-            }
-            connect(window, &QWindow::screenChanged, this, &MythDisplay::ScreenChanged);
+            else
+                m_widget->move(desired->geometry().topLeft());
         }
-        else
-        {
-            LOG(VB_GENERAL, LOG_WARNING, LOC + "Widget does not have a window");
-        }
+        connect(window, &QWindow::screenChanged, this, &MythDisplay::ScreenChanged);
     }
     else
     {
-        LOG(VB_GENERAL, LOG_INFO, LOC + "Widget removed");
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Widget does not have a window!");
     }
 }
 
