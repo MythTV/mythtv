@@ -31,7 +31,6 @@
 #include "globalsettings.h"
 #include "recordingprofile.h"
 #include "mythdisplay.h"
-#include "DisplayRes.h"
 #include "cardutil.h"
 #include "themeinfo.h"
 #include "mythdirs.h"
@@ -2029,19 +2028,8 @@ static HostTextEditSetting *SetupPinCode()
 static HostComboBoxSetting *XineramaScreen()
 {
     auto *gc = new HostComboBoxSetting("XineramaScreen", false);
-
-    foreach (QScreen *qscreen, qGuiApp->screens())
-    {
-        QString extra = MythDisplay::GetExtraScreenInfo(qscreen);
-        gc->addSelection(qscreen->name() + extra, qscreen->name());
-    }
-
-    gc->addSelection(AppearanceSettings::tr("All"), QString::number(-1));
-
     gc->setLabel(AppearanceSettings::tr("Display on screen"));
-
     gc->setValue(0);
-
     gc->setHelpText(AppearanceSettings::tr("Run on the specified screen or "
                                            "spanning all screens."));
     return gc;
@@ -2277,7 +2265,9 @@ static HostComboBoxSetting *GuiVidModeResolution()
     gc->setHelpText(VideoModeSettings::tr("Resolution of screen when not "
                                           "watching a video."));
 
-    vector<DisplayResScreen> scr = DisplayRes::GetModes();
+    MythDisplay* display = MythDisplay::AcquireRelease();
+    vector<DisplayResScreen> scr = display->GetVideoModes();
+    MythDisplay::AcquireRelease(false);
     for (size_t i = 0; i< scr.size(); ++i)
     {
         int w = scr[i].Width();
@@ -2324,7 +2314,9 @@ static HostComboBoxSetting *TVVidModeResolution(int idx=-1)
 
     gc->setHelpText(hstr);
 
-    vector<DisplayResScreen> scr = DisplayRes::GetModes();
+    MythDisplay* display = MythDisplay::AcquireRelease();
+    vector<DisplayResScreen> scr = display->GetVideoModes();
+    MythDisplay::AcquireRelease(false);
     for (size_t i = 0; i < scr.size(); ++i)
     {
         QString sel = QString("%1x%2").arg(scr[i].Width()).arg(scr[i].Height());
@@ -2383,12 +2375,9 @@ vector<double> HostRefreshRateComboBoxSetting::GetRefreshRates(
     vector<double> result;
     if (ok0 && ok1)
     {
-        DisplayRes *display_res = DisplayRes::AcquireRelease();
-        if (display_res)
-        {
-            result = display_res->GetRefreshRates(w, h);
-            DisplayRes::AcquireRelease(false);
-        }
+        MythDisplay *display = MythDisplay::AcquireRelease();
+        result = display->GetRefreshRates(w, h);
+        MythDisplay::AcquireRelease(false);
     }
 
     return result;
@@ -4550,6 +4539,19 @@ void AppearanceSettings::applyChange()
     GetMythMainWindow()->JumpTo("Reload Theme");
 }
 
+void AppearanceSettings::PopulateScreens(int Screens)
+{
+    m_xineramaScreen->setEnabled(Screens > 1);
+    m_xineramaAspect->setEnabled(Screens > 1);
+    m_xineramaScreen->clearSelections();
+    foreach (QScreen *qscreen, qGuiApp->screens())
+    {
+        QString extra = MythDisplay::GetExtraScreenInfo(qscreen);
+        m_xineramaScreen->addSelection(qscreen->name() + extra, qscreen->name());
+    }
+    m_xineramaScreen->addSelection(AppearanceSettings::tr("All"), QString::number(-1));
+}
+
 AppearanceSettings::AppearanceSettings()
 {
     auto *screen = new GroupSetting();
@@ -4562,11 +4564,13 @@ AppearanceSettings::AppearanceSettings()
     screen->addChild(MenuTheme());
     screen->addChild(GUIRGBLevels());
 
-    if (MythDisplay::GetNumberOfScreens() > 1)
-    {
-        screen->addChild(XineramaScreen());
-        screen->addChild(XineramaMonitorAspectRatio());
-    }
+    m_display = MythDisplay::AcquireRelease();
+    m_xineramaScreen = XineramaScreen();
+    m_xineramaAspect = XineramaMonitorAspectRatio();
+    screen->addChild(m_xineramaScreen);
+    screen->addChild(m_xineramaAspect);
+    PopulateScreens(m_display->GetScreenCount());
+    connect(m_display, &MythDisplay::ScreenCountChanged, this, &AppearanceSettings::PopulateScreens);
 
 //    screen->addChild(DisplaySizeHeight());
 //    screen->addChild(DisplaySizeWidth());
@@ -4584,7 +4588,9 @@ AppearanceSettings::AppearanceSettings()
 #endif
 
 #if defined(USING_XRANDR) || CONFIG_DARWIN
-    vector<DisplayResScreen> scr = DisplayRes::GetModes();
+    MythDisplay* display = MythDisplay::AcquireRelease();
+    vector<DisplayResScreen> scr = display->GetVideoModes();
+    MythDisplay::AcquireRelease(false);
     if (!scr.empty())
         addChild(UseVideoModes());
 #endif
@@ -4602,6 +4608,11 @@ AppearanceSettings::AppearanceSettings()
     addChild(dates);
 
     addChild(LCDEnable());
+}
+
+AppearanceSettings::~AppearanceSettings()
+{
+    MythDisplay::AcquireRelease(false);
 }
 
 /*******************************************************************************

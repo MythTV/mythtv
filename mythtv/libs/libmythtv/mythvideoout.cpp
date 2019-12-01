@@ -7,7 +7,6 @@
 #include "mythlogging.h"
 #include "mythmainwindow.h"
 #include "mythuihelper.h"
-#include "mythxdisplay.h"
 #include "mythavutil.h"
 #include "mthreadpool.h"
 #include "mythcodeccontext.h"
@@ -254,6 +253,7 @@ MythVideoOutput *MythVideoOutput::Create(const QString &Decoder,    MythCodecID 
  *        Init(int,int,float,WId,int,int,int,int,WId) call.
  */
 MythVideoOutput::MythVideoOutput()
+  : m_display(MythDisplay::AcquireRelease())
 {
     m_dbDisplayDimensionsMM = QSize(gCoreContext->GetNumSetting("DisplaySizeWidth",  0),
                                     gCoreContext->GetNumSetting("DisplaySizeHeight", 0));
@@ -270,8 +270,7 @@ MythVideoOutput::~MythVideoOutput()
 {
     delete m_dbDisplayProfile;
     ResizeForGui();
-    if (m_displayRes)
-        DisplayRes::AcquireRelease(false);
+    MythDisplay::AcquireRelease(false);
 }
 
 /**
@@ -915,8 +914,8 @@ void MythVideoOutput::DiscardFrames(bool KeyFrame, bool /*unused*/)
  */
 void MythVideoOutput::ResizeForGui(void)
 {
-    if (m_displayRes)
-        m_displayRes->SwitchToGUI();
+    if (m_display->UsingVideoModes())
+        m_display->SwitchToGUI();
 }
 
 /**
@@ -932,7 +931,7 @@ void MythVideoOutput::ResizeForGui(void)
  */
 void MythVideoOutput::ResizeForVideo(int Width, int Height)
 {
-    if (!m_displayRes)
+    if (!m_display->UsingVideoModes())
         return;
 
     if (!Width || !Height)
@@ -944,14 +943,13 @@ void MythVideoOutput::ResizeForVideo(int Width, int Height)
     }
 
     float rate = m_dbDisplayProfile ? m_dbDisplayProfile->GetOutput() : 0.0F;
-    if (m_displayRes && m_displayRes->SwitchToVideo(Width, Height, static_cast<double>(rate)))
+    if (m_display->SwitchToVideo(Width, Height, static_cast<double>(rate)))
     {
         // Switching to custom display resolution succeeded
         // Make a note of the new size
-        m_window.SetDisplayProperties(QSize(m_displayRes->GetPhysicalWidth(),
-                                            m_displayRes->GetPhysicalHeight()),
-                                      static_cast<float>(m_displayRes->GetAspectRatio()));
-        m_window.SetWindowSize(QSize(m_displayRes->GetWidth(), m_displayRes->GetHeight()));
+        m_window.SetDisplayProperties(m_display->GetPhysicalSize(),
+                                      static_cast<float>(m_display->GetAspectRatio()));
+        m_window.SetWindowSize(m_display->GetResolution());
 
         bool fullscreen = !m_window.UsingGuiSize();
 
@@ -965,7 +963,7 @@ void MythVideoOutput::ResizeForVideo(int Width, int Height)
 
         if (fullscreen)
         {
-            QSize sz(m_displayRes->GetWidth(), m_displayRes->GetHeight());
+            QSize sz = m_display->GetResolution();
             QRect display_visible_rect = QRect(GetMythMainWindow()->geometry().topLeft(), sz);
             if (HasMythMainWindow())
                 GetMythMainWindow()->MoveResize(display_visible_rect);
@@ -979,7 +977,7 @@ void MythVideoOutput::ResizeForVideo(int Width, int Height)
  */
 void MythVideoOutput::InitDisplayMeasurements(void)
 {
-    DisplayInfo disp = MythDisplay::GetDisplayInfo();
+    DisplayInfo disp = m_display->GetDisplayInfo();
     QString     source = "Actual";
 
     // get the physical dimensions (in mm) of the display. If using
@@ -1054,8 +1052,8 @@ void MythVideoOutput::InitDisplayMeasurements(void)
     disp_aspect = static_cast<float>(disp_dim.width()) / disp_dim.height();
 
     // If we are using XRandR, use the aspect ratio from it
-    if (m_displayRes)
-        disp_aspect = static_cast<float>(m_displayRes->GetAspectRatio());
+    if (m_display->UsingVideoModes())
+        disp_aspect = static_cast<float>(m_display->GetAspectRatio());
 
     m_window.SetDisplayProperties(disp_dim, disp_aspect);
 }

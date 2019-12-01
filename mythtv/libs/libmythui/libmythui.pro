@@ -12,7 +12,7 @@ CONFIG += thread dll
 target.path = $${LIBDIR}
 INSTALLS = target
 
-DEPENDPATH  += ./opengl
+DEPENDPATH  += ./opengl ./platforms
 INCLUDEPATH += $$DEPENDPATH
 INCLUDEPATH += ../libmythbase
 INCLUDEPATH += ../.. ../
@@ -33,7 +33,7 @@ HEADERS += mythuiclock.h mythuitextedit.h mythprogressdialog.h mythuispinbox.h
 HEADERS += mythuicheckbox.h mythuibuttonlist.h mythuigroup.h
 HEADERS += mythuiprogressbar.h mythuifilebrowser.h
 HEADERS += screensaver.h screensaver-null.h x11colors.h
-HEADERS += themeinfo.h mythxdisplay.h DisplayRes.h DisplayResScreen.h
+HEADERS += themeinfo.h platforms/mythxdisplay.h DisplayResScreen.h
 HEADERS += mythgenerictree.h mythuibuttontree.h mythuiutils.h
 HEADERS += mythvirtualkeyboard.h mythuishape.h mythuiguidegrid.h
 HEADERS += mythrender_base.h mythfontmanager.h mythuieditbar.h
@@ -54,7 +54,7 @@ SOURCES += mythuiclock.cpp mythuitextedit.cpp mythprogressdialog.cpp
 SOURCES += mythuispinbox.cpp mythuicheckbox.cpp mythuibuttonlist.cpp
 SOURCES += mythuigroup.cpp mythuiprogressbar.cpp
 SOURCES += screensaver.cpp screensaver-null.cpp x11colors.cpp
-SOURCES += themeinfo.cpp mythxdisplay.cpp DisplayRes.cpp DisplayResScreen.cpp
+SOURCES += themeinfo.cpp platforms/mythxdisplay.cpp DisplayResScreen.cpp
 SOURCES += mythgenerictree.cpp mythuibuttontree.cpp mythuiutils.cpp
 SOURCES += mythvirtualkeyboard.cpp mythuishape.cpp mythuiguidegrid.cpp
 SOURCES += mythfontmanager.cpp mythuieditbar.cpp
@@ -98,10 +98,12 @@ using_x11 {
     DEFINES += USING_X11
     HEADERS += screensaver-x11.h
     SOURCES += screensaver-x11.cpp
+    HEADERS += platforms/mythdisplayx11.h
+    SOURCES += platforms/mythdisplayx11.cpp
     using_xnvctrl {
         # Add nvidia XV-EXTENSION support
-        HEADERS += util-nvctrl.h
-        SOURCES += util-nvctrl.cpp
+        HEADERS += platforms/mythnvcontrol.h
+        SOURCES += platforms/mythnvcontrol.cpp
         ! using_xnvctrl_external {
             INCLUDEPATH += ../../external/libXNVCtrl
             LIBS += -L../../external/libXNVCtrl -lmythXNVCtrl-$${LIBVERSION}
@@ -118,8 +120,10 @@ using_qtdbus {
 }
 
 macx {
-    HEADERS += screensaver-osx.h   DisplayResOSX.h   util-osx.h
-    SOURCES += screensaver-osx.cpp DisplayResOSX.cpp util-osx.cpp
+    HEADERS += screensaver-osx.h   util-osx.h
+    SOURCES += screensaver-osx.cpp util-osx.cpp
+    HEADERS += platforms/mythdisplayosx.h
+    SOURCES += platforms/mythdisplayosx.cpp
     QMAKE_OBJECTIVE_CFLAGS += $$QMAKE_CXXFLAGS
     QMAKE_OBJECTIVE_CXXFLAGS += $$QMAKE_CXXFLAGS
     OBJECTIVE_HEADERS += util-osx-cocoa.h
@@ -135,8 +139,8 @@ macx {
 }
 
 android {
-    HEADERS += screensaver-android.h
-    SOURCES += screensaver-android.cpp
+    HEADERS += screensaver-android.h   platforms/mythdisplayandroid.h
+    SOURCES += screensaver-android.cpp platforms/mythdisplayandroid.cpp
 }
 
 using_joystick_menu {
@@ -159,8 +163,6 @@ using_libcec {
 
 using_xrandr {
     DEFINES += USING_XRANDR
-    HEADERS += DisplayResX.h
-    SOURCES += DisplayResX.cpp
 }
 
 cygwin:DEFINES += _WIN32
@@ -169,6 +171,8 @@ mingw :DEFINES += USING_MINGW
 mingw | win32-msvc*{
     HEADERS += mythpainter_d3d9.h   mythrender_d3d9.h
     SOURCES += mythpainter_d3d9.cpp mythrender_d3d9.cpp
+    HEADERS += platforms/mythdisplaywindows.h
+    SOURCES += platforms/mythdisplaywindows.cpp
     DEFINES += NODRAWTEXT
     LIBS    += -lGdi32 -lUser32
 

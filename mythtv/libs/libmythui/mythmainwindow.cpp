@@ -189,6 +189,7 @@ class MythMainWindowPrivate
     QVector<MythScreenStack *> m_stackList;
     MythScreenStack *m_mainStack         {nullptr};
 
+    MythDisplay     *m_display           { MythDisplay::AcquireRelease() };
     MythPainter     *m_painter           {nullptr};
     MythRender      *m_render            {nullptr};
 
@@ -589,6 +590,8 @@ MythMainWindow::~MythMainWindow()
     if (d->m_render)
         d->m_render->ReleaseResources();
 
+    MythDisplay::AcquireRelease(false);
+
     delete d;
 }
 
@@ -871,7 +874,8 @@ void MythMainWindow::GrabWindow(QImage &image)
         // https://doc.qt.io/qt-5/qtwidgets-desktop-screenshot-example.html#screenshot-class-implementation
         winid = 0;
 
-    QScreen *screen = MythDisplay::GetScreen();
+    QScreen *screen = MythDisplay::AcquireRelease()->GetCurrentScreen();
+    MythDisplay::AcquireRelease(false);
     QPixmap p = screen->grabWindow(winid);
     image = p.toImage();
 }
@@ -1037,15 +1041,11 @@ void MythMainWindow::Init(const QString& forcedpainter, bool mayReInit)
     }
 
     setWindowFlags(flags);
-    if (this->windowHandle())
-    {
-        QScreen *screen = MythDisplay::GetScreen();
-        if (screen && (screen != this->windowHandle()->screen()))
-        {
-            LOG(VB_GENERAL, LOG_INFO, QString("Setting screen"));
-            this->windowHandle()->setScreen(screen);
-        }
-    }
+
+    // NB there may be a chicken and egg problem here with screen dimensions
+    // MythUIHelper will be initialised to the current/default screen but we
+    // may move to a new screen here - which may have different dimensions
+    d->m_display->SetWidget(this);
 
     QTimer::singleShot(1000, this, SLOT(DelayedAction()));
 

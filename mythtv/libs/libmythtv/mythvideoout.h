@@ -16,7 +16,6 @@
 #include "videoouttypes.h"
 #include "videooutwindow.h"
 #include "mythdisplay.h"
-#include "DisplayRes.h"
 #include "videodisplayprofile.h"
 #include "videocolourspace.h"
 #include "visualisations/videovisual.h"
@@ -158,6 +157,7 @@ class MythVideoOutput
 
     static void  CopyFrame(VideoFrame* To, const VideoFrame* From);
 
+    MythDisplay*         m_display               {nullptr};
     VideoOutWindow       m_window;
     QSize                m_dbDisplayDimensionsMM {0,0};
     VideoColourSpace     m_videoColourSpace;
@@ -170,7 +170,6 @@ class MythVideoOutput
     VideoBuffers         m_videoBuffers;
     VideoErrorState      m_errorState            {kError_None};
     long long            m_framesPlayed          {0};
-    DisplayRes          *m_displayRes            {nullptr};
     QSize                m_monitorSize           {640,480};
     QSize                m_monitorDimensions     {400,300};
     VideoVisual         *m_visual                {nullptr};

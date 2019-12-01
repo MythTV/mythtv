@@ -29,10 +29,9 @@ using namespace std;
 #include "dbsettings.h"
 #include "langsettings.h"
 #include "mythtranslation.h"
-#include "mythxdisplay.h"
+#include "platforms/mythxdisplay.h"
 #include "mythevent.h"
 #include "dbutil.h"
-#include "DisplayRes.h"
 #include "mythmediamonitor.h"
 
 #include "mythdb.h"

@@ -18,6 +18,8 @@
 // MythTV headers
 #include "videoouttypes.h"
 
+class QScreen;
+class MythDisplay;
 class MythPlayer;
 
 class VideoOutWindow : public QObject
@@ -26,6 +28,7 @@ class VideoOutWindow : public QObject
 
   public:
     VideoOutWindow();
+   ~VideoOutWindow() override;
 
     bool Init(const QSize &VideoDim, const QSize &VideoDispDim,
               float Aspect, const QRect &WindowRect,
@@ -40,6 +43,8 @@ class VideoOutWindow : public QObject
     void WindowRectChanged      (const QRect &WindowRect);
 
   public slots:
+    void ScreenChanged          (QScreen*);
+
     // Sets
     void InputChanged           (const QSize &VideoDim, const QSize &VideoDispDim, float Aspect);
     void VideoAspectRatioChanged(float Aspect);
@@ -103,6 +108,7 @@ class VideoOutWindow : public QObject
     void Rotate                  (void);
 
   private:
+    MythDisplay* m_display     {nullptr};
     QPoint  m_dbMove           {0,0};   ///< Percentage move from database
     float   m_dbHorizScale     {0.0F};  ///< Horizontal Overscan/Underscan percentage
     float   m_dbVertScale      {0.0F};  ///< Vertical Overscan/Underscan percentage

@@ -48,7 +48,6 @@ using namespace std;
 #include "mythmainwindow.h"
 #include "mythscreenstack.h"
 #include "mythscreentype.h"
-#include "DisplayRes.h"
 #include "mythuiactions.h"              // for ACTION_LEFT, ACTION_RIGHT, etc
 
 // libmythtv

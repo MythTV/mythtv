@@ -1,7 +1,7 @@
 /** This file is intended to hold X11 specific utility functions */
 
-#ifndef _MYTHXDISPLAY_X_
-#define _MYTHXDISPLAY_X_
+#ifndef MYTHXDISPLAY_X_
+#define MYTHXDISPLAY_X_
 
 #include <QString>
 #include <QMutex>
@@ -82,4 +82,4 @@ MUI_PUBLIC MythXDisplay *OpenMythXDisplay(bool Warn = true);
 #undef KeyPress
 #undef KeyRelease
 
-#endif // _MYTHXDISPLAY_X_
+#endif // MYTHXDISPLAY_X_
