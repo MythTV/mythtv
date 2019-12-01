@@ -18,8 +18,11 @@ MythDisplayOSX::~MythDisplayOSX()
 DisplayInfo MythDisplayOSX::GetDisplayInfo(int VideoRate)
 {
     DisplayInfo ret;
+    if (!HasMythMainWindow())
+        return ret;
 
-    CGDirectDisplayID disp = GetOSXDisplay(GetWindowID());
+    WId win = (qobject_cast<QWidget*>(MythMainWindow::getMainWindow()))->winId();
+    CGDirectDisplayID disp = GetOSXDisplay(win);
     if (!disp)
         return ret;
 
