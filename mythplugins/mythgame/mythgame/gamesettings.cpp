@@ -66,7 +66,7 @@ QString GetGameTypeExtensions(const QString &GameType)
 
 static HostTextEditSetting *GameAllTreeLevels()
 {
-    HostTextEditSetting *gc = new HostTextEditSetting("GameAllTreeLevels");
+    auto *gc = new HostTextEditSetting("GameAllTreeLevels");
     gc->setLabel(TR("Game display order"));
     gc->setValue("system gamename");
     gc->setHelpText(TR("Order in which to sort the "
@@ -79,7 +79,7 @@ static HostTextEditSetting *GameAllTreeLevels()
 
 static HostTextEditSetting *GameFavTreeLevels()
 {
-    HostTextEditSetting *gc = new HostTextEditSetting("GameFavTreeLevels");
+    auto *gc = new HostTextEditSetting("GameFavTreeLevels");
     gc->setLabel(TR("Favorite display order"));
     gc->setValue("gamename");
     gc->setHelpText(TR("Order in which to sort the "
@@ -92,7 +92,7 @@ static HostTextEditSetting *GameFavTreeLevels()
 
 static HostCheckBoxSetting *GameDeepScan()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("GameDeepScan");
+    auto *gc = new HostCheckBoxSetting("GameDeepScan");
     gc->setLabel(TR("Indepth Game Scan"));
     gc->setHelpText(
                 TR("Enabling this causes a game scan to "
@@ -106,7 +106,7 @@ static HostCheckBoxSetting *GameDeepScan()
 
 static HostCheckBoxSetting *GameRemovalPrompt()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("GameRemovalPrompt");
+    auto *gc = new HostCheckBoxSetting("GameRemovalPrompt");
     gc->setLabel(TR("Prompt for removal of deleted ROM(s)"));
     gc->setHelpText(TR("This enables a prompt for "
                        "removing deleted ROMs from "
@@ -118,7 +118,7 @@ static HostCheckBoxSetting *GameRemovalPrompt()
 
 static HostCheckBoxSetting *GameShowFileNames()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("GameShowFileNames");
+    auto *gc = new HostCheckBoxSetting("GameShowFileNames");
     gc->setLabel(TR("Display Files Names in Game "
                     "Tree"));
     gc->setHelpText(TR("Enabling this causes the "
@@ -130,7 +130,7 @@ static HostCheckBoxSetting *GameShowFileNames()
 
 static HostCheckBoxSetting *GameTreeView()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("GameTreeView");
+    auto *gc = new HostCheckBoxSetting("GameTreeView");
     gc->setLabel(TR("Hash filenames in display"));
     gc->setValue(0);
     gc->setHelpText(TR("Enable hashing of names in "
@@ -142,7 +142,7 @@ static HostCheckBoxSetting *GameTreeView()
 
 static HostTextEditSetting *GetScreenshotDir()
 {
-    HostTextEditSetting *gc = new HostTextEditSetting("mythgame.screenshotdir");
+    auto *gc = new HostTextEditSetting("mythgame.screenshotdir");
     gc->setLabel(TR("Directory where Game Screenshots "
                     "are stored"));
     gc->setValue(GetConfDir() + "/MythGame/Screenshots");
@@ -154,7 +154,7 @@ static HostTextEditSetting *GetScreenshotDir()
 
 static HostTextEditSetting *GetFanartDir()
 {
-    HostTextEditSetting *gc = new HostTextEditSetting("mythgame.fanartdir");
+    auto *gc = new HostTextEditSetting("mythgame.fanartdir");
     gc->setLabel(TR("Directory where Game Fanart is "
                     "stored"));
     gc->setValue(GetConfDir() + "/MythGame/Fanart");
@@ -166,7 +166,7 @@ static HostTextEditSetting *GetFanartDir()
 
 static HostTextEditSetting *GetBoxartDir()
 {
-    HostTextEditSetting *gc = new HostTextEditSetting("mythgame.boxartdir");
+    auto *gc = new HostTextEditSetting("mythgame.boxartdir");
     gc->setLabel(TR("Directory where Game Boxart is "
                     "stored"));
     gc->setValue(GetConfDir() + "/MythGame/Boxart");

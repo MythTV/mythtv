@@ -219,7 +219,7 @@ void GameHandler::promptForRemoval(const GameScan& scan)
         return;
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythDialogBox *removalPopup = new MythDialogBox(
+    auto *removalPopup = new MythDialogBox(
         //: %1 is the file name
         tr("%1 appears to be missing.\n"
            "Remove it from the database?")
@@ -598,7 +598,7 @@ int GameHandler::buildFileCount(const QString& directory, GameHandler *handler)
 void GameHandler::clearAllGameData(void)
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythDialogBox *clearPopup = new MythDialogBox(
+    auto *clearPopup = new MythDialogBox(
         tr("This will clear all game metadata from the database. Are you sure "
             "you want to do this?"), popupStack, "clearAllPopup");
 
@@ -697,7 +697,7 @@ void GameHandler::processGames(GameHandler *handler)
         //: %1 is the system name
         QString message = tr("Scanning for %1 games...")
             .arg(handler->SystemName());
-        MythUIBusyDialog *busyDialog = new MythUIBusyDialog(message, popupStack,
+        auto *busyDialog = new MythUIBusyDialog(message, popupStack,
                                                 "gamescanbusy");
 
         if (busyDialog->Create())

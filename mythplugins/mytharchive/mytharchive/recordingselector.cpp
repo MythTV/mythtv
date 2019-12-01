@@ -110,7 +110,7 @@ void RecordingSelector::Init(void)
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    MythUIBusyDialog *busyPopup = new
+    auto *busyPopup = new
             MythUIBusyDialog(message, popupStack, "recordingselectorbusydialog");
 
     if (busyPopup->Create())
@@ -121,7 +121,7 @@ void RecordingSelector::Init(void)
         busyPopup = nullptr;
     }
 
-    GetRecordingListThread *thread = new GetRecordingListThread(this);
+    auto *thread = new GetRecordingListThread(this);
     while (thread->isRunning())
     {
         qApp->processEvents();
@@ -178,7 +178,7 @@ void RecordingSelector::ShowMenu()
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    MythDialogBox *menuPopup = new MythDialogBox(tr("Menu"), popupStack, "actionmenu");
+    auto *menuPopup = new MythDialogBox(tr("Menu"), popupStack, "actionmenu");
 
     if (menuPopup->Create())
         popupStack->AddScreen(menuPopup);
@@ -195,7 +195,7 @@ void RecordingSelector::selectAll()
          m_selectedList.takeFirst();
     m_selectedList.clear();
 
-    vector<ProgramInfo *>::iterator i = m_recordingList->begin();
+    auto i = m_recordingList->begin();
     for ( ; i != m_recordingList->end(); ++i)
     {
         ProgramInfo *p = *i;
@@ -235,7 +235,7 @@ void RecordingSelector::toggleSelected(MythUIButtonListItem *item)
 
 void RecordingSelector::titleChanged(MythUIButtonListItem *item)
 {
-    ProgramInfo *p = item->GetData().value<ProgramInfo *>();
+    auto *p = item->GetData().value<ProgramInfo *>();
 
     if (!p)
         return;
@@ -334,7 +334,7 @@ void RecordingSelector::OKPressed()
     for (int x = 0; x < m_selectedList.size(); x++)
     {
         ProgramInfo *p = m_selectedList.at(x);
-        ArchiveItem *a = new ArchiveItem;
+        auto *a = new ArchiveItem;
         a->type = "Recording";
         a->title = p->GetTitle();
         a->subtitle = p->GetSubtitle();
@@ -377,7 +377,7 @@ void RecordingSelector::updateRecordingList(void)
 
     if (m_categorySelector)
     {
-        vector<ProgramInfo *>::iterator i = m_recordingList->begin();
+        auto i = m_recordingList->begin();
         for ( ; i != m_recordingList->end(); ++i)
         {
             ProgramInfo *p = *i;
@@ -385,7 +385,7 @@ void RecordingSelector::updateRecordingList(void)
             if (p->GetTitle() == m_categorySelector->GetValue() ||
                 m_categorySelector->GetValue() == tr("All Recordings"))
             {
-                MythUIButtonListItem* item = new MythUIButtonListItem(
+                auto* item = new MythUIButtonListItem(
                     m_recordingButtonList,
                     p->GetTitle() + " ~ " +
                     p->GetScheduledStartTime().toLocalTime()
@@ -461,7 +461,7 @@ void RecordingSelector::getRecordingList(void)
 
     if (m_recordingList && !m_recordingList->empty())
     {
-        vector<ProgramInfo *>::iterator i = m_recordingList->begin();
+        auto i = m_recordingList->begin();
         for ( ; i != m_recordingList->end(); ++i)
         {
             ProgramInfo *p = *i;

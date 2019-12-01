@@ -375,7 +375,7 @@ bool ZMClient::updateAlarmStates(void)
     for (int x = 0; x < monitorCount; x++)
     {
         int monID = strList[x * 2 + 2].toInt();
-        State state = (State)strList[x * 2 + 3].toInt();
+        auto state = (State)strList[x * 2 + 3].toInt();
 
         if (m_monitorMap.contains(monID))
         {
@@ -536,7 +536,7 @@ void ZMClient::getFrameList(int eventID, vector<Frame*> *frameList)
     it++; it++;
     for (int x = 0; x < frameCount; x++)
     {
-        Frame *item = new Frame;
+        auto *item = new Frame;
         item->type = *it++;
         item->delta = (*it++).toDouble();
         frameList->push_back(item);
@@ -667,7 +667,7 @@ void ZMClient::getEventFrame(Event *event, int frameNo, MythImage **image)
     int imageSize = strList[1].toInt();
 
     // grab the image data
-    unsigned char *data = new unsigned char[imageSize];
+    auto *data = new unsigned char[imageSize];
     if (!readData(data, imageSize))
     {
         LOG(VB_GENERAL, LOG_ERR,
@@ -715,7 +715,7 @@ void ZMClient::getAnalyseFrame(Event *event, int frameNo, QImage &image)
     int imageSize = strList[1].toInt();
 
     // grab the image data
-    unsigned char *data = new unsigned char[imageSize];
+    auto *data = new unsigned char[imageSize];
     if (!readData(data, imageSize))
     {
         LOG(VB_GENERAL, LOG_ERR,
@@ -908,7 +908,7 @@ void ZMClient::doGetMonitorList(void)
 
     for (int x = 0; x < monitorCount; x++)
     {
-        Monitor *item = new Monitor;
+        auto *item = new Monitor;
         item->id = strList[x * 5 + 2].toInt();
         item->name = strList[x * 5 + 3];
         item->width = strList[x * 5 + 4].toInt();
@@ -965,7 +965,7 @@ void ZMClient::customEvent (QEvent* event)
 {
     if (event->type() == MythEvent::MythEventMessage)
     {
-        MythEvent *me = dynamic_cast<MythEvent*>(event);
+        auto *me = dynamic_cast<MythEvent*>(event);
         if (!me)
             return;
 
@@ -991,7 +991,7 @@ void ZMClient::showMiniPlayer(int monitorID)
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    ZMMiniPlayer *miniPlayer = new ZMMiniPlayer(popupStack);
+    auto *miniPlayer = new ZMMiniPlayer(popupStack);
 
     miniPlayer->setAlarmMonitor(monitorID);
 

@@ -142,8 +142,8 @@ bool Weather::SetupScreens()
             // If no screens exist, run the setup
             MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-            ScreenSetup *ssetup = new ScreenSetup(mainStack, "weatherscreensetup",
-                                                  m_srcMan);
+            auto *ssetup = new ScreenSetup(mainStack, "weatherscreensetup",
+                                           m_srcMan);
 
             connect(ssetup, SIGNAL(Exiting()), this, SLOT(setupScreens()));
 
@@ -326,8 +326,7 @@ void Weather::setupPage()
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    ScreenSetup *ssetup = new ScreenSetup(mainStack, "weatherscreensetup",
-                                            m_srcMan);
+    auto *ssetup = new ScreenSetup(mainStack, "weatherscreensetup", m_srcMan);
 
     connect(ssetup, SIGNAL(Exiting()), this, SLOT(setupScreens()));
 

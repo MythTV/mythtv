@@ -198,7 +198,7 @@ void ScreenSetup::updateHelpText()
         if (!item)
             return;
 
-        ScreenListInfo *si = item->GetData().value<ScreenListInfo *>();
+        auto *si = item->GetData().value<ScreenListInfo *>();
         if (!si)
             return;
 
@@ -216,7 +216,7 @@ void ScreenSetup::updateHelpText()
         if (!item)
             return;
 
-        ScreenListInfo *si = item->GetData().value<ScreenListInfo *>();
+        auto *si = item->GetData().value<ScreenListInfo *>();
         if (!si)
             return;
 
@@ -281,8 +281,7 @@ void ScreenSetup::loadData()
                 ScriptInfo *script = scriptList.at(x);
                 si->m_sources.append(script->name);
             }
-            MythUIButtonListItem *item =
-                        new MythUIButtonListItem(m_inactiveList, si->m_title);
+            auto *item = new MythUIButtonListItem(m_inactiveList, si->m_title);
             item->SetData(qVariantFromValue(new ScreenListInfo(*si)));
         }
 
@@ -325,14 +324,12 @@ void ScreenSetup::loadData()
 
         if (active_screens.find(draworder) == active_screens.end())
         {
-            ScreenListInfo *si = new ScreenListInfo(screenListMap[name]);
+            auto *si = new ScreenListInfo(screenListMap[name]);
             // Clear types first as we will re-insert the values from the database
             si->m_types.clear();
             si->m_units = units;
             
-            MythUIButtonListItem *item =
-                new MythUIButtonListItem(m_activeList, si->m_title);
-            
+            auto *item = new MythUIButtonListItem(m_activeList, si->m_title);
 
             // Only insert types meant for this screen
             for (QStringList::Iterator type_i = types.begin();
@@ -368,7 +365,7 @@ void ScreenSetup::saveData()
     for (int i=0; i < m_activeList->GetCount(); i++)
     {
         MythUIButtonListItem *item = m_activeList->GetItemAt(i);
-        ScreenListInfo *si = item->GetData().value<ScreenListInfo *>();
+        auto *si = item->GetData().value<ScreenListInfo *>();
         TypeListMap::iterator it = si->m_types.begin();
         for (; it != si->m_types.end(); ++it)
         {
@@ -403,7 +400,7 @@ void ScreenSetup::saveData()
     for (int i=0; i < m_activeList->GetCount(); i++)
     {
         MythUIButtonListItem *item = m_activeList->GetItemAt(i);
-        ScreenListInfo *si = item->GetData().value<ScreenListInfo *>();
+        auto *si = item->GetData().value<ScreenListInfo *>();
         db.bindValue(":DRAW", draworder);
         db.bindValue(":CONT", si->m_name);
         db.bindValue(":UNITS", si->m_units);
@@ -465,15 +462,15 @@ void ScreenSetup::doListSelect(MythUIButtonListItem *selected)
     QString txt = selected->GetText();
     if (GetFocusWidget() == m_activeList)
     {
-        ScreenListInfo *si = selected->GetData().value<ScreenListInfo *>();
+        auto *si = selected->GetData().value<ScreenListInfo *>();
 
         QString label = tr("Manipulate Screen");
 
         MythScreenStack *popupStack =
                                 GetMythMainWindow()->GetStack("popup stack");
 
-        MythDialogBox *menuPopup = new MythDialogBox(label, popupStack,
-                                                    "screensetupmenupopup");
+        auto *menuPopup = new MythDialogBox(label, popupStack,
+                                            "screensetupmenupopup");
 
         if (menuPopup->Create())
         {
@@ -497,7 +494,7 @@ void ScreenSetup::doListSelect(MythUIButtonListItem *selected)
     }
     else if (GetFocusWidget() == m_inactiveList)
     {
-        ScreenListInfo *si = selected->GetData().value<ScreenListInfo *>();
+        auto *si = selected->GetData().value<ScreenListInfo *>();
         QStringList type_strs;
 
         TypeListMap::iterator it = si->m_types.begin();
@@ -533,8 +530,8 @@ void ScreenSetup::doLocationDialog(ScreenListInfo *si)
     MythScreenStack *mainStack =
                             GetMythMainWindow()->GetMainStack();
 
-    LocationDialog *locdialog = new LocationDialog(mainStack, "locationdialog",
-                                                   this, si, m_sourceManager);
+    auto *locdialog = new LocationDialog(mainStack, "locationdialog",
+                                         this, si, m_sourceManager);
 
     if (locdialog->Create())
         mainStack->AddScreen(locdialog);
@@ -551,8 +548,7 @@ void ScreenSetup::showUnitsPopup(const QString &name, ScreenListInfo *si)
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    MythDialogBox *menuPopup = new MythDialogBox(label, popupStack,
-                                                "weatherunitspopup");
+    auto *menuPopup = new MythDialogBox(label, popupStack, "weatherunitspopup");
 
     if (menuPopup->Create())
     {
@@ -602,10 +598,8 @@ void ScreenSetup::customEvent(QEvent *event)
         {
             if (buttonnum > -1)
             {
-                MythUIButtonListItem *item =
-                                dce->GetData().value<MythUIButtonListItem *>();
-                        
-                ScreenListInfo *si = item->GetData().value<ScreenListInfo *>();
+                auto *item = dce->GetData().value<MythUIButtonListItem *>();
+                auto *si = item->GetData().value<ScreenListInfo *>();
 
                 if (buttonnum == 0)
                 {
@@ -636,7 +630,7 @@ void ScreenSetup::customEvent(QEvent *event)
         {
             if (buttonnum > -1)
             {
-                ScreenListInfo *si = dce->GetData().value<ScreenListInfo *>();
+                auto *si = dce->GetData().value<ScreenListInfo *>();
 
                 if (buttonnum == 0)
                 {
@@ -657,7 +651,7 @@ void ScreenSetup::customEvent(QEvent *event)
         }
         else if (resultid == "location")
         {
-            ScreenListInfo *si = dce->GetData().value<ScreenListInfo *>();
+            auto *si = dce->GetData().value<ScreenListInfo *>();
 
             TypeListMap::iterator it = si->m_types.begin();
             for (; it != si->m_types.end(); ++it)
@@ -675,8 +669,7 @@ void ScreenSetup::customEvent(QEvent *event)
             }
             else
             {
-                MythUIButtonListItem *item = 
-                        new MythUIButtonListItem(m_activeList, si->m_title);
+                auto *item = new MythUIButtonListItem(m_activeList, si->m_title);
                 item->SetData(qVariantFromValue(si));
             }
 
@@ -778,7 +771,7 @@ bool SourceSetup::loadData()
 
     while (db.next())
     {
-        SourceListInfo *si = new SourceListInfo;
+        auto *si = new SourceListInfo;
         si->id = db.value(0).toUInt();
         si->name = db.value(1).toString();
         si->update_timeout = db.value(2).toUInt() / 60;
@@ -799,7 +792,7 @@ void SourceSetup::saveData()
 
     if (curritem)
     {
-        SourceListInfo *si = curritem->GetData().value<SourceListInfo *>();
+        auto *si = curritem->GetData().value<SourceListInfo *>();
         si->update_timeout = m_updateSpinbox->GetIntValue();
         si->retrieve_timeout = m_retrieveSpinbox->GetIntValue();
     }
@@ -813,7 +806,7 @@ void SourceSetup::saveData()
     for (int i=0; i < m_sourceList->GetCount(); i++)
     {
         MythUIButtonListItem *item = m_sourceList->GetItemAt(i);
-        SourceListInfo *si = item->GetData().value<SourceListInfo *>();
+        auto *si = item->GetData().value<SourceListInfo *>();
         db.bindValue(":ID", si->id);
         db.bindValue(":UPDATE", si->update_timeout * 60);
         db.bindValue(":RETRIEVE", si->retrieve_timeout);
@@ -831,7 +824,7 @@ void SourceSetup::updateSpinboxUpdate()
 {
     if (m_sourceList->GetItemCurrent())
     {
-        SourceListInfo *si = m_sourceList->GetItemCurrent()->GetData().value<SourceListInfo *>();
+        auto *si = m_sourceList->GetItemCurrent()->GetData().value<SourceListInfo *>();
         si->update_timeout = m_updateSpinbox->GetIntValue();
     }
 }
@@ -840,7 +833,7 @@ void SourceSetup::retrieveSpinboxUpdate()
 {
     if (m_sourceList->GetItemCurrent())
     {
-        SourceListInfo *si = m_sourceList->GetItemCurrent()->GetData().value<SourceListInfo *>();
+        auto *si = m_sourceList->GetItemCurrent()->GetData().value<SourceListInfo *>();
         si->retrieve_timeout = m_retrieveSpinbox->GetIntValue();
     }
 }
@@ -853,7 +846,7 @@ void SourceSetup::sourceListItemSelected(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    SourceListInfo *si = item->GetData().value<SourceListInfo *>();
+    auto *si = item->GetData().value<SourceListInfo *>();
     if (!si)
         return;
 
@@ -930,8 +923,8 @@ void LocationDialog::doSearch()
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    MythUIBusyDialog *busyPopup = new MythUIBusyDialog(busymessage, popupStack,
-                                                       "mythweatherbusydialog");
+    auto *busyPopup = new MythUIBusyDialog(busymessage, popupStack,
+                                           "mythweatherbusydialog");
 
     if (busyPopup->Create())
     {
@@ -989,9 +982,8 @@ void LocationDialog::doSearch()
                 continue;
             }
             QString resultstring = QString("%1 (%2)").arg(tmp[1]).arg(name);
-            MythUIButtonListItem *item =
-                new MythUIButtonListItem(m_locationList, resultstring);
-            ResultListInfo *ri = new ResultListInfo;
+            auto *item = new MythUIButtonListItem(m_locationList, resultstring);
+            auto *ri = new ResultListInfo;
             ri->idstr = tmp[0];
             ri->src = si;
             item->SetData(qVariantFromValue(ri));
@@ -1024,15 +1016,14 @@ void LocationDialog::clearResults()
 
 void LocationDialog::itemSelected(MythUIButtonListItem *item)
 {
-    ResultListInfo *ri = item->GetData().value<ResultListInfo *>();
+    auto *ri = item->GetData().value<ResultListInfo *>();
     if (ri)
         m_sourceText->SetText(tr("Source: %1").arg(ri->src->name));
 }
 
 void LocationDialog::itemClicked(MythUIButtonListItem *item)
 {
-    ResultListInfo *ri = item->GetData().value<ResultListInfo *>();
-
+    auto *ri = item->GetData().value<ResultListInfo *>();
     if (ri)
     {
         TypeListMap::iterator it = m_screenListInfo->m_types.begin();
@@ -1043,9 +1034,8 @@ void LocationDialog::itemClicked(MythUIButtonListItem *item)
         }
     }
 
-    DialogCompletionEvent *dce =
-        new DialogCompletionEvent("location", 0, "",
-                                  qVariantFromValue(new ScreenListInfo(*m_screenListInfo)));
+    auto *dce = new DialogCompletionEvent("location", 0, "",
+                      qVariantFromValue(new ScreenListInfo(*m_screenListInfo)));
     QApplication::postEvent(m_retScreen, dce);
 
     Close();

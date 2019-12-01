@@ -104,8 +104,8 @@ void DVDThemeSelector::handleNextPage()
     // show next page
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    MythBurn *burn = new MythBurn(mainStack, m_destinationScreen, this,
-                                  m_archiveDestination, "MythBurn");
+    auto *burn = new MythBurn(mainStack, m_destinationScreen, this,
+                              m_archiveDestination, "MythBurn");
 
     if (burn->Create())
         mainStack->AddScreen(burn);

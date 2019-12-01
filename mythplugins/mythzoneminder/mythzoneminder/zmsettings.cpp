@@ -14,7 +14,7 @@
 
 static HostTextEditSetting *ZMServerIP()
 {
-    HostTextEditSetting *gc = new HostTextEditSetting("ZoneMinderServerIP");
+    auto *gc = new HostTextEditSetting("ZoneMinderServerIP");
     gc->setLabel(ZMSettings::tr("IP address of the MythZoneMinder server"));
     gc->setValue("127.0.0.1");
     gc->setHelpText(ZMSettings::tr("Enter the IP address of the MythZoneMinder "
@@ -25,7 +25,7 @@ static HostTextEditSetting *ZMServerIP()
 
 static HostTextEditSetting *ZMServerPort()
 {
-    HostTextEditSetting *gc = new HostTextEditSetting("ZoneMinderServerPort");
+    auto *gc = new HostTextEditSetting("ZoneMinderServerPort");
     gc->setLabel(ZMSettings::tr("Port the server runs on"));
     gc->setValue("6548");
     gc->setHelpText(ZMSettings::tr("Unless you've got good reason to, don't "
@@ -35,7 +35,7 @@ static HostTextEditSetting *ZMServerPort()
 
 static HostComboBoxSetting *ZMDateFormat()
 {
-    HostComboBoxSetting *gc = new HostComboBoxSetting("ZoneMinderDateFormat");
+    auto *gc = new HostComboBoxSetting("ZoneMinderDateFormat");
     gc->setLabel(ZMSettings::tr("Date format"));
 
     QDate sampdate = MythDate::current().toLocalTime().date();
@@ -71,7 +71,7 @@ static HostComboBoxSetting *ZMDateFormat()
 
 static HostComboBoxSetting *ZMTimeFormat()
 {
-    HostComboBoxSetting *gc = new HostComboBoxSetting("ZoneMinderTimeFormat");
+    auto *gc = new HostComboBoxSetting("ZoneMinderTimeFormat");
     gc->setLabel(ZMSettings::tr("Time format"));
 
     QTime samptime = QTime::currentTime();

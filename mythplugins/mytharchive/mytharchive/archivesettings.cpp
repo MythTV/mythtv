@@ -15,7 +15,7 @@
 
 static HostFileBrowserSetting *MythArchiveTempDir()
 {
-    HostFileBrowserSetting *gc = new HostFileBrowserSetting("MythArchiveTempDir");
+    auto *gc = new HostFileBrowserSetting("MythArchiveTempDir");
 
     gc->setLabel(ArchiveSettings::tr("MythArchive Temp Directory"));
     gc->setValue("");
@@ -30,7 +30,7 @@ static HostFileBrowserSetting *MythArchiveTempDir()
 
 static HostFileBrowserSetting *MythArchiveShareDir()
 {
-    HostFileBrowserSetting *gc = new HostFileBrowserSetting("MythArchiveShareDir");
+    auto *gc = new HostFileBrowserSetting("MythArchiveShareDir");
 
     gc->setLabel(ArchiveSettings::tr("MythArchive Share Directory"));
     gc->setValue(GetShareDir() + "mytharchive/");
@@ -45,7 +45,7 @@ static HostFileBrowserSetting *MythArchiveShareDir()
 
 static HostComboBoxSetting *PALNTSC()
 {
-    HostComboBoxSetting *gc = new HostComboBoxSetting("MythArchiveVideoFormat");
+    auto *gc = new HostComboBoxSetting("MythArchiveVideoFormat");
 
     gc->setLabel(ArchiveSettings::tr("Video format"));
 
@@ -59,7 +59,7 @@ static HostComboBoxSetting *PALNTSC()
 
 static HostTextEditSetting *MythArchiveFileFilter()
 {
-    HostTextEditSetting *gc = new HostTextEditSetting("MythArchiveFileFilter");
+    auto *gc = new HostTextEditSetting("MythArchiveFileFilter");
 
     gc->setLabel(ArchiveSettings::tr("File Selector Filter"));
     gc->setValue("*.mpg *.mov *.avi *.mpeg *.nuv");
@@ -71,7 +71,7 @@ static HostTextEditSetting *MythArchiveFileFilter()
 
 static HostFileBrowserSetting *MythArchiveDVDLocation()
 {
-    HostFileBrowserSetting *gc = new HostFileBrowserSetting("MythArchiveDVDLocation");
+    auto *gc = new HostFileBrowserSetting("MythArchiveDVDLocation");
 
     gc->setLabel(ArchiveSettings::tr("Location of DVD"));
     gc->setValue("/dev/dvd");
@@ -84,7 +84,7 @@ static HostFileBrowserSetting *MythArchiveDVDLocation()
 
 static HostSpinBoxSetting *MythArchiveDriveSpeed()
 {
-    HostSpinBoxSetting *gc = new HostSpinBoxSetting("MythArchiveDriveSpeed", 0, 48, 1);
+    auto *gc = new HostSpinBoxSetting("MythArchiveDriveSpeed", 0, 48, 1);
 
     gc->setLabel(ArchiveSettings::tr("DVD Drive Write Speed"));
     gc->setValue(0);
@@ -98,7 +98,7 @@ static HostSpinBoxSetting *MythArchiveDriveSpeed()
 
 static HostTextEditSetting *MythArchiveDVDPlayerCmd()
 {
-    HostTextEditSetting *gc = new HostTextEditSetting("MythArchiveDVDPlayerCmd");
+    auto *gc = new HostTextEditSetting("MythArchiveDVDPlayerCmd");
 
     gc->setLabel(ArchiveSettings::tr("Command to play DVD"));
     gc->setValue("Internal");
@@ -114,7 +114,7 @@ static HostTextEditSetting *MythArchiveDVDPlayerCmd()
 
 static HostCheckBoxSetting *MythArchiveCopyRemoteFiles()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("MythArchiveCopyRemoteFiles");
+    auto *gc = new HostCheckBoxSetting("MythArchiveCopyRemoteFiles");
 
     gc->setLabel(ArchiveSettings::tr("Copy remote files"));
     gc->setValue(false);
@@ -129,7 +129,7 @@ static HostCheckBoxSetting *MythArchiveCopyRemoteFiles()
 
 static HostCheckBoxSetting *MythArchiveAlwaysUseMythTranscode()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("MythArchiveAlwaysUseMythTranscode");
+    auto *gc = new HostCheckBoxSetting("MythArchiveAlwaysUseMythTranscode");
 
     gc->setLabel(ArchiveSettings::tr("Always Use Mythtranscode"));
     gc->setValue(true);
@@ -144,7 +144,7 @@ static HostCheckBoxSetting *MythArchiveAlwaysUseMythTranscode()
 
 static HostCheckBoxSetting *MythArchiveUseProjectX()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("MythArchiveUseProjectX");
+    auto *gc = new HostCheckBoxSetting("MythArchiveUseProjectX");
 
     gc->setLabel(ArchiveSettings::tr("Use ProjectX"));
     gc->setValue(false);
@@ -158,7 +158,7 @@ static HostCheckBoxSetting *MythArchiveUseProjectX()
 
 static HostCheckBoxSetting *MythArchiveUseFIFO()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("MythArchiveUseFIFO");
+    auto *gc = new HostCheckBoxSetting("MythArchiveUseFIFO");
 
     gc->setLabel(ArchiveSettings::tr("Use FIFOs"));
     gc->setValue(true);
@@ -174,7 +174,7 @@ static HostCheckBoxSetting *MythArchiveUseFIFO()
 
 static HostCheckBoxSetting *MythArchiveAddSubtitles()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("MythArchiveAddSubtitles");
+    auto *gc = new HostCheckBoxSetting("MythArchiveAddSubtitles");
 
     gc->setLabel(ArchiveSettings::tr("Add Subtitles"));
     gc->setValue(false);
@@ -187,7 +187,7 @@ static HostCheckBoxSetting *MythArchiveAddSubtitles()
 
 static HostComboBoxSetting *MainMenuAspectRatio()
 {
-    HostComboBoxSetting *gc = new HostComboBoxSetting("MythArchiveMainMenuAR");
+    auto *gc = new HostComboBoxSetting("MythArchiveMainMenuAR");
 
     gc->setLabel(ArchiveSettings::tr("Main Menu Aspect Ratio"));
 
@@ -203,7 +203,7 @@ static HostComboBoxSetting *MainMenuAspectRatio()
 
 static HostComboBoxSetting *ChapterMenuAspectRatio()
 {
-    HostComboBoxSetting *gc = new HostComboBoxSetting("MythArchiveChapterMenuAR");
+    auto *gc = new HostComboBoxSetting("MythArchiveChapterMenuAR");
 
     gc->setLabel(ArchiveSettings::tr("Chapter Menu Aspect Ratio"));
 
@@ -224,7 +224,7 @@ static HostComboBoxSetting *ChapterMenuAspectRatio()
 
 static HostComboBoxSetting *MythArchiveDateFormat()
 {
-    HostComboBoxSetting *gc = new HostComboBoxSetting("MythArchiveDateFormat");
+    auto *gc = new HostComboBoxSetting("MythArchiveDateFormat");
     gc->setLabel(ArchiveSettings::tr("Date format"));
 
     QDate sampdate = MythDate::current().toLocalTime().date();
@@ -260,7 +260,7 @@ static HostComboBoxSetting *MythArchiveDateFormat()
 
 static HostComboBoxSetting *MythArchiveTimeFormat()
 {
-    HostComboBoxSetting *gc = new HostComboBoxSetting("MythArchiveTimeFormat");
+    auto *gc = new HostComboBoxSetting("MythArchiveTimeFormat");
     gc->setLabel(ArchiveSettings::tr("Time format"));
 
     QTime samptime = QTime::currentTime();
@@ -278,7 +278,7 @@ static HostComboBoxSetting *MythArchiveTimeFormat()
 
 static HostComboBoxSetting *MythArchiveDefaultEncProfile()
 {
-    HostComboBoxSetting *gc = new HostComboBoxSetting("MythArchiveDefaultEncProfile");
+    auto *gc = new HostComboBoxSetting("MythArchiveDefaultEncProfile");
     gc->setLabel(ArchiveSettings::tr("Default Encoder Profile"));
 
     gc->addSelection(ArchiveSettings::tr("HQ", "Encoder profile"), "HQ");
@@ -295,7 +295,7 @@ static HostComboBoxSetting *MythArchiveDefaultEncProfile()
 
 static HostTextEditSetting *MythArchiveMplexCmd()
 {
-    HostTextEditSetting *gc = new HostTextEditSetting("MythArchiveMplexCmd");
+    auto *gc = new HostTextEditSetting("MythArchiveMplexCmd");
 
     gc->setLabel(ArchiveSettings::tr("mplex Command"));
 
@@ -308,7 +308,7 @@ static HostTextEditSetting *MythArchiveMplexCmd()
 
 static HostTextEditSetting *MythArchiveDvdauthorCmd()
 {
-    HostTextEditSetting *gc = new HostTextEditSetting("MythArchiveDvdauthorCmd");
+    auto *gc = new HostTextEditSetting("MythArchiveDvdauthorCmd");
 
     gc->setLabel(ArchiveSettings::tr("dvdauthor command"));
 
@@ -321,7 +321,7 @@ static HostTextEditSetting *MythArchiveDvdauthorCmd()
 
 static HostTextEditSetting *MythArchiveMkisofsCmd()
 {
-    HostTextEditSetting *gc = new HostTextEditSetting("MythArchiveMkisofsCmd");
+    auto *gc = new HostTextEditSetting("MythArchiveMkisofsCmd");
 
     gc->setLabel(ArchiveSettings::tr("mkisofs command"));
 
@@ -334,7 +334,7 @@ static HostTextEditSetting *MythArchiveMkisofsCmd()
 
 static HostTextEditSetting *MythArchiveGrowisofsCmd()
 {
-    HostTextEditSetting *gc = new HostTextEditSetting("MythArchiveGrowisofsCmd");
+    auto *gc = new HostTextEditSetting("MythArchiveGrowisofsCmd");
 
     gc->setLabel(ArchiveSettings::tr("growisofs command"));
 
@@ -347,7 +347,7 @@ static HostTextEditSetting *MythArchiveGrowisofsCmd()
 
 static HostTextEditSetting *MythArchiveM2VRequantiserCmd()
 {
-    HostTextEditSetting *gc = new HostTextEditSetting("MythArchiveM2VRequantiserCmd");
+    auto *gc = new HostTextEditSetting("MythArchiveM2VRequantiserCmd");
 
     gc->setLabel(ArchiveSettings::tr("M2VRequantiser command"));
 
@@ -361,7 +361,7 @@ static HostTextEditSetting *MythArchiveM2VRequantiserCmd()
 
 static HostTextEditSetting *MythArchiveJpeg2yuvCmd()
 {
-    HostTextEditSetting *gc = new HostTextEditSetting("MythArchiveJpeg2yuvCmd");
+    auto *gc = new HostTextEditSetting("MythArchiveJpeg2yuvCmd");
 
     gc->setLabel(ArchiveSettings::tr("jpeg2yuv command"));
 
@@ -374,7 +374,7 @@ static HostTextEditSetting *MythArchiveJpeg2yuvCmd()
 
 static HostTextEditSetting *MythArchiveSpumuxCmd()
 {
-    HostTextEditSetting *gc = new HostTextEditSetting("MythArchiveSpumuxCmd");
+    auto *gc = new HostTextEditSetting("MythArchiveSpumuxCmd");
 
     gc->setLabel(ArchiveSettings::tr("spumux command"));
 
@@ -387,7 +387,7 @@ static HostTextEditSetting *MythArchiveSpumuxCmd()
 
 static HostTextEditSetting *MythArchiveMpeg2encCmd()
 {
-    HostTextEditSetting *gc = new HostTextEditSetting("MythArchiveMpeg2encCmd");
+    auto *gc = new HostTextEditSetting("MythArchiveMpeg2encCmd");
 
     gc->setLabel(ArchiveSettings::tr("mpeg2enc command"));
 
@@ -400,7 +400,7 @@ static HostTextEditSetting *MythArchiveMpeg2encCmd()
 
 static HostTextEditSetting *MythArchiveProjectXCmd()
 {
-    HostTextEditSetting *gc = new HostTextEditSetting("MythArchiveProjectXCmd");
+    auto *gc = new HostTextEditSetting("MythArchiveProjectXCmd");
 
     gc->setLabel(ArchiveSettings::tr("projectx command"));
 
@@ -430,7 +430,7 @@ ArchiveSettings::ArchiveSettings()
     addChild(MythArchiveUseFIFO());
     addChild(MythArchiveDefaultEncProfile());
 
-    GroupSetting* DVDSettings = new GroupSetting();
+    auto* DVDSettings = new GroupSetting();
     DVDSettings->setLabel(ArchiveSettings::tr("DVD Menu Settings"));
     DVDSettings->addChild(MainMenuAspectRatio());
     DVDSettings->addChild(ChapterMenuAspectRatio());
@@ -438,7 +438,7 @@ ArchiveSettings::ArchiveSettings()
     DVDSettings->addChild(MythArchiveTimeFormat());
     addChild(DVDSettings);
 
-    GroupSetting* externalCmdSettings = new GroupSetting();
+    auto* externalCmdSettings = new GroupSetting();
     externalCmdSettings->setLabel(ArchiveSettings::tr("MythArchive External Commands"));
     externalCmdSettings->addChild(MythArchiveMplexCmd());
     externalCmdSettings->addChild(MythArchiveDvdauthorCmd());

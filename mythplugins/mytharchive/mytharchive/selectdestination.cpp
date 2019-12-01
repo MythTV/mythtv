@@ -66,7 +66,7 @@ bool SelectDestination::Create(void)
 
     for (int x = 0; x < ArchiveDestinationsCount; x++)
     {
-        MythUIButtonListItem *item = new 
+        auto *item = new
             MythUIButtonListItem(m_destinationSelector, tr(ArchiveDestinations[x].name));
         item->SetData(qVariantFromValue(ArchiveDestinations[x].type));
     }
@@ -118,14 +118,14 @@ void SelectDestination::handleNextPage()
 
     if (m_nativeMode)
     {
-        ExportNative *native = new ExportNative(mainStack, this, m_archiveDestination, "ExportNative");
+        auto *native = new ExportNative(mainStack, this, m_archiveDestination, "ExportNative");
 
         if (native->Create())
             mainStack->AddScreen(native);
     }
     else
     {
-        DVDThemeSelector *theme = new DVDThemeSelector(mainStack, this, m_archiveDestination, "ThemeSelector");
+        auto *theme = new DVDThemeSelector(mainStack, this, m_archiveDestination, "ThemeSelector");
 
         if (theme->Create())
             mainStack->AddScreen(theme);
@@ -269,7 +269,7 @@ void SelectDestination::handleFind(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    FileSelector *selector = new
+    auto *selector = new
             FileSelector(mainStack, nullptr, FSTYPE_DIRECTORY, m_filenameEdit->GetText(), "*.*");
 
     connect(selector, SIGNAL(haveResult(QString)),

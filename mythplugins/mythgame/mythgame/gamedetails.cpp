@@ -77,8 +77,7 @@ void GameDetailsPopup::Play()
 {
     if (m_retObject)
     {
-        DialogCompletionEvent *dce =
-            new DialogCompletionEvent(m_id, 0, "", "");
+        auto *dce = new DialogCompletionEvent(m_id, 0, "", "");
         QApplication::postEvent(m_retObject, dce);
         Close();
     }

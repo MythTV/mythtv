@@ -185,7 +185,8 @@ void ZMEvents::updateUIList()
     {
         Event *event = m_eventList->at(i);
 
-        MythUIButtonListItem *item = new MythUIButtonListItem(m_eventGrid, "", qVariantFromValue(event));
+        auto *item = new MythUIButtonListItem(m_eventGrid, "",
+                                              qVariantFromValue(event));
 
         item->SetText(event->eventName());
         item->SetText(event->monitorName(), "camera" );
@@ -242,7 +243,7 @@ void ZMEvents::eventVisible(MythUIButtonListItem *item)
     if (item->HasImage())
         return;
 
-    Event *event = item->GetData().value<Event*>();
+    auto *event = item->GetData().value<Event*>();
 
     if (event)
     {
@@ -273,8 +274,8 @@ void ZMEvents::playPressed(void)
     {
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-        ZMPlayer *player = new ZMPlayer(mainStack, "ZMPlayer",
-                                        m_eventList, &m_savedPosition);
+        auto *player = new ZMPlayer(mainStack, "ZMPlayer",
+                                    m_eventList, &m_savedPosition);
 
         connect(player, SIGNAL(Exiting()), this, SLOT(playerExited()));
 
@@ -461,8 +462,7 @@ void ZMEvents::deleteAll(void)
     QString title = tr("Delete All Events?");
     QString msg = tr("Deleting %1 events in this view.").arg(m_eventGrid->GetCount());
 
-    MythConfirmationDialog *dialog = new MythConfirmationDialog(
-            popupStack, title + '\n' + msg, true);
+    auto *dialog = new MythConfirmationDialog(popupStack, title + '\n' + msg, true);
 
     if (dialog->Create())
         popupStack->AddScreen(dialog);

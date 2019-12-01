@@ -237,7 +237,7 @@ void ArchiveFileSelector::itemSelected(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    FileData *fileData = item->GetData().value<FileData*>();
+    auto *fileData = item->GetData().value<FileData*>();
     if (!fileData)
         return;
 
@@ -267,7 +267,7 @@ void ArchiveFileSelector::nextPressed()
     {
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-        ImportNative *native = new ImportNative(mainStack, this, m_xmlFile, m_details);
+        auto *native = new ImportNative(mainStack, this, m_xmlFile, m_details);
 
         if (native->Create())
             mainStack->AddScreen(native);
@@ -505,7 +505,7 @@ void ImportNative::showList(const QString &caption, QString &value,
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    MythUISearchDialog *searchDialog = new
+    auto *searchDialog = new
             MythUISearchDialog(popupStack, caption, m_searchList, true, value);
 
     if (!searchDialog->Create())

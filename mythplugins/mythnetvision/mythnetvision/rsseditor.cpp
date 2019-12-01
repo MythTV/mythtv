@@ -276,7 +276,7 @@ void RSSEditPopup::SelectImagePopup(const QString &prefix,
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    MythUIFileBrowser *fb = new MythUIFileBrowser(popupStack, prefix);
+    auto *fb = new MythUIFileBrowser(popupStack, prefix);
     fb->SetNameFilter(GetSupportedImageExtensionFilter());
     if (fb->Create())
     {
@@ -423,8 +423,7 @@ void RSSEditor::fillRSSButtonList()
     for (RSSSite::rssList::iterator i = m_siteList.begin();
             i != m_siteList.end(); ++i)
     {
-        MythUIButtonListItem *item =
-                    new MythUIButtonListItem(m_sites, (*i)->GetTitle());
+        auto *item = new MythUIButtonListItem(m_sites, (*i)->GetTitle());
         item->SetText((*i)->GetTitle(), "title");
         item->SetText((*i)->GetDescription(), "description");
         item->SetText((*i)->GetURL(), "url");
@@ -436,8 +435,7 @@ void RSSEditor::fillRSSButtonList()
 
 void RSSEditor::SlotItemChanged()
 {
-    RSSSite *site = m_sites->GetItemCurrent()->GetData().value<RSSSite*>();
-
+    auto *site = m_sites->GetItemCurrent()->GetData().value<RSSSite*>();
     if (site)
     {
         if (m_image)
@@ -473,8 +471,7 @@ void RSSEditor::SlotDeleteSite()
     MythScreenStack *m_popupStack =
         GetMythMainWindow()->GetStack("popup stack");
 
-    MythConfirmationDialog *confirmdialog =
-        new MythConfirmationDialog(m_popupStack,message);
+    auto *confirmdialog = new MythConfirmationDialog(m_popupStack,message);
 
     if (confirmdialog->Create())
     {
@@ -493,11 +490,10 @@ void RSSEditor::SlotEditSite()
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    RSSSite *site = m_sites->GetItemCurrent()->GetData().value<RSSSite*>();
-
+    auto *site = m_sites->GetItemCurrent()->GetData().value<RSSSite*>();
     if (site)
     {
-        RSSEditPopup *rsseditpopup =
+        auto *rsseditpopup =
             new RSSEditPopup(site->GetURL(), true, mainStack, "rsseditpopup");
 
         if (rsseditpopup->Create())
@@ -517,8 +513,7 @@ void RSSEditor::SlotNewSite()
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    RSSEditPopup *rsseditpopup =
-        new RSSEditPopup("", false, mainStack, "rsseditpopup");
+    auto *rsseditpopup = new RSSEditPopup("", false, mainStack, "rsseditpopup");
 
     if (rsseditpopup->Create())
     {
@@ -537,7 +532,7 @@ void RSSEditor::DoDeleteSite(bool remove)
     if (!remove)
         return;
 
-    RSSSite *site = m_sites->GetItemCurrent()->GetData().value<RSSSite*>();
+    auto *site = m_sites->GetItemCurrent()->GetData().value<RSSSite*>();
 
     if (removeFromDB(site))
         ListChanged();
