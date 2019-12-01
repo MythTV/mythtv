@@ -52,7 +52,7 @@ MediaRenderer::MediaRenderer()
 
     int nPort = g_pConfig->GetValue( "UPnP/MythFrontend/ServicePort", 6547 );
 
-    HttpServer *pHttpServer = new HttpServer();
+    auto *pHttpServer = new HttpServer();
 
     if (!pHttpServer)
         return;
@@ -69,7 +69,7 @@ MediaRenderer::MediaRenderer()
     // Register any HttpServerExtensions...
     // ------------------------------------------------------------------
 
-    HtmlServerExtension *pHtmlServer =
+    auto *pHtmlServer =
                  new HtmlServerExtension(pHttpServer->GetSharePath() + "html",
                                          "frontend_");
     pHttpServer->RegisterExtension(pHtmlServer);

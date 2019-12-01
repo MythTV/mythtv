@@ -314,7 +314,7 @@ bool Commands::Run(const QString & filename, int data_rate, bool loopinput)
     m_fileName = filename;
 
     m_streamer = new Streamer(this, m_fileName, data_rate, loopinput);
-    QThread *streamThread = new QThread(this);
+    auto *streamThread = new QThread(this);
 
     m_streamer->moveToThread(streamThread);
     connect(streamThread, SIGNAL(finished(void)),

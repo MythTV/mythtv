@@ -85,8 +85,8 @@ computeBlankMap(FrameAnalyzer::FrameMap *blankMap, long long nframes,
 
     /* Select percentile values from monochromatic frames. */
 
-    uchar *blankmedian = new unsigned char[nblanks];
-    float *blankstddev = new float[nblanks];
+    auto *blankmedian = new unsigned char[nblanks];
+    auto *blankstddev = new float[nblanks];
     long long blankno = 0;
     for (frameno = 0; frameno < nframes; frameno++)
     {
@@ -248,7 +248,7 @@ computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
                 long long jjlen = *jjblank;
                 long long end = brke + jjlen / 2;
 
-                long long testlen = (long long)roundf((end - start) / fps);
+                auto testlen = (long long)roundf((end - start) / fps);
                 if (testlen > kBreakType[ii].m_len + kBreakType[ii].m_delta)
                     break;      /* Too far ahead; break to next break length. */
 

@@ -60,14 +60,14 @@ class VideoPerformanceTest
     {
         PIPMap dummy;
         RingBuffer *rb  = RingBuffer::Create(m_file, false, true, 2000);
-        MythPlayer  *mp  = new MythPlayer(
+        auto       *mp  = new MythPlayer(
             (PlayerFlags)(kAudioMuted | (m_allowGpu ? (kDecodeAllowGPU | kDecodeAllowEXT): kNoFlags)));
         mp->GetAudio()->SetAudioInfo("NULL", "NULL", 0, 0);
         mp->GetAudio()->SetNoAudio();
         m_ctx = new PlayerContext("VideoPerformanceTest");
         m_ctx->SetRingBuffer(rb);
         m_ctx->SetPlayer(mp);
-        ProgramInfo *pinfo = new ProgramInfo(m_file);
+        auto *pinfo = new ProgramInfo(m_file);
         m_ctx->SetPlayingInfo(pinfo); // makes a copy
         delete pinfo;
         mp->SetPlayerInfo(nullptr, GetMythMainWindow(), m_ctx);
@@ -103,7 +103,7 @@ class VideoPerformanceTest
         if (dec)
             LOG(VB_GENERAL, LOG_INFO, QString("Using decoder: %1").arg(dec->GetCodecDecoderName()));
 
-        Jitterometer *jitter = new Jitterometer("Performance: ", static_cast<int>(mp->GetFrameRate()));
+        auto *jitter = new Jitterometer("Performance: ", static_cast<int>(mp->GetFrameRate()));
 
         int ms = m_secondsToRun * 1000;
         QTime start = QTime::currentTime();
@@ -320,7 +320,7 @@ int main(int argc, char *argv[])
         int seconds = 5;
         if (!cmdline.toString("seconds").isEmpty())
             seconds = cmdline.toInt("seconds");
-        VideoPerformanceTest *test = new VideoPerformanceTest(filename,
+        auto *test = new VideoPerformanceTest(filename,
                     cmdline.toBool("nodecode"),
                     cmdline.toBool("decodeonly"), seconds,
                     cmdline.toBool("deinterlace"),

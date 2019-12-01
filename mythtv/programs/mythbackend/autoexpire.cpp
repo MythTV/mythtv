@@ -176,7 +176,7 @@ void AutoExpire::CalcParams()
         uint64_t thisKBperMin = 0;
 
         // append unknown recordings to all fsIDs
-        vector<int>::iterator unknownfs_it = fsEncoderMap[-1].begin();
+        auto unknownfs_it = fsEncoderMap[-1].begin();
         for (; unknownfs_it != fsEncoderMap[-1].end(); ++unknownfs_it)
             fsEncoderMap[fsit->getFSysID()].push_back(*unknownfs_it);
 
@@ -189,8 +189,7 @@ void AutoExpire::CalcParams()
                 .arg(fsit->getUsedSpace() / 1024.0 / 1024.0, 7, 'f', 1)
                 .arg(fsit->getFreeSpace() / 1024.0 / 1024.0, 7, 'f', 1));
 
-            vector<int>::iterator encit =
-                fsEncoderMap[fsit->getFSysID()].begin();
+            auto encit = fsEncoderMap[fsit->getFSysID()].begin();
             for (; encit != fsEncoderMap[fsit->getFSysID()].end(); ++encit)
             {
                 EncoderLink *enc = *(m_encoderList->find(*encit));
@@ -529,7 +528,7 @@ void AutoExpire::ExpireRecordings(void)
             LOG(VB_FILE, LOG_INFO,
                 "    Searching for files expirable in these directories");
             QString myHostName = gCoreContext->GetHostName();
-            pginfolist_t::iterator it = expireList.begin();
+            auto it = expireList.begin();
             while ((it != expireList.end()) &&
                    (max((int64_t)0LL, fsit->getFreeSpace()) <
                     m_desired_space[fsit->getFSysID()]))
@@ -625,7 +624,7 @@ void AutoExpire::SendDeleteMessages(pginfolist_t &deleteList)
 
     LOG(VB_FILE, LOG_INFO, LOC +
         "SendDeleteMessages, cycling through deleteList.");
-    pginfolist_t::iterator it = deleteList.begin();
+    auto it = deleteList.begin();
     while (it != deleteList.end())
     {
         msg = QString("%1Expiring %2 MB for %3 => %4")
@@ -804,7 +803,7 @@ void AutoExpire::PrintExpireList(const QString& expHost)
     msg += "(programs listed in order of expiration)";
     cout << msg.toLocal8Bit().constData() << endl;
 
-    pginfolist_t::iterator i = expireList.begin();
+    auto i = expireList.begin();
     for (; i != expireList.end(); ++i)
     {
         ProgramInfo *first = (*i);
@@ -849,7 +848,7 @@ void AutoExpire::GetAllExpiring(QStringList &strList)
 
     strList << QString::number(expireList.size());
 
-    pginfolist_t::iterator it = expireList.begin();
+    auto it = expireList.begin();
     for (; it != expireList.end(); ++it)
         (*it)->ToStringList(strList);
 
@@ -872,7 +871,7 @@ void AutoExpire::GetAllExpiring(pginfolist_t &list)
     FillDBOrdered(expireList, gCoreContext->GetNumSetting("AutoExpireMethod",
                   emOldestFirst));
 
-    pginfolist_t::iterator it = expireList.begin();
+    auto it = expireList.begin();
     for (; it != expireList.end(); ++it)
         list.push_back( new ProgramInfo( *(*it) ));
 
@@ -1009,7 +1008,7 @@ void AutoExpire::FillDBOrdered(pginfolist_t &expireList, int expMethod)
         }
         else
         {
-            ProgramInfo *pginfo = new ProgramInfo(chanid, recstartts);
+            auto *pginfo = new ProgramInfo(chanid, recstartts);
             if (pginfo->GetChanID())
             {
                 LOG(VB_FILE, LOG_INFO, LOC + QString("    Adding   %1 at %2")

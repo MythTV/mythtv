@@ -42,7 +42,7 @@ void XMLTVParser::lateInit()
 
 static uint ELFHash(const QByteArray &ba)
 {
-    const uchar *k = (const uchar *)ba.data();
+    const auto *k = (const uchar *)ba.data();
     uint h = 0;
 
     if (k)
@@ -74,7 +74,7 @@ static QString getFirstText(const QDomElement& element)
 
 ChannelInfo *XMLTVParser::parseChannel(QDomElement &element, QUrl &baseUrl)
 {
-    ChannelInfo *chaninfo = new ChannelInfo;
+    auto *chaninfo = new ChannelInfo;
 
     QString xmltvid = element.attribute("id", "");
 
@@ -316,7 +316,7 @@ static void parseAudio(QDomElement &element, ProgInfo *pginfo)
 ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
 {
     QString programid, season, episode, totalepisodes;
-    ProgInfo *pginfo = new ProgInfo();
+    auto *pginfo = new ProgInfo();
 
     QString text = element.attribute("start", "");
     fromXMLTVDate(text, pginfo->m_starttime);

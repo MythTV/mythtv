@@ -112,8 +112,8 @@ int preview_helper(uint chanid, QDateTime starttime,
         return GENERIC_EXIT_NOT_OK;
     }
 
-    PreviewGenerator *previewgen = new PreviewGenerator(
-        pginfo, QString(), PreviewGenerator::kLocal);
+    auto *previewgen = new PreviewGenerator(pginfo, QString(),
+                                            PreviewGenerator::kLocal);
 
     if (previewFrameNumber >= 0)
         previewgen->SetPreviewTimeAsFrameNumber(previewFrameNumber);

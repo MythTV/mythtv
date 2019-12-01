@@ -87,7 +87,7 @@ static int CheckRecordings(const MythUtilCommandLineParser &cmdline)
 
     if (!recordingList->empty())
     {
-        vector<ProgramInfo *>::iterator i = recordingList->begin();
+        auto i = recordingList->begin();
         for ( ; i != recordingList->end(); ++i)
         {
             ProgramInfo *p = *i;
@@ -180,7 +180,7 @@ static int CheckRecordings(const MythUtilCommandLineParser &cmdline)
         cout << endl << endl;
         cout << "MISSING RECORDINGS" << endl;
         cout << "------------------" << endl;
-        vector<ProgramInfo *>::iterator i = missingRecordings.begin();
+        auto i = missingRecordings.begin();
         for ( ; i != missingRecordings.end(); ++i)
         {
             ProgramInfo *p = *i;
@@ -195,7 +195,7 @@ static int CheckRecordings(const MythUtilCommandLineParser &cmdline)
         cout << endl << endl;
         cout << "ZERO BYTE RECORDINGS" << endl;
         cout << "--------------------" << endl;
-        vector<ProgramInfo *>::iterator i = zeroByteRecordings.begin();
+        auto i = zeroByteRecordings.begin();
         for ( ; i != zeroByteRecordings.end(); ++i)
         {
             ProgramInfo *p = *i;
@@ -210,7 +210,7 @@ static int CheckRecordings(const MythUtilCommandLineParser &cmdline)
         cout << endl << endl;
         cout << "NO SEEKTABLE RECORDINGS" << endl;
         cout << "-----------------------" << endl;
-        vector<ProgramInfo *>::iterator i = noSeektableRecordings.begin();
+        auto i = noSeektableRecordings.begin();
         for ( ; i != noSeektableRecordings.end(); ++i)
         {
             ProgramInfo *p = *i;

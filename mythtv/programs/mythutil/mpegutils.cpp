@@ -747,7 +747,7 @@ static int pid_printer(const MythUtilCommandLineParser &cmdline)
     bool autopts = !cmdline.toBool("noautopts");
     bool use_xml = cmdline.toBool("xml");
 
-    ScanStreamData *sd = new ScanStreamData(true);
+    auto *sd = new ScanStreamData(true);
     for (QHash<uint,bool>::iterator it = use_pid.begin();
          it != use_pid.end(); ++it)
     {
@@ -760,23 +760,16 @@ static int pid_printer(const MythUtilCommandLineParser &cmdline)
         sd->AddWritingPID(it.key());
     }
 
-    PTSListener                 *ptsl = new PTSListener();
-    PrintMPEGStreamListener     *pmsl =
-        new PrintMPEGStreamListener(out, *ptsl, autopts, sd, use_pid, use_xml);
-    PrintATSCMainStreamListener *pasl =
-        new PrintATSCMainStreamListener(out, use_xml);
-    PrintSCTEMainStreamListener *pssl =
-        new PrintSCTEMainStreamListener(out, use_xml);
-    PrintATSCAuxStreamListener  *paasl =
-        new PrintATSCAuxStreamListener(out, use_xml);
-    PrintATSCEITStreamListener  *paesl =
-        new PrintATSCEITStreamListener(out, use_xml);
-    PrintDVBMainStreamListener  *pdmsl =
-        new PrintDVBMainStreamListener(out, use_xml);
-    PrintDVBOtherStreamListener *pdosl =
-        new PrintDVBOtherStreamListener(out, use_xml);
-    PrintDVBEITStreamListener   *pdesl =
-        new PrintDVBEITStreamListener(out, use_xml);
+    auto *ptsl  = new PTSListener();
+    auto *pmsl  = new PrintMPEGStreamListener(out, *ptsl, autopts, sd,
+                                              use_pid, use_xml);
+    auto *pasl  = new PrintATSCMainStreamListener(out, use_xml);
+    auto *pssl  = new PrintSCTEMainStreamListener(out, use_xml);
+    auto *paasl = new PrintATSCAuxStreamListener(out, use_xml);
+    auto *paesl = new PrintATSCEITStreamListener(out, use_xml);
+    auto *pdmsl = new PrintDVBMainStreamListener(out, use_xml);
+    auto *pdosl = new PrintDVBOtherStreamListener(out, use_xml);
+    auto *pdesl = new PrintDVBEITStreamListener(out, use_xml);
 
     sd->AddWritingListener(ptsl);
     sd->AddMPEGListener(pmsl);

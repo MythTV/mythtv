@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
     QString logfile = cmdline.GetLogFilePath();
     QString logging = logPropagateArgs;
 
-    MythExternControl *control = new MythExternControl();
+    auto *control = new MythExternControl();
     MythExternRecApp  *process = nullptr;
 
     QString conf_file = cmdline.toString("conf");

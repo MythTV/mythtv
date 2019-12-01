@@ -750,8 +750,8 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
     int min = 255;
     int blankPixelsChecked = 0;
     long long totBrightness = 0;
-    unsigned char *rowMax = new unsigned char[m_height];
-    unsigned char *colMax = new unsigned char[m_width];
+    auto *rowMax = new unsigned char[m_height];
+    auto *colMax = new unsigned char[m_width];
     memset(rowMax, 0, sizeof(*rowMax)*m_height);
     memset(colMax, 0, sizeof(*colMax)*m_width);
     int topDarkRow = m_commDetectBorder;
@@ -1200,7 +1200,7 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
 
     m_commBreakMap.clear();
 
-    FrameBlock *fblock = new FrameBlock[m_blankFrameCount + 2];
+    auto *fblock = new FrameBlock[m_blankFrameCount + 2];
 
     int curBlock = 0;
     uint64_t curFrame = 1;
@@ -1849,9 +1849,9 @@ void ClassicCommDetector::BuildBlankFrameCommList(void)
 {
     LOG(VB_COMMFLAG, LOG_INFO, "CommDetect::BuildBlankFrameCommList()");
 
-    long long *bframes = new long long[m_blankFrameMap.count()*2];
-    long long *c_start = new long long[m_blankFrameMap.count()];
-    long long *c_end   = new long long[m_blankFrameMap.count()];
+    auto *bframes = new long long[m_blankFrameMap.count()*2];
+    auto *c_start = new long long[m_blankFrameMap.count()];
+    auto *c_end   = new long long[m_blankFrameMap.count()];
     int frames = 0;
     int commercials = 0;
 
@@ -2031,7 +2031,7 @@ void ClassicCommDetector::BuildSceneChangeCommList(void)
         {
             if (section_start == -1)
             {
-                long long f = (long long)(s * m_fps);
+                auto f = (long long)(s * m_fps);
                 for(int i = 0; i < m_fps; i++, f++)
                 {
                     if (m_sceneMap.contains(f))
@@ -2048,7 +2048,7 @@ void ClassicCommDetector::BuildSceneChangeCommList(void)
         if ((section_start >= 0) &&
             (s > (section_start + 32)))
         {
-            long long f = (long long)(section_start * m_fps);
+            auto f = (long long)(section_start * m_fps);
             bool found_end = false;
 
             for(int i = 0; i < m_fps; i++, f++)

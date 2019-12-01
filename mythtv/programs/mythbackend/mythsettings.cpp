@@ -30,14 +30,13 @@ static QString extract_query_list(
     MythSettingList::const_iterator it = settings.begin();
     for (; it != settings.end(); ++it)
     {
-        const MythSettingGroup *group =
-            dynamic_cast<const MythSettingGroup*>(*it);
+        const auto *group = dynamic_cast<const MythSettingGroup*>(*it);
         if (group)
         {
             list += extract_query_list(group->m_settings, stype);
             continue;
         }
-        const MythSetting *setting = dynamic_cast<const MythSetting*>(*it);
+        const auto *setting = dynamic_cast<const MythSetting*>(*it);
         if (setting && (setting->m_stype == stype))
             list += QString(",'%1'").arg(setting->m_value);
     }
@@ -51,8 +50,7 @@ static void fill_setting(
     MythSettingBase *sb, const QMap<QString,QString> &map,
     MythSetting::SettingType stype)
 {
-    const MythSettingGroup *group =
-        dynamic_cast<const MythSettingGroup*>(sb);
+    const auto *group = dynamic_cast<const MythSettingGroup*>(sb);
     if (group)
     {
         MythSettingList::const_iterator it = group->m_settings.begin();
@@ -61,7 +59,7 @@ static void fill_setting(
         return;
     }
 
-    MythSetting *setting = dynamic_cast<MythSetting*>(sb);
+    auto *setting = dynamic_cast<MythSetting*>(sb);
     if (setting && (setting->m_stype == stype))
     {
         QMap<QString,QString>::const_iterator it = map.find(setting->m_value);
@@ -506,7 +504,7 @@ bool parse_dom(MythSettingList &settings, const QDomElement &element,
                 tmpIncludeAllChildren = true;
             }
 
-            MythSettingGroup *g = new MythSettingGroup(
+            auto *g = new MythSettingGroup(
                 m_human_label, m_unique_label, m_ecma_script);
 
             if ((e.hasChildNodes()) &&
@@ -620,7 +618,7 @@ bool parse_dom(MythSettingList &settings, const QDomElement &element,
                 return false;
             }
 
-            MythSetting *s = new MythSetting(
+            auto *s = new MythSetting(
                 m["value"], m["default_data"], stype,
                 m["label"], m["help_text"], dtype,
                 data_list, display_list, range_min, range_max,

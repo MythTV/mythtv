@@ -213,8 +213,7 @@ bool VideoFilterSettings::matches_filter(const VideoMetadata &mdata) const
         matches = false;
 
         const VideoMetadata::genre_list &gl = mdata.GetGenres();
-        for (VideoMetadata::genre_list::const_iterator p = gl.begin();
-             p != gl.end(); ++p)
+        for (auto p = gl.cbegin(); p != gl.cend(); ++p)
         {
             if ((matches = (p->first == m_genre)))
             {
@@ -228,8 +227,7 @@ bool VideoFilterSettings::matches_filter(const VideoMetadata &mdata) const
         matches = false;
 
         const VideoMetadata::country_list &cl = mdata.GetCountries();
-        for (VideoMetadata::country_list::const_iterator p = cl.begin();
-             p != cl.end(); ++p)
+        for (auto p = cl.cbegin(); p != cl.cend(); ++p)
         {
             if ((matches = (p->first == m_country)))
             {
@@ -250,8 +248,7 @@ bool VideoFilterSettings::matches_filter(const VideoMetadata &mdata) const
         {
             matches = false;
 
-            for (VideoMetadata::cast_list::const_iterator p = cl.begin();
-                 p != cl.end(); ++p)
+            for (auto p = cl.cbegin(); p != cl.cend(); ++p)
             {
                 if ((matches = (p->first == m_cast)))
                 {
@@ -560,8 +557,7 @@ void VideoFilterDialog::fillWidgets()
 
     const VideoMetadataListManager::metadata_list &mdl =
             m_videoList.getListCache().getList();
-    for (VideoMetadataListManager::metadata_list::const_iterator p = mdl.begin();
-         p != mdl.end(); ++p)
+    for (auto p = mdl.cbegin(); p != mdl.cend(); ++p)
     {
         int year = (*p)->GetYear();
         if ((year == 0) || (year == VIDEO_YEAR_DEFAULT))
@@ -584,8 +580,7 @@ void VideoFilterDialog::fillWidgets()
 
     const VideoCategory::entry_list &vcl =
             VideoCategory::GetCategory().getList();
-    for (VideoCategory::entry_list::const_iterator p = vcl.begin();
-            p != vcl.end(); ++p)
+    for (auto p = vcl.cbegin(); p != vcl.cend(); ++p)
     {
         new MythUIButtonListItem(m_categoryList, p->second, p->first);
     }
@@ -598,8 +593,7 @@ void VideoFilterDialog::fillWidgets()
     new MythUIButtonListItem(m_genreList, tr("All", "Genre"), kGenreFilterAll);
 
     const VideoGenre::entry_list &gl = VideoGenre::getGenre().getList();
-    for (VideoGenre::entry_list::const_iterator p = gl.begin();
-            p != gl.end(); ++p)
+    for (auto p = gl.cbegin(); p != gl.cend(); ++p)
     {
         new MythUIButtonListItem(m_genreList, p->second, p->first);
     }
@@ -611,8 +605,7 @@ void VideoFilterDialog::fillWidgets()
     new MythUIButtonListItem(m_castList, tr("All", "Cast"), kCastFilterAll);
 
     const VideoCast::entry_list &cl = VideoCast::GetCast().getList();
-    for (VideoCast::entry_list::const_iterator p = cl.begin();
-            p != cl.end(); ++p)
+    for (auto p = cl.cbegin(); p != cl.cend(); ++p)
     {
         new MythUIButtonListItem(m_castList, p->second, p->first);
     }
@@ -624,8 +617,7 @@ void VideoFilterDialog::fillWidgets()
     new MythUIButtonListItem(m_countryList, tr("All", "Country"), kCountryFilterAll);
 
     const VideoCountry::entry_list &cnl = VideoCountry::getCountry().getList();
-    for (VideoCountry::entry_list::const_iterator p = cnl.begin();
-            p != cnl.end(); ++p)
+    for (auto p = cnl.cbegin(); p != cnl.cend(); ++p)
     {
         new MythUIButtonListItem(m_countryList, p->second, p->first);
     }
@@ -637,8 +629,7 @@ void VideoFilterDialog::fillWidgets()
     // Year
     new MythUIButtonListItem(m_yearList, tr("All", "Year"), kYearFilterAll);
 
-    for (int_list::const_reverse_iterator p = years.rbegin();
-            p != years.rend(); ++p)
+    for (auto p = years.crbegin(); p != years.crend(); ++p)
     {
         new MythUIButtonListItem(m_yearList, QString::number(*p), *p);
     }
@@ -656,8 +647,7 @@ void VideoFilterDialog::fillWidgets()
         new MythUIButtonListItem(m_runtimeList, VIDEO_RUNTIME_UNKNOWN,
                                kRuntimeFilterUnknown);
 
-    for (int_list::const_iterator p = runtimes.begin();
-            p != runtimes.end(); ++p)
+    for (auto p = runtimes.cbegin(); p != runtimes.cend(); ++p)
     {
         QString s = QString("%1 %2 ~ %3 %4").arg(*p * 30).arg(tr("minutes"))
                 .arg((*p + 1) * 30).arg(tr("minutes"));
@@ -670,8 +660,7 @@ void VideoFilterDialog::fillWidgets()
     new MythUIButtonListItem(m_userratingList, tr("All", "User rating"),
                            kUserRatingFilterAll);
 
-    for (int_list::const_reverse_iterator p = user_ratings.rbegin();
-            p != user_ratings.rend(); ++p)
+    for (auto p = user_ratings.crbegin(); p != user_ratings.crend(); ++p)
     {
         new MythUIButtonListItem(m_userratingList,
                                QString(">= %1").arg(QString::number(*p)),

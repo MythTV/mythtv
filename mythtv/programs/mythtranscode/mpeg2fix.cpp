@@ -460,7 +460,7 @@ int MPEG2fixup::FindMPEG2Header(const uint8_t *buf, int size, uint8_t code)
 // concurrently
 static int fill_buffers(void *r, int finish)
 {
-    MPEG2replex *rx = (MPEG2replex *)r;
+    auto *rx = (MPEG2replex *)r;
 
     if (finish)
         return 0;
@@ -518,7 +518,7 @@ int MPEG2replex::WaitBuffers()
 void *MPEG2fixup::ReplexStart(void *data)
 {
     MThread::ThreadSetup("MPEG2Replex");
-    MPEG2fixup *m2f = static_cast<MPEG2fixup *>(data);
+    auto *m2f = static_cast<MPEG2fixup *>(data);
     if (!m2f)
         return nullptr;
     m2f->m_rx.Start();
@@ -905,7 +905,7 @@ int MPEG2fixup::ProcessVideo(MPEG2frame *vf, mpeg2dec_t *dec)
         vf->m_isGop = false;
     }
 
-    mpeg2_info_t *info = (mpeg2_info_t *)mpeg2_info(dec);
+    auto *info = (mpeg2_info_t *)mpeg2_info(dec);
 
     mpeg2_buffer(dec, vf->m_pkt.data, vf->m_pkt.data + vf->m_pkt.size);
 
@@ -1047,7 +1047,7 @@ void MPEG2fixup::WriteFrame(const QString& filename, AVPacket *pkt)
     WriteData(fname, pkt->data, pkt->size);
 
     mpeg2dec_t *tmp_decoder = mpeg2_init();
-    mpeg2_info_t *info = (mpeg2_info_t *)mpeg2_info(tmp_decoder);
+    auto *info = (mpeg2_info_t *)mpeg2_info(tmp_decoder);
 
     while (!info->display_picture)
     {

@@ -76,7 +76,7 @@ void ProgInfoList::CreateButton(const QString& name, const QString& value)
     if (value.isEmpty())
         return;
 
-    MythUIButtonListItem *item = new MythUIButtonListItem(m_btnList, "");
+    auto *item = new MythUIButtonListItem(m_btnList, "");
 
     InfoMap infoMap;
     infoMap.insert("name", name);

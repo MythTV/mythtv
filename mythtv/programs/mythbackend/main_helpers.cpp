@@ -179,7 +179,7 @@ bool setupTVs(bool ismaster, bool &error)
                 TVRec *tv = TVRec::GetTVRec(cardid);
                 if (tv && tv->Init())
                 {
-                    EncoderLink *enc = new EncoderLink(cardid, tv);
+                    auto *enc = new EncoderLink(cardid, tv);
                     tvList[cardid] = enc;
                 }
                 else
@@ -200,7 +200,7 @@ bool setupTVs(bool ismaster, bool &error)
                 TVRec *tv = TVRec::GetTVRec(cardid);
                 if (tv && tv->Init())
                 {
-                    EncoderLink *enc = new EncoderLink(cardid, tv);
+                    auto *enc = new EncoderLink(cardid, tv);
                     tvList[cardid] = enc;
                 }
                 else
@@ -212,7 +212,7 @@ bool setupTVs(bool ismaster, bool &error)
             }
             else
             {
-                EncoderLink *enc = new EncoderLink(cardid, nullptr, host);
+                auto *enc = new EncoderLink(cardid, nullptr, host);
                 tvList[cardid] = enc;
             }
         }
@@ -367,7 +367,7 @@ int handle_command(const MythBackendCommandLineParser &cmdline)
     if (cmdline.toBool("printsched") ||
         cmdline.toBool("testsched"))
     {
-        Scheduler *sched = new Scheduler(false, &tvList);
+        auto *sched = new Scheduler(false, &tvList);
         if (cmdline.toBool("printsched"))
         {
             if (!gCoreContext->ConnectToMasterServer())
@@ -442,7 +442,7 @@ using namespace MythTZ;
 
 int connect_to_master(void)
 {
-    MythSocket *tempMonitorConnection = new MythSocket();
+    auto *tempMonitorConnection = new MythSocket();
     if (tempMonitorConnection->ConnectToHost(
             gCoreContext->GetMasterServerIP(),
             MythCoreContext::GetMasterServerPort()))

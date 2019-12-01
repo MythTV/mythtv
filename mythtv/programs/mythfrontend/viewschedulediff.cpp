@@ -124,8 +124,8 @@ void ViewScheduleDiff::showStatus(MythUIButtonListItem */*item*/)
 
     QString title = QObject::tr("Program Status");
     MythScreenStack *mainStack = GetMythMainWindow()->GetStack("main stack");
-    MythDialogBox   *dlg = new MythDialogBox(title, message, mainStack,
-                                             "statusdialog", true);
+    auto   *dlg = new MythDialogBox(title, message, mainStack,
+                                    "statusdialog", true);
 
     if (dlg->Create())
     {
@@ -192,7 +192,7 @@ void ViewScheduleDiff::fillList(void)
 
     QDateTime now = MythDate::current();
 
-    ProgramList::iterator it = m_recListBefore.begin();
+    auto it = m_recListBefore.begin();
     while (it != m_recListBefore.end())
     {
         if ((*it)->GetRecordingEndTime() >= now ||
@@ -220,8 +220,8 @@ void ViewScheduleDiff::fillList(void)
         }
     }
 
-    ProgramList::iterator pb = m_recListBefore.begin();
-    ProgramList::iterator pa = m_recListAfter.begin();
+    auto pb = m_recListBefore.begin();
+    auto pa = m_recListAfter.begin();
     ProgramStruct s;
 
     m_recList.clear();
@@ -279,8 +279,8 @@ void ViewScheduleDiff::updateUIList(void)
         if (!pginfo)
             pginfo = s.m_before;
 
-        MythUIButtonListItem *item = new MythUIButtonListItem(
-            m_conflictList, "", qVariantFromValue(pginfo));
+        auto *item = new MythUIButtonListItem(m_conflictList, "",
+                                              qVariantFromValue(pginfo));
 
         InfoMap infoMap;
         pginfo->ToMap(infoMap);
@@ -319,7 +319,7 @@ void ViewScheduleDiff::updateInfo(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    ProgramInfo *pginfo = item->GetData().value<ProgramInfo*> ();
+    auto *pginfo = item->GetData().value<ProgramInfo*> ();
     if (pginfo)
     {
         InfoMap infoMap;

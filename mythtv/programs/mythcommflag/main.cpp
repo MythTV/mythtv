@@ -83,7 +83,7 @@ QMap<QString,SkipType> *skipTypes = init_skip_types();
 
 static QMap<QString,SkipType> *init_skip_types(void)
 {
-    QMap<QString,SkipType> *tmp = new QMap<QString,SkipType>;
+    auto *tmp = new QMap<QString,SkipType>;
     (*tmp)["commfree"]    = COMM_DETECT_COMMFREE;
     (*tmp)["uninit"]      = COMM_DETECT_UNINIT;
     (*tmp)["off"]         = COMM_DETECT_OFF;
@@ -114,7 +114,7 @@ QMap<QString,OutputMethod> *outputTypes = init_output_types();
 
 static QMap<QString,OutputMethod> *init_output_types(void)
 {
-    QMap<QString,OutputMethod> *tmp = new QMap<QString,OutputMethod>;
+    auto *tmp = new QMap<QString,OutputMethod>;
     (*tmp)["essentials"] = kOutputMethodEssentials;
     (*tmp)["full"]       = kOutputMethodFull;
     return tmp;
@@ -469,7 +469,7 @@ static void incomingCustomEvent(QEvent* e)
 {
     if (e->type() == MythEvent::MythEventMessage)
     {
-        MythEvent *me = static_cast<MythEvent *>(e);
+        auto *me = static_cast<MythEvent *>(e);
         QString message = me->Message();
 
         message = message.simplified();
@@ -540,10 +540,10 @@ static int DoFlagCommercials(
     if (useDB)
         program_info->SaveCommFlagged(COMM_FLAG_PROCESSING);
 
-    CustomEventRelayer *cer = new CustomEventRelayer(incomingCustomEvent);
-    SlotRelayer *a = new SlotRelayer(commDetectorBreathe);
-    SlotRelayer *b = new SlotRelayer(commDetectorStatusUpdate);
-    SlotRelayer *c = new SlotRelayer(commDetectorGotNewCommercialBreakList);
+    auto *cer = new CustomEventRelayer(incomingCustomEvent);
+    auto *a = new SlotRelayer(commDetectorBreathe);
+    auto *b = new SlotRelayer(commDetectorStatusUpdate);
+    auto *c = new SlotRelayer(commDetectorGotNewCommercialBreakList);
     QObject::connect(commDetector, SIGNAL(breathe()),
                      a,            SLOT(relay()));
     QObject::connect(commDetector, SIGNAL(statusUpdate(const QString&)),
@@ -860,12 +860,12 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
         }
     }
 
-    PlayerFlags flags = (PlayerFlags)(kAudioMuted   |
-                                      kVideoIsNull  |
-                                      kDecodeLowRes |
-                                      kDecodeSingleThreaded |
-                                      kDecodeNoLoopFilter |
-                                      kNoITV);
+    auto flags = (PlayerFlags)(kAudioMuted   |
+                               kVideoIsNull  |
+                               kDecodeLowRes |
+                               kDecodeSingleThreaded |
+                               kDecodeNoLoopFilter |
+                               kNoITV);
     /* blank detector needs to be only sample center for this optimization. */
     if ((COMM_DETECT_BLANKS  == commDetectMethod) ||
         (COMM_DETECT_2_BLANK == commDetectMethod))
@@ -873,8 +873,8 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
         flags = (PlayerFlags) (flags | kDecodeFewBlocks);
     }
 
-    MythCommFlagPlayer *cfp = new MythCommFlagPlayer(flags);
-    PlayerContext *ctx = new PlayerContext(kFlaggerInUseID);
+    auto *cfp = new MythCommFlagPlayer(flags);
+    auto *ctx = new PlayerContext(kFlaggerInUseID);
     ctx->SetPlayingInfo(program_info);
     ctx->SetRingBuffer(tmprbuf);
     ctx->SetPlayer(cfp);
@@ -1019,10 +1019,9 @@ static int RebuildSeekTable(ProgramInfo *pginfo, int jobid, bool writefile = fal
         return GENERIC_EXIT_PERMISSIONS_ERROR;
     }
 
-    MythCommFlagPlayer *cfp = new MythCommFlagPlayer(
-                                    (PlayerFlags)(kAudioMuted | kVideoIsNull |
-                                                  kDecodeNoDecode | kNoITV));
-    PlayerContext *ctx = new PlayerContext(kFlaggerInUseID);
+    auto *cfp = new MythCommFlagPlayer((PlayerFlags)(kAudioMuted | kVideoIsNull |
+                                                     kDecodeNoDecode | kNoITV));
+    auto *ctx = new PlayerContext(kFlaggerInUseID);
     ctx->SetPlayingInfo(pginfo);
     ctx->SetRingBuffer(tmprbuf);
     ctx->SetPlayer(cfp);

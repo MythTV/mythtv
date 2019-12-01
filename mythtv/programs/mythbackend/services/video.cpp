@@ -90,7 +90,7 @@ DTC::VideoMetadataInfoList* Video::GetVideoList( const QString &Folder,
     // Build Response
     // ----------------------------------------------------------------------
 
-    DTC::VideoMetadataInfoList *pVideoMetadataInfos = new DTC::VideoMetadataInfoList();
+    auto *pVideoMetadataInfos = new DTC::VideoMetadataInfoList();
 
     nStartIndex   = (nStartIndex > 0) ? min( nStartIndex, (int)videos.size() ) : 0;
     nCount        = (nCount > 0) ? min( nCount, (int)videos.size() ) : videos.size();
@@ -143,7 +143,7 @@ DTC::VideoMetadataInfo* Video::GetVideo( int Id )
     if ( !metadata )
         throw( QString( "No metadata found for selected ID!." ));
 
-    DTC::VideoMetadataInfo *pVideoMetadataInfo = new DTC::VideoMetadataInfo();
+    auto *pVideoMetadataInfo = new DTC::VideoMetadataInfo();
 
     FillVideoMetadataInfo ( pVideoMetadataInfo, metadata, true );
 
@@ -165,7 +165,7 @@ DTC::VideoMetadataInfo* Video::GetVideoByFileName( const QString &FileName )
     if ( !metadata )
         throw( QString( "No metadata found for selected filename!." ));
 
-    DTC::VideoMetadataInfo *pVideoMetadataInfo = new DTC::VideoMetadataInfo();
+    auto *pVideoMetadataInfo = new DTC::VideoMetadataInfo();
 
     FillVideoMetadataInfo ( pVideoMetadataInfo, metadata, true );
 
@@ -184,11 +184,11 @@ DTC::VideoLookupList* Video::LookupVideo( const QString    &Title,
                                               const QString    &GrabberType,
                                               bool             AllowGeneric )
 {
-    DTC::VideoLookupList *pVideoLookups = new DTC::VideoLookupList();
+    auto *pVideoLookups = new DTC::VideoLookupList();
 
     MetadataLookupList list;
 
-    MetadataFactory *factory = new MetadataFactory(nullptr);
+    auto *factory = new MetadataFactory(nullptr);
 
     if (factory)
         list = factory->SynchronousLookup(Title, Subtitle,
@@ -401,7 +401,7 @@ DTC::BlurayInfo* Video::GetBluray( const QString &sPath )
     LOG(VB_GENERAL, LOG_NOTICE,
         QString("Parsing Blu-ray at path: %1 ").arg(path));
 
-    BlurayMetadata *bdmeta = new BlurayMetadata(path);
+    auto *bdmeta = new BlurayMetadata(path);
 
     if ( !bdmeta )
         throw( QString( "Unable to open Blu-ray Metadata Parser!" ));
@@ -412,7 +412,7 @@ DTC::BlurayInfo* Video::GetBluray( const QString &sPath )
     if ( !bdmeta->ParseDisc() )
         throw( QString( "Unable to parse metadata from Blu-ray Disc/Path!" ));
 
-    DTC::BlurayInfo *pBlurayInfo = new DTC::BlurayInfo();
+    auto *pBlurayInfo = new DTC::BlurayInfo();
 
     pBlurayInfo->setPath(path);
     pBlurayInfo->setTitle(bdmeta->GetTitle());

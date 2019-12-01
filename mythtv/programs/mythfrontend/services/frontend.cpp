@@ -31,7 +31,7 @@ QHash<QString,QStringList> Frontend::gActionDescriptions = QHash<QString,QString
 
 DTC::FrontendStatus* Frontend::GetStatus(void)
 {
-    DTC::FrontendStatus *status = new DTC::FrontendStatus();
+    auto *status = new DTC::FrontendStatus();
     MythUIStateTracker::GetFreshState(status->State());
 
     status->setName(gCoreContext->GetHostName());
@@ -100,7 +100,7 @@ bool Frontend::SendAction(const QString &Action, const QString &Value,
 
     if (!Value.isEmpty() && kValueActions.contains(Action))
     {
-        MythEvent* me = new MythEvent(Action, QStringList(Value));
+        auto* me = new MythEvent(Action, QStringList(Value));
         qApp->postEvent(GetMythMainWindow(), me);
         return true;
     }
@@ -115,12 +115,12 @@ bool Frontend::SendAction(const QString &Action, const QString &Value,
 
         QStringList args;
         args << QString::number(Width) << QString::number(Height);
-        MythEvent* me = new MythEvent(Action, args);
+        auto* me = new MythEvent(Action, args);
         qApp->postEvent(GetMythMainWindow(), me);
         return true;
     }
 
-    QKeyEvent* ke = new QKeyEvent(QEvent::KeyPress, 0, Qt::NoModifier, Action);
+    auto* ke = new QKeyEvent(QEvent::KeyPress, 0, Qt::NoModifier, Action);
     qApp->postEvent(GetMythMainWindow(), (QEvent*)ke);
     return true;
 }
@@ -239,7 +239,7 @@ bool Frontend::PlayVideo(const QString &Id, bool UseBookmark)
          << QString::number(metadata->GetID())
          << QString::number(UseBookmark);
 
-    MythEvent *me = new MythEvent(ACTION_HANDLEMEDIA, args);
+    auto *me = new MythEvent(ACTION_HANDLEMEDIA, args);
     qApp->postEvent(GetMythMainWindow(), me);
 
     return true;
@@ -253,7 +253,7 @@ QStringList Frontend::GetContextList(void)
 
 DTC::FrontendActionList* Frontend::GetActionList(const QString &lContext)
 {
-    DTC::FrontendActionList *list = new DTC::FrontendActionList();
+    auto *list = new DTC::FrontendActionList();
 
     InitialiseActions();
 
@@ -305,7 +305,7 @@ void Frontend::InitialiseActions(void)
         return;
 
     s_initialised = true;
-    KeyBindings *bindings = new KeyBindings(gCoreContext->GetHostName());
+    auto *bindings = new KeyBindings(gCoreContext->GetHostName());
     if (bindings)
     {
         QStringList contexts = bindings->GetContexts();

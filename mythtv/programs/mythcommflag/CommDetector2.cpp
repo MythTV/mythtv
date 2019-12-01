@@ -81,7 +81,7 @@ bool MythPlayerInited(FrameAnalyzerItem &pass,
                       MythPlayer *player,
                       long long nframes)
 {
-    FrameAnalyzerItem::iterator it = pass.begin();
+    auto it = pass.begin();
     while (it != pass.end())
     {
         FrameAnalyzer::analyzeFrameResult ares =
@@ -123,7 +123,7 @@ long long processFrame(FrameAnalyzerItem &pass,
     long long nextFrame = 0;
     long long minNextFrame = FrameAnalyzer::ANYFRAME;
 
-    FrameAnalyzerItem::iterator it = pass.begin();
+    auto it = pass.begin();
     while (it != pass.end())
     {
         FrameAnalyzer::analyzeFrameResult ares =
@@ -165,7 +165,7 @@ long long processFrame(FrameAnalyzerItem &pass,
 
 int passFinished(FrameAnalyzerItem &pass, long long nframes, bool final)
 {
-    FrameAnalyzerItem::iterator it = pass.begin();
+    auto it = pass.begin();
     for (; it != pass.end(); ++it)
         (void)(*it)->finished(nframes, final);
 
@@ -174,8 +174,8 @@ int passFinished(FrameAnalyzerItem &pass, long long nframes, bool final)
 
 int passReportTime(const FrameAnalyzerItem &pass)
 {
-    FrameAnalyzerItem::const_iterator it = pass.begin();
-    for (; it != pass.end(); ++it)
+    auto it = pass.cbegin();
+    for (; it != pass.cend(); ++it)
         (void)(*it)->reportTime();
 
     return 0;
@@ -186,9 +186,7 @@ bool searchingForLogo(TemplateFinder *tf, const FrameAnalyzerItem &pass)
     if (!tf)
         return false;
 
-    FrameAnalyzerItem::const_iterator it =
-        std::find(pass.begin(), pass.end(), tf);
-
+    auto it = std::find(pass.cbegin(), pass.cend(), tf);
     return it != pass.end();
 }
 
@@ -390,7 +388,7 @@ CommDetector2::CommDetector2(
         if (!borderDetector)
             borderDetector = new BorderDetector();
 
-        CannyEdgeDetector *cannyEdgeDetector = new CannyEdgeDetector();
+        auto *cannyEdgeDetector = new CannyEdgeDetector();
 
         if (!m_logoFinder)
         {

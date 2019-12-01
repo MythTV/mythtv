@@ -70,15 +70,15 @@ DTC::ChannelInfoList* Channel::GetChannelInfoList( uint nSourceID,
     // Build Response
     // ----------------------------------------------------------------------
 
-    DTC::ChannelInfoList *pChannelInfos = new DTC::ChannelInfoList();
+    auto *pChannelInfos = new DTC::ChannelInfoList();
 
     nStartIndex = (nStartIndex > 0) ? min( nStartIndex, nTotalAvailable ) : 0;
     nCount      = (nCount > 0) ? min(nCount, (nTotalAvailable - nStartIndex)) :
                                              (nTotalAvailable - nStartIndex);
 
     ChannelInfoList::iterator chanIt;
-    ChannelInfoList::iterator chanItBegin = chanList.begin() + nStartIndex;
-    ChannelInfoList::iterator chanItEnd   = chanItBegin      + nCount;
+    auto chanItBegin = chanList.begin() + nStartIndex;
+    auto chanItEnd   = chanItBegin      + nCount;
 
     for( chanIt = chanItBegin; chanIt < chanItEnd; ++chanIt )
     {
@@ -128,7 +128,7 @@ DTC::ChannelInfo* Channel::GetChannelInfo( uint nChanID )
     if (nChanID == 0)
         throw( QString("Channel ID appears invalid."));
 
-    DTC::ChannelInfo *pChannelInfo = new DTC::ChannelInfo();
+    auto *pChannelInfo = new DTC::ChannelInfo();
 
     if (!FillChannelInfo(pChannelInfo, nChanID, true))
     {
@@ -231,7 +231,7 @@ DTC::VideoSourceList* Channel::GetVideoSourceList()
     // return the results of the query
     // ----------------------------------------------------------------------
 
-    DTC::VideoSourceList* pList = new DTC::VideoSourceList();
+    auto* pList = new DTC::VideoSourceList();
 
     while (query.next())
     {
@@ -290,7 +290,7 @@ DTC::VideoSource* Channel::GetVideoSource( uint nSourceID )
     // return the results of the query
     // ----------------------------------------------------------------------
 
-    DTC::VideoSource *pVideoSource = new DTC::VideoSource();
+    auto *pVideoSource = new DTC::VideoSource();
 
     if (query.next())
     {
@@ -380,7 +380,7 @@ DTC::LineupList* Channel::GetDDLineupList( const QString &/*sSource*/,
                                            const QString &/*sUserId*/,
                                            const QString &/*sPassword*/ )
 {
-    DTC::LineupList *pLineups = new DTC::LineupList();
+    auto *pLineups = new DTC::LineupList();
     return pLineups;
 }
 
@@ -449,7 +449,7 @@ DTC::VideoMultiplexList* Channel::GetVideoMultiplexList( uint nSourceID,
     // Build Response
     // ----------------------------------------------------------------------
 
-    DTC::VideoMultiplexList *pVideoMultiplexes = new DTC::VideoMultiplexList();
+    auto *pVideoMultiplexes = new DTC::VideoMultiplexList();
 
     nStartIndex   = (nStartIndex > 0) ? min( nStartIndex, muxCount ) : 0;
     nCount        = (nCount > 0) ? min( nCount, muxCount ) : muxCount;
@@ -538,7 +538,7 @@ DTC::VideoMultiplex* Channel::GetVideoMultiplex( uint nMplexID )
         throw( QString( "Database Error executing query." ));
     }
 
-    DTC::VideoMultiplex *pVideoMultiplex = new DTC::VideoMultiplex();
+    auto *pVideoMultiplex = new DTC::VideoMultiplex();
 
     if (query.next())
     {

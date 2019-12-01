@@ -211,12 +211,12 @@ void GroupTransition::Pulse(int interval)
 void TransitionBlend::Initialise()
 {
     // Fade out prev image
-    Animation *oldPic = new Animation(m_prev, Animation::Alpha);
+    auto *oldPic = new Animation(m_prev, Animation::Alpha);
     oldPic->Set(255, 0, m_duration, QEasingCurve::InOutQuad);
     m_animation->Add(oldPic);
 
     // Fade in next image
-    Animation *newPic = new Animation(m_next, Animation::Alpha);
+    auto *newPic = new Animation(m_next, Animation::Alpha);
     newPic->Set(0, 255, m_duration, QEasingCurve::InOutQuad);
     m_animation->Add(newPic);
 
@@ -241,12 +241,12 @@ void TransitionBlend::Finalise()
 void TransitionTwist::Initialise()
 {
     // Reduce hzoom of left image to nothing
-    Animation *oldPic = new Animation(m_prev, Animation::HorizontalZoom);
+    auto *oldPic = new Animation(m_prev, Animation::HorizontalZoom);
     oldPic->Set(1.0, 0.0, m_duration / 2, QEasingCurve::InQuart);
     m_animation->Add(oldPic);
 
     // Increase hzoom of right image from nothing to full
-    Animation *newPic = new Animation(m_next, Animation::HorizontalZoom);
+    auto *newPic = new Animation(m_next, Animation::HorizontalZoom);
     newPic->Set(0.0, 1.0, m_duration / 2, QEasingCurve::OutQuart);
     m_animation->Add(newPic);
 
@@ -274,12 +274,12 @@ void TransitionSlide::Initialise()
     int width = m_old->GetArea().width();
 
     // Slide off to left
-    Animation *oldPic = new Animation(m_prev, Animation::Position);
+    auto *oldPic = new Animation(m_prev, Animation::Position);
     oldPic->Set(QPoint(0, 0), QPoint(-width, 0), m_duration, QEasingCurve::InOutQuart);
     m_animation->Add(oldPic);
 
     // Slide in from right
-    Animation *newPic = new Animation(m_next, Animation::Position);
+    auto *newPic = new Animation(m_next, Animation::Position);
     newPic->Set(QPoint(width, 0), QPoint(0, 0), m_duration, QEasingCurve::InOutQuart);
     m_animation->Add(newPic);
 
@@ -307,21 +307,21 @@ void TransitionZoom::Initialise()
     int width = m_old->GetArea().width();
 
     // Zoom away to left
-    Animation *oldZoom = new Animation(m_prev, Animation::Zoom);
+    auto *oldZoom = new Animation(m_prev, Animation::Zoom);
     oldZoom->Set(1.0, 0.0, m_duration, QEasingCurve::OutQuad);
     m_animation->Add(oldZoom);
 
-    Animation *oldMove = new Animation(m_prev, Animation::Position);
+    auto *oldMove = new Animation(m_prev, Animation::Position);
     oldMove->Set(QPoint(0, 0), QPoint(-width / 2, 0), m_duration,
                  QEasingCurve::InQuad);
     m_animation->Add(oldMove);
 
     // Zoom in from right
-    Animation *newZoom = new Animation(m_next, Animation::Zoom);
+    auto *newZoom = new Animation(m_next, Animation::Zoom);
     newZoom->Set(0.0, 1.0, m_duration, QEasingCurve::InQuad);
     m_animation->Add(newZoom);
 
-    Animation *newMove = new Animation(m_next, Animation::Position);
+    auto *newMove = new Animation(m_next, Animation::Position);
     newMove->Set(QPoint(width / 2, 0), QPoint(0, 0), m_duration,
                  QEasingCurve::OutQuad);
     m_animation->Add(newMove);
@@ -352,7 +352,7 @@ void TransitionSpin::Initialise()
     TransitionBlend::Initialise();
 
     // Add simultaneous spin
-    Animation *an = new Animation(m_prev, Animation::Angle);
+    auto *an = new Animation(m_prev, Animation::Angle);
     an->Set(0.0, 360.1, m_duration, QEasingCurve::InOutQuad);
     m_animation->Add(an);
 
@@ -361,7 +361,7 @@ void TransitionSpin::Initialise()
     m_animation->Add(an);
 
     // Zoom prev away, then back
-    SequentialAnimation *seq = new SequentialAnimation();
+    auto *seq = new SequentialAnimation();
     m_animation->Add(seq);
 
     an = new Animation(m_prev, Animation::Zoom);

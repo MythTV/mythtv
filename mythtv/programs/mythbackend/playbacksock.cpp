@@ -420,7 +420,7 @@ ProgramInfo *PlaybackSock::GetRecording(uint cardid)
     if (!SendReceiveStringList(strlist))
         return nullptr;
 
-    ProgramInfo *pginfo = new ProgramInfo(strlist);
+    auto *pginfo = new ProgramInfo(strlist);
     if (!pginfo->HasPathname() && !pginfo->GetChanID())
     {
         delete pginfo;

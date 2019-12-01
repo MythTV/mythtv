@@ -66,13 +66,12 @@ static int RunCCExtract(ProgramInfo &program_info, const QString & destdir)
         tmprbuf->SetWaitForWrite();
     }
 
-    PlayerFlags flags = (PlayerFlags)(kVideoIsNull | kAudioMuted  |
-                                      kDecodeNoLoopFilter | kDecodeFewBlocks |
-                                      kDecodeLowRes | kDecodeSingleThreaded |
-                                      kDecodeNoDecode);
-    MythCCExtractorPlayer *ccp = new MythCCExtractorPlayer(flags, true,
-                                                           filename, destdir);
-    PlayerContext *ctx = new PlayerContext(kCCExtractorInUseID);
+    auto flags = (PlayerFlags)(kVideoIsNull | kAudioMuted  |
+                               kDecodeNoLoopFilter | kDecodeFewBlocks |
+                               kDecodeLowRes | kDecodeSingleThreaded |
+                               kDecodeNoDecode);
+    auto *ccp = new MythCCExtractorPlayer(flags, true, filename, destdir);
+    auto *ctx = new PlayerContext(kCCExtractorInUseID);
     ctx->SetPlayingInfo(&program_info);
     ctx->SetRingBuffer(tmprbuf);
     ctx->SetPlayer(ccp);

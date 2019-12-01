@@ -65,7 +65,7 @@ void BackendConnectionManager::customEvent(QEvent *event)
 
     if (event->type() == MythEvent::MythEventMessage)
     {
-        MythEvent *me = static_cast<MythEvent *>(event);
+        auto *me = static_cast<MythEvent *>(event);
         const QString& message = me->Message();
 
         if (message == "BACKEND_SOCKETS_CLOSED")

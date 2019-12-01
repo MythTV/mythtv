@@ -82,7 +82,7 @@ void StartPrompter::backendRunningPrompt(void)
         warning += tr("Recording Status: None.");
     }
 
-    MythDialogBox *dia = new MythDialogBox(warning, m_d->m_stk, "actionmenu");
+    auto *dia = new MythDialogBox(warning, m_d->m_stk, "actionmenu");
 
     if (!dia->Create())
     {

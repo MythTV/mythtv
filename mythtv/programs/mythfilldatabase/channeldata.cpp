@@ -137,7 +137,7 @@ ChannelList ChannelData::channelList(int sourceId)
                                                 ChannelUtil::kChanGroupByChanid,
                                                 sourceId);
 
-    ChannelInfoList::iterator it = channelList.begin();
+    auto it = channelList.begin();
     for ( ; it != channelList.end(); ++it)
     {
         QString chanName = (*it).m_name;
@@ -202,7 +202,7 @@ void ChannelData::handleChannels(int id, ChannelInfoList *chanlist)
 
     bool insertChan = insert_chan(id);  // unscannable source
 
-    ChannelInfoList::iterator i = chanlist->begin();
+    auto i = chanlist->begin();
     for (; i != chanlist->end(); ++i)
     {
         if ((*i).m_xmltvid.isEmpty())

@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
 
     MythTranslation::load("mythfrontend");
 
-    LookerUpper *lookup = new LookerUpper();
+    auto *lookup = new LookerUpper();
 
     LOG(VB_GENERAL, LOG_INFO,
             "Testing grabbers and metadata sites for functionality...");

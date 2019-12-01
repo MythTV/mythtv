@@ -168,8 +168,7 @@ void AudioSetupWizard::Init(void)
          it != m_outputlist->end(); ++it)
     {
         QString name = it->m_name;
-        MythUIButtonListItem *output =
-                new MythUIButtonListItem(m_audioDeviceButtonList, name);
+        auto *output = new MythUIButtonListItem(m_audioDeviceButtonList, name);
         output->SetData(name);
     }
     if (found)
@@ -269,7 +268,7 @@ AudioOutputSettings AudioSetupWizard::UpdateCapabilities(bool restore, bool AC3)
             {
                 case 2:
                 {
-                    MythUIButtonListItem *stereo =
+                    auto *stereo =
                         new MythUIButtonListItem(m_speakerNumberButtonList,
                                                  QObject::tr("Stereo"));
                     stereo->SetData(2);
@@ -277,7 +276,7 @@ AudioOutputSettings AudioSetupWizard::UpdateCapabilities(bool restore, bool AC3)
                 }
                 case 6:
                 {
-                    MythUIButtonListItem *sixchan =
+                    auto *sixchan =
                         new MythUIButtonListItem(m_speakerNumberButtonList,
                                                  QObject::tr("5.1 Channel Audio"));
                     sixchan->SetData(6);
@@ -285,7 +284,7 @@ AudioOutputSettings AudioSetupWizard::UpdateCapabilities(bool restore, bool AC3)
                 }
                 case 8:
                 {
-                    MythUIButtonListItem *eightchan =
+                    auto *eightchan =
                         new MythUIButtonListItem(m_speakerNumberButtonList,
                                                  QObject::tr("7.1 Channel Audio"));
                     eightchan->SetData(8);
@@ -336,8 +335,8 @@ void AudioSetupWizard::slotNext(void)
     save();
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    VideoSetupWizard *sw = new VideoSetupWizard(mainStack, m_generalScreen,
-                                                this, "videosetupwizard");
+    auto *sw = new VideoSetupWizard(mainStack, m_generalScreen,
+                                    this, "videosetupwizard");
 
     if (sw->Create())
     {

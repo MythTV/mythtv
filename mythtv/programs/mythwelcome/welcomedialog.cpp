@@ -140,7 +140,7 @@ void WelcomeDialog::customEvent(QEvent *e)
 {
     if (e->type() == MythEvent::MythEventMessage)
     {
-        MythEvent *me = static_cast<MythEvent *>(e);
+        auto *me = static_cast<MythEvent *>(e);
 
         if (me->Message().startsWith("RECORDING_LIST_CHANGE") ||
             me->Message() == "UPDATE_PROG_INFO")
@@ -215,8 +215,7 @@ void WelcomeDialog::customEvent(QEvent *e)
 void WelcomeDialog::ShowSettings(GroupSetting *screen)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    StandardSettingDialog *ssd = new StandardSettingDialog(mainStack, "settings",
-                                                           screen);
+    auto *ssd = new StandardSettingDialog(mainStack, "settings", screen);
     if (ssd->Create())
         mainStack->AddScreen(ssd);
     else

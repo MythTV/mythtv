@@ -454,7 +454,7 @@ void CustomPriority::testSchedule(void)
         ltitle = m_titleEdit->GetText();
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    ViewScheduleDiff *vsd = new ViewScheduleDiff(mainStack, ttable, 0, ltitle);
+    auto *vsd = new ViewScheduleDiff(mainStack, ttable, 0, ltitle);
 
     if (vsd->Create())
         mainStack->AddScreen(vsd);

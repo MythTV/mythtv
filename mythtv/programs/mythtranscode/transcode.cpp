@@ -204,7 +204,7 @@ static bool get_bool_option(RecordingProfile *profile, const QString &name)
 static void TranscodeWriteText(void *ptr, unsigned char *buf, int len,
                                int timecode, int pagenr)
 {
-    NuppelVideoRecorder *nvr = (NuppelVideoRecorder *)ptr;
+    auto *nvr = (NuppelVideoRecorder *)ptr;
     nvr->WriteText(buf, len, timecode, pagenr);
 }
 #endif // CONFIG_LIBMP3LAME
@@ -264,7 +264,7 @@ int Transcode::TranscodeFile(const QString &inputname,
     }
 
     // Input setup
-    PlayerContext *player_ctx = new PlayerContext(kTranscoderInUseID);
+    auto *player_ctx = new PlayerContext(kTranscoderInUseID);
     player_ctx->SetPlayingInfo(m_proginfo);
     RingBuffer *rb = (hls && (hlsStreamID != -1)) ?
         RingBuffer::Create(hls->GetSourceFile(), false, false) :
@@ -1078,7 +1078,7 @@ int Transcode::TranscodeFile(const QString &inputname,
     else
         LOG(VB_GENERAL, LOG_INFO, "Transcoding Video and Audio");
 
-    VideoDecodeBuffer *videoBuffer =
+    auto *videoBuffer =
         new VideoDecodeBuffer(GetPlayer(), videoOutput, honorCutList);
     MThreadPool::globalInstance()->start(videoBuffer, "VideoDecodeBuffer");
 
@@ -1405,7 +1405,7 @@ int Transcode::TranscodeFile(const QString &inputname,
             AudioBuffer *ab = nullptr;
             while ((ab = arb->GetData(lastWrittenTime)) != nullptr)
             {
-                unsigned char *buf = (unsigned char *)ab->data();
+                auto *buf = (unsigned char *)ab->data();
                 if (avfMode)
                 {
                     if (did_ff != 1)

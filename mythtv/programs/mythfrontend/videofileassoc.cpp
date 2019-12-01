@@ -123,8 +123,7 @@ namespace
 
         ~BlockSignalsGuard()
         {
-            for (list_type::iterator p = m_objects.begin();
-                    p != m_objects.end(); ++p)
+            for (auto p = m_objects.begin(); p != m_objects.end(); ++p)
             {
                 (*p)->blockSignals(false);
             }
@@ -176,7 +175,7 @@ class FileAssocDialogPrivate
 
     ~FileAssocDialogPrivate()
     {
-        for (FA_collection::iterator p = m_fileAssociations.begin();
+        for (auto p = m_fileAssociations.begin();
                 p != m_fileAssociations.end(); ++p)
         {
             delete p->second;
@@ -185,7 +184,7 @@ class FileAssocDialogPrivate
 
    void SaveFileAssociations()
    {
-        for (FA_collection::iterator p = m_fileAssociations.begin();
+        for (auto p = m_fileAssociations.begin();
                 p != m_fileAssociations.end(); ++p)
         {
             p->second->CommitChanges();
@@ -207,7 +206,7 @@ class FileAssocDialogPrivate
 
     bool DeleteExtension(UIDToFAPair::UID_type uid)
     {
-        FA_collection::iterator p = m_fileAssociations.find(uid);
+        auto p = m_fileAssociations.find(uid);
         if (p != m_fileAssociations.end())
         {
             p->second->MarkForDeletion();
@@ -224,7 +223,7 @@ class FileAssocDialogPrivate
         UIReadyList_type ret;
         std::transform(m_fileAssociations.begin(), m_fileAssociations.end(),
                 std::back_inserter(ret), fa_col_ent_2_UIDFAPair());
-        UIReadyList_type::iterator deleted = std::remove_if(ret.begin(),
+        auto deleted = std::remove_if(ret.begin(),
                 ret.end(), test_fa_state<FileAssociationWrap::efsDELETE>());
 
         if (deleted != ret.end())
@@ -291,8 +290,7 @@ class FileAssocDialogPrivate
         tmp_fa_list tmp_fa;
         tmp_fa.reserve(fa_list.size());
 
-        for (FileAssociations::association_list::const_iterator p =
-                fa_list.begin(); p != fa_list.end(); ++p)
+        for (auto p = fa_list.cbegin(); p != fa_list.cend(); ++p)
         {
             tmp_fa.push_back(UIDToFAPair(++m_nextFAID,
                             new FileAssociationWrap(*p)));
@@ -442,8 +440,7 @@ void FileAssocDialog::OnNewExtensionPressed()
 
     QString message = tr("Enter the new extension:");
 
-    MythTextInputDialog *newextdialog =
-                                new MythTextInputDialog(popupStack, message);
+    auto *newextdialog = new MythTextInputDialog(popupStack, message);
 
     if (newextdialog->Create())
         popupStack->AddScreen(newextdialog);
@@ -500,15 +497,13 @@ void FileAssocDialog::UpdateScreen(bool useSelectionOverride /* = false*/)
         m_extensionList->SetVisible(true);
         m_extensionList->Reset();
 
-        for (FileAssocDialogPrivate::UIReadyList_type::iterator p =
-                tmp_list.begin(); p != tmp_list.end(); ++p)
+        for (auto p = tmp_list.begin(); p != tmp_list.end(); ++p)
         {
             if (p->m_fileAssoc)
             {
                 // No memory leak. MythUIButtonListItem adds the new
                 // item into m_extensionList.
-                MythUIButtonListItem *new_item =
-                        new MythUIButtonListItem(m_extensionList,
+                auto *new_item = new MythUIButtonListItem(m_extensionList,
                                 p->m_fileAssoc->GetExtension(),
                                 QVariant::fromValue(*p));
                 if (selected_id && p->m_uid == selected_id)

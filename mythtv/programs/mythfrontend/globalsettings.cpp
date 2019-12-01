@@ -56,7 +56,7 @@
 static HostSpinBoxSetting *AudioReadAhead()
 // was previously *DecodeExtraAudio()
 {
-    HostSpinBoxSetting *gc = new HostSpinBoxSetting("AudioReadAhead",0,5000,10,10);
+    auto *gc = new HostSpinBoxSetting("AudioReadAhead",0,5000,10,10);
 
     gc->setLabel(PlaybackSettings::tr("Audio read ahead (ms)"));
 
@@ -72,7 +72,7 @@ static HostSpinBoxSetting *AudioReadAhead()
 
 static HostCheckBoxSetting *ChromaUpsampling()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("ChromaUpsamplingFilter");
+    auto *gc = new HostCheckBoxSetting("ChromaUpsamplingFilter");
     gc->setLabel(PlaybackSettings::tr("Enable Chroma Upsampling Filter when deinterlacing"));
     gc->setHelpText(PlaybackSettings::tr(
         "The 'Chroma upsampling error' affects the quality of interlaced material "
@@ -87,7 +87,7 @@ static HostCheckBoxSetting *ChromaUpsampling()
 #ifdef USING_VAAPI
 static HostTextEditSetting *VAAPIDevice()
 {
-    HostTextEditSetting *ge = new HostTextEditSetting("VAAPIDevice");
+    auto *ge = new HostTextEditSetting("VAAPIDevice");
 
     ge->setLabel(MainGeneralSettings::tr("Decoder Device for VAAPI hardware decoding"));
 
@@ -114,7 +114,7 @@ static HostTextEditSetting *VAAPIDevice()
 
 static HostCheckBoxSetting *PlaybackAVSync2()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("PlaybackAVSync2");
+    auto *gc = new HostCheckBoxSetting("PlaybackAVSync2");
 
     gc->setLabel(PlaybackSettings::tr("Enable new timestamp based playback speed (AVSync2)"));
 
@@ -129,7 +129,7 @@ static HostCheckBoxSetting *PlaybackAVSync2()
 static HostSpinBoxSetting *AVSync2AdjustMS()
 // was previously *DecodeExtraAudio()
 {
-    HostSpinBoxSetting *gc = new HostSpinBoxSetting("AVSync2AdjustMS",1,40,1,1);
+    auto *gc = new HostSpinBoxSetting("AVSync2AdjustMS",1,40,1,1);
 
     gc->setLabel(PlaybackSettings::tr("AVSync2 audio correction (ms)"));
 
@@ -160,7 +160,7 @@ static HostCheckBoxSetting *FFmpegDemuxer()
 
 static HostComboBoxSetting *PIPLocationComboBox()
 {
-    HostComboBoxSetting *gc = new HostComboBoxSetting("PIPLocation");
+    auto *gc = new HostComboBoxSetting("PIPLocation");
 
     gc->setLabel(PlaybackSettings::tr("PIP video location"));
 
@@ -174,7 +174,7 @@ static HostComboBoxSetting *PIPLocationComboBox()
 
 static HostComboBoxSetting *DisplayRecGroup()
 {
-    HostComboBoxSetting *gc = new HostComboBoxSetting("DisplayRecGroup");
+    auto *gc = new HostComboBoxSetting("DisplayRecGroup");
 
     gc->setLabel(PlaybackSettings::tr("Default group filter to apply"));
 
@@ -216,7 +216,7 @@ static HostComboBoxSetting *DisplayRecGroup()
 
 static HostCheckBoxSetting *QueryInitialFilter()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("QueryInitialFilter");
+    auto *gc = new HostCheckBoxSetting("QueryInitialFilter");
 
     gc->setLabel(PlaybackSettings::tr("Always prompt for initial group "
                                       "filter"));
@@ -232,7 +232,7 @@ static HostCheckBoxSetting *QueryInitialFilter()
 
 static HostCheckBoxSetting *RememberRecGroup()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("RememberRecGroup");
+    auto *gc = new HostCheckBoxSetting("RememberRecGroup");
 
     gc->setLabel(PlaybackSettings::tr("Save current group filter when "
                                       "changed"));
@@ -249,7 +249,7 @@ static HostCheckBoxSetting *RememberRecGroup()
 
 static HostCheckBoxSetting *RecGroupMod()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("RecGroupsFocusable");
+    auto *gc = new HostCheckBoxSetting("RecGroupsFocusable");
 
     gc->setLabel(PlaybackSettings::tr("Change Recording Group using the arrow "
                                       "keys"));
@@ -267,7 +267,7 @@ static HostCheckBoxSetting *RecGroupMod()
 
 static HostCheckBoxSetting *PBBStartInTitle()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("PlaybackBoxStartInTitle");
+    auto *gc = new HostCheckBoxSetting("PlaybackBoxStartInTitle");
 
     gc->setLabel(PlaybackSettings::tr("Start in group list"));
 
@@ -281,7 +281,7 @@ static HostCheckBoxSetting *PBBStartInTitle()
 
 static HostCheckBoxSetting *SmartForward()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("SmartForward");
+    auto *gc = new HostCheckBoxSetting("SmartForward");
 
     gc->setLabel(PlaybackSettings::tr("Smart fast forwarding"));
 
@@ -295,7 +295,7 @@ static HostCheckBoxSetting *SmartForward()
 
 static GlobalComboBoxSetting *CommercialSkipMethod()
 {
-    GlobalComboBoxSetting *bc = new GlobalComboBoxSetting("CommercialSkipMethod");
+    auto *bc = new GlobalComboBoxSetting("CommercialSkipMethod");
 
     bc->setLabel(GeneralSettings::tr("Commercial detection method"));
 
@@ -313,7 +313,7 @@ static GlobalComboBoxSetting *CommercialSkipMethod()
 
 static GlobalCheckBoxSetting *CommFlagFast()
 {
-    GlobalCheckBoxSetting *gc = new GlobalCheckBoxSetting("CommFlagFast");
+    auto *gc = new GlobalCheckBoxSetting("CommFlagFast");
 
     gc->setLabel(GeneralSettings::tr("Enable experimental speedup of "
                                      "commercial detection"));
@@ -327,7 +327,7 @@ static GlobalCheckBoxSetting *CommFlagFast()
 
 static HostComboBoxSetting *AutoCommercialSkip()
 {
-    HostComboBoxSetting *gc = new HostComboBoxSetting("AutoCommercialSkip");
+    auto *gc = new HostComboBoxSetting("AutoCommercialSkip");
 
     gc->setLabel(PlaybackSettings::tr("Automatically skip commercials"));
 
@@ -348,7 +348,7 @@ static HostComboBoxSetting *AutoCommercialSkip()
 
 static GlobalSpinBoxSetting *DeferAutoTranscodeDays()
 {
-    GlobalSpinBoxSetting *gs = new GlobalSpinBoxSetting("DeferAutoTranscodeDays", 0, 365, 1);
+    auto *gs = new GlobalSpinBoxSetting("DeferAutoTranscodeDays", 0, 365, 1);
 
     gs->setLabel(GeneralSettings::tr("Deferral days for auto transcode jobs"));
 
@@ -364,7 +364,7 @@ static GlobalSpinBoxSetting *DeferAutoTranscodeDays()
 
 static GlobalCheckBoxSetting *AggressiveCommDetect()
 {
-    GlobalCheckBoxSetting *bc = new GlobalCheckBoxSetting("AggressiveCommDetect");
+    auto *bc = new GlobalCheckBoxSetting("AggressiveCommDetect");
 
     bc->setLabel(GeneralSettings::tr("Strict commercial detection"));
 
@@ -378,7 +378,7 @@ static GlobalCheckBoxSetting *AggressiveCommDetect()
 
 static HostSpinBoxSetting *CommRewindAmount()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("CommRewindAmount", 0, 10, 1);
+    auto *gs = new HostSpinBoxSetting("CommRewindAmount", 0, 10, 1);
 
     gs->setLabel(PlaybackSettings::tr("Commercial skip automatic rewind amount "
                                       "(secs)"));
@@ -394,7 +394,7 @@ static HostSpinBoxSetting *CommRewindAmount()
 
 static HostSpinBoxSetting *CommNotifyAmount()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("CommNotifyAmount", 0, 10, 1);
+    auto *gs = new HostSpinBoxSetting("CommNotifyAmount", 0, 10, 1);
 
     gs->setLabel(PlaybackSettings::tr("Commercial skip notify amount (secs)"));
 
@@ -411,7 +411,7 @@ static HostSpinBoxSetting *CommNotifyAmount()
 
 static GlobalSpinBoxSetting *MaximumCommercialSkip()
 {
-    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("MaximumCommercialSkip", 0, 3600, 10);
+    auto *bs = new GlobalSpinBoxSetting("MaximumCommercialSkip", 0, 3600, 10);
 
     bs->setLabel(PlaybackSettings::tr("Maximum commercial skip (secs)"));
 
@@ -429,7 +429,7 @@ static GlobalSpinBoxSetting *MaximumCommercialSkip()
 
 static GlobalSpinBoxSetting *MergeShortCommBreaks()
 {
-    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("MergeShortCommBreaks", 0, 3600, 5);
+    auto *bs = new GlobalSpinBoxSetting("MergeShortCommBreaks", 0, 3600, 5);
 
     bs->setLabel(PlaybackSettings::tr("Merge short commercial breaks (secs)"));
 
@@ -447,7 +447,7 @@ static GlobalSpinBoxSetting *MergeShortCommBreaks()
 
 static GlobalSpinBoxSetting *AutoExpireExtraSpace()
 {
-    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("AutoExpireExtraSpace", 0, 200, 1);
+    auto *bs = new GlobalSpinBoxSetting("AutoExpireExtraSpace", 0, 200, 1);
 
     bs->setLabel(GeneralSettings::tr("Extra disk space (GB)"));
 
@@ -479,7 +479,7 @@ static GlobalCheckBoxSetting *AutoExpireInsteadOfDelete()
 
 static GlobalSpinBoxSetting *DeletedMaxAge()
 {
-    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("DeletedMaxAge", -1, 365, 1);
+    auto *bs = new GlobalSpinBoxSetting("DeletedMaxAge", -1, 365, 1);
 
     bs->setLabel(GeneralSettings::tr("Time to retain deleted recordings "
                                      "(days)"));
@@ -525,7 +525,7 @@ class DeletedExpireOptions : public TriggeredConfigurationGroup
 
 static GlobalComboBoxSetting *AutoExpireMethod()
 {
-    GlobalComboBoxSetting *bc = new GlobalComboBoxSetting("AutoExpireMethod");
+    auto *bc = new GlobalComboBoxSetting("AutoExpireMethod");
 
     bc->setLabel(GeneralSettings::tr("Auto-Expire method"));
 
@@ -545,7 +545,7 @@ static GlobalComboBoxSetting *AutoExpireMethod()
 
 static GlobalCheckBoxSetting *AutoExpireWatchedPriority()
 {
-    GlobalCheckBoxSetting *bc = new GlobalCheckBoxSetting("AutoExpireWatchedPriority");
+    auto *bc = new GlobalCheckBoxSetting("AutoExpireWatchedPriority");
 
     bc->setLabel(GeneralSettings::tr("Watched before unwatched"));
 
@@ -560,7 +560,7 @@ static GlobalCheckBoxSetting *AutoExpireWatchedPriority()
 
 static GlobalSpinBoxSetting *AutoExpireDayPriority()
 {
-    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("AutoExpireDayPriority", 1, 400, 1);
+    auto *bs = new GlobalSpinBoxSetting("AutoExpireDayPriority", 1, 400, 1);
 
     bs->setLabel(GeneralSettings::tr("Priority weight"));
 
@@ -576,7 +576,7 @@ static GlobalSpinBoxSetting *AutoExpireDayPriority()
 
 static GlobalSpinBoxSetting *AutoExpireLiveTVMaxAge()
 {
-    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("AutoExpireLiveTVMaxAge", 1, 365, 1);
+    auto *bs = new GlobalSpinBoxSetting("AutoExpireLiveTVMaxAge", 1, 365, 1);
 
     bs->setLabel(GeneralSettings::tr("Live TV max age (days)"));
 
@@ -608,7 +608,7 @@ static GlobalSpinBoxSetting *MinRecordDiskThreshold()
 
 static GlobalCheckBoxSetting *RerecordWatched()
 {
-    GlobalCheckBoxSetting *bc = new GlobalCheckBoxSetting("RerecordWatched");
+    auto *bc = new GlobalCheckBoxSetting("RerecordWatched");
 
     bc->setLabel(GeneralSettings::tr("Re-record watched"));
 
@@ -623,7 +623,7 @@ static GlobalCheckBoxSetting *RerecordWatched()
 
 static GlobalSpinBoxSetting *RecordPreRoll()
 {
-    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("RecordPreRoll", 0, 600, 60, 1);
+    auto *bs = new GlobalSpinBoxSetting("RecordPreRoll", 0, 600, 60, 1);
 
     bs->setLabel(GeneralSettings::tr("Time to record before start of show "
                                      "(secs)"));
@@ -641,7 +641,7 @@ static GlobalSpinBoxSetting *RecordPreRoll()
 
 static GlobalSpinBoxSetting *RecordOverTime()
 {
-    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("RecordOverTime", 0, 1800, 60, 1);
+    auto *bs = new GlobalSpinBoxSetting("RecordOverTime", 0, 1800, 60, 1);
 
     bs->setLabel(GeneralSettings::tr("Time to record past end of show (secs)"));
 
@@ -658,7 +658,7 @@ static GlobalSpinBoxSetting *RecordOverTime()
 
 static GlobalComboBoxSetting *OverTimeCategory()
 {
-    GlobalComboBoxSetting *gc = new GlobalComboBoxSetting("OverTimeCategory");
+    auto *gc = new GlobalComboBoxSetting("OverTimeCategory");
 
     gc->setLabel(GeneralSettings::tr("Category of shows to be extended"));
 
@@ -688,8 +688,7 @@ static GlobalComboBoxSetting *OverTimeCategory()
 
 static GlobalSpinBoxSetting *CategoryOverTime()
 {
-    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("CategoryOverTime",
-                                          0, 180, 60, 1);
+    auto *bs = new GlobalSpinBoxSetting("CategoryOverTime", 0, 180, 60, 1);
 
     bs->setLabel(GeneralSettings::tr("Record past end of show (mins)"));
 
@@ -706,7 +705,7 @@ static GlobalSpinBoxSetting *CategoryOverTime()
 
 static GroupSetting *CategoryOverTimeSettings()
 {
-    GroupSetting *vcg = new GroupSetting();
+    auto *vcg = new GroupSetting();
 
     vcg->setLabel(GeneralSettings::tr("Category record over-time"));
 
@@ -1129,8 +1128,7 @@ void PlaybackProfileItemConfig::ShowDeleteDialog()
 {
     QString message = tr("Remove this profile item?");
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythConfirmationDialog *confirmDelete =
-        new MythConfirmationDialog(popupStack, message, true);
+    auto *confirmDelete = new MythConfirmationDialog(popupStack, message, true);
 
     if (confirmDelete->Create())
     {
@@ -1213,8 +1211,7 @@ void PlaybackProfileConfig::InitUI(StandardSetting *parent)
 StandardSetting * PlaybackProfileConfig::InitProfileItem(
     uint i, StandardSetting *parent)
 {
-    PlaybackProfileItemConfig* ppic =
-        new PlaybackProfileItemConfig(this, i, m_items[i]);
+    auto *ppic = new PlaybackProfileItemConfig(this, i, m_items[i]);
 
     m_items[i].Set("pref_priority", QString::number(i + 1));
 
@@ -1327,8 +1324,7 @@ void PlaybackProfileConfig::swap(int indexA, int indexB)
 
 static HostComboBoxSetting * CurrentPlaybackProfile()
 {
-    HostComboBoxSetting *grouptrigger =
-        new HostComboBoxSetting("DefaultVideoPlaybackProfile");
+    auto *grouptrigger = new HostComboBoxSetting("DefaultVideoPlaybackProfile");
     grouptrigger->setLabel(
         QCoreApplication::translate("PlaybackProfileConfigs",
                                     "Current Video Playback Profile"));
@@ -1362,8 +1358,7 @@ void PlaybackSettings::NewPlaybackProfileSlot()
     MythScreenStack *popupStack =
         GetMythMainWindow()->GetStack("popup stack");
 
-    MythTextInputDialog *settingdialog =
-        new MythTextInputDialog(popupStack, msg);
+    auto *settingdialog = new MythTextInputDialog(popupStack, msg);
 
     if (settingdialog->Create())
     {
@@ -1418,7 +1413,7 @@ static HostComboBoxSetting *PlayBoxOrdering()
                                         "titles. Sections in parentheses are "
                                         "not affected.");
 
-    HostComboBoxSetting *gc = new HostComboBoxSetting("PlayBoxOrdering");
+    auto *gc = new HostComboBoxSetting("PlayBoxOrdering");
 
     gc->setLabel(PlaybackSettings::tr("Episode sort orderings"));
 
@@ -1433,7 +1428,7 @@ static HostComboBoxSetting *PlayBoxOrdering()
 
 static HostComboBoxSetting *PlayBoxEpisodeSort()
 {
-    HostComboBoxSetting *gc = new HostComboBoxSetting("PlayBoxEpisodeSort");
+    auto *gc = new HostComboBoxSetting("PlayBoxEpisodeSort");
 
     gc->setLabel(PlaybackSettings::tr("Sort episodes"));
 
@@ -1450,7 +1445,7 @@ static HostComboBoxSetting *PlayBoxEpisodeSort()
 
 static HostSpinBoxSetting *FFRewReposTime()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("FFRewReposTime", 0, 200, 5);
+    auto *gs = new HostSpinBoxSetting("FFRewReposTime", 0, 200, 5);
 
     gs->setLabel(PlaybackSettings::tr("Fast forward/rewind reposition amount"));
 
@@ -1469,7 +1464,7 @@ static HostSpinBoxSetting *FFRewReposTime()
 
 static HostCheckBoxSetting *FFRewReverse()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("FFRewReverse");
+    auto *gc = new HostCheckBoxSetting("FFRewReverse");
 
     gc->setLabel(PlaybackSettings::tr("Reverse direction in fast "
                                       "forward/rewind"));
@@ -1488,7 +1483,7 @@ static HostCheckBoxSetting *FFRewReverse()
 
 static HostComboBoxSetting *MenuTheme()
 {
-    HostComboBoxSetting *gc = new HostComboBoxSetting("MenuTheme");
+    auto *gc = new HostComboBoxSetting("MenuTheme");
 
     gc->setLabel(AppearanceSettings::tr("Menu theme"));
 
@@ -1532,7 +1527,7 @@ static HostComboBoxSetting *DecodeVBIFormat()
 
 static HostComboBoxSetting *SubtitleCodec()
 {
-    HostComboBoxSetting *gc = new HostComboBoxSetting("SubtitleCodec");
+    auto *gc = new HostComboBoxSetting("SubtitleCodec");
 
     gc->setLabel(OSDSettings::tr("Subtitle Codec"));
 
@@ -1549,7 +1544,7 @@ static HostComboBoxSetting *SubtitleCodec()
 
 static HostComboBoxSetting *ChannelOrdering()
 {
-    HostComboBoxSetting *gc = new HostComboBoxSetting("ChannelOrdering");
+    auto *gc = new HostComboBoxSetting("ChannelOrdering");
 
     gc->setLabel(GeneralSettings::tr("Channel ordering"));
 
@@ -1561,7 +1556,7 @@ static HostComboBoxSetting *ChannelOrdering()
 
 static HostSpinBoxSetting *VertScanPercentage()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("VertScanPercentage", -100, 100, 1);
+    auto *gs = new HostSpinBoxSetting("VertScanPercentage", -100, 100, 1);
 
     gs->setLabel(PlaybackSettings::tr("Vertical scaling"));
 
@@ -1575,7 +1570,7 @@ static HostSpinBoxSetting *VertScanPercentage()
 
 static HostSpinBoxSetting *HorizScanPercentage()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("HorizScanPercentage", -100, 100, 1);
+    auto *gs = new HostSpinBoxSetting("HorizScanPercentage", -100, 100, 1);
 
     gs->setLabel(PlaybackSettings::tr("Horizontal scaling"));
 
@@ -1589,7 +1584,7 @@ static HostSpinBoxSetting *HorizScanPercentage()
 
 static HostSpinBoxSetting *XScanDisplacement()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("XScanDisplacement", -50, 50, 1);
+    auto *gs = new HostSpinBoxSetting("XScanDisplacement", -50, 50, 1);
 
     gs->setLabel(PlaybackSettings::tr("Scan displacement (X)"));
 
@@ -1603,7 +1598,7 @@ static HostSpinBoxSetting *XScanDisplacement()
 
 static HostSpinBoxSetting *YScanDisplacement()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("YScanDisplacement", -50, 50, 1);
+    auto *gs = new HostSpinBoxSetting("YScanDisplacement", -50, 50, 1);
 
     gs->setLabel(PlaybackSettings::tr("Scan displacement (Y)"));
 
@@ -1617,7 +1612,7 @@ static HostSpinBoxSetting *YScanDisplacement()
 
 static HostCheckBoxSetting *DefaultCCMode()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("DefaultCCMode");
+    auto *gc = new HostCheckBoxSetting("DefaultCCMode");
 
     gc->setLabel(OSDSettings::tr("Always display closed captioning or "
                                  "subtitles"));
@@ -1634,7 +1629,7 @@ static HostCheckBoxSetting *DefaultCCMode()
 
 static HostCheckBoxSetting *EnableMHEG()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("EnableMHEG");
+    auto *gc = new HostCheckBoxSetting("EnableMHEG");
 
     gc->setLabel(OSDSettings::tr("Enable interactive TV"));
 
@@ -1649,7 +1644,7 @@ static HostCheckBoxSetting *EnableMHEG()
 
 static HostCheckBoxSetting *EnableMHEGic()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("EnableMHEGic");
+    auto *gc = new HostCheckBoxSetting("EnableMHEGic");
     gc->setLabel(OSDSettings::tr("Enable network access for interactive TV"));
     gc->setValue(true);
     gc->setHelpText(OSDSettings::tr("If enabled, interactive TV applications "
@@ -1661,7 +1656,7 @@ static HostCheckBoxSetting *EnableMHEGic()
 
 static HostCheckBoxSetting *PersistentBrowseMode()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("PersistentBrowseMode");
+    auto *gc = new HostCheckBoxSetting("PersistentBrowseMode");
 
     gc->setLabel(OSDSettings::tr("Always use browse mode in Live TV"));
 
@@ -1676,7 +1671,7 @@ static HostCheckBoxSetting *PersistentBrowseMode()
 
 static HostCheckBoxSetting *BrowseAllTuners()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("BrowseAllTuners");
+    auto *gc = new HostCheckBoxSetting("BrowseAllTuners");
 
     gc->setLabel(OSDSettings::tr("Browse all channels"));
 
@@ -1691,7 +1686,7 @@ static HostCheckBoxSetting *BrowseAllTuners()
 
 static HostCheckBoxSetting *ClearSavedPosition()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("ClearSavedPosition");
+    auto *gc = new HostCheckBoxSetting("ClearSavedPosition");
 
     gc->setLabel(PlaybackSettings::tr("Clear bookmark on playback"));
 
@@ -1708,7 +1703,7 @@ static HostCheckBoxSetting *ClearSavedPosition()
 
 static HostCheckBoxSetting *UseProgStartMark()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("UseProgStartMark");
+    auto *gc = new HostCheckBoxSetting("UseProgStartMark");
 
     gc->setLabel(PlaybackSettings::tr("Playback from start of program"));
 
@@ -1725,7 +1720,7 @@ static HostCheckBoxSetting *UseProgStartMark()
 
 static HostComboBoxSetting *PlaybackExitPrompt()
 {
-    HostComboBoxSetting *gc = new HostComboBoxSetting("PlaybackExitPrompt");
+    auto *gc = new HostComboBoxSetting("PlaybackExitPrompt");
 
     gc->setLabel(PlaybackSettings::tr("Action on playback exit"));
 
@@ -1748,7 +1743,7 @@ static HostComboBoxSetting *PlaybackExitPrompt()
 
 static HostCheckBoxSetting *EndOfRecordingExitPrompt()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("EndOfRecordingExitPrompt");
+    auto *gc = new HostCheckBoxSetting("EndOfRecordingExitPrompt");
 
     gc->setLabel(PlaybackSettings::tr("Prompt at end of recording"));
 
@@ -1762,7 +1757,7 @@ static HostCheckBoxSetting *EndOfRecordingExitPrompt()
 
 static HostCheckBoxSetting *MusicChoiceEnabled()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("MusicChoiceEnabled");
+    auto *gc = new HostCheckBoxSetting("MusicChoiceEnabled");
 
     gc->setLabel(PlaybackSettings::tr("Enable Music Choice"));
 
@@ -1779,7 +1774,7 @@ static HostCheckBoxSetting *MusicChoiceEnabled()
 
 static HostCheckBoxSetting *JumpToProgramOSD()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("JumpToProgramOSD");
+    auto *gc = new HostCheckBoxSetting("JumpToProgramOSD");
 
     gc->setLabel(PlaybackSettings::tr("Jump to program OSD"));
 
@@ -1796,7 +1791,7 @@ static HostCheckBoxSetting *JumpToProgramOSD()
 
 static HostCheckBoxSetting *ContinueEmbeddedTVPlay()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("ContinueEmbeddedTVPlay");
+    auto *gc = new HostCheckBoxSetting("ContinueEmbeddedTVPlay");
 
     gc->setLabel(PlaybackSettings::tr("Continue playback when embedded"));
 
@@ -1813,7 +1808,7 @@ static HostCheckBoxSetting *ContinueEmbeddedTVPlay()
 
 static HostCheckBoxSetting *AutomaticSetWatched()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("AutomaticSetWatched");
+    auto *gc = new HostCheckBoxSetting("AutomaticSetWatched");
 
     gc->setLabel(PlaybackSettings::tr("Automatically mark a recording as "
                                       "watched"));
@@ -1832,7 +1827,7 @@ static HostCheckBoxSetting *AutomaticSetWatched()
 
 static HostSpinBoxSetting *LiveTVIdleTimeout()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("LiveTVIdleTimeout", 0, 3600, 1);
+    auto *gs = new HostSpinBoxSetting("LiveTVIdleTimeout", 0, 3600, 1);
 
     gs->setLabel(PlaybackSettings::tr("Live TV idle timeout (mins)"));
 
@@ -1879,7 +1874,7 @@ static HostSpinBoxSetting *LiveTVIdleTimeout()
 
 static HostCheckBoxSetting *UseVirtualKeyboard()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("UseVirtualKeyboard");
+    auto *gc = new HostCheckBoxSetting("UseVirtualKeyboard");
 
     gc->setLabel(MainGeneralSettings::tr("Use line edit virtual keyboards"));
 
@@ -1895,7 +1890,7 @@ static HostCheckBoxSetting *UseVirtualKeyboard()
 
 static HostSpinBoxSetting *FrontendIdleTimeout()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("FrontendIdleTimeout", 0, 360, 5);
+    auto *gs = new HostSpinBoxSetting("FrontendIdleTimeout", 0, 360, 5);
 
     gs->setLabel(MainGeneralSettings::tr("Idle time before entering standby "
                                          "mode (minutes)"));
@@ -1919,7 +1914,7 @@ static HostSpinBoxSetting *FrontendIdleTimeout()
 
 static HostComboBoxSetting *OverrideExitMenu()
 {
-    HostComboBoxSetting *gc = new HostComboBoxSetting("OverrideExitMenu");
+    auto *gc = new HostComboBoxSetting("OverrideExitMenu");
 
     gc->setLabel(MainGeneralSettings::tr("Customize exit menu options"));
 
@@ -1943,7 +1938,7 @@ static HostComboBoxSetting *OverrideExitMenu()
 
 static HostTextEditSetting *RebootCommand()
 {
-    HostTextEditSetting *ge = new HostTextEditSetting("RebootCommand");
+    auto *ge = new HostTextEditSetting("RebootCommand");
 
     ge->setLabel(MainGeneralSettings::tr("Reboot command"));
 
@@ -1960,7 +1955,7 @@ static HostTextEditSetting *RebootCommand()
 
 static HostTextEditSetting *HaltCommand()
 {
-    HostTextEditSetting *ge = new HostTextEditSetting("HaltCommand");
+    auto *ge = new HostTextEditSetting("HaltCommand");
 
     ge->setLabel(MainGeneralSettings::tr("Halt command"));
 
@@ -1977,7 +1972,7 @@ static HostTextEditSetting *HaltCommand()
 
 static HostTextEditSetting *LircDaemonDevice()
 {
-    HostTextEditSetting *ge = new HostTextEditSetting("LircSocket");
+    auto *ge = new HostTextEditSetting("LircSocket");
 
     ge->setLabel(MainGeneralSettings::tr("LIRC daemon socket"));
 
@@ -1999,7 +1994,7 @@ static HostTextEditSetting *LircDaemonDevice()
 
 static HostTextEditSetting *ScreenShotPath()
 {
-    HostTextEditSetting *ge = new HostTextEditSetting("ScreenShotPath");
+    auto *ge = new HostTextEditSetting("ScreenShotPath");
 
     ge->setLabel(MainGeneralSettings::tr("Screen shot path"));
 
@@ -2014,7 +2009,7 @@ static HostTextEditSetting *ScreenShotPath()
 
 static HostTextEditSetting *SetupPinCode()
 {
-    HostTextEditSetting *ge = new HostTextEditSetting("SetupPinCode");
+    auto *ge = new HostTextEditSetting("SetupPinCode");
 
     ge->setLabel(MainGeneralSettings::tr("Setup PIN code"));
 
@@ -2033,7 +2028,7 @@ static HostTextEditSetting *SetupPinCode()
 
 static HostComboBoxSetting *XineramaScreen()
 {
-    HostComboBoxSetting *gc = new HostComboBoxSetting("XineramaScreen", false);
+    auto *gc = new HostComboBoxSetting("XineramaScreen", false);
 
     foreach (QScreen *qscreen, qGuiApp->screens())
     {
@@ -2055,7 +2050,7 @@ static HostComboBoxSetting *XineramaScreen()
 
 static HostComboBoxSetting *XineramaMonitorAspectRatio()
 {
-    HostComboBoxSetting *gc = new HostComboBoxSetting("XineramaMonitorAspectRatio");
+    auto *gc = new HostComboBoxSetting("XineramaMonitorAspectRatio");
 
     gc->setLabel(AppearanceSettings::tr("Monitor aspect ratio"));
 
@@ -2072,7 +2067,7 @@ static HostComboBoxSetting *XineramaMonitorAspectRatio()
 
 static HostComboBoxSetting *LetterboxingColour()
 {
-    HostComboBoxSetting *gc = new HostComboBoxSetting("LetterboxColour");
+    auto *gc = new HostComboBoxSetting("LetterboxColour");
 
     gc->setLabel(PlaybackSettings::tr("Letterboxing color"));
 
@@ -2090,7 +2085,7 @@ static HostComboBoxSetting *LetterboxingColour()
 
 static HostComboBoxSetting *AspectOverride()
 {
-    HostComboBoxSetting *gc = new HostComboBoxSetting("AspectOverride");
+    auto *gc = new HostComboBoxSetting("AspectOverride");
 
     gc->setLabel(PlaybackSettings::tr("Video aspect override"));
 
@@ -2105,7 +2100,7 @@ static HostComboBoxSetting *AspectOverride()
 
 static HostComboBoxSetting *AdjustFill()
 {
-    HostComboBoxSetting *gc = new HostComboBoxSetting("AdjustFill");
+    auto *gc = new HostComboBoxSetting("AdjustFill");
 
     gc->setLabel(PlaybackSettings::tr("Zoom"));
 
@@ -2126,7 +2121,7 @@ static HostComboBoxSetting *AdjustFill()
 
 static HostSpinBoxSetting *GuiWidth()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("GuiWidth", 0, 3840, 8, 1);
+    auto *gs = new HostSpinBoxSetting("GuiWidth", 0, 3840, 8, 1);
 
     gs->setLabel(AppearanceSettings::tr("GUI width (pixels)"));
 
@@ -2142,7 +2137,7 @@ static HostSpinBoxSetting *GuiWidth()
 
 static HostSpinBoxSetting *GuiHeight()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("GuiHeight", 0, 2160, 8, 1);
+    auto *gs = new HostSpinBoxSetting("GuiHeight", 0, 2160, 8, 1);
 
     gs->setLabel(AppearanceSettings::tr("GUI height (pixels)"));
 
@@ -2158,7 +2153,7 @@ static HostSpinBoxSetting *GuiHeight()
 
 static HostSpinBoxSetting *GuiOffsetX()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("GuiOffsetX", -3840, 3840, 32, 1);
+    auto *gs = new HostSpinBoxSetting("GuiOffsetX", -3840, 3840, 32, 1);
 
     gs->setLabel(AppearanceSettings::tr("GUI X offset"));
 
@@ -2172,7 +2167,7 @@ static HostSpinBoxSetting *GuiOffsetX()
 
 static HostSpinBoxSetting *GuiOffsetY()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("GuiOffsetY", -1600, 1600, 8, 1);
+    auto *gs = new HostSpinBoxSetting("GuiOffsetY", -1600, 1600, 8, 1);
 
     gs->setLabel(AppearanceSettings::tr("GUI Y offset"));
 
@@ -2217,7 +2212,7 @@ static HostSpinBoxSetting *DisplaySizeHeight()
 
 static HostCheckBoxSetting *GuiSizeForTV()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("GuiSizeForTV");
+    auto *gc = new HostCheckBoxSetting("GuiSizeForTV");
 
     gc->setLabel(AppearanceSettings::tr("Use GUI size for TV playback"));
 
@@ -2245,9 +2240,8 @@ static HostCheckBoxSetting *UseVideoModes()
 
 static HostSpinBoxSetting *VidModeWidth(int idx)
 {
-    HostSpinBoxSetting *gs =
-        new HostSpinBoxSetting(QString("VidModeWidth%1").arg(idx),
-                               0, 3840, 16, 1);
+    auto *gs = new HostSpinBoxSetting(QString("VidModeWidth%1").arg(idx),
+                                      0, 3840, 16, 1);
 
     gs->setLabel(VideoModeSettings::tr("In X", "Video mode width"));
 
@@ -2261,9 +2255,8 @@ static HostSpinBoxSetting *VidModeWidth(int idx)
 
 static HostSpinBoxSetting *VidModeHeight(int idx)
 {
-    HostSpinBoxSetting *gs =
-        new HostSpinBoxSetting(QString("VidModeHeight%1").arg(idx),
-                               0, 2160, 16, 1);
+    auto *gs = new HostSpinBoxSetting(QString("VidModeHeight%1").arg(idx),
+                                      0, 2160, 16, 1);
 
     gs->setLabel(VideoModeSettings::tr("In Y", "Video mode height"));
 
@@ -2277,7 +2270,7 @@ static HostSpinBoxSetting *VidModeHeight(int idx)
 
 static HostComboBoxSetting *GuiVidModeResolution()
 {
-    HostComboBoxSetting *gc = new HostComboBoxSetting("GuiVidModeResolution");
+    auto *gc = new HostComboBoxSetting("GuiVidModeResolution");
 
     gc->setLabel(VideoModeSettings::tr("GUI"));
 
@@ -2322,7 +2315,7 @@ static HostComboBoxSetting *TVVidModeResolution(int idx=-1)
 
     QString qstr = (idx<0) ? "TVVidModeResolution" :
         QString("TVVidModeResolution%1").arg(idx);
-    HostComboBoxSetting *gc = new HostComboBoxSetting(qstr);
+    auto *gc = new HostComboBoxSetting(qstr);
     QString lstr = (idx<0) ? VideoModeSettings::tr("Video output") :
         VideoModeSettings::tr("Output");
     QString hstr = (idx<0) ? dhelp : ohelp;
@@ -2414,8 +2407,7 @@ static HostRefreshRateComboBoxSetting *TVVidModeRefreshRate(int idx=-1)
 
     QString qstr = (idx<0) ? "TVVidModeRefreshRate" :
         QString("TVVidModeRefreshRate%1").arg(idx);
-    HostRefreshRateComboBoxSetting *gc =
-        new HostRefreshRateComboBoxSetting(qstr);
+    auto *gc = new HostRefreshRateComboBoxSetting(qstr);
     QString lstr = VideoModeSettings::tr("Rate");
     QString hstr = (idx<0) ? dhelp : ohelp;
 
@@ -2445,7 +2437,7 @@ static HostComboBoxSetting *TVVidModeForceAspect(int idx=-1)
     QString qstr = (idx<0) ? "TVVidModeForceAspect" :
         QString("TVVidModeForceAspect%1").arg(idx);
 
-    HostComboBoxSetting *gc = new HostComboBoxSetting(qstr);
+    auto *gc = new HostComboBoxSetting(qstr);
 
     gc->setLabel(VideoModeSettings::tr("Aspect"));
 
@@ -2468,7 +2460,7 @@ void VideoModeSettings::updateButton(MythUIButtonListItem *item)
 
 static HostSpinBoxSetting* VideoModeChangePause(void)
 {
-    HostSpinBoxSetting *pause = new HostSpinBoxSetting("VideoModeChangePauseMS", 0, 5000, 100);
+    auto *pause = new HostSpinBoxSetting("VideoModeChangePauseMS", 0, 5000, 100);
     pause->setLabel(VideoModeSettings::tr("Pause while switching video modes (ms)"));
     pause->setHelpText(VideoModeSettings::tr(
         "For most displays, switching video modes takes time and content can be missed. "
@@ -2492,7 +2484,7 @@ VideoModeSettings::VideoModeSettings(const char *c) : HostCheckBoxSetting(c)
     connect(res, SIGNAL(valueChanged(StandardSetting *)),
             rate, SLOT(ChangeResolution(StandardSetting *)));
 
-    GroupSetting* overrides = new GroupSetting();
+    auto *overrides = new GroupSetting();
 
     overrides->setLabel(tr("Overrides for specific video sizes"));
 
@@ -2516,7 +2508,7 @@ VideoModeSettings::VideoModeSettings(const char *c) : HostCheckBoxSetting(c)
 
 static HostCheckBoxSetting *HideMouseCursor()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("HideMouseCursor");
+    auto *gc = new HostCheckBoxSetting("HideMouseCursor");
 
     gc->setLabel(AppearanceSettings::tr("Hide mouse cursor in MythTV"));
 
@@ -2534,7 +2526,7 @@ static HostCheckBoxSetting *HideMouseCursor()
 
 static HostCheckBoxSetting *RunInWindow()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("RunFrontendInWindow");
+    auto *gc = new HostCheckBoxSetting("RunFrontendInWindow");
 
     gc->setLabel(AppearanceSettings::tr("Use window border"));
 
@@ -2547,7 +2539,7 @@ static HostCheckBoxSetting *RunInWindow()
 
 static HostCheckBoxSetting *AlwaysOnTop()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("AlwaysOnTop");
+    auto *gc = new HostCheckBoxSetting("AlwaysOnTop");
 
     gc->setLabel(AppearanceSettings::tr("Always On Top"));
 
@@ -2560,7 +2552,8 @@ static HostCheckBoxSetting *AlwaysOnTop()
 
 static HostSpinBoxSetting *StartupScreenDelay()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("StartupScreenDelay", -1, 60, 1, 1, "Never show startup screen");
+    auto *gs = new HostSpinBoxSetting("StartupScreenDelay", -1, 60, 1, 1,
+                                      "Never show startup screen");
 
     gs->setLabel(AppearanceSettings::tr("Startup Screen Delay"));
 
@@ -2575,8 +2568,7 @@ static HostSpinBoxSetting *StartupScreenDelay()
 
 static HostSpinBoxSetting *GUIFontZoom()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("GUITEXTZOOM",
-                                                    50, 150, 1, 1);
+    auto *gs = new HostSpinBoxSetting("GUITEXTZOOM", 50, 150, 1, 1);
 
     gs->setLabel(AppearanceSettings::tr("GUI text zoom percentage"));
 
@@ -2591,7 +2583,7 @@ static HostSpinBoxSetting *GUIFontZoom()
 
 static HostComboBoxSetting *MythDateFormatCB()
 {
-    HostComboBoxSetting *gc = new HostComboBoxSetting("DateFormat");
+    auto *gc = new HostComboBoxSetting("DateFormat");
     gc->setLabel(AppearanceSettings::tr("Date format"));
 
     QDate sampdate = MythDate::current().toLocalTime().date();
@@ -2645,7 +2637,7 @@ static HostComboBoxSetting *MythDateFormatCB()
 
 static HostComboBoxSetting *MythShortDateFormat()
 {
-    HostComboBoxSetting *gc = new HostComboBoxSetting("ShortDateFormat");
+    auto *gc = new HostComboBoxSetting("ShortDateFormat");
     gc->setLabel(AppearanceSettings::tr("Short date format"));
 
     QDate sampdate = MythDate::current().toLocalTime().date();
@@ -2698,7 +2690,7 @@ static HostComboBoxSetting *MythShortDateFormat()
 
 static HostComboBoxSetting *MythTimeFormat()
 {
-    HostComboBoxSetting *gc = new HostComboBoxSetting("TimeFormat");
+    auto *gc = new HostComboBoxSetting("TimeFormat");
 
     gc->setLabel(AppearanceSettings::tr("Time format"));
 
@@ -2726,7 +2718,7 @@ static HostComboBoxSetting *MythTimeFormat()
 #if ! CONFIG_DARWIN
 static HostComboBoxSetting *ThemePainter()
 {
-    HostComboBoxSetting *gc = new HostComboBoxSetting("ThemePainter");
+    auto *gc = new HostComboBoxSetting("ThemePainter");
 
     gc->setLabel(AppearanceSettings::tr("Paint engine"));
 
@@ -2757,7 +2749,7 @@ static HostComboBoxSetting *ThemePainter()
 
 static HostCheckBoxSetting *GUIRGBLevels()
 {
-    HostCheckBoxSetting *rgb = new HostCheckBoxSetting("GUIRGBLevels");
+    auto *rgb = new HostCheckBoxSetting("GUIRGBLevels");
     rgb->setLabel(AppearanceSettings::tr("Use full range RGB output"));
     rgb->setValue(true);
     rgb->setHelpText("Enable (recommended) to supply full range RGB output to your display device. "
@@ -2769,7 +2761,7 @@ static HostCheckBoxSetting *GUIRGBLevels()
 
 static HostComboBoxSetting *ChannelFormat()
 {
-    HostComboBoxSetting *gc = new HostComboBoxSetting("ChannelFormat");
+    auto *gc = new HostComboBoxSetting("ChannelFormat");
 
     gc->setLabel(GeneralSettings::tr("Channel format"));
 
@@ -2788,7 +2780,7 @@ static HostComboBoxSetting *ChannelFormat()
 
 static HostComboBoxSetting *LongChannelFormat()
 {
-    HostComboBoxSetting *gc = new HostComboBoxSetting("LongChannelFormat");
+    auto *gc = new HostComboBoxSetting("LongChannelFormat");
 
     gc->setLabel(GeneralSettings::tr("Long channel format"));
 
@@ -2807,7 +2799,7 @@ static HostComboBoxSetting *LongChannelFormat()
 
 static HostCheckBoxSetting *ChannelGroupRememberLast()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("ChannelGroupRememberLast");
+    auto *gc = new HostCheckBoxSetting("ChannelGroupRememberLast");
 
     gc->setLabel(ChannelGroupSettings::tr("Remember last channel group"));
 
@@ -2824,7 +2816,7 @@ static HostCheckBoxSetting *ChannelGroupRememberLast()
 
 static HostComboBoxSetting *ChannelGroupDefault()
 {
-    HostComboBoxSetting *gc = new HostComboBoxSetting("ChannelGroupDefault");
+    auto *gc = new HostComboBoxSetting("ChannelGroupDefault");
 
     gc->setLabel(ChannelGroupSettings::tr("Default channel group"));
 
@@ -2850,7 +2842,7 @@ static HostComboBoxSetting *ChannelGroupDefault()
 
 static HostCheckBoxSetting *BrowseChannelGroup()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("BrowseChannelGroup");
+    auto *gc = new HostCheckBoxSetting("BrowseChannelGroup");
 
     gc->setLabel(GeneralSettings::tr("Browse/change channels from Channel "
                                      "Group"));
@@ -2914,7 +2906,7 @@ static GlobalTextEditSetting *SortPrefixExceptions()
 
 static GlobalComboBoxSetting *GRSchedOpenEnd()
 {
-    GlobalComboBoxSetting *bc = new GlobalComboBoxSetting("SchedOpenEnd");
+    auto *bc = new GlobalComboBoxSetting("SchedOpenEnd");
 
     bc->setLabel(GeneralRecPrioritiesSettings::tr("Avoid back to back "
                                                   "recordings"));
@@ -2939,7 +2931,7 @@ static GlobalComboBoxSetting *GRSchedOpenEnd()
 
 static GlobalSpinBoxSetting *GRPrefInputRecPriority()
 {
-    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("PrefInputPriority", 1, 99, 1);
+    auto *bs = new GlobalSpinBoxSetting("PrefInputPriority", 1, 99, 1);
 
     bs->setLabel(GeneralRecPrioritiesSettings::tr("Preferred input priority"));
 
@@ -2956,7 +2948,7 @@ static GlobalSpinBoxSetting *GRPrefInputRecPriority()
 
 static GlobalSpinBoxSetting *GRHDTVRecPriority()
 {
-    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("HDTVRecPriority", -99, 99, 1);
+    auto *bs = new GlobalSpinBoxSetting("HDTVRecPriority", -99, 99, 1);
 
     bs->setLabel(GeneralRecPrioritiesSettings::tr("HDTV recording priority"));
 
@@ -2972,7 +2964,7 @@ static GlobalSpinBoxSetting *GRHDTVRecPriority()
 
 static GlobalSpinBoxSetting *GRWSRecPriority()
 {
-    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("WSRecPriority", -99, 99, 1);
+    auto *bs = new GlobalSpinBoxSetting("WSRecPriority", -99, 99, 1);
 
     bs->setLabel(GeneralRecPrioritiesSettings::tr("Widescreen recording "
                                                   "priority"));
@@ -2989,8 +2981,7 @@ static GlobalSpinBoxSetting *GRWSRecPriority()
 
 static GlobalSpinBoxSetting *GRSignLangRecPriority()
 {
-    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("SignLangRecPriority",
-                                            -99, 99, 1);
+    auto *bs = new GlobalSpinBoxSetting("SignLangRecPriority", -99, 99, 1);
 
     bs->setLabel(GeneralRecPrioritiesSettings::tr("Sign language recording "
                                                   "priority"));
@@ -3008,8 +2999,7 @@ static GlobalSpinBoxSetting *GRSignLangRecPriority()
 
 static GlobalSpinBoxSetting *GROnScrSubRecPriority()
 {
-    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("OnScrSubRecPriority",
-                                            -99, 99, 1);
+    auto *bs = new GlobalSpinBoxSetting("OnScrSubRecPriority", -99, 99, 1);
 
     bs->setLabel(GeneralRecPrioritiesSettings::tr("In-vision Subtitles "
                                                   "Recording Priority"));
@@ -3026,8 +3016,7 @@ static GlobalSpinBoxSetting *GROnScrSubRecPriority()
 
 static GlobalSpinBoxSetting *GRCCRecPriority()
 {
-    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("CCRecPriority",
-                                            -99, 99, 1);
+    auto *bs = new GlobalSpinBoxSetting("CCRecPriority", -99, 99, 1);
 
     bs->setLabel(GeneralRecPrioritiesSettings::tr("Subtitles/CC recording "
                                                   "priority"));
@@ -3045,8 +3034,7 @@ static GlobalSpinBoxSetting *GRCCRecPriority()
 
 static GlobalSpinBoxSetting *GRHardHearRecPriority()
 {
-    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("HardHearRecPriority",
-                                            -99, 99, 1);
+    auto *bs = new GlobalSpinBoxSetting("HardHearRecPriority", -99, 99, 1);
 
     bs->setLabel(GeneralRecPrioritiesSettings::tr("Hard of hearing priority"));
 
@@ -3063,8 +3051,7 @@ static GlobalSpinBoxSetting *GRHardHearRecPriority()
 
 static GlobalSpinBoxSetting *GRAudioDescRecPriority()
 {
-    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("AudioDescRecPriority",
-                                            -99, 99, 1);
+    auto *bs = new GlobalSpinBoxSetting("AudioDescRecPriority", -99, 99, 1);
 
     bs->setLabel(GeneralRecPrioritiesSettings::tr("Audio described priority"));
 
@@ -3079,7 +3066,7 @@ static GlobalSpinBoxSetting *GRAudioDescRecPriority()
 
 static HostTextEditSetting *DefaultTVChannel()
 {
-    HostTextEditSetting *ge = new HostTextEditSetting("DefaultTVChannel");
+    auto *ge = new HostTextEditSetting("DefaultTVChannel");
 
     ge->setLabel(EPGSettings::tr("Guide starts at channel"));
 
@@ -3095,7 +3082,7 @@ static HostTextEditSetting *DefaultTVChannel()
 
 static HostSpinBoxSetting *EPGRecThreshold()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("SelChangeRecThreshold", 1, 600, 1);
+    auto *gs = new HostSpinBoxSetting("SelChangeRecThreshold", 1, 600, 1);
 
     gs->setLabel(EPGSettings::tr("Record threshold"));
 
@@ -3109,7 +3096,7 @@ static HostSpinBoxSetting *EPGRecThreshold()
 
 static GlobalComboBoxSetting *MythLanguage()
 {
-    GlobalComboBoxSetting *gc = new GlobalComboBoxSetting("Language");
+    auto *gc = new GlobalComboBoxSetting("Language");
 
     gc->setLabel(AppearanceSettings::tr("Language"));
 
@@ -3164,7 +3151,7 @@ static void ISO639_fill_selections(MythUIComboBoxSetting *widget, uint i)
 
 static GlobalComboBoxSetting *ISO639PreferredLanguage(uint i)
 {
-    GlobalComboBoxSetting *gc = new GlobalComboBoxSetting(QString("ISO639Language%1").arg(i));
+    auto *gc = new GlobalComboBoxSetting(QString("ISO639Language%1").arg(i));
 
     gc->setLabel(AppearanceSettings::tr("Guide language #%1").arg(i+1));
 
@@ -3180,7 +3167,7 @@ static GlobalComboBoxSetting *ISO639PreferredLanguage(uint i)
 
 static HostCheckBoxSetting *NetworkControlEnabled()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("NetworkControlEnabled");
+    auto *gc = new HostCheckBoxSetting("NetworkControlEnabled");
 
     gc->setLabel(MainGeneralSettings::tr("Enable Network Remote Control "
                                          "interface"));
@@ -3196,7 +3183,7 @@ static HostCheckBoxSetting *NetworkControlEnabled()
 
 static HostSpinBoxSetting *NetworkControlPort()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("NetworkControlPort", 1025, 65535, 1);
+    auto *gs = new HostSpinBoxSetting("NetworkControlPort", 1025, 65535, 1);
 
     gs->setLabel(MainGeneralSettings::tr("Network Remote Control port"));
 
@@ -3211,7 +3198,7 @@ static HostSpinBoxSetting *NetworkControlPort()
 
 static HostTextEditSetting *UDPNotifyPort()
 {
-    HostTextEditSetting *ge = new HostTextEditSetting("UDPNotifyPort");
+    auto *ge = new HostTextEditSetting("UDPNotifyPort");
 
     ge->setLabel(MainGeneralSettings::tr("UDP notify port"));
 
@@ -3227,7 +3214,7 @@ static HostTextEditSetting *UDPNotifyPort()
 #ifdef USING_LIBCEC
 static HostCheckBoxSetting *CECEnabled()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("libCECEnabled");
+    auto *gc = new HostCheckBoxSetting("libCECEnabled");
     gc->setLabel(MainGeneralSettings::tr("Enable CEC Control "
                                          "interface"));
     gc->setHelpText(MainGeneralSettings::tr("This enables "
@@ -3241,7 +3228,7 @@ static HostCheckBoxSetting *CECEnabled()
 
 static HostCheckBoxSetting *CECPowerOnTVAllowed()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("PowerOnTVAllowed");
+    auto *gc = new HostCheckBoxSetting("PowerOnTVAllowed");
     gc->setLabel(MainGeneralSettings::tr("Allow Power On TV"));
     gc->setHelpText(MainGeneralSettings::tr("Enables your TV to be powered "
         "on from MythTV remote or when MythTV starts "
@@ -3252,7 +3239,7 @@ static HostCheckBoxSetting *CECPowerOnTVAllowed()
 
 static HostCheckBoxSetting *CECPowerOffTVAllowed()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("PowerOffTVAllowed");
+    auto *gc = new HostCheckBoxSetting("PowerOffTVAllowed");
     gc->setLabel(MainGeneralSettings::tr("Allow Power Off TV"));
     gc->setHelpText(MainGeneralSettings::tr("Enables your TV to be powered "
         "off from MythTV remote or when MythTV starts "
@@ -3263,7 +3250,7 @@ static HostCheckBoxSetting *CECPowerOffTVAllowed()
 
 static HostCheckBoxSetting *CECPowerOnTVOnStart()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("PowerOnTVOnStart");
+    auto *gc = new HostCheckBoxSetting("PowerOnTVOnStart");
     gc->setLabel(MainGeneralSettings::tr("Power on TV At Start"));
     gc->setHelpText(MainGeneralSettings::tr("Powers "
         "on your TV when you start MythTV "
@@ -3274,7 +3261,7 @@ static HostCheckBoxSetting *CECPowerOnTVOnStart()
 
 static HostCheckBoxSetting *CECPowerOffTVOnExit()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("PowerOffTVOnExit");
+    auto *gc = new HostCheckBoxSetting("PowerOffTVOnExit");
     gc->setLabel(MainGeneralSettings::tr("Power off TV At Exit"));
     gc->setHelpText(MainGeneralSettings::tr("Powers "
         "off your TV when you exit MythTV "
@@ -3289,7 +3276,7 @@ static HostCheckBoxSetting *CECPowerOffTVOnExit()
 // AirPlay Settings
 static HostCheckBoxSetting *AirPlayEnabled()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("AirPlayEnabled");
+    auto *gc = new HostCheckBoxSetting("AirPlayEnabled");
 
     gc->setLabel(MainGeneralSettings::tr("Enable AirPlay"));
 
@@ -3305,7 +3292,7 @@ static HostCheckBoxSetting *AirPlayEnabled()
 
 static HostCheckBoxSetting *AirPlayAudioOnly()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("AirPlayAudioOnly");
+    auto *gc = new HostCheckBoxSetting("AirPlayAudioOnly");
 
     gc->setLabel(MainGeneralSettings::tr("Only support AirTunes (no video)"));
 
@@ -3320,7 +3307,7 @@ static HostCheckBoxSetting *AirPlayAudioOnly()
 
 static HostCheckBoxSetting *AirPlayPasswordEnabled()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("AirPlayPasswordEnabled");
+    auto *gc = new HostCheckBoxSetting("AirPlayPasswordEnabled");
 
     gc->setLabel(MainGeneralSettings::tr("Require password"));
 
@@ -3335,7 +3322,7 @@ static HostCheckBoxSetting *AirPlayPasswordEnabled()
 
 static HostTextEditSetting *AirPlayPassword()
 {
-    HostTextEditSetting *ge = new HostTextEditSetting("AirPlayPassword");
+    auto *ge = new HostTextEditSetting("AirPlayPassword");
 
     ge->setLabel(MainGeneralSettings::tr("Password"));
 
@@ -3350,7 +3337,7 @@ static HostTextEditSetting *AirPlayPassword()
 
 static GroupSetting *AirPlayPasswordSettings()
 {
-    GroupSetting *hc = new GroupSetting();
+    auto *hc = new GroupSetting();
 
     hc->setLabel(MainGeneralSettings::tr("AirPlay - Password"));
     hc->addChild(AirPlayPasswordEnabled());
@@ -3361,7 +3348,7 @@ static GroupSetting *AirPlayPasswordSettings()
 
 static HostCheckBoxSetting *AirPlayFullScreen()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("AirPlayFullScreen");
+    auto *gc = new HostCheckBoxSetting("AirPlayFullScreen");
 
     gc->setLabel(MainGeneralSettings::tr("AirPlay full screen playback"));
 
@@ -3405,7 +3392,7 @@ static HostCheckBoxSetting *AirPlayFullScreen()
 
 static HostCheckBoxSetting *RealtimePriority()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("RealtimePriority");
+    auto *gc = new HostCheckBoxSetting("RealtimePriority");
 
     gc->setLabel(PlaybackSettings::tr("Enable realtime priority threads"));
 
@@ -3421,7 +3408,7 @@ static HostCheckBoxSetting *RealtimePriority()
 
 static HostTextEditSetting *IgnoreMedia()
 {
-    HostTextEditSetting *ge = new HostTextEditSetting("IgnoreDevices");
+    auto *ge = new HostTextEditSetting("IgnoreDevices");
 
     ge->setLabel(MainGeneralSettings::tr("Ignore devices"));
 
@@ -3437,7 +3424,7 @@ static HostTextEditSetting *IgnoreMedia()
 
 static HostComboBoxSetting *DisplayGroupTitleSort()
 {
-    HostComboBoxSetting *gc = new HostComboBoxSetting("DisplayGroupTitleSort");
+    auto *gc = new HostComboBoxSetting("DisplayGroupTitleSort");
 
     gc->setLabel(PlaybackSettings::tr("Sort titles"));
 
@@ -3453,7 +3440,7 @@ static HostComboBoxSetting *DisplayGroupTitleSort()
 
 static HostCheckBoxSetting *PlaybackWatchList()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("PlaybackWatchList");
+    auto *gc = new HostCheckBoxSetting("PlaybackWatchList");
 
     gc->setLabel(WatchListSettings::tr("Include the 'Watch List' group"));
 
@@ -3469,7 +3456,7 @@ static HostCheckBoxSetting *PlaybackWatchList()
 
 static HostCheckBoxSetting *PlaybackWLStart()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("PlaybackWLStart");
+    auto *gc = new HostCheckBoxSetting("PlaybackWLStart");
 
     gc->setLabel(WatchListSettings::tr("Start from the Watch List view"));
 
@@ -3483,7 +3470,7 @@ static HostCheckBoxSetting *PlaybackWLStart()
 
 static HostCheckBoxSetting *PlaybackWLAutoExpire()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("PlaybackWLAutoExpire");
+    auto *gc = new HostCheckBoxSetting("PlaybackWLAutoExpire");
 
     gc->setLabel(WatchListSettings::tr("Exclude recordings not set for "
                                        "Auto-Expire"));
@@ -3501,7 +3488,7 @@ static HostCheckBoxSetting *PlaybackWLAutoExpire()
 
 static HostSpinBoxSetting *PlaybackWLMaxAge()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("PlaybackWLMaxAge", 30, 180, 10);
+    auto *gs = new HostSpinBoxSetting("PlaybackWLMaxAge", 30, 180, 10);
 
     gs->setLabel(WatchListSettings::tr("Maximum days counted in the score"));
 
@@ -3517,7 +3504,7 @@ static HostSpinBoxSetting *PlaybackWLMaxAge()
 
 static HostSpinBoxSetting *PlaybackWLBlackOut()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("PlaybackWLBlackOut", 0, 5, 1);
+    auto *gs = new HostSpinBoxSetting("PlaybackWLBlackOut", 0, 5, 1);
 
     gs->setLabel(WatchListSettings::tr("Days to exclude weekly episodes after "
                                        "delete"));
@@ -3536,7 +3523,7 @@ static HostSpinBoxSetting *PlaybackWLBlackOut()
 
 static HostCheckBoxSetting *EnableMediaMon()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("MonitorDrives");
+    auto *gc = new HostCheckBoxSetting("MonitorDrives");
 
     gc->setLabel(MainGeneralSettings::tr("Media Monitor"));
 
@@ -3555,7 +3542,7 @@ static HostCheckBoxSetting *EnableMediaMon()
 
 static HostCheckBoxSetting *LCDShowTime()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("LCDShowTime");
+    auto *gc = new HostCheckBoxSetting("LCDShowTime");
 
     gc->setLabel(LcdSettings::tr("Display time"));
 
@@ -3569,7 +3556,7 @@ static HostCheckBoxSetting *LCDShowTime()
 
 static HostCheckBoxSetting *LCDShowRecStatus()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("LCDShowRecStatus");
+    auto *gc = new HostCheckBoxSetting("LCDShowRecStatus");
 
     gc->setLabel(LcdSettings::tr("Display recording status"));
 
@@ -3583,7 +3570,7 @@ static HostCheckBoxSetting *LCDShowRecStatus()
 
 static HostCheckBoxSetting *LCDShowMenu()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("LCDShowMenu");
+    auto *gc = new HostCheckBoxSetting("LCDShowMenu");
 
     gc->setLabel(LcdSettings::tr("Display menus"));
 
@@ -3596,7 +3583,7 @@ static HostCheckBoxSetting *LCDShowMenu()
 
 static HostSpinBoxSetting *LCDPopupTime()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("LCDPopupTime", 1, 300, 1, 1);
+    auto *gs = new HostSpinBoxSetting("LCDPopupTime", 1, 300, 1, 1);
 
     gs->setLabel(LcdSettings::tr("Menu pop-up time"));
 
@@ -3610,7 +3597,7 @@ static HostSpinBoxSetting *LCDPopupTime()
 
 static HostCheckBoxSetting *LCDShowMusic()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("LCDShowMusic");
+    auto *gc = new HostCheckBoxSetting("LCDShowMusic");
 
     gc->setLabel(LcdSettings::tr("Display music artist and title"));
 
@@ -3624,7 +3611,7 @@ static HostCheckBoxSetting *LCDShowMusic()
 
 static HostComboBoxSetting *LCDShowMusicItems()
 {
-    HostComboBoxSetting *gc = new HostComboBoxSetting("LCDShowMusicItems");
+    auto *gc = new HostComboBoxSetting("LCDShowMusicItems");
 
     gc->setLabel(LcdSettings::tr("Items"));
 
@@ -3639,7 +3626,7 @@ static HostComboBoxSetting *LCDShowMusicItems()
 
 static HostCheckBoxSetting *LCDShowChannel()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("LCDShowChannel");
+    auto *gc = new HostCheckBoxSetting("LCDShowChannel");
 
     gc->setLabel(LcdSettings::tr("Display channel information"));
 
@@ -3653,7 +3640,7 @@ static HostCheckBoxSetting *LCDShowChannel()
 
 static HostCheckBoxSetting *LCDShowVolume()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("LCDShowVolume");
+    auto *gc = new HostCheckBoxSetting("LCDShowVolume");
 
     gc->setLabel(LcdSettings::tr("Display volume information"));
 
@@ -3667,7 +3654,7 @@ static HostCheckBoxSetting *LCDShowVolume()
 
 static HostCheckBoxSetting *LCDShowGeneric()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("LCDShowGeneric");
+    auto *gc = new HostCheckBoxSetting("LCDShowGeneric");
 
     gc->setLabel(LcdSettings::tr("Display generic information"));
 
@@ -3680,7 +3667,7 @@ static HostCheckBoxSetting *LCDShowGeneric()
 
 static HostCheckBoxSetting *LCDBacklightOn()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("LCDBacklightOn");
+    auto *gc = new HostCheckBoxSetting("LCDBacklightOn");
 
     gc->setLabel(LcdSettings::tr("Backlight always on"));
 
@@ -3693,7 +3680,7 @@ static HostCheckBoxSetting *LCDBacklightOn()
 
 static HostCheckBoxSetting *LCDHeartBeatOn()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("LCDHeartBeatOn");
+    auto *gc = new HostCheckBoxSetting("LCDHeartBeatOn");
 
     gc->setLabel(LcdSettings::tr("Heartbeat always on"));
 
@@ -3706,7 +3693,7 @@ static HostCheckBoxSetting *LCDHeartBeatOn()
 
 static HostCheckBoxSetting *LCDBigClock()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("LCDBigClock");
+    auto *gc = new HostCheckBoxSetting("LCDBigClock");
 
     gc->setLabel(LcdSettings::tr("Display large clock"));
 
@@ -3720,7 +3707,7 @@ static HostCheckBoxSetting *LCDBigClock()
 
 static HostTextEditSetting *LCDKeyString()
 {
-    HostTextEditSetting *ge = new HostTextEditSetting("LCDKeyString");
+    auto *ge = new HostTextEditSetting("LCDKeyString");
 
     ge->setLabel(LcdSettings::tr("LCD key order"));
 
@@ -3737,7 +3724,7 @@ static HostTextEditSetting *LCDKeyString()
 
 static HostCheckBoxSetting *LCDEnable()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("LCDEnable");
+    auto *gc = new HostCheckBoxSetting("LCDEnable");
 
     gc->setLabel(LcdSettings::tr("Enable LCD device"));
 
@@ -4026,12 +4013,12 @@ MainGeneralSettings::MainGeneralSettings()
 
     addChild(new DatabaseSettings());
 
-    GroupSetting *pin = new GroupSetting();
+    auto *pin = new GroupSetting();
     pin->setLabel(tr("Settings Access"));
     pin->addChild(SetupPinCode());
     addChild(pin);
 
-    GroupSetting *general = new GroupSetting();
+    auto *general = new GroupSetting();
     general->setLabel(tr("General"));
     general->addChild(UseVirtualKeyboard());
     general->addChild(ScreenShotPath());
@@ -4054,7 +4041,7 @@ MainGeneralSettings::MainGeneralSettings()
 
     addChild(new ShutDownRebootSetting());
 
-    GroupSetting *remotecontrol = new GroupSetting();
+    auto *remotecontrol = new GroupSetting();
     remotecontrol->setLabel(tr("Remote Control"));
     remotecontrol->addChild(LircDaemonDevice());
     remotecontrol->addChild(NetworkControlEnabled());
@@ -4079,7 +4066,7 @@ MainGeneralSettings::MainGeneralSettings()
     addChild(remotecontrol);
 
 #ifdef USING_AIRPLAY
-    GroupSetting *airplay = new GroupSetting();
+    auto *airplay = new GroupSetting();
     airplay->setLabel(tr("AirPlay Settings"));
     airplay->addChild(AirPlayEnabled());
     airplay->addChild(AirPlayFullScreen());
@@ -4186,8 +4173,7 @@ void PlaybackSettingsDialog::ShowMenu(void)
     MythUIButtonListItem *item = m_buttonList->GetItemCurrent();
     if (item)
     {
-        PlaybackProfileItemConfig *config =
-            item->GetData().value<PlaybackProfileItemConfig*>();
+        auto *config = item->GetData().value<PlaybackProfileItemConfig*>();
         if (config)
             ShowPlaybackProfileMenu(item);
     }
@@ -4196,8 +4182,7 @@ void PlaybackSettingsDialog::ShowMenu(void)
 
 void PlaybackSettingsDialog::ShowPlaybackProfileMenu(MythUIButtonListItem *item)
 {
-    MythMenu *menu = new MythMenu(tr("Playback Profile Menu"), this,
-                                  "mainmenu");
+    auto *menu = new MythMenu(tr("Playback Profile Menu"), this, "mainmenu");
 
     if (m_buttonList->GetItemPos(item) > 2)
         menu->AddItem(tr("Move Up"), SLOT(MoveProfileItemUp()));
@@ -4208,8 +4193,7 @@ void PlaybackSettingsDialog::ShowPlaybackProfileMenu(MythUIButtonListItem *item)
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    MythDialogBox *menuPopup = new MythDialogBox(menu, popupStack,
-                                                 "menudialog");
+    auto *menuPopup = new MythDialogBox(menu, popupStack, "menudialog");
     menuPopup->SetReturnEvent(this, "mainmenu");
 
     if (menuPopup->Create())
@@ -4223,8 +4207,7 @@ void PlaybackSettingsDialog::MoveProfileItemDown(void)
     MythUIButtonListItem *item = m_buttonList->GetItemCurrent();
     if (item)
     {
-        PlaybackProfileItemConfig *config =
-            item->GetData().value<PlaybackProfileItemConfig*>();
+        auto *config = item->GetData().value<PlaybackProfileItemConfig*>();
         if (config)
         {
             const int currentPos = m_buttonList->GetCurrentPos();
@@ -4241,8 +4224,7 @@ void PlaybackSettingsDialog::MoveProfileItemUp(void)
     MythUIButtonListItem *item = m_buttonList->GetItemCurrent();
     if (item)
     {
-        PlaybackProfileItemConfig *config =
-            item->GetData().value<PlaybackProfileItemConfig*>();
+        auto *config = item->GetData().value<PlaybackProfileItemConfig*>();
         if (config)
         {
             const int currentPos = m_buttonList->GetCurrentPos();
@@ -4256,8 +4238,7 @@ void PlaybackSettingsDialog::MoveProfileItemUp(void)
 
 void PlaybackSettingsDialog::DeleteProfileItem(void)
 {
-    PlaybackProfileItemConfig *config =
-        m_buttonList->GetDataValue().value<PlaybackProfileItemConfig*>();
+    auto *config = m_buttonList->GetDataValue().value<PlaybackProfileItemConfig*>();
     if (config)
         config->ShowDeleteDialog();
 }
@@ -4269,7 +4250,7 @@ PlaybackSettings::PlaybackSettings()
 
 void PlaybackSettings::Load(void)
 {
-    GroupSetting* general = new GroupSetting();
+    auto *general = new GroupSetting();
     general->setLabel(tr("General Playback"));
     general->addChild(JumpToProgramOSD());
     general->addChild(ClearSavedPosition());
@@ -4294,7 +4275,7 @@ void PlaybackSettings::Load(void)
     general->addChild(MusicChoiceEnabled());
     addChild(general);
 
-    GroupSetting* advanced = new GroupSetting();
+    auto *advanced = new GroupSetting();
     advanced->setLabel(tr("Advanced Playback Settings"));
     advanced->addChild(RealtimePriority());
     advanced->addChild(AudioReadAhead());
@@ -4317,7 +4298,7 @@ void PlaybackSettings::Load(void)
     connect(m_newPlaybackProfileButton, SIGNAL(clicked()),
             SLOT(NewPlaybackProfileSlot()));
 
-    GroupSetting* pbox = new GroupSetting();
+    auto *pbox = new GroupSetting();
     pbox->setLabel(tr("View Recordings"));
     pbox->addChild(PlayBoxOrdering());
     pbox->addChild(PlayBoxEpisodeSort());
@@ -4326,7 +4307,7 @@ void PlaybackSettings::Load(void)
     // pbox->addChild(HWAccelPlaybackPreview());
     pbox->addChild(PBBStartInTitle());
 
-    GroupSetting* pbox2 = new GroupSetting();
+    auto *pbox2 = new GroupSetting();
     pbox2->setLabel(tr("Recording Groups"));
     pbox2->addChild(DisplayRecGroup());
     pbox2->addChild(QueryInitialFilter());
@@ -4345,7 +4326,7 @@ void PlaybackSettings::Load(void)
     pbox->addChild(playbackWatchList);
     addChild(pbox);
 
-    GroupSetting* seek = new GroupSetting();
+    auto *seek = new GroupSetting();
     seek->setLabel(tr("Seeking"));
     seek->addChild(SmartForward());
     seek->addChild(FFRewReposTime());
@@ -4353,7 +4334,7 @@ void PlaybackSettings::Load(void)
 
     addChild(seek);
 
-    GroupSetting* comms = new GroupSetting();
+    auto *comms = new GroupSetting();
     comms->setLabel(tr("Commercial Skip"));
     comms->addChild(AutoCommercialSkip());
     comms->addChild(CommRewindAmount());
@@ -4418,7 +4399,7 @@ OSDSettings::OSDSettings()
 GeneralSettings::GeneralSettings()
 {
     setLabel(tr("General (Basic)"));
-    GroupSetting* general = new GroupSetting();
+    auto *general = new GroupSetting();
     general->setLabel(tr("General (Basic)"));
     general->addChild(ChannelOrdering());
     general->addChild(ChannelFormat());
@@ -4426,7 +4407,7 @@ GeneralSettings::GeneralSettings()
 
     addChild(general);
 
-    GroupSetting* autoexp = new GroupSetting();
+    auto *autoexp = new GroupSetting();
 
     autoexp->setLabel(tr("General (Auto-Expire)"));
 
@@ -4444,7 +4425,7 @@ GeneralSettings::GeneralSettings()
 
     addChild(autoexp);
 
-    GroupSetting* jobs = new GroupSetting();
+    auto *jobs = new GroupSetting();
 
     jobs->setLabel(tr("General (Jobs)"));
 
@@ -4455,7 +4436,7 @@ GeneralSettings::GeneralSettings()
 
     addChild(jobs);
 
-    GroupSetting* general2 = new GroupSetting();
+    auto *general2 = new GroupSetting();
 
     general2->setLabel(tr("General (Advanced)"));
 
@@ -4464,7 +4445,7 @@ GeneralSettings::GeneralSettings()
     general2->addChild(CategoryOverTimeSettings());
     addChild(general2);
 
-    GroupSetting* changrp = new GroupSetting();
+    auto *changrp = new GroupSetting();
 
     changrp->setLabel(tr("General (Channel Groups)"));
 
@@ -4485,7 +4466,7 @@ EPGSettings::EPGSettings()
 
 GeneralRecPrioritiesSettings::GeneralRecPrioritiesSettings()
 {
-    GroupSetting* sched = new GroupSetting();
+    auto *sched = new GroupSetting();
 
     sched->setLabel(tr("Scheduler Options"));
 
@@ -4496,7 +4477,7 @@ GeneralRecPrioritiesSettings::GeneralRecPrioritiesSettings()
 
     addChild(sched);
 
-    GroupSetting* access = new GroupSetting();
+    auto *access = new GroupSetting();
 
     access->setLabel(tr("Accessibility Options"));
 
@@ -4571,7 +4552,7 @@ void AppearanceSettings::applyChange()
 
 AppearanceSettings::AppearanceSettings()
 {
-    GroupSetting* screen = new GroupSetting();
+    auto *screen = new GroupSetting();
     screen->setLabel(tr("Theme / Screen Settings"));
     addChild(screen);
 
@@ -4607,7 +4588,7 @@ AppearanceSettings::AppearanceSettings()
     if (!scr.empty())
         addChild(UseVideoModes());
 #endif
-    GroupSetting* dates = new GroupSetting();
+    auto *dates = new GroupSetting();
 
     dates->setLabel(tr("Localization"));
 
@@ -4718,8 +4699,7 @@ void ChannelGroupSetting::Save()
         {
             if ((*i) != m_groupName)
             {
-                ChannelCheckBoxSetting *channel =
-                    dynamic_cast<ChannelCheckBoxSetting *>(*i);
+                auto *channel = dynamic_cast<ChannelCheckBoxSetting *>(*i);
                 if (channel)
                 {
                     if (channel->boolValue())
@@ -4771,7 +4751,7 @@ void ChannelGroupSetting::Load()
     {
         while (query.next())
         {
-            ChannelCheckBoxSetting *channelCheckBox =
+            auto *channelCheckBox =
                     new ChannelCheckBoxSetting(query.value(0).toUInt(),
                                                query.value(1).toString(),
                                                query.value(2).toString());
@@ -4814,8 +4794,7 @@ ChannelGroupsSetting::ChannelGroupsSetting()
 void ChannelGroupsSetting::Load()
 {
     clearSettings();
-    ButtonStandardSetting *newGroup =
-        new ButtonStandardSetting(tr("(Create New Channel Group)"));
+    auto *newGroup = new ButtonStandardSetting(tr("(Create New Channel Group)"));
     connect(newGroup, SIGNAL(clicked()), SLOT(ShowNewGroupDialog()));
     addChild(newGroup);
 
@@ -4850,8 +4829,7 @@ void ChannelGroupsSetting::Load()
 void ChannelGroupsSetting::ShowNewGroupDialog()
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythTextInputDialog *settingdialog =
-        new MythTextInputDialog(popupStack,
+    auto *settingdialog = new MythTextInputDialog(popupStack,
                                 tr("Enter the name of the new channel group"));
 
     if (settingdialog->Create())
@@ -4868,7 +4846,7 @@ void ChannelGroupsSetting::ShowNewGroupDialog()
 
 void ChannelGroupsSetting::CreateNewGroup(const QString& name)
 {
-    ChannelGroupSetting *button = new ChannelGroupSetting(name,-1);
+    auto *button = new ChannelGroupSetting(name,-1);
     button->setLabel(name);
     button->Load();
     addChild(button);

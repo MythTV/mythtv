@@ -37,7 +37,7 @@ void ScheduleCommon::ShowDetails(void) const
         return;
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    ProgDetails *details_dialog  = new ProgDetails(mainStack, pginfo);
+    auto *details_dialog  = new ProgDetails(mainStack, pginfo);
 
     if (!details_dialog->Create())
     {
@@ -58,7 +58,7 @@ void ScheduleCommon::ShowUpcoming(const QString &title,
         return;
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    ProgLister *pl = new ProgLister(mainStack, plTitle, title, seriesid);
+    auto *pl = new ProgLister(mainStack, plTitle, title, seriesid);
     if (pl->Create())
     {
         mainStack->AddScreen(pl);
@@ -99,8 +99,7 @@ void ScheduleCommon::ShowUpcomingScheduled(void) const
         return ShowUpcoming(pginfo->GetTitle(), pginfo->GetSeriesID());
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    ProgLister *pl = new ProgLister(mainStack, plRecordid,
-                                    QString::number(id), "");
+    auto *pl = new ProgLister(mainStack, plRecordid, QString::number(id), "");
 
     if (pl->Create())
         mainStack->AddScreen(pl);
@@ -118,9 +117,9 @@ void ScheduleCommon::ShowChannelSearch() const
         return;
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    ProgLister *pl = new ProgLister(mainStack, plChannel,
-                                    QString::number(pginfo->GetChanID()), "",
-                                    pginfo->GetScheduledStartTime());
+    auto *pl = new ProgLister(mainStack, plChannel,
+                              QString::number(pginfo->GetChanID()), "",
+                              pginfo->GetScheduledStartTime());
     if (pl->Create())
         mainStack->AddScreen(pl);
     else
@@ -187,7 +186,7 @@ void ScheduleCommon::EditScheduled(ProgramInfo *pginfo)
 void ScheduleCommon::EditScheduled(RecordingInfo *recinfo)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    ScheduleEditor *schededit = new ScheduleEditor(mainStack, recinfo);
+    auto *schededit = new ScheduleEditor(mainStack, recinfo);
     if (schededit->Create())
         mainStack->AddScreen(schededit);
     else
@@ -207,7 +206,7 @@ void ScheduleCommon::EditCustom(void)
         return;
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    CustomEdit *ce = new CustomEdit(mainStack, pginfo);
+    auto *ce = new CustomEdit(mainStack, pginfo);
     if (ce->Create())
         mainStack->AddScreen(ce);
     else
@@ -222,7 +221,7 @@ void ScheduleCommon::MakeOverride(RecordingInfo *recinfo)
     if (!recinfo || !recinfo->GetRecordingRuleID())
         return;
 
-    RecordingRule *recrule = new RecordingRule();
+    auto *recrule = new RecordingRule();
 
     if (!recrule->LoadByProgram(static_cast<ProgramInfo*>(recinfo)))
         LOG(VB_GENERAL, LOG_ERR, "Failed to load by program info");
@@ -236,7 +235,7 @@ void ScheduleCommon::MakeOverride(RecordingInfo *recinfo)
     recrule->m_type = kOverrideRecord;
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    ScheduleEditor *schededit = new ScheduleEditor(mainStack, recrule);
+    auto *schededit = new ScheduleEditor(mainStack, recrule);
     if (schededit->Create())
         mainStack->AddScreen(schededit);
     else
@@ -261,7 +260,7 @@ void ScheduleCommon::ShowPrevious(void) const
 void ScheduleCommon::ShowPrevious(uint ruleid, const QString &title) const
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    PrevRecordedList *pl = new PrevRecordedList(mainStack, ruleid, title);
+    auto *pl = new PrevRecordedList(mainStack, ruleid, title);
     if (pl->Create())
         mainStack->AddScreen(pl);
     else
@@ -324,8 +323,8 @@ void ScheduleCommon::EditRecording(bool may_watch_now)
     }
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythDialogBox *menuPopup = new MythDialogBox(message, popupStack,
-                                                 "recOptionPopup", true);
+    auto *menuPopup = new MythDialogBox(message, popupStack,
+                                        "recOptionPopup", true);
     if (!menuPopup->Create())
     {
         delete menuPopup;
@@ -473,7 +472,7 @@ void ScheduleCommon::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
+        auto *dce = (DialogCompletionEvent*)(event);
 
         QString resultid   = dce->GetId();
         QString resulttext = dce->GetResultText();

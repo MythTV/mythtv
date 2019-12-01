@@ -185,8 +185,8 @@ class VideoPlayerCommandPrivate
 
     VideoPlayerCommandPrivate(const VideoPlayerCommandPrivate &other)
     {
-        for (player_list::const_iterator p = other.m_playerProcs.begin();
-                p != other.m_playerProcs.end(); ++p)
+        for (auto p = other.m_playerProcs.cbegin();
+                p != other.m_playerProcs.cend(); ++p)
         {
             m_playerProcs.push_back((*p)->Clone());
         }
@@ -272,8 +272,7 @@ class VideoPlayerCommandPrivate
 
         const FileAssociations::association_list fa_list =
                 FileAssociations::getFileAssociation().getList();
-        for (FileAssociations::association_list::const_iterator p =
-                fa_list.begin(); p != fa_list.end(); ++p)
+        for (auto p = fa_list.cbegin(); p != fa_list.cend(); ++p)
         {
             if (p->extension.toLower() == extension.toLower() &&
                     !p->use_default)
@@ -317,8 +316,7 @@ class VideoPlayerCommandPrivate
 
     void ClearPlayerList()
     {
-        for (player_list::iterator p = m_playerProcs.begin();
-                        p != m_playerProcs.end(); ++p)
+        for (auto p = m_playerProcs.begin(); p != m_playerProcs.end(); ++p)
         {
             delete *p;
         }
@@ -327,8 +325,7 @@ class VideoPlayerCommandPrivate
 
     void Play() const
     {
-        for (player_list::const_iterator p = m_playerProcs.begin();
-                p != m_playerProcs.end(); ++p)
+        for (auto p = m_playerProcs.cbegin(); p != m_playerProcs.cend(); ++p)
         {
             if ((*p)->Play()) break;
         }

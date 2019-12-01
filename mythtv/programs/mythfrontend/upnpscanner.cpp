@@ -194,7 +194,7 @@ UPNPScanner* UPNPScanner::Instance(UPNPSubscription *sub)
 void UPNPScanner::StartFullScan(void)
 {
     m_fullscan = true;
-    MythEvent *me = new MythEvent(QString("UPNP_STARTSCAN"));
+    auto *me = new MythEvent(QString("UPNP_STARTSCAN"));
     qApp->postEvent(this, me);
 }
 
@@ -302,7 +302,7 @@ bool UPNPScanner::GetMetadata(QVariant &data)
     if (!valid)
         return false;
 
-    MythEvent *me = new MythEvent("UPNP_BROWSEOBJECT", list);
+    auto *me = new MythEvent("UPNP_BROWSEOBJECT", list);
     qApp->postEvent(this, me);
 
     int count = 0;
@@ -643,7 +643,7 @@ void UPNPScanner::customEvent(QEvent *event)
         return;
 
     // UPnP events
-    MythEvent *me  = static_cast<MythEvent *>(event);
+    auto *me = static_cast<MythEvent *>(event);
     const QString&    ev  = me->Message();
 
     if (ev == "UPNP_STARTSCAN")
@@ -673,7 +673,7 @@ void UPNPScanner::customEvent(QEvent *event)
     }
     if (ev == "UPNP_EVENT")
     {
-        MythInfoMapEvent *info = (MythInfoMapEvent*)event;
+        auto *info = (MythInfoMapEvent*)event;
         if (!info)
             return;
         if (!info->GetInfoMap())
@@ -991,7 +991,7 @@ void UPNPScanner::ParseBrowse(const QUrl &url, QNetworkReply *reply)
         return;
 
     // Open the response for parsing
-    QDomDocument *parent = new QDomDocument();
+    auto *parent = new QDomDocument();
     QString errorMessage;
     int errorLine   = 0;
     int errorColumn = 0;

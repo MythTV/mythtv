@@ -544,7 +544,7 @@ int main(int argc, char *argv[])
     if (jobID >= 0)
         JobQueue::ChangeJobStatus(jobID, JOB_RUNNING);
 
-    Transcode *transcode = new Transcode(pginfo);
+    auto *transcode = new Transcode(pginfo);
 
     if (!build_index)
     {
@@ -642,7 +642,7 @@ int main(int argc, char *argv[])
            check_func = &CheckJobQueue;
         }
 
-        MPEG2fixup *m2f = new MPEG2fixup(infile, outfile,
+        auto *m2f = new MPEG2fixup(infile, outfile,
                                          &deleteMap, nullptr, false, false, 20,
                                          showprogress, otype, update_func,
                                          check_func);
