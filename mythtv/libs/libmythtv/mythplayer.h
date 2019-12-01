@@ -651,7 +651,6 @@ class MTV_PUBLIC MythPlayer
     QWidget *parentWidget               {nullptr};
     bool     embedding                  {false};
     QRect    embedRect                  {0,0,0,0};
-    float    defaultDisplayAspect       {1.7777F};
 
     // State
     QWaitCondition decoderThreadPause;

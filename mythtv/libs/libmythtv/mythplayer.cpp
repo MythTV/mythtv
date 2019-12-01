@@ -168,10 +168,6 @@ MythPlayer::MythPlayer(PlayerFlags flags)
     detect_letter_box = new DetectLetterbox(this);
 
     vbimode = VBIMode::Parse(gCoreContext->GetSetting("VbiFormat"));
-
-    defaultDisplayAspect =
-        gCoreContext->GetFloatSettingOnHost("XineramaMonitorAspectRatio",
-                                            gCoreContext->GetHostName(), 1.7777);
     captionsEnabledbyDefault = gCoreContext->GetBoolSetting("DefaultCCMode");
     decode_extra_audio = gCoreContext->GetBoolSetting("DecodeExtraAudio", false);
     itvEnabled         = gCoreContext->GetBoolSetting("EnableMHEG", false);
