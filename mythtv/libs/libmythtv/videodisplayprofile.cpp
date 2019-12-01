@@ -221,19 +221,6 @@ bool ProfileItem::IsMatch(const QSize &Size,
     return match;
 }
 
-
-static QString toCommaList(const QStringList &list)
-{
-    QString ret = "";
-    for (QStringList::const_iterator it = list.begin(); it != list.end(); ++it)
-        ret += *it + ",";
-
-    if (ret.length())
-        return ret.left(ret.length()-1);
-
-    return "";
-}
-
 bool ProfileItem::IsValid(QString *Reason) const
 {
 
