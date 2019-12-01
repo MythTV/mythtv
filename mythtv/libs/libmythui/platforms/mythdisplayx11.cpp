@@ -83,7 +83,9 @@ static XRRScreenConfiguration *GetScreenConfig(MythXDisplay*& display)
 
 bool MythDisplayX11::UsingVideoModes(void)
 {
-    return gCoreContext->GetBoolSetting("UseVideoModes", false);
+    if (gCoreContext)
+        return gCoreContext->GetBoolSetting("UseVideoModes", false);
+    return false;
 }
 
 const std::vector<DisplayResScreen>& MythDisplayX11::GetVideoModes(void)

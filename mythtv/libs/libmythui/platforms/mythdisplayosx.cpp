@@ -47,7 +47,9 @@ DisplayInfo MythDisplayOSX::GetDisplayInfo(int VideoRate)
 
 bool MythDisplayOSX::UsingVideoModes(void)
 {
-    return gCoreContext->GetBoolSetting("UseVideoModes", false);
+    if (gCoreContext)
+        return gCoreContext->GetBoolSetting("UseVideoModes", false);
+    return false;
 }
 
 const std::vector<DisplayResScreen>& MythDisplayOSX::GetVideoModes(void)
