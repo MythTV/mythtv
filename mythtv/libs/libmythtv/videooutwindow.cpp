@@ -77,7 +77,7 @@ void VideoOutWindow::PopulateGeometry(void)
     if (!screen)
         return;
 
-    if (MythDisplay::SpanAllScreens())
+    if (MythDisplay::SpanAllScreens() && m_display->GetScreenCount() > 1)
     {
         m_usingXinerama = true;
         m_screenGeometry = screen->virtualGeometry();

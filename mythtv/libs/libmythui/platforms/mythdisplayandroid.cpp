@@ -2,6 +2,7 @@
 #include <QtAndroidExtras>
 
 // MythTV
+#include "mythlogging.h"
 #include "mythdisplayandroid.h"
 
 

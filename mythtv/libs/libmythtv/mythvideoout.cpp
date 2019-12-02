@@ -1026,6 +1026,9 @@ void MythVideoOutput::InitDisplayMeasurements(void)
         disp_aspect = static_cast<float>(gCoreContext->GetFloatSettingOnHost(
             "XineramaMonitorAspectRatio",
             gCoreContext->GetHostName(), static_cast<double>(pixel_aspect)));
+        // Auto setting
+        if (disp_aspect < 0.1F)
+            disp_aspect = static_cast<float>(m_display->EstimateVirtualAspectRatio());
         if (disp_dim.height() <= 0)
             disp_dim.setHeight(300);
         disp_dim.setWidth(static_cast<int>(lroundf(disp_dim.height() * disp_aspect)));

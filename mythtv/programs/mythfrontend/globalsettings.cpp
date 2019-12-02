@@ -2040,16 +2040,22 @@ static HostComboBoxSetting *XineramaMonitorAspectRatio()
 {
     auto *gc = new HostComboBoxSetting("XineramaMonitorAspectRatio");
 
-    gc->setLabel(AppearanceSettings::tr("Monitor aspect ratio"));
+    gc->setLabel(AppearanceSettings::tr("Virtual monitor aspect ratio"));
 
-    gc->addSelection(AppearanceSettings::tr("16:9"),  "1.7777");
-    gc->addSelection(AppearanceSettings::tr("16:10"), "1.6");
-    gc->addSelection(AppearanceSettings::tr("4:3"),   "1.3333");
+    gc->addSelection(AppearanceSettings::tr("Auto",                     "0.0"));
+    gc->addSelection(AppearanceSettings::tr("16:9 (Grid)"),             "1.7777");
+    gc->addSelection(AppearanceSettings::tr("32:9 (Side by side)"),     "3.5555");
+    gc->addSelection(AppearanceSettings::tr("16:18 (Above and below)"), "0.8888");
+    gc->addSelection(AppearanceSettings::tr("16:10 (Grid)"),            "1.6");
+    gc->addSelection(AppearanceSettings::tr("32:10 (Side by Side)"),    "3.2");
+    gc->addSelection(AppearanceSettings::tr("16:20 (Above and below)"), "0.8");
+    gc->addSelection(AppearanceSettings::tr("4:3 (Grid)"),              "1.3333");
 
-    gc->setHelpText(AppearanceSettings::tr("The aspect ratio of a Xinerama "
-                                           "display cannot be queried from "
-                                           "the display, so it must be "
-                                           "specified."));
+    gc->setHelpText(AppearanceSettings::tr(
+            "The aspect ratio cannot always be queried when using multiple "
+            "displays . Use Auto to try and detect a sensible value, otherwise "
+            "choose an appropriate override."));
+
     return gc;
 }
 
@@ -2066,8 +2072,7 @@ static HostComboBoxSetting *LetterboxingColour()
                                          "letterboxing to match broadcaster "
                                          "letterboxing, but those with plasma "
                                          "screens may prefer gray to minimize "
-                                         "burn-in. Currently only works with "
-                                         "XVideo video renderer."));
+                                         "burn-in."));
     return gc;
 }
 

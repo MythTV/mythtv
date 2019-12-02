@@ -569,6 +569,106 @@ double MythDisplay::GetAspectRatio(void)
     return m_last.AspectRatio();
 }
 
+/*! \brief Estimate the overall display aspect ratio for multi screen setups.
+ *
+ * \note This will only work where screens are configured either as a grid (e.g. 2x2)
+ * or as a single 'row' or 'column' of screens. Likewise it will fail if the aspect
+ * ratios of the displays are not similar and may not work if the display
+ * resolutions are significantly different (in a grid type setup).
+ *
+ * \note Untested with a grid layout - anyone have a card with 4 outputs?
+*/
+double MythDisplay::EstimateVirtualAspectRatio(void)
+{
+    auto sortscreens = [](const QScreen* First, const QScreen* Second)
+    {
+        if (First->geometry().left() < Second->geometry().left())
+            return true;
+        if (First->geometry().top() < Second->geometry().top())
+            return true;
+        return false;
+    };
+
+    // default
+    auto result = GetAspectRatio();
+
+    QList<QScreen*> screens;
+    if (m_screen)
+        screens = m_screen->virtualSiblings();
+    if (screens.size() < 2)
+        return result;
+
+    // N.B. This sorting may not be needed
+    std::sort(screens.begin(), screens.end(), sortscreens);
+    QList<double> aspectratios;
+    int lasttop = 0;
+    int lastleft = 0;
+    int rows = 1;
+    int columns = 1;
+    for (auto it = screens.constBegin() ; it != screens.constEnd(); ++it)
+    {
+        QRect geom = (*it)->geometry();
+        LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("%1x%2+%3+%4 %5")
+            .arg(geom.width()).arg(geom.height()).arg(geom.left()).arg(geom.top())
+            .arg((*it)->physicalSize().width() / (*it)->physicalSize().height()));
+        if (lastleft < geom.left())
+        {
+            columns++;
+            lastleft = geom.left();
+        }
+        if (lasttop < geom.top())
+        {
+            rows++;
+            lasttop = geom.top();
+            lastleft = 0;
+        }
+        aspectratios << (*it)->physicalSize().width() / (*it)->physicalSize().height();
+    }
+
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Screen layout: %1x%2").arg(rows).arg(columns));
+    if (rows == columns)
+    {
+        LOG(VB_GENERAL, LOG_DEBUG, LOC + "Grid layout");
+    }
+    else if (rows == 1 && columns > 1)
+    {
+        LOG(VB_GENERAL, LOG_DEBUG, LOC + "Horizontal layout");
+    }
+    else if (columns == 1 && rows > 1)
+    {
+        LOG(VB_GENERAL, LOG_DEBUG, LOC + "Vertical layout");
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_INFO,
+            LOC + QString("Unsupported layout - defaulting to %1")
+            .arg(result));
+        return result;
+    }
+
+    // validate aspect ratios - with a little fuzzyness
+    double aspectratio = 0.0;
+    double average = 0.0;
+    int count = 1;
+    for (auto it2 = aspectratios.constBegin() ; it2 != aspectratios.constEnd(); ++it2, ++count)
+    {
+        aspectratio += *it2;
+        average = aspectratio / count;
+        if (qAbs(*it2 - average) > 0.1)
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC +
+                QString("Inconsistent aspect ratios - defaulting to %1")
+                .arg(result));
+            return result;
+        }
+    }
+
+    aspectratio = (average * columns) / rows;
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Estimated aspect ratio: %1")
+        .arg(aspectratio));
+    return aspectratio;
+}
+
 QSize MythDisplay::GetResolution(void)
 {
     return QSize(m_last.Width(), m_last.Height());
