@@ -14,6 +14,7 @@ class MTV_PUBLIC DetectLetterbox
   private:
     bool           m_isDetectLetterbox                 { false };
     long long      m_firstFrameChecked                 { 0 };
+    VideoFrameType m_frameType                         { FMT_NONE };
     AdjustFillMode m_detectLetterboxDefaultMode        { kAdjustFill_Off };
     AdjustFillMode m_detectLetterboxDetectedMode       { kAdjustFill_Off }; /// Which mode was last detected
     long long      m_detectLetterboxSwitchFrame        { -1 }; /// On which frame was the mode switch detected
