@@ -207,7 +207,7 @@ bool MythCDROMLinux::hasWritableMedia()
         return false;
     }
 
-    CDROMdiscInfo *di = (CDROMdiscInfo *) buffer;
+    auto *di = (CDROMdiscInfo *) buffer;
     switch (di->m_discStatus)
     {
         case MEDIA_IS_EMPTY:
@@ -252,7 +252,7 @@ int MythCDROMLinux::SCSIstatus()
     cgc.buflen = sizeof(buffer);
     cgc.data_direction = CGC_DATA_READ;
 
-    CDROMeventStatus *es = (CDROMeventStatus *) buffer;
+    auto *es = (CDROMeventStatus *) buffer;
 
     if ((ioctl(m_DeviceHandle, CDROM_SEND_PACKET, &cgc) < 0)
         || es->m_nea                         // drive does not support request

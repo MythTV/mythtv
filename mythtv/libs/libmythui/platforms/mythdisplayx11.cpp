@@ -127,7 +127,7 @@ const std::vector<DisplayResScreen>& MythDisplayX11::GetVideoModes(void)
 
 bool MythDisplayX11::SwitchToVideoMode(int Width, int Height, double DesiredRate)
 {
-    double rate = static_cast<double>(NAN);
+    auto rate = static_cast<double>(NAN);
     DisplayResScreen desired_screen(Width, Height, 0, 0, -1.0, DesiredRate);
     int idx = DisplayResScreen::FindBestMatch(m_videoModesUnsorted, desired_screen, rate);
 
@@ -144,7 +144,7 @@ bool MythDisplayX11::SwitchToVideoMode(int Width, int Height, double DesiredRate
         XRRConfigCurrentConfiguration(cfg, &rot);
 
         // Search real xrandr rate for desired_rate
-        short finalrate = static_cast<short>(rate);
+        auto finalrate = static_cast<short>(rate);
 
         for (size_t i = 0; i < m_videoModes.size(); i++)
         {
@@ -195,12 +195,12 @@ void MythDisplayX11::DebugModes(const QString& Message) const
     if (VERBOSE_LEVEL_CHECK(VB_PLAYBACK, LOG_INFO))
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + Message + ":");
-        std::vector<DisplayResScreen>::const_iterator it = m_videoModes.cbegin();
+        auto it = m_videoModes.cbegin();
         for ( ; it != m_videoModes.cend(); ++it)
         {
             const std::vector<double>& rates = (*it).RefreshRates();
             QStringList rateslist;
-            std::vector<double>::const_reverse_iterator it2 = rates.crbegin();
+            auto it2 = rates.crbegin();
             for ( ; it2 != rates.crend(); ++it2)
                 rateslist.append(QString("%1").arg(*it2, 2, 'f', 2, '0'));
             LOG(VB_PLAYBACK, LOG_INFO, QString("%1x%2\t%3")

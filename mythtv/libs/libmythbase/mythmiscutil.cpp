@@ -262,7 +262,7 @@ bool ping(const QString &host, int timeout)
  */
 bool telnet(const QString &host, int port)
 {
-    MythSocket *s = new MythSocket();
+    auto *s = new MythSocket();
 
     bool connected = s->ConnectToHost(host, port);
     s->DecrRef();

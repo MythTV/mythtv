@@ -54,20 +54,20 @@ MythMenu::~MythMenu(void)
 
 void MythMenu::AddItem(const QString& title, const char* slot, MythMenu *subMenu, bool selected, bool checked)
 {
-    MythMenuItem *item = new MythMenuItem(title, slot, checked, subMenu);
+    auto *item = new MythMenuItem(title, slot, checked, subMenu);
     AddItem(item, selected, subMenu);
 }
 
 void MythMenu::AddItem(const QString &title, QVariant data, MythMenu *subMenu, bool selected, bool checked)
 {
-    MythMenuItem *item = new MythMenuItem(title, std::move(data), checked, subMenu);
+    auto *item = new MythMenuItem(title, std::move(data), checked, subMenu);
     AddItem(item, selected, subMenu);
 }
 
 void MythMenu::AddItem(const QString &title, const MythUIButtonCallback &slot,
                        MythMenu *subMenu, bool selected, bool checked)
 {
-    MythMenuItem *item = new MythMenuItem(title, slot, checked, subMenu);
+    auto *item = new MythMenuItem(title, slot, checked, subMenu);
     AddItem(item, selected, subMenu);
 }
 
@@ -194,7 +194,7 @@ void MythDialogBox::updateMenu(void)
     for (int x = 0; x < m_currentMenu->m_menuItems.count(); x++)
     {
         MythMenuItem *menuItem = m_currentMenu->m_menuItems.at(x);
-        MythUIButtonListItem *button = new MythUIButtonListItem(m_buttonList, menuItem->m_text);
+        auto *button = new MythUIButtonListItem(m_buttonList, menuItem->m_text);
         button->SetData(qVariantFromValue(menuItem));
         button->setDrawArrow((menuItem->m_subMenu != nullptr));
 
@@ -214,7 +214,7 @@ void MythDialogBox::Select(MythUIButtonListItem* item)
 
     if (m_currentMenu)
     {
-                MythMenuItem *menuItem = item->GetData().value< MythMenuItem * >();
+        auto *menuItem = item->GetData().value< MythMenuItem * >();
 
         if (menuItem->m_subMenu)
         {
@@ -299,7 +299,7 @@ void MythDialogBox::SetText(const QString &text)
 void MythDialogBox::AddButton(const QString &title, QVariant data, bool newMenu,
                               bool setCurrent)
 {
-    MythUIButtonListItem *button = new MythUIButtonListItem(m_buttonList, title);
+    auto *button = new MythUIButtonListItem(m_buttonList, title);
     button->SetData(std::move(data));
     button->setDrawArrow(newMenu);
 
@@ -313,7 +313,7 @@ void MythDialogBox::AddButton(const QString &title, QVariant data, bool newMenu,
 void MythDialogBox::AddButton(const QString &title, const char *slot,
                               bool newMenu, bool setCurrent)
 {
-    MythUIButtonListItem *button = new MythUIButtonListItem(m_buttonList, title);
+    auto *button = new MythUIButtonListItem(m_buttonList, title);
 
     m_useSlots = true;
 
@@ -418,7 +418,7 @@ void MythDialogBox::SendEvent(int res, const QString& text, const QVariant& data
         if (!m_currentMenu->m_retObject)
             return;
 
-        DialogCompletionEvent *dce = new DialogCompletionEvent(m_currentMenu->m_resultid, res, text, data);
+        auto *dce = new DialogCompletionEvent(m_currentMenu->m_resultid, res, text, data);
         QCoreApplication::postEvent(m_currentMenu->m_retObject, dce);
     }
     else
@@ -428,7 +428,7 @@ void MythDialogBox::SendEvent(int res, const QString& text, const QVariant& data
         if (!m_retObject)
             return;
 
-        DialogCompletionEvent *dce = new DialogCompletionEvent(m_id, res, text, data);
+        auto *dce = new DialogCompletionEvent(m_id, res, text, data);
         QCoreApplication::postEvent(m_retObject, dce);
     }
 }
@@ -535,8 +535,7 @@ void MythConfirmationDialog::sendResult(bool ok)
         if (ok)
             res = 1;
 
-        DialogCompletionEvent *dce = new DialogCompletionEvent(m_id, res, "",
-                                                               m_resultData);
+        auto *dce = new DialogCompletionEvent(m_id, res, "", m_resultData);
         QCoreApplication::postEvent(m_retObject, dce);
         m_retObject = nullptr;
     }
@@ -657,8 +656,7 @@ void MythTextInputDialog::sendResult()
 
     if (m_retObject)
     {
-        DialogCompletionEvent *dce = new DialogCompletionEvent(m_id, 0,
-                                                            inputString, "");
+        auto *dce = new DialogCompletionEvent(m_id, 0, inputString, "");
         QCoreApplication::postEvent(m_retObject, dce);
     }
 
@@ -756,8 +754,7 @@ void MythSpinBoxDialog::sendResult()
 
     if (m_retObject)
     {
-        DialogCompletionEvent *dce = new DialogCompletionEvent(m_id, 0,
-                                                               inputString, "");
+        auto *dce = new DialogCompletionEvent(m_id, 0, inputString, "");
         QCoreApplication::postEvent(m_retObject, dce);
     }
 
@@ -864,8 +861,7 @@ void MythUISearchDialog::slotSendResult()
 
     if (m_retObject)
     {
-        DialogCompletionEvent *dce = new DialogCompletionEvent(m_id, 0,
-                                                            result, "");
+        auto *dce = new DialogCompletionEvent(m_id, 0, result, "");
         QCoreApplication::postEvent(m_retObject, dce);
     }
 
@@ -1067,8 +1063,7 @@ void MythTimeInputDialog::okClicked(void)
     if (m_retObject)
     {
         QVariant data(dateTime);
-        DialogCompletionEvent *dce = new DialogCompletionEvent(m_id, 0, "",
-                                                               data);
+        auto *dce = new DialogCompletionEvent(m_id, 0, "", data);
         QCoreApplication::postEvent(m_retObject, dce);
     }
 

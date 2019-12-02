@@ -37,7 +37,7 @@ void MetadataImageDownload::addThumb(QString title,
 {
     QMutexLocker lock(&m_mutex);
 
-    ThumbnailData *id = new ThumbnailData();
+    auto *id = new ThumbnailData();
     id->title = std::move(title);
     id->data = std::move(data);
     id->url = std::move(url);

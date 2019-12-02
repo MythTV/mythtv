@@ -41,7 +41,7 @@ void MHTokenGroupItem::Initialise(MHParseNode *p, MHEngine *engine)
         for (int i = 0; i < pSlots->GetSeqCount(); i++)
         {
             MHParseNode *pAct = pSlots->GetSeqN(i);
-            MHActionSequence *pActions = new MHActionSequence;
+            auto *pActions = new MHActionSequence;
             m_ActionSlots.Append(pActions);
 
             // The action slot entry may be NULL.
@@ -123,7 +123,7 @@ void MHTokenGroup::Initialise(MHParseNode *p, MHEngine *engine)
     {
         for (int i = 0; i < pMovements->GetArgCount(); i++)
         {
-            MHMovement *pMove = new MHMovement;
+            auto *pMove = new MHMovement;
             m_MovementTable.Append(pMove);
             pMove->Initialise(pMovements->GetArgN(i), engine);
         }
@@ -135,7 +135,7 @@ void MHTokenGroup::Initialise(MHParseNode *p, MHEngine *engine)
     {
         for (int i = 0; i < pTokenGrp->GetArgCount(); i++)
         {
-            MHTokenGroupItem *pToken = new MHTokenGroupItem;
+            auto *pToken = new MHTokenGroupItem;
             m_TokenGrpItems.Append(pToken);
             pToken->Initialise(pTokenGrp->GetArgN(i), engine);
         }
@@ -148,7 +148,7 @@ void MHTokenGroup::Initialise(MHParseNode *p, MHEngine *engine)
         for (int i = 0; i < pNoToken->GetArgCount(); i++)
         {
             MHParseNode *pAct = pNoToken->GetArgN(i);
-            MHActionSequence *pActions = new MHActionSequence;
+            auto *pActions = new MHActionSequence;
             m_NoTokenActionSlots.Append(pActions);
 
             // The action slot entry may be NULL.

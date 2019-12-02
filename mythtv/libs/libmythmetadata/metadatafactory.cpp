@@ -87,7 +87,7 @@ void MetadataFactory::Lookup(RecordingRule *recrule, bool automatic,
     if (!recrule)
         return;
 
-    MetadataLookup *lookup = new MetadataLookup();
+    auto *lookup = new MetadataLookup();
 
     lookup->SetStep(kLookupSearch);
     lookup->SetType(kMetadataRecording);
@@ -115,7 +115,7 @@ void MetadataFactory::Lookup(ProgramInfo *pginfo, bool automatic,
     if (!pginfo)
         return;
 
-    MetadataLookup *lookup = new MetadataLookup();
+    auto *lookup = new MetadataLookup();
 
     lookup->SetStep(kLookupSearch);
     lookup->SetType(kMetadataRecording);
@@ -143,7 +143,7 @@ void MetadataFactory::Lookup(VideoMetadata *metadata, bool automatic,
     if (!metadata)
         return;
 
-    MetadataLookup *lookup = new MetadataLookup();
+    auto *lookup = new MetadataLookup();
 
     lookup->SetStep(kLookupSearch);
     lookup->SetType(kMetadataVideo);
@@ -186,7 +186,7 @@ META_PUBLIC MetadataLookupList MetadataFactory::SynchronousLookup(const QString&
                                                       const QString& grabber,
                                                       bool allowgeneric)
 {
-    MetadataLookup *lookup = new MetadataLookup();
+    auto *lookup = new MetadataLookup();
 
     lookup->SetStep(kLookupSearch);
     lookup->SetType(kMetadataRecording);
@@ -362,7 +362,7 @@ void MetadataFactory::OnVideoResult(MetadataLookup *lookup)
     if (!lookup)
        return;
 
-    VideoMetadata *metadata = lookup->GetData().value<VideoMetadata *>();
+    auto *metadata = lookup->GetData().value<VideoMetadata *>();
 
     if (!metadata)
         return;
@@ -551,7 +551,7 @@ void MetadataFactory::customEvent(QEvent *levent)
     }
     else if (levent->type() == ImageDLEvent::kEventType)
     {
-        ImageDLEvent *ide = dynamic_cast<ImageDLEvent *>(levent);
+        auto *ide = dynamic_cast<ImageDLEvent *>(levent);
         if (ide == nullptr)
             return;
 
@@ -566,7 +566,7 @@ void MetadataFactory::customEvent(QEvent *levent)
     }
     else if (levent->type() == ImageDLFailureEvent::kEventType)
     {
-        ImageDLFailureEvent *ide = dynamic_cast<ImageDLFailureEvent *>(levent);
+        auto *ide = dynamic_cast<ImageDLFailureEvent *>(levent);
         if (ide == nullptr)
             return;
 
@@ -581,7 +581,7 @@ void MetadataFactory::customEvent(QEvent *levent)
     }
     else if (levent->type() == VideoScanChanges::kEventType)
     {
-        VideoScanChanges *vsc = dynamic_cast<VideoScanChanges *>(levent);
+        auto *vsc = dynamic_cast<VideoScanChanges *>(levent);
         if (!vsc)
             return;
 
@@ -658,7 +658,7 @@ LookupType GuessLookupType(ProgramInfo *pginfo)
         // recording have an inetref, season, episode, or
         // subtitle, it's *probably* a movie.  If it's some
         // weird combination of both, we've got to try everything.
-        RecordingRule *rule = new RecordingRule();
+        auto *rule = new RecordingRule();
         rule->m_recordID = pginfo->GetRecordingRuleID();
         rule->Load();
         int ruleepisode = rule->m_episode;

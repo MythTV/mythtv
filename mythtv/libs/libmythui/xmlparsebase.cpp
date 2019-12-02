@@ -916,7 +916,7 @@ bool XMLParseBase::CopyWindowFromBase(const QString &windowname,
         return false;
     }
 
-    MythScreenType *st = dynamic_cast<MythScreenType *>(ui);
+    auto *st = dynamic_cast<MythScreenType *>(ui);
     if (!st)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +

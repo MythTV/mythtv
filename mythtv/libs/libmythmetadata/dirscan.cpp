@@ -25,8 +25,8 @@ namespace
         ext_lookup(const FileAssociations::ext_ignore_list &ext_disposition,
                    bool list_unknown) : m_listUnknown(list_unknown)
         {
-            for (FileAssociations::ext_ignore_list::const_iterator p =
-                 ext_disposition.begin(); p != ext_disposition.end(); ++p)
+            for (auto p = ext_disposition.cbegin();
+                 p != ext_disposition.cend(); ++p)
             {
                 m_extensions.insert(ext_map::value_type(p->first.toLower(),
                                                         p->second));

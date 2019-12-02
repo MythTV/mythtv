@@ -49,7 +49,7 @@ void WebSocketServer::newTcpConnection(qt_socket_fd_t socket)
 {
 
     PoolServerType type = kTCPServer;
-    PrivTcpServer *server = dynamic_cast<PrivTcpServer *>(QObject::sender());
+    auto *server = dynamic_cast<PrivTcpServer *>(QObject::sender());
     if (server)
         type = server->GetServerType();
 
@@ -83,7 +83,7 @@ WebSocketWorkerThread::WebSocketWorkerThread(WebSocketServer& webSocketServer,
 
 void WebSocketWorkerThread::run(void)
 {
-    WebSocketWorker *worker = new WebSocketWorker(m_webSocketServer, m_socketFD,
+    auto *worker = new WebSocketWorker(m_webSocketServer, m_socketFD,
                                                   m_connectionType
 #ifndef QT_NO_OPENSSL
                                                   , m_sslConfig
@@ -163,7 +163,7 @@ void WebSocketWorker::SetupSocket()
     {
 
 #ifndef QT_NO_OPENSSL
-        QSslSocket *pSslSocket = new QSslSocket();
+        auto *pSslSocket = new QSslSocket();
         if (pSslSocket->setSocketDescriptor(m_socketFD)
            && gCoreContext->CheckSubnet(pSslSocket))
         {

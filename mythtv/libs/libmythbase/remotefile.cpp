@@ -137,7 +137,7 @@ MythSocket *RemoteFile::openSocket(bool control)
 
     QString sgroup = qurl.userName();
 
-    MythSocket *lsock = new MythSocket();
+    auto *lsock = new MythSocket();
     QString stype = (control) ? "control socket" : "file data socket";
 
     QString loc = QString("RemoteFile::openSocket(%1): ").arg(stype);

@@ -180,7 +180,7 @@ void MythUDPListener::Process(const QByteArray &buf, const QHostAddress& /*sende
             QStringList args;
             args << QString::number(timeout);
             MythMainWindow *window = GetMythMainWindow();
-            MythEvent* me = new MythEvent(MythEvent::MythUserMessage, msg, args);
+            auto* me = new MythEvent(MythEvent::MythUserMessage, msg, args);
             qApp->postEvent(window, me);
         }
     }

@@ -491,7 +491,7 @@ bool MythDisplay::SwitchToVideo(int Width, int Height, double Rate)
 bool MythDisplay::SwitchToGUI(Mode NextMode)
 {
     DisplayResScreen next = m_mode[NextMode];
-    double target_rate = static_cast<double>(NAN);
+    auto target_rate = static_cast<double>(NAN);
 
     // need to change video mode?
     // If GuiVidModeRefreshRate is 0, assume any refresh rate is good enough.
@@ -535,7 +535,7 @@ double MythDisplay::GetRefreshRate(void)
 
 std::vector<double> MythDisplay::GetRefreshRates(int Width, int Height)
 {
-    double tr = static_cast<double>(NAN);
+    auto tr = static_cast<double>(NAN);
     std::vector<double> empty;
 
     const DisplayResScreen drs(Width, Height, 0, 0, -1.0, 0.0);

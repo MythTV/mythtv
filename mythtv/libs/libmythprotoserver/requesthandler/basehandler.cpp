@@ -33,7 +33,7 @@ bool BaseRequestHandler::HandleAnnounce(MythSocket *socket,
     bool systemevents = ( (eventlevel == 1) || (eventlevel == 3));
     bool normalevents = ( (eventlevel == 1) || (eventlevel == 2));
 
-    SocketHandler *handler = new SocketHandler(socket, m_parent, hostname);
+    auto *handler = new SocketHandler(socket, m_parent, hostname);
     socket->SetAnnounce(slist);
 
     handler->BlockShutdown(blockShutdown);

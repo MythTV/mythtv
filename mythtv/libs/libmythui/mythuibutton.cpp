@@ -104,7 +104,7 @@ void MythUIButton::SetState(const QString& state)
 
     m_BackgroundState->DisplayState(m_state);
 
-    MythUIGroup *activeState = dynamic_cast<MythUIGroup *>
+    auto *activeState = dynamic_cast<MythUIGroup *>
                                (m_BackgroundState->GetCurrentState());
 
     if (activeState)
@@ -230,7 +230,7 @@ void MythUIButton::SetText(const QString &msg)
 
     m_Message = msg;
 
-    MythUIGroup *activeState = dynamic_cast<MythUIGroup *>
+    auto *activeState = dynamic_cast<MythUIGroup *>
                                (m_BackgroundState->GetCurrentState());
 
     if (activeState)
@@ -274,7 +274,7 @@ bool MythUIButton::ParseElement(
  */
 void MythUIButton::CreateCopy(MythUIType *parent)
 {
-    MythUIButton *button = new MythUIButton(parent, objectName());
+    auto *button = new MythUIButton(parent, objectName());
     button->CopyFrom(this);
 }
 
@@ -283,8 +283,7 @@ void MythUIButton::CreateCopy(MythUIType *parent)
  */
 void MythUIButton::CopyFrom(MythUIType *base)
 {
-    MythUIButton *button = dynamic_cast<MythUIButton *>(base);
-
+    auto *button = dynamic_cast<MythUIButton *>(base);
     if (!button)
     {
         LOG(VB_GENERAL, LOG_ERR, "Dynamic cast of base failed");

@@ -51,9 +51,7 @@ bool ImageSearchResultsDialog::Create()
             i != m_list.end(); ++i)
     {
             ArtworkInfo info = (*i);
-            MythUIButtonListItem *button =
-                new MythUIButtonListItem(m_resultsList,
-                QString());
+            auto *button = new MythUIButtonListItem(m_resultsList, QString());
             button->SetText(info.label, "label");
             button->SetText(info.thumbnail, "thumbnail");
             button->SetText(info.url, "url");
@@ -122,7 +120,7 @@ void ImageSearchResultsDialog::customEvent(QEvent *event)
 {
     if (event->type() == ThumbnailDLEvent::kEventType)
     {
-        ThumbnailDLEvent *tde = dynamic_cast<ThumbnailDLEvent *>(event);
+        auto *tde = dynamic_cast<ThumbnailDLEvent *>(event);
         if (tde == nullptr)
             return;
 

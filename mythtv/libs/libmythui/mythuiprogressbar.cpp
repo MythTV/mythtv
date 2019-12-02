@@ -138,8 +138,8 @@ void MythUIProgressBar::CalculatePosition(void)
             break;
     }
 
-    MythUIImage *progressImage = dynamic_cast<MythUIImage *>(progressType);
-    MythUIShape *progressShape = dynamic_cast<MythUIShape *>(progressType);
+    auto *progressImage = dynamic_cast<MythUIImage *>(progressType);
+    auto *progressShape = dynamic_cast<MythUIShape *>(progressType);
 
     if (width <= 0)
         width = 1;
@@ -162,7 +162,7 @@ void MythUIProgressBar::Finalize()
 
 void MythUIProgressBar::CopyFrom(MythUIType *base)
 {
-    MythUIProgressBar *progressbar = dynamic_cast<MythUIProgressBar *>(base);
+    auto *progressbar = dynamic_cast<MythUIProgressBar *>(base);
 
     if (!progressbar)
         return;
@@ -179,7 +179,7 @@ void MythUIProgressBar::CopyFrom(MythUIType *base)
 
 void MythUIProgressBar::CreateCopy(MythUIType *parent)
 {
-    MythUIProgressBar *progressbar = new MythUIProgressBar(parent, objectName());
+    auto *progressbar = new MythUIProgressBar(parent, objectName());
     progressbar->CopyFrom(this);
 }
 

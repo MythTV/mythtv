@@ -106,7 +106,7 @@ int MetaIOTagLib::getTrackLength(const QString &filename)
 {
     int milliseconds = 0;
     QByteArray fname = filename.toLocal8Bit();
-    TagLib::FileRef *file = new TagLib::FileRef(fname.constData());
+    auto *file = new TagLib::FileRef(fname.constData());
 
     if (file && file->audioProperties())
         milliseconds = file->audioProperties()->length() * 1000;

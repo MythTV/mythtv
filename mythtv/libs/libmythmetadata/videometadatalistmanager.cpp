@@ -21,8 +21,7 @@ class VideoMetadataListManagerImp
         m_fileMap.clear();
         m_metaList.swap(list);
 
-        for (metadata_list::iterator p = m_metaList.begin();
-             p != m_metaList.end(); ++p)
+        for (auto p = m_metaList.begin(); p != m_metaList.end(); ++p)
         {
             m_idMap.insert(int_to_meta::value_type((*p)->GetID(), p));
             m_fileMap.insert(
@@ -71,16 +70,15 @@ class VideoMetadataListManagerImp
     {
         if (metadata)
         {
-            int_to_meta::iterator im = m_idMap.find(metadata->GetID());
+            auto im = m_idMap.find(metadata->GetID());
 
             if (im != m_idMap.end())
             {
-                metadata_list::iterator mdi = im->second;
+                auto mdi = im->second;
                 (*mdi)->DeleteFromDatabase();
 
                 m_idMap.erase(im);
-                string_to_meta::iterator sm =
-                        m_fileMap.find(metadata->GetFilename());
+                auto sm = m_fileMap.find(metadata->GetFilename());
                 if (sm != m_fileMap.end())
                     m_fileMap.erase(sm);
                 m_metaList.erase(mdi);
@@ -440,8 +438,7 @@ bool meta_dir_node::has_entries() const
 
     if (!ret)
     {
-        for (meta_dir_list::const_iterator p = m_subdirs.begin();
-        p != m_subdirs.end(); ++p)
+        for (auto p = m_subdirs.cbegin(); p != m_subdirs.cend(); ++p)
         {
             ret = (*p)->has_entries();
             if (ret) break;

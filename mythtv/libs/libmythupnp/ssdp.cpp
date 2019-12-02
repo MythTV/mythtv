@@ -549,7 +549,7 @@ bool SSDP::ProcessSearchRequest( const QStringMap &sHeaders,
 
     if ((sST == "ssdp:all") || (sST == "upnp:rootdevice"))
     {
-        UPnpSearchTask *pTask = new UPnpSearchTask( m_nServicePort, 
+        auto *pTask = new UPnpSearchTask( m_nServicePort,
             peerAddress, peerPort, sST, 
             UPnp::g_UPnpDeviceDesc.m_rootDevice.GetUDN());
 
@@ -575,11 +575,8 @@ bool SSDP::ProcessSearchRequest( const QStringMap &sHeaders,
 
     if (sUDN.length() > 0)
     {
-        UPnpSearchTask *pTask = new UPnpSearchTask( m_nServicePort,
-                                                    peerAddress,
-                                                    peerPort,
-                                                    sST, 
-                                                    sUDN );
+        auto *pTask = new UPnpSearchTask( m_nServicePort, peerAddress,
+                                          peerPort, sST, sUDN );
 
         // Excute task now for fastest response, queue for time-delayed response
         // -=>TODO: To be trully uPnp compliant, this Execute should be removed.

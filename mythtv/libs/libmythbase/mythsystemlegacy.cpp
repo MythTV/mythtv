@@ -453,7 +453,7 @@ void MythSystemLegacy::HandlePostRun(void)
     // handler thread), we need to use postEvents
     if (GetSetting("DisableDrawing"))
     {
-        QEvent *event = new QEvent(MythEvent::kPopDisableDrawingEventType);
+        auto *event = new QEvent(MythEvent::kPopDisableDrawingEventType);
         QCoreApplication::postEvent(gCoreContext->GetGUIObject(), event);
     }
 
@@ -461,7 +461,7 @@ void MythSystemLegacy::HandlePostRun(void)
     // the UDP ports before the child application has stopped and terminated
     if (GetSetting("DisableUDP"))
     {
-        QEvent *event = new QEvent(MythEvent::kEnableUDPListenerEventType);
+        auto *event = new QEvent(MythEvent::kEnableUDPListenerEventType);
         QCoreApplication::postEvent(gCoreContext->GetGUIObject(), event);
     }
 
@@ -469,7 +469,7 @@ void MythSystemLegacy::HandlePostRun(void)
     // after all existing (blocked) events are processed and ignored.
     if (GetSetting("BlockInputDevs"))
     {
-        QEvent *event = new QEvent(MythEvent::kUnlockInputDevicesEventType);
+        auto *event = new QEvent(MythEvent::kUnlockInputDevicesEventType);
         QCoreApplication::postEvent(gCoreContext->GetGUIObject(), event);
     }
 }
@@ -501,7 +501,7 @@ MythSystemLegacyPrivate::MythSystemLegacyPrivate(const QString &debugName) :
 uint myth_system(const QString &command, uint flags, uint timeout)
 {
     flags |= kMSRunShell | kMSAutoCleanup;
-    MythSystemLegacy *ms = new MythSystemLegacy(command, flags);
+    auto *ms = new MythSystemLegacy(command, flags);
     ms->Run(timeout);
     uint result = ms->Wait(0);
     if (!ms->GetSetting("RunInBackground"))

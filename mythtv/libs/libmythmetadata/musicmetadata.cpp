@@ -281,7 +281,7 @@ MusicMetadata *MusicMetadata::createFromID(int trackid)
 
     if (query.exec() && query.next())
     {
-        MusicMetadata *mdata = new MusicMetadata();
+        auto *mdata = new MusicMetadata();
         mdata->m_artist = query.value(0).toString();
         mdata->m_compilation_artist = query.value(1).toString();
         mdata->m_album = query.value(2).toString();
@@ -1498,7 +1498,7 @@ void AllMusic::resync()
 
             idList.append(id);
 
-            MusicMetadata *dbMeta = new MusicMetadata(
+            auto *dbMeta = new MusicMetadata(
                 query.value(12).toString(),    // filename
                 query.value(2).toString(),     // artist
                 query.value(3).toString(),     // compilation artist
@@ -1669,7 +1669,7 @@ void AllMusic::clearCDData(void)
 
 void AllMusic::addCDTrack(const MusicMetadata &the_track)
 {
-    MusicMetadata *mdata = new MusicMetadata(the_track);
+    auto *mdata = new MusicMetadata(the_track);
     mdata->setID(m_cdData.count() + 1);
     mdata->setRepo(RT_CD);
     m_cdData.append(mdata);
@@ -1761,7 +1761,7 @@ void AllStream::loadStreams(void)
             for (int x = 0; x < STREAMURLCOUNT; x++)
                 urls[x] = query.value(4 + x).toString();
 
-            MusicMetadata *mdata = new MusicMetadata(
+            auto *mdata = new MusicMetadata(
                     query.value(0).toInt(),        // intid
                     query.value(1).toString(),     // broadcaster
                     query.value(2).toString(),     // channel
@@ -1917,7 +1917,7 @@ void AlbumArtImages::findImages(void)
             {
                 QString logoUrl = query.value(0).toString();
 
-                AlbumArtImage *image = new AlbumArtImage();
+                auto *image = new AlbumArtImage();
                 image->m_id = -1;
                 image->m_filename = logoUrl;
                 image->m_imageType = IT_FRONTCOVER;
@@ -1951,7 +1951,7 @@ void AlbumArtImages::findImages(void)
         {
             while (query.next())
             {
-                AlbumArtImage *image = new AlbumArtImage();
+                auto *image = new AlbumArtImage();
                 bool embedded = (query.value(4).toInt() == 1);
                 image->m_id = query.value(0).toInt();
 
@@ -1988,7 +1988,7 @@ void AlbumArtImages::findImages(void)
         QString artist = m_parent->Artist().toLower();
         if (findIcon("artist", artist) != QString())
         {
-            AlbumArtImage *image = new AlbumArtImage();
+            auto *image = new AlbumArtImage();
             image->m_id = -1;
             image->m_filename = findIcon("artist", artist);
             image->m_imageType = IT_ARTIST;
@@ -2002,8 +2002,8 @@ void AlbumArtImages::findImages(void)
 void AlbumArtImages::scanForImages()
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythUIBusyDialog *busy = new MythUIBusyDialog(tr("Scanning for music album art..."),
-                                                  popupStack, "scanbusydialog");
+    auto *busy = new MythUIBusyDialog(tr("Scanning for music album art..."),
+                                      popupStack, "scanbusydialog");
 
     if (busy->Create())
     {
@@ -2021,7 +2021,7 @@ void AlbumArtImages::scanForImages()
             << QString::number(m_parent->ID())
             << "1";
 
-    AlbumArtScannerThread *scanThread = new AlbumArtScannerThread(strList);
+    auto *scanThread = new AlbumArtScannerThread(strList);
     scanThread->start();
 
     while (scanThread->isRunning())
@@ -2045,7 +2045,7 @@ void AlbumArtImages::scanForImages()
 
     for (int x = 2; x < strList.count(); x += 6)
     {
-        AlbumArtImage *image = new AlbumArtImage;
+        auto *image = new AlbumArtImage;
         image->m_id = strList[x].toInt();
         image->m_imageType = (ImageType) strList[x + 1].toInt();
         image->m_embedded = (strList[x + 2].toInt() == 1);

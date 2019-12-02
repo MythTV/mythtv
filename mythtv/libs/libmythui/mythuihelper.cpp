@@ -463,8 +463,7 @@ void MythUIHelper::LoadQtConfig(void)
     QString themename = GetMythDB()->GetSetting("Theme", DEFAULT_UI_THEME);
     QString themedir = FindThemeDir(themename);
 
-    ThemeInfo *themeinfo = new ThemeInfo(themedir);
-
+    auto *themeinfo = new ThemeInfo(themedir);
     if (themeinfo)
     {
         d->m_isWide = themeinfo->IsWide();

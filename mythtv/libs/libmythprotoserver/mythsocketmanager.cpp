@@ -105,7 +105,7 @@ bool MythSocketManager::Listen(int port)
 void MythSocketManager::newConnection(qt_socket_fd_t sd)
 {
     QMutexLocker locker(&m_socketListLock);
-    MythSocket *ms = new MythSocket(sd, this);
+    auto *ms = new MythSocket(sd, this);
     if (ms->IsConnected())
         m_socketList.insert(ms);
     else

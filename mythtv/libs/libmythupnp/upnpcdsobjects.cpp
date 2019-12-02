@@ -200,7 +200,7 @@ CDSObject *CDSObject::GetChild( const QString &sID )
 
 Resource *CDSObject::AddResource( const QString& sProtocol, const QString& sURI )
 {
-    Resource *pRes = new Resource( sProtocol, sURI );
+    auto *pRes = new Resource( sProtocol, sURI );
     
     m_resources.append( pRes );
 

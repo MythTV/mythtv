@@ -15,11 +15,11 @@ void MythUIComposite::SetTextFromMap(const InfoMap &infoMap)
     {
         MythUIType *type = i.next();
 
-        MythUIText *textType = dynamic_cast<MythUIText *> (type);
+        auto *textType = dynamic_cast<MythUIText *> (type);
         if (textType)
             textType->SetTextFromMap(infoMap);
 
-        MythUIComposite *group = dynamic_cast<MythUIComposite *> (type);
+        auto *group = dynamic_cast<MythUIComposite *> (type);
         if (group)
             group->SetTextFromMap(infoMap);
     }
@@ -37,11 +37,11 @@ void MythUIComposite::ResetMap(const InfoMap &infoMap)
     {
         MythUIType *type = i.next();
 
-        MythUIText *textType = dynamic_cast<MythUIText *> (type);
+        auto *textType = dynamic_cast<MythUIText *> (type);
         if (textType)
             textType->ResetMap(infoMap);
 
-        MythUIComposite *group = dynamic_cast<MythUIComposite *> (type);
+        auto *group = dynamic_cast<MythUIComposite *> (type);
         if (group)
             group->ResetMap(infoMap);
     }

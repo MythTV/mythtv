@@ -184,7 +184,7 @@ void UPnpDeviceDesc::ProcessIconList( const QDomNode& oListNode, UPnpDevice *pDe
 
         if ( e.tagName() == "icon" )
         {
-            UPnpIcon *pIcon = new UPnpIcon();
+            auto *pIcon = new UPnpIcon();
             pDevice->m_listIcons.append( pIcon );
 
             SetStrValue( e.namedItem( "mimetype" ), pIcon->m_sMimeType );
@@ -213,7 +213,7 @@ void UPnpDeviceDesc::ProcessServiceList( const QDomNode& oListNode, UPnpDevice *
 
         if ( e.tagName() == "service" )
         {
-            UPnpService *pService = new UPnpService();
+            auto *pService = new UPnpService();
             pDevice->m_listServices.append( pService );
 
             SetStrValue(e.namedItem( "serviceType" ), pService->m_sServiceType);
@@ -248,7 +248,7 @@ void UPnpDeviceDesc::ProcessDeviceList( const QDomNode&    oListNode,
 
         if ( e.tagName() == "device")
         {
-            UPnpDevice *pNewDevice = new UPnpDevice();
+            auto *pNewDevice = new UPnpDevice();
             pDevice->m_listDevices.append( pNewDevice );
             _InternalLoad( e, pNewDevice );
         }
@@ -708,7 +708,7 @@ UPnpDevice::UPnpDevice() :
 //       devices too.
 
     // Large PNG Icon
-    UPnpIcon *pngIconLrg = new UPnpIcon();
+    auto *pngIconLrg = new UPnpIcon();
     pngIconLrg->m_nDepth = 24;
     pngIconLrg->m_nHeight = 120;
     pngIconLrg->m_nWidth = 120;
@@ -717,7 +717,7 @@ UPnpDevice::UPnpDevice() :
     m_listIcons.append(pngIconLrg);
 
     // Large JPG Icon
-    UPnpIcon *jpgIconLrg = new UPnpIcon();
+    auto *jpgIconLrg = new UPnpIcon();
     jpgIconLrg->m_nDepth = 24;
     jpgIconLrg->m_nHeight = 120;
     jpgIconLrg->m_nWidth = 120;
@@ -726,7 +726,7 @@ UPnpDevice::UPnpDevice() :
     m_listIcons.append(jpgIconLrg);
 
     // Small PNG Icon
-    UPnpIcon *pngIconSm = new UPnpIcon();
+    auto *pngIconSm = new UPnpIcon();
     pngIconSm->m_nDepth = 24;
     pngIconSm->m_nHeight = 48;
     pngIconSm->m_nWidth = 48;
@@ -735,7 +735,7 @@ UPnpDevice::UPnpDevice() :
     m_listIcons.append(pngIconSm);
 
     // Small JPG Icon
-    UPnpIcon *jpgIconSm = new UPnpIcon();
+    auto *jpgIconSm = new UPnpIcon();
     jpgIconSm->m_nDepth = 24;
     jpgIconSm->m_nHeight = 48;
     jpgIconSm->m_nWidth = 48;

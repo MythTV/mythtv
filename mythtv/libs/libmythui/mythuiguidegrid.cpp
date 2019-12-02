@@ -212,7 +212,7 @@ bool MythUIGuideGrid::ParseElement(
 
 void MythUIGuideGrid::CopyFrom(MythUIType *base)
 {
-    MythUIGuideGrid *gg = dynamic_cast<MythUIGuideGrid *>(base);
+    auto *gg = dynamic_cast<MythUIGuideGrid *>(base);
 
     if (!gg)
     {
@@ -247,7 +247,7 @@ void MythUIGuideGrid::CopyFrom(MythUIType *base)
 
 void MythUIGuideGrid::CreateCopy(MythUIType *parent)
 {
-    MythUIGuideGrid *gg = new MythUIGuideGrid(parent, objectName());
+    auto *gg = new MythUIGuideGrid(parent, objectName());
     gg->CopyFrom(this);
 }
 
@@ -689,7 +689,7 @@ void MythUIGuideGrid::SetProgramInfo(int row, int col, const QRect &area,
                                      bool selected)
 {
     (void)col;
-    UIGTCon *data = new UIGTCon(area, title, genre, arrow, recType, recStat);
+    auto *data = new UIGTCon(area, title, genre, arrow, recType, recStat);
     m_allData[row].append(data);
 
     if (m_drawCategoryColors)
@@ -774,7 +774,7 @@ void MythUIGuideGrid::SetCategoryColors(const QMap<QString, QString> &catC)
 
 void MythUIGuideGrid::LoadImage(int recType, const QString &file)
 {
-    MythUIImage *uiimage = new MythUIImage(file, this, "guidegrid image");
+    auto *uiimage = new MythUIImage(file, this, "guidegrid image");
     uiimage->m_imageProperties.m_isThemeImage = true;
     uiimage->SetVisible(false);
     uiimage->Load(false);
@@ -786,7 +786,7 @@ void MythUIGuideGrid::LoadImage(int recType, const QString &file)
 
 void MythUIGuideGrid::SetArrow(int direction, const QString &file)
 {
-    MythUIImage *uiimage = new MythUIImage(file, this, "guidegrid arrow");
+    auto *uiimage = new MythUIImage(file, this, "guidegrid arrow");
     uiimage->m_imageProperties.m_isThemeImage = true;
     uiimage->SetVisible(false);
     uiimage->Load(false);

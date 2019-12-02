@@ -2196,8 +2196,7 @@ void MythCommandLineParser::allowArgs(bool allow)
     else if (!allow)
         return;
 
-    CommandLineArg *arg = new CommandLineArg("_args", QVariant::StringList,
-                                             QStringList());
+    auto *arg = new CommandLineArg("_args", QVariant::StringList, QStringList());
     m_namedArgs["_args"] = arg;
 }
 
@@ -2215,7 +2214,7 @@ void MythCommandLineParser::allowExtras(bool allow)
         return;
 
     QMap<QString,QVariant> vmap;
-    CommandLineArg *arg = new CommandLineArg("_extra", QVariant::Map, vmap);
+    auto *arg = new CommandLineArg("_extra", QVariant::Map, vmap);
 
     m_namedArgs["_extra"] = arg;
 }
@@ -2233,7 +2232,7 @@ void MythCommandLineParser::allowPassthrough(bool allow)
     else if (!allow)
         return;
 
-    CommandLineArg *arg = new CommandLineArg("_passthrough",
+    auto *arg = new CommandLineArg("_passthrough",
                                     QVariant::StringList, QStringList());
     m_namedArgs["_passthrough"] = arg;
 }

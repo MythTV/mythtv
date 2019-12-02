@@ -99,7 +99,7 @@ static inline void qt_socket_getportaddr(struct sockaddr *sa,
     if (sa->sa_family == AF_INET6)
     {
 
-        struct sockaddr_in6 *sa6 = (struct sockaddr_in6 *)sa;
+        auto *sa6 = (struct sockaddr_in6 *)sa;
         Q_IPV6ADDR tmp;
         memcpy(&tmp, &sa6->sin6_addr.s6_addr, sizeof(tmp));
         QHostAddress a(tmp);
@@ -109,7 +109,7 @@ static inline void qt_socket_getportaddr(struct sockaddr *sa,
     }
 
 
-    struct sockaddr_in *sa4 = (struct sockaddr_in *)sa;
+    auto *sa4 = (struct sockaddr_in *)sa;
 
     QHostAddress a(ntohl(sa4->sin_addr.s_addr));
 
@@ -132,7 +132,7 @@ MSocketDevice::Protocol MSocketDevice::getProtocol() const
         struct sockaddr_storage sa {};
         QT_SOCKLEN_T sz = sizeof(sa);
 
-        struct sockaddr *sap = reinterpret_cast<struct sockaddr *>(&sa);
+        auto *sap = reinterpret_cast<struct sockaddr *>(&sa);
 
         if (!::getsockname(fd, sap, &sz))
         {
@@ -376,7 +376,7 @@ int MSocketDevice::option(Option opt) const
 
         if (!e)
         {
-            MSocketDevice *that = (MSocketDevice*)this; // mutable function
+            auto *that = (MSocketDevice*)this; // mutable function
 
             switch (errno)
             {

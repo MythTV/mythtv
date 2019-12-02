@@ -145,7 +145,7 @@ void MythUIScrollBar::Finalize()
 
 void MythUIScrollBar::CopyFrom(MythUIType *base)
 {
-    MythUIScrollBar *scrollbar = dynamic_cast<MythUIScrollBar *>(base);
+    auto *scrollbar = dynamic_cast<MythUIScrollBar *>(base);
     if (!scrollbar)
         return;
 
@@ -158,7 +158,7 @@ void MythUIScrollBar::CopyFrom(MythUIType *base)
 
 void MythUIScrollBar::CreateCopy(MythUIType *parent)
 {
-    MythUIScrollBar *scrollbar = new MythUIScrollBar(parent, objectName());
+    auto *scrollbar = new MythUIScrollBar(parent, objectName());
     scrollbar->CopyFrom(this);
 }
 

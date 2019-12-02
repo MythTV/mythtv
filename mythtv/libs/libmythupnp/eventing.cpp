@@ -374,7 +374,7 @@ void Eventing::NotifySubscriber( SubscriberInfo *pInfo )
 
         // -=>TODO: Need to add support for more than one CallBack URL.
 
-        QByteArray  *pBuffer = new QByteArray();    // UPnpEventTask will delete this pointer.
+        auto *pBuffer = new QByteArray();    // UPnpEventTask will delete this pointer.
         QTextStream  tsMsg( pBuffer, QIODevice::WriteOnly );
 
         tsMsg.setCodec(QTextCodec::codecForName("UTF-8"));
@@ -407,9 +407,8 @@ void Eventing::NotifySubscriber( SubscriberInfo *pInfo )
             QString("UPnp::Eventing::NotifySubscriber( %1 ) : %2 Variables")
                 .arg( sHost ).arg(nCount));
 
-        UPnpEventTask *pEventTask = 
-            new UPnpEventTask(QHostAddress( pInfo->m_qURL.host() ),
-                              nPort, pBuffer );
+        auto *pEventTask = new UPnpEventTask(QHostAddress(pInfo->m_qURL.host()),
+                                             nPort, pBuffer);
 
         TaskQueue::Instance()->AddTask( 250, pEventTask );
 

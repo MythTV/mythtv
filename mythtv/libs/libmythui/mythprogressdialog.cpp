@@ -164,8 +164,7 @@ void MythUIProgressDialog::customEvent(QEvent *event)
 {
     if (event->type() == ProgressUpdateEvent::kEventType)
     {
-        ProgressUpdateEvent *pue = dynamic_cast<ProgressUpdateEvent*>(event);
-
+        auto *pue = dynamic_cast<ProgressUpdateEvent*>(event);
         if (!pue)
         {
             LOG(VB_GENERAL, LOG_ERR,

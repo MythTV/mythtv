@@ -127,12 +127,12 @@ void MythUIEditBar::Display(void)
         return;
     }
 
-    MythUIShape *barshape   = dynamic_cast<MythUIShape *>(cut);
-    MythUIImage *barimage   = dynamic_cast<MythUIImage *>(cut);
-    MythUIShape *leftshape  = dynamic_cast<MythUIShape *>(cuttoleft);
-    MythUIImage *leftimage  = dynamic_cast<MythUIImage *>(cuttoleft);
-    MythUIShape *rightshape = dynamic_cast<MythUIShape *>(cuttoright);
-    MythUIImage *rightimage = dynamic_cast<MythUIImage *>(cuttoright);
+    auto *barshape   = dynamic_cast<MythUIShape *>(cut);
+    auto *barimage   = dynamic_cast<MythUIImage *>(cut);
+    auto *leftshape  = dynamic_cast<MythUIShape *>(cuttoleft);
+    auto *leftimage  = dynamic_cast<MythUIImage *>(cuttoleft);
+    auto *rightshape = dynamic_cast<MythUIShape *>(cuttoright);
+    auto *rightimage = dynamic_cast<MythUIImage *>(cuttoright);
 
     QListIterator<QPair<float, float> > regions(m_regions);
 
@@ -202,8 +202,8 @@ void MythUIEditBar::AddBar(MythUIShape *_shape, MythUIImage *_image,
 
     if (add)
     {
-        MythUIShape *shape = dynamic_cast<MythUIShape *>(add);
-        MythUIImage *image = dynamic_cast<MythUIImage *>(add);
+        auto *shape = dynamic_cast<MythUIShape *>(add);
+        auto *image = dynamic_cast<MythUIImage *>(add);
 
         if (shape)
             shape->SetCropRect(area.left(), area.top(), area.width(), area.height());
@@ -235,7 +235,7 @@ MythUIType *MythUIEditBar::GetNew(MythUIShape *shape, MythUIImage *image)
 
     if (shape)
     {
-        MythUIShape *newshape = new MythUIShape(this, name);
+        auto *newshape = new MythUIShape(this, name);
 
         if (newshape)
         {
@@ -247,7 +247,7 @@ MythUIType *MythUIEditBar::GetNew(MythUIShape *shape, MythUIImage *image)
     }
     else if (image)
     {
-        MythUIImage *newimage = new MythUIImage(this, name);
+        auto *newimage = new MythUIImage(this, name);
 
         if (newimage)
         {
@@ -304,7 +304,7 @@ void MythUIEditBar::ClearImages(void)
  */
 void MythUIEditBar::CopyFrom(MythUIType *base)
 {
-    MythUIEditBar *editbar = dynamic_cast<MythUIEditBar *>(base);
+    auto *editbar = dynamic_cast<MythUIEditBar *>(base);
 
     if (!editbar)
         return;
@@ -324,7 +324,7 @@ void MythUIEditBar::CopyFrom(MythUIType *base)
  */
 void MythUIEditBar::CreateCopy(MythUIType *parent)
 {
-    MythUIEditBar *editbar = new MythUIEditBar(parent, objectName());
+    auto *editbar = new MythUIEditBar(parent, objectName());
     editbar->CopyFrom(this);
 }
 

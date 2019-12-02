@@ -75,7 +75,7 @@ MusicMetadata* MetaIOAVFComment::read(const QString &filename)
 
     length = getTrackLength(p_context);
 
-    MusicMetadata *retdata = new MusicMetadata(filename, artist, compilation_artist, album, 
+    auto *retdata = new MusicMetadata(filename, artist, compilation_artist, album,
                                      title, genre, year, tracknum, length);
 
     retdata->determineIfCompilation();

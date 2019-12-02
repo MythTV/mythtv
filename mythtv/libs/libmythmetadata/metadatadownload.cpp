@@ -442,7 +442,7 @@ MetadataLookupList MetadataDownload::readMXML(const QString& MXMLpath,
     {
         QByteArray mxmlraw;
         QDomElement item;
-        RemoteFile *rf = new RemoteFile(MXMLpath);
+        auto *rf = new RemoteFile(MXMLpath);
 
         if (rf->isOpen())
         {
@@ -491,7 +491,7 @@ MetadataLookupList MetadataDownload::readNFO(const QString& NFOpath,
     {
         QByteArray nforaw;
         QDomElement item;
-        RemoteFile *rf = new RemoteFile(NFOpath);
+        auto *rf = new RemoteFile(NFOpath);
 
         if (rf->isOpen())
         {

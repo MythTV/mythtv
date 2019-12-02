@@ -244,7 +244,7 @@ void BrowserApi::customEvent(QEvent *e)
 {
     if (e->type() == MythEvent::MythEventMessage)
     {
-        MythEvent *me = static_cast<MythEvent *>(e);
+        auto *me = static_cast<MythEvent *>(e);
         const QString& message = me->Message();
 
         if (!message.startsWith("MUSIC_CONTROL"))
@@ -291,7 +291,7 @@ bool MythWebPage::extension(Extension extension, const ExtensionOption *option,
         if (!option || !output)
             return false;
 
-        const ErrorPageExtensionOption *erroroption
+        const auto *erroroption
                         = static_cast<const ErrorPageExtensionOption *>(option);
         ErrorPageExtensionReturn *erroroutput = nullptr;
         erroroutput = static_cast<ErrorPageExtensionReturn *>(output);
@@ -536,9 +536,8 @@ void  MythWebView::doDownloadRequested(const QNetworkRequest &request)
         MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
         QString msg = tr("Enter filename to save file");
-        MythTextInputDialog *input = new MythTextInputDialog(popupStack, msg,
-                                                             FilterNone, false,
-                                                             saveFilename);
+        auto *input = new MythTextInputDialog(popupStack, msg, FilterNone,
+                                              false, saveFilename);
 
         if (input->Create())
         {
@@ -592,7 +591,7 @@ void MythWebView::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = (DialogCompletionEvent *)(event);
+        auto *dce = (DialogCompletionEvent *)(event);
 
         // make sure the user didn't ESCAPE out of the dialog
         if (dce->GetResult() < 0)
@@ -641,7 +640,7 @@ void MythWebView::customEvent(QEvent *event)
     }
     else if (event->type() == MythEvent::MythEventMessage)
     {
-        MythEvent *me = static_cast<MythEvent *>(event);
+        auto *me = static_cast<MythEvent *>(event);
         QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);
 
         if (tokens.isEmpty())
@@ -686,7 +685,7 @@ void MythWebView::showDownloadMenu(void)
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    MythDialogBox *menu = new MythDialogBox(label, popupStack, "downloadmenu");
+    auto *menu = new MythDialogBox(label, popupStack, "downloadmenu");
 
     if (!menu->Create())
     {
@@ -1680,7 +1679,7 @@ void MythUIWebBrowser::HandleMouseAction(const QString &action)
         {
             curPos = widget->mapFromGlobal(curPos);
 
-            QMouseEvent *me = new QMouseEvent(QEvent::MouseButtonPress, curPos,
+            auto *me = new QMouseEvent(QEvent::MouseButtonPress, curPos,
                                               Qt::LeftButton, Qt::LeftButton,
                                               Qt::NoModifier);
             QCoreApplication::postEvent(widget, me);
@@ -1763,8 +1762,7 @@ bool MythUIWebBrowser::ParseElement(
  */
 void MythUIWebBrowser::CopyFrom(MythUIType *base)
 {
-    MythUIWebBrowser *browser = dynamic_cast<MythUIWebBrowser *>(base);
-
+    auto *browser = dynamic_cast<MythUIWebBrowser *>(base);
     if (!browser)
     {
         LOG(VB_GENERAL, LOG_ERR, "ERROR, bad parsing");
@@ -1789,6 +1787,6 @@ void MythUIWebBrowser::CopyFrom(MythUIType *base)
  */
 void MythUIWebBrowser::CreateCopy(MythUIType *parent)
 {
-    MythUIWebBrowser *browser = new MythUIWebBrowser(parent, objectName());
+    auto *browser = new MythUIWebBrowser(parent, objectName());
     browser->CopyFrom(this);
 }

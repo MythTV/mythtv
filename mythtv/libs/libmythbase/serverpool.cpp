@@ -396,7 +396,7 @@ bool ServerPool::listen(QList<QHostAddress> addrs, quint16 port,
           && ! gCoreContext->GetBoolSetting("IPv6Support",true))
             continue;
 
-        PrivTcpServer *server = new PrivTcpServer(this, servertype);
+        auto *server = new PrivTcpServer(this, servertype);
             connect(server, &PrivTcpServer::newConnection,
                 this,   &ServerPool::newTcpConnection);
 
@@ -525,7 +525,7 @@ bool ServerPool::bind(QList<QHostAddress> addrs, quint16 port,
             }
         }
 
-        PrivUdpSocket *socket = new PrivUdpSocket(this, host);
+        auto *socket = new PrivUdpSocket(this, host);
 
         if (socket->bind(*it, port))
         {
@@ -631,11 +631,11 @@ void ServerPool::newTcpConnection(qt_socket_fd_t socket)
 {
     // Ignore connections from an SSL server for now, these are only handled
     // by HttpServer which overrides newTcpConnection
-    PrivTcpServer *server = dynamic_cast<PrivTcpServer *>(QObject::sender());
+    auto *server = dynamic_cast<PrivTcpServer *>(QObject::sender());
     if (!server || server->GetServerType() == kSSLServer)
         return;
 
-    QTcpSocket *qsock = new QTcpSocket(this);
+    auto *qsock = new QTcpSocket(this);
     if (qsock->setSocketDescriptor(socket)
        && gCoreContext->CheckSubnet(qsock))
     {
@@ -647,7 +647,7 @@ void ServerPool::newTcpConnection(qt_socket_fd_t socket)
 
 void ServerPool::newUdpDatagram(void)
 {
-    QUdpSocket *socket = dynamic_cast<QUdpSocket*>(sender());
+    auto *socket = dynamic_cast<QUdpSocket*>(sender());
 
     while (socket->state() == QAbstractSocket::BoundState &&
            socket->hasPendingDatagrams())

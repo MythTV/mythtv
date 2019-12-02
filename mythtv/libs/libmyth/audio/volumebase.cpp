@@ -23,7 +23,7 @@ class VolumeWriteBackThread : public MThread
     static VolumeWriteBackThread *Instance()
     {
         QMutexLocker lock(&s_mutex);
-        static VolumeWriteBackThread *s_instance = new VolumeWriteBackThread;
+        static auto *s_instance = new VolumeWriteBackThread;
         return s_instance;
     }
 

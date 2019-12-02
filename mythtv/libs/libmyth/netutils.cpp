@@ -75,8 +75,8 @@ GrabberScript* findTreeGrabberByCommand(const QString& commandline,
     bool search = query.value(6).toBool();
     bool tree = query.value(7).toBool();
 
-    GrabberScript *tmp = new GrabberScript(title, image, type, author, search,
-                                     tree, desc, command, ver);
+    auto *tmp = new GrabberScript(title, image, type, author, search,
+                                  tree, desc, command, ver);
     return tmp;
 }
 
@@ -107,8 +107,8 @@ GrabberScript* findSearchGrabberByCommand(const QString& commandline,
     bool search = query.value(6).toBool();
     bool tree = query.value(7).toBool();
 
-    GrabberScript *tmp = new GrabberScript(title, image, type, author, search,
-                                     tree, desc, command, ver);
+    auto *tmp = new GrabberScript(title, image, type, author, search,
+                                  tree, desc, command, ver);
     return tmp;
 }
 
@@ -138,8 +138,8 @@ GrabberScript::scriptList findAllDBTreeGrabbers()
         bool search = query.value(7).toBool();
         bool tree = query.value(8).toBool();
 
-        GrabberScript *script = new GrabberScript(title, image, type, author, search,
-                                     tree, desc, commandline, ver);
+        auto *script = new GrabberScript(title, image, type, author, search,
+                                         tree, desc, commandline, ver);
         tmp.append(script);
     }
 
@@ -173,8 +173,8 @@ GrabberScript::scriptList findAllDBTreeGrabbersByHost(ArticleType type)
         bool search = query.value(6).toBool();
         bool tree = query.value(7).toBool();
 
-        GrabberScript *script = new GrabberScript(title, image, type, author, search,
-                                     tree, desc, commandline, ver);
+        auto *script = new GrabberScript(title, image, type, author, search,
+                                         tree, desc, commandline, ver);
         tmp.append(script);
     }
 
@@ -208,8 +208,8 @@ GrabberScript::scriptList findAllDBSearchGrabbers(ArticleType type)
         bool search = query.value(6).toBool();
         bool tree = query.value(7).toBool();
 
-        GrabberScript *script = new GrabberScript(title, image, type, author, search,
-                                     tree, desc, commandline, ver);
+        auto *script = new GrabberScript(title, image, type, author, search,
+                                         tree, desc, commandline, ver);
         tmp.append(script);
     }
 

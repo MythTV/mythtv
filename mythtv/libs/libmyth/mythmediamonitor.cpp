@@ -361,7 +361,7 @@ MediaMonitor::MediaMonitor(QObject* par, unsigned long interval,
     QStringList::Iterator dev;
     for (dev = m_IgnoreList.begin(); dev != m_IgnoreList.end(); ++dev)
     {
-        QFileInfo *fi = new QFileInfo(*dev);
+        auto *fi = new QFileInfo(*dev);
 
         if (fi && fi->isSymLink())
         {
@@ -804,7 +804,7 @@ bool MediaMonitor::eventFilter(QObject *obj, QEvent *event)
 {
     if (event->type() == MythMediaEvent::kEventType)
     {
-        MythMediaEvent *me = dynamic_cast<MythMediaEvent *>(event);
+        auto *me = dynamic_cast<MythMediaEvent *>(event);
         if (me == nullptr)
         {
             LOG(VB_GENERAL, LOG_ALERT,

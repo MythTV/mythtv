@@ -527,7 +527,7 @@ bool MythUITextEdit::keyPressEvent(QKeyEvent *event)
                  && GetMythDB()->GetNumSetting("UseVirtualKeyboard", 1) == 1)
         {
             MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-            MythUIVirtualKeyboard *kb =  new MythUIVirtualKeyboard(popupStack, this);
+            auto *kb = new MythUIVirtualKeyboard(popupStack, this);
 
             if (kb->Create())
             {
@@ -576,7 +576,7 @@ bool MythUITextEdit::gestureEvent(MythGestureEvent *event)
 
 void MythUITextEdit::CopyFrom(MythUIType *base)
 {
-    MythUITextEdit *textedit = dynamic_cast<MythUITextEdit *>(base);
+    auto *textedit = dynamic_cast<MythUITextEdit *>(base);
 
     if (!textedit)
     {
@@ -600,6 +600,6 @@ void MythUITextEdit::CopyFrom(MythUIType *base)
 
 void MythUITextEdit::CreateCopy(MythUIType *parent)
 {
-    MythUITextEdit *textedit = new MythUITextEdit(parent, objectName());
+    auto *textedit = new MythUITextEdit(parent, objectName());
     textedit->CopyFrom(this);
 }

@@ -492,7 +492,7 @@ MythImage* MythPainter::GetImageFromRect(const QRect &area, int radius,
     QString incoming("R");
     if (fillBrush.style() == Qt::LinearGradientPattern && fillBrush.gradient())
     {
-        const QLinearGradient *gradient = static_cast<const QLinearGradient*>(fillBrush.gradient());
+        const auto *gradient = static_cast<const QLinearGradient*>(fillBrush.gradient());
         if (gradient)
         {
             incoming = QString::number(

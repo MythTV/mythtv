@@ -61,12 +61,12 @@ int MHParseNode::GetArgCount()
 {
     if (m_nNodeType == PNTagged)
     {
-        MHPTagged *pTag = (MHPTagged *)this;
+        auto *pTag = (MHPTagged *)this;
         return pTag->m_Args.Size();
     }
     if (m_nNodeType == PNSeq)
     {
-        MHParseSequence *pSeq = (MHParseSequence *)this;
+        auto *pSeq = (MHParseSequence *)this;
         return pSeq->Size();
     }
 
@@ -79,7 +79,7 @@ MHParseNode *MHParseNode::GetArgN(int n)
 {
     if (m_nNodeType == PNTagged)
     {
-        MHPTagged *pTag = (MHPTagged *)this;
+        auto *pTag = (MHPTagged *)this;
 
         if (n < 0 || n >= pTag->m_Args.Size())
         {
@@ -90,7 +90,7 @@ MHParseNode *MHParseNode::GetArgN(int n)
     }
     if (m_nNodeType == PNSeq)
     {
-        MHParseSequence *pSeq = (MHParseSequence *)this;
+        auto *pSeq = (MHParseSequence *)this;
 
         if (n < 0 || n >= pSeq->Size())
         {
@@ -145,7 +145,7 @@ int MHParseNode::GetSeqCount()
         Failure("Expected sequence");
     }
 
-    MHParseSequence *pSeq = (MHParseSequence *)this;
+    auto *pSeq = (MHParseSequence *)this;
     return pSeq->Size();
 }
 
@@ -156,7 +156,7 @@ MHParseNode *MHParseNode::GetSeqN(int n)
         Failure("Expected sequence");
     }
 
-    MHParseSequence *pSeq = (MHParseSequence *)this;
+    auto *pSeq = (MHParseSequence *)this;
 
     if (n < 0 || n >= pSeq->Size())
     {

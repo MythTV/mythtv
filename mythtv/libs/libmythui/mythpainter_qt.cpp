@@ -119,7 +119,7 @@ void MythQtPainter::DrawImage(const QRect &r, MythImage *im,
         return;
     }
 
-    MythQtImage *qim = reinterpret_cast<MythQtImage *>(im);
+    auto *qim = reinterpret_cast<MythQtImage *>(im);
 
     if (qim->NeedsRegen())
         qim->RegeneratePixmap();
@@ -136,7 +136,7 @@ MythImage *MythQtPainter::GetFormatImagePriv()
 
 void MythQtPainter::DeleteFormatImagePriv(MythImage *im)
 {
-    MythQtImage *qim = static_cast<MythQtImage *>(im);
+    auto *qim = static_cast<MythQtImage *>(im);
 
     QMutexLocker locker(&m_imageDeleteLock);
     if (qim->GetPixmap())

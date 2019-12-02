@@ -301,7 +301,7 @@ QString HttpServer::GetServerVersion(void)
 void HttpServer::newTcpConnection(qt_socket_fd_t socket)
 {
     PoolServerType type = kTCPServer;
-    PrivTcpServer *server = dynamic_cast<PrivTcpServer *>(QObject::sender());
+    auto *server = dynamic_cast<PrivTcpServer *>(QObject::sender());
     if (server)
         type = server->GetServerType();
 
@@ -482,7 +482,7 @@ void HttpWorker::run(void)
     {
 
 #ifndef QT_NO_OPENSSL
-        QSslSocket *pSslSocket = new QSslSocket();
+        auto *pSslSocket = new QSslSocket();
         if (pSslSocket->setSocketDescriptor(m_socket)
            && gCoreContext->CheckSubnet(pSslSocket))
         {

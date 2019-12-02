@@ -23,8 +23,7 @@ using namespace std;
 int MythPlugin::init(const char *libversion)
 {
     using PluginInitFunc = int (*)(const char *);
-    PluginInitFunc ifunc = (PluginInitFunc)QLibrary::resolve("mythplugin_init");
-
+    auto ifunc = (PluginInitFunc)QLibrary::resolve("mythplugin_init");
     if (ifunc)
         return ifunc(libversion);
 
@@ -46,8 +45,8 @@ int MythPlugin::run(void)
 {
     using PluginRunFunc = int (*)();
 
-    int           rVal  = -1;
-    PluginRunFunc rfunc = (PluginRunFunc)QLibrary::resolve("mythplugin_run");
+    int rVal = -1;
+    auto rfunc = (PluginRunFunc)QLibrary::resolve("mythplugin_run");
 
     if (rfunc)
         rVal = rfunc();
@@ -59,9 +58,8 @@ int MythPlugin::config(void)
 {
     using PluginConfigFunc = int (*)();
 
-    int              rVal  = -1;
-    PluginConfigFunc rfunc = (PluginConfigFunc)QLibrary::resolve(
-                                                   "mythplugin_config");
+    int rVal  = -1;
+    auto rfunc = (PluginConfigFunc)QLibrary::resolve("mythplugin_config");
 
     if (rfunc)
     {
@@ -75,7 +73,7 @@ int MythPlugin::config(void)
 MythPluginType MythPlugin::type(void)
 {
     using PluginTypeFunc = MythPluginType (*)();
-    PluginTypeFunc rfunc = (PluginTypeFunc)QLibrary::resolve("mythplugin_type");
+    auto rfunc = (PluginTypeFunc)QLibrary::resolve("mythplugin_type");
 
     if (rfunc)
         return rfunc();

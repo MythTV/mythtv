@@ -44,7 +44,7 @@ void MythUIStateTracker::GetFreshState(QVariantMap &state)
         return;
     }
 
-    MythEvent *e = new MythEvent(ACTION_GETSTATUS);
+    auto *e = new MythEvent(ACTION_GETSTATUS);
     qApp->postEvent(GetMythMainWindow(), e);
 
     int tries = 0;

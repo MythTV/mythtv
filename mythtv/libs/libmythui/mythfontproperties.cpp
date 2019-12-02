@@ -177,7 +177,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(
 
     static bool s_showAvailable = true;
     bool fromBase = false;
-    MythFontProperties *newFont = new MythFontProperties();
+    auto *newFont = new MythFontProperties();
     newFont->Freeze();
 
     if (element.tagName() == "font")

@@ -50,7 +50,7 @@ void MythUIButtonTree::Init()
     while (i < (int)m_numLists)
     {
         QString listname = QString("buttontree list %1").arg(i);
-        MythUIButtonList *list = new MythUIButtonList(this, listname);
+        auto *list = new MythUIButtonList(this, listname);
         list->CopyFrom(m_listTemplate);
         list->SetVisible(false);
         list->SetActive(false);
@@ -387,7 +387,7 @@ void MythUIButtonTree::RemoveItem(MythUIButtonListItem *item, bool deleteNode)
     if (!item || !m_rootNode)
         return;
 
-    MythGenericTree *node = item->GetData().value<MythGenericTree *>();
+    auto *node = item->GetData().value<MythGenericTree *>();
 
     if (node && node->getParent())
     {
@@ -523,7 +523,7 @@ void MythUIButtonTree::handleSelect(MythUIButtonListItem *item)
     m_activeList = list;
 
 
-        MythGenericTree *node = item->GetData().value<MythGenericTree *> ();
+        auto *node = item->GetData().value<MythGenericTree *> ();
     DoSetCurrentNode(node);
     SetTreeState();
 }
@@ -538,7 +538,7 @@ void MythUIButtonTree::handleClick(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    MythGenericTree *node = item->GetData().value<MythGenericTree *>();
+    auto *node = item->GetData().value<MythGenericTree *>();
 
     if (DoSetCurrentNode(node))
         emit itemClicked(item);
@@ -633,7 +633,7 @@ bool MythUIButtonTree::gestureEvent(MythGestureEvent *event)
         if (!type)
             return false;
 
-        MythUIButtonList *list = dynamic_cast<MythUIButtonList *>(type);
+        auto *list = dynamic_cast<MythUIButtonList *>(type);
 
         if (list)
             handled = list->gestureEvent(event);
@@ -669,7 +669,7 @@ bool MythUIButtonTree::ParseElement(
  */
 void MythUIButtonTree::CreateCopy(MythUIType *parent)
 {
-    MythUIButtonTree *bt = new MythUIButtonTree(parent, objectName());
+    auto *bt = new MythUIButtonTree(parent, objectName());
     bt->CopyFrom(this);
 }
 
@@ -678,7 +678,7 @@ void MythUIButtonTree::CreateCopy(MythUIType *parent)
  */
 void MythUIButtonTree::CopyFrom(MythUIType *base)
 {
-    MythUIButtonTree *bt = dynamic_cast<MythUIButtonTree *>(base);
+    auto *bt = dynamic_cast<MythUIButtonTree *>(base);
 
     if (!bt)
         return;

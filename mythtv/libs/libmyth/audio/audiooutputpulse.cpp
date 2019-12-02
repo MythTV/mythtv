@@ -618,7 +618,7 @@ void AudioOutputPulseAudio::FlushStream(const char *caller)
 void AudioOutputPulseAudio::ContextStateCallback(pa_context *c, void *arg)
 {
     QString fn_log_tag = "_ContextStateCallback, ";
-    AudioOutputPulseAudio *audoutP = static_cast<AudioOutputPulseAudio*>(arg);
+    auto *audoutP = static_cast<AudioOutputPulseAudio*>(arg);
     switch (pa_context_get_state(c))
     {
         case PA_CONTEXT_READY:
@@ -637,7 +637,7 @@ void AudioOutputPulseAudio::ContextStateCallback(pa_context *c, void *arg)
 void AudioOutputPulseAudio::StreamStateCallback(pa_stream *s, void *arg)
 {
     QString fn_log_tag = "StreamStateCallback, ";
-    AudioOutputPulseAudio *audoutP = static_cast<AudioOutputPulseAudio*>(arg);
+    auto *audoutP = static_cast<AudioOutputPulseAudio*>(arg);
     switch (pa_stream_get_state(s))
     {
         case PA_STREAM_READY:
@@ -653,7 +653,7 @@ void AudioOutputPulseAudio::StreamStateCallback(pa_stream *s, void *arg)
 
 void AudioOutputPulseAudio::WriteCallback(pa_stream */*s*/, size_t /*size*/, void *arg)
 {
-    AudioOutputPulseAudio *audoutP = static_cast<AudioOutputPulseAudio*>(arg);
+    auto *audoutP = static_cast<AudioOutputPulseAudio*>(arg);
     pa_threaded_mainloop_signal(audoutP->m_mainloop, 0);
 }
 
@@ -666,7 +666,7 @@ void AudioOutputPulseAudio::OpCompletionCallback(
     pa_context *c, int ok, void *arg)
 {
     QString fn_log_tag = "OpCompletionCallback, ";
-    AudioOutputPulseAudio *audoutP = static_cast<AudioOutputPulseAudio*>(arg);
+    auto *audoutP = static_cast<AudioOutputPulseAudio*>(arg);
     if (!ok)
     {
         VBERROR(fn_log_tag + QString("bummer, an operation failed: %1")
@@ -690,7 +690,7 @@ void AudioOutputPulseAudio::ServerInfoCallback(
 void AudioOutputPulseAudio::SinkInfoCallback(
     pa_context */*c*/, const pa_sink_info *info, int /*eol*/, void *arg)
 {
-    AudioOutputPulseAudio *audoutP = static_cast<AudioOutputPulseAudio*>(arg);
+    auto *audoutP = static_cast<AudioOutputPulseAudio*>(arg);
 
     if (!info)
     {

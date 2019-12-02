@@ -95,8 +95,7 @@ void StorageGroupEditor::ShowDeleteDialog()
     }
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythConfirmationDialog *confirmDelete =
-        new MythConfirmationDialog(popupStack, message, true);
+    auto *confirmDelete = new MythConfirmationDialog(popupStack, message, true);
     if (confirmDelete->Create())
     {
         connect(confirmDelete, SIGNAL(haveResult(bool)),
@@ -202,8 +201,7 @@ void StorageGroupDirSetting::ShowDeleteDialog()
     QString message =
         tr("Remove '%1'\nDirectory From Storage Group?").arg(getValue());
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythConfirmationDialog *confirmDelete =
-        new MythConfirmationDialog(popupStack, message, true);
+    auto *confirmDelete = new MythConfirmationDialog(popupStack, message, true);
 
     if (confirmDelete->Create())
     {
@@ -238,8 +236,7 @@ void StorageGroupEditor::Load(void)
 {
     clearSettings();
 
-    ButtonStandardSetting *button =
-        new ButtonStandardSetting(tr("(Add New Directory)"));
+    auto *button = new ButtonStandardSetting(tr("(Add New Directory)"));
     connect(button, SIGNAL(clicked()), SLOT(ShowFileBrowser()));
     addChild(button);
 
@@ -283,7 +280,7 @@ void StorageGroupEditor::ShowFileBrowser()
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    MythUIFileBrowser *settingdialog = new MythUIFileBrowser(popupStack, "");
+    auto *settingdialog = new MythUIFileBrowser(popupStack, "");
     settingdialog->SetTypeFilter(QDir::AllDirs | QDir::Drives);
 
     if (settingdialog->Create())
@@ -299,7 +296,7 @@ void StorageGroupEditor::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = dynamic_cast<DialogCompletionEvent*>(event);
+        auto *dce = dynamic_cast<DialogCompletionEvent*>(event);
         if (dce == nullptr)
             return;
         QString resultid  = dce->GetId();
@@ -350,7 +347,7 @@ StorageGroupListEditor::StorageGroupListEditor(void)
 void StorageGroupListEditor::AddSelection(const QString &label,
                                           const QString &value)
 {
-    StorageGroupEditor *button = new StorageGroupEditor(value);
+    auto *button = new StorageGroupEditor(value);
     button->setLabel(label);
     addChild(button);
 }
@@ -443,8 +440,7 @@ void StorageGroupListEditor::Load(void)
 
     if (isMaster)
     {
-        ButtonStandardSetting *newGroup =
-            new ButtonStandardSetting(tr("(Create new group)"));
+        auto *newGroup = new ButtonStandardSetting(tr("(Create new group)"));
         connect(newGroup, SIGNAL(clicked()), SLOT(ShowNewGroupDialog()));
         addChild(newGroup);
     }
@@ -470,8 +466,7 @@ void StorageGroupListEditor::Load(void)
 void StorageGroupListEditor::ShowNewGroupDialog()
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythTextInputDialog *settingdialog =
-        new MythTextInputDialog(popupStack,
+    auto *settingdialog = new MythTextInputDialog(popupStack,
                                 tr("Enter the name of the new storage group"));
 
     if (settingdialog->Create())
@@ -488,7 +483,7 @@ void StorageGroupListEditor::ShowNewGroupDialog()
 
 void StorageGroupListEditor::CreateNewGroup(const QString& name)
 {
-    StorageGroupEditor *button = new StorageGroupEditor(name);
+    auto *button = new StorageGroupEditor(name);
     button->setLabel(name + tr(" Storage Group Directories"));
     button->Load();
     addChild(button);

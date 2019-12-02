@@ -152,9 +152,7 @@ void TaskQueue::Clear( )
 {
     m_mutex.lock(); 
 
-    for ( TaskMap::iterator it  = m_mapTasks.begin();
-                            it != m_mapTasks.end();
-                          ++it )
+    for ( auto it  = m_mapTasks.begin(); it != m_mapTasks.end(); ++it )
     {
         if ((*it).second != nullptr)
             (*it).second->DecrRef();
@@ -222,8 +220,7 @@ Task *TaskQueue::GetNextExpiredTask( TaskTime tt, long nWithinMilliSecs /*=50*/ 
 
     m_mutex.lock(); 
 
-    TaskMap::iterator it = m_mapTasks.begin();
-
+    auto it = m_mapTasks.begin();
     if (it != m_mapTasks.end())
     {
         TaskTime ttTask = (*it).first;

@@ -58,7 +58,7 @@ MythXDisplay *GetMythXDisplay(Display *d)
 
 MythXDisplay *OpenMythXDisplay(bool Warn /*= true*/)
 {
-    MythXDisplay *disp = new MythXDisplay();
+    auto *disp = new MythXDisplay();
     if (disp && disp->Open())
         return disp;
 
@@ -269,7 +269,7 @@ void MythXDisplay::CheckOrphanedErrors(void)
     if (xerrors.empty())
         return;
 
-    std::map<Display*, XErrorVectorType>::iterator errors = xerrors.begin();
+    auto errors = xerrors.begin();
     for (; errors != xerrors.end(); ++errors)
         if (!xerror_handlers.count(errors->first))
             CheckErrors(errors->first);

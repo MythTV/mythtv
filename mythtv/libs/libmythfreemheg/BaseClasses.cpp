@@ -219,7 +219,7 @@ void MHOctetString::Append(const MHOctetString &str)
 
     int newLen = m_nLength + str.m_nLength;
     // Allocate a new string big enough to contain both and initialised to the first string.
-    unsigned char *p = (unsigned char *)realloc(m_pChars, newLen);
+    auto *p = (unsigned char *)realloc(m_pChars, newLen);
 
     if (p == nullptr)
     {

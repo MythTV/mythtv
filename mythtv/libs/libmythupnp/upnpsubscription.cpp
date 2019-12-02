@@ -290,8 +290,8 @@ bool UPNPSubscription::SendUnsubscribeRequest(const QString &usn,
 
     LOG(VB_UPNP, LOG_DEBUG, LOC + "\n\n" + sub);
 
-    MSocketDevice *sockdev = new MSocketDevice(MSocketDevice::Stream);
-    BufferedSocketDevice *sock = new BufferedSocketDevice(sockdev);
+    auto *sockdev = new MSocketDevice(MSocketDevice::Stream);
+    auto *sock = new BufferedSocketDevice(sockdev);
     sockdev->setBlocking(true);
 
     if (sock->Connect(QHostAddress(host), port))
@@ -357,8 +357,8 @@ int UPNPSubscription::SendSubscribeRequest(const QString &callback,
 
     LOG(VB_UPNP, LOG_DEBUG, LOC + "\n\n" + sub);
 
-    MSocketDevice *sockdev = new MSocketDevice(MSocketDevice::Stream);
-    BufferedSocketDevice *sock = new BufferedSocketDevice(sockdev);
+    auto *sockdev = new MSocketDevice(MSocketDevice::Stream);
+    auto *sock = new BufferedSocketDevice(sockdev);
     sockdev->setBlocking(true);
 
     QString uuid;

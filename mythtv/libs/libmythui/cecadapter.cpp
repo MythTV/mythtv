@@ -154,7 +154,7 @@ class CECAdapterPriv
 
         // find adapters
 #if CEC_LIB_VERSION_MAJOR >= 4
-        cec_adapter_descriptor *devices = new cec_adapter_descriptor[MAX_CEC_DEVICES];
+        auto *devices = new cec_adapter_descriptor[MAX_CEC_DEVICES];
         uint8_t num_devices = m_adapter->DetectAdapters(devices, MAX_CEC_DEVICES, nullptr, true);
 #else
         cec_adapter *devices = new cec_adapter[MAX_CEC_DEVICES];
@@ -665,7 +665,7 @@ class CECAdapterPriv
             return 1;
 
         MythUIHelper::ResetScreensaver();
-        QKeyEvent* ke = new QKeyEvent(QEvent::KeyPress, action, modifier);
+        auto* ke = new QKeyEvent(QEvent::KeyPress, action, modifier);
         qApp->postEvent(GetMythMainWindow(), (QEvent*)ke);
 
         return 1;
@@ -1000,7 +1000,7 @@ class CECAdapterPriv
             return;
 
         MythUIHelper::ResetScreensaver();
-        QKeyEvent* ke = new QKeyEvent(QEvent::KeyPress, action, Qt::NoModifier);
+        auto* ke = new QKeyEvent(QEvent::KeyPress, action, Qt::NoModifier);
         qApp->postEvent(GetMythMainWindow(), (QEvent*)ke);
     }
 

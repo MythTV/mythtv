@@ -423,7 +423,7 @@ bool MThreadPool::TryStartInternal(
     {
         if (reserved)
             m_priv->m_reserveThread++;
-        MPoolThread *thread = new MPoolThread(*this, m_priv->m_expiryTimeout);
+        auto *thread = new MPoolThread(*this, m_priv->m_expiryTimeout);
         m_priv->m_runningThreads.insert(thread);
         thread->SetRunnable(runnable, debugName, reserved);
         thread->start();

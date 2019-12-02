@@ -255,7 +255,7 @@ SSDPCache::SSDPCache()
     // Add Task to keep SSDPCache purged of stale entries.
     // ----------------------------------------------------------------------
 
-    SSDPCacheTask *task = new SSDPCacheTask();
+    auto *task = new SSDPCacheTask();
     TaskQueue::Instance()->AddTask(task);
     task->DecrRef();
 }      

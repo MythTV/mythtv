@@ -55,7 +55,7 @@ bool PulseHandler::Suspend(enum PulseAction action)
 
     static int s_iPulseRunning = -1;
     static QTime s_time;
-    static enum PulseAction s_ePulseAction = PulseAction(-1);
+    static auto s_ePulseAction = PulseAction(-1);
 
     // Use the last result of IsPulseAudioRunning if within time
     if (!s_time.isNull() && s_time.elapsed() < 30000)
@@ -93,7 +93,7 @@ bool PulseHandler::Suspend(enum PulseAction action)
     // create our handler
     if (!g_pulseHandler)
     {
-        PulseHandler* handler = new PulseHandler();
+        auto* handler = new PulseHandler();
         if (handler)
         {
             LOG(VB_AUDIO, LOG_INFO, LOC + "Created PulseHandler object");
@@ -125,7 +125,7 @@ static void StatusCallback(pa_context *ctx, void *userdata)
         return;
 
     // validate the callback
-    PulseHandler *handler = static_cast<PulseHandler*>(userdata);
+    auto *handler = static_cast<PulseHandler*>(userdata);
     if (!handler)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Callback: no handler.");
@@ -167,7 +167,7 @@ static void OperationCallback(pa_context *ctx, int success, void *userdata)
     }
 
     // validate the callback
-    PulseHandler *handler = static_cast<PulseHandler*>(userdata);
+    auto *handler = static_cast<PulseHandler*>(userdata);
     if (!handler)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Operation: no handler.");

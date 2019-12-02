@@ -150,7 +150,7 @@ int MMembuf::ungetch(int ch)
 {
     if (buf.isEmpty() || _index==0) {
         // we need a new QByteArray
-        QByteArray *ba = new QByteArray;
+        auto *ba = new QByteArray;
         ba->resize(1);
         buf.prepend(ba);
         _size++;

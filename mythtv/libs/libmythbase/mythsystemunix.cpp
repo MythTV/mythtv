@@ -450,7 +450,7 @@ void MythSystemLegacyManager::append(MythSystemLegacyUnix *ms)
 
     if( ms->GetSetting("UseStdout") )
     {
-        FDType_t *fdType = new FDType_t;
+        auto *fdType = new FDType_t;
         fdType->m_ms = ms;
         fdType->m_type = 1;
         fdLock.lock();
@@ -461,7 +461,7 @@ void MythSystemLegacyManager::append(MythSystemLegacyUnix *ms)
 
     if( ms->GetSetting("UseStderr") )
     {
-        FDType_t *fdType = new FDType_t;
+        auto *fdType = new FDType_t;
         fdType->m_ms = ms;
         fdType->m_type = 2;
         fdLock.lock();

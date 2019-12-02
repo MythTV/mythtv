@@ -419,7 +419,7 @@ static void fillSelectionsFromDir(const QDir &dir,
 
 AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
 {
-    ADCVect *list = new ADCVect;
+    auto *list = new ADCVect;
 
 #ifdef USING_PULSE
     bool pasuspended = PulseHandler::Suspend(PulseHandler::kPulseSuspend);
@@ -650,7 +650,7 @@ int AudioOutput::DecodeAudio(AVCodecContext *ctx,
         return ret;
     }
 
-    AVSampleFormat format = (AVSampleFormat)m_frame->format;
+    auto format = (AVSampleFormat)m_frame->format;
     AudioFormat fmt =
         AudioOutputSettings::AVSampleFormatToFormat(format, ctx->bits_per_raw_sample);
 

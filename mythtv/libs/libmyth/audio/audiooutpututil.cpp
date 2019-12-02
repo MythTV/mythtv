@@ -102,7 +102,7 @@ void AudioOutputUtil::AdjustVolume(void *buf, int len, int volume,
                                    bool music, bool upmix)
 {
     float g     = volume / 100.0F;
-    float *fptr = (float *)buf;
+    auto *fptr  = (float *)buf;
     int samples = len >> 2;
     int i       = 0;
 
@@ -203,8 +203,8 @@ char *AudioOutputUtil::GeneratePinkFrames(char *frames, int channels,
 
     initialize_pink_noise(&pink, bits);
 
-    int16_t *samp16 = (int16_t*) frames;
-    int32_t *samp32 = (int32_t*) frames;
+    auto *samp16 = (int16_t*) frames;
+    auto *samp32 = (int32_t*) frames;
 
     while (count-- > 0)
     {
@@ -287,7 +287,7 @@ int AudioOutputUtil::DecodeAudio(AVCodecContext *ctx,
         return ret;
     }
 
-    AVSampleFormat format = (AVSampleFormat)frame->format;
+    auto format = (AVSampleFormat)frame->format;
 
     data_size = frame->nb_samples * frame->channels * av_get_bytes_per_sample(format);
 

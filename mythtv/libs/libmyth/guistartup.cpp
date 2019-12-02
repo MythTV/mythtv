@@ -176,9 +176,7 @@ void GUIStartup::Close(void)
     QString message = tr("Do you really want to exit MythTV?");
     MythScreenStack *popupStack
       = GetMythMainWindow()->GetStack("popup stack");
-    MythConfirmationDialog *confirmdialog
-      = new MythConfirmationDialog(
-         popupStack, message);
+    auto *confirmdialog = new MythConfirmationDialog(popupStack, message);
 
     if (confirmdialog->Create())
         popupStack->AddScreen(confirmdialog);

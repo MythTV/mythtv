@@ -553,7 +553,7 @@ LoggingItem *LoggingItem::create(const char *_file,
                                  int _line, LogLevel_t _level,
                                  LoggingType _type)
 {
-    LoggingItem *item = new LoggingItem(_file, _function, _line, _level, _type);
+    auto *item = new LoggingItem(_file, _function, _line, _level, _type);
 
     return item;
 }
@@ -563,7 +563,7 @@ LoggingItem *LoggingItem::create(QByteArray &buf)
     // Deserialize buffer
     QVariant variant = QJsonWrapper::parseJson(buf);
 
-    LoggingItem *item = new LoggingItem;
+    auto *item = new LoggingItem;
     QJsonWrapper::qvariant2qobject(variant.toMap(), item);
 
     return item;
@@ -876,7 +876,7 @@ QString logLevelGetName(LogLevel_t level)
 /// \param  helptext    Descriptive text for --verbose help output
 void verboseAdd(uint64_t mask, QString name, bool additive, QString helptext)
 {
-    VerboseDef *item = new VerboseDef;
+    auto *item = new VerboseDef;
 
     item->mask = mask;
     // VB_GENERAL -> general
@@ -896,7 +896,7 @@ void verboseAdd(uint64_t mask, QString name, bool additive, QString helptext)
 /// \param  shortname   one-letter short name for output into logs
 void loglevelAdd(int value, QString name, char shortname)
 {
-    LoglevelDef *item = new LoglevelDef;
+    auto *item = new LoglevelDef;
 
     item->value = value;
     // LOG_CRIT -> crit

@@ -476,8 +476,7 @@ bool MythContextPrivate::FindDatabase(bool prompt, bool noAutodetect)
         if (manualSelect)
         {
             // Get the user to select a backend from a possible list:
-            BackendSelection::Decision d = (BackendSelection::Decision)
-                ChooseBackend(failure);
+            auto d = (BackendSelection::Decision)ChooseBackend(failure);
             switch (d)
             {
                 case BackendSelection::kAcceptConfigure:
@@ -727,10 +726,9 @@ bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
 
         EnableDBerrors();
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-        DatabaseSettings *dbsetting = new DatabaseSettings();
-        StandardSettingDialog *ssd =
-            new StandardSettingDialog(mainStack, "databasesettings",
-                                      dbsetting);
+        auto *dbsetting = new DatabaseSettings();
+        auto *ssd = new StandardSettingDialog(mainStack, "databasesettings",
+                                              dbsetting);
         if (ssd->Create())
         {
             mainStack->AddScreen(ssd);
@@ -1361,7 +1359,7 @@ bool MythContextPrivate::event(QEvent *e)
             m_registration = GetNotificationCenter()->Register(this);
         }
 
-        MythEvent *me = dynamic_cast<MythEvent*>(e);
+        auto *me = dynamic_cast<MythEvent*>(e);
         if (me == nullptr)
             return true;
 

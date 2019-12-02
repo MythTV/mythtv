@@ -852,8 +852,8 @@ void MythMainWindow::closeEvent(QCloseEvent *e)
 {
     if (e->spontaneous())
     {
-        QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, d->m_escapekey,
-                                   Qt::NoModifier);
+        auto *key = new QKeyEvent(QEvent::KeyPress, d->m_escapekey,
+                                  Qt::NoModifier);
         QCoreApplication::postEvent(this, key);
         e->ignore();
     }
@@ -1492,13 +1492,13 @@ void MythMainWindow::ExitToMainMenu(void)
             gCoreContext->dispatch(xe);
             if (screen->objectName() == QString("video playback window"))
             {
-                MythEvent *me = new MythEvent("EXIT_TO_MENU");
+                auto *me = new MythEvent("EXIT_TO_MENU");
                 QCoreApplication::postEvent(screen, me);
             }
             else
             {
-                QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, d->m_escapekey,
-                                               Qt::NoModifier);
+                auto *key = new QKeyEvent(QEvent::KeyPress, d->m_escapekey,
+                                          Qt::NoModifier);
                 QCoreApplication::postEvent(this, key);
                 MythNotificationCenter *nc =  MythNotificationCenter::GetInstance();
                 // Notifications have their own stack. We need to continue
@@ -1983,7 +1983,7 @@ void MythMainWindow::HandleCallback(const QString &Debug, MythCallbackEvent::Cal
     QWaitCondition wait;
     QMutex lock;
     lock.lock();
-    MythCallbackEvent *event = new MythCallbackEvent(Function, &wait, Opaque1, Opaque2);
+    auto *event = new MythCallbackEvent(Function, &wait, Opaque1, Opaque2);
     QCoreApplication::postEvent(window, event, Qt::HighEventPriority);
     int count = 0;
     while (!wait.wait(&lock, 100) && (count += 100))
@@ -2018,7 +2018,7 @@ bool MythMainWindow::keyLongPressFilter(QEvent **e,
     QScopedPointer<QEvent> &sNewEvent)
 {
     QEvent *newEvent = nullptr;
-    QKeyEvent *ke = dynamic_cast<QKeyEvent*>(*e);
+    auto *ke = dynamic_cast<QKeyEvent*>(*e);
     if (!ke)
         return false;
     int keycode = ke->key();
@@ -2088,8 +2088,10 @@ bool MythMainWindow::keyLongPressFilter(QEvent **e,
                     // short press or non-repeating keyboard - generate key
                     Qt::KeyboardModifiers modifier = Qt::NoModifier;
                     if (ke->timestamp() - d->m_longPressTime >= LONGPRESS_INTERVAL)
+                    {
                         // non-repeatng keyboard
                         modifier = Qt::MetaModifier;
+                    }
                     newEvent = new QKeyEvent(QEvent::KeyPress, keycode,
                         ke->modifiers() | modifier, ke->nativeScanCode(),
                         ke->nativeVirtualKey(), ke->nativeModifiers(),
@@ -2127,7 +2129,7 @@ bool MythMainWindow::eventFilter(QObject * /*watched*/, QEvent *e)
         case QEvent::KeyPress:
         {
             ResetIdleTimer();
-            QKeyEvent *ke = dynamic_cast<QKeyEvent*>(e);
+            auto *ke = dynamic_cast<QKeyEvent*>(e);
 
             // Work around weird GCC run-time bug. Only manifest on Mac OS X
             if (!ke)
@@ -2149,8 +2151,8 @@ bool MythMainWindow::eventFilter(QObject * /*watched*/, QEvent *e)
 
                 if (keycode > 0)
                 {
-                    QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, keycode,
-                                                   ke->modifiers());
+                    auto *key = new QKeyEvent(QEvent::KeyPress, keycode,
+                                              ke->modifiers());
                     QObject *key_target = getTarget(*key);
                     if (!key_target)
                         QCoreApplication::postEvent(this, key);
@@ -2186,7 +2188,7 @@ bool MythMainWindow::eventFilter(QObject * /*watched*/, QEvent *e)
             if (!d->m_gesture.recording())
             {
                 d->m_gesture.start();
-                QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent*>(e);
+                auto *mouseEvent = dynamic_cast<QMouseEvent*>(e);
                 if (!mouseEvent)
                     return false;
                 d->m_gesture.record(mouseEvent->pos());
@@ -2210,7 +2212,7 @@ bool MythMainWindow::eventFilter(QObject * /*watched*/, QEvent *e)
                 d->m_gesture.stop();
                 MythGestureEvent *ge = d->m_gesture.gesture();
 
-                QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent*>(e);
+                auto *mouseEvent = dynamic_cast<QMouseEvent*>(e);
 
                 /* handle clicks separately */
                 if (ge->gesture() == MythGestureEvent::Click)
@@ -2335,7 +2337,7 @@ bool MythMainWindow::eventFilter(QObject * /*watched*/, QEvent *e)
                 d->m_gestureTimer->stop();
                 d->m_gestureTimer->start(GESTURE_TIMEOUT);
 
-                QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent*>(e);
+                auto *mouseEvent = dynamic_cast<QMouseEvent*>(e);
                 if (!mouseEvent)
                     return false;
                 d->m_gesture.record(mouseEvent->pos());
@@ -2347,13 +2349,13 @@ bool MythMainWindow::eventFilter(QObject * /*watched*/, QEvent *e)
         {
             ResetIdleTimer();
             ShowMouseCursor(true);
-            QWheelEvent* qmw = static_cast<QWheelEvent*>(e);
+            auto* qmw = static_cast<QWheelEvent*>(e);
             int delta = qmw->delta();
             if (delta>0)
             {
                 qmw->accept();
-                QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, Qt::Key_Up,
-                                               Qt::NoModifier);
+                auto *key = new QKeyEvent(QEvent::KeyPress, Qt::Key_Up,
+                                          Qt::NoModifier);
                 QObject *key_target = getTarget(*key);
                 if (!key_target)
                     QCoreApplication::postEvent(this, key);
@@ -2363,8 +2365,8 @@ bool MythMainWindow::eventFilter(QObject * /*watched*/, QEvent *e)
             if (delta<0)
             {
                 qmw->accept();
-                QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, Qt::Key_Down,
-                                               Qt::NoModifier);
+                auto *key = new QKeyEvent(QEvent::KeyPress, Qt::Key_Down,
+                                          Qt::NoModifier);
                 QObject *key_target = getTarget(*key);
                 if (!key_target)
                     QCoreApplication::postEvent(this, key);
@@ -2384,7 +2386,7 @@ void MythMainWindow::customEvent(QEvent *ce)
 {
     if (ce->type() == MythGestureEvent::kEventType)
     {
-        MythGestureEvent *ge = static_cast<MythGestureEvent*>(ce);
+        auto *ge = static_cast<MythGestureEvent*>(ce);
         MythScreenStack *toplevel = GetMainStack();
         if (toplevel)
         {
@@ -2401,7 +2403,7 @@ void MythMainWindow::customEvent(QEvent *ce)
     }
     else if (ce->type() == ExternalKeycodeEvent::kEventType)
     {
-        ExternalKeycodeEvent *eke = static_cast<ExternalKeycodeEvent *>(ce);
+        auto *eke = static_cast<ExternalKeycodeEvent *>(ce);
         int keycode = eke->getKeycode();
 
         QKeyEvent key(QEvent::KeyPress, keycode, Qt::NoModifier);
@@ -2416,7 +2418,7 @@ void MythMainWindow::customEvent(QEvent *ce)
     else if (ce->type() == LircKeycodeEvent::kEventType &&
              !d->m_ignoreLircKeys)
     {
-        LircKeycodeEvent *lke = static_cast<LircKeycodeEvent *>(ce);
+        auto *lke = static_cast<LircKeycodeEvent *>(ce);
 
         if (LircKeycodeEvent::kLIRCInvalidKeyCombo == lke->modifiers())
         {
@@ -2446,7 +2448,7 @@ void MythMainWindow::customEvent(QEvent *ce)
     else if (ce->type() == JoystickKeycodeEvent::kEventType &&
              !d->m_ignoreJoystickKeys)
     {
-        JoystickKeycodeEvent *jke = static_cast<JoystickKeycodeEvent *>(ce);
+        auto *jke = static_cast<JoystickKeycodeEvent *>(ce);
         int keycode = jke->getKeycode();
 
         if (keycode)
@@ -2479,7 +2481,7 @@ void MythMainWindow::customEvent(QEvent *ce)
 #endif
     else if (ce->type() == MythMediaEvent::kEventType)
     {
-        MythMediaEvent *me = static_cast<MythMediaEvent*>(ce);
+        auto *me = static_cast<MythMediaEvent*>(ce);
 
         // A listener based system might be more efficient, but we should never
         // have that many screens open at once so impact should be minimal.
@@ -2516,7 +2518,7 @@ void MythMainWindow::customEvent(QEvent *ce)
     }
     else if (ce->type() == ScreenSaverEvent::kEventType)
     {
-        ScreenSaverEvent *sse = static_cast<ScreenSaverEvent *>(ce);
+        auto *sse = static_cast<ScreenSaverEvent *>(ce);
         switch (sse->getSSEventType())
         {
             case ScreenSaverEvent::ssetDisable:
@@ -2570,7 +2572,7 @@ void MythMainWindow::customEvent(QEvent *ce)
     }
     else if (ce->type() == MythEvent::MythEventMessage)
     {
-        MythEvent *me = static_cast<MythEvent *>(ce);
+        auto *me = static_cast<MythEvent *>(ce);
         QString message = me->Message();
 
         if (message.startsWith(ACTION_HANDLEMEDIA))
@@ -2660,7 +2662,7 @@ void MythMainWindow::customEvent(QEvent *ce)
     }
     else if (ce->type() == MythEvent::MythUserMessage)
     {
-        MythEvent *me = static_cast<MythEvent *>(ce);
+        auto *me = static_cast<MythEvent *>(ce);
         const QString& message = me->Message();
 
         if (!message.isEmpty())
@@ -2672,7 +2674,7 @@ void MythMainWindow::customEvent(QEvent *ce)
     }
     else if (ce->type() == MythCallbackEvent::kCallbackType)
     {
-        MythCallbackEvent *me = static_cast<MythCallbackEvent*>(ce);
+        auto *me = static_cast<MythCallbackEvent*>(ce);
         if (me && me->m_function)
             me->m_function(me->m_opaque1, me->m_opaque2, me->m_opaque3);
     }

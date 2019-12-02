@@ -70,7 +70,7 @@ MythRenderOpenGL* MythRenderOpenGL::GetOpenGLRender(void)
     if (!window)
         return nullptr;
 
-    MythRenderOpenGL* result = dynamic_cast<MythRenderOpenGL*>(window->GetRenderDevice());
+    auto* result = dynamic_cast<MythRenderOpenGL*>(window->GetRenderDevice());
     if (result)
         return result;
     return nullptr;
@@ -135,7 +135,7 @@ MythRenderOpenGL::MythRenderOpenGL(const QSurfaceFormat& Format, QPaintDevice* D
     m_parameters.fill(0);
     m_transforms.push(QMatrix4x4());
 
-    QWidget *w = dynamic_cast<QWidget*>(Device);
+    auto *w = dynamic_cast<QWidget*>(Device);
     m_window = (w) ? w->windowHandle() : nullptr;
 
     setFormat(Format);
@@ -573,7 +573,7 @@ MythGLTexture* MythRenderOpenGL::CreateTextureFromQImage(QImage *Image)
         return nullptr;
 
     OpenGLLocker locker(this);
-    QOpenGLTexture *texture = new QOpenGLTexture(*Image, QOpenGLTexture::DontGenerateMipMaps);
+    auto *texture = new QOpenGLTexture(*Image, QOpenGLTexture::DontGenerateMipMaps);
     if (!texture->textureId())
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + "Failed to create texure");
@@ -582,7 +582,7 @@ MythGLTexture* MythRenderOpenGL::CreateTextureFromQImage(QImage *Image)
     }
     texture->setMinMagFilters(QOpenGLTexture::Linear, QOpenGLTexture::Linear);
     texture->setWrapMode(QOpenGLTexture::ClampToEdge);
-    MythGLTexture *result = new MythGLTexture(texture);
+    auto *result = new MythGLTexture(texture);
     result->m_texture     = texture;
     result->m_vbo         = CreateVBO(kVertexSize);
     result->m_totalSize   = GetTextureSize(Image->size(), result->m_target != QOpenGLTexture::TargetRectangle);
@@ -700,7 +700,7 @@ MythGLTexture* MythRenderOpenGL::CreateFramebufferTexture(QOpenGLFramebufferObje
     if (!Framebuffer)
         return nullptr;
 
-    MythGLTexture *texture = new MythGLTexture(Framebuffer->texture());
+    auto *texture = new MythGLTexture(Framebuffer->texture());
     texture->m_size        = texture->m_totalSize = Framebuffer->size();
     texture->m_vbo         = CreateVBO(kVertexSize);
     texture->m_flip        = false;
@@ -1154,7 +1154,7 @@ QFunctionPointer MythRenderOpenGL::GetProcAddress(const QString &Proc) const
 QOpenGLBuffer* MythRenderOpenGL::CreateVBO(int Size, bool Release /*=true*/)
 {
     OpenGLLocker locker(this);
-    QOpenGLBuffer* buffer = new QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
+    auto* buffer = new QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
     if (buffer->create())
     {
         buffer->setUsagePattern(QOpenGLBuffer::StreamDraw);
@@ -1295,7 +1295,7 @@ GLfloat* MythRenderOpenGL::GetCachedVertices(GLuint Type, const QRect &Area)
         return m_cachedVertices[ref];
     }
 
-    GLfloat *vertices = new GLfloat[8];
+    auto *vertices = new GLfloat[8];
 
     vertices[2] = vertices[0] = Area.left();
     vertices[5] = vertices[1] = Area.top();
@@ -1457,7 +1457,7 @@ QOpenGLShaderProgram *MythRenderOpenGL::CreateShaderProgram(const QString &Verte
     OpenGLLocker locker(this);
     QString vertex   = Vertex.isEmpty()   ? kDefaultVertexShader  : Vertex;
     QString fragment = Fragment.isEmpty() ? kDefaultFragmentShader: Fragment;
-    QOpenGLShaderProgram *program = new QOpenGLShaderProgram();
+    auto *program = new QOpenGLShaderProgram();
     if (!program->addShaderFromSourceCode(QOpenGLShader::Vertex, vertex))
         return ShaderError(program, vertex);
     if (!program->addShaderFromSourceCode(QOpenGLShader::Fragment, fragment))

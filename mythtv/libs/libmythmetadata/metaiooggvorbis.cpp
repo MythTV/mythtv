@@ -16,8 +16,7 @@
 TagLib::Ogg::Vorbis::File *MetaIOOggVorbis::OpenFile(const QString &filename)
 {
     QByteArray fname = filename.toLocal8Bit();
-    TagLib::Ogg::Vorbis::File *oggfile =
-                            new TagLib::Ogg::Vorbis::File(fname.constData());
+    auto *oggfile = new TagLib::Ogg::Vorbis::File(fname.constData());
 
     if (!oggfile->isOpen())
     {
@@ -104,7 +103,7 @@ MusicMetadata* MetaIOOggVorbis::read(const QString &filename)
         return nullptr;
     }
 
-    MusicMetadata *metadata = new MusicMetadata(filename);
+    auto *metadata = new MusicMetadata(filename);
 
     ReadGenericMetadata(tag, metadata);
 

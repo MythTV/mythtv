@@ -323,7 +323,7 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings(bool passthrough)
     AudioFormat fmt = FORMAT_NONE;
     int err = 0;
 
-    AudioOutputSettings *settings = new AudioOutputSettings();
+    auto *settings = new AudioOutputSettings();
 
     if (m_pcm_handle)
     {
@@ -827,7 +827,7 @@ int AudioOutputALSA::GetVolumeChannel(int channel) const
     if (!m_mixer.elem)
         return retvol;
 
-    snd_mixer_selem_channel_id_t chan = (snd_mixer_selem_channel_id_t) channel;
+    auto chan = (snd_mixer_selem_channel_id_t) channel;
     if (!snd_mixer_selem_has_playback_channel(m_mixer.elem, chan))
         return retvol;
 
@@ -863,7 +863,7 @@ void AudioOutputALSA::SetVolumeChannel(int channel, int volume)
     mixervol = max(mixervol, m_mixer.volmin);
     mixervol = min(mixervol, m_mixer.volmax);
 
-    snd_mixer_selem_channel_id_t chan = (snd_mixer_selem_channel_id_t) channel;
+    auto chan = (snd_mixer_selem_channel_id_t) channel;
 
     if (snd_mixer_selem_has_playback_switch(m_mixer.elem))
         snd_mixer_selem_set_playback_switch(m_mixer.elem, chan, (volume > 0));
@@ -984,7 +984,7 @@ bool AudioOutputALSA::OpenMixer(void)
 
 QMap<QString, QString> *AudioOutputALSA::GetDevices(const char *type)
 {
-    QMap<QString, QString> *alsadevs = new QMap<QString, QString>();
+    auto *alsadevs = new QMap<QString, QString>();
     void **hints = nullptr, **n = nullptr;
 
     if (snd_device_name_hint(-1, type, &hints) < 0)

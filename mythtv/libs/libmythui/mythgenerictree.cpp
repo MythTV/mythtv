@@ -87,7 +87,7 @@ void MythGenericTree::ensureSortFields(void)
 MythGenericTree* MythGenericTree::addNode(const QString &a_string, int an_int,
                                   bool selectable_flag, bool visible)
 {
-    MythGenericTree *new_node = new MythGenericTree(a_string.simplified(),
+    auto *new_node = new MythGenericTree(a_string.simplified(),
                                                     an_int, selectable_flag);
     new_node->SetVisible(visible);
     return addNode(new_node);
@@ -97,7 +97,7 @@ MythGenericTree* MythGenericTree::addNode(const QString &a_string,
                                   const QString &sortText, int an_int, bool
                                   selectable_flag, bool visible)
 {
-    MythGenericTree *new_node = new MythGenericTree(a_string.simplified(),
+    auto *new_node = new MythGenericTree(a_string.simplified(),
                                                     an_int, selectable_flag);
     new_node->SetVisible(visible);
     new_node->SetSortText(sortText);
@@ -502,7 +502,7 @@ void MythGenericTree::SetVisible(bool visible)
 
 MythUIButtonListItem *MythGenericTree::CreateListButton(MythUIButtonList *list)
 {
-    MythUIButtonListItem *item = new MythUIButtonListItem(list, GetText());
+    auto *item = new MythUIButtonListItem(list, GetText());
     item->SetData(qVariantFromValue(this));
     item->SetTextFromMap(m_strings);
     item->SetImageFromMap(m_imageFilenames);

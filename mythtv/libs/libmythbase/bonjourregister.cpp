@@ -98,7 +98,7 @@ void BonjourRegister::BonjourCallback(DNSServiceRef ref, DNSServiceFlags flags,
     (void)ref;
     (void)flags;
 
-    BonjourRegister *bonjour = static_cast<BonjourRegister *>(object);
+    auto *bonjour = static_cast<BonjourRegister *>(object);
     if (bonjour)
     {
         delete bonjour->m_lock;

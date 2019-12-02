@@ -184,7 +184,7 @@ void MHDrawPoly::Initialise(MHParseNode *p, MHEngine *engine)
 
     for (int i = 0; i < args->GetSeqCount(); i++)
     {
-        MHPointArg *pPoint = new MHPointArg;
+        auto *pPoint = new MHPointArg;
         m_Points.Append(pPoint);
         pPoint->Initialise(args->GetSeqN(i), engine);
     }

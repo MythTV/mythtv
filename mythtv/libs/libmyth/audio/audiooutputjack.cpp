@@ -58,7 +58,7 @@ AudioOutputSettings* AudioOutputJACK::GetOutputSettings(bool /*digital*/)
     int rate = 0;
     int i = 0;
     const char **matching_ports = nullptr;
-    AudioOutputSettings *settings = new AudioOutputSettings();
+    auto *settings = new AudioOutputSettings();
 
     m_client = _jack_client_open();
     if (!m_client)
@@ -344,7 +344,7 @@ void AudioOutputJACK::DeinterleaveAudio(const float *aubuf, float **bufs, int nf
 */
 int AudioOutputJACK::_JackCallback(jack_nframes_t nframes, void *arg)
 {
-    AudioOutputJACK *aoj = static_cast<AudioOutputJACK*>(arg);
+    auto *aoj = static_cast<AudioOutputJACK*>(arg);
     return aoj->JackCallback(nframes);
 }
 
@@ -433,7 +433,7 @@ int AudioOutputJACK::JackCallback(jack_nframes_t nframes)
 */
 int AudioOutputJACK::_JackXRunCallback(void *arg)
 {
-    AudioOutputJACK *aoj = static_cast<AudioOutputJACK*>(arg);
+    auto *aoj = static_cast<AudioOutputJACK*>(arg);
     return aoj->JackXRunCallback();
 }
 
@@ -461,7 +461,7 @@ int AudioOutputJACK::JackXRunCallback(void)
 */
 int AudioOutputJACK::_JackGraphOrderCallback(void *arg)
 {
-    AudioOutputJACK *aoj = static_cast<AudioOutputJACK*>(arg);
+    auto *aoj = static_cast<AudioOutputJACK*>(arg);
     return aoj->JackGraphOrderCallback();
 }
 
@@ -569,8 +569,7 @@ void AudioOutputJACK::WriteAudio(unsigned char *aubuf, int size)
 jack_client_t* AudioOutputJACK::_jack_client_open(void)
 {
     QString client_name = QString("mythtv_%1").arg(getpid());
-    jack_options_t open_options =
-        (jack_options_t)(JackUseExactName | JackNoStartServer);
+    auto open_options = (jack_options_t)(JackUseExactName | JackNoStartServer);
     jack_status_t open_status = JackFailure;
 
     jack_client_t *client = jack_client_open(client_name.toLatin1().constData(),

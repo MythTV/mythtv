@@ -309,8 +309,7 @@ class ParentalLevelChangeCheckerPrivate : public QObject
         MythScreenStack *popupStack =
                 GetMythMainWindow()->GetStack("popup stack");
 
-        MythTextInputDialog *pwd =
-                new MythTextInputDialog(popupStack,
+        auto *pwd = new MythTextInputDialog(popupStack,
                         tr("Parental PIN:"), FilterNone, true);
 
         connect(pwd, SIGNAL(haveResult(QString)),

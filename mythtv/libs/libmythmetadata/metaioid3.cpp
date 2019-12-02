@@ -249,7 +249,7 @@ MusicMetadata *MetaIOID3::read(const QString &filename)
         }
     }
 
-    MusicMetadata *metadata = new MusicMetadata(filename);
+    auto *metadata = new MusicMetadata(filename);
 
     ReadGenericMetadata(tag, metadata);
 
@@ -387,7 +387,7 @@ MusicMetadata *MetaIOID3::read(const QString &filename)
  */
 QImage* MetaIOID3::getAlbumArt(const QString &filename, ImageType type)
 {
-    QImage *picture = new QImage();
+    auto *picture = new QImage();
 
     AttachedPictureFrame::Type apicType
         = AttachedPictureFrame::FrontCover;
@@ -423,11 +423,9 @@ QImage* MetaIOID3::getAlbumArt(const QString &filename, ImageType type)
         {
             TagLib::ID3v2::FrameList apicframes = tag->frameListMap()["APIC"];
 
-            for(TagLib::ID3v2::FrameList::Iterator it = apicframes.begin();
-                it != apicframes.end(); ++it)
+            for(auto it = apicframes.begin(); it != apicframes.end(); ++it)
             {
-                AttachedPictureFrame *frame =
-                                    dynamic_cast<AttachedPictureFrame *>(*it);
+                auto *frame = dynamic_cast<AttachedPictureFrame *>(*it);
                 if (frame && frame->type() == apicType)
                 {
                     picture->loadFromData((const uchar *)frame->picture().data(),
@@ -480,12 +478,9 @@ AlbumArtList MetaIOID3::readAlbumArt(TagLib::ID3v2::Tag *tag)
     {
         TagLib::ID3v2::FrameList apicframes = tag->frameListMap()["APIC"];
 
-        for(TagLib::ID3v2::FrameList::Iterator it = apicframes.begin();
-            it != apicframes.end(); ++it)
+        for(auto it = apicframes.begin(); it != apicframes.end(); ++it)
         {
-
-            AttachedPictureFrame *frame =
-                dynamic_cast<AttachedPictureFrame *>(*it);
+            auto *frame = dynamic_cast<AttachedPictureFrame *>(*it);
             if (frame == nullptr)
             {
                 LOG(VB_GENERAL, LOG_DEBUG,
@@ -503,7 +498,7 @@ AlbumArtList MetaIOID3::readAlbumArt(TagLib::ID3v2::Tag *tag)
                 continue;
             }
 
-            AlbumArtImage *art = new AlbumArtImage();
+            auto *art = new AlbumArtImage();
 
             if (frame->description().isEmpty())
                 art->m_description.clear();
@@ -586,9 +581,9 @@ AttachedPictureFrame* MetaIOID3::findAPIC(TagLib::ID3v2::Tag *tag,
                                         const String &description)
 {
   TagLib::ID3v2::FrameList l = tag->frameList("APIC");
-  for(TagLib::ID3v2::FrameList::Iterator it = l.begin(); it != l.end(); ++it)
+  for(auto it = l.begin(); it != l.end(); ++it)
   {
-    AttachedPictureFrame *f = dynamic_cast<AttachedPictureFrame *>(*it);
+    auto *f = dynamic_cast<AttachedPictureFrame *>(*it);
     if (f && f->type() == type &&
         (description.isNull() || f->description() == description))
       return f;
@@ -811,10 +806,9 @@ UserTextIdentificationFrame* MetaIOID3::find(TagLib::ID3v2::Tag *tag,
                                                 const String &description)
 {
   TagLib::ID3v2::FrameList l = tag->frameList("TXXX");
-  for(TagLib::ID3v2::FrameList::Iterator it = l.begin(); it != l.end(); ++it)
+  for(auto it = l.begin(); it != l.end(); ++it)
   {
-    UserTextIdentificationFrame *f =
-                                dynamic_cast<UserTextIdentificationFrame *>(*it);
+    auto *f = dynamic_cast<UserTextIdentificationFrame *>(*it);
     if (f && f->description() == description)
       return f;
   }
@@ -832,9 +826,9 @@ PopularimeterFrame* MetaIOID3::findPOPM(TagLib::ID3v2::Tag *tag,
                                         const String &_email)
 {
   TagLib::ID3v2::FrameList l = tag->frameList("POPM");
-  for(TagLib::ID3v2::FrameList::Iterator it = l.begin(); it != l.end(); ++it)
+  for(auto it = l.begin(); it != l.end(); ++it)
   {
-    PopularimeterFrame *f = dynamic_cast<PopularimeterFrame *>(*it);
+    auto *f = dynamic_cast<PopularimeterFrame *>(*it);
     if (f && f->email() == _email)
       return f;
   }

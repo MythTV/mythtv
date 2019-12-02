@@ -391,9 +391,8 @@ class ImageLoader
         QString frameFilename;
         int imageCount = 1;
 
-        MythImageReader *imageReader = new MythImageReader(imProps.m_filename);
-
-        AnimationFrames *images = new AnimationFrames();
+        auto *imageReader = new MythImageReader(imProps.m_filename);
+        auto *images = new AnimationFrames();
 
         while (imageReader->canRead() && !aborted)
         {
@@ -503,10 +502,9 @@ class ImageLoadThread : public QRunnable
 
              if (frames && frames->count() > 1)
              {
-                ImageLoadEvent *le = new ImageLoadEvent(m_parent, frames,
-                                                        m_basefile,
-                                                        m_imageProperties.m_filename,
-                                                        aborted);
+                auto *le = new ImageLoadEvent(m_parent, frames, m_basefile,
+                                              m_imageProperties.m_filename,
+                                              aborted);
                 QCoreApplication::postEvent(m_parent, le);
 
                 return;
@@ -519,9 +517,9 @@ class ImageLoadThread : public QRunnable
                                                     m_cacheMode, m_parent,
                                                     aborted);
 
-        ImageLoadEvent *le = new ImageLoadEvent(m_parent, image, m_basefile,
-                                                m_imageProperties.m_filename,
-                                                m_number, aborted);
+        auto *le = new ImageLoadEvent(m_parent, image, m_basefile,
+                                      m_imageProperties.m_filename,
+                                      m_number, aborted);
         QCoreApplication::postEvent(m_parent, le);
     }
 
@@ -1038,8 +1036,7 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
                 QString("Load(), spawning thread to load '%1'").arg(filename));
 
             m_runningThreads++;
-            ImageLoadThread *bImgThread =
-                new ImageLoadThread(this, GetPainter(),
+            auto *bImgThread = new ImageLoadThread(this, GetPainter(),
                                     imProps, bFilename, i,
                                     static_cast<ImageCacheMode>(cacheMode2));
             GetMythUI()->GetImageThreadPool()->start(bImgThread, "ImageLoad");
@@ -1421,8 +1418,7 @@ bool MythUIImage::ParseElement(
 void MythUIImage::CopyFrom(MythUIType *base)
 {
     d->m_updateLock.lockForWrite();
-    MythUIImage *im = dynamic_cast<MythUIImage *>(base);
-
+    auto *im = dynamic_cast<MythUIImage *>(base);
     if (!im)
     {
         LOG(VB_GENERAL, LOG_ERR,
@@ -1478,7 +1474,7 @@ void MythUIImage::CopyFrom(MythUIType *base)
 void MythUIImage::CreateCopy(MythUIType *parent)
 {
     QReadLocker updateLocker(&d->m_updateLock);
-    MythUIImage *im = new MythUIImage(parent, objectName());
+    auto *im = new MythUIImage(parent, objectName());
     im->CopyFrom(this);
 }
 
@@ -1528,8 +1524,7 @@ void MythUIImage::customEvent(QEvent *event)
 {
     if (event->type() == ImageLoadEvent::kEventType)
     {
-        ImageLoadEvent *le = static_cast<ImageLoadEvent *>(event);
-
+        auto *le = static_cast<ImageLoadEvent *>(event);
         if (le->GetParent() != this)
             return;
 

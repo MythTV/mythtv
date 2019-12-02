@@ -161,7 +161,7 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
         LOG(VB_AUDIO, LOG_INFO, LOC +
             QString("low mem, reallocating in buffer from %1 to %2")
                 .arg(m_in_size) .arg(required_len));
-        inbuf_t *tmp = reinterpret_cast<inbuf_t*>
+        auto *tmp = reinterpret_cast<inbuf_t*>
             (realloc(m_in, m_in_size, required_len));
         if (!tmp)
         {
@@ -275,7 +275,7 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
             LOG(VB_AUDIO, LOG_WARNING, LOC +
                 QString("low mem, reallocating out buffer from %1 to %2")
                     .arg(m_out_size) .arg(required_len));
-            outbuf_t *tmp = reinterpret_cast<outbuf_t*>
+            auto *tmp = reinterpret_cast<outbuf_t*>
                 (realloc(m_out, m_out_size, required_len));
             if (!tmp)
             {

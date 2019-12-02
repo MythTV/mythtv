@@ -400,7 +400,7 @@ std::string PictureMetaData::GetTag(const QString &key, bool *exists)
         return value;
 
     Exiv2::ExifKey exifKey = Exiv2::ExifKey(key.toStdString());
-    Exiv2::ExifData::iterator exifIt = m_exifData.findKey(exifKey);
+    auto exifIt = m_exifData.findKey(exifKey);
 
     if (exifIt == m_exifData.end())
         return value;
