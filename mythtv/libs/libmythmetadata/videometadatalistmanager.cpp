@@ -37,6 +37,7 @@ class VideoMetadataListManagerImp
 
     VideoMetadataPtr byFilename(const QString &file_name) const
     {
+        //NOLINTNEXTLINE(modernize-use-auto)
         string_to_meta::const_iterator p = m_fileMap.find(file_name);
         if (p != m_fileMap.end())
         {
@@ -47,6 +48,7 @@ class VideoMetadataListManagerImp
 
     VideoMetadataPtr byID(unsigned int db_id) const
     {
+        //NOLINTNEXTLINE(modernize-use-auto)
         int_to_meta::const_iterator p = m_idMap.find(db_id);
         if (p != m_idMap.end())
         {

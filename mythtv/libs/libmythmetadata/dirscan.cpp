@@ -35,6 +35,7 @@ namespace
 
         bool extension_ignored(const QString &extension) const
         {
+            //NOLINTNEXTLINE(modernize-use-auto)
             ext_map::const_iterator p = m_extensions.find(extension.toLower());
             if (p != m_extensions.end())
                 return p->second;
