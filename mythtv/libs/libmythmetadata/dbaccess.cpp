@@ -642,7 +642,7 @@ class FileAssociationsImp
 
     bool get(unsigned int id, file_association &val) const
     {
-        association_list::const_iterator p = find(id);
+        auto p = cfind(id);
         if (p != m_fileAssociations.end())
         {
             val = *p;
@@ -653,7 +653,7 @@ class FileAssociationsImp
 
     bool get(const QString &ext, file_association &val) const
     {
-        association_list::const_iterator p = find(ext);
+        auto p = cfind(ext);
         if (p != m_fileAssociations.end())
         {
             val = *p;
@@ -686,7 +686,7 @@ class FileAssociationsImp
 
     void getExtensionIgnoreList(ext_ignore_list &ext_ignore) const
     {
-        for (association_list::const_iterator p = m_fileAssociations.begin();
+        for (auto p = m_fileAssociations.cbegin();
              p != m_fileAssociations.cend(); ++p)
         {
             ext_ignore.push_back(std::make_pair(p->extension, p->ignore));
@@ -754,7 +754,7 @@ class FileAssociationsImp
         return m_fileAssociations.end();
     }
 
-    association_list::const_iterator find(const QString &ext) const
+    association_list::const_iterator cfind(const QString &ext) const
     {
         for (auto p = m_fileAssociations.cbegin();
              p != m_fileAssociations.cend(); ++p)
@@ -765,17 +765,17 @@ class FileAssociationsImp
                 return p;
             }
         }
-        return m_fileAssociations.end();
+        return m_fileAssociations.cend();
     }
 
-    association_list::const_iterator find(unsigned int id) const
+    association_list::const_iterator cfind(unsigned int id) const
     {
         for (auto p = m_fileAssociations.cbegin();
              p != m_fileAssociations.cend(); ++p)
         {
             if (p->id == id) return p;
         }
-        return m_fileAssociations.end();
+        return m_fileAssociations.cend();
     }
 
   private:
