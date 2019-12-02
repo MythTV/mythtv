@@ -151,9 +151,6 @@ Checks: '-*,
         # Noisy!!!  foo(void) => foo()  ,
        -modernize-redundant-void-arg,
 
-        # Not investigated yet. ,
-       -modernize-use-auto,
-
         # Why would anyone want this? ,
        -modernize-use-trailing-return-type,
 
@@ -258,3 +255,8 @@ CheckOptions:
     value:    'camelBack'
   - key:      readability-identifier-naming.StaticVariablePrefix
     value:    's_'
+
+  - key:      google-runtime-int.Signedtypeprefix
+    value:    'qint'
+  - key:      google-runtime-int.UnsignedTypePrefix
+    value:    'quint'
