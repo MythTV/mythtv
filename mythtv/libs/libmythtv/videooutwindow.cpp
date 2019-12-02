@@ -49,7 +49,7 @@ const float VideoOutWindow::kManualZoomMinVerticalZoom   = 0.25F;
 const int   VideoOutWindow::kManualZoomMaxMove           = 50;
 
 VideoOutWindow::VideoOutWindow()
-  : m_display(MythDisplay::AcquireRelease()),
+  : m_display(nullptr),
     // DB settings
     m_dbMove(0, 0),
     m_dbHorizScale(0.0F),
@@ -95,14 +95,6 @@ VideoOutWindow::VideoOutWindow()
     m_dbMove = QPoint(gCoreContext->GetNumSetting("xScanDisplacement", 0),
                      gCoreContext->GetNumSetting("yScanDisplacement", 0));
     m_dbUseGUISize = gCoreContext->GetBoolSetting("GuiSizeForTV", false);
-
-    PopulateGeometry();
-    connect(m_display, &MythDisplay::CurrentScreenChanged, this, &VideoOutWindow::ScreenChanged);
-}
-
-VideoOutWindow::~VideoOutWindow()
-{
-    MythDisplay::AcquireRelease(false);
 }
 
 void VideoOutWindow::ScreenChanged(QScreen*)
@@ -113,11 +105,17 @@ void VideoOutWindow::ScreenChanged(QScreen*)
 
 void VideoOutWindow::PopulateGeometry(void)
 {
+    if (!m_display)
+        return;
+
     qApp->processEvents();
     if (not qobject_cast<QApplication*>(qApp))
         return;
 
     QScreen *screen = m_display->GetCurrentScreen();
+    if (!screen)
+        return;
+
     if (MythDisplay::SpanAllScreens())
     {
         m_usingXinerama = true;
@@ -466,8 +464,14 @@ void VideoOutWindow::ApplyLetterboxing(void)
 
 bool VideoOutWindow::Init(const QSize &VideoDim, const QSize &VideoDispDim,
                           float Aspect, const QRect &WindowRect,
-                          AspectOverrideMode AspectOverride, AdjustFillMode AdjustFill)
+                          AspectOverrideMode AspectOverride, AdjustFillMode AdjustFill, MythDisplay *Display)
 {
+    if (!m_display && Display)
+    {
+        m_display = Display;
+        connect(m_display, &MythDisplay::CurrentScreenChanged, this, &VideoOutWindow::ScreenChanged);
+    }
+
     // Refresh the geometry in case the video mode has changed
     PopulateGeometry();
 

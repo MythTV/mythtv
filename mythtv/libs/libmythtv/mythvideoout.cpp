@@ -154,7 +154,7 @@ MythVideoOutput *MythVideoOutput::Create(const QString &Decoder,    MythCodecID 
             vo->SetVideoFrameRate(FrameRate);
             vo->SetReferenceFrames(ReferenceFrames);
             if (vo->Init(VideoDim, VideoDispDim, VideoAspect,
-                         widget->winId(), display_rect, CodecID))
+                         MythDisplay::AcquireRelease(), display_rect, CodecID))
             {
                 vo->SetVideoScalingAllowed(true);
                 return vo;
@@ -166,7 +166,7 @@ MythVideoOutput *MythVideoOutput::Create(const QString &Decoder,    MythCodecID 
         }
         else if (vo && (PlayerFlags & kVideoIsNull))
         {
-            if (vo->Init(VideoDim, VideoDispDim, VideoAspect, 0, QRect(), CodecID))
+            if (vo->Init(VideoDim, VideoDispDim, VideoAspect, nullptr, QRect(), CodecID))
                 return vo;
 
             vo->m_dbDisplayProfile = nullptr;
@@ -253,7 +253,7 @@ MythVideoOutput *MythVideoOutput::Create(const QString &Decoder,    MythCodecID 
  *        Init(int,int,float,WId,int,int,int,int,WId) call.
  */
 MythVideoOutput::MythVideoOutput()
-  : m_display(MythDisplay::AcquireRelease()),
+  : m_display(nullptr),
     m_dbDisplayDimensionsMM(0,0),
     m_dbAspectOverride(kAspect_Off),
     m_dbAdjustFill(kAdjustFill_Off),
@@ -284,7 +284,8 @@ MythVideoOutput::~MythVideoOutput()
 {
     delete m_dbDisplayProfile;
     ResizeForGui();
-    MythDisplay::AcquireRelease(false);
+    if (m_display)
+        MythDisplay::AcquireRelease(false);
 }
 
 /**
@@ -293,11 +294,10 @@ MythVideoOutput::~MythVideoOutput()
  * \return true if successful, false otherwise.
  */
 bool MythVideoOutput::Init(const QSize &VideoDim, const QSize &VideoDispDim,
-                           float VideoAspect, WId WinID,
+                           float VideoAspect, MythDisplay *Display,
                            const QRect &WindowRect, MythCodecID CodecID)
 {
-    (void)WinID;
-
+    m_display = Display;
     m_videoCodecID = CodecID;
     bool wasembedding = m_window.IsEmbedding();
     QRect oldrect;
@@ -309,7 +309,8 @@ bool MythVideoOutput::Init(const QSize &VideoDim, const QSize &VideoDispDim,
 
     bool mainSuccess = m_window.Init(VideoDim, VideoDispDim,
                                      VideoAspect, WindowRect,
-                                     m_dbAspectOverride, m_dbAdjustFill);
+                                     m_dbAspectOverride, m_dbAdjustFill,
+                                     m_display);
 
     if (m_dbDisplayProfile)
         m_dbDisplayProfile->SetInput(m_window.GetVideoDispDim());
@@ -928,7 +929,7 @@ void MythVideoOutput::DiscardFrames(bool KeyFrame, bool)
  */
 void MythVideoOutput::ResizeForGui(void)
 {
-    if (m_display->UsingVideoModes())
+    if (m_display && m_display->UsingVideoModes())
         m_display->SwitchToGUI();
 }
 
@@ -945,6 +946,8 @@ void MythVideoOutput::ResizeForGui(void)
  */
 void MythVideoOutput::ResizeForVideo(int Width, int Height)
 {
+    if (!m_display)
+        return;
     if (!m_display->UsingVideoModes())
         return;
 
@@ -991,6 +994,9 @@ void MythVideoOutput::ResizeForVideo(int Width, int Height)
  */
 void MythVideoOutput::InitDisplayMeasurements(void)
 {
+    if (!m_display)
+        return;
+
     DisplayInfo disp = m_display->GetDisplayInfo();
     QString     source = "Actual";
 

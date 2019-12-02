@@ -48,7 +48,7 @@ class MythVideoOutput
     virtual ~MythVideoOutput();
 
     virtual bool Init(const QSize &VideoDim, const QSize &VideoDispDim,
-                      float VideoAspect,     WId WinID,
+                      float VideoAspect, MythDisplay *Display,
                       const QRect &WindowRect, MythCodecID CodecID);
     virtual void SetVideoFrameRate(float);
     virtual void SetDeinterlacing(bool Enable, bool DoubleRate, MythDeintType Force = DEINT_NONE);

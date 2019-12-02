@@ -197,7 +197,7 @@ void MythVideoOutputOpenGL::DestroyBuffers(void)
 }
 
 bool MythVideoOutputOpenGL::Init(const QSize &VideoDim, const QSize &VideoDispDim, float Aspect,
-                                 WId, const QRect &DisplayVisibleRect, MythCodecID CodecId)
+                                 MythDisplay *Display, const QRect &DisplayVisibleRect, MythCodecID CodecId)
 {
     if (!m_render || !m_openGLPainter || !m_openGLVideo)
         return false;
@@ -217,7 +217,7 @@ bool MythVideoOutputOpenGL::Init(const QSize &VideoDim, const QSize &VideoDispDi
         m_openGLPainter->FreeResources();
 
     // Default initialisation - mainly VideoOutWindow
-    if (!MythVideoOutput::Init(VideoDim, VideoDispDim, Aspect, 0, DisplayVisibleRect, CodecId))
+    if (!MythVideoOutput::Init(VideoDim, VideoDispDim, Aspect, Display, DisplayVisibleRect, CodecId))
         return false;
 
     // Ensure any new profile preferences are handled after a stream change
@@ -425,7 +425,7 @@ void MythVideoOutputOpenGL::ProcessFrame(VideoFrame *Frame, OSD */*osd*/,
             m_dbDisplayProfile->SetInput(m_window.GetVideoDispDim(), 0 , codecName);
 
         bool ok = Init(m_newVideoDim, m_newVideoDispDim, m_newAspect,
-                       0, m_window.GetDisplayVisibleRect(), m_newCodecId);
+                       m_display, m_window.GetDisplayVisibleRect(), m_newCodecId);
         m_newCodecId = kCodec_NONE;
         m_newVideoDim = QSize();
         m_newVideoDispDim = QSize();

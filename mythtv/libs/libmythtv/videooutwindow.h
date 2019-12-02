@@ -28,11 +28,12 @@ class VideoOutWindow : public QObject
 
   public:
     VideoOutWindow();
-   ~VideoOutWindow() override;
+   ~VideoOutWindow() override = default;
 
     bool Init(const QSize &VideoDim, const QSize &VideoDispDim,
               float Aspect, const QRect &WindowRect,
-              AspectOverrideMode AspectOverride, AdjustFillMode AdjustFill);
+              AspectOverrideMode AspectOverride, AdjustFillMode AdjustFill,
+              MythDisplay* Display);
 
   signals:
     // Note These are emitted from MoveResize - which must be called after any call

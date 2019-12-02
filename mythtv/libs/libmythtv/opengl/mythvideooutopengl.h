@@ -20,7 +20,7 @@ class MythVideoOutputOpenGL : public MythVideoOutput
 
     // VideoOutput
     bool Init(const QSize &VideoDim, const QSize &VideoDispDim, float Aspect,
-              WId WinId, const QRect &DisplayVisibleRect, MythCodecID CodecId) override;
+              MythDisplay *Display, const QRect &DisplayVisibleRect, MythCodecID CodecId) override;
 
     void PrepareFrame(VideoFrame *Frame, FrameScanType, OSD *Osd) override;
     void ProcessFrame(VideoFrame *Frame, OSD *Osd,

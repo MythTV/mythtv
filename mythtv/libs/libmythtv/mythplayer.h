@@ -647,7 +647,7 @@ class MTV_PUBLIC MythPlayer
 #endif
 
     // Window stuff
-    MythDisplay* m_display              { MythDisplay::AcquireRelease() };
+    MythDisplay* m_display              {nullptr};
     QWidget *parentWidget               {nullptr};
     bool     embedding                  {false};
     QRect    embedRect                  {0,0,0,0};

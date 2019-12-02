@@ -148,6 +148,7 @@ void MythMultiLocker::Relock(void)
 
 MythPlayer::MythPlayer(PlayerFlags flags)
     : playerFlags(flags),
+      m_display((flags & kVideoIsNull) ? nullptr : MythDisplay::AcquireRelease()),
       // CC608/708
       cc608(this), cc708(this),
       // Audio
@@ -2415,7 +2416,7 @@ bool MythPlayer::CanSupportDoubleRate(void)
     {
         refreshinterval = videosync->getRefreshInterval();
     }
-    else
+    else if (m_display)
     {
         // used by the decoder before videosync is created
         refreshinterval = m_display->GetDisplayInfo(frame_interval).Rate();

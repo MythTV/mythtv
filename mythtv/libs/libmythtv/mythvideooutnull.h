@@ -11,10 +11,9 @@ class MythVideoOutputNull : public MythVideoOutput
     MythVideoOutputNull();
    ~MythVideoOutputNull() override;
 
-    bool Init(const QSize &video_dim_buf,
-              const QSize &video_dim_disp,
-              float aspect,
-              WId winid, const QRect &win_rect, MythCodecID codec_id) override; // VideoOutput
+    bool Init(const QSize &video_dim_buf, const QSize &video_dim_disp,
+              float aspect, MythDisplay *Display,
+              const QRect &win_rect, MythCodecID codec_id) override;
     void SetDeinterlacing(bool Enable, bool DoubleRate, MythDeintType Force = DEINT_NONE) override;
     void PrepareFrame(VideoFrame *buffer, FrameScanType, OSD *osd) override; // VideoOutput
     void Show(FrameScanType ) override; // VideoOutput
