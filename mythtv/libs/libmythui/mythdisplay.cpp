@@ -127,13 +127,10 @@ void MythDisplay::SetWidget(QWidget *MainWindow)
     m_widget = MainWindow;
 
     if (!m_widget)
-    {
-        LOG(VB_GENERAL, LOG_INFO, LOC + "Widget removed");
         return;
-    }
-
     if (m_widget != old)
         LOG(VB_GENERAL, LOG_INFO, LOC + "New main widget");
+
     QWindow* window = m_widget->windowHandle();
     if (window)
     {
@@ -155,11 +152,10 @@ void MythDisplay::SetWidget(QWidget *MainWindow)
                 m_widget->move(desired->geometry().topLeft());
         }
         connect(window, &QWindow::screenChanged, this, &MythDisplay::ScreenChanged);
+        return;
     }
-    else
-    {
-        LOG(VB_GENERAL, LOG_WARNING, LOC + "Widget does not have a window!");
-    }
+
+    LOG(VB_GENERAL, LOG_WARNING, LOC + "Widget does not have a window!");
 }
 
 int MythDisplay::GetScreenCount(void)
@@ -229,12 +225,12 @@ QScreen *MythDisplay::GetDesiredScreen(void)
     if (!newscreen)
     {
         QScreen *primary = qGuiApp->primaryScreen();
-        if (name.isEmpty())
+        if (name.isEmpty() && primary)
         {
             LOG(VB_GENERAL, LOG_INFO, LOC + QString("Defaulting to primary screen (%1)")
                 .arg(primary->name()));
         }
-        else if (name != "-1")
+        else if (name != "-1" && primary)
         {
             LOG(VB_GENERAL, LOG_INFO, LOC + QString("Screen '%1' not found, defaulting to primary screen (%2)")
                 .arg(name).arg(primary->name()));
@@ -295,6 +291,8 @@ DisplayInfo MythDisplay::GetDisplayInfo(int)
     // rounded down.
     QScreen *screen = GetCurrentScreen();
     DisplayInfo ret;
+    if (!screen)
+        return ret;
     ret.m_rate = 1000000.0F / static_cast<float>(screen->refreshRate());
     ret.m_res  = screen->size();
     ret.m_size = QSize(static_cast<int>(screen->physicalSize().width()),
@@ -326,6 +324,9 @@ QString MythDisplay::GetExtraScreenInfo(QScreen *qScreen)
 
 void MythDisplay::DebugScreen(QScreen *qScreen, const QString &Message)
 {
+    if (!qScreen)
+        return;
+
     QRect geom = qScreen->geometry();
     QString extra = GetExtraScreenInfo(qScreen);
 

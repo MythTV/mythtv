@@ -875,8 +875,11 @@ void MythMainWindow::GrabWindow(QImage &image)
 
     QScreen *screen = MythDisplay::AcquireRelease()->GetCurrentScreen();
     MythDisplay::AcquireRelease(false);
-    QPixmap p = screen->grabWindow(winid);
-    image = p.toImage();
+    if (screen)
+    {
+        QPixmap p = screen->grabWindow(winid);
+        image = p.toImage();
+    }
 }
 
 /* This is required to allow a screenshot to be requested by another thread
