@@ -261,7 +261,7 @@ void MythSystemEventHandler::customEvent(QEvent *e)
 {
     if (e->type() == MythEvent::MythEventMessage)
     {
-        MythEvent *me = dynamic_cast<MythEvent *>(e);
+        auto *me = dynamic_cast<MythEvent *>(e);
         if (me == nullptr)
             return;
         QString msg = me->Message().simplified();
@@ -298,7 +298,7 @@ void MythSystemEventHandler::customEvent(QEvent *e)
         {
             SubstituteMatches(tokens, cmd);
 
-            SystemEventThread *eventThread = new SystemEventThread(cmd);
+            auto *eventThread = new SystemEventThread(cmd);
             MThreadPool::globalInstance()->startReserved(
                 eventThread, "SystemEvent");
         }
@@ -312,8 +312,7 @@ void MythSystemEventHandler::customEvent(QEvent *e)
             LOG(VB_GENERAL, LOG_INFO, LOC +
                 QString("Starting thread for command '%1'").arg(cmd));
 
-            SystemEventThread *eventThread =
-                new SystemEventThread(cmd, tokens[1]);
+            auto *eventThread = new SystemEventThread(cmd, tokens[1]);
             MThreadPool::globalInstance()->startReserved(
                 eventThread, "SystemEvent");
         }

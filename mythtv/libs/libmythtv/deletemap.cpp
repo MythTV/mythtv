@@ -413,7 +413,7 @@ void DeleteMap::NewCut(uint64_t frame)
     if (existing > -1)
     {
         uint64_t total = m_ctx->m_player->GetTotalFrameCount();
-        uint64_t otherframe = static_cast<uint64_t>(existing);
+        auto otherframe = static_cast<uint64_t>(existing);
         if (otherframe == frame)
             Delete(otherframe);
         else

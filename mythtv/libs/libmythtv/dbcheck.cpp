@@ -2823,7 +2823,7 @@ nullptr
         while (query.next())
         {
             int recordingID = query.value(0).toInt();
-            RecordingInfo *recInfo = new RecordingInfo(recordingID);
+            auto *recInfo = new RecordingInfo(recordingID);
             RecordingFile *recFile = recInfo->GetRecordingFile();
             recFile->m_fileName = recInfo->GetBasename();
             recFile->m_fileSize = recInfo->GetFilesize();

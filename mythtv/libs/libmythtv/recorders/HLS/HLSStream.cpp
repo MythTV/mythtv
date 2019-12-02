@@ -75,7 +75,7 @@ bool HLSRecStream::DecodeData(MythSingleDownload& downloader,
 
     if ((Ikey = m_aeskeys.find(keypath)) == m_aeskeys.end())
     {
-        AES_KEY* key = new AES_KEY;
+        auto* key = new AES_KEY;
         DownloadKey(downloader, keypath, key);
         Ikey = m_aeskeys.insert(keypath, key);
         if (Ikey == m_aeskeys.end())

@@ -464,8 +464,7 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags,
     if (!playerError.isEmpty())
     {
         MythScreenStack *ss = GetMythMainWindow()->GetStack("popup stack");
-        MythConfirmationDialog *dlg = new MythConfirmationDialog(
-            ss, playerError, false);
+        auto *dlg = new MythConfirmationDialog(ss, playerError, false);
         if (!dlg->Create())
             delete dlg;
         else
@@ -1714,7 +1713,7 @@ void TV::AskAllowRecording(PlayerContext *ctx,
     if (!StateIsLiveTV(GetState(ctx)))
        return;
 
-    ProgramInfo *info = new ProgramInfo(msg);
+    auto *info = new ProgramInfo(msg);
     if (!info->GetChanID())
     {
         delete info;
@@ -3536,7 +3535,7 @@ bool TV::event(QEvent *e)
     {
         PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
         mctx->LockDeletePlayer(__FILE__, __LINE__);
-        const QResizeEvent *qre = dynamic_cast<const QResizeEvent*>(e);
+        const auto *qre = dynamic_cast<const QResizeEvent*>(e);
         if (qre && mctx->m_player)
             mctx->m_player->WindowResized(qre->size());
         mctx->UnlockDeletePlayer(__FILE__, __LINE__);
@@ -3828,7 +3827,7 @@ bool TV::ProcessKeypressOrGesture(PlayerContext *actx, QEvent *e)
 
 #ifdef Q_OS_LINUX
     // Fixups for _some_ linux native codes that QT doesn't know
-    QKeyEvent* eKeyEvent = dynamic_cast<QKeyEvent*>(e);
+    auto* eKeyEvent = dynamic_cast<QKeyEvent*>(e);
     if (eKeyEvent) {
         if (eKeyEvent->key() <= 0)
         {
@@ -3844,8 +3843,8 @@ bool TV::ProcessKeypressOrGesture(PlayerContext *actx, QEvent *e)
 
             if (keycode > 0)
             {
-                QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, keycode,
-                                                eKeyEvent->modifiers());
+                auto *key = new QKeyEvent(QEvent::KeyPress, keycode,
+                                          eKeyEvent->modifiers());
                 QCoreApplication::postEvent(this, key);
             }
         }
@@ -3881,12 +3880,12 @@ bool TV::ProcessKeypressOrGesture(PlayerContext *actx, QEvent *e)
     {
         if (QEvent::KeyPress == e->type())
         {
-            QKeyEvent *qke = dynamic_cast<QKeyEvent*>(e);
+            auto *qke = dynamic_cast<QKeyEvent*>(e);
             handled = (qke != nullptr) && osd->DialogHandleKeypress(qke);
         }
         if (MythGestureEvent::kEventType == e->type())
         {
-            MythGestureEvent *mge = dynamic_cast<MythGestureEvent*>(e);
+            auto *mge = dynamic_cast<MythGestureEvent*>(e);
             handled = (mge != nullptr) && osd->DialogHandleGesture(mge);
         }
     }
@@ -3949,7 +3948,7 @@ bool TV::ProcessKeypressOrGesture(PlayerContext *actx, QEvent *e)
     // This allows hex teletext entry and minor channel entry.
     if (QEvent::KeyPress == e->type())
     {
-        QKeyEvent *qke = dynamic_cast<QKeyEvent*>(e);
+        auto *qke = dynamic_cast<QKeyEvent*>(e);
         if (qke == nullptr)
             return false;
         const QString txt = qke->text();
@@ -5613,7 +5612,7 @@ bool TV::CreatePIP(PlayerContext *ctx, const ProgramInfo *info)
         return false;
     }
 
-    PlayerContext *pipctx = new PlayerContext(kPIPPlayerInUseID);
+    auto *pipctx = new PlayerContext(kPIPPlayerInUseID);
     // Hardware acceleration of PiP is currently disabled as the null video
     // renderer cannot deal with hardware codecs which are returned by the display
     // profile. The workaround would be to encourage the decoder, when using null
@@ -8374,7 +8373,7 @@ bool TV::IsTunable(uint chanid)
 static QString toCommaList(const QSet<uint> &list)
 {
     QString ret = "";
-    for (QSet<uint>::const_iterator it = list.begin(); it != list.end(); ++it)
+    for (auto it = list.cbegin(); it != list.cend(); ++it)
         ret += QString("%1,").arg(*it);
 
     if (ret.length())
@@ -8659,7 +8658,7 @@ void TV::EditSchedule(const PlayerContext */*ctx*/, int editType)
 {
     // post the request so the guide will be created in the UI thread
     QString message = QString("START_EPG %1").arg(editType);
-    MythEvent* me = new MythEvent(message);
+    auto* me = new MythEvent(message);
     qApp->postEvent(this, me);
 }
 
@@ -9176,7 +9175,7 @@ void TV::customEvent(QEvent *e)
 
     if (e->type() == MythEvent::MythUserMessage)
     {
-        MythEvent *me = dynamic_cast<MythEvent*>(e);
+        auto *me = dynamic_cast<MythEvent*>(e);
         if (me == nullptr)
             return;
         QString message = me->Message();
@@ -9207,8 +9206,7 @@ void TV::customEvent(QEvent *e)
 
     if (e->type() == MythEvent::kUpdateBrowseInfoEventType)
     {
-        UpdateBrowseInfoEvent *b =
-            reinterpret_cast<UpdateBrowseInfoEvent*>(e);
+        auto *b = reinterpret_cast<UpdateBrowseInfoEvent*>(e);
         PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
         OSD *osd = GetOSDLock(mctx);
         if (osd)
@@ -9223,8 +9221,7 @@ void TV::customEvent(QEvent *e)
 
     if (e->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce =
-            reinterpret_cast<DialogCompletionEvent*>(e);
+        auto *dce = reinterpret_cast<DialogCompletionEvent*>(e);
         if (dce->GetData().userType() == qMetaTypeId<MenuNodeTuple>())
         {
             MenuNodeTuple data = dce->GetData().value<MenuNodeTuple>();
@@ -9242,7 +9239,7 @@ void TV::customEvent(QEvent *e)
 
     if (e->type() == OSDHideEvent::kEventType)
     {
-        OSDHideEvent *ce = reinterpret_cast<OSDHideEvent*>(e);
+        auto *ce = reinterpret_cast<OSDHideEvent*>(e);
         HandleOSDClosed(ce->GetFunctionalType());
         return;
     }
@@ -9258,7 +9255,7 @@ void TV::customEvent(QEvent *e)
             return;
         }
 
-        MythMediaEvent *me = dynamic_cast<MythMediaEvent*>(e);
+        auto *me = dynamic_cast<MythMediaEvent*>(e);
         if (me == nullptr)
             return;
         MythMediaDevice *device = me->getDevice();
@@ -9287,7 +9284,7 @@ void TV::customEvent(QEvent *e)
         return;
 
     uint cardnum   = 0;
-    MythEvent *me = dynamic_cast<MythEvent*>(e);
+    auto *me = dynamic_cast<MythEvent*>(e);
     if (me == nullptr)
         return;
     QString message = me->Message();
@@ -10531,8 +10528,8 @@ void TV::OSDDialogEvent(int result, const QString& text, QString action)
                 cur_channum = actx->m_tvchain->GetChannelName(-1);
                 new_channum = cur_channum;
 
-                ChannelInfoList::const_iterator it = list.begin();
-                for (; it != list.end(); ++it)
+                auto it = list.cbegin();
+                for (; it != list.cend(); ++it)
                 {
                     if ((*it).m_channum == cur_channum)
                     {
@@ -11341,7 +11338,7 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
             static constexpr uint kCasOrd[] = { 0, 2, 1 };
             for (size_t i = 0; i < sizeof(kCasOrd)/sizeof(kCasOrd[0]); i++)
             {
-                const CommSkipMode mode = (CommSkipMode) kCasOrd[i];
+                const auto mode = (CommSkipMode) kCasOrd[i];
                 QString action = prefix + QString::number(kCasOrd[i]);
                 active = (mode == m_tvmCurSkip);
                 BUTTON(action, toString((CommSkipMode) kCasOrd[i]));
@@ -11405,7 +11402,7 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
         {
             uint inputid  = ctx->GetCardID();
             vector<InputInfo> inputs = RemoteRequestFreeInputInfo(inputid);
-            vector<InputInfo>::iterator it = inputs.begin();
+            auto it = inputs.begin();
             QSet <QString> addednames;
             addednames += CardUtil::GetDisplayName(inputid);
             for (; it != inputs.end(); ++it)
@@ -11431,7 +11428,7 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
             uint sourceid = info["sourceid"].toUInt();
             QMap<uint, bool> sourceids;
             vector<InputInfo> inputs = RemoteRequestFreeInputInfo(inputid);
-            vector<InputInfo>::iterator it = inputs.begin();
+            auto it = inputs.begin();
             for (; it != inputs.end(); ++it)
             {
                 if ((*it).m_sourceid == sourceid ||
@@ -12627,7 +12624,7 @@ void TV::DoSeekRWND(PlayerContext *ctx)
 */
 void TV::DVDJumpBack(PlayerContext *ctx)
 {
-    DVDRingBuffer *dvdrb = dynamic_cast<DVDRingBuffer*>(ctx->m_buffer);
+    auto *dvdrb = dynamic_cast<DVDRingBuffer*>(ctx->m_buffer);
     if (!ctx->HasPlayer() || !dvdrb)
         return;
 
@@ -12666,7 +12663,7 @@ void TV::DVDJumpBack(PlayerContext *ctx)
  */
 void TV::DVDJumpForward(PlayerContext *ctx)
 {
-    DVDRingBuffer *dvdrb = dynamic_cast<DVDRingBuffer*>(ctx->m_buffer);
+    auto *dvdrb = dynamic_cast<DVDRingBuffer*>(ctx->m_buffer);
     if (!ctx->HasPlayer() || !dvdrb)
         return;
 

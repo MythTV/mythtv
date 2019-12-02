@@ -310,8 +310,8 @@ QDateTime dvbdate2qt(const unsigned char *buf)
     // "Specification for Service Information in Digital Video Broadcasting"
     // to convert from Modified Julian Date to Year, Month, Day.
 
-    const float tmpA = (float)(1.0 / 365.25);
-    const float tmpB = (float)(1.0 / 30.6001);
+    const auto tmpA = (float)(1.0 / 365.25);
+    const auto tmpB = (float)(1.0 / 30.6001);
 
     float mjdf = mjd;
     int year  = (int) truncf((mjdf - 15078.2F) * tmpA);

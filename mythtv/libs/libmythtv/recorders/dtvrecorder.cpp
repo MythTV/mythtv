@@ -217,11 +217,11 @@ void DTVRecorder::InitStreamData(void)
     m_stream_data->AddMPEGSPListener(this);
     m_stream_data->AddMPEGListener(this);
 
-    DVBStreamData *dvb = dynamic_cast<DVBStreamData*>(m_stream_data);
+    auto *dvb = dynamic_cast<DVBStreamData*>(m_stream_data);
     if (dvb)
         dvb->AddDVBMainListener(this);
 
-    ATSCStreamData *atsc = dynamic_cast<ATSCStreamData*>(m_stream_data);
+    auto *atsc = dynamic_cast<ATSCStreamData*>(m_stream_data);
 
     if (atsc && atsc->DesiredMinorChannel())
         atsc->SetDesiredChannel(atsc->DesiredMajorChannel(),
@@ -696,8 +696,7 @@ bool DTVRecorder::FindAudioKeyframes(const TSPacket* /*tspacket*/)
     static constexpr uint64_t kMsecPerDay = 24 * 60 * 60 * 1000ULL;
     const double frame_interval = (1000.0 / m_video_frame_rate);
     uint64_t elapsed = (uint64_t) max(m_audio_timer.elapsed(), 0);
-    uint64_t expected_frame =
-        (uint64_t) ((double)elapsed / frame_interval);
+    auto expected_frame = (uint64_t) ((double)elapsed / frame_interval);
 
     while (m_frames_seen_count > expected_frame + 10000)
         expected_frame += (uint64_t) ((double)kMsecPerDay / frame_interval);

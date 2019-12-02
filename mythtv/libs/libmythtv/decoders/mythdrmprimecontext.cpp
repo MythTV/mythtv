@@ -71,8 +71,8 @@ MythCodecID MythDRMPRIMEContext::GetSupportedCodec(AVCodecContext **Context,
                                                    AVStream *Stream,
                                                    uint StreamType)
 {
-    MythCodecID success = static_cast<MythCodecID>(kCodec_MPEG1_DRMPRIME + (StreamType - 1));
-    MythCodecID failure = static_cast<MythCodecID>(kCodec_MPEG1 + (StreamType - 1));
+    auto success = static_cast<MythCodecID>(kCodec_MPEG1_DRMPRIME + (StreamType - 1));
+    auto failure = static_cast<MythCodecID>(kCodec_MPEG1 + (StreamType - 1));
 
     // not us
     if (Decoder != "drmprime")

@@ -781,7 +781,7 @@ void NuppelVideoRecorder::InitBuffers(void)
 
     for (int i = 0; i < m_video_buffer_count; i++)
     {
-        vidbuffertype *vidbuf = new vidbuffertype;
+        auto *vidbuf = new vidbuffertype;
         vidbuf->buffer = new unsigned char[m_video_buffer_size];
         vidbuf->sample = 0;
         vidbuf->freeToEncode = 0;
@@ -794,7 +794,7 @@ void NuppelVideoRecorder::InitBuffers(void)
 
     for (int i = 0; i < m_audio_buffer_count; i++)
     {
-        audbuffertype *audbuf = new audbuffertype;
+        auto *audbuf = new audbuffertype;
         audbuf->buffer = new unsigned char[m_audio_buffer_size];
         audbuf->sample = 0;
         audbuf->freeToEncode = 0;
@@ -805,7 +805,7 @@ void NuppelVideoRecorder::InitBuffers(void)
 
     for (int i = 0; i < m_text_buffer_count; i++)
     {
-        txtbuffertype *txtbuf = new txtbuffertype;
+        auto *txtbuf = new txtbuffertype;
         txtbuf->buffer = new unsigned char[m_text_buffer_size];
         txtbuf->freeToEncode = 0;
         txtbuf->freeToBuffer = 1;
@@ -2048,7 +2048,7 @@ void NuppelVideoRecorder::WriteSeekTable(void)
     char *seekbuf = new char[frameheader.packetlength];
     int offset = 0;
 
-    vector<struct seektable_entry>::iterator it = m_seektable->begin();
+    auto it = m_seektable->begin();
     for (; it != m_seektable->end(); ++it)
     {
         memcpy(seekbuf + offset, (const void *)&(*it),
@@ -2085,8 +2085,8 @@ void NuppelVideoRecorder::WriteKeyFrameAdjustTable(
     char *kfa_buf = new char[frameheader.packetlength];
     uint offset = 0;
 
-    vector<struct kfatable_entry>::const_iterator it = kfa_table.begin();
-    for (; it != kfa_table.end() ; ++it)
+    auto it = kfa_table.cbegin();
+    for (; it != kfa_table.cend() ; ++it)
     {
         memcpy(kfa_buf + offset, &(*it),
                sizeof(struct kfatable_entry));
@@ -2217,7 +2217,7 @@ void NuppelVideoRecorder::doAudioThread(void)
     }
 
     struct timeval anow {};
-    unsigned char *buffer = new unsigned char[m_audio_buffer_size];
+    auto *buffer = new unsigned char[m_audio_buffer_size];
     int act = 0, lastread = 0;
     m_audio_bytes_per_sample = m_audio_channels * m_audio_bits / 8;
 
@@ -2935,10 +2935,10 @@ void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
                              // of recording and the first timestamp, maybe we
                              // can calculate the audio-video +-lack at the
                             // beginning too
-        double abytes = (double)m_audiobytes; // - (double)m_audio_buffer_size;
+        auto abytes = (double)m_audiobytes; // - (double)m_audio_buffer_size;
                                      // wrong guess ;-)
         // need seconds instead of msec's
-        double mt = (double)timecode;
+        auto mt = (double)timecode;
         if (mt > 0.0)
         {
             double eff = (abytes / mt) * (100000.0 / m_audio_bytes_per_sample);

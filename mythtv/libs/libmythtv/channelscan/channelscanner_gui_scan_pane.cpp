@@ -155,7 +155,7 @@ void ChannelScannerGUIScanPane::AppendLine(const QString &text)
 {
     if (m_log)
     {
-        MythUIButtonListItem *listItem = new MythUIButtonListItem(m_log, text);
+        auto *listItem = new MythUIButtonListItem(m_log, text);
         m_log->SetItemCurrent(listItem);
     }
 }

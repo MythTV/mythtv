@@ -266,7 +266,7 @@ void MythCodecContext::InitVideoCodec(AVCodecContext *Context,
 /// \brief A generic hardware buffer initialisation method when using AVHWFramesContext.
 int MythCodecContext::GetBuffer(struct AVCodecContext *Context, AVFrame *Frame, int Flags)
 {
-    AvFormatDecoder *avfd = static_cast<AvFormatDecoder*>(Context->opaque);
+    auto *avfd = static_cast<AvFormatDecoder*>(Context->opaque);
     VideoFrame *videoframe = avfd->GetPlayer()->GetNextVideoFrame();
 
     // set fields required for directrendering
@@ -286,7 +286,7 @@ int MythCodecContext::GetBuffer(struct AVCodecContext *Context, AVFrame *Frame, 
     // set the underlying pixel format. Set here rather than guessing later.
     if (Frame->hw_frames_ctx)
     {
-        AVHWFramesContext *context = reinterpret_cast<AVHWFramesContext*>(Frame->hw_frames_ctx->data);
+        auto *context = reinterpret_cast<AVHWFramesContext*>(Frame->hw_frames_ctx->data);
         if (context)
             videoframe->sw_pix_fmt = context->sw_format;
     }
@@ -321,7 +321,7 @@ bool MythCodecContext::GetBuffer2(struct AVCodecContext *Context, VideoFrame* Fr
     if (!AvFrame || !Context || !Frame)
         return false;
 
-    AvFormatDecoder *avfd = static_cast<AvFormatDecoder*>(Context->opaque);
+    auto *avfd = static_cast<AvFormatDecoder*>(Context->opaque);
 
     Frame->pix_fmt = Context->pix_fmt;
     Frame->directrendering = 1;
@@ -333,7 +333,7 @@ bool MythCodecContext::GetBuffer2(struct AVCodecContext *Context, VideoFrame* Fr
     // retrieve the software format
     if (AvFrame->hw_frames_ctx)
     {
-        AVHWFramesContext *context = reinterpret_cast<AVHWFramesContext*>(AvFrame->hw_frames_ctx->data);
+        auto *context = reinterpret_cast<AVHWFramesContext*>(AvFrame->hw_frames_ctx->data);
         if (context)
             Frame->sw_pix_fmt = context->sw_format;
     }
@@ -346,7 +346,7 @@ bool MythCodecContext::GetBuffer2(struct AVCodecContext *Context, VideoFrame* Fr
     Frame->priv[0] = reinterpret_cast<unsigned char*>(av_buffer_ref(AvFrame->buf[0]));
 
     // Retrieve and set the interop class
-    AVHWDeviceContext *devicectx = reinterpret_cast<AVHWDeviceContext*>(Context->hw_device_ctx->data);
+    auto *devicectx = reinterpret_cast<AVHWDeviceContext*>(Context->hw_device_ctx->data);
     Frame->priv[1] = reinterpret_cast<unsigned char*>(devicectx->user_opaque);
 
     // Set release method
@@ -357,8 +357,8 @@ bool MythCodecContext::GetBuffer2(struct AVCodecContext *Context, VideoFrame* Fr
 
 void MythCodecContext::ReleaseBuffer(void *Opaque, uint8_t *Data)
 {
-    AvFormatDecoder *decoder = static_cast<AvFormatDecoder*>(Opaque);
-    VideoFrame *frame = reinterpret_cast<VideoFrame*>(Data);
+    auto *decoder = static_cast<AvFormatDecoder*>(Opaque);
+    auto *frame = reinterpret_cast<VideoFrame*>(Data);
     if (decoder && decoder->GetPlayer())
         decoder->GetPlayer()->DeLimboFrame(frame);
 }
@@ -366,8 +366,8 @@ void MythCodecContext::ReleaseBuffer(void *Opaque, uint8_t *Data)
 void MythCodecContext::DestroyInteropCallback(void *Wait, void *Interop, void* /*unused*/)
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "Destroy interop callback");
-    QWaitCondition *wait = reinterpret_cast<QWaitCondition*>(Wait);
-    MythOpenGLInterop *interop = reinterpret_cast<MythOpenGLInterop*>(Interop);
+    auto *wait = reinterpret_cast<QWaitCondition*>(Wait);
+    auto *interop = reinterpret_cast<MythOpenGLInterop*>(Interop);
     if (interop)
         interop->DecrRef();
     if (wait)
@@ -393,7 +393,7 @@ void MythCodecContext::FramesContextFinished(AVHWFramesContext *Context)
     s_hwFramesContextCount--;
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("%1 frames context finished")
         .arg(av_hwdevice_get_type_name(Context->device_ctx->type)));
-    MythOpenGLInterop *interop = reinterpret_cast<MythOpenGLInterop*>(Context->user_opaque);
+    auto *interop = reinterpret_cast<MythOpenGLInterop*>(Context->user_opaque);
     if (interop)
         DestroyInterop(interop);
 }
@@ -402,7 +402,7 @@ void MythCodecContext::DeviceContextFinished(AVHWDeviceContext* Context)
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("%1 device context finished")
         .arg(av_hwdevice_get_type_name(Context->type)));
-    MythOpenGLInterop *interop = reinterpret_cast<MythOpenGLInterop*>(Context->user_opaque);
+    auto *interop = reinterpret_cast<MythOpenGLInterop*>(Context->user_opaque);
     if (interop)
     {
         DestroyInterop(interop);
@@ -427,9 +427,9 @@ void MythCodecContext::DestroyInterop(MythOpenGLInterop *Interop)
 void MythCodecContext::CreateDecoderCallback(void *Wait, void *Context, void *Callback)
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "Create decoder callback");
-    QWaitCondition *wait     = reinterpret_cast<QWaitCondition*>(Wait);
-    AVCodecContext *context  = reinterpret_cast<AVCodecContext*>(Context);
-    CreateHWDecoder callback = reinterpret_cast<CreateHWDecoder>(Callback);
+    auto *wait     = reinterpret_cast<QWaitCondition*>(Wait);
+    auto *context  = reinterpret_cast<AVCodecContext*>(Context);
+    auto callback  = reinterpret_cast<CreateHWDecoder>(Callback);
     if (context && callback)
         (void)callback(context);
     if (wait)
@@ -472,7 +472,7 @@ AVBufferRef* MythCodecContext::CreateDevice(AVHWDeviceType Type, MythOpenGLInter
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Created hardware device '%1'%2")
             .arg(av_hwdevice_get_type_name(Type))
             .arg(Device == nullptr ? "" : QString(" (%1)").arg(Device)));
-        AVHWDeviceContext *context = reinterpret_cast<AVHWDeviceContext*>(result->data);
+        auto *context = reinterpret_cast<AVHWDeviceContext*>(result->data);
 
         if ((context->free || context->user_opaque) && !Interop)
         {

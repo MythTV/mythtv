@@ -2335,8 +2335,7 @@ uint ChannelUtil::GetNextChannel(
     bool              skip_non_visible,
     bool              skip_same_channum_and_callsign)
 {
-    ChannelInfoList::const_iterator it =
-        find(sorted.begin(), sorted.end(), old_chanid);
+    auto it = find(sorted.cbegin(), sorted.cend(), old_chanid);
 
     if (it == sorted.end())
         it = sorted.begin(); // not in list, pretend we are on first channel
@@ -2344,7 +2343,7 @@ uint ChannelUtil::GetNextChannel(
     if (it == sorted.end())
         return 0; // no channels..
 
-    ChannelInfoList::const_iterator start = it;
+    auto start = it;
 
     if (CHANNEL_DIRECTION_DOWN == direction)
     {

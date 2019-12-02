@@ -198,7 +198,7 @@ RingBuffer *RingBuffer::Create(
     if (!mythurl && lower.endsWith(".vob") && lfilename.contains("/VIDEO_TS/"))
     {
         LOG(VB_PLAYBACK, LOG_INFO, "DVD VOB at " + lfilename);
-        DVDStream *s = new DVDStream(lfilename);
+        auto *s = new DVDStream(lfilename);
         if (s && s->IsOpen())
             return s;
 
@@ -1675,7 +1675,7 @@ uint64_t RingBuffer::UpdateDecoderRate(uint64_t latest)
             total += it.value();
     }
 
-    uint64_t average = (uint64_t)((double)total * 8.0);
+    auto average = (uint64_t)((double)total * 8.0);
     m_decoderReadLock.unlock();
 
     LOG(VB_FILE, LOG_INFO, LOC + QString("Decoder read speed: %1 %2")

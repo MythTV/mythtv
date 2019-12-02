@@ -359,9 +359,8 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
                         if (!M3U::ParseStreamInformation(line, url, StreamURL(),
                                                          id, bandwidth))
                             break;
-                        HLSRecStream *hls =
-                            new HLSRecStream(id, bandwidth, url, m_segment_base);
-
+                        auto *hls = new HLSRecStream(id, bandwidth, url,
+                                                     m_segment_base);
                         if (hls)
                         {
                             LOG(VB_RECORD, LOG_INFO, LOC +

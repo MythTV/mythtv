@@ -59,7 +59,7 @@ QString freesat_huffman_to_string(const unsigned char *compressed, uint size)
             }
             else
             {
-                unsigned indx = (unsigned)lastch;
+                auto indx = (unsigned)lastch;
                 for (unsigned j = fsat_index[indx]; j < fsat_index[indx+1]; j++)
                 {
                     unsigned mask = 0, maskbit = 0x80000000;

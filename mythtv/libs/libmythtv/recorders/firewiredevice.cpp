@@ -37,9 +37,7 @@ void FirewireDevice::AddListener(TSDataListener *listener)
 {
     if (listener)
     {
-        vector<TSDataListener*>::iterator it =
-            find(m_listeners.begin(), m_listeners.end(), listener);
-
+        auto it = find(m_listeners.begin(), m_listeners.end(), listener);
         if (it == m_listeners.end())
             m_listeners.push_back(listener);
     }
@@ -50,7 +48,7 @@ void FirewireDevice::AddListener(TSDataListener *listener)
 
 void FirewireDevice::RemoveListener(TSDataListener *listener)
 {
-    vector<TSDataListener*>::iterator it = m_listeners.end();
+    auto it = m_listeners.end();
 
     do
     {
@@ -316,7 +314,7 @@ void FirewireDevice::BroadcastToListeners(
         ProcessPATPacket(*((const TSPacket*)data));
     }
 
-    vector<TSDataListener*>::iterator it = m_listeners.begin();
+    auto it = m_listeners.begin();
     for (; it != m_listeners.end(); ++it)
         (*it)->AddData(data, dataSize);
 }

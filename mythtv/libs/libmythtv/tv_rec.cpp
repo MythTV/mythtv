@@ -1885,7 +1885,7 @@ bool TVRec::SetupDTVSignalMonitor(bool EITscan)
         QString msg = QString("ATSC channel: %1_%2").arg(major).arg(minor);
         LOG(VB_RECORD, LOG_INFO, LOC + msg);
 
-        ATSCStreamData *asd = dynamic_cast<ATSCStreamData*>(sd);
+        auto *asd = dynamic_cast<ATSCStreamData*>(sd);
         if (!asd)
         {
             sd = asd = new ATSCStreamData(major, minor, m_inputid);
@@ -1916,7 +1916,7 @@ bool TVRec::SetupDTVSignalMonitor(bool EITscan)
         int netid   = dtvchan->GetOriginalNetworkID();
         int tsid    = dtvchan->GetTransportID();
 
-        DVBStreamData *dsd = dynamic_cast<DVBStreamData*>(sd);
+        auto *dsd = dynamic_cast<DVBStreamData*>(sd);
         if (!dsd)
         {
             sd = dsd = new DVBStreamData(netid, tsid, progNum, m_inputid);
@@ -3095,7 +3095,7 @@ void TVRec::SetChannel(const QString& name, uint requestType)
     ClearFlags(kFlagRingBufferReady, __FILE__, __LINE__);
 
     // Clear out any EITScan channel change requests
-    TuningQueue::iterator it = m_tuningRequests.begin();
+    auto it = m_tuningRequests.begin();
     while (it != m_tuningRequests.end())
     {
         if ((*it).m_flags & kFlagEITScan)
@@ -3447,7 +3447,7 @@ bool TVRec::TuningOnSameMultiplex(TuningRequest &request)
     if (ChannelUtil::IsOnSameMultiplex(sourceid, newchannum, oldchannum))
     {
         MPEGStreamData *mpeg = GetDTVRecorder()->GetStreamData();
-        ATSCStreamData *atsc = dynamic_cast<ATSCStreamData*>(mpeg);
+        auto *atsc = dynamic_cast<ATSCStreamData*>(mpeg);
 
         if (atsc)
         {
@@ -3669,7 +3669,7 @@ void TVRec::TuningFrequency(const TuningRequest &request)
         {
             m_channel->SetChannelByString(request.m_channel);
 
-            ATSCStreamData *atsc = dynamic_cast<ATSCStreamData*>(mpeg);
+            auto *atsc = dynamic_cast<ATSCStreamData*>(mpeg);
             if (atsc)
                 atsc->SetDesiredChannel(request.m_majorChan, request.m_minorChan);
         }
@@ -4038,7 +4038,7 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
 
     if (streamData)
     {
-        DVBStreamData *dsd = dynamic_cast<DVBStreamData*>(streamData);
+        auto *dsd = dynamic_cast<DVBStreamData*>(streamData);
         if (dsd)
             dsd->SetDishNetEIT(is_dishnet_eit(m_inputid));
         if (!get_use_eit(GetInputId()))
@@ -4774,7 +4774,7 @@ RecordingInfo *TVRec::SwitchRecordingRingBuffer(const RecordingInfo &rcinfo)
         return nullptr;
     }
 
-    RecordingInfo   *ri = new RecordingInfo(rcinfo);
+    auto *ri = new RecordingInfo(rcinfo);
     RecordingProfile profile;
 
     QString pn = LoadProfile(nullptr, ri, profile);

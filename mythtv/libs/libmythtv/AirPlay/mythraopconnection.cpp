@@ -319,7 +319,7 @@ void MythRAOPConnection::udpDataReady(QByteArray buf, const QHostAddress& /*peer
 
     // Check that the audio packet is valid, do so by decoding it. If an error
     // occurs, ask to resend it
-    QList<AudioData> *decoded = new QList<AudioData>();
+    auto *decoded = new QList<AudioData>();
     int numframes = decodeAudioPacket(type, &buf, decoded);
     if (numframes < 0)
     {
@@ -627,7 +627,7 @@ uint32_t MythRAOPConnection::decodeAudioPacket(uint8_t type,
     tmp_pkt.size = len;
 
     uint32_t frames_added = 0;
-    uint8_t *samples = (uint8_t *)av_mallocz(AudioOutput::MAX_SIZE_BUFFER);
+    auto *samples = (uint8_t *)av_mallocz(AudioOutput::MAX_SIZE_BUFFER);
     while (tmp_pkt.size > 0)
     {
         int data_size;
@@ -817,7 +817,7 @@ void MythRAOPConnection::audioRetry(void)
  */
 void MythRAOPConnection::readClient(void)
 {
-    QTcpSocket *socket = dynamic_cast<QTcpSocket *>(sender());
+    auto *socket = dynamic_cast<QTcpSocket *>(sender());
     if (!socket)
         return;
 
@@ -959,7 +959,7 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
         if (!LoadKey())
             return;
         int tosize = RSA_size(LoadKey());
-        uint8_t *to = new uint8_t[tosize];
+        auto *to = new uint8_t[tosize];
 
         QByteArray challenge =
         QByteArray::fromBase64(tags["Apple-Challenge"].toLatin1());
@@ -1618,7 +1618,7 @@ bool MythRAOPConnection::CreateDecoder(void)
     m_codeccontext = avcodec_alloc_context3(m_codec);
     if (m_codeccontext)
     {
-        unsigned char *extradata = new unsigned char[36];
+        auto *extradata = new unsigned char[36];
         memset(extradata, 0, 36);
         if (m_audioFormat.size() < 12)
         {
@@ -1734,7 +1734,7 @@ int64_t MythRAOPConnection::AudioCardLatency(void)
     if (!m_audio)
         return 0;
 
-    int16_t *samples = (int16_t *)av_mallocz(AudioOutput::MAX_SIZE_BUFFER);
+    auto *samples = (int16_t *)av_mallocz(AudioOutput::MAX_SIZE_BUFFER);
     int frames = AUDIOCARD_BUFFER * m_frameRate / 1000;
     m_audio->AddData((char *)samples,
                      frames * (m_sampleSize>>3) * m_channels,
@@ -1760,7 +1760,7 @@ void MythRAOPConnection::newEventClient(QTcpSocket *client)
 
 void MythRAOPConnection::deleteEventClient(void)
 {
-    QTcpSocket *client = dynamic_cast<QTcpSocket *>(sender());
+    auto *client = dynamic_cast<QTcpSocket *>(sender());
     QString label;
 
     if (client != nullptr)

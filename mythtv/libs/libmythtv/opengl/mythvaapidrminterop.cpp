@@ -71,7 +71,7 @@ void MythVAAPIInteropDRM::DeleteTextures(void)
         for ( ; it != m_openglTextures.constEnd(); ++it)
         {
             vector<MythVideoTexture*> textures = it.value();
-            vector<MythVideoTexture*>::iterator it2 = textures.begin();
+            auto it2 = textures.begin();
             for ( ; it2 != textures.end(); ++it2)
             {
                 if ((*it2)->m_data)
@@ -145,9 +145,9 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::GetReferenceFrames(void)
     if (size < 1)
         return result;
 
-    VASurfaceID next = static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(m_referenceFrames[0]->data));
-    VASurfaceID current = static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(m_referenceFrames[size > 1 ? 1 : 0]->data));
-    VASurfaceID last = static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(m_referenceFrames[size > 2 ? 2 : 0]->data));
+    auto next = static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(m_referenceFrames[0]->data));
+    auto current = static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(m_referenceFrames[size > 1 ? 1 : 0]->data));
+    auto last = static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(m_referenceFrames[size > 2 ? 2 : 0]->data));
 
     if (!m_openglTextures.contains(next) || !m_openglTextures.contains(current) ||
         !m_openglTextures.contains(last))
@@ -408,7 +408,7 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::AcquirePrime(VASurfaceID Id,
                                           exportflags, &vadesc);
         CHECK_ST;
 
-        AVDRMFrameDescriptor *drmdesc = reinterpret_cast<AVDRMFrameDescriptor*>(av_mallocz(sizeof(*drmdesc)));
+        auto *drmdesc = reinterpret_cast<AVDRMFrameDescriptor*>(av_mallocz(sizeof(AVDRMFrameDescriptor)));
         VADRMtoPRIME(&vadesc, drmdesc);
         m_drmFrames.insert(Id, drmdesc);
     }
@@ -481,7 +481,7 @@ bool MythVAAPIInteropDRM::TestPrimeInterop(void)
             if (!textures.empty())
             {
                 s_supported = true;
-                vector<MythVideoTexture*>::iterator it = textures.begin();
+                auto it = textures.begin();
                 for ( ; it != textures.end(); ++it)
                 {
                     s_supported &= (*it)->m_data && (*it)->m_textureId;

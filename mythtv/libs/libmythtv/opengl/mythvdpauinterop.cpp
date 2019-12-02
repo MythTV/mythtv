@@ -252,13 +252,13 @@ vector<MythVideoTexture*> MythVDPAUInterop::Acquire(MythRenderOpenGL *Context,
         !Frame->buf || !Frame->priv[1])
         return result;
 
-    AVBufferRef* buffer = reinterpret_cast<AVBufferRef*>(Frame->priv[1]);
+    auto* buffer = reinterpret_cast<AVBufferRef*>(Frame->priv[1]);
     if (!buffer || (buffer && !buffer->data))
         return result;
-    AVHWFramesContext* frames = reinterpret_cast<AVHWFramesContext*>(buffer->data);
+    auto* frames = reinterpret_cast<AVHWFramesContext*>(buffer->data);
     if (!frames || (frames && !frames->device_ctx))
         return result;
-    AVVDPAUDeviceContext *devicecontext = reinterpret_cast<AVVDPAUDeviceContext*>(frames->device_ctx->hwctx);
+    auto *devicecontext = reinterpret_cast<AVVDPAUDeviceContext*>(frames->device_ctx->hwctx);
     if (!devicecontext)
         return result;
 
@@ -267,7 +267,7 @@ vector<MythVideoTexture*> MythVDPAUInterop::Acquire(MythRenderOpenGL *Context,
         return result;
 
     // Retrieve surface - we need its size to create the mixer and output surface
-    VdpVideoSurface surface = static_cast<VdpVideoSurface>(reinterpret_cast<uintptr_t>(Frame->buf));
+    auto surface = static_cast<VdpVideoSurface>(reinterpret_cast<uintptr_t>(Frame->buf));
     if (!surface)
         return result;
 

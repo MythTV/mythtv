@@ -15,8 +15,7 @@ int AVFRingBuffer::AVF_Open(URLContext *h, const char *filename, int flags)
 
 int AVFRingBuffer::AVF_Read(URLContext *h, uint8_t *buf, int buf_size)
 {
-    AVFRingBuffer *avfr = (AVFRingBuffer *)h->priv_data;
-
+    auto *avfr = (AVFRingBuffer *)h->priv_data;
     if (!avfr)
         return 0;
 
@@ -29,8 +28,7 @@ int AVFRingBuffer::AVF_Read(URLContext *h, uint8_t *buf, int buf_size)
 
 int AVFRingBuffer::AVF_Write(URLContext *h, const uint8_t *buf, int buf_size)
 {
-    AVFRingBuffer *avfr = (AVFRingBuffer *)h->priv_data;
-
+    auto *avfr = (AVFRingBuffer *)h->priv_data;
     if (!avfr)
         return 0;
 
@@ -39,8 +37,7 @@ int AVFRingBuffer::AVF_Write(URLContext *h, const uint8_t *buf, int buf_size)
 
 int64_t AVFRingBuffer::AVF_Seek(URLContext *h, int64_t offset, int whence)
 {
-    AVFRingBuffer *avfr = (AVFRingBuffer *)h->priv_data;
-
+    auto *avfr = (AVFRingBuffer *)h->priv_data;
     if (!avfr)
         return 0;
 

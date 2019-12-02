@@ -146,7 +146,7 @@ DSMCCCacheDir *DSMCCCache::Srg(const DSMCCCacheReference &ref)
     LOG(VB_DSMCC, LOG_INFO, QString("[DSMCCCache] New gateway reference %1")
             .arg(ref.toString()));
 
-    DSMCCCacheDir *pSrg = new DSMCCCacheDir(ref);
+    auto *pSrg = new DSMCCCacheDir(ref);
     m_Gateways.insert(ref, pSrg);
 
     return pSrg;
@@ -169,7 +169,7 @@ DSMCCCacheDir *DSMCCCache::Directory(const DSMCCCacheReference &ref)
     LOG(VB_DSMCC, LOG_INFO, QString("[DSMCCCache] New directory reference %1")
             .arg(ref.toString()));
 
-    DSMCCCacheDir *pDir = new DSMCCCacheDir(ref);
+    auto *pDir = new DSMCCCacheDir(ref);
     m_Directories.insert(ref, pDir);
 
     return pDir;

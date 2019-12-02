@@ -90,7 +90,7 @@ void FirewireSignalMonitor::HandlePAT(const ProgramAssociationTable *pat)
 {
     AddFlags(kDTVSigMon_PATSeen);
 
-    FirewireChannel *fwchan = dynamic_cast<FirewireChannel*>(m_channel);
+    auto *fwchan = dynamic_cast<FirewireChannel*>(m_channel);
     if (!fwchan)
         return;
 
@@ -137,7 +137,7 @@ void FirewireSignalMonitor::RunTableMonitor(void)
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + "RunTableMonitor(): -- begin");
 
-    FirewireChannel *lchan = dynamic_cast<FirewireChannel*>(m_channel);
+    auto *lchan = dynamic_cast<FirewireChannel*>(m_channel);
     if (!lchan)
     {
         LOG(VB_CHANNEL, LOG_INFO, LOC + "RunTableMonitor(): -- err");
@@ -209,7 +209,7 @@ void FirewireSignalMonitor::UpdateValues(void)
     }
     m_stb_needs_to_wait_for_power = false;
 
-    FirewireChannel *fwchan = dynamic_cast<FirewireChannel*>(m_channel);
+    auto *fwchan = dynamic_cast<FirewireChannel*>(m_channel);
     if (!fwchan)
         return;
 

@@ -186,7 +186,7 @@ TransportListEditor::TransportListEditor(uint sourceid) :
     addChild(m_videosource);
     m_videosource->setEnabled(false);
 
-    ButtonStandardSetting *newTransport =
+    auto *newTransport =
         new ButtonStandardSetting("(" + tr("New Transport") + ")");
     connect(newTransport, SIGNAL(clicked()), SLOT(NewTransport(void)));
 
@@ -268,9 +268,8 @@ void TransportListEditor::Load()
                 .arg(mod).arg(query.value(2).toString())
                 .arg(hz).arg(rate).arg(netid).arg(tid).arg(type);
 
-            TransportSetting *transport =
-                new TransportSetting(txt, query.value(0).toUInt(), m_sourceid,
-                                    m_cardtype);
+            auto *transport = new TransportSetting(txt, query.value(0).toUInt(),
+                                                   m_sourceid, m_cardtype);
             connect(transport, &TransportSetting::deletePressed,
                     this, [transport, this] () { Delete(transport); });
             connect(transport, &TransportSetting::openMenu,
@@ -286,9 +285,8 @@ void TransportListEditor::Load()
 
 void TransportListEditor::NewTransport()
 {
-    TransportSetting *transport =
-        new TransportSetting(QString("New Transport"), 0,
-           m_sourceid, m_cardtype);
+    auto *transport = new TransportSetting(QString("New Transport"), 0,
+                                           m_sourceid, m_cardtype);
     addChild(transport);
     m_list.push_back(transport);
     emit settingsChanged(this);
@@ -344,13 +342,12 @@ void TransportListEditor::Menu(TransportSetting *transport)
     if (m_isLoading)
         return;
 
-    MythMenu *menu = new MythMenu(tr("Transport Menu"), this, "transportmenu");
+    auto *menu = new MythMenu(tr("Transport Menu"), this, "transportmenu");
     menu->AddItem(tr("Delete..."), [transport, this] () { Delete(transport); });
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    MythDialogBox *menuPopup = new MythDialogBox(menu, popupStack,
-                                                 "menudialog");
+    auto *menuPopup = new MythDialogBox(menu, popupStack, "menudialog");
     menuPopup->SetReturnEvent(this, "transportmenu");
 
     if (menuPopup->Create())

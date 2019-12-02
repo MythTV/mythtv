@@ -57,7 +57,7 @@ static BD_DIR_H *dir_open_mythiowrapper(const char* dirname)
         return sDefaultDirOpen(dirname);
     }
 
-    BD_DIR_H *dir = (BD_DIR_H*)calloc(1, sizeof(BD_DIR_H));
+    auto *dir = (BD_DIR_H*)calloc(1, sizeof(BD_DIR_H));
 
     LOG(VB_FILE, LOG_DEBUG, LOC + QString("Opening mythdir dir %1...").arg(dirname));
     dir->close = dir_close_mythiowrapper;
@@ -119,7 +119,7 @@ static BD_FILE_H *file_open_mythiowrapper(const char* filename, const char *cmod
         return sDefaultFileOpen(filename, cmode);
     }
 
-    BD_FILE_H *file = (BD_FILE_H*)calloc(1, sizeof(BD_FILE_H));
+    auto *file = (BD_FILE_H*)calloc(1, sizeof(BD_FILE_H));
 
     LOG(VB_FILE, LOG_DEBUG, LOC + QString("Opening mythfile file %1...").arg(filename));
     file->close = file_close_mythiowrapper;

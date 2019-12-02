@@ -66,7 +66,7 @@ QString dvb_decode_text(const unsigned char *src, uint raw_length,
     if (src[0] == 0x11)
     {
         size_t length = (raw_length - 1) / 2;
-        QChar *to = new QChar[length];
+        auto *to = new QChar[length];
         for (size_t i=0; i<length; i++)
             to[i] = (src[1 + i*2] << 8) + src[1 + i*2 + 1];
         QString to2(to, length);
@@ -85,8 +85,7 @@ QString dvb_decode_text(const unsigned char *src, uint raw_length,
 
     // if a override encoding is specified and the default ISO 6937 encoding
     // would be used copy the override encoding in front of the text
-    unsigned char *dst =
-        new unsigned char[raw_length + encoding_override_length];
+    auto *dst = new unsigned char[raw_length + encoding_override_length];
 
     uint length = 0;
     if (encoding_override && src[0] >= 0x20) {
@@ -189,7 +188,7 @@ QString dvb_decode_short_name(const unsigned char *src, uint raw_length)
         return "";
     }
 
-    unsigned char *dst = new unsigned char[raw_length];
+    auto *dst = new unsigned char[raw_length];
     uint length = 0;
 
     // check for emphasis control codes

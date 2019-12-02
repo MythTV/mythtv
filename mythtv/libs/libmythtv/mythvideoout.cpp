@@ -76,7 +76,7 @@ MythVideoOutput *MythVideoOutput::Create(const QString &Decoder,    MythCodecID 
 
     QString renderer;
 
-    VideoDisplayProfile *vprof = new VideoDisplayProfile();
+    auto *vprof = new VideoDisplayProfile();
 
     if (!renderers.empty())
     {

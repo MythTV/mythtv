@@ -41,7 +41,7 @@ ASIStreamHandler *ASIStreamHandler::Get(const QString &devname,
 
     if (it == s_handlers.end())
     {
-        ASIStreamHandler *newhandler = new ASIStreamHandler(devname, inputid);
+        auto *newhandler = new ASIStreamHandler(devname, inputid);
         newhandler->Open();
         s_handlers[devkey] = newhandler;
         s_handlers_refcnt[devkey] = 1;
@@ -142,7 +142,7 @@ void ASIStreamHandler::run(void)
         return;
     }
 
-    DeviceReadBuffer *drb = new DeviceReadBuffer(this, true, false);
+    auto *drb = new DeviceReadBuffer(this, true, false);
     bool ok = drb->Setup(m_device, m_fd, m_packet_size, m_buf_size,
                          m_num_buffers / 4);
     if (!ok)
@@ -157,7 +157,7 @@ void ASIStreamHandler::run(void)
     }
 
     uint buffer_size = m_packet_size * 15000;
-    unsigned char *buffer = new unsigned char[buffer_size];
+    auto *buffer = new unsigned char[buffer_size];
     if (!buffer)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to allocate buffer");

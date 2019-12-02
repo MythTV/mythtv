@@ -333,7 +333,7 @@ bool SourceUtil::IsCableCardPresent(uint sourceid)
 {
     bool ccpresent = false;
     vector<uint> inputs = CardUtil::GetInputIDs(sourceid);
-    vector<uint>::iterator it = inputs.begin();
+    auto it = inputs.begin();
     for (; it != inputs.end(); ++it)
     {
         if (CardUtil::IsCableCardPresent(*it, CardUtil::GetRawInputType(*it))

@@ -851,7 +851,7 @@ void MythVideoOutputOpenGL::ShowPIP(VideoFrame* /*Frame*/, MythPlayer *PiPPlayer
     if (!gl_pipchain)
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Initialise PiP");
-        VideoColourSpace *colourspace = new VideoColourSpace(&m_videoColourSpace);
+        auto *colourspace = new VideoColourSpace(&m_videoColourSpace);
         m_openGLVideoPiPs[PiPPlayer] = gl_pipchain = new MythOpenGLVideo(m_render, colourspace,
                                                                 pipvideodim, pipvideodim,
                                                                 dvr, position, pipvideorect,
@@ -870,7 +870,7 @@ void MythVideoOutputOpenGL::ShowPIP(VideoFrame* /*Frame*/, MythPlayer *PiPPlayer
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Re-initialise PiP.");
         delete gl_pipchain;
-        VideoColourSpace *colourspace = new VideoColourSpace(&m_videoColourSpace);
+        auto *colourspace = new VideoColourSpace(&m_videoColourSpace);
         m_openGLVideoPiPs[PiPPlayer] = gl_pipchain = new MythOpenGLVideo(m_render, colourspace,
                                                                 pipvideodim, pipvideodim,
                                                                 dvr, position, pipvideorect,

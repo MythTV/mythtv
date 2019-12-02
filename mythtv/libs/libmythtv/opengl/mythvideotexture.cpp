@@ -110,7 +110,7 @@ vector<MythVideoTexture*> MythVideoTexture::CreateHardwareTextures(MythRenderOpe
         if (!textureid)
             continue;
 
-        MythVideoTexture* texture = new MythVideoTexture(textureid);
+        auto* texture = new MythVideoTexture(textureid);
         texture->m_frameType   = Type;
         texture->m_frameFormat = Format;
         texture->m_plane       = plane;
@@ -420,7 +420,7 @@ MythVideoTexture* MythVideoTexture::CreateTexture(MythRenderOpenGL *Context,
     if (!datasize)
         return nullptr;
 
-    QOpenGLTexture *texture = new QOpenGLTexture(static_cast<QOpenGLTexture::Target>(Target));
+    auto *texture = new QOpenGLTexture(static_cast<QOpenGLTexture::Target>(Target));
     texture->setAutoMipMapGenerationEnabled(false);
     texture->setMipLevels(1);
     texture->setSize(Size.width(), Size.height()); // this triggers creation
@@ -443,7 +443,7 @@ MythVideoTexture* MythVideoTexture::CreateTexture(MythRenderOpenGL *Context,
     texture->setMinMagFilters(Filter, Filter);
     texture->setWrapMode(Wrap);
 
-    MythVideoTexture *result = new MythVideoTexture(texture);
+    auto *result = new MythVideoTexture(texture);
     result->m_target      = Target;
     result->m_pixelFormat = PixelFormat;
     result->m_pixelType   = PixelType;

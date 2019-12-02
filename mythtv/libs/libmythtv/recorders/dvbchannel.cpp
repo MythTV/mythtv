@@ -82,7 +82,7 @@ DVBChannel::DVBChannel(QString aDevice, TVRec *parent)
         key += QString(":%1")
             .arg(CardUtil::GetSourceID(m_pParent->GetInputId()));
     s_master_map[key].push_back(this); // == RegisterForMaster
-    DVBChannel *master = static_cast<DVBChannel*>(s_master_map[key].front());
+    auto *master = static_cast<DVBChannel*>(s_master_map[key].front());
     if (master == this)
     {
         m_dvbcam = new DVBCam(m_device);
@@ -107,7 +107,7 @@ DVBChannel::~DVBChannel()
     if (m_pParent)
         key += QString(":%1")
             .arg(CardUtil::GetSourceID(m_pParent->GetInputId()));
-    DVBChannel *master = static_cast<DVBChannel*>(s_master_map[key].front());
+    auto *master = static_cast<DVBChannel*>(s_master_map[key].front());
     if (master == this)
     {
         s_master_map[key].pop_front();
@@ -1353,7 +1353,7 @@ DVBChannel *DVBChannel::GetMasterLock(void)
         key += QString(":%1")
             .arg(CardUtil::GetSourceID(m_pParent->GetInputId()));
     DTVChannel *master = DTVChannel::GetMasterLock(key);
-    DVBChannel *dvbm = dynamic_cast<DVBChannel*>(master);
+    auto *dvbm = dynamic_cast<DVBChannel*>(master);
     if (master && !dvbm)
         DTVChannel::ReturnMasterLock(master);
     return dvbm;
@@ -1361,7 +1361,7 @@ DVBChannel *DVBChannel::GetMasterLock(void)
 
 void DVBChannel::ReturnMasterLock(DVBChannelP &dvbm)
 {
-    DTVChannel *chan = static_cast<DTVChannel*>(dvbm);
+    auto *chan = static_cast<DTVChannel*>(dvbm);
     DTVChannel::ReturnMasterLock(chan);
     dvbm = nullptr;
 }
@@ -1373,7 +1373,7 @@ const DVBChannel *DVBChannel::GetMasterLock(void) const
         key += QString(":%1")
             .arg(CardUtil::GetSourceID(m_pParent->GetInputId()));
     DTVChannel *master = DTVChannel::GetMasterLock(key);
-    DVBChannel *dvbm = dynamic_cast<DVBChannel*>(master);
+    auto *dvbm = dynamic_cast<DVBChannel*>(master);
     if (master && !dvbm)
         DTVChannel::ReturnMasterLock(master);
     return dvbm;
@@ -1381,8 +1381,7 @@ const DVBChannel *DVBChannel::GetMasterLock(void) const
 
 void DVBChannel::ReturnMasterLock(DVBChannelCP &dvbm)
 {
-    DTVChannel *chan =
-        static_cast<DTVChannel*>(const_cast<DVBChannel*>(dvbm));
+    auto *chan = static_cast<DTVChannel*>(const_cast<DVBChannel*>(dvbm));
     DTVChannel::ReturnMasterLock(chan);
     dvbm = nullptr;
 }

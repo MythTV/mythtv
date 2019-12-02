@@ -468,8 +468,8 @@ void VideoColourSpace::SaveValue(PictureAttribute AttributeType, int Value)
 QMatrix4x4 VideoColourSpace::GetPrimaryConversion(int Source, int Dest)
 {
     QMatrix4x4 result; // identity
-    AVColorPrimaries source = static_cast<AVColorPrimaries>(Source);
-    AVColorPrimaries dest   = static_cast<AVColorPrimaries>(Dest);
+    auto source = static_cast<AVColorPrimaries>(Source);
+    auto dest   = static_cast<AVColorPrimaries>(Dest);
 
     if ((source == dest) || (m_primariesMode == PrimariesDisabled))
         return result;
@@ -498,7 +498,7 @@ QMatrix4x4 VideoColourSpace::GetPrimaryConversion(int Source, int Dest)
 
 void VideoColourSpace::GetPrimaries(int Primary, ColourPrimaries &Out, float &Gamma)
 {
-    AVColorPrimaries primary = static_cast<AVColorPrimaries>(Primary);
+    auto primary = static_cast<AVColorPrimaries>(Primary);
     Gamma = 2.2F;
     switch (primary)
     {

@@ -60,8 +60,8 @@ MythCodecID MythV4L2M2MContext::GetSupportedCodec(AVCodecContext **Context,
                                                   uint StreamType)
 {
     bool decodeonly = Decoder == "v4l2-dec";
-    MythCodecID success = static_cast<MythCodecID>((decodeonly ? kCodec_MPEG1_V4L2_DEC : kCodec_MPEG1_V4L2) + (StreamType - 1));
-    MythCodecID failure = static_cast<MythCodecID>(kCodec_MPEG1 + (StreamType - 1));
+    auto success = static_cast<MythCodecID>((decodeonly ? kCodec_MPEG1_V4L2_DEC : kCodec_MPEG1_V4L2) + (StreamType - 1));
+    auto failure = static_cast<MythCodecID>(kCodec_MPEG1 + (StreamType - 1));
 
     // not us
     if (!Decoder.startsWith("v4l2"))
@@ -139,7 +139,7 @@ bool MythV4L2M2MContext::GetBuffer(AVCodecContext *Context, VideoFrame *Frame, A
         return false;
 
     // Ensure we can render this format
-    AvFormatDecoder *decoder = static_cast<AvFormatDecoder*>(Context->opaque);
+    auto *decoder = static_cast<AvFormatDecoder*>(Context->opaque);
     VideoFrameType type = PixelFormatToFrameType(static_cast<AVPixelFormat>(AvFrame->format));
     VideoFrameType* supported = decoder->GetPlayer()->DirectRenderFormats();
     bool found = false;

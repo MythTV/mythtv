@@ -32,7 +32,7 @@ void MythDRMPRIMEInterop::DeleteTextures(void)
         for ( ; it != m_openglTextures.constEnd(); ++it)
         {
             vector<MythVideoTexture*> textures = it.value();
-            vector<MythVideoTexture*>::iterator it2 = textures.begin();
+            auto it2 = textures.begin();
             for ( ; it2 != textures.end(); ++it2)
             {
                 if ((*it2)->m_data)
@@ -115,7 +115,7 @@ vector<MythVideoTexture*> MythDRMPRIMEInterop::Acquire(MythRenderOpenGL *Context
     bool firstpass = m_openglTextures.isEmpty();
 
     // return cached texture(s) if available
-    unsigned long long id = reinterpret_cast<unsigned long long>(drmdesc);
+    auto id = reinterpret_cast<unsigned long long>(drmdesc);
     if (!m_openglTextures.contains(id))
     {
         result = CreateTextures(drmdesc, m_context, Frame);

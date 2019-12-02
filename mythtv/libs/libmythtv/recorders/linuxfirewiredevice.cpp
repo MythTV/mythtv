@@ -925,7 +925,7 @@ void LinuxFirewireDevice::UpdateDeviceListItem(uint64_t guid, void *pitem)
 
     if (it == m_priv->m_devices.end())
     {
-        LinuxAVCInfo *ptr = new LinuxAVCInfo();
+        auto *ptr = new LinuxAVCInfo();
 
         LOG(VB_RECORD, LOG_INFO, LOC + QString("Adding   0x%1").arg(guid,0,16));
 
@@ -965,9 +965,7 @@ const LinuxAVCInfo *LinuxFirewireDevice::GetInfoPtr(void) const
 int linux_firewire_device_tspacket_handler(
     unsigned char *tspacket, int len, uint dropped, void *callback_data)
 {
-    LinuxFirewireDevice *fw =
-        reinterpret_cast<LinuxFirewireDevice*>(callback_data);
-
+    auto *fw = reinterpret_cast<LinuxFirewireDevice*>(callback_data);
     if (!fw)
         return 0;
 

@@ -368,8 +368,8 @@ void SubtitleFormat::CreateProviderDefault(const QString &family,
                                            MythFontProperties **returnFont,
                                            MythUIShape **returnBg)
 {
-    MythFontProperties *font = new MythFontProperties();
-    MythUIShape *bg = new MythUIShape(parent, kSubProvider);
+    auto *font = new MythFontProperties();
+    auto *bg = new MythUIShape(parent, kSubProvider);
     if (family == kSubFamily608)
     {
         font->GetFace()->setFamily("FreeMono");
@@ -454,7 +454,7 @@ void SubtitleFormat::Load(const QString &family,
                           const CC708CharacterAttribute &attr)
 {
     // Widgets for the actual values
-    MythUIType *baseParent = new MythUIType(nullptr, "base");
+    auto *baseParent = new MythUIType(nullptr, "base");
     m_cleanup += baseParent;
     MythFontProperties *providerBaseFont;
     MythUIShape *providerBaseShape;
@@ -462,7 +462,7 @@ void SubtitleFormat::Load(const QString &family,
                           &providerBaseFont, &providerBaseShape);
 
     // Widgets for the "negative" values
-    MythUIType *negParent = new MythUIType(nullptr, "base");
+    auto *negParent = new MythUIType(nullptr, "base");
     m_cleanup += negParent;
     MythFontProperties *negFont;
     MythUIShape *negBG;
@@ -481,8 +481,7 @@ void SubtitleFormat::Load(const QString &family,
     MythFontProperties *resultFont = baseParent->GetFont(prefix);
     if (!resultFont)
         resultFont = providerBaseFont;
-    MythUIShape *resultBG =
-        dynamic_cast<MythUIShape *>(baseParent->GetChild(prefix));
+    auto *resultBG = dynamic_cast<MythUIShape *>(baseParent->GetChild(prefix));
 
     // The providerBaseShape object is not leaked here.  It is added
     // to a list of children in its base class constructor.
@@ -491,8 +490,7 @@ void SubtitleFormat::Load(const QString &family,
     MythFontProperties *testFont = negParent->GetFont(prefix);
     if (!testFont)
         testFont = negFont;
-    MythUIShape *testBG =
-        dynamic_cast<MythUIShape *>(negParent->GetChild(prefix));
+    auto *testBG = dynamic_cast<MythUIShape *>(negParent->GetChild(prefix));
     if (!testBG)
         testBG = negBG;
     if (family == kSubFamily708 &&
@@ -602,8 +600,8 @@ SubtitleFormat::GetBackground(MythUIType *parent, const QString &name,
         Load(family, attr);
     if (m_shapeMap[prefix]->GetAlpha() == 0)
         return nullptr;
-    SubShape *result = new SubShape(parent, name, area, whichImageCache,
-                                    start + duration);
+    auto *result = new SubShape(parent, name, area, whichImageCache,
+                                start + duration);
     result->CopyFrom(m_shapeMap[prefix]);
     if (family == kSubFamily708)
     {
@@ -883,8 +881,7 @@ void FormattedTextSubtitle::Draw(void)
             // shapes should be added/drawn first, and text drawn on
             // top.
             if ((*chunk).m_textRect.width() > 0) {
-                SubSimpleText *text =
-                    new SubSimpleText((*chunk).m_text, *mythfont,
+                auto *text = new SubSimpleText((*chunk).m_text, *mythfont,
                                       (*chunk).m_textRect,
                                       Qt::AlignLeft|Qt::AlignTop,
                                       /*m_subScreen*/nullptr,
@@ -1220,7 +1217,7 @@ void FormattedTextSubtitle608::Init(const vector<CC608Text*> &buffers)
 
     if (buffers.empty())
         return;
-    vector<CC608Text*>::const_iterator i = buffers.begin();
+    auto i = buffers.cbegin();
     int xscale = 36;
     int yscale = 17;
     int pixelSize = m_safeArea.height() / (yscale * LINE_SPACING);
@@ -1241,7 +1238,7 @@ void FormattedTextSubtitle608::Init(const vector<CC608Text*> &buffers)
             xscale = m_safeArea.width() / fontwidth;
     }
 
-    for (; i != buffers.end(); ++i)
+    for (; i != buffers.cend(); ++i)
     {
         CC608Text *cc = (*i);
         int color = 0;
@@ -1296,8 +1293,7 @@ void FormattedTextSubtitle708::Draw(void)
     if (m_bgFillAlpha) // TODO border?
     {
         QBrush fill(m_bgFillColor, Qt::SolidPattern);
-        SubShape *shape =
-            new SubShape(m_subScreen, QString("cc708bg%1").arg(m_num),
+        auto *shape = new SubShape(m_subScreen, QString("cc708bg%1").arg(m_num),
                          MythRect(m_bounds), m_num, m_start + m_duration);
         shape->SetFillBrush(fill);
         shape->SetArea(MythRect(m_bounds));
@@ -1471,7 +1467,7 @@ void SubtitleScreen::DisplayDVDButton(AVSubtitle* dvdButton, QRect &buttonPos)
     uint w = hl_button->w;
     QRect rect = QRect(hl_button->x, hl_button->y, w, h);
     QImage bg_image(hl_button->data[0], w, h, w, QImage::Format_Indexed8);
-    uint32_t *bgpalette = (uint32_t *)(hl_button->data[1]);
+    auto *bgpalette = (uint32_t *)(hl_button->data[1]);
 
     QVector<uint32_t> bg_palette(4);
     for (int i = 0; i < 4; i++)
@@ -1482,7 +1478,7 @@ void SubtitleScreen::DisplayDVDButton(AVSubtitle* dvdButton, QRect &buttonPos)
     const QRect fg_rect(buttonPos.translated(-hl_button->x, -hl_button->y));
     QImage fg_image = bg_image.copy(fg_rect);
     QVector<uint32_t> fg_palette(4);
-    uint32_t *fgpalette = (uint32_t *)(dvdButton->rects[1]->data[1]);
+    auto *fgpalette = (uint32_t *)(dvdButton->rects[1]->data[1]);
     if (fgpalette)
     {
         for (int i = 0; i < 4; i++)
@@ -1540,7 +1536,7 @@ void SubtitleScreen::Clear708Cache(uint64_t mask)
     for (it = list.begin(); it != list.end(); ++it)
     {
         MythUIType *child = *it;
-        SubWrapper *wrapper = dynamic_cast<SubWrapper *>(child);
+        auto *wrapper = dynamic_cast<SubWrapper *>(child);
         if (wrapper)
         {
             int whichImageCache = wrapper->GetWhichImageCache();
@@ -1696,7 +1692,7 @@ void SubtitleScreen::Pulse(void)
     {
         itNext = it + 1;
         MythUIType *child = *it;
-        SubWrapper *wrapper = dynamic_cast<SubWrapper *>(child);
+        auto *wrapper = dynamic_cast<SubWrapper *>(child);
         if (!wrapper)
             continue;
 
@@ -1712,7 +1708,7 @@ void SubtitleScreen::Pulse(void)
         // Rescale the AV subtitle image if the zoom changed.
         if (expireTime > 0 && needRescale)
         {
-            SubImage *image = dynamic_cast<SubImage *>(child);
+            auto *image = dynamic_cast<SubImage *>(child);
             if (image)
             {
                 double factor = m_textFontZoom / (double)m_textFontZoomPrev;
@@ -1768,7 +1764,7 @@ void SubtitleScreen::OptimiseDisplayedArea(void)
     while (i.hasNext())
     {
         MythUIType *img = i.next();
-        SubWrapper *wrapper = dynamic_cast<SubWrapper *>(img);
+        auto *wrapper = dynamic_cast<SubWrapper *>(img);
         if (wrapper && img->IsVisible())
             visible = visible.united(wrapper->GetOrigArea());
     }
@@ -1787,7 +1783,7 @@ void SubtitleScreen::OptimiseDisplayedArea(void)
     while (i.hasNext())
     {
         MythUIType *img = i.next();
-        SubWrapper *wrapper = dynamic_cast<SubWrapper *>(img);
+        auto *wrapper = dynamic_cast<SubWrapper *>(img);
         if (wrapper && img->IsVisible())
             img->SetArea(wrapper->GetOrigArea().translated(left, top));
     }
@@ -2183,9 +2179,8 @@ void SubtitleScreen::DisplayRawTextSubtitles(void)
 void SubtitleScreen::DrawTextSubtitles(const QStringList &subs,
                                        uint64_t start, uint64_t duration)
 {
-    FormattedTextSubtitleSRT *fsub =
-        new FormattedTextSubtitleSRT(m_family, m_safeArea, start, duration,
-                                     this, subs);
+    auto *fsub = new FormattedTextSubtitleSRT(m_family, m_safeArea, start,
+                                              duration, this, subs);
     m_qInited.append(fsub);
 }
 
@@ -2215,8 +2210,7 @@ void SubtitleScreen::DisplayCC608Subtitles(void)
     if (textlist->m_buffers.empty())
         return;
 
-    FormattedTextSubtitle608 *fsub =
-        new FormattedTextSubtitle608(textlist->m_buffers, m_family,
+    auto *fsub = new FormattedTextSubtitle608(textlist->m_buffers, m_family,
                                      m_safeArea, this/*, m_textFontZoom*/);
     m_qInited.append(fsub);
 }
@@ -2256,10 +2250,8 @@ void SubtitleScreen::DisplayCC708Subtitles(void)
         vector<CC708String*> list = win.GetStrings();
         if (!list.empty())
         {
-            FormattedTextSubtitle708 *fsub =
-                new FormattedTextSubtitle708(win, i, list, m_family,
-                                             m_safeArea,
-                                             this, video_aspect);
+            auto *fsub = new FormattedTextSubtitle708(win, i, list, m_family,
+                                             m_safeArea, this, video_aspect);
             addList.append(fsub);
         }
         CC708Window::DisposeStrings(list);

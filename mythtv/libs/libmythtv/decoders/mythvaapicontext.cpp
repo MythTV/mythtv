@@ -133,8 +133,8 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext **Context,
                                                 uint StreamType)
 {
     bool decodeonly = Decoder == "vaapi-dec";
-    MythCodecID success = static_cast<MythCodecID>((decodeonly ? kCodec_MPEG1_VAAPI_DEC : kCodec_MPEG1_VAAPI) + (StreamType - 1));
-    MythCodecID failure = static_cast<MythCodecID>(kCodec_MPEG1 + (StreamType - 1));
+    auto success = static_cast<MythCodecID>((decodeonly ? kCodec_MPEG1_VAAPI_DEC : kCodec_MPEG1_VAAPI) + (StreamType - 1));
+    auto failure = static_cast<MythCodecID>(kCodec_MPEG1 + (StreamType - 1));
 
     if (!Decoder.startsWith("vaapi") || !HaveVAAPI() || getenv("NO_VAAPI"))
         return failure;
@@ -165,8 +165,8 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext **Context,
 
     // Check for ironlake decode only - which won't work due to FFmpeg frame format
     // constraints. May apply to other platforms.
-    AVHWDeviceContext    *device = reinterpret_cast<AVHWDeviceContext*>(hwdevicectx->data);
-    AVVAAPIDeviceContext *hwctx  = reinterpret_cast<AVVAAPIDeviceContext*>(device->hwctx);
+    auto *device = reinterpret_cast<AVHWDeviceContext*>(hwdevicectx->data);
+    auto *hwctx  = reinterpret_cast<AVVAAPIDeviceContext*>(device->hwctx);
 
     if (decodeonly)
     {
@@ -186,7 +186,7 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext **Context,
     VAConfigID config;
     if (vaCreateConfig(hwctx->display, desired, VAEntrypointVLD, nullptr, 0, &config) == VA_STATUS_SUCCESS)
     {
-        AVVAAPIHWConfig *hwconfig = reinterpret_cast<AVVAAPIHWConfig*>(av_hwdevice_hwconfig_alloc(hwdevicectx));
+        auto *hwconfig = reinterpret_cast<AVVAAPIHWConfig*>(av_hwdevice_hwconfig_alloc(hwdevicectx));
         hwconfig->config_id = config;
         AVHWFramesConstraints *constraints = av_hwdevice_get_hwframe_constraints(hwdevicectx, hwconfig);
         vaDestroyConfig(hwctx->display, config);
@@ -204,7 +204,7 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext **Context,
 
     // FFmpeg checks profiles very late and never checks entrypoints.
     int profilecount = vaMaxNumProfiles(hwctx->display);
-    VAProfile *profilelist = static_cast<VAProfile*>(av_malloc_array(static_cast<size_t>(profilecount), sizeof(VAProfile)));
+    auto *profilelist = static_cast<VAProfile*>(av_malloc_array(static_cast<size_t>(profilecount), sizeof(VAProfile)));
     if (vaQueryConfigProfiles(hwctx->display, profilelist, &profilecount) == VA_STATUS_SUCCESS)
     {
         for (int i = 0; i < profilecount; ++i)
@@ -222,7 +222,7 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext **Context,
     {
         int count = 0;
         int entrysize = vaMaxNumEntrypoints(hwctx->display);
-        VAEntrypoint *entrylist = static_cast<VAEntrypoint*>(av_malloc_array(static_cast<size_t>(entrysize), sizeof(VAEntrypoint)));
+        auto *entrylist = static_cast<VAEntrypoint*>(av_malloc_array(static_cast<size_t>(entrysize), sizeof(VAEntrypoint)));
         if (vaQueryConfigEntrypoints(hwctx->display, desired, entrylist, &count) == VA_STATUS_SUCCESS)
         {
             for (int i = 0; i < count; ++i)
@@ -328,10 +328,10 @@ int MythVAAPIContext::InitialiseContext(AVCodecContext *Context)
     }
 
     // set hardware device context - just needs a display
-    AVHWDeviceContext* hwdevicecontext  = reinterpret_cast<AVHWDeviceContext*>(hwdeviceref->data);
+    auto* hwdevicecontext  = reinterpret_cast<AVHWDeviceContext*>(hwdeviceref->data);
     if (!hwdevicecontext || (hwdevicecontext && !hwdevicecontext->hwctx))
         return -1;
-    AVVAAPIDeviceContext *vaapidevicectx = reinterpret_cast<AVVAAPIDeviceContext*>(hwdevicecontext->hwctx);
+    auto *vaapidevicectx = reinterpret_cast<AVVAAPIDeviceContext*>(hwdevicecontext->hwctx);
     if (!vaapidevicectx)
         return -1;
 
@@ -369,8 +369,8 @@ int MythVAAPIContext::InitialiseContext(AVCodecContext *Context)
     // setup the frames context
     // the frames context now holds the reference to MythVAAPIInterop
     // Set the callback to ensure it is released
-    AVHWFramesContext* hw_frames_ctx = reinterpret_cast<AVHWFramesContext*>(Context->hw_frames_ctx->data);
-    AVVAAPIFramesContext* vaapi_frames_ctx = reinterpret_cast<AVVAAPIFramesContext*>(hw_frames_ctx->hwctx);
+    auto* hw_frames_ctx = reinterpret_cast<AVHWFramesContext*>(Context->hw_frames_ctx->data);
+    auto* vaapi_frames_ctx = reinterpret_cast<AVVAAPIFramesContext*>(hw_frames_ctx->hwctx);
 
     // Workarounds for specific drivers, surface formats and codecs
     // NV12 seems to work best across GPUs and codecs with the exception of
@@ -385,7 +385,7 @@ int MythVAAPIContext::InitialiseContext(AVCodecContext *Context)
 
     if (format != VA_FOURCC_NV12)
     {
-        MythCodecID vaapiid = static_cast<MythCodecID>(kCodec_MPEG1_VAAPI + (mpeg_version(Context->codec_id) - 1));
+        auto vaapiid = static_cast<MythCodecID>(kCodec_MPEG1_VAAPI + (mpeg_version(Context->codec_id) - 1));
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Forcing surface format for %1 and %2 with driver '%3'")
             .arg(toString(vaapiid)).arg(MythOpenGLInterop::TypeToString(type)).arg(vendor));
     }
@@ -446,8 +446,8 @@ int MythVAAPIContext::InitialiseContext2(AVCodecContext *Context)
     }
 
     int referenceframes = AvFormatDecoder::GetMaxReferenceFrames(Context);
-    AVHWFramesContext* hw_frames_ctx = reinterpret_cast<AVHWFramesContext*>(Context->hw_frames_ctx->data);
-    AVVAAPIFramesContext* vaapi_frames_ctx = reinterpret_cast<AVVAAPIFramesContext*>(hw_frames_ctx->hwctx);
+    auto* hw_frames_ctx = reinterpret_cast<AVHWFramesContext*>(Context->hw_frames_ctx->data);
+    auto* vaapi_frames_ctx = reinterpret_cast<AVVAAPIFramesContext*>(hw_frames_ctx->hwctx);
     hw_frames_ctx->sw_format         = FramesFormat(Context->sw_pix_fmt);
     hw_frames_ctx->format            = AV_PIX_FMT_VAAPI;
     hw_frames_ctx->width             = Context->coded_width;
@@ -491,8 +491,8 @@ bool MythVAAPIContext::HaveVAAPI(bool ReCheck /*= false*/)
                                                           gCoreContext->GetSetting("VAAPIDevice"));
     if (context)
     {
-        AVHWDeviceContext    *hwdevice = reinterpret_cast<AVHWDeviceContext*>(context->data);
-        AVVAAPIDeviceContext *hwctx    = reinterpret_cast<AVVAAPIDeviceContext*>(hwdevice->hwctx);
+        auto *hwdevice = reinterpret_cast<AVHWDeviceContext*>(context->data);
+        auto *hwctx    = reinterpret_cast<AVVAAPIDeviceContext*>(hwdevice->hwctx);
         QString vendor(vaQueryVendorString(hwctx->display));
         if (vendor.contains("vdpau", Qt::CaseInsensitive))
         {

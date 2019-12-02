@@ -414,7 +414,7 @@ public:
         for (; it != m_segments.end(); ++it)
         {
             const HLSSegment *old = *it;
-            HLSSegment *segment = new HLSSegment(*old);
+            auto *segment = new HLSSegment(*old);
             AppendSegment(segment);
         }
     }
@@ -560,8 +560,7 @@ public:
 #ifndef USING_LIBCRYPTO
         QString m_keypath;
 #endif
-        HLSSegment *segment = new HLSSegment(duration, id, title, psz_uri,
-                                             m_keypath);
+        auto *segment = new HLSSegment(duration, id, title, psz_uri, m_keypath);
         AppendSegment(segment);
         m_duration += duration;
     }
@@ -1389,7 +1388,7 @@ private:
      */
     int ReloadPlaylist(void)
     {
-        StreamsList *streams = new StreamsList;
+        auto *streams = new StreamsList;
 
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "reloading HLS live meta playlist");
 
@@ -2767,8 +2766,8 @@ int HLSRingBuffer::DurationForBytes(uint size)
     {
         return 0;
     }
-    uint64_t byterate = (uint64_t)(((double)segment->Size()) /
-                                   ((double)segment->Duration()));
+    auto byterate = (uint64_t)(((double)segment->Size()) /
+                               ((double)segment->Duration()));
 
     return (int)((size * 1000.0) / byterate);
 }

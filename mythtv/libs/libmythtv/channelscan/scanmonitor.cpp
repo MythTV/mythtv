@@ -67,14 +67,14 @@ QEvent::Type ScannerEvent::SetStatusChannelTuned =
 
 void post_event(QObject *dest, QEvent::Type type, int val)
 {
-    ScannerEvent *e = new ScannerEvent(type);
+    auto *e = new ScannerEvent(type);
     e->intValue(val);
     QCoreApplication::postEvent(dest, e);
 }
 
 void post_event(QObject *dest, QEvent::Type type, const QString &val)
 {
-    ScannerEvent *e = new ScannerEvent(type);
+    auto *e = new ScannerEvent(type);
     e->strValue(val);
     QCoreApplication::postEvent(dest, e);
 }
@@ -82,7 +82,7 @@ void post_event(QObject *dest, QEvent::Type type, const QString &val)
 void post_event(QObject *dest, QEvent::Type type, int val,
                 Configurable *spp)
 {
-    ScannerEvent *e = new ScannerEvent(type);
+    auto *e = new ScannerEvent(type);
     e->intValue(val);
     e->ConfigurableValue(spp);
     QCoreApplication::postEvent(dest, e);
@@ -162,7 +162,7 @@ void ScanMonitor::customEvent(QEvent *e)
 {
     if (m_channelScanner)
     {
-        ScannerEvent *scanEvent = dynamic_cast<ScannerEvent*>(e);
+        auto *scanEvent = dynamic_cast<ScannerEvent*>(e);
         if (scanEvent != nullptr)
             m_channelScanner->HandleEvent(scanEvent);
     }

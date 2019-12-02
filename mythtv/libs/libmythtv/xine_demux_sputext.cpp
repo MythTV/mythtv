@@ -1145,7 +1145,7 @@ subtitle_t *sub_read_file (demux_sputext_t *demuxstr) {
 
     if(demuxstr->num>=n_max){
       n_max+=16;
-      subtitle_t *new_first=(subtitle_t *)realloc(first,n_max*sizeof(subtitle_t));
+      auto *new_first=(subtitle_t *)realloc(first,n_max*sizeof(subtitle_t));
       if (new_first == nullptr) {
           free(first);
           return nullptr;

@@ -333,7 +333,7 @@ bool H264Parser::fillRBSP(const uint8_t *byteP, uint32_t byte_count,
         required_size = ((required_size / 188) + 1) * 188;
 
         /* Need a bigger buffer */
-        uint8_t *new_buffer = new uint8_t[required_size];
+        auto *new_buffer = new uint8_t[required_size];
 
         if (new_buffer == nullptr)
         {

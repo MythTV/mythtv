@@ -193,7 +193,7 @@ QString VBox::getIPFromVideoDevice(const QString& dev)
 
 QDomDocument *VBox::getBoardInfo(void)
 {
-    QDomDocument *xmlDoc = new QDomDocument();
+    auto *xmlDoc = new QDomDocument();
     QString query = QUERY_BOARDINFO;
 
     query.replace("{URL}", m_url);
@@ -294,8 +294,8 @@ QStringList VBox::getTuners(void)
 
 vbox_chan_map_t *VBox::getChannels(void)
 {
-    vbox_chan_map_t *result = new vbox_chan_map_t;
-    QDomDocument *xmlDoc = new QDomDocument();
+    auto *result = new vbox_chan_map_t;
+    auto *xmlDoc = new QDomDocument();
     QString query = QUERY_CHANNELS;
 
     query.replace("{URL}", m_url);

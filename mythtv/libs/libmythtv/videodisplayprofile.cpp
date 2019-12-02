@@ -515,7 +515,7 @@ void VideoDisplayProfile::LoadBestPreferences
         .arg(static_cast<double>(Framerate), 0, 'f', 3).arg(CodecName));
 
     m_currentPreferences.clear();
-    vector<ProfileItem>::const_iterator it = FindMatch(Size, Framerate, CodecName);
+    auto it = FindMatch(Size, Framerate, CodecName);
     if (it != m_allowedPreferences.end())
         m_currentPreferences = (*it).GetAll();
 
@@ -593,8 +593,8 @@ bool VideoDisplayProfile::DeleteDB(uint GroupId, const vector<ProfileItem> &Item
         "      profileid      = :PROFILEID");
 
     bool ok = true;
-    vector<ProfileItem>::const_iterator it = Items.begin();
-    for (; it != Items.end(); ++it)
+    auto it = Items.cbegin();
+    for (; it != Items.cend(); ++it)
     {
         if (!(*it).GetProfileID())
             continue;
@@ -638,7 +638,7 @@ bool VideoDisplayProfile::SaveDB(uint GroupId, vector<ProfileItem> &Items)
         "      value          = :VALUE");
 
     bool ok = true;
-    vector<ProfileItem>::iterator it = Items.begin();
+    auto it = Items.begin();
     for (; it != Items.end(); ++it)
     {
         QMap<QString,QString> list = (*it).GetAll();

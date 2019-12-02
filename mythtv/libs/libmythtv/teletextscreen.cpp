@@ -78,7 +78,7 @@ QImage* TeletextScreen::GetRowImage(int row, QRect &rect)
     rect.translate(0, -(y * m_rowHeight));
     if (!m_rowImages.contains(y))
     {
-        QImage* img = new QImage(m_safeArea.width(), m_rowHeight * 2,
+        auto* img = new QImage(m_safeArea.width(), m_rowHeight * 2,
                                  QImage::Format_ARGB32);
         if (img)
         {
@@ -110,8 +110,7 @@ void TeletextScreen::OptimiseDisplayedArea(void)
 
         int row = it.key();
         image->Assign(*(it.value()));
-        MythUIImage *uiimage = new MythUIImage(this, QString("ttrow%1")
-                                                        .arg(row));
+        auto *uiimage = new MythUIImage(this, QString("ttrow%1").arg(row));
         if (uiimage)
         {
             uiimage->SetImage(image);
@@ -695,7 +694,7 @@ bool TeletextScreen::InitialiseFont()
 #endif // 0
     }
 
-    MythFontProperties *mythfont = new MythFontProperties();
+    auto *mythfont = new MythFontProperties();
     QString font = SubtitleScreen::GetTeletextFontName();
     if (mythfont)
     {

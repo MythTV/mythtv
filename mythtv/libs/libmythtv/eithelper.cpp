@@ -169,7 +169,7 @@ void EITHelper::AddEIT(uint atsc_major, uint atsc_minor,
             }
 
             // Save the EIT event in the incomplete_events for this channel.
-            unsigned char *tmp = new unsigned char[ev.m_desc_length];
+            auto *tmp = new unsigned char[ev.m_desc_length];
             memcpy(tmp, eit->Descriptors(i), ev.m_desc_length);
             ev.m_desc = tmp;
             events.insert(eit->EventID(i), ev);
@@ -613,7 +613,7 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
             EITFixUp::TimeFix(starttime);
         QDateTime endtime   = starttime.addSecs(eit->DurationInSeconds(i));
 
-        DBEventEIT *event = new DBEventEIT(
+        auto *event = new DBEventEIT(
             chanid,
             title,     subtitle,      description,
             category,  category_type,
@@ -730,7 +730,7 @@ void EITHelper::AddEIT(const PremiereContentInformationTable *cit)
                 EITFixUp::TimeFix(txstart);
             QDateTime txend = txstart.addSecs(cit->DurationInSeconds());
 
-            DBEventEIT *event = new DBEventEIT(
+            auto *event = new DBEventEIT(
                 chanid,
                 title,     subtitle,      description,
                 category,  category_type,

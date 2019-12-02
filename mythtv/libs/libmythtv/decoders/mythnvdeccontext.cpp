@@ -36,8 +36,8 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext **Context,
                                                 uint            StreamType)
 {
     bool decodeonly = Decoder == "nvdec-dec";
-    MythCodecID success = static_cast<MythCodecID>((decodeonly ? kCodec_MPEG1_NVDEC_DEC : kCodec_MPEG1_NVDEC) + (StreamType - 1));
-    MythCodecID failure = static_cast<MythCodecID>(kCodec_MPEG1 + (StreamType - 1));
+    auto success = static_cast<MythCodecID>((decodeonly ? kCodec_MPEG1_NVDEC_DEC : kCodec_MPEG1_NVDEC) + (StreamType - 1));
+    auto failure = static_cast<MythCodecID>(kCodec_MPEG1 + (StreamType - 1));
 
     // no brainers
     if (!Decoder.startsWith("nvdec") || getenv("NO_NVDEC") || !HaveNVDEC() || IsUnsupportedProfile(*Context))
@@ -81,7 +81,7 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext **Context,
     {
         // iterate over known decoder capabilities
         s_NVDECLock->lock();
-        vector<MythNVDECCaps>::const_iterator it = s_NVDECDecoderCaps.cbegin();
+        auto it = s_NVDECDecoderCaps.cbegin();
         for ( ; it != s_NVDECDecoderCaps.cend(); ++it)
         {
             if (((*it).m_codec == cudacodec) && ((*it).m_depth == depth) && ((*it).m_format == cudaformat))
@@ -183,10 +183,10 @@ int MythNVDECContext::InitialiseDecoder(AVCodecContext *Context)
     }
 
     // Set release method, interop and CUDA context
-    AVHWDeviceContext* hwdevicecontext = reinterpret_cast<AVHWDeviceContext*>(hwdeviceref->data);
+    auto* hwdevicecontext = reinterpret_cast<AVHWDeviceContext*>(hwdeviceref->data);
     hwdevicecontext->free = &MythCodecContext::DeviceContextFinished;
     hwdevicecontext->user_opaque = interop;
-    AVCUDADeviceContext *devicehwctx = reinterpret_cast<AVCUDADeviceContext*>(hwdevicecontext->hwctx);
+    auto *devicehwctx = reinterpret_cast<AVCUDADeviceContext*>(hwdevicecontext->hwctx);
     devicehwctx->cuda_ctx = interop->GetCUDAContext();
     devicehwctx->stream = nullptr;
 
@@ -403,7 +403,7 @@ bool MythNVDECContext::GetBuffer(struct AVCodecContext *Context, VideoFrame *Fra
     if (!Context || !Frame)
         return false;
 
-    AvFormatDecoder *decoder = static_cast<AvFormatDecoder*>(Context->opaque);
+    auto *decoder = static_cast<AvFormatDecoder*>(Context->opaque);
 
     for (int i = 0; i < 3; i++)
     {
@@ -423,7 +423,7 @@ bool MythNVDECContext::GetBuffer(struct AVCodecContext *Context, VideoFrame *Fra
     // set the pixel format - normally NV12 but P010 for 10bit etc. Set here rather than guessing later.
     if (AvFrame->hw_frames_ctx)
     {
-        AVHWFramesContext *context = reinterpret_cast<AVHWFramesContext*>(AvFrame->hw_frames_ctx->data);
+        auto *context = reinterpret_cast<AVHWFramesContext*>(AvFrame->hw_frames_ctx->data);
         if (context)
             Frame->sw_pix_fmt = context->sw_format;
     }
@@ -475,7 +475,7 @@ bool MythNVDECContext::HaveNVDEC(void)
 
 void MythNVDECContext::NVDECCheckCallback(void *Wait, void* /*unused*/, void* /*unused*/)
 {
-    QWaitCondition *wait = reinterpret_cast<QWaitCondition*>(Wait);
+    auto *wait = reinterpret_cast<QWaitCondition*>(Wait);
     NVDECCheck();
     if (wait)
         wait->wakeAll();
@@ -540,12 +540,12 @@ void MythNVDECContext::NVDECCheck(void)
             // now iterate over codecs, depths and formats to check support
             for (int codec = cudaVideoCodec_MPEG1; codec < cudaVideoCodec_NumCodecs; ++codec)
             {
-                cudaVideoCodec cudacodec = static_cast<cudaVideoCodec>(codec);
+                auto cudacodec = static_cast<cudaVideoCodec>(codec);
                 if (cudacodec == cudaVideoCodec_JPEG)
                     continue;
                 for (int format = cudaVideoChromaFormat_420; format < cudaVideoChromaFormat_444; ++format)
                 {
-                    cudaVideoChromaFormat cudaformat = static_cast<cudaVideoChromaFormat>(format);
+                    auto cudaformat = static_cast<cudaVideoChromaFormat>(format);
                     for (uint depth = 0; depth < 9; ++depth)
                     {
                         CUVIDDECODECAPS caps;

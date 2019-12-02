@@ -43,7 +43,7 @@ int MythVDPAUContext::InitialiseContext(AVCodecContext* Context)
         return -1;
 
     // Create interop
-    MythCodecID vdpauid = static_cast<MythCodecID>(kCodec_MPEG1_VDPAU + (mpeg_version(Context->codec_id) - 1));
+    auto vdpauid = static_cast<MythCodecID>(kCodec_MPEG1_VDPAU + (mpeg_version(Context->codec_id) - 1));
     MythVDPAUInterop *interop = MythVDPAUInterop::Create(render, vdpauid);
     if (!interop)
         return -1;
@@ -53,7 +53,7 @@ int MythVDPAUContext::InitialiseContext(AVCodecContext* Context)
     if (!hwdeviceref)
         return -1;
 
-    AVHWDeviceContext* hwdevicecontext = reinterpret_cast<AVHWDeviceContext*>(hwdeviceref->data);
+    auto* hwdevicecontext = reinterpret_cast<AVHWDeviceContext*>(hwdeviceref->data);
     if (!hwdevicecontext || (hwdevicecontext && !hwdevicecontext->hwctx))
         return -1;
 
@@ -76,7 +76,7 @@ int MythVDPAUContext::InitialiseContext(AVCodecContext* Context)
     }
 
     // Add our interop class and set the callback for its release
-    AVHWFramesContext* hwframesctx = reinterpret_cast<AVHWFramesContext*>(Context->hw_frames_ctx->data);
+    auto* hwframesctx = reinterpret_cast<AVHWFramesContext*>(Context->hw_frames_ctx->data);
     hwframesctx->user_opaque = interop;
     hwframesctx->free = &MythCodecContext::FramesContextFinished;
 
@@ -94,7 +94,7 @@ int MythVDPAUContext::InitialiseContext(AVCodecContext* Context)
         return res;
     }
 
-    AVVDPAUDeviceContext* vdpaudevicectx = static_cast<AVVDPAUDeviceContext*>(hwdevicecontext->hwctx);
+    auto* vdpaudevicectx = static_cast<AVVDPAUDeviceContext*>(hwdevicecontext->hwctx);
     if (av_vdpau_bind_context(Context, vdpaudevicectx->device, vdpaudevicectx->get_proc_address, 0) != 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to bind VDPAU context");
@@ -117,8 +117,8 @@ MythCodecID MythVDPAUContext::GetSupportedCodec(AVCodecContext **Context,
                                                 uint StreamType)
 {
     bool decodeonly = Decoder == "vdpau-dec";
-    MythCodecID success = static_cast<MythCodecID>((decodeonly ? kCodec_MPEG1_VDPAU_DEC : kCodec_MPEG1_VDPAU) + (StreamType - 1));
-    MythCodecID failure = static_cast<MythCodecID>(kCodec_MPEG1 + (StreamType - 1));
+    auto success = static_cast<MythCodecID>((decodeonly ? kCodec_MPEG1_VDPAU_DEC : kCodec_MPEG1_VDPAU) + (StreamType - 1));
+    auto failure = static_cast<MythCodecID>(kCodec_MPEG1 + (StreamType - 1));
 
     if (!Decoder.startsWith("vdpau") || getenv("NO_VDPAU") || IsUnsupportedProfile(*Context))
         return failure;
@@ -228,8 +228,8 @@ bool MythVDPAUContext::DecoderNeedsReset(AVCodecContext* Context)
     if (!Context->hw_frames_ctx)
         return false;
 
-    AVHWFramesContext* hwframesctx = reinterpret_cast<AVHWFramesContext*>(Context->hw_frames_ctx->data);
-    MythVDPAUInterop* interop = reinterpret_cast<MythVDPAUInterop*>(hwframesctx->user_opaque);
+    auto* hwframesctx = reinterpret_cast<AVHWFramesContext*>(Context->hw_frames_ctx->data);
+    auto* interop = reinterpret_cast<MythVDPAUInterop*>(hwframesctx->user_opaque);
     if (interop && interop->IsPreempted())
     {
         m_resetRequired = true;

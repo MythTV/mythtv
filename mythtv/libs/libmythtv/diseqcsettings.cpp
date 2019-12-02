@@ -17,7 +17,7 @@
 
 static GlobalTextEditSetting *DiSEqCLatitude(void)
 {
-    GlobalTextEditSetting *gc = new GlobalTextEditSetting("latitude");
+    auto *gc = new GlobalTextEditSetting("latitude");
     gc->setLabel("Latitude");
     gc->setHelpText(
         DeviceTree::tr("The Cartesian latitude for your location. "
@@ -27,7 +27,7 @@ static GlobalTextEditSetting *DiSEqCLatitude(void)
 
 static GlobalTextEditSetting *DiSEqCLongitude(void)
 {
-    GlobalTextEditSetting *gc = new GlobalTextEditSetting("longitude");
+    auto *gc = new GlobalTextEditSetting("longitude");
     gc->setLabel("Longitude");
     gc->setHelpText(
         DeviceTree::tr("The Cartesian longitude for your location. "
@@ -502,7 +502,7 @@ public:
 
 void RotorPosMap::valueChanged(StandardSetting *setting)
 {
-    RotorPosTextEdit *posEdit = dynamic_cast<RotorPosTextEdit*>(setting);
+    auto *posEdit = dynamic_cast<RotorPosTextEdit*>(setting);
     if (posEdit == nullptr)
         return;
     QString value = posEdit->getValue();
@@ -522,7 +522,7 @@ void RotorPosMap::PopulateList(void)
         if (it != m_posmap.end())
             posval = AngleToString(*it);
 
-        RotorPosTextEdit *posEdit =
+        auto *posEdit =
             new RotorPosTextEdit(DeviceTree::tr("Position #%1").arg(pos),
                                  pos,
                                  posval);
@@ -544,7 +544,7 @@ RotorConfig::RotorConfig(DiSEqCDevRotor &rotor, StandardSetting *parent)
     parent->addChild(new DeviceDescrSetting(rotor));
     parent->addChild(new DeviceRepeatSetting(rotor));
 
-    RotorTypeSetting *rtype = new RotorTypeSetting(rotor);
+    auto *rtype = new RotorTypeSetting(rotor);
     connect(rtype, SIGNAL(valueChanged(const QString&)),
             this,  SLOT(  SetType(     const QString&)));
     parent->addChild(rtype);
@@ -918,7 +918,7 @@ LNBConfig::LNBConfig(DiSEqCDevLNB &lnb, StandardSetting *parent)
     setValue(lnb.GetDescription());
 
     parent = this;
-    DeviceDescrSetting *deviceDescr = new DeviceDescrSetting(lnb);
+    auto *deviceDescr = new DeviceDescrSetting(lnb);
     parent->addChild(deviceDescr);
     m_preset = new LNBPresetSetting(lnb);
     parent->addChild(m_preset);
@@ -1040,7 +1040,7 @@ DiseqcConfigBase* DiseqcConfigBase::CreateByType(DiSEqCDevDevice *dev,
     {
         case DiSEqCDevDevice::kTypeSwitch:
         {
-            DiSEqCDevSwitch *sw = dynamic_cast<DiSEqCDevSwitch*>(dev);
+            auto *sw = dynamic_cast<DiSEqCDevSwitch*>(dev);
             if (sw)
                 setting = new SwitchConfig(*sw, parent);
         }
@@ -1048,7 +1048,7 @@ DiseqcConfigBase* DiseqcConfigBase::CreateByType(DiSEqCDevDevice *dev,
 
         case DiSEqCDevDevice::kTypeRotor:
         {
-            DiSEqCDevRotor *rotor = dynamic_cast<DiSEqCDevRotor*>(dev);
+            auto *rotor = dynamic_cast<DiSEqCDevRotor*>(dev);
             if (rotor)
                 setting = new RotorConfig(*rotor, parent);
         }
@@ -1056,7 +1056,7 @@ DiseqcConfigBase* DiseqcConfigBase::CreateByType(DiSEqCDevDevice *dev,
 
         case DiSEqCDevDevice::kTypeSCR:
         {
-            DiSEqCDevSCR *scr = dynamic_cast<DiSEqCDevSCR*>(dev);
+            auto *scr = dynamic_cast<DiSEqCDevSCR*>(dev);
             if (scr)
                 setting = new SCRConfig(*scr, parent);
         }
@@ -1064,7 +1064,7 @@ DiseqcConfigBase* DiseqcConfigBase::CreateByType(DiSEqCDevDevice *dev,
 
         case DiSEqCDevDevice::kTypeLNB:
         {
-            DiSEqCDevLNB *lnb = dynamic_cast<DiSEqCDevLNB*>(dev);
+            auto *lnb = dynamic_cast<DiSEqCDevLNB*>(dev);
             if (lnb)
                 setting = new LNBConfig(*lnb, parent);
         }
@@ -1084,7 +1084,7 @@ void DeviceTree::PopulateTree(DiSEqCDevDevice *node,
 {
     if (node)
     {
-        DeviceTypeSetting *devtype = new DeviceTypeSetting();
+        auto *devtype = new DeviceTypeSetting();
         devtype->SetDevice(node);
         devtype->Load();
         DiseqcConfigBase *setting = DiseqcConfigBase::CreateByType(node,
@@ -1103,7 +1103,7 @@ void DeviceTree::PopulateTree(DiSEqCDevDevice *node,
     }
     else
     {
-        DeviceTypeSetting *devtype = new DeviceTypeSetting();
+        auto *devtype = new DeviceTypeSetting();
         AddDeviceTypeSetting(devtype, parent, childnum, parentSetting);
     }
 }
@@ -1155,8 +1155,7 @@ void DeviceTree::ValueChanged(const QString &value,
     // Remove old setting from m_tree
     DeleteDevice(devtype);
 
-    const DiSEqCDevDevice::dvbdev_t type =
-        static_cast<DiSEqCDevDevice::dvbdev_t>(value.toUInt());
+    const auto type = static_cast<DiSEqCDevDevice::dvbdev_t>(value.toUInt());
 
     DiSEqCDevDevice *dev = DiSEqCDevDevice::CreateByType(m_tree, type);
     if (dev)
@@ -1235,7 +1234,7 @@ class RotorSetting : public MythUIComboBoxSetting
         setLabel(node.GetDescription());
         setHelpText(DeviceTree::tr("Choose a satellite position."));
 
-        DiSEqCDevRotor *rotor = dynamic_cast<DiSEqCDevRotor*>(&m_node);
+        auto *rotor = dynamic_cast<DiSEqCDevRotor*>(&m_node);
         if (rotor)
             m_posmap = rotor->GetPosMap();
     }
@@ -1380,7 +1379,7 @@ void DTVDeviceConfigGroup::AddNodes(
             break;
         case DiSEqCDevDevice::kTypeRotor:
         {
-            DiSEqCDevRotor *rotor = dynamic_cast<DiSEqCDevRotor*>(node);
+            auto *rotor = dynamic_cast<DiSEqCDevRotor*>(node);
             if (rotor && (rotor->GetType() == DiSEqCDevRotor::kTypeDiSEqC_1_2))
                 setting = new RotorSetting(*node, m_settings);
             else

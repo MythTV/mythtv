@@ -155,7 +155,7 @@ uint TransportScanItem::GetMultiplexIdFromDB(void) const
 
 uint64_t TransportScanItem::freq_offset(uint i) const
 {
-    int64_t freq = (int64_t) m_tuning.m_frequency;
+    auto freq = (int64_t) m_tuning.m_frequency;
 
     return (uint64_t) (freq + m_freqOffsets[i]);
 }

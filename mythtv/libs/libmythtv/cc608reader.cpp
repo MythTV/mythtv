@@ -188,7 +188,7 @@ int CC608Reader::Update(unsigned char *inpos)
         int row = 0;
         int linecont = (subtitle.resumetext & CC_LINE_CONT);
 
-        vector<CC608Text*> *ccbuf = new vector<CC608Text*>;
+        auto *ccbuf = new vector<CC608Text*>;
         vector<CC608Text*>::iterator ccp;
         CC608Text *tmpcc = nullptr;
         int replace = linecont;

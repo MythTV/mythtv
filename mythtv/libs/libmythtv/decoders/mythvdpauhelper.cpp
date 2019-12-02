@@ -58,7 +58,7 @@ bool MythVDPAUHelper::HaveMPEG4Decode(void)
 
 static void vdpau_preemption_callback(VdpDevice /*unused*/, void* Opaque)
 {
-    MythVDPAUHelper* helper = static_cast<MythVDPAUHelper*>(Opaque);
+    auto* helper = static_cast<MythVDPAUHelper*>(Opaque);
     if (helper)
         helper->SetPreempted();
 }
@@ -417,9 +417,9 @@ void MythVDPAUHelper::MixerRender(VdpVideoMixer Mixer, VdpVideoSurface Source,
         VdpVideoSurface past[2]   = { VDP_INVALID_HANDLE, VDP_INVALID_HANDLE };
         VdpVideoSurface future[1] = { VDP_INVALID_HANDLE };
 
-        VdpVideoSurface next    = static_cast<VdpVideoSurface>(reinterpret_cast<uintptr_t>(Frames[0]->data));
-        VdpVideoSurface current = static_cast<VdpVideoSurface>(reinterpret_cast<uintptr_t>(Frames[count > 1 ? 1 : 0]->data));
-        VdpVideoSurface last    = static_cast<VdpVideoSurface>(reinterpret_cast<uintptr_t>(Frames[count > 2 ? 2 : 0]->data));
+        auto next    = static_cast<VdpVideoSurface>(reinterpret_cast<uintptr_t>(Frames[0]->data));
+        auto current = static_cast<VdpVideoSurface>(reinterpret_cast<uintptr_t>(Frames[count > 1 ? 1 : 0]->data));
+        auto last    = static_cast<VdpVideoSurface>(reinterpret_cast<uintptr_t>(Frames[count > 2 ? 2 : 0]->data));
 
         if (field == VDP_VIDEO_MIXER_PICTURE_STRUCTURE_BOTTOM_FIELD)
         {

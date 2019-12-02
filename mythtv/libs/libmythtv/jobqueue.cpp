@@ -84,7 +84,7 @@ void JobQueue::customEvent(QEvent *e)
 {
     if (e->type() == MythEvent::MythEventMessage)
     {
-        MythEvent *me = dynamic_cast<MythEvent *>(e);
+        auto *me = dynamic_cast<MythEvent *>(e);
         if (me == nullptr)
             return;
         QString message = me->Message();
@@ -1776,7 +1776,7 @@ void JobQueue::ProcessJob(const JobQueueEntry& job)
 
 void JobQueue::StartChildJob(void *(*ChildThreadRoutine)(void *), int jobID)
 {
-    JobThreadStruct *jts = new JobThreadStruct;
+    auto *jts = new JobThreadStruct;
     jts->jq = this;
     jts->jobID = jobID;
 
@@ -1907,7 +1907,7 @@ QString JobQueue::PrettyPrint(off_t bytes)
 
 void *JobQueue::TranscodeThread(void *param)
 {
-    JobThreadStruct *jts = (JobThreadStruct *)param;
+    auto *jts = (JobThreadStruct *)param;
     JobQueue *jq = jts->jq;
 
     MThread::ThreadSetup(QString("Transcode_%1").arg(jts->jobID));
@@ -2137,7 +2137,7 @@ void JobQueue::DoTranscodeThread(int jobID)
 
 void *JobQueue::MetadataLookupThread(void *param)
 {
-    JobThreadStruct *jts = (JobThreadStruct *)param;
+    auto *jts = (JobThreadStruct *)param;
     JobQueue *jq = jts->jq;
 
     MThread::ThreadSetup(QString("Metadata_%1").arg(jts->jobID));
@@ -2262,7 +2262,7 @@ void JobQueue::DoMetadataLookupThread(int jobID)
 
 void *JobQueue::FlagCommercialsThread(void *param)
 {
-    JobThreadStruct *jts = (JobThreadStruct *)param;
+    auto *jts = (JobThreadStruct *)param;
     JobQueue *jq = jts->jq;
 
     MThread::ThreadSetup(QString("Commflag_%1").arg(jts->jobID));
@@ -2384,8 +2384,8 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
             program_info->SetPathname(program_info->GetPlaybackURL(false,true));
         if (program_info->IsLocal())
         {
-            PreviewGenerator *pg = new PreviewGenerator(
-                program_info, QString(), PreviewGenerator::kLocal);
+            auto *pg = new PreviewGenerator(program_info, QString(),
+                                            PreviewGenerator::kLocal);
             pg->Run();
             pg->deleteLater();
         }
@@ -2409,7 +2409,7 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
 
 void *JobQueue::UserJobThread(void *param)
 {
-    JobThreadStruct *jts = (JobThreadStruct *)param;
+    auto *jts = (JobThreadStruct *)param;
     JobQueue *jq = jts->jq;
 
     MThread::ThreadSetup(QString("UserJob_%1").arg(jts->jobID));

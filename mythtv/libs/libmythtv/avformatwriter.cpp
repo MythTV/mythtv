@@ -121,7 +121,7 @@ bool AVFormatWriter::Init(void)
         m_ctx->packet_size = 2324;
 
     QByteArray filename = m_filename.toLatin1();
-    size_t size = static_cast<size_t>(filename.size());
+    auto size = static_cast<size_t>(filename.size());
     m_ctx->url = static_cast<char*>(av_malloc(size));
     memcpy(m_ctx->url, filename.constData(), size);
 
@@ -169,7 +169,7 @@ bool AVFormatWriter::OpenFile(void)
     }
 
     m_avfRingBuffer     = new AVFRingBuffer(m_ringBuffer);
-    URLContext *uc      = (URLContext *)m_ctx->pb->opaque;
+    auto *uc            = (URLContext *)m_ctx->pb->opaque;
     uc->prot            = AVFRingBuffer::GetRingBufferURLProtocol();
     uc->priv_data       = (void *)m_avfRingBuffer;
 

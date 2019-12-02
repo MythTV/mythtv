@@ -347,7 +347,7 @@ void ChannelImporter::InsertChannels(
     uint chantype = (uint) kChannelTypeNonConflictingFirst;
     for (; chantype <= (uint) kChannelTypeNonConflictingLast; ++chantype)
     {
-        ChannelType type = (ChannelType) chantype;
+        auto type = (ChannelType) chantype;
         uint new_chan = 0;
         uint old_chan = 0;
         CountChannels(list, info, type, new_chan, old_chan);
@@ -387,7 +387,7 @@ void ChannelImporter::InsertChannels(
     chantype = (uint) kChannelTypeConflictingFirst;
     for (; chantype <= (uint) kChannelTypeConflictingLast; ++chantype)
     {
-        ChannelType type = (ChannelType) chantype;
+        auto type = (ChannelType) chantype;
         uint new_chan = 0;
         uint old_chan = 0;
         CountChannels(list, info, type, new_chan, old_chan);
@@ -1630,7 +1630,7 @@ ChannelImporter::QueryUserDelete(const QString &msg)
         {
             MythScreenStack *popupStack =
                 GetMythMainWindow()->GetStack("popup stack");
-            MythDialogBox *deleteDialog =
+            auto *deleteDialog =
                 new MythDialogBox(msg, popupStack, "deletechannels");
 
             if (deleteDialog->Create())
@@ -1705,7 +1705,7 @@ ChannelImporter::QueryUserInsert(const QString &msg)
         {
             MythScreenStack *popupStack =
                 GetMythMainWindow()->GetStack("popup stack");
-            MythDialogBox *insertDialog =
+            auto *insertDialog =
                 new MythDialogBox(msg, popupStack, "insertchannels");
 
             if (insertDialog->Create())
@@ -1775,7 +1775,7 @@ ChannelImporter::QueryUserUpdate(const QString &msg)
         {
             MythScreenStack *popupStack =
                 GetMythMainWindow()->GetStack("popup stack");
-            MythDialogBox *updateDialog =
+            auto *updateDialog =
                 new MythDialogBox(msg, popupStack, "updatechannels");
 
             if (updateDialog->Create())
@@ -1837,8 +1837,8 @@ OkCancelType ChannelImporter::ShowManualChannelPopup(
 {
     int dc = -1;
     MythScreenStack *popupStack = parent->GetStack("popup stack");
-    MythDialogBox *popup = new MythDialogBox(title, message, popupStack,
-                                             "manualchannelpopup");
+    auto *popup = new MythDialogBox(title, message, popupStack,
+                                    "manualchannelpopup");
 
     if (popup->Create())
     {
@@ -1864,7 +1864,7 @@ OkCancelType ChannelImporter::ShowManualChannelPopup(
     // Choice "Edit"
     if (1 == dc)
     {
-        MythTextInputDialog *textEdit =
+        auto *textEdit =
             new MythTextInputDialog(popupStack,
                                     tr("Please enter a unique channel number."),
                                     FilterNone, false, text);
@@ -1906,8 +1906,8 @@ OkCancelType ChannelImporter::ShowResolveChannelPopup(
 {
     int dc = -1;
     MythScreenStack *popupStack = parent->GetStack("popup stack");
-    MythDialogBox *popup = new MythDialogBox(title, message, popupStack,
-                                             "resolvechannelpopup");
+    auto *popup = new MythDialogBox(title, message, popupStack,
+                                    "resolvechannelpopup");
 
     if (popup->Create())
     {
@@ -1934,7 +1934,7 @@ OkCancelType ChannelImporter::ShowResolveChannelPopup(
     // Choice "Edit"
     if (2 == dc)
     {
-        MythTextInputDialog *textEdit =
+        auto *textEdit =
             new MythTextInputDialog(popupStack,
                                     tr("Please enter a unique channel number."),
                                     FilterNone, false, text);

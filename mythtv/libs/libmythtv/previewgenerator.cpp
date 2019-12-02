@@ -258,7 +258,7 @@ bool PreviewGenerator::Run(void)
             cmdargs << "--outfile" << m_outFileName;
 
         // Timeout in 30s
-        MythSystemLegacy *ms = new MythSystemLegacy(command, cmdargs,
+        auto *ms = new MythSystemLegacy(command, cmdargs,
                                         kMSDontBlockInputDevs |
                                         kMSDontDisableDrawing |
                                         kMSProcessEvents      |
@@ -420,7 +420,7 @@ bool PreviewGenerator::event(QEvent *e)
     if (e->type() != MythEvent::MythEventMessage)
         return QObject::event(e);
 
-    MythEvent *me = dynamic_cast<MythEvent*>(e);
+    auto *me = dynamic_cast<MythEvent*>(e);
     if (me == nullptr)
         return false;
     if (me->Message() != "GENERATED_PIXMAP" || me->ExtraDataCount() < 3)
@@ -686,10 +686,9 @@ bool PreviewGenerator::LocalPreviewRun(void)
     }
 
     width = height = sz = 0;
-    unsigned char *data = (unsigned char*)
-        GetScreenGrab(m_programInfo, m_pathname,
-                      captime, m_timeInSeconds,
-                      sz, width, height, aspect);
+    auto *data = (unsigned char*) GetScreenGrab(m_programInfo, m_pathname,
+                                                captime, m_timeInSeconds,
+                                                sz, width, height, aspect);
 
     QString outname = CreateAccessibleFilename(m_pathname, m_outFileName);
 
@@ -835,7 +834,7 @@ char *PreviewGenerator::GetScreenGrab(
         return nullptr;
     }
 
-    PlayerContext *ctx = new PlayerContext(kPreviewGeneratorInUseID);
+    auto *ctx = new PlayerContext(kPreviewGeneratorInUseID);
     ctx->SetRingBuffer(rbuf);
     ctx->SetPlayingInfo(&pginfo);
     ctx->SetPlayer(new MythPlayer((PlayerFlags)(kAudioMuted | kVideoIsNull | kNoITV)));

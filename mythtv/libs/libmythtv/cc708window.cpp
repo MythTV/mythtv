@@ -195,8 +195,7 @@ void CC708Window::Resize(uint new_rows, uint new_columns)
 
         // Expand the array if the new size exceeds the current capacity
         // in either dimension.
-        CC708Character *new_text =
-            new CC708Character[new_rows * new_columns];
+        auto *new_text = new CC708Character[new_rows * new_columns];
         m_pen.m_column = 0;
         m_pen.m_row = 0;
         uint i, j;

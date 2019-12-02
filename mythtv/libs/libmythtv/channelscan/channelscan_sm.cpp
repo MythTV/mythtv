@@ -168,7 +168,7 @@ ChannelScanSM::ChannelScanSM(ScanMonitor *_scan_monitor,
     if (dtvSigMon)
     {
         LOG(VB_CHANSCAN, LOG_INFO, LOC + "Connecting up DTVSignalMonitor");
-        ScanStreamData *data = new ScanStreamData();
+        auto *data = new ScanStreamData();
 
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare(
@@ -202,7 +202,7 @@ ChannelScanSM::ChannelScanSM(ScanMonitor *_scan_monitor,
                             SignalMonitor::kDTVSigMon_WaitForSDT);
 
 #ifdef USING_DVB
-        DVBChannel *dvbchannel = dynamic_cast<DVBChannel*>(m_channel);
+        auto *dvbchannel = dynamic_cast<DVBChannel*>(m_channel);
         if (dvbchannel && dvbchannel->GetRotor())
             dtvSigMon->AddFlags(SignalMonitor::kDVBSigMon_WaitForPos);
 #endif
@@ -1293,8 +1293,8 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
     pat_map_t::const_iterator pat_list_it = scan_info->m_pats.begin();
     for (; pat_list_it != scan_info->m_pats.end(); ++pat_list_it)
     {
-        pat_vec_t::const_iterator pat_it = (*pat_list_it).begin();
-        for (; pat_it != (*pat_list_it).end(); ++pat_it)
+        auto pat_it = (*pat_list_it).cbegin();
+        for (; pat_it != (*pat_list_it).cend(); ++pat_it)
         {
             bool could_be_opencable = false;
             for (uint i = 0; i < (*pat_it)->ProgramCount(); ++i)
@@ -1379,8 +1379,8 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
     sdt_map_t::const_iterator sdt_list_it = scan_info->m_sdts.begin();
     for (; sdt_list_it != scan_info->m_sdts.end(); ++sdt_list_it)
     {
-        sdt_vec_t::const_iterator sdt_it = (*sdt_list_it).begin();
-        for (; sdt_it != (*sdt_list_it).end(); ++sdt_it)
+        auto sdt_it = (*sdt_list_it).cbegin();
+        for (; sdt_it != (*sdt_list_it).cend(); ++sdt_it)
         {
             for (uint i = 0; i < (*sdt_it)->ServiceCount(); ++i)
             {
@@ -2192,7 +2192,7 @@ bool ChannelScanSM::ScanTransports(
 
     QString start = table_start;
     const QString& end   = table_end;
-    freq_table_list_t::iterator it = tables.begin();
+    auto it = tables.begin();
     for (; it != tables.end(); ++it)
     {
         const FrequencyTable &ft = **it;
@@ -2255,8 +2255,8 @@ bool ChannelScanSM::ScanForChannels(uint sourceid,
     DTVTunerType tunertype;
     tunertype.Parse(cardtype);
 
-    DTVChannelList::const_iterator it = channels.begin();
-    for (uint i = 0; it != channels.end(); ++it, ++i)
+    auto it = channels.cbegin();
+    for (uint i = 0; it != channels.cend(); ++it, ++i)
     {
         DTVTransport tmp = *it;
         tmp.m_sistandard = std;

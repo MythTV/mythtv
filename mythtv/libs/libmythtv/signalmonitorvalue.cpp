@@ -134,7 +134,7 @@ bool SignalMonitorValue::Set(const QString& _name, const QString& _longString)
 SignalMonitorValue* SignalMonitorValue::Create(const QString& _name,
                                                const QString& _longString)
 {
-    SignalMonitorValue *smv = new SignalMonitorValue();
+    auto *smv = new SignalMonitorValue();
     if (!smv->Set(_name, _longString))
     {
         delete smv;
@@ -177,8 +177,8 @@ SignalMonitorList SignalMonitorValue::Parse(const QStringList& slist)
 bool SignalMonitorValue::AllGood(const SignalMonitorList& slist)
 {
     bool good = true;
-    SignalMonitorList::const_iterator it = slist.begin();
-    for (; it != slist.end(); ++it)
+    auto it = slist.cbegin();
+    for (; it != slist.cend(); ++it)
         good &= it->IsGood();
 #if DEBUG_SIGNAL_MONITOR_VALUE
     if (!good)
@@ -207,8 +207,8 @@ bool SignalMonitorValue::AllGood(const SignalMonitorList& slist)
 int SignalMonitorValue::MaxWait(const SignalMonitorList& slist)
 {
     int wait = 0, minWait = 0;
-    SignalMonitorList::const_iterator it = slist.begin();
-    for (; it != slist.end(); ++it)
+    auto it = slist.cbegin();
+    for (; it != slist.cend(); ++it)
     {
         wait = max(wait, it->GetTimeout());
         minWait = min(minWait, it->GetTimeout());

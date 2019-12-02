@@ -700,7 +700,7 @@ ChannelBase *ChannelBase::CreateChannel(
     {
 #ifdef USING_DVB
         channel = new DVBChannel(genOpt.m_videoDev, tvrec);
-        DVBChannel *dvbchannel = dynamic_cast<DVBChannel*>(channel);
+        auto *dvbchannel = dynamic_cast<DVBChannel*>(channel);
         if (dvbchannel != nullptr)
             dvbchannel->SetSlowTuning(dvbOpt.m_dvbTuningDelay);
 #endif
@@ -814,7 +814,7 @@ ChannelBase *ChannelBase::CreateChannel(
         }
         else if (setchan)
         {
-            DTVChannel *dtvchannel = dynamic_cast<DTVChannel*>(channel);
+            auto *dtvchannel = dynamic_cast<DTVChannel*>(channel);
             if (dtvchannel)
                 dtvchannel->EnterPowerSavingMode();
         }

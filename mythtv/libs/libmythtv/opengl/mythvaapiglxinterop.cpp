@@ -105,7 +105,7 @@ void MythVAAPIInteropGLX::InitPictureAttributes(VideoColourSpace *ColourSpace)
     int supported_controls = kPictureAttributeSupported_None;
     QList<VADisplayAttribute> supported;
     int num = vaMaxNumDisplayAttributes(m_vaDisplay);
-    VADisplayAttribute* attribs = new VADisplayAttribute[static_cast<unsigned int>(num)];
+    auto* attribs = new VADisplayAttribute[static_cast<unsigned int>(num)];
 
     int actual = 0;
     INIT_ST;
@@ -452,8 +452,8 @@ vector<MythVideoTexture*> MythVAAPIInteropGLXPixmap::Acquire(MythRenderOpenGL *C
     INIT_ST;
     va_status = vaSyncSurface(m_vaDisplay, id);
     CHECK_ST;
-    unsigned short width  = static_cast<unsigned short>(m_openglTextureSize.width());
-    unsigned short height = static_cast<unsigned short>(m_openglTextureSize.height());
+    auto width  = static_cast<unsigned short>(m_openglTextureSize.width());
+    auto height = static_cast<unsigned short>(m_openglTextureSize.height());
     va_status = vaPutSurface(m_vaDisplay, id, m_pixmap,
                              0, 0, width, height, 0, 0, width, height,
                              nullptr, 0, GetFlagsForFrame(Frame, Scan));

@@ -168,7 +168,7 @@ void PreviewGeneratorQueue::GetPreviewImage(
     extra += outputfile;
     extra += QString::number(time);
     extra += (in_seconds ? "1" : "0");
-    MythEvent *e = new MythEvent("GET_PREVIEW", extra);
+    auto *e = new MythEvent("GET_PREVIEW", extra);
     QCoreApplication::postEvent(s_pgq, e);
 }
 
@@ -225,7 +225,7 @@ bool PreviewGeneratorQueue::event(QEvent *e)
     if (e->type() != MythEvent::MythEventMessage)
         return QObject::event(e);
 
-    MythEvent *me = dynamic_cast<MythEvent*>(e);
+    auto *me = dynamic_cast<MythEvent*>(e);
     if (me == nullptr)
         return false;
     if (me->Message() == "GET_PREVIEW")
@@ -318,7 +318,7 @@ bool PreviewGeneratorQueue::event(QEvent *e)
                 QSet<QObject*>::iterator sit = m_listeners.begin();
                 for (; sit != m_listeners.end(); ++sit)
                 {
-                    MythEvent *le = new MythEvent(me->Message(), list);
+                    auto *le = new MythEvent(me->Message(), list);
                     QCoreApplication::postEvent(*sit, le);
                 }
                 (*it).m_tokens.clear();
@@ -372,7 +372,7 @@ void PreviewGeneratorQueue::SendEvent(
     QSet<QObject*>::iterator it = m_listeners.begin();
     for (; it != m_listeners.end(); ++it)
     {
-        MythEvent *e = new MythEvent(eventname, list);
+        auto *e = new MythEvent(eventname, list);
         QCoreApplication::postEvent(*it, e);
     }
 }
@@ -535,7 +535,7 @@ QString PreviewGeneratorQueue::GeneratePreviewImage(
         {
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
                 QString("Requesting preview for '%1'") .arg(key));
-            PreviewGenerator *pg = new PreviewGenerator(&pginfo, token, m_mode);
+            auto *pg = new PreviewGenerator(&pginfo, token, m_mode);
             if (!outputfile.isEmpty() || time >= 0 ||
                 size.width() || size.height())
             {

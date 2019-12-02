@@ -36,7 +36,7 @@ VideoVisualGoom::~VideoVisualGoom()
 #ifdef USING_OPENGL
     if (m_glSurface && m_render && (m_render->Type() == kRenderOpenGL))
     {
-        MythRenderOpenGL *glrender = static_cast<MythRenderOpenGL*>(m_render);
+        auto *glrender = static_cast<MythRenderOpenGL*>(m_render);
         if (glrender)
             glrender->DeleteTexture(m_glSurface);
         m_glSurface = nullptr;
@@ -81,7 +81,7 @@ void VideoVisualGoom::Draw(const QRect &area, MythPainter */*painter*/,
 #ifdef USING_OPENGL
     if ((m_render->Type() == kRenderOpenGL))
     {
-        MythRenderOpenGL *glrender = dynamic_cast<MythRenderOpenGL*>(m_render);
+        auto *glrender = dynamic_cast<MythRenderOpenGL*>(m_render);
         if (glrender && m_buffer)
         {
             glrender->makeCurrent();

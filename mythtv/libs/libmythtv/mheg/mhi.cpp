@@ -136,7 +136,7 @@ MHIContext::~MHIContext()
 // NB caller must hold m_display_lock
 void MHIContext::ClearDisplay(void)
 {
-    list<MHIImageData*>::iterator it = m_display.begin();
+    auto it = m_display.begin();
     for (; it != m_display.end(); ++it)
         delete *it;
     m_display.clear();
@@ -146,7 +146,7 @@ void MHIContext::ClearDisplay(void)
 // NB caller must hold m_dsmccLock
 void MHIContext::ClearQueue(void)
 {
-    MythDeque<DSMCCPacket*>::iterator it = m_dsmccQueue.begin();
+    auto it = m_dsmccQueue.begin();
     for (; it != m_dsmccQueue.end(); ++it)
         delete *it;
     m_dsmccQueue.clear();
@@ -296,8 +296,7 @@ void MHIContext::QueueDSMCCPacket(
     unsigned char *data, int length, int componentTag,
     unsigned carouselId, int dataBroadcastId)
 {
-    unsigned char *dataCopy =
-        (unsigned char*) malloc(length * sizeof(unsigned char));
+    auto *dataCopy = (unsigned char*) malloc(length * sizeof(unsigned char));
 
     if (dataCopy == nullptr)
         return;
@@ -636,7 +635,7 @@ void MHIContext::Reinit(const QRect &videoRect, const QRect &dispRect, float asp
     // MHEG presumes square pixels
     enum { kNone, kHoriz, kBoth };
     int mode = gCoreContext->GetNumSetting("MhegAspectCorrection", kNone);
-    double const aspectd = static_cast<double>(aspect);
+    auto const aspectd = static_cast<double>(aspect);
     double const vz = (mode == kBoth) ? min(1.15, 1. / sqrt(aspectd)) : 1.;
     double const hz = (mode > kNone) ? vz * aspectd : 1.;
 
@@ -675,7 +674,7 @@ void MHIContext::UpdateOSD(InteractiveScreen *osdWindow,
     // but when we create the OSD we overlay everything over the video.
     // We need to cut out anything belowthe video on the display stack
     // to leave the video area clear.
-    list<MHIImageData*>::iterator it = m_display.begin();
+    auto it = m_display.begin();
     for (; it != m_display.end(); ++it)
     {
         MHIImageData *data = *it;
@@ -703,7 +702,7 @@ void MHIContext::UpdateOSD(InteractiveScreen *osdWindow,
             QImage image =
                 data->m_image.copy(rect.x()-data->m_x, rect.y()-data->m_y,
                                    rect.width(), rect.height());
-            MHIImageData *newData = new MHIImageData;
+            auto *newData = new MHIImageData;
             newData->m_image = image;
             newData->m_x = rect.x();
             newData->m_y = rect.y();
@@ -727,8 +726,7 @@ void MHIContext::UpdateOSD(InteractiveScreen *osdWindow,
             continue;
 
         image->Assign(data->m_image);
-        MythUIImage *uiimage = new MythUIImage(osdWindow, QString("itv%1")
-                                               .arg(count));
+        auto *uiimage = new MythUIImage(osdWindow, QString("itv%1").arg(count));
         if (uiimage)
         {
             uiimage->SetImage(image);
@@ -799,7 +797,7 @@ void MHIContext::AddToDisplay(const QImage &image, const QRect &displayRect, boo
 {
     const QRect scaledRect = Scale(displayRect);
 
-    MHIImageData *data = new MHIImageData;
+    auto *data = new MHIImageData;
 
     data->m_image = image.convertToFormat(QImage::Format_ARGB32).scaled(
         scaledRect.width(), scaledRect.height(),
@@ -814,7 +812,7 @@ void MHIContext::AddToDisplay(const QImage &image, const QRect &displayRect, boo
     else
     {
         // Replace any existing items under the video with this
-        list<MHIImageData*>::iterator it = m_display.begin();
+        auto it = m_display.begin();
         while (it != m_display.end())
         {
             MHIImageData *old = *it;
@@ -858,7 +856,7 @@ void MHIContext::DrawVideo(const QRect &videoRect, const QRect &dispRect)
 
     // Mark all existing items in the display stack as under the video
     QMutexLocker locker(&m_display_lock);
-    list<MHIImageData*>::iterator it = m_display.begin();
+    auto it = m_display.begin();
     for (; it != m_display.end(); ++it)
     {
         (*it)->m_bUnder = true;
@@ -1930,7 +1928,7 @@ void MHIBitmap::CreateFromMPEG(const unsigned char *data, int length)
         memset(&retbuf, 0, sizeof(AVFrame));
 
         int bufflen = nContentWidth * nContentHeight * 3;
-        unsigned char *outputbuf = (unsigned char*)av_malloc(bufflen);
+        auto *outputbuf = (unsigned char*)av_malloc(bufflen);
 
         av_image_fill_arrays(retbuf.data, retbuf.linesize,
             outputbuf, AV_PIX_FMT_RGB24,

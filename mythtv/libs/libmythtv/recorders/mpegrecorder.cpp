@@ -925,9 +925,9 @@ void MpegRecorder::run(void)
     if (m_driver == "hdpvr")
     {
         int progNum = 1;
-        MPEGStreamData *sd = new MPEGStreamData
-                             (progNum, m_tvrec ? m_tvrec->GetInputId() : -1,
-                              true);
+        auto *sd = new MPEGStreamData(progNum,
+                                      m_tvrec ? m_tvrec->GetInputId() : -1,
+                                      true);
         sd->SetRecordingType(m_recording_type);
         SetStreamData(sd);
 
@@ -948,7 +948,7 @@ void MpegRecorder::run(void)
         m_recordingWait.wakeAll();
     }
 
-    unsigned char *buffer = new unsigned char[m_bufferSize + 1];
+    auto *buffer = new unsigned char[m_bufferSize + 1];
     int len;
     int remainder = 0;
 

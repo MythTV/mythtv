@@ -507,9 +507,9 @@ ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID &id,
                                          "Channel Options - Common"));
     addChild(new Name(id));
 
-    Source *source = new Source(id, default_sourceid);
+    auto *source = new Source(id, default_sourceid);
 
-    Channum *channum = new Channum(id);
+    auto *channum = new Channum(id);
     addChild(channum);
     if (add_freqid)
     {

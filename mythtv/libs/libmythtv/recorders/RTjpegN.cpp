@@ -114,7 +114,7 @@ int RTjpeg::b2s(const int16_t *data, int8_t *strm, uint8_t /*bt8*/)
  unsigned char bitten;
  unsigned char bitoff;
 
- uint8_t *ustrm = (uint8_t *)strm;
+ auto *ustrm = (uint8_t *)strm;
 #ifdef SHOWBLOCK
 
   int ii;
@@ -280,7 +280,7 @@ fprintf(stdout, "\n\n");
 
 int RTjpeg::s2b(int16_t *data, const int8_t *strm, uint8_t /*bt8*/, int32_t *qtbla)
 {
- uint32_t *qtbl = (uint32_t *)qtbla;
+ auto *qtbl = (uint32_t *)qtbla;
  int ci;
  int co;
  int i;
@@ -710,8 +710,8 @@ void RTjpeg::DctY(uint8_t *idata, int rskip)
   }
 #else
   volatile mmx_t tmp6, tmp7;
-  mmx_t *dataptr = (mmx_t *)block;
-  mmx_t *idata2 = (mmx_t *)idata;
+  auto *dataptr = (mmx_t *)block;
+  auto *idata2 = (mmx_t *)idata;
 
 
    // first copy the input 8 bit to the destination 16 bits
@@ -1546,9 +1546,9 @@ static mmx_t s_fix184;         s_fix184.q = 0x7641764176417641LL;
 static mmx_t s_fixN184;       s_fixN184.q = 0x896f896f896f896fLL;
 static mmx_t s_fix108n184; s_fix108n184.q = 0xcf04cf04cf04cf04LL;
 
-  mmx_t *wsptr = (mmx_t *)ws;
-  mmx_t *dataptr = (mmx_t *)odata;
-  mmx_t *idata = (mmx_t *)data;
+  auto *wsptr = (mmx_t *)ws;
+  auto *dataptr = (mmx_t *)odata;
+  auto *idata = (mmx_t *)data;
 
   rskip = rskip>>3;
 /*
@@ -3076,8 +3076,8 @@ inline void RTjpeg::decompress8(int8_t *sp, uint8_t **planes)
 int RTjpeg::bcomp(int16_t *rblock, int16_t *_old, mmx_t *mask)
 {
  int i;
- mmx_t *mold=(mmx_t *)_old;
- mmx_t *mblock=(mmx_t *)rblock;
+ auto *mold=(mmx_t *)_old;
+ auto *mblock=(mmx_t *)rblock;
  volatile mmx_t result;
  static mmx_t s_neg= { 0xffffffffffffffffULL };
 
@@ -3314,7 +3314,7 @@ void RTjpeg::SetNextKey(void)
 
 int RTjpeg::Compress(int8_t *sp, uint8_t **planes)
 {
- RTjpeg_frameheader * fh = (RTjpeg_frameheader *)sp;
+ auto * fh = (RTjpeg_frameheader *)sp;
  int ds = 0;
 
  if (key_rate == 0)
@@ -3351,7 +3351,7 @@ int RTjpeg::Compress(int8_t *sp, uint8_t **planes)
 
 void RTjpeg::Decompress(int8_t *sp, uint8_t **planes)
 {
- RTjpeg_frameheader * fh = (RTjpeg_frameheader *)sp;
+ auto * fh = (RTjpeg_frameheader *)sp;
 
  if ((RTJPEG_SWAP_HALFWORD(fh->width) != width)||
     (RTJPEG_SWAP_HALFWORD(fh->height) != height))

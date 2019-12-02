@@ -118,7 +118,7 @@ void ImportRecorder::run(void)
     // build seek table
     if (m_import_fd && IsRecordingRequested() && !IsErrored())
     {
-        MythCommFlagPlayer *cfp =
+        auto *cfp =
             new MythCommFlagPlayer((PlayerFlags)(kAudioMuted | kVideoIsNull | kNoITV));
         RingBuffer *rb = RingBuffer::Create(
             m_ringBuffer->GetFilename(), false, true, 6000);
@@ -126,7 +126,7 @@ void ImportRecorder::run(void)
         //recorded / failure status for the relevant recording
         SetRecordingStatus(RecStatus::Recording, __FILE__, __LINE__);
 
-        PlayerContext *ctx = new PlayerContext(kImportRecorderInUseID);
+        auto *ctx = new PlayerContext(kImportRecorderInUseID);
         ctx->SetPlayingInfo(m_curRecording);
         ctx->SetRingBuffer(rb);
         ctx->SetPlayer(cfp);

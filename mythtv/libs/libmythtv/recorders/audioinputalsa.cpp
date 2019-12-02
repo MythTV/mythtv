@@ -234,7 +234,7 @@ bool AudioInputALSA::PrepSwParams(void)
 
 int AudioInputALSA::PcmRead(void* buf, uint nbytes)
 {
-    unsigned char* bufptr = (unsigned char*)buf;
+    auto* bufptr = (unsigned char*)buf;
     snd_pcm_uframes_t to_read = snd_pcm_bytes_to_frames(pcm_handle, nbytes);
     snd_pcm_uframes_t nframes = to_read;
     snd_pcm_sframes_t nread, avail;

@@ -523,7 +523,7 @@ int AvFormatDecoder::GetCurrentChapter(long long framesPlayed)
         int64_t start = m_ic->chapters[i]->start;
         long double total_secs = (long double)start * (long double)num /
                                  (long double)den;
-        long long framenum = (long long)(total_secs * m_fps);
+        auto framenum = (long long)(total_secs * m_fps);
         if (framesPlayed >= framenum)
         {
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
@@ -545,7 +545,7 @@ long long AvFormatDecoder::GetChapter(int chapter)
     int64_t start = m_ic->chapters[chapter - 1]->start;
     long double total_secs = (long double)start * (long double)num /
                              (long double)den;
-    long long framenum = (long long)(total_secs * m_fps);
+    auto framenum = (long long)(total_secs * m_fps);
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("GetChapter %1: framenum %2")
                                    .arg(chapter).arg(framenum));
     return framenum;
@@ -898,7 +898,7 @@ void AvFormatDecoder::InitByteContext(bool forceseek)
     m_readcontext.is_streamed     = streamed;
     m_readcontext.max_packet_size = 0;
     m_readcontext.priv_data       = m_avfRingBuffer;
-    unsigned char* buffer       = (unsigned char *)av_malloc(buf_size);
+    auto *buffer                  = (unsigned char *)av_malloc(buf_size);
     m_ic->pb                      = avio_alloc_context(buffer, buf_size, 0,
                                                       &m_readcontext,
                                                       AVFRingBuffer::AVF_Read_Packet,
@@ -913,8 +913,7 @@ void AvFormatDecoder::InitByteContext(bool forceseek)
 
 extern "C" void HandleStreamChange(void *data)
 {
-    AvFormatDecoder *decoder =
-        reinterpret_cast<AvFormatDecoder*>(data);
+    auto *decoder = reinterpret_cast<AvFormatDecoder*>(data);
 
     int cnt = decoder->m_ic->nb_streams;
 
@@ -1257,7 +1256,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         int minutes = ((int)total_secs / 60) - (hours * 60);
         double secs = (double)total_secs -
                       (double)(hours * 60 * 60 + minutes * 60);
-        long long framenum = (long long)(total_secs * m_fps);
+        auto framenum = (long long)(total_secs * m_fps);
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("Chapter %1 found @ [%2:%3:%4]->%5")
                 .arg(QString().sprintf("%02d", i + 1))
@@ -2581,7 +2580,7 @@ void AvFormatDecoder::SetupAudioStreamSubIndexes(int streamIndex)
     QMutexLocker locker(avcodeclock);
 
     // Find the position of the streaminfo in m_tracks[kTrackTypeAudio]
-    sinfo_vec_t::iterator current = m_tracks[kTrackTypeAudio].begin();
+    auto current = m_tracks[kTrackTypeAudio].begin();
     for (; current != m_tracks[kTrackTypeAudio].end(); ++current)
     {
         if (current->m_av_stream_index == streamIndex)
@@ -2598,7 +2597,7 @@ void AvFormatDecoder::SetupAudioStreamSubIndexes(int streamIndex)
     }
 
     // Remove the extra substream or duplicate the current substream
-    sinfo_vec_t::iterator next = current + 1;
+    auto next = current + 1;
     if (current->m_av_substream_index == -1)
     {
         // Split stream in two (Language I + Language II)
@@ -2658,7 +2657,7 @@ void AvFormatDecoder::RemoveAudioStreams()
 
 int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic, int flags)
 {
-    AvFormatDecoder *decoder = static_cast<AvFormatDecoder*>(c->opaque);
+    auto *decoder = static_cast<AvFormatDecoder*>(c->opaque);
     VideoFrameType type = PixelFormatToFrameType(c->pix_fmt);
     VideoFrameType* supported = decoder->GetPlayer()->DirectRenderFormats();
     bool found = false;
@@ -2710,8 +2709,8 @@ int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic, int flags)
     AVBufferRef *buffer = av_buffer_create(reinterpret_cast<uint8_t*>(frame), 0,
                             [](void* Opaque, uint8_t* Data)
                                 {
-                                    AvFormatDecoder *avfd = static_cast<AvFormatDecoder*>(Opaque);
-                                    VideoFrame *vf = reinterpret_cast<VideoFrame*>(Data);
+                                    auto *avfd = static_cast<AvFormatDecoder*>(Opaque);
+                                    auto *vf = reinterpret_cast<VideoFrame*>(Data);
                                     if (avfd && avfd->GetPlayer())
                                         avfd->GetPlayer()->DeLimboFrame(vf);
                                 }
@@ -3049,8 +3048,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
         {
             if (bufptr + 11 >= pkt->data + pkt->size)
                 continue; // not enough valid data...
-            const SequenceHeader *seq =
-                reinterpret_cast<const SequenceHeader*>(bufptr);
+            const auto *seq = reinterpret_cast<const SequenceHeader*>(bufptr);
 
             int  width  = static_cast<int>(seq->width())  >> context->lowres;
             int  height = static_cast<int>(seq->height()) >> context->lowres;
@@ -3214,7 +3212,7 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
             m_reordered_pts_detected = false;
 
             // fps debugging info
-            double avFPS = static_cast<double>(normalized_fps(stream, context));
+            auto avFPS = static_cast<double>(normalized_fps(stream, context));
             if ((seqFPS > avFPS + 0.01) || (seqFPS < avFPS - 0.01))
             {
                 LOG(VB_PLAYBACK, LOG_INFO, LOC +
@@ -3469,7 +3467,7 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt, boo
     {
         // MythTV logic expects that only one frame is processed
         // Save the packet for later and return.
-        AVPacket *newPkt = new AVPacket;
+        auto *newPkt = new AVPacket;
         memset(newPkt, 0, sizeof(AVPacket));
         av_init_packet(newPkt);
         av_packet_ref(newPkt, pkt);
@@ -3522,7 +3520,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
         }
     }
 
-    VideoFrame *frame = static_cast<VideoFrame*>(AvFrame->opaque);
+    auto *frame = static_cast<VideoFrame*>(AvFrame->opaque);
     if (frame)
         frame->directrendering = m_directrendering;
 
@@ -4157,8 +4155,8 @@ static vector<int> filter_lang(const sinfo_vec_t &tracks, int lang_key,
 {
     vector<int> ret;
 
-    vector<int>::const_iterator it = ftype.begin();
-    for (; it != ftype.end(); ++it)
+    auto it = ftype.cbegin();
+    for (; it != ftype.cend(); ++it)
     {
         if ((lang_key < 0) || tracks[*it].m_language == lang_key)
             ret.push_back(*it);
@@ -4188,8 +4186,8 @@ int AvFormatDecoder::filter_max_ch(const AVFormatContext *ic,
 {
     int selectedTrack = -1, max_seen = -1;
 
-    vector<int>::const_iterator it = fs.begin();
-    for (; it != fs.end(); ++it)
+    auto it = fs.cbegin();
+    for (; it != fs.cend(); ++it)
     {
         const int stream_index = tracks[*it].m_av_stream_index;
         AVCodecParameters *par = ic->streams[stream_index]->codecpar;

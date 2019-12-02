@@ -1799,7 +1799,7 @@ cCiMenu *cLlCiHandler::GetMenu(void)
 {
   cMutexLock MutexLock(&m_mutex);
   for (int Slot = 0; Slot < m_numSlots; Slot++) {
-      cCiMMI *mmi = dynamic_cast<cCiMMI *>(GetSessionByResourceId(RI_MMI, Slot));
+      auto *mmi = dynamic_cast<cCiMMI *>(GetSessionByResourceId(RI_MMI, Slot));
       if (mmi)
          return mmi->Menu();
       }
@@ -1810,7 +1810,7 @@ cCiEnquiry *cLlCiHandler::GetEnquiry(void)
 {
   cMutexLock MutexLock(&m_mutex);
   for (int Slot = 0; Slot < m_numSlots; Slot++) {
-      cCiMMI *mmi = dynamic_cast<cCiMMI *>(GetSessionByResourceId(RI_MMI, Slot));
+      auto *mmi = dynamic_cast<cCiMMI *>(GetSessionByResourceId(RI_MMI, Slot));
       if (mmi)
          return mmi->Enquiry();
       }

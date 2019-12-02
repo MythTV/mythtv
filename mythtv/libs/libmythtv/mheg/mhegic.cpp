@@ -165,7 +165,7 @@ MHInteractionChannel::GetFile(const QString &csPath, QByteArray &data,
 // signal from NetStream
 void MHInteractionChannel::slotFinished(QObject *obj)
 {
-    NetStream* p = dynamic_cast< NetStream* >(obj);
+    auto* p = dynamic_cast< NetStream* >(obj);
     if (!p)
         return;
 

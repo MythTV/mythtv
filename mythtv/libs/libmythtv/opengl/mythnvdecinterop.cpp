@@ -46,10 +46,10 @@ void MythNVDECInterop::DeleteTextures(void)
         for ( ; it != m_openglTextures.constEnd(); ++it)
         {
             vector<MythVideoTexture*> textures = it.value();
-            vector<MythVideoTexture*>::iterator it2 = textures.begin();
+            auto it2 = textures.begin();
             for ( ; it2 != textures.end(); ++it2)
             {
-                QPair<CUarray,CUgraphicsResource> *data = reinterpret_cast<QPair<CUarray,CUgraphicsResource>*>((*it2)->m_data);
+                auto *data = reinterpret_cast<QPair<CUarray,CUgraphicsResource>*>((*it2)->m_data);
                 if (data && data->second)
                     CUDA_CHECK(m_cudaFuncs, cuGraphicsUnregisterResource(data->second));
                 delete data;
@@ -139,7 +139,7 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
         return result;
     }
 
-    CUdeviceptr cudabuffer = reinterpret_cast<CUdeviceptr>(Frame->buf);
+    auto cudabuffer = reinterpret_cast<CUdeviceptr>(Frame->buf);
     if (!cudabuffer)
         return result;
 
@@ -208,10 +208,10 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
         }
         else
         {
-            vector<MythVideoTexture*>::iterator it = textures.begin();
+            auto it = textures.begin();
             for ( ; it != textures.end(); ++it)
             {
-                QPair<CUarray,CUgraphicsResource> *data = reinterpret_cast<QPair<CUarray,CUgraphicsResource>*>((*it)->m_data);
+                auto *data = reinterpret_cast<QPair<CUarray,CUgraphicsResource>*>((*it)->m_data);
                 if (data && data->second)
                     CUDA_CHECK(m_cudaFuncs, cuGraphicsUnregisterResource(data->second));
                 delete data;
@@ -236,7 +236,7 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
     result = m_openglTextures[cudabuffer];
     for (uint i = 0; i < result.size(); ++i)
     {
-        QPair<CUarray,CUgraphicsResource> *data = reinterpret_cast<QPair<CUarray,CUgraphicsResource>*>(result[i]->m_data);
+        auto *data = reinterpret_cast<QPair<CUarray,CUgraphicsResource>*>(result[i]->m_data);
         CUDA_MEMCPY2D cpy;
         memset(&cpy, 0, sizeof(cpy));
         cpy.srcMemoryType = CU_MEMORYTYPE_DEVICE;

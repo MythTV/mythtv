@@ -273,7 +273,7 @@ DiSEqCDevTree *DiSEqCDevTrees::FindTree(uint cardid)
     if (it != m_trees.end())
         return *it;
 
-    DiSEqCDevTree *tree = new DiSEqCDevTree;
+    auto *tree = new DiSEqCDevTree;
     tree->Load(cardid);
     m_trees[cardid] = tree;
 
@@ -1082,7 +1082,7 @@ DiSEqCDevSwitch::DiSEqCDevSwitch(DiSEqCDevTree &tree, uint devid)
 
 DiSEqCDevSwitch::~DiSEqCDevSwitch()
 {
-    dvbdev_vec_t::iterator it = m_children.begin();
+    auto it = m_children.begin();
     for (; it != m_children.end(); ++it)
     {
         if (*it)
@@ -1152,7 +1152,7 @@ void DiSEqCDevSwitch::Reset(void)
     m_lastPos = (uint) -1;
     m_lastHighBand = (uint) -1;
     m_lastHorizontal = (uint) -1;
-    dvbdev_vec_t::iterator it = m_children.begin();
+    auto it = m_children.begin();
     for (; it != m_children.end(); ++it)
     {
         if (*it)
@@ -1227,7 +1227,7 @@ uint DiSEqCDevSwitch::GetVoltage(const DiSEqCDevSettings &settings,
 bool DiSEqCDevSwitch::Load(void)
 {
     // clear old children
-    dvbdev_vec_t::iterator it = m_children.begin();
+    auto it = m_children.begin();
     for (; it != m_children.end(); ++it)
     {
         if (*it)
@@ -2153,7 +2153,7 @@ bool DiSEqCDevSCR::Execute(const DiSEqCDevSettings &settings, const DTVMultiplex
     uint t = (frequency / 1000 + m_scrFrequency + 2) / 4 - 350;
 
     // retrieve position settings (value should be 0 or 1)
-    dvbdev_pos_t scr_position = (dvbdev_pos_t)int(settings.GetValue(GetDeviceID()));
+    auto scr_position = (dvbdev_pos_t)int(settings.GetValue(GetDeviceID()));
 
     // check parameters
     if (m_scrUserband > 8)

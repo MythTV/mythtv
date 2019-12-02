@@ -149,8 +149,7 @@ QString MultipleStringStructure::Uncompressed(
         // Standard Compression Scheme for Unicode (SCSU)
         str=QString("TODO SCSU encoding");
     } else if (mode==0x3f) { //  Unicode, UTF-16 Form
-        const unsigned short* ustr =
-            reinterpret_cast<const unsigned short*>(buf);
+        const auto* ustr = reinterpret_cast<const unsigned short*>(buf);
         for (int j=0; j<(len>>1); j++)
             str.append( QChar( (ustr[j]<<8) | (ustr[j]>>8) ) );
     } else if (0x40<=mode && mode<=0x41)

@@ -28,7 +28,7 @@ void AudioPlayer::addVisual(MythTV::Visual *vis)
         return;
 
     QMutexLocker lock(&m_lock);
-    Visuals::iterator it = std::find(m_visuals.begin(), m_visuals.end(), vis);
+    auto it = std::find(m_visuals.begin(), m_visuals.end(), vis);
     if (it == m_visuals.end())
     {
         m_visuals.push_back(vis);
@@ -42,7 +42,7 @@ void AudioPlayer::removeVisual(MythTV::Visual *vis)
         return;
 
     QMutexLocker lock(&m_lock);
-    Visuals::iterator it = std::find(m_visuals.begin(), m_visuals.end(), vis);
+    auto it = std::find(m_visuals.begin(), m_visuals.end(), vis);
     if (it != m_visuals.end())
     {
         m_visuals.erase(it);

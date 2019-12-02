@@ -74,7 +74,7 @@ static void vbi_event(struct VBIData *data, struct vt_event *ev)
     {
        case EV_PAGE:
        {
-            struct vt_page *vtp = (struct vt_page *) ev->p1;
+            auto *vtp = (struct vt_page *) ev->p1;
             if (vtp->flags & PG_SUBTITLE)
             {
 #if 0

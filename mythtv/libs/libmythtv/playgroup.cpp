@@ -277,8 +277,8 @@ PlayGroupEditor::PlayGroupEditor()
 void PlayGroupEditor::CreateNewPlayBackGroup()
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythTextInputDialog *settingdialog =
-        new MythTextInputDialog(popupStack, tr("Enter new group name"));
+    auto *settingdialog = new MythTextInputDialog(popupStack,
+                                                  tr("Enter new group name"));
 
     if (settingdialog->Create())
     {

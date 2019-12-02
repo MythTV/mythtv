@@ -183,7 +183,7 @@ bool CardUtil::IsCableCardPresent(uint inputid,
         url.setPath("/get_var.json");
         url.setQuery(params);
 
-        QNetworkRequest *request = new QNetworkRequest();
+        auto *request = new QNetworkRequest();
         request->setAttribute(QNetworkRequest::CacheLoadControlAttribute,
                               QNetworkRequest::AlwaysNetwork);
         request->setUrl(url);

@@ -607,15 +607,15 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
 void release_nuppel_buffer(void *opaque, uint8_t *data)
 {
-    VideoFrame *frame = (VideoFrame*)data;
-    NuppelDecoder *nd = (NuppelDecoder*)opaque;
+    auto *frame = (VideoFrame*)data;
+    auto *nd = (NuppelDecoder*)opaque;
     if (nd && nd->GetPlayer())
         nd->GetPlayer()->DeLimboFrame(frame);
 }
 
 int get_nuppel_buffer(struct AVCodecContext *c, AVFrame *pic, int /*flags*/)
 {
-    NuppelDecoder *nd = (NuppelDecoder *)(c->opaque);
+    auto *nd = (NuppelDecoder *)(c->opaque);
 
     int i;
 
@@ -977,7 +977,7 @@ long NuppelDecoder::UpdateStoredFrameNum(long framenum)
 {
     long sync_offset = 0;
 
-    list<RawDataList*>::iterator it = m_storedData.begin();
+    auto it = m_storedData.begin();
     for ( ; it != m_storedData.end(); ++it)
     {
         RawDataList *data = *it;

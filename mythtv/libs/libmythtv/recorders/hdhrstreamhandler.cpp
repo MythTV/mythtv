@@ -38,8 +38,7 @@ HDHRStreamHandler *HDHRStreamHandler::Get(const QString &devname,
 
     if (it == s_handlers.end())
     {
-        HDHRStreamHandler *newhandler = new HDHRStreamHandler(devname, inputid,
-                                                              majorid);
+        auto *newhandler = new HDHRStreamHandler(devname, inputid, majorid);
         newhandler->Open();
         s_handlers[majorid] = newhandler;
         s_handlers_refcnt[majorid] = 1;

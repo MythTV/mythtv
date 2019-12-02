@@ -368,7 +368,7 @@ void MythCCExtractorPlayer::Process608Captions(uint flags)
             if (!(*cc608it).srtwriters[idx])
             {
                 int langCode = 0;
-                AvFormatDecoder *avd = dynamic_cast<AvFormatDecoder *>(decoder);
+                auto *avd = dynamic_cast<AvFormatDecoder *>(decoder);
                 if (avd)
                     langCode = avd->GetCaptionLanguage(
                         kTrackTypeCC608, idx + 1);
@@ -495,7 +495,7 @@ void MythCCExtractorPlayer::Process708Captions(uint flags)
             if (!(*cc708it).srtwriters[idx])
             {
                 int langCode = 0;
-                AvFormatDecoder *avd = dynamic_cast<AvFormatDecoder*>(decoder);
+                auto *avd = dynamic_cast<AvFormatDecoder*>(decoder);
                 if (avd)
                     langCode = avd->GetCaptionLanguage(kTrackTypeCC708, idx);
 
@@ -596,7 +596,7 @@ void MythCCExtractorPlayer::ProcessTeletext(uint flags)
             if (!(*ttxit).srtwriters[page])
             {
                 int langCode = 0;
-                AvFormatDecoder *avd = dynamic_cast<AvFormatDecoder *>(decoder);
+                auto *avd = dynamic_cast<AvFormatDecoder *>(decoder);
 
                 if (avd)
                     langCode = avd->GetTeletextLanguage(page);
@@ -741,7 +741,7 @@ void MythCCExtractorPlayer::ProcessDVBSubtitles(uint flags)
     for (; subit != m_dvbsub_info.end(); ++subit)
     {
         int langCode = 0;
-        AvFormatDecoder *avd = dynamic_cast<AvFormatDecoder *>(decoder);
+        auto *avd = dynamic_cast<AvFormatDecoder *>(decoder);
         int idx = subit.key();
         if (avd)
             langCode = avd->GetSubtitleLanguage(subtitleStreamCount, idx);

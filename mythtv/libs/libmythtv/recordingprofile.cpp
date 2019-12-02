@@ -342,8 +342,7 @@ class MPEG2AudioBitrateSettings : public GroupSetting
 
         setLabel(QObject::tr("Bitrate Settings"));
 
-        MPEG2audType *audType = new MPEG2audType(
-            parent, layer1, layer2, layer3);
+        auto *audType = new MPEG2audType(parent, layer1, layer2, layer3);
 
         addChild(audType);
 
@@ -952,7 +951,7 @@ class VideoCompressionSettings : public GroupSetting
         m_codecName->addTargetedChild(label, new PeakBitrate(m_parent));
 
         label = "MPEG-4 AVC Hardware Encoder";
-        GroupSetting *h0 = new GroupSetting();
+        auto *h0 = new GroupSetting();
         h0->setLabel(QObject::tr("Low Resolution"));
         h0->addChild(new AverageBitrate(m_parent, "low_mpeg4avgbitrate",
                                         1000, 13500, 4500, 500));
@@ -960,7 +959,7 @@ class VideoCompressionSettings : public GroupSetting
                                      1100, 20200, 6000, 500));
         m_codecName->addTargetedChild(label, h0);
 
-        GroupSetting *h1 = new GroupSetting();
+        auto *h1 = new GroupSetting();
         h1->setLabel(QObject::tr("Medium Resolution"));
         h1->addChild(new AverageBitrate(m_parent, "medium_mpeg4avgbitrate",
                                         1000, 13500, 9000, 500));
@@ -968,7 +967,7 @@ class VideoCompressionSettings : public GroupSetting
                                      1100, 20200, 11000, 500));
         m_codecName->addTargetedChild(label, h1);
 
-        GroupSetting *h2 = new GroupSetting();
+        auto *h2 = new GroupSetting();
         h2->setLabel(QObject::tr("High Resolution"));
         h2->addChild(new AverageBitrate(m_parent, "high_mpeg4avgbitrate",
                                             1000, 13500, 13500, 500));
@@ -1004,9 +1003,9 @@ class VideoCompressionSettings : public GroupSetting
                 QStringList::iterator Icodec = m_v4l2codecs.begin();
                 for ( ; Icodec < m_v4l2codecs.end(); ++Icodec)
                 {
-                    GroupSetting* bit_low    = new GroupSetting();
-                    GroupSetting* bit_medium = new GroupSetting();
-                    GroupSetting* bit_high   = new GroupSetting();
+                    auto* bit_low    = new GroupSetting();
+                    auto* bit_medium = new GroupSetting();
+                    auto* bit_high   = new GroupSetting();
                     bool dynamic_res = !v4l2->UserAdjustableResolution();
 
                     for (auto Iopt = options.begin() ; Iopt != options.end(); ++Iopt)
@@ -1663,8 +1662,7 @@ RecordingProfileEditor::RecordingProfileEditor(int id, QString profName) :
 void RecordingProfileEditor::Load(void)
 {
     clearSettings();
-    ButtonStandardSetting *newProfile =
-        new ButtonStandardSetting(tr("(Create new profile)"));
+    auto *newProfile = new ButtonStandardSetting(tr("(Create new profile)"));
     connect(newProfile, SIGNAL(clicked()), SLOT(ShowNewProfileDialog()));
     addChild(newProfile);
     RecordingProfile::fillSelections(this, m_group);
@@ -1674,8 +1672,7 @@ void RecordingProfileEditor::Load(void)
 void RecordingProfileEditor::ShowNewProfileDialog()
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythTextInputDialog *settingdialog =
-        new MythTextInputDialog(popupStack,
+    auto *settingdialog = new MythTextInputDialog(popupStack,
                                 tr("Enter the name of the new profile"));
 
     if (settingdialog->Create())
@@ -1722,7 +1719,7 @@ void RecordingProfileEditor::CreateNewProfile(const QString& profName)
        {
            if (query.next())
            {
-               RecordingProfile* profile = new RecordingProfile(profName);
+               auto* profile = new RecordingProfile(profName);
 
                profile->loadByID(query.value(0).toInt());
                profile->setCodecTypes();
@@ -1740,7 +1737,7 @@ void RecordingProfile::fillSelections(GroupSetting *setting, int group,
     {
        for (uint i = 0; !availProfiles[i].isEmpty(); i++)
        {
-           GroupSetting *profile = new GroupSetting();
+           auto *profile = new GroupSetting();
            profile->setLabel(availProfiles[i]);
            setting->addChild(profile);
        }
@@ -1768,7 +1765,7 @@ void RecordingProfile::fillSelections(GroupSetting *setting, int group,
     if (group == RecordingProfile::TranscoderGroup && foldautodetect)
     {
         QString id = QString::number(RecordingProfile::TranscoderAutodetect);
-        GroupSetting *profile = new GroupSetting();
+        auto *profile = new GroupSetting();
         profile->setLabel(QObject::tr("Autodetect"));
         setting->addChild(profile);
     }
@@ -1784,7 +1781,7 @@ void RecordingProfile::fillSelections(GroupSetting *setting, int group,
             {
                 if (!foldautodetect)
                 {
-                    RecordingProfile *profile =
+                    auto *profile =
                         new RecordingProfile(QObject::tr("Autodetect from %1")
                                              .arg(name));
                     profile->loadByID(id.toInt());
@@ -1794,7 +1791,7 @@ void RecordingProfile::fillSelections(GroupSetting *setting, int group,
             }
             else
             {
-                RecordingProfile *profile = new RecordingProfile(name);
+                auto *profile = new RecordingProfile(name);
                 profile->loadByID(id.toInt());
                 profile->setCodecTypes();
                 setting->addChild(profile);
@@ -1802,7 +1799,7 @@ void RecordingProfile::fillSelections(GroupSetting *setting, int group,
             continue;
         }
 
-        RecordingProfile *profile = new RecordingProfile(name);
+        auto *profile = new RecordingProfile(name);
         profile->loadByID(id.toInt());
         profile->setCodecTypes();
         setting->addChild(profile);

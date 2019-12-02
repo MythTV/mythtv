@@ -229,7 +229,7 @@ void VideoBuffers::SetDeinterlacing(MythDeintType Single, MythDeintType Double,
                                     MythCodecID CodecID)
 {
     QMutexLocker locker(&m_globalLock);
-    frame_vector_t::iterator it = m_buffers.begin();
+    auto it = m_buffers.begin();
     for ( ; it != m_buffers.end(); ++it)
         SetDeinterlacingFlags(*it, Single, Double, CodecID);
 }
@@ -306,7 +306,7 @@ void VideoBuffers::ReleaseDecoderResources(VideoFrame *Frame)
 {
     if (format_is_hw(Frame->codec))
     {
-        AVBufferRef* ref = reinterpret_cast<AVBufferRef*>(Frame->priv[0]);
+        auto* ref = reinterpret_cast<AVBufferRef*>(Frame->priv[0]);
         if (ref != nullptr)
             av_buffer_unref(&ref);
         Frame->buf = Frame->priv[0] = nullptr;
@@ -456,7 +456,7 @@ void VideoBuffers::DoneDisplayingFrame(VideoFrame *Frame)
 
     // check if any finished frames are no longer used by decoder and return to available
     frame_queue_t ula(m_finished);
-    frame_queue_t::iterator it = ula.begin();
+    auto it = ula.begin();
     for (; it != ula.end(); ++it)
     {
         if (!m_decode.contains(*it))
@@ -743,7 +743,7 @@ void VideoBuffers::DiscardFrames(bool NextFrameIsKeyFrame)
     if (!NextFrameIsKeyFrame)
     {
         frame_queue_t ula(m_used);
-        frame_queue_t::iterator it = ula.begin();
+        auto it = ula.begin();
         for (; it != ula.end(); ++it)
             DiscardFrame(*it);
         LOG(VB_PLAYBACK, LOG_INFO,
@@ -1061,7 +1061,7 @@ map<const VideoFrame *, int> dbg_str;
 
 static int DebugNum(const VideoFrame *Frame)
 {
-    map<const VideoFrame *, int>::iterator it = dbg_str.find(Frame);
+    auto it = dbg_str.find(Frame);
     if (it == dbg_str.end())
         return dbg_str[Frame] = next_dbg_str++;
     return it->second;
@@ -1082,8 +1082,8 @@ const QString& DebugString(uint FrameNum, bool Short)
 static unsigned long long to_bitmap(const frame_queue_t& Queue, int Num)
 {
     unsigned long long bitmap = 0;
-    frame_queue_t::const_iterator it = Queue.begin();
-    for (; it != Queue.end(); ++it)
+    auto it = Queue.cbegin();
+    for (; it != Queue.cend(); ++it)
     {
         int shift = DebugNum(*it) % Num;
         bitmap |= 1ULL << shift;

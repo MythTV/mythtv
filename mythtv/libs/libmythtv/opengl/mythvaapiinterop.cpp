@@ -157,7 +157,7 @@ VASurfaceID MythVAAPIInterop::VerifySurface(MythRenderOpenGL *Context, VideoFram
     }
 
     // Retrieve surface
-    VASurfaceID id = static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(Frame->buf));
+    auto id = static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(Frame->buf));
     if (id)
         result = id;
     return result;
@@ -322,7 +322,7 @@ VASurfaceID MythVAAPIInterop::Deinterlace(VideoFrame *Frame, VASurfaceID Current
 
         if (deinterlacer != DEINT_NONE)
         {
-            AVBufferRef* frames = reinterpret_cast<AVBufferRef*>(Frame->priv[1]);
+            auto* frames = reinterpret_cast<AVBufferRef*>(Frame->priv[1]);
             if (!frames)
                 break;
 
@@ -330,10 +330,10 @@ VASurfaceID MythVAAPIInterop::Deinterlace(VideoFrame *Frame, VASurfaceID Current
             if (!hwdeviceref)
                 break;
 
-            AVHWDeviceContext* hwdevicecontext  = reinterpret_cast<AVHWDeviceContext*>(hwdeviceref->data);
+            auto* hwdevicecontext  = reinterpret_cast<AVHWDeviceContext*>(hwdeviceref->data);
             hwdevicecontext->free = [](AVHWDeviceContext* /*unused*/) { LOG(VB_PLAYBACK, LOG_INFO, LOC + "VAAPI VPP device context finished"); };
 
-            AVVAAPIDeviceContext *vaapidevicectx = reinterpret_cast<AVVAAPIDeviceContext*>(hwdevicecontext->hwctx);
+            auto *vaapidevicectx = reinterpret_cast<AVVAAPIDeviceContext*>(hwdevicecontext->hwctx);
             vaapidevicectx->display = m_vaDisplay; // re-use the existing display
 
             if (av_hwdevice_ctx_init(hwdeviceref) < 0)
@@ -351,8 +351,8 @@ VASurfaceID MythVAAPIInterop::Deinterlace(VideoFrame *Frame, VASurfaceID Current
                 break;
             }
 
-            AVHWFramesContext* dstframes = reinterpret_cast<AVHWFramesContext*>(newframes->data);
-            AVHWFramesContext* srcframes = reinterpret_cast<AVHWFramesContext*>(frames->data);
+            auto* dstframes = reinterpret_cast<AVHWFramesContext*>(newframes->data);
+            auto* srcframes = reinterpret_cast<AVHWFramesContext*>(frames->data);
 
             m_filterWidth = srcframes->width;
             m_filterHeight = srcframes->height;
