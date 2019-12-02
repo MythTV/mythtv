@@ -2649,7 +2649,7 @@ ccache="yes"
 distcc="yes"
 qmake_default="qmake"
 qmakespecs_default=""
-python_default="python"
+python_default="python3"
 
 #Bluray
 bdj_type="j2se"
@@ -5888,7 +5888,7 @@ if enabled libbluray_external; then
                 . /etc/os-release
                 case $ID in
                     centos)
-                        if test $VERSION_ID -gt 7; then
+                        if test $VERSION_ID -gt 8; then
                             die "ERROR: can not find libbluray."
                         fi
                         ;;

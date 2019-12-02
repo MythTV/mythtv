@@ -30,6 +30,7 @@ class MTV_PUBLIC SourceUtil
     static bool    IsUnscanable(uint sourceid);
     static bool    IsCableCardPresent(uint sourceid);
     static bool    IsAnySourceScanable(void);
+    static bool    IsSourceIDValid(uint sourceid);
     static bool    UpdateChannelsFromListings(
         uint sourceid, const QString& inputtype = QString(), bool wait = false);
 
