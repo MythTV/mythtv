@@ -51,10 +51,14 @@ class AutoDeleteDeque
     iterator end(void)               { return m_list.end();   }
     const_iterator begin(void) const { return m_list.begin(); }
     const_iterator end(void)   const { return m_list.end();   }
+    const_iterator cbegin(void) const { return m_list.begin(); }
+    const_iterator cend(void)   const { return m_list.end();   }
     reverse_iterator rbegin(void)             { return m_list.rbegin(); }
     reverse_iterator rend(void)               { return m_list.rend();   }
     const_reverse_iterator rbegin(void) const { return m_list.rbegin(); }
     const_reverse_iterator rend(void)   const { return m_list.rend();   }
+    const_reverse_iterator crbegin(void) const { return m_list.rbegin(); }
+    const_reverse_iterator crend(void)   const { return m_list.rend();   }
 
     T back(void)                     { return m_list.back();  }
     const T back(void)         const { return m_list.back();  }

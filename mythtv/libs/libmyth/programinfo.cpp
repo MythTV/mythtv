@@ -589,8 +589,8 @@ ProgramInfo::ProgramInfo(
     if (m_originalAirDate.isValid() && m_originalAirDate < QDate(1940, 1, 1))
         m_originalAirDate = QDate();
 
-    ProgramList::const_iterator it = schedList.begin();
-    for (; it != schedList.end(); ++it)
+    auto it = schedList.cbegin();
+    for (; it != schedList.cend(); ++it)
     {
         // If this showing is scheduled to be recorded, then we need to copy
         // some of the information from the scheduler
