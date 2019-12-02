@@ -43,12 +43,12 @@ if( (x) >= 0 ) { \
     (x) = -1; \
 }
 
-typedef struct
+struct FDType_t
 {
     MythSystemLegacyUnix *m_ms;
     int                   m_type;
-} FDType_t;
-typedef QMap<int, FDType_t*> FDMap_t;
+};
+using FDMap_t = QMap<int, FDType_t*>;
 
 /**********************************
  * MythSystemLegacyManager method defines
@@ -450,7 +450,7 @@ void MythSystemLegacyManager::append(MythSystemLegacyUnix *ms)
 
     if( ms->GetSetting("UseStdout") )
     {
-        FDType_t *fdType = new FDType_t;
+        auto *fdType = new FDType_t;
         fdType->m_ms = ms;
         fdType->m_type = 1;
         fdLock.lock();
@@ -461,7 +461,7 @@ void MythSystemLegacyManager::append(MythSystemLegacyUnix *ms)
 
     if( ms->GetSetting("UseStderr") )
     {
-        FDType_t *fdType = new FDType_t;
+        auto *fdType = new FDType_t;
         fdType->m_ms = ms;
         fdType->m_type = 2;
         fdLock.lock();

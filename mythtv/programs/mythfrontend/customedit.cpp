@@ -135,9 +135,8 @@ void CustomEdit::loadData(void)
 
             // No memory leak. MythUIButtonListItem adds the new item
             // into m_ruleList.
-            MythUIButtonListItem *item =
-                new MythUIButtonListItem(m_ruleList, rule.title,
-                                         qVariantFromValue(rule));
+            auto *item = new MythUIButtonListItem(m_ruleList, rule.title,
+                                                  qVariantFromValue(rule));
 
             if (trimTitle == m_baseTitle ||
                 result.value(0).toUInt() == m_pginfo->GetRecordingRuleID())
@@ -647,9 +646,9 @@ void CustomEdit::testClicked(void)
     }
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    ProgLister *pl = new ProgLister(mainStack, plSQLSearch,
-                                    evaluate(m_descriptionEdit->GetText()),
-                                    m_subtitleEdit->GetText());
+    auto *pl = new ProgLister(mainStack, plSQLSearch,
+                              evaluate(m_descriptionEdit->GetText()),
+                              m_subtitleEdit->GetText());
     if (pl->Create())
     {
         mainStack->AddScreen(pl);
@@ -676,7 +675,7 @@ void CustomEdit::recordClicked(void)
     if (!checkSyntax())
         return;
 
-    RecordingRule *record = new RecordingRule();
+    auto *record = new RecordingRule();
 
     MythUIButtonListItem* item = m_ruleList->GetItemCurrent();
     CustomRuleInfo rule = item->GetData().value<CustomRuleInfo>();
@@ -697,7 +696,7 @@ void CustomEdit::recordClicked(void)
     }
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    ScheduleEditor *schededit = new ScheduleEditor(mainStack, record);
+    auto *schededit = new ScheduleEditor(mainStack, record);
     if (schededit->Create())
     {
         mainStack->AddScreen(schededit);
@@ -734,8 +733,7 @@ void CustomEdit::storeClicked(void)
     msg += m_descriptionEdit->GetText();
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    MythDialogBox *storediag = new MythDialogBox(msg, mainStack,
-                                                 "storePopup", true);
+    auto *storediag = new MythDialogBox(msg, mainStack, "storePopup", true);
 
     storediag->SetReturnEvent(this, "storeruledialog");
     if (storediag->Create())
@@ -810,7 +808,7 @@ bool CustomEdit::checkSyntax(void)
     {
         MythScreenStack *popupStack = GetMythMainWindow()->
                                               GetStack("popup stack");
-        MythConfirmationDialog *checkSyntaxPopup =
+        auto *checkSyntaxPopup =
                new MythConfirmationDialog(popupStack, msg, false);
 
         if (checkSyntaxPopup->Create())
@@ -902,7 +900,7 @@ void CustomEdit::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
+        auto *dce = (DialogCompletionEvent*)(event);
 
         QString resultid   = dce->GetId();
         QString resulttext = dce->GetResultText();

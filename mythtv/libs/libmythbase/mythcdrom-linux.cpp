@@ -31,13 +31,13 @@
 // Some features cannot be detected (reliably) using the standard
 // Linux ioctl()s, so we use some direct low-level device queries.
 
-typedef struct cdrom_generic_command CDROMgenericCmd;
+using CDROMgenericCmd = struct cdrom_generic_command;
 
 // Some structures stolen from the __KERNEL__ section of linux/cdrom.h.
 
 // This contains the result of a GPCMD_GET_EVENT_STATUS_NOTIFICATION.
 // It is the joining of a struct event_header and a struct media_event_desc
-typedef struct
+struct CDROMeventStatus
 {
     uint16_t m_dataLen[2];
 #if HAVE_BIGENDIAN
@@ -65,10 +65,10 @@ typedef struct
 #endif
     uint8_t  m_startSlot;
     uint8_t  m_endSlot;
-} CDROMeventStatus;
+};
 
 // and this is returned by GPCMD_READ_DISC_INFO
-typedef struct {
+struct CDROMdiscInfo {
     uint16_t m_discInformationLength;
 #if HAVE_BIGENDIAN
     uint8_t  m_reserved1         : 3;
@@ -106,7 +106,7 @@ typedef struct {
     uint8_t  m_discBarCode[8];
     uint8_t  m_reserved3;
     uint8_t  m_nOpc;
-} CDROMdiscInfo;
+};
 
 enum CDROMdiscStatus
 {
@@ -207,7 +207,7 @@ bool MythCDROMLinux::hasWritableMedia()
         return false;
     }
 
-    CDROMdiscInfo *di = (CDROMdiscInfo *) buffer;
+    auto *di = (CDROMdiscInfo *) buffer;
     switch (di->m_discStatus)
     {
         case MEDIA_IS_EMPTY:
@@ -252,7 +252,7 @@ int MythCDROMLinux::SCSIstatus()
     cgc.buflen = sizeof(buffer);
     cgc.data_direction = CGC_DATA_READ;
 
-    CDROMeventStatus *es = (CDROMeventStatus *) buffer;
+    auto *es = (CDROMeventStatus *) buffer;
 
     if ((ioctl(m_DeviceHandle, CDROM_SEND_PACKET, &cgc) < 0)
         || es->m_nea                         // drive does not support request

@@ -138,7 +138,7 @@ void VideoSelector::ShowMenu()
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    MythDialogBox *menuPopup = new MythDialogBox(tr("Menu"), popupStack, "actionmenu");
+    auto *menuPopup = new MythDialogBox(tr("Menu"), popupStack, "actionmenu");
 
     if (menuPopup->Create())
         popupStack->AddScreen(menuPopup);
@@ -155,7 +155,7 @@ void VideoSelector::selectAll()
          m_selectedList.takeFirst();
     m_selectedList.clear();
 
-    vector<VideoInfo *>::iterator i = m_videoList->begin();
+    auto i = m_videoList->begin();
     for ( ; i != m_videoList->end(); ++i)
     {
         VideoInfo *v = *i;
@@ -195,7 +195,7 @@ void VideoSelector::toggleSelected(MythUIButtonListItem *item)
 
 void VideoSelector::titleChanged(MythUIButtonListItem *item)
 {
-    VideoInfo *v = item->GetData().value<VideoInfo *>();
+    auto *v = item->GetData().value<VideoInfo *>();
 
     if (!v)
         return;
@@ -291,7 +291,7 @@ void VideoSelector::OKPressed()
     for (int x = 0; x < m_selectedList.size(); x++)
     {
         VideoInfo *v = m_selectedList.at(x);
-        ArchiveItem *a = new ArchiveItem;
+        auto *a = new ArchiveItem;
         a->type = "Video";
         a->title = v->title;
         a->subtitle = "";
@@ -333,7 +333,7 @@ void VideoSelector::updateVideoList(void)
 
     if (m_categorySelector)
     {
-        vector<VideoInfo *>::iterator i = m_videoList->begin();
+        auto i = m_videoList->begin();
         for ( ; i != m_videoList->end(); ++i)
         {
             VideoInfo *v = *i;
@@ -343,8 +343,8 @@ void VideoSelector::updateVideoList(void)
             {
                 if (v->parentalLevel <= m_currentParentalLevel)
                 {
-                    MythUIButtonListItem* item = new MythUIButtonListItem(
-                            m_videoButtonList, v->title);
+                    auto* item = new MythUIButtonListItem(m_videoButtonList,
+                                                          v->title);
                     item->setCheckable(true);
                     if (m_selectedList.indexOf(v) != -1)
                     {
@@ -381,7 +381,7 @@ void VideoSelector::updateVideoList(void)
 vector<VideoInfo *> *VideoSelector::getVideoListFromDB(void)
 {
     // get a list of category's
-    typedef QMap<int, QString> CategoryMap;
+    using CategoryMap = QMap<int, QString>;
     CategoryMap categoryMap;
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT intid, category FROM videocategory");
@@ -402,7 +402,7 @@ vector<VideoInfo *> *VideoSelector::getVideoListFromDB(void)
 
     if (query.exec() && query.size())
     {
-        vector<VideoInfo*> *videoList = new vector<VideoInfo*>;
+        auto *videoList = new vector<VideoInfo*>;
         QString artist, genre, episode;
         while (query.next())
         {
@@ -411,7 +411,7 @@ vector<VideoInfo *> *VideoSelector::getVideoListFromDB(void)
             if (filename.endsWith(".iso") || filename.endsWith(".ISO"))
                 continue;
 
-            VideoInfo *info = new VideoInfo;
+            auto *info = new VideoInfo;
 
             info->id = query.value(0).toInt();
             if (query.value(9).toInt() > 0)
@@ -488,7 +488,7 @@ void VideoSelector::getVideoList(void)
 
     if (m_videoList && !m_videoList->empty())
     {
-        vector<VideoInfo *>::iterator i = m_videoList->begin();
+        auto i = m_videoList->begin();
         for ( ; i != m_videoList->end(); ++i)
         {
             VideoInfo *v = *i;

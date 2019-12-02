@@ -11,7 +11,7 @@
 #include "mythdirs.h"
 #include "mythcorecontext.h"
 
-typedef QMap<QString, QTranslator*> TransMap;
+using TransMap = QMap<QString, QTranslator*>;
 
 class MythTranslationPrivate
 {
@@ -55,7 +55,7 @@ void MythTranslation::load(const QString &module_name)
         lang = "en_us";
     }
 
-    QTranslator *trans = new QTranslator(nullptr);
+    auto *trans = new QTranslator(nullptr);
     if (trans->load(GetTranslationsDir() + module_name
                     + "_" + lang + ".qm", "."))
     {

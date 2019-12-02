@@ -76,7 +76,7 @@ MythVideoOutput *MythVideoOutput::Create(const QString &Decoder,    MythCodecID 
 
     QString renderer;
 
-    VideoDisplayProfile *vprof = new VideoDisplayProfile();
+    auto *vprof = new VideoDisplayProfile();
 
     if (!renderers.empty())
     {
@@ -253,21 +253,7 @@ MythVideoOutput *MythVideoOutput::Create(const QString &Decoder,    MythCodecID 
  *        Init(int,int,float,WId,int,int,int,int,WId) call.
  */
 MythVideoOutput::MythVideoOutput()
-  : m_display(nullptr),
-    m_dbDisplayDimensionsMM(0,0),
-    m_dbAspectOverride(kAspect_Off),
-    m_dbAdjustFill(kAdjustFill_Off),
-    m_dbLetterboxColour(kLetterBoxColour_Black),
-    m_videoCodecID(kCodec_NONE),
-    m_maxReferenceFrames(16),
-    m_dbDisplayProfile(nullptr),
-    m_errorState(kError_None),
-    m_framesPlayed(0),
-    m_monitorSize(640,480),
-    m_monitorDimensions(400,300),
-    m_visual(nullptr),
-    m_stereo(kStereoscopicModeNone),
-    m_deinterlacer()
+  : m_display(nullptr)
 {
     m_dbDisplayDimensionsMM = QSize(gCoreContext->GetNumSetting("DisplaySizeWidth",  0),
                                     gCoreContext->GetNumSetting("DisplaySizeHeight", 0));
@@ -405,8 +391,8 @@ void MythVideoOutput::VideoAspectRatioChanged(float VideoAspect)
  */
 bool MythVideoOutput::InputChanged(const QSize &VideoDim, const QSize &VideoDispDim,
                                    float VideoAspect, MythCodecID  CodecID,
-                                   bool  &/*AspectOnly*/, MythMultiLocker*,
-                                   int   ReferenceFrames, bool)
+                                   bool  &/*AspectOnly*/, MythMultiLocker* /*Locks*/,
+                                   int   ReferenceFrames, bool /*ForceChange*/)
 {
     m_window.InputChanged(VideoDim, VideoDispDim, VideoAspect);
     m_maxReferenceFrames = ReferenceFrames;
@@ -475,7 +461,7 @@ QRect MythVideoOutput::GetVisibleOSDBounds(float &VisibleAspect,
     float ova = m_window.GetOverridenVideoAspect();
     QRect vr = m_window.GetVideoRect();
     float vs = vr.height() ? static_cast<float>(vr.width()) / vr.height() : 1.0F;
-    VisibleAspect = ThemeAspect * (ova > 0.0f ? vs / ova : 1.F) * dispPixelAdj;
+    VisibleAspect = ThemeAspect * (ova > 0.0F ? vs / ova : 1.F) * dispPixelAdj;
 
     FontScaling   = 1.0F;
     return { QPoint(0,0), dvr.size() };
@@ -847,11 +833,11 @@ QRect MythVideoOutput::GetImageRect(const QRect &Rect, QRect *DisplayRect)
  */
 QRect MythVideoOutput::GetSafeRect(void)
 {
-    static const float safeMargin = 0.05F;
+    static constexpr float kSafeMargin = 0.05F;
     float dummy;
     QRect result = GetVisibleOSDBounds(dummy, dummy, 1.0F);
-    int safex = static_cast<int>(static_cast<float>(result.width())  * safeMargin);
-    int safey = static_cast<int>(static_cast<float>(result.height()) * safeMargin);
+    int safex = static_cast<int>(static_cast<float>(result.width())  * kSafeMargin);
+    int safey = static_cast<int>(static_cast<float>(result.height()) * kSafeMargin);
     return { result.left() + safex, result.top() + safey,
              result.width() - (2 * safex), result.height() - (2 * safey) };
 }
@@ -863,8 +849,8 @@ void MythVideoOutput::SetPIPState(PIPState Setting)
 
 VideoFrameType* MythVideoOutput::DirectRenderFormats(void)
 {
-    static VideoFrameType defaultformats[] = { FMT_YV12, FMT_NONE };
-    return &defaultformats[0];
+    static VideoFrameType s_defaultFormats[] = { FMT_YV12, FMT_NONE };
+    return &s_defaultFormats[0];
 }
 
 /**
@@ -917,7 +903,7 @@ void MythVideoOutput::DiscardFrame(VideoFrame *Frame)
 
 /// \brief Releases all frames not being actively displayed from any queue
 ///        onto the queue of frames ready for decoding onto.
-void MythVideoOutput::DiscardFrames(bool KeyFrame, bool)
+void MythVideoOutput::DiscardFrames(bool KeyFrame, bool /*unused*/)
 {
     m_videoBuffers.DiscardFrames(KeyFrame);
 }
@@ -959,7 +945,7 @@ void MythVideoOutput::ResizeForVideo(int Width, int Height)
             return;
     }
 
-    float rate = m_dbDisplayProfile ? m_dbDisplayProfile->GetOutput() : 0.0f;
+    float rate = m_dbDisplayProfile ? m_dbDisplayProfile->GetOutput() : 0.0F;
     if (m_display->SwitchToVideo(Width, Height, static_cast<double>(rate)))
     {
         // Switching to custom display resolution succeeded

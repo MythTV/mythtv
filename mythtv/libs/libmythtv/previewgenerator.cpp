@@ -1,5 +1,6 @@
 // C headers
 #include <cmath>
+#include <utility>
 
 // POSIX headers
 #include <sys/types.h> // for utime
@@ -8,14 +9,14 @@
 #include <utime.h>     // for utime
 
 // Qt headers
-#include <QCoreApplication>
-#include <QTemporaryFile>
-#include <QFileInfo>
-#include <QMetaType>
-#include <QImage>
-#include <QDir>
-#include <QUrl>
 #include <QApplication>
+#include <QCoreApplication>
+#include <QDir>
+#include <QFileInfo>
+#include <QImage>
+#include <QMetaType>
+#include <QTemporaryFile>
+#include <QUrl>
 
 // MythTV headers
 #include "mythconfig.h"
@@ -70,12 +71,12 @@
  *                    in order to be processed.
  */
 PreviewGenerator::PreviewGenerator(const ProgramInfo *pginfo,
-                                   const QString     &token,
+                                   QString            token,
                                    PreviewGenerator::Mode mode)
     : MThread("PreviewGenerator"),
       m_programInfo(*pginfo), m_mode(mode),
       m_pathname(pginfo->GetPathname()),
-      m_token(token)
+      m_token(std::move(token))
 {
     // Qt requires that a receiver have the same thread affinity as the QThread
     // sending the event, which is used to dispatch MythEvents sent by
@@ -257,7 +258,7 @@ bool PreviewGenerator::Run(void)
             cmdargs << "--outfile" << m_outFileName;
 
         // Timeout in 30s
-        MythSystemLegacy *ms = new MythSystemLegacy(command, cmdargs,
+        auto *ms = new MythSystemLegacy(command, cmdargs,
                                         kMSDontBlockInputDevs |
                                         kMSDontDisableDrawing |
                                         kMSProcessEvents      |
@@ -419,7 +420,7 @@ bool PreviewGenerator::event(QEvent *e)
     if (e->type() != MythEvent::MythEventMessage)
         return QObject::event(e);
 
-    MythEvent *me = dynamic_cast<MythEvent*>(e);
+    auto *me = dynamic_cast<MythEvent*>(e);
     if (me == nullptr)
         return false;
     if (me->Message() != "GENERATED_PIXMAP" || me->ExtraDataCount() < 3)
@@ -685,10 +686,9 @@ bool PreviewGenerator::LocalPreviewRun(void)
     }
 
     width = height = sz = 0;
-    unsigned char *data = (unsigned char*)
-        GetScreenGrab(m_programInfo, m_pathname,
-                      captime, m_timeInSeconds,
-                      sz, width, height, aspect);
+    auto *data = (unsigned char*) GetScreenGrab(m_programInfo, m_pathname,
+                                                captime, m_timeInSeconds,
+                                                sz, width, height, aspect);
 
     QString outname = CreateAccessibleFilename(m_pathname, m_outFileName);
 
@@ -834,7 +834,7 @@ char *PreviewGenerator::GetScreenGrab(
         return nullptr;
     }
 
-    PlayerContext *ctx = new PlayerContext(kPreviewGeneratorInUseID);
+    auto *ctx = new PlayerContext(kPreviewGeneratorInUseID);
     ctx->SetRingBuffer(rbuf);
     ctx->SetPlayingInfo(&pginfo);
     ctx->SetPlayer(new MythPlayer((PlayerFlags)(kAudioMuted | kVideoIsNull | kNoITV)));

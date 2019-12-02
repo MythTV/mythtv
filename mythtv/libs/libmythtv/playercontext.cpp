@@ -1,4 +1,5 @@
 #include <cmath>
+#include <utility>
 
 #include <QPainter>
 
@@ -26,8 +27,8 @@
 const uint PlayerContext::kSMExitTimeout     = 2000;
 const uint PlayerContext::kMaxChannelHistory = 30;
 
-PlayerContext::PlayerContext(const QString &inUseID) :
-    m_recUsage(inUseID)
+PlayerContext::PlayerContext(QString inUseID) :
+    m_recUsage(std::move(inUseID))
 {
     m_lastSignalMsgTime.start();
     m_lastSignalMsgTime.addMSecs(-2 * (int)kSMExitTimeout);

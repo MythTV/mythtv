@@ -11,6 +11,9 @@
 #include "videoouttypes.h"
 #include "referencecounter.h"
 
+// FFmpeg
+#include "libavutil/pixfmt.h" // For AVCOL_xxx defines
+
 class VideoColourSpace : public QObject, public QMatrix4x4, public ReferenceCounter
 {
     Q_OBJECT
@@ -63,34 +66,34 @@ class VideoColourSpace : public QObject, public QMatrix4x4, public ReferenceCoun
     void  Update(void);
     void  Debug(void);
     QMatrix4x4 GetPrimaryConversion(int Source, int Dest);
-    void  GetPrimaries(int Primary, ColourPrimaries &Out, float &Gamma);
-    QMatrix4x4 RGBtoXYZ(ColourPrimaries Primaries);
+    static void GetPrimaries(int Primary, ColourPrimaries &Out, float &Gamma);
+    static QMatrix4x4 RGBtoXYZ(ColourPrimaries Primaries);
 
   private:
-    PictureAttributeSupported  m_supportedAttributes;
+    PictureAttributeSupported  m_supportedAttributes {kPictureAttributeSupported_None};
     QMap<PictureAttribute,int> m_dbSettings;
 
-    bool      m_fullRange;
-    float     m_brightness;
-    float     m_contrast;
-    float     m_saturation;
-    float     m_hue;
-    float     m_alpha;
-    int       m_colourSpace;
-    int       m_colourSpaceDepth;
-    int       m_range;
-    bool      m_updatesDisabled;
-    int       m_colourShifted;
-    int       m_colourTransfer;
-    PrimariesMode m_primariesMode;
-    int       m_colourPrimaries;
-    int       m_displayPrimaries;
-    float     m_colourGamma;
-    float     m_displayGamma;
-    QMatrix4x4 m_primaryMatrix;
-    float     m_customDisplayGamma;
-    ColourPrimaries* m_customDisplayPrimaries;
-    VideoColourSpace *m_parent;
+    bool              m_fullRange              {true};
+    float             m_brightness             {0.0F};
+    float             m_contrast               {1.0F};
+    float             m_saturation             {1.0F};
+    float             m_hue                    {0.0F};
+    float             m_alpha                  {1.0F};
+    int               m_colourSpace            {AVCOL_SPC_UNSPECIFIED};
+    int               m_colourSpaceDepth       {8};
+    int               m_range                  {AVCOL_RANGE_MPEG};
+    bool              m_updatesDisabled        {true};
+    int               m_colourShifted          {0};
+    int               m_colourTransfer         {AVCOL_TRC_BT709};
+    PrimariesMode     m_primariesMode          {PrimariesAuto};
+    int               m_colourPrimaries        {AVCOL_PRI_BT709};
+    int               m_displayPrimaries       {AVCOL_PRI_BT709};
+    float             m_colourGamma            {2.2F};
+    float             m_displayGamma           {2.2F};
+    QMatrix4x4        m_primaryMatrix;
+    float             m_customDisplayGamma     {2.2F};
+    ColourPrimaries  *m_customDisplayPrimaries {nullptr};
+    VideoColourSpace *m_parent                 {nullptr};
 };
 
 #endif

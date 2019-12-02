@@ -10,7 +10,7 @@
 
 class ExternalStreamHandler;
 
-typedef QMap<uint,int> FilterMap;
+using FilterMap = QMap<uint,int>;
 
 class ExternalSignalMonitor: public DTVSignalMonitor
 {

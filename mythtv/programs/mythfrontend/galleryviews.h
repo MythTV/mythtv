@@ -24,7 +24,7 @@ enum SlideOrderType {
 
 
 //! Seasonal weightings for images in a view
-typedef QVector<double> WeightList;
+using WeightList = QVector<double>;
 
 
 //! A container of images/dirs that have been marked

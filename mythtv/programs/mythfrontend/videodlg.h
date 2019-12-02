@@ -41,9 +41,8 @@ class VideoDialog : public MythScreenType
                       BRS_USERRATING = 0x20, BRS_INSERTDATE = 0x40,
                       BRS_TVMOVIE = 0x80, BRS_STUDIO = 0x100, btLast };
 
-    typedef simple_ref_ptr<class VideoList> VideoListPtr;
-
-    typedef QPointer<class VideoListDeathDelay> VideoListDeathDelayPtr;
+    using VideoListPtr = simple_ref_ptr<class VideoList>;
+    using VideoListDeathDelayPtr = QPointer<class VideoListDeathDelay>;
 
     static VideoListDeathDelayPtr &GetSavedVideoList();
 

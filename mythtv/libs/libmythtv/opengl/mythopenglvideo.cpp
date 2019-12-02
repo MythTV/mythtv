@@ -1,3 +1,6 @@
+// C/C++
+#include <utility>
+
 // MythTV
 #include "mythcontext.h"
 #include "tv.h"
@@ -23,35 +26,16 @@ MythOpenGLVideo::MythOpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *Col
                                  QSize VideoDim, QSize VideoDispDim,
                                  QRect DisplayVisibleRect, QRect DisplayVideoRect, QRect VideoRect,
                                  bool  ViewportControl, QString Profile)
-  : QObject(),
-    m_valid(false),
-    m_profile(Profile),
-    m_inputType(FMT_NONE),
-    m_outputType(FMT_NONE),
+  : m_profile(std::move(Profile)),
     m_render(Render),
     m_videoDispDim(VideoDispDim),
     m_videoDim(VideoDim),
     m_masterViewportSize(DisplayVisibleRect.size()),
     m_displayVideoRect(DisplayVideoRect),
     m_videoRect(VideoRect),
-    m_deinterlacer(MythDeintType::DEINT_NONE),
-    m_deinterlacer2x(false),
-    m_fallbackDeinterlacer(MythDeintType::DEINT_NONE),
     m_videoColourSpace(ColourSpace),
     m_viewportControl(ViewportControl),
-    m_inputTextures(),
-    m_prevTextures(),
-    m_nextTextures(),
-    m_frameBuffer(nullptr),
-    m_frameBufferTexture(nullptr),
-    m_inputTextureSize(m_videoDim),
-    m_features(),
-    m_extraFeatures(0),
-    m_resizing(false),
-    m_textureTarget(QOpenGLTexture::Target2D),
-    m_discontinuityCounter(0),
-    m_lastRotation(0),
-    m_chromaUpsamplingFilter(false)
+    m_inputTextureSize(m_videoDim)
 {
     if (!m_render || !m_videoColourSpace)
         return;
@@ -103,7 +87,7 @@ void MythOpenGLVideo::UpdateColourSpace(bool PrimariesChanged)
     }
 
     float colourgamma  = m_videoColourSpace->GetColourGamma();
-    float displaygamma = 1.0f / m_videoColourSpace->GetDisplayGamma();
+    float displaygamma = 1.0F / m_videoColourSpace->GetDisplayGamma();
     QMatrix4x4 primary = m_videoColourSpace->GetPrimaryMatrix();
     for (int i = Progressive; i < ShaderCount; ++i)
     {
@@ -124,9 +108,9 @@ void MythOpenGLVideo::UpdateShaderParameters(void)
 
     OpenGLLocker locker(m_render);
     bool rect = m_textureTarget == QOpenGLTexture::TargetRectangle;
-    GLfloat lineheight = rect ? 1.0f : 1.0f / m_inputTextureSize.height();
+    GLfloat lineheight = rect ? 1.0F : 1.0F / m_inputTextureSize.height();
     GLfloat maxheight  = rect ? m_videoDispDim.height() : m_videoDispDim.height() / static_cast<GLfloat>(m_inputTextureSize.height());
-    GLfloat fieldsize  = rect ? 0.5f : m_inputTextureSize.height() / 2.0f;
+    GLfloat fieldsize  = rect ? 0.5F : m_inputTextureSize.height() / 2.0F;
     QVector4D parameters(lineheight,                                       /* lineheight */
                          static_cast<GLfloat>(m_inputTextureSize.width()), /* 'Y' select */
                          maxheight - lineheight,                           /* maxheight  */
@@ -251,7 +235,7 @@ bool MythOpenGLVideo::AddDeinterlacer(const VideoFrame *Frame, FrameScanType Sca
     if (refstocreate)
     {
         vector<QSize> sizes;
-        sizes.push_back(QSize(m_videoDim));
+        sizes.emplace_back(QSize(m_videoDim));
         m_prevTextures = MythVideoTexture::CreateTextures(m_render, m_inputType, m_outputType, sizes);
         m_nextTextures = MythVideoTexture::CreateTextures(m_render, m_inputType, m_outputType, sizes);
     }
@@ -821,9 +805,9 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
     if (DrawBorder)
     {
         QRect piprect = m_displayVideoRect.adjusted(-10, -10, +10, +10);
-        static const QPen nopen(Qt::NoPen);
-        static const QBrush redbrush(QBrush(QColor(127, 0, 0, 255)));
-        m_render->DrawRect(nullptr, piprect, redbrush, nopen, 255);
+        static const QPen kNopen(Qt::NoPen);
+        static const QBrush kRedBrush(QBrush(QColor(127, 0, 0, 255)));
+        m_render->DrawRect(nullptr, piprect, kRedBrush, kNopen, 255);
     }
 
     // bind correct textures

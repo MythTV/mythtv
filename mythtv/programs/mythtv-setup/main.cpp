@@ -76,9 +76,8 @@ static void SetupMenuCallback(void* /* data */, QString& selection)
     if (sel == "general")
     {
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-        StandardSettingDialog *ssd =
-            new StandardSettingDialog(mainStack, "generalsettings",
-                                      new BackendSettings());
+        auto *ssd = new StandardSettingDialog(mainStack, "generalsettings",
+                                              new BackendSettings());
 
         if (ssd->Create())
             mainStack->AddScreen(ssd);
@@ -88,9 +87,8 @@ static void SetupMenuCallback(void* /* data */, QString& selection)
     else if (sel == "capture cards")
     {
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-        StandardSettingDialog *ssd =
-            new StandardSettingDialog(mainStack, "capturecardeditor",
-                                      new CaptureCardEditor());
+        auto *ssd = new StandardSettingDialog(mainStack, "capturecardeditor",
+                                              new CaptureCardEditor());
 
         if (ssd->Create())
             mainStack->AddScreen(ssd);
@@ -100,8 +98,7 @@ static void SetupMenuCallback(void* /* data */, QString& selection)
     else if (sel == "video sources")
     {
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-        StandardSettingDialog *ssd =
-            new StandardSettingDialog(mainStack, "videosourceeditor",
+        auto *ssd = new StandardSettingDialog(mainStack, "videosourceeditor",
                new VideoSourceEditor());
         if (ssd->Create())
             mainStack->AddScreen(ssd);
@@ -111,9 +108,8 @@ static void SetupMenuCallback(void* /* data */, QString& selection)
     else if (sel == "card inputs")
     {
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-        StandardSettingDialog *ssd =
-            new StandardSettingDialog(mainStack, "cardinputeditor",
-                                      new CardInputEditor());
+        auto *ssd = new StandardSettingDialog(mainStack, "cardinputeditor",
+                                              new CardInputEditor());
 
         if (ssd->Create())
             mainStack->AddScreen(ssd);
@@ -123,9 +119,8 @@ static void SetupMenuCallback(void* /* data */, QString& selection)
     else if (sel == "recording profile")
     {
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-        StandardSettingDialog *ssd =
-            new StandardSettingDialog(mainStack, "recordingprofileeditor",
-                                      new ProfileGroupEditor());
+        auto *ssd = new StandardSettingDialog(mainStack, "recordingprofileeditor",
+                                              new ProfileGroupEditor());
 
         if (ssd->Create())
             mainStack->AddScreen(ssd);
@@ -136,7 +131,7 @@ static void SetupMenuCallback(void* /* data */, QString& selection)
     {
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-        ChannelEditor *chanedit = new ChannelEditor(mainStack);
+        auto *chanedit = new ChannelEditor(mainStack);
 
         if (chanedit->Create())
             mainStack->AddScreen(chanedit);
@@ -146,9 +141,8 @@ static void SetupMenuCallback(void* /* data */, QString& selection)
     else if (sel == "storage groups")
     {
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-        StandardSettingDialog *ssd =
-            new StandardSettingDialog(mainStack, "storagegroupeditor",
-                                      new StorageGroupListEditor());
+        auto *ssd = new StandardSettingDialog(mainStack, "storagegroupeditor",
+                                              new StorageGroupListEditor());
 
         if (ssd->Create())
             mainStack->AddScreen(ssd);
@@ -159,8 +153,7 @@ static void SetupMenuCallback(void* /* data */, QString& selection)
     {
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-        MythSystemEventEditor *msee = new MythSystemEventEditor(
-                                    mainStack, "System Event Editor");
+        auto *msee = new MythSystemEventEditor(mainStack, "System Event Editor");
 
         if (msee->Create())
             mainStack->AddScreen(msee);

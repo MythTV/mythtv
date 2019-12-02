@@ -652,7 +652,7 @@ void MythPlayer::SetVideoParams(int width, int height, double fps,
     {
         paramsChanged  = true;
         video_dim      = video_disp_dim = QSize(width, height);
-        video_aspect   = aspect > 0.0f ? aspect : static_cast<float>(width) / height;
+        video_aspect   = aspect > 0.0F ? aspect : static_cast<float>(width) / height;
     }
 
     if (!qIsNaN(fps) && fps > 0.0 && fps < 121.0)
@@ -729,11 +729,11 @@ void MythPlayer::OpenDummy(void)
     if (!videoOutput)
     {
         SetKeyframeDistance(15);
-        SetVideoParams(720, 576, 25.00, 1.25f, false, 2);
+        SetVideoParams(720, 576, 25.00, 1.25F, false, 2);
     }
 
     player_ctx->LockPlayingInfo(__FILE__, __LINE__);
-    DummyDecoder *dec = new DummyDecoder(this, *(player_ctx->m_playingInfo));
+    auto *dec = new DummyDecoder(this, *(player_ctx->m_playingInfo));
     player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
     SetDecoder(dec);
 }
@@ -911,10 +911,10 @@ int MythPlayer::GetFreeVideoFrames(void) const
 /// \brief Return a list of frame types that can be rendered directly.
 VideoFrameType* MythPlayer::DirectRenderFormats(void)
 {
-    static VideoFrameType defaultformats[] = { FMT_YV12, FMT_NONE };
+    static VideoFrameType s_defaultFormats[] = { FMT_YV12, FMT_NONE };
     if (videoOutput)
         return videoOutput->DirectRenderFormats();
-    return &defaultformats[0];
+    return &s_defaultFormats[0];
 }
 
 /**
@@ -1934,7 +1934,7 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
     int64_t audio_adjustment = 0;
     int64_t unow = 0;
     int64_t lateness = 0;
-    int64_t playspeed1000 = static_cast<int64_t>(1000.0f / play_speed);
+    auto playspeed1000 = static_cast<int64_t>(1000.0F / play_speed);
     bool reset = false;
 
     while (framedue == 0)
@@ -2017,7 +2017,7 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
             if (audio_adjustment * sign > 200)
                 // fix the sync within 15 - 20 frames
                 fix_amount = audio_adjustment * sign / 15;
-            int64_t speedup1000 = static_cast<int64_t>(1000 * play_speed);
+            auto speedup1000 = static_cast<int64_t>(1000 * play_speed);
             rtcbase -= static_cast<int64_t>(1000000 * fix_amount * sign / speedup1000);
             if (audio_adjustment * sign > 20 || (framesPlayed % 400 == 0))
                 LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("AV Sync: Audio %1 by %2 ms")
@@ -2160,7 +2160,7 @@ void MythPlayer::RefreshPauseFrame(void)
             {
                 osdLock.lock();
                 if (osd)
-                    deleteMap.UpdateOSD(GetLatestVideoTimecode(), osd);
+                    DeleteMap::UpdateOSD(GetLatestVideoTimecode(), osd);
                 osdLock.unlock();
             }
         }
@@ -2238,7 +2238,7 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
         {
             uint64_t frameCount = GetCurrentFrameCount();
             uint64_t framesLeft = frameCount - framesPlayed;
-            uint64_t margin = (uint64_t) (video_frame_rate * 3);
+            auto margin = (uint64_t) (video_frame_rate * 3);
             if (framesLeft < margin)
             {
                 if (rtcbase)
@@ -2716,7 +2716,7 @@ void MythPlayer::SwitchToProgram(void)
     if (player_ctx->m_buffer->GetType() == ICRingBuffer::kRingBufferType)
     {
         // Restore original ringbuffer
-        ICRingBuffer *ic = dynamic_cast< ICRingBuffer* >(player_ctx->m_buffer);
+        auto *ic = dynamic_cast< ICRingBuffer* >(player_ctx->m_buffer);
         if (ic) // should always be true
             player_ctx->m_buffer = ic->Take();
         delete ic;
@@ -2872,7 +2872,7 @@ void MythPlayer::JumpToProgram(void)
     if (player_ctx->m_buffer->GetType() == ICRingBuffer::kRingBufferType)
     {
         // Restore original ringbuffer
-        ICRingBuffer *ic = dynamic_cast< ICRingBuffer* >(player_ctx->m_buffer);
+        auto *ic = dynamic_cast< ICRingBuffer* >(player_ctx->m_buffer);
         if (ic) // should always be true
             player_ctx->m_buffer = ic->Take();
         delete ic;
@@ -4064,7 +4064,7 @@ bool MythPlayer::IsNearEnd(void)
     }
     player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
-    long long margin = (long long)(video_frame_rate * 2);
+    auto margin = (long long)(video_frame_rate * 2);
     margin = (long long) (margin * audio.GetStretchFactor());
     bool watchingTV = IsWatchingInprogress();
 
@@ -4635,7 +4635,7 @@ bool MythPlayer::HasTVChainNext(void) const
 char *MythPlayer::GetScreenGrab(int secondsin, int &bufflen,
                                 int &vw, int &vh, float &ar)
 {
-    long long frameNum = (long long)(secondsin * video_frame_rate);
+    auto frameNum = (long long)(secondsin * video_frame_rate);
 
     return GetScreenGrabAtFrame(frameNum, false, bufflen, vw, vh, ar);
 }
@@ -5065,7 +5065,7 @@ void MythPlayer::GetPlaybackData(InfoMap &infoMap)
     GetCodecDescription(infoMap);
 }
 
-int64_t MythPlayer::GetSecondsPlayed(bool honorCutList, int divisor) const
+int64_t MythPlayer::GetSecondsPlayed(bool honorCutList, int divisor)
 {
     int64_t pos = TranslatePositionFrameToMs(framesPlayed, honorCutList);
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
@@ -5572,7 +5572,7 @@ long MythPlayer::GetStreamMaxPos()
 // Called from the interactiveTV (MHIContext) thread
 long MythPlayer::SetStreamPos(long ms)
 {
-    uint64_t frameNum = (uint64_t)((ms * SafeFPS(decoder)) / 1000);
+    auto frameNum = (uint64_t)((ms * SafeFPS(decoder)) / 1000);
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("SetStreamPos %1 mS = frame %2, now=%3")
         .arg(ms).arg(frameNum).arg(GetFramesPlayed()) );
     JumpToFrame(frameNum);
@@ -5824,16 +5824,16 @@ void MythPlayer::ForceSetupAudioStream(void)
 
 static unsigned dbg_ident(const MythPlayer *player)
 {
-    static QMutex   dbg_lock;
-    static unsigned dbg_next_ident = 0;
-    typedef QMap<const MythPlayer*, unsigned> DbgMapType;
-    static DbgMapType dbg_ident;
+    static QMutex   s_dbgLock;
+    static unsigned s_dbgNextIdent = 0;
+    using DbgMapType = QMap<const MythPlayer*, unsigned>;
+    static DbgMapType s_dbgIdent;
 
-    QMutexLocker locker(&dbg_lock);
-    DbgMapType::iterator it = dbg_ident.find(player);
-    if (it != dbg_ident.end())
+    QMutexLocker locker(&s_dbgLock);
+    DbgMapType::iterator it = s_dbgIdent.find(player);
+    if (it != s_dbgIdent.end())
         return *it;
-    return dbg_ident[player] = dbg_next_ident++;
+    return s_dbgIdent[player] = s_dbgNextIdent++;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

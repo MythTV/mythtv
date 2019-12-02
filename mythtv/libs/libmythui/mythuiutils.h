@@ -49,7 +49,7 @@ struct UIUtilDisp
     }
 };
 
-typedef struct UIUtilDisp<ETPrintWarning> UIUtilW;
-typedef struct UIUtilDisp<ETPrintError> UIUtilE;
+using UIUtilW = struct UIUtilDisp<ETPrintWarning>;
+using UIUtilE = struct UIUtilDisp<ETPrintError>;
 
 #endif

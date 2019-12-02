@@ -12,13 +12,13 @@
 
 class DisplayResScreen;
 
-typedef std::vector<DisplayResScreen>     DisplayResVector;
-typedef DisplayResVector::iterator        DisplayResVectorIt;
-typedef DisplayResVector::const_iterator  DisplayResVectorCIt;
+using DisplayResVector    = std::vector<DisplayResScreen>;
+using DisplayResVectorIt  = DisplayResVector::iterator;
+using DisplayResVectorCIt = DisplayResVector::const_iterator;
 
-typedef std::map<uint64_t, DisplayResScreen> DisplayResMap;
-typedef DisplayResMap::iterator           DisplayResMapIt;
-typedef DisplayResMap::const_iterator     DisplayResMapCIt;
+using DisplayResMap    = std::map<uint64_t, DisplayResScreen>;
+using DisplayResMapIt  = DisplayResMap::iterator;
+using DisplayResMapCIt = DisplayResMap::const_iterator;
 
 class MUI_PUBLIC DisplayResScreen
 {

@@ -230,8 +230,8 @@ void ExitPrompter::handleExit()
     }
 
     MythScreenStack *ss = GetMythMainWindow()->GetStack("popup stack");
-    MythDialogBox *dlg = new MythDialogBox(
-        tr("Do you really want to exit MythTV?"), ss, "exit prompt");
+    auto *dlg = new MythDialogBox(tr("Do you really want to exit MythTV?"), ss,
+                                  "exit prompt");
 
     if (!dlg->Create())
     {
@@ -266,7 +266,7 @@ void ExitPrompter::handleExit()
 void ExitPrompter::confirm(int Action)
 {
     MythScreenStack *ss = GetMythMainWindow()->GetStack("popup stack");
-    MythConfirmationDialog *dlg = new MythConfirmationDialog(ss,
+    auto *dlg = new MythConfirmationDialog(ss,
         tr("Mythbackend is running on this system. Are you sure you want to continue?"));
 
     if (!dlg->Create())

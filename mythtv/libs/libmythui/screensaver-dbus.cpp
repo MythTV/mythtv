@@ -123,7 +123,7 @@ ScreenSaverDBus::ScreenSaverDBus() :
 {
     // service, path, interface, bus - note that interface = service, hence it is used twice
     for (uint i=0; i < NUM_DBUS_METHODS; i++) {
-        ScreenSaverDBusPrivate *ssdbp =
+        auto *ssdbp =
             new ScreenSaverDBusPrivate(m_dbusService[i], m_dbusPath[i], m_dbusService[i], &m_bus);
         ssdbp->SetUnInhibit(m_dbusUnInhibit[i]);
         m_dbusPrivateInterfaces.push_back(ssdbp);

@@ -465,8 +465,7 @@ ExternalStreamHandler *ExternalStreamHandler::Get(const QString &devname,
 
     if (it == s_handlers.end())
     {
-        ExternalStreamHandler *newhandler =
-            new ExternalStreamHandler(devname, inputid, majorid);
+        auto *newhandler = new ExternalStreamHandler(devname, inputid, majorid);
         s_handlers[majorid] = newhandler;
         s_handlers_refcnt[majorid] = 1;
 

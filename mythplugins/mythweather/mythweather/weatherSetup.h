@@ -130,7 +130,7 @@ struct ResultListInfo
 
 Q_DECLARE_METATYPE(ResultListInfo *)
 
-typedef QMultiHash<QString, QList<ScriptInfo*> > CacheMap;
+using CacheMap = QMultiHash<QString, QList<ScriptInfo*> >;
 
 class LocationDialog : public MythScreenType
 {

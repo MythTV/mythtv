@@ -297,7 +297,7 @@ void ImportMusicDialog::doExit(bool ok)
 void ImportMusicDialog::locationPressed()
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythUIFileBrowser *fb = new MythUIFileBrowser(popupStack, m_locationEdit->GetText());
+    auto *fb = new MythUIFileBrowser(popupStack, m_locationEdit->GetText());
     // TODO Install a name filter on supported music formats
     fb->SetTypeFilter(QDir::AllDirs | QDir::Readable);
     if (fb->Create())
@@ -463,7 +463,7 @@ bool ImportMusicDialog::copyFile(const QString &src, const QString &dst)
     QString host = QUrl(dst).host();
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythUIBusyDialog *busy =
+    auto *busy =
             new MythUIBusyDialog(tr("Copying music file to the 'Music' storage group on %1").arg(host),
                                     popupStack,
                                     "scanbusydialog");
@@ -478,7 +478,7 @@ bool ImportMusicDialog::copyFile(const QString &src, const QString &dst)
         busy = nullptr;
     }
 
-    FileCopyThread *copy = new FileCopyThread(src, dst);
+    auto *copy = new FileCopyThread(src, dst);
     copy->start();
 
     while (!copy->isFinished())
@@ -505,10 +505,8 @@ void ImportMusicDialog::startScan()
         location.append('/');
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythUIBusyDialog *busy =
-            new MythUIBusyDialog(tr("Searching for music files"),
-                                     popupStack,
-                                     "scanbusydialog");
+    auto *busy = new MythUIBusyDialog(tr("Searching for music files"),
+                                      popupStack, "scanbusydialog");
 
     if (busy->Create())
     {
@@ -519,7 +517,7 @@ void ImportMusicDialog::startScan()
         delete busy;
         busy = nullptr;
     }
-    FileScannerThread *scanner = new FileScannerThread(this);
+    auto *scanner = new FileScannerThread(this);
     scanner->start();
 
     while (!scanner->isFinished())
@@ -573,7 +571,7 @@ void ImportMusicDialog::scanDirectory(QString &directory, vector<TrackInfo*> *tr
                 MusicMetadata *metadata = tagger->read(filename);
                 if (metadata)
                 {
-                    TrackInfo * track = new TrackInfo;
+                    auto * track = new TrackInfo;
                     track->metadata = metadata;
                     track->isNewTune = isNewTune(metadata->Artist(), metadata->Album(),
                                                  metadata->Title());
@@ -597,7 +595,7 @@ void ImportMusicDialog::showEditMetadataDialog()
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    EditMetadataDialog *editDialog = new EditMetadataDialog(mainStack, editMeta);
+    auto *editDialog = new EditMetadataDialog(mainStack, editMeta);
 
     if (!editDialog->Create())
     {
@@ -628,7 +626,7 @@ void ImportMusicDialog::ShowMenu()
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    MythDialogBox *menu = new MythDialogBox("", popupStack, "importmusicmenu");
+    auto *menu = new MythDialogBox("", popupStack, "importmusicmenu");
 
     if (menu->Create())
         popupStack->AddScreen(menu);
@@ -683,7 +681,7 @@ void ImportMusicDialog::chooseBackend(void)
     QString msg = tr("Select where to save tracks");
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythUISearchDialog *searchDlg = new MythUISearchDialog(popupStack, msg, hostList, false, "");
+    auto *searchDlg = new MythUISearchDialog(popupStack, msg, hostList, false, "");
 
     if (!searchDlg->Create())
     {
@@ -881,7 +879,7 @@ void ImportMusicDialog::showImportCoverArtDialog(void)
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    ImportCoverArtDialog *import = new ImportCoverArtDialog(mainStack,
+    auto *import = new ImportCoverArtDialog(mainStack,
                                         fi.absolutePath(),
                                         m_tracks->at(m_currentTrack)->metadata,
                                         m_musicStorageDir);

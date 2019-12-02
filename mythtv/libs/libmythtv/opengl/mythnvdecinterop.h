@@ -37,7 +37,7 @@ class MythNVDECInterop : public MythOpenGLInterop
     void           RotateReferenceFrames(CUdeviceptr Buffer);
 
     CUcontext      m_cudaContext;
-    CudaFunctions *m_cudaFuncs;
+    CudaFunctions *m_cudaFuncs { nullptr };
     QVector<CUdeviceptr> m_referenceFrames;
 };
 

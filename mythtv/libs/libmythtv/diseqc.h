@@ -27,10 +27,10 @@ class DiSEqCDevRotor;
 class DiSEqCDevLNB;
 class DiSEqCDevSCR;
 
-typedef QMap<uint, double>         uint_to_dbl_t;
-typedef QMap<double, uint>         dbl_to_uint_t;
-typedef QMap<uint, DiSEqCDevTree*> cardid_to_diseqc_tree_t;
-typedef vector<DiSEqCDevDevice*>   dvbdev_vec_t;
+using uint_to_dbl_t           = QMap<uint, double>;
+using dbl_to_uint_t           = QMap<double, uint>;
+using cardid_to_diseqc_tree_t = QMap<uint, DiSEqCDevTree*>;
+using dvbdev_vec_t            = vector<DiSEqCDevDevice*>;
 
 class DiSEqCDevSettings
 {
@@ -44,14 +44,14 @@ class DiSEqCDevSettings
 
   protected:
     uint_to_dbl_t m_config;       //< map of dev tree id to configuration value
-    uint          m_input_id {1}; ///< current input id
+    uint          m_inputId {1};  ///< current input id
 };
 
 class DiSEqCDev
 {
   public:
-    DiSEqCDevTree* FindTree(uint cardid);
-    void           InvalidateTrees(void);
+    static DiSEqCDevTree* FindTree(uint cardid);
+    static void           InvalidateTrees(void);
 
   protected:
     static DiSEqCDevTrees s_trees;
@@ -67,7 +67,7 @@ class DiSEqCDevTrees
 
   protected:
     cardid_to_diseqc_tree_t m_trees;
-    QMutex                  m_trees_lock;
+    QMutex                  m_treesLock;
 };
 
 class DiSEqCDevTree
@@ -99,20 +99,20 @@ class DiSEqCDevTree
 
     // frontend fd
     void Open(int fd_frontend, bool is_SCR);
-    void Close(void) { m_fd_frontend = -1; }
-    int  GetFD(void) const { return m_fd_frontend; }
+    void Close(void) { m_fdFrontend = -1; }
+    int  GetFD(void) const { return m_fdFrontend; }
 
     // Sets
     bool SetTone(bool on);
     bool SetVoltage(uint voltage);
 
     // Gets
-    uint GetVoltage(void) const { return m_last_voltage; }
+    uint GetVoltage(void) const { return m_lastVoltage; }
     bool IsInNeedOfConf(void) const;
 
     // tree management
     void AddDeferredDelete(uint dev_id) { m_delete.push_back(dev_id); }
-    uint CreateFakeDiSEqCID(void)       { return m_previous_fake_diseqcid++; }
+    uint CreateFakeDiSEqCID(void)       { return m_previousFakeDiseqcid++; }
 
     static bool IsFakeDiSEqCID(uint id) { return id >= kFirstFakeDiSEqCID; }
     static bool Exists(int cardid);
@@ -121,10 +121,10 @@ class DiSEqCDevTree
     bool ApplyVoltage(const DiSEqCDevSettings &settings,
                       const DTVMultiplex &tuning);
 
-    int              m_fd_frontend            {-1};
+    int              m_fdFrontend             {-1};
     DiSEqCDevDevice *m_root                   {nullptr};
-    uint             m_last_voltage;
-    uint             m_previous_fake_diseqcid {kFirstFakeDiSEqCID};
+    uint             m_lastVoltage            {UINT_MAX};
+    uint             m_previousFakeDiseqcid   {kFirstFakeDiSEqCID};
     vector<uint>     m_delete;
 
     static const uint kFirstFakeDiSEqCID;
@@ -151,7 +151,7 @@ class DiSEqCDevDevice
         kTypeSCR = 2,
         kTypeLNB = 3,
     };
-    void SetDeviceType(dvbdev_t type)        { m_dev_type = type;    }
+    void SetDeviceType(dvbdev_t type)        { m_devType = type;     }
     void SetParent(DiSEqCDevDevice* parent)  { m_parent   = parent;  }
     void SetOrdinal(uint ordinal)            { m_ordinal  = ordinal; }
     void SetDescription(const QString &desc) { m_desc     = desc;    }
@@ -159,7 +159,7 @@ class DiSEqCDevDevice
     virtual bool SetChild(uint, DiSEqCDevDevice*){return false;      }
 
     // Gets
-    dvbdev_t      GetDeviceType(void)  const { return m_dev_type;    }
+    dvbdev_t      GetDeviceType(void)  const { return m_devType;     }
     uint          GetDeviceID(void)    const { return m_devid;       }
     bool          IsRealDeviceID(void) const
         { return !DiSEqCDevTree::IsFakeDiSEqCID(m_devid); }
@@ -182,9 +182,9 @@ class DiSEqCDevDevice
 
     // Statics
     static QString DevTypeToString(dvbdev_t type)
-        { return TableToString((uint)type, dvbdev_lookup); }
+        { return TableToString((uint)type, kDvbdevLookup); }
     static dvbdev_t DevTypeFromString(const QString &type)
-        { return (dvbdev_t) TableFromString(type, dvbdev_lookup); }
+        { return (dvbdev_t) TableFromString(type, kDvbdevLookup); }
 
     static DiSEqCDevDevice *CreateById(  DiSEqCDevTree &tree,
                                       uint        devid);
@@ -196,20 +196,20 @@ class DiSEqCDevDevice
     void SetDeviceID(uint devid)       const { m_devid    = devid;   }
 
     mutable uint     m_devid;
-    dvbdev_t         m_dev_type {kTypeLNB};
+    dvbdev_t         m_devType  {kTypeLNB};
     QString          m_desc;
     DiSEqCDevTree   &m_tree;
     DiSEqCDevDevice *m_parent   {nullptr};
     uint             m_ordinal  {0};
     uint             m_repeat   {1};
 
-    typedef struct { QString name; uint value; } TypeTable;
+    struct TypeTable { QString name; uint value; };
     static QString TableToString(uint type, const TypeTable *table);
     static uint    TableFromString(const QString   &type,
                                    const TypeTable *table);
 
   private:
-    static const TypeTable dvbdev_lookup[5];
+    static const TypeTable kDvbdevLookup[5];
 };
 
 class DiSEqCDevSwitch : public DiSEqCDevDevice
@@ -244,7 +244,7 @@ class DiSEqCDevSwitch : public DiSEqCDevDevice
     // Gets
     dvbdev_switch_t GetType(void)       const { return m_type;       }
     uint            GetAddress(void)    const { return m_address;    }
-    uint            GetNumPorts(void)   const { return m_num_ports;  }
+    uint            GetNumPorts(void)   const { return m_numPorts;   }
     bool            ShouldSwitch(const DiSEqCDevSettings &settings,
                                  const DTVMultiplex &tuning) const;
     uint    GetChildCount(void) const override; // DiSEqCDevDevice
@@ -259,9 +259,9 @@ class DiSEqCDevSwitch : public DiSEqCDevDevice
 
     // Statics
     static QString SwitchTypeToString(dvbdev_switch_t type)
-        { return TableToString((uint)type, SwitchTypeTable); }
+        { return TableToString((uint)type, kSwitchTypeTable); }
     static dvbdev_switch_t SwitchTypeFromString(const QString &type)
-        { return (dvbdev_switch_t) TableFromString(type, SwitchTypeTable); }
+        { return (dvbdev_switch_t) TableFromString(type, kSwitchTypeTable); }
 
 
   protected:
@@ -281,13 +281,13 @@ class DiSEqCDevSwitch : public DiSEqCDevDevice
   private:
     dvbdev_switch_t m_type            {kTypeTone};
     uint            m_address         {0x10}; //DISEQC_ADR_SW_ALL
-    uint            m_num_ports       {2};
-    uint            m_last_pos        {(uint)-1};
-    uint            m_last_high_band  {(uint)-1};
-    uint            m_last_horizontal {(uint)-1};
+    uint            m_numPorts        {2};
+    uint            m_lastPos         {(uint)-1};
+    uint            m_lastHighBand    {(uint)-1};
+    uint            m_lastHorizontal  {(uint)-1};
     dvbdev_vec_t    m_children;
 
-    static const TypeTable SwitchTypeTable[9];
+    static const TypeTable kSwitchTypeTable[9];
 };
 
 class DiSEqCDevRotor : public DiSEqCDevDevice
@@ -306,16 +306,16 @@ class DiSEqCDevRotor : public DiSEqCDevDevice
     // Sets
     enum dvbdev_rotor_t { kTypeDiSEqC_1_2 = 0, kTypeDiSEqC_1_3 = 1, };
     void   SetType(dvbdev_rotor_t type)    { m_type     = type;  }
-    void   SetLoSpeed(double speed)        { m_speed_lo = speed; }
-    void   SetHiSpeed(double speed)        { m_speed_hi = speed; }
+    void   SetLoSpeed(double speed)        { m_speedLo = speed;  }
+    void   SetHiSpeed(double speed)        { m_speedHi = speed;  }
     void   SetPosMap(const uint_to_dbl_t &posmap);
     bool SetChild(uint ordinal, DiSEqCDevDevice* device) override; // DiSEqCDevDevice
     void   RotationComplete(void) const;
 
     // Gets
     dvbdev_rotor_t GetType(void)         const { return m_type;      }
-    double         GetLoSpeed(void)      const { return m_speed_lo;  }
-    double         GetHiSpeed(void)      const { return m_speed_hi;  }
+    double         GetLoSpeed(void)      const { return m_speedLo;   }
+    double         GetHiSpeed(void)      const { return m_speedHi;   }
     uint_to_dbl_t  GetPosMap(void)       const;
     double         GetProgress(void)     const;
     bool           IsPositionKnown(void) const;
@@ -334,9 +334,9 @@ class DiSEqCDevRotor : public DiSEqCDevDevice
 
     // Statics
     static QString RotorTypeToString(dvbdev_rotor_t type)
-        { return TableToString((uint)type, RotorTypeTable); }
+        { return TableToString((uint)type, kRotorTypeTable); }
     static dvbdev_rotor_t RotorTypeFromString(const QString &type)
-        { return (dvbdev_rotor_t) TableFromString(type, RotorTypeTable); }
+        { return (dvbdev_rotor_t) TableFromString(type, kRotorTypeTable); }
 
   protected:
     bool   ExecuteRotor(const DiSEqCDevSettings&, const DTVMultiplex&,
@@ -345,29 +345,29 @@ class DiSEqCDevRotor : public DiSEqCDevDevice
                         double angle);
     void   StartRotorPositionTracking(double azimuth);
 
-    double CalculateAzimuth(double angle) const;
+    static double CalculateAzimuth(double angle);
     double GetApproxAzimuth(void) const;
 
   private:
     // configuration
     dvbdev_rotor_t    m_type            {kTypeDiSEqC_1_3};
-    double            m_speed_hi        {2.5};
-    double            m_speed_lo        {1.9};
+    double            m_speedHi         {2.5};
+    double            m_speedLo         {1.9};
     dbl_to_uint_t     m_posmap;
     DiSEqCDevDevice  *m_child           {nullptr};
 
     // state
-    double            m_last_position   {0.0};
-    double            m_desired_azimuth {0.0};
+    double            m_lastPosition    {0.0};
+    double            m_desiredAzimuth  {0.0};
     bool              m_reset           {true};
 
     // rotor position tracking state
-    mutable double m_move_time          {0.0};
-    mutable bool   m_last_pos_known     {false};
-    mutable double m_last_azimuth       {0.0};
+    mutable double m_moveTime           {0.0};
+    mutable bool   m_lastPosKnown       {false};
+    mutable double m_lastAzimuth        {0.0};
 
     // statics
-    static const TypeTable RotorTypeTable[3];
+    static const TypeTable kRotorTypeTable[3];
 };
 
 class DiSEqCDevSCR : public DiSEqCDevDevice
@@ -390,15 +390,15 @@ class DiSEqCDevSCR : public DiSEqCDevDevice
         kTypeScrPosA               = 0,
         kTypeScrPosB               = 1,
     };
-    void SetUserBand(uint userband)        { m_scr_userband  = userband;   }
-    void SetFrequency(uint freq)           { m_scr_frequency = freq;       }
-    void SetPIN(int pin)                   { m_scr_pin       = pin;        }
+    void SetUserBand(uint userband)        { m_scrUserband  = userband;    }
+    void SetFrequency(uint freq)           { m_scrFrequency = freq;        }
+    void SetPIN(int pin)                   { m_scrPin       = pin;         }
     bool SetChild(uint ordinal, DiSEqCDevDevice* device) override; // DiSEqCDevDevice
 
     // Gets
-    uint         GetUserBand(void) const   { return m_scr_userband;        }
-    uint         GetFrequency(void) const  { return m_scr_frequency;       }
-    int          GetPIN(void) const        { return m_scr_pin;             }
+    uint         GetUserBand(void) const   { return m_scrUserband;         }
+    uint         GetFrequency(void) const  { return m_scrFrequency;        }
+    int          GetPIN(void) const        { return m_scrPin;              }
     uint GetChildCount(void) const  override // DiSEqCDevDevice
         { return 1; }
     bool IsCommandNeeded(const DiSEqCDevSettings&,
@@ -416,23 +416,23 @@ class DiSEqCDevSCR : public DiSEqCDevDevice
 
     // statics
     static QString SCRPositionToString(dvbdev_pos_t pos)
-        { return TableToString((uint)pos, SCRPositionTable); }
+        { return TableToString((uint)pos, kSCRPositionTable); }
 
     static dvbdev_pos_t SCRPositionFromString(const QString &pos)
-        { return (dvbdev_pos_t) TableFromString(pos, SCRPositionTable); }
+        { return (dvbdev_pos_t) TableFromString(pos, kSCRPositionTable); }
 
   protected:
     bool         SendCommand(uint cmd, uint repeats, uint data_len = 0,
                              unsigned char *data = nullptr) const;
 
   private:
-    uint             m_scr_userband  {0};    /* 0-7 */
-    uint             m_scr_frequency {1400};
-    int              m_scr_pin       {-1};   /* 0-255, -1=disabled */
+    uint             m_scrUserband   {0};    /* 0-7 */
+    uint             m_scrFrequency  {1400};
+    int              m_scrPin        {-1};   /* 0-255, -1=disabled */
 
     DiSEqCDevDevice *m_child         {nullptr};
 
-    static const TypeTable SCRPositionTable[3];
+    static const TypeTable kSCRPositionTable[3];
 };
 
 class DiSEqCDevLNB : public DiSEqCDevDevice
@@ -455,16 +455,16 @@ class DiSEqCDevLNB : public DiSEqCDevDevice
         kTypeBandstacked           = 3,
     };
     void SetType(dvbdev_lnb_t type)       { m_type       = type;       }
-    void SetLOFSwitch(uint lof_switch)    { m_lof_switch = lof_switch; }
-    void SetLOFHigh(  uint lof_hi)        { m_lof_hi     = lof_hi;     }
-    void SetLOFLow(   uint lof_lo)        { m_lof_lo     = lof_lo;     }
+    void SetLOFSwitch(uint lof_switch)    { m_lofSwitch = lof_switch;  }
+    void SetLOFHigh(  uint lof_hi)        { m_lofHi     = lof_hi;      }
+    void SetLOFLow(   uint lof_lo)        { m_lofLo     = lof_lo;      }
     void SetPolarityInverted(bool inv)    { m_pol_inv    = inv;        }
 
     // Gets
     dvbdev_lnb_t GetType(void)      const { return m_type;             }
-    uint         GetLOFSwitch(void) const { return m_lof_switch;       }
-    uint         GetLOFHigh(void)   const { return m_lof_hi;           }
-    uint         GetLOFLow(void)    const { return m_lof_lo;           }
+    uint         GetLOFSwitch(void) const { return m_lofSwitch;        }
+    uint         GetLOFHigh(void)   const { return m_lofHi;            }
+    uint         GetLOFLow(void)    const { return m_lofLo;            }
     bool         IsPolarityInverted(void) const { return m_pol_inv;    }
     bool         IsHighBand(const DTVMultiplex&) const;
     bool         IsHorizontal(const DTVMultiplex&) const;
@@ -475,22 +475,22 @@ class DiSEqCDevLNB : public DiSEqCDevDevice
 
     // statics
     static QString LNBTypeToString(dvbdev_lnb_t type)
-        { return TableToString((uint)type, LNBTypeTable); }
+        { return TableToString((uint)type, kLNBTypeTable); }
 
     static dvbdev_lnb_t LNBTypeFromString(const QString &type)
-        { return (dvbdev_lnb_t) TableFromString(type, LNBTypeTable); }
+        { return (dvbdev_lnb_t) TableFromString(type, kLNBTypeTable); }
 
   private:
     dvbdev_lnb_t m_type       {kTypeVoltageAndToneControl};
-    uint         m_lof_switch {11700000};
-    uint         m_lof_hi     {10600000};
-    uint         m_lof_lo     { 9750000};
+    uint         m_lofSwitch  {11700000};
+    uint         m_lofHi      {10600000};
+    uint         m_lofLo      { 9750000};
     /// If a signal is circularly polarized the polarity will flip
     /// on each reflection, so antenna systems with an even number
     /// of reflectors will need to set this value.
     bool         m_pol_inv    {false};
 
-    static const TypeTable LNBTypeTable[5];
+    static const TypeTable kLNBTypeTable[5];
 };
 
 #endif // _DISEQC_H_

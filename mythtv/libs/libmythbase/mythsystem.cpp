@@ -51,8 +51,7 @@ class MythSystemLegacyWrapper : public MythSystem
         if (args.empty())
             return nullptr;
 
-        MythSystemLegacy *legacy =
-            new MythSystemLegacy(args.join(" "), flags);
+        auto *legacy = new MythSystemLegacy(args.join(" "), flags);
 
         if (!startPath.isEmpty())
             legacy->SetDirectory(startPath);
@@ -64,8 +63,7 @@ class MythSystemLegacyWrapper : public MythSystem
             return nullptr;
         }
 
-        MythSystemLegacyWrapper *wrapper =
-            new MythSystemLegacyWrapper(legacy, flags);
+        auto *wrapper = new MythSystemLegacyWrapper(legacy, flags);
 
         // TODO implement cpuPriority and diskPriority
         return wrapper;

@@ -75,7 +75,7 @@ public:
     bool m_notify;
 };
 
-typedef QSharedPointer<ThumbTask> TaskPtr;
+using TaskPtr = QSharedPointer<ThumbTask>;
 
 
 //! A generator worker thread
@@ -104,7 +104,7 @@ private:
     Q_DISABLE_COPY(ThumbThread)
 
     //! A priority queue where 0 is highest priority
-    typedef QMultiMap<int, TaskPtr> ThumbQueue;
+    using ThumbQueue = QMultiMap<int, TaskPtr>;
 
     QString CreateThumbnail(ImagePtrK im, int thumbPriority);
     static void RemoveTasks(ThumbQueue &queue, int devId);

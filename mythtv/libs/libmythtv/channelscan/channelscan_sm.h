@@ -60,17 +60,17 @@ class SignalMonitor;
 class DTVSignalMonitor;
 class DVBSignalMonitor;
 
-typedef vector<const ProgramMapTable*>  pmt_vec_t;
-typedef QMap<uint, pmt_vec_t>           pmt_map_t;
+using pmt_vec_t = vector<const ProgramMapTable*>;
+using pmt_map_t = QMap<uint, pmt_vec_t>;
 class ScannedChannelInfo;
-typedef QPair<transport_scan_items_it_t, ScannedChannelInfo*> ChannelListItem;
-typedef QList<ChannelListItem> ChannelList;
+using ChannelListItem = QPair<transport_scan_items_it_t, ScannedChannelInfo*>;
+using ChannelList = QList<ChannelListItem>;
 
 class ChannelScanSM;
 class AnalogSignalHandler : public SignalMonitorListener
 {
   public:
-    explicit AnalogSignalHandler(ChannelScanSM *_siscan) : siscan(_siscan) { }
+    explicit AnalogSignalHandler(ChannelScanSM *_siscan) : m_siScan(_siscan) { }
 
   public:
     inline void AllGood(void) override; // SignalMonitorListener
@@ -79,7 +79,7 @@ class AnalogSignalHandler : public SignalMonitorListener
     void StatusSignalStrength(const SignalMonitorValue&) override { } // SignalMonitorListener
 
   private:
-    ChannelScanSM *siscan;
+    ChannelScanSM *m_siScan;
 };
 
 class ChannelScanSM : public MPEGStreamListener,
@@ -94,7 +94,7 @@ class ChannelScanSM : public MPEGStreamListener,
     ChannelScanSM(ScanMonitor *_scan_monitor,
                   const QString &_cardtype, ChannelBase* _channel, int _sourceID,
                   uint signal_timeout, uint channel_timeout,
-                  const QString &_inputname, bool test_decryption);
+                  QString _inputname, bool test_decryption);
     ~ChannelScanSM();
 
     void StartScanner(void);
@@ -129,7 +129,7 @@ class ChannelScanSM : public MPEGStreamListener,
     DTVSignalMonitor *GetDTVSignalMonitor(void);
     DVBSignalMonitor *GetDVBSignalMonitor(void);
 
-    typedef QMap<uint,ChannelInsertInfo> chan_info_map_t;
+    using chan_info_map_t = QMap<uint,ChannelInsertInfo>;
     chan_info_map_t GetChannelList(transport_scan_items_it_t trans_info,
                                    ScannedChannelInfo *scan_info) const;
     uint GetCurrentTransportInfo(QString &chan, QString &chan_tr) const;
@@ -172,7 +172,7 @@ class ChannelScanSM : public MPEGStreamListener,
     bool Tune(const transport_scan_items_it_t &transport);
     void ScanTransport(const transport_scan_items_it_t &transport);
     DTVTunerType GuessDTVTunerType(DTVTunerType) const;
-    void LogLines(const QString& string) const;
+    static void LogLines(const QString& string);
 
     /// \brief Updates Transport Scan progress bar
     inline void UpdateScanPercentCompleted(void);
@@ -269,7 +269,7 @@ inline void ChannelScanSM::UpdateScanPercentCompleted(void)
 
 void AnalogSignalHandler::AllGood(void)
 {
-    siscan->HandleAllGood();
+    m_siScan->HandleAllGood();
 }
 
 #endif // SISCAN_H

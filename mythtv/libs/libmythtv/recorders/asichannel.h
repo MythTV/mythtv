@@ -15,7 +15,7 @@ using namespace std;
 class ASIChannel : public DTVChannel
 {
   public:
-    ASIChannel(TVRec *parent, const QString &device);
+    ASIChannel(TVRec *parent, QString device);
     ~ASIChannel(void);
 
     // Commands

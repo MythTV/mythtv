@@ -533,7 +533,7 @@ QString ImportIconsWizard::wget(QUrl& url, const QString& strParam )
 {
     QByteArray data(strParam.toLatin1());
 
-    QNetworkRequest *req = new QNetworkRequest(url);
+    auto *req = new QNetworkRequest(url);
     req->setHeader(QNetworkRequest::ContentTypeHeader, QString("application/x-www-form-urlencoded"));
     req->setHeader(QNetworkRequest::ContentLengthHeader, data.size());
 
@@ -775,8 +775,7 @@ void ImportIconsWizard::askSubmit(const QString& strParam)
                          "choices back to mythtv.org so that others can "
                          "benefit from your selections.");
 
-    MythConfirmationDialog *confirmPopup =
-            new MythConfirmationDialog(m_popupStack, message);
+    auto *confirmPopup = new MythConfirmationDialog(m_popupStack, message);
 
     confirmPopup->SetReturnEvent(this, "submitresults");
 
@@ -836,7 +835,7 @@ void ImportIconsWizard::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
+        auto *dce = (DialogCompletionEvent*)(event);
 
         QString resultid  = dce->GetId();
         int     buttonnum = dce->GetResult();

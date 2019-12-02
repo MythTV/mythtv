@@ -245,7 +245,7 @@ unsigned short pick_mintmpledges(const unsigned short *matches,
     static constexpr float  kMatchStart = 0.20;
     static constexpr float  kMatchEnd = 0.80;
 
-    ushort *sorted = new unsigned short[nframes];
+    auto *sorted = new unsigned short[nframes];
     memcpy(sorted, matches, nframes * sizeof(*matches));
     qsort(sorted, nframes, sizeof(*sorted), sort_ascending);
     ushort minmatch = sorted[0];
@@ -253,12 +253,12 @@ unsigned short pick_mintmpledges(const unsigned short *matches,
     ushort matchrange = maxmatch - minmatch;
     /* degenerate minmatch==maxmatch case is gracefully handled */
 
-    ushort leftwidth = (unsigned short)(kLeftWidth * matchrange);
-    ushort middlewidth = (unsigned short)(kMiddleWidth * matchrange);
-    ushort rightwidth = (unsigned short)(kRightWidth * matchrange);
+    auto leftwidth = (unsigned short)(kLeftWidth * matchrange);
+    auto middlewidth = (unsigned short)(kMiddleWidth * matchrange);
+    auto rightwidth = (unsigned short)(kRightWidth * matchrange);
 
     int nfreq = maxmatch + 1;
-    ushort *freq = new unsigned short[nfreq];
+    auto *freq = new unsigned short[nfreq];
     memset(freq, 0, nfreq * sizeof(*freq));
     for (long long frameno = 0; frameno < nframes; frameno++)
         freq[matches[frameno]]++;   /* freq[<matchcnt>] = <framecnt> */

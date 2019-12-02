@@ -606,14 +606,14 @@ setup_dev(struct vbi *vbi)
 struct vbi *
 vbi_open(const char *vbi_dev_name, struct cache *ca, int fine_tune, int big_buf)
 {
-    static int inited = 0;
+    static int s_inited = 0;
     struct vbi *vbi = 0;
 
     (void)ca;
 
-    if (! inited)
+    if (! s_inited)
        lang_init();
-    inited = 1;
+    s_inited = 1;
 
     if (!(vbi = malloc(sizeof(*vbi))))
     {

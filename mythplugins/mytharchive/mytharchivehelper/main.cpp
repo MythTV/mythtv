@@ -1620,7 +1620,7 @@ static int grabThumbnail(const QString& inFile, const QString& thumbList, const 
     MythPictureDeinterlacer deinterlacer(codecCtx->pix_fmt, width, height);
 
     int bufflen = width * height * 4;
-    unsigned char *outputbuf = new unsigned char[bufflen];
+    auto *outputbuf = new unsigned char[bufflen];
 
     int frameNo = -1, thumbCount = 0;
     bool frameFinished = false;

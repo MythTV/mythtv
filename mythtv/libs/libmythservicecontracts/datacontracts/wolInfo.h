@@ -60,7 +60,7 @@ class SERVICE_PUBLIC WOLInfo : public QObject
         Q_DISABLE_COPY(WOLInfo);
 };
 
-typedef WOLInfo* WOLInfoPtr;
+using WOLInfoPtr = WOLInfo*;
 
 inline void WOLInfo::InitializeCustomTypes()
 {

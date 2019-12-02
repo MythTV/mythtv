@@ -21,6 +21,8 @@
  */
 
 #include <iostream>
+#include <utility>
+
 using namespace std;
 
 #include <QFileInfo>
@@ -50,13 +52,13 @@ TeletextStuff::~TeletextStuff() { delete reader; }
 DVBSubStuff::~DVBSubStuff() { delete reader; }
 
 MythCCExtractorPlayer::MythCCExtractorPlayer(PlayerFlags flags, bool showProgress,
-                                             const QString &fileName,
+                                             QString fileName,
                                              const QString &destdir) :
     MythPlayer(flags),
     m_curTime(0),
     m_myFramesPlayed(0),
     m_showProgress(showProgress),
-    m_fileName(fileName)
+    m_fileName(std::move(fileName))
 {
     // Determine where we will put extracted info.
     QStringList comps = QFileInfo(m_fileName).fileName().split(".");
@@ -106,8 +108,8 @@ static QString progress_string(
             .arg(m_myFramesPlayed,7);
     }
 
-    static char const spin_chars[] = "/-\\|";
-    static uint spin_cnt = 0;
+    static constexpr char kSpinChars[] = "/-\\|";
+    static uint s_spinCnt = 0;
 
     double elapsed = flagTime.elapsed() * 0.001;
     double flagFPS = (elapsed > 0.0) ? (m_myFramesPlayed / elapsed) : 0;
@@ -121,7 +123,7 @@ static QString progress_string(
           .arg(flagFPS,4,'f', (flagFPS < 10.0 ? 1 : 0)).arg(percentage,4,'f',1);
     return QString("%1 fps %2      \r")
         .arg(flagFPS,4,'f', (flagFPS < 10.0 ? 1 : 0))
-        .arg(spin_chars[++spin_cnt % 4]);
+        .arg(kSpinChars[++s_spinCnt % 4]);
 }
 
 bool MythCCExtractorPlayer::run(void)
@@ -294,7 +296,7 @@ void MythCCExtractorPlayer::IngestSubtitle(
 
 void MythCCExtractorPlayer::Ingest608Captions(void)
 {
-    static const int ccIndexTbl[7] =
+    static constexpr int kCcIndexTbl[7] =
     {
         0, // CC_CC1
         1, // CC_CC2
@@ -322,20 +324,20 @@ void MythCCExtractorPlayer::Ingest608Captions(void)
             if (streamRawIdx < 0)
                 continue;
 
-            textlist->lock.lock();
+            textlist->m_lock.lock();
 
-            const int ccIdx = ccIndexTbl[min(streamRawIdx,6)];
+            const int ccIdx = kCcIndexTbl[min(streamRawIdx,6)];
 
             if (ccIdx >= 4)
             {
-                textlist->lock.unlock();
+                textlist->m_lock.unlock();
                 continue;
             }
 
-            FormattedTextSubtitle608 fsub(textlist->buffers);
+            FormattedTextSubtitle608 fsub(textlist->m_buffers);
             QStringList content = fsub.ToSRT();
 
-            textlist->lock.unlock();
+            textlist->m_lock.unlock();
 
             IngestSubtitle((*it).subs[ccIdx], content);
         }
@@ -366,7 +368,7 @@ void MythCCExtractorPlayer::Process608Captions(uint flags)
             if (!(*cc608it).srtwriters[idx])
             {
                 int langCode = 0;
-                AvFormatDecoder *avd = dynamic_cast<AvFormatDecoder *>(decoder);
+                auto *avd = dynamic_cast<AvFormatDecoder *>(decoder);
                 if (avd)
                     langCode = avd->GetCaptionLanguage(
                         kTrackTypeCC608, idx + 1);
@@ -425,7 +427,7 @@ void MythCCExtractorPlayer::Ingest708Captions(void)
                         Ingest708Caption(it.key(), serviceIdx, windowIdx,
                                          win.m_pen.m_row, win.m_pen.m_column,
                                          win, strings);
-                        win.DisposeStrings(strings);
+                        CC708Window::DisposeStrings(strings);
                     }
                     service->m_windows[windowIdx].ResetChanged();
                 }
@@ -493,7 +495,7 @@ void MythCCExtractorPlayer::Process708Captions(uint flags)
             if (!(*cc708it).srtwriters[idx])
             {
                 int langCode = 0;
-                AvFormatDecoder *avd = dynamic_cast<AvFormatDecoder*>(decoder);
+                auto *avd = dynamic_cast<AvFormatDecoder*>(decoder);
                 if (avd)
                     langCode = avd->GetCaptionLanguage(kTrackTypeCC708, idx);
 
@@ -550,7 +552,7 @@ void MythCCExtractorPlayer::IngestTeletext(void)
     TeletextInfo::iterator ttxit = m_ttx_info.begin();
     for (; ttxit != m_ttx_info.end(); ++ttxit)
     {
-        typedef QPair<int, int> qpii;
+        using qpii = QPair<int, int>;
         QSet<qpii> updatedPages = (*ttxit).reader->GetUpdatedPages();
         if (updatedPages.isEmpty())
             continue;
@@ -594,7 +596,7 @@ void MythCCExtractorPlayer::ProcessTeletext(uint flags)
             if (!(*ttxit).srtwriters[page])
             {
                 int langCode = 0;
-                AvFormatDecoder *avd = dynamic_cast<AvFormatDecoder *>(decoder);
+                auto *avd = dynamic_cast<AvFormatDecoder *>(decoder);
 
                 if (avd)
                     langCode = avd->GetTeletextLanguage(page);
@@ -661,7 +663,7 @@ void MythCCExtractorPlayer::IngestDVBSubtitles(void)
 
         while (!avsubtitles->m_buffers.empty())
         {
-            const AVSubtitle subtitle = avsubtitles->m_buffers.front();
+            AVSubtitle subtitle = avsubtitles->m_buffers.front();
             avsubtitles->m_buffers.pop_front();
 
             const QSize v_size =
@@ -709,7 +711,7 @@ void MythCCExtractorPlayer::IngestDVBSubtitles(void)
             sub.length =
                 subtitle.end_display_time - subtitle.start_display_time;
 
-            (*subit).reader->FreeAVSubtitle(subtitle);
+            SubtitleReader::FreeAVSubtitle(subtitle);
 
             if (min_x < max_x && min_y < max_y)
             {
@@ -739,7 +741,7 @@ void MythCCExtractorPlayer::ProcessDVBSubtitles(uint flags)
     for (; subit != m_dvbsub_info.end(); ++subit)
     {
         int langCode = 0;
-        AvFormatDecoder *avd = dynamic_cast<AvFormatDecoder *>(decoder);
+        auto *avd = dynamic_cast<AvFormatDecoder *>(decoder);
         int idx = subit.key();
         if (avd)
             langCode = avd->GetSubtitleLanguage(subtitleStreamCount, idx);

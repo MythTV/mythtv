@@ -1149,7 +1149,7 @@ class MTV_PUBLIC SpliceInformationTable : public PSIPTable
     //    E_CRC_32             32   ??.0
     // CRC_32                  32   ??.0
 
-    SpliceInformationTable *GetDecrypted(const QString &codeWord) const;
+    static SpliceInformationTable *GetDecrypted(const QString &codeWord);
     bool Parse(void);
 
     QString toString(void) const override // PSIPTable

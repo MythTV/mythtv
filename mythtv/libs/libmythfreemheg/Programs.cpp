@@ -1071,7 +1071,7 @@ void MHCall::Initialise(MHParseNode *p, MHEngine *engine)
 
     for (int i = 0; i < args->GetSeqCount(); i++)
     {
-        MHParameter *pParm = new MHParameter;
+        auto *pParm = new MHParameter;
         m_Parameters.Append(pParm);
         pParm->Initialise(args->GetSeqN(i), engine);
     }

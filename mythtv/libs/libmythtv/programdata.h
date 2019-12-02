@@ -24,7 +24,7 @@ class MSqlQuery;
 class MTV_PUBLIC DBPerson
 {
   public:
-    typedef enum
+    enum Role
     {
         kUnknown = 0,
         kActor,
@@ -38,11 +38,11 @@ class MTV_PUBLIC DBPerson
         kPresenter,
         kCommentator,
         kGuest,
-    } Role;
+    };
 
     DBPerson(const DBPerson&);
-    DBPerson(Role _role, const QString &_name);
-    DBPerson(const QString &_role, const QString &_name);
+    DBPerson(Role _role, QString _name);
+    DBPerson(const QString &_role, QString _name);
 
     QString GetRole(void) const;
 
@@ -59,7 +59,7 @@ class MTV_PUBLIC DBPerson
     Role    m_role;
     QString m_name;
 };
-typedef vector<DBPerson> DBCredits;
+using DBCredits = vector<DBPerson>;
 
 class MTV_PUBLIC EventRating
 {

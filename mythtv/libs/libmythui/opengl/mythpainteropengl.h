@@ -55,10 +55,10 @@ class MUI_PUBLIC MythOpenGLPainter : public MythPainter
     void  DeleteFormatImagePriv(MythImage *Image) override;
 
   protected:
-    QWidget          *m_parent;
-    MythRenderOpenGL *m_render;
-    QOpenGLFramebufferObject* m_target;
-    bool              m_swapControl;
+    QWidget          *m_parent { nullptr };
+    MythRenderOpenGL *m_render { nullptr };
+    QOpenGLFramebufferObject* m_target { nullptr };
+    bool              m_swapControl { true };
 
     QMap<MythImage *, MythGLTexture*> m_imageToTextureMap;
     std::list<MythImage *>     m_ImageExpireList;

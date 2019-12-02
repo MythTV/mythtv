@@ -19,7 +19,7 @@
 class QTcpSocket;
 class QUdpSocket;
 
-typedef QMap<QString, QString> Params;
+using Params = QMap<QString, QString>;
 
 class CetonRTSP : QObject
 {
@@ -47,7 +47,7 @@ protected:
                         const QString &alternative = QString());
 
   private:
-    QStringList splitLines(const QByteArray &lines);
+    static QStringList splitLines(const QByteArray &lines);
     QString readParameters(const QString &key, Params &parameters);
     QUrl GetBaseUrl(void);
     void timerEvent(QTimerEvent*) override; // QObject

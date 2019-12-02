@@ -186,7 +186,7 @@ TransportListEditor::TransportListEditor(uint sourceid) :
     addChild(m_videosource);
     m_videosource->setEnabled(false);
 
-    ButtonStandardSetting *newTransport =
+    auto *newTransport =
         new ButtonStandardSetting("(" + tr("New Transport") + ")");
     connect(newTransport, SIGNAL(clicked()), SLOT(NewTransport(void)));
 
@@ -268,9 +268,8 @@ void TransportListEditor::Load()
                 .arg(mod).arg(query.value(2).toString())
                 .arg(hz).arg(rate).arg(netid).arg(tid).arg(type);
 
-            TransportSetting *transport =
-                new TransportSetting(txt, query.value(0).toUInt(), m_sourceid,
-                                    m_cardtype);
+            auto *transport = new TransportSetting(txt, query.value(0).toUInt(),
+                                                   m_sourceid, m_cardtype);
             connect(transport, &TransportSetting::deletePressed,
                     this, [transport, this] () { Delete(transport); });
             connect(transport, &TransportSetting::openMenu,
@@ -286,9 +285,8 @@ void TransportListEditor::Load()
 
 void TransportListEditor::NewTransport()
 {
-    TransportSetting *transport =
-        new TransportSetting(QString("New Transport"), 0,
-           m_sourceid, m_cardtype);
+    auto *transport = new TransportSetting(QString("New Transport"), 0,
+                                           m_sourceid, m_cardtype);
     addChild(transport);
     m_list.push_back(transport);
     emit settingsChanged(this);
@@ -325,16 +323,7 @@ void TransportListEditor::Delete(TransportSetting *transport)
                 MythDB::DBError("TransportEditor -- delete channels", query);
 
             removeChild(transport);
-            // m_list.removeAll(transport);
-            // Following for QT 5.3 which does not have the removeAll
-            // method in QVector
-            int ix;
-            do
-            {
-                ix = m_list.indexOf(transport);
-                if (ix != -1)
-                    m_list.remove(ix);
-            } while (ix != -1);
+            m_list.removeAll(transport);
         },
         true);
 }
@@ -344,13 +333,12 @@ void TransportListEditor::Menu(TransportSetting *transport)
     if (m_isLoading)
         return;
 
-    MythMenu *menu = new MythMenu(tr("Transport Menu"), this, "transportmenu");
+    auto *menu = new MythMenu(tr("Transport Menu"), this, "transportmenu");
     menu->AddItem(tr("Delete..."), [transport, this] () { Delete(transport); });
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    MythDialogBox *menuPopup = new MythDialogBox(menu, popupStack,
-                                                 "menudialog");
+    auto *menuPopup = new MythDialogBox(menu, popupStack, "menudialog");
     menuPopup->SetReturnEvent(this, "transportmenu");
 
     if (menuPopup->Create())
@@ -363,36 +351,36 @@ class MuxDBStorage : public SimpleDBStorage
 {
   protected:
     MuxDBStorage(StorageUser *_setting, const MultiplexID *_id, const QString& _name) :
-        SimpleDBStorage(_setting, "dtv_multiplex", _name), mplexid(_id)
+        SimpleDBStorage(_setting, "dtv_multiplex", _name), m_mplexId(_id)
     {
     }
 
     QString GetSetClause(MSqlBindings &bindings) const override; // SimpleDBStorage
     QString GetWhereClause(MSqlBindings &bindings) const override; // SimpleDBStorage
 
-    const MultiplexID *mplexid;
+    const MultiplexID *m_mplexId;
 };
 
 QString MuxDBStorage::GetWhereClause(MSqlBindings &bindings) const
 {
-    QString muxTag = ":WHERE" + mplexid->GetColumnName().toUpper();
+    QString muxTag = ":WHERE" + m_mplexId->GetColumnName().toUpper();
 
-    bindings.insert(muxTag, mplexid->getValue());
+    bindings.insert(muxTag, m_mplexId->getValue());
 
     // return query
-    return mplexid->GetColumnName() + " = " + muxTag;
+    return m_mplexId->GetColumnName() + " = " + muxTag;
 }
 
 QString MuxDBStorage::GetSetClause(MSqlBindings &bindings) const
 {
-    QString muxTag  = ":SET" + mplexid->GetColumnName().toUpper();
+    QString muxTag  = ":SET" + m_mplexId->GetColumnName().toUpper();
     QString nameTag = ":SET" + GetColumnName().toUpper();
 
-    bindings.insert(muxTag,  mplexid->getValue());
+    bindings.insert(muxTag,  m_mplexId->getValue());
     bindings.insert(nameTag, m_user->GetDBValue());
 
     // return query
-    return (mplexid->GetColumnName() + " = " + muxTag + ", " +
+    return (m_mplexId->GetColumnName() + " = " + muxTag + ", " +
             GetColumnName()   + " = " + nameTag);
 }
 

@@ -19,19 +19,19 @@ enum { VIDEO_YEAR_DEFAULT = 1895 };
 
 const QString VIDEO_SUBTITLE_DEFAULT = "";
 
-typedef QHash<QString,QString> MetadataMap;
+using MetadataMap = QHash<QString,QString>;
 
 class META_PUBLIC VideoMetadata
 {
     Q_DECLARE_TR_FUNCTIONS(VideoMetadata);
 
   public:
-    typedef std::pair<int, QString> genre_entry;
-    typedef std::pair<int, QString> country_entry;
-    typedef std::pair<int, QString> cast_entry;
-    typedef std::vector<genre_entry> genre_list;
-    typedef std::vector<country_entry> country_list;
-    typedef std::vector<cast_entry> cast_list;
+    using genre_entry = std::pair<int, QString>;
+    using country_entry = std::pair<int, QString>;
+    using cast_entry = std::pair<int, QString>;
+    using genre_list = std::vector<genre_entry>;
+    using country_list = std::vector<country_entry>;
+    using cast_list = std::vector<cast_entry>;
 
   public:
     static int UpdateHashedDBRecord(const QString &hash, const QString &file_name,

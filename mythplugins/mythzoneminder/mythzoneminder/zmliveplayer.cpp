@@ -167,7 +167,7 @@ ZMLivePlayer::~ZMLivePlayer()
     if (m_players)
     {
         QString s = "";
-        vector<Player*>::iterator i = m_players->begin();
+        auto i = m_players->begin();
         for (; i != m_players->end(); ++i)
         {
             Player *p = *i;
@@ -240,7 +240,7 @@ void ZMLivePlayer::ShowMenu()
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    MythDialogBox *menuPopup = new MythDialogBox("Menu", popupStack, "mainmenu");
+    auto *menuPopup = new MythDialogBox("Menu", popupStack, "mainmenu");
 
     if (menuPopup->Create())
         popupStack->AddScreen(menuPopup);
@@ -448,7 +448,7 @@ void ZMLivePlayer::setMonitorLayout(int layout, bool restore)
         MythUIText  *cameraText = dynamic_cast<MythUIText *> (GetChild(QString("name%1-%2").arg(layout).arg(x)));
         MythUIText  *statusText = dynamic_cast<MythUIText *> (GetChild(QString("status%1-%2").arg(layout).arg(x)));
 
-        Player *p = new Player();
+        auto *p = new Player();
         p->setMonitor(monitor);
         p->setWidgets(frameImage, statusText, cameraText);
         p->updateCamera();

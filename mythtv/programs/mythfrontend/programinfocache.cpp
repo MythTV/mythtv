@@ -16,12 +16,12 @@
 
 #include <algorithm>
 
-typedef vector<ProgramInfo*> *VPI_ptr;
+using VPI_ptr = vector<ProgramInfo *> *;
 static void free_vec(VPI_ptr &v)
 {
     if (v)
     {
-        vector<ProgramInfo*>::iterator it = v->begin();
+        auto it = v->begin();
         for (; it != v->end(); ++it)
             delete *it;
         delete v;
@@ -120,7 +120,7 @@ void ProgramInfoCache::Refresh(void)
     if (m_next_cache)
     {
         Clear();
-        vector<ProgramInfo*>::iterator it = m_next_cache->begin();
+        auto it = m_next_cache->begin();
         for (; it != m_next_cache->end(); ++it)
         {
             if (!(*it)->GetChanID())

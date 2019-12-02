@@ -71,8 +71,7 @@ bool ManualSchedule::Create(void)
     {
         QString chantext = channels[i].GetFormatted(ChannelInfo::kChannelLong);
 
-        MythUIButtonListItem *item =
-                            new MythUIButtonListItem(m_channelList, chantext);
+        auto *item = new MythUIButtonListItem(m_channelList, chantext);
         InfoMap infomap;
         channels[i].ToMap(infomap);
         item->SetTextFromMap(infomap);
@@ -217,12 +216,12 @@ void ManualSchedule::recordClicked(void)
                   m_chanids[m_channelList->GetCurrentPos()],
                   m_startDateTime, endts);
 
-    RecordingRule *record = new RecordingRule();
+    auto *record = new RecordingRule();
     record->LoadByProgram(&p);
     record->m_searchType = kManualSearch;
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    ScheduleEditor *schededit = new ScheduleEditor(mainStack, record);
+    auto *schededit = new ScheduleEditor(mainStack, record);
     if (schededit->Create())
     {
         mainStack->AddScreen(schededit);

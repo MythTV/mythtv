@@ -23,7 +23,7 @@ class HDHRChannel : public DTVChannel
     friend class HDHRRecorder;
 
   public:
-    HDHRChannel(TVRec *parent, const QString &device);
+    HDHRChannel(TVRec *parent, QString device);
     ~HDHRChannel(void);
 
     bool Open(void) override; // ChannelBase

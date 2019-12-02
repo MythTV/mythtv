@@ -134,11 +134,11 @@ bool DTVConfParser::ParseConfOFDM(const QStringList &tokens)
     PARSE_UINT(mux.m_frequency);
     PARSE_CONF(mux.m_inversion);
     PARSE_CONF(mux.m_bandwidth);
-    PARSE_CONF(mux.m_hp_code_rate);
-    PARSE_CONF(mux.m_lp_code_rate);
+    PARSE_CONF(mux.m_hpCodeRate);
+    PARSE_CONF(mux.m_lpCodeRate);
     PARSE_CONF(mux.m_modulation);
-    PARSE_CONF(mux.m_trans_mode);
-    PARSE_CONF(mux.m_guard_interval);
+    PARSE_CONF(mux.m_transMode);
+    PARSE_CONF(mux.m_guardInterval);
     PARSE_CONF(mux.m_hierarchy);
     PARSE_SKIP(unknown);
     PARSE_SKIP(unknown);
@@ -244,19 +244,19 @@ bool DTVConfParser::ParseVDR(const QStringList &tokens, int channelNo)
                 mux.m_bandwidth.ParseVDR(params);
                 break;
             case 'C':
-                mux.m_hp_code_rate.ParseVDR(params);
+                mux.m_hpCodeRate.ParseVDR(params);
                 break;
             case 'D':
-                mux.m_lp_code_rate.ParseVDR(params);
+                mux.m_lpCodeRate.ParseVDR(params);
                 break;
             case 'M':
                 mux.m_modulation.ParseVDR(params);
                 break;
             case 'T':
-                mux.m_trans_mode.ParseVDR(params);
+                mux.m_transMode.ParseVDR(params);
                 break;
             case 'G':
-                mux.m_guard_interval.ParseVDR(params);
+                mux.m_guardInterval.ParseVDR(params);
                 break;
             case 'Y':
                 mux.m_hierarchy.ParseVDR(params);
@@ -268,7 +268,7 @@ bool DTVConfParser::ParseVDR(const QStringList &tokens, int channelNo)
                 mux.m_polarity.ParseVDR(ori);
                 break;
             case 'S':
-                mux.m_mod_sys.ParseVDR(params);
+                mux.m_modSys.ParseVDR(params);
                 break;
             case 'O':
                 mux.m_rolloff.ParseVDR(params);

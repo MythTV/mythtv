@@ -119,7 +119,7 @@ void LCDServer::newConnection(QTcpSocket *socket)
 
 void LCDServer::endConnection(void)
 {
-    QTcpSocket *socket = dynamic_cast<QTcpSocket*>(sender());
+    auto *socket = dynamic_cast<QTcpSocket*>(sender());
     if (socket)
     {
         socket->close();
@@ -134,8 +134,7 @@ void LCDServer::endConnection(void)
 
 void LCDServer::readSocket()
 {
-    QTcpSocket *socket = dynamic_cast<QTcpSocket*>(sender());
-
+    auto *socket = dynamic_cast<QTcpSocket*>(sender());
     if (socket)
     {
         m_lastSocket = socket;

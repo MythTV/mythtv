@@ -121,4 +121,4 @@ cleanall: clean
 
 compdb:
 	@echo "Building ../compile_commands.json"
-	@programs/scripts/build_commdb.py
+	@programs/scripts/build_compdb.py

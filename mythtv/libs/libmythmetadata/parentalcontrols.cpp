@@ -165,7 +165,7 @@ namespace
     class PasswordManager
     {
       private:
-        typedef std::map<ParentalLevel::Level, QString> pws;
+        using pws = std::map<ParentalLevel::Level, QString>;
 
       public:
         void Add(ParentalLevel::Level level, const QString &password)
@@ -309,8 +309,7 @@ class ParentalLevelChangeCheckerPrivate : public QObject
         MythScreenStack *popupStack =
                 GetMythMainWindow()->GetStack("popup stack");
 
-        MythTextInputDialog *pwd =
-                new MythTextInputDialog(popupStack,
+        auto *pwd = new MythTextInputDialog(popupStack,
                         tr("Parental PIN:"), FilterNone, true);
 
         connect(pwd, SIGNAL(haveResult(QString)),

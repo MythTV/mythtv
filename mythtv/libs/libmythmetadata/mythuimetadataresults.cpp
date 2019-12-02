@@ -50,9 +50,8 @@ bool MetadataResultsDialog::Create()
     for (int i = 0;
             i != m_results.count(); ++i)
     {
-        MythUIButtonListItem *button =
-            new MythUIButtonListItem(m_resultsList,
-                m_results[i]->GetTitle());
+        auto *button = new MythUIButtonListItem(m_resultsList,
+                                                m_results[i]->GetTitle());
         InfoMap metadataMap;
         m_results[i]->toMap(metadataMap);
 
@@ -128,7 +127,7 @@ void MetadataResultsDialog::customEvent(QEvent *event)
 {
     if (event->type() == ThumbnailDLEvent::kEventType)
     {
-        ThumbnailDLEvent *tde = dynamic_cast<ThumbnailDLEvent *>(event);
+        auto *tde = dynamic_cast<ThumbnailDLEvent *>(event);
         if (tde == nullptr)
             return;
 

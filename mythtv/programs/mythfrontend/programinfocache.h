@@ -52,7 +52,7 @@ class ProgramInfoCache
     // We could store a hash, but sort the vector in GetOrdered which might
     // be a suitable compromise, fractionally slower initial load but faster
     // scrolling and updates
-    typedef QHash<uint,ProgramInfo*> Cache;
+    using Cache = QHash<uint,ProgramInfo*>;
 
     mutable QMutex          m_lock;
     Cache                   m_cache;

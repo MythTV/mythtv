@@ -241,7 +241,7 @@ bool ZMConsole::keyPressEvent(QKeyEvent *event)
 
 void ZMConsole::showEditFunctionPopup()
 {
-    Monitor *currentMonitor = m_monitor_list->GetItemCurrent()->GetData().value<Monitor*>();
+    auto *currentMonitor = m_monitor_list->GetItemCurrent()->GetData().value<Monitor*>();
     if (!currentMonitor)
         return;
 
@@ -268,7 +268,7 @@ void ZMConsole::updateMonitorList()
 
         if (monitor)
         {
-            MythUIButtonListItem *item = new MythUIButtonListItem(m_monitor_list,
+            auto *item = new MythUIButtonListItem(m_monitor_list,
                 "", nullptr, true, MythUIButtonListItem::NotChecked);
             item->SetData(qVariantFromValue(monitor));
             item->SetText(monitor->name, "name");

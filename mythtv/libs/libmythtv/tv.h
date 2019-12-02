@@ -6,12 +6,12 @@
 class VBIMode
 {
   public:
-    typedef enum
+    enum vbimode_t
     {
         None    = 0,
         PAL_TT  = 1,
         NTSC_CC = 2,
-    } vbimode_t;
+    };
 
     static uint Parse(QString vbiformat)
     {
@@ -25,16 +25,16 @@ class VBIMode
 /** \brief ChannelChangeDirection is an enumeration of possible channel
  *         changing directions.
  */
-typedef enum
+enum ChannelChangeDirection
 {
     CHANNEL_DIRECTION_UP       = 0,
     CHANNEL_DIRECTION_DOWN     = 1,
     CHANNEL_DIRECTION_FAVORITE = 2,
     CHANNEL_DIRECTION_SAME     = 3,
-} ChannelChangeDirection;
+};
 
 /// Used to request ProgramInfo for channel browsing.
-typedef enum BrowseDirections
+enum BrowseDirection
 {
     BROWSE_INVALID = -1,
     BROWSE_SAME = 0, ///< Fetch browse information on current channel and time
@@ -43,11 +43,11 @@ typedef enum BrowseDirections
     BROWSE_LEFT,     ///< Fetch information on current channel in the past
     BROWSE_RIGHT,    ///< Fetch information on current channel in the future
     BROWSE_FAVORITE  ///< Fetch information on the next favorite channel
-} BrowseDirection;
+};
 
 /** \brief TVState is an enumeration of the states used by TV and TVRec.
  */
-typedef enum
+enum TVState
 {
     /** \brief Error State, if we ever try to enter this state errored is set.
      */
@@ -87,14 +87,14 @@ typedef enum
      *         of changing the state.
      */
     kState_ChangingState,
-} TVState;
+};
 inline TVState myth_deque_init(const TVState*) { return (TVState)(0); }
 
 QString StateToString(TVState state);
 
 /** \brief SleepStatus is an enumeration of the awake/sleep status of a slave.
  */
-typedef enum SleepStatus {
+enum SleepStatus {
     /** \brief A slave is awake when it is connected to the master
       */
     sStatus_Awake         = 0x0,
@@ -115,25 +115,25 @@ typedef enum SleepStatus {
       *        awakened.
       */
     sStatus_Undefined     = 0x8
-} SleepStatus;
+};
 
-typedef enum PictureAdjustType
+enum PictureAdjustType
 {
     kAdjustingPicture_None = 0,
     kAdjustingPicture_Playback,
     kAdjustingPicture_Channel,
     kAdjustingPicture_Recording,
-} PictureAdjustType;
+};
 QString toTypeString(PictureAdjustType type);
 QString toTitleString(PictureAdjustType type);
 
-typedef enum
+enum CommSkipMode
 {
     kCommSkipOff    = 0,
     kCommSkipOn     = 1,
     kCommSkipNotify = 2,
     kCommSkipCount,
     kCommSkipIncr,
-} CommSkipMode;
+};
 QString toString(CommSkipMode type);
 #endif

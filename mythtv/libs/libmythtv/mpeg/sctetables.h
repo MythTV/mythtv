@@ -179,7 +179,7 @@ class ModulationModeSubtable
     uint DescriptorsLength(void) const { return _end - _beg - 7; }
     const unsigned char *Descriptors(void) const { return _beg + 7; }
 
-    QString toString(void) const;
+    static QString toString(void);
     QString toStringXML(uint indent_level) const;
 
   private:

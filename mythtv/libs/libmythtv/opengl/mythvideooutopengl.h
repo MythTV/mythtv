@@ -15,7 +15,7 @@ class MythVideoOutputOpenGL : public MythVideoOutput
     static void GetRenderOptions(RenderOptions &Options);
     static QStringList GetAllowedRenderers(MythCodecID CodecId, const QSize &VideoDim);
 
-    explicit MythVideoOutputOpenGL(const QString &Profile = QString());
+    explicit MythVideoOutputOpenGL(QString Profile = QString());
     ~MythVideoOutputOpenGL() override;
 
     // VideoOutput
@@ -51,22 +51,22 @@ class MythVideoOutputOpenGL : public MythVideoOutput
     bool CreateBuffers(MythCodecID CodecID, QSize Size);
     QRect GetDisplayVisibleRect(void);
 
-    MythRenderOpenGL      *m_render;
-    bool                   m_isGLES2;
-    MythOpenGLVideo       *m_openGLVideo;
+    MythRenderOpenGL      *m_render               { nullptr };
+    bool                   m_isGLES2              { false };
+    MythOpenGLVideo       *m_openGLVideo          { nullptr };
     QMap<MythPlayer*,MythOpenGLVideo*> m_openGLVideoPiPs;
     QMap<MythPlayer*,bool> m_openGLVideoPiPsReady;
-    MythOpenGLVideo       *m_openGLVideoPiPActive;
-    MythOpenGLPainter     *m_openGLPainter;
+    MythOpenGLVideo       *m_openGLVideoPiPActive { nullptr };
+    MythOpenGLPainter     *m_openGLPainter        { nullptr };
     QString                m_videoProfile;
-    MythCodecID            m_newCodecId;
+    MythCodecID            m_newCodecId           { kCodec_NONE };
     QSize                  m_newVideoDim;
     QSize                  m_newVideoDispDim;
-    float                  m_newAspect;
-    bool                   m_buffersCreated;
+    float                  m_newAspect            { 0.0F };
+    bool                   m_buffersCreated       { false };
 
     // performance monitoring (-v gpu)
-    MythOpenGLPerf        *m_openGLPerf;
+    MythOpenGLPerf        *m_openGLPerf           { nullptr };
 };
 
 #endif

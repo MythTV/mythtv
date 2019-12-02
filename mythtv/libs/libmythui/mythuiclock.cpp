@@ -109,7 +109,7 @@ bool MythUIClock::ParseElement(
  */
 void MythUIClock::CopyFrom(MythUIType *base)
 {
-    MythUIClock *clock = dynamic_cast<MythUIClock *>(base);
+    auto *clock = dynamic_cast<MythUIClock *>(base);
 
     if (!clock)
     {
@@ -135,6 +135,6 @@ void MythUIClock::CopyFrom(MythUIType *base)
  */
 void MythUIClock::CreateCopy(MythUIType *parent)
 {
-    MythUIClock *clock = new MythUIClock(parent, objectName());
+    auto *clock = new MythUIClock(parent, objectName());
     clock->CopyFrom(this);
 }

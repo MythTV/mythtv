@@ -42,7 +42,7 @@ extern "C" {
 #include "libavformat/avformat.h"
 }
 
-typedef int (*CreateHWDecoder)(AVCodecContext *Context);
+using CreateHWDecoder = int (*)(AVCodecContext *Context);
 
 class MythOpenGLInterop;
 class VideoDisplayProfile;

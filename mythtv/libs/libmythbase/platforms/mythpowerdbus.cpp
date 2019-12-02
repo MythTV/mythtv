@@ -46,9 +46,9 @@ bool MythPowerDBus::IsAvailable(void)
     if (!checked)
     {
         checked = true;
-        QDBusInterface* upower = new QDBusInterface(
+        auto* upower = new QDBusInterface(
             UPOWER_SERVICE, UPOWER_PATH, UPOWER_INTERFACE, QDBusConnection::systemBus());
-        QDBusInterface* login1 = new QDBusInterface(
+        auto* login1 = new QDBusInterface(
             LOGIN1_SERVICE, LOGIN1_PATH, LOGIN1_INTERFACE, QDBusConnection::systemBus());
         available = upower->isValid() || login1->isValid();
         delete upower;
@@ -297,7 +297,7 @@ bool MythPowerDBus::ScheduleFeature(enum Feature Type, uint Delay)
         struct timespec time {};
         if (clock_gettime(CLOCK_REALTIME, &time) == 0)
         {
-            quint64 nanosecs = static_cast<quint64>((time.tv_sec * 1000000000) +
+            auto nanosecs = static_cast<quint64>((time.tv_sec * 1000000000) +
                                     time.tv_nsec + (Delay * 1000000000));
             QLatin1String type;
             switch (Type)

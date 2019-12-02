@@ -464,8 +464,7 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags,
     if (!playerError.isEmpty())
     {
         MythScreenStack *ss = GetMythMainWindow()->GetStack("popup stack");
-        MythConfirmationDialog *dlg = new MythConfirmationDialog(
-            ss, playerError, false);
+        auto *dlg = new MythConfirmationDialog(ss, playerError, false);
         if (!dlg->Create())
             delete dlg;
         else
@@ -1589,7 +1588,7 @@ void TV::GetStatus(void)
 /**
  * \brief get tv state of active player context
  */
-TVState TV::GetState(const PlayerContext *actx) const
+TVState TV::GetState(const PlayerContext *actx)
 {
     TVState ret = kState_ChangingState;
     if (!actx->InStateChange())
@@ -1714,7 +1713,7 @@ void TV::AskAllowRecording(PlayerContext *ctx,
     if (!StateIsLiveTV(GetState(ctx)))
        return;
 
-    ProgramInfo *info = new ProgramInfo(msg);
+    auto *info = new ProgramInfo(msg);
     if (!info->GetChanID())
     {
         delete info;
@@ -1741,7 +1740,7 @@ void TV::AskAllowRecording(PlayerContext *ctx,
         QMap<QString,AskProgramInfo>::iterator it = m_askAllowPrograms.find(key);
         if (it != m_askAllowPrograms.end())
         {
-            delete (*it).info;
+            delete (*it).m_info;
             m_askAllowPrograms.erase(it);
         }
         delete info;
@@ -1777,13 +1776,13 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
     while (it != m_askAllowPrograms.end())
     {
         next = it; ++next;
-        if ((*it).expiry <= timeNow)
+        if ((*it).m_expiry <= timeNow)
         {
 #if 0
             LOG(VB_GENERAL, LOG_DEBUG, LOC + "-- " +
-                QString("removing '%1'").arg((*it).info->m_title));
+                QString("removing '%1'").arg((*it).m_info->m_title));
 #endif
-            delete (*it).info;
+            delete (*it).m_info;
             m_askAllowPrograms.erase(it);
         }
         it = next;
@@ -1793,9 +1792,9 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
     uint conflict_count = m_askAllowPrograms.size();
 
     it = m_askAllowPrograms.begin();
-    if ((1 == m_askAllowPrograms.size()) && ((*it).info->GetInputID() == cardid))
+    if ((1 == m_askAllowPrograms.size()) && ((*it).m_info->GetInputID() == cardid))
     {
-        (*it).is_in_same_input_group = (*it).is_conflicting = true;
+        (*it).m_isInSameInputGroup = (*it).m_isConflicting = true;
     }
     else if (!m_askAllowPrograms.empty())
     {
@@ -1809,10 +1808,10 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
         it = m_askAllowPrograms.begin();
         for (; it != m_askAllowPrograms.end(); ++it)
         {
-            (*it).is_in_same_input_group =
-                (cardid == (*it).info->GetInputID());
+            (*it).m_isInSameInputGroup =
+                (cardid == (*it).m_info->GetInputID());
 
-            if ((*it).is_in_same_input_group)
+            if ((*it).m_isInSameInputGroup)
                 continue;
 
             // is busy_input in same input group as recording
@@ -1823,14 +1822,14 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
             }
 
             vector<uint> input_grps =
-                CardUtil::GetInputGroups((*it).info->GetInputID());
+                CardUtil::GetInputGroups((*it).m_info->GetInputID());
 
             for (size_t i = 0; i < input_grps.size(); i++)
             {
                 if (find(busy_input_grps.begin(), busy_input_grps.end(),
                          input_grps[i]) !=  busy_input_grps.end())
                 {
-                    (*it).is_in_same_input_group = true;
+                    (*it).m_isInSameInputGroup = true;
                     break;
                 }
             }
@@ -1841,26 +1840,26 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
         it = m_askAllowPrograms.begin();
         for (; it != m_askAllowPrograms.end(); ++it)
         {
-            if (!(*it).is_in_same_input_group)
-                (*it).is_conflicting = false;    // NOLINT(bugprone-branch-clone)
-            else if (cardid == (*it).info->GetInputID())
-                (*it).is_conflicting = true;    // NOLINT(bugprone-branch-clone)
-            else if (!CardUtil::IsTunerShared(cardid, (*it).info->GetInputID()))
-                (*it).is_conflicting = true;
+            if (!(*it).m_isInSameInputGroup)
+                (*it).m_isConflicting = false;    // NOLINT(bugprone-branch-clone)
+            else if (cardid == (*it).m_info->GetInputID())
+                (*it).m_isConflicting = true;    // NOLINT(bugprone-branch-clone)
+            else if (!CardUtil::IsTunerShared(cardid, (*it).m_info->GetInputID()))
+                (*it).m_isConflicting = true;
             else if ((busy_input.m_mplexid &&
-                      (busy_input.m_mplexid  == (*it).info->QueryMplexID())) ||
+                      (busy_input.m_mplexid  == (*it).m_info->QueryMplexID())) ||
                      (!busy_input.m_mplexid &&
-                      (busy_input.m_chanid == (*it).info->GetChanID())))
-                (*it).is_conflicting = false;
+                      (busy_input.m_chanid == (*it).m_info->GetChanID())))
+                (*it).m_isConflicting = false;
             else
-                (*it).is_conflicting = true;
+                (*it).m_isConflicting = true;
 
-            conflict_count += (*it).is_conflicting ? 1 : 0;
+            conflict_count += (*it).m_isConflicting ? 1 : 0;
         }
     }
 
     it = m_askAllowPrograms.begin();
-    for (; it != m_askAllowPrograms.end() && !(*it).is_conflicting; ++it);
+    for (; it != m_askAllowPrograms.end() && !(*it).m_isConflicting; ++it);
 
     if (conflict_count == 0)
     {
@@ -1869,7 +1868,7 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
         // TODO take down mplexid and inform user of problem
         // on channel changes.
     }
-    else if (conflict_count == 1 && ((*it).info->GetInputID() == cardid))
+    else if (conflict_count == 1 && ((*it).m_info->GetInputID() == cardid))
     {
 #if 0
         LOG(VB_GENERAL, LOG_DEBUG, LOC + "UpdateOSDAskAllowDialog -- " +
@@ -1880,24 +1879,24 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
 
         QString channel = m_dbChannelFormat;
         channel
-            .replace("<num>",  (*it).info->GetChanNum())
-            .replace("<sign>", (*it).info->GetChannelSchedulingID())
-            .replace("<name>", (*it).info->GetChannelName());
+            .replace("<num>",  (*it).m_info->GetChanNum())
+            .replace("<sign>", (*it).m_info->GetChannelSchedulingID())
+            .replace("<name>", (*it).m_info->GetChannelName());
 
-        message = single_rec.arg((*it).info->GetTitle()).arg(channel);
+        message = single_rec.arg((*it).m_info->GetTitle()).arg(channel);
 
         OSD *osd = GetOSDLock(ctx);
         if (osd)
         {
             m_browseHelper->BrowseEnd(ctx, false);
-            timeuntil = MythDate::current().secsTo((*it).expiry) * 1000;
+            timeuntil = MythDate::current().secsTo((*it).m_expiry) * 1000;
             osd->DialogShow(OSD_DLG_ASKALLOW, message, timeuntil);
             osd->DialogAddButton(record_watch, "DIALOG_ASKALLOW_WATCH_0",
-                                 false, !((*it).has_rec));
+                                 false, !((*it).m_hasRec));
             osd->DialogAddButton(let_record1, "DIALOG_ASKALLOW_EXIT_0");
-            osd->DialogAddButton(((*it).has_later) ? record_later1 : do_not_record1,
+            osd->DialogAddButton(((*it).m_hasLater) ? record_later1 : do_not_record1,
                                  "DIALOG_ASKALLOW_CANCELRECORDING_0",
-                                 false, ((*it).has_rec));
+                                 false, ((*it).m_hasRec));
         }
         ReturnOSDLock(ctx, osd);
     }
@@ -1914,20 +1913,20 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
         it = m_askAllowPrograms.begin();
         for (; it != m_askAllowPrograms.end(); ++it)
         {
-            if (!(*it).is_conflicting)
+            if (!(*it).m_isConflicting)
                 continue;
 
-            QString title = (*it).info->GetTitle();
-            if ((title.length() < 10) && !(*it).info->GetSubtitle().isEmpty())
-                title += ": " + (*it).info->GetSubtitle();
+            QString title = (*it).m_info->GetTitle();
+            if ((title.length() < 10) && !(*it).m_info->GetSubtitle().isEmpty())
+                title += ": " + (*it).m_info->GetSubtitle();
             if (title.length() > 20)
                 title = title.left(17) + "...";
 
             QString channel = m_dbChannelFormat;
             channel
-                .replace("<num>",  (*it).info->GetChanNum())
-                .replace("<sign>", (*it).info->GetChannelSchedulingID())
-                .replace("<name>", (*it).info->GetChannelName());
+                .replace("<num>",  (*it).m_info->GetChanNum())
+                .replace("<sign>", (*it).m_info->GetChannelSchedulingID())
+                .replace("<name>", (*it).m_info->GetChannelName());
 
             if (conflict_count > 1)
             {
@@ -1936,8 +1935,8 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
             }
             else
             {
-                message = single_rec.arg((*it).info->GetTitle()).arg(channel);
-                has_rec = (*it).has_rec;
+                message = single_rec.arg((*it).m_info->GetTitle()).arg(channel);
+                has_rec = (*it).m_hasRec;
             }
         }
 
@@ -1952,10 +1951,10 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
         it = m_askAllowPrograms.begin();
         for (; it != m_askAllowPrograms.end(); ++it)
         {
-            if ((*it).is_conflicting)
+            if ((*it).m_isConflicting)
             {
-                all_have_later &= (*it).has_later;
-                int tmp = MythDate::current().secsTo((*it).expiry);
+                all_have_later &= (*it).m_hasLater;
+                int tmp = MythDate::current().secsTo((*it).m_expiry);
                 tmp *= 1000;
                 timeuntil = min(timeuntil, max(tmp, 0));
             }
@@ -2008,8 +2007,8 @@ void TV::HandleOSDAskAllow(PlayerContext *ctx, const QString& action)
             m_askAllowPrograms.begin();
         for (; it != m_askAllowPrograms.end(); ++it)
         {
-            if ((*it).is_conflicting)
-                RemoteCancelNextRecording((*it).info->GetInputID(), true);
+            if ((*it).m_isConflicting)
+                RemoteCancelNextRecording((*it).m_info->GetInputID(), true);
         }
     }
     else if (action == "WATCH")
@@ -3536,7 +3535,7 @@ bool TV::event(QEvent *e)
     {
         PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
         mctx->LockDeletePlayer(__FILE__, __LINE__);
-        const QResizeEvent *qre = dynamic_cast<const QResizeEvent*>(e);
+        const auto *qre = dynamic_cast<const QResizeEvent*>(e);
         if (qre && mctx->m_player)
             mctx->m_player->WindowResized(qre->size());
         mctx->UnlockDeletePlayer(__FILE__, __LINE__);
@@ -3828,7 +3827,7 @@ bool TV::ProcessKeypressOrGesture(PlayerContext *actx, QEvent *e)
 
 #ifdef Q_OS_LINUX
     // Fixups for _some_ linux native codes that QT doesn't know
-    QKeyEvent* eKeyEvent = dynamic_cast<QKeyEvent*>(e);
+    auto* eKeyEvent = dynamic_cast<QKeyEvent*>(e);
     if (eKeyEvent) {
         if (eKeyEvent->key() <= 0)
         {
@@ -3844,8 +3843,8 @@ bool TV::ProcessKeypressOrGesture(PlayerContext *actx, QEvent *e)
 
             if (keycode > 0)
             {
-                QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, keycode,
-                                                eKeyEvent->modifiers());
+                auto *key = new QKeyEvent(QEvent::KeyPress, keycode,
+                                          eKeyEvent->modifiers());
                 QCoreApplication::postEvent(this, key);
             }
         }
@@ -3881,12 +3880,12 @@ bool TV::ProcessKeypressOrGesture(PlayerContext *actx, QEvent *e)
     {
         if (QEvent::KeyPress == e->type())
         {
-            QKeyEvent *qke = dynamic_cast<QKeyEvent*>(e);
+            auto *qke = dynamic_cast<QKeyEvent*>(e);
             handled = (qke != nullptr) && osd->DialogHandleKeypress(qke);
         }
         if (MythGestureEvent::kEventType == e->type())
         {
-            MythGestureEvent *mge = dynamic_cast<MythGestureEvent*>(e);
+            auto *mge = dynamic_cast<MythGestureEvent*>(e);
             handled = (mge != nullptr) && osd->DialogHandleGesture(mge);
         }
     }
@@ -3949,7 +3948,7 @@ bool TV::ProcessKeypressOrGesture(PlayerContext *actx, QEvent *e)
     // This allows hex teletext entry and minor channel entry.
     if (QEvent::KeyPress == e->type())
     {
-        QKeyEvent *qke = dynamic_cast<QKeyEvent*>(e);
+        auto *qke = dynamic_cast<QKeyEvent*>(e);
         if (qke == nullptr)
             return false;
         const QString txt = qke->text();
@@ -5613,7 +5612,7 @@ bool TV::CreatePIP(PlayerContext *ctx, const ProgramInfo *info)
         return false;
     }
 
-    PlayerContext *pipctx = new PlayerContext(kPIPPlayerInUseID);
+    auto *pipctx = new PlayerContext(kPIPPlayerInUseID);
     // Hardware acceleration of PiP is currently disabled as the null video
     // renderer cannot deal with hardware codecs which are returned by the display
     // profile. The workaround would be to encourage the decoder, when using null
@@ -6874,7 +6873,7 @@ void TV::DoQueueTranscode(PlayerContext *ctx, const QString& profile)
     ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 }
 
-int TV::GetNumChapters(const PlayerContext *ctx) const
+int TV::GetNumChapters(const PlayerContext *ctx)
 {
     int num_chapters = 0;
     ctx->LockDeletePlayer(__FILE__, __LINE__);
@@ -6884,7 +6883,7 @@ int TV::GetNumChapters(const PlayerContext *ctx) const
     return num_chapters;
 }
 
-void TV::GetChapterTimes(const PlayerContext *ctx, QList<long long> &times) const
+void TV::GetChapterTimes(const PlayerContext *ctx, QList<long long> &times)
 {
     ctx->LockDeletePlayer(__FILE__, __LINE__);
     if (ctx->m_player)
@@ -6892,7 +6891,7 @@ void TV::GetChapterTimes(const PlayerContext *ctx, QList<long long> &times) cons
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 }
 
-int TV::GetCurrentChapter(const PlayerContext *ctx) const
+int TV::GetCurrentChapter(const PlayerContext *ctx)
 {
     int chapter = 0;
     ctx->LockDeletePlayer(__FILE__, __LINE__);
@@ -6918,7 +6917,7 @@ void TV::DoJumpChapter(PlayerContext *ctx, int chapter)
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 }
 
-int TV::GetNumTitles(const PlayerContext *ctx) const
+int TV::GetNumTitles(const PlayerContext *ctx)
 {
     int num_titles = 0;
     ctx->LockDeletePlayer(__FILE__, __LINE__);
@@ -6928,7 +6927,7 @@ int TV::GetNumTitles(const PlayerContext *ctx) const
     return num_titles;
 }
 
-int TV::GetCurrentTitle(const PlayerContext *ctx) const
+int TV::GetCurrentTitle(const PlayerContext *ctx)
 {
     int currentTitle = 0;
     ctx->LockDeletePlayer(__FILE__, __LINE__);
@@ -6938,7 +6937,7 @@ int TV::GetCurrentTitle(const PlayerContext *ctx) const
     return currentTitle;
 }
 
-int TV::GetNumAngles(const PlayerContext *ctx) const
+int TV::GetNumAngles(const PlayerContext *ctx)
 {
     int num_angles = 0;
     ctx->LockDeletePlayer(__FILE__, __LINE__);
@@ -6948,7 +6947,7 @@ int TV::GetNumAngles(const PlayerContext *ctx) const
     return num_angles;
 }
 
-int TV::GetCurrentAngle(const PlayerContext *ctx) const
+int TV::GetCurrentAngle(const PlayerContext *ctx)
 {
     int currentAngle = 0;
     ctx->LockDeletePlayer(__FILE__, __LINE__);
@@ -6958,7 +6957,7 @@ int TV::GetCurrentAngle(const PlayerContext *ctx) const
     return currentAngle;
 }
 
-QString TV::GetAngleName(const PlayerContext *ctx, int angle) const
+QString TV::GetAngleName(const PlayerContext *ctx, int angle)
 {
     QString name;
     ctx->LockDeletePlayer(__FILE__, __LINE__);
@@ -6968,7 +6967,7 @@ QString TV::GetAngleName(const PlayerContext *ctx, int angle) const
     return name;
 }
 
-int TV::GetTitleDuration(const PlayerContext *ctx, int title) const
+int TV::GetTitleDuration(const PlayerContext *ctx, int title)
 {
     int seconds = 0;
     ctx->LockDeletePlayer(__FILE__, __LINE__);
@@ -6979,7 +6978,7 @@ int TV::GetTitleDuration(const PlayerContext *ctx, int title) const
 }
 
 
-QString TV::GetTitleName(const PlayerContext *ctx, int title) const
+QString TV::GetTitleName(const PlayerContext *ctx, int title)
 {
     QString name;
     ctx->LockDeletePlayer(__FILE__, __LINE__);
@@ -8051,7 +8050,7 @@ void TV::UpdateOSDInput(const PlayerContext *ctx)
 /** \fn TV::UpdateOSDSignal(const PlayerContext*, const QStringList&)
  *  \brief Updates Signal portion of OSD...
  */
-void TV::UpdateOSDSignal(const PlayerContext *ctx, const QStringList &strlist)
+void TV::UpdateOSDSignal(PlayerContext *ctx, const QStringList &strlist)
 {
     OSD *osd = GetOSDLock(ctx);
     if (!osd || m_browseHelper->IsBrowsing() || !m_queuedChanNum.isEmpty())
@@ -8061,8 +8060,7 @@ void TV::UpdateOSDSignal(const PlayerContext *ctx, const QStringList &strlist)
         ReturnOSDLock(ctx, osd);
 
         QMutexLocker locker(&m_timerIdLock);
-        m_signalMonitorTimerId[StartTimer(1, __LINE__)] =
-            const_cast<PlayerContext*>(ctx);
+        m_signalMonitorTimerId[StartTimer(1, __LINE__)] = ctx;
         return;
     }
     ReturnOSDLock(ctx, osd);
@@ -8247,17 +8245,17 @@ void TV::UpdateOSDTimeoutMessage(PlayerContext *ctx)
     }
 
     // create dialog...
-    static QString chan_up   = GET_KEY("TV Playback", ACTION_CHANNELUP);
-    static QString chan_down = GET_KEY("TV Playback", ACTION_CHANNELDOWN);
-    static QString next_src  = GET_KEY("TV Playback", "NEXTSOURCE");
-    static QString tog_cards = GET_KEY("TV Playback", "NEXTINPUT");
+    static QString s_chanUp   = GET_KEY("TV Playback", ACTION_CHANNELUP);
+    static QString s_chanDown = GET_KEY("TV Playback", ACTION_CHANNELDOWN);
+    static QString s_nextSrc  = GET_KEY("TV Playback", "NEXTSOURCE");
+    static QString s_togCards = GET_KEY("TV Playback", "NEXTINPUT");
 
     QString message = tr(
         "You should have received a channel lock by now. "
         "You can continue to wait for a signal, or you "
         "can change the channel with %1 or %2, change "
         "video source (%3), inputs (%4), etc.")
-        .arg(chan_up).arg(chan_down).arg(next_src).arg(tog_cards);
+        .arg(s_chanUp).arg(s_chanDown).arg(s_nextSrc).arg(s_togCards);
 
     osd->DialogShow(OSD_DLG_INFO, message);
     QString action = "DIALOG_INFO_CHANNELLOCK_0";
@@ -8375,7 +8373,7 @@ bool TV::IsTunable(uint chanid)
 static QString toCommaList(const QSet<uint> &list)
 {
     QString ret = "";
-    for (QSet<uint>::const_iterator it = list.begin(); it != list.end(); ++it)
+    for (auto it = list.cbegin(); it != list.cend(); ++it)
         ret += QString("%1,").arg(*it);
 
     if (ret.length())
@@ -8660,7 +8658,7 @@ void TV::EditSchedule(const PlayerContext */*ctx*/, int editType)
 {
     // post the request so the guide will be created in the UI thread
     QString message = QString("START_EPG %1").arg(editType);
-    MythEvent* me = new MythEvent(message);
+    auto* me = new MythEvent(message);
     qApp->postEvent(this, me);
 }
 
@@ -8753,7 +8751,7 @@ void TV::ChangeTimeStretch(PlayerContext *ctx, int dir, bool allowEdit)
         return;
     }
 
-    ctx->m_tsNormal = kTimeStretchStep * (int)(new_ts_normal / kTimeStretchStep + 0.5F);
+    ctx->m_tsNormal = kTimeStretchStep * lroundf(new_ts_normal / kTimeStretchStep);
 
     ctx->LockDeletePlayer(__FILE__, __LINE__);
     if (ctx->m_player && !ctx->m_player->IsPaused())
@@ -9177,7 +9175,7 @@ void TV::customEvent(QEvent *e)
 
     if (e->type() == MythEvent::MythUserMessage)
     {
-        MythEvent *me = dynamic_cast<MythEvent*>(e);
+        auto *me = dynamic_cast<MythEvent*>(e);
         if (me == nullptr)
             return;
         QString message = me->Message();
@@ -9208,8 +9206,7 @@ void TV::customEvent(QEvent *e)
 
     if (e->type() == MythEvent::kUpdateBrowseInfoEventType)
     {
-        UpdateBrowseInfoEvent *b =
-            reinterpret_cast<UpdateBrowseInfoEvent*>(e);
+        auto *b = reinterpret_cast<UpdateBrowseInfoEvent*>(e);
         PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
         OSD *osd = GetOSDLock(mctx);
         if (osd)
@@ -9224,8 +9221,7 @@ void TV::customEvent(QEvent *e)
 
     if (e->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce =
-            reinterpret_cast<DialogCompletionEvent*>(e);
+        auto *dce = reinterpret_cast<DialogCompletionEvent*>(e);
         if (dce->GetData().userType() == qMetaTypeId<MenuNodeTuple>())
         {
             MenuNodeTuple data = dce->GetData().value<MenuNodeTuple>();
@@ -9243,7 +9239,7 @@ void TV::customEvent(QEvent *e)
 
     if (e->type() == OSDHideEvent::kEventType)
     {
-        OSDHideEvent *ce = reinterpret_cast<OSDHideEvent*>(e);
+        auto *ce = reinterpret_cast<OSDHideEvent*>(e);
         HandleOSDClosed(ce->GetFunctionalType());
         return;
     }
@@ -9259,7 +9255,7 @@ void TV::customEvent(QEvent *e)
             return;
         }
 
-        MythMediaEvent *me = dynamic_cast<MythMediaEvent*>(e);
+        auto *me = dynamic_cast<MythMediaEvent*>(e);
         if (me == nullptr)
             return;
         MythMediaDevice *device = me->getDevice();
@@ -9288,7 +9284,7 @@ void TV::customEvent(QEvent *e)
         return;
 
     uint cardnum   = 0;
-    MythEvent *me = dynamic_cast<MythEvent*>(e);
+    auto *me = dynamic_cast<MythEvent*>(e);
     if (me == nullptr)
         return;
     QString message = me->Message();
@@ -10279,7 +10275,7 @@ bool TV::HandleOSDChannelEdit(PlayerContext *ctx, const QString& action)
 /** \fn TV::ChannelEditAutoFill(const PlayerContext*,InfoMap&) const
  *  \brief Automatically fills in as much information as possible.
  */
-void TV::ChannelEditAutoFill(const PlayerContext *ctx, InfoMap &infoMap) const
+void TV::ChannelEditAutoFill(const PlayerContext *ctx, InfoMap &infoMap)
 {
 #if 0
     const QString keys[4] = { "XMLTV", "callsign", "channame", "channum", };
@@ -10289,7 +10285,7 @@ void TV::ChannelEditAutoFill(const PlayerContext *ctx, InfoMap &infoMap) const
     ChannelEditXDSFill(ctx, infoMap);
 }
 
-void TV::ChannelEditXDSFill(const PlayerContext *ctx, InfoMap &infoMap) const
+void TV::ChannelEditXDSFill(const PlayerContext *ctx, InfoMap &infoMap)
 {
     QMap<QString,bool> modifiable;
     if (!(modifiable["callsign"] = infoMap["callsign"].isEmpty()))
@@ -10532,8 +10528,8 @@ void TV::OSDDialogEvent(int result, const QString& text, QString action)
                 cur_channum = actx->m_tvchain->GetChannelName(-1);
                 new_channum = cur_channum;
 
-                ChannelInfoList::const_iterator it = list.begin();
-                for (; it != list.end(); ++it)
+                auto it = list.cbegin();
+                for (; it != list.cend(); ++it)
                 {
                     if ((*it).m_channum == cur_channum)
                     {
@@ -11288,10 +11284,10 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
     else if (matchesGroup(actionName, "ADJUSTSTRETCH", category, prefix))
     {
         static struct {
-            int speedX100;
-            QString suffix;
-            QString trans;
-        } speeds[] = {
+            int     m_speedX100;
+            QString m_suffix;
+            QString m_trans;
+        } s_speeds[] = {
             {  0, "",    tr("Adjust")},
             { 50, "0.5", tr("0.5x")},
             { 90, "0.9", tr("0.9x")},
@@ -11302,11 +11298,11 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
             {140, "1.4", tr("1.4x")},
             {150, "1.5", tr("1.5x")},
         };
-        for (size_t i = 0; i < sizeof(speeds) / sizeof(*speeds); ++i)
+        for (size_t i = 0; i < sizeof(s_speeds) / sizeof(*s_speeds); ++i)
         {
-            QString action = prefix + speeds[i].suffix;
-            active = (m_tvmSpeedX100 == speeds[i].speedX100);
-            BUTTON(action, speeds[i].trans);
+            QString action = prefix + s_speeds[i].m_suffix;
+            active = (m_tvmSpeedX100 == s_speeds[i].m_speedX100);
+            BUTTON(action, s_speeds[i].m_trans);
         }
     }
     else if (matchesGroup(actionName, "TOGGLESLEEP", category, prefix))
@@ -11339,13 +11335,13 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
     {
         if (m_tvmIsRecording || m_tvmIsRecorded)
         {
-            static uint cas_ord[] = { 0, 2, 1 };
-            for (size_t i = 0; i < sizeof(cas_ord)/sizeof(cas_ord[0]); i++)
+            static constexpr uint kCasOrd[] = { 0, 2, 1 };
+            for (size_t i = 0; i < sizeof(kCasOrd)/sizeof(kCasOrd[0]); i++)
             {
-                const CommSkipMode mode = (CommSkipMode) cas_ord[i];
-                QString action = prefix + QString::number(cas_ord[i]);
+                const auto mode = (CommSkipMode) kCasOrd[i];
+                QString action = prefix + QString::number(kCasOrd[i]);
                 active = (mode == m_tvmCurSkip);
-                BUTTON(action, toString((CommSkipMode) cas_ord[i]));
+                BUTTON(action, toString((CommSkipMode) kCasOrd[i]));
             }
         }
     }
@@ -11406,7 +11402,7 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
         {
             uint inputid  = ctx->GetCardID();
             vector<InputInfo> inputs = RemoteRequestFreeInputInfo(inputid);
-            vector<InputInfo>::iterator it = inputs.begin();
+            auto it = inputs.begin();
             QSet <QString> addednames;
             addednames += CardUtil::GetDisplayName(inputid);
             for (; it != inputs.end(); ++it)
@@ -11432,7 +11428,7 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
             uint sourceid = info["sourceid"].toUInt();
             QMap<uint, bool> sourceids;
             vector<InputInfo> inputs = RemoteRequestFreeInputInfo(inputid);
-            vector<InputInfo>::iterator it = inputs.begin();
+            auto it = inputs.begin();
             for (; it != inputs.end(); ++it)
             {
                 if ((*it).m_sourceid == sourceid ||
@@ -12011,7 +12007,7 @@ void TV::PlaybackMenuShow(const MenuBase &menu,
     PlaybackMenuDeinit(menu);
 }
 
-void TV::MenuStrings(void) const
+void TV::MenuStrings(void)
 {
     // Playback menu
     (void)tr("Playback Menu");
@@ -12628,7 +12624,7 @@ void TV::DoSeekRWND(PlayerContext *ctx)
 */
 void TV::DVDJumpBack(PlayerContext *ctx)
 {
-    DVDRingBuffer *dvdrb = dynamic_cast<DVDRingBuffer*>(ctx->m_buffer);
+    auto *dvdrb = dynamic_cast<DVDRingBuffer*>(ctx->m_buffer);
     if (!ctx->HasPlayer() || !dvdrb)
         return;
 
@@ -12667,7 +12663,7 @@ void TV::DVDJumpBack(PlayerContext *ctx)
  */
 void TV::DVDJumpForward(PlayerContext *ctx)
 {
-    DVDRingBuffer *dvdrb = dynamic_cast<DVDRingBuffer*>(ctx->m_buffer);
+    auto *dvdrb = dynamic_cast<DVDRingBuffer*>(ctx->m_buffer);
     if (!ctx->HasPlayer() || !dvdrb)
         return;
 
@@ -12710,7 +12706,7 @@ void TV::DVDJumpForward(PlayerContext *ctx)
 /* \fn TV::IsBookmarkAllowed(const PlayerContext*) const
  * \brief Returns true if bookmarks are allowed for the current player.
  */
-bool TV::IsBookmarkAllowed(const PlayerContext *ctx) const
+bool TV::IsBookmarkAllowed(const PlayerContext *ctx)
 {
     ctx->LockPlayingInfo(__FILE__, __LINE__);
 
@@ -12736,7 +12732,7 @@ bool TV::IsBookmarkAllowed(const PlayerContext *ctx) const
 /* \fn TV::IsDeleteAllowed(const PlayerContext*) const
  * \brief Returns true if the delete menu option should be offered.
  */
-bool TV::IsDeleteAllowed(const PlayerContext *ctx) const
+bool TV::IsDeleteAllowed(const PlayerContext *ctx)
 {
     bool allowed = false;
 
@@ -13245,7 +13241,7 @@ void TV::ReturnPlayerLock(const PlayerContext *&ctx) const
     ctx = nullptr;
 }
 
-QString TV::GetLiveTVIndex(const PlayerContext *ctx) const
+QString TV::GetLiveTVIndex(const PlayerContext *ctx)
 {
 #ifdef DEBUG_LIVETV_TRANSITION
     return (ctx->m_tvchain ?

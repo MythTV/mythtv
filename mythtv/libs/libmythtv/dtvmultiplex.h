@@ -95,21 +95,21 @@ class MTV_PUBLIC DTVMultiplex
     uint64_t         m_symbolrate {0};
     DTVInversion     m_inversion;
     DTVBandwidth     m_bandwidth;
-    DTVCodeRate      m_hp_code_rate;    ///< High Priority FEC rate
-    DTVCodeRate      m_lp_code_rate;    ///< Low Priority FEC rate
+    DTVCodeRate      m_hpCodeRate;      ///< High Priority FEC rate
+    DTVCodeRate      m_lpCodeRate;      ///< Low Priority FEC rate
     DTVModulation    m_modulation;
-    DTVTransmitMode  m_trans_mode;
-    DTVGuardInterval m_guard_interval;
+    DTVTransmitMode  m_transMode;
+    DTVGuardInterval m_guardInterval;
     DTVHierarchy     m_hierarchy;
     DTVPolarity      m_polarity;
     DTVCodeRate      m_fec;             ///< Inner Forward Error Correction rate
-    DTVModulationSystem m_mod_sys;      ///< Modulation system
+    DTVModulationSystem m_modSys;      ///< Modulation system
     DTVRollOff       m_rolloff;
 
     // Optional additional info
     uint             m_mplex      {0};
     QString          m_sistandard;
-    IPTVTuningData   m_iptv_tuning;
+    IPTVTuningData   m_iptvTuning;
 };
 
 class MTV_PUBLIC ScanDTVTransport : public DTVMultiplex
@@ -138,6 +138,6 @@ class MTV_PUBLIC ScanDTVTransport : public DTVMultiplex
     uint                  m_cardid     {0};
     ChannelInsertInfoList m_channels;
 };
-typedef vector<ScanDTVTransport> ScanDTVTransportList;
+using ScanDTVTransportList = vector<ScanDTVTransport>;
 
 #endif // _DTVMULTIPLEX_H_

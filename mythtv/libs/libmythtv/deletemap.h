@@ -9,15 +9,14 @@
 class OSD;
 class PlayerContext;
 
-typedef struct DeleteMapUndoEntry
+struct DeleteMapUndoEntry
 {
     frm_dir_map_t m_deleteMap;
     QString       m_message; // how we got from previous map to this map
     DeleteMapUndoEntry(const frm_dir_map_t &dm, const QString &msg)
         : m_deleteMap(dm), m_message(msg) { }
     DeleteMapUndoEntry(void) = default;
-
-} DeleteMapUndoEntry;
+};
 
 class MTV_PUBLIC DeleteMap
 {
@@ -32,7 +31,7 @@ class MTV_PUBLIC DeleteMap
     void SetSeekAmount(float amount) { m_seekamount = amount; }
 
     void UpdateOSD(uint64_t frame, double frame_rate, OSD *osd);
-    void UpdateOSD(int64_t timecode, OSD *osd);
+    static void UpdateOSD(int64_t timecode, OSD *osd);
 
     bool IsEditing(void) const { return m_editing; }
     void SetEditing(bool edit, OSD *osd = nullptr);

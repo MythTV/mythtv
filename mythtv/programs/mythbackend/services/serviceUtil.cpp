@@ -525,7 +525,7 @@ void FillInputInfo(DTC::Input* input, const InputInfo& inputInfo)
     input->setCardId(inputInfo.m_inputid);
     input->setSourceId(inputInfo.m_sourceid);
     input->setDisplayName(inputInfo.m_displayName);
-    input->setLiveTVOrder(inputInfo.m_livetvorder);
+    input->setLiveTVOrder(inputInfo.m_liveTvOrder);
     input->setScheduleOrder(inputInfo.m_scheduleOrder);
     input->setRecPriority(inputInfo.m_recPriority);
     input->setQuickTune(inputInfo.m_quickTune);

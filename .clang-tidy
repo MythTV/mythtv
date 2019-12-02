@@ -24,17 +24,9 @@
 Checks: '-*,
 
     bugprone-*,
-        # A handful of warnings
-        bugprone-integer-division,
-
         # Bunch of warnings.... ,
         # Comment out this and the cppcoreguidelines version. ,
        -bugprone-narrowing-conversions,
-
-        # Errors in code?  GroupAnimation overrides several parent
-        # functions with an explicit nullptr.  Shouldnt it just call
-        # up? ,
-        bugprone-parent-virtual-call,
 
         # Prevent self-assignment.  Needs to be investigated.
        -bugprone-unhandled-self-assignment,
@@ -112,10 +104,9 @@ Checks: '-*,
        -cppcoreguidelines-no-malloc,
         # No gsl. ,
        -cppcoreguidelines-owning-memory,
-        # No gsl. ,
        -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
-        # No gsl. ,
        -cppcoreguidelines-pro-bounds-constant-array-index,
+
         # Bunch of warnings.... ,
        -cppcoreguidelines-pro-bounds-pointer-arithmetic,
         cppcoreguidelines-pro-type-const-cast,
@@ -160,18 +151,8 @@ Checks: '-*,
         # Noisy!!!  foo(void) => foo()  ,
        -modernize-redundant-void-arg,
 
-        # Not investigated yet. ,
-       -modernize-use-auto,
-
-        # One weirdness in videooutput_xv.cpp.  Making the proposed
-        # change causes one of the programs to fail in the link stage. ,
-       -modernize-use-emplace,
-
         # Why would anyone want this? ,
        -modernize-use-trailing-return-type,
-
-        # Noisy. Needs work.,
-       -modernize-use-using,
 
         ## C++14 modernize-make-unique,
         ## C++14 modernize-use-transparent-functors,
@@ -187,12 +168,6 @@ Checks: '-*,
        -readability-braces-around-statements,
         # Not investigated yet. ,
        -readability-function-size,
-
-        # Will fix member names, but not any uses of the changed
-        # memeber names.
-        #
-        # Done for all but libmythtv and libmythui. ,
-       -readability-identifier-naming,
 
         # Wants to convert all "if (x)" pointer validity checks to be
         # "if (x != nullptr)".  These should be ignored as the
@@ -280,3 +255,8 @@ CheckOptions:
     value:    'camelBack'
   - key:      readability-identifier-naming.StaticVariablePrefix
     value:    's_'
+
+  - key:      google-runtime-int.Signedtypeprefix
+    value:    'qint'
+  - key:      google-runtime-int.UnsignedTypePrefix
+    value:    'quint'

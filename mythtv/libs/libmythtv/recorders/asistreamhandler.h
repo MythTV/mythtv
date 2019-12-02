@@ -18,15 +18,15 @@ class DTVSignalMonitor;
 class ASIChannel;
 class DeviceReadBuffer;
 
-typedef enum ASIClockSource
+enum ASIClockSource
 {
     kASIInternalClock         = 0,
     kASIExternalClock         = 1,
     kASIRecoveredReceiveClock = 2,
     kASIExternalClock2        = 1,
-} ASIClockSource;
+};
 
-typedef enum ASIRXMode
+enum ASIRXMode
 {
     kASIRXRawMode                  = 0,
     kASIRXSyncOn188                = 1,
@@ -34,7 +34,7 @@ typedef enum ASIRXMode
     kASIRXSyncOnActualSize         = 3,
     kASIRXSyncOnActualConvertTo188 = 4,
     kASIRXSyncOn204ConvertTo188    = 5,
-} ASIRXMode;
+};
 
 
 //#define RETUNE_TIMEOUT 5000

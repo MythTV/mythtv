@@ -64,7 +64,7 @@ class SERVICE_PUBLIC EnvInfo : public QObject
         Q_DISABLE_COPY(EnvInfo);
 };
 
-typedef EnvInfo* EnvInfoPtr;
+using EnvInfoPtr = EnvInfo*;
 
 inline void EnvInfo::InitializeCustomTypes()
 {

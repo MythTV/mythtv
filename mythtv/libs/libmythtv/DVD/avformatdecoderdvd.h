@@ -36,7 +36,7 @@ class AvFormatDecoderDVD : public AvFormatDecoder
 
     void CheckContext(int64_t pts);
     void ReleaseLastVideoPkt();
-    void ReleaseContext(MythDVDContext *&context);
+    static void ReleaseContext(MythDVDContext *&context);
 
     long long DVDFindPosition(long long desiredFrame);
 

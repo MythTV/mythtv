@@ -80,7 +80,7 @@ bool LanguageSelection::Create(void)
 
 void LanguageSelection::Load(void)
 {
-    MythLocale *locale = new MythLocale();
+    auto *locale = new MythLocale();
 
     QString langCode;
 
@@ -187,8 +187,7 @@ bool LanguageSelection::prompt(bool force)
         if (!mainStack)
             return false;
 
-        LanguageSelection *langSettings = new LanguageSelection(mainStack,
-                                                                true);
+        auto *langSettings = new LanguageSelection(mainStack, true);
 
         if (langSettings->Create())
         {

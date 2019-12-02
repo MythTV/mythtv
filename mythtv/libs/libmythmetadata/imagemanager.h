@@ -109,7 +109,7 @@ protected:
     ~DeviceManager();
 
 private:
-    typedef QMap<int, Device*> DeviceMap;
+    using DeviceMap = QMap<int, Device*>;
 
     //! Device store
     DeviceMap m_devices;

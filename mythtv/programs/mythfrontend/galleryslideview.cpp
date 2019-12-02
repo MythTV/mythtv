@@ -212,8 +212,8 @@ void GallerySlideView::customEvent(QEvent *event)
 {
     if (event->type() == MythEvent::MythEventMessage)
     {
-        MythEvent *me      = static_cast<MythEvent *>(event);
-        const QString&    message = me->Message();
+        auto *me = static_cast<MythEvent *>(event);
+        const QString& message = me->Message();
 
         QStringList extra = me->ExtraDataList();
 
@@ -233,7 +233,7 @@ void GallerySlideView::customEvent(QEvent *event)
     }
     else if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = (DialogCompletionEvent *)(event);
+        auto *dce = (DialogCompletionEvent *)(event);
 
         QString resultid  = dce->GetId();
         int     buttonnum = dce->GetResult();
@@ -261,7 +261,7 @@ void GallerySlideView::customEvent(QEvent *event)
 void GallerySlideView::MenuMain()
 {
     // Create the main menu that will contain the submenus above
-    MythMenu *menu = new MythMenu(tr("Slideshow Options"), this, "mainmenu");
+    auto *menu = new MythMenu(tr("Slideshow Options"), this, "mainmenu");
 
     ImagePtrK im = m_slides.GetCurrent().GetImageData();
     if (im && im->m_type == kVideoFile)
@@ -301,7 +301,7 @@ void GallerySlideView::MenuMain()
         menu->AddItem(tr("Hide Details"), SLOT(HideInfo()));
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythDialogBox *menuPopup = new MythDialogBox(menu, popupStack, "menuPopup");
+    auto *menuPopup = new MythDialogBox(menu, popupStack, "menuPopup");
     if (menuPopup->Create())
         popupStack->AddScreen(menuPopup);
     else
@@ -318,7 +318,7 @@ void GallerySlideView::MenuTransforms(MythMenu &mainMenu)
     ImagePtrK im = m_slides.GetCurrent().GetImageData();
     if (im && !m_playing)
     {
-        MythMenu *menu = new MythMenu(tr("Transform Options"),
+        auto *menu = new MythMenu(tr("Transform Options"),
                                       this, "metadatamenu");
         if (m_editsAllowed)
         {

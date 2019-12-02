@@ -1,4 +1,8 @@
 #include "HLSSegment.h"
+
+// C/C++
+#include <utility>
+
 #include "HLSReader.h"
 
 #define LOC QString("HLSSegment: ")
@@ -15,21 +19,21 @@ HLSRecSegment::HLSRecSegment(const HLSRecSegment& rhs)
 }
 
 HLSRecSegment::HLSRecSegment(int seq, int duration,
-                       const QString& title, const QUrl& uri)
+                       QString title, QUrl uri)
     : m_sequence(seq),
       m_duration(duration),
-      m_title(title),
-      m_url(uri)
+      m_title(std::move(title)),
+      m_url(std::move(uri))
 {
     LOG(VB_RECORD, LOG_DEBUG, LOC + "ctor");
 }
 
-HLSRecSegment::HLSRecSegment(int seq, int duration, const QString& title,
-           const QUrl& uri, const QString& current_key_path)
+HLSRecSegment::HLSRecSegment(int seq, int duration, QString title,
+           QUrl uri, const QString& current_key_path)
     : m_sequence(seq),
       m_duration(duration),
-      m_title(title),
-      m_url(uri)
+      m_title(std::move(title)),
+      m_url(std::move(uri))
 {
     LOG(VB_RECORD, LOG_DEBUG, LOC + "ctor");
 #ifdef USING_LIBCRYPTO

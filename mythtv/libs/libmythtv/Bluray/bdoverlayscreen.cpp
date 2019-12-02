@@ -51,7 +51,7 @@ void BDOverlayScreen::DisplayBDOverlay(BDOverlay *overlay)
     if (image)
     {
         image->Assign(img);
-        MythUIImage *uiimage = new MythUIImage(this, "bdoverlay");
+        auto *uiimage = new MythUIImage(this, "bdoverlay");
         if (uiimage)
         {
             uiimage->SetImage(image);

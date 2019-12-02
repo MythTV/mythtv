@@ -36,8 +36,8 @@ template <class T> inline const T& Max( const T &x, const T &y )
 // Typedefs
 //////////////////////////////////////////////////////////////////////////////
 
-typedef struct timeval              TaskTime;
-typedef QMap< QString, QString >    QStringMap;
+using TaskTime   = struct timeval;
+using QStringMap = QMap< QString, QString >;
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -117,11 +117,8 @@ inline NameValue& NameValue::operator=(const NameValue &nv)
 
 inline NameValue::~NameValue()
 {
-    if (m_pAttributes)
-    {
-        delete m_pAttributes;
-        m_pAttributes = nullptr;
-    }
+    delete m_pAttributes;
+    m_pAttributes = nullptr;
 }
 
 inline void NameValue::AddAttribute(const QString &name, const QString &value,

@@ -82,8 +82,8 @@ void GrabberSettings::Init(void)
     {
         InfoMap map;
         it->toMap(map);
-        MythUIButtonListItem *item =
-                    new MythUIButtonListItem(m_movieGrabberButtonList, it->GetName());
+        auto *item = new MythUIButtonListItem(m_movieGrabberButtonList,
+                                              it->GetName());
         item->SetData(it->GetRelPath());
         item->SetTextFromMap(map);
     }
@@ -95,8 +95,8 @@ void GrabberSettings::Init(void)
     {
         InfoMap map;
         it->toMap(map);
-        MythUIButtonListItem *item =
-                    new MythUIButtonListItem(m_tvGrabberButtonList, it->GetName());
+        auto *item = new MythUIButtonListItem(m_tvGrabberButtonList,
+                                              it->GetName());
         item->SetData(it->GetRelPath());
         item->SetTextFromMap(map);
     }
@@ -108,8 +108,8 @@ void GrabberSettings::Init(void)
     {
         InfoMap map;
         it->toMap(map);
-        MythUIButtonListItem *item =
-                    new MythUIButtonListItem(m_gameGrabberButtonList, it->GetName());
+        auto *item = new MythUIButtonListItem(m_gameGrabberButtonList,
+                                              it->GetName());
         item->SetData(it->GetRelPath());
         item->SetTextFromMap(map);
     }

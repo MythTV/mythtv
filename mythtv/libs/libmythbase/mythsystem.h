@@ -29,7 +29,7 @@
 // MythTV headers
 #include "mythbaseexp.h"
 
-typedef enum MythSystemMask {
+enum MythSystemFlag {
     kMSNone               = 0x00000000,
     kMSDontBlockInputDevs = 0x00000001, ///< avoid blocking LIRC & Joystick Menu
     kMSDontDisableDrawing = 0x00000002, ///< avoid disabling UI drawing
@@ -49,9 +49,9 @@ typedef enum MythSystemMask {
                                         ///  for the duration of application.
     kMSPropagateLogs      = 0x00020000, ///< add arguments for MythTV log
                                         ///  propagation
-} MythSystemMask;
+};
 
-typedef enum MythSignal {
+enum MythSignal {
     kSignalNone,
     kSignalUnknown,
     kSignalHangup,
@@ -64,7 +64,7 @@ typedef enum MythSignal {
     kSignalUser2,
     kSignalTerm,
     kSignalStop,
-} MythSignal;
+};
 
 class QStringList;
 class QIODevice;
@@ -82,7 +82,7 @@ class MBASE_PUBLIC MythSystem
 {
   public:
     /// Priorities that can be used for cpu and disk usage of child process
-    typedef enum Priority {
+    enum Priority {
         kIdlePriority   = 0, ///< run only when no one else wants to
         kLowestPriority,
         kLowPriority,
@@ -91,7 +91,7 @@ class MBASE_PUBLIC MythSystem
         kHighestPriority,
         kTimeCriticalPriority,
         kInheritPriority, ///< Use parent priority
-    } Priority;
+    };
 
     static MythSystem *Create(
         const QStringList &args,

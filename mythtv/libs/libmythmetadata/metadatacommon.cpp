@@ -412,7 +412,7 @@ MetadataLookup* LookupFromProgramInfo(ProgramInfo *pginfo)
                            .secsTo(pginfo->GetRecordingEndTime());
     uint runtime = (runtimesecs/60);
 
-    MetadataLookup *ret = new MetadataLookup(kMetadataRecording, kUnknownVideo,
+    auto *ret = new MetadataLookup(kMetadataRecording, kUnknownVideo,
         qVariantFromValue(pginfo), kLookupData, false, false, false, false, false,
         pginfo->GetHostname(),pginfo->GetBasename(),pginfo->GetTitle(),
         QStringList() << pginfo->GetCategory(), pginfo->GetStars() * 10,

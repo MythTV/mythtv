@@ -37,7 +37,7 @@ public:
     inline int64_t Next() const { return m_tcNext; }
     inline int64_t First() const { return m_tcFirst; }
 
-    typedef QPair<int64_t, int64_t> range_t;
+    using range_t = QPair<int64_t, int64_t>;
     range_t Avail(int64_t timecode) const
     {
         if (timecode == 0 || timecode == -1)
@@ -154,8 +154,8 @@ protected:
                 unsigned long cnt = len;
                 int n = size();
                 resize(n + sizeof(int16_t) * cnt);
-                const uchar *s = reinterpret_cast< const uchar* >(b);
-                int16_t *p = reinterpret_cast< int16_t* >(data() + n);
+                const auto *s = reinterpret_cast< const uchar* >(b);
+                auto *p = reinterpret_cast< int16_t* >(data() + n);
                 while (cnt--)
                     *p++ = (int16_t(*s++) - CHAR_MAX) << (16 - CHAR_BIT);
             }
@@ -172,8 +172,8 @@ protected:
                 int n = size();
                 resize(n + sizeof(int16_t) * cnt);
                 const float f((1 << 15) - 1);
-                const float *s = reinterpret_cast< const float* >(b);
-                int16_t *p = reinterpret_cast< int16_t* >(data() + n);
+                const auto *s = reinterpret_cast< const float* >(b);
+                auto *p = reinterpret_cast< int16_t* >(data() + n);
                 while (cnt--)
                     *p++ = int16_t(f * *s++);
             }
@@ -312,7 +312,7 @@ MythImage *AudioOutputGraph::GetImage(int64_t timecode) const
             image.setPixel(x, height - 1 - y, rgb);
     }
 
-    MythImage *mi = new MythImage(m_painter);
+    auto *mi = new MythImage(m_painter);
     mi->Assign(image);
     return mi;
 }

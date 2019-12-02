@@ -15,8 +15,8 @@ extern "C" {
 #include <X11/extensions/Xinerama.h>
 #include <X11/extensions/xf86vmode.h>
 }
-typedef int (*XErrorCallbackType)(Display *, XErrorEvent *);
-typedef std::vector<XErrorEvent>       XErrorVectorType;
+using XErrorCallbackType = int (*)(Display *, XErrorEvent *);
+using XErrorVectorType = std::vector<XErrorEvent>;
 std::map<Display*, XErrorVectorType>   xerrors;
 std::map<Display*, XErrorCallbackType> xerror_handlers;
 std::map<Display*, MythXDisplay*>      xdisplays;
@@ -58,7 +58,7 @@ MythXDisplay *GetMythXDisplay(Display *d)
 
 MythXDisplay *OpenMythXDisplay(bool Warn /*= true*/)
 {
-    MythXDisplay *disp = new MythXDisplay();
+    auto *disp = new MythXDisplay();
     if (disp && disp->Open())
         return disp;
 
@@ -269,7 +269,7 @@ void MythXDisplay::CheckOrphanedErrors(void)
     if (xerrors.empty())
         return;
 
-    std::map<Display*, XErrorVectorType>::iterator errors = xerrors.begin();
+    auto errors = xerrors.begin();
     for (; errors != xerrors.end(); ++errors)
         if (!xerror_handlers.count(errors->first))
             CheckErrors(errors->first);

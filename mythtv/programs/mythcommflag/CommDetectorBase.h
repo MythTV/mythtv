@@ -11,13 +11,13 @@ using namespace std;
 
 #define MAX_BLANK_FRAMES 180
 
-typedef enum commMapValues {
+enum CommMapValue {
     MARK_START   = 0,
     MARK_END     = 1,
     MARK_PRESENT = 2,
-} CommMapValue;
+};
 
-typedef QMap<uint64_t, CommMapValue> show_map_t;
+using show_map_t = QMap<uint64_t, CommMapValue>;
 
 /** \class CommDetectorBase
  *  \brief Abstract base class for all CommDetectors.

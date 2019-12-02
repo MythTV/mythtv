@@ -9,13 +9,13 @@
 #include "mythuiexp.h"
 #include "mythuidefines.h"
 
-typedef enum
+enum RenderType
 {
     kRenderUnknown = 0,
     kRenderDirect3D9,
     kRenderVDPAU,
     kRenderOpenGL
-} RenderType;
+};
 
 class MUI_PUBLIC MythRender : public ReferenceCounter
 {

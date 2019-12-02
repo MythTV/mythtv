@@ -62,16 +62,16 @@ static QMap<QString, LoggerBase *> loggerMap;
 
 LogForwardThread                   *logForwardThread = nullptr;
 
-typedef QList<LoggerBase *> LoggerList;
+using LoggerList = QList<LoggerBase *>;
 
-typedef struct {
+struct LoggerListItem {
     LoggerList *m_itemList;
     qlonglong   m_itemEpoch;
-} LoggerListItem;
-typedef QMap<QString, LoggerListItem *> ClientMap;
+};
+using  ClientMap = QMap<QString, LoggerListItem *>;
 
-typedef QList<QString> ClientList;
-typedef QMap<LoggerBase *, ClientList *> RevClientMap;
+using  ClientList = QList<QString>;
+using  RevClientMap = QMap<LoggerBase *, ClientList *>;
 
 static QMutex                       logClientMapMutex;
 static ClientMap                    logClientMap;
@@ -159,7 +159,7 @@ FileLogger *FileLogger::create(const QString& filename, QMutex *mutex)
     logger = new FileLogger(file);
     mutex->lock();
 
-    ClientList *clients = new ClientList;
+    auto *clients = new ClientList;
     logRevClientMap.insert(logger, clients);
     return logger;
 }
@@ -266,7 +266,7 @@ SyslogLogger *SyslogLogger::create(QMutex *mutex, bool open)
     logger = new SyslogLogger(open);
     mutex->lock();
 
-    ClientList *clients = new ClientList;
+    auto *clients = new ClientList;
     logRevClientMap.insert(logger, clients);
     return logger;
 }
@@ -323,7 +323,7 @@ JournalLogger *JournalLogger::create(QMutex *mutex)
     logger = new JournalLogger();
     mutex->lock();
 
-    ClientList *clients = new ClientList;
+    auto *clients = new ClientList;
     logRevClientMap.insert(logger, clients);
     return logger;
 }
@@ -395,7 +395,7 @@ DatabaseLogger *DatabaseLogger::create(const QString& table, QMutex *mutex)
     logger = new DatabaseLogger(tble);
     mutex->lock();
 
-    ClientList *clients = new ClientList;
+    auto *clients = new ClientList;
     logRevClientMap.insert(logger, clients);
     return logger;
 }
@@ -597,7 +597,7 @@ void DBLoggerThread::run(void)
         // We want the query to be out of scope before the RunEpilog() so
         // shutdown occurs correctly as otherwise the connection appears still
         // in use, and we get a qWarning on shutdown.
-        MSqlQuery *query = new MSqlQuery(MSqlQuery::InitCon());
+        auto *query = new MSqlQuery(MSqlQuery::InitCon());
         m_logger->prepare(*query);
 
         QMutexLocker qLock(&m_queueMutex);
@@ -819,7 +819,7 @@ void LogForwardThread::forwardMessage(LogMessage *msg)
         QMutexLocker lock3(&logRevClientMapMutex);
 
         // Need to find or create the loggers
-        LoggerList *loggers = new LoggerList;
+        auto *loggers = new LoggerList;
 
         // FileLogger from logFile
         QString logfile = item->logFile();
@@ -939,7 +939,7 @@ void logForwardStop(void)
 
 void logForwardMessage(const QList<QByteArray> &msg)
 {
-    LogMessage *message = new LogMessage(msg);
+    auto *message = new LogMessage(msg);
     QMutexLocker lock(&logMsgListMutex);
 
     bool wasEmpty = logMsgList.isEmpty();

@@ -8,7 +8,7 @@
 #ifndef __EDGEDETECTOR_H__
 #define __EDGEDETECTOR_H__
 
-typedef struct AVFrame AVFrame;
+using AVFrame = struct AVFrame;
 
 namespace edgeDetector {
 

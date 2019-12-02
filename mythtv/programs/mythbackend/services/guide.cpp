@@ -114,7 +114,7 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &rawStartTime,
 
     // NOTE: Fetching this information directly from the schedule is
     //       significantly faster than using ProgramInfo::LoadFromScheduler()
-    Scheduler *scheduler = dynamic_cast<Scheduler*>(gCoreContext->GetScheduler());
+    auto *scheduler = dynamic_cast<Scheduler*>(gCoreContext->GetScheduler());
     if (scheduler)
         scheduler->GetAllPending(schedList);
 
@@ -122,7 +122,7 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &rawStartTime,
     // Build Response
     // ----------------------------------------------------------------------
 
-    DTC::ProgramGuide *pGuide = new DTC::ProgramGuide();
+    auto *pGuide = new DTC::ProgramGuide();
 
     ChannelInfoList::iterator chan_it;
     for (chan_it = chanList.begin(); chan_it != chanList.end(); ++chan_it)
@@ -298,7 +298,7 @@ DTC::ProgramList* Guide::GetProgramList(int              nStartIndex,
 
     // NOTE: Fetching this information directly from the schedule is
     //       significantly faster than using ProgramInfo::LoadFromScheduler()
-    Scheduler *scheduler = dynamic_cast<Scheduler*>(gCoreContext->GetScheduler());
+    auto *scheduler = dynamic_cast<Scheduler*>(gCoreContext->GetScheduler());
     if (scheduler)
         scheduler->GetAllPending(schedList);
 
@@ -312,7 +312,7 @@ DTC::ProgramList* Guide::GetProgramList(int              nStartIndex,
     // Build Response
     // ----------------------------------------------------------------------
 
-    DTC::ProgramList *pPrograms = new DTC::ProgramList();
+    auto *pPrograms = new DTC::ProgramList();
 
     nCount        = (int)progList.size();
     int nEndIndex = (int)progList.size();
@@ -359,7 +359,7 @@ DTC::Program* Guide::GetProgramDetails( int              nChanId,
 
     // Build Response
 
-    DTC::Program *pProgram = new DTC::Program();
+    auto *pProgram = new DTC::Program();
     ProgramInfo  *pInfo    = LoadProgramFromProgram(nChanId, dtStartTime);
 
     FillProgramInfo( pProgram, pInfo, true, true, true );
@@ -447,7 +447,7 @@ QFileInfo Guide::GetChannelIcon( int nChanId,
         return QFileInfo();
     }
 
-    QImage *pImage = new QImage( sFullFileName );
+    auto *pImage = new QImage( sFullFileName );
 
     if (!pImage)
     {
@@ -501,7 +501,7 @@ QFileInfo Guide::GetChannelIcon( int nChanId,
 DTC::ChannelGroupList* Guide::GetChannelGroupList( bool bIncludeEmpty )
 {
     ChannelGroupList list = ChannelGroup::GetChannelGroups(bIncludeEmpty);
-    DTC::ChannelGroupList *pGroupList = new DTC::ChannelGroupList();
+    auto *pGroupList = new DTC::ChannelGroupList();
 
     ChannelGroupList::iterator it;
     for (it = list.begin(); it < list.end(); ++it)

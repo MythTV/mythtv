@@ -23,10 +23,8 @@ int
 scenechange_data_sort_desc_frequency(const void *aa, const void *bb)
 {
     /* Descending by frequency, then ascending by color. */
-    const struct SceneChangeDetector::scenechange_data *sc1 =
-        (const struct SceneChangeDetector::scenechange_data*)aa;
-    const struct SceneChangeDetector::scenechange_data *sc2 =
-        (const struct SceneChangeDetector::scenechange_data*)bb;
+    const auto *sc1 = (const struct SceneChangeDetector::scenechange_data*)aa;
+    const auto *sc2 = (const struct SceneChangeDetector::scenechange_data*)bb;
     int freqdiff = sc2->frequency - sc1->frequency;
     return freqdiff ? freqdiff : sc1->color - sc2->color;
 }
@@ -192,7 +190,7 @@ SceneChangeDetector::finished(long long nframes, bool final)
     }
 
     /* Identify all scene-change frames (changeMap). */
-    unsigned short *scdiffsort = new unsigned short[nframes];
+    auto *scdiffsort = new unsigned short[nframes];
     memcpy(scdiffsort, m_scdiff, nframes * sizeof(*m_scdiff));
     unsigned short mindiff = quick_select_ushort(scdiffsort, nframes,
                                                  (int)(0.979472 * nframes));

@@ -48,7 +48,7 @@ class MPUBLIC RSSSite : public QObject
 
     ~RSSSite() = default;
 
-    typedef QList<RSSSite *> rssList;
+    using rssList = QList<RSSSite *>;
 
     const QString& GetTitle() const { return m_title; }
     const QString& GetSortTitle() const { return m_sortTitle; }

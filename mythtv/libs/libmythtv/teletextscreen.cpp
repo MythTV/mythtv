@@ -78,7 +78,7 @@ QImage* TeletextScreen::GetRowImage(int row, QRect &rect)
     rect.translate(0, -(y * m_rowHeight));
     if (!m_rowImages.contains(y))
     {
-        QImage* img = new QImage(m_safeArea.width(), m_rowHeight * 2,
+        auto* img = new QImage(m_safeArea.width(), m_rowHeight * 2,
                                  QImage::Format_ARGB32);
         if (img)
         {
@@ -110,8 +110,7 @@ void TeletextScreen::OptimiseDisplayedArea(void)
 
         int row = it.key();
         image->Assign(*(it.value()));
-        MythUIImage *uiimage = new MythUIImage(this, QString("ttrow%1")
-                                                        .arg(row));
+        auto *uiimage = new MythUIImage(this, QString("ttrow%1").arg(row));
         if (uiimage)
         {
             uiimage->SetImage(image);
@@ -683,9 +682,9 @@ void TeletextScreen::DrawStatus(void)
 
 bool TeletextScreen::InitialiseFont()
 {
-    static bool initialised = false;
+    static bool s_initialised = false;
     //QString font = gCoreContext->GetSetting("DefaultSubtitleFont", "FreeMono");
-    if (initialised)
+    if (s_initialised)
     {
         return true;
 #if 0
@@ -695,7 +694,7 @@ bool TeletextScreen::InitialiseFont()
 #endif // 0
     }
 
-    MythFontProperties *mythfont = new MythFontProperties();
+    auto *mythfont = new MythFontProperties();
     QString font = SubtitleScreen::GetTeletextFontName();
     if (mythfont)
     {
@@ -708,7 +707,7 @@ bool TeletextScreen::InitialiseFont()
 
     gTTBackgroundAlpha = SubtitleScreen::GetTeletextBackgroundAlpha();
 
-    initialised = true;
+    s_initialised = true;
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Loaded main subtitle font '%1'")
         .arg(font));
     return true;

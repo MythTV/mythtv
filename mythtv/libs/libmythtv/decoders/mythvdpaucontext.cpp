@@ -43,7 +43,7 @@ int MythVDPAUContext::InitialiseContext(AVCodecContext* Context)
         return -1;
 
     // Create interop
-    MythCodecID vdpauid = static_cast<MythCodecID>(kCodec_MPEG1_VDPAU + (mpeg_version(Context->codec_id) - 1));
+    auto vdpauid = static_cast<MythCodecID>(kCodec_MPEG1_VDPAU + (mpeg_version(Context->codec_id) - 1));
     MythVDPAUInterop *interop = MythVDPAUInterop::Create(render, vdpauid);
     if (!interop)
         return -1;
@@ -53,7 +53,7 @@ int MythVDPAUContext::InitialiseContext(AVCodecContext* Context)
     if (!hwdeviceref)
         return -1;
 
-    AVHWDeviceContext* hwdevicecontext = reinterpret_cast<AVHWDeviceContext*>(hwdeviceref->data);
+    auto* hwdevicecontext = reinterpret_cast<AVHWDeviceContext*>(hwdeviceref->data);
     if (!hwdevicecontext || (hwdevicecontext && !hwdevicecontext->hwctx))
         return -1;
 
@@ -76,7 +76,7 @@ int MythVDPAUContext::InitialiseContext(AVCodecContext* Context)
     }
 
     // Add our interop class and set the callback for its release
-    AVHWFramesContext* hwframesctx = reinterpret_cast<AVHWFramesContext*>(Context->hw_frames_ctx->data);
+    auto* hwframesctx = reinterpret_cast<AVHWFramesContext*>(Context->hw_frames_ctx->data);
     hwframesctx->user_opaque = interop;
     hwframesctx->free = &MythCodecContext::FramesContextFinished;
 
@@ -94,7 +94,7 @@ int MythVDPAUContext::InitialiseContext(AVCodecContext* Context)
         return res;
     }
 
-    AVVDPAUDeviceContext* vdpaudevicectx = static_cast<AVVDPAUDeviceContext*>(hwdevicecontext->hwctx);
+    auto* vdpaudevicectx = static_cast<AVVDPAUDeviceContext*>(hwdevicecontext->hwctx);
     if (av_vdpau_bind_context(Context, vdpaudevicectx->device, vdpaudevicectx->get_proc_address, 0) != 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to bind VDPAU context");
@@ -112,13 +112,13 @@ int MythVDPAUContext::InitialiseContext(AVCodecContext* Context)
 }
 
 MythCodecID MythVDPAUContext::GetSupportedCodec(AVCodecContext **Context,
-                                                AVCodec **,
+                                                AVCodec ** /*Codec*/,
                                                 const QString &Decoder,
                                                 uint StreamType)
 {
     bool decodeonly = Decoder == "vdpau-dec";
-    MythCodecID success = static_cast<MythCodecID>((decodeonly ? kCodec_MPEG1_VDPAU_DEC : kCodec_MPEG1_VDPAU) + (StreamType - 1));
-    MythCodecID failure = static_cast<MythCodecID>(kCodec_MPEG1 + (StreamType - 1));
+    auto success = static_cast<MythCodecID>((decodeonly ? kCodec_MPEG1_VDPAU_DEC : kCodec_MPEG1_VDPAU) + (StreamType - 1));
+    auto failure = static_cast<MythCodecID>(kCodec_MPEG1 + (StreamType - 1));
 
     if (!Decoder.startsWith("vdpau") || getenv("NO_VDPAU") || IsUnsupportedProfile(*Context))
         return failure;
@@ -188,7 +188,7 @@ enum AVPixelFormat MythVDPAUContext::GetFormat2(struct AVCodecContext* Context, 
     return AV_PIX_FMT_NONE;
 }
 
-bool MythVDPAUContext::RetrieveFrame(AVCodecContext*, VideoFrame *Frame, AVFrame *AvFrame)
+bool MythVDPAUContext::RetrieveFrame(AVCodecContext* /*unused*/, VideoFrame *Frame, AVFrame *AvFrame)
 {
     if (AvFrame->format != AV_PIX_FMT_VDPAU)
         return false;
@@ -228,8 +228,8 @@ bool MythVDPAUContext::DecoderNeedsReset(AVCodecContext* Context)
     if (!Context->hw_frames_ctx)
         return false;
 
-    AVHWFramesContext* hwframesctx = reinterpret_cast<AVHWFramesContext*>(Context->hw_frames_ctx->data);
-    MythVDPAUInterop* interop = reinterpret_cast<MythVDPAUInterop*>(hwframesctx->user_opaque);
+    auto* hwframesctx = reinterpret_cast<AVHWFramesContext*>(Context->hw_frames_ctx->data);
+    auto* interop = reinterpret_cast<MythVDPAUInterop*>(hwframesctx->user_opaque);
     if (interop && interop->IsPreempted())
     {
         m_resetRequired = true;
@@ -247,7 +247,7 @@ void MythVDPAUContext::InitVideoCodec(AVCodecContext *Context, bool SelectedStre
         Context->slice_flags = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
         return;
     }
-    else if (codec_is_vdpau_dechw(m_codecID))
+    if (codec_is_vdpau_dechw(m_codecID))
     {
         Context->get_format   = MythVDPAUContext::GetFormat2;
         Context->slice_flags  = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;

@@ -245,8 +245,7 @@ void MythControls::Close()
         MythScreenStack *popupStack =
                                 GetMythMainWindow()->GetStack("popup stack");
 
-        MythConfirmationDialog *confirmPopup
-                    = new MythConfirmationDialog(popupStack, label, true);
+        auto *confirmPopup = new MythConfirmationDialog(popupStack, label, true);
 
         if (confirmPopup->Create())
             popupStack->AddScreen(confirmPopup);
@@ -292,7 +291,7 @@ void MythControls::SetListContents(
     QStringList::const_iterator it = contents.begin();
     for (; it != contents.end(); ++it)
     {
-        MythUIButtonListItem *item = new MythUIButtonListItem(uilist, *it);
+        auto *item = new MythUIButtonListItem(uilist, *it);
         item->setDrawArrow(arrows);
     }
 }
@@ -550,8 +549,7 @@ void MythControls::DeleteKey(void)
     MythScreenStack *popupStack =
                             GetMythMainWindow()->GetStack("popup stack");
 
-    MythConfirmationDialog *confirmPopup =
-            new MythConfirmationDialog(popupStack, label, false);
+    auto *confirmPopup = new MythConfirmationDialog(popupStack, label, false);
 
     if (confirmPopup->Create())
     {
@@ -588,8 +586,7 @@ void MythControls::ResolveConflict(ActionID *conflict, int error_level,
     MythScreenStack *popupStack =
                             GetMythMainWindow()->GetStack("popup stack");
 
-    MythConfirmationDialog *confirmPopup =
-            new MythConfirmationDialog(popupStack, label, !error);
+    auto *confirmPopup = new MythConfirmationDialog(popupStack, label, !error);
 
     if (!error)
     {
@@ -609,7 +606,7 @@ void MythControls::GrabKey(void)
     MythScreenStack *popupStack =
                             GetMythMainWindow()->GetStack("popup stack");
 
-    KeyGrabPopupBox *keyGrabPopup = new KeyGrabPopupBox(popupStack);
+    auto *keyGrabPopup = new KeyGrabPopupBox(popupStack);
 
     if (keyGrabPopup->Create())
         popupStack->AddScreen(keyGrabPopup, false);
@@ -666,7 +663,7 @@ void MythControls::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
+        auto *dce = (DialogCompletionEvent*)(event);
 
         QString resultid  = dce->GetId();
         int     buttonnum = dce->GetResult();

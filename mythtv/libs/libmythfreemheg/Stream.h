@@ -196,7 +196,7 @@ public:
 
 class MHSetSpeed: public MHElemAction
 {
-    typedef MHElemAction base;
+    using base = MHElemAction;
 public:
     MHSetSpeed(): base(":SetSpeed") {}
     void Initialise(MHParseNode *p, MHEngine *engine) override { // MHElemAction

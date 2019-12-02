@@ -62,7 +62,7 @@ class DarwinAVCInfo : public AVCInfo
     IOFireWireAVCLibUnitInterface **avc_handle {0};
     IOFireWireLibDeviceRef          fw_handle  {0};
 };
-typedef QMap<uint64_t,DarwinAVCInfo*> avcinfo_list_t;
+using avcinfo_list_t = QMap<uint64_t,DarwinAVCInfo*>;
 
 #endif // USING_OSX_FIREWIRE
 

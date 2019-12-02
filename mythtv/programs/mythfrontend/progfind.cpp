@@ -214,7 +214,7 @@ void ProgFinder::ShowMenu(void)
     QString label = tr("Options");
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythDialogBox *menuPopup = new MythDialogBox(label, popupStack, "menuPopup");
+    auto *menuPopup = new MythDialogBox(label, popupStack, "menuPopup");
 
     if (menuPopup->Create())
     {
@@ -246,7 +246,7 @@ void ProgFinder::customEvent(QEvent *event)
 {
     if (event->type() == MythEvent::MythEventMessage)
     {
-        MythEvent *me = static_cast<MythEvent *>(event);
+        auto *me = static_cast<MythEvent *>(event);
         const QString& message = me->Message();
 
         if (message == "SCHEDULE_CHANGE")
@@ -262,7 +262,7 @@ void ProgFinder::customEvent(QEvent *event)
     }
     else if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
+        auto *dce = (DialogCompletionEvent*)(event);
 
         QString resultid   = dce->GetId();
         QString resulttext = dce->GetResultText();
@@ -280,8 +280,7 @@ void ProgFinder::customEvent(QEvent *event)
             else if (resulttext == tr("Edit Search"))
             {
                 MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-                SearchInputDialog *textInput =
-                        new SearchInputDialog(popupStack, m_searchStr);
+                auto *textInput = new SearchInputDialog(popupStack, m_searchStr);
 
                 if (textInput->Create())
                 {
@@ -441,8 +440,7 @@ void ProgFinder::updateTimesList()
             itemText = MythDate::toString(starttime,
                                             MythDate::kDateTimeFull | MythDate::kSimplify);
 
-            MythUIButtonListItem *item =
-                new MythUIButtonListItem(m_timesList, "");
+            auto *item = new MythUIButtonListItem(m_timesList, "");
 
             QString state = RecStatus::toUIState(m_showData[i]->GetRecordingStatus());
             item->SetText(itemText, "buttontext", state);
@@ -1098,8 +1096,7 @@ void SearchInputDialog::editChanged(void)
     if (m_retObject)
     {
         //FIXME: add a new event type for this?
-        DialogCompletionEvent *dce =
-                new DialogCompletionEvent(m_id, 0, inputString, "");
+        auto *dce = new DialogCompletionEvent(m_id, 0, inputString, "");
         QCoreApplication::postEvent(m_retObject, dce);
     }
 }

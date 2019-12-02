@@ -90,22 +90,22 @@ MythUIBusyDialog  *ShowBusyPopup(const QString &message)
 {
     QString                  LOC = "ShowBusyPopup('" + message + "') - ";
     MythUIBusyDialog        *pop = nullptr;
-    static MythScreenStack  *stk = nullptr;
+    static MythScreenStack  *s_stk = nullptr;
 
 
-    if (!stk)
+    if (!s_stk)
     {
         MythMainWindow *win = GetMythMainWindow();
 
         if (win)
-            stk = win->GetStack("popup stack");
+            s_stk = win->GetStack("popup stack");
         else
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "no main window?");
             return nullptr;
         }
 
-        if (!stk)
+        if (!s_stk)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "no popup stack? "
                                            "Is there a MythThemeBase?");
@@ -113,9 +113,9 @@ MythUIBusyDialog  *ShowBusyPopup(const QString &message)
         }
     }
 
-    pop = new MythUIBusyDialog(message, stk, "showBusyPopup");
+    pop = new MythUIBusyDialog(message, s_stk, "showBusyPopup");
     if (pop->Create())
-        stk->AddScreen(pop);
+        s_stk->AddScreen(pop);
 
     return pop;
 }
@@ -164,8 +164,7 @@ void MythUIProgressDialog::customEvent(QEvent *event)
 {
     if (event->type() == ProgressUpdateEvent::kEventType)
     {
-        ProgressUpdateEvent *pue = dynamic_cast<ProgressUpdateEvent*>(event);
-
+        auto *pue = dynamic_cast<ProgressUpdateEvent*>(event);
         if (!pue)
         {
             LOG(VB_GENERAL, LOG_ERR,

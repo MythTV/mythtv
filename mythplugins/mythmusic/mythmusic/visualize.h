@@ -245,7 +245,7 @@ class Piano : public VisualBase
 #define PIANO_MIN_VOL -10
 #define PIANO_KEYPRESS_TOO_LIGHT .2
 
-typedef struct piano_key_data {
+struct piano_key_data {
     goertzel_data q1, q2, coeff, magnitude;
     goertzel_data max_magnitude_seen;
 
@@ -256,7 +256,7 @@ typedef struct piano_key_data {
     int samples_process_before_display_update;
 
     bool is_black_note; // These are painted on top of white notes, and have different colouring
-} piano_key_data;
+};
 
   public:
     Piano();

@@ -11,7 +11,7 @@
 
 using namespace std;
 
-typedef enum
+enum TTColor
 {
     kTTColorBlack       = 0,
     kTTColorRed         = 1,
@@ -22,7 +22,7 @@ typedef enum
     kTTColorCyan        = 6,
     kTTColorWhite       = 7,
     kTTColorTransparent = 8,
-} TTColor;
+};
 
 #define TP_SUPPRESS_HEADER  0x01
 #define TP_UPDATE_INDICATOR 0x02
@@ -47,7 +47,7 @@ class TeletextSubPage
     bool active;              ///< data has arrived since page last cleared
 };
 
-typedef map<int, TeletextSubPage> int_to_subpage_t;
+using int_to_subpage_t = map<int, TeletextSubPage>;
 
 class TeletextPage
 {
@@ -56,7 +56,7 @@ class TeletextPage
     int               current_subpage;
     int_to_subpage_t  subpages;
 };
-typedef map<int, TeletextPage> int_to_page_t;
+using int_to_page_t = map<int, TeletextPage>;
 
 class TeletextMagazine
 {

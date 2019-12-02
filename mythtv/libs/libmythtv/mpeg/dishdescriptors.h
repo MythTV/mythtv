@@ -134,7 +134,7 @@ class DishEventTagsDescriptor : public MPEGDescriptor
     QDate originalairdate(void) const;
 };
 
-typedef enum
+enum DishThemeType
 {
     kThemeNone = 0,
     kThemeMovie,
@@ -147,7 +147,7 @@ typedef enum
     kThemeReligious,
     kThemeOffAir,
     kThemeLast,
-} DishThemeType;
+};
 
 QString dish_theme_type_to_string(uint theme_type);
 DishThemeType string_to_dish_theme_type(const QString &type);

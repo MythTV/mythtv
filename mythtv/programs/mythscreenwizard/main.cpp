@@ -97,8 +97,7 @@ static void startAppearWiz(int _x, int _y, int _w, int _h)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    ScreenWizard *screenwizard = new ScreenWizard(mainStack,
-                                                        "screenwizard");
+    auto *screenwizard = new ScreenWizard(mainStack, "screenwizard");
     screenwizard->SetInitialSettings(_x, _y, _w, _h);
 
     if (screenwizard->Create())

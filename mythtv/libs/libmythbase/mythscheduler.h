@@ -9,12 +9,12 @@
 class ProgramInfo;
 class RecordingInfo;
 
-typedef std::deque<RecordingInfo*> RecList;
+using RecList = std::deque<RecordingInfo*>;
 #define SORT_RECLIST(LIST, ORDER) \
   do { std::stable_sort((LIST).begin(), (LIST).end(), ORDER); } while (false)
 
-typedef RecList::const_iterator RecConstIter;
-typedef RecList::iterator RecIter;
+using RecConstIter = RecList::const_iterator;
+using RecIter = RecList::iterator;
 
 /** This is an generic interface to a program scheduler */
 class MythScheduler

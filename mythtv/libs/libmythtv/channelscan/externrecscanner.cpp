@@ -3,6 +3,7 @@
 // Std C headers
 #include <cmath>
 #include <unistd.h>
+#include <utility>
 
 // Qt headers
 #include <QFile>
@@ -20,12 +21,12 @@
 #define LOC QString("ExternRecChanFetch: ")
 
 ExternRecChannelScanner::ExternRecChannelScanner(uint cardid,
-                                                 const QString &inputname,
+                                                 QString inputname,
                                                  uint sourceid,
                                                  ScanMonitor *monitor)
     : m_scan_monitor(monitor)
     , m_cardid(cardid)
-    , m_inputname(inputname)
+    , m_inputname(std::move(inputname))
     , m_sourceid(sourceid)
     , m_thread(new MThread("ExternRecChannelScanner", this))
 {

@@ -660,35 +660,35 @@ QString get_decoder_name(MythCodecID codec_id)
 {
     if (codec_is_vdpau(codec_id))
         return "vdpau";
-    else if (codec_is_vdpau_dec(codec_id))
+    if (codec_is_vdpau_dec(codec_id))
         return "vdpau-dec";
-    else if (codec_is_vaapi(codec_id))
+    if (codec_is_vaapi(codec_id))
         return "vaapi";
-    else if (codec_is_vaapi_dec(codec_id))
+    if (codec_is_vaapi_dec(codec_id))
         return "vaapi-dec";
-    else if (codec_is_dxva2(codec_id))
+    if (codec_is_dxva2(codec_id))
         return "dxva2";
-    else if (codec_is_mediacodec(codec_id))
+    if (codec_is_mediacodec(codec_id))
         return "mediacodec";
-    else if (codec_is_mediacodec_dec(codec_id))
+    if (codec_is_mediacodec_dec(codec_id))
         return "mediacodec-dec";
-    else if (codec_is_nvdec(codec_id))
+    if (codec_is_nvdec(codec_id))
         return "nvdec";
-    else if (codec_is_nvdec_dec(codec_id))
+    if (codec_is_nvdec_dec(codec_id))
         return "nvdec-dec";
-    else if (codec_is_vtb(codec_id))
+    if (codec_is_vtb(codec_id))
         return "vtb";
-    else if (codec_is_vtb_dec(codec_id))
+    if (codec_is_vtb_dec(codec_id))
         return "vtb-dec";
-    else if (codec_is_v4l2(codec_id))
+    if (codec_is_v4l2(codec_id))
         return "v4l2";
-    else if (codec_is_v4l2_dec(codec_id))
+    if (codec_is_v4l2_dec(codec_id))
         return "v4l2-dec";
-    else if (codec_is_mmal(codec_id))
+    if (codec_is_mmal(codec_id))
         return "mmal";
-    else if (codec_is_mmal_dec(codec_id))
+    if (codec_is_mmal_dec(codec_id))
         return "mmal-dec";
-    else if (codec_is_drmprime(codec_id))
+    if (codec_is_drmprime(codec_id))
         return "drmprime";
     return "ffmpeg";
 }

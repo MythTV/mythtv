@@ -87,7 +87,7 @@ void MythVDPAUInterop::RotateReferenceFrames(AVBufferRef *Buffer)
         return;
 
     // don't retain twice for double rate
-    if ((m_referenceFrames.size() > 0) &&
+    if (!m_referenceFrames.empty() &&
             (static_cast<VdpVideoSurface>(reinterpret_cast<uintptr_t>(m_referenceFrames[0]->data)) ==
              static_cast<VdpVideoSurface>(reinterpret_cast<uintptr_t>(Buffer->data))))
     {
@@ -132,11 +132,8 @@ bool MythVDPAUInterop::InitNV(AVVDPAUDeviceContext* DeviceContext)
             LOG(VB_PLAYBACK, LOG_INFO, LOC + "Ready");
             return true;
         }
-        else
-        {
-            delete m_helper;
-            m_helper = nullptr;
-        }
+        delete m_helper;
+        m_helper = nullptr;
     }
 
     LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to retrieve procs");
@@ -255,13 +252,13 @@ vector<MythVideoTexture*> MythVDPAUInterop::Acquire(MythRenderOpenGL *Context,
         !Frame->buf || !Frame->priv[1])
         return result;
 
-    AVBufferRef* buffer = reinterpret_cast<AVBufferRef*>(Frame->priv[1]);
+    auto* buffer = reinterpret_cast<AVBufferRef*>(Frame->priv[1]);
     if (!buffer || (buffer && !buffer->data))
         return result;
-    AVHWFramesContext* frames = reinterpret_cast<AVHWFramesContext*>(buffer->data);
+    auto* frames = reinterpret_cast<AVHWFramesContext*>(buffer->data);
     if (!frames || (frames && !frames->device_ctx))
         return result;
-    AVVDPAUDeviceContext *devicecontext = reinterpret_cast<AVVDPAUDeviceContext*>(frames->device_ctx->hwctx);
+    auto *devicecontext = reinterpret_cast<AVVDPAUDeviceContext*>(frames->device_ctx->hwctx);
     if (!devicecontext)
         return result;
 
@@ -270,7 +267,7 @@ vector<MythVideoTexture*> MythVDPAUInterop::Acquire(MythRenderOpenGL *Context,
         return result;
 
     // Retrieve surface - we need its size to create the mixer and output surface
-    VdpVideoSurface surface = static_cast<VdpVideoSurface>(reinterpret_cast<uintptr_t>(Frame->buf));
+    auto surface = static_cast<VdpVideoSurface>(reinterpret_cast<uintptr_t>(Frame->buf));
     if (!surface)
         return result;
 
@@ -356,7 +353,7 @@ vector<MythVideoTexture*> MythVDPAUInterop::Acquire(MythRenderOpenGL *Context,
     return m_openglTextures[DUMMY_INTEROP_ID];
 }
 
-void MythVDPAUInterop::UpdateColourSpace(bool)
+void MythVDPAUInterop::UpdateColourSpace(bool /*PrimariesChanged*/)
 {
     if (!m_mixer || !m_context || !m_colourSpace || !m_helper)
         return;

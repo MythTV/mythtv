@@ -170,8 +170,8 @@ void NetSearch::ShowMenu(void)
 {
     QString label = tr("Search Options");
 
-    MythDialogBox *menuPopup = new MythDialogBox(label, m_popupStack,
-                                                 "mythnetvisionmenupopup");
+    auto *menuPopup = new MythDialogBox(label, m_popupStack,
+                                        "mythnetvisionmenupopup");
 
     if (menuPopup->Create())
     {
@@ -244,8 +244,7 @@ void NetSearch::FillGrabberButtonList()
     for (GrabberScript::scriptList::iterator i = m_grabberList.begin();
             i != m_grabberList.end(); ++i)
     {
-        MythUIButtonListItem *item =
-                    new MythUIButtonListItem(m_siteList, (*i)->GetTitle());
+        auto *item = new MythUIButtonListItem(m_siteList, (*i)->GetTitle());
         item->SetText((*i)->GetTitle(), "title");
         item->SetData((*i)->GetCommandline());
         QString thumb = QString("%1mythnetvision/icons/%2").arg(GetShareDir())
@@ -357,7 +356,7 @@ void NetSearch::SearchFinished(void)
 {
     CloseBusyPopup();
 
-    Search *item = new Search();
+    auto *item = new Search();
     QByteArray data = m_reply->readAll();
     item->SetData(data);
 
@@ -421,9 +420,8 @@ void NetSearch::PopulateResultList(ResultItem::resultList list)
             i != list.end(); ++i)
     {
         QString title = (*i)->GetTitle();
-        MythUIButtonListItem *item =
-            new MythUIButtonListItem(m_searchResultList, title,
-                                     qVariantFromValue(*i));
+        auto *item = new MythUIButtonListItem(m_searchResultList, title,
+                                              qVariantFromValue(*i));
         InfoMap metadataMap;
         (*i)->toMap(metadataMap);
         item->SetTextFromMap(metadataMap);
@@ -458,7 +456,7 @@ void NetSearch::RunSearchEditor()
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    SearchEditor *searchedit = new SearchEditor(mainStack, "mythnetsearchedit");
+    auto *searchedit = new SearchEditor(mainStack, "mythnetsearchedit");
 
     if (searchedit->Create())
     {
@@ -482,7 +480,7 @@ void NetSearch::DoListRefresh()
 
 void NetSearch::SlotItemChanged()
 {
-    ResultItem *item = m_searchResultList->GetDataValue().value<ResultItem*>();
+    auto *item = m_searchResultList->GetDataValue().value<ResultItem*>();
 
     if (item && GetFocusWidget() == m_searchResultList)
     {
@@ -545,7 +543,7 @@ void NetSearch::customEvent(QEvent *event)
 {
     if (event->type() == ThumbnailDLEvent::kEventType)
     {
-        ThumbnailDLEvent *tde = dynamic_cast<ThumbnailDLEvent *>(event);
+        auto *tde = dynamic_cast<ThumbnailDLEvent *>(event);
         if (tde == nullptr)
             return;
 

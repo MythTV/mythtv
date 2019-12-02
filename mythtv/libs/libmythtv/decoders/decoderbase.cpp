@@ -420,7 +420,7 @@ bool DecoderBase::FindPosition(long long desired_value, bool search_adjusted,
 {
     QMutexLocker locker(&m_positionMapLock);
     // Binary search
-    long long size  = (long long) m_positionMap.size();
+    auto size = (long long) m_positionMap.size();
     long long lower = -1;
     long long upper = size;
 

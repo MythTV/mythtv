@@ -43,9 +43,9 @@ MPUBLIC extern const char *kJobQueueInUseID;
 MPUBLIC extern const char *kCCExtractorInUseID;
 
 /// Frame # -> File offset map
-typedef QMap<long long, long long> frm_pos_map_t;
+using frm_pos_map_t = QMap<long long, long long>;
 
-typedef enum {
+enum MarkTypes {
     MARK_ALL           = -100,
     MARK_UNSET         = -10,
     MARK_TMP_CUT_END   = -5,
@@ -74,21 +74,21 @@ typedef enum {
     MARK_TOTAL_FRAMES  = 34,
     MARK_UTIL_PROGSTART = 40,
     MARK_UTIL_LASTPLAYPOS = 41,
-} MarkTypes;
+};
 MPUBLIC QString toString(MarkTypes type);
 
 /// Frame # -> Mark map
-typedef QMap<uint64_t, MarkTypes> frm_dir_map_t;
+using frm_dir_map_t = QMap<uint64_t, MarkTypes>;
 
-typedef enum CommFlagStatuses {
+enum CommFlagStatus {
     COMM_FLAG_NOT_FLAGGED = 0,
     COMM_FLAG_DONE = 1,
     COMM_FLAG_PROCESSING = 2,
     COMM_FLAG_COMMFREE = 3
-} CommFlagStatus;
+};
 
 /// This is used as a bitmask.
-typedef enum SkipTypes {
+enum SkipType {
     COMM_DETECT_COMMFREE    = -2,
     COMM_DETECT_UNINIT      = -1,
     COMM_DETECT_OFF         = 0x00000000,
@@ -112,22 +112,22 @@ typedef enum SkipTypes {
     COMM_DETECT_PREPOSTROLL_ALL = (COMM_DETECT_PREPOSTROLL
                                    | COMM_DETECT_BLANKS
                                    | COMM_DETECT_SCENE)
-} SkipType;
+};
 
 MPUBLIC QString SkipTypeToString(int);
 MPUBLIC std::deque<int> GetPreferredSkipTypeCombinations(void);
 
-typedef enum TranscodingStatuses {
+enum TranscodingStatus {
     TRANSCODING_NOT_TRANSCODED = 0,
     TRANSCODING_COMPLETE       = 1,
     TRANSCODING_RUNNING        = 2
-} TranscodingStatus;
+};
 
 /// If you change these please update:
 /// mythplugins/mythweb/modules/tv/classes/Program.php
 /// mythtv/bindings/perl/MythTV/Program.pm
 /// (search for "Assign the program flags" in both)
-typedef enum FlagMask {
+enum ProgramFlag {
     FL_NONE           = 0x00000000,
     FL_COMMFLAG       = 0x00000001,
     FL_CUTLIST        = 0x00000002,
@@ -152,20 +152,20 @@ typedef enum FlagMask {
     FL_INUSERECORDING = 0x01000000,
     FL_INUSEPLAYING   = 0x02000000,
     FL_INUSEOTHER     = 0x04000000,
-} ProgramFlag;
+};
 
-typedef enum ProgramInfoType {
+enum ProgramInfoType {
     kProgramInfoTypeRecording = 0,
     kProgramInfoTypeVideoFile,
     kProgramInfoTypeVideoDVD,
     kProgramInfoTypeVideoStreamingHTML,
     kProgramInfoTypeVideoStreamingRTSP,
     kProgramInfoTypeVideoBD,
-} ProgramInfoType;
+};
 
 /// if AudioProps changes, the audioprop column in program and
 /// recordedprogram has to changed accordingly
-typedef enum AudioProps {
+enum AudioProps {
     AUD_UNKNOWN       = 0x00, // For backwards compatibility do not change 0 or 1
     AUD_STEREO        = 0x01,
     AUD_MONO          = 0x02,
@@ -173,14 +173,14 @@ typedef enum AudioProps {
     AUD_DOLBY         = 0x08,
     AUD_HARDHEAR      = 0x10,
     AUD_VISUALIMPAIR  = 0x20,
-} AudioProperty; // has 6 bits in ProgramInfo::properties
+}; // has 6 bits in ProgramInfo::properties
 #define kAudioPropertyBits 6
 #define kAudioPropertyOffset 0
 #define kAudioPropertyMask (0x3f<<kAudioPropertyOffset)
 
 /// if VideoProps changes, the videoprop column in program and
 /// recordedprogram has to changed accordingly
-typedef enum VideoProps {
+enum VideoProps {
     // For backwards compatibility do not change 0 or 1
     VID_UNKNOWN       = 0x00,
     VID_HDTV          = 0x01,
@@ -190,34 +190,34 @@ typedef enum VideoProps {
     VID_1080          = 0x10,
     VID_DAMAGED       = 0x20,
     VID_3DTV          = 0x40,
-} VideoProperty; // has 7 bits in ProgramInfo::properties
+}; // has 7 bits in ProgramInfo::properties
 #define kVideoPropertyBits 7
 #define kVideoPropertyOffset kAudioPropertyBits
 #define kVideoPropertyMask (0x7f<<kVideoPropertyOffset)
 
 /// if SubtitleTypes changes, the subtitletypes column in program and
 /// recordedprogram has to changed accordingly
-typedef enum SubtitleTypes {
+enum SubtitleType {
     // For backwards compatibility do not change 0 or 1
     SUB_UNKNOWN       = 0x00,
     SUB_HARDHEAR      = 0x01,
     SUB_NORMAL        = 0x02,
     SUB_ONSCREEN      = 0x04,
     SUB_SIGNED        = 0x08
-} SubtitleType; // has 4 bits in ProgramInfo::properties
+}; // has 4 bits in ProgramInfo::properties
 #define kSubtitlePropertyBits 4
 #define kSubtitlePropertyOffset (kAudioPropertyBits+kVideoPropertyBits)
 #define kSubtitlePropertyMask (0x0f<<kSubtitlePropertyOffset)
 
 
-typedef enum AvailableStatusTypes {
+enum AvailableStatusType {
     asAvailable = 0,
     asNotYetAvailable,
     asPendingDelete,
     asFileNotFound,
     asZeroByte,
     asDeleted
-} AvailableStatusType; // note stored in uint8_t in ProgramInfo
+}; // note stored in uint8_t in ProgramInfo
 MPUBLIC QString toString(AvailableStatusType);
 
 enum WatchListStatus {
@@ -227,11 +227,11 @@ enum WatchListStatus {
     wlExpireOff = -1
 };
 
-typedef enum AutoExpireTypes {
+enum AutoExpireType {
     kDisableAutoExpire = 0,
     kNormalAutoExpire  = 1,
     kDeletedAutoExpire = 9999,
     kLiveTVAutoExpire = 10000
-} AutoExpireType;
+};
 
 #endif // _PROGRAM_INFO_TYPES_H_

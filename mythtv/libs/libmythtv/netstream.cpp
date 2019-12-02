@@ -8,29 +8,30 @@
 using std::getenv;
 #include <cstddef>
 #include <cstdio>
+#include <utility>
 
 // Qt
+#include <QAtomicInt>
+#include <QCoreApplication>
+#include <QDesktopServices>
+#include <QEvent>
+#include <QFile>
+#include <QMetaType> // qRegisterMetaType
+#include <QMutexLocker>
 #include <QNetworkAccessManager>
-#include <QNetworkRequest>
-#include <QNetworkReply>
-#include <QNetworkProxy>
 #include <QNetworkDiskCache>
+#include <QNetworkProxy>
+#include <QNetworkReply>
+#include <QNetworkRequest>
+#include <QScopedPointer>
+#include <QThread>
+#include <QUrl>
 #ifndef QT_NO_OPENSSL
 #include <QSslConfiguration>
 #include <QSslError>
 #include <QSslSocket>
 #include <QSslKey>
 #endif
-#include <QFile>
-#include <QUrl>
-#include <QThread>
-#include <QMutexLocker>
-#include <QEvent>
-#include <QCoreApplication>
-#include <QAtomicInt>
-#include <QMetaType> // qRegisterMetaType
-#include <QDesktopServices>
-#include <QScopedPointer>
 
 // Myth
 #include "mythlogging.h"
@@ -93,16 +94,10 @@ public:
  * Network streaming request
  */
 NetStream::NetStream(const QUrl &url, EMode mode /*= kPreferCache*/,
-        const QByteArray &cert) :
+        QByteArray cert) :
     m_id(s_nRequest.fetchAndAddRelaxed(1)),
     m_url(url),
-    m_state(kClosed),
-    m_pending(nullptr),
-    m_reply(nullptr),
-    m_nRedirections(0),
-    m_size(-1),
-    m_pos(0),
-    m_cert(cert)
+    m_cert(std::move(cert))
 {
     setObjectName("NetStream " + url.toString());
 
@@ -727,12 +722,12 @@ NAMThread & NAMThread::manager()
     QMutexLocker locker(&s_mtx);
 
     // Singleton
-    static NAMThread thread;
-    thread.start();
-    return thread;
+    static NAMThread s_thread;
+    s_thread.start();
+    return s_thread;
 }
 
-NAMThread::NAMThread() : m_bQuit(false), m_mutexNAM(QMutex::Recursive), m_nam(nullptr)
+NAMThread::NAMThread()
 {
     setObjectName("NAMThread");
 
@@ -958,7 +953,7 @@ QDateTime NAMThread::GetLastModified(const QUrl &url)
     Q_FOREACH(const QNetworkCacheMetaData::RawHeader &h, headers)
     {
         // RFC 1123 date format: Thu, 01 Dec 1994 16:00:00 GMT
-        static const char kszFormat[] = "ddd, dd MMM yyyy HH:mm:ss 'GMT'";
+        static constexpr char kSzFormat[] = "ddd, dd MMM yyyy HH:mm:ss 'GMT'";
 
         QString const first(h.first.toLower());
         if (first == "cache-control")
@@ -975,7 +970,7 @@ QDateTime NAMThread::GetLastModified(const QUrl &url)
         }
         else if (first == "date")
         {
-            QDateTime d = QDateTime::fromString(h.second, kszFormat);
+            QDateTime d = QDateTime::fromString(h.second, kSzFormat);
             if (!d.isValid())
             {
                 LOG(VB_GENERAL, LOG_WARNING, LOC +

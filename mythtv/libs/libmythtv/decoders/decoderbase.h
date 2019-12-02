@@ -23,7 +23,7 @@ class MythCodecContext;
 const int kDecoderProbeBufferSize = 256 * 1024;
 
 /// Track types
-typedef enum TrackTypes
+enum TrackType
 {
     kTrackTypeUnknown = 0,
     kTrackTypeAudio,            // 1
@@ -40,19 +40,19 @@ typedef enum TrackTypes
     // is used when auto-selecting the correct tracks to decode according to
     // language, bitrate etc
     kTrackTypeTextSubtitle,     // 11
-} TrackType;
+};
 QString toString(TrackType type);
 int to_track_type(const QString &str);
 
-typedef enum DecodeTypes
+enum DecodeType
 {
     kDecodeNothing = 0x00, // Demux and preprocess only.
     kDecodeVideo   = 0x01,
     kDecodeAudio   = 0x02,
     kDecodeAV      = 0x03,
-} DecodeType;
+};
 
-typedef enum AudioTrackType
+enum AudioTrackType
 {
     kAudioTypeNormal = 0,
     kAudioTypeAudioDescription, // Audio Description for the visually impaired
@@ -60,16 +60,16 @@ typedef enum AudioTrackType
     kAudioTypeHearingImpaired, // Greater contrast between dialog and background audio
     kAudioTypeSpokenSubs, // Spoken subtitles for the visually impaired
     kAudioTypeCommentary // Director/actor/etc Commentary
-} AudioTrackType;
+};
 QString toString(AudioTrackType type);
 
 // Eof States
-typedef enum
+enum EofState
 {
     kEofStateNone,     // no eof
     kEofStateDelayed,  // decoder eof, but let player drain buffered frames
     kEofStateImmediate // true eof
-} EofState;
+};
 
 class StreamInfo
 {
@@ -108,7 +108,7 @@ class StreamInfo
         return (this->m_stream_id < b.m_stream_id);
     }
 };
-typedef vector<StreamInfo> sinfo_vec_t;
+using sinfo_vec_t = vector<StreamInfo>;
 
 inline AVRational AVRationalInit(int num, int den = 1) {
     AVRational result;
@@ -282,12 +282,12 @@ class DecoderBase
     long long GetLastFrameInPosMap(void) const;
     unsigned long GetPositionMapSize(void) const;
 
-    typedef struct posmapentry
+    struct PosMapEntry
     {
         long long index;    // frame or keyframe number
         long long adjFrame; // keyFrameAdjustTable adjusted frame number
         long long pos;      // position in stream
-    } PosMapEntry;
+    };
     long long GetKey(const PosMapEntry &entry) const;
 
     MythPlayer          *m_parent                  {nullptr};

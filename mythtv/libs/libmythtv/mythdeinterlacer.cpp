@@ -138,7 +138,7 @@ void MythDeinterlacer::Filter(VideoFrame *Frame, FrameScanType Scan)
         // copy Frame metadata, preserving any existing buffer allocation
         unsigned char *buf = m_bobFrame->buf;
         int size = m_bobFrame->size;
-        memcpy(m_bobFrame, Frame, sizeof(VideoFrame_));
+        memcpy(m_bobFrame, Frame, sizeof(VideoFrame));
         m_bobFrame->priv[0] = m_bobFrame->priv[1] = m_bobFrame->priv[2] = m_bobFrame->priv[3] = nullptr;
         m_bobFrame->buf = buf;
         m_bobFrame->size = size;

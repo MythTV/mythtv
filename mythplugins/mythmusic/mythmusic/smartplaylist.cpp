@@ -469,7 +469,7 @@ void SmartPlaylistEditor::customEvent(QEvent *event)
                 MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
                 QString label = tr("Enter Name Of New Category");
 
-                MythTextInputDialog *input = new MythTextInputDialog(popupStack, label);
+                auto *input = new MythTextInputDialog(popupStack, label);
 
                 connect(input, SIGNAL(haveResult(QString)),
                         SLOT(newCategory(QString)));
@@ -486,7 +486,7 @@ void SmartPlaylistEditor::customEvent(QEvent *event)
                 MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
                 QString label = tr("Enter New Name For Category: %1").arg(m_categorySelector->GetValue());
 
-                MythTextInputDialog *input = new MythTextInputDialog(popupStack, label);
+                auto *input = new MythTextInputDialog(popupStack, label);
 
                 connect(input, SIGNAL(haveResult(QString)),
                         SLOT(renameCategory(QString)));
@@ -513,14 +513,14 @@ void SmartPlaylistEditor::editCriteria(void)
     if (!item)
         return;
 
-    SmartPLCriteriaRow *row = item->GetData().value<SmartPLCriteriaRow*>();
+    auto *row = item->GetData().value<SmartPLCriteriaRow*>();
 
     if (!row)
         return;
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    CriteriaRowEditor *editor = new CriteriaRowEditor(popupStack, row);
+    auto *editor = new CriteriaRowEditor(popupStack, row);
 
     if (!editor->Create())
     {
@@ -552,7 +552,7 @@ void SmartPlaylistEditor::doDeleteCriteria(bool doit)
         if (!item)
             return;
 
-        SmartPLCriteriaRow *row = item->GetData().value<SmartPLCriteriaRow*>();
+        auto *row = item->GetData().value<SmartPLCriteriaRow*>();
 
         if (!row)
             return;
@@ -582,7 +582,7 @@ void SmartPlaylistEditor::addCriteria(void)
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    CriteriaRowEditor *editor = new CriteriaRowEditor(popupStack, m_tempCriteriaRow);
+    auto *editor = new CriteriaRowEditor(popupStack, m_tempCriteriaRow);
 
     if (!editor->Create())
     {
@@ -618,7 +618,7 @@ void SmartPlaylistEditor::criteriaChanged()
         if (!item)
             return;
 
-        SmartPLCriteriaRow *row = item->GetData().value<SmartPLCriteriaRow*>();
+        auto *row = item->GetData().value<SmartPLCriteriaRow*>();
 
         if (!row)
             return;
@@ -635,7 +635,7 @@ void SmartPlaylistEditor::showCategoryMenu(void)
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    MythDialogBox *menu = new MythDialogBox(label, popupStack, "actionmenu");
+    auto *menu = new MythDialogBox(label, popupStack, "actionmenu");
 
     if (!menu->Create())
     {
@@ -658,7 +658,7 @@ void SmartPlaylistEditor::showCriteriaMenu(void)
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    MythDialogBox *menu = new MythDialogBox(label, popupStack, "actionmenu");
+    auto *menu = new MythDialogBox(label, popupStack, "actionmenu");
 
     if (!menu->Create())
     {
@@ -872,8 +872,7 @@ void SmartPlaylistEditor::loadFromDatabase(const QString& category, const QStrin
             QString Value1 = query.value(2).toString();
             QString Value2 = query.value(3).toString();
             // load smartplaylist items
-            SmartPLCriteriaRow *row =
-                  new SmartPLCriteriaRow(Field, Operator, Value1, Value2);
+            auto *row = new SmartPLCriteriaRow(Field, Operator, Value1, Value2);
             m_criteriaRows.append(row);
 
             new MythUIButtonListItem(m_criteriaList, row->toString(), qVariantFromValue(row));
@@ -1010,7 +1009,7 @@ void SmartPlaylistEditor::showResultsClicked(void)
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    SmartPLResultViewer *resultViewer = new SmartPLResultViewer(mainStack);
+    auto *resultViewer = new SmartPLResultViewer(mainStack);
 
     if (!resultViewer->Create())
     {
@@ -1027,7 +1026,7 @@ void SmartPlaylistEditor::orderByClicked(void)
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    SmartPLOrderByDialog *orderByDialog = new SmartPLOrderByDialog(popupStack);
+    auto *orderByDialog = new SmartPLOrderByDialog(popupStack);
 
     if (!orderByDialog->Create())
     {
@@ -1551,7 +1550,7 @@ void CriteriaRowEditor::valueButtonClicked(void)
     }
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythUISearchDialog *searchDlg = new MythUISearchDialog(popupStack, msg, searchList, false, s);
+    auto *searchDlg = new MythUISearchDialog(popupStack, msg, searchList, false, s);
 
     if (!searchDlg->Create())
     {
@@ -1575,7 +1574,7 @@ void CriteriaRowEditor::setValue(const QString& value)
 void CriteriaRowEditor::editDate(void)
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    SmartPLDateDialog *dateDlg = new SmartPLDateDialog(popupStack);
+    auto *dateDlg = new SmartPLDateDialog(popupStack);
     QString date = GetFocusWidget() == m_value1Button ? m_value1Selector->GetValue() : m_value2Selector->GetValue();
 
     if (!dateDlg->Create())
@@ -1676,7 +1675,7 @@ void SmartPLResultViewer::trackVisible(MythUIButtonListItem *item)
 
     if (item->GetImageFilename().isEmpty())
     {
-        MusicMetadata *mdata = item->GetData().value<MusicMetadata *>();
+        auto *mdata = item->GetData().value<MusicMetadata *>();
         if (mdata)
         {
             QString artFile = mdata->getAlbumArtFile();
@@ -1704,13 +1703,13 @@ void SmartPLResultViewer::showTrackInfo(void)
     if (!item)
         return;
 
-    MusicMetadata *mdata = item->GetData().value<MusicMetadata *>();
+    auto *mdata = item->GetData().value<MusicMetadata *>();
     if (!mdata)
         return;
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    TrackInfoDialog *dlg = new TrackInfoDialog(popupStack, mdata, "trackinfopopup");
+    auto *dlg = new TrackInfoDialog(popupStack, mdata, "trackinfopopup");
 
     if (!dlg->Create())
     {
@@ -1737,7 +1736,7 @@ void SmartPLResultViewer::setSQL(const QString& sql)
                 InfoMap metadataMap;
                 mdata->toMap(metadataMap);
 
-                MythUIButtonListItem *item = new MythUIButtonListItem(m_trackList, "", qVariantFromValue(mdata));
+                auto *item = new MythUIButtonListItem(m_trackList, "", qVariantFromValue(mdata));
                 item->SetTextFromMap(metadataMap);
             }
         }
@@ -1824,7 +1823,7 @@ void SmartPLOrderByDialog::setFieldList(const QString &fieldList)
 
     for (int x = 0; x < list.count(); x++)
     {
-        MythUIButtonListItem *item = new MythUIButtonListItem(m_fieldList, list[x].trimmed());
+        auto *item = new MythUIButtonListItem(m_fieldList, list[x].trimmed());
         QString state = list[x].contains("(A)") ? "ascending" : "descending";
         item->DisplayState(state, "sortstate");
     }
@@ -1866,7 +1865,7 @@ void SmartPLOrderByDialog::descendingPressed(void)
 
 void SmartPLOrderByDialog::addPressed(void)
 {
-    MythUIButtonListItem *item = new MythUIButtonListItem(m_fieldList, m_orderSelector->GetValue() + " (A)");
+    auto *item = new MythUIButtonListItem(m_fieldList, m_orderSelector->GetValue() + " (A)");
     item->DisplayState("ascending", "sortstate");
 
     orderByChanged();

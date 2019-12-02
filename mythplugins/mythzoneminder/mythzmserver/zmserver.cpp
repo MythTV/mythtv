@@ -1626,7 +1626,7 @@ void ZMServer::handleDeleteEventList(vector<string> tokens)
     string eventList;
     string outStr;
 
-    vector<string>::iterator it = tokens.begin();
+    auto it = tokens.begin();
     if (it != tokens.end())
         ++it;
     while (it != tokens.end())
@@ -1705,7 +1705,7 @@ void ZMServer::getMonitorList(void)
         MYSQL_ROW row = mysql_fetch_row(res);
         if (row)
         {
-            MONITOR *m = new MONITOR;
+            auto *m = new MONITOR;
             m->m_mon_id = atoi(row[0]);
             m->m_name = row[1];
             m->m_width = atoi(row[2]);

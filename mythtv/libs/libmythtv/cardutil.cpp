@@ -183,7 +183,7 @@ bool CardUtil::IsCableCardPresent(uint inputid,
         url.setPath("/get_var.json");
         url.setQuery(params);
 
-        QNetworkRequest *request = new QNetworkRequest();
+        auto *request = new QNetworkRequest();
         request->setAttribute(QNetworkRequest::CacheLoadControlAttribute,
                               QNetworkRequest::AlwaysNetwork);
         request->setUrl(url);
@@ -1657,7 +1657,7 @@ bool CardUtil::GetInputInfo(InputInfo &input, vector<uint> *groupids)
 
     input.m_name          = query.value(0).toString();
     input.m_sourceid      = query.value(1).toUInt();
-    input.m_livetvorder   = query.value(2).toUInt();
+    input.m_liveTvOrder   = query.value(2).toUInt();
     input.m_scheduleOrder = query.value(3).toUInt();
     input.m_displayName   = query.value(4).toString();
     input.m_recPriority   = query.value(5).toInt();
@@ -1691,7 +1691,7 @@ QList<InputInfo> CardUtil::GetAllInputInfo()
         input.m_inputid       = query.value(0).toUInt();
         input.m_name          = query.value(1).toString();
         input.m_sourceid      = query.value(2).toUInt();
-        input.m_livetvorder   = query.value(3).toUInt();
+        input.m_liveTvOrder   = query.value(3).toUInt();
         input.m_scheduleOrder = query.value(4).toUInt();
         input.m_displayName   = query.value(5).toString();
         input.m_recPriority   = query.value(6).toInt();
@@ -2119,8 +2119,7 @@ bool CardUtil::GetTimeouts(uint inputid,
 
 bool CardUtil::IsInNeedOfExternalInputConf(uint inputid)
 {
-    DiSEqCDev dev;
-    DiSEqCDevTree *diseqc_tree = dev.FindTree(inputid);
+    DiSEqCDevTree *diseqc_tree = DiSEqCDev::FindTree(inputid);
 
     bool needsConf = false;
     if (diseqc_tree)

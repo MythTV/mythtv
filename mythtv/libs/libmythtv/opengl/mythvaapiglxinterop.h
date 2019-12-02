@@ -42,8 +42,8 @@ class MythVAAPIInteropGLXCopy : public MythVAAPIInteropGLX
 
 #include "GL/glx.h"
 #include "GL/glxext.h"
-typedef void ( * MYTH_GLXBINDTEXIMAGEEXT)(Display*, GLXDrawable, int, int*);
-typedef void ( * MYTH_GLXRELEASETEXIMAGEEXT)(Display*, GLXDrawable, int);
+using MYTH_GLXBINDTEXIMAGEEXT = void (*)(Display*, GLXDrawable, int, int*);
+using MYTH_GLXRELEASETEXIMAGEEXT = void (*)(Display*, GLXDrawable, int);
 
 class MythVAAPIInteropGLXPixmap : public MythVAAPIInteropGLX
 {

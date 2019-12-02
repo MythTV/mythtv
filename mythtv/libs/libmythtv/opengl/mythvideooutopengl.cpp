@@ -1,3 +1,6 @@
+// C/C++
+#include <utility>
+
 // MythTV
 #include "mythcontext.h"
 #include "mythmainwindow.h"
@@ -93,20 +96,8 @@ void MythVideoOutputOpenGL::GetRenderOptions(RenderOptions &Options)
 #endif
 }
 
-MythVideoOutputOpenGL::MythVideoOutputOpenGL(const QString &Profile)
-  : MythVideoOutput(),
-    m_render(nullptr),
-    m_isGLES2(false),
-    m_openGLVideo(nullptr),
-    m_openGLVideoPiPActive(nullptr),
-    m_openGLPainter(nullptr),
-    m_videoProfile(Profile),
-    m_newCodecId(kCodec_NONE),
-    m_newVideoDim(),
-    m_newVideoDispDim(),
-    m_newAspect(0.0f),
-    m_buffersCreated(false),
-    m_openGLPerf(nullptr)
+MythVideoOutputOpenGL::MythVideoOutputOpenGL(QString Profile)
+  : m_videoProfile(std::move(Profile))
 {
     // Retrieve render context
     m_render = MythRenderOpenGL::GetOpenGLRender();
@@ -176,8 +167,7 @@ MythVideoOutputOpenGL::~MythVideoOutputOpenGL()
     m_openGLVideoPiPsReady.clear();
     if (m_openGLPainter)
         m_openGLPainter->SetSwapControl(true);
-    if (m_openGLVideo)
-        delete m_openGLVideo;
+    delete m_openGLVideo;
     if (m_render)
     {
         m_render->makeCurrent();
@@ -265,7 +255,7 @@ bool MythVideoOutputOpenGL::Init(const QSize &VideoDim, const QSize &VideoDispDi
 
 bool MythVideoOutputOpenGL::InputChanged(const QSize &VideoDim, const QSize &VideoDispDim,
                                          float Aspect, MythCodecID CodecId, bool &AspectOnly,
-                                         MythMultiLocker*, int ReferenceFrames,
+                                         MythMultiLocker* /*Locks*/, int ReferenceFrames,
                                          bool ForceChange)
 {
     QSize currentvideodim     = m_window.GetVideoDim();
@@ -367,17 +357,17 @@ bool MythVideoOutputOpenGL::CreateBuffers(MythCodecID CodecID, QSize Size)
 
     if (codec_is_mediacodec(CodecID))
         return m_videoBuffers.CreateBuffers(FMT_MEDIACODEC, Size, false, 1, 2, 2);
-    else if (codec_is_vaapi(CodecID))
+    if (codec_is_vaapi(CodecID))
         return m_videoBuffers.CreateBuffers(FMT_VAAPI, Size, false, 2, 1, 4, m_maxReferenceFrames);
-    else if (codec_is_vtb(CodecID))
+    if (codec_is_vtb(CodecID))
         return m_videoBuffers.CreateBuffers(FMT_VTB, Size, false, 1, 4, 2);
-    else if (codec_is_vdpau(CodecID))
+    if (codec_is_vdpau(CodecID))
         return m_videoBuffers.CreateBuffers(FMT_VDPAU, Size, false, 2, 1, 4, m_maxReferenceFrames);
-    else if (codec_is_nvdec(CodecID))
+    if (codec_is_nvdec(CodecID))
         return m_videoBuffers.CreateBuffers(FMT_NVDEC, Size, false, 2, 1, 4);
-    else if (codec_is_mmal(CodecID))
+    if (codec_is_mmal(CodecID))
         return m_videoBuffers.CreateBuffers(FMT_MMAL, Size, false, 2, 1, 4);
-    else if (codec_is_v4l2(CodecID) || codec_is_drmprime(CodecID))
+    if (codec_is_v4l2(CodecID) || codec_is_drmprime(CodecID))
         return m_videoBuffers.CreateBuffers(FMT_DRMPRIME, Size, false, 2, 1, 4);
 
     return m_videoBuffers.CreateBuffers(FMT_YV12, Size, false, 1, 8, 4, m_maxReferenceFrames);
@@ -429,7 +419,7 @@ void MythVideoOutputOpenGL::ProcessFrame(VideoFrame *Frame, OSD */*osd*/,
         m_newCodecId = kCodec_NONE;
         m_newVideoDim = QSize();
         m_newVideoDispDim = QSize();
-        m_newAspect = 0.0f;
+        m_newAspect = 0.0F;
 
         if (wasembedding && ok)
             EmbedInWidget(oldrect);
@@ -720,7 +710,7 @@ void MythVideoOutputOpenGL::DiscardFrames(bool KeyFrame, bool Flushed)
 
 VideoFrameType* MythVideoOutputOpenGL::DirectRenderFormats(void)
 {
-    static VideoFrameType openglformats[] =
+    static VideoFrameType s_openglFormats[] =
         { FMT_YV12,     FMT_NV12,      FMT_YUY2,      FMT_YUV422P,   FMT_YUV444P,
           FMT_YUV420P9, FMT_YUV420P10, FMT_YUV420P12, FMT_YUV420P14, FMT_YUV420P16,
           FMT_YUV422P9, FMT_YUV422P10, FMT_YUV422P12, FMT_YUV422P14, FMT_YUV422P16,
@@ -728,9 +718,9 @@ VideoFrameType* MythVideoOutputOpenGL::DirectRenderFormats(void)
           FMT_P010, FMT_P016,
           FMT_NONE };
     // OpenGLES2 only allows luminance textures - no RG etc
-    static VideoFrameType opengles2formats[] =
+    static VideoFrameType s_opengles2Formats[] =
         { FMT_YV12, FMT_YUY2, FMT_YUV422P, FMT_YUV444P, FMT_NONE };
-    return m_isGLES2 ? &opengles2formats[0] : &openglformats[0];
+    return m_isGLES2 ? &s_opengles2Formats[0] : &s_openglFormats[0];
 }
 
 void MythVideoOutputOpenGL::WindowResized(const QSize &Size)
@@ -777,7 +767,7 @@ void MythVideoOutputOpenGL::ClearAfterSeek(void)
  * filtering, we allow the OpenGL video code to fallback to a supported, reasonable
  * alternative.
 */
-QStringList MythVideoOutputOpenGL::GetAllowedRenderers(MythCodecID CodecId, const QSize&)
+QStringList MythVideoOutputOpenGL::GetAllowedRenderers(MythCodecID CodecId, const QSize& /*VideoDim*/)
 {
     QStringList allowed;
     if (getenv("NO_OPENGL"))
@@ -836,7 +826,7 @@ void MythVideoOutputOpenGL::InitPictureAttributes(void)
     m_videoColourSpace.SetSupportedAttributes(ALL_PICTURE_ATTRIBUTES);
 }
 
-void MythVideoOutputOpenGL::ShowPIP(VideoFrame*, MythPlayer *PiPPlayer, PIPLocation Location)
+void MythVideoOutputOpenGL::ShowPIP(VideoFrame* /*Frame*/, MythPlayer *PiPPlayer, PIPLocation Location)
 {
     if (!PiPPlayer)
         return;
@@ -846,7 +836,7 @@ void MythVideoOutputOpenGL::ShowPIP(VideoFrame*, MythPlayer *PiPPlayer, PIPLocat
     const QSize pipvideodim  = PiPPlayer->GetVideoBufferSize();
     QRect       pipvideorect = QRect(QPoint(0, 0), pipvideodim);
 
-    if ((PiPPlayer->GetVideoAspect() <= 0.0f) || !pipimage || !pipimage->buf ||
+    if ((PiPPlayer->GetVideoAspect() <= 0.0F) || !pipimage || !pipimage->buf ||
         (pipimage->codec != FMT_YV12) || !PiPPlayer->IsPIPVisible())
     {
         PiPPlayer->ReleaseCurrentFrame(pipimage);
@@ -861,7 +851,7 @@ void MythVideoOutputOpenGL::ShowPIP(VideoFrame*, MythPlayer *PiPPlayer, PIPLocat
     if (!gl_pipchain)
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Initialise PiP");
-        VideoColourSpace *colourspace = new VideoColourSpace(&m_videoColourSpace);
+        auto *colourspace = new VideoColourSpace(&m_videoColourSpace);
         m_openGLVideoPiPs[PiPPlayer] = gl_pipchain = new MythOpenGLVideo(m_render, colourspace,
                                                                 pipvideodim, pipvideodim,
                                                                 dvr, position, pipvideorect,
@@ -880,7 +870,7 @@ void MythVideoOutputOpenGL::ShowPIP(VideoFrame*, MythPlayer *PiPPlayer, PIPLocat
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Re-initialise PiP.");
         delete gl_pipchain;
-        VideoColourSpace *colourspace = new VideoColourSpace(&m_videoColourSpace);
+        auto *colourspace = new VideoColourSpace(&m_videoColourSpace);
         m_openGLVideoPiPs[PiPPlayer] = gl_pipchain = new MythOpenGLVideo(m_render, colourspace,
                                                                 pipvideodim, pipvideodim,
                                                                 dvr, position, pipvideorect,
@@ -930,12 +920,12 @@ MythPainter *MythVideoOutputOpenGL::GetOSDPainter(void)
     return m_openGLPainter;
 }
 
-bool MythVideoOutputOpenGL::CanVisualise(AudioPlayer *Audio, MythRender*)
+bool MythVideoOutputOpenGL::CanVisualise(AudioPlayer *Audio, MythRender* /*Render*/)
 {
     return MythVideoOutput::CanVisualise(Audio, m_render);
 }
 
-bool MythVideoOutputOpenGL::SetupVisualisation(AudioPlayer *Audio, MythRender*, const QString &Name)
+bool MythVideoOutputOpenGL::SetupVisualisation(AudioPlayer *Audio, MythRender* /*Render*/, const QString &Name)
 {
     return MythVideoOutput::SetupVisualisation(Audio, m_render, Name);
 }

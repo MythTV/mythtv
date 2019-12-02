@@ -46,8 +46,8 @@ class MythDialogBox;
 class MythMenu;
 class MythUIBusyDialog;
 
-typedef QMap<QString,ProgramList>       ProgramMap;
-typedef QMap<QString,QString>           Str2StrMap;
+using ProgramMap = QMap<QString,ProgramList>;
+using Str2StrMap = QMap<QString,QString>;
 
 enum {
     kArtworkFanTimeout    = 300,
@@ -62,7 +62,7 @@ class PlaybackBox : public ScheduleCommon
 
   public:
     // ViewType values cannot change; they are stored in the database.
-    typedef enum {
+    enum ViewType {
         TitlesOnly = 0,
         TitlesCategories = 1,
         TitlesCategoriesRecGroups = 2,
@@ -71,16 +71,16 @@ class PlaybackBox : public ScheduleCommon
         CategoriesRecGroups = 5,
         RecGroups = 6,
         ViewTypes,                  // placeholder value, not in database
-    } ViewType;
+    };
 
     // Sort function when TitlesOnly. Values are stored in database.
-    typedef enum {
+    enum ViewTitleSort {
         TitleSortAlphabetical = 0,
         TitleSortRecPriority = 1,
         TitleSortMethods,           // placeholder value, not in database
-    } ViewTitleSort;
+    };
 
-    typedef enum {
+    enum ViewMask {
         VIEW_NONE       =  0x0000,
         VIEW_TITLES     =  0x0001,
         VIEW_CATEGORIES =  0x0002,
@@ -90,30 +90,30 @@ class PlaybackBox : public ScheduleCommon
         VIEW_LIVETVGRP  =  0x0020,
         // insert new entries above here
         VIEW_WATCHED    =  0x8000
-    } ViewMask;
+    };
 
-    typedef enum
+    enum DeletePopupType
     {
         kDeleteRecording,
         kStopRecording,
         kForceDeleteRecording,
-    } DeletePopupType;
+    };
 
-    typedef enum
+    enum DeleteFlags
     {
         kNoFlags       = 0x00,
         kForgetHistory = 0x01,
         kForce         = 0x02,
         kIgnore        = 0x04,
         kAllRemaining  = 0x08,
-    } DeleteFlags;
+    };
 
-    typedef enum
+    enum killStateType
     {
         kNvpToPlay,
         kNvpToStop,
         kDone
-    } killStateType;
+    };
 
     PlaybackBox(MythScreenStack *parent, const QString& name,
                 TV *player = nullptr, bool showTV = false);
@@ -348,8 +348,9 @@ class PlaybackBox : public ScheduleCommon
     MythUIImage *m_previewImage               {nullptr};
 
     QString      m_artHostOverride;
-    MythUIImage *m_artImage[3];
-    QTimer      *m_artTimer[3];
+    constexpr static int kNumArtImages = 3;
+    MythUIImage *m_artImage[kNumArtImages];
+    QTimer      *m_artTimer[kNumArtImages];
 
     InfoMap m_currentMap;
 
@@ -391,7 +392,7 @@ class PlaybackBox : public ScheduleCommon
     bool                m_doToggleMenu        {true};
 
     // Recording Group popup support
-    typedef QPair<QString, QString> RecGroup;
+    using RecGroup = QPair<QString, QString>;
     QMap<QString,QString> m_recGroupType;
     QMap<QString,QString> m_recGroupPwCache;
 
@@ -464,7 +465,7 @@ class PlaybackBox : public ScheduleCommon
         void Update();
         QDateTime m_lastUpdated;
         // Maps <chanid, recstartts> to a set of JobQueueEntry values.
-        typedef QMultiMap<QPair<uint, QDateTime>, JobQueueEntry> MapType;
+        using MapType = QMultiMap<QPair<uint, QDateTime>, JobQueueEntry>;
         MapType m_jobs;
     } m_jobQueue;
 };

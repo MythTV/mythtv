@@ -12,10 +12,10 @@
 //#include "metadatacommon.h"
 #include "referencecounterlist.h"
 class MetadataLookup;
-typedef RefCountedList<MetadataLookup> MetadataLookupList;
+using MetadataLookupList = RefCountedList<MetadataLookup>;
 
 class MetaGrabberScript;
-typedef QList<MetaGrabberScript> GrabberList;
+using GrabberList = QList<MetaGrabberScript>;
 
 enum GrabberType {
     kGrabberAll,

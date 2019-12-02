@@ -36,7 +36,7 @@
 // Typedefs / Defines
 /////////////////////////////////////////////////////////////////////////////
 
-typedef enum
+enum HttpRequestType
 {
     RequestTypeUnknown      = 0x0000,
     // HTTP 1.1
@@ -56,17 +56,16 @@ typedef enum
     // Not a request type
     RequestTypeResponse     = 0x1000
 
-} HttpRequestType;
+};
 
-typedef enum
+enum HttpContentType
 {
     ContentType_Unknown    = 0,
     ContentType_Urlencoded = 1,
     ContentType_XML        = 2
+};
 
-} HttpContentType;
-
-typedef enum
+enum HttpResponseType
 {
     ResponseTypeNone     = -1,
     ResponseTypeUnknown  =  0,
@@ -79,15 +78,14 @@ typedef enum
     ResponseTypeFile     =  7,
     ResponseTypeOther    =  8,
     ResponseTypeHeader   =  9
+};
 
-} HttpResponseType;
-
-typedef struct
+struct MIMETypes
 {
     const char *pszExtension;
     const char *pszType;
 
-} MIMETypes;
+};
 
 /////////////////////////////////////////////////////////////////////////////
 

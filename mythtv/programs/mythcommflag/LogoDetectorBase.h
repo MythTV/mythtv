@@ -2,9 +2,9 @@
 #define _LOGODETECTORBASE_H_
 
 #include <QObject>
+#include "mythframe.h"
 
 class MythPlayer;
-typedef struct VideoFrame_ VideoFrame;
 
 class LogoDetectorBase : public QObject
 {

@@ -63,7 +63,7 @@ protected:
 };
 
 
-typedef QMap<int, Transition*> TransitionMap;
+using TransitionMap = QMap<int, Transition*>;
 
 
 //! Switches images instantly with no effects

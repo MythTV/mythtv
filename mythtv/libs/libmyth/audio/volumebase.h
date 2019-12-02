@@ -3,12 +3,12 @@
 
 #include "mythexp.h"
 
-typedef enum {
+enum MuteState {
     kMuteOff = 0,
     kMuteLeft,
     kMuteRight,
     kMuteAll,
-} MuteState;
+};
 
 class MPUBLIC VolumeBase
 {

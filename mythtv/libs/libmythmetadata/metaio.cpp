@@ -46,7 +46,7 @@ MetaIO* MetaIO::createTagger(const QString& filename)
         return new MetaIOOggVorbis;
     if (extension == "flac")
     {
-        MetaIOFLACVorbis *tagger = new MetaIOFLACVorbis;
+        auto *tagger = new MetaIOFLACVorbis;
         if (tagger->TagExists(filename))
             return tagger;
         delete tagger;
@@ -175,8 +175,8 @@ MusicMetadata* MetaIO::readFromFilename(const QString &filename, bool blnLength)
     if (blnLength)
         length = getTrackLength(filename);
 
-    MusicMetadata *retdata = new MusicMetadata(filename, artist, "", album,
-                                               title, genre, 0, tracknum, length);
+    auto *retdata = new MusicMetadata(filename, artist, "", album, title, genre,
+                                      0, tracknum, length);
 
     return retdata;
 }

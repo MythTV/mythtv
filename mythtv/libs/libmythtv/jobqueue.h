@@ -96,7 +96,7 @@ static QMap< QString, int > JobNameToType {
     { "UserJob4",  JOB_USERJOB4 }
 };
 
-typedef struct jobqueueentry {
+struct JobQueueEntry {
     int id;
     uint chanid;
     QDateTime recstartts;
@@ -111,16 +111,16 @@ typedef struct jobqueueentry {
     QString hostname;
     QString args;
     QString comment;
-} JobQueueEntry;
+};
 
-typedef struct runningjobinfo {
+struct RunningJobInfo {
     int          id;
     int          type;
     int          flag;
     QString      desc;
     QString      command;
     ProgramInfo *pginfo;
-} RunningJobInfo;
+};
 
 class JobQueue;
 
@@ -216,11 +216,11 @@ class MTV_PUBLIC JobQueue : public QObject, public QRunnable
     static bool InJobRunWindow(QDateTime jobstarttsRaw);
 
   private:
-    typedef struct jobthreadstruct
+    struct JobThreadStruct
     {
         JobQueue *jq;
         int jobID;
-    } JobThreadStruct;
+    };
 
     void run(void) override; // QRunnable
     void ProcessQueue(void);
@@ -233,8 +233,8 @@ class MTV_PUBLIC JobQueue : public QObject, public QRunnable
 
     void StartChildJob(void *(*ChildThreadRoutine)(void *), int jobID);
 
-    QString GetJobDescription(int jobType);
-    QString GetJobCommand(int id, int jobType, ProgramInfo *tmpInfo);
+    static QString GetJobDescription(int jobType);
+    static QString GetJobCommand(int id, int jobType, ProgramInfo *tmpInfo);
     void RemoveRunningJob(int id);
 
     static QString PrettyPrint(off_t bytes);

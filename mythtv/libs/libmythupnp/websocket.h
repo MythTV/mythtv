@@ -98,7 +98,7 @@ class WebSocketFrame
         m_fragmented = false;
     }
 
-    typedef enum OpCodes
+    enum OpCode
     {
         kOpContinuation = 0x0,
         kOpTextFrame    = 0x1,
@@ -108,7 +108,7 @@ class WebSocketFrame
         kOpPing         = 0x9,
         kOpPong         = 0xA
         // Reserved
-    } OpCode;
+    };
 
     bool       m_finalFrame  {false};
     QByteArray m_payload;
@@ -216,7 +216,7 @@ class WebSocketWorker : public QObject
 
     void Exec();
 
-    typedef enum ErrorCodes
+    enum ErrorCode
     {
         kCloseNormal        = 1000,
         kCloseGoingAway     = 1001,
@@ -237,7 +237,7 @@ class WebSocketWorker : public QObject
         // Reserved - 1012-1014
         kCloseNoTLS         = 1012  // Connection closed because it must use TLS
         // Reserved
-    } ErrorCode;
+    };
 
   public slots:
     void doRead();

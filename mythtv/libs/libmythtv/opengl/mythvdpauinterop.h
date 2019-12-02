@@ -15,12 +15,12 @@ extern "C" {
 
 class MythVDPAUHelper;
 
-typedef GLintptr MythVDPAUSurfaceNV;
-typedef void (APIENTRY * MYTH_VDPAUINITNV)(const void*, const void*);
-typedef void (APIENTRY * MYTH_VDPAUFININV)(void);
-typedef MythVDPAUSurfaceNV (APIENTRY *  MYTH_VDPAUREGOUTSURFNV)(const void*, GLenum, GLsizei, const GLuint*);
-typedef void (APIENTRY * MYTH_VDPAUSURFACCESSNV)(MythVDPAUSurfaceNV, GLenum);
-typedef void (APIENTRY * MYTH_VDPAUMAPSURFNV)(GLsizei, MythVDPAUSurfaceNV*);
+using MythVDPAUSurfaceNV = GLintptr;
+using MYTH_VDPAUINITNV = void (APIENTRY *)(const void*, const void*);
+using MYTH_VDPAUFININV = void (APIENTRY *)(void);
+using MYTH_VDPAUREGOUTSURFNV = MythVDPAUSurfaceNV (APIENTRY *)(const void*, GLenum, GLsizei, const GLuint*);
+using MYTH_VDPAUSURFACCESSNV = void (APIENTRY *)(MythVDPAUSurfaceNV, GLenum);
+using MYTH_VDPAUMAPSURFNV = void (APIENTRY *)(GLsizei, MythVDPAUSurfaceNV*);
 
 class MythVDPAUInterop : public MythOpenGLInterop
 {

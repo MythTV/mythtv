@@ -754,7 +754,7 @@ bool MythUIText::GetNarrowWidth(const QStringList & paragraphs,
             qreal lines = roundf((height - m_drawRect.height()) / line_height);
             lines -= (1.0 - last_line_width / width);
             width += (lines * width) /
-                ((float)m_drawRect.height() / line_height);
+                ((double)m_drawRect.height() / line_height);
 
             if (width > best_width || static_cast<int>(width) == last_width)
             {
@@ -1615,7 +1615,7 @@ bool MythUIText::ParseElement(
 
 void MythUIText::CopyFrom(MythUIType *base)
 {
-    MythUIText *text = dynamic_cast<MythUIText *>(base);
+    auto *text = dynamic_cast<MythUIText *>(base);
 
     if (!text)
     {
@@ -1682,7 +1682,7 @@ void MythUIText::CopyFrom(MythUIType *base)
 
 void MythUIText::CreateCopy(MythUIType *parent)
 {
-    MythUIText *text = new MythUIText(parent, objectName());
+    auto *text = new MythUIText(parent, objectName());
     text->CopyFrom(this);
 }
 

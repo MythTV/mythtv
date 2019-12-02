@@ -16,14 +16,14 @@ CC708Reader::CC708Reader(MythPlayer *owner)
 {
     for (uint i=0; i < k708MaxServices; i++)
     {
-        m_buf_alloc[i] = 512;
-        m_buf[i]       = (unsigned char*) malloc(m_buf_alloc[i]);
-        m_buf_size[i]  = 0;
+        m_bufAlloc[i]  = 512;
+        m_buf[i]       = (unsigned char*) malloc(m_bufAlloc[i]);
+        m_bufSize[i]   = 0;
         m_delayed[i]   = false;
 
-        m_temp_str_alloc[i] = 512;
-        m_temp_str_size[i]  = 0;
-        m_temp_str[i]       = (short*) malloc(m_temp_str_alloc[i] * sizeof(short));
+        m_tempStrAlloc[i]  = 512;
+        m_tempStrSize[i]   = 0;
+        m_tempStr[i]       = (short*) malloc(m_tempStrAlloc[i] * sizeof(short));
     }
     memset(&CC708DelayedDeletes, 0, sizeof(CC708DelayedDeletes));
 }
@@ -33,7 +33,7 @@ CC708Reader::~CC708Reader()
     for (uint i=0; i < k708MaxServices; i++)
     {
         free(m_buf[i]);
-        free(m_temp_str[i]);
+        free(m_tempStr[i]);
     }
 }
 
@@ -48,7 +48,7 @@ void CC708Reader::SetCurrentWindow(uint service_num, int window_id)
     CHECKENABLED;
     LOG(VB_VBI, LOG_DEBUG, LOC + QString("SetCurrentWindow(%1, %2)")
             .arg(service_num).arg(window_id));
-    CC708services[service_num].m_current_window = window_id;
+    CC708services[service_num].m_currentWindow = window_id;
 }
 
 void CC708Reader::DefineWindow(
@@ -91,7 +91,7 @@ void CC708Reader::DefineWindow(
                       row_lock,         column_lock,
                       pen_style,        window_style);
 
-    CC708services[service_num].m_current_window = window_id;
+    CC708services[service_num].m_currentWindow = window_id;
 }
 
 void CC708Reader::DeleteWindows(uint service_num, int window_map)
@@ -219,7 +219,7 @@ void CC708Reader::SetPenAttributes(
 {
     CHECKENABLED;
     LOG(VB_VBI, LOG_DEBUG, LOC + QString("SetPenAttributes(%1, %2,")
-            .arg(service_num).arg(CC708services[service_num].m_current_window) +
+            .arg(service_num).arg(CC708services[service_num].m_currentWindow) +
             QString("\n\t\t\t\t\t      pen_size %1, offset %2, text_tag %3, "
                     "font_tag %4,"
                     "\n\t\t\t\t\t      edge_type %5, underline %6, italics %7")
@@ -242,13 +242,13 @@ void CC708Reader::SetPenColor(
         .arg(service_num).arg(fg_color).arg(fg_opacity)
         .arg(bg_color).arg(bg_opacity).arg(edge_color));
 
-    CC708CharacterAttribute &attr = GetCCWin(service_num).m_pen.attr;
+    CC708CharacterAttribute &attr = GetCCWin(service_num).m_pen.m_attr;
 
-    attr.m_fg_color   = fg_color;
-    attr.m_fg_opacity = fg_opacity;
-    attr.m_bg_color   = bg_color;
-    attr.m_bg_opacity = bg_opacity;
-    attr.m_edge_color = edge_color;
+    attr.m_fgColor   = fg_color;
+    attr.m_fgOpacity = fg_opacity;
+    attr.m_bgColor   = bg_color;
+    attr.m_bgOpacity = bg_opacity;
+    attr.m_edgeColor = edge_color;
 }
 
 void CC708Reader::SetPenLocation(uint service_num, int row, int column)
@@ -291,5 +291,5 @@ void CC708Reader::TextWrite(uint service_num,
         debug += QChar(unicode_string[i]);
     }
     LOG(VB_VBI, LOG_DEBUG, LOC + QString("AddText to %1->%2 |%3|")
-        .arg(service_num).arg(CC708services[service_num].m_current_window).arg(debug));
+        .arg(service_num).arg(CC708services[service_num].m_currentWindow).arg(debug));
 }

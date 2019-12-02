@@ -44,7 +44,7 @@ private slots:
 private:
     Q_DISABLE_COPY(MHInteractionChannel)
     mutable QMutex m_mutex;
-    typedef QHash< QUrl, NetStream* > map_t;
+    using map_t = QHash< QUrl, NetStream* >;
     map_t m_pending; // Pending requests
     map_t m_finished; // Completed requests
 };

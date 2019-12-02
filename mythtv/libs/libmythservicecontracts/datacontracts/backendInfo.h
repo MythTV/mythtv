@@ -67,7 +67,7 @@ class SERVICE_PUBLIC BackendInfo : public QObject
         Q_DISABLE_COPY(BackendInfo);
 };
 
-typedef BackendInfo* BackendInfoPtr;
+using BackendInfoPtr = BackendInfo*;
 
 inline void BackendInfo::InitializeCustomTypes()
 {

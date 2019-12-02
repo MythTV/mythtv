@@ -29,9 +29,9 @@ FIFOWriter::FIFOWriter(int count, bool sync) :
     if (count <= 0)
         return;
 
-    m_fifo_buf   = new struct fifo_buf *[count];
-    m_fb_inptr   = new struct fifo_buf *[count];
-    m_fb_outptr  = new struct fifo_buf *[count];
+    m_fifo_buf   = new fifo_buf *[count];
+    m_fb_inptr   = new fifo_buf *[count];
+    m_fb_outptr  = new fifo_buf *[count];
     m_fifothrds  = new FIFOThread[count];
     m_fifo_lock  = new QMutex[count];
     m_full_cond  = new QWaitCondition[count];
@@ -100,7 +100,7 @@ bool FIFOWriter::FIFOInit(int id, const QString& desc, const QString& name, long
     m_killwr[id]     = 0;
     m_fbcount[id]    = (m_usesync) ? 2 : num_bufs;
     m_fbmaxcount[id] = 512;
-    m_fifo_buf[id] = new struct fifo_buf;
+    m_fifo_buf[id]   = new fifo_buf;
     struct fifo_buf *fifoptr = m_fifo_buf[id];
     for (int i = 0; i < m_fbcount[id]; i++)
     {

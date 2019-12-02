@@ -46,40 +46,40 @@ extern "C" void HandleBDStreamChange(void*);
 class AudioInfo
 {
   public:
-    AudioInfo() :
-        codec_id(AV_CODEC_ID_NONE), format(FORMAT_NONE), sample_size(-2),
-        sample_rate(-1), channels(-1), codec_profile(0),
-        do_passthru(false), original_channels(-1)
-    {;}
+    AudioInfo() = default;
 
     AudioInfo(AVCodecID id, AudioFormat fmt, int sr, int ch, bool passthru,
               int original_ch, int profile = 0) :
-        codec_id(id), format(fmt),
-        sample_size(ch * AudioOutputSettings::SampleSize(fmt)),
-            sample_rate(sr), channels(ch), codec_profile(profile),
-            do_passthru(passthru), original_channels(original_ch)
+        m_codecId(id), format(fmt),
+        m_sampleSize(ch * AudioOutputSettings::SampleSize(fmt)),
+        m_sampleRate(sr), m_channels(ch), m_codecProfile(profile),
+        m_doPassthru(passthru), m_originalChannels(original_ch)
     {
     }
 
-    AVCodecID codec_id;
-    AudioFormat format;
-    int sample_size, sample_rate, channels, codec_profile;
-    bool do_passthru;
-    int original_channels;
+    AVCodecID   m_codecId          {AV_CODEC_ID_NONE};
+    AudioFormat format             {FORMAT_NONE};
+    int         m_sampleSize       {-2};
+    int         m_sampleRate       {-1};
+    int         m_channels         {-1};
+    int         m_codecProfile     {0};
+    bool        m_doPassthru       {false};
+    int         m_originalChannels {-1};
+
     bool operator==(const AudioInfo &o) const
     {
-        return (codec_id==o.codec_id        && channels==o.channels       &&
-                sample_size==o.sample_size  && sample_rate==o.sample_rate &&
-                format==o.format            && do_passthru==o.do_passthru &&
-                original_channels==o.original_channels &&
-                codec_profile == o.codec_profile);
+        return (m_codecId==o.m_codecId        && m_channels==o.m_channels     &&
+                m_sampleSize==o.m_sampleSize  && m_sampleRate==o.m_sampleRate &&
+                format==o.format              && m_doPassthru==o.m_doPassthru &&
+                m_originalChannels==o.m_originalChannels &&
+                m_codecProfile == o.m_codecProfile);
     }
     QString toString() const
     {
         return QString("id(%1) %2Hz %3ch %4bps %5 (profile %6)")
-            .arg(ff_codec_id_string(codec_id),4).arg(sample_rate,6)
-            .arg(channels,2).arg(AudioOutputSettings::FormatToBits(format),2)
-            .arg((do_passthru) ? "pt":"",3).arg(codec_profile);
+            .arg(ff_codec_id_string(m_codecId),4).arg(m_sampleRate,6)
+            .arg(m_channels,2).arg(AudioOutputSettings::FormatToBits(format),2)
+            .arg((m_doPassthru) ? "pt":"",3).arg(m_codecProfile);
     }
 };
 
@@ -180,7 +180,7 @@ class AvFormatDecoder : public DecoderBase
     // Stream language info
     virtual int GetTeletextLanguage(uint lang_idx) const;
     virtual int GetSubtitleLanguage(uint subtitle_index, uint stream_index);
-    virtual int GetCaptionLanguage(TrackTypes trackType, int service_num);
+    virtual int GetCaptionLanguage(TrackType trackType, int service_num);
     virtual int GetAudioLanguage(uint audio_index, uint stream_index);
     virtual AudioTrackType GetAudioTrackType(uint stream_index);
 
@@ -251,8 +251,8 @@ class AvFormatDecoder : public DecoderBase
     bool GenerateDummyVideoFrames(void);
     bool HasVideo(const AVFormatContext *ic);
     float normalized_fps(AVStream *stream, AVCodecContext *enc);
-    void av_update_stream_timings_video(AVFormatContext *ic);
-    bool OpenAVCodec(AVCodecContext *avctx, const AVCodec *codec);
+    static void av_update_stream_timings_video(AVFormatContext *ic);
+    static bool OpenAVCodec(AVCodecContext *avctx, const AVCodec *codec);
 
     void UpdateFramesPlayed(void) override; // DecoderBase
     bool DoRewindSeek(long long desiredFrame) override; // DecoderBase

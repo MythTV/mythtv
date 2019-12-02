@@ -19,12 +19,12 @@ class QStringList;
 class QObject;
 class QTimer;
 
-typedef enum CheckAvailabilityType {
+enum CheckAvailabilityType {
     kCheckForCache,
     kCheckForMenuAction,
     kCheckForPlayAction,
     kCheckForPlaylistAction,
-} CheckAvailabilityType;
+};
 
 class PlaybackBoxHelper : public MThread
 {

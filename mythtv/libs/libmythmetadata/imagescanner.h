@@ -61,7 +61,7 @@ private:
     void CountFiles(const QStringList &paths);
     void Broadcast(int progress);
 
-    typedef QPair<int, QString> ClearTask;
+    using ClearTask = QPair<int, QString>;
 
     bool              m_scanning {false}; //!< The requested scan state
     QMutex            m_mutexState; //!< Mutex protecting scan state

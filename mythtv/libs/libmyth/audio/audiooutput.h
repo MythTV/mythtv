@@ -42,7 +42,7 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
         AudioDeviceConfig &operator= (AudioDeviceConfig &&) = default;
     };
 
-    typedef QVector<AudioDeviceConfig> ADCVect;
+    using ADCVect = QVector<AudioDeviceConfig>;
 
     static void Cleanup(void);
     static ADCVect* GetOutputList(void);

@@ -491,7 +491,7 @@ MHTextItem::MHTextItem()
 
 MHTextItem *MHTextItem::NewItem()
 {
-    MHTextItem *pItem = new MHTextItem;
+    auto *pItem = new MHTextItem;
     pItem->m_colour = m_colour;
     return pItem;
 }
@@ -555,8 +555,8 @@ void MHText::Redraw()
     // Process any escapes in the text and construct the text arrays.
     MHSequence <MHTextLine *> theText;
     // Set up the first item on the first line.
-    MHTextItem *pCurrItem = new MHTextItem;
-    MHTextLine *pCurrLine = new MHTextLine;
+    auto *pCurrItem = new MHTextItem;
+    auto *pCurrLine = new MHTextLine;
     pCurrLine->m_items.Append(pCurrItem);
     theText.Append(pCurrLine);
     MHStack <MHRgba> colourStack; // Stack to handle nested colour codes.
@@ -745,7 +745,7 @@ void MHText::Redraw()
                 if (nNewWidth != 0)
                 {
                     // Create a new line from the extra text.
-                    MHTextLine *pNewLine = new MHTextLine;
+                    auto *pNewLine = new MHTextLine;
                     theText.InsertAt(pNewLine, i + 1);
                     // The first item on the new line is the rest of the text.
                     MHTextItem *pNewItem = pItem->NewItem();

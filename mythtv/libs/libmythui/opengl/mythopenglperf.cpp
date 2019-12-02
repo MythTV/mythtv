@@ -1,17 +1,20 @@
+// C++
+#include <utility>
+
 // MythTV
 #include "mythlogging.h"
 #include "mythopenglperf.h"
 
+
 /*! \class MythOpenGLPerf
  *  \brief A simple overload of QOpenGLTimeMonitor to record and log OpenGL execution intervals
 */
-MythOpenGLPerf::MythOpenGLPerf(const QString &Name,
+MythOpenGLPerf::MythOpenGLPerf(QString Name,
                                QVector<QString> Names,
                                int SampleCount)
-  : QOpenGLTimeMonitor(),
-    m_name(Name),
+  : m_name(std::move(Name)),
     m_totalSamples(SampleCount),
-    m_timerNames(Names)
+    m_timerNames(std::move(Names))
 {
     while (m_timerData.size() < m_timerNames.size())
         m_timerData.append(0);

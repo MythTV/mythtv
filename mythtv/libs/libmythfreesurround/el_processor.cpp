@@ -29,7 +29,7 @@ extern "C" {
 #include "libavcodec/avfft.h"
 #include "libavcodec/fft.h"
 }
-typedef FFTSample FFTComplexArray[2];
+using FFTComplexArray = FFTSample[2];
 #endif
 
 
@@ -37,7 +37,7 @@ typedef FFTSample FFTComplexArray[2];
 #pragma comment (lib,"libfftw3f-3.lib")
 #endif
 
-typedef std::complex<float> cfloat;
+using cfloat = std::complex<float>;
 
 static const float PI = 3.141592654;
 static const float epsilon = 0.000001;

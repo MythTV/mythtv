@@ -45,8 +45,7 @@ bool TestDatabase(const QString& dbHostName,
     if (dbHostName.isEmpty() || dbUserName.isEmpty())
         return ret;
 
-    MSqlDatabase *db = new MSqlDatabase("dbtest");
-
+    auto *db = new MSqlDatabase("dbtest");
     if (!db)
         return ret;
 

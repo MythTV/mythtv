@@ -368,7 +368,7 @@ void NetworkControl::newConnection(QTcpSocket *client)
 
     gCoreContext->SendSystemEvent("NET_CTRL_CONNECTED");
 
-    NetworkControlClient *ncc = new NetworkControlClient(client);
+    auto *ncc = new NetworkControlClient(client);
 
     QMutexLocker locker(&clientLock);
     clients.push_back(ncc);
@@ -405,7 +405,7 @@ NetworkControlClient::~NetworkControlClient()
 
 void NetworkControlClient::readClient(void)
 {
-    QTcpSocket *socket = (QTcpSocket *)sender();
+    auto *socket = (QTcpSocket *)sender();
     if (!socket)
         return;
 
@@ -435,7 +435,7 @@ void NetworkControl::receiveCommand(QString &command)
 {
     LOG(VB_NETWORK, LOG_INFO, LOC +
         QString("NetworkControl::receiveCommand(%1)").arg(command));
-    NetworkControlClient *ncc = static_cast<NetworkControlClient *>(sender());
+    auto *ncc = static_cast<NetworkControlClient *>(sender());
     if (!ncc)
          return;
 
@@ -591,7 +591,7 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
         {
             QStringList args;
             args << nc->getFrom(2);
-            MythEvent *me = new MythEvent(ACTION_HANDLEMEDIA, args);
+            auto *me = new MythEvent(ACTION_HANDLEMEDIA, args);
             qApp->postEvent(GetMythMainWindow(), me);
         }
         else
@@ -1179,7 +1179,7 @@ QString NetworkControl::processTheme( NetworkCommand* nc)
         if (!topScreen)
             return QString("ERROR: no top screen found!");
 
-        MythUIType *currType = static_cast<MythUIType*>(topScreen);
+        auto *currType = static_cast<MythUIType*>(topScreen);
 
         while (!path.isEmpty())
         {
@@ -1222,7 +1222,7 @@ QString NetworkControl::processTheme( NetworkCommand* nc)
         if (!topScreen)
             return QString("ERROR: no top screen found!");
 
-        MythUIType *currType = static_cast<MythUIType*>(topScreen);
+        auto *currType = static_cast<MythUIType*>(topScreen);
 
         while (path.count() > 1)
         {
@@ -1270,7 +1270,7 @@ QString NetworkControl::processTheme( NetworkCommand* nc)
         if (!topScreen)
             return QString("ERROR: no top screen found!");
 
-                MythUIType *currType = static_cast<MythUIType*>(topScreen);
+                auto *currType = static_cast<MythUIType*>(topScreen);
 
         while (path.count() > 1)
         {
@@ -1486,7 +1486,7 @@ QString NetworkControl::processMessage(NetworkCommand *nc)
 
     QString message = nc->getCommand().remove(0, 7).trimmed();
     MythMainWindow *window = GetMythMainWindow();
-    MythEvent* me = new MythEvent(MythEvent::MythUserMessage, message);
+    auto* me = new MythEvent(MythEvent::MythUserMessage, message);
     qApp->postEvent(window, me);
     return QString("OK");
 }
@@ -1540,7 +1540,7 @@ void NetworkControl::customEvent(QEvent *e)
 {
     if (e->type() == MythEvent::MythEventMessage)
     {
-        MythEvent *me = static_cast<MythEvent *>(e);
+        auto *me = static_cast<MythEvent *>(e);
         const QString& message = me->Message();
 
         if (message.startsWith("MUSIC_CONTROL"))
@@ -1613,7 +1613,7 @@ void NetworkControl::customEvent(QEvent *e)
     }
     else if (e->type() == NetworkControlCloseEvent::kEventType)
     {
-        NetworkControlCloseEvent *ncce = static_cast<NetworkControlCloseEvent*>(e);
+        auto *ncce = static_cast<NetworkControlCloseEvent*>(e);
         NetworkControlClient     *ncc  = ncce->getClient();
 
         deleteClient(ncc);
@@ -1797,7 +1797,7 @@ QString NetworkControl::saveScreenshot(NetworkCommand *nc)
         args << QString::number(width);
         args << QString::number(height);
     }
-    MythEvent* me = new MythEvent(MythEvent::MythEventMessage,
+    auto *me = new MythEvent(MythEvent::MythEventMessage,
                                   ACTION_SCREENSHOT, args);
     qApp->postEvent(window, me);
     return "OK";

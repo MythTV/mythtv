@@ -11,7 +11,7 @@ using namespace std;
 class NewsArticle
 {
   public:
-    typedef vector<NewsArticle> List;
+    using List = vector<NewsArticle>;
 
     NewsArticle(QString title, QString desc, QString articleURL,
                 QString thumbnail, QString mediaURL, QString enclosure);

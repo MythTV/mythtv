@@ -88,7 +88,7 @@ DTC::CaptureCardList* Capture::GetCaptureCardList( const QString &sHostName,
     // return the results of the query
     // ----------------------------------------------------------------------
 
-    DTC::CaptureCardList* pList = new DTC::CaptureCardList();
+    auto* pList = new DTC::CaptureCardList();
 
     while (query.next())
     {
@@ -179,7 +179,7 @@ DTC::CaptureCard* Capture::GetCaptureCard( int nCardId )
         throw( QString( "Database Error executing query." ));
     }
 
-    DTC::CaptureCard* pCaptureCard = new DTC::CaptureCard();
+    auto* pCaptureCard = new DTC::CaptureCard();
 
     if (query.next())
     {

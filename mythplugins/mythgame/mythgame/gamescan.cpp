@@ -181,8 +181,7 @@ void GameScannerThread::SendProgressEvent(uint progress, uint total,
     if (!m_dialog)
         return;
 
-    ProgressUpdateEvent *pue = new ProgressUpdateEvent(progress, total,
-                                                       std::move(message));
+    auto *pue = new ProgressUpdateEvent(progress, total, std::move(message));
     QApplication::postEvent(m_dialog, pue);
 }
 
@@ -206,7 +205,7 @@ void GameScanner::doScan(QList<GameHandler*> handlers)
     {
         MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-        MythUIProgressDialog *progressDlg = new MythUIProgressDialog("",
+        auto *progressDlg = new MythUIProgressDialog("",
                 popupStack, "gamescanprogressdialog");
 
         if (progressDlg->Create())

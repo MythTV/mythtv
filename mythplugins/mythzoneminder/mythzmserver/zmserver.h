@@ -59,17 +59,17 @@ const string RESTART          = "restart";
 const string RELOAD           = "reload";
 const string RUNNING          = "running";
 
-typedef enum 
+enum State
 {
     IDLE,
     PREALARM,
     ALARM,
     ALERT,
     TAPE
-} State;
+};
 
 // shared data for ZM version 1.24.x and 1.25.x
-typedef struct
+struct SharedData
 {
     int size;
     bool valid;
@@ -89,10 +89,10 @@ typedef struct
     int alarm_x;
     int alarm_y;
     char control_state[256];
-} SharedData;
+};
 
 // shared data for ZM version 1.26.x
-typedef struct
+struct SharedData26
 {
     uint32_t size;
     uint32_t last_write_index;
@@ -122,10 +122,10 @@ typedef struct
             uint64_t extrapad2;
     };
     uint8_t control_state[256];
-} SharedData26;
+};
 
 // shared data for ZM version 1.32.x
-typedef struct
+struct SharedData32
 {
     uint32_t size;
     uint32_t last_write_index;
@@ -160,12 +160,12 @@ typedef struct
     uint8_t control_state[256];
 
     char alarm_cause[256];
-} SharedData32;
+};
 
-typedef enum { TRIGGER_CANCEL, TRIGGER_ON, TRIGGER_OFF } TriggerState;
+enum TriggerState { TRIGGER_CANCEL, TRIGGER_ON, TRIGGER_OFF };
 
 // Triggerdata for ZM version 1.24.x and 1.25.x
-typedef struct
+struct TriggerData
 {
     int size;
     TriggerState trigger_state;
@@ -173,10 +173,10 @@ typedef struct
     char trigger_cause[32];
     char trigger_text[256];
     char trigger_showtext[256];
-} TriggerData;
+};
 
 // Triggerdata for ZM version 1.26.x and 1.32.x
-typedef struct
+struct TriggerData26
 {
     uint32_t size;
     uint32_t trigger_state;
@@ -185,16 +185,16 @@ typedef struct
     char trigger_cause[32];
     char trigger_text[256];
     char trigger_showtext[256];
-} TriggerData26;
+};
 
 // VideoStoreData for ZM version 1.32.x
-typedef struct
+struct VideoStoreData
 {
     uint32_t size;
     uint64_t current_event;
     char event_file[4096];
     timeval recording;
-} VideoStoreData;
+};
 
 class MONITOR
 {

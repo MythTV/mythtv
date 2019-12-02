@@ -48,17 +48,17 @@ class MTV_PUBLIC Vaapi2Context : public MythCodecContext
 
 
     virtual int InitDeinterlaceFilter(AVCodecContext *ctx, AVFrame *frame);
-    AVStream* stream;
-    AVFilterContext *buffersink_ctx;
-    AVFilterContext *buffersrc_ctx;
-    AVFilterGraph *filter_graph;
-    bool filtersInitialized;
-    AVBufferRef *hw_frames_ctx;
-    int64_t priorPts[2];
-    int64_t ptsUsed;
-    int width;
-    int height;
-    bool doublerate;
+    AVStream        *m_stream             {nullptr};
+    AVFilterContext *m_bufferSinkCtx      {nullptr};
+    AVFilterContext *m_bufferSrcCtx       {nullptr};
+    AVFilterGraph   *m_filterGraph        {nullptr};
+    bool             m_filtersInitialized {false};
+    AVBufferRef     *m_hwFramesCtx        {nullptr};
+    int64_t          m_priorPts[2]        {0,0};
+    int64_t          m_ptsUsed            {0};
+    int              m_width              {0};
+    int              m_height             {0};
+    bool             m_doubleRate         {false};
 };
 
 #endif // VAAPI2CONTEXT_H

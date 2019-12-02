@@ -163,7 +163,7 @@ uint FreeSurround::putFrames(void* buffer, uint numFrames, uint numChannels)
     int ic = in_count;
     int bs = block_size/2;
     bool process = true;
-    float *samples = (float *)buffer;
+    auto *samples = (float *)buffer;
     // demultiplex
 
     float **inputs = decoder->getInputBuffers();
@@ -327,7 +327,7 @@ uint FreeSurround::receiveFrames(void *buffer, uint maxFrames)
     uint oc = out_count;
     if (maxFrames > oc) maxFrames = oc;
     uint outindex = processed_size - oc;
-    float *output = (float *)buffer;
+    auto *output = (float *)buffer;
     if (channels == 8)
     {
         float *l   = &bufs->m_l[outindex];

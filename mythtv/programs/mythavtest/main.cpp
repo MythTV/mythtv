@@ -1,5 +1,6 @@
 #include <unistd.h>
 #include <iostream>
+#include <utility>
 
 using namespace std;
 
@@ -7,8 +8,8 @@ using namespace std;
 #include <QDir>
 #include <QRegExp>
 #include <QString>
-#include <QTime>
 #include <QSurfaceFormat>
+#include <QTime>
 
 #include "tv_play.h"
 #include "programinfo.h"
@@ -34,14 +35,14 @@ using namespace std;
 class VideoPerformanceTest
 {
   public:
-    VideoPerformanceTest(const QString &filename, bool decodeno, bool onlydecode,
+    VideoPerformanceTest(QString filename, bool decodeno, bool onlydecode,
                          int runfor, bool deint, bool gpu)
       : m_file(std::move(filename)),
         m_noDecode(decodeno),
         m_decodeOnly(onlydecode),
         m_secondsToRun(runfor),
         m_deinterlace(deint),
-        m_allowgpu(gpu),
+        m_allowGpu(gpu),
         m_ctx(nullptr)
     {
         if (m_secondsToRun < 1)
@@ -59,14 +60,14 @@ class VideoPerformanceTest
     {
         PIPMap dummy;
         RingBuffer *rb  = RingBuffer::Create(m_file, false, true, 2000);
-        MythPlayer  *mp  = new MythPlayer(
-            (PlayerFlags)(kAudioMuted | (m_allowgpu ? (kDecodeAllowGPU | kDecodeAllowEXT): kNoFlags)));
+        auto       *mp  = new MythPlayer(
+            (PlayerFlags)(kAudioMuted | (m_allowGpu ? (kDecodeAllowGPU | kDecodeAllowEXT): kNoFlags)));
         mp->GetAudio()->SetAudioInfo("NULL", "NULL", 0, 0);
         mp->GetAudio()->SetNoAudio();
         m_ctx = new PlayerContext("VideoPerformanceTest");
         m_ctx->SetRingBuffer(rb);
         m_ctx->SetPlayer(mp);
-        ProgramInfo *pinfo = new ProgramInfo(m_file);
+        auto *pinfo = new ProgramInfo(m_file);
         m_ctx->SetPlayingInfo(pinfo); // makes a copy
         delete pinfo;
         mp->SetPlayerInfo(nullptr, GetMythMainWindow(), m_ctx);
@@ -102,7 +103,7 @@ class VideoPerformanceTest
         if (dec)
             LOG(VB_GENERAL, LOG_INFO, QString("Using decoder: %1").arg(dec->GetCodecDecoderName()));
 
-        Jitterometer *jitter = new Jitterometer("Performance: ", static_cast<int>(mp->GetFrameRate()));
+        auto *jitter = new Jitterometer("Performance: ", static_cast<int>(mp->GetFrameRate()));
 
         int ms = m_secondsToRun * 1000;
         QTime start = QTime::currentTime();
@@ -169,7 +170,7 @@ class VideoPerformanceTest
     bool    m_decodeOnly;
     int     m_secondsToRun;
     bool    m_deinterlace;
-    bool    m_allowgpu;
+    bool    m_allowGpu;
     PlayerContext *m_ctx;
 };
 
@@ -319,7 +320,7 @@ int main(int argc, char *argv[])
         int seconds = 5;
         if (!cmdline.toString("seconds").isEmpty())
             seconds = cmdline.toInt("seconds");
-        VideoPerformanceTest *test = new VideoPerformanceTest(filename,
+        auto *test = new VideoPerformanceTest(filename,
                     cmdline.toBool("nodecode"),
                     cmdline.toBool("decodeonly"), seconds,
                     cmdline.toBool("deinterlace"),

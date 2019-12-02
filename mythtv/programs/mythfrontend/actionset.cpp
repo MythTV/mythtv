@@ -205,7 +205,7 @@ bool ActionSet::AddAction(const ActionID &id,
     else if ((*cit).find(id.GetAction()) != (*cit).end())
         return false;
 
-    Action *a = new Action(description, keys);
+    auto *a = new Action(description, keys);
     (*cit).insert(id.GetAction(), a);
 
     const QStringList keylist = a->GetKeys();

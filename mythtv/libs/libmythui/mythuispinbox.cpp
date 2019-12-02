@@ -178,7 +178,7 @@ bool MythUISpinBox::MoveUp(MovementUnit unit, uint amount)
  */
 void MythUISpinBox::CreateCopy(MythUIType *parent)
 {
-    MythUISpinBox *spinbox = new MythUISpinBox(parent, objectName());
+    auto *spinbox = new MythUISpinBox(parent, objectName());
     spinbox->CopyFrom(this);
 }
 
@@ -187,7 +187,7 @@ void MythUISpinBox::CreateCopy(MythUIType *parent)
  */
 void MythUISpinBox::CopyFrom(MythUIType *base)
 {
-    MythUISpinBox *spinbox = dynamic_cast<MythUISpinBox *>(base);
+    auto *spinbox = dynamic_cast<MythUISpinBox *>(base);
 
     if (!spinbox)
         return;
@@ -265,7 +265,7 @@ void MythUISpinBox::ShowEntryDialog(QString initialEntry)
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    SpinBoxEntryDialog *dlg = new SpinBoxEntryDialog(popupStack, "SpinBoxEntryDialog",
+    auto *dlg = new SpinBoxEntryDialog(popupStack, "SpinBoxEntryDialog",
         this, std::move(initialEntry), m_low, m_high, m_step);
 
     if (dlg->Create())

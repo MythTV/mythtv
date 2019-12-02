@@ -147,7 +147,7 @@ void UPnpSearchTask::SendMsg( MSocketDevice  *pSocket,
 
 void UPnpSearchTask::Execute( TaskQueue * /*pQueue*/ )
 {
-    MSocketDevice *pSocket = new MSocketDevice( MSocketDevice::Datagram );
+    auto *pSocket = new MSocketDevice( MSocketDevice::Datagram );
 
     // ----------------------------------------------------------------------
     // Refresh IP Address List in case of changes

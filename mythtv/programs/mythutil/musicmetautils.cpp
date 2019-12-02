@@ -179,7 +179,7 @@ static int ExtractImage(const MythUtilCommandLineParser &cmdline)
 
 static int ScanMusic(const MythUtilCommandLineParser &/*cmdline*/)
 {
-    MusicFileScanner *fscan = new MusicFileScanner();
+    auto *fscan = new MusicFileScanner();
     QStringList dirList;
 
     if (!StorageGroup::FindDirs("Music", gCoreContext->GetHostName(), &dirList))

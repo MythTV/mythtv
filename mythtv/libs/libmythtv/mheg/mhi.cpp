@@ -72,18 +72,9 @@ class MHIImageData
     bool   m_bUnder;
 };
 
-// Special value for the NetworkBootInfo version.  Real values are a byte.
-#define NBI_VERSION_UNSET       257
-
 MHIContext::MHIContext(InteractiveTV *parent)
     : m_parent(parent),     m_dsmcc(new Dsmcc()),
-      m_notify(nullptr),    m_keyProfile(0),
-      m_engine(MHCreateEngine(this)), m_stop(false),
-      m_updated(false),     m_face(nullptr),
-      m_face_loaded(false), m_engineThread(nullptr), m_currentChannel(-1),
-      m_currentStream(-1),  m_isLive(false),      m_currentSource(-1),
-      m_audioTag(-1),       m_videoTag(-1),
-      m_lastNbiVersion(NBI_VERSION_UNSET)
+      m_engine(MHCreateEngine(this))
 {
     if (!ft_loaded)
     {
@@ -145,7 +136,7 @@ MHIContext::~MHIContext()
 // NB caller must hold m_display_lock
 void MHIContext::ClearDisplay(void)
 {
-    list<MHIImageData*>::iterator it = m_display.begin();
+    auto it = m_display.begin();
     for (; it != m_display.end(); ++it)
         delete *it;
     m_display.clear();
@@ -155,7 +146,7 @@ void MHIContext::ClearDisplay(void)
 // NB caller must hold m_dsmccLock
 void MHIContext::ClearQueue(void)
 {
-    MythDeque<DSMCCPacket*>::iterator it = m_dsmccQueue.begin();
+    auto it = m_dsmccQueue.begin();
     for (; it != m_dsmccQueue.end(); ++it)
         delete *it;
     m_dsmccQueue.clear();
@@ -305,8 +296,7 @@ void MHIContext::QueueDSMCCPacket(
     unsigned char *data, int length, int componentTag,
     unsigned carouselId, int dataBroadcastId)
 {
-    unsigned char *dataCopy =
-        (unsigned char*) malloc(length * sizeof(unsigned char));
+    auto *dataCopy = (unsigned char*) malloc(length * sizeof(unsigned char));
 
     if (dataCopy == nullptr)
         return;
@@ -519,7 +509,7 @@ bool MHIContext::GetCarouselData(QString objectPath, QByteArray &result)
 // Mapping from key name & UserInput register to UserInput EventData
 class MHKeyLookup
 {
-    typedef QPair< QString, int /*UserInput register*/ > key_t;
+    using key_t = QPair< QString, int /*UserInput register*/ >;
 
 public:
     MHKeyLookup();
@@ -617,8 +607,8 @@ MHKeyLookup::MHKeyLookup()
 // and return true otherwise we return false.
 bool MHIContext::OfferKey(const QString& key)
 {
-    static const MHKeyLookup s_keymap;
-    int action = s_keymap.Find(key, m_keyProfile);
+    static const MHKeyLookup kKeymap;
+    int action = kKeymap.Find(key, m_keyProfile);
     if (action == 0)
         return false;
 
@@ -645,7 +635,7 @@ void MHIContext::Reinit(const QRect &videoRect, const QRect &dispRect, float asp
     // MHEG presumes square pixels
     enum { kNone, kHoriz, kBoth };
     int mode = gCoreContext->GetNumSetting("MhegAspectCorrection", kNone);
-    double const aspectd = static_cast<double>(aspect);
+    auto const aspectd = static_cast<double>(aspect);
     double const vz = (mode == kBoth) ? min(1.15, 1. / sqrt(aspectd)) : 1.;
     double const hz = (mode > kNone) ? vz * aspectd : 1.;
 
@@ -684,7 +674,7 @@ void MHIContext::UpdateOSD(InteractiveScreen *osdWindow,
     // but when we create the OSD we overlay everything over the video.
     // We need to cut out anything belowthe video on the display stack
     // to leave the video area clear.
-    list<MHIImageData*>::iterator it = m_display.begin();
+    auto it = m_display.begin();
     for (; it != m_display.end(); ++it)
     {
         MHIImageData *data = *it;
@@ -712,7 +702,7 @@ void MHIContext::UpdateOSD(InteractiveScreen *osdWindow,
             QImage image =
                 data->m_image.copy(rect.x()-data->m_x, rect.y()-data->m_y,
                                    rect.width(), rect.height());
-            MHIImageData *newData = new MHIImageData;
+            auto *newData = new MHIImageData;
             newData->m_image = image;
             newData->m_x = rect.x();
             newData->m_y = rect.y();
@@ -736,8 +726,7 @@ void MHIContext::UpdateOSD(InteractiveScreen *osdWindow,
             continue;
 
         image->Assign(data->m_image);
-        MythUIImage *uiimage = new MythUIImage(osdWindow, QString("itv%1")
-                                               .arg(count));
+        auto *uiimage = new MythUIImage(osdWindow, QString("itv%1").arg(count));
         if (uiimage)
         {
             uiimage->SetImage(image);
@@ -808,7 +797,7 @@ void MHIContext::AddToDisplay(const QImage &image, const QRect &displayRect, boo
 {
     const QRect scaledRect = Scale(displayRect);
 
-    MHIImageData *data = new MHIImageData;
+    auto *data = new MHIImageData;
 
     data->m_image = image.convertToFormat(QImage::Format_ARGB32).scaled(
         scaledRect.width(), scaledRect.height(),
@@ -823,7 +812,7 @@ void MHIContext::AddToDisplay(const QImage &image, const QRect &displayRect, boo
     else
     {
         // Replace any existing items under the video with this
-        list<MHIImageData*>::iterator it = m_display.begin();
+        auto it = m_display.begin();
         while (it != m_display.end())
         {
             MHIImageData *old = *it;
@@ -867,7 +856,7 @@ void MHIContext::DrawVideo(const QRect &videoRect, const QRect &dispRect)
 
     // Mark all existing items in the display stack as under the video
     QMutexLocker locker(&m_display_lock);
-    list<MHIImageData*>::iterator it = m_display.begin();
+    auto it = m_display.begin();
     for (; it != m_display.end(); ++it)
     {
         (*it)->m_bUnder = true;
@@ -1242,15 +1231,6 @@ void MHIContext::DrawBackground(const QRegion &reg)
     QRect bounds = reg.boundingRect();
     DrawRect(bounds.x(), bounds.y(), bounds.width(), bounds.height(),
              MHRgba(0, 0, 0, 255)/* black. */);
-}
-
-MHIText::MHIText(MHIContext *parent): m_parent(parent)
-{
-    m_fontsize = 12;
-    m_fontItalic = false;
-    m_fontBold = false;
-    m_width = 0;
-    m_height = 0;
 }
 
 void MHIText::Draw(int x, int y)
@@ -1712,7 +1692,7 @@ void MHIDLA::DrawArcSector(int /*x*/, int /*y*/, int /*width*/, int /*height*/,
 // The UK profile says that MHEG should not contain concave or
 // self-crossing polygons but we can get the former at least as
 // a result of rounding when drawing ellipses.
-typedef struct { int yBottom, yTop, xBottom; float slope; } lineSeg;
+struct lineSeg { int m_yBottom, m_yTop, m_xBottom; float m_slope; };
 
 void MHIDLA::DrawPoly(bool isFilled, int nPoints, const int *xArray, const int *yArray)
 {
@@ -1737,17 +1717,17 @@ void MHIDLA::DrawPoly(bool isFilled, int nPoints, const int *xArray, const int *
             {
                 if (lastY > thisY)
                 {
-                    lineArray[nLines].yBottom = thisY;
-                    lineArray[nLines].yTop = lastY;
-                    lineArray[nLines].xBottom = thisX;
+                    lineArray[nLines].m_yBottom = thisY;
+                    lineArray[nLines].m_yTop = lastY;
+                    lineArray[nLines].m_xBottom = thisX;
                 }
                 else
                 {
-                    lineArray[nLines].yBottom = lastY;
-                    lineArray[nLines].yTop = thisY;
-                    lineArray[nLines].xBottom = lastX;
+                    lineArray[nLines].m_yBottom = lastY;
+                    lineArray[nLines].m_yTop = thisY;
+                    lineArray[nLines].m_xBottom = lastX;
                 }
-                lineArray[nLines++].slope =
+                lineArray[nLines++].m_slope =
                     (float)(thisX-lastX) / (float)(thisY-lastY);
             }
             if (thisY < yMin)
@@ -1768,10 +1748,10 @@ void MHIDLA::DrawPoly(bool isFilled, int nPoints, const int *xArray, const int *
             int crossings = 0, xMin = 0, xMax = 0;
             for (int l = 0; l < nLines; l++)
             {
-                if (y >= lineArray[l].yBottom && y < lineArray[l].yTop)
+                if (y >= lineArray[l].m_yBottom && y < lineArray[l].m_yTop)
                 {
-                    int x = (int)round((float)(y - lineArray[l].yBottom) *
-                        lineArray[l].slope) + lineArray[l].xBottom;
+                    int x = (int)round((float)(y - lineArray[l].m_yBottom) *
+                        lineArray[l].m_slope) + lineArray[l].m_xBottom;
                     if (crossings == 0 || x < xMin)
                         xMin = x;
                     if (crossings == 0 || x > xMax)
@@ -1806,7 +1786,7 @@ void MHIDLA::DrawPoly(bool isFilled, int nPoints, const int *xArray, const int *
 }
 
 MHIBitmap::MHIBitmap(MHIContext *parent, bool tiled)
-    : m_parent(parent), m_tiled(tiled), m_opaque(false),
+    : m_parent(parent), m_tiled(tiled),
       m_copyCtx(new MythAVCopy(false))
 {
 }
@@ -1948,7 +1928,7 @@ void MHIBitmap::CreateFromMPEG(const unsigned char *data, int length)
         memset(&retbuf, 0, sizeof(AVFrame));
 
         int bufflen = nContentWidth * nContentHeight * 3;
-        unsigned char *outputbuf = (unsigned char*)av_malloc(bufflen);
+        auto *outputbuf = (unsigned char*)av_malloc(bufflen);
 
         av_image_fill_arrays(retbuf.data, retbuf.linesize,
             outputbuf, AV_PIX_FMT_RGB24,

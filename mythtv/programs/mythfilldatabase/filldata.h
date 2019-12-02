@@ -37,7 +37,7 @@ struct Source
     QString xmltvgrabber_prefmethod;
     vector<int> dd_dups;
 };
-typedef vector<Source> SourceList;
+using SourceList = vector<Source>;
 
 class FillData
 {

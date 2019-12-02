@@ -13,16 +13,8 @@
 using namespace std;
 
 MythOpenGLPainter::MythOpenGLPainter(MythRenderOpenGL *Render, QWidget *Parent)
-  : MythPainter(),
-    m_parent(Parent),
-    m_render(Render),
-    m_target(nullptr),
-    m_swapControl(true),
-    m_imageToTextureMap(),
-    m_ImageExpireList(),
-    m_textureDeleteList(),
-    m_textureDeleteLock(),
-    m_mappedTextures()
+  : m_parent(Parent),
+    m_render(Render)
 {
     m_mappedTextures.reserve(MAX_BUFFER_POOL);
 }
@@ -64,7 +56,7 @@ void MythOpenGLPainter::DeleteTextures(void)
     while (!m_textureDeleteList.empty())
     {
         MythGLTexture *texture = m_textureDeleteList.front();
-        m_HardwareCacheSize -= m_render->GetTextureDataSize(texture);
+        m_HardwareCacheSize -= MythRenderOpenGL::GetTextureDataSize(texture);
         m_render->DeleteTexture(texture);
         m_textureDeleteList.pop_front();
     }
@@ -94,7 +86,7 @@ void MythOpenGLPainter::Begin(QPaintDevice *Parent)
 
     if (!m_render)
     {
-        MythPainterWindowGL* glwin = static_cast<MythPainterWindowGL*>(m_parent);
+        auto* glwin = static_cast<MythPainterWindowGL*>(m_parent);
         if (!glwin)
         {
             LOG(VB_GENERAL, LOG_ERR, "FATAL ERROR: Failed to cast parent to MythPainterWindowGL");
@@ -203,7 +195,7 @@ MythGLTexture* MythOpenGLPainter::GetTextureFromCache(MythImage *Image)
     }
 
     CheckFormatImage(Image);
-    m_HardwareCacheSize += m_render->GetTextureDataSize(texture);
+    m_HardwareCacheSize += MythRenderOpenGL::GetTextureDataSize(texture);
     m_imageToTextureMap[Image] = texture;
     m_ImageExpireList.push_back(Image);
 

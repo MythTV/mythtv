@@ -171,8 +171,7 @@ void ProgLister::Load(void)
 
     FillItemList(false, false);
 
-    ScreenLoadCompletionEvent *slce =
-        new ScreenLoadCompletionEvent(objectName());
+    auto *slce = new ScreenLoadCompletionEvent(objectName());
     QCoreApplication::postEvent(this, slce);
 }
 
@@ -266,12 +265,12 @@ bool ProgLister::keyPressEvent(QKeyEvent *e)
 
 void ProgLister::ShowMenu(void)
 {
-    MythMenu *sortMenu = new MythMenu(tr("Sort Options"), this, "sortmenu");
+    auto *sortMenu = new MythMenu(tr("Sort Options"), this, "sortmenu");
     sortMenu->AddItem(tr("Reverse Sort Order"));
     sortMenu->AddItem(tr("Sort By Title"));
     sortMenu->AddItem(tr("Sort By Time"));
 
-    MythMenu *menu = new MythMenu(tr("Options"), this, "menu");
+    auto *menu = new MythMenu(tr("Options"), this, "menu");
 
     if (m_allowViewDialog && m_type != plPreviouslyRecorded)
     {
@@ -307,7 +306,7 @@ void ProgLister::ShowMenu(void)
     }
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythDialogBox *menuPopup = new MythDialogBox(menu, popupStack, "menuPopup");
+    auto *menuPopup = new MythDialogBox(menu, popupStack, "menuPopup");
 
     if (!menuPopup->Create())
     {
@@ -594,7 +593,7 @@ void ProgLister::ShowDeleteRuleMenu(void)
     if (!pi || !pi->GetRecordingRuleID())
         return;
 
-    RecordingRule *record = new RecordingRule();
+    auto *record = new RecordingRule();
     if (!record->LoadByProgram(pi))
     {
         delete record;
@@ -606,7 +605,7 @@ void ProgLister::ShowDeleteRuleMenu(void)
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    MythConfirmationDialog *okPopup = new MythConfirmationDialog(
+    auto *okPopup = new MythConfirmationDialog(
         popupStack, message, true);
 
     okPopup->SetReturnEvent(this, "deleterule");
@@ -701,7 +700,7 @@ void ProgLister::ShowOldRecordedMenu(void)
 
     QString title = tr("Previously Recorded");
 
-    MythMenu *menu = new MythMenu(title, message, this, "deletemenu");
+    auto *menu = new MythMenu(title, message, this, "deletemenu");
     if (pi->IsDuplicate())
         menu->AddItem(tr("Allow this episode to re-record"));
     else
@@ -711,7 +710,7 @@ void ProgLister::ShowOldRecordedMenu(void)
     menu->AddItem(tr("Cancel"));
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    MythDialogBox *menuPopup = new MythDialogBox(menu, mainStack, "deletepopup", true);
+    auto *menuPopup = new MythDialogBox(menu, mainStack, "deletepopup", true);
 
     if (menuPopup->Create())
         mainStack->AddScreen(menuPopup);
@@ -1361,7 +1360,7 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
         {
             // Prune to one per title
             QString curtitle;
-            ProgramList::iterator it = m_itemList.begin();
+            auto it = m_itemList.begin();
             while (it != m_itemList.end())
             {
                 if ((*it)->GetSortTitle() != curtitle)
@@ -1492,7 +1491,7 @@ void ProgLister::RestoreSelection(const ProgramInfo *selected,
 
 void ProgLister::HandleVisible(MythUIButtonListItem *item)
 {
-    ProgramInfo *pginfo = item->GetData().value<ProgramInfo*>();
+    auto *pginfo = item->GetData().value<ProgramInfo*>();
 
     if (item->GetText("is_item_initialized").isNull())
     {
@@ -1548,7 +1547,7 @@ void ProgLister::HandleSelected(MythUIButtonListItem *item)
         return;
     }
 
-    ProgramInfo *pginfo = item->GetData().value<ProgramInfo*> ();
+    auto *pginfo = item->GetData().value<ProgramInfo*> ();
     if (!pginfo)
     {
         ClearCurrentProgramInfo();
@@ -1584,7 +1583,7 @@ void ProgLister::customEvent(QEvent *event)
 
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
+        auto *dce = (DialogCompletionEvent*)(event);
 
         QString resultid   = dce->GetId();
         QString resulttext = dce->GetResultText();
@@ -1638,8 +1637,7 @@ void ProgLister::customEvent(QEvent *event)
         }
         else if (resultid == "deleterule")
         {
-            RecordingRule *record =
-                dce->GetData().value<RecordingRule *>();
+            auto *record = dce->GetData().value<RecordingRule *>();
             if (record && buttonnum > 0 && !record->Delete())
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -1654,7 +1652,7 @@ void ProgLister::customEvent(QEvent *event)
     }
     else if (event->type() == ScreenLoadCompletionEvent::kEventType)
     {
-        ScreenLoadCompletionEvent *slce = (ScreenLoadCompletionEvent*)(event);
+        auto *slce = (ScreenLoadCompletionEvent*)(event);
         QString id = slce->GetId();
 
         if (id == objectName())
@@ -1668,7 +1666,7 @@ void ProgLister::customEvent(QEvent *event)
     }
     else if (event->type() == MythEvent::MythEventMessage)
     {
-        MythEvent *me = static_cast<MythEvent *>(event);
+        auto *me = static_cast<MythEvent *>(event);
         const QString& message = me->Message();
 
         if (m_allowViewDialog && message == "CHOOSE_VIEW")

@@ -188,7 +188,7 @@ int CC608Reader::Update(unsigned char *inpos)
         int row = 0;
         int linecont = (subtitle.resumetext & CC_LINE_CONT);
 
-        vector<CC608Text*> *ccbuf = new vector<CC608Text*>;
+        auto *ccbuf = new vector<CC608Text*>;
         vector<CC608Text*>::iterator ccp;
         CC608Text *tmpcc = nullptr;
         int replace = linecont;
@@ -278,7 +278,7 @@ int CC608Reader::Update(unsigned char *inpos)
                 if (row)
                     scroll = m_state[streamIdx].m_outputRow - 15;
                 if (tmpcc)
-                    tmpcc->y = 15;
+                    tmpcc->m_y = 15;
             }
         }
         else if (subtitle.rowcount == 0 || row > 1)
@@ -291,7 +291,7 @@ int CC608Reader::Update(unsigned char *inpos)
                 for (; ccp != ccbuf->end(); ++ccp)
                 {
                     tmpcc = *ccp;
-                    tmpcc->y -= (m_state[streamIdx].m_outputRow - 15);
+                    tmpcc->m_y -= (m_state[streamIdx].m_outputRow - 15);
                 }
             }
         }
@@ -308,7 +308,7 @@ int CC608Reader::Update(unsigned char *inpos)
             {
                 m_state[streamIdx].m_outputRow = subtitle.rowcount;
                 if (tmpcc)
-                    tmpcc->y = m_state[streamIdx].m_outputRow;
+                    tmpcc->m_y = m_state[streamIdx].m_outputRow;
             }
             if (row)
             {
@@ -365,17 +365,17 @@ void CC608Reader::Update608Text(
     vector<CC608Text*>::iterator i;
     int visible = 0;
 
-    m_state[streamIdx].m_output.lock.lock();
-    if (!m_state[streamIdx].m_output.buffers.empty() && (scroll || replace))
+    m_state[streamIdx].m_output.m_lock.lock();
+    if (!m_state[streamIdx].m_output.m_buffers.empty() && (scroll || replace))
     {
         CC608Text *cc;
 
         // get last row
         int ylast = 0;
-        i = m_state[streamIdx].m_output.buffers.end() - 1;
+        i = m_state[streamIdx].m_output.m_buffers.end() - 1;
         cc = *i;
         if (cc)
-            ylast = cc->y;
+            ylast = cc->m_y;
 
         // calculate row positions to delete, keep
         int ydel = scroll_yoff + scroll;
@@ -388,34 +388,34 @@ void CC608Reader::Update608Text(
             ykeep += ymove;
         }
 
-        i = m_state[streamIdx].m_output.buffers.begin();
-        while (i < m_state[streamIdx].m_output.buffers.end())
+        i = m_state[streamIdx].m_output.m_buffers.begin();
+        while (i < m_state[streamIdx].m_output.m_buffers.end())
         {
             cc = (*i);
             if (!cc)
             {
-                i = m_state[streamIdx].m_output.buffers.erase(i);
+                i = m_state[streamIdx].m_output.m_buffers.erase(i);
                 continue;
             }
 
-            if (cc->y > (ylast - replace))
+            if (cc->m_y > (ylast - replace))
             {
                 // delete last lines
                 delete cc;
-                i = m_state[streamIdx].m_output.buffers.erase(i);
+                i = m_state[streamIdx].m_output.m_buffers.erase(i);
             }
             else if (scroll)
             {
-                if (cc->y > ydel && cc->y <= ykeep)
+                if (cc->m_y > ydel && cc->m_y <= ykeep)
                 {
                     // scroll up
-                    cc->y -= (scroll + ymove);
+                    cc->m_y -= (scroll + ymove);
                     ++i;
                 }
                 else
                 {
                     // delete lines outside scroll window
-                    i = m_state[streamIdx].m_output.buffers.erase(i);
+                    i = m_state[streamIdx].m_output.m_buffers.erase(i);
                     delete cc;
                 }
             }
@@ -426,7 +426,7 @@ void CC608Reader::Update608Text(
         }
     }
 
-    visible += m_state[streamIdx].m_output.buffers.size();
+    visible += m_state[streamIdx].m_output.m_buffers.size();
 
     if (ccbuf)
     {
@@ -436,12 +436,12 @@ void CC608Reader::Update608Text(
             if (*i)
             {
                 visible++;
-                m_state[streamIdx].m_output.buffers.push_back(*i);
+                m_state[streamIdx].m_output.m_buffers.push_back(*i);
             }
         }
     }
     m_state[streamIdx].m_changed = visible;
-    m_state[streamIdx].m_output.lock.unlock();
+    m_state[streamIdx].m_output.m_lock.unlock();
 }
 
 void CC608Reader::ClearBuffers(bool input, bool output, int outputStreamIdx)

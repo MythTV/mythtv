@@ -93,14 +93,14 @@ class EITFixUp
     void FixBellExpressVu(DBEventEIT &event) const; // Canada DVB-S
     void SetUKSubtitle(DBEventEIT &event) const;
     void FixUK(DBEventEIT &event) const;            // UK DVB-T
-    void FixPBS(DBEventEIT &event) const;           // USA ATSC
+    static void FixPBS(DBEventEIT &event);          // USA ATSC
     void FixComHem(DBEventEIT &event,
                    bool process_subtitle) const;    // Sweden DVB-C
-    void FixAUStar(DBEventEIT &event) const;        // Australia DVB-S
+    static void FixAUStar(DBEventEIT &event);       // Australia DVB-S
     void FixAUFreeview(DBEventEIT &event) const;    // Australia DVB-T
-    void FixAUNine(DBEventEIT &event) const;    
-    void FixAUSeven(DBEventEIT &event) const;    
-    void FixAUDescription(DBEventEIT &event) const;
+    static void FixAUNine(DBEventEIT &event);
+    static void FixAUSeven(DBEventEIT &event);
+    static void FixAUDescription(DBEventEIT &event);
     void FixMCA(DBEventEIT &event) const;           // MultiChoice Africa DVB-S
     void FixRTL(DBEventEIT &event) const;           // RTL group DVB
     void FixPRO7(DBEventEIT &event) const;          // Pro7/Sat1 Group
@@ -109,12 +109,12 @@ class EITFixUp
     void FixFI(DBEventEIT &event) const;            // Finland DVB-T
     void FixPremiere(DBEventEIT &event) const;      // german pay-tv Premiere
     void FixNL(DBEventEIT &event) const;            // Netherlands DVB-C
-    void FixCategory(DBEventEIT &event) const;      // Generic Category fixes
+    static void FixCategory(DBEventEIT &event);     // Generic Category fixes
     void FixNO(DBEventEIT &event) const;            // Norwegian DVB-S
     void FixNRK_DVBT(DBEventEIT &event) const;      // Norwegian NRK DVB-T
     void FixDK(DBEventEIT &event) const;            // Danish YouSee DVB-C
     void FixStripHTML(DBEventEIT &event) const;     // Strip HTML tags
-    void FixGreekSubtitle(DBEventEIT &event) const; // Greek Nat TV fix
+    static void FixGreekSubtitle(DBEventEIT &event);// Greek Nat TV fix
     void FixGreekEIT(DBEventEIT &event) const;
     void FixGreekCategories(DBEventEIT &event) const; // Greek categories from descr.
     void FixUnitymedia(DBEventEIT &event) const;    // handle cast/crew from Unitymedia

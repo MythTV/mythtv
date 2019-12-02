@@ -47,7 +47,7 @@ AVPixelFormat FrameTypeToPixelFormat(VideoFrameType type)
         case FMT_YUV444P14:  return AV_PIX_FMT_YUV444P14;
         case FMT_YUV444P16:  return AV_PIX_FMT_YUV444P16;
         case FMT_RGB24:      return AV_PIX_FMT_RGB24;
-        case FMT_BGRA:       return AV_PIX_FMT_BGRA;
+        case FMT_BGRA:       return AV_PIX_FMT_BGRA; // NOLINT(bugprone-branch-clone)
         case FMT_RGB32:      return AV_PIX_FMT_RGB32;
         case FMT_ARGB32:     return AV_PIX_FMT_ARGB;
         case FMT_RGBA32:     return AV_PIX_FMT_RGBA;
@@ -213,18 +213,18 @@ class MythAVCopyPrivate
 {
 public:
     explicit MythAVCopyPrivate(bool uswc)
-    : swsctx(nullptr), copyctx(new MythUSWCCopy(4096, !uswc)),
-      width(0), height(0), size(0), format(AV_PIX_FMT_NONE)
+    : m_swsctx(nullptr), m_copyctx(new MythUSWCCopy(4096, !uswc)),
+      m_width(0), m_height(0), m_size(0), m_format(AV_PIX_FMT_NONE)
     {
     }
 
     ~MythAVCopyPrivate()
     {
-        if (swsctx)
+        if (m_swsctx)
         {
-            sws_freeContext(swsctx);
+            sws_freeContext(m_swsctx);
         }
-        delete copyctx;
+        delete m_copyctx;
     }
 
     MythAVCopyPrivate(const MythAVCopyPrivate &) = delete;            // not copyable
@@ -232,21 +232,23 @@ public:
 
     int SizeData(int _width, int _height, AVPixelFormat _fmt)
     {
-        if (_width == width && _height == height && _fmt == format)
+        if (_width == m_width && _height == m_height && _fmt == m_format)
         {
-            return size;
+            return m_size;
         }
-        size    = av_image_get_buffer_size(_fmt, _width, _height, IMAGE_ALIGN);
-        width   = _width;
-        height  = _height;
-        format  = _fmt;
-        return size;
+        m_size    = av_image_get_buffer_size(_fmt, _width, _height, IMAGE_ALIGN);
+        m_width   = _width;
+        m_height  = _height;
+        m_format  = _fmt;
+        return m_size;
     }
 
-    SwsContext *swsctx;
-    MythUSWCCopy *copyctx;
-    int width, height, size;
-    AVPixelFormat format;
+    SwsContext   *m_swsctx;
+    MythUSWCCopy *m_copyctx;
+    int           m_width;
+    int           m_height;
+    int           m_size;
+    AVPixelFormat m_format;
 };
 
 MythAVCopy::MythAVCopy(bool uswc) : d(new MythAVCopyPrivate(uswc))
@@ -296,7 +298,7 @@ int MythAVCopy::Copy(AVFrame *dst, AVPixelFormat dst_pix_fmt,
         FillFrame(&framein, src, width, width, height, pix_fmt);
         FillFrame(&frameout, dst, width, width, height, dst_pix_fmt);
 
-        d->copyctx->copy(&frameout, &framein);
+        d->m_copyctx->copy(&frameout, &framein);
         return frameout.size;
     }
 
@@ -312,15 +314,15 @@ int MythAVCopy::Copy(AVFrame *dst, AVPixelFormat dst_pix_fmt,
       && dst_pix_fmt == AV_PIX_FMT_BGRA)
         new_width = width - 1;
 #endif
-    d->swsctx = sws_getCachedContext(d->swsctx, width, height, pix_fmt,
+    d->m_swsctx = sws_getCachedContext(d->m_swsctx, width, height, pix_fmt,
                                      new_width, height, dst_pix_fmt,
                                      SWS_FAST_BILINEAR, nullptr, nullptr, nullptr);
-    if (d->swsctx == nullptr)
+    if (d->m_swsctx == nullptr)
     {
         return -1;
     }
 
-    sws_scale(d->swsctx, src->data, src->linesize,
+    sws_scale(d->m_swsctx, src->data, src->linesize,
               0, height, dst->data, dst->linesize);
 
     return d->SizeData(width, height, dst_pix_fmt);
@@ -331,7 +333,7 @@ int MythAVCopy::Copy(VideoFrame *dst, const VideoFrame *src)
     if ((src->codec == FMT_YV12 || src->codec == FMT_NV12) &&
         (dst->codec == FMT_YV12))
     {
-        d->copyctx->copy(dst, src);
+        d->m_copyctx->copy(dst, src);
         return dst->size;
     }
 

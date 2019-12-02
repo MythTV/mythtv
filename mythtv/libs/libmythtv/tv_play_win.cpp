@@ -13,7 +13,7 @@
 
 
 TvPlayWindow::TvPlayWindow(MythScreenStack *parent, const char *name)
-  : MythScreenType(parent, name), m_progressBar(nullptr), m_progress(0)
+  : MythScreenType(parent, name)
 {
     SetCanTakeFocus(true);
 }

@@ -26,8 +26,8 @@
 #ifdef USING_ALSA
 #include <alsa/asoundlib.h>
 #else
-typedef int snd_pcm_t;
-typedef int snd_pcm_uframes_t;
+using snd_pcm_t = int;
+using snd_pcm_uframes_t = int;
 #endif // USING_ALSA
 
 class AudioInputALSA : public AudioInput

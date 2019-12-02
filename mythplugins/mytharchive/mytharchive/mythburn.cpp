@@ -230,7 +230,7 @@ void MythBurn::updateSizeBar(void)
 
 void MythBurn::loadEncoderProfiles()
 {
-    EncoderProfile *item = new EncoderProfile;
+    auto *item = new EncoderProfile;
     item->name = "NONE";
     item->description = "";
     item->bitrate = 0.0F;
@@ -293,7 +293,7 @@ void MythBurn::loadEncoderProfiles()
 
         }
 
-        EncoderProfile *item2 = new EncoderProfile;
+        auto *item2 = new EncoderProfile;
         item2->name = name;
         item2->description = desc;
         item2->bitrate = bitrate.toFloat();
@@ -304,7 +304,7 @@ void MythBurn::loadEncoderProfiles()
 void MythBurn::toggleUseCutlist(void)
 {
     MythUIButtonListItem *item = m_archiveButtonList->GetItemCurrent();
-    ArchiveItem *a = item->GetData().value<ArchiveItem *>();
+    auto *a = item->GetData().value<ArchiveItem *>();
 
     if (!a)
         return;
@@ -390,7 +390,7 @@ void MythBurn::updateArchiveList(void)
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    MythUIBusyDialog *busyPopup = new
+    auto *busyPopup = new
             MythUIBusyDialog(message, popupStack, "mythburnbusydialog");
 
     if (busyPopup->Create())
@@ -431,8 +431,7 @@ void MythBurn::updateArchiveList(void)
 
             recalcItemSize(a);
 
-            MythUIButtonListItem* item = new
-                    MythUIButtonListItem(m_archiveButtonList, a->title);
+            auto* item = new MythUIButtonListItem(m_archiveButtonList, a->title);
             item->SetData(qVariantFromValue(a));
             item->SetText(a->subtitle, "subtitle");
             item->SetText(a->startDate + " " + a->startTime, "date");
@@ -580,7 +579,7 @@ void MythBurn::createConfigFile(const QString &filename)
         if (!item)
             continue;
 
-        ArchiveItem *a = item->GetData().value<ArchiveItem *>();
+        auto *a = item->GetData().value<ArchiveItem *>();
         if (!a)
             continue;
 
@@ -673,7 +672,7 @@ void MythBurn::loadConfiguration(void)
 
     while (query.next())
     {
-        ArchiveItem *a = new ArchiveItem;
+        auto *a = new ArchiveItem;
         a->type = query.value(0).toString();
         a->title = query.value(1).toString();
         a->subtitle = query.value(2).toString();
@@ -721,7 +720,7 @@ void MythBurn::saveConfiguration(void)
         if (!item)
             continue;
 
-        ArchiveItem *a = item->GetData().value<ArchiveItem *>();
+        auto *a = item->GetData().value<ArchiveItem *>();
         if (!a)
             continue;
 
@@ -761,15 +760,14 @@ void MythBurn::ShowMenu()
         return;
 
     MythUIButtonListItem *item = m_archiveButtonList->GetItemCurrent();
-    ArchiveItem *curItem = item->GetData().value<ArchiveItem *>();
+    auto *curItem = item->GetData().value<ArchiveItem *>();
 
     if (!curItem)
         return;
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    MythDialogBox *menuPopup = new MythDialogBox(tr("Menu"),
-                                                 popupStack, "actionmenu");
+    auto *menuPopup = new MythDialogBox(tr("Menu"), popupStack, "actionmenu");
 
     if (menuPopup->Create())
         popupStack->AddScreen(menuPopup);
@@ -795,7 +793,7 @@ void MythBurn::ShowMenu()
 void MythBurn::removeItem()
 {
     MythUIButtonListItem *item = m_archiveButtonList->GetItemCurrent();
-    ArchiveItem *curItem = item->GetData().value<ArchiveItem *>();
+    auto *curItem = item->GetData().value<ArchiveItem *>();
 
     if (!curItem)
         return;
@@ -808,14 +806,14 @@ void MythBurn::removeItem()
 void MythBurn::editDetails()
 {
     MythUIButtonListItem *item = m_archiveButtonList->GetItemCurrent();
-    ArchiveItem *curItem = item->GetData().value<ArchiveItem *>();
+    auto *curItem = item->GetData().value<ArchiveItem *>();
 
     if (!curItem)
         return;
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    EditMetadataDialog *editor = new EditMetadataDialog(mainStack, curItem);
+    auto *editor = new EditMetadataDialog(mainStack, curItem);
 
     connect(editor, SIGNAL(haveResult(bool, ArchiveItem *)),
             this, SLOT(editorClosed(bool, ArchiveItem *)));
@@ -827,14 +825,14 @@ void MythBurn::editDetails()
 void MythBurn::editThumbnails()
 {
     MythUIButtonListItem *item = m_archiveButtonList->GetItemCurrent();
-    ArchiveItem *curItem = item->GetData().value<ArchiveItem *>();
+    auto *curItem = item->GetData().value<ArchiveItem *>();
 
     if (!curItem)
         return;
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    ThumbFinder *finder = new ThumbFinder(mainStack, curItem, m_theme);
+    auto *finder = new ThumbFinder(mainStack, curItem, m_theme);
 
     if (finder->Create())
         mainStack->AddScreen(finder);
@@ -856,15 +854,14 @@ void MythBurn::editorClosed(bool ok, ArchiveItem *item)
 void MythBurn::changeProfile()
 {
     MythUIButtonListItem *item = m_archiveButtonList->GetItemCurrent();
-    ArchiveItem *curItem = item->GetData().value<ArchiveItem *>();
+    auto *curItem = item->GetData().value<ArchiveItem *>();
 
     if (!curItem)
         return;
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    ProfileDialog *profileDialog = new ProfileDialog(popupStack,
-                                                     curItem, m_profileList);
+    auto *profileDialog = new ProfileDialog(popupStack, curItem, m_profileList);
 
     if (profileDialog->Create())
     {
@@ -885,7 +882,7 @@ void MythBurn::profileChanged(int profileNo)
     if (!item)
         return;
 
-    ArchiveItem *archiveItem = item->GetData().value<ArchiveItem *>();
+    auto *archiveItem = item->GetData().value<ArchiveItem *>();
     if (!archiveItem)
         return;
 
@@ -942,8 +939,7 @@ void MythBurn::handleAddRecording()
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    RecordingSelector *selector = new RecordingSelector(mainStack,
-                                                        &m_archiveList);
+    auto *selector = new RecordingSelector(mainStack, &m_archiveList);
 
     connect(selector, SIGNAL(haveResult(bool)),
             this, SLOT(selectorClosed(bool)));
@@ -973,7 +969,7 @@ void MythBurn::handleAddVideo()
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    VideoSelector *selector = new VideoSelector(mainStack, &m_archiveList);
+    auto *selector = new VideoSelector(mainStack, &m_archiveList);
 
     connect(selector, SIGNAL(haveResult(bool)),
             this, SLOT(selectorClosed(bool)));
@@ -989,8 +985,8 @@ void MythBurn::handleAddFile()
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    FileSelector *selector = new FileSelector(mainStack, &m_archiveList,
-                                             FSTYPE_FILELIST, "/", filter);
+    auto *selector = new FileSelector(mainStack, &m_archiveList,
+                                      FSTYPE_FILELIST, "/", filter);
 
     connect(selector, SIGNAL(haveResult(bool)),
             this, SLOT(selectorClosed(bool)));
@@ -1032,7 +1028,7 @@ bool ProfileDialog::Create()
 
     for (int x = 0; x < m_profileList.size(); x++)
     {
-        MythUIButtonListItem *item = new
+        auto *item = new
                 MythUIButtonListItem(m_profile_list, m_profileList.at(x)->name);
         item->SetData(qVariantFromValue(m_profileList.at(x)));
     }
@@ -1060,7 +1056,7 @@ void ProfileDialog::profileChanged(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    EncoderProfile *profile = item->GetData().value<EncoderProfile *>();
+    auto *profile = item->GetData().value<EncoderProfile *>();
     if (!profile)
         return;
 
@@ -1104,7 +1100,7 @@ void BurnMenu::start(void)
     QString msg   = tr("\nPlace a blank DVD in the"
                       " drive and select an option below.");
     MythScreenStack *mainStack = GetMythMainWindow()->GetStack("main stack");
-    MythDialogBox   *menuPopup = new MythDialogBox(title, msg, mainStack,
+    auto   *menuPopup = new MythDialogBox(title, msg, mainStack,
                                                    "actionmenu", true);
 
     if (menuPopup->Create())

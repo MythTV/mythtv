@@ -17,8 +17,8 @@ class FirewireChannel : public DTVChannel
     friend class FirewireRecorder;
 
   public:
-    FirewireChannel(TVRec *parent, const QString &videodevice,
-                    const FireWireDBOptions &firewire_opts);
+    FirewireChannel(TVRec *parent, QString videodevice,
+                    FireWireDBOptions firewire_opts);
     virtual ~FirewireChannel();
 
     // Commands

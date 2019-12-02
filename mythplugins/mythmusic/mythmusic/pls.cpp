@@ -62,7 +62,7 @@ int PlayListFile::parsePLS(PlayListFile *pls, const QString &filename)
 
     for (int n = 1; n <= num_entries; n++)
     {
-        PlayListFileEntry *e = new PlayListFileEntry();
+        auto *e = new PlayListFileEntry();
         QString t_key = QString("Title%1").arg(n);
         QString f_key = QString("File%1").arg(n);
         QString l_key = QString("Length%1").arg(n);
@@ -106,7 +106,7 @@ int PlayListFile::parseM3U(PlayListFile *pls, const QString &filename)
             continue;
 
         // add to the playlist
-        PlayListFileEntry *e = new PlayListFileEntry();
+        auto *e = new PlayListFileEntry();
         e->setFile(*it);
         e->setTitle(*it);
         e->setLength(-1);
@@ -149,7 +149,7 @@ int PlayListFile::parseASX(PlayListFile *pls, const QString &filename)
                 url = elem2.attribute("href");
 
                 // add to the playlist
-                PlayListFileEntry *e = new PlayListFileEntry();
+                auto *e = new PlayListFileEntry();
                 e->setFile(url.replace("mms://", "mmsh://"));
                 e->setTitle(url.replace("mms://", "mmsh://"));
                 e->setLength(-1);

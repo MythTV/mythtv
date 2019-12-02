@@ -13,42 +13,42 @@
 
 class ProgramInfo;
 
-typedef enum
+enum ARCHIVEDESTINATION
 {
     AD_DVD_SL = 0,
     AD_DVD_DL = 1,
     AD_DVD_RW = 2,
     AD_FILE   = 3
-} ARCHIVEDESTINATION;
+};
 
 Q_DECLARE_METATYPE (ARCHIVEDESTINATION);
 
-typedef struct ArchiveDestination
+struct ArchiveDestination
 {
     ARCHIVEDESTINATION type;
     const char *name;
     const char *description;
     int64_t freeSpace;
-}_ArchiveDestination;
+};
 
 extern struct ArchiveDestination ArchiveDestinations[];
 extern int ArchiveDestinationsCount;
 
-typedef struct
+struct EncoderProfile
 {
     QString name;
     QString description;
     float bitrate;
-} EncoderProfile;
+};
 
-typedef struct ThumbImage
+struct ThumbImage
 {
     QString caption;
     QString filename;
     qint64  frame;
-} ThumbImage;
+};
 
-typedef struct
+struct ArchiveItem
 {
     int     id;
     QString type;
@@ -70,7 +70,7 @@ typedef struct
     bool useCutlist;
     bool editedDetails;
     QList<ThumbImage*> thumbList;
-} ArchiveItem;
+};
 
 QString formatSize(int64_t sizeKB, int prec = 2);
 QString getTempDirectory(bool showError = false);

@@ -217,7 +217,7 @@ bool MediaMonitorUnix::CheckMountable(void)
         }
 
         // Enumerate devices
-        typedef QList<QDBusObjectPath> QDBusObjectPathList;
+        using QDBusObjectPathList = QList<QDBusObjectPath>;
         QDBusReply<QDBusObjectPathList> reply = iface.call("EnumerateDevices");
         if (!reply.isValid())
         {
@@ -435,7 +435,7 @@ QStringList MediaMonitorUnix::GetCDROMBlockDevices(void)
     if (iface.isValid())
     {
         // Enumerate devices
-        typedef QList<QDBusObjectPath> QDBusObjectPathList;
+        using QDBusObjectPathList = QList<QDBusObjectPath>;
         QDBusReply<QDBusObjectPathList> reply = iface.call("EnumerateDevices");
         if (reply.isValid())
         {

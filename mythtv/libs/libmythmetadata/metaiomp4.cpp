@@ -124,15 +124,10 @@ MusicMetadata* MetaIOMP4::read(const QString &filename)
 
     metadataSanityCheck(&artist, &album, &title, &genre);
 
-    MusicMetadata *retdata = new MusicMetadata(filename,
-                                     artist,
-                                     compilation ? artist : "",
-                                     album,
-                                     title,
-                                     genre,
-                                     year,
-                                     tracknum,
-                                     length);
+    auto *retdata = new MusicMetadata(filename, artist,
+                                      compilation ? artist : "",
+                                      album, title, genre, year,
+                                      tracknum, length);
 
     retdata->setCompilation(compilation);
 

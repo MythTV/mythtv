@@ -101,8 +101,7 @@ bool StatusBox::Create()
 
 void StatusBox::Init()
 {
-    MythUIButtonListItem *item =
-        new MythUIButtonListItem(m_categoryList, tr("Listings Status"),
+    auto *item = new MythUIButtonListItem(m_categoryList, tr("Listings Status"),
                             qVariantFromValue((void*)SLOT(doListingsStatus())));
     item->DisplayState("listings", "icon");
 
@@ -158,8 +157,8 @@ void StatusBox::AddLogLine(const QString & line,
     logline.m_state = state;
     logline.m_data = data;
 
-    MythUIButtonListItem *item = new MythUIButtonListItem(m_logList, line,
-                                                qVariantFromValue(logline));
+    auto *item = new MythUIButtonListItem(m_logList, line,
+                                          qVariantFromValue(logline));
     if (logline.m_state.isEmpty())
         logline.m_state = "normal";
 
@@ -195,7 +194,7 @@ bool StatusBox::keyPressEvent(QKeyEvent *event)
                 QString message = tr("Acknowledge all log entries at "
                                      "this priority level or lower?");
 
-                MythConfirmationDialog *confirmPopup =
+                auto *confirmPopup =
                         new MythConfirmationDialog(m_popupStack, message);
 
                 confirmPopup->SetReturnEvent(this, "LogAckAll");
@@ -269,8 +268,7 @@ void StatusBox::clicked(MythUIButtonListItem *item)
     {
         QString message = tr("Acknowledge this log entry?");
 
-        MythConfirmationDialog *confirmPopup =
-                new MythConfirmationDialog(m_popupStack, message);
+        auto *confirmPopup = new MythConfirmationDialog(m_popupStack, message);
 
         confirmPopup->SetReturnEvent(this, "LogAck");
         confirmPopup->SetData(logline.m_data);
@@ -287,7 +285,7 @@ void StatusBox::clicked(MythUIButtonListItem *item)
         {
             QString message = tr("Delete Job?");
 
-            MythConfirmationDialog *confirmPopup =
+            auto *confirmPopup =
                     new MythConfirmationDialog(m_popupStack, message);
 
             confirmPopup->SetReturnEvent(this, "JobDelete");
@@ -303,8 +301,8 @@ void StatusBox::clicked(MythUIButtonListItem *item)
         {
             QString label = tr("Job Queue Actions:");
 
-            MythDialogBox *menuPopup = new MythDialogBox(label, m_popupStack,
-                                                            "statusboxpopup");
+            auto *menuPopup = new MythDialogBox(label, m_popupStack,
+                                                "statusboxpopup");
 
             if (menuPopup->Create())
                 m_popupStack->AddScreen(menuPopup, false);
@@ -324,7 +322,7 @@ void StatusBox::clicked(MythUIButtonListItem *item)
         {
             QString message = tr("Requeue Job?");
 
-            MythConfirmationDialog *confirmPopup =
+            auto *confirmPopup =
                     new MythConfirmationDialog(m_popupStack, message);
 
             confirmPopup->SetReturnEvent(this, "JobRequeue");
@@ -342,8 +340,8 @@ void StatusBox::clicked(MythUIButtonListItem *item)
         {
             QString label = tr("AutoExpire Actions:");
 
-            MythDialogBox *menuPopup = new MythDialogBox(label, m_popupStack,
-                                                            "statusboxpopup");
+            auto *menuPopup = new MythDialogBox(label, m_popupStack,
+                                                "statusboxpopup");
 
             if (menuPopup->Create())
                 m_popupStack->AddScreen(menuPopup, false);
@@ -371,7 +369,7 @@ void StatusBox::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
+        auto *dce = (DialogCompletionEvent*)(event);
 
         QString resultid  = dce->GetId();
         int     buttonnum = dce->GetResult();
@@ -442,7 +440,7 @@ void StatusBox::customEvent(QEvent *event)
         }
         else if (resultid == "AutoExpireManage")
         {
-            ProgramInfo* rec = dce->GetData().value<ProgramInfo*>();
+            auto* rec = dce->GetData().value<ProgramInfo*>();
 
             // button 2 is "No Change"
             if (!rec || buttonnum == 2)

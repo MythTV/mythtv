@@ -65,7 +65,7 @@ class SERVICE_PUBLIC VersionInfo : public QObject
         Q_DISABLE_COPY(VersionInfo);
 };
 
-typedef VersionInfo* VersionInfoPtr;
+using VersionInfoPtr = VersionInfo*;
 
 inline void VersionInfo::InitializeCustomTypes()
 {

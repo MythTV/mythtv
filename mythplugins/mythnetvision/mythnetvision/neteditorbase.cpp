@@ -189,8 +189,7 @@ void NetEditorBase::FillGrabberButtonList()
     for (GrabberScript::scriptList::iterator i = m_grabberList.begin();
             i != m_grabberList.end(); ++i)
     {
-        MythUIButtonListItem *item =
-            new MythUIButtonListItem(m_grabbers, (*i)->GetTitle());
+        auto *item = new MythUIButtonListItem(m_grabbers, (*i)->GetTitle());
         item->SetText((*i)->GetTitle(), "title");
         item->SetData(qVariantFromValue(*i));
         QString img = (*i)->GetImage();
@@ -217,8 +216,7 @@ void NetEditorBase::ToggleItem(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    GrabberScript *script = item->GetData().value<GrabberScript*>();
-
+    auto *script = item->GetData().value<GrabberScript*>();
     if (!script)
         return;
 

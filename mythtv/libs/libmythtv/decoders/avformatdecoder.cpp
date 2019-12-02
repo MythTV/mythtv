@@ -124,11 +124,11 @@ static float get_aspect(const AVCodecContext &ctx)
 }
 static float get_aspect(H264Parser &p)
 {
-    static const float default_aspect = 4.0F / 3.0F;
+    static constexpr float kDefaultAspect = 4.0F / 3.0F;
     int asp = p.aspectRatio();
     switch (asp)
     {
-        case 0: return default_aspect;
+        case 0: return kDefaultAspect;
         case 2: return 4.0F / 3.0F;
         case 3: return 16.0F / 9.0F;
         case 4: return 2.21F;
@@ -145,7 +145,7 @@ static float get_aspect(H264Parser &p)
         }
         else
         {
-            aspect_ratio = default_aspect;
+            aspect_ratio = kDefaultAspect;
         }
     }
     return aspect_ratio;
@@ -239,9 +239,9 @@ static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
     if (VERBOSE_LEVEL_NONE)
         return;
 
-    static QString full_line("");
-    static const int msg_len = 255;
-    static QMutex string_lock;
+    static QString s_fullLine("");
+    static constexpr int kMsgLen = 255;
+    static QMutex s_stringLock;
     uint64_t   verbose_mask  = VB_LIBAV;
     LogLevel_t verbose_level = LOG_EMERG;
 
@@ -277,33 +277,33 @@ static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
     if (!VERBOSE_LEVEL_CHECK(verbose_mask, verbose_level))
         return;
 
-    string_lock.lock();
-    if (full_line.isEmpty() && ptr) {
+    s_stringLock.lock();
+    if (s_fullLine.isEmpty() && ptr) {
         AVClass* avc = *(AVClass**)ptr;
-        full_line = QString("[%1 @ %2] ")
+        s_fullLine = QString("[%1 @ %2] ")
             .arg(avc->item_name(ptr))
             .arg((quintptr)avc, QT_POINTER_SIZE * 2, 16, QChar('0'));
     }
 
-    char str[msg_len+1];
-    int bytes = vsnprintf(str, msg_len+1, fmt, vl);
+    char str[kMsgLen+1];
+    int bytes = vsnprintf(str, kMsgLen+1, fmt, vl);
 
     // check for truncated messages and fix them
-    if (bytes > msg_len)
+    if (bytes > kMsgLen)
     {
         LOG(VB_GENERAL, LOG_WARNING,
             QString("Libav log output truncated %1 of %2 bytes written")
-                .arg(msg_len).arg(bytes));
-        str[msg_len-1] = '\n';
+                .arg(kMsgLen).arg(bytes));
+        str[kMsgLen-1] = '\n';
     }
 
-    full_line += QString(str);
-    if (full_line.endsWith("\n"))
+    s_fullLine += QString(str);
+    if (s_fullLine.endsWith("\n"))
     {
-        LOG(verbose_mask, verbose_level, full_line.trimmed());
-        full_line.truncate(0);
+        LOG(verbose_mask, verbose_level, s_fullLine.trimmed());
+        s_fullLine.truncate(0);
     }
-    string_lock.unlock();
+    s_stringLock.unlock();
 }
 
 static int get_canonical_lang(const char *lang_cstr)
@@ -350,7 +350,7 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
 
     av_log_set_callback(myth_av_log);
 
-    m_audioIn.sample_size = -32; // force SetupAudioStream to run once
+    m_audioIn.m_sampleSize = -32;// force SetupAudioStream to run once
     m_itv = m_parent->GetInteractiveTV();
 
     cc608_build_parity_table(m_cc608_parity_table);
@@ -523,7 +523,7 @@ int AvFormatDecoder::GetCurrentChapter(long long framesPlayed)
         int64_t start = m_ic->chapters[i]->start;
         long double total_secs = (long double)start * (long double)num /
                                  (long double)den;
-        long long framenum = (long long)(total_secs * m_fps);
+        auto framenum = (long long)(total_secs * m_fps);
         if (framesPlayed >= framenum)
         {
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
@@ -545,7 +545,7 @@ long long AvFormatDecoder::GetChapter(int chapter)
     int64_t start = m_ic->chapters[chapter - 1]->start;
     long double total_secs = (long double)start * (long double)num /
                              (long double)den;
-    long long framenum = (long long)(total_secs * m_fps);
+    auto framenum = (long long)(total_secs * m_fps);
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("GetChapter %1: framenum %2")
                                    .arg(chapter).arg(framenum));
     return framenum;
@@ -898,7 +898,7 @@ void AvFormatDecoder::InitByteContext(bool forceseek)
     m_readcontext.is_streamed     = streamed;
     m_readcontext.max_packet_size = 0;
     m_readcontext.priv_data       = m_avfRingBuffer;
-    unsigned char* buffer       = (unsigned char *)av_malloc(buf_size);
+    auto *buffer                  = (unsigned char *)av_malloc(buf_size);
     m_ic->pb                      = avio_alloc_context(buffer, buf_size, 0,
                                                       &m_readcontext,
                                                       AVFRingBuffer::AVF_Read_Packet,
@@ -913,8 +913,7 @@ void AvFormatDecoder::InitByteContext(bool forceseek)
 
 extern "C" void HandleStreamChange(void *data)
 {
-    AvFormatDecoder *decoder =
-        reinterpret_cast<AvFormatDecoder*>(data);
+    auto *decoder = reinterpret_cast<AvFormatDecoder*>(data);
 
     int cnt = decoder->m_ic->nb_streams;
 
@@ -1257,7 +1256,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         int minutes = ((int)total_secs / 60) - (hours * 60);
         double secs = (double)total_secs -
                       (double)(hours * 60 * 60 + minutes * 60);
-        long long framenum = (long long)(total_secs * m_fps);
+        auto framenum = (long long)(total_secs * m_fps);
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("Chapter %1 found @ [%2:%3:%4]->%5")
                 .arg(QString().sprintf("%02d", i + 1))
@@ -2403,13 +2402,13 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         if (tvformat == "ntsc" || tvformat == "ntsc-jp" ||
             tvformat == "pal-m" || tvformat == "atsc")
         {
-            m_fps = 29.97f;
-            m_parent->SetVideoParams(-1, -1, 29.97, 1.0f, false, 16);
+            m_fps = 29.97F;
+            m_parent->SetVideoParams(-1, -1, 29.97, 1.0F, false, 16);
         }
         else
         {
-            m_fps = 25.0;
-            m_parent->SetVideoParams(-1, -1, 25.0, 1.0f, false, 16);
+            m_fps = 25.0F;
+            m_parent->SetVideoParams(-1, -1, 25.0, 1.0F, false, 16);
         }
     }
 
@@ -2491,7 +2490,7 @@ int AvFormatDecoder::GetSubtitleLanguage(uint subtitle_index, uint stream_index)
 }
 
 /// Return ATSC Closed Caption Language
-int AvFormatDecoder::GetCaptionLanguage(TrackTypes trackType, int service_num)
+int AvFormatDecoder::GetCaptionLanguage(TrackType trackType, int service_num)
 {
     int ret = -1;
     for (uint i = 0; i < (uint) m_pmt_track_types.size(); i++)
@@ -2581,7 +2580,7 @@ void AvFormatDecoder::SetupAudioStreamSubIndexes(int streamIndex)
     QMutexLocker locker(avcodeclock);
 
     // Find the position of the streaminfo in m_tracks[kTrackTypeAudio]
-    sinfo_vec_t::iterator current = m_tracks[kTrackTypeAudio].begin();
+    auto current = m_tracks[kTrackTypeAudio].begin();
     for (; current != m_tracks[kTrackTypeAudio].end(); ++current)
     {
         if (current->m_av_stream_index == streamIndex)
@@ -2598,7 +2597,7 @@ void AvFormatDecoder::SetupAudioStreamSubIndexes(int streamIndex)
     }
 
     // Remove the extra substream or duplicate the current substream
-    sinfo_vec_t::iterator next = current + 1;
+    auto next = current + 1;
     if (current->m_av_substream_index == -1)
     {
         // Split stream in two (Language I + Language II)
@@ -2658,7 +2657,7 @@ void AvFormatDecoder::RemoveAudioStreams()
 
 int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic, int flags)
 {
-    AvFormatDecoder *decoder = static_cast<AvFormatDecoder*>(c->opaque);
+    auto *decoder = static_cast<AvFormatDecoder*>(c->opaque);
     VideoFrameType type = PixelFormatToFrameType(c->pix_fmt);
     VideoFrameType* supported = decoder->GetPlayer()->DirectRenderFormats();
     bool found = false;
@@ -2710,8 +2709,8 @@ int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic, int flags)
     AVBufferRef *buffer = av_buffer_create(reinterpret_cast<uint8_t*>(frame), 0,
                             [](void* Opaque, uint8_t* Data)
                                 {
-                                    AvFormatDecoder *avfd = static_cast<AvFormatDecoder*>(Opaque);
-                                    VideoFrame *vf = reinterpret_cast<VideoFrame*>(Data);
+                                    auto *avfd = static_cast<AvFormatDecoder*>(Opaque);
+                                    auto *vf = reinterpret_cast<VideoFrame*>(Data);
                                     if (avfd && avfd->GetPlayer())
                                         avfd->GetPlayer()->DeLimboFrame(vf);
                                 }
@@ -3049,8 +3048,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
         {
             if (bufptr + 11 >= pkt->data + pkt->size)
                 continue; // not enough valid data...
-            SequenceHeader *seq = reinterpret_cast<SequenceHeader*>(
-                const_cast<uint8_t*>(bufptr));
+            const auto *seq = reinterpret_cast<const SequenceHeader*>(bufptr);
 
             int  width  = static_cast<int>(seq->width())  >> context->lowres;
             int  height = static_cast<int>(seq->height()) >> context->lowres;
@@ -3067,7 +3065,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
 
             // some hardware decoders (e.g. VAAPI MPEG2) will reset when the aspect
             // ratio changes
-            bool forceaspectchange = !qFuzzyCompare(m_current_aspect + 10.0f, aspect + 10.0f) &&
+            bool forceaspectchange = !qFuzzyCompare(m_current_aspect + 10.0F, aspect + 10.0F) &&
                                       m_mythcodecctx && m_mythcodecctx->DecoderWillResetOnAspect();
 
             m_current_aspect = aspect;
@@ -3179,7 +3177,7 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
         bool res_changed = ((width  != m_current_width) || (height != m_current_height));
         bool fps_changed = (seqFPS > 0.0) && ((seqFPS > static_cast<double>(m_fps) + 0.01) ||
                                               (seqFPS < static_cast<double>(m_fps) - 0.01));
-        bool forcechange = !qFuzzyCompare(aspect + 10.0f, m_current_aspect) &&
+        bool forcechange = !qFuzzyCompare(aspect + 10.0F, m_current_aspect) &&
                             m_mythcodecctx && m_mythcodecctx->DecoderWillResetOnAspect();
         m_current_aspect = aspect;
 
@@ -3214,7 +3212,7 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
             m_reordered_pts_detected = false;
 
             // fps debugging info
-            double avFPS = static_cast<double>(normalized_fps(stream, context));
+            auto avFPS = static_cast<double>(normalized_fps(stream, context));
             if ((seqFPS > avFPS + 0.01) || (seqFPS < avFPS - 0.01))
             {
                 LOG(VB_PLAYBACK, LOG_INFO, LOC +
@@ -3469,7 +3467,7 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt, boo
     {
         // MythTV logic expects that only one frame is processed
         // Save the packet for later and return.
-        AVPacket *newPkt = new AVPacket;
+        auto *newPkt = new AVPacket;
         memset(newPkt, 0, sizeof(AVPacket));
         av_init_packet(newPkt);
         av_packet_ref(newPkt, pkt);
@@ -3522,7 +3520,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
         }
     }
 
-    VideoFrame *frame = static_cast<VideoFrame*>(AvFrame->opaque);
+    auto *frame = static_cast<VideoFrame*>(AvFrame->opaque);
     if (frame)
         frame->directrendering = m_directrendering;
 
@@ -3730,13 +3728,13 @@ void AvFormatDecoder::ProcessVBIDataPacket(
         return;
     }
 
-    static const uint min_blank = 6;
+    static constexpr uint kMinBlank = 6;
     for (uint i = 0; i < 36; i++)
     {
         if (!((linemask >> i) & 0x1))
             continue;
 
-        const uint line  = ((i < 18) ? i : i-18) + min_blank;
+        const uint line  = ((i < 18) ? i : i-18) + kMinBlank;
         const uint field = (i<18) ? 0 : 1;
         const uint id2 = *buf & 0xf;
         switch (id2)
@@ -4157,8 +4155,8 @@ static vector<int> filter_lang(const sinfo_vec_t &tracks, int lang_key,
 {
     vector<int> ret;
 
-    vector<int>::const_iterator it = ftype.begin();
-    for (; it != ftype.end(); ++it)
+    auto it = ftype.cbegin();
+    for (; it != ftype.cend(); ++it)
     {
         if ((lang_key < 0) || tracks[*it].m_language == lang_key)
             ret.push_back(*it);
@@ -4188,8 +4186,8 @@ int AvFormatDecoder::filter_max_ch(const AVFormatContext *ic,
 {
     int selectedTrack = -1, max_seen = -1;
 
-    vector<int>::const_iterator it = fs.begin();
-    for (; it != fs.end(); ++it)
+    auto it = fs.cbegin();
+    for (; it != fs.cend(); ++it)
     {
         const int stream_index = tracks[*it].m_av_stream_index;
         AVCodecParameters *par = ic->streams[stream_index]->codecpar;
@@ -4476,13 +4474,13 @@ static void extract_mono_channel(uint channel, AudioInfo *audioInfo,
                                  char *buffer, int bufsize)
 {
     // Only stereo -> mono (left or right) is supported
-    if (audioInfo->channels != 2)
+    if (audioInfo->m_channels != 2)
         return;
 
-    if (channel >= (uint)audioInfo->channels)
+    if (channel >= (uint)audioInfo->m_channels)
         return;
 
-    const uint samplesize = audioInfo->sample_size;
+    const uint samplesize = audioInfo->m_sampleSize;
     const uint samples    = bufsize / samplesize;
     const uint halfsample = samplesize >> 1;
 
@@ -4608,16 +4606,16 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
         data_size = 0;
 
         // Check if the number of channels or sampling rate have changed
-        if (ctx->sample_rate != m_audioOut.sample_rate ||
-            ctx->channels    != m_audioOut.channels ||
+        if (ctx->sample_rate != m_audioOut.m_sampleRate ||
+            ctx->channels    != m_audioOut.m_channels ||
             AudioOutputSettings::AVSampleFormatToFormat(ctx->sample_fmt,
                                                         ctx->bits_per_raw_sample) != m_audioOut.format)
         {
             LOG(VB_GENERAL, LOG_INFO, LOC + "Audio stream changed");
-            if (ctx->channels != m_audioOut.channels)
+            if (ctx->channels != m_audioOut.m_channels)
             {
                 LOG(VB_GENERAL, LOG_INFO, LOC + QString("Number of audio channels changed from %1 to %2")
-                    .arg(m_audioOut.channels).arg(ctx->channels));
+                    .arg(m_audioOut.m_channels).arg(ctx->channels));
             }
             m_currentTrack[kTrackTypeAudio] = -1;
             m_selectedTrack[kTrackTypeAudio].m_av_stream_index = -1;
@@ -4625,7 +4623,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
             AutoSelectAudioTrack();
         }
 
-        if (m_audioOut.do_passthru)
+        if (m_audioOut.m_doPassthru)
         {
             if (!already_decoded)
             {
@@ -4679,7 +4677,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
 
         long long temppts = m_lastapts;
 
-        if (audSubIdx != -1 && !m_audioOut.do_passthru)
+        if (audSubIdx != -1 && !m_audioOut.m_doPassthru)
             extract_mono_channel(audSubIdx, &m_audioOut,
                                  (char *)m_audioSamples, data_size);
 
@@ -4687,7 +4685,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
         int frames = (ctx->channels <= 0 || decoded_size < 0 || !samplesize) ? -1 :
             decoded_size / (ctx->channels * samplesize);
         m_audio->AddAudioData((char *)m_audioSamples, data_size, temppts, frames);
-        if (m_audioOut.do_passthru && !m_audio->NeedDecodingBeforePassthrough())
+        if (m_audioOut.m_doPassthru && !m_audio->NeedDecodingBeforePassthrough())
         {
             m_lastapts += m_audio->LengthLastData();
         }
@@ -5279,8 +5277,8 @@ bool AvFormatDecoder::SetupAudioStream(void)
 
     m_audio->SetAudioParams(m_audioOut.format, ctx->channels,
                             requested_channels,
-                            m_audioOut.codec_id, m_audioOut.sample_rate,
-                            m_audioOut.do_passthru, m_audioOut.codec_profile);
+                            m_audioOut.m_codecId, m_audioOut.m_sampleRate,
+                            m_audioOut.m_doPassthru, m_audioOut.m_codecProfile);
     m_audio->ReinitAudio();
     AudioOutput *audioOutput = m_audio->GetAudioOutput();
     if (audioOutput)
@@ -5320,12 +5318,12 @@ bool AvFormatDecoder::SetupAudioStream(void)
 
         lcd->setAudioFormatLEDs(audio_format, true);
 
-        if (m_audioOut.do_passthru)
+        if (m_audioOut.m_doPassthru)
             lcd->setVariousLEDs(VARIOUS_SPDIF, true);
         else
             lcd->setVariousLEDs(VARIOUS_SPDIF, false);
 
-        switch (m_audioIn.channels)
+        switch (m_audioIn.m_channels)
         {
             case 0:
             /* nb: aac and mp3 seem to be coming up 0 here, may point to an

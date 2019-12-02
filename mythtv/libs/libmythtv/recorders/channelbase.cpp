@@ -696,85 +696,85 @@ ChannelBase *ChannelBase::CreateChannel(
     rbFileExt = "ts";
 
     ChannelBase *channel = nullptr;
-    if (genOpt.inputtype == "DVB")
+    if (genOpt.m_inputType == "DVB")
     {
 #ifdef USING_DVB
-        channel = new DVBChannel(genOpt.videodev, tvrec);
-        DVBChannel *dvbchannel = dynamic_cast<DVBChannel*>(channel);
+        channel = new DVBChannel(genOpt.m_videoDev, tvrec);
+        auto *dvbchannel = dynamic_cast<DVBChannel*>(channel);
         if (dvbchannel != nullptr)
-            dvbchannel->SetSlowTuning(dvbOpt.dvb_tuning_delay);
+            dvbchannel->SetSlowTuning(dvbOpt.m_dvbTuningDelay);
 #endif
     }
-    else if (genOpt.inputtype == "FIREWIRE")
+    else if (genOpt.m_inputType == "FIREWIRE")
     {
 #ifdef USING_FIREWIRE
-        channel = new FirewireChannel(tvrec, genOpt.videodev, fwOpt);
+        channel = new FirewireChannel(tvrec, genOpt.m_videoDev, fwOpt);
 #else
         Q_UNUSED(fwOpt);
 #endif
     }
-    else if (genOpt.inputtype == "HDHOMERUN")
+    else if (genOpt.m_inputType == "HDHOMERUN")
     {
 #ifdef USING_HDHOMERUN
-        channel = new HDHRChannel(tvrec, genOpt.videodev);
+        channel = new HDHRChannel(tvrec, genOpt.m_videoDev);
 #endif
     }
-    else if ((genOpt.inputtype == "IMPORT") ||
-             (genOpt.inputtype == "DEMO") ||
-             (genOpt.inputtype == "MPEG" &&
-              genOpt.videodev.toLower().startsWith("file:")))
+    else if ((genOpt.m_inputType == "IMPORT") ||
+             (genOpt.m_inputType == "DEMO") ||
+             (genOpt.m_inputType == "MPEG" &&
+              genOpt.m_videoDev.toLower().startsWith("file:")))
     {
         channel = new DummyChannel(tvrec);
         rbFileExt = "mpg";
     }
 #ifdef USING_IPTV
-    else if (genOpt.inputtype == "FREEBOX") // IPTV
+    else if (genOpt.m_inputType == "FREEBOX") // IPTV
     {   // NOLINTNEXTLINE(bugprone-branch-clone)
-        channel = new IPTVChannel(tvrec, genOpt.videodev);
+        channel = new IPTVChannel(tvrec, genOpt.m_videoDev);
     }
 #endif
 #ifdef USING_VBOX
-    else if (genOpt.inputtype == "VBOX")
+    else if (genOpt.m_inputType == "VBOX")
     {
-        channel = new IPTVChannel(tvrec, genOpt.videodev);
+        channel = new IPTVChannel(tvrec, genOpt.m_videoDev);
     }
 #endif
 #ifdef USING_ASI
-    else if (genOpt.inputtype == "ASI")
+    else if (genOpt.m_inputType == "ASI")
     {
-        channel = new ASIChannel(tvrec, genOpt.videodev);
+        channel = new ASIChannel(tvrec, genOpt.m_videoDev);
     }
 #endif
 #ifdef USING_CETON
-    else if (genOpt.inputtype == "CETON")
+    else if (genOpt.m_inputType == "CETON")
     {
-        channel = new CetonChannel(tvrec, genOpt.videodev);
+        channel = new CetonChannel(tvrec, genOpt.m_videoDev);
     }
 #endif
-    else if (genOpt.inputtype == "V4L2ENC")
+    else if (genOpt.m_inputType == "V4L2ENC")
     {
 #ifdef USING_V4L2
-        channel = new V4LChannel(tvrec, genOpt.videodev);
+        channel = new V4LChannel(tvrec, genOpt.m_videoDev);
 #endif
-        if (genOpt.inputtype == "MPEG")
+        if (genOpt.m_inputType == "MPEG")
             rbFileExt = "mpg";
     }
-    else if (CardUtil::IsV4L(genOpt.inputtype))
+    else if (CardUtil::IsV4L(genOpt.m_inputType))
     {
 #ifdef USING_V4L2
-        channel = new V4LChannel(tvrec, genOpt.videodev);
+        channel = new V4LChannel(tvrec, genOpt.m_videoDev);
 #endif
-        if (genOpt.inputtype != "HDPVR")
+        if (genOpt.m_inputType != "HDPVR")
         {
-            if (genOpt.inputtype != "MPEG")
+            if (genOpt.m_inputType != "MPEG")
                 rbFileExt = "nuv";
             else
                 rbFileExt = "mpg";
         }
     }
-    else if (genOpt.inputtype == "EXTERNAL")
+    else if (genOpt.m_inputType == "EXTERNAL")
     {
-        channel = new ExternalChannel(tvrec, genOpt.videodev);
+        channel = new ExternalChannel(tvrec, genOpt.m_videoDev);
     }
 
     if (!channel)
@@ -785,8 +785,8 @@ ChannelBase *ChannelBase::CreateChannel(
             "\n"
             "Recompile MythTV with %4 support or remove the card \n"
             "from the configuration and restart MythTV.")
-            .arg(genOpt.inputtype).arg(genOpt.videodev)
-            .arg(genOpt.inputtype).arg(genOpt.inputtype);
+            .arg(genOpt.m_inputType).arg(genOpt.m_videoDev)
+            .arg(genOpt.m_inputType).arg(genOpt.m_inputType);
         LOG(VB_GENERAL, LOG_ERR, "ChannelBase: CreateChannel() Error: \n" +
             msg + "\n");
         return nullptr;
@@ -795,7 +795,7 @@ ChannelBase *ChannelBase::CreateChannel(
     if (!channel->Open())
     {
         LOG(VB_GENERAL, LOG_ERR, "ChannelBase: CreateChannel() Error: " +
-            QString("Failed to open device %1").arg(genOpt.videodev));
+            QString("Failed to open device %1").arg(genOpt.m_videoDev));
         delete channel;
         return nullptr;
     }
@@ -806,15 +806,15 @@ ChannelBase *ChannelBase::CreateChannel(
     if (enter_power_save_mode)
     {
         if (channel &&
-            ((genOpt.inputtype == "DVB" && dvbOpt.dvb_on_demand) ||
-             genOpt.inputtype == "HDHOMERUN" ||
-             CardUtil::IsV4L(genOpt.inputtype)))
+            ((genOpt.m_inputType == "DVB" && dvbOpt.m_dvbOnDemand) ||
+             genOpt.m_inputType == "HDHOMERUN" ||
+             CardUtil::IsV4L(genOpt.m_inputType)))
         {
             channel->Close();
         }
         else if (setchan)
         {
-            DTVChannel *dtvchannel = dynamic_cast<DTVChannel*>(channel);
+            auto *dtvchannel = dynamic_cast<DTVChannel*>(channel);
             if (dtvchannel)
                 dtvchannel->EnterPowerSavingMode();
         }

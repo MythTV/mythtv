@@ -52,7 +52,7 @@ BackendSelection::Decision BackendSelection::Prompt(
     if (!mainStack)
         return ret;
 
-    BackendSelection *backendSettings =
+    auto *backendSettings =
         new BackendSelection(mainStack, dbParams, pConfig, true);
 
     if (backendSettings->Create())
@@ -98,8 +98,7 @@ void BackendSelection::Accept(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    DeviceLocation *dev = item->GetData().value<DeviceLocation *>();
-
+    auto *dev = item->GetData().value<DeviceLocation *>();
     if (!dev)
     {
         Cancel();
@@ -304,7 +303,7 @@ void BackendSelection::customEvent(QEvent *event)
 {
     if (event->type() == MythEvent::MythEventMessage)
     {
-        MythEvent *me      = dynamic_cast<MythEvent *>(event);
+        auto *me = dynamic_cast<MythEvent *>(event);
         if (me == nullptr)
             return;
 
@@ -337,8 +336,7 @@ void BackendSelection::customEvent(QEvent *event)
     }
     else if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = dynamic_cast<DialogCompletionEvent*>(event);
-
+        auto *dce = dynamic_cast<DialogCompletionEvent*>(event);
         if (!dce)
             return;
 
@@ -358,10 +356,8 @@ void BackendSelection::PromptForPassword(void)
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    MythTextInputDialog *pwDialog = new MythTextInputDialog(popupStack,
-                                                            message,
-                                                            FilterNone,
-                                                            true);
+    auto *pwDialog = new MythTextInputDialog(popupStack, message,
+                                             FilterNone, true);
 
     if (pwDialog->Create())
     {

@@ -16,7 +16,7 @@
 using std::vector;
 
 class VideoColourSpace;
-typedef void (*FreeAVHWDeviceContext)(struct AVHWDeviceContext*);
+using FreeAVHWDeviceContext = void (*)(struct AVHWDeviceContext*);
 #define DUMMY_INTEROP_ID 1
 
 class MythOpenGLInterop : public QObject, public ReferenceCounter
@@ -71,10 +71,10 @@ class MythOpenGLInterop : public QObject, public ReferenceCounter
     Type                m_type;
     QHash<unsigned long long, vector<MythVideoTexture*> > m_openglTextures;
     QSize               m_openglTextureSize;
-    long long           m_discontinuityCounter;
+    long long           m_discontinuityCounter { 0 };
 
-    FreeAVHWDeviceContext m_defaultFree;
-    void               *m_defaultUserOpaque;
+    FreeAVHWDeviceContext m_defaultFree { nullptr };
+    void               *m_defaultUserOpaque { nullptr };
 };
 
 #endif // MYTHOPENGLINTEROP_H

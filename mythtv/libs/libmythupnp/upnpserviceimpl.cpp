@@ -6,7 +6,7 @@ void UPnpServiceImpl::RegisterService(UPnpDevice *pDevice)
 {
     if (pDevice != nullptr)
     {
-        UPnpService *pService = new UPnpService();
+        auto *pService = new UPnpService();
             
         pService->m_sServiceType = GetServiceType();
         pService->m_sServiceId   = GetServiceId();

@@ -24,7 +24,7 @@ class ExternRecChannelScanner : public QRunnable
     Q_DECLARE_TR_FUNCTIONS(ExternRecChannelScanner);
 
   public:
-    ExternRecChannelScanner(uint cardid, const QString &inputname, uint sourceid,
+    ExternRecChannelScanner(uint cardid, QString inputname, uint sourceid,
                             ScanMonitor *monitor = nullptr);
     ~ExternRecChannelScanner();
 

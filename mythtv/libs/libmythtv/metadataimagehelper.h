@@ -27,9 +27,8 @@ struct ArtworkInfo
     uint height;
 };
 
-typedef QList< ArtworkInfo > ArtworkList;
-
-typedef QMultiMap< VideoArtworkType, ArtworkInfo > ArtworkMap;
+using ArtworkList = QList< ArtworkInfo >;
+using ArtworkMap  = QMultiMap< VideoArtworkType, ArtworkInfo >;
 
 MTV_PUBLIC ArtworkMap GetArtwork(const QString& inetref,
                                        uint season,

@@ -25,12 +25,12 @@ class VideoDecodeBuffer : public QRunnable
     VideoFrame *GetFrame(int &didFF, bool &isKey);
 
   private:
-    typedef struct decodedFrameInfo
+    struct DecodedFrameInfo
     {
         VideoFrame *frame;
         int         didFF;
         bool        isKey;
-    } DecodedFrameInfo;
+    };
 
     MythPlayer * const      m_player      {nullptr};
     MythVideoOutput * const m_videoOutput {nullptr};

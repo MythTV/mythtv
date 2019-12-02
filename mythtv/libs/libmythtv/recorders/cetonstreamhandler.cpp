@@ -45,7 +45,7 @@ CetonStreamHandler *CetonStreamHandler::Get(const QString &devname,
 
     if (it == s_handlers.end())
     {
-        CetonStreamHandler *newhandler = new CetonStreamHandler(devkey, inputid);
+        auto *newhandler = new CetonStreamHandler(devkey, inputid);
         newhandler->Open();
         s_handlers[devkey] = newhandler;
         s_handlers_refcnt[devkey] = 1;
@@ -536,7 +536,7 @@ bool CetonStreamHandler::HttpRequest(
     QString &response, uint &status_code) const
 {
     QUrl url;
-    QNetworkRequest *request = new QNetworkRequest();
+    auto *request = new QNetworkRequest();
     QByteArray data;
     MythDownloadManager *manager = GetMythDownloadManager();
 

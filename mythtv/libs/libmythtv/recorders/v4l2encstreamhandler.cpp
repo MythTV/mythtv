@@ -66,9 +66,7 @@ V4L2encStreamHandler *V4L2encStreamHandler::Get(const QString &devname,
 
     if (it == s_handlers.end())
     {
-        V4L2encStreamHandler *newhandler = new V4L2encStreamHandler(devname,
-                                                                    audioinput,
-                                                                    inputid);
+        auto *newhandler = new V4L2encStreamHandler(devname, audioinput, inputid);
 
         s_handlers[devkey] = newhandler;
         s_handlers_refcnt[devkey] = 1;

@@ -21,7 +21,7 @@ class MythSocket;
 class QObject;
 class QEvent;
 
-typedef QMap<QString,QDateTime> FileTimeStampMap;
+using FileTimeStampMap = QMap<QString,QDateTime>;
 
 class MTV_PUBLIC PreviewGenerator : public QObject, public MThread
 {
@@ -36,7 +36,7 @@ class MTV_PUBLIC PreviewGenerator : public QObject, public MThread
     Q_OBJECT
 
   public:
-    typedef enum Mode
+    enum Mode
     {
         kNone           = 0x0,
         kLocal          = 0x1,
@@ -44,11 +44,11 @@ class MTV_PUBLIC PreviewGenerator : public QObject, public MThread
         kLocalAndRemote = 0x3,
         kForceLocal     = 0x5,
         kModeMask       = 0x7,
-    } Mode;
+    };
 
   public:
     PreviewGenerator(const ProgramInfo *pginfo,
-                     const QString     &token,
+                     QString            token,
                      Mode               mode = kLocal);
 
     void SetPreviewTime(long long time, bool in_seconds)

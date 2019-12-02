@@ -117,7 +117,7 @@ class MTV_PUBLIC ChannelOptionsCommon: public GroupSetting
         uint default_sourceid,  bool add_freqid);
 
   public slots:
-    void onAirGuideChanged(bool);
+    static void onAirGuideChanged(bool);
     void sourceChanged(const QString&);
 
   protected:

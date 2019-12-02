@@ -167,11 +167,9 @@ bool MythExternRecApp::Open(void)
     QObject::connect(&m_proc, &QProcess::readyReadStandardError, this,
                      &MythExternRecApp::ProcReadStandardError);
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
     qRegisterMetaType<QProcess::ProcessError>("QProcess::ProcessError");
     QObject::connect(&m_proc, &QProcess::errorOccurred,
                      this, &MythExternRecApp::ProcError);
-#endif
 
     qRegisterMetaType<QProcess::ExitStatus>("QProcess::ExitStatus");
     QObject::connect(&m_proc,

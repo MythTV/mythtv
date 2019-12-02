@@ -24,7 +24,7 @@ class MythDVDPlayer : public MythPlayer
     // Gets
     uint64_t GetBookmark(void) override; // MythPlayer
     int64_t GetSecondsPlayed(bool honorCutList,
-                             int divisor = 1000) const override; // MythPlayer
+                             int divisor = 1000) override; // MythPlayer
     int64_t GetTotalSeconds(bool honorCutList,
                             int divisor = 1000) const override; // MythPlayer
 

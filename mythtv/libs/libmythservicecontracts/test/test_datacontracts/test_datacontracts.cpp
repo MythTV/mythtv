@@ -35,7 +35,7 @@ void TestDataContracts::cleanupTestCase(void)
 
 void TestDataContracts::test_channelinfo(void)
 {
-    DTC::ChannelInfo *pChan = new DTC::ChannelInfo();
+    auto *pChan = new DTC::ChannelInfo();
     pChan->setChanId(1119);
     pChan->setChanNum("119");
     pChan->setCallSign("WEATH");
@@ -48,7 +48,7 @@ void TestDataContracts::test_channelinfo(void)
     QCOMPARE(known, qtype);
 
     // Convert back to DTC::Program
-    DTC::ChannelInfo *pChan2 = v.value<DTC::ChannelInfo*>();
+    auto *pChan2 = v.value<DTC::ChannelInfo*>();
     QCOMPARE(pChan->ChanId(), pChan2->ChanId());
     QCOMPARE(pChan->ChanNum(), pChan2->ChanNum());
     QCOMPARE(pChan->CallSign(), pChan2->CallSign());
@@ -58,7 +58,7 @@ void TestDataContracts::test_channelinfo(void)
 void TestDataContracts::test_program(void)
 {
     // Create DTC::Program
-    DTC::Program *pProgram = new DTC::Program();
+    auto *pProgram = new DTC::Program();
     pProgram->setTitle("Big Buck Bunny");
     pProgram->setDescription("Follow a day of the life of Big Buck Bunny "
                              "when he meets three bullying rodents...");
@@ -72,7 +72,7 @@ void TestDataContracts::test_program(void)
     QCOMPARE(known, qtype);
 
     // Convert back to DTC::Program
-    DTC::Program *pProgram2 = v.value<DTC::Program*>();
+    auto *pProgram2 = v.value<DTC::Program*>();
     QCOMPARE(pProgram->Title(), pProgram2->Title());
     QCOMPARE(pProgram->Description(), pProgram2->Description());
     QCOMPARE(pProgram->Inetref(), pProgram2->Inetref());
@@ -82,7 +82,7 @@ void TestDataContracts::test_program(void)
 void TestDataContracts::test_programlist(void)
 {
     // Create ProgramList with one Program
-    DTC::ProgramList *pPrograms = new DTC::ProgramList();
+    auto *pPrograms = new DTC::ProgramList();
     DTC::Program *pProgram = pPrograms->AddNewProgram();
     pProgram->setTitle("Big Buck Bunny");
     pProgram->setDescription("Follow a day of the life of Big Buck Bunny "
@@ -103,7 +103,7 @@ void TestDataContracts::test_programlist(void)
     QCOMPARE(known, qtype);
 
     // Convert back to DTC::ProgramList
-    DTC::ProgramList *pPrograms2 = v.value<DTC::ProgramList*>();
+    auto *pPrograms2 = v.value<DTC::ProgramList*>();
     QCOMPARE(pPrograms->StartIndex(), pPrograms2->StartIndex());
     QCOMPARE(pPrograms->Count(), pPrograms2->Count());
     QCOMPARE(pPrograms->TotalAvailable(), pPrograms2->TotalAvailable());
@@ -114,7 +114,7 @@ void TestDataContracts::test_programlist(void)
 
     // Check the program
     QVariant v2 = pPrograms2->Programs()[0];
-    DTC::Program *pProgram2 = v2.value<DTC::Program*>();
+    auto *pProgram2 = v2.value<DTC::Program*>();
     QCOMPARE(pProgram->Title(), pProgram2->Title());
     QCOMPARE(pProgram->Description(), pProgram2->Description());
     QCOMPARE(pProgram->Inetref(), pProgram2->Inetref());
@@ -124,7 +124,7 @@ void TestDataContracts::test_programlist(void)
 void TestDataContracts::test_recrule(void)
 {
     // Create DTC::RecRule
-    DTC::RecRule *pRule = new DTC::RecRule();
+    auto *pRule = new DTC::RecRule();
     pRule->setId(12345);
     pRule->setTitle("Big Buck Bunny");
     pRule->setSubTitle("Bunny");
@@ -140,7 +140,7 @@ void TestDataContracts::test_recrule(void)
     QCOMPARE(known, qtype);
 
     // Convert back to DTC::RecRule
-    DTC::RecRule *pRule2 = v.value<DTC::RecRule*>();
+    auto *pRule2 = v.value<DTC::RecRule*>();
     QCOMPARE(pRule->Id(), pRule2->Id());
     QCOMPARE(pRule->Title(), pRule2->Title());
     QCOMPARE(pRule->SubTitle(), pRule2->SubTitle());
@@ -154,7 +154,7 @@ void TestDataContracts::test_recordinginfo(void)
     QDateTime now = QDateTime::currentDateTime();
 
     // Create DTC::RecordingInfo
-    DTC::RecordingInfo *pRecording = new DTC::RecordingInfo();
+    auto *pRecording = new DTC::RecordingInfo();
     pRecording->setRecordedId(12345);
     pRecording->setStatus(RecStatus::Recorded);
     pRecording->setStartTs(now);
@@ -167,7 +167,7 @@ void TestDataContracts::test_recordinginfo(void)
     QCOMPARE(known, qtype);
 
     // Convert back to DTC::RecordingInfo
-    DTC::RecordingInfo *pRecording2 = v.value<DTC::RecordingInfo*>();
+    auto *pRecording2 = v.value<DTC::RecordingInfo*>();
     QCOMPARE(pRecording->RecordedId(), pRecording2->RecordedId());
     QCOMPARE(pRecording->Status(), pRecording2->Status());
     QCOMPARE(pRecording->StartTs(), pRecording2->StartTs());

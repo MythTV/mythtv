@@ -27,7 +27,7 @@
 #define NUMPROGRAMLINES 52
 
 class ProgramInfo;
-typedef AutoDeleteDeque<ProgramInfo*> ProgramList;
+using ProgramList = AutoDeleteDeque<ProgramInfo*>;
 
 /** \class ProgramInfo
  *  \brief Holds information on recordings and videos.
@@ -348,7 +348,7 @@ class MPUBLIC ProgramInfo
     bool IsMythStream(void) const { return m_pathname.startsWith("myth://"); }
     bool IsPathSet(void) const { return GetBasename() != m_pathname; }
     bool HasPathname(void) const { return !GetPathname().isEmpty(); }
-    bool IsFileReadable(void) const;
+    bool IsFileReadable(void);
 
     QString GetTitle(void)        const { return m_title; }
     QString GetSortTitle(void)    const { return m_sortTitle; }
@@ -488,13 +488,13 @@ class MPUBLIC ProgramInfo
     uint GetAudioProperties(void) const
         { return (m_properties & kAudioPropertyMask) >> kAudioPropertyOffset; }
 
-    typedef enum
+    enum Verbosity
     {
         kLongDescription,
         kTitleSubtitle,
         kRecordingKey,
         kSchedulingKey,
-    } Verbosity;
+    };
     QString toString(Verbosity v = kLongDescription, const QString& sep = ":",
                      const QString& grp = "\"") const;
 
@@ -503,7 +503,7 @@ class MPUBLIC ProgramInfo
     void SetSubtitle(const QString &st, const QString &sst = nullptr);
     void SetProgramInfoType(ProgramInfoType t)
         { m_programflags &= ~FL_TYPEMASK; m_programflags |= ((uint32_t)t<<20); }
-    void SetPathname(const QString&) const;
+    void SetPathname(const QString&);
     void SetChanID(uint _chanid)                  { m_chanid       = _chanid; }
     void SetScheduledStartTime(const QDateTime &dt) { m_startts      = dt;    }
     void SetScheduledEndTime(  const QDateTime &dt) { m_endts        = dt;    }
@@ -626,9 +626,9 @@ class MPUBLIC ProgramInfo
     void SaveInetRef(const QString &inet);
 
     // Extremely slow functions that cannot be called from the UI thread.
-    QString DiscoverRecordingDirectory(void) const;
+    QString DiscoverRecordingDirectory(void);
     QString GetPlaybackURL(bool checkMaster = false,
-                           bool forceCheckLocal = false) const;
+                           bool forceCheckLocal = false);
     ProgramInfoType DiscoverProgramInfoType(void) const;
 
     // Edit flagging map

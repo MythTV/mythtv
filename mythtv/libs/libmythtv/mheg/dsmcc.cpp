@@ -187,7 +187,7 @@ void Dsmcc::ProcessDownloadServerInitiate(const unsigned char *data,
     ObjCarousel *car = GetCarouselById(carouselId);
 
     // This provides us with a map from component tag to carousel ID.
-    ProfileBodyFull *full = dynamic_cast<ProfileBodyFull*>(gatewayProfile.m_profile_body);
+    auto *full = dynamic_cast<ProfileBodyFull*>(gatewayProfile.m_profile_body);
     if (full)
     {
         LOG(VB_DSMCC, LOG_DEBUG, QString("[dsmcc] DSI ServiceGateway"

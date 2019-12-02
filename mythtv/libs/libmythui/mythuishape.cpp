@@ -149,7 +149,7 @@ bool MythUIShape::ParseElement(
  */
 void MythUIShape::CopyFrom(MythUIType *base)
 {
-    MythUIShape *shape = dynamic_cast<MythUIShape *>(base);
+    auto *shape = dynamic_cast<MythUIShape *>(base);
 
     if (!shape)
     {
@@ -171,6 +171,6 @@ void MythUIShape::CopyFrom(MythUIType *base)
  */
 void MythUIShape::CreateCopy(MythUIType *parent)
 {
-    MythUIShape *shape = new MythUIShape(parent, objectName());
+    auto *shape = new MythUIShape(parent, objectName());
     shape->CopyFrom(this);
 }

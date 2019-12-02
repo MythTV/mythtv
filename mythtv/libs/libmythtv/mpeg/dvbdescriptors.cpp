@@ -66,7 +66,7 @@ QString dvb_decode_text(const unsigned char *src, uint raw_length,
     if (src[0] == 0x11)
     {
         size_t length = (raw_length - 1) / 2;
-        QChar *to = new QChar[length];
+        auto *to = new QChar[length];
         for (size_t i=0; i<length; i++)
             to[i] = (src[1 + i*2] << 8) + src[1 + i*2 + 1];
         QString to2(to, length);
@@ -85,8 +85,7 @@ QString dvb_decode_text(const unsigned char *src, uint raw_length,
 
     // if a override encoding is specified and the default ISO 6937 encoding
     // would be used copy the override encoding in front of the text
-    unsigned char *dst =
-        new unsigned char[raw_length + encoding_override_length];
+    auto *dst = new unsigned char[raw_length + encoding_override_length];
 
     uint length = 0;
     if (encoding_override && src[0] >= 0x20) {
@@ -117,7 +116,7 @@ static QString decode_text(const unsigned char *buf, uint length)
 {
     // Only some of the QTextCodec calls are reentrant.
     // If you use this please verify that you are using a reentrant call.
-    static const QTextCodec *iso8859_codecs[16] =
+    static const QTextCodec *s_iso8859Codecs[16] =
     {
         QTextCodec::codecForName("Latin1"),
         QTextCodec::codecForName("ISO8859-1"),  // Western
@@ -144,7 +143,7 @@ static QString decode_text(const unsigned char *buf, uint length)
     }
     if ((buf[0] >= 0x01) && (buf[0] <= 0x0B))
     {
-        return iso8859_codecs[4 + buf[0]]->toUnicode((char*)(buf + 1), length - 1);
+        return s_iso8859Codecs[4 + buf[0]]->toUnicode((char*)(buf + 1), length - 1);
     }
     if (buf[0] == 0x10)
     {
@@ -156,7 +155,7 @@ static QString decode_text(const unsigned char *buf, uint length)
 
         uint code = buf[1] << 8 | buf[2];
         if (code <= 15)
-            return iso8859_codecs[code]->toUnicode((char*)(buf + 3), length - 3);
+            return s_iso8859Codecs[code]->toUnicode((char*)(buf + 3), length - 3);
         return QString::fromLocal8Bit((char*)(buf + 3), length - 3);
     }
     if (buf[0] == 0x15) // Already Unicode
@@ -189,7 +188,7 @@ QString dvb_decode_short_name(const unsigned char *src, uint raw_length)
         return "";
     }
 
-    unsigned char *dst = new unsigned char[raw_length];
+    auto *dst = new unsigned char[raw_length];
     uint length = 0;
 
     // check for emphasis control codes

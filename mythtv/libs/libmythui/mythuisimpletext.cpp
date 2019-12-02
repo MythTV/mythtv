@@ -44,7 +44,7 @@ void MythUISimpleText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
 
 void MythUISimpleText::CopyFrom(MythUIType *base)
 {
-    MythUISimpleText *text = dynamic_cast<MythUISimpleText *>(base);
+    auto *text = dynamic_cast<MythUISimpleText *>(base);
 
     if (!text)
     {
@@ -61,6 +61,6 @@ void MythUISimpleText::CopyFrom(MythUIType *base)
 
 void MythUISimpleText::CreateCopy(MythUIType *parent)
 {
-    MythUISimpleText *text = new MythUISimpleText(parent, objectName());
+    auto *text = new MythUISimpleText(parent, objectName());
     text->CopyFrom(this);
 }

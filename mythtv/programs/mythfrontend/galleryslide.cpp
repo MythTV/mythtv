@@ -597,7 +597,7 @@ void SlideBuffer::Initialise(MythUIImage &image)
     // Fill buffer with slides cloned from the XML image widget
 
     // Create first as a child of the XML image.
-    Slide *slide = new Slide(nullptr, "slide0", &image);
+    auto *slide = new Slide(nullptr, "slide0", &image);
 
     // Buffer is notified when it has loaded image
     connect(slide, SIGNAL(ImageLoaded(Slide *)),

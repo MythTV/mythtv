@@ -61,7 +61,7 @@ inline vector<MythVideoTexture*> MythEGLDMABUF::CreateComposed(AVDRMFrameDescrip
                                                                VideoFrame *Frame)
 {
     vector<QSize> sizes;
-    sizes.push_back(QSize(Frame->width, Frame->height));
+    sizes.emplace_back(QSize(Frame->width, Frame->height));
     vector<MythVideoTexture*> textures =
             MythVideoTexture::CreateTextures(Context, Frame->codec, FMT_RGBA32, sizes,
                                              m_gltwo ? GL_TEXTURE_EXTERNAL_OES : QOpenGLTexture::Target2D);
@@ -86,19 +86,19 @@ inline vector<MythVideoTexture*> MythEGLDMABUF::CreateComposed(AVDRMFrameDescrip
             break;
     }
 
-    static const EGLint PLANE_FD[4] =
+    static constexpr EGLint kPlaneFd[4] =
         { EGL_DMA_BUF_PLANE0_FD_EXT, EGL_DMA_BUF_PLANE1_FD_EXT,
           EGL_DMA_BUF_PLANE2_FD_EXT, EGL_DMA_BUF_PLANE3_FD_EXT };
-    static const EGLint PLANE_OFFSET[4] =
+    static constexpr EGLint kPlaneOffset[4] =
         { EGL_DMA_BUF_PLANE0_OFFSET_EXT, EGL_DMA_BUF_PLANE1_OFFSET_EXT,
           EGL_DMA_BUF_PLANE2_OFFSET_EXT, EGL_DMA_BUF_PLANE3_OFFSET_EXT };
-    static const EGLint PLANE_PITCH[4] =
+    static constexpr EGLint kPlanePitch[4] =
         { EGL_DMA_BUF_PLANE0_PITCH_EXT, EGL_DMA_BUF_PLANE1_PITCH_EXT,
           EGL_DMA_BUF_PLANE2_PITCH_EXT, EGL_DMA_BUF_PLANE3_PITCH_EXT };
-    static const EGLint PLANE_MODLO[4] =
+    static constexpr EGLint kPlaneModlo[4] =
         { EGL_DMA_BUF_PLANE0_MODIFIER_LO_EXT, EGL_DMA_BUF_PLANE1_MODIFIER_LO_EXT,
           EGL_DMA_BUF_PLANE2_MODIFIER_LO_EXT, EGL_DMA_BUF_PLANE3_MODIFIER_LO_EXT };
-    static const EGLint PLANE_MODHI[4] =
+    static constexpr EGLint kPlaneModhi[4] =
         { EGL_DMA_BUF_PLANE0_MODIFIER_HI_EXT, EGL_DMA_BUF_PLANE1_MODIFIER_HI_EXT,
           EGL_DMA_BUF_PLANE2_MODIFIER_HI_EXT, EGL_DMA_BUF_PLANE3_MODIFIER_HI_EXT };
 
@@ -117,14 +117,14 @@ inline vector<MythVideoTexture*> MythEGLDMABUF::CreateComposed(AVDRMFrameDescrip
     for (int plane = 0; plane < layer->nb_planes; ++plane)
     {
         AVDRMPlaneDescriptor* drmplane = &layer->planes[plane];
-        attribs << PLANE_FD[plane]     << Desc->objects[drmplane->object_index].fd
-                << PLANE_OFFSET[plane] << static_cast<EGLint>(drmplane->offset)
-                << PLANE_PITCH[plane]  << static_cast<EGLint>(drmplane->pitch);
+        attribs << kPlaneFd[plane]     << Desc->objects[drmplane->object_index].fd
+                << kPlaneOffset[plane] << static_cast<EGLint>(drmplane->offset)
+                << kPlanePitch[plane]  << static_cast<EGLint>(drmplane->pitch);
         if (m_useModifiers && (Desc->objects[drmplane->object_index].format_modifier != 0 /* DRM_FORMAT_MOD_NONE*/))
         {
-            attribs << PLANE_MODLO[plane]
+            attribs << kPlaneModlo[plane]
                     << static_cast<EGLint>(Desc->objects[drmplane->object_index].format_modifier & 0xffffffff)
-                    << PLANE_MODHI[plane]
+                    << kPlaneModhi[plane]
                     << static_cast<EGLint>(Desc->objects[drmplane->object_index].format_modifier >> 32);
         }
     }
@@ -154,7 +154,7 @@ inline vector<MythVideoTexture*> MythEGLDMABUF::CreateSeparate(AVDRMFrameDescrip
     {
         int width = Frame->width >> ((plane > 0) ? 1 : 0);
         int height = Frame->height >> ((plane > 0) ? 1 : 0);
-        sizes.push_back(QSize(width, height));
+        sizes.emplace_back(QSize(width, height));
     }
 
     VideoFrameType format = PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->sw_pix_fmt));
@@ -235,9 +235,5 @@ vector<MythVideoTexture*> MythEGLDMABUF::CreateTextures(AVDRMFrameDescriptor* De
     if (numlayers == 1)
         return CreateComposed(Desc, Context, Frame);
     // X layers with one plane each
-    else
-        return CreateSeparate(Desc, Context, Frame);
-
-    LOG(VB_PLAYBACK, LOG_ERR, LOC + "Unknown DRM frame format");
-    return result;
+    return CreateSeparate(Desc, Context, Frame);
 }

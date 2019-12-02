@@ -26,9 +26,9 @@ using namespace std;
 class VideoMetadataImp
 {
   public:
-    typedef VideoMetadata::genre_list genre_list;
-    typedef VideoMetadata::country_list country_list;
-    typedef VideoMetadata::cast_list cast_list;
+    using genre_list = VideoMetadata::genre_list;
+    using country_list = VideoMetadata::country_list;
+    using cast_list = VideoMetadata::cast_list;
 
   public:
     VideoMetadataImp(QString filename, QString sortFilename,
@@ -827,7 +827,7 @@ void VideoMetadataImp::updateGenres()
     VideoGenreMap::getGenreMap().remove(m_id);
 
     // ensure that all genres we have are in the DB
-    genre_list::iterator genre = m_genres.begin();
+    auto genre = m_genres.begin();
     while (genre != m_genres.end())
     {
         if (!genre->second.trimmed().isEmpty())
@@ -848,7 +848,7 @@ void VideoMetadataImp::updateCountries()
     // remove countries for this video
     VideoCountryMap::getCountryMap().remove(m_id);
 
-    country_list::iterator country = m_countries.begin();
+    auto country = m_countries.begin();
     while (country != m_countries.end())
     {
         if (!country->second.trimmed().isEmpty())
@@ -869,7 +869,7 @@ void VideoMetadataImp::updateCast()
     VideoCastMap::getCastMap().remove(m_id);
 
     // ensure that all cast we have are in the DB
-    cast_list::iterator cast = m_cast.begin();
+    auto cast = m_cast.begin();
     while (cast != m_cast.end())
     {
         if (!cast->second.trimmed().isEmpty())

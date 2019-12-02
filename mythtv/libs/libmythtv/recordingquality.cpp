@@ -1,4 +1,6 @@
 #include <algorithm>
+#include <utility>
+
 using namespace std;
 
 #include "recordingquality.h"
@@ -13,8 +15,8 @@ static QDateTime get_start(const RecordingInfo& /*ri*/);
 static QDateTime get_end(const RecordingInfo& /*ri*/);
 
 RecordingQuality::RecordingQuality(const RecordingInfo *ri,
-                                   const RecordingGaps &rg)
-                 : m_recording_gaps(rg)
+                                   RecordingGaps rg)
+                 : m_recording_gaps(std::move(rg))
 {
     if (!ri)
         return;
@@ -29,9 +31,9 @@ RecordingQuality::RecordingQuality(const RecordingInfo *ri,
 }
 
 RecordingQuality::RecordingQuality(
-    const RecordingInfo *ri, const RecordingGaps &rg,
+    const RecordingInfo *ri, RecordingGaps rg,
     const QDateTime &first, const QDateTime &latest) :
-    m_recording_gaps(rg)
+    m_recording_gaps(std::move(rg))
 {
     if (!ri)
         return;

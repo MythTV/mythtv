@@ -75,7 +75,7 @@ namespace
         }
 
       private:
-        typedef std::set<QString> image_ext;
+        using image_ext = std::set<QString>;
         image_ext    m_imageExt;
         DirListType &m_videoFiles;
     };
@@ -257,9 +257,8 @@ void VideoScannerThread::verifyFiles(FileCheckList &files,
                           tr("Verifying video files"));
 
     // For every file we know about, check to see if it still exists.
-    for (VideoMetadataListManager::metadata_list::const_iterator p =
-         m_dbmetadata->getList().begin();
-         p != m_dbmetadata->getList().end(); ++p)
+    for (auto p = m_dbmetadata->getList().cbegin();
+         p != m_dbmetadata->getList().cend(); ++p)
     {
         QString lname = (*p)->GetFilename();
         QString lhost = (*p)->GetHost().toLower();
@@ -312,7 +311,7 @@ bool VideoScannerThread::updateDB(const FileCheckList &add, const PurgeList &rem
         SendProgressEvent(counter, (uint)(add.size() + remove.size()),
                           tr("Updating video database"));
 
-    for (FileCheckList::const_iterator p = add.begin(); p != add.end(); ++p)
+    for (auto p = add.cbegin(); p != add.cend(); ++p)
     {
         // add files not already in the DB
         if (!p->second.check)
@@ -371,8 +370,7 @@ bool VideoScannerThread::updateDB(const FileCheckList &add, const PurgeList &rem
 
     // When prompting is restored, account for the answer here.
     ret += remove.size();
-    for (PurgeList::const_iterator p = remove.begin(); p != remove.end();
-            ++p)
+    for (auto p = remove.cbegin(); p != remove.cend(); ++p)
     {
         if (!m_movList.contains(p->first))
         {
@@ -411,8 +409,7 @@ void VideoScannerThread::SendProgressEvent(uint progress, uint total,
     if (!m_dialog)
         return;
 
-    ProgressUpdateEvent *pue = new ProgressUpdateEvent(progress, total,
-                                                       std::move(messsage));
+    auto *pue = new ProgressUpdateEvent(progress, total, std::move(messsage));
     QApplication::postEvent(m_dialog, pue);
 }
 
@@ -436,8 +433,8 @@ void VideoScanner::doScan(const QStringList &dirs)
     {
         MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-        MythUIProgressDialog *progressDlg = new MythUIProgressDialog("",
-                popupStack, "videoscanprogressdialog");
+        auto *progressDlg = new MythUIProgressDialog("", popupStack,
+                                                     "videoscanprogressdialog");
 
         if (progressDlg->Create())
         {

@@ -119,6 +119,6 @@ void MythUIVideo::CopyFrom(MythUIType *base)
  */
 void MythUIVideo::CreateCopy(MythUIType *parent)
 {
-    MythUIVideo *im = new MythUIVideo(parent, objectName());
+    auto *im = new MythUIVideo(parent, objectName());
     im->CopyFrom(this);
 }

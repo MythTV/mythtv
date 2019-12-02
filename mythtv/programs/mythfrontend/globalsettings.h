@@ -227,9 +227,9 @@ class PlaybackProfileItemConfig : public GroupSetting
                             TransMythUICheckBoxSetting *Shader,
                             TransMythUICheckBoxSetting *Driver,
                             QString &Value);
-    QString GetQuality(TransMythUIComboBoxSetting *Deint,
-                      TransMythUICheckBoxSetting *Shader,
-                      TransMythUICheckBoxSetting *Driver);
+    static QString GetQuality(TransMythUIComboBoxSetting *Deint,
+                              TransMythUICheckBoxSetting *Shader,
+                              TransMythUICheckBoxSetting *Driver);
     void InitLabel(void);
     void DoDeleteSlot(bool);
 

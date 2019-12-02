@@ -38,7 +38,7 @@ class MythUIButton;
 class MythUIImage;
 class MythDialogBox;
 
-typedef enum { kActionsByContext, kKeysByContext, kContextsByKey, } ViewType;
+enum ViewType { kActionsByContext, kKeysByContext, kContextsByKey, };
 
 /**
  *  \class MythControls
@@ -63,12 +63,12 @@ class MythControls : public MythScreenType
     bool Create(void) override; // MythScreenType
     void customEvent(QEvent*) override; // MythUIType
 
-    typedef enum
+    enum ListType
     {
         kContextList,
         kKeyList,
         kActionList
-    } ListType;
+    };
 
     // Gets
     QString GetCurrentContext(void);

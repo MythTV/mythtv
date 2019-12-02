@@ -32,13 +32,13 @@ status = m_vdpGetProcAddress(m_device, FUNC_ID, reinterpret_cast<void **>(&(PROC
 bool MythVDPAUHelper::HaveVDPAU(void)
 {
     QMutexLocker locker(&gVDPAULock);
-    static bool checked = false;
-    if (checked)
+    static bool s_checked = false;
+    if (s_checked)
         return gVDPAUAvailable;
 
     MythVDPAUHelper vdpau;
     gVDPAUAvailable = vdpau.IsValid();
-    checked = true;
+    s_checked = true;
     if (gVDPAUAvailable)
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + "VDPAU is available");
@@ -56,9 +56,9 @@ bool MythVDPAUHelper::HaveMPEG4Decode(void)
     return gVDPAUMPEG4Available;
 }
 
-static void vdpau_preemption_callback(VdpDevice, void* Opaque)
+static void vdpau_preemption_callback(VdpDevice /*unused*/, void* Opaque)
 {
-    MythVDPAUHelper* helper = static_cast<MythVDPAUHelper*>(Opaque);
+    auto* helper = static_cast<MythVDPAUHelper*>(Opaque);
     if (helper)
         helper->SetPreempted();
 }
@@ -81,10 +81,10 @@ MythVDPAUHelper::MythVDPAUHelper(AVVDPAUDeviceContext* Context)
     }
 }
 
-static const char* DummyGetError(VdpStatus)
+static const char* DummyGetError(VdpStatus /*status*/)
 {
-    static const char dummy[] = "Unknown";
-    return &dummy[0];
+    static constexpr char kDummy[] = "Unknown";
+    return &kDummy[0];
 }
 
 MythVDPAUHelper::MythVDPAUHelper(void)
@@ -417,9 +417,9 @@ void MythVDPAUHelper::MixerRender(VdpVideoMixer Mixer, VdpVideoSurface Source,
         VdpVideoSurface past[2]   = { VDP_INVALID_HANDLE, VDP_INVALID_HANDLE };
         VdpVideoSurface future[1] = { VDP_INVALID_HANDLE };
 
-        VdpVideoSurface next    = static_cast<VdpVideoSurface>(reinterpret_cast<uintptr_t>(Frames[0]->data));
-        VdpVideoSurface current = static_cast<VdpVideoSurface>(reinterpret_cast<uintptr_t>(Frames[count > 1 ? 1 : 0]->data));
-        VdpVideoSurface last    = static_cast<VdpVideoSurface>(reinterpret_cast<uintptr_t>(Frames[count > 2 ? 2 : 0]->data));
+        auto next    = static_cast<VdpVideoSurface>(reinterpret_cast<uintptr_t>(Frames[0]->data));
+        auto current = static_cast<VdpVideoSurface>(reinterpret_cast<uintptr_t>(Frames[count > 1 ? 1 : 0]->data));
+        auto last    = static_cast<VdpVideoSurface>(reinterpret_cast<uintptr_t>(Frames[count > 2 ? 2 : 0]->data));
 
         if (field == VDP_VIDEO_MIXER_PICTURE_STRUCTURE_BOTTOM_FIELD)
         {
@@ -478,7 +478,7 @@ bool MythVDPAUHelper::IsFeatureAvailable(uint Feature)
 QSize MythVDPAUHelper::GetSurfaceParameters(VdpVideoSurface Surface, VdpChromaType &Chroma)
 {
     if (!Surface)
-        return QSize();
+        return {};
 
     uint width = 0;
     uint height = 0;
@@ -486,5 +486,5 @@ QSize MythVDPAUHelper::GetSurfaceParameters(VdpVideoSurface Surface, VdpChromaTy
     status = m_vdpVideoSurfaceGetParameters(Surface, &Chroma, &width, &height);
     CHECK_ST
 
-    return QSize(static_cast<int>(width), static_cast<int>(height));
+    return {static_cast<int>(width), static_cast<int>(height)};
 }

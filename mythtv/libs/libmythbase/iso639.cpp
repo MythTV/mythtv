@@ -873,7 +873,7 @@ static int createCode2ToCode3Map(QMap<int, int>& codemap) {
     functionality.
 */
 
-typedef QMap<QString, QString> ISO639ToNameMap;
+using  ISO639ToNameMap = QMap<QString, QString>;
 static ISO639ToNameMap createLanguageMap(void)
 {
     ISO639ToNameMap map;

@@ -77,7 +77,7 @@ bool MythBrowser::Create(void)
     }
 
     // this is the template for all other browser tabs
-    WebPage *page = new WebPage(this, browser);
+    auto *page = new WebPage(this, browser);
 
     m_browserList.append(page);
     page->getBrowser()->SetDefaultSaveDirectory(m_defaultSaveDir);
@@ -142,7 +142,7 @@ void MythBrowser::slotEnterURL(void)
     QString message = tr("Enter URL");
 
 
-    MythTextInputDialog *dialog = new MythTextInputDialog(popupStack, message);
+    auto *dialog = new MythTextInputDialog(popupStack, message);
 
     if (dialog->Create())
        popupStack->AddScreen(dialog);
@@ -154,8 +154,8 @@ void MythBrowser::slotEnterURL(void)
 void MythBrowser::slotAddTab(const QString &url, bool doSwitch)
 {
     QString name = QString("browser%1").arg(m_browserList.size() + 1);
-    WebPage *page = new WebPage(this, m_browserList[0]->getBrowser()->GetArea(),
-                                name.toLatin1().constData());
+    auto *page = new WebPage(this, m_browserList[0]->getBrowser()->GetArea(),
+                             name.toLatin1().constData());
     m_browserList.append(page);
 
     QString newUrl = url;
@@ -259,7 +259,7 @@ void MythBrowser::slotAddBookmark()
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    BookmarkEditor *editor = new BookmarkEditor(&m_editBookmark,
+    auto *editor = new BookmarkEditor(&m_editBookmark,
             true, mainStack, "bookmarkeditor");
 
 

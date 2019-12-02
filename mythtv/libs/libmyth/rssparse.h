@@ -17,12 +17,12 @@
 #include "mythexp.h"
 #include "mythtypes.h"
 
-typedef enum ArticleTypes {
+enum ArticleType {
     VIDEO_FILE = 0,
     VIDEO_PODCAST = 1,
     AUDIO_FILE = 2,
     AUDIO_PODCAST = 3
-} ArticleType;
+};
 
 /** Describes an enclosure associated with an item.
  */
@@ -111,8 +111,8 @@ class MPUBLIC ResultItem
 
   public:
 
-    typedef QList<ResultItem *> resultList;
-    typedef std::vector<ResultItem> List;
+    using resultList = QList<ResultItem *>;
+    using List = std::vector<ResultItem>;
 
     ResultItem(const QString& title, const QString& sortTitle,
               const QString& subtitle, const QString& sortSubtitle,

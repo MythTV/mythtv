@@ -3,8 +3,9 @@
 #include "jitterometer.h"
 
 // Std
-#include <cstdlib>
 #include <cmath>
+#include <cstdlib>
+#include <utility>
 
 #define UNIX_PROC_STAT "/proc/stat"
 #define MAX_CORES 8
@@ -16,8 +17,8 @@
 #include <mach/vm_map.h>
 #endif
 
-Jitterometer::Jitterometer(const QString &nname, int ncycles)
-  : m_num_cycles(ncycles), m_name(nname)
+Jitterometer::Jitterometer(QString nname, int ncycles)
+  : m_num_cycles(ncycles), m_name(std::move(nname))
 {
     m_times.resize(m_num_cycles);
 
@@ -165,9 +166,9 @@ QString Jitterometer::GetCPUStat(void)
         line = m_cpustat->readLine(256);
         while (!line.isEmpty() && cores < MAX_CORES)
         {
-            static const int size = sizeof(unsigned long long) * 9;
+            static constexpr int kSize = sizeof(unsigned long long) * 9;
             unsigned long long stats[9];
-            memset(stats, 0, size);
+            memset(stats, 0, kSize);
             int num = 0;
             if (sscanf(line.constData(),
                        "cpu%30d %30llu %30llu %30llu %30llu %30llu "
@@ -184,7 +185,7 @@ QString Jitterometer::GetCPUStat(void)
                 float total = load + stats[3] - m_laststats[ptr + 3];
                 if (total > 0)
                     result += QString("%1% ").arg(load / total * 100, 0, 'f', 0);
-                memcpy(&m_laststats[ptr], stats, size);
+                memcpy(&m_laststats[ptr], stats, kSize);
             }
             line = m_cpustat->readLine(256);
             cores++;

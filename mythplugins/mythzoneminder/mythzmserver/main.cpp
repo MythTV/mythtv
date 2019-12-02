@@ -351,7 +351,7 @@ int main(int argc, char **argv)
                         }
 
                         // create new ZMServer and add to map
-                        ZMServer *server = new ZMServer(newfd, debug);
+                        auto *server = new ZMServer(newfd, debug);
                         serverList[newfd] = server;
 
                         printf("new connection from %s on socket %d\n",
@@ -396,7 +396,7 @@ int main(int argc, char **argv)
     }
 
     // cleanly remove all the ZMServer's
-    for (std::map<int, ZMServer*>::iterator it = serverList.begin();
+    for (auto it = serverList.begin();
          it != serverList.end(); ++it)
     {
         delete it->second;

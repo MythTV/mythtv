@@ -600,7 +600,7 @@ void ProgramRecPriority::showMenu(void)
     QString label = tr("Options");
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythDialogBox *menuPopup = new MythDialogBox(label, popupStack, "menuPopup");
+    auto *menuPopup = new MythDialogBox(label, popupStack, "menuPopup");
 
     if (menuPopup->Create())
     {
@@ -628,7 +628,7 @@ void ProgramRecPriority::showSortMenu(void)
     QString label = tr("Sort Options");
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythDialogBox *menuPopup = new MythDialogBox(label, popupStack, "menuPopup");
+    auto *menuPopup = new MythDialogBox(label, popupStack, "menuPopup");
 
     if (menuPopup->Create())
     {
@@ -655,7 +655,7 @@ void ProgramRecPriority::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
+        auto *dce = (DialogCompletionEvent*)(event);
 
         QString resultid   = dce->GetId();
         QString resulttext = dce->GetResultText();
@@ -698,9 +698,8 @@ void ProgramRecPriority::customEvent(QEvent *event)
             {
                 MythScreenStack *popupStack =
                     GetMythMainWindow()->GetStack("popup stack");
-                MythTextInputDialog *textInput =
-                    new MythTextInputDialog(popupStack,
-                                            tr("Template Name"));
+                auto *textInput = new MythTextInputDialog(popupStack,
+                                                          tr("Template Name"));
                 if (textInput->Create())
                 {
                     textInput->SetReturnEvent(this, "templatecat");
@@ -797,8 +796,7 @@ void ProgramRecPriority::customEvent(QEvent *event)
         }
         else if (resultid == "deleterule")
         {
-            RecordingRule *record =
-                dce->GetData().value<RecordingRule *>();
+            auto *record = dce->GetData().value<RecordingRule *>();
             if (record)
             {
                 if (buttonnum > 0)
@@ -829,19 +827,17 @@ void ProgramRecPriority::edit(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    ProgramRecPriorityInfo *pgRecInfo =
-                        item->GetData().value<ProgramRecPriorityInfo*>();
-
+    auto *pgRecInfo = item->GetData().value<ProgramRecPriorityInfo*>();
     if (!pgRecInfo)
         return;
 
-    RecordingRule *record = new RecordingRule();
+    auto *record = new RecordingRule();
     record->m_recordID = pgRecInfo->GetRecordingRuleID();
     if (record->m_searchType == kNoSearch)
         record->LoadByProgram(pgRecInfo);
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    ScheduleEditor *schededit = new ScheduleEditor(mainStack, record);
+    auto *schededit = new ScheduleEditor(mainStack, record);
     if (schededit->Create())
     {
         mainStack->AddScreen(schededit);
@@ -873,13 +869,13 @@ void ProgramRecPriority::newTemplate(QString category)
         }
     }
 
-    RecordingRule *record = new RecordingRule();
+    auto *record = new RecordingRule();
     if (!record)
         return;
     record->MakeTemplate(category);
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    ScheduleEditor *schededit = new ScheduleEditor(mainStack, record);
+    auto *schededit = new ScheduleEditor(mainStack, record);
     if (schededit->Create())
     {
         mainStack->AddScreen(schededit);
@@ -972,9 +968,7 @@ void ProgramRecPriority::remove(void)
     if (!item)
         return;
 
-    ProgramRecPriorityInfo *pgRecInfo =
-                        item->GetData().value<ProgramRecPriorityInfo*>();
-
+    auto *pgRecInfo = item->GetData().value<ProgramRecPriorityInfo*>();
     if (!pgRecInfo ||
         (pgRecInfo->m_recType == kTemplateRecord &&
          pgRecInfo->GetCategory()
@@ -983,7 +977,7 @@ void ProgramRecPriority::remove(void)
         return;
     }
 
-    RecordingRule *record = new RecordingRule();
+    auto *record = new RecordingRule();
     record->m_recordID = pgRecInfo->GetRecordingRuleID();
     if (!record->Load())
     {
@@ -996,9 +990,7 @@ void ProgramRecPriority::remove(void)
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    MythConfirmationDialog *okPopup = new MythConfirmationDialog(popupStack,
-                                                                message, true);
-
+    auto *okPopup = new MythConfirmationDialog(popupStack, message, true);
     okPopup->SetReturnEvent(this, "deleterule");
     okPopup->SetData(qVariantFromValue(record));
 
@@ -1014,9 +1006,7 @@ void ProgramRecPriority::deactivate(void)
     if (!item)
         return;
 
-    ProgramRecPriorityInfo *pgRecInfo =
-                        item->GetData().value<ProgramRecPriorityInfo*>();
-
+    auto *pgRecInfo = item->GetData().value<ProgramRecPriorityInfo*>();
     if (pgRecInfo)
     {
         MSqlQuery query(MSqlQuery::InitCon());
@@ -1069,9 +1059,7 @@ void ProgramRecPriority::changeRecPriority(int howMuch)
     if (!item)
         return;
 
-    ProgramRecPriorityInfo *pgRecInfo =
-                        item->GetData().value<ProgramRecPriorityInfo*>();
-
+    auto *pgRecInfo = item->GetData().value<ProgramRecPriorityInfo*>();
     if (!pgRecInfo)
         return;
 
@@ -1130,7 +1118,7 @@ void ProgramRecPriority::FillList(void)
 
     RemoteGetAllScheduledRecordings(recordinglist);
 
-    vector<ProgramInfo *>::iterator pgiter = recordinglist.begin();
+    auto pgiter = recordinglist.begin();
 
     for (; pgiter != recordinglist.end(); ++pgiter)
     {
@@ -1308,9 +1296,8 @@ void ProgramRecPriority::UpdateList()
     {
         ProgramRecPriorityInfo *progInfo = *it;
 
-        MythUIButtonListItem *item =
-               new MythUIButtonListItem(m_programList, "",
-                                                qVariantFromValue(progInfo));
+        auto *item = new MythUIButtonListItem(m_programList, "",
+                                              qVariantFromValue(progInfo));
 
         int progRecPriority = progInfo->GetRecordingPriority();
 
@@ -1430,8 +1417,7 @@ void ProgramRecPriority::updateInfo(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    ProgramRecPriorityInfo *pgRecInfo = item->GetData()
-                                .value<ProgramRecPriorityInfo *>();
+    auto *pgRecInfo = item->GetData().value<ProgramRecPriorityInfo *>();
 
     if (!pgRecInfo)
         return;
@@ -1540,8 +1526,7 @@ void ProgramRecPriority::RemoveItemFromList(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    ProgramRecPriorityInfo *pgRecInfo = item->GetData()
-                                  .value<ProgramRecPriorityInfo *>();
+    auto *pgRecInfo = item->GetData().value<ProgramRecPriorityInfo *>();
 
     if (!pgRecInfo)
         return;

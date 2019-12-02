@@ -84,8 +84,8 @@ class ImageProperties
     QString m_maskImageFilename;
 };
 
-typedef QPair<MythImage *, int> AnimationFrame;
-typedef QVector<AnimationFrame> AnimationFrames;
+using AnimationFrame = QPair<MythImage *, int>;
+using AnimationFrames = QVector<AnimationFrame>;
 
 /**
  * \class MythUIImage

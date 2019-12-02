@@ -26,11 +26,11 @@ namespace
 class SingleValueImp
 {
   public:
-    typedef SingleValue::entry entry;
-    typedef std::vector<entry> entry_list;
+    using entry = SingleValue::entry;
+    using entry_list = std::vector<entry>;
 
   private:
-    typedef std::map<int, QString> entry_map;
+    using entry_map = std::map<int, QString>;
 
   public:
     SingleValueImp(QString table_name, QString id_name, QString value_name)
@@ -97,7 +97,7 @@ class SingleValueImp
 
     void remove(int id)
     {
-        entry_map::iterator p = m_entries.find(id);
+        auto p = m_entries.find(id);
         if (p != m_entries.end())
         {
             MSqlQuery query(MSqlQuery::InitCon());
@@ -164,8 +164,7 @@ class SingleValueImp
   private:
     entry_map::iterator find(const QString &name)
     {
-        for (entry_map::iterator p = m_entries.begin();
-             p != m_entries.end(); ++p)
+        for (auto p = m_entries.begin(); p != m_entries.end(); ++p)
         {
             if (p->second == name)
                 return p;
@@ -253,10 +252,10 @@ void SingleValue::load_data()
 class MultiValueImp
 {
   public:
-    typedef MultiValue::entry entry;
+    using entry = MultiValue::entry;
 
   private:
-    typedef std::map<int, entry> id_map;
+    using id_map = std::map<int, entry>;
 
   public:
     MultiValueImp(QString table_name, QString id_name,
@@ -291,12 +290,11 @@ class MultiValueImp
     int add(int id, int value)
     {
         bool db_insert = false;
-        id_map::iterator p = m_valMap.find(id);
+        auto p = m_valMap.find(id);
         if (p != m_valMap.end())
         {
             entry::values_type &va = p->second.values;
-            entry::values_type::iterator v =
-                    std::find(va.begin(), va.end(), value);
+            auto v = std::find(va.begin(), va.end(), value);
             if (v == va.end())
             {
                 va.push_back(value);
@@ -327,7 +325,7 @@ class MultiValueImp
 
     bool get(int id, entry &values)
     {
-        id_map::iterator p = m_valMap.find(id);
+        auto p = m_valMap.find(id);
         if (p != m_valMap.end())
         {
             values = p->second;
@@ -338,12 +336,11 @@ class MultiValueImp
 
     void remove(int id, int value)
     {
-        id_map::iterator p = m_valMap.find(id);
+        auto p = m_valMap.find(id);
         if (p != m_valMap.end())
         {
-            entry::values_type::iterator vp =
-                    std::find(p->second.values.begin(), p->second.values.end(),
-                              value);
+            auto vp = std::find(p->second.values.begin(),
+                                p->second.values.end(), value);
             if (vp != p->second.values.end())
             {
                 MSqlQuery query(MSqlQuery::InitCon());
@@ -364,7 +361,7 @@ class MultiValueImp
 
     void remove(int id)
     {
-        id_map::iterator p = m_valMap.find(id);
+        auto p = m_valMap.find(id);
         if (p != m_valMap.end())
         {
             MSqlQuery query(MSqlQuery::InitCon());
@@ -382,10 +379,10 @@ class MultiValueImp
 
     bool exists(int id, int value)
     {
-        id_map::iterator p = m_valMap.find(id);
+        auto p = m_valMap.find(id);
         if (p != m_valMap.end())
         {
-            entry::values_type::iterator vp =
+            auto vp =
                     std::find(p->second.values.begin(), p->second.values.end(),
                               value);
             return vp != p->second.values.end();
@@ -407,7 +404,7 @@ class MultiValueImp
 
         if (query.exec(m_fillSql) && query.size() > 0)
         {
-            id_map::iterator p = m_valMap.end();
+            auto p = m_valMap.end();
             while (query.next())
             {
                 int id = query.value(0).toInt();
@@ -586,9 +583,9 @@ VideoCastMap &VideoCastMap::getCastMap()
 class FileAssociationsImp
 {
   public:
-    typedef FileAssociations::file_association file_association;
-    typedef FileAssociations::association_list association_list;
-    typedef FileAssociations::ext_ignore_list ext_ignore_list;
+    using file_association = FileAssociations::file_association;
+    using association_list = FileAssociations::association_list;
+    using ext_ignore_list = FileAssociations::ext_ignore_list;
 
   public:
     FileAssociationsImp() = default;
@@ -600,7 +597,7 @@ class FileAssociationsImp
         file_association *existing_fa = nullptr;
         MSqlQuery query(MSqlQuery::InitCon());
 
-        association_list::iterator p = find(ret_fa.extension);
+        auto p = find(ret_fa.extension);
         if (p != m_fileAssociations.end())
         {
             ret_fa.id = p->id;
@@ -645,7 +642,7 @@ class FileAssociationsImp
 
     bool get(unsigned int id, file_association &val) const
     {
-        association_list::const_iterator p = find(id);
+        auto p = cfind(id);
         if (p != m_fileAssociations.end())
         {
             val = *p;
@@ -656,7 +653,7 @@ class FileAssociationsImp
 
     bool get(const QString &ext, file_association &val) const
     {
-        association_list::const_iterator p = find(ext);
+        auto p = cfind(ext);
         if (p != m_fileAssociations.end())
         {
             val = *p;
@@ -667,7 +664,7 @@ class FileAssociationsImp
 
     bool remove(unsigned int id)
     {
-        association_list::iterator p = find(id);
+        auto p = find(id);
         if (p != m_fileAssociations.end())
         {
             MSqlQuery query(MSqlQuery::InitCon());
@@ -689,8 +686,8 @@ class FileAssociationsImp
 
     void getExtensionIgnoreList(ext_ignore_list &ext_ignore) const
     {
-        for (association_list::const_iterator p = m_fileAssociations.begin();
-             p != m_fileAssociations.end(); ++p)
+        for (auto p = m_fileAssociations.cbegin();
+             p != m_fileAssociations.cend(); ++p)
         {
             ext_ignore.push_back(std::make_pair(p->extension, p->ignore));
         }
@@ -735,7 +732,7 @@ class FileAssociationsImp
 
     association_list::iterator find(const QString &ext)
     {
-        for (association_list::iterator p = m_fileAssociations.begin();
+        for (auto p = m_fileAssociations.begin();
              p != m_fileAssociations.end(); ++p)
         {
             if (p->extension.length() == ext.length() &&
@@ -749,7 +746,7 @@ class FileAssociationsImp
 
     association_list::iterator find(unsigned int id)
     {
-        for (association_list::iterator p = m_fileAssociations.begin();
+        for (auto p = m_fileAssociations.begin();
              p != m_fileAssociations.end(); ++p)
         {
             if (p->id == id) return p;
@@ -757,10 +754,10 @@ class FileAssociationsImp
         return m_fileAssociations.end();
     }
 
-    association_list::const_iterator find(const QString &ext) const
+    association_list::const_iterator cfind(const QString &ext) const
     {
-        for (association_list::const_iterator p = m_fileAssociations.begin();
-             p != m_fileAssociations.end(); ++p)
+        for (auto p = m_fileAssociations.cbegin();
+             p != m_fileAssociations.cend(); ++p)
         {
             if (p->extension.length() == ext.length() &&
                 ext.indexOf(p->extension) == 0)
@@ -768,17 +765,17 @@ class FileAssociationsImp
                 return p;
             }
         }
-        return m_fileAssociations.end();
+        return m_fileAssociations.cend();
     }
 
-    association_list::const_iterator find(unsigned int id) const
+    association_list::const_iterator cfind(unsigned int id) const
     {
-        for (association_list::const_iterator p = m_fileAssociations.begin();
-             p != m_fileAssociations.end(); ++p)
+        for (auto p = m_fileAssociations.cbegin();
+             p != m_fileAssociations.cend(); ++p)
         {
             if (p->id == id) return p;
         }
-        return m_fileAssociations.end();
+        return m_fileAssociations.cend();
     }
 
   private:

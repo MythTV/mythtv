@@ -21,12 +21,12 @@ class MythUIButtonList;
 class MythUICheckBox;
 class MythDialogBox;
 
-typedef struct
+struct TrackInfo
 {
     MusicMetadata *metadata;
     bool           isNewTune;
     bool           metadataHasChanged;
-} TrackInfo;
+};
 
 class FileScannerThread: public MThread
 {

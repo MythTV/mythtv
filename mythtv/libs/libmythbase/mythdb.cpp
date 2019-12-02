@@ -60,7 +60,7 @@ struct SingleSetting
     QString m_host;
 };
 
-typedef QHash<QString,QString> SettingsMap;
+using SettingsMap = QHash<QString,QString>;
 
 class MythDBPrivate
 {
@@ -434,7 +434,7 @@ QString MythDB::GetSetting(const QString &_key, const QString &defaultval)
 bool MythDB::GetSettings(QMap<QString,QString> &_key_value_pairs)
 {
     QMap<QString,bool> done;
-    typedef QMap<QString,QString>::iterator KVIt;
+    using KVIt = QMap<QString,QString>::iterator;
     KVIt kvit = _key_value_pairs.begin();
     for (; kvit != _key_value_pairs.end(); ++kvit)
         done[kvit.key().toLower()] = false;

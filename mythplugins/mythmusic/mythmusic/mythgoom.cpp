@@ -107,7 +107,7 @@ bool Goom::draw(QPainter *p, const QColor &back)
         height /= m_scaleh;
     }
 
-    QImage *image = new QImage((uchar*) m_buffer, width, height, width * 4, QImage::Format_RGB32);
+    auto *image = new QImage((uchar*) m_buffer, width, height, width * 4, QImage::Format_RGB32);
 
     p->drawImage(QRect(0, 0, m_size.width(), m_size.height()), *image);
 

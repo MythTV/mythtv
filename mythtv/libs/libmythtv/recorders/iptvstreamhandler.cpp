@@ -43,7 +43,7 @@ IPTVStreamHandler *IPTVStreamHandler::Get(const IPTVTuningData &tuning,
 
     if (it == s_iptvhandlers.end())
     {
-        IPTVStreamHandler *newhandler = new IPTVStreamHandler(tuning, inputid);
+        auto *newhandler = new IPTVStreamHandler(tuning, inputid);
         newhandler->Start();
         s_iptvhandlers[devkey] = newhandler;
         s_iptvhandlers_refcnt[devkey] = 1;

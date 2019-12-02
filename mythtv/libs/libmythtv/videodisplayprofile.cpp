@@ -53,14 +53,14 @@ uint ProfileItem::GetPriority(void) const
 // If string is blank then assumes a match.
 // If value is 0 or negative assume a match (i.e. value unknown assumes a match)
 // float values must be no more than 3 decimals.
-bool ProfileItem::CheckRange(const QString Key, float Value, bool *Ok) const
+bool ProfileItem::CheckRange(const QString &Key, float Value, bool *Ok) const
 {
-    return CheckRange(std::move(Key), Value, 0, true, Ok);
+    return CheckRange(Key, Value, 0, true, Ok);
 }
 
-bool ProfileItem::CheckRange(const QString Key, int Value, bool *Ok) const
+bool ProfileItem::CheckRange(const QString &Key, int Value, bool *Ok) const
 {
-    return CheckRange(std::move(Key), 0.0, Value, false, Ok);
+    return CheckRange(Key, 0.0, Value, false, Ok);
 }
 
 bool ProfileItem::CheckRange(const QString& Key,
@@ -361,7 +361,7 @@ void VideoDisplayProfile::SetInput(const QSize &Size, float Framerate, const QSt
         m_lastSize = Size;
         change = true;
     }
-    if (Framerate > 0.0F && !qFuzzyCompare(Framerate + 1.0f, m_lastRate + 1.0f))
+    if (Framerate > 0.0F && !qFuzzyCompare(Framerate + 1.0F, m_lastRate + 1.0F))
     {
         m_lastRate = Framerate;
         change = true;
@@ -378,7 +378,7 @@ void VideoDisplayProfile::SetInput(const QSize &Size, float Framerate, const QSt
 void VideoDisplayProfile::SetOutput(float Framerate)
 {
     QMutexLocker locker(&m_lock);
-    if (!qFuzzyCompare(Framerate + 1.0f, m_lastRate + 1.0f))
+    if (!qFuzzyCompare(Framerate + 1.0F, m_lastRate + 1.0F))
     {
         m_lastRate = Framerate;
         LoadBestPreferences(m_lastSize, m_lastRate, m_lastCodecName);
@@ -514,7 +514,7 @@ void VideoDisplayProfile::LoadBestPreferences
         .arg(static_cast<double>(Framerate), 0, 'f', 3).arg(CodecName));
 
     m_currentPreferences.clear();
-    vector<ProfileItem>::const_iterator it = FindMatch(Size, Framerate, CodecName);
+    auto it = FindMatch(Size, Framerate, CodecName);
     if (it != m_allowedPreferences.end())
         m_currentPreferences = (*it).GetAll();
 
@@ -592,8 +592,8 @@ bool VideoDisplayProfile::DeleteDB(uint GroupId, const vector<ProfileItem> &Item
         "      profileid      = :PROFILEID");
 
     bool ok = true;
-    vector<ProfileItem>::const_iterator it = Items.begin();
-    for (; it != Items.end(); ++it)
+    auto it = Items.cbegin();
+    for (; it != Items.cend(); ++it)
     {
         if (!(*it).GetProfileID())
             continue;
@@ -637,7 +637,7 @@ bool VideoDisplayProfile::SaveDB(uint GroupId, vector<ProfileItem> &Items)
         "      value          = :VALUE");
 
     bool ok = true;
-    vector<ProfileItem>::iterator it = Items.begin();
+    auto it = Items.begin();
     for (; it != Items.end(); ++it)
     {
         QMap<QString,QString> list = (*it).GetAll();

@@ -9,7 +9,7 @@
 
 #include "mythbaseexp.h"
 
-typedef enum {
+enum MythMediaStatus {
     MEDIASTAT_ERROR,        ///< Unable to mount, but could be usable
     MEDIASTAT_UNKNOWN,
     MEDIASTAT_UNPLUGGED,
@@ -19,9 +19,9 @@ typedef enum {
     MEDIASTAT_USEABLE,
     MEDIASTAT_NOTMOUNTED,
     MEDIASTAT_MOUNTED
-} MythMediaStatus;
+};
 
-typedef enum {
+enum MythMediaType {
     MEDIATYPE_UNKNOWN  = 0x0001,
     MEDIATYPE_DATA     = 0x0002,
     MEDIATYPE_MIXED    = 0x0004,
@@ -33,17 +33,17 @@ typedef enum {
     MEDIATYPE_MGALLERY = 0x0100,
     MEDIATYPE_BD       = 0x0200,
     MEDIATYPE_END      = 0x0400,
-} MythMediaType;
+};
 // MediaType conflicts with a definition within OSX Quicktime Libraries.
 
-typedef enum {
+enum MythMediaError {
     MEDIAERR_OK,
     MEDIAERR_FAILED,
     MEDIAERR_UNSUPPORTED
-} MythMediaError;
+};
 
-typedef QMap<QString,uint> ext_cnt_t;
-typedef QMap<QString,uint> ext_to_media_t;
+using ext_cnt_t = QMap<QString,uint>;
+using ext_to_media_t = QMap<QString,uint>;
 
 class MBASE_PUBLIC MythMediaDevice : public QObject
 {

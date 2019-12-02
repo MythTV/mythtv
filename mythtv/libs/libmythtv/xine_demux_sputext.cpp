@@ -142,8 +142,8 @@ static char *read_line_from_input(demux_sputext_t *demuxstr, char *line, off_t l
 
 static subtitle_t *sub_read_line_sami(demux_sputext_t *demuxstr, subtitle_t *current) {
 
-  static char line[LINE_LEN + 1];
-  static char *s = nullptr;
+  static char s_line[LINE_LEN + 1];
+  static char *s_s = nullptr;
   char text[LINE_LEN + 1], *p, *q;
   int state;
 
@@ -153,44 +153,44 @@ static subtitle_t *sub_read_line_sami(demux_sputext_t *demuxstr, subtitle_t *cur
   state = 0;
 
   /* read the first line */
-  if (!s)
-    if (!(s = read_line_from_input(demuxstr, line, LINE_LEN))) return nullptr;
+  if (!s_s)
+    if (!(s_s = read_line_from_input(demuxstr, s_line, LINE_LEN))) return nullptr;
 
   do {
     switch (state) {
 
     case 0: /* find "START=" */
-      s = strstr (s, "Start=");
-      if (s) {
-        current->start = strtol (s + 6, &s, 0) / 10;
+      s_s = strstr (s_s, "Start=");
+      if (s_s) {
+        current->start = strtol (s_s + 6, &s_s, 0) / 10;
         state = 1; continue;
       }
       break;
 
     case 1: /* find "<P" */
-      if ((s = strstr (s, "<P"))) { s += 2; state = 2; continue; }
+      if ((s_s = strstr (s_s, "<P"))) { s_s += 2; state = 2; continue; }
       break;
 
     case 2: /* find ">" */
-      if ((s = strchr (s, '>'))) { s++; state = 3; p = text; continue; }
+      if ((s_s = strchr (s_s, '>'))) { s_s++; state = 3; p = text; continue; }
       break;
 
     case 3: /* get all text until '<' appears */
-      if (*s == '\0') { break; }
-      else if (*s == '<') { state = 4; }
-      else if (strncasecmp (s, "&nbsp;", 6) == 0) { *p++ = ' '; s += 6; }
-      else if (*s == '\r') { s++; }
-      else if (strncasecmp (s, "<br>", 4) == 0 || *s == '\n') {
+      if (*s_s == '\0') { break; }
+      else if (*s_s == '<') { state = 4; }
+      else if (strncasecmp (s_s, "&nbsp;", 6) == 0) { *p++ = ' '; s_s += 6; }
+      else if (*s_s == '\r') { s_s++; }
+      else if (strncasecmp (s_s, "<br>", 4) == 0 || *s_s == '\n') {
         *p = '\0'; p = text; trail_space (text);
         if (text[0] != '\0')
           current->text[current->lines++] = strdup (text);
-        if (*s == '\n') s++; else s += 4;
+        if (*s_s == '\n') s_s++; else s_s += 4;
       }
-      else *p++ = *s++;
+      else *p++ = *s_s++;
       continue;
 
     case 4: /* get current->end or skip <TAG> */
-      q = strstr (s, "Start=");
+      q = strstr (s_s, "Start=");
       if (q) {
         current->end = strtol (q + 6, &q, 0) / 10 - 1;
         *p = '\0'; trail_space (text);
@@ -199,13 +199,13 @@ static subtitle_t *sub_read_line_sami(demux_sputext_t *demuxstr, subtitle_t *cur
         if (current->lines > 0) { state = 99; break; }
         state = 0; continue;
       }
-      s = strchr (s, '>');
-      if (s) { s++; state = 3; continue; }
+      s_s = strchr (s_s, '>');
+      if (s_s) { s_s++; state = 3; continue; }
       break;
     }
 
     /* read next line */
-    if (state != 99 && !(s = read_line_from_input (demuxstr, line, LINE_LEN)))
+    if (state != 99 && !(s_s = read_line_from_input (demuxstr, s_line, LINE_LEN)))
       return nullptr;
 
   } while (state != 99);
@@ -510,7 +510,7 @@ static subtitle_t *sub_read_line_rt(demux_sputext_t *demuxstr,subtitle_t *curren
 
 static subtitle_t *sub_read_line_ssa(demux_sputext_t *demuxstr,subtitle_t *current) {
   int comma;
-  static int max_comma = 32; /* let's use 32 for the case that the */
+  static int s_maxComma = 32; /* let's use 32 for the case that the */
   /*  amount of commas increase with newer SSA versions */
 
   int hour1, min1, sec1, hunsec1, hour2, min2, sec2, hunsec2, nothing;
@@ -536,7 +536,7 @@ static subtitle_t *sub_read_line_ssa(demux_sputext_t *demuxstr,subtitle_t *curre
   if (!line2)
     return nullptr;
 
-  for (comma = 4; comma < max_comma; comma ++)
+  for (comma = 4; comma < s_maxComma; comma ++)
     {
       tmp = line2;
       if(!(tmp=strchr(++tmp, ','))) break;
@@ -545,7 +545,7 @@ static subtitle_t *sub_read_line_ssa(demux_sputext_t *demuxstr,subtitle_t *curre
       line2 = tmp;
     }
 
-  if(comma < max_comma)max_comma = comma;
+  if(comma < s_maxComma)s_maxComma = comma;
   /* eliminate the trailing comma */
   if(*line2 == ',') line2++;
 
@@ -700,8 +700,8 @@ static subtitle_t *sub_read_line_aqt (demux_sputext_t *demuxstr, subtitle_t *cur
 static subtitle_t *sub_read_line_jacobsub(demux_sputext_t *demuxstr, subtitle_t *current) {
     char line1[LINE_LEN+1], line2[LINE_LEN+1], directive[LINE_LEN+1], *p, *q;
     unsigned a1, a2, a3, a4, b1, b2, b3, b4, comment = 0;
-    static unsigned jacoTimeres = 30;
-    static int jacoShift = 0;
+    static unsigned s_jacoTimeRes = 30;
+    static int s_jacoShift = 0;
 
     memset(current, 0, sizeof(subtitle_t));
     memset(line1, 0, LINE_LEN+1);
@@ -717,7 +717,7 @@ static subtitle_t *sub_read_line_jacobsub(demux_sputext_t *demuxstr, subtitle_t 
             if (sscanf(line1, "@%u @%u %" LINE_LEN_QUOT "[^\n\r]", &a4, &b4, line2) < 3) {
                 if (line1[0] == '#') {
                     int hours = 0, minutes = 0, seconds, delta;
-                    unsigned units = jacoShift;
+                    unsigned units = s_jacoShift;
                     int inverter = 1;
                     switch (toupper(line1[1])) {
                     case 'S':
@@ -749,9 +749,9 @@ static subtitle_t *sub_read_line_jacobsub(demux_sputext_t *demuxstr, subtitle_t 
                                        &units);
                                 seconds *= inverter;
                             }
-                            jacoShift =
+                            s_jacoShift =
                                 ((hours * 3600 + minutes * 60 +
-                                  seconds) * jacoTimeres +
+                                  seconds) * s_jacoTimeRes +
                                  units) * inverter;
                         }
                         break;
@@ -761,27 +761,27 @@ static subtitle_t *sub_read_line_jacobsub(demux_sputext_t *demuxstr, subtitle_t 
                         } else {
                             delta = 2;
                         }
-                        sscanf(&line1[delta], "%u", &jacoTimeres);
+                        sscanf(&line1[delta], "%u", &s_jacoTimeRes);
                         break;
                     }
                 }
                 continue;
             }
             current->start =
-                (unsigned long) ((a4 + jacoShift) * 100.0 /
-                                 jacoTimeres);
+                (unsigned long) ((a4 + s_jacoShift) * 100.0 /
+                                 s_jacoTimeRes);
             current->end =
-                (unsigned long) ((b4 + jacoShift) * 100.0 /
-                                 jacoTimeres);
+                (unsigned long) ((b4 + s_jacoShift) * 100.0 /
+                                 s_jacoTimeRes);
         } else {
             current->start =
                 (unsigned
-                 long) (((a1 * 3600 + a2 * 60 + a3) * jacoTimeres + a4 +
-                         jacoShift) * 100.0 / jacoTimeres);
+                 long) (((a1 * 3600 + a2 * 60 + a3) * s_jacoTimeRes + a4 +
+                         s_jacoShift) * 100.0 / s_jacoTimeRes);
             current->end =
                 (unsigned
-                 long) (((b1 * 3600 + b2 * 60 + b3) * jacoTimeres + b4 +
-                         jacoShift) * 100.0 / jacoTimeres);
+                 long) (((b1 * 3600 + b2 * 60 + b3) * s_jacoTimeRes + b4 +
+                         s_jacoShift) * 100.0 / s_jacoTimeRes);
         }
         current->lines = 0;
         p = line2;
@@ -1145,7 +1145,7 @@ subtitle_t *sub_read_file (demux_sputext_t *demuxstr) {
 
     if(demuxstr->num>=n_max){
       n_max+=16;
-      subtitle_t *new_first=(subtitle_t *)realloc(first,n_max*sizeof(subtitle_t));
+      auto *new_first=(subtitle_t *)realloc(first,n_max*sizeof(subtitle_t));
       if (new_first == nullptr) {
           free(first);
           return nullptr;

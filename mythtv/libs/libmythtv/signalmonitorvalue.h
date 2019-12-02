@@ -15,9 +15,9 @@ class SignalMonitorValue
 {
     Q_DECLARE_TR_FUNCTIONS(SignalMonitorValue)
 
-    typedef vector<SignalMonitorValue> SignalMonitorList;
+    using SignalMonitorList = vector<SignalMonitorValue>;
   public:
-    SignalMonitorValue(const QString& _name, const QString& _noSpaceName,
+    SignalMonitorValue(QString _name, QString _noSpaceName,
                        int _threshold, bool _high_threshold,
                        int _min, int _max, int _timeout);
     virtual ~SignalMonitorValue() { ; } /* forces class to have vtable */
@@ -130,7 +130,7 @@ class SignalMonitorValue
     }
   private:
     SignalMonitorValue() = default;
-    SignalMonitorValue(const QString& _name, const QString& _noSpaceName,
+    SignalMonitorValue(QString  _name, QString  _noSpaceName,
                        int _value, int _threshold, bool _high_threshold,
                        int _min, int _max, int _timeout, bool _set);
     bool Set(const QString& _name, const QString& _longString);
@@ -146,6 +146,6 @@ class SignalMonitorValue
     bool    m_set           {false}; // false until value initially set
 };
 
-typedef vector<SignalMonitorValue> SignalMonitorList;
+using SignalMonitorList = vector<SignalMonitorValue>;
 
 #endif // SIGNALMONITORVALUES_H

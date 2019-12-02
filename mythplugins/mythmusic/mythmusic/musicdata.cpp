@@ -47,7 +47,7 @@ MusicData::~MusicData(void)
 void MusicData::scanMusic (void)
 {
     QStringList strList("SCAN_MUSIC");
-    SendStringListThread *thread = new SendStringListThread(strList);
+    auto *thread = new SendStringListThread(strList);
     MThreadPool::globalInstance()->start(thread, "Send SCAN_MUSIC");
 
     LOG(VB_GENERAL, LOG_INFO, "Requested a music file scan");
@@ -62,8 +62,7 @@ void MusicData::reloadMusic(void)
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
     QString message = tr("Rebuilding music tree");
 
-    MythUIBusyDialog *busy = new MythUIBusyDialog(message, popupStack,
-                                                  "musicscanbusydialog");
+    auto *busy = new MythUIBusyDialog(message, popupStack, "musicscanbusydialog");
 
     if (busy->Create())
         popupStack->AddScreen(busy, false);
@@ -106,8 +105,7 @@ void MusicData::loadMusic(void)
     QString message = qApp->translate("(MythMusicMain)",
                                       "Loading Music. Please wait ...");
 
-    MythUIBusyDialog *busy = new MythUIBusyDialog(message, popupStack,
-                                                  "musicscanbusydialog");
+    auto *busy = new MythUIBusyDialog(message, popupStack, "musicscanbusydialog");
     if (busy->Create())
         popupStack->AddScreen(busy, false);
     else
@@ -116,10 +114,10 @@ void MusicData::loadMusic(void)
     // Set the various track formatting modes
     MusicMetadata::setArtistAndTrackFormats();
 
-    AllMusic *all_music = new AllMusic();
+    auto *all_music = new AllMusic();
 
     //  Load all playlists into RAM (once!)
-    PlaylistContainer *all_playlists = new PlaylistContainer(all_music);
+    auto *all_playlists = new PlaylistContainer(all_music);
 
     gMusicData->m_all_music = all_music;
     gMusicData->m_all_streams = new AllStream();

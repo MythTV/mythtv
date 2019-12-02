@@ -55,9 +55,9 @@ int Vaapi2Context::FilteredReceiveFrame(AVCodecContext *ctx, AVFrame *frame)
 
     while (true)
     {
-        if (filter_graph)
+        if (m_filterGraph)
         {
-            ret = av_buffersink_get_frame(buffersink_ctx, frame);
+            ret = av_buffersink_get_frame(m_bufferSinkCtx, frame);
             if  (ret >= 0)
             {
                 if (priorPts[0] && ptsUsed == priorPts[1])
@@ -83,9 +83,9 @@ int Vaapi2Context::FilteredReceiveFrame(AVCodecContext *ctx, AVFrame *frame)
             break;
         priorPts[0]=priorPts[1];
         priorPts[1]=frame->pts;
-        if (frame->interlaced_frame || filter_graph)
+        if (frame->interlaced_frame || m_filterGraph)
         {
-            if (!filtersInitialized
+            if (!m_filtersInitialized
               || width != frame->width
               || height != frame->height)
             {
@@ -99,9 +99,9 @@ int Vaapi2Context::FilteredReceiveFrame(AVCodecContext *ctx, AVFrame *frame)
                     break;
                 }
             }
-            if (filter_graph)
+            if (m_filterGraph)
             {
-                ret = av_buffersrc_add_frame(buffersrc_ctx, frame);
+                ret = av_buffersrc_add_frame(m_bufferSrcCtx, frame);
                 if (ret < 0)
                     break;
             }
@@ -123,13 +123,13 @@ int Vaapi2Context::InitDeinterlaceFilter(AVCodecContext *ctx, AVFrame *frame)
     CloseFilters();
     width = frame->width;
     height = frame->height;
-    filtersInitialized = true;
-    if (!player || !stream)
+    m_filtersInitialized = true;
+    if (!player || !m_stream)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Player or stream is not set up in MythCodecContext");
         return -1;
     }
-    if (doublerate && !player->CanSupportDoubleRate())
+    if (m_doubleRate && !player->CanSupportDoubleRate())
     {
         QString request = deinterlacername;
         deinterlacername = GetFallbackDeint();
@@ -138,7 +138,7 @@ int Vaapi2Context::InitDeinterlaceFilter(AVCodecContext *ctx, AVFrame *frame)
           .arg(request).arg(deinterlacername));
         if (!isCodecDeinterlacer(deinterlacername))
             deinterlacername.clear();
-        doublerate = deinterlacername.contains("doublerate");
+        m_doubleRate = deinterlacername.contains("doublerate");
 
         // if the fallback is a non-vaapi - deinterlace will be turned off
         // and the videoout methods can take over.
@@ -157,11 +157,11 @@ int Vaapi2Context::InitDeinterlaceFilter(AVCodecContext *ctx, AVFrame *frame)
     const AVFilter *buffersink = avfilter_get_by_name("buffersink");
     AVFilterInOut *outputs = avfilter_inout_alloc();
     AVFilterInOut *inputs  = avfilter_inout_alloc();
-    AVRational time_base = stream->time_base;
+    AVRational time_base = m_stream->time_base;
     AVBufferSrcParameters* params = nullptr;
 
-    filter_graph = avfilter_graph_alloc();
-    if (!outputs || !inputs || !filter_graph)
+    m_filterGraph = avfilter_graph_alloc();
+    if (!outputs || !inputs || !m_filterGraph)
     {
         ret = AVERROR(ENOMEM);
         goto end;
@@ -176,8 +176,8 @@ int Vaapi2Context::InitDeinterlaceFilter(AVCodecContext *ctx, AVFrame *frame)
 
     // isInterlaced = frame->interlaced_frame;
 
-    ret = avfilter_graph_create_filter(&buffersrc_ctx, buffersrc, "in",
-                                       args, nullptr, filter_graph);
+    ret = avfilter_graph_create_filter(&m_bufferSrcCtx, buffersrc, "in",
+                                       args, nullptr, m_filterGraph);
     if (ret < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "avfilter_graph_create_filter failed for buffer source");
@@ -185,12 +185,12 @@ int Vaapi2Context::InitDeinterlaceFilter(AVCodecContext *ctx, AVFrame *frame)
     }
 
     params = av_buffersrc_parameters_alloc();
-    if (hw_frames_ctx)
-        av_buffer_unref(&hw_frames_ctx);
-    hw_frames_ctx = av_buffer_ref(frame->hw_frames_ctx);
-    params->hw_frames_ctx = hw_frames_ctx;
+    if (m_hwFramesCtx)
+        av_buffer_unref(&m_hwFramesCtx);
+    m_hwFramesCtx = av_buffer_ref(frame->m_hwFramesCtx);
+    params->m_hwFramesCtx = m_hwFramesCtx;
 
-    ret = av_buffersrc_parameters_set(buffersrc_ctx, params);
+    ret = av_buffersrc_parameters_set(m_bufferSrcCtx, params);
 
     if (ret < 0)
     {
@@ -201,8 +201,8 @@ int Vaapi2Context::InitDeinterlaceFilter(AVCodecContext *ctx, AVFrame *frame)
     av_freep(&params);
 
     /* buffer video sink: to terminate the filter chain. */
-    ret = avfilter_graph_create_filter(&buffersink_ctx, buffersink, "out",
-                                       nullptr, nullptr, filter_graph);
+    ret = avfilter_graph_create_filter(&m_bufferSinkCtx, buffersink, "out",
+                                       nullptr, nullptr, m_filterGraph);
     if (ret < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "avfilter_graph_create_filter failed for buffer sink");
@@ -221,7 +221,7 @@ int Vaapi2Context::InitDeinterlaceFilter(AVCodecContext *ctx, AVFrame *frame)
      * default.
      */
     outputs->name       = av_strdup("in");
-    outputs->filter_ctx = buffersrc_ctx;
+    outputs->filter_ctx = m_bufferSrcCtx;
     outputs->pad_idx    = 0;
     outputs->next       = nullptr;
 
@@ -232,11 +232,11 @@ int Vaapi2Context::InitDeinterlaceFilter(AVCodecContext *ctx, AVFrame *frame)
      * default.
      */
     inputs->name       = av_strdup("out");
-    inputs->filter_ctx = buffersink_ctx;
+    inputs->filter_ctx = m_bufferSinkCtx;
     inputs->pad_idx    = 0;
     inputs->next       = nullptr;
 
-    if ((ret = avfilter_graph_parse_ptr(filter_graph, filters.toLocal8Bit(),
+    if ((ret = avfilter_graph_parse_ptr(m_filterGraph, filters.toLocal8Bit(),
                                     &inputs, &outputs,nullptr)) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC
@@ -244,7 +244,7 @@ int Vaapi2Context::InitDeinterlaceFilter(AVCodecContext *ctx, AVFrame *frame)
         goto end;
     }
 
-    if ((ret = avfilter_graph_config(filter_graph, nullptr)) < 0)
+    if ((ret = avfilter_graph_config(m_filterGraph, nullptr)) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC
             + QString("avfilter_graph_config failed"));
@@ -257,9 +257,9 @@ int Vaapi2Context::InitDeinterlaceFilter(AVCodecContext *ctx, AVFrame *frame)
 end:
     if (ret < 0)
     {
-        avfilter_graph_free(&filter_graph);
-        filter_graph = nullptr;
-        doublerate = false;
+        avfilter_graph_free(&m_filterGraph);
+        m_filterGraph = nullptr;
+        m_doubleRate = false;
     }
     avfilter_inout_free(&inputs);
     avfilter_inout_free(&outputs);
@@ -269,18 +269,18 @@ end:
 
 void Vaapi2Context::CloseFilters()
 {
-    avfilter_graph_free(&filter_graph);
-    filter_graph = nullptr;
-    buffersink_ctx = nullptr;
-    buffersrc_ctx = nullptr;
-    filtersInitialized = false;
-    ptsUsed = 0;
-    priorPts[0] = 0;
-    priorPts[1] = 0;
+    avfilter_graph_free(&m_filterGraph);
+    m_filterGraph = nullptr;
+    m_bufferSinkCtx = nullptr;
+    m_bufferSrcCtx = nullptr;
+    m_filtersInitialized = false;
+    m_ptsUsed = 0;
+    m_priorPts[0] = 0;
+    m_priorPts[1] = 0;
     // isInterlaced = 0;
-    width = 0;
-    height = 0;
+    m_width = 0;
+    m_height = 0;
 
-    if (hw_frames_ctx)
-        av_buffer_unref(&hw_frames_ctx);
+    if (m_hwFramesCtx)
+        av_buffer_unref(&m_hwFramesCtx);
 }

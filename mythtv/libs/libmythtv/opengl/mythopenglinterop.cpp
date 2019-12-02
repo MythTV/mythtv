@@ -59,9 +59,9 @@ QStringList MythOpenGLInterop::GetAllowedRenderers(VideoFrameType Format)
 void MythOpenGLInterop::GetInteropTypeCallback(void *Wait, void *Format, void *Result)
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "Check interop callback");
-    QWaitCondition *wait = reinterpret_cast<QWaitCondition*>(Wait);
-    VideoFrameType *format = reinterpret_cast<VideoFrameType*>(Format);
-    MythOpenGLInterop::Type *result = reinterpret_cast<MythOpenGLInterop::Type*>(Result);
+    auto *wait = reinterpret_cast<QWaitCondition*>(Wait);
+    auto *format = reinterpret_cast<VideoFrameType*>(Format);
+    auto *result = reinterpret_cast<MythOpenGLInterop::Type*>(Result);
 
     if (format && result)
         *result = MythOpenGLInterop::GetInteropType(*format);
@@ -173,19 +173,19 @@ vector<MythVideoTexture*> MythOpenGLInterop::Retrieve(MythRenderOpenGL *Context,
     else
     {
         // Unpick
-        AVBufferRef* buffer = reinterpret_cast<AVBufferRef*>(Frame->priv[1]);
+        auto* buffer = reinterpret_cast<AVBufferRef*>(Frame->priv[1]);
         if (!buffer || (buffer && !buffer->data))
             return result;
         if (Frame->codec == FMT_NVDEC)
         {
-            AVHWDeviceContext* context = reinterpret_cast<AVHWDeviceContext*>(buffer->data);
+            auto* context = reinterpret_cast<AVHWDeviceContext*>(buffer->data);
             if (!context || (context && !context->user_opaque))
                 return result;
             interop = reinterpret_cast<MythOpenGLInterop*>(context->user_opaque);
         }
         else
         {
-            AVHWFramesContext* frames = reinterpret_cast<AVHWFramesContext*>(buffer->data);
+            auto* frames = reinterpret_cast<AVHWFramesContext*>(buffer->data);
             if (!frames || (frames && !frames->user_opaque))
                 return result;
             interop = reinterpret_cast<MythOpenGLInterop*>(frames->user_opaque);
@@ -199,15 +199,10 @@ vector<MythVideoTexture*> MythOpenGLInterop::Retrieve(MythRenderOpenGL *Context,
 }
 
 MythOpenGLInterop::MythOpenGLInterop(MythRenderOpenGL *Context, Type InteropType)
-  : QObject(),
-    ReferenceCounter("GLInterop", true),
+  : ReferenceCounter("GLInterop", true),
     m_context(Context),
     m_type(InteropType),
-    m_openglTextures(),
-    m_openglTextureSize(),
-    m_discontinuityCounter(0),
-    m_defaultFree(nullptr),
-    m_defaultUserOpaque(nullptr)
+    m_openglTextureSize()
 {
     if (m_context)
         m_context->IncrRef();
@@ -229,8 +224,9 @@ MythOpenGLInterop* MythOpenGLInterop::CreateDummy(void)
     return new MythOpenGLInterop(nullptr, DUMMY);
 }
 
-vector<MythVideoTexture*> MythOpenGLInterop::Acquire(MythRenderOpenGL*, VideoColourSpace*,
-                                                     VideoFrame*, FrameScanType)
+vector<MythVideoTexture*> MythOpenGLInterop::Acquire(MythRenderOpenGL* /*Context*/,
+                                                     VideoColourSpace* /*ColourSpace*/,
+                                                     VideoFrame* /*Frame*/, FrameScanType /*Scan*/)
 {
     return vector<MythVideoTexture*>();
 }
@@ -245,7 +241,7 @@ void MythOpenGLInterop::DeleteTextures(void)
         for ( ; it != m_openglTextures.constEnd(); ++it)
         {
             vector<MythVideoTexture*> textures = it.value();
-            vector<MythVideoTexture*>::iterator it2 = textures.begin();
+            auto it2 = textures.begin();
             for ( ; it2 != textures.end(); ++it2)
             {
                 if ((*it2)->m_textureId)

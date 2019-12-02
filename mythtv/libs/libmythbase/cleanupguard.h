@@ -6,7 +6,7 @@
 class MBASE_PUBLIC CleanupGuard
 {
   public:
-    typedef void (*CleanupFunc)();
+    using CleanupFunc = void (*)();
 
   public:
     explicit CleanupGuard(CleanupFunc cleanFunction);

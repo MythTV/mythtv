@@ -14,7 +14,7 @@
 #include "mainserver.h"
 #include "upnpcds.h"
               
-typedef QMap<int, QString> IntMap;
+using IntMap = QMap<int, QString>;
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -55,9 +55,9 @@ class UPnpCDSVideo : public UPnpCDSExtension
                          UPnpCDSExtensionResults *pResults,
                          IDTokenMap tokens );
 
-        bool LoadGenres( const UPnpCDSRequest *pRequest,
-                         UPnpCDSExtensionResults *pResults,
-                         const IDTokenMap& tokens );
+        static bool LoadGenres( const UPnpCDSRequest *pRequest,
+                                UPnpCDSExtensionResults *pResults,
+                                const IDTokenMap& tokens );
 
         bool LoadVideos( const UPnpCDSRequest *pRequest,
                          UPnpCDSExtensionResults *pResults,

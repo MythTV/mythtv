@@ -95,10 +95,10 @@ class Dsmcc
     void ProcessSectionIndication(const unsigned char *data, int length,
                                   unsigned short streamTag);
     void ProcessSectionData(const unsigned char *data, int length);
-    void ProcessSectionDesc(const unsigned char *data, int length);
+    static void ProcessSectionDesc(const unsigned char *data, int length);
 
-    bool ProcessSectionHeader(DsmccSectionHeader *header,
-                              const unsigned char *data, int length);
+    static bool ProcessSectionHeader(DsmccSectionHeader *header,
+                                     const unsigned char *data, int length);
 
     void ProcessDownloadServerInitiate(const unsigned char *data, int length);
     void ProcessDownloadInfoIndication(const unsigned char *data,

@@ -268,7 +268,7 @@ void MythUIAnimation::ParseSection(const QDomElement &element,
         else
             continue;
 
-        MythUIAnimation* a = new MythUIAnimation(parent, trigger, type);
+        auto* a = new MythUIAnimation(parent, trigger, type);
         a->setStartValue(start);
         a->setEndValue(end);
         a->setDuration(effectduration);

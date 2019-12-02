@@ -39,18 +39,18 @@ void loggingGetTimeStamp(qlonglong *epoch, uint *usec);
 
 class QWaitCondition;
 
-typedef enum {
+enum LoggingType {
     kMessage       = 0x01,
     kRegistering   = 0x02,
     kDeregistering = 0x04,
     kFlush         = 0x08,
     kStandardIO    = 0x10,
     kInitializing  = 0x20,
-} LoggingType;
+};
 
 class LoggerThread;
 
-typedef struct tm tmType;
+using tmType = struct tm;
 
 #define SET_LOGGING_ARG(arg){ \
                                 free(arg); \

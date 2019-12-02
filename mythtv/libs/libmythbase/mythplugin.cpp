@@ -22,9 +22,8 @@ using namespace std;
 
 int MythPlugin::init(const char *libversion)
 {
-    typedef int (*PluginInitFunc)(const char *);
-    PluginInitFunc ifunc = (PluginInitFunc)QLibrary::resolve("mythplugin_init");
-
+    using PluginInitFunc = int (*)(const char *);
+    auto ifunc = (PluginInitFunc)QLibrary::resolve("mythplugin_init");
     if (ifunc)
         return ifunc(libversion);
 
@@ -44,10 +43,10 @@ int MythPlugin::init(const char *libversion)
 
 int MythPlugin::run(void)
 {
-    typedef int (*PluginRunFunc)();
+    using PluginRunFunc = int (*)();
 
-    int           rVal  = -1;
-    PluginRunFunc rfunc = (PluginRunFunc)QLibrary::resolve("mythplugin_run");
+    int rVal = -1;
+    auto rfunc = (PluginRunFunc)QLibrary::resolve("mythplugin_run");
 
     if (rfunc)
         rVal = rfunc();
@@ -57,11 +56,10 @@ int MythPlugin::run(void)
 
 int MythPlugin::config(void)
 {
-    typedef int (*PluginConfigFunc)();
+    using PluginConfigFunc = int (*)();
 
-    int              rVal  = -1;
-    PluginConfigFunc rfunc = (PluginConfigFunc)QLibrary::resolve(
-                                                   "mythplugin_config");
+    int rVal  = -1;
+    auto rfunc = (PluginConfigFunc)QLibrary::resolve("mythplugin_config");
 
     if (rfunc)
     {
@@ -74,8 +72,8 @@ int MythPlugin::config(void)
 
 MythPluginType MythPlugin::type(void)
 {
-    typedef MythPluginType (*PluginTypeFunc)();
-    PluginTypeFunc rfunc = (PluginTypeFunc)QLibrary::resolve("mythplugin_type");
+    using PluginTypeFunc = MythPluginType (*)();
+    auto rfunc = (PluginTypeFunc)QLibrary::resolve("mythplugin_type");
 
     if (rfunc)
         return rfunc();
@@ -85,7 +83,7 @@ MythPluginType MythPlugin::type(void)
 
 void MythPlugin::destroy(void)
 {
-    typedef void (*PluginDestFunc)();
+    using PluginDestFunc = void (*)();
     PluginDestFunc rfunc = QLibrary::resolve("mythplugin_destroy");
 
     if (rfunc)

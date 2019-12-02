@@ -24,7 +24,7 @@ using namespace std;
 #endif
 
 #ifndef _WAVEFORMATEXTENSIBLE_
-typedef struct {
+struct WAVEFORMATEXTENSIBLE {
     WAVEFORMATEX    Format;
     union {
         WORD wValidBitsPerSample;       // bits of precision
@@ -33,7 +33,8 @@ typedef struct {
     } Samples;
     DWORD           dwChannelMask;      // which channels are present in stream
     GUID            SubFormat;
-} WAVEFORMATEXTENSIBLE, *PWAVEFORMATEXTENSIBLE;
+};
+using PWAVEFORMATEXTENSIBLE = WAVEFORMATEXTENSIBLE*;
 #endif
 
 const uint AudioOutputWin::kPacketCnt = 4;

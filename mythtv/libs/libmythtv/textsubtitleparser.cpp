@@ -191,7 +191,7 @@ QStringList TextSubtitles::GetSubtitles(uint64_t timecode)
     uint64_t startCode = 0, endCode = 0;
     if (nextSubPos != m_subtitles.begin())
     {
-        TextSubtitleList::const_iterator currentSubPos = nextSubPos;
+        auto currentSubPos = nextSubPos;
         --currentSubPos;
 
         const text_subtitle_t &sub = *currentSubPos;

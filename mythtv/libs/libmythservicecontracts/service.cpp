@@ -105,7 +105,7 @@ void* Service::ConvertToParameterPtr( int            nTypeId,
 
             int nParentId = QMetaType::type( sParentFQN.toUtf8() );
 
-            QObject *pParentClass = (QObject *)QMetaType::create( nParentId );
+            auto *pParentClass = (QObject *)QMetaType::create( nParentId );
             if (pParentClass == nullptr)
                 break;
 

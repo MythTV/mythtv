@@ -417,7 +417,7 @@ void TestEITFixups::testUKMarvel()
 
 DBEventEIT *TestEITFixups::SimpleDBEventEIT (FixupValue fixup, const QString& title, const QString& subtitle, const QString& description)
 {
-    DBEventEIT *event = new DBEventEIT (1, // channel id
+    auto *event = new DBEventEIT (1, // channel id
                                        title, // title
                                        subtitle, // subtitle
                                        description, // description

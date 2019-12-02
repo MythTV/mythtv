@@ -105,21 +105,21 @@ void BDOverlay::wipe(int x, int y, int width, int height)
 
 static void HandleOverlayCallback(void *data, const bd_overlay_s *const overlay)
 {
-    BDRingBuffer *bdrb = (BDRingBuffer*) data;
+    auto *bdrb = (BDRingBuffer*) data;
     if (bdrb)
         bdrb->SubmitOverlay(overlay);
 }
 
 static void HandleARGBOverlayCallback(void *data, const bd_argb_overlay_s *const overlay)
 {
-    BDRingBuffer *bdrb = (BDRingBuffer*) data;
+    auto *bdrb = (BDRingBuffer*) data;
     if (bdrb)
         bdrb->SubmitARGBOverlay(overlay);
 }
 
 static void file_opened_callback(void* bdr)
 {
-    BDRingBuffer *obj = (BDRingBuffer*)bdr;
+    auto *obj = (BDRingBuffer*)bdr;
     if (obj)
         obj->ProgressUpdate();
 }
@@ -1481,7 +1481,7 @@ bool BDRingBuffer::IsInStillFrame(void) const
  * \param streamCount   Number of streams in the array
  * \return Pointer to the matching stream if found, otherwise nullptr.
  */
-const BLURAY_STREAM_INFO* BDRingBuffer::FindStream(int streamid, BLURAY_STREAM_INFO* streams, int streamCount) const
+const BLURAY_STREAM_INFO* BDRingBuffer::FindStream(int streamid, BLURAY_STREAM_INFO* streams, int streamCount)
 {
     const BLURAY_STREAM_INFO* stream = nullptr;
 
@@ -1728,7 +1728,7 @@ void BDRingBuffer::SubmitOverlay(const bd_overlay_s * const overlay)
         case BD_OVERLAY_FLUSH:   /* all changes have been done, flush overlay to display at given pts */
             if (osd)
             {
-                BDOverlay* newOverlay = new BDOverlay(*osd);
+                auto* newOverlay = new BDOverlay(*osd);
                 newOverlay->m_image =
                     osd->m_image.convertToFormat(QImage::Format_ARGB32);
                 newOverlay->m_pts = overlay->pts;
@@ -1811,7 +1811,7 @@ void BDRingBuffer::SubmitARGBOverlay(const bd_argb_overlay_s * const overlay)
             if (osd)
             {
                 QMutexLocker lock(&m_overlayLock);
-                BDOverlay* newOverlay = new BDOverlay(*osd);
+                auto* newOverlay = new BDOverlay(*osd);
                 newOverlay->m_pts = overlay->pts;
                 m_overlayImages.append(newOverlay);
             }

@@ -168,7 +168,7 @@ void GrabberManager::stopTimer()
 
 void GrabberManager::doUpdate()
 {
-    GrabberDownloadThread *gdt = new GrabberDownloadThread(this);
+    auto *gdt = new GrabberDownloadThread(this);
     if (m_refreshAll)
        gdt->refreshAll();
     gdt->start(QThread::LowPriority);

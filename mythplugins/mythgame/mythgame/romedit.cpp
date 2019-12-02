@@ -103,7 +103,7 @@ namespace
         MythScreenStack *popupStack =
                 GetMythMainWindow()->GetStack("popup stack");
 
-        MythUIFileBrowser *fb = new MythUIFileBrowser(popupStack, fp);
+        auto *fb = new MythUIFileBrowser(popupStack, fp);
         fb->SetNameFilter(GetSupportedImageExtensionFilter());
         if (fb->Create())
         {
@@ -162,10 +162,9 @@ void EditRomInfoDialog::SaveAndExit()
 {
     if (m_retObject)
     {
-        RomInfo *romInfo = new RomInfo(*m_workingRomInfo);
-        DialogCompletionEvent *dce =
-            new DialogCompletionEvent(m_id, 0, "",
-                                      qVariantFromValue(romInfo));
+        auto *romInfo = new RomInfo(*m_workingRomInfo);
+        auto *dce = new DialogCompletionEvent(m_id, 0, "",
+                                              qVariantFromValue(romInfo));
 
         QApplication::postEvent(m_retObject, dce);
     }

@@ -66,7 +66,7 @@ void showLogViewer(void)
     // do any logs exist?
     if ((!progressLog.isEmpty()) || (!fullLog.isEmpty()))
     {
-        LogViewer *viewer = new LogViewer(mainStack);
+        auto *viewer = new LogViewer(mainStack);
         viewer->setFilenames(progressLog, fullLog);
         if (viewer->Create())
             mainStack->AddScreen(viewer);
@@ -333,7 +333,7 @@ void LogViewer::showFullLog(void)
 void LogViewer::ShowMenu()
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythDialogBox *menuPopup = new MythDialogBox(tr("Menu"), popupStack, "actionmenu");
+    auto *menuPopup = new MythDialogBox(tr("Menu"), popupStack, "actionmenu");
 
     if (menuPopup->Create())
         popupStack->AddScreen(menuPopup);

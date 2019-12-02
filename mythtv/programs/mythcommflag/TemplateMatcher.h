@@ -23,7 +23,7 @@ extern "C" {
 }
 #include "FrameAnalyzer.h"
 
-typedef struct AVFrame AVFrame;
+using AVFrame = struct AVFrame;
 class PGMConverter;
 class EdgeDetector;
 class TemplateFinder;

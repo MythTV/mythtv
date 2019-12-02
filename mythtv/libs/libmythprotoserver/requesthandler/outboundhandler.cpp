@@ -63,7 +63,7 @@ bool OutboundRequestHandler::DoConnectToMaster(void)
         return false;
     }
 
-    SocketHandler *handler = new SocketHandler(m_socket, m_parent, hostname);
+    auto *handler = new SocketHandler(m_socket, m_parent, hostname);
     handler->BlockShutdown(true);
     handler->AllowStandardEvents(true);
     handler->AllowSystemEvents(true);

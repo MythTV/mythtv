@@ -46,7 +46,7 @@ ProfileGroup::ProfileGroup()
 
     setLabel(tr("Profile Group"));
     addChild(m_name = new Name(*this));
-    CardInfo *cardInfo = new CardInfo(*this);
+    auto *cardInfo = new CardInfo(*this);
     addChild(cardInfo);
     CardType::fillSelections(cardInfo);
     m_host = new HostName(*this);
@@ -164,7 +164,7 @@ void ProfileGroup::fillSelections(GroupSetting* setting)
             }
             else
             {
-                ProfileGroup *profileGroup = new ProfileGroup();
+                auto *profileGroup = new ProfileGroup();
                 profileGroup->loadByID(id.toInt());
                 profileGroup->setLabel(name);
                 profileGroup->addChild(

@@ -74,7 +74,7 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
     int     nSSLPort  = g_pConfig->GetValue( "BackendSSLPort", (g_pConfig->GetValue( "BackendStatusPort", 6544 ) + 10) );
     int     nWSPort   = (g_pConfig->GetValue( "BackendStatusPort", 6544 ) + 5);
 
-    HttpServer *pHttpServer = new HttpServer();
+    auto *pHttpServer = new HttpServer();
 
     if (!pHttpServer->isListening())
     {
@@ -130,7 +130,7 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
 
     LOG(VB_UPNP, LOG_INFO, "MediaServer: Registering Http Server Extensions.");
 
-    HtmlServerExtension *pHtmlServer =
+    auto *pHtmlServer =
         new HtmlServerExtension(m_sSharePath + "html", "backend_");
     pHttpServer->RegisterExtension( pHtmlServer );
     pHttpServer->RegisterExtension( new HttpConfig() );

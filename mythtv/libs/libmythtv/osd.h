@@ -83,7 +83,9 @@ class ChannelEditor : public MythScreenType
     Q_OBJECT
 
   public:
-    ChannelEditor(QObject *RetObject, const char * Name);
+    ChannelEditor(QObject *RetObject, const char * Name)
+        : MythScreenType((MythScreenType*)nullptr, Name),
+          m_retObject(RetObject) {}
 
     bool Create(void) override;
     bool keyPressEvent(QKeyEvent *Event) override;
@@ -131,7 +133,8 @@ class OSD
     Q_DECLARE_TR_FUNCTIONS(OSD)
 
   public:
-    OSD(MythPlayer *Player, QObject *Parent, MythPainter *Painter);
+    OSD(MythPlayer *Player, QObject *Parent, MythPainter *Painter)
+        : m_parent(Player), m_ParentObject(Parent), m_CurrentPainter(Painter) {}
    ~OSD();
 
     bool    Init(const QRect &Rect, float FontAspect);
@@ -205,10 +208,10 @@ class OSD
     QDateTime       m_NextPulseUpdate   { };
     bool            m_Refresh           { false };
     bool            m_Visible           { false };
-    int             m_Timeouts[4]       { 0 };
+    int             m_Timeouts[4]       { -1,3000,5000,13000 };
     bool            m_UIScaleOverride   { false };
     float           m_SavedWMult        { 1.0F };
-    float           m_SavedHMult        { 1.0F};
+    float           m_SavedHMult        { 1.0F };
     QRect           m_SavedUIRect       { };
     int             m_fontStretch       { 100 };
     int             m_savedFontStretch  { 100 };
@@ -223,7 +226,9 @@ class OsdNavigation : public MythScreenType
     Q_OBJECT
 
   public:
-    OsdNavigation(QObject *RetObject, const QString &Name, OSD *Osd);
+    OsdNavigation(QObject *RetObject, const QString &Name, OSD *Osd)
+        : MythScreenType((MythScreenType*)nullptr, Name),
+          m_retObject(RetObject), m_osd(Osd) {}
     bool Create(void) override;
     bool keyPressEvent(QKeyEvent *Event) override;
     void SetTextFromMap(const InfoMap &Map) override;

@@ -217,11 +217,11 @@ void DTVRecorder::InitStreamData(void)
     m_stream_data->AddMPEGSPListener(this);
     m_stream_data->AddMPEGListener(this);
 
-    DVBStreamData *dvb = dynamic_cast<DVBStreamData*>(m_stream_data);
+    auto *dvb = dynamic_cast<DVBStreamData*>(m_stream_data);
     if (dvb)
         dvb->AddDVBMainListener(this);
 
-    ATSCStreamData *atsc = dynamic_cast<ATSCStreamData*>(m_stream_data);
+    auto *atsc = dynamic_cast<ATSCStreamData*>(m_stream_data);
 
     if (atsc && atsc->DesiredMinorChannel())
         atsc->SetDesiredChannel(atsc->DesiredMajorChannel(),
@@ -693,14 +693,13 @@ bool DTVRecorder::FindAudioKeyframes(const TSPacket* /*tspacket*/)
     if (!m_ringBuffer || (GetStreamData()->VideoPIDSingleProgram() <= 0x1fff))
         return hasKeyFrame;
 
-    static const uint64_t msec_per_day = 24 * 60 * 60 * 1000ULL;
+    static constexpr uint64_t kMsecPerDay = 24 * 60 * 60 * 1000ULL;
     const double frame_interval = (1000.0 / m_video_frame_rate);
     uint64_t elapsed = (uint64_t) max(m_audio_timer.elapsed(), 0);
-    uint64_t expected_frame =
-        (uint64_t) ((double)elapsed / frame_interval);
+    auto expected_frame = (uint64_t) ((double)elapsed / frame_interval);
 
     while (m_frames_seen_count > expected_frame + 10000)
-        expected_frame += (uint64_t) ((double)msec_per_day / frame_interval);
+        expected_frame += (uint64_t) ((double)kMsecPerDay / frame_interval);
 
     if (!m_frames_seen_count || (m_frames_seen_count < expected_frame))
     {
@@ -1435,17 +1434,17 @@ bool DTVRecorder::ProcessTSPacket(const TSPacket &tspacket)
          * unprocessed we cannot wait for a keyframe to trigger the
          * writes. */
 
-        static MythTimer timer;
+        static MythTimer s_timer;
 
         if (m_frames_seen_count++ == 0)
-            timer.start();
+            s_timer.start();
 
-        if (timer.elapsed() > 500) // 0.5 seconds
+        if (s_timer.elapsed() > 500) // 0.5 seconds
         {
             UpdateFramesWritten();
             m_last_keyframe_seen = m_frames_seen_count;
             HandleKeyframe(m_payload_buffer.size());
-            timer.addMSecs(-500);
+            s_timer.addMSecs(-500);
         }
     }
     else if (m_stream_id[pid] == 0)

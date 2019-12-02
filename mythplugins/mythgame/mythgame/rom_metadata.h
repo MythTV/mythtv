@@ -42,7 +42,7 @@ class RomData
     QString m_version;
 };
 
-typedef QMap <QString, RomData> RomDBMap;
+using RomDBMap = QMap <QString, RomData>;
 
 QString crcStr(int crc);
 

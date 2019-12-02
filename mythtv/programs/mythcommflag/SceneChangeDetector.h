@@ -11,7 +11,7 @@
 
 #include "FrameAnalyzer.h"
 
-typedef struct AVFrame AVFrame;
+using AVFrame = struct AVFrame;
 class HistogramAnalyzer;
 
 class SceneChangeDetector : public FrameAnalyzer
@@ -35,10 +35,11 @@ public:
     /* SceneChangeDetector interface. */
     const FrameAnalyzer::FrameMap *getChanges(void) const { return &m_changeMap; }
 
-    typedef struct scenechange_data {
+    struct scenechange_data {
         unsigned char   color;
         unsigned char   frequency;
-    } SceneChangeData[UCHAR_MAX + 1];
+    };
+    using SceneChangeData = scenechange_data[UCHAR_MAX + 1];
 
   protected:
     virtual ~SceneChangeDetector(void) = default;

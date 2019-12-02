@@ -30,10 +30,6 @@ MythV4L2M2MContext::MythV4L2M2MContext(DecoderBase *Parent, MythCodecID CodecID)
 {
 }
 
-MythV4L2M2MContext::~MythV4L2M2MContext()
-{
-}
-
 inline uint32_t V4L2CodecType(AVCodecID Id)
 {
     switch (Id)
@@ -64,8 +60,8 @@ MythCodecID MythV4L2M2MContext::GetSupportedCodec(AVCodecContext **Context,
                                                   uint StreamType)
 {
     bool decodeonly = Decoder == "v4l2-dec";
-    MythCodecID success = static_cast<MythCodecID>((decodeonly ? kCodec_MPEG1_V4L2_DEC : kCodec_MPEG1_V4L2) + (StreamType - 1));
-    MythCodecID failure = static_cast<MythCodecID>(kCodec_MPEG1 + (StreamType - 1));
+    auto success = static_cast<MythCodecID>((decodeonly ? kCodec_MPEG1_V4L2_DEC : kCodec_MPEG1_V4L2) + (StreamType - 1));
+    auto failure = static_cast<MythCodecID>(kCodec_MPEG1 + (StreamType - 1));
 
     // not us
     if (!Decoder.startsWith("v4l2"))
@@ -136,14 +132,14 @@ void MythV4L2M2MContext::SetDecoderOptions(AVCodecContext* Context, AVCodec* Cod
  * AvFormatDecoder but we copy the data from the AVFrame rather than providing
  * our own buffer (the codec does not support direct rendering).
 */
-bool MythV4L2M2MContext::GetBuffer(AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame, int)
+bool MythV4L2M2MContext::GetBuffer(AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame, int /*Flags*/)
 {
     // Sanity checks
     if (!Context || !AvFrame || !Frame)
         return false;
 
     // Ensure we can render this format
-    AvFormatDecoder *decoder = static_cast<AvFormatDecoder*>(Context->opaque);
+    auto *decoder = static_cast<AvFormatDecoder*>(Context->opaque);
     VideoFrameType type = PixelFormatToFrameType(static_cast<AVPixelFormat>(AvFrame->format));
     VideoFrameType* supported = decoder->GetPlayer()->DirectRenderFormats();
     bool found = false;
@@ -177,11 +173,11 @@ bool MythV4L2M2MContext::GetBuffer(AVCodecContext *Context, VideoFrame *Frame, A
 
 bool MythV4L2M2MContext::HaveV4L2Codecs(AVCodecID Codec /* = AV_CODEC_ID_NONE */)
 {
-    static QVector<AVCodecID> avcodecs({AV_CODEC_ID_MPEG1VIDEO, AV_CODEC_ID_MPEG2VIDEO,
-                                        AV_CODEC_ID_MPEG4,      AV_CODEC_ID_H263,
-                                        AV_CODEC_ID_H264,       AV_CODEC_ID_VC1,
-                                        AV_CODEC_ID_VP8,        AV_CODEC_ID_VP9,
-                                        AV_CODEC_ID_HEVC});
+    static QVector<AVCodecID> s_avcodecs({AV_CODEC_ID_MPEG1VIDEO, AV_CODEC_ID_MPEG2VIDEO,
+                                          AV_CODEC_ID_MPEG4,      AV_CODEC_ID_H263,
+                                          AV_CODEC_ID_H264,       AV_CODEC_ID_VC1,
+                                          AV_CODEC_ID_VP8,        AV_CODEC_ID_VP9,
+                                          AV_CODEC_ID_HEVC});
 
     static bool s_needscheck = true;
     static QVector<AVCodecID> s_supportedV4L2Codecs;
@@ -232,7 +228,7 @@ bool MythV4L2M2MContext::HaveV4L2Codecs(AVCodecID Codec /* = AV_CODEC_ID_NONE */
 
             // check codec support
             QStringList debug;
-            foreach (AVCodecID codec, avcodecs)
+            foreach (AVCodecID codec, s_avcodecs)
             {
                 bool found = false;
                 uint32_t v4l2pixfmt = V4L2CodecType(codec);

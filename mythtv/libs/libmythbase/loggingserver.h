@@ -125,8 +125,8 @@ class DatabaseLogger : public LoggerBase
                                        ///  (in ms)
 };
 
-typedef QList<QByteArray> LogMessage;
-typedef QList<LogMessage *> LogMessageList;
+using LogMessage = QList<QByteArray>;
+using LogMessageList = QList<LogMessage *>;
 
 /// \brief The logging thread that forwards received messages to the consuming
 ///        loggers via ZeroMQ

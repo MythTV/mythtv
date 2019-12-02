@@ -13,7 +13,7 @@ using namespace std;
 
 using namespace std;
 
-typedef QMap<int, const unsigned char*> IntToBuf;
+using IntToBuf = QMap<int, const unsigned char*>;
 
 class MultipleStringStructure
 {

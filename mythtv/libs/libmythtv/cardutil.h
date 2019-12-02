@@ -18,13 +18,13 @@ using namespace std;
 
 class InputInfo;
 class CardInput;
-typedef QMap<int,QString> InputNames;
+using InputNames = QMap<int,QString>;
 
 MTV_PUBLIC QString get_on_input(const QString&, uint);
 
 MTV_PUBLIC bool set_on_input(const QString&, uint, const QString&);
 
-typedef enum
+enum dvb_dev_type_t
 {
     DVB_DEV_FRONTEND = 1,
     DVB_DEV_DVR,
@@ -32,7 +32,7 @@ typedef enum
     DVB_DEV_CA,
     DVB_DEV_AUDIO,
     DVB_DEV_VIDEO,
-} dvb_dev_type_t;
+};
 
 /** \class CardUtil
  *  \brief Collection of helper utilities for input DB use
@@ -40,7 +40,7 @@ typedef enum
 class MTV_PUBLIC CardUtil
 {
   public:
-    typedef QMap<QString, QString> InputTypes;
+    using InputTypes = QMap<QString, QString>;
 
     /// \brief all the different inputs
     enum INPUT_TYPES

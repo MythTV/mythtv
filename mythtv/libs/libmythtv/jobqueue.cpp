@@ -84,7 +84,7 @@ void JobQueue::customEvent(QEvent *e)
 {
     if (e->type() == MythEvent::MythEventMessage)
     {
-        MythEvent *me = dynamic_cast<MythEvent *>(e);
+        auto *me = dynamic_cast<MythEvent *>(e);
         if (me == nullptr)
             return;
         QString message = me->Message();
@@ -1776,7 +1776,7 @@ void JobQueue::ProcessJob(const JobQueueEntry& job)
 
 void JobQueue::StartChildJob(void *(*ChildThreadRoutine)(void *), int jobID)
 {
-    JobThreadStruct *jts = new JobThreadStruct;
+    auto *jts = new JobThreadStruct;
     jts->jq = this;
     jts->jobID = jobID;
 
@@ -1877,10 +1877,10 @@ QString JobQueue::PrettyPrint(off_t bytes)
     // Pretty print "bytes" as KB, MB, GB, TB, etc., subject to the desired
     // number of units
     static const struct {
-        const char      *suffix;
-        unsigned int    max;
-        int         precision;
-    } pptab[] = {
+        const char   *m_suffix;
+        unsigned int  m_max;
+        int           m_precision;
+    } kPpTab[] = {
         { "bytes", 9999, 0 },
         { "kB", 999, 0 },
         { "MB", 999, 1 },
@@ -1895,19 +1895,19 @@ QString JobQueue::PrettyPrint(off_t bytes)
     float           fbytes = bytes;
 
     ii = 0;
-    while (pptab[ii].max && fbytes > pptab[ii].max) {
+    while (kPpTab[ii].m_max && fbytes > kPpTab[ii].m_max) {
         fbytes /= 1024;
         ii++;
     }
 
     return QString("%1 %2")
-        .arg(fbytes, 0, 'f', pptab[ii].precision)
-        .arg(pptab[ii].suffix);
+        .arg(fbytes, 0, 'f', kPpTab[ii].m_precision)
+        .arg(kPpTab[ii].m_suffix);
 }
 
 void *JobQueue::TranscodeThread(void *param)
 {
-    JobThreadStruct *jts = (JobThreadStruct *)param;
+    auto *jts = (JobThreadStruct *)param;
     JobQueue *jq = jts->jq;
 
     MThread::ThreadSetup(QString("Transcode_%1").arg(jts->jobID));
@@ -2137,7 +2137,7 @@ void JobQueue::DoTranscodeThread(int jobID)
 
 void *JobQueue::MetadataLookupThread(void *param)
 {
-    JobThreadStruct *jts = (JobThreadStruct *)param;
+    auto *jts = (JobThreadStruct *)param;
     JobQueue *jq = jts->jq;
 
     MThread::ThreadSetup(QString("Metadata_%1").arg(jts->jobID));
@@ -2262,7 +2262,7 @@ void JobQueue::DoMetadataLookupThread(int jobID)
 
 void *JobQueue::FlagCommercialsThread(void *param)
 {
-    JobThreadStruct *jts = (JobThreadStruct *)param;
+    auto *jts = (JobThreadStruct *)param;
     JobQueue *jq = jts->jq;
 
     MThread::ThreadSetup(QString("Commflag_%1").arg(jts->jobID));
@@ -2384,8 +2384,8 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
             program_info->SetPathname(program_info->GetPlaybackURL(false,true));
         if (program_info->IsLocal())
         {
-            PreviewGenerator *pg = new PreviewGenerator(
-                program_info, QString(), PreviewGenerator::kLocal);
+            auto *pg = new PreviewGenerator(program_info, QString(),
+                                            PreviewGenerator::kLocal);
             pg->Run();
             pg->deleteLater();
         }
@@ -2409,7 +2409,7 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
 
 void *JobQueue::UserJobThread(void *param)
 {
-    JobThreadStruct *jts = (JobThreadStruct *)param;
+    auto *jts = (JobThreadStruct *)param;
     JobQueue *jq = jts->jq;
 
     MThread::ThreadSetup(QString("UserJob_%1").arg(jts->jobID));

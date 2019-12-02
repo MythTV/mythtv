@@ -371,7 +371,7 @@ void MHGroup::SetTimer(int nTimerId, bool fAbsolute, int nMilliSecs, MHEngine * 
         return;
     }
 
-    MHTimer *pTimer = new MHTimer;
+    auto *pTimer = new MHTimer;
     m_Timers.append(pTimer);
     pTimer->m_nTimerId = nTimerId;
 
@@ -920,7 +920,7 @@ void MHPersistent::Initialise(MHParseNode *p, MHEngine *engine)
 
     for (int i = 0; i < pVarSeq->GetSeqCount(); i++)
     {
-        MHObjectRef *pVar = new MHObjectRef;
+        auto *pVar = new MHObjectRef;
         m_Variables.Append(pVar);
         pVar->Initialise(pVarSeq->GetSeqN(i), engine);
     }

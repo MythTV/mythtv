@@ -9,9 +9,9 @@
 #define LOC      QString("VideoMetaDataUtil: ")
 
 static QReadWriteLock art_path_map_lock;
-typedef QPair< QString, QString > ArtPair;
+using ArtPair = QPair< QString, QString >;
 static QMultiHash<QString, ArtPair> art_path_map;
-typedef QList< ArtPair > ArtList;
+using ArtList = QList<ArtPair>;
 
 QString VideoMetaDataUtil::GetArtPath(const QString &pathname,
                                       const QString &type)

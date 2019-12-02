@@ -66,7 +66,7 @@ DTC::Enum* Rtti::GetEnum( const QString &sFQN )
         nParentId  = QMetaType::type( sParentFQN.toUtf8() );
     }
 
-    QObject *pParentClass = (QObject *)QMetaType::create( nParentId );
+    auto *pParentClass = (QObject *)QMetaType::create( nParentId );
     if (pParentClass == nullptr)
         return nullptr;
 
@@ -89,7 +89,7 @@ DTC::Enum* Rtti::GetEnum( const QString &sFQN )
     //
     // ----------------------------------------------------------------------
 
-    DTC::Enum *pEnum = new DTC::Enum();
+    auto *pEnum = new DTC::Enum();
 
     pEnum->setType( sFQN );
 

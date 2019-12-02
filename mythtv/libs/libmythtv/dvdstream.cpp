@@ -96,7 +96,7 @@ bool DVDStream::OpenFile(const QString &filename, uint /*retry_ms*/)
     {
         // Locate the start block of the requested title
         uint32_t len;
-        m_start = UDFFindFile(m_reader, const_cast<char*>(qPrintable(path)), &len);
+        m_start = UDFFindFile(m_reader, qPrintable(path), &len);
         if (m_start == 0)
         {
             LOG(VB_GENERAL, LOG_ERR, QString("DVDStream(%1) UDFFindFile(%2) failed").

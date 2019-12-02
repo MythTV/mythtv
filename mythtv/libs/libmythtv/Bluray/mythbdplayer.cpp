@@ -402,7 +402,7 @@ void MythBDPlayer::SetBookmark(bool clear)
             else
                 LOG(VB_PLAYBACK, LOG_INFO, LOC + "Clear bookmark");
 
-            player_ctx->m_playingInfo->SaveBDBookmark(fields);
+            ProgramInfo::SaveBDBookmark(fields);
 
         }
         player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);

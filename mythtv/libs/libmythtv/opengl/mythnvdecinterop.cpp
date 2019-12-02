@@ -8,19 +8,17 @@
 
 #define CUDA_CHECK(CUDA_FUNCS, CUDA_CALL) \
 { \
-    CUresult res = CUDA_FUNCS->CUDA_CALL; \
+    CUresult res = (CUDA_FUNCS)->CUDA_CALL;          \
     if (res != CUDA_SUCCESS) { \
         const char * desc; \
-        CUDA_FUNCS->cuGetErrorString(res, &desc); \
+        (CUDA_FUNCS)->cuGetErrorString(res, &desc);                      \
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("CUDA error %1 (%2)").arg(res).arg(desc)); \
     } \
 }
 
 MythNVDECInterop::MythNVDECInterop(MythRenderOpenGL *Context)
   : MythOpenGLInterop(Context, NVDEC),
-    m_cudaContext(),
-    m_cudaFuncs(nullptr),
-    m_referenceFrames()
+    m_cudaContext()
 {
     InitialiseCuda();
 }
@@ -48,10 +46,10 @@ void MythNVDECInterop::DeleteTextures(void)
         for ( ; it != m_openglTextures.constEnd(); ++it)
         {
             vector<MythVideoTexture*> textures = it.value();
-            vector<MythVideoTexture*>::iterator it2 = textures.begin();
+            auto it2 = textures.begin();
             for ( ; it2 != textures.end(); ++it2)
             {
-                QPair<CUarray,CUgraphicsResource> *data = reinterpret_cast<QPair<CUarray,CUgraphicsResource>*>((*it2)->m_data);
+                auto *data = reinterpret_cast<QPair<CUarray,CUgraphicsResource>*>((*it2)->m_data);
                 if (data && data->second)
                     CUDA_CHECK(m_cudaFuncs, cuGraphicsUnregisterResource(data->second));
                 delete data;
@@ -141,7 +139,7 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
         return result;
     }
 
-    CUdeviceptr cudabuffer = reinterpret_cast<CUdeviceptr>(Frame->buf);
+    auto cudabuffer = reinterpret_cast<CUdeviceptr>(Frame->buf);
     if (!cudabuffer)
         return result;
 
@@ -156,8 +154,8 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
     if (!m_openglTextures.contains(cudabuffer))
     {
         vector<QSize> sizes;
-        sizes.push_back(QSize(Frame->width, Frame->height));
-        sizes.push_back(QSize(Frame->width, Frame->height >> 1));
+        sizes.emplace_back(QSize(Frame->width, Frame->height));
+        sizes.emplace_back(QSize(Frame->width, Frame->height >> 1));
         vector<MythVideoTexture*> textures =
                 MythVideoTexture::CreateTextures(m_context, FMT_NVDEC, type, sizes);
         if (textures.empty())
@@ -210,10 +208,10 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
         }
         else
         {
-            vector<MythVideoTexture*>::iterator it = textures.begin();
+            auto it = textures.begin();
             for ( ; it != textures.end(); ++it)
             {
-                QPair<CUarray,CUgraphicsResource> *data = reinterpret_cast<QPair<CUarray,CUgraphicsResource>*>((*it)->m_data);
+                auto *data = reinterpret_cast<QPair<CUarray,CUgraphicsResource>*>((*it)->m_data);
                 if (data && data->second)
                     CUDA_CHECK(m_cudaFuncs, cuGraphicsUnregisterResource(data->second));
                 delete data;
@@ -238,7 +236,7 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
     result = m_openglTextures[cudabuffer];
     for (uint i = 0; i < result.size(); ++i)
     {
-        QPair<CUarray,CUgraphicsResource> *data = reinterpret_cast<QPair<CUarray,CUgraphicsResource>*>(result[i]->m_data);
+        auto *data = reinterpret_cast<QPair<CUarray,CUgraphicsResource>*>(result[i]->m_data);
         CUDA_MEMCPY2D cpy;
         memset(&cpy, 0, sizeof(cpy));
         cpy.srcMemoryType = CU_MEMORYTYPE_DEVICE;
@@ -292,10 +290,7 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
             result.push_back(tex);
         return result;
     }
-    else
-    {
-        m_referenceFrames.clear();
-    }
+    m_referenceFrames.clear();
     m_discontinuityCounter = Frame->frameCounter;
 
     return result;
@@ -381,7 +376,7 @@ void MythNVDECInterop::RotateReferenceFrames(CUdeviceptr Buffer)
         return;
 
     // don't retain twice for double rate
-    if ((m_referenceFrames.size() > 0) && (m_referenceFrames[0] == Buffer))
+    if (!m_referenceFrames.empty() && (m_referenceFrames[0] == Buffer))
         return;
 
     m_referenceFrames.push_front(Buffer);

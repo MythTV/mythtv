@@ -101,7 +101,7 @@ bool MythNVControl::GetNvidiaRates(MythXDisplay *MythDisplay, std::vector<Displa
     if (!major)
     {
         LOG(VB_GENERAL, LOG_DEBUG, LOC + "Dynamic Twinview not enabled, ignoring");
-        return 0;
+        return false;
     }
 
     // Query the enabled displays on this screen, print basic information about each display
@@ -281,7 +281,7 @@ bool MythNVControl::GetNvidiaRates(MythXDisplay *MythDisplay, std::vector<Displa
     do
     {
         erased = false;
-        std::vector<DisplayResScreen>::iterator it = VideoModes.begin();
+        auto it = VideoModes.begin();
         for ( ; it != VideoModes.end(); ++it)
         {
             QPair<int,int> resolution((*it).Width(), (*it).Height());
@@ -294,7 +294,7 @@ bool MythNVControl::GetNvidiaRates(MythXDisplay *MythDisplay, std::vector<Displa
                 break;
             }
         }
-    } while (erased == true);
+    } while (erased);
 
     // Update refresh rates
     for (size_t i = 0; i < VideoModes.size(); i++)
@@ -309,7 +309,7 @@ bool MythNVControl::GetNvidiaRates(MythXDisplay *MythDisplay, std::vector<Displa
         const std::vector<double>& rates = scr.RefreshRates();
         bool found = false;
 
-        for (std::vector<double>::const_iterator it = rates.cbegin(); it !=  rates.cend(); ++it)
+        for (auto it = rates.cbegin(); it != rates.cend(); ++it)
         {
             uint64_t key = DisplayResScreen::CalcKey(w, h, *it);
             if (screenmap.contains(key))

@@ -33,7 +33,7 @@ HLSStreamHandler* HLSStreamHandler::Get(const IPTVTuningData& tuning, int inputi
 
     if (it == s_hlshandlers.end())
     {
-        HLSStreamHandler* newhandler = new HLSStreamHandler(tuning, inputid);
+        auto* newhandler = new HLSStreamHandler(tuning, inputid);
         newhandler->Start();
         s_hlshandlers[devkey] = newhandler;
         s_hlshandlers_refcnt[devkey] = 1;

@@ -11,12 +11,12 @@
 
 #include "xmlparsebase.h" // for VERBOSE_XML && Xml Parsing helpers
 
-typedef enum {
+enum ThemeType {
     THEME_UNKN  = 0x00,
     THEME_UI    = 0x01,
     THEME_OSD   = 0x02,
     THEME_MENU  = 0x04
-} ThemeType;
+};
 
 class MUI_PUBLIC ThemeInfo : public XMLParseBase
 {

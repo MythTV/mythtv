@@ -53,7 +53,7 @@ class QThread;
 class QWidget;
 class RingBuffer;
 
-typedef  void (*StatusCallback)(int, void*);
+using StatusCallback = void (*)(int, void*);
 
 /// Timecode types
 enum TCTypes
@@ -212,7 +212,7 @@ class MTV_PUBLIC MythPlayer
     // divisor can be passed in as an argument, e.g. pass divisor=1 to
     // return the time in milliseconds.
     virtual  int64_t GetSecondsPlayed(bool honorCutList,
-                                      int divisor = 1000) const;
+                                      int divisor = 1000);
     virtual  int64_t GetTotalSeconds(bool honorCutList,
                                      int divisor = 1000) const;
     int64_t  GetLatestVideoTimecode() const   { return m_latestVideoTimecode; }
@@ -608,7 +608,7 @@ class MTV_PUBLIC MythPlayer
     // Private seeking stuff
     void WaitForSeek(uint64_t frame, uint64_t seeksnap_wanted);
     void ClearAfterSeek(bool clearvideobuffers = true);
-    void ClearBeforeSeek(uint64_t Frames);
+    static void ClearBeforeSeek(uint64_t Frames);
 
     // Private chapter stuff
     virtual bool DoJumpChapter(int chapter);

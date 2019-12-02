@@ -16,7 +16,7 @@
 #include "httpserver.h"
 #include "eventing.h"
               
-typedef enum 
+enum UPnpCMGRMethod
 {
     CMGRM_Unknown                  = 0,
     CMGRM_GetServiceDescription    = 1,
@@ -24,20 +24,18 @@ typedef enum
     CMGRM_GetCurrentConnectionInfo = 3,
     CMGRM_GetCurrentConnectionIDs  = 4,
     CMGRM_GetFeatureList           = 5
-
-} UPnpCMGRMethod;
+};
 
 //////////////////////////////////////////////////////////////////////////////
 
-typedef enum 
+enum UPnpCMGRConnectionStatus
 {
     CMGRSTATUS_Unknown               = 0,
     CMGRSTATUS_OK                    = 1,
     CMGRSTATUS_ContentFormatMismatch = 2,
     CMGRSTATUS_InsufficientBandwidth = 3,
     CMGRSTATUS_UnreliableChannel     = 4
-
-} UPnpCMGRConnectionStatus;
+};
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////

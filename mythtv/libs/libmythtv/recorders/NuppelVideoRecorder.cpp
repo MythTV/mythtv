@@ -361,7 +361,7 @@ bool NuppelVideoRecorder::IsPaused(bool holding_lock) const
     return ret;
 }
 
-void NuppelVideoRecorder::SetVideoFilters(QString&)
+void NuppelVideoRecorder::SetVideoFilters(QString& /*filters*/)
 {
 }
 
@@ -781,7 +781,7 @@ void NuppelVideoRecorder::InitBuffers(void)
 
     for (int i = 0; i < m_video_buffer_count; i++)
     {
-        vidbuffertype *vidbuf = new vidbuffertype;
+        auto *vidbuf = new vidbuffertype;
         vidbuf->buffer = new unsigned char[m_video_buffer_size];
         vidbuf->sample = 0;
         vidbuf->freeToEncode = 0;
@@ -794,7 +794,7 @@ void NuppelVideoRecorder::InitBuffers(void)
 
     for (int i = 0; i < m_audio_buffer_count; i++)
     {
-        audbuffertype *audbuf = new audbuffertype;
+        auto *audbuf = new audbuffertype;
         audbuf->buffer = new unsigned char[m_audio_buffer_size];
         audbuf->sample = 0;
         audbuf->freeToEncode = 0;
@@ -805,7 +805,7 @@ void NuppelVideoRecorder::InitBuffers(void)
 
     for (int i = 0; i < m_text_buffer_count; i++)
     {
-        txtbuffertype *txtbuf = new txtbuffertype;
+        auto *txtbuf = new txtbuffertype;
         txtbuf->buffer = new unsigned char[m_text_buffer_size];
         txtbuf->freeToEncode = 0;
         txtbuf->freeToBuffer = 1;
@@ -1884,11 +1884,11 @@ void NuppelVideoRecorder::SetNewVideoParams(double newaspect)
 void NuppelVideoRecorder::WriteFileHeader(void)
 {
     struct rtfileheader fileheader {};
-    static const char finfo[12] = "MythTVVideo";
-    static const char vers[5]   = "0.07";
+    static constexpr char kFinfo[12] = "MythTVVideo";
+    static constexpr char kVers[5]   = "0.07";
 
-    memcpy(fileheader.finfo, finfo, sizeof(fileheader.finfo));
-    memcpy(fileheader.version, vers, sizeof(fileheader.version));
+    memcpy(fileheader.finfo, kFinfo, sizeof(fileheader.finfo));
+    memcpy(fileheader.version, kVers, sizeof(fileheader.version));
     fileheader.width  = m_w_out;
     fileheader.height = (int)(m_h_out * m_height_multiplier);
     fileheader.desiredwidth  = 0;
@@ -1935,16 +1935,16 @@ void NuppelVideoRecorder::WriteHeader(void)
     }
     else
     {
-        static unsigned long int tbls[128];
+        static unsigned long int s_tbls[128];
 
         frameheader.comptype = 'R'; // compressor data for RTjpeg
-        frameheader.packetlength = sizeof(tbls);
+        frameheader.packetlength = sizeof(s_tbls);
 
         // compression configuration header
         WriteFrameheader(&frameheader);
 
-        memset(tbls, 0, sizeof(tbls));
-        m_ringBuffer->Write(tbls, sizeof(tbls));
+        memset(s_tbls, 0, sizeof(s_tbls));
+        m_ringBuffer->Write(s_tbls, sizeof(s_tbls));
     }
 
     memset(&frameheader, 0, sizeof(frameheader));
@@ -2048,7 +2048,7 @@ void NuppelVideoRecorder::WriteSeekTable(void)
     char *seekbuf = new char[frameheader.packetlength];
     int offset = 0;
 
-    vector<struct seektable_entry>::iterator it = m_seektable->begin();
+    auto it = m_seektable->begin();
     for (; it != m_seektable->end(); ++it)
     {
         memcpy(seekbuf + offset, (const void *)&(*it),
@@ -2085,8 +2085,8 @@ void NuppelVideoRecorder::WriteKeyFrameAdjustTable(
     char *kfa_buf = new char[frameheader.packetlength];
     uint offset = 0;
 
-    vector<struct kfatable_entry>::const_iterator it = kfa_table.begin();
-    for (; it != kfa_table.end() ; ++it)
+    auto it = kfa_table.cbegin();
+    for (; it != kfa_table.cend() ; ++it)
     {
         memcpy(kfa_buf + offset, &(*it),
                sizeof(struct kfatable_entry));
@@ -2217,7 +2217,7 @@ void NuppelVideoRecorder::doAudioThread(void)
     }
 
     struct timeval anow {};
-    unsigned char *buffer = new unsigned char[m_audio_buffer_size];
+    auto *buffer = new unsigned char[m_audio_buffer_size];
     int act = 0, lastread = 0;
     m_audio_bytes_per_sample = m_audio_channels * m_audio_bits / 8;
 
@@ -2935,10 +2935,10 @@ void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
                              // of recording and the first timestamp, maybe we
                              // can calculate the audio-video +-lack at the
                             // beginning too
-        double abytes = (double)m_audiobytes; // - (double)m_audio_buffer_size;
+        auto abytes = (double)m_audiobytes; // - (double)m_audio_buffer_size;
                                      // wrong guess ;-)
         // need seconds instead of msec's
-        double mt = (double)timecode;
+        auto mt = (double)timecode;
         if (mt > 0.0)
         {
             double eff = (abytes / mt) * (100000.0 / m_audio_bytes_per_sample);
@@ -3045,14 +3045,14 @@ void NuppelVideoRecorder::WriteText(unsigned char *buf, int len, int timecode,
         frameheader.packetlength = len + 4;
         WriteFrameheader(&frameheader);
         union page_t {
-            int32_t val32;
-            struct { int8_t a,b,c,d; } val8;
+            int32_t m_val32;
+            struct { int8_t m_a,m_b,m_c,m_d; } m_val8;
         } v {};
-        v.val32 = pagenr;
-        m_ringBuffer->Write(&v.val8.d, sizeof(int8_t));
-        m_ringBuffer->Write(&v.val8.c, sizeof(int8_t));
-        m_ringBuffer->Write(&v.val8.b, sizeof(int8_t));
-        m_ringBuffer->Write(&v.val8.a, sizeof(int8_t));
+        v.m_val32 = pagenr;
+        m_ringBuffer->Write(&v.m_val8.m_d, sizeof(int8_t));
+        m_ringBuffer->Write(&v.m_val8.m_c, sizeof(int8_t));
+        m_ringBuffer->Write(&v.m_val8.m_b, sizeof(int8_t));
+        m_ringBuffer->Write(&v.m_val8.m_a, sizeof(int8_t));
         m_ringBuffer->Write(buf, len);
     }
     else if (VBIMode::NTSC_CC == m_vbimode)

@@ -49,7 +49,7 @@ class SERVICE_PUBLIC LogInfo : public QObject
         Q_DISABLE_COPY(LogInfo);
 };
 
-typedef LogInfo* LogInfoPtr;
+using LogInfoPtr = LogInfo*;
 
 inline void LogInfo::InitializeCustomTypes()
 {

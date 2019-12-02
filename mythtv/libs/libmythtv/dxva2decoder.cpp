@@ -77,11 +77,11 @@ DEFINE_GUID(DXVA2_Intel_ModeH264_C, 0x604F8E66, 0x4951, 0x4c54, 0x88,0xFE,0xAB,0
 DEFINE_GUID(DXVA2_Intel_ModeH264_E, 0x604F8E68, 0x4951, 0x4c54, 0x88,0xFE,0xAB,0xD2,0x5C,0x15,0xB3,0xD6);
 DEFINE_GUID(DXVA2_Intel_ModeVC1_E , 0xBCC5DB6D, 0xA2B6, 0x4AF0, 0xAC,0xE4,0xAD,0xB1,0xF7,0x87,0xBC,0x89);
 
-typedef struct {
+struct dxva2_mode {
     const QString name;
     const GUID   *guid;
     MythCodecID   codec;
-} dxva2_mode;
+};
 
 static const dxva2_mode dxva2_modes[] =
 {
@@ -160,7 +160,7 @@ bool DXVA2Decoder::Init(MythRenderD3D9* render)
     return ok;
 }
 
-typedef HRESULT (__stdcall *DXVA2CreateVideoServicePtr)(IDirect3DDevice9* pDD,
+using DXVA2CreateVideoServicePtr = HRESULT (__stdcall *)(IDirect3DDevice9* pDD,
                                                         REFIID riid,
                                                         void** ppService);
 

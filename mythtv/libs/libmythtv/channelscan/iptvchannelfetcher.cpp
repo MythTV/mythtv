@@ -3,6 +3,7 @@
 // Std C headers
 #include <cmath>
 #include <unistd.h>
+#include <utility>
 
 // Qt headers
 #include <QFile>
@@ -31,10 +32,10 @@ static bool parse_extinf(const QString &line,
                          int           &nextChanNum);
 
 IPTVChannelFetcher::IPTVChannelFetcher(
-    uint cardid, const QString &inputname, uint sourceid,
+    uint cardid, QString inputname, uint sourceid,
     bool is_mpts, ScanMonitor *monitor) :
     m_scan_monitor(monitor),
-    m_cardid(cardid),       m_inputname(inputname),
+    m_cardid(cardid),       m_inputname(std::move(inputname)),
     m_sourceid(sourceid),   m_is_mpts(is_mpts),
     m_thread(new MThread("IPTVChannelFetcher", this))
 {
@@ -532,14 +533,12 @@ static bool parse_extinf(const QString &line,
                 nextChanNum = channel_number + 1;
             return true;
         }
-        else
-        {
-            // no valid channel number found use the default next one
-            LOG(VB_GENERAL, LOG_ERR, QString("No channel number found, using next available: %1 for channel: %2").arg(nextChanNum).arg(name));
-            channum = QString::number(nextChanNum);
-            nextChanNum++;
-            return true;
-        }
+
+        // no valid channel number found use the default next one
+        LOG(VB_GENERAL, LOG_ERR, QString("No channel number found, using next available: %1 for channel: %2").arg(nextChanNum).arg(name));
+        channum = QString::number(nextChanNum);
+        nextChanNum++;
+        return true;
     }
 
     // not one of the formats we support

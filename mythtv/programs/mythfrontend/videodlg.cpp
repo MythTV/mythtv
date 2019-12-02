@@ -141,7 +141,7 @@ namespace
         const QString base_name = qfi.completeBaseName();
         QList<QByteArray> image_types = QImageReader::supportedImageFormats();
 
-        typedef std::set<QString> image_type_list;
+        using image_type_list = std::set<QString>;
         image_type_list image_exts;
 
         QString suffix;
@@ -168,8 +168,7 @@ namespace
             RemoteGetFileList(host, "", &hostFiles, sgroup, true);
             const QString hntm("%2.%3");
 
-            for (image_type_list::const_iterator ext = image_exts.begin();
-                    ext != image_exts.end(); ++ext)
+            for (auto ext = image_exts.cbegin(); ext != image_exts.cend(); ++ext)
             {
                 QStringList sfn;
                 if (episode > 0 || season > 0)
@@ -212,8 +211,7 @@ namespace
         {
             if (!(*dir).length()) continue;
 
-            for (image_type_list::const_iterator ext = image_exts.begin();
-                    ext != image_exts.end(); ++ext)
+            for (auto ext = image_exts.cbegin(); ext != image_exts.cend(); ++ext)
             {
                 QStringList sfn;
                 if (season > 0 || episode > 0)
@@ -439,7 +437,7 @@ namespace
     void CopyMetadataToUI(const VideoMetadata *metadata,
             CopyMetadataDestination &dest)
     {
-        typedef std::map<QString, QString> valuelist;
+        using valuelist = std::map<QString, QString>;
         valuelist tmp;
 
         if (metadata)
@@ -666,8 +664,7 @@ const char * const ItemDetailPopup::WINDOW_NAME = "itemdetailpopup";
 class VideoDialogPrivate
 {
   private:
-    typedef std::list<std::pair<QString, ParentalLevel::Level> >
-            parental_level_map;
+    using parental_level_map = std::list<std::pair<QString, ParentalLevel::Level> >;
 
     struct rating_to_pl_less :
         public std::binary_function<parental_level_map::value_type,
@@ -680,7 +677,7 @@ class VideoDialogPrivate
         }
     };
 
-    typedef VideoDialog::VideoListPtr VideoListPtr;
+    using VideoListPtr = VideoDialog::VideoListPtr;
 
   public:
     VideoDialogPrivate(const VideoListPtr& videoList, VideoDialog::DialogType type,
@@ -1186,7 +1183,7 @@ void VideoDialog::loadData()
             }
         }
 
-        typedef QList<MythGenericTree *> MGTreeChildList;
+        using MGTreeChildList = QList<MythGenericTree *>;
         MGTreeChildList *lchildren = m_d->m_currentNode->getAllChildren();
 
         for (MGTreeChildList::const_iterator p = lchildren->begin();
@@ -1194,7 +1191,7 @@ void VideoDialog::loadData()
         {
             if (*p != nullptr)
             {
-                MythUIButtonListItem *item =
+                auto *item =
                         new MythUIButtonListItem(m_videoButtonList, QString(), nullptr,
                                 true, MythUIButtonListItem::NotChecked);
 
@@ -2185,8 +2182,7 @@ void VideoDialog::createOkDialog(const QString& title)
 {
     const QString& message = title;
 
-    MythConfirmationDialog *okPopup =
-            new MythConfirmationDialog(m_popupStack, message, false);
+    auto *okPopup = new MythConfirmationDialog(m_popupStack, message, false);
 
     if (okPopup->Create())
         m_popupStack->AddScreen(okPopup);
@@ -2255,7 +2251,7 @@ void VideoDialog::searchStart(void)
 
     MythScreenStack *popupStack =
         GetMythMainWindow()->GetStack("popup stack");
-    MythUISearchDialog *searchDialog = new MythUISearchDialog(popupStack,
+    auto *searchDialog = new MythUISearchDialog(popupStack,
         tr("Video Search"), childList, false, "");
 
     if (searchDialog->Create())
@@ -2409,7 +2405,7 @@ void VideoDialog::VideoMenu()
     else
         label = tr("Video Options");
 
-    MythMenu *menu = new MythMenu(label, this, "actions");
+    auto *menu = new MythMenu(label, this, "actions");
 
     MythUIButtonListItem *item = GetItemCurrent();
     MythGenericTree *node = GetNodePtrFromButton(item);
@@ -2464,7 +2460,7 @@ MythMenu* VideoDialog::CreatePlayMenu()
     else
         return nullptr;
 
-    MythMenu *menu = new MythMenu(label, this, "actions");
+    auto *menu = new MythMenu(label, this, "actions");
 
     menu->AddItem(tr("Play"), SLOT(playVideo()));
 
@@ -2496,7 +2492,7 @@ void VideoDialog::DisplayMenu()
 {
     QString label = tr("Video Display Menu");
 
-    MythMenu *menu = new MythMenu(label, this, "display");
+    auto *menu = new MythMenu(label, this, "display");
 
     menu->AddItem(tr("Scan For Changes"), SLOT(doVideoScan()));
     menu->AddItem(tr("Retrieve All Details"), SLOT(VideoAutoSearch()));
@@ -2538,7 +2534,7 @@ MythMenu* VideoDialog::CreateViewMenu()
 {
     QString label = tr("Change View");
 
-    MythMenu *menu = new MythMenu(label, this, "view");
+    auto *menu = new MythMenu(label, this, "view");
 
     if (!(m_d->m_type & DLG_BROWSER))
         menu->AddItem(tr("Switch to Browse View"), SLOT(SwitchBrowse()));
@@ -2574,7 +2570,7 @@ MythMenu* VideoDialog::CreateSettingsMenu()
 {
     QString label = tr("Video Settings");
 
-    MythMenu *menu = new MythMenu(label, this, "settings");
+    auto *menu = new MythMenu(label, this, "settings");
 
     menu->AddItem(tr("Player Settings"), SLOT(ShowPlayerSettings()));
     menu->AddItem(tr("Metadata Settings"), SLOT(ShowMetadataSettings()));
@@ -2589,7 +2585,7 @@ MythMenu* VideoDialog::CreateSettingsMenu()
  */
 void VideoDialog::ShowPlayerSettings()
 {
-    PlayerSettings *ps = new PlayerSettings(m_mainStack, "player settings");
+    auto *ps = new PlayerSettings(m_mainStack, "player settings");
 
     if (ps->Create())
         m_mainStack->AddScreen(ps);
@@ -2603,7 +2599,7 @@ void VideoDialog::ShowPlayerSettings()
  */
 void VideoDialog::ShowMetadataSettings()
 {
-    MetadataSettings *ms = new MetadataSettings(m_mainStack, "metadata settings");
+    auto *ms = new MetadataSettings(m_mainStack, "metadata settings");
 
     if (ms->Create())
         m_mainStack->AddScreen(ms);
@@ -2617,7 +2613,7 @@ void VideoDialog::ShowMetadataSettings()
  */
 void VideoDialog::ShowExtensionSettings()
 {
-    FileAssocDialog *fa = new FileAssocDialog(m_mainStack, "fa dialog");
+    auto *fa = new FileAssocDialog(m_mainStack, "fa dialog");
 
     if (fa->Create())
         m_mainStack->AddScreen(fa);
@@ -2633,7 +2629,7 @@ MythMenu* VideoDialog::CreateMetadataBrowseMenu()
 {
     QString label = tr("Browse By");
 
-    MythMenu *menu = new MythMenu(label, this, "metadata");
+    auto *menu = new MythMenu(label, this, "metadata");
 
     if (m_d->m_groupType != BRS_CAST)
         menu->AddItem(tr("Cast"), SLOT(SwitchVideoCastGroup()));
@@ -2676,7 +2672,7 @@ MythMenu *VideoDialog::CreateInfoMenu()
 {
     QString label = tr("Video Info");
 
-    MythMenu *menu = new MythMenu(label, this, "info");
+    auto *menu = new MythMenu(label, this, "info");
 
     if (ItemDetailPopup::Exists())
         menu->AddItem(tr("View Details"), SLOT(DoItemDetailShow()));
@@ -2703,7 +2699,7 @@ MythMenu *VideoDialog::CreateManageMenu()
 {
     QString label = tr("Manage Video Details");
 
-    MythMenu *menu = new MythMenu(label, this, "manage");
+    auto *menu = new MythMenu(label, this, "manage");
 
     VideoMetadata *metadata = GetMetadata(GetItemCurrent());
 
@@ -2950,7 +2946,7 @@ void VideoDialog::SwitchLayout(DialogType type, BrowseType browse)
     // save current position so it can be restored after the switch
     SavePosition();
 
-    VideoDialog *mythvideo =
+    auto *mythvideo =
             new VideoDialog(GetMythMainWindow()->GetMainStack(), "mythvideo",
                     m_d->m_videoList, type, browse);
 
@@ -2977,7 +2973,7 @@ void VideoDialog::ViewPlot()
 {
     VideoMetadata *metadata = GetMetadata(GetItemCurrent());
 
-    PlotDialog *plotdialog = new PlotDialog(m_popupStack, metadata);
+    auto *plotdialog = new PlotDialog(m_popupStack, metadata);
 
     if (plotdialog->Create())
         m_popupStack->AddScreen(plotdialog);
@@ -2994,7 +2990,7 @@ bool VideoDialog::DoItemDetailShow()
     if (metadata)
     {
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-        ItemDetailPopup *idp = new ItemDetailPopup(mainStack, metadata,
+        auto *idp = new ItemDetailPopup(mainStack, metadata,
                 m_d->m_videoList->getListCache());
 
         if (idp->Create())
@@ -3015,7 +3011,7 @@ void VideoDialog::ShowCastDialog()
 {
     VideoMetadata *metadata = GetMetadata(GetItemCurrent());
 
-    CastDialog *castdialog = new CastDialog(m_popupStack, metadata);
+    auto *castdialog = new CastDialog(m_popupStack, metadata);
 
     if (castdialog->Create())
         m_popupStack->AddScreen(castdialog);
@@ -3247,7 +3243,7 @@ void VideoDialog::ChangeFilter()
 {
     MythScreenStack *mainStack = GetScreenStack();
 
-    VideoFilterDialog *filterdialog = new VideoFilterDialog(mainStack,
+    auto *filterdialog = new VideoFilterDialog(mainStack,
             "videodialogfilters", m_d->m_videoList.get());
 
     if (filterdialog->Create())
@@ -3283,7 +3279,7 @@ void VideoDialog::customEvent(QEvent *levent)
 {
     if (levent->type() == MetadataFactoryMultiResult::kEventType)
     {
-        MetadataFactoryMultiResult *mfmr = dynamic_cast<MetadataFactoryMultiResult*>(levent);
+        auto *mfmr = dynamic_cast<MetadataFactoryMultiResult*>(levent);
 
         if (!mfmr)
             return;
@@ -3292,11 +3288,9 @@ void VideoDialog::customEvent(QEvent *levent)
 
         if (list.count() > 1)
         {
-            VideoMetadata *metadata =
-                list[0]->GetData().value<VideoMetadata *>();
+            auto *metadata = list[0]->GetData().value<VideoMetadata *>();
             dismissFetchDialog(metadata, true);
-            MetadataResultsDialog *resultsdialog =
-                  new MetadataResultsDialog(m_popupStack, list);
+            auto *resultsdialog = new MetadataResultsDialog(m_popupStack, list);
 
             connect(resultsdialog, SIGNAL(haveResult(RefCountHandler<MetadataLookup>)),
                     SLOT(OnVideoSearchListSelection(RefCountHandler<MetadataLookup>)),
@@ -3308,7 +3302,7 @@ void VideoDialog::customEvent(QEvent *levent)
     }
     else if (levent->type() == MetadataFactorySingleResult::kEventType)
     {
-        MetadataFactorySingleResult *mfsr = dynamic_cast<MetadataFactorySingleResult*>(levent);
+        auto *mfsr = dynamic_cast<MetadataFactorySingleResult*>(levent);
 
         if (!mfsr)
             return;
@@ -3322,7 +3316,7 @@ void VideoDialog::customEvent(QEvent *levent)
     }
     else if (levent->type() == MetadataFactoryNoResult::kEventType)
     {
-        MetadataFactoryNoResult *mfnr = dynamic_cast<MetadataFactoryNoResult*>(levent);
+        auto *mfnr = dynamic_cast<MetadataFactoryNoResult*>(levent);
 
         if (!mfnr)
             return;
@@ -3332,8 +3326,7 @@ void VideoDialog::customEvent(QEvent *levent)
         if (!lookup)
             return;
 
-        VideoMetadata *metadata =
-            lookup->GetData().value<VideoMetadata *>();
+        auto *metadata = lookup->GetData().value<VideoMetadata *>();
         if (metadata)
         {
             dismissFetchDialog(metadata, false);
@@ -3346,7 +3339,7 @@ void VideoDialog::customEvent(QEvent *levent)
     }
     else if (levent->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = static_cast<DialogCompletionEvent *>(levent);
+        auto *dce = static_cast<DialogCompletionEvent *>(levent);
         QString id = dce->GetId();
 
         if (id == "scanprompt")
@@ -3447,7 +3440,7 @@ void VideoDialog::VideoAutoSearch(MythGenericTree *node)
 {
     if (!node)
         node = m_d->m_rootNode;
-    typedef QList<MythGenericTree *> MGTreeChildList;
+    using MGTreeChildList = QList<MythGenericTree *>;
     MGTreeChildList *lchildren = node->getAllChildren();
 
     LOG(VB_GENERAL, LOG_DEBUG,
@@ -3522,7 +3515,7 @@ void VideoDialog::EditMetadata()
 
     MythScreenStack *screenStack = GetScreenStack();
 
-    EditMetadataDialog *md_editor = new EditMetadataDialog(screenStack,
+    auto *md_editor = new EditMetadataDialog(screenStack,
             "mythvideoeditmetadata", metadata,
             m_d->m_videoList->getListCache());
 
@@ -3542,8 +3535,7 @@ void VideoDialog::RemoveVideo()
     QString message = tr("Are you sure you want to permanently delete:\n%1")
                           .arg(metadata->GetTitle());
 
-    MythConfirmationDialog *confirmdialog =
-            new MythConfirmationDialog(m_popupStack,message);
+    auto *confirmdialog = new MythConfirmationDialog(m_popupStack,message);
 
     if (confirmdialog->Create())
         m_popupStack->AddScreen(confirmdialog);
@@ -3579,8 +3571,8 @@ void VideoDialog::OnRemoveVideo(bool dodelete)
     {
         QString message = tr("Failed to delete file");
 
-        MythConfirmationDialog *confirmdialog =
-                        new MythConfirmationDialog(m_popupStack,message,false);
+        auto *confirmdialog = new MythConfirmationDialog(m_popupStack,message,
+                                                         false);
 
         if (confirmdialog->Create())
             m_popupStack->AddScreen(confirmdialog);
@@ -3683,7 +3675,7 @@ void VideoDialog::OnVideoSearchDone(MetadataLookup *lookup)
     if (!lookup)
        return;
 
-    VideoMetadata *metadata = lookup->GetData().value<VideoMetadata *>();
+    auto *metadata = lookup->GetData().value<VideoMetadata *>();
 
     if (!metadata)
         return;
@@ -3820,9 +3812,7 @@ void VideoDialog::PromptToScan()
 {
     QString message = tr("There are no videos in the database, would you like "
                          "to scan your video directories now?");
-    MythConfirmationDialog *dialog = new MythConfirmationDialog(m_popupStack,
-                                                                message,
-                                                                true);
+    auto *dialog = new MythConfirmationDialog(m_popupStack, message, true);
     dialog->SetReturnEvent(this, "scanprompt");
     if (dialog->Create())
         m_popupStack->AddScreen(dialog);

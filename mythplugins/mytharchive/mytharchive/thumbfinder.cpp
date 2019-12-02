@@ -94,7 +94,7 @@ ThumbFinder::ThumbFinder(MythScreenStack *parent, ArchiveItem *archiveItem,
     m_thumbList.clear();
     for (int x = 0; x < m_archiveItem->thumbList.size(); x++)
     {
-        ThumbImage *thumb = new ThumbImage;
+        auto *thumb = new ThumbImage;
         *thumb = *m_archiveItem->thumbList.at(x);
         m_thumbList.append(thumb);
     }
@@ -290,7 +290,7 @@ void ThumbFinder::savePressed()
 
     for (int x = 0; x < m_thumbList.size(); x++)
     {
-        ThumbImage *thumb = new ThumbImage;
+        auto *thumb = new ThumbImage;
         *thumb = *m_thumbList.at(x);
         m_archiveItem->thumbList.append(thumb);
     }
@@ -500,7 +500,7 @@ bool ThumbFinder::getThumbImages()
             int sec = chapter % 60;
             QString time = QString::asprintf("%02d:%02d:%02d", hour, min, sec);
 
-            int64_t frame = (int64_t) (chapter * ceil(m_fps));
+            auto frame = (int64_t) (chapter * ceil(m_fps));
 
             // no thumb available create a new one
             thumb = new ThumbImage;
@@ -865,7 +865,7 @@ void ThumbFinder::closeAVCodec()
 void ThumbFinder::ShowMenu()
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythDialogBox *menuPopup = new MythDialogBox(tr("Menu"), popupStack, "actionmenu");
+    auto *menuPopup = new MythDialogBox(tr("Menu"), popupStack, "actionmenu");
 
     if (menuPopup->Create())
         popupStack->AddScreen(menuPopup);
@@ -882,7 +882,7 @@ void ThumbFinder::updatePositionBar(int64_t frame)
         return;
 
     QSize size = m_positionImage->GetArea().size();
-    QPixmap *pixmap = new QPixmap(size.width(), size.height());
+    auto *pixmap = new QPixmap(size.width(), size.height());
 
     QPainter p(pixmap);
     QBrush brush(Qt::green);

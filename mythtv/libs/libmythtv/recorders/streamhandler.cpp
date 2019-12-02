@@ -245,7 +245,7 @@ bool StreamHandler::RemoveAllPIDFilters(void)
         del_pids.push_back(it.key());
 
     bool ok = true;
-    vector<int>::iterator dit = del_pids.begin();
+    auto dit = del_pids.begin();
     for (; dit != del_pids.end(); ++dit)
         ok &= RemovePIDFilter(*dit);
 
@@ -325,7 +325,7 @@ bool StreamHandler::UpdateFiltersFromStreamData(void)
 
     // Remove PIDs
     bool ok = true;
-    vector<uint>::iterator dit = del_pids.begin();
+    auto dit = del_pids.begin();
     for (; dit != del_pids.end(); ++dit)
         ok &= RemovePIDFilter(*dit);
 

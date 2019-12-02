@@ -60,12 +60,12 @@ class MPEG2frame
     mpeg2_picture_t   m_mpeg2_pic;
 };
 
-typedef struct {
+struct poq_idx_t {
     int64_t newPTS;
     int64_t pos_pts;
     int framenum;
     bool type;
-} poq_idx_t;
+};
 
 class PTSOffsetQueue
 {
@@ -110,9 +110,9 @@ class MPEG2replex
     multiplex_t    *m_mplex                   {nullptr};
 };
 
-typedef QList<MPEG2frame *> FrameList;
-typedef QQueue<MPEG2frame *> FrameQueue;
-typedef QMap<int, FrameList *> FrameMap;
+using FrameList  = QList<MPEG2frame *>;
+using FrameQueue = QQueue<MPEG2frame *>;
+using FrameMap   = QMap<int, FrameList *>;
 
 class MPEG2fixup
 {

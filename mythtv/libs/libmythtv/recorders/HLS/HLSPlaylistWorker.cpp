@@ -37,7 +37,7 @@ void HLSPlaylistWorker::run(void)
 
     RunProlog();
 
-    MythSingleDownload *downloader = new MythSingleDownload;
+    auto *downloader = new MythSingleDownload;
 
     while (!m_cancel)
     {

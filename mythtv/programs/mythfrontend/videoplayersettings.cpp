@@ -144,21 +144,21 @@ void PlayerSettings::toggleAlt()
 
 void PlayerSettings::fillRegionList()
 {
-    MythUIButtonListItem *noRegion =
+    auto *noRegion =
             new MythUIButtonListItem(m_blurayRegionList, tr("No Region"));
     noRegion->SetData(0);
 
-    MythUIButtonListItem *regionA =
+    auto *regionA =
             new MythUIButtonListItem(m_blurayRegionList, tr("Region A: "
                                      "The Americas, Southeast Asia, Japan"));
     regionA->SetData(1);
 
-    MythUIButtonListItem *regionB =
+    auto *regionB =
             new MythUIButtonListItem(m_blurayRegionList, tr("Region B: "
                                      "Europe, Middle East, Africa, Oceania"));
     regionB->SetData(2);
 
-    MythUIButtonListItem *regionC =
+    auto *regionC =
             new MythUIButtonListItem(m_blurayRegionList, tr("Region C: "
                                      "Eastern Europe, Central and South Asia"));
     regionC->SetData(4);

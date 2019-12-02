@@ -29,7 +29,7 @@ class TeletextScreen: public MythScreenType
   private:
     void OptimiseDisplayedArea(void);
     QImage* GetRowImage(int row, QRect &rect);
-    void SetForegroundColor(int color);
+    static void SetForegroundColor(int color);
     void SetBackgroundColor(int color);
     void DrawBackground(int x, int y);
     void DrawRect(int row, const QRect);

@@ -40,7 +40,7 @@ class pid_cache_item_t
     uint m_pid     {0};
     uint m_sid_tid {0};
 };
-typedef vector<pid_cache_item_t> pid_cache_t;
+using pid_cache_t = vector<pid_cache_item_t>;
 
 /** \class ChannelUtil
  *  \brief Collection of helper utilities for channel DB use

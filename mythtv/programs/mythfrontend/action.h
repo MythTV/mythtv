@@ -72,7 +72,7 @@ class Action
     QString     m_description; ///< The actions description.
     QStringList m_keys;        ///< The keys bound to the action.
 };
-typedef QHash<QString, Action*> Context;
+using Context = QHash<QString, Action*>;
 
 /** \class ActionID
  *  \brief A class that uniquely identifies an action.
@@ -117,6 +117,6 @@ class ActionID
     QString m_context;
     QString m_action;
 };
-typedef QList<ActionID> ActionList;
+using ActionList = QList<ActionID>;
 
 #endif /* ACTION_H */

@@ -161,15 +161,15 @@ class MTV_PUBLIC BDRingBuffer : public RingBuffer
     bool HandleBDEvents(void);
     void HandleBDEvent(BD_EVENT &event);
 
-    const BLURAY_STREAM_INFO* FindStream(int streamid, BLURAY_STREAM_INFO* streams, int streamCount) const;
+    static const BLURAY_STREAM_INFO* FindStream(int streamid, BLURAY_STREAM_INFO* streams, int streamCount);
 
 
-    typedef enum
+    enum processState_t
     {
         PROCESS_NORMAL,
         PROCESS_REPROCESS,
         PROCESS_WAIT
-    }processState_t;
+    };
 
     BLURAY            *m_bdnav                       {nullptr};
     bool               m_isHDMVNavigation            {false};

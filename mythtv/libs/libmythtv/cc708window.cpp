@@ -195,8 +195,7 @@ void CC708Window::Resize(uint new_rows, uint new_columns)
 
         // Expand the array if the new size exceeds the current capacity
         // in either dimension.
-        CC708Character *new_text =
-            new CC708Character[new_rows * new_columns];
+        auto *new_text = new CC708Character[new_rows * new_columns];
         m_pen.m_column = 0;
         m_pen.m_row = 0;
         uint i, j;
@@ -205,11 +204,11 @@ void CC708Window::Resize(uint new_rows, uint new_columns)
             for (j = 0; j < m_column_count; ++j)
                 new_text[i * new_columns + j] = m_text[i * m_true_column_count + j];
             for (; j < new_columns; ++j)
-                new_text[i * new_columns + j].m_attr = m_pen.attr;
+                new_text[i * new_columns + j].m_attr = m_pen.m_attr;
         }
         for (; i < new_rows; ++i)
             for (j = 0; j < new_columns; ++j)
-                new_text[i * new_columns + j].m_attr = m_pen.attr;
+                new_text[i * new_columns + j].m_attr = m_pen.m_attr;
 
         delete [] m_text;
         m_text = new_text;
@@ -225,13 +224,13 @@ void CC708Window::Resize(uint new_rows, uint new_columns)
             for (uint j = m_column_count; j < new_columns; ++j)
             {
                 m_text[i * m_true_column_count + j].m_character = ' ';
-                m_text[i * m_true_column_count + j].m_attr = m_pen.attr;
+                m_text[i * m_true_column_count + j].m_attr = m_pen.m_attr;
             }
         for (uint i = m_row_count; i < new_rows; ++i)
             for (uint j = 0; j < new_columns; ++j)
             {
                 m_text[i * m_true_column_count + j].m_character = ' ';
-                m_text[i * m_true_column_count + j].m_attr = m_pen.attr;
+                m_text[i * m_true_column_count + j].m_attr = m_pen.m_attr;
             }
         SetChanged();
     }
@@ -264,7 +263,7 @@ void CC708Window::Clear(void)
     for (uint i = 0; i < m_true_row_count * m_true_column_count; i++)
     {
         m_text[i].m_character = QChar(' ');
-        m_text[i].m_attr = m_pen.attr;
+        m_text[i].m_attr = m_pen.m_attr;
     }
     SetChanged();
 }
@@ -321,24 +320,24 @@ vector<CC708String*> CC708Window::GetStrings(void) const
             if (!cur)
             {
                 cur = new CC708String;
-                cur->x    = i;
-                cur->y    = j;
-                cur->attr = chr.m_attr;
+                cur->m_x    = i;
+                cur->m_y    = j;
+                cur->m_attr = chr.m_attr;
                 strStart = i;
             }
             bool isDisplayable = (chr.m_character != ' ' || chr.m_attr.m_underline);
             if (inLeadingSpaces && isDisplayable)
             {
-                cur->attr = chr.m_attr;
+                cur->m_attr = chr.m_attr;
                 inLeadingSpaces = false;
             }
             if (isDisplayable)
             {
                 inTrailingSpaces = false;
             }
-            if (cur->attr != chr.m_attr)
+            if (cur->m_attr != chr.m_attr)
             {
-                cur->str = QString(&chars[strStart], i - strStart);
+                cur->m_str = QString(&chars[strStart], i - strStart);
                 list.push_back(cur);
                 createdString = true;
                 createdNonblankStrings = true;
@@ -357,7 +356,7 @@ vector<CC708String*> CC708Window::GetStrings(void) const
                 int length = allSpaces ? 0 : m_column_count - strStart;
                 if (length)
                     createdNonblankStrings = true;
-                cur->str = QString(&chars[strStart], length);
+                cur->m_str = QString(&chars[strStart], length);
                 list.push_back(cur);
             }
             else
@@ -370,7 +369,7 @@ vector<CC708String*> CC708Window::GetStrings(void) const
     return list;
 }
 
-void CC708Window::DisposeStrings(vector<CC708String*> &strings) const
+void CC708Window::DisposeStrings(vector<CC708String*> &strings)
 {
     while (!strings.empty())
     {
@@ -439,14 +438,14 @@ void CC708Window::AddChar(QChar ch)
     {
         DecrPenLocation();
         CC708Character& chr = GetCCChar();
-        chr.m_attr      = m_pen.attr;
+        chr.m_attr      = m_pen.m_attr;
         chr.m_character = QChar(' ');
         SetChanged();
         return;
     }
 
     CC708Character& chr = GetCCChar();
-    chr.m_attr      = m_pen.attr;
+    chr.m_attr      = m_pen.m_attr;
     chr.m_character = ch;
     int c = m_pen.m_column;
     int r = m_pen.m_row;
@@ -607,47 +606,47 @@ void CC708Window::LimitPenLocation(void)
 
 void CC708Pen::SetPenStyle(uint style)
 {
-    static const uint style2font[] = { 0, 0, 1, 2, 3, 4, 3, 4 };
+    static const uint kStyle2Font[] = { 0, 0, 1, 2, 3, 4, 3, 4 };
 
     if ((style < 1) || (style > 7))
         return;
 
-    attr.m_pen_size   = k708AttrSizeStandard;
-    attr.m_offset     = k708AttrOffsetNormal;
-    attr.m_font_tag   = style2font[style];
-    attr.m_italics    = false;
-    attr.m_underline  = false;
-    attr.m_boldface   = false;
-    attr.m_edge_type  = 0;
-    attr.m_fg_color   = k708AttrColorWhite;
-    attr.m_fg_opacity = k708AttrOpacitySolid;
-    attr.m_bg_color   = k708AttrColorBlack;
-    attr.m_bg_opacity = (style<6) ?
+    m_attr.m_penSize    = k708AttrSizeStandard;
+    m_attr.m_offset     = k708AttrOffsetNormal;
+    m_attr.m_fontTag    = kStyle2Font[style];
+    m_attr.m_italics    = false;
+    m_attr.m_underline  = false;
+    m_attr.m_boldface   = false;
+    m_attr.m_edgeType   = 0;
+    m_attr.m_fgColor    = k708AttrColorWhite;
+    m_attr.m_fgOpacity  = k708AttrOpacitySolid;
+    m_attr.m_bgColor    = k708AttrColorBlack;
+    m_attr.m_bgOpacity  = (style<6) ?
         k708AttrOpacitySolid : k708AttrOpacityTransparent;
-    attr.m_edge_color = k708AttrColorBlack;
-    attr.m_actual_fg_color = QColor();
+    m_attr.m_edgeColor  = k708AttrColorBlack;
+    m_attr.m_actualFgColor = QColor();
 }
 
 CC708Character::CC708Character(const CC708Window &win)
-    : m_attr(win.m_pen.attr)
+    : m_attr(win.m_pen.m_attr)
 {
 }
 
 bool CC708CharacterAttribute::operator==(
     const CC708CharacterAttribute &other) const
 {
-    return ((m_pen_size   == other.m_pen_size)   &&
+    return ((m_penSize    == other.m_penSize)    &&
             (m_offset     == other.m_offset)     &&
-            (m_text_tag   == other.m_text_tag)   &&
-            (m_font_tag   == other.m_font_tag)   &&
-            (m_edge_type  == other.m_edge_type)  &&
+            (m_textTag    == other.m_textTag)    &&
+            (m_fontTag    == other.m_fontTag)    &&
+            (m_edgeType   == other.m_edgeType)   &&
             (m_underline  == other.m_underline)  &&
             (m_italics    == other.m_italics)    &&
-            (m_fg_color   == other.m_fg_color)   &&
-            (m_fg_opacity == other.m_fg_opacity) &&
-            (m_bg_color   == other.m_bg_color)   &&
-            (m_bg_opacity == other.m_bg_opacity) &&
-            (m_edge_color == other.m_edge_color));
+            (m_fgColor    == other.m_fgColor)    &&
+            (m_fgOpacity  == other.m_fgOpacity)  &&
+            (m_bgColor    == other.m_bgColor)    &&
+            (m_bgOpacity  == other.m_bgOpacity)  &&
+            (m_edgeColor  == other.m_edgeColor));
 }
 
 QColor CC708CharacterAttribute::ConvertToQColor(uint eia708color)
@@ -656,6 +655,6 @@ QColor CC708CharacterAttribute::ConvertToQColor(uint eia708color)
     // U.S. ATSC programs seem to use just the higher-order bit,
     // i.e. values 0 and 2, so the last two elements of X[] are both
     // set to the maximum 255, otherwise font colors are dim.
-    static int X[] = {0, 96, 255, 255};
-    return {X[(eia708color>>4)&3], X[(eia708color>>2)&3], X[eia708color&3]};
+    static constexpr int kX[] = {0, 96, 255, 255};
+    return {kX[(eia708color>>4)&3], kX[(eia708color>>2)&3], kX[eia708color&3]};
 }

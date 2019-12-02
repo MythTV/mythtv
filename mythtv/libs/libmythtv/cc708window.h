@@ -73,22 +73,22 @@ const int k708MaxColumns = 64; // 6-bit field in DefineWindow
 class CC708CharacterAttribute
 {
   public:
-    uint   m_pen_size        {k708AttrSizeStandard};
+    uint   m_penSize         {k708AttrSizeStandard};
     uint   m_offset          {k708AttrOffsetNormal};
-    uint   m_text_tag        {0};
-    uint   m_font_tag        {0};                    // system font
-    uint   m_edge_type       {k708AttrEdgeNone};
+    uint   m_textTag         {0};
+    uint   m_fontTag         {0};                    // system font
+    uint   m_edgeType        {k708AttrEdgeNone};
     bool   m_underline       {false};
     bool   m_italics         {false};
     bool   m_boldface        {false};
 
-    uint   m_fg_color        {k708AttrColorWhite};   // will be overridden
-    uint   m_fg_opacity      {k708AttrOpacitySolid}; // solid
-    uint   m_bg_color        {k708AttrColorBlack};
-    uint   m_bg_opacity      {k708AttrOpacitySolid};
-    uint   m_edge_color      {k708AttrColorBlack};
+    uint   m_fgColor         {k708AttrColorWhite};   // will be overridden
+    uint   m_fgOpacity       {k708AttrOpacitySolid}; // solid
+    uint   m_bgColor         {k708AttrColorBlack};
+    uint   m_bgOpacity       {k708AttrOpacitySolid};
+    uint   m_edgeColor       {k708AttrColorBlack};
 
-    QColor m_actual_fg_color; // if !isValid(), then convert m_fg_color
+    QColor m_actualFgColor;   // if !isValid(), then convert m_fgColor
 
     CC708CharacterAttribute(bool isItalic = false,
                             bool isBold = false,
@@ -97,38 +97,38 @@ class CC708CharacterAttribute
         m_underline(isUnderline),
         m_italics(isItalic),
         m_boldface(isBold),
-        m_actual_fg_color(fgColor)
+        m_actualFgColor(fgColor)
     {
     }
 
     static QColor ConvertToQColor(uint eia708color);
     QColor GetFGColor(void) const
     {
-        QColor fg = (m_actual_fg_color.isValid() ?
-                     m_actual_fg_color : ConvertToQColor(m_fg_color));
+        QColor fg = (m_actualFgColor.isValid() ?
+                     m_actualFgColor : ConvertToQColor(m_fgColor));
         fg.setAlpha(GetFGAlpha());
         return fg;
     }
     QColor GetBGColor(void) const
     {
-        QColor bg = ConvertToQColor(m_bg_color);
+        QColor bg = ConvertToQColor(m_bgColor);
         bg.setAlpha(GetBGAlpha());
         return bg;
     }
-    QColor GetEdgeColor(void) const { return ConvertToQColor(m_edge_color); }
+    QColor GetEdgeColor(void) const { return ConvertToQColor(m_edgeColor); }
 
     uint GetFGAlpha(void) const
     {
         //SOLID=0, FLASH=1, TRANSLUCENT=2, and TRANSPARENT=3.
         static uint alpha[4] = { 0xff, 0xff, 0x7f, 0x00, };
-        return alpha[m_fg_opacity & 0x3];
+        return alpha[m_fgOpacity & 0x3];
     }
 
     uint GetBGAlpha(void) const
     {
         //SOLID=0, FLASH=1, TRANSLUCENT=2, and TRANSPARENT=3.
         static uint alpha[4] = { 0xff, 0xff, 0x7f, 0x00, };
-        return alpha[m_bg_opacity & 0x3];
+        return alpha[m_bgOpacity & 0x3];
     }
 
     bool operator==(const CC708CharacterAttribute &other) const;
@@ -145,17 +145,17 @@ class CC708Pen
                        int offset,       int text_tag,  int font_tag,
                        int edge_type,    int underline, int italics)
     {
-        attr.m_pen_size  = pen_size;
-        attr.m_offset    = offset;
-        attr.m_text_tag  = text_tag;
-        attr.m_font_tag  = font_tag;
-        attr.m_edge_type = edge_type;
-        attr.m_underline = underline;
-        attr.m_italics   = italics;
-        attr.m_boldface  = 0;
+        m_attr.m_penSize   = pen_size;
+        m_attr.m_offset    = offset;
+        m_attr.m_textTag   = text_tag;
+        m_attr.m_fontTag   = font_tag;
+        m_attr.m_edgeType  = edge_type;
+        m_attr.m_underline = underline;
+        m_attr.m_italics   = italics;
+        m_attr.m_boldface  = 0;
     }
   public:
-    CC708CharacterAttribute attr;
+    CC708CharacterAttribute m_attr;
 
     uint m_row    {0};
     uint m_column {0};
@@ -174,10 +174,10 @@ class CC708Character
 class CC708String
 {
   public:
-    uint x;
-    uint y;
-    QString str;
-    CC708CharacterAttribute attr;
+    uint                    m_x;
+    uint                    m_y;
+    QString                 m_str;
+    CC708CharacterAttribute m_attr;
 };
 
 class MTV_PUBLIC CC708Window
@@ -209,7 +209,7 @@ class MTV_PUBLIC CC708Window
     }
     CC708Character &GetCCChar(void) const;
     vector<CC708String*> GetStrings(void) const;
-    void DisposeStrings(vector<CC708String*> &strings) const;
+    static void DisposeStrings(vector<CC708String*> &strings);
     QColor GetFillColor(void) const
     {
         QColor fill = CC708CharacterAttribute::ConvertToQColor(m_fill_color);
@@ -305,7 +305,7 @@ class CC708Service
     CC708Service() = default;
 
   public:
-    uint        m_current_window {0};
+    uint        m_currentWindow {0};
     CC708Window m_windows[k708MaxWindows];
 };
 

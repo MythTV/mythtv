@@ -22,8 +22,7 @@
 TagLib::FLAC::File *MetaIOFLACVorbis::OpenFile(const QString &filename)
 {
     QByteArray fname = filename.toLocal8Bit();
-    TagLib::FLAC::File *flacfile =
-                            new TagLib::FLAC::File(fname.constData());
+    auto *flacfile = new TagLib::FLAC::File(fname.constData());
 
     if (!flacfile->isOpen())
     {
@@ -110,7 +109,7 @@ MusicMetadata* MetaIOFLACVorbis::read(const QString &filename)
         return nullptr;
     }
 
-    MusicMetadata *metadata = new MusicMetadata(filename);
+    auto *metadata = new MusicMetadata(filename);
 
     ReadGenericMetadata(tag, metadata);
 
@@ -154,7 +153,7 @@ MusicMetadata* MetaIOFLACVorbis::read(const QString &filename)
  */
 QImage* MetaIOFLACVorbis::getAlbumArt(const QString &filename, ImageType type)
 {
-    QImage *picture = new QImage();
+    auto *picture = new QImage();
     TagLib::FLAC::File * flacfile = OpenFile(filename);
 
     if (flacfile)
@@ -252,8 +251,7 @@ AlbumArtList MetaIOFLACVorbis::getAlbumArtList(const QString &filename)
     {
         const TagLib::List<Picture *>& picList = flacfile->pictureList();
 
-        for(TagLib::List<Picture *>::ConstIterator it = picList.begin();
-            it != picList.end(); it++)
+        for(auto it = picList.begin(); it != picList.end(); it++)
         {
             Picture* pic = *it;
             // Assume a valid image would have at least
@@ -266,7 +264,7 @@ AlbumArtList MetaIOFLACVorbis::getAlbumArtList(const QString &filename)
                 continue;
             }
 
-            AlbumArtImage *art = new AlbumArtImage();
+            auto *art = new AlbumArtImage();
 
             if (pic->description().isEmpty())
                 art->m_description.clear();

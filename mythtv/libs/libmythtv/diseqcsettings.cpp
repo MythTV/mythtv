@@ -6,6 +6,7 @@
 
 // Std C headers
 #include <cmath>
+#include <utility>
 
 // MythTV headers
 #include "mythdbcon.h"
@@ -16,7 +17,7 @@
 
 static GlobalTextEditSetting *DiSEqCLatitude(void)
 {
-    GlobalTextEditSetting *gc = new GlobalTextEditSetting("latitude");
+    auto *gc = new GlobalTextEditSetting("latitude");
     gc->setLabel("Latitude");
     gc->setHelpText(
         DeviceTree::tr("The Cartesian latitude for your location. "
@@ -26,7 +27,7 @@ static GlobalTextEditSetting *DiSEqCLatitude(void)
 
 static GlobalTextEditSetting *DiSEqCLongitude(void)
 {
-    GlobalTextEditSetting *gc = new GlobalTextEditSetting("longitude");
+    auto *gc = new GlobalTextEditSetting("longitude");
     gc->setLabel("Longitude");
     gc->setHelpText(
         DeviceTree::tr("The Cartesian longitude for your location. "
@@ -501,7 +502,7 @@ public:
 
 void RotorPosMap::valueChanged(StandardSetting *setting)
 {
-    RotorPosTextEdit *posEdit = dynamic_cast<RotorPosTextEdit*>(setting);
+    auto *posEdit = dynamic_cast<RotorPosTextEdit*>(setting);
     if (posEdit == nullptr)
         return;
     QString value = posEdit->getValue();
@@ -521,7 +522,7 @@ void RotorPosMap::PopulateList(void)
         if (it != m_posmap.end())
             posval = AngleToString(*it);
 
-        RotorPosTextEdit *posEdit =
+        auto *posEdit =
             new RotorPosTextEdit(DeviceTree::tr("Position #%1").arg(pos),
                                  pos,
                                  posval);
@@ -543,7 +544,7 @@ RotorConfig::RotorConfig(DiSEqCDevRotor &rotor, StandardSetting *parent)
     parent->addChild(new DeviceDescrSetting(rotor));
     parent->addChild(new DeviceRepeatSetting(rotor));
 
-    RotorTypeSetting *rtype = new RotorTypeSetting(rotor);
+    auto *rtype = new RotorTypeSetting(rotor);
     connect(rtype, SIGNAL(valueChanged(const QString&)),
             this,  SLOT(  SetType(     const QString&)));
     parent->addChild(rtype);
@@ -669,20 +670,20 @@ SCRConfig::SCRConfig(DiSEqCDevSCR &scr, StandardSetting *parent) : m_scr(scr)
 class lnb_preset
 {
   public:
-    lnb_preset(const QString &_name, DiSEqCDevLNB::dvbdev_lnb_t _type,
+    lnb_preset(QString _name, DiSEqCDevLNB::dvbdev_lnb_t _type,
                uint _lof_sw = 0, uint _lof_lo = 0,
                uint _lof_hi = 0, bool _pol_inv = false) :
-        name(_name),     type(_type),
-        lof_sw(_lof_sw), lof_lo(_lof_lo),
-        lof_hi(_lof_hi), pol_inv(_pol_inv) {}
+        m_name(std::move(_name)), m_type(_type),
+        m_lofSw(_lof_sw), m_lofLo(_lof_lo),
+        m_lofHi(_lof_hi), m_polInv(_pol_inv) {}
 
   public:
-    QString                    name;
-    DiSEqCDevLNB::dvbdev_lnb_t type;
-    uint                       lof_sw;
-    uint                       lof_lo;
-    uint                       lof_hi;
-    bool                       pol_inv;
+    QString                    m_name;
+    DiSEqCDevLNB::dvbdev_lnb_t m_type;
+    uint                       m_lofSw;
+    uint                       m_lofLo;
+    uint                       m_lofHi;
+    bool                       m_polInv;
 };
 
 static lnb_preset lnb_presets[] =
@@ -708,13 +709,13 @@ static lnb_preset lnb_presets[] =
 static uint FindPreset(const DiSEqCDevLNB &lnb)
 {
     uint i;
-    for (i = 0; !lnb_presets[i].name.isEmpty(); i++)
+    for (i = 0; !lnb_presets[i].m_name.isEmpty(); i++)
     {
-        if (lnb_presets[i].type   == lnb.GetType()      &&
-            lnb_presets[i].lof_sw == lnb.GetLOFSwitch() &&
-            lnb_presets[i].lof_lo == lnb.GetLOFLow()    &&
-            lnb_presets[i].lof_hi == lnb.GetLOFHigh()   &&
-            lnb_presets[i].pol_inv== lnb.IsPolarityInverted())
+        if (lnb_presets[i].m_type   == lnb.GetType()      &&
+            lnb_presets[i].m_lofSw == lnb.GetLOFSwitch()  &&
+            lnb_presets[i].m_lofLo == lnb.GetLOFLow()     &&
+            lnb_presets[i].m_lofHi == lnb.GetLOFHigh()    &&
+            lnb_presets[i].m_polInv== lnb.IsPolarityInverted())
         {
             break;
         }
@@ -734,8 +735,8 @@ class LNBPresetSetting : public MythUIComboBoxSetting
         setHelpText(help);
 
         uint i = 0;
-        for (; !lnb_presets[i].name.isEmpty(); i++)
-                        addSelection(DeviceTree::tr( lnb_presets[i].name.toUtf8() ),
+        for (; !lnb_presets[i].m_name.isEmpty(); i++)
+                        addSelection(DeviceTree::tr( lnb_presets[i].m_name.toUtf8() ),
                          QString::number(i));
         addSelection(DeviceTree::tr("Custom"), QString::number(i));
     }
@@ -917,20 +918,20 @@ LNBConfig::LNBConfig(DiSEqCDevLNB &lnb, StandardSetting *parent)
     setValue(lnb.GetDescription());
 
     parent = this;
-    DeviceDescrSetting *deviceDescr = new DeviceDescrSetting(lnb);
+    auto *deviceDescr = new DeviceDescrSetting(lnb);
     parent->addChild(deviceDescr);
     m_preset = new LNBPresetSetting(lnb);
     parent->addChild(m_preset);
     m_type = new LNBTypeSetting(lnb);
     parent->addChild(m_type);
-    m_lof_switch = new LNBLOFSwitchSetting(lnb);
-    parent->addChild(m_lof_switch);
-    m_lof_lo = new LNBLOFLowSetting(lnb);
-    parent->addChild(m_lof_lo);
-    m_lof_hi = new LNBLOFHighSetting(lnb);
-    parent->addChild(m_lof_hi);
-    m_pol_inv = new LNBPolarityInvertedSetting(lnb);
-    parent->addChild(m_pol_inv);
+    m_lofSwitch = new LNBLOFSwitchSetting(lnb);
+    parent->addChild(m_lofSwitch);
+    m_lofLo = new LNBLOFLowSetting(lnb);
+    parent->addChild(m_lofLo);
+    m_lofHi = new LNBLOFHighSetting(lnb);
+    parent->addChild(m_lofHi);
+    m_polInv = new LNBPolarityInvertedSetting(lnb);
+    parent->addChild(m_polInv);
     connect(m_type, SIGNAL(valueChanged(const QString&)),
             this,   SLOT(  UpdateType(  void)));
     connect(m_preset, SIGNAL(valueChanged(const QString&)),
@@ -952,7 +953,7 @@ void LNBConfig::SetPreset(const QString &value)
         return;
 
     lnb_preset &preset = lnb_presets[index];
-    if (preset.name.isEmpty())
+    if (preset.m_name.isEmpty())
     {
         m_type->setEnabled(true);
         UpdateType();
@@ -960,16 +961,16 @@ void LNBConfig::SetPreset(const QString &value)
     else
     {
         m_type->setValue(m_type->getValueIndex(
-                             QString::number((uint)preset.type)));
-        m_lof_switch->setValue(QString::number(preset.lof_sw / 1000));
-        m_lof_lo->setValue(QString::number(preset.lof_lo / 1000));
-        m_lof_hi->setValue(QString::number(preset.lof_hi / 1000));
-        m_pol_inv->setValue(preset.pol_inv);
+                             QString::number((uint)preset.m_type)));
+        m_lofSwitch->setValue(QString::number(preset.m_lofSw / 1000));
+        m_lofLo->setValue(QString::number(preset.m_lofLo / 1000));
+        m_lofHi->setValue(QString::number(preset.m_lofHi / 1000));
+        m_polInv->setValue(preset.m_polInv);
         m_type->setEnabled(false);
-        m_lof_switch->setEnabled(false);
-        m_lof_hi->setEnabled(false);
-        m_lof_lo->setEnabled(false);
-        m_pol_inv->setEnabled(false);
+        m_lofSwitch->setEnabled(false);
+        m_lofHi->setEnabled(false);
+        m_lofLo->setEnabled(false);
+        m_polInv->setEnabled(false);
     }
 }
 
@@ -982,22 +983,22 @@ void LNBConfig::UpdateType(void)
     {
         case DiSEqCDevLNB::kTypeFixed:
         case DiSEqCDevLNB::kTypeVoltageControl:
-            m_lof_switch->setEnabled(false);
-            m_lof_hi->setEnabled(false);
-            m_lof_lo->setEnabled(true);
-            m_pol_inv->setEnabled(true);
+            m_lofSwitch->setEnabled(false);
+            m_lofHi->setEnabled(false);
+            m_lofLo->setEnabled(true);
+            m_polInv->setEnabled(true);
             break;
         case DiSEqCDevLNB::kTypeVoltageAndToneControl:
-            m_lof_switch->setEnabled(true);
-            m_lof_hi->setEnabled(true);
-            m_lof_lo->setEnabled(true);
-            m_pol_inv->setEnabled(true);
+            m_lofSwitch->setEnabled(true);
+            m_lofHi->setEnabled(true);
+            m_lofLo->setEnabled(true);
+            m_polInv->setEnabled(true);
             break;
         case DiSEqCDevLNB::kTypeBandstacked:
-            m_lof_switch->setEnabled(false);
-            m_lof_hi->setEnabled(true);
-            m_lof_lo->setEnabled(true);
-            m_pol_inv->setEnabled(true);
+            m_lofSwitch->setEnabled(false);
+            m_lofHi->setEnabled(true);
+            m_lofLo->setEnabled(true);
+            m_polInv->setEnabled(true);
             break;
     }
 }
@@ -1039,7 +1040,7 @@ DiseqcConfigBase* DiseqcConfigBase::CreateByType(DiSEqCDevDevice *dev,
     {
         case DiSEqCDevDevice::kTypeSwitch:
         {
-            DiSEqCDevSwitch *sw = dynamic_cast<DiSEqCDevSwitch*>(dev);
+            auto *sw = dynamic_cast<DiSEqCDevSwitch*>(dev);
             if (sw)
                 setting = new SwitchConfig(*sw, parent);
         }
@@ -1047,7 +1048,7 @@ DiseqcConfigBase* DiseqcConfigBase::CreateByType(DiSEqCDevDevice *dev,
 
         case DiSEqCDevDevice::kTypeRotor:
         {
-            DiSEqCDevRotor *rotor = dynamic_cast<DiSEqCDevRotor*>(dev);
+            auto *rotor = dynamic_cast<DiSEqCDevRotor*>(dev);
             if (rotor)
                 setting = new RotorConfig(*rotor, parent);
         }
@@ -1055,7 +1056,7 @@ DiseqcConfigBase* DiseqcConfigBase::CreateByType(DiSEqCDevDevice *dev,
 
         case DiSEqCDevDevice::kTypeSCR:
         {
-            DiSEqCDevSCR *scr = dynamic_cast<DiSEqCDevSCR*>(dev);
+            auto *scr = dynamic_cast<DiSEqCDevSCR*>(dev);
             if (scr)
                 setting = new SCRConfig(*scr, parent);
         }
@@ -1063,7 +1064,7 @@ DiseqcConfigBase* DiseqcConfigBase::CreateByType(DiSEqCDevDevice *dev,
 
         case DiSEqCDevDevice::kTypeLNB:
         {
-            DiSEqCDevLNB *lnb = dynamic_cast<DiSEqCDevLNB*>(dev);
+            auto *lnb = dynamic_cast<DiSEqCDevLNB*>(dev);
             if (lnb)
                 setting = new LNBConfig(*lnb, parent);
         }
@@ -1083,7 +1084,7 @@ void DeviceTree::PopulateTree(DiSEqCDevDevice *node,
 {
     if (node)
     {
-        DeviceTypeSetting *devtype = new DeviceTypeSetting();
+        auto *devtype = new DeviceTypeSetting();
         devtype->SetDevice(node);
         devtype->Load();
         DiseqcConfigBase *setting = DiseqcConfigBase::CreateByType(node,
@@ -1102,7 +1103,7 @@ void DeviceTree::PopulateTree(DiSEqCDevDevice *node,
     }
     else
     {
-        DeviceTypeSetting *devtype = new DeviceTypeSetting();
+        auto *devtype = new DeviceTypeSetting();
         AddDeviceTypeSetting(devtype, parent, childnum, parentSetting);
     }
 }
@@ -1154,8 +1155,7 @@ void DeviceTree::ValueChanged(const QString &value,
     // Remove old setting from m_tree
     DeleteDevice(devtype);
 
-    const DiSEqCDevDevice::dvbdev_t type =
-        static_cast<DiSEqCDevDevice::dvbdev_t>(value.toUInt());
+    const auto type = static_cast<DiSEqCDevDevice::dvbdev_t>(value.toUInt());
 
     DiSEqCDevDevice *dev = DiSEqCDevDevice::CreateByType(m_tree, type);
     if (dev)
@@ -1234,7 +1234,7 @@ class RotorSetting : public MythUIComboBoxSetting
         setLabel(node.GetDescription());
         setHelpText(DeviceTree::tr("Choose a satellite position."));
 
-        DiSEqCDevRotor *rotor = dynamic_cast<DiSEqCDevRotor*>(&m_node);
+        auto *rotor = dynamic_cast<DiSEqCDevRotor*>(&m_node);
         if (rotor)
             m_posmap = rotor->GetPosMap();
     }
@@ -1269,8 +1269,8 @@ class USALSRotorSetting : public GroupSetting
 {
   public:
     USALSRotorSetting(DiSEqCDevDevice &node, DiSEqCDevSettings &settings) :
-        numeric(new TransTextEditSetting()),
-        hemisphere(new TransMythUIComboBoxSetting(/*false*/)),
+        m_numeric(new TransTextEditSetting()),
+        m_hemisphere(new TransMythUIComboBoxSetting(/*false*/)),
         m_node(node), m_settings(settings)
     {
         QString help =
@@ -1279,17 +1279,17 @@ class USALSRotorSetting : public GroupSetting
                 "with the longitude along the Clarke Belt of "
                 "the satellite [-180..180] and its hemisphere.");
 
-        numeric->setLabel(DeviceTree::tr("Longitude (degrees)"));
-        numeric->setHelpText(help);
-        hemisphere->setLabel(DeviceTree::tr("Hemisphere"));
-        hemisphere->addSelection(DeviceTree::tr("Eastern"), "E", false);
-        hemisphere->addSelection(DeviceTree::tr("Western"), "W", true);
-        hemisphere->setHelpText(help);
+        m_numeric->setLabel(DeviceTree::tr("Longitude (degrees)"));
+        m_numeric->setHelpText(help);
+        m_hemisphere->setLabel(DeviceTree::tr("Hemisphere"));
+        m_hemisphere->addSelection(DeviceTree::tr("Eastern"), "E", false);
+        m_hemisphere->addSelection(DeviceTree::tr("Western"), "W", true);
+        m_hemisphere->setHelpText(help);
 
-        addChild(numeric);
-        addChild(hemisphere);
+        addChild(m_numeric);
+        addChild(m_hemisphere);
 
-        addChild(new RotorConfig(static_cast<DiSEqCDevRotor&>(node), this));
+        addChild(new RotorConfig(static_cast<DiSEqCDevRotor&>(m_node), this));
     }
 
     void Load(void) override // StandardSetting
@@ -1297,23 +1297,23 @@ class USALSRotorSetting : public GroupSetting
         double  val  = m_settings.GetValue(m_node.GetDeviceID());
         QString hemi;
         double  eval = AngleToEdit(val, hemi);
-        numeric->setValue(QString::number(eval));
-        hemisphere->setValue(hemisphere->getValueIndex(hemi));
+        m_numeric->setValue(QString::number(eval));
+        m_hemisphere->setValue(m_hemisphere->getValueIndex(hemi));
         GroupSetting::Load();
     }
 
     void Save(void) override // StandardSetting
     {
-        QString val = QString::number(numeric->getValue().toDouble());
-        val += hemisphere->getValue();
+        QString val = QString::number(m_numeric->getValue().toDouble());
+        val += m_hemisphere->getValue();
         m_settings.SetValue(m_node.GetDeviceID(), AngleToFloat(val, false));
     }
 
   private:
-    TransTextEditSetting *numeric;
-    TransMythUIComboBoxSetting *hemisphere;
-    DiSEqCDevDevice      &m_node;
-    DiSEqCDevSettings    &m_settings;
+    TransTextEditSetting       *m_numeric    {nullptr};
+    TransMythUIComboBoxSetting *m_hemisphere {nullptr};
+    DiSEqCDevDevice            &m_node;
+    DiSEqCDevSettings          &m_settings;
 };
 
 //////////////////////////////////////// SCRPositionSetting
@@ -1353,7 +1353,7 @@ class SCRPositionSetting : public MythUIComboBoxSetting
 
 DTVDeviceConfigGroup::DTVDeviceConfigGroup(
     DiSEqCDevSettings &settings, uint cardid, bool switches_enabled) :
-    m_settings(settings), m_switches_enabled(switches_enabled)
+    m_settings(settings), m_switchesEnabled(switches_enabled)
 {
     setLabel(DeviceTree::tr("DTV Device Configuration"));
 
@@ -1375,11 +1375,11 @@ void DTVDeviceConfigGroup::AddNodes(
     {
         case DiSEqCDevDevice::kTypeSwitch:
             setting = new SwitchSetting(*node, m_settings);
-            setting->setEnabled(m_switches_enabled);
+            setting->setEnabled(m_switchesEnabled);
             break;
         case DiSEqCDevDevice::kTypeRotor:
         {
-            DiSEqCDevRotor *rotor = dynamic_cast<DiSEqCDevRotor*>(node);
+            auto *rotor = dynamic_cast<DiSEqCDevRotor*>(node);
             if (rotor && (rotor->GetType() == DiSEqCDevRotor::kTypeDiSEqC_1_2))
                 setting = new RotorSetting(*node, m_settings);
             else

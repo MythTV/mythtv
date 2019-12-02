@@ -26,7 +26,7 @@ HTTPTSStreamHandler* HTTPTSStreamHandler::Get(const IPTVTuningData& tuning,
 
     if (it == s_httphandlers.end())
     {
-        HTTPTSStreamHandler* newhandler = new HTTPTSStreamHandler(tuning, inputid);
+        auto* newhandler = new HTTPTSStreamHandler(tuning, inputid);
         newhandler->Start();
         s_httphandlers[devkey] = newhandler;
         s_httphandlers_refcnt[devkey] = 1;

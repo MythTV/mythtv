@@ -315,8 +315,7 @@ QStringList ImageAdapterBase::SupportedVideos()
     QStringList formats;
     const FileAssociations::association_list faList =
         FileAssociations::getFileAssociation().getList();
-    for (FileAssociations::association_list::const_iterator p =
-        faList.begin(); p != faList.end(); ++p)
+    for (auto p = faList.cbegin(); p != faList.cend(); ++p)
     {
         if (!p->use_default && p->playcommand == "Internal")
             formats << QString(p->extension);
@@ -336,7 +335,7 @@ QStringList ImageAdapterBase::SupportedVideos()
 ImageItem *ImageAdapterLocal::CreateItem(const QFileInfo &fi, int parentId,
                                          int devId, const QString & /*base*/) const
 {
-    ImageItem *im = new ImageItem();
+    auto *im = new ImageItem();
 
     im->m_parentId  = parentId;
     im->m_device    = devId;
@@ -411,7 +410,7 @@ void ImageAdapterLocal::Notify(const QString &mesg,
 ImageItem *ImageAdapterSg::CreateItem(const QFileInfo &fi, int parentId,
                                       int /*devId*/, const QString &base) const
 {
-    ImageItem *im = new ImageItem();
+    auto *im = new ImageItem();
 
     im->m_device    = 0;
     im->m_parentId  = parentId;
@@ -513,7 +512,7 @@ QString ImageAdapterSg::GetAbsFilePath(const ImagePtrK &im) const
 template <class FS>
 ImageItem *ImageDb<FS>::CreateImage(const MSqlQuery &query) const
 {
-    ImageItem *im = new ImageItem(FS::ImageId(query.value(0).toInt()));
+    auto *im = new ImageItem(FS::ImageId(query.value(0).toInt()));
 
     // Ordered as per DB_COLUMNS
     im->m_filePath      = query.value(1).toString();
@@ -1191,7 +1190,7 @@ QStringList ImageHandler<DBFS>::HandleGetMetadata(const QString &id) const
         RESULT_ERR("Image not found",
                    QString("File %1 not found").arg(im->m_filePath))
 
-    ReadMetaThread *worker = new ReadMetaThread(im, absPath);
+    auto *worker = new ReadMetaThread(im, absPath);
 
     MThreadPool::globalInstance()->start(worker, "ImageMetaData");
 
@@ -2500,7 +2499,7 @@ void ImageManagerFe::DeviceEvent(MythMediaEvent *event)
 
 QString ImageManagerFe::CreateImport()
 {
-    QTemporaryDir *tmp = new QTemporaryDir(QDir::tempPath() % "/" IMPORTDIR "-XXXXXX");
+    auto *tmp = new QTemporaryDir(QDir::tempPath() % "/" IMPORTDIR "-XXXXXX");
     if (!tmp->isValid())
     {
         delete tmp;

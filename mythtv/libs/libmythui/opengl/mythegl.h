@@ -7,9 +7,9 @@
 // MythTV
 #include "mythuiexp.h"
 
-typedef void  ( * MYTH_EGLIMAGETARGET)  (GLenum, void*);
-typedef void* ( * MYTH_EGLCREATEIMAGE)  (void*, void*, unsigned int, void*, const int32_t *);
-typedef void  ( * MYTH_EGLDESTROYIMAGE) (void*, void*);
+using MYTH_EGLIMAGETARGET  = void  (*)(GLenum, void*);
+using MYTH_EGLCREATEIMAGE  = void* (*)(void*, void*, unsigned int, void*, const int32_t *);
+using MYTH_EGLDESTROYIMAGE = void  (*)(void*, void*);
 
 class MythRenderOpenGL;
 
@@ -22,7 +22,7 @@ class MUI_PUBLIC MythEGL
     bool  IsEGL(void);
     bool  HasEGLExtension(QString Extension);
     void* GetEGLDisplay(void);
-    qint32 GetEGLError(void);
+    static qint32 GetEGLError(void);
     void  eglImageTargetTexture2DOES (GLenum Target, void* Image);
     void* eglCreateImageKHR          (void* Disp, void* Context, unsigned int Target,
                                       void* Buffer, const int32_t *Attributes);

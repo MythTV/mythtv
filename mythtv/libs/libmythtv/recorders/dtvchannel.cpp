@@ -11,7 +11,7 @@
 #define LOC QString("DTVChan[%1](%2): ").arg(m_inputid).arg(GetDevice())
 
 QReadWriteLock DTVChannel::s_master_map_lock(QReadWriteLock::Recursive);
-typedef QMap<QString,QList<DTVChannel*> > MasterMap;
+using MasterMap = QMap<QString,QList<DTVChannel*> >;
 MasterMap DTVChannel::s_master_map;
 
 DTVChannel::~DTVChannel()
@@ -338,7 +338,7 @@ bool DTVChannel::SetChannelByString(const QString &channum)
         int pcrpid = -1;
         vector<uint> pids;
         vector<uint> types;
-        pid_cache_t::iterator pit = pid_cache.begin();
+        auto pit = pid_cache.begin();
         for (; pit != pid_cache.end(); ++pit)
         {
             if (!pit->GetStreamID())

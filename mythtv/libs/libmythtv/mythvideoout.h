@@ -29,7 +29,7 @@ class OSD;
 class AudioPlayer;
 class MythRender;
 
-typedef QMap<MythPlayer*,PIPLocation> PIPMap;
+using PIPMap = QMap<MythPlayer*,PIPLocation>;
 
 class MythMultiLocker;
 
@@ -157,23 +157,23 @@ class MythVideoOutput
 
     static void  CopyFrame(VideoFrame* To, const VideoFrame* From);
 
-    MythDisplay*         m_display;
+    MythDisplay*         m_display               {nullptr};
     VideoOutWindow       m_window;
-    QSize                m_dbDisplayDimensionsMM;
+    QSize                m_dbDisplayDimensionsMM {0,0};
     VideoColourSpace     m_videoColourSpace;
-    AspectOverrideMode   m_dbAspectOverride;
-    AdjustFillMode       m_dbAdjustFill;
-    LetterBoxColour      m_dbLetterboxColour;
-    MythCodecID          m_videoCodecID;
-    int                  m_maxReferenceFrames;
-    VideoDisplayProfile *m_dbDisplayProfile;
+    AspectOverrideMode   m_dbAspectOverride      {kAspect_Off};
+    AdjustFillMode       m_dbAdjustFill          {kAdjustFill_Off};
+    LetterBoxColour      m_dbLetterboxColour     {kLetterBoxColour_Black};
+    MythCodecID          m_videoCodecID          {kCodec_NONE};
+    int                  m_maxReferenceFrames    {16};
+    VideoDisplayProfile *m_dbDisplayProfile      {nullptr};
     VideoBuffers         m_videoBuffers;
-    VideoErrorState      m_errorState;
-    long long            m_framesPlayed;
-    QSize                m_monitorSize;
-    QSize                m_monitorDimensions;
-    VideoVisual         *m_visual;
-    StereoscopicMode     m_stereo;
+    VideoErrorState      m_errorState            {kError_None};
+    long long            m_framesPlayed          {0};
+    QSize                m_monitorSize           {640,480};
+    QSize                m_monitorDimensions     {400,300};
+    VideoVisual         *m_visual                {nullptr};
+    StereoscopicMode     m_stereo                {kStereoscopicModeNone};
     MythAVCopy           m_copyFrame;
     MythDeinterlacer     m_deinterlacer;
 };

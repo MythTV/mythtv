@@ -208,8 +208,8 @@ void BookmarkManager::UpdateURLList(void)
 
         if (group == site->m_category)
         {
-            MythUIButtonListItem *item2 = new MythUIButtonListItem(
-                    m_bookmarkList, "", "", true, MythUIButtonListItem::NotChecked);
+            auto *item2 = new MythUIButtonListItem(m_bookmarkList,
+                    "", "", true, MythUIButtonListItem::NotChecked);
             item2->SetText(site->m_name, "name");
             item2->SetText(site->m_url, "url");
             if (site->m_isHomepage)
@@ -293,7 +293,7 @@ bool BookmarkManager::keyPressEvent(QKeyEvent *event)
 
             if (item)
             {
-                Bookmark *site = item->GetData().value<Bookmark*>();
+                auto *site = item->GetData().value<Bookmark*>();
 
                 if (item->state() == MythUIButtonListItem::NotChecked)
                 {
@@ -336,7 +336,7 @@ void BookmarkManager::slotBookmarkClicked(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    Bookmark *site = item->GetData().value<Bookmark*>();
+    auto *site = item->GetData().value<Bookmark*>();
     if (!site)
         return;
 
@@ -408,8 +408,8 @@ void BookmarkManager::ShowEditDialog(bool edit)
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    BookmarkEditor *editor = new BookmarkEditor(&m_savedBookmark, edit, mainStack,
-                                                        "bookmarkeditor");
+    auto *editor = new BookmarkEditor(&m_savedBookmark, edit, mainStack,
+                                      "bookmarkeditor");
 
     connect(editor, SIGNAL(Exiting()), this, SLOT(slotEditDialogExited()));
 
@@ -436,7 +436,7 @@ void BookmarkManager::ReloadBookmarks(void)
         MythUIButtonListItem *item = m_bookmarkList->GetItemAt(x);
         if (item && item->GetData().isValid())
         {
-            Bookmark *site = item->GetData().value<Bookmark*>();
+            auto *site = item->GetData().value<Bookmark*>();
             if (site && (*site == m_savedBookmark))
             {
                 m_bookmarkList->SetItemCurrent(item);
@@ -449,7 +449,7 @@ void BookmarkManager::ReloadBookmarks(void)
 void BookmarkManager::slotSettings(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    BrowserConfig *config = new BrowserConfig(mainStack, "browserconfig");
+    auto *config = new BrowserConfig(mainStack, "browserconfig");
 
     if (config->Create())
         mainStack->AddScreen(config);
@@ -464,7 +464,7 @@ void BookmarkManager::slotSetHomepage(void)
     MythUIButtonListItem *item = m_bookmarkList->GetItemCurrent();
     if (item && item->GetData().isValid())
     {
-        Bookmark *site = item->GetData().value<Bookmark*>();
+        auto *site = item->GetData().value<Bookmark*>();
         if (site)
             UpdateHomepageInDB(site);
     }
@@ -490,7 +490,7 @@ void BookmarkManager::slotDeleteCurrent(void)
 
     QString message = tr("Are you sure you want to delete the selected bookmark?");
 
-    MythConfirmationDialog *dialog = new MythConfirmationDialog(popupStack, message, true);
+    auto *dialog = new MythConfirmationDialog(popupStack, message, true);
 
     if (dialog->Create())
         popupStack->AddScreen(dialog);
@@ -508,7 +508,7 @@ void BookmarkManager::slotDoDeleteCurrent(bool doDelete)
     if (item)
     {
         QString category = "";
-        Bookmark *site = item->GetData().value<Bookmark*>();
+        auto *site = item->GetData().value<Bookmark*>();
         if (site)
         {
             category = site->m_category;
@@ -534,7 +534,7 @@ void BookmarkManager::slotDeleteMarked(void)
 
     QString message = tr("Are you sure you want to delete the marked bookmarks?");
 
-    MythConfirmationDialog *dialog = new MythConfirmationDialog(popupStack, message, true);
+    auto *dialog = new MythConfirmationDialog(popupStack, message, true);
 
     if (dialog->Create())
         popupStack->AddScreen(dialog);
@@ -581,7 +581,7 @@ void BookmarkManager::slotShowMarked(void)
     MythUIButtonListItem *item = m_bookmarkList->GetItemCurrent();
     if (item && item->GetData().isValid())
     {
-       Bookmark *site = item->GetData().value<Bookmark*>();
+       auto *site = item->GetData().value<Bookmark*>();
        m_savedBookmark = *site;
     }
 
@@ -600,7 +600,7 @@ void BookmarkManager::slotShowMarked(void)
     {
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-        MythBrowser *mythbrowser = new MythBrowser(mainStack, urls);
+        auto *mythbrowser = new MythBrowser(mainStack, urls);
 
         if (mythbrowser->Create())
         {
@@ -644,7 +644,7 @@ void BookmarkManager::slotClearMarked(void)
         {
             item->setChecked(MythUIButtonListItem::NotChecked);
 
-            Bookmark *site = item->GetData().value<Bookmark*>();
+            auto *site = item->GetData().value<Bookmark*>();
             if (site)
                 site->m_selected = false;
         }

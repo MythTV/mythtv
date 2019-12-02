@@ -41,9 +41,7 @@ void ExitPrompter::masterPromptExit()
                            " master backend to populate the"
                            " database with guide information.");
 
-        MythConfirmationDialog *dia = new MythConfirmationDialog(m_d->m_stk,
-                                                                 label,
-                                                                 false);
+        auto *dia = new MythConfirmationDialog(m_d->m_stk, label, false);
         if (!dia->Create())
         {
             LOG(VB_GENERAL, LOG_ERR, "Can't create fill DB prompt?");
@@ -71,8 +69,8 @@ void ExitPrompter::handleExit()
         problems.push_back(tr("Do you want to go back and fix this(these) "
                               "problem(s)?", nullptr, problems.size()));
 
-        MythDialogBox *dia = new MythDialogBox(problems.join("\n"),
-                                                m_d->m_stk, "exit prompt");
+        auto *dia = new MythDialogBox(problems.join("\n"),
+                                      m_d->m_stk, "exit prompt");
         if (!dia->Create())
         {
             LOG(VB_GENERAL, LOG_ERR, "Can't create Exit Prompt dialog?");
@@ -97,7 +95,7 @@ void ExitPrompter::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
+        auto *dce = (DialogCompletionEvent*)(event);
 
         QString resultid= dce->GetId();
         int buttonnum = dce->GetResult();

@@ -94,7 +94,7 @@ QString ScanStreamData::GetSIStandard(const QString& guess) const
 }
 
 
-bool ScanStreamData::DeleteCachedTable(PSIPTable *psip) const
+bool ScanStreamData::DeleteCachedTable(const PSIPTable *psip) const
 {
     if (!psip)
         return false;

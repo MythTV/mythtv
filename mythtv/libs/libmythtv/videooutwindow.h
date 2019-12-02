@@ -105,66 +105,66 @@ class VideoOutWindow : public QObject
     void ApplyLetterboxing       (void);
     void PrintMoveResizeDebug    (void);
     void SetVideoAspectRatio     (float Aspect);
-    QSize Fix1088                (QSize Dimensions);
+    static QSize Fix1088         (QSize Dimensions);
     void Rotate                  (void);
 
   private:
-    MythDisplay* m_display;
-    QPoint  m_dbMove;         ///< Percentage move from database
-    float   m_dbHorizScale;   ///< Horizontal Overscan/Underscan percentage
-    float   m_dbVertScale;    ///< Vertical Overscan/Underscan percentage
-    int     m_dbPipSize;      ///< percentage of full window to use for PiP
-    bool    m_dbScalingAllowed;///< disable this to prevent overscan/underscan
-    bool    m_dbUseGUISize;   ///< Use the gui size for video window
-    bool    m_usingXinerama;  ///< Display is using multiple screens
-    QRect   m_screenGeometry; ///< Full screen geometry
+    MythDisplay* m_display     {nullptr};
+    QPoint  m_dbMove           {0,0};   ///< Percentage move from database
+    float   m_dbHorizScale     {0.0F};  ///< Horizontal Overscan/Underscan percentage
+    float   m_dbVertScale      {0.0F};  ///< Vertical Overscan/Underscan percentage
+    int     m_dbPipSize        {26};    ///< percentage of full window to use for PiP
+    bool    m_dbScalingAllowed {true};  ///< disable this to prevent overscan/underscan
+    bool    m_dbUseGUISize     {false}; ///< Use the gui size for video window
+    bool    m_usingXinerama    {false}; ///< Display is using multiple screens
+    QRect   m_screenGeometry   {0,0,1024,768}; ///< Full screen geometry
 
     // Manual Zoom
-    float   m_manualVertScale;///< Manually applied vertical scaling.
-    float   m_manualHorizScale; ///< Manually applied horizontal scaling.
-    QPoint  m_manualMove;     ///< Manually applied percentage move.
+    float   m_manualVertScale  {1.0F}; ///< Manually applied vertical scaling.
+    float   m_manualHorizScale {1.0F}; ///< Manually applied horizontal scaling.
+    QPoint  m_manualMove       {0,0};  ///< Manually applied percentage move.
 
     // Physical dimensions
-    QSize   m_displayDimensions; ///< Screen dimensions of playback window in mm
-    float   m_displayAspect;  ///< Physical aspect ratio of playback window
+    QSize   m_displayDimensions {400,300}; ///< Screen dimensions of playback window in mm
+    float   m_displayAspect     {1.3333F}; ///< Physical aspect ratio of playback window
 
     // Video dimensions
-    QSize   m_videoDim;       ///< Pixel dimensions of video buffer
-    QSize   m_videoDispDim;   ///< Pixel dimensions of video display area
-    float   m_videoAspect;    ///< Physical aspect ratio of video
+    QSize   m_videoDim          {640,480}; ///< Pixel dimensions of video buffer
+    QSize   m_videoDispDim      {640,480}; ///< Pixel dimensions of video display area
+    float   m_videoAspect       {1.3333F}; ///< Physical aspect ratio of video
 
     /// Normally this is the same as videoAspect, but may not be
     /// if the user has toggled the aspect override mode.
-    float   m_videoAspectOverride;
+    float   m_videoAspectOverride {1.3333F};
     /// AspectOverrideMode to use to modify overriden_video_aspect
-    AspectOverrideMode m_videoAspectOverrideMode;
+    AspectOverrideMode m_videoAspectOverrideMode {kAspect_Off};
     /// Zoom mode
-    AdjustFillMode m_adjustFill;
-    int     m_rotation;
+    AdjustFillMode m_adjustFill {kAdjustFill_Off};
+    int     m_rotation {0};
 
     /// Pixel rectangle in video frame to display
-    QRect   m_videoRect;
+    QRect   m_videoRect {0,0,0,0};
     /// Pixel rectangle in display window into which video_rect maps to
-    QRect   m_displayVideoRect;
+    QRect   m_displayVideoRect {0,0,0,0};
     /// Visible portion of display window in pixels.
     /// This may be bigger or smaller than display_video_rect.
-    QRect   m_displayVisibleRect;
+    QRect   m_displayVisibleRect {0,0,0,0};
     /// Rectangle describing QWidget bounds.
-    QRect   m_windowRect;
+    QRect   m_windowRect {0,0,0,0};
     /// Used to save the display_visible_rect for
     /// restoration after video embedding ends.
-    QRect   m_tmpDisplayVisibleRect;
+    QRect   m_tmpDisplayVisibleRect {0,0,0,0};
     /// Embedded video rectangle
     QRect   m_embeddingRect;
 
     // Interactive TV (MHEG) video embedding
-    bool    m_itvResizing;
+    bool    m_itvResizing {false};
     QRect   m_itvDisplayVideoRect;
 
     /// State variables
-    bool    m_embedding;
-    bool    m_bottomLine;
-    PIPState m_pipState;
+    bool    m_embedding  {false};
+    bool    m_bottomLine {false};
+    PIPState m_pipState  {kPIPOff};
 
     // Constants
     static const float kManualZoomMaxHorizontalZoom;

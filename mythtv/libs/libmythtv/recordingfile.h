@@ -9,13 +9,13 @@
 
 class RecordingRule;
 
-typedef enum AVContainerFormats
+enum AVContainer
 {
     formatUnknown  = 0,
     formatNUV      = 1,
     formatMPEG2_TS = 2,
     formatMPEG2_PS = 3
-} AVContainer;
+};
 
 /** \class RecordingFile
  *  \brief Holds information on a recording file and it's video and audio streams

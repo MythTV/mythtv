@@ -466,7 +466,7 @@ void MHParseText::NextSym()
                     }
 
                     // We grow the buffer to the largest string in the input.
-                    unsigned char *str = (unsigned char *)realloc(m_String, m_nStringLength + 2);
+                    auto *str = (unsigned char *)realloc(m_String, m_nStringLength + 2);
 
                     if (str == nullptr)
                     {
@@ -568,7 +568,7 @@ void MHParseText::NextSym()
                     }
 
                     // We grow the buffer to the largest string in the input.
-                    unsigned char *str = (unsigned char *)realloc(m_String, m_nStringLength + 2);
+                    auto *str = (unsigned char *)realloc(m_String, m_nStringLength + 2);
 
                     if (str == nullptr)
                     {
@@ -785,7 +785,7 @@ void MHParseText::NextSym()
                     if (stricmp(buff, colourTable[i].m_name) == 0)
                     {
                         m_nType = PTString;
-                        unsigned char *str = (unsigned char *)realloc(m_String, 4 + 1);
+                        auto *str = (unsigned char *)realloc(m_String, 4 + 1);
 
                         if (str == nullptr)
                         {
@@ -858,7 +858,7 @@ MHParseNode *MHParseText::DoParse()
                     Error("Expected ':' after '{'");
                 }
 
-                MHPTagged *pTag = new MHPTagged(m_nTag);
+                auto *pTag = new MHPTagged(m_nTag);
                 pRes = pTag;
                 NextSym();
 
@@ -874,7 +874,7 @@ MHParseNode *MHParseText::DoParse()
             case PTTag: // Tag on its own.
             {
                 int nTag = m_nTag;
-                MHPTagged *pTag = new MHPTagged(nTag);
+                auto *pTag = new MHPTagged(nTag);
                 pRes = pTag;
                 NextSym();
 
@@ -1081,7 +1081,7 @@ MHParseNode *MHParseText::DoParse()
 
             case PTStartSeq: // Open parenthesis.
             {
-                MHParseSequence *pSeq = new MHParseSequence;
+                auto *pSeq = new MHParseSequence;
                 pRes = pSeq;
                 NextSym();
 

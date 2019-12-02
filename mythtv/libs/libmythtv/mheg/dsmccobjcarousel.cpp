@@ -33,7 +33,7 @@ DSMCCCacheModuleData::DSMCCCacheModuleData(DsmccDii *dii,
 
 DSMCCCacheModuleData::~DSMCCCacheModuleData()
 {
-    vector<QByteArray*>::iterator it = m_blocks.begin();
+    auto it = m_blocks.begin();
     for (; it != m_blocks.end(); ++it)
         delete *it;
     m_blocks.clear();
@@ -96,7 +96,7 @@ unsigned char *DSMCCCacheModuleData::AddModuleData(DsmccDb *ddb,
             .arg(m_module_id));
 
     // Re-assemble the blocks into the complete module.
-    unsigned char *tmp_data = (unsigned char*) malloc(m_receivedData);
+    auto *tmp_data = (unsigned char*) malloc(m_receivedData);
     if (tmp_data == nullptr)
         return nullptr;
 
@@ -126,7 +126,7 @@ unsigned char *DSMCCCacheModuleData::AddModuleData(DsmccDb *ddb,
                                         "compressed size %1, final size %2")
             .arg(m_moduleSize).arg(dataLen));
 
-        unsigned char *uncompressed = (unsigned char*) malloc(dataLen);
+        auto *uncompressed = (unsigned char*) malloc(dataLen);
         int ret = uncompress(uncompressed, &dataLen, tmp_data, m_moduleSize);
         if (ret != Z_OK)
         {
@@ -210,7 +210,7 @@ void ObjCarousel::AddModuleInfo(DsmccDii *dii, Dsmcc *status,
                 .arg(dii->m_modules[i].m_module_id));
 
         // Create a new cache module data object.
-        DSMCCCacheModuleData *cachep = new DSMCCCacheModuleData(dii, info, streamTag);
+        auto *cachep = new DSMCCCacheModuleData(dii, info, streamTag);
         int tag = info->m_modinfo.m_tap.m_assoc_tag;
         LOG(VB_DSMCC, LOG_DEBUG, QString("[dsmcc] Module info tap identifies "
                                          "tag %1 with carousel %2")

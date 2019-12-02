@@ -533,7 +533,7 @@ MythSocket *MythCoreContext::ConnectCommandSocket(
 MythSocket *MythCoreContext::ConnectEventSocket(const QString &hostname,
                                                 int port)
 {
-    MythSocket *eventSock = new MythSocket(-1, this);
+    auto *eventSock = new MythSocket(-1, this);
 
     // Assume that since we _just_ connected the command socket,
     // this one won't need multiple retries to work...

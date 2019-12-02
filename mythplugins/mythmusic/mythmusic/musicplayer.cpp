@@ -515,7 +515,7 @@ void MusicPlayer::nextAuto(void)
         MythScreenStack *popupStack =
                             GetMythMainWindow()->GetStack("popup stack");
 
-        MiniPlayer *miniplayer = new MiniPlayer(popupStack);
+        auto *miniplayer = new MiniPlayer(popupStack);
 
         if (miniplayer->Create())
             popupStack->AddScreen(miniplayer);
@@ -555,11 +555,11 @@ void MusicPlayer::customEvent(QEvent *event)
     }
     else if (event->type() == DecoderHandlerEvent::Meta)
     {
-        DecoderHandlerEvent *dhe = dynamic_cast<DecoderHandlerEvent*>(event);
+        auto *dhe = dynamic_cast<DecoderHandlerEvent*>(event);
         if (!dhe)
             return;
 
-        MusicMetadata *mdata = new MusicMetadata(*dhe->getMetadata());
+        auto *mdata = new MusicMetadata(*dhe->getMetadata());
 
         m_lastTrackStart += m_currentTime;
 
@@ -583,7 +583,7 @@ void MusicPlayer::customEvent(QEvent *event)
         {
             MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-            MiniPlayer *miniplayer = new MiniPlayer(popupStack);
+            auto *miniplayer = new MiniPlayer(popupStack);
 
             if (miniplayer->Create())
                 popupStack->AddScreen(miniplayer);
@@ -598,7 +598,7 @@ void MusicPlayer::customEvent(QEvent *event)
     // handle MythEvent events
     else if (event->type() == MythEvent::MythEventMessage)
     {
-        MythEvent *me = dynamic_cast<MythEvent*>(event);
+        auto *me = dynamic_cast<MythEvent*>(event);
         if (!me)
             return;
 
@@ -791,7 +791,7 @@ void MusicPlayer::customEvent(QEvent *event)
 
     if (event->type() == OutputEvent::Error)
     {
-        OutputEvent *aoe = dynamic_cast<OutputEvent *>(event);
+        auto *aoe = dynamic_cast<OutputEvent *>(event);
 
         if (!aoe)
             return;
@@ -813,7 +813,7 @@ void MusicPlayer::customEvent(QEvent *event)
     }
     else if (event->type() == DecoderEvent::Error)
     {
-        DecoderEvent *dxe = dynamic_cast<DecoderEvent *>(event);
+        auto *dxe = dynamic_cast<DecoderEvent *>(event);
 
         if (!dxe)
             return;
@@ -835,7 +835,7 @@ void MusicPlayer::customEvent(QEvent *event)
     }
     else if (event->type() == DecoderHandlerEvent::Error)
     {
-        DecoderHandlerEvent *dhe = dynamic_cast<DecoderHandlerEvent*>(event);
+        auto *dhe = dynamic_cast<DecoderHandlerEvent*>(event);
 
         if (!dhe)
             return;
@@ -857,7 +857,7 @@ void MusicPlayer::customEvent(QEvent *event)
     }
     else if (event->type() == OutputEvent::Info)
     {
-        OutputEvent *oe = dynamic_cast<OutputEvent*>(event);
+        auto *oe = dynamic_cast<OutputEvent*>(event);
 
         if (!oe)
             return;
@@ -925,7 +925,7 @@ void MusicPlayer::customEvent(QEvent *event)
     }
     else if (event->type() == DecoderHandlerEvent::BufferStatus)
     {
-        DecoderHandlerEvent *dhe = dynamic_cast<DecoderHandlerEvent*>(event);
+        auto *dhe = dynamic_cast<DecoderHandlerEvent*>(event);
         if (!dhe)
             return;
 
@@ -1114,7 +1114,7 @@ void MusicPlayer::showMiniPlayer(void)
         MythScreenStack *popupStack =
                             GetMythMainWindow()->GetStack("popup stack");
 
-        MiniPlayer *miniplayer = new MiniPlayer(popupStack);
+        auto *miniplayer = new MiniPlayer(popupStack);
 
         if (miniplayer->Create())
             popupStack->AddScreen(miniplayer);
@@ -1287,7 +1287,7 @@ void MusicPlayer::updateVolatileMetadata(void)
                         << QString::number(getCurrentMetadata()->Rating())
                         << QString::number(getCurrentMetadata()->Playcount())
                         << getCurrentMetadata()->LastPlay().toString(Qt::ISODate);
-                SendStringListThread *thread = new SendStringListThread(strList);
+                auto *thread = new SendStringListThread(strList);
                 MThreadPool::globalInstance()->start(thread, "UpdateVolatile");
             }
 
@@ -1506,7 +1506,7 @@ void MusicPlayer::decoderHandlerReady(void)
             .arg(getDecoder()->getURL()));
 
 #ifdef HAVE_CDIO
-    CdDecoder *cddecoder = dynamic_cast<CdDecoder*>(getDecoder());
+    auto *cddecoder = dynamic_cast<CdDecoder*>(getDecoder());
     if (cddecoder)
         cddecoder->setDevice(gCDdevice);
 #endif
@@ -1626,7 +1626,7 @@ void MusicPlayer::sendNotification(int notificationID, const QString &title, con
     map["minm"] = author;
     map["asal"] = desc;
 
-    MythImageNotification *n = new MythImageNotification(MythNotification::Info, image, map);
+    auto *n = new MythImageNotification(MythNotification::Info, image, map);
 
     n->SetId(notificationID);
     n->SetParent(this);

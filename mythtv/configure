@@ -86,6 +86,7 @@ Advanced options (experts only):
   --extra-cxxflags=ECXFLAGS add ECXXFLAGS to list of flags for C++ compile
   --extra-ldflags=ELDFLAGS add ELDFLAGS to LDFLAGS [$LDFLAGS]
   --disable-symbol-visibility disables symbol visibility options
+  --disable-deprecation-warnings disables deprecated declaration warnings
   --arch=ARCH              select architecture [$arch]
   --tune=CPU               tune instruction usage for a particular CPU [$tune]
   --cpu=CPU                select the minimum required CPU (affects
@@ -2018,6 +2019,7 @@ MYTHTV_LIST='
     proc_opt
     silent_cc
     symbol_visibility
+    deprecation_warnings
 '
 
 USING_LIST='
@@ -2764,6 +2766,7 @@ enable opengl
 enable opengles
 enable egl
 enable symbol_visibility
+enable deprecation_warnings
 enable v4l1
 enable v4l2
 enable v4l2prime
@@ -5168,7 +5171,7 @@ version2num(){
 }
 
 # Minimum supported Qt version
-QT_MIN_VERSION_STR="5.5"
+QT_MIN_VERSION_STR="5.7"
 QT_MIN_VERSION=$(version2num $QT_MIN_VERSION_STR)
 QT_MIN_VERSION_HEX=$(printf "0x%06x" $QT_MIN_VERSION)
 
@@ -6202,6 +6205,9 @@ enabled debug && add_cxxflags -g"$debuglevel"
 #check_cflags -Wdeclaration-after-statement
 check_cflags -Wall
 check_cflags -Wextra
+if disabled deprecation_warnings; then
+    check_cflags -Wno-deprecated-declarations
+fi
 ! disabled optimizations && check_cflags -Wdisabled-optimization
 check_cflags -Wpointer-arith
 disabled icc && check_cflags -Wredundant-decls
@@ -6253,6 +6259,9 @@ EOF
 check_cxxflags -Wall
 check_cxxflags -Wextra
 check_cxxflags -Wpointer-arith
+if disabled deprecation_warnings; then
+    check_cxxflags -Wno-deprecated-declarations
+fi
 #needed for INT64_C in libs/libavformat under g++
 check_cxxflags -D__STDC_CONSTANT_MACROS
 check_cxxflags -D__STDC_LIMIT_MACROS

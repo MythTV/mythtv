@@ -17,7 +17,7 @@
 extern "C" {
 #endif
 
-typedef void (*callback_t)(void*);
+typedef void (*callback_t)(void*); //NOLINT(modernize-use-using)included from C code
 void    mythfile_open_register_callback(const char *pathname, void* object,
                                         callback_t func);
 

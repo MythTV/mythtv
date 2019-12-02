@@ -32,12 +32,6 @@
 
 QEvent::Type OSDHideEvent::kEventType = static_cast<QEvent::Type>(QEvent::registerEventType());
 
-ChannelEditor::ChannelEditor(QObject *RetObject, const char *Name)
-  : MythScreenType(static_cast<MythScreenType*>(nullptr), Name),
-    m_retObject(RetObject)
-{
-}
-
 bool ChannelEditor::Create(void)
 {
     if (!XMLParseBase::LoadWindowFromXML("osd.xml", "ChannelEditor", this))
@@ -141,17 +135,8 @@ void ChannelEditor::SendResult(int result)
             break;
     }
 
-    DialogCompletionEvent *dce = new DialogCompletionEvent("", result,
-                                                           "", message);
+    auto *dce = new DialogCompletionEvent("", result, "", message);
     QCoreApplication::postEvent(m_retObject, dce);
-}
-
-OSD::OSD(MythPlayer *Player, QObject *Parent, MythPainter *Painter)
-  : m_parent(Player),
-    m_ParentObject(Parent),
-    m_CurrentPainter(Painter)
-{
-    SetTimeouts(3000, 5000, 13000);
 }
 
 OSD::~OSD()
@@ -308,14 +293,14 @@ void OSD::HideAll(bool KeepSubs, MythScreenType* Except, bool DropNotification)
 
 void OSD::LoadWindows(void)
 {
-    static const char* default_windows[7] = {
+    static const char* s_defaultWindows[7] = {
         "osd_message", "osd_input", "program_info", "browse_info", "osd_status",
         "osd_program_editor", "osd_debug"};
 
     for (int i = 0; i < 7; i++)
     {
-        const char* window = default_windows[i];
-        MythOSDWindow *win = new MythOSDWindow(nullptr, window, true);
+        const char* window = s_defaultWindows[i];
+        auto *win = new MythOSDWindow(nullptr, window, true);
 
         win->SetPainter(m_CurrentPainter);
         if (win->Create())
@@ -555,7 +540,7 @@ void OSD::SetText(const QString &Window, const InfoMap &Map, OSDTimeout Timeout)
 
     if (win == m_Dialog)
     {
-        ChannelEditor *edit = dynamic_cast<ChannelEditor*>(m_Dialog);
+        auto *edit = dynamic_cast<ChannelEditor*>(m_Dialog);
         if (edit)
             edit->SetText(Map);
         else
@@ -639,7 +624,7 @@ void OSD::SetGraph(const QString &Window, const QString &Graph, int64_t Timecode
     if (!win)
         return;
 
-    MythUIImage *image = dynamic_cast<MythUIImage* >(win->GetChild(Graph));
+    auto *image = dynamic_cast<MythUIImage* >(win->GetChild(Graph));
     if (!image)
         return;
 
@@ -684,7 +669,7 @@ bool OSD::Draw(MythPainter* Painter, QSize Size, bool Repaint)
     QList<MythScreenType*>::iterator it2 = notifications.begin();
     while (it2 != notifications.end())
     {
-        if (!nc->ScreenCreated(*it2))
+        if (!MythNotificationCenter::ScreenCreated(*it2))
         {
             LOG(VB_GUI, LOG_DEBUG, LOC + "Creating OSD Notification");
 
@@ -708,11 +693,11 @@ bool OSD::Draw(MythPainter* Painter, QSize Size, bool Repaint)
 
             (*it2)->SetPainter(m_CurrentPainter);
 
-            nc->UpdateScreen(*it2);
+            MythNotificationCenter::UpdateScreen(*it2);
 
             visible = true;
             (*it2)->Pulse();
-            QTime expires = nc->ScreenExpiryTime(*it2).time();
+            QTime expires = MythNotificationCenter::ScreenExpiryTime(*it2).time();
             int left = now.msecsTo(expires);
             if (left < 0)
                 left = 0;
@@ -779,7 +764,7 @@ void OSD::CheckExpiry(void)
             if (!m_PulsedDialogText.isEmpty() && now > m_NextPulseUpdate)
             {
                 QString newtext = m_PulsedDialogText;
-                MythDialogBox *dialog = dynamic_cast<MythDialogBox*>(m_Dialog);
+                auto *dialog = dynamic_cast<MythDialogBox*>(m_Dialog);
                 if (dialog)
                 {
                     // The disambiguation string must be an empty string
@@ -789,7 +774,7 @@ void OSD::CheckExpiry(void)
                                           static_cast<int>(now.secsTo(it.value())));
                     dialog->SetText(newtext.replace("%d", replace));
                 }
-                MythConfirmationDialog *cdialog = dynamic_cast<MythConfirmationDialog*>(m_Dialog);
+                auto *cdialog = dynamic_cast<MythConfirmationDialog*>(m_Dialog);
                 if (cdialog)
                 {
                     QString replace = QString::number(now.secsTo(it.value()));
@@ -948,7 +933,7 @@ void OSD::HideWindow(const QString &Window)
 
 void OSD::SendHideEvent(void)
 {
-    OSDHideEvent *event = new OSDHideEvent(m_FunctionalType);
+    auto *event = new OSDHideEvent(m_FunctionalType);
     QCoreApplication::postEvent(m_ParentObject, event);
 }
 
@@ -999,7 +984,7 @@ void OSD::DialogShow(const QString &Window, const QString &Text, int UpdateFor)
         }
         else
         {
-            MythDialogBox *dialog = dynamic_cast<MythDialogBox*>(m_Dialog);
+            auto *dialog = dynamic_cast<MythDialogBox*>(m_Dialog);
             if (dialog)
                 dialog->Reset();
 
@@ -1026,10 +1011,10 @@ void OSD::DialogShow(const QString &Window, const QString &Text, int UpdateFor)
         {
             PositionWindow(dialog);
             m_Dialog = dialog;
-            MythDialogBox *dbox = dynamic_cast<MythDialogBox*>(m_Dialog);
+            auto *dbox = dynamic_cast<MythDialogBox*>(m_Dialog);
             if (dbox)
                 dbox->SetReturnEvent(m_ParentObject, Window);
-            MythConfirmationDialog *cbox = dynamic_cast<MythConfirmationDialog*>(m_Dialog);
+            auto *cbox = dynamic_cast<MythConfirmationDialog*>(m_Dialog);
             if (cbox)
             {
                 cbox->SetReturnEvent(m_ParentObject, Window);
@@ -1061,14 +1046,14 @@ void OSD::DialogShow(const QString &Window, const QString &Text, int UpdateFor)
 
 void OSD::DialogSetText(const QString &Text)
 {
-    MythDialogBox *dialog = dynamic_cast<MythDialogBox*>(m_Dialog);
+    auto *dialog = dynamic_cast<MythDialogBox*>(m_Dialog);
     if (dialog)
         dialog->SetText(Text);
 }
 
 void OSD::DialogBack(const QString& Text, const QVariant& Data, bool Exit)
 {
-    MythDialogBox *dialog = dynamic_cast<MythDialogBox*>(m_Dialog);
+    auto *dialog = dynamic_cast<MythDialogBox*>(m_Dialog);
     if (dialog)
     {
         dialog->SetBackAction(Text, Data);
@@ -1079,14 +1064,14 @@ void OSD::DialogBack(const QString& Text, const QVariant& Data, bool Exit)
 
 void OSD::DialogAddButton(const QString& Text, QVariant Data, bool Menu, bool Current)
 {
-    MythDialogBox *dialog = dynamic_cast<MythDialogBox*>(m_Dialog);
+    auto *dialog = dynamic_cast<MythDialogBox*>(m_Dialog);
     if (dialog)
         dialog->AddButton(Text, std::move(Data), Menu, Current);
 }
 
 void OSD::DialogGetText(InfoMap &Map)
 {
-    ChannelEditor *edit = dynamic_cast<ChannelEditor*>(m_Dialog);
+    auto *edit = dynamic_cast<ChannelEditor*>(m_Dialog);
     if (edit)
         edit->GetText(Map);
 }
@@ -1259,13 +1244,6 @@ void OSD::DisplayBDOverlay(BDOverlay* Overlay)
         bd->DisplayBDOverlay(Overlay);
 }
 
-OsdNavigation::OsdNavigation(QObject *RetObject, const QString &Name, OSD *Osd)
-  : MythScreenType(static_cast<MythScreenType*>(nullptr), Name),
-    m_retObject(RetObject),
-    m_osd(Osd)
-{
-}
-
 bool OsdNavigation::Create(void)
 {
     if (!XMLParseBase::LoadWindowFromXML("osd.xml", "osd_navigation", this))
@@ -1370,8 +1348,7 @@ void OsdNavigation::SendResult(int Result, const QString& Action)
     if (!m_retObject)
         return;
 
-    DialogCompletionEvent *dce =
-            new DialogCompletionEvent("", Result, "", Action);
+    auto *dce = new DialogCompletionEvent("", Result, "", Action);
     QCoreApplication::postEvent(m_retObject, dce);
 }
 

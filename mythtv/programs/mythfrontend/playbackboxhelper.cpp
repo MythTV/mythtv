@@ -112,7 +112,7 @@ AvailableStatusType PBHEventHandler::CheckAvailability(const QStringList &slist)
     QStringList list;
     list.push_back(QString::number(evinfo.GetRecordingID()));
     list.push_back(evinfo.GetPathname());
-    MythEvent *e0 = new MythEvent("SET_PLAYBACK_URL", list);
+    auto *e0 = new MythEvent("SET_PLAYBACK_URL", list);
     QCoreApplication::postEvent(m_pbh.m_listener, e0);
 
     list.clear();
@@ -131,7 +131,7 @@ AvailableStatusType PBHEventHandler::CheckAvailability(const QStringList &slist)
         if (*cit == kCheckForCache && cats.size() > 1)
             continue;
         list[1] = QString::number((int)*cit);
-        MythEvent *e = new MythEvent("AVAILABILITY", list);
+        auto *e = new MythEvent("AVAILABILITY", list);
         QCoreApplication::postEvent(m_pbh.m_listener, e);
     }
 
@@ -142,7 +142,7 @@ bool PBHEventHandler::event(QEvent *e)
 {
     if (e->type() == QEvent::Timer)
     {
-        QTimerEvent *te = (QTimerEvent*)e;
+        auto *te = (QTimerEvent*)e;
         const int timer_id = te->timerId();
         if (timer_id == m_freeSpaceTimerId)
             UpdateFreeSpaceEvent();
@@ -164,7 +164,7 @@ bool PBHEventHandler::event(QEvent *e)
     }
     if (e->type() == MythEvent::MythEventMessage)
     {
-        MythEvent *me = static_cast<MythEvent*>(e);
+        auto *me = static_cast<MythEvent*>(e);
         if (me->Message() == "UPDATE_FREE_SPACE")
         {
             UpdateFreeSpaceEvent();
@@ -200,12 +200,12 @@ bool PBHEventHandler::event(QEvent *e)
             }
             if (!successes.empty())
             {
-                MythEvent *oe = new MythEvent("DELETE_SUCCESSES", successes);
+                auto *oe = new MythEvent("DELETE_SUCCESSES", successes);
                 QCoreApplication::postEvent(m_pbh.m_listener, oe);
             }
             if (!failures.empty())
             {
-                MythEvent *oe = new MythEvent("DELETE_FAILURES", failures);
+                auto *oe = new MythEvent("DELETE_FAILURES", failures);
                 QCoreApplication::postEvent(m_pbh.m_listener, oe);
             }
 
@@ -229,12 +229,12 @@ bool PBHEventHandler::event(QEvent *e)
             }
             if (!successes.empty())
             {
-                MythEvent *oe = new MythEvent("UNDELETE_SUCCESSES", successes);
+                auto *oe = new MythEvent("UNDELETE_SUCCESSES", successes);
                 QCoreApplication::postEvent(m_pbh.m_listener, oe);
             }
             if (!failures.empty())
             {
-                MythEvent *oe = new MythEvent("UNDELETE_FAILURES", failures);
+                auto *oe = new MythEvent("UNDELETE_FAILURES", failures);
                 QCoreApplication::postEvent(m_pbh.m_listener, oe);
             }
 
@@ -278,7 +278,7 @@ bool PBHEventHandler::event(QEvent *e)
         {
             const QString&         inetref    = me->ExtraData(0);
             uint                   season     = me->ExtraData(1).toUInt();
-            const VideoArtworkType type       = (VideoArtworkType)me->ExtraData(2).toInt();
+            const auto             type       = (VideoArtworkType)me->ExtraData(2).toInt();
 #if 0 /* const ref for an unused variable doesn't make much sense either */
             uint                   recordingID = me->ExtraData(3).toUInt();
             const QString          &group     = me->ExtraData(4);
@@ -303,7 +303,7 @@ bool PBHEventHandler::event(QEvent *e)
             {
                 QStringList list = me->ExtraDataList();
                 list.push_back(foundFile);
-                MythEvent *oe = new MythEvent("FOUND_ARTWORK", list);
+                auto *oe = new MythEvent("FOUND_ARTWORK", list);
                 QCoreApplication::postEvent(m_pbh.m_listener, oe);
             }
 
@@ -354,7 +354,7 @@ void PlaybackBoxHelper::StopRecording(const ProgramInfo &pginfo)
 {
     QStringList list;
     pginfo.ToStringList(list);
-    MythEvent *e = new MythEvent("STOP_RECORDING", list);
+    auto *e = new MythEvent("STOP_RECORDING", list);
     QCoreApplication::postEvent(m_eventHandler, e);
 }
 
@@ -370,7 +370,7 @@ void PlaybackBoxHelper::DeleteRecording( uint recordingID, bool forceDelete,
 
 void PlaybackBoxHelper::DeleteRecordings(const QStringList &list)
 {
-    MythEvent *e = new MythEvent("DELETE_RECORDINGS", list);
+    auto *e = new MythEvent("DELETE_RECORDINGS", list);
     QCoreApplication::postEvent(m_eventHandler, e);
 }
 
@@ -378,7 +378,7 @@ void PlaybackBoxHelper::UndeleteRecording(uint recordingID)
 {
     QStringList list;
     list.push_back(QString::number(recordingID));
-    MythEvent *e = new MythEvent("UNDELETE_RECORDINGS", list);
+    auto *e = new MythEvent("UNDELETE_RECORDINGS", list);
     QCoreApplication::postEvent(m_eventHandler, e);
 }
 
@@ -395,7 +395,7 @@ void PlaybackBoxHelper::UpdateFreeSpace(void)
             m_freeSpaceUsedMB  = (uint64_t) (fsInfos[i].getUsedSpace()  >> 10);
         }
     }
-    MythEvent *e = new MythEvent("UPDATE_USAGE_UI");
+    auto *e = new MythEvent("UPDATE_USAGE_UI");
     QCoreApplication::postEvent(m_listener, e);
 }
 
@@ -429,7 +429,7 @@ void PlaybackBoxHelper::CheckAvailability(
     {
         (*it).push_back(catstr);
     }
-    MythEvent *e = new MythEvent("CHECK_AVAILABILITY", QStringList(catstr));
+    auto *e = new MythEvent("CHECK_AVAILABILITY", QStringList(catstr));
     QCoreApplication::postEvent(m_eventHandler, e);
 }
 
@@ -455,7 +455,7 @@ QString PlaybackBoxHelper::LocateArtwork(
     list.push_back(QString::number(type));
     list.push_back((pginfo)?QString::number(pginfo->GetRecordingID()):"");
     list.push_back(groupname);
-    MythEvent *e = new MythEvent("LOCATE_ARTWORK", list);
+    auto *e = new MythEvent("LOCATE_ARTWORK", list);
     QCoreApplication::postEvent(m_eventHandler, e);
 
     return QString();
@@ -476,7 +476,7 @@ QString PlaybackBoxHelper::GetPreviewImage(
     QStringList extra(token);
     extra.push_back(check_availability?"1":"0");
     pginfo.ToStringList(extra);
-    MythEvent *e = new MythEvent("GET_PREVIEW", extra);
+    auto *e = new MythEvent("GET_PREVIEW", extra);
     QCoreApplication::postEvent(m_eventHandler, e);
 
     return token;

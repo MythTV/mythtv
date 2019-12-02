@@ -16,12 +16,12 @@ class CC608Text
 {
   public:
     CC608Text(const QString &T, int X, int Y) :
-        text(T), x(X), y(Y) {}
+        m_text(T), m_x(X), m_y(Y) {}
     CC608Text(const CC608Text &other) :
-        text(other.text), x(other.x), y(other.y) {}
-    QString text;
-    int x;
-    int y;
+        m_text(other.m_text), m_x(other.m_x), m_y(other.m_y) {}
+    QString m_text;
+    int     m_x;
+    int     m_y;
 };
 
 struct TextContainer
@@ -38,20 +38,19 @@ class CC608Buffer
    ~CC608Buffer(void) { Clear(); }
     void Clear(void)
     {
-        lock.lock();
-        vector<CC608Text*>::iterator i = buffers.begin();
-        for (; i != buffers.end(); ++i)
+        m_lock.lock();
+        vector<CC608Text*>::iterator i = m_buffers.begin();
+        for (; i != m_buffers.end(); ++i)
         {
             CC608Text *cc = (*i);
-            if (cc)
-                delete cc;
+            delete cc;
         }
-        buffers.clear();
-        lock.unlock();
+        m_buffers.clear();
+        m_lock.unlock();
     }
 
-    QMutex lock;
-    vector<CC608Text*> buffers;
+    QMutex             m_lock;
+    vector<CC608Text*> m_buffers;
 };
 
 class CC608StateTracker

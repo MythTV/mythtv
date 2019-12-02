@@ -42,7 +42,7 @@
 #include "upnputil.h"
 #include "compat.h"
 
-typedef struct timeval  TaskTime;
+using TaskTime = struct timeval;
 
 class HttpWorkerThread;
 class QScriptEngine;
@@ -53,12 +53,12 @@ class QSslCertificate;
 class QSslConfiguration;
 #endif
 
-typedef enum
+enum ContentProtection
 {
     cpLocalNoAuth = 0x00,  // Can only be accessed locally, but no authentication is required
     cpLocalAuth   = 0x01,  // Can only be accessed locally, authentication is required
     cpRemoteAuth  = 0x02   // Can be accessed remotely, authentication is required
-} ContentProtection;
+};
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -99,7 +99,7 @@ class UPNP_PUBLIC HttpServerExtension : public QObject
         virtual int GetSocketTimeout() const { return m_nSocketTimeout; }// -1 = Use config value
 };
 
-typedef QList<QPointer<HttpServerExtension> > HttpServerExtensionList;
+using HttpServerExtensionList = QList<QPointer<HttpServerExtension> >;
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////

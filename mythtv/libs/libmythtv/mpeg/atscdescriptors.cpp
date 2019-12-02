@@ -149,8 +149,7 @@ QString MultipleStringStructure::Uncompressed(
         // Standard Compression Scheme for Unicode (SCSU)
         str=QString("TODO SCSU encoding");
     } else if (mode==0x3f) { //  Unicode, UTF-16 Form
-        const unsigned short* ustr =
-            reinterpret_cast<const unsigned short*>(buf);
+        const auto* ustr = reinterpret_cast<const unsigned short*>(buf);
         for (int j=0; j<(len>>1); j++)
             str.append( QChar( (ustr[j]<<8) | (ustr[j]>>8) ) );
     } else if (0x40<=mode && mode<=0x41)
@@ -234,26 +233,26 @@ QString ContentAdvisoryDescriptor::toString() const
 
 QString AudioStreamDescriptor::SampleRateCodeString(void) const
 {
-    static const char* asd[] =
+    static const char* s_asd[] =
     {
         "48kbps", "44.1kbps", "32kbps", "Reserved",
         "48kbps or 44.1kbps", "48kbps or 32kbps",
         "44.1kbps or 32kbps", "48kbps or 44.1kbps or 32kbps"
     };
-    return QString(asd[SampleRateCode()]);
+    return QString(s_asd[SampleRateCode()]);
 }
 
 QString AudioStreamDescriptor::BitRateCodeString(void) const
 {
     // cppcheck-suppress variableScope
-    static const char* ebr[19] =
+    static const char* s_ebr[19] =
     {
         "=32kbps",  "=40kbps",  "=48kbps",  "=56kbps",  "=64kbps",
         "=80kbps",  "=96kbps",  "=112kbps", "=128kbps", "=160kbps",
         "=192kbps", "=224kbps", "=256kbps", "=320kbps", "=384kbps",
         "=448kbps", "=512kbps", "=576kbps", "=640kbps"
     };
-    static const char* ubr[19] =
+    static const char* s_ubr[19] =
     {
         "<=32kbps",  "<=40kbps", "<=48kbps",  "<=56kbps",  "<=64kbps",
         "<=80kbps",  "<=96kbps", "<=112kbps", "<=128kbps", "<=160kbps",
@@ -262,34 +261,34 @@ QString AudioStreamDescriptor::BitRateCodeString(void) const
     };
 
     if (BitRateCode() <= 18)
-        return QString(ebr[BitRateCode()]);
+        return QString(s_ebr[BitRateCode()]);
     if ((BitRateCode() >= 32) && (BitRateCode() <= 50))
-        return QString(ubr[BitRateCode()-32]);
+        return QString(s_ubr[BitRateCode()-32]);
     return QString("Unknown Bit Rate Code");
 }
 
 QString AudioStreamDescriptor::SurroundModeString(void) const
 {
-    static const char* sms[] =
+    static const char* s_sms[] =
     {
         "Not indicated",
         "Not Dolby surround encoded",
         "Dolby surround encoded",
         "Reserved",
     };
-    return QString(sms[SurroundMode()]);
+    return QString(s_sms[SurroundMode()]);
 }
 
 QString AudioStreamDescriptor::ChannelsString(void) const
 {
-    static const char* cs[] =
+    static const char* s_cs[] =
     {
         "1 + 1",    "1/0",      "2/0",      "3/0",
         "2/1",      "3/1",      "2/2 ",     "3/2",
         "1",        "<= 2",     "<= 3",     "<= 4",
         "<= 5",     "<= 6",     "Reserved", "Reserved"
     };
-    return cs[Channels()];
+    return s_cs[Channels()];
 }
 
 QString AudioStreamDescriptor::toString() const

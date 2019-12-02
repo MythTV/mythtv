@@ -26,8 +26,8 @@ class MythFontProperties;
 class MythImage;
 class UIEffects;
 
-typedef QVector<QTextLayout *>            LayoutVector;
-typedef QVector<QTextLayout::FormatRange> FormatVector;
+using LayoutVector = QVector<QTextLayout *>;
+using FormatVector = QVector<QTextLayout::FormatRange>;
 
 class MUI_PUBLIC MythPainter
 {

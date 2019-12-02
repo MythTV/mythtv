@@ -12,15 +12,14 @@
 #include "ClassicLogoDetector.h"
 #include "ClassicCommDetector.h"
 
-typedef struct edgemaskentry
+struct EdgeMaskEntry
 {
     int m_isEdge;
     int m_horiz;
     int m_vert;
     int m_rdiag;
     int m_ldiag;
-}
-EdgeMaskEntry;
+};
 
 
 ClassicLogoDetector::ClassicLogoDetector(ClassicCommDetector* commdetector,
@@ -82,7 +81,7 @@ bool ClassicLogoDetector::searchForLogo(MythPlayer* player)
 
     m_logoInfoAvailable = false;
 
-    EdgeMaskEntry *edgeCounts = new EdgeMaskEntry[m_width * m_height];
+    auto *edgeCounts = new EdgeMaskEntry[m_width * m_height];
 
     // Back in 2005, a threshold of 50 minimum pixelsInMask was established.
     // I don't know whether that was tested against SD or HD resolutions.

@@ -46,17 +46,9 @@ void VideoOutputD3D::GetRenderOptions(RenderOptions &Options)
 }
 
 VideoOutputD3D::VideoOutputD3D(void)
-  : MythVideoOutput(),         m_lock(QMutex::Recursive),
-    m_hWnd(nullptr),       m_render(nullptr),
-    m_video(nullptr),
-    m_render_valid(false), m_render_reset(false), m_pip_active(nullptr),
-    m_osd_painter(nullptr)
+  : MythVideoOutput(),
 {
     m_pauseFrame.buf = nullptr;
-#ifdef USING_DXVA2
-    m_decoder = nullptr;
-#endif
-    m_pause_surface = nullptr;
 }
 
 VideoOutputD3D::~VideoOutputD3D()
@@ -76,16 +68,16 @@ void VideoOutputD3D::TearDown(void)
         m_pauseFrame.buf = nullptr;
     }
 
-    if (m_osd_painter)
+    if (m_osdPainter)
     {
         // Hack to ensure that the osd painter is not
         // deleted while image load thread is still busy
         // loading images with that painter
-        m_osd_painter->Teardown();
+        m_osdPainter->Teardown();
         if (invalid_osd_painter)
             delete invalid_osd_painter;
-        invalid_osd_painter = m_osd_painter;
-        m_osd_painter = nullptr;
+        invalid_osd_painter = m_osdPainter;
+        m_osdPainter = nullptr;
     }
 
     DeleteDecoder();
@@ -95,15 +87,15 @@ void VideoOutputD3D::TearDown(void)
 void VideoOutputD3D::DestroyContext(void)
 {
     QMutexLocker locker(&m_lock);
-    m_render_valid = false;
-    m_render_reset = false;
+    m_renderValid = false;
+    m_renderReset = false;
 
     while (!m_pips.empty())
     {
         delete *m_pips.begin();
         m_pips.erase(m_pips.begin());
     }
-    m_pip_ready.clear();
+    m_pipReady.clear();
 
     if (m_video)
     {
@@ -195,7 +187,7 @@ bool VideoOutputD3D::SetupContext()
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
         "Direct3D device successfully initialized.");
-    m_render_valid = true;
+    m_renderValid = true;
     return true;
 }
 
@@ -239,10 +231,10 @@ bool VideoOutputD3D::Init(const QSize &video_dim_buf,
         TearDown();
     else
     {
-        m_osd_painter = new MythD3D9Painter(m_render);
-        if (m_osd_painter)
+        m_osdPainter = new MythD3D9Painter(m_render);
+        if (m_osdPainter)
         {
-            m_osd_painter->SetSwapControl(false);
+            m_osdPainter->SetSwapControl(false);
             LOG(VB_PLAYBACK, LOG_INFO, LOC + "Created D3D9 osd painter.");
         }
         else
@@ -337,8 +329,8 @@ void VideoOutputD3D::PrepareFrame(VideoFrame *buffer, FrameScanType t,
     if (!m_render || !m_video)
         return;
 
-    m_render_valid = m_render->Test(m_render_reset);
-    if (m_render_valid)
+    m_renderValid = m_render->Test(m_renderReset);
+    if (m_renderValid)
     {
         QRect dvr = m_window.GetITVResizing() ? m_window.GetITVDisplayRect() :
                                   m_window.GetDisplayVideoRect();
@@ -357,9 +349,9 @@ void VideoOutputD3D::PrepareFrame(VideoFrame *buffer, FrameScanType t,
                 QMap<MythPlayer*,D3D9Image*>::iterator it = m_pips.begin();
                 for (; it != m_pips.end(); ++it)
                 {
-                    if (m_pip_ready[it.key()])
+                    if (m_pipReady[it.key()])
                     {
-                        if (m_pip_active == *it)
+                        if (m_pipActive == *it)
                         {
                             QRect rect = (*it)->GetRect();
                             if (!rect.isNull())
@@ -373,10 +365,10 @@ void VideoOutputD3D::PrepareFrame(VideoFrame *buffer, FrameScanType t,
                 }
 
                 if (m_visual)
-                    m_visual->Draw(GetTotalOSDBounds(), m_osd_painter, nullptr);
+                    m_visual->Draw(GetTotalOSDBounds(), m_osdPainter, nullptr);
 
-                if (osd && m_osd_painter && !m_window.IsEmbedding())
-                    osd->Draw(m_osd_painter, GetTotalOSDBounds().size(),
+                if (osd && m_osdPainter && !m_window.IsEmbedding())
+                    osd->Draw(m_osdPainter, GetTotalOSDBounds().size(),
                                     true);
                 m_render->End();
             }
@@ -397,8 +389,8 @@ void VideoOutputD3D::Show(FrameScanType )
     if (!m_render)
         return;
 
-    m_render_valid = m_render->Test(m_render_reset);
-    if (m_render_valid)
+    m_renderValid = m_render->Test(m_renderReset);
+    if (m_renderValid)
         m_render->Present(m_window.IsEmbedding() ? m_hEmbedWnd : nullptr);
 }
 
@@ -435,7 +427,7 @@ void VideoOutputD3D::UpdatePauseFrame(int64_t &disp_timecode)
     {
         if (used_frame)
         {
-            m_pause_surface = used_frame->buf;
+            m_pauseSurface = used_frame->buf;
             disp_timecode = used_frame->disp_timecode;
         }
         else
@@ -512,28 +504,28 @@ void VideoOutputD3D::ProcessFrame(VideoFrame *frame, OSD *osd,
         ShowPIPs(frame, pipPlayers);
 
     // Test the device
-    m_render_valid |= m_render->Test(m_render_reset);
-    if (m_render_reset)
+    m_renderValid |= m_render->Test(m_renderReset);
+    if (m_renderReset)
         SetupContext();
 
     // Update a software decoded frame
-    if (m_render_valid && !gpu && !dummy)
+    if (m_renderValid && !gpu && !dummy)
         UpdateFrame(frame, m_video);
 
     // Update a GPU decoded frame
-    if (m_render_valid && gpu && !dummy)
+    if (m_renderValid && gpu && !dummy)
     {
-        m_render_valid = m_render->Test(m_render_reset);
-        if (m_render_reset)
+        m_renderValid = m_render->Test(m_renderReset);
+        if (m_renderReset)
             CreateDecoder();
 
-        if (m_render_valid && frame)
+        if (m_renderValid && frame)
         {
             m_render->CopyFrame(frame->buf, m_video);
         }
-        else if (m_render_valid && pauseframe)
+        else if (m_renderValid && pauseframe)
         {
-            m_render->CopyFrame(m_pause_surface, m_video);
+            m_render->CopyFrame(m_pauseSurface, m_video);
         }
     }
 }
@@ -563,7 +555,7 @@ void VideoOutputD3D::ShowPIP(VideoFrame */*frame*/,
 
     QRect position = GetPIPRect(loc, pipplayer);
 
-    m_pip_ready[pipplayer] = false;
+    m_pipReady[pipplayer] = false;
     D3D9Image *m_pip = m_pips[pipplayer];
     if (!m_pip)
     {
@@ -596,9 +588,9 @@ void VideoOutputD3D::ShowPIP(VideoFrame */*frame*/,
     m_pip->UpdateVertices(position, QRect(0, 0, pipVideoWidth, pipVideoHeight),
                           255, true);
     UpdateFrame(pipimage, m_pip);
-    m_pip_ready[pipplayer] = true;
+    m_pipReady[pipplayer] = true;
     if (pipActive)
-        m_pip_active = m_pip;
+        m_pipActive = m_pip;
 
     pipplayer->ReleaseCurrentFrame(pipimage);
 }
@@ -613,7 +605,7 @@ void VideoOutputD3D::RemovePIP(MythPlayer *pipplayer)
     D3D9Image *m_pip = m_pips[pipplayer];
     if (m_pip)
         delete m_pip;
-    m_pip_ready.remove(pipplayer);
+    m_pipReady.remove(pipplayer);
     m_pips.remove(pipplayer);
 }
 
@@ -631,7 +623,7 @@ QStringList VideoOutputD3D::GetAllowedRenderers(
 
 MythPainter *VideoOutputD3D::GetOSDPainter(void)
 {
-    return m_osd_painter;
+    return m_osdPainter;
 }
 
 MythCodecID VideoOutputD3D::GetBestSupportedCodec(

@@ -48,7 +48,6 @@
 
 #include "exitcodes.h"  // included for GENERIC_EXIT_OK
 #include "mythsystem.h" // included for MythSystemFlag and MythSignal
-typedef MythSystemMask MythSystemFlag;
 
 #include <QStringList>
 #include <QSemaphore>
@@ -57,8 +56,7 @@ typedef MythSystemMask MythSystemFlag;
 #include <QString>
 #include <QMap> // FIXME: This shouldn't be needed, Setting_t is not public
 
-// FIXME: _t is not how we name types in MythTV...
-typedef QMap<QString, bool> Setting_t;
+using Setting = QMap<QString, bool>;
 
 void MBASE_PUBLIC ShutdownMythSystemLegacy(void);
 
@@ -192,7 +190,7 @@ class MBASE_PUBLIC MythSystemLegacy : public QObject
     int         m_nice   {0};
     int         m_ioprio {0};
 
-    Setting_t   m_settings;
+    Setting     m_settings;
     QBuffer     m_stdbuff[3];
 };
 

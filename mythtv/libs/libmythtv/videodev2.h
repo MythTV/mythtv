@@ -60,14 +60,14 @@
 #include <sys/time.h>
 
 #ifdef __FreeBSD__
-typedef uint64_t __u64;
-typedef uint32_t __u32;
-typedef uint16_t __u16;
-typedef uint8_t __u8;
-typedef int64_t __s64;
-typedef int32_t __s32;
-typedef int16_t __s16;
-typedef int8_t __s8;
+using __u64 = uint64_t;
+using __u32 = uint32_t;
+using __u16 = uint16_t;
+using __u8  = uint8_t;
+using __s64 = int64_t;
+using __s32 = int32_t;
+using __s16 = int16_t;
+using __s8  = int8_t;
 #else
 #include <linux/ioctl.h>
 #include <linux/types.h>
@@ -1140,7 +1140,7 @@ struct v4l2_selection {
  *      A N A L O G   V I D E O   S T A N D A R D
  */
 
-typedef __u64 v4l2_std_id;
+using v4l2_std_id = __u64;
 
 /* one bit for each */
 #define V4L2_STD_PAL_B          ((v4l2_std_id)0x00000001)

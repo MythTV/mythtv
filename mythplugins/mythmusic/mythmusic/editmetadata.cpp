@@ -164,7 +164,7 @@ void EditMetadataCommon::showSaveMenu()
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    MythDialogBox *menu = new MythDialogBox(label, popupStack, "savechangesmenu");
+    auto *menu = new MythDialogBox(label, popupStack, "savechangesmenu");
 
     if (!menu->Create())
     {
@@ -226,7 +226,7 @@ void EditMetadataCommon::saveAll()
                 << s_metadata->Hostname()
                 << QString::number(s_metadata->ID());
 
-        SendStringListThread *thread = new SendStringListThread(strList);
+        auto *thread = new SendStringListThread(strList);
         MThreadPool::globalInstance()->start(thread, "UpdateMetadata");
     }
 
@@ -475,7 +475,7 @@ void EditMetadataDialog::showMenu(void )
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    MythDialogBox *menu = new MythDialogBox(label, popupStack, "optionsmenu");
+    auto *menu = new MythDialogBox(label, popupStack, "optionsmenu");
 
     if (!menu->Create())
     {
@@ -500,7 +500,7 @@ void EditMetadataDialog::switchToAlbumArt()
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    EditAlbumartDialog *editDialog = new EditAlbumartDialog(mainStack);
+    auto *editDialog = new EditAlbumartDialog(mainStack);
 
     if (!editDialog->Create())
     {
@@ -536,7 +536,7 @@ void EditMetadataDialog::searchArtist()
     QString s = s_metadata->Artist();
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythUISearchDialog *searchDlg = new MythUISearchDialog(popupStack, msg, searchList, false, s);
+    auto *searchDlg = new MythUISearchDialog(popupStack, msg, searchList, false, s);
 
     if (!searchDlg->Create())
     {
@@ -581,7 +581,7 @@ void EditMetadataDialog::searchCompilationArtist()
     QString s = s_metadata->CompilationArtist();
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythUISearchDialog *searchDlg = new MythUISearchDialog(popupStack, msg, searchList, false, s);
+    auto *searchDlg = new MythUISearchDialog(popupStack, msg, searchList, false, s);
 
     if (!searchDlg->Create())
     {
@@ -606,7 +606,7 @@ void EditMetadataDialog::searchAlbum()
     QString s = s_metadata->Album();
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythUISearchDialog *searchDlg = new MythUISearchDialog(popupStack, msg, searchList, false, s);
+    auto *searchDlg = new MythUISearchDialog(popupStack, msg, searchList, false, s);
 
     if (!searchDlg->Create())
     {
@@ -657,7 +657,7 @@ void EditMetadataDialog::searchGenre()
     QString s = s_metadata->Genre();
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythUISearchDialog *searchDlg = new MythUISearchDialog(popupStack, msg, searchList, false, s);
+    auto *searchDlg = new MythUISearchDialog(popupStack, msg, searchList, false, s);
 
     if (!searchDlg->Create())
     {
@@ -772,7 +772,7 @@ void EditMetadataDialog::customEvent(QEvent *event)
                         << s_metadata->Hostname()
                         << QString::number(s_metadata->ID());
 
-                SendStringListThread *thread = new SendStringListThread(strList);
+                auto *thread = new SendStringListThread(strList);
                 MThreadPool::globalInstance()->start(thread, "Send MUSIC_CALC_TRACK_LENGTH");
 
                 ShowOkPopup(tr("Asked the backend to check the tracks length"));
@@ -781,7 +781,7 @@ void EditMetadataDialog::customEvent(QEvent *event)
     }
     else if (event->type() == MythEvent::MythEventMessage)
     {
-        MythEvent *me = dynamic_cast<MythEvent *>(event);
+        auto *me = dynamic_cast<MythEvent *>(event);
         if (me == nullptr)
             return;
         QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);
@@ -911,7 +911,7 @@ void EditAlbumartDialog::gridItemChanged(MythUIButtonListItem *item)
 
     if (m_coverartImage)
     {
-        AlbumArtImage *image = item->GetData().value<AlbumArtImage*>();
+        auto *image = item->GetData().value<AlbumArtImage*>();
         if (image)
         {
             m_coverartImage->SetFilename(image->m_filename);
@@ -935,8 +935,7 @@ void EditAlbumartDialog::updateImageGrid(void)
 
     for (int x = 0; x < albumArtList->size(); x++)
     {
-        MythUIButtonListItem *item =
-            new MythUIButtonListItem(m_coverartList,
+        auto *item = new MythUIButtonListItem(m_coverartList,
                                      AlbumArtImages::getTypeName(albumArtList->at(x)->m_imageType),
                                      qVariantFromValue(albumArtList->at(x)));
         item->SetImage(albumArtList->at(x)->m_filename);
@@ -976,7 +975,7 @@ void EditAlbumartDialog::switchToMetadata(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    EditMetadataDialog *editDialog = new EditMetadataDialog(mainStack);
+    auto *editDialog = new EditMetadataDialog(mainStack);
 
     if (!editDialog->Create())
     {
@@ -1003,7 +1002,7 @@ void EditAlbumartDialog::showTypeMenu(bool changeType)
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    MythDialogBox *menu = new MythDialogBox(label, popupStack, "typemenu");
+    auto *menu = new MythDialogBox(label, popupStack, "typemenu");
 
     if (!menu->Create())
     {
@@ -1036,7 +1035,7 @@ void EditAlbumartDialog::showMenu(void )
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    MythDialogBox *menu = new MythDialogBox(label, popupStack, "optionsmenu");
+    auto *menu = new MythDialogBox(label, popupStack, "optionsmenu");
 
     if (!menu->Create())
     {
@@ -1063,7 +1062,7 @@ void EditAlbumartDialog::showMenu(void )
             MythUIButtonListItem *item = m_coverartList->GetItemCurrent();
             if (item)
             {
-                AlbumArtImage *image = item->GetData().value<AlbumArtImage*>();
+                auto *image = item->GetData().value<AlbumArtImage*>();
                 if (image)
                 {
                     if (!image->m_embedded)
@@ -1115,7 +1114,7 @@ void EditAlbumartDialog::customEvent(QEvent *event)
                 if (item)
                 {
                     item->SetText(AlbumArtImages::getTypeName((ImageType) type));
-                    AlbumArtImage *image = item->GetData().value<AlbumArtImage*>();
+                    auto *image = item->GetData().value<AlbumArtImage*>();
                     if (image)
                     {
                         QStringList strList("MUSIC_TAG_CHANGEIMAGE");
@@ -1170,7 +1169,7 @@ void EditAlbumartDialog::customEvent(QEvent *event)
     }
     else if (event->type() == MythEvent::MythEventMessage)
     {
-        MythEvent *me = dynamic_cast<MythEvent *>(event);
+        auto *me = dynamic_cast<MythEvent *>(event);
         if (me == nullptr)
             return;
         QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);
@@ -1183,7 +1182,7 @@ void EditAlbumartDialog::customEvent(QEvent *event)
             {
                 if (tokens.size() >= 2)
                 {
-                    MusicMetadata::IdType songID = (MusicMetadata::IdType)tokens[1].toInt();
+                    auto songID = (MusicMetadata::IdType)tokens[1].toInt();
 
                     if (s_metadata->ID() == songID)
                     {
@@ -1217,7 +1216,7 @@ void EditAlbumartDialog::startCopyImageToTag(void)
     QString lastLocation = gCoreContext->GetSetting("MusicLastImageLocation", "/");
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythUIFileBrowser *fb = new MythUIFileBrowser(popupStack, lastLocation);
+    auto *fb = new MythUIFileBrowser(popupStack, lastLocation);
 
     fb->SetTypeFilter(QDir::AllDirs | QDir::Files | QDir::Readable);
 
@@ -1248,7 +1247,7 @@ void EditAlbumartDialog::copySelectedImageToTag(void)
     MythUIButtonListItem *item = m_coverartList->GetItemCurrent();
     if (item)
     {
-        AlbumArtImage *image = item->GetData().value<AlbumArtImage*>();
+        auto *image = item->GetData().value<AlbumArtImage*>();
         if (image)
             doCopyImageToTag(image);
     }
@@ -1259,7 +1258,7 @@ void EditAlbumartDialog::removeSelectedImageFromTag(void)
     MythUIButtonListItem *item = m_coverartList->GetItemCurrent();
     if (item)
     {
-        AlbumArtImage *image = item->GetData().value<AlbumArtImage*>();
+        auto *image = item->GetData().value<AlbumArtImage*>();
         if (image)
         {
             QString msg = tr("Are you sure you want to permanently remove this image from the tag?");
@@ -1276,7 +1275,7 @@ void EditAlbumartDialog::doRemoveImageFromTag(bool doIt)
     MythUIButtonListItem *item = m_coverartList->GetItemCurrent();
     if (item)
     {
-        AlbumArtImage *image = item->GetData().value<AlbumArtImage*>();
+        auto *image = item->GetData().value<AlbumArtImage*>();
         if (image)
         {
             // ask the backend to remove the image from the tracks tag
@@ -1315,8 +1314,8 @@ class CopyImageThread: public MThread
 void EditAlbumartDialog::doCopyImageToTag(const AlbumArtImage *image)
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythUIBusyDialog *busy = new MythUIBusyDialog(tr("Copying image to tag..."),
-                                                  popupStack, "copyimagebusydialog");
+    auto *busy = new MythUIBusyDialog(tr("Copying image to tag..."),
+                                      popupStack, "copyimagebusydialog");
 
     if (busy->Create())
     {
@@ -1343,7 +1342,7 @@ void EditAlbumartDialog::doCopyImageToTag(const AlbumArtImage *image)
             << fi.fileName()
             << QString::number(image->m_imageType);
 
-    CopyImageThread *copyThread = new CopyImageThread(strList);
+    auto *copyThread = new CopyImageThread(strList);
     copyThread->start();
 
     while (copyThread->isRunning())

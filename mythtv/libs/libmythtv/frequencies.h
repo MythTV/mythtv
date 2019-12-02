@@ -93,16 +93,16 @@
 
 /* --------------------------------------------------------------------- */
 
-typedef struct CHANLIST {
+struct CHANLIST {
     const char *name;
     int   freq;
-} _chanlist;
+};
 
-typedef struct CHANLISTS {
+struct CHANLISTS {
     const char       *name;
     struct CHANLIST  *list;
     int               count;
-} _chanlists;
+};
 
 #define CHAN_COUNT(x) (sizeof(x)/sizeof(struct CHANLIST))
 

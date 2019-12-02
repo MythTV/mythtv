@@ -24,12 +24,12 @@ class DVBCam;
 class DVBRecorder;
 class DVBChannel;
 
-typedef QMap<const DVBChannel*,bool> IsOpenMap;
+using IsOpenMap = QMap<const DVBChannel*,bool>;
 
 class DVBChannel : public DTVChannel
 {
   public:
-    DVBChannel(const QString &device, TVRec *parent = nullptr);
+    DVBChannel(QString device, TVRec *parent = nullptr);
     ~DVBChannel();
 
     bool Open(void) override // ChannelBase
@@ -102,11 +102,11 @@ class DVBChannel : public DTVChannel
     bool CheckModulation(DTVModulation modulation) const;
     bool CheckCodeRate(DTVCodeRate rate) const;
 
-    typedef DVBChannel* DVBChannelP;
+    using DVBChannelP = DVBChannel*;
     DVBChannel *GetMasterLock(void);
     static void ReturnMasterLock(DVBChannelP &dvbm);
 
-    typedef const DVBChannel* DVBChannelCP;
+    using DVBChannelCP = const DVBChannel*;
     const DVBChannel *GetMasterLock(void) const;
     static void ReturnMasterLock(DVBChannelCP &dvbm);
 

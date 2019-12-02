@@ -10,7 +10,7 @@
 // MythTV headers
 #include "audiooutputbase.h"
 
-typedef SLresult (*slCreateEngine_t)(
+using slCreateEngine_t = SLresult (*)(
         SLObjectItf*, SLuint32, const SLEngineOption*, SLuint32,
         const SLInterfaceID*, const SLboolean*);
 

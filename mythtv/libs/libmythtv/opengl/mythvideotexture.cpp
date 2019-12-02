@@ -14,24 +14,16 @@ MythVideoTexture::MythVideoTexture(GLuint Texture)
 {
 }
 
-MythVideoTexture::~MythVideoTexture()
-{
-}
-
 void MythVideoTexture::DeleteTexture(MythRenderOpenGL *Context, MythVideoTexture *Texture)
 {
     if (!Context || !Texture)
         return;
 
      OpenGLLocker locker(Context);
-     if (Texture->m_copyContext)
-         delete Texture->m_copyContext;
-     if (Texture->m_texture)
-         delete Texture->m_texture;
-     if (Texture->m_data)
-         delete [] Texture->m_data;
-     if (Texture->m_vbo)
-         delete Texture->m_vbo;
+     delete Texture->m_copyContext;
+     delete Texture->m_texture;
+     delete [] Texture->m_data;
+     delete Texture->m_vbo;
 
      delete Texture;
 }
@@ -118,7 +110,7 @@ vector<MythVideoTexture*> MythVideoTexture::CreateHardwareTextures(MythRenderOpe
         if (!textureid)
             continue;
 
-        MythVideoTexture* texture = new MythVideoTexture(textureid);
+        auto* texture = new MythVideoTexture(textureid);
         texture->m_frameType   = Type;
         texture->m_frameFormat = Format;
         texture->m_plane       = plane;
@@ -424,11 +416,11 @@ MythVideoTexture* MythVideoTexture::CreateTexture(MythRenderOpenGL *Context,
 
     OpenGLLocker locker(Context);
 
-    int datasize = Context->GetBufferSize(Size, PixelFormat, PixelType);
+    int datasize = MythRenderOpenGL::GetBufferSize(Size, PixelFormat, PixelType);
     if (!datasize)
         return nullptr;
 
-    QOpenGLTexture *texture = new QOpenGLTexture(static_cast<QOpenGLTexture::Target>(Target));
+    auto *texture = new QOpenGLTexture(static_cast<QOpenGLTexture::Target>(Target));
     texture->setAutoMipMapGenerationEnabled(false);
     texture->setMipLevels(1);
     texture->setSize(Size.width(), Size.height()); // this triggers creation
@@ -451,7 +443,7 @@ MythVideoTexture* MythVideoTexture::CreateTexture(MythRenderOpenGL *Context,
     texture->setMinMagFilters(Filter, Filter);
     texture->setWrapMode(Wrap);
 
-    MythVideoTexture *result = new MythVideoTexture(texture);
+    auto *result = new MythVideoTexture(texture);
     result->m_target      = Target;
     result->m_pixelFormat = PixelFormat;
     result->m_pixelType   = PixelType;
@@ -579,7 +571,7 @@ MythVideoTexture* MythVideoTexture::CreateHelperTexture(MythRenderOpenGL *Contex
 
     for (int i = 0; i < width; i++)
     {
-        float x = (i + 0.5f) / static_cast<float>(width);
+        float x = (i + 0.5F) / static_cast<float>(width);
         StoreBicubicWeights(x, ref);
         ref += 4;
     }

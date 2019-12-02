@@ -25,7 +25,7 @@
 #include "upnpexp.h"
 
 /// Key == Unique Service Name (USN)
-typedef QMap< QString, DeviceLocation * > EntryMap;
+using EntryMap = QMap< QString, DeviceLocation * >;
 
 /////////////////////////////////////////////////////////////////////////////
 // QDict Implementation that uses RefCounted pointers
@@ -67,7 +67,7 @@ class UPNP_PUBLIC SSDPCacheEntries : public ReferenceCounter
 };
 
 /// Key == Service Type URI
-typedef QMap< QString, SSDPCacheEntries * > SSDPCacheEntriesMap;
+using SSDPCacheEntriesMap = QMap< QString, SSDPCacheEntries * >;
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////

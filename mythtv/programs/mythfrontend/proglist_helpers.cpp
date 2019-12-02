@@ -189,12 +189,12 @@ void PhrasePopup::recordClicked(void)
         MSqlEscapeAsAQuery(what, bindings);
     }
 
-    RecordingRule *record = new RecordingRule();
+    auto *record = new RecordingRule();
 
     record->LoadBySearch(m_searchType, text, what, fromgenre);
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    ScheduleEditor *schededit = new ScheduleEditor(mainStack, record);
+    auto *schededit = new ScheduleEditor(mainStack, record);
     if (schededit->Create())
     {
         mainStack->AddScreen(schededit);
@@ -290,8 +290,7 @@ void PowerSearchPopup::editClicked(void)
     if (m_phraseList->GetCurrentPos() != 0)
         currentItem = m_phraseList->GetValue();
 
-    EditPowerSearchPopup *popup = new EditPowerSearchPopup(
-        popupStack, m_parent, currentItem);
+    auto *popup = new EditPowerSearchPopup(popupStack, m_parent, currentItem);
 
     if (!popup->Create())
     {
@@ -371,12 +370,12 @@ void PowerSearchPopup::recordClicked(void)
         MSqlEscapeAsAQuery(what, bindings);
     }
 
-    RecordingRule *record = new RecordingRule();
+    auto *record = new RecordingRule();
 
     record->LoadBySearch(m_searchType, text, what, fromgenre);
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    ScheduleEditor *schededit = new ScheduleEditor(mainStack, record);
+    auto *schededit = new ScheduleEditor(mainStack, record);
     if (schededit->Create())
     {
         mainStack->AddScreen(schededit);
@@ -531,8 +530,8 @@ void EditPowerSearchPopup::initLists(void)
         m_parent->m_viewList << QString::number(channels[i].m_chanid);
         m_parent->m_viewTextList << chantext;
 
-        MythUIButtonListItem *item =
-               new MythUIButtonListItem(m_channelList, chantext, nullptr, false);
+        auto *item = new MythUIButtonListItem(m_channelList, chantext,
+                                              nullptr, false);
 
         InfoMap chanmap;
         channels[i].ToMap(chanmap);

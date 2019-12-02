@@ -199,12 +199,12 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     int safe_read(void *data, uint sz) override; //RingBuffer
     long long SeekInternal(long long pos, int whence) override; //RingBuffer
 
-    typedef enum
+    enum processState_t
     {
         PROCESS_NORMAL,
         PROCESS_REPROCESS,
         PROCESS_WAIT
-    }processState_t;
+    };
 
     dvdnav_t      *m_dvdnav                 {nullptr};
     unsigned char  m_dvdBlockWriteBuf[DVD_BLOCK_SIZE] {0};
@@ -295,18 +295,18 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     long long Seek(long long time);
 
     void ClearChapterCache(void);
-    uint ConvertLangCode(uint16_t code);
+    static uint ConvertLangCode(uint16_t code);
     void SelectDefaultButton(void);
     void WaitForPlayer(void);
 
-    int get_nibble(const uint8_t *buf, int nibble_offset);
-    int decode_rle(uint8_t *bitmap, int linesize, int w, int h,
+    static int get_nibble(const uint8_t *buf, int nibble_offset);
+    static int decode_rle(uint8_t *bitmap, int linesize, int w, int h,
                     const uint8_t *buf, int nibble_offset, int buf_size);
     void guess_palette(uint32_t *rgba_palette,const uint8_t *palette,
                        const uint8_t *alpha);
-    int is_transp(const uint8_t *buf, int pitch, int n,
-                  const uint8_t *transp_color);
-    int find_smallest_bounding_rectangle(AVSubtitle *s);
+    static int is_transp(const uint8_t *buf, int pitch, int n,
+                         const uint8_t *transp_color);
+    static int find_smallest_bounding_rectangle(AVSubtitle *s);
 };
 
 #endif // DVD_RING_BUFFER_H_

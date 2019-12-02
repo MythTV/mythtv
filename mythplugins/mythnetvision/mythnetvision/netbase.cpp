@@ -184,8 +184,7 @@ void NetBase::SlotDeleteVideo()
 {
     QString message = tr("Are you sure you want to delete this file?");
 
-    MythConfirmationDialog *confirmdialog =
-        new MythConfirmationDialog(m_popupStack, message);
+    auto *confirmdialog = new MythConfirmationDialog(m_popupStack, message);
 
     if (confirmdialog->Create())
     {
@@ -223,7 +222,7 @@ void NetBase::customEvent(QEvent *event)
 {
     if (event->type() == MythEvent::MythEventMessage)
     {
-        MythEvent *me = dynamic_cast<MythEvent *>(event);
+        auto *me = dynamic_cast<MythEvent *>(event);
         if (me == nullptr)
             return;
         QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);

@@ -13,8 +13,7 @@ class DsmccDii
     DsmccDii() = default;
     ~DsmccDii()
     {
-        if (m_modules)
-            delete[] m_modules;
+        delete[] m_modules;
     }
 
     unsigned long    m_download_id          {0};

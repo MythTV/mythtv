@@ -27,7 +27,7 @@ class IPTVChannel : QObject, public DTVChannel
     friend class IPTVRecorder;
 
   public:
-    IPTVChannel(TVRec*, const QString&);
+    IPTVChannel(TVRec*, QString);
     ~IPTVChannel();
 
     // Commands

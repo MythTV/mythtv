@@ -338,7 +338,7 @@ QList<RomInfo*> RomInfo::GetAllRomInfo()
 
     while (query.next())
     {
-        RomInfo *add = new RomInfo(
+        auto *add = new RomInfo(
                            query.value(0).toInt(),
                            query.value(2).toString(),
                            query.value(1).toString(),

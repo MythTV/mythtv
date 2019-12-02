@@ -92,7 +92,7 @@ class VideoSync
     static VideoSync *BestMethod(MythVideoOutput *, uint refresh_interval);
 
   protected:
-    int64_t GetTime(void);
+    static int64_t GetTime(void);
     int CalcDelay(int nominal_frame_interval);
 
     MythVideoOutput *m_video_output     {nullptr};

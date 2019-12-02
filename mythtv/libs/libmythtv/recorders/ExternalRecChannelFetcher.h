@@ -26,7 +26,7 @@ class ExternalStreamHandler;
 class ExternalRecChannelFetcher
 {
   public:
-    ExternalRecChannelFetcher(int cardid, const QString & cmd);
+    ExternalRecChannelFetcher(int cardid, QString cmd);
     ~ExternalRecChannelFetcher(void);
 
     bool Valid(void) const;

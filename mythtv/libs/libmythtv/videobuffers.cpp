@@ -151,7 +151,7 @@ uint VideoBuffers::GetNumBuffers(int PixelFormat, int MaxReferenceFrames, bool D
         case FMT_VDPAU: return refs + 12;
         // Copyback of hardware frames. These decoders are buffering internally
         // already - so no need for a large presentation buffer
-        case FMT_NONE:  return 8;
+        case FMT_NONE:  return 8; // NOLINT(bugprone-branch-clone)
         // As for copyback, these decoders buffer internally
         case FMT_NVDEC: return 8;
         case FMT_MEDIACODEC: return 8;
@@ -229,7 +229,7 @@ void VideoBuffers::SetDeinterlacing(MythDeintType Single, MythDeintType Double,
                                     MythCodecID CodecID)
 {
     QMutexLocker locker(&m_globalLock);
-    frame_vector_t::iterator it = m_buffers.begin();
+    auto it = m_buffers.begin();
     for ( ; it != m_buffers.end(); ++it)
         SetDeinterlacingFlags(*it, Single, Double, CodecID);
 }
@@ -244,33 +244,35 @@ void VideoBuffers::SetDeinterlacing(MythDeintType Single, MythDeintType Double,
 void VideoBuffers::SetDeinterlacingFlags(VideoFrame &Frame, MythDeintType Single,
                                          MythDeintType Double, MythCodecID CodecID)
 {
-    static const MythDeintType driver   = DEINT_ALL & ~(DEINT_CPU | DEINT_SHADER);
-    static const MythDeintType shader   = DEINT_ALL & ~(DEINT_CPU | DEINT_DRIVER);
-    static const MythDeintType software = DEINT_ALL & ~(DEINT_SHADER | DEINT_DRIVER);
+    static const MythDeintType kDriver   = DEINT_ALL & ~(DEINT_CPU | DEINT_SHADER);
+    static const MythDeintType kShader   = DEINT_ALL & ~(DEINT_CPU | DEINT_DRIVER);
+    static const MythDeintType kSoftware = DEINT_ALL & ~(DEINT_SHADER | DEINT_DRIVER);
     Frame.deinterlace_single  = Single;
     Frame.deinterlace_double  = Double;
 
     if (codec_is_copyback(CodecID))
     {
         if (codec_is_vaapi_dec(CodecID) || codec_is_nvdec_dec(CodecID))
-            Frame.deinterlace_allowed = software | shader | driver;
+            Frame.deinterlace_allowed = kSoftware | kShader | kDriver;
         else // VideoToolBox, MediaCodec and VDPAU copyback
-            Frame.deinterlace_allowed = software | shader;
+            Frame.deinterlace_allowed = kSoftware | kShader;
     }
     else if (FMT_DRMPRIME == Frame.codec)
-        Frame.deinterlace_allowed = shader; // No driver deint - if RGBA frames are returned, shaders will be disabled
+        // NOLINTNEXTLINE(bugprone-branch-clone)
+        Frame.deinterlace_allowed = kShader; // No driver deint - if RGBA frames are returned, shaders will be disabled
     else if (FMT_MMAL == Frame.codec)
-        Frame.deinterlace_allowed = shader; // No driver deint yet (TODO) and YUV frames returned
+        Frame.deinterlace_allowed = kShader; // No driver deint yet (TODO) and YUV frames returned
     else if (FMT_VTB == Frame.codec)
-        Frame.deinterlace_allowed = shader; // No driver deint and YUV frames returned
+        Frame.deinterlace_allowed = kShader; // No driver deint and YUV frames returned
     else if (FMT_NVDEC == Frame.codec)
-        Frame.deinterlace_allowed = shader | driver; // YUV frames and decoder deint
+        Frame.deinterlace_allowed = kShader | kDriver; // YUV frames and decoder deint
     else if (FMT_VDPAU == Frame.codec)
-        Frame.deinterlace_allowed = driver; // No YUV frames for shaders
+        // NOLINTNEXTLINE(bugprone-branch-clone)
+        Frame.deinterlace_allowed = kDriver; // No YUV frames for shaders
     else if (FMT_VAAPI == Frame.codec)
-        Frame.deinterlace_allowed = driver; // DRM will allow shader if no VPP
+        Frame.deinterlace_allowed = kDriver; // DRM will allow shader if no VPP
     else
-        Frame.deinterlace_allowed = software | shader;
+        Frame.deinterlace_allowed = kSoftware | kShader;
 }
 
 /**
@@ -304,7 +306,7 @@ void VideoBuffers::ReleaseDecoderResources(VideoFrame *Frame)
 {
     if (format_is_hw(Frame->codec))
     {
-        AVBufferRef* ref = reinterpret_cast<AVBufferRef*>(Frame->priv[0]);
+        auto* ref = reinterpret_cast<AVBufferRef*>(Frame->priv[0]);
         if (ref != nullptr)
             av_buffer_unref(&ref);
         Frame->buf = Frame->priv[0] = nullptr;
@@ -454,7 +456,7 @@ void VideoBuffers::DoneDisplayingFrame(VideoFrame *Frame)
 
     // check if any finished frames are no longer used by decoder and return to available
     frame_queue_t ula(m_finished);
-    frame_queue_t::iterator it = ula.begin();
+    auto it = ula.begin();
     for (; it != ula.end(); ++it)
     {
         if (!m_decode.contains(*it))
@@ -625,8 +627,7 @@ frame_queue_t::iterator VideoBuffers::BeginLock(BufferType Type)
     frame_queue_t *queue = Queue(Type);
     if (queue)
         return queue->begin();
-    else
-        return m_available.begin();
+    return m_available.begin();
 }
 
 void VideoBuffers::EndLock(void)
@@ -742,7 +743,7 @@ void VideoBuffers::DiscardFrames(bool NextFrameIsKeyFrame)
     if (!NextFrameIsKeyFrame)
     {
         frame_queue_t ula(m_used);
-        frame_queue_t::iterator it = ula.begin();
+        auto it = ula.begin();
         for (; it != ula.end(); ++it)
             DiscardFrame(*it);
         LOG(VB_PLAYBACK, LOG_INFO,
@@ -987,7 +988,7 @@ QString VideoBuffers::GetStatus(uint Num) const
         unsigned long long x = to_bitmap(m_decode, count);
         for (uint i = 0; i < Num; i++)
         {
-            unsigned long long mask = 1Ull << i;
+            unsigned long long mask = 1ULL << i;
             QString tmp("");
             if (a & mask)
                 tmp += (x & mask) ? "a" : "A";
@@ -1060,7 +1061,7 @@ map<const VideoFrame *, int> dbg_str;
 
 static int DebugNum(const VideoFrame *Frame)
 {
-    map<const VideoFrame *, int>::iterator it = dbg_str.find(Frame);
+    auto it = dbg_str.find(Frame);
     if (it == dbg_str.end())
         return dbg_str[Frame] = next_dbg_str++;
     return it->second;
@@ -1070,8 +1071,7 @@ const QString& DebugString(const VideoFrame *Frame, bool Short)
 {
     if (Short)
         return dbg_str_arr_short[DebugNum(Frame) % DBG_STR_ARR_SIZE];
-    else
-        return dbg_str_arr[DebugNum(Frame) % DBG_STR_ARR_SIZE];
+    return dbg_str_arr[DebugNum(Frame) % DBG_STR_ARR_SIZE];
 }
 
 const QString& DebugString(uint FrameNum, bool Short)
@@ -1082,8 +1082,8 @@ const QString& DebugString(uint FrameNum, bool Short)
 static unsigned long long to_bitmap(const frame_queue_t& Queue, int Num)
 {
     unsigned long long bitmap = 0;
-    frame_queue_t::const_iterator it = Queue.begin();
-    for (; it != Queue.end(); ++it)
+    auto it = Queue.cbegin();
+    for (; it != Queue.cend(); ++it)
     {
         int shift = DebugNum(*it) % Num;
         bitmap |= 1ULL << shift;

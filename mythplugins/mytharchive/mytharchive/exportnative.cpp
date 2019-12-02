@@ -181,7 +181,7 @@ void ExportNative::updateSizeBar()
 
 void ExportNative::titleChanged(MythUIButtonListItem *item)
 {
-    ArchiveItem *a = item->GetData().value<ArchiveItem *>();
+    auto *a = item->GetData().value<ArchiveItem *>();
     if (!a)
         return;
 
@@ -238,7 +238,7 @@ void ExportNative::updateArchiveList(void)
         {
             ArchiveItem *a = m_archiveList.at(x);
 
-            MythUIButtonListItem* item = new MythUIButtonListItem(m_archiveButtonList, a->title);
+            auto* item = new MythUIButtonListItem(m_archiveButtonList, a->title);
             item->SetData(qVariantFromValue(a));
         }
 
@@ -266,7 +266,7 @@ void ExportNative::getArchiveListFromDB(void)
     {
         while (query.next())
         {
-            ArchiveItem *item = new ArchiveItem;
+            auto *item = new ArchiveItem;
 
             item->id = query.value(0).toInt();
             item->type = query.value(1).toString();
@@ -348,7 +348,7 @@ void ExportNative::ShowMenu()
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    MythDialogBox *menuPopup = new MythDialogBox(tr("Menu"), popupStack, "actionmenu");
+    auto *menuPopup = new MythDialogBox(tr("Menu"), popupStack, "actionmenu");
 
     if (menuPopup->Create())
         popupStack->AddScreen(menuPopup);
@@ -361,7 +361,7 @@ void ExportNative::ShowMenu()
 void ExportNative::removeItem()
 {
     MythUIButtonListItem *item = m_archiveButtonList->GetItemCurrent();
-    ArchiveItem *curItem = item->GetData().value<ArchiveItem *>();
+    auto *curItem = item->GetData().value<ArchiveItem *>();
 
     if (!curItem)
         return;
@@ -461,7 +461,7 @@ void ExportNative::handleAddRecording()
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    RecordingSelector *selector = new RecordingSelector(mainStack, &m_archiveList);
+    auto *selector = new RecordingSelector(mainStack, &m_archiveList);
 
     connect(selector, SIGNAL(haveResult(bool)),
             this, SLOT(selectorClosed(bool)));
@@ -491,7 +491,7 @@ void ExportNative::handleAddVideo()
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    VideoSelector *selector = new VideoSelector(mainStack, &m_archiveList);
+    auto *selector = new VideoSelector(mainStack, &m_archiveList);
 
     connect(selector, SIGNAL(haveResult(bool)),
             this, SLOT(selectorClosed(bool)));

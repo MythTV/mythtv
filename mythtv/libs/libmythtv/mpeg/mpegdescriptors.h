@@ -314,7 +314,7 @@ class MTV_PUBLIC MPEGDescriptor
 
   public:
     QString hexdump(void) const;
-    QString descrDump(QString name) const;
+    QString descrDump(const QString &name) const;
 };
 
 // a_52a.pdf p119, Table A1

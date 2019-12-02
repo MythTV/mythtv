@@ -260,7 +260,7 @@ void BufferedSocketDevice::Flush()
 
     while ( !osBufferFull && ( m_nWriteSize > 0 ) && m_pSocket->isValid())
     {
-        deque<QByteArray*>::iterator it = m_bufWrite.begin();
+        auto it = m_bufWrite.begin();
         QByteArray *a = *it;
 
         int nwritten = 0;

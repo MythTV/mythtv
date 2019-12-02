@@ -51,7 +51,7 @@
 class MTV_PUBLIC TableClass
 {
   public:
-    typedef enum
+    enum kTableTypes
     {
         UNKNOWN = -1,
         TVCTc   =  0,
@@ -64,7 +64,7 @@ class MTV_PUBLIC TableClass
         ETTe    =  7,
         DCCT    =  8,
         RRT     =  9,
-    } kTableTypes;
+    };
 };
 
 /** \class MasterGuideTable

@@ -43,12 +43,12 @@ if( (x) ) { \
     (x) = nullptr; \
 }
 
-typedef struct
+struct FDType_t
 {
     MythSystemLegacyWindows *ms;
     int                type;
-} FDType_t;
-typedef QMap<HANDLE, FDType_t*> FDMap_t;
+};
+using FDMap_t = QMap<HANDLE, FDType_t*>;
 
 /**********************************
  * MythSystemLegacyManager method defines

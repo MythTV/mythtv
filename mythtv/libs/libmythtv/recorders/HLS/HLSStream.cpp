@@ -1,5 +1,7 @@
 #include <unistd.h>
 
+#include <utility>
+
 #include "mythlogging.h"
 
 #include "HLSReader.h"
@@ -7,11 +9,11 @@
 
 #define LOC QString("%1 stream: ").arg(m_m3u8_url)
 
-HLSRecStream::HLSRecStream(int seq, uint64_t bitrate, const QString& m3u8_url, const QString &segment_base_url)
+HLSRecStream::HLSRecStream(int seq, uint64_t bitrate, QString  m3u8_url, QString segment_base_url)
     : m_id(seq),
       m_bitrate(bitrate),
-      m_m3u8_url(m3u8_url),
-      m_segment_base_url(segment_base_url)
+      m_m3u8_url(std::move(m3u8_url)),
+      m_segment_base_url(std::move(segment_base_url))
 {
     LOG(VB_RECORD, LOG_DEBUG, LOC + "ctor");
 }
@@ -73,7 +75,7 @@ bool HLSRecStream::DecodeData(MythSingleDownload& downloader,
 
     if ((Ikey = m_aeskeys.find(keypath)) == m_aeskeys.end())
     {
-        AES_KEY* key = new AES_KEY;
+        auto* key = new AES_KEY;
         DownloadKey(downloader, keypath, key);
         Ikey = m_aeskeys.insert(keypath, key);
         if (Ikey == m_aeskeys.end())

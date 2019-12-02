@@ -908,13 +908,13 @@ void CC608Decoder::DecodeVPS(const unsigned char *buf)
 
 void CC608Decoder::DecodeWSS(const unsigned char *buf)
 {
-    static const int wss_bits[8] = { 0, 0, 0, 1, 0, 1, 1, 1 };
+    static const int kWssBits[8] = { 0, 0, 0, 1, 0, 1, 1, 1 };
     uint wss = 0;
 
     for (uint i = 0; i < 16; i++)
     {
-        uint b1 = wss_bits[buf[i] & 7];
-        uint b2 = wss_bits[(buf[i] >> 3) & 7];
+        uint b1 = kWssBits[buf[i] & 7];
+        uint b2 = kWssBits[(buf[i] >> 3) & 7];
 
         if (b1 == b2)
             return;

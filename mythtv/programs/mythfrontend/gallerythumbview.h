@@ -114,7 +114,7 @@ private slots:
     void    RepeatOff()            { RepeatOn(0); }
 
 private:
-    typedef QPair<int,int> IntPair;
+    using IntPair = QPair<int,int>;
 
     // Theme widgets
     MythUIButtonList  *m_imageList        {nullptr};
@@ -144,7 +144,7 @@ private:
     //! Current selection/marked files when menu is invoked
     MenuSubjects m_menuState;
 
-    typedef QPair<MythUIButtonListItem *, int> ThumbLocation;
+    using ThumbLocation = QPair<MythUIButtonListItem *, int>;
     //! Buttons waiting for thumbnails to be created
     QHash<int, ThumbLocation> m_pendingMap;
 

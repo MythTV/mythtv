@@ -273,7 +273,7 @@ bool MythImage::Load(MythImageReader *reader)
     if (!reader || !reader->canRead())
         return false;
 
-    QImage *im = new QImage;
+    auto *im = new QImage;
 
     if (im && reader->read(im))
     {
@@ -306,7 +306,7 @@ bool MythImage::Load(const QString &filename)
         QString mythUrl = RemoteFile::FindFile(fname, url.host(), url.userName());
         if (!mythUrl.isEmpty())
         {
-            RemoteFile *rf = new RemoteFile(mythUrl, false, false, 0);
+            auto *rf = new RemoteFile(mythUrl, false, false, 0);
 
             QByteArray data;
             bool ret = rf->SaveAs(data);

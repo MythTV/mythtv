@@ -43,19 +43,19 @@ void MHStream::Initialise(MHParseNode *p, MHEngine *engine)
 
             if (pItem->GetTagNo() == C_AUDIO)
             {
-                MHAudio *pAudio = new MHAudio;
+                auto *pAudio = new MHAudio;
                 m_Multiplex.Append(pAudio);
                 pAudio->Initialise(pItem, engine);
             }
             else if (pItem->GetTagNo() == C_VIDEO)
             {
-                MHVideo *pVideo = new MHVideo;
+                auto *pVideo = new MHVideo;
                 m_Multiplex.Append(pVideo);
                 pVideo->Initialise(pItem, engine);
             }
             else if (pItem->GetTagNo() == C_RTGRAPHICS)
             {
-                MHRTGraphics *pRtGraph = new MHRTGraphics;
+                auto *pRtGraph = new MHRTGraphics;
                 m_Multiplex.Append(pRtGraph);
                 pRtGraph->Initialise(pItem, engine);
             }

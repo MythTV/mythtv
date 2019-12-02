@@ -23,7 +23,7 @@ static int RunWeather()
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    Weather *weather = new Weather(mainStack, "mythweather", srcMan);
+    auto *weather = new Weather(mainStack, "mythweather", srcMan);
 
     if (weather->Create())
     {
@@ -91,7 +91,7 @@ static void WeatherCallback(void *data, QString &selection)
 
     if (selection == "SETTINGS_GENERAL")
     {
-        GlobalSetup *gsetup = new GlobalSetup(mainStack, "weatherglobalsetup");
+        auto *gsetup = new GlobalSetup(mainStack, "weatherglobalsetup");
 
         if (gsetup->Create())
             mainStack->AddScreen(gsetup);
@@ -100,7 +100,7 @@ static void WeatherCallback(void *data, QString &selection)
     }
     else if (selection == "SETTINGS_SCREEN")
     {
-        ScreenSetup *ssetup = new ScreenSetup(mainStack, "weatherscreensetup", srcMan);
+        auto *ssetup = new ScreenSetup(mainStack, "weatherscreensetup", srcMan);
 
         if (ssetup->Create())
             mainStack->AddScreen(ssetup);
@@ -109,7 +109,7 @@ static void WeatherCallback(void *data, QString &selection)
     }
     else if (selection == "SETTINGS_SOURCE")
     {
-        SourceSetup *srcsetup = new SourceSetup(mainStack, "weathersourcesetup");
+        auto *srcsetup = new SourceSetup(mainStack, "weathersourcesetup");
 
         if (srcsetup->Create())
             mainStack->AddScreen(srcsetup);
@@ -123,9 +123,9 @@ int mythplugin_config()
     QString menuname = "weather_settings.xml";
     QString themedir = GetMythUI()->GetThemeDir();
 
-    MythThemedMenu *menu = new MythThemedMenu(
-        themedir, menuname,
-        GetMythMainWindow()->GetMainStack(), "weather menu");
+    auto *menu = new MythThemedMenu(themedir, menuname,
+                                    GetMythMainWindow()->GetMainStack(),
+                                    "weather menu");
 
     menu->setCallback(WeatherCallback, nullptr);
     menu->setKillable();

@@ -137,7 +137,7 @@ static int SendMessage(const MythUtilCommandLineParser &cmdline)
 
     cout << "output:\n" << message.toLocal8Bit().constData() << endl;
 
-    QUdpSocket *sock = new QUdpSocket();
+    auto *sock = new QUdpSocket();
     QByteArray utf8 = message.toUtf8();
 
     int result = GENERIC_EXIT_OK;

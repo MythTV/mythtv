@@ -107,7 +107,7 @@ void GeneralSetupWizard::slotNext(void)
     save();
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    AudioSetupWizard *sw = new AudioSetupWizard(mainStack, this, "audiosetupwizard");
+    auto *sw = new AudioSetupWizard(mainStack, this, "audiosetupwizard");
 
     if (sw->Create())
     {
@@ -123,8 +123,7 @@ void GeneralSetupWizard::slotSubmit(void)
                          "hardware profile with the MythTV developers? "
                          "Profiles are anonymous and are a great way to "
                          "help with future development.");
-    MythConfirmationDialog *confirmdialog =
-            new MythConfirmationDialog(m_popupStack,message);
+    auto *confirmdialog = new MythConfirmationDialog(m_popupStack,message);
 
     if (confirmdialog->Create())
         m_popupStack->AddScreen(confirmdialog);
@@ -222,8 +221,7 @@ void GeneralSetupWizard::slotDelete(void)
                          "is anonymous and helps the developers "
                          "to know what hardware the majority of users "
                          "prefer.");
-    MythConfirmationDialog *confirmdialog =
-            new MythConfirmationDialog(m_popupStack,message);
+    auto *confirmdialog = new MythConfirmationDialog(m_popupStack,message);
 
     if (confirmdialog->Create())
         m_popupStack->AddScreen(confirmdialog);

@@ -35,14 +35,14 @@ void OutputListeners::error(const QString &e)
 
 void OutputListeners::addVisual(MythTV::Visual *v)
 {
-    Visuals::iterator it = std::find(m_visuals.begin(), m_visuals.end(), v);
+    auto it = std::find(m_visuals.begin(), m_visuals.end(), v);
     if (it == m_visuals.end())
         m_visuals.push_back(v);
 }
 
 void OutputListeners::removeVisual(MythTV::Visual *v)
 {
-    Visuals::iterator it = std::find(m_visuals.begin(), m_visuals.end(), v);
+    auto it = std::find(m_visuals.begin(), m_visuals.end(), v);
     if (it != m_visuals.end())
         m_visuals.erase(it);
 }
@@ -53,7 +53,7 @@ void OutputListeners::dispatchVisual(uchar *buffer, unsigned long b_len,
     if (! buffer)
        return;
 
-    Visuals::iterator it = m_visuals.begin();
+    auto it = m_visuals.begin();
     for (; it != m_visuals.end(); ++it)
     {
         QMutexLocker locker((*it)->mutex());
@@ -63,7 +63,7 @@ void OutputListeners::dispatchVisual(uchar *buffer, unsigned long b_len,
 
 void OutputListeners::prepareVisuals()
 {
-    Visuals::iterator it = m_visuals.begin();
+    auto it = m_visuals.begin();
     for (; it != m_visuals.end(); ++it)
     {
         QMutexLocker locker((*it)->mutex());

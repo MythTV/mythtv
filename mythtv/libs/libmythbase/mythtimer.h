@@ -13,10 +13,10 @@
 class MBASE_PUBLIC MythTimer
 {
   public:
-    typedef enum {
+    enum StartState {
         kStartRunning,
         kStartInactive,
-    } StartState;
+    };
 
     explicit MythTimer(StartState state = kStartInactive);
 
@@ -26,7 +26,7 @@ class MBASE_PUBLIC MythTimer
 
     void addMSecs(int ms);
 
-    int elapsed(void) const;
+    int elapsed(void);
     int64_t nsecsElapsed(void) const;
     bool isRunning(void) const;
 

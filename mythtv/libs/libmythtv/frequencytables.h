@@ -21,8 +21,8 @@ using namespace std;
 class FrequencyTable;
 class TransportScanItem;
 
-typedef QMap<QString, const FrequencyTable*> freq_table_map_t;
-typedef vector<const FrequencyTable*>        freq_table_list_t;
+using freq_table_map_t  = QMap<QString, const FrequencyTable*>;
+using freq_table_list_t = vector<const FrequencyTable*>;
 
 bool teardown_frequency_tables(void);
 
@@ -127,33 +127,33 @@ class TransportScanItem
     TransportScanItem();
     TransportScanItem(uint           _sourceid,
                       const QString &_si_std,
-                      const QString &_name,
+                      QString        _name,
                       uint           _mplexid,
                       uint           _timeoutTune);
 
     TransportScanItem(uint           _sourceid,
-                      const QString &_name,
+                      QString        _name,
                       DTVMultiplex  &_tuning,
                       uint           _timeoutTune);
 
     TransportScanItem(uint                _sourceid,
-                      const QString      &_name,
+                      QString             _name,
                       DTVTunerType        _tuner_type,
                       const DTVTransport &_tuning,
                       uint                _timeoutTune);
 
     TransportScanItem(uint                _sourceid,
                       const QString      &_si_std,
-                      const QString &strFmt,  /* fmt for info shown to user  */
+                      QString strFmt,  /* fmt for info shown to user  */
                       uint freqNum,
                       uint frequency,         /* center frequency to use     */
                       const FrequencyTable&,  /* freq table to get info from */
                       uint                _timeoutTune);
 
     TransportScanItem(uint                  _sourceid,
-                      const QString        &_name,
-                      const IPTVTuningData &_tuning,
-                      const QString        &_channel,
+                      QString               _name,
+                      IPTVTuningData        _tuning,
+                      QString               _channel,
                       uint                  _timeoutTune);
 
     uint offset_cnt() const
@@ -283,6 +283,6 @@ inline bool operator==(const transport_scan_items_it_t& A,
     return (A_it == B_it) && (0 == A.offset());
 }
 
-typedef list<TransportScanItem> transport_scan_items_t;
+using transport_scan_items_t = list<TransportScanItem>;
 
 #endif // FREQUENCY_TABLE_H

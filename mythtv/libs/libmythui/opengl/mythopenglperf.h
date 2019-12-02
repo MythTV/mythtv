@@ -9,7 +9,7 @@
 #if defined(QT_OPENGL_ES_2)
 
 #ifndef GLuint64
-typedef uint64_t GLuint64;
+using GLuint64 = uint64_t;
 #endif
 
 class QOpenGLTimeMonitor
@@ -33,7 +33,7 @@ class QOpenGLTimeMonitor
 class MUI_PUBLIC MythOpenGLPerf : public QOpenGLTimeMonitor
 {
   public:
-    MythOpenGLPerf(const QString &Name, QVector<QString> Names, int SampleCount = 30);
+    MythOpenGLPerf(QString Name, QVector<QString> Names, int SampleCount = 30);
     void RecordSample    (void);
     void LogSamples      (void);
     int  GetTimersRunning(void);

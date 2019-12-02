@@ -21,13 +21,13 @@ class RemoteFileDownloadThread;
 void ShutdownMythDownloadManager(void);
 
 // TODO : Overlap/Clash with RequestType in libupnp/httprequest.h
-typedef enum MRequestType {
+enum MRequestType {
     kRequestGet,
     kRequestHead,
     kRequestPost
-} MRequestType;
+};
 
-typedef void (*AuthCallback)(QNetworkReply*, QAuthenticator*, void*);
+using AuthCallback = void (*)(QNetworkReply*, QAuthenticator*, void*);
 
 class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
 {

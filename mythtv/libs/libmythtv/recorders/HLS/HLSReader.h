@@ -37,8 +37,8 @@ class MTV_PUBLIC  HLSReader
     friend class HLSPlaylistWorker;
 
   public:
-    typedef QMap<QString, HLSRecStream* > StreamContainer;
-    typedef QList<HLSRecSegment> SegmentContainer;
+    using StreamContainer = QMap<QString, HLSRecStream* >;
+    using SegmentContainer = QList<HLSRecSegment>;
 
     HLSReader(void) = default;
     ~HLSReader(void);

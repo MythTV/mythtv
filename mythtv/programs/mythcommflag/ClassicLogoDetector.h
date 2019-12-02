@@ -3,8 +3,7 @@
 
 #include "LogoDetectorBase.h"
 
-typedef struct edgemaskentry EdgeMaskEntry;
-typedef struct VideoFrame_ VideoFrame;
+struct EdgeMaskEntry;
 class ClassicCommDetector;
 
 class ClassicLogoDetector : public LogoDetectorBase

@@ -7,7 +7,7 @@
 
 #include "mythframe.h"
 
-typedef enum {
+enum HTTPLiveStreamStatus {
     kHLSStatusUndefined    = -1,
     kHLSStatusQueued       = 0,
     kHLSStatusStarting     = 1,
@@ -16,7 +16,7 @@ typedef enum {
     kHLSStatusErrored      = 4,
     kHLSStatusStopping     = 5,
     kHLSStatusStopped      = 6
-} HTTPLiveStreamStatus;
+};
 
 
 class MTV_PUBLIC HTTPLiveStream
@@ -68,7 +68,7 @@ class MTV_PUBLIC HTTPLiveStream
     bool UpdateStatusMessage(const QString& message);
     bool UpdatePercentComplete(int percent);
 
-    QString StatusToString(HTTPLiveStreamStatus status);
+    static QString StatusToString(HTTPLiveStreamStatus status);
 
     bool CheckStop(void);
 

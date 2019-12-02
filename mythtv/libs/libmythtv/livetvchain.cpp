@@ -294,7 +294,7 @@ void LiveTVChain::GetEntryAt(int at, LiveTVChainEntry &entry) const
 
 ProgramInfo *LiveTVChain::EntryToProgram(const LiveTVChainEntry &entry)
 {
-    ProgramInfo *pginfo = new ProgramInfo(entry.chanid, entry.starttime);
+    auto *pginfo = new ProgramInfo(entry.chanid, entry.starttime);
 
     if (pginfo->GetChanID())
     {
@@ -706,10 +706,10 @@ void LiveTVChain::SetHostSocket(MythSocket *sock)
         m_inUseSocks.append(sock);
 }
 
-bool LiveTVChain::IsHostSocket(const MythSocket *sock) const
+bool LiveTVChain::IsHostSocket(MythSocket *sock)
 {
     QMutexLocker lock(&m_sockLock);
-    return m_inUseSocks.contains(const_cast<MythSocket*>(sock));
+    return m_inUseSocks.contains(sock);
 }
 
 uint LiveTVChain::HostSocketCount(void) const

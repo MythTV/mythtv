@@ -30,7 +30,7 @@ void AvFormatDecoderBD::UpdateFramesPlayed(void)
     if (!ringBuffer->IsBD())
         return;
 
-    long long currentpos = (long long)(ringBuffer->BD()->GetCurrentTime() * m_fps);
+    auto currentpos = (long long)(ringBuffer->BD()->GetCurrentTime() * m_fps);
     m_framesPlayed = m_framesRead = currentpos ;
     m_parent->SetFramesPlayed(currentpos + 1);
 }

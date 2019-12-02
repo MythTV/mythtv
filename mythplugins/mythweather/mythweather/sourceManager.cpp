@@ -61,7 +61,7 @@ bool SourceManager::findScriptsDB()
             // findScripts() -- run when entering setup
             continue;
         }
-        ScriptInfo *si = new ScriptInfo;
+        auto *si = new ScriptInfo;
         si->id = db.value(0).toInt();
         si->name = db.value(1).toString();
         si->updateTimeout = db.value(2).toUInt() * 1000;
@@ -95,8 +95,8 @@ bool SourceManager::findScripts()
     if (popupStack == nullptr)
         popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    MythUIBusyDialog *busyPopup = new MythUIBusyDialog(busymessage, popupStack,
-                                                       "mythweatherbusydialog");
+    auto *busyPopup = new MythUIBusyDialog(busymessage, popupStack,
+                                           "mythweatherbusydialog");
 
     if (busyPopup->Create())
     {
@@ -217,7 +217,7 @@ QStringList SourceManager::getLocationList(ScriptInfo *si, const QString &str)
 {
     if (!m_scripts.contains(si))
         return QStringList();
-    WeatherSource *ws = new WeatherSource(si);
+    auto *ws = new WeatherSource(si);
 
     QStringList locationList(ws->getLocationList(str));
 
@@ -246,7 +246,7 @@ WeatherSource *SourceManager::needSourceFor(int id, const QString &loc,
         ScriptInfo *si = m_scripts.at(x);
         if (si->id == id)
         {
-            WeatherSource *ws = new WeatherSource(si);
+            auto *ws = new WeatherSource(si);
             ws->setLocale(loc);
             ws->setUnits(units);
             m_sources.append(ws);

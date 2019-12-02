@@ -15,20 +15,20 @@
 // MythTV headers
 #include "mthread.h"
 
-typedef struct
+struct buttonMapType
 {
     int button;
     QString keystring;
     int chord;
-}  buttonMapType;
+};
 
-typedef struct
+struct axisMapType
 {
     int axis;
     int from;
     int to;
     QString keystring;
-} axisMapType;
+};
 
 /**
  *  \class JoystickMap
@@ -62,8 +62,8 @@ class JoystickMap
             m_axisMap.push_back(new_axis);
         }
 
-        typedef std::vector<buttonMapType> button_map_t;
-        typedef std::vector<axisMapType> axis_map_t;
+        using button_map_t = std::vector<buttonMapType>;
+        using axis_map_t = std::vector<axisMapType>;
         const button_map_t &buttonMap() const { return m_buttonMap; }
         const axis_map_t &axisMap() const { return m_axisMap; }
 

@@ -5,7 +5,7 @@
 
 QString MasterGuideTable::TableClassString(uint i) const
 {
-    static const QString tts[] = {
+    static const QString kTts[] = {
         QString("UNKNOWN"),
         QString("Terrestrial VCT with current()"),
         QString("Terrestrial VCT with !current()"),
@@ -19,7 +19,7 @@ QString MasterGuideTable::TableClassString(uint i) const
         QString("RTT + 0x300")
     };
     int tt = TableClass(i) + 1;
-    return tts[tt];
+    return kTts[tt];
 }
 
 int MasterGuideTable::TableClass(uint i) const
@@ -174,27 +174,27 @@ QString MasterGuideTable::toStringXML(uint indent_level) const
 
 QString VirtualChannelTable::ModulationModeString(uint i) const
 {
-    static const char *modnames[6] =
+    static const char *s_modnames[6] =
     {
         "[Reserved]",   "Analog",      "SCTE mode 1",
         "SCTE mode 2",  "ATSC 8-VSB",  "ATSC 16-VSB",
     };
     uint mode = ModulationMode(i);
-    if (mode >= (sizeof(modnames) / sizeof(char*)))
+    if (mode >= (sizeof(s_modnames) / sizeof(char*)))
         return QString("Unknown 0x%1").arg(mode,2,16,QChar('0'));
-    return QString(modnames[mode]);
+    return QString(s_modnames[mode]);
 }
 
 QString VirtualChannelTable::ServiceTypeString(uint i) const
 {
-    static const char *servicenames[5] =
+    static const char *s_servicenames[5] =
     {
         "[Reserved]", "Analog", "ATSC TV", "ATSC Audio", "ATSC Data",
     };
     uint type = ServiceType(i);
-    if (type >= (sizeof(servicenames) / sizeof(char*)))
+    if (type >= (sizeof(s_servicenames) / sizeof(char*)))
         return QString("Unknown 0x%1").arg(type,2,16,QChar('0'));
-    return QString(servicenames[type]);
+    return QString(s_servicenames[type]);
 }
 
 QString VirtualChannelTable::toString(void) const

@@ -55,8 +55,8 @@ class TransferThread : public MThread
 {
     Q_DECLARE_TR_FUNCTIONS(FileTransferWorker);
 public:
-    typedef QMap<ImagePtrK, QString> TransferMap;
-    typedef QSet<ImagePtrK> ImageSet;
+    using TransferMap = QMap<ImagePtrK, QString>;
+    using ImageSet = QSet<ImagePtrK>;
 
     TransferThread(TransferMap files, bool move, MythUIProgressDialog *dialog)
         : MThread("FileTransfer"),
@@ -85,8 +85,7 @@ public:
                         .arg(action, QFileInfo(im->m_url).fileName(),
                              ImageAdapterBase::FormatSize(im->m_size / 1024));
 
-                ProgressUpdateEvent *pue =
-                        new ProgressUpdateEvent(progressSize, total, message);
+                auto *pue = new ProgressUpdateEvent(progressSize, total, message);
                 QApplication::postEvent(m_dialog, pue);
             }
 
@@ -113,7 +112,7 @@ public:
         // Update progress dialog
         if (m_dialog)
         {
-            ProgressUpdateEvent *pue =
+            auto *pue =
                     new ProgressUpdateEvent(progressSize, total, tr("Complete"));
             QApplication::postEvent(m_dialog, pue);
         }
@@ -352,8 +351,8 @@ void GalleryThumbView::customEvent(QEvent *event)
 
     if (event->type() == MythEvent::MythEventMessage)
     {
-        MythEvent  *me    = static_cast<MythEvent *>(event);
-        const QString&     mesg  = me->Message();
+        auto  *me = static_cast<MythEvent *>(event);
+        const QString& mesg  = me->Message();
         QStringList extra = me->ExtraDataList();
 
         // Internal messages contain a hostname. Ignore other FE messages
@@ -451,7 +450,7 @@ void GalleryThumbView::customEvent(QEvent *event)
     }
     else if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = (DialogCompletionEvent *)(event);
+        auto *dce = (DialogCompletionEvent *)(event);
 
         QString resultid  = dce->GetId();
         int     buttonnum = dce->GetResult();
@@ -655,8 +654,8 @@ void GalleryThumbView::BuildImageList()
             // Data must be set by constructor: First item is automatically
             // selected and must have data available for selection event, as
             // subsequent reselection of same item will always fail.
-            MythUIButtonListItem *item =
-                    new MythUIButtonListItem(m_imageList, "", qVariantFromValue(im));
+            auto *item = new MythUIButtonListItem(m_imageList, "",
+                                                  qVariantFromValue(im));
 
             item->setCheckable(true);
             item->setChecked(MythUIButtonListItem::NotChecked);
@@ -1003,7 +1002,7 @@ void GalleryThumbView::SetUiSelection(MythUIButtonListItem *item)
 void GalleryThumbView::MenuMain()
 {
     // Create the main menu
-    MythMenu *menu = new MythMenu(tr("Gallery Options"), this, "mainmenu");
+    auto *menu = new MythMenu(tr("Gallery Options"), this, "mainmenu");
 
     // Menu options depend on the marked files and the current node
     m_menuState = m_view->GetMenuSubjects();
@@ -1031,7 +1030,7 @@ void GalleryThumbView::MenuMain()
 
     menu->AddItem(tr("Settings"), SLOT(ShowSettings()));
 
-    MythDialogBox *popup = new MythDialogBox(menu, &m_popupStack, "menuPopup");
+    auto *popup = new MythDialogBox(menu, &m_popupStack, "menuPopup");
     if (popup->Create())
         m_popupStack.AddScreen(popup);
     else
@@ -1051,7 +1050,7 @@ void GalleryThumbView::MenuMarked(MythMenu *mainMenu)
         return;
 
     QString   title = tr("%L1 marked").arg(m_menuState.m_markedId.size());
-    MythMenu *menu  = new MythMenu(title, this, "markmenu");
+    auto *menu  = new MythMenu(title, this, "markmenu");
 
     // Mark/unmark selected
     if (m_menuState.m_selected->IsFile())
@@ -1111,7 +1110,7 @@ void GalleryThumbView::MenuPaste(MythMenu *mainMenu)
 
         QString title = tr("%L1 marked").arg(files.size());
 
-        MythMenu *menu = new MythMenu(title, this, "pastemenu");
+        auto *menu = new MythMenu(title, this, "pastemenu");
 
         menu->AddItem(tr("Move Marked Into"), SLOT(Move()));
         menu->AddItem(tr("Copy Marked Into"), SLOT(Copy()));
@@ -1132,7 +1131,7 @@ void GalleryThumbView::MenuTransform(MythMenu *mainMenu)
     {
         QString title = tr("%L1 marked").arg(m_menuState.m_markedId.size());
 
-        MythMenu *menu = new MythMenu(title, this, "");
+        auto *menu = new MythMenu(title, this, "");
 
         menu->AddItem(tr("Rotate Marked CW"), SLOT(RotateCWMarked()));
         menu->AddItem(tr("Rotate Marked CCW"), SLOT(RotateCCWMarked()));
@@ -1144,7 +1143,7 @@ void GalleryThumbView::MenuTransform(MythMenu *mainMenu)
     }
     else if (m_menuState.m_selected->IsFile())
     {
-        MythMenu *menu = new MythMenu(m_menuState.m_selected->m_baseName, this, "");
+        auto *menu = new MythMenu(m_menuState.m_selected->m_baseName, this, "");
 
         menu->AddItem(tr("Rotate CW"), SLOT(RotateCW()));
         menu->AddItem(tr("Rotate CCW"), SLOT(RotateCCW()));
@@ -1241,8 +1240,8 @@ void GalleryThumbView::MenuSlideshow(MythMenu *mainMenu)
     case kOrdered  : ordering = tr("Ordered"); break;
     }
 
-    MythMenu *menu = new MythMenu(tr("Slideshow") + " (" + ordering + ")",
-                                  this, "SlideshowMenu");
+    auto *menu = new MythMenu(tr("Slideshow") + " (" + ordering + ")",
+                              this, "SlideshowMenu");
 
     // Use selected dir or parent, if image selected
     if (m_menuState.m_selected->IsDirectory())
@@ -1256,8 +1255,7 @@ void GalleryThumbView::MenuSlideshow(MythMenu *mainMenu)
     else
         menu->AddItem(tr("Current Directory"), SLOT(Slideshow()));
 
-    MythMenu *orderMenu = new MythMenu(tr("Slideshow Order"), this,
-                                       "SlideOrderMenu");
+    auto *orderMenu = new MythMenu(tr("Slideshow Order"), this, "SlideOrderMenu");
 
     orderMenu->AddItem(tr("Ordered"),  nullptr, nullptr, order == kOrdered);
     orderMenu->AddItem(tr("Shuffled"), nullptr, nullptr, order == kShuffle);
@@ -1281,7 +1279,7 @@ void GalleryThumbView::MenuSlideshow(MythMenu *mainMenu)
 */
 void GalleryThumbView::MenuShow(MythMenu *mainMenu)
 {
-    MythMenu *menu = new MythMenu(tr("Show Options"), this, "showmenu");
+    auto *menu = new MythMenu(tr("Show Options"), this, "showmenu");
 
     int type = m_mgr.GetType();
     if (type == kPicAndVideo)
@@ -1294,8 +1292,8 @@ void GalleryThumbView::MenuShow(MythMenu *mainMenu)
                       SLOT(ShowType()));
 
     int show = gCoreContext->GetNumSetting("GalleryImageCaption");
-    MythMenu *captionMenu = new MythMenu(tr("Image Captions"), this,
-                                         "ImageCaptionMenu");
+    auto *captionMenu = new MythMenu(tr("Image Captions"), this,
+                                     "ImageCaptionMenu");
 
     captionMenu->AddItem(tr("Name"),    nullptr, nullptr, show == kNameCaption);
     captionMenu->AddItem(tr("Date"),    nullptr, nullptr, show == kDateCaption);
@@ -1401,8 +1399,8 @@ void GalleryThumbView::StartSlideshow(ImageSlideShowType mode)
         return;
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    GallerySlideView *slide = new GallerySlideView(mainStack, "galleryslideview",
-                                                   m_editsAllowed);
+    auto *slide = new GallerySlideView(mainStack, "galleryslideview",
+                                       m_editsAllowed);
     if (slide->Create())
     {
         mainStack->AddScreen(slide);
@@ -1607,11 +1605,9 @@ void GalleryThumbView::DeleteMarked()
 void GalleryThumbView::ShowSettings()
 {
     // Show settings dialog
-    GallerySettings *config = new GallerySettings(m_editsAllowed);
+    auto *config = new GallerySettings(m_editsAllowed);
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    StandardSettingDialog *ssd = new StandardSettingDialog(mainStack,
-                                                           "gallerysettings",
-                                                           config);
+    auto *ssd = new StandardSettingDialog(mainStack, "gallerysettings", config);
     if (!ssd->Create())
     {
         delete ssd;
@@ -1680,8 +1676,7 @@ void GalleryThumbView::ShowHidden(bool show)
 */
 void GalleryThumbView::ShowDialog(const QString& msg, const QString& event)
 {
-    MythConfirmationDialog *popup =
-            new MythConfirmationDialog(&m_popupStack, msg, true);
+    auto *popup = new MythConfirmationDialog(&m_popupStack, msg, true);
 
     if (popup->Create())
     {
@@ -1702,8 +1697,8 @@ void GalleryThumbView::ShowRenameInput()
     {
         QString base = QFileInfo(m_menuState.m_selected->m_baseName).completeBaseName();
         QString msg  = tr("Enter a new name:");
-        MythTextInputDialog *popup =
-                new MythTextInputDialog(&m_popupStack, msg, FilterNone, false, base);
+        auto *popup = new MythTextInputDialog(&m_popupStack, msg, FilterNone,
+                                              false, base);
         if (popup->Create())
         {
             popup->SetReturnEvent(this, "FileRename");
@@ -1730,8 +1725,7 @@ void GalleryThumbView::ShowDetails()
 void GalleryThumbView::ShowPassword()
 {
     QString msg = tr("Enter password:");
-    MythTextInputDialog *popup =
-            new MythTextInputDialog(&m_popupStack, msg, FilterNone, true);
+    auto *popup = new MythTextInputDialog(&m_popupStack, msg, FilterNone, true);
     if (popup->Create())
     {
         popup->SetReturnEvent(this, "Password");
@@ -1842,9 +1836,9 @@ void GalleryThumbView::SelectZoomWidget(int change)
 */
 void GalleryThumbView::MakeDir()
 {
-    MythTextInputDialog *popup =
-            new MythTextInputDialog(&m_popupStack, tr("Enter name of new directory"),
-                                    FilterNone, false);
+    auto *popup = new MythTextInputDialog(&m_popupStack,
+                                          tr("Enter name of new directory"),
+                                          FilterNone, false);
     if (popup->Create())
     {
         popup->SetReturnEvent(this, "MakeDir");
@@ -1926,8 +1920,8 @@ void GalleryThumbView::Copy(bool deleteAfter)
 
     // Create progress dialog
     MythScreenStack      *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythUIProgressDialog *progress   =
-            new MythUIProgressDialog(tr("Copying files"), popupStack, "copydialog");
+    auto *progress = new MythUIProgressDialog(tr("Copying files"), popupStack,
+                                              "copydialog");
     if (progress->Create())
         popupStack->AddScreen(progress, false);
     else
@@ -2060,8 +2054,8 @@ void GalleryThumbView::Move()
 
     // Create progress dialog
     MythScreenStack      *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythUIProgressDialog *progress   =
-            new MythUIProgressDialog(tr("Moving files"), popupStack, "movedialog");
+    auto *progress = new MythUIProgressDialog(tr("Moving files"), popupStack,
+                                              "movedialog");
 
     if (progress->Create())
         popupStack->AddScreen(progress, false);

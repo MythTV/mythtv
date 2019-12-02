@@ -215,8 +215,7 @@ void MythRAOPDevice::newConnection(QTcpSocket *client)
     n.SetVisibility(n.GetVisibility() & ~MythNotification::kPlayback);
     GetNotificationCenter()->Queue(n);
 
-    MythRAOPConnection *obj =
-            new MythRAOPConnection(this, client, m_hardwareId, 6000);
+    auto *obj = new MythRAOPConnection(this, client, m_hardwareId, 6000);
 
     if (obj->Init())
     {

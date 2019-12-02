@@ -124,7 +124,7 @@ void InternetContent::GetInternetSearch( HTTPRequest *pRequest )
         return;
     }
 
-    Search *search = new Search();
+    auto *search = new Search();
     QEventLoop loop;
 
     QObject::connect(search, SIGNAL(finishedSearch(Search *)),

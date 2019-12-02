@@ -123,7 +123,7 @@ void FileSelector::itemClicked(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    FileData *fileData = item->GetData().value<FileData*>();
+    auto *fileData = item->GetData().value<FileData*>();
 
     if (fileData->directory)
     {
@@ -263,7 +263,7 @@ void FileSelector::OKPressed()
                 if (pos > 0)
                     title = f.mid(pos + 1);
 
-                ArchiveItem *a = new ArchiveItem;
+                auto *a = new ArchiveItem;
                 a->type = "File";
                 a->title = title;
                 a->subtitle = "";
@@ -289,7 +289,7 @@ void FileSelector::OKPressed()
     else
     {
         MythUIButtonListItem *item = m_fileButtonList->GetItemCurrent();
-        FileData *fileData = item->GetData().value<FileData*>();
+        auto *fileData = item->GetData().value<FileData*>();
 
         if (m_selectorType == FSTYPE_DIRECTORY)
         {
@@ -389,7 +389,7 @@ void FileSelector::updateFileList()
             fi = list.at(x);
             if (fi.fileName() != ".")
             {
-                FileData  *data = new FileData;
+                auto  *data = new FileData;
                 data->selected = false;
                 data->directory = true;
                 data->filename = fi.fileName();
@@ -397,7 +397,7 @@ void FileSelector::updateFileList()
                 m_fileData.append(data);
 
                 // add a row to the MythUIButtonList
-                MythUIButtonListItem* item = new
+                auto* item = new
                         MythUIButtonListItem(m_fileButtonList, data->filename);
                 item->setCheckable(false);
                 item->SetImage("ma_folder.png");
@@ -414,7 +414,7 @@ void FileSelector::updateFileList()
             for (int x = 0; x < list.size(); x++)
             {
                 fi = list.at(x);
-                FileData  *data = new FileData;
+                auto  *data = new FileData;
                 data->selected = false;
                 data->directory = false;
                 data->filename = fi.fileName();
@@ -422,7 +422,7 @@ void FileSelector::updateFileList()
                 m_fileData.append(data);
 
                 // add a row to the UIListBtnArea
-                MythUIButtonListItem* item = 
+                auto* item = 
                      new MythUIButtonListItem(m_fileButtonList, data->filename);
                 item->SetText(formatSize(data->size / 1024, 2), "size");
 

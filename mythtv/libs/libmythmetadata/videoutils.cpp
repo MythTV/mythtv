@@ -33,7 +33,7 @@ namespace
     template <typename T>
     void CopySecond(const T &src, QStringList &dest)
     {
-        for (typename T::const_iterator p = src.begin(); p != src.end(); ++p)
+        for (auto p = src.cbegin(); p != src.cend(); ++p)
         {
             dest.push_back((*p).second);
         }
@@ -56,12 +56,12 @@ void CheckedSet(MythUIType *container, const QString &itemName,
     if (container)
     {
         MythUIType *uit = container->GetChild(itemName);
-        MythUIText *tt = dynamic_cast<MythUIText *>(uit);
+        auto *tt = dynamic_cast<MythUIText *>(uit);
         if (tt)
             CheckedSet(tt, value);
         else
         {
-            MythUIStateType *st = dynamic_cast<MythUIStateType *>(uit);
+            auto *st = dynamic_cast<MythUIStateType *>(uit);
             CheckedSet(st, value);
         }
     }

@@ -100,8 +100,7 @@ void AudioConfigScreen::Init(void)
 {
     StandardSettingDialog::Init();
 
-    AudioConfigSettings *settings =
-        static_cast<AudioConfigSettings*>(GetGroupSettings());
+    auto *settings = static_cast<AudioConfigSettings*>(GetGroupSettings());
     settings->CheckConfiguration();
 }
 
@@ -112,7 +111,7 @@ AudioConfigSettings::AudioConfigSettings()
     addChild((m_OutputDevice = new AudioDeviceComboBox(this)));
         // Rescan button
 
-    ButtonStandardSetting *rescan = new ButtonStandardSetting("rescan");
+    auto *rescan = new ButtonStandardSetting("rescan");
     rescan->setLabel(tr("Rescan"));
     rescan->setHelpText(tr("Rescan for available audio devices. "
                            "Current entry will be checked and "
@@ -136,7 +135,7 @@ AudioConfigSettings::AudioConfigSettings()
     addChild(MythControlsVolume());
 
     //Advanced Settings
-    GroupSetting * advancedSettings = new GroupSetting();
+    auto *advancedSettings = new GroupSetting();
     advancedSettings->setLabel(tr("Advanced Audio Settings"));
     advancedSettings->setHelpText(tr("Enable extra audio settings. Under most "
                                      "usage all options should be left alone"));
@@ -423,7 +422,7 @@ HostComboBoxSetting *AudioConfigSettings::MaxAudioChannels()
 {
     QString name = "MaxChannels";
 
-    HostComboBoxSetting *gc = new HostComboBoxSetting(name, false);
+    auto *gc = new HostComboBoxSetting(name, false);
 
     gc->setLabel(tr("Speaker configuration"));
 
@@ -438,7 +437,7 @@ HostComboBoxSetting *AudioConfigSettings::MaxAudioChannels()
 
 HostCheckBoxSetting *AudioConfigSettings::AudioUpmix()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("AudioDefaultUpmix");
+    auto *gc = new HostCheckBoxSetting("AudioDefaultUpmix");
 
     gc->setLabel(tr("Upconvert stereo to 5.1 surround"));
 
@@ -452,7 +451,7 @@ HostCheckBoxSetting *AudioConfigSettings::AudioUpmix()
 
 HostComboBoxSetting *AudioConfigSettings::AudioUpmixType()
 {
-    HostComboBoxSetting *gc = new HostComboBoxSetting("AudioUpmixType", false);
+    auto *gc = new HostComboBoxSetting("AudioUpmixType", false);
 
     gc->setLabel(tr("Upmix Quality"));
 
@@ -468,7 +467,7 @@ HostComboBoxSetting *AudioConfigSettings::AudioUpmixType()
 
 HostCheckBoxSetting *AudioConfigSettings::AC3PassThrough()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("AC3PassThru");
+    auto *gc = new HostCheckBoxSetting("AC3PassThru");
 
     gc->setLabel(tr("Dolby Digital"));
 
@@ -482,7 +481,7 @@ HostCheckBoxSetting *AudioConfigSettings::AC3PassThrough()
 
 HostCheckBoxSetting *AudioConfigSettings::DTSPassThrough()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("DTSPassThru");
+    auto *gc = new HostCheckBoxSetting("DTSPassThru");
 
     gc->setLabel(tr("DTS"));
 
@@ -496,7 +495,7 @@ HostCheckBoxSetting *AudioConfigSettings::DTSPassThrough()
 
 HostCheckBoxSetting *AudioConfigSettings::EAC3PassThrough()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("EAC3PassThru");
+    auto *gc = new HostCheckBoxSetting("EAC3PassThru");
 
     gc->setLabel(tr("E-AC-3"));
 
@@ -509,7 +508,7 @@ HostCheckBoxSetting *AudioConfigSettings::EAC3PassThrough()
 
 HostCheckBoxSetting *AudioConfigSettings::TrueHDPassThrough()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("TrueHDPassThru");
+    auto *gc = new HostCheckBoxSetting("TrueHDPassThru");
 
     gc->setLabel(tr("TrueHD"));
 
@@ -522,7 +521,7 @@ HostCheckBoxSetting *AudioConfigSettings::TrueHDPassThrough()
 
 HostCheckBoxSetting *AudioConfigSettings::DTSHDPassThrough()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("DTSHDPassThru");
+    auto *gc = new HostCheckBoxSetting("DTSHDPassThru");
 
     gc->setLabel(tr("DTS-HD"));
 
@@ -948,7 +947,7 @@ void AudioTest::prepareTest()
         QString msg = tr("Audio device is invalid or not useable.");
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-        MythConfirmationDialog *mcd = new MythConfirmationDialog(mainStack,
+        auto *mcd = new MythConfirmationDialog(mainStack,
                                                                  msg, false);
 
         if (mcd->Create())
@@ -963,8 +962,8 @@ bool AudioTest::event(QEvent *event)
     if (event->type() != ChannelChangedEvent::kEventType)
         return QObject::event(event); //not handled
 
-    ChannelChangedEvent *cce = (ChannelChangedEvent*)(event);
-    QString channel          = cce->m_channel;
+    auto *cce = (ChannelChangedEvent*)(event);
+    QString channel = cce->m_channel;
 
     if (!cce->m_fulltest)
         return false;
@@ -1026,7 +1025,7 @@ bool AudioTest::event(QEvent *event)
 
 HostCheckBoxSetting *AudioConfigSettings::MythControlsVolume()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("MythControlsVolume");
+    auto *gc = new HostCheckBoxSetting("MythControlsVolume");
 
     gc->setLabel(tr("Use internal volume controls"));
 
@@ -1047,7 +1046,7 @@ HostCheckBoxSetting *AudioConfigSettings::MythControlsVolume()
 
 HostComboBoxSetting *AudioConfigSettings::MixerDevice()
 {
-    HostComboBoxSetting *gc = new HostComboBoxSetting("MixerDevice", true);
+    auto *gc = new HostComboBoxSetting("MixerDevice", true);
     gc->setLabel(tr("Mixer device"));
 
 #ifdef USING_OSS
@@ -1088,7 +1087,7 @@ const char* AudioConfigSettings::MixerControlControls[] =
 
 HostComboBoxSetting *AudioConfigSettings::MixerControl()
 {
-    HostComboBoxSetting *gc = new HostComboBoxSetting("MixerControl", true);
+    auto *gc = new HostComboBoxSetting("MixerControl", true);
 
     gc->setLabel(tr("Mixer controls"));
 
@@ -1105,8 +1104,7 @@ HostComboBoxSetting *AudioConfigSettings::MixerControl()
 
 HostSpinBoxSetting *AudioConfigSettings::MixerVolume()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("MasterMixerVolume", 0, 100,
-                                                    1);
+    auto *gs = new HostSpinBoxSetting("MasterMixerVolume", 0, 100, 1);
 
     gs->setLabel(tr("Master mixer volume"));
 
@@ -1120,8 +1118,7 @@ HostSpinBoxSetting *AudioConfigSettings::MixerVolume()
 
 HostSpinBoxSetting *AudioConfigSettings::PCMVolume()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("PCMMixerVolume", 0, 100,
-                                                    1);
+    auto *gs = new HostSpinBoxSetting("PCMMixerVolume", 0, 100, 1);
 
     gs->setLabel(tr("PCM mixer volume"));
 
@@ -1134,7 +1131,7 @@ HostSpinBoxSetting *AudioConfigSettings::PCMVolume()
 
 HostCheckBoxSetting *AudioConfigSettings::MPCM()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("StereoPCM");
+    auto *gc = new HostCheckBoxSetting("StereoPCM");
 
     gc->setLabel(tr("Stereo PCM Only"));
 
@@ -1149,7 +1146,7 @@ HostCheckBoxSetting *AudioConfigSettings::MPCM()
 
 HostCheckBoxSetting *AudioConfigSettings::SRCQualityOverride()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("SRCQualityOverride");
+    auto *gc = new HostCheckBoxSetting("SRCQualityOverride");
 
     gc->setLabel(tr("Override SRC quality"));
 
@@ -1162,7 +1159,7 @@ HostCheckBoxSetting *AudioConfigSettings::SRCQualityOverride()
 
 HostComboBoxSetting *AudioConfigSettings::SRCQuality()
 {
-    HostComboBoxSetting *gc = new HostComboBoxSetting("SRCQuality", false);
+    auto *gc = new HostComboBoxSetting("SRCQuality", false);
 
     gc->setLabel(tr("Sample rate conversion"));
 
@@ -1183,7 +1180,7 @@ HostComboBoxSetting *AudioConfigSettings::SRCQuality()
 
 HostCheckBoxSetting *AudioConfigSettings::Audio48kOverride()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("Audio48kOverride");
+    auto *gc = new HostCheckBoxSetting("Audio48kOverride");
 
     gc->setLabel(tr("Force audio device output to 48kHz"));
     gc->setValue(false);
@@ -1196,7 +1193,7 @@ HostCheckBoxSetting *AudioConfigSettings::Audio48kOverride()
 
 HostCheckBoxSetting *AudioConfigSettings::PassThroughOverride()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("PassThruDeviceOverride");
+    auto *gc = new HostCheckBoxSetting("PassThruDeviceOverride");
 
     gc->setLabel(tr("Separate digital output device"));
 
@@ -1209,7 +1206,7 @@ HostCheckBoxSetting *AudioConfigSettings::PassThroughOverride()
 
 HostComboBoxSetting *AudioConfigSettings::PassThroughOutputDevice()
 {
-    HostComboBoxSetting *gc = new HostComboBoxSetting("PassThruOutputDevice",
+    auto *gc = new HostComboBoxSetting("PassThruOutputDevice",
                                                       true);
 
     gc->setLabel(tr("Digital output device"));
@@ -1234,7 +1231,7 @@ HostComboBoxSetting *AudioConfigSettings::PassThroughOutputDevice()
 
 HostCheckBoxSetting *AudioConfigSettings::SPDIFRateOverride()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("SPDIFRateOverride");
+    auto *gc = new HostCheckBoxSetting("SPDIFRateOverride");
 
     gc->setLabel(tr("SPDIF 48kHz rate override"));
 
@@ -1249,7 +1246,7 @@ HostCheckBoxSetting *AudioConfigSettings::SPDIFRateOverride()
 
 HostCheckBoxSetting *AudioConfigSettings::HBRPassthrough()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("HBRPassthru");
+    auto *gc = new HostCheckBoxSetting("HBRPassthru");
 
     gc->setLabel(tr("HBR passthrough support"));
 

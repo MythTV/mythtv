@@ -56,10 +56,8 @@ void TestSortHelper::titles_timing(void)
     QFETCH(int, sensitive);
     QFETCH(int, disposition);
     QFETCH(QString, exclusions);
-    MythSortHelper *sh =
-        new MythSortHelper(static_cast<Qt::CaseSensitivity>(sensitive),
-                           static_cast<SortPrefixMode>(disposition),
-                           "");
+    auto *sh = new MythSortHelper(static_cast<Qt::CaseSensitivity>(sensitive),
+                                  static_cast<SortPrefixMode>(disposition), "");
     QBENCHMARK {
         QString title = sh->doTitle("The Flash");
     }
@@ -77,10 +75,8 @@ void TestSortHelper::pathnames_timing(void)
     QFETCH(int, disposition);
     QFETCH(QString, exclusions);
 
-    MythSortHelper *sh =
-        new MythSortHelper(static_cast<Qt::CaseSensitivity>(sensitive),
-                           static_cast<SortPrefixMode>(disposition),
-                           "");
+    auto *sh = new MythSortHelper(static_cast<Qt::CaseSensitivity>(sensitive),
+                                  static_cast<SortPrefixMode>(disposition), "");
     QBENCHMARK {
         QString title = sh->doPathname("dvds/The Flash/Season 2/The Flash - S02E01.ts");
     }

@@ -73,7 +73,7 @@ bool DeleteThread::AddFile(const QString& path)
         return false;
 
     QMutexLocker lock(&m_newlock);
-    DeleteHandler *handler = new DeleteHandler(path);
+    auto *handler = new DeleteHandler(path);
     m_newfiles << handler;
     return true;
 }

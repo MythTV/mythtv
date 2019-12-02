@@ -118,7 +118,7 @@ class MTV_PUBLIC ChannelInfo
     QList<uint>  m_groupIdList;
     QList<uint>  m_inputIdList;
 };
-typedef vector<ChannelInfo> ChannelInfoList;
+using ChannelInfoList = vector<ChannelInfo>;
 
 class MTV_PUBLIC ChannelInsertInfo
 {
@@ -240,7 +240,7 @@ class MTV_PUBLIC ChannelInsertInfo
     bool    m_could_be_opencable {false};
     int     m_decryption_status  {0};
 };
-typedef vector<ChannelInsertInfo> ChannelInsertInfoList;
+using ChannelInsertInfoList = vector<ChannelInsertInfo>;
 
 Q_DECLARE_METATYPE(ChannelInfo*)
 

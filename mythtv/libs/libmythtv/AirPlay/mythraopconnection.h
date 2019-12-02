@@ -27,7 +27,7 @@ class AudioOutput;
 class ServerPool;
 class _NetStream;
 
-typedef QHash<QString,QString> RawHash;
+using RawHash = QHash<QString,QString>;
 
 struct AudioData
 {
@@ -79,12 +79,12 @@ class MTV_PUBLIC MythRAOPConnection : public QObject
     void     ResetAudio(void);
     void     ProcessRequest(const QStringList &header,
                             const QByteArray &content);
-    void     FinishResponse(_NetStream *stream, QTcpSocket *socket,
-			    QString &option, QString &cseq, QString &responseData);
+    static void  FinishResponse(_NetStream *stream, QTcpSocket *socket,
+                                QString &option, QString &cseq, QString &responseData);
     void     FinishAuthenticationResponse(_NetStream *stream, QTcpSocket *socket,
                                           QString &cseq);
 
-    RawHash  FindTags(const QStringList &lines);
+    static RawHash  FindTags(const QStringList &lines);
     bool     CreateDecoder(void);
     void     DestroyDecoder(void);
     bool     OpenAudioDevice(void);
@@ -96,16 +96,16 @@ class MTV_PUBLIC MythRAOPConnection : public QObject
     // time sync
     void     SendTimeRequest(void);
     void     ProcessTimeResponse(const QByteArray &buf);
-    uint64_t NTPToLocal(uint32_t sec, uint32_t ticks);
+    static uint64_t NTPToLocal(uint32_t sec, uint32_t ticks);
 
     // incoming data packet
-    bool    GetPacketType(const QByteArray &buf, uint8_t &type,
+    static bool GetPacketType(const QByteArray &buf, uint8_t &type,
                           uint16_t &seq, uint64_t &timestamp);
 
     // utility functions
     int64_t     AudioCardLatency(void);
-    QStringList splitLines(const QByteArray &lines);
-    QString     stringFromSeconds(int timeInSeconds);
+    static QStringList splitLines(const QByteArray &lines);
+    static QString     stringFromSeconds(int timeInSeconds);
     uint64_t    framesToMs(uint64_t frames);
 
     // notification functions

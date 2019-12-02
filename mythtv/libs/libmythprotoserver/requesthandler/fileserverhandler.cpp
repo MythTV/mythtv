@@ -180,8 +180,7 @@ bool FileServerHandler::HandleAnnounce(MythSocket *socket,
     {
         if (slist.size() >= 3)
         {
-            SocketHandler *handler =
-                new SocketHandler(socket, m_parent, commands[2]);
+            auto *handler = new SocketHandler(socket, m_parent, commands[2]);
 
             handler->BlockShutdown(true);
             handler->AllowStandardEvents(true);

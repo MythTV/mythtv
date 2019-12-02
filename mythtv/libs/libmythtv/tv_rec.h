@@ -64,88 +64,79 @@ class RecordingQuality;
 class GeneralDBOptions
 {
   public:
-    GeneralDBOptions() :
-        videodev(""),         vbidev(""),
-        audiodev(""),
-        inputtype("V4L"),
-        audiosamplerate(-1),  skip_btaudio(false),
-        signal_timeout(1000), channel_timeout(3000),
-        wait_for_seqstart(false) {}
+    GeneralDBOptions()= default;
 
-    QString videodev;
-    QString vbidev;
-    QString audiodev;
-    QString inputtype;
-    int     audiosamplerate;
-    bool    skip_btaudio;
-    uint    signal_timeout;
-    uint    channel_timeout;
-    bool    wait_for_seqstart;
+    QString m_videoDev;
+    QString m_vbiDev;
+    QString m_audioDev;
+    QString m_inputType       {"V4L"};
+    int     m_audioSampleRate {-1};
+    bool    m_skipBtAudio     {false};
+    uint    m_signalTimeout   {1000};
+    uint    m_channelTimeout  {3000};
+    bool    m_waitForSeqstart {false};
 };
 
 class DVBDBOptions
 {
   public:
-    DVBDBOptions() : dvb_on_demand(false), dvb_tuning_delay(0), dvb_eitscan(true) {;}
-    bool dvb_on_demand;
-    uint dvb_tuning_delay;
-    bool dvb_eitscan;
+    DVBDBOptions() = default;
+
+    bool m_dvbOnDemand    {false};
+    uint m_dvbTuningDelay {0};
+    bool m_dvbEitScan     {true};
 };
 
 class FireWireDBOptions
 {
   public:
-    FireWireDBOptions() : speed(-1), connection(-1), model("") {;}
+    FireWireDBOptions() = default;
 
-    int speed;
-    int connection;
-    QString model;
+    int     m_speed      {-1};
+    int     m_connection {-1};
+    QString m_model;
 };
 
 class TuningRequest
 {
   public:
     explicit TuningRequest(uint f) :
-        flags(f), program(nullptr),
-        majorChan(0), minorChan(0), progNum(-1) {;}
+        m_flags(f) {;}
     TuningRequest(uint f, RecordingInfo *p) :
-        flags(f), program(p),
-        majorChan(0), minorChan(0), progNum(-1) {;}
+        m_flags(f), m_program(p) {;}
     TuningRequest(uint f, const QString& ch, const QString& in = QString()) :
-        flags(f), program(nullptr), channel(ch),
-        input(in), majorChan(0), minorChan(0), progNum(-1) {;}
+        m_flags(f), m_channel(ch), m_input(in) {;}
 
     QString toString(void) const;
 
-    bool IsOnSameMultiplex(void) const { return minorChan || (progNum >= 0); }
+    bool IsOnSameMultiplex(void) const { return m_minorChan || (m_progNum >= 0); }
 
   public:
-    uint         flags;
-    RecordingInfo *program;
-    QString      channel;
-    QString      input;
-    uint         majorChan;
-    uint         minorChan;
-    int          progNum;
+    uint           m_flags;
+    RecordingInfo *m_program   {nullptr};
+    QString        m_channel;
+    QString        m_input;
+    uint           m_majorChan {0};
+    uint           m_minorChan {0};
+    int            m_progNum   {-1};
 };
-typedef MythDeque<TuningRequest> TuningQueue;
+using TuningQueue = MythDeque<TuningRequest>;
 inline TuningRequest myth_deque_init(const TuningRequest*) { return (TuningRequest)(0); }
 
 class PendingInfo
 {
   public:
-    PendingInfo() :
-        info(nullptr), hasLaterShowing(false), canceled(false),
-        ask(false), doNotAsk(false) { }
-    ProgramInfo *info;
-    QDateTime    recordingStart;
-    bool         hasLaterShowing;
-    bool         canceled;
-    bool         ask;
-    bool         doNotAsk;
-    vector<uint> possibleConflicts;
+    PendingInfo() = default;
+
+    ProgramInfo *m_info              {nullptr};
+    QDateTime    m_recordingStart;
+    bool         m_hasLaterShowing   {false};
+    bool         m_canceled          {false};
+    bool         m_ask               {false};
+    bool         m_doNotAsk          {false};
+    vector<uint> m_possibleConflicts;
 };
-typedef QMap<uint,PendingInfo> PendingMap;
+using PendingMap = QMap<uint,PendingInfo>;
 
 class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
 {
@@ -308,8 +299,8 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
 
     void HandleStateChange(void);
     void ChangeState(TVState nextState);
-    bool StateIsRecording(TVState state);
-    bool StateIsPlaying(TVState state);
+    static bool StateIsRecording(TVState state);
+    static bool StateIsPlaying(TVState state);
     TVState RemovePlaying(TVState state);
     TVState RemoveRecording(TVState state);
 
@@ -329,7 +320,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     QDateTime GetRecordEndTime(const ProgramInfo*) const;
     void CheckForRecGroupChange(void);
     void NotifySchedulerOfRecording(RecordingInfo*);
-    typedef enum { kAutoRunProfile, kAutoRunNone, } AutoRunInitType;
+    enum AutoRunInitType { kAutoRunProfile, kAutoRunNone, };
     void InitAutoRunJobs(RecordingInfo*, AutoRunInitType,
                          RecordingProfile *, int line);
 

@@ -816,8 +816,7 @@ DTC::LiveStreamInfo *HTTPLiveStream::StartStream(void)
     if (GetDBStatus() != kHLSStatusQueued)
         return GetLiveStreamInfo();
 
-    HTTPLiveStreamThread *streamThread =
-        new HTTPLiveStreamThread(GetStreamID());
+    auto *streamThread = new HTTPLiveStreamThread(GetStreamID());
     MThreadPool::globalInstance()->startReserved(streamThread,
                                                  "HTTPLiveStream");
     MythTimer statusTimer;
@@ -852,7 +851,7 @@ bool HTTPLiveStream::RemoveStream(int id)
         return false;
     }
 
-    HTTPLiveStream *hls = new HTTPLiveStream(id);
+    auto *hls = new HTTPLiveStream(id);
 
     if (hls->GetDBStatus() == kHLSStatusRunning) {
         HTTPLiveStream::StopStream(id);
@@ -927,7 +926,7 @@ DTC::LiveStreamInfo *HTTPLiveStream::StopStream(int id)
         return nullptr;
     }
 
-    HTTPLiveStream *hls = new HTTPLiveStream(id);
+    auto *hls = new HTTPLiveStream(id);
     if (!hls)
         return nullptr;
 
@@ -996,7 +995,7 @@ DTC::LiveStreamInfo *HTTPLiveStream::GetLiveStreamInfo(
 
 DTC::LiveStreamInfoList *HTTPLiveStream::GetLiveStreamInfoList(const QString &FileName)
 {
-    DTC::LiveStreamInfoList *infoList = new DTC::LiveStreamInfoList();
+    auto *infoList = new DTC::LiveStreamInfoList();
 
     QString sql = "SELECT id FROM livestream ";
 

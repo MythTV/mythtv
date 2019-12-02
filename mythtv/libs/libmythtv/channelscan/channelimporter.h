@@ -23,12 +23,12 @@
 #include "channelscantypes.h"
 #include "mythmainwindow.h"
 
-typedef enum {
+enum OkCancelType {
     kOCTCancelAll = -1,
     kOCTCancel    = +0,
     kOCTOk        = +1,
     kOCTOkAll     = +2,
-} OkCancelType;
+};
 
 class ChannelImporterBasicStats
 {
@@ -96,27 +96,27 @@ class MTV_PUBLIC ChannelImporter
     void Process(const ScanDTVTransportList&, int sourceid = -1);
 
   protected:
-    typedef enum
+    enum DeleteAction
     {
         kDeleteAll,
         kDeleteManual,
         kDeleteIgnoreAll,
         kDeleteInvisibleAll,
-    } DeleteAction;
-    typedef enum
+    };
+    enum InsertAction
     {
         kInsertAll,
         kInsertManual,
         kInsertIgnoreAll,
-    } InsertAction;
-    typedef enum
+    };
+    enum UpdateAction
     {
         kUpdateAll,
         kUpdateManual,
         kUpdateIgnoreAll,
-    } UpdateAction;
+    };
 
-    typedef enum
+    enum ChannelType
     {
         kChannelTypeFirst = 0,
 
@@ -136,11 +136,11 @@ class MTV_PUBLIC ChannelImporter
         kNTSCConflicting,
         kChannelTypeConflictingLast = kNTSCConflicting,
         kChannelTypeLast = kChannelTypeConflictingLast,
-    } ChannelType;
+    };
 
-    QString toString(ChannelType type);
+    static QString toString(ChannelType type);
 
-    void CleanupDuplicates(ScanDTVTransportList &transports) const;
+    static void CleanupDuplicates(ScanDTVTransportList &transports);
     void FilterServices(ScanDTVTransportList &transports) const;
     ScanDTVTransportList GetDBTransports(
         uint sourceid, ScanDTVTransportList&) const;

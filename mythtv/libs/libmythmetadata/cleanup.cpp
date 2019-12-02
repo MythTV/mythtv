@@ -6,7 +6,7 @@
 class CleanupHooksImp
 {
   private:
-    typedef std::list<CleanupProc *> clean_list;
+    using clean_list = std::list<CleanupProc *>;
 
   private:
     clean_list m_cleanList;
@@ -19,8 +19,7 @@ class CleanupHooksImp
 
     void removeHook(CleanupProc *clean_proc)
     {
-        clean_list::iterator p = std::find(m_cleanList.begin(),
-                                           m_cleanList.end(), clean_proc);
+        auto p = std::find(m_cleanList.begin(), m_cleanList.end(), clean_proc);
         if (p != m_cleanList.end())
         {
             m_cleanList.erase(p);
@@ -29,8 +28,7 @@ class CleanupHooksImp
 
     void cleanup()
     {
-        for (clean_list::iterator p = m_cleanList.begin();
-             p != m_cleanList.end();++p)
+        for (auto p = m_cleanList.begin(); p != m_cleanList.end(); ++p)
         {
             (*p)->doClean();
         }

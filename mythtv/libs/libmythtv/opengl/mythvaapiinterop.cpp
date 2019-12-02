@@ -44,9 +44,9 @@ MythOpenGLInterop::Type MythVAAPIInterop::GetInteropType(VideoFrameType Format)
     // best first
     if (egl && MythVAAPIInteropDRM::IsSupported(context)) // zero copy
         return VAAPIEGLDRM;
-    else if (!egl && !wayland && MythVAAPIInteropGLXPixmap::IsSupported(context)) // copy
+    if (!egl && !wayland && MythVAAPIInteropGLXPixmap::IsSupported(context)) // copy
         return VAAPIGLXPIX;
-    else if (!egl && !opengles && !wayland) // 2 * copy
+    if (!egl && !opengles && !wayland) // 2 * copy
         return VAAPIGLXCOPY;
     return Unsupported;
 }
@@ -58,9 +58,9 @@ MythVAAPIInterop* MythVAAPIInterop::Create(MythRenderOpenGL *Context, Type Inter
 
     if (InteropType == VAAPIEGLDRM)
         return new MythVAAPIInteropDRM(Context);
-    else if (InteropType == VAAPIGLXPIX)
+    if (InteropType == VAAPIGLXPIX)
         return new MythVAAPIInteropGLXPixmap(Context);
-    else if (InteropType == VAAPIGLXCOPY)
+    if (InteropType == VAAPIGLXCOPY)
         return new MythVAAPIInteropGLXCopy(Context);
     return nullptr;
 }
@@ -157,7 +157,7 @@ VASurfaceID MythVAAPIInterop::VerifySurface(MythRenderOpenGL *Context, VideoFram
     }
 
     // Retrieve surface
-    VASurfaceID id = static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(Frame->buf));
+    auto id = static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(Frame->buf));
     if (id)
         result = id;
     return result;
@@ -322,7 +322,7 @@ VASurfaceID MythVAAPIInterop::Deinterlace(VideoFrame *Frame, VASurfaceID Current
 
         if (deinterlacer != DEINT_NONE)
         {
-            AVBufferRef* frames = reinterpret_cast<AVBufferRef*>(Frame->priv[1]);
+            auto* frames = reinterpret_cast<AVBufferRef*>(Frame->priv[1]);
             if (!frames)
                 break;
 
@@ -330,10 +330,10 @@ VASurfaceID MythVAAPIInterop::Deinterlace(VideoFrame *Frame, VASurfaceID Current
             if (!hwdeviceref)
                 break;
 
-            AVHWDeviceContext* hwdevicecontext  = reinterpret_cast<AVHWDeviceContext*>(hwdeviceref->data);
-            hwdevicecontext->free = [](AVHWDeviceContext*) { LOG(VB_PLAYBACK, LOG_INFO, LOC + "VAAPI VPP device context finished"); };
+            auto* hwdevicecontext  = reinterpret_cast<AVHWDeviceContext*>(hwdeviceref->data);
+            hwdevicecontext->free = [](AVHWDeviceContext* /*unused*/) { LOG(VB_PLAYBACK, LOG_INFO, LOC + "VAAPI VPP device context finished"); };
 
-            AVVAAPIDeviceContext *vaapidevicectx = reinterpret_cast<AVVAAPIDeviceContext*>(hwdevicecontext->hwctx);
+            auto *vaapidevicectx = reinterpret_cast<AVVAAPIDeviceContext*>(hwdevicecontext->hwctx);
             vaapidevicectx->display = m_vaDisplay; // re-use the existing display
 
             if (av_hwdevice_ctx_init(hwdeviceref) < 0)
@@ -351,18 +351,18 @@ VASurfaceID MythVAAPIInterop::Deinterlace(VideoFrame *Frame, VASurfaceID Current
                 break;
             }
 
-            AVHWFramesContext* dstframes = reinterpret_cast<AVHWFramesContext*>(newframes->data);
-            AVHWFramesContext* srcframes = reinterpret_cast<AVHWFramesContext*>(frames->data);
+            auto* dstframes = reinterpret_cast<AVHWFramesContext*>(newframes->data);
+            auto* srcframes = reinterpret_cast<AVHWFramesContext*>(frames->data);
 
             m_filterWidth = srcframes->width;
             m_filterHeight = srcframes->height;
-            static const int vpppoolsize = 2; // seems to be enough
+            static constexpr int kVppPoolSize = 2; // seems to be enough
             dstframes->sw_format = srcframes->sw_format;
             dstframes->width = m_filterWidth;
             dstframes->height = m_filterHeight;
-            dstframes->initial_pool_size = vpppoolsize;
+            dstframes->initial_pool_size = kVppPoolSize;
             dstframes->format = AV_PIX_FMT_VAAPI;
-            dstframes->free = [](AVHWFramesContext*) { LOG(VB_PLAYBACK, LOG_INFO, LOC + "VAAPI VPP frames context finished"); };
+            dstframes->free = [](AVHWFramesContext* /*unused*/) { LOG(VB_PLAYBACK, LOG_INFO, LOC + "VAAPI VPP frames context finished"); };
 
             if (av_hwframe_ctx_init(newframes) < 0)
             {
@@ -374,7 +374,7 @@ VASurfaceID MythVAAPIInterop::Deinterlace(VideoFrame *Frame, VASurfaceID Current
 
             m_vppFramesContext = newframes;
             LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("New VAAPI frame pool with %1 %2x%3 surfaces")
-                .arg(vpppoolsize).arg(m_filterWidth).arg(m_filterHeight));
+                .arg(kVppPoolSize).arg(m_filterWidth).arg(m_filterHeight));
             av_buffer_unref(&hwdeviceref);
 
             if (!MythVAAPIInterop::SetupDeinterlacer(deinterlacer, doublerate, m_vppFramesContext,
@@ -438,7 +438,7 @@ VASurfaceID MythVAAPIInterop::Deinterlace(VideoFrame *Frame, VASurfaceID Current
                         m_firstField = true;
                         break;
                     }
-                    else if (ret != AVERROR(EAGAIN))
+                    if (ret != AVERROR(EAGAIN))
                         break;
                 }
 

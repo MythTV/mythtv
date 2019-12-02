@@ -26,7 +26,7 @@ struct RomFileInfo
     bool indb;
 };
 
-typedef QList< RomFileInfo > RomFileInfoList;
+using RomFileInfoList = QList< RomFileInfo >;
 
 class GameScannerThread : public MThread
 {

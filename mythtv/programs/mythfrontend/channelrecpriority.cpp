@@ -21,11 +21,11 @@ using namespace std;
 #include "mythdialogbox.h"
 #include "mythmainwindow.h"
 
-typedef struct RecPriorityInfo
+struct RecPriorityInfo
 {
     ChannelInfo *m_chan;
     int          m_cnt;
-} RecPriorityInfo;
+};
 
 class channelSort
 {
@@ -158,8 +158,7 @@ void ChannelRecPriority::ShowMenu()
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    MythDialogBox *menuPopup = new MythDialogBox(label, popupStack,
-                                                 "chanrecmenupopup");
+    auto *menuPopup = new MythDialogBox(label, popupStack, "chanrecmenupopup");
 
     if (!menuPopup->Create())
     {
@@ -183,7 +182,7 @@ void ChannelRecPriority::changeRecPriority(int howMuch)
     if (!item)
         return;
 
-    ChannelInfo *chanInfo = item->GetData().value<ChannelInfo *>();
+    auto *chanInfo = item->GetData().value<ChannelInfo *>();
 
     // inc/dec recording priority
     int tempRecPriority = chanInfo->m_recpriority + howMuch;
@@ -259,7 +258,7 @@ void ChannelRecPriority::FillList(void)
         int cnt = 999;
         while (result.next())
         {
-            ChannelInfo *chaninfo = new ChannelInfo;
+            auto *chaninfo = new ChannelInfo;
             chaninfo->m_chanid = result.value(0).toInt();
             chaninfo->m_channum = result.value(1).toString();
             chaninfo->m_sourceid = result.value(2).toInt();
@@ -298,9 +297,8 @@ void ChannelRecPriority::updateList()
     {
         ChannelInfo *chanInfo = *it;
 
-        MythUIButtonListItem *item =
-               new MythUIButtonListItem(m_channelList, "",
-                                                   qVariantFromValue(chanInfo));
+        auto *item = new MythUIButtonListItem(m_channelList, "",
+                                              qVariantFromValue(chanInfo));
 
         QString fontState = "default";
 
@@ -344,7 +342,7 @@ void ChannelRecPriority::SortList()
 
     if (item)
     {
-        ChannelInfo *channelItem = item->GetData().value<ChannelInfo *>();
+        auto *channelItem = item->GetData().value<ChannelInfo *>();
         m_currentItem = channelItem;
     }
 
@@ -396,7 +394,7 @@ void ChannelRecPriority::updateInfo(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    ChannelInfo *channelItem = item->GetData().value<ChannelInfo *>();
+    auto *channelItem = item->GetData().value<ChannelInfo *>();
     if (!m_channelData.isEmpty() && channelItem)
     {
         QString rectype;
@@ -429,14 +427,14 @@ void ChannelRecPriority::upcoming()
     if (!item)
         return;
 
-    ChannelInfo *chanInfo = item->GetData().value<ChannelInfo *>();
+    auto *chanInfo = item->GetData().value<ChannelInfo *>();
 
     if (!chanInfo || chanInfo->m_chanid < 1)
         return;
 
     QString chanID = QString("%1").arg(chanInfo->m_chanid);
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    ProgLister *pl = new ProgLister(mainStack, plChannel, chanID, "");
+    auto *pl = new ProgLister(mainStack, plChannel, chanID, "");
     if (pl->Create())
         mainStack->AddScreen(pl);
     else
@@ -448,7 +446,7 @@ void ChannelRecPriority::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
+        auto *dce = (DialogCompletionEvent*)(event);
 
         QString resultid  = dce->GetId();
         int     buttonnum = dce->GetResult();

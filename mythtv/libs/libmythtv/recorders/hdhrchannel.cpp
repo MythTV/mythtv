@@ -18,6 +18,8 @@
 
 // C++ includes
 #include <algorithm>
+#include <utility>
+
 using namespace std;
 
 // MythTV includes
@@ -30,9 +32,9 @@ using namespace std;
 
 #define LOC     QString("HDHRChan[%1](%2): ").arg(m_inputid).arg(HDHRChannel::GetDevice())
 
-HDHRChannel::HDHRChannel(TVRec *parent, const QString &device)
+HDHRChannel::HDHRChannel(TVRec *parent, QString device)
     : DTVChannel(parent),
-      m_device_id(device)
+      m_device_id(std::move(device))
 {
     RegisterForMaster(m_device_id);
 }

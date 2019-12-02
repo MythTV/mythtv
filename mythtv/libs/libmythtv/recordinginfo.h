@@ -29,7 +29,7 @@ class RecordingRule;
 class RecordingInfo;
 class RecordingRule;
 
-typedef AutoDeleteDeque<RecordingInfo*> RecordingList;
+using RecordingList = AutoDeleteDeque<RecordingInfo*>;
 
 class MTV_PUBLIC RecordingInfo : public ProgramInfo
 {
@@ -176,21 +176,21 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
 
     // Create ProgramInfo that overlaps the desired time on the
     // specified channel id.
-    typedef enum {
+    enum LoadStatus {
         kNoProgram           = 0,
         kFoundProgram        = 1,
         kFakedLiveTVProgram  = 2,
         kFakedZeroMinProgram = 3,
-    } LoadStatus;
+    };
     RecordingInfo(uint _chanid, const QDateTime &desiredts,
                   bool genUnknown, uint maxHours = 0,
                   LoadStatus *status = nullptr);
 
-    typedef enum {
+    enum SpecialRecordingGroups {
         kDefaultRecGroup     = 1, // Auto-increment columns start at one
         kLiveTVRecGroup      = 2,
         kDeletedRecGroup     = 3,
-    } SpecialRecordingGroups;
+    };
 
   public:
     RecordingInfo &operator=(const RecordingInfo &other)

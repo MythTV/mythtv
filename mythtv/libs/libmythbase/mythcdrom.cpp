@@ -136,15 +136,15 @@ void MythCDROM::setDeviceSpeed(const char *devicePath, int speed)
         .arg(devicePath).arg(speed));
 }
 
-typedef struct
+struct blockInput_t
 {
     udfread_block_input m_input;  /* This *must* be the first entry in the struct */
     RemoteFile*         m_file;
-} blockInput_t;
+};
 
 static int _def_close(udfread_block_input *p_gen)
 {
-    blockInput_t *p = (blockInput_t *)p_gen;
+    auto *p = (blockInput_t *)p_gen;
     int result = -1;
 
     if (p && p->m_file)
@@ -159,7 +159,7 @@ static int _def_close(udfread_block_input *p_gen)
 
 static uint32_t _def_size(udfread_block_input *p_gen)
 {
-    blockInput_t *p = (blockInput_t *)p_gen;
+    auto *p = (blockInput_t *)p_gen;
 
     return (uint32_t)(p->m_file->GetRealFileSize() / UDF_BLOCK_SIZE);
 }
@@ -168,7 +168,7 @@ static int _def_read(udfread_block_input *p_gen, uint32_t lba, void *buf, uint32
 {
     (void)flags;
     int result = -1;
-    blockInput_t *p = (blockInput_t *)p_gen;
+    auto *p = (blockInput_t *)p_gen;
 
     if (p && p->m_file && (p->m_file->Seek(lba * UDF_BLOCK_SIZE, SEEK_SET) != -1))
         result = p->m_file->Read(buf, nblocks * UDF_BLOCK_SIZE) / UDF_BLOCK_SIZE;

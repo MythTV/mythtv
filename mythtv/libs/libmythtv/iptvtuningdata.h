@@ -15,15 +15,15 @@
 class MTV_PUBLIC IPTVTuningData
 {
   public:
-    typedef enum FECType
+    enum FECType
     {
         kNone,
         kRFC2733,
         kRFC5109,
         kSMPTE2022,
-    } FECType;
+    };
 
-    typedef enum IPTVType
+    enum IPTVType
     {
         kData = 1,
         kRFC2733_1,
@@ -32,9 +32,9 @@ class MTV_PUBLIC IPTVTuningData
         kRFC5109_2,
         kSMPTE2022_1,
         kSMPTE2022_2,
-    } IPTVType;
+    };
 
-    typedef enum IPTVProtocol
+    enum IPTVProtocol
     {
         inValid = 0,
         udp,
@@ -42,15 +42,15 @@ class MTV_PUBLIC IPTVTuningData
         rtsp,
         http_ts,
         http_hls
-    } IPTVProtocol;
+    };
 
-    IPTVTuningData() : m_fec_type(kNone), m_protocol(inValid)
+    IPTVTuningData()
     {
         memset(&m_bitrate, 0, sizeof(m_bitrate));
     }
 
     IPTVTuningData(const QString &data_url, IPTVProtocol protocol) :
-        m_data_url(data_url),  m_fec_type(kNone), m_protocol(protocol)
+        m_dataUrl(data_url),  m_protocol(protocol)
     {
         memset(&m_bitrate, 0, sizeof(m_bitrate));
     }
@@ -59,8 +59,8 @@ class MTV_PUBLIC IPTVTuningData
                    const FECType fec_type,
                    const QString &fec_url0, uint fec_bitrate0,
                    const QString &fec_url1, uint fec_bitrate1) :
-        m_data_url(data_url),
-        m_fec_type(fec_type), m_fec_url0(fec_url0), m_fec_url1(fec_url1)
+        m_dataUrl(data_url),
+        m_fecType(fec_type), m_fecUrl0(fec_url0), m_fecUrl1(fec_url1)
     {
         GuessProtocol();
         m_bitrate[0] = data_bitrate;
@@ -73,23 +73,23 @@ class MTV_PUBLIC IPTVTuningData
                    const QString &fec_url0, uint fec_bitrate0,
                    const QString &fec_url1, uint fec_bitrate1,
                    const IPTVProtocol protocol) :
-        m_data_url(data_url),
-        m_fec_type(kNone), m_fec_url0(fec_url0), m_fec_url1(fec_url1),
+        m_dataUrl(data_url),
+        m_fecUrl0(fec_url0), m_fecUrl1(fec_url1),
         m_protocol(protocol)
     {
         m_bitrate[0] = data_bitrate;
         m_bitrate[1] = fec_bitrate0;
         m_bitrate[2] = fec_bitrate1;
         if (fec_type.toLower() == "rfc2733")
-            m_fec_type = kRFC2733;
+            m_fecType = kRFC2733;
         else if (fec_type.toLower() == "rfc5109")
-            m_fec_type = kRFC5109;
+            m_fecType = kRFC5109;
         else if (fec_type.toLower() == "smpte2022")
-            m_fec_type = kSMPTE2022;
+            m_fecType = kSMPTE2022;
         else
         {
-            m_fec_url0.clear();
-            m_fec_url1.clear();
+            m_fecUrl0.clear();
+            m_fecUrl1.clear();
         }
     }
 
@@ -126,13 +126,13 @@ class MTV_PUBLIC IPTVTuningData
 
     void SetDataURL(const QUrl &url)
     {
-        m_data_url = url;
+        m_dataUrl = url;
         GuessProtocol();
     }
 
-    QUrl GetDataURL(void) const { return m_data_url; }
-    QUrl GetFECURL0(void) const { return m_fec_url0; }
-    QUrl GetFECURL1(void) const { return m_fec_url1; }
+    QUrl GetDataURL(void) const { return m_dataUrl; }
+    QUrl GetFECURL0(void) const { return m_fecUrl0; }
+    QUrl GetFECURL1(void) const { return m_fecUrl1; }
     QUrl GetURL(uint i) const
     {
         if (0 == i)
@@ -146,13 +146,13 @@ class MTV_PUBLIC IPTVTuningData
     }
     uint GetBitrate(uint i) const { return m_bitrate[i]; }
 
-    FECType GetFECType(void) const { return m_fec_type; }
+    FECType GetFECType(void) const { return m_fecType; }
 
     QString GetFECTypeString(uint i) const
     {
         if (0 == i)
             return "data";
-        switch (m_fec_type)
+        switch (m_fecType)
         {
             case kNone: return QString();
             case kRFC2733: return QString("rfc2733-%1").arg(i);
@@ -166,10 +166,10 @@ class MTV_PUBLIC IPTVTuningData
 
     bool IsValid(void) const
     {
-        bool ret = (m_data_url.isValid() && (IsUDP() || IsRTP() || IsRTSP() || IsHLS() || IsHTTPTS()));
+        bool ret = (m_dataUrl.isValid() && (IsUDP() || IsRTP() || IsRTSP() || IsHLS() || IsHTTPTS()));
 
         LOG(VB_CHANNEL, LOG_DEBUG, QString("IPTVTuningdata (%1): IsValid = %2")
-            .arg(m_data_url.toString())
+            .arg(m_dataUrl.toString())
             .arg(ret ? "true" : "false"));
 
         return ret;
@@ -202,17 +202,17 @@ class MTV_PUBLIC IPTVTuningData
 
     void GuessProtocol(void)
     {
-        if (!m_data_url.isValid())
+        if (!m_dataUrl.isValid())
             m_protocol = IPTVTuningData::inValid;
-        else if (m_data_url.scheme() == "udp")
+        else if (m_dataUrl.scheme() == "udp")
             m_protocol = IPTVTuningData::udp;
-        else if (m_data_url.scheme() == "rtp")
+        else if (m_dataUrl.scheme() == "rtp")
             m_protocol = IPTVTuningData::rtp;
-        else if (m_data_url.scheme() == "rtsp")
+        else if (m_dataUrl.scheme() == "rtsp")
             m_protocol = IPTVTuningData::rtsp;
-        else if (((m_data_url.scheme() == "http") || (m_data_url.scheme() == "https")) && IsHLSPlaylist())
+        else if (((m_dataUrl.scheme() == "http") || (m_dataUrl.scheme() == "https")) && IsHLSPlaylist())
             m_protocol = IPTVTuningData::http_hls;
-        else if ((m_data_url.scheme() == "http") || (m_data_url.scheme() == "https"))
+        else if ((m_dataUrl.scheme() == "http") || (m_dataUrl.scheme() == "https"))
             m_protocol = IPTVTuningData::http_ts;
         else
             m_protocol = IPTVTuningData::inValid;
@@ -232,7 +232,7 @@ class MTV_PUBLIC IPTVTuningData
             return false;
         }
 
-        QString url = m_data_url.toString();
+        QString url = m_dataUrl.toString();
 
         // check url is valid for a playlist before downloading (see trac ticket #12856)
         if(url.endsWith(".m3u8", Qt::CaseInsensitive) ||
@@ -264,12 +264,12 @@ class MTV_PUBLIC IPTVTuningData
     }
 
   protected:
-    QUrl         m_data_url;
-    FECType      m_fec_type;
-    QUrl         m_fec_url0;
-    QUrl         m_fec_url1;
+    QUrl         m_dataUrl;
+    FECType      m_fecType    {kNone};
+    QUrl         m_fecUrl0;
+    QUrl         m_fecUrl1;
     uint         m_bitrate[3];
-    IPTVProtocol m_protocol;
+    IPTVProtocol m_protocol   {inValid};
 };
 
 #endif // _IPTV_TUNING_DATA_H_

@@ -19,7 +19,7 @@
 TagLib::WavPack::File *MetaIOWavPack::OpenFile(const QString &filename)
 {
     QByteArray fname = filename.toLocal8Bit();
-    TagLib::WavPack::File *wpfile = new TagLib::WavPack::File(fname.constData());
+    auto *wpfile = new TagLib::WavPack::File(fname.constData());
 
     if (!wpfile->isOpen())
     {
@@ -97,7 +97,7 @@ MusicMetadata* MetaIOWavPack::read(const QString &filename)
         return nullptr;
     }
 
-    MusicMetadata *metadata = new MusicMetadata(filename);
+    auto *metadata = new MusicMetadata(filename);
 
     ReadGenericMetadata(tag, metadata);
 

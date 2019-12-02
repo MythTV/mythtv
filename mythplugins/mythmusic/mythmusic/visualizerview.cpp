@@ -91,7 +91,7 @@ void VisualizerView::ShowMenu(void)
 {
     QString label = tr("Actions");
 
-    MythMenu *menu = new MythMenu(label, this, "menu");
+    auto *menu = new MythMenu(label, this, "menu");
 
     menu->AddItem(tr("Change Visualizer"), nullptr, createVisualizerMenu());
     menu->AddItem(tr("Show Track Info"), SLOT(showTrackInfoPopup()));
@@ -99,7 +99,7 @@ void VisualizerView::ShowMenu(void)
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    MythDialogBox *menuPopup = new MythDialogBox(menu, popupStack, "actionmenu");
+    auto *menuPopup = new MythDialogBox(menu, popupStack, "actionmenu");
 
     if (menuPopup->Create())
         popupStack->AddScreen(menuPopup);
@@ -111,7 +111,7 @@ void VisualizerView::showTrackInfoPopup(void)
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    TrackInfoPopup *popup = new TrackInfoPopup(popupStack, gPlayer->getCurrentMetadata());
+    auto *popup = new TrackInfoPopup(popupStack, gPlayer->getCurrentMetadata());
 
     if (!popup->Create())
     {

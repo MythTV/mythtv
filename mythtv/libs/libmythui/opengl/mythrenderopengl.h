@@ -27,14 +27,14 @@
 #include "mythuianimation.h"
 #include "mythegl.h"
 
-typedef enum
+enum GLFeatures
 {
     kGLFeatNone    = 0x0000,
     kGLBufferMap   = 0x0001,
     kGLExtRects    = 0x0002,
     kGLExtRGBA16   = 0x0004,
     kGLExtSubimage = 0x0008
-} GLFeatures;
+};
 
 #define TEX_OFFSET 8
 
@@ -66,7 +66,7 @@ class MUI_PUBLIC MythGLTexture
     Q_DISABLE_COPY(MythGLTexture)
 };
 
-typedef enum
+enum DefaultShaders
 {
     kShaderSimple  = 0,
     kShaderDefault,
@@ -75,7 +75,7 @@ typedef enum
     kShaderVertLine,
     kShaderHorizLine,
     kShaderCount,
-} DefaultShaders;
+};
 
 class QWindow;
 class QPaintDevice;
@@ -118,12 +118,12 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
 
     MythGLTexture* CreateTextureFromQImage(QImage *Image);
     QSize GetTextureSize(const QSize &size, bool Normalised);
-    int   GetTextureDataSize(MythGLTexture *Texture);
+    static int GetTextureDataSize(MythGLTexture *Texture);
     void  SetTextureFilters(MythGLTexture *Texture, QOpenGLTexture::Filter Filter,
                             QOpenGLTexture::WrapMode Wrap = QOpenGLTexture::ClampToEdge);
     void  ActiveTexture(GLuint ActiveTex);
     void  DeleteTexture(MythGLTexture *Texture);
-    int   GetBufferSize(QSize Size, QOpenGLTexture::PixelFormat Format, QOpenGLTexture::PixelType Type);
+    static int GetBufferSize(QSize Size, QOpenGLTexture::PixelFormat Format, QOpenGLTexture::PixelType Type);
 
     QOpenGLFramebufferObject* CreateFramebuffer(QSize &Size, GLenum InternalFormat = 0);
     MythGLTexture* CreateFramebufferTexture(QOpenGLFramebufferObject *Framebuffer);
@@ -161,8 +161,8 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     void  Init2DState(void);
     void  SetMatrixView(void);
     void  DeleteFramebuffers(void);
-    bool  UpdateTextureVertices(MythGLTexture *Texture, const QRect &Source,
-                                const QRect &Destination, int Rotation);
+    static bool UpdateTextureVertices(MythGLTexture *Texture, const QRect &Source,
+                                      const QRect &Destination, int Rotation);
     GLfloat* GetCachedVertices(GLuint Type, const QRect &Area);
     void  ExpireVertices(int Max = 0);
     void  GetCachedVBO(GLuint Type, const QRect &Area);
@@ -176,14 +176,14 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
                                        GLboolean Normalize, GLsizei Stride,
                                        const GLuint Value);
     // Framebuffers
-    QOpenGLFramebufferObject    *m_activeFramebuffer;
+    QOpenGLFramebufferObject    *m_activeFramebuffer { nullptr };
 
     // Synchronisation
-    GLuint                       m_fence;
+    GLuint                       m_fence { 0 };
 
     // Shaders
     QOpenGLShaderProgram*        m_defaultPrograms[kShaderCount];
-    QOpenGLShaderProgram*        m_activeProgram;
+    QOpenGLShaderProgram*        m_activeProgram { nullptr };
 
     // Vertices
     QMap<uint64_t,GLfloat*>      m_cachedVertices;
@@ -192,41 +192,41 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     QList<uint64_t>              m_vboExpiry;
 
     // Locking
-    QMutex     m_lock;
-    int        m_lockLevel;
+    QMutex     m_lock { QMutex::Recursive };
+    int        m_lockLevel { 0 };
 
     // profile
-    QOpenGLFunctions::OpenGLFeatures m_features;
-    int        m_extraFeatures;
-    int        m_extraFeaturesUsed;
-    int        m_maxTextureSize;
-    int        m_maxTextureUnits;
-    int        m_colorDepth;
-    bool       m_coreProfile;
+    QOpenGLFunctions::OpenGLFeatures m_features { Multitexture };
+    int        m_extraFeatures { kGLFeatNone };
+    int        m_extraFeaturesUsed { kGLFeatNone };
+    int        m_maxTextureSize { 0 };
+    int        m_maxTextureUnits { 0 };
+    int        m_colorDepth { 0 };
+    bool       m_coreProfile { false };
 
     // State
     QRect      m_viewport;
-    GLuint     m_activeTexture;
-    bool       m_blend;
-    int32_t    m_background;
-    bool       m_fullRange;
+    GLuint     m_activeTexture { 0 };
+    bool       m_blend { false };
+    int32_t    m_background { 0x00000000 };
+    bool       m_fullRange { true };
     QMatrix4x4 m_projection;
     QStack<QMatrix4x4> m_transforms;
     QMatrix4x4 m_parameters;
     QHash<QString,QMatrix4x4> m_cachedMatrixUniforms;
     QHash<QOpenGLShaderProgram*, QHash<QByteArray, GLint> > m_cachedUniformLocations;
-    GLuint     m_vao; // core profile only
+    GLuint     m_vao { 0 }; // core profile only
 
     // For Performance improvement set false to disable glFlush.
     // Needed for Raspberry pi
-    bool       m_flushEnabled;
+    bool       m_flushEnabled { true };
 
   private:
     Q_DISABLE_COPY(MythRenderOpenGL)
     void DebugFeatures (void);
-    QOpenGLDebugLogger *m_openglDebugger;
-    QOpenGLDebugMessage::Types m_openGLDebuggerFilter;
-    QWindow *m_window;
+    QOpenGLDebugLogger *m_openglDebugger { nullptr };
+    QOpenGLDebugMessage::Types m_openGLDebuggerFilter { QOpenGLDebugMessage::InvalidType };
+    QWindow *m_window { nullptr };
 };
 
 class MUI_PUBLIC OpenGLLocker

@@ -56,11 +56,11 @@ enum ImageSortOrder {
 
 
 // Convenience types
-typedef QList<int>                ImageIdList;
-typedef QPair<QString, QString>   StringPair;
-typedef QHash<QString, QString>   NameHash;
-typedef QMap<int, QString>        StringMap;
-typedef QPair<int, QString>       ThumbPair;
+using ImageIdList = QList<int>;
+using StringPair  = QPair<QString, QString>;
+using NameHash    = QHash<QString, QString>;
+using StringMap   = QMap<int, QString>;
+using ThumbPair   = QPair<int, QString>;
 
 
 //! Represents a picture, video or directory
@@ -170,14 +170,14 @@ private:
 };
 
 // Convenience containers
-typedef QSharedPointer<ImageItem>  ImagePtr;
-typedef QList<ImagePtr>            ImageList;
-typedef QHash<QString, ImagePtr>   ImageHash;
+using ImagePtr  = QSharedPointer<ImageItem>;
+using ImageList = QList<ImagePtr>;
+using ImageHash = QHash<QString, ImagePtr>;
 
 // Read-only images alias
-typedef const ImageItem            ImageItemK;
-typedef QSharedPointer<ImageItemK> ImagePtrK;
-typedef QList<ImagePtrK>           ImageListK;
+using ImageItemK = const ImageItem;
+using ImagePtrK  = QSharedPointer<ImageItemK>;
+using ImageListK = QList<ImagePtrK>;
 
 Q_DECLARE_METATYPE(ImagePtrK)
 

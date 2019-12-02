@@ -159,7 +159,7 @@ void DVBStreamHandler::RunTS(void)
 
     int remainder = 0;
     int buffer_size = TSPacket::kSize * 15000;
-    unsigned char *buffer = new unsigned char[buffer_size];
+    auto *buffer = new unsigned char[buffer_size];
     if (!buffer)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to allocate memory");
@@ -354,7 +354,7 @@ void DVBStreamHandler::RunSR(void)
     LOG(VB_RECORD, LOG_DEBUG, LOC + "RunSR(): " + "end");
 }
 
-typedef vector<uint> pid_list_t;
+using pid_list_t = vector<uint>;
 
 static pid_list_t::iterator find(
     const PIDInfoMap &map,
@@ -407,14 +407,12 @@ void DVBStreamHandler::CycleFiltersByPriority(void)
             // if we can open a filter, just do it
 
             // find first closed filter after first open an filter "k"
-            pid_list_t::iterator open = find(
-                m_pid_info, priority_queue[i],
+            auto open = find(m_pid_info, priority_queue[i],
                 priority_queue[i].begin(), priority_queue[i].end(), true);
             if (open == priority_queue[i].end())
                 open = priority_queue[i].begin();
 
-            pid_list_t::iterator closed = find(
-                m_pid_info, priority_queue[i],
+            auto closed = find(m_pid_info, priority_queue[i],
                 open, priority_queue[i].end(), false);
 
             if (closed == priority_queue[i].end())
@@ -429,7 +427,7 @@ void DVBStreamHandler::CycleFiltersByPriority(void)
 
             // if we can't open a filter, try to close a lower priority one
             bool freed = false;
-            for (PIDPriority j = (PIDPriority)((int)i - 1);
+            for (auto j = (PIDPriority)((int)i - 1);
                  (j > kPIDPriorityNone) && !freed;
                  j = (PIDPriority)((int)j-1))
             {

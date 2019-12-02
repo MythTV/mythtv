@@ -45,13 +45,13 @@ class CDEjectorThread: public MThread
         Ripper    *m_parent {nullptr};
 };
 
-typedef struct
+struct RipTrack
 {
     MusicMetadata *metadata;
     bool           active;
     int            length;
     bool           isNew;
-} RipTrack;
+};
 
 Q_DECLARE_METATYPE(RipTrack *)
 

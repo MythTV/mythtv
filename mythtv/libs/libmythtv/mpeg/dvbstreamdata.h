@@ -125,7 +125,7 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
     void CacheBAT(BouquetAssociationTable*);
 
   protected:
-    bool DeleteCachedTable(PSIPTable *psip) const override; // MPEGStreamData
+    bool DeleteCachedTable(const PSIPTable *psip) const override; // MPEGStreamData
 
   private:
     /// DVB table monitoring

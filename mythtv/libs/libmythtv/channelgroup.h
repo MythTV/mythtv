@@ -29,7 +29,7 @@ class MTV_PUBLIC ChannelGroupItem
     uint    m_grpid;
     QString m_name;
 };
-typedef vector<ChannelGroupItem> ChannelGroupList;
+using ChannelGroupList = vector<ChannelGroupItem>;
 
 /** \class ChannelGroup
 */

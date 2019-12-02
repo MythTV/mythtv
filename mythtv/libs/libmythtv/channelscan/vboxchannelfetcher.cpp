@@ -1,6 +1,7 @@
 // Std C headers
 #include <cmath>
 #include <unistd.h>
+#include <utility>
 
 // Qt headers
 #include <QFile>
@@ -18,11 +19,11 @@
 
 #define LOC QString("VBoxChanFetch: ")
 
-VBoxChannelFetcher::VBoxChannelFetcher(uint cardid, const QString &inputname, uint sourceid,
+VBoxChannelFetcher::VBoxChannelFetcher(uint cardid, QString inputname, uint sourceid,
                                        bool ftaOnly, ServiceRequirements serviceType,
                                        ScanMonitor *monitor) :
     m_scan_monitor(monitor),
-    m_cardid(cardid),       m_inputname(inputname),
+    m_cardid(cardid),       m_inputname(std::move(inputname)),
     m_sourceid(sourceid),   m_ftaOnly(ftaOnly),
     m_serviceType(serviceType),
     m_thread(new MThread("VBoxChannelFetcher", this))

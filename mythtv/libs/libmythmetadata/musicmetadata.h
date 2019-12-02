@@ -51,7 +51,7 @@ class META_PUBLIC AlbumArtImage
      bool      m_embedded    {false};
 };
 
-typedef QList<AlbumArtImage*> AlbumArtList;
+using AlbumArtList = QList<AlbumArtImage*>;
 
 enum RepoType
 {
@@ -73,7 +73,7 @@ enum RepoType
 #define STREAMUPDATEURL "https://services.mythtv.org/music/data/?data=streams"
 #define STREAMURLCOUNT 5
 
-typedef QString UrlList[STREAMURLCOUNT];
+using UrlList = QString[STREAMURLCOUNT];
 
 class META_PUBLIC MusicMetadata
 {
@@ -81,7 +81,7 @@ class META_PUBLIC MusicMetadata
 
   public:
 
-    typedef uint32_t IdType;
+    using IdType = uint32_t;
 
     MusicMetadata(QString lfilename = "", QString lartist = "", QString lcompilation_artist = "",
              QString lalbum = "", QString ltitle = "", QString lgenre = "",
@@ -383,7 +383,7 @@ bool operator!=(MusicMetadata& a, MusicMetadata& b);
 Q_DECLARE_METATYPE(MusicMetadata *)
 Q_DECLARE_METATYPE(MusicMetadata)
 
-typedef QList<MusicMetadata*> MetadataPtrList;
+using MetadataPtrList = QList<MusicMetadata*>;
 Q_DECLARE_METATYPE(MetadataPtrList *)
 Q_DECLARE_METATYPE(ImageType);
 
@@ -445,7 +445,7 @@ class META_PUBLIC AllMusic
     int m_numPcs                               {0};
     int m_numLoaded                            {0};
 
-    typedef QMap<int, MusicMetadata*> MusicMap;
+    using MusicMap = QMap<int, MusicMetadata*>;
     MusicMap m_music_map;
 
     // cd stuff
@@ -466,7 +466,7 @@ class META_PUBLIC AllMusic
 #endif
 };
 
-typedef QList<MusicMetadata*> StreamList;
+using StreamList = QList<MusicMetadata*>;
 
 class META_PUBLIC AllStream
 {

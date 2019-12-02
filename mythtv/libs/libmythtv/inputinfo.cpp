@@ -23,7 +23,7 @@ bool InputInfo::FromStringList(QStringList::const_iterator &it,
     m_sourceid      = (*it).toUInt(); NEXT();
     m_inputid       = (*it).toUInt(); NEXT();
     m_mplexid       = (*it).toUInt(); NEXT();
-    m_livetvorder   = (*it).toUInt(); NEXT();
+    m_liveTvOrder   = (*it).toUInt(); NEXT();
 
     m_displayName   = *it;
     m_displayName   = (m_displayName == "<EMPTY>") ? QString() : m_displayName;
@@ -44,7 +44,7 @@ void InputInfo::ToStringList(QStringList &list) const
     list.push_back(QString::number(m_sourceid));
     list.push_back(QString::number(m_inputid));
     list.push_back(QString::number(m_mplexid));
-    list.push_back(QString::number(m_livetvorder));
+    list.push_back(QString::number(m_liveTvOrder));
     list.push_back(m_displayName.isEmpty() ? "<EMPTY>" : m_displayName);
     list.push_back(QString::number(m_recPriority));
     list.push_back(QString::number(m_scheduleOrder));

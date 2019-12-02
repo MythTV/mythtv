@@ -65,8 +65,8 @@ void EITScanner::TeardownAll(void)
  */
 void EITScanner::run(void)
 {
-    static const uint  sz[] = { 2000, 1800, 1600, 1400, 1200, };
-    static const float rt[] = { 0.0F, 0.2F, 0.4F, 0.6F, 0.8F, };
+    static constexpr uint  kSz[] = { 2000, 1800, 1600, 1400, 1200, };
+    static constexpr float kRt[] = { 0.0F, 0.2F, 0.4F, 0.6F, 0.8F, };
 
     m_lock.lock();
 
@@ -81,9 +81,9 @@ void EITScanner::run(void)
         float rate = 1.0F;
         for (uint i = 0; i < 5; i++)
         {
-            if (list_size >= sz[i])
+            if (list_size >= kSz[i])
             {
-                rate = rt[i];
+                rate = kRt[i];
                 break;
             }
         }
@@ -131,11 +131,11 @@ void EITScanner::run(void)
 
             if (!(*m_activeScanNextChan).isEmpty())
             {
-                m_eitHelper->WriteEITCache();
-                if (rec->QueueEITChannelChange(*m_activeScanNextChan))
+                EITHelper::WriteEITCache();
+                if (m_rec->QueueEITChannelChange(*m_activeScanNextChan))
                 {
                     m_eitHelper->SetChannelID(ChannelUtil::GetChanID(
-                        rec->GetSourceID(), *m_activeScanNextChan));
+                        m_rec->GetSourceID(), *m_activeScanNextChan));
                     LOG(VB_EIT, LOG_INFO,
                         LOC_ID + QString("Now looking for EIT data on "
                                          "multiplex of channel %1")
@@ -154,9 +154,9 @@ void EITScanner::run(void)
 
             // 24 hours ago
 #if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-            m_eitHelper->PruneEITCache(m_activeScanNextTrig.toTime_t() - 86400);
+            EITHelper::PruneEITCache(m_activeScanNextTrig.toTime_t() - 86400);
 #else
-            m_eitHelper->PruneEITCache(m_activeScanNextTrig.toSecsSinceEpoch() - 86400);
+            EITHelper::PruneEITCache(m_activeScanNextTrig.toSecsSinceEpoch() - 86400);
 #endif
         }
 
@@ -226,14 +226,14 @@ void EITScanner::StopPassiveScan(void)
     }
     m_channel = nullptr;
 
-    m_eitHelper->WriteEITCache();
+    EITHelper::WriteEITCache();
     m_eitHelper->SetChannelID(0);
     m_eitHelper->SetSourceID(0);
 }
 
 void EITScanner::StartActiveScan(TVRec *_rec, uint max_seconds_per_source)
 {
-    rec = _rec;
+    m_rec = _rec;
 
     if (m_activeScanChannels.isEmpty())
     {
@@ -254,7 +254,7 @@ void EITScanner::StartActiveScan(TVRec *_rec, uint max_seconds_per_source)
             "GROUP BY mplexid "
             "ORDER BY capturecard.sourceid, mplexid, "
             "         atsc_major_chan, atsc_minor_chan ");
-        query.bindValue(":CARDID", rec->GetInputId());
+        query.bindValue(":CARDID", m_rec->GetInputId());
 
         if (!query.exec() || !query.isActive())
         {
@@ -311,5 +311,5 @@ void EITScanner::StopActiveScan(void)
     while (!m_activeScan && !m_activeScanStopped)
         m_activeScanCond.wait(&m_lock, 100);
 
-    rec = nullptr;
+    m_rec = nullptr;
 }

@@ -36,8 +36,8 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext **Context,
                                                 uint            StreamType)
 {
     bool decodeonly = Decoder == "nvdec-dec";
-    MythCodecID success = static_cast<MythCodecID>((decodeonly ? kCodec_MPEG1_NVDEC_DEC : kCodec_MPEG1_NVDEC) + (StreamType - 1));
-    MythCodecID failure = static_cast<MythCodecID>(kCodec_MPEG1 + (StreamType - 1));
+    auto success = static_cast<MythCodecID>((decodeonly ? kCodec_MPEG1_NVDEC_DEC : kCodec_MPEG1_NVDEC) + (StreamType - 1));
+    auto failure = static_cast<MythCodecID>(kCodec_MPEG1 + (StreamType - 1));
 
     // no brainers
     if (!Decoder.startsWith("nvdec") || getenv("NO_NVDEC") || !HaveNVDEC() || IsUnsupportedProfile(*Context))
@@ -81,7 +81,7 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext **Context,
     {
         // iterate over known decoder capabilities
         s_NVDECLock->lock();
-        vector<MythNVDECCaps>::const_iterator it = s_NVDECDecoderCaps.cbegin();
+        auto it = s_NVDECDecoderCaps.cbegin();
         for ( ; it != s_NVDECDecoderCaps.cend(); ++it)
         {
             if (((*it).m_codec == cudacodec) && ((*it).m_depth == depth) && ((*it).m_format == cudaformat))
@@ -183,10 +183,10 @@ int MythNVDECContext::InitialiseDecoder(AVCodecContext *Context)
     }
 
     // Set release method, interop and CUDA context
-    AVHWDeviceContext* hwdevicecontext = reinterpret_cast<AVHWDeviceContext*>(hwdeviceref->data);
+    auto* hwdevicecontext = reinterpret_cast<AVHWDeviceContext*>(hwdeviceref->data);
     hwdevicecontext->free = &MythCodecContext::DeviceContextFinished;
     hwdevicecontext->user_opaque = interop;
-    AVCUDADeviceContext *devicehwctx = reinterpret_cast<AVCUDADeviceContext*>(hwdevicecontext->hwctx);
+    auto *devicehwctx = reinterpret_cast<AVCUDADeviceContext*>(hwdevicecontext->hwctx);
     devicehwctx->cuda_ctx = interop->GetCUDAContext();
     devicehwctx->stream = nullptr;
 
@@ -221,7 +221,7 @@ int MythNVDECContext::HwDecoderInit(AVCodecContext *Context)
         return MythCodecContext::InitialiseDecoder2(Context, MythNVDECContext::InitialiseDecoder,
                                                  "Create NVDEC decoder");
     }
-    else if (codec_is_nvdec_dec(m_codecID))
+    if (codec_is_nvdec_dec(m_codecID))
     {
         AVBufferRef *context = MythCodecContext::CreateDevice(AV_HWDEVICE_TYPE_CUDA, nullptr,
                                                            gCoreContext->GetSetting("NVDECDevice"));
@@ -301,12 +301,10 @@ void MythNVDECContext::SetDeinterlacing(AVCodecContext *Context,
         {
             if (doubledeint)
             {
-                if (doublepref & DEINT_DRIVER)
+                if (doublepref & (DEINT_DRIVER | DEINT_CPU))
                     deinterlacer = doubledeint;
                 else if (doublepref & DEINT_SHADER)
                     other = true;
-                else if (doublepref & DEINT_CPU)
-                    deinterlacer = doubledeint;
             }
             else
             {
@@ -316,12 +314,10 @@ void MythNVDECContext::SetDeinterlacing(AVCodecContext *Context,
 
         if (!deinterlacer && !other && singledeint)
         {
-            if (singlepref & DEINT_DRIVER)
+            if (singlepref & (DEINT_DRIVER | DEINT_CPU))
                 deinterlacer = singledeint;
             else if (singlepref & DEINT_SHADER)
                 { }
-            else if (singlepref & DEINT_CPU)
-                deinterlacer = singledeint;
         }
     }
 
@@ -344,7 +340,7 @@ void MythNVDECContext::SetDeinterlacing(AVCodecContext *Context,
     }
 }
 
-void MythNVDECContext::PostProcessFrame(AVCodecContext*, VideoFrame *Frame)
+void MythNVDECContext::PostProcessFrame(AVCodecContext* /*Context*/, VideoFrame *Frame)
 {
     // Remove interlacing flags and set deinterlacer if necessary
     if (Frame && m_deinterlacer)
@@ -357,7 +353,7 @@ void MythNVDECContext::PostProcessFrame(AVCodecContext*, VideoFrame *Frame)
     }
 }
 
-bool MythNVDECContext::IsDeinterlacing(bool &DoubleRate, bool)
+bool MythNVDECContext::IsDeinterlacing(bool &DoubleRate, bool /*unused*/)
 {
     if (m_deinterlacer != DEINT_NONE)
     {
@@ -368,7 +364,7 @@ bool MythNVDECContext::IsDeinterlacing(bool &DoubleRate, bool)
     return false;
 }
 
-enum AVPixelFormat MythNVDECContext::GetFormat(AVCodecContext*, const AVPixelFormat *PixFmt)
+enum AVPixelFormat MythNVDECContext::GetFormat(AVCodecContext* /*Contextconst*/, const AVPixelFormat *PixFmt)
 {
     while (*PixFmt != AV_PIX_FMT_NONE)
     {
@@ -385,7 +381,7 @@ bool MythNVDECContext::RetrieveFrame(AVCodecContext *Context, VideoFrame *Frame,
         return false;
     if (codec_is_nvdec_dec(m_codecID))
         return RetrieveHWFrame(Frame, AvFrame);
-    else if (codec_is_nvdec(m_codecID))
+    if (codec_is_nvdec(m_codecID))
         return GetBuffer(Context, Frame, AvFrame, 0);
     return false;
 }
@@ -396,7 +392,7 @@ bool MythNVDECContext::RetrieveFrame(AVCodecContext *Context, VideoFrame *Frame,
  * frame held in device (GPU) memory. There is no need to call avcodec_default_get_buffer2.
 */
 bool MythNVDECContext::GetBuffer(struct AVCodecContext *Context, VideoFrame *Frame,
-                                 AVFrame *AvFrame, int)
+                                 AVFrame *AvFrame, int /*Flags*/)
 {
     if ((AvFrame->format != AV_PIX_FMT_CUDA) || !AvFrame->data[0])
     {
@@ -407,7 +403,7 @@ bool MythNVDECContext::GetBuffer(struct AVCodecContext *Context, VideoFrame *Fra
     if (!Context || !Frame)
         return false;
 
-    AvFormatDecoder *decoder = static_cast<AvFormatDecoder*>(Context->opaque);
+    auto *decoder = static_cast<AvFormatDecoder*>(Context->opaque);
 
     for (int i = 0; i < 3; i++)
     {
@@ -427,7 +423,7 @@ bool MythNVDECContext::GetBuffer(struct AVCodecContext *Context, VideoFrame *Fra
     // set the pixel format - normally NV12 but P010 for 10bit etc. Set here rather than guessing later.
     if (AvFrame->hw_frames_ctx)
     {
-        AVHWFramesContext *context = reinterpret_cast<AVHWFramesContext*>(AvFrame->hw_frames_ctx->data);
+        auto *context = reinterpret_cast<AVHWFramesContext*>(AvFrame->hw_frames_ctx->data);
         if (context)
             Frame->sw_pix_fmt = context->sw_format;
     }
@@ -465,21 +461,21 @@ MythNVDECContext::MythNVDECCaps::MythNVDECCaps(cudaVideoCodec Codec, uint Depth,
 bool MythNVDECContext::HaveNVDEC(void)
 {
     QMutexLocker locker(s_NVDECLock);
-    static bool checked = false;
-    if (!checked)
+    static bool s_checked = false;
+    if (!s_checked)
     {
         if (gCoreContext->IsUIThread())
             NVDECCheck();
         else
             MythMainWindow::HandleCallback("NVDEC support check", MythNVDECContext::NVDECCheckCallback, nullptr, nullptr);
     }
-    checked = true;
+    s_checked = true;
     return s_NVDECAvailable;
 }
 
-void MythNVDECContext::NVDECCheckCallback(void *Wait, void*, void*)
+void MythNVDECContext::NVDECCheckCallback(void *Wait, void* /*unused*/, void* /*unused*/)
 {
-    QWaitCondition *wait = reinterpret_cast<QWaitCondition*>(Wait);
+    auto *wait = reinterpret_cast<QWaitCondition*>(Wait);
     NVDECCheck();
     if (wait)
         wait->wakeAll();
@@ -544,12 +540,12 @@ void MythNVDECContext::NVDECCheck(void)
             // now iterate over codecs, depths and formats to check support
             for (int codec = cudaVideoCodec_MPEG1; codec < cudaVideoCodec_NumCodecs; ++codec)
             {
-                cudaVideoCodec cudacodec = static_cast<cudaVideoCodec>(codec);
+                auto cudacodec = static_cast<cudaVideoCodec>(codec);
                 if (cudacodec == cudaVideoCodec_JPEG)
                     continue;
                 for (int format = cudaVideoChromaFormat_420; format < cudaVideoChromaFormat_444; ++format)
                 {
-                    cudaVideoChromaFormat cudaformat = static_cast<cudaVideoChromaFormat>(format);
+                    auto cudaformat = static_cast<cudaVideoChromaFormat>(format);
                     for (uint depth = 0; depth < 9; ++depth)
                     {
                         CUVIDDECODECAPS caps;
@@ -560,7 +556,7 @@ void MythNVDECContext::NVDECCheck(void)
                         if (cuvid->cuvidGetDecoderCaps && (cuvid->cuvidGetDecoderCaps(&caps) == CUDA_SUCCESS) &&
                             caps.bIsSupported)
                         {
-                            s_NVDECDecoderCaps.push_back(
+                            s_NVDECDecoderCaps.emplace_back(
                                     MythNVDECCaps(cudacodec, depth, cudaformat,
                                         QSize(caps.nMinWidth, caps.nMinHeight),
                                         QSize(static_cast<int>(caps.nMaxWidth), static_cast<int>(caps.nMaxHeight)),
@@ -575,7 +571,7 @@ void MythNVDECContext::NVDECCheck(void)
                         else if (!cuvid->cuvidGetDecoderCaps)
                         {
                             // dummy - just support everything:)
-                            s_NVDECDecoderCaps.push_back(MythNVDECCaps(cudacodec, depth, cudaformat,
+                            s_NVDECDecoderCaps.emplace_back(MythNVDECCaps(cudacodec, depth, cudaformat,
                                                                        QSize(32, 32), QSize(8192, 8192),
                                                                        (8192 * 8192) / 256));
                         }

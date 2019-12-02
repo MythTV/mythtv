@@ -423,11 +423,11 @@ uint ChannelUtil::CreateMultiplex(uint sourceid, const DTVMultiplex &mux,
         transport_id,                        network_id,
         mux.m_symbolrate,                    mux.m_bandwidth.toChar().toLatin1(),
         mux.m_polarity.toChar().toLatin1(),  mux.m_inversion.toChar().toLatin1(),
-        mux.m_trans_mode.toChar().toLatin1(),
+        mux.m_transMode.toChar().toLatin1(),
         mux.m_fec.toString(),                mux.m_modulation.toString(),
-        mux.m_hierarchy.toChar().toLatin1(), mux.m_hp_code_rate.toString(),
-        mux.m_lp_code_rate.toString(),       mux.m_guard_interval.toString(),
-        mux.m_mod_sys.toString(),            mux.m_rolloff.toString());
+        mux.m_hierarchy.toChar().toLatin1(), mux.m_hpCodeRate.toString(),
+        mux.m_lpCodeRate.toString(),         mux.m_guardInterval.toString(),
+        mux.m_modSys.toString(),             mux.m_rolloff.toString());
 }
 
 
@@ -1171,17 +1171,17 @@ bool ChannelUtil::SetChannelValue(const QString &field_name,
 /** Returns the DVB default authority for the chanid given. */
 QString ChannelUtil::GetDefaultAuthority(uint chanid)
 {
-    static QReadWriteLock channel_default_authority_map_lock;
-    static QMap<uint,QString> channel_default_authority_map;
-    static bool run_init = true;
+    static QReadWriteLock s_channelDefaultAuthorityMapLock;
+    static QMap<uint,QString> s_channelDefaultAuthorityMap;
+    static bool s_runInit = true;
 
-    channel_default_authority_map_lock.lockForRead();
+    s_channelDefaultAuthorityMapLock.lockForRead();
 
-    if (run_init)
+    if (s_runInit)
     {
-        channel_default_authority_map_lock.unlock();
-        channel_default_authority_map_lock.lockForWrite();
-        if (run_init)
+        s_channelDefaultAuthorityMapLock.unlock();
+        s_channelDefaultAuthorityMapLock.lockForWrite();
+        if (s_runInit)
         {
             MSqlQuery query(MSqlQuery::InitCon());
             query.prepare(
@@ -1196,11 +1196,11 @@ QString ChannelUtil::GetDefaultAuthority(uint chanid)
                 {
                     if (!query.value(1).toString().isEmpty())
                     {
-                        channel_default_authority_map[query.value(0).toUInt()] =
+                        s_channelDefaultAuthorityMap[query.value(0).toUInt()] =
                             query.value(1).toString();
                     }
                 }
-                run_init = false;
+                s_runInit = false;
             }
             else
             {
@@ -1217,11 +1217,11 @@ QString ChannelUtil::GetDefaultAuthority(uint chanid)
                 {
                     if (!query.value(1).toString().isEmpty())
                     {
-                        channel_default_authority_map[query.value(0).toUInt()] =
+                        s_channelDefaultAuthorityMap[query.value(0).toUInt()] =
                             query.value(1).toString();
                     }
                 }
-                run_init = false;
+                s_runInit = false;
             }
             else
             {
@@ -1231,60 +1231,60 @@ QString ChannelUtil::GetDefaultAuthority(uint chanid)
         }
     }
 
-    QMap<uint,QString>::iterator it = channel_default_authority_map.find(chanid);
+    QMap<uint,QString>::iterator it = s_channelDefaultAuthorityMap.find(chanid);
     QString ret;
-    if (it != channel_default_authority_map.end())
+    if (it != s_channelDefaultAuthorityMap.end())
         ret = *it;
-    channel_default_authority_map_lock.unlock();
+    s_channelDefaultAuthorityMapLock.unlock();
 
     return ret;
 }
 
 QString ChannelUtil::GetIcon(uint chanid)
 {
-    static QReadWriteLock channel_icon_map_lock;
-    static QHash<uint,QString> channel_icon_map;
-    static bool run_init = true;
+    static QReadWriteLock s_channelIconMapLock;
+    static QHash<uint,QString> s_channelIconMap;
+    static bool s_runInit = true;
 
-    channel_icon_map_lock.lockForRead();
+    s_channelIconMapLock.lockForRead();
 
-    QString ret(channel_icon_map.value(chanid, "_cold_"));
+    QString ret(s_channelIconMap.value(chanid, "_cold_"));
 
-    channel_icon_map_lock.unlock();
+    s_channelIconMapLock.unlock();
 
     if (ret != "_cold_")
         return ret;
 
-    channel_icon_map_lock.lockForWrite();
+    s_channelIconMapLock.lockForWrite();
 
     MSqlQuery query(MSqlQuery::InitCon());
     QString iconquery = "SELECT chanid, icon FROM channel";
 
-    if (run_init)
+    if (s_runInit)
         iconquery += " WHERE visible = 1";
     else
         iconquery += " WHERE chanid = :CHANID";
 
     query.prepare(iconquery);
 
-    if (!run_init)
+    if (!s_runInit)
         query.bindValue(":CHANID", chanid);
 
     if (query.exec())
     {
-        if (run_init)
+        if (s_runInit)
         {
-            channel_icon_map.reserve(query.size());
+            s_channelIconMap.reserve(query.size());
             while (query.next())
             {
-                channel_icon_map[query.value(0).toUInt()] =
+                s_channelIconMap[query.value(0).toUInt()] =
                     query.value(1).toString();
             }
-            run_init = false;
+            s_runInit = false;
         }
         else
         {
-            channel_icon_map[chanid] = (query.next()) ?
+            s_channelIconMap[chanid] = (query.next()) ?
                 query.value(1).toString() : "";
         }
     }
@@ -1293,9 +1293,9 @@ QString ChannelUtil::GetIcon(uint chanid)
         MythDB::DBError("GetIcon", query);
     }
 
-    ret = channel_icon_map.value(chanid, "");
+    ret = s_channelIconMap.value(chanid, "");
 
-    channel_icon_map_lock.unlock();
+    s_channelIconMapLock.unlock();
 
     return ret;
 }
@@ -2164,8 +2164,8 @@ inline bool lt_callsign(const ChannelInfo &a, const ChannelInfo &b)
 
 inline bool lt_smart(const ChannelInfo &a, const ChannelInfo &b)
 {
-    static QMutex sepExprLock;
-    static const QRegExp sepExpr(ChannelUtil::kATSCSeparators);
+    static QMutex s_sepExprLock;
+    static const QRegExp kSepExpr(ChannelUtil::kATSCSeparators);
 
     bool isIntA, isIntB;
     int a_int   = a.m_channum.toUInt(&isIntA);
@@ -2179,9 +2179,9 @@ inline bool lt_smart(const ChannelInfo &a, const ChannelInfo &b)
     bool tmp1, tmp2;
     int idxA, idxB;
     {
-        QMutexLocker locker(&sepExprLock);
-        idxA = a.m_channum.indexOf(sepExpr);
-        idxB = b.m_channum.indexOf(sepExpr);
+        QMutexLocker locker(&s_sepExprLock);
+        idxA = a.m_channum.indexOf(kSepExpr);
+        idxB = b.m_channum.indexOf(kSepExpr);
     }
     if (idxA >= 0)
     {
@@ -2335,8 +2335,7 @@ uint ChannelUtil::GetNextChannel(
     bool              skip_non_visible,
     bool              skip_same_channum_and_callsign)
 {
-    ChannelInfoList::const_iterator it =
-        find(sorted.begin(), sorted.end(), old_chanid);
+    auto it = find(sorted.cbegin(), sorted.cend(), old_chanid);
 
     if (it == sorted.end())
         it = sorted.begin(); // not in list, pretend we are on first channel
@@ -2344,7 +2343,7 @@ uint ChannelUtil::GetNextChannel(
     if (it == sorted.end())
         return 0; // no channels..
 
-    ChannelInfoList::const_iterator start = it;
+    auto start = it;
 
     if (CHANNEL_DIRECTION_DOWN == direction)
     {

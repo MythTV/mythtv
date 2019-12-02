@@ -20,7 +20,7 @@
  *   \sa iso639.h
  */
 
-typedef QMap<QString, QString> ISO3166ToNameMap;
+using ISO3166ToNameMap = QMap<QString, QString>;
 
 // WARNING: These functions are not thread-safe and sould only be
 // called from the main UI thread.

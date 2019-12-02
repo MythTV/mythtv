@@ -141,8 +141,8 @@ public:
              int width, int height);
 
 private:
-    void FillFrame(VideoFrame *frame, const AVFrame *pic, int pitch,
-                   int width, int height, AVPixelFormat pix_fmt);
+    static void FillFrame(VideoFrame *frame, const AVFrame *pic, int pitch,
+                          int width, int height, AVPixelFormat pix_fmt);
     MythAVCopy(const MythAVCopy &) = delete;            // not copyable
     MythAVCopy &operator=(const MythAVCopy &) = delete; // not copyable
     MythAVCopyPrivate *d;

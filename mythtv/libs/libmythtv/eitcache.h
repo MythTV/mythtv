@@ -16,8 +16,8 @@
 // MythTV headers
 #include "mythtvexp.h"
 
-typedef QMap<uint, uint64_t> event_map_t;
-typedef QMap<uint, event_map_t*> key_map_t;
+using event_map_t = QMap<uint, uint64_t>;
+using key_map_t = QMap<uint, event_map_t*>;
 
 class EITCache
 {

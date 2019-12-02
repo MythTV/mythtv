@@ -36,15 +36,15 @@ static guint32 *p1, *p2, *tmp;
 static guint32 cycle;
 
 typedef struct {
-	int drawIFS;
-	int drawPoints;
-	int drawTentacle;
+	int m_drawIfs;
+	int m_drawPoints;
+	int m_drawTentacle;
 
-	int drawScope;
-	int farScope;
+	int m_drawScope;
+	int m_farScope;
 
-	int rangemin;
-	int rangemax;
+	int m_rangeMin;
+	int m_rangeMax;
 } GoomState;
 
 #define STATES_NB 8
@@ -139,39 +139,39 @@ void goom_set_resolution (guint32 resx, guint32 resy, int cinemascope) {
 
 
 guint32 * goom_update (gint16 data[2][512], int forceMode) {
-	static int lockvar = 0;				// pour empecher de nouveaux changements
-	static int goomvar = 0;				// boucle des gooms
-	static int totalgoom = 0;			// nombre de gooms par seconds
-	static int agoom = 0;					// un goom a eu lieu..      
-	static int abiggoom = 0;					// un big goom a eu lieu..      
-	static int loopvar = 0;				// mouvement des points
-	static int speedvar = 0;			// vitesse des particules
+	static int s_lockVar = 0;		// pour empecher de nouveaux changements
+	static int s_goomVar = 0;		// boucle des gooms
+	static int s_totalGoom = 0;		// nombre de gooms par seconds
+	static int s_aGoom = 0;			// un goom a eu lieu..
+	static int s_aBigGoom = 0;		// un big goom a eu lieu..
+	static int s_loopVar = 0;		// mouvement des points
+	static int s_speedVar = 0;		// vitesse des particules
 
 	// duree de la transition entre afficher les lignes ou pas
 #define DRAWLINES 80
-	static int lineMode = DRAWLINES;	// l'effet lineaire a dessiner
-	static int nombreCDDC = 0;		// nombre de Cycle Depuis Dernier Changement
+	static int s_lineMode = DRAWLINES;	// l'effet lineaire a dessiner
+	static int s_nombreCddc = 0;		// nombre de Cycle Depuis Dernier Changement
 	guint32 *return_val;
 	guint32 pointWidth;
 	guint32 pointHeight;
-	int     incvar;								// volume du son
-	static int accelvar=0;							// acceleration des particules
+	int     incvar;				// volume du son
+	static int s_accelVar=0;		// acceleration des particules
 	int     i;
-	float   largfactor;						// elargissement de l'intervalle d'évolution
-	static int stop_lines = 0;
+	float   largfactor;			// elargissement de l'intervalle d'évolution
+	static int s_stopLines = 0;
 
 	// des points
-	static int ifs_incr = 1;			// dessiner l'ifs (0 = non: > = increment)
-	static int decay_ifs = 0;			// disparition de l'ifs
-	static int recay_ifs = 0;			// dédisparition de l'ifs
+	static int s_ifsIncr = 1;		// dessiner l'ifs (0 = non: > = increment)
+	static int s_decayIfs = 0;		// disparition de l'ifs
+	static int s_recayIfs = 0;		// dédisparition de l'ifs
 
 #define SWITCHMULT (29.0F/30.0F)
 #define SWITCHINCR 0x7f
-	static float switchMult = 1.0F;
-	static int switchIncr = SWITCHINCR;
+	static float s_switchMult = 1.0F;
+	static int s_switchIncr = SWITCHINCR;
 
-	static char goomlimit = 2;		// sensibilité du goom
-	static ZoomFilterData zfd = {
+	static char s_goomLimit = 2;		// sensibilité du goom
+	static ZoomFilterData s_zfd = {
 		127, 8, 16,
 		1, 1, 0, NORMAL_MODE,
 		0, 0, 0, 0, 0
@@ -190,83 +190,83 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 			incvar = data[0][i];
 	}
 
-	i = accelvar;
-	accelvar = incvar / 1000;
+	i = s_accelVar;
+	s_accelVar = incvar / 1000;
 
-	if (speedvar > 5) {
-		accelvar--;
-		if (speedvar > 20)
-			accelvar--;
-		if (speedvar > 40)
-			speedvar = 40;
+	if (s_speedVar > 5) {
+		s_accelVar--;
+		if (s_speedVar > 20)
+			s_accelVar--;
+		if (s_speedVar > 40)
+			s_speedVar = 40;
 	}
-	accelvar--;
+	s_accelVar--;
 
-	i = accelvar - i;
+	i = s_accelVar - i;
 	if (i<0) i=-i;
 
-	speedvar += (speedvar + i/2);
-	speedvar /= 2;
-	if ((speedvar) && (cycle%9==0)) {
-		speedvar -= 1;
+	s_speedVar += (s_speedVar + i/2);
+	s_speedVar /= 2;
+	if ((s_speedVar) && (cycle%9==0)) {
+		s_speedVar -= 1;
 	}
-	if ((speedvar) && (cycle%5==0)) {
-		speedvar = (speedvar*7)/8;
+	if ((s_speedVar) && (cycle%5==0)) {
+		s_speedVar = (s_speedVar*7)/8;
 	}
 
-	if (speedvar < 0)
-		speedvar = 0;
-	if (speedvar > 50)
-		speedvar = 50;
+	if (s_speedVar < 0)
+		s_speedVar = 0;
+	if (s_speedVar > 50)
+		s_speedVar = 50;
 
 
 	/* ! calcul du deplacement des petits points ... */
 
-	largfactor = ((float) speedvar / 40.0F + (float) incvar / 50000.0F) / 1.5F;
+	largfactor = ((float) s_speedVar / 40.0F + (float) incvar / 50000.0F) / 1.5F;
 	if (largfactor > 1.5F)
 		largfactor = 1.5F;
 
-	decay_ifs--;
-	if (decay_ifs > 0)
-		ifs_incr += 2;
-	if (decay_ifs == 0)
-		ifs_incr = 0;
+	s_decayIfs--;
+	if (s_decayIfs > 0)
+		s_ifsIncr += 2;
+	if (s_decayIfs == 0)
+		s_ifsIncr = 0;
 
 
-	if (recay_ifs) {
-		ifs_incr -= 2;
-		recay_ifs--;
-		if ((recay_ifs == 0)&&(ifs_incr<=0))
-			ifs_incr = 1;
+	if (s_recayIfs) {
+		s_ifsIncr -= 2;
+		s_recayIfs--;
+		if ((s_recayIfs == 0)&&(s_ifsIncr<=0))
+			s_ifsIncr = 1;
 	}
 
-	if (ifs_incr > 0)
-		ifs_update (p1 + c_offset, p2 + c_offset, resolx, c_resoly, ifs_incr);
+	if (s_ifsIncr > 0)
+		ifs_update (p1 + c_offset, p2 + c_offset, resolx, c_resoly, s_ifsIncr);
 	
-	if (curGState->drawPoints) {
-		for (i = 1; i * 15 <= speedvar + 15; i++) {
-			loopvar += speedvar*2/3 + 1;
+	if (curGState->m_drawPoints) {
+		for (i = 1; i * 15 <= s_speedVar + 15; i++) {
+			s_loopVar += s_speedVar*2/3 + 1;
 
 			pointFilter (p1 + c_offset, YELLOW,
                                      ((pointWidth - 6.0F) * largfactor + 5.0F),
                                      ((pointHeight - 6.0F) * largfactor + 5.0F),
-                                     i * 152.0F, 128.0F, loopvar + i * 2032);
+                                     i * 152.0F, 128.0F, s_loopVar + i * 2032);
 			pointFilter (p1 + c_offset, ORANGE,
                                      ((pointWidth  / 2.0F) * largfactor) / i + 10.0F * i,
                                      ((pointHeight / 2.0F) * largfactor) / i + 10.0F * i,
-                                     96.0F, i * 80.0F, loopvar / i);
+                                     96.0F, i * 80.0F, s_loopVar / i);
 			pointFilter (p1 + c_offset, VIOLET,
                                      ((pointHeight / 3.0F + 5.0F) * largfactor) / i + 10.0F * i,
                                      ((pointHeight / 3.0F + 5.0F) * largfactor) / i + 10.0F * i,
-                                     i + 122.0F, 134.0F, loopvar / i);
+                                     i + 122.0F, 134.0F, s_loopVar / i);
 			pointFilter (p1 + c_offset, BLACK,
                                      ((pointHeight / 3.0F) * largfactor + 20.0F),
                                      ((pointHeight / 3.0F) * largfactor + 20.0F),
-                                     58.0F, i * 66.0F, loopvar / i);
+                                     58.0F, i * 66.0F, s_loopVar / i);
 			pointFilter (p1 + c_offset, WHITE,
                                      (pointHeight * largfactor + 10.0F * i) / i,
                                      (pointHeight * largfactor + 10.0F * i) / i,
-                                     66.0F, 74.0F, loopvar + i * 500); }
+                                     66.0F, 74.0F, s_loopVar + i * 500); }
 	}
 
 	// par défaut pas de changement de zoom
@@ -287,158 +287,158 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 	// changement d'etat du plugins juste apres un autre changement d'etat. oki 
 	// 
 	// ?
-	if (--lockvar < 0)
-		lockvar = 0;
+	if (--s_lockVar < 0)
+		s_lockVar = 0;
 
 	// temps du goom
-	if (--agoom < 0)
-		agoom = 0;
+	if (--s_aGoom < 0)
+		s_aGoom = 0;
 
 	// temps du goom
-	if (--abiggoom < 0)
-		abiggoom = 0;
+	if (--s_aBigGoom < 0)
+		s_aBigGoom = 0;
 
-	if ((!abiggoom) && (speedvar > 4) && (goomlimit > 4) &&
-			((accelvar > goomlimit*9/8+7)||(accelvar < -goomlimit*9/8-7))) {
-		static int couleur =
+	if ((!s_aBigGoom) && (s_speedVar > 4) && (s_goomLimit > 4) &&
+			((s_accelVar > s_goomLimit*9/8+7)||(s_accelVar < -s_goomLimit*9/8-7))) {
+		static int s_couleur =
 			 (0xc0<<(ROUGE*8))
 			|(0xc0<<(VERT*8))
 			|(0xf0<<(BLEU*8))
 			|(0xf0<<(ALPHA*8));
-		abiggoom = 100;
+		s_aBigGoom = 100;
 		int size = resolx*c_resoly;
 		for (int j=0;j<size;j++)
-			(p1+c_offset)[j] = (~(p1+c_offset)[j]) | couleur;
+			(p1+c_offset)[j] = (~(p1+c_offset)[j]) | s_couleur;
 	}
 
 	// on verifie qu'il ne se pas un truc interressant avec le son.
-	if ((accelvar > goomlimit) || (accelvar < -goomlimit) || (forceMode > 0)
-			|| (nombreCDDC > TIME_BTW_CHG)) {
+	if ((s_accelVar > s_goomLimit) || (s_accelVar < -s_goomLimit) || (forceMode > 0)
+			|| (s_nombreCddc > TIME_BTW_CHG)) {
 
 //        if (nombreCDDC > 300) {
 //        }
 
 		// UN GOOM !!! YAHOO !
-		totalgoom++;
-		agoom = 20;									// mais pdt 20 cycles, il n'y en aura plus.
+		s_totalGoom++;
+		s_aGoom = 20;			// mais pdt 20 cycles, il n'y en aura plus.
 
 		// changement eventuel de mode
 		if (iRAND(16) == 0)
 		switch (iRAND (32)) {
 		case 0:
 		case 10:
-			zfd.hypercosEffect = iRAND (2);
+			s_zfd.hypercosEffect = iRAND (2);
 			// Checked Fedora26 get-plugins-good sources.
 			// No break statement there.
 			// fall through
 		case 13:
 		case 20:
 		case 21:
-			zfd.mode = WAVE_MODE;
-			zfd.reverse = 0;
-			zfd.waveEffect = (iRAND (3) == 0);
+			s_zfd.mode = WAVE_MODE;
+			s_zfd.reverse = 0;
+			s_zfd.waveEffect = (iRAND (3) == 0);
 			if (iRAND (2))
-				zfd.vitesse = (zfd.vitesse + 127) >> 1;
+				s_zfd.vitesse = (s_zfd.vitesse + 127) >> 1;
 			break;
 		case 1:
 		case 11:
-			zfd.mode = CRYSTAL_BALL_MODE;
-			zfd.waveEffect = 0;
-			zfd.hypercosEffect = 0;
+			s_zfd.mode = CRYSTAL_BALL_MODE;
+			s_zfd.waveEffect = 0;
+			s_zfd.hypercosEffect = 0;
 			break;
 		case 2:
 		case 12:
-			zfd.mode = AMULETTE_MODE;
-			zfd.waveEffect = 0;
-			zfd.hypercosEffect = 0;
+			s_zfd.mode = AMULETTE_MODE;
+			s_zfd.waveEffect = 0;
+			s_zfd.hypercosEffect = 0;
 			break;
 		case 3:
-			zfd.mode = WATER_MODE;
-			zfd.waveEffect = 0;
-			zfd.hypercosEffect = 0;
+			s_zfd.mode = WATER_MODE;
+			s_zfd.waveEffect = 0;
+			s_zfd.hypercosEffect = 0;
 			break;
 		case 4:
 		case 14:
-			zfd.mode = SCRUNCH_MODE;
-			zfd.waveEffect = 0;
-			zfd.hypercosEffect = 0;
+			s_zfd.mode = SCRUNCH_MODE;
+			s_zfd.waveEffect = 0;
+			s_zfd.hypercosEffect = 0;
 			break;
 		case 5:
   	case 15:
 		case 22:
-			zfd.mode = HYPERCOS1_MODE;
-			zfd.waveEffect = 0;
-			zfd.hypercosEffect = (iRAND (3) == 0);
+			s_zfd.mode = HYPERCOS1_MODE;
+			s_zfd.waveEffect = 0;
+			s_zfd.hypercosEffect = (iRAND (3) == 0);
 			break;
 		case 6:
 		case 16:
-			zfd.mode = HYPERCOS2_MODE;
-			zfd.waveEffect = 0;
-			zfd.hypercosEffect = 0;
+			s_zfd.mode = HYPERCOS2_MODE;
+			s_zfd.waveEffect = 0;
+			s_zfd.hypercosEffect = 0;
 			break;
 		case 7:
 		case 17:
-			zfd.mode = CRYSTAL_BALL_MODE;
-			zfd.waveEffect = (iRAND (4) == 0);
-			zfd.hypercosEffect = iRAND (2);
+			s_zfd.mode = CRYSTAL_BALL_MODE;
+			s_zfd.waveEffect = (iRAND (4) == 0);
+			s_zfd.hypercosEffect = iRAND (2);
 			break;
 		case 8:
 		case 18:
 		case 19:
-			zfd.mode = SCRUNCH_MODE;
-			zfd.waveEffect = 1;
-			zfd.hypercosEffect = 1;
+			s_zfd.mode = SCRUNCH_MODE;
+			s_zfd.waveEffect = 1;
+			s_zfd.hypercosEffect = 1;
 			break;
 	  case 29:
 	 	case 30:
-			zfd.mode = YONLY_MODE;
+			s_zfd.mode = YONLY_MODE;
 			break;
 	  case 31:
 	 	case 32:
-			zfd.mode = SPEEDWAY_MODE;
+			s_zfd.mode = SPEEDWAY_MODE;
 			break;
 		default:
-			zfd.mode = NORMAL_MODE;
-			zfd.waveEffect = 0;
-			zfd.hypercosEffect = 0;
+			s_zfd.mode = NORMAL_MODE;
+			s_zfd.waveEffect = 0;
+			s_zfd.hypercosEffect = 0;
 		}
 	}
 	
 	// tout ceci ne sera fait qu'en cas de non-blocage
-	if (lockvar == 0) {
+	if (s_lockVar == 0) {
 		// reperage de goom (acceleration forte de l'acceleration du volume)
 		// -> coup de boost de la vitesse si besoin..
-		if ((accelvar > goomlimit) || (accelvar < -goomlimit)) {
-			static int rndn = 0;
-			static int blocker = 0;
-			goomvar++;
+		if ((s_accelVar > s_goomLimit) || (s_accelVar < -s_goomLimit)) {
+			static int s_rndn = 0;
+			static int s_blocker = 0;
+			s_goomVar++;
 
 			/* SELECTION OF THE GOOM STATE */
-			if ((!blocker)&&(iRAND(3))) {
-				rndn = iRAND(STATES_RANGEMAX);
-				blocker = 3;
+			if ((!s_blocker)&&(iRAND(3))) {
+				s_rndn = iRAND(STATES_RANGEMAX);
+				s_blocker = 3;
 			}
-			else if (blocker) blocker--;
+			else if (s_blocker) s_blocker--;
 
 			for (int j=0;j<STATES_NB;j++)
-				if ((rndn >= states[j].rangemin)
-						&& (rndn <= states[j].rangemax))
+				if ((s_rndn >= states[j].m_rangeMin)
+				    && (s_rndn <= states[j].m_rangeMax))
 					curGState = states+j;
 
-			if ((curGState->drawIFS) && (ifs_incr<=0)) {
-				recay_ifs = 5;
-				ifs_incr = 11;
+			if ((curGState->m_drawIfs) && (s_ifsIncr<=0)) {
+				s_recayIfs = 5;
+				s_ifsIncr = 11;
 			}
 
-			if ((!curGState->drawIFS) && (ifs_incr>0) && (decay_ifs<=0))
-				decay_ifs = 100;
+			if ((!curGState->m_drawIfs) && (s_ifsIncr>0) && (s_decayIfs<=0))
+				s_decayIfs = 100;
 
-			if (!curGState->drawScope)
-				stop_lines = 0xf000 & 5;
+			if (!curGState->m_drawScope)
+				s_stopLines = 0xf000 & 5;
 			
-			if (!curGState->drawScope) {
-				stop_lines = 0;			
-				lineMode = DRAWLINES;
+			if (!curGState->m_drawScope) {
+				s_stopLines = 0;
+				s_lineMode = DRAWLINES;
 			}
 
 			// if (goomvar % 1 == 0)
@@ -446,184 +446,184 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 				guint32 vtmp;
 				guint32 newvit;
 
-				lockvar = 50;
-				newvit = STOP_SPEED + 1 - (4.0F * log10f(speedvar+1));
+				s_lockVar = 50;
+				newvit = STOP_SPEED + 1 - (4.0F * log10f(s_speedVar+1));
 				// retablir le zoom avant..
-				if ((zfd.reverse) && (!(cycle % 13)) && (rand () % 5 == 0)) {
-					zfd.reverse = 0;
-					zfd.vitesse = STOP_SPEED - 2;
-					lockvar = 75;
+				if ((s_zfd.reverse) && (!(cycle % 13)) && (rand () % 5 == 0)) {
+					s_zfd.reverse = 0;
+					s_zfd.vitesse = STOP_SPEED - 2;
+					s_lockVar = 75;
 				}
 				if (iRAND (10) == 0) {
-					zfd.reverse = 1;
-					lockvar = 100;
+					s_zfd.reverse = 1;
+					s_lockVar = 100;
 				}
 
 				if (iRAND (10) == 0)
-					zfd.vitesse = STOP_SPEED - 1;
+					s_zfd.vitesse = STOP_SPEED - 1;
 				if (iRAND (12) == 0)
-					zfd.vitesse = STOP_SPEED + 1;
+					s_zfd.vitesse = STOP_SPEED + 1;
 
 				// changement de milieu..
 				switch (iRAND (25)) {
 				case 0:
 				case 3:
 				case 6:
-					zfd.middleY = c_resoly - 1;
-					zfd.middleX = resolx / 2;
+					s_zfd.middleY = c_resoly - 1;
+					s_zfd.middleX = resolx / 2;
 					break;
 				case 1:
 				case 4:
-					zfd.middleX = resolx - 1;
+					s_zfd.middleX = resolx - 1;
 					break;
 				case 2:
 				case 5:
-					zfd.middleX = 1;
+					s_zfd.middleX = 1;
 					break;
 				default:
-					zfd.middleY = c_resoly / 2;
-					zfd.middleX = resolx / 2;
+					s_zfd.middleY = c_resoly / 2;
+					s_zfd.middleX = resolx / 2;
 				}
 
-				if ((zfd.mode == WATER_MODE)
-						|| (zfd.mode == YONLY_MODE)
-						|| (zfd.mode == AMULETTE_MODE)) {
-					zfd.middleX = resolx / 2;
-					zfd.middleY = c_resoly / 2;
+				if ((s_zfd.mode == WATER_MODE)
+						|| (s_zfd.mode == YONLY_MODE)
+						|| (s_zfd.mode == AMULETTE_MODE)) {
+					s_zfd.middleX = resolx / 2;
+					s_zfd.middleY = c_resoly / 2;
 				}
 
 				switch (vtmp = (iRAND (15))) {
 				case 0:
                                     
                                         // NOLINTNEXTLINE(misc-redundant-expression)
-					zfd.vPlaneEffect = iRAND (3) - iRAND (3);
+					s_zfd.vPlaneEffect = iRAND (3) - iRAND (3);
                                         // NOLINTNEXTLINE(misc-redundant-expression)
-					zfd.hPlaneEffect = iRAND (3) - iRAND (3);
+					s_zfd.hPlaneEffect = iRAND (3) - iRAND (3);
 					break;
 				case 3:
-					zfd.vPlaneEffect = 0;
+					s_zfd.vPlaneEffect = 0;
                                         // NOLINTNEXTLINE(misc-redundant-expression)
-					zfd.hPlaneEffect = iRAND (8) - iRAND (8);
+					s_zfd.hPlaneEffect = iRAND (8) - iRAND (8);
 					break;
 				case 4:
 				case 5:
 				case 6:
 				case 7:
                                         // NOLINTNEXTLINE(misc-redundant-expression)
-					zfd.vPlaneEffect = iRAND (5) - iRAND (5);
-					zfd.hPlaneEffect = -zfd.vPlaneEffect;
+					s_zfd.vPlaneEffect = iRAND (5) - iRAND (5);
+					s_zfd.hPlaneEffect = -s_zfd.vPlaneEffect;
 					break;
 				case 8:
-					zfd.hPlaneEffect = 5 + iRAND (8);
-					zfd.vPlaneEffect = -zfd.hPlaneEffect;
+					s_zfd.hPlaneEffect = 5 + iRAND (8);
+					s_zfd.vPlaneEffect = -s_zfd.hPlaneEffect;
 					break;
 				case 9:
-					zfd.vPlaneEffect = 5 + iRAND (8);
-					zfd.hPlaneEffect = -zfd.hPlaneEffect;
+					s_zfd.vPlaneEffect = 5 + iRAND (8);
+					s_zfd.hPlaneEffect = -s_zfd.hPlaneEffect;
 					break;
 				case 13:
-					zfd.hPlaneEffect = 0;
+					s_zfd.hPlaneEffect = 0;
                                         // NOLINTNEXTLINE(misc-redundant-expression)
-					zfd.vPlaneEffect = iRAND (10) - iRAND (10);
+					s_zfd.vPlaneEffect = iRAND (10) - iRAND (10);
 					break;
 				case 14:
                                         // NOLINTNEXTLINE(misc-redundant-expression)
-					zfd.hPlaneEffect = iRAND (10) - iRAND (10);
+					s_zfd.hPlaneEffect = iRAND (10) - iRAND (10);
                                         // NOLINTNEXTLINE(misc-redundant-expression)
-					zfd.vPlaneEffect = iRAND (10) - iRAND (10);
+					s_zfd.vPlaneEffect = iRAND (10) - iRAND (10);
 					break;
 				default:
 					if (vtmp < 10) {
-						zfd.vPlaneEffect = 0;
-						zfd.hPlaneEffect = 0;
+						s_zfd.vPlaneEffect = 0;
+						s_zfd.hPlaneEffect = 0;
 					}
 				}
 
 				if (iRAND (5) != 0)
-					zfd.noisify = 0;
+					s_zfd.noisify = 0;
 				else {
-					zfd.noisify = iRAND (2) + 1;
-					lockvar *= 2;
+					s_zfd.noisify = iRAND (2) + 1;
+					s_lockVar *= 2;
 				}
 
-				if (zfd.mode == AMULETTE_MODE) {
-					zfd.vPlaneEffect = 0;
-					zfd.hPlaneEffect = 0;
-					zfd.noisify = 0;
+				if (s_zfd.mode == AMULETTE_MODE) {
+					s_zfd.vPlaneEffect = 0;
+					s_zfd.hPlaneEffect = 0;
+					s_zfd.noisify = 0;
 				}
 
-				if ((zfd.middleX == 1) || (zfd.middleX == (int)resolx - 1)) {
-					zfd.vPlaneEffect = 0;
-					zfd.hPlaneEffect = iRAND (2) ? 0 : zfd.hPlaneEffect;
+				if ((s_zfd.middleX == 1) || (s_zfd.middleX == (int)resolx - 1)) {
+					s_zfd.vPlaneEffect = 0;
+					s_zfd.hPlaneEffect = iRAND (2) ? 0 : s_zfd.hPlaneEffect;
 				}
 
-				if (newvit < (guint32)zfd.vitesse)	// on accelere
+				if (newvit < (guint32)s_zfd.vitesse)	// on accelere
 				{
-					pzfd = &zfd;
+					pzfd = &s_zfd;
 					if (((newvit < STOP_SPEED - 7) &&
-							 (zfd.vitesse < STOP_SPEED - 6) &&
+							 (s_zfd.vitesse < STOP_SPEED - 6) &&
 							 (cycle % 3 == 0)) || (iRAND (40) == 0)) {
-						zfd.vitesse = STOP_SPEED - iRAND (2) + iRAND (2);
-						zfd.reverse = !zfd.reverse;
+						s_zfd.vitesse = STOP_SPEED - iRAND (2) + iRAND (2);
+						s_zfd.reverse = !s_zfd.reverse;
 					}
 					else {
-						zfd.vitesse = (newvit + zfd.vitesse * 7) / 8;
+						s_zfd.vitesse = (newvit + s_zfd.vitesse * 7) / 8;
 					}
-					lockvar += 50;
+					s_lockVar += 50;
 				}
 			}
 
-			if (lockvar > 150) {
-				switchIncr = SWITCHINCR;
-				switchMult = 1.0F;
+			if (s_lockVar > 150) {
+				s_switchIncr = SWITCHINCR;
+				s_switchMult = 1.0F;
 			}
 		}
 		// mode mega-lent
 		if (iRAND (700) == 0) {
-			pzfd = &zfd;
-			zfd.vitesse = STOP_SPEED - 1;
-			zfd.pertedec = 8;
-			zfd.sqrtperte = 16;
-			goomvar = 1;
-			lockvar += 50;
-			switchIncr = SWITCHINCR;
-			switchMult = 1.0F;
+			pzfd = &s_zfd;
+			s_zfd.vitesse = STOP_SPEED - 1;
+			s_zfd.pertedec = 8;
+			s_zfd.sqrtperte = 16;
+			s_goomVar = 1;
+			s_lockVar += 50;
+			s_switchIncr = SWITCHINCR;
+			s_switchMult = 1.0F;
 		}
 	}
 
 	/*
 	 * gros frein si la musique est calme
 	 */
-	if ((speedvar < 1) && (zfd.vitesse < STOP_SPEED - 4) && (cycle % 16 == 0)) {
-		pzfd = &zfd;
-		zfd.vitesse += 3;
-		zfd.pertedec = 8;
-		zfd.sqrtperte = 16;
-		goomvar = 0;
+	if ((s_speedVar < 1) && (s_zfd.vitesse < STOP_SPEED - 4) && (cycle % 16 == 0)) {
+		pzfd = &s_zfd;
+		s_zfd.vitesse += 3;
+		s_zfd.pertedec = 8;
+		s_zfd.sqrtperte = 16;
+		s_goomVar = 0;
 	}
 
 	/*
 	 * baisser regulierement la vitesse...
 	 */
-	if ((cycle % 73 == 0) && (zfd.vitesse < STOP_SPEED - 5)) {
-		pzfd = &zfd;
-		zfd.vitesse++;
+	if ((cycle % 73 == 0) && (s_zfd.vitesse < STOP_SPEED - 5)) {
+		pzfd = &s_zfd;
+		s_zfd.vitesse++;
 	}
 
 	/*
 	 * arreter de decrémenter au bout d'un certain temps
 	 */
-	if ((cycle % 101 == 0) && (zfd.pertedec == 7)) {
-		pzfd = &zfd;
-		zfd.pertedec = 8;
-		zfd.sqrtperte = 16;
+	if ((cycle % 101 == 0) && (s_zfd.pertedec == 7)) {
+		pzfd = &s_zfd;
+		s_zfd.pertedec = 8;
+		s_zfd.sqrtperte = 16;
 	}
 
 	/*
 	 * Permet de forcer un effet.
 	 */
 	if ((forceMode > 0) && (forceMode <= NB_FX)) {
-		pzfd = &zfd;
+		pzfd = &s_zfd;
 		pzfd->mode = forceMode - 1;
 	}
 
@@ -635,35 +635,35 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 	 * Changement d'effet de zoom !
 	 */
 	if (pzfd != NULL) {
-		static int exvit = 128;
+		static int s_exvit = 128;
 		int     dif;
 
-		nombreCDDC = 0;
+		s_nombreCddc = 0;
 
-		switchIncr = SWITCHINCR;
+		s_switchIncr = SWITCHINCR;
 
-		dif = zfd.vitesse - exvit;
+		dif = s_zfd.vitesse - s_exvit;
 		if (dif < 0)
 			dif = -dif;
 
 		if (dif > 2) {
-			switchIncr *= (dif + 2) / 2;
+			s_switchIncr *= (dif + 2) / 2;
 		}
-		exvit = zfd.vitesse;
-		switchMult = 1.0F;
+		s_exvit = s_zfd.vitesse;
+		s_switchMult = 1.0F;
 
-		if (((accelvar > goomlimit) && (totalgoom < 2)) || (forceMode > 0)) {
-			switchIncr = 0;
-			switchMult = SWITCHMULT;
+		if (((s_accelVar > s_goomLimit) && (s_totalGoom < 2)) || (forceMode > 0)) {
+			s_switchIncr = 0;
+			s_switchMult = SWITCHMULT;
 		}
 	}
 	else {
-		if (nombreCDDC > TIME_BTW_CHG) {
-			pzfd = &zfd;
-			nombreCDDC = 0;
+		if (s_nombreCddc > TIME_BTW_CHG) {
+			pzfd = &s_zfd;
+			s_nombreCddc = 0;
 		}
 		else
-			nombreCDDC++;
+			s_nombreCddc++;
 	}
 
 #ifdef VERBOSE
@@ -673,16 +673,16 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 #endif
 
 	// Zoom here !
-	zoomFilterFastRGB (p1 + c_offset, p2 + c_offset, pzfd, resolx, c_resoly, switchIncr, switchMult);
+	zoomFilterFastRGB (p1 + c_offset, p2 + c_offset, pzfd, resolx, c_resoly, s_switchIncr, s_switchMult);
 
 	/*
 	 * Affichage tentacule
 	 */
 
-	if (goomlimit!=0)
-        tentacle_update((gint32*)(p2 + c_offset), (gint32*)(p1 + c_offset), resolx, c_resoly, data, (float)accelvar/goomlimit, curGState->drawTentacle);
+	if (s_goomLimit!=0)
+        tentacle_update((gint32*)(p2 + c_offset), (gint32*)(p1 + c_offset), resolx, c_resoly, data, (float)s_accelVar/s_goomLimit, curGState->m_drawTentacle);
 	else
-        tentacle_update((gint32*)(p2 + c_offset), (gint32*)(p1 + c_offset), resolx, c_resoly, data,0.0F, curGState->drawTentacle);
+        tentacle_update((gint32*)(p2 + c_offset), (gint32*)(p1 + c_offset), resolx, c_resoly, data,0.0F, curGState->m_drawTentacle);
 
 /*
 	{
@@ -742,7 +742,7 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 	/*
 	 * arret demande
 	 */
-	if ((stop_lines & 0xf000)||(!curGState->drawScope)) {
+	if ((s_stopLines & 0xf000)||(!curGState->m_drawScope)) {
 		float   param1, param2, amplitude;
 		int     couleur;
 		int     mode;
@@ -752,37 +752,37 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 		
 		goom_lines_switch_to (gmline1, mode, param1, amplitude, couleur);
 		goom_lines_switch_to (gmline2, mode, param2, amplitude, couleur);
-		stop_lines &= 0x0fff;
+		s_stopLines &= 0x0fff;
 	}
 	
 	/*
 	 * arret aleatore.. changement de mode de ligne..
 	 */
-	if (lineMode != DRAWLINES) {
-		lineMode--;
-		if (lineMode == -1)
-			lineMode = 0;
+	if (s_lineMode != DRAWLINES) {
+		s_lineMode--;
+		if (s_lineMode == -1)
+			s_lineMode = 0;
 	}
 	else
-		if ((cycle%80==0)&&(iRAND(5)==0)&&lineMode)
-			lineMode--;
+		if ((cycle%80==0)&&(iRAND(5)==0)&&s_lineMode)
+			s_lineMode--;
 
 	if ((cycle % 120 == 0)
 			&& (iRAND (4) == 0)
-			&& (curGState->drawScope)) {
-		if (lineMode == 0)
-			lineMode = DRAWLINES;
-		else if (lineMode == DRAWLINES) {
+			&& (curGState->m_drawScope)) {
+		if (s_lineMode == 0)
+			s_lineMode = DRAWLINES;
+		else if (s_lineMode == DRAWLINES) {
 			float   param1, param2, amplitude;
 			int     couleur1,couleur2;
 			int     mode;
 
-			lineMode--;
-			choose_a_goom_line (&param1, &param2, &couleur1, &mode, &amplitude,stop_lines);
+			s_lineMode--;
+			choose_a_goom_line (&param1, &param2, &couleur1, &mode, &amplitude,s_stopLines);
 
 			couleur2 = 5-couleur1;
-			if (stop_lines) {
-				stop_lines--;
+			if (s_stopLines) {
+				s_stopLines--;
 				if (iRAND(2))
 					couleur2=couleur1 = GML_BLACK;
 			}
@@ -795,23 +795,23 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 	/*
 	 * si on est dans un goom : afficher les lignes...
 	 */
-	if ((lineMode != 0) || (agoom > 15)) {
+	if ((s_lineMode != 0) || (s_aGoom > 15)) {
 		gmline2->power = gmline1->power;
 
 		goom_lines_draw (gmline1, data[0], p2 + c_offset);
 		goom_lines_draw (gmline2, data[1], p2 + c_offset);
 
 		if (((cycle % 121) == 9) && (iRAND (3) == 1)
-				&& ((lineMode == 0) || (lineMode == DRAWLINES))) {
+				&& ((s_lineMode == 0) || (s_lineMode == DRAWLINES))) {
 			float   param1, param2, amplitude;
 			int     couleur1,couleur2;
 			int     mode;
 
-			choose_a_goom_line (&param1, &param2, &couleur1, &mode, &amplitude, stop_lines);
+			choose_a_goom_line (&param1, &param2, &couleur1, &mode, &amplitude, s_stopLines);
 			couleur2 = 5-couleur1;
 			
-			if (stop_lines) {
-				stop_lines--;
+			if (s_stopLines) {
+				s_stopLines--;
 				if (iRAND(2))
 					couleur2=couleur1 = GML_BLACK;
 			}
@@ -831,20 +831,20 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 	// toute les 2 secondes : vérifier si le taux de goom est correct
 	// et le modifier sinon..
 	if (!(cycle % 64)) {
-		if (speedvar<1)
-			goomlimit /= 2;
-		if (totalgoom > 4) {
-			goomlimit++;
+		if (s_speedVar<1)
+			s_goomLimit /= 2;
+		if (s_totalGoom > 4) {
+			s_goomLimit++;
 		}
-		if (totalgoom > 7) {
-			goomlimit*=4/3;
-			goomlimit+=2;
+		if (s_totalGoom > 7) {
+			s_goomLimit*=4/3;
+			s_goomLimit+=2;
 		}
-		if ((totalgoom == 0) && (goomlimit > 1))
-			goomlimit--;
-		if ((totalgoom == 1) && (goomlimit > 1))
-			goomlimit--;
-		totalgoom = 0;
+		if ((s_totalGoom == 0) && (s_goomLimit > 1))
+			s_goomLimit--;
+		if ((s_totalGoom == 1) && (s_goomLimit > 1))
+			s_goomLimit--;
+		s_totalGoom = 0;
 	}
 	return return_val;
 }

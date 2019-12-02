@@ -112,7 +112,7 @@ void MythQImagePainter::Clear(QPaintDevice *device, const QRegion &region)
     if (!device || region.isEmpty())
         return;
 
-    QImage *dev = dynamic_cast<QImage*>(device);
+    auto *dev = dynamic_cast<QImage*>(device);
     if (!dev)
         return;
 

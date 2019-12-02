@@ -84,7 +84,7 @@ class UPNP_PUBLIC SubscriberInfo
 
 //////////////////////////////////////////////////////////////////////////////
 
-typedef QMap<QString,SubscriberInfo*> Subscribers;
+using Subscribers = QMap<QString,SubscriberInfo*>;
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -172,7 +172,7 @@ class UPNP_PUBLIC StateVariables
     protected:
 
         virtual void Notify() = 0;
-        typedef QMap<QString, StateVariableBase*> SVMap;
+        using SVMap = QMap<QString, StateVariableBase*>;
         SVMap m_map;
     public:
 

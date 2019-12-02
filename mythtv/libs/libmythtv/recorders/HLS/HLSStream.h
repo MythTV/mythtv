@@ -19,10 +19,10 @@ class HLSRecStream
 
   public:
 #ifdef USING_LIBCRYPTO
-    typedef QMap<QString, AES_KEY* >  AESKeyMap;
+    using AESKeyMap = QMap<QString, AES_KEY* >;
 #endif
 
-    HLSRecStream(int seq, uint64_t bitrate, const QString& m3u8_url, const QString &segment_base_url);
+    HLSRecStream(int seq, uint64_t bitrate, QString m3u8_url, QString segment_base_url);
     ~HLSRecStream(void);
 
     int Read(uint8_t* buffer, int len);

@@ -564,7 +564,7 @@ bool MythSocket::IsConnected(void) const
     return m_connected;
 }
 
-bool MythSocket::IsDataAvailable(void) const
+bool MythSocket::IsDataAvailable(void)
 {
     if (QThread::currentThread() == m_thread->qthread())
         return m_tcpSocket->bytesAvailable() > 0;
@@ -575,7 +575,7 @@ bool MythSocket::IsDataAvailable(void) const
     bool ret = false;
 
     QMetaObject::invokeMethod(
-        const_cast<MythSocket*>(this), "IsDataAvailableReal",
+        this, "IsDataAvailableReal",
         Qt::BlockingQueuedConnection,
         Q_ARG(bool*, &ret));
 

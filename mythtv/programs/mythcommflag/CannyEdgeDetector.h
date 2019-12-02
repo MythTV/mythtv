@@ -12,7 +12,6 @@ extern "C" {
 }
 #include "EdgeDetector.h"
 
-typedef struct VideoFrame_ VideoFrame;
 class MythPlayer;
 
 class CannyEdgeDetector : public EdgeDetector

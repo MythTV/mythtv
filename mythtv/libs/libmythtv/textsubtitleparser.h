@@ -38,7 +38,7 @@ class text_subtitle_t
     QStringList m_textLines;
 };
 
-typedef vector<text_subtitle_t> TextSubtitleList;
+using TextSubtitleList = vector<text_subtitle_t>;
 
 class TextSubtitles
 {

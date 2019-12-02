@@ -32,8 +32,7 @@
 void *ViewScheduled::RunViewScheduled(void *player, bool showTV)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    ViewScheduled *vsb = new ViewScheduled(mainStack, static_cast<TV*>(player),
-                                           showTV);
+    auto *vsb = new ViewScheduled(mainStack, static_cast<TV*>(player), showTV);
 
     if (vsb->Create())
         mainStack->AddScreen(vsb, (player == nullptr));
@@ -200,8 +199,7 @@ void ViewScheduled::ShowMenu(void)
     QString label = tr("Options");
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythDialogBox *menuPopup = new MythDialogBox(label, popupStack,
-                                                 "menuPopup");
+    auto *menuPopup = new MythDialogBox(label, popupStack, "menuPopup");
 
     if (menuPopup->Create())
     {
@@ -244,8 +242,7 @@ void ViewScheduled::LoadList(bool useExistingData)
 
     if (currentItem)
     {
-        ProgramInfo *currentpginfo = currentItem->GetData()
-                                        .value<ProgramInfo*>();
+        auto *currentpginfo = currentItem->GetData().value<ProgramInfo*>();
         if (currentpginfo)
         {
             callsign   = currentpginfo->GetChannelSchedulingID();
@@ -267,7 +264,7 @@ void ViewScheduled::LoadList(bool useExistingData)
     if (!useExistingData)
         LoadFromScheduler(m_recList, m_conflictBool);
 
-    ProgramList::iterator pit = m_recList.begin();
+    auto pit = m_recList.begin();
     QString currentDate;
     m_recgroupList[m_defaultGroup] = ProgramList(false);
     m_recgroupList[m_defaultGroup].setAutoDelete(false);
@@ -396,7 +393,7 @@ void ViewScheduled::FillList()
 
     plist = m_recgroupList[m_currentGroup];
 
-    ProgramList::iterator pit = plist.begin();
+    auto pit = plist.begin();
     while (pit != plist.end())
     {
         ProgramInfo *pginfo = *pit;
@@ -440,9 +437,8 @@ void ViewScheduled::FillList()
         else
             state = "warning";
 
-        MythUIButtonListItem *item =
-                                new MythUIButtonListItem(m_schedulesList,"",
-                                                    qVariantFromValue(pginfo));
+        auto *item = new MythUIButtonListItem(m_schedulesList,"",
+                                              qVariantFromValue(pginfo));
 
         InfoMap infoMap;
         pginfo->ToMap(infoMap);
@@ -500,7 +496,7 @@ void ViewScheduled::updateInfo(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    ProgramInfo *pginfo = item->GetData().value<ProgramInfo*> ();
+    auto *pginfo = item->GetData().value<ProgramInfo*> ();
     if (pginfo)
     {
         InfoMap infoMap;
@@ -524,11 +520,11 @@ void ViewScheduled::deleteRule()
     if (!item)
         return;
 
-    ProgramInfo *pginfo = item->GetData().value<ProgramInfo*>();
+    auto *pginfo = item->GetData().value<ProgramInfo*>();
     if (!pginfo)
         return;
 
-    RecordingRule *record = new RecordingRule();
+    auto *record = new RecordingRule();
     if (!record->LoadByProgram(pginfo))
     {
         delete record;
@@ -540,8 +536,7 @@ void ViewScheduled::deleteRule()
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    MythConfirmationDialog *okPopup = new MythConfirmationDialog(popupStack,
-                                                                 message, true);
+    auto *okPopup = new MythConfirmationDialog(popupStack, message, true);
 
     okPopup->SetReturnEvent(this, "deleterule");
     okPopup->SetData(qVariantFromValue(record));
@@ -582,7 +577,7 @@ void ViewScheduled::customEvent(QEvent *event)
 {
     if (event->type() == MythEvent::MythEventMessage)
     {
-        MythEvent *me = static_cast<MythEvent *>(event);
+        auto *me = static_cast<MythEvent *>(event);
         const QString& message = me->Message();
 
         if (message != "SCHEDULE_CHANGE")
@@ -601,7 +596,7 @@ void ViewScheduled::customEvent(QEvent *event)
     }
     else if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
+        auto *dce = (DialogCompletionEvent*)(event);
 
         QString resultid   = dce->GetId();
         QString resulttext = dce->GetResultText();
@@ -609,8 +604,7 @@ void ViewScheduled::customEvent(QEvent *event)
 
         if (resultid == "deleterule")
         {
-            RecordingRule *record =
-                dce->GetData().value<RecordingRule *>();
+            auto *record = dce->GetData().value<RecordingRule *>();
             if (record)
             {
                 if (buttonnum > 0)

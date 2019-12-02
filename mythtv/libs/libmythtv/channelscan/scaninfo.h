@@ -3,7 +3,7 @@
 
 // C++ headers
 #include <cstdint>
-typedef unsigned uint;
+using uint = unsigned;
 #include <vector>
 using namespace std;
 
@@ -20,7 +20,7 @@ class ScanInfo
   public:
     ScanInfo() = default;
     ScanInfo(uint scanid, uint cardid, uint sourceid,
-             bool processed, const QDateTime &scandate);
+             bool processed, QDateTime scandate);
 
     static bool MarkProcessed(uint scanid);
     static bool DeleteScan(uint scanid);

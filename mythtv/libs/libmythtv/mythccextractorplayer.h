@@ -54,13 +54,13 @@ class MTV_PUBLIC OneSubtitle
 };
 
 /// Key is a CC number (1-4), values are the subtitles in chrono order.
-typedef QHash<int, QList<OneSubtitle> > CC608StreamType;
+using CC608StreamType = QHash<int, QList<OneSubtitle> >;
 /// Key is a CC service (1-63), values are the subtitles in chrono order.
-typedef QHash<int, QList<OneSubtitle> > CC708StreamType;
+using CC708StreamType = QHash<int, QList<OneSubtitle> >;
 /// Key is a page number, values are the subtitles in chrono order.
-typedef QHash<int, QList<OneSubtitle> > TeletextStreamType;
+using TeletextStreamType = QHash<int, QList<OneSubtitle> >;
 /// Subtitles in chrono order.
-typedef QList<OneSubtitle> DVBStreamType;
+using DVBStreamType = QList<OneSubtitle>;
 
 class SRTStuff
 {
@@ -79,7 +79,7 @@ class CC608Stuff : public SRTStuff
     CC608Reader *reader;
     CC608StreamType subs;
 };
-typedef QHash<uint, CC608Stuff> CC608Info;
+using CC608Info = QHash<uint, CC608Stuff>;
 
 class CC708Stuff : public SRTStuff
 {
@@ -89,7 +89,7 @@ class CC708Stuff : public SRTStuff
     CC708Reader *reader;
     CC708StreamType subs;
 };
-typedef QHash<uint, CC708Stuff> CC708Info;
+using CC708Info = QHash<uint, CC708Stuff>;
 
 class TeletextExtractorReader;
 class TeletextStuff : public SRTStuff
@@ -100,7 +100,7 @@ class TeletextStuff : public SRTStuff
     TeletextExtractorReader *reader;
     TeletextStreamType subs;
 };
-typedef QHash<uint, TeletextStuff> TeletextInfo;
+using TeletextInfo = QHash<uint, TeletextStuff>;
 
 class DVBSubStuff
 {
@@ -111,15 +111,15 @@ class DVBSubStuff
     int             subs_num;
     DVBStreamType   subs;
 };
-typedef QHash<uint, DVBSubStuff> DVBSubInfo;
+using DVBSubInfo = QHash<uint, DVBSubStuff>;
 
-typedef QHash<uint, SubtitleReader*> SubtitleReaders;
+using SubtitleReaders = QHash<uint, SubtitleReader*>;
 
 class MTV_PUBLIC MythCCExtractorPlayer : public MythPlayer
 {
   public:
     MythCCExtractorPlayer(PlayerFlags flags, bool showProgress,
-                          const QString &fileName, const QString & destdir);
+                          QString fileName, const QString & destdir);
     MythCCExtractorPlayer(const MythCCExtractorPlayer& rhs);
     ~MythCCExtractorPlayer() = default;
 
@@ -132,7 +132,7 @@ class MTV_PUBLIC MythCCExtractorPlayer : public MythPlayer
 
   private:
     void IngestSubtitle(QList<OneSubtitle>&, const QStringList&);
-    void IngestSubtitle(QList<OneSubtitle>&, const OneSubtitle&);
+    static void IngestSubtitle(QList<OneSubtitle>&, const OneSubtitle&);
 
     enum { kProcessNormal = 0, kProcessFinalize = 1 };
     void Ingest608Captions(void);
@@ -168,7 +168,7 @@ class MTV_PUBLIC MythCCExtractorPlayer : public MythPlayer
         uint column;
         QStringList text;
     };
-    typedef QHash<uint, QMap<int, Window> > WindowsOnService;
+    using WindowsOnService = QHash<uint, QMap<int, Window> >;
     QHash<uint, WindowsOnService > m_cc708_windows;
 
     /// Keeps track for decoding time to make timestamps for subtitles.

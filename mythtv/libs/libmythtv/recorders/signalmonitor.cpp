@@ -100,7 +100,7 @@ SignalMonitor *SignalMonitor::Init(const QString& cardtype, int db_cardnum,
 #ifdef USING_DVB
     else if (CardUtil::IsDVBInputType(cardtype))
     {
-        DVBChannel *dvbc = dynamic_cast<DVBChannel*>(channel);
+        auto *dvbc = dynamic_cast<DVBChannel*>(channel);
         if (dvbc)
             signalMonitor = new DVBSignalMonitor(db_cardnum, dvbc,
                                                  release_stream);
@@ -110,14 +110,14 @@ SignalMonitor *SignalMonitor::Init(const QString& cardtype, int db_cardnum,
 #ifdef USING_V4L2
     else if ((cardtype.toUpper() == "HDPVR"))
     {
-        V4LChannel *chan = dynamic_cast<V4LChannel*>(channel);
+        auto *chan = dynamic_cast<V4LChannel*>(channel);
         if (chan)
             signalMonitor = new AnalogSignalMonitor(db_cardnum, chan,
                                                     release_stream);
     }
     else if (cardtype.toUpper() == "V4L2ENC")
     {
-        V4LChannel *chan = dynamic_cast<V4LChannel*>(channel);
+        auto *chan = dynamic_cast<V4LChannel*>(channel);
         if (chan)
             signalMonitor = new V4L2encSignalMonitor(db_cardnum, chan,
                                                      release_stream);
@@ -127,7 +127,7 @@ SignalMonitor *SignalMonitor::Init(const QString& cardtype, int db_cardnum,
 #ifdef USING_HDHOMERUN
     else if (cardtype.toUpper() == "HDHOMERUN")
     {
-        HDHRChannel *hdhrc = dynamic_cast<HDHRChannel*>(channel);
+        auto *hdhrc = dynamic_cast<HDHRChannel*>(channel);
         if (hdhrc)
             signalMonitor = new HDHRSignalMonitor(db_cardnum, hdhrc,
                                                   release_stream);
@@ -137,7 +137,7 @@ SignalMonitor *SignalMonitor::Init(const QString& cardtype, int db_cardnum,
 #ifdef USING_CETON
     else if (cardtype.toUpper() == "CETON")
     {
-        CetonChannel *cetonchan = dynamic_cast<CetonChannel*>(channel);
+        auto *cetonchan = dynamic_cast<CetonChannel*>(channel);
         if (cetonchan)
             signalMonitor = new CetonSignalMonitor(db_cardnum, cetonchan,
                                                    release_stream);
@@ -147,7 +147,7 @@ SignalMonitor *SignalMonitor::Init(const QString& cardtype, int db_cardnum,
 #ifdef USING_IPTV
     else if (cardtype.toUpper() == "FREEBOX")
     {
-        IPTVChannel *fbc = dynamic_cast<IPTVChannel*>(channel);
+        auto *fbc = dynamic_cast<IPTVChannel*>(channel);
         if (fbc)
             signalMonitor = new IPTVSignalMonitor(db_cardnum, fbc,
                                                   release_stream);
@@ -157,7 +157,7 @@ SignalMonitor *SignalMonitor::Init(const QString& cardtype, int db_cardnum,
 #ifdef USING_VBOX
     else if (cardtype.toUpper() == "VBOX")
     {
-        IPTVChannel *fbc = dynamic_cast<IPTVChannel*>(channel);
+        auto *fbc = dynamic_cast<IPTVChannel*>(channel);
         if (fbc)
             signalMonitor = new IPTVSignalMonitor(db_cardnum, fbc,
                                                   release_stream);
@@ -167,7 +167,7 @@ SignalMonitor *SignalMonitor::Init(const QString& cardtype, int db_cardnum,
 #ifdef USING_FIREWIRE
     else if (cardtype.toUpper() == "FIREWIRE")
     {
-        FirewireChannel *fc = dynamic_cast<FirewireChannel*>(channel);
+        auto *fc = dynamic_cast<FirewireChannel*>(channel);
         if (fc)
             signalMonitor = new FirewireSignalMonitor(db_cardnum, fc,
                                                       release_stream);
@@ -177,7 +177,7 @@ SignalMonitor *SignalMonitor::Init(const QString& cardtype, int db_cardnum,
 #ifdef USING_ASI
     else if (cardtype.toUpper() == "ASI")
     {
-        ASIChannel *fc = dynamic_cast<ASIChannel*>(channel);
+        auto *fc = dynamic_cast<ASIChannel*>(channel);
         if (fc)
             signalMonitor = new ASISignalMonitor(db_cardnum, fc,
                                                  release_stream);
@@ -186,7 +186,7 @@ SignalMonitor *SignalMonitor::Init(const QString& cardtype, int db_cardnum,
 
     else if (cardtype.toUpper() == "EXTERNAL")
     {
-        ExternalChannel *fc = dynamic_cast<ExternalChannel*>(channel);
+        auto *fc = dynamic_cast<ExternalChannel*>(channel);
         if (fc)
             signalMonitor = new ExternalSignalMonitor(db_cardnum, fc,
                                                       release_stream);
@@ -406,8 +406,7 @@ void SignalMonitor::SendMessage(
     for (size_t i = 0; i < m_listeners.size(); i++)
     {
         SignalMonitorListener *listener = m_listeners[i];
-        DVBSignalMonitorListener *dvblistener =
-            dynamic_cast<DVBSignalMonitorListener*>(listener);
+        auto *dvblistener = dynamic_cast<DVBSignalMonitorListener*>(listener);
 
         switch (type)
         {

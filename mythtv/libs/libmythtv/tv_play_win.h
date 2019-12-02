@@ -23,8 +23,8 @@ class TvPlayWindow : public MythScreenType
     void UpdateProgress(void);
 
   protected:
-    MythUIProgressBar *m_progressBar;
-    int                m_progress;
+    MythUIProgressBar *m_progressBar {nullptr};
+    int                m_progress    {0};
 };
 
 #endif

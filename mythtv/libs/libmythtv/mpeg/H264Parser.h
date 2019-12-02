@@ -137,7 +137,7 @@ class H264Parser {
                       const uint64_t  stream_offset);
     void Reset(void);
 
-    QString NAL_type_str(uint8_t type);
+    static QString NAL_type_str(uint8_t type);
 
     bool stateChanged(void) const { return state_changed; }
 

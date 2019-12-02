@@ -57,7 +57,7 @@ class DTVChannelInfo
     uint    m_serviceid {0};
     int     m_lcn       {-1};
 };
-typedef vector<DTVChannelInfo> DTVChannelInfoList;
+using DTVChannelInfoList = vector<DTVChannelInfo>;
 
 class DTVTransport : public DTVMultiplex
 {
@@ -67,7 +67,7 @@ class DTVTransport : public DTVMultiplex
   public:
     DTVChannelInfoList channels;
 };
-typedef vector<DTVTransport> DTVChannelList;
+using DTVChannelList = vector<DTVTransport>;
 
 /** \class DTVConfParser
  *  \brief Parses dvb-utils channel scanner output files.

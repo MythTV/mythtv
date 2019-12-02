@@ -11,7 +11,7 @@
 
 #include "ringbuffer.h"
 
-typedef struct dvd_reader_s dvd_reader_t;
+using dvd_reader_t = struct dvd_reader_s;
 
 
 /**
@@ -41,7 +41,7 @@ private:
     uint32_t      m_start  {0};
 
     class BlockRange;
-    typedef QList<BlockRange> list_t;
+    using list_t = QList<BlockRange>;
     list_t        m_list;   // List of possibly encryoted block ranges
 
     uint32_t      m_pos    {0};     // Current read position (blocks)

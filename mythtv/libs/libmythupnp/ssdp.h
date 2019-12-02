@@ -27,22 +27,20 @@
 #define SSDP_PORT       1900
 #define SSDP_SEARCHPORT 6549
 
-typedef enum
+enum SSDPMethod
 {
     SSDPM_Unknown         = 0,
     SSDPM_GetDeviceDesc   = 1,
     SSDPM_GetDeviceList   = 2
+};
 
-} SSDPMethod;
-
-typedef enum
+enum SSDPRequestType
 {
     SSDP_Unknown        = 0,
     SSDP_MSearch        = 1,
     SSDP_MSearchResp    = 2,
     SSDP_Notify         = 3
-
-} SSDPRequestType;
+};
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -56,8 +54,6 @@ typedef enum
 #define SocketIdx_Multicast  1
 #define SocketIdx_Broadcast  2
 
-#define NumberOfSockets     (sizeof( m_Sockets ) / sizeof( MSocketDevice * ))
-
 class UPNP_PUBLIC SSDP : public MThread
 {
     private:
@@ -65,7 +61,8 @@ class UPNP_PUBLIC SSDP : public MThread
         static SSDP*        g_pSSDP;  
 
         QRegExp             m_procReqLineExp        {"[ \r\n][ \r\n]*"};
-        MSocketDevice      *m_Sockets[3]            {nullptr,nullptr,nullptr};
+        constexpr static int kNumberOfSockets = 3;
+        MSocketDevice      *m_Sockets[kNumberOfSockets] {nullptr,nullptr,nullptr};
 
         int                 m_nPort                 {SSDP_PORT};
         int                 m_nSearchPort           {SSDP_SEARCHPORT};

@@ -52,8 +52,7 @@ class ThemeExtractThread : public QRunnable
     {
         extractZIP(m_srcFile, m_destDir);
 
-        MythEvent *me =
-             new MythEvent("THEME_INSTALLED", QStringList(m_srcFile));
+        auto *me = new MythEvent("THEME_INSTALLED", QStringList(m_srcFile));
         QCoreApplication::postEvent(m_parent, me);
     }
 
@@ -557,7 +556,7 @@ void ThemeChooser::showPopupMenu(void)
     MythUIButtonListItem *current = m_themes->GetItemCurrent();
     if (current)
     {
-        ThemeInfo *info = current->GetData().value<ThemeInfo *>();
+        auto *info = current->GetData().value<ThemeInfo *>();
 
         if (info)
         {
@@ -636,7 +635,7 @@ void ThemeChooser::toggleFullscreenPreview(void)
         else
         {
             MythUIButtonListItem *item = m_themes->GetItemCurrent();
-            ThemeInfo *info = item->GetData().value<ThemeInfo*>();
+            auto *info = item->GetData().value<ThemeInfo*>();
             if (info)
             {
                 if (m_fullScreenPreview)
@@ -680,7 +679,7 @@ void ThemeChooser::saveAndReload(void)
 
 void ThemeChooser::saveAndReload(MythUIButtonListItem *item)
 {
-    ThemeInfo *info = item->GetData().value<ThemeInfo *>();
+    auto *info = item->GetData().value<ThemeInfo *>();
 
     if (!info)
         return;
@@ -736,7 +735,7 @@ void ThemeChooser::saveAndReload(MythUIButtonListItem *item)
 
 void ThemeChooser::itemChanged(MythUIButtonListItem *item)
 {
-    ThemeInfo *info = item->GetData().value<ThemeInfo*>();
+    auto *info = item->GetData().value<ThemeInfo*>();
 
     if (!info)
         return;
@@ -805,7 +804,7 @@ void ThemeChooser::customEvent(QEvent *e)
 {
     if (e->type() == MythEvent::MythEventMessage)
     {
-        MythEvent *me = static_cast<MythEvent *>(e);
+        auto *me = static_cast<MythEvent *>(e);
         QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);
 
         if (tokens.isEmpty())
@@ -876,7 +875,7 @@ void ThemeChooser::customEvent(QEvent *e)
                         (fileSize > 0))
                     {
                         m_downloadState = dsExtractingTheme;
-                        ThemeExtractThread *extractThread =
+                        auto *extractThread =
                             new ThemeExtractThread(this, m_downloadFile,
                                                    m_userThemeDir);
                         MThreadPool::globalInstance()->start(
@@ -913,7 +912,7 @@ void ThemeChooser::customEvent(QEvent *e)
             gCoreContext->SaveSetting("Theme", m_downloadTheme->GetDirectoryName());
 
             // Send a message to ourself so we trigger a reload our next chance
-            MythEvent *me2 = new MythEvent("THEME_RELOAD");
+            auto *me2 = new MythEvent("THEME_RELOAD");
             qApp->postEvent(this, me2);
         }
         else if ((me->Message() == "THEME_RELOAD") &&
@@ -933,7 +932,7 @@ void ThemeChooser::removeTheme(void)
         return;
     }
 
-    ThemeInfo *info = current->GetData().value<ThemeInfo *>();
+    auto *info = current->GetData().value<ThemeInfo *>();
     if (!info)
     {
         ShowOkPopup(tr("Error, unable to find current theme."));
@@ -1081,7 +1080,7 @@ void ThemeUpdateChecker::checkForUpdate(void)
                 int locMaj = 0;
                 int locMin = 0;
 
-                ThemeInfo *remoteTheme = new ThemeInfo(remoteThemeDir);
+                auto *remoteTheme = new ThemeInfo(remoteThemeDir);
                 if (!remoteTheme || remoteTheme->GetType() & THEME_UNKN)
                 {
                     LOG(VB_GENERAL, LOG_ERR,

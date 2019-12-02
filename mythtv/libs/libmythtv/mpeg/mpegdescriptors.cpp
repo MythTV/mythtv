@@ -78,8 +78,8 @@ desc_list_t MPEGDescriptor::ParseOnlyInclude(
 const unsigned char *MPEGDescriptor::Find(const desc_list_t &parsed,
                                           uint desc_tag)
 {
-    desc_list_t::const_iterator it = parsed.begin();
-    for (; it != parsed.end(); ++it)
+    auto it = parsed.cbegin();
+    for (; it != parsed.cend(); ++it)
     {
         if ((*it)[0] == desc_tag)
             return *it;
@@ -90,8 +90,8 @@ const unsigned char *MPEGDescriptor::Find(const desc_list_t &parsed,
 desc_list_t MPEGDescriptor::FindAll(const desc_list_t &parsed, uint desc_tag)
 {
     desc_list_t tmp;
-    desc_list_t::const_iterator it = parsed.begin();
-    for (; it != parsed.end(); ++it)
+    auto it = parsed.cbegin();
+    for (; it != parsed.cend(); ++it)
     {
         if ((*it)[0] == desc_tag)
             tmp.push_back(*it);
@@ -387,7 +387,7 @@ QString MPEGDescriptor::DescriptorTagString(void) const
     if (IsValid()) { DESC_NAME d(_data, DescriptorLength()+2); \
     if (d.IsValid()) str = d.toString(); } } while (false)
 
-QString MPEGDescriptor::descrDump(QString name) const
+QString MPEGDescriptor::descrDump(const QString &name) const
 {
     QString str;
     str = QString("%1 Descriptor (0x%2) length(%3). Dumping\n")

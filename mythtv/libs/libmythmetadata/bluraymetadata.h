@@ -11,7 +11,7 @@
 
 class QStringList;
 
-typedef QList< QPair < uint,QString > > BlurayTitles;
+using BlurayTitles = QList< QPair < uint,QString > >;
 
 struct meta_dl;
 class META_PUBLIC BlurayMetadata : public QObject

@@ -19,11 +19,11 @@ extern "C" {
 #include "remoteavformatcontext.h"
 #include "mythavutil.h"
 
-typedef struct SeekAmount
+struct SeekAmount
 {
     QString name;
     int amount;
-} SeekAmount;
+};
 
 extern struct SeekAmount SeekAmounts[];
 extern int SeekAmountsCount;

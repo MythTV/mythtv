@@ -53,7 +53,7 @@ static void runZMConsole(void)
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    ZMConsole *console = new ZMConsole(mainStack);
+    auto *console = new ZMConsole(mainStack);
 
     if (console->Create())
         mainStack->AddScreen(console);
@@ -67,7 +67,7 @@ static void runZMLiveView(void)
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    ZMLivePlayer *player = new ZMLivePlayer(mainStack);
+    auto *player = new ZMLivePlayer(mainStack);
 
     if (player->Create())
         mainStack->AddScreen(player);
@@ -80,7 +80,7 @@ static void runZMEventView(void)
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    ZMEvents *events = new ZMEvents(mainStack);
+    auto *events = new ZMEvents(mainStack);
 
     if (events->Create())
         mainStack->AddScreen(events);
@@ -96,7 +96,7 @@ static void runZMMiniPlayer(void)
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    ZMMiniPlayer *miniPlayer = new ZMMiniPlayer(mainStack);
+    auto *miniPlayer = new ZMMiniPlayer(mainStack);
 
     if (miniPlayer->Create())
         mainStack->AddScreen(miniPlayer);
@@ -145,7 +145,7 @@ static int runMenu(const QString& which_menu)
         parentObject = parentObject->parent();
     }
 
-    MythThemedMenu *diag = new MythThemedMenu(
+    auto *diag = new MythThemedMenu(
         themedir, which_menu, GetMythMainWindow()->GetMainStack(),
         "zoneminder menu");
 
@@ -211,9 +211,8 @@ int mythplugin_run(void)
 int mythplugin_config(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    StandardSettingDialog *ssd =
-        new StandardSettingDialog(mainStack, "zonemindersettings",
-                                  new ZMSettings());
+    auto *ssd = new StandardSettingDialog(mainStack, "zonemindersettings",
+                                          new ZMSettings());
 
     if (ssd->Create())
         mainStack->AddScreen(ssd);

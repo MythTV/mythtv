@@ -7,7 +7,7 @@
 // Qt headers
 #include <QCoreApplication>
 
-typedef QMap<QString, int> IdCache;
+using IdCache = QMap<QString, int>;
 
 class META_PUBLIC MusicFileScanner
 {
@@ -27,7 +27,7 @@ class META_PUBLIC MusicFileScanner
         MusicFileLocation location;
     };
 
-    typedef QMap <QString, MusicFileData> MusicLoadedMap;
+    using MusicLoadedMap = QMap <QString, MusicFileData>;
     public:
         MusicFileScanner(void);
         ~MusicFileScanner(void) = default;

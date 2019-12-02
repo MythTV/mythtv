@@ -31,8 +31,8 @@ QString strftimeval(const struct timeval *tv);
 
 };  /* namespace */
 
-typedef vector<FrameAnalyzer*>    FrameAnalyzerItem;
-typedef vector<FrameAnalyzerItem> FrameAnalyzerList;
+using FrameAnalyzerItem = vector<FrameAnalyzer*>;
+using FrameAnalyzerList = vector<FrameAnalyzerItem>;
 
 class CommDetector2 : public CommDetectorBase
 {
@@ -57,7 +57,7 @@ class CommDetector2 : public CommDetectorBase
     int computeBreaks(long long nframes);
 
   private:
-    enum SkipTypes               m_commDetectMethod;
+    SkipType                     m_commDetectMethod;
     bool                         m_showProgress            {false};
     bool                         m_fullSpeed               {false};
     MythPlayer                  *m_player                  {nullptr};

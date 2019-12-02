@@ -14,13 +14,13 @@ class PlayGroupDBStorage : public SimpleDBStorage
     PlayGroupDBStorage(StandardSetting *_setting,
                        const PlayGroupConfig &_parent,
                        const QString&   _name) :
-        SimpleDBStorage(_setting, "playgroup", _name), parent(_parent)
+        SimpleDBStorage(_setting, "playgroup", _name), m_parent(_parent)
     {
     }
 
     QString GetWhereClause(MSqlBindings &bindings) const override; // SimpleDBStorage
 
-    const PlayGroupConfig &parent;
+    const PlayGroupConfig &m_parent;
 };
 
 QString PlayGroupDBStorage::GetWhereClause(MSqlBindings &bindings) const
@@ -28,7 +28,7 @@ QString PlayGroupDBStorage::GetWhereClause(MSqlBindings &bindings) const
     QString nameTag(":WHERENAME");
     QString query("name = " + nameTag);
 
-    bindings.insert(nameTag, parent.getName());
+    bindings.insert(nameTag, m_parent.getName());
 
     return query;
 }
@@ -277,8 +277,8 @@ PlayGroupEditor::PlayGroupEditor()
 void PlayGroupEditor::CreateNewPlayBackGroup()
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythTextInputDialog *settingdialog =
-        new MythTextInputDialog(popupStack, tr("Enter new group name"));
+    auto *settingdialog = new MythTextInputDialog(popupStack,
+                                                  tr("Enter new group name"));
 
     if (settingdialog->Create())
     {

@@ -56,7 +56,7 @@ bool MythThemedMenuState::Create(void)
 
 void MythThemedMenuState::CopyFrom(MythUIType *base)
 {
-    MythThemedMenuState *st = dynamic_cast<MythThemedMenuState *>(base);
+    auto *st = dynamic_cast<MythThemedMenuState *>(base);
     if (!st)
     {
         LOG(VB_GENERAL, LOG_INFO, "ERROR, bad parsing");
@@ -373,7 +373,7 @@ void MythThemedMenu::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
+        auto *dce = (DialogCompletionEvent*)(event);
 
         QString resultid = dce->GetId();
         //int buttonnum = dce->GetResult();
@@ -691,8 +691,7 @@ void MythThemedMenu::addButton(const QString &type, const QString &text,
     if (m_watermarkState)
         m_watermarkState->EnsureStateLoaded(type);
 
-    MythUIButtonListItem *listbuttonitem =
-                                new MythUIButtonListItem(m_buttonList, text,
+    auto *listbuttonitem = new MythUIButtonListItem(m_buttonList, text,
                                                 qVariantFromValue(newbutton));
 
     listbuttonitem->DisplayState(type, "icon");
@@ -794,8 +793,7 @@ bool MythThemedMenu::handleAction(const QString &action, const QString &password
 
         MythScreenStack *stack = GetScreenStack();
 
-        MythThemedMenu *newmenu = new MythThemedMenu("", menu, stack, menu,
-                                                     false, m_state);
+        auto *newmenu = new MythThemedMenu("", menu, stack, menu, false, m_state);
         if (newmenu->foundTheme())
             stack->AddScreen(newmenu);
         else
@@ -921,8 +919,7 @@ bool MythThemedMenu::checkPinCode(const QString &password_setting)
 
     QString text = tr("Enter password:");
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythTextInputDialog *dialog =
-            new MythTextInputDialog(popupStack, text, FilterNone, true);
+    auto *dialog = new MythTextInputDialog(popupStack, text, FilterNone, true);
 
     if (dialog->Create())
     {

@@ -21,7 +21,7 @@ class MTV_PUBLIC InputInfo
         m_inputid(_inputid),
         m_mplexid(_mplexid),
         m_chanid(_chanid),
-        m_livetvorder(_livetvorder) {}
+        m_liveTvOrder(_livetvorder) {}
 
     InputInfo(const InputInfo &other) :
         m_name(other.m_name),
@@ -32,7 +32,7 @@ class MTV_PUBLIC InputInfo
         m_displayName(other.m_displayName),
         m_recPriority(other.m_recPriority),
         m_scheduleOrder(other.m_scheduleOrder),
-        m_livetvorder(other.m_livetvorder),
+        m_liveTvOrder(other.m_liveTvOrder),
         m_quickTune(other.m_quickTune) {}
 
     InputInfo &operator=(const InputInfo &other)
@@ -45,7 +45,7 @@ class MTV_PUBLIC InputInfo
         m_displayName   = other.m_displayName;
         m_recPriority   = other.m_recPriority;
         m_scheduleOrder = other.m_scheduleOrder;
-        m_livetvorder   = other.m_livetvorder;
+        m_liveTvOrder   = other.m_liveTvOrder;
         m_quickTune     = other.m_quickTune;
         return *this;
     }
@@ -74,7 +74,7 @@ class MTV_PUBLIC InputInfo
     QString m_displayName;
     int     m_recPriority   {0};
     uint    m_scheduleOrder {0};
-    uint    m_livetvorder   {0}; ///< order for live TV use
+    uint    m_liveTvOrder   {0}; ///< order for live TV use
     bool    m_quickTune     {false};
 };
 

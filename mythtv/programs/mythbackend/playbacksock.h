@@ -18,12 +18,12 @@ class MythSocket;
 class MainServer;
 class ProgramInfo;
 
-typedef enum {
+enum PlaybackSockEventsMode {
     kPBSEvents_None       = 0,
     kPBSEvents_Normal     = 1,
     kPBSEvents_NonSystem  = 2,
     kPBSEvents_SystemOnly = 3
-} PlaybackSockEventsMode;
+};
 
 class PlaybackSock : public ReferenceCounter
 {

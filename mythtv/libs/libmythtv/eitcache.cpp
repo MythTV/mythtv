@@ -239,7 +239,7 @@ event_map_t * EITCache::LoadChannel(uint chanid)
         return nullptr;
     }
 
-    event_map_t * eventMap = new event_map_t();
+    auto *eventMap = new event_map_t();
 
     while (query.next())
     {

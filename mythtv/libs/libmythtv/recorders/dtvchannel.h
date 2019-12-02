@@ -124,7 +124,7 @@ class DTVChannel : public ChannelBase
     void RegisterForMaster(const QString &key);
     void DeregisterForMaster(const QString &key);
     static DTVChannel *GetMasterLock(const QString &key);
-    typedef DTVChannel* DTVChannelP;
+    using DTVChannelP = DTVChannel*;
     static void ReturnMasterLock(DTVChannelP&);
 
     /// \brief Returns true if this is the first of a number of multi-rec devs
@@ -176,7 +176,7 @@ class DTVChannel : public ChannelBase
     /// This is a generated PMT for RAW pid tuning
     ProgramMapTable         *m_genPMT {nullptr};
 
-    typedef QMap<QString,QList<DTVChannel*> > MasterMap;
+    using MasterMap = QMap<QString,QList<DTVChannel*> >;
     static QReadWriteLock    s_master_map_lock;
     static MasterMap         s_master_map;
 };

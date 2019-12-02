@@ -142,7 +142,7 @@ ProgramInfo *RemoteEncoder::GetRecording(void)
 
     if (SendReceiveStringList(strlist))
     {
-        ProgramInfo *proginfo = new ProgramInfo(strlist);
+        auto *proginfo = new ProgramInfo(strlist);
         if (proginfo->GetChanID())
             return proginfo;
         delete proginfo;
