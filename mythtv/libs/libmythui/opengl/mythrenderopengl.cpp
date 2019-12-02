@@ -354,6 +354,24 @@ bool MythRenderOpenGL::Init(void)
         extra.glBindVertexArray(m_vao);
     }
 
+    // For (embedded) GPUs that use tile based rendering, it is faster to use
+    // glClear e.g. on the Pi3 it improves video frame rate significantly. Using
+    // glClear tells the GPU it doesn't have to retrieve the old framebuffer and will
+    // also clear existing draw calls.
+    // For now this just includes Broadcom VideoCoreIV.
+    // Other Tile Based Deferred Rendering GPUS - PowerVR5/6/7, Apple (PowerVR as well?)
+    // Other Tile Based Immediate Mode Rendering GPUS - ARM Mali, Qualcomm Adreno
+    static const QByteArray tiled[2] = { "videocore", "vc4" };
+    auto renderer = QByteArray(reinterpret_cast<const char*>(glGetString(GL_RENDERER))).toLower();
+    for (int i = 0 ; i < 2; ++i)
+    {
+        if (renderer.contains(tiled[i]))
+        {
+            m_extraFeatures |= kGLTiled;
+            break;
+        }
+    }
+
     DebugFeatures();
 
     m_extraFeaturesUsed = m_extraFeatures;

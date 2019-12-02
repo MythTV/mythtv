@@ -500,25 +500,27 @@ void MythVideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, 
 
     m_render->BindFramebuffer(nullptr);
 
-    // avoid clearing the framebuffer if it will be entirely overwritten by video
-    if (!m_window.VideoIsFullScreen() || (!Frame || dummy))
-    {
-        if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
-            m_render->logDebugMarker(LOC + "CLEAR_START");
+    if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
+        m_render->logDebugMarker(LOC + "CLEAR_START");
 
-        int gray = m_dbLetterboxColour == kLetterBoxColour_Gray25 ? 127 : 0;
-
+    int gray = m_dbLetterboxColour == kLetterBoxColour_Gray25 ? 64 : 0;
+    bool useclear = !Frame || dummy || m_render->GetExtraFeatures() & kGLTiled;
 #if QT_VERSION < QT_VERSION_CHECK(5, 8, 0)
-        // Qt < 5.8 uses a different QRegion API. Just clear and remove this code
-        // when 5.8 is standard
+    // Qt < 5.8 uses a different QRegion API. Just clear and remove this code
+    // when 5.8 is standard
+    useclear = true;
+#endif
+
+    if (useclear)
+    {
         m_render->SetBackground(gray, gray, gray, 255);
         m_render->ClearFramebuffer();
-#else
-        if (!Frame || dummy)
-        {
-            m_render->ClearFramebuffer();
-        }
-        else if (m_window.IsEmbedding())
+    }
+#if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
+    // avoid clearing the framebuffer if it will be entirely overwritten by video
+    else if (!m_window.VideoIsFullScreen())
+    {
+        if (m_window.IsEmbedding())
         {
             // use MythRenderOpenGL rendering as it will clear to the appropriate 'black level'
             m_render->ClearRect(nullptr, m_window.GetWindowRect(), gray);
@@ -528,14 +530,14 @@ void MythVideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, 
             // in the vast majority of cases it is significantly quicker to just
             // clear the unused portions of the screen
             QRegion toclear = m_window.GetBoundingRegion();
-            for (QRegion::const_iterator it = toclear.begin() ; it != toclear.end(); ++it)
+            for (auto it = toclear.begin() ; it != toclear.end(); ++it)
                 m_render->ClearRect(nullptr, *it, gray);
         }
+    }
 #endif
 
-        if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
-            m_render->logDebugMarker(LOC + "CLEAR_END");
-    }
+    if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
+        m_render->logDebugMarker(LOC + "CLEAR_END");
 
     // time framebuffer clearing
     if (m_openGLPerf)
