@@ -3679,6 +3679,26 @@ nullptr
             return false;
     }
 
+    if (dbver == "1358")
+    {
+        const char *updates[] = {
+            // Allow videosouce.userid to be NULL as originally intended.
+            "ALTER TABLE videosource "
+            "  CHANGE COLUMN userid userid VARCHAR(128) NULL DEFAULT NULL",
+            // And fix any leftover, empty values.
+            "UPDATE videosource "
+            "  SET userid = NULL "
+            "  WHERE userid = ''",
+            // Remove potential clear text credentials no longer usable
+            "UPDATE videosource "
+            "  SET userid = NULL, password = NULL "
+            "  WHERE xmltvgrabber IN ('schedulesdirect1', 'datadirect')",
+            nullptr
+        };
+        if (!performActualUpdate(updates, "1359", dbver))
+            return false;
+    }
+
     return true;
 }
 
