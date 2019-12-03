@@ -47,7 +47,7 @@ ProgramInfoUpdater *ProgramInfo::s_updater;
 int force_init = pginfo_init_statics();
 bool ProgramInfo::s_usingProgIDAuth = true;
 
-const static uint kInvalidDateTime = (uint)-1;
+const static uint kInvalidDateTime = UINT_MAX;
 
 
 const QString ProgramInfo::kFromRecordedQuery =

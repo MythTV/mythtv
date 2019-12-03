@@ -7531,7 +7531,7 @@ void MainServer::HandlePixmapLastModified(QStringList &slist, PlaybackSock *pbs)
         if (lastmodified.isValid())
             strlist = QStringList(QString::number(lastmodified.toSecsSinceEpoch()));
         else
-            strlist = QStringList(QString::number((uint)-1));
+            strlist = QStringList(QString::number(UINT_MAX));
 #endif
     }
     else
@@ -7605,7 +7605,7 @@ void MainServer::HandlePixmapGetIfModified(
                     if (lastmodified.isValid())
                         strlist += QString::number(lastmodified.toSecsSinceEpoch());
                     else
-                        strlist += QString::number((uint)-1);
+                        strlist += QString::number(UINT_MAX);
 #endif
                     strlist += QString::number(data.size());
                     strlist += QString::number(qChecksum(data.constData(),
@@ -7647,7 +7647,7 @@ void MainServer::HandlePixmapGetIfModified(
                 if (lastmodified.isValid())
                     strlist += QString::number(lastmodified.toSecsSinceEpoch());
                 else
-                    strlist += QString::number((uint)-1);
+                    strlist += QString::number(UINT_MAX);
 #endif
             }
 

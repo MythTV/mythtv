@@ -116,14 +116,14 @@ class V4L2encStreamHandler : public StreamHandler
     int           m_audio_volume           {-1};
     int           m_lang_mode              {-1}; ///< 0 is Main Lang; 1 is SAP Lang; 2 is Dual
     uint          m_low_bitrate_mode       {V4L2_MPEG_VIDEO_BITRATE_MODE_VBR};
-    uint          m_low_bitrate            {(uint)-1};
-    uint          m_low_peak_bitrate       {(uint)-1};
+    uint          m_low_bitrate            {UINT_MAX};
+    uint          m_low_peak_bitrate       {UINT_MAX};
     uint          m_medium_bitrate_mode    {V4L2_MPEG_VIDEO_BITRATE_MODE_VBR};
-    uint          m_medium_bitrate         {(uint)-1};
-    uint          m_medium_peak_bitrate    {(uint)-1};
+    uint          m_medium_bitrate         {UINT_MAX};
+    uint          m_medium_peak_bitrate    {UINT_MAX};
     uint          m_high_bitrate_mode      {V4L2_MPEG_VIDEO_BITRATE_MODE_VBR};
-    uint          m_high_bitrate           {(uint)-1};
-    uint          m_high_peak_bitrate      {(uint)-1};
+    uint          m_high_bitrate           {UINT_MAX};
+    uint          m_high_peak_bitrate      {UINT_MAX};
 
     static const int   s_audio_rateL1[];
     static const int   s_audio_rateL2[];
@@ -134,10 +134,10 @@ class V4L2encStreamHandler : public StreamHandler
     int           m_fd                     {-1};
     int           m_audio_input;
 
-    uint          m_width                  {(uint)-1};
-    uint          m_height                 {(uint)-1};
+    uint          m_width                  {UINT_MAX};
+    uint          m_height                 {UINT_MAX};
     bool          m_has_lock               {false};
-    uint          m_signal_strength        {(uint)-1};
+    uint          m_signal_strength        {UINT_MAX};
 
     V4L2util      m_v4l2;
     DeviceReadBuffer *m_drb                {nullptr};
