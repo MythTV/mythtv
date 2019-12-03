@@ -214,6 +214,19 @@ static subtitle_t *sub_read_line_sami(demux_sputext_t *demuxstr, subtitle_t *cur
 }
 
 
+
+/**
+ * \brief Extract the next token from a string.
+ *
+ * \param source The character string to scan.
+ * \param dest A newly allocated string containing the text from the
+ *             source string up to the next newline, carriage return,
+ *             or vertical bar.
+ *
+ * \returns one of 1) a pointer to a newly allocated string, 2)
+ * nullptr ig the end of te string was reached, or "(char*)-1" on
+ * error.
+ */
 static char *sub_readtext(char *source, char **dest) {
   int len=0;
   char *p=source;
@@ -259,7 +272,7 @@ static subtitle_t *sub_read_line_microdvd(demux_sputext_t *demuxstr, subtitle_t 
 
   next=p, i=0;
   while ((next =sub_readtext (next, &(current->text[i])))) {
-    if (current->text[i]==ERR) return (subtitle_t *)ERR;
+    if (next==ERR) return (subtitle_t *)ERR;
     i++;
     if (i>=SUB_MAX_TEXT) {
       printf ("Too many lines in a subtitle\n");
@@ -443,7 +456,7 @@ static subtitle_t *sub_read_line_vplayer(demux_sputext_t *demuxstr,subtitle_t *c
     next=p;
     i=0;
     while( (next = sub_readtext( next, &(current->text[i]))) ) {
-      if (current->text[i]==ERR)
+      if (next==ERR)
         return (subtitle_t *)ERR;
       i++;
       if (i>=SUB_MAX_TEXT) {
@@ -494,7 +507,7 @@ static subtitle_t *sub_read_line_rt(demux_sputext_t *demuxstr,subtitle_t *curren
     /* TODO: I don't know what kind of convention is here for marking multiline subs, maybe <br/> like in xml? */
     next = strstr(line,"<clear/>")+8;i=0;
     while ((next =sub_readtext (next, &(current->text[i])))) {
-      if (current->text[i]==ERR)
+      if (next==ERR)
           return (subtitle_t *)ERR;
       i++;
       if (i>=SUB_MAX_TEXT) {
@@ -953,7 +966,7 @@ static subtitle_t *sub_read_line_subrip09 (demux_sputext_t *demuxstr, subtitle_t
   next=line;
   i=0;
   while ((next = sub_readtext (next, &(current->text[i])))) {
-    if (current->text[i]==ERR) return (subtitle_t *)ERR;
+    if (next==ERR) return (subtitle_t *)ERR;
     i++;
     if (i>=SUB_MAX_TEXT) {
       printf("Too many lines in a subtitle\n");
@@ -988,7 +1001,7 @@ static subtitle_t *sub_read_line_mpl2(demux_sputext_t *demuxstr, subtitle_t *cur
 
   next=p, i=0;
   while ((next = sub_readtext (next, &(current->text[i])))) {
-      if (current->text[i] == ERR) {return (subtitle_t *)ERR;}
+      if (next == ERR) {return (subtitle_t *)ERR;}
       i++;
       if (i >= SUB_MAX_TEXT) {
         printf("Too many lines in a subtitle\n");
