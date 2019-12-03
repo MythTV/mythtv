@@ -2704,6 +2704,9 @@ void MythPlayer::SwitchToProgram(void)
     Pause();
     ChangeSpeed();
 
+    // Release all frames to ensure the current decoder resources are released
+    DiscardVideoFrames(true, true);
+
     if (newIsDummy)
     {
         OpenDummy();
@@ -2854,6 +2857,10 @@ void MythPlayer::JumpToProgram(void)
     Pause();
     ChangeSpeed();
     ResetCaptions();
+
+    // Release all frames to ensure the current decoder resources are released
+    DiscardVideoFrames(true, true);
+
     player_ctx->m_tvchain->SetProgram(*pginfo);
     player_ctx->m_buffer->Reset(true);
 
