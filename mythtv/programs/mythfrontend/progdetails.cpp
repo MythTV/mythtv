@@ -827,7 +827,7 @@ void ProgDetails::loadPage(void)
     }
     else if (m_progInfo.GetRecordingRuleID())
     {
-        recordingProfile =  record->m_recProfile;
+        recordingProfile = record ? record->m_recProfile : tr("Unknown");
     }
     addItem(tr("Recording Host"), recordingHost, ProgInfoList::kLevel2);
     addItem(tr("Recording Input"), recordingInput, ProgInfoList::kLevel2);

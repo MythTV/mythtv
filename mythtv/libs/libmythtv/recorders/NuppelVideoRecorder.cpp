@@ -1556,7 +1556,8 @@ again:
 
         if (!m_request_pause)
         {
-            if (m_v4l2_pixelformat == V4L2_PIX_FMT_YUYV)
+            if ((m_v4l2_pixelformat == V4L2_PIX_FMT_YUYV) &&
+                     (output_buffer != nullptr))
             {
                 AVFrame img_in;
                 av_image_fill_arrays(img_in.data, img_in.linesize,
@@ -1566,7 +1567,8 @@ again:
                           0, m_height, img_out.data, img_out.linesize);
                 BufferIt(output_buffer, m_video_buffer_size);
             }
-            else if (m_v4l2_pixelformat == V4L2_PIX_FMT_UYVY)
+            else if ((m_v4l2_pixelformat == V4L2_PIX_FMT_UYVY) &&
+                     (output_buffer != nullptr))
             {
                 AVFrame img_in;
                 av_image_fill_arrays(img_in.data, img_in.linesize,
