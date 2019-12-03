@@ -30,7 +30,6 @@ class MythEGLDMABUF
                                                            MythRenderOpenGL *Context,
                                                            VideoFrame *Frame);
     bool m_useModifiers { false };
-    bool m_gltwo        { true };
 };
 
 #endif // MYTHEGLDMABUF_H

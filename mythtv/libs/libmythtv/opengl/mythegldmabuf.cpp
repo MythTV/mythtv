@@ -20,9 +20,6 @@ MythEGLDMABUF::MythEGLDMABUF(MythRenderOpenGL *Context)
         OpenGLLocker locker(Context);
         m_useModifiers = Context->IsEGL() && Context->HasEGLExtension("EGL_EXT_image_dma_buf_import_modifiers");
         QSurfaceFormat fmt = Context->format();
-        // NB this forces GL_TEXTURE_EXTERNAL_OES texture type for GLES2
-        // untested on GLES3 or GL2
-        m_gltwo = fmt.majorVersion() < 3;
     }
 }
 
@@ -64,7 +61,7 @@ inline vector<MythVideoTexture*> MythEGLDMABUF::CreateComposed(AVDRMFrameDescrip
     sizes.emplace_back(QSize(Frame->width, Frame->height));
     vector<MythVideoTexture*> textures =
             MythVideoTexture::CreateTextures(Context, Frame->codec, FMT_RGBA32, sizes,
-                                             m_gltwo ? GL_TEXTURE_EXTERNAL_OES : QOpenGLTexture::Target2D);
+                                             GL_TEXTURE_EXTERNAL_OES);
     for (uint i = 0; i < textures.size(); ++i)
         textures[i]->m_allowGLSLDeint = false;
 
@@ -160,7 +157,7 @@ inline vector<MythVideoTexture*> MythEGLDMABUF::CreateSeparate(AVDRMFrameDescrip
     VideoFrameType format = PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->sw_pix_fmt));
     vector<MythVideoTexture*> result =
             MythVideoTexture::CreateTextures(Context, Frame->codec, format, sizes,
-                                             m_gltwo ? GL_TEXTURE_EXTERNAL_OES : QOpenGLTexture::Target2D);
+                                             QOpenGLTexture::Target2D);
     for (uint i = 0; i < result.size(); ++i)
         result[i]->m_allowGLSLDeint = true;
 

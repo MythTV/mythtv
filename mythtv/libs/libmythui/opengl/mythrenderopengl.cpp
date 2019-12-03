@@ -361,9 +361,9 @@ bool MythRenderOpenGL::Init(void)
     // For now this just includes Broadcom VideoCoreIV.
     // Other Tile Based Deferred Rendering GPUS - PowerVR5/6/7, Apple (PowerVR as well?)
     // Other Tile Based Immediate Mode Rendering GPUS - ARM Mali, Qualcomm Adreno
-    static const QByteArray tiled[2] = { "videocore", "vc4" };
+    static const QByteArray tiled[3] = { "videocore", "vc4", "v3d" };
     auto renderer = QByteArray(reinterpret_cast<const char*>(glGetString(GL_RENDERER))).toLower();
-    for (int i = 0 ; i < 2; ++i)
+    for (int i = 0 ; i < 3; ++i)
     {
         if (renderer.contains(tiled[i]))
         {
