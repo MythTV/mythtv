@@ -1159,7 +1159,7 @@ void VideoDisplayProfile::CreateProfiles(const QString &HostName)
     {
         (void) QObject::tr("MediaCodec Normal",
                            "Sample: MediaCodec Normal");
-        groupid = CreateProfileGroup("MediaCodec Normal", hostname);
+        groupid = CreateProfileGroup("MediaCodec Normal", HostName);
         CreateProfile(groupid, 1, "", "", "",
                       "mediacodec-dec", 4, true, "opengl-yv12",
                       "shader:driver:medium", "shader:driver:medium");

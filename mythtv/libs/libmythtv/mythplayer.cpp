@@ -4264,7 +4264,7 @@ void MythPlayer::ClearBeforeSeek(uint64_t Frames)
     MythCodecID codec = decoder ? decoder->GetVideoCodecID() : kCodec_NONE;
     decoder_change_lock.unlock();
     if (codec_is_mediacodec(codec))
-        videoOutput->DiscardFrames(true);
+        videoOutput->DiscardFrames(true, true);
 #else
     Q_UNUSED(Frames);
 #endif
