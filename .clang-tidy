@@ -175,19 +175,6 @@ Checks: '-*,
         # anyway. ,
        -readability-implicit-bool-conversion,
 
-        # Has two issues:
-        #
-        #    function template specialization
-        #    CheckedSet<MythUIStateType> has a primary template
-        #    declaration with different parameter names
-        #
-        #    function ParentalLevelChangeCheckerPrivate::SigDone has a
-        #    definition with different parameter names
-        #    [readability-inconsistent-declaration-parameter-name]
-        #    void SigDone(bool passwordValid => _t1,
-        #    ParentalLevel::Level toLevel => _t2);       ,
-       -readability-inconsistent-declaration-parameter-name,
-
         # Produces lots of changes.  Is this necessary? ,
        -readability-isolate-declaration,
 
