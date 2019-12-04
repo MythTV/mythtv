@@ -69,6 +69,7 @@ static inline void mmx_zero_reg ()
     pxor_r2r (mm0, mm0);
 }
 
+/* NOLINTNEXTLINE(readability-non-const-parameter) */
 static inline void mmx_average_2_U8 (uint8_t * dest, const uint8_t * src1,
 				     const uint8_t * src2)
 {
@@ -88,6 +89,7 @@ static inline void mmx_average_2_U8 (uint8_t * dest, const uint8_t * src1,
     movq_r2m (mm4, *dest);	/* store result in dest */
 }
 
+/* NOLINTNEXTLINE(readability-non-const-parameter) */
 static inline void mmx_interp_average_2_U8 (uint8_t * dest,
 					    const uint8_t * src1,
 					    const uint8_t * src2)
@@ -118,6 +120,7 @@ static inline void mmx_interp_average_2_U8 (uint8_t * dest,
     movq_r2m (mm6, *dest);	/* store result in dest */
 }
 
+/* NOLINTNEXTLINE(readability-non-const-parameter) */
 static inline void mmx_average_4_U8 (uint8_t * dest, const uint8_t * src1,
 				     const uint8_t * src2,
 				     const uint8_t * src3,
@@ -171,6 +174,7 @@ static inline void mmx_average_4_U8 (uint8_t * dest, const uint8_t * src1,
     movq_r2m (mm1, *dest);	/* store result in dest */
 }
 
+/* NOLINTNEXTLINE(readability-non-const-parameter) */
 static inline void mmx_interp_average_4_U8 (uint8_t * dest,
 					    const uint8_t * src1,
 					    const uint8_t * src2,
@@ -267,6 +271,7 @@ static void MC_avg_o_8_mmx (uint8_t * dest, const uint8_t * ref,
 
 /*-----------------------------------------------------------------------*/
 
+/* NOLINTNEXTLINE(readability-non-const-parameter) */
 static inline void MC_put_mmx (const int width, int height, uint8_t * dest,
 			       const uint8_t * ref, const int stride)
 {
@@ -524,6 +529,7 @@ do {					\
 /* CPU_MMXEXT code */
 
 
+/* NOLINTNEXTLINE(readability-non-const-parameter) */
 static inline void MC_put1_8 (int height, uint8_t * dest, const uint8_t * ref,
 			      const int stride)
 {
@@ -535,6 +541,7 @@ static inline void MC_put1_8 (int height, uint8_t * dest, const uint8_t * ref,
     } while (--height);
 }
 
+/* NOLINTNEXTLINE(readability-non-const-parameter) */
 static inline void MC_put1_16 (int height, uint8_t * dest, const uint8_t * ref,
 			       const int stride)
 {
@@ -548,6 +555,7 @@ static inline void MC_put1_16 (int height, uint8_t * dest, const uint8_t * ref,
     } while (--height);
 }
 
+/* NOLINTNEXTLINE(readability-non-const-parameter) */
 static inline void MC_avg1_8 (int height, uint8_t * dest, const uint8_t * ref,
 			      const int stride, const int cpu)
 {
@@ -560,6 +568,7 @@ static inline void MC_avg1_8 (int height, uint8_t * dest, const uint8_t * ref,
     } while (--height);
 }
 
+/* NOLINTNEXTLINE(readability-non-const-parameter) */
 static inline void MC_avg1_16 (int height, uint8_t * dest, const uint8_t * ref,
 			       const int stride, const int cpu)
 {
@@ -575,6 +584,7 @@ static inline void MC_avg1_16 (int height, uint8_t * dest, const uint8_t * ref,
     } while (--height);
 }
 
+/* NOLINTNEXTLINE(readability-non-const-parameter) */
 static inline void MC_put2_8 (int height, uint8_t * dest, const uint8_t * ref,
 			      const int stride, const int offset,
 			      const int cpu)
@@ -588,6 +598,7 @@ static inline void MC_put2_8 (int height, uint8_t * dest, const uint8_t * ref,
     } while (--height);
 }
 
+/* NOLINTNEXTLINE(readability-non-const-parameter) */
 static inline void MC_put2_16 (int height, uint8_t * dest, const uint8_t * ref,
 			       const int stride, const int offset,
 			       const int cpu)
@@ -604,6 +615,7 @@ static inline void MC_put2_16 (int height, uint8_t * dest, const uint8_t * ref,
     } while (--height);
 }
 
+/* NOLINTNEXTLINE(readability-non-const-parameter) */
 static inline void MC_avg2_8 (int height, uint8_t * dest, const uint8_t * ref,
 			      const int stride, const int offset,
 			      const int cpu)
@@ -618,6 +630,7 @@ static inline void MC_avg2_8 (int height, uint8_t * dest, const uint8_t * ref,
     } while (--height);
 }
 
+/* NOLINTNEXTLINE(readability-non-const-parameter) */
 static inline void MC_avg2_16 (int height, uint8_t * dest, const uint8_t * ref,
 			       const int stride, const int offset,
 			       const int cpu)
@@ -638,6 +651,7 @@ static inline void MC_avg2_16 (int height, uint8_t * dest, const uint8_t * ref,
 
 static mmx_t mask_one = {0x0101010101010101LL};
 
+/* NOLINTNEXTLINE(readability-non-const-parameter) */
 static inline void MC_put4_8 (int height, uint8_t * dest, const uint8_t * ref,
 			      const int stride, const int cpu)
 {
@@ -677,6 +691,7 @@ static inline void MC_put4_8 (int height, uint8_t * dest, const uint8_t * ref,
     } while (--height);
 }
 
+/* NOLINTNEXTLINE(readability-non-const-parameter) */
 static inline void MC_put4_16 (int height, uint8_t * dest, const uint8_t * ref,
 			       const int stride, const int cpu)
 {
@@ -723,6 +738,7 @@ static inline void MC_put4_16 (int height, uint8_t * dest, const uint8_t * ref,
     } while (--height);
 }
 
+/* NOLINTNEXTLINE(readability-non-const-parameter) */
 static inline void MC_avg4_8 (int height, uint8_t * dest, const uint8_t * ref,
 			      const int stride, const int cpu)
 {
@@ -752,6 +768,7 @@ static inline void MC_avg4_8 (int height, uint8_t * dest, const uint8_t * ref,
     } while (--height);
 }
 
+/* NOLINTNEXTLINE(readability-non-const-parameter) */
 static inline void MC_avg4_16 (int height, uint8_t * dest, const uint8_t * ref,
 			       const int stride, const int cpu)
 {

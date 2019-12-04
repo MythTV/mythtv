@@ -7,6 +7,7 @@
 
 #include "goom_tools.h"
 
+/* NOLINTNEXTLINE(readability-non-const-parameter) */
 void
 ifs_update (guint32 * data, const guint32 * back, int width, int height,
 						int increment)

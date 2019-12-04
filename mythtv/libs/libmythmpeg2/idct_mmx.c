@@ -147,6 +147,7 @@ static inline void mmxext_row (const int16_t * const table,
     psubd_r2r (mm5, mm4);		/* mm4 = a3-b3 a2-b2 + rounder */
 }
 
+/* NOLINTNEXTLINE(readability-non-const-parameter) */
 static inline void mmxext_row_tail (int16_t * const row, const int store)
 {
     psrad_i2r (ROW_SHIFT, mm0);		/* mm0 = y3 y2 */
@@ -165,6 +166,7 @@ static inline void mmxext_row_tail (int16_t * const row, const int store)
     movq_r2m (mm4, *(row+store+4));	/* save y7 y6 y5 y4 */
 }
 
+/* NOLINTNEXTLINE(readability-non-const-parameter) */
 static inline void mmxext_row_mid (int16_t * const row, const int store,
 				   const int offset,
 				   const int16_t * const table)
@@ -265,6 +267,7 @@ static inline void mmx_row (const int16_t * const table,
     psubd_r2r (mm5, mm7);		/* mm7 = a3-b3 a2-b2 + rounder */
 }
 
+/* NOLINTNEXTLINE(readability-non-const-parameter) */
 static inline void mmx_row_tail (int16_t * const row, const int store)
 {
     psrad_i2r (ROW_SHIFT, mm0);		/* mm0 = y3 y2 */
@@ -289,6 +292,7 @@ static inline void mmx_row_tail (int16_t * const row, const int store)
     movq_r2m (mm7, *(row+store+4));	/* save y7 y6 y5 y4 */
 }
 
+/* NOLINTNEXTLINE(readability-non-const-parameter) */
 static inline void mmx_row_mid (int16_t * const row, const int store,
 				const int offset, const int16_t * const table)
 {
@@ -397,6 +401,7 @@ static inline void idct_col (int16_t * col, int offset)
 
 
 /* MMX column IDCT */
+/* NOLINTNEXTLINE(readability-non-const-parameter) */
 static inline void idct_col (int16_t * const col, const int offset)
 {
 #define T1 13036
@@ -602,6 +607,7 @@ do {					\
     packuswb_r2r (r1, r0);		\
 } while (0)
 
+/* NOLINTNEXTLINE(readability-non-const-parameter) */
 static inline void block_copy (const int16_t * const block, uint8_t * dest,
 			       const int stride)
 {
@@ -635,6 +641,7 @@ do {					\
     paddsw_m2r (*(block+(offset)+4), r2);	\
 } while (0)
 
+/* NOLINTNEXTLINE(readability-non-const-parameter) */
 static inline void block_add (const int16_t * const block, uint8_t * dest,
 			      const int stride)
 {
@@ -664,6 +671,7 @@ static inline void block_add (const int16_t * const block, uint8_t * dest,
 }
 
 
+/* NOLINTNEXTLINE(readability-non-const-parameter) */
 static inline void block_zero (int16_t * const block)
 {
     pxor_r2r (mm0, mm0);
@@ -698,6 +706,7 @@ do {					\
 	pshufw_r2r (reg, reg, 0x00);	\
 } while (0)
 
+/* NOLINTNEXTLINE(readability-non-const-parameter) */
 static inline void block_add_DC (int16_t * const block, uint8_t * dest,
 				 const int stride, const int cpu)
 {

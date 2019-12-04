@@ -194,9 +194,6 @@ Checks: '-*,
         # Lots of noise. Needs work. ,
        -readability-magic-numbers,
 
-        # Doesnt understand MMX assembly code. ,
-       -readability-non-const-parameter,
-
 '
 
 CheckOptions:

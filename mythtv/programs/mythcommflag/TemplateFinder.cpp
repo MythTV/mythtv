@@ -613,8 +613,8 @@ analyzeFrameDebug(long long frameno, const AVFrame *pgm, int pgmheight,
     return true;
 }
 
-bool
-readTemplate(const QString& datafile, int *prow, int *pcol, int *pwidth, int *pheight,
+/* NOLINTNEXTLINE(readability-non-const-parameter) */
+bool readTemplate(const QString& datafile, int *prow, int *pcol, int *pwidth, int *pheight,
         const QString& tmplfile, AVFrame *tmpl, bool *pvalid)
 {
     QFile dfile(datafile);
