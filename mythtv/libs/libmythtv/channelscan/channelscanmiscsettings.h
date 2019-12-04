@@ -150,7 +150,7 @@ class CompleteChannelsOnly : public TransMythUICheckBoxSetting
                 "such as feeds and offline channels, "
                 "that are not useful in a MythTV system. "
                 "These are filtered out by this option."));
-        setValue(false);
+        setValue(true);
     };
 };
 

@@ -957,12 +957,24 @@ void ChannelImporter::FilterServices(ScanDTVTransportList &transports) const
             if (m_lcn_only && transports[i].m_channels[k].m_chan_num.isEmpty())
             {
                 QString msg = FormatChannel(transports[i], transports[i].m_channels[k]);
-                LOG(VB_CHANSCAN, LOG_DEBUG, LOC + QString("No LCN: %1").arg(msg));
+                LOG(VB_CHANSCAN, LOG_INFO, LOC + QString("No LCN: %1").arg(msg));
                 continue;
             }
 
-            // Filter channels out that are not present in PAT, PMT and SDT.
+            // Filter channels out that are not present in PAT and PMT.
             if (m_complete_only &&
+                !(transports[i].m_channels[k].m_in_pat &&
+                  transports[i].m_channels[k].m_in_pmt ))
+            {
+                QString msg = FormatChannel(transports[i], transports[i].m_channels[k]);
+                LOG(VB_CHANSCAN, LOG_INFO, LOC + QString("Not in PAT/PMT: %1").arg(msg));
+                continue;
+            }
+
+            // Filter channels out that are not present in SDT and that are not ATSC
+            if (m_complete_only &&
+                transports[i].m_channels[k].m_atsc_major_channel == 0 &&
+                transports[i].m_channels[k].m_atsc_minor_channel == 0 &&
                 !(transports[i].m_channels[k].m_in_pat &&
                   transports[i].m_channels[k].m_in_pmt &&
                   transports[i].m_channels[k].m_in_sdt &&
@@ -970,7 +982,7 @@ void ChannelImporter::FilterServices(ScanDTVTransportList &transports) const
                   transports[i].m_channels[k].m_sdt_tsid)))
             {
                 QString msg = FormatChannel(transports[i], transports[i].m_channels[k]);
-                LOG(VB_CHANSCAN, LOG_DEBUG, LOC + QString("Not in PAT/PMT/SDT: %1").arg(msg));
+                LOG(VB_CHANSCAN, LOG_INFO, LOC + QString("Not in PAT/PMT/SDT: %1").arg(msg));
                 continue;
             }
 
@@ -978,7 +990,7 @@ void ChannelImporter::FilterServices(ScanDTVTransportList &transports) const
             if (m_complete_only && transports[i].m_channels[k].m_service_name.isEmpty())
             {
                 QString msg = FormatChannel(transports[i], transports[i].m_channels[k]);
-                LOG(VB_CHANSCAN, LOG_DEBUG, LOC + QString("No name: %1").arg(msg));
+                LOG(VB_CHANSCAN, LOG_INFO, LOC + QString("No name: %1").arg(msg));
                 continue;
             }
 
