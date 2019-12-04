@@ -107,7 +107,7 @@ class MTV_PUBLIC VideoBuffers
     bool EnoughFreeFrames(void) const;
     bool EnoughDecodedFrames(void) const;
 
-    const VideoFrame *At(uint i) const;
+    const VideoFrame *At(uint FrameNum) const;
     const VideoFrame *GetLastDecodedFrame(void) const;
     const VideoFrame *GetLastShownFrame(void) const;
     uint  Size(void) const;

@@ -52,7 +52,7 @@ class VideoOutWindow : public QObject
     void EmbedInWidget          (const QRect &Rect);
     void StopEmbedding          (void);
     void ToggleAdjustFill       (AdjustFillMode AdjustFillMode = kAdjustFill_Toggle);
-    void ToggleAspectOverride   (AspectOverrideMode AspectOverrideMode = kAspect_Toggle);
+    void ToggleAspectOverride   (AspectOverrideMode AspectMode = kAspect_Toggle);
     void ResizeDisplayWindow    (const QRect &Rect, bool SaveVisibleRect);
     void MoveResize             (void);
     void Zoom                   (ZoomDirection Direction);
