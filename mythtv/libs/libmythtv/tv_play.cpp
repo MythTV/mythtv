@@ -6228,7 +6228,8 @@ void TV::RestartMainPlayer(PlayerContext *mctx)
         return;
     }
 
-    MuteState mctx_mute = mctx->m_player->GetMuteState();
+//  MuteState mctx_mute = mctx->m_player->GetMuteState();
+    MuteState mctx_mute; //FOR HACK
 
     // HACK - FIXME
     // workaround muted audio when Player is re-created

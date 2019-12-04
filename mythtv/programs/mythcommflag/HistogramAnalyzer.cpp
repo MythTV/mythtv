@@ -62,7 +62,7 @@ readData(const QString& filename, float *mean, unsigned char *median, float *std
         }
         for (size_t ii = 0; ii < sizeof(counter)/sizeof(*counter); ii++)
         {
-            if ((nitems = fscanf(fp, "%20x", &counter[ii])) != 1)
+            if (fscanf(fp, "%20x", &counter[ii]) != 1)
             {
                 LOG(VB_COMMFLAG, LOG_ERR,
                     QString("Not enough data in %1: frame %2")

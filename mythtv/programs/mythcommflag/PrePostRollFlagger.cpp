@@ -189,8 +189,7 @@ bool PrePostRollFlagger::go()
         LOG(VB_COMMFLAG, LOG_INFO, QString("Closest before postroll: %1")
                 .arg(m_closestBeforePost));
 
-        // cppcheck-suppress unreadVariable
-        framesToProcess = framesProcessed;
+//      framesToProcess = framesProcessed;
     }
 
     if (m_showProgress)

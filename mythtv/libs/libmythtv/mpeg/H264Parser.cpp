@@ -1098,9 +1098,11 @@ void H264Parser::decode_PPS(GetBitContext * gb)
 void H264Parser::decode_SEI(GetBitContext *gb)
 {
     int   recovery_frame_cnt = -1;
+#if 0
     bool  exact_match_flag = false;
     bool  broken_link_flag = false;
     int   changing_group_slice_idc = -1;
+#endif
 
     int type = 0, size = 0;
 
@@ -1121,12 +1123,11 @@ void H264Parser::decode_SEI(GetBitContext *gb)
         {
           case SEI_TYPE_RECOVERY_POINT:
             recovery_frame_cnt = get_ue_golomb(gb);
-            // cppcheck-suppress unreadVariable
+#if 0
             exact_match_flag = (get_bits1(gb) != 0U);
-            // cppcheck-suppress unreadVariable
             broken_link_flag = (get_bits1(gb) != 0U);
-            // cppcheck-suppress unreadVariable
             changing_group_slice_idc = get_bits(gb, 2);
+#endif
             au_contains_keyframe_message = (recovery_frame_cnt == 0);
             if ((size - 12) > 0)
                 skip_bits(gb, (size - 12) * 8);
@@ -1137,10 +1138,6 @@ void H264Parser::decode_SEI(GetBitContext *gb)
             break;
         }
     }
-
-    (void) exact_match_flag; // suppress unused var warning
-    (void) broken_link_flag; // suppress unused var warning
-    (void) changing_group_slice_idc; // suppress unused var warning
 }
 
 void H264Parser::vui_parameters(GetBitContext * gb)

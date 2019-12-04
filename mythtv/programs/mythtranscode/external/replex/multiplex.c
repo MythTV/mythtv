@@ -538,7 +538,7 @@ void check_times( multiplex_t *mx, int *video_ok, int *ext_ok, int *start)
 	    (ptscmp(mx->viu.dts + mx->video_delay, 500*CLOCK_MS +mx->oldSCR)<0)
 	    && ring_avail(mx->index_vrbuffer)){
 		*video_ok = 1;
-                set_ok = 1;
+                set_ok = 1; //NOLINT(clang-analyzer-deadcode.DeadStores)
 	}
 	
 	for (int i = 0; i < mx->extcnt; i++){
@@ -547,7 +547,7 @@ void check_times( multiplex_t *mx, int *video_ok, int *ext_ok, int *start)
 		    ptscmp(mx->ext[i].pts, 500*CLOCK_MS + mx->oldSCR) < 0
 		    && ring_avail(&mx->index_extrbuffer[i])){
 			ext_ok[i] = 1;
-                        set_ok = 1;
+                        set_ok = 1; //NOLINT(clang-analyzer-deadcode.DeadStores)
 		}
 	}
 #ifdef OUT_DEBUG

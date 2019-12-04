@@ -306,7 +306,7 @@ static subtitle_t *sub_read_line_subviewer(demux_sputext_t *demuxstr, subtitle_t
     if (!read_line_from_input(demuxstr, line, LINE_LEN))
       return nullptr;
 
-    p=q=line;
+    p=line;
     for (current->lines=1; current->lines <= SUB_MAX_TEXT; current->lines++) {
       for (q=p,len=0; *p && *p!='\r' && *p!='\n' && *p!='|' &&
                (strncasecmp(p,"[br]",4) != 0); p++,len++);
@@ -478,32 +478,30 @@ static subtitle_t *sub_read_line_rt(demux_sputext_t *demuxstr,subtitle_t *curren
    */
   char line[LINE_LEN + 1];
   int a1,a2,a3,a4,b1,b2,b3,b4;
-  char *p=nullptr,*next=nullptr;
+  char *next=nullptr;
   int i,plen;
 
   memset (current, 0, sizeof(subtitle_t));
 
   while (!current->text[0]) {
-    int len;
     if (!read_line_from_input(demuxstr, line, LINE_LEN)) return nullptr;
     /*
      * TODO: it seems that format of time is not easily determined, it may be 1:12, 1:12.0 or 0:1:12.0
      * to describe the same moment in time. Maybe there are even more formats in use.
      */
-    if ((len=sscanf (line, "<Time Begin=\"%d:%d:%d.%d\" End=\"%d:%d:%d.%d\"",&a1,&a2,&a3,&a4,&b1,&b2,&b3,&b4)) < 8)
+    if (sscanf (line, "<Time Begin=\"%d:%d:%d.%d\" End=\"%d:%d:%d.%d\"",&a1,&a2,&a3,&a4,&b1,&b2,&b3,&b4) < 8)
 
       plen=a1=a2=a3=a4=b1=b2=b3=b4=0;
     if (
-        ((len=sscanf (line, "<%*[tT]ime %*[bB]egin=\"%d:%d\" %*[Ee]nd=\"%d:%d\"%*[^<]<clear/>%n",&a2,&a3,&b2,&b3,&plen)) < 4) &&
-        ((len=sscanf (line, "<%*[tT]ime %*[bB]egin=\"%d:%d\" %*[Ee]nd=\"%d:%d.%d\"%*[^<]<clear/>%n",&a2,&a3,&b2,&b3,&b4,&plen)) < 5) &&
-        /*      ((len=sscanf (line, "<%*[tT]ime %*[bB]egin=\"%d:%d.%d\" %*[Ee]nd=\"%d:%d\"%*[^<]<clear/>%n",&a2,&a3,&a4,&b2,&b3,&plen)) < 5) && */
-        ((len=sscanf (line, "<%*[tT]ime %*[bB]egin=\"%d:%d.%d\" %*[Ee]nd=\"%d:%d.%d\"%*[^<]<clear/>%n",&a2,&a3,&a4,&b2,&b3,&b4,&plen)) < 6) &&
-        ((len=sscanf (line, "<%*[tT]ime %*[bB]egin=\"%d:%d:%d.%d\" %*[Ee]nd=\"%d:%d:%d.%d\"%*[^<]<clear/>%n",&a1,&a2,&a3,&a4,&b1,&b2,&b3,&b4,&plen)) < 8)
+        (sscanf (line, "<%*[tT]ime %*[bB]egin=\"%d:%d\" %*[Ee]nd=\"%d:%d\"%*[^<]<clear/>%n",&a2,&a3,&b2,&b3,&plen) < 4) &&
+        (sscanf (line, "<%*[tT]ime %*[bB]egin=\"%d:%d\" %*[Ee]nd=\"%d:%d.%d\"%*[^<]<clear/>%n",&a2,&a3,&b2,&b3,&b4,&plen) < 5) &&
+        /*      (sscanf (line, "<%*[tT]ime %*[bB]egin=\"%d:%d.%d\" %*[Ee]nd=\"%d:%d\"%*[^<]<clear/>%n",&a2,&a3,&a4,&b2,&b3,&plen) < 5) && */
+        (sscanf (line, "<%*[tT]ime %*[bB]egin=\"%d:%d.%d\" %*[Ee]nd=\"%d:%d.%d\"%*[^<]<clear/>%n",&a2,&a3,&a4,&b2,&b3,&b4,&plen) < 6) &&
+        (sscanf (line, "<%*[tT]ime %*[bB]egin=\"%d:%d:%d.%d\" %*[Ee]nd=\"%d:%d:%d.%d\"%*[^<]<clear/>%n",&a1,&a2,&a3,&a4,&b1,&b2,&b3,&b4,&plen) < 8)
         )
       continue;
     current->start = a1*360000+a2*6000+a3*100+a4/10;
     current->end   = b1*360000+b2*6000+b3*100+b4/10;
-    p=line;     p+=plen;i=0;
     /* TODO: I don't know what kind of convention is here for marking multiline subs, maybe <br/> like in xml? */
     next = strstr(line,"<clear/>")+8;i=0;
     while ((next =sub_readtext (next, &(current->text[i])))) {
@@ -924,7 +922,7 @@ static subtitle_t *sub_read_line_subviewer2(demux_sputext_t *demuxstr, subtitle_
         if (!read_line_from_input(demuxstr, line, LINE_LEN)) return nullptr;
         if (line[0]!='{')
             continue;
-        if ((len=sscanf (line, "{T %d:%d:%d:%d",&a1,&a2,&a3,&a4)) < 4)
+        if (sscanf (line, "{T %d:%d:%d:%d",&a1,&a2,&a3,&a4) < 4)
             continue;
         current->start = a1*360000+a2*6000+a3*100+a4/10;
         for (i=0; i<SUB_MAX_TEXT;) {

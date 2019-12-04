@@ -4661,7 +4661,6 @@ char *MythPlayer::GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
                                        float &ar)
 {
     uint64_t       number    = 0;
-    unsigned char *data      = nullptr;
     unsigned char *outputbuf = nullptr;
     VideoFrame    *frame     = nullptr;
     AVFrame      orig;
@@ -4725,7 +4724,7 @@ char *MythPlayer::GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
 
     while (true)
     {
-        if (!(data = frame->buf))
+        if (!frame->buf)
         {
             break;
         }

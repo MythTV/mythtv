@@ -1063,10 +1063,9 @@ static int lirc_readconfig_only_internal(const struct lirc_state *state,
 			}
 			else
 			{
-                                char *token3 = NULL;
 				token2=strtok_r(NULL," \t",&strtok_state);
 				if(token2!=NULL && 
-				   (token3=strtok_r(NULL," \t",&strtok_state))!=NULL)
+				   strtok_r(NULL," \t",&strtok_state)!=NULL)
 				{
 					lirc_printf(state, "%s: unexpected token in line %s:%d\n",
 						    state->lirc_prog,filestack->m_name,filestack->m_line);

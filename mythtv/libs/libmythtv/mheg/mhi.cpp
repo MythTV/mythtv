@@ -1369,7 +1369,9 @@ void MHIText::AddText(int x, int y, const QString &str, MHRgba colour)
 {
     if (!m_parent->IsFaceLoaded()) return;
     FT_Face face = m_parent->GetFontFace();
-    FT_Error error = FT_Set_Char_Size(face, 0, Point2FT(m_fontsize),
+    FT_Error error;
+
+    FT_Set_Char_Size(face, 0, Point2FT(m_fontsize),
                                       FONT_WIDTHRES, FONT_HEIGHTRES);
 
     // X positions are computed to 64ths and rounded.
@@ -1901,7 +1903,7 @@ void MHIBitmap::CreateFromMPEG(const unsigned char *data, int length)
             len = avcodec_send_packet(c, &pkt);
         if (len == AVERROR(EAGAIN) || len == AVERROR_EOF)
             len = 0;
-        else if (len < 0) // Error
+        if (len < 0) // Error
         {
             char error[AV_ERROR_MAX_STRING_SIZE];
             LOG(VB_GENERAL, LOG_ERR,

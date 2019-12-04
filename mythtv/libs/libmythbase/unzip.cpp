@@ -761,7 +761,6 @@ UnZip::ErrorCode UnzipPrivate::seekToCentralDirectory()
 	}
 	else
 	{
-		qint64 read = 0;
 		char* p = nullptr;
 
 		offset -= UNZIP_EOCD_SIZE;
@@ -772,7 +771,7 @@ UnZip::ErrorCode UnzipPrivate::seekToCentralDirectory()
 		if (!device->seek( offset ))
 			return UnZip::SeekFailed;
 
-		while ((read = device->read(buffer1, UNZIP_EOCD_SIZE)) >= 0)
+		while (device->read(buffer1, UNZIP_EOCD_SIZE) >= 0)
 		{
 			if ( (p = strstr(buffer1, "PK\5\6")) != nullptr)
 			{
@@ -1151,7 +1150,7 @@ UnZip::ErrorCode UnzipPrivate::extractFile(const QString& path, ZipEntryP& entry
 		int zret = Z_OK;
 
 		// Use inflateInit2 with negative windowBits to get raw decompression
-		if ( (zret = inflateInit2_(&zstr, -MAX_WBITS, ZLIB_VERSION, sizeof(z_stream))) != Z_OK )
+		if (inflateInit2_(&zstr, -MAX_WBITS, ZLIB_VERSION, sizeof(z_stream)) != Z_OK )
 			return UnZip::ZlibError;
 
 		int szDecomp = 0;
@@ -1346,7 +1345,7 @@ bool UnzipPrivate::testKeys(const ZipEntryP& header, quint32* keys)
 
 	// decrypt encryption header
 	for (int i=0; i<11; ++i)
-		updateKeys(keys, lastByte = buffer1[i] ^ decryptByte(keys[2]));
+		updateKeys(keys, buffer1[i] ^ decryptByte(keys[2]));
 	updateKeys(keys, lastByte = buffer1[11] ^ decryptByte(keys[2]));
 
 	// if there is an extended header (bit in the gp flag) buffer[11] is a byte from the file time

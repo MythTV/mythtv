@@ -340,7 +340,7 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings(bool passthrough)
 
     snd_pcm_hw_params_alloca(&params);
 
-    if ((err = snd_pcm_hw_params_any(m_pcm_handle, params)) < 0)
+    if (snd_pcm_hw_params_any(m_pcm_handle, params) < 0)
     {
         snd_pcm_close(m_pcm_handle);
         if ((err = TryOpenDevice(OPEN_FLAGS&FILTER_FLAGS, passthrough)) < 0)

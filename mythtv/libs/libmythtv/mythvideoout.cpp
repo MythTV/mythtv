@@ -1013,7 +1013,7 @@ void MythVideoOutput::InitDisplayMeasurements(void)
             .arg(window_size.width()).arg(window_size.height()));
 
     // Check the display dimensions
-    disp_aspect = m_window.GetDisplayAspect();
+//  disp_aspect = m_window.GetDisplayAspect();
     disp_dim = m_window.GetDisplayDim();
 
     // If we are using Xinerama the display dimensions cannot be trusted.
