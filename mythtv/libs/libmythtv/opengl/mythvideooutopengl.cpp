@@ -154,6 +154,7 @@ MythVideoOutputOpenGL::MythVideoOutputOpenGL(QString Profile)
     QObject::connect(&m_window, &VideoOutWindow::VideoSizeChanged,  m_openGLVideo, &MythOpenGLVideo::SetVideoDimensions);
     QObject::connect(&m_window, &VideoOutWindow::VideoRectsChanged, m_openGLVideo, &MythOpenGLVideo::SetVideoRects);
     QObject::connect(&m_window, &VideoOutWindow::WindowRectChanged, m_openGLVideo, &MythOpenGLVideo::SetViewportRect);
+    QObject::connect(m_openGLVideo, &MythOpenGLVideo::OutputChanged, &m_window,    &VideoOutWindow::InputChanged);
 }
 
 MythVideoOutputOpenGL::~MythVideoOutputOpenGL()

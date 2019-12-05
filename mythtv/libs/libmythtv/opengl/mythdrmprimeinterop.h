@@ -25,6 +25,7 @@ class MythDRMPRIMEInterop : public MythOpenGLInterop, public MythEGLDMABUF
 
   private:
     AVDRMFrameDescriptor*     VerifyBuffer(MythRenderOpenGL *Context, VideoFrame *Frame);
+    bool m_deinterlacing { false };
 };
 
 #endif // MYTHDRMPRIMEINTEROP_H

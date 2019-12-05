@@ -541,6 +541,9 @@ void VideoOutWindow::VideoAspectRatioChanged(float Aspect)
  */
 void VideoOutWindow::InputChanged(const QSize &VideoDim, const QSize &VideoDispDim, float Aspect)
 {
+    if (Aspect < 0.0F)
+        Aspect = m_videoAspect;
+
     QSize newvideodispdim = Fix1088(VideoDispDim);
 
     if (!((VideoDim == m_videoDim) && (newvideodispdim == m_videoDispDim) &&
@@ -561,8 +564,14 @@ void VideoOutWindow::InputChanged(const QSize &VideoDim, const QSize &VideoDispD
 QSize VideoOutWindow::Fix1088(QSize Dimensions)
 {
     QSize result = Dimensions;
-    if ((result.height() == 1088) && ((result.width() == 1920) || (result.width() == 1440)))
-        result.setHeight(1080);
+    // 544 represents a 1088 field
+    if (result.width() == 1920 || result.width() == 1440)
+    {
+        if (result.height() == 1088)
+            result.setHeight(1080);
+        else if (result.height() == 544)
+            result.setHeight(540);
+    }
     return result;
 }
 

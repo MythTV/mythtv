@@ -51,6 +51,9 @@ class MythOpenGLVideo : public QObject
     void    ResetFrameFormat(void);
     void    ResetTextures(void);
 
+  signals:
+    void    OutputChanged(QSize VideoDim, QSize VideoDispDim, float);
+
   public slots:
     void    SetVideoDimensions(const QSize &VideoDim, const QSize &VideoDispDim);
     void    SetVideoRects(const QRect &DisplayVideoRect, const QRect &VideoRect);
