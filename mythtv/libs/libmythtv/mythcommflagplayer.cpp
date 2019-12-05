@@ -65,7 +65,9 @@ QMap<DecoderBase*,uint> RebuildSaver::s_cnt;
 bool MythCommFlagPlayer::RebuildSeekTable(
     bool showPercentage, StatusCallback cb, void* cbData)
 {
-    uint64_t myFramesPlayed = 0, pmap_first = 0,  pmap_last  = 0;
+    uint64_t myFramesPlayed = 0;
+    uint64_t pmap_first = 0;
+    uint64_t pmap_last  = 0;
 
     killdecoder = false;
     framesPlayed = 0;
@@ -97,7 +99,10 @@ bool MythCommFlagPlayer::RebuildSeekTable(
     ClearAfterSeek();
 
     int save_timeout = 1001;
-    MythTimer flagTime, ui_timer, inuse_timer, save_timer;
+    MythTimer flagTime;
+    MythTimer ui_timer;
+    MythTimer inuse_timer;
+    MythTimer save_timer;
     flagTime.start();
     ui_timer.start();
     inuse_timer.start();

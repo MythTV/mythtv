@@ -497,7 +497,8 @@ static int FindLyrics(const MythUtilCommandLineParser &cmdline)
 
         QDomDocument domDoc;
         QString errorMsg;
-        int errorLine = 0, errorColumn = 0;
+        int errorLine = 0;
+        int errorColumn = 0;
 
         if (!domDoc.setContent(result, false, &errorMsg, &errorLine, &errorColumn))
         {

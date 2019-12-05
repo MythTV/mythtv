@@ -288,8 +288,12 @@ void DVBSignalMonitor::UpdateValues(void)
             RemoveFlags(SignalMonitor::kDVBSigMon_WaitForPos);
     }
 
-    bool wasLocked = false, isLocked = false;
-    uint sig = 0, snr = 0, ber = 0, ublocks = 0;
+    bool wasLocked = false;
+    bool isLocked = false;
+    uint sig = 0;
+    uint snr = 0;
+    uint ber = 0;
+    uint ublocks = 0;
 
     // Get info from card
     bool has_lock = dvbchannel->HasLock();

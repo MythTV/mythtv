@@ -157,13 +157,11 @@ generatePrecalCoef ()
 	static int s_firstime = 1;
 
 	if (s_firstime) {
-		int     coefh, coefv;
-
 		s_firstime = 0;
 
-		for (coefh = 0; coefh < 16; coefh++) {
+		for (int coefh = 0; coefh < 16; coefh++) {
 
-			for (coefv = 0; coefv < 16; coefv++) {
+			for (int coefv = 0; coefv < 16; coefv++) {
 				int     i;
 				int     diffcoeffh;
 				int     diffcoeffv;
@@ -176,12 +174,10 @@ generatePrecalCoef ()
 				if (!(coefh || coefv))
 					i = 255;
 				else {
-					int     i1, i2, i3, i4;
-
-					i1 = diffcoeffh * diffcoeffv;
-					i2 = coefh * diffcoeffv;
-					i3 = diffcoeffh * coefv;
-					i4 = coefh * coefv;
+					int i1 = diffcoeffh * diffcoeffv;
+					int i2 = coefh * diffcoeffv;
+					int i3 = diffcoeffh * coefv;
+					int i4 = coefh * coefv;
 					if (i1)
 						i1--;
 					if (i2)
@@ -232,9 +228,9 @@ calculatePXandPY (int x, int y, int *px, int *py)
 			s_wavesp = (s_wavesp * 9) / 10;
 	}
 	else {
-		int     dist = 0, vx9, vy9;
-	  int     vx, vy;
-		int     ppx, ppy;
+		int     dist = 0;
+		int     ppx;
+		int     ppy;
 		int     fvitesse = vitesse << 4;
 
 		if (noisify) {
@@ -243,8 +239,8 @@ calculatePXandPY (int x, int y, int *px, int *py)
                         // NOLINTNEXTLINE(misc-redundant-expression)
 			y += RAND () % noisify - RAND () % noisify;
 		}
-		vx = (x - middleX) << 9;
-		vy = (y - middleY) << 9;
+		int vx = (x - middleX) << 9;
+		int vy = (y - middleY) << 9;
 
 		if (hPlaneEffect)
 			vx += hPlaneEffect * (y - middleY);
@@ -267,8 +263,8 @@ calculatePXandPY (int x, int y, int *px, int *py)
 			vy += ShiftRight (sintable[(vx + dist) & 0xffff], 1);
 		}
 
-		vx9 = ShiftRight (vx, 9);
-		vy9 = ShiftRight (vy, 9);
+		int vx9 = ShiftRight (vx, 9);
+		int vy9 = ShiftRight (vy, 9);
 		dist = vx9 * vx9 + vy9 * vy9;
 
 		switch (theMode) {
@@ -418,7 +414,8 @@ void c_zoom (unsigned int *lexpix1, unsigned int *lexpix2,
 	Color   couleur;
 //	unsigned int coefv, coefh;
 
-	unsigned int ax = (lprevX - 1) << PERTEDEC, ay = (lprevY - 1) << PERTEDEC;
+	unsigned int ax = (lprevX - 1) << PERTEDEC;
+	unsigned int ay = (lprevY - 1) << PERTEDEC;
 
 	int     bufsize = lprevX * lprevY * 2;
 	int     bufwidth = lprevX;
@@ -426,28 +423,26 @@ void c_zoom (unsigned int *lexpix1, unsigned int *lexpix2,
 	lexpix1[0]=lexpix1[lprevX-1]=lexpix1[lprevX*lprevY-1]=lexpix1[lprevX*lprevY-lprevX]=0;
 
 	for (myPos = 0; myPos < bufsize; myPos += 2) {
-		Color   col1, col2, col3, col4;
-		int     c1, c2, c3, c4, px, py;
-		int     pos;
-		int     lcoeffs;
-
+		Color   col1;
+		Color   col2;
+		Color   col3;
+		Color   col4;
 		int     brutSmypos = lbrutS[myPos];
-                int     myPos2;
 
-		myPos2 = myPos + 1;
+		int myPos2 = myPos + 1;
 
-		px = brutSmypos + (((lbrutD[myPos] - brutSmypos) * buffratio) >> BUFFPOINTNB);
+		int px = brutSmypos + (((lbrutD[myPos] - brutSmypos) * buffratio) >> BUFFPOINTNB);
 		brutSmypos = lbrutS[myPos2];
-		py = brutSmypos + (((lbrutD[myPos2] - brutSmypos) * buffratio) >> BUFFPOINTNB);
+		int py = brutSmypos + (((lbrutD[myPos2] - brutSmypos) * buffratio) >> BUFFPOINTNB);
 
                 if (px < 0)
                     px = 0;
                 if (py < 0)
                     py = 0;
 
-		pos = ((px >> PERTEDEC) + lprevX * (py >> PERTEDEC));
+		int pos = ((px >> PERTEDEC) + lprevX * (py >> PERTEDEC));
 		// coef en modulo 15
-		lcoeffs = precalCoef[px & PERTEMASK][py & PERTEMASK];
+		int lcoeffs = precalCoef[px & PERTEMASK][py & PERTEMASK];
 
 		if ((py >= (int)ay) || (px >= (int)ax)) {
 			pos = lcoeffs = 0;
@@ -458,10 +453,10 @@ void c_zoom (unsigned int *lexpix1, unsigned int *lexpix2,
 		getPixelRGB_ (lexpix1, pos + bufwidth, &col3);
 		getPixelRGB_ (lexpix1, pos + bufwidth + 1, &col4);
 
-		c1 = lcoeffs;
-		c2 = (c1 & 0x0000ff00) >> 8;
-		c3 = (c1 & 0x00ff0000) >> 16;
-		c4 = (c1 & 0xff000000) >> 24;
+		int c1 = lcoeffs;
+		int c2 = (c1 & 0x0000ff00) >> 8;
+		int c3 = (c1 & 0x00ff0000) >> 16;
+		int c4 = (c1 & 0xff000000) >> 24;
 		c1 = c1 & 0xff;
 
 		couleur.r = col1.r * c1 + col2.r * c2 + col3.r * c3 + col4.r * c4;
@@ -505,7 +500,8 @@ getAsmUse ()
 void
 zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uint resy, int switchIncr, float switchMult)
 {
-	register Uint x, y;
+	register Uint x;
+	register Uint y;
 
 	static unsigned char s_pertedec = 8;
 	static char s_firstTime = 1;
@@ -695,7 +691,8 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 		for (y = (Uint)s_interlaceStart; (y < (Uint)prevY) && (y < (Uint)maxEnd); y++) {
 			Uint premul_y_prevX = y * prevX * 2;
 			for (x = 0; x < prevX; x++) {
-				int     px, py;
+				int     px;
+				int     py;
 				
 				calculatePXandPY (x, y, &px, &py);
 				

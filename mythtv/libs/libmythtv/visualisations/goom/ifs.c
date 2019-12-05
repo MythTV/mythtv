@@ -337,16 +337,14 @@ init_ifs (int width, int height)
 static inline void
 Transform (SIMI * Simi, F_PT xo, F_PT yo, F_PT * x, F_PT * y)
 {
-	F_PT    xx, yy;
-
 	xo = xo - Simi->m_fCx;
 	xo = (xo * Simi->m_fR) / UNIT;
 	yo = yo - Simi->m_fCy;
 	yo = (yo * Simi->m_fR) / UNIT;
 
-	xx = xo - Simi->m_fCx;
+	F_PT xx = xo - Simi->m_fCx;
 	xx = (xx * Simi->m_fR2) / UNIT;
-	yy = -yo - Simi->m_fCy;
+	F_PT yy = -yo - Simi->m_fCy;
 	yy = (yy * Simi->m_fR2) / UNIT;
 
 	*x =
@@ -360,11 +358,12 @@ Transform (SIMI * Simi, F_PT xo, F_PT yo, F_PT * x, F_PT * y)
 static void
 Trace (FRACTAL * F, F_PT xo, F_PT yo)
 {
-	F_PT    x, y, i;
+	F_PT    x;
+	F_PT    y;
 	SIMI   *Cur;
 
 	Cur = Cur_F->m_components;
-	for (i = Cur_F->m_nbSimi; i; --i, Cur++) {
+	for (F_PT i = Cur_F->m_nbSimi; i; --i, Cur++) {
 		Transform (Cur, xo, yo, &x, &y);
 
 		Buf->x = F->m_lx + ((x * F->m_lx) / (UNIT*2) );
@@ -385,9 +384,10 @@ static void
 Draw_Fractal ( void /* ModeInfo * mi */ )
 {
 	FRACTAL *F = Root;
-	int     i, j;
-	F_PT    x, y;
-	SIMI   *Cur, *Simi;
+	int     i;
+	int     j;
+	SIMI   *Cur;
+	SIMI   *Simi;
 
 	for (Cur = F->m_components, i = F->m_nbSimi; i; --i, Cur++) {
 		Cur->m_fCx = DBL_To_F_PT (Cur->m_dCx);
@@ -407,10 +407,11 @@ Draw_Fractal ( void /* ModeInfo * mi */ )
 	Cur_F = F;
 	Buf = F->m_buffer2;
 	for (Cur = F->m_components, i = F->m_nbSimi; i; --i, Cur++) {
-        F_PT xo, yo;
-		xo = Cur->m_fCx;
-		yo = Cur->m_fCy;
+		F_PT xo = Cur->m_fCx;
+		F_PT yo = Cur->m_fCy;
 		for (Simi = F->m_components, j = F->m_nbSimi; j; --j, Simi++) {
+			F_PT x;
+			F_PT y;
 			if (Simi == Cur)
 				continue;
 			Transform (Simi, xo, yo, &x, &y);
@@ -458,33 +459,28 @@ Draw_Fractal ( void /* ModeInfo * mi */ )
 IFSPoint *
 draw_ifs ( /* ModeInfo * mi */ int *nbPoints)
 {
-	int     i;
-	DBL     u, uu, v, vv, u0, u1, u2, u3;
-	SIMI   *S, *S1, *S2, *S3, *S4;
-	FRACTAL *F;
-
 	if (Root == NULL)
 		return NULL;
-	F = Root;											// [/*MI_SCREEN(mi)*/0];
+	FRACTAL *F = Root; // [/*MI_SCREEN(mi)*/0];
 	if (F->m_buffer1 == NULL)
 		return NULL;
 
-	u = (DBL) (F->m_count) * (DBL) (F->m_speed) / 1000.0;
-	uu = u * u;
-	v = 1.0 - u;
-	vv = v * v;
-	u0 = vv * v;
-	u1 = 3.0 * vv * u;
-	u2 = 3.0 * v * uu;
-	u3 = u * uu;
+	DBL u = (DBL) (F->m_count) * (DBL) (F->m_speed) / 1000.0;
+	DBL uu = u * u;
+	DBL v = 1.0 - u;
+	DBL vv = v * v;
+	DBL u0 = vv * v;
+	DBL u1 = 3.0 * vv * u;
+	DBL u2 = 3.0 * v * uu;
+	DBL u3 = u * uu;
 
-	S = F->m_components;
-	S1 = S + F->m_nbSimi;
-	S2 = S1 + F->m_nbSimi;
-	S3 = S2 + F->m_nbSimi;
-	S4 = S3 + F->m_nbSimi;
+	SIMI *S = F->m_components;
+	SIMI *S1 = S + F->m_nbSimi;
+	SIMI *S2 = S1 + F->m_nbSimi;
+	SIMI *S3 = S2 + F->m_nbSimi;
+	SIMI *S4 = S3 + F->m_nbSimi;
 
-	for (i = F->m_nbSimi; i; --i, S++, S1++, S2++, S3++, S4++) {
+	for (int i = F->m_nbSimi; i; --i, S++, S1++, S2++, S3++, S4++) {
 		S->m_dCx = u0 * S1->m_dCx + u1 * S2->m_dCx + u2 * S3->m_dCx + u3 * S4->m_dCx;
 		S->m_dCy = u0 * S1->m_dCy + u1 * S2->m_dCy + u2 * S3->m_dCy + u3 * S4->m_dCy;
 		S->m_dR  = u0 * S1->m_dR  + u1 * S2->m_dR  + u2 * S3->m_dR  + u3 * S4->m_dR;
@@ -504,7 +500,7 @@ draw_ifs ( /* ModeInfo * mi */ int *nbPoints)
 		S3 = S2 + F->m_nbSimi;
 		S4 = S3 + F->m_nbSimi;
 
-		for (i = F->m_nbSimi; i; --i, S++, S1++, S2++, S3++, S4++) {
+		for (int i = F->m_nbSimi; i; --i, S++, S1++, S2++, S3++, S4++) {
 			S2->m_dCx = 2.0 * S4->m_dCx - S3->m_dCx;
 			S2->m_dCy = 2.0 * S4->m_dCy - S3->m_dCy;
 			S2->m_dR  = 2.0 * S4->m_dR  - S3->m_dR;

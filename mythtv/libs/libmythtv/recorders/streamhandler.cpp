@@ -254,7 +254,8 @@ bool StreamHandler::RemoveAllPIDFilters(void)
 
 void StreamHandler::UpdateListeningForEIT(void)
 {
-    vector<uint> add_eit, del_eit;
+    vector<uint> add_eit;
+    vector<uint> del_eit;
 
     QMutexLocker read_locker(&m_listener_lock);
 

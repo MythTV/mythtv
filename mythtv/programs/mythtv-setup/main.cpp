@@ -297,7 +297,8 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_OK;
     }
 
-    bool quiet = false, use_display = true;
+    bool quiet = false;
+    bool use_display = true;
     if (cmdline.toBool("scan"))
     {
         quiet = true;

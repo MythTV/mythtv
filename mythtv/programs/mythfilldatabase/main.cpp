@@ -284,7 +284,8 @@ int main(int argc, char *argv[])
     if (from_file)
     {
         QString status = QObject::tr("currently running.");
-        QDateTime GuideDataBefore, GuideDataAfter;
+        QDateTime GuideDataBefore;
+        QDateTime GuideDataAfter;
 
         updateLastRunStart();
         updateLastRunStatus(status);

@@ -243,7 +243,9 @@ QString getOrderBySQL(const QString& orderByFields)
         return QString();
 
     QStringList list = orderByFields.split(",");
-    QString fieldName, result, order;
+    QString fieldName;
+    QString result;
+    QString order;
     bool bFirst = true;
 
     for (int x = 0; x < list.count(); x++)
@@ -949,7 +951,10 @@ void SmartPlaylistEditor::renameCategory(const QString &category)
 
 QString SmartPlaylistEditor::getSQL(const QString& fields)
 {
-    QString sql, whereClause, orderByClause, limitClause;
+    QString sql;
+    QString whereClause;
+    QString orderByClause;
+    QString limitClause;
     sql = "SELECT " + fields + " FROM music_songs "
           "LEFT JOIN music_artists ON music_songs.artist_id=music_artists.artist_id "
           "LEFT JOIN music_albums ON music_songs.album_id=music_albums.album_id "

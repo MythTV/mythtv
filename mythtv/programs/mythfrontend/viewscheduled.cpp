@@ -237,7 +237,8 @@ void ViewScheduled::LoadList(bool useExistingData)
     MythUIButtonListItem *currentItem = m_schedulesList->GetItemCurrent();
 
     QString callsign;
-    QDateTime startts, recstartts;
+    QDateTime startts;
+    QDateTime recstartts;
     QDate group = m_currentGroup;
 
     if (currentItem)

@@ -63,7 +63,9 @@ computeBlankMap(FrameAnalyzer::FrameMap *blankMap, long long nframes,
     const float             MEDIANPCTILE = 0.95;
     const float             STDDEVPCTILE = 0.85;
 
-    long long       frameno = 1, segb = 0, sege = 0;
+    long long frameno = 1;
+    long long segb = 0;
+    long long sege = 0;
 
     /* Count and select for monochromatic frames. */
 

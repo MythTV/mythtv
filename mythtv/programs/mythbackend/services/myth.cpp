@@ -269,7 +269,9 @@ DTC::StorageGroupDirList *Myth::GetStorageGroupDirs( const QString &sGroupName,
     {
         DTC::StorageGroupDir *pStorageGroupDir = pList->AddNewStorageGroupDir();
         QFileInfo fi(query.value(3).toString());
-        int64_t free = 0, total = 0, used = 0;
+        int64_t free = 0;
+        int64_t total = 0;
+        int64_t used = 0;
 
         free = getDiskSpace(query.value(3).toString(), total, used);
 

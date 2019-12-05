@@ -49,8 +49,14 @@ void DetectLetterbox::Detect(VideoFrame *Frame)
 
     // Lines to scan for black letterbox edge
     const int xPos[] = { Frame->width / 4, Frame->width / 2, Frame->width * 3 / 4} ;
-    int topHits = 0, bottomHits = 0, minTop = 0, minBottom = 0, maxTop = 0, maxBottom = 0;
-    int topHit[] = { 0, 0, 0 }, bottomHit[] = { 0, 0, 0 };
+    int topHits     = 0;
+    int bottomHits  = 0;
+    int minTop      = 0;
+    int minBottom   = 0;
+    int maxTop      = 0;
+    int maxBottom   = 0;
+    int topHit[]    = { 0, 0, 0 };
+    int bottomHit[] = { 0, 0, 0 };
 
     switch (Frame->codec)
     {

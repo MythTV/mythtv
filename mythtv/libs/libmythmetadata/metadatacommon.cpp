@@ -902,19 +902,56 @@ MetadataLookup* ParseMetadataItem(const QDomElement& item,
     if (!lookup)
         return new MetadataLookup();
 
-    uint season = 0, episode = 0, chanid = 0, programflags = 0,
-         audioproperties = 0, videoproperties = 0, subtitletype = 0,
-         tracknum = 0, budget = 0, revenue = 0,
-         year = 0, runtime = 0, runtimesecs = 0, ratingcount = 0;
-    QString title, network, status, subtitle, tagline, description, certification,
-        channum, chansign, channame, chanplaybackfilters, recgroup,
-        playgroup, seriesid, programid, storagegroup, album, system,
-        inetref, collectionref, tmsref, imdb, homepage, trailerURL, language;
-    QStringList categories, countries, studios;
+    uint season = 0;
+    uint episode = 0;
+    uint chanid = 0;
+    uint programflags = 0;
+    uint audioproperties = 0;
+    uint videoproperties = 0;
+    uint subtitletype = 0;
+    uint tracknum = 0;
+    uint budget = 0;
+    uint revenue = 0;
+    uint year = 0;
+    uint runtime = 0;
+    uint runtimesecs = 0;
+    uint ratingcount = 0;
+    QString title;
+    QString network;
+    QString status;
+    QString subtitle;
+    QString tagline;
+    QString description;
+    QString certification;
+    QString channum;
+    QString chansign;
+    QString channame;
+    QString chanplaybackfilters;
+    QString recgroup;
+    QString playgroup;
+    QString seriesid;
+    QString programid;
+    QString storagegroup;
+    QString album;
+    QString system;
+    QString inetref;
+    QString collectionref;
+    QString tmsref;
+    QString imdb;
+    QString homepage;
+    QString trailerURL;
+    QString language;
+    QStringList categories;
+    QStringList countries;
+    QStringList studios;
     float userrating = 0;
     float popularity = 0;
     QDate releasedate;
-    QDateTime lastupdated, startts, endts, recstartts, recendts;
+    QDateTime lastupdated;
+    QDateTime startts;
+    QDateTime endts;
+    QDateTime recstartts;
+    QDateTime recendts;
     PeopleMap people;
     ArtworkMap artwork;
 
@@ -1125,10 +1162,18 @@ MetadataLookup* ParseMetadataMovieNFO(const QDomElement& item,
     if (!lookup)
         return new MetadataLookup();
 
-    uint year = 0, runtime = 0, runtimesecs = 0,
-         season = 0, episode = 0;
-    QString title, subtitle, tagline, description,
-        inetref, trailer, certification;
+    uint year = 0;
+    uint runtime = 0;
+    uint runtimesecs = 0;
+    uint season = 0;
+    uint episode = 0;
+    QString title;
+    QString subtitle;
+    QString tagline;
+    QString description;
+    QString inetref;
+    QString trailer;
+    QString certification;
     float userrating = 0;
     QDate releasedate;
     QStringList categories;
@@ -1379,7 +1424,8 @@ QDateTime RFC822TimeToQDateTime(const QString& t)
         return QDateTime();
 
     QString time = t.simplified();
-    short int hoursShift = 0, minutesShift = 0;
+    short int hoursShift = 0;
+    short int minutesShift = 0;
 
     QStringList tmp = time.split(' ');
     if (tmp.isEmpty())

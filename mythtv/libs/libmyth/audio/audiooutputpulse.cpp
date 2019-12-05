@@ -561,7 +561,8 @@ bool AudioOutputPulseAudio::ConnectPlaybackStream(void)
 
     pa_context_state_t cstate = PA_CONTEXT_UNCONNECTED;
     pa_stream_state_t sstate = PA_STREAM_UNCONNECTED;
-    bool connected = false, failed = false;
+    bool connected = false;
+    bool failed = false;
 
     while (!(connected || failed))
     {

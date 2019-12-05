@@ -206,7 +206,8 @@ bool SignalMonitorValue::AllGood(const SignalMonitorList& slist)
  */
 int SignalMonitorValue::MaxWait(const SignalMonitorList& slist)
 {
-    int wait = 0, minWait = 0;
+    int wait = 0;
+    int minWait = 0;
     auto it = slist.cbegin();
     for (; it != slist.cend(); ++it)
     {

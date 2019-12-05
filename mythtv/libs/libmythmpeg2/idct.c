@@ -68,10 +68,8 @@ do {					\
 
 static inline void idct_row (int16_t * const block)
 {
-    int d0 = 0, d1 = 0, d2 = 0, d3 = 0;
-    int a0 = 0, a1 = 0, a2 = 0, a3 = 0;
-    int b0 = 0, b1 = 0, b2 = 0, b3 = 0;
-    int t0 = 0, t1 = 0, t2 = 0, t3 = 0;
+    int t2 = 0;
+    int t3 = 0;
 
     /* shortcut */
     if (likely (!(block[1] | ((int32_t *)block)[1] | ((int32_t *)block)[2] |
@@ -85,17 +83,17 @@ static inline void idct_row (int16_t * const block)
 	return;
     }
 
-    d0 = (block[0] << 11) + 2048;
-    d1 = block[1];
-    d2 = block[2] << 11;
-    d3 = block[3];
-    t0 = d0 + d2;
-    t1 = d0 - d2;
+    int d0 = (block[0] << 11) + 2048;
+    int d1 = block[1];
+    int d2 = block[2] << 11;
+    int d3 = block[3];
+    int t0 = d0 + d2;
+    int t1 = d0 - d2;
     BUTTERFLY (t2, t3, W6, W2, d3, d1);
-    a0 = t0 + t2;
-    a1 = t1 + t3;
-    a2 = t1 - t3;
-    a3 = t0 - t2;
+    int a0 = t0 + t2;
+    int a1 = t1 + t3;
+    int a2 = t1 - t3;
+    int a3 = t0 - t2;
 
     d0 = block[4];
     d1 = block[5];
@@ -103,12 +101,12 @@ static inline void idct_row (int16_t * const block)
     d3 = block[7];
     BUTTERFLY (t0, t1, W7, W1, d3, d0);
     BUTTERFLY (t2, t3, W3, W5, d1, d2);
-    b0 = t0 + t2;
-    b3 = t1 + t3;
+    int b0 = t0 + t2;
+    int b3 = t1 + t3;
     t0 -= t2;
     t1 -= t3;
-    b1 = ((t0 + t1) >> 8) * 181;
-    b2 = ((t0 - t1) >> 8) * 181;
+    int b1 = ((t0 + t1) >> 8) * 181;
+    int b2 = ((t0 - t1) >> 8) * 181;
 
     block[0] = (a0 + b0) >> 12;
     block[1] = (a1 + b1) >> 12;
@@ -122,22 +120,20 @@ static inline void idct_row (int16_t * const block)
 
 static inline void idct_col (int16_t * const block)
 {
-    int d0 = 0, d1 = 0, d2 = 0, d3 = 0;
-    int a0 = 0, a1 = 0, a2 = 0, a3 = 0;
-    int b0 = 0, b1 = 0, b2 = 0, b3 = 0;
-    int t0 = 0, t1 = 0, t2 = 0, t3 = 0;
+    int t2 = 0;
+    int t3 = 0;
 
-    d0 = (block[8*0] << 11) + 65536;
-    d1 = block[8*1];
-    d2 = block[8*2] << 11;
-    d3 = block[8*3];
-    t0 = d0 + d2;
-    t1 = d0 - d2;
+    int d0 = (block[8*0] << 11) + 65536;
+    int d1 = block[8*1];
+    int d2 = block[8*2] << 11;
+    int d3 = block[8*3];
+    int t0 = d0 + d2;
+    int t1 = d0 - d2;
     BUTTERFLY (t2, t3, W6, W2, d3, d1);
-    a0 = t0 + t2;
-    a1 = t1 + t3;
-    a2 = t1 - t3;
-    a3 = t0 - t2;
+    int a0 = t0 + t2;
+    int a1 = t1 + t3;
+    int a2 = t1 - t3;
+    int a3 = t0 - t2;
 
     d0 = block[8*4];
     d1 = block[8*5];
@@ -145,12 +141,12 @@ static inline void idct_col (int16_t * const block)
     d3 = block[8*7];
     BUTTERFLY (t0, t1, W7, W1, d3, d0);
     BUTTERFLY (t2, t3, W3, W5, d1, d2);
-    b0 = t0 + t2;
-    b3 = t1 + t3;
+    int b0 = t0 + t2;
+    int b3 = t1 + t3;
     t0 -= t2;
     t1 -= t3;
-    b1 = ((t0 + t1) >> 8) * 181;
-    b2 = ((t0 - t1) >> 8) * 181;
+    int b1 = ((t0 + t1) >> 8) * 181;
+    int b2 = ((t0 - t1) >> 8) * 181;
 
     block[8*0] = (a0 + b0) >> 17;
     block[8*1] = (a1 + b1) >> 17;

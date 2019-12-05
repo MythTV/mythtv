@@ -94,7 +94,8 @@ void TestMPEGTables::pat_test(void)
     QCOMPARE (pat.FindAnyPID(),        (uint32_t)  6100);
 
     // Create a PAT no CRC error
-    vector<uint> pnums, pids;
+    vector<uint> pnums;
+    vector<uint> pids;
     pnums.push_back(1);
     pids.push_back(0x100);
     ProgramAssociationTable* pat2 =

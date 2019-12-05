@@ -102,7 +102,8 @@ bool delete_file_immediately(const QString &filename,
 {
     /* Return true for success, false for error. */
     QFile checkFile(filename);
-    bool success1 = true, success2 = true;
+    bool success1 = true;
+    bool success2 = true;
 
     LOG(VB_FILE, LOG_INFO, LOC +
         QString("About to delete file: %1").arg(filename));
@@ -3511,7 +3512,10 @@ void MainServer::HandleQueryMemStats(PlaybackSock *pbs)
 {
     MythSocket    *pbssock = pbs->getSocket();
     QStringList strlist;
-    int         totalMB = 0, freeMB = 0, totalVM = 0, freeVM = 0;
+    int         totalMB = 0;
+    int         freeMB = 0;
+    int         totalVM = 0;
+    int         freeVM = 0;
 
     if (getMemStats(totalMB, freeMB, totalVM, freeVM))
         strlist << QString::number(totalMB) << QString::number(freeMB)
@@ -4773,9 +4777,15 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         auto direction = (BrowseDirection)slist[4].toInt();
         QString starttime = slist[5];
 
-        QString title = "", subtitle = "", desc = "", category = "";
-        QString endtime = "", callsign = "", iconpath = "";
-        QString seriesid = "", programid = "";
+        QString title = "";
+        QString subtitle = "";
+        QString desc = "";
+        QString category = "";
+        QString endtime = "";
+        QString callsign = "";
+        QString iconpath = "";
+        QString seriesid = "";
+        QString programid = "";
 
         enc->GetNextProgram(direction,
                             title, subtitle, desc, category, starttime,
@@ -4799,7 +4809,10 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     {
         uint chanid = slist[2].toUInt();
         uint sourceid = 0;
-        QString callsign = "", channum = "", channame = "", xmltv = "";
+        QString callsign = "";
+        QString channum = "";
+        QString channame = "";
+        QString xmltv = "";
 
         enc->GetChannelInfo(chanid, sourceid,
                             callsign, channum, channame, xmltv);
@@ -5093,7 +5106,8 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
                                        bool allHosts)
 {
     QString allHostList = gCoreContext->GetHostName();
-    int64_t totalKB = -1, usedKB = -1;
+    int64_t totalKB = -1;
+    int64_t usedKB = -1;
     QMap <QString, bool>foundDirs;
     QString driveKey;
     QString localStr = "1";
@@ -5244,8 +5258,8 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
     // Consolidate hosts sharing storage
     int64_t maxWriteFiveSec = GetCurrentMaxBitrate()/12 /*5 seconds*/;
     maxWriteFiveSec = max((int64_t)2048, maxWriteFiveSec); // safety for NFS mounted dirs
-    QList<FileSystemInfo>::iterator it1, it2;
-    for (it1 = fsInfos.begin(); it1 != fsInfos.end(); ++it1)
+
+    for (auto it1 = fsInfos.begin(); it1 != fsInfos.end(); ++it1)
     {
         if (it1->getFSysID() == -1)
         {
@@ -5254,7 +5268,7 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
                 it1->getHostname().section(".", 0, 0) + ":" + it1->getPath());
         }
 
-        for (it2 = it1 + 1; it2 != fsInfos.end(); ++it2)
+        for (auto it2 = it1 + 1; it2 != fsInfos.end(); ++it2)
         {
             // our fuzzy comparison uses the maximum of the two block sizes
             // or 32, whichever is greater
@@ -5282,7 +5296,7 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
     // Passed the cleaned list back
     totalKB = 0;
     usedKB  = 0;
-    for (it1 = fsInfos.begin(); it1 != fsInfos.end(); ++it1)
+    for (auto it1 = fsInfos.begin(); it1 != fsInfos.end(); ++it1)
     {
         strlist << it1->getHostname();
         strlist << it1->getPath();
@@ -6926,7 +6940,8 @@ void MainServer::HandleMusicGetLyricGrabbers(const QStringList &/*slist*/, Playb
 
         QDomDocument domDoc;
         QString errorMsg;
-        int errorLine = 0, errorColumn = 0;
+        int errorLine = 0;
+        int errorColumn = 0;
 
         if (!domDoc.setContent(result, false, &errorMsg, &errorLine, &errorColumn))
         {

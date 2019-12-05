@@ -252,9 +252,8 @@ bool ExternIO::KillIfRunning(const QString & cmd)
     QString grp = QString("pgrep -x -f -- \"%1\" 2>&1 > /dev/null").arg(cmd);
     QString kil = QString("pkill --signal 15 -x -f -- \"%1\" 2>&1 > /dev/null")
                   .arg(cmd);
-    int res_grp, res_kil;
 
-    res_grp = system(grp.toUtf8().constData());
+    int res_grp = system(grp.toUtf8().constData());
     if (WEXITSTATUS(res_grp) == 1)
     {
         LOG(VB_RECORD, LOG_DEBUG, QString("'%1' not running.").arg(cmd));
@@ -263,7 +262,7 @@ bool ExternIO::KillIfRunning(const QString & cmd)
 
     LOG(VB_RECORD, LOG_WARNING, QString("'%1' already running, killing...")
         .arg(cmd));
-    res_kil = system(kil.toUtf8().constData());
+    int res_kil = system(kil.toUtf8().constData());
     if (WEXITSTATUS(res_kil) == 1)
         LOG(VB_GENERAL, LOG_WARNING, QString("'%1' failed: %2")
             .arg(kil).arg(ENO));
@@ -572,7 +571,8 @@ void ExternalStreamHandler::run(void)
     QString    ready_cmd;
     QByteArray buffer;
     int        sz;
-    uint       len, read_len;
+    uint       len;
+    uint       read_len;
     uint       restart_cnt = 0;
     MythTimer  status_timer;
     MythTimer  nodata_timer;

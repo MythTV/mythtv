@@ -387,9 +387,14 @@ void MythDisplay::InitialiseModes(void)
 
     for (int i = 0; true; ++i)
     {
-        int iw = 0, ih = 0, ow = 0, oh = 0;
-        double iaspect = 0.0, oaspect = 0.0;
-        double irate = 0.0, orate = 0.0;
+        int iw = 0;
+        int ih = 0;
+        int ow = 0;
+        int oh = 0;
+        double iaspect = 0.0;
+        double oaspect = 0.0;
+        double irate = 0.0;
+        double orate = 0.0;
 
         GetMythDB()->GetResolutionSetting("VidMode", iw, ih, iaspect, irate, i);
         GetMythDB()->GetResolutionSetting("TVVidMode", ow, oh, oaspect, orate, i);

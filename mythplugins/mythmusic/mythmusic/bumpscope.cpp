@@ -239,9 +239,11 @@ inline void BumpScope::draw_vert_line(unsigned char *buffer, int x, int y1,
 
 void BumpScope::render_light(int lx, int ly)
 {
-    int dx = 0, dy = 0;
+    int dx = 0;
+    int dy = 0;
     unsigned int PHONGRES = m_phongrad * 2;
-    unsigned int i = 0, j = 0;
+    unsigned int i = 0;
+    unsigned int j = 0;
 
     int prev_y = m_bpl + 1;
     int out_y = 0;
@@ -304,7 +306,9 @@ void BumpScope::rgb_to_hsv(unsigned int color, double *h, double *s, double *v)
 
 void BumpScope::hsv_to_rgb(double h, double s, double v, unsigned int *color)
 {
-  double r = NAN, g = NAN, b = NAN;
+  double r = NAN;
+  double g = NAN;
+  double b = NAN;
 
   if (s == 0.0)
     s = 0.000001;

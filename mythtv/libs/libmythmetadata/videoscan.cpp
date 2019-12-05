@@ -109,10 +109,12 @@ void VideoScannerThread::SetHosts(const QStringList &hosts)
 void VideoScannerThread::SetDirs(QStringList dirs)
 {
     QString master = gCoreContext->GetMasterHostName().toLower();
-    QStringList searchhosts, mdirs;
+    QStringList searchhosts;
+    QStringList mdirs;
     m_offlineSGHosts.clear();
 
-    QStringList::iterator iter = dirs.begin(), iter2;
+    QStringList::iterator iter = dirs.begin();
+    QStringList::iterator iter2;
     while ( iter != dirs.end() )
     {
         if (iter->startsWith("myth://"))

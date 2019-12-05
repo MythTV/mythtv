@@ -496,7 +496,8 @@ bool AudioPlayer::GetBufferStatus(uint &fill, uint &total)
 
 bool AudioPlayer::IsBufferAlmostFull(void)
 {
-    uint ofill = 0, ototal = 0;
+    uint ofill = 0;
+    uint ototal = 0;
     if (GetBufferStatus(ofill, ototal))
     {
         uint othresh =  ((ototal>>1) + (ototal>>2));

@@ -362,7 +362,8 @@ bool MythOpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Dein
             {
                 QString find1 = QString("sampler2D kernelTex%1").arg(i);
                 QString find2 = QString("kernelTex%1").arg(i);
-                QStringList replacelist1, replacelist2;
+                QStringList replacelist1;
+                QStringList replacelist2;
                 for (int j = 0; j < count; ++j)
                 {
                     replacelist1 << QString("sampler2D kernelTexture%1%2").arg(i).arg(j);

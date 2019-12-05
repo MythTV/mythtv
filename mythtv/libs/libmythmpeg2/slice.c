@@ -1208,8 +1208,12 @@ static void motion_mp1 (mpeg2_decoder_t * const decoder,
 			motion_t * const motion,
 			mpeg2_mc_fct * const * const table)
 {
-    int motion_x = 0, motion_y = 0;
-    unsigned int pos_x = 0, pos_y = 0, xy_half = 0, offset = 0;
+    int motion_x = 0;
+    int motion_y = 0;
+    unsigned int pos_x = 0;
+    unsigned int pos_y = 0;
+    unsigned int xy_half = 0;
+    unsigned int offset = 0;
 
     NEEDBITS (bit_buf, bits, bit_ptr);
     motion_x = (motion->pmv[0][0] +
@@ -1747,7 +1751,8 @@ void mpeg2_slice (mpeg2_decoder_t * const decoder, const int code,
 
 	if (macroblock_modes & MACROBLOCK_INTRA) {
 
-	    int DCT_offset = 0, DCT_stride = 0;
+	    int DCT_offset = 0;
+	    int DCT_stride = 0;
 
 	    if (decoder->concealment_motion_vectors) {
 		if (decoder->picture_structure == FRAME_PICTURE)
@@ -1814,7 +1819,8 @@ void mpeg2_slice (mpeg2_decoder_t * const decoder, const int code,
 	    MOTION_CALL (parser, macroblock_modes);
 
 	    if (macroblock_modes & MACROBLOCK_PATTERN) {
-		int DCT_offset = 0, DCT_stride = 0;
+		int DCT_offset = 0;
+		int DCT_stride = 0;
 
 		if (macroblock_modes & DCT_TYPE_INTERLACED) {
 		    DCT_offset = decoder->stride;

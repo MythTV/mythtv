@@ -438,8 +438,10 @@ void MythPlayer::ReinitOSD(void)
             osdLock.unlock();
             return;
         }
-        QRect visible, total;
-        float aspect, scaling;
+        QRect visible;
+        QRect total;
+        float aspect;
+        float scaling;
         videoOutput->GetOSDBounds(total, visible, aspect,
                                   scaling, 1.0F);
         if (osd)
@@ -2451,8 +2453,10 @@ void MythPlayer::VideoStart(void)
 {
     if (!FlagIsSet(kVideoIsNull) && !player_ctx->IsPIP())
     {
-        QRect visible, total;
-        float aspect, scaling;
+        QRect visible;
+        QRect total;
+        float aspect;
+        float scaling;
 
         osdLock.lock();
         osd = new OSD(this, m_tv, videoOutput->GetOSDPainter());
@@ -2691,7 +2695,8 @@ void MythPlayer::SwitchToProgram(void)
         return;
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "SwitchToProgram - start");
-    bool discontinuity = false, newtype = false;
+    bool discontinuity = false;
+    bool newtype = false;
     int newid = -1;
     ProgramInfo *pginfo = player_ctx->m_tvchain->GetSwitchProgram(
         discontinuity, newtype, newid);
@@ -2838,7 +2843,8 @@ void MythPlayer::FileChanged(void)
 void MythPlayer::JumpToProgram(void)
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "JumpToProgram - start");
-    bool discontinuity = false, newtype = false;
+    bool discontinuity = false;
+    bool newtype = false;
     int newid = -1;
     long long nextpos = player_ctx->m_tvchain->GetJumpPos();
     ProgramInfo *pginfo = player_ctx->m_tvchain->GetSwitchProgram(
@@ -4050,8 +4056,6 @@ bool MythPlayer::IsReallyNearEnd(void) const
  */
 bool MythPlayer::IsNearEnd(void)
 {
-    uint64_t framesRead, framesLeft = 0;
-
     if (!player_ctx)
         return false;
 
@@ -4068,7 +4072,8 @@ bool MythPlayer::IsNearEnd(void)
     margin = (long long) (margin * audio.GetStretchFactor());
     bool watchingTV = IsWatchingInprogress();
 
-    framesRead = framesPlayed;
+    uint64_t framesRead = framesPlayed;
+    uint64_t framesLeft = 0;
 
     if (!player_ctx->IsPIP() &&
         player_ctx->GetState() == kState_WatchingPreRecorded)
@@ -5244,7 +5249,9 @@ void MythPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
         int sbmins = (secsbehind - sbhours * 3600) / 60;
         int sbsecs = (secsbehind - sbhours * 3600 - sbmins * 60);
 
-        QString text1, text2, text3;
+        QString text1;
+        QString text2;
+        QString text3;
         if (paddedFields)
         {
             text1.sprintf("%02d:%02d:%02d", phours, pmins, psecs);

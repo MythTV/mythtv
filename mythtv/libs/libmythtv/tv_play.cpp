@@ -1176,8 +1176,12 @@ bool TV::Init(bool createWindow)
                                  GetMythMainWindow()->size());
 
         // adjust for window manager wierdness.
-        int xbase, width, ybase, height;
-        float wmult, hmult;
+        int xbase;
+        int width;
+        int ybase;
+        int height;
+        float wmult;
+        float hmult;
         GetMythUI()->GetScreenSettings(xbase, width, wmult,
                                        ybase, height, hmult);
         if ((abs(m_savedGuiBounds.x()-xbase) < 3) &&
@@ -1190,7 +1194,8 @@ bool TV::Init(bool createWindow)
         // if width && height are zero users expect fullscreen playback
         if (!fullscreen)
         {
-            int gui_width = 0, gui_height = 0;
+            int gui_width = 0;
+            int gui_height = 0;
             gCoreContext->GetResolutionSetting("Gui", gui_width, gui_height);
             fullscreen |= (0 == gui_width && 0 == gui_height);
         }
@@ -2504,7 +2509,8 @@ bool TV::StartRecorder(PlayerContext *ctx, int maxWait)
     maxWait = (maxWait <= 0) ? 40000 : maxWait;
     MythTimer t;
     t.start();
-    bool recording = false, ok = true;
+    bool recording = false;
+    bool ok = true;
     if (!rec) {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid Remote Encoder");
         SetErrored(ctx);
@@ -5053,10 +5059,8 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
                 if (tokens[2].contains(re))
                 {
                     QStringList matches = re.capturedTexts();
-
-                    int numerator, denominator;
-                    numerator = matches[1].toInt(&ok);
-                    denominator = matches[2].toInt(&ok);
+                    int numerator = matches[1].toInt(&ok);
+                    int denominator = matches[2].toInt(&ok);
 
                     if (ok && denominator != 0)
                         tmpSpeed = static_cast<float>(numerator) /
@@ -5720,7 +5724,8 @@ bool TV::PIPAddPlayer(PlayerContext *mctx, PlayerContext *pipctx)
     if (!mctx->IsPlayerPlaying())
         return false;
 
-    bool ok = false, addCondition = false;
+    bool ok = false;
+    bool addCondition = false;
     bool is_using_null = false;
     pipctx->LockDeletePlayer(__FILE__, __LINE__);
     if (pipctx->m_player)
@@ -6484,9 +6489,14 @@ bool TV::DoPlayerSeekToFrame(PlayerContext *ctx, uint64_t target)
 bool TV::SeekHandleAction(PlayerContext *actx, const QStringList &actions,
                           const bool isDVD)
 {
-    const int kRewind = 4, kForward = 8, kSticky = 16, kSlippery = 32,
-              kRelative = 64, kAbsolute = 128, kIgnoreCutlist = 256,
-              kWhenceMask = 3;
+    const int kRewind = 4;
+    const int kForward = 8;
+    const int kSticky = 16;
+    const int kSlippery = 32;
+    const int kRelative = 64;
+    const int kAbsolute = 128;
+    const int kIgnoreCutlist = 256;
+    const int kWhenceMask = 3;
     int flags = 0;
     if (has_action(ACTION_SEEKFFWD, actions))
         flags = ARBSEEK_FORWARD | kForward | kSlippery | kRelative;
@@ -7595,7 +7605,8 @@ void TV::ChangeChannel(PlayerContext *ctx, ChannelChangeDirection direction)
 static uint get_chanid(const PlayerContext *ctx,
                        uint cardid, const QString &channum)
 {
-    uint chanid = 0, cur_sourceid = 0;
+    uint chanid = 0;
+    uint cur_sourceid = 0;
     // try to find channel on current input
     if (ctx && ctx->m_playingInfo && ctx->m_playingInfo->GetSourceID())
     {
@@ -8095,8 +8106,15 @@ void TV::UpdateOSDSignal(PlayerContext *ctx, const QStringList &strlist)
     uint  ber  = 0xffffffff;
     int   pos  = -1;
     int   tuned = -1;
-    QString pat(""), pmt(""), mgt(""), vct(""), nit(""), sdt(""), crypt("");
-    QString err, msg;
+    QString pat("");
+    QString pmt("");
+    QString mgt("");
+    QString vct("");
+    QString nit("");
+    QString sdt("");
+    QString crypt("");
+    QString err;
+    QString msg;
     for (it = slist.begin(); it != slist.end(); ++it)
     {
         if ("error" == it->GetShortName())
@@ -8322,8 +8340,10 @@ void TV::ShowLCDDVDInfo(const PlayerContext *ctx)
     }
 
     DVDRingBuffer *dvd = ctx->m_buffer->DVD();
-    QString dvdName, dvdSerial;
-    QString mainStatus, subStatus;
+    QString dvdName;
+    QString dvdSerial;
+    QString mainStatus;
+    QString subStatus;
 
     if (!dvd->GetNameAndSerialNum(dvdName, dvdSerial))
     {
@@ -8340,8 +8360,11 @@ void TV::ShowLCDDVDInfo(const PlayerContext *ctx)
     }
     else
     {
-        QString timeMins, timeHrsMin;
-        int playingTitle, playingPart, totalParts;
+        QString timeMins;
+        QString timeHrsMin;
+        int playingTitle;
+        int playingPart;
+        int totalParts;
 
         dvd->GetPartAndTitle(playingPart, playingTitle);
         totalParts = dvd->NumPartsInTitle();
@@ -9412,7 +9435,8 @@ void TV::customEvent(QEvent *e)
     if (message.startsWith("ASK_RECORDING "))
     {
         int timeuntil = 0;
-        bool hasrec = false, haslater = false;
+        bool hasrec = false;
+        bool haslater = false;
         if (tokens.size() >= 5)
         {
             cardnum   = tokens[1].toUInt();
@@ -10521,7 +10545,8 @@ void TV::OSDDialogEvent(int result, const QString& text, QString action)
 
             // make sure the current channel is from the selected group
             // or tune to the first in the group
-            QString cur_channum, new_channum;
+            QString cur_channum;
+            QString new_channum;
             if (actx->m_tvchain)
             {
                 QMutexLocker locker(&m_channelGroupLock);

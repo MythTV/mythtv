@@ -225,9 +225,11 @@ bool FillData::Run(SourceList &sourcelist)
 {
     SourceList::iterator it;
 
-    QString status, querystr;
+    QString status;
+    QString querystr;
     MSqlQuery query(MSqlQuery::InitCon());
-    QDateTime GuideDataBefore, GuideDataAfter;
+    QDateTime GuideDataBefore;
+    QDateTime GuideDataAfter;
     int failures = 0;
     int externally_handled = 0;
     int total_sources = sourcelist.size();

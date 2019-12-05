@@ -146,7 +146,10 @@ bool MythCCExtractorPlayer::run(void)
 
     ClearAfterSeek();
 
-    MythTimer flagTime, ui_timer, inuse_timer, save_timer;
+    MythTimer flagTime;
+    MythTimer ui_timer;
+    MythTimer inuse_timer;
+    MythTimer save_timer;
     flagTime.start();
     ui_timer.start();
     inuse_timer.start();

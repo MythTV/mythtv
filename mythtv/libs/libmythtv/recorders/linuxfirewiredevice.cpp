@@ -981,7 +981,7 @@ int linux_firewire_device_tspacket_handler(
 static bool has_data(int fd, int msec)
 {
     fd_set rfds;
-    FD_ZERO(&rfds);
+    FD_ZERO(&rfds); // NOLINT(readability-isolate-declaration)
     FD_SET(fd, &rfds);
 
     struct timeval tv {};

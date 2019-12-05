@@ -307,7 +307,8 @@ void LCDProcClient::checkConnections()
 
 void LCDProcClient::serverSendingData()
 {
-    QString lineFromServer, tempString;
+    QString lineFromServer;
+    QString tempString;
     QStringList aList;
     QStringList::Iterator it;
 
@@ -967,7 +968,8 @@ void LCDProcClient::formatScrollingWidgets()
         ++it;
         if (curItem->getText().length() > (int) m_lcdWidth )
         {
-            QString temp, temp2;
+            QString temp;
+            QString temp2;
             temp = temp.fill(QChar(' '), max_len - curItem->getText().length());
             temp2 = temp2.fill(QChar(' '), m_lcdWidth );
             curItem->setText(temp2 + curItem->getText() + temp);
@@ -1059,9 +1061,8 @@ void LCDProcClient::startMusic(QString artist, const QString& album, const QStri
     sendToServer("widget_set Music timeWidget 1 1 \"\"");
     m_lcdTextItems->clear();
 
-    QString aString;
     m_musicProgress = 0.0F;
-    aString = std::move(artist);
+    QString aString = std::move(artist);
     if ( m_lcdShowMusicItems == "ArtistAlbumTitle")
     {
         aString += " [";
@@ -1419,7 +1420,8 @@ void LCDProcClient::scrollMenuText()
     if (!m_lcdMenuItems )
         return;
 
-    QString aString, bString;
+    QString aString;
+    QString bString;
     QList<LCDMenuItem>::iterator it = m_lcdMenuItems->begin();
 
     ++m_menuScrollPosition;
@@ -1874,7 +1876,8 @@ void LCDProcClient::dostdclock()
     }
 
     QString aString;
-    int x = 0, y = 0;
+    int x = 0;
+    int y = 0;
 
     if ( m_lcdHeight < 3)
         y = m_lcdHeight;
@@ -1945,7 +1948,8 @@ void LCDProcClient::outputRecStatus(void)
         return;
     }  
 
-    QString aString, status;
+    QString aString;
+    QString status;
     QStringList list;
     int listTime = 0;
 

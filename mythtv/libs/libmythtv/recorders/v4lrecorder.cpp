@@ -101,7 +101,9 @@ int V4LRecorder::OpenVBIDevice(void)
 
     struct VBIData *vbi_cb = nullptr;
     struct vbi     *pal_tt = nullptr;
-    uint width = 0, start_line = 0, line_count = 0;
+    uint width = 0;
+    uint start_line = 0;
+    uint line_count = 0;
 
     QByteArray vbidev = m_vbidevice.toLatin1();
     if (VBIMode::PAL_TT == m_vbimode)
@@ -247,7 +249,9 @@ void V4LRecorder::RunVBIDevice(void)
     if (m_vbi_fd < 0)
         return;
 
-    unsigned char *buf = nullptr, *ptr = nullptr, *ptr_end = nullptr;
+    unsigned char *buf = nullptr;
+    unsigned char *ptr = nullptr;
+    unsigned char *ptr_end = nullptr;
     if (m_ntsc_vbi_width)
     {
         uint sz   = m_ntsc_vbi_width * m_ntsc_vbi_line_count * 2;
@@ -266,7 +270,7 @@ void V4LRecorder::RunVBIDevice(void)
         struct timeval tv {0, 5000};
         fd_set rdset;
 
-        FD_ZERO(&rdset);
+        FD_ZERO(&rdset); // NOLINT(readability-isolate-declaration)
         FD_SET(m_vbi_fd, &rdset);
 
         int nr = select(m_vbi_fd + 1, &rdset, nullptr, nullptr, &tv);

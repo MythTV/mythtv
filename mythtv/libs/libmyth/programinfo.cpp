@@ -1440,7 +1440,9 @@ bool ProgramInfo::FromStringList(QStringList::const_iterator &it,
     INT_FROM_LIST(m_recpriority2);      // 39
     INT_FROM_LIST(m_parentid);          // 40
     STR_FROM_LIST(m_storagegroup);      // 41
-    uint audioproperties = 0, videoproperties = 0, subtitleType = 0;
+    uint audioproperties = 0;
+    uint videoproperties = 0;
+    uint subtitleType = 0;
     INT_FROM_LIST(audioproperties);   // 42
     INT_FROM_LIST(videoproperties);   // 43
     INT_FROM_LIST(subtitleType);      // 44
@@ -3033,7 +3035,8 @@ bool ProgramInfo::QueryIsInUse(QStringList &byWho) const
     byWho.clear();
     if (query.exec() && query.size() > 0)
     {
-        QString usageStr, recusage;
+        QString usageStr;
+        QString recusage;
         while (query.next())
         {
             usageStr = QObject::tr("Unknown");
@@ -3106,7 +3109,9 @@ bool ProgramInfo::QueryIsDeleteCandidate(bool one_playback_allowed) const
     QStringList byWho;
     if (QueryIsInUse(byWho) && !byWho.isEmpty())
     {
-        uint play_cnt = 0, ft_cnt = 0, jq_cnt = 0;
+        uint play_cnt = 0;
+        uint ft_cnt = 0;
+        uint jq_cnt = 0;
         for (uint i = 0; (i+2 < (uint)byWho.size()) && ok; i+=3)
         {
             play_cnt += byWho[i].contains(kPlayerInUseID) ? 1 : 0;
@@ -3689,9 +3694,8 @@ void ProgramInfo::SavePositionMap(
 
         if ((min_frame >= 0) || (max_frame >= 0))
         {
-            frm_pos_map_t::const_iterator it, it_end;
-            it     = m_positionMapDBReplacement->map[type].begin();
-            it_end = m_positionMapDBReplacement->map[type].end();
+            auto it     = m_positionMapDBReplacement->map[type].begin();
+            auto it_end = m_positionMapDBReplacement->map[type].end();
 
             frm_pos_map_t new_map;
             for (; it != it_end; ++it)

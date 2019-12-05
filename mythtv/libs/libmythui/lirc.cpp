@@ -443,7 +443,7 @@ void LIRC::run(void)
         }
 
         fd_set readfds;
-        FD_ZERO(&readfds);
+        FD_ZERO(&readfds); // NOLINT(readability-isolate-declaration)
         FD_SET(d->m_lircState->lirc_lircd, &readfds);
 
         // the maximum time select() should wait

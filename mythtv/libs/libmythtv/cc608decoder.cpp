@@ -100,7 +100,7 @@ static const QChar extendedchar3[] =
 
 void CC608Decoder::FormatCCField(int tc, int field, int data)
 {
-    int b1, b2, len, x;
+    int len;
     int mode;
 
     if (data == -1)              // invalid data. flush buffers to be safe.
@@ -129,8 +129,8 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
     m_last_format_tc[field&1] = tc;
     m_last_format_data[field&1] = data;
 
-    b1 = data & 0x7f;
-    b2 = (data >> 8) & 0x7f;
+    int b1 = data & 0x7f;
+    int b2 = (data >> 8) & 0x7f;
 #if 1
     LOG(VB_VBI, LOG_DEBUG,
         QString("Format CC @%1/%2 = %3 %4, %5/%6 = '%7' '%8'")
@@ -497,7 +497,7 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
                     }
                     else
                         // illegal?
-                        for (x = 0; x < (b2 & 0x03); x++)
+                        for (int x = 0; x < (b2 & 0x03); x++)
                         {
                             m_ccbuf[mode] += ' ';
                             m_col[mode]++;
@@ -534,10 +534,8 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
 
 int CC608Decoder::FalseDup(int tc, int field, int data)
 {
-    int b1, b2;
-
-    b1 = data & 0x7f;
-    b2 = (data >> 8) & 0x7f;
+    int b1 = data & 0x7f;
+    int b2 = (data >> 8) & 0x7f;
 
     if (m_ignore_time_code)
     {
@@ -557,7 +555,8 @@ int CC608Decoder::FalseDup(int tc, int field, int data)
     // bttv-0.7 reads don't seem to work as well so if read intervals
     // vary from this, be more conservative in detecting duplicate
     // CC codes.
-    int dup_text_fudge, dup_ctrl_fudge;
+    int dup_text_fudge;
+    int dup_ctrl_fudge;
     if (m_badvbi[field] < 100 && b1 != 0 && b2 != 0)
     {
         int d = tc - m_lasttc[field];
@@ -868,8 +867,6 @@ static void DumpPIL(int pil)
 
 void CC608Decoder::DecodeVPS(const unsigned char *buf)
 {
-    int cni, pcs, pty, pil;
-
     int c = vbi_bit_reverse[buf[1]];
 
     if ((int8_t) c < 0)
@@ -886,13 +883,13 @@ void CC608Decoder::DecodeVPS(const unsigned char *buf)
             .arg(buf[0]).arg(buf[1]).arg(buf[2]).arg(buf[3]).arg(buf[4])
             .arg(buf[5]).arg(buf[6]).arg(buf[7]).arg(m_vps_pr_label));
 
-    pcs = buf[2] >> 6;
-    cni = + ((buf[10] & 3) << 10)
+    int pcs = buf[2] >> 6;
+    int cni = + ((buf[10] & 3) << 10)
         + ((buf[11] & 0xC0) << 2)
         + ((buf[8] & 0xC0) << 0)
         + (buf[11] & 0x3F);
-    pil = ((buf[8] & 0x3F) << 14) + (buf[9] << 6) + (buf[10] >> 2);
-    pty = buf[12];
+    int pil = ((buf[8] & 0x3F) << 14) + (buf[9] << 6) + (buf[10] >> 2);
+    int pty = buf[12];
 
     LOG(VB_VBI, LOG_INFO, QString("CNI: %1 PCS: %2 PTY: %3 ")
             .arg(cni).arg(pcs).arg(pty));

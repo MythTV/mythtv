@@ -380,7 +380,8 @@ void MDBManager::PurgeIdleConnections(bool leaveOne)
     DBList &list = m_pool[QThread::currentThread()];
     DBList::iterator it = list.begin();
 
-    uint purgedConnections = 0, totalConnections = 0;
+    uint purgedConnections = 0;
+    uint totalConnections = 0;
     MSqlDatabase *newDb = nullptr;
     while (it != list.end())
     {

@@ -60,7 +60,8 @@ bool ChannelData::insert_chan(uint sourceid)
     bool insert_channels = m_channelUpdates;
     if (!insert_channels)
     {
-        bool isEncoder = false, isUnscanable = false;
+        bool isEncoder = false;
+        bool isUnscanable = false;
         bool isCableCard  = SourceUtil::IsCableCardPresent(sourceid);
         if (m_cardType.isEmpty())
         {
@@ -393,7 +394,8 @@ void ChannelData::handleChannels(int id, ChannelInfoList *chanlist)
         }
         else if (insertChan) // Only insert channels for non-scannable sources
         {
-            int major = 0, minor = 0;
+            int major = 0;
+            int minor = 0;
             long long freq = 0;
             get_atsc_stuff((*i).m_channum, id, (*i).m_freqid.toInt(), major, minor, freq);
 
@@ -456,7 +458,8 @@ void ChannelData::handleChannels(int id, ChannelInfoList *chanlist)
             {
                 // We only do this if we are not asked to skip it with the
                 // --update-guide-only (formerly --update) flag.
-                int mplexid = 0, chanid = 0;
+                int mplexid = 0;
+                int chanid = 0;
                 if (minor > 0)
                 {
                     mplexid = ChannelUtil::CreateMultiplex(

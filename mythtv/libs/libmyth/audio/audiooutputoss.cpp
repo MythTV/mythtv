@@ -239,7 +239,8 @@ void AudioOutputOSS::WriteAudio(uchar *aubuf, int size)
     if (m_audiofd < 0)
         return;
 
-    int written = 0, lw = 0;
+    int written = 0;
+    int lw = 0;
 
     uchar *tmpbuf = aubuf;
 

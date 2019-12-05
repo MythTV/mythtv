@@ -175,9 +175,6 @@ Checks: '-*,
         # anyway. ,
        -readability-implicit-bool-conversion,
 
-        # Produces lots of changes.  Is this necessary? ,
-       -readability-isolate-declaration,
-
         # Lots of noise. Needs work. ,
        -readability-magic-numbers,
 

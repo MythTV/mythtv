@@ -74,7 +74,8 @@ void fix_audio_count(uint64_t *acount, audio_frame_t *aframe, uint64_t origpts, 
 
 uint64_t next_ptsdts_video(uint64_t *pts, sequence_t *s, uint64_t fcount, uint64_t gcount)
 {
-	int64_t newdts = 0, newpts = 0;
+	int64_t newdts = 0;
+	int64_t newpts = 0;
 	int64_t fnum = s->current_tmpref - gcount + fcount;
 
 	

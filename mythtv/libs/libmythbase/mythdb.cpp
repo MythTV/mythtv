@@ -534,7 +534,8 @@ bool MythDB::GetSettings(QMap<QString,QString> &_key_value_pairs)
         QMap<QString,KVIt>::const_iterator it = keymap.begin();
         for (; it != keymap.end(); ++it)
         {
-            QString key = it.key(), value = **it;
+            QString key = it.key();
+            QString value = **it;
 
             // another thread may have inserted a value into the cache
             // while we did not have the lock, check first then save
@@ -717,7 +718,9 @@ void MythDB::GetResolutionSetting(const QString &type,
                                        double &refresh_rate,
                                        int index)
 {
-    bool ok = false, ok0 = false, ok1 = false;
+    bool ok = false;
+    bool ok0 = false;
+    bool ok1 = false;
     QString sRes =    QString("%1Resolution").arg(type);
     QString sRR =     QString("%1RefreshRate").arg(type);
     QString sAspect = QString("%1ForceAspect").arg(type);
@@ -737,7 +740,8 @@ void MythDB::GetResolutionSetting(const QString &type,
     if (!res.isEmpty())
     {
         QStringList slist = res.split(QString("x"));
-        int w = width, h = height;
+        int w = width;
+        int h = height;
         if (2 == slist.size())
         {
             w = slist[0].toInt(&ok0);
@@ -786,7 +790,9 @@ void MythDB::GetResolutionSetting(const QString &t, int &w, int &h, int i)
 void MythDB::OverrideSettingForSession(
     const QString &key, const QString &value)
 {
-    QString mk = key.toLower(), mk2 = d->m_localhostname + ' ' + mk, mv = value;
+    QString mk = key.toLower();
+    QString mk2 = d->m_localhostname + ' ' + mk;
+    QString mv = value;
     if ("dbschemaver" == mk)
     {
         LOG(VB_GENERAL, LOG_ERR,

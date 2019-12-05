@@ -315,7 +315,10 @@ static void parseAudio(QDomElement &element, ProgInfo *pginfo)
 
 ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
 {
-    QString programid, season, episode, totalepisodes;
+    QString programid;
+    QString season;
+    QString episode;
+    QString totalepisodes;
     auto *pginfo = new ProgInfo();
 
     QString text = element.attribute("start", "");

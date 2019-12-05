@@ -66,7 +66,8 @@ static void
 vbi_send(struct vbi *vbi, int type, int i1, int i2, int i3, void *p1)
 {
     struct vt_event ev[1];
-    struct vbi_client *cl, *cln;
+    struct vbi_client *cl;
+    struct vbi_client *cln;
 
     ev->resource = vbi;
     ev->type = type;
@@ -169,16 +170,15 @@ vt_line(struct vbi *vbi, unsigned char *p)
 {
     struct vt_page *cvtp;
     struct raw_page *rvtp;
-    int hdr, mag, mag8, pkt, i;
     int err = 0;
 
-    hdr = hamm16(p, &err);
+    int hdr = hamm16(p, &err);
     if (err & 0xf000)
        return -4;
 
-    mag = hdr & 7;
-    mag8 = mag?: 8;
-    pkt = (hdr >> 3) & 0x1f;
+    int mag = hdr & 7;
+    int mag8 = mag?: 8;
+    int pkt = (hdr >> 3) & 0x1f;
     p += 2;
 
     rvtp = vbi->rpage + mag;
@@ -188,12 +188,10 @@ vt_line(struct vbi *vbi, unsigned char *p)
     {
        case 0:
        {
-           int b1, b2, b3, b4;
-
-           b1 = hamm16(p, &err);       // page number
-           b2 = hamm16(p+2, &err);     // subpage number + flags
-           b3 = hamm16(p+4, &err);     // subpage number + flags
-           b4 = hamm16(p+6, &err);     // language code + more flags
+           int b1 = hamm16(p, &err);       // page number
+           int b2 = hamm16(p+2, &err);     // subpage number + flags
+           int b3 = hamm16(p+4, &err);     // subpage number + flags
+           int b4 = hamm16(p+6, &err);     // language code + more flags
 
            if (vbi->ppage->page->flags & PG_MAGSERIAL)
                vbi_send_page(vbi, vbi->ppage, b1);
@@ -243,17 +241,15 @@ vt_line(struct vbi *vbi, unsigned char *p)
        }
        case 26:
        {
-           int d, t[13];
-
            if (~cvtp->flags & PG_ACTIVE)
                return 0;
 
-
-           d = hamm8(p, &err);
+           int d = hamm8(p, &err);
            if (err & 0xf000)
                return 4;
 
-           for (i = 0; i < 13; ++i)
+           int t[13];
+           for (int i = 0; i < 13; ++i)
                t[i] = hamm24(p + 1 + 3*i, &err);
            if (err & 0xf000)
                return 4;
@@ -265,19 +261,17 @@ vt_line(struct vbi *vbi, unsigned char *p)
        case 27:
        {
            // FLOF data (FastText)
-           int b1,b2;
-
            if (~cvtp->flags & PG_ACTIVE)
                return 0; // -1 flushes all pages.  we may never resync again :(
 
-           b1 = hamm8(p, &err);
-           b2 = hamm8(p + 37, &err);
+           int b1 = hamm8(p, &err);
+           int b2 = hamm8(p + 37, &err);
            if (err & 0xf000)
                return 4;
            if (b1 != 0 || !(b2 & 8))
                return 0;
 
-           for (i = 0; i < 6; ++i)
+           for (int i = 0; i < 6; ++i)
            {
                err = 0;
                b1 = hamm16(p+1+6*i, &err);
@@ -325,9 +319,12 @@ vt_line(struct vbi *vbi, unsigned char *p)
 static int
 vbi_line(struct vbi *vbi, const unsigned char *p)
 {
-    unsigned char data[43], min, max;
-    int dt[256], hi[6], lo[6];
-    int i, n, sync, thr;
+    unsigned char data[43];
+    int dt[256];
+    int hi[6];
+    int lo[6];
+    int i;
+    int n;
     int bpb = vbi->bpb;
 
     /* remove DC. edge-detector */
@@ -356,14 +353,16 @@ vbi_line(struct vbi *vbi, const unsigned char *p)
        return -1;      // bad frequency
 
     /* AGC and sync-reference */
-    min = 255, max = 0, sync = 0;
+    unsigned char min = 255;
+    unsigned char max = 0;
+    int sync = 0;
     for (i = hi[4]; i < hi[5]; ++i)
        if (p[i] > max)
            max = p[i], sync = i;
     for (i = lo[4]; i < lo[5]; ++i)
        if (p[i] < min)
            min = p[i];
-    thr = (min + max) / 2;
+    int thr = (min + max) / 2;
 
     p += sync;
 
@@ -475,11 +474,6 @@ vbi_del_handler(struct vbi *vbi, void *handler, void *data)
 static int
 set_decode_parms(struct vbi *vbi, struct v4l2_vbi_format *p)
 {
-    double fs;         // sampling rate
-    double bpb;                // bytes per bit
-    int soc, eoc;      // start/end of clock run-in
-    int bpl;           // bytes per line
-
     if (p->sample_format != V4L2_PIX_FMT_GREY)
     {
        fprintf(stderr, "got pix fmt %x\n", p->sample_format);
@@ -498,11 +492,11 @@ set_decode_parms(struct vbi *vbi, struct v4l2_vbi_format *p)
     //   latest last bit                       tl = 12us+0.4us+3.5/ft = 12.9us
     //   total number of used bits             n = (2+1+2+40)*8 = 360
 
-    bpl = p->samples_per_line;
-    fs = p->sampling_rate;
-    bpb = fs/6937500.0;
-    soc = (int)(9.2e-6*fs) - (int)p->offset;
-    eoc = (int)(12.9e-6*fs) - (int)p->offset;
+    int    bpl = p->samples_per_line; // bytes per line
+    double fs = p->sampling_rate; // sampling rate
+    double bpb = fs/6937500.0; // bytes per bit
+    int    soc = (int)(9.2e-6*fs) - (int)p->offset;  // start of clock run-in
+    int    eoc = (int)(12.9e-6*fs) - (int)p->offset; // end of clock run-in
     if (soc < 0)
        soc = 0;
     if (eoc > bpl - (int)(43*8*bpb))

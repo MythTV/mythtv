@@ -269,7 +269,9 @@ void MythBurn::loadEncoderProfiles()
 
     QDomElement docElem = doc.documentElement();
     QDomNodeList profileNodeList = doc.elementsByTagName("profile");
-    QString name, desc, bitrate;
+    QString name;
+    QString desc;
+    QString bitrate;
 
     for (int x = 0; x < profileNodeList.count(); x++)
     {

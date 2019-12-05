@@ -371,9 +371,12 @@ int Transcode::TranscodeFile(const QString &inputname,
 
     GetPlayer()->GetAudio()->ReinitAudio();
     QString encodingType = GetPlayer()->GetEncodingType();
-    bool copyvideo = false, copyaudio = false;
+    bool copyvideo = false;
+    bool copyaudio = false;
 
-    QString vidsetting = nullptr, audsetting = nullptr, vidfilters = nullptr;
+    QString vidsetting = nullptr;
+    QString audsetting = nullptr;
+    QString vidfilters = nullptr;
 
     QSize buf_size = GetPlayer()->GetVideoBufferSize();
     int video_width = buf_size.width();
@@ -791,7 +794,8 @@ int Transcode::TranscodeFile(const QString &inputname,
         if (!recorderOptionsMap.empty())
         {
             QMap<QString, QString>::Iterator it;
-            QString key, value;
+            QString key;
+            QString value;
             for (it = recorderOptionsMap.begin();
                  it != recorderOptionsMap.end(); ++it)
             {
@@ -1064,7 +1068,8 @@ int Transcode::TranscodeFile(const QString &inputname,
     MythVideoOutput *videoOutput = GetPlayer()->GetVideoOutput();
     bool is_key = false;
     bool first_loop = true;
-    AVFrame imageIn, imageOut;
+    AVFrame imageIn;
+    AVFrame imageOut;
     struct SwsContext  *scontext = nullptr;
 
     if (fifow)

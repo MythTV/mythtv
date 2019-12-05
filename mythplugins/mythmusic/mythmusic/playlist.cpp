@@ -252,7 +252,8 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
                     double lastplaydbl = mdata->LastPlay().toSecsSinceEpoch();
 #endif
                     double ratingValue = (double)(rating) / 10;
-                    double playcountValue = NAN, lastplayValue = NAN;
+                    double playcountValue = NAN;
+                    double lastplayValue = NAN;
 
                     if (playcountMax == playcountMin)
                         playcountValue = 0;
@@ -276,8 +277,8 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
             // then we divide weights with the number of songs in the rating class
             // (more songs in a class ==> lower weight, without affecting other classes)
             double totalWeights = 0;
-            std::map<int,double>::iterator weightsIt, weightsEnd = weights.end();
-            for (weightsIt = weights.begin() ; weightsIt != weightsEnd ; ++weightsIt)
+            auto weightsEnd = weights.end();
+            for (auto weightsIt = weights.begin() ; weightsIt != weightsEnd ; ++weightsIt)
             {
                 weightsIt->second /= ratingCounts[ratings[weightsIt->first]];
                 totalWeights += weightsIt->second;
@@ -286,12 +287,11 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
             // then we get a random order, balanced with relative weights of remaining songs
             std::map<int,uint32_t> order;
             uint32_t orderCpt = 1;
-            std::map<int,double>::iterator weightIt, weightEnd;
             while (!weights.empty())
             {
                 double hit = totalWeights * (double)rand() / (double)RAND_MAX;
-                weightEnd = weights.end();
-                weightIt = weights.begin();
+                auto weightEnd = weights.end();
+                auto weightIt = weights.begin();
                 double pos = 0;
                 while (weightIt != weightEnd)
                 {
@@ -505,7 +505,8 @@ void Playlist::describeYourself(void) const
 
 void Playlist::getStats(uint *trackCount, uint *totalLength, uint currenttrack, uint *playedLength) const
 {
-    uint64_t total = 0, played = 0;
+    uint64_t total = 0;
+    uint64_t played = 0;
 
     *trackCount = m_shuffledSongs.size();
 
@@ -1014,7 +1015,8 @@ void Playlist::savePlaylist(const QString& a_name, const QString& a_host)
     QString rawSonglist = toRawSonglist(true, true);
 
     MSqlQuery query(MSqlQuery::InitCon());
-    uint songcount = 0, playtime = 0;
+    uint songcount = 0;
+    uint playtime = 0;
 
     getStats(&songcount, &playtime);
 

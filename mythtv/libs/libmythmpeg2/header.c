@@ -369,7 +369,8 @@ int mpeg2_guess_aspect (const mpeg2_sequence_t * sequence,
 	width != sequence->display_width || height != sequence->display_height)
 	return 0;
 
-    unsigned int pix_width = 1, pix_height = 1;
+    unsigned int pix_width = 1;
+    unsigned int pix_height = 1;
     for (pix_height = 1; height * pix_height < 480; pix_height <<= 1);
     height *= pix_height;
     for (pix_width = 1; width * pix_width <= 352; pix_width <<= 1);

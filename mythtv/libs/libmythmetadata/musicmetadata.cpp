@@ -875,7 +875,8 @@ void MusicMetadata::ensureSortFields()
 
 inline void MusicMetadata::setCompilationFormatting(bool cd)
 {
-    QString format_artist, format_title;
+    QString format_artist;
+    QString format_title;
 
     if (!m_compilation
         || "" == m_compilation_artist
@@ -1460,7 +1461,9 @@ bool AllMusic::startLoading(void)
 /// resync our cache with the database
 void AllMusic::resync()
 {
-    uint added = 0, removed = 0, changed = 0;
+    uint added = 0;
+    uint removed = 0;
+    uint changed = 0;
 
     m_done_loading = false;
 
@@ -1480,7 +1483,11 @@ void AllMusic::resync()
                      "LEFT JOIN music_genres ON music_songs.genre_id=music_genres.genre_id "
                      "ORDER BY music_songs.song_id;";
 
-    QString filename, artist, album, title, compartist;
+    QString filename;
+    QString artist;
+    QString album;
+    QString title;
+    QString compartist;
 
     MSqlQuery query(MSqlQuery::InitCon());
     if (!query.exec(aquery))

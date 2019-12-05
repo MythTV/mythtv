@@ -1699,7 +1699,8 @@ void GuideUpdateProgramRow::fillProgramRowInfosWith(int row,
     MythRect programRect = m_ggProgramRect;
 
     /// use doubles to avoid large gaps at end..
-    double ydifference = 0.0, xdifference = 0.0;
+    double ydifference = 0.0;
+    double xdifference = 0.0;
 
     if (m_verticalLayout)
     {
@@ -2078,7 +2079,8 @@ void GuideGrid::updateChannelsNonUI(QVector<ChannelInfo *> &chinfos,
 
         chinfo = GetChannelInfo(chanNumber);
 
-        bool unavailable = false, try_alt = false;
+        bool unavailable = false;
+        bool try_alt = false;
 
         if (m_player)
         {

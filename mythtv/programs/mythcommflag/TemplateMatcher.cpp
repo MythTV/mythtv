@@ -435,9 +435,12 @@ TemplateMatcher::analyzeFrame(const VideoFrame *frame, long long frameno,
      */
     const int           JITTER_RADIUS = 0;
 
-    const AVFrame      *edges = nullptr;
-    int                 pgmwidth = 0, pgmheight = 0;
-    struct timeval      start {}, end {}, elapsed {};
+    const AVFrame  *edges = nullptr;
+    int             pgmwidth = 0;
+    int             pgmheight = 0;
+    struct timeval  start {};
+    struct timeval  end {};
+    struct timeval  elapsed {};
 
     *pNextFrame = NEXTFRAME;
 
@@ -486,8 +489,9 @@ TemplateMatcher::finished(long long nframes, bool final)
     const int       MINBREAKLEN = (int)roundf(45 * m_fps);  /* frames */
     const int       MINSEGLEN = (int)roundf(105 * m_fps);    /* frames */
 
-    int             minbreaklen = 1, minseglen = 1;
-    long long       brkb = 0;
+    int       minbreaklen = 1;
+    int       minseglen = 1;
+    long long brkb = 0;
 
     if (!m_matches_done && m_debug_matches)
     {

@@ -437,7 +437,7 @@ static int64_t lsb3full(int64_t lsb, int64_t base_ts, int lsb_bits)
 
 int64_t AvFormatDecoder::NormalizeVideoTimecode(int64_t timecode)
 {
-    int64_t start_pts = 0, pts;
+    int64_t start_pts = 0;
 
     AVStream *st = nullptr;
     for (uint i = 0; i < m_ic->nb_streams; i++)
@@ -457,7 +457,7 @@ int64_t AvFormatDecoder::NormalizeVideoTimecode(int64_t timecode)
                                st->time_base.den,
                                AV_TIME_BASE * (int64_t)st->time_base.num);
 
-    pts = av_rescale(timecode / 1000.0,
+    int64_t pts = av_rescale(timecode / 1000.0,
                      st->time_base.den,
                      st->time_base.num);
 
@@ -470,14 +470,14 @@ int64_t AvFormatDecoder::NormalizeVideoTimecode(int64_t timecode)
 int64_t AvFormatDecoder::NormalizeVideoTimecode(AVStream *st,
                                                 int64_t timecode)
 {
-    int64_t start_pts = 0, pts;
+    int64_t start_pts = 0;
 
     if (m_ic->start_time != AV_NOPTS_VALUE)
         start_pts = av_rescale(m_ic->start_time,
                                st->time_base.den,
                                AV_TIME_BASE * (int64_t)st->time_base.num);
 
-    pts = av_rescale(timecode / 1000.0,
+    int64_t pts = av_rescale(timecode / 1000.0,
                      st->time_base.den,
                      st->time_base.num);
 
@@ -1147,7 +1147,8 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
 #ifdef USING_MHEG
     {
-        int initialAudio = -1, initialVideo = -1;
+        int initialAudio = -1;
+        int initialVideo = -1;
         if (m_itv || (m_itv = m_parent->GetInteractiveTV()))
             m_itv->GetInitialStreams(initialAudio, initialVideo);
         if (initialAudio >= 0)
@@ -1292,8 +1293,11 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
 float AvFormatDecoder::normalized_fps(AVStream *stream, AVCodecContext *enc)
 {
-    double fps, avg_fps, codec_fps, container_fps, estimated_fps;
-    avg_fps = codec_fps = container_fps = estimated_fps = 0.0;
+    double fps = 0.0;
+    double avg_fps = 0.0;
+    double codec_fps = 0.0;
+    double container_fps = 0.0;
+    double estimated_fps = 0.0;
 
     if (stream->avg_frame_rate.den && stream->avg_frame_rate.num)
         avg_fps = av_q2d(stream->avg_frame_rate); // MKV default_duration
@@ -1676,7 +1680,8 @@ void AvFormatDecoder::UpdateATSCCaptionTracks(void)
     m_tracks[kTrackTypeCC708].clear();
     memset(m_ccX08_in_tracks, 0, sizeof(m_ccX08_in_tracks));
 
-    uint pidx = 0, sidx = 0;
+    uint pidx = 0;
+    uint sidx = 0;
     map<int,uint> lang_cc_cnt[2];
     while (true)
     {
@@ -2776,7 +2781,8 @@ void AvFormatDecoder::DecodeCCx08(const uint8_t *buf, uint buf_size, bool scte)
     if (buf_size < 3)
         return;
 
-    bool had_608 = false, had_708 = false;
+    bool had_608 = false;
+    bool had_708 = false;
     for (uint cur = 0; cur + 3 < buf_size; cur += 3)
     {
         uint cc_code  = buf[cur];
@@ -3834,7 +3840,8 @@ void AvFormatDecoder::ProcessDSMCCPacket(
     // The packet may contain several tables.
     uint8_t *data = pkt->data;
     int length = pkt->size;
-    int componentTag, dataBroadcastId;
+    int componentTag;
+    int dataBroadcastId;
     unsigned carouselId;
     {
         QMutexLocker locker(avcodeclock);
@@ -4184,7 +4191,8 @@ int AvFormatDecoder::filter_max_ch(const AVFormatContext *ic,
                                    enum AVCodecID         codecId,
                                    int                    profile)
 {
-    int selectedTrack = -1, max_seen = -1;
+    int selectedTrack = -1;
+    int max_seen = -1;
 
     auto it = fs.cbegin();
     for (; it != fs.cend(); ++it)
@@ -5351,12 +5359,9 @@ bool AvFormatDecoder::SetupAudioStream(void)
 
 void AvFormatDecoder::av_update_stream_timings_video(AVFormatContext *ic)
 {
-    int64_t start_time, end_time;
-    int64_t duration;
+    int64_t start_time = INT64_MAX;
+    int64_t end_time = INT64_MIN;
     AVStream *st = nullptr;
-
-    start_time = INT64_MAX;
-    end_time = INT64_MIN;
 
     for (uint i = 0; i < ic->nb_streams; i++)
     {
@@ -5370,7 +5375,7 @@ void AvFormatDecoder::av_update_stream_timings_video(AVFormatContext *ic)
     if (!st)
         return;
 
-   duration = INT64_MIN;
+   int64_t duration = INT64_MIN;
    if (st->start_time != AV_NOPTS_VALUE && st->time_base.den) {
        int64_t start_time1= av_rescale_q(st->start_time, st->time_base, AV_TIME_BASE_Q);
        if (start_time1 < start_time)

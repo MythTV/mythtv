@@ -167,13 +167,15 @@ void MetaIO::readFromFilename(const QString &filename,
 
 MusicMetadata* MetaIO::readFromFilename(const QString &filename, bool blnLength)
 {
-    QString artist, album, title, genre;
-    int tracknum = 0, length = 0;
+    QString artist;
+    QString album;
+    QString title;
+    QString genre;
+    int tracknum = 0;
 
     readFromFilename(filename, artist, album, title, genre, tracknum);
 
-    if (blnLength)
-        length = getTrackLength(filename);
+    int length = (blnLength) ? getTrackLength(filename) : 0;
 
     auto *retdata = new MusicMetadata(filename, artist, "", album, title, genre,
                                       0, tracknum, length);
@@ -188,7 +190,10 @@ MusicMetadata* MetaIO::readFromFilename(const QString &filename, bool blnLength)
 */
 void MetaIO::readFromFilename(MusicMetadata* metadata)
 {
-    QString artist, album, title, genre;
+    QString artist;
+    QString album;
+    QString title;
+    QString genre;
     int tracknum = 0;
 
     const QString filename = metadata->Filename(false);

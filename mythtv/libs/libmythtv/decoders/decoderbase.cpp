@@ -95,7 +95,8 @@ bool DecoderBase::PosMapFromDb(void)
         return false;
 
     // Overwrites current positionmap with entire contents of database
-    frm_pos_map_t posMap, durMap;
+    frm_pos_map_t posMap;
+    frm_pos_map_t durMap;
 
     if (ringBuffer && ringBuffer->IsDVD())
     {
@@ -230,7 +231,8 @@ bool DecoderBase::PosMapFromEnc(void)
             start = m_positionMap.back().index + 1;
     }
 
-    frm_pos_map_t posMap, durMap;
+    frm_pos_map_t posMap;
+    frm_pos_map_t durMap;
     if (!m_parent->PosMapFromEnc(start, posMap, durMap))
         return false;
 
@@ -497,7 +499,9 @@ bool DecoderBase::FindPosition(long long desired_value, bool search_adjusted,
 
 uint64_t DecoderBase::SavePositionMapDelta(long long first, long long last)
 {
-    MythTimer ttm, ctm, stm;
+    MythTimer ttm;
+    MythTimer ctm;
+    MythTimer stm;
     ttm.start();
 
     QMutexLocker locker(&m_positionMapLock);
@@ -600,7 +604,8 @@ bool DecoderBase::DoRewindSeek(long long desiredFrame)
     }
 
     // Find keyframe <= desiredFrame, store in lastKey (frames)
-    int pre_idx, post_idx;
+    int pre_idx;
+    int post_idx;
     FindPosition(desiredFrame, m_hasKeyFrameAdjustTable, pre_idx, post_idx);
 
     PosMapEntry e;
@@ -832,12 +837,15 @@ void DecoderBase::DoFastForwardSeek(long long desiredFrame, bool &needflush)
         return;
     }
 
-    int pre_idx, post_idx;
+    int pre_idx;
+    int post_idx;
     FindPosition(desiredFrame, m_hasKeyFrameAdjustTable, pre_idx, post_idx);
 
     // if exactseeks, use keyframe <= desiredFrame
 
-    PosMapEntry e, e_pre, e_post;
+    PosMapEntry e;
+    PosMapEntry e_pre;
+    PosMapEntry e_post;
     {
         QMutexLocker locker(&m_positionMapLock);
         e_pre  = m_positionMap[pre_idx];
@@ -1210,8 +1218,10 @@ uint64_t DecoderBase::TranslatePosition(const frm_pos_map_t &map,
                                         long long key,
                                         float fallback_ratio)
 {
-    uint64_t key1, key2;
-    uint64_t val1, val2;
+    uint64_t key1;
+    uint64_t key2;
+    uint64_t val1;
+    uint64_t val2;
 
     frm_pos_map_t::const_iterator lower = map.lowerBound(key);
     // QMap::lowerBound() finds a key >= the given key.  We want one

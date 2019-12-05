@@ -388,7 +388,8 @@ static int fromFloat32(AudioFormat format, int* out, const float* in, int len)
 #if ARCH_X86
     if (sse_check() && len >= 16)
     {
-        float o = 0.99999995, mo = -1;
+        float o = 0.99999995;
+        float mo = -1;
         int loops = len >> 4;
         i = loops << 4;
 
@@ -469,7 +470,8 @@ static int fromFloatFLT(float* out, const float* in, int len)
     if (sse_check() && len >= 16)
     {
         int loops = len >> 4;
-        float o = 1, mo = -1;
+        float o = 1;
+        float mo = -1;
         i = loops << 4;
 
         __asm__ volatile (

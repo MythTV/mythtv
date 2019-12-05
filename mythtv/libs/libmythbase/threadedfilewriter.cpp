@@ -418,7 +418,8 @@ void ThreadedFileWriter::DiskLoop(void)
     // Even if the bytes buffered is less than the minimum write
     // size we do want to write to the OS buffers periodically.
     // This timer makes sure we do.
-    MythTimer minWriteTimer, lastRegisterTimer;
+    MythTimer minWriteTimer;
+    MythTimer lastRegisterTimer;
     minWriteTimer.start();
     lastRegisterTimer.start();
 

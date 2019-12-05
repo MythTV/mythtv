@@ -437,7 +437,8 @@ void avfDecoder::run()
         return;
     }
 
-    AVPacket pkt, tmp_pkt;
+    AVPacket pkt;
+    AVPacket tmp_pkt;
     memset(&pkt, 0, sizeof(AVPacket));
     av_init_packet(&pkt);
 

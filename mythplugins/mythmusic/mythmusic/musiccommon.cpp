@@ -920,7 +920,8 @@ void MusicCommon::updateProgressBar()
     if (gPlayer->getPlayMode() == MusicPlayer::PLAYMODE_RADIO)
     {
         // radio mode so show the buffer fill level since we don't know the track length
-        int available = 0, maxSize = 0;
+        int available = 0;
+        int maxSize = 0;
         gPlayer->getBufferStatus(&available, &maxSize);
 
         if (m_infoText)
@@ -2550,7 +2551,8 @@ void MusicCommon::showPlaylistOptionsMenu(bool addMainMenu)
 
 void MusicCommon::doUpdatePlaylist(void)
 {
-    int curTrackID = -1, trackCount = 0;
+    int curTrackID = -1;
+    int trackCount = 0;
     int curPos = gPlayer->getCurrentTrackPos();
 
     if (gPlayer->getCurrentPlaylist())

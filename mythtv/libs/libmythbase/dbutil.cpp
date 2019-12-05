@@ -387,7 +387,10 @@ QStringList DBUtil::CheckRepairStatus(MSqlQuery &query)
     int table_index = record.indexOf("Table");
     int type_index = record.indexOf("Msg_type");
     int text_index = record.indexOf("Msg_text");
-    QString table, type, text, previous_table;
+    QString table;
+    QString type;
+    QString text;
+    QString previous_table;
     bool ok = true;
     while (query.next())
     {
@@ -779,7 +782,8 @@ bool DBUtil::ParseDBMSVersion()
             return false;
 
     QString section;
-    int pos = 0, i = 0;
+    int pos = 0;
+    int i = 0;
     int version[3] = {-1, -1, -1};
     QRegExp digits("(\\d+)");
 

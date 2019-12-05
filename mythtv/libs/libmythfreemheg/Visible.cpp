@@ -155,7 +155,10 @@ void MHVisible::Deactivation(MHEngine *engine)
 // Return the colour, looking up in the palette if necessary.  Used by the sub-classes
 MHRgba MHVisible::GetColour(const MHColour &colour)
 {
-    int red = 0, green = 0, blue = 0, alpha = 0;
+    int red = 0;
+    int green = 0;
+    int blue = 0;
+    int alpha = 0;
     if (colour.IsSet())
     {
         int cSize = colour.m_ColStr.Size();

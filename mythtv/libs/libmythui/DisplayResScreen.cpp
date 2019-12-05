@@ -201,7 +201,8 @@ uint64_t DisplayResScreen::FindBestScreen(const DisplayResMap& resmap,
                                           int iwidth, int iheight, double frate)
 {
     DisplayResMapCIt it;
-    int w = 0, h = 0;
+    int w = 0;
+    int h = 0;
     double r = NAN;
 
         // 1. search for exact match (width, height, rate)

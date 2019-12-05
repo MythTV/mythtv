@@ -39,7 +39,9 @@ int pgm_read(unsigned char *buf, int width, int height, const char *filename)
         return -1;
     }
 
-    int fwidth = 0, fheight = 0, maxgray = 0;
+    int fwidth = 0;
+    int fheight = 0;
+    int maxgray = 0;
     int nn = fscanf(fp, "P5\n%20d %20d\n%20d\n", &fwidth, &fheight, &maxgray);
     if (nn != 3)
     {

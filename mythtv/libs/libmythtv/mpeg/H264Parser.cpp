@@ -1104,7 +1104,8 @@ void H264Parser::decode_SEI(GetBitContext *gb)
     int   changing_group_slice_idc = -1;
 #endif
 
-    int type = 0, size = 0;
+    int type = 0;
+    int size = 0;
 
     /* A message requires at least 2 bytes, and then
      * there's the stop bit plus alignment, so there

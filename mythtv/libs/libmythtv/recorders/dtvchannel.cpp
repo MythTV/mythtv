@@ -184,11 +184,20 @@ bool DTVChannel::SetChannelByString(const QString &channum)
     }
 
     // Fetch tuning data from the database.
-    QString tvformat, modulation, freqtable, freqid, si_std;
+    QString tvformat;
+    QString modulation;
+    QString freqtable;
+    QString freqid;
+    QString si_std;
     int finetune;
     uint64_t frequency;
     int mpeg_prog_num;
-    uint atsc_major, atsc_minor, mplexid, chanid, tsid, netid;
+    uint atsc_major;
+    uint atsc_minor;
+    uint mplexid;
+    uint chanid;
+    uint tsid;
+    uint netid;
 
     if (!ChannelUtil::GetChannelData(
         m_sourceid, chanid, channum,

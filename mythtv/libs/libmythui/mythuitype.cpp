@@ -688,7 +688,10 @@ void MythUIType::VanishSibling(void)
 void MythUIType::SetMinAreaParent(MythRect actual_area, MythRect allowed_area,
                                   MythUIType *calling_child)
 {
-    int delta_x = 0, delta_y = 0, delta_w = 0, delta_h = 0;
+    int delta_x = 0;
+    int delta_y = 0;
+    int delta_w = 0;
+    int delta_h = 0;
     MythRect area;
 
     // If a minsize is not set, don't use MinArea

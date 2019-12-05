@@ -899,7 +899,8 @@ void GalleryThumbView::UpdateScanProgress(const QString &scanner,
     }
 
     // Aggregate all running scans
-    int currentAgg = 0, totalAgg = 0;
+    int currentAgg = 0;
+    int totalAgg = 0;
     foreach (IntPair scan, m_scanProgress.values())
     {
         currentAgg += scan.first;
@@ -1889,7 +1890,8 @@ void GalleryThumbView::Copy(bool deleteAfter)
     }
 
     // Get all files/dirs in subtree(s). Only files are copied
-    ImageList files, dirs;
+    ImageList files;
+    ImageList dirs;
     m_mgr.GetDescendants(markedIds, files, dirs);
 
     if (dirs.isEmpty() && files.isEmpty())
@@ -2024,7 +2026,8 @@ void GalleryThumbView::Move()
     }
 
     // Get marked images. Each file and dir will be renamed
-    ImageList files, dirs;
+    ImageList files;
+    ImageList dirs;
     if (m_mgr.GetImages(markedIds, files, dirs) <= 0)
     {
         ShowOkPopup(tr("No images specified"));

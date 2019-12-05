@@ -743,7 +743,9 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 	 * arret demande
 	 */
 	if ((s_stopLines & 0xf000)||(!curGState->m_drawScope)) {
-		float   param1, param2, amplitude;
+		float   param1;
+		float   param2;
+		float   amplitude;
 		int     couleur;
 		int     mode;
 		
@@ -773,8 +775,11 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 		if (s_lineMode == 0)
 			s_lineMode = DRAWLINES;
 		else if (s_lineMode == DRAWLINES) {
-			float   param1, param2, amplitude;
-			int     couleur1,couleur2;
+			float   param1;
+			float   param2;
+			float   amplitude;
+			int     couleur1;
+			int     couleur2;
 			int     mode;
 
 			s_lineMode--;
@@ -803,8 +808,11 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 
 		if (((cycle % 121) == 9) && (iRAND (3) == 1)
 				&& ((s_lineMode == 0) || (s_lineMode == DRAWLINES))) {
-			float   param1, param2, amplitude;
-			int     couleur1,couleur2;
+			float   param1;
+			float   param2;
+			float   amplitude;
+			int     couleur1;
+			int     couleur2;
 			int     mode;
 
 			choose_a_goom_line (&param1, &param2, &couleur1, &mode, &amplitude, s_stopLines);

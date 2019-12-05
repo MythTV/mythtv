@@ -26,8 +26,13 @@ bool MetaIOAVFComment::write(const QString & /*filename*/, MusicMetadata* /*mdat
 */
 MusicMetadata* MetaIOAVFComment::read(const QString &filename)
 {
-    QString artist, compilation_artist, album, title, genre;
-    int year = 0, tracknum = 0, length = 0;
+    QString artist;
+    QString compilation_artist;
+    QString album;
+    QString title;
+    QString genre;
+    int year = 0;
+    int tracknum = 0;
 
     AVFormatContext* p_context = nullptr;
     AVInputFormat* p_inputformat = nullptr;
@@ -73,7 +78,7 @@ MusicMetadata* MetaIOAVFComment::read(const QString &filename)
             tracknum = atoi(tag->value);
     }
 
-    length = getTrackLength(p_context);
+    int length = getTrackLength(p_context);
 
     auto *retdata = new MusicMetadata(filename, artist, compilation_artist, album,
                                      title, genre, year, tracknum, length);

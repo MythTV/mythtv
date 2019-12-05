@@ -545,9 +545,12 @@ QSet<QString> SubtitleFormat::Diff(const QString &family,
     if (is708 && font1->hasShadow() != font2->hasShadow())
     {
         result << kSubAttrShadow;
-        QPoint offset1, offset2;
-        QColor color1, color2;
-        int alpha1, alpha2;
+        QPoint offset1;
+        QPoint offset2;
+        QColor color1;
+        QColor color2;
+        int alpha1;
+        int alpha2;
         font1->GetShadow(offset1, color1, alpha1);
         font2->GetShadow(offset2, color2, alpha2);
         if (offset1 != offset2)
@@ -560,9 +563,12 @@ QSet<QString> SubtitleFormat::Diff(const QString &family,
     if (is708 && font1->hasOutline() != font2->hasOutline())
     {
         result << kSubAttrOutline;
-        QColor color1, color2;
-        int size1, size2;
-        int alpha1, alpha2;
+        QColor color1;
+        QColor color2;
+        int size1;
+        int size2;
+        int alpha1;
+        int alpha2;
         font1->GetOutline(color1, size1, alpha1);
         font2->GetOutline(color2, size2, alpha2);
         if (color1 != color2)
@@ -713,7 +719,8 @@ bool FormattedTextChunk::PreRender(bool isFirst, bool isLast,
 #else
     int x_adjust = count * font.horizontalAdvance(" ");
 #endif
-    int leftPadding, rightPadding;
+    int leftPadding;
+    int rightPadding;
     CalcPadding(isFirst, isLast, leftPadding, rightPadding);
     // Account for extra padding before the first chunk.
     if (isFirst)
@@ -742,8 +749,10 @@ bool FormattedTextChunk::PreRender(bool isFirst, bool isLast,
 
 QSize FormattedTextLine::CalcSize(float layoutSpacing) const
 {
-    int height = 0, width = 0;
-    int leftPadding = 0, rightPadding = 0;
+    int height = 0;
+    int width = 0;
+    int leftPadding = 0;
+    int rightPadding = 0;
     QList<FormattedTextChunk>::const_iterator it;
     bool isFirst = true;
     for (it = chunks.constBegin(); it != chunks.constEnd(); ++it)
@@ -863,7 +872,8 @@ void FormattedTextSubtitle::PreRender(void)
 // returned.
 void FormattedTextSubtitle::Draw(void)
 {
-    QList<MythUIType *> textList, shapeList;
+    QList<MythUIType *> textList;
+    QList<MythUIType *> shapeList;
     for (int i = 0; i < m_lines.size(); i++)
     {
         QList<FormattedTextChunk>::const_iterator chunk;
@@ -986,7 +996,8 @@ void FormattedTextSubtitleSRT::Init(const QStringList &subs)
     bool isUnderline = false;
     QColor color(Qt::white);
     QRegExp htmlTag("</?.+>");
-    QString htmlPrefix("<font color=\""), htmlSuffix("\">");
+    QString htmlPrefix("<font color=\"");
+    QString htmlSuffix("\">");
     htmlTag.setMinimal(true);
     foreach (QString subtitle, subs)
     {
@@ -1242,7 +1253,8 @@ void FormattedTextSubtitle608::Init(const vector<CC608Text*> &buffers)
     {
         CC608Text *cc = (*i);
         int color = 0;
-        bool isItalic = false, isUnderline = false;
+        bool isItalic = false;
+        bool isUnderline = false;
         const bool isBold = false;
         QString text(cc->m_text);
 
@@ -1581,7 +1593,8 @@ static QSize CalcShadowOffsetPadding(MythFontProperties *mythfont)
     QColor color;
     int alpha;
     int outlineSize = 0;
-    int shadowWidth = 0, shadowHeight = 0;
+    int shadowWidth = 0;
+    int shadowHeight = 0;
     if (mythfont->hasOutline())
     {
         mythfont->GetOutline(color, outlineSize, alpha);
@@ -1681,7 +1694,8 @@ bool SubtitleScreen::Create(void)
 
 void SubtitleScreen::Pulse(void)
 {
-    QList<MythUIType *>::iterator it, itNext;
+    QList<MythUIType *>::iterator it;
+    QList<MythUIType *>::iterator itNext;
 
     MythVideoOutput *videoOut = m_player->GetVideoOutput();
     VideoFrame *currentFrame = videoOut ? videoOut->GetLastShownFrame() : nullptr;
@@ -1917,17 +1931,15 @@ int SubtitleScreen::DisplayScaledAVSubtitles(const AVSubtitleRect *rect,
     // split image vertically if it spans middle of display
     // - split point is empty line nearest the middle
     // crop image to reduce scaling time
-    int xmin, xmax, ymin, ymax;
-    int ylast, ysplit;
     bool prev_empty = false;
 
     // initialize to opposite edges
-    xmin = bbox.right();
-    xmax = bbox.left();
-    ymin = bbox.bottom();
-    ymax = bbox.top();
-    ylast = bbox.top();
-    ysplit = bbox.bottom();
+    int xmin = bbox.right();
+    int xmax = bbox.left();
+    int ymin = bbox.bottom();
+    int ymax = bbox.top();
+    int ylast = bbox.top();
+    int ysplit = bbox.bottom();
 
     // find bounds of active image
     for (int y = bbox.top(); y <= bbox.bottom(); ++y)

@@ -393,7 +393,8 @@ QString ImageThumb<DBFS>::DeleteThumbs(const ImageList &images)
     QStringList ids;
 
     // Pictures & videos are deleted by their own threads
-    ImageListK pics, videos;
+    ImageListK pics;
+    ImageListK videos;
     foreach (ImagePtrK im, images)
     {
         if (im->m_type == kVideoFile)

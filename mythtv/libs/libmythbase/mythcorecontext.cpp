@@ -431,7 +431,8 @@ MythSocket *MythCoreContext::ConnectCommandSocket(
     if (maxConnTry < 1)
         maxConnTry = max(GetNumSetting("BackendConnectRetry", 1), 1);
 
-    int WOLsleepTime = 0, WOLmaxConnTry = 0;
+    int WOLsleepTime = 0;
+    int WOLmaxConnTry = 0;
     if (!WOLcmd.isEmpty())
     {
         WOLsleepTime  = GetNumSetting("WOLbackendReconnectWaitTime", 0);
@@ -1170,7 +1171,8 @@ QString MythCoreContext::resolveAddress(const QString &host, ResolveType type,
                 QString("Can't resolve hostname:'%1', using localhost").arg(host));
             return type == ResolveIPv4 ? "127.0.0.1" : "::1";
         }
-        QHostAddress v4, v6;
+        QHostAddress v4;
+        QHostAddress v6;
 
         // Return the first address fitting the type critera
         for (int i=0; i < list.size(); i++)

@@ -1508,7 +1508,7 @@ again:
 
         tv.tv_sec = 5;
         tv.tv_usec = 0;
-        FD_ZERO(&rdset);
+        FD_ZERO(&rdset); // NOLINT(readability-isolate-declaration)
         FD_SET(m_fd, &rdset);
 
         switch (select(m_fd+1, &rdset, nullptr, nullptr, &tv))
@@ -2220,7 +2220,6 @@ void NuppelVideoRecorder::doAudioThread(void)
 
     struct timeval anow {};
     auto *buffer = new unsigned char[m_audio_buffer_size];
-    int act = 0, lastread = 0;
     m_audio_bytes_per_sample = m_audio_channels * m_audio_bits / 8;
 
     while (IsHelperRequested() && !IsErrored())
@@ -2250,7 +2249,7 @@ void NuppelVideoRecorder::doAudioThread(void)
         if (!IsHelperRequested() || IsErrored())
             break;
 
-        lastread = m_audio_device->GetSamples(buffer, m_audio_buffer_size);
+        int lastread = m_audio_device->GetSamples(buffer, m_audio_buffer_size);
         if (m_audio_buffer_size != lastread)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -2265,7 +2264,7 @@ void NuppelVideoRecorder::doAudioThread(void)
         gettimeofday(&anow, &m_tzone);
         int bytes_read = max(m_audio_device->GetNumReadyBytes(), 0);
 
-        act = m_act_audio_buffer;
+        int act = m_act_audio_buffer;
 
         if (!audiobuffer[act]->freeToBuffer)
         {
@@ -2682,7 +2681,8 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
     int tmp = 0;
     lzo_uint out_len = OUT_LEN;
     struct rtframeheader frameheader {};
-    int raw = 0, compressthis = m_compression;
+    int raw = 0;
+    int compressthis = m_compression;
     // cppcheck-suppress variableScope
     uint8_t *planes[3] = {
         frame->buf + frame->offsets[0],

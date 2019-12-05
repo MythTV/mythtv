@@ -198,7 +198,8 @@ void CC708Window::Resize(uint new_rows, uint new_columns)
         auto *new_text = new CC708Character[new_rows * new_columns];
         m_pen.m_column = 0;
         m_pen.m_row = 0;
-        uint i, j;
+        uint i;
+        uint j;
         for (i = 0; m_text && i < m_row_count; ++i)
         {
             for (j = 0; j < m_column_count; ++j)
@@ -493,7 +494,8 @@ void CC708Window::IncrPenLocation(void)
 {
     // TODO: Scroll direction and up/down printing,
     // and word wrap not handled yet...
-    int new_column = m_pen.m_column, new_row = m_pen.m_row;
+    int new_column = m_pen.m_column;
+    int new_row = m_pen.m_row;
 
     new_column += (m_print_dir == k708DirLeftToRight) ? +1 : 0;
     new_column += (m_print_dir == k708DirRightToLeft) ? -1 : 0;
@@ -535,7 +537,8 @@ void CC708Window::DecrPenLocation(void)
 {
     // TODO: Scroll direction and up/down printing,
     // and word wrap not handled yet...
-    int new_column = m_pen.m_column, new_row = m_pen.m_row;
+    int new_column = m_pen.m_column;
+    int new_row = m_pen.m_row;
 
     new_column -= (m_print_dir == k708DirLeftToRight) ? +1 : 0;
     new_column -= (m_print_dir == k708DirRightToLeft) ? -1 : 0;

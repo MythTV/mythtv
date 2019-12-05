@@ -264,7 +264,7 @@ void SSDP::run()
     {
         int nMaxSocket = 0;
 
-        FD_ZERO( &read_set );
+        FD_ZERO( &read_set ); // NOLINT(readability-isolate-declaration)
 
         for (size_t nIdx = 0; nIdx < kNumberOfSockets; nIdx++ )
         {
@@ -809,7 +809,8 @@ void SSDPExtension::GetDeviceList( HTTPRequest *pRequest )
     QString     sXML;
     QTextStream os(&sXML, QIODevice::WriteOnly);
 
-    uint nDevCount = 0, nEntryCount = 0;
+    uint nDevCount = 0;
+    uint nEntryCount = 0;
     SSDPCache::Instance()->OutputXML(os, &nDevCount, &nEntryCount);
 
     NameValues list;

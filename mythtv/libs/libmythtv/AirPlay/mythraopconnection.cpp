@@ -527,16 +527,16 @@ void MythRAOPConnection::SendTimeRequest(void)
  */
 void MythRAOPConnection::ProcessTimeResponse(const QByteArray &buf)
 {
-    timeval t1 {}, t2 {};
+    timeval t1 {};
+    timeval t2 {};
     const char *req = buf.constData();
 
     t1.tv_sec  = qFromBigEndian(*(uint32_t *)(req + 8));
     t1.tv_usec = qFromBigEndian(*(uint32_t *)(req + 12));
 
     gettimeofday(&t2, nullptr);
-    uint64_t time1, time2;
-    time1 = t1.tv_sec * 1000 + t1.tv_usec / 1000;
-    time2 = t2.tv_sec * 1000 + t2.tv_usec / 1000;
+    uint64_t time1 = t1.tv_sec * 1000 + t1.tv_usec / 1000;
+    uint64_t time2 = t2.tv_sec * 1000 + t2.tv_usec / 1000;
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("Read back time (Local %1.%2)")
         .arg(t1.tv_sec).arg(t1.tv_usec));
     // network latency equal time difference in ms between request and response

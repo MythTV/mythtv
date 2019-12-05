@@ -584,11 +584,9 @@ void RecordingRule::ToMap(InfoMap &infoMap) const
     QDateTime endts(m_enddate, m_endtime, Qt::UTC);
 
     QString length;
-    int hours, minutes, seconds;
-    seconds = startts.secsTo(endts);
-
-    minutes = seconds / 60;
-    hours   = minutes / 60;
+    int seconds = startts.secsTo(endts);
+    int minutes = seconds / 60;
+    int hours   = minutes / 60;
     minutes = minutes % 60;
 
     infoMap["lenmins"] = QCoreApplication::translate("(Common)", "%n minute(s)",

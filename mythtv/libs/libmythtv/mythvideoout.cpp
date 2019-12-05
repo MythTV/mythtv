@@ -959,7 +959,8 @@ void MythVideoOutput::ResizeForVideo(int Width, int Height)
         // if width && height are zero users expect fullscreen playback
         if (!fullscreen)
         {
-            int gui_width = 0, gui_height = 0;
+            int gui_width = 0;
+            int gui_height = 0;
             gCoreContext->GetResolutionSetting("Gui", gui_width, gui_height);
             fullscreen |= (0 == gui_width && 0 == gui_height);
         }

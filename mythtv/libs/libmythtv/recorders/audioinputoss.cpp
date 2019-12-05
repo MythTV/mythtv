@@ -70,7 +70,8 @@ bool AudioInputOSS::Open(uint sample_bits, uint sample_rate, uint channels)
     }
 
     // Set format
-    int format, choice;
+    int format;
+    int choice;
     QString tag;
     switch (sample_bits)
     {

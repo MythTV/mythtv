@@ -163,7 +163,8 @@ bool StereoScope::process( VisualNode *node )
             if (indexTo == (unsigned long)(index))
                 indexTo = (unsigned long)(index + 1);
 
-            double valL = 0, valR = 0;
+            double valL = 0;
+            double valR = 0;
 #if RUBBERBAND
             if ( m_rubberband ) {
                 valL = m_magnitudes[ i ];

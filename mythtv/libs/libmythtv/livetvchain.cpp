@@ -145,13 +145,12 @@ void LiveTVChain::DeleteProgram(ProgramInfo *pginfo)
 {
     QMutexLocker lock(&m_lock);
 
-    QList<LiveTVChainEntry>::iterator it, del;
-    for (it = m_chain.begin(); it != m_chain.end(); ++it)
+    for (auto it = m_chain.begin(); it != m_chain.end(); ++it)
     {
         if ((*it).chanid    == pginfo->GetChanID() &&
             (*it).starttime == pginfo->GetRecordingStartTime())
         {
-            del = it;
+            auto del = it;
             ++it;
 
             MSqlQuery query(MSqlQuery::InitCon());
@@ -367,9 +366,8 @@ int LiveTVChain::GetLengthAtCurPos(void)
 int LiveTVChain::GetLengthAtPos(int pos)
 {
     QMutexLocker lock(&m_lock);
-    LiveTVChainEntry entry, nextentry;
 
-    entry = m_chain[pos];
+    LiveTVChainEntry entry = m_chain[pos];
     if (pos == (m_chain.count() - 1))
     {
         // We're on live program, it hasn't ended. Use current time as end time
@@ -380,7 +378,7 @@ int LiveTVChain::GetLengthAtPos(int pos)
     // the end time is set as per the EPG, but should playback be interrupted
     // such as a channel change, the end value wouldn't have reflected the actual
     // duration of the program
-    nextentry = m_chain[pos+1];
+    LiveTVChainEntry nextentry = m_chain[pos+1];
     return entry.starttime.secsTo(nextentry.starttime);
 }
 
@@ -446,7 +444,8 @@ ProgramInfo *LiveTVChain::GetSwitchProgram(bool &discont, bool &newtype,
 ProgramInfo *LiveTVChain::DoGetNextProgram(bool up, int curpos, int &newid,
                                            bool &discont, bool &newtype)
 {
-    LiveTVChainEntry oldentry, entry;
+    LiveTVChainEntry oldentry;
+    LiveTVChainEntry entry;
     ProgramInfo *pginfo = nullptr;
 
     GetEntryAt(curpos, oldentry);
@@ -625,8 +624,10 @@ void LiveTVChain::JumpToNext(bool up, int pos)
     {
         QMutexLocker lock(&m_lock);
 
-        int current = m_curpos, switchto = m_curpos;
-        bool discont = false, newtype = false;
+        int current = m_curpos;
+        int switchto = m_curpos;
+        bool discont = false;
+        bool newtype = false;
 
         while (current >= 0 && current < m_chain.size())
         {

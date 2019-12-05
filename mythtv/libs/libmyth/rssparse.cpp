@@ -734,13 +734,27 @@ ResultItem::resultList Parse::parseRSS(const QDomDocument& domDoc)
 
 ResultItem* Parse::ParseItem(const QDomElement& item) const
 {
-    QString title(""), subtitle(""), description(""), url(""), author(""),
-            duration(""), rating(""), thumbnail(""), mediaURL(""), player(""),
-            language(""), download("");
+    QString title("");
+    QString subtitle("");
+    QString description("");
+    QString url("");
+    QString author("");
+    QString duration("");
+    QString rating("");
+    QString thumbnail("");
+    QString mediaURL("");
+    QString player("");
+    QString language("");
+    QString download("");
     off_t filesize = 0;
-    uint width = 0, height = 0, season = 0, episode = 0;
+    uint width = 0;
+    uint height = 0;
+    uint season = 0;
+    uint episode = 0;
     QDateTime date;
-    QStringList playerargs, downloadargs, countries;
+    QStringList playerargs;
+    QStringList downloadargs;
+    QStringList countries;
     bool downloadable = true;
     bool customhtml = false;
 
@@ -1012,7 +1026,8 @@ QDateTime Parse::RFC822TimeToQDateTime(const QString& t) const
         return QDateTime();
 
     QString time = t.simplified();
-    short int hoursShift = 0, minutesShift = 0;
+    short int hoursShift = 0;
+    short int minutesShift = 0;
 
     QStringList tmp = time.split(' ');
     if (tmp.isEmpty())
@@ -1055,7 +1070,6 @@ QDateTime Parse::RFC822TimeToQDateTime(const QString& t) const
 
 QDateTime Parse::FromRFC3339(const QString& t)
 {
-    int hoursShift = 0, minutesShift = 0;
     if (t.size() < 19)
         return QDateTime();
     QDateTime result = MythDate::fromString(t.left(19).toUpper());
@@ -1079,8 +1093,8 @@ QDateTime Parse::FromRFC3339(const QString& t)
         short int multiplier = -1;
         if (timeZone.cap(1) == "-")
             multiplier = 1;
-        hoursShift = timeZone.cap(2).toInt();
-        minutesShift = timeZone.cap(4).toInt();
+        int hoursShift = timeZone.cap(2).toInt();
+        int minutesShift = timeZone.cap(4).toInt();
         result = result.addSecs(hoursShift * 3600 * multiplier + minutesShift * 60 * multiplier);
     }
     result.setTimeSpec(Qt::UTC);

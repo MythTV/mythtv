@@ -474,7 +474,8 @@ QMatrix4x4 VideoColourSpace::GetPrimaryConversion(int Source, int Dest)
     if ((source == dest) || (m_primariesMode == PrimariesDisabled))
         return result;
 
-    ColourPrimaries srcprimaries, dstprimaries;
+    ColourPrimaries srcprimaries;
+    ColourPrimaries dstprimaries;
     GetPrimaries(source, srcprimaries, m_colourGamma);
     GetPrimaries(dest,   dstprimaries, m_displayGamma);
 

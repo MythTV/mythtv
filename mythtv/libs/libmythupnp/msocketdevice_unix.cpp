@@ -904,7 +904,7 @@ qint64 MSocketDevice::waitForMore(int msecs, bool *timeout) const
 
     struct timeval tv {};
 
-    FD_ZERO(&fds);
+    FD_ZERO(&fds); // NOLINT(readability-isolate-declaration)
 
     FD_SET(fd, &fds);
 

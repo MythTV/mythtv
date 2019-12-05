@@ -174,7 +174,8 @@ void ScanWizard::Scan()
 
     if (do_scan)
     {
-        QString table_start, table_end;
+        QString table_start;
+        QString table_end;
         GetFrequencyTableRange(table_start, table_end);
 
         m_scannerPane->Scan(

@@ -149,7 +149,8 @@ bool AudioInputALSA::PrepHwParams(void)
         return false;
     if (VERBOSE_LEVEL_CHECK(VB_AUDIO, LOG_DEBUG))
     {
-        uint min_chans, max_chans;
+        uint min_chans;
+        uint max_chans;
         if(AlsaBad(snd_pcm_hw_params_get_channels_min(hwparams, &min_chans),
                     QString("unable to get min channel count")))
             min_chans = 0;
@@ -237,7 +238,8 @@ int AudioInputALSA::PcmRead(void* buf, uint nbytes)
     auto* bufptr = (unsigned char*)buf;
     snd_pcm_uframes_t to_read = snd_pcm_bytes_to_frames(pcm_handle, nbytes);
     snd_pcm_uframes_t nframes = to_read;
-    snd_pcm_sframes_t nread, avail;
+    snd_pcm_sframes_t nread;
+    snd_pcm_sframes_t avail;
     int retries = 0;
     while (nframes > 0 && retries < 3)
     {

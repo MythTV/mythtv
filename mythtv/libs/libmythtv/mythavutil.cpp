@@ -293,7 +293,8 @@ int MythAVCopy::Copy(AVFrame *dst, AVPixelFormat dst_pix_fmt,
     if ((pix_fmt == AV_PIX_FMT_YUV420P || pix_fmt == AV_PIX_FMT_NV12) &&
         (dst_pix_fmt == AV_PIX_FMT_YUV420P))
     {
-        VideoFrame framein, frameout;
+        VideoFrame framein;
+        VideoFrame frameout;
 
         FillFrame(&framein, src, width, width, height, pix_fmt);
         FillFrame(&frameout, dst, width, width, height, dst_pix_fmt);
@@ -337,7 +338,8 @@ int MythAVCopy::Copy(VideoFrame *dst, const VideoFrame *src)
         return dst->size;
     }
 
-    AVFrame srcpic, dstpic;
+    AVFrame srcpic;
+    AVFrame dstpic;
 
     AVPictureFill(&srcpic, src);
     AVPictureFill(&dstpic, dst);
@@ -467,7 +469,8 @@ int MythPictureDeinterlacer::Flush()
         return -1;
     }
 
-    AVFilterInOut *inputs = nullptr, *outputs = nullptr;
+    AVFilterInOut *inputs = nullptr;
+    AVFilterInOut *outputs = nullptr;
     AVRational ar = av_d2q(m_ar, 100000);
     QString args = QString("buffer=video_size=%1x%2:pix_fmt=%3:time_base=1/1:pixel_aspect=%4/%5[in];"
                            "[in]yadif[out];[out] buffersink")

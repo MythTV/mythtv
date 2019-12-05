@@ -472,7 +472,8 @@ class PrintMPEGStreamListener : public MPEGStreamListener, public PrintOutput
             Output(pmt);
         if (pmt && m_autopts)
         {
-            uint video_pid = 0, audio_pid = 0;
+            uint video_pid = 0;
+            uint audio_pid = 0;
             for (uint i = 0; i < pmt->StreamCount(); i++)
             {
                 if (pmt->IsVideo(i, "mpeg"))

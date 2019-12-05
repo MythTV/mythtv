@@ -987,7 +987,10 @@ QString NetworkControl::processQuery(NetworkCommand *nc)
     else if (is_abbrev("memstats", nc->getArg(1)))
     {
         QString str;
-        int     totalMB = 0, freeMB = 0, totalVM = 0, freeVM = 0;
+        int     totalMB = 0;
+        int     freeMB = 0;
+        int     totalVM = 0;
+        int     freeVM = 0;
 
         if (getMemStats(totalMB, freeMB, totalVM, freeVM))
             str = QString("%1 %2 %3 %4")
@@ -1296,7 +1299,8 @@ QString NetworkControl::processTheme( NetworkCommand* nc)
 
 QString NetworkControl::processHelp(NetworkCommand *nc)
 {
-    QString command, helpText;
+    QString command;
+    QString helpText;
 
     if (nc->getArgCount() >= 1)
     {
@@ -1697,7 +1701,9 @@ QString NetworkControl::listRecordings(const QString& chanid, const QString& sta
     query.prepare(queryStr);
     if (query.exec())
     {
-        QString episode, title, subtitle;
+        QString episode;
+        QString title;
+        QString subtitle;
         while (query.next())
         {
             title = query.value(2).toString();

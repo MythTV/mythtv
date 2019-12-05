@@ -377,7 +377,8 @@ void CdDecoder::run()
             continue;
 
         // Wait until we need to decode or supply more samples
-        uint fill = 0, total = 0;
+        uint fill = 0;
+        uint total = 0;
         while (!m_finish && !m_user_stop && m_seekTime <= +0.)
         {
             output()->GetBufferStatus(fill, total);
@@ -537,7 +538,11 @@ static Cddb::Toc& GetToc(CdIo_t *cdio, Cddb::Toc& toc)
 //virtual
 MusicMetadata *CdDecoder::getMetadata()
 {
-    QString artist, album, compilation_artist, title, genre;
+    QString artist;
+    QString album;
+    QString compilation_artist;
+    QString title;
+    QString genre;
     int year = 0;
     unsigned long length = 0;
     track_t tracknum = 0;

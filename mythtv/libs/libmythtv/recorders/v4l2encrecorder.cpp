@@ -133,7 +133,6 @@ void V4L2encRecorder::run(void)
 {
     LOG(VB_RECORD, LOG_INFO, LOC + "run() -- begin");
 
-    bool failing, failed;
     bool is_TS = false;
 
     if (!m_stream_data)
@@ -195,6 +194,8 @@ void V4L2encRecorder::run(void)
             continue;
         }
 
+        bool failing;
+        bool failed;
         if (!m_stream_handler->Status(failed, failing))
         {
             if (failed)

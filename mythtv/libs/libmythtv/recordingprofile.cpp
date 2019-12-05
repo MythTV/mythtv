@@ -482,8 +482,9 @@ class AudioCompressionSettings : public GroupSetting
                         }
                         else if ((*Iopt).m_category == DriverOption::AUDIO_BITRATE)
                         {
-                            bool layer1, layer2, layer3;
-                            layer1 = layer2 = layer3 = false;
+                            bool layer1 = false;
+                            bool layer2 = false;
+                            bool layer3 = false;
 
                             DriverOption::menu_t::iterator Imenu =
                                 (*Iopt).m_menu.begin();
@@ -1341,7 +1342,8 @@ class ImageSize : public GroupSetting
     {
         setLabel(QObject::tr("Image size"));
 
-        QSize defaultsize(768, 576), maxsize(768, 576);
+        QSize defaultsize(768, 576);
+        QSize maxsize(768, 576);
         bool transcoding = profName.startsWith("Transcoders");
         bool ivtv = profName.startsWith("IVTV MPEG-2 Encoders");
 

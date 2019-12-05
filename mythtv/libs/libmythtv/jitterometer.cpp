@@ -97,27 +97,25 @@ bool Jitterometer::RecordEndTime()
     if (m_count >= cycles)
     {
         /* compute and display stuff, reset count to -1  */
-        double mean = 0, sum_of_squared_deviations=0;
-        double standard_deviation;
-        double tottime = 0;
-        int i;
+        double mean = 0;
+        double sum_of_squared_deviations=0;
 
         /* compute the mean */
-        for(i = 0; i < cycles; i++)
+        for (int i = 0; i < cycles; i++)
             mean += m_times[i];
 
-        tottime = mean;
+        double tottime = mean;
         mean /= cycles;
 
         if (tottime > 0)
             m_last_fps = cycles / tottime * 1000000;
 
         /* compute the sum of the squares of each deviation from the mean */
-        for(i = 0; i < cycles; i++)
+        for (int i = 0; i < cycles; i++)
             sum_of_squared_deviations += (mean - m_times[i]) * (mean - m_times[i]);
 
         /* compute standard deviation */
-        standard_deviation = sqrt(sum_of_squared_deviations / (cycles - 1));
+        double standard_deviation = sqrt(sum_of_squared_deviations / (cycles - 1));
         if (mean > 0)
             m_last_sd = standard_deviation / mean;
 

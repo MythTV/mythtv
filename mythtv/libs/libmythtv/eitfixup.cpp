@@ -715,7 +715,8 @@ void EITFixUp::SetUKSubtitle(DBEventEIT &event) const
     QStringList strListColon = event.m_description.split(":");
     QStringList strListEnd;
 
-    bool fColon = false, fQuotedSubtitle = false;
+    bool fColon = false;
+    bool fQuotedSubtitle = false;
     int nPosition1;
     QString strEnd;
     if (strListColon.count()>1)

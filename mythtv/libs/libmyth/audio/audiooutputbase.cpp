@@ -560,7 +560,8 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
 
     /* Set samplerate_tmp and channels_tmp to appropriate values
        if passing through */
-    int samplerate_tmp = 0, channels_tmp = 0;
+    int samplerate_tmp = 0;
+    int channels_tmp = 0;
     if (settings.m_use_passthru)
     {
         samplerate_tmp = settings.m_samplerate;

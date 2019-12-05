@@ -366,7 +366,9 @@ void NetStream::slotReadyRead()
 
         if (m_size < 0 || m_state < kReady)
         {
-            qlonglong first, last, len = ContentRange(m_reply, first, last);
+            qlonglong first;
+            qlonglong last;
+            qlonglong len = ContentRange(m_reply, first, last);
             if (len >= 0)
             {
                 m_size = len;

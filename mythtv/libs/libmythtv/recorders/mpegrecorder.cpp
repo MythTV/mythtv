@@ -372,7 +372,8 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
 
     m_bufferSize = 4096;
 
-    bool supports_tuner = false, supports_audio = false;
+    bool supports_tuner = false;
+    bool supports_audio = false;
     uint32_t capabilities = 0;
     if (CardUtil::GetV4LInfo(m_chanfd, m_card, m_driver, m_version, capabilities))
     {
@@ -1072,7 +1073,7 @@ void MpegRecorder::run(void)
             {
                 tv.tv_sec = 5;
                 tv.tv_usec = 0;
-                FD_ZERO(&rdset);
+                FD_ZERO(&rdset); // NOLINT(readability-isolate-declaration)
                 FD_SET(m_readfd, &rdset);
 
                 switch (select(m_readfd + 1, &rdset, nullptr, nullptr, &tv))
@@ -1494,7 +1495,8 @@ bool MpegRecorder::HandleResolutionChanges(void)
         return false; // nothing to do, we don't have a resolution yet
     }
 
-    int old_max = m_maxbitrate, old_avg = m_bitrate;
+    int old_max = m_maxbitrate;
+    int old_avg = m_bitrate;
     if (pix <= 768*568)
     {
         m_maxbitrate = m_low_mpeg4peakbitrate;

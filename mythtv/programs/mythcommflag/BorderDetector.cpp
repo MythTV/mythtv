@@ -114,29 +114,25 @@ BorderDetector::getDimensions(const AVFrame *pgm, int pgmheight,
     const int               VERTSLOP = max(kMaxLines, pgmheight * 1 / 120);
     const int               HORIZSLOP = max(kMaxLines, pgmwidth * 1 / 160);
 
-    struct timeval          start {}, end {}, elapsed {};
-    int                     minrow = 0, mincol = 0, maxrow1 = 0, maxcol1 = 0;
-    int                     newrow = 0, newcol = 0, newwidth = 0, newheight = 0;
-    bool                    top = false, bottom = false;
+    struct timeval start {};
+    struct timeval end {};
+    struct timeval elapsed {};
+
+    int minrow    = VERTMARGIN;
+    int mincol    = HORIZMARGIN;
+    int maxrow1   = pgmheight - VERTMARGIN;   /* maxrow + 1 */
+    int maxcol1   = pgmwidth - HORIZMARGIN;   /* maxcol + 1 */
+    int newrow    = minrow - 1;
+    int newcol    = mincol - 1;
+    int newwidth  = maxcol1 + 1 - mincol;
+    int newheight = maxrow1 + 1 - minrow;
+    bool top    = false;
+    bool bottom = false;
 
     (void)gettimeofday(&start, nullptr);
 
     if (_frameno != UNCACHED && _frameno == m_frameno)
         goto done;
-
-    top = false;
-    bottom = false;
-
-    minrow = VERTMARGIN;
-    maxrow1 = pgmheight - VERTMARGIN;   /* maxrow + 1 */
-
-    mincol = HORIZMARGIN;
-    maxcol1 = pgmwidth - HORIZMARGIN;   /* maxcol + 1 */
-
-    newrow = minrow - 1;
-    newcol = mincol - 1;
-    newwidth = maxcol1 + 1 - mincol;
-    newheight = maxrow1 + 1 - minrow;
 
     for (;;)
     {

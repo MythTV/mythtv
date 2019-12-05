@@ -191,7 +191,8 @@ void LyricsView::customEvent(QEvent *event)
         if (!dhe)
             return;
 
-        int available = 0, maxSize = 0;
+        int available = 0;
+        int maxSize = 0;
         dhe->getBufferStatus(&available, &maxSize);
 
         if (m_bufferStatus)

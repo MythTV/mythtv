@@ -262,7 +262,8 @@ static EProtocol PathProtocol(const QString& csPath)
     if (csPath.startsWith("CI:"))
         return kProtoCI;
 
-    int firstColon = csPath.indexOf(':'), firstSlash = csPath.indexOf('/');
+    int firstColon = csPath.indexOf(':');
+    int firstSlash = csPath.indexOf('/');
     if (firstColon > 0 && firstSlash > 0 && firstColon < firstSlash)
         return kProtoUnknown;
 
@@ -574,7 +575,8 @@ MHRoot *MHEngine::FindObject(const MHObjectRef &oRef, bool failOnNotFound)
 {
     // It should match either the application or the scene.
     MHGroup *pSearch = nullptr;
-    MHGroup *pScene = CurrentScene(), *pApp = CurrentApp();
+    MHGroup *pScene = CurrentScene();
+    MHGroup *pApp = CurrentApp();
 
     if (pScene && GetPathName(pScene->m_ObjectReference.m_GroupId) == GetPathName(oRef.m_GroupId))
     {

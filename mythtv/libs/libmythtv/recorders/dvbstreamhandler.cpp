@@ -198,7 +198,7 @@ void DVBStreamHandler::RunTS(void)
     LOG(VB_RECORD, LOG_DEBUG, LOC + "RunTS(): begin");
 
     fd_set fd_select_set;
-    FD_ZERO(        &fd_select_set);
+    FD_ZERO(        &fd_select_set); // NOLINT(readability-isolate-declaration)
     FD_SET (dvr_fd, &fd_select_set);
     while (m_running_desired && !m_bError)
     {
@@ -518,7 +518,8 @@ void DVBStreamHandler::RetuneMonitor(void)
         const DiSEqCDevRotor *rotor = _dvbchannel->GetRotor();
         if (rotor)
         {
-            bool was_moving, is_moving;
+            bool was_moving;
+            bool is_moving;
             _sigmon->GetRotorStatus(was_moving, is_moving);
 
             // Retune if move completes normally

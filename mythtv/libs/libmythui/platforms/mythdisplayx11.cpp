@@ -66,7 +66,8 @@ static XRRScreenConfiguration *GetScreenConfig(MythXDisplay*& display)
     Window root = RootWindow(display->GetDisplay(), display->GetScreen());
 
     XRRScreenConfiguration *cfg = nullptr;
-    int event_basep = 0, error_basep = 0;
+    int event_basep = 0;
+    int error_basep = 0;
 
     if (XRRQueryExtension(display->GetDisplay(), &event_basep, &error_basep))
         cfg = XRRGetScreenInfo(display->GetDisplay(), root);
@@ -98,7 +99,8 @@ const std::vector<DisplayResScreen>& MythDisplayX11::GetVideoModes(void)
     if (!cfg)
         return m_videoModes;
 
-    int num_sizes = 0, num_rates = 0;
+    int num_sizes = 0;
+    int num_rates = 0;
 
     XRRScreenSize *sizes = XRRConfigSizes(cfg, &num_sizes);
     for (int i = 0; i < num_sizes; ++i)

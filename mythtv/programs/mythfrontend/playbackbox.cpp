@@ -1337,7 +1337,8 @@ void PlaybackBox::UpdateUIGroupList(const QStringList &groupPreferences)
 
     if (!m_titleList.isEmpty())
     {
-        int best_pref = INT_MAX, sel_idx = 0;
+        int best_pref = INT_MAX;
+        int sel_idx = 0;
         QStringList::iterator it;
         for (it = m_titleList.begin(); it != m_titleList.end(); ++it)
         {
@@ -1580,7 +1581,9 @@ bool PlaybackBox::UpdateUILists(void)
     m_isFilling = true;
 
     // Save selection, including next few items & groups
-    QStringList groupSelPref, itemSelPref, itemTopPref;
+    QStringList groupSelPref;
+    QStringList itemSelPref;
+    QStringList itemTopPref;
     if (!save_position(m_groupList, m_recordingList,
                        groupSelPref, itemSelPref, itemTopPref))
     {
@@ -3597,7 +3600,8 @@ ProgramInfo *PlaybackBox::FindProgramInUILists(uint recordingID,
 
     for (uint i = 0; i < 2; i++)
     {
-        auto it = _it[i], end = _end[i];
+        auto it = _it[i];
+        auto end = _end[i];
         for (; it != end; ++it)
         {
             if ((*it)->GetRecordingID() == recordingID)
@@ -5302,7 +5306,8 @@ void RecMetadataEdit::SaveChanges()
     QString newRecSubtitle = m_subtitleEdit->GetText();
     QString newRecDescription = nullptr;
     QString newRecInetref = nullptr;
-    uint newRecSeason = 0, newRecEpisode = 0;
+    uint newRecSeason = 0;
+    uint newRecEpisode = 0;
     if (m_descriptionEdit)
         newRecDescription = m_descriptionEdit->GetText();
     newRecInetref = m_inetrefEdit->GetText();
@@ -5533,8 +5538,8 @@ bool PlaybackBox::PbbJobQueue::IsJobQueued(int jobType, uint chanid,
 {
     Update();
     QList<JobQueueEntry> values = m_jobs.values(qMakePair(chanid, recstartts));
-    QList<JobQueueEntry>::const_iterator iter, end = values.end();
-    for (iter = values.begin(); iter != end; ++iter)
+    auto end = values.cend();
+    for (auto iter = values.cbegin(); iter != end; ++iter)
     {
         if (iter->type == jobType)
             return JobQueue::IsJobStatusQueued(iter->status);
@@ -5547,8 +5552,8 @@ bool PlaybackBox::PbbJobQueue::IsJobRunning(int jobType, uint chanid,
 {
     Update();
     QList<JobQueueEntry> values = m_jobs.values(qMakePair(chanid, recstartts));
-    QList<JobQueueEntry>::const_iterator iter, end = values.end();
-    for (iter = values.begin(); iter != end; ++iter)
+    auto end = values.cend();
+    for (auto iter = values.cbegin(); iter != end; ++iter)
     {
         if (iter->type == jobType)
             return JobQueue::IsJobStatusRunning(iter->status);

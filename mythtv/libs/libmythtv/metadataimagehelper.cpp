@@ -134,7 +134,9 @@ bool SetArtwork(const QString &inetref,
     if (inetref.isEmpty())
         return false;
 
-    QString coverart, fanart, banner;
+    QString coverart;
+    QString fanart;
+    QString banner;
 
     QUrl coverurl(map.value(kArtworkCoverart).url);
     if (!coverurl.path().isEmpty())

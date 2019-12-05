@@ -1904,7 +1904,8 @@ nullptr
             return false;
         }
 
-        MSqlQuery update(MSqlQuery::InitCon()), insert(MSqlQuery::InitCon());
+        MSqlQuery update(MSqlQuery::InitCon());
+        MSqlQuery insert(MSqlQuery::InitCon());
         update.prepare("UPDATE settings "
                           "SET data=:IP4ADDY "
                        "WHERE value='BackendServerIP' "

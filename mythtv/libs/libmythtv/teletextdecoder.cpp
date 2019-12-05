@@ -42,8 +42,15 @@ using namespace std;
  */
 void TeletextDecoder::Decode(const unsigned char *buf, int vbimode)
 {
-    int err = 0, latin1 = -1, pagenum, subpagenum, lang, flags;
-    uint magazine, packet, header;
+    int err = 0;
+    int latin1 = -1;
+    int pagenum;
+    int subpagenum;
+    int lang;
+    int flags;
+    uint magazine;
+    uint packet;
+    uint header;
 
     if (!m_teletext_reader)
         return;

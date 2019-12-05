@@ -197,7 +197,8 @@ void OSD::OverrideUIScale(bool Log)
     m_savedFontStretch = GetMythUI()->GetFontStretch();
     GetMythUI()->SetFontStretch(m_fontStretch);
 
-    int width, height;
+    int width;
+    int height;
     GetMythUI()->GetScreenSettings(width, m_SavedWMult, height, m_SavedHMult);
     QSize theme_size = GetMythUI()->GetBaseSize();
     m_SavedUIRect = uirect;

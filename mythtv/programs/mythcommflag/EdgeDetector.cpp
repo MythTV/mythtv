@@ -143,7 +143,8 @@ edge_mark(AVFrame *dst, int dstheight,
         first++;
     if (first * 100 / nn < kMinThresholdPct)
     {
-        int last = ii, last2 = nn - 1;
+        int last = ii;
+        int last2 = nn - 1;
         for ( ; last < last2 && sgmsorted[last] == thresholdval;
                 last++) ;
         if (sgmsorted[last] != thresholdval)

@@ -230,7 +230,8 @@ void LyricsData::loadLyrics(const QString &xmlData)
 {
     QDomDocument domDoc;
     QString errorMsg;
-    int errorLine = 0, errorColumn = 0;
+    int errorLine = 0;
+    int errorColumn = 0;
 
     if (!domDoc.setContent(xmlData, false, &errorMsg, &errorLine, &errorColumn))
     {

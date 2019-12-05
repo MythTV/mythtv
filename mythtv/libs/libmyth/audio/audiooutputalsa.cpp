@@ -184,7 +184,9 @@ int AudioOutputALSA::GetPCMInfo(int &card, int &device, int &subdevice)
 
 bool AudioOutputALSA::IncPreallocBufferSize(int requested, int buffer_time)
 {
-    int card = 0, device = 0, subdevice = 0;
+    int card = 0;
+    int device = 0;
+    int subdevice = 0;
 
     m_pbufsize = 0;
 
@@ -387,7 +389,9 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings(bool passthrough)
         if (snd_pcm_hw_params_test_channels(m_pcm_handle, params, channels) >= 0)
             settings->AddSupportedChannels(channels);
 
-    int card = 0, device = 0, subdevice = 0;
+    int card = 0;
+    int device = 0;
+    int subdevice = 0;
     if (GetPCMInfo(card, device, subdevice) >= 0)
     {
         // Check if we can retrieve ELD for this device
@@ -515,7 +519,9 @@ template <class AudioDataType>
 static inline void _ReorderSmpteToAlsa(AudioDataType *buf, uint frames,
                                        uint extrach)
 {
-    AudioDataType tmpC, tmpLFE, *buf2 = nullptr;
+    AudioDataType tmpC;
+    AudioDataType tmpLFE;
+    AudioDataType *buf2 = nullptr;
 
     for (uint i = 0; i < frames; i++)
     {
@@ -658,8 +664,12 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
 {
     snd_pcm_hw_params_t  *params = nullptr;
     snd_pcm_sw_params_t  *swparams = nullptr;
-    snd_pcm_uframes_t     period_size = 0, period_size_min = 0, period_size_max = 0;
-    snd_pcm_uframes_t     buffer_size = 0, buffer_size_min = 0, buffer_size_max = 0;
+    snd_pcm_uframes_t     period_size = 0;
+    snd_pcm_uframes_t     period_size_min = 0;
+    snd_pcm_uframes_t     period_size_max = 0;
+    snd_pcm_uframes_t     buffer_size = 0;
+    snd_pcm_uframes_t     buffer_size_min = 0;
+    snd_pcm_uframes_t     buffer_size_max = 0;
 
     VBAUDIO(QString("SetParameters(format=%1, channels=%2, rate=%3, "
                     "buffer_time=%4, period_time=%5)")
@@ -985,7 +995,8 @@ bool AudioOutputALSA::OpenMixer(void)
 QMap<QString, QString> *AudioOutputALSA::GetDevices(const char *type)
 {
     auto *alsadevs = new QMap<QString, QString>();
-    void **hints = nullptr, **n = nullptr;
+    void **hints = nullptr;
+    void **n = nullptr;
 
     if (snd_device_name_hint(-1, type, &hints) < 0)
         return alsadevs;

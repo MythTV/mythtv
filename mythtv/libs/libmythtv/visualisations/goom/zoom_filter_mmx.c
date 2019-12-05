@@ -26,7 +26,8 @@ void zoom_filter_mmx (int prevX, int prevY,
                       const int *brutS, const int *brutD, int buffratio,
                       int precalCoef[16][16])
 {
-    unsigned int ax = (prevX-1)<<PERTEDEC, ay = (prevY-1)<<PERTEDEC;
+    unsigned int ax = (prevX-1)<<PERTEDEC;
+    unsigned int ay = (prevY-1)<<PERTEDEC;
     
     int bufsize = prevX * prevY;
     int loop;
@@ -35,20 +36,20 @@ void zoom_filter_mmx (int prevX, int prevY,
     
     for (loop=0; loop<bufsize; loop++)
     {
-        int px,py;
         int pos;
         int coeffs;
     
         int posplusprevX;
     
-        int myPos = loop << 1, myPos2 = myPos + 1;
+        int myPos = loop << 1;
+        int myPos2 = myPos + 1;
         int brutSmypos = brutS[myPos];
         
-        px = brutSmypos + 
+        int px = brutSmypos +
              (((brutD[myPos] - brutSmypos)*buffratio) >> BUFFPOINTNB);
 
         brutSmypos = brutS[myPos2];
-        py = brutSmypos + 
+        int py = brutSmypos +
              (((brutD[myPos2] - brutSmypos)*buffratio) >> BUFFPOINTNB);
 
         if (px < 0)

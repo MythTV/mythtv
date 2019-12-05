@@ -99,7 +99,8 @@ void MythVAAPIInterop::InitaliseDisplay(void)
 {
     if (!m_vaDisplay)
         return;
-    int major, minor;
+    int major;
+    int minor;
     if (vaInitialize(m_vaDisplay, &major, &minor) != VA_STATUS_SUCCESS)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to initialise VAAPI display");
