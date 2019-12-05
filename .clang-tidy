@@ -53,10 +53,6 @@ Checks: '-*,
         # Dont use floating point variable for looping. ,
        -cert-flp30-c,
 
-        # Limited randomness. Should fix. ,
-       -cert-msc30-c,
-       -cert-msc50-cpp,
-
     clang-analyzer-*,
         # Not tested. ,
        -clang-analyzer-apiModeling.*,

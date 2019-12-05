@@ -92,6 +92,8 @@ void goom_init (guint32 resx, guint32 resy, int cinemascope) {
         srand ((uintptr_t) pixel);
         if (!rand_tab) rand_tab = (int *) malloc (NB_RAND * sizeof(int)) ;
         rand_pos = 1 ;
+        // Pseudo-random is good enough. Don't need a true random.
+        // NOLINTNEXTLINE(cert-msc30-c,cert-msc50-cpp)
         while (rand_pos != 0) rand_tab [rand_pos++] = rand () ;
                 
 	cycle = 0;
@@ -449,6 +451,8 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 				s_lockVar = 50;
 				newvit = STOP_SPEED + 1 - (4.0F * log10f(s_speedVar+1));
 				// retablir le zoom avant..
+                                // Pseudo-random is good enough. Don't need a true random.
+                                // NOLINTNEXTLINE(cert-msc30-c,cert-msc50-cpp)
 				if ((s_zfd.reverse) && (!(cycle % 13)) && (rand () % 5 == 0)) {
 					s_zfd.reverse = 0;
 					s_zfd.vitesse = STOP_SPEED - 2;

@@ -395,6 +395,9 @@ bool PeriodicHouseKeeperTask::DoCheckRun(QDateTime now)
     // remember, this is computing the probability that up to this point, one
     //      of these tests has returned positive, so each individual test has
     //      a necessarily low probability
+    //
+    // Pseudo-random is good enough. Don't need a true random.
+    // NOLINTNEXTLINE(cert-msc30-c,cert-msc50-cpp)
     bool res = (rand() > (int)(prob2 * static_cast<float>(RAND_MAX)));
     m_currentProb = prob;
 //  if (res)

@@ -35,9 +35,13 @@ void tentacle_new (void) {
 	vals = (float*)malloc ((definitionx+20)*sizeof(float));
 	
 	for (tmp=0;tmp<nbgrid;tmp++) {
+		// Pseudo-random is good enough. Don't need a true random.
+		// NOLINTNEXTLINE(cert-msc30-c,cert-msc50-cpp)
 		int z = 45+rand()%30;
+		// NOLINTNEXTLINE(cert-msc30-c,cert-msc50-cpp)
 		int x = 85+rand()%5;
 		center.z = z;
+		// NOLINTNEXTLINE(cert-msc30-c,cert-msc50-cpp)
 		grille[tmp] = grid3d_new (x,definitionx,z,definitionz+rand()%10,center);
 		center.y += 8;
 	}

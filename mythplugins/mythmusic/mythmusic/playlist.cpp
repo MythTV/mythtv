@@ -164,6 +164,8 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
 
             for (int x = 0; x < m_songs.count(); x++)
             {
+                // Pseudo-random is good enough. Don't need a true random.
+                // NOLINTNEXTLINE(cert-msc30-c,cert-msc50-cpp)
                 songMap.insert(rand(), m_songs.at(x));
             }
 
@@ -289,6 +291,8 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
             uint32_t orderCpt = 1;
             while (!weights.empty())
             {
+                // Pseudo-random is good enough. Don't need a true random.
+                // NOLINTNEXTLINE(cert-msc30-c,cert-msc50-cpp)
                 double hit = totalWeights * (double)rand() / (double)RAND_MAX;
                 auto weightEnd = weights.end();
                 auto weightIt = weights.begin();
