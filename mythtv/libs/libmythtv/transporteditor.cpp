@@ -92,8 +92,8 @@ static CardUtil::INPUT_TYPES get_cardtype(uint sourceid)
     if (cardids.empty())
     {
         ShowOkPopup(QObject::tr(
-            "Sorry, the Transport Editor can only be used to "
-            "edit transports which are connected to a card input."));
+            "Sorry, the Transport Editor can only edit transports "
+            "of a video source that is connected to a capture card."));
 
         return CardUtil::ERROR_PROBE;
     }
@@ -140,7 +140,7 @@ static CardUtil::INPUT_TYPES get_cardtype(uint sourceid)
         typeA = (CardUtil::MPEG == typeA) ? CardUtil::V4L  : typeA;
         typeB = (CardUtil::MPEG == typeB) ? CardUtil::V4L  : typeB;
 
-        // HDHOMERUN devices can be DVBC, DVBT/T2, DVBT2, ATSC or a combination of those.
+        // HDHOMERUN devices can be DVBC, DVBT/T2, ATSC or a combination of those.
         // If there are other non-HDHR devices connected to this videosource that
         // have an explicit type then assume that the HDHOMERUN is also of that type.
         typeA = (CardUtil::HDHOMERUN == typeA) ? typeB : typeA;
@@ -151,9 +151,9 @@ static CardUtil::INPUT_TYPES get_cardtype(uint sourceid)
 
         ShowOkPopup(
             QObject::tr(
-                "The Video Sources to which this Transport is connected "
-                "are incompatible, please create separate video sources "
-                "for these cards. "));
+                "The capture cards connected to this transport's video source "
+                "are incompatible. Please create separate video sources "
+                "per capture card type."));
 
         return CardUtil::ERROR_PROBE;
     }
