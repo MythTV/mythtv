@@ -142,6 +142,7 @@ QString DeinterlacerName(MythDeintType Deint, bool DoubleRate, VideoFrameType Fo
         switch (Format)
         {
             case FMT_MEDIACODEC: return "MediaCodec";
+            case FMT_DRMPRIME: return result + "EGL Onefield";
             case FMT_VDPAU:
                 result += "VDPAU ";
                 switch (deint)

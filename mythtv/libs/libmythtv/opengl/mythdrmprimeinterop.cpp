@@ -155,7 +155,7 @@ vector<MythVideoTexture*> MythDRMPRIMEInterop::Acquire(MythRenderOpenGL *Context
     if (option != DEINT_NONE)
         doublerate = true;
     else
-        GetSingleRateOption(Frame, DEINT_CPU | DEINT_SHADER | DEINT_DRIVER);
+        option = GetSingleRateOption(Frame, DEINT_CPU | DEINT_SHADER | DEINT_DRIVER);
     interlaced &= option != DEINT_NONE;
 
     // Clear redundant frame caches
@@ -187,7 +187,7 @@ vector<MythVideoTexture*> MythDRMPRIMEInterop::Acquire(MythRenderOpenGL *Context
     if (m_deinterlacing)
     {
         result.clear();
-        Frame->deinterlace_inuse = DEINT_CPU | DEINT_BASIC;
+        Frame->deinterlace_inuse = DEINT_DRIVER | DEINT_BASIC;
         Frame->deinterlace_inuse2x = doublerate;
         bool tff = Frame->interlaced_reversed ? !Frame->top_field_first : Frame->top_field_first;
         result.emplace_back(m_openglTextures[id].at(Scan == kScan_Interlaced ? (tff ? 1 : 0) : tff ? 0 : 1));
