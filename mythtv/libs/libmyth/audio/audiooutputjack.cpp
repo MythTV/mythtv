@@ -265,7 +265,7 @@ void AudioOutputJACK::DeinterleaveAudio(const float *aubuf, float **bufs, int nf
     // Create a local float version of the channel_volumes array
     // TODO: This can probably be removed
     //       if we have float software volume control in AOB?
-    float volumes[m_channels];
+    float volumes[JACK_CHANNELS_MAX];
     for (int channel = 0; channel < m_channels; channel++)
     {
         if (internal_vol)
