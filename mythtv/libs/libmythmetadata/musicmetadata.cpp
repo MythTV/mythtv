@@ -96,6 +96,9 @@ MusicMetadata::~MusicMetadata()
 
 MusicMetadata& MusicMetadata::operator=(const MusicMetadata &rhs)
 {
+    if (this == &rhs)
+        return *this;
+
     m_artist = rhs.m_artist;
     m_artist_sort = rhs.m_artist_sort;
     m_compilation_artist = rhs.m_compilation_artist;

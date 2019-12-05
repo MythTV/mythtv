@@ -44,6 +44,9 @@ ImageProperties::ImageProperties(const ImageProperties& other)
 
 ImageProperties &ImageProperties::operator=(const ImageProperties &other)
 {
+    if (this == &other)
+        return *this;
+
     Copy(other);
 
     return *this;

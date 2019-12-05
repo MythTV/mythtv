@@ -830,6 +830,9 @@ ProgramInfo::ProgramInfo(const QString &_title, uint _chanid,
  */
 ProgramInfo &ProgramInfo::operator=(const ProgramInfo &other)
 {
+    if (this == &other)
+        return *this;
+
     clone(other);
     return *this;
 }

@@ -28,9 +28,6 @@ Checks: '-*,
         # Comment out this and the cppcoreguidelines version. ,
        -bugprone-narrowing-conversions,
 
-        # Prevent self-assignment.  Needs to be investigated.
-       -bugprone-unhandled-self-assignment,
-
     # Explicitly list the tests that arent aliases. ,
     cert-*,
 
@@ -59,9 +56,6 @@ Checks: '-*,
         # Limited randomness. Should fix. ,
        -cert-msc30-c,
        -cert-msc50-cpp,
-
-        # Alias for -bugprone-unhandled-self-assignment. ,
-       -cert-oop54-cpp,
 
     clang-analyzer-*,
         # Not tested. ,

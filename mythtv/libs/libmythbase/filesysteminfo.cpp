@@ -82,6 +82,9 @@ void FileSystemInfo::clone(const FileSystemInfo &other)
 
 FileSystemInfo &FileSystemInfo::operator=(const FileSystemInfo &other)
 {
+    if (this == &other)
+        return *this;
+
     clone(other);
     return *this;
 }
