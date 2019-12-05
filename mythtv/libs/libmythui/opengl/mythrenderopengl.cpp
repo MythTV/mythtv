@@ -149,7 +149,7 @@ MythRenderOpenGL::~MythRenderOpenGL()
     if (!isValid())
         return;
     disconnect(this, &QOpenGLContext::aboutToBeDestroyed, this, &MythRenderOpenGL::contextToBeDestroyed);
-    ReleaseResources();
+    MythRenderOpenGL::ReleaseResources();
 }
 
 void MythRenderOpenGL::messageLogged(const QOpenGLDebugMessage &Message)

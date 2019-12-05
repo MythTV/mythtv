@@ -79,7 +79,7 @@ MythVAAPIInterop::MythVAAPIInterop(MythRenderOpenGL *Context, Type InteropType)
 
 MythVAAPIInterop::~MythVAAPIInterop()
 {
-    DestroyDeinterlacer();
+    MythVAAPIInterop::DestroyDeinterlacer();
     if (m_vaDisplay)
         if (vaTerminate(m_vaDisplay) != VA_STATUS_SUCCESS)
             LOG(VB_GENERAL, LOG_WARNING, LOC + "Error closing VAAPI display");

@@ -25,7 +25,7 @@ MythOpenGLPainter::~MythOpenGLPainter()
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         m_render->logDebugMarker("PAINTER_RELEASE_START");
     Teardown();
-    FreeResources();
+    MythOpenGLPainter::FreeResources();
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         m_render->logDebugMarker("PAINTER_RELEASE_END");
 }

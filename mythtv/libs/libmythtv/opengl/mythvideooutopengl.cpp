@@ -158,7 +158,7 @@ MythVideoOutputOpenGL::MythVideoOutputOpenGL(QString Profile)
 
 MythVideoOutputOpenGL::~MythVideoOutputOpenGL()
 {
-    DestroyBuffers();
+    MythVideoOutputOpenGL::DestroyBuffers();
     while (!m_openGLVideoPiPs.empty())
     {
         delete *m_openGLVideoPiPs.begin();
@@ -180,7 +180,7 @@ MythVideoOutputOpenGL::~MythVideoOutputOpenGL()
 
 void MythVideoOutputOpenGL::DestroyBuffers(void)
 {
-    DiscardFrames(true, true);
+    MythVideoOutputOpenGL::DiscardFrames(true, true);
     m_videoBuffers.DeleteBuffers();
     m_videoBuffers.Reset();
     m_buffersCreated = false;

@@ -269,7 +269,7 @@ MythVideoOutput::MythVideoOutput()
 MythVideoOutput::~MythVideoOutput()
 {
     delete m_dbDisplayProfile;
-    ResizeForGui();
+    MythVideoOutput::ResizeForGui();
     if (m_display)
         MythDisplay::AcquireRelease(false);
 }
