@@ -21,7 +21,18 @@ from __future__ import print_function
 from future import standard_library
 standard_library.install_aliases()
 import smolt
-import json, urllib.request, urllib.parse, urllib.error
+import json
+
+try:
+    from urllib2 import urlopen
+except ImportError:
+    from urllib.request import urlopen
+
+try:
+    import urlparse as parse
+except ImportError:
+    from urllib import parse
+
 from i18n import _
 from smolt_config import get_config_attr
 
@@ -29,8 +40,8 @@ def rating(profile, smoonURL, gate):
     print("")
     print(_("Current rating for vendor/model."))
     print("")
-    scanURL='%s/client/host_rating?vendor=%s&system=%s' % (smoonURL, urllib.parse.quote(profile.host.systemVendor), urllib.parse.quote(profile.host.systemModel))
-    r = json.load(urllib.request.urlopen(scanURL))['ratings']
+    scanURL='%s/client/host_rating?vendor=%s&system=%s' % (smoonURL, parse.quote(profile.host.systemVendor), parse.quote(profile.host.systemModel))
+    r = json.load(urlopen(scanURL))['ratings']
     rating_system = { '0' : _('Unrated/Unknown'),
                       '1' : _('Non-working'),
                       '2' : _('Partially-working'),
@@ -54,13 +65,13 @@ def scan(profile, smoonURL, gate):
                                              int(SubsysVendorID or 0),
                                              int(SubsysDeviceID or 0)) )
     searchDevices = 'NULLPAGE'
-    devices.append('System/%s/%s' % ( urllib.parse.quote(profile.host.systemVendor), urllib.parse.quote(profile.host.systemModel) ))
+    devices.append('System/%s/%s' % ( parse.quote(profile.host.systemVendor), parse.quote(profile.host.systemModel) ))
     for dev in devices:
         searchDevices = "%s|%s" % (searchDevices, dev)
     scanURL='%ssmolt-w/api.php' % smoonURL
     scanData = 'action=query&titles=%s&format=json' % searchDevices
     try:
-         r = json.load(urllib.request.urlopen(scanURL, bytes(scanData, 'latin1')))
+         r = json.load(urlopen(scanURL, bytes(scanData, 'latin1')))
     except ValueError:
         print("Could not wiki for errata!")
         return

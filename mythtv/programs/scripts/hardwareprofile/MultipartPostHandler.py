@@ -45,12 +45,24 @@ from __future__ import print_function
 from future import standard_library
 standard_library.install_aliases()
 from builtins import object
-import urllib.request, urllib.error, urllib.parse
 from email.generator import _make_boundary
 import mimetypes
 import os, stat
 import sys
 from io import StringIO
+
+IS_PY2 = sys.version_info[0] == 2
+
+if IS_PY2:
+    from urllib2 import BaseHandler, build_opener, HTTPHandler
+else:
+    from urllib.request import BaseHandler, build_opener, HTTPHandler
+
+if IS_PY2:
+    import urllib as ulib
+else:
+    import urllib.parse as ulib
+
 
 class Callable(object):
     def __init__(self, anycallable):
@@ -60,8 +72,8 @@ class Callable(object):
 #  assigning a sequence.
 doseq = 1
 
-class MultipartPostHandler(urllib.request.BaseHandler):
-    handler_order = urllib.request.HTTPHandler.handler_order - 10 # needs to run first
+class MultipartPostHandler(BaseHandler):
+    handler_order = HTTPHandler.handler_order - 10 # needs to run first
 
     def http_request(self, request):
         data = request.data
@@ -77,7 +89,7 @@ class MultipartPostHandler(urllib.request.BaseHandler):
                 raise TypeError("not a valid non-string sequence or mapping object", traceback)
 
             if len(v_files) == 0:
-                data = urllib.parse.urlencode(v_vars, doseq)
+                data = ulib.urlencode(v_vars, doseq)
             else:
                 boundary, data = self.multipart_encode(v_vars, v_files)
 
@@ -121,7 +133,7 @@ def main():
     import tempfile, sys
 
     validatorURL = "http://validator.w3.org/check"
-    opener = urllib.request.build_opener(MultipartPostHandler)
+    opener = build_opener(MultipartPostHandler)
 
     def validateFile(url):
         temp = tempfile.mkstemp(suffix=".html")

@@ -60,7 +60,7 @@ class _UuidDb(object):
     def set_pub_uuid(self, hw_uuid, host, pub_uuid):
         for i in (hw_uuid, host, pub_uuid):
             if not i:
-                raise Exception('No paramater allowed to be None.')
+                raise Exception('No parameter is allowed to be None')
         self._config.set(_SECTION, _get_option_name(hw_uuid, host), pub_uuid)
         logging.info('Public UUID "%s" written to database' % pub_uuid)
         self._flush()

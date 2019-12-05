@@ -90,14 +90,16 @@ class _UuidDb(object):
     def set_pub_uuid(self, hw_uuid, host, pub_uuid):
         for i in (hw_uuid, host, pub_uuid):
             if not i:
-                raise Exception('No paramater allowed to be None.')
+                raise Exception('No parameter is allowed to be None')
         self._config.set(_SECTION, _get_option_name(hw_uuid, host), pub_uuid)
         logging.info('Public UUID "%s" written to database' % pub_uuid)
         self._flush()
 
     def gen_uuid(self):
         try:
-            return file('/proc/sys/kernel/random/uuid').read().strip()
+            with open('/proc/sys/kernel/random/uuid') as rand_uuid:
+                rand_uuid_string = rand_uuid.read().strip()
+                return rand_uuid_string
         except IOError:
             try:
                 import uuid
@@ -110,7 +112,8 @@ class _UuidDb(object):
             return self.hw_uuid
 
         try:
-            self.hw_uuid = file(self.hw_uuid_file).read().strip()
+            with open(self.hw_uuid_file) as hwuuidfile:
+                self.hw_uuid = hwuuidfile.read().strip()
         except IOError:
             try:
                 self.hw_uuid = self.genUUID()
@@ -118,7 +121,8 @@ class _UuidDb(object):
                 raise UUIDError('Unable to determine UUID of system!')
             try:
                 # make sure directory exists, create if not
-                file(self.hw_uuid_file).write(self.hw_uuid)
+                with open(self.hw_uuid_file, 'w') as hwuuidfile:
+                    hwuuidfile.write(self.hw_uuid)
             except Exception as e:
                 raise UUIDError('Unable to save UUID to %s. Please run once as root.' % self.hw_uuid_file)
 

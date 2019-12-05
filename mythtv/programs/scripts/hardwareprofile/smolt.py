@@ -41,9 +41,9 @@ import requests
 import sys
 import os
 try:
-    from urllib.request import build_opener
-except ImportError:
     from urllib2 import build_opener
+except ImportError:
+    from urllib.request import build_opener
 try:
     from urllib.parse import urlparse
 except ImportError:
@@ -642,7 +642,7 @@ class _HardwareProfile:
         try:
             uuiddb.set_pub_uuid(uuid, smoonURLparsed.netloc, pub_uuid)
         except Exception as e:
-            sys.stderr.write(_('\tYour pub_uuid could not be written.\n\n'))
+            sys.stderr.write(_('\tYour pub_uuid could not be written: {}.\n\n'.format(e)))
         return
 
     def write_admin_token(self,smoonURL,admin,admin_token_file):
@@ -652,7 +652,7 @@ class _HardwareProfile:
             with open(admin_token_file, 'w') as at_file:
                 at_file.write(admin)
         except Exception as e:
-            sys.stderr.write(_('\tYour admin token  could not be cached: %s\n' % e))
+            sys.stderr.write(_('\tYour admin token could not be cached: %s\n' % e))
         return
 
     def get_submission_data(self, prefered_protocol=None):
@@ -1312,12 +1312,13 @@ def read_uuid():
     try:
         with open(hw_uuid_file) as hw_uuid:
             UUID = hw_uuid.read().strip()
-    except IOError:
+    except (FileNotFoundError, IOError):
         try:
             with open('/proc/sys/kernel/random/uuid') as rand_uuid:
                 UUID = rand_uuid.read().strip()
-                rand_uuid.write(UUID)
-        except IOError:
+            with open(hw_uuid_file, 'w') as write_uuid:
+                write_uuid.write(UUID)
+        except (FileNotFoundError, IOError):
             sys.stderr.write(_('Unable to determine UUID of system!\n'))
             raise UUIDError('Unable to get/save UUID. file = %s.  Please run once as root.' % hw_uuid_file)
     return UUID
