@@ -1120,6 +1120,8 @@ subtitle_t *sub_read_file (demux_sputext_t *demuxstr) {
   int n_max;
   int timeout;
   subtitle_t *first;
+  // These functions all return either 1) nullptr, 2) (subtitle_t*)ERR,
+  // or 3) a pointer to the dest parameter.
   subtitle_t * (*func[])(demux_sputext_t *demuxstr,subtitle_t *dest)=
   {
     sub_read_line_microdvd,
@@ -1164,8 +1166,6 @@ subtitle_t *sub_read_file (demux_sputext_t *demuxstr) {
   else timeout *= 10;
 
   while(true) {
-    subtitle_t *sub;
-
     if(demuxstr->num>=n_max){
       n_max+=16;
       auto *new_first=(subtitle_t *)realloc(first,n_max*sizeof(subtitle_t));
@@ -1176,8 +1176,7 @@ subtitle_t *sub_read_file (demux_sputext_t *demuxstr) {
       first = new_first;
     }
 
-    sub = func[demuxstr->format] (demuxstr, &first[demuxstr->num]);
-
+    subtitle_t *sub = func[demuxstr->format] (demuxstr, &first[demuxstr->num]);
     if (!sub) {
       break;   /* EOF */
     }
@@ -1223,5 +1222,7 @@ subtitle_t *sub_read_file (demux_sputext_t *demuxstr) {
   }
 #endif
 
+  // No memory leak of 'sub' here.  'Sub' always points to an element in 'first'.
+  // NOLINT(clang-analyzer-unix.Malloc)
   return first;
 }
