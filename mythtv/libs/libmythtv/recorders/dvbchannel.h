@@ -102,13 +102,8 @@ class DVBChannel : public DTVChannel
     bool CheckModulation(DTVModulation modulation) const;
     bool CheckCodeRate(DTVCodeRate rate) const;
 
-    using DVBChannelP = DVBChannel*;
-    DVBChannel *GetMasterLock(void);
-    static void ReturnMasterLock(DVBChannelP &dvbm);
-
-    using DVBChannelCP = const DVBChannel*;
-    const DVBChannel *GetMasterLock(void) const;
-    static void ReturnMasterLock(DVBChannelCP &dvbm);
+    DVBChannel *GetMasterLock(void) const;
+    static void ReturnMasterLock(DVBChannel* &dvbm);
 
     /// \brief Get Signal strength from the DVBv5 interface [0-1.0]
     /// It is transformed to a linear relative scale if provided in dB

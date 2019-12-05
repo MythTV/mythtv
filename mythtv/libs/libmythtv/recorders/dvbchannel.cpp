@@ -357,7 +357,7 @@ void DVBChannel::CheckOptions(DTVMultiplex &tuning) const
     // DVB-S needs a fully initialized diseqc tree and is checked later in Tune
     if (!m_diseqc_tree)
     {
-        const DVBChannel *master = GetMasterLock();
+        DVBChannel *master = GetMasterLock();
         if (master == nullptr || !master->m_diseqc_tree)
             CheckFrequency(tuning.m_frequency);
         ReturnMasterLock(master);
@@ -858,7 +858,7 @@ bool DVBChannel::IsTuningParamsProbeSupported(void) const
         return false;
     }
 
-    const DVBChannel *master = GetMasterLock();
+    DVBChannel *master = GetMasterLock();
     if (master != this)
     {
         bool ok = master->IsTuningParamsProbeSupported();
@@ -904,7 +904,7 @@ bool DVBChannel::ProbeTuningParams(DTVMultiplex &tuning) const
         return false;
     }
 
-    const DVBChannel *master = GetMasterLock();
+    DVBChannel *master = GetMasterLock();
     if (master != this)
     {
         bool ok = master->ProbeTuningParams(tuning);
@@ -1008,7 +1008,7 @@ const DiSEqCDevRotor *DVBChannel::GetRotor(void) const
 // documented in dvbchannel.h
 bool DVBChannel::HasLock(bool *ok) const
 {
-    const DVBChannel *master = GetMasterLock();
+    DVBChannel *master = GetMasterLock();
     if (master != this)
     {
         bool haslock = master->HasLock(ok);
@@ -1091,7 +1091,7 @@ double DVBChannel::GetSignalStrengthDVBv5(bool *ok) const
 // documented in dvbchannel.h
 double DVBChannel::GetSignalStrength(bool *ok) const
 {
-    const DVBChannel *master = GetMasterLock();
+    DVBChannel *master = GetMasterLock();
     if (master != this)
     {
         double val = master->GetSignalStrength(ok);
@@ -1174,7 +1174,7 @@ double DVBChannel::GetSNRDVBv5(bool *ok) const
 // documented in dvbchannel.h
 double DVBChannel::GetSNR(bool *ok) const
 {
-    const DVBChannel *master = GetMasterLock();
+    DVBChannel *master = GetMasterLock();
     if (master != this)
     {
         double val = master->GetSNR(ok);
@@ -1254,7 +1254,7 @@ double DVBChannel::GetBitErrorRateDVBv5(bool *ok) const
 // documented in dvbchannel.h
 double DVBChannel::GetBitErrorRate(bool *ok) const
 {
-    const DVBChannel *master = GetMasterLock();
+    DVBChannel *master = GetMasterLock();
     if (master != this)
     {
         double val = master->GetBitErrorRate(ok);
@@ -1319,7 +1319,7 @@ double DVBChannel::GetUncorrectedBlockCountDVBv5(bool *ok) const
 // documented in dvbchannel.h
 double DVBChannel::GetUncorrectedBlockCount(bool *ok) const
 {
-    const DVBChannel *master = GetMasterLock();
+    DVBChannel *master = GetMasterLock();
     if (master != this)
     {
         double val = master->GetUncorrectedBlockCount(ok);
@@ -1346,27 +1346,14 @@ double DVBChannel::GetUncorrectedBlockCount(bool *ok) const
     return (double) ublocks;
 }
 
-DVBChannel *DVBChannel::GetMasterLock(void)
-{
-    QString key = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, m_device);
-    if (m_pParent)
-        key += QString(":%1")
-            .arg(CardUtil::GetSourceID(m_pParent->GetInputId()));
-    DTVChannel *master = DTVChannel::GetMasterLock(key);
-    auto *dvbm = dynamic_cast<DVBChannel*>(master);
-    if (master && !dvbm)
-        DTVChannel::ReturnMasterLock(master);
-    return dvbm;
-}
-
-void DVBChannel::ReturnMasterLock(DVBChannelP &dvbm)
+void DVBChannel::ReturnMasterLock(DVBChannel* &dvbm)
 {
     auto *chan = static_cast<DTVChannel*>(dvbm);
     DTVChannel::ReturnMasterLock(chan);
     dvbm = nullptr;
 }
 
-const DVBChannel *DVBChannel::GetMasterLock(void) const
+DVBChannel *DVBChannel::GetMasterLock(void) const
 {
     QString key = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, m_device);
     if (m_pParent)
@@ -1379,16 +1366,9 @@ const DVBChannel *DVBChannel::GetMasterLock(void) const
     return dvbm;
 }
 
-void DVBChannel::ReturnMasterLock(DVBChannelCP &dvbm)
-{
-    auto *chan = static_cast<DTVChannel*>(const_cast<DVBChannel*>(dvbm));
-    DTVChannel::ReturnMasterLock(chan);
-    dvbm = nullptr;
-}
-
 bool DVBChannel::IsMaster(void) const
 {
-    const DVBChannel *master = GetMasterLock();
+    DVBChannel *master = GetMasterLock();
     bool is_master = (master == this);
     ReturnMasterLock(master);
     return is_master;
