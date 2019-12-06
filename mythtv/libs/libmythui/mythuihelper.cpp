@@ -98,12 +98,9 @@ public:
     ~MythUIHelperPrivate();
 
     void Init();
-
     void GetScreenBounds(void);
     void StoreGUIsettings(void);
-
     double GetPixelAspectRatio(void);
-    static void WaitForScreenChange(void) ;
 
     bool      m_themeloaded {false}; ///< Do we have a palette and pixmap to use?
     QString   m_menuthemepathname;
@@ -374,25 +371,6 @@ double MythUIHelperPrivate::GetPixelAspectRatio(void)
     return static_cast<double>(m_pixelAspectRatio);
 }
 
-void MythUIHelperPrivate::WaitForScreenChange(void)
-{
-    // Wait for screen signal change, so we later get updated screen resolution
-    QEventLoop loop;
-    QTimer timer;
-    QScreen *screen = MythDisplay::AcquireRelease()->GetCurrentScreen();
-    MythDisplay::AcquireRelease(false);
-
-    timer.setSingleShot(true);
-    QObject::connect(&timer, SIGNAL(timeout()),
-                     &loop, SLOT(quit()));
-    QObject::connect(screen, SIGNAL(geometryChanged(const QRect&)),
-                     &loop, SLOT(quit()));
-    QObject::connect(screen, SIGNAL(availableGeometryChanged(const QRect&)),
-                     &loop, SLOT(quit()));
-    timer.start(300); //300ms maximum wait
-    loop.exec();
-}
-
 MythUIHelper::MythUIHelper()
 {
     d = new MythUIHelperPrivate(this);
@@ -450,10 +428,7 @@ void MythUIHelper::LoadQtConfig(void)
 
     // Switch to desired GUI resolution
     if (d->m_display->UsingVideoModes())
-    {
-        if (d->m_display->SwitchToGUI())
-            d->WaitForScreenChange();
-    }
+        d->m_display->SwitchToGUI(MythDisplay::GUI, true);
 
     // Note the possibly changed screen settings
     d->GetScreenBounds();

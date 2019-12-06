@@ -1,4 +1,5 @@
 //Qt
+#include <QTimer>
 #include <QThread>
 #include <QApplication>
 #include <QElapsedTimer>
@@ -108,6 +109,8 @@ MythDisplay::MythDisplay()
 {
     m_screen = GetDesiredScreen();
     DebugScreen(m_screen, "Using");
+    if (m_screen)
+        connect(m_screen, &QScreen::geometryChanged, this, &MythDisplay::GeometryChanged);
 
     connect(qGuiApp, &QGuiApplication::screenRemoved, this, &MythDisplay::ScreenRemoved);
     connect(qGuiApp, &QGuiApplication::screenAdded, this, &MythDisplay::ScreenAdded);
@@ -247,8 +250,11 @@ void MythDisplay::ScreenChanged(QScreen *qScreen)
 {
     if (qScreen == m_screen)
         return;
+    if (m_screen)
+        disconnect(m_screen, nullptr, this, nullptr);
     DebugScreen(qScreen, "Changed to");
     m_screen = qScreen;
+    connect(m_screen, &QScreen::geometryChanged, this, &MythDisplay::GeometryChanged);
     m_videoModes.clear();
     InitialiseModes();
     emit CurrentScreenChanged(qScreen);
@@ -269,6 +275,12 @@ void MythDisplay::ScreenRemoved(QScreen* qScreen)
 {
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Screen '%1' removed").arg(qScreen->name()));
     emit ScreenCountChanged(qGuiApp->screens().size());
+}
+
+void MythDisplay::GeometryChanged(const QRect &Geo)
+{
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("New screen geometry: %1x%2+%3+%4")
+        .arg(Geo.width()).arg(Geo.height()).arg(Geo.left()).arg(Geo.top()));
 }
 
 float MythDisplay::SanitiseRefreshRate(int Rate)
@@ -408,6 +420,23 @@ void MythDisplay::InitialiseModes(void)
     }
 }
 
+/*! \brief Check whether the next mode is smaller in size than the current mode.
+ *
+ * This is used to allow the caller to force an update of the main window to ensure
+ * the window is fully resized and is in no way clipped. Not an issue if the next
+ * mode is smaller.
+*/
+bool MythDisplay::NextModeIsLarger(Mode NextMode)
+{
+    DisplayResScreen next = m_mode[NextMode];
+    return next.Width() > m_last.Width() || next.Height() > m_last.Height();
+}
+
+bool MythDisplay::NextModeIsLarger(int Width, int Height)
+{
+    return Width > m_last.Width() || Height > m_last.Height();
+}
+
 /// \brief Return the screen to the original desktop settings
 void MythDisplay::SwitchToDesktop()
 {
@@ -489,7 +518,7 @@ bool MythDisplay::SwitchToVideo(int Width, int Height, double Rate)
  * \param which_gui either regular GUI or CUSTOM_GUI
  * \sa SwitchToCustomGUI
  */
-bool MythDisplay::SwitchToGUI(Mode NextMode)
+bool MythDisplay::SwitchToGUI(Mode NextMode, bool Wait)
 {
     DisplayResScreen next = m_mode[NextMode];
     auto target_rate = static_cast<double>(NAN);
@@ -517,6 +546,9 @@ bool MythDisplay::SwitchToGUI(Mode NextMode)
             .arg(next.RefreshRate(), 0, 'f', 3));
         return false;
     }
+
+    if (Wait && (next.Width() != m_last.Width() || next.Height() != m_last.Height()))
+        WaitForScreenChange();
 
     m_curMode = NextMode;
 
@@ -679,6 +711,20 @@ QSize MythDisplay::GetPhysicalSize(void)
     return QSize(m_last.Width_mm(), m_last.Height_mm());
 }
 
+void MythDisplay::WaitForScreenChange(void)
+{
+    LOG(VB_GENERAL, LOG_INFO, LOC + "Waiting for resolution change");
+    QEventLoop loop;
+    QTimer timer;
+    timer.setSingleShot(true);
+    connect(&timer, &QTimer::timeout, [](){ LOG(VB_GENERAL, LOG_WARNING, LOC + "Timed out wating for screen change"); });
+    QObject::connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
+    QObject::connect(m_screen, &QScreen::geometryChanged, &loop, &QEventLoop::quit);
+    // 500ms maximum wait
+    timer.start(500);
+    loop.exec();
+}
+
 void MythDisplay::PauseForModeSwitch(void)
 {
     int pauselengthinms = gCoreContext->GetNumSetting("VideoModeChangePauseMS", 0);
@@ -686,12 +732,12 @@ void MythDisplay::PauseForModeSwitch(void)
     {
         LOG(VB_GENERAL, LOG_INFO, LOC +
             QString("Pausing %1ms for video mode switch").arg(pauselengthinms));
-        QElapsedTimer timer;
-        timer.start();
-        while (!timer.hasExpired(pauselengthinms))
-        {
-            QThread::msleep(100);
-            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-        }
+        QEventLoop loop;
+        QTimer timer;
+        timer.setSingleShot(true);
+        QObject::connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
+        // 500ms maximum wait
+        timer.start(pauselengthinms);
+        loop.exec();
     }
 }

@@ -1,6 +1,9 @@
 #ifndef MYTHDISPLAYX11_H
 #define MYTHDISPLAYX11_H
 
+// Qt
+#include <QMap>
+
 // MythTV
 #include "mythdisplay.h"
 
@@ -21,7 +24,8 @@ class MythDisplayX11 : public MythDisplay
   private:
     void DebugModes(const QString& Message) const;
 
-    mutable std::vector<DisplayResScreen> m_videoModesUnsorted { };
+    QMap<uint64_t, unsigned long> m_modeMap { };
+    unsigned long m_crtc { 0 };
 };
 
 #endif // MYTHDISPLAYX11_H

@@ -64,8 +64,10 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
 
     virtual bool UsingVideoModes   (void) { return false; }
     virtual const DisplayResVector& GetVideoModes(void);
+    bool         NextModeIsLarger  (Mode NextMode);
+    bool         NextModeIsLarger  (int Width, int Height);
     void         SwitchToDesktop   (void);
-    bool         SwitchToGUI       (Mode NextMode = GUI);
+    bool         SwitchToGUI       (Mode NextMode = GUI, bool Wait = false);
     bool         SwitchToVideo     (int Width, int Height, double Rate = 0.0);
     QSize        GetResolution     (void);
     QSize        GetPhysicalSize   (void);
@@ -74,12 +76,12 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
     double       EstimateVirtualAspectRatio(void);
     std::vector<double> GetRefreshRates(int Width, int Height);
 
-
   public slots:
     void ScreenChanged        (QScreen *qScreen);
     void PrimaryScreenChanged (QScreen *qScreen);
     void ScreenAdded          (QScreen *qScreen);
     void ScreenRemoved        (QScreen *qScreen);
+    void GeometryChanged      (const QRect &Geometry);
 
   signals:
     void CurrentScreenChanged (QScreen *Screen);
@@ -96,6 +98,7 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
 
     void         InitialiseModes    (void);
     virtual bool SwitchToVideoMode  (int Width, int Height, double Framerate);
+    void         WaitForScreenChange(void);
 
     QWidget* m_widget { nullptr };
     QScreen* m_screen { nullptr };
