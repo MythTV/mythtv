@@ -74,7 +74,7 @@ class MBASE_PUBLIC MythPower : public QObject, public ReferenceCounter
     static QMutex s_lock;
 
     MythPower();
-    virtual ~MythPower();
+    virtual ~MythPower() = default;
 
     virtual void   Init              (void);
     virtual bool   DoFeature         (bool = false) { return false; }

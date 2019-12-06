@@ -8,7 +8,7 @@ class MythDisplayX11 : public MythDisplay
 {
   public:
     MythDisplayX11();
-   ~MythDisplayX11() override;
+   ~MythDisplayX11() override = default;
     static bool IsAvailable(void);
     DisplayInfo GetDisplayInfo(int VideoRate = 0) override;
 

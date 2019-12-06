@@ -21,10 +21,6 @@ MythDisplayX11::MythDisplayX11()
     InitialiseModes();
 }
 
-MythDisplayX11::~MythDisplayX11()
-{
-}
-
 bool MythDisplayX11::IsAvailable(void)
 {
     static bool s_checked = false;
