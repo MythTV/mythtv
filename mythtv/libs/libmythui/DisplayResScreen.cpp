@@ -182,6 +182,10 @@ int DisplayResScreen::FindBestMatch(const DisplayResVector& dsr,
                 }
                 target_rate = rates[rates.size() - 1];
             }
+            else if (!rates.empty())
+            {
+                target_rate = rates[rates.size() - 1];
+            }
             return i;
         }
     }
