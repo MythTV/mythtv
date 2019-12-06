@@ -192,6 +192,9 @@ bool MythDisplayX11::SwitchToVideoMode(int Width, int Height, double DesiredRate
                                       currentcrtc->rotation, currentcrtc->outputs,
                                       currentcrtc->noutput);
             XRRFreeCrtcInfo(currentcrtc);
+            XRRScreenConfiguration *config = XRRGetScreenInfo(display->GetDisplay(), display->GetRoot());
+            if (config)
+                XRRFreeScreenConfigInfo(config);
         }
         XRRFreeScreenResources(res);
     }
