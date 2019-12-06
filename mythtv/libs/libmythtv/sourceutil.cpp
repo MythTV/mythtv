@@ -377,10 +377,7 @@ bool SourceUtil::IsSourceIDValid(uint sourceid)
         return false;
     }
 
-    if (!query.next())
-        return false;
-
-    return true;
+    return query.next();
 }
 
 bool SourceUtil::UpdateChannelsFromListings(uint sourceid, const QString& inputtype, bool wait)

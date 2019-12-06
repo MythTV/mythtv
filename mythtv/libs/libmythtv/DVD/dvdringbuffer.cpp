@@ -1734,7 +1734,7 @@ bool DVDRingBuffer::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
                     sub->num_rects = 0;
                 }
 
-                uint8_t *bitmap = (uint8_t*) av_malloc(w * h);
+                auto *bitmap = (uint8_t*) av_malloc(w * h);
                 sub->num_rects = (NumMenuButtons() > 0) ? 2 : 1;
                 sub->rects = (AVSubtitleRect **)
                         av_mallocz(sizeof(AVSubtitleRect*) * sub->num_rects);
@@ -2307,7 +2307,7 @@ int DVDRingBuffer::find_smallest_bounding_rectangle(AVSubtitle *s)
 
     int w = x2 - x1 + 1;
     int h = y2 - y1 + 1;
-    uint8_t *bitmap = (uint8_t*) av_malloc(w * h);
+    auto *bitmap = (uint8_t*) av_malloc(w * h);
     if (!bitmap)
         return 1;
 

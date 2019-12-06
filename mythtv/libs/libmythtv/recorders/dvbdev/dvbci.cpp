@@ -1547,7 +1547,6 @@ cLlCiHandler::~cLlCiHandler()
 {
   cMutexLock MutexLock(&m_mutex);
   for (int i = 0; i < MAX_CI_SESSION; i++)
-    if (m_sessions[i] != nullptr)
       delete m_sessions[i];
   delete m_tpl;
   close(m_fdCa);

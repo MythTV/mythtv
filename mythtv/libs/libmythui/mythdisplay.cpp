@@ -103,8 +103,7 @@ MythDisplay* MythDisplay::AcquireRelease(bool Acquire)
 }
 
 MythDisplay::MythDisplay()
-  : QObject(),
-    ReferenceCounter("Display")
+  : ReferenceCounter("Display")
 {
     m_screen = GetDesiredScreen();
     DebugScreen(m_screen, "Using");
@@ -273,18 +272,18 @@ void MythDisplay::ScreenRemoved(QScreen* qScreen)
 
 float MythDisplay::SanitiseRefreshRate(int Rate)
 {
-    static const float default_rate = 1000000.0F / 60.0F;
-    float fixed = default_rate;
+    static const float kDefaultRate = 1000000.0F / 60.0F;
+    float fixed = kDefaultRate;
     if (Rate > 0)
     {
         fixed = static_cast<float>(Rate) / 2.0F;
-        if (fixed < default_rate)
-            fixed = default_rate;
+        if (fixed < kDefaultRate)
+            fixed = kDefaultRate;
     }
     return fixed;
 }
 
-DisplayInfo MythDisplay::GetDisplayInfo(int)
+DisplayInfo MythDisplay::GetDisplayInfo(int /*VideoRate*/)
 {
     // This is the final fallback when no other platform specifics are available
     // It is usually accurate apart from the refresh rate - which is often
@@ -554,7 +553,7 @@ std::vector<double> MythDisplay::GetRefreshRates(int Width, int Height)
     return drv[static_cast<size_t>(t)].RefreshRates();
 }
 
-bool MythDisplay::SwitchToVideoMode(int, int, double)
+bool MythDisplay::SwitchToVideoMode(int /*Width*/, int /*Height*/, double /*FrameRate*/)
 {
     return false;
 }

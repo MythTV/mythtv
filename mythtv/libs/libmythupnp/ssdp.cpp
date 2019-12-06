@@ -129,10 +129,7 @@ SSDP::~SSDP()
 
     for (int nIdx = 0; nIdx < kNumberOfSockets; nIdx++ )
     {
-        if (m_Sockets[ nIdx ] != nullptr )
-        {
-            delete m_Sockets[ nIdx ];
-        }
+        delete m_Sockets[ nIdx ];
     }
 
     LOG(VB_UPNP, LOG_INFO, "SSDP Thread Terminated." );

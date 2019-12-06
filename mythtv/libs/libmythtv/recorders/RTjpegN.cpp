@@ -533,8 +533,8 @@ void RTjpeg::QuantInit(void)
 
 void RTjpeg::Quant(int16_t *_block, int32_t *qtbl)
 {
- mmx_t *ql=(mmx_t *)qtbl;
- mmx_t *bl=(mmx_t *)_block;
+ auto *ql=(mmx_t *)qtbl;
+ auto *bl=(mmx_t *)_block;
 
  movq_m2r(RTjpeg_ones, mm6);
  movq_m2r(RTjpeg_half, mm7);

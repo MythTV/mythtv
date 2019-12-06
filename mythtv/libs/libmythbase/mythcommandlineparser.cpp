@@ -821,7 +821,7 @@ void CommandLineArg::SetBlocks(CommandLineArg *other, bool forward)
 
 /** \brief Mark a list of arguments as mutually exclusive
  */
-void CommandLineArg::AllowOneOf(QList<CommandLineArg*> args)
+void CommandLineArg::AllowOneOf(const QList<CommandLineArg*>& args)
 {
     // TODO: blocks do not get set properly if multiple dummy arguments
     //       are provided. since this method will not have access to the

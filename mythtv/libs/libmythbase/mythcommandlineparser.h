@@ -63,7 +63,7 @@ class MBASE_PUBLIC CommandLineArg : public ReferenceCounter
     CommandLineArg* SetDeprecated(QString depstr = "");
     CommandLineArg* SetRemoved(QString remstr = "", QString remver = "");
 
-    static void     AllowOneOf(QList<CommandLineArg*> args);
+    static void     AllowOneOf(const QList<CommandLineArg*>& args);
 
     void            PrintVerbose(void) const;
 
