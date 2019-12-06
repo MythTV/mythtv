@@ -7,8 +7,6 @@
 
 #include <unistd.h> // for usleep()
 
-using std::vector;
-
 void ProgramInfoUpdater::insert(
     uint     recordedid, PIAction action, uint64_t filesize)
 {
