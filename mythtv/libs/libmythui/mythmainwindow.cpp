@@ -1382,23 +1382,11 @@ void MythMainWindow::Show(void)
 {
     bool inwindow = GetMythDB()->GetBoolSetting("RunFrontendInWindow", false);
     bool fullscreen = d->m_doesFillScreen && !MythUIHelper::IsGeometryOverridden();
-
     if (fullscreen && !inwindow && !d->m_firstinit)
-    {
         showFullScreen();
-    }
     else
-    {
         show();
-    }
     d->m_firstinit = false;
-
-#ifdef Q_WS_MACX_OLDQT
-    if (d->m_doesFillScreen)
-        HideMenuBar();
-    else
-        ShowMenuBar();
-#endif
 }
 
 void MythMainWindow::MoveResize(QRect &Geometry)
@@ -1411,7 +1399,6 @@ void MythMainWindow::MoveResize(QRect &Geometry)
         d->m_paintwin->setFixedSize(Geometry.size());
         d->m_paintwin->setGeometry(0, 0, Geometry.width(), Geometry.height());
     }
-
 }
 
 uint MythMainWindow::PushDrawDisabled(void)
