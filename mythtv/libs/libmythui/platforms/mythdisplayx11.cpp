@@ -139,7 +139,7 @@ const std::vector<MythDisplayMode>& MythDisplayX11::GetVideoModes(void)
         if (interlaced)
         {
             LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Ignoring interlaced mode %1x%2 %3i")
-                .arg(width).arg(height).arg(rate));
+                .arg(width).arg(height).arg(rate, 2, 'f', 2, '0'));
             continue;
         }
 
