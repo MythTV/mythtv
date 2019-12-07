@@ -86,11 +86,8 @@ const std::vector<DisplayResScreen>& MythDisplayOSX::GetVideoModes(void)
 
     //CFRelease(displayModes); // this release causes a segfault
 
-    DisplayResMapCIt it = screen_map.begin();
-
-    for (; screen_map.end() != it; ++it)
+    for (auto it = screen_map.begin(); screen_map.end() != it; ++it)
         m_videoModes.push_back(it->second);
-
     return m_videoModes;
 }
 

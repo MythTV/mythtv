@@ -448,9 +448,9 @@ void MythDisplay::SwitchToDesktop()
 */
 bool MythDisplay::SwitchToVideo(int Width, int Height, double Rate)
 {
-    Mode next_mode = VIDEO; // default VIDEO mode
-    DisplayResScreen next = m_mode[next_mode];
-    double target_rate = 0.0;
+    Mode nextmode = VIDEO; // default VIDEO mode
+    DisplayResScreen next = m_mode[nextmode];
+    double targetrate = 0.0;
 
     // try to find video override mode
     uint64_t key = DisplayResScreen::FindBestScreen(m_inSizeToOutputMode,
@@ -458,7 +458,7 @@ bool MythDisplay::SwitchToVideo(int Width, int Height, double Rate)
 
     if (key != 0)
     {
-        m_mode[next_mode = CUSTOM_VIDEO] = next = m_inSizeToOutputMode[key];
+        m_mode[nextmode = CUSTOM_VIDEO] = next = m_inSizeToOutputMode[key];
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Found custom screen override %1x%2")
             .arg(next.Width()).arg(next.Height()));
     }
@@ -472,18 +472,16 @@ bool MythDisplay::SwitchToVideo(int Width, int Height, double Rate)
     }
 
     // need to change video mode?
-    DisplayResScreen::FindBestMatch(GetVideoModes(), next, target_rate);
+    DisplayResScreen::FindBestMatch(GetVideoModes(), next, targetrate);
 
-    bool chg = !(next == m_last) ||
-               !(DisplayResScreen::compare_rates(m_last.RefreshRate(),
-                                                 target_rate));
+    bool chg = !(next == m_last) || !(DisplayResScreen::CompareRates(m_last.RefreshRate(), targetrate));
 
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("%1 %2x%3 %4 Hz")
         .arg(chg ? "Changing to" : "Using")
         .arg(next.Width()).arg(next.Height())
-        .arg(target_rate, 0, 'f', 3));
+        .arg(targetrate, 0, 'f', 3));
 
-    if (chg && !SwitchToVideoMode(next.Width(), next.Height(), target_rate))
+    if (chg && !SwitchToVideoMode(next.Width(), next.Height(), targetrate))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("SwitchToVideo: Video size %1 x %2: "
                                                "xrandr failed for %3 x %4")
@@ -491,17 +489,17 @@ bool MythDisplay::SwitchToVideo(int Width, int Height, double Rate)
         return false;
     }
 
-    m_curMode = next_mode;
+    m_curMode = nextmode;
 
     m_last = next;
-    m_last.SetRefreshRate(target_rate);
+    m_last.SetRefreshRate(targetrate);
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("SwitchToVideo: Video size %1x%2")
         .arg(Width).arg(Height));
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("%1 displaying resolution %2x%3, %4mmx%5mm")
         .arg((chg) ? "Switched to" : "Already")
         .arg(m_last.Width()).arg(m_last.Height())
-        .arg(m_last.Width_mm()).arg(m_last.Height_mm()));
+        .arg(m_last.WidthMM()).arg(m_last.HeightMM()));
 
     if (chg)
         PauseForModeSwitch();
@@ -521,24 +519,22 @@ bool MythDisplay::SwitchToVideo(int Width, int Height, double Rate)
 bool MythDisplay::SwitchToGUI(Mode NextMode, bool Wait)
 {
     DisplayResScreen next = m_mode[NextMode];
-    auto target_rate = static_cast<double>(NAN);
+    auto targetrate = static_cast<double>(NAN);
 
     // need to change video mode?
     // If GuiVidModeRefreshRate is 0, assume any refresh rate is good enough.
     if (qFuzzyIsNull(next.RefreshRate()))
         next.SetRefreshRate(m_last.RefreshRate());
 
-    DisplayResScreen::FindBestMatch(GetVideoModes(), next, target_rate);
-    bool chg = !(next == m_last) ||
-               !(DisplayResScreen::compare_rates(m_last.RefreshRate(),
-                                                 target_rate));
+    DisplayResScreen::FindBestMatch(GetVideoModes(), next, targetrate);
+    bool chg = !(next == m_last) || !(DisplayResScreen::CompareRates(m_last.RefreshRate(), targetrate));
 
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("%1 %2x%3 %4 Hz")
         .arg(chg ? "Changing to" : "Using")
         .arg(next.Width()).arg(next.Height())
-        .arg(target_rate, 0, 'f', 3));
+        .arg(targetrate, 0, 'f', 3));
 
-    if (chg && !SwitchToVideoMode(next.Width(), next.Height(), target_rate))
+    if (chg && !SwitchToVideoMode(next.Width(), next.Height(), targetrate))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("SwitchToGUI: xrandr failed for %1x%2 %3  Hz")
@@ -553,7 +549,7 @@ bool MythDisplay::SwitchToGUI(Mode NextMode, bool Wait)
     m_curMode = NextMode;
 
     m_last = next;
-    m_last.SetRefreshRate(target_rate);
+    m_last.SetRefreshRate(targetrate);
 
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("SwitchToGUI: Switched to %1x%2 %3 Hz")
         .arg(m_last.Width()).arg(m_last.Height()).arg(GetRefreshRate(), 0, 'f', 3));
@@ -708,7 +704,7 @@ QSize MythDisplay::GetResolution(void)
 
 QSize MythDisplay::GetPhysicalSize(void)
 {
-    return QSize(m_last.Width_mm(), m_last.Height_mm());
+    return QSize(m_last.WidthMM(), m_last.HeightMM());
 }
 
 void MythDisplay::WaitForScreenChange(void)
