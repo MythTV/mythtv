@@ -100,16 +100,6 @@ using_x11 {
     SOURCES += screensaver-x11.cpp
     HEADERS += platforms/mythdisplayx11.h
     SOURCES += platforms/mythdisplayx11.cpp
-    using_xnvctrl {
-        # Add nvidia XV-EXTENSION support
-        HEADERS += platforms/mythnvcontrol.h
-        SOURCES += platforms/mythnvcontrol.cpp
-        ! using_xnvctrl_external {
-            INCLUDEPATH += ../../external/libXNVCtrl
-            LIBS += -L../../external/libXNVCtrl -lmythXNVCtrl-$${LIBVERSION}
-            POST_TARGETDEPS += ../../external/libXNVCtrl/libmythXNVCtrl-$${LIBVERSION}.$${QMAKE_EXTENSION_STATICLIB}
-        }
-    }
 }
 
 using_qtdbus {

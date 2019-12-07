@@ -130,7 +130,6 @@ Advanced options (experts only):
   --disable-asi            disable support for DVEO ASI recorder
   --disable-x11            disable X11 support
   --x11-path=X11LOC        location of X11 include files [$x11_path_default]
-  --disable-xnvctrl        disable xNVCtrl support
   --disable-xrandr         disable X11 resolution switching
   --disable-vdpau          disable NVidia VDPAU hardware acceleration.
   --disable-vaapi          disable VAAPI hardware accelerated video decoding
@@ -1981,8 +1980,6 @@ MYTHTV_CONFIG_LIST='
     v4l1
     valgrind
     x11
-    xnvctrl
-    xnvctrl_external
     libbluray_external
     xrandr
     profiletype
@@ -2771,8 +2768,6 @@ enable v4l1
 enable v4l2
 enable v4l2prime
 enable x11
-enable xnvctrl
-enable xnvctrl_external
 enable xrandr
 disable indevs
 enable libfftw3
@@ -6633,39 +6628,6 @@ if enabled x11; then
     require libXxf86vm "X11/Xdefs.h X11/Xlib.h X11/extensions/xf86vmode.h" XF86VidModeSetClientVersion -lXxf86vm
     require libXinerama X11/extensions/Xinerama.h XineramaQueryExtension -lXinerama
     require libXext "X11/Xdefs.h X11/Xlib.h X11/extensions/Xext.h" XMissingExtension -lXext
-    if enabled xnvctrl; then
-        case $target_os in
-            linux)
-                # Bah. Suse linux doesn't have xnvctrl.
-                . /etc/os-release
-                case $ID in
-                    *suse*)
-			# This is hopefully temporary.
-			disable xnvctrl_external
-			;;
-                    *gentoo*)
-                        if [ -e "/usr/bin/nvidia-settings" ]
-                        then
-                            require XNVctrl "X11/Xlib.h NVCtrl/NVCtrl.h NVCtrl/NVCtrlLib.h" XNVCTRLIsNvScreen -lXNVCtrl || disable xnvctrl
-                        else
-                            disable xnvctrl_external
-                        fi
-                        ;;
-		    *)
-                        require XNVctrl "X11/Xlib.h NVCtrl/NVCtrl.h NVCtrl/NVCtrlLib.h" XNVCTRLIsNvScreen -lXNVCtrl || disable xnvctrl
-                        ;;
-                esac
-                ;;
-            freebsd)
-                # This is hopefully temporary, and will eventually
-                # check for a system library too.
-                disable xnvctrl_external
-                ;;
-            *)
-                disable xnvctrl
-                ;;
-        esac
-    fi
 fi
 
 # CoreVideo in only available on Mac OS 10.4, or on 10.3 with QuickTime 7.
@@ -7400,15 +7362,6 @@ if enabled frontend; then
   echo "# Video Output Support"
   echo "x11 support               ${x11-no}"
 if enabled x11 ; then
-  if enabled xnvctrl; then
-    if enabled xnvctrl_external; then
-      echo "xnvctrl support           yes (system)"
-    else
-      echo "xnvctrl support           yes (internal)"
-    fi
-  else
-      echo "xnvctrl support           no"
-  fi
   echo "xrandr support            ${xrandr-no}"
   echo "VDPAU support             ${vdpau-no}"
   echo "VAAPI support             ${vaapi-no}"
@@ -7919,10 +7872,5 @@ echo "Configuring libudfread..."
 echo "Configuring libmythsoundtouch..."
 (cd external/libmythsoundtouch ;
        ${qmakeconf} -o Makefile)
-if ! enabled xnvctrl_external ; then
-    echo "Configuring libXNVCtrl..."
-    (cd external/libXNVCtrl; \
-           ${qmakeconf} -o Makefile.lib)
-fi
 
 test -n "$WARNINGS" && printf "\n$WARNINGS" || exit 0

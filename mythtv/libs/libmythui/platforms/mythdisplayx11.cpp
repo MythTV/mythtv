@@ -5,10 +5,6 @@
 #include "mythdisplayx11.h"
 #include "mythxdisplay.h"
 
-#ifdef CONFIG_XNVCTRL
-#include "mythnvcontrol.h"
-#endif
-
 #ifdef USING_XRANDR
 #include <X11/extensions/Xrandr.h> // always last
 #endif
