@@ -60,7 +60,7 @@ bool MythDisplayX11::UsingVideoModes(void)
     return false;
 }
 
-const std::vector<DisplayResScreen>& MythDisplayX11::GetVideoModes(void)
+const std::vector<MythDisplayMode>& MythDisplayX11::GetVideoModes(void)
 {
     if (!m_videoModes.empty())
         return m_videoModes;
@@ -117,7 +117,7 @@ const std::vector<DisplayResScreen>& MythDisplayX11::GetVideoModes(void)
     int mmheight = static_cast<int>(output->mm_height);
     m_crtc = output->crtc;
 
-    DisplayResMap screenmap;
+    DisplayModeMap screenmap;
     for (int i = 0; i < output->nmode; ++i)
     {
         RRMode rrmode = output->modes[i];
@@ -130,12 +130,12 @@ const std::vector<DisplayResScreen>& MythDisplayX11::GetVideoModes(void)
         int height = static_cast<int>(mode.height);
         double rate = static_cast<double>(mode.dotClock) / (mode.vTotal * mode.hTotal);
 
-        uint64_t key = DisplayResScreen::CalcKey(width, height, 0.0);
+        uint64_t key = MythDisplayMode::CalcKey(width, height, 0.0);
         if (screenmap.find(key) == screenmap.end())
-            screenmap[key] = DisplayResScreen(width, height, mmwidth, mmheight, -1.0, rate);
+            screenmap[key] = MythDisplayMode(width, height, mmwidth, mmheight, -1.0, rate);
         else
             screenmap[key].AddRefreshRate(rate);
-        m_modeMap.insert(DisplayResScreen::CalcKey(width, height, rate), rrmode);
+        m_modeMap.insert(MythDisplayMode::CalcKey(width, height, rate), rrmode);
     }
 
     for (auto it = screenmap.begin(); screenmap.end() != it; ++it)
@@ -156,8 +156,8 @@ bool MythDisplayX11::SwitchToVideoMode(int Width, int Height, double DesiredRate
         return false;
 
     auto rate = static_cast<double>(NAN);
-    DisplayResScreen desired(Width, Height, 0, 0, -1.0, DesiredRate);
-    int idx = DisplayResScreen::FindBestMatch(m_videoModes, desired, rate);
+    MythDisplayMode desired(Width, Height, 0, 0, -1.0, DesiredRate);
+    int idx = MythDisplayMode::FindBestMatch(m_videoModes, desired, rate);
 
     if (idx < 0)
     {
@@ -165,7 +165,7 @@ bool MythDisplayX11::SwitchToVideoMode(int Width, int Height, double DesiredRate
         return false;
     }
 
-    auto mode = DisplayResScreen::CalcKey(Width, Height, rate);
+    auto mode = MythDisplayMode::CalcKey(Width, Height, rate);
     if (!m_modeMap.contains(mode))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to find mode");

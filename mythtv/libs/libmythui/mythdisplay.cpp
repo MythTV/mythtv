@@ -371,7 +371,7 @@ void MythDisplay::InitialiseModes(void)
     double refreshrate = 1000000.0 / static_cast<double>(info.m_rate);
 
     m_mode[DESKTOP].Init();
-    m_mode[DESKTOP] = DisplayResScreen(pixelwidth, pixelheight, mmwidth, mmheight, -1.0, refreshrate);
+    m_mode[DESKTOP] = MythDisplayMode(pixelwidth, pixelheight, mmwidth, mmheight, -1.0, refreshrate);
     LOG(VB_GENERAL, LOG_NOTICE, LOC + QString("Desktop video mode: %1x%2 %3 Hz")
         .arg(pixelwidth).arg(pixelheight).arg(refreshrate, 0, 'f', 3));
 
@@ -381,7 +381,7 @@ void MythDisplay::InitialiseModes(void)
     double aspectratio = 0.0;
     GetMythDB()->GetResolutionSetting("GuiVidMode", pixelwidth, pixelheight, aspectratio, refreshrate);
     GetMythDB()->GetResolutionSetting("DisplaySize", mmwidth, mmheight);
-    m_mode[GUI] = DisplayResScreen(pixelwidth, pixelheight, mmwidth, mmheight, -1.0, refreshrate);
+    m_mode[GUI] = MythDisplayMode(pixelwidth, pixelheight, mmwidth, mmheight, -1.0, refreshrate);
 
     if (m_mode[DESKTOP] == m_mode[GUI] && qFuzzyIsNull(refreshrate))
     {
@@ -392,7 +392,7 @@ void MythDisplay::InitialiseModes(void)
     // Initialize default VIDEO mode
     pixelwidth = pixelheight = 0;
     GetMythDB()->GetResolutionSetting("TVVidMode", pixelwidth, pixelheight, aspectratio, refreshrate);
-    m_mode[VIDEO] = DisplayResScreen(pixelwidth, pixelheight, mmwidth, mmheight, aspectratio, refreshrate);
+    m_mode[VIDEO] = MythDisplayMode(pixelwidth, pixelheight, mmwidth, mmheight, aspectratio, refreshrate);
 
     // Initialize video override mode
     m_inSizeToOutputMode.clear();
@@ -412,9 +412,9 @@ void MythDisplay::InitialiseModes(void)
         if (!(ih && ow && oh))
             break;
 
-        uint64_t key = DisplayResScreen::CalcKey(iw, ih, irate);
+        uint64_t key = MythDisplayMode::CalcKey(iw, ih, irate);
 
-        DisplayResScreen scr(ow, oh, mmwidth, mmheight, oaspect, orate);
+        MythDisplayMode scr(ow, oh, mmwidth, mmheight, oaspect, orate);
 
         m_inSizeToOutputMode[key] = scr;
     }
@@ -428,7 +428,7 @@ void MythDisplay::InitialiseModes(void)
 */
 bool MythDisplay::NextModeIsLarger(Mode NextMode)
 {
-    DisplayResScreen next = m_mode[NextMode];
+    MythDisplayMode next = m_mode[NextMode];
     return next.Width() > m_last.Width() || next.Height() > m_last.Height();
 }
 
@@ -449,11 +449,11 @@ void MythDisplay::SwitchToDesktop()
 bool MythDisplay::SwitchToVideo(int Width, int Height, double Rate)
 {
     Mode nextmode = VIDEO; // default VIDEO mode
-    DisplayResScreen next = m_mode[nextmode];
+    MythDisplayMode next = m_mode[nextmode];
     double targetrate = 0.0;
 
     // try to find video override mode
-    uint64_t key = DisplayResScreen::FindBestScreen(m_inSizeToOutputMode,
+    uint64_t key = MythDisplayMode::FindBestScreen(m_inSizeToOutputMode,
                    Width, Height, Rate);
 
     if (key != 0)
@@ -472,9 +472,9 @@ bool MythDisplay::SwitchToVideo(int Width, int Height, double Rate)
     }
 
     // need to change video mode?
-    DisplayResScreen::FindBestMatch(GetVideoModes(), next, targetrate);
+    MythDisplayMode::FindBestMatch(GetVideoModes(), next, targetrate);
 
-    bool chg = !(next == m_last) || !(DisplayResScreen::CompareRates(m_last.RefreshRate(), targetrate));
+    bool chg = !(next == m_last) || !(MythDisplayMode::CompareRates(m_last.RefreshRate(), targetrate));
 
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("%1 %2x%3 %4 Hz")
         .arg(chg ? "Changing to" : "Using")
@@ -518,7 +518,7 @@ bool MythDisplay::SwitchToVideo(int Width, int Height, double Rate)
  */
 bool MythDisplay::SwitchToGUI(Mode NextMode, bool Wait)
 {
-    DisplayResScreen next = m_mode[NextMode];
+    MythDisplayMode next = m_mode[NextMode];
     auto targetrate = static_cast<double>(NAN);
 
     // need to change video mode?
@@ -526,8 +526,8 @@ bool MythDisplay::SwitchToGUI(Mode NextMode, bool Wait)
     if (qFuzzyIsNull(next.RefreshRate()))
         next.SetRefreshRate(m_last.RefreshRate());
 
-    DisplayResScreen::FindBestMatch(GetVideoModes(), next, targetrate);
-    bool chg = !(next == m_last) || !(DisplayResScreen::CompareRates(m_last.RefreshRate(), targetrate));
+    MythDisplayMode::FindBestMatch(GetVideoModes(), next, targetrate);
+    bool chg = !(next == m_last) || !(MythDisplayMode::CompareRates(m_last.RefreshRate(), targetrate));
 
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("%1 %2x%3 %4 Hz")
         .arg(chg ? "Changing to" : "Using")
@@ -567,9 +567,9 @@ std::vector<double> MythDisplay::GetRefreshRates(int Width, int Height)
     auto tr = static_cast<double>(NAN);
     std::vector<double> empty;
 
-    const DisplayResScreen drs(Width, Height, 0, 0, -1.0, 0.0);
-    const DisplayResVector& drv = GetVideoModes();
-    int t = DisplayResScreen::FindBestMatch(drv, drs, tr);
+    const MythDisplayMode drs(Width, Height, 0, 0, -1.0, 0.0);
+    const DisplayModeVector& drv = GetVideoModes();
+    int t = MythDisplayMode::FindBestMatch(drv, drs, tr);
 
     if (t < 0)
         return empty;
@@ -582,7 +582,7 @@ bool MythDisplay::SwitchToVideoMode(int, int, double)
     return false;
 }
 
-const DisplayResVector& MythDisplay::GetVideoModes(void)
+const DisplayModeVector& MythDisplay::GetVideoModes(void)
 {
     return m_videoModes;
 }

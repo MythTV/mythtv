@@ -9,7 +9,7 @@
 // MythTV
 #include "mythuiexp.h"
 #include "referencecounter.h"
-#include "DisplayResScreen.h"
+#include "mythdisplaymode.h"
 
 // Std
 #include <cmath>
@@ -63,7 +63,7 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
     static QString      GetExtraScreenInfo(QScreen *qScreen);
 
     virtual bool UsingVideoModes   (void) { return false; }
-    virtual const DisplayResVector& GetVideoModes(void);
+    virtual const DisplayModeVector& GetVideoModes(void);
     bool         NextModeIsLarger  (Mode NextMode);
     bool         NextModeIsLarger  (int Width, int Height);
     void         SwitchToDesktop   (void);
@@ -102,16 +102,16 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
 
     QWidget* m_widget { nullptr };
     QScreen* m_screen { nullptr };
-    mutable std::vector<DisplayResScreen> m_videoModes { };
+    mutable std::vector<MythDisplayMode> m_videoModes { };
 
   private:
     Q_DISABLE_COPY(MythDisplay)
     void PauseForModeSwitch(void);
 
-    Mode             m_curMode            { GUI };
-    DisplayResScreen m_mode[MAX_MODES]    { };
-    DisplayResScreen m_last               { }; // mirror of mode[current_mode]
-    DisplayResMap    m_inSizeToOutputMode { };
+    Mode            m_curMode            { GUI };
+    MythDisplayMode m_mode[MAX_MODES]    { };
+    MythDisplayMode m_last               { }; // mirror of mode[current_mode]
+    DisplayModeMap  m_inSizeToOutputMode { };
 };
 
 #endif // MYTHDISPLAY_H

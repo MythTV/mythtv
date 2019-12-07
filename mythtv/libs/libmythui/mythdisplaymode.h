@@ -1,5 +1,5 @@
-#ifndef DISPLAYRESCREEN_H_
-#define DISPLAYRESCREEN_H_
+#ifndef MYTHDISPLAYMODE_H_
+#define MYTHDISPLAYMODE_H_
 
 // Qt
 #include <QString>
@@ -13,20 +13,20 @@
 #include <map>
 #include <vector>
 
-class DisplayResScreen;
+class MythDisplayMode;
 using namespace std;
-typedef vector<DisplayResScreen> DisplayResVector;
-typedef map<uint64_t, DisplayResScreen> DisplayResMap;
+typedef vector<MythDisplayMode> DisplayModeVector;
+typedef map<uint64_t, MythDisplayMode> DisplayModeMap;
 
-class MUI_PUBLIC DisplayResScreen
+class MUI_PUBLIC MythDisplayMode
 {
   public:
-    bool operator <  (const DisplayResScreen& Other) const;
-    bool operator == (const DisplayResScreen& Other) const;
+    bool operator <  (const MythDisplayMode& Other) const;
+    bool operator == (const MythDisplayMode& Other) const;
 
-    DisplayResScreen() = default;
-    DisplayResScreen(int Width, int Height, int MMWidth, int MMHeight,
-                     double AspectRatio, double RefreshRate);
+    MythDisplayMode() = default;
+    MythDisplayMode(int Width, int Height, int MMWidth, int MMHeight,
+                    double AspectRatio, double RefreshRate);
     void   Init          (void);
     int    Width         (void) const;
     int    Height        (void) const;
@@ -39,11 +39,11 @@ class MUI_PUBLIC DisplayResScreen
     void   ClearRefreshRates(void);
     void   SetRefreshRate(double Rate);
     const std::vector<double>& RefreshRates(void) const;
-    static int      FindBestMatch (const DisplayResVector Modes,
-                                   const DisplayResScreen& Mode, double& TargetRate);
+    static int      FindBestMatch (const DisplayModeVector Modes,
+                                   const MythDisplayMode& Mode, double& TargetRate);
     static uint64_t CalcKey       (int Width, int Height, double Rate);
     static bool     CompareRates  (double First, double Second, double Precision = 0.01);
-    static uint64_t FindBestScreen(const DisplayResMap& Map,
+    static uint64_t FindBestScreen(const DisplayModeMap& Map,
                                    int Width, int Height, double Rate);
 
   private:
@@ -54,4 +54,4 @@ class MUI_PUBLIC DisplayResScreen
     double m_aspect { -1.0 };
     vector<double> m_refreshRates { };
 };
-#endif // DISPLAYRESCREEN_H_
+#endif // MYTHDISPLAYMODE_H_

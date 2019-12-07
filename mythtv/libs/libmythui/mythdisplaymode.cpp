@@ -2,13 +2,13 @@
 #include <QStringList>
 
 // MythTV
-#include "DisplayResScreen.h"
+#include "mythdisplaymode.h"
 
 // Std
 #include <cmath>
 
-DisplayResScreen::DisplayResScreen(int Width, int Height, int MMWidth, int MMHeight,
-                                   double AspectRatio, double RefreshRate)
+MythDisplayMode::MythDisplayMode(int Width, int Height, int MMWidth, int MMHeight,
+                                 double AspectRatio, double RefreshRate)
   : m_width(Width),
     m_height(Height),
     m_widthMM(MMWidth),
@@ -19,7 +19,7 @@ DisplayResScreen::DisplayResScreen(int Width, int Height, int MMWidth, int MMHei
         m_refreshRates.push_back(RefreshRate);
 }
 
-bool DisplayResScreen::operator < (const DisplayResScreen& Other) const
+bool MythDisplayMode::operator < (const MythDisplayMode& Other) const
 {
     if (m_width < Other.m_width)
         return true;
@@ -28,43 +28,43 @@ bool DisplayResScreen::operator < (const DisplayResScreen& Other) const
     return false;
 }
 
-bool DisplayResScreen::operator == (const DisplayResScreen &Other) const
+bool MythDisplayMode::operator == (const MythDisplayMode &Other) const
 {
     return m_width == Other.m_width && m_height == Other.m_height;
 }
 
-void DisplayResScreen::Init(void)
+void MythDisplayMode::Init(void)
 {
     m_width = m_height = m_widthMM = m_heightMM = 0;
     m_aspect = -1.0;
 }
 
-int DisplayResScreen::Width(void) const
+int MythDisplayMode::Width(void) const
 {
     return m_width;
 }
 
-int DisplayResScreen::Height(void) const
+int MythDisplayMode::Height(void) const
 {
     return m_height;
 }
 
-int DisplayResScreen::WidthMM(void) const
+int MythDisplayMode::WidthMM(void) const
 {
     return m_widthMM;
 }
 
-int DisplayResScreen::HeightMM(void) const
+int MythDisplayMode::HeightMM(void) const
 {
     return m_heightMM;
 }
 
-const std::vector<double>& DisplayResScreen::RefreshRates(void) const
+const std::vector<double>& MythDisplayMode::RefreshRates(void) const
 {
     return m_refreshRates;
 }
 
-double DisplayResScreen::AspectRatio() const
+double MythDisplayMode::AspectRatio() const
 {
     if (m_aspect <= 0.0)
     {
@@ -75,14 +75,14 @@ double DisplayResScreen::AspectRatio() const
     return m_aspect;
 }
 
-double DisplayResScreen::RefreshRate() const
+double MythDisplayMode::RefreshRate() const
 {
     if (m_refreshRates.size() >= 1)
         return m_refreshRates[0];
     else return 0.0;
 }
 
-void DisplayResScreen::SetAspectRatio(double AspectRatio)
+void MythDisplayMode::SetAspectRatio(double AspectRatio)
 {
     if (AspectRatio > 0.0)
         m_aspect = AspectRatio;
@@ -90,24 +90,24 @@ void DisplayResScreen::SetAspectRatio(double AspectRatio)
         m_aspect = static_cast<double>(m_widthMM) / m_heightMM;
 }
 
-void DisplayResScreen::AddRefreshRate(double Rate)
+void MythDisplayMode::AddRefreshRate(double Rate)
 {
     m_refreshRates.push_back(Rate);
     std::sort(m_refreshRates.begin(), m_refreshRates.end());
 }
 
-void DisplayResScreen::ClearRefreshRates(void)
+void MythDisplayMode::ClearRefreshRates(void)
 {
     m_refreshRates.clear();
 }
 
-void DisplayResScreen::SetRefreshRate(double Rate)
+void MythDisplayMode::SetRefreshRate(double Rate)
 {
     ClearRefreshRates();
     AddRefreshRate(Rate);
 }
 
-uint64_t DisplayResScreen::CalcKey(int Width, int Height, double Rate)
+uint64_t MythDisplayMode::CalcKey(int Width, int Height, double Rate)
 {
     return (static_cast<uint64_t>(Width) << 34) |
            (static_cast<uint64_t>(Height) << 18) |
@@ -115,13 +115,13 @@ uint64_t DisplayResScreen::CalcKey(int Width, int Height, double Rate)
 }
 
 /// \brief Determine whether two rates are considered equal with the given precision
-bool DisplayResScreen::CompareRates(double First, double Second, double Precision)
+bool MythDisplayMode::CompareRates(double First, double Second, double Precision)
 {
     return qAbs(First - Second) < Precision;
 }
 
-int DisplayResScreen::FindBestMatch(const DisplayResVector Modes,
-                                    const DisplayResScreen& Mode, double &TargetRate)
+int MythDisplayMode::FindBestMatch(const DisplayModeVector Modes,
+                                   const MythDisplayMode& Mode, double &TargetRate)
 {
     double videorate = Mode.RefreshRate();
     bool rate2x = false;
@@ -203,8 +203,8 @@ int DisplayResScreen::FindBestMatch(const DisplayResVector Modes,
         height = ((key) >> 18) & ((1<<16) - 1); \
         width = ((key) >> 34) & ((1<<16) - 1); }
 
-uint64_t DisplayResScreen::FindBestScreen(const DisplayResMap& Map,
-                                          int Width, int Height, double Rate)
+uint64_t MythDisplayMode::FindBestScreen(const DisplayModeMap& Map,
+                                         int Width, int Height, double Rate)
 {
     int width = 0;
     int height = 0;

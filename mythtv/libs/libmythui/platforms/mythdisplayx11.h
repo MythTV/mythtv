@@ -17,7 +17,7 @@ class MythDisplayX11 : public MythDisplay
 
 #ifdef USING_XRANDR
     bool UsingVideoModes(void) override;
-    const std::vector<DisplayResScreen>& GetVideoModes(void) override;
+    const std::vector<MythDisplayMode>& GetVideoModes(void) override;
     bool SwitchToVideoMode(int Width, int Height, double DesiredRate) override;
 #endif
 

@@ -52,7 +52,7 @@ bool MythDisplayOSX::UsingVideoModes(void)
     return false;
 }
 
-const std::vector<DisplayResScreen>& MythDisplayOSX::GetVideoModes(void)
+const std::vector<MythDisplayMode>& MythDisplayOSX::GetVideoModes(void)
 {
     if (!m_videoModes.empty() || !HasMythMainWindow())
         return m_videoModes;
@@ -65,7 +65,7 @@ const std::vector<DisplayResScreen>& MythDisplayOSX::GetVideoModes(void)
     if (nullptr == displayModes)
         return m_videoModes;
 
-    DisplayResMap screen_map;
+    DisplayModeMap screen_map;
 
     for (int i = 0; i < CFArrayGetCount(displayModes); ++i)
     {
@@ -75,11 +75,10 @@ const std::vector<DisplayResScreen>& MythDisplayOSX::GetVideoModes(void)
         int height  = get_int_CF(displayMode, kCGDisplayHeight);
         int refresh = get_int_CF(displayMode, kCGDisplayRefreshRate);
 
-        uint64_t key = DisplayResScreen::CalcKey(width, height, 0.0);
+        uint64_t key = MythDisplayMode::CalcKey(width, height, 0.0);
 
         if (screen_map.find(key) == screen_map.end())
-            screen_map[key] = DisplayResScreen(width, height,
-                                               0, 0, -1.0, (double) refresh);
+            screen_map[key] = MythDisplayMode(width, height, 0, 0, -1.0, (double) refresh);
         else
             screen_map[key].AddRefreshRate(refresh);
     }

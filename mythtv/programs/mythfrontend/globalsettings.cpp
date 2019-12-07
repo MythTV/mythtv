@@ -2271,7 +2271,7 @@ static HostComboBoxSetting *GuiVidModeResolution()
                                           "watching a video."));
 
     MythDisplay* display = MythDisplay::AcquireRelease();
-    vector<DisplayResScreen> scr = display->GetVideoModes();
+    vector<MythDisplayMode> scr = display->GetVideoModes();
     MythDisplay::AcquireRelease(false);
     for (size_t i = 0; i< scr.size(); ++i)
     {
@@ -2292,9 +2292,9 @@ static HostComboBoxSetting *GuiVidModeResolution()
             h = 480;
         }
 
-        DisplayResScreen dscr(w, h, -1, -1, -1.0, 0);
+        MythDisplayMode dscr(w, h, -1, -1, -1.0, 0);
         double rate = -1.0;
-        int i = DisplayResScreen::FindBestMatch(scr, dscr, rate);
+        int i = MythDisplayMode::FindBestMatch(scr, dscr, rate);
         gc->setValue((i >= 0) ? i : scr.size() - 1);
     }
 
@@ -2320,7 +2320,7 @@ static HostComboBoxSetting *TVVidModeResolution(int idx=-1)
     gc->setHelpText(hstr);
 
     MythDisplay* display = MythDisplay::AcquireRelease();
-    vector<DisplayResScreen> scr = display->GetVideoModes();
+    vector<MythDisplayMode> scr = display->GetVideoModes();
     MythDisplay::AcquireRelease(false);
     for (size_t i = 0; i < scr.size(); ++i)
     {
@@ -4594,7 +4594,7 @@ AppearanceSettings::AppearanceSettings()
 
 #if defined(USING_XRANDR) || CONFIG_DARWIN
     MythDisplay* display = MythDisplay::AcquireRelease();
-    vector<DisplayResScreen> scr = display->GetVideoModes();
+    vector<MythDisplayMode> scr = display->GetVideoModes();
     MythDisplay::AcquireRelease(false);
     if (!scr.empty())
         addChild(UseVideoModes());
