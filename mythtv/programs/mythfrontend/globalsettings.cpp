@@ -4584,8 +4584,11 @@ AppearanceSettings::AppearanceSettings()
 
     screen->addChild(GuiSizeForTV());
     screen->addChild(HideMouseCursor());
-    screen->addChild(RunInWindow());
-    screen->addChild(AlwaysOnTop());
+    if (!GetMythMainWindow()->WindowIsAlwaysFullscreen())
+    {
+        screen->addChild(RunInWindow());
+        screen->addChild(AlwaysOnTop());
+    }
     screen->addChild(StartupScreenDelay());
     screen->addChild(GUIFontZoom());
 #ifdef USING_AIRPLAY
