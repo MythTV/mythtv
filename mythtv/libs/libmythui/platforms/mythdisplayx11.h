@@ -22,8 +22,6 @@ class MythDisplayX11 : public MythDisplay
 #endif
 
   private:
-    void DebugModes(const QString& Message) const;
-
     QMap<uint64_t, unsigned long> m_modeMap { };
     unsigned long m_crtc { 0 };
 };

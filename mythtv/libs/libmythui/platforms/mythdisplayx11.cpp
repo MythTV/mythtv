@@ -129,6 +129,19 @@ const std::vector<MythDisplayMode>& MythDisplayX11::GetVideoModes(void)
         int width = static_cast<int>(mode.width);
         int height = static_cast<int>(mode.height);
         double rate = static_cast<double>(mode.dotClock) / (mode.vTotal * mode.hTotal);
+        bool interlaced = mode.modeFlags & RR_Interlace;
+        if (interlaced)
+            rate *= 2.0;
+
+        // TODO don't filter out interlaced modes but ignore them in MythDisplayMode
+        // when not required. This may then be used in future to allow 'exact' match
+        // display modes to display interlaced material on interlaced displays
+        if (interlaced)
+        {
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Ignoring interlaced mode %1x%2 %3i")
+                .arg(width).arg(height).arg(rate));
+            continue;
+        }
 
         uint64_t key = MythDisplayMode::CalcKey(width, height, 0.0);
         if (screenmap.find(key) == screenmap.end())
@@ -141,7 +154,7 @@ const std::vector<MythDisplayMode>& MythDisplayX11::GetVideoModes(void)
     for (auto it = screenmap.begin(); screenmap.end() != it; ++it)
         m_videoModes.push_back(it->second);
 
-    DebugModes("XRandr modes");
+    DebugModes();
     XRRFreeOutputInfo(output);
     XRRFreeScreenResources(res);
     delete display;
@@ -201,23 +214,3 @@ bool MythDisplayX11::SwitchToVideoMode(int Width, int Height, double DesiredRate
     return RRSetConfigSuccess == status;
 }
 #endif
-
-void MythDisplayX11::DebugModes(const QString& Message) const
-{
-    // This is intentionally formatted to match the output of xrandr for comparison
-    if (VERBOSE_LEVEL_CHECK(VB_PLAYBACK, LOG_INFO))
-    {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + Message + ":");
-        auto it = m_videoModes.crbegin();
-        for ( ; it != m_videoModes.crend(); ++it)
-        {
-            auto rates = (*it).RefreshRates();
-            QStringList rateslist;
-            auto it2 = rates.crbegin();
-            for ( ; it2 != rates.crend(); ++it2)
-                rateslist.append(QString("%1").arg(*it2, 2, 'f', 2, '0'));
-            LOG(VB_PLAYBACK, LOG_INFO, QString("%1x%2\t%3")
-                .arg((*it).Width()).arg((*it).Height()).arg(rateslist.join("\t")));
-        }
-    }
-}

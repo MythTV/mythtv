@@ -91,6 +91,7 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
     MythDisplay();
     virtual ~MythDisplay();
 
+    void         DebugModes         (void) const;
     void         SetWidget          (QWidget *MainWindow);
     QScreen*     GetDesiredScreen   (void);
     static void  DebugScreen        (QScreen *qScreen, const QString &Message);
