@@ -3,6 +3,7 @@
 
 // MythTV
 #include "mythframe.h"
+#include "videoouttypes.h"
 
 // Std
 #include <vector>
@@ -20,17 +21,18 @@ class MythEGLDMABUF
     static bool HaveDMABuf(MythRenderOpenGL *Context);
     vector<MythVideoTexture*> CreateTextures(AVDRMFrameDescriptor* Desc,
                                              MythRenderOpenGL *Context,
-                                             VideoFrame *Frame);
+                                             VideoFrame *Frame,
+                                             FrameScanType Scan = kScan_Progressive);
 
   private:
     vector<MythVideoTexture*> CreateComposed(AVDRMFrameDescriptor* Desc,
-                                                           MythRenderOpenGL *Context,
-                                                           VideoFrame *Frame);
+                                             MythRenderOpenGL *Context,
+                                             VideoFrame *Frame,
+                                             FrameScanType Scan);
     vector<MythVideoTexture*> CreateSeparate(AVDRMFrameDescriptor* Desc,
-                                                           MythRenderOpenGL *Context,
-                                                           VideoFrame *Frame);
+                                             MythRenderOpenGL *Context,
+                                             VideoFrame *Frame);
     bool m_useModifiers { false };
-    bool m_gltwo        { true };
 };
 
 #endif // MYTHEGLDMABUF_H

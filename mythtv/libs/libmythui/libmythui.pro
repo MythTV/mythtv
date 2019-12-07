@@ -33,7 +33,7 @@ HEADERS += mythuiclock.h mythuitextedit.h mythprogressdialog.h mythuispinbox.h
 HEADERS += mythuicheckbox.h mythuibuttonlist.h mythuigroup.h
 HEADERS += mythuiprogressbar.h mythuifilebrowser.h
 HEADERS += screensaver.h screensaver-null.h x11colors.h
-HEADERS += themeinfo.h platforms/mythxdisplay.h DisplayResScreen.h
+HEADERS += themeinfo.h platforms/mythxdisplay.h mythdisplaymode.h
 HEADERS += mythgenerictree.h mythuibuttontree.h mythuiutils.h
 HEADERS += mythvirtualkeyboard.h mythuishape.h mythuiguidegrid.h
 HEADERS += mythrender_base.h mythfontmanager.h mythuieditbar.h
@@ -54,7 +54,7 @@ SOURCES += mythuiclock.cpp mythuitextedit.cpp mythprogressdialog.cpp
 SOURCES += mythuispinbox.cpp mythuicheckbox.cpp mythuibuttonlist.cpp
 SOURCES += mythuigroup.cpp mythuiprogressbar.cpp
 SOURCES += screensaver.cpp screensaver-null.cpp x11colors.cpp
-SOURCES += themeinfo.cpp platforms/mythxdisplay.cpp DisplayResScreen.cpp
+SOURCES += themeinfo.cpp platforms/mythxdisplay.cpp mythdisplaymode.cpp
 SOURCES += mythgenerictree.cpp mythuibuttontree.cpp mythuiutils.cpp
 SOURCES += mythvirtualkeyboard.cpp mythuishape.cpp mythuiguidegrid.cpp
 SOURCES += mythfontmanager.cpp mythuieditbar.cpp
@@ -100,16 +100,6 @@ using_x11 {
     SOURCES += screensaver-x11.cpp
     HEADERS += platforms/mythdisplayx11.h
     SOURCES += platforms/mythdisplayx11.cpp
-    using_xnvctrl {
-        # Add nvidia XV-EXTENSION support
-        HEADERS += platforms/mythnvcontrol.h
-        SOURCES += platforms/mythnvcontrol.cpp
-        ! using_xnvctrl_external {
-            INCLUDEPATH += ../../external/libXNVCtrl
-            LIBS += -L../../external/libXNVCtrl -lmythXNVCtrl-$${LIBVERSION}
-            POST_TARGETDEPS += ../../external/libXNVCtrl/libmythXNVCtrl-$${LIBVERSION}.$${QMAKE_EXTENSION_STATICLIB}
-        }
-    }
 }
 
 using_qtdbus {

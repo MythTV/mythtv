@@ -2477,7 +2477,6 @@ void SubtitleScreen::AddAssEvent(char *event)
 
 void SubtitleScreen::ResizeAssRenderer(void)
 {
-    // TODO this probably won't work properly for anamorphic content and XVideo
     ass_set_frame_size(m_assRenderer, m_safeArea.width(), m_safeArea.height());
     ass_set_margins(m_assRenderer, 0, 0, 0, 0);
     ass_set_use_margins(m_assRenderer, static_cast<int>(true));

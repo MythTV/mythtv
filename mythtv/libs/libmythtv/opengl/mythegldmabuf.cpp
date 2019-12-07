@@ -20,9 +20,6 @@ MythEGLDMABUF::MythEGLDMABUF(MythRenderOpenGL *Context)
         OpenGLLocker locker(Context);
         m_useModifiers = Context->IsEGL() && Context->HasEGLExtension("EGL_EXT_image_dma_buf_import_modifiers");
         QSurfaceFormat fmt = Context->format();
-        // NB this forces GL_TEXTURE_EXTERNAL_OES texture type for GLES2
-        // untested on GLES3 or GL2
-        m_gltwo = fmt.majorVersion() < 3;
     }
 }
 
@@ -58,89 +55,102 @@ static void inline DebugDRMFrame(AVDRMFrameDescriptor* Desc)
 
 inline vector<MythVideoTexture*> MythEGLDMABUF::CreateComposed(AVDRMFrameDescriptor* Desc,
                                                                MythRenderOpenGL *Context,
-                                                               VideoFrame *Frame)
+                                                               VideoFrame *Frame, FrameScanType Scan)
 {
-    vector<QSize> sizes;
-    sizes.emplace_back(QSize(Frame->width, Frame->height));
-    vector<MythVideoTexture*> textures =
-            MythVideoTexture::CreateTextures(Context, Frame->codec, FMT_RGBA32, sizes,
-                                             m_gltwo ? GL_TEXTURE_EXTERNAL_OES : QOpenGLTexture::Target2D);
-    for (uint i = 0; i < textures.size(); ++i)
-        textures[i]->m_allowGLSLDeint = false;
-
-    EGLint colourspace = EGL_ITU_REC709_EXT;
-    switch (Frame->colorspace)
-    {
-        case AVCOL_SPC_BT470BG:
-        case AVCOL_SPC_SMPTE170M:
-        case AVCOL_SPC_SMPTE240M:
-            colourspace = EGL_ITU_REC601_EXT;
-            break;
-        case AVCOL_SPC_BT2020_CL:
-        case AVCOL_SPC_BT2020_NCL:
-            colourspace = EGL_ITU_REC2020_EXT;
-            break;
-        default:
-            if (Frame->width < 1280)
-                colourspace = EGL_ITU_REC601_EXT;
-            break;
-    }
-
-    static constexpr EGLint kPlaneFd[4] =
-        { EGL_DMA_BUF_PLANE0_FD_EXT, EGL_DMA_BUF_PLANE1_FD_EXT,
-          EGL_DMA_BUF_PLANE2_FD_EXT, EGL_DMA_BUF_PLANE3_FD_EXT };
-    static constexpr EGLint kPlaneOffset[4] =
-        { EGL_DMA_BUF_PLANE0_OFFSET_EXT, EGL_DMA_BUF_PLANE1_OFFSET_EXT,
-          EGL_DMA_BUF_PLANE2_OFFSET_EXT, EGL_DMA_BUF_PLANE3_OFFSET_EXT };
-    static constexpr EGLint kPlanePitch[4] =
-        { EGL_DMA_BUF_PLANE0_PITCH_EXT, EGL_DMA_BUF_PLANE1_PITCH_EXT,
-          EGL_DMA_BUF_PLANE2_PITCH_EXT, EGL_DMA_BUF_PLANE3_PITCH_EXT };
-    static constexpr EGLint kPlaneModlo[4] =
-        { EGL_DMA_BUF_PLANE0_MODIFIER_LO_EXT, EGL_DMA_BUF_PLANE1_MODIFIER_LO_EXT,
-          EGL_DMA_BUF_PLANE2_MODIFIER_LO_EXT, EGL_DMA_BUF_PLANE3_MODIFIER_LO_EXT };
-    static constexpr EGLint kPlaneModhi[4] =
-        { EGL_DMA_BUF_PLANE0_MODIFIER_HI_EXT, EGL_DMA_BUF_PLANE1_MODIFIER_HI_EXT,
-          EGL_DMA_BUF_PLANE2_MODIFIER_HI_EXT, EGL_DMA_BUF_PLANE3_MODIFIER_HI_EXT };
-
-    AVDRMLayerDescriptor* layer = &Desc->layers[0];
-
-    QVector<EGLint> attribs = {
-        EGL_LINUX_DRM_FOURCC_EXT,      static_cast<EGLint>(layer->format),
-        EGL_WIDTH,                     Frame->width,
-        EGL_HEIGHT,                    Frame->height,
-        EGL_YUV_COLOR_SPACE_HINT_EXT,  colourspace,
-        EGL_SAMPLE_RANGE_HINT_EXT,     Frame->colorrange == AVCOL_RANGE_JPEG ? EGL_YUV_FULL_RANGE_EXT : EGL_YUV_NARROW_RANGE_EXT,
-        EGL_YUV_CHROMA_VERTICAL_SITING_HINT_EXT,   EGL_YUV_CHROMA_SITING_0_EXT,
-        EGL_YUV_CHROMA_HORIZONTAL_SITING_HINT_EXT, EGL_YUV_CHROMA_SITING_0_EXT
-    };
-
-    for (int plane = 0; plane < layer->nb_planes; ++plane)
-    {
-        AVDRMPlaneDescriptor* drmplane = &layer->planes[plane];
-        attribs << kPlaneFd[plane]     << Desc->objects[drmplane->object_index].fd
-                << kPlaneOffset[plane] << static_cast<EGLint>(drmplane->offset)
-                << kPlanePitch[plane]  << static_cast<EGLint>(drmplane->pitch);
-        if (m_useModifiers && (Desc->objects[drmplane->object_index].format_modifier != 0 /* DRM_FORMAT_MOD_NONE*/))
-        {
-            attribs << kPlaneModlo[plane]
-                    << static_cast<EGLint>(Desc->objects[drmplane->object_index].format_modifier & 0xffffffff)
-                    << kPlaneModhi[plane]
-                    << static_cast<EGLint>(Desc->objects[drmplane->object_index].format_modifier >> 32);
-        }
-    }
-    attribs << EGL_NONE;
-
-    EGLImageKHR image = Context->eglCreateImageKHR(Context->GetEGLDisplay(), EGL_NO_CONTEXT,
-                                                   EGL_LINUX_DMA_BUF_EXT, nullptr, attribs.data());
-    if (!image)
-        LOG(VB_GENERAL, LOG_ERR, LOC + QString("No EGLImage '%1'").arg(Context->GetEGLError()));
-    MythVideoTexture *texture = textures[0];
-    Context->glBindTexture(texture->m_target, texture->m_textureId);
-    Context->eglImageTargetTexture2DOES(texture->m_target, image);
-    Context->glBindTexture(texture->m_target, 0);
-    texture->m_data = static_cast<unsigned char *>(image);
     vector<MythVideoTexture*> result;
-    result.push_back(texture);
+    for (int i = 0; i < (Scan == kScan_Progressive ? 1 : 2); ++i)
+    {
+        vector<QSize> sizes;
+        int frameheight = Scan == kScan_Progressive ? Frame->height : Frame->height >> 1;
+        sizes.emplace_back(QSize(Frame->width, frameheight));
+        vector<MythVideoTexture*> textures =
+                MythVideoTexture::CreateTextures(Context, Frame->codec, FMT_RGBA32, sizes,
+                                                 GL_TEXTURE_EXTERNAL_OES);
+        for (uint j = 0; j < textures.size(); ++j)
+            textures[j]->m_allowGLSLDeint = false;
+
+        EGLint colourspace = EGL_ITU_REC709_EXT;
+        switch (Frame->colorspace)
+        {
+            case AVCOL_SPC_BT470BG:
+            case AVCOL_SPC_SMPTE170M:
+            case AVCOL_SPC_SMPTE240M:
+                colourspace = EGL_ITU_REC601_EXT;
+                break;
+            case AVCOL_SPC_BT2020_CL:
+            case AVCOL_SPC_BT2020_NCL:
+                colourspace = EGL_ITU_REC2020_EXT;
+                break;
+            default:
+                if (Frame->width < 1280)
+                    colourspace = EGL_ITU_REC601_EXT;
+                break;
+        }
+
+        static constexpr EGLint kPlaneFd[4] =
+            { EGL_DMA_BUF_PLANE0_FD_EXT, EGL_DMA_BUF_PLANE1_FD_EXT,
+              EGL_DMA_BUF_PLANE2_FD_EXT, EGL_DMA_BUF_PLANE3_FD_EXT };
+        static constexpr EGLint kPlaneOffset[4] =
+            { EGL_DMA_BUF_PLANE0_OFFSET_EXT, EGL_DMA_BUF_PLANE1_OFFSET_EXT,
+              EGL_DMA_BUF_PLANE2_OFFSET_EXT, EGL_DMA_BUF_PLANE3_OFFSET_EXT };
+        static constexpr EGLint kPlanePitch[4] =
+            { EGL_DMA_BUF_PLANE0_PITCH_EXT, EGL_DMA_BUF_PLANE1_PITCH_EXT,
+              EGL_DMA_BUF_PLANE2_PITCH_EXT, EGL_DMA_BUF_PLANE3_PITCH_EXT };
+        static constexpr EGLint kPlaneModlo[4] =
+            { EGL_DMA_BUF_PLANE0_MODIFIER_LO_EXT, EGL_DMA_BUF_PLANE1_MODIFIER_LO_EXT,
+              EGL_DMA_BUF_PLANE2_MODIFIER_LO_EXT, EGL_DMA_BUF_PLANE3_MODIFIER_LO_EXT };
+        static constexpr EGLint kPlaneModhi[4] =
+            { EGL_DMA_BUF_PLANE0_MODIFIER_HI_EXT, EGL_DMA_BUF_PLANE1_MODIFIER_HI_EXT,
+              EGL_DMA_BUF_PLANE2_MODIFIER_HI_EXT, EGL_DMA_BUF_PLANE3_MODIFIER_HI_EXT };
+
+        AVDRMLayerDescriptor* layer = &Desc->layers[0];
+
+        QVector<EGLint> attribs = {
+            EGL_LINUX_DRM_FOURCC_EXT,      static_cast<EGLint>(layer->format),
+            EGL_WIDTH,                     Frame->width,
+            EGL_HEIGHT,                    frameheight,
+            EGL_YUV_COLOR_SPACE_HINT_EXT,  colourspace,
+            EGL_SAMPLE_RANGE_HINT_EXT,     Frame->colorrange == AVCOL_RANGE_JPEG ? EGL_YUV_FULL_RANGE_EXT : EGL_YUV_NARROW_RANGE_EXT,
+            EGL_YUV_CHROMA_VERTICAL_SITING_HINT_EXT,   EGL_YUV_CHROMA_SITING_0_EXT,
+            EGL_YUV_CHROMA_HORIZONTAL_SITING_HINT_EXT, EGL_YUV_CHROMA_SITING_0_EXT
+        };
+
+        for (int plane = 0; plane < layer->nb_planes; ++plane)
+        {
+            AVDRMPlaneDescriptor* drmplane = &layer->planes[plane];
+            ptrdiff_t pitch  = drmplane->pitch;
+            ptrdiff_t offset = drmplane->offset;
+            if (Scan != kScan_Progressive)
+            {
+                if (i > 0)
+                    offset += pitch;
+                pitch = pitch << 1;
+            }
+            attribs << kPlaneFd[plane]     << Desc->objects[drmplane->object_index].fd
+                    << kPlaneOffset[plane] << static_cast<EGLint>(offset)
+                    << kPlanePitch[plane]  << static_cast<EGLint>(pitch);
+            if (m_useModifiers && (Desc->objects[drmplane->object_index].format_modifier != 0 /* DRM_FORMAT_MOD_NONE*/))
+            {
+                attribs << kPlaneModlo[plane]
+                        << static_cast<EGLint>(Desc->objects[drmplane->object_index].format_modifier & 0xffffffff)
+                        << kPlaneModhi[plane]
+                        << static_cast<EGLint>(Desc->objects[drmplane->object_index].format_modifier >> 32);
+            }
+        }
+        attribs << EGL_NONE;
+
+        EGLImageKHR image = Context->eglCreateImageKHR(Context->GetEGLDisplay(), EGL_NO_CONTEXT,
+                                                       EGL_LINUX_DMA_BUF_EXT, nullptr, attribs.data());
+        if (!image)
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("No EGLImage '%1'").arg(Context->GetEGLError()));
+        MythVideoTexture *texture = textures[0];
+        Context->glBindTexture(texture->m_target, texture->m_textureId);
+        Context->eglImageTargetTexture2DOES(texture->m_target, image);
+        Context->glBindTexture(texture->m_target, 0);
+        texture->m_data = static_cast<unsigned char *>(image);
+        result.push_back(texture);
+    }
+
     return result;
 }
 
@@ -160,7 +170,7 @@ inline vector<MythVideoTexture*> MythEGLDMABUF::CreateSeparate(AVDRMFrameDescrip
     VideoFrameType format = PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->sw_pix_fmt));
     vector<MythVideoTexture*> result =
             MythVideoTexture::CreateTextures(Context, Frame->codec, format, sizes,
-                                             m_gltwo ? GL_TEXTURE_EXTERNAL_OES : QOpenGLTexture::Target2D);
+                                             QOpenGLTexture::Target2D);
     for (uint i = 0; i < result.size(); ++i)
         result[i]->m_allowGLSLDeint = true;
 
@@ -204,7 +214,8 @@ inline vector<MythVideoTexture*> MythEGLDMABUF::CreateSeparate(AVDRMFrameDescrip
 
 vector<MythVideoTexture*> MythEGLDMABUF::CreateTextures(AVDRMFrameDescriptor* Desc,
                                                         MythRenderOpenGL *Context,
-                                                        VideoFrame *Frame)
+                                                        VideoFrame *Frame,
+                                                        FrameScanType Scan)
 {
     vector<MythVideoTexture*> result;
     if (!Desc || !Context || !Frame)
@@ -233,7 +244,7 @@ vector<MythVideoTexture*> MythEGLDMABUF::CreateTextures(AVDRMFrameDescriptor* De
 
     // One layer with X planes
     if (numlayers == 1)
-        return CreateComposed(Desc, Context, Frame);
+        return CreateComposed(Desc, Context, Frame, Scan);
     // X layers with one plane each
     return CreateSeparate(Desc, Context, Frame);
 }

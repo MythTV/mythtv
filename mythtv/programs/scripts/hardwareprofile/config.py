@@ -29,9 +29,9 @@ FS_T_FILTER=False
 FS_M_FILTER=True
 
 try:
-    p = Popen(['rpm', '-ql', 'filesystem'], stdout=PIPE)
-    p.wait()
-    FS_MOUNTS = p.stdout.read().strip()
+    # This doesn't appear to be used and the old rpm command didn't return mounts.
+    p = Popen(['findmnt', '--noheadings', '--output', 'TARGET', '--raw', '--real'], stdout=PIPE)
+    FS_MOUNTS = p.stdout.read().decode('utf-8')
 except OSError:
     FS_MOUNTS = ''
 

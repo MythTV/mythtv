@@ -431,6 +431,11 @@ bool MythOpenGLVideo::SetupFrameFormat(VideoFrameType InputType, VideoFrameType 
     m_textureTarget = TextureTarget;
     m_videoDim = Size;
 
+    // This is only currently needed for RGBA32 frames from composed DRM_PRIME
+    // textures that may be half height for simple bob deinterlacing
+    if (m_inputType == FMT_DRMPRIME && m_outputType == FMT_RGBA32)
+        emit OutputChanged(m_videoDim, m_videoDim, -1.0F);
+
     if (!format_is_hw(InputType))
     {
         vector<QSize> sizes;

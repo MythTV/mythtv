@@ -2709,6 +2709,9 @@ void MythPlayer::SwitchToProgram(void)
     Pause();
     ChangeSpeed();
 
+    // Release all frames to ensure the current decoder resources are released
+    DiscardVideoFrames(true, true);
+
     if (newIsDummy)
     {
         OpenDummy();
@@ -2860,6 +2863,10 @@ void MythPlayer::JumpToProgram(void)
     Pause();
     ChangeSpeed();
     ResetCaptions();
+
+    // Release all frames to ensure the current decoder resources are released
+    DiscardVideoFrames(true, true);
+
     player_ctx->m_tvchain->SetProgram(*pginfo);
     player_ctx->m_buffer->Reset(true);
 
@@ -4262,7 +4269,7 @@ void MythPlayer::ClearBeforeSeek(uint64_t Frames)
     MythCodecID codec = decoder ? decoder->GetVideoCodecID() : kCodec_NONE;
     decoder_change_lock.unlock();
     if (codec_is_mediacodec(codec))
-        videoOutput->DiscardFrames(true);
+        videoOutput->DiscardFrames(true, true);
 #else
     Q_UNUSED(Frames);
 #endif

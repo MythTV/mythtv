@@ -3,9 +3,6 @@ include ../config.mak
 SUBDIRS = FFmpeg libmythdvdnav libudfread
 SUBDIRS += libmythsoundtouch
 
-ifneq ($(CONFIG_XNVCTRL_EXTERNAL),yes)
-    SUBDIRS += libXNVCtrl
-endif
 ifneq ($(CONFIG_LIBBLURAY_EXTERNAL),yes)
     SUBDIRS += libmythbluray
 endif
@@ -38,9 +35,6 @@ libudfread-all libudfread-clean libudfread-distclean libudfread-install libudfre
 
 libmythsoundtouch-all libmythsoundtouch-clean libmythsoundtouch-distclean libmythsoundtouch-install libmythsoundtouch-uninstall:
 	${MAKE} -C libmythsoundtouch ${@:libmythsoundtouch-%=%}
-
-libXNVCtrl-all libXNVCtrl-install libXNVCtrl-uninstall libXNVCtrl-clean libXNVCtrl-distclean:
-	${MAKE} -C libXNVCtrl -f Makefile.lib ${@:libXNVCtrl-%=%}
 
 nv-codec-headers-distclean:
 	rm -rf nv-codec-headers/install nv-codec-headers/ffnvcodec.pc

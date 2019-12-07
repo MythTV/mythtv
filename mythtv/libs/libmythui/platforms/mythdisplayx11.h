@@ -1,6 +1,9 @@
 #ifndef MYTHDISPLAYX11_H
 #define MYTHDISPLAYX11_H
 
+// Qt
+#include <QMap>
+
 // MythTV
 #include "mythdisplay.h"
 
@@ -14,14 +17,13 @@ class MythDisplayX11 : public MythDisplay
 
 #ifdef USING_XRANDR
     bool UsingVideoModes(void) override;
-    const std::vector<DisplayResScreen>& GetVideoModes(void) override;
+    const std::vector<MythDisplayMode>& GetVideoModes(void) override;
     bool SwitchToVideoMode(int Width, int Height, double DesiredRate) override;
 #endif
 
   private:
-    void DebugModes(const QString& Message) const;
-
-    mutable std::vector<DisplayResScreen> m_videoModesUnsorted { };
+    QMap<uint64_t, unsigned long> m_modeMap { };
+    unsigned long m_crtc { 0 };
 };
 
 #endif // MYTHDISPLAYX11_H

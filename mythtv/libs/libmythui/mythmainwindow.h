@@ -44,6 +44,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     void ReinitDone(void);
     void Show(void);
     void MoveResize(QRect &Geometry);
+    bool WindowIsAlwaysFullscreen(void);
 
     void AddScreenStack(MythScreenStack *stack, bool main = false);
     void PopScreenStack();

@@ -269,7 +269,6 @@ MythVideoOutput::MythVideoOutput()
 MythVideoOutput::~MythVideoOutput()
 {
     delete m_dbDisplayProfile;
-    MythVideoOutput::ResizeForGui();
     if (m_display)
         MythDisplay::AcquireRelease(false);
 }
@@ -909,17 +908,6 @@ void MythVideoOutput::DiscardFrames(bool KeyFrame, bool /*unused*/)
 }
 
 /**
- * \fn VideoOutput::ResizeForGui(void)
- * If we are using DisplayRes support, return the screen size and
- * refresh rate to those used for the GUI.
- */
-void MythVideoOutput::ResizeForGui(void)
-{
-    if (m_display && m_display->UsingVideoModes())
-        m_display->SwitchToGUI();
-}
-
-/**
  * \fn VideoOutput::ResizeForVideo(uint width, uint height)
  * Sets display parameters based on video resolution.
  *
@@ -946,6 +934,12 @@ void MythVideoOutput::ResizeForVideo(int Width, int Height)
     }
 
     float rate = m_dbDisplayProfile ? m_dbDisplayProfile->GetOutput() : 0.0F;
+
+    bool hide = m_display->NextModeIsLarger(Width, Height);
+    MythMainWindow* window = GetMythMainWindow();
+    if (hide)
+        window->hide();
+
     if (m_display->SwitchToVideo(Width, Height, static_cast<double>(rate)))
     {
         // Switching to custom display resolution succeeded
@@ -970,9 +964,18 @@ void MythVideoOutput::ResizeForVideo(int Width, int Height)
             QSize sz = m_display->GetResolution();
             QRect display_visible_rect = QRect(GetMythMainWindow()->geometry().topLeft(), sz);
             if (HasMythMainWindow())
+            {
+                if (hide)
+                {
+                    window->Show();
+                    hide = false;
+                }
                 GetMythMainWindow()->MoveResize(display_visible_rect);
+            }
         }
     }
+    if (hide)
+        window->Show();
 }
 
 /**
@@ -1027,6 +1030,9 @@ void MythVideoOutput::InitDisplayMeasurements(void)
         disp_aspect = static_cast<float>(gCoreContext->GetFloatSettingOnHost(
             "XineramaMonitorAspectRatio",
             gCoreContext->GetHostName(), static_cast<double>(pixel_aspect)));
+        // Auto setting
+        if (disp_aspect < 0.1F)
+            disp_aspect = static_cast<float>(m_display->EstimateVirtualAspectRatio());
         if (disp_dim.height() <= 0)
             disp_dim.setHeight(300);
         disp_dim.setWidth(static_cast<int>(lroundf(disp_dim.height() * disp_aspect)));

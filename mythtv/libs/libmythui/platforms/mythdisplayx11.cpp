@@ -5,10 +5,6 @@
 #include "mythdisplayx11.h"
 #include "mythxdisplay.h"
 
-#ifdef CONFIG_XNVCTRL
-#include "mythnvcontrol.h"
-#endif
-
 #ifdef USING_XRANDR
 #include <X11/extensions/Xrandr.h> // always last
 #endif
@@ -52,31 +48,6 @@ DisplayInfo MythDisplayX11::GetDisplayInfo(int VideoRate)
 }
 
 #ifdef USING_XRANDR
-static XRRScreenConfiguration *GetScreenConfig(MythXDisplay*& display)
-{
-    display = OpenMythXDisplay();
-    if (!display)
-        return nullptr;
-
-    Window root = RootWindow(display->GetDisplay(), display->GetScreen());
-
-    XRRScreenConfiguration *cfg = nullptr;
-    int event_basep = 0;
-    int error_basep = 0;
-
-    if (XRRQueryExtension(display->GetDisplay(), &event_basep, &error_basep))
-        cfg = XRRGetScreenInfo(display->GetDisplay(), root);
-
-    if (!cfg)
-    {
-        delete display;
-        display = nullptr;
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Unable to XRRgetScreenInfo");
-    }
-
-    return cfg;
-}
-
 bool MythDisplayX11::UsingVideoModes(void)
 {
     if (gCoreContext)
@@ -84,126 +55,157 @@ bool MythDisplayX11::UsingVideoModes(void)
     return false;
 }
 
-const std::vector<DisplayResScreen>& MythDisplayX11::GetVideoModes(void)
+const std::vector<MythDisplayMode>& MythDisplayX11::GetVideoModes(void)
 {
     if (!m_videoModes.empty())
         return m_videoModes;
 
-    MythXDisplay *display = nullptr;
-    XRRScreenConfiguration *cfg = GetScreenConfig(display);
-    if (!cfg)
+    m_videoModes.clear();
+    m_modeMap.clear();
+
+    MythXDisplay *display = OpenMythXDisplay();
+    if (!display)
         return m_videoModes;
 
-    int num_sizes = 0;
-    int num_rates = 0;
-
-    XRRScreenSize *sizes = XRRConfigSizes(cfg, &num_sizes);
-    for (int i = 0; i < num_sizes; ++i)
+    RROutput current = 0;
+    XRROutputInfo *output = nullptr;
+    XRRScreenResources* res = XRRGetScreenResourcesCurrent(display->GetDisplay(), display->GetRoot());
+    for (int i = 0; i < res->noutput; ++i)
     {
-        short *rates = nullptr;
-        rates = XRRRates(display->GetDisplay(), display->GetScreen(),
-                         i, &num_rates);
-        DisplayResScreen scr(sizes[i].width, sizes[i].height,
-                             sizes[i].mwidth, sizes[i].mheight,
-                             rates, static_cast<uint>(num_rates));
-        m_videoModes.push_back(scr);
+        if (output)
+        {
+            XRRFreeOutputInfo(output);
+            output = nullptr;
+        }
+
+        output = XRRGetOutputInfo(display->GetDisplay(), res, res->outputs[i]);
+        if (!output || output->nameLen < 1)
+            continue;
+        if (output->connection != RR_Connected)
+        {
+            LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Output '%1' is disconnected")
+                .arg(output->name));
+            continue;
+        }
+
+        QString name(output->name);
+        if (name == m_screen->name())
+        {
+            LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Matched '%1' to output %2")
+                .arg(m_screen->name()).arg(res->outputs[i]));
+            current = res->outputs[i];
+            break;
+        }
     }
-    XRRFreeScreenConfigInfo(cfg);
 
-    DebugModes("Raw/unsorted XRANDR modes");
+    if (!current)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to find an output that matches '%1'")
+            .arg(m_screen->name()));
+        XRRFreeOutputInfo(output);
+        XRRFreeScreenResources(res);
+        delete display;
+        return m_videoModes;
+    }
 
-#if defined (CONFIG_XNVCTRL)
-    if (MythNVControl::GetNvidiaRates(display, m_videoModes))
-        DebugModes("Updated/sorted XRANDR modes (interlaced modes may be removed)");
-#endif
+    int mmwidth = static_cast<int>(output->mm_width);
+    int mmheight = static_cast<int>(output->mm_height);
+    m_crtc = output->crtc;
 
-    m_videoModesUnsorted = m_videoModes;
-    std::sort(m_videoModes.begin(), m_videoModes.end());
+    DisplayModeMap screenmap;
+    for (int i = 0; i < output->nmode; ++i)
+    {
+        RRMode rrmode = output->modes[i];
+        XRRModeInfo mode = res->modes[i];
+        if (mode.id != rrmode)
+            continue;
+        if (!(mode.dotClock > 1 && mode.vTotal > 1 && mode.hTotal > 1))
+            continue;
+        int width = static_cast<int>(mode.width);
+        int height = static_cast<int>(mode.height);
+        double rate = static_cast<double>(mode.dotClock) / (mode.vTotal * mode.hTotal);
+        bool interlaced = mode.modeFlags & RR_Interlace;
+        if (interlaced)
+            rate *= 2.0;
+
+        // TODO don't filter out interlaced modes but ignore them in MythDisplayMode
+        // when not required. This may then be used in future to allow 'exact' match
+        // display modes to display interlaced material on interlaced displays
+        if (interlaced)
+        {
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Ignoring interlaced mode %1x%2 %3i")
+                .arg(width).arg(height).arg(rate, 2, 'f', 2, '0'));
+            continue;
+        }
+
+        uint64_t key = MythDisplayMode::CalcKey(width, height, 0.0);
+        if (screenmap.find(key) == screenmap.end())
+            screenmap[key] = MythDisplayMode(width, height, mmwidth, mmheight, -1.0, rate);
+        else
+            screenmap[key].AddRefreshRate(rate);
+        m_modeMap.insert(MythDisplayMode::CalcKey(width, height, rate), rrmode);
+    }
+
+    for (auto it = screenmap.begin(); screenmap.end() != it; ++it)
+        m_videoModes.push_back(it->second);
+
+    DebugModes();
+    XRRFreeOutputInfo(output);
+    XRRFreeScreenResources(res);
     delete display;
-
     return m_videoModes;
 }
 
 bool MythDisplayX11::SwitchToVideoMode(int Width, int Height, double DesiredRate)
 {
+    if (!m_crtc)
+        (void)GetVideoModes();
+    if (!m_crtc)
+        return false;
+
     auto rate = static_cast<double>(NAN);
-    DisplayResScreen desired_screen(Width, Height, 0, 0, -1.0, DesiredRate);
-    int idx = DisplayResScreen::FindBestMatch(m_videoModesUnsorted, desired_screen, rate);
+    MythDisplayMode desired(Width, Height, 0, 0, -1.0, DesiredRate);
+    int idx = MythDisplayMode::FindBestMatch(m_videoModes, desired, rate);
 
-    if (idx >= 0)
+    if (idx < 0)
     {
-        MythXDisplay *display = nullptr;
-        XRRScreenConfiguration *cfg = GetScreenConfig(display);
-
-        if (!cfg)
-            return false;
-
-        Rotation rot = 0;
-
-        XRRConfigCurrentConfiguration(cfg, &rot);
-
-        // Search real xrandr rate for desired_rate
-        auto finalrate = static_cast<short>(rate);
-
-        for (size_t i = 0; i < m_videoModes.size(); i++)
-        {
-            if ((m_videoModes[i].Width() == Width) && (m_videoModes[i].Height() == Height))
-            {
-                if (m_videoModes[i].Custom())
-                {
-                    finalrate = m_videoModes[i].realRates[rate];
-                    LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                        QString("Dynamic TwinView rate found, set %1Hz as "
-                                "XRandR %2") .arg(rate) .arg(finalrate));
-                }
-
-                break;
-            }
-        }
-
-        Window root = display->GetRoot();
-
-        Status status = XRRSetScreenConfigAndRate(display->GetDisplay(), cfg,
-                        root, idx, rot, finalrate,
-                        CurrentTime);
-
-        XRRFreeScreenConfigInfo(cfg);
-
-        // Force refresh of xf86VidMode current modeline
-        cfg = XRRGetScreenInfo(display->GetDisplay(), root);
-        if (cfg)
-            XRRFreeScreenConfigInfo(cfg);
-
-        delete display;
-
-        if (RRSetConfigSuccess != status)
-            LOG(VB_GENERAL, LOG_ERR, LOC + "XRRSetScreenConfigAndRate() call failed.");
-
-        return RRSetConfigSuccess == status;
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Desired resolution and frame rate not found.");
+        return false;
     }
 
-    LOG(VB_GENERAL, LOG_ERR, LOC + "Desired resolution and frame rate not found.");
+    auto mode = MythDisplayMode::CalcKey(Width, Height, rate);
+    if (!m_modeMap.contains(mode))
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to find mode");
+        return false;
+    }
 
-    return false;
+    MythXDisplay *display = OpenMythXDisplay();
+    if (!display)
+        return false;
+
+    Status status = RRSetConfigFailed;
+    XRRScreenResources* res = XRRGetScreenResourcesCurrent(display->GetDisplay(), display->GetRoot());
+    if (res)
+    {
+        XRRCrtcInfo *currentcrtc = XRRGetCrtcInfo(display->GetDisplay(), res, m_crtc);
+        if (currentcrtc)
+        {
+            status = XRRSetCrtcConfig(display->GetDisplay(), res, m_crtc, CurrentTime,
+                                      currentcrtc->x, currentcrtc->y, m_modeMap.value(mode),
+                                      currentcrtc->rotation, currentcrtc->outputs,
+                                      currentcrtc->noutput);
+            XRRFreeCrtcInfo(currentcrtc);
+            XRRScreenConfiguration *config = XRRGetScreenInfo(display->GetDisplay(), display->GetRoot());
+            if (config)
+                XRRFreeScreenConfigInfo(config);
+        }
+        XRRFreeScreenResources(res);
+    }
+    delete display;
+
+    if (RRSetConfigSuccess != status)
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to set video mode");
+    return RRSetConfigSuccess == status;
 }
 #endif
-
-void MythDisplayX11::DebugModes(const QString& Message) const
-{
-    // This is intentionally formatted to match the output of xrandr for comparison
-    if (VERBOSE_LEVEL_CHECK(VB_PLAYBACK, LOG_INFO))
-    {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + Message + ":");
-        auto it = m_videoModes.cbegin();
-        for ( ; it != m_videoModes.cend(); ++it)
-        {
-            const std::vector<double>& rates = (*it).RefreshRates();
-            QStringList rateslist;
-            auto it2 = rates.crbegin();
-            for ( ; it2 != rates.crend(); ++it2)
-                rateslist.append(QString("%1").arg(*it2, 2, 'f', 2, '0'));
-            LOG(VB_PLAYBACK, LOG_INFO, QString("%1x%2\t%3")
-                .arg((*it).Width()).arg((*it).Height()).arg(rateslist.join("\t")));
-        }
-    }
-}

@@ -68,7 +68,6 @@ class MythVideoOutput
     virtual void EmbedInWidget(const QRect &EmbedRect);
     bool         IsEmbedding(void);
     virtual void StopEmbedding(void);
-    virtual void ResizeForGui(void);
     virtual void ResizeForVideo(int Width = 0, int Height = 0);
     virtual void Zoom(ZoomDirection Direction);
     virtual void ToggleMoveBottomLine(void);

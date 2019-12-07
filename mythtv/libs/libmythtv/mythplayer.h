@@ -608,7 +608,7 @@ class MTV_PUBLIC MythPlayer
     // Private seeking stuff
     void WaitForSeek(uint64_t frame, uint64_t seeksnap_wanted);
     void ClearAfterSeek(bool clearvideobuffers = true);
-    static void ClearBeforeSeek(uint64_t Frames);
+    void ClearBeforeSeek(uint64_t Frames);
 
     // Private chapter stuff
     virtual bool DoJumpChapter(int chapter);

@@ -33,7 +33,8 @@ enum GLFeatures
     kGLBufferMap   = 0x0001,
     kGLExtRects    = 0x0002,
     kGLExtRGBA16   = 0x0004,
-    kGLExtSubimage = 0x0008
+    kGLExtSubimage = 0x0008,
+    kGLTiled       = 0x0010
 };
 
 #define TEX_OFFSET 8

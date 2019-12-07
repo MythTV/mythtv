@@ -61,12 +61,21 @@ void DetectLetterbox::Detect(VideoFrame *Frame)
     switch (Frame->codec)
     {
         case FMT_YV12:
-            if (!m_firstFrameChecked)
+        case FMT_YUV420P9:
+        case FMT_YUV420P10:
+        case FMT_YUV420P12:
+        case FMT_YUV420P14:
+        case FMT_YUV420P16:
+        case FMT_NV12:
+        case FMT_P010:
+        case FMT_P016:
+            if (!m_firstFrameChecked || m_frameType != Frame->codec)
             {
                 m_firstFrameChecked = Frame->frameNumber;
                 LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("'%1' frame format detected")
                     .arg(format_description(Frame->codec)));
             }
+            m_frameType = Frame->codec;
             break;
         default:
             LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("'%1' frame format is not supported")
@@ -116,14 +125,32 @@ void DetectLetterbox::Detect(VideoFrame *Frame)
     if (averageY > 64) // Too bright to be a letterbox border
         averageY = 0;
 
+    // Note - for 10/12 bit etc we only sample the most significant byte
+    bool triplanar = format_is_420(m_frameType);
+    int depth = ColorDepth(m_frameType);
+    int leftshift = depth > 8 ? 1 : 0;
+    int rightshift = depth > 8 ? 0 : 1;
+
     // Scan the detection lines
     for (int y = 5; y < height / 4; y++) // skip first pixels incase of noise in the edge
     {
         for (int detectionLine = 0; detectionLine < NUMBER_OF_DETECTION_LINES; detectionLine++)
         {
-            int Y = buf[offsets[0] +  y     * pitches[0] +  xPos[detectionLine]];
-            int U = buf[offsets[1] + (y>>1) * pitches[1] + (xPos[detectionLine]>>1)];
-            int V = buf[offsets[2] + (y>>1) * pitches[2] + (xPos[detectionLine]>>1)];
+            int Y = buf[offsets[0] + y * pitches[0] + (xPos[detectionLine] << leftshift)];
+            int U = 0;
+            int V = 0;
+            if (triplanar)
+            {
+                U = buf[offsets[1] + (y>>1) * pitches[1] + (xPos[detectionLine] >> rightshift)];
+                V = buf[offsets[2] + (y>>1) * pitches[2] + (xPos[detectionLine] >> rightshift)];
+            }
+            else
+            {
+                int offset = offsets[1] + ((y >> 1) * pitches[1]) + (xPos[detectionLine & ~0x1] << leftshift);
+                U = buf[offset];
+                V = buf[offset + (1 << leftshift)];
+            }
+
             if ((!topHit[detectionLine]) &&
                 ( Y > averageY + THRESHOLD || Y < averageY - THRESHOLD ||
                   U < 128 - 32 || U > 128 + 32 ||
@@ -136,9 +163,19 @@ void DetectLetterbox::Detect(VideoFrame *Frame)
                 maxTop = y;
             }
 
-            Y = buf[offsets[0] + (height-y-1     ) * pitches[0] + xPos[detectionLine]];
-            U = buf[offsets[1] + ((height-y-1) >> 1) * pitches[1] + (xPos[detectionLine]>>1)];
-            V = buf[offsets[2] + ((height-y-1) >> 1) * pitches[2] + (xPos[detectionLine]>>1)];
+            Y = buf[offsets[0] + (height-y-1) * pitches[0] + (xPos[detectionLine] << leftshift)];
+            if (triplanar)
+            {
+                U = buf[offsets[1] + ((height-y-1) >> 1) * pitches[1] + (xPos[detectionLine] >> rightshift)];
+                V = buf[offsets[2] + ((height-y-1) >> 1) * pitches[2] + (xPos[detectionLine] >> rightshift)];
+            }
+            else
+            {
+                int offset = offsets[1] + (((height - y -1) >> 1) * pitches[1]) + (xPos[detectionLine & ~0x1] << leftshift);
+                U = buf[offset];
+                V = buf[offset + (1 << leftshift)];
+            }
+
             if ((!bottomHit[detectionLine]) &&
                 ( Y > averageY + THRESHOLD || Y < averageY - THRESHOLD ||
                   U < 128 - 32 || U > 128 + 32 ||

@@ -999,7 +999,8 @@ void MythMainWindow::Init(const QString& forcedpainter, bool mayReInit)
     // Set window border based on fullscreen attribute
     Qt::WindowFlags flags = Qt::Window;
 
-    bool inwindow = GetMythDB()->GetBoolSetting("RunFrontendInWindow", false);
+    bool inwindow = GetMythDB()->GetBoolSetting("RunFrontendInWindow", false) &&
+                    !WindowIsAlwaysFullscreen();
     bool fullscreen = d->m_doesFillScreen && !MythUIHelper::IsGeometryOverridden();
 
     // On Compiz/Unit, when the window is fullscreen and frameless changing
@@ -1038,7 +1039,8 @@ void MythMainWindow::Init(const QString& forcedpainter, bool mayReInit)
         setWindowState(Qt::WindowNoState);
     }
 
-    if (gCoreContext->GetBoolSetting("AlwaysOnTop", false))
+    if (gCoreContext->GetBoolSetting("AlwaysOnTop", false) &&
+        !WindowIsAlwaysFullscreen())
     {
         flags |= Qt::WindowStaysOnTopHint;
     }
@@ -1382,23 +1384,11 @@ void MythMainWindow::Show(void)
 {
     bool inwindow = GetMythDB()->GetBoolSetting("RunFrontendInWindow", false);
     bool fullscreen = d->m_doesFillScreen && !MythUIHelper::IsGeometryOverridden();
-
     if (fullscreen && !inwindow && !d->m_firstinit)
-    {
         showFullScreen();
-    }
     else
-    {
         show();
-    }
     d->m_firstinit = false;
-
-#ifdef Q_WS_MACX_OLDQT
-    if (d->m_doesFillScreen)
-        HideMenuBar();
-    else
-        ShowMenuBar();
-#endif
 }
 
 void MythMainWindow::MoveResize(QRect &Geometry)
@@ -1411,7 +1401,19 @@ void MythMainWindow::MoveResize(QRect &Geometry)
         d->m_paintwin->setFixedSize(Geometry.size());
         d->m_paintwin->setGeometry(0, 0, Geometry.width(), Geometry.height());
     }
+}
 
+/// \brief Return true if the current platform only supports fullscreen windows
+bool MythMainWindow::WindowIsAlwaysFullscreen(void)
+{
+#ifdef Q_OS_ANDROID
+    return true;
+#else
+    // this may need to cover other platform plugins
+    if (qApp->platformName().toLower().contains("eglfs"))
+        return true;
+    return false;
+#endif
 }
 
 uint MythMainWindow::PushDrawDisabled(void)

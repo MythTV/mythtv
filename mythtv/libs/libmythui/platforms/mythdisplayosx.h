@@ -13,7 +13,7 @@ class MythDisplayOSX : public MythDisplay
     DisplayInfo GetDisplayInfo(int VideoRate = 0) override;
 
     bool UsingVideoModes(void) override;
-    const std::vector<DisplayResScreen>& GetVideoModes(void) override;
+    const std::vector<MythDisplayMode>& GetVideoModes(void) override;
     bool SwitchToVideoMode(int Width, int Height, double DesiredRate) override;
 };
 

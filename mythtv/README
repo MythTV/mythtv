@@ -17,25 +17,20 @@ The following is a list of some of the prerequisites you will need installed:
                 optional in the future, or we may switch to vorbis if they speed
                 optimize things a little more.
 
-   QT - Version 5.3 or greater is required.  You will need the MySQL bindings.
+   QT - Version 5.7 or greater is required.  You will need the MySQL bindings.
         https://www.qt.io
 
    MySQL - You need this setup and working.  Version 5.0.15 or higher is
            required.  http://www.mysql.com
 
-   XMLTV - If you are outside of North America, it's always advised to install
-           the latest version available.  This will do the work
-           of actually grabbing the program information. Get it from
-           http://xmltv.org
+   XMLTV - It's always advised to install the latest version available.  This
+           will do the work  of actually grabbing the program information. Get
+           it from http://xmltv.org
 
            If XMLTV does not have a grabber for your country, then you need
            to create one. For information on how to do this, see the XMLTV
            website at http://xmltv.org
-
-           If you are in North America, you do not need XMLTV.  MythTV has
-           a built-in grabber which uses Schedules Direct as a data source. See
-           the HOWTO for complete instructions on configuring an account.
-
+ 
 See the mythtv-HOWTO.html, .pdf or .txt file in the docs/ subdirectory or on
 http://www.mythtv.org/docs/ for in-depth instructions on installing and
 compiling MythTV and all of the pre-requisites.  It has instructions for

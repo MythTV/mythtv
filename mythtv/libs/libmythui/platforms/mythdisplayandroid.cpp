@@ -2,8 +2,10 @@
 #include <QtAndroidExtras>
 
 // MythTV
+#include "mythlogging.h"
 #include "mythdisplayandroid.h"
 
+#define LOC QString("Display: ")
 
 MythDisplayAndroid::MythDisplayAndroid()
   : MythDisplay()

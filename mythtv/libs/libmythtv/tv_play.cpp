@@ -1290,6 +1290,18 @@ TV::~TV(void)
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "-- lock");
 
     // restore window to gui size and position
+    MythDisplay* display = MythDisplay::AcquireRelease();
+    if (display->UsingVideoModes())
+    {
+        bool hide = display->NextModeIsLarger(MythDisplay::GUI);
+        if (hide)
+            mwnd->hide();
+        display->SwitchToGUI(MythDisplay::GUI, true);
+        if (hide)
+            mwnd->Show();
+    }
+    MythDisplay::AcquireRelease(false);
+
     mwnd->MoveResize(m_savedGuiBounds);
 #ifdef Q_OS_ANDROID
     mwnd->Show();
@@ -8621,15 +8633,28 @@ void TV::DoEditSchedule(int editType)
     m_savedPause = DoSetPauseState(actx, do_pause);
 
     // Resize window to the MythTV GUI size
-    PlayerContext *mctx = GetPlayer(actx,0);
-    mctx->LockDeletePlayer(__FILE__, __LINE__);
-    if (mctx->m_player && mctx->m_player->GetVideoOutput())
-        mctx->m_player->GetVideoOutput()->ResizeForGui();
-    mctx->UnlockDeletePlayer(__FILE__, __LINE__);
-    ReturnPlayerLock(actx);
     MythMainWindow *mwnd = GetMythMainWindow();
+    MythDisplay* display = MythDisplay::AcquireRelease();
+    if (display->UsingVideoModes())
+    {
+        bool hide = display->NextModeIsLarger(MythDisplay::GUI);
+        if (hide)
+            mwnd->hide();
+        display->SwitchToGUI(MythDisplay::GUI, true);
+        if (hide)
+            mwnd->Show();
+    }
+    MythDisplay::AcquireRelease(false);
+
     if (!m_dbUseGuiSizeForTv)
         mwnd->MoveResize(m_savedGuiBounds);
+#ifdef Q_OS_ANDROID
+    mwnd->Show();
+#else
+    mwnd->show();
+#endif
+    ReturnPlayerLock(actx);
+
 
     // Actually show the pop-up UI
     switch (editType)
