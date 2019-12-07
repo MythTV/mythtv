@@ -435,7 +435,7 @@ void NetworkControl::receiveCommand(QString &command)
 {
     LOG(VB_NETWORK, LOG_INFO, LOC +
         QString("NetworkControl::receiveCommand(%1)").arg(command));
-    auto *ncc = static_cast<NetworkControlClient *>(sender());
+    auto *ncc = dynamic_cast<NetworkControlClient *>(sender());
     if (!ncc)
          return;
 
@@ -1182,7 +1182,9 @@ QString NetworkControl::processTheme( NetworkCommand* nc)
         if (!topScreen)
             return QString("ERROR: no top screen found!");
 
-        auto *currType = static_cast<MythUIType*>(topScreen);
+        auto *currType = dynamic_cast<MythUIType*>(topScreen);
+        if (currType == nullptr)
+            return QString("ERROR: cannot cast top screen!");
 
         while (!path.isEmpty())
         {
@@ -1225,7 +1227,9 @@ QString NetworkControl::processTheme( NetworkCommand* nc)
         if (!topScreen)
             return QString("ERROR: no top screen found!");
 
-        auto *currType = static_cast<MythUIType*>(topScreen);
+        auto *currType = dynamic_cast<MythUIType*>(topScreen);
+        if (currType == nullptr)
+            return QString("ERROR: cannot cast top screen!");
 
         while (path.count() > 1)
         {
@@ -1270,10 +1274,9 @@ QString NetworkControl::processTheme( NetworkCommand* nc)
             topScreen = stack->GetTopScreen();
         }
 
+        auto *currType = dynamic_cast<MythUIType*>(topScreen);
         if (!topScreen)
             return QString("ERROR: no top screen found!");
-
-                auto *currType = static_cast<MythUIType*>(topScreen);
 
         while (path.count() > 1)
         {
@@ -1544,7 +1547,10 @@ void NetworkControl::customEvent(QEvent *e)
 {
     if (e->type() == MythEvent::MythEventMessage)
     {
-        auto *me = static_cast<MythEvent *>(e);
+        auto *me = dynamic_cast<MythEvent *>(e);
+        if (me == nullptr)
+            return;
+
         const QString& message = me->Message();
 
         if (message.startsWith("MUSIC_CONTROL"))
@@ -1617,9 +1623,11 @@ void NetworkControl::customEvent(QEvent *e)
     }
     else if (e->type() == NetworkControlCloseEvent::kEventType)
     {
-        auto *ncce = static_cast<NetworkControlCloseEvent*>(e);
-        NetworkControlClient     *ncc  = ncce->getClient();
-
+        auto *ncce = dynamic_cast<NetworkControlCloseEvent*>(e);
+        if (ncce == nullptr)
+            return;
+        
+        NetworkControlClient *ncc  = ncce->getClient();
         deleteClient(ncc);
     }
 }

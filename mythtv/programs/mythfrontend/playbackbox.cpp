@@ -3983,7 +3983,6 @@ void PlaybackBox::customEvent(QEvent *event)
     if (event->type() == DialogCompletionEvent::kEventType)
     {
         auto *dce = dynamic_cast<DialogCompletionEvent*>(event);
-
         if (!dce)
             return;
 
@@ -3994,7 +3993,10 @@ void PlaybackBox::customEvent(QEvent *event)
     }
     else if (event->type() == MythEvent::MythEventMessage)
     {
-        auto *me = static_cast<MythEvent *>(event);
+        auto *me = dynamic_cast<MythEvent *>(event);
+        if (me == nullptr)
+            return;
+
         const QString& message = me->Message();
 
         if (message.startsWith("RECORDING_LIST_CHANGE"))

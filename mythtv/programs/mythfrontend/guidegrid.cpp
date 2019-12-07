@@ -1846,7 +1846,10 @@ void GuideGrid::customEvent(QEvent *event)
 {
     if (event->type() == MythEvent::MythEventMessage)
     {
-        auto *me = static_cast<MythEvent *>(event);
+        auto *me = dynamic_cast<MythEvent *>(event);
+        if (me == nullptr)
+            return;
+
         const QString& message = me->Message();
 
         if (message == "SCHEDULE_CHANGE")
@@ -2004,8 +2007,8 @@ void GuideGrid::customEvent(QEvent *event)
     }
     else if (event->type() == UpdateGuideEvent::kEventType)
     {
-        auto *uge = static_cast<UpdateGuideEvent*>(event);
-        if (uge->m_updater)
+        auto *uge = dynamic_cast<UpdateGuideEvent*>(event);
+        if (uge && uge->m_updater)
         {
             uge->m_updater->ExecuteUI();
             delete uge->m_updater;

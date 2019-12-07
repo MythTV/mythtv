@@ -351,7 +351,10 @@ void GalleryThumbView::customEvent(QEvent *event)
 
     if (event->type() == MythEvent::MythEventMessage)
     {
-        auto  *me = static_cast<MythEvent *>(event);
+        auto *me = dynamic_cast<MythEvent *>(event);
+        if (me == nullptr)
+            return;
+
         const QString& mesg  = me->Message();
         QStringList extra = me->ExtraDataList();
 

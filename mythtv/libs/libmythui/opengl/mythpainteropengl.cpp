@@ -86,7 +86,7 @@ void MythOpenGLPainter::Begin(QPaintDevice *Parent)
 
     if (!m_render)
     {
-        auto* glwin = static_cast<MythPainterWindowGL*>(m_parent);
+        auto* glwin = dynamic_cast<MythPainterWindowGL*>(m_parent);
         if (!glwin)
         {
             LOG(VB_GENERAL, LOG_ERR, "FATAL ERROR: Failed to cast parent to MythPainterWindowGL");

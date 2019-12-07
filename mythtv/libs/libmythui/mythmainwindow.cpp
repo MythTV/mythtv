@@ -2138,6 +2138,7 @@ bool MythMainWindow::eventFilter(QObject * /*watched*/, QEvent *e)
 
             // Work around weird GCC run-time bug. Only manifest on Mac OS X
             if (!ke)
+                // NOLINTNEXTLINE(cppcoreguidelines-pro-type-static-cast-downcast)
                 ke = static_cast<QKeyEvent *>(e);
 
 #ifdef Q_OS_LINUX
@@ -2354,7 +2355,9 @@ bool MythMainWindow::eventFilter(QObject * /*watched*/, QEvent *e)
         {
             ResetIdleTimer();
             ShowMouseCursor(true);
-            auto* qmw = static_cast<QWheelEvent*>(e);
+            auto* qmw = dynamic_cast<QWheelEvent*>(e);
+            if (qmw == nullptr)
+                return false;
             int delta = qmw->delta();
             if (delta>0)
             {
@@ -2391,7 +2394,9 @@ void MythMainWindow::customEvent(QEvent *ce)
 {
     if (ce->type() == MythGestureEvent::kEventType)
     {
-        auto *ge = static_cast<MythGestureEvent*>(ce);
+        auto *ge = dynamic_cast<MythGestureEvent*>(ce);
+        if (ge == nullptr)
+            return;
         MythScreenStack *toplevel = GetMainStack();
         if (toplevel)
         {
@@ -2408,7 +2413,9 @@ void MythMainWindow::customEvent(QEvent *ce)
     }
     else if (ce->type() == ExternalKeycodeEvent::kEventType)
     {
-        auto *eke = static_cast<ExternalKeycodeEvent *>(ce);
+        auto *eke = dynamic_cast<ExternalKeycodeEvent *>(ce);
+        if (eke == nullptr)
+            return;
         int keycode = eke->getKeycode();
 
         QKeyEvent key(QEvent::KeyPress, keycode, Qt::NoModifier);
@@ -2423,7 +2430,9 @@ void MythMainWindow::customEvent(QEvent *ce)
     else if (ce->type() == LircKeycodeEvent::kEventType &&
              !d->m_ignoreLircKeys)
     {
-        auto *lke = static_cast<LircKeycodeEvent *>(ce);
+        auto *lke = dynamic_cast<LircKeycodeEvent *>(ce);
+        if (lke == nullptr)
+            return;
 
         if (LircKeycodeEvent::kLIRCInvalidKeyCombo == lke->modifiers())
         {
@@ -2453,9 +2462,11 @@ void MythMainWindow::customEvent(QEvent *ce)
     else if (ce->type() == JoystickKeycodeEvent::kEventType &&
              !d->m_ignoreJoystickKeys)
     {
-        auto *jke = static_cast<JoystickKeycodeEvent *>(ce);
-        int keycode = jke->getKeycode();
+        auto *jke = dynamic_cast<JoystickKeycodeEvent *>(ce);
+        if (jke == nullptr)
+            return;
 
+        int keycode = jke->getKeycode();
         if (keycode)
         {
             MythUIHelper::ResetScreensaver();
@@ -2486,7 +2497,9 @@ void MythMainWindow::customEvent(QEvent *ce)
 #endif
     else if (ce->type() == MythMediaEvent::kEventType)
     {
-        auto *me = static_cast<MythMediaEvent*>(ce);
+        auto *me = dynamic_cast<MythMediaEvent*>(ce);
+        if (me == nullptr)
+            return;
 
         // A listener based system might be more efficient, but we should never
         // have that many screens open at once so impact should be minimal.
@@ -2523,7 +2536,9 @@ void MythMainWindow::customEvent(QEvent *ce)
     }
     else if (ce->type() == ScreenSaverEvent::kEventType)
     {
-        auto *sse = static_cast<ScreenSaverEvent *>(ce);
+        auto *sse = dynamic_cast<ScreenSaverEvent *>(ce);
+        if (sse == nullptr)
+            return;
         switch (sse->getSSEventType())
         {
             case ScreenSaverEvent::ssetDisable:
@@ -2577,9 +2592,11 @@ void MythMainWindow::customEvent(QEvent *ce)
     }
     else if (ce->type() == MythEvent::MythEventMessage)
     {
-        auto *me = static_cast<MythEvent *>(ce);
-        QString message = me->Message();
+        auto *me = dynamic_cast<MythEvent *>(ce);
+        if (me == nullptr)
+            return;
 
+        QString message = me->Message();
         if (message.startsWith(ACTION_HANDLEMEDIA))
         {
             if (me->ExtraDataCount() == 1)
@@ -2667,9 +2684,11 @@ void MythMainWindow::customEvent(QEvent *ce)
     }
     else if (ce->type() == MythEvent::MythUserMessage)
     {
-        auto *me = static_cast<MythEvent *>(ce);
-        const QString& message = me->Message();
+        auto *me = dynamic_cast<MythEvent *>(ce);
+        if (me == nullptr)
+            return;
 
+        const QString& message = me->Message();
         if (!message.isEmpty())
             ShowOkPopup(message);
     }
@@ -2679,7 +2698,7 @@ void MythMainWindow::customEvent(QEvent *ce)
     }
     else if (ce->type() == MythCallbackEvent::kCallbackType)
     {
-        auto *me = static_cast<MythCallbackEvent*>(ce);
+        auto *me = dynamic_cast<MythCallbackEvent*>(ce);
         if (me && me->m_function)
             me->m_function(me->m_opaque1, me->m_opaque2, me->m_opaque3);
     }

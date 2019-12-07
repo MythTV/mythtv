@@ -100,7 +100,9 @@ void AudioConfigScreen::Init(void)
 {
     StandardSettingDialog::Init();
 
-    auto *settings = static_cast<AudioConfigSettings*>(GetGroupSettings());
+    auto *settings = dynamic_cast<AudioConfigSettings*>(GetGroupSettings());
+    if (settings == nullptr)
+        return;
     settings->CheckConfiguration();
 }
 
