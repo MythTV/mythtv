@@ -137,7 +137,7 @@ bool AudioOutputJACK::OpenDevice()
             .arg(m_main_device));
 
     // Setup volume control
-    if (internal_vol)
+    if (m_internalVol)
         VolumeInit();
 
     // Connect to the Jack audio server
@@ -268,7 +268,7 @@ void AudioOutputJACK::DeinterleaveAudio(const float *aubuf, float **bufs, int nf
     float volumes[JACK_CHANNELS_MAX];
     for (int channel = 0; channel < m_channels; channel++)
     {
-        if (internal_vol)
+        if (m_internalVol)
         {
             // Software volume control - we use an exponential adjustment
             // (perhaps should be log?)
@@ -509,7 +509,7 @@ int AudioOutputJACK::GetVolumeChannel(int channel) const
 {
     unsigned int vol = 0;
 
-    if (!internal_vol)
+    if (!m_internalVol)
         return 100;
 
     if (channel < JACK_CHANNELS_MAX)
@@ -520,7 +520,7 @@ int AudioOutputJACK::GetVolumeChannel(int channel) const
 
 void AudioOutputJACK::SetVolumeChannel(int channel, int volume)
 {
-    if (internal_vol && (channel < JACK_CHANNELS_MAX))
+    if (m_internalVol && (channel < JACK_CHANNELS_MAX))
     {
         m_chan_volumes[channel] = volume;
         if (channel == 0)

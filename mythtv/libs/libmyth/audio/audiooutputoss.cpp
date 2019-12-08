@@ -216,7 +216,7 @@ bool AudioOutputOSS::OpenDevice()
         VBERRENO("Unable to get audio card capabilities");
 
     // Setup volume control
-    if (internal_vol)
+    if (m_internalVol)
         VolumeInit();
 
     // Device opened successfully

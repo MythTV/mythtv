@@ -38,12 +38,12 @@ class MPUBLIC VolumeBase
     void UpdateVolume(void);
     void SyncVolume(void);
     void SetChannels(int new_channels);
-    bool internal_vol            {false};
+    bool      m_internalVol        {false};
 
  private:
 
     int       m_volume             {80};
-    MuteState m_currentMuteState  {kMuteOff};
+    MuteState m_currentMuteState   {kMuteOff};
     bool      m_swvol              {false};
     bool      m_swvolSetting       {false};
     int       m_channels           {0};

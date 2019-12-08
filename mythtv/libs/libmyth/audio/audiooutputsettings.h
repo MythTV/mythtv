@@ -204,13 +204,13 @@ class MPUBLIC AudioOutputSettings
              * processing capabilities of the device connected to the audio card
              * ELD is usually retrieved from EDID CEA-861-E extension.
              */
-        bool         m_has_eld     {false};
+        bool         m_hasEld      {false};
         ELD          m_eld;
 
         std::vector<int> m_sr, m_rates, m_channels;
         std::vector<AudioFormat> m_sf, m_formats;
-        std::vector<int>::iterator m_sr_it;
-        std::vector<AudioFormat>::iterator m_sf_it;
+        std::vector<int>::iterator m_srIt;
+        std::vector<AudioFormat>::iterator m_sfIt;
 };
 
 #endif // _AUDIO_OUTPUT_SETTINGS_H_

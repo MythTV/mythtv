@@ -69,8 +69,8 @@ bool MythCommFlagPlayer::RebuildSeekTable(
     uint64_t pmap_first = 0;
     uint64_t pmap_last  = 0;
 
-    killdecoder = false;
-    framesPlayed = 0;
+    m_killDecoder = false;
+    m_framesPlayed = 0;
 
     // clear out any existing seektables
     m_playerCtx->LockPlayingInfo(__FILE__, __LINE__);
@@ -108,7 +108,7 @@ bool MythCommFlagPlayer::RebuildSeekTable(
     inuse_timer.start();
     save_timer.start();
 
-    decoder->TrackTotalDuration(true);
+    m_decoder->TrackTotalDuration(true);
 
     if (showPercentage)
         cout << "\r                         \r" << flush;
@@ -133,11 +133,11 @@ bool MythCommFlagPlayer::RebuildSeekTable(
                 usleep(200 * 1000);
 
             // If we're already saving, just save a larger block next time..
-            if (RebuildSaver::GetCount(decoder) < 1)
+            if (RebuildSaver::GetCount(m_decoder) < 1)
             {
                 pmap_last = myFramesPlayed;
                 MThreadPool::globalInstance()->start(
-                    new RebuildSaver(decoder, pmap_first, pmap_last),
+                    new RebuildSaver(m_decoder, pmap_first, pmap_last),
                     "RebuildSaver");
                 pmap_first = pmap_last + 1;
             }
@@ -149,13 +149,13 @@ bool MythCommFlagPlayer::RebuildSeekTable(
         {
             ui_timer.restart();
 
-            if (totalFrames)
+            if (m_totalFrames)
             {
                 float elapsed = flagTime.elapsed() * 0.001F;
                 int flagFPS = (elapsed > 0.0F) ?
                     (int)(myFramesPlayed / elapsed) : 0;
 
-                int percentage = myFramesPlayed * 100 / totalFrames;
+                int percentage = myFramesPlayed * 100 / m_totalFrames;
                 if (cb)
                     (*cb)(percentage, cbData);
 
@@ -188,7 +188,7 @@ bool MythCommFlagPlayer::RebuildSeekTable(
         }
 
         if (DecoderGetFrame(kDecodeNothing,true))
-            myFramesPlayed = decoder->GetFramesRead();
+            myFramesPlayed = m_decoder->GetFramesRead();
 
         // H.264 recordings from an HD-PVR contain IDR keyframes,
         // which are the only valid cut points for lossless cuts.
@@ -198,16 +198,16 @@ bool MythCommFlagPlayer::RebuildSeekTable(
         // seektable entries, we can assume it is because of the IDR
         // keyframe setting, and so we rewind and allow h.264 non-IDR
         // I-frames to be treated as keyframes.
-        uint64_t frames = decoder->GetFramesRead();
+        uint64_t frames = m_decoder->GetFramesRead();
         if (!usingIframes &&
             (GetEof() != kEofStateNone || (frames > 1000 && frames < 1100)) &&
-            !decoder->HasPositionMap())
+            !m_decoder->HasPositionMap())
         {
             cout << "No I-frames found, rewinding..." << endl;
-            decoder->DoRewind(0);
-            decoder->Reset(true, true, true);
+            m_decoder->DoRewind(0);
+            m_decoder->Reset(true, true, true);
             pmap_first = pmap_last = myFramesPlayed = 0;
-            decoder->SetIdrOnlyKeyframes(false);
+            m_decoder->SetIdrOnlyKeyframes(false);
             usingIframes = true;
         }
     }
@@ -219,12 +219,12 @@ bool MythCommFlagPlayer::RebuildSeekTable(
     SaveTotalFrames();
 
     SetPlaying(false);
-    killdecoder = true;
+    m_killDecoder = true;
 
     MThreadPool::globalInstance()->start(
-        new RebuildSaver(decoder, pmap_first, myFramesPlayed),
+        new RebuildSaver(m_decoder, pmap_first, myFramesPlayed),
         "RebuildSaver");
-    RebuildSaver::Wait(decoder);
+    RebuildSaver::Wait(m_decoder);
 
     return true;
 }

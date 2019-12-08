@@ -11,7 +11,7 @@ bool MythBDPlayer::HasReachedEof(void) const
     EofState eof = GetEof();
     // DeleteMap and EditMode from the parent MythPlayer should not be
     // relevant here.
-    return eof != kEofStateNone && !allpaused;
+    return eof != kEofStateNone && !m_allPaused;
 }
 
 void MythBDPlayer::PreProcessNormalFrame(void)
@@ -21,10 +21,10 @@ void MythBDPlayer::PreProcessNormalFrame(void)
 
 bool MythBDPlayer::GoToMenu(QString str)
 {
-    if (m_playerCtx->m_buffer->BD() && videoOutput)
+    if (m_playerCtx->m_buffer->BD() && m_videoOutput)
     {
         int64_t pts = 0;
-        VideoFrame *frame = videoOutput->GetLastShownFrame();
+        VideoFrame *frame = m_videoOutput->GetLastShownFrame();
         if (frame)
             pts = (int64_t)(frame->timecode  * 90);
         return m_playerCtx->m_buffer->BD()->GoToMenu(str, pts);
@@ -37,11 +37,11 @@ void MythBDPlayer::DisplayMenu(void)
     if (!m_playerCtx->m_buffer->IsBD())
         return;
 
-    osdLock.lock();
+    m_osdLock.lock();
     BDOverlay *overlay = nullptr;
-    while (osd && (nullptr != (overlay = m_playerCtx->m_buffer->BD()->GetOverlay())))
-        osd->DisplayBDOverlay(overlay);
-    osdLock.unlock();
+    while (m_osd && (nullptr != (overlay = m_playerCtx->m_buffer->BD()->GetOverlay())))
+        m_osd->DisplayBDOverlay(overlay);
+    m_osdLock.unlock();
 }
 
 void MythBDPlayer::DisplayPauseFrame(void)
@@ -71,7 +71,7 @@ bool MythBDPlayer::VideoLoop(void)
         return !IsErrored();
     }
 
-    int nbframes = videoOutput ? videoOutput->ValidVideoFrames() : 0;
+    int nbframes = m_videoOutput ? m_videoOutput->ValidVideoFrames() : 0;
 
     // completely drain the video buffers for certain situations
     bool drain = m_playerCtx->m_buffer->BD()->BDWaitingForPlayer() &&
@@ -79,8 +79,8 @@ bool MythBDPlayer::VideoLoop(void)
 
     if (drain)
     {
-        if (nbframes < 2 && videoOutput)
-            videoOutput->UpdatePauseFrame(disp_timecode);
+        if (nbframes < 2 && m_videoOutput)
+            m_videoOutput->UpdatePauseFrame(m_dispTimecode);
 
         // if we go below the pre-buffering limit, the player will pause
         // so do this 'manually'
@@ -100,16 +100,16 @@ bool MythBDPlayer::VideoLoop(void)
     {
         if (nbframes > 1 && !m_stillFrameShowing)
         {
-            videoOutput->UpdatePauseFrame(disp_timecode);
+            m_videoOutput->UpdatePauseFrame(m_dispTimecode);
             DisplayNormalFrame(false);
             return !IsErrored();
         }
 
         if (!m_stillFrameShowing)
-            needNewPauseFrame = true;
+            m_needNewPauseFrame = true;
 
         // we are in a still frame so pause video output
-        if (!videoPaused)
+        if (!m_videoPaused)
         {
             PauseVideo();
             return !IsErrored();
@@ -130,7 +130,7 @@ bool MythBDPlayer::VideoLoop(void)
     }
     else
     {
-        if (videoPaused && m_stillFrameShowing)
+        if (m_videoPaused && m_stillFrameShowing)
         {
             UnpauseVideo();
             LOG(VB_PLAYBACK, LOG_INFO, LOC + "Exiting still frame.");
@@ -290,7 +290,7 @@ bool MythBDPlayer::SwitchTitle(int title)
         else
         {
             ok = true;
-            forcePositionMapSync = true;
+            m_forcePositionMapSync = true;
         }
     }
 
@@ -448,6 +448,6 @@ void MythBDPlayer::CreateDecoder(char *testbuf, int testreadsize)
                                      testreadsize))
     {
         SetDecoder(new AvFormatDecoderBD(this, *m_playerCtx->m_playingInfo,
-                                         playerFlags));
+                                         m_playerFlags));
     }
 }

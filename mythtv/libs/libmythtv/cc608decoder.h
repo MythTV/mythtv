@@ -52,7 +52,7 @@ class CC608Decoder
     void DecodeVPS(const unsigned char *buf);
     void DecodeWSS(const unsigned char *buf);
 
-    void SetIgnoreTimecode(bool val) { m_ignore_time_code = val; }
+    void SetIgnoreTimecode(bool val) { m_ignoreTimeCode = val; }
 
     uint    GetRatingSystems(bool future) const;
     uint    GetRating(uint i, bool future) const;
@@ -67,7 +67,7 @@ class CC608Decoder
     static QString ToASCII(const QString &cc608, bool suppress_unknown);
 
   private:
-    QChar CharCC(int code) const { return m_stdchar[code]; }
+    QChar CharCC(int code) const { return m_stdChar[code]; }
     void ResetCC(int mode);
     void BufferCC(int mode, int len, int clr);
     int NewRowCC(int mode, int len);
@@ -84,67 +84,67 @@ class CC608Decoder
 
     CC608Input     *m_reader                {nullptr};
 
-    bool            m_ignore_time_code      {false};
+    bool            m_ignoreTimeCode        {false};
 
-    time_t          m_last_seen[4]          {0};
+    time_t          m_lastSeen[4]           {0};
 
     // per-field
-    int             m_badvbi[2]             { 0,  0};
-    int             m_lasttc[2]             { 0,  0};
-    int             m_lastcode[2]           {-1, -1};
-    int             m_lastcodetc[2]         { 0,  0};
-    int             m_ccmode[2]             {-1, -1}; // 0=cc1/txt1, 1=cc2/txt2
+    int             m_badVbi[2]             { 0,  0};
+    int             m_lastTc[2]             { 0,  0};
+    int             m_lastCode[2]           {-1, -1};
+    int             m_lastCodeTc[2]         { 0,  0};
+    int             m_ccMode[2]             {-1, -1}; // 0=cc1/txt1, 1=cc2/txt2
     int             m_xds[2]                { 0,  0};
-    int             m_txtmode[4]            { 0,  0,  0,  0};
+    int             m_txtMode[4]            { 0,  0,  0,  0};
 
     // per-mode state
-    int             m_lastrow[8]            {0};
-    int             m_newrow[8]             {0};
-    int             m_newcol[8]             {0};
-    int             m_newattr[8]            {0}; // color+italic+underline
-    int             m_timecode[8]           {0};
+    int             m_lastRow[8]            {0};
+    int             m_newRow[8]             {0};
+    int             m_newCol[8]             {0};
+    int             m_newAttr[8]            {0}; // color+italic+underline
+    int             m_timeCode[8]           {0};
     int             m_row[8]                {0};
     int             m_col[8]                {0};
-    int             m_rowcount[8]           {0};
+    int             m_rowCount[8]           {0};
     int             m_style[8]              {0};
-    int             m_linecont[8]           {0};
-    int             m_resumetext[8]         {0};
-    int             m_lastclr[8]            {0};
-    QString         m_ccbuf[8];
+    int             m_lineCont[8]           {0};
+    int             m_resumeText[8]         {0};
+    int             m_lastClr[8]            {0};
+    QString         m_ccBuf[8];
 
     // translation table
-    QChar           m_stdchar[128];
+    QChar           m_stdChar[128];
 
     // temporary buffer
     unsigned char  *m_rbuf                  {nullptr};
-    int             m_last_format_tc[2]     {0, 0};
-    int             m_last_format_data[2]   {0, 0};
+    int             m_lastFormatTc[2]       {0, 0};
+    int             m_lastFormatData[2]     {0, 0};
 
     // VPS data
-    char            m_vps_pr_label[20]      {0};
-    char            m_vps_label[20]         {0};
-    int             m_vps_l                 {0};
+    char            m_vpsPrLabel[20]        {0};
+    char            m_vpsLabel[20]          {0};
+    int             m_vpsL                  {0};
 
     // WSS data
-    uint            m_wss_flags             {0};
-    bool            m_wss_valid             {false};
+    uint            m_wssFlags              {0};
+    bool            m_wssValid              {false};
 
-    int             m_xds_cur_service       {-1};
-    vector<unsigned char> m_xds_buf[7];
-    uint            m_xds_crc_passed        {0};
-    uint            m_xds_crc_failed        {0};
+    int             m_xdsCurService         {-1};
+    vector<unsigned char> m_xdsBuf[7];
+    uint            m_xdsCrcPassed          {0};
+    uint            m_xdsCrcFailed          {0};
 
-    mutable QMutex  m_xds_lock              {QMutex::Recursive};
-    uint            m_xds_rating_systems[2] {0};
-    uint            m_xds_rating[2][4]      {{0}};
-    QString         m_xds_program_name[2];
-    vector<uint>    m_xds_program_type[2];
+    mutable QMutex  m_xdsLock               {QMutex::Recursive};
+    uint            m_xdsRatingSystems[2]   {0};
+    uint            m_xdsRating[2][4]       {{0}};
+    QString         m_xdsProgramName[2];
+    vector<uint>    m_xdsProgramType[2];
 
-    QString         m_xds_net_call;
-    QString         m_xds_net_name;
-    uint            m_xds_tsid              {0};
+    QString         m_xdsNetCall;
+    QString         m_xdsNetName;
+    uint            m_xdsTsid               {0};
 
-    QString         m_xds_program_type_string[96];
+    QString         m_xdsProgramTypeString[96];
 };
 
 #endif

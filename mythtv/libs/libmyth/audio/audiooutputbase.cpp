@@ -206,7 +206,7 @@ bool AudioOutputBase::CanPassthrough(int samplerate, int channels,
                                      AVCodecID codec, int profile) const
 {
     DigitalFeature arg = FEATURE_NONE;
-    bool           ret = !(internal_vol && SWVolume());
+    bool           ret = !(m_internalVol && SWVolume());
 
     switch(codec)
     {
@@ -747,7 +747,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
 
     // Turn on float conversion?
     if (m_need_resampler || m_needs_upmix || m_needs_downmix ||
-        m_stretchfactor != 1.0F || (internal_vol && SWVolume()) ||
+        m_stretchfactor != 1.0F || (m_internalVol && SWVolume()) ||
         (m_enc && m_output_format != FORMAT_S16) ||
         !OutputSettings(m_enc || m_passthru)->IsSupportedFormat(m_output_format))
     {
@@ -792,7 +792,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     VBAUDIO(QString("Audio fragment size: %1").arg(m_fragment_size));
 
     // Only used for software volume
-    if (m_set_initial_vol && internal_vol && SWVolume())
+    if (m_set_initial_vol && m_internalVol && SWVolume())
     {
         VBAUDIO("Software volume enabled");
         m_volumeControl  = gCoreContext->GetSetting("MixerControl", "PCM");
@@ -1534,7 +1534,7 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
             org_waud = (org_waud + nFrames * bpf) % kAudioRingBufferSize;
         }
 
-        if (internal_vol && SWVolume())
+        if (m_internalVol && SWVolume())
         {
             org_waud    = m_waud;
             int num     = len;

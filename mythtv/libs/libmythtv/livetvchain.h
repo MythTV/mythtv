@@ -51,22 +51,22 @@ class MTV_PUBLIC LiveTVChain : public ReferenceCounter
 
     // const gets
     QString GetID(void)  const { return m_id; }
-    int  GetCurPos(void) const { return m_curpos; }
+    int  GetCurPos(void) const { return m_curPos; }
     int  ProgramIsAt(uint chanid, const QDateTime &starttime) const;
     int  ProgramIsAt(const ProgramInfo &pginfo) const;
     int  GetLengthAtCurPos(void);
     int  GetLengthAtPos(int pos);
     int  TotalSize(void) const;
     bool HasNext(void)   const;
-    bool HasPrev(void)   const { return (m_curpos > 0); }
+    bool HasPrev(void)   const { return (m_curPos > 0); }
     ProgramInfo *GetProgramAt(int at) const;
     /// Returns true iff a switch is required but no jump is required
     /// m_jumppos sets to INT_MAX means not set
     bool NeedsToSwitch(void) const
-        { return (m_switchid >= 0 && m_jumppos == INT_MAX); }
+        { return (m_switchId >= 0 && m_jumpPos == INT_MAX); }
     /// Returns true iff a switch and jump are required
     bool NeedsToJump(void)   const
-        { return (m_switchid >= 0 && m_jumppos != INT_MAX); }
+        { return (m_switchId >= 0 && m_jumpPos != INT_MAX); }
     QString GetChannelName(int pos = -1) const;
     QString GetInputName(int pos = -1) const;
     QString GetInputType(int pos = -1) const;
@@ -105,20 +105,20 @@ class MTV_PUBLIC LiveTVChain : public ReferenceCounter
 
     QString                 m_id;
     QList<LiveTVChainEntry> m_chain;
-    int                     m_maxpos      {0};
+    int                     m_maxPos      {0};
     mutable QMutex          m_lock        {QMutex::Recursive};
 
-    QString                 m_hostprefix;
-    QString                 m_inputtype;
+    QString                 m_hostPrefix;
+    QString                 m_inputType;
 
-    int                     m_curpos      {0};
-    uint                    m_cur_chanid  {0};
-    QDateTime               m_cur_startts;
+    int                     m_curPos      {0};
+    uint                    m_curChanId   {0};
+    QDateTime               m_curStartTs;
 
-    int                     m_switchid    {-1};
-    LiveTVChainEntry        m_switchentry;
+    int                     m_switchId    {-1};
+    LiveTVChainEntry        m_switchEntry;
 
-    int                     m_jumppos     {INT_MAX};
+    int                     m_jumpPos     {INT_MAX};
 
     mutable QMutex          m_sockLock;
     QList<MythSocket*>      m_inUseSocks;

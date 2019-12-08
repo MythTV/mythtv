@@ -2785,9 +2785,9 @@ void TV::timerEvent(QTimerEvent *te)
         QMutexLocker locker(&m_timerIdLock);
         if (timer_id == m_networkControlTimerId)
         {
-            if (!networkControlCommands.empty())
-                netCmd = networkControlCommands.dequeue();
-            if (networkControlCommands.empty())
+            if (!m_networkControlCommands.empty())
+                netCmd = m_networkControlCommands.dequeue();
+            if (m_networkControlCommands.empty())
             {
                 KillTimer(m_networkControlTimerId);
                 m_networkControlTimerId = 0;
@@ -9645,7 +9645,7 @@ void TV::customEvent(QEvent *e)
                 (tokens2[1] != "ANSWER") && (tokens2[1] != "RESPONSE"))
             {
                 QMutexLocker locker(&m_timerIdLock);
-                networkControlCommands.enqueue(message);
+                m_networkControlCommands.enqueue(message);
                 if (!m_networkControlTimerId)
                     m_networkControlTimerId = StartTimer(1, __LINE__);
             }
@@ -10552,7 +10552,7 @@ void TV::OSDDialogEvent(int result, const QString& text, QString action)
          ShowOSDMenu();
     else if (action == "AUTODETECT_FILL")
     {
-        actx->m_player->detect_letter_box->SetDetectLetterbox(!actx->m_player->detect_letter_box->GetDetectLetterbox());
+        actx->m_player->m_detectLetterBox->SetDetectLetterbox(!actx->m_player->m_detectLetterBox->GetDetectLetterbox());
     }
     else if (action == ACTION_GUIDE)
         EditSchedule(actx, kScheduleProgramGuide);

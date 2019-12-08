@@ -941,7 +941,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     ChannelInfoList     m_channelGroupChannelList;
 
     // Network Control stuff
-    MythDeque<QString> networkControlCommands;
+    MythDeque<QString> m_networkControlCommands;
 
     // Timers
     using TimerContextMap      = QMap<int,PlayerContext*>;

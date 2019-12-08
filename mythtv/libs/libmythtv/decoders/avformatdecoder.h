@@ -325,7 +325,7 @@ class AvFormatDecoder : public DecoderBase
 
     bool               m_force_dts_timestamps         {false};
 
-    PlayerFlags        playerFlags;
+    PlayerFlags        m_playerFlags;
     MythCodecID        m_video_codec_id               {kCodec_NONE};
 
     int                m_maxkeyframedist              {-1};

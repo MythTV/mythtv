@@ -339,7 +339,7 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
     : DecoderBase(parent, pginfo),
       m_is_db_ignored(gCoreContext->IsDatabaseIgnored()),
       m_h264_parser(new H264Parser()),
-      playerFlags(flags),
+      m_playerFlags(flags),
       // Closed Caption & Teletext decoders
       m_ccd608(new CC608Decoder(parent->GetCC608Reader())),
       m_ccd708(new CC708Decoder(parent->GetCC708Reader())),
@@ -359,7 +359,7 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
     m_audioReadAhead = gCoreContext->GetNumSetting("AudioReadAhead", 100);
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("PlayerFlags: 0x%1, AudioReadAhead: %2 msec")
-        .arg(playerFlags, 0, 16).arg(m_audioReadAhead));
+        .arg(m_playerFlags, 0, 16).arg(m_audioReadAhead));
 }
 
 AvFormatDecoder::~AvFormatDecoder()
@@ -2312,7 +2312,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
             // Use a PrivateDecoder if allowed in playerFlags AND matched
             // via the decoder name
-            m_private_dec = PrivateDecoder::Create(dec, playerFlags, enc);
+            m_private_dec = PrivateDecoder::Create(dec, m_playerFlags, enc);
             if (m_private_dec)
                 thread_count = 1;
 

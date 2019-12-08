@@ -289,7 +289,7 @@ bool AudioOutputCA::OpenDevice()
         return false;
     }
 
-    if (internal_vol && m_set_initial_vol)
+    if (m_internalVol && m_set_initial_vol)
     {
         QString controlLabel = gCoreContext->GetSetting("MixerControl", "PCM");
         controlLabel += "MixerVolume";

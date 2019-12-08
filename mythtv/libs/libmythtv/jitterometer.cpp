@@ -18,9 +18,9 @@
 #endif
 
 Jitterometer::Jitterometer(QString nname, int ncycles)
-  : m_num_cycles(ncycles), m_name(std::move(nname))
+  : m_numCycles(ncycles), m_name(std::move(nname))
 {
-    m_times.resize(m_num_cycles);
+    m_times.resize(m_numCycles);
 
     if (m_name.isEmpty())
         m_name = "Jitterometer";
@@ -29,47 +29,47 @@ Jitterometer::Jitterometer(QString nname, int ncycles)
     // N.B. Access to /proc/stat was revoked on Android for API >=26 (Oreo)
     if (QFile::exists(UNIX_PROC_STAT))
     {
-        m_cpustat = new QFile(UNIX_PROC_STAT);
-        if (m_cpustat)
+        m_cpuStat = new QFile(UNIX_PROC_STAT);
+        if (m_cpuStat)
         {
-            if (!m_cpustat->open(QIODevice::ReadOnly))
+            if (!m_cpuStat->open(QIODevice::ReadOnly))
             {
-                delete m_cpustat;
-                m_cpustat = nullptr;
+                delete m_cpuStat;
+                m_cpuStat = nullptr;
             }
             else
             {
-                m_laststats = new unsigned long long[MAX_CORES * 9];
-                memset(m_laststats, 0, sizeof(unsigned long long) * MAX_CORES * 9);
+                m_lastStats = new unsigned long long[MAX_CORES * 9];
+                memset(m_lastStats, 0, sizeof(unsigned long long) * MAX_CORES * 9);
             }
         }
     }
 #endif
 
 #ifdef Q_OS_MACOS
-    m_laststats = new unsigned long long[MAX_CORES * 2];
-    memset(m_laststats, 0, sizeof(unsigned long long) * MAX_CORES * 2);
+    m_lastStats = new unsigned long long[MAX_CORES * 2];
+    memset(m_lastStats, 0, sizeof(unsigned long long) * MAX_CORES * 2);
 #endif
 }
 
 Jitterometer::~Jitterometer()
 {
-    if (m_cpustat)
-        m_cpustat->close();
-    delete m_cpustat;
-    delete [] m_laststats;
+    if (m_cpuStat)
+        m_cpuStat->close();
+    delete m_cpuStat;
+    delete [] m_lastStats;
 }
 
 void Jitterometer::SetNumCycles(int cycles)
 {
-    m_num_cycles = cycles;
-    m_times.resize(m_num_cycles);
+    m_numCycles = cycles;
+    m_times.resize(m_numCycles);
     m_count = 0;
 }
 
 bool Jitterometer::RecordCycleTime()
 {
-    if (!m_num_cycles)
+    if (!m_numCycles)
         return false;
     bool ret = RecordEndTime();
     RecordStartTime();
@@ -78,21 +78,21 @@ bool Jitterometer::RecordCycleTime()
 
 bool Jitterometer::RecordEndTime()
 {
-    if (!m_num_cycles)
+    if (!m_numCycles)
         return false;
 
-    int cycles = m_num_cycles;
+    int cycles = m_numCycles;
     struct timeval timenow {};
     gettimeofday(&timenow, nullptr);
 
-    if (m_starttime_valid)
+    if (m_starttimeValid)
     {
         m_times[m_count] = (timenow.tv_sec  - m_starttime.tv_sec ) * 1000000 +
                            (timenow.tv_usec - m_starttime.tv_usec) ;
         m_count++;
     }
 
-    m_starttime_valid = false;
+    m_starttimeValid = false;
 
     if (m_count >= cycles)
     {
@@ -108,7 +108,7 @@ bool Jitterometer::RecordEndTime()
         mean /= cycles;
 
         if (tottime > 0)
-            m_last_fps = cycles / tottime * 1000000;
+            m_lastFps = cycles / tottime * 1000000;
 
         /* compute the sum of the squares of each deviation from the mean */
         for (int i = 0; i < cycles; i++)
@@ -117,17 +117,17 @@ bool Jitterometer::RecordEndTime()
         /* compute standard deviation */
         double standard_deviation = sqrt(sum_of_squared_deviations / (cycles - 1));
         if (mean > 0)
-            m_last_sd = standard_deviation / mean;
+            m_lastSd = standard_deviation / mean;
 
         /* retrieve load if available */
         QString extra;
-        m_lastcpustats = GetCPUStat();
-        if (!m_lastcpustats.isEmpty())
-            extra = QString("CPUs: ") + m_lastcpustats;
+        m_lastCpuStats = GetCPUStat();
+        if (!m_lastCpuStats.isEmpty())
+            extra = QString("CPUs: ") + m_lastCpuStats;
 
         LOG(VB_GENERAL, LOG_INFO,
             m_name + QString("FPS: %1 Mean: %2 Std.Dev: %3 ")
-                .arg(m_last_fps, 7, 'f', 2).arg((int)mean, 5)
+                .arg(m_lastFps, 7, 'f', 2).arg((int)mean, 5)
                 .arg((int)standard_deviation, 5) + extra);
 
         m_count = 0;
@@ -138,10 +138,10 @@ bool Jitterometer::RecordEndTime()
 
 void Jitterometer::RecordStartTime()
 {
-    if (!m_num_cycles)
+    if (!m_numCycles)
         return;
     gettimeofday(&m_starttime, nullptr);
-    m_starttime_valid = true;
+    m_starttimeValid = true;
 }
 
 QString Jitterometer::GetCPUStat(void)
@@ -149,19 +149,19 @@ QString Jitterometer::GetCPUStat(void)
     QString result = "N/A";
 
 #if defined(__linux__) || defined(Q_OS_ANDROID)
-    if (m_cpustat)
+    if (m_cpuStat)
     {
-        m_cpustat->seek(0);
-        m_cpustat->flush();
+        m_cpuStat->seek(0);
+        m_cpuStat->flush();
 
-        QByteArray line = m_cpustat->readLine(256);
+        QByteArray line = m_cpuStat->readLine(256);
         if (line.isEmpty())
             return result;
 
         result = "";
         int cores = 0;
         int ptr   = 0;
-        line = m_cpustat->readLine(256);
+        line = m_cpuStat->readLine(256);
         while (!line.isEmpty() && cores < MAX_CORES)
         {
             static constexpr int kSize = sizeof(unsigned long long) * 9;
@@ -176,16 +176,16 @@ QString Jitterometer::GetCPUStat(void)
             {
                 float load  = stats[0] + stats[1] + stats[2] + stats[4] +
                               stats[5] + stats[6] + stats[7] + stats[8] -
-                              m_laststats[ptr + 0] - m_laststats[ptr + 1] -
-                              m_laststats[ptr + 2] - m_laststats[ptr + 4] -
-                              m_laststats[ptr + 5] - m_laststats[ptr + 6] -
-                              m_laststats[ptr + 7] - m_laststats[ptr + 8];
-                float total = load + stats[3] - m_laststats[ptr + 3];
+                              m_lastStats[ptr + 0] - m_lastStats[ptr + 1] -
+                              m_lastStats[ptr + 2] - m_lastStats[ptr + 4] -
+                              m_lastStats[ptr + 5] - m_lastStats[ptr + 6] -
+                              m_lastStats[ptr + 7] - m_lastStats[ptr + 8];
+                float total = load + stats[3] - m_lastStats[ptr + 3];
                 if (total > 0)
                     result += QString("%1% ").arg(load / total * 100, 0, 'f', 0);
-                memcpy(&m_laststats[ptr], stats, kSize);
+                memcpy(&m_lastStats[ptr], stats, kSize);
             }
-            line = m_cpustat->readLine(256);
+            line = m_cpuStat->readLine(256);
             cores++;
             ptr += 9;
         }
@@ -208,11 +208,11 @@ QString Jitterometer::GetCPUStat(void)
             stats[0] = load[i].cpu_ticks[CPU_STATE_IDLE];
             stats[1] = load[i].cpu_ticks[CPU_STATE_IDLE] + load[i].cpu_ticks[CPU_STATE_USER] +
                        load[i].cpu_ticks[CPU_STATE_SYSTEM] + load[i].cpu_ticks[CPU_STATE_NICE];
-            double idledelta  = stats[0] - m_laststats[ptr];
-            double totaldelta = stats[1] - m_laststats[ptr + 1];
+            double idledelta  = stats[0] - m_lastStats[ptr];
+            double totaldelta = stats[1] - m_lastStats[ptr + 1];
             if (totaldelta > 0)
                 result += QString("%1% ").arg(((totaldelta - idledelta) / totaldelta) * 100.0, 0, 'f', 0);
-            memcpy(&m_laststats[ptr], stats, sizeof(unsigned long long) * 2);
+            memcpy(&m_lastStats[ptr], stats, sizeof(unsigned long long) * 2);
             ptr += 2;
         }
     }

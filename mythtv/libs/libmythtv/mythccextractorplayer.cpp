@@ -81,16 +81,16 @@ MythCCExtractorPlayer::MythCCExtractorPlayer(PlayerFlags flags, bool showProgres
 
 void MythCCExtractorPlayer::OnGotNewFrame(void)
 {
-    m_myFramesPlayed = decoder->GetFramesRead();
-    videoOutput->StartDisplayingFrame();
+    m_myFramesPlayed = m_decoder->GetFramesRead();
+    m_videoOutput->StartDisplayingFrame();
     {
-        VideoFrame *frame = videoOutput->GetLastShownFrame();
+        VideoFrame *frame = m_videoOutput->GetLastShownFrame();
         double fps = frame->frame_rate;
         if (fps <= 0)
             fps = GetDecoder()->GetFPS();
         double duration = 1 / fps + frame->repeat_pict * 0.5 / fps;
         m_curTime += duration * 1000;
-        videoOutput->DoneDisplayingFrame(frame);
+        m_videoOutput->DoneDisplayingFrame(frame);
     }
 
     Ingest608Captions();  Process608Captions(kProcessNormal);
@@ -130,10 +130,10 @@ bool MythCCExtractorPlayer::run(void)
 {
     m_myFramesPlayed = 0;
 
-    killdecoder = false;
-    framesPlayed = 0;
+    m_killDecoder = false;
+    m_framesPlayed = 0;
 
-    decoder->SetDecodeAllSubtitles(true);
+    m_decoder->SetDecodeAllSubtitles(true);
 
     SetPlaying(true);
 
@@ -165,7 +165,7 @@ bool MythCCExtractorPlayer::run(void)
     if (m_showProgress)
         cout << "\r                                      \r" << flush;
 
-    while (!killdecoder && !IsErrored())
+    while (!m_killDecoder && !IsErrored())
     {
         if (inuse_timer.elapsed() > 2534)
         {
@@ -180,7 +180,7 @@ bool MythCCExtractorPlayer::run(void)
         {
             ui_timer.restart();
             QString str = progress_string(
-                flagTime, m_myFramesPlayed, totalFrames);
+                flagTime, m_myFramesPlayed, m_totalFrames);
             cout << qPrintable(str) << '\r' << flush;
         }
 
@@ -192,12 +192,12 @@ bool MythCCExtractorPlayer::run(void)
 
     if (m_showProgress)
     {
-        if ((m_myFramesPlayed < totalFrames) &&
-            ((m_myFramesPlayed + 30) > totalFrames))
+        if ((m_myFramesPlayed < m_totalFrames) &&
+            ((m_myFramesPlayed + 30) > m_totalFrames))
         {
-            m_myFramesPlayed = totalFrames;
+            m_myFramesPlayed = m_totalFrames;
         }
-        QString str = progress_string(flagTime, m_myFramesPlayed, totalFrames);
+        QString str = progress_string(flagTime, m_myFramesPlayed, m_totalFrames);
         cout << qPrintable(str) << endl;
     }
 
@@ -207,7 +207,7 @@ bool MythCCExtractorPlayer::run(void)
     ProcessDVBSubtitles(kProcessFinalize);
 
     SetPlaying(false);
-    killdecoder = true;
+    m_killDecoder = true;
 
     return true;
 }
@@ -371,7 +371,7 @@ void MythCCExtractorPlayer::Process608Captions(uint flags)
             if (!(*cc608it).srtwriters[idx])
             {
                 int langCode = 0;
-                auto *avd = dynamic_cast<AvFormatDecoder *>(decoder);
+                auto *avd = dynamic_cast<AvFormatDecoder *>(m_decoder);
                 if (avd)
                     langCode = avd->GetCaptionLanguage(
                         kTrackTypeCC608, idx + 1);
@@ -498,7 +498,7 @@ void MythCCExtractorPlayer::Process708Captions(uint flags)
             if (!(*cc708it).srtwriters[idx])
             {
                 int langCode = 0;
-                auto *avd = dynamic_cast<AvFormatDecoder*>(decoder);
+                auto *avd = dynamic_cast<AvFormatDecoder*>(m_decoder);
                 if (avd)
                     langCode = avd->GetCaptionLanguage(kTrackTypeCC708, idx);
 
@@ -599,7 +599,7 @@ void MythCCExtractorPlayer::ProcessTeletext(uint flags)
             if (!(*ttxit).srtwriters[page])
             {
                 int langCode = 0;
-                auto *avd = dynamic_cast<AvFormatDecoder *>(decoder);
+                auto *avd = dynamic_cast<AvFormatDecoder *>(m_decoder);
 
                 if (avd)
                     langCode = avd->GetTeletextLanguage(page);
@@ -744,7 +744,7 @@ void MythCCExtractorPlayer::ProcessDVBSubtitles(uint flags)
     for (; subit != m_dvbsub_info.end(); ++subit)
     {
         int langCode = 0;
-        auto *avd = dynamic_cast<AvFormatDecoder *>(decoder);
+        auto *avd = dynamic_cast<AvFormatDecoder *>(m_decoder);
         int idx = subit.key();
         if (avd)
             langCode = avd->GetSubtitleLanguage(subtitleStreamCount, idx);

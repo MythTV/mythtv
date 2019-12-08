@@ -100,13 +100,13 @@ enum PlayerFlags
     kMusicChoice          = 0x040000,
 };
 
-#define FlagIsSet(arg) (playerFlags & arg)
+#define FlagIsSet(arg) (m_playerFlags & arg)
 
 class DecoderThread : public MThread
 {
   public:
     DecoderThread(MythPlayer *mp, bool start_paused)
-      : MThread("Decoder"), m_mp(mp), m_start_paused(start_paused) { }
+      : MThread("Decoder"), m_mp(mp), m_startPaused(start_paused) { }
     ~DecoderThread() override { wait(); }
 
   protected:
@@ -114,7 +114,7 @@ class DecoderThread : public MThread
 
   private:
     MythPlayer *m_mp;
-    bool        m_start_paused;
+    bool        m_startPaused;
 };
 
 class MythMultiLocker
@@ -162,11 +162,11 @@ class MTV_PUBLIC MythPlayer
 
     // Public Sets
     void SetPlayerInfo(TV *tv, QWidget *widget, PlayerContext *ctx);
-    void SetLength(int len)                   { totalLength = len; }
+    void SetLength(int len)                   { m_totalLength = len; }
     void SetFramesPlayed(uint64_t played);
     void SetEof(EofState eof);
-    void SetPIPActive(bool is_active)         { pip_active = is_active; }
-    void SetPIPVisible(bool is_visible)       { pip_visible = is_visible; }
+    void SetPIPActive(bool is_active)         { m_pipActive = is_active; }
+    void SetPIPVisible(bool is_visible)       { m_pipVisible = is_visible; }
 
     void SetTranscoding(bool value);
     void SetWatchingRecording(bool mode);
@@ -184,29 +184,29 @@ class MTV_PUBLIC MythPlayer
     void SetFrameRate(double fps);
 
     // Gets
-    QSize   GetVideoBufferSize(void) const    { return video_dim; }
-    QSize   GetVideoSize(void) const          { return video_disp_dim; }
-    float   GetVideoAspect(void) const        { return video_aspect; }
-    float   GetFrameRate(void) const          { return video_frame_rate; }
+    QSize   GetVideoBufferSize(void) const    { return m_videoDim; }
+    QSize   GetVideoSize(void) const          { return m_videoDispDim; }
+    float   GetVideoAspect(void) const        { return m_videoAspect; }
+    float   GetFrameRate(void) const          { return m_videoFrameRate; }
     void    GetPlaybackData(InfoMap &infoMap);
     bool    IsAudioNeeded(void)
         { return !(FlagIsSet(kVideoIsNull)) && m_playerCtx->IsAudioNeeded(); }
-    uint    GetVolume(void) { return audio.GetVolume(); }
+    uint    GetVolume(void) { return m_audio.GetVolume(); }
     int     GetFreeVideoFrames(void) const;
     AspectOverrideMode GetAspectOverride(void) const;
     AdjustFillMode     GetAdjustFill(void) const;
-    MuteState          GetMuteState(void) { return audio.GetMuteState(); }
+    MuteState          GetMuteState(void) { return m_audio.GetMuteState(); }
 
-    int     GetFFRewSkip(void) const          { return ffrew_skip; }
-    float   GetPlaySpeed(void) const          { return play_speed; }
-    AudioPlayer* GetAudio(void)               { return &audio; }
+    int     GetFFRewSkip(void) const          { return m_ffrewSkip; }
+    float   GetPlaySpeed(void) const          { return m_playSpeed; }
+    AudioPlayer* GetAudio(void)               { return &m_audio; }
     const AudioOutputGraph& GetAudioGraph() const { return m_audiograph; }
-    float   GetAudioStretchFactor(void)       { return audio.GetStretchFactor(); }
-    float   GetNextPlaySpeed(void) const      { return next_play_speed; }
-    int     GetLength(void) const             { return totalLength; }
-    uint64_t GetTotalFrameCount(void) const   { return totalFrames; }
+    float   GetAudioStretchFactor(void)       { return m_audio.GetStretchFactor(); }
+    float   GetNextPlaySpeed(void) const      { return m_nextPlaySpeed; }
+    int     GetLength(void) const             { return m_totalLength; }
+    uint64_t GetTotalFrameCount(void) const   { return m_totalFrames; }
     uint64_t GetCurrentFrameCount(void) const;
-    uint64_t GetFramesPlayed(void) const      { return framesPlayed; }
+    uint64_t GetFramesPlayed(void) const      { return m_framesPlayed; }
     // GetSecondsPlayed() and GetTotalSeconds() internally calculate
     // in terms of milliseconds and divide the result by 1000.  This
     // divisor can be passed in as an argument, e.g. pass divisor=1 to
@@ -224,20 +224,20 @@ class MTV_PUBLIC MythPlayer
     PIPLocation GetNextPIPLocation(void) const;
 
     // Bool Gets
-    bool    IsPaused(void) const              { return allpaused;      }
+    bool    IsPaused(void) const              { return m_allPaused;      }
     bool    GetRawAudioState(void) const;
-    bool    GetLimitKeyRepeat(void) const     { return limitKeyRepeat; }
+    bool    GetLimitKeyRepeat(void) const     { return m_limitKeyRepeat; }
     EofState GetEof(void) const;
     bool    IsErrored(void) const;
     bool    IsPlaying(uint wait_in_msec = 0, bool wait_for = true) const;
-    bool    AtNormalSpeed(void) const         { return next_normal_speed; }
+    bool    AtNormalSpeed(void) const         { return m_nextNormalSpeed; }
     bool    IsReallyNearEnd(void) const;
     bool    IsNearEnd(void);
-    bool    HasAudioOut(void) const           { return audio.HasAudioOut(); }
-    bool    IsPIPActive(void) const           { return pip_active; }
-    bool    IsPIPVisible(void) const          { return pip_visible; }
-    bool    IsMuted(void)                     { return audio.IsMuted(); }
-    bool    PlayerControlsVolume(void) const  { return audio.ControlsVolume(); }
+    bool    HasAudioOut(void) const           { return m_audio.HasAudioOut(); }
+    bool    IsPIPActive(void) const           { return m_pipActive; }
+    bool    IsPIPVisible(void) const          { return m_pipVisible; }
+    bool    IsMuted(void)                     { return m_audio.IsMuted(); }
+    bool    PlayerControlsVolume(void) const  { return m_audio.ControlsVolume(); }
     bool    UsingNullVideo(void) const { return FlagIsSet(kVideoIsNull); }
     bool    HasTVChainNext(void) const;
     bool    CanSupportDoubleRate(void);
@@ -249,8 +249,8 @@ class MTV_PUBLIC MythPlayer
     virtual char *GetScreenGrab(int secondsin, int &bufflen,
                                 int &vw, int &vh, float &ar);
     InteractiveTV *GetInteractiveTV(void);
-    MythVideoOutput *GetVideoOutput(void)       { return videoOutput; }
-    MythCodecContext *GetMythCodecContext(void) { return decoder->GetMythCodecContext(); }
+    MythVideoOutput *GetVideoOutput(void)       { return m_videoOutput; }
+    MythCodecContext *GetMythCodecContext(void) { return m_decoder->GetMythCodecContext(); }
 
     // Title stuff
     virtual bool SwitchTitle(int /*title*/) { return false; }
@@ -282,7 +282,7 @@ class MTV_PUBLIC MythPlayer
     void DiscardVideoFrame(VideoFrame *buffer);
     void DiscardVideoFrames(bool KeyFrame, bool Flushed);
     /// Returns the stream decoder currently in use.
-    DecoderBase *GetDecoder(void) { return decoder; }
+    DecoderBase *GetDecoder(void) { return m_decoder; }
     virtual bool HasReachedEof(void) const;
     void SetDisablePassThrough(bool disabled);
     void ForceSetupAudioStream(void);
@@ -294,25 +294,25 @@ class MTV_PUBLIC MythPlayer
     virtual bool PrepareAudioSample(int64_t &timecode);
 
     // Public Closed caption and teletext stuff
-    uint GetCaptionMode(void) const    { return textDisplayMode; }
-    virtual CC708Reader    *GetCC708Reader(uint /*id*/=0) { return &cc708; }
-    virtual CC608Reader    *GetCC608Reader(uint /*id*/=0) { return &cc608; }
-    virtual SubtitleReader *GetSubReader(uint /*id*/=0) { return &subReader; }
-    virtual TeletextReader *GetTeletextReader(uint /*id*/=0) { return &ttxReader; }
+    uint GetCaptionMode(void) const    { return m_textDisplayMode; }
+    virtual CC708Reader    *GetCC708Reader(uint /*id*/=0) { return &m_cc708; }
+    virtual CC608Reader    *GetCC608Reader(uint /*id*/=0) { return &m_cc608; }
+    virtual SubtitleReader *GetSubReader(uint /*id*/=0) { return &m_subReader; }
+    virtual TeletextReader *GetTeletextReader(uint /*id*/=0) { return &m_ttxReader; }
 
     // Public Audio/Subtitle/EIA-608/EIA-708 stream selection - thread safe
     void TracksChanged(uint trackType);
     void EnableSubtitles(bool enable);
     void EnableForcedSubtitles(bool enable);
     bool ForcedSubtitlesFavored(void) const {
-        return allowForcedSubtitles && !captionsEnabledbyDefault;
+        return m_allowForcedSubtitles && !m_captionsEnabledbyDefault;
     }
     // How to handle forced Subtitles (i.e. when in a movie someone speaks
     // in a different language than the rest of the movie, subtitles are
     // forced on even if the user doesn't have them turned on.)
     // These two functions are not thread-safe (UI thread use only).
     void SetAllowForcedSubtitles(bool allow);
-    bool GetAllowForcedSubtitles(void) const { return allowForcedSubtitles; }
+    bool GetAllowForcedSubtitles(void) const { return m_allowForcedSubtitles; }
 
     // Public MHEG/MHI stream selection
     bool SetAudioByComponentTag(int tag);
@@ -354,9 +354,9 @@ class MTV_PUBLIC MythPlayer
                        frm_pos_map_t &durMap);
 
     // OSD locking for TV class
-    bool TryLockOSD(void) { return osdLock.tryLock(50); }
-    void LockOSD(void)    { osdLock.lock();   }
-    void UnlockOSD(void)  { osdLock.unlock(); }
+    bool TryLockOSD(void) { return m_osdLock.tryLock(50); }
+    void LockOSD(void)    { m_osdLock.lock();   }
+    void UnlockOSD(void)  { m_osdLock.unlock(); }
 
     // Public picture controls
     void ToggleNightMode(void);
@@ -393,7 +393,7 @@ class MTV_PUBLIC MythPlayer
         { SetScanType((FrameScanType)(((int)m_scan + 1) & 0x3)); }
     void SetScanType(FrameScanType);
     FrameScanType GetScanType(void) const { return m_scan; }
-    bool IsScanTypeLocked(void) const { return m_scan_locked; }
+    bool IsScanTypeLocked(void) const { return m_scanLocked; }
     void Zoom(ZoomDirection direction);
     void ToggleMoveBottomLine(void);
     void SaveBottomLine(void);
@@ -407,14 +407,14 @@ class MTV_PUBLIC MythPlayer
     void WindowResized(const QSize &new_size);
 
     // Audio Sets
-    uint AdjustVolume(int change)           { return audio.AdjustVolume(change); }
-    uint SetVolume(int newvolume)           { return audio.SetVolume(newvolume); }
-    bool SetMuted(bool mute)                { return audio.SetMuted(mute);       }
-    MuteState SetMuteState(MuteState state) { return audio.SetMuteState(state);  }
-    MuteState IncrMuteState(void)           { return audio.IncrMuteState();      }
+    uint AdjustVolume(int change)           { return m_audio.AdjustVolume(change); }
+    uint SetVolume(int newvolume)           { return m_audio.SetVolume(newvolume); }
+    bool SetMuted(bool mute)                { return m_audio.SetMuted(mute);       }
+    MuteState SetMuteState(MuteState state) { return m_audio.SetMuteState(state);  }
+    MuteState IncrMuteState(void)           { return m_audio.IncrMuteState();      }
 
     // Non-const gets
-    OSD         *GetOSD(void)               { return osd;         }
+    OSD         *GetOSD(void)               { return m_osd;       }
     virtual void SeekForScreenGrab(uint64_t &number, uint64_t frameNum,
                                    bool absolute);
 
@@ -426,7 +426,7 @@ class MTV_PUBLIC MythPlayer
                                         bool use_cutlist) const;
     uint64_t TranslatePositionMsToFrame(uint64_t position,
                                         bool use_cutlist) const {
-        return deleteMap.TranslatePositionMsToFrame(position,
+        return m_deleteMap.TranslatePositionMsToFrame(position,
                                                     GetFrameRate(),
                                                     use_cutlist);
     }
@@ -434,10 +434,10 @@ class MTV_PUBLIC MythPlayer
     // used for frame calculations when seeking relative to a number
     // of frames rather than by time.
     uint64_t TranslatePositionAbsToRel(uint64_t position) const {
-        return deleteMap.TranslatePositionAbsToRel(position);
+        return m_deleteMap.TranslatePositionAbsToRel(position);
     }
     uint64_t TranslatePositionRelToAbs(uint64_t position) const {
-        return deleteMap.TranslatePositionRelToAbs(position);
+        return m_deleteMap.TranslatePositionRelToAbs(position);
     }
     float ComputeSecs(uint64_t position, bool use_cutlist) const {
         return TranslatePositionFrameToMs(position, use_cutlist) / 1000.0;
@@ -446,12 +446,12 @@ class MTV_PUBLIC MythPlayer
 
     // Commercial stuff
     void SetAutoCommercialSkip(CommSkipMode autoskip)
-        { commBreakMap.SetAutoCommercialSkip(autoskip, framesPlayed); }
+        { m_commBreakMap.SetAutoCommercialSkip(autoskip, m_framesPlayed); }
     void SkipCommercials(int direction)
-        { commBreakMap.SkipCommercials(direction); }
+        { m_commBreakMap.SkipCommercials(direction); }
     void SetCommBreakMap(frm_dir_map_t &newMap);
     CommSkipMode GetAutoCommercialSkip(void)
-        { return commBreakMap.GetAutoCommercialSkip(); }
+        { return m_commBreakMap.GetAutoCommercialSkip(); }
 
     // Toggle Sets
     void ToggleAspectOverride(AspectOverrideMode aspectMode = kAspect_Toggle);
@@ -504,17 +504,17 @@ class MTV_PUBLIC MythPlayer
     // Edit mode stuff
     bool EnableEdit(void);
     bool HandleProgramEditorActions(QStringList &actions);
-    bool GetEditMode(void) const { return deleteMap.IsEditing(); }
+    bool GetEditMode(void) const { return m_deleteMap.IsEditing(); }
     void DisableEdit(int howToSave);
     bool IsInDelete(uint64_t frame);
     uint64_t GetNearestMark(uint64_t frame, bool right);
     bool IsTemporaryMark(uint64_t frame);
     bool HasTemporaryMark(void);
-    bool IsCutListSaved(void) { return deleteMap.IsSaved(); }
-    bool DeleteMapHasUndo(void) { return deleteMap.HasUndo(); }
-    bool DeleteMapHasRedo(void) { return deleteMap.HasRedo(); }
-    QString DeleteMapGetUndoMessage(void) { return deleteMap.GetUndoMessage(); }
-    QString DeleteMapGetRedoMessage(void) { return deleteMap.GetRedoMessage(); }
+    bool IsCutListSaved(void) { return m_deleteMap.IsSaved(); }
+    bool DeleteMapHasUndo(void) { return m_deleteMap.HasUndo(); }
+    bool DeleteMapHasRedo(void) { return m_deleteMap.HasRedo(); }
+    QString DeleteMapGetUndoMessage(void) { return m_deleteMap.GetUndoMessage(); }
+    QString DeleteMapGetRedoMessage(void) { return m_deleteMap.GetRedoMessage(); }
 
     // Reinit
     void ReinitOSD(void);
@@ -527,7 +527,7 @@ class MTV_PUBLIC MythPlayer
     void ResetCaptions(void);
     bool ToggleCaptions(void);
     bool ToggleCaptions(uint type);
-    bool HasTextSubtitles(void)        { return subReader.HasTextSubtitles(); }
+    bool HasTextSubtitles(void)        { return m_subReader.HasTextSubtitles(); }
     void SetCaptionsEnabled(bool, bool osd_msg=true);
     bool GetCaptionsEnabled(void);
     virtual void DisableCaptions(uint mode, bool osd_msg=true);
@@ -557,10 +557,10 @@ class MTV_PUBLIC MythPlayer
     // Time Code adjustment stuff
     int64_t AdjustAudioTimecodeOffset(int64_t v, int newsync = -9999);
     int64_t GetAudioTimecodeOffset(void) const
-        { return tc_wrap[TC_AUDIO]; }
+        { return m_tcWrap[TC_AUDIO]; }
 
     // Playback (output) zoom automation
-    DetectLetterbox *detect_letter_box;
+    DetectLetterbox *m_detectLetterBox;
 
   protected:
     // Private initialization stuff
@@ -586,7 +586,7 @@ class MTV_PUBLIC MythPlayer
     virtual void CreateDecoder(char *testbuf, int testreadsize);
     void  SetDecoder(DecoderBase *dec);
     /// Returns the stream decoder currently in use.
-    const DecoderBase *GetDecoder(void) const { return decoder; }
+    const DecoderBase *GetDecoder(void) const { return m_decoder; }
     bool DecodeFrame(struct rtframeheader *frameheader,
                      unsigned char *strm, unsigned char *outbuf);
 
@@ -634,84 +634,84 @@ class MTV_PUBLIC MythPlayer
     void  JumpToStream(const QString&);
 
   protected:
-    PlayerFlags    playerFlags;
-    DecoderBase   *decoder              {nullptr};
-    mutable QMutex decoder_change_lock  {QMutex::Recursive};
-    MythVideoOutput *videoOutput        {nullptr};
+    PlayerFlags      m_playerFlags;
+    DecoderBase     *m_decoder            {nullptr};
+    mutable QMutex   m_decoderChangeLock  {QMutex::Recursive};
+    MythVideoOutput *m_videoOutput        {nullptr};
     PlayerContext   *m_playerCtx          {nullptr};
-    DecoderThread *decoderThread        {nullptr};
-    QThread       *playerThread         {nullptr};
+    DecoderThread   *m_decoderThread      {nullptr};
+    QThread         *m_playerThread       {nullptr};
 
 #ifdef Q_OS_ANDROID
-    int            playerThreadId       {0};
+    int            m_playerThreadId       {0};
 #endif
 
     // Window stuff
-    MythDisplay* m_display              {nullptr};
-    QWidget *parentWidget               {nullptr};
-    bool     embedding                  {false};
-    QRect    embedRect                  {0,0,0,0};
+    MythDisplay* m_display                {nullptr};
+    QWidget *m_parentWidget               {nullptr};
+    bool     m_embedding                  {false};
+    QRect    m_embedRect                  {0,0,0,0};
 
     // State
-    QWaitCondition decoderThreadPause;
-    QWaitCondition decoderThreadUnpause;
-    mutable QMutex decoderPauseLock;
-    mutable QMutex decoderSeekLock;
-    bool           totalDecoderPause    {false};
-    bool           decoderPaused        {false};
-    bool           inJumpToProgramPause {false};
-    bool           pauseDecoder         {false};
-    bool           unpauseDecoder       {false};
-    bool volatile  killdecoder          {false};
-    int64_t        decoderSeek          {-1};
-    bool           decodeOneFrame       {false};
-    bool           needNewPauseFrame    {false};
-    mutable QMutex bufferPauseLock;
-    mutable QMutex videoPauseLock;
-    mutable QMutex pauseLock;
-    bool           bufferPaused         {false};
-    bool           videoPaused          {false};
-    bool           allpaused            {false};
-    bool           playing              {false};
+    QWaitCondition m_decoderThreadPause;
+    QWaitCondition m_decoderThreadUnpause;
+    mutable QMutex m_decoderPauseLock;
+    mutable QMutex m_decoderSeekLock;
+    bool           m_totalDecoderPause      {false};
+    bool           m_decoderPaused          {false};
+    bool           m_inJumpToProgramPause   {false};
+    bool           m_pauseDecoder           {false};
+    bool           m_unpauseDecoder         {false};
+    bool volatile  m_killDecoder            {false};
+    int64_t        m_decoderSeek            {-1};
+    bool           m_decodeOneFrame         {false};
+    bool           m_needNewPauseFrame      {false};
+    mutable QMutex m_bufferPauseLock;
+    mutable QMutex m_videoPauseLock;
+    mutable QMutex m_pauseLock;
+    bool           m_bufferPaused           {false};
+    bool           m_videoPaused            {false};
+    bool           m_allPaused              {false};
+    bool           m_playing                {false};
 
-    mutable QWaitCondition playingWaitCond;
-    mutable QMutex vidExitLock;
-    mutable QMutex playingLock;
-    bool     m_double_framerate         {false};///< Output fps is double Video (input) rate
-    bool     livetv                     {false};
-    bool     watchingrecording          {false};
-    bool     transcoding                {false};
-    bool     hasFullPositionMap         {false};
-    mutable bool     limitKeyRepeat     {false};
-    mutable QMutex   errorLock;
-    QString  errorMsg;   ///< Reason why NVP exited with a error
-    int errorType                       {kError_None};
+    mutable QWaitCondition m_playingWaitCond;
+    mutable QMutex m_vidExitLock;
+    mutable QMutex m_playingLock;
+    bool     m_doubleFramerate            {false};///< Output fps is double Video (input) rate
+    bool     m_liveTV                     {false};
+    bool     m_watchingRecording          {false};
+    bool     m_transcoding                {false};
+    bool     m_hasFullPositionMap         {false};
+    mutable bool     m_limitKeyRepeat     {false};
+    mutable QMutex   m_errorLock;
+    QString  m_errorMsg;   ///< Reason why NVP exited with a error
+    int m_errorType                       {kError_None};
 
     // Chapter stuff
-    int jumpchapter                     {0};
+    int m_jumpChapter                     {0};
 
     // Bookmark stuff
-    uint64_t bookmarkseek               {0};
-    int      clearSavedPosition         {1};
-    int      endExitPrompt;
+    uint64_t m_bookmarkSeek               {0};
+    int      m_clearSavedPosition         {1};
+    int      m_endExitPrompt;
 
     // Seek
-    /// If fftime>0, number of frames to seek forward.
-    /// If fftime<0, number of frames to seek backward.
-    long long fftime                    {0};
+    /// If m_ffTime>0, number of frames to seek forward.
+    /// If m_ffTime<0, number of frames to seek backward.
+    long long m_ffTime                    {0};
 
     // Playback misc.
     /// How often we have tried to wait for a video output buffer and failed
-    int       videobuf_retries          {0};
-    uint64_t  framesPlayed              {0};
+    int       m_videobufRetries           {0};
+    uint64_t  m_framesPlayed              {0};
     // "Fake" frame counter for when the container frame rate doesn't
     // match the stream frame rate.
-    uint64_t  framesPlayedExtra         {0};
-    uint64_t  totalFrames               {0};
-    long long totalLength               {0};
-    int64_t   totalDuration             {0};
-    long long rewindtime                {0};
-    int64_t   m_latestVideoTimecode     {-1};
+    uint64_t  m_framesPlayedExtra         {0};
+    uint64_t  m_totalFrames               {0};
+    long long m_totalLength               {0};
+    int64_t   m_totalDuration             {0};
+    long long m_rewindTime                {0};
+    int64_t   m_latestVideoTimecode       {-1};
     QElapsedTimer m_avTimer;
 
     // Tracks deinterlacer for Debug OSD
@@ -722,156 +722,156 @@ class MTV_PUBLIC MythPlayer
     // -- end state stuff --
 
     // Input Video Attributes
-    QSize    video_disp_dim             {0,0}; ///< Video (input) width & height
-    QSize    video_dim                  {0,0}; ///< Video (input) buffer width & height
-    int      m_maxReferenceFrames       {0}; ///< Number of reference frames used in the video stream
-    double   video_frame_rate           {29.97};///< Video (input) Frame Rate (often inaccurate)
-    float    video_aspect               {4.0F / 3.0F};    ///< Video (input) Apect Ratio
-    float    forced_video_aspect        {-1};
+    QSize    m_videoDispDim              {0,0}; ///< Video (input) width & height
+    QSize    m_videoDim                  {0,0}; ///< Video (input) buffer width & height
+    int      m_maxReferenceFrames        {0}; ///< Number of reference frames used in the video stream
+    double   m_videoFrameRate            {29.97};///< Video (input) Frame Rate (often inaccurate)
+    float    m_videoAspect               {4.0F / 3.0F};    ///< Video (input) Apect Ratio
+    float    m_forcedVideoAspect         {-1};
     /// Tell the player thread to set the scan type (and hence deinterlacers)
-    FrameScanType resetScan             {kScan_Ignore};
+    FrameScanType m_resetScan            {kScan_Ignore};
     /// Video (input) Scan Type (interlaced, progressive, detect, ignore...)
-    FrameScanType m_scan                {kScan_Interlaced};
+    FrameScanType m_scan                 {kScan_Interlaced};
     /// Set when the user selects a scan type, overriding the detected one
-    bool     m_scan_locked              {false};
+    bool     m_scanLocked                {false};
     /// Used for tracking of scan type for auto-detection of interlacing
-    int      m_scan_tracker             {0};
+    int      m_scanTracker               {0};
     /// Set when SetScanType runs the first time
-    bool     m_scan_initialized         {false};
+    bool     m_scanInitialized           {false};
     /// Video (input) Number of frames between key frames (often inaccurate)
-    uint     keyframedist               {30};
+    uint     m_keyframeDist              {30};
     /// Codec Name - used by playback profile
     QString  m_codecName;
 
     // Buffering
-    bool     buffering                  {false};
-    QTime    buffering_start;
-    QTime    buffering_last_msg;
+    bool     m_buffering                  {false};
+    QTime    m_bufferingStart;
+    QTime    m_bufferingLastMsg;
 
     // General Caption/Teletext/Subtitle support
-    uint     textDisplayMode            {kDisplayNone};
-    uint     prevTextDisplayMode        {kDisplayNone};
-    uint     prevNonzeroTextDisplayMode {kDisplayNone};
+    uint     m_textDisplayMode            {kDisplayNone};
+    uint     m_prevTextDisplayMode        {kDisplayNone};
+    uint     m_prevNonzeroTextDisplayMode {kDisplayNone};
 
     // Support for analog captions and teletext
     // (i.e. Vertical Blanking Interval (VBI) encoded data.)
-    uint     vbimode                    {VBIMode::None}; ///< VBI decoder to use
-    int      ttPageNum                  {0x888}; ///< VBI page to display when in PAL vbimode
+    uint     m_vbiMode                    {VBIMode::None}; ///< VBI decoder to use
+    int      m_ttPageNum                  {0x888}; ///< VBI page to display when in PAL vbimode
 
     // Support for captions, teletext, etc. decoded by libav
-    SubtitleReader subReader;
-    TeletextReader ttxReader;
+    SubtitleReader m_subReader;
+    TeletextReader m_ttxReader;
     /// This allows us to enable captions/subtitles later if the streams
     /// are not immediately available when the video starts playing.
-    bool      captionsEnabledbyDefault  {false};
-    bool      textDesired               {false};
-    bool      enableCaptions            {false};
-    bool      disableCaptions           {false};
-    bool      enableForcedSubtitles     {false};
-    bool      disableForcedSubtitles    {false};
-    bool      allowForcedSubtitles      {true};
+    bool      m_captionsEnabledbyDefault  {false};
+    bool      m_textDesired               {false};
+    bool      m_enableCaptions            {false};
+    bool      m_disableCaptions           {false};
+    bool      m_enableForcedSubtitles     {false};
+    bool      m_disableForcedSubtitles    {false};
+    bool      m_allowForcedSubtitles      {true};
 
     // CC608/708
-    CC608Reader cc608;
-    CC708Reader cc708;
+    CC608Reader m_cc608;
+    CC708Reader m_cc708;
 
     // Support for MHEG/MHI
-    bool       itvVisible               {false};
-    InteractiveTV *interactiveTV        {nullptr};
-    bool       itvEnabled               {false};
-    QMutex     itvLock;
-    QMutex     streamLock;
+    bool       m_itvVisible               {false};
+    InteractiveTV *m_interactiveTV        {nullptr};
+    bool       m_itvEnabled               {false};
+    QMutex     m_itvLock;
+    QMutex     m_streamLock;
     QString    m_newStream; // Guarded by streamLock
 
     // OSD stuff
-    OSD  *osd                           {nullptr};
-    bool  reinit_osd                    {false};
-    QMutex osdLock                      {QMutex::Recursive};
+    OSD    *m_osd                         {nullptr};
+    bool    m_reinitOsd                   {false};
+    QMutex  m_osdLock                     {QMutex::Recursive};
 
     // Audio stuff
-    AudioPlayer audio;
+    AudioPlayer      m_audio;
     AudioOutputGraph m_audiograph;
 
     // Picture-in-Picture
-    PIPMap         pip_players;
-    volatile bool  pip_active           {false};
-    volatile bool  pip_visible          {true};
-    PIPLocation    pip_default_loc;
+    PIPMap         m_pipPlayers;
+    volatile bool  m_pipActive            {false};
+    volatile bool  m_pipVisible           {true};
+    PIPLocation    m_pipDefaultLoc;
 
     // Commercial filtering
-    CommBreakMap   commBreakMap;
-    bool       forcePositionMapSync     {false};
+    CommBreakMap   m_commBreakMap;
+    bool       m_forcePositionMapSync     {false};
     // Manual editing
-    DeleteMap  deleteMap;
-    bool       pausedBeforeEdit         {false};
-    QTime      editUpdateTimer;
-    float      speedBeforeEdit          {1.0F};
+    DeleteMap  m_deleteMap;
+    bool       m_pausedBeforeEdit         {false};
+    QTime      m_editUpdateTimer;
+    float      m_speedBeforeEdit          {1.0F};
 
     // Playback (output) speed control
     /// Lock for next_play_speed and next_normal_speed
-    QMutex     decoder_lock             {QMutex::Recursive};
-    float      next_play_speed          {1.0F};
-    bool       next_normal_speed        {true};
+    QMutex     m_decoderLock              {QMutex::Recursive};
+    float      m_nextPlaySpeed            {1.0F};
+    bool       m_nextNormalSpeed        {true};
 
-    float      play_speed               {1.0F};
-    bool       normal_speed             {true};
-    int        frame_interval           {static_cast<int>((1000000.0F / 30))};///< always adjusted for play_speed
-    int        m_frame_interval         {0}; ///< used to detect changes to frame_interval
-    int        m_fpsMultiplier          {1}; ///< used to detect changes
+    float      m_playSpeed                {1.0F};
+    bool       m_normalSpeed              {true};
+    int        m_frameInterval            {static_cast<int>((1000000.0F / 30))};///< always adjusted for play_speed
+    int        m_frameIntervalPrev        {0}; ///< used to detect changes to frame_interval
+    int        m_fpsMultiplier            {1}; ///< used to detect changes
 
-    int        ffrew_skip               {1};
-    int        ffrew_adjust             {0};
-    bool       fileChanged              {false};
+    int        m_ffrewSkip                {1};
+    int        m_ffrewAdjust              {0};
+    bool       m_fileChanged              {false};
 
     // Audio and video synchronization stuff
-    VideoSync *videosync                {nullptr};
-    int        avsync_delay             {0};
-    int        avsync_adjustment        {0};
-    int        avsync_avg               {0};
-    int        avsync_predictor         {0};
-    bool       avsync_predictor_enabled {false};
-    int        refreshrate              {0};
-    bool       lastsync                 {false};
-    bool       decode_extra_audio       {false};
-    int        repeat_delay             {0};
-    int64_t    disp_timecode            {0};
-    bool       avsync_audiopaused       {false};
-    float      max_diverge              {3.0F};  // from setting PlayerMaxDiverge default 2
+    VideoSync *m_videoSync                {nullptr};
+    int        m_avsyncDelay              {0};
+    int        m_avsyncAdjustment         {0};
+    int        m_avsyncAvg                {0};
+    int        m_avsyncPredictor          {0};
+    bool       m_avsyncPredictorEnabled   {false};
+    int        m_refreshRate              {0};
+    bool       m_lastSync                 {false};
+    bool       m_decodeExtraAudio         {false};
+    int        m_repeatDelay              {0};
+    int64_t    m_dispTimecode             {0};
+    bool       m_avsyncAudioPaused        {false};
+    float      m_maxDiverge               {3.0F};  // from setting PlayerMaxDiverge default 2
     // AVSync for Raspberry Pi digital streams
-    int        avsync_averaging         {4}; // Number of frames to average
-    int        avsync_interval          {0}; // Number of frames skip between sync checks
-    int        avsync_next              {0}; // Frames till next sync check
+    int        m_avsyncAveraging          {4}; // Number of frames to average
+    int        m_avsyncInterval           {0}; // Number of frames skip between sync checks
+    int        m_avsyncNext               {0}; // Frames till next sync check
 
     // Time Code stuff
-    int        prevtc                   {0}; ///< 32 bit timecode if last VideoFrame shown
-    int        prevrp                   {0}; ///< repeat_pict of last frame
-    int64_t    tc_wrap[TCTYPESMAX]      {};
-    int64_t    tc_lastval[TCTYPESMAX]   {};
-    int64_t    savedAudioTimecodeOffset {0};
+    int        m_prevTc                   {0}; ///< 32 bit timecode if last VideoFrame shown
+    int        m_prevRp                   {0}; ///< repeat_pict of last frame
+    int64_t    m_tcWrap[TCTYPESMAX]       {};
+    int64_t    m_tcLastVal[TCTYPESMAX]    {};
+    int64_t    m_savedAudioTimecodeOffset {0};
 
     // AVSync2
-    int64_t   rtcbase                   {0}; // real time clock base for presentation time (microsecs)
-    int64_t   maxtcval                  {0}; // maximum to date video tc
-    int       maxtcframes               {0}; // number of frames seen since max to date tc
-    int64_t   avsync2adjustms           {10};// number of milliseconds to adjust for av sync errors
-    int       numdroppedframes          {0}; // number of consecutive dropped frames.
-    int64_t   prior_audiotimecode       {0}; // time code from prior frame
-    int64_t   prior_videotimecode       {0}; // time code from prior frame
-    int64_t   m_timeOffsetBase          {0};
+    int64_t   m_rtcBase                   {0}; // real time clock base for presentation time (microsecs)
+    int64_t   m_maxTcVal                  {0}; // maximum to date video tc
+    int       m_maxTcFrames               {0}; // number of frames seen since max to date tc
+    int64_t   m_avsync2adjustMs           {10};// number of milliseconds to adjust for av sync errors
+    int       m_numDroppedFrames          {0}; // number of consecutive dropped frames.
+    int64_t   m_priorAudioTimecode        {0}; // time code from prior frame
+    int64_t   m_priorVideoTimecode        {0}; // time code from prior frame
+    int64_t   m_timeOffsetBase            {0};
 
     // LiveTV
-    TV *m_tv                            {nullptr};
-    bool isDummy                        {false};
+    TV *m_tv                              {nullptr};
+    bool m_isDummy                        {false};
 
     // Counter for buffering messages
-    int  bufferingCounter               {0};
+    int  m_bufferingCounter               {0};
 
     // Debugging variables
-    Jitterometer *output_jmeter         {nullptr};
+    Jitterometer *m_outputJmeter          {nullptr};
 
   private:
     void syncWithAudioStretch();
-    bool disable_passthrough            {false};
+    bool m_disablePassthrough             {false};
 };
 
 #endif

@@ -98,7 +98,7 @@ QMutex VolumeWriteBackThread::s_mutex;
 
 VolumeBase::VolumeBase()
 {
-    internal_vol = gCoreContext->GetBoolSetting("MythControlsVolume", true);
+    m_internalVol = gCoreContext->GetBoolSetting("MythControlsVolume", true);
     m_swvol = m_swvolSetting =
         (gCoreContext->GetSetting("MixerDevice", "default").toLower() == "software");
 }

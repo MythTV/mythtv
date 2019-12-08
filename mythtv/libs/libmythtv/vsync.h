@@ -123,8 +123,8 @@ class DRMVideoSync : public VideoSync
     int WaitForFrame(int nominal_frame_interval, int extra_delay) override; // VideoSync
 
   private:
-    int m_dri_fd;
-    static const char *s_dri_dev;
+    int m_driFd;
+    static const char *s_driDev;
     
 };
 #endif // !_WIN32
