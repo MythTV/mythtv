@@ -77,6 +77,7 @@ static CardUtil::INPUT_TYPES get_cardtype(uint sourceid)
         "SELECT capturecard.cardid "
         "FROM  capturecard "
         "WHERE capturecard.sourceid = :SOURCEID AND "
+        "      capturecard.parentid = 0         AND "
         "      capturecard.hostname = :HOSTNAME");
     query.bindValue(":SOURCEID", sourceid);
     query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
