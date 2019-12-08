@@ -2186,10 +2186,10 @@ static int getDBParamters(const QString& outFile)
     }
 
     QTextStream t(&f);
-    t << params.dbHostName << endl;
-    t << params.dbUserName << endl;
-    t << params.dbPassword << endl;
-    t << params.dbName << endl;
+    t << params.m_dbHostName << endl;
+    t << params.m_dbUserName << endl;
+    t << params.m_dbPassword << endl;
+    t << params.m_dbName << endl;
     t << gCoreContext->GetHostName() << endl;
     t << GetInstallPrefix() << endl;
     f.close();

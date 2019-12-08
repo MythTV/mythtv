@@ -204,7 +204,7 @@ bool BackendSelection::ConnectBackend(DeviceLocation *dev)
         case UPnPResult_Success:
             LOG(VB_UPNP, LOG_INFO,
                 QString("ConnectBackend() - success. New hostname: %1")
-                .arg(m_DBparams->dbHostName));
+                .arg(m_DBparams->m_dbHostName));
             return true;
 
         case UPnPResult_HumanInterventionRequired:
@@ -292,7 +292,7 @@ bool BackendSelection::TryDBfromURL(const QString &error, QString URL)
     {
         URL.remove("http://");
         URL.remove(QRegExp("[:/].*"));
-        m_DBparams->dbHostName = URL;
+        m_DBparams->m_dbHostName = URL;
         return true;
     }
 

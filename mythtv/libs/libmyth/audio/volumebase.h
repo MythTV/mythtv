@@ -43,9 +43,9 @@ class MPUBLIC VolumeBase
  private:
 
     int       m_volume             {80};
-    MuteState m_current_mute_state {kMuteOff};
+    MuteState m_currentMuteState  {kMuteOff};
     bool      m_swvol              {false};
-    bool      m_swvol_setting      {false};
+    bool      m_swvolSetting       {false};
     int       m_channels           {0};
 
 };

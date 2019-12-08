@@ -385,7 +385,7 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
 
     DatabaseParams dbParam = MythDB::getMythDB()->GetDatabaseParams();
     message += "\n\n" + tr("Database Host: %1\nDatabase Name: %2")
-                        .arg(dbParam.dbHostName).arg(dbParam.dbName);
+                        .arg(dbParam.m_dbHostName).arg(dbParam.m_dbName);
 
     if (gui)
     {

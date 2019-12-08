@@ -99,8 +99,8 @@ class MBASE_PUBLIC UpdateBrowseInfoEvent : public QEvent
 {
   public:
     explicit UpdateBrowseInfoEvent(const InfoMap &infoMap) :
-        QEvent(MythEvent::kUpdateBrowseInfoEventType), im(infoMap) {}
-    InfoMap im;
+        QEvent(MythEvent::kUpdateBrowseInfoEventType), m_im(infoMap) {}
+    InfoMap m_im;
 };
 
 // TODO combine with UpdateBrowseInfoEvent above

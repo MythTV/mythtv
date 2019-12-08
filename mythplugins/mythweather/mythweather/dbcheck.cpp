@@ -138,7 +138,7 @@ bool InitializeDatabase()
     {
         QStringList updates;
         updates << QString("ALTER DATABASE %1 DEFAULT CHARACTER SET latin1;")
-            .arg(gContext->GetDatabaseParams().dbName) <<
+            .arg(gContext->GetDatabaseParams().m_dbName) <<
             "ALTER TABLE weatherdatalayout"
             "  MODIFY location varbinary(64) NOT NULL,"
             "  MODIFY dataitem varbinary(64) NOT NULL;" <<
@@ -163,7 +163,7 @@ bool InitializeDatabase()
     {
         QStringList updates;
         updates << QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
-                .arg(gContext->GetDatabaseParams().dbName) <<
+                .arg(gContext->GetDatabaseParams().m_dbName) <<
             "ALTER TABLE weatherdatalayout"
             "  DEFAULT CHARACTER SET default,"
             "  MODIFY location varchar(64) CHARACTER SET utf8 NOT NULL,"

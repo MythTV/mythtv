@@ -73,19 +73,19 @@ DTC::ConnectionInfo* Myth::GetConnectionInfo( const QString  &sPin )
     QString sServerIP = gCoreContext->GetBackendServerIP();
     //QString sPeerIP   = pRequest->GetPeerAddress();
 
-    if ((params.dbHostName.compare("localhost",Qt::CaseInsensitive)==0
-      || params.dbHostName == "127.0.0.1"
-      || params.dbHostName == "::1")
+    if ((params.m_dbHostName.compare("localhost",Qt::CaseInsensitive)==0
+      || params.m_dbHostName == "127.0.0.1"
+      || params.m_dbHostName == "::1")
       && !sServerIP.isEmpty())  // &&
         //(sServerIP         != sPeerIP    ))
     {
-        params.dbHostName = sServerIP;
+        params.m_dbHostName = sServerIP;
     }
 
     // If dbHostName is an IPV6 address with scope,
     // remove the scope. Unescaped % signs are an
     // xml violation
-    QString dbHostName(params.dbHostName);
+    QString dbHostName(params.m_dbHostName);
     QHostAddress addr;
     if (addr.setAddress(dbHostName))
     {
@@ -101,20 +101,20 @@ DTC::ConnectionInfo* Myth::GetConnectionInfo( const QString  &sPin )
     DTC::WOLInfo        *pWOL      = pInfo->WOL();
     DTC::VersionInfo    *pVersion  = pInfo->Version();
 
-    pDatabase->setHost         ( dbHostName           );
-    pDatabase->setPing         ( params.dbHostPing    );
-    pDatabase->setPort         ( params.dbPort        );
-    pDatabase->setUserName     ( params.dbUserName    );
-    pDatabase->setPassword     ( params.dbPassword    );
-    pDatabase->setName         ( params.dbName        );
-    pDatabase->setType         ( params.dbType        );
-    pDatabase->setLocalEnabled ( params.localEnabled  );
-    pDatabase->setLocalHostName( params.localHostName );
+    pDatabase->setHost         ( dbHostName             );
+    pDatabase->setPing         ( params.m_dbHostPing    );
+    pDatabase->setPort         ( params.m_dbPort        );
+    pDatabase->setUserName     ( params.m_dbUserName    );
+    pDatabase->setPassword     ( params.m_dbPassword    );
+    pDatabase->setName         ( params.m_dbName        );
+    pDatabase->setType         ( params.m_dbType        );
+    pDatabase->setLocalEnabled ( params.m_localEnabled  );
+    pDatabase->setLocalHostName( params.m_localHostName );
 
-    pWOL->setEnabled           ( params.wolEnabled   );
-    pWOL->setReconnect         ( params.wolReconnect );
-    pWOL->setRetry             ( params.wolRetry     );
-    pWOL->setCommand           ( params.wolCommand   );
+    pWOL->setEnabled           ( params.m_wolEnabled   );
+    pWOL->setReconnect         ( params.m_wolReconnect );
+    pWOL->setRetry             ( params.m_wolRetry     );
+    pWOL->setCommand           ( params.m_wolCommand   );
 
     pVersion->setVersion       ( MYTH_SOURCE_VERSION   );
     pVersion->setBranch        ( MYTH_SOURCE_PATH      );

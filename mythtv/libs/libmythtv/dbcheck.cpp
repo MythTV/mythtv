@@ -588,7 +588,7 @@ static bool doUpgradeTVDatabaseSchema(void)
         MSqlQuery query(MSqlQuery::InitCon());
         if (!query.exec(QString("ALTER DATABASE %1 DEFAULT "
                                 "CHARACTER SET utf8 COLLATE utf8_general_ci;")
-                        .arg(gCoreContext->GetDatabaseParams().dbName)))
+                        .arg(gCoreContext->GetDatabaseParams().m_dbName)))
         {
             MythDB::DBError("UpgradeTVDatabaseSchema -- alter charset", query);
         }

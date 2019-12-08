@@ -9260,7 +9260,7 @@ void TV::customEvent(QEvent *e)
         OSD *osd = GetOSDLock(mctx);
         if (osd)
         {
-            osd->SetText("browse_info", b->im, kOSDTimeout_None);
+            osd->SetText("browse_info", b->m_im, kOSDTimeout_None);
             osd->SetExpiry("browse_info", kOSDTimeout_None);
         }
         ReturnOSDLock(mctx, osd);

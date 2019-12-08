@@ -57,8 +57,8 @@ class MPUBLIC MythContext
     void SetDisableEventPopup(bool check);
 
   private:
-    MythContextPrivate *d {nullptr};
-    QString             m_app_binary_version;
+    MythContextPrivate *d {nullptr}; // NOLINT(readability-identifier-naming)
+    QString             m_appBinaryVersion;
 };
 
 /// This global variable contains the MythContext instance for the application

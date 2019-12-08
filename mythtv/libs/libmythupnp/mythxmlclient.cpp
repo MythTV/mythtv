@@ -57,37 +57,37 @@ UPnPResultCode MythXMLClient::GetConnectionInfo( const QString &sPin, DatabasePa
     {
         QDomNode dbNode = oNode.namedItem( "Database" );
 
-        pParams->dbHostName   = GetNodeValue( dbNode, "Host"     , QString());
-        pParams->dbPort       = GetNodeValue( dbNode, "Port"     , 0        );
-        pParams->dbUserName   = GetNodeValue( dbNode, "UserName" , QString());
-        pParams->dbPassword   = GetNodeValue( dbNode, "Password" , QString());
-        pParams->dbName       = GetNodeValue( dbNode, "Name"     , QString());
-        pParams->dbType       = GetNodeValue( dbNode, "Type"     , QString());
+        pParams->m_dbHostName   = GetNodeValue( dbNode, "Host"     , QString());
+        pParams->m_dbPort       = GetNodeValue( dbNode, "Port"     , 0        );
+        pParams->m_dbUserName   = GetNodeValue( dbNode, "UserName" , QString());
+        pParams->m_dbPassword   = GetNodeValue( dbNode, "Password" , QString());
+        pParams->m_dbName       = GetNodeValue( dbNode, "Name"     , QString());
+        pParams->m_dbType       = GetNodeValue( dbNode, "Type"     , QString());
 
         QDomNode wolNode = oNode.namedItem( "WOL" );
 
-        pParams->wolEnabled   = GetNodeValue( wolNode, "Enabled"  , false    );
-        pParams->wolReconnect = GetNodeValue( wolNode, "Reconnect", 0        );
-        pParams->wolRetry     = GetNodeValue( wolNode, "Retry"    , 0        );
-        pParams->wolCommand   = GetNodeValue( wolNode, "Command"  , QString());
+        pParams->m_wolEnabled   = GetNodeValue( wolNode, "Enabled"  , false    );
+        pParams->m_wolReconnect = GetNodeValue( wolNode, "Reconnect", 0        );
+        pParams->m_wolRetry     = GetNodeValue( wolNode, "Retry"    , 0        );
+        pParams->m_wolCommand   = GetNodeValue( wolNode, "Command"  , QString());
 
         QDomNode verNode = oNode.namedItem( "Version" );
 
-        pParams->verVersion   = GetNodeValue( verNode, "Version"  , ""       );
-        pParams->verBranch    = GetNodeValue( verNode, "Branch"   , ""       );
-        pParams->verProtocol  = GetNodeValue( verNode, "Protocol" , ""       );
-        pParams->verBinary    = GetNodeValue( verNode, "Binary"   , ""       );
-        pParams->verSchema    = GetNodeValue( verNode, "Schema"   , ""       );
+        pParams->m_verVersion   = GetNodeValue( verNode, "Version"  , ""       );
+        pParams->m_verBranch    = GetNodeValue( verNode, "Branch"   , ""       );
+        pParams->m_verProtocol  = GetNodeValue( verNode, "Protocol" , ""       );
+        pParams->m_verBinary    = GetNodeValue( verNode, "Binary"   , ""       );
+        pParams->m_verSchema    = GetNodeValue( verNode, "Schema"   , ""       );
 
-        if ((pParams->verProtocol != MYTH_PROTO_VERSION) ||
-            (pParams->verSchema   != MYTH_DATABASE_VERSION))
+        if ((pParams->m_verProtocol != MYTH_PROTO_VERSION) ||
+            (pParams->m_verSchema   != MYTH_DATABASE_VERSION))
             // incompatible version, we cannot use this backend
         {
             LOG(VB_GENERAL, LOG_ERR,
                 QString("MythXMLClient::GetConnectionInfo Failed - "
                         "Version Mismatch (%1,%2) != (%3,%4)")
-                .arg(pParams->verProtocol)
-                .arg(pParams->verSchema)
+                .arg(pParams->m_verProtocol)
+                .arg(pParams->m_verSchema)
                 .arg(MYTH_PROTO_VERSION)
                 .arg(MYTH_DATABASE_VERSION));
             sMsg = QObject::tr("Version Mismatch", "UPNP Errors");

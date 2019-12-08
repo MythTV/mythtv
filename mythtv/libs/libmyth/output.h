@@ -32,24 +32,24 @@ class MPUBLIC OutputEvent : public MythEvent
     explicit OutputEvent(Type type) :
         MythEvent(type) {}
     OutputEvent(long s, unsigned long w, int b, int f, int p, int c) :
-        MythEvent(Info), m_elasped_seconds(s), m_written_bytes(w),
+        MythEvent(Info), m_elaspedSeconds(s), m_writtenBytes(w),
         m_brate(b), m_freq(f), m_prec(p), m_chan(c) {}
     explicit OutputEvent(const QString &e) :
         MythEvent(Error)
     {
         QByteArray tmp = e.toUtf8();
-        m_error_msg = new QString(tmp.constData());
+        m_errorMsg = new QString(tmp.constData());
     }
 
     ~OutputEvent()
     {
-        delete m_error_msg;
+        delete m_errorMsg;
     }
 
-    const QString *errorMessage() const { return m_error_msg; }
+    const QString *errorMessage() const { return m_errorMsg; }
 
-    const long &elapsedSeconds() const { return m_elasped_seconds; }
-    const unsigned long &writtenBytes() const { return m_written_bytes; }
+    const long &elapsedSeconds() const { return m_elaspedSeconds; }
+    const unsigned long &writtenBytes() const { return m_writtenBytes; }
     const int &bitrate() const { return m_brate; }
     const int &frequency() const { return m_freq; }
     const int &precision() const { return m_prec; }
@@ -67,23 +67,23 @@ class MPUBLIC OutputEvent : public MythEvent
 
   private:
     OutputEvent(const OutputEvent &o) : MythEvent(o),
-        m_elasped_seconds(o.m_elasped_seconds),
-        m_written_bytes(o.m_written_bytes),
+        m_elaspedSeconds(o.m_elaspedSeconds),
+        m_writtenBytes(o.m_writtenBytes),
         m_brate(o.m_brate), m_freq(o.m_freq),
         m_prec(o.m_prec), m_chan(o.m_chan)
     {
-        if (o.m_error_msg)
+        if (o.m_errorMsg)
         {
-            m_error_msg = new QString(*o.m_error_msg);
+            m_errorMsg = new QString(*o.m_errorMsg);
         }
     }
     OutputEvent &operator=(const OutputEvent&);
 
   private:
-    QString       *m_error_msg       {nullptr};
+    QString       *m_errorMsg        {nullptr};
 
-    long           m_elasped_seconds {0};
-    unsigned long  m_written_bytes   {0};
+    long           m_elaspedSeconds  {0};
+    unsigned long  m_writtenBytes    {0};
     int            m_brate           {0};
     int            m_freq            {0};
     int            m_prec            {0};
