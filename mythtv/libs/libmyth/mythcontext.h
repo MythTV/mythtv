@@ -27,7 +27,7 @@ class MythContextSlotHandler : public QObject
   private:
     ~MythContextSlotHandler() = default;
 
-    MythContextPrivate *d {nullptr};
+    MythContextPrivate *d {nullptr}; // NOLINT(readability-identifier-naming)
 };
 
 /** \class MythContext

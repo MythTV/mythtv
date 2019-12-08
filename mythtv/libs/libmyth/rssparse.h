@@ -212,20 +212,20 @@ class MPUBLIC Parse : public QObject
     static QString UnescapeHTML (const QString&);
 
   private:
-    QMap<QString, int> TimezoneOffsets;
+    QMap<QString, int> m_timezoneOffsets;
 
   protected:
-    static const QString s_DC;
-    static const QString s_WFW;
-    static const QString s_Atom;
-    static const QString s_RDF;
-    static const QString s_Slash;
-    static const QString s_Enc;
-    static const QString s_ITunes;
-    static const QString s_GeoRSSSimple;
-    static const QString s_GeoRSSW3;
-    static const QString s_MediaRSS;
-    static const QString s_MythRSS;
+    static const QString kDC;
+    static const QString kWFW;
+    static const QString kAtom;
+    static const QString kRDF;
+    static const QString kSlash;
+    static const QString kEnc;
+    static const QString kITunes;
+    static const QString kGeoRSSSimple;
+    static const QString kGeoRSSW3;
+    static const QString kMediaRSS;
+    static const QString kMythRSS;
 };
 
 Q_DECLARE_METATYPE(ResultItem*)

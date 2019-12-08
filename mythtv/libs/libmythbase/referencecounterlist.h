@@ -35,7 +35,7 @@ public:
     const T *operator->() const { return r; }
 
 private:
-    T *r;
+    T *r; //NOLINT(readability-identifier-naming)
 };
 
 /** \brief General purpose reference counted list.

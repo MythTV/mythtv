@@ -54,7 +54,7 @@ class META_PUBLIC meta_node
   private:
     QString m_fq_path;
     bool m_path_root;
-    static const QString m_empty_path;
+    static const QString kEmptyPath;
 };
 
 class META_PUBLIC meta_data_node : public meta_node
@@ -68,7 +68,7 @@ class META_PUBLIC meta_data_node : public meta_node
 
   private:
     VideoMetadata *m_data {nullptr};
-    static const QString m_meta_bug;
+    static const QString kMetaBug;
 };
 
 class meta_dir_node;

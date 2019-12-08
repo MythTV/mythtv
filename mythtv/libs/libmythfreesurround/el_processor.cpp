@@ -565,35 +565,35 @@ private:
 
 // implementation of the shell class
 
-fsurround_decoder::fsurround_decoder(unsigned blocksize): impl(new decoder_impl(blocksize)) { }
+fsurround_decoder::fsurround_decoder(unsigned blocksize): m_impl(new decoder_impl(blocksize)) { }
 
-fsurround_decoder::~fsurround_decoder() { delete impl; }
+fsurround_decoder::~fsurround_decoder() { delete m_impl; }
 
 void fsurround_decoder::decode(float center_width, float dimension, float adaption_rate) {
-    impl->decode(center_width,dimension,adaption_rate);
+    m_impl->decode(center_width,dimension,adaption_rate);
 }
 
-void fsurround_decoder::flush() { impl->flush(); }
+void fsurround_decoder::flush() { m_impl->flush(); }
 
-void fsurround_decoder::surround_coefficients(float a, float b) { impl->surround_coefficients(a,b); }
+void fsurround_decoder::surround_coefficients(float a, float b) { m_impl->surround_coefficients(a,b); }
 
-void fsurround_decoder::phase_mode(unsigned mode) { impl->phase_mode(mode); }
+void fsurround_decoder::phase_mode(unsigned mode) { m_impl->phase_mode(mode); }
 
-void fsurround_decoder::steering_mode(bool mode) { impl->steering_mode(mode); }
+void fsurround_decoder::steering_mode(bool mode) { m_impl->steering_mode(mode); }
 
-void fsurround_decoder::separation(float front, float rear) { impl->separation(front,rear); }
+void fsurround_decoder::separation(float front, float rear) { m_impl->separation(front,rear); }
 
 float ** fsurround_decoder::getInputBuffers()
 {
-    return impl->getInputBuffers();
+    return m_impl->getInputBuffers();
 }
 
 float ** fsurround_decoder::getOutputBuffers()
 {
-    return impl->getOutputBuffers();
+    return m_impl->getOutputBuffers();
 }
 
 void fsurround_decoder::sample_rate(unsigned int samplerate)
 {
-    impl->sample_rate(samplerate);
+    m_impl->sample_rate(samplerate);
 }

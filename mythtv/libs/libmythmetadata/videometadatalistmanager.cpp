@@ -189,11 +189,11 @@ bool VideoMetadataListManager::purgeByID(unsigned int db_id)
     return m_imp->purgeByID(db_id);
 }
 
-const QString meta_node::m_empty_path;
+const QString meta_node::kEmptyPath;
 
 const QString& meta_node::getPath() const
 {
-    return m_empty_path;
+    return kEmptyPath;
 }
 
 const QString& meta_node::getFQPath()
@@ -225,7 +225,7 @@ void meta_node::setPathRoot(bool is_root)
     m_path_root = is_root;
 }
 
-const QString meta_data_node::m_meta_bug = "Bug";
+const QString meta_data_node::kMetaBug = "Bug";
 
 const QString& meta_data_node::getName() const
 {
@@ -234,7 +234,7 @@ const QString& meta_data_node::getName() const
         return m_data->GetTitle();
     }
 
-    return m_meta_bug;
+    return kMetaBug;
 }
 
 const VideoMetadata* meta_data_node::getData() const

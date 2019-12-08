@@ -306,7 +306,7 @@ MSqlDatabase *MDBManager::popConnection(bool reuse)
         db = m_inuse[QThread::currentThread()];
         if (db != nullptr)
         {
-            m_inuse_count[QThread::currentThread()]++;
+            m_inuseCount[QThread::currentThread()]++;
             m_lock.unlock();
             return db;
         }
@@ -330,7 +330,7 @@ MSqlDatabase *MDBManager::popConnection(bool reuse)
 #if REUSE_CONNECTION
     if (reuse)
     {
-        m_inuse_count[QThread::currentThread()]=1;
+        m_inuseCount[QThread::currentThread()]=1;
         m_inuse[QThread::currentThread()] = db;
     }
 #endif
@@ -349,7 +349,7 @@ void MDBManager::pushConnection(MSqlDatabase *db)
 #if REUSE_CONNECTION
     if (db == m_inuse[QThread::currentThread()])
     {
-        int cnt = --m_inuse_count[QThread::currentThread()];
+        int cnt = --m_inuseCount[QThread::currentThread()];
         if (cnt > 0)
         {
             m_lock.unlock();
@@ -449,8 +449,8 @@ MSqlDatabase *MDBManager::getStaticCon(MSqlDatabase **dbcon, const QString& name
 
     (*dbcon)->OpenDatabase();
 
-    if (!m_static_pool[QThread::currentThread()].contains(*dbcon))
-        m_static_pool[QThread::currentThread()].push_back(*dbcon);
+    if (!m_staticPool[QThread::currentThread()].contains(*dbcon))
+        m_staticPool[QThread::currentThread()].push_back(*dbcon);
 
     return *dbcon;
 }
@@ -482,7 +482,7 @@ void MDBManager::CloseDatabases()
     }
 
     m_lock.lock();
-    DBList &slist = m_static_pool[QThread::currentThread()];
+    DBList &slist = m_staticPool[QThread::currentThread()];
     while (!slist.isEmpty())
     {
         MSqlDatabase *db = slist.takeFirst();
@@ -608,7 +608,7 @@ bool MSqlQuery::exec()
         return false;
     }
 
-    if (m_last_prepared_query.isEmpty())
+    if (m_lastPreparedQuery.isEmpty())
     {
         LOG(VB_GENERAL, LOG_ERR,
             "MSqlQuery::exec(void) called without a prepared query.");
@@ -812,7 +812,7 @@ bool MSqlQuery::prepare(const QString& query)
         return false;
     }
 
-    m_last_prepared_query = query;
+    m_lastPreparedQuery = query;
 
     if (!m_db->isOpen() && !Reconnect())
     {
@@ -893,10 +893,10 @@ bool MSqlQuery::Reconnect(void)
 {
     if (!m_db->Reconnect())
         return false;
-    if (!m_last_prepared_query.isEmpty())
+    if (!m_lastPreparedQuery.isEmpty())
     {
         MSqlBindings tmp = QSqlQuery::boundValues();
-        if (!QSqlQuery::prepare(m_last_prepared_query))
+        if (!QSqlQuery::prepare(m_lastPreparedQuery))
             return false;
         bindValues(tmp);
     }

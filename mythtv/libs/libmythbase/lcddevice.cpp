@@ -38,7 +38,7 @@
 #define LOC QString("LCDdevice: ")
 
 LCD::LCD()
-    : m_retryTimer(new QTimer(this)), m_LEDTimer(new QTimer(this))
+    : m_retryTimer(new QTimer(this)), m_ledTimer(new QTimer(this))
 {
     m_sendBuffer.clear(); m_lastCommand.clear();
     m_lcdShowMusicItems.clear(); m_lcdKeyString.clear();
@@ -54,7 +54,7 @@ LCD::LCD()
         "An LCD object now exists (LCD() was called)");
 
     connect(m_retryTimer, SIGNAL(timeout()),   this, SLOT(restartConnection()));
-    connect(m_LEDTimer,   SIGNAL(timeout()),   this, SLOT(outputLEDs()));
+    connect(m_ledTimer,   SIGNAL(timeout()),   this, SLOT(outputLEDs()));
     connect(this, &LCD::sendToServer, this, &LCD::sendToServerSlot, Qt::QueuedConnection);
 }
 
@@ -527,10 +527,10 @@ void LCD::setVolumeLevel(float value)
 
 void LCD::setupLEDs(int(*LedMaskFunc)(void))
 {
-    GetLEDMask = LedMaskFunc;
+    m_getLEDMask = LedMaskFunc;
     // update LED status every 10 seconds
-    m_LEDTimer->setSingleShot(false);
-    m_LEDTimer->start(10000);
+    m_ledTimer->setSingleShot(false);
+    m_ledTimer->start(10000);
 }
 
 void LCD::outputLEDs()
@@ -542,8 +542,8 @@ void LCD::outputLEDs()
 
     QString aString;
     int mask = 0;
-    if (0 && GetLEDMask)
-        mask = GetLEDMask();
+    if (0 && m_getLEDMask)
+        mask = m_getLEDMask();
     aString = "UPDATE_LEDS ";
     aString += QString::number(mask);
     sendToServer(aString);

@@ -173,7 +173,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
 
     void ShowMouseCursor(bool show);
 
-    MythMainWindowPrivate *d {nullptr};
+    MythMainWindowPrivate *d {nullptr}; // NOLINT(readability-identifier-naming)
 
   private slots:
     void DelayedAction(void);

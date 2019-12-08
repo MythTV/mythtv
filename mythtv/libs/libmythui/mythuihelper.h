@@ -147,7 +147,7 @@ class MUI_PUBLIC MythUIHelper
     void RemoveCacheDir(const QString &dirname);
     static void PruneCacheDir(const QString& dirname);
 
-    MythUIHelperPrivate *d {nullptr};
+    MythUIHelperPrivate *d {nullptr}; // NOLINT(readability-identifier-naming)
 
     QMutex m_locationLock;
     QStringList m_currentLocation;

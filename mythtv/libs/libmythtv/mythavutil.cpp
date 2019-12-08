@@ -214,10 +214,7 @@ class MythAVCopyPrivate
 {
 public:
     explicit MythAVCopyPrivate(bool uswc)
-    : m_swsctx(nullptr), m_copyctx(new MythUSWCCopy(4096, !uswc)),
-      m_width(0), m_height(0), m_size(0), m_format(AV_PIX_FMT_NONE)
-    {
-    }
+        : m_copyctx(new MythUSWCCopy(4096, !uswc)) {}
 
     ~MythAVCopyPrivate()
     {
@@ -244,12 +241,12 @@ public:
         return m_size;
     }
 
-    SwsContext   *m_swsctx;
-    MythUSWCCopy *m_copyctx;
-    int           m_width;
-    int           m_height;
-    int           m_size;
-    AVPixelFormat m_format;
+    SwsContext   *m_swsctx  {nullptr};
+    MythUSWCCopy *m_copyctx {nullptr};
+    int           m_width   {0};
+    int           m_height  {0};
+    int           m_size    {0};
+    AVPixelFormat m_format  {AV_PIX_FMT_NONE};
 };
 
 MythAVCopy::MythAVCopy(bool uswc) : d(new MythAVCopyPrivate(uswc))
@@ -387,14 +384,10 @@ int MythAVCopy::Copy(VideoFrame *frame, const AVFrame *pic, AVPixelFormat fmt)
 
 MythPictureDeinterlacer::MythPictureDeinterlacer(AVPixelFormat pixfmt,
                                                  int width, int height, float ar)
-    : m_filter_graph(nullptr)
-    , m_buffersink_ctx(nullptr)
-    , m_buffersrc_ctx(nullptr)
-    , m_pixfmt(pixfmt)
+    : m_pixfmt(pixfmt)
     , m_width(width)
     , m_height(height)
     , m_ar(ar)
-    , m_errored(false)
 {
     if (Flush() < 0)
     {
@@ -514,10 +507,6 @@ MythPictureDeinterlacer::~MythPictureDeinterlacer()
 
 MythCodecMap *gCodecMap = new MythCodecMap();
 
-MythCodecMap::MythCodecMap() : mapLock(QMutex::Recursive)
-{
-}
-
 MythCodecMap::~MythCodecMap()
 {
     freeAllCodecContexts();
@@ -526,8 +515,8 @@ MythCodecMap::~MythCodecMap()
 AVCodecContext *MythCodecMap::getCodecContext(const AVStream *stream,
     const AVCodec *pCodec, bool nullCodec)
 {
-    QMutexLocker lock(&mapLock);
-    AVCodecContext *avctx = streamMap.value(stream, nullptr);
+    QMutexLocker lock(&m_mapLock);
+    AVCodecContext *avctx = m_streamMap.value(stream, nullptr);
     if (!avctx)
     {
         if (stream == nullptr || stream->codecpar == nullptr)
@@ -551,7 +540,7 @@ AVCodecContext *MythCodecMap::getCodecContext(const AVStream *stream,
         if (avctx)
         {
             avctx->pkt_timebase =  stream->time_base;
-            streamMap.insert(stream, avctx);
+            m_streamMap.insert(stream, avctx);
         }
     }
     return avctx;
@@ -559,7 +548,7 @@ AVCodecContext *MythCodecMap::getCodecContext(const AVStream *stream,
 
 AVCodecContext *MythCodecMap::hasCodecContext(const AVStream *stream)
 {
-    return streamMap.value(stream, nullptr);
+    return m_streamMap.value(stream, nullptr);
 }
 
 /// \note This will not free a hardware or frames context that is in anyway referenced outside
@@ -567,8 +556,8 @@ AVCodecContext *MythCodecMap::hasCodecContext(const AVStream *stream)
 /// as well. Leaking hardware contexts is a very bad idea.
 void MythCodecMap::freeCodecContext(const AVStream *stream)
 {
-    QMutexLocker lock(&mapLock);
-    AVCodecContext *avctx = streamMap.take(stream);
+    QMutexLocker lock(&m_mapLock);
+    AVCodecContext *avctx = m_streamMap.take(stream);
     if (avctx)
     {
         if (avctx->internal)
@@ -579,9 +568,9 @@ void MythCodecMap::freeCodecContext(const AVStream *stream)
 
 void MythCodecMap::freeAllCodecContexts()
 {
-    QMutexLocker lock(&mapLock);
-    QMap<const AVStream*, AVCodecContext*>::iterator i = streamMap.begin();
-    while (i != streamMap.end()) {
+    QMutexLocker lock(&m_mapLock);
+    QMap<const AVStream*, AVCodecContext*>::iterator i = m_streamMap.begin();
+    while (i != m_streamMap.end()) {
         const AVStream *stream = i.key();
         ++i;
         freeCodecContext(stream);

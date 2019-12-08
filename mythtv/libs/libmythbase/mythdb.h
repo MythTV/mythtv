@@ -93,7 +93,7 @@ class MBASE_PUBLIC MythDB
   private:
     MythDB(const MythDB &) = delete;            // not copyable
     MythDB &operator=(const MythDB &) = delete; // not copyable
-    MythDBPrivate *d {nullptr};
+    MythDBPrivate *d {nullptr}; // NOLINT(readability-identifier-naming)
 };
 
  MBASE_PUBLIC  MythDB *GetMythDB();

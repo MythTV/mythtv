@@ -602,7 +602,7 @@ bool avfDecoderFactory::supports(const QString &source) const
 
 const QString &avfDecoderFactory::extension() const
 {
-    return MetaIO::ValidFileExtensions;
+    return MetaIO::kValidFileExtensions;
 }
 
 const QString &avfDecoderFactory::description() const

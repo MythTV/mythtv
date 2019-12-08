@@ -61,7 +61,7 @@ class MBASE_PUBLIC ThreadedFileWriter
     void Sync(void);
     void Flush(void);
     bool SetBlocking(bool block = true);
-    bool WritesFailing(void) const { return m_ignore_writes; }
+    bool WritesFailing(void) const { return m_ignoreWrites; }
 
   protected:
     void DiskLoop(void);
@@ -77,9 +77,9 @@ class MBASE_PUBLIC ThreadedFileWriter
 
     // state
     bool            m_flush              {false};         // protected by buflock
-    bool            m_in_dtor            {false};         // protected by buflock
-    bool            m_ignore_writes      {false};         // protected by buflock
-    uint            m_tfw_min_write_size {kMinWriteSize}; // protected by buflock
+    bool            m_inDtor             {false};         // protected by buflock
+    bool            m_ignoreWrites       {false};         // protected by buflock
+    uint            m_tfwMinWriteSize    {kMinWriteSize}; // protected by buflock
     uint            m_totalBufferUse     {0};             // protected by buflock
 
     // buffers
@@ -89,7 +89,7 @@ class MBASE_PUBLIC ThreadedFileWriter
         vector<char> data;
         QDateTime    lastUsed;
     };
-    mutable QMutex    m_buflock;
+    mutable QMutex    m_bufLock;
     QList<TFWBuffer*> m_writeBuffers;     // protected by buflock
     QList<TFWBuffer*> m_emptyBuffers;     // protected by buflock
 

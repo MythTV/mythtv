@@ -395,12 +395,12 @@ class META_PUBLIC MetadataLoadingThread : public MThread
   public:
 
     explicit MetadataLoadingThread(AllMusic *parent_ptr)
-        : MThread("MetadataLoading"), parent(parent_ptr) {}
+        : MThread("MetadataLoading"), m_parent(parent_ptr) {}
     void run() override; // MThread
 
   private:
 
-    AllMusic *parent {nullptr};
+    AllMusic *m_parent {nullptr};
 };
 
 //---------------------------------------------------------------------------

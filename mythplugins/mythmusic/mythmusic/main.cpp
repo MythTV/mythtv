@@ -446,7 +446,7 @@ static void showMiniPlayer(void)
 
 static QStringList GetMusicFilter()
 {
-    QString filt = MetaIO::ValidFileExtensions;
+    QString filt = MetaIO::kValidFileExtensions;
     filt.replace(".", "*.");
     return filt.split('|');
 }
@@ -865,7 +865,7 @@ static void setupKeys(void)
     REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
         "MythMusic Media Handler 1/2"), "", handleCDMedia,
         MEDIATYPE_AUDIO | MEDIATYPE_MIXED, QString());
-    QString filt = MetaIO::ValidFileExtensions;
+    QString filt = MetaIO::kValidFileExtensions;
     filt.replace('|',',');
     filt.remove('.');
     REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",

@@ -88,7 +88,7 @@ private:
 class MTV_PUBLIC MythCodecMap
 {
   public:
-    MythCodecMap();
+    MythCodecMap() = default;
     ~MythCodecMap();
     static MythCodecMap *getInstance();
     AVCodecContext *getCodecContext(const AVStream*,
@@ -97,8 +97,8 @@ class MTV_PUBLIC MythCodecMap
     void freeCodecContext(const AVStream*);
     void freeAllCodecContexts();
   protected:
-    QMap<const AVStream*, AVCodecContext*> streamMap;
-    QMutex mapLock;
+    QMap<const AVStream*, AVCodecContext*> m_streamMap;
+    QMutex m_mapLock {QMutex::Recursive};
 };
 
 /// This global variable contains the MythCodecMap instance for the app
@@ -145,7 +145,7 @@ private:
                           int width, int height, AVPixelFormat pix_fmt);
     MythAVCopy(const MythAVCopy &) = delete;            // not copyable
     MythAVCopy &operator=(const MythAVCopy &) = delete; // not copyable
-    MythAVCopyPrivate *d;
+MythAVCopyPrivate *d {nullptr}; // NOLINT(readability-identifier-naming)
 };
 
 /**

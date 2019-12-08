@@ -1389,7 +1389,7 @@ void MetadataLoadingThread::run()
     RunProlog();
     //if you want to simulate a big music collection load
     //sleep(3);
-    parent->resync();
+    m_parent->resync();
     RunEpilog();
 }
 
