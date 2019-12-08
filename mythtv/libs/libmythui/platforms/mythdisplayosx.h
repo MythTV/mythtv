@@ -4,6 +4,9 @@
 // MythTV
 #include "mythdisplay.h"
 
+// CoreGraphics
+#include <CoreGraphics/CGDirectDisplay.h>
+
 class MythDisplayOSX : public MythDisplay
 {
   public:
@@ -15,6 +18,10 @@ class MythDisplayOSX : public MythDisplay
     bool UsingVideoModes(void) override;
     const std::vector<MythDisplayMode>& GetVideoModes(void) override;
     bool SwitchToVideoMode(int Width, int Height, double DesiredRate) override;
+
+  private:
+    void ClearModes(void);
+    QMap<uint64_t, CGDisplayModeRef> m_modeMap { };
 };
 
 #endif // MYTHDISPLAYOSX_H
