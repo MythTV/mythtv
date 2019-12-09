@@ -115,9 +115,13 @@ linux:DEFINES += linux
 macx {
     HEADERS += mythcdrom-darwin.h
     SOURCES += mythcdrom-darwin.cpp
-
-    QMAKE_CXXFLAGS += -F/System/Library/Frameworks/IOKit.framework/Frameworks
-    LIBS           += -framework IOKit
+    HEADERS += platforms/mythpowerosx.h
+    SOURCES += platforms/mythpowerosx.cpp
+    QMAKE_OBJECTIVE_CFLAGS += $$QMAKE_CXXFLAGS
+    QMAKE_OBJECTIVE_CXXFLAGS += $$QMAKE_CXXFLAGS
+    OBJECTIVE_HEADERS += platforms/mythcocoautils.h
+    OBJECTIVE_SOURCES += platforms/mythcocoautils.mm
+    LIBS              += -framework Cocoa -framework IOKit
 }
 
 linux {
