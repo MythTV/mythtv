@@ -89,7 +89,7 @@ bool MythPowerOSX::DoFeature(bool)
     if (!((m_features & m_scheduledFeature) && m_scheduledFeature))
         return false;
 
-    FeatureHappening():
+    FeatureHappening();
     AEEventID event = 0;
     switch (m_scheduledFeature)
     {
