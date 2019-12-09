@@ -190,7 +190,7 @@ class MTV_PUBLIC MythPlayer
     float   GetFrameRate(void) const          { return video_frame_rate; }
     void    GetPlaybackData(InfoMap &infoMap);
     bool    IsAudioNeeded(void)
-        { return !(FlagIsSet(kVideoIsNull)) && player_ctx->IsAudioNeeded(); }
+        { return !(FlagIsSet(kVideoIsNull)) && m_playerCtx->IsAudioNeeded(); }
     uint    GetVolume(void) { return audio.GetVolume(); }
     int     GetFreeVideoFrames(void) const;
     AspectOverrideMode GetAspectOverride(void) const;
@@ -638,7 +638,7 @@ class MTV_PUBLIC MythPlayer
     DecoderBase   *decoder              {nullptr};
     mutable QMutex decoder_change_lock  {QMutex::Recursive};
     MythVideoOutput *videoOutput        {nullptr};
-    PlayerContext *player_ctx           {nullptr};
+    PlayerContext   *m_playerCtx          {nullptr};
     DecoderThread *decoderThread        {nullptr};
     QThread       *playerThread         {nullptr};
 

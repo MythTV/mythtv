@@ -73,15 +73,15 @@ bool MythCommFlagPlayer::RebuildSeekTable(
     framesPlayed = 0;
 
     // clear out any existing seektables
-    player_ctx->LockPlayingInfo(__FILE__, __LINE__);
-    if (player_ctx->m_playingInfo)
+    m_playerCtx->LockPlayingInfo(__FILE__, __LINE__);
+    if (m_playerCtx->m_playingInfo)
     {
-        player_ctx->m_playingInfo->ClearPositionMap(MARK_KEYFRAME);
-        player_ctx->m_playingInfo->ClearPositionMap(MARK_GOP_START);
-        player_ctx->m_playingInfo->ClearPositionMap(MARK_GOP_BYFRAME);
-        player_ctx->m_playingInfo->ClearPositionMap(MARK_DURATION_MS);
+        m_playerCtx->m_playingInfo->ClearPositionMap(MARK_KEYFRAME);
+        m_playerCtx->m_playingInfo->ClearPositionMap(MARK_GOP_START);
+        m_playerCtx->m_playingInfo->ClearPositionMap(MARK_GOP_BYFRAME);
+        m_playerCtx->m_playingInfo->ClearPositionMap(MARK_DURATION_MS);
     }
-    player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
+    m_playerCtx->UnlockPlayingInfo(__FILE__, __LINE__);
 
     if (OpenFile() < 0)
         return false;
@@ -120,10 +120,10 @@ bool MythCommFlagPlayer::RebuildSeekTable(
         if (inuse_timer.elapsed() > 2534)
         {
             inuse_timer.restart();
-            player_ctx->LockPlayingInfo(__FILE__, __LINE__);
-            if (player_ctx->m_playingInfo)
-                player_ctx->m_playingInfo->UpdateInUseMark();
-            player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
+            m_playerCtx->LockPlayingInfo(__FILE__, __LINE__);
+            if (m_playerCtx->m_playingInfo)
+                m_playerCtx->m_playingInfo->UpdateInUseMark();
+            m_playerCtx->UnlockPlayingInfo(__FILE__, __LINE__);
         }
 
         if (save_timer.elapsed() > save_timeout)
