@@ -129,6 +129,44 @@ void VideoSourceSelector::Load(void)
     TransMythUIComboBoxSetting::Load();
 }
 
+VideoSourceShow::VideoSourceShow(uint    _initial_sourceid) :
+    m_initialSourceId(_initial_sourceid)
+{
+    setLabel(tr("Video Source"));
+    setHelpText(
+        QObject::tr(
+            "The video source that is "
+            "selected in the Channel Editor page."
+            ));
+}
+
+void VideoSourceShow::Load(void)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    QString querystr =
+        "SELECT DISTINCT videosource.name, videosource.sourceid "
+        "FROM capturecard, videosource "
+        "WHERE capturecard.sourceid = videosource.sourceid AND "
+        "      capturecard.hostname = :HOSTNAME            AND "
+        "      videosource.sourceid = :SOURCEID ";
+
+    query.prepare(querystr);
+    query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
+    query.bindValue(":SOURCEID", m_initialSourceId);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythDB::DBError("VideoSourceShow::Load", query);
+        return;
+    }
+
+    if (query.next())
+    {
+        setValue(query.value(0).toString());
+    }
+}
+
 class InstanceCount : public MythUISpinBoxSetting
 {
   public:

@@ -72,6 +72,21 @@ class VideoSourceSelector : public TransMythUIComboBoxSetting
     bool    m_mustHaveMplexId;
 };
 
+class VideoSourceShow : public GroupSetting
+{
+    Q_OBJECT
+
+  public:
+    VideoSourceShow(uint    _initial_sourceid);
+
+    void Load(void) override; // StandardSetting
+
+    uint GetSourceID(void) const { return getValue().toUInt(); }
+
+  private:
+    uint    m_initialSourceId;
+};
+
 class FreqTableSelector :
     public MythUIComboBoxSetting
 {
