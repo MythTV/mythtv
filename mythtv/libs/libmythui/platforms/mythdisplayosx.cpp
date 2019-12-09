@@ -32,7 +32,7 @@ DisplayInfo MythDisplayOSX::GetDisplayInfo(int VideoRate)
     if (!mode)
         return ret;
     double rate     = CGDisplayModeGetRefreshRate(mode);
-    bool interlaced = CGDisplayModeGetIOFlags(mode) & kDisplayModeInterlacedFlag;
+    //bool interlaced = CGDisplayModeGetIOFlags(mode) & kDisplayModeInterlacedFlag;
     size_t width    = CGDisplayModeGetWidth(mode);
     size_t height   = CGDisplayModeGetHeight(mode);
     CGDisplayModeRelease(mode);
