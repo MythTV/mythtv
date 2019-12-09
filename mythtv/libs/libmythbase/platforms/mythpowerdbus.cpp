@@ -187,10 +187,7 @@ void MythPowerDBus::DBusSuspending(bool Stopping)
         if (UpdateStatus())
             return;
 
-        // This code is probably never hit
-        m_isSpontaneous = true;
-        m_scheduledFeature = FeatureSuspend;
-        return FeatureHappening();
+        return FeatureHappening(FeatureSuspend);
     }
     DidWakeUp();
 }
@@ -205,9 +202,7 @@ void MythPowerDBus::DBusShuttingDown(bool Stopping)
         if (UpdateStatus())
             return;
 
-        m_isSpontaneous = true;
-        m_scheduledFeature = FeatureShutdown;
-        return FeatureHappening();
+        return FeatureHappening(FeatureShutdown);
     }
     DidWakeUp(); // after hibernate?
 }

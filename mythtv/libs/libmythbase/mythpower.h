@@ -79,7 +79,7 @@ class MBASE_PUBLIC MythPower : public QObject, public ReferenceCounter
     virtual void   Init              (void);
     virtual bool   DoFeature         (bool = false) { return false; }
     virtual void   DidWakeUp         (void);
-    virtual void   FeatureHappening  (void);
+    virtual void   FeatureHappening  (Feature Spontaneous = FeatureNone);
     virtual bool   ScheduleFeature   (enum Feature Type, uint Delay);
     void           SetRequestedDelay (uint Delay);
     void           PowerLevelChanged (int Level);

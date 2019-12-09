@@ -5,6 +5,9 @@
 #ifdef USING_DBUS
 #include "platforms/mythpowerdbus.h"
 #endif
+#if defined(Q_OS_MAC)
+#include "platforms/mythpowerosx.h"
+#endif
 
 #define LOC QString("Power: ")
 
@@ -79,8 +82,9 @@ MythPower* MythPower::AcquireRelease(void *Reference, bool Acquire, uint Minimum
         }
         else
         {
-#if CONFIG_DARIWN
+#if defined(Q_OS_MAC)
             // NB OSX may have DBUS but it won't help here
+            s_instance = new MythPowerOSX();
 #elif USING_DBUS
             if (MythPowerDBus::IsAvailable())
                 s_instance = new MythPowerDBus();
@@ -290,8 +294,14 @@ bool MythPower::ScheduleFeature(enum Feature Type, uint Delay)
  * pending action there is little they can do now as there is no guarantee anything
  * will be completed before the system goes offline.
 */
-void MythPower::FeatureHappening(void)
+void MythPower::FeatureHappening(Feature Spontaneous)
 {
+    if (FeatureNone != Spontaneous)
+    {
+        m_scheduledFeature = Spontaneous;
+        m_isSpontaneous = true;
+    }
+
     if (!m_scheduledFeature)
         return;
 
