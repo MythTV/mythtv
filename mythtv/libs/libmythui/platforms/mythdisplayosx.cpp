@@ -3,7 +3,7 @@
 #include "mythcorecontext.h"
 #include "mythmainwindow.h"
 #include "mythdisplayosx.h"
-#import "util-osx.h"
+#import  "mythosxutils.h"
 
 #define LOC QString("DisplayOSX: ")
 

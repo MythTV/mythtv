@@ -110,14 +110,14 @@ using_qtdbus {
 }
 
 macx {
-    HEADERS += screensaver-osx.h   util-osx.h
-    SOURCES += screensaver-osx.cpp util-osx.cpp
+    HEADERS += screensaver-osx.h   platforms/mythosxutils.h
+    SOURCES += screensaver-osx.cpp platforms/mythosxutils.cpp
     HEADERS += platforms/mythdisplayosx.h
     SOURCES += platforms/mythdisplayosx.cpp
     QMAKE_OBJECTIVE_CFLAGS += $$QMAKE_CXXFLAGS
     QMAKE_OBJECTIVE_CXXFLAGS += $$QMAKE_CXXFLAGS
-    OBJECTIVE_HEADERS += util-osx-cocoa.h
-    OBJECTIVE_SOURCES += util-osx-cocoa.mm
+    OBJECTIVE_HEADERS += platforms/mythutilscocoa.h
+    OBJECTIVE_SOURCES += platforms/mythutilscocoa.mm
     LIBS              += -framework Cocoa -framework IOKit
 
     using_appleremote {
