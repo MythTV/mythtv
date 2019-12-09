@@ -98,31 +98,31 @@ bool DecoderBase::PosMapFromDb(void)
     frm_pos_map_t posMap;
     frm_pos_map_t durMap;
 
-    if (ringBuffer && ringBuffer->IsDVD())
+    if (m_ringBuffer && m_ringBuffer->IsDVD())
     {
         long long totframes;
         m_keyframedist = 15;
-        m_fps = ringBuffer->DVD()->GetFrameRate();
+        m_fps = m_ringBuffer->DVD()->GetFrameRate();
         if (m_fps < 26 && m_fps > 24)
            m_keyframedist = 12;
-        totframes = (long long)(ringBuffer->DVD()->GetTotalTimeOfTitle() * m_fps);
-        posMap[totframes] = ringBuffer->DVD()->GetTotalReadPosition();
+        totframes = (long long)(m_ringBuffer->DVD()->GetTotalTimeOfTitle() * m_fps);
+        posMap[totframes] = m_ringBuffer->DVD()->GetTotalReadPosition();
     }
-    else if (ringBuffer && ringBuffer->IsBD())
+    else if (m_ringBuffer && m_ringBuffer->IsBD())
     {
         long long totframes;
         m_keyframedist = 15;
-        m_fps = ringBuffer->BD()->GetFrameRate();
+        m_fps = m_ringBuffer->BD()->GetFrameRate();
         if (m_fps < 26 && m_fps > 24)
            m_keyframedist = 12;
-        totframes = (long long)(ringBuffer->BD()->GetTotalTimeOfTitle() * m_fps);
-        posMap[totframes] = ringBuffer->BD()->GetTotalReadPosition();
+        totframes = (long long)(m_ringBuffer->BD()->GetTotalTimeOfTitle() * m_fps);
+        posMap[totframes] = m_ringBuffer->BD()->GetTotalReadPosition();
 #if 0
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
             QString("%1 TotalTimeOfTitle() in ticks, %2 TotalReadPosition() "
                     "in bytes, %3 is fps")
-                .arg(ringBuffer->BD()->GetTotalTimeOfTitle())
-                .arg(ringBuffer->BD()->GetTotalReadPosition()).arg(m_fps));
+                .arg(m_ringBuffer->BD()->GetTotalTimeOfTitle())
+                .arg(m_ringBuffer->BD()->GetTotalReadPosition()).arg(m_fps));
 #endif
     }
     else if ((m_positionMapType == MARK_UNSET) ||
@@ -183,7 +183,7 @@ bool DecoderBase::PosMapFromDb(void)
         m_positionMap.push_back(e);
     }
 
-    if (!m_positionMap.empty() && !(ringBuffer && ringBuffer->IsDisc()))
+    if (!m_positionMap.empty() && !(m_ringBuffer && m_ringBuffer->IsDisc()))
         m_indexOffset = m_positionMap[0].index;
 
     if (!m_positionMap.empty())
@@ -254,7 +254,7 @@ bool DecoderBase::PosMapFromEnc(void)
         m_positionMap.push_back(e);
     }
 
-    if (!m_positionMap.empty() && !(ringBuffer && ringBuffer->IsDisc()))
+    if (!m_positionMap.empty() && !(m_ringBuffer && m_ringBuffer->IsDisc()))
         m_indexOffset = m_positionMap[0].index;
 
     if (!m_positionMap.empty())
@@ -378,15 +378,15 @@ bool DecoderBase::SyncPositionMap(void)
         long long totframes = 0;
         int length = 0;
 
-        if (ringBuffer && ringBuffer->IsDVD())
+        if (m_ringBuffer && m_ringBuffer->IsDVD())
         {
-            length = ringBuffer->DVD()->GetTotalTimeOfTitle();
+            length = m_ringBuffer->DVD()->GetTotalTimeOfTitle();
             QMutexLocker locker(&m_positionMapLock);
             totframes = m_positionMap.back().index;
         }
-        else if (ringBuffer && ringBuffer->IsBD())
+        else if (m_ringBuffer && m_ringBuffer->IsBD())
         {
-            length = ringBuffer->BD()->GetTotalTimeOfTitle();
+            length = m_ringBuffer->BD()->GetTotalTimeOfTitle();
             QMutexLocker locker(&m_positionMapLock);
             totframes = m_positionMap.back().index;
         }
@@ -574,7 +574,7 @@ bool DecoderBase::DoRewind(long long desiredFrame, bool discardFrames)
     normalframes = max(normalframes, 0);
     SeekReset(m_lastKey, normalframes, true, discardFrames);
 
-    if (discardFrames || (ringBuffer && ringBuffer->IsDisc()))
+    if (discardFrames || (m_ringBuffer && m_ringBuffer->IsDisc()))
         m_parent->SetFramesPlayed(m_framesPlayed+1);
 
     return true;
@@ -582,7 +582,7 @@ bool DecoderBase::DoRewind(long long desiredFrame, bool discardFrames)
 
 long long DecoderBase::GetKey(const PosMapEntry &e) const
 {
-    long long kf = (ringBuffer && ringBuffer->IsDisc()) ?
+    long long kf = (m_ringBuffer && m_ringBuffer->IsDisc()) ?
         1LL : m_keyframedist;
     return (m_hasKeyFrameAdjustTable) ? e.adjFrame :(e.index - m_indexOffset) * kf;
 }
@@ -597,7 +597,7 @@ bool DecoderBase::DoRewindSeek(long long desiredFrame)
         return false;
     }
 
-    if (!ringBuffer)
+    if (!m_ringBuffer)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "No ringBuffer yet, can't seek");
         return false;
@@ -640,7 +640,7 @@ bool DecoderBase::DoRewindSeek(long long desiredFrame)
         }
     }
 
-    ringBuffer->Seek(e.pos, SEEK_SET);
+    m_ringBuffer->Seek(e.pos, SEEK_SET);
 
     return true;
 }
@@ -715,15 +715,15 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool discardFrames)
             .arg(desiredFrame).arg(m_framesPlayed)
             .arg((discardFrames) ? "do" : "don't"));
 
-    if (!ringBuffer)
+    if (!m_ringBuffer)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "No ringBuffer yet, can't fast forward");
         return false;
     }
 
-    if (ringBuffer->IsDVD() &&
-        !ringBuffer->IsInDiscMenuOrStillFrame() &&
-        ringBuffer->DVD()->TitleTimeLeft() < 5)
+    if (m_ringBuffer->IsDVD() &&
+        !m_ringBuffer->IsInDiscMenuOrStillFrame() &&
+        m_ringBuffer->DVD()->TitleTimeLeft() < 5)
     {
         return false;
     }
@@ -830,7 +830,7 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool discardFrames)
  */
 void DecoderBase::DoFastForwardSeek(long long desiredFrame, bool &needflush)
 {
-    if (!ringBuffer)
+    if (!m_ringBuffer)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             "No ringBuffer yet, can't fast forward seek");
@@ -866,7 +866,7 @@ void DecoderBase::DoFastForwardSeek(long long desiredFrame, bool &needflush)
 
     if (m_framesPlayed < m_lastKey)
     {
-        ringBuffer->Seek(e.pos, SEEK_SET);
+        m_ringBuffer->Seek(e.pos, SEEK_SET);
         needflush    = true;
         m_framesPlayed = m_lastKey;
         m_fpsSkip = 0;

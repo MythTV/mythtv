@@ -120,7 +120,7 @@ QString NuppelDecoder::GetRawEncodingType(void)
 
 bool NuppelDecoder::ReadFileheader(struct rtfileheader *fh)
 {
-    if (ringBuffer->Read(fh, FILEHEADERSIZE) != FILEHEADERSIZE)
+    if (m_ringBuffer->Read(fh, FILEHEADERSIZE) != FILEHEADERSIZE)
         return false; // NOLINT(readability-simplify-boolean-expr)
 
 #if HAVE_BIGENDIAN
@@ -141,7 +141,7 @@ bool NuppelDecoder::ReadFileheader(struct rtfileheader *fh)
 
 bool NuppelDecoder::ReadFrameheader(struct rtframeheader *fh)
 {
-    if (ringBuffer->Read(fh, FRAMEHEADERSIZE) != FRAMEHEADERSIZE)
+    if (m_ringBuffer->Read(fh, FRAMEHEADERSIZE) != FRAMEHEADERSIZE)
         return false; // NOLINT(readability-simplify-boolean-expr)
 
 #if HAVE_BIGENDIAN
@@ -158,7 +158,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 {
     (void)testbuf;
 
-    ringBuffer = rbuffer;
+    m_ringBuffer = rbuffer;
     m_disablevideo = novideo;
     m_tracks[kTrackTypeVideo].clear();
     StreamInfo si(0, 0, 0, 0, 0);
@@ -173,30 +173,30 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     if (!ReadFileheader(&m_fileheader))
     {
         LOG(VB_GENERAL, LOG_ERR,
-            QString("Error reading file: %1").arg(ringBuffer->GetFilename()));
+            QString("Error reading file: %1").arg(m_ringBuffer->GetFilename()));
         return -1;
     }
 
     while ((QString(m_fileheader.finfo) != "NuppelVideo") &&
            (QString(m_fileheader.finfo) != "MythTVVideo"))
     {
-        ringBuffer->Seek(startpos, SEEK_SET);
+        m_ringBuffer->Seek(startpos, SEEK_SET);
         char dummychar;
-        ringBuffer->Read(&dummychar, 1);
+        m_ringBuffer->Read(&dummychar, 1);
 
-        startpos = ringBuffer->GetReadPosition();
+        startpos = m_ringBuffer->GetReadPosition();
 
         if (!ReadFileheader(&m_fileheader))
         {
             LOG(VB_GENERAL, LOG_ERR, QString("Error reading file: %1")
-                    .arg(ringBuffer->GetFilename()));
+                    .arg(m_ringBuffer->GetFilename()));
             return -1;
         }
 
         if (startpos > 20000)
         {
             LOG(VB_GENERAL, LOG_ERR, QString("Bad file: '%1'")
-                    .arg(ringBuffer->GetFilename()));
+                    .arg(m_ringBuffer->GetFilename()));
             return -1;
         }
     }
@@ -234,7 +234,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         if (m_ffmpeg_extradatasize > 0)
         {
             m_ffmpeg_extradata = new uint8_t[m_ffmpeg_extradatasize];
-            if (frameheader.packetlength != ringBuffer->Read(m_ffmpeg_extradata,
+            if (frameheader.packetlength != m_ringBuffer->Read(m_ffmpeg_extradata,
                                                      frameheader.packetlength))
             {
                 LOG(VB_GENERAL, LOG_ERR,
@@ -248,7 +248,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     }
     else
     {
-        if (frameheader.packetlength != ringBuffer->Read(space,
+        if (frameheader.packetlength != m_ringBuffer->Read(space,
                                                      frameheader.packetlength))
         {
             LOG(VB_GENERAL, LOG_ERR,
@@ -266,7 +266,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                 .arg( m_video_height));
     }
 
-    startpos = ringBuffer->GetReadPosition();
+    startpos = m_ringBuffer->GetReadPosition();
 
     ReadFrameheader(&frameheader);
 
@@ -278,7 +278,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         }
         else
         {
-            ringBuffer->Read(&m_extradata, frameheader.packetlength);
+            m_ringBuffer->Read(&m_extradata, frameheader.packetlength);
 #if HAVE_BIGENDIAN
             struct extendeddata *ed = &m_extradata;
             ed->version                 = bswap_32(ed->version);
@@ -306,10 +306,10 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     if (m_usingextradata && m_extradata.seektable_offset > 0)
     {
-        long long currentpos = ringBuffer->GetReadPosition();
+        long long currentpos = m_ringBuffer->GetReadPosition();
         struct rtframeheader seek_frameheader {};
 
-        int seekret = ringBuffer->Seek(m_extradata.seektable_offset, SEEK_SET);
+        int seekret = m_ringBuffer->Seek(m_extradata.seektable_offset, SEEK_SET);
         if (seekret == -1)
         {
             LOG(VB_GENERAL, LOG_ERR,
@@ -330,7 +330,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
             if (seek_frameheader.packetlength > 0)
             {
                 char *seekbuf = new char[seek_frameheader.packetlength];
-                ringBuffer->Read(seekbuf, seek_frameheader.packetlength);
+                m_ringBuffer->Read(seekbuf, seek_frameheader.packetlength);
 
                 int numentries = seek_frameheader.packetlength /
                                  sizeof(struct seektable_entry);
@@ -376,16 +376,16 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                 LOG(VB_GENERAL, LOG_ERR, "0 length seek table");
         }
 
-        ringBuffer->Seek(currentpos, SEEK_SET);
+        m_ringBuffer->Seek(currentpos, SEEK_SET);
     }
 
     if (m_usingextradata && m_extradata.keyframeadjust_offset > 0 &&
         m_hasFullPositionMap)
     {
-        long long currentpos = ringBuffer->GetReadPosition();
+        long long currentpos = m_ringBuffer->GetReadPosition();
         struct rtframeheader kfa_frameheader {};
 
-        int kfa_ret = ringBuffer->Seek(m_extradata.keyframeadjust_offset,
+        int kfa_ret = m_ringBuffer->Seek(m_extradata.keyframeadjust_offset,
                                        SEEK_SET);
         if (kfa_ret == -1)
         {
@@ -394,7 +394,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                     .arg(strerror(errno)));
         }
 
-        ringBuffer->Read(&kfa_frameheader, FRAMEHEADERSIZE);
+        m_ringBuffer->Read(&kfa_frameheader, FRAMEHEADERSIZE);
 
         if (kfa_frameheader.frametype != 'K')
         {
@@ -407,7 +407,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
             if (kfa_frameheader.packetlength > 0)
             {
                 char *kfa_buf = new char[kfa_frameheader.packetlength];
-                ringBuffer->Read(kfa_buf, kfa_frameheader.packetlength);
+                m_ringBuffer->Read(kfa_buf, kfa_frameheader.packetlength);
 
                 int numentries = kfa_frameheader.packetlength /
                                  sizeof(struct kfatable_entry);
@@ -456,19 +456,19 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                 LOG(VB_GENERAL, LOG_ERR, "0 length key frame adjust table");
         }
 
-        ringBuffer->Seek(currentpos, SEEK_SET);
+        m_ringBuffer->Seek(currentpos, SEEK_SET);
     }
 
     while (frameheader.frametype != 'A' && frameheader.frametype != 'V' &&
            frameheader.frametype != 'S' && frameheader.frametype != 'T' &&
            frameheader.frametype != 'R')
     {
-        ringBuffer->Seek(startpos, SEEK_SET);
+        m_ringBuffer->Seek(startpos, SEEK_SET);
 
         char dummychar;
-        ringBuffer->Read(&dummychar, 1);
+        m_ringBuffer->Read(&dummychar, 1);
 
-        startpos = ringBuffer->GetReadPosition();
+        startpos = m_ringBuffer->GetReadPosition();
 
         if (!ReadFrameheader(&frameheader))
         {
@@ -531,7 +531,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         }
         if (frameheader.frametype != 'R' && frameheader.packetlength != 0)
         {
-            if (frameheader.packetlength != ringBuffer->Read(space,
+            if (frameheader.packetlength != m_ringBuffer->Read(space,
                                                  frameheader.packetlength))
             {
                 foundit = 1;
@@ -539,7 +539,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
             }
         }
 
-        long long startpos2 = ringBuffer->GetReadPosition();
+        long long startpos2 = m_ringBuffer->GetReadPosition();
 
         foundit = !ReadFrameheader(&frameheader);
 
@@ -554,12 +554,12 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
             framesearch = true;
 
-            ringBuffer->Seek(startpos2, SEEK_SET);
+            m_ringBuffer->Seek(startpos2, SEEK_SET);
 
             char dummychar;
-            ringBuffer->Read(&dummychar, 1);
+            m_ringBuffer->Read(&dummychar, 1);
 
-            startpos2 = ringBuffer->GetReadPosition();
+            startpos2 = m_ringBuffer->GetReadPosition();
 
             foundit = !ReadFrameheader(&frameheader);
             if (foundit)
@@ -586,12 +586,12 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     LOG(VB_PLAYBACK, LOG_INFO,
         QString("Setting bitrate to %1 Kb/s").arg(m_bitrate));
 
-    ringBuffer->UpdateRawBitrate(GetRawBitrate());
+    m_ringBuffer->UpdateRawBitrate(GetRawBitrate());
 
     m_videosizetotal = 0;
     m_videoframesread = 0;
 
-    ringBuffer->Seek(startpos, SEEK_SET);
+    m_ringBuffer->Seek(startpos, SEEK_SET);
 
     m_buf = (unsigned char*)av_malloc(m_video_size);
     m_strm = (unsigned char*)av_malloc(m_video_size * 2);
@@ -1035,11 +1035,11 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype, bool& /*Retry*/)
 
     while (!gotvideo)
     {
-        long long currentposition = ringBuffer->GetReadPosition();
+        long long currentposition = m_ringBuffer->GetReadPosition();
         if (m_waitingForChange && currentposition + 4 >= m_readAdjust)
         {
             FileChanged();
-            currentposition = ringBuffer->GetReadPosition();
+            currentposition = m_ringBuffer->GetReadPosition();
         }
 
         if (!ReadFrameheader(&m_frameheader))
@@ -1049,7 +1049,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype, bool& /*Retry*/)
         }
 
 
-        if (!ringBuffer->LiveMode() &&
+        if (!m_ringBuffer->LiveMode() &&
             ((m_frameheader.frametype == 'Q') || (m_frameheader.frametype == 'K')))
         {
             SetEof(true);
@@ -1065,7 +1065,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype, bool& /*Retry*/)
 
             framesearch = true;
 
-            ringBuffer->Seek((long long)seeklen-FRAMEHEADERSIZE, SEEK_CUR);
+            m_ringBuffer->Seek((long long)seeklen-FRAMEHEADERSIZE, SEEK_CUR);
 
             if (!ReadFrameheader(&m_frameheader))
             {
@@ -1080,7 +1080,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype, bool& /*Retry*/)
             int sizetoskip = sizeof(rtfileheader) - sizeof(rtframeheader);
             char *dummy = new char[sizetoskip + 1];
 
-            if (ringBuffer->Read(dummy, sizetoskip) != sizetoskip)
+            if (m_ringBuffer->Read(dummy, sizetoskip) != sizetoskip)
             {
                 delete [] dummy;
                 SetEof(true);
@@ -1148,7 +1148,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype, bool& /*Retry*/)
                 SetEof(true);
                 return false;
             }
-            if (ringBuffer->Read(m_strm, m_frameheader.packetlength) !=
+            if (m_ringBuffer->Read(m_strm, m_frameheader.packetlength) !=
                 m_frameheader.packetlength)
             {
                 SetEof(true);
@@ -1208,7 +1208,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype, bool& /*Retry*/)
                                  static_cast<float>(m_video_frame_rate));
                     m_bitrate = (uint) (bps * 1.5F);
 
-                    ringBuffer->UpdateRawBitrate(GetRawBitrate());
+                    m_ringBuffer->UpdateRawBitrate(GetRawBitrate());
                     m_setreadahead = true;
                 }
             }

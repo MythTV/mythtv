@@ -687,7 +687,7 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
 void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
                                 bool doflush, bool discardFrames)
 {
-    if (!ringBuffer)
+    if (!m_ringBuffer)
         return; // nothing to reset...
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
@@ -725,7 +725,7 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
         // not when using libavformat's seeking
         if (m_recordingHasPositionMap || m_livetv)
         {
-            m_ic->pb->pos = ringBuffer->GetReadPosition();
+            m_ic->pb->pos = m_ringBuffer->GetReadPosition();
             m_ic->pb->buf_ptr = m_ic->pb->buffer;
             m_ic->pb->buf_end = m_ic->pb->buffer;
             m_ic->pb->eof_reached = 0;
@@ -755,7 +755,7 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
 
         m_prevgoppos = 0;
         m_gopset = false;
-        if (!ringBuffer->IsDVD())
+        if (!m_ringBuffer->IsDVD())
         {
             if (!m_no_dts_hack)
             {
@@ -891,8 +891,8 @@ bool AvFormatDecoder::CanHandle(char testbuf[kDecoderProbeBufferSize],
 
 void AvFormatDecoder::InitByteContext(bool forceseek)
 {
-    int buf_size                = ringBuffer->BestBufferSize();
-    int streamed                = ringBuffer->IsStreamed();
+    int buf_size                = m_ringBuffer->BestBufferSize();
+    int streamed                = m_ringBuffer->IsStreamed();
     m_readcontext.prot            = AVFRingBuffer::GetRingBufferURLProtocol();
     m_readcontext.flags           = AVIO_FLAG_READ;
     m_readcontext.is_streamed     = streamed;
@@ -908,7 +908,7 @@ void AvFormatDecoder::InitByteContext(bool forceseek)
     // We can always seek during LiveTV
     m_ic->pb->seekable            = !streamed || forceseek;
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Buffer size: %1 Streamed %2 Seekable %3 Available %4")
-        .arg(buf_size).arg(streamed).arg(m_ic->pb->seekable).arg(ringBuffer->GetReadBufAvail()));
+        .arg(buf_size).arg(streamed).arg(m_ic->pb->seekable).arg(m_ringBuffer->GetReadBufAvail()));
 }
 
 extern "C" void HandleStreamChange(void *data)
@@ -958,18 +958,18 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 {
     CloseContext();
 
-    ringBuffer = rbuffer;
+    m_ringBuffer = rbuffer;
 
     // Process frames immediately unless we're decoding
     // a DVD, in which case don't so that we don't show
     // anything whilst probing the data streams.
-    m_processFrames = !ringBuffer->IsDVD();
+    m_processFrames = !m_ringBuffer->IsDVD();
 
     delete m_avfRingBuffer;
     m_avfRingBuffer = new AVFRingBuffer(rbuffer);
 
     AVInputFormat *fmt      = nullptr;
-    QString        fnames   = ringBuffer->GetFilename();
+    QString        fnames   = m_ringBuffer->GetFilename();
     QByteArray     fnamea   = fnames.toLatin1();
     const char    *filename = fnamea.constData();
 
@@ -1017,7 +1017,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         // demuxer if it is not already used.
         // For regular videos, this shouldn't be an issue as the complete file
         // should be available - though we try a little harder for streamed formats
-        int retries = m_livetv || ringBuffer->IsStreamed() ? 50 : 10;
+        int retries = m_livetv || m_ringBuffer->IsStreamed() ? 50 : 10;
 
         while (!found && --retries)
         {
@@ -1117,7 +1117,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     fmt->flags &= ~AVFMT_NOFILE;
 
-    if (!m_livetv && !ringBuffer->IsDisc())
+    if (!m_livetv && !m_ringBuffer->IsDisc())
     {
         // generate timings based on the video stream to avoid bogus ffmpeg
         // values for duration and bitrate
@@ -1185,7 +1185,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     if (dur == 0)
     {
         if ((m_ic->duration == AV_NOPTS_VALUE) &&
-            (!m_livetv && !ringBuffer->IsDisc()))
+            (!m_livetv && !m_ringBuffer->IsDisc()))
             av_estimate_timings(m_ic, 0);
 
         dur = m_ic->duration / (int64_t)AV_TIME_BASE;
@@ -1210,7 +1210,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         {
             // the pvr-250 seems to over report the bitrate by * 2
             float bytespersec = (float)m_bitrate / 8 / 2;
-            float secs = ringBuffer->GetRealFileSize() * 1.0F / bytespersec;
+            float secs = m_ringBuffer->GetRealFileSize() * 1.0F / bytespersec;
             m_parent->SetFileLength((int)(secs),
                                     (int)(secs * static_cast<float>(m_fps)));
         }
@@ -1270,15 +1270,15 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     if (getenv("FORCE_DTS_TIMESTAMPS"))
         m_force_dts_timestamps = true;
 
-    if (ringBuffer->IsDVD())
+    if (m_ringBuffer->IsDVD())
     {
         // Reset DVD playback and clear any of
         // our buffers so that none of the data
         // parsed so far to determine decoders
         // gets shown.
-        if (!ringBuffer->StartFromBeginning())
+        if (!m_ringBuffer->StartFromBeginning())
             return -1;
-        ringBuffer->IgnoreWaitStates(false);
+        m_ringBuffer->IgnoreWaitStates(false);
 
         Reset(true, true, true);
 
@@ -1419,7 +1419,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
             .arg(ff_codec_type_string(enc->codec_type))
             .arg(enc->width).arg(enc->height));
 
-    if (ringBuffer && ringBuffer->IsDVD())
+    if (m_ringBuffer && m_ringBuffer->IsDVD())
         m_directrendering = false;
 
     enc->opaque = static_cast<void*>(this);
@@ -1902,10 +1902,10 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     map<int,uint> lang_aud_cnt;
     uint audioStreamCount = 0;
 
-    if (ringBuffer && ringBuffer->IsDVD() &&
-        ringBuffer->DVD()->AudioStreamsChanged())
+    if (m_ringBuffer && m_ringBuffer->IsDVD() &&
+        m_ringBuffer->DVD()->AudioStreamsChanged())
     {
-        ringBuffer->DVD()->AudioStreamsChanged(false);
+        m_ringBuffer->DVD()->AudioStreamsChanged(false);
         RemoveAudioStreams();
     }
 
@@ -2159,10 +2159,10 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             else
             {
                 int logical_stream_id;
-                if (ringBuffer && ringBuffer->IsDVD())
+                if (m_ringBuffer && m_ringBuffer->IsDVD())
                 {
-                    logical_stream_id = ringBuffer->DVD()->GetAudioTrackNum(m_ic->streams[strm]->id);
-                    channels = ringBuffer->DVD()->GetNumAudioChannels(logical_stream_id);
+                    logical_stream_id = m_ringBuffer->DVD()->GetAudioTrackNum(m_ic->streams[strm]->id);
+                    channels = m_ringBuffer->DVD()->GetNumAudioChannels(logical_stream_id);
                 }
                 else
                     logical_stream_id = m_ic->streams[strm]->id;
@@ -2318,7 +2318,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
             // N.B. MediaCodec and NVDEC require frame timing
             m_use_frame_timing = false;
-            if ((!ringBuffer->IsDVD() && (codec_sw_copy(m_video_codec_id) ||
+            if ((!m_ringBuffer->IsDVD() && (codec_sw_copy(m_video_codec_id) ||
                 codec_is_mediacodec(m_video_codec_id) || codec_is_v4l2(m_video_codec_id))) ||
                 codec_is_nvdec(m_video_codec_id))
             {
@@ -2373,14 +2373,14 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     if (m_bitrate > 0)
     {
         m_bitrate = (m_bitrate + 999) / 1000;
-        if (ringBuffer)
-            ringBuffer->UpdateRawBitrate(m_bitrate);
+        if (m_ringBuffer)
+            m_ringBuffer->UpdateRawBitrate(m_bitrate);
     }
 
     // update RingBuffer buffer size
-    if (ringBuffer)
+    if (m_ringBuffer)
     {
-        ringBuffer->SetBufferSizeFactors(unknownbitrate,
+        m_ringBuffer->SetBufferSizeFactors(unknownbitrate,
                         m_ic && QString(m_ic->iformat->name).contains("matroska"));
     }
 
@@ -2395,7 +2395,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     {
         m_audio->SetAudioParams(FORMAT_NONE, -1, -1, AV_CODEC_ID_NONE, -1, false);
         m_audio->ReinitAudio();
-        if (ringBuffer && ringBuffer->IsDVD())
+        if (m_ringBuffer && m_ringBuffer->IsDVD())
             m_audioIn = AudioInfo();
     }
 
@@ -3019,7 +3019,7 @@ void AvFormatDecoder::HandleGopStart(
         {
             m_bitrate = (int)((pkt->pos * 8 * m_fps) / (m_framesRead - 1));
             float bytespersec = (float)m_bitrate / 8;
-            float secs = ringBuffer->GetRealFileSize() * 1.0 / bytespersec;
+            float secs = m_ringBuffer->GetRealFileSize() * 1.0 / bytespersec;
             m_parent->SetFileLength((int)(secs), (int)(secs * m_fps));
         }
 #endif
@@ -3044,8 +3044,8 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
         bufptr = avpriv_find_start_code(bufptr, bufend, &m_start_code_state);
 
         float aspect_override = -1.0F;
-        if (ringBuffer->IsDVD())
-            aspect_override = ringBuffer->DVD()->GetAspectOverride();
+        if (m_ringBuffer->IsDVD())
+            aspect_override = m_ringBuffer->DVD()->GetAspectOverride();
 
         if (m_start_code_state >= SLICE_MIN && m_start_code_state <= SLICE_MAX)
             continue;
@@ -3434,7 +3434,7 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt, boo
             // the DTS timestamp is missing. Also use fixups for missing PTS instead of
             // DTS to avoid oscillating between PTS and DTS. Only select DTS if PTS is
             // more faulty or never detected.
-            if (m_force_dts_timestamps || ringBuffer->IsDVD())
+            if (m_force_dts_timestamps || m_ringBuffer->IsDVD())
             {
                 if (pkt->dts != AV_NOPTS_VALUE)
                     pts = pkt->dts;
@@ -3626,7 +3626,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
     // Validate the video pts against the last pts. If it's
     // a little bit smaller, equal or missing, compute
     // it from the last. Otherwise assume a wraparound.
-    if (!ringBuffer->IsDVD() &&
+    if (!m_ringBuffer->IsDVD() &&
         temppts <= m_lastvpts &&
         (temppts + (1000 / m_fps) > m_lastvpts || temppts <= 0))
     {
@@ -3887,11 +3887,11 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
     AVSubtitle subtitle;
     memset(&subtitle, 0, sizeof(AVSubtitle));
 
-    if (ringBuffer->IsDVD())
+    if (m_ringBuffer->IsDVD())
     {
-        if (ringBuffer->DVD()->NumMenuButtons() > 0)
+        if (m_ringBuffer->DVD()->NumMenuButtons() > 0)
         {
-            ringBuffer->DVD()->GetMenuSPUPkt(pkt->data, pkt->size,
+            m_ringBuffer->DVD()->GetMenuSPUPkt(pkt->data, pkt->size,
                                              curstream->id, pts);
         }
         else
@@ -3899,7 +3899,7 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
             if (pkt->stream_index == subIdx)
             {
                 QMutexLocker locker(avcodeclock);
-                ringBuffer->DVD()->DecodeSubtitles(&subtitle, &gotSubtitles,
+                m_ringBuffer->DVD()->DecodeSubtitles(&subtitle, &gotSubtitles,
                                                    pkt->data, pkt->size, pts);
             }
         }
@@ -4032,7 +4032,7 @@ QString AvFormatDecoder::GetTrackDesc(uint type, uint trackNo) const
                         msg += QString(" %1").arg(ctx->codec->name).toUpper();
 
                     int channels = 0;
-                    if (ringBuffer->IsDVD() || par->channels)
+                    if (m_ringBuffer->IsDVD() || par->channels)
                         channels = m_tracks[kTrackTypeAudio][trackNo].m_orig_num_channels;
 
                     if (channels == 0)
@@ -4151,7 +4151,7 @@ int AvFormatDecoder::AutoSelectTrack(uint type)
     if (kTrackTypeAudio == type)
         return AutoSelectAudioTrack();
 
-    if (ringBuffer->IsInDiscMenuOrStillFrame())
+    if (m_ringBuffer->IsInDiscMenuOrStillFrame())
         return -1;
 
     return DecoderBase::AutoSelectTrack(type);
@@ -4706,7 +4706,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
         LOG(VB_TIMESTAMP, LOG_INFO, LOC + QString("audio timecode %1 %2 %3 %4")
                 .arg(pkt->pts).arg(pkt->dts).arg(temppts).arg(m_lastapts));
 
-        m_allowedquit |= ringBuffer->IsInStillFrame() ||
+        m_allowedquit |= m_ringBuffer->IsInStillFrame() ||
                        m_audio->IsBufferAlmostFull();
 
         tmp_pkt.data += ret;
@@ -4815,7 +4815,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
                      // underruns in case you are setting negative values
                      // in Adjust Audio Sync.
                      m_lastapts < m_lastvpts + m_audioReadAhead &&
-                     !ringBuffer->IsInStillFrame())
+                     !m_ringBuffer->IsInStillFrame())
             {
                 storevideoframes = true;
             }

@@ -293,7 +293,7 @@ class DecoderBase
     MythPlayer          *m_parent                  {nullptr};
     ProgramInfo         *m_playbackinfo            {nullptr};
     AudioPlayer         *m_audio                   {nullptr};
-    RingBuffer          *ringBuffer                {nullptr};
+    RingBuffer          *m_ringBuffer              {nullptr};
 
     int                  m_current_width           {640};
     int                  m_current_height          {480};
