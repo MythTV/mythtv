@@ -52,7 +52,7 @@ class MythVideoOutputOpenGL : public MythVideoOutput
     QRect GetDisplayVisibleRect(void);
 
     MythRenderOpenGL      *m_render               { nullptr };
-    bool                   m_isGLES2              { false };
+    bool                   m_legacyTextureFormats { false };
     MythOpenGLVideo       *m_openGLVideo          { nullptr };
     QMap<MythPlayer*,MythOpenGLVideo*> m_openGLVideoPiPs;
     QMap<MythPlayer*,bool> m_openGLVideoPiPsReady;

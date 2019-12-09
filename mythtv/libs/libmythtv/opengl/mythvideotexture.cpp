@@ -147,10 +147,10 @@ vector<MythVideoTexture*> MythVideoTexture::CreateSoftwareTextures(MythRenderOpe
 
     // Strict OpenGL ES 2.0 has no GL_RED or GL_R8 so use Luminance alternatives which give the same result
     // There is no obvious alternative solution for GL_RG/8 for higher bit depths. These will fail on some
-    // implementations
-    bool gles2 = Context->isOpenGLES() && Context->format().majorVersion() < 3;
-    QOpenGLTexture::PixelFormat bytepixfmt   = gles2 ? QOpenGLTexture::Luminance       : QOpenGLTexture::Red;
-    QOpenGLTexture::TextureFormat bytetexfmt = gles2 ? QOpenGLTexture::LuminanceFormat : QOpenGLTexture::R8_UNorm;
+    // implementations.
+    bool legacy = Context->GetExtraFeatures() & kGLLegacyTextures;
+    QOpenGLTexture::PixelFormat bytepixfmt   = legacy ? QOpenGLTexture::Luminance       : QOpenGLTexture::Red;
+    QOpenGLTexture::TextureFormat bytetexfmt = legacy ? QOpenGLTexture::LuminanceFormat : QOpenGLTexture::R8_UNorm;
     for (uint plane = 0; plane < count; ++plane)
     {
         QSize size = Sizes[0];
@@ -433,7 +433,7 @@ MythVideoTexture* MythVideoTexture::CreateTexture(MythRenderOpenGL *Context,
 
     if (Format == QOpenGLTexture::NoFormat)
     {
-        if (Context->isOpenGLES() && Context->format().majorVersion() < 3)
+        if (Context->GetExtraFeatures() & kGLLegacyTextures)
             Format = QOpenGLTexture::RGBAFormat;
         else
             Format = QOpenGLTexture::RGBA8_UNorm;
