@@ -1,6 +1,9 @@
 // MythTV
 #include "mythutilscocoa.h"
 
+// OSX
+#import <Cocoa/Cocoa.h>
+
 CGDirectDisplayID GetOSXCocoaDisplay(void* view)
 {
     NSView *thisview = static_cast<NSView *>(view);
