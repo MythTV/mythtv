@@ -37,12 +37,12 @@ AudioOutputALSA::AudioOutputALSA(const AudioSettings &settings) :
     m_mixer.elem = nullptr;
 
     // Set everything up
-    if (m_passthru_device == "auto")
+    if (m_passthruDevice == "auto")
     {
-        m_passthru_device = m_main_device;
+        m_passthruDevice = m_mainDevice;
 
-        int len = m_passthru_device.length();
-        int args = m_passthru_device.indexOf(":");
+        int len = m_passthruDevice.length();
+        int args = m_passthruDevice.indexOf(":");
 
             /*
              * AES description:
@@ -61,40 +61,40 @@ AudioOutputALSA::AudioOutputALSA(const AudioSettings &settings) :
         if (args < 0)
         {
             /* no existing parameters: add it behind device name */
-            m_passthru_device += ":" + iecarg;
+            m_passthruDevice += ":" + iecarg;
         }
         else
         {
             do
                 ++args;
-            while (args < m_passthru_device.length() &&
-                   m_passthru_device[args].isSpace());
-            if (args == m_passthru_device.length())
+            while (args < m_passthruDevice.length() &&
+                   m_passthruDevice[args].isSpace());
+            if (args == m_passthruDevice.length())
             {
                 /* ":" but no parameters */
-                m_passthru_device += iecarg;
+                m_passthruDevice += iecarg;
             }
-            else if (m_passthru_device[args] != '{')
+            else if (m_passthruDevice[args] != '{')
             {
                 /* a simple list of parameters: add it at the end of the list */
-                m_passthru_device += "," + iecarg;
+                m_passthruDevice += "," + iecarg;
             }
             else
             {
                 /* parameters in config syntax: add it inside the { } block */
                 do
                     --len;
-                while (len > 0 && m_passthru_device[len].isSpace());
-                if (m_passthru_device[len] == '}')
-                    m_passthru_device =
-                        m_passthru_device.insert(len, " " + iecarg2);
+                while (len > 0 && m_passthruDevice[len].isSpace());
+                if (m_passthruDevice[len] == '}')
+                    m_passthruDevice =
+                        m_passthruDevice.insert(len, " " + iecarg2);
             }
         }
     }
-    else if (m_passthru_device.toLower() == "default")
-        m_passthru_device = m_main_device;
+    else if (m_passthruDevice.toLower() == "default")
+        m_passthruDevice = m_mainDevice;
     else
-        m_discretedigital = true;
+        m_discreteDigital = true;
 
     InitSettings(settings);
     if (settings.m_init)
@@ -114,14 +114,14 @@ int AudioOutputALSA::TryOpenDevice(int open_mode, bool try_ac3)
 
     if (try_ac3)
     {
-        dev_ba = m_passthru_device.toLatin1();
-        VBAUDIO(QString("OpenDevice %1 for passthrough").arg(m_passthru_device));
+        dev_ba = m_passthruDevice.toLatin1();
+        VBAUDIO(QString("OpenDevice %1 for passthrough").arg(m_passthruDevice));
         err = snd_pcm_open(&m_pcm_handle, dev_ba.constData(),
                            SND_PCM_STREAM_PLAYBACK, open_mode);
 
-        m_lastdevice = m_passthru_device;
+        m_lastdevice = m_passthruDevice;
 
-        if (m_discretedigital)
+        if (m_discreteDigital)
             return err;
 
         if (err < 0)
@@ -133,11 +133,11 @@ int AudioOutputALSA::TryOpenDevice(int open_mode, bool try_ac3)
     if (!try_ac3 || err < 0)
     {
         // passthru open failed, retry default device
-        VBAUDIO(QString("OpenDevice %1").arg(m_main_device));
-        dev_ba = m_main_device.toLatin1();
+        VBAUDIO(QString("OpenDevice %1").arg(m_mainDevice));
+        dev_ba = m_mainDevice.toLatin1();
         err = snd_pcm_open(&m_pcm_handle, dev_ba.constData(),
                            SND_PCM_STREAM_PLAYBACK, open_mode);
-        m_lastdevice = m_main_device;
+        m_lastdevice = m_mainDevice;
     }
     return err;
 }
@@ -416,8 +416,8 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings(bool passthrough)
     QMap<QString, QString> *alsadevs = GetDevices("pcm");
     while (true)
     {
-        QString real_device = ((passthrough && m_discretedigital) ?
-                               m_passthru_device : m_main_device);
+        QString real_device = ((passthrough && m_discreteDigital) ?
+                               m_passthruDevice : m_mainDevice);
 
         QString desc = alsadevs->value(real_device);
 
@@ -467,7 +467,7 @@ bool AudioOutputALSA::OpenDevice()
         return false;
     }
 
-    switch (m_output_format)
+    switch (m_outputFormat)
     {
         case FORMAT_U8:     format = SND_PCM_FORMAT_U8;    break;
         case FORMAT_S16:    format = SND_PCM_FORMAT_S16;   break;
@@ -477,7 +477,7 @@ bool AudioOutputALSA::OpenDevice()
         case FORMAT_S32:    format = SND_PCM_FORMAT_S32;   break;
         case FORMAT_FLT:    format = SND_PCM_FORMAT_FLOAT; break;
         default:
-            Error(QObject::tr("Unknown sample format: %1").arg(m_output_format));
+            Error(QObject::tr("Unknown sample format: %1").arg(m_outputFormat));
             return false;
     }
 
@@ -486,7 +486,7 @@ bool AudioOutputALSA::OpenDevice()
 
     uint period_time = 4; // aim for an interrupt every (1/4th of buffer_time)
 
-    err = SetParameters(m_pcm_handle, format, m_channels, m_samplerate,
+    err = SetParameters(m_pcm_handle, format, m_channels, m_sampleRate,
                         buffer_time, period_time);
     if (err < 0)
     {
@@ -551,7 +551,7 @@ static inline void ReorderSmpteToAlsa(void *buf, uint frames,
 void AudioOutputALSA::WriteAudio(uchar *aubuf, int size)
 {
     uchar *tmpbuf = aubuf;
-    uint frames = size / m_output_bytes_per_frame;
+    uint frames = size / m_outputBytesPerFrame;
 
     if (m_pcm_handle == nullptr)
     {
@@ -562,7 +562,7 @@ void AudioOutputALSA::WriteAudio(uchar *aubuf, int size)
     //Audio received is in SMPTE channel order, reorder to ALSA unless passthru
     if (!m_passthru && (m_channels  == 6 || m_channels == 8))
     {
-        ReorderSmpteToAlsa(aubuf, frames, m_output_format, m_channels - 6);
+        ReorderSmpteToAlsa(aubuf, frames, m_outputFormat, m_channels - 6);
     }
 
     LOG(VB_AUDIO | VB_TIMESTAMP, LOG_INFO,
@@ -577,10 +577,10 @@ void AudioOutputALSA::WriteAudio(uchar *aubuf, int size)
         {
             if ((uint)lw < frames)
                 VBAUDIO(QString("WriteAudio: short write %1 bytes (ok)")
-                        .arg(lw * m_output_bytes_per_frame));
+                        .arg(lw * m_outputBytesPerFrame));
 
             frames -= lw;
-            tmpbuf += lw * m_output_bytes_per_frame; // bytes
+            tmpbuf += lw * m_outputBytesPerFrame; // bytes
             continue;
         }
 
@@ -648,7 +648,7 @@ int AudioOutputALSA::GetBufferedOnSoundcard(void) const
         return 0;
 
     // BUG: calling snd_pcm_state causes noise and repeats on the Raspberry Pi
-    return delay * m_output_bytes_per_frame;
+    return delay * m_outputBytesPerFrame;
 }
 
 /**
@@ -703,7 +703,7 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
     CHECKERR(QString("Channels count %1 not available").arg(channels));
 
     /* set the stream rate */
-    if (m_src_quality == QUALITY_DISABLED)
+    if (m_srcQuality == QUALITY_DISABLED)
     {
         err = snd_pcm_hw_params_set_rate_resample(handle, params, 1);
         CHECKERR(QString("Resampling setup failed").arg(rate));
@@ -805,8 +805,8 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
             .arg(buffer_size).arg(period_size));
 
     /* set member variables */
-    m_soundcard_buffer_size = buffer_size * m_output_bytes_per_frame;
-    m_fragment_size = (period_size >> 1) * m_output_bytes_per_frame;
+    m_soundcardBufferSize = buffer_size * m_outputBytesPerFrame;
+    m_fragmentSize = (period_size >> 1) * m_outputBytesPerFrame;
 
     /* get the current swparams */
     err = snd_pcm_sw_params_current(handle, swparams);
@@ -978,7 +978,7 @@ bool AudioOutputALSA::OpenMixer(void)
             .arg(mixer_device_tag)
             .arg(m_mixer.control));
 
-    if (m_set_initial_vol)
+    if (m_setInitialVol)
     {
         int initial_vol = 80;
         if (m_mixer.control == "PCM")

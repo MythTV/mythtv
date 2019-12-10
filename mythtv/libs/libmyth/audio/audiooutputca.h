@@ -55,8 +55,8 @@ private:
     CoreAudioData * d {nullptr};
     friend class    CoreAudioData;
 
-    int             bufferedBytes;
-    long            CA_audiotime_updated;
+    int             m_bufferedBytes;
+    long            m_caAudiotimeUpdated;
 };
 
 #endif

@@ -61,19 +61,19 @@ bool AudioOutputAudioTrack::OpenDevice()
     bool exception=false;
     QAndroidJniEnvironment env;
     jint encoding = 0;
-    jint sampleRate = m_samplerate;
+    jint sampleRate = m_sampleRate;
 
     // m_bitsPer10Frames = output bits per 10 frames
-    m_bitsPer10Frames = m_output_bytes_per_frame * 80;
+    m_bitsPer10Frames = m_outputBytesPerFrame * 80;
 
-    if ((m_passthru || m_enc) && m_source_bitrate > 0)
-        m_bitsPer10Frames = m_source_bitrate * 10 / m_source_samplerate;
+    if ((m_passthru || m_enc) && m_sourceBitRate > 0)
+        m_bitsPer10Frames = m_sourceBitRate * 10 / m_sourceSampleRate;
 
     // 50 milliseconds
-    m_fragment_size = m_bitsPer10Frames * m_source_samplerate * 5 / 8000;
+    m_fragmentSize = m_bitsPer10Frames * m_sourceSampleRate * 5 / 8000;
 
-    if (m_fragment_size < 1536)
-        m_fragment_size = 1536;
+    if (m_fragmentSize < 1536)
+        m_fragmentSize = 1536;
 
 
     if (m_passthru || m_enc)
@@ -100,7 +100,7 @@ bool AudioOutputAudioTrack::OpenDevice()
     }
     else
     {
-        switch (m_output_format)
+        switch (m_outputFormat)
         {
             case FORMAT_U8:
                 // This could be used to get the value from java instead         // of haning these constants in pour header file.
@@ -115,13 +115,13 @@ bool AudioOutputAudioTrack::OpenDevice()
                 encoding = AF_ENCODING_PCM_FLOAT;
                 break;
             default:
-                LOG(VB_GENERAL, LOG_ERR, LOC + __func__ + QString(" No support for audio format %1").arg(m_output_format));
+                LOG(VB_GENERAL, LOG_ERR, LOC + __func__ + QString(" No support for audio format %1").arg(m_outputFormat));
                 return false;
         }
     }
 
-    jint minBufferSize = m_fragment_size * 4;
-    m_soundcard_buffer_size = minBufferSize;
+    jint minBufferSize = m_fragmentSize * 4;
+    m_soundcardBufferSize = minBufferSize;
     jint channels = m_channels;
 
     m_audioTrack = new QAndroidJniObject("org/mythtv/audio/AudioOutputAudioTrack",
@@ -209,7 +209,7 @@ void AudioOutputAudioTrack::WriteAudio(unsigned char* aubuf, int size)
 {
     bool exception=false;
     QAndroidJniEnvironment env;
-    if (m_actually_paused)
+    if (m_actuallyPaused)
     {
         if (m_audioTrack)
         {
@@ -259,7 +259,7 @@ int AudioOutputAudioTrack::GetBufferedOnSoundcard(void) const
         ANDROID_EXCEPTION_CHECK
         if (exception)
             latency = 0;
-        buffered += latency * m_samplerate / 1000 * m_bitsPer10Frames / 80 ;
+        buffered += latency * m_sampleRate / 1000 * m_bitsPer10Frames / 80 ;
     }
 
     return buffered;
@@ -287,11 +287,11 @@ void AudioOutputAudioTrack::Pause(bool paused)
 void AudioOutputAudioTrack::SetSourceBitrate(int rate)
 {
     AudioOutputBase::SetSourceBitrate(rate);
-    if (m_source_bitrate > 0
+    if (m_sourceBitRate > 0
         && (m_passthru || m_enc)
         &&  m_audioTrack)
     {
-        m_bitsPer10Frames = m_source_bitrate * 10 / m_source_samplerate;
+        m_bitsPer10Frames = m_sourceBitRate * 10 / m_sourceSampleRate;
         jint bitsPer10Frames = m_bitsPer10Frames;
         m_audioTrack->callMethod<void>("setBitsPer10Frames","(I)V",bitsPer10Frames);
     }

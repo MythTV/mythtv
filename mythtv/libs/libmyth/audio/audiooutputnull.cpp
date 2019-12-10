@@ -40,8 +40,8 @@ bool AudioOutputNULL::OpenDevice()
 {
     LOG(VB_GENERAL, LOG_INFO, "Opening NULL audio device, will fail.");
 
-    m_fragment_size = NULLAUDIO_OUTPUT_BUFFER_SIZE / 2;
-    m_soundcard_buffer_size = NULLAUDIO_OUTPUT_BUFFER_SIZE;
+    m_fragmentSize = NULLAUDIO_OUTPUT_BUFFER_SIZE / 2;
+    m_soundcardBufferSize = NULLAUDIO_OUTPUT_BUFFER_SIZE;
 
     return false;
 }
@@ -80,55 +80,55 @@ AudioOutputSettings* AudioOutputNULL::GetOutputSettings(bool /*digital*/)
 
 void AudioOutputNULL::WriteAudio(unsigned char* aubuf, int size)
 {
-    if (m_buffer_output_data_for_use)
+    if (m_bufferOutputDataForUse)
     {
-        if (size + m_current_buffer_size > NULLAUDIO_OUTPUT_BUFFER_SIZE)
+        if (size + m_currentBufferSize > NULLAUDIO_OUTPUT_BUFFER_SIZE)
         {
             LOG(VB_GENERAL, LOG_ERR, "null audio output should not have just "
                                      "had data written to it");
             return;
         }
-        m_pcm_output_buffer_mutex.lock();
-        memcpy(m_pcm_output_buffer + m_current_buffer_size, aubuf, size);
-        m_current_buffer_size += size;
-        m_pcm_output_buffer_mutex.unlock();
+        m_pcmOutputBufferMutex.lock();
+        memcpy(m_pcmOutputBuffer + m_currentBufferSize, aubuf, size);
+        m_currentBufferSize += size;
+        m_pcmOutputBufferMutex.unlock();
     }
 }
 
 int AudioOutputNULL::readOutputData(unsigned char *read_buffer, int max_length)
 {
     int amount_to_read = max_length;
-    if (amount_to_read > m_current_buffer_size)
+    if (amount_to_read > m_currentBufferSize)
     {
-        amount_to_read = m_current_buffer_size;
+        amount_to_read = m_currentBufferSize;
     }
 
-    m_pcm_output_buffer_mutex.lock();
-    memcpy(read_buffer, m_pcm_output_buffer, amount_to_read);
-    memmove(m_pcm_output_buffer, m_pcm_output_buffer + amount_to_read,
-            m_current_buffer_size - amount_to_read);
-    m_current_buffer_size -= amount_to_read;
-    m_pcm_output_buffer_mutex.unlock();
+    m_pcmOutputBufferMutex.lock();
+    memcpy(read_buffer, m_pcmOutputBuffer, amount_to_read);
+    memmove(m_pcmOutputBuffer, m_pcmOutputBuffer + amount_to_read,
+            m_currentBufferSize - amount_to_read);
+    m_currentBufferSize -= amount_to_read;
+    m_pcmOutputBufferMutex.unlock();
 
     return amount_to_read;
 }
 
 void AudioOutputNULL::Reset()
 {
-    if (m_buffer_output_data_for_use)
+    if (m_bufferOutputDataForUse)
     {
-        m_pcm_output_buffer_mutex.lock();
-        m_current_buffer_size = 0;
-        m_pcm_output_buffer_mutex.unlock();
+        m_pcmOutputBufferMutex.lock();
+        m_currentBufferSize = 0;
+        m_pcmOutputBufferMutex.unlock();
     }
     AudioOutputBase::Reset();
 }
 
 int AudioOutputNULL::GetBufferedOnSoundcard(void) const
 {
-    if (m_buffer_output_data_for_use)
+    if (m_bufferOutputDataForUse)
     {
-        return m_current_buffer_size;
+        return m_currentBufferSize;
     }
 
     return 0;

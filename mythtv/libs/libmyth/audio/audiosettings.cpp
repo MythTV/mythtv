@@ -9,15 +9,15 @@
 
 // startup_upmixer
 AudioSettings::AudioSettings(const AudioSettings &other) :
-    m_main_device(other.m_main_device),
-    m_passthru_device(other.m_passthru_device),
+    m_mainDevice(other.m_mainDevice),
+    m_passthruDevice(other.m_passthruDevice),
     m_format(other.m_format),
     m_channels(other.m_channels),
     m_codec(other.m_codec),
-    m_codec_profile(other.m_codec_profile),
-    m_samplerate(other.m_samplerate),
-    m_set_initial_vol(other.m_set_initial_vol),
-    m_use_passthru(other.m_use_passthru),
+    m_codecProfile(other.m_codecProfile),
+    m_sampleRate(other.m_sampleRate),
+    m_setInitialVol(other.m_setInitialVol),
+    m_usePassthru(other.m_usePassthru),
     m_source(other.m_source),
     m_upmixer(other.m_upmixer),
     m_init(true)
@@ -44,14 +44,14 @@ AudioSettings::AudioSettings(
     bool                        use_passthru,
     int                         upmixer_startup,
     AudioOutputSettings        *custom) :
-    m_main_device(std::move(main_device)),
-    m_passthru_device(std::move(passthru_device)),
+    m_mainDevice(std::move(main_device)),
+    m_passthruDevice(std::move(passthru_device)),
     m_format(format),
     m_channels(channels),
     m_codec(codec),
-    m_samplerate(samplerate),
-    m_set_initial_vol(set_initial_vol),
-    m_use_passthru(use_passthru),
+    m_sampleRate(samplerate),
+    m_setInitialVol(set_initial_vol),
+    m_usePassthru(use_passthru),
     m_source(source),
     m_upmixer(upmixer_startup),
     m_init(true)
@@ -77,9 +77,9 @@ AudioSettings::AudioSettings(
     m_format(format),
     m_channels(channels),
     m_codec(codec),
-    m_codec_profile(codec_profile),
-    m_samplerate(samplerate),
-    m_use_passthru(use_passthru),
+    m_codecProfile(codec_profile),
+    m_sampleRate(samplerate),
+    m_usePassthru(use_passthru),
     m_upmixer(upmixer_startup),
     m_init(true)
 {
@@ -92,13 +92,13 @@ AudioSettings::~AudioSettings()
 
 void AudioSettings::FixPassThrough(void)
 {
-    if (m_passthru_device.isEmpty())
-        m_passthru_device = "auto";
+    if (m_passthruDevice.isEmpty())
+        m_passthruDevice = "auto";
 }
 
 void AudioSettings::TrimDeviceType(void)
 {
-    m_main_device.remove(0, 5);
-    if (m_passthru_device != "auto" && m_passthru_device.toLower() != "default")
-        m_passthru_device.remove(0, 5);
+    m_mainDevice.remove(0, 5);
+    if (m_passthruDevice != "auto" && m_passthruDevice.toLower() != "default")
+        m_passthruDevice.remove(0, 5);
 }

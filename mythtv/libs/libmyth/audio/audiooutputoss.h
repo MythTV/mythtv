@@ -33,11 +33,11 @@ class AudioOutputOSS : public AudioOutputBase
 
     void SetFragSize(void);
 
-    int         m_audiofd      {-1};
-    mutable int m_numbadioctls {0};
+    int         m_audioFd      {-1};
+    mutable int m_numBadIoctls {0};
 
     // Volume related
-    int         m_mixerfd      {-1};
+    int         m_mixerFd      {-1};
     int         m_control      {SOUND_MIXER_VOLUME};
 };
 

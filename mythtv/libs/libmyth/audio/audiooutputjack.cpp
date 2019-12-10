@@ -45,7 +45,7 @@ AudioOutputJACK::AudioOutputJACK(const AudioSettings &settings) :
     for (int i = 0; i < JACK_CHANNELS_MAX; i++)
         m_ports[i] = nullptr;
     for (int i = 0; i < JACK_CHANNELS_MAX; i++)
-        m_chan_volumes[i] = 100;
+        m_chanVolumes[i] = 100;
 
     // Set everything up
     InitSettings(settings);
@@ -134,7 +134,7 @@ bool AudioOutputJACK::OpenDevice()
     }
 
     VBAUDIO( QString("Opening JACK audio device: '%1'.")
-            .arg(m_main_device));
+            .arg(m_mainDevice));
 
     // Setup volume control
     if (m_internalVol)
@@ -182,14 +182,14 @@ bool AudioOutputJACK::OpenDevice()
     }
 
     // Note some basic soundserver parameters
-    m_samplerate = jack_get_sample_rate(m_client);
+    m_sampleRate = jack_get_sample_rate(m_client);
 
     // Get the size of our callback buffer in bytes
-    m_fragment_size = jack_get_buffer_size(m_client) * m_output_bytes_per_frame;
+    m_fragmentSize = jack_get_buffer_size(m_client) * m_outputBytesPerFrame;
 
     // Allocate a new temp buffer to de-interleave our audio data
-    delete[] m_aubuf;
-    m_aubuf = new unsigned char[m_fragment_size];
+    delete[] m_auBuf;
+    m_auBuf = new unsigned char[m_fragmentSize];
 
     // Set our callbacks
     // These will actually get called after jack_activate()!
@@ -228,11 +228,11 @@ err_out:
 void AudioOutputJACK::CloseDevice()
 {
     _jack_client_close(&m_client);
-    _jack_client_close(&m_stale_client);
-    if (m_aubuf)
+    _jack_client_close(&m_staleClient);
+    if (m_auBuf)
     {
-        delete[] m_aubuf;
-        m_aubuf = nullptr;
+        delete[] m_auBuf;
+        m_auBuf = nullptr;
     }
 
     VBAUDIO("Jack: Stop Event");
@@ -246,8 +246,8 @@ int AudioOutputJACK::GetBufferedOnSoundcard(void) const
     int frames_played = jack_frames_since_cycle_start (this->m_client);
     LOG(VB_AUDIO | VB_TIMESTAMP, LOG_INFO,
         QString("Stats: frames_since_cycle_start:%1 fragment_size:%2")
-            .arg(frames_played).arg(m_fragment_size));
-    return  (m_fragment_size * 2) - (frames_played * m_output_bytes_per_frame);
+            .arg(frames_played).arg(m_fragmentSize));
+    return  (m_fragmentSize * 2) - (frames_played * m_outputBytesPerFrame);
 }
 
 /* Converts buffer to jack buffers
@@ -360,64 +360,64 @@ int AudioOutputJACK::_JackCallback(jack_nframes_t nframes, void *arg)
 int AudioOutputJACK::JackCallback(jack_nframes_t nframes)
 {
     float *bufs[JACK_CHANNELS_MAX];
-    int bytes_needed = nframes * m_output_bytes_per_frame;
+    int bytes_needed = nframes * m_outputBytesPerFrame;
     int bytes_read = 0;
 
     // Check for stale_client set during shutdown callback
-    _jack_client_close(&m_stale_client);
+    _jack_client_close(&m_staleClient);
 
     // Deal with xruns which may have occured
     // Basically read and discard the data which should have been played
-    int t_jack_xruns = m_jack_xruns;
+    int t_jack_xruns = m_jackXruns;
     for (int i = 0; i < t_jack_xruns; i++)
     {
-        bytes_read = GetAudioData(m_aubuf, m_fragment_size, true);
+        bytes_read = GetAudioData(m_auBuf, m_fragmentSize, true);
         VBERROR("Discarded one audio fragment to compensate for xrun");
     }
-    m_jack_xruns -= t_jack_xruns;
+    m_jackXruns -= t_jack_xruns;
 
     // Get jack output buffers
     for (int i = 0; i < m_channels; i++)
         bufs[i] = (float*)jack_port_get_buffer(m_ports[i], nframes);
 
-    if (m_pauseaudio || m_killaudio)
+    if (m_pauseAudio || m_killAudio)
     {
-        if (!m_actually_paused)
+        if (!m_actuallyPaused)
         {
             VBAUDIO("JackCallback: audio paused");
             OutputEvent e(OutputEvent::Paused);
             dispatch(e);
-            m_was_paused = true;
+            m_wasPaused = true;
         }
 
-        m_actually_paused = true;
+        m_actuallyPaused = true;
     }
     else
     {
-        if (m_was_paused)
+        if (m_wasPaused)
         {
             VBAUDIO("JackCallback: Play Event");
             OutputEvent e(OutputEvent::Playing);
             dispatch(e);
-            m_was_paused = false;
+            m_wasPaused = false;
         }
-        bytes_read = GetAudioData(m_aubuf, bytes_needed, false);
+        bytes_read = GetAudioData(m_auBuf, bytes_needed, false);
     }
 
     // Pad with silence
     if (bytes_needed > bytes_read)
     {
         // play silence on buffer underrun
-        memset(m_aubuf + bytes_read, 0, bytes_needed - bytes_read);
-        if (!m_pauseaudio)
+        memset(m_auBuf + bytes_read, 0, bytes_needed - bytes_read);
+        if (!m_pauseAudio)
             VBERROR(QString("Having to insert silence because GetAudioData "
                             "hasn't returned enough data. Wanted: %1 Got: %2")
                                     .arg(bytes_needed).arg(bytes_read));
     }
     // Now deinterleave audio (and convert to float)
-    DeinterleaveAudio((float*)m_aubuf, bufs, nframes, m_chan_volumes);
+    DeinterleaveAudio((float*)m_auBuf, bufs, nframes, m_chanVolumes);
 
-    if (!m_pauseaudio)
+    if (!m_pauseAudio)
     {
         // Output a status event - needed for Music player
         Status();
@@ -446,11 +446,11 @@ int AudioOutputJACK::JackXRunCallback(void)
     // Increment our counter of "callbacks missed".
     // All we want to do is chuck away some audio from the ring buffer
     // to keep our audio output roughly where it should be if we didn't xrun
-    int fragments = (int)ceilf( ((delay / 1000000.0F) * m_samplerate )
-                            / ((float)m_fragment_size / m_output_bytes_per_frame) );
-    m_jack_xruns += fragments; //should be at least 1...
+    int fragments = (int)ceilf( ((delay / 1000000.0F) * m_sampleRate )
+                            / ((float)m_fragmentSize / m_outputBytesPerFrame) );
+    m_jackXruns += fragments; //should be at least 1...
     VBERROR(QString("Jack XRun Callback: %1 usecs delayed, xruns now %2")
-                        .arg(delay).arg(m_jack_xruns) );
+                        .arg(delay).arg(m_jackXruns) );
 
     return 0;
 }
@@ -482,9 +482,9 @@ int AudioOutputJACK::JackGraphOrderCallback(void)
             max_latency = port_latency;
     }
 
-    m_jack_latency = max_latency;
+    m_jackLatency = max_latency;
     VBAUDIO(QString("JACK graph reordered. Maximum latency=%1")
-                    .arg(m_jack_latency));
+                    .arg(m_jackLatency));
 
     return 0;
 }
@@ -494,7 +494,7 @@ int AudioOutputJACK::JackGraphOrderCallback(void)
 void AudioOutputJACK::VolumeInit(void)
 {
     int volume = 100;
-    if (m_set_initial_vol)
+    if (m_setInitialVol)
     {
         QString controlLabel = gCoreContext->GetSetting("MixerControl", "PCM");
         controlLabel += "MixerVolume";
@@ -502,7 +502,7 @@ void AudioOutputJACK::VolumeInit(void)
     }
 
     for (int i=0; i<JACK_CHANNELS_MAX; i++)
-        m_chan_volumes[i] = volume;
+        m_chanVolumes[i] = volume;
 }
 
 int AudioOutputJACK::GetVolumeChannel(int channel) const
@@ -513,7 +513,7 @@ int AudioOutputJACK::GetVolumeChannel(int channel) const
         return 100;
 
     if (channel < JACK_CHANNELS_MAX)
-        vol = m_chan_volumes[channel];
+        vol = m_chanVolumes[channel];
 
     return vol;
 }
@@ -522,21 +522,21 @@ void AudioOutputJACK::SetVolumeChannel(int channel, int volume)
 {
     if (m_internalVol && (channel < JACK_CHANNELS_MAX))
     {
-        m_chan_volumes[channel] = volume;
+        m_chanVolumes[channel] = volume;
         if (channel == 0)
         {
             // Left
-            m_chan_volumes[2] = volume; // left rear
+            m_chanVolumes[2] = volume; // left rear
         }
         else if (channel == 1)
         {
             // Right
-            m_chan_volumes[3] = volume; // right rear
+            m_chanVolumes[3] = volume; // right rear
         }
 
         // LFE and Center
-        m_chan_volumes[4] = m_chan_volumes[5] =
-                                    (m_chan_volumes[0] + m_chan_volumes[1]) / 2;
+        m_chanVolumes[4] = m_chanVolumes[5] =
+                                    (m_chanVolumes[0] + m_chanVolumes[1]) / 2;
     }
 }
 
@@ -585,9 +585,9 @@ const char** AudioOutputJACK::_jack_get_ports(void)
     const char *port_name = nullptr;
 
     // Have we been given a target port to connect to
-    if (!m_main_device.isEmpty())
+    if (!m_mainDevice.isEmpty())
     {
-        port_name = m_main_device.toLatin1().constData();
+        port_name = m_mainDevice.toLatin1().constData();
     }
     else
     {

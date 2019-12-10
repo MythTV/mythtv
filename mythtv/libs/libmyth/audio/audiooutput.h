@@ -154,7 +154,7 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
     virtual bool IsUpmixing(void)   { return false; }
     virtual bool ToggleUpmix(void)  { return false; }
     virtual bool CanUpmix(void)     { return false; }
-    bool PulseStatus(void) { return m_pulsewassuspended; }
+    bool PulseStatus(void) { return m_pulseWasSuspended; }
 
     /**
      * \param fmt The audio format in question.
@@ -200,7 +200,7 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
 
     QString m_lastError;
     QString m_lastWarn;
-    bool    m_pulsewassuspended {false};
+    bool    m_pulseWasSuspended {false};
     AVFrame *m_frame            {nullptr};
 };
 

@@ -157,9 +157,9 @@ bool AudioOutputOpenSLES::StartPlayer()
     SLDataFormat_PCM format_pcm;
     format_pcm.formatType       = SL_DATAFORMAT_PCM;
     format_pcm.numChannels      = 2;
-    format_pcm.samplesPerSec    = ((SLuint32) m_samplerate * 1000) ;
+    format_pcm.samplesPerSec    = ((SLuint32) m_sampleRate * 1000) ;
     format_pcm.endianness       = SL_BYTEORDER_LITTLEENDIAN;
-    switch (m_output_format)
+    switch (m_outputFormat)
     {
         case FORMAT_U8:     format_pcm.bitsPerSample = SL_PCMSAMPLEFORMAT_FIXED_8;  break;
         case FORMAT_S16:    format_pcm.bitsPerSample = SL_PCMSAMPLEFORMAT_FIXED_16; break;
@@ -173,7 +173,7 @@ bool AudioOutputOpenSLES::StartPlayer()
         // case FORMAT_FLT:    format_pcm.bitsPerSample    = SL_PCMSAMPLEFORMAT_FIXED_32; break;
 #endif
         default:
-            Error(QObject::tr("Unknown sample format: %1").arg(m_output_format));
+            Error(QObject::tr("Unknown sample format: %1").arg(m_outputFormat));
             return false;
     }
     format_pcm.containerSize    = format_pcm.bitsPerSample;
@@ -192,7 +192,7 @@ bool AudioOutputOpenSLES::StartPlayer()
     const SLInterfaceID ids2[] = { m_SL_IID_ANDROIDSIMPLEBUFFERQUEUE, m_SL_IID_VOLUME };
     static const SLboolean req2[] = { SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE };
 
-    if (GetNativeOutputSampleRate() >= m_samplerate) { // FIXME
+    if (GetNativeOutputSampleRate() >= m_sampleRate) { // FIXME
         result = CreateAudioPlayer(m_engineEngine, &m_playerObject, &audioSrc,
                                     &audioSnk, sizeof(ids2) / sizeof(*ids2),
                                     ids2, req2);
@@ -238,8 +238,8 @@ bool AudioOutputOpenSLES::StartPlayer()
     CHECK_OPENSL_ERROR("Failed to switch to playing state");
 
     /* XXX: rounding shouldn't affect us at normal sampling rate */
-    uint32_t samplesPerBuf = OPENSLES_BUFLEN * m_samplerate / 1000;
-    m_buf = (uint8_t*)malloc(OPENSLES_BUFFERS * samplesPerBuf * m_bytes_per_frame);
+    uint32_t samplesPerBuf = OPENSLES_BUFLEN * m_sampleRate / 1000;
+    m_buf = (uint8_t*)malloc(OPENSLES_BUFFERS * samplesPerBuf * m_bytesPerFrame);
     if (!m_buf)
     {
         Stop();
@@ -372,12 +372,12 @@ bool AudioOutputOpenSLES::OpenDevice(void)
     }
 
     // fragments are 10ms worth of samples
-    m_fragment_size = OPENSLES_BUFLEN * m_output_bytes_per_frame * m_samplerate / 1000;
+    m_fragmentSize = OPENSLES_BUFLEN * m_outputBytesPerFrame * m_sampleRate / 1000;
     // OpenSLES buffer holds 10 fragments = 80ms worth of samples
-    m_soundcard_buffer_size = OPENSLES_BUFFERS * m_fragment_size;
+    m_soundcardBufferSize = OPENSLES_BUFFERS * m_fragmentSize;
 
     VBAUDIO(QString("Buffering %1 fragments of %2 bytes each, total: %3 bytes")
-            .arg(OPENSLES_BUFFERS).arg(m_fragment_size).arg(m_soundcard_buffer_size));
+            .arg(OPENSLES_BUFFERS).arg(m_fragmentSize).arg(m_soundcardBufferSize));
 
     return true;
 }
@@ -433,7 +433,7 @@ void AudioOutputOpenSLES::WriteAudio(unsigned char * buffer, int size)
             continue;
         }
 
-        if (size < (m_fragment_size + m_bufWriteIndex))
+        if (size < (m_fragmentSize + m_bufWriteIndex))
         {
             memcpy(&m_buf[m_bufWriteBase + m_bufWriteIndex], buffer, size);
             size = 0;
@@ -442,11 +442,11 @@ void AudioOutputOpenSLES::WriteAudio(unsigned char * buffer, int size)
         }
         else
         {
-            memcpy(&m_buf[m_bufWriteBase + m_bufWriteIndex], buffer, m_fragment_size - m_bufWriteIndex);
-            size -= m_fragment_size - m_bufWriteIndex;
+            memcpy(&m_buf[m_bufWriteBase + m_bufWriteIndex], buffer, m_fragmentSize - m_bufWriteIndex);
+            size -= m_fragmentSize - m_bufWriteIndex;
         }
 
-        SLresult r = Enqueue(m_playerBufferQueue, &m_buf[m_bufWriteBase], m_fragment_size);
+        SLresult r = Enqueue(m_playerBufferQueue, &m_buf[m_bufWriteBase], m_fragmentSize);
         VBAUDIO(QString("Enqueue %1").arg(m_bufWriteBase));
 
         if (r != SL_RESULT_SUCCESS)
@@ -454,14 +454,14 @@ void AudioOutputOpenSLES::WriteAudio(unsigned char * buffer, int size)
             // should never happen so show a log
             VBERROR(QString("error %1 when writing %2 bytes %3")
                     .arg(r)
-                    .arg(m_fragment_size)
+                    .arg(m_fragmentSize)
                     .arg((r == SL_RESULT_BUFFER_INSUFFICIENT) ? " (buffer insufficient)" : ""));
             // toss the remaining data, we got bigger problems
             return;
         }
         // update pointers for next time only if the data was queued correctly
-        m_bufWriteBase += m_fragment_size;
-        if (m_bufWriteBase >= (m_fragment_size * OPENSLES_BUFFERS))
+        m_bufWriteBase += m_fragmentSize;
+        if (m_bufWriteBase >= (m_fragmentSize * OPENSLES_BUFFERS))
             m_bufWriteBase = 0;
         m_bufWriteIndex = 0;
     }
@@ -474,7 +474,7 @@ int AudioOutputOpenSLES::GetBufferedOnSoundcard(void) const
     {
         return 0;
     }
-    return numBufferesQueued * m_fragment_size + m_bufWriteIndex;
+    return numBufferesQueued * m_fragmentSize + m_bufWriteIndex;
 }
 
 int AudioOutputOpenSLES::GetVolumeChannel(int channel) const

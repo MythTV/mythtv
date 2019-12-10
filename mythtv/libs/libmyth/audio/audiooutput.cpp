@@ -80,7 +80,7 @@ AudioOutput *AudioOutput::OpenAudio(
 AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
                                     bool willsuspendpa)
 {
-    QString &main_device = settings.m_main_device;
+    QString &main_device = settings.m_mainDevice;
     AudioOutput *ret = nullptr;
 
     // Don't suspend Pulse if unnecessary.  This can save 100mS
@@ -236,7 +236,7 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
         return nullptr;
     }
 #ifdef USING_PULSE
-    ret->m_pulsewassuspended = pulsestatus;
+    ret->m_pulseWasSuspended = pulsestatus;
 #endif
     return ret;
 }
@@ -244,7 +244,7 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
 AudioOutput::~AudioOutput()
 {
 #ifdef USING_PULSE
-    if (m_pulsewassuspended)
+    if (m_pulseWasSuspended)
         PulseHandler::Suspend(PulseHandler::kPulseResume);
 #endif
     av_frame_free(&m_frame);
