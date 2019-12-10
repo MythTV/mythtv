@@ -110,6 +110,7 @@ using_drm {
     HEADERS += platforms/mythdrmdevice.h
     SOURCES += platforms/mythdisplaydrm.cpp
     SOURCES += platforms/mythdrmdevice.cpp
+    QMAKE_CXXFLAGS += $${LIBDRM_CFLAGS}
 }
 
 using_qtdbus {
