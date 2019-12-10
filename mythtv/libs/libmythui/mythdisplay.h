@@ -77,7 +77,7 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
     std::vector<double> GetRefreshRates(int Width, int Height);
 
   public slots:
-    void ScreenChanged        (QScreen *qScreen);
+    virtual void ScreenChanged(QScreen *qScreen);
     void PrimaryScreenChanged (QScreen *qScreen);
     void ScreenAdded          (QScreen *qScreen);
     void ScreenRemoved        (QScreen *qScreen);

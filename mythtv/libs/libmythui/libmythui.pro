@@ -42,6 +42,7 @@ HEADERS += mythuiexp.h mythuisimpletext.h mythuistatetracker.h
 HEADERS += mythuianimation.h mythuiscrollbar.h
 HEADERS += mythnotificationcenter.h mythnotificationcenter_private.h
 HEADERS += mythuicomposite.h mythnotification.h mythuidefines.h
+HEADERS += mythedid.h
 
 SOURCES  = mythmainwindow.cpp mythpainter.cpp mythimage.cpp mythrect.cpp
 SOURCES += myththemebase.cpp  mythpainter_qimage.cpp
@@ -63,6 +64,7 @@ SOURCES += mythuisimpletext.cpp mythuistatetracker.cpp
 SOURCES += mythuianimation.cpp mythuiscrollbar.cpp
 SOURCES += mythnotificationcenter.cpp mythnotification.cpp
 SOURCES += mythuicomposite.cpp
+SOURCES += mythedid.cpp
 
 using_qtwebkit {
 HEADERS += mythuiwebbrowser.h
@@ -100,6 +102,14 @@ using_x11 {
     SOURCES += screensaver-x11.cpp
     HEADERS += platforms/mythdisplayx11.h
     SOURCES += platforms/mythdisplayx11.cpp
+}
+
+using_drm {
+    DEFINES += USING_DRM
+    HEADERS += platforms/mythdisplaydrm.h
+    HEADERS += platforms/mythdrmdevice.h
+    SOURCES += platforms/mythdisplaydrm.cpp
+    SOURCES += platforms/mythdrmdevice.cpp
 }
 
 using_qtdbus {
