@@ -21,7 +21,7 @@ using namespace std;
 #include "mythavutil.h"
 #include "fourcc.h"
 #include "RTjpegN.h"
-#include "audiooutpututil.h"               // for RTjpeg, RTJ_YUV420
+#include "audiooutput.h"                // for RTjpeg, RTJ_YUV420
 #include "audiooutputsettings.h"        // for ::FORMAT_NONE, ::FORMAT_S16, etc
 #include "audioplayer.h"                // for AudioPlayer
 #include "cc608reader.h"                // for CC608Reader
@@ -46,7 +46,7 @@ NuppelDecoder::NuppelDecoder(MythPlayer *parent,
     memset(&m_frameheader, 0, sizeof(rtframeheader));
     memset(&m_extradata, 0, sizeof(extendeddata));
     m_planes[0] = m_planes[1] = m_planes[2] = nullptr;
-    m_audioSamples = (uint8_t *)av_mallocz(AudioOutputUtil::MAX_SIZE_BUFFER);
+    m_audioSamples = (uint8_t *)av_mallocz(AudioOutput::kMaxSizeBuffer);
 
     // set parent class variables
     m_positionMapType = MARK_KEYFRAME;

@@ -187,9 +187,9 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
                     uint8_t *buffer, int &data_size,
                     const AVPacket *pkt);
     /**
-     * MAX_SIZE_BUFFER is the maximum size of a buffer to be used with DecodeAudio
+     * kMaxSizeBuffer is the maximum size of a buffer to be used with DecodeAudio
      */
-    static const int MAX_SIZE_BUFFER = 384000;
+    static const int kMaxSizeBuffer = 384000;
 
   protected:
     void Error(const QString &msg);

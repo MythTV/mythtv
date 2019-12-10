@@ -345,7 +345,7 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
       m_ccd708(new CC708Decoder(parent->GetCC708Reader())),
       m_ttd(new TeletextDecoder(parent->GetTeletextReader()))
 {
-    m_audioSamples = (uint8_t *)av_mallocz(AudioOutput::MAX_SIZE_BUFFER);
+    m_audioSamples = (uint8_t *)av_mallocz(AudioOutput::kMaxSizeBuffer);
     m_ccd608->SetIgnoreTimecode(true);
 
     av_log_set_callback(myth_av_log);
