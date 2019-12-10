@@ -572,13 +572,13 @@ void AvFormatDecoderDVD::StreamChangeCheck(void)
     if (!m_ringBuffer->IsDVD())
         return;
 
-    if (m_streams_changed)
+    if (m_streamsChanged)
     {
         // This was originally in HandleDVDStreamChange
         QMutexLocker locker(avcodeclock);
         ScanStreams(true);
         avcodeclock->unlock();
-        m_streams_changed=false;
+        m_streamsChanged=false;
     }
 
     // Update the title length

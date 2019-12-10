@@ -62,7 +62,7 @@ void AvFormatDecoderBD::StreamChangeCheck(void)
     if (!m_ringBuffer->IsBD())
         return;
 
-    if (m_streams_changed)
+    if (m_streamsChanged)
     {
         // This was originally in HandleBDStreamChange
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "resetting");
@@ -72,7 +72,7 @@ void AvFormatDecoderBD::StreamChangeCheck(void)
         FindStreamInfo();
         ScanStreams(false);
         avcodeclock->unlock();
-        m_streams_changed=false;
+        m_streamsChanged=false;
     }
 
     if (m_parent->AtNormalSpeed() && m_ringBuffer->BD()->TitleChanged())

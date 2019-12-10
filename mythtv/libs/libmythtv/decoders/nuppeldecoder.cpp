@@ -52,8 +52,8 @@ NuppelDecoder::NuppelDecoder(MythPlayer *parent,
     m_positionMapType = MARK_KEYFRAME;
     m_lastKey = 0;
     m_framesPlayed = 0;
-    m_getrawframes = false;
-    m_getrawvideo = false;
+    m_getRawFrames = false;
+    m_getRawVideo = false;
 
     m_rtjd = new RTjpeg();
     int format = RTJ_YUV420;
@@ -203,16 +203,16 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     if (m_fileHeader.aspect > .999 && m_fileHeader.aspect < 1.001)
         m_fileHeader.aspect = 4.0 / 3;
-    m_current_aspect = m_fileHeader.aspect;
+    m_currentAspect = m_fileHeader.aspect;
 
     GetPlayer()->SetKeyframeDistance(m_fileHeader.keyframedist);
     GetPlayer()->SetVideoParams(m_fileHeader.width, m_fileHeader.height,
-                                m_fileHeader.fps, m_current_aspect, false, 16);
+                                m_fileHeader.fps, m_currentAspect, false, 16);
 
     m_videoWidth = m_fileHeader.width;
     m_videoHeight = m_fileHeader.height;
     m_videoSize = m_videoHeight * m_videoWidth * 3 / 2;
-    m_keyframedist = m_fileHeader.keyframedist;
+    m_keyframeDist = m_fileHeader.keyframedist;
     m_videoFrameRate = m_fileHeader.fps;
 
     if (!ReadFrameheader(&frameheader))
@@ -353,18 +353,18 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                     offset += sizeof(struct seektable_entry);
 
                     PosMapEntry e = {ste.keyframe_number,
-                                     ste.keyframe_number * m_keyframedist,
+                                     ste.keyframe_number * m_keyframeDist,
                                      ste.file_offset};
                     m_positionMap.push_back(e);
-                    uint64_t frame_num = ste.keyframe_number * m_keyframedist;
+                    uint64_t frame_num = ste.keyframe_number * m_keyframeDist;
                     m_frameToDurMap[frame_num] =
                         frame_num * 1000 / m_videoFrameRate;
                     m_durToFrameMap[m_frameToDurMap[frame_num]] = frame_num;
                 }
                 m_hasFullPositionMap = true;
-                m_totalLength = (int)((ste.keyframe_number * m_keyframedist * 1.0) /
+                m_totalLength = (int)((ste.keyframe_number * m_keyframeDist * 1.0) /
                                      m_videoFrameRate);
-                m_totalFrames = (long long)ste.keyframe_number * m_keyframedist;
+                m_totalFrames = (long long)ste.keyframe_number * m_keyframeDist;
 
                 m_positionMapLock.unlock();
 
@@ -1093,7 +1093,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype, bool& /*Retry*/)
 
         if (m_frameHeader.frametype == 'R')
         {
-            if (m_getrawframes)
+            if (m_getRawFrames)
                 StoreRawData(nullptr);
             continue; // the R-frame has no data packet
         }
@@ -1118,7 +1118,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype, bool& /*Retry*/)
                 if (!m_hasFullPositionMap)
                 {
                     long long last_index = 0;
-                    long long this_index = m_lastKey / m_keyframedist;
+                    long long this_index = m_lastKey / m_keyframeDist;
 
                     QMutexLocker locker(&m_positionMapLock);
                     if (!m_positionMap.empty())
@@ -1134,7 +1134,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype, bool& /*Retry*/)
                     }
                 }
             }
-            if (m_getrawframes)
+            if (m_getRawFrames)
                 StoreRawData(nullptr);
         }
 
@@ -1178,7 +1178,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype, bool& /*Retry*/)
                 continue;
             }
 
-            buf->aspect = m_current_aspect;
+            buf->aspect = m_currentAspect;
             buf->frameNumber = m_framesPlayed;
             buf->frameCounter = m_frameCounter++;
             buf->dummy = 0;
@@ -1191,7 +1191,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype, bool& /*Retry*/)
 
             m_decodedVideoFrame = buf;
             gotvideo = true;
-            if (m_getrawframes && m_getrawvideo)
+            if (m_getRawFrames && m_getRawVideo)
                 StoreRawData(m_strm);
             m_framesPlayed++;
 
@@ -1219,7 +1219,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype, bool& /*Retry*/)
         {
             if ((m_frameHeader.comptype == '3') || (m_frameHeader.comptype == 'A'))
             {
-                if (m_getrawframes)
+                if (m_getRawFrames)
                     StoreRawData(m_strm);
 
                 if (!m_mpaAudCodec)
@@ -1266,7 +1266,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype, bool& /*Retry*/)
             }
             else
             {
-                m_getrawframes = false;
+                m_getRawFrames = false;
 #if HAVE_BIGENDIAN
                 // Why endian correct the audio buffer here?
                 // Don't big-endian clients have to do it in audiooutBlah.cpp?
@@ -1289,7 +1289,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype, bool& /*Retry*/)
 
         if (m_frameHeader.frametype == 'T' && (kDecodeVideo & decodetype))
         {
-            if (m_getrawframes)
+            if (m_getRawFrames)
                 StoreRawData(m_strm);
 
             GetPlayer()->GetCC608Reader()->AddTextData(m_strm, m_frameHeader.packetlength,
@@ -1332,11 +1332,11 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype, bool& /*Retry*/)
 
                 if (m_fileHeader.aspect > .999 && m_fileHeader.aspect < 1.001)
                     m_fileHeader.aspect = 4.0 / 3;
-                m_current_aspect = m_fileHeader.aspect;
+                m_currentAspect = m_fileHeader.aspect;
 
                 GetPlayer()->SetKeyframeDistance(m_fileHeader.keyframedist);
                 GetPlayer()->SetVideoParams(m_fileHeader.width, m_fileHeader.height,
-                                            m_fileHeader.fps, m_current_aspect, false, 2);
+                                            m_fileHeader.fps, m_currentAspect, false, 2);
             }
         }
     }
@@ -1365,7 +1365,7 @@ void NuppelDecoder::SeekReset(long long newKey, uint skipFrames,
     if (discardFrames)
         GetPlayer()->DiscardVideoFrames(doFlush, false);
 
-    for (;(skipFrames > 0) && !m_ateof; skipFrames--)
+    for (;(skipFrames > 0) && !m_atEof; skipFrames--)
     {
         bool retry = false;
         GetFrame(kDecodeAV, retry);
