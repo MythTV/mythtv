@@ -1407,12 +1407,7 @@ static bool resetTheme(QString themedir, const QString &badtheme)
     MythTranslation::reload();
     gCoreContext->ReInitLocale();
     GetMythUI()->LoadQtConfig();
-#if CONFIG_DARWIN
-    GetMythMainWindow()->Init(OPENGL2_PAINTER);
-#else
     GetMythMainWindow()->Init();
-#endif
-
     GetMythMainWindow()->ReinitDone();
 
     return RunMenu(themedir, themename);
@@ -2152,7 +2147,7 @@ int main(int argc, char **argv)
 
 #if CONFIG_DARWIN
     GetMythMainWindow()->SetEffectsEnabled(false);
-    GetMythMainWindow()->Init(OPENGL2_PAINTER);
+    GetMythMainWindow()->Init();
     GetMythMainWindow()->ReinitDone();
     GetMythMainWindow()->SetEffectsEnabled(true);
     gLoaded = true;

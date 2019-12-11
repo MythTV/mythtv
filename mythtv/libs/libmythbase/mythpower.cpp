@@ -209,7 +209,7 @@ bool MythPower::RequestFeature(Feature Request, bool Delay)
         case FeatureRestart:     emit WillRestart(remaining);     break;
         case FeatureHibernate:   emit WillHibernate(remaining);   break;
         case FeatureHybridSleep: emit WillHybridSleep(remaining); break;
-        case FeatureNone: break;
+        default: break;
     }
     return true;
 }

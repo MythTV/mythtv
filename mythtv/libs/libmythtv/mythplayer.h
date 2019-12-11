@@ -715,9 +715,9 @@ class MTV_PUBLIC MythPlayer
     QElapsedTimer m_avTimer;
 
     // Tracks deinterlacer for Debug OSD
-    MythDeintType m_lastDeinterlacer;
-    bool      m_lastDeinterlacer2x;
-    VideoFrameType m_lastFrameCodec;
+    MythDeintType m_lastDeinterlacer    { DEINT_NONE };
+    bool      m_lastDeinterlacer2x      { false };
+    VideoFrameType m_lastFrameCodec     { FMT_NONE };
 
     // -- end state stuff --
 

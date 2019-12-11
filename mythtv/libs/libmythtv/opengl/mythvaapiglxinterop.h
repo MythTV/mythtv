@@ -20,11 +20,11 @@ class MythVAAPIInteropGLX : public MythVAAPIInterop
     void InitPictureAttributes(VideoColourSpace *ColourSpace);
 
   protected:
-    VADisplayAttribute *m_vaapiPictureAttributes;
-    int                 m_vaapiPictureAttributeCount;
-    int                 m_vaapiHueBase;
-    uint                m_vaapiColourSpace;
-    MythDeintType       m_basicDeinterlacer;
+    VADisplayAttribute *m_vaapiPictureAttributes     { nullptr };
+    int                 m_vaapiPictureAttributeCount { 0 };
+    int                 m_vaapiHueBase               { 0 };
+    uint                m_vaapiColourSpace           { 0 };
+    MythDeintType       m_basicDeinterlacer          { DEINT_NONE };
 };
 
 class MythVAAPIInteropGLXCopy : public MythVAAPIInteropGLX
@@ -37,7 +37,7 @@ class MythVAAPIInteropGLXCopy : public MythVAAPIInteropGLX
                                       VideoFrame *Frame, FrameScanType Scan) final override;
 
   private:
-    void* m_glxSurface;
+    void* m_glxSurface { nullptr };
 };
 
 #include "GL/glx.h"
@@ -59,10 +59,10 @@ class MythVAAPIInteropGLXPixmap : public MythVAAPIInteropGLX
     bool        InitPixmaps(void);
 
     // Texture from Pixmap
-    Pixmap                     m_pixmap;
-    GLXPixmap                  m_glxPixmap;
-    MYTH_GLXBINDTEXIMAGEEXT    m_glxBindTexImageEXT;
-    MYTH_GLXRELEASETEXIMAGEEXT m_glxReleaseTexImageEXT;
+    Pixmap                     m_pixmap                { 0 };
+    GLXPixmap                  m_glxPixmap             { 0 };
+    MYTH_GLXBINDTEXIMAGEEXT    m_glxBindTexImageEXT    { nullptr };
+    MYTH_GLXRELEASETEXIMAGEEXT m_glxReleaseTexImageEXT { nullptr };
 };
 
 

@@ -3774,7 +3774,7 @@ QList<QKeyEvent> TV::ConvertScreenPressKeyMap(const QString &keyList)
 bool TV::TranslateGesture(const QString &context, MythGestureEvent *e,
                           QStringList &actions, bool isLiveTV)
 {
-    if (context == "TV Playback")
+    if (e && context == "TV Playback")
     {
         // TODO make this configuable via a similar mechanism to
         //      TranslateKeyPress
@@ -6418,7 +6418,7 @@ void TV::UpdateNavDialog(PlayerContext *ctx)
                 || ctx->m_player->IsPaused()));
         ctx->UnlockDeletePlayer(__FILE__, __LINE__);
         info.text["paused"] = (paused ? "Y" : "N");
-        bool muted = ctx->m_player->IsMuted();
+        bool muted = ctx->m_player && ctx->m_player->IsMuted();
         info.text["muted"] = (muted ? "Y" : "N");
         osd->SetText(OSD_DLG_NAVIGATE, info.text, paused ? kOSDTimeout_None : kOSDTimeout_Long);
     }
