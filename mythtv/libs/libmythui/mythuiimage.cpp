@@ -1630,7 +1630,7 @@ void MythUIImage::FindRandomImage(void)
     if (!imageDir.exists())
     {
         QString themeDir = GetMythUI()->GetThemeDir() + '/';
-        imageDir = themeDir + m_imageDirectory;
+        imageDir.setPath(themeDir + m_imageDirectory);
     }
 
     QStringList imageTypes;
