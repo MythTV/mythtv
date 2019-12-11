@@ -123,6 +123,10 @@ MythCodecID MythVDPAUContext::GetSupportedCodec(AVCodecContext **Context,
     if (!Decoder.startsWith("vdpau") || getenv("NO_VDPAU") || IsUnsupportedProfile(*Context))
         return failure;
 
+    // direct rendering needs interop support
+    if (!decodeonly && (MythOpenGLInterop::GetInteropType(FMT_VDPAU) == MythOpenGLInterop::Unsupported))
+        return failure;
+
     QString codec   = ff_codec_id_string((*Context)->codec_id);
     QString profile = avcodec_profile_name((*Context)->codec_id, (*Context)->profile);
     QString pixfmt  = av_get_pix_fmt_name((*Context)->pix_fmt);
