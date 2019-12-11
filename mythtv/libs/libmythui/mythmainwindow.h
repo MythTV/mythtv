@@ -40,7 +40,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
   public:
     enum {drawRefresh = 70};
 
-    void Init(const QString& forcedpainter = QString(), bool mayReInit=true);
+    void Init(bool mayReInit = true);
     void ReinitDone(void);
     void Show(void);
     void MoveResize(QRect &Geometry);

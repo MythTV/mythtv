@@ -35,7 +35,6 @@
 #include "themeinfo.h"
 #include "mythdirs.h"
 #include "mythuihelper.h"
-#include "mythuidefines.h"
 #include "langsettings.h"
 #include "decoders/mythcodeccontext.h"
 #include "mythsorthelper.h"
@@ -2709,38 +2708,6 @@ static HostComboBoxSetting *MythTimeFormat()
     return gc;
 }
 
-#if ! CONFIG_DARWIN
-static HostComboBoxSetting *ThemePainter()
-{
-    auto *gc = new HostComboBoxSetting("ThemePainter");
-
-    gc->setLabel(AppearanceSettings::tr("Paint engine"));
-
-    gc->addSelection(QCoreApplication::translate("(Common)", "Auto", "Automatic"),
-                     AUTO_PAINTER);
-#ifdef _WIN32
-    gc->addSelection(QCoreApplication::translate("(Common)", "Direct3D"),
-                     D3D9_PAINTER);
-#endif
-#if defined USING_OPENGL && ! defined USING_OPENGLES
-    gc->addSelection(QCoreApplication::translate("(Common)", "OpenGL 2"),
-                     OPENGL2_PAINTER);
-    gc->addSelection(QCoreApplication::translate("(Common)", "OpenGL 1"),
-                     OPENGL_PAINTER);
-#endif
-    gc->addSelection(QCoreApplication::translate("(Common)", "Qt"), QT_PAINTER);
-    gc->setHelpText(
-        AppearanceSettings::tr("This selects what MythTV uses to draw. "
-                               "Choosing '%1' is recommended, unless running "
-                               "on systems with broken OpenGL implementations "
-                               "(broken hardware or drivers or windowing "
-                               "systems) where only Qt works.")
-        .arg(QCoreApplication::translate("(Common)", "Auto", "Automatic")));
-
-    return gc;
-}
-#endif
-
 static HostCheckBoxSetting *GUIRGBLevels()
 {
     auto *rgb = new HostCheckBoxSetting("GUIRGBLevels");
@@ -4563,9 +4530,6 @@ AppearanceSettings::AppearanceSettings()
     screen->setLabel(tr("Theme / Screen Settings"));
     addChild(screen);
 
-#if ! CONFIG_DARWIN
-    screen->addChild(ThemePainter());
-#endif
     screen->addChild(MenuTheme());
     screen->addChild(GUIRGBLevels());
 
