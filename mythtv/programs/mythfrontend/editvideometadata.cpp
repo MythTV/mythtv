@@ -325,15 +325,14 @@ void EditMetadataDialog::fillWidgets()
 
     // No memory leak. MythUIButtonListItem adds the new item into
     // m_categoryList.
-    auto *button =
-        new MythUIButtonListItem(m_categoryList, VIDEO_CATEGORY_UNKNOWN);
+    new MythUIButtonListItem(m_categoryList, VIDEO_CATEGORY_UNKNOWN);
     const VideoCategory::entry_list &vcl =
             VideoCategory::GetCategory().getList();
     for (auto p = vcl.cbegin(); p != vcl.cend(); ++p)
     {
         // No memory leak. MythUIButtonListItem adds the new item into
         // m_categoryList.
-        button = new MythUIButtonListItem(m_categoryList, p->second);
+        auto *button = new MythUIButtonListItem(m_categoryList, p->second);
         button->SetData(p->first);
     }
     m_categoryList->SetValueByData(m_workingMetadata->GetCategoryID());
@@ -343,7 +342,7 @@ void EditMetadataDialog::fillWidgets()
     {
         // No memory leak. MythUIButtonListItem adds the new item into
         // m_levelList.
-        button = new MythUIButtonListItem(m_levelList,
+        auto *button = new MythUIButtonListItem(m_levelList,
                                           tr("Level %1").arg(i.GetLevel()));
         button->SetData(i.GetLevel());
     }
@@ -356,8 +355,7 @@ void EditMetadataDialog::fillWidgets()
 
     // No memory leak. MythUIButtonListItem adds the new item into
     // m_childList.
-    // cppcheck-suppress unreadVariable
-    button = new MythUIButtonListItem(m_childList,tr("None"));
+    new MythUIButtonListItem(m_childList,tr("None"));
 
     // TODO: maybe make the title list have the same sort order
     // as elsewhere.
@@ -382,7 +380,7 @@ void EditMetadataDialog::fillWidgets()
     {
         if (p->first != m_workingMetadata->GetID())
         {
-            button = new MythUIButtonListItem(m_childList,p->second);
+            auto *button = new MythUIButtonListItem(m_childList,p->second);
             button->SetData(p->first);
         }
     }

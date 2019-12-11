@@ -320,11 +320,20 @@ void ProgDetails::PowerPriorities(const QString & ptable)
 void ProgDetails::loadPage(void)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    QString category_type, showtype, year, syndicatedEpisodeNum;
-    QString rating, colorcode, title_pronounce;
+    QString category_type;
+    QString showtype;
+    QString year;
+    QString syndicatedEpisodeNum;
+    QString rating;
+    QString colorcode;
+    QString title_pronounce;
     float stars = 0.0;
-    int partnumber = 0, parttotal = 0;
-    int audioprop = 0, videoprop = 0, subtype = 0, generic = 0;
+    int partnumber = 0;
+    int parttotal = 0;
+    int audioprop = 0;
+    int videoprop = 0;
+    int subtype = 0;
+    int generic = 0;
     bool recorded = false;
 
     RecordingRule* record = nullptr;
@@ -466,9 +475,17 @@ void ProgDetails::loadPage(void)
 
     addItem(tr("Description"), s, ProgInfoList::kLevel1);
 
-    QString actors, directors, producers, execProducers;
-    QString writers, guestStars, hosts, adapters;
-    QString presenters, commentators, guests;
+    QString actors;
+    QString directors;
+    QString producers;
+    QString execProducers;
+    QString writers;
+    QString guestStars;
+    QString hosts;
+    QString adapters;
+    QString presenters;
+    QString commentators;
+    QString guests;
 
     if (m_progInfo.GetScheduledEndTime() != m_progInfo.GetScheduledStartTime())
     {
@@ -491,7 +508,9 @@ void ProgDetails::loadPage(void)
         if (query.exec() && query.size() > 0)
         {
             QStringList plist;
-            QString rstr, role, pname;
+            QString rstr;
+            QString role;
+            QString pname;
 
             while(query.next())
             {
@@ -827,7 +846,7 @@ void ProgDetails::loadPage(void)
     }
     else if (m_progInfo.GetRecordingRuleID())
     {
-        recordingProfile =  record->m_recProfile;
+        recordingProfile = record ? record->m_recProfile : tr("Unknown");
     }
     addItem(tr("Recording Host"), recordingHost, ProgInfoList::kLevel2);
     addItem(tr("Recording Input"), recordingInput, ProgInfoList::kLevel2);

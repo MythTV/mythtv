@@ -381,7 +381,8 @@ bool MPEGStreamData::CreatePATSingleProgram(
 
     AddListeningPID(_pid_pmt_single_program);
 
-    vector<uint> pnums, pids;
+    vector<uint> pnums;
+    vector<uint> pids;
 
     pnums.push_back(1);
     pids.push_back(_pid_pmt_single_program);
@@ -506,7 +507,9 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable &pmt)
     uint video_cnt = 0;
     uint audio_cnt = 0;
 
-    vector<uint> videoPIDs, audioPIDs, dataPIDs;
+    vector<uint> videoPIDs;
+    vector<uint> audioPIDs;
+    vector<uint> dataPIDs;
 
     for (uint i = 0; i < pmt.StreamCount(); i++)
     {

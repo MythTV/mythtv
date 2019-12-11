@@ -112,7 +112,7 @@ public:
     void ProcessQueue(void);
 
 private:
-    NCPrivate *d {nullptr};
+    NCPrivate *d {nullptr}; // NOLINT(readability-identifier-naming)
 };
 
 /**

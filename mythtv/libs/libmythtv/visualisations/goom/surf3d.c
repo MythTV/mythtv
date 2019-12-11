@@ -63,9 +63,8 @@ void surf3d_draw (surf3d *s, int color, int dist, int *buf, int *back, int W,int
 void grid3d_draw (grid3d *g, int color, int colorlow,
 									int dist, int *buf, int *back, int W,int H) {
 	int x;
-//	int *p1;
-//	int *p2;
-	v2d v2,v2x;
+	v2d v2;
+	v2d v2x;
 	
 	for (x=0;x<g->defx;x++) {
 		int z;

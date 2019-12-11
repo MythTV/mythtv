@@ -187,7 +187,8 @@ bool V4L2encSignalMonitor::HasLock(void)
  */
 int V4L2encSignalMonitor::StableResolution(void)
 {
-    int width, height;
+    int width;
+    int height;
 
     if (m_v4l2.GetResolution(width, height))
     {

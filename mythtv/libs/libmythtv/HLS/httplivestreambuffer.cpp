@@ -1511,12 +1511,11 @@ private:
         /* Duplicate HLS stream META information */
         for (int i = 0; i < m_parent->m_streams.size() && !m_interrupted; i++)
         {
-            HLSStream *src, *dst;
-            src = m_parent->GetStream(i);
+            auto *src = m_parent->GetStream(i);
             if (src == nullptr)
                 return RET_ERROR;
 
-            dst = new HLSStream(*src);
+            auto *dst = new HLSStream(*src);
             streams->append(dst);
 
             /* Download playlist file from server */
@@ -1974,7 +1973,8 @@ int HLSRingBuffer::ParseKey(HLSStream *hls, const QString &line)
 #ifdef USING_LIBCRYPTO
     else if (attr.startsWith(QLatin1String("AES-128")))
     {
-        QString uri, iv;
+        QString uri;
+        QString iv;
         if (!m_aesmsg)
         {
             LOG(VB_PLAYBACK, LOG_INFO, LOC +

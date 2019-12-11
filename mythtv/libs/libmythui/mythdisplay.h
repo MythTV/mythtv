@@ -54,9 +54,9 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
         MAX_MODES    = 5,
     } Mode;
 
-    QScreen* GetCurrentScreen (void);
-    int      GetScreenCount   (void);
-    double   GetPixelAspectRatio(void);
+    QScreen*   GetCurrentScreen (void);
+    static int GetScreenCount   (void);
+    double     GetPixelAspectRatio(void);
 
     virtual DisplayInfo GetDisplayInfo(int VideoRate = 0);
     static bool         SpanAllScreens(void);
@@ -78,7 +78,7 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
 
   public slots:
     virtual void ScreenChanged(QScreen *qScreen);
-    void PrimaryScreenChanged (QScreen *qScreen);
+    static void PrimaryScreenChanged (QScreen *qScreen);
     void ScreenAdded          (QScreen *qScreen);
     void ScreenRemoved        (QScreen *qScreen);
     void GeometryChanged      (const QRect &Geometry);
@@ -91,11 +91,11 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
     MythDisplay();
     virtual ~MythDisplay();
 
-    void         DebugModes         (void) const;
-    void         SetWidget          (QWidget *MainWindow);
-    QScreen*     GetDesiredScreen   (void);
-    static void  DebugScreen        (QScreen *qScreen, const QString &Message);
-    static float SanitiseRefreshRate(int Rate);
+    void            DebugModes         (void) const;
+    void            SetWidget          (QWidget *MainWindow);
+    static QScreen* GetDesiredScreen   (void);
+    static void     DebugScreen        (QScreen *qScreen, const QString &Message);
+    static float    SanitiseRefreshRate(int Rate);
 
     void         InitialiseModes    (void);
     virtual bool SwitchToVideoMode  (int Width, int Height, double Framerate);
@@ -107,7 +107,7 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
 
   private:
     Q_DISABLE_COPY(MythDisplay)
-    void PauseForModeSwitch(void);
+    static void PauseForModeSwitch(void);
 
     Mode            m_curMode            { GUI };
     MythDisplayMode m_mode[MAX_MODES]    { };

@@ -148,9 +148,9 @@ static void StatusCallback(pa_context *ctx, void *userdata)
     // update our status
     pa_context_state state = pa_context_get_state(ctx);
     LOG(VB_AUDIO, LOG_INFO, LOC + QString("Callback: State changed %1->%2")
-            .arg(state_to_string(handler->m_ctx_state))
+            .arg(state_to_string(handler->m_ctxState))
             .arg(state_to_string(state)));
-    handler->m_ctx_state = state;
+    handler->m_ctxState = state;
 }
 
 static void OperationCallback(pa_context *ctx, int success, void *userdata)
@@ -188,9 +188,9 @@ static void OperationCallback(pa_context *ctx, int success, void *userdata)
     }
 
     // update the context
-    handler->m_pending_operations--;
+    handler->m_pendingOperations--;
     LOG(VB_AUDIO, LOG_INFO, LOC + QString("Operation: success %1 remaining %2")
-            .arg(success).arg(handler->m_pending_operations));
+            .arg(success).arg(handler->m_pendingOperations));
 }
 
 PulseHandler::~PulseHandler(void)
@@ -217,8 +217,8 @@ bool PulseHandler::Valid(void)
 {
     if (m_initialised && m_valid)
     {
-        m_ctx_state = pa_context_get_state(m_ctx);
-        return PA_CONTEXT_READY == m_ctx_state;
+        m_ctxState = pa_context_get_state(m_ctx);
+        return PA_CONTEXT_READY == m_ctxState;
     }
     return false;
 }
@@ -267,13 +267,13 @@ bool PulseHandler::Init(void)
     pa_context_connect(m_ctx, nullptr, PA_CONTEXT_NOAUTOSPAWN, nullptr);
     int ret = 0;
     int tries = 0;
-    while ((tries++ < 100) && !IS_READY(m_ctx_state))
+    while ((tries++ < 100) && !IS_READY(m_ctxState))
     {
         pa_mainloop_iterate(m_loop, 0, &ret);
         usleep(10000);
     }
 
-    if (PA_CONTEXT_READY != m_ctx_state)
+    if (PA_CONTEXT_READY != m_ctxState)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Context not ready after 1000ms");
         return m_valid;
@@ -306,7 +306,7 @@ bool PulseHandler::SuspendInternal(bool suspend)
 
     // create and dispatch 2 operations to suspend or resume all current sinks
     // and all current sources
-    m_pending_operations = 2;
+    m_pendingOperations = 2;
     pa_operation *operation_sink =
         pa_context_suspend_sink_by_index(
             m_ctx, PA_INVALID_INDEX, static_cast<int>(suspend), OperationCallback, this);
@@ -320,16 +320,16 @@ bool PulseHandler::SuspendInternal(bool suspend)
     // run the loop manually and wait for the callbacks
     int count = 0;
     int ret = 0;
-    while (m_pending_operations && count++ < 100)
+    while (m_pendingOperations && count++ < 100)
     {
         pa_mainloop_iterate(m_loop, 0, &ret);
         usleep(10000);
     }
 
     // a failure isn't necessarily disastrous
-    if (m_pending_operations)
+    if (m_pendingOperations)
     {
-        m_pending_operations = 0;
+        m_pendingOperations = 0;
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to " + action);
         return false;
     }

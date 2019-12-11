@@ -668,7 +668,6 @@ qint64 HTTPRequest::SendData( QIODevice *pDevice, qint64 llStart, qint64 llBytes
     qint64 llBytesRemaining = llBytes;
     qint64 llBytesToRead    = 0;
     qint64 llBytesRead      = 0;
-    qint64 llBytesWritten   = 0;
 
     memset (aBuffer, 0, sizeof(aBuffer));
 
@@ -678,7 +677,7 @@ qint64 HTTPRequest::SendData( QIODevice *pDevice, qint64 llStart, qint64 llBytes
 
         if (( llBytesRead = pDevice->read( aBuffer, llBytesToRead )) != -1 )
         {
-            if (( llBytesWritten = WriteBlock( aBuffer, llBytesRead )) == -1)
+            if ( WriteBlock( aBuffer, llBytesRead ) == -1)
                 return -1;
 
             // -=>TODO: We don't handle the situation where we read more than was sent.

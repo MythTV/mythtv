@@ -527,16 +527,16 @@ void MythRAOPConnection::SendTimeRequest(void)
  */
 void MythRAOPConnection::ProcessTimeResponse(const QByteArray &buf)
 {
-    timeval t1 {}, t2 {};
+    timeval t1 {};
+    timeval t2 {};
     const char *req = buf.constData();
 
     t1.tv_sec  = qFromBigEndian(*(uint32_t *)(req + 8));
     t1.tv_usec = qFromBigEndian(*(uint32_t *)(req + 12));
 
     gettimeofday(&t2, nullptr);
-    uint64_t time1, time2;
-    time1 = t1.tv_sec * 1000 + t1.tv_usec / 1000;
-    time2 = t2.tv_sec * 1000 + t2.tv_usec / 1000;
+    uint64_t time1 = t1.tv_sec * 1000 + t1.tv_usec / 1000;
+    uint64_t time2 = t2.tv_sec * 1000 + t2.tv_usec / 1000;
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("Read back time (Local %1.%2)")
         .arg(t1.tv_sec).arg(t1.tv_usec));
     // network latency equal time difference in ms between request and response
@@ -627,7 +627,7 @@ uint32_t MythRAOPConnection::decodeAudioPacket(uint8_t type,
     tmp_pkt.size = len;
 
     uint32_t frames_added = 0;
-    auto *samples = (uint8_t *)av_mallocz(AudioOutput::MAX_SIZE_BUFFER);
+    auto *samples = (uint8_t *)av_mallocz(AudioOutput::kMaxSizeBuffer);
     while (tmp_pkt.size > 0)
     {
         int data_size;
@@ -1734,7 +1734,7 @@ int64_t MythRAOPConnection::AudioCardLatency(void)
     if (!m_audio)
         return 0;
 
-    auto *samples = (int16_t *)av_mallocz(AudioOutput::MAX_SIZE_BUFFER);
+    auto *samples = (int16_t *)av_mallocz(AudioOutput::kMaxSizeBuffer);
     int frames = AUDIOCARD_BUFFER * m_frameRate / 1000;
     m_audio->AddData((char *)samples,
                      frames * (m_sampleSize>>3) * m_channels,

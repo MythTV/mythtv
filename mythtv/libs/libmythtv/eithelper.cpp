@@ -372,8 +372,12 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
         QString description   = QString("");
         QString category      = QString("");
         ProgramInfo::CategoryType category_type = ProgramInfo::kCategoryNone;
-        unsigned char subtitle_type=0, audio_props=0, video_props=0;
-        uint season = 0, episode = 0, totalepisodes = 0;
+        unsigned char subtitle_type=0;
+        unsigned char audio_props=0;
+        unsigned char video_props=0;
+        uint season = 0;
+        uint episode = 0;
+        uint totalepisodes = 0;
         QMap<QString,QString> items;
 
         // Parse descriptors
@@ -642,8 +646,12 @@ void EITHelper::AddEIT(const PremiereContentInformationTable *cit)
     QString description   = QString("");
     QString category      = QString("");
     ProgramInfo::CategoryType category_type = ProgramInfo::kCategoryNone;
-    unsigned char subtitle_type=0, audio_props=0, video_props=0;
-    uint season = 0, episode = 0, totalepisodes = 0;
+    unsigned char subtitle_type=0;
+    unsigned char audio_props=0;
+    unsigned char video_props=0;
+    uint season = 0;
+    uint episode = 0;
+    uint totalepisodes = 0;
     QMap<QString,QString> items;
 
     // Parse descriptors

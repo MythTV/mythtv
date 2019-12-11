@@ -30,7 +30,9 @@ QString freesat_huffman_to_string(const unsigned char *compressed, uint size)
         }
         QByteArray uncompressed(size * 3, '\0');
         int p = 0;
-        unsigned value = 0, byte = 2, bit = 0;
+        unsigned value = 0;
+        unsigned byte = 2;
+        unsigned bit = 0;
         while (byte < 6 && byte < size)
         {
             value |= src[byte] << ((5-byte) * 8);
@@ -62,7 +64,8 @@ QString freesat_huffman_to_string(const unsigned char *compressed, uint size)
                 auto indx = (unsigned)lastch;
                 for (unsigned j = fsat_index[indx]; j < fsat_index[indx+1]; j++)
                 {
-                    unsigned mask = 0, maskbit = 0x80000000;
+                    unsigned mask = 0;
+                    unsigned maskbit = 0x80000000;
                     for (short kk = 0; kk < fsat_table[j].m_bits; kk++)
                     {
                         mask |= maskbit;

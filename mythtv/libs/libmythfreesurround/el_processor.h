@@ -67,7 +67,7 @@ public:
     void sample_rate(unsigned int samplerate);
 
 private:
-	class decoder_impl *impl; // private implementation (details hidden)
+	class decoder_impl *m_impl; // private implementation (details hidden)
 };
 
 

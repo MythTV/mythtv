@@ -136,44 +136,44 @@ void DatabaseSettings::Load(void)
 {
     DatabaseParams params = gContext->GetDatabaseParams();
 
-    if (params.dbHostName.isEmpty() ||
-        params.dbUserName.isEmpty() ||
-        params.dbPassword.isEmpty() ||
-        params.dbName.isEmpty())
+    if (params.m_dbHostName.isEmpty() ||
+        params.m_dbUserName.isEmpty() ||
+        params.m_dbPassword.isEmpty() ||
+        params.m_dbName.isEmpty())
         setHelpText(getHelpText() + "\n" +
                     DatabaseSettings::tr("Required fields are"
                                          " marked with an asterisk (*)."));
 
-    if (params.dbHostName.isEmpty())
+    if (params.m_dbHostName.isEmpty())
     {
         m_dbHostName->setLabel("* " + m_dbHostName->getLabel());
         m_dbHostName->setValue(m_DBhostOverride);
     }
     else
-        m_dbHostName->setValue(params.dbHostName);
+        m_dbHostName->setValue(params.m_dbHostName);
 
-    m_dbHostPing->setValue(params.dbHostPing);
+    m_dbHostPing->setValue(params.m_dbHostPing);
 
-    if (params.dbPort)
-        m_dbPort->setValue(QString::number(params.dbPort));
+    if (params.m_dbPort)
+        m_dbPort->setValue(QString::number(params.m_dbPort));
 
-    m_dbUserName->setValue(params.dbUserName);
-    if (params.dbUserName.isEmpty())
+    m_dbUserName->setValue(params.m_dbUserName);
+    if (params.m_dbUserName.isEmpty())
         m_dbUserName->setLabel("* " + m_dbUserName->getLabel());
-    m_dbPassword->setValue(params.dbPassword);
-    if (params.dbPassword.isEmpty())
+    m_dbPassword->setValue(params.m_dbPassword);
+    if (params.m_dbPassword.isEmpty())
         m_dbPassword->setLabel("* " + m_dbPassword->getLabel());
-    m_dbName->setValue(params.dbName);
-    if (params.dbName.isEmpty())
+    m_dbName->setValue(params.m_dbName);
+    if (params.m_dbName.isEmpty())
         m_dbName->setLabel("* " + m_dbName->getLabel());
 
-    m_localEnabled->setValue(params.localEnabled);
-    m_localHostName->setValue(params.localHostName);
+    m_localEnabled->setValue(params.m_localEnabled);
+    m_localHostName->setValue(params.m_localHostName);
 
-    m_wolEnabled->setValue(params.wolEnabled);
-    m_wolReconnect->setValue(params.wolReconnect);
-    m_wolRetry->setValue(params.wolRetry);
-    m_wolCommand->setValue(params.wolCommand);
+    m_wolEnabled->setValue(params.m_wolEnabled);
+    m_wolReconnect->setValue(params.m_wolReconnect);
+    m_wolRetry->setValue(params.m_wolRetry);
+    m_wolCommand->setValue(params.m_wolCommand);
     //set all the children's m_haveChanged to false
     GroupSetting::Load();
 }
@@ -181,21 +181,21 @@ void DatabaseSettings::Save(void)
 {
     DatabaseParams params = gContext->GetDatabaseParams();
 
-    params.dbHostName = m_dbHostName->getValue();
-    params.dbHostPing = m_dbHostPing->boolValue();
-    params.dbPort = m_dbPort->getValue().toInt();
-    params.dbUserName = m_dbUserName->getValue();
-    params.dbPassword = m_dbPassword->getValue();
-    params.dbName = m_dbName->getValue();
-    params.dbType = "QMYSQL";
+    params.m_dbHostName = m_dbHostName->getValue();
+    params.m_dbHostPing = m_dbHostPing->boolValue();
+    params.m_dbPort = m_dbPort->getValue().toInt();
+    params.m_dbUserName = m_dbUserName->getValue();
+    params.m_dbPassword = m_dbPassword->getValue();
+    params.m_dbName = m_dbName->getValue();
+    params.m_dbType = "QMYSQL";
 
-    params.localEnabled = m_localEnabled->boolValue();
-    params.localHostName = m_localHostName->getValue();
+    params.m_localEnabled = m_localEnabled->boolValue();
+    params.m_localHostName = m_localHostName->getValue();
 
-    params.wolEnabled = m_wolEnabled->boolValue();
-    params.wolReconnect = m_wolReconnect->intValue();
-    params.wolRetry = m_wolRetry->intValue();
-    params.wolCommand = m_wolCommand->getValue();
+    params.m_wolEnabled = m_wolEnabled->boolValue();
+    params.m_wolReconnect = m_wolReconnect->intValue();
+    params.m_wolRetry = m_wolRetry->intValue();
+    params.m_wolCommand = m_wolCommand->getValue();
 
     gContext->SaveDatabaseParams(params);
     //set all the children's m_haveChanged to false

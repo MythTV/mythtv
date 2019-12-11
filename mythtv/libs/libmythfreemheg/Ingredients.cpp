@@ -379,7 +379,8 @@ void MHSetData::Perform(MHEngine *engine)
     else
     {
         MHContentRef referenced;
-        int size = 0, cc = 0;
+        int size = 0;
+        int cc = 0;
         m_Referenced.GetValue(referenced, engine);
 
         if (m_fSizePresent)

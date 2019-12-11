@@ -8,29 +8,29 @@
 /// creating a new object.
 void DatabaseParams::LoadDefaults(void)
 {
-    dbHostName    = "localhost";
-    dbHostPing    = true;
-    dbPort        = 3306;
-    dbUserName    = "mythtv";
-    dbPassword    = "mythtv";
-    dbName        = "mythconverg";
-    dbType        = "QMYSQL";
+    m_dbHostName    = "localhost";
+    m_dbHostPing    = true;
+    m_dbPort        = 3306;
+    m_dbUserName    = "mythtv";
+    m_dbPassword    = "mythtv";
+    m_dbName        = "mythconverg";
+    m_dbType        = "QMYSQL";
 
-    localEnabled  = false;
-    localHostName = "my-unique-identifier-goes-here";
+    m_localEnabled  = false;
+    m_localHostName = "my-unique-identifier-goes-here";
 
-    wolEnabled    = false;
-    wolReconnect  = 0;
-    wolRetry      = 5;
-    wolCommand    = "echo 'WOLsqlServerCommand not set'";
+    m_wolEnabled    = false;
+    m_wolReconnect  = 0;
+    m_wolRetry      = 5;
+    m_wolCommand    = "echo 'WOLsqlServerCommand not set'";
 
-    forceSave     = false;
+    m_forceSave     = false;
 
-    verVersion.clear();
-    verBranch.clear();
-    verProtocol.clear();
-    verBinary.clear();
-    verSchema.clear();
+    m_verVersion.clear();
+    m_verBranch.clear();
+    m_verProtocol.clear();
+    m_verBinary.clear();
+    m_verSchema.clear();
 }
 
 bool DatabaseParams::IsValid(const QString &source) const
@@ -38,22 +38,22 @@ bool DatabaseParams::IsValid(const QString &source) const
     // Print some warnings if things look fishy..
     QString msg = QString(" is not set in %1").arg(source);
 
-    if (dbHostName.isEmpty())
+    if (m_dbHostName.isEmpty())
     {
         LOG(VB_GENERAL, LOG_ERR, "DBHostName" + msg);
         return false;
     }
-    if (dbUserName.isEmpty())
+    if (m_dbUserName.isEmpty())
     {
         LOG(VB_GENERAL, LOG_ERR, "DBUserName" + msg);
         return false;
     }
-    if (dbPassword.isEmpty())
+    if (m_dbPassword.isEmpty())
     {
         LOG(VB_GENERAL, LOG_ERR, "DBPassword" + msg);
         return false;
     }
-    if (dbName.isEmpty())
+    if (m_dbName.isEmpty())
     {
         LOG(VB_GENERAL, LOG_ERR, "DBName" + msg);
         return false;
@@ -65,18 +65,18 @@ bool DatabaseParams::IsValid(const QString &source) const
 bool DatabaseParams::operator==(const DatabaseParams &other) const
 {
     return
-        dbHostName   == other.dbHostName     &&
-        dbHostPing   == other.dbHostPing     &&
-        dbPort       == other.dbPort         &&
-        dbUserName   == other.dbUserName     &&
-        dbPassword   == other.dbPassword     &&
-        dbName       == other.dbName         &&
-        dbType       == other.dbType         &&
-        localEnabled == other.localEnabled   &&
-        wolEnabled   == other.wolEnabled     &&
-        (!localEnabled || (localHostName == other.localHostName)) &&
-        (!wolEnabled ||
-         (wolReconnect == other.wolReconnect &&
-          wolRetry     == other.wolRetry     &&
-          wolCommand   == other.wolCommand));
+        m_dbHostName   == other.m_dbHostName     &&
+        m_dbHostPing   == other.m_dbHostPing     &&
+        m_dbPort       == other.m_dbPort         &&
+        m_dbUserName   == other.m_dbUserName     &&
+        m_dbPassword   == other.m_dbPassword     &&
+        m_dbName       == other.m_dbName         &&
+        m_dbType       == other.m_dbType         &&
+        m_localEnabled == other.m_localEnabled   &&
+        m_wolEnabled   == other.m_wolEnabled     &&
+        (!m_localEnabled || (m_localHostName == other.m_localHostName)) &&
+        (!m_wolEnabled ||
+         (m_wolReconnect == other.m_wolReconnect &&
+          m_wolRetry     == other.m_wolRetry     &&
+          m_wolCommand   == other.m_wolCommand));
 }

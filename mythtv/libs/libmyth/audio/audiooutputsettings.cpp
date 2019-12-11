@@ -28,8 +28,8 @@ AudioOutputSettings::AudioOutputSettings(bool invalid) :
                 sizeof(srs)  / sizeof(int));
     m_sf.assign(fmts, fmts +
                 sizeof(fmts) / sizeof(AudioFormat));
-    m_sr_it = m_sr.begin();
-    m_sf_it = m_sf.begin();
+    m_srIt = m_sr.begin();
+    m_sfIt = m_sf.begin();
 }
 
 AudioOutputSettings::~AudioOutputSettings()
@@ -54,22 +54,22 @@ AudioOutputSettings& AudioOutputSettings::operator=(
     m_passthrough   = rhs.m_passthrough;
     m_features      = rhs.m_features;
     m_invalid       = rhs.m_invalid;
-    m_has_eld       = rhs.m_has_eld;
+    m_hasEld        = rhs.m_hasEld;
     m_eld           = rhs.m_eld;
-    m_sr_it         = m_sr.begin() + (rhs.m_sr_it - rhs.m_sr.begin());
-    m_sf_it         = m_sf.begin() + (rhs.m_sf_it - rhs.m_sf.begin());
+    m_srIt          = m_sr.begin() + (rhs.m_srIt - rhs.m_sr.begin());
+    m_sfIt          = m_sf.begin() + (rhs.m_sfIt - rhs.m_sf.begin());
     return *this;
 }
 
 int AudioOutputSettings::GetNextRate()
 {
-    if (m_sr_it == m_sr.end())
+    if (m_srIt == m_sr.end())
     {
-        m_sr_it = m_sr.begin();
+        m_srIt = m_sr.begin();
         return 0;
     }
 
-    return *m_sr_it++;
+    return *m_srIt++;
 }
 
 void AudioOutputSettings::AddSupportedRate(int rate)
@@ -119,13 +119,13 @@ int AudioOutputSettings::NearestSupportedRate(int rate)
 
 AudioFormat AudioOutputSettings::GetNextFormat()
 {
-    if (m_sf_it == m_sf.end())
+    if (m_sfIt == m_sf.end())
     {
-        m_sf_it = m_sf.begin();
+        m_sfIt = m_sf.begin();
         return FORMAT_NONE;
     }
 
-    return *m_sf_it++;
+    return *m_sfIt++;
 }
 
 void AudioOutputSettings::AddSupportedFormat(AudioFormat format)
@@ -553,17 +553,17 @@ QString AudioOutputSettings::GetPassthroughParams(int codec, int codec_profile,
 
 bool AudioOutputSettings::hasValidELD()
 {
-    return m_has_eld && m_eld.isValid();
+    return m_hasEld && m_eld.isValid();
 };
 
 bool AudioOutputSettings::hasELD()
 {
-    return m_has_eld;
+    return m_hasEld;
 };
 
 void AudioOutputSettings::setELD(QByteArray *ba)
 {
-    m_has_eld = true;
+    m_hasEld = true;
     m_eld = ELD(ba->constData(), ba->size());
     m_eld.show();
 }

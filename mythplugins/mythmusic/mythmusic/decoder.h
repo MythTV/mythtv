@@ -31,14 +31,14 @@ class DecoderEvent : public MythEvent
   public:
     explicit DecoderEvent(Type type) : MythEvent(type) { ; }
 
-    explicit DecoderEvent(QString *e) : MythEvent(Error), m_error_msg(e) { ; }
+    explicit DecoderEvent(QString *e) : MythEvent(Error), m_errorMsg(e) { ; }
 
     ~DecoderEvent()
     {
-        delete m_error_msg;
+        delete m_errorMsg;
     }
 
-    const QString *errorMessage() const { return m_error_msg; }
+    const QString *errorMessage() const { return m_errorMsg; }
 
     MythEvent *clone(void) const override // MythEvent
         { return new DecoderEvent(*this); }
@@ -51,15 +51,15 @@ class DecoderEvent : public MythEvent
   private:
     DecoderEvent(const DecoderEvent &o) : MythEvent(o)
     {
-        if (o.m_error_msg)
+        if (o.m_errorMsg)
         {
-            m_error_msg = new QString(*o.m_error_msg);
+            m_errorMsg = new QString(*o.m_errorMsg);
         }
     }
     DecoderEvent &operator=(const DecoderEvent&);
 
   private:
-    QString *m_error_msg {nullptr};
+    QString *m_errorMsg {nullptr};
 };
 
 class Decoder : public MThread, public MythObservable

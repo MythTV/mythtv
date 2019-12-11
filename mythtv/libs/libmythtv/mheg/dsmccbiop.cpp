@@ -68,8 +68,8 @@ int BiopName::Process(const unsigned char *data)
 
 int BiopBinding::Process(const unsigned char *data)
 {
-    int off = 0, ret;
-    ret = m_name.Process(data);
+    int off = 0;
+    int ret = m_name.Process(data);
 
     if (ret > 0)
         off += ret;
@@ -491,7 +491,7 @@ int ProfileBodyLite::Process(const unsigned char * /*data*/)
 
 int ProfileBodyFull::Process(const unsigned char *data)
 {
-    int off = 0, ret;
+    int off = 0;
 
     m_data_len = COMBINE32(data, off);
     off += 4;
@@ -510,7 +510,7 @@ int ProfileBodyFull::Process(const unsigned char *data)
         return 0;
     }
 
-    ret = m_obj_loc.Process(data + off);
+    int ret = m_obj_loc.Process(data + off);
     if (ret <= 0)
         return ret;
     off += ret;
@@ -529,7 +529,7 @@ int ProfileBodyFull::Process(const unsigned char *data)
 
 int BiopIor::Process(const unsigned char *data)
 {
-    int off = 0, ret;
+    int off = 0;
     m_type_id_len = COMBINE32(data, 0);
     m_type_id = (char*) malloc(m_type_id_len);
     off += 4;
@@ -550,7 +550,7 @@ int BiopIor::Process(const unsigned char *data)
     if (m_profile_id_tag == 0x49534F06) // profile_id_tag == 0x49534F06
     {
         m_profile_body = new ProfileBodyFull;
-        ret = m_profile_body->Process(data + off);
+        int ret = m_profile_body->Process(data + off);
         if (ret <= 0)
             return ret;
         off += ret;
@@ -558,7 +558,7 @@ int BiopIor::Process(const unsigned char *data)
     else if(m_profile_id_tag == 0x49534F05) // profile_id_tag == 0x49534F05
     {
         m_profile_body = new ProfileBodyLite;
-        ret = m_profile_body->Process(data + off);
+        int ret = m_profile_body->Process(data + off);
         if (ret <= 0)
             return ret;
         off += ret;

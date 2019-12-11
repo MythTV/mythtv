@@ -161,7 +161,8 @@ void CleanupTask::CleanupOrphanedLiveTV(void)
         return;
     }
 
-    QString msg, keepChains;
+    QString msg;
+    QString keepChains;
     while (query.next())
         if (keepChains.isEmpty())
             keepChains = "'" + query.value(0).toString() + "'";

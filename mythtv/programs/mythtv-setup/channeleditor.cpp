@@ -280,7 +280,8 @@ void ChannelEditor::fillList(void)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(querystr);
 
-    uint selidx = 0, idx = 1;
+    uint selidx = 0;
+    uint idx = 1;
     if (query.exec() && query.size() > 0)
     {
         for (; query.next() ; idx++)

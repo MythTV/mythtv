@@ -1416,7 +1416,7 @@ static bool wait_for_backend(int fd, int timeout_ms)
 {
     struct timeval select_timeout = { timeout_ms/1000, (timeout_ms % 1000) * 1000 /*usec*/};
     fd_set fd_select_set;
-    FD_ZERO(    &fd_select_set);
+    FD_ZERO(    &fd_select_set); // NOLINT(readability-isolate-declaration)
     FD_SET (fd, &fd_select_set);
 
     // Try to wait for some output like an event, unfortunately

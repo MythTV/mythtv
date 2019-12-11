@@ -130,14 +130,14 @@ class DecoderBase
                          char testbuf[kDecoderProbeBufferSize],
                          int testbufsize = kDecoderProbeBufferSize) = 0;
 
-    virtual void SetEofState(EofState eof)  { m_ateof = eof;  }
+    virtual void SetEofState(EofState eof)  { m_atEof = eof;  }
     virtual void SetEof(bool eof)  {
-        m_ateof = eof ? kEofStateDelayed : kEofStateNone;
+        m_atEof = eof ? kEofStateDelayed : kEofStateNone;
     }
-    EofState     GetEof(void)      { return m_ateof; }
+    EofState     GetEof(void)      { return m_atEof; }
 
-    void SetSeekSnap(uint64_t snap)  { m_seeksnap = snap; }
-    uint64_t GetSeekSnap(void) const { return m_seeksnap;  }
+    void SetSeekSnap(uint64_t snap)  { m_seekSnap = snap; }
+    uint64_t GetSeekSnap(void) const { return m_seekSnap;  }
     void SetLiveTVMode(bool live)  { m_livetv = live;      }
 
     // Must be done while player is paused.
@@ -181,7 +181,7 @@ class DecoderBase
                                         float fallback_framerate,
                                         const frm_dir_map_t &cutlist);
 
-    float GetVideoAspect(void) const { return m_current_aspect; }
+    float GetVideoAspect(void) const { return m_currentAspect; }
 
     virtual int64_t NormalizeVideoTimecode(int64_t timecode) { return timecode; }
 
@@ -189,10 +189,10 @@ class DecoderBase
     virtual void WriteStoredData(RingBuffer *rb, bool storevid,
                                  long timecodeOffset) = 0;
     virtual void ClearStoredData(void) { return; }
-    virtual void SetRawAudioState(bool state) { m_getrawframes = state; }
-    virtual bool GetRawAudioState(void) const { return m_getrawframes; }
-    virtual void SetRawVideoState(bool state) { m_getrawvideo = state; }
-    virtual bool GetRawVideoState(void) const { return m_getrawvideo; }
+    virtual void SetRawAudioState(bool state) { m_getRawFrames = state; }
+    virtual bool GetRawAudioState(void) const { return m_getRawFrames; }
+    virtual void SetRawVideoState(bool state) { m_getRawVideo = state; }
+    virtual bool GetRawVideoState(void) const { return m_getRawVideo; }
 
     virtual long UpdateStoredFrameNum(long frame) = 0;
 
@@ -264,7 +264,7 @@ class DecoderBase
     void SaveTotalFrames(void);
     void TrackTotalDuration(bool track) { m_trackTotalDuration = track; }
     int GetfpsMultiplier(void) { return m_fpsMultiplier; }
-    MythCodecContext *GetMythCodecContext(void) { return m_mythcodecctx; }
+    MythCodecContext *GetMythCodecContext(void) { return m_mythCodecCtx; }
     VideoDisplayProfile * GetVideoDisplayProfile(void) { return &m_videoDisplayProfile; }
     AVPixelFormat GetBestVideoFormat(AVPixelFormat* Formats);
 
@@ -291,13 +291,13 @@ class DecoderBase
     long long GetKey(const PosMapEntry &entry) const;
 
     MythPlayer          *m_parent                  {nullptr};
-    ProgramInfo         *m_playbackinfo            {nullptr};
+    ProgramInfo         *m_playbackInfo            {nullptr};
     AudioPlayer         *m_audio                   {nullptr};
-    RingBuffer          *ringBuffer                {nullptr};
+    RingBuffer          *m_ringBuffer              {nullptr};
 
-    int                  m_current_width           {640};
-    int                  m_current_height          {480};
-    float                m_current_aspect          {1.33333f};
+    int                  m_currentWidth            {640};
+    int                  m_currentHeight           {480};
+    float                m_currentAspect           {1.33333f};
     double               m_fps                     {29.97};
     int                  m_fpsMultiplier           {1};
     int                  m_fpsSkip                 {0};
@@ -308,7 +308,7 @@ class DecoderBase
     unsigned long long   m_frameCounter            {0};
     AVRational           m_totalDuration;
     long long            m_lastKey                 {0};
-    int                  m_keyframedist            {-1};
+    int                  m_keyframeDist            {-1};
     long long            m_indexOffset             {0};
     MythAVCopy           m_copyFrame;
 
@@ -317,8 +317,8 @@ class DecoderBase
     // indicates whether this is the case.
     bool                 m_trackTotalDuration      {false};
 
-    EofState             m_ateof                   {kEofStateNone};
-    bool                 m_exitafterdecoded        {false};
+    EofState             m_atEof                   {kEofStateNone};
+    bool                 m_exitAfterDecoded        {false};
     bool                 m_transcoding             {false};
 
     bool                 m_hasFullPositionMap      {false};
@@ -333,14 +333,14 @@ class DecoderBase
     bool                 m_dontSyncPositionMap     {false};
     mutable QDateTime    m_lastPositionMapUpdate; // guarded by m_positionMapLock
 
-    uint64_t             m_seeksnap                {UINT64_MAX};
+    uint64_t             m_seekSnap                {UINT64_MAX};
     bool                 m_livetv                  {false};
-    bool                 m_watchingrecording       {false};
+    bool                 m_watchingRecording       {false};
 
     bool                 m_hasKeyFrameAdjustTable  {false};
 
-    bool                 m_getrawframes            {false};
-    bool                 m_getrawvideo             {false};
+    bool                 m_getRawFrames            {false};
+    bool                 m_getRawVideo             {false};
 
     bool                 m_errored                 {false};
 
@@ -357,7 +357,7 @@ class DecoderBase
     StreamInfo           m_selectedTrack[(uint)kTrackTypeCount];
     /// language preferences for auto-selection of streams
     vector<int>  m_languagePreference;
-    MythCodecContext    *m_mythcodecctx            {nullptr};
+    MythCodecContext    *m_mythCodecCtx            {nullptr};
     VideoDisplayProfile  m_videoDisplayProfile;
 };
 

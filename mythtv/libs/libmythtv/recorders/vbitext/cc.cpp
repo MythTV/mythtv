@@ -37,7 +37,8 @@
 static int parityok(int n)      /* check parity for 2 bytes packed in n */
 {
     int mask = 0;
-    int j, k;
+    int j;
+    int k;
     for (k = 1, j = 0; j < 7; j++)
     {
         if (n & (1 << j))
@@ -58,8 +59,8 @@ static int parityok(int n)      /* check parity for 2 bytes packed in n */
 
 static bool decodebit(const unsigned char *data, int threshold, int scale1)
 {
-    int i, sum = 0;
-    for (i = 0; i < scale1; i++)
+    int sum = 0;
+    for (int i = 0; i < scale1; i++)
         sum += data[i];
     return (sum > threshold * scale1);
 }
@@ -67,12 +68,17 @@ static bool decodebit(const unsigned char *data, int threshold, int scale1)
 
 static int decode(unsigned char *vbiline, int scale0, int scale1)
 {
-    int max[7], min[7], val[7], i, clk, tmp, sample, packedbits = 0;
+    int max[7];
+    int min[7];
+    int val[7];
+    int sample;
+    int packedbits = 0;
 
-    for (clk = 0; clk < 7; clk++)
+    for (int clk = 0; clk < 7; clk++)
         max[clk] = min[clk] = val[clk] = -1;
-    clk = tmp = 0;
-    i = 30;
+    int clk = 0;
+    int tmp = 0;
+    int i = 30;
 
     while (i < 600 && clk < 7)
     {   /* find and lock all 7 clocks */

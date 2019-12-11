@@ -74,7 +74,8 @@ bool FlatView::Update(int id)
         return false;
 
     // Get updated image
-    ImageList files, dirs;
+    ImageList files;
+    ImageList dirs;
     ImageIdList ids = ImageIdList() << id;
     if (m_mgr.GetImages(ids, files, dirs) != 1 || files.size() != 1)
         return false;
@@ -358,7 +359,8 @@ bool FlatView::LoadFromDb(int parentId)
     m_parentId = parentId;
 
     // Load child images of the parent
-    ImageList files, dirs;
+    ImageList files;
+    ImageList dirs;
     m_mgr.GetChildren(m_parentId, files, dirs);
 
     // Load gallery datastore with current dir
@@ -486,7 +488,8 @@ subtree.
 bool DirectoryView::LoadFromDb(int parentId)
 {
     // Determine parent (defaulting to ancestor) & get initial children
-    ImageList files, dirs;
+    ImageList files;
+    ImageList dirs;
     ImagePtr parent;
     int count = 0;
     // Root is guaranteed to return at least 1 item
@@ -561,7 +564,8 @@ void DirectoryView::LoadDirThumbs(ImageItem &parent, int thumbsNeeded, int level
         return;
 
     // Load child images & dirs
-    ImageList files, dirs;
+    ImageList files;
+    ImageList dirs;
     m_mgr.GetChildren(parent.m_id, files, dirs);
 
     PopulateThumbs(parent, thumbsNeeded, files, dirs, level);
@@ -601,7 +605,8 @@ void DirectoryView::PopulateThumbs(ImageItem &parent, int thumbsNeeded,
     }
 
     // Children to use as thumbnails
-    ImageList thumbFiles, thumbDirs;
+    ImageList thumbFiles;
+    ImageList thumbDirs;
 
     if (!userIm)
     {

@@ -294,7 +294,8 @@ static void handle_transport_desc(vector<uint> &muxes,
         {
             QString dummy_mod;
             QString dummy_sistd;
-            uint dummy_tsid, dummy_netid;
+            uint dummy_tsid;
+            uint dummy_netid;
             ChannelUtil::GetTuningParams(mux, dummy_mod, freq,
                                          dummy_tsid, dummy_netid, dummy_sistd);
         }
@@ -615,7 +616,8 @@ int ChannelUtil::GetBetterMplexID(int current_mplexid,
         QString("GetBetterMplexID(mplexId %1, tId %2, netId %3)")
             .arg(current_mplexid).arg(transport_id).arg(network_id));
 
-    int q_networkid = 0, q_transportid = 0;
+    int q_networkid = 0;
+    int q_transportid = 0;
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT networkid, transportid "
@@ -871,7 +873,8 @@ bool ChannelUtil::GetCachedPids(uint chanid,
 
     while (query.next())
     {
-        int pid = query.value(0).toInt(), tid = query.value(1).toInt();
+        int pid = query.value(0).toInt();
+        int tid = query.value(1).toInt();
         if ((pid >= 0) && (tid >= 0))
             pid_cache.push_back(pid_cache_item_t(pid, tid));
     }
@@ -1991,7 +1994,9 @@ IPTVTuningData ChannelUtil::GetIPTVTuningData(uint chanid)
         return IPTVTuningData();
     }
 
-    QString data_url, fec_url0, fec_url1;
+    QString data_url;
+    QString fec_url0;
+    QString fec_url1;
     IPTVTuningData::FECType fec_type = IPTVTuningData::kNone;
     uint bitrate[3] = { 0, 0, 0, };
     while (query.next())
@@ -2167,7 +2172,8 @@ inline bool lt_smart(const ChannelInfo &a, const ChannelInfo &b)
     static QMutex s_sepExprLock;
     static const QRegExp kSepExpr(ChannelUtil::kATSCSeparators);
 
-    bool isIntA, isIntB;
+    bool isIntA;
+    bool isIntB;
     int a_int   = a.m_channum.toUInt(&isIntA);
     int b_int   = b.m_channum.toUInt(&isIntB);
     int a_major = a.m_atsc_major_chan;
@@ -2176,8 +2182,10 @@ inline bool lt_smart(const ChannelInfo &a, const ChannelInfo &b)
     int b_minor = b.m_atsc_minor_chan;
 
     // Extract minor and major numbers from channum..
-    bool tmp1, tmp2;
-    int idxA, idxB;
+    bool tmp1;
+    bool tmp2;
+    int idxA;
+    int idxB;
     {
         QMutexLocker locker(&s_sepExprLock);
         idxA = a.m_channum.indexOf(kSepExpr);

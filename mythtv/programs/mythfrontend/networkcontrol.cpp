@@ -435,7 +435,7 @@ void NetworkControl::receiveCommand(QString &command)
 {
     LOG(VB_NETWORK, LOG_INFO, LOC +
         QString("NetworkControl::receiveCommand(%1)").arg(command));
-    auto *ncc = static_cast<NetworkControlClient *>(sender());
+    auto *ncc = dynamic_cast<NetworkControlClient *>(sender());
     if (!ncc)
          return;
 
@@ -987,7 +987,10 @@ QString NetworkControl::processQuery(NetworkCommand *nc)
     else if (is_abbrev("memstats", nc->getArg(1)))
     {
         QString str;
-        int     totalMB = 0, freeMB = 0, totalVM = 0, freeVM = 0;
+        int     totalMB = 0;
+        int     freeMB = 0;
+        int     totalVM = 0;
+        int     freeVM = 0;
 
         if (getMemStats(totalMB, freeMB, totalVM, freeVM))
             str = QString("%1 %2 %3 %4")
@@ -1179,7 +1182,9 @@ QString NetworkControl::processTheme( NetworkCommand* nc)
         if (!topScreen)
             return QString("ERROR: no top screen found!");
 
-        auto *currType = static_cast<MythUIType*>(topScreen);
+        auto *currType = dynamic_cast<MythUIType*>(topScreen);
+        if (currType == nullptr)
+            return QString("ERROR: cannot cast top screen!");
 
         while (!path.isEmpty())
         {
@@ -1222,7 +1227,9 @@ QString NetworkControl::processTheme( NetworkCommand* nc)
         if (!topScreen)
             return QString("ERROR: no top screen found!");
 
-        auto *currType = static_cast<MythUIType*>(topScreen);
+        auto *currType = dynamic_cast<MythUIType*>(topScreen);
+        if (currType == nullptr)
+            return QString("ERROR: cannot cast top screen!");
 
         while (path.count() > 1)
         {
@@ -1267,10 +1274,9 @@ QString NetworkControl::processTheme( NetworkCommand* nc)
             topScreen = stack->GetTopScreen();
         }
 
+        auto *currType = dynamic_cast<MythUIType*>(topScreen);
         if (!topScreen)
             return QString("ERROR: no top screen found!");
-
-                auto *currType = static_cast<MythUIType*>(topScreen);
 
         while (path.count() > 1)
         {
@@ -1296,7 +1302,8 @@ QString NetworkControl::processTheme( NetworkCommand* nc)
 
 QString NetworkControl::processHelp(NetworkCommand *nc)
 {
-    QString command, helpText;
+    QString command;
+    QString helpText;
 
     if (nc->getArgCount() >= 1)
     {
@@ -1540,7 +1547,10 @@ void NetworkControl::customEvent(QEvent *e)
 {
     if (e->type() == MythEvent::MythEventMessage)
     {
-        auto *me = static_cast<MythEvent *>(e);
+        auto *me = dynamic_cast<MythEvent *>(e);
+        if (me == nullptr)
+            return;
+
         const QString& message = me->Message();
 
         if (message.startsWith("MUSIC_CONTROL"))
@@ -1613,9 +1623,11 @@ void NetworkControl::customEvent(QEvent *e)
     }
     else if (e->type() == NetworkControlCloseEvent::kEventType)
     {
-        auto *ncce = static_cast<NetworkControlCloseEvent*>(e);
-        NetworkControlClient     *ncc  = ncce->getClient();
-
+        auto *ncce = dynamic_cast<NetworkControlCloseEvent*>(e);
+        if (ncce == nullptr)
+            return;
+        
+        NetworkControlClient *ncc  = ncce->getClient();
         deleteClient(ncc);
     }
 }
@@ -1697,7 +1709,9 @@ QString NetworkControl::listRecordings(const QString& chanid, const QString& sta
     query.prepare(queryStr);
     if (query.exec())
     {
-        QString episode, title, subtitle;
+        QString episode;
+        QString title;
+        QString subtitle;
         while (query.next())
         {
             title = query.value(2).toString();

@@ -12,13 +12,8 @@
 #define LOC QString("DisplayX11: ")
 
 MythDisplayX11::MythDisplayX11()
-  : MythDisplay()
 {
     InitialiseModes();
-}
-
-MythDisplayX11::~MythDisplayX11()
-{
 }
 
 bool MythDisplayX11::IsAvailable(void)

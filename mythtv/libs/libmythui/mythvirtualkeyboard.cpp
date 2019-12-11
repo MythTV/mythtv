@@ -102,8 +102,10 @@ bool MythUIVirtualKeyboard::Create()
     loadKeyDefinitions(gCoreContext->GetLanguageAndVariant());
     updateKeys(true);
 
-    int screenWidth = 0, screenHeight = 0;
-    float xmult = 0, ymult = 0;
+    int screenWidth = 0;
+    int screenHeight = 0;
+    float xmult = 0;
+    float ymult = 0;
     GetMythUI()->GetScreenSettings(screenWidth, xmult, screenHeight, ymult);
     MythRect editArea = m_parentEdit->GetArea();
     MythRect area = GetArea();
@@ -230,8 +232,14 @@ void MythUIVirtualKeyboard::loadKeyDefinitions(const QString &lang)
 
 void MythUIVirtualKeyboard::parseKey(const QDomElement &element)
 {
-    QString left, right, up, down;
-    QString normal, shift, alt, altshift;
+    QString left;
+    QString right;
+    QString up;
+    QString down;
+    QString normal;
+    QString shift;
+    QString alt;
+    QString altshift;
 
     QString name = element.attribute("name");
     QString type = element.attribute("type");

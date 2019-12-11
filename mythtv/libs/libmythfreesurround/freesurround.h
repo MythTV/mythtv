@@ -69,21 +69,21 @@ private:
         int32_t front_sep, rear_sep;    // front/rear stereo separation
         // (default) constructor
         fsurround_params(int32_t center_width=100, int32_t dimension=0);
-    } params;
+    } m_params;
 
     // additional settings
-    uint srate;
+    uint m_srate;
 
     // info about the current setup
-    struct buffers *bufs;               // our buffers
-    class fsurround_decoder *decoder;   // the surround decoder
-    int in_count;                       // amount in lt,rt
-    int out_count;                      // amount in output bufs
-    bool processed;             // whether processing is enabled for latency calc
-    int processed_size;                 // amount processed
-    SurroundMode surround_mode;         // 1 of 3 surround modes supported
-    int latency_frames;                 // number of frames of incurred latency
-    int channels;
+    struct buffers          *m_bufs    {nullptr}; // our buffers
+    class fsurround_decoder *m_decoder {nullptr}; // the surround decoder
+    int  m_inCount                     {0};       // amount in lt,rt
+    int  m_outCount                    {0};       // amount in output bufs
+    bool m_processed                   {true};    // whether processing is enabled for latency calc
+    int  m_processedSize               {0};       // amount processed
+    SurroundMode m_surroundMode {SurroundModePassive}; // 1 of 3 surround modes supported
+    int m_latencyFrames                {0};       // number of frames of incurred latency
+    int m_channels                     {0};
 };
 
 #endif

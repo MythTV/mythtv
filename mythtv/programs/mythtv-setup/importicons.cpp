@@ -800,7 +800,11 @@ bool ImportIconsWizard::submit()
     LOG(VB_CHANNEL, LOG_INFO, QString("Icon Import: Working submit : %1")
         .arg(str));
     QStringList strSplit = str.split("\n", QString::SkipEmptyParts);
-    unsigned atsc = 0, dvb = 0, callsign = 0, tv = 0, xmltvid = 0;
+    unsigned atsc = 0;
+    unsigned dvb = 0;
+    unsigned callsign = 0;
+    unsigned tv = 0;
+    unsigned xmltvid = 0;
     for (QStringList::const_iterator it = strSplit.begin();
          it != strSplit.end(); ++it)
     {

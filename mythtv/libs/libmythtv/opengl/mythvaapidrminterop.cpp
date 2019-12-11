@@ -53,8 +53,8 @@ MythVAAPIInteropDRM::~MythVAAPIInteropDRM()
     CleanupDRMPRIME();
 
     CleanupReferenceFrames();
-    DestroyDeinterlacer();
-    DeleteTextures();
+    MythVAAPIInteropDRM::DestroyDeinterlacer();
+    MythVAAPIInteropDRM::DeleteTextures();
 
     if (m_drmFile.isOpen())
         m_drmFile.close();

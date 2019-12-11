@@ -239,6 +239,7 @@ class ParentalLevelChangeCheckerPrivate : public QObject
     }
 
   signals:
+    // NOLINTNEXTLINE(readability-inconsistent-declaration-parameter-name)
     void SigDone(bool passwordValid, ParentalLevel::Level toLevel);
 
   private:

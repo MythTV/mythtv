@@ -230,7 +230,8 @@ uint ChannelImporter::DeleteChannels(
     {
         for (size_t k = 0; k < off_air_list.size(); ++k)
         {
-            int i = off_air_list[k] >> 16, j = off_air_list[k] & 0xFFFF;
+            int i = off_air_list[k] >> 16;
+            int j = off_air_list[k] & 0xFFFF;
             ChannelUtil::DeleteChannel(
                 transports[i].m_channels[j].m_channel_id);
             deleted[off_air_list[k]] = true;
@@ -240,7 +241,8 @@ uint ChannelImporter::DeleteChannels(
     {
         for (size_t k = 0; k < off_air_list.size(); ++k)
         {
-            int i = off_air_list[k] >> 16, j = off_air_list[k] & 0xFFFF;
+            int i = off_air_list[k] >> 16;
+            int j = off_air_list[k] & 0xFFFF;
             int chanid = transports[i].m_channels[j].m_channel_id;
             QString channum = ChannelUtil::GetChanNum(chanid);
             ChannelUtil::SetVisible(chanid, false);

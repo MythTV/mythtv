@@ -244,7 +244,10 @@ void BrowserApi::customEvent(QEvent *e)
 {
     if (e->type() == MythEvent::MythEventMessage)
     {
-        auto *me = static_cast<MythEvent *>(e);
+        auto *me = dynamic_cast<MythEvent *>(e);
+        if (me == nullptr)
+            return;
+
         const QString& message = me->Message();
 
         if (!message.startsWith("MUSIC_CONTROL"))
@@ -291,9 +294,16 @@ bool MythWebPage::extension(Extension extension, const ExtensionOption *option,
         if (!option || !output)
             return false;
 
-        const auto *erroroption
-                        = static_cast<const ErrorPageExtensionOption *>(option);
+        // Using static_cast yields the clang-tidy warning: do not use
+        // static_cast to downcast from a base to a derived class; use
+        // dynamic_cast instead.  Using dynamic-cast yields the
+        // compiler error: 'QWebPage::ExtensionOption' is not
+        // polymorphic.
+        //
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-static-cast-downcast)
+        const auto *erroroption = static_cast<const ErrorPageExtensionOption *>(option);
         ErrorPageExtensionReturn *erroroutput = nullptr;
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-static-cast-downcast)
         erroroutput = static_cast<ErrorPageExtensionReturn *>(output);
 
         QString filename = "htmls/notfound.html";
@@ -640,9 +650,11 @@ void MythWebView::customEvent(QEvent *event)
     }
     else if (event->type() == MythEvent::MythEventMessage)
     {
-        auto *me = static_cast<MythEvent *>(event);
-        QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);
+        auto *me = dynamic_cast<MythEvent *>(event);
+        if (me == nullptr)
+            return;
 
+        QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);
         if (tokens.isEmpty())
             return;
 

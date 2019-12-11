@@ -144,13 +144,12 @@ static subtitle_t *sub_read_line_sami(demux_sputext_t *demuxstr, subtitle_t *cur
 
   static char s_line[LINE_LEN + 1];
   static char *s_s = nullptr;
-  char text[LINE_LEN + 1], *p, *q;
-  int state;
+  char text[LINE_LEN + 1];
 
-  p = nullptr;
+  char *p = nullptr;
   current->lines = current->start = 0;
   current->end = -1;
-  state = 0;
+  int state = 0;
 
   /* read the first line */
   if (!s_s)
@@ -190,7 +189,7 @@ static subtitle_t *sub_read_line_sami(demux_sputext_t *demuxstr, subtitle_t *cur
       continue;
 
     case 4: /* get current->end or skip <TAG> */
-      q = strstr (s_s, "Start=");
+      char *q = strstr (s_s, "Start=");
       if (q) {
         current->end = strtol (q + 6, &q, 0) / 10 - 1;
         *p = '\0'; trail_space (text);
@@ -214,6 +213,19 @@ static subtitle_t *sub_read_line_sami(demux_sputext_t *demuxstr, subtitle_t *cur
 }
 
 
+
+/**
+ * \brief Extract the next token from a string.
+ *
+ * \param source The character string to scan.
+ * \param dest A newly allocated string containing the text from the
+ *             source string up to the next newline, carriage return,
+ *             or vertical bar.
+ *
+ * \returns one of 1) a pointer to a newly allocated string, 2)
+ * nullptr ig the end of te string was reached, or "(char*)-1" on
+ * error.
+ */
 static char *sub_readtext(char *source, char **dest) {
   int len=0;
   char *p=source;
@@ -243,8 +255,6 @@ static subtitle_t *sub_read_line_microdvd(demux_sputext_t *demuxstr, subtitle_t 
 
   char line[LINE_LEN + 1];
   char line2[LINE_LEN + 1];
-  char *p, *next;
-  int i;
 
   memset (current, 0, sizeof(subtitle_t));
 
@@ -255,11 +265,11 @@ static subtitle_t *sub_read_line_microdvd(demux_sputext_t *demuxstr, subtitle_t 
            (sscanf (line, "{%ld}{%ld}%" LINE_LEN_QUOT "[^\r\n]", &(current->start), &(current->end),line2) !=3)
           );
 
-  p=line2;
-
-  next=p, i=0;
+  char *p=line2;
+  char *next=p;
+  int i=0;
   while ((next =sub_readtext (next, &(current->text[i])))) {
-    if (current->text[i]==ERR) return (subtitle_t *)ERR;
+    if (next==ERR) return (subtitle_t *)ERR;
     i++;
     if (i>=SUB_MAX_TEXT) {
       printf ("Too many lines in a subtitle\n");
@@ -275,9 +285,7 @@ static subtitle_t *sub_read_line_microdvd(demux_sputext_t *demuxstr, subtitle_t 
 static subtitle_t *sub_read_line_subviewer(demux_sputext_t *demuxstr, subtitle_t *current) {
 
   char line[LINE_LEN + 1];
-  int a1,a2,a3,a4,b1,b2,b3,b4;
-  char *p=nullptr, *q=nullptr;
-  int len;
+  int a1,a2,a3,a4,b1,b2,b3,b4; // NOLINT(readability-isolate-declaration)
 
   memset (current, 0, sizeof(subtitle_t));
 
@@ -293,8 +301,10 @@ static subtitle_t *sub_read_line_subviewer(demux_sputext_t *demuxstr, subtitle_t
     if (!read_line_from_input(demuxstr, line, LINE_LEN))
       return nullptr;
 
-    p=q=line;
+    char *p=line;
     for (current->lines=1; current->lines <= SUB_MAX_TEXT; current->lines++) {
+      char *q=nullptr;
+      int len;
       for (q=p,len=0; *p && *p!='\r' && *p!='\n' && *p!='|' &&
                (strncasecmp(p,"[br]",4) != 0); p++,len++);
       current->text[current->lines-1]=(char *)malloc (len+1);
@@ -313,8 +323,8 @@ static subtitle_t *sub_read_line_subviewer(demux_sputext_t *demuxstr, subtitle_t
 
 static subtitle_t *sub_read_line_subrip(demux_sputext_t *demuxstr,subtitle_t *current) {
   char line[LINE_LEN + 1];
-  int a1,a2,a3,a4,b1,b2,b3,b4;
-  int i,end_sub;
+  int a1,a2,a3,a4,b1,b2,b3,b4; // NOLINT(readability-isolate-declaration)
+  int i;
 
   memset(current,0,sizeof(subtitle_t));
   do {
@@ -325,7 +335,7 @@ static subtitle_t *sub_read_line_subrip(demux_sputext_t *demuxstr,subtitle_t *cu
   current->start = a1*360000+a2*6000+a3*100+a4/10;
   current->end   = b1*360000+b2*6000+b3*100+b4/10;
   i=0;
-  end_sub=0;
+  int end_sub=0;
   do {
     char *p; /* pointer to the curently read char */
     char temp_line[SUB_BUFSIZE]; /* subtitle line that will be transfered to current->text[i] */
@@ -404,9 +414,7 @@ static subtitle_t *sub_read_line_subrip(demux_sputext_t *demuxstr,subtitle_t *cu
 
 static subtitle_t *sub_read_line_vplayer(demux_sputext_t *demuxstr,subtitle_t *current) {
   char line[LINE_LEN + 1];
-  int a1,a2,a3,b1,b2,b3;
-  char *p=nullptr, *next, *p2;
-  int i;
+  int a1,a2,a3,b1,b2,b3; // NOLINT(readability-isolate-declaration)
 
   memset (current, 0, sizeof(subtitle_t));
 
@@ -432,18 +440,18 @@ static subtitle_t *sub_read_line_vplayer(demux_sputext_t *demuxstr,subtitle_t *c
     if ((current->end - current->start) > LINE_LEN)
       current->end = current->start + LINE_LEN; /* not too long though.  */
     /* teraz czas na wkopiowanie stringu */
-    p=line;
+    char *p=line;
     /* finds the body of the subtitle_t */
-    for (i=0; i<3; i++){
-      p2=strchr( p, ':');
+    for (int i=0; i<3; i++){
+      char *p2=strchr( p, ':');
       if( p2 == nullptr ) break;
       p=p2+1;
     }
 
-    next=p;
-    i=0;
+    char *next=p;
+    int i=0;
     while( (next = sub_readtext( next, &(current->text[i]))) ) {
-      if (current->text[i]==ERR)
+      if (next==ERR)
         return (subtitle_t *)ERR;
       i++;
       if (i>=SUB_MAX_TEXT) {
@@ -464,37 +472,35 @@ static subtitle_t *sub_read_line_rt(demux_sputext_t *demuxstr,subtitle_t *curren
    * WARNING: full XML parses can be required for proper parsing
    */
   char line[LINE_LEN + 1];
-  int a1,a2,a3,a4,b1,b2,b3,b4;
-  char *p=nullptr,*next=nullptr;
-  int i,plen;
+  int a1,a2,a3,a4,b1,b2,b3,b4; // NOLINT(readability-isolate-declaration)
+  int plen;
 
   memset (current, 0, sizeof(subtitle_t));
 
   while (!current->text[0]) {
-    int len;
     if (!read_line_from_input(demuxstr, line, LINE_LEN)) return nullptr;
     /*
      * TODO: it seems that format of time is not easily determined, it may be 1:12, 1:12.0 or 0:1:12.0
      * to describe the same moment in time. Maybe there are even more formats in use.
      */
-    if ((len=sscanf (line, "<Time Begin=\"%d:%d:%d.%d\" End=\"%d:%d:%d.%d\"",&a1,&a2,&a3,&a4,&b1,&b2,&b3,&b4)) < 8)
+    if (sscanf (line, "<Time Begin=\"%d:%d:%d.%d\" End=\"%d:%d:%d.%d\"",&a1,&a2,&a3,&a4,&b1,&b2,&b3,&b4) < 8)
 
       plen=a1=a2=a3=a4=b1=b2=b3=b4=0;
     if (
-        ((len=sscanf (line, "<%*[tT]ime %*[bB]egin=\"%d:%d\" %*[Ee]nd=\"%d:%d\"%*[^<]<clear/>%n",&a2,&a3,&b2,&b3,&plen)) < 4) &&
-        ((len=sscanf (line, "<%*[tT]ime %*[bB]egin=\"%d:%d\" %*[Ee]nd=\"%d:%d.%d\"%*[^<]<clear/>%n",&a2,&a3,&b2,&b3,&b4,&plen)) < 5) &&
-        /*      ((len=sscanf (line, "<%*[tT]ime %*[bB]egin=\"%d:%d.%d\" %*[Ee]nd=\"%d:%d\"%*[^<]<clear/>%n",&a2,&a3,&a4,&b2,&b3,&plen)) < 5) && */
-        ((len=sscanf (line, "<%*[tT]ime %*[bB]egin=\"%d:%d.%d\" %*[Ee]nd=\"%d:%d.%d\"%*[^<]<clear/>%n",&a2,&a3,&a4,&b2,&b3,&b4,&plen)) < 6) &&
-        ((len=sscanf (line, "<%*[tT]ime %*[bB]egin=\"%d:%d:%d.%d\" %*[Ee]nd=\"%d:%d:%d.%d\"%*[^<]<clear/>%n",&a1,&a2,&a3,&a4,&b1,&b2,&b3,&b4,&plen)) < 8)
+        (sscanf (line, "<%*[tT]ime %*[bB]egin=\"%d:%d\" %*[Ee]nd=\"%d:%d\"%*[^<]<clear/>%n",&a2,&a3,&b2,&b3,&plen) < 4) &&
+        (sscanf (line, "<%*[tT]ime %*[bB]egin=\"%d:%d\" %*[Ee]nd=\"%d:%d.%d\"%*[^<]<clear/>%n",&a2,&a3,&b2,&b3,&b4,&plen) < 5) &&
+        /*      (sscanf (line, "<%*[tT]ime %*[bB]egin=\"%d:%d.%d\" %*[Ee]nd=\"%d:%d\"%*[^<]<clear/>%n",&a2,&a3,&a4,&b2,&b3,&plen) < 5) && */
+        (sscanf (line, "<%*[tT]ime %*[bB]egin=\"%d:%d.%d\" %*[Ee]nd=\"%d:%d.%d\"%*[^<]<clear/>%n",&a2,&a3,&a4,&b2,&b3,&b4,&plen) < 6) &&
+        (sscanf (line, "<%*[tT]ime %*[bB]egin=\"%d:%d:%d.%d\" %*[Ee]nd=\"%d:%d:%d.%d\"%*[^<]<clear/>%n",&a1,&a2,&a3,&a4,&b1,&b2,&b3,&b4,&plen) < 8)
         )
       continue;
     current->start = a1*360000+a2*6000+a3*100+a4/10;
     current->end   = b1*360000+b2*6000+b3*100+b4/10;
-    p=line;     p+=plen;i=0;
     /* TODO: I don't know what kind of convention is here for marking multiline subs, maybe <br/> like in xml? */
-    next = strstr(line,"<clear/>")+8;i=0;
+    char *next = strstr(line,"<clear/>")+8;
+    int i=0;
     while ((next =sub_readtext (next, &(current->text[i])))) {
-      if (current->text[i]==ERR)
+      if (next==ERR)
           return (subtitle_t *)ERR;
       i++;
       if (i>=SUB_MAX_TEXT) {
@@ -513,9 +519,17 @@ static subtitle_t *sub_read_line_ssa(demux_sputext_t *demuxstr,subtitle_t *curre
   static int s_maxComma = 32; /* let's use 32 for the case that the */
   /*  amount of commas increase with newer SSA versions */
 
-  int hour1, min1, sec1, hunsec1, hour2, min2, sec2, hunsec2, nothing;
-  int num;
-  char line[LINE_LEN + 1], line3[LINE_LEN + 1], *line2;
+  int hour1;
+  int min1;
+  int sec1;
+  int hunsec1;
+  int hour2;
+  int min2;
+  int sec2;
+  int hunsec2;
+  int nothing;
+  char line[LINE_LEN + 1];
+  char line3[LINE_LEN + 1];
   char *tmp;
 
   do {
@@ -532,7 +546,7 @@ static subtitle_t *sub_read_line_ssa(demux_sputext_t *demuxstr,subtitle_t *curre
                    &hour2, &min2, &sec2, &hunsec2,
                    line3) < 9       );
 
-  line2=strchr(line3, ',');
+  char *line2=strchr(line3, ',');
   if (!line2)
     return nullptr;
 
@@ -549,7 +563,8 @@ static subtitle_t *sub_read_line_ssa(demux_sputext_t *demuxstr,subtitle_t *curre
   /* eliminate the trailing comma */
   if(*line2 == ',') line2++;
 
-  current->lines=0;num=0;
+  current->lines=0;
+  int num=0;
   current->start = 360000*hour1 + 6000*min1 + 100*sec1 + hunsec1;
   current->end   = 360000*hour2 + 6000*min2 + 100*sec2 + hunsec2;
 
@@ -583,7 +598,8 @@ static subtitle_t *sub_read_line_ssa(demux_sputext_t *demuxstr,subtitle_t *curre
 static subtitle_t *sub_read_line_pjs (demux_sputext_t *demuxstr, subtitle_t *current) {
   char line[LINE_LEN + 1];
   char text[LINE_LEN + 1];
-  char *s, *d;
+  char *s;
+  char *d;
 
   memset (current, 0, sizeof(subtitle_t));
 
@@ -620,9 +636,9 @@ static subtitle_t *sub_read_line_pjs (demux_sputext_t *demuxstr, subtitle_t *cur
 
 static subtitle_t *sub_read_line_mpsub (demux_sputext_t *demuxstr, subtitle_t *current) {
   char line[LINE_LEN + 1];
-  float a,b;
+  float a;
+  float b;
   int num=0;
-  char *p, *q;
 
   do {
     if (!read_line_from_input(demuxstr, line, LINE_LEN))
@@ -638,7 +654,7 @@ static subtitle_t *sub_read_line_mpsub (demux_sputext_t *demuxstr, subtitle_t *c
     if (!read_line_from_input(demuxstr, line, LINE_LEN))
       return nullptr;
 
-    p=line;
+    char *p=line;
     while (isspace(*p))
       p++;
 
@@ -648,6 +664,7 @@ static subtitle_t *sub_read_line_mpsub (demux_sputext_t *demuxstr, subtitle_t *c
     if (eol(*p))
       return nullptr;
 
+    char *q;
     for (q=p; !eol(*q); q++);
     *q='\0';
     if (strlen(p)) {
@@ -698,8 +715,13 @@ static subtitle_t *sub_read_line_aqt (demux_sputext_t *demuxstr, subtitle_t *cur
 }
 
 static subtitle_t *sub_read_line_jacobsub(demux_sputext_t *demuxstr, subtitle_t *current) {
-    char line1[LINE_LEN+1], line2[LINE_LEN+1], directive[LINE_LEN+1], *p, *q;
-    unsigned a1, a2, a3, a4, b1, b2, b3, b4, comment = 0;
+    char line1[LINE_LEN+1];
+    char line2[LINE_LEN+1];
+    char directive[LINE_LEN+1];
+    char *p;
+    char *q;
+    unsigned a1, a2, a3, a4, b1, b2, b3, b4; // NOLINT(readability-isolate-declaration)
+    unsigned comment = 0;
     static unsigned s_jacoTimeRes = 30;
     static int s_jacoShift = 0;
 
@@ -716,7 +738,10 @@ static subtitle_t *sub_read_line_jacobsub(demux_sputext_t *demuxstr, subtitle_t 
              &b1, &b2, &b3, &b4, line2) < 9) {
             if (sscanf(line1, "@%u @%u %" LINE_LEN_QUOT "[^\n\r]", &a4, &b4, line2) < 3) {
                 if (line1[0] == '#') {
-                    int hours = 0, minutes = 0, seconds, delta;
+                    int hours = 0;
+                    int minutes = 0;
+                    int seconds;
+                    int delta;
                     unsigned units = s_jacoShift;
                     int inverter = 1;
                     switch (toupper(line1[1])) {
@@ -789,12 +814,10 @@ static subtitle_t *sub_read_line_jacobsub(demux_sputext_t *demuxstr, subtitle_t 
             ++p;
         }
         if (isalpha(*p)||*p == '[') {
-            int cont, jLength;
-
             if (sscanf(p, "%" LINE_LEN_QUOT "s %" LINE_LEN_QUOT "[^\n\r]", directive, line1) < 2)
                 return (subtitle_t *)ERR;
-            jLength = strlen(directive);
-            for (cont = 0; cont < jLength; ++cont) {
+            int jLength = strlen(directive);
+            for (int cont = 0; cont < jLength; ++cont) {
                 if (isalpha(*(directive + cont)))
                     *(directive + cont) = toupper(*(directive + cont));
             }
@@ -903,21 +926,21 @@ static subtitle_t *sub_read_line_jacobsub(demux_sputext_t *demuxstr, subtitle_t 
 
 static subtitle_t *sub_read_line_subviewer2(demux_sputext_t *demuxstr, subtitle_t *current) {
     char line[LINE_LEN+1];
-    int a1,a2,a3,a4;
+    int a1,a2,a3,a4; // NOLINT(readability-isolate-declaration)
     char *p=nullptr;
-    int i,len;
+    int i;
 
     while (!current->text[0]) {
         if (!read_line_from_input(demuxstr, line, LINE_LEN)) return nullptr;
         if (line[0]!='{')
             continue;
-        if ((len=sscanf (line, "{T %d:%d:%d:%d",&a1,&a2,&a3,&a4)) < 4)
+        if (sscanf (line, "{T %d:%d:%d:%d",&a1,&a2,&a3,&a4) < 4)
             continue;
         current->start = a1*360000+a2*6000+a3*100+a4/10;
         for (i=0; i<SUB_MAX_TEXT;) {
             if (!read_line_from_input(demuxstr, line, LINE_LEN)) break;
             if (line[0]=='}') break;
-            len=0;
+            int len=0;
             for (p=line; *p!='\n' && *p!='\r' && *p; ++p,++len);
             if (len) {
                 current->text[i]=(char *)malloc (len+1);
@@ -935,9 +958,9 @@ static subtitle_t *sub_read_line_subviewer2(demux_sputext_t *demuxstr, subtitle_
 
 static subtitle_t *sub_read_line_subrip09 (demux_sputext_t *demuxstr, subtitle_t *current) {
   char line[LINE_LEN + 1];
-  char *next;
-  int h, m, s;
-  int i;
+  int h;
+  int m;
+  int s;
 
   memset (current, 0, sizeof(subtitle_t));
 
@@ -950,10 +973,10 @@ static subtitle_t *sub_read_line_subrip09 (demux_sputext_t *demuxstr, subtitle_t
   current->start = 360000 * h + 6000 * m + 100 * s;
   current->end = -1;
 
-  next=line;
-  i=0;
+  char *next=line;
+  int i=0;
   while ((next = sub_readtext (next, &(current->text[i])))) {
-    if (current->text[i]==ERR) return (subtitle_t *)ERR;
+    if (next==ERR) return (subtitle_t *)ERR;
     i++;
     if (i>=SUB_MAX_TEXT) {
       printf("Too many lines in a subtitle\n");
@@ -973,8 +996,6 @@ static subtitle_t *sub_read_line_subrip09 (demux_sputext_t *demuxstr, subtitle_t
 static subtitle_t *sub_read_line_mpl2(demux_sputext_t *demuxstr, subtitle_t *current) {
   char line[LINE_LEN+1];
   char line2[LINE_LEN+1];
-  char *p, *next;
-  int i;
 
   memset (current, 0, sizeof(subtitle_t));
   do {
@@ -984,11 +1005,12 @@ static subtitle_t *sub_read_line_mpl2(demux_sputext_t *demuxstr, subtitle_t *cur
                       &(current->start), &(current->end), line2) < 3));
   current->start *= 10;
   current->end *= 10;
-  p=line2;
 
-  next=p, i=0;
+  char *p=line2;
+  char *next=p;
+  int i=0;
   while ((next = sub_readtext (next, &(current->text[i])))) {
-      if (current->text[i] == ERR) {return (subtitle_t *)ERR;}
+      if (next == ERR) {return (subtitle_t *)ERR;}
       i++;
       if (i >= SUB_MAX_TEXT) {
         printf("Too many lines in a subtitle\n");
@@ -1005,7 +1027,8 @@ static subtitle_t *sub_read_line_mpl2(demux_sputext_t *demuxstr, subtitle_t *cur
 static int sub_autodetect (demux_sputext_t *demuxstr) {
 
   char line[LINE_LEN + 1];
-  int  i, j=0;
+  int  i;
+  int  j=0;
   char p;
 
   while (j < 100) {
@@ -1097,6 +1120,8 @@ subtitle_t *sub_read_file (demux_sputext_t *demuxstr) {
   int n_max;
   int timeout;
   subtitle_t *first;
+  // These functions all return either 1) nullptr, 2) (subtitle_t*)ERR,
+  // or 3) a pointer to the dest parameter.
   subtitle_t * (*func[])(demux_sputext_t *demuxstr,subtitle_t *dest)=
   {
     sub_read_line_microdvd,
@@ -1141,8 +1166,6 @@ subtitle_t *sub_read_file (demux_sputext_t *demuxstr) {
   else timeout *= 10;
 
   while(true) {
-    subtitle_t *sub;
-
     if(demuxstr->num>=n_max){
       n_max+=16;
       auto *new_first=(subtitle_t *)realloc(first,n_max*sizeof(subtitle_t));
@@ -1153,8 +1176,7 @@ subtitle_t *sub_read_file (demux_sputext_t *demuxstr) {
       first = new_first;
     }
 
-    sub = func[demuxstr->format] (demuxstr, &first[demuxstr->num]);
-
+    subtitle_t *sub = func[demuxstr->format] (demuxstr, &first[demuxstr->num]);
     if (!sub) {
       break;   /* EOF */
     }
@@ -1200,5 +1222,7 @@ subtitle_t *sub_read_file (demux_sputext_t *demuxstr) {
   }
 #endif
 
+  // No memory leak of 'sub' here.  'Sub' always points to an element in 'first'.
+  // NOLINT(clang-analyzer-unix.Malloc)
   return first;
 }

@@ -65,7 +65,8 @@ bool V4LChannel::Open(void)
          return false;
     }
 
-    uint32_t version, capabilities;
+    uint32_t version;
+    uint32_t capabilities;
     if (!CardUtil::GetV4LInfo(m_videofd, m_device_name, m_driver_name,
                               version, capabilities))
     {

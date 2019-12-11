@@ -61,11 +61,11 @@ class AudioOutputPulseAudio : public AudioOutputBase
     pa_context             *m_pcontext   {nullptr};
     pa_stream              *m_pstream    {nullptr};
     pa_threaded_mainloop   *m_mainloop   {nullptr};
-    pa_sample_spec          m_sample_spec     {};
-    pa_channel_map          m_channel_map     {};
-    pa_cvolume              m_volume_control  {};
-    pa_buffer_attr          m_buffer_settings {};
-    AudioOutputSettings    *m_aosettings {nullptr};
+    pa_sample_spec          m_sampleSpec      {};
+    pa_channel_map          m_channelMap      {};
+    pa_cvolume              m_volumeControl   {};
+    pa_buffer_attr          m_bufferSettings  {};
+    AudioOutputSettings    *m_aoSettings {nullptr};
 };
 #endif
 

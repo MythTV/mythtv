@@ -52,14 +52,10 @@
     asynchronous IO classes like QSocket, QHttp and QProcess.
 */
 
-MMembuf::MMembuf() : _size(0), _index(0)
-{
-}
-
 MMembuf::~MMembuf()
 {
-    while (!buf.isEmpty())
-        delete buf.takeFirst();
+    while (!m_buf.isEmpty())
+        delete m_buf.takeFirst();
 }
 
 /*! \internal
@@ -69,29 +65,29 @@ MMembuf::~MMembuf()
 */
 bool MMembuf::consumeBytes(quint64 nbytes, char *sink)
 {
-    if (nbytes == 0 || (qint64)nbytes > _size)
+    if (nbytes == 0 || (qint64)nbytes > m_size)
         return false;
-    _size -= nbytes;
-    while (!buf.isEmpty()) {
-        QByteArray *a = buf.first();
-        if ((int)(_index + nbytes) >= a->size()) {
+    m_size -= nbytes;
+    while (!m_buf.isEmpty()) {
+        QByteArray *a = m_buf.first();
+        if ((int)(m_index + nbytes) >= a->size()) {
             // Here we skip the whole byte array and get the next later
-            int len = a->size() - _index;
+            int len = a->size() - m_index;
             if (sink) {
-                memcpy(sink, a->constData()+_index, len);
+                memcpy(sink, a->constData()+m_index, len);
                 sink += len;
             }
             nbytes -= len;
-            buf.removeFirst();
+            m_buf.removeFirst();
 	    delete a;
-            _index = 0;
+            m_index = 0;
             if (nbytes == 0)
                 break;
         } else {
             // Here we skip only a part of the first byte array
             if (sink)
-                memcpy(sink, a->constData()+_index, nbytes);
-            _index += nbytes;
+                memcpy(sink, a->constData()+m_index, nbytes);
+            m_index += nbytes;
             break;
         }
     }
@@ -107,18 +103,18 @@ bool MMembuf::consumeBytes(quint64 nbytes, char *sink)
 */
 bool MMembuf::scanNewline(QByteArray *store)
 {
-    if (_size == 0)
+    if (m_size == 0)
         return false;
     int i = 0; // index into 'store'
     bool retval = false;
-    for (int j = 0; j < buf.size(); ++j) {
-        QByteArray *a = buf.at(j);
+    for (int j = 0; j < m_buf.size(); ++j) {
+        QByteArray *a = m_buf.at(j);
         char *p = a->data();
         int n = a->size();
         if (!j) {
             // first buffer
-            p += _index;
-            n -= _index;
+            p += m_index;
+            n -= m_index;
         }
         if (store) {
             while (n-- > 0) {
@@ -148,19 +144,19 @@ bool MMembuf::scanNewline(QByteArray *store)
 
 int MMembuf::ungetch(int ch)
 {
-    if (buf.isEmpty() || _index==0) {
+    if (m_buf.isEmpty() || m_index==0) {
         // we need a new QByteArray
         auto *ba = new QByteArray;
         ba->resize(1);
-        buf.prepend(ba);
-        _size++;
+        m_buf.prepend(ba);
+        m_size++;
         (*ba)[0] = ch;
     } else {
         // we can reuse a place in the buffer
-        QByteArray *ba = buf.first();
-        _index--;
-        _size++;
-        (*ba)[(int)_index] = ch;
+        QByteArray *ba = m_buf.first();
+        m_index--;
+        m_size++;
+        (*ba)[(int)m_index] = ch;
     }
     return ch;
 }

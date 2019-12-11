@@ -61,7 +61,7 @@
 class MMembuf
 {
 public:
-    MMembuf();
+    MMembuf() = default;
     ~MMembuf();
 
     void append(QByteArray *ba);
@@ -78,24 +78,24 @@ public:
 
 private:
 
-    QList<QByteArray *> buf;
-    qint64 _size;
-    qint64 _index;
+    QList<QByteArray *> m_buf;
+    qint64 m_size  {0};
+    qint64 m_index {0};
 };
 
 inline void MMembuf::append(QByteArray *ba)
-{ buf.append(ba); _size += ba->size(); }
+{ m_buf.append(ba); m_size += ba->size(); }
 
 inline void MMembuf::clear()
-{ qDeleteAll(buf); buf.clear(); _size=0; _index=0; }
+{ qDeleteAll(m_buf); m_buf.clear(); m_size=0; m_index=0; }
 
 inline QByteArray MMembuf::readAll()
-{ QByteArray ba; ba.resize(_size); consumeBytes(_size,ba.data()); return ba; }
+{ QByteArray ba; ba.resize(m_size); consumeBytes(m_size,ba.data()); return ba; }
 
 inline bool MMembuf::canReadLine() const
 { return const_cast<MMembuf*>(this)->scanNewline(nullptr); }
 
 inline qint64 MMembuf::size() const
-{ return _size; }
+{ return m_size; }
 
 #endif // MMEMBUF_P_H

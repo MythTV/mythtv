@@ -1057,7 +1057,10 @@ bool MHIContext::BeginStream(const QString &stream, MHStream *notify)
         return false;
     if (VERBOSE_LEVEL_CHECK(VB_MHEG, LOG_ANY))
     {
-        int netId, origNetId, transportId, serviceId;
+        int netId;
+        int origNetId;
+        int transportId;
+        int serviceId;
         GetServiceInfo(chan, netId, origNetId, transportId, serviceId);
     }
 
@@ -1369,7 +1372,9 @@ void MHIText::AddText(int x, int y, const QString &str, MHRgba colour)
 {
     if (!m_parent->IsFaceLoaded()) return;
     FT_Face face = m_parent->GetFontFace();
-    FT_Error error = FT_Set_Char_Size(face, 0, Point2FT(m_fontsize),
+    FT_Error error;
+
+    FT_Set_Char_Size(face, 0, Point2FT(m_fontsize),
                                       FONT_WIDTHRES, FONT_HEIGHTRES);
 
     // X positions are computed to 64ths and rounded.
@@ -1469,7 +1474,8 @@ void MHIDLA::DrawRect(int x, int y, int width, int height, MHRgba colour)
     if (width <= 0 || height <= 0)
         return;
 
-    int imageWidth = m_image.width(), imageHeight = m_image.height();
+    int imageWidth = m_image.width();
+    int imageHeight = m_image.height();
     if (x+width > imageWidth)
         width = imageWidth - x;
 
@@ -1575,7 +1581,8 @@ void MHIDLA::DrawLineSub(int x1, int y1, int x2, int y2, bool swapped)
 {
     QRgb colour = qRgba(m_lineColour.red(), m_lineColour.green(),
                          m_lineColour.blue(), m_lineColour.alpha());
-    int dx = x2-x1, dy = abs(y2-y1);
+    int dx = x2-x1;
+    int dy = abs(y2-y1);
     int yStep = y2 >= y1 ? 1 : -1;
     // Adjust the starting positions to take account of the
     // line width.
@@ -1708,7 +1715,8 @@ void MHIDLA::DrawPoly(bool isFilled, int nPoints, const int *xArray, const int *
         // with the last point in the array.
         int lastX = xArray[nPoints-1]; // Last point
         int lastY = yArray[nPoints-1];
-        int yMin = lastY, yMax = lastY;
+        int yMin = lastY;
+        int yMax = lastY;
         for (int k = 0; k < nPoints; k++)
         {
             int thisX = xArray[k];
@@ -1745,7 +1753,9 @@ void MHIDLA::DrawPoly(bool isFilled, int nPoints, const int *xArray, const int *
                                 m_fillColour.blue(), m_fillColour.alpha());
         for (int y = yMin; y < yMax; y++)
         {
-            int crossings = 0, xMin = 0, xMax = 0;
+            int crossings = 0;
+            int xMin = 0;
+            int xMax = 0;
             for (int l = 0; l < nLines; l++)
             {
                 if (y >= lineArray[l].m_yBottom && y < lineArray[l].m_yTop)
@@ -1901,7 +1911,7 @@ void MHIBitmap::CreateFromMPEG(const unsigned char *data, int length)
             len = avcodec_send_packet(c, &pkt);
         if (len == AVERROR(EAGAIN) || len == AVERROR_EOF)
             len = 0;
-        else if (len < 0) // Error
+        if (len < 0) // Error
         {
             char error[AV_ERROR_MAX_STRING_SIZE];
             LOG(VB_GENERAL, LOG_ERR,

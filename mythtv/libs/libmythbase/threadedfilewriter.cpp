@@ -64,7 +64,7 @@ bool ThreadedFileWriter::ReOpen(const QString& newFilename)
 {
     Flush();
 
-    m_buflock.lock();
+    m_bufLock.lock();
 
     if (m_fd >= 0)
     {
@@ -80,7 +80,7 @@ bool ThreadedFileWriter::ReOpen(const QString& newFilename)
     if (!newFilename.isEmpty())
         m_filename = newFilename;
 
-    m_buflock.unlock();
+    m_bufLock.unlock();
 
     return Open();
 }
@@ -91,7 +91,7 @@ bool ThreadedFileWriter::ReOpen(const QString& newFilename)
  */
 bool ThreadedFileWriter::Open(void)
 {
-    m_ignore_writes = false;
+    m_ignoreWrites = false;
 
     if (m_filename == "-")
         m_fd = fileno(stdout);
@@ -139,8 +139,8 @@ ThreadedFileWriter::~ThreadedFileWriter()
     Flush();
 
     {  /* tell child threads to exit */
-        QMutexLocker locker(&m_buflock);
-        m_in_dtor = true;
+        QMutexLocker locker(&m_bufLock);
+        m_inDtor = true;
         m_bufferSyncWait.wakeAll();
         m_bufferHasData.wakeAll();
     }
@@ -192,9 +192,9 @@ int ThreadedFileWriter::Write(const void *data, uint count)
     if (count == 0)
         return 0;
 
-    QMutexLocker locker(&m_buflock);
+    QMutexLocker locker(&m_bufLock);
 
-    if (m_ignore_writes)
+    if (m_ignoreWrites)
         return -1;
 
     uint written    = 0;
@@ -215,7 +215,7 @@ int ThreadedFileWriter::Write(const void *data, uint count)
                     "\n\t\t\tThis generally indicates your disk performance "
                     "\n\t\t\tis insufficient to deal with the number of on-going "
                     "\n\t\t\trecordings, or you have a disk failure.");
-                m_ignore_writes = true;
+                m_ignoreWrites = true;
                 return -1;
             }
             if (!m_warned)
@@ -296,7 +296,7 @@ int ThreadedFileWriter::Write(const void *data, uint count)
  */
 long long ThreadedFileWriter::Seek(long long pos, int whence)
 {
-    QMutexLocker locker(&m_buflock);
+    QMutexLocker locker(&m_bufLock);
     m_flush = true;
     while (!m_writeBuffers.empty())
     {
@@ -317,7 +317,7 @@ long long ThreadedFileWriter::Seek(long long pos, int whence)
  */
 void ThreadedFileWriter::Flush(void)
 {
-    QMutexLocker locker(&m_buflock);
+    QMutexLocker locker(&m_bufLock);
     m_flush = true;
     while (!m_writeBuffers.empty())
     {
@@ -373,9 +373,9 @@ void ThreadedFileWriter::Sync(void)
  */
 void ThreadedFileWriter::SetWriteBufferMinWriteSize(uint newMinSize)
 {
-    QMutexLocker locker(&m_buflock);
+    QMutexLocker locker(&m_bufLock);
     if (newMinSize > 0)
-        m_tfw_min_write_size = newMinSize;
+        m_tfwMinWriteSize = newMinSize;
     m_bufferHasData.wakeAll();
 }
 
@@ -384,8 +384,8 @@ void ThreadedFileWriter::SetWriteBufferMinWriteSize(uint newMinSize)
  */
 void ThreadedFileWriter::SyncLoop(void)
 {
-    QMutexLocker locker(&m_buflock);
-    while (!m_in_dtor)
+    QMutexLocker locker(&m_bufLock);
+    while (!m_inDtor)
     {
         locker.unlock();
 
@@ -393,13 +393,13 @@ void ThreadedFileWriter::SyncLoop(void)
 
         locker.relock();
 
-        if (m_ignore_writes && m_registered)
+        if (m_ignoreWrites && m_registered)
         {
             // we aren't going to write to the disk anymore, so can de-register
             gCoreContext->UnregisterFileForWrite(m_filename);
             m_registered = false;
         }
-        m_bufferSyncWait.wait(&m_buflock, 1000);
+        m_bufferSyncWait.wait(&m_bufLock, 1000);
     }
 }
 
@@ -413,20 +413,21 @@ void ThreadedFileWriter::DiskLoop(void)
     signal(SIGXFSZ, SIG_IGN);
 #endif
 
-    QMutexLocker locker(&m_buflock);
+    QMutexLocker locker(&m_bufLock);
 
     // Even if the bytes buffered is less than the minimum write
     // size we do want to write to the OS buffers periodically.
     // This timer makes sure we do.
-    MythTimer minWriteTimer, lastRegisterTimer;
+    MythTimer minWriteTimer;
+    MythTimer lastRegisterTimer;
     minWriteTimer.start();
     lastRegisterTimer.start();
 
     uint64_t total_written = 0LL;
 
-    while (!m_in_dtor)
+    while (!m_inDtor)
     {
-        if (m_ignore_writes)
+        if (m_ignoreWrites)
         {
             while (!m_writeBuffers.empty())
             {
@@ -488,7 +489,7 @@ void ThreadedFileWriter::DiskLoop(void)
         MythTimer writeTimer;
         writeTimer.start();
 
-        while ((tot < sz) && !m_in_dtor)
+        while ((tot < sz) && !m_inDtor)
         {
             locker.unlock();
 
@@ -525,7 +526,7 @@ void ThreadedFileWriter::DiskLoop(void)
 
             locker.relock();
 
-            if ((tot < sz) && !m_in_dtor)
+            if ((tot < sz) && !m_inDtor)
                 m_bufferHasData.wait(locker.mutex(), 50);
         }
 
@@ -577,7 +578,7 @@ void ThreadedFileWriter::DiskLoop(void)
             }
 
             LOG(VB_GENERAL, LOG_ERR, LOC + msg.arg(m_filename));
-            m_ignore_writes = true;
+            m_ignoreWrites = true;
         }
     }
 }

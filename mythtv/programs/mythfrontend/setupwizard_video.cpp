@@ -232,9 +232,11 @@ void VideoSetupWizard::customEvent(QEvent *e)
 {
     if (e->type() == MythEvent::MythEventMessage)
     {
-        auto *me = static_cast<MythEvent *>(e);
-        QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);
+        auto *me = dynamic_cast<MythEvent *>(e);
+        if (me == nullptr)
+            return;
 
+        QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);
         if (tokens.isEmpty())
             return;
 

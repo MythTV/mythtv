@@ -25,7 +25,7 @@ MythOpenGLPainter::~MythOpenGLPainter()
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         m_render->logDebugMarker("PAINTER_RELEASE_START");
     Teardown();
-    FreeResources();
+    MythOpenGLPainter::FreeResources();
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         m_render->logDebugMarker("PAINTER_RELEASE_END");
 }
@@ -56,7 +56,7 @@ void MythOpenGLPainter::DeleteTextures(void)
     while (!m_textureDeleteList.empty())
     {
         MythGLTexture *texture = m_textureDeleteList.front();
-        m_HardwareCacheSize -= MythRenderOpenGL::GetTextureDataSize(texture);
+        m_hardwareCacheSize -= MythRenderOpenGL::GetTextureDataSize(texture);
         m_render->DeleteTexture(texture);
         m_textureDeleteList.pop_front();
     }
@@ -86,7 +86,7 @@ void MythOpenGLPainter::Begin(QPaintDevice *Parent)
 
     if (!m_render)
     {
-        auto* glwin = static_cast<MythPainterWindowGL*>(m_parent);
+        auto* glwin = dynamic_cast<MythPainterWindowGL*>(m_parent);
         if (!glwin)
         {
             LOG(VB_GENERAL, LOG_ERR, "FATAL ERROR: Failed to cast parent to MythPainterWindowGL");
@@ -186,19 +186,19 @@ MythGLTexture* MythOpenGLPainter::GetTextureFromCache(MythImage *Image)
             break;
 
         // This can happen if the cached textures are too big for GPU memory
-        if (m_HardwareCacheSize <= 8 * 1024 * 1024)
+        if (m_hardwareCacheSize <= 8 * 1024 * 1024)
         {
             LOG(VB_GENERAL, LOG_ERR, "Failed to create OpenGL texture.");
             return nullptr;
         }
 
         // Shrink the cache size
-        m_MaxHardwareCacheSize = (3 * m_HardwareCacheSize) / 4;
+        m_maxHardwareCacheSize = (3 * m_hardwareCacheSize) / 4;
         LOG(VB_GENERAL, LOG_NOTICE, QString(
                 "Shrinking UIPainterMaxCacheHW to %1KB")
-            .arg(m_MaxHardwareCacheSize / 1024));
+            .arg(m_maxHardwareCacheSize / 1024));
 
-        while (m_HardwareCacheSize > m_MaxHardwareCacheSize)
+        while (m_hardwareCacheSize > m_maxHardwareCacheSize)
         {
             MythImage *expiredIm = m_ImageExpireList.front();
             m_ImageExpireList.pop_front();
@@ -208,11 +208,11 @@ MythGLTexture* MythOpenGLPainter::GetTextureFromCache(MythImage *Image)
     }
 
     CheckFormatImage(Image);
-    m_HardwareCacheSize += MythRenderOpenGL::GetTextureDataSize(texture);
+    m_hardwareCacheSize += MythRenderOpenGL::GetTextureDataSize(texture);
     m_imageToTextureMap[Image] = texture;
     m_ImageExpireList.push_back(Image);
 
-    while (m_HardwareCacheSize > m_MaxHardwareCacheSize)
+    while (m_hardwareCacheSize > m_maxHardwareCacheSize)
     {
         MythImage *expiredIm = m_ImageExpireList.front();
         m_ImageExpireList.pop_front();

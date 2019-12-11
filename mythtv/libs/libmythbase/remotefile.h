@@ -62,7 +62,7 @@ class MBASE_PUBLIC RemoteFile
     long long GetRealFileSize(void);
 
     QStringList GetAuxiliaryFiles(void) const
-        { return m_auxfiles; }
+        { return m_auxFiles; }
 
   private:
     bool Open(void);
@@ -76,26 +76,26 @@ class MBASE_PUBLIC RemoteFile
     MythSocket     *openSocket(bool control);
 
     QString         m_path;
-    bool            m_usereadahead     {true};
-    int             m_timeout_ms       {2000};
-    long long       m_filesize         {-1};
-    bool            m_timeoutisfast    {false};
-    long long       m_readposition     {0LL};
-    long long       m_lastposition     {0LL};
-    bool            m_canresume        {false};
-    int             m_recordernum      {0};
+    bool            m_useReadAhead     {true};
+    int             m_timeoutMs        {2000};
+    long long       m_fileSize         {-1};
+    bool            m_timeoutIsFast    {false};
+    long long       m_readPosition     {0LL};
+    long long       m_lastPosition     {0LL};
+    bool            m_canResume        {false};
+    int             m_recorderNum      {0};
 
     mutable QMutex  m_lock             {QMutex::NonRecursive};
     MythSocket     *m_controlSock      {nullptr};
     MythSocket     *m_sock             {nullptr};
     QString         m_query            {"QUERY_FILETRANSFER %1"};
 
-    bool            m_writemode        {false};
+    bool            m_writeMode        {false};
     bool            m_completed        {false};
     MythTimer       m_lastSizeCheck;
 
-    QStringList     m_possibleauxfiles;
-    QStringList     m_auxfiles;
+    QStringList     m_possibleAuxFiles;
+    QStringList     m_auxFiles;
     int             m_localFile        {-1};
     ThreadedFileWriter *m_fileWriter   {nullptr};
 };

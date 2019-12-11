@@ -50,11 +50,11 @@ class MBASE_PUBLIC MythSortHelper
     void MythSortHelperCommon(void);
 
     /// Whether sorting two strings should ignore upper/lower case.
-    Qt::CaseSensitivity m_case_sensitive {Qt::CaseInsensitive};
+    Qt::CaseSensitivity m_caseSensitive {Qt::CaseInsensitive};
 
     /// Whether or not to ignore prefix words (like A, An, and The)
     /// when sorting two strings.
-    SortPrefixMode m_prefix_mode {SortPrefixRemove};
+    SortPrefixMode m_prefixMode {SortPrefixRemove};
 
     /// A string containing the regular expression of prefixes to
     /// ignore when sorting.  The code will ensure that this is
@@ -62,10 +62,10 @@ class MBASE_PUBLIC MythSortHelper
     QString m_prefixes {QString()};
     /// A regular expression used for removing a leading prefix.  It
     /// is created from m_prefixes.
-    QRegularExpression m_prefixes_regex {QRegularExpression()};
+    QRegularExpression m_prefixesRegex {QRegularExpression()};
     /// A regular expression used for moving leading prefix to the end
     /// of a string.  It is created from m_prefixes.
-    QRegularExpression m_prefixes_regex2 {QRegularExpression()};
+    QRegularExpression m_prefixesRegex2 {QRegularExpression()};
 
     /// A string containing names that should be ignored when greating
     /// the sortable form of a title.  Multiple titles should be
@@ -74,8 +74,8 @@ class MBASE_PUBLIC MythSortHelper
     /// "A " sorted to the end of the name.
     QString m_exclusions {"A to Z"};
     /// The m_exclusion string converted into a string list.
-    QStringList m_excl_list {QStringList()};
-    SortExclusionMode m_excl_mode {SortExclusionMatch};
+    QStringList m_exclList {QStringList()};
+    SortExclusionMode m_exclMode {SortExclusionMatch};
 };
 
 MBASE_PUBLIC std::shared_ptr<MythSortHelper> getMythSortHelper(void);

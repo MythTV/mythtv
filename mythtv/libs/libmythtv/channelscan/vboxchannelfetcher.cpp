@@ -274,7 +274,8 @@ void VBoxChannelFetcher::run(void)
 
 void VBoxChannelFetcher::SetNumChannelsInserted(uint val)
 {
-    uint minval = 70, range = 100 - minval;
+    uint minval = 70;
+    uint range = 100 - minval;
     uint pct = minval + (uint) truncf((((float)val) / m_chan_cnt) * range);
     if (m_scan_monitor)
         m_scan_monitor->ScanPercentComplete(pct);

@@ -631,7 +631,6 @@ bool PreviewGenerator::LocalPreviewRun(void)
     m_programInfo.SetAllowLastPlayPos(false);
 
     float aspect = 0;
-    int   width, height, sz;
     long long captime = m_captureTime;
 
     QDateTime dt = MythDate::current();
@@ -685,7 +684,9 @@ bool PreviewGenerator::LocalPreviewRun(void)
             QString("Preview at calculated offset (%1 seconds)").arg(captime));
     }
 
-    width = height = sz = 0;
+    int width = 0;
+    int height = 0;
+    int sz = 0;
     auto *data = (unsigned char*) GetScreenGrab(m_programInfo, m_pathname,
                                                 captime, m_timeInSeconds,
                                                 sz, width, height, aspect);

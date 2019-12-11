@@ -953,7 +953,8 @@ void MythVideoOutput::ResizeForVideo(int Width, int Height)
         // if width && height are zero users expect fullscreen playback
         if (!fullscreen)
         {
-            int gui_width = 0, gui_height = 0;
+            int gui_width = 0;
+            int gui_height = 0;
             gCoreContext->GetResolutionSetting("Gui", gui_width, gui_height);
             fullscreen |= (0 == gui_width && 0 == gui_height);
         }
@@ -1016,7 +1017,7 @@ void MythVideoOutput::InitDisplayMeasurements(void)
             .arg(window_size.width()).arg(window_size.height()));
 
     // Check the display dimensions
-    disp_aspect = m_window.GetDisplayAspect();
+//  disp_aspect = m_window.GetDisplayAspect();
     disp_dim = m_window.GetDisplayDim();
 
     // If we are using Xinerama the display dimensions cannot be trusted.

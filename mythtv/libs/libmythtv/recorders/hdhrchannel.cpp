@@ -189,7 +189,8 @@ bool HDHRChannel::SetChannelByString(const QString &channum)
     // need to try alternative tuning...
     if (!ok && DTVTunerType::kTunerTypeDVBT == m_tunerType)
     {
-        bool has_dvbc = false, has_dvbt = false;
+        bool has_dvbc = false;
+        bool has_dvbt = false;
         vector<DTVTunerType>::const_iterator it = m_tuner_types.begin();
         for (; it != m_tuner_types.end(); ++it)
         {

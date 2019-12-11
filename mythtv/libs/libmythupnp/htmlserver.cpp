@@ -29,11 +29,11 @@
 HtmlServerExtension::HtmlServerExtension( const QString &sSharePath,
                                           const QString &sApplicationPrefix)
   : HttpServerExtension( "Html" , sSharePath),
-    m_IndexFilename(sApplicationPrefix + "index")
+    m_indexFilename(sApplicationPrefix + "index")
 {
     LOG(VB_HTTP, LOG_INFO, QString("HtmlServerExtension() - SharePath = %1")
             .arg(m_sSharePath));
-    m_Scripting.SetResourceRootPath( m_sSharePath );
+    m_scripting.SetResourceRootPath( m_sSharePath );
     
     // ----------------------------------------------------------------------
     // Register Rtti with QtScript Engine.
@@ -75,12 +75,12 @@ bool HtmlServerExtension::ProcessRequest( HTTPRequest *pRequest )
 
         if (oInfo.isDir())
         {
-            QString sIndexFileName = oInfo.filePath() + m_IndexFilename + ".qsp";
+            QString sIndexFileName = oInfo.filePath() + m_indexFilename + ".qsp";
 
             if (QFile::exists( sIndexFileName ))
                 oInfo.setFile( sIndexFileName );
             else 
-                oInfo.setFile( oInfo.filePath() + m_IndexFilename + ".html" );
+                oInfo.setFile( oInfo.filePath() + m_indexFilename + ".html" );
         }
 
         if (pRequest->m_sResourceUrl.startsWith("/StorageGroup/"))
@@ -203,7 +203,7 @@ bool HtmlServerExtension::ProcessRequest( HTTPRequest *pRequest )
                     {
                         QTextStream stream( &pRequest->m_response );
                         
-                        m_Scripting.EvaluatePage( &stream, sResName, pRequest, cspNonce);
+                        m_scripting.EvaluatePage( &stream, sResName, pRequest, cspNonce);
 
                         return true;
                     }

@@ -163,7 +163,10 @@ bool MythVDPAUHelper::CheckMPEG4(void)
 #ifdef VDP_DECODER_PROFILE_MPEG4_PART2_ASP
     INIT_ST
     VdpBool supported = false;
-    uint32_t tmp1, tmp2, tmp3, tmp4;
+    uint32_t tmp1;
+    uint32_t tmp2;
+    uint32_t tmp3;
+    uint32_t tmp4;
     status = m_vdpDecoderQueryCapabilities(m_device,
                 VDP_DECODER_PROFILE_MPEG4_PART2_ASP, &supported,
                 &tmp1, &tmp2, &tmp3, &tmp4);
@@ -219,7 +222,10 @@ bool MythVDPAUHelper::HEVCProfileCheck(AVCodecContext *Context)
     }
 
     VdpBool supported = false;
-    uint32_t level, macros, width, height;
+    uint32_t level;
+    uint32_t macros;
+    uint32_t width;
+    uint32_t height;
     status = m_vdpDecoderQueryCapabilities(m_device, profile, &supported, &level, &macros, &width, &height);
     CHECK_ST
     if (!supported)
@@ -295,7 +301,10 @@ bool MythVDPAUHelper::H264ProfileCheck(VdpDecoderProfile Profile, AVCodecContext
         return false;
 
     VdpBool supported = false;
-    uint32_t level, macros, width, height;
+    uint32_t level;
+    uint32_t macros;
+    uint32_t width;
+    uint32_t height;
     INIT_ST
     status = m_vdpDecoderQueryCapabilities(m_device, Profile, &supported, &level, &macros, &width, &height);
     CHECK_ST

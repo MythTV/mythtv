@@ -74,7 +74,8 @@ void fix_audio_count(uint64_t *acount, audio_frame_t *aframe, uint64_t origpts, 
 
 uint64_t next_ptsdts_video(uint64_t *pts, sequence_t *s, uint64_t fcount, uint64_t gcount)
 {
-	int64_t newdts = 0, newpts = 0;
+	int64_t newdts = 0;
+	int64_t newpts = 0;
 	int64_t fnum = s->current_tmpref - gcount + fcount;
 
 	
@@ -323,7 +324,6 @@ int find_audio_sync(ringbuffer *rbuf, uint8_t *buf, int off, int type, int le)
 {
 	int found = 0;
 	int l=0;
-	int r=0;
 
 	memset(buf,0,7);
 	uint8_t b1 = 0x00;
@@ -350,7 +350,7 @@ int find_audio_sync(ringbuffer *rbuf, uint8_t *buf, int off, int type, int le)
 	int c = off;
 	while ( c-off < le){
 		uint8_t b = 0;
-		if ((r = mring_peek(rbuf, &b, 1, c)) <0) return -1;
+		if (mring_peek(rbuf, &b, 1, c) <0) return -1;
 		switch(found){
 
 		case 0:
@@ -359,7 +359,7 @@ int find_audio_sync(ringbuffer *rbuf, uint8_t *buf, int off, int type, int le)
 			
 		case 1:
 			if ( (b&m2) == b2){
-				if ((r = mring_peek(rbuf, buf, l, c-1)) < -1) 
+				if (mring_peek(rbuf, buf, l, c-1) < -1) 
 					return -2;
 				return c-1-off;	
 			} else if ( b != b1) found = 0;
@@ -373,7 +373,6 @@ int find_audio_sync(ringbuffer *rbuf, uint8_t *buf, int off, int type, int le)
 int find_audio_s(const uint8_t *rbuf, int off, int type, int le)
 {
 	int found = 0;
-	int l=0;
 
 	uint8_t b1 = 0x00;
 	uint8_t b2 = 0x00;
@@ -382,14 +381,12 @@ int find_audio_s(const uint8_t *rbuf, int off, int type, int le)
 	case AC3:
 		b1 = 0x0B;
 		b2 = 0x77;
-		l = 6;
 		break;
 
 	case MPEG_AUDIO:
 		b1 = 0xFF;
 		b2 = 0xF8;
 		m2 = 0xF8;
-		l = 4;
 		break;
 
 	default:

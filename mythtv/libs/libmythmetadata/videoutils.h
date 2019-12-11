@@ -22,7 +22,7 @@ class MythUIType;
 class MythUIImage;
 
 template <>
-META_PUBLIC void CheckedSet( MythUIStateType *uiItem, const QString &state);
+META_PUBLIC void CheckedSet( MythUIStateType *uiItem, const QString &value);
 
 META_PUBLIC void CheckedSet( MythUIType *container, const QString &itemName,
         const QString &value);

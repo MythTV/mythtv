@@ -172,9 +172,9 @@ static OSStatus RenderCallbackSPDIF(AudioDeviceID        inDevice,
 AudioOutputCA::AudioOutputCA(const AudioSettings &settings) :
 AudioOutputBase(settings)
 {
-    m_main_device.remove(0, 10);
-    VBAUDIO(QString("AudioOutputCA::AudioOutputCA searching %1").arg(m_main_device));
-    d = new CoreAudioData(this, m_main_device);
+    m_mainDevice.remove(0, 10);
+    VBAUDIO(QString("AudioOutputCA::AudioOutputCA searching %1").arg(m_mainDevice));
+    d = new CoreAudioData(this, m_mainDevice);
 
     InitSettings(settings);
     if (settings.m_init)
@@ -289,7 +289,7 @@ bool AudioOutputCA::OpenDevice()
         return false;
     }
 
-    if (internal_vol && m_set_initial_vol)
+    if (m_internalVol && m_setInitialVol)
     {
         QString controlLabel = gCoreContext->GetSetting("MixerControl", "PCM");
         controlLabel += "MixerVolume";
@@ -342,9 +342,9 @@ static inline void ReorderSmpteToCA(void *buf, uint frames, AudioFormat format)
 bool AudioOutputCA::RenderAudio(unsigned char *aubuf,
                                 int size, unsigned long long timestamp)
 {
-    if (m_pauseaudio || m_killaudio)
+    if (m_pauseAudio || m_killAudio)
     {
-        m_actually_paused = true;
+        m_actuallyPaused = true;
         return false;
     }
 
@@ -365,15 +365,15 @@ bool AudioOutputCA::RenderAudio(unsigned char *aubuf,
     //Audio received is in SMPTE channel order, reorder to CA unless passthru
     if (!m_passthru && m_channels == 8)
     {
-        ReorderSmpteToCA(aubuf, size / m_output_bytes_per_frame, m_output_format);
+        ReorderSmpteToCA(aubuf, size / m_outputBytesPerFrame, m_outputFormat);
     }
 
-    /* update audiotime (bufferedBytes is read by GetBufferedOnSoundcard) */
+    /* update audiotime (m_bufferedBytes is read by GetBufferedOnSoundcard) */
     UInt64 nanos = AudioConvertHostTimeToNanos(timestamp -
                                                AudioGetCurrentHostTime());
-    bufferedBytes = (int)((nanos / 1000000000.0) *    // secs
-                          (m_effdsp / 100.0) *        // frames/sec
-                          m_output_bytes_per_frame);  // bytes/frame
+    m_bufferedBytes = (int)((nanos / 1000000000.0) *  // secs
+                            (m_effDsp / 100.0) *      // frames/sec
+                            m_outputBytesPerFrame);   // bytes/frame
 
     return (written_size > 0);
 }
@@ -387,7 +387,7 @@ void AudioOutputCA::WriteAudio(unsigned char *aubuf, int size)
 
 int AudioOutputCA::GetBufferedOnSoundcard(void) const
 {
-    return bufferedBytes;
+    return m_bufferedBytes;
 }
 
 /** Reimplement the base class's version of GetAudiotime()
@@ -403,8 +403,8 @@ int64_t AudioOutputCA::GetAudiotime(void)
     int totalbuffer = audioready() + GetBufferedOnSoundcard();
 
     return audbuf_timecode - (int)(totalbuffer * 100000.0 /
-                                   (m_output_bytes_per_frame *
-                                    m_effdsp * m_stretchfactor));
+                                   (m_outputBytesPerFrame *
+                                    m_effDsp * m_stretchFactor));
 }
 
 /* This callback provides converted audio data to the default output device. */
@@ -1253,7 +1253,7 @@ int CoreAudioData::OpenAnalog()
 
     // Set up the audio output unit
     int formatFlags;
-    switch (mCA->m_output_format)
+    switch (mCA->m_outputFormat)
     {
         case FORMAT_S16:
             formatFlags = kLinearPCMFormatFlagIsSignedInteger;
@@ -1268,18 +1268,18 @@ int CoreAudioData::OpenAnalog()
 
     AudioStreamBasicDescription conv_in_desc;
     memset(&conv_in_desc, 0, sizeof(AudioStreamBasicDescription));
-    conv_in_desc.mSampleRate       = mCA->m_samplerate;
+    conv_in_desc.mSampleRate       = mCA->m_sampleRate;
     conv_in_desc.mFormatID         = kAudioFormatLinearPCM;
     conv_in_desc.mFormatFlags      = formatFlags |
         kAudioFormatFlagsNativeEndian |
         kLinearPCMFormatFlagIsPacked;
-    conv_in_desc.mBytesPerPacket   = mCA->m_output_bytes_per_frame;
+    conv_in_desc.mBytesPerPacket   = mCA->m_outputBytesPerFrame;
     // This seems inefficient, does it hurt if we increase this?
     conv_in_desc.mFramesPerPacket  = 1;
-    conv_in_desc.mBytesPerFrame    = mCA->m_output_bytes_per_frame;
+    conv_in_desc.mBytesPerFrame    = mCA->m_outputBytesPerFrame;
     conv_in_desc.mChannelsPerFrame = mCA->m_channels;
     conv_in_desc.mBitsPerChannel   =
-        AudioOutputSettings::FormatToBits(mCA->m_output_format);
+        AudioOutputSettings::FormatToBits(mCA->m_outputFormat);
 
     /* Set AudioUnit input format */
     err = AudioUnitSetProperty(mOutputUnit,
@@ -1404,7 +1404,7 @@ bool CoreAudioData::OpenSPDIF()
                   .arg(StreamDescriptionToString(formats[j])));
             if ((formats[j].mFormatID == 'IAC3' ||
                  formats[j].mFormatID == kAudioFormat60958AC3) &&
-                formats[j].mSampleRate == mCA->m_samplerate)
+                formats[j].mSampleRate == mCA->m_sampleRate)
             {
                 Debug("OpenSPDIF: Found digital format");
                 mStreamIndex  = i;

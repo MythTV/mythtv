@@ -833,7 +833,8 @@ void MHSendEvent::PrintArgs(FILE *fd, int /*nTabs*/) const
 void MHSendEvent::Perform(MHEngine *engine)
 {
     // The target is always the current scene so we ignore it here.
-    MHObjectRef target, source;
+    MHObjectRef target;
+    MHObjectRef source;
     m_Target.GetValue(target, engine); // TODO: Check this is the scene?
     m_EventSource.GetValue(source, engine);
 

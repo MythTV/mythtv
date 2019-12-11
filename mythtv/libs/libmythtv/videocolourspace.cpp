@@ -13,13 +13,13 @@ extern "C" {
 // Std
 #include <cmath>
 
-const VideoColourSpace::ColourPrimaries VideoColourSpace::BT709 =
+const VideoColourSpace::ColourPrimaries VideoColourSpace::kBT709 =
     {{{0.640F, 0.330F}, {0.300F, 0.600F}, {0.150F, 0.060F}}, {0.3127F, 0.3290F}};
-const VideoColourSpace::ColourPrimaries VideoColourSpace::BT610_525 =
+const VideoColourSpace::ColourPrimaries VideoColourSpace::kBT610_525 =
     {{{0.640F, 0.340F}, {0.310F, 0.595F}, {0.155F, 0.070F}}, {0.3127F, 0.3290F}};
-const VideoColourSpace::ColourPrimaries VideoColourSpace::BT610_625 =
+const VideoColourSpace::ColourPrimaries VideoColourSpace::kBT610_625 =
     {{{0.640F, 0.330F}, {0.290F, 0.600F}, {0.150F, 0.060F}}, {0.3127F, 0.3290F}};
-const VideoColourSpace::ColourPrimaries VideoColourSpace::BT2020 =
+const VideoColourSpace::ColourPrimaries VideoColourSpace::kBT2020 =
     {{{0.708F, 0.292F}, {0.170F, 0.797F}, {0.131F, 0.046F}}, {0.3127F, 0.3290F}};
 
 #define LOC QString("ColourSpace: ")
@@ -474,7 +474,8 @@ QMatrix4x4 VideoColourSpace::GetPrimaryConversion(int Source, int Dest)
     if ((source == dest) || (m_primariesMode == PrimariesDisabled))
         return result;
 
-    ColourPrimaries srcprimaries, dstprimaries;
+    ColourPrimaries srcprimaries;
+    ColourPrimaries dstprimaries;
     GetPrimaries(source, srcprimaries, m_colourGamma);
     GetPrimaries(dest,   dstprimaries, m_displayGamma);
 
@@ -503,11 +504,11 @@ void VideoColourSpace::GetPrimaries(int Primary, ColourPrimaries &Out, float &Ga
     switch (primary)
     {
         case AVCOL_PRI_BT470BG:
-        case AVCOL_PRI_BT470M:    Out = BT610_625; return;
+        case AVCOL_PRI_BT470M:    Out = kBT610_625; return;
         case AVCOL_PRI_SMPTE170M:
-        case AVCOL_PRI_SMPTE240M: Out = BT610_525; return;
-        case AVCOL_PRI_BT2020:    Out = BT2020; Gamma = 2.4F; return;
-        default: Out = BT709; return;
+        case AVCOL_PRI_SMPTE240M: Out = kBT610_525; return;
+        case AVCOL_PRI_BT2020:    Out = kBT2020; Gamma = 2.4F; return;
+        default: Out = kBT709; return;
     }
 }
 

@@ -36,7 +36,7 @@ ResultItem::ResultItem(const QString& title, const QString& sortTitle,
     m_subtitle = subtitle;
     m_sortsubtitle = sortSubtitle;
     m_desc = desc;
-    m_URL = URL;
+    m_url = URL;
     m_thumbnail = thumbnail;
     m_mediaURL = mediaURL;
     m_author = author;
@@ -80,7 +80,7 @@ void ResultItem::toMap(InfoMap &metadataMap)
     metadataMap["subtitle"] = m_subtitle;
     metadataMap["sortsubtitle"] = m_sortsubtitle;
     metadataMap["description"] = m_desc;
-    metadataMap["url"] = m_URL;
+    metadataMap["url"] = m_url;
     metadataMap["thumbnail"] = m_thumbnail;
     metadataMap["mediaurl"] = m_mediaURL;
     metadataMap["author"] = m_author;
@@ -269,7 +269,7 @@ public:
     {
         QList<MRSSEntry> result;
 
-        QDomNodeList groups = item.elementsByTagNameNS(Parse::s_MediaRSS,
+        QDomNodeList groups = item.elementsByTagNameNS(Parse::kMediaRSS,
             "group");
 
         for (int i = 0; i < groups.size(); ++i)
@@ -285,7 +285,7 @@ private:
     static QList<MRSSEntry> CollectChildren(const QDomElement& holder)
     {
          QList<MRSSEntry> result;
-         QDomNodeList entries = holder.elementsByTagNameNS(Parse::s_MediaRSS,
+         QDomNodeList entries = holder.elementsByTagNameNS(Parse::kMediaRSS,
              "content");
 
          for (int i = 0; i < entries.size(); ++i)
@@ -379,7 +379,7 @@ private:
 
     static QString GetURL(const QDomElement& element)
     {
-        QList<QDomNode> elems = GetDirectChildrenNS(element, Parse::s_MediaRSS,
+        QList<QDomNode> elems = GetDirectChildrenNS(element, Parse::kMediaRSS,
             "player");
         if (elems.empty())
             return QString();
@@ -389,7 +389,7 @@ private:
 
     static QString GetTitle(const QDomElement& element)
     {
-        QList<QDomNode> elems = GetDirectChildrenNS(element, Parse::s_MediaRSS,
+        QList<QDomNode> elems = GetDirectChildrenNS(element, Parse::kMediaRSS,
             "title");
 
         if (elems.empty())
@@ -401,7 +401,7 @@ private:
 
     static QString GetDescription(const QDomElement& element)
     {
-        QList<QDomNode> elems = GetDirectChildrenNS(element, Parse::s_MediaRSS,
+        QList<QDomNode> elems = GetDirectChildrenNS(element, Parse::kMediaRSS,
             "description");
 
         if (elems.empty())
@@ -413,7 +413,7 @@ private:
 
     static QString GetKeywords(const QDomElement& element)
     {
-        QList<QDomNode> elems = GetDirectChildrenNS(element, Parse::s_MediaRSS,
+        QList<QDomNode> elems = GetDirectChildrenNS(element, Parse::kMediaRSS,
             "keywords");
 
         if (elems.empty())
@@ -438,7 +438,7 @@ private:
     static QList<MRSSThumbnail> GetThumbnails(const QDomElement& element)
     {
         QList<MRSSThumbnail> result;
-        QList<QDomNode> thumbs = GetDirectChildrenNS(element, Parse::s_MediaRSS,
+        QList<QDomNode> thumbs = GetDirectChildrenNS(element, Parse::kMediaRSS,
             "thumbnail");
         for (int i = 0; i < thumbs.size(); ++i)
         {
@@ -462,7 +462,7 @@ private:
     static QList<MRSSCredit> GetCredits(const QDomElement& element)
     {
         QList<MRSSCredit> result;
-        QList<QDomNode> credits = GetDirectChildrenNS(element, Parse::s_MediaRSS,
+        QList<QDomNode> credits = GetDirectChildrenNS(element, Parse::kMediaRSS,
            "credit");
 
         for (int i = 0; i < credits.size(); ++i)
@@ -483,13 +483,13 @@ private:
     static QList<MRSSComment> GetComments(const QDomElement& element)
     {
         QList<MRSSComment> result;
-        QList<QDomNode> commParents = GetDirectChildrenNS(element, Parse::s_MediaRSS,
+        QList<QDomNode> commParents = GetDirectChildrenNS(element, Parse::kMediaRSS,
             "comments");
 
         if (!commParents.empty())
         {
             QDomNodeList comments = commParents.at(0).toElement()
-                .elementsByTagNameNS(Parse::s_MediaRSS,
+                .elementsByTagNameNS(Parse::kMediaRSS,
                 "comment");
             for (int i = 0; i < comments.size(); ++i)
             {
@@ -502,13 +502,13 @@ private:
             }
         }
 
-        QList<QDomNode> respParents = GetDirectChildrenNS(element, Parse::s_MediaRSS,
+        QList<QDomNode> respParents = GetDirectChildrenNS(element, Parse::kMediaRSS,
             "responses");
 
         if (!respParents.empty())
         {
             QDomNodeList responses = respParents.at(0).toElement()
-                .elementsByTagNameNS(Parse::s_MediaRSS,
+                .elementsByTagNameNS(Parse::kMediaRSS,
                 "response");
             for (int i = 0; i < responses.size(); ++i)
             {
@@ -521,13 +521,13 @@ private:
             }
         }
 
-        QList<QDomNode> backParents = GetDirectChildrenNS(element, Parse::s_MediaRSS,
+        QList<QDomNode> backParents = GetDirectChildrenNS(element, Parse::kMediaRSS,
             "backLinks");
 
         if (!backParents.empty())
         {
             QDomNodeList backlinks = backParents.at(0).toElement()
-                .elementsByTagNameNS(Parse::s_MediaRSS,
+                .elementsByTagNameNS(Parse::kMediaRSS,
                 "backLink");
             for (int i = 0; i < backlinks.size(); ++i)
             {
@@ -545,7 +545,7 @@ private:
     static QList<MRSSPeerLink> GetPeerLinks(const QDomElement& element)
     {
         QList<MRSSPeerLink> result;
-        QList<QDomNode> links = GetDirectChildrenNS(element, Parse::s_MediaRSS,
+        QList<QDomNode> links = GetDirectChildrenNS(element, Parse::kMediaRSS,
             "peerLink");
 
         for (int i = 0; i < links.size(); ++i)
@@ -564,13 +564,13 @@ private:
     static QList<MRSSScene> GetScenes(const QDomElement& element)
     {
         QList<MRSSScene> result;
-        QList<QDomNode> scenesNode = GetDirectChildrenNS(element, Parse::s_MediaRSS,
+        QList<QDomNode> scenesNode = GetDirectChildrenNS(element, Parse::kMediaRSS,
             "scenes");
 
         if (!scenesNode.empty())
         {
             QDomNodeList scenesNodes = scenesNode.at(0).toElement()
-                .elementsByTagNameNS(Parse::s_MediaRSS, "scene");
+                .elementsByTagNameNS(Parse::kMediaRSS, "scene");
 
             for (int i = 0; i < scenesNodes.size(); ++i)
             {
@@ -594,7 +594,7 @@ private:
         QString rating;
         QString rscheme;
         {
-            QList<QDomNode> elems = GetDirectChildrenNS(element, Parse::s_MediaRSS,
+            QList<QDomNode> elems = GetDirectChildrenNS(element, Parse::kMediaRSS,
                 "rating");
 
             if (!elems.empty())
@@ -611,7 +611,7 @@ private:
         QString curl;
         QString ctext;
         {
-            QList<QDomNode> elems = GetDirectChildrenNS(element, Parse::s_MediaRSS,
+            QList<QDomNode> elems = GetDirectChildrenNS(element, Parse::kMediaRSS,
                 "copyright");
 
             if (!elems.empty())
@@ -631,12 +631,12 @@ private:
         int favs = 0;
         QString tags;
         {
-            QList<QDomNode> comms = GetDirectChildrenNS(element, Parse::s_MediaRSS,
+            QList<QDomNode> comms = GetDirectChildrenNS(element, Parse::kMediaRSS,
                 "community");
             if (!comms.empty())
             {
                 QDomElement comm = comms.at(0).toElement();
-                QDomNodeList stars = comm.elementsByTagNameNS(Parse::s_MediaRSS,
+                QDomNodeList stars = comm.elementsByTagNameNS(Parse::kMediaRSS,
                     "starRating");
                 if (stars.size())
                 {
@@ -647,7 +647,7 @@ private:
                     rmax = GetInt(ratingDom, "max");
                 }
 
-                QDomNodeList stats = comm.elementsByTagNameNS(Parse::s_MediaRSS,
+                QDomNodeList stats = comm.elementsByTagNameNS(Parse::kMediaRSS,
                     "statistics");
                 if (stats.size())
                 {
@@ -656,7 +656,7 @@ private:
                     favs = GetInt(stat, "favorites");
                  }
 
-                QDomNodeList tagsNode = comm.elementsByTagNameNS(Parse::s_MediaRSS,
+                QDomNodeList tagsNode = comm.elementsByTagNameNS(Parse::kMediaRSS,
                     "tags");
                 if (tagsNode.size())
                 {
@@ -697,17 +697,17 @@ private:
 //          Search Construction, Destruction
 //========================================================================================
 
-const QString Parse::s_DC = "http://purl.org/dc/elements/1.1/";
-const QString Parse::s_WFW = "http://wellformedweb.org/CommentAPI/";
-const QString Parse::s_Atom = "http://www.w3.org/2005/Atom";
-const QString Parse::s_RDF = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
-const QString Parse::s_Slash = "http://purl.org/rss/1.0/modules/slash/";
-const QString Parse::s_Enc = "http://purl.oclc.org/net/rss_2.0/enc#";
-const QString Parse::s_ITunes = "http://www.itunes.com/dtds/podcast-1.0.dtd";
-const QString Parse::s_GeoRSSSimple = "http://www.georss.org/georss";
-const QString Parse::s_GeoRSSW3 = "http://www.w3.org/2003/01/geo/wgs84_pos#";
-const QString Parse::s_MediaRSS = "http://search.yahoo.com/mrss/";
-const QString Parse::s_MythRSS = "http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format";
+const QString Parse::kDC = "http://purl.org/dc/elements/1.1/";
+const QString Parse::kWFW = "http://wellformedweb.org/CommentAPI/";
+const QString Parse::kAtom = "http://www.w3.org/2005/Atom";
+const QString Parse::kRDF = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+const QString Parse::kSlash = "http://purl.org/rss/1.0/modules/slash/";
+const QString Parse::kEnc = "http://purl.oclc.org/net/rss_2.0/enc#";
+const QString Parse::kITunes = "http://www.itunes.com/dtds/podcast-1.0.dtd";
+const QString Parse::kGeoRSSSimple = "http://www.georss.org/georss";
+const QString Parse::kGeoRSSW3 = "http://www.w3.org/2003/01/geo/wgs84_pos#";
+const QString Parse::kMediaRSS = "http://search.yahoo.com/mrss/";
+const QString Parse::kMythRSS = "http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format";
 
 ResultItem::resultList Parse::parseRSS(const QDomDocument& domDoc)
 {
@@ -734,13 +734,27 @@ ResultItem::resultList Parse::parseRSS(const QDomDocument& domDoc)
 
 ResultItem* Parse::ParseItem(const QDomElement& item) const
 {
-    QString title(""), subtitle(""), description(""), url(""), author(""),
-            duration(""), rating(""), thumbnail(""), mediaURL(""), player(""),
-            language(""), download("");
+    QString title("");
+    QString subtitle("");
+    QString description("");
+    QString url("");
+    QString author("");
+    QString duration("");
+    QString rating("");
+    QString thumbnail("");
+    QString mediaURL("");
+    QString player("");
+    QString language("");
+    QString download("");
     off_t filesize = 0;
-    uint width = 0, height = 0, season = 0, episode = 0;
+    uint width = 0;
+    uint height = 0;
+    uint season = 0;
+    uint episode = 0;
     QDateTime date;
-    QStringList playerargs, downloadargs, countries;
+    QStringList playerargs;
+    QStringList downloadargs;
+    QStringList countries;
     bool downloadable = true;
     bool customhtml = false;
 
@@ -751,7 +765,7 @@ ResultItem* Parse::ParseItem(const QDomElement& item) const
         title = "";
 
     // Get the subtitle of this item.
-    QDomNodeList subt = item.elementsByTagNameNS(s_MythRSS, "subtitle");
+    QDomNodeList subt = item.elementsByTagNameNS(kMythRSS, "subtitle");
     if (subt.size())
     {
         subtitle = subt.at(0).toElement().text();
@@ -763,7 +777,7 @@ ResultItem* Parse::ParseItem(const QDomElement& item) const
         description = descriptiontemp.text();
     if (description.isEmpty())
     {
-        QDomNodeList nodes = item.elementsByTagNameNS(s_ITunes, "summary");
+        QDomNodeList nodes = item.elementsByTagNameNS(kITunes, "summary");
         if (nodes.size())
             description = nodes.at(0).toElement().text();
     }
@@ -791,7 +805,7 @@ ResultItem* Parse::ParseItem(const QDomElement& item) const
         date = MythDate::current();
 
     // Parse the insane iTunes duration (HH:MM:SS or H:MM:SS or MM:SS or M:SS or SS)
-    QDomNodeList dur = item.elementsByTagNameNS(s_ITunes, "duration");
+    QDomNodeList dur = item.elementsByTagNameNS(kITunes, "duration");
     if (dur.size())
     {
         QString itunestime = dur.at(0).toElement().text();
@@ -847,7 +861,7 @@ ResultItem* Parse::ParseItem(const QDomElement& item) const
         downloadargs = downloadargstemp.text().split(" ");
 
     // Get the countries in which this item is playable
-    QDomNodeList cties = item.elementsByTagNameNS(s_MythRSS, "country");
+    QDomNodeList cties = item.elementsByTagNameNS(kMythRSS, "country");
     if (cties.size())
     {
         int i = 0;
@@ -859,21 +873,21 @@ ResultItem* Parse::ParseItem(const QDomElement& item) const
     }
 
     // Get the season number of this item.
-    QDomNodeList seas = item.elementsByTagNameNS(s_MythRSS, "season");
+    QDomNodeList seas = item.elementsByTagNameNS(kMythRSS, "season");
     if (seas.size())
     {
         season = seas.at(0).toElement().text().toUInt();
     }
 
     // Get the Episode number of this item.
-    QDomNodeList ep = item.elementsByTagNameNS(s_MythRSS, "episode");
+    QDomNodeList ep = item.elementsByTagNameNS(kMythRSS, "episode");
     if (ep.size())
     {
         episode = ep.at(0).toElement().text().toUInt();
     }
 
     // Does this grabber return custom HTML?
-    QDomNodeList html = item.elementsByTagNameNS(s_MythRSS, "customhtml");
+    QDomNodeList html = item.elementsByTagNameNS(kMythRSS, "customhtml");
     if (html.size())
     {
         QString htmlstring = html.at(0).toElement().text();
@@ -960,7 +974,7 @@ QString Parse::GetLink(const QDomElement& parent)
 QString Parse::GetAuthor(const QDomElement& parent)
 {
     QString result("");
-    QDomNodeList nodes = parent.elementsByTagNameNS(s_ITunes,
+    QDomNodeList nodes = parent.elementsByTagNameNS(kITunes,
         "author");
     if (nodes.size())
     {
@@ -968,7 +982,7 @@ QString Parse::GetAuthor(const QDomElement& parent)
         return result;
     }
 
-    nodes = parent.elementsByTagNameNS(s_DC,
+    nodes = parent.elementsByTagNameNS(kDC,
        "creator");
     if (nodes.size())
     {
@@ -982,7 +996,7 @@ QString Parse::GetAuthor(const QDomElement& parent)
 QString Parse::GetCommentsRSS(const QDomElement& parent)
 {
     QString result;
-    QDomNodeList nodes = parent.elementsByTagNameNS(s_WFW,
+    QDomNodeList nodes = parent.elementsByTagNameNS(kWFW,
         "commentRss");
     if (nodes.size())
         result = nodes.at(0).toElement().text();
@@ -1000,7 +1014,7 @@ QString Parse::GetCommentsLink(const QDomElement& parent)
 
 QDateTime Parse::GetDCDateTime(const QDomElement& parent)
 {
-    QDomNodeList dates = parent.elementsByTagNameNS(s_DC, "date");
+    QDomNodeList dates = parent.elementsByTagNameNS(kDC, "date");
     if (!dates.size())
         return QDateTime();
     return FromRFC3339(dates.at(0).toElement().text());
@@ -1012,7 +1026,8 @@ QDateTime Parse::RFC822TimeToQDateTime(const QString& t) const
         return QDateTime();
 
     QString time = t.simplified();
-    short int hoursShift = 0, minutesShift = 0;
+    short int hoursShift = 0;
+    short int minutesShift = 0;
 
     QStringList tmp = time.split(' ');
     if (tmp.isEmpty())
@@ -1033,7 +1048,7 @@ QDateTime Parse::RFC822TimeToQDateTime(const QString& t) const
         }
     }
     else
-        hoursShift = TimezoneOffsets.value(tmpTimezone, 0);
+        hoursShift = m_timezoneOffsets.value(tmpTimezone, 0);
 
     if (tmp.at(0).size() == 1)
         tmp[0].prepend("0");
@@ -1055,7 +1070,6 @@ QDateTime Parse::RFC822TimeToQDateTime(const QString& t) const
 
 QDateTime Parse::FromRFC3339(const QString& t)
 {
-    int hoursShift = 0, minutesShift = 0;
     if (t.size() < 19)
         return QDateTime();
     QDateTime result = MythDate::fromString(t.left(19).toUpper());
@@ -1079,8 +1093,8 @@ QDateTime Parse::FromRFC3339(const QString& t)
         short int multiplier = -1;
         if (timeZone.cap(1) == "-")
             multiplier = 1;
-        hoursShift = timeZone.cap(2).toInt();
-        minutesShift = timeZone.cap(4).toInt();
+        int hoursShift = timeZone.cap(2).toInt();
+        int minutesShift = timeZone.cap(4).toInt();
         result = result.addSecs(hoursShift * 3600 * multiplier + minutesShift * 60 * multiplier);
     }
     result.setTimeSpec(Qt::UTC);

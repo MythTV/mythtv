@@ -165,7 +165,10 @@ bounding_box(const AVFrame *img, int imgheight,
     int col = mincol;
     int width = maxcol1 - mincol;
     int height = maxrow1 - minrow;
-    int newrow = 0, newcol = 0, newright = 0, newbottom = 0;
+    int newrow = 0;
+    int newcol = 0;
+    int newright = 0;
+    int newbottom = 0;
 
     for (;;)
     {
@@ -451,10 +454,12 @@ template_alloc(const unsigned int *scores, int width, int height,
      */
     static constexpr float kMinScorePctile = 0.998;
 
-    const int               nn = width * height;
-    int                     ii = 0, first = 0, last = 0;
-    unsigned int            threshscore = 0;
-    AVFrame               thresh;
+    const int    nn = width * height;
+    int          ii = 0;
+    int          first = 0;
+    int          last = 0;
+    unsigned int threshscore = 0;
+    AVFrame      thresh;
 
     if (av_image_alloc(thresh.data, thresh.linesize,
         width, height, AV_PIX_FMT_GRAY8, IMAGE_ALIGN))
@@ -496,7 +501,7 @@ template_alloc(const unsigned int *scores, int width, int height,
             .arg((float)first / nn, 0, 'f', 6)
             .arg((float)last / nn, 0, 'f', 6));
 
-    for (ii = 0; ii < nn; ii++)
+    for (int ii = 0; ii < nn; ii++)
         thresh.data[0][ii] = scores[ii] >= threshscore ? UCHAR_MAX : 0;
 
     if (debug_edgecounts)
@@ -512,7 +517,7 @@ template_alloc(const unsigned int *scores, int width, int height,
             goto free_thresh;
         }
         unsigned int maxscore = sortedscores[nn - 1];
-        for (ii = 0; ii < nn; ii++)
+        for (int ii = 0; ii < nn; ii++)
             scored.data[0][ii] = scores[ii] * UCHAR_MAX / maxscore;
         bool success = writeJPG(debugdir + "/TemplateFinder-scores", &scored,
                 height);
@@ -570,8 +575,11 @@ analyzeFrameDebug(long long frameno, const AVFrame *pgm, int pgmheight,
         int croprow, int cropcol, bool debug_frames, const QString& debugdir)
 {
     static constexpr int kDelta = 24;
-    static int          s_lastrow, s_lastcol, s_lastwidth, s_lastheight;
-    const int           cropwidth = cropped->linesize[0];
+    static int s_lastrow;
+    static int s_lastcol;
+    static int s_lastwidth;
+    static int s_lastheight;
+    const int  cropwidth = cropped->linesize[0];
 
     int rowsame    = abs(s_lastrow - croprow) <= kDelta ? 1 : 0;
     int colsame    = abs(s_lastcol - cropcol) <= kDelta ? 1 : 0;
@@ -613,8 +621,8 @@ analyzeFrameDebug(long long frameno, const AVFrame *pgm, int pgmheight,
     return true;
 }
 
-bool
-readTemplate(const QString& datafile, int *prow, int *pcol, int *pwidth, int *pheight,
+/* NOLINTNEXTLINE(readability-non-const-parameter) */
+bool readTemplate(const QString& datafile, int *prow, int *pcol, int *pwidth, int *pheight,
         const QString& tmplfile, AVFrame *tmpl, bool *pvalid)
 {
     QFile dfile(datafile);
@@ -769,7 +777,8 @@ TemplateFinder::MythPlayerInited(MythPlayer *player, long long nframes)
      *    correct): don't "pollute" the set of candidate template edges with
      *    the "content" edges in the non-template portions of the frame.
      */
-    QString tmpldims, playerdims;
+    QString tmpldims;
+    QString playerdims;
 
     (void)nframes; /* gcc */
     QSize buf_dim = player->GetVideoBufferSize();
@@ -880,9 +889,15 @@ TemplateFinder::analyzeFrame(const VideoFrame *frame, long long frameno,
     static constexpr float kExcludeWidth = 0.5;
     static constexpr float kExcludeHeight = 0.5;
 
-    int                 pgmwidth= 0, pgmheight = 0;
-    int                 croprow= 0, cropcol = 0, cropwidth = 0, cropheight = 0;
-    struct timeval      start {}, end {}, elapsed {};
+    int            pgmwidth= 0;
+    int            pgmheight = 0;
+    int            croprow= 0;
+    int            cropcol = 0;
+    int            cropwidth = 0;
+    int            cropheight = 0;
+    struct timeval start {};
+    struct timeval end {};
+    struct timeval elapsed {};
 
     if (frameno < m_nextFrame)
     {

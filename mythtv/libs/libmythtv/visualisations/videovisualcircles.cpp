@@ -13,7 +13,8 @@ void VideoVisualCircles::DrawPriv(MythPainter *painter, QPaintDevice* device)
         return;
 
     static const QBrush kNobrush(Qt::NoBrush);
-    int red = 0, green = 200;
+    int red = 0;
+    int green = 200;
     QPen pen(QColor(red, green, 0, 255));
     int count = m_scale.range();
     int incr = 200 / count;

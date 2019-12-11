@@ -210,7 +210,7 @@ MythOpenGLInterop::MythOpenGLInterop(MythRenderOpenGL *Context, Type InteropType
 
 MythOpenGLInterop::~MythOpenGLInterop()
 {
-    DeleteTextures();
+    MythOpenGLInterop::DeleteTextures();
     if (m_context)
         m_context->DecrRef();
 }

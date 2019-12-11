@@ -44,6 +44,9 @@ ImageProperties::ImageProperties(const ImageProperties& other)
 
 ImageProperties &ImageProperties::operator=(const ImageProperties &other)
 {
+    if (this == &other)
+        return *this;
+
     Copy(other);
 
     return *this;
@@ -1242,7 +1245,8 @@ void MythUIImage::DrawSelf(MythPainter *p, int xoffset, int yoffset,
             area.setSize(area.size().expandedTo(currentImage->size()));
 
         // Centre image in available space, accounting for zoom
-        int x = 0, y = 0;
+        int x = 0;
+        int y = 0;
         QRect visibleImage = m_Effects.GetExtent(currentImageArea.size());
 
         if (area.width() > visibleImage.width())

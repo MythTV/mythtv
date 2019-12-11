@@ -140,8 +140,9 @@ void VideoVisual::add(const void *b, unsigned long b_len, unsigned long w, int c
     if (m_disabled)
         return;
 
-    long len = b_len, cnt;
-    short *l = nullptr, *r = nullptr;
+    long len = b_len;
+    short *l = nullptr;
+    short *r = nullptr;
 
     len /= c;
     len /= (p / 8);
@@ -149,7 +150,7 @@ void VideoVisual::add(const void *b, unsigned long b_len, unsigned long w, int c
     if (len > 512)
         len = 512;
 
-    cnt = len;
+    long cnt = len;
 
     if (c == 2)
     {

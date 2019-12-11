@@ -882,7 +882,8 @@ void RingBuffer::run(void)
     RunProlog();
 
     // These variables are used to adjust the read block size
-    struct timeval lastread {}, now {};
+    struct timeval lastread {};
+    struct timeval now {};
     int readtimeavg = 300;
     bool ignore_for_read_timing = true;
     int eofreads = 0;

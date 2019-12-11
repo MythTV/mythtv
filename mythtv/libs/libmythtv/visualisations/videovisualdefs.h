@@ -7,28 +7,27 @@ class LogScale
 {
   public:
     LogScale(int maxscale = 0, int maxrange = 0)
-    : indices(nullptr), s(0), r(0)
     {
         setMax(maxscale, maxrange);
     }
 
    ~LogScale()
     {
-        delete [] indices;
+        delete [] m_indices;
     }
 
-    int scale() const { return s; }
-    int range() const { return r; }
+    int scale() const { return m_s; }
+    int range() const { return m_r; }
 
     void setMax(int maxscale, int maxrange)
     {
         if (maxscale == 0 || maxrange == 0)
             return;
 
-        s = maxscale;
-        r = maxrange;
+        m_s = maxscale;
+        m_r = maxrange;
 
-        delete [] indices;
+        delete [] m_indices;
 
         double alpha;
         long double domain = (long double) maxscale;
@@ -37,9 +36,9 @@ class LogScale
         long double dx = 1.0;
         long double e4 = 1.0E-8;
 
-        indices = new int[maxrange];
+        m_indices = new int[maxrange];
         for (int i = 0; i < maxrange; i++)
-            indices[i] = 0;
+            m_indices[i] = 0;
 
         // initialize log scale
         for (uint i = 0; i < 10000 && (std::abs(dx) > e4); i++)
@@ -57,20 +56,21 @@ class LogScale
             int scaled = (int) floor(0.5 + (alpha * log((double(i) + alpha) / alpha)));
             if (scaled < 1)
                 scaled = 1;
-            if (indices[scaled - 1] < i)
-                indices[scaled - 1] = i;
+            if (m_indices[scaled - 1] < i)
+                m_indices[scaled - 1] = i;
         }
     }
 
     int operator[](int index) const
     {
-        return indices[index];
+        return m_indices[index];
     }
 
 
   private:
-    int *indices;
-    int s, r;
+    int *m_indices {nullptr};
+    int  m_s       {0};
+    int  m_r       {0};
 };
 
 static inline void stereo16_from_stereopcm8(short *l,

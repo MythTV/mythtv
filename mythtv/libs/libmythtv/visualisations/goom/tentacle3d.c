@@ -35,10 +35,13 @@ void tentacle_new (void) {
 	vals = (float*)malloc ((definitionx+20)*sizeof(float));
 	
 	for (tmp=0;tmp<nbgrid;tmp++) {
-		int x,z;
-		z = 45+rand()%30;
-		x = 85+rand()%5;
+		// Pseudo-random is good enough. Don't need a true random.
+		// NOLINTNEXTLINE(cert-msc30-c,cert-msc50-cpp)
+		int z = 45+rand()%30;
+		// NOLINTNEXTLINE(cert-msc30-c,cert-msc50-cpp)
+		int x = 85+rand()%5;
 		center.z = z;
+		// NOLINTNEXTLINE(cert-msc30-c,cert-msc50-cpp)
 		grille[tmp] = grid3d_new (x,definitionx,z,definitionz+rand()%10,center);
 		center.y += 8;
 	}
@@ -163,7 +166,9 @@ void tentacle_update(int *buf, int *back, int W, int H, short data[2][512], floa
 	int color;
 	int colorlow;
 
-	float dist,dist2,rotangle;
+	float dist;
+	float dist2;
+	float rotangle;
 
 	if ((!drawit) && (s_ligs>0.0F))
 		s_ligs = -s_ligs;

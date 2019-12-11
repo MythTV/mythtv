@@ -216,7 +216,8 @@ void ExternRecChannelScanner::run(void)
 
 void ExternRecChannelScanner::SetNumChannelsParsed(uint val)
 {
-    uint minval = 35, range = 70 - minval;
+    uint minval = 35;
+    uint range = 70 - minval;
     uint pct = minval + (uint) truncf((((float)val) / m_channel_cnt) * range);
     if (m_scan_monitor)
         m_scan_monitor->ScanPercentComplete(pct);
@@ -224,7 +225,8 @@ void ExternRecChannelScanner::SetNumChannelsParsed(uint val)
 
 void ExternRecChannelScanner::SetNumChannelsInserted(uint val)
 {
-    uint minval = 70, range = 100 - minval;
+    uint minval = 70;
+    uint range = 100 - minval;
     uint pct = minval + (uint) truncf((((float)val) / m_channel_cnt) * range);
     if (m_scan_monitor)
         m_scan_monitor->ScanPercentComplete(pct);

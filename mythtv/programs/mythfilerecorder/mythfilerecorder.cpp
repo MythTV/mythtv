@@ -69,7 +69,8 @@ void Streamer::CloseFile(void)
 
 void Streamer::SendBytes(void)
 {
-    int pkt_size = 0, buf_size = 0, write_len = 0, wrote = 0;
+    int pkt_size = 0;
+    int buf_size = 0;
 
     LOG(VB_RECORD, LOG_DEBUG, LOC + "SendBytes -- start");
 
@@ -131,13 +132,13 @@ void Streamer::SendBytes(void)
         QString("SendBytes -- Read %1 from file.  %2 bytes buffered")
         .arg(pkt_size).arg(buf_size));
 
-    write_len = m_blockSize.loadAcquire();
+    int write_len = m_blockSize.loadAcquire();
     if (write_len > buf_size)
         write_len = buf_size;
     LOG(VB_RECORD, LOG_DEBUG, LOC +
         QString("SendBytes -- writing %1 bytes").arg(write_len));
 
-    wrote = write(1, m_buffer.constData(), write_len);
+    int wrote = write(1, m_buffer.constData(), write_len);
 
     LOG(VB_RECORD, LOG_DEBUG, LOC +
         QString("SendBytes -- wrote %1 bytes").arg(wrote));

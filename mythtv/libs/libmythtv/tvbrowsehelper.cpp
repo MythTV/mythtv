@@ -266,8 +266,15 @@ void TVBrowseHelper::GetNextProgram(
     if (!m_ctx || !m_ctx->m_recorder)
         return;
 
-    QString title, subtitle, desc, category, endtime, callsign, iconpath;
-    QDateTime begts, endts;
+    QString title;
+    QString subtitle;
+    QString desc;
+    QString category;
+    QString endtime;
+    QString callsign;
+    QString iconpath;
+    QDateTime begts;
+    QDateTime endts;
 
     QString starttime = infoMap["dbstarttime"];
     QString chanid    = infoMap["chanid"];
@@ -303,7 +310,8 @@ void TVBrowseHelper::GetNextProgram(
     infoMap["lentime"] = "0:00";
     if (begts.isValid() && endts.isValid())
     {
-        QString lenM, lenHM;
+        QString lenM;
+        QString lenHM;
         format_time(begts.secsTo(endts), lenM, lenHM);
         infoMap["lenmins"] = lenM;
         infoMap["lentime"] = lenHM;

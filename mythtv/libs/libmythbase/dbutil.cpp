@@ -387,7 +387,10 @@ QStringList DBUtil::CheckRepairStatus(MSqlQuery &query)
     int table_index = record.indexOf("Table");
     int type_index = record.indexOf("Msg_type");
     int text_index = record.indexOf("Msg_text");
-    QString table, type, text, previous_table;
+    QString table;
+    QString type;
+    QString text;
+    QString previous_table;
     bool ok = true;
     while (query.next())
     {
@@ -564,7 +567,7 @@ bool DBUtil::DoBackup(const QString &backupScript, QString &filename,
     DatabaseParams dbParams = gCoreContext->GetDatabaseParams();
     QString     dbSchemaVer = gCoreContext->GetSetting("DBSchemaVer");
     QString backupDirectory = GetBackupDirectory();
-    QString  backupFilename = CreateBackupFilename(dbParams.dbName + "-" +
+    QString  backupFilename = CreateBackupFilename(dbParams.m_dbName + "-" +
                                                    dbSchemaVer, ".sql");
     QString      scriptArgs = gCoreContext->GetSetting("BackupDBScriptArgs");
     QString rotate = "";
@@ -580,9 +583,9 @@ bool DBUtil::DoBackup(const QString &backupScript, QString &filename,
                 "DBUserName=%3\nDBPassword=%4\n"
                 "DBName=%5\nDBSchemaVer=%6\n"
                 "DBBackupDirectory=%7\nDBBackupFilename=%8\n%9\n")
-        .arg(dbParams.dbHostName).arg(dbParams.dbPort)
-        .arg(dbParams.dbUserName).arg(dbParams.dbPassword)
-        .arg(dbParams.dbName).arg(dbSchemaVer)
+        .arg(dbParams.m_dbHostName).arg(dbParams.m_dbPort)
+        .arg(dbParams.m_dbUserName).arg(dbParams.m_dbPassword)
+        .arg(dbParams.m_dbName).arg(dbSchemaVer)
         .arg(backupDirectory).arg(backupFilename).arg(rotate);
     QString tempDatabaseConfFile;
     bool hastemp = CreateTemporaryDBConf(privateinfo, tempDatabaseConfFile);
@@ -672,27 +675,27 @@ bool DBUtil::DoBackup(QString &filename)
                                   "The database backup will be uncompressed.");
 
     QString backupFilename = CreateBackupFilename(
-        dbParams.dbName + "-" + dbSchemaVer, extension);
+        dbParams.m_dbName + "-" + dbSchemaVer, extension);
     QString backupPathname = backupDirectory + "/" + backupFilename;
 
     QString privateinfo = QString(
         "[client]\npassword=%1\n[mysqldump]\npassword=%2\n")
-        .arg(dbParams.dbPassword).arg(dbParams.dbPassword);
+        .arg(dbParams.m_dbPassword).arg(dbParams.m_dbPassword);
     QString tempExtraConfFile;
     if (!CreateTemporaryDBConf(privateinfo, tempExtraConfFile))
         return false;
 
     QString portArg = "";
-    if (dbParams.dbPort > 0)
-        portArg = QString(" --port='%1'").arg(dbParams.dbPort);
+    if (dbParams.m_dbPort > 0)
+        portArg = QString(" --port='%1'").arg(dbParams.m_dbPort);
     command = QString("mysqldump --defaults-extra-file='%1' --host='%2'%3"
                       " --user='%4' --add-drop-table --add-locks"
                       " --allow-keywords --complete-insert"
                       " --extended-insert --lock-tables --no-create-db --quick"
                       " '%5' > '%6' 2>/dev/null")
-                      .arg(tempExtraConfFile).arg(dbParams.dbHostName)
-                      .arg(portArg).arg(dbParams.dbUserName)
-                      .arg(dbParams.dbName).arg(backupPathname);
+                      .arg(tempExtraConfFile).arg(dbParams.m_dbHostName)
+                      .arg(portArg).arg(dbParams.m_dbUserName)
+                      .arg(dbParams.m_dbName).arg(backupPathname);
 
     LOG(VB_FILE, LOG_INFO, QString("Backing up database with command: '%1'")
             .arg(command));
@@ -779,7 +782,8 @@ bool DBUtil::ParseDBMSVersion()
             return false;
 
     QString section;
-    int pos = 0, i = 0;
+    int pos = 0;
+    int i = 0;
     int version[3] = {-1, -1, -1};
     QRegExp digits("(\\d+)");
 
@@ -823,7 +827,7 @@ int DBUtil::CountClients(void)
 
     QSqlRecord record = query.record();
     int db_index = record.indexOf("db");
-    QString dbName = gCoreContext->GetDatabaseParams().dbName;
+    QString dbName = gCoreContext->GetDatabaseParams().m_dbName;
     QString inUseDB;
 
     while (query.next())

@@ -576,7 +576,8 @@ QString PreviewGeneratorQueue::GeneratePreviewImage(
     }
     else
     {
-        uint queue_depth, token_cnt;
+        uint queue_depth;
+        uint token_cnt;
         GetInfo(key, queue_depth, token_cnt);
         QString msg = QString("Queue depth %1, our tokens %2")
             .arg(queue_depth).arg(token_cnt);

@@ -173,6 +173,7 @@ class MBASE_PUBLIC MythSystemLegacy : public QObject
   private:
     Q_DISABLE_COPY(MythSystemLegacy)
     void initializePrivate(void);
+    // NOLINTNEXTLINE(readability-identifier-naming)
     MythSystemLegacyPrivate *d {nullptr}; // FIXME we generally call this m_priv in MythTV
 
   protected:

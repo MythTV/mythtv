@@ -142,7 +142,7 @@ class AvFormatDecoder : public DecoderBase
 
     QString      GetCodecDecoderName(void) const override; // DecoderBase
     QString      GetRawEncodingType(void) override; // DecoderBase
-    MythCodecID  GetVideoCodecID(void) const override { return m_video_codec_id; } // DecoderBase
+    MythCodecID  GetVideoCodecID(void) const override { return m_videoCodecId; } // DecoderBase
 
     void SetDisablePassThrough(bool disable) override; // DecoderBase
     void ForceSetupAudioStream(void) override; // DecoderBase
@@ -161,7 +161,7 @@ class AvFormatDecoder : public DecoderBase
     bool DoRewind(long long desiredFrame, bool discardFrames = true) override; // DecoderBase
     bool DoFastForward(long long desiredFrame, bool discardFrames = true) override; // DecoderBase
     void SetIdrOnlyKeyframes(bool value) override // DecoderBase
-        { m_h264_parser->use_I_forKeyframes(!value); }
+        { m_h264Parser->use_I_forKeyframes(!value); }
 
     int64_t NormalizeVideoTimecode(int64_t timecode) override; // DecoderBase
     virtual int64_t NormalizeVideoTimecode(AVStream *st, int64_t timecode);
@@ -266,104 +266,104 @@ class AvFormatDecoder : public DecoderBase
 
     virtual int ReadPacket(AVFormatContext *ctx, AVPacket *pkt, bool &storePacket);
 
-    PrivateDecoder    *m_private_dec                  {nullptr};
+    PrivateDecoder    *m_privateDec                   {nullptr};
 
-    bool               m_is_db_ignored;
+    bool               m_isDbIgnored;
 
-    H264Parser        *m_h264_parser                  {nullptr};
+    H264Parser        *m_h264Parser                   {nullptr};
 
     AVFormatContext   *m_ic                           {nullptr};
     // AVFormatParameters params;
 
-    URLContext         m_readcontext                  {};
+    URLContext         m_readContext                  {};
 
-    int                m_frame_decoded                {0};
-    VideoFrame        *m_decoded_video_frame          {nullptr};
+    int                m_frameDecoded                 {0};
+    VideoFrame        *m_decodedVideoFrame            {nullptr};
     AVFRingBuffer     *m_avfRingBuffer                {nullptr};
 
-    struct SwsContext *m_sws_ctx                      {nullptr};
-    bool               m_directrendering              {false};
+    struct SwsContext *m_swsCtx                       {nullptr};
+    bool               m_directRendering              {false};
 
-    bool               m_no_dts_hack                  {false};
-    bool               m_dorewind                     {false};
+    bool               m_noDtsHack                    {false};
+    bool               m_doRewind                     {false};
 
-    bool               m_gopset                       {false};
+    bool               m_gopSet                       {false};
     /// A flag to indicate that we've seen a GOP frame.  Used in junction with seq_count.
-    bool               m_seen_gop                     {false};
+    bool               m_seenGop                      {false};
     /// A counter used to determine if we need to force a call to HandleGopStart
-    int                m_seq_count                    {0};
+    int                m_seqCount                     {0};
 
     QList<AVPacket*>   m_storedPackets;
 
-    int                m_prevgoppos                   {0};
+    int                m_prevGopPos                   {0};
 
     // GetFrame
     bool               m_gotVideoFrame                {false};
     bool               m_hasVideo                     {false};
     bool               m_needDummyVideoFrames         {false};
-    bool               m_skipaudio                    {false};
-    bool               m_allowedquit                  {false};
+    bool               m_skipAudio                    {false};
+    bool               m_allowedQuit                  {false};
 
-    uint32_t           m_start_code_state             {0xffffffff};
+    uint32_t           m_startCodeState               {0xffffffff};
 
-    long long          m_lastvpts                     {0};
-    long long          m_lastapts                     {0};
-    long long          m_lastccptsu                   {0};
-    long long          m_firstvpts                    {0};
-    bool               m_firstvptsinuse               {false};
+    long long          m_lastVPts                     {0};
+    long long          m_lastAPts                     {0};
+    long long          m_lastCcPtsu                   {0};
+    long long          m_firstVPts                    {0};
+    bool               m_firstVPtsInuse               {false};
 
-    int64_t            m_faulty_pts                   {0};
-    int64_t            m_faulty_dts                   {0};
-    int64_t            m_last_pts_for_fault_detection {0};
-    int64_t            m_last_dts_for_fault_detection {0};
-    bool               m_pts_detected                 {false};
-    bool               m_reordered_pts_detected       {false};
-    bool               m_pts_selected                 {true};
+    int64_t            m_faultyPts                    {0};
+    int64_t            m_faultyDts                    {0};
+    int64_t            m_lastPtsForFaultDetection     {0};
+    int64_t            m_lastDtsForFaultDetection     {0};
+    bool               m_ptsDetected                  {false};
+    bool               m_reorderedPtsDetected         {false};
+    bool               m_ptsSelected                  {true};
     // set use_frame_timing true to utilize the pts values in returned
     // frames. Set fale to use deprecated method.
-    bool               m_use_frame_timing             {false};
+    bool               m_useFrameTiming               {false};
 
-    bool               m_force_dts_timestamps         {false};
+    bool               m_forceDtsTimestamps           {false};
 
-    PlayerFlags        playerFlags;
-    MythCodecID        m_video_codec_id               {kCodec_NONE};
+    PlayerFlags        m_playerFlags;
+    MythCodecID        m_videoCodecId                 {kCodec_NONE};
 
-    int                m_maxkeyframedist              {-1};
-    int                m_averror_count                {0};
+    int                m_maxKeyframeDist              {-1};
+    int                m_averrorCount                 {0};
 
     // Caption/Subtitle/Teletext decoders
-    uint               m_ignore_scte                  {0};
-    uint               m_invert_scte_field            {0};
-    uint               m_last_scte_field              {0};
+    uint               m_ignoreScte                   {0};
+    uint               m_invertScteField              {0};
+    uint               m_lastScteField                {0};
     CC608Decoder      *m_ccd608                       {nullptr};
     CC708Decoder      *m_ccd708                       {nullptr};
     TeletextDecoder   *m_ttd                          {nullptr};
-    int                m_cc608_parity_table[256]      {0};
+    int                m_cc608ParityTable[256]        {0};
     /// Lookup table for whether a stream was seen in the PMT
     /// entries 0-3 correspond to CEA-608 CC1 through CC4, while
     /// entries 4-67 corresport to CEA-708 streams 0 through 64
-    bool               m_ccX08_in_pmt[64+4]           {};
+    bool               m_ccX08InPmt[64+4]             {};
     /// Lookup table for whether a stream is represented in the UI
     /// entries 0-3 correspond to CEA-608 CC1 through CC4, while
     /// entries 4-67 corresport to CEA-708 streams 0 through 64
-    bool               m_ccX08_in_tracks[64+4]        {};
+    bool               m_ccX08InTracks[64+4]          {};
     /// StreamInfo for 608 and 708 Captions seen in the PMT descriptor
-    QList<StreamInfo>  m_pmt_tracks;
+    QList<StreamInfo>  m_pmtTracks;
     /// TrackType (608 or 708) for Captions seen in the PMT descriptor
-    QList<TrackType>   m_pmt_track_types;
+    QList<TrackType>   m_pmtTrackTypes;
     /// StreamInfo for 608 and 708 Captions seen in the caption stream itself
     /// but not seen in the PMT
-    QList<StreamInfo>  m_stream_tracks;
+    QList<StreamInfo>  m_streamTracks;
     /// TrackType (608 or 708) for Captions seen in the caption stream itself
     /// but not seen in the PMT
-    QList<TrackType>   m_stream_track_types;
+    QList<TrackType>   m_streamTrackTypes;
 
     /// MHEG/MHP decoder
     InteractiveTV     *m_itv                          {nullptr};
 
     // Audio
     uint8_t           *m_audioSamples                 {nullptr};
-    bool               m_disable_passthru             {false};
+    bool               m_disablePassthru              {false};
 
     AudioInfo          m_audioIn;
     AudioInfo          m_audioOut;
@@ -371,7 +371,7 @@ class AvFormatDecoder : public DecoderBase
     float              m_fps                          {0.0F};
     bool               m_processFrames                {true};
 
-    bool               m_streams_changed              { false };
+    bool               m_streamsChanged               { false };
     bool               m_resetHardwareDecoders        { false };
 
     // Value in milliseconds, from setting AudioReadAhead

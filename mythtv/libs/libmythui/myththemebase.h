@@ -16,7 +16,7 @@ class MUI_PUBLIC MythThemeBase
   private:
     void Init(void);
 
-    MythThemeBasePrivate *d {nullptr};
+    MythThemeBasePrivate *d {nullptr}; // NOLINT(readability-identifier-naming)
 };
 
 #endif

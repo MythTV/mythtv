@@ -1699,7 +1699,8 @@ void GuideUpdateProgramRow::fillProgramRowInfosWith(int row,
     MythRect programRect = m_ggProgramRect;
 
     /// use doubles to avoid large gaps at end..
-    double ydifference = 0.0, xdifference = 0.0;
+    double ydifference = 0.0;
+    double xdifference = 0.0;
 
     if (m_verticalLayout)
     {
@@ -1845,7 +1846,10 @@ void GuideGrid::customEvent(QEvent *event)
 {
     if (event->type() == MythEvent::MythEventMessage)
     {
-        auto *me = static_cast<MythEvent *>(event);
+        auto *me = dynamic_cast<MythEvent *>(event);
+        if (me == nullptr)
+            return;
+
         const QString& message = me->Message();
 
         if (message == "SCHEDULE_CHANGE")
@@ -2003,8 +2007,8 @@ void GuideGrid::customEvent(QEvent *event)
     }
     else if (event->type() == UpdateGuideEvent::kEventType)
     {
-        auto *uge = static_cast<UpdateGuideEvent*>(event);
-        if (uge->m_updater)
+        auto *uge = dynamic_cast<UpdateGuideEvent*>(event);
+        if (uge && uge->m_updater)
         {
             uge->m_updater->ExecuteUI();
             delete uge->m_updater;
@@ -2078,7 +2082,8 @@ void GuideGrid::updateChannelsNonUI(QVector<ChannelInfo *> &chinfos,
 
         chinfo = GetChannelInfo(chanNumber);
 
-        bool unavailable = false, try_alt = false;
+        bool unavailable = false;
+        bool try_alt = false;
 
         if (m_player)
         {

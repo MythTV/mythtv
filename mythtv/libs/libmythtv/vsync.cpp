@@ -200,37 +200,37 @@ static int drmWaitVBlank(int fd, drm_wait_vblank_t *vbl)
     return ret;
 }
 
-const char *DRMVideoSync::s_dri_dev = "/dev/dri/card0";
+const char *DRMVideoSync::s_driDev = "/dev/dri/card0";
 
 DRMVideoSync::DRMVideoSync(MythVideoOutput *vo, int refresh_interval) :
     VideoSync(vo, refresh_interval)
 {
-    m_dri_fd = -1;
+    m_driFd = -1;
 }
 
 DRMVideoSync::~DRMVideoSync()
 {
-    if (m_dri_fd >= 0)
-        close(m_dri_fd);
-    m_dri_fd = -1;
+    if (m_driFd >= 0)
+        close(m_driFd);
+    m_driFd = -1;
 }
 
 bool DRMVideoSync::TryInit(void)
 {
     drm_wait_vblank_t blank;
 
-    m_dri_fd = open(s_dri_dev, O_RDWR);
-    if (m_dri_fd < 0)
+    m_driFd = open(s_driDev, O_RDWR);
+    if (m_driFd < 0)
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("DRMVideoSync: Could not open device %1, %2")
-                .arg(s_dri_dev).arg(strerror(errno)));
+                .arg(s_driDev).arg(strerror(errno)));
         return false; // couldn't open device
     }
 
     blank.m_request.m_type = DRM_VBLANK_RELATIVE;
     blank.m_request.m_sequence = 1;
-    if (drmWaitVBlank(m_dri_fd, &blank))
+    if (drmWaitVBlank(m_driFd, &blank))
     {
         LOG(VB_PLAYBACK, LOG_ERR, LOC +
             QString("DRMVideoSync: VBlank ioctl did not"
@@ -247,7 +247,7 @@ void DRMVideoSync::Start(void)
     drm_wait_vblank_t blank;
     blank.m_request.m_type = DRM_VBLANK_RELATIVE;
     blank.m_request.m_sequence = 1;
-    drmWaitVBlank(m_dri_fd, &blank);
+    drmWaitVBlank(m_driFd, &blank);
     VideoSync::Start();
 }
 
@@ -267,7 +267,7 @@ int DRMVideoSync::WaitForFrame(int nominal_frame_interval, int extra_delay)
         drm_wait_vblank_t blank;
         blank.m_request.m_type = DRM_VBLANK_RELATIVE;
         blank.m_request.m_sequence = 1;
-        drmWaitVBlank(m_dri_fd, &blank);
+        drmWaitVBlank(m_driFd, &blank);
         m_delay = CalcDelay(nominal_frame_interval);
 #if 0
         LOG(VB_GENERAL, LOG_DEBUG, QString("Delay at sync: %1").arg(m_delay));
@@ -282,7 +282,7 @@ int DRMVideoSync::WaitForFrame(int nominal_frame_interval, int extra_delay)
         drm_wait_vblank_t blank;
         blank.m_request.m_type = DRM_VBLANK_RELATIVE;
         blank.m_request.m_sequence = n;
-        drmWaitVBlank(m_dri_fd, &blank);
+        drmWaitVBlank(m_driFd, &blank);
         m_delay = CalcDelay(nominal_frame_interval);
 #if 0
         LOG(VB_GENERAL, LOG_DEBUG,

@@ -478,7 +478,8 @@ bool Scheduler::FillRecordList(void)
  */
 void Scheduler::FillRecordListFromDB(uint recordid)
 {
-    struct timeval fillstart {}, fillend {};
+    struct timeval fillstart {};
+    struct timeval fillend {};
 
     MSqlQuery query(m_dbConn);
     QString thequery;
@@ -2306,7 +2307,8 @@ bool Scheduler::HandleReschedule(void)
     // sure our DB connection is fresh before continuing.
     m_dbConn = MSqlQuery::SchedCon();
 
-    struct timeval fillstart {}, fillend {};
+    struct timeval fillstart {};
+    struct timeval fillend {};
 
     gettimeofday(&fillstart, nullptr);
     QString msg;
@@ -3962,7 +3964,8 @@ static QString progfindid = QString(
 void Scheduler::UpdateMatches(uint recordid, uint sourceid, uint mplexid,
                               const QDateTime &maxstarttime)
 {
-    struct timeval dbstart {}, dbend {};
+    struct timeval dbstart {};
+    struct timeval dbend {};
 
     MSqlQuery query(m_dbConn);
     MSqlBindings bindings;
@@ -4045,7 +4048,8 @@ void Scheduler::UpdateMatches(uint recordid, uint sourceid, uint mplexid,
             MythDB::DBError("UpdateMatches4", query);
     }
 
-    QStringList fromclauses, whereclauses;
+    QStringList fromclauses;
+    QStringList whereclauses;
 
     BuildNewRecordsQueries(recordid, fromclauses, whereclauses, bindings);
 
@@ -4308,7 +4312,8 @@ void Scheduler::AddNewRecords(void)
     if (schedTmpRecord == "record")
         schedTmpRecord = "sched_temp_record";
 
-    struct timeval dbstart {}, dbend {};
+    struct timeval dbstart {};
+    struct timeval dbend {};
 
     RecList tmpList;
 
@@ -4727,7 +4732,8 @@ void Scheduler::AddNewRecords(void)
 
 void Scheduler::AddNotListed(void) {
 
-    struct timeval dbstart {}, dbend {};
+    struct timeval dbstart {};
+    struct timeval dbend {};
     RecList tmpList;
 
     QString query = QString(

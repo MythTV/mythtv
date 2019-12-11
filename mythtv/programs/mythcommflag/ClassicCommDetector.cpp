@@ -585,12 +585,14 @@ bool ClassicCommDetector::go()
 
     if (m_showProgress)
     {
+#if 0
         float elapsed = flagTime.elapsed() / 1000.0;
 
         if (elapsed)
             flagFPS = currentFrameNumber / elapsed;
         else
             flagFPS = 0.0;
+#endif
 
         if (myTotalFrames)
             cerr << "\b\b\b\b\b\b      \b\b\b\b\b\b";
@@ -1232,7 +1234,7 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
         if (aspectFrames < ((m_framesProcessed - m_preRoll - m_postRoll) / 2))
         {
             aspect = COMM_ASPECT_WIDE;
-            aspectFrames = m_framesProcessed - m_preRoll - m_postRoll - aspectFrames;
+//          aspectFrames = m_framesProcessed - m_preRoll - m_postRoll - aspectFrames;
         }
     }
     else
@@ -1320,7 +1322,7 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
 
     int maxBlock = curBlock;
     curBlock = 0;
-    lastScore = 0;
+//  lastScore = 0;
 
     LOG(VB_COMMFLAG, LOG_INFO, "Initial Block pass");
     LOG(VB_COMMFLAG, LOG_DEBUG,
@@ -1482,7 +1484,7 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
         msg = FORMAT_MSG("NOW", fbp);
         LOG(VB_COMMFLAG, LOG_DEBUG, msg);
 
-        lastScore = fbp->score;
+//      lastScore = fbp->score;
         curBlock++;
     }
 

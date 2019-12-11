@@ -878,7 +878,6 @@ bool NCPrivate::Queue(const MythNotification &notification)
                 QString("Queue: 0x%1, not registered for id (%2)")
                 .arg((size_t)parent, QT_POINTER_SIZE, 16, QChar('0'))
                 .arg(id));
-            id = -1;
         }
         else
         {

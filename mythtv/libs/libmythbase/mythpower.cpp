@@ -127,10 +127,6 @@ MythPower::MythPower()
     connect(&m_featureTimer, &QTimer::timeout, this, &MythPower::FeatureTimeout);
 }
 
-MythPower::~MythPower()
-{
-}
-
 void MythPower::Init(void)
 {
     QStringList supported;

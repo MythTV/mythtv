@@ -588,7 +588,7 @@ static bool doUpgradeTVDatabaseSchema(void)
         MSqlQuery query(MSqlQuery::InitCon());
         if (!query.exec(QString("ALTER DATABASE %1 DEFAULT "
                                 "CHARACTER SET utf8 COLLATE utf8_general_ci;")
-                        .arg(gCoreContext->GetDatabaseParams().dbName)))
+                        .arg(gCoreContext->GetDatabaseParams().m_dbName)))
         {
             MythDB::DBError("UpgradeTVDatabaseSchema -- alter charset", query);
         }
@@ -1904,7 +1904,8 @@ nullptr
             return false;
         }
 
-        MSqlQuery update(MSqlQuery::InitCon()), insert(MSqlQuery::InitCon());
+        MSqlQuery update(MSqlQuery::InitCon());
+        MSqlQuery insert(MSqlQuery::InitCon());
         update.prepare("UPDATE settings "
                           "SET data=:IP4ADDY "
                        "WHERE value='BackendServerIP' "

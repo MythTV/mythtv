@@ -111,7 +111,8 @@ void VideoSourceSelector::Load(void)
     if (!query.exec() || !query.isActive() || query.size() <= 0)
         return;
 
-    uint sel = 0, cnt = 0;
+    uint sel = 0;
+    uint cnt = 0;
     for (; query.next(); cnt++)
     {
         addSelection(query.value(0).toString(),
@@ -277,7 +278,10 @@ class XMLTVGrabber : public MythUIComboBoxSetting
 
         addSelection(QObject::tr("No grabber"), "/bin/true");
 
-        QString gname, d1, d2, d3;
+        QString gname;
+        QString d1;
+        QString d2;
+        QString d3;
         SourceUtil::GetListingsLoginData(m_parent.getSourceID(), gname, d1, d2, d3);
 
 #ifdef _MSC_VER
@@ -834,7 +838,8 @@ class VideoDevice : public CaptureCardComboBoxSetting
             int videofd = open(tmp.constData(), O_RDWR);
             if (videofd >= 0)
             {
-                QString card_name, driver_name;
+                QString card_name;
+                QString driver_name;
                 if (CardUtil::GetV4LInfo(videofd, card_name, driver_name) &&
                     (!driverExp     || (driverExp->exactMatch(driver_name)))  &&
                     (card.isEmpty() || (card_name == card)))
@@ -921,7 +926,8 @@ class VBIDevice : public CaptureCardComboBoxSetting
             if (vbifd < 0)
                 continue;
 
-            QString cn, dn;
+            QString cn;
+            QString dn;
             if (CardUtil::GetV4LInfo(vbifd, cn, dn)  &&
                 (driver.isEmpty() || (dn == driver)) &&
                 (card.isEmpty()   || (cn == card)))
@@ -1919,7 +1925,8 @@ ImportConfigurationGroup::ImportConfigurationGroup(CaptureCard& a_parent,
 
 void ImportConfigurationGroup::probeCard(const QString &device)
 {
-    QString   ci, cs;
+    QString   ci;
+    QString   cs;
     QFileInfo fileInfo(device);
 
     // For convenience, ImportRecorder allows both formats:
@@ -2158,7 +2165,9 @@ V4LConfigurationGroup::V4LConfigurationGroup(CaptureCard& a_parent,
 
 void V4LConfigurationGroup::probeCard(const QString &device)
 {
-    QString cn = tr("Failed to open"), ci = cn, dn;
+    QString cn = tr("Failed to open");
+    QString ci = cn;
+    QString dn;
 
     QByteArray adevice = device.toLatin1();
     int videofd = open(adevice.constData(), O_RDWR);
@@ -2202,7 +2211,9 @@ MPEGConfigurationGroup::MPEGConfigurationGroup(CaptureCard &a_parent,
 
 void MPEGConfigurationGroup::probeCard(const QString &device)
 {
-    QString cn = tr("Failed to open"), ci = cn, dn;
+    QString cn = tr("Failed to open");
+    QString ci = cn;
+    QString dn;
 
     QByteArray adevice = device.toLatin1();
     int videofd = open(adevice.constData(), O_RDWR);
@@ -2250,7 +2261,8 @@ DemoConfigurationGroup::DemoConfigurationGroup(CaptureCard &a_parent,
 
 void DemoConfigurationGroup::probeCard(const QString &device)
 {
-    QString   ci, cs;
+    QString   ci;
+    QString   cs;
     QFileInfo fileInfo(device.mid(5));
     if (fileInfo.exists())
     {
@@ -2303,7 +2315,8 @@ void ExternalConfigurationGroup::probeApp(const QString & path)
     int idx1 = path.toLower().startsWith("file:") ? 5 : 0;
     int idx2 = path.indexOf(' ', idx1);
 
-    QString   ci, cs;
+    QString   ci;
+    QString   cs;
     QFileInfo fileInfo(path.mid(idx1, idx2 - idx1));
 
     if (fileInfo.exists())
@@ -2353,7 +2366,9 @@ HDPVRConfigurationGroup::HDPVRConfigurationGroup(CaptureCard &a_parent,
 
 void HDPVRConfigurationGroup::probeCard(const QString &device)
 {
-    QString cn = tr("Failed to open"), ci = cn, dn;
+    QString cn = tr("Failed to open");
+    QString ci = cn;
+    QString dn;
 
     int videofd = open(device.toLocal8Bit().constData(), O_RDWR);
     if (videofd >= 0)

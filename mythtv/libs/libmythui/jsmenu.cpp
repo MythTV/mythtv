@@ -202,7 +202,7 @@ void JoystickMenuThread::run(void)
         ** Wait for activity from the joy stick (we wait a configurable
         **      poll time)
         **------------------------------------------------------------------*/
-        FD_ZERO(&readfds);
+        FD_ZERO(&readfds); // NOLINT(readability-isolate-declaration)
         FD_SET(m_fd, &readfds);
 
         // the maximum time select() should wait

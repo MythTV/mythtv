@@ -103,8 +103,8 @@ QStringList VBox::doUPNPSearch(void)
         }
 
         QString friendlyName = BE->GetDeviceDesc()->m_rootDevice.m_sFriendlyName;
-        QString ip = BE->GetDeviceDesc()->m_HostUrl.host();
-        int port = BE->GetDeviceDesc()->m_HostUrl.port();
+        QString ip = BE->GetDeviceDesc()->m_hostUrl.host();
+        int port = BE->GetDeviceDesc()->m_hostUrl.port();
 
         LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Found possible VBox at %1 (%2:%3)").arg(friendlyName).arg(ip).arg(port));
 

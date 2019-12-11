@@ -696,7 +696,8 @@ void MythControls::customEvent(QEvent *event)
         else if (resultid == "view")
         {
             QStringList contents;
-            QString leftcaption, rightcaption;
+            QString leftcaption;
+            QString rightcaption;
 
             if (buttonnum == 0)
             {

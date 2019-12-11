@@ -22,9 +22,9 @@ class PulseHandler
    ~PulseHandler(void);
     bool Valid(void);
 
-    pa_context_state m_ctx_state          {PA_CONTEXT_UNCONNECTED};
+    pa_context_state m_ctxState           {PA_CONTEXT_UNCONNECTED};
     pa_context      *m_ctx                {nullptr};
-    int              m_pending_operations {0};
+    int              m_pendingOperations  {0};
 
   private:
     PulseHandler(void) = default;

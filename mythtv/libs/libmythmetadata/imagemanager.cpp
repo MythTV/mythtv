@@ -1129,7 +1129,8 @@ public:
     void run() override // QRunnable
     {
         QStringList tags;
-        QString     orientation, size;
+        QString     orientation;
+        QString     size;
 
         // Read metadata for files only
         if (m_im->IsFile())
@@ -1179,7 +1180,8 @@ template <class DBFS>
 QStringList ImageHandler<DBFS>::HandleGetMetadata(const QString &id) const
 {
     // Find image in DB
-    ImageList files, dirs;
+    ImageList files;
+    ImageList dirs;
     if (DBFS::GetImages(id, files, dirs) != 1)
         RESULT_ERR("Image not found", QString("Unknown image %1").arg(id))
 
@@ -1214,7 +1216,8 @@ QStringList ImageHandler<DBFS>::HandleRename(const QString &id,
         RESULT_ERR("Invalid name", QString("Invalid name %1").arg(newBase))
 
     // Find image in DB
-    ImageList files, dirs;
+    ImageList files;
+    ImageList dirs;
     if (DBFS::GetImages(id, files, dirs) != 1)
         RESULT_ERR("Image not found", QString("Image %1 not in Db").arg(id))
 
@@ -1284,7 +1287,8 @@ template <class DBFS>
 QStringList ImageHandler<DBFS>::HandleDelete(const QString &ids) const
 {
     // Get subtree of all files
-    ImageList files, dirs;
+    ImageList files;
+    ImageList dirs;
     // Dirs will be in depth-first order, (subdirs after parent)
     DBFS::GetDescendants(ids, files, dirs);
 
@@ -1391,7 +1395,9 @@ QStringList ImageHandler<DBFS>::HandleDbMove(const QString &ids,
         RESULT_ERR("Invalid path", QString("Invalid path %1").arg(destPath))
 
     // Get subtrees of renamed files
-    ImageList images, dirs, files;
+    ImageList images;
+    ImageList dirs;
+    ImageList files;
     bool ok = DBFS::GetDescendants(ids, files, dirs);
     images << dirs << files;
 
@@ -1475,7 +1481,8 @@ QStringList ImageHandler<DBFS>::HandleTransform(int transform,
     if (transform < kResetToExif || transform > kFlipVertical)
         RESULT_ERR("Transform failed", QString("Bad transform %1").arg(transform))
 
-    ImageList files, dirs;
+    ImageList files;
+    ImageList dirs;
     if (DBFS::GetImages(ids, files, dirs) < 1 || files.isEmpty())
         RESULT_ERR("Image not found", QString("Images %1 not in Db").arg(ids))
 
@@ -1520,7 +1527,8 @@ QStringList ImageHandler<DBFS>::HandleDirs(const QString &destId,
                                            const QStringList &relPaths) const
 {
     // Find image in DB
-    ImageList files, dirs;
+    ImageList files;
+    ImageList dirs;
     if (DBFS::GetImages(destId, files, dirs) != 1 || dirs.isEmpty())
         RESULT_ERR("Destination not found",
                    QString("Image %1 not in Db").arg(destId))
@@ -1669,7 +1677,8 @@ QStringList ImageHandler<DBFS>::HandleCreateThumbnails
                 ? kDirRequestPriority : kPicRequestPriority;
 
     // get specific image details from db
-    ImageList files, dirs;
+    ImageList files;
+    ImageList dirs;
     DBFS::GetImages(message.at(1), files, dirs);
 
     foreach (const ImagePtrK &im, files)
@@ -2389,7 +2398,8 @@ QString ImageManagerFe::CrumbName(ImageItemK &im, bool getPath) const
     if (!getPath)
         return im.m_baseName;
 
-    QString dev, path(im.m_filePath);
+    QString dev;
+    QString path(im.m_filePath);
 
     if (im.IsLocal())
     {

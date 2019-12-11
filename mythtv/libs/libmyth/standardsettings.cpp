@@ -612,7 +612,7 @@ MythUISpinBoxSetting::MythUISpinBoxSetting(Storage *_storage, int min, int max,
       m_max(max),
       m_step(step),
       m_pageMultiple(pageMultiple),
-      m_special_value_text(std::move(special_value_text))
+      m_specialValueText(std::move(special_value_text))
 {
     // We default to 0 unless 0 is out of range.
     if (m_min > 0 || m_max < 0)
@@ -643,8 +643,8 @@ void MythUISpinBoxSetting::updateButton(MythUIButtonListItem *item)
     item->DisplayState("spinbox", "widgettype");
     item->setEnabled(isEnabled());
     item->SetText(m_label);
-    if (m_settingValue.toInt() == m_min && !m_special_value_text.isEmpty())
-        item->SetText(m_special_value_text, "value");
+    if (m_settingValue.toInt() == m_min && !m_specialValueText.isEmpty())
+        item->SetText(m_specialValueText, "value");
     else
         item->SetText(m_settingValue, "value");
     item->SetText(getHelpText(), "description");
@@ -668,8 +668,8 @@ void MythUISpinBoxSetting::edit(MythScreenType * screen)
     if (settingdialog->Create())
     {
         settingdialog->SetRange(m_min, m_max, m_step, m_pageMultiple);
-        if (!m_special_value_text.isEmpty())
-            settingdialog->AddSelection(m_special_value_text, m_min);
+        if (!m_specialValueText.isEmpty())
+            settingdialog->AddSelection(m_specialValueText, m_min);
         settingdialog->SetValue(m_settingValue);
         settingdialog->SetReturnEvent(screen, "editsetting");
         popupStack->AddScreen(settingdialog);

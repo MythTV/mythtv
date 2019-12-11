@@ -192,7 +192,8 @@ QString TeletextReader::GetPage(void)
     if (mag > 8 || mag < 1)
         return str;
 
-    int count = 1, selected = 0;
+    int count = 1;
+    int selected = 0;
     const TeletextPage *page = FindPage(m_curpage);
     if (page)
     {
@@ -396,7 +397,10 @@ void TeletextReader::AddTeletextData(int magazine, int row,
     //LOG(VB_GENERAL, LOG_ERR, QString("AddTeletextData(%1, %2)")
     //    .arg(magazine).arg(row));
 
-    int b1, b2, b3, err = 0;
+    int b1;
+    int b2;
+    int b3;
+    int err = 0;
 
     if (magazine < 1 || magazine > 8)
         return;

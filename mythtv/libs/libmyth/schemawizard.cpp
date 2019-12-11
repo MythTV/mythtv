@@ -128,7 +128,8 @@ int SchemaUpgradeWizard::Compare(void)
     else
     {
         // Branch DB versions may not be integer version numbers.
-        bool new_ok = false, old_ok = false;
+        bool new_ok = false;
+        bool old_ok = false;
         int new_version = m_newSchemaVer.toInt(&new_ok);
         int old_version = m_DBver.toInt(&old_ok);
         if (new_ok && old_ok)
@@ -384,7 +385,7 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
 
     DatabaseParams dbParam = MythDB::getMythDB()->GetDatabaseParams();
     message += "\n\n" + tr("Database Host: %1\nDatabase Name: %2")
-                        .arg(dbParam.dbHostName).arg(dbParam.dbName);
+                        .arg(dbParam.m_dbHostName).arg(dbParam.m_dbName);
 
     if (gui)
     {

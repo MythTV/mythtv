@@ -440,6 +440,6 @@ void write_ts_patpmt(extdata_t *ext, int extcnt, uint8_t prog_num, uint8_t *buf)
 	memcpy(buf+pos, pmt, pmtpos);
 	pos += pmtpos;
 	memset(buf+pos, 0xff, 2*TS_SIZE - pos);
-	pos = 2*TS_SIZE;
+//	pos = 2*TS_SIZE;
 	s_count = (s_count+1) & 0x0f;
 }

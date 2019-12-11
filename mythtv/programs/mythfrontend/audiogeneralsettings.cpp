@@ -100,7 +100,9 @@ void AudioConfigScreen::Init(void)
 {
     StandardSettingDialog::Init();
 
-    auto *settings = static_cast<AudioConfigSettings*>(GetGroupSettings());
+    auto *settings = dynamic_cast<AudioConfigSettings*>(GetGroupSettings());
+    if (settings == nullptr)
+        return;
     settings->CheckConfiguration();
 }
 
@@ -286,7 +288,8 @@ AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
         m_lastAudioDevice = out;
     }
 
-    AudioOutputSettings settings, settingsdigital;
+    AudioOutputSettings settings;
+    AudioOutputSettings settingsdigital;
 
         // Test if everything is set yet
     if (!m_OutputDevice    || !m_MaxAudioChannels   ||
@@ -968,8 +971,14 @@ bool AudioTest::event(QEvent *event)
     if (!cce->m_fulltest)
         return false;
 
-    bool fl = false, fr = false, c = false, lfe = false;
-    bool sl = false, sr = false, rl = false, rr = false;
+    bool fl = false;
+    bool fr = false;
+    bool c = false;
+    bool lfe = false;
+    bool sl = false;
+    bool sr = false;
+    bool rl = false;
+    bool rr = false;
 
     if (channel == "frontleft")
     {

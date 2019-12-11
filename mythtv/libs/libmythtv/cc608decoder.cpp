@@ -26,19 +26,19 @@ CC608Decoder::CC608Decoder(CC608Input *ccr)
 {
     // fill translation table
     for (uint i = 0; i < 128; i++)
-        m_stdchar[i] = QChar(i);
-    m_stdchar[42]  = QLatin1Char(0xE1); // á
-    m_stdchar[92]  = QLatin1Char(0xE9); // é
-    m_stdchar[94]  = QLatin1Char(0xED); // í
-    m_stdchar[95]  = QLatin1Char(0xF3); // ó
-    m_stdchar[96]  = QLatin1Char(0xFA); // ú
-    m_stdchar[123] = QLatin1Char(0xE7); // ç
-    m_stdchar[124] = QLatin1Char(0xF7); // ÷
-    m_stdchar[125] = QLatin1Char(0xD1); // Ñ
-    m_stdchar[126] = QLatin1Char(0xF1); // ñ
-    m_stdchar[127] = 0x2588; /* full block */
+        m_stdChar[i] = QChar(i);
+    m_stdChar[42]  = QLatin1Char(0xE1); // á
+    m_stdChar[92]  = QLatin1Char(0xE9); // é
+    m_stdChar[94]  = QLatin1Char(0xED); // í
+    m_stdChar[95]  = QLatin1Char(0xF3); // ó
+    m_stdChar[96]  = QLatin1Char(0xFA); // ú
+    m_stdChar[123] = QLatin1Char(0xE7); // ç
+    m_stdChar[124] = QLatin1Char(0xF7); // ÷
+    m_stdChar[125] = QLatin1Char(0xD1); // Ñ
+    m_stdChar[126] = QLatin1Char(0xF1); // ñ
+    m_stdChar[127] = 0x2588; /* full block */
 
-    init_xds_program_type(m_xds_program_type_string);
+    init_xds_program_type(m_xdsProgramTypeString);
 }
 
 CC608Decoder::~CC608Decoder(void)
@@ -57,7 +57,7 @@ void CC608Decoder::GetServices(uint seconds, bool seen[4]) const
     time_t now = time(nullptr);
     time_t then = now - seconds;
     for (uint i = 0; i < 4; i++)
-        seen[i] = (m_last_seen[i] >= then);
+        seen[i] = (m_lastSeen[i] >= then);
 }
 
 static const int rowdata[] =
@@ -100,37 +100,37 @@ static const QChar extendedchar3[] =
 
 void CC608Decoder::FormatCCField(int tc, int field, int data)
 {
-    int b1, b2, len, x;
+    int len;
     int mode;
 
     if (data == -1)              // invalid data. flush buffers to be safe.
     {
         // TODO:  flush reader buffer
-        if (m_ccmode[field] != -1)
+        if (m_ccMode[field] != -1)
         {
             for (mode = field*4; mode < (field*4 + 4); mode++)
                 ResetCC(mode);
             m_xds[field] = 0;
-            m_badvbi[field] = 0;
-            m_ccmode[field] = -1;
-            m_txtmode[field*2] = 0;
-            m_txtmode[field*2 + 1] = 0;
+            m_badVbi[field] = 0;
+            m_ccMode[field] = -1;
+            m_txtMode[field*2] = 0;
+            m_txtMode[field*2 + 1] = 0;
         }
         return;
     }
 
-    if ((m_last_format_data[field&1] == data) &&
-        (m_last_format_tc[field&1] == tc))
+    if ((m_lastFormatData[field&1] == data) &&
+        (m_lastFormatTc[field&1] == tc))
     {
         LOG(VB_VBI, LOG_DEBUG, "Format CC -- Duplicate");
         return;
     }
 
-    m_last_format_tc[field&1] = tc;
-    m_last_format_data[field&1] = data;
+    m_lastFormatTc[field&1] = tc;
+    m_lastFormatData[field&1] = data;
 
-    b1 = data & 0x7f;
-    b2 = (data >> 8) & 0x7f;
+    int b1 = data & 0x7f;
+    int b2 = (data >> 8) & 0x7f;
 #if 1
     LOG(VB_VBI, LOG_DEBUG,
         QString("Format CC @%1/%2 = %3 %4, %5/%6 = '%7' '%8'")
@@ -142,13 +142,13 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
         .arg(QChar((b1 & 0x60) ? b1 : '_'))
         .arg(QChar((b2 & 0x60) ? b2 : '_')));
 #endif
-    if (m_ccmode[field] >= 0)
+    if (m_ccMode[field] >= 0)
     {
         mode = field << 2 |
-            (m_txtmode[field*2 + m_ccmode[field]] << 1) |
-            m_ccmode[field];
+            (m_txtMode[field*2 + m_ccMode[field]] << 1) |
+            m_ccMode[field];
         if (mode >= 0)
-            len = m_ccbuf[mode].length();
+            len = m_ccBuf[mode].length();
         else
             len = 0;
     }
@@ -160,7 +160,7 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
 
     if (FalseDup(tc, field, data))
     {
-        if (m_ignore_time_code)
+        if (m_ignoreTimeCode)
             return;
         goto skip;
     }
@@ -174,19 +174,19 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
     {
         if (mode >= 0)
         {
-            m_lastcodetc[field] += 33;
-            m_timecode[mode] = tc;
+            m_lastCodeTc[field] += 33;
+            m_timeCode[mode] = tc;
 
             // commit row number only when first text code
             // comes in
-            if (m_newrow[mode])
+            if (m_newRow[mode])
                 NewRowCC(mode, len);
 
-            m_ccbuf[mode] += CharCC(b1);
+            m_ccBuf[mode] += CharCC(b1);
             m_col[mode]++;
             if (b2 & 0x60)
             {
-                m_ccbuf[mode] += CharCC(b2);
+                m_ccBuf[mode] += CharCC(b2);
                 m_col[mode]++;
             }
         }
@@ -196,10 +196,10 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
         // 0x10 <= b1 <= 0x1F
         // control codes
     {
-        m_lastcodetc[field] += 67;
+        m_lastCodeTc[field] += 67;
 
         int newccmode = (b1 >> 3) & 1;
-        int newtxtmode = m_txtmode[field*2 + newccmode];
+        int newtxtmode = m_txtMode[field*2 + newccmode];
         if ((b1 & 0x06) == 0x04)
         {
             switch (b2)
@@ -221,12 +221,12 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
                     break;
             }
         }
-        m_ccmode[field] = newccmode;
-        m_txtmode[field*2 + newccmode] = newtxtmode;
-        mode = (field << 2) | (newtxtmode << 1) | m_ccmode[field];
+        m_ccMode[field] = newccmode;
+        m_txtMode[field*2 + newccmode] = newtxtmode;
+        mode = (field << 2) | (newtxtmode << 1) | m_ccMode[field];
 
-        m_timecode[mode] = tc;
-        len = m_ccbuf[mode].length();
+        m_timeCode[mode] = tc;
+        len = m_ccBuf[mode].length();
 
         if (b2 & 0x40)           //preamble address code (row & indent)
         {
@@ -234,25 +234,25 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
                 // no address codes in TXT mode?
                 goto skip;
 
-            m_newrow[mode] = rowdata[((b1 << 1) & 14) | ((b2 >> 5) & 1)];
-            if (m_newrow[mode] == -1)
+            m_newRow[mode] = rowdata[((b1 << 1) & 14) | ((b2 >> 5) & 1)];
+            if (m_newRow[mode] == -1)
                 // bogus code?
-                m_newrow[mode] = m_lastrow[mode] + 1;
+                m_newRow[mode] = m_lastRow[mode] + 1;
 
             if (b2 & 0x10)        //row contains indent flag
             {
-                m_newcol[mode] = (b2 & 0x0E) << 1;
+                m_newCol[mode] = (b2 & 0x0E) << 1;
                 // Encode as 0x7020 or 0x7021 depending on the
                 // underline flag.
-                m_newattr[mode] = (b2 & 0x1) + 0x20;
+                m_newAttr[mode] = (b2 & 0x1) + 0x20;
                 LOG(VB_VBI, LOG_INFO,
                         QString("cc608 preamble indent, b2=%1")
                         .arg(b2, 2, 16));
             }
             else
             {
-                m_newcol[mode] = 0;
-                m_newattr[mode] = (b2 & 0xf) + 0x10;
+                m_newCol[mode] = 0;
+                m_newAttr[mode] = (b2 & 0xf) + 0x10;
                 // Encode as 0x7010 through 0x702f for the 16 possible
                 // values of b2.
                 LOG(VB_VBI, LOG_INFO,
@@ -274,7 +274,7 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
 #endif
                     break;
                 case 0x01:          //midrow or char
-                    if (m_newrow[mode])
+                    if (m_newRow[mode])
                         NewRowCC(mode, len);
 
                     switch (b2 & 0x70)
@@ -285,12 +285,12 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
                                     .arg(b2, 2, 16));
                             // Encode as 0x7000 through 0x700f for the
                             // 16 possible values of b2.
-                            m_ccbuf[mode] += ' ';
-                            m_ccbuf[mode] += QChar(0x7000 + (b2 & 0xf));
+                            m_ccBuf[mode] += ' ';
+                            m_ccBuf[mode] += QChar(0x7000 + (b2 & 0xf));
                             m_col[mode]++;
                             break;
                         case 0x30:      //special character..
-                            m_ccbuf[mode] += specialchar[b2 & 0x0f];
+                            m_ccBuf[mode] += specialchar[b2 & 0x0f];
                             m_col[mode]++;
                             break;
                     }
@@ -303,8 +303,8 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
 
                     if (b2 & 0x30)
                     {
-                        m_ccbuf[mode].remove(len - 1, 1);
-                        m_ccbuf[mode] += extendedchar2[b2 - 0x20];
+                        m_ccBuf[mode].remove(len - 1, 1);
+                        m_ccBuf[mode] += extendedchar2[b2 - 0x20];
                         break;
                     }
                     break;
@@ -316,8 +316,8 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
 
                     if (b2 & 0x30)
                     {
-                        m_ccbuf[mode].remove(len - 1, 1);
-                        m_ccbuf[mode] += extendedchar3[b2 - 0x20];
+                        m_ccBuf[mode].remove(len - 1, 1);
+                        m_ccBuf[mode] += extendedchar3[b2 - 0x20];
                         break;
                     }
                     break;
@@ -325,25 +325,25 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
                 case 0x05:          //misc + F
 #if 0
                     LOG(VB_VBI, LOG_DEBUG,
-                        QString("ccmode %1 cmd %2").arg(m_ccmode)
+                        QString("ccmode %1 cmd %2").arg(m_ccMode)
                             .arg(b2, 2, 16, '0'));
 #endif
                     switch (b2)
                     {
                         case 0x21:      //backspace
                             // add backspace if line has been encoded already
-                            if (m_newrow[mode])
+                            if (m_newRow[mode])
                                 len = NewRowCC(mode, len);
 
                             if (len == 0 ||
-                                m_ccbuf[mode].startsWith("\b"))
+                                m_ccBuf[mode].startsWith("\b"))
                             {
-                                m_ccbuf[mode] += '\b';
+                                m_ccBuf[mode] += '\b';
                                 m_col[mode]--;
                             }
                             else
                             {
-                                m_ccbuf[mode].remove(len - 1, 1);
+                                m_ccBuf[mode].remove(len - 1, 1);
                                 m_col[mode]--;
                             }
                             break;
@@ -354,26 +354,26 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
                             {
                                 // flush
                                 BufferCC(mode, len, 0);
-                                m_ccbuf[mode] = "";
+                                m_ccBuf[mode] = "";
                                 m_row[mode] = 0;
                                 m_col[mode] = 0;
                             }
                             else if (m_style[mode] == CC_STYLE_POPUP)
                                 ResetCC(mode);
 
-                            m_rowcount[mode] = b2 - 0x25 + 2;
+                            m_rowCount[mode] = b2 - 0x25 + 2;
                             m_style[mode] = CC_STYLE_ROLLUP;
                             break;
                         case 0x2D:      //carriage return
                             if (m_style[mode] != CC_STYLE_ROLLUP)
                                 break;
 
-                            if (m_newrow[mode])
-                                m_row[mode] = m_newrow[mode];
+                            if (m_newRow[mode])
+                                m_row[mode] = m_newRow[mode];
 
                             // flush if there is text or need to scroll
                             // TODO:  decode ITV (WebTV) link in TXT2
-                            if (len || (m_row[mode] != 0 && !m_linecont[mode] &&
+                            if (len || (m_row[mode] != 0 && !m_lineCont[mode] &&
                                         (!newtxtmode || m_row[mode] >= 16)))
                             {
                                 BufferCC(mode, len, 0);
@@ -382,15 +382,15 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
                             if (newtxtmode)
                             {
                                 if (m_row[mode] < 16)
-                                    m_newrow[mode] = m_row[mode] + 1;
+                                    m_newRow[mode] = m_row[mode] + 1;
                                 else
                                     // scroll up previous lines
-                                    m_newrow[mode] = 16;
+                                    m_newRow[mode] = 16;
                             }
 
-                            m_ccbuf[mode] = "";
+                            m_ccBuf[mode] = "";
                             m_col[mode] = 0;
-                            m_linecont[mode] = 0;
+                            m_lineCont[mode] = 0;
                             break;
 
                         case 0x29:
@@ -399,7 +399,7 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
                             {
                                 // flush
                                 BufferCC(mode, len, 0);
-                                m_ccbuf[mode] = "";
+                                m_ccBuf[mode] = "";
                                 m_row[mode] = 0;
                                 m_col[mode] = 0;
                             }
@@ -407,24 +407,24 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
                                 ResetCC(mode);
 
                             m_style[mode] = CC_STYLE_PAINT;
-                            m_rowcount[mode] = 0;
-                            m_linecont[mode] = 0;
+                            m_rowCount[mode] = 0;
+                            m_lineCont[mode] = 0;
                             break;
 
                         case 0x2B:      //resume text display
-                            m_resumetext[mode] = 1;
+                            m_resumeText[mode] = 1;
                             if (m_row[mode] == 0)
                             {
-                                m_newrow[mode] = 1;
-                                m_newcol[mode] = 0;
-                                m_newattr[mode] = 0;
+                                m_newRow[mode] = 1;
+                                m_newCol[mode] = 0;
+                                m_newAttr[mode] = 0;
                             }
                             m_style[mode] = CC_STYLE_ROLLUP;
                             break;
                         case 0x2C:      //erase displayed memory
-                            if (m_ignore_time_code ||
-                                (tc - m_lastclr[mode]) > 5000 ||
-                                m_lastclr[mode] == 0)
+                            if (m_ignoreTimeCode ||
+                                (tc - m_lastClr[mode]) > 5000 ||
+                                m_lastClr[mode] == 0)
                                 // don't overflow the frontend with
                                 // too many redundant erase codes
                                 BufferCC(mode, 0, 1);
@@ -433,7 +433,7 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
                                 m_row[mode] = 0;
                                 m_col[mode] = 0;
                             }
-                            m_linecont[mode] = 0;
+                            m_lineCont[mode] = 0;
                             break;
 
                         case 0x20:      //resume caption (pop-up style)
@@ -442,13 +442,13 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
                                 if (len)
                                     // flush
                                     BufferCC(mode, len, 0);
-                                m_ccbuf[mode] = "";
+                                m_ccBuf[mode] = "";
                                 m_row[mode] = 0;
                                 m_col[mode] = 0;
                             }
                             m_style[mode] = CC_STYLE_POPUP;
-                            m_rowcount[mode] = 0;
-                            m_linecont[mode] = 0;
+                            m_rowCount[mode] = 0;
+                            m_lineCont[mode] = 0;
                             break;
                         case 0x2F:      //end caption + swap memory
                             if (m_style[mode] != CC_STYLE_POPUP)
@@ -457,20 +457,20 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
                                     // flush
                                     BufferCC(mode, len, 0);
                             }
-                            else if (m_ignore_time_code ||
-                                     (tc - m_lastclr[mode]) > 5000 ||
-                                     m_lastclr[mode] == 0)
+                            else if (m_ignoreTimeCode ||
+                                     (tc - m_lastClr[mode]) > 5000 ||
+                                     m_lastClr[mode] == 0)
                                 // clear and flush
                                 BufferCC(mode, len, 1);
                             else if (len)
                                 // flush
                                 BufferCC(mode, len, 0);
-                            m_ccbuf[mode] = "";
+                            m_ccBuf[mode] = "";
                             m_row[mode] = 0;
                             m_col[mode] = 0;
                             m_style[mode] = CC_STYLE_POPUP;
-                            m_rowcount[mode] = 0;
-                            m_linecont[mode] = 0;
+                            m_rowCount[mode] = 0;
+                            m_lineCont[mode] = 0;
                             break;
 
                         case 0x2A:      //text restart
@@ -478,9 +478,9 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
                             BufferCC(mode, 0, 1);
                             ResetCC(mode);
                             // TXT starts at row 1
-                            m_newrow[mode] = 1;
-                            m_newcol[mode] = 0;
-                            m_newattr[mode] = 0;
+                            m_newRow[mode] = 1;
+                            m_newCol[mode] = 0;
+                            m_newAttr[mode] = 0;
                             m_style[mode] = CC_STYLE_ROLLUP;
                             break;
 
@@ -490,16 +490,16 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
                     }
                     break;
                 case 0x07:          //misc (TAB)
-                    if (m_newrow[mode])
+                    if (m_newRow[mode])
                     {
-                        m_newcol[mode] += (b2 & 0x03);
+                        m_newCol[mode] += (b2 & 0x03);
                         NewRowCC(mode, len);
                     }
                     else
                         // illegal?
-                        for (x = 0; x < (b2 & 0x03); x++)
+                        for (int x = 0; x < (b2 & 0x03); x++)
                         {
-                            m_ccbuf[mode] += ' ';
+                            m_ccBuf[mode] += ' ';
                             m_col[mode]++;
                         }
                     break;
@@ -510,44 +510,42 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
   skip:
     for (mode = field*4; mode < (field*4 + 4); mode++)
     {
-        len = m_ccbuf[mode].length();
-        if ((m_ignore_time_code || ((tc - m_timecode[mode]) > 100)) &&
+        len = m_ccBuf[mode].length();
+        if ((m_ignoreTimeCode || ((tc - m_timeCode[mode]) > 100)) &&
              (m_style[mode] != CC_STYLE_POPUP) && len)
         {
             // flush unfinished line if waiting too long
             // in paint-on or scroll-up mode
-            m_timecode[mode] = tc;
+            m_timeCode[mode] = tc;
             BufferCC(mode, len, 0);
-            m_ccbuf[mode] = "";
-            m_row[mode] = m_lastrow[mode];
-            m_linecont[mode] = 1;
+            m_ccBuf[mode] = "";
+            m_row[mode] = m_lastRow[mode];
+            m_lineCont[mode] = 1;
         }
     }
 
-    if (data != m_lastcode[field])
+    if (data != m_lastCode[field])
     {
-        m_lastcode[field] = data;
-        m_lastcodetc[field] = tc;
+        m_lastCode[field] = data;
+        m_lastCodeTc[field] = tc;
     }
-    m_lasttc[field] = tc;
+    m_lastTc[field] = tc;
 }
 
 int CC608Decoder::FalseDup(int tc, int field, int data)
 {
-    int b1, b2;
+    int b1 = data & 0x7f;
+    int b2 = (data >> 8) & 0x7f;
 
-    b1 = data & 0x7f;
-    b2 = (data >> 8) & 0x7f;
-
-    if (m_ignore_time_code)
+    if (m_ignoreTimeCode)
     {
         // most digital streams with encoded VBI
         // have duplicate control codes;
         // suppress every other repeated control code
-        if ((data == m_lastcode[field]) &&
+        if ((data == m_lastCode[field]) &&
             ((b1 & 0x70) == 0x10))
         {
-            m_lastcode[field] = -1;
+            m_lastCode[field] = -1;
             return 1;
         }
         return 0;
@@ -557,16 +555,17 @@ int CC608Decoder::FalseDup(int tc, int field, int data)
     // bttv-0.7 reads don't seem to work as well so if read intervals
     // vary from this, be more conservative in detecting duplicate
     // CC codes.
-    int dup_text_fudge, dup_ctrl_fudge;
-    if (m_badvbi[field] < 100 && b1 != 0 && b2 != 0)
+    int dup_text_fudge;
+    int dup_ctrl_fudge;
+    if (m_badVbi[field] < 100 && b1 != 0 && b2 != 0)
     {
-        int d = tc - m_lasttc[field];
+        int d = tc - m_lastTc[field];
         if (d < 25 || d > 42)
-            m_badvbi[field]++;
-        else if (m_badvbi[field] > 0)
-            m_badvbi[field]--;
+            m_badVbi[field]++;
+        else if (m_badVbi[field] > 0)
+            m_badVbi[field]--;
     }
-    if (m_badvbi[field] < 4)
+    if (m_badVbi[field] < 4)
     {
         // this should pick up all codes
         dup_text_fudge = -2;
@@ -579,17 +578,17 @@ int CC608Decoder::FalseDup(int tc, int field, int data)
         dup_ctrl_fudge = 33 - 4;
     }
 
-    if (data == m_lastcode[field])
+    if (data == m_lastCode[field])
     {
         if ((b1 & 0x70) == 0x10)
         {
-            if (tc > (m_lastcodetc[field] + 67 + dup_ctrl_fudge))
+            if (tc > (m_lastCodeTc[field] + 67 + dup_ctrl_fudge))
                 return 0;
         }
         else if (b1)
         {
             // text, XDS
-            if (tc > (m_lastcodetc[field] + 33 + dup_text_fudge))
+            if (tc > (m_lastCodeTc[field] + 33 + dup_text_fudge))
                 return 0;
         }
 
@@ -601,18 +600,18 @@ int CC608Decoder::FalseDup(int tc, int field, int data)
 
 void CC608Decoder::ResetCC(int mode)
 {
-//    m_lastrow[mode] = 0;
-//    m_newrow[mode] = 0;
-//    m_newcol[mode] = 0;
-//    m_timecode[mode] = 0;
+//    m_lastRow[mode] = 0;
+//    m_newRow[mode] = 0;
+//    m_newCol[mode] = 0;
+//    m_timeCode[mode] = 0;
     m_row[mode] = 0;
     m_col[mode] = 0;
-    m_rowcount[mode] = 0;
+    m_rowCount[mode] = 0;
 //    m_style[mode] = CC_STYLE_POPUP;
-    m_linecont[mode] = 0;
-    m_resumetext[mode] = 0;
-    m_lastclr[mode] = 0;
-    m_ccbuf[mode] = "";
+    m_lineCont[mode] = 0;
+    m_resumeText[mode] = 0;
+    m_lastClr[mode] = 0;
+    m_ccBuf[mode] = "";
 }
 
 QString CC608Decoder::ToASCII(const QString &cc608str, bool suppress_unknown)
@@ -661,19 +660,19 @@ void CC608Decoder::BufferCC(int mode, int len, int clr)
     if (len)
     {
         // calculate UTF-8 encoding length
-        tmpbuf = m_ccbuf[mode].toUtf8();
+        tmpbuf = m_ccBuf[mode].toUtf8();
         len = min(tmpbuf.length(), 255);
     }
 
     unsigned char f;
     unsigned char *bp = m_rbuf;
     *(bp++) = m_row[mode];
-    *(bp++) = m_rowcount[mode];
+    *(bp++) = m_rowCount[mode];
     *(bp++) = m_style[mode];
     // overload resumetext field
-    f = m_resumetext[mode];
+    f = m_resumeText[mode];
     f |= mode << 4;
-    if (m_linecont[mode])
+    if (m_lineCont[mode])
         f |= CC_LINE_CONT;
     *(bp++) = f;
     *(bp++) = clr;
@@ -691,14 +690,14 @@ void CC608Decoder::BufferCC(int mode, int len, int clr)
     if (len && VERBOSE_LEVEL_CHECK(VB_VBI, LOG_INFO))
     {
         LOG(VB_VBI, LOG_INFO, QString("### %1 %2 %3 %4 %5 %6 %7 - '%8'")
-            .arg(m_timecode[mode], 10)
-            .arg(m_row[mode], 2).arg(m_rowcount[mode])
+            .arg(m_timeCode[mode], 10)
+            .arg(m_row[mode], 2).arg(m_rowCount[mode])
             .arg(m_style[mode]).arg(f, 2, 16)
             .arg(clr).arg(len, 3)
             .arg(ToASCII(QString::fromUtf8(tmpbuf.constData(), len), false)));
     }
 
-    m_reader->AddTextData(m_rbuf, len, m_timecode[mode], 'C');
+    m_reader->AddTextData(m_rbuf, len, m_timeCode[mode], 'C');
     int ccmode = m_rbuf[3] & CC_MODE_MASK;
     int stream = -1;
     switch (ccmode)
@@ -709,13 +708,13 @@ void CC608Decoder::BufferCC(int mode, int len, int clr)
         case CC_CC4: stream = 3; break;
     }
     if (stream >= 0)
-        m_last_seen[stream] = time(nullptr);
+        m_lastSeen[stream] = time(nullptr);
 
-    m_resumetext[mode] = 0;
+    m_resumeText[mode] = 0;
     if (clr && !len)
-        m_lastclr[mode] = m_timecode[mode];
+        m_lastClr[mode] = m_timeCode[mode];
     else if (len)
-        m_lastclr[mode] = 0;
+        m_lastClr[mode] = 0;
 }
 
 int CC608Decoder::NewRowCC(int mode, int len)
@@ -723,15 +722,15 @@ int CC608Decoder::NewRowCC(int mode, int len)
     if (m_style[mode] == CC_STYLE_ROLLUP)
     {
         // previous line was likely missing a carriage return
-        m_row[mode] = m_newrow[mode];
+        m_row[mode] = m_newRow[mode];
         if (len)
         {
             BufferCC(mode, len, 0);
-            m_ccbuf[mode] = "";
+            m_ccBuf[mode] = "";
             len = 0;
         }
         m_col[mode] = 0;
-        m_linecont[mode] = 0;
+        m_lineCont[mode] = 0;
     }
     else
     {
@@ -740,35 +739,35 @@ int CC608Decoder::NewRowCC(int mode, int len)
         if (m_row[mode] == 0)
         {
             if (len == 0)
-                m_row[mode] = m_newrow[mode];
+                m_row[mode] = m_newRow[mode];
             else
             {
                 // previous line was missing a row address
                 // - assume it was one row up
-                m_ccbuf[mode] += '\n';
+                m_ccBuf[mode] += '\n';
                 len++;
                 if (m_row[mode] == 0)
-                    m_row[mode] = m_newrow[mode] - 1;
+                    m_row[mode] = m_newRow[mode] - 1;
                 else
                     m_row[mode]--;
             }
         }
-        else if (m_newrow[mode] > m_lastrow[mode])
+        else if (m_newRow[mode] > m_lastRow[mode])
         {
             // next line can be more than one row away
-            for (int i = 0; i < (m_newrow[mode] - m_lastrow[mode]); i++)
+            for (int i = 0; i < (m_newRow[mode] - m_lastRow[mode]); i++)
             {
-                m_ccbuf[mode] += '\n';
+                m_ccBuf[mode] += '\n';
                 len++;
             }
             m_col[mode] = 0;
         }
-        else if (m_newrow[mode] == m_lastrow[mode])
+        else if (m_newRow[mode] == m_lastRow[mode])
         {
             // same row
-            if (m_newcol[mode] >= m_col[mode])
+            if (m_newCol[mode] >= m_col[mode])
                 // new line appends to current line
-                m_newcol[mode] -= m_col[mode];
+                m_newCol[mode] -= m_col[mode];
             else
             {
                 // new line overwrites current line;
@@ -776,7 +775,7 @@ int CC608Decoder::NewRowCC(int mode, int len)
                 // more likely we have bad address codes
                 // - just move to next line; may exceed row 15
                 // but frontend will adjust
-                m_ccbuf[mode] += '\n';
+                m_ccBuf[mode] += '\n';
                 len++;
                 m_col[mode] = 0;
             }
@@ -786,33 +785,33 @@ int CC608Decoder::NewRowCC(int mode, int len)
             // next line goes upwards (not legal?)
             // - flush
             BufferCC(mode, len, 0);
-            m_ccbuf[mode] = "";
-            m_row[mode] = m_newrow[mode];
+            m_ccBuf[mode] = "";
+            m_row[mode] = m_newRow[mode];
             m_col[mode] = 0;
-            m_linecont[mode] = 0;
+            m_lineCont[mode] = 0;
             len = 0;
         }
     }
 
-    m_lastrow[mode] = m_newrow[mode];
-    m_newrow[mode] = 0;
+    m_lastRow[mode] = m_newRow[mode];
+    m_newRow[mode] = 0;
 
-    int limit = m_newcol[mode];
+    int limit = m_newCol[mode];
     for (int x = 0; x < limit; x++)
     {
-        m_ccbuf[mode] += ' ';
+        m_ccBuf[mode] += ' ';
         len++;
         m_col[mode]++;
     }
 
-    if (m_newattr[mode])
+    if (m_newAttr[mode])
     {
-        m_ccbuf[mode] += QChar(m_newattr[mode] + 0x7000);
+        m_ccBuf[mode] += QChar(m_newAttr[mode] + 0x7000);
         len++;
     }
 
-    m_newcol[mode] = 0;
-    m_newattr[mode] = 0;
+    m_newCol[mode] = 0;
+    m_newAttr[mode] = 0;
 
     return len;
 }
@@ -868,31 +867,29 @@ static void DumpPIL(int pil)
 
 void CC608Decoder::DecodeVPS(const unsigned char *buf)
 {
-    int cni, pcs, pty, pil;
-
     int c = vbi_bit_reverse[buf[1]];
 
     if ((int8_t) c < 0)
     {
-        m_vps_label[m_vps_l] = 0;
-        memcpy(m_vps_pr_label, m_vps_label, sizeof(m_vps_pr_label));
-        m_vps_l = 0;
+        m_vpsLabel[m_vpsL] = 0;
+        memcpy(m_vpsPrLabel, m_vpsLabel, sizeof(m_vpsPrLabel));
+        m_vpsL = 0;
     }
     c &= 0x7F;
-    m_vps_label[m_vps_l] = Printable(c);
-    m_vps_l = (m_vps_l + 1) % 16;
+    m_vpsLabel[m_vpsL] = Printable(c);
+    m_vpsL = (m_vpsL + 1) % 16;
 
     LOG(VB_VBI, LOG_INFO, QString("VPS: 3-10: %1 %2 %3 %4 %5 %6 %7 %8 (\"%9\")")
             .arg(buf[0]).arg(buf[1]).arg(buf[2]).arg(buf[3]).arg(buf[4])
-            .arg(buf[5]).arg(buf[6]).arg(buf[7]).arg(m_vps_pr_label));
+            .arg(buf[5]).arg(buf[6]).arg(buf[7]).arg(m_vpsPrLabel));
 
-    pcs = buf[2] >> 6;
-    cni = + ((buf[10] & 3) << 10)
+    int pcs = buf[2] >> 6;
+    int cni = + ((buf[10] & 3) << 10)
         + ((buf[11] & 0xC0) << 2)
         + ((buf[8] & 0xC0) << 0)
         + (buf[11] & 0x3F);
-    pil = ((buf[8] & 0x3F) << 14) + (buf[9] << 6) + (buf[10] >> 2);
-    pty = buf[12];
+    int pil = ((buf[8] & 0x3F) << 14) + (buf[9] << 6) + (buf[10] >> 2);
+    int pty = buf[12];
 
     LOG(VB_VBI, LOG_INFO, QString("CNI: %1 PCS: %2 PTY: %3 ")
             .arg(cni).arg(pcs).arg(pty));
@@ -941,8 +938,8 @@ void CC608Decoder::DecodeWSS(const unsigned char *buf)
 
     if (parity & 1)
     {
-        m_wss_flags = wss;
-        m_wss_valid = true;
+        m_wssFlags = wss;
+        m_wssValid = true;
     }
 }
 
@@ -994,19 +991,19 @@ static bool is_better(const QString &newStr, const QString &oldStr)
 
 uint CC608Decoder::GetRatingSystems(bool future) const
 {
-    QMutexLocker locker(&m_xds_lock);
-    return m_xds_rating_systems[(future) ? 1 : 0];
+    QMutexLocker locker(&m_xdsLock);
+    return m_xdsRatingSystems[(future) ? 1 : 0];
 }
 
 uint CC608Decoder::GetRating(uint i, bool future) const
 {
-    QMutexLocker locker(&m_xds_lock);
-    return m_xds_rating[(future) ? 1 : 0][i & 0x3] & 0x7;
+    QMutexLocker locker(&m_xdsLock);
+    return m_xdsRating[(future) ? 1 : 0][i & 0x3] & 0x7;
 }
 
 QString CC608Decoder::GetRatingString(uint i, bool future) const
 {
-    QMutexLocker locker(&m_xds_lock);
+    QMutexLocker locker(&m_xdsLock);
 
     QString prefix[4] = { "MPAA-", "TV-", "CE-", "CF-" };
     QString mainStr[4][8] =
@@ -1022,18 +1019,18 @@ QString CC608Decoder::GetRatingString(uint i, bool future) const
     if (kRatingTPG == i)
     {
         uint cf = (future) ? 1 : 0;
-        if (!(m_xds_rating[cf][i]&0xF0))
+        if (!(m_xdsRating[cf][i]&0xF0))
             return main;
 
         main += " ";
         // TPG flags
-        if (m_xds_rating[cf][i] & 0x80)
+        if (m_xdsRating[cf][i] & 0x80)
             main += "D"; // Dialog
-        if (m_xds_rating[cf][i] & 0x40)
+        if (m_xdsRating[cf][i] & 0x40)
             main += "V"; // Violence
-        if (m_xds_rating[cf][i] & 0x20)
+        if (m_xdsRating[cf][i] & 0x20)
             main += "S"; // Sex
-        if (m_xds_rating[cf][i] & 0x10)
+        if (m_xdsRating[cf][i] & 0x10)
             main += "L"; // Language
     }
 
@@ -1042,21 +1039,21 @@ QString CC608Decoder::GetRatingString(uint i, bool future) const
 
 QString CC608Decoder::GetProgramName(bool future) const
 {
-    QMutexLocker locker(&m_xds_lock);
-    return m_xds_program_name[(future) ? 1 : 0];
+    QMutexLocker locker(&m_xdsLock);
+    return m_xdsProgramName[(future) ? 1 : 0];
 }
 
 QString CC608Decoder::GetProgramType(bool future) const
 {
-    QMutexLocker locker(&m_xds_lock);
-    const vector<uint> &program_type = m_xds_program_type[(future) ? 1 : 0];
+    QMutexLocker locker(&m_xdsLock);
+    const vector<uint> &program_type = m_xdsProgramType[(future) ? 1 : 0];
     QString tmp = "";
 
     for (size_t i = 0; i < program_type.size(); i++)
     {
         if (i != 0)
             tmp += ", ";
-        tmp += m_xds_program_type_string[program_type[i]];
+        tmp += m_xdsProgramTypeString[program_type[i]];
     }
 
     return tmp;
@@ -1064,7 +1061,7 @@ QString CC608Decoder::GetProgramType(bool future) const
 
 QString CC608Decoder::GetXDS(const QString &key) const
 {
-    QMutexLocker locker(&m_xds_lock);
+    QMutexLocker locker(&m_xdsLock);
 
     if (key == "ratings")
         return QString::number(GetRatingSystems(false));
@@ -1091,11 +1088,11 @@ QString CC608Decoder::GetXDS(const QString &key) const
         return GetProgramType(true);
 
     if (key == "callsign")
-        return m_xds_net_call;
+        return m_xdsNetCall;
     if (key == "channame")
-        return m_xds_net_name;
+        return m_xdsNetName;
     if (key == "tsid")
-        return QString::number(m_xds_tsid);
+        return QString::number(m_xdsTsid);
 
     return QString();
 }
@@ -1124,60 +1121,60 @@ bool CC608Decoder::XDSDecode(int field, int b1, int b2)
         .arg((CharCC(b1).unicode()>0x20) ? CharCC(b1) : QChar(' '))
         .arg((CharCC(b2).unicode()>0x20) ? CharCC(b2) : QChar(' '))
         .arg(field).arg(m_xds[field])
-        .arg(m_xds_cur_service));
+        .arg(m_xdsCurService));
 #else
     (void) field;
 #endif // DEBUG_XDS
 
-    if (m_xds_cur_service < 0)
+    if (m_xdsCurService < 0)
     {
         if (b1 > 0x0f)
             return false;
 
-        m_xds_cur_service = b1_to_service[b1];
+        m_xdsCurService = b1_to_service[b1];
 
-        if (m_xds_cur_service < 0)
+        if (m_xdsCurService < 0)
             return false;
 
         if (b1 & 1)
         {
-            m_xds_buf[m_xds_cur_service].clear(); // if start of service clear buffer
+            m_xdsBuf[m_xdsCurService].clear(); // if start of service clear buffer
 #if DEBUG_XDS
-            LOG(VB_VBI, LOG_INFO, QString("XDSDecode: Starting XDS %1").arg(m_xds_cur_service));
+            LOG(VB_VBI, LOG_INFO, QString("XDSDecode: Starting XDS %1").arg(m_xdsCurService));
 #endif // DEBUG_XDS
         }
     }
     else if ((0x0 < b1) && (b1 < 0x0f))
     { // switch to different service
-        m_xds_cur_service = b1_to_service[b1];
+        m_xdsCurService = b1_to_service[b1];
 #if DEBUG_XDS
-        LOG(VB_VBI, LOG_INFO, QString("XDSDecode: Resuming XDS %1").arg(m_xds_cur_service));
+        LOG(VB_VBI, LOG_INFO, QString("XDSDecode: Resuming XDS %1").arg(m_xdsCurService));
 #endif // DEBUG_XDS
     }
 
-    if (m_xds_cur_service < 0)
+    if (m_xdsCurService < 0)
         return false;
 
-    m_xds_buf[m_xds_cur_service].push_back(b1);
-    m_xds_buf[m_xds_cur_service].push_back(b2);
+    m_xdsBuf[m_xdsCurService].push_back(b1);
+    m_xdsBuf[m_xdsCurService].push_back(b2);
 
     if (b1 == 0x0f) // end of packet
     {
 #if DEBUG_XDS
-        LOG(VB_VBI, LOG_INFO, QString("XDSDecode: Ending XDS %1").arg(m_xds_cur_service));
+        LOG(VB_VBI, LOG_INFO, QString("XDSDecode: Ending XDS %1").arg(m_xdsCurService));
 #endif // DEBUG_XDS
-        if (XDSPacketCRC(m_xds_buf[m_xds_cur_service]))
-            XDSPacketParse(m_xds_buf[m_xds_cur_service]);
-        m_xds_buf[m_xds_cur_service].clear();
-        m_xds_cur_service = -1;
+        if (XDSPacketCRC(m_xdsBuf[m_xdsCurService]))
+            XDSPacketParse(m_xdsBuf[m_xdsCurService]);
+        m_xdsBuf[m_xdsCurService].clear();
+        m_xdsCurService = -1;
     }
     else if ((0x10 <= b1) && (b1 <= 0x1f)) // suspension of XDS packet
     {
 #if DEBUG_XDS
         LOG(VB_VBI, LOG_INFO, QString("XDSDecode: Suspending XDS %1 on 0x%2")
-            .arg(m_xds_cur_service).arg(b1,2,16,QChar('0')));
+            .arg(m_xdsCurService).arg(b1,2,16,QChar('0')));
 #endif // DEBUG_XDS
-        m_xds_cur_service = -1;
+        m_xdsCurService = -1;
     }
 
     return true;
@@ -1185,7 +1182,7 @@ bool CC608Decoder::XDSDecode(int field, int b1, int b2)
 
 void CC608Decoder::XDSPacketParse(const vector<unsigned char> &xds_buf)
 {
-    QMutexLocker locker(&m_xds_lock);
+    QMutexLocker locker(&m_xdsLock);
 
     bool handled   = false;
     int  xds_class = xds_buf[0];
@@ -1225,15 +1222,15 @@ bool CC608Decoder::XDSPacketCRC(const vector<unsigned char> &xds_buf)
 
     if ((((~sum) & 0x7f) + 1) != xds_buf[xds_buf.size() - 1])
     {
-        m_xds_crc_failed++;
+        m_xdsCrcFailed++;
 
         LOG(VB_VBI, LOG_ERR, QString("XDS: failed CRC %1 of %2")
-                .arg(m_xds_crc_failed).arg(m_xds_crc_failed + m_xds_crc_passed));
+                .arg(m_xdsCrcFailed).arg(m_xdsCrcFailed + m_xdsCrcPassed));
 
         return false;
     }
 
-    m_xds_crc_passed++;
+    m_xdsCrcPassed++;
     return true;
 }
 
@@ -1284,9 +1281,9 @@ bool CC608Decoder::XDSPacketParseProgram(
     else if ((b2 == 0x03) && (xds_buf.size() >= 6))
     {
         QString tmp = XDSDecodeString(xds_buf, 2, xds_buf.size() - 2);
-        if (is_better(tmp, m_xds_program_name[cf]))
+        if (is_better(tmp, m_xdsProgramName[cf]))
         {
-            m_xds_program_name[cf] = tmp;
+            m_xdsProgramName[cf] = tmp;
             LOG(VB_VBI, LOG_INFO, loc + QString("Program Name: '%1'")
                     .arg(GetProgramName(future)));
         }
@@ -1301,13 +1298,13 @@ bool CC608Decoder::XDSPacketParseProgram(
                 program_type.push_back(cur);
         }
 
-        bool unchanged = m_xds_program_type[cf].size() == program_type.size();
+        bool unchanged = m_xdsProgramType[cf].size() == program_type.size();
         for (uint i = 0; (i < program_type.size()) && unchanged; i++)
-            unchanged = m_xds_program_type[cf][i] == program_type[i];
+            unchanged = m_xdsProgramType[cf][i] == program_type[i];
 
         if (!unchanged)
         {
-            m_xds_program_type[cf] = program_type;
+            m_xdsProgramType[cf] = program_type;
             LOG(VB_VBI, LOG_INFO, loc + QString("Program Type '%1'")
                     .arg(GetProgramType(future)));
         }
@@ -1321,22 +1318,22 @@ bool CC608Decoder::XDSPacketParseProgram(
         uint sel           = VSL | rating_system;
         if (sel == 3)
         {
-            if (!(kHasCanEnglish & m_xds_rating_systems[cf]) ||
+            if (!(kHasCanEnglish & m_xdsRatingSystems[cf]) ||
                 (tv_rating != GetRating(kRatingCanEnglish, future)))
             {
-                m_xds_rating_systems[cf]            |= kHasCanEnglish;
-                m_xds_rating[cf][kRatingCanEnglish]  = tv_rating;
+                m_xdsRatingSystems[cf]             |= kHasCanEnglish;
+                m_xdsRating[cf][kRatingCanEnglish]  = tv_rating;
                 LOG(VB_VBI, LOG_INFO, loc + QString("VChip %1")
                         .arg(GetRatingString(kRatingCanEnglish, future)));
             }
         }
         else if (sel == 7)
         {
-            if (!(kHasCanFrench & m_xds_rating_systems[cf]) ||
+            if (!(kHasCanFrench & m_xdsRatingSystems[cf]) ||
                 (tv_rating != GetRating(kRatingCanFrench, future)))
             {
-                m_xds_rating_systems[cf]           |= kHasCanFrench;
-                m_xds_rating[cf][kRatingCanFrench]  = tv_rating;
+                m_xdsRatingSystems[cf]            |= kHasCanFrench;
+                m_xdsRating[cf][kRatingCanFrench]  = tv_rating;
                 LOG(VB_VBI, LOG_INFO, loc + QString("VChip %1")
                         .arg(GetRatingString(kRatingCanFrench, future)));
             }
@@ -1345,23 +1342,23 @@ bool CC608Decoder::XDSPacketParseProgram(
             ; // Reserved according to TVTime code
         else if ((rating_system & 0x3) == 1)
         {
-            if (!(kHasTPG & m_xds_rating_systems[cf]) ||
+            if (!(kHasTPG & m_xdsRatingSystems[cf]) ||
                 (tv_rating != GetRating(kRatingTPG, future)))
             {
                 uint f = ((xds_buf[0]<<3) & 0x80) | ((xds_buf[1]<<1) & 0x70);
-                m_xds_rating_systems[cf]     |= kHasTPG;
-                m_xds_rating[cf][kRatingTPG]  = tv_rating | f;
+                m_xdsRatingSystems[cf]      |= kHasTPG;
+                m_xdsRating[cf][kRatingTPG]  = tv_rating | f;
                 LOG(VB_VBI, LOG_INFO, loc + QString("VChip %1")
                         .arg(GetRatingString(kRatingTPG, future)));
             }
         }
         else if (rating_system == 0)
         {
-            if (!(kHasMPAA & m_xds_rating_systems[cf]) ||
+            if (!(kHasMPAA & m_xdsRatingSystems[cf]) ||
                 (movie_rating != GetRating(kRatingMPAA, future)))
             {
-                m_xds_rating_systems[cf]      |= kHasMPAA;
-                m_xds_rating[cf][kRatingMPAA]  = movie_rating;
+                m_xdsRatingSystems[cf]       |= kHasMPAA;
+                m_xdsRating[cf][kRatingMPAA]  = movie_rating;
                 LOG(VB_VBI, LOG_INFO, loc + QString("VChip %1")
                         .arg(GetRatingString(kRatingMPAA, future)));
             }
@@ -1406,29 +1403,29 @@ bool CC608Decoder::XDSPacketParseChannel(const vector<unsigned char> &xds_buf)
     if ((b2 == 0x01) && (xds_buf.size() >= 6))
     {
         QString tmp = XDSDecodeString(xds_buf, 2, xds_buf.size() - 2);
-        if (is_better(tmp, m_xds_net_name))
+        if (is_better(tmp, m_xdsNetName))
         {
             LOG(VB_VBI, LOG_INFO, QString("XDS: Network Name '%1'").arg(tmp));
-            m_xds_net_name = tmp;
+            m_xdsNetName = tmp;
         }
     }
     else if ((b2 == 0x02) && (xds_buf.size() >= 6))
     {
         QString tmp = XDSDecodeString(xds_buf, 2, xds_buf.size() - 2);
-        if (is_better(tmp, m_xds_net_call) && (tmp.indexOf(" ") < 0))
+        if (is_better(tmp, m_xdsNetCall) && (tmp.indexOf(" ") < 0))
         {
             LOG(VB_VBI, LOG_INFO, QString("XDS: Network Call '%1'").arg(tmp));
-            m_xds_net_call = tmp;
+            m_xdsNetCall = tmp;
         }
     }
     else if ((b2 == 0x04) && (xds_buf.size() >= 6))
     {
         uint tsid = (xds_buf[2] << 24 | xds_buf[3] << 16 |
                      xds_buf[4] <<  8 | xds_buf[5]);
-        if (tsid != m_xds_tsid)
+        if (tsid != m_xdsTsid)
         {
             LOG(VB_VBI, LOG_INFO, QString("XDS: TSID 0x%1").arg(tsid,0,16));
-            m_xds_tsid = tsid;
+            m_xdsTsid = tsid;
         }
     }
     else

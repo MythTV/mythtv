@@ -97,9 +97,9 @@ bool MythXDisplay::Open(void)
         return false;
 
     xdisplays[m_disp] = this;
-    m_screen_num = DefaultScreen(m_disp);
+    m_screenNum  = DefaultScreen(m_disp);
     m_screen     = DefaultScreenOfDisplay(m_disp);
-    m_black      = XBlackPixel(m_disp, m_screen_num);
+    m_black      = XBlackPixel(m_disp, m_screenNum);
     m_depth      = DefaultDepthOfScreen(m_screen);
     m_root       = DefaultRootWindow(m_disp);
 
@@ -144,8 +144,8 @@ void MythXDisplay::MoveResizeWin(Window win, const QRect &rect)
 QSize MythXDisplay::GetDisplaySize(void)
 {
     MythXLocker locker(this);
-    int displayWidthPixel  = DisplayWidth( m_disp, m_screen_num);
-    int displayHeightPixel = DisplayHeight(m_disp, m_screen_num);
+    int displayWidthPixel  = DisplayWidth( m_disp, m_screenNum);
+    int displayHeightPixel = DisplayHeight(m_disp, m_screenNum);
     return {displayWidthPixel, displayHeightPixel};
 }
 
@@ -157,8 +157,8 @@ QSize MythXDisplay::GetDisplaySize(void)
 QSize MythXDisplay::GetDisplayDimensions(void)
 {
     MythXLocker locker(this);
-    int displayWidthMM  = DisplayWidthMM( m_disp, m_screen_num);
-    int displayHeightMM = DisplayHeightMM(m_disp, m_screen_num);
+    int displayWidthMM  = DisplayWidthMM( m_disp, m_screenNum);
+    int displayHeightMM = DisplayHeightMM(m_disp, m_screenNum);
     return {displayWidthMM, displayHeightMM};
 }
 
@@ -168,7 +168,7 @@ float MythXDisplay::GetRefreshRate(void)
     int dot_clock = 0;
     MythXLocker locker(this);
 
-    if (!XF86VidModeGetModeLine(m_disp, m_screen_num, &dot_clock, &mode_line))
+    if (!XF86VidModeGetModeLine(m_disp, m_screenNum, &dot_clock, &mode_line))
     {
         LOG(VB_GENERAL, LOG_ERR, "X11 ModeLine query failed");
         return -1;

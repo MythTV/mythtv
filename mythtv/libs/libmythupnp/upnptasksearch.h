@@ -45,7 +45,7 @@ class UPnpSearchTask : public Task
         int                     m_nServicePort;
         int                     m_nMaxAge      {3600};
 
-        QHostAddress    m_PeerAddress;
+        QHostAddress    m_peerAddress;
         int             m_nPeerPort;
         QString         m_sST; 
         QString         m_sUDN;

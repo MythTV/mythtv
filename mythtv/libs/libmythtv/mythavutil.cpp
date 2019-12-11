@@ -214,10 +214,7 @@ class MythAVCopyPrivate
 {
 public:
     explicit MythAVCopyPrivate(bool uswc)
-    : m_swsctx(nullptr), m_copyctx(new MythUSWCCopy(4096, !uswc)),
-      m_width(0), m_height(0), m_size(0), m_format(AV_PIX_FMT_NONE)
-    {
-    }
+        : m_copyctx(new MythUSWCCopy(4096, !uswc)) {}
 
     ~MythAVCopyPrivate()
     {
@@ -244,12 +241,12 @@ public:
         return m_size;
     }
 
-    SwsContext   *m_swsctx;
-    MythUSWCCopy *m_copyctx;
-    int           m_width;
-    int           m_height;
-    int           m_size;
-    AVPixelFormat m_format;
+    SwsContext   *m_swsctx  {nullptr};
+    MythUSWCCopy *m_copyctx {nullptr};
+    int           m_width   {0};
+    int           m_height  {0};
+    int           m_size    {0};
+    AVPixelFormat m_format  {AV_PIX_FMT_NONE};
 };
 
 MythAVCopy::MythAVCopy(bool uswc) : d(new MythAVCopyPrivate(uswc))
@@ -294,7 +291,8 @@ int MythAVCopy::Copy(AVFrame *dst, AVPixelFormat dst_pix_fmt,
     if ((pix_fmt == AV_PIX_FMT_YUV420P || pix_fmt == AV_PIX_FMT_NV12) &&
         (dst_pix_fmt == AV_PIX_FMT_YUV420P))
     {
-        VideoFrame framein, frameout;
+        VideoFrame framein;
+        VideoFrame frameout;
 
         FillFrame(&framein, src, width, width, height, pix_fmt);
         FillFrame(&frameout, dst, width, width, height, dst_pix_fmt);
@@ -338,7 +336,8 @@ int MythAVCopy::Copy(VideoFrame *dst, const VideoFrame *src)
         return dst->size;
     }
 
-    AVFrame srcpic, dstpic;
+    AVFrame srcpic;
+    AVFrame dstpic;
 
     AVPictureFill(&srcpic, src);
     AVPictureFill(&dstpic, dst);
@@ -385,14 +384,10 @@ int MythAVCopy::Copy(VideoFrame *frame, const AVFrame *pic, AVPixelFormat fmt)
 
 MythPictureDeinterlacer::MythPictureDeinterlacer(AVPixelFormat pixfmt,
                                                  int width, int height, float ar)
-    : m_filter_graph(nullptr)
-    , m_buffersink_ctx(nullptr)
-    , m_buffersrc_ctx(nullptr)
-    , m_pixfmt(pixfmt)
+    : m_pixfmt(pixfmt)
     , m_width(width)
     , m_height(height)
     , m_ar(ar)
-    , m_errored(false)
 {
     if (Flush() < 0)
     {
@@ -408,29 +403,29 @@ int MythPictureDeinterlacer::Deinterlace(AVFrame *dst, const AVFrame *src)
     }
     if (src)
     {
-        memcpy(m_filter_frame->data, src->data, sizeof(src->data));
-        memcpy(m_filter_frame->linesize, src->linesize, sizeof(src->linesize));
-        m_filter_frame->width = m_width;
-        m_filter_frame->height = m_height;
-        m_filter_frame->format = m_pixfmt;
+        memcpy(m_filterFrame->data, src->data, sizeof(src->data));
+        memcpy(m_filterFrame->linesize, src->linesize, sizeof(src->linesize));
+        m_filterFrame->width = m_width;
+        m_filterFrame->height = m_height;
+        m_filterFrame->format = m_pixfmt;
     }
-    int res = av_buffersrc_add_frame(m_buffersrc_ctx, m_filter_frame);
+    int res = av_buffersrc_add_frame(m_bufferSrcCtx, m_filterFrame);
     if (res < 0)
     {
         return res;
     }
-    res = av_buffersink_get_frame(m_buffersink_ctx, m_filter_frame);
+    res = av_buffersink_get_frame(m_bufferSinkCtx, m_filterFrame);
     if (res < 0)
     {
         return res;
     }
 
     av_image_copy(dst->data, dst->linesize,
-        (const uint8_t **)((AVFrame*)m_filter_frame)->data,
-        (const int*)((AVFrame*)m_filter_frame)->linesize,
+        (const uint8_t **)((AVFrame*)m_filterFrame)->data,
+        (const int*)((AVFrame*)m_filterFrame)->linesize,
         m_pixfmt, m_width, m_height);
 
-    av_frame_unref(m_filter_frame);
+    av_frame_unref(m_filterFrame);
 
     return 0;
 }
@@ -441,7 +436,7 @@ int MythPictureDeinterlacer::DeinterlaceSingle(AVFrame *dst, const AVFrame *src)
     {
         return -1;
     }
-    if (!m_filter_graph && Flush() < 0)
+    if (!m_filterGraph && Flush() < 0)
     {
         return -1;
     }
@@ -450,46 +445,47 @@ int MythPictureDeinterlacer::DeinterlaceSingle(AVFrame *dst, const AVFrame *src)
     {
         res = Deinterlace(dst, nullptr);
         // We have drained the filter, we need to recreate it on the next run.
-        avfilter_graph_free(&m_filter_graph);
+        avfilter_graph_free(&m_filterGraph);
     }
     return res;
 }
 
 int MythPictureDeinterlacer::Flush()
 {
-    if (m_filter_graph)
+    if (m_filterGraph)
     {
-        avfilter_graph_free(&m_filter_graph);
+        avfilter_graph_free(&m_filterGraph);
     }
 
-    m_filter_graph = avfilter_graph_alloc();
-    if (!m_filter_graph)
+    m_filterGraph = avfilter_graph_alloc();
+    if (!m_filterGraph)
     {
         return -1;
     }
 
-    AVFilterInOut *inputs = nullptr, *outputs = nullptr;
+    AVFilterInOut *inputs = nullptr;
+    AVFilterInOut *outputs = nullptr;
     AVRational ar = av_d2q(m_ar, 100000);
     QString args = QString("buffer=video_size=%1x%2:pix_fmt=%3:time_base=1/1:pixel_aspect=%4/%5[in];"
                            "[in]yadif[out];[out] buffersink")
                        .arg(m_width).arg(m_height).arg(m_pixfmt).arg(ar.num).arg(ar.den);
-    int res = avfilter_graph_parse2(m_filter_graph, args.toLatin1().data(), &inputs, &outputs);
+    int res = avfilter_graph_parse2(m_filterGraph, args.toLatin1().data(), &inputs, &outputs);
     while (true)
     {
         if (res < 0 || inputs || outputs)
         {
             break;
         }
-        res = avfilter_graph_config(m_filter_graph, nullptr);
+        res = avfilter_graph_config(m_filterGraph, nullptr);
         if (res < 0)
         {
             break;
         }
-        if (!(m_buffersrc_ctx = avfilter_graph_get_filter(m_filter_graph, "Parsed_buffer_0")))
+        if (!(m_bufferSrcCtx = avfilter_graph_get_filter(m_filterGraph, "Parsed_buffer_0")))
         {
             break;
         }
-        if (!(m_buffersink_ctx = avfilter_graph_get_filter(m_filter_graph, "Parsed_buffersink_2")))
+        if (!(m_bufferSinkCtx = avfilter_graph_get_filter(m_filterGraph, "Parsed_buffersink_2")))
         {
             break;
         }
@@ -502,18 +498,14 @@ int MythPictureDeinterlacer::Flush()
 
 MythPictureDeinterlacer::~MythPictureDeinterlacer()
 {
-    if (m_filter_graph)
+    if (m_filterGraph)
     {
-        avfilter_graph_free(&m_filter_graph);
+        avfilter_graph_free(&m_filterGraph);
     }
 }
 
 
 MythCodecMap *gCodecMap = new MythCodecMap();
-
-MythCodecMap::MythCodecMap() : mapLock(QMutex::Recursive)
-{
-}
 
 MythCodecMap::~MythCodecMap()
 {
@@ -523,8 +515,8 @@ MythCodecMap::~MythCodecMap()
 AVCodecContext *MythCodecMap::getCodecContext(const AVStream *stream,
     const AVCodec *pCodec, bool nullCodec)
 {
-    QMutexLocker lock(&mapLock);
-    AVCodecContext *avctx = streamMap.value(stream, nullptr);
+    QMutexLocker lock(&m_mapLock);
+    AVCodecContext *avctx = m_streamMap.value(stream, nullptr);
     if (!avctx)
     {
         if (stream == nullptr || stream->codecpar == nullptr)
@@ -548,7 +540,7 @@ AVCodecContext *MythCodecMap::getCodecContext(const AVStream *stream,
         if (avctx)
         {
             avctx->pkt_timebase =  stream->time_base;
-            streamMap.insert(stream, avctx);
+            m_streamMap.insert(stream, avctx);
         }
     }
     return avctx;
@@ -556,7 +548,7 @@ AVCodecContext *MythCodecMap::getCodecContext(const AVStream *stream,
 
 AVCodecContext *MythCodecMap::hasCodecContext(const AVStream *stream)
 {
-    return streamMap.value(stream, nullptr);
+    return m_streamMap.value(stream, nullptr);
 }
 
 /// \note This will not free a hardware or frames context that is in anyway referenced outside
@@ -564,8 +556,8 @@ AVCodecContext *MythCodecMap::hasCodecContext(const AVStream *stream)
 /// as well. Leaking hardware contexts is a very bad idea.
 void MythCodecMap::freeCodecContext(const AVStream *stream)
 {
-    QMutexLocker lock(&mapLock);
-    AVCodecContext *avctx = streamMap.take(stream);
+    QMutexLocker lock(&m_mapLock);
+    AVCodecContext *avctx = m_streamMap.take(stream);
     if (avctx)
     {
         if (avctx->internal)
@@ -576,9 +568,9 @@ void MythCodecMap::freeCodecContext(const AVStream *stream)
 
 void MythCodecMap::freeAllCodecContexts()
 {
-    QMutexLocker lock(&mapLock);
-    QMap<const AVStream*, AVCodecContext*>::iterator i = streamMap.begin();
-    while (i != streamMap.end()) {
+    QMutexLocker lock(&m_mapLock);
+    QMap<const AVStream*, AVCodecContext*>::iterator i = m_streamMap.begin();
+    while (i != m_streamMap.end()) {
         const AVStream *stream = i.key();
         ++i;
         freeCodecContext(stream);

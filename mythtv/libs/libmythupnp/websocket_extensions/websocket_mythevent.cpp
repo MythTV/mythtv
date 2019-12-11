@@ -57,7 +57,9 @@ void WebSocketMythEvent::customEvent(QEvent* event)
         if (!m_sendEvents)
             return;
 
-        auto *me = static_cast<MythEvent *>(event);
+        auto *me = dynamic_cast<MythEvent *>(event);
+        if (me == nullptr)
+            return;
         QString message = me->Message();
 
         if (message.startsWith("SYSTEM_EVENT"))

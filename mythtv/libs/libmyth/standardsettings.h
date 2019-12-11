@@ -347,7 +347,7 @@ class MPUBLIC MythUISpinBoxSetting : public StandardSetting
     int m_max;
     int m_step;
     int m_pageMultiple;
-    QString m_special_value_text;
+    QString m_specialValueText;
 };
 
 class MPUBLIC TransMythUISpinBoxSetting: public MythUISpinBoxSetting

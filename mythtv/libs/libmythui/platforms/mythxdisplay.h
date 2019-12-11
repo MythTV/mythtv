@@ -21,7 +21,7 @@ class MUI_PUBLIC MythXDisplay
     ~MythXDisplay();
     Display *GetDisplay(void)          { return m_disp;       }
     QString  GetDisplayName(void) const{ return m_displayName;}
-    int      GetScreen(void) const     { return m_screen_num; }
+    int      GetScreen(void) const     { return m_screenNum; }
     void     Lock(void)                { m_lock.lock();       }
     void     Unlock(void)              { m_lock.unlock();     }
     int      GetDepth(void) const      { return m_depth;      }
@@ -45,7 +45,7 @@ class MUI_PUBLIC MythXDisplay
     void CheckOrphanedErrors(void);
 
     Display      *m_disp       {nullptr};
-    int           m_screen_num {0};
+    int           m_screenNum  {0};
     Screen       *m_screen     {nullptr};
     int           m_depth      {0};
     unsigned long m_black      {0};
@@ -58,18 +58,18 @@ class MUI_PUBLIC MythXDisplay
 class MythXLocker
 {
   public:
-    explicit MythXLocker(MythXDisplay*d) : disp(d)
+    explicit MythXLocker(MythXDisplay*d) : m_disp(d)
     {
-        if (disp) disp->Lock();
+        if (m_disp) m_disp->Lock();
     }
 
     ~MythXLocker()
     {
-        if (disp) disp->Unlock();
+        if (m_disp) m_disp->Unlock();
     }
 
   private:
-    MythXDisplay *disp {nullptr};
+    MythXDisplay *m_disp {nullptr};
 };
 
 MUI_PUBLIC void          LockMythXDisplays(bool lock);

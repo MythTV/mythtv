@@ -678,8 +678,7 @@ void write_padding_pes( int pack_size, int extcnt,
 	pos = write_ps_header(buf,SCR,muxr, extcnt, 0, 0, 1, 1, 1,
 			      0);
 
-	pos += write_pes_header( PADDING_STREAM, pack_size-pos, 0, 0, buf+pos,
-				 0, 0);
+	write_pes_header( PADDING_STREAM, pack_size-pos, 0, 0, buf+pos, 0, 0);
 
 }
 
@@ -726,7 +725,7 @@ int write_video_pes( int pack_size, int extcnt, uint64_t vpts,
 	pos += add;
 
 	if (pos+PES_MIN < pack_size){
-		pos += write_pes_header( PADDING_STREAM, pack_size-pos, 0, 0,
+		write_pes_header( PADDING_STREAM, pack_size-pos, 0, 0,
 					 buf+pos, 0, 0);
 		pos = pack_size;
 	}		
@@ -766,7 +765,7 @@ int write_audio_pes(  int pack_size, int extcnt, int n, uint64_t pts,
 	pos += add;
 
 	if (pos+PES_MIN < pack_size){
-		pos += write_pes_header( PADDING_STREAM, pack_size-pos, 0,0,
+		write_pes_header( PADDING_STREAM, pack_size-pos, 0,0,
 					 buf+pos, 0, 0);
 		pos = pack_size;
 	}		
@@ -819,7 +818,7 @@ int write_ac3_pes(  int pack_size, int extcnt, int n,
 	pos += add;
 
 	if (pos+PES_MIN < pack_size){
-		pos += write_pes_header( PADDING_STREAM, pack_size-pos, 0,0,
+		write_pes_header( PADDING_STREAM, pack_size-pos, 0,0,
 					 buf+pos, 0, 0);
 		pos = pack_size;
 	}		

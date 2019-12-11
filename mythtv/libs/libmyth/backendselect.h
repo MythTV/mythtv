@@ -72,7 +72,7 @@ class BackendSelection : public MythScreenType
     void PromptForPassword(void);
     void CloseWithDecision(Decision);
 
-    DatabaseParams   *m_DBparams        {nullptr};
+    DatabaseParams   *m_dbParams        {nullptr};
     Configuration    *m_pConfig         {nullptr};
     bool              m_exitOnFinish;
     ItemMap           m_devices;
@@ -84,7 +84,7 @@ class BackendSelection : public MythScreenType
     //MythUIButton   *m_searchButton    {nullptr};
 
     QString           m_pinCode;
-    QString           m_USN;
+    QString           m_usn;
 
     QMutex            m_mutex;
 

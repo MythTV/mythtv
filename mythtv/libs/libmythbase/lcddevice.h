@@ -317,7 +317,7 @@ signals:
     bool     m_connected        {false};
 
     QTimer *m_retryTimer        {nullptr};
-    QTimer *m_LEDTimer          {nullptr};
+    QTimer *m_ledTimer          {nullptr};
 
     QString m_sendBuffer;
     QString m_lastCommand;
@@ -342,7 +342,7 @@ signals:
 
     int     m_lcdLedMask        {0};
 
-    int (*GetLEDMask)(void)     {nullptr};
+    int (*m_getLEDMask)(void)   {nullptr};
 };
 
 #endif

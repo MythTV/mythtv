@@ -503,10 +503,13 @@ void StatusBox::doListingsStatus()
     if (m_justHelpText)
         m_justHelpText->SetText(helpmsg);
 
-    QDateTime mfdLastRunStart, mfdLastRunEnd, mfdNextRunStart;
+    QDateTime mfdLastRunStart;
+    QDateTime mfdLastRunEnd;
+    QDateTime mfdNextRunStart;
     QString mfdLastRunStatus;
     QString querytext;
-    QDateTime qdtNow, GuideDataThrough;
+    QDateTime qdtNow;
+    QDateTime GuideDataThrough;
 
     qdtNow = MythDate::current();
 
@@ -1247,9 +1250,13 @@ void StatusBox::doMachineStatus()
     if (m_justHelpText)
         m_justHelpText->SetText(machineStr);
 
-    int           totalM = 0, usedM = 0, freeM = 0;    // Physical memory
-    int           totalS = 0, usedS = 0, freeS = 0;    // Virtual  memory (swap)
-    time_t        uptime = 0;
+    int    totalM = 0;    // Physical memory
+    int    usedM = 0;
+    int    freeM = 0;
+    int    totalS = 0;    // Virtual  memory (swap)
+    int    usedS = 0;
+    int    freeS = 0;
+    time_t uptime = 0;
 
     QString line;
     if (m_isBackendActive)

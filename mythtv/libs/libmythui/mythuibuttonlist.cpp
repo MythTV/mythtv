@@ -260,8 +260,10 @@ bool MythUIButtonList::DistributeRow(int &first_button, int &last_button,
 {
     MythUIGroup *buttonstate = nullptr;
     int  left_cnt = 0;
-    int  left_width = 0, right_width = 0;
-    int  begin = 0, end = 0;
+    int  left_width = 0;
+    int  right_width = 0;
+    int  begin = 0;
+    int  end = 0;
     bool underflow = false;
 
     int selectedIdx = -1;
@@ -724,15 +726,22 @@ bool MythUIButtonList::DistributeCols(int &first_button, int &last_button,
  */
 bool MythUIButtonList::DistributeButtons(void)
 {
-    int  first_button = 0, last_button = 0, start_button = 0;
+    int  first_button = 0;
+    int  last_button = 0;
+    int  start_button = 0;
     int  start_item = m_selPosition;
-    int  first_item = 0, last_item = 0, skip_cols = 0;
+    int  first_item = 0;
+    int  last_item = 0;
+    int  skip_cols = 0;
     int *col_widths = nullptr;
     int  col_cnt = 0;
-    int  selected_column = -1, selected_row = -1;
+    int  selected_column = -1;
+    int  selected_row = -1;
     bool wrapped = false;
     bool grow_left = true;
-    int height = 0, top_height = 0, bottom_height = 0;
+    int height = 0;
+    int top_height = 0;
+    int bottom_height = 0;
 
     QList<int> row_heights;
     QList<int>::iterator Iheight;
@@ -887,7 +896,10 @@ bool MythUIButtonList::DistributeButtons(void)
         return false;
 
     int total = 0;
-    int left_spacing = 0, right_spacing = 0, top_spacing = 0, bottom_spacing = 0;
+    int left_spacing = 0;
+    int right_spacing = 0;
+    int top_spacing = 0;
+    int bottom_spacing = 0;
     MythRect   min_rect;
     QString status_msg;
 
@@ -1139,7 +1151,9 @@ bool MythUIButtonList::DistributeButtons(void)
 
     // Calculate position of each button
     int buttonIdx = first_button - skip_cols;
-    int x = 0, x_adj = 0, y_adj = 0;
+    int x = 0;
+    int x_adj = 0;
+    int y_adj = 0;
 
     int vertical_spacing = top_spacing;
 

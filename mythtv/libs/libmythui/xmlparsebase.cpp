@@ -93,11 +93,13 @@ MythPoint XMLParseBase::parsePoint(QDomElement &element, bool normalize)
 
 QSize XMLParseBase::parseSize(const QString &text, bool normalize)
 {
-    int x = 0, y = 0;
+    int x = 0;
+    int y = 0;
     QSize retval;
 
     QStringList tmp = text.split(",");
-    bool x_ok = false, y_ok = false;
+    bool x_ok = false;
+    bool y_ok = false;
     if (tmp.size() >= 2)
     {
         x = tmp[0].toInt(&x_ok);
@@ -262,7 +264,9 @@ QBrush XMLParseBase::parseGradient(const QDomElement &element)
     {
         QRadialGradient gradient;
         gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
-        float x1 = 0.5, y1 = 0.5, radius = 0.5;
+        float x1 = 0.5;
+        float y1 = 0.5;
+        float radius = 0.5;
         gradient.setCenter(x1,y1);
         gradient.setFocalPoint(x1,y1);
         gradient.setRadius(radius);
@@ -273,7 +277,10 @@ QBrush XMLParseBase::parseGradient(const QDomElement &element)
     {
         QLinearGradient gradient;
         gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
-        float x1 = 0.0, y1 = 0.0, x2 = 0.0, y2 = 0.0;
+        float x1 = 0.0;
+        float y1 = 0.0;
+        float x2 = 0.0;
+        float y2 = 0.0;
         if (direction == "vertical")
         {
             x1 = 0.5;

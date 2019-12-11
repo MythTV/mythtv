@@ -74,7 +74,7 @@ class MBASE_PUBLIC MythPower : public QObject, public ReferenceCounter
     static QMutex s_lock;
 
     MythPower();
-    virtual ~MythPower();
+    virtual ~MythPower() = default;
 
     virtual void   Init              (void);
     virtual bool   DoFeature         (bool = false) { return false; }
@@ -84,7 +84,7 @@ class MBASE_PUBLIC MythPower : public QObject, public ReferenceCounter
     void           SetRequestedDelay (uint Delay);
     void           PowerLevelChanged (int Level);
     static QString FeatureToString   (enum Feature Type);
-    bool           FeatureIsEquivalent(Feature First, Feature Second);
+    static bool    FeatureIsEquivalent(Feature First, Feature Second);
 
     Features  m_features             { FeatureNone };
     Feature   m_scheduledFeature     { FeatureNone };

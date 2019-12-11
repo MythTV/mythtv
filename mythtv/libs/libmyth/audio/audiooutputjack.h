@@ -59,12 +59,12 @@ class AudioOutputJACK : public AudioOutputBase
                            int nframes, const int* channel_volumes);
 
     jack_port_t   *m_ports[JACK_CHANNELS_MAX];
-    int            m_chan_volumes[JACK_CHANNELS_MAX];
+    int            m_chanVolumes[JACK_CHANNELS_MAX];
     jack_client_t *m_client       {nullptr};
-    jack_client_t *m_stale_client {nullptr};
-    int            m_jack_latency {0};
-    int            m_jack_xruns   {0};
-    unsigned char *m_aubuf        {nullptr};
+    jack_client_t *m_staleClient  {nullptr};
+    int            m_jackLatency  {0};
+    int            m_jackXruns    {0};
+    unsigned char *m_auBuf        {nullptr};
 
 
 };

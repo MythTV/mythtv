@@ -150,7 +150,8 @@ removeShortSegments(FrameAnalyzer::FrameMap *breakMap, long long nframes,
      *
      * Return whether or not any segments were actually removed.
      */
-    FrameAnalyzer::FrameMap::Iterator   bb, bbnext;
+    FrameAnalyzer::FrameMap::Iterator   bb;
+    FrameAnalyzer::FrameMap::Iterator   bbnext;
 
     bool removed = false;
 

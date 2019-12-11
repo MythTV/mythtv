@@ -43,7 +43,10 @@ static inline uint32_t arch_accel (uint32_t accel)
 
 #ifdef ACCEL_DETECT
     if (accel & MPEG2_ACCEL_DETECT) {
-	uint32_t eax = 0, ebx = 0, ecx = 0, edx = 0;
+	uint32_t eax = 0;
+	uint32_t ebx = 0;
+	uint32_t ecx = 0;
+	uint32_t edx = 0;
 
 #if defined(__x86_64__) || (!defined(PIC) && !defined(__PIC__))
 #define cpuid(op,eax,ebx,ecx,edx)	\

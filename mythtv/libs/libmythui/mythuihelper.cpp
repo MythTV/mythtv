@@ -872,7 +872,9 @@ void MythUIHelper::PruneCacheDir(const QString& dirname)
         QString("Removing files not accessed since %1")
         .arg(cutoff.toLocalTime().toString(Qt::ISODate)));
 
-    int kept = 0, deleted = 0, errcnt = 0;
+    int kept = 0;
+    int deleted = 0;
+    int errcnt = 0;
     QDir dir(dirname);
     dir.setFilter(QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot);
     dir.setSorting(QDir::NoSort);
@@ -992,9 +994,8 @@ void MythUIHelper::ParseGeometryOverride(const QString &geometry)
     }
 
     bool parsed = false;
-    int tmp_w = 0, tmp_h = 0;
-
-    tmp_w = geo[1].toInt(&parsed);
+    int tmp_h = 0;
+    int tmp_w = geo[1].toInt(&parsed);
 
     if (!parsed)
     {

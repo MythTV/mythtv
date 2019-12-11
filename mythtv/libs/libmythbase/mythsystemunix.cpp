@@ -121,7 +121,8 @@ void MythSystemLegacyIOHandler::run(void)
 
             else if( retval > 0 )
             {
-                PMap_t::iterator i, next;
+                PMap_t::iterator i;
+                PMap_t::iterator next;
                 for( i = m_pMap.begin(); i != m_pMap.end(); i = next )
                 {
                     next = i+1;
@@ -242,7 +243,7 @@ void MythSystemLegacyIOHandler::wake()
 void MythSystemLegacyIOHandler::BuildFDs()
 {
     // build descriptor list
-    FD_ZERO(&m_fds);
+    FD_ZERO(&m_fds); //NOLINT(readability-isolate-declaration)
     m_maxfd = -1;
 
     PMap_t::iterator i;
@@ -366,7 +367,8 @@ void MythSystemLegacyManager::run(void)
 
 
         // loop through running processes for any that require action
-        MSMap_t::iterator   i, next;
+        MSMap_t::iterator   i;
+        MSMap_t::iterator   next;
         time_t              now = time(nullptr);
 
         m_mapLock.lock();
@@ -583,12 +585,12 @@ bool MythSystemLegacyUnix::ParseShell(const QString &cmd, QString &abscmd,
 {
     QList<QChar> whitespace; whitespace << ' ' << '\t' << '\n' << '\r';
     QList<QChar> whitechr; whitechr << 't' << 'n' << 'r';
-    QChar quote = '"',
-      hardquote = '\'',
-         escape = '\\';
-    bool quoted = false,
-     hardquoted = false,
-        escaped = false;
+    QChar quote     = '"';
+    QChar hardquote = '\'';
+    QChar escape    = '\\';
+    bool quoted     = false;
+    bool hardquoted = false;
+    bool escaped    = false;
 
     QString tmp;
     QString::const_iterator i = cmd.begin();

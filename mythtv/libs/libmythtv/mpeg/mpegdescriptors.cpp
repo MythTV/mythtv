@@ -539,7 +539,9 @@ QString MPEGDescriptor::toStringXML(uint level) const
 QString MPEGDescriptor::hexdump(void) const
 {
     uint i;
-    QString str, hex, prt;
+    QString str;
+    QString hex;
+    QString prt;
     for (i=0; i<DescriptorLength(); i++)
     {
         uint ch = _data[i+2];

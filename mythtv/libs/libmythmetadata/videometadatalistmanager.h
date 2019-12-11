@@ -39,7 +39,7 @@ class META_PUBLIC meta_node
 {
   public:
     meta_node(meta_node *parent, bool is_path_root = false) :
-            m_parent(parent), m_path_root(is_path_root) {}
+            m_parent(parent), m_pathRoot(is_path_root) {}
     virtual ~meta_node() = default;
 
     virtual const QString &getName() const = 0;
@@ -52,9 +52,9 @@ class META_PUBLIC meta_node
     meta_node *m_parent {nullptr};
 
   private:
-    QString m_fq_path;
-    bool m_path_root;
-    static const QString m_empty_path;
+    QString m_fqPath;
+    bool m_pathRoot;
+    static const QString kEmptyPath;
 };
 
 class META_PUBLIC meta_data_node : public meta_node
@@ -68,7 +68,7 @@ class META_PUBLIC meta_data_node : public meta_node
 
   private:
     VideoMetadata *m_data {nullptr};
-    static const QString m_meta_bug;
+    static const QString kMetaBug;
 };
 
 class meta_dir_node;

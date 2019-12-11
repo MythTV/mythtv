@@ -69,8 +69,13 @@ bool MetaIOMP4::write(const QString &filename, MusicMetadata* mdata)
  */
 MusicMetadata* MetaIOMP4::read(const QString &filename)
 {
-    QString title, artist, album, genre;
-    int year = 0, tracknum = 0, length = 0;
+    QString title;
+    QString artist;
+    QString album;
+    QString genre;
+    int year = 0;
+    int tracknum = 0;
+    int length = 0;
     bool compilation = false;
 
     AVFormatContext* p_context = nullptr;

@@ -134,8 +134,8 @@ class MBASE_PUBLIC MThread
 
     MThreadInternal *m_thread {nullptr};
     QRunnable *m_runnable     {nullptr};
-    bool m_prolog_executed    {true};
-    bool m_epilog_executed    {true};
+    bool m_prologExecuted     {true};
+    bool m_epilogExecuted     {true};
 };
 
 #endif // _MYTH_THREAD_H_

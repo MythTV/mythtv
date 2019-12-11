@@ -20,8 +20,8 @@
 
 #define LOC      QString("MythFontProperties: ")
 
-QMutex MythFontProperties::m_zoom_lock;
-uint MythFontProperties::m_zoom_percent = 0;
+QMutex MythFontProperties::s_zoomLock;
+uint MythFontProperties::s_zoomPercent = 0;
 
 MythFontProperties::MythFontProperties(void)
 {
@@ -40,7 +40,7 @@ QFont MythFontProperties::face(void) const
     QFont face = m_face;
 
     face.setPixelSize(face.pixelSize() *
-                      (static_cast<double>(m_zoom_percent) / 100.0));
+                      (static_cast<double>(s_zoomPercent) / 100.0));
     return face;
 }
 
@@ -103,22 +103,22 @@ void MythFontProperties::CalcHash(void)
         m_hash += QString("%1%2%3").arg(m_outlineColor.name())
                  .arg(m_outlineSize).arg(m_outlineAlpha);
 
-    m_hash += QString("Z%1").arg(m_zoom_percent);
+    m_hash += QString("Z%1").arg(s_zoomPercent);
 }
 
 void MythFontProperties::Zoom(void)
 {
-    QMutexLocker locker(&m_zoom_lock);
-    if (m_zoom_percent == 0)
-        m_zoom_percent = gCoreContext->GetNumSetting("GUITEXTZOOM", 100);
+    QMutexLocker locker(&s_zoomLock);
+    if (s_zoomPercent == 0)
+        s_zoomPercent = gCoreContext->GetNumSetting("GUITEXTZOOM", 100);
 }
 
 void MythFontProperties::SetZoom(uint percent)
 {
-    QMutexLocker locker(&m_zoom_lock);
+    QMutexLocker locker(&s_zoomLock);
 
     gCoreContext->SaveSetting("GUITEXTZOOM", QString::number(percent));
-    m_zoom_percent = percent;
+    s_zoomPercent = percent;
 }
 
 void MythFontProperties::Rescale(int height)
@@ -493,8 +493,8 @@ MythFontProperties *FontMap::GetFont(const QString &text)
     if (text.isEmpty())
         return nullptr;
 
-    if (m_FontMap.contains(text))
-        return &(m_FontMap[text]);
+    if (m_fontMap.contains(text))
+        return &(m_fontMap[text]);
     return nullptr;
 }
 
@@ -503,14 +503,14 @@ bool FontMap::AddFont(const QString &text, MythFontProperties *font)
     if (!font || text.isEmpty())
         return false;
 
-    if (m_FontMap.contains(text))
+    if (m_fontMap.contains(text))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Already have a font: %1").arg(text));
         return false;
     }
 
-    m_FontMap[text] = *font;
+    m_fontMap[text] = *font;
 
     {
         /* FIXME backwards compat, remove */
@@ -532,12 +532,12 @@ bool FontMap::AddFont(const QString &text, MythFontProperties *font)
 
 bool FontMap::Contains(const QString &text)
 {
-    return m_FontMap.contains(text);
+    return m_fontMap.contains(text);
 }
 
 void FontMap::Clear(void)
 {
-    m_FontMap.clear();
+    m_fontMap.clear();
 
     //FIXME: remove
     globalFontMap.clear();
@@ -552,7 +552,7 @@ void FontMap::Rescale(int height)
     }
 
     QMap<QString, MythFontProperties>::iterator it;
-    for (it = m_FontMap.begin(); it != m_FontMap.end(); ++it)
+    for (it = m_fontMap.begin(); it != m_fontMap.end(); ++it)
     {
         (*it).Rescale(height);
     }

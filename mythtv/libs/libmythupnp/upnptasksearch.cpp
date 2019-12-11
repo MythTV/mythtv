@@ -47,7 +47,7 @@ UPnpSearchTask::UPnpSearchTask( int          nServicePort,
                                 QString      sUDN ) :
     Task("UPnpSearchTask")
 {
-    m_PeerAddress = std::move(peerAddress);
+    m_peerAddress = std::move(peerAddress);
     m_nPeerPort   = nPeerPort;
     m_sST         = std::move(sST);
     m_sUDN        = std::move(sUDN);
@@ -91,8 +91,8 @@ void UPnpSearchTask::SendMsg( MSocketDevice  *pSocket,
                         .arg(sST) .arg(sUSN));
 
     LOG(VB_UPNP, LOG_DEBUG,
-        QString("UPnpSearchTask::SendMsg    m_PeerAddress = %1 Port=%2")
-                        .arg(m_PeerAddress.toString()) .arg(m_nPeerPort));
+        QString("UPnpSearchTask::SendMsg    m_peerAddress = %1 Port=%2")
+                        .arg(m_peerAddress.toString()) .arg(m_nPeerPort));
 #endif
 
     for ( QList<QHostAddress>::Iterator it  = m_addressList.begin();
@@ -133,10 +133,10 @@ void UPnpSearchTask::SendMsg( MSocketDevice  *pSocket,
         // Send Packet to UDP Socket (Send same packet twice)
         // ------------------------------------------------------------------
 
-        pSocket->writeBlock( scPacket, scPacket.length(), m_PeerAddress,
+        pSocket->writeBlock( scPacket, scPacket.length(), m_peerAddress,
                              m_nPeerPort );
         std::this_thread::sleep_for( std::chrono::milliseconds( random() % 250 ));
-        pSocket->writeBlock( scPacket, scPacket.length(), m_PeerAddress,
+        pSocket->writeBlock( scPacket, scPacket.length(), m_peerAddress,
                              m_nPeerPort );
     }
 }

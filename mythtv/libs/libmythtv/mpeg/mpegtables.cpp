@@ -814,7 +814,8 @@ QString ProgramAssociationTable::toString(void) const
     str.append(QString("      tsid(%1) ").arg(TransportStreamID()));
     str.append(QString("programCount(%1)\n").arg(ProgramCount()));
 
-    uint cnt0 = 0, cnt1fff = 0;
+    uint cnt0 = 0;
+    uint cnt1fff = 0;
     for (uint i = 0; i < ProgramCount(); i++)
     {
         if (0x1fff == ProgramPID(i))

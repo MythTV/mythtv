@@ -187,7 +187,7 @@ class MUI_PUBLIC MythUIImage : public MythUIType
     bool            m_showingRandomImage {false};
     QString         m_imageDirectory;
 
-    MythUIImagePrivate *d                {nullptr};
+    MythUIImagePrivate *d                {nullptr}; // NOLINT(readability-identifier-naming)
 
     enum AnimationCycle {kCycleStart, kCycleReverse};
     AnimationCycle  m_animationCycle     {kCycleStart};

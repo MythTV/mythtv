@@ -157,7 +157,7 @@ bool MusicFileScanner::IsMusicFile(const QString &filename)
 {
     QFileInfo fi(filename);
     QString extension = fi.suffix().toLower();
-    QString nameFilter = MetaIO::ValidFileExtensions;
+    QString nameFilter = MetaIO::kValidFileExtensions;
 
     return !extension.isEmpty() && nameFilter.indexOf(extension.toLower()) > -1;
 }
@@ -283,7 +283,7 @@ void MusicFileScanner::AddFileToDB(const QString &filename, const QString &start
         return;
     }
 
-    if (extension.isEmpty() || !MetaIO::ValidFileExtensions.contains(extension.toLower()))
+    if (extension.isEmpty() || !MetaIO::kValidFileExtensions.contains(extension.toLower()))
     {
         LOG(VB_GENERAL, LOG_WARNING, QString("Ignoring filename with unsupported filename: '%1'").arg(filename));
         return;

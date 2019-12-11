@@ -167,7 +167,7 @@ class TransportScanItem
     uint GetMultiplexIdFromDB(void) const;
 
   public:
-    uint               m_mplexid     {(uint)-1}; ///< DB Mplexid
+    uint               m_mplexid     {UINT_MAX}; ///< DB Mplexid
 
     QString            m_friendlyName;        ///< Name to display in scanner dialog
     uint               m_friendlyNum {0};     ///< Frequency number (freqid w/freq table)

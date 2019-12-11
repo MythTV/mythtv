@@ -55,11 +55,11 @@ public:
 MythGesture::MythGesture(size_t max_points, size_t min_points,
                          size_t max_sequence, size_t scale_ratio,
                          float bin_percent) :
-    m_max_points(max_points), m_min_points(min_points), m_max_sequence(max_sequence),
-    m_scale_ratio(scale_ratio), m_bin_percent(bin_percent)
+    m_maxPoints(max_points), m_minPoints(min_points), m_maxSequence(max_sequence),
+    m_scaleRatio(scale_ratio), m_binPercent(bin_percent)
 {
     /* default to an invalid event */
-    m_last_gesture = MythGestureEvent::MaxGesture;
+    m_lastGesture = MythGestureEvent::MaxGesture;
 
     /* create new private information */
     p = new MythGesturePrivate();
@@ -102,10 +102,10 @@ MythGesture::~MythGesture()
 /* comments in header */
 void MythGesture::adjustExtremes(int x, int y)
 {
-    m_min_x = std::min(m_min_x, x);
-    m_max_x = std::max(m_max_x, x);
-    m_min_y = std::min(m_min_y, y);
-    m_max_y = std::max(m_max_y, y);
+    m_minX = std::min(m_minX, x);
+    m_maxX = std::max(m_maxX, x);
+    m_minY = std::min(m_minY, y);
+    m_maxY = std::max(m_maxY, y);
 }
 
 bool MythGesture::recording(void) const
@@ -134,10 +134,10 @@ void MythGesture::stop(void)
         m_recording = false;
 
         /* translate before resetting maximums */
-        m_last_gesture = p->m_sequences[translate()];
+        m_lastGesture = p->m_sequences[translate()];
 
-        m_min_x = m_min_y = 10000;
-        m_max_x = m_max_y = -1;
+        m_minX = m_minY = 10000;
+        m_maxX = m_maxY = -1;
     }
 
     p->m_m.unlock();
@@ -145,7 +145,7 @@ void MythGesture::stop(void)
 
 MythGestureEvent *MythGesture::gesture(void) const
 {
-    return new MythGestureEvent(m_last_gesture);
+    return new MythGestureEvent(m_lastGesture);
 }
 
 /* comments in header */
@@ -169,7 +169,7 @@ QString MythGesture::translate(void)
 {
     size_t total_points = m_points.count();
 
-    if (total_points > m_max_points)
+    if (total_points > m_maxPoints)
     {
         m_points.clear();
         return "0";
@@ -177,7 +177,7 @@ QString MythGesture::translate(void)
 
     /* treat any stroke with less than the minimum number of points as
      * a click (not a drag), which is the center bin */
-    if (total_points < m_min_points)
+    if (total_points < m_minPoints)
     {
         m_points.clear();
         return "5";
@@ -197,25 +197,25 @@ QString MythGesture::translate(void)
     bool first_bin = true;
 
     /* determine size of grid */
-    int delta_x = m_max_x - m_min_x;
-    int delta_y = m_max_y - m_min_y;
+    int delta_x = m_maxX - m_minX;
+    int delta_y = m_maxY - m_minY;
 
     /* calculate bin boundary positions */
-    int bound_x_1 = m_min_x + (delta_x / 3);
-    int bound_x_2 = m_min_x + 2 * (delta_x / 3);
+    int bound_x_1 = m_minX + (delta_x / 3);
+    int bound_x_2 = m_minX + 2 * (delta_x / 3);
 
-    int bound_y_1 = m_min_y + (delta_y / 3);
-    int bound_y_2 = m_min_y + 2 * (delta_y / 3);
+    int bound_y_1 = m_minY + (delta_y / 3);
+    int bound_y_2 = m_minY + 2 * (delta_y / 3);
 
-    if (delta_x > m_scale_ratio * delta_y)
+    if (delta_x > m_scaleRatio * delta_y)
     {
-        bound_y_1 = (m_max_y + m_min_y - delta_x) / 2 + (delta_x / 3);
-        bound_y_2 = (m_max_y + m_min_y - delta_x) / 2 + 2 * (delta_x / 3);
+        bound_y_1 = (m_maxY + m_minY - delta_x) / 2 + (delta_x / 3);
+        bound_y_2 = (m_maxY + m_minY - delta_x) / 2 + 2 * (delta_x / 3);
     }
-    else if (delta_y > m_scale_ratio * delta_x)
+    else if (delta_y > m_scaleRatio * delta_x)
     {
-        bound_x_1 = (m_max_x + m_min_x - delta_y) / 2 + (delta_y / 3);
-        bound_x_2 = (m_max_x + m_min_x - delta_y) / 2 + 2 * (delta_y / 3);
+        bound_x_1 = (m_maxX + m_minX - delta_y) / 2 + (delta_y / 3);
+        bound_x_2 = (m_maxX + m_minX - delta_y) / 2 + 2 * (delta_y / 3);
     }
 
     /* build string by placing points in bins, collapsing bins and
@@ -240,7 +240,7 @@ QString MythGesture::translate(void)
 
             /* we are moving to a new bin -- consider adding to the
                sequence */
-            if ((bin_count > (total_points * m_bin_percent)) || first_bin)
+            if ((bin_count > (total_points * m_binPercent)) || first_bin)
             {
                 first_bin = false;
                 sequence += '0' + prev_bin;
@@ -258,7 +258,7 @@ QString MythGesture::translate(void)
     sequence_count++;
 
     /* bail out on error cases */
-    if (sequence_count > m_max_sequence)
+    if (sequence_count > m_maxSequence)
         sequence = '0';
 
     return sequence;
@@ -268,7 +268,7 @@ QString MythGesture::translate(void)
 bool MythGesture::record(const QPoint & pt)
 {
     /* only record if we haven't exceeded the maximum points */
-    if (((uint)m_points.size() >= m_max_points) || !recording())
+    if (((uint)m_points.size() >= m_maxPoints) || !recording())
         return false;
 
     if (m_points.empty())

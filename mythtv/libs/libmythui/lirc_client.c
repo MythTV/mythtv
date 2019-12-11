@@ -298,7 +298,8 @@ static char *lirc_trim(char *s)
 static char lirc_parse_escape(const struct lirc_state *state, char **s,const char *name,int line)
 {
 
-	unsigned int i = 0, count = 0;
+	unsigned int i = 0;
+	unsigned int count = 0;
 
 	char c=**s;
 	(*s)++;
@@ -955,7 +956,6 @@ static int lirc_readconfig_only_internal(const struct lirc_state *state,
                                          char **full_name,
                                          char **sha_bang)
 {
-	char *string = NULL, *token = NULL, *token2 = NULL, *strtok_state = NULL;
 	int ret=0;
 	int firstline=1;
 	char *save_full_name = NULL;
@@ -981,6 +981,7 @@ static int lirc_readconfig_only_internal(const struct lirc_state *state,
 	char *remote=LIRC_ALL;
 	while (filestack)
 	{
+		char *string = NULL;
 		if((ret=lirc_readline(state,&string,filestack->m_file))==-1 ||
 		   string==NULL)
 		{
@@ -1015,7 +1016,8 @@ static int lirc_readconfig_only_internal(const struct lirc_state *state,
 		char *eq=strchr(string,'=');
 		if(eq==NULL)
 		{
-			token=strtok_r(string," \t",&strtok_state);
+			char *strtok_state = NULL;
+			char *token=strtok_r(string," \t",&strtok_state);
 			if ((token==NULL) || (token[0]=='#'))
 			{
 				/* ignore empty line or comment */
@@ -1033,7 +1035,7 @@ static int lirc_readconfig_only_internal(const struct lirc_state *state,
 				}
 				else
 				{
-					token2 = strtok_r(NULL, "", &strtok_state);
+					char *token2 = strtok_r(NULL, "", &strtok_state);
 					token2 = lirc_trim(token2);
 					lirc_parse_include
 						(token2, filestack->m_name,
@@ -1063,10 +1065,9 @@ static int lirc_readconfig_only_internal(const struct lirc_state *state,
 			}
 			else
 			{
-                                char *token3 = NULL;
-				token2=strtok_r(NULL," \t",&strtok_state);
+				char *token2=strtok_r(NULL," \t",&strtok_state);
 				if(token2!=NULL && 
-				   (token3=strtok_r(NULL," \t",&strtok_state))!=NULL)
+				   strtok_r(NULL," \t",&strtok_state)!=NULL)
 				{
 					lirc_printf(state, "%s: unexpected token in line %s:%d\n",
 						    state->lirc_prog,filestack->m_name,filestack->m_line);
@@ -1104,8 +1105,8 @@ static int lirc_readconfig_only_internal(const struct lirc_state *state,
 		else
 		{
 			eq[0]=0;
-			token=lirc_trim(string);
-			token2=lirc_trim(eq+1);
+			char *token=lirc_trim(string);
+			char *token2=lirc_trim(eq+1);
 			if(token[0]=='#')
 			{
 				/* ignore comment */
@@ -1772,7 +1773,8 @@ int lirc_nextcode(struct lirc_state *state, char **code)
 {
 	static int s_packetSize=PACKET_SIZE;
 	static int s_endLen=0;
-	char *end = NULL, c = '\0';
+	char *end = NULL;
+	char c = '\0';
 
 	*code=NULL;
 	if(state->lirc_buffer==NULL)
@@ -1901,7 +1903,8 @@ static const char *lirc_read_string(const struct lirc_state *state, int fd)
 {
 	static char s_buffer[LIRC_PACKET_SIZE+1]="";
 	char *end = NULL;
-	static size_t s_head=0, s_tail=0;
+	static size_t s_head=0;
+	static size_t s_tail=0;
 	int ret = 0;
 	ssize_t n = 0;
 	fd_set fds;
@@ -1932,7 +1935,7 @@ static const char *lirc_read_string(const struct lirc_state *state, int fd)
 			goto lirc_read_string_error;
 		}
 		
-		FD_ZERO(&fds);
+		FD_ZERO(&fds); // NOLINT(readability-isolate-declaration)
 		FD_SET(fd,&fds);
 		tv.tv_sec=LIRC_TIMEOUT;
 		tv.tv_usec=0;
@@ -1978,8 +1981,11 @@ static const char *lirc_read_string(const struct lirc_state *state, int fd)
 int lirc_send_command(const struct lirc_state *lstate, int sockfd, const char *command, char *buf, size_t *buf_len, int *ret_status)
 {
 	char *endptr = NULL;
-	unsigned long n = 0, data_n=0;
-	size_t written=0, max=0, len = 0;
+	unsigned long n = 0;
+	unsigned long data_n=0;
+	size_t written=0;
+	size_t max=0;
+	size_t len = 0;
 
 	if(buf_len!=NULL)
 	{

@@ -715,7 +715,8 @@ void EITFixUp::SetUKSubtitle(DBEventEIT &event) const
     QStringList strListColon = event.m_description.split(":");
     QStringList strListEnd;
 
-    bool fColon = false, fQuotedSubtitle = false;
+    bool fColon = false;
+    bool fQuotedSubtitle = false;
     int nPosition1;
     QString strEnd;
     if (strListColon.count()>1)
@@ -963,7 +964,7 @@ void EITFixUp::FixUK(DBEventEIT &event) const
     // Multi-part episodes, or films (e.g. ITV film split by news)
     // Matches Part 1, Pt 1/2, Part 1 of 2 etc.
     QRegExp tmpPart = m_ukPart;
-    if ((position1 = tmpPart.indexIn(event.m_title)) != -1)
+    if (tmpPart.indexIn(event.m_title) != -1)
     {
         event.m_partnumber = tmpPart.cap(1).toUInt();
         event.m_parttotal  = tmpPart.cap(2).toUInt();
@@ -1016,8 +1017,8 @@ void EITFixUp::FixUK(DBEventEIT &event) const
         !event.m_title.contains(m_ukLaONoSplit) &&
         !event.m_title.startsWith("Mission: Impossible"))
     {
-        if (((position1=event.m_title.indexOf(m_ukDoubleDotEnd)) != -1) &&
-            ((position2=event.m_description.indexOf(m_ukDoubleDotStart)) != -1))
+        if ((event.m_title.indexOf(m_ukDoubleDotEnd) != -1) &&
+            (event.m_description.indexOf(m_ukDoubleDotStart) != -1))
         {
             QString strPart=event.m_title.remove(m_ukDoubleDotEnd)+" ";
             strFull = strPart + event.m_description.remove(m_ukDoubleDotStart);
@@ -1059,7 +1060,7 @@ void EITFixUp::FixUK(DBEventEIT &event) const
                                 tmp24ep.cap(0).length() - 2);
             event.m_description = event.m_description.remove(tmp24ep.cap(0));
         }
-        else if ((position1 = event.m_description.indexOf(m_ukTime)) == -1)
+        else if (event.m_description.indexOf(m_ukTime) == -1)
         {
             if (!isMovie && (event.m_title.indexOf(m_ukYearColon) < 0))
             {
@@ -1171,7 +1172,7 @@ void EITFixUp::FixComHem(DBEventEIT &event, bool process_subtitle) const
     int pos;
     QRegExp tmpSeries1 = m_comHemSeries1;
     QRegExp tmpSeries2 = m_comHemSeries2;
-    if ((pos = tmpSeries2.indexIn(event.m_title)) != -1)
+    if (tmpSeries2.indexIn(event.m_title) != -1)
     {
         QStringList list = tmpSeries2.capturedTexts();
         event.m_partnumber = list[2].toUInt();
@@ -1578,7 +1579,7 @@ void EITFixUp::FixMCA(DBEventEIT &event) const
 
     // Try to find subtitle in description
     tmpExp1 = m_mcaSubtitle;
-    if ((position = tmpExp1.indexIn(event.m_description)) != -1)
+    if (tmpExp1.indexIn(event.m_description) != -1)
     {
         uint tmpExp1Len = tmpExp1.cap(1).length();
         uint evDescLen = max(event.m_description.length(), 1);
@@ -1593,7 +1594,7 @@ void EITFixUp::FixMCA(DBEventEIT &event) const
 
     // Try to find episode numbers in subtitle
     tmpExp1 = m_mcaSeries;
-    if ((position = tmpExp1.indexIn(event.m_subtitle)) != -1)
+    if (tmpExp1.indexIn(event.m_subtitle) != -1)
     {
         uint season    = tmpExp1.cap(1).toUInt();
         uint episode   = tmpExp1.cap(2).toUInt();

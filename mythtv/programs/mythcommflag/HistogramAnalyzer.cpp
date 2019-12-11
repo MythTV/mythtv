@@ -38,9 +38,14 @@ readData(const QString& filename, float *mean, unsigned char *median, float *std
 
     for (long long frameno = 0; frameno < nframes; frameno++)
     {
-        int monochromaticval = 0, medianval = 0, widthval = 0;
-        int heightval = 0, colval = 0, rowval = 0;
-        float meanval = NAN, stddevval = NAN;
+        int monochromaticval = 0;
+        int medianval = 0;
+        int widthval = 0;
+        int heightval = 0;
+        int colval = 0;
+        int rowval = 0;
+        float meanval = NAN;
+        float stddevval = NAN;
         int nitems = fscanf(fp, "%20d %20f %20d %20f %20d %20d %20d %20d",
                 &monochromaticval, &meanval, &medianval, &stddevval,
                 &widthval, &heightval, &colval, &rowval);
@@ -62,7 +67,7 @@ readData(const QString& filename, float *mean, unsigned char *median, float *std
         }
         for (size_t ii = 0; ii < sizeof(counter)/sizeof(*counter); ii++)
         {
-            if ((nitems = fscanf(fp, "%20x", &counter[ii])) != 1)
+            if (fscanf(fp, "%20x", &counter[ii]) != 1)
             {
                 LOG(VB_COMMFLAG, LOG_ERR,
                     QString("Not enough data in %1: frame %2")
@@ -272,14 +277,30 @@ HistogramAnalyzer::analyzeFrame(const VideoFrame *frame, long long frameno)
     static constexpr int kCInc = 4;
 #define ROUNDUP(a,b)    (((a) + (b) - 1) / (b) * (b))
 
-    int                 pgmwidth = 0, pgmheight = 0;
+    int                 pgmwidth = 0;
+    int                 pgmheight = 0;
     bool                ismonochromatic = false;
-    int                 croprow = 0, cropcol = 0, cropwidth = 0, cropheight = 0;
-    unsigned int        borderpixels = 0, livepixels = 0, npixels = 0, halfnpixels = 0;
-    unsigned char       *pp = nullptr, bordercolor = 0;
-    unsigned long long  sumval = 0, sumsquares = 0;
-    int                 rr1 = 0, cc1 = 0, rr2 = 0, cc2 = 0, rr3 = 0, cc3 = 0;
-    struct timeval      start {}, end {}, elapsed {};
+    int                 croprow = 0;
+    int                 cropcol = 0;
+    int                 cropwidth = 0;
+    int                 cropheight = 0;
+    unsigned int        borderpixels = 0;
+    unsigned int        livepixels = 0;
+    unsigned int        npixels = 0;
+    unsigned int        halfnpixels = 0;
+    unsigned char       *pp = nullptr;
+    unsigned char       bordercolor = 0;
+    unsigned long long  sumval = 0;
+    unsigned long long  sumsquares = 0;
+    int                 rr1 = 0;
+    int                 cc1 = 0;
+    int                 rr2 = 0;
+    int                 cc2 = 0;
+    int                 rr3 = 0;
+    int                 cc3 = 0;
+    struct timeval      start {};
+    struct timeval      end {};
+    struct timeval      elapsed {};
 
     if (m_lastframeno != UNCACHED && m_lastframeno == frameno)
         return FrameAnalyzer::ANALYZE_OK;

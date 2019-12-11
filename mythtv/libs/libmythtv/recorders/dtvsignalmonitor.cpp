@@ -173,7 +173,8 @@ void DTVSignalMonitor::UpdateMonitorValues(void)
 
 void DTVSignalMonitor::UpdateListeningForEIT(void)
 {
-    vector<uint> add_eit, del_eit;
+    vector<uint> add_eit;
+    vector<uint> del_eit;
 
     if (GetStreamData()->HasEITPIDChanges(m_eit_pids) &&
         GetStreamData()->GetEITPIDChanges(m_eit_pids, add_eit, del_eit))

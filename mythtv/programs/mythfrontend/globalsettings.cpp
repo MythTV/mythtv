@@ -2253,7 +2253,8 @@ static HostComboBoxSetting *GuiVidModeResolution()
     // if no resolution setting, set it with a reasonable initial value
     if (!scr.empty() && (gCoreContext->GetSetting("GuiVidModeResolution").isEmpty()))
     {
-        int w = 0, h = 0;
+        int w = 0;
+        int h = 0;
         gCoreContext->GetResolutionSetting("GuiVidMode", w, h);
         if ((w <= 0) || (h <= 0))
         {
@@ -2307,7 +2308,8 @@ void HostRefreshRateComboBoxSetting::ChangeResolution(StandardSetting * setting)
 
     clearSelections();
     QString resolution = setting->getValue();
-    int hz50 = -1, hz60 = -1;
+    int hz50 = -1;
+    int hz60 = -1;
     const vector<double> list = GetRefreshRates(resolution);
     addSelection(QObject::tr("Auto"), "0");
     for (size_t i = 0; i < list.size(); ++i)
@@ -2338,8 +2340,10 @@ vector<double> HostRefreshRateComboBoxSetting::GetRefreshRates(
     const QString &res)
 {
     QStringList slist = res.split("x");
-    int w = 0, h = 0;
-    bool ok0 = false, ok1 = false;
+    int w = 0;
+    int h = 0;
+    bool ok0 = false;
+    bool ok1 = false;
     if (2 == slist.size())
     {
         w = slist[0].toInt(&ok0);

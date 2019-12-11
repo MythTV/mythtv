@@ -98,6 +98,7 @@ int MHParseBinary::ParseInt(int endInt)
         }
 
         firstByte = false;
+        // NOLINTNEXTLINE(clang-analyzer-core.UndefinedBinaryOperatorResult)
         intVal = (intVal << 8) | ch;
     }
 

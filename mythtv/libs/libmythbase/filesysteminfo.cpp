@@ -82,6 +82,9 @@ void FileSystemInfo::clone(const FileSystemInfo &other)
 
 FileSystemInfo &FileSystemInfo::operator=(const FileSystemInfo &other)
 {
+    if (this == &other)
+        return *this;
+
     clone(other);
     return *this;
 }
@@ -172,8 +175,7 @@ void FileSystemInfo::Consolidate(QList<FileSystemInfo> &disks,
 {
     int newid = 0;
 
-    QList<FileSystemInfo>::iterator it1, it2;
-    for (it1 = disks.begin(); it1 != disks.end(); ++it1)
+    for (auto it1 = disks.begin(); it1 != disks.end(); ++it1)
     {
         if (it1->getFSysID() == -1)
         {
@@ -183,7 +185,7 @@ void FileSystemInfo::Consolidate(QList<FileSystemInfo> &disks,
                                 + ":" + it1->getPath());
         }
 
-        for (it2 = it1+1; it2 != disks.end(); ++it2)
+        for (auto it2 = it1+1; it2 != disks.end(); ++it2)
         {
             if (it2->getFSysID() != -1) // disk has already been matched
                 continue;
@@ -220,7 +222,8 @@ void FileSystemInfo::Consolidate(QList<FileSystemInfo> &disks,
 
 void FileSystemInfo::PopulateDiskSpace(void)
 {
-    int64_t total = -1, used = -1;
+    int64_t total = -1;
+    int64_t used = -1;
     getDiskSpace(getPath().toLatin1().constData(), total, used);
     setTotalSpace(total);
     setUsedSpace(used);

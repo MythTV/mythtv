@@ -147,11 +147,11 @@ class UPNP_PUBLIC UPnpDeviceDesc
 
         UPnpDevice      m_rootDevice;
         QString         m_sHostName;
-        QUrl            m_HostUrl;
+        QUrl            m_hostUrl;
 
     protected:
 
-        void    _InternalLoad( QDomNode  oNode, UPnpDevice *pCurDevice );
+        void    InternalLoad( QDomNode  oNode, UPnpDevice *pCurDevice );
 
         static void     ProcessIconList   ( const QDomNode& oListNode, UPnpDevice *pDevice );
         static void     ProcessServiceList( const QDomNode& oListNode, UPnpDevice *pDevice );

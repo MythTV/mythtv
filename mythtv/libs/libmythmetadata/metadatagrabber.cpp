@@ -104,7 +104,8 @@ GrabberList MetaGrabberScript::GetList(GrabberType type,
 {
     InitializeStaticMaps();
 
-    GrabberList tmpGrabberList, retGrabberList;
+    GrabberList tmpGrabberList;
+    GrabberList retGrabberList;
     {
         QMutexLocker listLock(&grabberLock);
         QDateTime now = MythDate::current();

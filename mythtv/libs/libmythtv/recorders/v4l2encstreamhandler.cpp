@@ -190,8 +190,6 @@ void V4L2encStreamHandler::run(void)
     bool      gap = false;
     QDateTime gap_start;
 
-    int len, remainder = 0;
-
     QByteArray buffer;
     char* pkt_buf = new char[PACKET_SIZE + 1];
 
@@ -213,7 +211,7 @@ void V4L2encStreamHandler::run(void)
         if (!m_drb)
             break;
 
-        len = m_drb->Read(reinterpret_cast<unsigned char *>(pkt_buf),
+        int len = m_drb->Read(reinterpret_cast<unsigned char *>(pkt_buf),
                           PACKET_SIZE);
         if (m_drb->IsErrored())
         {
@@ -300,6 +298,7 @@ void V4L2encStreamHandler::run(void)
             continue;
         }
 
+        int remainder = 0;
         StreamDataList::const_iterator sit = m_stream_data_list.begin();
         for (; sit != m_stream_data_list.end(); ++sit)
             remainder = sit.key()->ProcessData
@@ -952,7 +951,8 @@ bool V4L2encStreamHandler::SetBitrateForResolution(void)
 {
     m_width = m_height = -1;
 
-    int width, height, pix;
+    int width;
+    int height;
     int idx = 0;
     for ( ; idx < 10; ++idx)
     {
@@ -970,7 +970,7 @@ bool V4L2encStreamHandler::SetBitrateForResolution(void)
 
     m_width  = width;
     m_height = height;
-    pix      = width * height;
+    int pix = width * height;
 
     int old_mode = m_bitrate_mode;
     int old_max  = m_max_bitrate;

@@ -241,7 +241,7 @@ avfDecoder::avfDecoder(const QString &file, DecoderFactory *d, AudioOutput *o) :
     setURL(file);
 
     m_outputBuffer =
-        (uint8_t *)av_malloc(AudioOutput::MAX_SIZE_BUFFER);
+        (uint8_t *)av_malloc(AudioOutput::kMaxSizeBuffer);
 
     bool debug = VERBOSE_LEVEL_CHECK(VB_LIBAV, LOG_ANY);
     av_log_set_level((debug) ? AV_LOG_DEBUG : AV_LOG_ERROR);
@@ -437,7 +437,8 @@ void avfDecoder::run()
         return;
     }
 
-    AVPacket pkt, tmp_pkt;
+    AVPacket pkt;
+    AVPacket tmp_pkt;
     memset(&pkt, 0, sizeof(AVPacket));
     av_init_packet(&pkt);
 
@@ -601,7 +602,7 @@ bool avfDecoderFactory::supports(const QString &source) const
 
 const QString &avfDecoderFactory::extension() const
 {
-    return MetaIO::ValidFileExtensions;
+    return MetaIO::kValidFileExtensions;
 }
 
 const QString &avfDecoderFactory::description() const

@@ -41,12 +41,12 @@ namespace
 }
 
 template <>
-void CheckedSet(MythUIStateType *uiItem, const QString &state)
+void CheckedSet(MythUIStateType *uiItem, const QString &value)
 {
     if (uiItem)
     {
         uiItem->Reset();
-        uiItem->DisplayState(state);
+        uiItem->DisplayState(value);
     }
 }
 

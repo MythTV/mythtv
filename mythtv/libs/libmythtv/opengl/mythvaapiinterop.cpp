@@ -79,7 +79,7 @@ MythVAAPIInterop::MythVAAPIInterop(MythRenderOpenGL *Context, Type InteropType)
 
 MythVAAPIInterop::~MythVAAPIInterop()
 {
-    DestroyDeinterlacer();
+    MythVAAPIInterop::DestroyDeinterlacer();
     if (m_vaDisplay)
         if (vaTerminate(m_vaDisplay) != VA_STATUS_SUCCESS)
             LOG(VB_GENERAL, LOG_WARNING, LOC + "Error closing VAAPI display");
@@ -99,7 +99,8 @@ void MythVAAPIInterop::InitaliseDisplay(void)
 {
     if (!m_vaDisplay)
         return;
-    int major, minor;
+    int major;
+    int minor;
     if (vaInitialize(m_vaDisplay, &major, &minor) != VA_STATUS_SUCCESS)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to initialise VAAPI display");

@@ -55,7 +55,8 @@ DTC::MusicMetadataInfoList* Music::GetTrackList(int nStartIndex,
             FillMusicMetadataInfo ( pMusicMetadataInfo, metadata, true );
     }
 
-    int curPage = 0, totalPages = 0;
+    int curPage = 0;
+    int totalPages = 0;
     if (nCount == 0)
         totalPages = 1;
     else

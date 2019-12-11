@@ -193,7 +193,11 @@ public:
         m_surroundBalance = (a-b)/(a+b);
         m_surroundLevel = 1/(a+b);
         // calc the linear coefficients
-        cfloat i(0,1), u((a+b)*i), v((b-a)*i), n(0.25,0),o(1,0);
+        cfloat i(0,1);
+        cfloat u((a+b)*i);
+        cfloat v((b-a)*i);
+        cfloat n(0.25,0);
+        cfloat o(1,0);
         m_a = (v-o)*n; m_b = (o-u)*n; m_c = (-o-v)*n; m_d = (o+u)*n;
         m_e = (o+v)*n; m_f = (o+u)*n; m_g = (o-v)*n;  m_h = (o-u)*n;
     }
@@ -271,8 +275,10 @@ private:
         //    but dont do DC or N/2 component
         for (unsigned f=0;f<m_halfN;f++) {
             // get left/right amplitudes/phases
-            float ampL = amplitude(m_dftL[f]), ampR = amplitude(m_dftR[f]);
-            float phaseL = phase(m_dftL[f]), phaseR = phase(m_dftR[f]);
+            float ampL = amplitude(m_dftL[f]);
+            float ampR = amplitude(m_dftR[f]);
+            float phaseL = phase(m_dftL[f]);
+            float phaseR = phase(m_dftR[f]);
 //          if (ampL+ampR < epsilon)
 //              continue;       
 
@@ -297,8 +303,10 @@ private:
                 m_xFs[f] = clamp(m_xFs[f] * (m_frontSeparation*(1+m_yFs[f])/2 + m_rearSeparation*(1-m_yFs[f])/2));
 
                 // 3. generate frequency filters for each output channel
-                float left = (1-m_xFs[f])/2, right = (1+m_xFs[f])/2;
-                float front = (1+m_yFs[f])/2, back = (1-m_yFs[f])/2;
+                float left = (1-m_xFs[f])/2;
+                float right = (1+m_xFs[f])/2;
+                float front = (1+m_yFs[f])/2;
+                float back = (1-m_yFs[f])/2;
                 float volume[5] = {
                     front * (left * center_width + max(0,-m_xFs[f]) * (1-center_width)),  // left
                     front * center_level*((1-abs(m_xFs[f])) * (1-center_width)),          // center
@@ -342,8 +350,10 @@ private:
 
                 // 3. generate frequency filters for each output channel, according to the signal position
                 // the sum of all channel volumes must be 1.0
-                float left = (1-m_xFs[f])/2, right = (1+m_xFs[f])/2;
-                float front = (1+m_yFs[f])/2, back = (1-m_yFs[f])/2;
+                float left = (1-m_xFs[f])/2;
+                float right = (1+m_xFs[f])/2;
+                float front = (1+m_yFs[f])/2;
+                float back = (1-m_yFs[f])/2;
                 float volume[5] = {
                     front * (left * center_width + max(0,-m_xFs[f]) * (1-center_width)),      // left
                     front * center_level*((1-abs(m_xFs[f])) * (1-center_width)),              // center
@@ -391,7 +401,8 @@ private:
 
     // map from amplitude difference and yfs to xfs
     static inline double get_xfs(double ampDiff, double yfs) {
-        double x=ampDiff,y=yfs;
+        double x=ampDiff;
+        double y=yfs;
 #ifdef FASTER_CALC
         double tanX = tan(x);
         double tanY = tan(y);
@@ -554,35 +565,35 @@ private:
 
 // implementation of the shell class
 
-fsurround_decoder::fsurround_decoder(unsigned blocksize): impl(new decoder_impl(blocksize)) { }
+fsurround_decoder::fsurround_decoder(unsigned blocksize): m_impl(new decoder_impl(blocksize)) { }
 
-fsurround_decoder::~fsurround_decoder() { delete impl; }
+fsurround_decoder::~fsurround_decoder() { delete m_impl; }
 
 void fsurround_decoder::decode(float center_width, float dimension, float adaption_rate) {
-    impl->decode(center_width,dimension,adaption_rate);
+    m_impl->decode(center_width,dimension,adaption_rate);
 }
 
-void fsurround_decoder::flush() { impl->flush(); }
+void fsurround_decoder::flush() { m_impl->flush(); }
 
-void fsurround_decoder::surround_coefficients(float a, float b) { impl->surround_coefficients(a,b); }
+void fsurround_decoder::surround_coefficients(float a, float b) { m_impl->surround_coefficients(a,b); }
 
-void fsurround_decoder::phase_mode(unsigned mode) { impl->phase_mode(mode); }
+void fsurround_decoder::phase_mode(unsigned mode) { m_impl->phase_mode(mode); }
 
-void fsurround_decoder::steering_mode(bool mode) { impl->steering_mode(mode); }
+void fsurround_decoder::steering_mode(bool mode) { m_impl->steering_mode(mode); }
 
-void fsurround_decoder::separation(float front, float rear) { impl->separation(front,rear); }
+void fsurround_decoder::separation(float front, float rear) { m_impl->separation(front,rear); }
 
 float ** fsurround_decoder::getInputBuffers()
 {
-    return impl->getInputBuffers();
+    return m_impl->getInputBuffers();
 }
 
 float ** fsurround_decoder::getOutputBuffers()
 {
-    return impl->getOutputBuffers();
+    return m_impl->getOutputBuffers();
 }
 
 void fsurround_decoder::sample_rate(unsigned int samplerate)
 {
-    impl->sample_rate(samplerate);
+    m_impl->sample_rate(samplerate);
 }

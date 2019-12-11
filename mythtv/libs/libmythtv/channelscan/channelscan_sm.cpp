@@ -648,7 +648,8 @@ bool ChannelScanSM::TestNextProgramEncryption(void)
 
         if (pmt)
         {
-            QString cur_chan, cur_chan_tr;
+            QString cur_chan;
+            QString cur_chan_tr;
             GetCurrentTransportInfo(cur_chan, cur_chan_tr);
 
             QString msg_tr =
@@ -1002,7 +1003,8 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
     // Start scanning next transport if we are done with this one..
     if (transport_tune_complete)
     {
-        QString cchan, cchan_tr;
+        QString cchan;
+        QString cchan_tr;
         uint cchan_cnt = GetCurrentTransportInfo(cchan, cchan_tr);
         m_channelsFound += cchan_cnt;
         QString chan_tr = QObject::tr("%1 -- Timed out").arg(cchan_tr);
@@ -1896,7 +1898,8 @@ bool ChannelScanSM::HasTimedOut(void)
         const DiSEqCDevRotor *rotor = GetDVBChannel()->GetRotor();
         if (rotor)
         {
-            bool was_moving, is_moving;
+            bool was_moving;
+            bool is_moving;
             sigmon->GetRotorStatus(was_moving, is_moving);
             if (was_moving && !is_moving)
             {

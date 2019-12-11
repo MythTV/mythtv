@@ -13,7 +13,7 @@
 void MythDVDPlayer::AutoDeint(VideoFrame *Frame, bool AllowLock)
 {
     bool dummy = false;
-    if (decoder && decoder->GetMythCodecContext()->IsDeinterlacing(dummy))
+    if (m_decoder && m_decoder->GetMythCodecContext()->IsDeinterlacing(dummy))
     {
         MythPlayer::AutoDeint(Frame, AllowLock);
         return;
@@ -33,7 +33,7 @@ void MythDVDPlayer::ReleaseNextVideoFrame(VideoFrame *Buffer,
                                           int64_t Timecode, bool /*wrap*/)
 {
     MythPlayer::ReleaseNextVideoFrame(Buffer, Timecode,
-                        !player_ctx->m_buffer->IsInDiscMenuOrStillFrame());
+                        !m_playerCtx->m_buffer->IsInDiscMenuOrStillFrame());
 }
 
 bool MythDVDPlayer::HasReachedEof(void) const
@@ -41,26 +41,26 @@ bool MythDVDPlayer::HasReachedEof(void) const
     EofState eof = GetEof();
     // DeleteMap and EditMode from the parent MythPlayer should not be
     // relevant here.
-    return eof != kEofStateNone && !allpaused;
+    return eof != kEofStateNone && !m_allPaused;
 }
 
 void MythDVDPlayer::DisableCaptions(uint Mode, bool OSDMsg)
 {
-    if ((kDisplayAVSubtitle & Mode) && player_ctx->m_buffer->IsDVD())
-        player_ctx->m_buffer->DVD()->SetTrack(kTrackTypeSubtitle, -1);
+    if ((kDisplayAVSubtitle & Mode) && m_playerCtx->m_buffer->IsDVD())
+        m_playerCtx->m_buffer->DVD()->SetTrack(kTrackTypeSubtitle, -1);
     MythPlayer::DisableCaptions(Mode, OSDMsg);
 }
 
 void MythDVDPlayer::EnableCaptions(uint Mode, bool OSDMsg)
 {
-    if ((kDisplayAVSubtitle & Mode) && player_ctx->m_buffer->IsDVD())
+    if ((kDisplayAVSubtitle & Mode) && m_playerCtx->m_buffer->IsDVD())
     {
         int track = GetTrack(kTrackTypeSubtitle);
-        if (track >= 0 && track < static_cast<int>(decoder->GetTrackCount(kTrackTypeSubtitle)))
+        if (track >= 0 && track < static_cast<int>(m_decoder->GetTrackCount(kTrackTypeSubtitle)))
         {
-            StreamInfo stream = decoder->GetTrackInfo(kTrackTypeSubtitle,
+            StreamInfo stream = m_decoder->GetTrackInfo(kTrackTypeSubtitle,
                                                       static_cast<uint>(track));
-            player_ctx->m_buffer->DVD()->SetTrack(kTrackTypeSubtitle,
+            m_playerCtx->m_buffer->DVD()->SetTrack(kTrackTypeSubtitle,
                                                 stream.m_stream_id);
         }
     }
@@ -69,8 +69,8 @@ void MythDVDPlayer::EnableCaptions(uint Mode, bool OSDMsg)
 
 void MythDVDPlayer::DisplayPauseFrame(void)
 {
-    if (player_ctx->m_buffer->IsDVD() &&
-        player_ctx->m_buffer->DVD()->IsInStillFrame())
+    if (m_playerCtx->m_buffer->IsDVD() &&
+        m_playerCtx->m_buffer->DVD()->IsInStillFrame())
     {
         SetScanType(kScan_Progressive);
     }
@@ -92,11 +92,11 @@ bool MythDVDPlayer::PrebufferEnoughFrames(int /*MinBuffers*/)
 bool MythDVDPlayer::DecoderGetFrameFFREW(void)
 {
     bool res = MythPlayer::DecoderGetFrameFFREW();
-    if (decoder_change_lock.tryLock(1))
+    if (m_decoderChangeLock.tryLock(1))
     {
-        if (decoder)
-            decoder->UpdateFramesPlayed();
-        decoder_change_lock.unlock();
+        if (m_decoder)
+            m_decoder->UpdateFramesPlayed();
+        m_decoderChangeLock.unlock();
     }
     return res;
 }
@@ -104,8 +104,8 @@ bool MythDVDPlayer::DecoderGetFrameFFREW(void)
 bool MythDVDPlayer::DecoderGetFrameREW(void)
 {
     MythPlayer::DecoderGetFrameREW();
-    return (player_ctx->m_buffer->IsDVD() &&
-            (player_ctx->m_buffer->DVD()->GetCurrentTime() < 2));
+    return (m_playerCtx->m_buffer->IsDVD() &&
+            (m_playerCtx->m_buffer->DVD()->GetCurrentTime() < 2));
 }
 
 void MythDVDPlayer::PreProcessNormalFrame(void)
@@ -115,23 +115,23 @@ void MythDVDPlayer::PreProcessNormalFrame(void)
 
 void MythDVDPlayer::VideoStart(void)
 {
-    if (!m_initial_dvdstate.isEmpty())
-        player_ctx->m_buffer->DVD()->RestoreDVDStateSnapshot(m_initial_dvdstate);
+    if (!m_initialDvdState.isEmpty())
+        m_playerCtx->m_buffer->DVD()->RestoreDVDStateSnapshot(m_initialDvdState);
 
     MythPlayer::VideoStart();
 }
 
 bool MythDVDPlayer::VideoLoop(void)
 {
-    if (!player_ctx->m_buffer->IsDVD())
+    if (!m_playerCtx->m_buffer->IsDVD())
     {
         SetErrored("RingBuffer is not a DVD.");
         return !IsErrored();
     }
 
     int nbframes = 0;
-    if (videoOutput)
-        nbframes = videoOutput->ValidVideoFrames();
+    if (m_videoOutput)
+        nbframes = m_videoOutput->ValidVideoFrames();
 
 #if 0
     LOG(VB_PLAYBACK, LOG_DEBUG,
@@ -140,36 +140,36 @@ bool MythDVDPlayer::VideoLoop(void)
 #endif
 
     // completely drain the video buffers for certain situations
-    bool release_all = player_ctx->m_buffer->DVD()->DVDWaitingForPlayer() &&
+    bool release_all = m_playerCtx->m_buffer->DVD()->DVDWaitingForPlayer() &&
                       (nbframes > 0);
-    bool release_one = (nbframes > 1) && videoPaused && !allpaused &&
-                       (!videoOutput->EnoughFreeFrames() ||
-                        player_ctx->m_buffer->DVD()->IsWaiting() ||
-                        player_ctx->m_buffer->DVD()->IsInStillFrame());
+    bool release_one = (nbframes > 1) && m_videoPaused && !m_allPaused &&
+                       (!m_videoOutput->EnoughFreeFrames() ||
+                        m_playerCtx->m_buffer->DVD()->IsWaiting() ||
+                        m_playerCtx->m_buffer->DVD()->IsInStillFrame());
     if (release_all || release_one)
     {
-        if (nbframes < 5 && videoOutput)
-            videoOutput->UpdatePauseFrame(disp_timecode);
+        if (nbframes < 5 && m_videoOutput)
+            m_videoOutput->UpdatePauseFrame(m_dispTimecode);
 
         // if we go below the pre-buffering limit, the player will pause
         // so do this 'manually'
         DisplayNormalFrame(false);
         // unpause the still frame if more frames become available
-        if (m_dvd_stillframe_showing && nbframes > 1)
+        if (m_dvdStillFrameShowing && nbframes > 1)
         {
-            m_dvd_stillframe_showing = false;
+            m_dvdStillFrameShowing = false;
             UnpauseVideo();
         }
         return !IsErrored();
     }
 
     // clear the mythtv imposed wait state
-    if (player_ctx->m_buffer->DVD()->DVDWaitingForPlayer())
+    if (m_playerCtx->m_buffer->DVD()->DVDWaitingForPlayer())
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Clearing MythTV DVD wait state");
-        player_ctx->m_buffer->DVD()->SkipDVDWaitingForPlayer();
+        m_playerCtx->m_buffer->DVD()->SkipDVDWaitingForPlayer();
         ClearAfterSeek(true);
-        if (videoPaused && !allpaused)
+        if (m_videoPaused && !m_allPaused)
             UnpauseVideo();
         return !IsErrored();
     }
@@ -178,27 +178,27 @@ bool MythDVDPlayer::VideoLoop(void)
     if (nbframes < 2)
     {
         // clear the DVD wait state
-        if (player_ctx->m_buffer->DVD()->IsWaiting())
+        if (m_playerCtx->m_buffer->DVD()->IsWaiting())
         {
             LOG(VB_PLAYBACK, LOG_INFO, LOC + "Clearing DVD wait state");
-            player_ctx->m_buffer->DVD()->WaitSkip();
-            if (videoPaused && !allpaused)
+            m_playerCtx->m_buffer->DVD()->WaitSkip();
+            if (m_videoPaused && !m_allPaused)
                 UnpauseVideo();
             return !IsErrored();
         }
 
         // the still frame is treated as a pause frame
-        if (player_ctx->m_buffer->DVD()->IsStillFramePending())
+        if (m_playerCtx->m_buffer->DVD()->IsStillFramePending())
         {
             // ensure we refresh the pause frame
-            if (!m_dvd_stillframe_showing)
-                needNewPauseFrame = true;
+            if (!m_dvdStillFrameShowing)
+                m_needNewPauseFrame = true;
 
             // we are in a still frame so pause video output
-            if (!videoPaused)
+            if (!m_videoPaused)
             {
                 PauseVideo();
-                m_dvd_stillframe_showing = true;
+                m_dvdStillFrameShowing = true;
                 return !IsErrored();
             }
 
@@ -214,15 +214,15 @@ bool MythDVDPlayer::VideoLoop(void)
                 return !IsErrored();
             }
 
-            m_dvd_stillframe_showing = true;
+            m_dvdStillFrameShowing = true;
         }
     }
 
     // unpause the still frame if more frames become available
-    if (m_dvd_stillframe_showing && nbframes > 1)
+    if (m_dvdStillFrameShowing && nbframes > 1)
     {
         UnpauseVideo();
-        m_dvd_stillframe_showing = false;
+        m_dvdStillFrameShowing = false;
         return !IsErrored();
     }
 
@@ -242,15 +242,15 @@ void MythDVDPlayer::DisplayLastFrame(void)
 
 bool MythDVDPlayer::FastForward(float Seconds)
 {
-    if (decoder)
-        decoder->UpdateFramesPlayed();
+    if (m_decoder)
+        m_decoder->UpdateFramesPlayed();
     return MythPlayer::FastForward(Seconds);
 }
 
 bool MythDVDPlayer::Rewind(float Seconds)
 {
-    if (decoder)
-        decoder->UpdateFramesPlayed();
+    if (m_decoder)
+        m_decoder->UpdateFramesPlayed();
     return MythPlayer::Rewind(Seconds);
 }
 
@@ -259,58 +259,58 @@ bool MythDVDPlayer::JumpToFrame(uint64_t Frame)
     if (Frame == ~0x0ULL)
         return false;
 
-    if (decoder)
-        decoder->UpdateFramesPlayed();
+    if (m_decoder)
+        m_decoder->UpdateFramesPlayed();
     return MythPlayer::JumpToFrame(Frame);
 }
 
 void MythDVDPlayer::EventStart(void)
 {
-    if (player_ctx->m_buffer->DVD())
-        player_ctx->m_buffer->DVD()->SetParent(this);
+    if (m_playerCtx->m_buffer->DVD())
+        m_playerCtx->m_buffer->DVD()->SetParent(this);
 
-    player_ctx->LockPlayingInfo(__FILE__, __LINE__);
-    if (player_ctx->m_playingInfo)
+    m_playerCtx->LockPlayingInfo(__FILE__, __LINE__);
+    if (m_playerCtx->m_playingInfo)
     {
         QString name;
         QString serialid;
-        if (player_ctx->m_playingInfo->GetTitle().isEmpty() &&
-            player_ctx->m_buffer->DVD() &&
-            player_ctx->m_buffer->DVD()->GetNameAndSerialNum(name, serialid))
+        if (m_playerCtx->m_playingInfo->GetTitle().isEmpty() &&
+            m_playerCtx->m_buffer->DVD() &&
+            m_playerCtx->m_buffer->DVD()->GetNameAndSerialNum(name, serialid))
         {
-            player_ctx->m_playingInfo->SetTitle(name);
+            m_playerCtx->m_playingInfo->SetTitle(name);
         }
     }
-    player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
+    m_playerCtx->UnlockPlayingInfo(__FILE__, __LINE__);
 
     MythPlayer::EventStart();
 }
 
 void MythDVDPlayer::InitialSeek(void)
 {
-    player_ctx->m_buffer->IgnoreWaitStates(true);
+    m_playerCtx->m_buffer->IgnoreWaitStates(true);
 
-    if (m_initial_title > -1)
-        player_ctx->m_buffer->DVD()->PlayTitleAndPart(m_initial_title, 1);
+    if (m_initialTitle > -1)
+        m_playerCtx->m_buffer->DVD()->PlayTitleAndPart(m_initialTitle, 1);
 
-    if (m_initial_audio_track > -1)
-        player_ctx->m_buffer->DVD()->SetTrack(kTrackTypeAudio,
-                                            m_initial_audio_track);
-    if (m_initial_subtitle_track > -1)
-        player_ctx->m_buffer->DVD()->SetTrack(kTrackTypeSubtitle,
-                                            m_initial_subtitle_track);
+    if (m_initialAudioTrack > -1)
+        m_playerCtx->m_buffer->DVD()->SetTrack(kTrackTypeAudio,
+                                               m_initialAudioTrack);
+    if (m_initialSubtitleTrack > -1)
+        m_playerCtx->m_buffer->DVD()->SetTrack(kTrackTypeSubtitle,
+                                               m_initialSubtitleTrack);
 
-    if (bookmarkseek > 30)
+    if (m_bookmarkSeek > 30)
     {
         // we need to trigger a dvd cell change to ensure the new title length
         // is set and the position map updated accordingly
-        decodeOneFrame = true;
+        m_decodeOneFrame = true;
         int count = 0;
-        while (count++ < 100 && decodeOneFrame)
+        while (count++ < 100 && m_decodeOneFrame)
             usleep(50000);
     }
     MythPlayer::InitialSeek();
-    player_ctx->m_buffer->IgnoreWaitStates(false);
+    m_playerCtx->m_buffer->IgnoreWaitStates(false);
 }
 
 void MythDVDPlayer::ResetPlaying(bool /*ResetFrames*/)
@@ -320,22 +320,22 @@ void MythDVDPlayer::ResetPlaying(bool /*ResetFrames*/)
 
 void MythDVDPlayer::EventEnd(void)
 {
-    if (player_ctx->m_buffer->DVD())
-        player_ctx->m_buffer->DVD()->SetParent(nullptr);
+    if (m_playerCtx->m_buffer->DVD())
+        m_playerCtx->m_buffer->DVD()->SetParent(nullptr);
 }
 
 bool MythDVDPlayer::PrepareAudioSample(int64_t &Timecode)
 {
-    if (!player_ctx->m_buffer->IsInDiscMenuOrStillFrame())
+    if (!m_playerCtx->m_buffer->IsInDiscMenuOrStillFrame())
         WrapTimecode(Timecode, TC_AUDIO);
 
-    return player_ctx->m_buffer->IsDVD() &&
-           player_ctx->m_buffer->DVD()->IsInStillFrame();
+    return m_playerCtx->m_buffer->IsDVD() &&
+           m_playerCtx->m_buffer->DVD()->IsInStillFrame();
 }
 
 void MythDVDPlayer::SetBookmark(bool Clear)
 {
-    if (!player_ctx->m_buffer->IsDVD())
+    if (!m_playerCtx->m_buffer->IsDVD())
         return;
 
     QStringList fields;
@@ -343,25 +343,25 @@ void MythDVDPlayer::SetBookmark(bool Clear)
     QString serialid;
     QString dvdstate;
 
-    if (!player_ctx->m_buffer->IsInMenu() &&
-        (player_ctx->m_buffer->IsBookmarkAllowed() || Clear))
+    if (!m_playerCtx->m_buffer->IsInMenu() &&
+        (m_playerCtx->m_buffer->IsBookmarkAllowed() || Clear))
     {
-        if (!player_ctx->m_buffer->DVD()->GetNameAndSerialNum(name, serialid))
+        if (!m_playerCtx->m_buffer->DVD()->GetNameAndSerialNum(name, serialid))
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 "DVD has no name and serial number. Cannot set bookmark.");
             return;
         }
 
-        if (!Clear && !player_ctx->m_buffer->DVD()->GetDVDStateSnapshot(dvdstate))
+        if (!Clear && !m_playerCtx->m_buffer->DVD()->GetDVDStateSnapshot(dvdstate))
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 "Unable to retrieve DVD state. Cannot set bookmark.");
             return;
         }
 
-        player_ctx->LockPlayingInfo(__FILE__, __LINE__);
-        if (player_ctx->m_playingInfo)
+        m_playerCtx->LockPlayingInfo(__FILE__, __LINE__);
+        if (m_playerCtx->m_playingInfo)
         {
             fields += serialid;
             fields += name;
@@ -377,28 +377,28 @@ void MythDVDPlayer::SetBookmark(bool Clear)
             ProgramInfo::SaveDVDBookmark(fields);
 
         }
-        player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
+        m_playerCtx->UnlockPlayingInfo(__FILE__, __LINE__);
     }
 }
 
 uint64_t MythDVDPlayer::GetBookmark(void)
 {
-    if (gCoreContext->IsDatabaseIgnored() || !player_ctx->m_buffer->IsDVD())
+    if (gCoreContext->IsDatabaseIgnored() || !m_playerCtx->m_buffer->IsDVD())
         return 0;
 
     QString name;
     QString serialid;
     uint64_t frames = 0;
-    player_ctx->LockPlayingInfo(__FILE__, __LINE__);
-    if (player_ctx->m_playingInfo)
+    m_playerCtx->LockPlayingInfo(__FILE__, __LINE__);
+    if (m_playerCtx->m_playingInfo)
     {
-        if (!player_ctx->m_buffer->DVD()->GetNameAndSerialNum(name, serialid))
+        if (!m_playerCtx->m_buffer->DVD()->GetNameAndSerialNum(name, serialid))
         {
-            player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
+            m_playerCtx->UnlockPlayingInfo(__FILE__, __LINE__);
             return 0;
         }
 
-        QStringList dvdbookmark = player_ctx->m_playingInfo->QueryDVDBookmark(serialid);
+        QStringList dvdbookmark = m_playerCtx->m_playingInfo->QueryDVDBookmark(serialid);
 
         if (!dvdbookmark.empty())
         {
@@ -406,26 +406,26 @@ uint64_t MythDVDPlayer::GetBookmark(void)
 
             if (dvdbookmark.count() == 1)
             {
-                m_initial_dvdstate = *it;
+                m_initialDvdState = *it;
                 frames = ~0x0ULL;
                 LOG(VB_PLAYBACK, LOG_INFO, LOC + "Get Bookmark: bookmark found");
             }
             else
             {
                 // Legacy bookmarks
-                m_initial_title = (*it).toInt();
+                m_initialTitle = (*it).toInt();
                 frames = ((*++it).toLongLong() & 0xffffffffLL);
-                m_initial_audio_track    = (*++it).toInt();
-                m_initial_subtitle_track = (*++it).toInt();
+                m_initialAudioTrack    = (*++it).toInt();
+                m_initialSubtitleTrack = (*++it).toInt();
                 LOG(VB_PLAYBACK, LOG_INFO, LOC +
                     QString("Get Bookmark: title %1 audiotrack %2 subtrack %3 "
                             "frame %4")
-                    .arg(m_initial_title).arg(m_initial_audio_track)
-                    .arg(m_initial_subtitle_track).arg(frames));
+                    .arg(m_initialTitle).arg(m_initialAudioTrack)
+                    .arg(m_initialSubtitleTrack).arg(frames));
             }
         }
     }
-    player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
+    m_playerCtx->UnlockPlayingInfo(__FILE__, __LINE__);
     return frames;;
 }
 
@@ -438,7 +438,7 @@ void MythDVDPlayer::ChangeSpeed(void)
         // it to what the unstretched value would have been
         // had we been playing with the new timestretch value
         // all along
-        int elapsed = static_cast<int>((m_stillFrameTimer.elapsed() * play_speed / next_play_speed));
+        int elapsed = static_cast<int>((m_stillFrameTimer.elapsed() * m_playSpeed / m_nextPlaySpeed));
         m_stillFrameTimer.restart();
         m_stillFrameTimer.addMSecs(elapsed);
         m_stillFrameTimerLock.unlock();
@@ -446,38 +446,38 @@ void MythDVDPlayer::ChangeSpeed(void)
 
     MythPlayer::ChangeSpeed();
 
-    if (decoder)
-        decoder->UpdateFramesPlayed();
-    if (player_ctx->m_buffer->IsDVD())
+    if (m_decoder)
+        m_decoder->UpdateFramesPlayed();
+    if (m_playerCtx->m_buffer->IsDVD())
     {
-        if (play_speed > 1.0F)
-            player_ctx->m_buffer->DVD()->SetDVDSpeed(-1);
+        if (m_playSpeed > 1.0F)
+            m_playerCtx->m_buffer->DVD()->SetDVDSpeed(-1);
         else
-            player_ctx->m_buffer->DVD()->SetDVDSpeed();
+            m_playerCtx->m_buffer->DVD()->SetDVDSpeed();
     }
 }
 
 long long MythDVDPlayer::CalcMaxFFTime(long long FastFwd, bool Setjump) const
 {
-    if ((totalFrames > 0) && player_ctx->m_buffer->IsDVD() &&
-        player_ctx->m_buffer->DVD()->TitleTimeLeft() < 5)
+    if ((m_totalFrames > 0) && m_playerCtx->m_buffer->IsDVD() &&
+        m_playerCtx->m_buffer->DVD()->TitleTimeLeft() < 5)
         return 0;
     return MythPlayer::CalcMaxFFTime(FastFwd, Setjump);
 }
 
 int64_t MythDVDPlayer::GetSecondsPlayed(bool /*HonorCutList*/, int Divisor)
 {
-    if (!player_ctx->m_buffer->IsDVD())
+    if (!m_playerCtx->m_buffer->IsDVD())
         return 0;
 
-    int64_t played = player_ctx->m_buffer->DVD()->GetCurrentTime();
+    int64_t played = m_playerCtx->m_buffer->DVD()->GetCurrentTime();
 
     if (m_stillFrameLength > 0)
     {
         if (m_stillFrameLength == 255)
             played = -1;
         else
-            played = static_cast<int64_t>(m_stillFrameTimer.elapsed() * play_speed / Divisor);
+            played = static_cast<int64_t>(m_stillFrameTimer.elapsed() * m_playSpeed / Divisor);
     }
 
     return played;
@@ -485,7 +485,7 @@ int64_t MythDVDPlayer::GetSecondsPlayed(bool /*HonorCutList*/, int Divisor)
 
 int64_t MythDVDPlayer::GetTotalSeconds(bool /*HonorCutList*/, int Divisor) const
 {
-    int64_t total = totalLength;
+    int64_t total = m_totalLength;
 
     if (m_stillFrameLength > 0)
     {
@@ -500,22 +500,22 @@ int64_t MythDVDPlayer::GetTotalSeconds(bool /*HonorCutList*/, int Divisor) const
 void MythDVDPlayer::SeekForScreenGrab(uint64_t &Number, uint64_t FrameNum,
                                       bool /*Absolute*/)
 {
-    if (!player_ctx->m_buffer->IsDVD())
+    if (!m_playerCtx->m_buffer->IsDVD())
         return;
     if (GoToMenu("menu"))
     {
-        if (player_ctx->m_buffer->DVD()->IsInMenu() &&
-            !player_ctx->m_buffer->DVD()->IsInStillFrame())
+        if (m_playerCtx->m_buffer->DVD()->IsInMenu() &&
+            !m_playerCtx->m_buffer->DVD()->IsInStillFrame())
         {
             GoToDVDProgram(true);
         }
     }
-    else if (player_ctx->m_buffer->DVD()->GetTotalTimeOfTitle() < 60)
+    else if (m_playerCtx->m_buffer->DVD()->GetTotalTimeOfTitle() < 60)
     {
         GoToDVDProgram(true);
         Number = FrameNum;
-        if (Number >= totalFrames)
-            Number = totalFrames / 2;
+        if (Number >= m_totalFrames)
+            Number = m_totalFrames / 2;
     }
 }
 
@@ -523,8 +523,8 @@ int MythDVDPlayer::SetTrack(uint Type, int TrackNo)
 {
     if (kTrackTypeAudio == Type)
     {
-        StreamInfo stream = decoder->GetTrackInfo(Type, static_cast<uint>(TrackNo));
-        player_ctx->m_buffer->DVD()->SetTrack(Type, stream.m_stream_id);
+        StreamInfo stream = m_decoder->GetTrackInfo(Type, static_cast<uint>(TrackNo));
+        m_playerCtx->m_buffer->DVD()->SetTrack(Type, stream.m_stream_id);
     }
 
     return MythPlayer::SetTrack(Type, TrackNo);
@@ -532,28 +532,28 @@ int MythDVDPlayer::SetTrack(uint Type, int TrackNo)
 
 int MythDVDPlayer::GetNumChapters(void)
 {
-    if (!player_ctx->m_buffer->IsDVD())
+    if (!m_playerCtx->m_buffer->IsDVD())
         return 0;
-    return player_ctx->m_buffer->DVD()->NumPartsInTitle();
+    return m_playerCtx->m_buffer->DVD()->NumPartsInTitle();
 }
 
 int MythDVDPlayer::GetCurrentChapter(void)
 {
-    if (!player_ctx->m_buffer->IsDVD())
+    if (!m_playerCtx->m_buffer->IsDVD())
         return 0;
-    return player_ctx->m_buffer->DVD()->GetPart();
+    return m_playerCtx->m_buffer->DVD()->GetPart();
 }
 
 void MythDVDPlayer::GetChapterTimes(QList<long long> &Times)
 {
-    if (!player_ctx->m_buffer->IsDVD())
+    if (!m_playerCtx->m_buffer->IsDVD())
         return;
-    player_ctx->m_buffer->DVD()->GetChapterTimes(Times);
+    m_playerCtx->m_buffer->DVD()->GetChapterTimes(Times);
 }
 
 bool MythDVDPlayer::DoJumpChapter(int Chapter)
 {
-    if (!player_ctx->m_buffer->IsDVD())
+    if (!m_playerCtx->m_buffer->IsDVD())
         return false;
 
     int total   = GetNumChapters();
@@ -573,38 +573,38 @@ bool MythDVDPlayer::DoJumpChapter(int Chapter)
         }
     }
 
-    bool success = player_ctx->m_buffer->DVD()->playTrack(Chapter);
+    bool success = m_playerCtx->m_buffer->DVD()->playTrack(Chapter);
     if (success)
     {
-        if (decoder)
+        if (m_decoder)
         {
-            decoder->UpdateFramesPlayed();
-            if (player_ctx->m_buffer->DVD()->GetCellStart() == 0)
-                decoder->SeekReset(static_cast<long long>(framesPlayed), 0, true, true);
+            m_decoder->UpdateFramesPlayed();
+            if (m_playerCtx->m_buffer->DVD()->GetCellStart() == 0)
+                m_decoder->SeekReset(static_cast<long long>(m_framesPlayed), 0, true, true);
         }
-        ClearAfterSeek(!player_ctx->m_buffer->IsInDiscMenuOrStillFrame());
+        ClearAfterSeek(!m_playerCtx->m_buffer->IsInDiscMenuOrStillFrame());
     }
 
-    jumpchapter = 0;
+    m_jumpChapter = 0;
     return success;
 }
 
 void MythDVDPlayer::DisplayDVDButton(void)
 {
-    if (!osd || !player_ctx->m_buffer->IsDVD())
+    if (!m_osd || !m_playerCtx->m_buffer->IsDVD())
         return;
 
     uint buttonversion = 0;
-    AVSubtitle *dvdSubtitle = player_ctx->m_buffer->DVD()->GetMenuSubtitle(buttonversion);
-    bool numbuttons    = player_ctx->m_buffer->DVD()->NumMenuButtons() != 0;
+    AVSubtitle *dvdSubtitle = m_playerCtx->m_buffer->DVD()->GetMenuSubtitle(buttonversion);
+    bool numbuttons    = m_playerCtx->m_buffer->DVD()->NumMenuButtons() != 0;
 
     bool expired = false;
 
-    VideoFrame *currentFrame = videoOutput ? videoOutput->GetLastShownFrame() : nullptr;
+    VideoFrame *currentFrame = m_videoOutput ? m_videoOutput->GetLastShownFrame() : nullptr;
 
     if (!currentFrame)
     {
-        player_ctx->m_buffer->DVD()->ReleaseMenuButton();
+        m_playerCtx->m_buffer->DVD()->ReleaseMenuButton();
         return;
     }
 
@@ -618,44 +618,44 @@ void MythDVDPlayer::DisplayDVDButton(void)
     // nothing to do
     if (!expired && (buttonversion == (static_cast<uint>(m_buttonVersion))))
     {
-        player_ctx->m_buffer->DVD()->ReleaseMenuButton();
+        m_playerCtx->m_buffer->DVD()->ReleaseMenuButton();
         return;
     }
 
     // clear any buttons
     if (!numbuttons || !dvdSubtitle || (buttonversion == 0) || expired)
     {
-        osdLock.lock();
-        if (osd)
-            osd->ClearSubtitles();
-        osdLock.unlock();
+        m_osdLock.lock();
+        if (m_osd)
+            m_osd->ClearSubtitles();
+        m_osdLock.unlock();
         m_buttonVersion = 0;
-        player_ctx->m_buffer->DVD()->ReleaseMenuButton();
+        m_playerCtx->m_buffer->DVD()->ReleaseMenuButton();
         return;
     }
 
     if (currentFrame->timecode && (dvdSubtitle->start_display_time > currentFrame->timecode))
     {
-        player_ctx->m_buffer->DVD()->ReleaseMenuButton();
+        m_playerCtx->m_buffer->DVD()->ReleaseMenuButton();
         return;
     }
 
     m_buttonVersion = static_cast<int>(buttonversion);
-    QRect buttonPos = player_ctx->m_buffer->DVD()->GetButtonCoords();
-    osdLock.lock();
-    if (osd)
-        osd->DisplayDVDButton(dvdSubtitle, buttonPos);
-    osdLock.unlock();
-    textDisplayMode = kDisplayDVDButton;
-    player_ctx->m_buffer->DVD()->ReleaseMenuButton();
+    QRect buttonPos = m_playerCtx->m_buffer->DVD()->GetButtonCoords();
+    m_osdLock.lock();
+    if (m_osd)
+        m_osd->DisplayDVDButton(dvdSubtitle, buttonPos);
+    m_osdLock.unlock();
+    m_textDisplayMode = kDisplayDVDButton;
+    m_playerCtx->m_buffer->DVD()->ReleaseMenuButton();
 }
 
 bool MythDVDPlayer::GoToMenu(QString Menu)
 {
-    if (!player_ctx->m_buffer->IsDVD())
+    if (!m_playerCtx->m_buffer->IsDVD())
         return false;
-    textDisplayMode = kDisplayNone;
-    bool ret = player_ctx->m_buffer->DVD()->GoToMenu(Menu);
+    m_textDisplayMode = kDisplayNone;
+    bool ret = m_playerCtx->m_buffer->DVD()->GoToMenu(Menu);
 
     if (!ret)
     {
@@ -669,12 +669,12 @@ bool MythDVDPlayer::GoToMenu(QString Menu)
 
 void MythDVDPlayer::GoToDVDProgram(bool Direction)
 {
-    if (!player_ctx->m_buffer->IsDVD())
+    if (!m_playerCtx->m_buffer->IsDVD())
         return;
     if (Direction)
-        player_ctx->m_buffer->DVD()->GoToPreviousProgram();
+        m_playerCtx->m_buffer->DVD()->GoToPreviousProgram();
     else
-        player_ctx->m_buffer->DVD()->GoToNextProgram();
+        m_playerCtx->m_buffer->DVD()->GoToNextProgram();
 }
 
 bool MythDVDPlayer::IsInStillFrame() const
@@ -684,15 +684,15 @@ bool MythDVDPlayer::IsInStillFrame() const
 
 int MythDVDPlayer::GetNumAngles(void) const
 {
-    if (player_ctx->m_buffer->DVD() && player_ctx->m_buffer->DVD()->IsOpen())
-        return player_ctx->m_buffer->DVD()->GetNumAngles();
+    if (m_playerCtx->m_buffer->DVD() && m_playerCtx->m_buffer->DVD()->IsOpen())
+        return m_playerCtx->m_buffer->DVD()->GetNumAngles();
     return 0;
 }
 
 int MythDVDPlayer::GetCurrentAngle(void) const
 {
-    if (player_ctx->m_buffer->DVD() && player_ctx->m_buffer->DVD()->IsOpen())
-        return player_ctx->m_buffer->DVD()->GetCurrentAngle();
+    if (m_playerCtx->m_buffer->DVD() && m_playerCtx->m_buffer->DVD()->IsOpen())
+        return m_playerCtx->m_buffer->DVD()->GetCurrentAngle();
     return -1;
 }
 
@@ -715,7 +715,7 @@ bool MythDVDPlayer::SwitchAngle(int Angle)
     if (Angle < 1 || Angle > total)
         Angle = 1;
 
-    return player_ctx->m_buffer->DVD()->SwitchAngle(static_cast<uint>(Angle));
+    return m_playerCtx->m_buffer->DVD()->SwitchAngle(static_cast<uint>(Angle));
 }
 
 void MythDVDPlayer::ResetStillFrameTimer(void)
@@ -738,19 +738,19 @@ void MythDVDPlayer::SetStillFrameTimeout(int Length)
 
 void MythDVDPlayer::StillFrameCheck(void)
 {
-    if (player_ctx->m_buffer->IsDVD() &&
-        player_ctx->m_buffer->DVD()->IsInStillFrame() &&
+    if (m_playerCtx->m_buffer->IsDVD() &&
+        m_playerCtx->m_buffer->DVD()->IsInStillFrame() &&
        (m_stillFrameLength > 0) && (m_stillFrameLength < 0xff))
     {
         m_stillFrameTimerLock.lock();
-        int elapsedTime = static_cast<int>(m_stillFrameTimer.elapsed() * play_speed / 1000.0F);
+        int elapsedTime = static_cast<int>(m_stillFrameTimer.elapsed() * m_playSpeed / 1000.0F);
         m_stillFrameTimerLock.unlock();
         if (elapsedTime >= m_stillFrameLength)
         {
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
                 QString("Stillframe timeout after %1 seconds (timestretch %2)")
-                    .arg(m_stillFrameLength).arg(static_cast<double>(play_speed)));
-            player_ctx->m_buffer->DVD()->SkipStillFrame();
+                .arg(m_stillFrameLength).arg(static_cast<double>(m_playSpeed)));
+            m_playerCtx->m_buffer->DVD()->SkipStillFrame();
             m_stillFrameLength = 0;
         }
     }
@@ -758,10 +758,10 @@ void MythDVDPlayer::StillFrameCheck(void)
 
 void MythDVDPlayer::CreateDecoder(char *Testbuf, int TestReadSize)
 {
-    if (AvFormatDecoderDVD::CanHandle(Testbuf, player_ctx->m_buffer->GetFilename(),
+    if (AvFormatDecoderDVD::CanHandle(Testbuf, m_playerCtx->m_buffer->GetFilename(),
                                       TestReadSize))
     {
-        SetDecoder(new AvFormatDecoderDVD(this, *player_ctx->m_playingInfo,
-                                          playerFlags));
+        SetDecoder(new AvFormatDecoderDVD(this, *m_playerCtx->m_playingInfo,
+                                          m_playerFlags));
     }
 }

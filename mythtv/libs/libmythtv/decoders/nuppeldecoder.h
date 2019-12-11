@@ -82,45 +82,45 @@ class NuppelDecoder : public DecoderBase
     friend int get_nuppel_buffer(struct AVCodecContext *c, AVFrame *pic, int flags);
     friend void release_nuppel_buffer(void *opaque, uint8_t *data);
 
-    struct rtfileheader   m_fileheader;
-    struct rtframeheader  m_frameheader;
+    struct rtfileheader   m_fileHeader;
+    struct rtframeheader  m_frameHeader;
 
     RTjpeg               *m_rtjd                  {nullptr};
 
-    int                   m_video_width           {0};
-    int                   m_video_height          {0};
-    int                   m_video_size            {0};
-    double                m_video_frame_rate      {0.0};
-    int                   m_audio_samplerate      {44100};
+    int                   m_videoWidth           {0};
+    int                   m_videoHeight          {0};
+    int                   m_videoSize            {0};
+    double                m_videoFrameRate       {0.0};
+    int                   m_audioSamplerate      {44100};
 #if HAVE_BIGENDIAN
-    int                   m_audio_bits_per_sample {0};
+    int                   m_audioBitsPerSample   {0};
 #endif
 
-    int                   m_ffmpeg_extradatasize  {0};
-    uint8_t              *m_ffmpeg_extradata      {nullptr};
+    int                   m_ffmpegExtraDataSize   {0};
+    uint8_t              *m_ffmpegExtraData       {nullptr};
 
-    struct extendeddata   m_extradata;
-    bool                  m_usingextradata        {false};
+    struct extendeddata   m_extraData;
+    bool                  m_usingExtraData        {false};
 
-    bool                  m_disablevideo          {false};
+    bool                  m_disableVideo          {false};
 
     int                   m_totalLength           {0};
     long long             m_totalFrames           {0};
 
-    int                   m_effdsp                {0};
+    int                   m_effDsp                {0};
 
-    VideoFrame           *m_directframe           {nullptr};
-    VideoFrame           *m_decoded_video_frame   {nullptr};
+    VideoFrame           *m_directFrame           {nullptr};
+    VideoFrame           *m_decodedVideoFrame     {nullptr};
 
-    AVCodec              *m_mpa_vidcodec          {nullptr};
-    AVCodecContext       *m_mpa_vidctx            {nullptr};
-    AVCodec              *m_mpa_audcodec          {nullptr};
-    AVCodecContext       *m_mpa_audctx            {nullptr};
+    AVCodec              *m_mpaVidCodec           {nullptr};
+    AVCodecContext       *m_mpaVidCtx             {nullptr};
+    AVCodec              *m_mpaAudCodec           {nullptr};
+    AVCodecContext       *m_mpaAudCtx             {nullptr};
     uint8_t              *m_audioSamples          {nullptr};
 
-    bool                  m_directrendering       {false};
+    bool                  m_directRendering       {false};
 
-    char                  m_lastct                {'1'};
+    char                  m_lastCt                {'1'};
 
     unsigned char        *m_strm                  {nullptr};
     unsigned char        *m_buf                   {nullptr};
@@ -129,9 +129,9 @@ class NuppelDecoder : public DecoderBase
 
     list<RawDataList*>    m_storedData;
 
-    int                   m_videosizetotal        {0};
-    int                   m_videoframesread       {0};
-    bool                  m_setreadahead          {false};
+    int                   m_videoSizeTotal        {0};
+    int                   m_videoFramesRead       {0};
+    bool                  m_setReadAhead          {false};
 };
 
 #endif

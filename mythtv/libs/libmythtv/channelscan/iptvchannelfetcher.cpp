@@ -213,7 +213,8 @@ void IPTVChannelFetcher::run(void)
 
 void IPTVChannelFetcher::SetNumChannelsParsed(uint val)
 {
-    uint minval = 35, range = 70 - minval;
+    uint minval = 35;
+    uint range = 70 - minval;
     uint pct = minval + (uint) truncf((((float)val) / m_chan_cnt) * range);
     if (m_scan_monitor)
         m_scan_monitor->ScanPercentComplete(pct);
@@ -221,7 +222,8 @@ void IPTVChannelFetcher::SetNumChannelsParsed(uint val)
 
 void IPTVChannelFetcher::SetNumChannelsInserted(uint val)
 {
-    uint minval = 70, range = 100 - minval;
+    uint minval = 70;
+    uint range = 100 - minval;
     uint pct = minval + (uint) truncf((((float)val) / m_chan_cnt) * range);
     if (m_scan_monitor)
         m_scan_monitor->ScanPercentComplete(pct);

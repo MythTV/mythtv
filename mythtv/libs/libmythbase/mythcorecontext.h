@@ -264,7 +264,7 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
 
   private:
     Q_DISABLE_COPY(MythCoreContext)
-    MythCoreContextPrivate *d {nullptr};
+    MythCoreContextPrivate *d {nullptr}; // NOLINT(readability-identifier-naming)
 
     void connected(MythSocket *sock) override { (void)sock; } //MythSocketCBs
     void connectionFailed(MythSocket *sock) override { (void)sock; } //MythSocketCBs

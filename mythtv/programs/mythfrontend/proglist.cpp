@@ -1666,7 +1666,10 @@ void ProgLister::customEvent(QEvent *event)
     }
     else if (event->type() == MythEvent::MythEventMessage)
     {
-        auto *me = static_cast<MythEvent *>(event);
+        auto *me = dynamic_cast<MythEvent *>(event);
+        if (me == nullptr)
+            return;
+
         const QString& message = me->Message();
 
         if (m_allowViewDialog && message == "CHOOSE_VIEW")

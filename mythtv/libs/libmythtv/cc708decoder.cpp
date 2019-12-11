@@ -129,7 +129,10 @@ do { \
 static void parse_cc_service_stream(CC708Reader* cc, uint service_num)
 {
     const int blk_size = cc->m_bufSize[service_num];
-    int blk_start = 0, dlc_loc = 0, rst_loc = 0, i = 0;
+    int blk_start = 0;
+    int dlc_loc = 0;
+    int rst_loc = 0;
+    int i = 0;
 
     // find last reset or delay cancel in buffer
     for (i = 0; i < blk_size; i++)

@@ -138,13 +138,14 @@ edge_mark(AVFrame *dst, int dstheight,
      * cases.
      */
     int first = ii;
-    for (first = ii; first > 0 && sgmsorted[first] == thresholdval; first--) ;
+    for ( ; first > 0 && sgmsorted[first] == thresholdval; first--) ;
     if (sgmsorted[first] != thresholdval)
         first++;
     if (first * 100 / nn < kMinThresholdPct)
     {
-        int last = ii, last2 = nn - 1;
-        for (last = ii; last < last2 && sgmsorted[last] == thresholdval;
+        int last = ii;
+        int last2 = nn - 1;
+        for ( ; last < last2 && sgmsorted[last] == thresholdval;
                 last++) ;
         if (sgmsorted[last] != thresholdval)
             last--;

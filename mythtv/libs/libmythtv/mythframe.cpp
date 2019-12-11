@@ -94,6 +94,7 @@ static bool has_sse4     = false;
 #define cpuid    __cpuid
 
 #else
+/* NOLINTNEXTLINE(readability-non-const-parameter) */
 inline void cpuid(int CPUInfo[4],int InfoType)
 {
     __asm__ __volatile__ (

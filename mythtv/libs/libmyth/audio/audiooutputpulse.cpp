@@ -33,9 +33,9 @@ using std::min;
 AudioOutputPulseAudio::AudioOutputPulseAudio(const AudioSettings &settings) :
     AudioOutputBase(settings)
 {
-    m_volume_control.channels = 0;
+    m_volumeControl.channels = 0;
     for (unsigned int i = 0; i < PA_CHANNELS_MAX; ++i)
-        m_volume_control.values[i] = PA_VOLUME_MUTED;
+        m_volumeControl.values[i] = PA_VOLUME_MUTED;
 
     InitSettings(settings);
     if (settings.m_init)
@@ -54,7 +54,7 @@ AudioOutputPulseAudio::~AudioOutputPulseAudio()
 
 AudioOutputSettings* AudioOutputPulseAudio::GetOutputSettings(bool /*digital*/)
 {
-    m_aosettings = new AudioOutputSettings();
+    m_aoSettings = new AudioOutputSettings();
     QString fn_log_tag = "OpenDevice, ";
 
     /* Start the mainloop and connect a context so we can retrieve the
@@ -63,7 +63,7 @@ AudioOutputSettings* AudioOutputPulseAudio::GetOutputSettings(bool /*digital*/)
     if (!m_mainloop)
     {
         VBERROR(fn_log_tag + "Failed to get new threaded mainloop");
-        delete m_aosettings;
+        delete m_aoSettings;
         return nullptr;
     }
 
@@ -74,7 +74,7 @@ AudioOutputSettings* AudioOutputPulseAudio::GetOutputSettings(bool /*digital*/)
     {
         pa_threaded_mainloop_unlock(m_mainloop);
         pa_threaded_mainloop_stop(m_mainloop);
-        delete m_aosettings;
+        delete m_aoSettings;
         return nullptr;
     }
 
@@ -98,7 +98,7 @@ AudioOutputSettings* AudioOutputPulseAudio::GetOutputSettings(bool /*digital*/)
 
     // All formats except S24 (pulse wants S24LSB)
     AudioFormat fmt = FORMAT_NONE;
-    while ((fmt = m_aosettings->GetNextFormat()))
+    while ((fmt = m_aoSettings->GetNextFormat()))
     {
         if (fmt == FORMAT_S24
 // define from PA 0.9.15 only
@@ -107,7 +107,7 @@ AudioOutputSettings* AudioOutputPulseAudio::GetOutputSettings(bool /*digital*/)
 #endif
             )
             continue;
-        m_aosettings->AddSupportedFormat(fmt);
+        m_aoSettings->AddSupportedFormat(fmt);
     }
 
     pa_context_disconnect(m_pcontext);
@@ -116,7 +116,7 @@ AudioOutputSettings* AudioOutputPulseAudio::GetOutputSettings(bool /*digital*/)
     pa_threaded_mainloop_stop(m_mainloop);
     m_mainloop = nullptr;
 
-    return m_aosettings;
+    return m_aoSettings;
 }
 
 bool AudioOutputPulseAudio::OpenDevice()
@@ -129,34 +129,34 @@ bool AudioOutputPulseAudio::OpenDevice()
         return false;
     }
 
-    m_sample_spec.rate = m_samplerate;
-    m_sample_spec.channels = m_volume_control.channels = m_channels;
-    switch (m_output_format)
+    m_sampleSpec.rate = m_sampleRate;
+    m_sampleSpec.channels = m_volumeControl.channels = m_channels;
+    switch (m_outputFormat)
     {
-        case FORMAT_U8:     m_sample_spec.format = PA_SAMPLE_U8;         break;
-        case FORMAT_S16:    m_sample_spec.format = PA_SAMPLE_S16NE;      break;
+        case FORMAT_U8:     m_sampleSpec.format = PA_SAMPLE_U8;         break;
+        case FORMAT_S16:    m_sampleSpec.format = PA_SAMPLE_S16NE;      break;
 // define from PA 0.9.15 only
 #ifdef PA_MAJOR
-        case FORMAT_S24LSB: m_sample_spec.format = PA_SAMPLE_S24_32NE;   break;
+        case FORMAT_S24LSB: m_sampleSpec.format = PA_SAMPLE_S24_32NE;   break;
 #endif
-        case FORMAT_S32:    m_sample_spec.format = PA_SAMPLE_S32NE;      break;
-        case FORMAT_FLT:    m_sample_spec.format = PA_SAMPLE_FLOAT32NE;  break;
+        case FORMAT_S32:    m_sampleSpec.format = PA_SAMPLE_S32NE;      break;
+        case FORMAT_FLT:    m_sampleSpec.format = PA_SAMPLE_FLOAT32NE;  break;
         default:
             VBERROR(fn_log_tag + QString("unsupported sample format %1")
-                                 .arg(m_output_format));
+                                 .arg(m_outputFormat));
             return false;
     }
 
-    if (!pa_sample_spec_valid(&m_sample_spec))
+    if (!pa_sample_spec_valid(&m_sampleSpec))
     {
         VBERROR(fn_log_tag + "invalid sample spec");
         return false;
     }
     char spec[PA_SAMPLE_SPEC_SNPRINT_MAX];
-    pa_sample_spec_snprint(spec, sizeof(spec), &m_sample_spec);
+    pa_sample_spec_snprint(spec, sizeof(spec), &m_sampleSpec);
     VBAUDIO(fn_log_tag + QString("using sample spec %1").arg(spec));
 
-    if(!pa_channel_map_init_auto(&m_channel_map, m_channels, PA_CHANNEL_MAP_WAVEEX))
+    if(!pa_channel_map_init_auto(&m_channelMap, m_channels, PA_CHANNEL_MAP_WAVEEX))
     {
         VBERROR(fn_log_tag + "failed to init channel map");
         return false;
@@ -306,13 +306,13 @@ int AudioOutputPulseAudio::GetBufferedOnSoundcard(void) const
 
     pa_threaded_mainloop_unlock(m_mainloop);
 
-    return (latency * m_samplerate *
-            m_output_bytes_per_frame / 1000000) + buffered;
+    return (latency * m_sampleRate *
+            m_outputBytesPerFrame / 1000000) + buffered;
 }
 
 int AudioOutputPulseAudio::GetVolumeChannel(int channel) const
 {
-    return (float)m_volume_control.values[channel] /
+    return (float)m_volumeControl.values[channel] /
            (float)PA_VOLUME_NORM * 100.0F;
 }
 
@@ -327,7 +327,7 @@ void AudioOutputPulseAudio::SetVolumeChannel(int channel, int volume)
         return;
     }
 
-    m_volume_control.values[channel] =
+    m_volumeControl.values[channel] =
         (float)volume / 100.0F * (float)PA_VOLUME_NORM;
 
 // FIXME: This code did nothing at all so has been commented out for now
@@ -341,7 +341,7 @@ void AudioOutputPulseAudio::SetVolumeChannel(int channel, int volume)
         pa_threaded_mainloop_lock(m_mainloop);
         pa_operation *op =
             pa_context_set_sink_input_volume(m_pcontext, stream_index,
-                                             &m_volume_control,
+                                             &m_volumeControl,
                                              OpCompletionCallback, this);
         pa_threaded_mainloop_unlock(m_mainloop);
         if (op)
@@ -359,7 +359,7 @@ void AudioOutputPulseAudio::SetVolumeChannel(int channel, int volume)
         pa_threaded_mainloop_lock(m_mainloop);
         pa_operation *op =
             pa_context_set_sink_volume_by_index(m_pcontext, sink_index,
-                                                &m_volume_control,
+                                                &m_volumeControl,
                                                 OpCompletionCallback, this);
         pa_threaded_mainloop_unlock(m_mainloop);
         if (op)
@@ -467,7 +467,7 @@ char *AudioOutputPulseAudio::ChooseHost(void)
 {
     QString fn_log_tag = "ChooseHost, ";
     char *pulse_host = nullptr;
-    char *device = strdup(m_main_device.toLatin1().constData());
+    char *device = strdup(m_mainDevice.toLatin1().constData());
     const char *host = nullptr;
 
     for (host=device; host && *host != ':' && *host != 0; host++);
@@ -522,8 +522,8 @@ bool AudioOutputPulseAudio::ConnectPlaybackStream(void)
     }
     pa_proplist_sets(proplist, PA_PROP_MEDIA_ROLE, "video");
     m_pstream =
-        pa_stream_new_with_proplist(m_pcontext, "MythTV playback", &m_sample_spec,
-                                    &m_channel_map, proplist);
+        pa_stream_new_with_proplist(m_pcontext, "MythTV playback", &m_sampleSpec,
+                                    &m_channelMap, proplist);
     if (!m_pstream)
     {
         VBERROR("failed to create new playback stream");
@@ -534,34 +534,35 @@ bool AudioOutputPulseAudio::ConnectPlaybackStream(void)
     pa_stream_set_overflow_callback(m_pstream, BufferFlowCallback, (char*)"over");
     pa_stream_set_underflow_callback(m_pstream, BufferFlowCallback,
                                      (char*)"under");
-    if (m_set_initial_vol)
+    if (m_setInitialVol)
     {
         int volume = gCoreContext->GetNumSetting("MasterMixerVolume", 80);
-        pa_cvolume_set(&m_volume_control, m_channels,
+        pa_cvolume_set(&m_volumeControl, m_channels,
                        (float)volume * (float)PA_VOLUME_NORM / 100.0F);
     }
     else
-        pa_cvolume_reset(&m_volume_control, m_channels);
+        pa_cvolume_reset(&m_volumeControl, m_channels);
 
-    m_fragment_size = (m_samplerate * 25 * m_output_bytes_per_frame) / 1000;
+    m_fragmentSize = (m_sampleRate * 25 * m_outputBytesPerFrame) / 1000;
 
-    m_buffer_settings.maxlength   = (uint32_t)-1;
-    m_buffer_settings.tlength     = m_fragment_size * 4;
-    m_buffer_settings.prebuf      = (uint32_t)-1;
-    m_buffer_settings.minreq      = (uint32_t)-1;
-    m_buffer_settings.fragsize    = (uint32_t) -1;
+    m_bufferSettings.maxlength   = (uint32_t)-1;
+    m_bufferSettings.tlength     = m_fragmentSize * 4;
+    m_bufferSettings.prebuf      = (uint32_t)-1;
+    m_bufferSettings.minreq      = (uint32_t)-1;
+    m_bufferSettings.fragsize    = (uint32_t) -1;
 
     int flags = PA_STREAM_INTERPOLATE_TIMING
         | PA_STREAM_ADJUST_LATENCY
         | PA_STREAM_AUTO_TIMING_UPDATE
         | PA_STREAM_NO_REMIX_CHANNELS;
 
-    pa_stream_connect_playback(m_pstream, nullptr, &m_buffer_settings,
+    pa_stream_connect_playback(m_pstream, nullptr, &m_bufferSettings,
                                (pa_stream_flags_t)flags, nullptr, nullptr);
 
     pa_context_state_t cstate = PA_CONTEXT_UNCONNECTED;
     pa_stream_state_t sstate = PA_STREAM_UNCONNECTED;
-    bool connected = false, failed = false;
+    bool connected = false;
+    bool failed = false;
 
     while (!(connected || failed))
     {
@@ -594,11 +595,11 @@ bool AudioOutputPulseAudio::ConnectPlaybackStream(void)
     }
 
     const pa_buffer_attr *buf_attr = pa_stream_get_buffer_attr(m_pstream);
-    m_fragment_size = buf_attr->tlength >> 2;
-    m_soundcard_buffer_size = buf_attr->maxlength;
+    m_fragmentSize = buf_attr->tlength >> 2;
+    m_soundcardBufferSize = buf_attr->maxlength;
 
     VBAUDIO(QString("fragment size %1, soundcard buffer size %2")
-                .arg(m_fragment_size).arg(m_soundcard_buffer_size));
+                .arg(m_fragmentSize).arg(m_soundcardBufferSize));
 
     return (connected && !failed);
 }
@@ -698,10 +699,10 @@ void AudioOutputPulseAudio::SinkInfoCallback(
         return;
     }
 
-    audoutP->m_aosettings->AddSupportedRate(info->sample_spec.rate);
+    audoutP->m_aoSettings->AddSupportedRate(info->sample_spec.rate);
 
     for (uint i = 2; i <= info->sample_spec.channels; i++)
-        audoutP->m_aosettings->AddSupportedChannels(i);
+        audoutP->m_aoSettings->AddSupportedChannels(i);
 
     pa_threaded_mainloop_signal(audoutP->m_mainloop, 0);
 }

@@ -293,7 +293,7 @@ bool UpgradeGameDatabaseSchema(void)
     {
         const QString updates[] = {
 QString("ALTER DATABASE %1 DEFAULT CHARACTER SET latin1;")
-        .arg(gContext->GetDatabaseParams().dbName),
+        .arg(gContext->GetDatabaseParams().m_dbName),
 "ALTER TABLE gamemetadata"
 "  MODIFY `system` varbinary(128) NOT NULL default '',"
 "  MODIFY romname varbinary(128) NOT NULL default '',"
@@ -339,7 +339,7 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET latin1;")
     {
         const QString updates[] = {
 QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
-        .arg(gContext->GetDatabaseParams().dbName),
+        .arg(gContext->GetDatabaseParams().m_dbName),
 "ALTER TABLE gamemetadata"
 "  DEFAULT CHARACTER SET default,"
 "  MODIFY `system` varchar(128) CHARACTER SET utf8 NOT NULL default '',"

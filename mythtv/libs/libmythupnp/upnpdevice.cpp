@@ -91,7 +91,7 @@ bool UPnpDeviceDesc::Load( const QDomDocument &xmlDevDesc )
 
     QDomNode  oNode = xmlDevDesc.documentElement();
 
-    _InternalLoad( oNode.namedItem( "device" ), &m_rootDevice );
+    InternalLoad( oNode.namedItem( "device" ), &m_rootDevice );
 
     return true;
 }
@@ -100,7 +100,7 @@ bool UPnpDeviceDesc::Load( const QDomDocument &xmlDevDesc )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpDeviceDesc::_InternalLoad( QDomNode oNode, UPnpDevice *pCurDevice )
+void UPnpDeviceDesc::InternalLoad( QDomNode oNode, UPnpDevice *pCurDevice )
 {
     QString pin = GetMythDB()->GetSetting( "SecurityPin", "");
     pCurDevice->m_securityPin = !(pin.isEmpty() || pin == "0000");
@@ -250,7 +250,7 @@ void UPnpDeviceDesc::ProcessDeviceList( const QDomNode&    oListNode,
         {
             auto *pNewDevice = new UPnpDevice();
             pDevice->m_listDevices.append( pNewDevice );
-            _InternalLoad( e, pNewDevice );
+            InternalLoad( e, pNewDevice );
         }
     }
 }
@@ -640,8 +640,8 @@ UPnpDeviceDesc *UPnpDeviceDesc::Retrieve( QString &sURL )
         {
             pDevice = new UPnpDeviceDesc();
             pDevice->Load( xml );
-            pDevice->m_HostUrl   = sURL;
-            pDevice->m_sHostName = pDevice->m_HostUrl.host();
+            pDevice->m_hostUrl   = sURL;
+            pDevice->m_sHostName = pDevice->m_hostUrl.host();
         }
         else
         {

@@ -62,7 +62,7 @@ class UPNP_PUBLIC SSDP : public MThread
 
         QRegExp             m_procReqLineExp        {"[ \r\n][ \r\n]*"};
         constexpr static int kNumberOfSockets = 3;
-        MSocketDevice      *m_Sockets[kNumberOfSockets] {nullptr,nullptr,nullptr};
+        MSocketDevice      *m_sockets[kNumberOfSockets] {nullptr,nullptr,nullptr};
 
         int                 m_nPort                 {SSDP_PORT};
         int                 m_nSearchPort           {SSDP_SEARCHPORT};

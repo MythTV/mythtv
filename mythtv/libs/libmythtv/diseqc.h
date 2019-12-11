@@ -282,9 +282,9 @@ class DiSEqCDevSwitch : public DiSEqCDevDevice
     dvbdev_switch_t m_type            {kTypeTone};
     uint            m_address         {0x10}; //DISEQC_ADR_SW_ALL
     uint            m_numPorts        {2};
-    uint            m_lastPos         {(uint)-1};
-    uint            m_lastHighBand    {(uint)-1};
-    uint            m_lastHorizontal  {(uint)-1};
+    uint            m_lastPos         {UINT_MAX};
+    uint            m_lastHighBand    {UINT_MAX};
+    uint            m_lastHorizontal  {UINT_MAX};
     dvbdev_vec_t    m_children;
 
     static const TypeTable kSwitchTypeTable[9];

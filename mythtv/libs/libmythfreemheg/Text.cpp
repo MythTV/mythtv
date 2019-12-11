@@ -680,7 +680,10 @@ void MHText::Redraw()
     }
 
     // Set up the initial attributes.
-    int style = 0, size = 0, lineSpace = 0, letterSpace = 0;
+    int style = 0;
+    int size = 0;
+    int lineSpace = 0;
+    int letterSpace = 0;
     InterpretAttributes(m_fontAttrs, style, size, lineSpace, letterSpace);
     // Create a font with this information.
     m_pDisplay->SetFont(size, (style & 2) != 0, (style & 1) != 0);

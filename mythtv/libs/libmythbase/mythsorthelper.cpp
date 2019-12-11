@@ -18,22 +18,22 @@ void MythSortHelper::MythSortHelperCommon(void)
     m_prefixes = m_prefixes.trimmed();
     if (not hasPrefixes()) {
         // This language doesn't ignore any words when sorting
-        m_prefix_mode = SortPrefixKeep;
+        m_prefixMode = SortPrefixKeep;
         return;
     }
     if (not m_prefixes.startsWith("^"))
         m_prefixes = "^" + m_prefixes;
 
-    if (m_case_sensitive == Qt::CaseInsensitive)
+    if (m_caseSensitive == Qt::CaseInsensitive)
     {
         m_prefixes = m_prefixes.toLower();
         m_exclusions = m_exclusions.toLower();
     }
-    m_prefixes_regex = QRegularExpression(m_prefixes);
-    m_prefixes_regex2 = QRegularExpression(m_prefixes + "(.*)");
-    m_excl_list = m_exclusions.split(";", QString::SkipEmptyParts);
-    for (int i = 0; i < m_excl_list.size(); i++)
-      m_excl_list[i] = m_excl_list[i].trimmed();
+    m_prefixesRegex = QRegularExpression(m_prefixes);
+    m_prefixesRegex2 = QRegularExpression(m_prefixes + "(.*)");
+    m_exclList = m_exclusions.split(";", QString::SkipEmptyParts);
+    for (int i = 0; i < m_exclList.size(); i++)
+      m_exclList[i] = m_exclList[i].trimmed();
 }
 
 /**
@@ -52,11 +52,11 @@ MythSortHelper::MythSortHelper()
         // Last minute change.  QStringRef::localeAwareCompare appears to
         // always do case insensitive sorting, so there's no point in
         // presenting this option to a user.
-        m_case_sensitive =
+        m_caseSensitive =
             gCoreContext->GetBoolSetting("SortCaseSensitive", false)
             ? Qt::CaseSensitive : Qt::CaseInsensitive;
 #endif
-        m_prefix_mode =
+        m_prefixMode =
             gCoreContext->GetBoolSetting("SortStripPrefixes", true)
             ? SortPrefixRemove : SortPrefixKeep;
         m_exclusions =
@@ -81,8 +81,8 @@ MythSortHelper::MythSortHelper(
     Qt::CaseSensitivity case_sensitive,
     SortPrefixMode prefix_mode,
     QString exclusions) :
-    m_case_sensitive(case_sensitive),
-    m_prefix_mode(prefix_mode),
+    m_caseSensitive(case_sensitive),
+    m_prefixMode(prefix_mode),
     m_exclusions(std::move(exclusions))
 {
     MythSortHelperCommon();
@@ -99,14 +99,14 @@ MythSortHelper::MythSortHelper(
  */
 MythSortHelper::MythSortHelper(MythSortHelper *other)
 {
-    m_case_sensitive  = other->m_case_sensitive;
-    m_prefix_mode     = other->m_prefix_mode;
+    m_caseSensitive   = other->m_caseSensitive;
+    m_prefixMode      = other->m_prefixMode;
     m_prefixes        = other->m_prefixes;
-    m_prefixes_regex  = other->m_prefixes_regex;
-    m_prefixes_regex2 = other->m_prefixes_regex2;
+    m_prefixesRegex   = other->m_prefixesRegex;
+    m_prefixesRegex2  = other->m_prefixesRegex2;
     m_exclusions      = other->m_exclusions;
-    m_excl_list       = other->m_excl_list;
-    m_excl_mode       = other->m_excl_mode;
+    m_exclList        = other->m_exclList;
+    m_exclMode        = other->m_exclMode;
 }
 
 static std::shared_ptr<MythSortHelper> singleton = nullptr;
@@ -155,22 +155,22 @@ void resetMythSortHelper(void)
 QString MythSortHelper::doTitle(const QString& title) const
 {
     QString ltitle = title;
-    if (m_case_sensitive == Qt::CaseInsensitive)
+    if (m_caseSensitive == Qt::CaseInsensitive)
         ltitle = ltitle.toLower();
-    if (m_prefix_mode == SortPrefixKeep)
+    if (m_prefixMode == SortPrefixKeep)
 	return ltitle;
-    if (m_excl_mode == SortExclusionMatch)
+    if (m_exclMode == SortExclusionMatch)
     {
-        if (m_excl_list.contains(ltitle))
+        if (m_exclList.contains(ltitle))
             return ltitle;
     } else {
-        foreach (const QString &str, m_excl_list)
+        foreach (const QString &str, m_exclList)
             if (ltitle.startsWith(str))
                 return ltitle;
     }
-    if (m_prefix_mode == SortPrefixRemove)
-        return ltitle.remove(m_prefixes_regex);
-    return ltitle.replace(m_prefixes_regex2, "\\2, \\1").trimmed();
+    if (m_prefixMode == SortPrefixRemove)
+        return ltitle.remove(m_prefixesRegex);
+    return ltitle.replace(m_prefixesRegex2, "\\2, \\1").trimmed();
 }
 
 /**
@@ -188,25 +188,25 @@ QString MythSortHelper::doTitle(const QString& title) const
 QString MythSortHelper::doPathname(const QString& pathname) const
 {
     QString lpathname = pathname;
-    if (m_case_sensitive == Qt::CaseInsensitive)
+    if (m_caseSensitive == Qt::CaseInsensitive)
         lpathname = lpathname.toLower();
-    if (m_prefix_mode == SortPrefixKeep)
+    if (m_prefixMode == SortPrefixKeep)
 	return lpathname;
     QStringList parts = lpathname.split("/");
     for (int i = 0; i < parts.size(); ++i) {
         bool excluded = false;
-        for (int j = 0; j < m_excl_list.size(); ++j) {
-            if (parts[i].startsWith(m_excl_list[j])) {
+        for (int j = 0; j < m_exclList.size(); ++j) {
+            if (parts[i].startsWith(m_exclList[j])) {
                 excluded = true;
                 break;
             }
         }
         if (excluded)
             continue;
-        if (m_prefix_mode == SortPrefixRemove)
-            parts[i] = parts[i].remove(m_prefixes_regex);
+        if (m_prefixMode == SortPrefixRemove)
+            parts[i] = parts[i].remove(m_prefixesRegex);
         else
-            parts[i] = parts[i].replace(m_prefixes_regex2, "\\2, \\1").trimmed();
+            parts[i] = parts[i].replace(m_prefixesRegex2, "\\2, \\1").trimmed();
     }
     return parts.join("/");
 }

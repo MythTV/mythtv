@@ -70,13 +70,13 @@ class MythDVDPlayer : public MythPlayer
     void     DisplayLastFrame(void);
 
     int      m_buttonVersion          { 0 };
-    bool     m_dvd_stillframe_showing { false };
+    bool     m_dvdStillFrameShowing   { false };
 
     // additional bookmark seeking information
-    int      m_initial_title          { -1 };
-    int      m_initial_audio_track    { -1 };
-    int      m_initial_subtitle_track { -1 };
-    QString  m_initial_dvdstate       { };
+    int      m_initialTitle           { -1 };
+    int      m_initialAudioTrack      { -1 };
+    int      m_initialSubtitleTrack   { -1 };
+    QString  m_initialDvdState        { };
 
     // still frame timing
     MythTimer m_stillFrameTimer       { };

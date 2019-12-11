@@ -70,7 +70,8 @@ bool operator < (const DSMCCCacheKey &key1, const DSMCCCacheKey &key2)
 {
     const char *data1 = key1.data();
     const char *data2 = key2.data();
-    uint size1 = key1.size(), size2 = key2.size();
+    uint size1 = key1.size();
+    uint size2 = key2.size();
     uint size;
     if (size1 < size2)
         size = size1;

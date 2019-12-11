@@ -18,7 +18,7 @@ MythDRMPRIMEInterop::MythDRMPRIMEInterop(MythRenderOpenGL *Context)
 
 MythDRMPRIMEInterop::~MythDRMPRIMEInterop()
 {
-    DeleteTextures();
+    MythDRMPRIMEInterop::DeleteTextures();
 }
 
 void MythDRMPRIMEInterop::DeleteTextures(void)

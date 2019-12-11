@@ -475,7 +475,9 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
 
         if (fsID == "total")
         {
-            long long iLiveTV = -1, iDeleted = -1, iExpirable = -1;
+            long long iLiveTV = -1;
+            long long iDeleted = -1;
+            long long iExpirable = -1;
             MSqlQuery query(MSqlQuery::InitCon());
             query.prepare("SELECT SUM(filesize) FROM recorded "
                           " WHERE recgroup = :RECGROUP;");
@@ -1450,7 +1452,8 @@ int HttpStatus::PrintMiscellaneousInfo( QTextStream &os, const QDomElement& info
     uint count = nodes.count();
     if (count > 0)
     {
-        QString display, linebreak;
+        QString display;
+        QString linebreak;
         //QString name, value;
         os << "<div class=\"content\">\r\n"
            << "    <h2 class=\"status\">Miscellaneous</h2>\r\n";

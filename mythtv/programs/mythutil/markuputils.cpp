@@ -227,7 +227,8 @@ static int GetMarkup(const MythUtilCommandLineParser &cmdline)
         LOG(VB_STDIO|VB_FLUSH, LOG_ERR, "Missing --getmarkup filename\n");
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
-    QVector<ProgramInfo::MarkupEntry> mapMark, mapSeek;
+    QVector<ProgramInfo::MarkupEntry> mapMark;
+    QVector<ProgramInfo::MarkupEntry> mapSeek;
     pginfo.QueryMarkup(mapMark, mapSeek);
     QFile outfile(filename);
     if (!outfile.open(QIODevice::WriteOnly))
@@ -286,7 +287,8 @@ static int SetMarkup(const MythUtilCommandLineParser &cmdline)
         LOG(VB_STDIO|VB_FLUSH, LOG_ERR, "Missing --setmarkup filename\n");
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
-    QVector<ProgramInfo::MarkupEntry> mapMark, mapSeek;
+    QVector<ProgramInfo::MarkupEntry> mapMark;
+    QVector<ProgramInfo::MarkupEntry> mapSeek;
     QFile infile(filename);
     if (!infile.open(QIODevice::ReadOnly))
     {

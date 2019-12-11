@@ -316,9 +316,11 @@ ScriptInfo *WeatherSource::ProbeScript(const QFileInfo &fi)
     return new ScriptInfo(info);
 }
 
-/*
+/**
  * Watch out, we store the parameter as a member variable, don't go deleting it,
  * that wouldn't be good.
+ *
+ * \param info is a required variable.
  */
 WeatherSource::WeatherSource(ScriptInfo *info)
     : m_ready(info != nullptr),
@@ -330,9 +332,11 @@ WeatherSource::WeatherSource(ScriptInfo *info)
     if (!dir.exists("MythWeather"))
         dir.mkdir("MythWeather");
     dir.cd("MythWeather");
-    if (!dir.exists(info->name))
-        dir.mkdir(info->name);
-    dir.cd(info->name);
+    if (info != nullptr) {
+        if (!dir.exists(info->name))
+            dir.mkdir(info->name);
+        dir.cd(info->name);
+    }
     m_dir = dir.absolutePath();
 
     connect( m_updateTimer, SIGNAL(timeout()), this, SLOT(updateTimeout()));

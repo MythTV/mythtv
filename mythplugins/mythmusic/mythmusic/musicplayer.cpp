@@ -360,7 +360,8 @@ void MusicPlayer::stopDecoder(void)
 
 bool MusicPlayer::openOutputDevice(void)
 {
-    QString adevice, pdevice;
+    QString adevice;
+    QString pdevice;
 
     adevice = gCoreContext->GetSetting("MusicAudioDevice", "default");
     if (adevice == "default" || adevice.isEmpty())

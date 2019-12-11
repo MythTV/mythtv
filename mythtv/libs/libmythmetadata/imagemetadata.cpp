@@ -449,7 +449,8 @@ QDateTime PictureMetaData::GetOriginalDateTime(bool *exists)
 QString PictureMetaData::GetComment(bool *exists)
 {
     // Use User Comment or else Image Description
-    bool comExists = false, desExists = false;
+    bool comExists = false;
+    bool desExists = false;
 
     std::string comment = GetTag(EXIF_TAG_USERCOMMENT, &comExists);
 

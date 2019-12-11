@@ -489,7 +489,8 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
             if (args.Size() == 4)
             {
                 // Find a substring within a string and return an index to the position.
-                MHOctetString string, searchString;
+                MHOctetString string;
+                MHOctetString searchString;
                 GetString(args.GetAt(0), string, engine);
                 int nStart = GetInt(args.GetAt(1), engine);
 
@@ -546,7 +547,8 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
             {
                 // Find a substring within a string and return an index to the position
                 // and the prefix to the substring.
-                MHOctetString string, searchString;
+                MHOctetString string;
+                MHOctetString searchString;
                 GetString(args.GetAt(0), string, engine);
                 int nStart = GetInt(args.GetAt(1), engine);
 
@@ -661,7 +663,10 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
             if (args.Size() == 5)
             {
                 int channelId = GetInt(args.GetAt(0), engine);
-                int netId = 0, origNetId = 0, transportId = 0, serviceId = 0;
+                int netId = 0;
+                int origNetId = 0;
+                int transportId = 0;
+                int serviceId = 0;
                 // Look the information up in the database.
                 bool res = engine->GetContext()->GetServiceInfo(channelId, netId, origNetId,
                                                                 transportId, serviceId);

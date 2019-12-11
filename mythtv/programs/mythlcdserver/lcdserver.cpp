@@ -303,8 +303,10 @@ void LCDServer::sendKeyPress(const QString& key_pressed)
 
 void LCDServer::sendConnected(QTcpSocket *socket)
 {
-    QString sWidth, sHeight;
-    int nWidth = 0, nHeight = 0;
+    QString sWidth;
+    QString sHeight;
+    int nWidth = 0;
+    int nHeight = 0;
 
     if (m_lcd)
     {

@@ -818,10 +818,7 @@ QRect VideoOutWindow::GetVisibleOSDBounds(float &VisibleAspect,
 void VideoOutWindow::ToggleAspectOverride(AspectOverrideMode AspectMode)
 {
     if (m_pipState > kPIPOff)
-    {
-        AspectMode = kAspect_Off;
         return;
-    }
 
     if (AspectMode == kAspect_Toggle)
         AspectMode = static_cast<AspectOverrideMode>(((m_videoAspectOverrideMode + 1) % kAspect_END));

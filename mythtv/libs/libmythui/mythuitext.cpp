@@ -500,7 +500,8 @@ bool MythUIText::FormatTemplate(QString & paragraph, QTextLayout *layout)
     range.start = 0;
     range.length = 0;
 
-    int pos = 0, end = 0;
+    int pos = 0;
+    int end = 0;
     while ((pos = paragraph.indexOf("[font]", pos, Qt::CaseInsensitive)) != -1)
     {
         if ((end = paragraph.indexOf("[/font]", pos + 1, Qt::CaseInsensitive))
@@ -721,7 +722,7 @@ bool MythUIText::LayoutParagraphs(const QStringList & paragraphs,
 bool MythUIText::GetNarrowWidth(const QStringList & paragraphs,
                                 const QTextOption & textoption, qreal & width)
 {
-    qreal    height = 0, last_line_width = NAN;
+    qreal    last_line_width = NAN;
     int      last_width = -1;
     int      num_lines = 0;
     Qt::TextElideMode cutdown = m_Cutdown;
@@ -737,7 +738,7 @@ bool MythUIText::GetNarrowWidth(const QStringList & paragraphs,
         QRectF min_rect;
 
         m_drawRect.setWidth(0);
-        height = 0;
+        qreal height = 0;
 
         LayoutParagraphs(paragraphs, textoption, width, height,
                          min_rect, last_line_width, num_lines, false);
@@ -909,14 +910,14 @@ void MythUIText::FillCutMessage(void)
         for (int idx = m_Layouts.size(); idx < paragraphs.size(); ++idx)
             m_Layouts.push_back(new QTextLayout);
 
-        qreal width = NAN, height = NAN;
+        qreal width = NAN;
         if (m_MultiLine && m_ShrinkNarrow &&
             m_MinSize.isValid() && !m_CutMessage.isEmpty())
             GetNarrowWidth(paragraphs, textoption, width);
         else
             width = m_Area.width();
 
-        height = 0;
+        qreal height = 0;
         m_leftBearing = m_rightBearing = 0;
         int   num_lines = 0;
         qreal last_line_width = NAN;
@@ -1136,7 +1137,8 @@ QPoint MythUIText::CursorPosition(int text_offset)
 
     QVector<QTextLayout *>::const_iterator Ipara = nullptr;
     QPoint pos;
-    int    x = 0, y = 0;
+    int    x = 0;
+    int    y = 0;
     int    offset = text_offset;
 
     for (Ipara = m_Layouts.constBegin(); Ipara != m_Layouts.constEnd(); ++Ipara)

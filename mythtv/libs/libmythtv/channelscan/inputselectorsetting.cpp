@@ -73,7 +73,8 @@ void InputSelector::Load(void)
         return;
     }
 
-    uint which = 0, cnt = 0;
+    uint which = 0;
+    uint cnt = 0;
     for (; query.next(); ++cnt)
     {
         uint    cardid     = query.value(0).toUInt();

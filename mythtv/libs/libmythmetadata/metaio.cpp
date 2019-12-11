@@ -18,7 +18,7 @@
 // Libmyth
 #include <mythcontext.h>
 
-const QString MetaIO::ValidFileExtensions(".mp3|.mp2|.ogg|.oga|.flac|.wma|.wav|.ac3|.oma|.omg|"
+const QString MetaIO::kValidFileExtensions(".mp3|.mp2|.ogg|.oga|.flac|.wma|.wav|.ac3|.oma|.omg|"
                                           ".atp|.ra|.dts|.aac|.m4a|.aa3|.tta|.mka|.aiff|.swa|.wv");
 /*!
  * \brief Constructor
@@ -34,7 +34,7 @@ MetaIO* MetaIO::createTagger(const QString& filename)
     QFileInfo fi(filename);
     QString extension = fi.suffix().toLower();
 
-    if (extension.isEmpty() || !MetaIO::ValidFileExtensions.contains(extension))
+    if (extension.isEmpty() || !MetaIO::kValidFileExtensions.contains(extension))
     {
         LOG(VB_FILE, LOG_WARNING, QString("MetaIO: unknown extension: '%1'").arg(extension));
         return nullptr;
@@ -167,13 +167,15 @@ void MetaIO::readFromFilename(const QString &filename,
 
 MusicMetadata* MetaIO::readFromFilename(const QString &filename, bool blnLength)
 {
-    QString artist, album, title, genre;
-    int tracknum = 0, length = 0;
+    QString artist;
+    QString album;
+    QString title;
+    QString genre;
+    int tracknum = 0;
 
     readFromFilename(filename, artist, album, title, genre, tracknum);
 
-    if (blnLength)
-        length = getTrackLength(filename);
+    int length = (blnLength) ? getTrackLength(filename) : 0;
 
     auto *retdata = new MusicMetadata(filename, artist, "", album, title, genre,
                                       0, tracknum, length);
@@ -188,7 +190,10 @@ MusicMetadata* MetaIO::readFromFilename(const QString &filename, bool blnLength)
 */
 void MetaIO::readFromFilename(MusicMetadata* metadata)
 {
-    QString artist, album, title, genre;
+    QString artist;
+    QString album;
+    QString title;
+    QString genre;
     int tracknum = 0;
 
     const QString filename = metadata->Filename(false);

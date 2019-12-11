@@ -476,7 +476,9 @@ RecStatus::Type TVRec::StartRecording(ProgramInfo *pginfo)
             "Checking input group recorders - begin");
         vector<uint> &inputids = pendinfo.m_possibleConflicts;
 
-        uint mplexid = 0, chanid = 0, sourceid = 0;
+        uint mplexid = 0;
+        uint chanid = 0;
+        uint sourceid = 0;
         vector<uint> inputids2;
         vector<TVState> states;
 
@@ -1549,11 +1551,9 @@ void TVRec::HandlePendingRecordings(void)
 {
     QMutexLocker pendlock(&m_pendingRecLock);
 
-    PendingMap::iterator it, next;
-
-    for (it = m_pendingRecordings.begin(); it != m_pendingRecordings.end();)
+    for (auto it = m_pendingRecordings.begin(); it != m_pendingRecordings.end();)
     {
-        next = it; ++next;
+        auto next = it; ++next;
         if (MythDate::current() > (*it).m_recordingStart.addSecs(30))
         {
             LOG(VB_RECORD, LOG_INFO, LOC + "Deleting stale pending recording " +
@@ -1583,7 +1583,7 @@ void TVRec::HandlePendingRecordings(void)
     // ready send an ASK_RECORDING query to frontend.
 
     bool has_rec = false;
-    it = m_pendingRecordings.begin();
+    auto it = m_pendingRecordings.begin();
     if ((1 == m_pendingRecordings.size()) &&
         (*it).m_ask &&
         ((*it).m_info->GetInputID() == m_inputid) &&
@@ -2518,7 +2518,8 @@ bool TVRec::IsBusy(InputInfo *busy_input, int time_buffer) const
 
         if (timeLeft <= time_buffer)
         {
-            QString channum, input;
+            QString channum;
+            QString input;
             if (pendinfo.m_info->QueryTuningInfo(channum, input))
             {
                 busy_input->m_inputid = m_channel->GetInputID();
@@ -3451,7 +3452,8 @@ bool TVRec::TuningOnSameMultiplex(TuningRequest &request)
 
         if (atsc)
         {
-            uint major, minor = 0;
+            uint major = 0;
+            uint minor = 0;
             ChannelUtil::GetATSCChannel(sourceid, newchannum, major, minor);
 
             if (minor && atsc->HasChannel(major, minor))
@@ -3560,7 +3562,8 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
     LOG(VB_RECORD, LOG_INFO, LOC + QString("TuningShutdowns(%1)")
         .arg(request.toString()));
 
-    QString channum, inputname;
+    QString channum;
+    QString inputname;
 
     if (m_scanner && !(request.m_flags & kFlagEITScan) &&
         HasFlags(kFlagEITScannerRunning))

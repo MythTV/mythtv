@@ -34,6 +34,9 @@ AVCInfo::AVCInfo(const AVCInfo &o) :
 
 AVCInfo &AVCInfo::operator=(const AVCInfo &o)
 {
+    if (this == &o)
+        return *this;
+
     m_port     = o.m_port;
     m_node     = o.m_node;
     m_guid     = o.m_guid;

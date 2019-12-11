@@ -65,6 +65,9 @@ VideoFilterSettings::VideoFilterSettings(const VideoFilterSettings &rhs) :
 VideoFilterSettings &
 VideoFilterSettings::operator=(const VideoFilterSettings &rhs)
 {
+    if (this == &rhs)
+        return *this;
+
     m_prefix = rhs.m_prefix;
 
     if (m_category != rhs.m_category)

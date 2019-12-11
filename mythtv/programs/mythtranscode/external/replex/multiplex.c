@@ -8,9 +8,8 @@
 
 static int buffers_filled(multiplex_t *mx)
 {
-	int vavail=0, aavail=0;
-
-	vavail = ring_avail(mx->index_vrbuffer)/sizeof(index_unit);
+	int aavail=0;
+	int vavail = ring_avail(mx->index_vrbuffer)/sizeof(index_unit);
 	
 	for (int i=0; i<mx->extcnt;i++) {
 		aavail += ring_avail(&mx->index_extrbuffer[i])/
@@ -120,7 +119,8 @@ static int peek_next_ext_unit(multiplex_t *mx, index_unit *extiu, int i)
 	
 static int get_next_ext_unit(multiplex_t *mx, index_unit *extiu, int i)
 {
-	index_unit niu, *piu = extiu;
+	index_unit niu;
+	index_unit *piu = extiu;
 	int length = 0;
 	int j = 0;
 	for(j = 0; j < mx->ext[i].frmperpkt; j++) {
@@ -538,7 +538,7 @@ void check_times( multiplex_t *mx, int *video_ok, int *ext_ok, int *start)
 	    (ptscmp(mx->viu.dts + mx->video_delay, 500*CLOCK_MS +mx->oldSCR)<0)
 	    && ring_avail(mx->index_vrbuffer)){
 		*video_ok = 1;
-                set_ok = 1;
+                set_ok = 1; //NOLINT(clang-analyzer-deadcode.DeadStores)
 	}
 	
 	for (int i = 0; i < mx->extcnt; i++){
@@ -547,7 +547,7 @@ void check_times( multiplex_t *mx, int *video_ok, int *ext_ok, int *start)
 		    ptscmp(mx->ext[i].pts, 500*CLOCK_MS + mx->oldSCR) < 0
 		    && ring_avail(&mx->index_extrbuffer[i])){
 			ext_ok[i] = 1;
-                        set_ok = 1;
+                        set_ok = 1; //NOLINT(clang-analyzer-deadcode.DeadStores)
 		}
 	}
 #ifdef OUT_DEBUG

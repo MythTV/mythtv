@@ -63,7 +63,7 @@ class LIRCPriv
     struct lirc_config *m_lircConfig {nullptr};
 };
 
-QMutex LIRC::lirclib_lock;
+QMutex LIRC::s_lirclibLock;
 
 /** \class LIRC
  *  \brief Interface between mythtv and lircd
@@ -77,18 +77,13 @@ LIRC::LIRC(QObject *main_window,
            QString our_program,
            QString config_file)
     : MThread("LIRC"),
-      lock(QMutex::Recursive),
       m_mainWindow(main_window),
-      lircdDevice(std::move(lircd_device)),
-      program(std::move(our_program)),
-      configFile(std::move(config_file)),
-      doRun(false),
-      buf_offset(0),
-      eofCount(0),
-      retryCount(0),
+      m_lircdDevice(std::move(lircd_device)),
+      m_program(std::move(our_program)),
+      m_configFile(std::move(config_file)),
       d(new LIRCPriv())
 {
-    buf.resize(0);
+    m_buf.resize(0);
 }
 
 LIRC::~LIRC()
@@ -104,13 +99,13 @@ void LIRC::deleteLater(void)
 
 void LIRC::TeardownAll(void)
 {
-    QMutexLocker locker(&lock);
-    if (doRun)
+    QMutexLocker locker(&m_lock);
+    if (m_doRun)
     {
-        doRun = false;
-        lock.unlock();
+        m_doRun = false;
+        m_lock.unlock();
         wait();
-        lock.lock();
+        m_lock.lock();
     }
 
     if (d)
@@ -163,21 +158,21 @@ static QByteArray get_ip(const QString &h)
 
 bool LIRC::Init(void)
 {
-    QMutexLocker locker(&lock);
+    QMutexLocker locker(&m_lock);
     if (d->m_lircState)
         return true;
 
-    uint64_t vtype = (0 == retryCount) ? VB_GENERAL : VB_FILE;
+    uint64_t vtype = (0 == m_retryCount) ? VB_GENERAL : VB_FILE;
 
     int lircd_socket = -1;
-    if (lircdDevice.startsWith('/'))
+    if (m_lircdDevice.startsWith('/'))
     {
         // Connect the unix socket
-        QByteArray dev = lircdDevice.toLocal8Bit();
+        QByteArray dev = m_lircdDevice.toLocal8Bit();
         if (dev.size() > 107)
         {
             LOG(vtype, LOG_ERR, LOC +
-                QString("lircdDevice '%1'").arg(lircdDevice) +
+                QString("m_lircdDevice '%1'").arg(m_lircdDevice) +
                 " is too long for the 'unix' socket API");
 
             return false;
@@ -187,7 +182,7 @@ bool LIRC::Init(void)
         if (lircd_socket < 0)
         {
             LOG(vtype, LOG_ERR, LOC + QString("Failed to open Unix socket '%1'")
-                    .arg(lircdDevice) + ENO);
+                    .arg(m_lircdDevice) + ENO);
 
             return false;
         }
@@ -203,7 +198,7 @@ bool LIRC::Init(void)
         {
             LOG(vtype, LOG_ERR, LOC +
                 QString("Failed to connect to Unix socket '%1'")
-                    .arg(lircdDevice) + ENO);
+                    .arg(m_lircdDevice) + ENO);
 
             close(lircd_socket);
             return false;
@@ -215,14 +210,14 @@ bool LIRC::Init(void)
         if (lircd_socket < 0)
         {
             LOG(vtype, LOG_ERR, LOC + QString("Failed to open TCP socket '%1'")
-                    .arg(lircdDevice) + ENO);
+                    .arg(m_lircdDevice) + ENO);
 
             return false;
         }
 
-        QString dev  = lircdDevice;
+        QString dev  = m_lircdDevice;
         uint    port = 8765;
-        QStringList tmp = lircdDevice.split(':');
+        QStringList tmp = m_lircdDevice.split(':');
         if (2 == tmp.size())
         {
             dev  = tmp[0];
@@ -248,7 +243,7 @@ bool LIRC::Init(void)
         {
             LOG(vtype, LOG_ERR, LOC +
                 QString("Failed to connect TCP socket '%1'")
-                    .arg(lircdDevice) + ENO);
+                    .arg(m_lircdDevice) + ENO);
 
             close(lircd_socket);
             return false;
@@ -265,7 +260,7 @@ bool LIRC::Init(void)
             {
                 LOG(VB_GENERAL, LOG_WARNING, LOC +
                     QString("Failed set flags for socket '%1'")
-                        .arg(lircdDevice) + ENO);
+                        .arg(m_lircdDevice) + ENO);
             }
         }
 
@@ -276,7 +271,7 @@ bool LIRC::Init(void)
         {
             LOG(VB_GENERAL, LOG_WARNING, LOC +
                 QString("Failed setting OOBINLINE option for socket '%1'")
-                    .arg(lircdDevice) + ENO);
+                    .arg(m_lircdDevice) + ENO);
         }
         i = 1;
         ret = setsockopt(lircd_socket, SOL_SOCKET, SO_KEEPALIVE, &i, sizeof(i));
@@ -284,7 +279,7 @@ bool LIRC::Init(void)
         {
             LOG(VB_GENERAL, LOG_WARNING, LOC +
                 QString("Failed setting KEEPALIVE option for socket '%1'")
-                    .arg(lircdDevice) + ENO);
+                    .arg(m_lircdDevice) + ENO);
         }
     }
 
@@ -299,12 +294,12 @@ bool LIRC::Init(void)
     // parse the config file
     if (!d->m_lircConfig)
     {
-        QMutexLocker static_lock(&lirclib_lock);
-        QByteArray cfg = configFile.toLocal8Bit();
+        QMutexLocker static_lock(&s_lirclibLock);
+        QByteArray cfg = m_configFile.toLocal8Bit();
         if (lirc_readconfig(d->m_lircState, cfg.constData(), &d->m_lircConfig, nullptr))
         {
             LOG(vtype, LOG_ERR, LOC +
-                QString("Failed to read config file '%1'").arg(configFile));
+                QString("Failed to read config file '%1'").arg(m_configFile));
 
             lirc_deinit(d->m_lircState);
             d->m_lircState = nullptr;
@@ -314,14 +309,14 @@ bool LIRC::Init(void)
 
     LOG(VB_GENERAL, LOG_INFO, LOC +
         QString("Successfully initialized '%1' using '%2' config")
-            .arg(lircdDevice).arg(configFile));
+            .arg(m_lircdDevice).arg(m_configFile));
 
     return true;
 }
 
 void LIRC::start(void)
 {
-    QMutexLocker locker(&lock);
+    QMutexLocker locker(&m_lock);
 
     if (!d->m_lircState)
     {
@@ -329,19 +324,19 @@ void LIRC::start(void)
         return;
     }
 
-    doRun = true;
+    m_doRun = true;
     MThread::start();
 }
 
 bool LIRC::IsDoRunSet(void) const
 {
-    QMutexLocker locker(&lock);
-    return doRun;
+    QMutexLocker locker(&m_lock);
+    return m_doRun;
 }
 
 void LIRC::Process(QByteArray &data)
 {
-    QMutexLocker static_lock(&lirclib_lock);
+    QMutexLocker static_lock(&s_lirclibLock);
 
     // lirc_code2char will make code point to a static datafer..
     char *code = nullptr;
@@ -414,18 +409,18 @@ void LIRC::run(void)
     /* Process all events read */
     while (IsDoRunSet())
     {
-        if (eofCount && retryCount)
+        if (m_eofCount && m_retryCount)
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-        if ((eofCount >= 10) || (!d->m_lircState))
+        if ((m_eofCount >= 10) || (!d->m_lircState))
         {
-            QMutexLocker locker(&lock);
-            eofCount = 0;
-            if (++retryCount > 1000)
+            QMutexLocker locker(&m_lock);
+            m_eofCount = 0;
+            if (++m_retryCount > 1000)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                     "Failed to reconnect, exiting LIRC thread.");
-                doRun = false;
+                m_doRun = false;
                 continue;
             }
             LOG(VB_FILE, LOG_WARNING, LOC + "EOF -- reconnecting");
@@ -434,7 +429,7 @@ void LIRC::run(void)
             d->m_lircState = nullptr;
 
             if (Init())
-                retryCount = 0;
+                m_retryCount = 0;
             else
                 // wait a while before we retry..
                 std::this_thread::sleep_for(std::chrono::seconds(2));
@@ -443,7 +438,7 @@ void LIRC::run(void)
         }
 
         fd_set readfds;
-        FD_ZERO(&readfds);
+        FD_ZERO(&readfds); // NOLINT(readability-isolate-declaration)
         FD_SET(d->m_lircState->lirc_lircd, &readfds);
 
         // the maximum time select() should wait
@@ -478,12 +473,12 @@ QList<QByteArray> LIRC::GetCodes(void)
     QList<QByteArray> ret;
     ssize_t len = -1;
 
-    uint buf_size = buf.size() + 128;
-    buf.resize(buf_size);
+    uint buf_size = m_buf.size() + 128;
+    m_buf.resize(buf_size);
 
     while (true)
     {
-        len = read(d->m_lircState->lirc_lircd, buf.data() + buf_offset, 128);
+        len = read(d->m_lircState->lirc_lircd, m_buf.data() + m_bufOffset, 128);
         if (len >= 0)
             break;
 
@@ -496,9 +491,9 @@ QList<QByteArray> LIRC::GetCodes(void)
                 return ret;
 
             case ENOTCONN:   // 107 (according to asm-generic/errno.h)
-                if (!eofCount)
+                if (!m_eofCount)
                     LOG(VB_GENERAL, LOG_NOTICE, LOC + "GetCodes -- EOF?");
-                eofCount++;
+                m_eofCount++;
                 return ret;
 
             default:
@@ -509,25 +504,25 @@ QList<QByteArray> LIRC::GetCodes(void)
 
     if (!len)
     {
-        if (!eofCount)
+        if (!m_eofCount)
             LOG(VB_GENERAL, LOG_NOTICE, LOC + "GetCodes -- eof?");
-        eofCount++;
+        m_eofCount++;
         return ret;
     }
 
-    eofCount   = 0;
-    retryCount = 0;
+    m_eofCount   = 0;
+    m_retryCount = 0;
 
-    buf_offset += len;
-    buf.truncate(buf_offset);
-    ret = buf.split('\n');
-    if (buf.endsWith('\n'))
+    m_bufOffset += len;
+    m_buf.truncate(m_bufOffset);
+    ret = m_buf.split('\n');
+    if (m_buf.endsWith('\n'))
     {
-        buf_offset = 0;
+        m_bufOffset = 0;
         return ret;
     }
 
-    buf = ret.takeLast();
-    buf_offset = buf.size();
+    m_buf = ret.takeLast();
+    m_bufOffset = m_buf.size();
     return ret;
 }

@@ -94,7 +94,8 @@ DTC::ChannelInfoList* Channel::GetChannelInfoList( uint nSourceID,
         }
     }
 
-    int nCurPage = 0, nTotalPages = 0;
+    int nCurPage = 0;
+    int nTotalPages = 0;
     if (nCount == 0)
         nTotalPages = 1;
     else
@@ -575,7 +576,8 @@ DTC::VideoMultiplexList* Channel::GetVideoMultiplexList( uint nSourceID,
         }
     }
 
-    int curPage = 0, totalPages = 0;
+    int curPage = 0;
+    int totalPages = 0;
     if (nCount == 0)
         totalPages = 1;
     else

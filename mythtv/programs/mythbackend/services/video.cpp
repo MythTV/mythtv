@@ -106,7 +106,8 @@ DTC::VideoMetadataInfoList* Video::GetVideoList( const QString &Folder,
             FillVideoMetadataInfo ( pVideoMetadataInfo, metadata, true );
     }
 
-    int curPage = 0, totalPages = 0;
+    int curPage = 0;
+    int totalPages = 0;
     if (nCount == 0)
         totalPages = 1;
     else

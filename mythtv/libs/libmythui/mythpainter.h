@@ -47,14 +47,14 @@ class MUI_PUBLIC MythPainter
     virtual bool SupportsAlpha(void) = 0;
     virtual bool SupportsClipping(void) = 0;
     virtual void FreeResources(void) { }
-    virtual void Begin(QPaintDevice *parent) { m_Parent = parent; }
-    virtual void End() { m_Parent = nullptr; }
+    virtual void Begin(QPaintDevice *parent) { m_parent = parent; }
+    virtual void End() { m_parent = nullptr; }
 
     virtual void SetClipRect(const QRect &clipRect);
     virtual void SetClipRegion(const QRegion &clipRegion);
     virtual void Clear(QPaintDevice *device, const QRegion &region);
 
-    QPaintDevice *GetParent(void) { return m_Parent; }
+    QPaintDevice *GetParent(void) { return m_parent; }
 
     virtual void DrawImage(const QRect &dest, MythImage *im, const QRect &src,
                            int alpha) = 0;
@@ -125,19 +125,19 @@ class MUI_PUBLIC MythPainter
 
     void CheckFormatImage(MythImage *im);
 
-    QPaintDevice *m_Parent      {nullptr};
-    int m_HardwareCacheSize     {0};
-    int m_MaxHardwareCacheSize  {0};
+    QPaintDevice *m_parent      {nullptr};
+    int m_hardwareCacheSize     {0};
+    int m_maxHardwareCacheSize  {0};
 
   private:
-    int64_t m_SoftwareCacheSize {0};
-    int64_t m_MaxSoftwareCacheSize {1024 * 1024 * 48};
+    int64_t m_softwareCacheSize {0};
+    int64_t m_maxSoftwareCacheSize {1024 * 1024 * 48};
 
     QMutex           m_allocationLock;
     QSet<MythImage*> m_allocatedImages;
 
-    QMap<QString, MythImage *> m_StringToImageMap;
-    std::list<QString>         m_StringExpireList;
+    QMap<QString, MythImage *> m_stringToImageMap;
+    std::list<QString>         m_stringExpireList;
 
     bool m_showBorders          {false};
     bool m_showNames            {false};

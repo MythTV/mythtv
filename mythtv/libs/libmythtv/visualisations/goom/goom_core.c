@@ -92,6 +92,8 @@ void goom_init (guint32 resx, guint32 resy, int cinemascope) {
         srand ((uintptr_t) pixel);
         if (!rand_tab) rand_tab = (int *) malloc (NB_RAND * sizeof(int)) ;
         rand_pos = 1 ;
+        // Pseudo-random is good enough. Don't need a true random.
+        // NOLINTNEXTLINE(cert-msc30-c,cert-msc50-cpp)
         while (rand_pos != 0) rand_tab [rand_pos++] = rand () ;
                 
 	cycle = 0;
@@ -449,6 +451,8 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 				s_lockVar = 50;
 				newvit = STOP_SPEED + 1 - (4.0F * log10f(s_speedVar+1));
 				// retablir le zoom avant..
+                                // Pseudo-random is good enough. Don't need a true random.
+                                // NOLINTNEXTLINE(cert-msc30-c,cert-msc50-cpp)
 				if ((s_zfd.reverse) && (!(cycle % 13)) && (rand () % 5 == 0)) {
 					s_zfd.reverse = 0;
 					s_zfd.vitesse = STOP_SPEED - 2;
@@ -743,7 +747,9 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 	 * arret demande
 	 */
 	if ((s_stopLines & 0xf000)||(!curGState->m_drawScope)) {
-		float   param1, param2, amplitude;
+		float   param1;
+		float   param2;
+		float   amplitude;
 		int     couleur;
 		int     mode;
 		
@@ -773,8 +779,11 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 		if (s_lineMode == 0)
 			s_lineMode = DRAWLINES;
 		else if (s_lineMode == DRAWLINES) {
-			float   param1, param2, amplitude;
-			int     couleur1,couleur2;
+			float   param1;
+			float   param2;
+			float   amplitude;
+			int     couleur1;
+			int     couleur2;
 			int     mode;
 
 			s_lineMode--;
@@ -803,8 +812,11 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 
 		if (((cycle % 121) == 9) && (iRAND (3) == 1)
 				&& ((s_lineMode == 0) || (s_lineMode == DRAWLINES))) {
-			float   param1, param2, amplitude;
-			int     couleur1,couleur2;
+			float   param1;
+			float   param2;
+			float   amplitude;
+			int     couleur1;
+			int     couleur2;
 			int     mode;
 
 			choose_a_goom_line (&param1, &param2, &couleur1, &mode, &amplitude, s_stopLines);

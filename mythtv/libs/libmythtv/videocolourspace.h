@@ -40,10 +40,10 @@ class VideoColourSpace : public QObject, public QMatrix4x4, public ReferenceCoun
         float whitepoint[2];
     };
 
-    static const ColourPrimaries BT709;
-    static const ColourPrimaries BT610_525;
-    static const ColourPrimaries BT610_625;
-    static const ColourPrimaries BT2020;
+    static const ColourPrimaries kBT709;
+    static const ColourPrimaries kBT610_525;
+    static const ColourPrimaries kBT610_625;
+    static const ColourPrimaries kBT2020;
 
   public slots:
     int   SetPictureAttribute(PictureAttribute Attribute, int Value);
