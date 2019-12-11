@@ -299,13 +299,19 @@ QString MythDRMDevice::FindBestDevice(void)
     serial = m_screen->serialNumber();
 #endif
     if (serial.isEmpty())
+    {
+        LOG(VB_GENERAL, m_verbose, LOC + "No serial number to search for");
         return QString();
+    }
 
     for (auto it = devices.cbegin(); it != devices.cend(); ++it)
     {
         QString device = root + *it;
         if (!ConfirmDevice(device))
+        {
+            LOG(VB_GENERAL, m_verbose, LOC + "Failed to confirm device");
             continue;
+        }
         MythDRMDevice drmdevice(m_screen, device);
         if (drmdevice.GetSerialNumber() == serial)
             return device;

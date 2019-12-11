@@ -44,9 +44,6 @@
 #include "signalhandling.h"
 #include "mythmiscutil.h"
 #include "ssdp.h"
-#if CONFIG_DARWIN
-#include "mythuidefines.h"
-#endif
 #include "cleanupguard.h"
 
 using namespace std;
