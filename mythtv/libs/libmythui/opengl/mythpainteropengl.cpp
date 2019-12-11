@@ -110,6 +110,19 @@ void MythOpenGLPainter::Begin(QPaintDevice *Parent)
             m_mappedBufferPool[i] = m_render->CreateVBO(static_cast<int>(MythRenderOpenGL::kVertexSize));
     }
 
+    // check if we need to adjust cache sizes
+    if (m_lastSize != m_parent->size())
+    {
+        // This will scale the cache depending on the resolution in use
+        static const int s_onehd = 1920 * 1080;
+        static const int s_basesize = 64;
+        m_lastSize = m_parent->size();
+        float hdscreens = (static_cast<float>(m_lastSize.width() + 1) * m_lastSize.height()) / s_onehd;
+        int cpu = qMax(static_cast<int>(hdscreens * s_basesize), s_basesize);
+        int gpu = cpu * 3 / 2;
+        SetMaximumCacheSizes(gpu, cpu);
+    }
+
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         m_render->logDebugMarker("PAINTER_FRAME_START");
 

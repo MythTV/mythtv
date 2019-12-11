@@ -21,9 +21,7 @@
 
 MythPainter::MythPainter()
 {
-    SetMaximumCacheSizes(
-        gCoreContext->GetNumSetting("UIPainterMaxCacheHW",64),
-        gCoreContext->GetNumSetting("UIPainterMaxCacheSW",48) );
+    SetMaximumCacheSizes(64, 48);
 }
 
 void MythPainter::Teardown(void)
@@ -623,7 +621,7 @@ void MythPainter::SetMaximumCacheSizes(int hardware, int software)
     }
 
     LOG((err) ? VB_GENERAL : VB_GUI, (err) ? LOG_ERR : LOG_INFO,
-        QString("MythPainter cache sizes: Hardware %1 MB, Software %2 MB")
+        QString("MythPainter cache sizes: Hardware %1MB, Software %2MB")
         .arg(m_MaxHardwareCacheSize / kOneMeg)
         .arg(m_MaxSoftwareCacheSize / kOneMeg));
 }
