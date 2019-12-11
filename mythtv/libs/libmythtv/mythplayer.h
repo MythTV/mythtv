@@ -620,13 +620,10 @@ class MTV_PUBLIC MythPlayer
     // Private A/V Sync Stuff
     void  WrapTimecode(int64_t &timecode, TCTypes tc_type);
     void  InitAVSync(void);
-    virtual void AVSync(VideoFrame *buffer, bool limit_delay = false);
-    // New video sync method
-    void AVSync2(VideoFrame *buffer);
+    virtual void AVSync(VideoFrame *buffer);
     void  ResetAVSync(void);
-    int64_t AVSyncGetAudiotime(void);
     void  SetFrameInterval(FrameScanType scan, double frame_period);
-    void WaitForTime(int64_t framedue);
+    void  WaitForTime(int64_t framedue);
 
     // Private LiveTV stuff
     void  SwitchToProgram(void);
@@ -825,22 +822,19 @@ class MTV_PUBLIC MythPlayer
 
     // Audio and video synchronization stuff
     VideoSync *videosync                {nullptr};
-    int        avsync_delay             {0};
-    int        avsync_adjustment        {0};
     int        avsync_avg               {0};
     int        avsync_predictor         {0};
-    bool       avsync_predictor_enabled {false};
     int        refreshrate              {0};
-    bool       lastsync                 {false};
-    bool       decode_extra_audio       {false};
-    int        repeat_delay             {0};
     int64_t    disp_timecode            {0};
     bool       avsync_audiopaused       {false};
-    float      max_diverge              {3.0F};  // from setting PlayerMaxDiverge default 2
-    // AVSync for Raspberry Pi digital streams
-    int        avsync_averaging         {4}; // Number of frames to average
-    int        avsync_interval          {0}; // Number of frames skip between sync checks
-    int        avsync_next              {0}; // Frames till next sync check
+    int64_t    rtcbase                   {0}; // real time clock base for presentation time (microsecs)
+    int64_t    maxtcval                  {0}; // maximum to date video tc
+    int        maxtcframes               {0}; // number of frames seen since max to date tc
+    int        numdroppedframes          {0}; // number of consecutive dropped frames.
+    int64_t    prior_audiotimecode       {0}; // time code from prior frame
+    int64_t    prior_videotimecode       {0}; // time code from prior frame
+    float      last_fix                  {0.0F}; //last sync adjustment to prior frame
+    int64_t    m_timeOffsetBase          {0};
 
     // Time Code stuff
     int        prevtc                   {0}; ///< 32 bit timecode if last VideoFrame shown
@@ -848,16 +842,6 @@ class MTV_PUBLIC MythPlayer
     int64_t    tc_wrap[TCTYPESMAX]      {};
     int64_t    tc_lastval[TCTYPESMAX]   {};
     int64_t    savedAudioTimecodeOffset {0};
-
-    // AVSync2
-    int64_t   rtcbase                   {0}; // real time clock base for presentation time (microsecs)
-    int64_t   maxtcval                  {0}; // maximum to date video tc
-    int       maxtcframes               {0}; // number of frames seen since max to date tc
-    int64_t   avsync2adjustms           {10};// number of milliseconds to adjust for av sync errors
-    int       numdroppedframes          {0}; // number of consecutive dropped frames.
-    int64_t   prior_audiotimecode       {0}; // time code from prior frame
-    int64_t   prior_videotimecode       {0}; // time code from prior frame
-    int64_t   m_timeOffsetBase          {0};
 
     // LiveTV
     TV *m_tv                            {nullptr};

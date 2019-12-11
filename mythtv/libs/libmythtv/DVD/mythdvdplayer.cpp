@@ -237,7 +237,7 @@ void MythDVDPlayer::DisplayLastFrame(void)
     SetScanType(kScan_Progressive);
     DisplayDVDButton();
 
-    AVSync(nullptr, true);
+    AVSync(nullptr);
 }
 
 bool MythDVDPlayer::FastForward(float Seconds)
@@ -455,11 +455,6 @@ void MythDVDPlayer::ChangeSpeed(void)
         else
             player_ctx->m_buffer->DVD()->SetDVDSpeed();
     }
-}
-
-void MythDVDPlayer::AVSync(VideoFrame *Frame, bool /*LimitDelay*/)
-{
-    MythPlayer::AVSync(Frame, true);
 }
 
 long long MythDVDPlayer::CalcMaxFFTime(long long FastFwd, bool Setjump) const
@@ -757,9 +752,6 @@ void MythDVDPlayer::StillFrameCheck(void)
                     .arg(m_stillFrameLength).arg(static_cast<double>(play_speed)));
             player_ctx->m_buffer->DVD()->SkipStillFrame();
             m_stillFrameLength = 0;
-        }
-        else {
-            LOG(VB_GENERAL, LOG_INFO, LOC + QString("elapsed %1").arg(elapsedTime));
         }
     }
 }

@@ -44,7 +44,6 @@ class MythDVDPlayer : public MythPlayer
     bool     DecoderGetFrameFFREW(void) override;
     bool     DecoderGetFrameREW(void) override;
     void     ChangeSpeed(void) override;
-    void     AVSync(VideoFrame *Frame, bool LimitDelay = false) override;
     void     DisplayPauseFrame(void) override;
     void     PreProcessNormalFrame(void) override;
     void     VideoStart(void) override;

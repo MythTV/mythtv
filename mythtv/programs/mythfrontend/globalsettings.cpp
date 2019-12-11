@@ -110,36 +110,6 @@ static HostTextEditSetting *VAAPIDevice()
 }
 #endif
 
-static HostCheckBoxSetting *PlaybackAVSync2()
-{
-    auto *gc = new HostCheckBoxSetting("PlaybackAVSync2");
-
-    gc->setLabel(PlaybackSettings::tr("Enable new timestamp based playback speed (AVSync2)"));
-
-    gc->setHelpText(PlaybackSettings::tr("Simplified timing and synchronization method. "
-        "This may offer smoother video playback. Note there is a setting that can be used "
-        "for fine tuning playback (press right arrow)."));
-    gc->setValue(false);
-
-    return gc;
-}
-
-static HostSpinBoxSetting *AVSync2AdjustMS()
-// was previously *DecodeExtraAudio()
-{
-    auto *gc = new HostSpinBoxSetting("AVSync2AdjustMS",1,40,1,1);
-
-    gc->setLabel(PlaybackSettings::tr("AVSync2 audio correction (ms)"));
-
-    gc->setValue(10);
-
-    gc->setHelpText(PlaybackSettings::tr(
-        "When using AVSync2, if video playback is speeding up and slowing down every few seconds, reduce "
-        "this value. For quicker recovery of audio sync after jumps, increase this value. "
-        "Values can be from 1 to 40. Default is 10."));
-    return gc;
-}
-
 #if CONFIG_DEBUGTYPE
 static HostCheckBoxSetting *FFmpegDemuxer()
 {
@@ -4244,9 +4214,6 @@ void PlaybackSettings::Load(void)
 #ifdef USING_VAAPI
     advanced->addChild(VAAPIDevice());
 #endif
-    HostCheckBoxSetting *avsync2 = PlaybackAVSync2();
-    advanced->addChild(avsync2);
-    avsync2->addTargetedChild("1",AVSync2AdjustMS());
 
     addChild(advanced);
 
