@@ -36,9 +36,6 @@
 #include "mythmainwindow.h"
 #include "mythuihelper.h"
 #include "mythcorecontext.h"
-#if CONFIG_DARWIN
-#include "mythuidefines.h"
-#endif
 #include "cleanupguard.h"
 
 #define LOC      QString("MythScreenWizard: ")
