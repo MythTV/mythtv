@@ -156,11 +156,6 @@ MythPlayer::MythPlayer(PlayerFlags flags)
       // Debugging variables
       m_outputJmeter(new Jitterometer(LOC))
 {
-    m_maxDiverge = float(gCoreContext->GetFloatSetting
-        ("PlayerMaxDiverge", 3.0));
-    if (m_maxDiverge < 1.0F)
-        m_maxDiverge = 1.0F;
-
     m_playerThread = QThread::currentThread();
 #ifdef Q_OS_ANDROID
     m_playerThreadId = gettid();
@@ -170,7 +165,6 @@ MythPlayer::MythPlayer(PlayerFlags flags)
 
     m_vbiMode = VBIMode::Parse(gCoreContext->GetSetting("VbiFormat"));
     m_captionsEnabledbyDefault = gCoreContext->GetBoolSetting("DefaultCCMode");
-    m_decodeExtraAudio   = gCoreContext->GetBoolSetting("DecodeExtraAudio", false);
     m_itvEnabled         = gCoreContext->GetBoolSetting("EnableMHEG", false);
     m_clearSavedPosition = gCoreContext->GetNumSetting("ClearSavedPosition", 1);
     m_endExitPrompt      = gCoreContext->GetNumSetting("EndOfRecordingExitPrompt");
@@ -182,11 +176,6 @@ MythPlayer::MythPlayer(PlayerFlags flags)
     uint tmp = mypage.toInt(&valid, 16);
     m_ttPageNum = (valid) ? tmp : m_ttPageNum;
     m_cc608.SetTTPageNum(m_ttPageNum);
-    m_avsync2adjustMs = (int64_t)gCoreContext->GetNumSetting("AVSync2AdjustMS", 10);
-    if (m_avsync2adjustMs < 1)
-        m_avsync2adjustMs = 1;
-    if (m_avsync2adjustMs > 40)
-        m_avsync2adjustMs = 40;
     m_avTimer.start();
 }
 
@@ -307,6 +296,7 @@ bool MythPlayer::Play(float speed, bool normal, bool unpauseaudio)
     m_rtcBase = 0;
     m_priorAudioTimecode = 0;
     m_priorVideoTimecode = 0;
+    m_lastFix  = 0.0;
     SetEof(kEofStateNone);
     UnpauseBuffer();
     UnpauseDecoder();
@@ -1515,28 +1505,21 @@ void MythPlayer::SetFrameInterval(FrameScanType scan, double frame_period)
     if (m_decoder)
         m_fpsMultiplier = m_decoder->GetfpsMultiplier();
     m_frameInterval = static_cast<int>(lround(1000000.0 * frame_period) / m_fpsMultiplier);
-    if (!m_avsyncPredictorEnabled)
-        m_avsyncPredictor = 0;
-    m_avsyncPredictorEnabled = false;
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("SetFrameInterval Interval:%1 Speed:%2 Scan:%3 (Multiplier: %4)")
         .arg(m_frameInterval).arg(static_cast<double>(m_playSpeed)).arg(toQString(scan)).arg(m_fpsMultiplier));
     if (m_playSpeed < 1 || m_playSpeed > 2 || m_refreshRate <= 0)
         return;
-
-    m_avsyncPredictorEnabled = ((m_frameInterval - (m_frameInterval / 200)) < m_refreshRate);
 }
 
 void MythPlayer::ResetAVSync(void)
 {
     m_avsyncAvg = 0;
-    if (!m_avsyncPredictorEnabled || m_avsyncPredictor >= m_refreshRate)
-        m_avsyncPredictor = 0;
     m_prevTc = 0;
-    m_avsyncNext = m_avsyncInterval;      // Frames till next sync check
     m_rtcBase = 0;
     m_priorAudioTimecode = 0;
     m_priorVideoTimecode = 0;
+    m_lastFix = 0.0;
     LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC + "A/V sync reset");
 }
 
@@ -1544,26 +1527,12 @@ void MythPlayer::InitAVSync(void)
 {
     m_videoSync->Start();
 
-    m_avsyncAdjustment = 0;
-
-    m_repeatDelay = 0;
-
     m_refreshRate = m_display->GetDisplayInfo(m_frameInterval).Rate();
 
-    // Number of frames over which to average time divergence
-    m_avsyncAveraging=4;
     m_rtcBase = 0;
     m_priorAudioTimecode = 0;
     m_priorVideoTimecode = 0;
-
-    // Allow override of averaging value
-    m_avsyncAveraging = gCoreContext->GetNumSetting("AVSyncAveraging", m_avsyncAveraging);  // Number of frames to average
-    if (m_avsyncAveraging < 4)
-        m_avsyncAveraging = 4;
-    m_avsyncInterval = m_avsyncAveraging / m_maxDiverge - 1;   // Number of frames skip between sync checks
-    if (m_avsyncInterval < 0)
-        m_avsyncInterval = 0;
-    m_avsyncNext = m_avsyncInterval;      // Frames till next sync check
+    m_lastFix = 0.0;
 
     if (!FlagIsSet(kVideoIsNull))
     {
@@ -1584,314 +1553,6 @@ void MythPlayer::InitAVSync(void)
     }
 }
 
-int64_t MythPlayer::AVSyncGetAudiotime(void)
-{
-    int64_t currentaudiotime = 0;
-    if (m_normalSpeed)
-    {
-        currentaudiotime = m_audio.GetAudioTime();
-    }
-    return currentaudiotime;
-}
-
-void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
-{
-    if (gCoreContext->GetBoolSetting("PlaybackAVSync2", false))
-    {
-        AVSync2(buffer);
-        return;
-    }
-
-    int repeat_pict  = 0;
-    int64_t timecode = m_audio.GetAudioTime();
-
-    if (buffer)
-    {
-        repeat_pict   = buffer->repeat_pict;
-        timecode      = buffer->timecode;
-        m_dispTimecode = buffer->disp_timecode;
-    }
-
-    bool decoderdeint = buffer && buffer->decoder_deinterlaced;
-    FrameScanType ps = m_scan;
-    if (kScan_Detect == m_scan || kScan_Ignore == m_scan || decoderdeint)
-    {
-        ps = kScan_Progressive;
-    }
-    else if (buffer && is_interlaced(ps))
-    {
-        ps = kScan_Interlaced;
-        buffer->interlaced_reversed = m_scan == kScan_Intr2ndField;
-    }
-
-    // only display the second field if needed
-    m_doubleFramerate = is_interlaced(ps) && m_lastDeinterlacer2x;
-
-    float diverge = 0.0F;
-    int frameDelay = m_doubleFramerate ? m_frameInterval / 2 : m_frameInterval;
-    int vsync_delay_clock = 0;
-    //int64_t currentaudiotime = 0;
-
-    if (m_videoOutput->IsErrored())
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            "AVSync: Unknown error in videoOutput, aborting playback.");
-        SetErrored(tr("Failed to initialize A/V Sync"));
-        return;
-    }
-
-    if (m_normalSpeed && m_avsyncNext==0)
-    {
-        diverge = (float)m_avsyncAvg / (float)m_frameInterval;
-    }
-
-    if (m_avsyncNext > 0)
-    {
-        m_avsyncNext--;
-    }
-    else
-    {
-        int divisor = int(abs(diverge) - m_maxDiverge - 1.0F);
-        if (divisor < 1)
-            divisor=1;
-        m_avsyncNext = m_avsyncInterval/divisor;
-    }
-
-    bool max_video_behind = diverge < -m_maxDiverge;
-    bool dropframe = false;
-    QString dbg;
-
-    if (m_avsyncPredictorEnabled)
-    {
-        m_avsyncPredictor += m_frameInterval + m_avsyncAdjustment + m_repeatDelay;
-        if (m_avsyncPredictor >= m_refreshRate)
-        {
-            int refreshperiodsinframe = m_avsyncPredictor/m_refreshRate;
-            m_avsyncPredictor -= m_refreshRate * refreshperiodsinframe;
-        }
-        else
-        {
-            dropframe = !FlagIsSet(kMusicChoice);
-            dbg = QString("A/V predict drop frame, refreshrate %1, avsync_predictor %2, diverge %3, ")
-            .arg(m_refreshRate).arg(m_avsyncPredictor).arg(diverge);
-        }
-    }
-
-    if (max_video_behind)
-    {
-        dropframe = !FlagIsSet(kMusicChoice);
-        // If video is way behind of audio, adjust for it...
-        dbg = QString("Video is %1 frames behind audio (too slow), ")
-            .arg(-diverge);
-    }
-
-    if (!dropframe && m_avsyncAudioPaused)
-    {
-        m_avsyncAudioPaused = false;
-        m_audio.Pause(false);
-    }
-
-    if (!dropframe)
-    {
-        // PGB this was orignally in the calling methods
-        // MythPlayer::DisplayNormalFrame and MythDVDPlayer::DisplayLastFrame
-        // Moved here to reduce CPU usage since the OSD was being merged
-        // into frames that were not being displayed, thereby causing
-        // interruptions and slowdowns.
-        m_osdLock.lock();
-        m_videoOutput->ProcessFrame(buffer, m_osd, m_pipPlayers, ps);
-        m_osdLock.unlock();
-    }
-
-    if (dropframe)
-    {
-        // Reset A/V Sync
-        m_lastSync = true;
-        //currentaudiotime = AVSyncGetAudiotime();
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + dbg + "dropping frame to catch up.");
-        if (max_video_behind)
-        {
-            m_audio.Pause(true);
-            m_avsyncAudioPaused = true;
-        }
-    }
-    else if (!FlagIsSet(kVideoIsNull))
-    {
-        // if we get here, we're actually going to do video output
-        m_osdLock.lock();
-        m_videoOutput->PrepareFrame(buffer, ps, m_osd);
-        m_osdLock.unlock();
-        // Don't wait for sync if this is a secondary PBP otherwise
-        // the primary PBP will become out of sync
-        if (!m_playerCtx->IsPBP() || m_playerCtx->IsPrimaryPBP())
-        {
-            LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO,
-                LOC + QString("AVSync waitforframe %1 %2 %3")
-                    .arg(frameDelay).arg(m_avsyncAdjustment).arg(m_doubleFramerate));
-            vsync_delay_clock = m_videoSync->WaitForFrame(frameDelay, m_avsyncAdjustment + m_repeatDelay);
-        }
-        else
-        {
-            vsync_delay_clock = 0;
-            m_lastSync = true;
-        }
-        //currentaudiotime = AVSyncGetAudiotime();
-        LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC + "AVSync show");
-        m_videoOutput->Show(ps);
-
-        if (m_videoOutput->IsErrored())
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Error condition detected "
-                    "in videoOutput after Show(), aborting playback.");
-            SetErrored(tr("Serious error detected in Video Output"));
-            return;
-        }
-
-        if (m_doubleFramerate)
-        {
-            // second stage of deinterlacer processing
-            if (ps == kScan_Interlaced)
-                ps = kScan_Intr2ndField;
-            m_osdLock.lock();
-            // Only double rate CPU deinterlacers require an extra call to ProcessFrame
-            if (GetDoubleRateOption(buffer, DEINT_CPU) && !GetDoubleRateOption(buffer, DEINT_SHADER))
-                m_videoOutput->ProcessFrame(buffer, m_osd, m_pipPlayers, ps);
-            m_videoOutput->PrepareFrame(buffer, ps, m_osd);
-            m_osdLock.unlock();
-            // Display the second field
-            if (!m_playerCtx->IsPBP() || m_playerCtx->IsPrimaryPBP())
-            {
-                LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC + QString("AVSync waitforframe %1 %2 %3")
-                        .arg(frameDelay).arg(m_avsyncAdjustment).arg(m_doubleFramerate));
-                vsync_delay_clock = m_videoSync->WaitForFrame(frameDelay, m_avsyncAdjustment);
-            }
-            m_videoOutput->Show(ps);
-        }
-
-        m_repeatDelay = m_frameInterval * repeat_pict * 0.5;
-
-        if (m_repeatDelay)
-            LOG(VB_TIMESTAMP, LOG_INFO, LOC +
-                QString("A/V repeat_pict, adding %1 repeat delay")
-                    .arg(m_repeatDelay));
-    }
-    else
-    {
-        vsync_delay_clock = m_videoSync->WaitForFrame(frameDelay, 0);
-        //currentaudiotime = AVSyncGetAudiotime();
-    }
-
-    if (m_outputJmeter && m_outputJmeter->RecordCycleTime())
-    {
-        LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC +
-            QString("A/V avsync_delay: %1, avsync_avg: %2")
-                .arg(m_avsyncDelay / 1000).arg(m_avsyncAvg / 1000));
-    }
-
-    m_avsyncAdjustment = 0;
-
-    if (diverge > m_maxDiverge)
-    {
-        // If audio is way behind of video, adjust for it...
-        // by cutting the frame rate in half for the length of this frame
-        m_avsyncAdjustment = m_frameInterval;
-        m_lastSync = true;
-        LOG(VB_PLAYBACK, LOG_INFO, LOC +
-            QString("Video is %1 frames ahead of audio,\n"
-                    "\t\t\tdoubling video frame interval to slow down.")
-                .arg(diverge));
-    }
-
-    if (m_audio.HasAudioOut() && m_normalSpeed)
-    {
-        // must be sampled here due to Show delays
-        int64_t currentaudiotime = m_audio.GetAudioTime();
-        LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC +
-            QString("A/V timecodes audio %1 video %2 frameinterval %3 "
-                    "avdel %4 avg %5 tcoffset %6 avp %7 avpen %8 avdc %9 "
-                    "diverge %10")
-                .arg(currentaudiotime)
-                .arg(timecode)
-                .arg(m_frameInterval)
-                .arg(timecode - currentaudiotime -
-                     (int)(vsync_delay_clock*m_audio.GetStretchFactor()+500)/1000)
-                .arg(m_avsyncAvg)
-                .arg(m_tcWrap[TC_AUDIO])
-                .arg(m_avsyncPredictor)
-                .arg(m_avsyncPredictorEnabled)
-                .arg(vsync_delay_clock)
-                .arg(diverge)
-                 );
-        if (currentaudiotime != 0 && timecode != 0)
-        { // currentaudiotime == 0 after a seek
-            // The time at the start of this frame (ie, now) is given by
-            // last->timecode
-            if (m_prevTc != 0)
-            {
-                int delta = (int)((timecode - m_prevTc)/m_playSpeed) -
-                                  (m_frameInterval / 1000);
-                // If timecode is off by a frame (dropped frame) wait to sync
-                if (delta > m_frameInterval / 1200 &&
-                    delta < m_frameInterval / 1000 * 3 &&
-                    m_prevRp == 0)
-                {
-                    // wait an extra frame interval
-                    LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC +
-                        QString("A/V delay %1").arg(delta));
-                    m_avsyncAdjustment += m_frameInterval;
-                    // If we're duplicating a frame, it may be because
-                    // the container frame rate doesn't match the
-                    // stream frame rate.  In this case, we increment
-                    // the fake frame counter so that avformat
-                    // timestamp-based seeking will work.
-                    if (!m_decoder->HasPositionMap())
-                        ++m_framesPlayedExtra;
-                }
-            }
-            m_prevTc = timecode;
-            m_prevRp = repeat_pict;
-
-            // usec
-            m_avsyncDelay = (timecode - currentaudiotime) * 1000 -
-                            (int)(vsync_delay_clock*m_audio.GetStretchFactor());
-
-            // prevents major jitter when pts resets during dvd title
-            if (m_avsyncDelay > 2000000 && limit_delay)
-                m_avsyncDelay = 90000;
-            m_avsyncAvg = (m_avsyncDelay + (m_avsyncAvg * (m_avsyncAveraging-1))) / m_avsyncAveraging;
-
-            int avsync_used = m_avsyncAvg;
-            if (labs(avsync_used) > labs(m_avsyncDelay))
-                avsync_used = m_avsyncDelay;
-
-            /* If the audio time codes and video diverge, shift
-               the video by one interlaced field (1/2 frame) */
-            if (!m_lastSync)
-            {
-                if (avsync_used > m_refreshRate)
-                {
-                    m_avsyncAdjustment += m_refreshRate;
-                }
-                else if (avsync_used < 0 - m_refreshRate)
-                {
-                    m_avsyncAdjustment -= m_refreshRate;
-                }
-            }
-            else
-                m_lastSync = false;
-        }
-        else
-        {
-            ResetAVSync();
-        }
-    }
-    else
-    {
-        LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC +
-            QString("A/V no sync proc ns:%1").arg(m_normalSpeed));
-    }
-}
-
 void MythPlayer::WaitForTime(int64_t framedue)
 {
     int64_t unow = m_avTimer.nsecsElapsed() / 1000;
@@ -1901,7 +1562,7 @@ void MythPlayer::WaitForTime(int64_t framedue)
 }
 
 #define AVSYNC_MAX_LATE 10000000
-void MythPlayer::AVSync2(VideoFrame *buffer)
+void MythPlayer::AVSync(VideoFrame *buffer)
 {
     if (m_videoOutput->IsErrored())
     {
@@ -1920,6 +1581,10 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
     int64_t lateness = 0;
     auto playspeed1000 = static_cast<int64_t>(1000.0F / m_playSpeed);
     bool reset = false;
+    // controller gain
+    static float const s_av_control_gain = 0.4F;
+    // time weighted exponential filter coefficient
+    static float const s_sync_fc = 0.6F;
 
     while (framedue == 0)
     {
@@ -1994,16 +1659,11 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
                 audio_adjustment = 0;
             }
             int sign = audio_adjustment < 0 ? -1 : 1;
-            int64_t fix_amount = audio_adjustment * sign;
-            if (fix_amount > m_avsync2adjustMs)
-                fix_amount = m_avsync2adjustMs;
-            // Faster catch-up when off by more than 200 ms
-            if (audio_adjustment * sign > 200)
-                // fix the sync within 15 - 20 frames
-                fix_amount = audio_adjustment * sign / 15;
+            float fix_amount = (m_lastFix * s_sync_fc + (1 - s_sync_fc) * audio_adjustment) * sign * s_av_control_gain;
+            m_lastFix = fix_amount * sign;
             auto speedup1000 = static_cast<int64_t>(1000 * m_playSpeed);
             m_rtcBase -= static_cast<int64_t>(1000000 * fix_amount * sign / speedup1000);
-            if (audio_adjustment * sign > 20 || (m_framesPlayed % 400 == 0))
+            if (audio_adjustment * sign > 20)
                 LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("AV Sync: Audio %1 by %2 ms")
                     .arg(audio_adjustment > 0 ? "ahead" : "behind").arg(abs(audio_adjustment)));
             if (audio_adjustment > 200)
@@ -2119,7 +1779,7 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
 
     LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC +
         QString("A/V timecodes audio=%1 video=%2 frameinterval=%3 "
-                "audioadj=%4 tcoffset=%5 unow=%6 udue=%7")
+                "audioadj=%4 tcoffset=%5 unow=%6 udue=%7 ")
             .arg(m_priorAudioTimecode)
             .arg(m_priorVideoTimecode)
             .arg(m_frameInterval)
@@ -2355,7 +2015,7 @@ void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
     AutoDeint(frame);
     m_detectLetterBox->SwitchTo(frame);
 
-    AVSync(frame, false);
+    AVSync(frame);
 
     // If PiP then keep this frame for MythPlayer::GetCurrentFrame
     if (!m_playerCtx->IsPIP())
@@ -2486,11 +2146,8 @@ void MythPlayer::VideoStart(void)
     SetPlaying(true);
     ClearAfterSeek(false);
 
-    m_avsyncDelay = 0;
-    m_avsyncAvg = 0;
-    m_avsyncNext = m_avsyncInterval;      // Frames till next sync check
+    m_avsyncAvg = 0;  // Frames till next sync check
     m_refreshRate = 0;
-    m_lastSync = false;
 
     EnableFrameRateMonitor();
     m_refreshRate = m_frameInterval;
@@ -5032,13 +4689,9 @@ void MythPlayer::GetPlaybackData(InfoMap &infoMap)
     infoMap.insert("storagerate", m_playerCtx->m_buffer->GetStorageRate());
     infoMap.insert("bufferavail", m_playerCtx->m_buffer->GetAvailableBuffer());
     infoMap.insert("buffersize",  QString::number(m_playerCtx->m_buffer->GetBufferSize() >> 20));
-    if (gCoreContext->GetBoolSetting("PlaybackAVSync2", false))
-    {
-        int avsync = m_avsyncAvg / 1000;
-        infoMap.insert("avsync", tr("%1 ms").arg(avsync));
-    }
-    else
-        infoMap.insert("avsync", QString::number((float)m_avsyncAvg / (float)m_frameInterval, 'f', 2));
+    int avsync = m_avsyncAvg / 1000;
+    infoMap.insert("avsync", tr("%1 ms").arg(avsync));
+
     if (m_videoOutput)
     {
         QString frames = QString("%1/%2").arg(m_videoOutput->ValidVideoFrames())

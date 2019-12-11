@@ -99,6 +99,7 @@ void MythMediaCodecContext::InitVideoCodec(AVCodecContext *Context, bool Selecte
     {
         Context->get_format = MythMediaCodecContext::GetFormat;
         Context->slice_flags = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
+        DirectRendering = false;
         return;
     }
 

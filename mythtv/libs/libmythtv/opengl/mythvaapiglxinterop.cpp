@@ -5,12 +5,7 @@
 #define LOC QString("VAAPIGLX: ")
 
 MythVAAPIInteropGLX::MythVAAPIInteropGLX(MythRenderOpenGL *Context, Type InteropType)
-  : MythVAAPIInterop(Context, InteropType),
-    m_vaapiPictureAttributes(nullptr),
-    m_vaapiPictureAttributeCount(0),
-    m_vaapiHueBase(0),
-    m_vaapiColourSpace(0),
-    m_basicDeinterlacer(DEINT_NONE)
+  : MythVAAPIInterop(Context, InteropType)
 {
 }
 
@@ -315,11 +310,7 @@ vector<MythVideoTexture*> MythVAAPIInteropGLXCopy::Acquire(MythRenderOpenGL *Con
 }
 
 MythVAAPIInteropGLXPixmap::MythVAAPIInteropGLXPixmap(MythRenderOpenGL *Context)
-  : MythVAAPIInteropGLX(Context, VAAPIGLXPIX),
-    m_pixmap(0),
-    m_glxPixmap(0),
-    m_glxBindTexImageEXT(nullptr),
-    m_glxReleaseTexImageEXT(nullptr)
+  : MythVAAPIInteropGLX(Context, VAAPIGLXPIX)
 {
     m_vaDisplay = vaGetDisplay(glXGetCurrentDisplay());
     if (!m_vaDisplay)

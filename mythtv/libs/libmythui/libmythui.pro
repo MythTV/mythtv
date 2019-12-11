@@ -41,7 +41,8 @@ HEADERS += mythdisplay.h mythuivideo.h mythudplistener.h
 HEADERS += mythuiexp.h mythuisimpletext.h mythuistatetracker.h
 HEADERS += mythuianimation.h mythuiscrollbar.h
 HEADERS += mythnotificationcenter.h mythnotificationcenter_private.h
-HEADERS += mythuicomposite.h mythnotification.h mythuidefines.h
+HEADERS += mythuicomposite.h mythnotification.h
+HEADERS += mythedid.h
 
 SOURCES  = mythmainwindow.cpp mythpainter.cpp mythimage.cpp mythrect.cpp
 SOURCES += myththemebase.cpp  mythpainter_qimage.cpp
@@ -63,6 +64,7 @@ SOURCES += mythuisimpletext.cpp mythuistatetracker.cpp
 SOURCES += mythuianimation.cpp mythuiscrollbar.cpp
 SOURCES += mythnotificationcenter.cpp mythnotification.cpp
 SOURCES += mythuicomposite.cpp
+SOURCES += mythedid.cpp
 
 using_qtwebkit {
 HEADERS += mythuiwebbrowser.h
@@ -102,6 +104,15 @@ using_x11 {
     SOURCES += platforms/mythdisplayx11.cpp
 }
 
+using_drm {
+    DEFINES += USING_DRM
+    HEADERS += platforms/mythdisplaydrm.h
+    HEADERS += platforms/mythdrmdevice.h
+    SOURCES += platforms/mythdisplaydrm.cpp
+    SOURCES += platforms/mythdrmdevice.cpp
+    QMAKE_CXXFLAGS += $${LIBDRM_CFLAGS}
+}
+
 using_qtdbus {
     QT      += dbus
     DEFINES += USING_DBUS
@@ -110,14 +121,14 @@ using_qtdbus {
 }
 
 macx {
-    HEADERS += screensaver-osx.h   util-osx.h
-    SOURCES += screensaver-osx.cpp util-osx.cpp
+    HEADERS += screensaver-osx.h   platforms/mythosxutils.h
+    SOURCES += screensaver-osx.cpp platforms/mythosxutils.cpp
     HEADERS += platforms/mythdisplayosx.h
     SOURCES += platforms/mythdisplayosx.cpp
     QMAKE_OBJECTIVE_CFLAGS += $$QMAKE_CXXFLAGS
     QMAKE_OBJECTIVE_CXXFLAGS += $$QMAKE_CXXFLAGS
-    OBJECTIVE_HEADERS += util-osx-cocoa.h
-    OBJECTIVE_SOURCES += util-osx-cocoa.mm
+    OBJECTIVE_HEADERS += platforms/mythutilscocoa.h
+    OBJECTIVE_SOURCES += platforms/mythutilscocoa.mm
     LIBS              += -framework Cocoa -framework IOKit
 
     using_appleremote {

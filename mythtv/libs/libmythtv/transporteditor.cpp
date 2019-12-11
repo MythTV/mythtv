@@ -77,6 +77,7 @@ static CardUtil::INPUT_TYPES get_cardtype(uint sourceid)
         "SELECT capturecard.cardid "
         "FROM  capturecard "
         "WHERE capturecard.sourceid = :SOURCEID AND "
+        "      capturecard.parentid = 0         AND "
         "      capturecard.hostname = :HOSTNAME");
     query.bindValue(":SOURCEID", sourceid);
     query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
@@ -186,12 +187,11 @@ void TransportListEditor::SetSourceID(uint _sourceid)
 }
 
 TransportListEditor::TransportListEditor(uint sourceid) :
-    m_videosource(new VideoSourceSelector(sourceid, QString(), false))
+    m_videosource(new VideoSourceShow(sourceid))
 {
     setLabel(tr("Transport Editor"));
 
     addChild(m_videosource);
-    m_videosource->setEnabled(false);
 
     auto *newTransport =
         new ButtonStandardSetting("(" + tr("New Transport") + ")");

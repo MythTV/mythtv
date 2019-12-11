@@ -7,7 +7,6 @@
 
 #include "referencecounter.h"
 #include "mythuiexp.h"
-#include "mythuidefines.h"
 
 enum RenderType
 {

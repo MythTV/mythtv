@@ -2588,6 +2588,8 @@ int MythCommandLineParser::ConfigureLogging(const QString& mask, unsigned int pr
         .arg(MYTH_SOURCE_PATH).arg(MYTH_SOURCE_VERSION));
     LOG(VB_GENERAL, LOG_CRIT, QString("Qt version: compile: %1, runtime: %2")
         .arg(QT_VERSION_STR).arg(qVersion()));
+    LOG(VB_GENERAL, LOG_INFO, QString("%1 (%2)")
+        .arg(QSysInfo::prettyProductName()).arg(QSysInfo::currentCpuArchitecture()));
     LOG(VB_GENERAL, LOG_NOTICE,
         QString("Enabled verbose msgs: %1").arg(verboseString));
 

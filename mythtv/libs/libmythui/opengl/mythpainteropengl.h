@@ -59,6 +59,7 @@ class MUI_PUBLIC MythOpenGLPainter : public MythPainter
     MythRenderOpenGL *m_render { nullptr };
     QOpenGLFramebufferObject* m_target { nullptr };
     bool              m_swapControl { true };
+    QSize             m_lastSize { };
 
     QMap<MythImage *, MythGLTexture*> m_imageToTextureMap;
     std::list<MythImage *>     m_ImageExpireList;

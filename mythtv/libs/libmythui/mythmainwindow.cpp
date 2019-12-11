@@ -48,7 +48,6 @@ using namespace std;
 #include "mythuistatetracker.h"
 #include "mythuiactions.h"
 #include "mythrect.h"
-#include "mythuidefines.h"
 #include "mythdisplay.h"
 
 #ifdef USING_APPLEREMOTE
@@ -980,7 +979,7 @@ bool MythMainWindow::event(QEvent *e)
     return QWidget::event(e);
 }
 
-void MythMainWindow::Init(const QString& forcedpainter, bool mayReInit)
+void MythMainWindow::Init(bool mayReInit)
 {
     d->m_useDB = ! gCoreContext->GetDB()->SuppressDBMessages();
 
@@ -1089,21 +1088,12 @@ void MythMainWindow::Init(const QString& forcedpainter, bool mayReInit)
         d->m_render = nullptr;
     }
 
-    QString painter = forcedpainter.isEmpty() ?
-        GetMythDB()->GetSetting("ThemePainter", AUTO_PAINTER) : forcedpainter;
-#ifdef _WIN32
-    if (painter == AUTO_PAINTER || painter == D3D9_PAINTER)
-    {
-        LOG(VB_GENERAL, LOG_INFO, QString("Using the %1 painter").arg(D3D9_PAINTER));
-        d->painter = new MythD3D9Painter();
-        d->m_paintwin = new MythPainterWindowD3D9(this, d);
-    }
-#endif
 #ifdef USING_OPENGL
-    if ((!d->m_painter && !d->m_paintwin) &&
-        (painter == AUTO_PAINTER || painter.contains(OPENGL_PAINTER)))
+    // always use OpenGL by default. Only fallback to Qt painter as a last resort.
+    if (!d->m_painter && !d->m_paintwin)
     {
-        MythRenderOpenGL *gl = MythRenderOpenGL::Create(painter);
+        QString dummy;
+        MythRenderOpenGL *gl = MythRenderOpenGL::Create(dummy);
         d->m_render = gl;
         if (!gl)
         {
@@ -1117,7 +1107,7 @@ void MythMainWindow::Init(const QString& forcedpainter, bool mayReInit)
 
             // we need to initialise MythRenderOpenGL before checking
             // IsRecommendedRenderer
-            if (!gl->Init() || (painter == AUTO_PAINTER && !gl->IsRecommendedRenderer()))
+            if (!gl->Init() || !gl->IsRecommendedRenderer())
             {
                 LOG(VB_GENERAL, LOG_WARNING,
                     "OpenGL painter not recommended with this system's "
@@ -1136,7 +1126,7 @@ void MythMainWindow::Init(const QString& forcedpainter, bool mayReInit)
     // NOLINTNEXTLINE(readability-misleading-indentation)
     if (!d->m_painter && !d->m_paintwin)
     {
-        LOG(VB_GENERAL, LOG_INFO, "Using the Qt painter");
+        LOG(VB_GENERAL, LOG_INFO, "Using the Qt painter. Video playback will not work!");
         d->m_painter = new MythQtPainter();
         d->m_paintwin = new MythPainterWindowQt(this, d);
     }

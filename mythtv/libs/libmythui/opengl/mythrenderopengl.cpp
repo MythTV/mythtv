@@ -337,7 +337,13 @@ bool MythRenderOpenGL::Init(void)
                           hasExtension("GL_EXT_texture_rectangle")))
         m_extraFeatures |= kGLExtRects;
 
+    // GL_RED etc texure formats. Not available on GLES2.0 or GL < 2
+    if ((isOpenGLES() && format().majorVersion() < 3) ||
+        (!isOpenGLES() && format().majorVersion() < 2))
+        m_extraFeatures |= kGLLegacyTextures;
+
     // GL_UNPACK_ROW_LENGTH - for uploading video textures
+    // Note: Should also be available on GL1.4 per specification
     if (!isOpenGLES() || (isOpenGLES() && ((fmt.majorVersion() >= 3) || hasExtension("GL_EXT_unpack_subimage"))))
         m_extraFeatures |= kGLExtSubimage;
 
@@ -425,6 +431,7 @@ void MythRenderOpenGL::DebugFeatures(void)
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Buffer mapping       : %1").arg(GLYesNo(m_extraFeatures & kGLBufferMap)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Framebuffer objects  : %1").arg(GLYesNo(m_features & Framebuffers)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Unpack Subimage      : %1").arg(GLYesNo(m_extraFeatures & kGLExtSubimage)));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("GL_RED/GL_R8         : %1").arg(GLYesNo(!(m_extraFeatures & kGLLegacyTextures))));
     //LOG(VB_GENERAL, LOG_INFO, LOC + QString("Compute shaders      : %1").arg(GLYesNo(QOpenGLShader::hasOpenGLShaders(QOpenGLShader::Compute))));
 
     // warnings

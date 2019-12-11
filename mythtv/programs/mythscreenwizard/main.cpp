@@ -36,9 +36,6 @@
 #include "mythmainwindow.h"
 #include "mythuihelper.h"
 #include "mythcorecontext.h"
-#if CONFIG_DARWIN
-#include "mythuidefines.h"
-#endif
 #include "cleanupguard.h"
 
 #define LOC      QString("MythScreenWizard: ")
@@ -83,11 +80,7 @@ static bool resetTheme(QString themedir, const QString badtheme)
 
     MythTranslation::reload();
     GetMythUI()->LoadQtConfig();
-#if CONFIG_DARWIN
-    GetMythMainWindow()->Init(QT_PAINTER);
-#else
     GetMythMainWindow()->Init();
-#endif
     GetMythMainWindow()->ReinitDone();
 
     return RunMenu(themedir, themename);
@@ -201,11 +194,7 @@ int main(int argc, char **argv)
     }
 
     MythMainWindow *mainWindow = GetMythMainWindow();
-#if CONFIG_DARWIN
-    mainWindow->Init(OPENGL2_PAINTER);
-#else
     mainWindow->Init();
-#endif
     mainWindow->setWindowTitle(QObject::tr("MythTV Screen Setup Wizard"));
 
     // We must reload the translation after a language change and this

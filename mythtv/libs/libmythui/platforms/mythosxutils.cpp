@@ -13,9 +13,14 @@
  * Nigel Pearson
  *****************************************************************************/
 
-#import "util-osx.h"
-#import "util-osx-cocoa.h"
+// MythTV
+#import "mythosxutils.h"
+#import "mythutilscocoa.h"
+
+// OSX
 #import <CoreFoundation/CFNumber.h>
+
+// Std
 #include <cstdio>
 
 int get_int_CF(CFDictionaryRef dict, CFStringRef key)

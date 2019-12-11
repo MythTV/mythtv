@@ -1446,7 +1446,7 @@ class ScramblingDescriptor : public MPEGDescriptor
 class ServiceDescriptorMapping
 {
   public:
-    explicit ServiceDescriptorMapping(const uint service_type) { m_service_type = service_type; }
+    explicit ServiceDescriptorMapping(const uint service_type) { m_serviceType = service_type; }
     enum
     {
         kServiceTypeDigitalTelevision          = 0x01,
@@ -1497,7 +1497,7 @@ class ServiceDescriptorMapping
         kServiceTypeNimiqTV9                   = 0x96,
 
     };
-    uint ServiceType(void) const { return m_service_type; }
+    uint ServiceType(void) const { return m_serviceType; }
     bool IsDTV(void) const
     {
         return ((ServiceType() == kServiceTypeDigitalTelevision) ||
@@ -1544,7 +1544,7 @@ class ServiceDescriptorMapping
     QString toString(void) const;
 
   private:
-    uint m_service_type;
+    uint m_serviceType;
 };
 
 // DVB Bluebook A038 (Sept 2011) p 80

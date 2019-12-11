@@ -21,6 +21,9 @@
 #ifdef USING_X11
 #include "mythdisplayx11.h"
 #endif
+#ifdef USING_DRM
+#include "mythdisplaydrm.h"
+#endif
 #if defined(Q_OS_WIN)
 #include "mythdisplaywindows.h"
 #endif
@@ -77,6 +80,14 @@ MythDisplay* MythDisplay::AcquireRelease(bool Acquire)
 #ifdef USING_X11
             if (MythDisplayX11::IsAvailable())
                 s_display = new MythDisplayX11();
+#endif
+#ifdef USING_DRM
+#if QT_VERSION >= QT_VERSION_CHECK(5,9,0)
+            // this will only work by validating the screen's serial number
+            // - which is only available with Qt 5.9
+            if (!s_display)
+                s_display = new MythDisplayDRM();
+#endif
 #endif
 #if defined(Q_OS_MAC)
             if (!s_display)

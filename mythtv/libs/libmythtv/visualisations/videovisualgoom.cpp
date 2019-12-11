@@ -90,11 +90,11 @@ void VideoVisualGoom::Draw(const QRect &area, MythPainter */*painter*/,
             {
                 QImage image(m_area.size(), QImage::Format_ARGB32);
                 m_glSurface = glrender->CreateTextureFromQImage(&image);
-                m_glSurface->m_crop = false;
             }
 
             if (m_glSurface)
             {
+                m_glSurface->m_crop = false;
                 if (m_buffer != last)
                     m_glSurface->m_texture->setData(m_glSurface->m_pixelFormat, m_glSurface->m_pixelType, m_buffer);
                 // goom doesn't render properly due to changes in video alpha blending

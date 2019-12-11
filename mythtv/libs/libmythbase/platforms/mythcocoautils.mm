@@ -1,10 +1,13 @@
-#include "util-osx-cocoa.h"
+// MythTV
+#include "platforms/mythcocoautils.h"
+
+// OSX
 #import <Cocoa/Cocoa.h>
 
 // Dummy NSThread for Cocoa multithread initialization
 @implementation NSThread (Dummy)
 
-    - (void) run;
+    - (void) run
 {
 }
 
@@ -37,16 +40,4 @@ void DeleteOSXCocoaPool(void* &pool)
         pool = nullptr;
         [a_pool release];
     }
-}
-
-CGDirectDisplayID GetOSXCocoaDisplay(void* view)
-{
-    NSView *thisview = static_cast<NSView *>(view);
-    if (!thisview)
-        return 0;
-    NSScreen *screen = [[thisview window] screen];
-    if (!screen)
-        return 0;
-    NSDictionary* desc = [screen deviceDescription];
-    return (CGDirectDisplayID)[[desc objectForKey:@"NSScreenNumber"] intValue];
 }
