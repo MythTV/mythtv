@@ -76,6 +76,13 @@ MythCodecID MythV4L2M2MContext::GetSupportedCodec(AVCodecContext **Context,
     if (!HaveV4L2Codecs((*Codec)->id))
         return failure;
 
+    if (!qgetenv("MYTHTV_V4L2_REQUEST").isEmpty() && !decodeonly)
+    {
+        return MythDRMPRIMEContext::GetPrimeCodec(Context, Codec, Stream,
+                                                  success, failure, "v4l2request",
+                                                  AV_PIX_FMT_DRM_PRIME);
+    }
+
     return MythDRMPRIMEContext::GetPrimeCodec(Context, Codec, Stream,
                                               success, failure, "v4l2m2m",
                                               decodeonly ? (*Context)->pix_fmt : AV_PIX_FMT_DRM_PRIME);
@@ -183,6 +190,12 @@ bool MythV4L2M2MContext::HaveV4L2Codecs(AVCodecID Codec /* = AV_CODEC_ID_NONE */
     static QVector<AVCodecID> s_supportedV4L2Codecs;
 
     QMutexLocker locker(&s_drmPrimeLock);
+
+    if (!qgetenv("MYTHTV_V4L2_REQUEST").isEmpty())
+    {
+        s_needscheck = false;
+        s_supportedV4L2Codecs = s_avcodecs;
+    }
 
     if (s_needscheck)
     {

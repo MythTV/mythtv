@@ -230,8 +230,9 @@ bool MythDRMPRIMEContext::HavePrimeDecoders(AVCodecID Codec)
 
         if (debugcodecs.isEmpty())
             debugcodecs.append("None");
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("DRM PRIME codecs supported: %1 using: %2")
-            .arg(debugcodecs.join(",")).arg(s_drmPrimeDecoders.join(",")));
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("DRM PRIME codecs supported: %1 %2")
+            .arg(debugcodecs.join(","))
+            .arg(s_drmPrimeDecoders.isEmpty() ? "" : QString("using: %1").arg(s_drmPrimeDecoders.join(","))));
     }
 
     if (!Codec)
