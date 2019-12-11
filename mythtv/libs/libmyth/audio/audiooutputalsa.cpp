@@ -116,10 +116,10 @@ int AudioOutputALSA::TryOpenDevice(int open_mode, bool try_ac3)
     {
         dev_ba = m_passthruDevice.toLatin1();
         VBAUDIO(QString("OpenDevice %1 for passthrough").arg(m_passthruDevice));
-        err = snd_pcm_open(&m_pcm_handle, dev_ba.constData(),
+        err = snd_pcm_open(&m_pcmHandle, dev_ba.constData(),
                            SND_PCM_STREAM_PLAYBACK, open_mode);
 
-        m_lastdevice = m_passthruDevice;
+        m_lastDevice = m_passthruDevice;
 
         if (m_discreteDigital)
             return err;
@@ -135,9 +135,9 @@ int AudioOutputALSA::TryOpenDevice(int open_mode, bool try_ac3)
         // passthru open failed, retry default device
         VBAUDIO(QString("OpenDevice %1").arg(m_mainDevice));
         dev_ba = m_mainDevice.toLatin1();
-        err = snd_pcm_open(&m_pcm_handle, dev_ba.constData(),
+        err = snd_pcm_open(&m_pcmHandle, dev_ba.constData(),
                            SND_PCM_STREAM_PLAYBACK, open_mode);
-        m_lastdevice = m_mainDevice;
+        m_lastDevice = m_mainDevice;
     }
     return err;
 }
@@ -153,14 +153,14 @@ int AudioOutputALSA::GetPCMInfo(int &card, int &device, int &subdevice)
         return 0;
     }
 
-    if (!m_pcm_handle)
+    if (!m_pcmHandle)
         return -1;
 
     snd_pcm_info_t *pcm_info = nullptr;
 
     snd_pcm_info_alloca(&pcm_info);
 
-    int err = snd_pcm_info(m_pcm_handle, pcm_info);
+    int err = snd_pcm_info(m_pcmHandle, pcm_info);
     CHECKERR("snd_pcm_info");
 
     err = snd_pcm_info_get_card(pcm_info);
@@ -188,7 +188,7 @@ bool AudioOutputALSA::IncPreallocBufferSize(int requested, int buffer_time)
     int device = 0;
     int subdevice = 0;
 
-    m_pbufsize = 0;
+    m_pbufSize = 0;
 
     if (GetPCMInfo(card, device, subdevice) < 0)
         return false;
@@ -327,35 +327,35 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings(bool passthrough)
 
     auto *settings = new AudioOutputSettings();
 
-    if (m_pcm_handle)
+    if (m_pcmHandle)
     {
-        snd_pcm_close(m_pcm_handle);
-        m_pcm_handle = nullptr;
+        snd_pcm_close(m_pcmHandle);
+        m_pcmHandle = nullptr;
     }
 
     if ((err = TryOpenDevice(OPEN_FLAGS, passthrough)) < 0)
     {
-        AERROR(QString("snd_pcm_open(\"%1\")").arg(m_lastdevice));
+        AERROR(QString("snd_pcm_open(\"%1\")").arg(m_lastDevice));
         delete settings;
         return nullptr;
     }
 
     snd_pcm_hw_params_alloca(&params);
 
-    if (snd_pcm_hw_params_any(m_pcm_handle, params) < 0)
+    if (snd_pcm_hw_params_any(m_pcmHandle, params) < 0)
     {
-        snd_pcm_close(m_pcm_handle);
+        snd_pcm_close(m_pcmHandle);
         if ((err = TryOpenDevice(OPEN_FLAGS&FILTER_FLAGS, passthrough)) < 0)
         {
-            AERROR(QString("snd_pcm_open(\"%1\")").arg(m_lastdevice));
+            AERROR(QString("snd_pcm_open(\"%1\")").arg(m_lastDevice));
             delete settings;
             return nullptr;
         }
-        if ((err = snd_pcm_hw_params_any(m_pcm_handle, params)) < 0)
+        if ((err = snd_pcm_hw_params_any(m_pcmHandle, params)) < 0)
         {
             AERROR("No playback configurations available");
-            snd_pcm_close(m_pcm_handle);
-            m_pcm_handle = nullptr;
+            snd_pcm_close(m_pcmHandle);
+            m_pcmHandle = nullptr;
             delete settings;
             return nullptr;
         }
@@ -365,7 +365,7 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings(bool passthrough)
 
     // NOLINTNEXTLINE(bugprone-infinite-loop)
     while (int rate = settings->GetNextRate())
-        if(snd_pcm_hw_params_test_rate(m_pcm_handle, params, rate, 0) >= 0)
+        if(snd_pcm_hw_params_test_rate(m_pcmHandle, params, rate, 0) >= 0)
             settings->AddSupportedRate(rate);
 
     while ((fmt = settings->GetNextFormat()))
@@ -381,12 +381,12 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings(bool passthrough)
             case FORMAT_FLT:    afmt = SND_PCM_FORMAT_FLOAT; break;
             default:         continue;
         }
-        if (snd_pcm_hw_params_test_format(m_pcm_handle, params, afmt) >= 0)
+        if (snd_pcm_hw_params_test_format(m_pcmHandle, params, afmt) >= 0)
             settings->AddSupportedFormat(fmt);
     }
 
     for (uint channels = CHANNELS_MIN; channels <= CHANNELS_MAX; channels++)
-        if (snd_pcm_hw_params_test_channels(m_pcm_handle, params, channels) >= 0)
+        if (snd_pcm_hw_params_test_channels(m_pcmHandle, params, channels) >= 0)
             settings->AddSupportedChannels(channels);
 
     int card = 0;
@@ -408,8 +408,8 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings(bool passthrough)
         VBAUDIO("Can't get card and device number");
     }
 
-    snd_pcm_close(m_pcm_handle);
-    m_pcm_handle = nullptr;
+    snd_pcm_close(m_pcmHandle);
+    m_pcmHandle = nullptr;
 
     /* Check if name or description contains information
        to know if device can accept passthrough or not */
@@ -456,13 +456,13 @@ bool AudioOutputALSA::OpenDevice()
     snd_pcm_format_t format = SND_PCM_FORMAT_UNKNOWN;
     int err = 0;
 
-    if (m_pcm_handle != nullptr)
+    if (m_pcmHandle != nullptr)
         CloseDevice();
 
     if ((err = TryOpenDevice(0, m_passthru || m_enc)) < 0)
     {
-        AERROR(QString("snd_pcm_open(\"%1\")").arg(m_lastdevice));
-        if (m_pcm_handle)
+        AERROR(QString("snd_pcm_open(\"%1\")").arg(m_lastDevice));
+        if (m_pcmHandle)
             CloseDevice();
         return false;
     }
@@ -486,7 +486,7 @@ bool AudioOutputALSA::OpenDevice()
 
     uint period_time = 4; // aim for an interrupt every (1/4th of buffer_time)
 
-    err = SetParameters(m_pcm_handle, format, m_channels, m_sampleRate,
+    err = SetParameters(m_pcmHandle, format, m_channels, m_sampleRate,
                         buffer_time, period_time);
     if (err < 0)
     {
@@ -507,11 +507,11 @@ void AudioOutputALSA::CloseDevice()
     if (m_mixer.handle)
         snd_mixer_close(m_mixer.handle);
     m_mixer.handle = nullptr;
-    if (m_pcm_handle)
+    if (m_pcmHandle)
     {
-        snd_pcm_drain(m_pcm_handle);
-        snd_pcm_close(m_pcm_handle);
-        m_pcm_handle = nullptr;
+        snd_pcm_drain(m_pcmHandle);
+        snd_pcm_close(m_pcmHandle);
+        m_pcmHandle = nullptr;
     }
 }
 
@@ -553,7 +553,7 @@ void AudioOutputALSA::WriteAudio(uchar *aubuf, int size)
     uchar *tmpbuf = aubuf;
     uint frames = size / m_outputBytesPerFrame;
 
-    if (m_pcm_handle == nullptr)
+    if (m_pcmHandle == nullptr)
     {
         Error("WriteAudio() called with pcm_handle == nullptr!");
         return;
@@ -571,7 +571,7 @@ void AudioOutputALSA::WriteAudio(uchar *aubuf, int size)
 
     while (frames > 0)
     {
-        int lw = snd_pcm_writei(m_pcm_handle, tmpbuf, frames);
+        int lw = snd_pcm_writei(m_pcmHandle, tmpbuf, frames);
 
         if (lw >= 0)
         {
@@ -589,10 +589,10 @@ void AudioOutputALSA::WriteAudio(uchar *aubuf, int size)
         switch (err)
         {
             case -EPIPE:
-                 if (snd_pcm_state(m_pcm_handle) == SND_PCM_STATE_XRUN)
+                 if (snd_pcm_state(m_pcmHandle) == SND_PCM_STATE_XRUN)
                  {
                     VBAUDIO("WriteAudio: buffer underrun");
-                    if ((err = snd_pcm_prepare(m_pcm_handle)) < 0)
+                    if ((err = snd_pcm_prepare(m_pcmHandle)) < 0)
                     {
                         AERROR("WriteAudio: unable to recover from xrun");
                         return;
@@ -603,13 +603,13 @@ void AudioOutputALSA::WriteAudio(uchar *aubuf, int size)
 #if ESTRPIPE != EPIPE
             case -ESTRPIPE:
                 VBAUDIO("WriteAudio: device is suspended");
-                while ((err = snd_pcm_resume(m_pcm_handle)) == -EAGAIN)
+                while ((err = snd_pcm_resume(m_pcmHandle)) == -EAGAIN)
                     usleep(200);
 
                 if (err < 0)
                 {
                     VBERROR("WriteAudio: resume failed");
-                    if ((err = snd_pcm_prepare(m_pcm_handle)) < 0)
+                    if ((err = snd_pcm_prepare(m_pcmHandle)) < 0)
                     {
                         AERROR("WriteAudio: unable to recover from suspend");
                         return;
@@ -621,12 +621,12 @@ void AudioOutputALSA::WriteAudio(uchar *aubuf, int size)
             case -EBADFD:
                 Error(
                     QString("WriteAudio: device is in a bad state (state = %1)")
-                    .arg(snd_pcm_state(m_pcm_handle)));
+                    .arg(snd_pcm_state(m_pcmHandle)));
                 return;
 
             default:
                 AERROR(QString("WriteAudio: Write failed, state: %1, err")
-                       .arg(snd_pcm_state(m_pcm_handle)));
+                       .arg(snd_pcm_state(m_pcmHandle)));
                 return;
         }
     }
@@ -634,7 +634,7 @@ void AudioOutputALSA::WriteAudio(uchar *aubuf, int size)
 
 int AudioOutputALSA::GetBufferedOnSoundcard(void) const
 {
-    if (m_pcm_handle == nullptr)
+    if (m_pcmHandle == nullptr)
     {
         VBERROR("getBufferedOnSoundcard() called with pcm_handle == nullptr!");
         return 0;
@@ -644,7 +644,7 @@ int AudioOutputALSA::GetBufferedOnSoundcard(void) const
 
     /* Delay is the total delay from writing to the pcm until the samples
        hit the DAC - includes buffered samples and any fixed latencies */
-    if (snd_pcm_delay(m_pcm_handle, &delay) < 0)
+    if (snd_pcm_delay(m_pcmHandle, &delay) < 0)
         return 0;
 
     // BUG: calling snd_pcm_state causes noise and repeats on the Raspberry Pi
@@ -781,7 +781,7 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
         VBWARN(QString("Requested %1us got %2 buffer time")
                 .arg(original_buffer_time).arg(buffer_time));
         // We need to increase preallocated buffer size in the driver
-        if (canincrease && m_pbufsize < 0)
+        if (canincrease && m_pbufSize < 0)
         {
             IncPreallocBufferSize(original_buffer_time, buffer_time);
         }
@@ -887,7 +887,7 @@ void AudioOutputALSA::SetVolumeChannel(int channel, int volume)
 
 bool AudioOutputALSA::OpenMixer(void)
 {
-    if (!m_pcm_handle)
+    if (!m_pcmHandle)
     {
         VBERROR("mixer setup without a pcm");
         return false;

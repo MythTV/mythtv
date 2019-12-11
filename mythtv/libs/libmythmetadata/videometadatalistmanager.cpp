@@ -198,21 +198,21 @@ const QString& meta_node::getPath() const
 
 const QString& meta_node::getFQPath()
 {
-    if (m_fq_path.length())
-        return m_fq_path;
+    if (m_fqPath.length())
+        return m_fqPath;
 
-    if (m_parent && !m_path_root)
-        m_fq_path = m_parent->getFQPath() + "/" + getPath();
+    if (m_parent && !m_pathRoot)
+        m_fqPath = m_parent->getFQPath() + "/" + getPath();
     else
     {
         QString p = getPath();
         if (p.startsWith("myth://"))
-            m_fq_path = p;
+            m_fqPath = p;
         else
-            m_fq_path = ((p.length() && p[0] != '/') ? "/" : "") + p;
+            m_fqPath = ((p.length() && p[0] != '/') ? "/" : "") + p;
     }
 
-    return m_fq_path;
+    return m_fqPath;
 }
 
 void meta_node::setParent(meta_node *parent)
@@ -222,7 +222,7 @@ void meta_node::setParent(meta_node *parent)
 
 void meta_node::setPathRoot(bool is_root)
 {
-    m_path_root = is_root;
+    m_pathRoot = is_root;
 }
 
 const QString meta_data_node::kMetaBug = "Bug";

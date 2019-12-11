@@ -87,58 +87,58 @@ MetadataLookup::MetadataLookup(
     m_data(std::move(data)),
     m_step(step),
     m_automatic(automatic),
-    m_handleimages(handleimages),
-    m_allowoverwrites(allowoverwrites),
-    m_allowgeneric(allowgeneric),
-    m_dvdorder(preferdvdorder),
+    m_handleImages(handleimages),
+    m_allowOverwrites(allowoverwrites),
+    m_allowGeneric(allowgeneric),
+    m_dvdOrder(preferdvdorder),
     m_host(std::move(host)),
     m_filename(std::move(filename)),
     m_title(title),
     m_network(std::move(network)),
     m_status(std::move(status)),
     m_categories(std::move(categories)),
-    m_userrating(userrating),
-    m_ratingcount(ratingcount),
+    m_userRating(userrating),
+    m_ratingCount(ratingcount),
     m_language(std::move(language)),
     m_subtitle(std::move(subtitle)),
     m_tagline(std::move(tagline)),
     m_description(std::move(description)),
     m_season(season),
     m_episode(episode),
-    m_chanid(chanid),
-    m_channum(std::move(channum)),
-    m_chansign(std::move(chansign)),
-    m_channame(std::move(channame)),
-    m_chanplaybackfilters(std::move(chanplaybackfilters)),
-    m_recgroup(std::move(recgroup)),
-    m_playgroup(std::move(playgroup)),
-    m_seriesid(std::move(seriesid)),
+    m_chanId(chanid),
+    m_chanNum(std::move(channum)),
+    m_chanSign(std::move(chansign)),
+    m_chanName(std::move(channame)),
+    m_chanPlaybackFilters(std::move(chanplaybackfilters)),
+    m_recGroup(std::move(recgroup)),
+    m_playGroup(std::move(playgroup)),
+    m_seriesId(std::move(seriesid)),
     m_programid(std::move(programid)),
-    m_storagegroup(std::move(storagegroup)),
-    m_startts(std::move(startts)),
-    m_endts(std::move(endts)),
-    m_recstartts(std::move(recstartts)),
-    m_recendts(std::move(recendts)),
-    m_programflags(programflags),
-    m_audioproperties(audioproperties),
-    m_videoproperties(videoproperties),
-    m_subtitletype(subtitletype),
+    m_storageGroup(std::move(storagegroup)),
+    m_startTs(std::move(startts)),
+    m_endTs(std::move(endts)),
+    m_recStartTs(std::move(recstartts)),
+    m_recEndTs(std::move(recendts)),
+    m_programFlags(programflags),
+    m_audioProperties(audioproperties),
+    m_videoProperties(videoproperties),
+    m_subtitleType(subtitletype),
     m_certification(std::move(certification)),
     m_countries(std::move(countries)),
     m_popularity(popularity),
     m_budget(budget),
     m_revenue(revenue),
     m_album(std::move(album)),
-    m_tracknum(tracknum),
+    m_trackNum(tracknum),
     m_system(std::move(system)),
     m_year(year),
-    m_releasedate(releasedate),
-    m_lastupdated(std::move(lastupdated)),
+    m_releaseDate(releasedate),
+    m_lastUpdated(std::move(lastupdated)),
     m_runtime(runtime),
-    m_runtimesecs(runtimesecs),
-    m_inetref(std::move(inetref)),
-    m_collectionref(std::move(collectionref)),
-    m_tmsref(std::move(tmsref)),
+    m_runtimeSecs(runtimesecs),
+    m_inetRef(std::move(inetref)),
+    m_collectionRef(std::move(collectionref)),
+    m_tmsRef(std::move(tmsref)),
     m_imdb(std::move(imdb)),
     m_people(std::move(people)),
     m_studios(std::move(studios)),
@@ -148,8 +148,8 @@ MetadataLookup::MetadataLookup(
     m_downloads(std::move(downloads))
 {
     QString manRecSuffix = QString(" (%1)").arg(QObject::tr("Manual Record"));
-    m_base_title = title;
-    m_base_title.replace(manRecSuffix,"");
+    m_baseTitle = title;
+    m_baseTitle.replace(manRecSuffix,"");
 }
 
 // ProgramInfo-style constructor
@@ -200,47 +200,47 @@ MetadataLookup::MetadataLookup(
     m_data(std::move(data)),
     m_step(step),
     m_automatic(automatic),
-    m_handleimages(handleimages),
-    m_allowoverwrites(allowoverwrites),
-    m_allowgeneric(allowgeneric),
-    m_dvdorder(preferdvdorder),
+    m_handleImages(handleimages),
+    m_allowOverwrites(allowoverwrites),
+    m_allowGeneric(allowgeneric),
+    m_dvdOrder(preferdvdorder),
     m_host(std::move(host)),
     m_filename(std::move(filename)),
     m_title(title),
     m_categories(std::move(categories)),
-    m_userrating(userrating),
-    m_ratingcount(0),
+    m_userRating(userrating),
+    m_ratingCount(0),
     m_subtitle(std::move(subtitle)),
     m_description(std::move(description)),
     m_season(0),
     m_episode(0),
-    m_chanid(chanid),
-    m_channum(std::move(channum)),
-    m_chansign(std::move(chansign)),
-    m_channame(std::move(channame)),
-    m_chanplaybackfilters(std::move(chanplaybackfilters)),
-    m_recgroup(std::move(recgroup)),
-    m_playgroup(std::move(playgroup)),
-    m_seriesid(std::move(seriesid)),
+    m_chanId(chanid),
+    m_chanNum(std::move(channum)),
+    m_chanSign(std::move(chansign)),
+    m_chanName(std::move(channame)),
+    m_chanPlaybackFilters(std::move(chanplaybackfilters)),
+    m_recGroup(std::move(recgroup)),
+    m_playGroup(std::move(playgroup)),
+    m_seriesId(std::move(seriesid)),
     m_programid(std::move(programid)),
-    m_storagegroup(std::move(storagegroup)),
-    m_startts(std::move(startts)),
-    m_endts(std::move(endts)),
-    m_recstartts(std::move(recstartts)),
-    m_recendts(std::move(recendts)),
-    m_programflags(programflags),
-    m_audioproperties(audioproperties),
-    m_videoproperties(videoproperties),
-    m_subtitletype(subtitletype),
+    m_storageGroup(std::move(storagegroup)),
+    m_startTs(std::move(startts)),
+    m_endTs(std::move(endts)),
+    m_recStartTs(std::move(recstartts)),
+    m_recEndTs(std::move(recendts)),
+    m_programFlags(programflags),
+    m_audioProperties(audioproperties),
+    m_videoProperties(videoproperties),
+    m_subtitleType(subtitletype),
     m_year(year),
-    m_releasedate(releasedate),
-    m_lastupdated(std::move(lastupdated)),
+    m_releaseDate(releasedate),
+    m_lastUpdated(std::move(lastupdated)),
     m_runtime(runtime),
-    m_runtimesecs(runtimesecs)
+    m_runtimeSecs(runtimesecs)
 {
     QString manRecSuffix = QString(" (%1)").arg(QObject::tr("Manual Record"));
-    m_base_title = title;
-    m_base_title.replace(manRecSuffix,"");
+    m_baseTitle = title;
+    m_baseTitle.replace(manRecSuffix,"");
 }
 
 // XBMC NFO-style constructor
@@ -281,15 +281,15 @@ MetadataLookup::MetadataLookup(
     m_data(std::move(data)),
     m_step(step),
     m_automatic(automatic),
-    m_handleimages(handleimages),
-    m_allowoverwrites(allowoverwrites),
-    m_allowgeneric(allowgeneric),
-    m_dvdorder(preferdvdorder),
+    m_handleImages(handleimages),
+    m_allowOverwrites(allowoverwrites),
+    m_allowGeneric(allowgeneric),
+    m_dvdOrder(preferdvdorder),
     m_host(std::move(host)),
     m_filename(std::move(filename)),
     m_title(title),
     m_categories(std::move(categories)),
-    m_userrating(userrating),
+    m_userRating(userrating),
     m_subtitle(std::move(subtitle)),
     m_tagline(std::move(tagline)),
     m_description(std::move(description)),
@@ -297,18 +297,18 @@ MetadataLookup::MetadataLookup(
     m_episode(episode),
     m_certification(std::move(certification)),
     m_year(year),
-    m_releasedate(releasedate),
+    m_releaseDate(releasedate),
     m_runtime(runtime),
-    m_runtimesecs(runtimesecs),
-    m_inetref(std::move(inetref)),
+    m_runtimeSecs(runtimesecs),
+    m_inetRef(std::move(inetref)),
     m_people(std::move(people)),
     m_trailerURL(std::move(trailerURL)),
     m_artwork(std::move(artwork)),
     m_downloads(std::move(downloads))
 {
     QString manRecSuffix = QString(" (%1)").arg(QObject::tr("Manual Record"));
-    m_base_title = title;
-    m_base_title.replace(manRecSuffix,"");
+    m_baseTitle = title;
+    m_baseTitle.replace(manRecSuffix,"");
 }
 
 QList<PersonInfo> MetadataLookup::GetPeople(PeopleType type) const
@@ -351,41 +351,41 @@ void MetadataLookup::toMap(InfoMap &metadataMap)
     metadataMap["network"] = m_network;
     metadataMap["status"] = m_status;
     metadataMap["category"] = m_categories.join(", ");
-    metadataMap["userrating"] = QString::number(m_userrating);
-    metadataMap["ratingcount"] = QString::number(m_ratingcount);
+    metadataMap["userrating"] = QString::number(m_userRating);
+    metadataMap["ratingcount"] = QString::number(m_ratingCount);
     metadataMap["language"] = m_language;
     metadataMap["subtitle"] = m_subtitle;
     metadataMap["tagline"] = m_tagline;
     metadataMap["description0"] = metadataMap["description"] = m_description;
     metadataMap["season"] = QString::number(m_season);
     metadataMap["episode"] = QString::number(m_episode);
-    metadataMap["chanid"] = QString::number(m_chanid);
-    metadataMap["channum"] = m_channum;
-    metadataMap["callsign"] = m_chansign;
-    metadataMap["channame"] = m_channame;
-    metadataMap["playbackfilters"] = m_chanplaybackfilters;
-    metadataMap["recgroup"] = m_recgroup;
-    metadataMap["playgroup"] = m_playgroup;
-    metadataMap["seriesid"] = m_seriesid;
+    metadataMap["chanid"] = QString::number(m_chanId);
+    metadataMap["channum"] = m_chanNum;
+    metadataMap["callsign"] = m_chanSign;
+    metadataMap["channame"] = m_chanName;
+    metadataMap["playbackfilters"] = m_chanPlaybackFilters;
+    metadataMap["recgroup"] = m_recGroup;
+    metadataMap["playgroup"] = m_playGroup;
+    metadataMap["seriesid"] = m_seriesId;
     metadataMap["programid"] = m_programid;
-    metadataMap["storagegroup"] = m_storagegroup;
-    metadataMap["startts"] = MythDate::toString(m_startts, MythDate::kDateFull);
-    metadataMap["endts"] = MythDate::toString(m_endts, MythDate::kDateFull);
-    metadataMap["recstartts"] = MythDate::toString(m_recstartts, MythDate::kDateFull);
-    metadataMap["recendts"] = MythDate::toString(m_recendts, MythDate::kDateFull);
+    metadataMap["storagegroup"] = m_storageGroup;
+    metadataMap["startts"] = MythDate::toString(m_startTs, MythDate::kDateFull);
+    metadataMap["endts"] = MythDate::toString(m_endTs, MythDate::kDateFull);
+    metadataMap["recstartts"] = MythDate::toString(m_recStartTs, MythDate::kDateFull);
+    metadataMap["recendts"] = MythDate::toString(m_recEndTs, MythDate::kDateFull);
     metadataMap["certification"] = m_certification;
     metadataMap["countries"] = m_countries.join(", ");
     metadataMap["popularity"] = QString::number(m_popularity);
     metadataMap["budget"] = QString::number(m_budget);
     metadataMap["revenue"] = QString::number(m_revenue);
     metadataMap["album"] = m_album;
-    metadataMap["tracknum"] = QString::number(m_tracknum);
+    metadataMap["tracknum"] = QString::number(m_trackNum);
     metadataMap["system"] = m_system;
     metadataMap["year"] = QString::number(m_year);
 
     metadataMap["releasedate"] = MythDate::toString(
-        m_releasedate, MythDate::kDateFull);
-    metadataMap["lastupdated"] = MythDate::toString(m_lastupdated, MythDate::kDateFull);
+        m_releaseDate, MythDate::kDateFull);
+    metadataMap["lastupdated"] = MythDate::toString(m_lastUpdated, MythDate::kDateFull);
 
     metadataMap["runtime"] = QCoreApplication::translate("(Common)",
                                                          "%n minute(s)",
@@ -396,10 +396,10 @@ void MetadataLookup::toMap(InfoMap &metadataMap)
     metadataMap["runtimesecs"] = QCoreApplication::translate("(Common)",
                                                              "%n second(s)",
                                                              "",
-                                                             m_runtimesecs);
-    metadataMap["inetref"] = m_inetref;
-    metadataMap["collectionref"] = m_collectionref;
-    metadataMap["tmsref"] = m_tmsref;
+                                                             m_runtimeSecs);
+    metadataMap["inetref"] = m_inetRef;
+    metadataMap["collectionref"] = m_collectionRef;
+    metadataMap["tmsref"] = m_tmsRef;
     metadataMap["imdb"] = m_imdb;
     metadataMap["studios"] = m_studios.join(", ");
     metadataMap["homepage"] = m_homepage;

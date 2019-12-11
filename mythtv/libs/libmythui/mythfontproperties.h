@@ -77,8 +77,8 @@ class MUI_PUBLIC MythFontProperties: public XMLParseBase
 
     int     m_stretch       {100};
 
-    static QMutex m_zoom_lock;
-    static uint   m_zoom_percent;
+    static QMutex s_zoomLock;
+    static uint   s_zoomPercent;
 
     friend class FontMap;
 };
@@ -98,7 +98,7 @@ class MUI_PUBLIC FontMap
     static FontMap *GetGlobalFontMap(void);
 
   private:
-    QMap<QString, MythFontProperties> m_FontMap;
+    QMap<QString, MythFontProperties> m_fontMap;
 };
 
 MUI_PUBLIC FontMap *GetGlobalFontMap(void);

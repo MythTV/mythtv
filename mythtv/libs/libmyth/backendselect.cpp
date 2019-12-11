@@ -17,7 +17,7 @@ BackendSelection::BackendSelection(
     MythScreenStack *parent, DatabaseParams *params,
     Configuration *pConfig, bool exitOnFinish) :
     MythScreenType(parent, "BackEnd Selection"),
-    m_DBparams(params), m_pConfig(pConfig), m_exitOnFinish(exitOnFinish)
+    m_dbParams(params), m_pConfig(pConfig), m_exitOnFinish(exitOnFinish)
 {
     if (exitOnFinish)
     {
@@ -113,7 +113,7 @@ void BackendSelection::Accept(MythUIButtonListItem *item)
         {
             if (m_pinCode.length())
                 m_pConfig->SetValue(kDefaultPIN, m_pinCode);
-            m_pConfig->SetValue(kDefaultUSN, m_USN);
+            m_pConfig->SetValue(kDefaultUSN, m_usn);
             m_pConfig->Save();
         }
         CloseWithDecision(kAcceptConfigure);
@@ -188,11 +188,11 @@ bool BackendSelection::ConnectBackend(DeviceLocation *dev)
     QString          error;
     QString          message;
 
-    m_USN   = dev->m_sUSN;
+    m_usn   = dev->m_sUSN;
 
     MythXMLClient client( dev->m_sLocation );
 
-    UPnPResultCode stat = client.GetConnectionInfo(m_pinCode, m_DBparams, message);
+    UPnPResultCode stat = client.GetConnectionInfo(m_pinCode, m_dbParams, message);
 
     QString backendName = dev->GetFriendlyName();
 
@@ -204,7 +204,7 @@ bool BackendSelection::ConnectBackend(DeviceLocation *dev)
         case UPnPResult_Success:
             LOG(VB_UPNP, LOG_INFO,
                 QString("ConnectBackend() - success. New hostname: %1")
-                .arg(m_DBparams->m_dbHostName));
+                .arg(m_dbParams->m_dbHostName));
             return true;
 
         case UPnPResult_HumanInterventionRequired:
@@ -292,7 +292,7 @@ bool BackendSelection::TryDBfromURL(const QString &error, QString URL)
     {
         URL.remove("http://");
         URL.remove(QRegExp("[:/].*"));
-        m_DBparams->m_dbHostName = URL;
+        m_dbParams->m_dbHostName = URL;
         return true;
     }
 

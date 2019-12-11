@@ -28,8 +28,8 @@ class UPNP_PUBLIC HtmlServerExtension : public HttpServerExtension
 {
     private:
 
-        ServerSideScripting m_Scripting;
-        QString             m_IndexFilename;
+        ServerSideScripting m_scripting;
+        QString             m_indexFilename;
 
     public:
                  HtmlServerExtension( const QString &sSharePath,
@@ -46,7 +46,7 @@ class UPNP_PUBLIC HtmlServerExtension : public HttpServerExtension
 
         QScriptEngine* ScriptEngine()
         {
-            return &(m_Scripting.m_engine);
+            return &(m_scripting.m_engine);
         }
 
 };

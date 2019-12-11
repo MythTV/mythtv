@@ -195,7 +195,7 @@ class MythGesture
      * \return true if the gesture can be translated, otherwise, false.
      */
     bool hasMinimumPoints(void) const
-        { return (uint)m_points.size() >= m_min_points; }
+        { return (uint)m_points.size() >= m_minPoints; }
 
   protected:
 
@@ -216,20 +216,20 @@ class MythGesture
 
   private:
 
-    bool m_recording      {false};
-    int m_min_x           {10000};
-    int m_max_x           {-1};
-    int m_min_y           {10000};
-    int m_max_y           {-1};
-    size_t m_max_points   {10000};
-    size_t m_min_points   {50};
-    size_t m_max_sequence {20};
-    int m_scale_ratio     {4};
-    float m_bin_percent   {0.07F};
-    MythGestureEvent::Gesture m_last_gesture {MythGestureEvent::MaxGesture};
+    bool   m_recording    {false};
+    int    m_minX         {10000};
+    int    m_maxX         {-1};
+    int    m_minY         {10000};
+    int    m_maxY         {-1};
+    size_t m_maxPoints    {10000};
+    size_t m_minPoints    {50};
+    size_t m_maxSequence  {20};
+    int    m_scaleRatio   {4};
+    float  m_binPercent   {0.07F};
+    MythGestureEvent::Gesture m_lastGesture {MythGestureEvent::MaxGesture};
     QList <QPoint> m_points;
 
-    MythGesturePrivate *p {nullptr};
+    MythGesturePrivate *p {nullptr}; // NOLINT(readability-identifier-naming)
 };
 
 #endif /* MYTHGESTURE_H */

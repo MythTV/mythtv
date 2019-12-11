@@ -11,19 +11,19 @@ public:
     enum ScreenSaverEventKind {ssetDisable, ssetRestore, ssetReset};
 
     explicit ScreenSaverEvent(ScreenSaverEventKind type) :
-        QEvent(kEventType), sset(type)
+        QEvent(kEventType), m_sset(type)
     {
     }
 
     ScreenSaverEventKind getSSEventType()
     {
-        return sset;
+        return m_sset;
     }
 
     static Type kEventType;
 
 protected:
-    ScreenSaverEventKind sset;
+    ScreenSaverEventKind m_sset;
 };
 
 /// Base Class for screensavers

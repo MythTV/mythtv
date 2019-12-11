@@ -157,8 +157,7 @@ public:
     connectionless UDP socket.
 */
 MSocketDevice::MSocketDevice(int socket, Type type)
-        : fd(socket), t(type), p(0), pp(0), e(NoError),
-        d(new MSocketDevicePrivate(Unknown))
+        : m_fd(socket), m_t(type), d(new MSocketDevicePrivate(Unknown))
 {
 #if defined(MSOCKETDEVICE_DEBUG)
     qDebug("MSocketDevice: Created MSocketDevice %p (socket %x, type %d)",
@@ -180,8 +179,7 @@ MSocketDevice::MSocketDevice(int socket, Type type)
     \sa blocking() protocol()
 */
 MSocketDevice::MSocketDevice(Type type)
-        : fd(-1), t(type), p(0), pp(0), e(NoError),
-        d(new MSocketDevicePrivate(Unknown))
+        : m_t(type), d(new MSocketDevicePrivate(Unknown))
 {
 #if defined(MSOCKETDEVICE_DEBUG)
     qDebug("MSocketDevice: Created MSocketDevice object %p, type %d",
@@ -209,8 +207,7 @@ MSocketDevice::MSocketDevice(Type type)
     \sa blocking() protocol()
 */
 MSocketDevice::MSocketDevice(Type type, Protocol protocol, int /*dummy*/)
-        : fd(-1), t(type), p(0), pp(0), e(NoError),
-        d(new MSocketDevicePrivate(protocol))
+        : m_t(type), d(new MSocketDevicePrivate(protocol))
 {
 #if defined(MSOCKETDEVICE_DEBUG)
     qDebug("MSocketDevice: Created MSocketDevice object %p, type %d",
@@ -241,7 +238,7 @@ MSocketDevice::~MSocketDevice()
 */
 bool MSocketDevice::isValid() const
 {
-    return fd != -1;
+    return m_fd != -1;
 }
 
 
@@ -255,7 +252,7 @@ bool MSocketDevice::isValid() const
 */
 MSocketDevice::Type MSocketDevice::type() const
 {
-    return t;
+    return m_t;
 }
 
 /*!
@@ -290,7 +287,7 @@ void MSocketDevice::setProtocol(Protocol protocol)
 */
 int MSocketDevice::socket() const
 {
-    return fd;
+    return m_fd;
 }
 
 
@@ -309,20 +306,20 @@ int MSocketDevice::socket() const
 */
 void MSocketDevice::setSocket(int socket, Type type)
 {
-    if (fd != -1)     // close any open socket
+    if (m_fd != -1)     // close any open socket
         MSocketDevice::close();
 
 #if defined(MSOCKETDEVICE_DEBUG)
     qDebug("MSocketDevice::setSocket: socket %x, type %d", socket, type);
 
 #endif
-    t = type;
+    m_t = type;
 
-    fd = socket;
+    m_fd = socket;
 
     d->m_protocol = Unknown;
 
-    e = NoError;
+    m_e = NoError;
 
     //resetStatus();
     open(ReadWrite);
@@ -548,7 +545,7 @@ void MSocketDevice::setSendBufferSize(uint size)
 */
 quint16 MSocketDevice::port() const
 {
-    return p;
+    return m_p;
 }
 
 
@@ -562,15 +559,15 @@ QHostAddress MSocketDevice::address() const
 
     QString ipaddress;
 
-    if (a.toString().startsWith("0:0:0:0:0:FFFF:"))
+    if (m_a.toString().startsWith("0:0:0:0:0:FFFF:"))
     {
-        Q_IPV6ADDR addr = a.toIPv6Address();
+        Q_IPV6ADDR addr = m_a.toIPv6Address();
         // addr contains 16 unsigned characters
 
         ipaddress = QString("%1.%2.%3.%4").arg(addr[12]).arg(addr[13]).arg(addr[14]).arg(addr[15]);
     }
     else
-        ipaddress = a.toString();
+        ipaddress = m_a.toString();
 
     return QHostAddress(ipaddress);
 }
@@ -581,7 +578,7 @@ QHostAddress MSocketDevice::address() const
 */
 MSocketDevice::Error MSocketDevice::error() const
 {
-    return e;
+    return m_e;
 }
 
 
@@ -590,7 +587,7 @@ MSocketDevice::Error MSocketDevice::error() const
 */
 void MSocketDevice::setError(Error err)
 {
-    e = err;
+    m_e = err;
 }
 
 /*! \fn MSocketDevice::readBlock(char *data, Q_ULONG maxlen)

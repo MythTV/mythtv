@@ -136,7 +136,7 @@ class MPUBLIC ResultItem
     const QString& GetSubtitle() const { return m_subtitle; }
     const QString& GetSortSubtitle() const { return m_sortsubtitle; }
     const QString& GetDescription() const { return m_desc; }
-    const QString& GetURL() const { return m_URL; }
+    const QString& GetURL() const { return m_url; }
     const QString& GetThumbnail() const { return m_thumbnail; }
     const QString& GetMediaURL() const { return m_mediaURL; }
     const QString& GetAuthor() const { return m_author; }
@@ -163,7 +163,7 @@ class MPUBLIC ResultItem
     QString      m_subtitle;
     QString      m_sortsubtitle;
     QString      m_desc;
-    QString      m_URL;
+    QString      m_url;
     QString      m_thumbnail;
     QString      m_mediaURL;
     QString      m_author;

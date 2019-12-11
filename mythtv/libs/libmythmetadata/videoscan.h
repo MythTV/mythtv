@@ -67,7 +67,7 @@ class META_PUBLIC VideoScannerThread : public MThread
     void SetHosts(const QStringList &hosts);
     void SetProgressDialog(MythUIProgressDialog *dialog) { m_dialog = dialog; };
     QStringList GetOfflineSGHosts(void) { return m_offlineSGHosts; };
-    bool getDataChanged() { return m_DBDataChanged; };
+    bool getDataChanged() { return m_dbDataChanged; };
 
     void ResetCounts() { m_addList.clear(); m_movList.clear(); m_delList.clear(); };
 
@@ -95,21 +95,21 @@ class META_PUBLIC VideoScannerThread : public MThread
 
     QObject *m_parent    {nullptr};
 
-    bool m_ListUnknown   {false};
-    bool m_RemoveAll     {false};
-    bool m_KeepAll       {false};
-    bool m_HasGUI        {false};
+    bool m_listUnknown   {false};
+    bool m_removeAll     {false};
+    bool m_keepAll       {false};
+    bool m_hasGUI        {false};
     QStringList m_directories;
     QStringList m_liveSGHosts;
     QStringList m_offlineSGHosts;
 
-    VideoMetadataListManager *m_dbmetadata {nullptr};
+    VideoMetadataListManager *m_dbMetadata {nullptr};
     MythUIProgressDialog     *m_dialog     {nullptr};
 
     QList<int> m_addList; // newly added intids
     QList<int> m_movList; // intids moved to new filename
     QList<int> m_delList; // orphaned/deleted intids
-    bool m_DBDataChanged {false};
+    bool m_dbDataChanged {false};
 };
 
 #endif

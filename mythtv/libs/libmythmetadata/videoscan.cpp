@@ -88,14 +88,14 @@ VideoScannerThread::VideoScannerThread(QObject *parent) :
     MThread("VideoScanner")
 {
     m_parent = parent;
-    m_dbmetadata = new VideoMetadataListManager;
-    m_HasGUI = gCoreContext->HasGUI();
-    m_ListUnknown = gCoreContext->GetBoolSetting("VideoListUnknownFiletypes", false);
+    m_dbMetadata = new VideoMetadataListManager;
+    m_hasGUI = gCoreContext->HasGUI();
+    m_listUnknown = gCoreContext->GetBoolSetting("VideoListUnknownFiletypes", false);
 }
 
 VideoScannerThread::~VideoScannerThread()
 {
-    delete m_dbmetadata;
+    delete m_dbMetadata;
 }
 
 void VideoScannerThread::SetHosts(const QStringList &hosts)
@@ -162,7 +162,7 @@ void VideoScannerThread::run()
 
     VideoMetadataListManager::metadata_list ml;
     VideoMetadataListManager::loadAllFromDatabase(ml);
-    m_dbmetadata->setList(ml);
+    m_dbMetadata->setList(ml);
 
     QList<QByteArray> image_types = QImageReader::supportedImageFormats();
     QStringList imageExtensions;
@@ -177,7 +177,7 @@ void VideoScannerThread::run()
     uint counter = 0;
     FileCheckList fs_files;
 
-    if (m_HasGUI)
+    if (m_hasGUI)
         SendProgressEvent(counter, (uint)m_directories.size(),
                           tr("Searching for video files"));
     for (QStringList::const_iterator iter = m_directories.begin();
@@ -197,15 +197,15 @@ void VideoScannerThread::run()
                     QString("Failed to scan :%1:").arg(*iter));
             }
         }
-        if (m_HasGUI)
+        if (m_hasGUI)
             SendProgressEvent(++counter);
     }
 
     PurgeList db_remove;
     verifyFiles(fs_files, db_remove);
-    m_DBDataChanged = updateDB(fs_files, db_remove);
+    m_dbDataChanged = updateDB(fs_files, db_remove);
 
-    if (m_DBDataChanged)
+    if (m_dbDataChanged)
     {
         QCoreApplication::postEvent(m_parent,
             new VideoScanChanges(m_addList, m_movList,
@@ -238,13 +238,13 @@ void VideoScannerThread::removeOrphans(unsigned int id,
     (void) filename;
 
     // TODO: use single DB connection for all calls
-    if (m_RemoveAll)
-        m_dbmetadata->purgeByID(id);
+    if (m_removeAll)
+        m_dbMetadata->purgeByID(id);
 
-    if (!m_KeepAll && !m_RemoveAll)
+    if (!m_keepAll && !m_removeAll)
     {
-        m_RemoveAll = true;
-        m_dbmetadata->purgeByID(id);
+        m_removeAll = true;
+        m_dbMetadata->purgeByID(id);
     }
 }
 
@@ -254,13 +254,13 @@ void VideoScannerThread::verifyFiles(FileCheckList &files,
     int counter = 0;
     FileCheckList::iterator iter;
 
-    if (m_HasGUI)
-        SendProgressEvent(counter, (uint)m_dbmetadata->getList().size(),
+    if (m_hasGUI)
+        SendProgressEvent(counter, (uint)m_dbMetadata->getList().size(),
                           tr("Verifying video files"));
 
     // For every file we know about, check to see if it still exists.
-    for (auto p = m_dbmetadata->getList().cbegin();
-         p != m_dbmetadata->getList().cend(); ++p)
+    for (auto p = m_dbMetadata->getList().cbegin();
+         p != m_dbMetadata->getList().cend(); ++p)
     {
         QString lname = (*p)->GetFilename();
         QString lhost = (*p)->GetHost().toLower();
@@ -300,7 +300,7 @@ void VideoScannerThread::verifyFiles(FileCheckList &files,
                     m_offlineSGHosts.append(lhost);
             }
         }
-        if (m_HasGUI)
+        if (m_hasGUI)
             SendProgressEvent(++counter);
     }
 }
@@ -309,7 +309,7 @@ bool VideoScannerThread::updateDB(const FileCheckList &add, const PurgeList &rem
 {
     int ret = 0;
     uint counter = 0;
-    if (m_HasGUI)
+    if (m_hasGUI)
         SendProgressEvent(counter, (uint)(add.size() + remove.size()),
                           tr("Updating video database"));
 
@@ -366,7 +366,7 @@ bool VideoScannerThread::updateDB(const FileCheckList &add, const PurgeList &rem
             }
             ret += 1;
         }
-        if (m_HasGUI)
+        if (m_hasGUI)
             SendProgressEvent(++counter);
     }
 
@@ -379,7 +379,7 @@ bool VideoScannerThread::updateDB(const FileCheckList &add, const PurgeList &rem
             removeOrphans(p->first, p->second);
             m_delList << p->first;
         }
-        if (m_HasGUI)
+        if (m_hasGUI)
             SendProgressEvent(++counter);
     }
 
@@ -402,7 +402,7 @@ bool VideoScannerThread::buildFileList(const QString &directory,
     FileAssociations::getFileAssociation().getExtensionIgnoreList(ext_list);
 
     dirhandler<FileCheckList> dh(filelist, imageExtensions);
-    return ScanVideoDirectory(directory, &dh, ext_list, m_ListUnknown);
+    return ScanVideoDirectory(directory, &dh, ext_list, m_listUnknown);
 }
 
 void VideoScannerThread::SendProgressEvent(uint progress, uint total,

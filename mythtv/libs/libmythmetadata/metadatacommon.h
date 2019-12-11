@@ -241,9 +241,9 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
     void SetAutomatic(bool autom) { m_automatic = autom; };
 
     // Sets for image download handling
-    void SetHandleImages(bool handle) { m_handleimages = handle; };
-    void SetAllowOverwrites(bool allow) { m_allowoverwrites = allow; };
-    void SetAllowGeneric(bool allow) { m_allowgeneric = allow; };
+    void SetHandleImages(bool handle) { m_handleImages = handle; };
+    void SetAllowOverwrites(bool allow) { m_allowOverwrites = allow; };
+    void SetAllowGeneric(bool allow) { m_allowGeneric = allow; };
     void SetHost(const QString &host) { m_host = host; };
     void SetDownloads(ArtworkMap map) { m_downloads = map; };
 
@@ -252,8 +252,8 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
     {
         m_title = title;
         QString manRecSuffix = QString(" (%1)").arg(QObject::tr("Manual Record"));
-        m_base_title = title;  // m_title with " (Manual Record)" stripped.
-        m_base_title.replace(manRecSuffix,"");
+        m_baseTitle = title;  // m_title with " (Manual Record)" stripped.
+        m_baseTitle.replace(manRecSuffix,"");
     };
     void SetFilename(const QString &filename) { m_filename = filename; };
 
@@ -261,17 +261,17 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
     void SetSubtitle(const QString &subtitle) { m_subtitle = subtitle; };
     void SetSeason(uint season) { m_season = season; };
     void SetEpisode(uint episode) { m_episode = episode; };
-    void SetInetref(const QString &inetref) { m_inetref = inetref; };
+    void SetInetref(const QString &inetref) { m_inetRef = inetref; };
     void SetCollectionref(const QString &collectionref)
-                             { m_collectionref = collectionref; };
-    void SetTMSref(const QString &tmsref) { m_tmsref = tmsref; };
-    void SetIsCollection(bool collection) { m_iscollection = collection; };
+                             { m_collectionRef = collectionref; };
+    void SetTMSref(const QString &tmsref) { m_tmsRef = tmsref; };
+    void SetIsCollection(bool collection) { m_isCollection = collection; };
     void SetPreferDVDOrdering(bool preferdvdorder)
-                             { m_dvdorder = preferdvdorder; };
+                             { m_dvdOrder = preferdvdorder; };
 
     // General Sets - Music
     void SetAlbum(const QString &album) { m_album = album; };
-    void SetTrack(uint track) { m_tracknum = track; };
+    void SetTrack(uint track) { m_trackNum = track; };
 
     // General Sets - Games
     void SetSystem(const QString &system) { m_system = system; };
@@ -285,17 +285,17 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
     bool GetAutomatic() const { return m_automatic; };
 
     // Image Handling Gets
-    bool GetHandleImages() const { return m_handleimages; };
-    bool GetAllowOverwrites() const { return m_allowoverwrites; };
-    bool GetAllowGeneric() const { return m_allowgeneric; };
+    bool GetHandleImages() const { return m_handleImages; };
+    bool GetAllowOverwrites() const { return m_allowOverwrites; };
+    bool GetAllowGeneric() const { return m_allowGeneric; };
 
     // General
     QString GetFilename() const { return m_filename; };
     QString GetTitle() const { return m_title; };
-    QString GetBaseTitle() const { return m_base_title; };
+    QString GetBaseTitle() const { return m_baseTitle; };
     QStringList GetCategories() const { return m_categories; };
-    float GetUserRating() const { return m_userrating; };
-    uint GetRatingCount() const { return m_ratingcount; };
+    float GetUserRating() const { return m_userRating; };
+    uint GetRatingCount() const { return m_ratingCount; };
     QString GetLanguage() const { return m_language; };
     QString GetHost() const { return m_host; };
 
@@ -305,27 +305,27 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
     QString GetSubtitle() const { return m_subtitle; };
     QString GetTagline() const { return m_tagline; };
     QString GetDescription() const { return m_description; };
-    bool GetPreferDVDOrdering() const { return m_dvdorder; };
+    bool GetPreferDVDOrdering() const { return m_dvdOrder; };
     uint GetSeason() const { return m_season; };
     uint GetEpisode() const { return m_episode; };
-    uint GetChanId() const { return m_chanid; };
-    QString GetChanNum() const { return m_channum; };
-    QString GetChanSign() const { return m_chansign; };
-    QString GetChanName() const { return m_channame; };
-    QString GetChanPlaybackFilters() const { return m_chanplaybackfilters; };
-    QString GetRecGroup() const { return m_recgroup; };
-    QString GetPlayGroup() const { return m_playgroup; };
-    QString GetSeriesId() const { return m_seriesid; };
+    uint GetChanId() const { return m_chanId; };
+    QString GetChanNum() const { return m_chanNum; };
+    QString GetChanSign() const { return m_chanSign; };
+    QString GetChanName() const { return m_chanName; };
+    QString GetChanPlaybackFilters() const { return m_chanPlaybackFilters; };
+    QString GetRecGroup() const { return m_recGroup; };
+    QString GetPlayGroup() const { return m_playGroup; };
+    QString GetSeriesId() const { return m_seriesId; };
     QString GetProgramId() const { return m_programid; };
-    QString GetStorageGroup() const { return m_storagegroup; };
-    QDateTime GetStartTS() const { return m_startts; };
-    QDateTime GetEndTS() const { return m_endts; };
-    QDateTime GetRecStartTS() const { return m_recstartts; };
-    QDateTime GetRecEndTS() const { return m_recendts; };
-    uint GetProgramFlags() const { return m_programflags; };
-    uint GetAudioProperties() const { return m_audioproperties; };
-    uint GetVideoProperties() const { return m_videoproperties; };
-    uint GetSubtitleType() const { return m_subtitletype; };
+    QString GetStorageGroup() const { return m_storageGroup; };
+    QDateTime GetStartTS() const { return m_startTs; };
+    QDateTime GetEndTS() const { return m_endTs; };
+    QDateTime GetRecStartTS() const { return m_recStartTs; };
+    QDateTime GetRecEndTS() const { return m_recEndTs; };
+    uint GetProgramFlags() const { return m_programFlags; };
+    uint GetAudioProperties() const { return m_audioProperties; };
+    uint GetVideoProperties() const { return m_videoProperties; };
+    uint GetSubtitleType() const { return m_subtitleType; };
 
     QString GetCertification() const { return m_certification; };
     QStringList GetCountries() const { return m_countries; };
@@ -335,24 +335,24 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
 
     // General - Music
     QString GetAlbumTitle() const { return m_album; };
-    uint GetTrackNumber() const { return m_tracknum; };
+    uint GetTrackNumber() const { return m_trackNum; };
 
     // General - Game
     QString GetSystem() const { return m_system; };
 
     // Times
     uint GetYear() const { return m_year; };
-    QDate GetReleaseDate() const { return m_releasedate; };
-    QDateTime GetLastUpdated() const { return m_lastupdated; };
+    QDate GetReleaseDate() const { return m_releaseDate; };
+    QDateTime GetLastUpdated() const { return m_lastUpdated; };
     uint GetRuntime() const { return m_runtime; };
-    uint GetRuntimeSeconds() const { return m_runtimesecs; };
+    uint GetRuntimeSeconds() const { return m_runtimeSecs; };
 
     // Inetref
-    QString GetInetref() const { return m_inetref; };
-    QString GetCollectionref() const { return m_collectionref; };
+    QString GetInetref() const { return m_inetRef; };
+    QString GetCollectionref() const { return m_collectionRef; };
     QString GetIMDB() const { return m_imdb; };
-    QString GetTMSref() const { return m_tmsref; };
-    bool    GetIsCollection() const { return m_iscollection; };
+    QString GetTMSref() const { return m_tmsRef; };
+    bool    GetIsCollection() const { return m_isCollection; };
 
     // People
     QList<PersonInfo> GetPeople(PeopleType type) const;
@@ -373,20 +373,20 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
     QVariant m_data;
     LookupStep m_step       {kLookupSearch};
     bool m_automatic        {false};
-    bool m_handleimages     {false};
-    bool m_allowoverwrites  {false};
-    bool m_allowgeneric     {false};
-    bool m_dvdorder         {false};
+    bool m_handleImages     {false};
+    bool m_allowOverwrites  {false};
+    bool m_allowGeneric     {false};
+    bool m_dvdOrder         {false};
     QString m_host;
 
     QString m_filename;
     QString m_title;
-    QString m_base_title;  // m_title with " (Manual Record)" stripped.
+    QString m_baseTitle;  // m_title with " (Manual Record)" stripped.
     QString m_network;
     QString m_status;
     const QStringList m_categories;
-    float m_userrating      {0.0};
-    uint m_ratingcount      {0};
+    float m_userRating      {0.0};
+    uint m_ratingCount      {0};
     const QString m_language;
 
     // General - Video & ProgramInfo
@@ -395,24 +395,24 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
     const QString m_description;
     uint          m_season  {0};
     uint          m_episode {0};
-    uint          m_chanid  {0};
-    const QString m_channum;
-    const QString m_chansign;
-    const QString m_channame;
-    const QString m_chanplaybackfilters;
-    const QString m_recgroup;
-    const QString m_playgroup;
-    const QString m_seriesid;
+    uint          m_chanId  {0};
+    const QString m_chanNum;
+    const QString m_chanSign;
+    const QString m_chanName;
+    const QString m_chanPlaybackFilters;
+    const QString m_recGroup;
+    const QString m_playGroup;
+    const QString m_seriesId;
     const QString m_programid;
-    const QString m_storagegroup;
-    const QDateTime m_startts;
-    const QDateTime m_endts;
-    const QDateTime m_recstartts;
-    const QDateTime m_recendts;
-    uint m_programflags     {0};
-    uint m_audioproperties  {0};
-    uint m_videoproperties  {0};
-    uint m_subtitletype     {0};
+    const QString m_storageGroup;
+    const QDateTime m_startTs;
+    const QDateTime m_endTs;
+    const QDateTime m_recStartTs;
+    const QDateTime m_recEndTs;
+    uint m_programFlags     {0};
+    uint m_audioProperties  {0};
+    uint m_videoProperties  {0};
+    uint m_subtitleType     {0};
 
     const QString m_certification;
     const QStringList m_countries;
@@ -422,24 +422,24 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
 
     // General - Music
     QString m_album;
-    uint    m_tracknum      {0};
+    uint    m_trackNum      {0};
 
     // General - Game
     QString m_system;
 
     // Times
     uint m_year             {0};
-    const QDate m_releasedate;
-    const QDateTime m_lastupdated;
+    const QDate m_releaseDate;
+    const QDateTime m_lastUpdated;
     uint m_runtime          {0};
-    uint m_runtimesecs      {0};
+    uint m_runtimeSecs      {0};
 
     // Inetref
-    QString m_inetref;
-    QString m_collectionref;
-    QString m_tmsref;
+    QString m_inetRef;
+    QString m_collectionRef;
+    QString m_tmsRef;
     QString m_imdb;
-    bool    m_iscollection  {false};
+    bool    m_isCollection  {false};
 
     // People - Video
     const PeopleMap m_people;

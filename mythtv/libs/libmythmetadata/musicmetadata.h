@@ -89,18 +89,18 @@ class META_PUBLIC MusicMetadata
              int lrating = 0, int lplaycount = 0, QDateTime llastplay = QDateTime(),
              QDateTime ldateadded = QDateTime(), bool lcompilation = false, QString lformat = "")
                 : m_artist(lartist),
-                   m_compilation_artist(lcompilation_artist),
+                   m_compilationArtist(lcompilation_artist),
                    m_album(lalbum),
                    m_title(ltitle),
                    m_genre(lgenre),
                    m_format(lformat),
                    m_year(lyear),
-                   m_tracknum(ltracknum),
+                   m_trackNum(ltracknum),
                    m_length(llength),
                    m_rating(lrating),
-                   m_lastplay(llastplay),
-                   m_dateadded(ldateadded),
-                   m_playcount(lplaycount),
+                   m_lastPlay(llastplay),
+                   m_dateAdded(ldateadded),
+                   m_playCount(lplaycount),
                    m_compilation(lcompilation),
                    m_id(lid),
                    m_filename(lfilename)
@@ -123,45 +123,45 @@ class META_PUBLIC MusicMetadata
     MusicMetadata& operator=(const MusicMetadata &rhs);
 
     QString Artist() const { return m_artist; }
-    QString ArtistSort() const { return m_artist_sort; }
+    QString ArtistSort() const { return m_artistSort; }
     void setArtist(const QString &lartist,
                    const QString &lartist_sort = nullptr)
     {
         m_artist = lartist;
-        m_artist_sort = lartist_sort;
-        m_formattedartist.clear(); m_formattedtitle.clear();
+        m_artistSort = lartist_sort;
+        m_formattedArtist.clear(); m_formattedTitle.clear();
         ensureSortFields();
     }
 
-    QString CompilationArtist() const { return m_compilation_artist; }
-    QString CompilationArtistSort() const { return m_compilation_artist_sort; }
+    QString CompilationArtist() const { return m_compilationArtist; }
+    QString CompilationArtistSort() const { return m_compilationArtistSort; }
     void setCompilationArtist(const QString &lcompilation_artist,
                               const QString &lcompilation_artist_sort = nullptr)
     {
-        m_compilation_artist = lcompilation_artist;
-        m_compilation_artist_sort = lcompilation_artist_sort;
-        m_formattedartist.clear(); m_formattedtitle.clear();
+        m_compilationArtist = lcompilation_artist;
+        m_compilationArtistSort = lcompilation_artist_sort;
+        m_formattedArtist.clear(); m_formattedTitle.clear();
         ensureSortFields();
     }
 
     QString Album() const { return m_album; }
-    QString AlbumSort() const { return m_album_sort; }
+    QString AlbumSort() const { return m_albumSort; }
     void setAlbum(const QString &lalbum,
                   const QString &lalbum_sort = nullptr)
     {
         m_album = lalbum;
-        m_album_sort = lalbum_sort;
-        m_formattedartist.clear(); m_formattedtitle.clear();
+        m_albumSort = lalbum_sort;
+        m_formattedArtist.clear(); m_formattedTitle.clear();
         ensureSortFields();
     }
 
     QString Title() const { return m_title; }
-    QString TitleSort() const { return m_title_sort; }
+    QString TitleSort() const { return m_titleSort; }
     void setTitle(const QString &ltitle,
                   const QString &ltitle_sort = nullptr)
     {
         m_title = ltitle;
-        m_title_sort = ltitle_sort;
+        m_titleSort = ltitle_sort;
         ensureSortFields();
     }
 
@@ -171,23 +171,23 @@ class META_PUBLIC MusicMetadata
     QString Genre() const { return m_genre; }
     void setGenre(const QString &lgenre) { m_genre = lgenre; }
 
-    void setDirectoryId(int ldirectoryid) { m_directoryid = ldirectoryid; }
+    void setDirectoryId(int ldirectoryid) { m_directoryId = ldirectoryid; }
     int getDirectoryId();
 
-    void setArtistId(int lartistid) { m_artistid = lartistid; }
+    void setArtistId(int lartistid) { m_artistId = lartistid; }
     int getArtistId();
 
-    void setAlbumId(int lalbumid) { m_albumid = lalbumid; }
+    void setAlbumId(int lalbumid) { m_albumId = lalbumid; }
     int getAlbumId();
 
-    void setGenreId(int lgenreid) { m_genreid = lgenreid; }
+    void setGenreId(int lgenreid) { m_genreId = lgenreid; }
     int getGenreId();
 
     int Year() const { return m_year; }
     void setYear(int lyear) { m_year = lyear; }
 
-    int Track() const { return m_tracknum; }
-    void setTrack(int ltrack) { m_tracknum = ltrack; }
+    int Track() const { return m_trackNum; }
+    void setTrack(int ltrack) { m_trackNum = ltrack; }
 
     int GetTrackCount() const { return m_trackCount; }
     void setTrackCount(int ltrackcount) { m_trackCount = ltrackcount; }
@@ -195,14 +195,14 @@ class META_PUBLIC MusicMetadata
     int Length() const { return m_length; }
     void setLength(int llength) { m_length = llength; }
 
-    int DiscNumber() const {return m_discnum;}
-    void setDiscNumber(int discnum) { m_discnum = discnum; }
+    int DiscNumber() const {return m_discNum;}
+    void setDiscNumber(int discnum) { m_discNum = discnum; }
 
-    int DiscCount() const {return m_disccount;}
-    void setDiscCount(int disccount) { m_disccount = disccount; }
+    int DiscCount() const {return m_discCount;}
+    void setDiscCount(int disccount) { m_discCount = disccount; }
 
-    int Playcount() const { return m_playcount; }
-    void setPlaycount(int lplaycount) { m_playcount = lplaycount; }
+    int Playcount() const { return m_playCount; }
+    void setPlaycount(int lplaycount) { m_playCount = lplaycount; }
 
     IdType ID() const { return m_id; }
     void setID(IdType lid) { m_id = lid; }
@@ -230,11 +230,11 @@ class META_PUBLIC MusicMetadata
     void incRating();
     void setRating(int lrating) { m_rating = lrating; }
 
-    QDateTime LastPlay() const { return m_lastplay; }
+    QDateTime LastPlay() const { return m_lastPlay; }
     void setLastPlay();
     void setLastPlay(const QDateTime& lastPlay);
 
-    int PlayCount() const { return m_playcount; }
+    int PlayCount() const { return m_playCount; }
     void incPlayCount();
 
     // track is part of a compilation album
@@ -242,8 +242,8 @@ class META_PUBLIC MusicMetadata
     void setCompilation(bool state)
     {
         m_compilation = state;
-        m_formattedartist.clear();
-        m_formattedtitle.clear();
+        m_formattedArtist.clear();
+        m_formattedTitle.clear();
     }
     bool determineIfCompilation(bool cd = false);
 
@@ -313,35 +313,34 @@ class META_PUBLIC MusicMetadata
     void saveHostname(void);
 
     QString m_artist;
-    QString m_artist_sort;
-    QString m_compilation_artist;
-    QString m_compilation_artist_sort;
+    QString m_artistSort;
+    QString m_compilationArtist;
+    QString m_compilationArtistSort;
     QString m_album;
-    QString m_album_sort;
+    QString m_albumSort;
     QString m_title;
-    QString m_title_sort;
-    QString m_formattedartist;
-    QString m_formattedtitle;
+    QString m_titleSort;
+    QString m_formattedArtist;
+    QString m_formattedTitle;
     QString m_genre;
-    QString m_genre_sort;
     QString m_format;
     int     m_year             {0};
-    int     m_tracknum         {0};
+    int     m_trackNum         {0};
     int     m_trackCount       {0};
-    int     m_discnum          {0};
-    int     m_disccount        {0};
+    int     m_discNum          {0};
+    int     m_discCount        {0};
     int     m_length           {0};
     int     m_rating           {0};
-    int     m_directoryid      {-1};
-    int     m_artistid         {-1};
-    int     m_compartistid     {-1};
-    int     m_albumid          {-1};
-    int     m_genreid          {-1};
-    QDateTime m_lastplay;
-    QDateTime m_templastplay;
-    QDateTime m_dateadded;
-    int  m_playcount           {0};
-    int  m_tempplaycount       {0};
+    int     m_directoryId      {-1};
+    int     m_artistId         {-1};
+    int     m_compartistId     {-1};
+    int     m_albumId          {-1};
+    int     m_genreId          {-1};
+    QDateTime m_lastPlay;
+    QDateTime m_tempLastPlay;
+    QDateTime m_dateAdded;
+    int  m_playCount           {0};
+    int  m_tempPlayCount       {0};
     bool m_compilation         {false};
 
     AlbumArtImages *m_albumArt {nullptr};
@@ -366,15 +365,15 @@ class META_PUBLIC MusicMetadata
     QString m_language;
 
     // Various formatting strings
-    static QString m_formatnormalfileartist;
-    static QString m_formatnormalfiletrack;
-    static QString m_formatnormalcdartist;
-    static QString m_formatnormalcdtrack;
+    static QString s_formatNormalFileArtist;
+    static QString s_formatNormalFileTrack;
+    static QString s_formatNormalCdArtist;
+    static QString s_formatNormalCdTrack;
 
-    static QString m_formatcompilationfileartist;
-    static QString m_formatcompilationfiletrack;
-    static QString m_formatcompilationcdartist;
-    static QString m_formatcompilationcdtrack;
+    static QString s_formatCompilationFileArtist;
+    static QString s_formatCompilationFileTrack;
+    static QString s_formatCompilationCdArtist;
+    static QString s_formatCompilationCdTrack;
 };
 
 bool operator==(MusicMetadata& a, MusicMetadata& b);
@@ -431,38 +430,38 @@ class META_PUBLIC AllMusic
     void        setCDTitle(const QString &a_title) { m_cdTitle = a_title; }
     int         getCDTrackCount(void) const { return m_cdData.count(); }
 
-    bool        doneLoading() const { return m_done_loading; }
+    bool        doneLoading() const { return m_doneLoading; }
     bool        cleanOutThreads();
 
-    MetadataPtrList *getAllMetadata(void) { return &m_all_music; }
+    MetadataPtrList *getAllMetadata(void) { return &m_allMusic; }
     MetadataPtrList *getAllCDMetadata(void) { return &m_cdData; }
 
     bool isValidID(int an_id);
 
   private:
-    MetadataPtrList     m_all_music;
+    MetadataPtrList     m_allMusic;
 
     int m_numPcs                               {0};
     int m_numLoaded                            {0};
 
     using MusicMap = QMap<int, MusicMetadata*>;
-    MusicMap m_music_map;
+    MusicMap m_musicMap;
 
     // cd stuff
     MetadataPtrList m_cdData; //  More than one cd player?
     QString m_cdTitle;
 
-    MetadataLoadingThread   *m_metadata_loader {nullptr};
-    bool                     m_done_loading    {false};
+    MetadataLoadingThread   *m_metadataLoader  {nullptr};
+    bool                     m_doneLoading     {false};
 
-    int                      m_playcountMin    {0};
-    int                      m_playcountMax    {0};
+    int                      m_playCountMin    {0};
+    int                      m_playCountMax    {0};
 #if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-    double                   m_lastplayMin     {0.0};
-    double                   m_lastplayMax     {0.0};
+    double                   m_lastPlayMin     {0.0};
+    double                   m_lastPlayMax     {0.0};
 #else
-    qint64                   m_lastplayMin     {0};
-    qint64                   m_lastplayMax     {0};
+    qint64                   m_lastPlayMin     {0};
+    qint64                   m_lastPlayMax     {0};
 #endif
 };
 

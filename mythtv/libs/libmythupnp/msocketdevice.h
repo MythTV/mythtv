@@ -160,14 +160,14 @@ protected:
     qint64 writeData(const char *data, qint64 len) override; // QIODevice
 
 private:
-    int fd;
-    Type t;
-    quint16 p;
-    QHostAddress a;
-    quint16 pp;
-    QHostAddress pa;
-    MSocketDevice::Error e;
-    MSocketDevicePrivate * d;
+    int                   m_fd {-1};
+    Type                  m_t;
+    quint16               m_p  {0};
+    QHostAddress          m_a;
+    quint16               m_pp {0};
+    QHostAddress          m_pa;
+    MSocketDevice::Error  m_e {NoError};
+    MSocketDevicePrivate *d{nullptr}; // NOLINT(readability-identifier-naming)
 
     enum Option { Broadcast, ReceiveBuffer, ReuseAddress, SendBuffer, Keepalive };
 

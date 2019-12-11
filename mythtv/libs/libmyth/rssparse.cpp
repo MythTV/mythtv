@@ -36,7 +36,7 @@ ResultItem::ResultItem(const QString& title, const QString& sortTitle,
     m_subtitle = subtitle;
     m_sortsubtitle = sortSubtitle;
     m_desc = desc;
-    m_URL = URL;
+    m_url = URL;
     m_thumbnail = thumbnail;
     m_mediaURL = mediaURL;
     m_author = author;
@@ -80,7 +80,7 @@ void ResultItem::toMap(InfoMap &metadataMap)
     metadataMap["subtitle"] = m_subtitle;
     metadataMap["sortsubtitle"] = m_sortsubtitle;
     metadataMap["description"] = m_desc;
-    metadataMap["url"] = m_URL;
+    metadataMap["url"] = m_url;
     metadataMap["thumbnail"] = m_thumbnail;
     metadataMap["mediaurl"] = m_mediaURL;
     metadataMap["author"] = m_author;

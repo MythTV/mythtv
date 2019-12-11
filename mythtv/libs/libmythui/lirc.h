@@ -43,18 +43,18 @@ class LIRC : public QObject, public MThread
     QList<QByteArray> GetCodes(void);
     void Process(QByteArray &data);
 
-    mutable QMutex  lock;
-    static  QMutex  lirclib_lock;
-    QObject        *m_mainWindow {nullptr};  ///< window to send key events to
-    QString         lircdDevice;   ///< device on which to receive lircd data
-    QString         program;       ///< program to extract from config file
-    QString         configFile;    ///< file containing LIRC->key mappings
-    bool            doRun;
-    uint            buf_offset;
-    QByteArray      buf;
-    uint            eofCount;
-    uint            retryCount;
-    LIRCPriv       *d {nullptr};
+    mutable QMutex  m_lock        {QMutex::Recursive};
+    static  QMutex  s_lirclibLock;
+    QObject        *m_mainWindow  {nullptr}; ///< window to send key events to
+    QString         m_lircdDevice;           ///< device on which to receive lircd data
+    QString         m_program;               ///< program to extract from config file
+    QString         m_configFile;            ///< file containing LIRC->key mappings
+    bool            m_doRun       {false};
+    uint            m_bufOffset   {0};
+    QByteArray      m_buf;
+    uint            m_eofCount    {0};
+    uint            m_retryCount  {0};
+    LIRCPriv       *d             {nullptr}; // NOLINT(readability-identifier-naming)
 };
 
 #endif
