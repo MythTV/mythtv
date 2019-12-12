@@ -206,6 +206,7 @@ MythCodecID MythCodecContext::FindDecoder(const QString &Decoder, AVStream *Stre
         return result;
 #endif
 #ifdef USING_VTB
+    (void)Stream;
     result = MythVTBContext::GetSupportedCodec(Context, Codec, Decoder, streamtype);
     if (codec_is_vtb(result) || codec_is_vtb_dec(result))
         return result;
