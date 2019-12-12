@@ -167,4 +167,35 @@ MTV_PUBLIC VideoFrameType PixelFormatToFrameType(AVPixelFormat fmt);
 MTV_PUBLIC QString DeinterlacerName(MythDeintType Deint, bool DoubleRate, VideoFrameType Format = FMT_NONE);
 
 MTV_PUBLIC QString DeinterlacerPref(MythDeintType Deint);
+
+/**
+ * MythPictureDeinterlacer
+ * simple deinterlacer based on FFmpeg's yadif filter.
+ * Yadif requires 3 frames before starting to return a deinterlaced frame.
+ */
+class MTV_PUBLIC MythPictureDeinterlacer
+{
+public:
+    MythPictureDeinterlacer(AVPixelFormat pixfmt, int width, int height, float ar = 1.0F);
+    ~MythPictureDeinterlacer();
+    // Will deinterlace src into dst. If EAGAIN is returned, more frames
+    // are needed to output a frame.
+    // To drain the deinterlacer, call Deinterlace with src = nullptr until you
+    // get no more frames. Once drained, you must call Flush() to start
+    // deinterlacing again.
+    int Deinterlace(AVFrame *dst, const AVFrame *src);
+    int DeinterlaceSingle(AVFrame *dst, const AVFrame *src);
+    // Flush and reset the deinterlacer.
+    int Flush();
+private:
+    AVFilterGraph*      m_filterGraph   {nullptr};
+    MythAVFrame         m_filterFrame;
+    AVFilterContext*    m_bufferSinkCtx {nullptr};
+    AVFilterContext*    m_bufferSrcCtx  {nullptr};
+    AVPixelFormat       m_pixfmt        {AV_PIX_FMT_NONE};
+    int                 m_width         {0};
+    int                 m_height        {0};
+    float               m_ar;
+    bool                m_errored       {false};
+};
 #endif
