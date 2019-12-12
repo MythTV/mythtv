@@ -25,44 +25,6 @@ extern "C" {
 
 int next_dbg_str = 0;
 
-YUVInfo::YUVInfo(uint Width, uint Height, uint Size, const int *Pitches,
-                 const int *Offsets, int Alignment)
-  : m_width(Width),
-    m_height(Height),
-    m_size(Size)
-{
-    // make sure all our pitches are a multiple of "aligned" bytes
-    // Needs to take into consideration that U and V channels are half
-    // the width of Y channel
-    uint alignedwidth;
-
-    if (!Alignment)
-        alignedwidth = m_width;
-    else
-        alignedwidth = (m_width + Alignment - 1) & ~(Alignment - 1);
-
-    if (Pitches)
-    {
-        memcpy(m_pitches, Pitches, 3 * sizeof(int));
-    }
-    else
-    {
-        m_pitches[0] = alignedwidth;
-        m_pitches[1] = m_pitches[2] = (alignedwidth+1) >> 1;
-    }
-
-    if (Offsets)
-    {
-        memcpy(m_offsets, Offsets, 3 * sizeof(int));
-    }
-    else
-    {
-        m_offsets[0] = 0;
-        m_offsets[1] = alignedwidth * m_height;
-        m_offsets[2] = m_offsets[1] + ((alignedwidth+1) >> 1) * ((m_height+1) >> 1);
-    }
-}
-
 /**
  * \class VideoBuffers
  *  This class creates tracks the state of the buffers used by
@@ -863,9 +825,11 @@ bool VideoBuffers::CreateBuffers(VideoFrameType Type, QSize Size, bool ExtraForP
 
 bool VideoBuffers::CreateBuffers(VideoFrameType Type, int Width, int Height)
 {
+    bool success = true;
+
+    // Hardware buffers with no allocated memory
     if (format_is_hw(Type))
     {
-        bool success = true;
         for (uint i = 0; i < Size(); i++)
             success &= CreateBuffer(Width, Height, i, nullptr, Type);
         LOG(VB_PLAYBACK, LOG_INFO, QString("Created %1 %2 (%3x%4) video buffers")
@@ -873,38 +837,21 @@ bool VideoBuffers::CreateBuffers(VideoFrameType Type, int Width, int Height)
         return success;
     }
 
-    vector<YUVInfo> yuvinfo;
-    return CreateBuffers(Type, Width, Height, yuvinfo);
-}
-
-bool VideoBuffers::CreateBuffers(VideoFrameType Type, int Width, int Height, vector<YUVInfo> YUVInfos)
-{
-    if ((FMT_YV12 != Type) && (FMT_YUY2 != Type))
-        return false;
-
+    // Software buffers
     size_t bufsize = GetBufferSize(Type, Width, Height);
-    while (YUVInfos.size() < Size())
-        YUVInfos.emplace_back(Width, Height, bufsize, nullptr, nullptr);
-
-    bool ok = true;
     for (uint i = 0; i < Size(); i++)
     {
-        size_t size = std::max(bufsize, static_cast<size_t>(YUVInfos[i].m_size));
-        // NB VideoFrame init will clear buffer to sensible values
         unsigned char *data = GetAlignedBuffer(bufsize);
         if (!data)
             LOG(VB_GENERAL, LOG_CRIT, "Failed to allocate video buffer memory");
-        init(&m_buffers[i], Type, data,
-             static_cast<int>(YUVInfos[i].m_width), static_cast<int>(YUVInfos[i].m_height),
-             static_cast<int>(size), reinterpret_cast<int*>(YUVInfos[i].m_pitches),
-             reinterpret_cast<int*>(YUVInfos[i].m_offsets));
-        ok &= (m_buffers[i].buf != nullptr);
+        init(&m_buffers[i], Type, data, Width, Height, static_cast<int>(bufsize));
+        success &= (m_buffers[i].buf != nullptr);
     }
 
     Clear();
     LOG(VB_PLAYBACK, LOG_INFO, QString("Created %1 %2 (%3x%4) video buffers")
        .arg(Size()).arg(format_description(Type)).arg(Width).arg(Height));
-    return ok;
+    return success;
 }
 
 bool VideoBuffers::CreateBuffer(int Width, int Height, uint Number,

@@ -36,20 +36,6 @@ enum BufferType
     kVideoBuffer_all       = 0x0000003F,
 };
 
-class YUVInfo
-{
-  public:
-    YUVInfo(uint Width, uint Height, uint Size, const int *Pitches,
-            const int *Offsets, int Alignment = 64);
-
-  public:
-    uint m_width;
-    uint m_height;
-    uint m_size;
-    uint m_pitches[3];
-    uint m_offsets[3];
-};
-
 class MTV_PUBLIC VideoBuffers
 {
   public:
@@ -63,8 +49,6 @@ class MTV_PUBLIC VideoBuffers
     bool CreateBuffers(VideoFrameType Type, QSize Size, bool ExtraForPause,
                        uint NeedFree, uint NeedprebufferNormal,
                        uint NeedPrebufferSmall, int MaxReferenceFrames = 16);
-    bool CreateBuffers(VideoFrameType Type, int Width, int Height,
-                       vector<YUVInfo> YUVInfos);
     bool CreateBuffers(VideoFrameType Type, int Width, int Height);
     static bool ReinitBuffer(VideoFrame *Frame, VideoFrameType Type, MythCodecID CodecID, int Width, int Height);
     void DeleteBuffers(void);
