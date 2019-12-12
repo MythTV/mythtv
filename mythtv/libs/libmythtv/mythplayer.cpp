@@ -3551,6 +3551,7 @@ void MythPlayer::ChangeSpeed(void)
 
     // ensure we re-check double rate support following a speed change
     m_scanInitialized = false;
+    m_scanLocked = false;
 
     if (m_normalSpeed && m_audio.HasAudioOut())
     {
