@@ -57,12 +57,12 @@ class LameEncoder : public Encoder
 
     int m_bits                {16};
     int m_channels            {2};
-    int m_bytes_per_sample    {m_channels * m_bits / 8};
-    int m_samples_per_channel {0};
+    int m_bytesPerSample      {m_channels * m_bits / 8};
+    int m_samplesPerChannel   {0};
 
                               // worst-case estimate
-    int   m_mp3buf_size       {(int)(1.25 * 16384 + 7200)};
-    char *m_mp3buf            {nullptr};
+    int   m_mp3BufSize        {(int)(1.25 * 16384 + 7200)};
+    char *m_mp3Buf            {nullptr};
 
     lame_global_flags *m_gf   {nullptr};
 };

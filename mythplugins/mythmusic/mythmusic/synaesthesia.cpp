@@ -498,9 +498,9 @@ bool Synaesthesia::process(VisualNode *node)
     double brightFactor2 = (brightFactor / 65536.0 / NumSamples) *
                            sqrt(m_outHeight * m_outWidth / (320.0 * 200.0));
 
-    m_energy_avg = m_energy_avg * 0.95 + energy * 0.05;
-    if (m_energy_avg > 0.0)
-        brightFactor2 *= 80.0 / (m_energy_avg + 5.0);
+    m_energyAvg = m_energyAvg * 0.95 + energy * 0.05;
+    if (m_energyAvg > 0.0)
+        brightFactor2 *= 80.0 / (m_energyAvg + 5.0);
 
     for (int i = 1; i < NumSamples / 2; i++)
     {

@@ -1019,7 +1019,7 @@ bool ProfileDialog::Create()
     UIUtilE::Assign(this, m_descriptionText, "description_text", &err);
     UIUtilE::Assign(this, m_oldSizeText, "oldsize_text", &err);
     UIUtilE::Assign(this, m_newSizeText, "newsize_text", &err);
-    UIUtilE::Assign(this, m_profile_list, "profile_list", &err);
+    UIUtilE::Assign(this, m_profileBtnList, "profile_list", &err);
     UIUtilE::Assign(this, m_okButton, "ok_button", &err);
 
     if (err)
@@ -1031,15 +1031,15 @@ bool ProfileDialog::Create()
     for (int x = 0; x < m_profileList.size(); x++)
     {
         auto *item = new
-                MythUIButtonListItem(m_profile_list, m_profileList.at(x)->name);
+                MythUIButtonListItem(m_profileBtnList, m_profileList.at(x)->name);
         item->SetData(qVariantFromValue(m_profileList.at(x)));
     }
 
-    connect(m_profile_list, SIGNAL(itemSelected(MythUIButtonListItem*)),
+    connect(m_profileBtnList, SIGNAL(itemSelected(MythUIButtonListItem*)),
             this, SLOT(profileChanged(MythUIButtonListItem*)));
 
 
-    m_profile_list->MoveToNamedPosition(m_archiveItem->encoderProfile->name);
+    m_profileBtnList->MoveToNamedPosition(m_archiveItem->encoderProfile->name);
 
     m_captionText->SetText(m_archiveItem->title);
     m_oldSizeText->SetText(formatSize(m_archiveItem->size / 1024, 2));
@@ -1048,7 +1048,7 @@ bool ProfileDialog::Create()
 
     BuildFocusList();
 
-    SetFocusWidget(m_profile_list);
+    SetFocusWidget(m_profileBtnList);
 
     return true;
 }
@@ -1075,7 +1075,7 @@ void ProfileDialog::profileChanged(MythUIButtonListItem *item)
 
 void ProfileDialog::save(void)
 {
-    emit haveResult(m_profile_list->GetCurrentPos());
+    emit haveResult(m_profileBtnList->GetCurrentPos());
 
     Close();
 }

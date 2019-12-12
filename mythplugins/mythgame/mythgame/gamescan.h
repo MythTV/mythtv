@@ -39,7 +39,7 @@ class GameScannerThread : public MThread
     void SetHandlers(QList<GameHandler*> handlers) { m_handlers = handlers; };
     void SetProgressDialog(MythUIProgressDialog *dialog) { m_dialog = dialog; };
 
-    bool getDataChanged() { return m_DBDataChanged; };
+    bool getDataChanged() { return m_dbDataChanged; };
 
   private:
 
@@ -53,7 +53,7 @@ class GameScannerThread : public MThread
     void SendProgressEvent(uint progress, uint total = 0,
                            QString message = QString());
 
-    bool m_HasGUI;
+    bool m_hasGUI;
 
     QList<GameHandler*> m_handlers;
 
@@ -63,7 +63,7 @@ class GameScannerThread : public MThread
 
     MythUIProgressDialog *m_dialog        {nullptr};
 
-    bool                  m_DBDataChanged {false};
+    bool                  m_dbDataChanged {false};
 };
 
 class GameScanner : public QObject

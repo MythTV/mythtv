@@ -46,11 +46,11 @@ class MythNews : public MythScreenType
     void ShowFeedManager();
 
     mutable QMutex m_lock            {QMutex::Recursive};
-    NewsSite::List m_NewsSites;
+    NewsSite::List m_newsSites;
 
-    QTimer        *m_RetrieveTimer   {nullptr};
-    int            m_TimerTimeout    {10*60*1000};
-    unsigned int   m_UpdateFreq      {30};
+    QTimer        *m_retrieveTimer   {nullptr};
+    int            m_timerTimeout    {10*60*1000};
+    unsigned int   m_updateFreq      {30};
 
     QString        m_zoom            {"1.0"};
     QString        m_browser;

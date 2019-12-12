@@ -42,7 +42,7 @@ class ProfileDialog : public MythScreenType
     MythUIText             *m_oldSizeText     {nullptr};
     MythUIText             *m_newSizeText     {nullptr};
 
-    MythUIButtonList       *m_profile_list    {nullptr};
+    MythUIButtonList       *m_profileBtnList  {nullptr};
     MythUICheckBox         *m_enabledCheck    {nullptr};
     MythUIButton           *m_okButton        {nullptr};
 };

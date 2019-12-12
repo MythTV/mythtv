@@ -22,7 +22,7 @@ class MythUIProgressDialog;
 
 GameScannerThread::GameScannerThread(void) :
     MThread("GameScanner"),
-    m_HasGUI(gCoreContext->HasGUI())
+    m_hasGUI(gCoreContext->HasGUI())
 {
 }
 
@@ -59,7 +59,7 @@ void GameScannerThread::verifyFiles()
 {
     int counter = 0;
 
-    if (m_HasGUI)
+    if (m_hasGUI)
         SendProgressEvent(counter, (uint)m_dbgames.count(),
                           GameScanner::tr("Verifying game files..."));
 
@@ -89,7 +89,7 @@ void GameScannerThread::verifyFiles()
                 m_remove.append(info->Id());
             }
         }
-        if (m_HasGUI)
+        if (m_hasGUI)
             SendProgressEvent(++counter);
 
         delete info;
@@ -100,7 +100,7 @@ void GameScannerThread::verifyFiles()
 void GameScannerThread::updateDB()
 {
     uint counter = 0;
-    if (m_HasGUI)
+    if (m_hasGUI)
         SendProgressEvent(counter, (uint)(m_files.size() + m_remove.size()),
                           GameScanner::tr("Updating game database..."));
 
@@ -114,9 +114,9 @@ void GameScannerThread::updateDB()
                         "", "", 0, (*p).gametype, 0, "", "", "",
                         "", "", "", "", "");
             add.SaveToDatabase();
-            m_DBDataChanged = true;
+            m_dbDataChanged = true;
         }
-        if (m_HasGUI)
+        if (m_hasGUI)
             SendProgressEvent(++counter);
     }
 
@@ -124,7 +124,7 @@ void GameScannerThread::updateDB()
                                  p != m_remove.end(); ++p)
     {
         removeOrphan(*p);
-        m_DBDataChanged = true;
+        m_dbDataChanged = true;
     }
 }
 
@@ -135,7 +135,7 @@ bool GameScannerThread::buildFileList()
 
     int counter = 0;
 
-    if (m_HasGUI)
+    if (m_hasGUI)
         SendProgressEvent(counter, (uint)m_handlers.size(),
                           GameScanner::tr("Searching for games..."));
 
@@ -168,7 +168,7 @@ bool GameScannerThread::buildFileList()
             m_files.append(info);
         }
 
-        if (m_HasGUI)
+        if (m_hasGUI)
             SendProgressEvent(++counter);
     }
 

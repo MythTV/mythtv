@@ -17,8 +17,8 @@ class VorbisEncoder : public Encoder
   private:
     ogg_page         m_og;
     ogg_packet       m_op;
-    long             m_packetsdone   {0};
-    long             m_bytes_written {0L};
+    long             m_packetsDone   {0};
+    long             m_bytesWritten  {0L};
     vorbis_comment   m_vc;
     ogg_stream_state m_os;
 

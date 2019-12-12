@@ -111,15 +111,13 @@ class DecoderHandler : public QObject, public MythObservable
     void createPlaylistFromRemoteUrl(const QUrl &url);
 
     int               m_state        {STOPPED};
-    int               m_playlist_pos {0};
+    int               m_playlistPos  {0};
     PlayListFile      m_playlist;
     Decoder          *m_decoder      {nullptr};
     MusicMetadata     m_meta;
     QUrl              m_url;
     bool              m_op           {false};
     uint              m_redirects    {0};
-
-    static const uint MaxRedirects = 3;
 };
 
 #endif /* DECODERHANDLER_H_ */

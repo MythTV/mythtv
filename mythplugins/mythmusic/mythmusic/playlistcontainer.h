@@ -20,14 +20,14 @@ class PlaylistLoadingThread : public MThread
   public:
     PlaylistLoadingThread(PlaylistContainer *parent_ptr,
                           AllMusic *all_music_ptr)
-        : MThread("PlaylistLoading"), parent(parent_ptr),
-          all_music(all_music_ptr) {}
+        : MThread("PlaylistLoading"), m_parent(parent_ptr),
+          m_allMusic(all_music_ptr) {}
 
     void run() override; // MThread
 
   private:
-    PlaylistContainer *parent    {nullptr};
-    AllMusic          *all_music {nullptr};
+    PlaylistContainer *m_parent   {nullptr};
+    AllMusic          *m_allMusic {nullptr};
 };
 
 class PlaylistContainer

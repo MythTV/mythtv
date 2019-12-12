@@ -32,11 +32,11 @@ BumpScope::BumpScope()
 
 BumpScope::~BumpScope()
 {
-    delete [] m_rgb_buf;
+    delete [] m_rgbBuf;
     delete m_image;
-    for (size_t i = 0; i < m_phongdat.size(); i++)
-        m_phongdat[i].resize(0);
-    m_phongdat.resize(0);
+    for (size_t i = 0; i < m_phongDat.size(); i++)
+        m_phongDat[i].resize(0);
+    m_phongDat.resize(0);
 }
 
 void BumpScope::resize(const QSize &newsize)
@@ -46,11 +46,11 @@ void BumpScope::resize(const QSize &newsize)
     m_size.setHeight((m_size.height() / 2) * 2);
     m_size.setWidth((m_size.width() / 4) * 4);
 
-    delete [] m_rgb_buf;
+    delete [] m_rgbBuf;
 
     int bufsize = (m_size.height() + 2) * (m_size.width() + 2);
 
-    m_rgb_buf = new unsigned char[bufsize];
+    m_rgbBuf = new unsigned char[bufsize];
 
     m_bpl = m_size.width() + 2;
 
@@ -59,14 +59,14 @@ void BumpScope::resize(const QSize &newsize)
 
     m_width = m_size.width();
     m_height = m_size.height();
-    m_phongrad = m_width;
+    m_phongRad = m_width;
 
     m_x = m_width / 2;
     m_y = m_height;
 
-    m_phongdat.resize(m_phongrad * 2);
-    for (size_t i = 0; i < m_phongdat.size(); i++)
-        m_phongdat[i].resize(m_phongrad * 2);
+    m_phongDat.resize(m_phongRad * 2);
+    for (size_t i = 0; i < m_phongDat.size(); i++)
+        m_phongDat[i].resize(m_phongRad * 2);
 
     generate_phongdat();
     generate_cmap(m_color);
@@ -120,14 +120,14 @@ void BumpScope::generate_cmap(unsigned int color)
 
 void BumpScope::generate_phongdat(void)
 {
-    unsigned int PHONGRES = m_phongrad * 2;
+    unsigned int PHONGRES = m_phongRad * 2;
 
-    for (uint y = 0; y < m_phongrad; y++)
+    for (uint y = 0; y < m_phongRad; y++)
     {
-        for (uint x = 0; x < m_phongrad; x++)
+        for (uint x = 0; x < m_phongRad; x++)
         {
-            double i = (double)x / ((double)m_phongrad) - 1;
-            double i2 = (double)y / ((double)m_phongrad) - 1;
+            double i = (double)x / ((double)m_phongRad) - 1;
+            double i2 = (double)y / ((double)m_phongRad) - 1;
 
             //if (m_diamond)
                i = 1 - pow(i*i2,.75) - i*i - i2*i2;
@@ -145,17 +145,17 @@ void BumpScope::generate_phongdat(void)
                     i = 255;
                 auto uci = (unsigned char)i;
 
-                m_phongdat[y][x] = uci;
-                m_phongdat[(PHONGRES-1)-y][x] = uci;
-                m_phongdat[y][(PHONGRES-1)-x] = uci;
-                m_phongdat[(PHONGRES-1)-y][(PHONGRES-1)-x] = uci;
+                m_phongDat[y][x] = uci;
+                m_phongDat[(PHONGRES-1)-y][x] = uci;
+                m_phongDat[y][(PHONGRES-1)-x] = uci;
+                m_phongDat[(PHONGRES-1)-y][(PHONGRES-1)-x] = uci;
             }
             else
             {
-                m_phongdat[y][x] = 0;
-                m_phongdat[(PHONGRES-1)-y][x] = 0;
-                m_phongdat[y][(PHONGRES-1)-x] = 0;
-                m_phongdat[(PHONGRES-1)-y][(PHONGRES-1)-x] = 0;
+                m_phongDat[y][x] = 0;
+                m_phongDat[(PHONGRES-1)-y][x] = 0;
+                m_phongDat[y][(PHONGRES-1)-x] = 0;
+                m_phongDat[(PHONGRES-1)-y][(PHONGRES-1)-x] = 0;
             }
         }
     }
@@ -241,7 +241,7 @@ void BumpScope::render_light(int lx, int ly)
 {
     int dx = 0;
     int dy = 0;
-    unsigned int PHONGRES = m_phongrad * 2;
+    unsigned int PHONGRES = m_phongRad * 2;
     unsigned int i = 0;
     unsigned int j = 0;
 
@@ -255,8 +255,8 @@ void BumpScope::render_light(int lx, int ly)
         for (dx = (-lx) + (PHONGRES / 2), i = 0; i < m_width; i++, dx++,
              prev_y++, out_y++)
         {
-            int xp = (m_rgb_buf[prev_y - 1] - m_rgb_buf[prev_y + 1]) + dx;
-            int yp = (m_rgb_buf[prev_y - m_bpl] - m_rgb_buf[prev_y + m_bpl]) + dy;
+            int xp = (m_rgbBuf[prev_y - 1] - m_rgbBuf[prev_y + 1]) + dx;
+            int yp = (m_rgbBuf[prev_y - m_bpl] - m_rgbBuf[prev_y + m_bpl]) + dy;
 
             if (yp < 0 || yp >= (int)PHONGRES ||
                 xp < 0 || xp >= (int)PHONGRES)
@@ -265,7 +265,7 @@ void BumpScope::render_light(int lx, int ly)
                 continue;
             }
 
-            outputbuf[out_y] = m_phongdat[yp][xp];
+            outputbuf[out_y] = m_phongDat[yp][xp];
         }
     }
 }
@@ -369,11 +369,11 @@ bool BumpScope::process(VisualNode *node)
         if (y >= (int)m_height)
             y = m_height - 1;
 
-        draw_vert_line(m_rgb_buf, i, prev_y, y);
+        draw_vert_line(m_rgbBuf, i, prev_y, y);
         prev_y = y;
     }
 
-    blur_8(m_rgb_buf, m_width, m_height, m_bpl);
+    blur_8(m_rgbBuf, m_width, m_height, m_bpl);
 
     return false;
 }
@@ -391,12 +391,12 @@ bool BumpScope::draw(QPainter *p, const QColor &back)
     m_ilx = m_x;
     m_ily = m_y;
 
-    if (m_moving_light)
+    if (m_movingLight)
     {
-        if (!m_was_moving)
+        if (!m_wasMoving)
         {
             translate(m_ilx, m_ily, &m_ixo, &m_iyo, &m_ixd, &m_iyd, &m_iangle);
-            m_was_moving = 1;
+            m_wasMoving = 1;
         }
 
         m_ilx = (int)(m_width / 2.0F + cosf(m_iangle * (M_PI / 180.0)) * m_ixo);
@@ -439,12 +439,12 @@ bool BumpScope::draw(QPainter *p, const QColor &back)
         }
     }
 
-    if (m_color_cycle)
+    if (m_colorCycle)
     {
-        if (!m_was_color)
+        if (!m_wasColor)
         {
             rgb_to_hsv(m_color, &m_ih, &m_is, &m_iv);
-            m_was_color = 1;
+            m_wasColor = 1;
 
             if (random() & 1)
             {

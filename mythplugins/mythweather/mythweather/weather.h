@@ -56,14 +56,14 @@ class Weather : public MythScreenType
     bool    m_firstRun              {true};
     int     m_nextpageInterval      {10};
 
-    QTimer *m_nextpage_Timer        {nullptr};
+    QTimer *m_nextPageTimer         {nullptr};
 
     bool    m_firstSetup            {true};
 
     bool    m_createdSrcMan         {false};
     SourceManager *m_srcMan         {nullptr};
     ScreenList m_screens; //screens in correct display order
-    int        m_cur_screen         {0};
+    int        m_curScreenNum       {0};
 
     ScreenListMap m_allScreens; //screens parsed from xml
     WeatherScreen *m_currScreen     {nullptr};

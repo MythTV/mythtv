@@ -169,12 +169,12 @@ CDRipperThread::CDRipperThread(RipStatus *parent,  QString device,
                                QVector<RipTrack*> *tracks, int quality) :
     MThread("CDRipper"),
     m_parent(parent),
-    m_CDdevice(std::move(device)), m_quality(quality),
+    m_cdDevice(std::move(device)), m_quality(quality),
     m_tracks(tracks)
 {
 #ifdef WIN32 // libcdio needs the drive letter with no path
-    if (m_CDdevice.endsWith('\\'))
-        m_CDdevice.chop(1);
+    if (m_cdDevice.endsWith('\\'))
+        m_cdDevice.chop(1);
 #endif // WIN32
 
     QString lastHost = gCoreContext->GetSetting("MythMusicLastRipHost", gCoreContext->GetMasterHostName());
@@ -213,7 +213,7 @@ void CDRipperThread::run(void)
     m_totalSectorsDone = 0;
     for (int trackno = 0; trackno < m_tracks->size(); trackno++)
     {
-        m_totalSectors += getSectorCount(m_CDdevice, trackno + 1);
+        m_totalSectors += getSectorCount(m_cdDevice, trackno + 1);
     }
 
     if (!m_totalSectors)
@@ -351,7 +351,7 @@ void CDRipperThread::run(void)
                 RunEpilog();
                 return;
             }
-            ripTrack(m_CDdevice, encoder.get(), trackno + 1);
+            ripTrack(m_cdDevice, encoder.get(), trackno + 1);
 
             if (isCancelled())
             {
@@ -519,7 +519,7 @@ int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
 Ripper::Ripper(MythScreenStack *parent, QString device) :
     MythScreenType(parent, "ripcd"),
     m_tracks(new QVector<RipTrack*>),
-    m_CDdevice(std::move(device))
+    m_cdDevice(std::move(device))
 {
 #ifndef _WIN32
     // if the MediaMonitor is running stop it
@@ -828,15 +828,15 @@ void Ripper::scanCD(void)
 #ifdef HAVE_CDIO
     {
     LOG(VB_MEDIA, LOG_INFO, QString("Ripper::%1 CD='%2'").
-        arg(__func__).arg(m_CDdevice));
-    (void)cdio_close_tray(m_CDdevice.toLatin1().constData(), nullptr);
+        arg(__func__).arg(m_cdDevice));
+    (void)cdio_close_tray(m_cdDevice.toLatin1().constData(), nullptr);
     }
 #endif // HAVE_CDIO
 
     delete m_decoder;
     m_decoder = new CdDecoder("cda", nullptr, nullptr);
     if (m_decoder)
-        m_decoder->setDevice(m_CDdevice);
+        m_decoder->setDevice(m_cdDevice);
 }
 
 void Ripper::deleteAllExistingTracks(void)
@@ -1102,7 +1102,7 @@ void Ripper::startRipper(void)
 
     int quality = m_qualityList->GetItemCurrent()->GetData().toInt();
 
-    auto *statusDialog = new RipStatus(mainStack, m_CDdevice, m_tracks, quality);
+    auto *statusDialog = new RipStatus(mainStack, m_cdDevice, m_tracks, quality);
 
     if (statusDialog->Create())
     {
@@ -1162,13 +1162,13 @@ void Ripper::ejectCD()
     {
 #ifdef HAVE_CDIO
         LOG(VB_MEDIA, LOG_INFO, QString("Ripper::%1 '%2'").
-            arg(__func__).arg(m_CDdevice));
-        (void)cdio_eject_media_drive(m_CDdevice.toLatin1().constData());
+            arg(__func__).arg(m_cdDevice));
+        (void)cdio_eject_media_drive(m_cdDevice.toLatin1().constData());
 #else
         MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
         if (mon)
         {
-            QByteArray devname = m_CDdevice.toLatin1();
+            QByteArray devname = m_cdDevice.toLatin1();
             MythMediaDevice *pMedia = mon->GetMedia(devname.constData());
             if (pMedia && mon->ValidateAndLock(pMedia))
             {
@@ -1627,6 +1627,6 @@ void RipStatus::customEvent(QEvent *event)
 void RipStatus::startRip(void)
 {
     delete m_ripperThread;
-    m_ripperThread = new CDRipperThread(this, m_CDdevice, m_tracks, m_quality);
+    m_ripperThread = new CDRipperThread(this, m_cdDevice, m_tracks, m_quality);
     m_ripperThread->start();
 }

@@ -801,12 +801,12 @@ static class SpectrumFactory : public VisFactory
 
 Squares::Squares()
 {
-    m_fake_height = m_number_of_squares * m_analyzerBarWidth;
+    m_fakeHeight = m_numberOfSquares * m_analyzerBarWidth;
 }
 
 void Squares::resize (const QSize &newsize) {
     // Trick the spectrum analyzer into calculating 16 rectangles
-    Spectrum::resize (QSize (m_fake_height, m_fake_height));
+    Spectrum::resize (QSize (m_fakeHeight, m_fakeHeight));
     // We have our own copy, Spectrum has it's own...
     m_actualSize = newsize;
 }
@@ -821,12 +821,12 @@ void Squares::drawRect(QPainter *p, QRect *rect, int i, int c, int w, int h)
     if (i % 2 == 0)
     {
         y = c - h;
-        per = double(m_fake_height - rect->top()) / double(m_fake_height);
+        per = double(m_fakeHeight - rect->top()) / double(m_fakeHeight);
     }
     else
     {
         y = c;
-        per = double(rect->bottom()) / double(m_fake_height);
+        per = double(rect->bottom()) / double(m_fakeHeight);
     }
 
     per = clamp(per, 1.0, 0.0);

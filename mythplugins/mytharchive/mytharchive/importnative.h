@@ -111,24 +111,24 @@ class ImportNative : public MythScreenType
 
     QStringList     m_searchList;
 
-    MythUIText   *m_progTitle_text        {nullptr};
-    MythUIText   *m_progDateTime_text     {nullptr};
-    MythUIText   *m_progDescription_text  {nullptr};
+    MythUIText   *m_progTitleText         {nullptr};
+    MythUIText   *m_progDateTimeText      {nullptr};
+    MythUIText   *m_progDescriptionText   {nullptr};
 
-    MythUIText   *m_chanID_text           {nullptr};
-    MythUIText   *m_chanNo_text           {nullptr};
-    MythUIText   *m_chanName_text         {nullptr};
-    MythUIText   *m_callsign_text         {nullptr};
+    MythUIText   *m_chanIDText            {nullptr};
+    MythUIText   *m_chanNoText            {nullptr};
+    MythUIText   *m_chanNameText          {nullptr};
+    MythUIText   *m_callsignText          {nullptr};
 
-    MythUIText   *m_localChanID_text      {nullptr};
-    MythUIText   *m_localChanNo_text      {nullptr};
-    MythUIText   *m_localChanName_text    {nullptr};
-    MythUIText   *m_localCallsign_text    {nullptr};
+    MythUIText   *m_localChanIDText       {nullptr};
+    MythUIText   *m_localChanNoText       {nullptr};
+    MythUIText   *m_localChanNameText     {nullptr};
+    MythUIText   *m_localCallsignText     {nullptr};
 
-    MythUIButton *m_searchChanID_button   {nullptr};
-    MythUIButton *m_searchChanNo_button   {nullptr};
-    MythUIButton *m_searchChanName_button {nullptr};
-    MythUIButton *m_searchCallsign_button {nullptr};
+    MythUIButton *m_searchChanIDButton    {nullptr};
+    MythUIButton *m_searchChanNoButton    {nullptr};
+    MythUIButton *m_searchChanNameButton  {nullptr};
+    MythUIButton *m_searchCallsignButton  {nullptr};
 
     MythUIButton *m_finishButton          {nullptr};
     MythUIButton *m_prevButton            {nullptr};

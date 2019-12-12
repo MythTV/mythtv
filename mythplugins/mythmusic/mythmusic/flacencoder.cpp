@@ -44,8 +44,8 @@ FlacEncoder::FlacEncoder(const QString &outfile, int qualitylevel,
     int max_residual_partition_order = 3;
     int rice_parameter_search_dist = 0;
 
-    encoder = encoder_new();
-    encoder_setup(encoder, streamable_subset,
+    m_encoder = encoder_new();
+    encoder_setup(m_encoder, streamable_subset,
                   do_mid_side, loose_mid_side,
                   NUM_CHANNELS, bits_per_sample,
                   sample_rate, blocksize,
@@ -59,14 +59,14 @@ FlacEncoder::FlacEncoder(const QString &outfile, int qualitylevel,
     QByteArray ofile = outfile.toLocal8Bit();
 #if !defined(NEWFLAC)
     /* FLAC 1.0.4 to 1.1.2 */
-    FLAC__file_encoder_set_filename(encoder, ofile.constData());
+    FLAC__file_encoder_set_filename(m_encoder, ofile.constData());
 
-    int ret = FLAC__file_encoder_init(encoder);
+    int ret = FLAC__file_encoder_init(m_encoder);
     if (ret != FLAC__FILE_ENCODER_OK)
 #else
     /* FLAC 1.1.3 and up */
     int ret = FLAC__stream_encoder_init_file(
-        encoder, ofile.constData(), nullptr, nullptr);
+        m_encoder, ofile.constData(), nullptr, nullptr);
     if (ret != FLAC__STREAM_ENCODER_INIT_STATUS_OK)
 #endif
     {
@@ -77,20 +77,20 @@ FlacEncoder::FlacEncoder(const QString &outfile, int qualitylevel,
 
     for (int i = 0; i < NUM_CHANNELS; i++)
         for (int j = 0; j < MAX_SAMPLES; j++)
-            inputin[i][j] = 0;
+            m_inputIn[i][j] = 0;
 
     for (int i = 0; i < NUM_CHANNELS; i++)
-        input[i] = &(inputin[i][0]);
+        m_input[i] = &(m_inputIn[i][0]);
 }
 
 FlacEncoder::~FlacEncoder()
 {
     FlacEncoder::addSamples(nullptr, 0); // flush buffer
 
-    if (encoder)
+    if (m_encoder)
     {
-        encoder_finish(encoder);
-        encoder_delete(encoder);
+        encoder_finish(m_encoder);
+        encoder_delete(m_encoder);
     }
 
     if (m_metadata)
@@ -104,23 +104,24 @@ int FlacEncoder::addSamples(int16_t *bytes, unsigned int length)
     length /= sizeof(int16_t);
 
     do {
-        while (bytes && index < length && sampleindex < MAX_SAMPLES) 
+        while (bytes && index < length && m_sampleIndex < MAX_SAMPLES)
         {
-            input[0][sampleindex] = (FLAC__int32)(bytes[index++]);
-            input[1][sampleindex] = (FLAC__int32)(bytes[index++]);
-            sampleindex += 1;
+            m_input[0][m_sampleIndex] = (FLAC__int32)(bytes[index++]);
+            m_input[1][m_sampleIndex] = (FLAC__int32)(bytes[index++]);
+            m_sampleIndex += 1;
         }
 
-        if(sampleindex == MAX_SAMPLES || (length == 0 && sampleindex > 0) ) 
+        if(m_sampleIndex == MAX_SAMPLES || (length == 0 && m_sampleIndex > 0) ) 
         {
-            if (!encoder_process(encoder, (const FLAC__int32 * const *) input,
-                                 sampleindex))
+            if (!encoder_process(m_encoder,
+                                 (const FLAC__int32 * const *) m_input,
+                                 m_sampleIndex))
             {
                 LOG(VB_GENERAL, LOG_ERR,
                     QString("Failed to write flac data. Aborting."));
                 return EENCODEERROR;
             }
-            sampleindex = 0;
+            m_sampleIndex = 0;
         }
     } while (index < length);
 

@@ -45,16 +45,16 @@ private:
     unsigned int   m_y              {0};
     unsigned int   m_width          {800};
     unsigned int   m_height         {600};
-    unsigned int   m_phongrad       {800};
+    unsigned int   m_phongRad       {800};
 
-    bool           m_color_cycle    {true};
-    bool           m_moving_light   {true};
+    bool           m_colorCycle     {true};
+    bool           m_movingLight    {true};
     //bool         m_diamond        {true};
 
     int            m_bpl            {0};
 
-    vector<vector<unsigned char> > m_phongdat;
-    unsigned char *m_rgb_buf        {nullptr};
+    vector<vector<unsigned char> > m_phongDat;
+    unsigned char *m_rgbBuf         {nullptr};
     double         m_intense1[256];
     double         m_intense2[256];
 
@@ -65,8 +65,8 @@ private:
     int            m_iyd            {0};
     int            m_ilx            {0};
     int            m_ily            {0};
-    int            m_was_moving     {0};
-    int            m_was_color      {0};
+    int            m_wasMoving      {0};
+    int            m_wasColor       {0};
     double         m_ih             {0.0};
     double         m_is             {0.0};
     double         m_iv             {0.0};

@@ -58,7 +58,6 @@ class GlobalSetup : public MythScreenType
     MythUICheckBox *m_backgroundCheckbox {nullptr};
     MythUISpinBox  *m_timeoutSpinbox     {nullptr};
     int             m_timeout            {0};
-    int             m_hold_timeout       {0};
     MythUIButton   *m_finishButton       {nullptr};
 };
 

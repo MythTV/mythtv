@@ -23,7 +23,7 @@ Weather::Weather(MythScreenStack *parent, const QString &name, SourceManager *sr
     : MythScreenType(parent, name),
       m_weatherStack(new MythScreenStack(GetMythMainWindow(), "weather stack")),
       m_nextpageInterval(gCoreContext->GetNumSetting("weatherTimeout", 10)),
-      m_nextpage_Timer(new QTimer(this))
+      m_nextPageTimer(new QTimer(this))
 {
     if (!srcMan)
     {
@@ -42,7 +42,7 @@ Weather::Weather(MythScreenStack *parent, const QString &name, SourceManager *sr
         m_createdSrcMan = false;
     }
 
-    connect(m_nextpage_Timer, SIGNAL(timeout()), SLOT(nextpage_timeout()) );
+    connect(m_nextPageTimer, SIGNAL(timeout()), SLOT(nextpage_timeout()) );
 
     m_allScreens = loadScreens();
 }
@@ -94,7 +94,7 @@ void Weather::clearScreens()
 {
     m_currScreen = nullptr;
 
-    m_cur_screen = 0;
+    m_curScreenNum = 0;
     while (!m_screens.empty())
     {
         WeatherScreen *screen = m_screens.back();
@@ -191,7 +191,7 @@ bool Weather::SetupScreens()
         {
             // We rejected every screen...  sit on this and rotate.
             LOG(VB_GENERAL, LOG_ERR, "No weather screens left, aborting.");
-            m_nextpage_Timer->stop();
+            m_nextPageTimer->stop();
             if( m_updatedText )
             {
                 m_updatedText->SetText(tr("None of the configured screens are complete in this theme (missing copyright information)."));
@@ -210,11 +210,11 @@ bool Weather::SetupScreens()
 
 void Weather::screenReady(WeatherScreen *ws)
 {
-    if (m_firstRun && !m_screens.empty() && ws == m_screens[m_cur_screen])
+    if (m_firstRun && !m_screens.empty() && ws == m_screens[m_curScreenNum])
     {
         m_firstRun = false;
         showScreen(ws);
-        m_nextpage_Timer->start(1000 * m_nextpageInterval);
+        m_nextPageTimer->start(1000 * m_nextpageInterval);
     }
     disconnect(ws, SIGNAL(screenReady(WeatherScreen *)), this,
                SLOT(screenReady(WeatherScreen *)));
@@ -225,8 +225,8 @@ WeatherScreen *Weather::nextScreen(void)
     if (m_screens.empty())
         return nullptr;
 
-    m_cur_screen = (m_cur_screen + 1) % m_screens.size();
-    return m_screens[m_cur_screen];
+    m_curScreenNum = (m_curScreenNum + 1) % m_screens.size();
+    return m_screens[m_curScreenNum];
 }
 
 WeatherScreen *Weather::prevScreen(void)
@@ -234,9 +234,9 @@ WeatherScreen *Weather::prevScreen(void)
     if (m_screens.empty())
         return nullptr;
 
-    m_cur_screen = (m_cur_screen < 0) ? 0 : m_cur_screen;
-    m_cur_screen = (m_cur_screen + m_screens.size() - 1) % m_screens.size();
-    return m_screens[m_cur_screen];
+    m_curScreenNum = (m_curScreenNum < 0) ? 0 : m_curScreenNum;
+    m_curScreenNum = (m_curScreenNum + m_screens.size() - 1) % m_screens.size();
+    return m_screens[m_curScreenNum];
 }
 
 bool Weather::keyPressEvent(QKeyEvent *event)
@@ -266,7 +266,7 @@ bool Weather::keyPressEvent(QKeyEvent *event)
         }
         else if (action == "ESCAPE")
         {
-            m_nextpage_Timer->stop();
+            m_nextPageTimer->stop();
             hideScreen();
             Close();
         }
@@ -301,10 +301,10 @@ void Weather::hideScreen()
 
 void Weather::holdPage()
 {
-    if (!m_nextpage_Timer->isActive())
-        m_nextpage_Timer->start(1000 * m_nextpageInterval);
+    if (!m_nextPageTimer->isActive())
+        m_nextPageTimer->start(1000 * m_nextpageInterval);
     else
-        m_nextpage_Timer->stop();
+        m_nextPageTimer->stop();
 
     m_paused = !m_paused;
 
@@ -320,7 +320,7 @@ void Weather::holdPage()
 void Weather::setupPage()
 {
     m_srcMan->stopTimers();
-    m_nextpage_Timer->stop();
+    m_nextPageTimer->stop();
     m_srcMan->clearSources();
     m_srcMan->findScripts();
 
@@ -351,7 +351,7 @@ void Weather::cursorRight()
         hideScreen();
         showScreen(ws);
         if (!m_paused)
-            m_nextpage_Timer->start(1000 * m_nextpageInterval);
+            m_nextPageTimer->start(1000 * m_nextpageInterval);
     }
 }
 
@@ -363,7 +363,7 @@ void Weather::cursorLeft()
         hideScreen();
         showScreen(ws);
         if (!m_paused)
-            m_nextpage_Timer->start(1000 * m_nextpageInterval);
+            m_nextPageTimer->start(1000 * m_nextpageInterval);
     }
 }
 
@@ -379,7 +379,7 @@ void Weather::nextpage_timeout()
     else
         LOG(VB_GENERAL, LOG_ERR, "Next screen not ready");
 
-    m_nextpage_Timer->start(1000 * m_nextpageInterval);
+    m_nextPageTimer->start(1000 * m_nextpageInterval);
 }
 
 /*

@@ -222,8 +222,8 @@ class Squares : public Spectrum
   private:
     void drawRect(QPainter *p, QRect *rect, int i, int c, int w, int h);
     QSize m_actualSize        {0,0};
-    int   m_fake_height       {0};
-    int   m_number_of_squares {16};
+    int   m_fakeHeight        {0};
+    int   m_numberOfSquares   {16};
 };
 
 #endif // FFTW3_SUPPORT

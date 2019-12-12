@@ -76,7 +76,7 @@ class CDRipperThread: public MThread
 
         RipStatus         *m_parent           {nullptr};
         bool               m_quit             {false};
-        QString            m_CDdevice;
+        QString            m_cdDevice;
         int                m_quality;
         QVector<RipTrack*> *m_tracks          {nullptr};
 
@@ -167,12 +167,15 @@ class Ripper : public MythScreenType
 
     QVector<RipTrack*> *m_tracks             {nullptr};
 
-    QString            m_albumName, m_artistName, m_genreName, m_year;
+    QString            m_albumName;
+    QString            m_artistName;
+    QString            m_genreName;
+    QString            m_year;
     QStringList        m_searchList;
     bool               m_somethingwasripped  {false};
     bool               m_mediaMonitorActive  {false};
 
-    QString            m_CDdevice;
+    QString            m_cdDevice;
 
     CDEjectorThread   *m_ejectThread         {nullptr};
     CDScannerThread   *m_scanThread          {nullptr};
@@ -213,7 +216,7 @@ class RipStatus : public MythScreenType
     RipStatus(MythScreenStack *parent, const QString &device,
               QVector<RipTrack*> *tracks, int quality)
         : MythScreenType(parent, "ripstatus"), m_tracks(tracks),
-          m_quality(quality), m_CDdevice(device) {}
+          m_quality(quality), m_cdDevice(device) {}
     ~RipStatus(void);
 
     bool Create(void) override; // MythScreenType
@@ -230,7 +233,7 @@ class RipStatus : public MythScreenType
 
     QVector<RipTrack*> *m_tracks         {nullptr};
     int                m_quality;
-    QString            m_CDdevice;
+    QString            m_cdDevice;
 
     MythUIText        *m_overallText     {nullptr};
     MythUIText        *m_trackText       {nullptr};

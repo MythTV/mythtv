@@ -217,23 +217,23 @@ class MONITOR
     int            m_enabled            {0};
     string         m_device             {""};
     string         m_host               {""};
-    int            m_image_buffer_count {0};
+    int            m_imageBufferCount   {0};
     int            m_width              {0};
     int            m_height             {0};
-    int            m_bytes_per_pixel    {3};
-    int            m_mon_id             {0};
-    unsigned char *m_shared_images      {nullptr};
-    int            m_last_read          {0};
+    int            m_bytesPerPixel      {3};
+    int            m_monId              {0};
+    unsigned char *m_sharedImages       {nullptr};
+    int            m_lastRead           {0};
     string         m_status             {""};
     int            m_palette            {0};
     int            m_controllable       {0};
     int            m_trackMotion        {0};
     int            m_mapFile            {-1};
-    void          *m_shm_ptr            {nullptr};
+    void          *m_shmPtr             {nullptr};
   private:
-    SharedData    *m_shared_data        {nullptr};
-    SharedData26  *m_shared_data26      {nullptr};
-    SharedData32  *m_shared_data32      {nullptr};
+    SharedData    *m_sharedData         {nullptr};
+    SharedData26  *m_sharedData26       {nullptr};
+    SharedData32  *m_sharedData32       {nullptr};
     string         m_id                 {""};
 };
 

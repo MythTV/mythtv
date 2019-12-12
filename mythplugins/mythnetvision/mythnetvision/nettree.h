@@ -123,9 +123,9 @@ class NetTree : public NetBase
     void customEvent(QEvent *levent) override; // NetBase
 
   protected:
-    static const QString RSSNode;
-    static const QString SearchNode;
-    static const QString DownloadNode;
+    static const QString kRSSNode;
+    static const QString kSearchNode;
+    static const QString kDownloadNode;
 };
 
 #endif
