@@ -4283,12 +4283,11 @@ bool MythPlayer::HasTVChainNext(void) const
  *  \param vh        [out] Height of buffer returned
  *  \param ar        [out] Aspect of buffer returned
  */
-char *MythPlayer::GetScreenGrab(int secondsin, int &bufflen,
-                                int &vw, int &vh, float &ar)
+char *MythPlayer::GetScreenGrab(int SecondsIn, int &BufferSize,
+                                int &FrameWidth, int &FrameHeight, float &AspectRatio)
 {
-    auto frameNum = (long long)(secondsin * m_videoFrameRate);
-
-    return GetScreenGrabAtFrame(frameNum, false, bufflen, vw, vh, ar);
+    auto frameNum = static_cast<uint64_t>(SecondsIn * m_videoFrameRate);
+    return GetScreenGrabAtFrame(frameNum, false, BufferSize, FrameWidth, FrameHeight, AspectRatio);
 }
 
 /**
@@ -4307,22 +4306,13 @@ char *MythPlayer::GetScreenGrab(int secondsin, int &bufflen,
  *  \param vh        [out] Height of buffer returned
  *  \param ar        [out] Aspect of buffer returned
  */
-char *MythPlayer::GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
-                                       int &bufflen, int &vw, int &vh,
-                                       float &ar)
+char *MythPlayer::GetScreenGrabAtFrame(uint64_t FrameNum, bool Absolute,
+                                       int &BufferSize, int &FrameWidth, int &FrameHeight,
+                                       float &AspectRatio)
 {
-    uint64_t       number    = 0;
-    unsigned char *outputbuf = nullptr;
-    VideoFrame    *frame     = nullptr;
-    AVFrame      orig;
-    AVFrame      retbuf;
-    MythAVCopy     copyCtx;
-    memset(&orig,   0, sizeof(AVFrame));
-    memset(&retbuf, 0, sizeof(AVFrame));
-
-    bufflen = 0;
-    vw = vh = 0;
-    ar = 0;
+    BufferSize = 0;
+    FrameWidth = FrameHeight = 0;
+    AspectRatio = 0;
 
     if (OpenFile(0) < 0)
     {
@@ -4337,71 +4327,63 @@ char *MythPlayer::GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
                 .arg(m_videoDim.width()).arg(m_videoDim.height()));
 
         // This is probably an audio file, just return a grey frame.
-        vw = 640;
-        vh = 480;
-        ar = 4.0F / 3.0F;
+        FrameWidth = 640;
+        FrameHeight = 480;
+        AspectRatio = 4.0F / 3.0F;
 
-        bufflen = vw * vh * 4;
-        outputbuf = new unsigned char[bufflen];
-        memset(outputbuf, 0x3f, bufflen * sizeof(unsigned char));
-        return (char*) outputbuf;
+        BufferSize = FrameWidth * FrameHeight * 4;
+        char* result = new char[BufferSize];
+        memset(result, 0x3f, static_cast<size_t>(BufferSize) * sizeof(char));
+        return result;
     }
 
     if (!InitVideo())
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            "Unable to initialize video for screen grab.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Unable to initialize video for screen grab.");
         return nullptr;
     }
 
     ClearAfterSeek();
     if (!m_decoderThread)
         DecoderStart(true /*start paused*/);
-    SeekForScreenGrab(number, frameNum, absolute);
+    uint64_t dummy = 0;
+    SeekForScreenGrab(dummy, FrameNum, Absolute);
     int tries = 0;
     while (!m_videoOutput->ValidVideoFrames() && ((tries++) < 500))
     {
         m_decodeOneFrame = true;
         usleep(10000);
         if ((tries & 10) == 10)
-            LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                "ScreenGrab: Waited 100ms for video frame");
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + "ScreenGrab: Waited 100ms for video frame");
     }
 
+    VideoFrame *frame = nullptr;
     if (!(frame = m_videoOutput->GetLastDecodedFrame()))
-    {
         return nullptr;
-    }
+    if (!frame->buf)
+        return nullptr;
 
-    while (true)
+    if (frame->interlaced_frame)
     {
-        if (!frame->buf)
-        {
-            break;
-        }
-
-        AVPictureFill(&orig, frame);
-        float par = frame->aspect * m_videoDim.height() / m_videoDim.width();
-        MythPictureDeinterlacer deinterlacer(AV_PIX_FMT_YUV420P,
-                                             m_videoDim.width(), m_videoDim.height(),
-                                             par);
-        if (deinterlacer.DeinterlaceSingle(&orig, &orig) < 0)
-        {
-            break;
-        }
-
-        outputbuf = CreateBuffer(FMT_RGB32, m_videoDim.width(), m_videoDim.height());
-        copyCtx.Copy(&retbuf, frame, outputbuf, AV_PIX_FMT_RGB32);
-        vw = m_videoDispDim.width();
-        vh = m_videoDispDim.height();
-        ar = frame->aspect;
-        break;
+        // Use medium quality - which is currently yadif
+        frame->deinterlace_double = DEINT_NONE;
+        frame->deinterlace_allowed = frame->deinterlace_single = DEINT_CPU | DEINT_MEDIUM;
+        MythDeinterlacer deinterlacer;
+        deinterlacer.Filter(frame, kScan_Interlaced, true);
     }
+    unsigned char *result = CreateBuffer(FMT_RGB32, m_videoDim.width(), m_videoDim.height());
+    MythAVCopy copyCtx;
+    AVFrame retbuf;
+    memset(&retbuf, 0, sizeof(AVFrame));
+    copyCtx.Copy(&retbuf, frame, result, AV_PIX_FMT_RGB32);
+    FrameWidth = m_videoDispDim.width();
+    FrameHeight = m_videoDispDim.height();
+    AspectRatio = frame->aspect;
+
     if (frame)
-    {
         DiscardVideoFrame(frame);
-    }
-    return reinterpret_cast<char*>(outputbuf);
+
+    return reinterpret_cast<char*>(result);
 }
 
 void MythPlayer::SeekForScreenGrab(uint64_t &number, uint64_t frameNum,

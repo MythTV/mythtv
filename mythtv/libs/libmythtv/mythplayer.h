@@ -244,10 +244,10 @@ class MTV_PUBLIC MythPlayer
     bool    IsWatchingInprogress(void) const;
 
     // Non-const gets
-    virtual char *GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
-                                       int &bufflen, int &vw, int &vh, float &ar);
-    virtual char *GetScreenGrab(int secondsin, int &bufflen,
-                                int &vw, int &vh, float &ar);
+    virtual char *GetScreenGrabAtFrame(uint64_t FrameNum, bool Absolute, int &BufferSize,
+                                       int &FrameWidth, int &FrameHeight, float &AspectRatio);
+    virtual char *GetScreenGrab(int SecondsIn, int &BufferSize, int &FrameWidth,
+                                int &FrameHeight, float &AspectRatio);
     InteractiveTV *GetInteractiveTV(void);
     MythVideoOutput *GetVideoOutput(void)       { return m_videoOutput; }
     MythCodecContext *GetMythCodecContext(void) { return m_decoder->GetMythCodecContext(); }
