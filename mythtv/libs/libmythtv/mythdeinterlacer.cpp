@@ -45,8 +45,11 @@ MythDeinterlacer::~MythDeinterlacer()
  *
  * libavilter's must be recreated if any parameter is changed as there is no method
  * to select the field 'on the fly'.
+ *
+ * \param Force Set to true to ensure a deinterlaced frame is always returned.
+ * Used for preview images.
 */
-void MythDeinterlacer::Filter(VideoFrame *Frame, FrameScanType Scan)
+void MythDeinterlacer::Filter(VideoFrame *Frame, FrameScanType Scan, bool Force)
 {
     // nothing to see here
     if (!Frame || (Scan != kScan_Interlaced && Scan != kScan_Intr2ndField))
@@ -213,14 +216,21 @@ void MythDeinterlacer::Filter(VideoFrame *Frame, FrameScanType Scan)
     m_frame->format = Frame->pix_fmt;
     m_frame->pts    = Frame->timecode;
 
+    auto AddFrame = [](AVFilterContext* Source, AVFrame *AvFrame)
+        { return av_buffersrc_add_frame(Source, AvFrame); };
+
     // Add frame on first pass only
     if (kScan_Interlaced == Scan)
     {
-        if (av_buffersrc_add_frame(m_source, m_frame) < 0)
+        if (AddFrame(m_source, m_frame) < 0)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Error adding frame");
             return;
         }
+        // Both yadif and bwdif need 2 frames to work with - add the frame
+        // again if we need a result now
+        if (Force)
+            AddFrame(m_source, m_frame);
     }
 
     // Retrieve frame
