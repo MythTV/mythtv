@@ -701,9 +701,9 @@ TemplateFinder::TemplateFinder(PGMConverter *pgmc, BorderDetector *bd,
     : m_pgmConverter(pgmc)
     , m_borderDetector(bd)
     , m_edgeDetector(ed)
-    , m_debugdir(debugdir)
-    , m_debugdata(debugdir + "/TemplateFinder.txt")
-    , m_debugtmpl(debugdir + "/TemplateFinder.pgm")
+    , m_debugDir(debugdir)
+    , m_debugData(debugdir + "/TemplateFinder.txt")
+    , m_debugTmpl(debugdir + "/TemplateFinder.pgm")
 {
     /*
      * TUNABLE:
@@ -747,20 +747,20 @@ TemplateFinder::TemplateFinder(PGMConverter *pgmc, BorderDetector *bd,
 
     if (m_debugLevel >= 1)
     {
-        createDebugDirectory(m_debugdir,
+        createDebugDirectory(m_debugDir,
             QString("TemplateFinder debugLevel %1").arg(m_debugLevel));
 
-        m_debug_template = true;
-        m_debug_edgecounts = true;
+        m_debugTemplate = true;
+        m_debugEdgeCounts = true;
 
         if (m_debugLevel >= 3)
-            m_debug_frames = true;
+            m_debugFrames = true;
     }
 }
 
 TemplateFinder::~TemplateFinder(void)
 {
-    delete []scores;
+    delete []m_scores;
     av_freep(&m_tmpl.data[0]);
     av_freep(&m_cropped.data[0]);
 }
@@ -786,19 +786,19 @@ TemplateFinder::MythPlayerInited(MythPlayer *player, long long nframes)
     m_height = buf_dim.height();
     playerdims = QString("%1x%2").arg(m_width).arg(m_height);
 
-    if (m_debug_template)
+    if (m_debugTemplate)
     {
-        if ((m_tmpl_done = readTemplate(m_debugdata, &m_tmplrow, &m_tmplcol,
-                        &m_tmplwidth, &m_tmplheight, m_debugtmpl, &m_tmpl,
-                        &m_tmpl_valid)))
+        if ((m_tmplDone = readTemplate(m_debugData, &m_tmplRow, &m_tmplCol,
+                        &m_tmplWidth, &m_tmplHeight, m_debugTmpl, &m_tmpl,
+                        &m_tmplValid)))
         {
-            tmpldims = m_tmpl_valid ? QString("%1x%2@(%3,%4)")
-                .arg(m_tmplwidth).arg(m_tmplheight).arg(m_tmplcol).arg(m_tmplrow) :
+            tmpldims = m_tmplValid ? QString("%1x%2@(%3,%4)")
+                .arg(m_tmplWidth).arg(m_tmplHeight).arg(m_tmplCol).arg(m_tmplRow) :
                     "no template";
 
             LOG(VB_COMMFLAG, LOG_INFO,
                 QString("TemplateFinder::MythPlayerInited read %1: %2")
-                    .arg(m_debugtmpl)
+                    .arg(m_debugTmpl)
                     .arg(tmpldims));
         }
     }
@@ -809,13 +809,13 @@ TemplateFinder::MythPlayerInited(MythPlayer *player, long long nframes)
     if (m_borderDetector->MythPlayerInited(player))
         goto free_tmpl;
 
-    if (m_tmpl_done)
+    if (m_tmplDone)
     {
-        if (m_tmpl_valid)
+        if (m_tmplValid)
         {
             LOG(VB_COMMFLAG, LOG_INFO,
                 QString("TemplateFinder::MythPlayerInited %1 of %2 (%3)")
-                    .arg(tmpldims).arg(playerdims).arg(m_debugtmpl));
+                    .arg(tmpldims).arg(playerdims).arg(m_debugTmpl));
         }
         return ANALYZE_FINISHED;
     }
@@ -823,7 +823,7 @@ TemplateFinder::MythPlayerInited(MythPlayer *player, long long nframes)
     LOG(VB_COMMFLAG, LOG_INFO,
         QString("TemplateFinder::MythPlayerInited framesize %1")
             .arg(playerdims));
-    scores = new unsigned int[m_width * m_height];
+    m_scores = new unsigned int[m_width * m_height];
 
     return ANALYZE_OK;
 
@@ -919,14 +919,14 @@ TemplateFinder::analyzeFrame(const VideoFrame *frame, long long frameno,
 
         (void)gettimeofday(&start, nullptr);
 
-        if (croprow < mincontentrow)
-            mincontentrow = croprow;
-        if (cropcol < mincontentcol)
-            mincontentcol = cropcol;
-        if (cropcol + cropwidth > maxcontentcol1)
-            maxcontentcol1 = cropcol + cropwidth;
-        if (croprow + cropheight > maxcontentrow1)
-            maxcontentrow1 = croprow + cropheight;
+        if (croprow < m_minContentRow)
+            m_minContentRow = croprow;
+        if (cropcol < m_minContentCol)
+            m_minContentCol = cropcol;
+        if (cropcol + cropwidth > m_maxContentCol1)
+            m_maxContentCol1 = cropcol + cropwidth;
+        if (croprow + cropheight > m_maxContentRow1)
+            m_maxContentRow1 = croprow + cropheight;
 
         if (resetBuffers(cropwidth, cropheight))
             goto error;
@@ -951,20 +951,20 @@ TemplateFinder::analyzeFrame(const VideoFrame *frame, long long frameno,
         if (edges == nullptr)
             goto error;
 
-        if (pgm_scorepixels(scores, pgmwidth, croprow, cropcol,
+        if (pgm_scorepixels(m_scores, pgmwidth, croprow, cropcol,
                     edges, cropheight))
             goto error;
 
         if (m_debugLevel >= 2)
         {
             if (!analyzeFrameDebug(frameno, pgm, pgmheight, &m_cropped, edges,
-                        cropheight, croprow, cropcol, m_debug_frames, m_debugdir))
+                        cropheight, croprow, cropcol, m_debugFrames, m_debugDir))
                 goto error;
         }
 
         (void)gettimeofday(&end, nullptr);
         timersub(&end, &start, &elapsed);
-        timeradd(&m_analyze_time, &elapsed, &m_analyze_time);
+        timeradd(&m_analyzeTime, &elapsed, &m_analyzeTime);
     }
 
     if (m_nextFrame > m_endFrame)
@@ -987,36 +987,36 @@ int
 TemplateFinder::finished(long long nframes, bool final)
 {
     (void)nframes;  /* gcc */
-    if (!m_tmpl_done)
+    if (!m_tmplDone)
     {
-        if (!template_alloc(scores, m_width, m_height,
-                    mincontentrow, mincontentcol,
-                    maxcontentrow1, maxcontentcol1,
-                    &m_tmpl, &m_tmplrow, &m_tmplcol, &m_tmplwidth, &m_tmplheight,
-                    m_debug_edgecounts, m_debugdir))
+        if (!template_alloc(m_scores, m_width, m_height,
+                    m_minContentRow, m_minContentCol,
+                    m_maxContentRow1, m_maxContentCol1,
+                    &m_tmpl, &m_tmplRow, &m_tmplCol, &m_tmplWidth, &m_tmplHeight,
+                    m_debugEdgeCounts, m_debugDir))
         {
             if (final)
-                writeDummyTemplate(m_debugdata);
+                writeDummyTemplate(m_debugData);
         }
         else
         {
-            if (final && m_debug_template)
+            if (final && m_debugTemplate)
             {
-                if (!(m_tmpl_valid = writeTemplate(m_debugtmpl, &m_tmpl, m_debugdata,
-                                m_tmplrow, m_tmplcol, m_tmplwidth, m_tmplheight)))
+                if (!(m_tmplValid = writeTemplate(m_debugTmpl, &m_tmpl, m_debugData,
+                                m_tmplRow, m_tmplCol, m_tmplWidth, m_tmplHeight)))
                     goto free_tmpl;
 
                 LOG(VB_COMMFLAG, LOG_INFO,
                     QString("TemplateFinder::finished wrote %1"
                             " and %2 [%3x%4@(%5,%6)]")
-                        .arg(m_debugtmpl).arg(m_debugdata)
-                        .arg(m_tmplwidth).arg(m_tmplheight)
-                        .arg(m_tmplcol).arg(m_tmplrow));
+                        .arg(m_debugTmpl).arg(m_debugData)
+                        .arg(m_tmplWidth).arg(m_tmplHeight)
+                        .arg(m_tmplCol).arg(m_tmplRow));
             }
         }
 
         if (final)
-            m_tmpl_done = true;
+            m_tmplDone = true;
     }
 
     m_borderDetector->setLogoState(this);
@@ -1038,7 +1038,7 @@ TemplateFinder::reportTime(void) const
         return -1;
 
     LOG(VB_COMMFLAG, LOG_INFO, QString("TF Time: analyze=%1s")
-            .arg(strftimeval(&m_analyze_time)));
+            .arg(strftimeval(&m_analyzeTime)));
     return 0;
 }
 
@@ -1046,12 +1046,12 @@ const struct AVFrame *
 TemplateFinder::getTemplate(int *prow, int *pcol, int *pwidth, int *pheight)
     const
 {
-    if (m_tmpl_valid)
+    if (m_tmplValid)
     {
-        *prow = m_tmplrow;
-        *pcol = m_tmplcol;
-        *pwidth = m_tmplwidth;
-        *pheight = m_tmplheight;
+        *prow = m_tmplRow;
+        *pcol = m_tmplCol;
+        *pwidth = m_tmplWidth;
+        *pheight = m_tmplHeight;
         return &m_tmpl;
     }
     return nullptr;

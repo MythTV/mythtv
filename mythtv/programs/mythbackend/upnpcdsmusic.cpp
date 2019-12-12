@@ -61,9 +61,9 @@ UPnpCDSMusic::UPnpCDSMusic()
 {
     QString sServerIp   = gCoreContext->GetBackendServerIP();
     int sPort           = gCoreContext->GetBackendStatusPort();
-    m_URIBase.setScheme("http");
-    m_URIBase.setHost(sServerIp);
-    m_URIBase.setPort(sPort);
+    m_uriBase.setScheme("http");
+    m_uriBase.setHost(sServerIp);
+    m_uriBase.setPort(sPort);
 
     // ShortCuts
     m_shortcuts.insert(UPnPShortcutFeature::MUSIC, "Music");
@@ -367,7 +367,7 @@ bool UPnpCDSMusic::LoadChildren(const UPnpCDSRequest* pRequest,
 
 void UPnpCDSMusic::PopulateArtworkURIS(CDSObject* pItem, int nSongID)
 {
-    QUrl artURI = m_URIBase;
+    QUrl artURI = m_uriBase;
     artURI.setPath("/Content/GetAlbumArt");
     QUrlQuery artQuery;
     artQuery.addQueryItem("Id", QString::number(nSongID));
@@ -801,7 +801,7 @@ bool UPnpCDSMusic::LoadTracks(const UPnpCDSRequest *pRequest,
 
         QFileInfo fInfo( sFileName );
 
-        QUrl    resURI    = m_URIBase;
+        QUrl    resURI    = m_uriBase;
         QUrlQuery resQuery;
         resURI.setPath("/Content/GetMusic");
         resQuery.addQueryItem("Id", QString::number(nId));

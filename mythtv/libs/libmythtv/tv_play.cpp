@@ -3765,10 +3765,10 @@ QList<QKeyEvent> TV::ConvertScreenPressKeyMap(const QString &keyList)
             keyPressList.append(keyEvent);
         }
     }
-    if (stringKeyList.count() < s_screenPressRegionCount)
+    if (stringKeyList.count() < kScreenPressRegionCount)
     {
         // add default remainders
-        for(; i < s_screenPressRegionCount; i++)
+        for(; i < kScreenPressRegionCount; i++)
         {
             QKeyEvent keyEvent(QEvent::None, Qt::Key_Escape, Qt::NoModifier);
             keyPressList.append(keyEvent);

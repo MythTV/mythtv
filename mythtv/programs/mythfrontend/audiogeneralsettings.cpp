@@ -110,7 +110,7 @@ AudioConfigSettings::AudioConfigSettings()
 {
     setLabel(tr("Audio System"));
 
-    addChild((m_OutputDevice = new AudioDeviceComboBox(this)));
+    addChild((m_outputDevice = new AudioDeviceComboBox(this)));
         // Rescan button
 
     auto *rescan = new ButtonStandardSetting("rescan");
@@ -124,16 +124,16 @@ AudioConfigSettings::AudioConfigSettings()
     // digital settings
     m_triggerDigital = new GroupSetting();
     m_triggerDigital->setLabel(tr("Digital Audio Capabilities"));
-    m_triggerDigital->addChild(m_AC3PassThrough = AC3PassThrough());
-    m_triggerDigital->addChild(m_DTSPassThrough = DTSPassThrough());
-    m_triggerDigital->addChild(m_EAC3PassThrough = EAC3PassThrough());
-    m_triggerDigital->addChild(m_TrueHDPassThrough = TrueHDPassThrough());
-    m_triggerDigital->addChild(m_DTSHDPassThrough = DTSHDPassThrough());
+    m_triggerDigital->addChild(m_ac3PassThrough = AC3PassThrough());
+    m_triggerDigital->addChild(m_dtsPassThrough = DTSPassThrough());
+    m_triggerDigital->addChild(m_eac3PassThrough = EAC3PassThrough());
+    m_triggerDigital->addChild(m_trueHDPassThrough = TrueHDPassThrough());
+    m_triggerDigital->addChild(m_dtsHDPassThrough = DTSHDPassThrough());
     addChild(m_triggerDigital);
 
-    addChild((m_MaxAudioChannels = MaxAudioChannels()));
-    addChild((m_AudioUpmix = AudioUpmix()));
-    addChild((m_AudioUpmixType = AudioUpmixType()));
+    addChild((m_maxAudioChannels = MaxAudioChannels()));
+    addChild((m_audioUpmix = AudioUpmix()));
+    addChild((m_audioUpmixType = AudioUpmixType()));
     addChild(MythControlsVolume());
 
     //Advanced Settings
@@ -142,13 +142,13 @@ AudioConfigSettings::AudioConfigSettings()
     advancedSettings->setHelpText(tr("Enable extra audio settings. Under most "
                                      "usage all options should be left alone"));
     addChild(advancedSettings);
-    m_PassThroughOverride = PassThroughOverride();
-    advancedSettings->addChild(m_PassThroughOverride);
-    m_PassThroughDeviceOverride = PassThroughOutputDevice();
-    advancedSettings->addChild(m_PassThroughDeviceOverride);
-    m_PassThroughDeviceOverride->setEnabled(m_PassThroughOverride->boolValue());
-    connect(m_PassThroughOverride, SIGNAL(valueChanged(bool)),
-            m_PassThroughDeviceOverride, SLOT(setEnabled(bool)));
+    m_passThroughOverride = PassThroughOverride();
+    advancedSettings->addChild(m_passThroughOverride);
+    m_passThroughDeviceOverride = PassThroughOutputDevice();
+    advancedSettings->addChild(m_passThroughDeviceOverride);
+    m_passThroughDeviceOverride->setEnabled(m_passThroughOverride->boolValue());
+    connect(m_passThroughOverride, SIGNAL(valueChanged(bool)),
+            m_passThroughDeviceOverride, SLOT(setEnabled(bool)));
 
     StandardSetting *srcqualityoverride = SRCQualityOverride();
     srcqualityoverride->addTargetedChild("1", SRCQuality());
@@ -161,36 +161,36 @@ AudioConfigSettings::AudioConfigSettings()
 
     advancedSettings->addChild(HBRPassthrough());
 
-    advancedSettings->addChild(m_MPCM = MPCM());
+    advancedSettings->addChild(m_mpcm = MPCM());
 
     addChild(m_audioTest = new AudioTest());
 
         // Set slots
-    connect(m_MaxAudioChannels, SIGNAL(valueChanged(StandardSetting *)),
+    connect(m_maxAudioChannels, SIGNAL(valueChanged(StandardSetting *)),
             this, SLOT(UpdateVisibility(StandardSetting *)));
-    connect(m_OutputDevice, SIGNAL(valueChanged(StandardSetting *)),
+    connect(m_outputDevice, SIGNAL(valueChanged(StandardSetting *)),
             this, SLOT(UpdateCapabilities()));
-    connect(m_AC3PassThrough, SIGNAL(valueChanged(StandardSetting *)),
+    connect(m_ac3PassThrough, SIGNAL(valueChanged(StandardSetting *)),
             this, SLOT(UpdateCapabilitiesAC3()));
 
-    connect(m_DTSPassThrough, SIGNAL(valueChanged(StandardSetting *)),
+    connect(m_dtsPassThrough, SIGNAL(valueChanged(StandardSetting *)),
             this, SLOT(UpdateCapabilities()));
-    connect(m_EAC3PassThrough, SIGNAL(valueChanged(StandardSetting *)),
+    connect(m_eac3PassThrough, SIGNAL(valueChanged(StandardSetting *)),
             this, SLOT(UpdateCapabilities()));
-    connect(m_TrueHDPassThrough, SIGNAL(valueChanged(StandardSetting *)),
+    connect(m_trueHDPassThrough, SIGNAL(valueChanged(StandardSetting *)),
             this, SLOT(UpdateCapabilities()));
-    connect(m_DTSHDPassThrough, SIGNAL(valueChanged(StandardSetting *)),
+    connect(m_dtsHDPassThrough, SIGNAL(valueChanged(StandardSetting *)),
             this, SLOT(UpdateCapabilities()));
     //Slot for audio test
-    connect(m_OutputDevice, SIGNAL(valueChanged(StandardSetting *)),
+    connect(m_outputDevice, SIGNAL(valueChanged(StandardSetting *)),
             this, SLOT(UpdateAudioTest()));
-    connect(m_MaxAudioChannels, SIGNAL(valueChanged(StandardSetting *)),
+    connect(m_maxAudioChannels, SIGNAL(valueChanged(StandardSetting *)),
             this, SLOT(UpdateAudioTest()));
 }
 
 void AudioConfigSettings::CheckConfiguration(void)
 {
-    QString name = m_OutputDevice->getValue();
+    QString name = m_outputDevice->getValue();
     AudioOutput::AudioDeviceConfig *adc =
         AudioOutput::GetAudioDeviceConfig(name, name, true);
     if (adc)
@@ -209,7 +209,7 @@ void AudioConfigSettings::CheckConfiguration(void)
 
     if (!CheckPassthrough())
     {
-        QString pt_name = m_PassThroughDeviceOverride->getValue();
+        QString pt_name = m_passThroughDeviceOverride->getValue();
         QString pt_msg = tr("Passthrough device is invalid or not useable. Check "
                          "configuration in Advanced Settings:") +
             pt_name;
@@ -233,41 +233,41 @@ void AudioConfigSettings::Load()
 
 void AudioConfigSettings::AudioRescan()
 {
-    if (!slotlock.tryLock())
+    if (!m_slotLock.tryLock())
         return;
 
     AudioOutput::ADCVect* list = AudioOutput::GetOutputList();
 
-    audiodevs.clear();
+    m_audioDevs.clear();
     for (auto it = list->begin(); it != list->end(); ++it)
-        audiodevs.insert(it->m_name, *it);
+        m_audioDevs.insert(it->m_name, *it);
 
-    devices = *list;
+    m_devices = *list;
     delete list;
 
-    QString name = m_OutputDevice->getValue();
-    if (!audiodevs.contains(name))
+    QString name = m_outputDevice->getValue();
+    if (!m_audioDevs.contains(name))
     {
         // Scan for possible custom entry that isn't in the list
         AudioOutput::AudioDeviceConfig *adc =
             AudioOutput::GetAudioDeviceConfig(name, name, true);
-        audiodevs.insert(name, *adc);
-        devices.append(*adc);
+        m_audioDevs.insert(name, *adc);
+        m_devices.append(*adc);
         delete adc;
     }
-    m_OutputDevice->AudioRescan();
-    slotlock.unlock();
+    m_outputDevice->AudioRescan();
+    m_slotLock.unlock();
     UpdateCapabilities();
 }
 
 void AudioConfigSettings::UpdateVisibility(StandardSetting * /*setting*/)
 {
-    if (!m_MaxAudioChannels || !m_AudioUpmix || !m_AudioUpmixType)
+    if (!m_maxAudioChannels || !m_audioUpmix || !m_audioUpmixType)
         return;
 
-    int cur_speakers = m_MaxAudioChannels->getValue().toInt();
-    m_AudioUpmix->setEnabled(cur_speakers > 2);
-    m_AudioUpmixType->setEnabled(cur_speakers > 2);
+    int cur_speakers = m_maxAudioChannels->getValue().toInt();
+    m_audioUpmix->setEnabled(cur_speakers > 2);
+    m_audioUpmixType->setEnabled(cur_speakers > 2);
 }
 
 AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
@@ -279,8 +279,8 @@ AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
     bool invalid = false;
     QString out;
 
-    if (m_OutputDevice)
-        out = m_OutputDevice->getValue();
+    if (m_outputDevice)
+        out = m_outputDevice->getValue();
 
     if (!out.isEmpty())
     {
@@ -292,12 +292,12 @@ AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
     AudioOutputSettings settingsdigital;
 
         // Test if everything is set yet
-    if (!m_OutputDevice    || !m_MaxAudioChannels   ||
-        !m_AC3PassThrough  || !m_DTSPassThrough     ||
-        !m_EAC3PassThrough || !m_TrueHDPassThrough  || !m_DTSHDPassThrough)
+    if (!m_outputDevice    || !m_maxAudioChannels   ||
+        !m_ac3PassThrough  || !m_dtsPassThrough     ||
+        !m_eac3PassThrough || !m_trueHDPassThrough  || !m_dtsHDPassThrough)
         return settings;
 
-    if (!slotlock.tryLock()) // Doing a rescan of channels
+    if (!m_slotLock.tryLock()) // Doing a rescan of channels
         return settings;
 
     bool bAC3 = true;
@@ -307,26 +307,26 @@ AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
     bool bTRUEHD = true;
     bool bDTSHD = true;
 
-    if (!audiodevs.contains(out))
+    if (!m_audioDevs.contains(out))
     {
         LOG(VB_AUDIO, LOG_ERR, QString("Update not found (%1)").arg(out));
         invalid = true;
     }
     else
     {
-        bool bForceDigital = m_PassThroughOverride->boolValue();
+        bool bForceDigital = m_passThroughOverride->boolValue();
 
-        settings = audiodevs.value(out).m_settings;
+        settings = m_audioDevs.value(out).m_settings;
         settingsdigital = bForceDigital ?
-            audiodevs.value(m_PassThroughDeviceOverride->getValue())
+            m_audioDevs.value(m_passThroughDeviceOverride->getValue())
             .m_settings : settings;
 
         realmax_speakers = max_speakers = settings.BestSupportedChannels();
 
         bAC3  = settingsdigital.canFeature(FEATURE_AC3) &&
-            m_AC3PassThrough->boolValue();
+            m_ac3PassThrough->boolValue();
         //bDTS  = settingsdigital.canFeature(FEATURE_DTS)  &&
-        //    m_DTSPassThrough->boolValue();
+        //    m_dtsPassThrough->boolValue();
         bLPCM = settings.canFeature(FEATURE_LPCM) &&
             !gCoreContext->GetBoolSetting("StereoPCM", false);
         bEAC3 = settingsdigital.canFeature(FEATURE_EAC3) &&
@@ -352,18 +352,18 @@ AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
     m_triggerDigital->setEnabled(invalid || settingsdigital.canFeature(
                                    FEATURE_AC3 | FEATURE_DTS | FEATURE_EAC3 |
                                    FEATURE_TRUEHD | FEATURE_DTSHD));
-    m_EAC3PassThrough->setEnabled(bEAC3);
-    m_TrueHDPassThrough->setEnabled(bTRUEHD);
-    m_DTSHDPassThrough->setEnabled(bDTSHD);
+    m_eac3PassThrough->setEnabled(bEAC3);
+    m_trueHDPassThrough->setEnabled(bTRUEHD);
+    m_dtsHDPassThrough->setEnabled(bDTSHD);
 
-    int cur_speakers = m_MaxAudioChannels->getValue().toInt();
-    if (cur_speakers > m_maxspeakers)
+    int cur_speakers = m_maxAudioChannels->getValue().toInt();
+    if (cur_speakers > m_maxSpeakers)
     {
-        m_maxspeakers = m_MaxAudioChannels->getValue().toInt();
+        m_maxSpeakers = m_maxAudioChannels->getValue().toInt();
     }
     if (restore)
     {
-        cur_speakers = m_maxspeakers;
+        cur_speakers = m_maxSpeakers;
     }
 
     if (cur_speakers > max_speakers)
@@ -373,8 +373,8 @@ AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
     }
 
     // Remove everything and re-add available channels
-    bool chansChanged = m_MaxAudioChannels->haveChanged();
-    m_MaxAudioChannels->clearSelections();
+    bool chansChanged = m_maxAudioChannels->haveChanged();
+    m_maxAudioChannels->clearSelections();
     for (int i = 1; i <= max_speakers; i++)
     {
         if (invalid || settings.IsSupportedChannels(i) ||
@@ -396,11 +396,11 @@ AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
                 default:
                     continue;
             }
-            m_MaxAudioChannels->addSelection(txt, QString::number(i),
+            m_maxAudioChannels->addSelection(txt, QString::number(i),
                                              i == cur_speakers);
         }
     }
-    m_MaxAudioChannels->setChanged(chansChanged);
+    m_maxAudioChannels->setChanged(chansChanged);
 
     setMPCMEnabled(settings.canPassthrough() >= 0);
 
@@ -411,7 +411,7 @@ AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
     settings.setFeature(bAC3, FEATURE_AC3);
     settings.setFeature(bLPCM && realmax_speakers > 2, FEATURE_LPCM);
 
-    slotlock.unlock();
+    m_slotLock.unlock();
     return settings;
 }
 
@@ -539,9 +539,9 @@ bool AudioConfigSettings::CheckPassthrough()
 {
     bool ok = true;
 
-    if (m_PassThroughOverride->boolValue())
+    if (m_passThroughOverride->boolValue())
     {
-        QString name = m_PassThroughDeviceOverride->getValue();
+        QString name = m_passThroughDeviceOverride->getValue();
         AudioOutput::AudioDeviceConfig *adc =
             AudioOutput::GetAudioDeviceConfig(name, name, true);
         if (adc->m_settings.IsInvalid())
@@ -552,8 +552,8 @@ bool AudioConfigSettings::CheckPassthrough()
             ok = false;
         }
         // add it to list of known devices
-        audiodevs.insert(name, *adc);
-        devices.append(*adc);
+        m_audioDevs.insert(name, *adc);
+        m_devices.append(*adc);
         delete adc;
     }
     return ok;
@@ -583,11 +583,11 @@ static void fillSelectionsFromDir(HostComboBoxSetting *comboBox,
 void AudioConfigSettings::UpdateAudioTest()
 {
     AudioOutputSettings settings = UpdateCapabilities(false);
-    QString out = m_OutputDevice->getValue();
+    QString out = m_outputDevice->getValue();
     QString passthrough =
-        m_PassThroughOverride->boolValue() ?
-        m_PassThroughDeviceOverride->getValue(): QString();
-    int channels = m_MaxAudioChannels->getValue().toInt();
+        m_passThroughOverride->boolValue() ?
+        m_passThroughDeviceOverride->getValue(): QString();
+    int channels = m_maxAudioChannels->getValue().toInt();
 
     m_audioTest->UpdateCapabilities(out, passthrough, channels, settings);
 }
@@ -1090,7 +1090,7 @@ HostComboBoxSetting *AudioConfigSettings::MixerDevice()
     return gc;
 }
 
-const char* AudioConfigSettings::MixerControlControls[] =
+const char* AudioConfigSettings::kMixerControlControls[] =
     {QT_TR_NOOP("PCM"),
      QT_TR_NOOP("Master")};
 
@@ -1100,10 +1100,10 @@ HostComboBoxSetting *AudioConfigSettings::MixerControl()
 
     gc->setLabel(tr("Mixer controls"));
 
-    for (size_t i = 0; i < sizeof(MixerControlControls) / sizeof(char*); ++i)
+    for (size_t i = 0; i < sizeof(kMixerControlControls) / sizeof(char*); ++i)
     {
-        gc->addSelection(tr(MixerControlControls[i]),
-                         MixerControlControls[i]);
+        gc->addSelection(tr(kMixerControlControls[i]),
+                         kMixerControlControls[i]);
     }
 
     gc->setHelpText(tr("Changing the volume adjusts the selected mixer."));
@@ -1272,6 +1272,6 @@ HostCheckBoxSetting *AudioConfigSettings::HBRPassthrough()
 
 void AudioConfigSettings::setMPCMEnabled(bool flag)
 {
-    m_MPCM->setEnabled(flag);
+    m_mpcm->setEnabled(flag);
 }
 // vim:set sw=4 ts=4 expandtab:

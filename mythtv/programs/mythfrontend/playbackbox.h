@@ -415,7 +415,7 @@ class PlaybackBox : public ScheduleCommon
 
     // Play List support
     QList<uint>         m_playList;   ///< list of selected items "play list"
-    bool                m_op_on_playlist      {false};
+    bool                m_opOnPlaylist        {false};
     QList<uint>         m_playListPlay; ///< list of items being played.
 
     ProgramInfoCache    m_programInfoCache;
@@ -435,11 +435,11 @@ class PlaybackBox : public ScheduleCommon
 
     // Other
     TV                 *m_player              {nullptr};
-    QStringList         m_player_selected_new_show;
+    QStringList         m_playerSelectedNewShow;
     /// Main helper thread
     PlaybackBoxHelper   m_helper;
     /// Outstanding preview image requests
-    QSet<QString>       m_preview_tokens;
+    QSet<QString>       m_previewTokens;
 
     bool                m_firstGroup          {true};
     bool                m_usingGroupSelector  {false};
@@ -479,7 +479,7 @@ class GroupSelector : public MythScreenType
                   const QStringList &list, const QStringList &data,
                   const QString &selected)
         : MythScreenType(lparent, "groupselector"), m_label(label),
-          m_List(list), m_Data(data), m_selected(selected) {}
+          m_list(list), m_data(data), m_selected(selected) {}
 
     bool Create(void) override; // MythScreenType
 
@@ -493,8 +493,8 @@ class GroupSelector : public MythScreenType
     void loadGroups(void);
 
     QString m_label;
-    QStringList m_List;
-    QStringList m_Data;
+    QStringList m_list;
+    QStringList m_data;
     QString m_selected;
 };
 

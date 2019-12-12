@@ -562,20 +562,20 @@ class ItemDetailPopup : public MythScreenType
     static bool Exists()
     {
         // TODO: Add ability to theme loader to do this a better way.
-        return LoadWindowFromXML("video-ui.xml", WINDOW_NAME, nullptr);
+        return LoadWindowFromXML("video-ui.xml", kWindowName, nullptr);
     }
 
   public:
     ItemDetailPopup(MythScreenStack *lparent, VideoMetadata *metadata,
             const VideoMetadataListManager &listManager) :
-        MythScreenType(lparent, WINDOW_NAME), m_metadata(metadata),
+        MythScreenType(lparent, kWindowName), m_metadata(metadata),
         m_listManager(listManager)
     {
     }
 
     bool Create() override // MythScreenType
     {
-        if (!LoadWindowFromXML("video-ui.xml", WINDOW_NAME, this))
+        if (!LoadWindowFromXML("video-ui.xml", kWindowName, this))
             return false;
 
         UIUtilW::Assign(this, m_playButton, "play_button");
@@ -651,7 +651,7 @@ class ItemDetailPopup : public MythScreenType
     }
 
   private:
-    static const char * const WINDOW_NAME;
+    static const char * const kWindowName;
     VideoMetadata *m_metadata   {nullptr};
     const VideoMetadataListManager &m_listManager;
 
@@ -659,7 +659,7 @@ class ItemDetailPopup : public MythScreenType
     MythUIButton  *m_doneButton {nullptr};
 };
 
-const char * const ItemDetailPopup::WINDOW_NAME = "itemdetailpopup";
+const char * const ItemDetailPopup::kWindowName = "itemdetailpopup";
 
 class VideoDialogPrivate
 {

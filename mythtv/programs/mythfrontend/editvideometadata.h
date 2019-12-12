@@ -135,7 +135,7 @@ class EditMetadataDialog : public MythScreenType
     //  child videos on and off
     //
 
-    int cachedChildSelection                        {0};
+    int               m_cachedChildSelection        {0};
 
     const VideoMetadataListManager &m_metaCache;
     MetadataDownload               *m_query         {nullptr};

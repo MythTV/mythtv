@@ -182,10 +182,10 @@ class MainGeneralSettings : public GroupSetting
   public slots:
     void cecChanged(bool);
   protected:
-    HostCheckBoxSetting *m_CECPowerOnTVAllowed  {nullptr};
-    HostCheckBoxSetting *m_CECPowerOffTVAllowed {nullptr};
-    HostCheckBoxSetting *m_CECPowerOnTVOnStart  {nullptr};
-    HostCheckBoxSetting *m_CECPowerOffTVOnExit  {nullptr};
+    HostCheckBoxSetting *m_cecPowerOnTVAllowed  {nullptr};
+    HostCheckBoxSetting *m_cecPowerOffTVAllowed {nullptr};
+    HostCheckBoxSetting *m_cecPowerOnTVOnStart  {nullptr};
+    HostCheckBoxSetting *m_cecPowerOffTVOnExit  {nullptr};
 #endif  // USING_LIBCEC
 };
 
@@ -235,14 +235,14 @@ class PlaybackProfileItemConfig : public GroupSetting
 
   private:
     ProfileItem                &m_item;
-    TransTextEditSetting       *m_width_range  {nullptr};
-    TransTextEditSetting       *m_height_range {nullptr};
+    TransTextEditSetting       *m_widthRange   {nullptr};
+    TransTextEditSetting       *m_heightRange  {nullptr};
     MythUIComboBoxSetting      *m_codecs       {nullptr};
     TransTextEditSetting       *m_framerate    {nullptr};
     TransMythUIComboBoxSetting *m_decoder      {nullptr};
-    TransMythUISpinBoxSetting  *m_max_cpus     {nullptr};
-    TransMythUICheckBoxSetting *m_skiploop     {nullptr};
-    TransMythUIComboBoxSetting *m_vidrend      {nullptr};
+    TransMythUISpinBoxSetting  *m_maxCpus      {nullptr};
+    TransMythUICheckBoxSetting *m_skipLoop     {nullptr};
+    TransMythUIComboBoxSetting *m_vidRend      {nullptr};
     TransMythUIComboBoxSetting *m_singleDeint  {nullptr};
     TransMythUICheckBoxSetting *m_singleShader {nullptr};
     TransMythUICheckBoxSetting *m_singleDriver {nullptr};
@@ -277,14 +277,14 @@ class PlaybackProfileConfig : public GroupSetting
   private:
     void ReloadSettings(void);
     vector<ProfileItem> m_items;
-    vector<ProfileItem> m_del_items;
-    QString     m_profile_name;
-    uint        m_groupid {0};
+    vector<ProfileItem> m_delItems;
+    QString     m_profileName;
+    uint        m_groupId {0};
 
     TransMythUICheckBoxSetting *m_markForDeletion {nullptr};
     ButtonStandardSetting      *m_addNewEntry     {nullptr};
     vector<PlaybackProfileItemConfig*> m_profiles;
-    vector<TransMythUISpinBoxSetting*> priority;
+    vector<TransMythUISpinBoxSetting*> m_priority;
 };
 
 class ChannelGroupSetting : public GroupSetting

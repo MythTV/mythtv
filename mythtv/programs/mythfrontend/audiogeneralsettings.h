@@ -37,8 +37,8 @@ class AudioConfigSettings : public GroupSetting
 
     using ADCMap = QMap<QString,AudioOutput::AudioDeviceConfig>;
 
-    ADCMap &AudioDeviceMap(void) { return audiodevs; };
-    AudioOutput::ADCVect &AudioDeviceVect(void) { return devices; };
+    ADCMap &AudioDeviceMap(void) { return m_audioDevs; };
+    AudioOutput::ADCVect &AudioDeviceVect(void) { return m_devices; };
 
     void CheckConfiguration(void);
 
@@ -80,32 +80,32 @@ class AudioConfigSettings : public GroupSetting
 
     bool                CheckPassthrough();
 
-    AudioDeviceComboBox *m_OutputDevice              {nullptr};
-    HostComboBoxSetting *m_MaxAudioChannels          {nullptr};
-    HostCheckBoxSetting *m_AudioUpmix                {nullptr};
-    HostComboBoxSetting *m_AudioUpmixType            {nullptr};
+    AudioDeviceComboBox *m_outputDevice              {nullptr};
+    HostComboBoxSetting *m_maxAudioChannels          {nullptr};
+    HostCheckBoxSetting *m_audioUpmix                {nullptr};
+    HostComboBoxSetting *m_audioUpmixType            {nullptr};
 
     // digital settings
     GroupSetting        *m_triggerDigital            {nullptr};
-    HostCheckBoxSetting *m_AC3PassThrough            {nullptr};
-    HostCheckBoxSetting *m_DTSPassThrough            {nullptr};
-    HostCheckBoxSetting *m_EAC3PassThrough           {nullptr};
-    HostCheckBoxSetting *m_TrueHDPassThrough         {nullptr};
-    HostCheckBoxSetting *m_DTSHDPassThrough          {nullptr};
+    HostCheckBoxSetting *m_ac3PassThrough            {nullptr};
+    HostCheckBoxSetting *m_dtsPassThrough            {nullptr};
+    HostCheckBoxSetting *m_eac3PassThrough           {nullptr};
+    HostCheckBoxSetting *m_trueHDPassThrough         {nullptr};
+    HostCheckBoxSetting *m_dtsHDPassThrough          {nullptr};
     //advanced setting
-    HostCheckBoxSetting *m_MPCM                      {nullptr};
-    HostCheckBoxSetting *m_PassThroughOverride       {nullptr};
-    HostComboBoxSetting *m_PassThroughDeviceOverride {nullptr};
+    HostCheckBoxSetting *m_mpcm                      {nullptr};
+    HostCheckBoxSetting *m_passThroughOverride       {nullptr};
+    HostComboBoxSetting *m_passThroughDeviceOverride {nullptr};
 
     AudioTest           *m_audioTest                 {nullptr};
 
-    ADCMap               audiodevs;
-    AudioOutput::ADCVect devices;
-    QMutex               slotlock;
+    ADCMap               m_audioDevs;
+    AudioOutput::ADCVect m_devices;
+    QMutex               m_slotLock;
 
-    int                  m_maxspeakers               {0};
+    int                  m_maxSpeakers               {0};
     QString              m_lastAudioDevice;
-    static const char   *MixerControlControls[];
+    static const char   *kMixerControlControls[];
 };
 
 class AudioDeviceComboBox : public HostComboBoxSetting

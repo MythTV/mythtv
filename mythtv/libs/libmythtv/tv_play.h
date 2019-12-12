@@ -872,7 +872,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     ///  0  1   2  3
     ///  4  5   6  7
     ///  8  9  10 11
-    static const int s_screenPressRegionCount = 12;
+    static const int kScreenPressRegionCount = 12;
     QList<QKeyEvent> m_screenPressKeyMapPlayback;
     QList<QKeyEvent> m_screenPressKeyMapLiveTV;
 

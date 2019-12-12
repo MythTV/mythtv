@@ -61,8 +61,7 @@ class StatusBox : public MythScreenType
     MythUIButtonList  *m_logList         {nullptr};
     MythUIStateType   *m_iconState       {nullptr};
 
-    QMap<int, QString> contentData;
-    recprof2bps_t      recordingProfilesBPS;
+    recprof2bps_t      m_recordingProfilesBps;
 
     vector<ProgramInfo *> m_expList;
 

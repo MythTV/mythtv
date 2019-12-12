@@ -33,21 +33,21 @@ class Streamer : public QObject
     void OpenFile(void);
 
   private:
-    Commands *m_parent;
-    QString   m_fileName;
-    QFile    *m_file;
-    bool      m_loop;
+    Commands   *m_parent    { nullptr };
+    QString     m_fileName;
+    QFile      *m_file      { nullptr };
+    bool        m_loop;
 
-    QString m_error;
+    QString     m_error;
 
     QByteArray  m_buffer;
-    int     m_bufferMax;
-    QAtomicInt  m_blockSize;
+    int         m_bufferMax { 188 * 100000 };
+    QAtomicInt  m_blockSize { m_bufferMax / 4 };
 
     // Regulate data rate
-    uint      m_data_rate;  // bytes per second
-    QDateTime m_start_time; // When the first packet was processed
-    quint64   m_data_read;  // How many bytes have been sent
+    uint        m_dataRate;        // bytes per second
+    QDateTime   m_startTime;       // When the first packet was processed
+    quint64     m_dataRead  { 0 }; // How many bytes have been sent
 };
 
 class Commands : public QObject
@@ -70,7 +70,7 @@ class Commands : public QObject
 
   private:
     QString   m_fileName;
-    Streamer *m_streamer;
+    Streamer *m_streamer { nullptr };
     int       m_timeout;
     bool      m_run;
     QAtomicInt m_eof;

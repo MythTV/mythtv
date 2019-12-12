@@ -60,29 +60,23 @@ class FillData
     };
 
   public:
-    ProgramData         m_prog_data;
-    ChannelData         m_chan_data;
-    XMLTVParser         m_xmltv_parser;
+    ChannelData m_chanData;
+    XMLTVParser m_xmltvParser;
 
-    QString m_logged_in;
-    QString m_lastdduserid;
-    QString m_graboptions;
-    int     m_raw_lineup              {0};
+    QString m_grabOptions;
     uint    m_maxDays                 {0};
 
     bool    m_interrupted             {false};
-    bool    m_endofdata               {false};
-    bool    m_refresh_tba             {true};
-    bool    m_dd_grab_all             {false};
-    bool    m_dddataretrieved         {false};
-    bool    m_need_post_grab_proc     {true};
-    bool    m_only_update_channels    {false};
-    bool    m_channel_update_run      {false};
-    bool    m_no_allatonce            {false};
+    bool    m_endOfData               {false};
+    bool    m_refreshTba              {true};
+    bool    m_needPostGrabProc        {true};
+    bool    m_onlyUpdateChannels      {false};
+    bool    m_channelUpdateRun        {false};
+    bool    m_noAllAtOnce             {false};
 
   private:
-    QMap<uint,bool>     m_refresh_day;
-    bool                m_refresh_all {false};
+    QMap<uint,bool>     m_refreshDay;
+    bool                m_refreshAll  {false};
     mutable QStringList m_fatalErrors;
 };
 

@@ -122,7 +122,7 @@ long long processFrame(FrameAnalyzerItem &pass,
                        long long frameno)
 {
     long long nextFrame = 0;
-    long long minNextFrame = FrameAnalyzer::ANYFRAME;
+    long long minNextFrame = FrameAnalyzer::kAnyFrame;
 
     auto it = pass.begin();
     while (it != pass.end())
@@ -155,10 +155,10 @@ long long processFrame(FrameAnalyzerItem &pass,
         }
     }
 
-    if (minNextFrame == FrameAnalyzer::ANYFRAME)
-        minNextFrame = FrameAnalyzer::NEXTFRAME;
+    if (minNextFrame == FrameAnalyzer::kAnyFrame)
+        minNextFrame = FrameAnalyzer::kNextFrame;
 
-    if (minNextFrame == FrameAnalyzer::NEXTFRAME)
+    if (minNextFrame == FrameAnalyzer::kNextFrame)
         minNextFrame = frameno + 1;
 
     return minNextFrame;

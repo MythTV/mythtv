@@ -78,7 +78,7 @@ class UPnpCDSTv : public UPnpCDSExtension
         static void    BindValues ( MSqlQuery &query,
                              IDTokenMap tokens );
 
-        QUrl                   m_URIBase;
+        QUrl                   m_uriBase;
 
         QStringMap             m_mapBackendIp;
         QMap<QString, int>     m_mapBackendPort;

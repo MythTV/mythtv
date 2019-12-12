@@ -31,7 +31,7 @@
 
 XMLTVParser::XMLTVParser()
 {
-    m_current_year = MythDate::current().date().toString("yyyy").toUInt();
+    m_currentYear = MythDate::current().date().toString("yyyy").toUInt();
 }
 
 void XMLTVParser::lateInit()
@@ -591,7 +591,7 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
 
     if (!pginfo->m_airdate
         && ProgramInfo::kCategorySeries != pginfo->m_categoryType)
-        pginfo->m_airdate = m_current_year;
+        pginfo->m_airdate = m_currentYear;
 
     if (programid.isEmpty())
     {

@@ -49,16 +49,16 @@ public:
     float                   m_fps                {0.0F};
 
     /* per-frame info */
-    SceneChangeData         *m_scdata            {nullptr};
-    unsigned short          *m_scdiff            {nullptr};
+    SceneChangeData         *m_scData            {nullptr};
+    unsigned short          *m_scDiff            {nullptr};
 
     FrameAnalyzer::FrameMap m_changeMap;
 
     /* Debugging */
     int                     m_debugLevel         {0};
-    QString                 m_debugdata;            /* filename */
-    bool                    m_debug_scenechange  {false};
-    bool                    m_scenechange_done   {false};
+    QString                 m_debugData;            /* filename */
+    bool                    m_debugSceneChange   {false};
+    bool                    m_sceneChangeDone    {false};
 };
 
 #endif  /* !__SCENECHANGEDETECTOR_H__ */

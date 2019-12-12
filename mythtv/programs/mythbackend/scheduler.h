@@ -33,16 +33,16 @@ class SchedInputInfo
 {
   public:
     SchedInputInfo(void) :
-        m_group_inputs(),
-        m_conflicting_inputs() {};
+        m_groupInputs(),
+        m_conflictingInputs() {};
     ~SchedInputInfo(void) = default;
 
     uint          m_inputid      {0};
     uint          m_sgroupid     {0};
-    bool          m_schedgroup   {false};
-    vector<uint>  m_group_inputs;
-    vector<uint>  m_conflicting_inputs;
-    RecList      *m_conflictlist {nullptr};
+    bool          m_schedGroup   {false};
+    vector<uint>  m_groupInputs;
+    vector<uint>  m_conflictingInputs;
+    RecList      *m_conflictList {nullptr};
 };
 
 class Scheduler : public MThread, public MythScheduler
@@ -97,7 +97,7 @@ class Scheduler : public MThread, public MythScheduler
     void getConflicting(RecordingInfo *pginfo, RecList *retlist);
 
     void PrintList(bool onlyFutureRecordings = false)
-        { PrintList(m_reclist, onlyFutureRecordings); };
+        { PrintList(m_recList, onlyFutureRecordings); };
     static void PrintList(RecList &list, bool onlyFutureRecordings = false);
     static void PrintRec(const RecordingInfo *p, const QString &prefix = "");
 
@@ -238,33 +238,33 @@ class Scheduler : public MThread, public MythScheduler
 
     MythDeque<QStringList> m_reschedQueue;
     mutable QMutex         m_schedLock;
-    QMutex                 m_recordmatchLock;
+    QMutex                 m_recordMatchLock;
     QWaitCondition         m_reschedWait;
-    RecList                m_reclist;
-    RecList                m_worklist;
-    RecList                m_livetvlist;
-    QMap<uint, SchedInputInfo> m_sinputinfomap;
-    vector<RecList *>      m_conflictlists;
-    QMap<uint, RecList>    m_recordidlistmap;
-    QMap<QString, RecList> m_titlelistmap;
+    RecList                m_recList;
+    RecList                m_workList;
+    RecList                m_livetvList;
+    QMap<uint, SchedInputInfo> m_sinputInfoMap;
+    vector<RecList *>      m_conflictLists;
+    QMap<uint, RecList>    m_recordIdListMap;
+    QMap<QString, RecList> m_titleListMap;
 
     QDateTime m_schedTime;
-    bool m_reclist_changed             {false};
+    bool m_recListChanged              {false};
 
-    bool m_specsched;
+    bool m_specSched;
     bool m_schedulingEnabled           {true};
     QMap<int, bool> m_schedAfterStartMap;
 
     QMap<int, EncoderLink *> *m_tvList {nullptr};
     AutoExpire *m_expirer              {nullptr};
 
-    QSet<uint> m_schedorder_warned;
+    QSet<uint> m_schedOrderWarned;
 
     bool m_doRun;
 
     MainServer *m_mainServer           {nullptr};
 
-    QMutex m_resetIdleTime_lock;
+    QMutex m_resetIdleTimeLock;
     bool   m_resetIdleTime             {false};
 
     bool m_isShuttingDown              {false};
@@ -288,7 +288,7 @@ class Scheduler : public MThread, public MythScheduler
     // cache IsSameProgram()
     using IsSameKey = pair<const RecordingInfo*,const RecordingInfo*>;
     using IsSameCacheType = QMap<IsSameKey,bool>;
-    mutable IsSameCacheType m_cache_is_same_program;
+    mutable IsSameCacheType m_cacheIsSameProgram;
     int m_tmLastLog                    {0};
 };
 

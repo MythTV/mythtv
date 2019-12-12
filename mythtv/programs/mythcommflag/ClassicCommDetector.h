@@ -181,7 +181,7 @@ protected:
         void Init();
         void SetVideoParams(float aspect);
         void ProcessFrame(VideoFrame *frame, long long frame_number);
-        QMap<long long, FrameInfoEntry> frameInfo;
+        QMap<long long, FrameInfoEntry> m_frameInfo;
 
 public slots:
         void sceneChangeDetectorHasNewInformation(unsigned int framenum, bool isSceneChange,float debugValue);

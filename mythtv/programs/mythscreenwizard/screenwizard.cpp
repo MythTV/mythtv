@@ -23,31 +23,18 @@ using namespace std;
 
 ScreenWizard::ScreenWizard(MythScreenStack *parent, const char *name) :
     MythScreenType(parent, name),
-    m_whichcorner(true),
-    m_coarsefine(false), // fine adjustments by default
-    m_changed(false),
-    m_fine(1),           // fine moves corners by one pixel
-    m_coarse(10),        // coarse moves corners by ten pixels
-    m_change(m_fine),
-    m_topleft_x(0),     m_topleft_y(0),
-    m_bottomright_x(0), m_bottomright_y(0),
-    m_screenwidth(0),        m_screenheight(0),
-    m_xsize(GetMythMainWindow()->GetUIScreenRect().width()),
-    m_ysize(GetMythMainWindow()->GetUIScreenRect().height()),
-    m_xoffset(0),            m_yoffset(0),
-    m_blackout(nullptr),     m_preview(nullptr),
-    m_size(nullptr),         m_offsets(nullptr),
-    m_changeamount(nullptr), m_menuPopup(nullptr)
+    m_xSize(GetMythMainWindow()->GetUIScreenRect().width()),
+    m_ySize(GetMythMainWindow()->GetUIScreenRect().height())
 {
 }
 
 void ScreenWizard::SetInitialSettings(int _x, int _y, int _w, int _h)
 {
-    m_xoffset = _x;
-    m_yoffset = _y;
+    m_xOffset = _x;
+    m_yOffset = _y;
 
-    m_screenwidth  = _w ? _w : m_xsize;
-    m_screenheight = _h ? _h : m_ysize;
+    m_screenWidth  = _w ? _w : m_xSize;
+    m_screenHeight = _h ? _h : m_ySize;
 }
 
 bool ScreenWizard::Create()
@@ -61,22 +48,22 @@ bool ScreenWizard::Create()
     m_preview = dynamic_cast<MythUIImage *> (GetChild("preview"));
     m_size = dynamic_cast<MythUIText *> (GetChild("size"));
     m_offsets = dynamic_cast<MythUIText *> (GetChild("offsets"));
-    m_changeamount = dynamic_cast<MythUIText *> (GetChild("changeamount"));
+    m_changeAmount = dynamic_cast<MythUIText *> (GetChild("changeamount"));
 
-    if (!m_blackout || !m_preview || !m_size || !m_offsets || !m_changeamount)
+    if (!m_blackout || !m_preview || !m_size || !m_offsets || !m_changeAmount)
     {
         LOG(VB_GENERAL, LOG_ERR, "ScreenWizard, Error: "
                "Could not instantiate, please check appear-ui.xml for errors");
         return false;
     }
 
-    m_blackout->SetArea(MythRect(0, 0, m_xsize, m_ysize));
+    m_blackout->SetArea(MythRect(0, 0, m_xSize, m_ySize));
 
     // work out origin co-ordinates for preview corners
-    m_topleft_x = m_xoffset;
-    m_topleft_y = m_yoffset;
-    m_bottomright_x = m_xoffset + m_screenwidth;
-    m_bottomright_y = m_yoffset + m_screenheight;
+    m_topLeftX = m_xOffset;
+    m_topLeftY = m_yOffset;
+    m_bottomRightX = m_xOffset + m_screenWidth;
+    m_bottomRightY = m_yOffset + m_screenHeight;
 
     updateScreen();
 
@@ -99,33 +86,33 @@ bool ScreenWizard::keyPressEvent(QKeyEvent *event)
 
         if (action == "SELECT")
         {
-            m_whichcorner = !m_whichcorner;
+            m_whichCorner = !m_whichCorner;
             refresh = true;
         }
         else if (action == "UP")
         {
-            if (m_whichcorner)
+            if (m_whichCorner)
                 refresh = moveTLUp();
             else
                 refresh = moveBRUp();
         }
         else if (action == "DOWN")
         {
-            if (m_whichcorner)
+            if (m_whichCorner)
                 refresh = moveTLDown();
             else
                 refresh = moveBRDown();
         }
         else if (action == "LEFT")
         {
-            if (m_whichcorner)
+            if (m_whichCorner)
                 refresh = moveTLLeft();
             else
                 refresh = moveBRLeft();
         }
         else if (action == "RIGHT")
         {
-            if (m_whichcorner)
+            if (m_whichCorner)
                 refresh = moveTLRight();
             else
                 refresh = moveBRRight();
@@ -154,89 +141,89 @@ bool ScreenWizard::keyPressEvent(QKeyEvent *event)
 
 bool ScreenWizard::moveTLUp(void)
 {
-    if (m_topleft_y < (0 + m_change))
+    if (m_topLeftY < (0 + m_change))
         return false;
 
-    m_topleft_y -= m_change;
+    m_topLeftY -= m_change;
     return true;
 }
 
 bool ScreenWizard::moveTLDown(void)
 {
-    if (m_topleft_y > (m_bottomright_y - m_change - kMinHeight))
+    if (m_topLeftY > (m_bottomRightY - m_change - kMinHeight))
         if (!moveBRDown())
             return false;
 
-    m_topleft_y += m_change;
+    m_topLeftY += m_change;
     return true;
 }
 
 bool ScreenWizard::moveTLLeft(void)
 {
-    if (m_topleft_x < (0 + m_change))
+    if (m_topLeftX < (0 + m_change))
         return false;
 
-    m_topleft_x -= m_change;
+    m_topLeftX -= m_change;
     return true;
 }
 
 bool ScreenWizard::moveTLRight(void)
 {
-    if (m_topleft_x > (m_bottomright_x - m_change - kMinWidth))
+    if (m_topLeftX > (m_bottomRightX - m_change - kMinWidth))
         if (!moveBRRight())
             return false;
 
-    m_topleft_x += m_change;
+    m_topLeftX += m_change;
     return true;
 }
 
 bool ScreenWizard::moveBRUp(void)
 {
-    if (m_bottomright_y < (m_topleft_y + m_change + kMinHeight))
+    if (m_bottomRightY < (m_topLeftY + m_change + kMinHeight))
         if (!moveTLUp())
             return false;
 
-    m_bottomright_y -= m_change;
+    m_bottomRightY -= m_change;
     return true;
 }
 
 bool ScreenWizard::moveBRDown(void)
 {
-    if (m_bottomright_y > (m_ysize - m_change))
+    if (m_bottomRightY > (m_ySize - m_change))
         return false;
 
-    m_bottomright_y += m_change;
+    m_bottomRightY += m_change;
     return true;
 }
 
 bool ScreenWizard::moveBRLeft(void)
 {
-    if (m_bottomright_x < (m_topleft_x + m_change + kMinWidth))
+    if (m_bottomRightX < (m_topLeftX + m_change + kMinWidth))
         if (!moveTLLeft())
             return false;
 
-    m_bottomright_x -= m_change;
+    m_bottomRightX -= m_change;
     return true;
 }
 
 bool ScreenWizard::moveBRRight(void)
 {
-    if (m_bottomright_x > (m_xsize - m_change))
+    if (m_bottomRightX > (m_xSize - m_change))
         return false;
 
-    m_bottomright_x += m_change;
+    m_bottomRightX += m_change;
     return true;
 }
 
 void ScreenWizard::updateScreen()
 {
-    int width = m_bottomright_x - m_topleft_x;
-    int height = m_bottomright_y - m_topleft_y;
+    int width = m_bottomRightX - m_topLeftX;
+    int height = m_bottomRightY - m_topLeftY;
 
-    m_preview->SetArea(MythRect(m_topleft_x, m_topleft_y, width, height));
+    m_preview->SetArea(MythRect(m_topLeftX, m_topLeftY, width, height));
     m_size->SetText(tr("Size: %1 x %2").arg(width).arg(height));
-    m_offsets->SetText(tr("Offset: %1 x %2").arg(m_topleft_x).arg(m_topleft_y));
-    m_changeamount->SetText(tr("Change amount: %n pixel(s)", "", m_change));
+    m_offsets->SetText(tr("Offset: %1 x %2").arg(m_topLeftX).arg(m_topLeftY));
+    m_changeAmount->SetText(tr("Change amount: %n pixel(s)", "", m_change));
 
 }
 
@@ -302,14 +289,14 @@ void ScreenWizard::doExit()
 
 void ScreenWizard::slotChangeCoarseFine()
 {
-    if (m_coarsefine)
+    if (m_coarseFine)
     {
-        m_coarsefine = false;
+        m_coarseFine = false;
         m_change = m_fine;
     }
     else
     {
-        m_coarsefine = true;
+        m_coarseFine = true;
         m_change = m_coarse;
     }
 
@@ -319,10 +306,10 @@ void ScreenWizard::slotChangeCoarseFine()
 void ScreenWizard::slotSaveSettings()
 {
     LOG(VB_GENERAL, LOG_ERR, "Updating screen size settings");
-    gCoreContext->SaveSetting("GuiOffsetX", m_topleft_x);
-    gCoreContext->SaveSetting("GuiOffsetY", m_topleft_y);
-    gCoreContext->SaveSetting("GuiWidth", m_bottomright_x - m_topleft_x);
-    gCoreContext->SaveSetting("GuiHeight", m_bottomright_y - m_topleft_y);
+    gCoreContext->SaveSetting("GuiOffsetX", m_topLeftX);
+    gCoreContext->SaveSetting("GuiOffsetY", m_topLeftY);
+    gCoreContext->SaveSetting("GuiWidth", m_bottomRightX - m_topLeftX);
+    gCoreContext->SaveSetting("GuiHeight", m_bottomRightY - m_topLeftY);
     qApp->quit();
 }
 
@@ -337,13 +324,13 @@ void ScreenWizard::slotResetSettings()
 
 bool ScreenWizard::anythingChanged()
 {
-    if (m_screenwidth != m_bottomright_x - m_topleft_x)
+    if (m_screenWidth != m_bottomRightX - m_topLeftX)
         return true;
-    if (m_xoffset != m_topleft_x)
+    if (m_xOffset != m_topLeftX)
         return true;
-    if (m_screenheight != m_bottomright_y - m_topleft_y)
+    if (m_screenHeight != m_bottomRightY - m_topLeftY)
         return true;
-    if (m_yoffset != m_topleft_y)
+    if (m_yOffset != m_topLeftY)
         return true;
     return false;
 }

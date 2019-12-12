@@ -76,7 +76,7 @@ class UPnpCDSVideo : public UPnpCDSExtension
         QStringMap             m_mapBackendIp;
         QMap<QString, int>     m_mapBackendPort;
 
-        QUrl m_URIBase;
+        QUrl m_uriBase;
 
 };
 

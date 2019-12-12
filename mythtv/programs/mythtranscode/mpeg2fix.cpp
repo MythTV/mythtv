@@ -133,9 +133,9 @@ void MPEG2frame::set_pkt(AVPacket *newpkt)
 PTSOffsetQueue::PTSOffsetQueue(int vidid, QList<int> keys, int64_t initPTS)
 {
     poq_idx_t idx;
-    m_vid_id = vidid;
+    m_vidId = vidid;
     m_keyList = std::move(keys);
-    m_keyList.append(m_vid_id);
+    m_keyList.append(m_vidId);
 
     idx.newPTS = initPTS;
     idx.pos_pts = 0;
@@ -188,7 +188,7 @@ void PTSOffsetQueue::SetNextPTS(int64_t newPTS, int64_t atPTS)
 
 void PTSOffsetQueue::SetNextPos(int64_t newPTS, AVPacket *pkt)
 {
-    int64_t delta = MPEG2fixup::diff2x33(newPTS, m_offset[m_vid_id].last().newPTS);
+    int64_t delta = MPEG2fixup::diff2x33(newPTS, m_offset[m_vidId].last().newPTS);
     poq_idx_t idx;
 
     idx.pos_pts = pkt->pos;
@@ -196,7 +196,7 @@ void PTSOffsetQueue::SetNextPos(int64_t newPTS, AVPacket *pkt)
     idx.type = true;
 
     LOG(VB_FRAME, LOG_INFO, QString("Offset %1 -> %2 (%3) at %4")
-            .arg(PtsTime(m_offset[m_vid_id].last().newPTS))
+            .arg(PtsTime(m_offset[m_vidId].last().newPTS))
             .arg(PtsTime(newPTS)).arg(PtsTime(delta)).arg(pkt->pos));
     for (auto it = m_keyList.begin(); it != m_keyList.end(); ++it)
     {
@@ -238,9 +238,9 @@ MPEG2fixup::MPEG2fixup(const QString &inf, const QString &outf,
     m_rx.m_outfile = outf;
     m_rx.m_done = 0;
     m_format = fmt;
-    m_no_repeat = norp;
-    m_fix_PTS = fixPTS;
-    m_maxframes = maxf;
+    m_noRepeat = norp;
+    m_fixPts = fixPTS;
+    m_maxFrames = maxf;
     m_rx.m_otype = otype;
 
     if (deleteMap && deleteMap->count())
@@ -267,12 +267,12 @@ MPEG2fixup::MPEG2fixup(const QString &inf, const QString &outf,
         }
         if (m_delMap.begin().value() == MARK_CUT_END)
             m_discard = true;
-        m_use_secondary = true;
+        m_useSecondary = true;
     }
 
     mpeg2_malloc_hooks(my_malloc, nullptr);
-    m_header_decoder = mpeg2_init();
-    m_img_decoder = mpeg2_init();
+    m_headerDecoder = mpeg2_init();
+    m_imgDecoder = mpeg2_init();
 
     av_log_set_callback(my_av_print);
 
@@ -286,30 +286,30 @@ MPEG2fixup::MPEG2fixup(const QString &inf, const QString &outf,
     pthread_mutex_unlock(&m_rx.m_mutex);
 
     //initialize progress stats
-    m_showprogress = showprog;
-    update_status = update_func;
-    check_abort = check_func;
-    if (m_showprogress || update_status)
+    m_showProgress = showprog;
+    m_updateStatus = update_func;
+    m_checkAbort = check_func;
+    if (m_showProgress || m_updateStatus)
     {
-        if (update_status)
+        if (m_updateStatus)
         {
-            m_status_update_time = 20;
-            update_status(0);
+            m_statusUpdateTime = 20;
+            m_updateStatus(0);
         }
         else
-            m_status_update_time = 5;
-        m_statustime = MythDate::current();
-        m_statustime = m_statustime.addSecs(m_status_update_time);
+            m_statusUpdateTime = 5;
+        m_statusTime = MythDate::current();
+        m_statusTime = m_statusTime.addSecs(m_statusUpdateTime);
 
         const QFileInfo finfo(inf);
-        m_filesize = finfo.size();
+        m_fileSize = finfo.size();
     }
 }
 
 MPEG2fixup::~MPEG2fixup()
 {
-    mpeg2_close(m_header_decoder);
-    mpeg2_close(m_img_decoder);
+    mpeg2_close(m_headerDecoder);
+    mpeg2_close(m_imgDecoder);
 
     if (m_inputFC)
         avformat_close_input(&m_inputFC);
@@ -470,17 +470,17 @@ static int fill_buffers(void *r, int finish)
 
 MPEG2replex::~MPEG2replex()
 {
-    if (m_vrbuf.size)
-        ring_destroy(&m_vrbuf);
-    if (m_index_vrbuf.size)
-        ring_destroy(&m_index_vrbuf);
+    if (m_vrBuf.size)
+        ring_destroy(&m_vrBuf);
+    if (m_indexVrbuf.size)
+        ring_destroy(&m_indexVrbuf);
     
-    for (int i = 0; i < m_ext_count; i++)
+    for (int i = 0; i < m_extCount; i++)
     {
         if (m_extrbuf[i].size)
             ring_destroy(&m_extrbuf[i]);
-        if (m_index_extrbuf[i].size)
-            ring_destroy(&m_index_extrbuf[i]);
+        if (m_indexExtrbuf[i].size)
+            ring_destroy(&m_indexExtrbuf[i]);
     }
 }
 
@@ -491,11 +491,11 @@ int MPEG2replex::WaitBuffers()
     {
         int ok = 1;
 
-        if (ring_avail(&m_index_vrbuf) < sizeof(index_unit))
+        if (ring_avail(&m_indexVrbuf) < sizeof(index_unit))
             ok = 0;
 
-        for (int i = 0; i < m_ext_count; i++)
-            if (ring_avail(&m_index_extrbuf[i]) < sizeof(index_unit))
+        for (int i = 0; i < m_extCount; i++)
+            if (ring_avail(&m_indexExtrbuf[i]) < sizeof(index_unit))
                 ok = 0;
 
         if (ok || m_done)
@@ -562,7 +562,7 @@ void MPEG2replex::Start()
 
     init_multiplex(&mx, &m_seq_head, m_extframe, m_exttype, m_exttypcnt,
                    video_delay, audio_delay, fd_out, fill_buffers,
-                   &m_vrbuf, &m_index_vrbuf, m_extrbuf, m_index_extrbuf, m_otype);
+                   &m_vrBuf, &m_indexVrbuf, m_extrbuf, m_indexExtrbuf, m_otype);
     setup_multiplex(&mx);
 
     while (true)
@@ -595,8 +595,8 @@ void MPEG2fixup::InitReplex()
     //this should support > 100 frames
     uint32_t memsize = m_vFrame.first()->m_mpeg2_seq.width *
                        m_vFrame.first()->m_mpeg2_seq.height * 10;
-    ring_init(&m_rx.m_vrbuf, memsize);
-    ring_init(&m_rx.m_index_vrbuf, INDEX_BUF);
+    ring_init(&m_rx.m_vrBuf, memsize);
+    ring_init(&m_rx.m_indexVrbuf, INDEX_BUF);
 
     memset(m_rx.m_exttype, 0, sizeof(m_rx.m_exttype));
     memset(m_rx.m_exttypcnt, 0, sizeof(m_rx.m_exttypcnt));
@@ -609,13 +609,13 @@ void MPEG2fixup::InitReplex()
         uint index = it.key();
         if (index > m_inputFC->nb_streams)
             continue;   // will never happen in practice
-        int i = m_aud_map[index];
+        int i = m_audMap[index];
         AVDictionaryEntry *metatag =
             av_dict_get(m_inputFC->streams[index]->metadata,
                         "language", nullptr, 0);
         char *lang = metatag ? metatag->value : (char *)"";
         ring_init(&m_rx.m_extrbuf[i], memsize / 5);
-        ring_init(&m_rx.m_index_extrbuf[i], INDEX_BUF);
+        ring_init(&m_rx.m_indexExtrbuf[i], INDEX_BUF);
         m_rx.m_extframe[i].set = 1;
         m_rx.m_extframe[i].bit_rate = getCodecContext(index)->bit_rate;
         m_rx.m_extframe[i].framesize = (*it)->first()->m_pkt.size;
@@ -639,21 +639,21 @@ void MPEG2fixup::InitReplex()
     m_rx.m_seq_head.frame_rate = (m_vFrame.first()->m_mpeg2_seq.frame_period +
                          26999999ULL) / m_vFrame.first()->m_mpeg2_seq.frame_period;
 
-    m_rx.m_ext_count = m_ext_count;
+    m_rx.m_extCount = m_extCount;
 }
 
 void MPEG2fixup::FrameInfo(MPEG2frame *f)
 {
     QString msg = QString("Id:%1 %2 V:%3").arg(f->m_pkt.stream_index)
                     .arg(PtsTime(f->m_pkt.pts))
-                    .arg(ring_free(&m_rx.m_index_vrbuf) / sizeof(index_unit));
+                    .arg(ring_free(&m_rx.m_indexVrbuf) / sizeof(index_unit));
 
-    if (m_ext_count)
+    if (m_extCount)
     {
         msg += " EXT:";
-        for (int i = 0; i < m_ext_count; i++)
+        for (int i = 0; i < m_extCount; i++)
             msg += QString(" %2")
-                   .arg(ring_free(&m_rx.m_index_extrbuf[i]) / sizeof(index_unit));
+                   .arg(ring_free(&m_rx.m_indexExtrbuf[i]) / sizeof(index_unit));
     }
     LOG(VB_RPLXQUEUE, LOG_INFO, msg);
 }
@@ -668,10 +668,10 @@ int MPEG2fixup::AddFrame(MPEG2frame *f)
     memset(&iu, 0, sizeof(index_unit));
     iu.frame_start = 1;
 
-    if (id == m_vid_id)
+    if (id == m_vidId)
     {
-        rb = &m_rx.m_vrbuf;
-        rbi = &m_rx.m_index_vrbuf;
+        rb = &m_rx.m_vrBuf;
+        rbi = &m_rx.m_indexVrbuf;
         iu.frame = GetFrameTypeN(f);
         iu.seq_header = f->m_isSequence;
         iu.gop = f->m_isGop;
@@ -684,8 +684,8 @@ int MPEG2fixup::AddFrame(MPEG2frame *f)
              GetStreamType(id) == AV_CODEC_ID_MP3 ||
              GetStreamType(id) == AV_CODEC_ID_AC3)
     {
-        rb = &m_rx.m_extrbuf[m_aud_map[id]];
-        rbi = &m_rx.m_index_extrbuf[m_aud_map[id]];
+        rb = &m_rx.m_extrbuf[m_audMap[id]];
+        rbi = &m_rx.m_indexExtrbuf[m_audMap[id]];
         iu.framesize = f->m_pkt.size;
     }
 
@@ -706,13 +706,13 @@ int MPEG2fixup::AddFrame(MPEG2frame *f)
     {
         int ok = 1;
 
-        if (rbi != &m_rx.m_index_vrbuf &&
-                ring_avail(&m_rx.m_index_vrbuf) < sizeof(index_unit))
+        if (rbi != &m_rx.m_indexVrbuf &&
+                ring_avail(&m_rx.m_indexVrbuf) < sizeof(index_unit))
             ok = 0;
 
-        for (int i = 0; i < m_ext_count; i++)
-            if (rbi != &m_rx.m_index_extrbuf[i] &&
-                    ring_avail(&m_rx.m_index_extrbuf[i]) < sizeof(index_unit))
+        for (int i = 0; i < m_extCount; i++)
+            if (rbi != &m_rx.m_indexExtrbuf[i] &&
+                    ring_avail(&m_rx.m_indexExtrbuf[i]) < sizeof(index_unit))
                 ok = 0;
 
         if (!ok && ring_free(rb) < (unsigned int)f->m_pkt.size &&
@@ -759,7 +759,7 @@ int MPEG2fixup::AddFrame(MPEG2frame *f)
         return 1;
     }
     pthread_mutex_unlock(&m_rx.m_mutex);
-    m_last_written_pos = f->m_pkt.pos;
+    m_lastWrittenPos = f->m_pkt.pos;
     return 0;
 }
 
@@ -808,10 +808,10 @@ bool MPEG2fixup::InitAV(const QString& inputfile, const char *type, int64_t offs
         }
     }
 
-    m_mkvfile = strcmp(m_inputFC->iformat->name, "mkv") == 0;
+    m_mkvFile = strcmp(m_inputFC->iformat->name, "mkv") == 0;
 
     if (offset)
-        av_seek_frame(m_inputFC, m_vid_id, offset, AVSEEK_FLAG_BYTE);
+        av_seek_frame(m_inputFC, m_vidId, offset, AVSEEK_FLAG_BYTE);
 
     // Getting stream information
     ret = avformat_find_stream_info(m_inputFC, nullptr);
@@ -833,12 +833,12 @@ bool MPEG2fixup::InitAV(const QString& inputfile, const char *type, int64_t offs
         switch (m_inputFC->streams[i]->codecpar->codec_type)
         {
             case AVMEDIA_TYPE_VIDEO:
-                if (m_vid_id == -1)
-                    m_vid_id = i;
+                if (m_vidId == -1)
+                    m_vidId = i;
                 break;
 
             case AVMEDIA_TYPE_AUDIO:
-                if (!m_allaudio && m_ext_count > 0 &&
+                if (!m_allAudio && m_extCount > 0 &&
                     m_inputFC->streams[i]->codecpar->channels < 2 &&
                     m_inputFC->streams[i]->codecpar->sample_rate < 100000)
                 {
@@ -850,7 +850,7 @@ bool MPEG2fixup::InitAV(const QString& inputfile, const char *type, int64_t offs
                     m_inputFC->streams[i]->codecpar->codec_id == AV_CODEC_ID_MP3 ||
                     m_inputFC->streams[i]->codecpar->codec_id == AV_CODEC_ID_MP2)
                 {
-                    m_aud_map[i] = m_ext_count++;
+                    m_audMap[i] = m_extCount++;
                     m_aFrame[i] = new FrameList();
                 }
                 else
@@ -885,7 +885,7 @@ void MPEG2fixup::AddSequence(MPEG2frame *frame1, MPEG2frame *frame2)
     frame1->ensure_size(frame1->m_pkt.size + head_size); // Changes pkt.size
     memmove(frame1->m_pkt.data + head_size, frame1->m_pkt.data, oldPktSize);
     memcpy(frame1->m_pkt.data, frame2->m_pkt.data, head_size);
-    ProcessVideo(frame1, m_header_decoder);
+    ProcessVideo(frame1, m_headerDecoder);
 #if 0
     if (VERBOSE_LEVEL_CHECK(VB_PROCESS, LOG_ANY))
     {
@@ -901,7 +901,7 @@ int MPEG2fixup::ProcessVideo(MPEG2frame *vf, mpeg2dec_t *dec)
     int state = -1;
     int last_pos = 0;
 
-    if (dec == m_header_decoder)
+    if (dec == m_headerDecoder)
     {
         mpeg2_reset(dec, 0);
         vf->m_isSequence = false;
@@ -916,7 +916,7 @@ int MPEG2fixup::ProcessVideo(MPEG2frame *vf, mpeg2dec_t *dec)
     {
         state = mpeg2_parse(dec);
 
-        if (dec == m_header_decoder)
+        if (dec == m_headerDecoder)
         {
             switch (state)
             {
@@ -959,7 +959,7 @@ int MPEG2fixup::ProcessVideo(MPEG2frame *vf, mpeg2dec_t *dec)
         last_pos = (vf->m_pkt.size - mpeg2_getpos(dec)) - 4;
     }
 
-    if (dec != m_header_decoder)
+    if (dec != m_headerDecoder)
     {
         while (state != STATE_BUFFER)
             state = mpeg2_parse(dec);
@@ -1128,7 +1128,7 @@ bool MPEG2fixup::BuildFrame(AVPacket *pkt, const QString& fname)
     uint16_t intra_matrix[64] ATTR_ALIGN(16);
     int64_t savedPts = pkt->pts; // save the original pts
 
-    const mpeg2_info_t *info = mpeg2_info(m_img_decoder);
+    const mpeg2_info_t *info = mpeg2_info(m_imgDecoder);
     if (!info->display_fbuf)
         return true;
 
@@ -1166,17 +1166,17 @@ bool MPEG2fixup::BuildFrame(AVPacket *pkt, const QString& fname)
 
     m_picture->opaque = info->display_fbuf->id;
 
-    //copy_quant_matrix(m_img_decoder, intra_matrix);
-    if (!m_zigzag_init)
+    //copy_quant_matrix(m_imgDecoder, intra_matrix);
+    if (!m_zigzagInit)
     {
         for (int i = 0; i < 64; i++)
         {
-            m_inv_zigzag_direct16[ff_zigzag_direct[i]] = i + 1;
+            m_invZigzagDirect16[ff_zigzag_direct[i]] = i + 1;
         }
     }
     for (int i = 0; i < 64; i++)
     {
-        intra_matrix[m_inv_zigzag_direct16[i] - 1] = m_img_decoder->quantizer_matrix[0][i];
+        intra_matrix[m_invZigzagDirect16[i] - 1] = m_imgDecoder->quantizer_matrix[0][i];
     }
 
     if (info->display_picture->nb_fields % 2)
@@ -1339,9 +1339,9 @@ int MPEG2fixup::GetFrame(AVPacket *pkt)
         if (m_unreadFrames.count())
         {
             m_vFrame.append(m_unreadFrames.dequeue());
-            if (m_real_file_end && !m_unreadFrames.count())
-                m_file_end = true;
-            return m_file_end;
+            if (m_realFileEnd && !m_unreadFrames.count())
+                m_fileEnd = true;
+            return m_fileEnd;
         }
 
         while (!done)
@@ -1373,31 +1373,31 @@ int MPEG2fixup::GetFrame(AVPacket *pkt)
                 }
 
                 m_vFrame.append(tmpFrame);
-                m_real_file_end = true;
-                m_file_end = true;
+                m_realFileEnd = true;
+                m_fileEnd = true;
                 return 1;
             }
 
-            if (pkt->stream_index == m_vid_id ||
+            if (pkt->stream_index == m_vidId ||
                   m_aFrame.contains(pkt->stream_index))
                 done = true;
             else 
                 av_packet_unref(pkt);
         }
-        pkt->duration = m_framenum++;
-        if ((m_showprogress || update_status) &&
-            MythDate::current() > m_statustime)
+        pkt->duration = m_frameNum++;
+        if ((m_showProgress || m_updateStatus) &&
+            MythDate::current() > m_statusTime)
         {
-            float percent_done = 100.0 * pkt->pos / m_filesize;
-            if (update_status)
-                update_status(percent_done);
-            if (m_showprogress)
+            float percent_done = 100.0 * pkt->pos / m_fileSize;
+            if (m_updateStatus)
+                m_updateStatus(percent_done);
+            if (m_showProgress)
                 LOG(VB_GENERAL, LOG_INFO, QString("%1% complete")
                         .arg(percent_done, 0, 'f', 1));
-            if (check_abort && check_abort())
+            if (m_checkAbort && m_checkAbort())
                 return REENCODE_STOPPED;
-            m_statustime = MythDate::current();
-            m_statustime = m_statustime.addSecs(m_status_update_time);
+            m_statusTime = MythDate::current();
+            m_statusTime = m_statusTime.addSecs(m_statusUpdateTime);
         }
 
 #ifdef DEBUG_AUDIO
@@ -1421,7 +1421,7 @@ int MPEG2fixup::GetFrame(AVPacket *pkt)
                 m_vFrame.append(tmpFrame);
                 av_packet_unref(pkt);
 
-                if (!ProcessVideo(m_vFrame.last(), m_header_decoder))
+                if (!ProcessVideo(m_vFrame.last(), m_headerDecoder))
                     return 0;
                 m_framePool.enqueue(m_vFrame.takeLast());
                 break;
@@ -1460,7 +1460,7 @@ bool MPEG2fixup::FindStart()
         if (GetFrame(&pkt))
             return false;
 
-        if (m_vid_id == pkt.stream_index)
+        if (m_vidId == pkt.stream_index)
         {
             while (!m_vFrame.isEmpty())
             {
@@ -1645,7 +1645,7 @@ void MPEG2fixup::StoreSecondary()
 
     while (m_vFrame.count() > 1)
     {
-        if (m_use_secondary && GetFrameTypeT(m_vFrame.first()) != 'B')
+        if (m_useSecondary && GetFrameTypeT(m_vFrame.first()) != 'B')
             m_vSecondary.append(m_vFrame.takeFirst());
         else
             m_framePool.enqueue(m_vFrame.takeFirst());
@@ -1655,11 +1655,11 @@ void MPEG2fixup::StoreSecondary()
 int MPEG2fixup::PlaybackSecondary()
 {
     int frame_num = 0;
-    mpeg2_reset(m_img_decoder, 1);
+    mpeg2_reset(m_imgDecoder, 1);
     for (auto it = m_vSecondary.begin(); it != m_vSecondary.end(); it++)
     {
         SetFrameNum((*it)->m_framePos, frame_num++);
-        if (ProcessVideo((*it), m_img_decoder) < 0)
+        if (ProcessVideo((*it), m_imgDecoder) < 0)
             return 1;
     }
     return 0;
@@ -1670,14 +1670,14 @@ MPEG2frame *MPEG2fixup::DecodeToFrame(int frameNum, int skip_reset)
     MPEG2frame *spare = nullptr;
     int found = 0;
     bool skip_first = false;
-    const mpeg2_info_t * info = mpeg2_info(m_img_decoder);
+    const mpeg2_info_t * info = mpeg2_info(m_imgDecoder);
     int maxPos = m_vFrame.count() - 1;
 
     if (m_vFrame.at(m_displayFrame)->m_isSequence)
     {
         skip_first = true;
         if (!skip_reset && (m_displayFrame != maxPos || m_displayFrame == 0))
-            mpeg2_reset(m_img_decoder, 1);
+            mpeg2_reset(m_imgDecoder, 1);
     }
 
     spare = FindFrameNum(frameNum);
@@ -1689,7 +1689,7 @@ MPEG2frame *MPEG2fixup::DecodeToFrame(int frameNum, int skip_reset)
     for (int curPos = m_displayFrame; m_displayFrame != maxPos;
          curPos++, m_displayFrame++)
     {
-        if (ProcessVideo(m_vFrame.at(m_displayFrame), m_img_decoder) < 0)
+        if (ProcessVideo(m_vFrame.at(m_displayFrame), m_imgDecoder) < 0)
             return nullptr;
 
         if (!skip_first && curPos >= framePos && info->display_picture &&
@@ -1717,7 +1717,7 @@ MPEG2frame *MPEG2fixup::DecodeToFrame(int frameNum, int skip_reset)
                (int)info->display_picture->temporal_reference < frameNum)
         {
             SetFrameNum(tmpFrame->m_framePos, ++tmpFrameNum);
-            if (ProcessVideo(tmpFrame, m_img_decoder) < 0)
+            if (ProcessVideo(tmpFrame, m_imgDecoder) < 0)
             {
                 delete tmpFrame;
                 return nullptr;
@@ -1790,7 +1790,7 @@ int MPEG2fixup::ConvertToI(FrameList *orderedFrames, int headPos)
         spare->set_pkt(&pkt);
         av_packet_unref(&pkt);
         SetFrameNum(spare->m_pkt.data, GetFrameNum(spare));
-        ProcessVideo(spare, m_header_decoder); //process this new frame
+        ProcessVideo(spare, m_headerDecoder); //process this new frame
     }
 
     //reorder frames
@@ -1849,7 +1849,7 @@ int MPEG2fixup::InsertFrame(int frameNum, int64_t deltaPTS,
         if (tmpFrame == nullptr)
             return -1;
         m_vFrame.insert(index, tmpFrame);
-        ProcessVideo(tmpFrame, m_header_decoder); //process new frame
+        ProcessVideo(tmpFrame, m_headerDecoder); //process new frame
 
         inc2x33(&pkt.pts, ptsIncrement);
         deltaPTS -= ptsIncrement;
@@ -1903,7 +1903,7 @@ void MPEG2fixup::AddRangeList(QStringList rangelist, int type)
     }
 
     if (rangelist.count())
-        m_use_secondary = true;
+        m_useSecondary = true;
 }
 
 void MPEG2fixup::ShowRangeMap(frm_dir_map_t *mapPtr, QString msg)
@@ -2032,7 +2032,7 @@ int MPEG2fixup::Start()
     int64_t initPTS = m_vFrame.first()->m_pkt.pts;
 
     LOG(VB_GENERAL, LOG_INFO, QString("#%1 PTS:%2 Delta: 0.0ms queue: %3")
-            .arg(m_vid_id).arg(PtsTime(m_vFrame.first()->m_pkt.pts))
+            .arg(m_vidId).arg(PtsTime(m_vFrame.first()->m_pkt.pts))
             .arg(m_vFrame.count()));
 
     for (auto it = m_aFrame.begin(); it != m_aFrame.end(); it++)
@@ -2050,7 +2050,7 @@ int MPEG2fixup::Start()
 
     initPTS -= 16200; //0.18 seconds back to prevent underflow
 
-    PTSOffsetQueue poq(m_vid_id, m_aFrame.keys(), initPTS);
+    PTSOffsetQueue poq(m_vidId, m_aFrame.keys(), initPTS);
 
     LOG(VB_PROCESS, LOG_INFO,
         QString("ptsIncrement: %1 Frame #: %2 PTS-adjust: %3")
@@ -2083,14 +2083,14 @@ int MPEG2fixup::Start()
 
     InitReplex();
 
-    while (!m_file_end)
+    while (!m_fileEnd)
     {
         /* read packet */
         int ret = GetFrame(&pkt);
         if (ret < 0)
             return ret;
 
-        if (m_vFrame.count() && (m_file_end || m_vFrame.last()->m_isSequence))
+        if (m_vFrame.count() && (m_fileEnd || m_vFrame.last()->m_isSequence))
         {
             m_displayFrame = 0;
 
@@ -2147,27 +2147,27 @@ int MPEG2fixup::Start()
                      it2 != Lreorder.end(); it2++)
                 {
                     MPEG2frame *curFrame = (*it2);
-                    poq.UpdateOrigPTS(m_vid_id, origvPTS, &curFrame->m_pkt);
+                    poq.UpdateOrigPTS(m_vidId, origvPTS, &curFrame->m_pkt);
                     InitialPTSFixup(curFrame, origvPTS, PTSdiscrep, 
-                                    m_maxframes, true);
+                                    m_maxFrames, true);
                 }
 
                 // if there was a PTS jump, find the largest change
                 // in the next x frames
                 // At the end of this, vFrame should look just like it did
                 // beforehand
-                if (PTSdiscrep && !m_file_end)
+                if (PTSdiscrep && !m_fileEnd)
                 {
                     int pos = m_vFrame.count();
                     int count = Lreorder.count();
-                    while (m_vFrame.count() - frame_pos - count < 20 && !m_file_end)
+                    while (m_vFrame.count() - frame_pos - count < 20 && !m_fileEnd)
                         if ((ret = GetFrame(&pkt)) < 0)
                             return ret;
 
-                    if (!m_file_end)
+                    if (!m_fileEnd)
                     {
                         int64_t tmp_origvPTS = origvPTS;
-                        int numframes = (m_maxframes > 1) ? m_maxframes - 1 : 1;
+                        int numframes = (m_maxFrames > 1) ? m_maxFrames - 1 : 1;
                         bool done = false;
                         while (!done &&
                                (frame_pos + count + 1) < m_vFrame.count())
@@ -2202,7 +2202,7 @@ int MPEG2fixup::Start()
                     {
                         m_unreadFrames.enqueue(m_vFrame.takeAt(pos));
                     }
-                    m_file_end = false;
+                    m_fileEnd = false;
                 }
   
                 //check for cutpoints and convert to I-frames if needed 
@@ -2315,7 +2315,7 @@ int MPEG2fixup::Start()
                         }
 
                         dec2x33(&curFrame->m_pkt.pts,
-                                poq.Get(m_vid_id, &curFrame->m_pkt));
+                                poq.Get(m_vidId, &curFrame->m_pkt));
                         deltaPTS = diff2x33(curFrame->m_pkt.pts,
                                             expectedvPTS / 300);
 
@@ -2331,20 +2331,20 @@ int MPEG2fixup::Start()
                         }
 
                         //remove repeat_first_field if necessary
-                        if (m_no_repeat)
+                        if (m_noRepeat)
                             SetRepeat(curFrame, 2, false);
 
                         //force PTS to stay in sync (this could be a bad idea!)
-                        if (m_fix_PTS)
+                        if (m_fixPts)
                             curFrame->m_pkt.pts = expectedvPTS / 300;
 
-                        if (deltaPTS > m_ptsIncrement*m_maxframes)
+                        if (deltaPTS > m_ptsIncrement*m_maxFrames)
                         {
                             LOG(VB_GENERAL, LOG_NOTICE,
                                 QString("Need to insert %1 frames > max "
                                         "allowed: %2.  Assuming bad PTS")
                                     .arg((int)(deltaPTS / m_ptsIncrement))
-                                    .arg(m_maxframes));
+                                    .arg(m_maxFrames));
                             curFrame->m_pkt.pts = expectedvPTS / 300;
                             deltaPTS = 0;
                         }
@@ -2438,16 +2438,16 @@ int MPEG2fixup::Start()
                     frame_pos += Lreorder.count();
                 }
                 if (PTSdiscrep)
-                    poq.SetNextPos(add2x33(poq.Get(m_vid_id, &lastRealvPkt),
+                    poq.SetNextPos(add2x33(poq.Get(m_vidId, &lastRealvPkt),
                                                    PTSdiscrep), &lastRealvPkt);
             }
 
             if (m_discard)
                 cutEndPTS = lastRealvPkt.pts;
 
-            if (m_file_end)
-                m_use_secondary = false;
-            if (m_vFrame.count() > 1 || m_file_end)
+            if (m_fileEnd)
+                m_useSecondary = false;
+            if (m_vFrame.count() > 1 || m_fileEnd)
                 StoreSecondary();
         }
 
@@ -2507,7 +2507,7 @@ int MPEG2fixup::Start()
                     continue;
                 }
 
-                if (tmpPTS > incPTS * m_maxframes)
+                if (tmpPTS > incPTS * m_maxFrames)
                 {
                     LOG(VB_PROCESS, LOG_INFO,
                         QString("Found invalid audio PTS (off by %1) at %2")
@@ -2750,11 +2750,11 @@ int MPEG2fixup::BuildKeyframeIndex(QString &file,
     int count = 0;
 
     /*============ initialise AV ===============*/
-    m_vid_id = -1;
+    m_vidId = -1;
     if (!InitAV(file, nullptr, 0))
         return GENERIC_EXIT_NOT_OK;
 
-    if (m_mkvfile)
+    if (m_mkvFile)
     {
         LOG(VB_GENERAL, LOG_INFO, "Seek tables are not required for MKV");
         return GENERIC_EXIT_NOT_OK;
@@ -2765,7 +2765,7 @@ int MPEG2fixup::BuildKeyframeIndex(QString &file,
     uint64_t totalDuration = 0;
     while (av_read_frame(m_inputFC, &pkt) >= 0)
     {
-        if (pkt.stream_index == m_vid_id)
+        if (pkt.stream_index == m_vidId)
         {
             if (pkt.flags & AV_PKT_FLAG_KEY)
             {

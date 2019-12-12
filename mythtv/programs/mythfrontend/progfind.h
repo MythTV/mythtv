@@ -103,7 +103,7 @@ class JaProgFinder : public ProgFinder
     void whereClauseGetSearchData(QString &where, MSqlBindings &bindings) override; // ProgFinder
 
   private:
-    static const QChar s_searchChars[];
+    static const QChar kSearchChars[];
     int m_numberOfSearchChars;
 };
 
@@ -121,7 +121,7 @@ class HeProgFinder : public ProgFinder
     void whereClauseGetSearchData(QString &where, MSqlBindings &bindings) override; // ProgFinder
 
   private:
-    static const QChar s_searchChars[];
+    static const QChar kSearchChars[];
     int m_numberOfSearchChars;
 };
 ///////////////////////////////
@@ -139,7 +139,7 @@ class RuProgFinder : public ProgFinder
     void whereClauseGetSearchData(QString &where, MSqlBindings &bindings) override; // ProgFinder
                                              
   private:
-    static const QChar s_searchChars[];
+    static const QChar kSearchChars[];
     int m_numberOfSearchChars;
 };
 ///////////////////////////////////

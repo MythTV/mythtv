@@ -69,9 +69,9 @@ class JumpToChannel : public QObject
   private:
     JumpToChannelListener *m_listener {nullptr};
     QString  m_entry;
-    int      m_previous_start_channel_index;
-    int      m_previous_current_channel_index;
-    uint     m_rows_displayed;
+    int      m_previousStartChannelIndex;
+    int      m_previousCurrentChannelIndex;
+    uint     m_rowsDisplayed;
     QTimer  *m_timer                  {nullptr}; // audited ref #5318
 
     static const uint kJumpToChannelTimeout = 3500; // ms

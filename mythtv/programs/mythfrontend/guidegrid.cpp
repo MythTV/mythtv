@@ -71,9 +71,9 @@ JumpToChannel::JumpToChannel(
     int start_chan_idx, int cur_chan_idx, uint rows_disp) :
     m_listener(parent),
     m_entry(std::move(start_entry)),
-    m_previous_start_channel_index(start_chan_idx),
-    m_previous_current_channel_index(cur_chan_idx),
-    m_rows_displayed(rows_disp),
+    m_previousStartChannelIndex(start_chan_idx),
+    m_previousCurrentChannelIndex(cur_chan_idx),
+    m_rowsDisplayed(rows_disp),
     m_timer(new QTimer(this))
 {
     if (parent && m_timer)
@@ -121,8 +121,8 @@ bool JumpToChannel::ProcessEntry(const QStringList &actions, const QKeyEvent *e)
 
     if (has_action("ESCAPE", actions))
     {
-        m_listener->GoTo(m_previous_start_channel_index,
-                         m_previous_current_channel_index);
+        m_listener->GoTo(m_previousStartChannelIndex,
+                         m_previousCurrentChannelIndex);
         deleteLater();
         return true;
     }
@@ -177,8 +177,8 @@ bool JumpToChannel::Update(void)
         m_timer->start(kJumpToChannelTimeout);
 
         // rows_displayed to center
-        int start = i - m_rows_displayed/2;
-        int cur   = m_rows_displayed/2;
+        int start = i - m_rowsDisplayed/2;
+        int cur   = m_rowsDisplayed/2;
         m_listener->GoTo(start, cur);
         return true;
     }

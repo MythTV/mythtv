@@ -31,32 +31,32 @@ class ScreenWizard : public MythScreenType
     void doMenu();
     void doExit();
   private:
-    bool m_whichcorner;
-    bool m_coarsefine;
-    bool m_changed;
-    int m_fine;
-    int m_coarse;
-    int m_change;
-    int m_topleft_x;
-    int m_topleft_y;
-    int m_bottomright_x;
-    int m_bottomright_y;
-    int m_screenwidth;
-    int m_screenheight;
-    int m_xsize;
-    int m_ysize;
-    int m_xoffset;
-    int m_yoffset;
+    bool           m_whichCorner   { true };
+    bool           m_coarseFine    { false }; // fine adjustments by default
+    bool           m_changed       { false };
+    int            m_fine          { 1 };     // fine moves corners by one pixel
+    int            m_coarse        { 10 };    // coarse moves corners by ten pixels
+    int            m_change        { m_fine };
+    int            m_topLeftX      { 0 };
+    int            m_topLeftY      { 0 };
+    int            m_bottomRightX  { 0 };
+    int            m_bottomRightY  { 0 };
+    int            m_screenWidth   { 0 };
+    int            m_screenHeight  { 0 };
+    int            m_xSize         { 0 };
+    int            m_ySize         { 0 };
+    int            m_xOffset       { 0 };
+    int            m_yOffset       { 0 };
 
-    QRect m_menuRect;
-    QRect m_arrowsRect;
+    QRect          m_menuRect;
+    QRect          m_arrowsRect;
 
-    MythUIShape *m_blackout;
-    MythUIImage *m_preview;
-    MythUIText *m_size;
-    MythUIText *m_offsets;
-    MythUIText *m_changeamount;
-    MythDialogBox *m_menuPopup;
+    MythUIShape   *m_blackout     { nullptr };
+    MythUIImage   *m_preview      { nullptr };
+    MythUIText    *m_size         { nullptr };
+    MythUIText    *m_offsets      { nullptr };
+    MythUIText    *m_changeAmount { nullptr };
+    MythDialogBox *m_menuPopup    { nullptr };
 
     bool moveTLUp(void);
     bool moveTLDown(void);

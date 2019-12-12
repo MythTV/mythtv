@@ -30,8 +30,8 @@ class HttpConfig : public HttpServerExtension
     static bool LoadSettings(MythSettingList&, const QString &hostname);
     static void PrintSettings(QBuffer&, const MythSettingList&);
 
-    MythSettingList m_database_settings;
-    MythSettingList m_general_settings;
+    MythSettingList m_databaseSettings;
+    MythSettingList m_generalSettings;
 };
 
 #endif

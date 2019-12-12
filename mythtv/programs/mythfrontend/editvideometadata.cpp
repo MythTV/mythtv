@@ -388,7 +388,7 @@ void EditMetadataDialog::fillWidgets()
     if (m_workingMetadata->GetChildID() > 0)
     {
         m_childList->SetValueByData(m_workingMetadata->GetChildID());
-        cachedChildSelection = m_workingMetadata->GetChildID();
+        m_cachedChildSelection = m_workingMetadata->GetChildID();
     }
 
     if (m_workingMetadata->GetBrowse())
@@ -602,8 +602,8 @@ void EditMetadataDialog::SetLevel(MythUIButtonListItem *item)
 
 void EditMetadataDialog::SetChild(MythUIButtonListItem *item)
 {
-    cachedChildSelection = item->GetData().toInt();
-    m_workingMetadata->SetChildID(cachedChildSelection);
+    m_cachedChildSelection = item->GetData().toInt();
+    m_workingMetadata->SetChildID(m_cachedChildSelection);
 }
 
 void EditMetadataDialog::ToggleBrowse()

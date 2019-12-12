@@ -30,10 +30,10 @@ private:
     int resetBuffers(int newwidth, int newheight);
 
     double         *m_mask        {nullptr}; /* pre-computed Gaussian mask */
-    int             m_mask_radius {2};       /* radius of mask */
+    int             m_maskRadius  {2};       /* radius of mask */
 
     unsigned int   *m_sgm         {nullptr}; /* squared-gradient magnitude */
-    unsigned int   *m_sgmsorted   {nullptr}; /* squared-gradient magnitude */
+    unsigned int   *m_sgmSorted   {nullptr}; /* squared-gradient magnitude */
     AVFrame         m_s1          {};        /* smoothed grayscale frame */
     AVFrame         m_s2          {};        /* smoothed grayscale frame */
     AVFrame         m_convolved   {};        /* smoothed grayscale frame */

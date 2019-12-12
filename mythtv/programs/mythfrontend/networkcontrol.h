@@ -133,25 +133,25 @@ class NetworkControl : public ServerPool, public QRunnable
 
     static QString getWidgetType(MythUIType *type);
 
-    QString prompt             {"# "};
-    bool    gotAnswer          {false};
-    QString answer             {""};
-    QMap <QString, QString> jumpMap;
-    QMap <QString, int> keyMap;
-    QMap <int, QString> keyTextMap;
+    QString m_prompt             {"# "};
+    bool    m_gotAnswer          {false};
+    QString m_answer             {""};
+    QMap <QString, QString> m_jumpMap;
+    QMap <QString, int>     m_keyMap;
+    QMap <int, QString>     m_keyTextMap;
 
-    mutable QMutex  clientLock {QMutex::Recursive};
-    QList<NetworkControlClient*> clients;
+    mutable QMutex  m_clientLock {QMutex::Recursive};
+    QList<NetworkControlClient*> m_clients;
 
-    QList<NetworkCommand*> networkControlCommands; // protected by ncLock
-    QMutex ncLock;
-    QWaitCondition ncCond; // protected by ncLock
+    QList<NetworkCommand*> m_networkControlCommands; // protected by ncLock
+    QMutex m_ncLock;
+    QWaitCondition m_ncCond; // protected by ncLock
 
-    QList<NetworkCommand*> networkControlReplies;
-    QMutex nrLock;
+    QList<NetworkCommand*> m_networkControlReplies;
+    QMutex m_nrLock;
 
-    MThread *commandThread     {nullptr};
-    bool stopCommandThread     {false}; // protected by ncLock
+    MThread *m_commandThread     {nullptr};
+    bool m_stopCommandThread     {false}; // protected by ncLock
 };
 
 #endif

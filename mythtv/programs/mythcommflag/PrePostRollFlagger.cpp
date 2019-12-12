@@ -340,7 +340,7 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
 
         ProcessFrame(currentFrame, currentFrameNumber);
 
-        if(frameInfo[currentFrameNumber].flagMask &
+        if (m_frameInfo[currentFrameNumber].flagMask &
            (COMM_FRAME_SCENE_CHANGE | COMM_FRAME_BLANK))
         {
             foundFrame = currentFrameNumber;

@@ -56,11 +56,11 @@ class ProgramInfoCache
 
     mutable QMutex          m_lock;
     Cache                   m_cache;
-    vector<ProgramInfo*>   *m_next_cache        {nullptr};
+    vector<ProgramInfo*>   *m_nextCache         {nullptr};
     QObject                *m_listener          {nullptr};
-    bool                    m_load_is_queued    {false};
-    uint                    m_loads_in_progress {0};
-    mutable QWaitCondition  m_load_wait;
+    bool                    m_loadIsQueued      {false};
+    uint                    m_loadsInProgress   {0};
+    mutable QWaitCondition  m_loadWait;
 };
 
 #endif // _PROGRAM_INFO_CACHE_H_

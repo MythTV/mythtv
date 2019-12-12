@@ -44,7 +44,7 @@ class UPnpCDSMusic : public UPnpCDSExtension
 
     private:
 
-        QUrl             m_URIBase;
+        QUrl             m_uriBase;
 
         void             PopulateArtworkURIS( CDSObject *pItem,
                                               int songID );

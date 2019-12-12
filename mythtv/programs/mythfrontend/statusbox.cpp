@@ -1178,11 +1178,11 @@ static QString uptimeStr(time_t uptime)
 }
 
 /** \fn StatusBox::getActualRecordedBPS(QString hostnames)
- *  \brief Fills in recordingProfilesBPS w/ average bitrate from recorded table
+ *  \brief Fills in m_recordingProfilesBps w/ average bitrate from recorded table
  */
 void StatusBox::getActualRecordedBPS(const QString& hostnames)
 {
-    recordingProfilesBPS.clear();
+    m_recordingProfilesBps.clear();
 
     QString querystr;
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1203,7 +1203,7 @@ void StatusBox::getActualRecordedBPS(const QString& hostnames)
 
         // Don't user a tr() directly here as the Qt tools will
         // not be able to extract the string for translation.
-        recordingProfilesBPS[rateStr] =
+        m_recordingProfilesBps[rateStr] =
             (int)(query.value(0).toDouble());
     }
 
@@ -1223,7 +1223,7 @@ void StatusBox::getActualRecordedBPS(const QString& hostnames)
 
         // Don't user a tr() directly here as the Qt tools will
         // not be able to extract the string for translation.
-        recordingProfilesBPS[rateStr] =
+        m_recordingProfilesBps[rateStr] =
             (int)(query.value(0).toDouble());
     }
 }
@@ -1412,7 +1412,7 @@ void StatusBox::doMachineStatus()
         disk_usage_with_rec_time_kb(list,
             fsInfos[i].getTotalSpace(), fsInfos[i].getUsedSpace(),
             fsInfos[i].getTotalSpace() - fsInfos[i].getUsedSpace(),
-            recordingProfilesBPS);
+            m_recordingProfilesBps);
 
         if (fsInfos[i].getPath() == "TotalDiskSpace")
         {
