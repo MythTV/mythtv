@@ -501,7 +501,7 @@ template_alloc(const unsigned int *scores, int width, int height,
             .arg((float)first / nn, 0, 'f', 6)
             .arg((float)last / nn, 0, 'f', 6));
 
-    for (int ii = 0; ii < nn; ii++)
+    for (ii = 0; ii < nn; ii++)
         thresh.data[0][ii] = scores[ii] >= threshscore ? UCHAR_MAX : 0;
 
     if (debug_edgecounts)
@@ -517,7 +517,7 @@ template_alloc(const unsigned int *scores, int width, int height,
             goto free_thresh;
         }
         unsigned int maxscore = sortedscores[nn - 1];
-        for (int ii = 0; ii < nn; ii++)
+        for (ii = 0; ii < nn; ii++)
             scored.data[0][ii] = scores[ii] * UCHAR_MAX / maxscore;
         bool success = writeJPG(debugdir + "/TemplateFinder-scores", &scored,
                 height);
