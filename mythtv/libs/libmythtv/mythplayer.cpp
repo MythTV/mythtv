@@ -1963,6 +1963,8 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
         return false;
     }
 
+    if (!m_avsyncAudioPaused)
+        m_audio.Pause(false);
     SetBuffering(false);
     return true;
 }

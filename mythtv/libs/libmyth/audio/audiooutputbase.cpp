@@ -935,6 +935,7 @@ void AudioOutputBase::Reset()
     m_resetActive.Ref();
     m_currentSeconds = -1;
     m_wasPaused = !m_pauseAudio;
+    m_unpauseWhenReady = false;
     // clear any state that could remember previous audio in any active filters
     if (m_needsUpmix && m_upmixer)
         m_upmixer->flush();
