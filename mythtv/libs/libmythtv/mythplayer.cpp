@@ -1582,7 +1582,7 @@ void MythPlayer::AVSync(VideoFrame *buffer)
     auto playspeed1000 = static_cast<int64_t>(1000.0F / m_playSpeed);
     bool reset = false;
     // controller gain
-    static float const s_av_control_gain = 0.4F;
+    static float const s_av_control_gain = 0.04F;
     // time weighted exponential filter coefficient
     static float const s_sync_fc = 0.6F;
 
@@ -1690,7 +1690,7 @@ void MythPlayer::AVSync(VideoFrame *buffer)
     m_dispTimecode = videotimecode;
 
     m_outputJmeter && m_outputJmeter->RecordCycleTime();
-    m_avsyncAvg = static_cast<int>(audio_adjustment * 1000);
+    m_avsyncAvg = static_cast<int>(m_lastFix * 1000 / s_av_control_gain);
 
     bool decoderdeint = buffer && buffer->decoder_deinterlaced;
     FrameScanType ps = m_scan;
