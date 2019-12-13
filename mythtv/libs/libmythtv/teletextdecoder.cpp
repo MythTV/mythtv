@@ -52,10 +52,10 @@ void TeletextDecoder::Decode(const unsigned char *buf, int vbimode)
     uint packet;
     uint header;
 
-    if (!m_teletext_reader)
+    if (!m_teletextReader)
         return;
 
-    m_decodertype = vbimode;
+    m_decoderType = vbimode;
 
     switch (vbimode)
     {
@@ -143,14 +143,14 @@ void TeletextDecoder::Decode(const unsigned char *buf, int vbimode)
             flags = b4 & 0x1F;
             flags |= b3 & 0xC0;
             flags |= (b2 & 0x80) >> 2;
-            m_teletext_reader->AddPageHeader(pagenum, subpagenum, buf,
-                                             vbimode, lang, flags);
+            m_teletextReader->AddPageHeader(pagenum, subpagenum, buf,
+                                            vbimode, lang, flags);
 
             break;
 
         default: // Page Data
-            m_teletext_reader->AddTeletextData((magazine ? magazine : 8), packet,
-                                               buf, vbimode);
+            m_teletextReader->AddTeletextData((magazine ? magazine : 8), packet,
+                                              buf, vbimode);
             break;
     }
 }

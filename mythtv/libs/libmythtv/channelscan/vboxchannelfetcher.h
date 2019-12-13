@@ -71,7 +71,7 @@ class VBoxChannelFetcher : public QRunnable
     vbox_chan_map_t GetChannels(void);
 
   private:
-    void SetTotalNumChannels(uint val) { m_chan_cnt = (val) ? val : 1; }
+    void SetTotalNumChannels(uint val) { m_chanCnt = (val) ? val : 1; }
     void SetNumChannelsInserted(uint);
     bool SupportedTransmission(const QString &transType);
 
@@ -79,17 +79,17 @@ class VBoxChannelFetcher : public QRunnable
     void run(void) override; // QRunnable
 
   private:
-    ScanMonitor         *m_scan_monitor   {nullptr};
-    uint                 m_cardid;
-    QString              m_inputname;
-    uint                 m_sourceid;
+    ScanMonitor         *m_scanMonitor    {nullptr};
+    uint                 m_cardId;
+    QString              m_inputName;
+    uint                 m_sourceId;
     bool                 m_ftaOnly;
     ServiceRequirements  m_serviceType;
     QString              m_transType      {"UNKNOWN"};
     vbox_chan_map_t     *m_channels       {nullptr};
-    uint                 m_chan_cnt       {1};
-    bool                 m_thread_running {false};
-    bool                 m_stop_now       {false};
+    uint                 m_chanCnt        {1};
+    bool                 m_threadRunning  {false};
+    bool                 m_stopNow        {false};
     MThread             *m_thread         {nullptr};
     QMutex               m_lock;
 };

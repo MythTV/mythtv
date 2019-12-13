@@ -722,7 +722,7 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
     m_currentPGTextSTStream = 0;
     m_currentSecondaryAudioStream = 0;
     m_currentSecondaryVideoStream = 0;
-    m_PGTextSTEnabled = false;
+    m_pgTextSTEnabled = false;
     m_secondaryAudioEnabled = false;
     m_secondaryVideoEnabled = false;
     m_secondaryVideoIsFullscreen = false;
@@ -1414,7 +1414,7 @@ void BDRingBuffer::HandleBDEvent(BD_EVENT &ev)
         case BD_EVENT_PG_TEXTST:
             LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("EVENT_PG_TEXTST %1")
                                 .arg(ev.param ? "enable" : "disable"));
-            m_PGTextSTEnabled = (ev.param != 0U);
+            m_pgTextSTEnabled = (ev.param != 0U);
             break;
         case BD_EVENT_SECONDARY_AUDIO:
             LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("EVENT_SECONDARY_AUDIO %1")

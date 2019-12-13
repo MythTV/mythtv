@@ -458,14 +458,14 @@ class DiSEqCDevLNB : public DiSEqCDevDevice
     void SetLOFSwitch(uint lof_switch)    { m_lofSwitch = lof_switch;  }
     void SetLOFHigh(  uint lof_hi)        { m_lofHi     = lof_hi;      }
     void SetLOFLow(   uint lof_lo)        { m_lofLo     = lof_lo;      }
-    void SetPolarityInverted(bool inv)    { m_pol_inv    = inv;        }
+    void SetPolarityInverted(bool inv)    { m_polInv    = inv;         }
 
     // Gets
     dvbdev_lnb_t GetType(void)      const { return m_type;             }
     uint         GetLOFSwitch(void) const { return m_lofSwitch;        }
     uint         GetLOFHigh(void)   const { return m_lofHi;            }
     uint         GetLOFLow(void)    const { return m_lofLo;            }
-    bool         IsPolarityInverted(void) const { return m_pol_inv;    }
+    bool         IsPolarityInverted(void) const { return m_polInv;     }
     bool         IsHighBand(const DTVMultiplex&) const;
     bool         IsHorizontal(const DTVMultiplex&) const;
     uint32_t     GetIntermediateFrequency(const DiSEqCDevSettings& settings,
@@ -488,7 +488,7 @@ class DiSEqCDevLNB : public DiSEqCDevDevice
     /// If a signal is circularly polarized the polarity will flip
     /// on each reflection, so antenna systems with an even number
     /// of reflectors will need to set this value.
-    bool         m_pol_inv    {false};
+    bool         m_polInv     {false};
 
     static const TypeTable kLNBTypeTable[5];
 };

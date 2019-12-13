@@ -1390,10 +1390,10 @@ void SubtitleScreen::EnableSubtitles(int type, bool forced_only)
         m_subreader->EnableTextSubtitles(kDisplayTextSubtitle == m_subtitleType);
         m_subreader->EnableRawTextSubtitles(kDisplayRawTextSubtitle == m_subtitleType);
     }
-    if (m_608reader)
-        m_608reader->SetEnabled(kDisplayCC608 == m_subtitleType);
-    if (m_708reader)
-        m_708reader->SetEnabled(kDisplayCC708 == m_subtitleType);
+    if (m_cc608reader)
+        m_cc608reader->SetEnabled(kDisplayCC608 == m_subtitleType);
+    if (m_cc708reader)
+        m_cc708reader->SetEnabled(kDisplayCC708 == m_subtitleType);
     ClearAllSubtitles();
     SetVisible(m_subtitleType != kDisplayNone);
     SetArea(MythRect());
@@ -1446,10 +1446,10 @@ void SubtitleScreen::ClearNonDisplayedSubtitles(void)
         m_subreader->ClearAVSubtitles();
     if (m_subreader && (kDisplayRawTextSubtitle == m_subtitleType))
         m_subreader->ClearRawTextSubtitles();
-    if (m_608reader && (kDisplayCC608 == m_subtitleType))
-        m_608reader->ClearBuffers(true, true);
-    if (m_708reader && (kDisplayCC708 == m_subtitleType))
-        m_708reader->ClearBuffers();
+    if (m_cc608reader && (kDisplayCC608 == m_subtitleType))
+        m_cc608reader->ClearBuffers(true, true);
+    if (m_cc708reader && (kDisplayCC708 == m_subtitleType))
+        m_cc708reader->ClearBuffers();
 }
 
 void SubtitleScreen::ClearDisplayedSubtitles(void)
@@ -1680,13 +1680,13 @@ bool SubtitleScreen::Create(void)
         return false;
 
     m_subreader = m_player->GetSubReader();
-    m_608reader = m_player->GetCC608Reader();
-    m_708reader = m_player->GetCC708Reader();
+    m_cc608reader = m_player->GetCC608Reader();
+    m_cc708reader = m_player->GetCC708Reader();
     if (!m_subreader)
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Failed to get subtitle reader.");
-    if (!m_608reader)
+    if (!m_cc608reader)
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Failed to get CEA-608 reader.");
-    if (!m_708reader)
+    if (!m_cc708reader)
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Failed to get CEA-708 reader.");
 
     return true;
@@ -2198,7 +2198,7 @@ void SubtitleScreen::DrawTextSubtitles(const QStringList &subs,
 
 void SubtitleScreen::DisplayCC608Subtitles(void)
 {
-    if (!m_608reader)
+    if (!m_cc608reader)
         return;
 
     bool changed = (m_textFontZoom != m_textFontZoomPrev);
@@ -2207,7 +2207,7 @@ void SubtitleScreen::DisplayCC608Subtitles(void)
         return;
     m_safeArea = m_player->GetVideoOutput()->GetSafeRect();
 
-    CC608Buffer* textlist = m_608reader->GetOutputText(changed);
+    CC608Buffer* textlist = m_cc608reader->GetOutputText(changed);
     if (!changed)
         return;
 
@@ -2229,10 +2229,10 @@ void SubtitleScreen::DisplayCC608Subtitles(void)
 
 void SubtitleScreen::DisplayCC708Subtitles(void)
 {
-    if (!m_708reader || !m_player || !m_player->GetVideoOutput())
+    if (!m_cc708reader || !m_player || !m_player->GetVideoOutput())
         return;
 
-    CC708Service *cc708service = m_708reader->GetCurrentService();
+    CC708Service *cc708service = m_cc708reader->GetCurrentService();
     float video_aspect = m_player->GetVideoAspect();
     QRect oldsafe = m_safeArea;
     m_safeArea = m_player->GetVideoOutput()->GetSafeRect();

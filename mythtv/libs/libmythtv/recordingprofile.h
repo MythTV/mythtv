@@ -127,7 +127,7 @@ class MTV_PUBLIC RecordingProfile : public GroupSetting
                                int group, bool foldautodetect = false);
 
     // constants
-    static const uint TranscoderAutodetect = 0; ///< sentinel value
+    static const uint kTranscoderAutodetect = 0; ///< sentinel value
 
   private slots:
     void ResizeTranscode(const QString &val);

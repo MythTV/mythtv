@@ -94,7 +94,7 @@ class FreqTableSelector :
 public:
     explicit FreqTableSelector(const VideoSource& parent);
 protected:
-    QString freq;
+    QString m_freq;
 };
 
 class TransFreqTableSelector : public TransMythUIComboBoxSetting
@@ -111,7 +111,7 @@ class TransFreqTableSelector : public TransMythUIComboBoxSetting
 
   private:
     uint    m_sourceId;
-    QString m_LoadedFreqTable;
+    QString m_loadedFreqTable;
 };
 
 class XMLTV_generic_config: public GroupSetting
@@ -143,7 +143,7 @@ public:
     virtual void Save(QString) { Save(); }
 
 protected:
-    UseEIT *m_useeit {nullptr};
+    UseEIT *m_useEit {nullptr};
 };
 
 class NoGrabber_config: public GroupSetting
@@ -155,7 +155,7 @@ public:
     virtual void Save(QString) { Save(); }
 
 protected:
-    UseEIT *m_useeit {nullptr};
+    UseEIT *m_useEit {nullptr};
 };
 
 class IdSetting : public AutoIncrementSetting {
@@ -335,10 +335,10 @@ class UseHDHomeRunDevice;
 class HDHomeRunDevice
 {
   public:
-    QString deviceid;
-    QString model;
-    QString cardip;
-    UseHDHomeRunDevice *checkbox;
+    QString m_deviceId;
+    QString m_model;
+    QString m_cardIp;
+    UseHDHomeRunDevice *m_checkbox;
 };
 
 using HDHomeRunDeviceList = QMap<QString, HDHomeRunDevice>;
@@ -375,7 +375,7 @@ class HDHomeRunDeviceID : public MythUITextEditSetting
     void Save(void) override; // StandardSetting
 
   private:
-    HDHomeRunConfigurationGroup &group;
+    HDHomeRunConfigurationGroup &m_group;
 };
 
 #endif
@@ -383,14 +383,14 @@ class HDHomeRunDeviceID : public MythUITextEditSetting
 class VBoxDevice
 {
   public:
-    QString mythdeviceid;
-    QString deviceid;
-    QString desc;
-    QString cardip;
-    QString tunerno;
-    QString tunertype;
-    bool    inuse;
-    bool    discovered;
+    QString m_mythDeviceId;
+    QString m_deviceId;
+    QString m_desc;
+    QString m_cardIp;
+    QString m_tunerNo;
+    QString m_tunerType;
+    bool    m_inUse;
+    bool    m_discovered;
 };
 
 using VBoxDeviceList = QMap<QString, VBoxDevice>;
@@ -486,7 +486,7 @@ class V4L2encGroup: public GroupSetting
     TransTextEditSetting *m_cardInfo {nullptr};
     VideoDevice          *m_device   {nullptr};
 
-    QString               m_DriverName;
+    QString               m_driverName;
 
   protected slots:
     void probeCard(const QString &device);

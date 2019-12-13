@@ -2077,7 +2077,7 @@ nullptr
             gCoreContext->GetBoolSetting("AutoTranscode", false);
         record.m_transcoder =
             gCoreContext->GetNumSetting(
-                "DefaultTranscoder", static_cast<int>(RecordingProfile::TranscoderAutodetect));
+                "DefaultTranscoder", static_cast<int>(RecordingProfile::kTranscoderAutodetect));
         record.m_autoUserJob1 =
             gCoreContext->GetBoolSetting("AutoRunUserJob1", false);
         record.m_autoUserJob2 =

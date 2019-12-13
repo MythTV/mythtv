@@ -48,24 +48,24 @@ class MTV_PUBLIC FIFOWriter
         unsigned char *data;
         long blksize;
     };
-    fifo_buf       **m_fifo_buf   {nullptr};
-    fifo_buf       **m_fb_inptr   {nullptr};
-    fifo_buf       **m_fb_outptr  {nullptr};
+    fifo_buf       **m_fifoBuf    {nullptr};
+    fifo_buf       **m_fbInptr    {nullptr};
+    fifo_buf       **m_fbOutptr   {nullptr};
 
-    FIFOThread      *m_fifothrds  {nullptr};
-    QMutex          *m_fifo_lock  {nullptr};
-    QWaitCondition  *m_full_cond  {nullptr};
-    QWaitCondition  *m_empty_cond {nullptr};
+    FIFOThread      *m_fifoThrds  {nullptr};
+    QMutex          *m_fifoLock   {nullptr};
+    QWaitCondition  *m_fullCond   {nullptr};
+    QWaitCondition  *m_emptyCond  {nullptr};
 
     QString         *m_filename   {nullptr};
-    QString         *m_fbdesc     {nullptr};
+    QString         *m_fbDesc     {nullptr};
 
-    long            *m_maxblksize {nullptr};
-    int             *m_killwr     {nullptr};
-    int             *m_fbcount    {nullptr};
-    int             *m_fbmaxcount {nullptr};
-    int              m_num_fifos;
-    bool             m_usesync;
+    long            *m_maxBlkSize {nullptr};
+    int             *m_killWr     {nullptr};
+    int             *m_fbCount    {nullptr};
+    int             *m_fbMaxCount {nullptr};
+    int              m_numFifos   {0};
+    bool             m_useSync;
 };
 
 #endif

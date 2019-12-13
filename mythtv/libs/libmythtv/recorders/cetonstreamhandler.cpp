@@ -144,7 +144,7 @@ CetonStreamHandler::CetonStreamHandler(const QString &device, int inputid)
     QString url = QString("rtsp://%1:%2/cetonmpeg%3")
         .arg(m_ip_address).arg(rtspPort).arg(m_tuner);
     m_tuning = IPTVTuningData(url, 0, IPTVTuningData::kNone, "", 0, "", 0);
-    m_use_rtp_streaming = true;
+    m_useRtpStreaming = true;
 
     m_valid = true;
 

@@ -39,13 +39,13 @@ class SubtitleReader
     void EnableTextSubtitles(bool enable);
     void EnableRawTextSubtitles(bool enable);
 
-    AVSubtitles* GetAVSubtitles(void) { return &m_AVSubtitles; }
+    AVSubtitles* GetAVSubtitles(void) { return &m_avSubtitles; }
     bool AddAVSubtitle(AVSubtitle& subtitle, bool fix_position,
                        bool allow_forced);
     void ClearAVSubtitles(void);
     static void FreeAVSubtitle(AVSubtitle &sub);
 
-    TextSubtitles* GetTextSubtitles(void) { return &m_TextSubtitles; }
+    TextSubtitles* GetTextSubtitles(void) { return &m_textSubtitles; }
     bool HasTextSubtitles(void);
     void LoadExternalSubtitles(const QString &subtitleFileName, bool isInProgress);
 
@@ -54,12 +54,12 @@ class SubtitleReader
     void ClearRawTextSubtitles(void);
 
   private:
-    AVSubtitles   m_AVSubtitles;
-    bool          m_AVSubtitlesEnabled      {false};
-    TextSubtitles m_TextSubtitles;
-    bool          m_TextSubtitlesEnabled    {false};
-    RawTextSubs   m_RawTextSubtitles;
-    bool          m_RawTextSubtitlesEnabled {false};
+    AVSubtitles   m_avSubtitles;
+    bool          m_avSubtitlesEnabled      {false};
+    TextSubtitles m_textSubtitles;
+    bool          m_textSubtitlesEnabled    {false};
+    RawTextSubs   m_rawTextSubtitles;
+    bool          m_rawTextSubtitlesEnabled {false};
 };
 
 #endif // SUBTITLEREADER_H

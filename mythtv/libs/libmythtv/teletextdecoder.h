@@ -9,15 +9,15 @@ class TeletextDecoder
 {
   public:
     explicit TeletextDecoder(TeletextReader *reader)
-      : m_teletext_reader(reader) {}
+      : m_teletextReader(reader) {}
     virtual ~TeletextDecoder() = default;
 
-    int  GetDecoderType(void) const { return m_decodertype; }
+    int  GetDecoderType(void) const { return m_decoderType; }
     void Decode(const unsigned char *buf, int vbimode);
 
   private:
-    TeletextReader *m_teletext_reader {nullptr};
-    int             m_decodertype     {-1};
+    TeletextReader *m_teletextReader {nullptr};
+    int             m_decoderType    {-1};
 };
 
 #endif

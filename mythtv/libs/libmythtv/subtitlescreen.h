@@ -229,8 +229,8 @@ private:
 
     MythPlayer     *m_player              {nullptr};
     SubtitleReader *m_subreader           {nullptr};
-    CC608Reader    *m_608reader           {nullptr};
-    CC708Reader    *m_708reader           {nullptr};
+    CC608Reader    *m_cc608reader         {nullptr};
+    CC708Reader    *m_cc708reader         {nullptr};
     QRect           m_safeArea;
     QRegExp         m_removeHTML          {"</?.+>"};
     int             m_subtitleType        {kDisplayNone};

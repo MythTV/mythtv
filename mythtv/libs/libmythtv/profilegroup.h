@@ -100,7 +100,7 @@ public:
     };
 
     int isDefault(void) const {
-        return m_is_default->getValue().toInt();
+        return m_isDefault->getValue().toInt();
     };
 
     QString getName(void) const { return m_name->getValue(); };
@@ -114,7 +114,7 @@ private:
     ID         *m_id         {nullptr};
     Name       *m_name       {nullptr};
     HostName   *m_host       {nullptr};
-    Is_default *m_is_default {nullptr};
+    Is_default *m_isDefault  {nullptr};
 };
 
 class MTV_PUBLIC ProfileGroupEditor :

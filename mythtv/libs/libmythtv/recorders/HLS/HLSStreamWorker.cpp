@@ -27,7 +27,7 @@ void HLSStreamWorker::Cancel(void)
 
 void HLSStreamWorker::CancelCurrentDownload(void)
 {
-    QMutexLocker locker(&m_downloader_lock);
+    QMutexLocker locker(&m_downloaderLock);
     if (m_downloader)
         m_downloader->Cancel();
 }
@@ -37,9 +37,9 @@ void HLSStreamWorker::run(void)
     LOG(VB_RECORD, LOG_INFO, LOC + "run -- begin");
     RunProlog();
 
-    m_downloader_lock.lock();
+    m_downloaderLock.lock();
     m_downloader = new MythSingleDownload;
-    m_downloader_lock.unlock();
+    m_downloaderLock.unlock();
 
     uint64_t delay;
     int retries = 0;
@@ -58,10 +58,10 @@ void HLSStreamWorker::run(void)
             // Asking QNetworkAccessManager to redownload after a
             // failure seems to result in another failure, even if the
             // segment is now available.  So, create a new instance.
-            m_downloader_lock.lock();
+            m_downloaderLock.lock();
             delete m_downloader;
             m_downloader = new MythSingleDownload;
-            m_downloader_lock.unlock();
+            m_downloaderLock.unlock();
 
             if (retries == 1)   // first error
                 continue;       // will retry immediately
@@ -87,7 +87,7 @@ void HLSStreamWorker::run(void)
                 LOG(VB_RECORD, LOG_WARNING, LOC + "waiting to retry");
             else
                 LOG(VB_RECORD, LOG_DEBUG, LOC + "waiting for work");
-            m_waitcond.wait(&m_lock, delay);
+            m_waitCond.wait(&m_lock, delay);
         }
         m_wokenup = false;
         m_lock.unlock();

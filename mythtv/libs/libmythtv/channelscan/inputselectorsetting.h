@@ -53,9 +53,9 @@ class InputSelector : public TransMythUIComboBoxSetting
     void SetSourceID(const QString &sourceid);
 
   private:
-    uint    m_sourceid {0};
-    uint    m_default_cardid;
-    QString m_default_inputname;
+    uint    m_sourceId {0};
+    uint    m_defaultCardId;
+    QString m_defaultInputName;
 };
 
 #endif // _INPUT_SELECTOR_SETTING_H_

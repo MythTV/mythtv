@@ -37,7 +37,7 @@ class ExternalChannel : public DTVChannel
 
     // Gets
     bool IsOpen(void) const override // ChannelBase
-        { return m_stream_handler; }
+        { return m_streamHandler; }
     QString GetDevice(void) const override // ChannelBase
         { return m_device; }
     bool IsPIDTuningSupported(void) const override // DTVChannel
@@ -53,7 +53,7 @@ class ExternalChannel : public DTVChannel
   private:
     QString                  m_device;
     QStringList              m_args;
-    ExternalStreamHandler   *m_stream_handler {nullptr};
+    ExternalStreamHandler   *m_streamHandler {nullptr};
     QString                  m_loc;
 };
 

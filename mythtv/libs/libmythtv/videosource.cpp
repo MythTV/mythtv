@@ -502,15 +502,15 @@ void TransFreqTableSelector::Load(void)
         return;
     }
 
-    m_LoadedFreqTable.clear();
+    m_loadedFreqTable.clear();
 
     if (query.next())
     {
-        m_LoadedFreqTable = query.value(0).toString();
-        if (!m_LoadedFreqTable.isEmpty() &&
-            (m_LoadedFreqTable.toLower() != "default"))
+        m_loadedFreqTable = query.value(0).toString();
+        if (!m_loadedFreqTable.isEmpty() &&
+            (m_loadedFreqTable.toLower() != "default"))
         {
-            int idx2 = getValueIndex(m_LoadedFreqTable);
+            int idx2 = getValueIndex(m_loadedFreqTable);
             if (idx2 >= 0)
                 setValue(idx2);
         }
@@ -521,8 +521,8 @@ void TransFreqTableSelector::Save(void)
 {
     LOG(VB_GENERAL, LOG_INFO, "TransFreqTableSelector::Save(void)");
 
-    if ((m_LoadedFreqTable == getValue()) ||
-        ((m_LoadedFreqTable.toLower() == "default") &&
+    if ((m_loadedFreqTable == getValue()) ||
+        ((m_loadedFreqTable.toLower() == "default") &&
          (getValue() == gCoreContext->GetSetting("FreqTable"))))
     {
         return;
@@ -621,10 +621,10 @@ EITOnly_config::EITOnly_config(const VideoSource& _parent, StandardSetting *_set
 {
     setVisible(false);
 
-    m_useeit = new UseEIT(_parent);
-    m_useeit->setValue(true);
-    m_useeit->setVisible(false);
-    addChild(m_useeit);
+    m_useEit = new UseEIT(_parent);
+    m_useEit->setValue(true);
+    m_useEit->setVisible(false);
+    addChild(m_useEit);
 
     TransTextEditSetting *label;
     label=new TransTextEditSetting();
@@ -638,16 +638,16 @@ EITOnly_config::EITOnly_config(const VideoSource& _parent, StandardSetting *_set
 void EITOnly_config::Save(void)
 {
     // Force this value on
-    m_useeit->setValue(true);
-    m_useeit->Save();
+    m_useEit->setValue(true);
+    m_useEit->Save();
 }
 
 NoGrabber_config::NoGrabber_config(const VideoSource& _parent)
 {
-    m_useeit = new UseEIT(_parent);
-    m_useeit->setValue(false);
-    m_useeit->setVisible(false);
-    addChild(m_useeit);
+    m_useEit = new UseEIT(_parent);
+    m_useEit->setValue(false);
+    m_useEit->setVisible(false);
+    addChild(m_useEit);
 
     auto *label = new TransTextEditSetting();
     label->setValue(QObject::tr("Do not configure a grabber"));
@@ -656,8 +656,8 @@ NoGrabber_config::NoGrabber_config(const VideoSource& _parent)
 
 void NoGrabber_config::Save(void)
 {
-    m_useeit->setValue(false);
-    m_useeit->Save();
+    m_useEit->setValue(false);
+    m_useEit->Save();
 }
 
 VideoSource::VideoSource()
@@ -1369,7 +1369,7 @@ HDHomeRunDeviceID::HDHomeRunDeviceID(const CaptureCard &parent,
                                      HDHomeRunConfigurationGroup &_group) :
     MythUITextEditSetting(
         new CaptureCardDBStorage(this, parent, "videodevice")),
-    group(_group)
+    m_group(_group)
 {
     setVisible(false);
 };
@@ -1377,12 +1377,12 @@ HDHomeRunDeviceID::HDHomeRunDeviceID(const CaptureCard &parent,
 void HDHomeRunDeviceID::Load(void)
 {
     MythUITextEditSetting::Load();
-    group.SetDeviceCheckBoxes(getValue());
+    m_group.SetDeviceCheckBoxes(getValue());
 }
 
 void HDHomeRunDeviceID::Save(void)
 {
-    setValue(group.GetDeviceCheckBoxes());
+    setValue(m_group.GetDeviceCheckBoxes());
     MythUITextEditSetting::Save();
 }
 
@@ -1433,9 +1433,9 @@ HDHomeRunConfigurationGroup::HDHomeRunConfigurationGroup
     for (dit = m_deviceList.begin(); dit != m_deviceList.end(); ++dit)
     {
         HDHomeRunDevice &dev = *dit;
-        dev.checkbox = new UseHDHomeRunDevice(
-            dev.deviceid, dev.model, dev.cardip);
-        a_cardtype.addTargetedChild("HDHOMERUN", dev.checkbox);
+        dev.m_checkbox = new UseHDHomeRunDevice(
+            dev.m_deviceId, dev.m_model, dev.m_cardIp);
+        a_cardtype.addTargetedChild("HDHOMERUN", dev.m_checkbox);
     }
     a_cardtype.addTargetedChild("HDHOMERUN", new EmptyAudioDevice(m_parent));
     a_cardtype.addTargetedChild("HDHOMERUN", new EmptyVBIDevice(m_parent));
@@ -1468,13 +1468,13 @@ void HDHomeRunConfigurationGroup::FillDeviceList(void)
         const QString& model = devinfo.at(2);
 
         HDHomeRunDevice tmpdevice;
-        tmpdevice.model    = model;
-        tmpdevice.cardip   = devip;
-        tmpdevice.deviceid = devid;
+        tmpdevice.m_model    = model;
+        tmpdevice.m_cardIp   = devip;
+        tmpdevice.m_deviceId = devid;
         // Fully specify object.  Checkboxes will be added later when
         // the configuration group is created.
-        tmpdevice.checkbox = nullptr;
-        m_deviceList[tmpdevice.deviceid] = tmpdevice;
+        tmpdevice.m_checkbox = nullptr;
+        m_deviceList[tmpdevice.m_deviceId] = tmpdevice;
     }
 
 #if 0
@@ -1510,7 +1510,7 @@ void HDHomeRunConfigurationGroup::SetDeviceCheckBoxes(const QString& devices)
         QMap<QString, HDHomeRunDevice>::iterator dit;
         dit = m_deviceList.find(devid);
         if (dit != m_deviceList.end())
-            (*dit).checkbox->setValue(true);
+            (*dit).m_checkbox->setValue(true);
     }
 }
 
@@ -1522,8 +1522,8 @@ QString HDHomeRunConfigurationGroup::GetDeviceCheckBoxes(void)
     QMap<QString, HDHomeRunDevice>::iterator dit;
     for (dit = m_deviceList.begin(); dit != m_deviceList.end(); ++dit)
     {
-        if ((*dit).checkbox->boolValue())
-            devstrs << (*dit).deviceid;
+        if ((*dit).m_checkbox->boolValue())
+            devstrs << (*dit).m_deviceId;
     }
     QString devices = devstrs.join(",");
     return devices;
@@ -1667,7 +1667,7 @@ void VBoxDeviceIDList::fillSelections(const QString &cur)
     for (; it != m_deviceList->end(); ++it)
     {
         devs.push_back(it.key());
-        in_use[it.key()] = (*it).inuse;
+        in_use[it.key()] = (*it).m_inUse;
     }
 
     QString man_addr = VBoxDeviceIDList::tr("Manually Enter IP Address");
@@ -1731,9 +1731,9 @@ void VBoxDeviceIDList::UpdateDevices(const QString &v)
         m_deviceId->setValue(v);
 
         // Update _cardip and _cardtuner
-        m_cardIp->setValue((*m_deviceList)[v].cardip);
-        m_cardTuner->setValue(QString("%1").arg((*m_deviceList)[v].tunerno));
-        m_desc->setValue((*m_deviceList)[v].desc);
+        m_cardIp->setValue((*m_deviceList)[v].m_cardIp);
+        m_cardTuner->setValue(QString("%1").arg((*m_deviceList)[v].m_tunerNo));
+        m_desc->setValue((*m_deviceList)[v].m_desc);
     }
     m_oldValue = v;
 };
@@ -2015,15 +2015,15 @@ void VBoxConfigurationGroup::FillDeviceList(void)
         const QString& tunerType = devinfo.at(3);
 
         VBoxDevice tmpdevice;
-        tmpdevice.deviceid   = id;
-        tmpdevice.desc       = CardUtil::GetVBoxdesc(id, ip, tunerNo, tunerType);
-        tmpdevice.cardip     = ip;
-        tmpdevice.inuse      = false;
-        tmpdevice.discovered = true;
-        tmpdevice.tunerno  = tunerNo;
-        tmpdevice.tunertype  = tunerType;
-        tmpdevice.mythdeviceid = id + "-" + tunerNo + "-" + tunerType;
-        m_deviceList[tmpdevice.mythdeviceid] = tmpdevice;
+        tmpdevice.m_deviceId   = id;
+        tmpdevice.m_desc       = CardUtil::GetVBoxdesc(id, ip, tunerNo, tunerType);
+        tmpdevice.m_cardIp     = ip;
+        tmpdevice.m_inUse      = false;
+        tmpdevice.m_discovered = true;
+        tmpdevice.m_tunerNo  = tunerNo;
+        tmpdevice.m_tunerType  = tunerType;
+        tmpdevice.m_mythDeviceId = id + "-" + tunerNo + "-" + tunerType;
+        m_deviceList[tmpdevice.m_mythDeviceId] = tmpdevice;
     }
 
     // Now find configured devices
@@ -2037,7 +2037,7 @@ void VBoxConfigurationGroup::FillDeviceList(void)
         dit = m_deviceList.find(*it);
 
         if (dit != m_deviceList.end())
-            (*dit).inuse = true;
+            (*dit).m_inUse = true;
     }
 }
 
@@ -2414,14 +2414,14 @@ void V4L2encGroup::probeCard(const QString &device_name)
 
     if (!v4l2.IsOpen())
     {
-        m_DriverName = tr("Failed to probe");
+        m_driverName = tr("Failed to probe");
         return;
     }
-    m_DriverName = v4l2.DriverName();
+    m_driverName = v4l2.DriverName();
     card_name = v4l2.CardName();
 
-    if (!m_DriverName.isEmpty())
-        card_info = card_name + "  [" + m_DriverName + "]";
+    if (!m_driverName.isEmpty())
+        card_info = card_name + "  [" + m_driverName + "]";
 
     m_cardInfo->setValue(card_info);
 
@@ -2431,7 +2431,7 @@ void V4L2encGroup::probeCard(const QString &device_name)
         if (audioinput->fillSelections(device_name) > 1)
         {
             audioinput->setName("AudioInput");
-            m_device->addTargetedChild(m_DriverName, audioinput);
+            m_device->addTargetedChild(m_driverName, audioinput);
         }
         else
             delete audioinput;
@@ -2439,17 +2439,17 @@ void V4L2encGroup::probeCard(const QString &device_name)
         if (v4l2.HasSlicedVBI())
         {
             auto* vbidev = new VBIDevice(m_parent);
-            if (vbidev->setFilter(card_name, m_DriverName) > 0)
+            if (vbidev->setFilter(card_name, m_driverName) > 0)
             {
                 vbidev->setName("VBIDevice");
-                m_device->addTargetedChild(m_DriverName, vbidev);
+                m_device->addTargetedChild(m_driverName, vbidev);
             }
             else
                 delete vbidev;
         }
 
-        m_device->addTargetedChild(m_DriverName, new EmptyVBIDevice(m_parent));
-        m_device->addTargetedChild(m_DriverName,
+        m_device->addTargetedChild(m_driverName, new EmptyVBIDevice(m_parent));
+        m_device->addTargetedChild(m_driverName,
                                    new ChannelTimeout(m_parent, 15000, 2000));
     }
 #else

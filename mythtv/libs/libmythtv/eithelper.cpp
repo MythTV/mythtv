@@ -169,8 +169,8 @@ void EITHelper::AddEIT(uint atsc_major, uint atsc_minor,
             }
 
             // Save the EIT event in the incomplete_events for this channel.
-            auto *tmp = new unsigned char[ev.m_desc_length];
-            memcpy(tmp, eit->Descriptors(i), ev.m_desc_length);
+            auto *tmp = new unsigned char[ev.m_descLength];
+            memcpy(tmp, eit->Descriptors(i), ev.m_descLength);
             ev.m_desc = tmp;
             events.insert(eit->EventID(i), ev);
         }
@@ -780,10 +780,10 @@ void EITHelper::CompleteEvent(uint atsc_major, uint atsc_minor,
 
 #if QT_VERSION < QT_VERSION_CHECK(5,8,0)
     QDateTime starttime = MythDate::fromTime_t(
-        event.m_start_time + GPS_EPOCH + m_gpsOffset);
+        event.m_startTime + GPS_EPOCH + m_gpsOffset);
 #else
     QDateTime starttime = MythDate::fromSecsSinceEpoch(
-        event.m_start_time + GPS_EPOCH + m_gpsOffset);
+        event.m_startTime + GPS_EPOCH + m_gpsOffset);
 #endif
 
     // fix starttime only if the duration is a multiple of a minute
@@ -791,7 +791,7 @@ void EITHelper::CompleteEvent(uint atsc_major, uint atsc_minor,
         EITFixUp::TimeFix(starttime);
     QDateTime endtime = starttime.addSecs(event.m_length);
 
-    desc_list_t list = MPEGDescriptor::Parse(event.m_desc, event.m_desc_length);
+    desc_list_t list = MPEGDescriptor::Parse(event.m_desc, event.m_descLength);
     unsigned char subtitle_type =
         MPEGDescriptor::Find(list, DescriptorID::caption_service) ?
         SUB_HARDHEAR : SUB_UNKNOWN;

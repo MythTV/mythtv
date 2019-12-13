@@ -42,7 +42,7 @@ ProfileGroup::ProfileGroup()
 {
     // This must be first because it is needed to load/save the other settings
     addChild(m_id = new ID());
-    addChild(m_is_default = new Is_default(*this));
+    addChild(m_isDefault = new Is_default(*this));
 
     setLabel(tr("Profile Group"));
     addChild(m_name = new Name(*this));

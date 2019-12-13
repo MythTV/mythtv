@@ -4,23 +4,23 @@
 SubtitleReader::~SubtitleReader()
 {
     ClearAVSubtitles();
-    m_TextSubtitles.Clear();
+    m_textSubtitles.Clear();
     ClearRawTextSubtitles();
 }
 
 void SubtitleReader::EnableAVSubtitles(bool enable)
 {
-    m_AVSubtitlesEnabled = enable;
+    m_avSubtitlesEnabled = enable;
 }
 
 void SubtitleReader::EnableTextSubtitles(bool enable)
 {
-    m_TextSubtitlesEnabled = enable;
+    m_textSubtitlesEnabled = enable;
 }
 
 void SubtitleReader::EnableRawTextSubtitles(bool enable)
 {
-    m_RawTextSubtitlesEnabled = enable;
+    m_rawTextSubtitlesEnabled = enable;
 }
 
 bool SubtitleReader::AddAVSubtitle(AVSubtitle &subtitle,
@@ -28,13 +28,13 @@ bool SubtitleReader::AddAVSubtitle(AVSubtitle &subtitle,
                                    bool allow_forced)
 {
     bool enableforced = false;
-    if (!m_AVSubtitlesEnabled && !subtitle.forced)
+    if (!m_avSubtitlesEnabled && !subtitle.forced)
     {
         FreeAVSubtitle(subtitle);
         return enableforced;
     }
 
-    if (!m_AVSubtitlesEnabled && subtitle.forced)
+    if (!m_avSubtitlesEnabled && subtitle.forced)
     {
         if (!allow_forced)
         {
@@ -49,18 +49,18 @@ bool SubtitleReader::AddAVSubtitle(AVSubtitle &subtitle,
     }
 
     bool clearsubs = false;
-    m_AVSubtitles.m_lock.lock();
-    m_AVSubtitles.m_fixPosition = fix_position;
-    m_AVSubtitles.m_buffers.push_back(subtitle);
+    m_avSubtitles.m_lock.lock();
+    m_avSubtitles.m_fixPosition = fix_position;
+    m_avSubtitles.m_buffers.push_back(subtitle);
     // in case forced subtitles aren't displayed, avoid leaking by
     // manually clearing the subtitles
-    if (m_AVSubtitles.m_buffers.size() > 40)
+    if (m_avSubtitles.m_buffers.size() > 40)
     {
         LOG(VB_GENERAL, LOG_ERR,
             "SubtitleReader: >40 AVSubtitles queued - clearing.");
         clearsubs = true;
     }
-    m_AVSubtitles.m_lock.unlock();
+    m_avSubtitles.m_lock.unlock();
 
     if (clearsubs)
         ClearAVSubtitles();
@@ -70,13 +70,13 @@ bool SubtitleReader::AddAVSubtitle(AVSubtitle &subtitle,
 
 void SubtitleReader::ClearAVSubtitles(void)
 {
-    m_AVSubtitles.m_lock.lock();
-    while (!m_AVSubtitles.m_buffers.empty())
+    m_avSubtitles.m_lock.lock();
+    while (!m_avSubtitles.m_buffers.empty())
     {
-        FreeAVSubtitle(m_AVSubtitles.m_buffers.front());
-        m_AVSubtitles.m_buffers.pop_front();
+        FreeAVSubtitle(m_avSubtitles.m_buffers.front());
+        m_avSubtitles.m_buffers.pop_front();
     }
-    m_AVSubtitles.m_lock.unlock();
+    m_avSubtitles.m_lock.unlock();
 }
 
 void SubtitleReader::FreeAVSubtitle(AVSubtitle &subtitle)
@@ -87,42 +87,41 @@ void SubtitleReader::FreeAVSubtitle(AVSubtitle &subtitle)
 void SubtitleReader::LoadExternalSubtitles(const QString &subtitleFileName,
                                            bool isInProgress)
 {
-    m_TextSubtitles.Clear();
-    m_TextSubtitles.SetInProgress(isInProgress);
-    TextSubtitleParser::LoadSubtitles(subtitleFileName, m_TextSubtitles,
-                                      false);
+    m_textSubtitles.Clear();
+    m_textSubtitles.SetInProgress(isInProgress);
+    TextSubtitleParser::LoadSubtitles(subtitleFileName, m_textSubtitles, false);
 }
 
 bool SubtitleReader::HasTextSubtitles(void)
 {
-    return m_TextSubtitles.GetSubtitleCount() >= 0;
+    return m_textSubtitles.GetSubtitleCount() >= 0;
 }
 
 QStringList SubtitleReader::GetRawTextSubtitles(uint64_t &duration)
 {
-    QMutexLocker lock(&m_RawTextSubtitles.m_lock);
-    if (m_RawTextSubtitles.m_buffers.empty())
+    QMutexLocker lock(&m_rawTextSubtitles.m_lock);
+    if (m_rawTextSubtitles.m_buffers.empty())
         return QStringList();
 
-    duration = m_RawTextSubtitles.m_duration;
-    QStringList result = m_RawTextSubtitles.m_buffers;
-    m_RawTextSubtitles.m_buffers.clear();
+    duration = m_rawTextSubtitles.m_duration;
+    QStringList result = m_rawTextSubtitles.m_buffers;
+    m_rawTextSubtitles.m_buffers.clear();
     return result;
 }
 
 void SubtitleReader::AddRawTextSubtitle(const QStringList& list, uint64_t duration)
 {
-    if (!m_RawTextSubtitlesEnabled || list.empty())
+    if (!m_rawTextSubtitlesEnabled || list.empty())
         return;
 
-    QMutexLocker lock(&m_RawTextSubtitles.m_lock);
-    m_RawTextSubtitles.m_buffers.clear();
-    m_RawTextSubtitles.m_buffers = list;
-    m_RawTextSubtitles.m_duration = duration;
+    QMutexLocker lock(&m_rawTextSubtitles.m_lock);
+    m_rawTextSubtitles.m_buffers.clear();
+    m_rawTextSubtitles.m_buffers = list;
+    m_rawTextSubtitles.m_duration = duration;
 }
 
 void SubtitleReader::ClearRawTextSubtitles(void)
 {
-    QMutexLocker lock(&m_RawTextSubtitles.m_lock);
-    m_RawTextSubtitles.m_buffers.clear();
+    QMutexLocker lock(&m_rawTextSubtitles.m_lock);
+    m_rawTextSubtitles.m_buffers.clear();
 }

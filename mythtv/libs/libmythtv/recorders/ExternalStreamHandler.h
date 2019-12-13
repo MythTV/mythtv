@@ -41,18 +41,18 @@ class ExternIO
 
     QFileInfo   m_app;
     QStringList m_args;
-    int         m_appin   {-1};
-    int         m_appout  {-1};
-    int         m_apperr  {-1};
+    int         m_appIn   {-1};
+    int         m_appOut  {-1};
+    int         m_appErr  {-1};
     pid_t       m_pid     {-1};
     QString     m_error;
 
-    int         m_bufsize {0};
+    int         m_bufSize {0};
     char       *m_buffer  {nullptr};
 
-    QString     m_status_buf;
+    QString     m_statusBuf;
     QTextStream m_status;
-    int         m_errcnt  {0};
+    int         m_errCnt  {0};
 };
 
 // Note : This class always uses a TS reader.
@@ -86,9 +86,9 @@ class ExternalStreamHandler : public StreamHandler
 
     bool RestartStream(void);
 
-    void LockReplay(void) { m_replay_lock.lock(); }
+    void LockReplay(void) { m_replayLock.lock(); }
     void UnlockReplay(bool enable_replay = false)
-        { m_replay = enable_replay; m_replay_lock.unlock(); }
+        { m_replay = enable_replay; m_replayLock.unlock(); }
     void ReplayStream(void);
     bool StartStreaming(void);
     bool StopStreaming(void);
@@ -111,33 +111,33 @@ class ExternalStreamHandler : public StreamHandler
     void CloseApp(void);
 
     QString       m_loc;
-    int           m_majorid;
-    QMutex        m_io_lock;
+    int           m_majorId;
+    QMutex        m_ioLock;
     ExternIO     *m_io                   {nullptr};
     QStringList   m_args;
     QString       m_app;
-    bool          m_tsopen               {false};
-    int           m_io_errcnt            {0};
-    bool          m_poll_mode            {false};
+    bool          m_tsOpen               {false};
+    int           m_ioErrCnt             {0};
+    bool          m_pollMode             {false};
 
     int           m_apiVersion           {1};
     uint          m_serialNo             {0};
     bool          m_hasTuner             {false};
     bool          m_hasPictureAttributes {false};
 
-    QByteArray    m_replay_buffer;
+    QByteArray    m_replayBuffer;
     bool          m_replay               {false};
     bool          m_xon                  {false};
 
     // for implementing Get & Return
-    static QMutex                            s_handlers_lock;
+    static QMutex                            s_handlersLock;
     static QMap<int, ExternalStreamHandler*> s_handlers;
-    static QMap<int, uint>                   s_handlers_refcnt;
+    static QMap<int, uint>                   s_handlersRefCnt;
 
-    QAtomicInt    m_streaming_cnt;
-    QMutex        m_stream_lock;
-    QMutex        m_replay_lock;
-    QMutex        m_process_lock;
+    QAtomicInt    m_streamingCnt;
+    QMutex        m_streamLock;
+    QMutex        m_replayLock;
+    QMutex        m_processLock;
 };
 
 #endif // _ExternalSTREAMHANDLER_H_

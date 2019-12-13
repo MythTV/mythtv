@@ -25,7 +25,7 @@
 #define LOC QString("IPTVChan[%1]: ").arg(m_inputid)
 
 IPTVChannel::IPTVChannel(TVRec *rec, QString videodev) :
-    DTVChannel(rec), m_videodev(std::move(videodev))
+    DTVChannel(rec), m_videoDev(std::move(videodev))
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
 }
@@ -43,7 +43,7 @@ bool IPTVChannel::Open(void)
     if (IsOpen())
         return true;
 
-    QMutexLocker locker(&m_tune_lock);
+    QMutexLocker locker(&m_tuneLock);
 
     if (!InitializeInput())
     {
@@ -51,8 +51,8 @@ bool IPTVChannel::Open(void)
         return false;
     }
 
-    if (m_stream_data)
-        SetStreamData(m_stream_data);
+    if (m_streamData)
+        SetStreamData(m_streamData);
 
     return true;
 }
@@ -61,33 +61,33 @@ void IPTVChannel::SetStreamData(MPEGStreamData *sd)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC +
         QString("SetStreamData(0x%1) StreamHandler(0x%2)")
-        .arg((intptr_t)sd,0,16).arg((intptr_t)m_stream_handler,0,16));
+        .arg((intptr_t)sd,0,16).arg((intptr_t)m_streamHandler,0,16));
 
-    QMutexLocker locker(&m_stream_lock);
+    QMutexLocker locker(&m_streamLock);
 
-    if (m_stream_data == sd && m_stream_handler)
+    if (m_streamData == sd && m_streamHandler)
         return;
 
-    if (m_stream_handler)
+    if (m_streamHandler)
     {
         if (sd)
-            m_stream_handler->AddListener(sd);
+            m_streamHandler->AddListener(sd);
 
-        if (m_stream_data)
-            m_stream_handler->RemoveListener(m_stream_data);
+        if (m_streamData)
+            m_streamHandler->RemoveListener(m_streamData);
     }
     else if (sd)
     {
         OpenStreamHandler();
-        m_stream_handler->AddListener(sd);
+        m_streamHandler->AddListener(sd);
     }
 
-    m_stream_data = sd;
+    m_streamData = sd;
 }
 
 void IPTVChannel::Close(void)
 {
-    if (m_stream_handler)
+    if (m_streamHandler)
         CloseStreamHandler();
 }
 
@@ -99,20 +99,20 @@ bool IPTVChannel::EnterPowerSavingMode(void)
 
 void IPTVChannel::OpenStreamHandler(void)
 {
-    if (m_last_tuning.IsHLS())
+    if (m_lastTuning.IsHLS())
     {
         LOG(VB_CHANNEL, LOG_INFO, LOC + "Creating HLSStreamHandler");
-        m_stream_handler = HLSStreamHandler::Get(m_last_tuning, GetInputID());
+        m_streamHandler = HLSStreamHandler::Get(m_lastTuning, GetInputID());
     }
-    else if (m_last_tuning.IsHTTPTS())
+    else if (m_lastTuning.IsHTTPTS())
     {
         LOG(VB_CHANNEL, LOG_INFO, LOC + "Creating HTTPTSStreamHandler");
-        m_stream_handler = HTTPTSStreamHandler::Get(m_last_tuning, GetInputID());
+        m_streamHandler = HTTPTSStreamHandler::Get(m_lastTuning, GetInputID());
     }
     else
     {
         LOG(VB_CHANNEL, LOG_INFO, LOC + "Creating IPTVStreamHandler");
-        m_stream_handler = IPTVStreamHandler::Get(m_last_tuning, GetInputID());
+        m_streamHandler = IPTVStreamHandler::Get(m_lastTuning, GetInputID());
     }
 }
 
@@ -120,50 +120,50 @@ void IPTVChannel::CloseStreamHandler(void)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "CloseStreamHandler()");
 
-    QMutexLocker locker(&m_stream_lock);
+    QMutexLocker locker(&m_streamLock);
 
-    if (m_stream_handler)
+    if (m_streamHandler)
     {
-        if (m_stream_data)
+        if (m_streamData)
         {
-            m_stream_handler->RemoveListener(m_stream_data);
-            m_stream_data = nullptr; //see trac ticket #12773
+            m_streamHandler->RemoveListener(m_streamData);
+            m_streamData = nullptr; //see trac ticket #12773
         }
 
-        auto* hsh = dynamic_cast<HLSStreamHandler*>(m_stream_handler);
-        auto* httpsh = dynamic_cast<HTTPTSStreamHandler*>(m_stream_handler);
+        auto* hsh = dynamic_cast<HLSStreamHandler*>(m_streamHandler);
+        auto* httpsh = dynamic_cast<HTTPTSStreamHandler*>(m_streamHandler);
 
         if (hsh)
         {
             HLSStreamHandler::Return(hsh, GetInputID());
-            m_stream_handler = hsh;
+            m_streamHandler = hsh;
         }
         else if (httpsh)
         {
             HTTPTSStreamHandler::Return(httpsh, GetInputID());
-            m_stream_handler = httpsh;
+            m_streamHandler = httpsh;
         }
         else
         {
-            IPTVStreamHandler::Return(m_stream_handler, GetInputID());
+            IPTVStreamHandler::Return(m_streamHandler, GetInputID());
         }
     }
 }
 
 bool IPTVChannel::IsOpen(void) const
 {
-    QMutexLocker locker(&m_stream_lock);
-    bool ret = (m_stream_handler && !m_stream_handler->HasError() &&
-                m_stream_handler->IsRunning());
+    QMutexLocker locker(&m_streamLock);
+    bool ret = (m_streamHandler && !m_streamHandler->HasError() &&
+                m_streamHandler->IsRunning());
     LOG(VB_CHANNEL, LOG_DEBUG, LOC + QString("IsOpen(%1) %2")
-        .arg(m_last_tuning.GetDeviceName())
+        .arg(m_lastTuning.GetDeviceName())
         .arg(ret ? "true" : "false"));
     return ret;
 }
 
 bool IPTVChannel::Tune(const IPTVTuningData &tuning, bool scanning)
 {
-    QMutexLocker locker(&m_tune_lock);
+    QMutexLocker locker(&m_tuneLock);
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Tune(%1)")
         .arg(tuning.GetDeviceName()));
@@ -180,21 +180,21 @@ bool IPTVChannel::Tune(const IPTVTuningData &tuning, bool scanning)
         return false;
     }
 
-    if (m_last_tuning == tuning)
+    if (m_lastTuning == tuning)
     {
         LOG(VB_CHANNEL, LOG_DEBUG, LOC + QString("Already tuned to %1")
             .arg(tuning.GetDeviceName()));
         return true;
     }
 
-    m_last_tuning = tuning;
+    m_lastTuning = tuning;
 
-    if (!m_firsttune || scanning)
+    if (!m_firstTune || scanning)
         // for historical reason, an initial tune is requested at
         // startup so don't open the stream handler just yet it will
         // be opened after the next Tune or SetStreamData)
     {
-        MPEGStreamData *tmp = m_stream_data;
+        MPEGStreamData *tmp = m_streamData;
 
         CloseStreamHandler();
         if (tmp)
@@ -203,7 +203,7 @@ bool IPTVChannel::Tune(const IPTVTuningData &tuning, bool scanning)
             OpenStreamHandler();
     }
 
-    m_firsttune = false;
+    m_firstTune = false;
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Tuned to (%1)")
         .arg(tuning.GetDeviceName()));

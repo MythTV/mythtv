@@ -134,12 +134,12 @@ class OSD
 
   public:
     OSD(MythPlayer *Player, QObject *Parent, MythPainter *Painter)
-        : m_parent(Player), m_ParentObject(Parent), m_CurrentPainter(Painter) {}
+        : m_parent(Player), m_parentObject(Parent), m_currentPainter(Painter) {}
    ~OSD();
 
     bool    Init(const QRect &Rect, float FontAspect);
     void    SetPainter(MythPainter *Painter);
-    QRect   Bounds(void) const { return m_Rect; }
+    QRect   Bounds(void) const { return m_rect; }
     int     GetFontStretch(void) const { return m_fontStretch; }
     void    OverrideUIScale(bool Log = true);
     void    RevertUIScale(void);
@@ -199,26 +199,26 @@ class OSD
 
   private:
     MythPlayer     *m_parent            { nullptr };
-    QObject        *m_ParentObject      { nullptr };
-    MythPainter    *m_CurrentPainter    { nullptr };
-    QRect           m_Rect              { };
-    int             m_FadeTime          { kOSDFadeTime };
-    MythScreenType *m_Dialog            { nullptr };
-    QString         m_PulsedDialogText  { };
-    QDateTime       m_NextPulseUpdate   { };
-    bool            m_Refresh           { false };
-    bool            m_Visible           { false };
-    int             m_Timeouts[4]       { -1,3000,5000,13000 };
-    bool            m_UIScaleOverride   { false };
-    float           m_SavedWMult        { 1.0F };
-    float           m_SavedHMult        { 1.0F };
-    QRect           m_SavedUIRect       { };
+    QObject        *m_parentObject      { nullptr };
+    MythPainter    *m_currentPainter    { nullptr };
+    QRect           m_rect              { };
+    int             m_fadeTime          { kOSDFadeTime };
+    MythScreenType *m_dialog            { nullptr };
+    QString         m_pulsedDialogText  { };
+    QDateTime       m_nextPulseUpdate   { };
+    bool            m_refresh           { false };
+    bool            m_visible           { false };
+    int             m_timeouts[4]       { -1,3000,5000,13000 };
+    bool            m_uiScaleOverride   { false };
+    float           m_savedWMult        { 1.0F };
+    float           m_savedHMult        { 1.0F };
+    QRect           m_savedUIRect       { };
     int             m_fontStretch       { 100 };
     int             m_savedFontStretch  { 100 };
-    enum OSDFunctionalType m_FunctionalType { kOSDFunctionalType_Default };
-    QString                m_FunctionalWindow { };
-    QMap<QString, MythScreenType*>    m_Children { };
-    QHash<MythScreenType*, QDateTime> m_ExpireTimes { };
+    enum OSDFunctionalType m_functionalType { kOSDFunctionalType_Default };
+    QString                m_functionalWindow { };
+    QMap<QString, MythScreenType*>    m_children { };
+    QHash<MythScreenType*, QDateTime> m_expireTimes { };
 };
 
 class OsdNavigation : public MythScreenType
@@ -253,7 +253,7 @@ class OsdNavigation : public MythScreenType
     char          m_muted           { 'X' };
     int           m_visibleGroup    { 0 };
     int           m_maxGroupNum     { -1 };
-    bool          m_IsVolumeControl { true };
+    bool          m_isVolumeControl { true };
 };
 
 #endif

@@ -30,7 +30,7 @@ RecordingRule::RecordingRule()
   : m_findtime(QTime::fromString("00:00:00", Qt::ISODate)),
     m_findid(QDate(1970, 1, 1).daysTo(MythDate::current().toLocalTime().date())
              + 719528),
-    m_transcoder(RecordingProfile::TranscoderAutodetect)
+    m_transcoder(RecordingProfile::kTranscoderAutodetect)
 {
     QDateTime dt = MythDate::current();
     m_enddate = m_startdate = dt.date();
