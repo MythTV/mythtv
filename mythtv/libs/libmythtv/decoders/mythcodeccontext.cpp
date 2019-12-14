@@ -181,7 +181,7 @@ void MythCodecContext::GetDecoders(RenderOptions &Opts)
 #ifdef USING_MMAL
     Opts.decoders->append("mmal-dec");
     (*Opts.equiv_decoders)["mmal-dec"].append("dummy");
-    if (MythOpenGLInterop::GetInteropType(FMT_MMAL) != MythOpenGLInterop::Unsupported)
+    if (MythOpenGLInterop::GetInteropType(FMT_MMAL, nullptr) != MythOpenGLInterop::Unsupported)
     {
         Opts.decoders->append("mmal");
         (*Opts.equiv_decoders)["mmal"].append("dummy");
