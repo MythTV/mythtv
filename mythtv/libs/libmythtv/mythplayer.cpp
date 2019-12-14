@@ -712,44 +712,48 @@ void MythPlayer::OpenDummy(void)
     SetDecoder(dec);
 }
 
-void MythPlayer::CreateDecoder(char *testbuf, int testreadsize)
+void MythPlayer::CreateDecoder(char *TestBuffer, int TestSize)
 {
-    if (NuppelDecoder::CanHandle(testbuf, testreadsize))
-        SetDecoder(new NuppelDecoder(this, *m_playerCtx->m_playingInfo));
-    else if (AvFormatDecoder::CanHandle(testbuf,
-                                        m_playerCtx->m_buffer->GetFilename(),
-                                        testreadsize))
+    if (NuppelDecoder::CanHandle(TestBuffer, TestSize))
     {
-        SetDecoder(new AvFormatDecoder(this, *m_playerCtx->m_playingInfo,
-                                       m_playerFlags));
+        SetDecoder(new NuppelDecoder(this, *m_playerCtx->m_playingInfo));
+        return;
     }
+
+    if (AvFormatDecoder::CanHandle(TestBuffer, m_playerCtx->m_buffer->GetFilename(), TestSize))
+        SetDecoder(new AvFormatDecoder(this, *m_playerCtx->m_playingInfo, m_playerFlags));
 }
 
-int MythPlayer::OpenFile(uint retries)
+int MythPlayer::OpenFile(int Retries)
 {
+    // Sanity check
+    if (!m_playerCtx || (m_playerCtx && !m_playerCtx->m_buffer))
+        return -1;
+
     // Disable hardware acceleration for second PBP
     if (m_playerCtx && (m_playerCtx->IsPBP() && !m_playerCtx->IsPrimaryPBP()) &&
         FlagIsSet(kDecodeAllowGPU))
     {
-        m_playerFlags = (PlayerFlags)(m_playerFlags - kDecodeAllowGPU);
+        m_playerFlags = static_cast<PlayerFlags>(m_playerFlags - kDecodeAllowGPU);
     }
 
     m_isDummy = false;
-
-    if (!m_playerCtx || !m_playerCtx->m_buffer)
-        return -1;
-
     m_liveTV = m_playerCtx->m_tvchain && m_playerCtx->m_buffer->LiveMode();
 
-    if (m_playerCtx->m_tvchain &&
-        m_playerCtx->m_tvchain->GetInputType(m_playerCtx->m_tvchain->GetCurPos()) ==
-        "DUMMY")
+    // Dummy setup for livetv transtions. Can we get rid of this?
+    if (m_playerCtx->m_tvchain)
     {
-        OpenDummy();
-        return 0;
+        int currentposition = m_playerCtx->m_tvchain->GetCurPos();
+        if (m_playerCtx->m_tvchain->GetInputType(currentposition) == "DUMMY")
+        {
+            OpenDummy();
+            return 0;
+        }
     }
 
+    // Start the RingBuffer read ahead thread
     m_playerCtx->m_buffer->Start();
+
     /// OSX has a small stack, so we put this buffer on the heap instead.
     char *testbuf = new char[kDecoderProbeBufferSize];
     UnpauseBuffer();
@@ -758,11 +762,14 @@ int MythPlayer::OpenFile(uint retries)
     SetDecoder(nullptr);
     int testreadsize = 2048;
 
-    MythTimer bigTimer; bigTimer.start();
-    int timeout = max((retries + 1) * 500, 30000U);
+    // Test the incoming buffer and create a suitable decoder
+    MythTimer bigTimer;
+    bigTimer.start();
+    int timeout = max((Retries + 1) * 500, 30000);
     while (testreadsize <= kDecoderProbeBufferSize)
     {
-        MythTimer peekTimer; peekTimer.start();
+        MythTimer peekTimer;
+        peekTimer.start();
         while (m_playerCtx->m_buffer->Peek(testbuf, testreadsize) != testreadsize)
         {
             // NB need to allow for streams encountering network congestion
@@ -789,6 +796,7 @@ int MythPlayer::OpenFile(uint retries)
         testreadsize <<= 1;
     }
 
+    // Fail
     if (!m_decoder)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -799,6 +807,7 @@ int MythPlayer::OpenFile(uint retries)
         delete[] testbuf;
         return -1;
     }
+
     if (m_decoder->IsErrored())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Could not initialize A/V decoder.");
@@ -809,21 +818,17 @@ int MythPlayer::OpenFile(uint retries)
         return -1;
     }
 
+    // Pre-init the decoder
     m_decoder->SetSeekSnap(0);
     m_decoder->SetLiveTVMode(m_liveTV);
     m_decoder->SetWatchingRecording(m_watchingRecording);
     m_decoder->SetTranscoding(m_transcoding);
 
-    // Set 'no_video_decode' to true for audio only decodeing
-    bool no_video_decode = false;
-
-    // We want to locate decoder for video even if using_null_videoout
-    // is true, only disable if no_video_decode is true.
-    int ret = m_decoder->OpenFile(
-        m_playerCtx->m_buffer, no_video_decode, testbuf, testreadsize);
+    // Open the decoder
+    int result = m_decoder->OpenFile(m_playerCtx->m_buffer, false, testbuf, testreadsize);
     delete[] testbuf;
 
-    if (ret < 0)
+    if (result < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Couldn't open decoder for: %1")
                 .arg(m_playerCtx->m_buffer->GetFilename()));
@@ -831,9 +836,11 @@ int MythPlayer::OpenFile(uint retries)
         return -1;
     }
 
+    // Disable audio if necessary
     m_audio.CheckFormat();
 
-    if (ret > 0)
+    // Livetv, recording or in-progress
+    if (result > 0)
     {
         m_hasFullPositionMap = true;
         m_deleteMap.LoadMap();
@@ -848,15 +855,14 @@ int MythPlayer::OpenFile(uint retries)
     if (!gCoreContext->IsDatabaseIgnored() &&
         m_playerCtx->m_playingInfo->QueryAutoExpire() == kLiveTVAutoExpire)
     {
-        gCoreContext->SaveSetting(
-            "DefaultChanid", m_playerCtx->m_playingInfo->GetChanID());
+        gCoreContext->SaveSetting("DefaultChanid",
+                                  static_cast<int>(m_playerCtx->m_playingInfo->GetChanID()));
         QString callsign = m_playerCtx->m_playingInfo->GetChannelSchedulingID();
         QString channum = m_playerCtx->m_playingInfo->GetChanNum();
-        gCoreContext->SaveSetting(
-            "DefaultChanKeys", callsign + "[]:[]" + channum);
+        gCoreContext->SaveSetting("DefaultChanKeys", callsign + "[]:[]" + channum);
         if (m_playerCtx->m_recorder && m_playerCtx->m_recorder->IsValidRecorder())
         {
-            int cardid = m_playerCtx->m_recorder->GetRecorderNumber();
+            uint cardid = static_cast<uint>(m_playerCtx->m_recorder->GetRecorderNumber());
             CardUtil::SetStartChannel(cardid, channum);
         }
     }

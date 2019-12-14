@@ -178,7 +178,7 @@ class MTV_PUBLIC MythPlayer
     virtual ~MythPlayer();
 
     // Initialisation
-    virtual int OpenFile(uint retries = 4);
+    virtual int OpenFile(int Retries = 4);
     bool InitVideo(void);
 
     // Public Sets
@@ -610,7 +610,7 @@ class MTV_PUBLIC MythPlayer
     void UnpauseBuffer(void);
 
     // Private decoder stuff
-    virtual void CreateDecoder(char *testbuf, int testreadsize);
+    virtual void CreateDecoder(char *TestBuffer, int TestSize);
     void  SetDecoder(DecoderBase *dec);
     /// Returns the stream decoder currently in use.
     const DecoderBase *GetDecoder(void) const { return m_decoder; }
