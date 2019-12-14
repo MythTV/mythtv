@@ -2,7 +2,7 @@
 #include <QWaitCondition>
 
 // MythTV
-#include "mythmainwindow.h"
+#include "mythplayer.h"
 #include "mythcorecontext.h"
 #include "videocolourspace.h"
 #include "opengl/mythrenderopengl.h"
@@ -51,7 +51,7 @@ QString MythOpenGLInterop::TypeToString(Type InteropType)
 QStringList MythOpenGLInterop::GetAllowedRenderers(VideoFrameType Format)
 {
     QStringList result;
-    if (GetInteropType(Format) != Unsupported)
+    if (GetInteropType(Format, nullptr) != Unsupported)
         result << "opengl-hw";
     return result;
 }
@@ -64,7 +64,7 @@ void MythOpenGLInterop::GetInteropTypeCallback(void *Wait, void *Format, void *R
     auto *result = reinterpret_cast<MythOpenGLInterop::Type*>(Result);
 
     if (format && result)
-        *result = MythOpenGLInterop::GetInteropType(*format);
+        *result = MythOpenGLInterop::GetInteropType(*format, nullptr);
     if (wait)
         wait->wakeAll();
 }
@@ -74,7 +74,7 @@ void MythOpenGLInterop::GetInteropTypeCallback(void *Wait, void *Format, void *R
  * \note GetInteropType is protected in all subclasses to ensure thread safety.
  * The subclasses will fail this check if not called from the UI thread.
 */
-MythOpenGLInterop::Type MythOpenGLInterop::GetInteropType(VideoFrameType Format)
+MythOpenGLInterop::Type MythOpenGLInterop::GetInteropType(VideoFrameType Format, MythPlayer *Player)
 {
     // cache supported formats to avoid potentially expensive callbacks
     static QMutex s_lock(QMutex::Recursive);
@@ -97,8 +97,13 @@ MythOpenGLInterop::Type MythOpenGLInterop::GetInteropType(VideoFrameType Format)
     {
         if (!gCoreContext->IsUIThread())
         {
-            MythMainWindow::HandleCallback("interop check", MythOpenGLInterop::GetInteropTypeCallback,
-                                           &Format, &supported);
+            if (!Player)
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    "GetInteropType called from another thread without player");
+            else
+                MythPlayer::HandleDecoderCallback(Player, "interop check",
+                                                  MythOpenGLInterop::GetInteropTypeCallback,
+                                                  &Format, &supported);
             return supported;
         }
 
@@ -201,8 +206,7 @@ vector<MythVideoTexture*> MythOpenGLInterop::Retrieve(MythRenderOpenGL *Context,
 MythOpenGLInterop::MythOpenGLInterop(MythRenderOpenGL *Context, Type InteropType)
   : ReferenceCounter("GLInterop", true),
     m_context(Context),
-    m_type(InteropType),
-    m_openglTextureSize()
+    m_type(InteropType)
 {
     if (m_context)
         m_context->IncrRef();
@@ -260,6 +264,16 @@ void MythOpenGLInterop::DeleteTextures(void)
 MythOpenGLInterop::Type MythOpenGLInterop::GetType(void)
 {
     return m_type;
+}
+
+MythPlayer* MythOpenGLInterop::GetPlayer(void)
+{
+    return m_player;
+}
+
+void MythOpenGLInterop::SetPlayer(MythPlayer *Player)
+{
+    m_player = Player;
 }
 
 void MythOpenGLInterop::SetDefaultFree(FreeAVHWDeviceContext FreeContext)

@@ -153,15 +153,22 @@ int MythNVDECContext::InitialiseDecoder(AVCodecContext *Context)
     if (!gCoreContext->IsUIThread() || !Context)
         return -1;
 
+    // We need a player to release the interop
+    MythPlayer *player = nullptr;
+    auto *decoder = reinterpret_cast<AvFormatDecoder*>(Context->opaque);
+    if (decoder)
+        player = decoder->GetPlayer();
+    if (!player)
+        return -1;
+
     // Retrieve OpenGL render context
     MythRenderOpenGL* render = MythRenderOpenGL::GetOpenGLRender();
     if (!render)
         return -1;
-
-    // Lock
     OpenGLLocker locker(render);
 
-    if (MythOpenGLInterop::GetInteropType(FMT_NVDEC) == MythOpenGLInterop::Unsupported)
+    // Check interop type
+    if (MythOpenGLInterop::GetInteropType(FMT_NVDEC, player) == MythOpenGLInterop::Unsupported)
         return -1;
 
     // Create interop (and CUDA context)
@@ -173,6 +180,9 @@ int MythNVDECContext::InitialiseDecoder(AVCodecContext *Context)
         interop->DecrRef();
         return -1;
     }
+
+    // Set player
+    interop->SetPlayer(player);
 
     // Allocate the device context
     AVBufferRef* hwdeviceref = av_hwdevice_ctx_alloc(AV_HWDEVICE_TYPE_CUDA);
@@ -219,12 +229,12 @@ int MythNVDECContext::HwDecoderInit(AVCodecContext *Context)
     if (codec_is_nvdec(m_codecID))
     {
         return MythCodecContext::InitialiseDecoder2(Context, MythNVDECContext::InitialiseDecoder,
-                                                 "Create NVDEC decoder");
+                                                    "Create NVDEC decoder");
     }
     if (codec_is_nvdec_dec(m_codecID))
     {
         AVBufferRef *context = MythCodecContext::CreateDevice(AV_HWDEVICE_TYPE_CUDA, nullptr,
-                                                           gCoreContext->GetSetting("NVDECDevice"));
+                                                              gCoreContext->GetSetting("NVDECDevice"));
         if (context)
         {
             Context->hw_device_ctx = context;
@@ -467,18 +477,10 @@ bool MythNVDECContext::HaveNVDEC(void)
         if (gCoreContext->IsUIThread())
             NVDECCheck();
         else
-            MythMainWindow::HandleCallback("NVDEC support check", MythNVDECContext::NVDECCheckCallback, nullptr, nullptr);
+            LOG(VB_GENERAL, LOG_WARNING, LOC + "HaveNVDEC must be initialised from the main thread");
     }
     s_checked = true;
     return s_NVDECAvailable;
-}
-
-void MythNVDECContext::NVDECCheckCallback(void *Wait, void* /*unused*/, void* /*unused*/)
-{
-    auto *wait = reinterpret_cast<QWaitCondition*>(Wait);
-    NVDECCheck();
-    if (wait)
-        wait->wakeAll();
 }
 
 inline MythCodecID cuda_to_myth(cudaVideoCodec Codec)

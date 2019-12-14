@@ -250,7 +250,7 @@ void MythPlayer::UnpauseBuffer(void)
 
 bool MythPlayer::Pause(void)
 {
-    if (!m_pauseLock.tryLock(100))
+    while (!m_pauseLock.tryLock(100))
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Waited 100ms to get pause lock.");
         DecoderPauseCheck();
@@ -2195,6 +2195,8 @@ void MythPlayer::VideoStart(void)
 
 bool MythPlayer::VideoLoop(void)
 {
+    ProcessCallbacks();
+
     if (m_videoPaused || m_isDummy)
     {
         switch (m_playerCtx->GetPIPState())
@@ -2653,6 +2655,7 @@ bool MythPlayer::StartPlaying(void)
 #ifdef Q_OS_ANDROID
     setpriority(PRIO_PROCESS, m_playerThreadId, -20);
 #endif
+    ProcessCallbacks();
     UnpauseDecoder();
     return !IsErrored();
 }
@@ -2677,6 +2680,7 @@ void MythPlayer::StopPlaying()
     setpriority(PRIO_PROCESS, m_playerThreadId, 0);
 #endif
 
+    ProcessCallbacks();
     DecoderEnd();
     VideoEnd();
     AudioEnd();
@@ -2704,6 +2708,9 @@ void MythPlayer::EventStart(void)
 
 void MythPlayer::EventLoop(void)
 {
+    // Handle decoder callbacks
+    ProcessCallbacks();
+
     // Live TV program change
     if (m_fileChanged)
         FileChanged();
@@ -2966,6 +2973,58 @@ void MythPlayer::AudioEnd(void)
     m_audio.DeleteOutput();
 }
 
+/*! \brief Convenience function to request and wait for a callback into the main thread.
+ *
+ * This is used by hardware decoders to ensure certain resources are created
+ * and destroyed in the UI (render) thread.
+*/
+void MythPlayer::HandleDecoderCallback(MythPlayer *Player, const QString &Debug,
+                                       DecoderCallback::Callback Function,
+                                       void *Opaque1, void *Opaque2)
+{
+    if (!Player)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "No player to call back");
+        return;
+    }
+
+    if (!Function)
+        return;
+
+    QWaitCondition wait;
+    QMutex lock;
+    lock.lock();
+    Player->QueueCallback(Debug, Function, &wait, Opaque1, Opaque2);
+    int count = 0;
+    while (!wait.wait(&lock, 100) && (count += 100))
+        LOG(VB_GENERAL, LOG_WARNING, QString("Waited %1ms for %2").arg(count).arg(Debug));
+    lock.unlock();
+}
+
+void MythPlayer::ProcessCallbacks(void)
+{
+    m_decoderCallbackLock.lock();
+    for (auto it = m_decoderCallbacks.cbegin(); it != m_decoderCallbacks.cend(); ++it)
+    {
+        if (it->m_function)
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Executing %1").arg(it->m_debug));
+            it->m_function(it->m_opaque1, it->m_opaque2, it->m_opaque3);
+        }
+    }
+    m_decoderCallbacks.clear();
+    m_decoderCallbackLock.unlock();
+}
+
+void MythPlayer::QueueCallback(QString Debug, DecoderCallback::Callback Function,
+                               void *Opaque1, void *Opaque2, void *Opaque3)
+{
+    m_decoderCallbackLock.lock();
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Queuing callback for %1").arg(Debug));
+    m_decoderCallbacks.append(DecoderCallback(Debug, Function, Opaque1, Opaque2, Opaque3));
+    m_decoderCallbackLock.unlock();
+}
+
 bool MythPlayer::PauseDecoder(void)
 {
     m_decoderPauseLock.lock();
@@ -2982,7 +3041,7 @@ bool MythPlayer::PauseDecoder(void)
     while (m_decoderThread && !m_killDecoder && (tries++ < 100) &&
            !m_decoderThreadPause.wait(&m_decoderPauseLock, 100))
     {
-        qApp->processEvents();
+        ProcessCallbacks();
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Waited 100ms for decoder to pause");
     }
     m_pauseDecoder = false;
@@ -3009,7 +3068,7 @@ void MythPlayer::UnpauseDecoder(void)
         while (m_decoderThread && !m_killDecoder && (tries++ < 100) &&
                !m_decoderThreadUnpause.wait(&m_decoderPauseLock, 100))
         {
-            qApp->processEvents();
+            ProcessCallbacks();
             LOG(VB_GENERAL, LOG_WARNING, LOC + "Waited 100ms for decoder to unpause");
         }
         m_unpauseDecoder = false;
@@ -3827,7 +3886,7 @@ void MythPlayer::WaitForSeek(uint64_t frame, uint64_t seeksnap_wanted)
         // certain resources. Ensure the callback is processed.
         // Ideally MythPlayer should be fully event driven and these
         // calls wouldn't be necessary.
-        qApp->processEvents();
+        ProcessCallbacks();
 
         usleep(50 * 1000);
 

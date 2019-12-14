@@ -62,7 +62,6 @@ class MythNVDECContext : public MythCodecContext
     static bool        s_NVDECAvailable;
     static std::vector<MythNVDECCaps> s_NVDECDecoderCaps;
     static void   NVDECCheck             (void);
-    static void   NVDECCheckCallback     (void *Wait, void*, void*);
 
   private:
     MythDeintType m_deinterlacer         { DEINT_NONE  };

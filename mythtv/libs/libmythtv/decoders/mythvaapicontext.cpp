@@ -152,13 +152,26 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext **Context,
         return failure;
     }
 
-    // direct rendering needs interop support
-    if (!decodeonly && (MythOpenGLInterop::GetInteropType(FMT_VAAPI) == MythOpenGLInterop::Unsupported))
-        return failure;
+    if (!decodeonly)
+    {
+        // If called from outside of the main thread, we need a MythPlayer instance to
+        // process the interop check callback - which may fail otherwise (depending
+        // on whether the result is cached).
+        MythPlayer* player = nullptr;
+        if (!gCoreContext->IsUIThread())
+        {
+            auto decoder = reinterpret_cast<AvFormatDecoder*>((*Context)->opaque);
+            if (decoder)
+                player = decoder->GetPlayer();
+        }
 
-    // check for actual decoder support
-    AVBufferRef *hwdevicectx = MythCodecContext::CreateDevice(AV_HWDEVICE_TYPE_VAAPI,
-                                                              nullptr,
+        // Direct rendering needs interop support
+        if (MythOpenGLInterop::GetInteropType(FMT_VAAPI, player) == MythOpenGLInterop::Unsupported)
+            return failure;
+    }
+
+    // Check for actual decoder support
+    AVBufferRef *hwdevicectx = MythCodecContext::CreateDevice(AV_HWDEVICE_TYPE_VAAPI, nullptr,
                                                               gCoreContext->GetSetting("VAAPIDevice"));
     if(!hwdevicectx)
         return failure;
@@ -312,14 +325,39 @@ int MythVAAPIContext::InitialiseContext(AVCodecContext *Context)
     if (!Context || !gCoreContext->IsUIThread())
         return -1;
 
-    MythOpenGLInterop::Type type = MythOpenGLInterop::GetInteropType(FMT_VAAPI);
-    if (type == MythOpenGLInterop::Unsupported)
-        return -1;
-
+    // We need a render device
     MythRenderOpenGL* render = MythRenderOpenGL::GetOpenGLRender();
     if (!render)
         return -1;
 
+    // The interop must have a reference to the player so it can be deleted
+    // from the main thread.
+    MythPlayer *player = nullptr;
+    auto *decoder = reinterpret_cast<AvFormatDecoder*>(Context->opaque);
+    if (decoder)
+        player = decoder->GetPlayer();
+    if (!player)
+        return -1;
+
+    // Check interop support
+    MythOpenGLInterop::Type type = MythOpenGLInterop::GetInteropType(FMT_VAAPI, player);
+    if (type == MythOpenGLInterop::Unsupported)
+        return -1;
+
+    // Create interop
+    MythVAAPIInterop *interop = MythVAAPIInterop::Create(render, type);
+    if (!interop)
+        return -1;
+    if (!interop->GetDisplay())
+    {
+        interop->DecrRef();
+        return -1;
+    }
+
+    // Set the player required to process interop release
+    interop->SetPlayer(player);
+
+    // Create hardware device context
     AVBufferRef* hwdeviceref = av_hwdevice_ctx_alloc(AV_HWDEVICE_TYPE_VAAPI);
     if (!hwdeviceref || (hwdeviceref && !hwdeviceref->data))
     {
@@ -327,7 +365,6 @@ int MythVAAPIContext::InitialiseContext(AVCodecContext *Context)
         return -1;
     }
 
-    // set hardware device context - just needs a display
     auto* hwdevicecontext  = reinterpret_cast<AVHWDeviceContext*>(hwdeviceref->data);
     if (!hwdevicecontext || (hwdevicecontext && !hwdevicecontext->hwctx))
         return -1;
@@ -335,18 +372,10 @@ int MythVAAPIContext::InitialiseContext(AVCodecContext *Context)
     if (!vaapidevicectx)
         return -1;
 
-    MythVAAPIInterop *interop = MythVAAPIInterop::Create(render, type);
-    if (!interop->GetDisplay())
-    {
-        interop->DecrRef();
-        av_buffer_unref(&hwdeviceref);
-        return -1;
-    }
-
-    // set the display
+    // Set the display
     vaapidevicectx->display = interop->GetDisplay();
 
-    // initialise hardware device context
+    // Initialise hardware device context
     int res = av_hwdevice_ctx_init(hwdeviceref);
     if (res < 0)
     {
@@ -356,7 +385,7 @@ int MythVAAPIContext::InitialiseContext(AVCodecContext *Context)
         return res;
     }
 
-    // allocate the hardware frames context for FFmpeg
+    // Allocate the hardware frames context for FFmpeg
     Context->hw_frames_ctx = av_hwframe_ctx_alloc(hwdeviceref);
     if (!Context->hw_frames_ctx)
     {
@@ -366,9 +395,7 @@ int MythVAAPIContext::InitialiseContext(AVCodecContext *Context)
         return -1;
     }
 
-    // setup the frames context
-    // the frames context now holds the reference to MythVAAPIInterop
-    // Set the callback to ensure it is released
+    // Setup the frames context
     auto* hw_frames_ctx = reinterpret_cast<AVHWFramesContext*>(Context->hw_frames_ctx->data);
     auto* vaapi_frames_ctx = reinterpret_cast<AVVAAPIFramesContext*>(hw_frames_ctx->hwctx);
 
@@ -402,8 +429,12 @@ int MythVAAPIContext::InitialiseContext(AVCodecContext *Context)
     hw_frames_ctx->format            = AV_PIX_FMT_VAAPI;
     hw_frames_ctx->width             = Context->coded_width;
     hw_frames_ctx->height            = Context->coded_height;
+    // The frames context now holds the reference to MythVAAPIInterop
     hw_frames_ctx->user_opaque       = interop;
+    // Set the callback to ensure it is released
     hw_frames_ctx->free              = &MythCodecContext::FramesContextFinished;
+
+    // Initialise hardwar frames context
     res = av_hwframe_ctx_init(Context->hw_frames_ctx);
     if (res < 0)
     {

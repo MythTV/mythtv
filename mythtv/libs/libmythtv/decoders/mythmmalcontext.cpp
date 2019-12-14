@@ -89,9 +89,22 @@ MythCodecID MythMMALContext::GetSupportedCodec(AVCodecContext **Context,
     if (!found)
         return failure;
 
-    // check interop
-    if (!decodeonly && (MythOpenGLInterop::GetInteropType(FMT_MMAL) == MythOpenGLInterop::Unsupported))
-        return failure;
+    if (!decodeonly)
+    {
+        // If called from outside of the main thread, we need a MythPlayer instance to
+        // process the callback interop check callback - which may fail otherwise
+        MythPlayer* player = nullptr;
+        if (!gCoreContext->IsUIThread())
+        {
+            AvFormatDecoder* decoder = reinterpret_cast<AvFormatDecoder*>((*Context)->opaque);
+            if (decoder)
+                player = decoder->GetPlayer();
+        }
+
+        // direct rendering needs interop support
+        if (MythOpenGLInterop::GetInteropType(FMT_MMAL, player) == MythOpenGLInterop::Unsupported)
+            return failure;
+    }
 
     // look for a decoder
     QString name = QString((*Codec)->name) + "_mmal";

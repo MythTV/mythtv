@@ -364,17 +364,6 @@ void MythCodecContext::ReleaseBuffer(void *Opaque, uint8_t *Data)
         decoder->GetPlayer()->DeLimboFrame(frame);
 }
 
-void MythCodecContext::DestroyInteropCallback(void *Wait, void *Interop, void* /*unused*/)
-{
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + "Destroy interop callback");
-    auto *wait = reinterpret_cast<QWaitCondition*>(Wait);
-    auto *interop = reinterpret_cast<MythOpenGLInterop*>(Interop);
-    if (interop)
-        interop->DecrRef();
-    if (wait)
-        wait->wakeAll();
-}
-
 /*! \brief Track the number of concurrent frames contexts
  *
  * More than one hardware frames context is indicative of wider issues and needs
@@ -420,9 +409,29 @@ void MythCodecContext::DeviceContextFinished(AVHWDeviceContext* Context)
 void MythCodecContext::DestroyInterop(MythOpenGLInterop *Interop)
 {
     if (gCoreContext->IsUIThread())
+    {
         Interop->DecrRef();
-    else
-        MythMainWindow::HandleCallback("destroy OpenGL interop", MythCodecContext::DestroyInteropCallback, Interop, nullptr);
+        return;
+    }
+
+    auto destroy = [](void *Wait, void *Interop2, void* /*unused*/)
+    {
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + "Destroy interop callback");
+        auto *wait = reinterpret_cast<QWaitCondition*>(Wait);
+        auto *interop = reinterpret_cast<MythOpenGLInterop*>(Interop2);
+        if (interop)
+            interop->DecrRef();
+        if (wait)
+            wait->wakeAll();
+    };
+
+    if (!Interop->GetPlayer())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Cannot destroy interop - no player");
+        return;
+    }
+    MythPlayer::HandleDecoderCallback(Interop->GetPlayer(), "Destroy OpenGL interop",
+                                      destroy, Interop, nullptr);
 }
 
 void MythCodecContext::CreateDecoderCallback(void *Wait, void *Context, void *Callback)
@@ -439,27 +448,39 @@ void MythCodecContext::CreateDecoderCallback(void *Wait, void *Context, void *Ca
 
 /// \brief Initialise a hardware decoder that is expected to use AVHWFramesContext
 int MythCodecContext::InitialiseDecoder(AVCodecContext *Context, CreateHWDecoder Callback,
-                                     const QString &Debug)
+                                        const QString &Debug)
 {
     if (!Context || !Callback)
         return -1;
     if (gCoreContext->IsUIThread())
         return Callback(Context);
-    MythMainWindow::HandleCallback(Debug, MythCodecContext::CreateDecoderCallback,
-                                   Context, reinterpret_cast<void*>(Callback));
+
+    // Callback to MythPlayer (which will fail without a MythPlayer instance)
+    MythPlayer *player = nullptr;
+    AvFormatDecoder *decoder = reinterpret_cast<AvFormatDecoder*>(Context->opaque);
+    if (decoder)
+        player = decoder->GetPlayer();
+    MythPlayer::HandleDecoderCallback(player, Debug, MythCodecContext::CreateDecoderCallback,
+                                      Context, reinterpret_cast<void*>(Callback));
     return Context->hw_frames_ctx ? 0 : -1;
 }
 
 /// \brief Initialise a hardware decoder that is NOT expected to use AVHWFramesContext
 int MythCodecContext::InitialiseDecoder2(AVCodecContext *Context, CreateHWDecoder Callback,
-                                      const QString &Debug)
+                                         const QString &Debug)
 {
     if (!Context || !Callback)
         return -1;
     if (gCoreContext->IsUIThread())
         return Callback(Context);
-    MythMainWindow::HandleCallback(Debug, MythCodecContext::CreateDecoderCallback,
-                                   Context, reinterpret_cast<void*>(Callback));
+
+    // Callback to MythPlayer (which will fail without a MythPlayer instance)
+    MythPlayer *player = nullptr;
+    AvFormatDecoder *decoder = reinterpret_cast<AvFormatDecoder*>(Context->opaque);
+    if (decoder)
+        player = decoder->GetPlayer();
+    MythPlayer::HandleDecoderCallback(player, Debug, MythCodecContext::CreateDecoderCallback,
+                                      Context, reinterpret_cast<void*>(Callback));
     return Context->hw_device_ctx ? 0 : -1;
 }
 

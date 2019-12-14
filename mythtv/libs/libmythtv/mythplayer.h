@@ -132,6 +132,27 @@ class MythMultiLocker
     QVector<QMutex*> m_locks;
 };
 
+class DecoderCallback
+{
+  public:
+    using Callback = void (*)(void*, void*, void*);
+    DecoderCallback() { }
+    DecoderCallback(QString &Debug, Callback Function, void *Opaque1, void *Opaque2, void *Opaque3)
+      : m_debug(std::move(Debug)),
+        m_function(Function),
+        m_opaque1(Opaque1),
+        m_opaque2(Opaque2),
+        m_opaque3(Opaque3)
+    {
+    }
+
+    QString m_debug;
+    Callback m_function { nullptr };
+    void* m_opaque1     { nullptr };
+    void* m_opaque2     { nullptr };
+    void* m_opaque3     { nullptr };
+};
+
 class MTV_PUBLIC MythPlayer
 {
     Q_DECLARE_TR_FUNCTIONS(MythPlayer)
@@ -286,6 +307,12 @@ class MTV_PUBLIC MythPlayer
     virtual bool HasReachedEof(void) const;
     void SetDisablePassThrough(bool disabled);
     void ForceSetupAudioStream(void);
+    static void HandleDecoderCallback(MythPlayer *Player, const QString &Debug,
+                                      DecoderCallback::Callback Function,
+                                      void *Opaque1, void *Opaque2);
+    void ProcessCallbacks(void);
+    void QueueCallback(QString Debug, DecoderCallback::Callback Function,
+                       void *Opaque1, void *Opaque2, void *Opaque3);
 
     // Reinit
     void ReinitVideo(bool ForceUpdate);
@@ -633,6 +660,8 @@ class MTV_PUBLIC MythPlayer
   protected:
     PlayerFlags      m_playerFlags;
     DecoderBase     *m_decoder            {nullptr};
+    QMutex           m_decoderCallbackLock;
+    QVector<DecoderCallback> m_decoderCallbacks;
     mutable QMutex   m_decoderChangeLock  {QMutex::Recursive};
     MythVideoOutput *m_videoOutput        {nullptr};
     PlayerContext   *m_playerCtx          {nullptr};

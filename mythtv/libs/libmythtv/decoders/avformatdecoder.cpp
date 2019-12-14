@@ -2295,9 +2295,14 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             bool foundgpudecoder = false;
             if (version && FlagIsSet(kDecodeAllowGPU))
             {
+                // We need to set this so that MythyCodecContext can callback
+                // to the player in use to check interop support.
+                enc->opaque = static_cast<void*>(this);
                 MythCodecID hwcodec = MythCodecContext::FindDecoder(dec, stream, &enc, &codec);
                 if (hwcodec != kCodec_NONE)
                 {
+                    // the context may have changed
+                    enc->opaque = static_cast<void*>(this);
                     m_videoCodecId = hwcodec;
                     foundgpudecoder = true;
                 }
