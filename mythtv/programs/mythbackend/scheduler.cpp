@@ -3693,8 +3693,9 @@ void Scheduler::UpdateManuals(uint recordid)
 {
     MSqlQuery query(m_dbConn);
 
-    query.prepare(QString("SELECT type,title,station,startdate,starttime, "
-                  " enddate,endtime "
+    query.prepare(QString("SELECT type,title,subtitle,description,"
+                          "station,startdate,starttime,"
+                          "enddate,endtime "
                   "FROM %1 WHERE recordid = :RECORDID").arg(m_recordTable));
     query.bindValue(":RECORDID", recordid);
     if (!query.exec() || query.size() != 1)
@@ -3708,12 +3709,17 @@ void Scheduler::UpdateManuals(uint recordid)
 
     RecordingType rectype = RecordingType(query.value(0).toInt());
     QString title = query.value(1).toString();
-    QString station = query.value(2).toString() ;
-    QDateTime startdt = QDateTime(query.value(3).toDate(),
-                                  query.value(4).toTime(), Qt::UTC);
+    QString subtitle = query.value(2).toString();
+    QString description = query.value(3).toString();
+    QString station = query.value(4).toString();
+    QDateTime startdt = QDateTime(query.value(5).toDate(),
+                                  query.value(6).toTime(), Qt::UTC);
     int duration = startdt.secsTo(
-        QDateTime(query.value(5).toDate(),
-                  query.value(6).toTime(), Qt::UTC));
+        QDateTime(query.value(7).toDate(),
+                  query.value(8).toTime(), Qt::UTC));
+
+    if (description.isEmpty())
+        description = startdt.toLocalTime().toString();
 
     query.prepare("SELECT chanid from channel "
                   "WHERE deleted IS NULL AND callsign = :STATION");
@@ -3777,14 +3783,15 @@ void Scheduler::UpdateManuals(uint recordid)
                 continue;
 
             query.prepare("REPLACE INTO program (chanid, starttime, endtime,"
-                          " title, subtitle, manualid, generic) "
+                          " title, subtitle, description, manualid, generic) "
                           "VALUES (:CHANID, :STARTTIME, :ENDTIME, :TITLE,"
-                          " :SUBTITLE, :RECORDID, 1)");
+                          " :SUBTITLE, :DESCRIPTION, :RECORDID, 1)");
             query.bindValue(":CHANID", chanidlist[i]);
             query.bindValue(":STARTTIME", startdt);
             query.bindValue(":ENDTIME", startdt.addSecs(duration));
             query.bindValue(":TITLE", title);
-            query.bindValue(":SUBTITLE", startdt.toLocalTime());
+            query.bindValue(":SUBTITLE", subtitle);
+            query.bindValue(":DESCRIPTION", description);
             query.bindValue(":RECORDID", recordid);
             if (!query.exec())
             {
@@ -5760,7 +5767,7 @@ bool Scheduler::CreateConflictLists(void)
     }
 
     bool result = true;
-    
+
     query.prepare("SELECT ci.cardid "
                   "FROM capturecard ci "
                   "LEFT JOIN inputgroup ig "
@@ -5783,7 +5790,7 @@ bool Scheduler::CreateConflictLists(void)
             QString("Assigning input %1 to conflict set %2")
             .arg(id).arg(m_conflictlists.size()));
         m_sinputinfomap[id].m_conflictlist = conflictlist;
-    }                  
+    }
 
     return result;
 }
