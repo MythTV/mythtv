@@ -267,6 +267,7 @@ class PlaybackBox : public ScheduleCommon
     bool UpdateUILists(void);
     void UpdateUIGroupList(const QStringList &groupPreferences);
     void UpdateUIRecGroupList(void);
+    void SelectNextRecGroup(void);
 
     void UpdateProgressBar(void);
 

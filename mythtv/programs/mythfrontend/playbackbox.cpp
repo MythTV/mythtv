@@ -1389,6 +1389,22 @@ void PlaybackBox::updateRecGroup(MythUIButtonListItem *sel_item)
     displayRecGroup(newRecGroup);
 }
 
+void PlaybackBox::SelectNextRecGroup(void)
+{
+    QString nextGroup;
+    m_recGroupsLock.lock();
+    if (m_recGroupIdx >= 0 && !m_recGroups.empty())
+    {
+        if (++m_recGroupIdx >= m_recGroups.size())
+            m_recGroupIdx = 0;
+        nextGroup = m_recGroups[m_recGroupIdx];
+    }
+    m_recGroupsLock.unlock();
+
+    if (!nextGroup.isEmpty())
+        displayRecGroup(nextGroup);
+}
+
 void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
 {
     if (!sel_item)
@@ -1815,6 +1831,7 @@ bool PlaybackBox::UpdateUILists(void)
         m_progLists[""];
         m_titleList << "";
         m_playList.clear();
+        SelectNextRecGroup();
 
         m_isFilling = false;
         return false;
@@ -3892,18 +3909,7 @@ bool PlaybackBox::keyPressEvent(QKeyEvent *event)
         }
         else if (action == ACTION_PAGERIGHT)
         {
-            QString nextGroup;
-            m_recGroupsLock.lock();
-            if (m_recGroupIdx >= 0 && !m_recGroups.empty())
-            {
-                if (++m_recGroupIdx >= m_recGroups.size())
-                    m_recGroupIdx = 0;
-                nextGroup = m_recGroups[m_recGroupIdx];
-            }
-            m_recGroupsLock.unlock();
-
-            if (!nextGroup.isEmpty())
-                displayRecGroup(nextGroup);
+            SelectNextRecGroup();
         }
         else if (action == ACTION_PAGELEFT)
         {
