@@ -1615,10 +1615,15 @@ void MythPlayer::AVSync(VideoFrame *buffer)
             // cater for DVB radio
             if (videotimecode == 0)
                 videotimecode = m_audio.GetAudioTime();;
+
+            // minor 'hack' to ensure data only streams work - always ensure
+            // m_rtcBase is set so we don't continually fail the next check
+            m_rtcBase = unow - videotimecode * playspeed1000;
+
             // On first frame we get nothing, so exit out.
             if (videotimecode == 0)
                 return;
-            m_rtcBase = unow - videotimecode * playspeed1000;
+
             m_maxTcVal = 0;
             m_maxTcFrames = 0;
             m_numDroppedFrames = 0;
