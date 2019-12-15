@@ -1547,7 +1547,7 @@ void MusicPlayer::decoderHandlerReady(void)
     if (getDecoder()->initialize())
     {
         if (m_output)
-             m_output->Reset();
+             m_output->PauseUntilBuffered();
 
         getDecoder()->start();
 
