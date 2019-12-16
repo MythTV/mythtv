@@ -119,7 +119,7 @@ class MTV_PUBLIC MasterGuideTable : public PSIPTable
     //   table_type                    16  0.0
     uint TableType(uint i) const
     {
-        return (_ptrs[i][0]<<8) | _ptrs[i][1];
+        return (m_ptrs[i][0]<<8) | m_ptrs[i][1];
     }
     int TableClass(uint i) const;
     QString TableClassString(uint i) const;
@@ -127,25 +127,25 @@ class MTV_PUBLIC MasterGuideTable : public PSIPTable
     //   table_type_PID                13  2.3
     uint TablePID(uint i) const
     {
-        return ((_ptrs[i][2]<<8) | (_ptrs[i][3])) & 0x1fff;
+        return ((m_ptrs[i][2]<<8) | (m_ptrs[i][3])) & 0x1fff;
     }
     //   reserved                       3  4.0    0x7
     //   table_type_version_number      5  4.3
     uint TableVersion(uint i) const
     {
-        return (_ptrs[i][4]) & 0x1f;
+        return (m_ptrs[i][4]) & 0x1f;
     }
     //   number_bytes for table desc.  32  5.0
     uint TableDescriptorsBytes(uint i) const
     {
-        return ((_ptrs[i][5]<<24) | (_ptrs[i][6]<<16) |
-                (_ptrs[i][7]<<8)  | (_ptrs[i][8]));
+        return ((m_ptrs[i][5]<<24) | (m_ptrs[i][6]<<16) |
+                (m_ptrs[i][7]<<8)  | (m_ptrs[i][8]));
     }
     //   reserved                       4  9.0    0xf
     //   table_type_descriptors_length 12  9.4
     uint TableDescriptorsLength(uint i) const
     {
-        return ((_ptrs[i][9]<<8) | (_ptrs[i][10])) & 0xfff;
+        return ((m_ptrs[i][9]<<8) | (m_ptrs[i][10])) & 0xfff;
     }
 
     //   for (I = 0; I<M; I++)
@@ -154,19 +154,19 @@ class MTV_PUBLIC MasterGuideTable : public PSIPTable
     // }
     const unsigned char* TableDescriptors(uint i) const
     {
-        return _ptrs[i]+11;
+        return m_ptrs[i]+11;
     }
     // reserved                         4         0xf
     // descriptors_length              12
     uint GlobalDescriptorsLength() const
     {
-        return ((_ptrs[TableCount()][0]<<8) |
-                (_ptrs[TableCount()][1])) & 0xfff;
+        return ((m_ptrs[TableCount()][0]<<8) |
+                (m_ptrs[TableCount()][1])) & 0xfff;
     }
 
     const unsigned char* GlobalDescriptors() const
     {
-        return _ptrs[TableCount()]+2;
+        return m_ptrs[TableCount()]+2;
     }
     // for (I=0; I<N; I++) {
     //   descriptor()
@@ -177,7 +177,7 @@ class MTV_PUBLIC MasterGuideTable : public PSIPTable
     QString toString(void) const override; // PSIPTable
     QString toStringXML(uint indent_level) const override; // PSIPTable
   private:
-    mutable vector<unsigned char*> _ptrs; // used to parse
+    mutable vector<unsigned char*> m_ptrs; // used to parse
 };
 
 /** \class VirtualChannelTable
@@ -229,7 +229,7 @@ class MTV_PUBLIC VirtualChannelTable : public PSIPTable
 
         QString str;
         const unsigned short* ustr =
-            reinterpret_cast<const unsigned short*>(_ptrs[i]);
+            reinterpret_cast<const unsigned short*>(m_ptrs[i]);
         for (int j=0; j<7; j++)
         {
             QChar c((ustr[j]<<8) | (ustr[j]>>8));
@@ -244,73 +244,73 @@ class MTV_PUBLIC VirtualChannelTable : public PSIPTable
     //              JJ JJjj jjjj  mm MMMM MMMM
     uint MajorChannel(uint i) const
     {
-        return (((_ptrs[i][14])<<6)&0x3c0) | (_ptrs[i][15]>>2);
+        return (((m_ptrs[i][14])<<6)&0x3c0) | (m_ptrs[i][15]>>2);
     }
     //   minor_channel_number  10  14.6
     uint MinorChannel(uint i) const
     {
-        return (((_ptrs[i][15])<<8)&0x300) | _ptrs[i][16];
+        return (((m_ptrs[i][15])<<8)&0x300) | m_ptrs[i][16];
     }
     //   modulation_mode        8  16.0
     uint ModulationMode(uint i) const
     {
-        return _ptrs[i][17];
+        return m_ptrs[i][17];
     }
     QString ModulationModeString(uint i) const;
     //   carrier_frequency     32  17.0 deprecated
     //   channel_TSID          16  21.0
     uint ChannelTransportStreamID(uint i) const
     {
-        return ((_ptrs[i][22]<<8) | _ptrs[i][23]);
+        return ((m_ptrs[i][22]<<8) | m_ptrs[i][23]);
     }
     //   program_number        16  23.0
     uint ProgramNumber(uint i) const
     {
-        return ((_ptrs[i][24]<<8) | _ptrs[i][25]);
+        return ((m_ptrs[i][24]<<8) | m_ptrs[i][25]);
     }
     //   ETM_location           2  25.0
     uint ETMlocation(uint i) const
     {
-        return (_ptrs[i][26]>>6) & 0x03;
+        return (m_ptrs[i][26]>>6) & 0x03;
     }
     //   access_controlled      1  25.2
     bool IsAccessControlled(uint i) const
     {
-        return bool(_ptrs[i][26] & 0x20);
+        return bool(m_ptrs[i][26] & 0x20);
     }
     //   hidden                 1  25.3
     bool IsHidden(uint i) const
     {
-        return bool(_ptrs[i][26] & 0x10);
+        return bool(m_ptrs[i][26] & 0x10);
     }
     //   reserved               2  25.4          3
     //   hide_guide             1  25.6
     bool IsHiddenInGuide(uint i) const
     {
-        return bool(_ptrs[i][26] & 0x2);
+        return bool(m_ptrs[i][26] & 0x2);
     }
     //   reserved               6  25.7       0x3f
     //   service_type           6  26.2
     uint ServiceType(uint i) const
     {
-        return _ptrs[i][27] & 0x3f;
+        return m_ptrs[i][27] & 0x3f;
     }
     QString ServiceTypeString(uint i) const;
     //   source_id             16  27.0
     uint SourceID(uint i) const
     {
-        return ((_ptrs[i][28]<<8) | _ptrs[i][29]);
+        return ((m_ptrs[i][28]<<8) | m_ptrs[i][29]);
     }
     //   reserved               6  29.0       0xfb
     //   descriptors_length    10  29.6
     uint DescriptorsLength(uint i) const
     {
-        return ((_ptrs[i][30]<<8) | _ptrs[i][31]) & 0x03ff;
+        return ((m_ptrs[i][30]<<8) | m_ptrs[i][31]) & 0x03ff;
     }
     //   for (i=0;i<N;i++) { descriptor() }
     const unsigned char* Descriptors(uint i) const
     {
-        return _ptrs[i]+32;
+        return m_ptrs[i]+32;
     }
     // }
     // reserved                 6             0xfb
@@ -318,12 +318,12 @@ class MTV_PUBLIC VirtualChannelTable : public PSIPTable
     uint GlobalDescriptorsLength() const
     {
         uint i = ChannelCount();
-        return ((_ptrs[i][0]<<8) | _ptrs[i][1]) & 0x03ff;
+        return ((m_ptrs[i][0]<<8) | m_ptrs[i][1]) & 0x03ff;
     }
     // for (j=0; j<N; j++) { additional_descriptor() }
     const unsigned char* GlobalDescriptors() const
     {
-        return _ptrs[ChannelCount()]+2;
+        return m_ptrs[ChannelCount()]+2;
     }
     // CRC_32                  32
     void Parse() const;
@@ -335,7 +335,7 @@ class MTV_PUBLIC VirtualChannelTable : public PSIPTable
     virtual QString ChannelStringXML(uint indent_level, uint channel) const;
     virtual QString XMLChannelValues(uint indent_level, uint channel) const;
   protected:
-    mutable vector<unsigned char*> _ptrs;
+    mutable vector<unsigned char*> m_ptrs;
 };
 
 /** \class TerrestrialVirtualChannelTable
@@ -490,12 +490,12 @@ class MTV_PUBLIC CableVirtualChannelTable : public VirtualChannelTable
     //   path_select            1  26.4
     bool IsPathSelect(uint i) const
     {
-        return bool(_ptrs[i][26] & 0x8);
+        return bool(m_ptrs[i][26] & 0x8);
     }
     //   out_of_band            1  26.5
     bool IsOutOfBand(uint i) const
     {
-        return bool(_ptrs[i][26] & 0x4);
+        return bool(m_ptrs[i][26] & 0x4);
     }
     //   hide_guide             1  26.6
     //   reserved               3  26.7          7
@@ -557,13 +557,13 @@ class MTV_PUBLIC EventInformationTable : public PSIPTable
     //   event_id              14   0.2
     uint EventID(uint i) const
     {
-        return ((_ptrs[i][0]<<8) | _ptrs[i][1])&0x3fff;
+        return ((m_ptrs[i][0]<<8) | m_ptrs[i][1])&0x3fff;
     }
     //   start_time            32   2.0
     uint StartTimeRaw(uint i) const
     {
-        return ((_ptrs[i][2]<<24) | (_ptrs[i][3]<<16) |
-                (_ptrs[i][4]<<8)  | (_ptrs[i][5]));
+        return ((m_ptrs[i][2]<<24) | (m_ptrs[i][3]<<16) |
+                (m_ptrs[i][4]<<8)  | (m_ptrs[i][5]));
     }
     QDateTime StartTimeGPS(uint i) const
     {
@@ -578,27 +578,27 @@ class MTV_PUBLIC EventInformationTable : public PSIPTable
     //   ETM_location           2   6.2
     uint ETMLocation(uint i) const
     {
-        return (_ptrs[i][6]>>4)&3;
+        return (m_ptrs[i][6]>>4)&3;
     }
     //   length_in_seconds     20   6.4
     uint LengthInSeconds(uint i) const
     {
-        return ((_ptrs[i][6]<<16) | (_ptrs[i][7]<<8) |
-                (_ptrs[i][8])) & 0xfffff;
+        return ((m_ptrs[i][6]<<16) | (m_ptrs[i][7]<<8) |
+                (m_ptrs[i][8])) & 0xfffff;
     }
     //   title_length           8   9.0
     uint TitleLength(uint i) const
-    { return _ptrs[i][9]; }
+    { return m_ptrs[i][9]; }
     //   title_text() var       *  10.0
     MultipleStringStructure title(int i) const
     {
-        return MultipleStringStructure(_ptrs[i]+10);
+        return MultipleStringStructure(m_ptrs[i]+10);
     }
     //   reserved               4        0xf
     //   descriptors_length    12
     uint DescriptorsLength(uint i) const
     {
-        unsigned char *desc=_ptrs[i]+10+TitleLength(i);
+        unsigned char *desc=m_ptrs[i]+10+TitleLength(i);
         return ((desc[0]<<8)|(desc[1]))&0xfff;
     }
     //   for (i=0;i<N;i++)
@@ -606,7 +606,7 @@ class MTV_PUBLIC EventInformationTable : public PSIPTable
     //      descriptor()
     const unsigned char* Descriptors(uint i) const
     {
-        return _ptrs[i]+12+TitleLength(i);
+        return m_ptrs[i]+12+TitleLength(i);
     }
     //   }
     // }
@@ -614,7 +614,7 @@ class MTV_PUBLIC EventInformationTable : public PSIPTable
     void Parse() const;
     QString toString() const override; // PSIPTable
   private:
-    mutable vector<unsigned char*> _ptrs;
+    mutable vector<unsigned char*> m_ptrs;
 };
 
 /** \class ExtendedTextTable

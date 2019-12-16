@@ -384,7 +384,7 @@ QString MPEGDescriptor::DescriptorTagString(void) const
 }
 
 #define SET_STRING(DESC_NAME) do { \
-    if (IsValid()) { DESC_NAME d(_data, DescriptorLength()+2); \
+    if (IsValid()) { DESC_NAME d(m_data, DescriptorLength()+2); \
     if (d.IsValid()) str = d.toString(); } } while (false)
 
 QString MPEGDescriptor::descrDump(const QString &name) const
@@ -525,7 +525,7 @@ QString MPEGDescriptor::toStringXML(uint level) const
     {
         if (((i%8) == 0) && i)
             str += "\n" + indent_1 + "      ";
-        str += QString("0x%1 ").arg(_data[i+2],2,16,QChar('0'));
+        str += QString("0x%1 ").arg(m_data[i+2],2,16,QChar('0'));
     }
 
     str += "\n" + indent_1 + "</Data>\n";
@@ -544,7 +544,7 @@ QString MPEGDescriptor::hexdump(void) const
     QString prt;
     for (i=0; i<DescriptorLength(); i++)
     {
-        uint ch = _data[i+2];
+        uint ch = m_data[i+2];
         hex.append(QString(" %1").arg(ch, 2, 16, QChar('0')));
         prt.append(QString("%1").arg(isprint(ch) ? QChar(ch) : '.'));
         if (((i+1) % 8) == 0)

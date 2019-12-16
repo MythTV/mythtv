@@ -18,12 +18,12 @@ using IntToBuf = QMap<int, const unsigned char*>;
 class MultipleStringStructure
 {
   public:
-    explicit MultipleStringStructure(const unsigned char *data) : _data(data)
+    explicit MultipleStringStructure(const unsigned char *data) : m_data(data)
     {
         Parse();
     }
 
-    uint StringCount(void) const { return _data[0]; }
+    uint StringCount(void) const { return m_data[0]; }
     //uimsbf for (i= 0;i< number_strings;i++) {
     //  ISO_639_language_code 24;
     int LanguageKey(uint i) const
@@ -66,11 +66,11 @@ class MultipleStringStructure
     static QString Uncompressed(const unsigned char *buf, int len, int mode);
     static uint Index(int i, int j) { return (i<<8)|(j&0xff); }
     const unsigned char *Offset(int i, int j) const
-        { return _ptrs[Index(i,j)]; }
+        { return m_ptrs[Index(i,j)]; }
 
   private:
-    const unsigned char *_data;
-    mutable IntToBuf _ptrs;
+    const unsigned char *m_data;
+    mutable IntToBuf m_ptrs;
 };
 
 class CaptionServiceDescriptor : public MPEGDescriptor
@@ -79,15 +79,15 @@ class CaptionServiceDescriptor : public MPEGDescriptor
     CaptionServiceDescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, DescriptorID::caption_service)
     {
-        if (_data && !Parse())
-            _data = nullptr;
+        if (m_data && !Parse())
+            m_data = nullptr;
     }
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x86
     // descriptor_length        8   1.0
     // reserved                 3   2.0       0x07
     // number_of_services       5   2.3
-    uint ServicesCount() const { return _data[2]&0x1f; }
+    uint ServicesCount() const { return m_data[2]&0x1f; }
     //uimsbf for (i=0;i<number_of_services;i++) {
     //   language             8*3  0.0
     int LanguageKey(int i) const
@@ -125,10 +125,10 @@ class CaptionServiceDescriptor : public MPEGDescriptor
   private:
     int Index(int i, int j) const { return (i<<8) | (j & 0xff); }
     const unsigned char *Offset(int i, int j) const
-        { return _ptrs[Index(i,j)]; }
+        { return m_ptrs[Index(i,j)]; }
 
   private:
-    IntToBuf _ptrs;
+    IntToBuf m_ptrs;
 };
 
 class ContentAdvisoryDescriptor : public MPEGDescriptor
@@ -137,15 +137,15 @@ class ContentAdvisoryDescriptor : public MPEGDescriptor
     ContentAdvisoryDescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, DescriptorID::content_advisory)
     {
-        if (_data && !Parse())
-            _data = nullptr;
+        if (m_data && !Parse())
+            m_data = nullptr;
     }
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x87
     // descriptor_length        8   1.0
     // reserved                 2   2.0       0x03
     // rating_region_count      6   2.2
-    uint RatingRegionCount(void) const { return _data[2] & 0x3f; }
+    uint RatingRegionCount(void) const { return m_data[2] & 0x3f; }
     // for (i=0; i<rating_region_count; i++) {
     //   rating_region          8 x+0.0
     uint RatingRegion(uint i) const
@@ -179,10 +179,10 @@ class ContentAdvisoryDescriptor : public MPEGDescriptor
     int Index(int i, int j) const { return (i<<8)|(j&0xff); }
     const unsigned char *Offset(int i, int j) const
     {
-        IntToBuf::const_iterator it = _ptrs.find(Index(i,j));
-        return (it != _ptrs.end()) ? *it : nullptr;
+        IntToBuf::const_iterator it = m_ptrs.find(Index(i,j));
+        return (it != m_ptrs.end()) ? *it : nullptr;
     }
-    IntToBuf _ptrs;
+    IntToBuf m_ptrs;
 };
 
 class ComponentNameDescriptor : public MPEGDescriptor
@@ -194,7 +194,7 @@ class ComponentNameDescriptor : public MPEGDescriptor
     }
     const MultipleStringStructure ComponentNameStrings() const
     {
-        return MultipleStringStructure(_data+2);
+        return MultipleStringStructure(m_data+2);
     }
     QString toString() const override // MPEGDescriptor
     {
@@ -212,15 +212,15 @@ class AudioStreamDescriptor : public MPEGDescriptor
         MPEGDescriptor(data, len, DescriptorID::ac3_audio_stream) { }
     // descriptor_tag                        8   0.0   0x81
     // sample_rate_code                      3   2.0
-    uint SampleRateCode(void) const { return (_data[2]>>5)&7; }
+    uint SampleRateCode(void) const { return (m_data[2]>>5)&7; }
     QString SampleRateCodeString(void) const;
     // bsid                                  5   2.3
-    uint bsid(void) const { return _data[2]&0x1f; }
+    uint bsid(void) const { return m_data[2]&0x1f; }
     // bit_rate_code                         6   3.0
-    uint BitRateCode(void) const { return (_data[3]>>2)&0x3f; }
+    uint BitRateCode(void) const { return (m_data[3]>>2)&0x3f; }
     QString BitRateCodeString(void) const;
     // surround_mode                         2   3.6
-    uint SurroundMode(void) const { return _data[3]&3; }
+    uint SurroundMode(void) const { return m_data[3]&3; }
     QString SurroundModeString(void) const;
     /*
       000 Major ?
@@ -229,41 +229,41 @@ class AudioStreamDescriptor : public MPEGDescriptor
       111 Karaoke Mode if acmod >= 0x2. a_52a.pdf p130
     */
     // bsmod                                 3   4.0
-    uint BasicServiceMode(void) const { return (_data[4]>>5)&7; }
+    uint BasicServiceMode(void) const { return (m_data[4]>>5)&7; }
     // num_channels                          4   4.3
-    uint Channels(void) const { return (_data[4]>>1)&0xf; }
+    uint Channels(void) const { return (m_data[4]>>1)&0xf; }
     QString ChannelsString(void) const;
 
     // full service that can be presented alone to listener?
     // full_svc                              1   4.7
-    bool FullService(void) const { return bool((_data[4])&1); }
+    bool FullService(void) const { return bool((m_data[4])&1); }
 
     // langcod                               8   5.0
     // ignore for language specification
-    uint LanguageCode(void) const { return _data[5]; }
+    uint LanguageCode(void) const { return m_data[5]; }
     // if(num_channels==0) /* 1+1 mode */
     //   langcod2                            8   6.0
     // ignore for language specification
-    uint LanguageCode2(void) const { return _data[6]; }
+    uint LanguageCode2(void) const { return m_data[6]; }
 
     // if(bsmod<2) {
     //  mainid                               3   7.0/6.0
     uint MainID(void) const
     {
-        return _data[(Channels()==0)?7:6]>>5;
+        return m_data[(Channels()==0)?7:6]>>5;
     }
     //  reserved                             5   7.3/6.3
     //uint reserved(void) const { return _data[7]&0x1f; }
     // } else asvcflags                      8   7.0/6.0
     uint AServiceFlags(void) const
     {
-        return _data[(Channels()==0)?7:6];
+        return m_data[(Channels()==0)?7:6];
     }
 
     // textlen                               7   8.0/7.0
     uint TextLength(void) const
     {
-        return _data[(Channels()==0)?8:7]>>1;
+        return m_data[(Channels()==0)?8:7]>>1;
     }
 
     /* If this bit is a  1 , the text is encoded as 1-byte characters
@@ -272,7 +272,7 @@ class AudioStreamDescriptor : public MPEGDescriptor
     // text_code 1 bslbf
     bool IsTextLatin1(void) const
     {
-        return bool(_data[(Channels()==0)?8:7]&1);
+        return bool(m_data[(Channels()==0)?8:7]&1);
     }
     // for(i=0; i<M; i++) {
     //        text[i] 8 bslbf

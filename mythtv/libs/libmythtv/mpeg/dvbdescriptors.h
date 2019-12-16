@@ -75,9 +75,9 @@ class NetworkNameDescriptor : public MPEGDescriptor
     // descriptor_length        8   1.0
     // for (i=0;i<N;i++){ char 8 uimsbf }
     QString Name(void) const
-        { return dvb_decode_text(_data+2, DescriptorLength()); }
+        { return dvb_decode_text(m_data+2, DescriptorLength()); }
     QString ShortName(void) const
-        { return dvb_decode_short_name(_data+2, DescriptorLength()); }
+        { return dvb_decode_short_name(m_data+2, DescriptorLength()); }
     QString toString(void) const override // MPEGDescriptor
         { return QString("NetworkNameDescriptor: ")+Name(); }
 };
@@ -89,30 +89,30 @@ class LinkageDescriptor : public MPEGDescriptor
     LinkageDescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, DescriptorID::linkage)
     {
-        if (!_data)
+        if (!m_data)
             return;
         if (DescriptorLength() < 7)
         {
-            _data = nullptr;
+            m_data = nullptr;
         }
         else if (kMobileHandOver == LinkageType())
         {
             uint end = 8;
             if (DescriptorLength() < end)
             {
-                _data = nullptr;
+                m_data = nullptr;
                 return;
             }
             end += (HasMobileNetworkID()) ? 2 : 0;
             end += (HasMobileInitialServiceID()) ? 2 : 0;
             if (DescriptorLength() < end)
-                _data = nullptr;
+                m_data = nullptr;
             m_offset = end + 2;
         }
         else if (kEventLinkage == LinkageType())
         {
             if (DescriptorLength() < 10)
-                _data = nullptr;
+                m_data = nullptr;
             m_offset = 12;
         }
     }
@@ -120,11 +120,11 @@ class LinkageDescriptor : public MPEGDescriptor
     // descriptor_tag           8   0.0       0x4A
     // descriptor_length        8   1.0
     // transport_stream_id     16   2.0
-    uint TSID(void)            const { return (_data[2]<<8) | _data[3]; }
+    uint TSID(void)            const { return (m_data[2]<<8) | m_data[3]; }
     // original_network_id     16   4.0
-    uint OriginalNetworkID()   const { return (_data[4]<<8) | _data[5]; }
+    uint OriginalNetworkID()   const { return (m_data[4]<<8) | m_data[5]; }
     // service_id              16   6.0
-    uint ServiceID(void)       const { return (_data[6]<<8) | _data[7]; }
+    uint ServiceID(void)       const { return (m_data[6]<<8) | m_data[7]; }
     // linkage_type             8   8.0
     enum
     {
@@ -142,7 +142,7 @@ class LinkageDescriptor : public MPEGDescriptor
         kTSContaining_INT_BAT_NIT    = 0x0C,
         kEventLinkage                = 0x0D,
     };
-    uint LinkageType(void)     const { return _data[8]; }
+    uint LinkageType(void)     const { return m_data[8]; }
     QString LinkageTypeString(void) const;
 
     // if (linkage_type == 0x08)
@@ -154,7 +154,7 @@ class LinkageDescriptor : public MPEGDescriptor
         kHandOverLocalVariation    = 0x02,
         kHandOverAssociatedService = 0x03,
     };
-    uint MobileHandOverType(void) const { return _data[9]>>4; }
+    uint MobileHandOverType(void) const { return m_data[9]>>4; }
     QString MobileHandOverTypeString(void) const;
     //    reserved_future_use   3   9.4
     //    origin_type           1   9.7
@@ -163,14 +163,14 @@ class LinkageDescriptor : public MPEGDescriptor
         kOriginNIT = 0x0,
         kOriginSDT = 0x1,
     };
-    uint MobileOriginType(void) const { return _data[9]&0x1; }
+    uint MobileOriginType(void) const { return m_data[9]&0x1; }
     QString MobileOriginTypeString(void) const;
     //    if (hand-over_type == 0x01 || hand-over_type == 0x02 ||
     //        hand-over_type == 0x03)
     //    { network_id         16  10.0 }
     bool HasMobileNetworkID(void) const
         { return bool(MobileHandOverType() & 0x3); }
-    uint MobileNetworkID(void) const { return (_data[10]<<8) | _data[11]; }
+    uint MobileNetworkID(void) const { return (m_data[10]<<8) | m_data[11]; }
     //    if (origin_type ==0x00)
     //    { initial_service_id 16  HasNetworkID()?10.0:12.0 }
     bool HasMobileInitialServiceID(void) const
@@ -178,23 +178,23 @@ class LinkageDescriptor : public MPEGDescriptor
     uint MobileInitialServiceID(void) const
     {
         return HasMobileNetworkID() ?
-            ((_data[12]<<8) | _data[13]) : ((_data[10]<<8) | _data[11]);
+            ((m_data[12]<<8) | m_data[13]) : ((m_data[10]<<8) | m_data[11]);
     }
     // }
     // if (linkage_type == 0x0D)
     // {
     //    target_event_id      16   9.0
-    uint TargetEventID(void) const { return (_data[9]<<8) | _data[10]; }
+    uint TargetEventID(void) const { return (m_data[9]<<8) | m_data[10]; }
     //    target_listed         1  11.0
-    bool IsTargetListed(void) const { return ( _data[11]&0x80 ) != 0; }
+    bool IsTargetListed(void) const { return ( m_data[11]&0x80 ) != 0; }
     //    event_simulcast       1  11.1
-    bool IsEventSimulcast(void) const { return ( _data[11]&0x40 ) != 0; }
+    bool IsEventSimulcast(void) const { return ( m_data[11]&0x40 ) != 0; }
     //    reserved              6  11.2
     // }
     //      for (i=0;i<N;i++)
     //        { private_data_byte 8 bslbf }
     const unsigned char *PrivateData(void) const
-        { return &_data[m_offset]; }
+        { return &m_data[m_offset]; }
     uint PrivateDataLength(void) const
         { return DescriptorLength() + 2 - m_offset; }
 
@@ -212,7 +212,7 @@ class AdaptationFieldDataDescriptor : public MPEGDescriptor
     // descriptor_tag           8   0.0       0x70
     // descriptor_length        8   1.0
     // adapt_field_data_id      8   2.0
-    uint AdaptationFieldDataID(void) const { return _data[2]; }
+    uint AdaptationFieldDataID(void) const { return m_data[2]; }
     QString toString(void) const override // MPEGDescriptor
     {
         return QString("AdaptationFieldDataDescriptor  "
@@ -231,7 +231,7 @@ class AncillaryDataDescriptor : public MPEGDescriptor
     // descriptor_tag           8   0.0       0x6b
     // descriptor_length        8   1.0
     // ancillary_data_id        8   2.0
-    uint AncillaryDataID(void) const { return _data[2]; }
+    uint AncillaryDataID(void) const { return m_data[2]; }
     QString toString(void) const override // MPEGDescriptor
     {
         return QString("AncillaryDataDescriptor "
@@ -276,9 +276,9 @@ class BouquetNameDescriptor : public MPEGDescriptor
     // descriptor_length        8   1.0
     // for(i=0;i<N;i++) { char 8 }
     QString BouquetName(void) const
-         { return dvb_decode_text(_data+2, _data[1]); }
+         { return dvb_decode_text(m_data+2, m_data[1]); }
     QString BouquetShortName(void) const
-         { return dvb_decode_short_name(_data+2, _data[1]); }
+         { return dvb_decode_short_name(m_data+2, m_data[1]); }
 
     QString toString(void) const override // MPEGDescriptor
     {
@@ -301,7 +301,7 @@ class CAIdentifierDescriptor : public MPEGDescriptor
     // for (i=0; i<N; i++)
     //   { CA_system_id 16 }
     int CASystemId(uint i) const
-        { return (_data[2 + i*2] << 8) | _data[3 + i*2]; }
+        { return (m_data[2 + i*2] << 8) | m_data[3 + i*2]; }
     QString toString(void) const override; // MPEGDescriptor
 };
 
@@ -366,14 +366,14 @@ class ComponentDescriptor : public MPEGDescriptor
     // descriptor_length        8   1.0
     // reserved_future_use      4   2.0
     // stream_content           4   2.4
-    uint StreamContent(void) const { return _data[2] & 0xf; }
+    uint StreamContent(void) const { return m_data[2] & 0xf; }
     // component_type           8   3.0
-    uint ComponentType(void) const { return _data[3]; }
+    uint ComponentType(void) const { return m_data[3]; }
     // component_tag            8   4.0
-    uint ComponentTag(void)  const { return _data[4]; }
+    uint ComponentTag(void)  const { return m_data[4]; }
     // ISO_639_language_code   24   5.0
     int LanguageKey(void) const
-        { return iso639_str3_to_key(&_data[5]); }
+        { return iso639_str3_to_key(&m_data[5]); }
     QString LanguageString(void) const
         { return iso639_key_to_str3(LanguageKey()); }
     int CanonicalLanguageKey(void) const
@@ -591,17 +591,17 @@ class ContentDescriptor : public MPEGDescriptor
     // for (i=0;i<N;i++)
     // {
     //   content_nibble_level_1 4   0.0+p
-    uint Nibble1(uint i)     const { return _data[2 + (i<<1)] >> 4; }
+    uint Nibble1(uint i)     const { return m_data[2 + (i<<1)] >> 4; }
     //   content_nibble_level_2 4   0.4+p
-    uint Nibble2(uint i)     const { return _data[2 + (i<<1)] & 0xf; }
+    uint Nibble2(uint i)     const { return m_data[2 + (i<<1)] & 0xf; }
 
-    uint Nibble(uint i)      const { return _data[2 + (i<<1)]; }
+    uint Nibble(uint i)      const { return m_data[2 + (i<<1)]; }
 
     //   user_nibble            4   1.0+p
-    uint UserNibble1(uint i) const { return _data[3 + (i<<1)] >> 4; }
+    uint UserNibble1(uint i) const { return m_data[3 + (i<<1)] >> 4; }
     //   user_nibble            4   1.4+p
-    uint UserNibble2(uint i) const { return _data[3 + (i<<1)] & 0xf; }
-    uint UserNibble(uint i)  const { return _data[3 + (i<<1)]; }
+    uint UserNibble2(uint i) const { return m_data[3 + (i<<1)] & 0xf; }
+    uint UserNibble(uint i)  const { return m_data[3 + (i<<1)]; }
     // }                            2.0
 
     ProgramInfo::CategoryType GetMythCategory(uint i) const;
@@ -612,9 +612,9 @@ class ContentDescriptor : public MPEGDescriptor
     static void Init(void);
 
   protected:
-    static QMutex             categoryLock;
-    static QMap<uint,QString> categoryDesc;
-    static volatile bool      categoryDescExists;
+    static QMutex             s_categoryLock;
+    static QMap<uint,QString> s_categoryDesc;
+    static volatile bool      s_categoryDescExists;
 };
 
 // DVB Bluebook A038 (Sept 2011) p 49
@@ -630,7 +630,7 @@ class CountryAvailabilityDescriptor : public MPEGDescriptor
     uint CountryCount(void) const { return ((DescriptorLength() - 1) / 3); }
 
     // country_avail_flag       1   2.0
-    bool IsAvailable(void) const { return (_data[2] & 0x1); }
+    bool IsAvailable(void) const { return (m_data[2] & 0x1); }
     // reserved_future_use      7   2.1
     //
     // for (i=0; i<N; i++)
@@ -642,7 +642,7 @@ class CountryAvailabilityDescriptor : public MPEGDescriptor
         {
             if (i!=0) countries.append(" ");
             countries.append(QString::fromLatin1(
-                                 (const char *)_data+(3*(i+1)), 3));
+                                 (const char *)m_data+(3*(i+1)), 3));
         };
         return countries;
     }
@@ -665,19 +665,19 @@ class DataBroadcastDescriptor : public MPEGDescriptor
     // descriptor_length        8   1.0
 
     // data_broadcast_id       16   2.0
-    uint DataBroadcastId(void) const { return _data[2] << 8 | _data[3]; }
+    uint DataBroadcastId(void) const { return m_data[2] << 8 | m_data[3]; }
     // component_tag            8   4.0
-    uint DataComponentTag(void) const { return _data[4]; }
+    uint DataComponentTag(void) const { return m_data[4]; }
     // selector_length          8   5.0
-    uint SelectorLength(void) const { return _data[5]; }
+    uint SelectorLength(void) const { return m_data[5]; }
     // for (i=0; i<selector_length; i++)
     // {
     //   selector_byte          8
-    const unsigned char *Selector(void) const { return &_data[6]; }
+    const unsigned char *Selector(void) const { return &m_data[6]; }
     // }
     // ISO_639_language_code   24
     int LanguageKey(void) const
-        { return iso639_str3_to_key(&_data[6 + SelectorLength()]); }
+        { return iso639_str3_to_key(&m_data[6 + SelectorLength()]); }
     QString LanguageString(void) const
         { return iso639_key_to_str3(LanguageKey()); }
     int CanonicalLanguageKey(void) const
@@ -685,11 +685,11 @@ class DataBroadcastDescriptor : public MPEGDescriptor
     QString CanonicalLanguageString(void) const
         { return iso639_key_to_str3(CanonicalLanguageKey()); }
     // text_length              8
-    uint TextLength(void) const { return _data[6 + SelectorLength() + 3]; }
+    uint TextLength(void) const { return m_data[6 + SelectorLength() + 3]; }
     // for (i=0; i<text_length; i++) { text_char 8 }
     QString Text(void) const
     {
-        return dvb_decode_text(&_data[6 + SelectorLength() + 4], TextLength());
+        return dvb_decode_text(&m_data[6 + SelectorLength() + 4], TextLength());
     }
 
     QString toString(void) const override; // MPEGDescriptor
@@ -706,7 +706,7 @@ class DataBroadcastIdDescriptor : public MPEGDescriptor
     // descriptor_length        8   1.0
 
     // data_broadcast_id       16   2.0
-    uint DataBroadCastId(void) const { return _data[2] << 8 | _data[3]; }
+    uint DataBroadCastId(void) const { return m_data[2] << 8 | m_data[3]; }
     // for(i=0; i < N;i++ )
     // { id_selector_byte       8 }
 };
@@ -724,12 +724,12 @@ class CableDeliverySystemDescriptor : public MPEGDescriptor
     // frequency               32   2.0
     uint FrequencyRaw(void) const
     {
-        return ((_data[2]<<24) | (_data[3]<<16) |
-                (_data[4]<<8)  | (_data[5]));
+        return ((m_data[2]<<24) | (m_data[3]<<16) |
+                (m_data[4]<<8)  | (m_data[5]));
     }
     unsigned long long FrequencyHz(void) const
     {
-        return byte4BCD2int(_data[2], _data[3], _data[4], _data[5]) * 100;
+        return byte4BCD2int(m_data[2], m_data[3], m_data[4], m_data[5]) * 100;
     }
     // reserved_future_use     12   6.0
     // FEC_outer                4   7.4
@@ -738,7 +738,7 @@ class CableDeliverySystemDescriptor : public MPEGDescriptor
         kOuterFEC_None        = 0x1,
         kOuterFEC_RS204_RS188 = 0x2,
     };
-    uint FECOuter(void) const { return _data[7] & 0xf; }
+    uint FECOuter(void) const { return m_data[7] & 0xf; }
     QString FECOuterString(void) const
     {
         return (FECOuter() == kOuterFEC_None) ? "None" :
@@ -753,7 +753,7 @@ class CableDeliverySystemDescriptor : public MPEGDescriptor
         kModulationQAM128 = 0x04,
         kModulationQAM256 = 0x05,
     };
-    uint Modulation(void) const { return _data[8]; }
+    uint Modulation(void) const { return m_data[8]; }
     QString ModulationString(void) const
     {
         static QString ms[] =
@@ -764,13 +764,13 @@ class CableDeliverySystemDescriptor : public MPEGDescriptor
     // symbol_rate             28   9.0
     uint SymbolRateRaw(void) const
     {
-        return ((_data[9]<<20) | (_data[10]<<12) |
-                (_data[11]<<4) | (_data[12]>>4));
+        return ((m_data[9]<<20) | (m_data[10]<<12) |
+                (m_data[11]<<4) | (m_data[12]>>4));
     }
     uint SymbolRateHz(void) const
     {
-        return ((byte3BCD2int(_data[9], _data[10], _data[11]) * 1000) +
-                (byteBCDH2int(_data[12]) * 100));
+        return ((byte3BCD2int(m_data[9], m_data[10], m_data[11]) * 1000) +
+                (byteBCDH2int(m_data[12]) * 100));
     }
     // FEC_inner                4  12.4
     enum
@@ -783,7 +783,7 @@ class CableDeliverySystemDescriptor : public MPEGDescriptor
         kInnerFEC_8_9_ConvolutionCodeRate = 0x6,
         kInnerFEC_None                    = 0xF,
     };
-    uint FECInner(void) const { return _data[12] & 0xf; }
+    uint FECInner(void) const { return m_data[12] & 0xf; }
     QString FECInnerString(void) const { return coderate_inner(FECInner()); }
     QString toString(void) const override; // MPEGDescriptor
 };
@@ -802,16 +802,16 @@ class SatelliteDeliverySystemDescriptor : public MPEGDescriptor
     /// frequency              32   2.0
     uint FrequencyRaw(void) const
     {
-        return ((_data[2]<<24) | (_data[3]<<16) |
-                (_data[4]<<8)  | (_data[5]));
+        return ((m_data[2]<<24) | (m_data[3]<<16) |
+                (m_data[4]<<8)  | (m_data[5]));
     }
     unsigned long long FrequencykHz(void) const
     {
-        return byte4BCD2int(_data[2], _data[3], _data[4], _data[5]) * 10;
+        return byte4BCD2int(m_data[2], m_data[3], m_data[4], m_data[5]) * 10;
     }
     /// orbital_position       16   6.0
     uint OrbitalPosition(void) const
-        { return byte2BCD2int(_data[6], _data[7]); }
+        { return byte2BCD2int(m_data[6], m_data[7]); }
     QString OrbitalPositionString(void) const
     {
         uint num = OrbitalPosition();
@@ -821,20 +821,20 @@ class SatelliteDeliverySystemDescriptor : public MPEGDescriptor
     double OrbitalPositionFloat()  const
         { return ((double) OrbitalPosition()) / 10.0; }
     /// west_east_flag          1   8.0
-    bool IsEast(void)             const { return ( (_data[8]&0x80) ) != 0; }
+    bool IsEast(void)             const { return ( (m_data[8]&0x80) ) != 0; }
     bool IsWest(void)             const { return !IsEast(); }
     // polarization             2   8.1
-    uint Polarization(void)       const { return (_data[8]>>5)&0x3; }
+    uint Polarization(void)       const { return (m_data[8]>>5)&0x3; }
     QString PolarizationString()  const
     {
         static QString ps[] = { "h", "v", "l", "r" };
         return ps[Polarization()];
     }
-    bool IsCircularPolarization(void) const { return (_data[8]>>6)&0x1; }
-    bool IsLinearPolarization(void) const { return !((_data[8]>>6)&0x1); }
-    bool IsHorizontalLeftPolarization(void) const { return (_data[8]>>5)&0x1; }
+    bool IsCircularPolarization(void) const { return (m_data[8]>>6)&0x1; }
+    bool IsLinearPolarization(void) const { return !((m_data[8]>>6)&0x1); }
+    bool IsHorizontalLeftPolarization(void) const { return (m_data[8]>>5)&0x1; }
     bool IsVerticalRightPolarization(void) const
-        { return !((_data[8]>>5)&0x1); }
+        { return !((m_data[8]>>5)&0x1); }
     // roll off                 2   8.3
     enum
     {
@@ -843,14 +843,14 @@ class SatelliteDeliverySystemDescriptor : public MPEGDescriptor
         kRollOff_25,
         kRollOff_Auto,
     };
-    uint RollOff(void) const { return (_data[8]>>3)&0x3; }
+    uint RollOff(void) const { return (m_data[8]>>3)&0x3; }
     QString RollOffString(void) const
     {
         static QString ro[] = { "0.35", "0.20", "0.25", "auto" };
         return ro[RollOff()];
     }
     // modulation system        1   8.5
-    uint ModulationSystem(void) const { return (_data[8]>>2)&0x1; }
+    uint ModulationSystem(void) const { return (m_data[8]>>2)&0x1; }
     QString ModulationSystemString(void) const
     {
         return ModulationSystem() ? "DVB-S2" : "DVB-S";
@@ -864,7 +864,7 @@ class SatelliteDeliverySystemDescriptor : public MPEGDescriptor
         kModulation8PSK   = 0x2,
         kModulationQAM16  = 0x3,
     };
-    uint Modulation(void) const { return _data[8]&0x03; }
+    uint Modulation(void) const { return m_data[8]&0x03; }
     QString ModulationString(void) const
     {
         static QString ms[] = { "qpsk", "qpsk", "8psk", "qam_16" };
@@ -873,13 +873,13 @@ class SatelliteDeliverySystemDescriptor : public MPEGDescriptor
     // symbol_rate             28   9.0
     uint SymbolRate(void) const
     {
-        return ((_data[9]<<20) | (_data[10]<<12) |
-                (_data[11]<<4) | (_data[12]>>4));
+        return ((m_data[9]<<20) | (m_data[10]<<12) |
+                (m_data[11]<<4) | (m_data[12]>>4));
     }
     uint SymbolRateHz(void) const
     {
-        return ((byte3BCD2int(_data[9], _data[10], _data[11]) * 1000) +
-                (byteBCDH2int(_data[12]) * 100));
+        return ((byte3BCD2int(m_data[9], m_data[10], m_data[11]) * 1000) +
+                (byteBCDH2int(m_data[12]) * 100));
     }
     // FEC_inner                4  12.4
     enum
@@ -892,7 +892,7 @@ class SatelliteDeliverySystemDescriptor : public MPEGDescriptor
         kInnerFEC_8_9_ConvolutionCodeRate = 0x6,
         kInnerFEC_None                    = 0xF,
     };
-    uint FECInner(void) const { return _data[12] & 0xf; }
+    uint FECInner(void) const { return m_data[12] & 0xf; }
     QString FECInnerString(void) const { return coderate_inner(FECInner()); }
 
     QString toString(void) const override; // MPEGDescriptor
@@ -912,8 +912,8 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
     // centre_frequency        32   2.0
     uint Frequency(void) const
     {
-        return ((_data[2]<<24) | (_data[3]<<16) |
-                (_data[4]<<8)  | (_data[5]));
+        return ((m_data[2]<<24) | (m_data[3]<<16) |
+                (m_data[4]<<8)  | (m_data[5]));
     }
     uint64_t FrequencyHz(void) const { return uint64_t(Frequency()) * 10ULL; }
 
@@ -925,7 +925,7 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
         kBandwidth6Mhz = 0x2,
         kBandwidth5Mhz = 0x3,
     };
-    uint Bandwidth(void) const { return _data[6]>>5; }
+    uint Bandwidth(void) const { return m_data[6]>>5; }
     uint BandwidthHz(void) const { return (8 - Bandwidth()) * 1000000; }
     QString BandwidthString(void) const
     {
@@ -933,11 +933,11 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
         return (Bandwidth() <= kBandwidth5Mhz) ? bs[Bandwidth()] : "auto";
     }
     // priority                 1   6.3
-    bool HighPriority(void) const { return ( _data[6] & 0x10 ) != 0; }
+    bool HighPriority(void) const { return ( m_data[6] & 0x10 ) != 0; }
     // time_slicing_indicator   1   6.4
-    bool IsTimeSlicingIndicatorUsed(void) const { return !(_data[6] & 0x08); }
+    bool IsTimeSlicingIndicatorUsed(void) const { return !(m_data[6] & 0x08); }
     // MPE-FEC_indicator        1   6.5
-    bool IsMPE_FECUsed(void) const { return !(_data[6] & 0x04); }
+    bool IsMPE_FECUsed(void) const { return !(m_data[6] & 0x04); }
     // reserved_future_use      2   6.6
     // constellation            2   7.0
     enum
@@ -947,7 +947,7 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
         kConstellationQAM64 = 0x2,
         kConstellationQAM256 = 0x3,
     };
-    uint Constellation(void) const { return _data[7]>>6; }
+    uint Constellation(void) const { return m_data[7]>>6; }
     QString ConstellationString(void) const
     {
         static QString cs[] = { "qpsk", "qam_16", "qam_64", "qam_256" };
@@ -966,7 +966,7 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
         kHierarchyInfoAlpha2InDepthInterleaver          = 0x6,
         kHierarchyInfoAlpha4InDepthInterleaver          = 0x7,
     };
-    uint Hierarchy(void) const { return (_data[7]>>3) & 0x7; }
+    uint Hierarchy(void) const { return (m_data[7]>>3) & 0x7; }
 
     /// \bug returns "a" for values >= 4 for compatibility with siparser.cpp
     QString HierarchyString(void) const
@@ -974,10 +974,10 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
         static QString hs[] = { "n", "1", "2", "4", "a", "a", "a", "a" };
         return hs[Hierarchy()];
     }
-    bool NativeInterleaver(void) const { return ( _data[7] & 0x20 ) != 0; }
+    bool NativeInterleaver(void) const { return ( m_data[7] & 0x20 ) != 0; }
     uint Alpha(void) const
     {
-        uint i = (_data[7]>>3) & 0x3;
+        uint i = (m_data[7]>>3) & 0x3;
         return (0x2 == i) ? 4 : i;
     }
     // code_rate-HP_stream      3   7.5
@@ -989,7 +989,7 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
         kCodeRate_5_6 = 0x3,
         kCodeRate_7_8 = 0x4,
     };
-    uint CodeRateHP(void) const { return _data[7] & 0x7; }
+    uint CodeRateHP(void) const { return m_data[7] & 0x7; }
     QString CodeRateHPString(void) const
     {
         static QString cr[] = {
@@ -998,7 +998,7 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
         return cr[CodeRateHP()];
     }
     // code_rate-LP_stream      3   8.0
-    uint CodeRateLP(void) const { return (_data[8]>>5) & 0x7; }
+    uint CodeRateLP(void) const { return (m_data[8]>>5) & 0x7; }
     QString CodeRateLPString(void) const
     {
         static QString cr[] = {
@@ -1014,7 +1014,7 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
         kGuardInterval_1_8  = 0x2,
         kGuardInterval_1_4  = 0x3,
     };
-    uint GuardInterval(void) const { return (_data[8]>>3) & 0x3; }
+    uint GuardInterval(void) const { return (m_data[8]>>3) & 0x3; }
     QString GuardIntervalString(void) const
     {
         static QString gi[] = { "1/32", "1/16", "1/8", "1/4" };
@@ -1027,14 +1027,14 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
         kTransmissionMode8k = 0x01,
         kTransmissionMode4k = 0x02,
     };
-    uint TransmissionMode(void) const { return (_data[8]>>1) & 0x3; }
+    uint TransmissionMode(void) const { return (m_data[8]>>1) & 0x3; }
     QString TransmissionModeString(void) const
     {
         static QString tm[] = { "2", "8", "4", "auto" };
         return tm[TransmissionMode()];
     }
     // other_frequency_flag     1   8.7
-    bool OtherFrequencyInUse(void) const { return _data[8] & 0x1; }
+    bool OtherFrequencyInUse(void) const { return m_data[8] & 0x1; }
     // reserved_future_use     32   9.0
 
     QString toString(void) const override; // MPEGDescriptor
@@ -1063,12 +1063,12 @@ class ExtendedEventDescriptor : public MPEGDescriptor
     // descriptor_length        8   1.0
 
     // descriptor_number        4   2.0
-    uint DescriptorNumber(void) const { return _data[2] >> 4; }
+    uint DescriptorNumber(void) const { return m_data[2] >> 4; }
     // last_number              4   2.4
-    uint LastNumber(void)       const { return _data[2] & 0xf; }
+    uint LastNumber(void)       const { return m_data[2] & 0xf; }
     // ISO_639_language_code   24   3.0
     int LanguageKey(void) const
-        { return iso639_str3_to_key(&_data[3]); }
+        { return iso639_str3_to_key(&m_data[3]); }
     QString LanguageString(void) const
         { return iso639_key_to_str3(LanguageKey()); }
     int CanonicalLanguageKey(void) const
@@ -1076,7 +1076,7 @@ class ExtendedEventDescriptor : public MPEGDescriptor
     QString CanonicalLanguageString(void) const
         { return iso639_key_to_str3(CanonicalLanguageKey()); }
     // length_of_items          8   6.0
-    uint LengthOfItems(void)    const { return _data[6]; }
+    uint LengthOfItems(void)    const { return m_data[6]; }
     // for ( i=0;i<N;i++)
     // {
     //   item_description_len   8   0.0+p
@@ -1086,16 +1086,16 @@ class ExtendedEventDescriptor : public MPEGDescriptor
     // }
     QMap<QString,QString> Items(void) const;
     // text_length 8
-    uint TextLength(void)       const { return _data[7 + LengthOfItems()]; }
+    uint TextLength(void)       const { return m_data[7 + LengthOfItems()]; }
     // for (i=0; i<N; i++) { text_char 8 }
     QString Text(void) const
-        { return dvb_decode_text(&_data[8 + LengthOfItems()], TextLength()); }
+        { return dvb_decode_text(&m_data[8 + LengthOfItems()], TextLength()); }
 
     // HACK beg -- Pro7Sat is missing encoding
     QString Text(const unsigned char *encoding_override,
                  uint encoding_length) const
     {
-        return dvb_decode_text(&_data[8 + LengthOfItems()], TextLength(),
+        return dvb_decode_text(&m_data[8 + LengthOfItems()], TextLength(),
                                encoding_override, encoding_length);
     }
     // HACK end -- Pro7Sat is missing encoding
@@ -1120,7 +1120,7 @@ class FrequencyListDescriptor : public MPEGDescriptor
         kCodingTypeCable       = 0x2,
         kCodingTypeTerrestrial = 0x3,
     };
-    uint CodingType(void)  const { return _data[2] & 0x3; }
+    uint CodingType(void)  const { return m_data[2] & 0x3; }
     // for (i=0;I<N;i++)
     // {
     //   centre_frequency      32
@@ -1129,13 +1129,13 @@ class FrequencyListDescriptor : public MPEGDescriptor
     unsigned long long Frequency(uint i) const
     {
         if (kCodingTypeTerrestrial == CodingType())
-            return (((unsigned long long)_data[i*4+3]<<24) |
-                                        (_data[i*4+4]<<16) |
-                                        (_data[i*4+5]<<8)  |
-                                        (_data[i*4+6]));
+            return (((unsigned long long)m_data[i*4+3]<<24) |
+                                        (m_data[i*4+4]<<16) |
+                                        (m_data[i*4+5]<<8)  |
+                                        (m_data[i*4+6]));
         else
-            return byte4BCD2int(_data[i*4+3], _data[i*4+4],
-                                _data[i*4+5], _data[i*4+6]);
+            return byte4BCD2int(m_data[i*4+3], m_data[i*4+4],
+                                m_data[i*4+5], m_data[i*4+6]);
     }
     unsigned long long FrequencyHz(uint i) const
     {
@@ -1163,30 +1163,30 @@ class LocalTimeOffsetDescriptor : public MPEGDescriptor
     uint CountryCode(uint i) const
     {
         int o = 2 + i*13;
-        return ((_data[o] << 16) | (_data[o+1] << 8) | _data[o+2]);
+        return ((m_data[o] << 16) | (m_data[o+1] << 8) | m_data[o+2]);
     }
     QString CountryCodeString(uint i) const
     {
         int o = 2 + i*13;
-        return QString(_data[o]) + QChar(_data[o+1]) + QChar(_data[o+2]);
+        return QString(m_data[o]) + QChar(m_data[o+1]) + QChar(m_data[o+2]);
     }
     //   country_region_id      6   3.0+p
-    uint CountryRegionId(uint i) const { return _data[2 + i*13 + 3] >> 2; }
+    uint CountryRegionId(uint i) const { return m_data[2 + i*13 + 3] >> 2; }
     //   reserved               1   3.6+p
     //   local_time_off_polarity 1   3.7+p
     /// -1 if true, +1 if false (behind utc, ahead of utc, resp).
     bool LocalTimeOffsetPolarity(uint i) const
-        { return _data[2 + i*13 + 3] & 0x01; }
+        { return m_data[2 + i*13 + 3] & 0x01; }
     //   local_time_offset     16   4.0+p
     uint LocalTimeOffset(uint i) const
-        { return (_data[2 + i*13 + 4] << 8) | _data[2 + i*13 + 5]; }
+        { return (m_data[2 + i*13 + 4] << 8) | m_data[2 + i*13 + 5]; }
     int LocalTimeOffsetWithPolarity(uint i) const
         { return (LocalTimeOffsetPolarity(i) ? -1 : +1) * LocalTimeOffset(i); }
     //   time_of_change        40   6.0+p
     // TODO decode this
     //   next_time_offset      16  11.0+p
     uint NextTimeOffset(uint i) const
-        { return (_data[2 + i*13 + 11]<<8) | _data[2 + i*13 + 12]; }
+        { return (m_data[2 + i*13 + 11]<<8) | m_data[2 + i*13 + 12]; }
     // }                           13.0
     QString toString(void) const override; // MPEGDescriptor
 };
@@ -1319,13 +1319,13 @@ class NVODReferenceDescriptor : public MPEGDescriptor
     // {
     //   transport_stream_id   16
     uint TransportStreamId(uint i) const
-        { return (_data[i * 6 + 2] << 8) | _data[i * 6 + 3]; }
+        { return (m_data[i * 6 + 2] << 8) | m_data[i * 6 + 3]; }
     //   original_network_id   16
     uint OriginalNetworkId(uint i) const
-        { return (_data[i * 6 + 4] << 8) |  _data[i * 6 + 5]; }
+        { return (m_data[i * 6 + 4] << 8) |  m_data[i * 6 + 5]; }
     //   service_id            16
     uint ServiceId(uint i) const
-        { return (_data[i * 6 + 6] << 8) | _data[i * 6 + 7]; }
+        { return (m_data[i * 6 + 6] << 8) | m_data[i * 6 + 7]; }
     // }
     QString toString(void) const override; // MPEGDescriptor
 };
@@ -1352,7 +1352,7 @@ class ParentalRatingDescriptor : public MPEGDescriptor
         int o = 2 + i*4;
         if (i < Count())
         {
-            return QString(_data[o]) + QChar(_data[o+1]) + QChar(_data[o+2]);
+            return QString(m_data[o]) + QChar(m_data[o+1]) + QChar(m_data[o+2]);
         }
         else
         {
@@ -1366,7 +1366,7 @@ class ParentalRatingDescriptor : public MPEGDescriptor
             return -1;
         }
 
-        unsigned char rawRating = _data[2 + 3 + i*4];
+        unsigned char rawRating = m_data[2 + 3 + i*4];
         if (rawRating == 0)
         {
             // 0x00 - undefined
@@ -1398,7 +1398,7 @@ class PDCDescriptor : public MPEGDescriptor
     // reserved_future_use      4   2.0
     // program_id_label        20   2.4
     uint ProgramIdLabel(void) const
-    { return  (_data[2] & 0x0F) << 16 | _data[3] << 8 |  _data[4]; }
+    { return  (m_data[2] & 0x0F) << 16 | m_data[3] << 8 |  m_data[4]; }
     QString toString(void) const override // MPEGDescriptor
     {
         return QString("PDCDescriptor program_id_label(%1)")
@@ -1419,7 +1419,7 @@ class PrivateDataSpecifierDescriptor : public MPEGDescriptor
     // private_data_specifier  32   2.0
     uint32_t PrivateDataSpecifier (void) const
     {
-        return (_data[2] << 24 | _data[3] << 16 | _data[4] << 8 | _data[5]);
+        return (m_data[2] << 24 | m_data[3] << 16 | m_data[4] << 8 | m_data[5]);
     }
 };
 
@@ -1434,7 +1434,7 @@ class ScramblingDescriptor : public MPEGDescriptor
     // descriptor_length        8   1.0
 
     // scrambling_mode          8   2.0
-    uint ScramblingMode(void) const { return _data[2]; }
+    uint ScramblingMode(void) const { return m_data[2]; }
     QString toString(void) const override // MPEGDescriptor
     {
         return QString("ScramblingDescriptor scrambling_mode(%1)")
@@ -1558,28 +1558,28 @@ class ServiceDescriptor : public MPEGDescriptor
     // descriptor_length        8   1.0
 
     // service_type             8   2.0
-    uint ServiceType(void) const { return _data[2]; }
+    uint ServiceType(void) const { return m_data[2]; }
     // svc_provider_name_len    8   3.0
-    uint ServiceProviderNameLength(void) const { return _data[3]; }
+    uint ServiceProviderNameLength(void) const { return m_data[3]; }
     // for (i=0;i<N;I++) { char 8 }
     QString ServiceProviderName(void) const
-        { return dvb_decode_text(_data + 4, ServiceProviderNameLength()); }
+        { return dvb_decode_text(m_data + 4, ServiceProviderNameLength()); }
     QString ServiceProviderShortName(void) const
     {
-        return dvb_decode_short_name(_data + 4, ServiceProviderNameLength());
+        return dvb_decode_short_name(m_data + 4, ServiceProviderNameLength());
     }
     // service_name_length      8
     uint ServiceNameLength(void) const
-        { return _data[4 + ServiceProviderNameLength()]; }
+        { return m_data[4 + ServiceProviderNameLength()]; }
     // for (i=0;i<N;I++) { char 8 }
     QString ServiceName(void) const
     {
-        return dvb_decode_text(_data + 5 + ServiceProviderNameLength(),
+        return dvb_decode_text(m_data + 5 + ServiceProviderNameLength(),
                                ServiceNameLength());
     }
     QString ServiceShortName(void) const
     {
-        return dvb_decode_short_name(_data + 5 + ServiceProviderNameLength(),
+        return dvb_decode_short_name(m_data + 5 + ServiceProviderNameLength(),
                                      ServiceNameLength());
     }
     bool IsDTV(void) const
@@ -1633,9 +1633,9 @@ class ServiceListDescriptor : public MPEGDescriptor
     uint ServiceCount(void) const { return DescriptorLength() / 3; }
 
     uint ServiceID(uint i) const
-        { return (_data[2+i*3] << 8) | _data[3+i*3]; }
+        { return (m_data[2+i*3] << 8) | m_data[3+i*3]; }
 
-    uint ServiceType(uint i) const { return _data[4+i*3]; }
+    uint ServiceType(uint i) const { return m_data[4+i*3]; }
 
     QString toString(void) const override // MPEGDescriptor
     {
@@ -1678,7 +1678,7 @@ class ShortEventDescriptor : public MPEGDescriptor
 
     // ISO_639_language_code   24   2.0
     int LanguageKey(void) const
-        { return iso639_str3_to_key(&_data[2]); }
+        { return iso639_str3_to_key(&m_data[2]); }
     QString LanguageString(void) const
         { return iso639_key_to_str3(LanguageKey()); }
     int CanonicalLanguageKey(void) const
@@ -1686,30 +1686,30 @@ class ShortEventDescriptor : public MPEGDescriptor
     QString CanonicalLanguageString(void) const
         { return iso639_key_to_str3(CanonicalLanguageKey()); }
     // event_name_length        8   5.0
-    uint EventNameLength(void) const { return _data[5]; }
+    uint EventNameLength(void) const { return m_data[5]; }
     // for (i=0;i<event_name_length;i++) { event_name_char 8 }
     QString EventName(void) const
-        { return dvb_decode_text(&_data[6], _data[5]); }
+        { return dvb_decode_text(&m_data[6], m_data[5]); }
     QString EventShortName(void) const
-        { return dvb_decode_short_name(&_data[6], _data[5]); }
+        { return dvb_decode_short_name(&m_data[6], m_data[5]); }
     // text_length              8
-    uint TextLength(void) const { return _data[6 + _data[5]]; }
+    uint TextLength(void) const { return m_data[6 + m_data[5]]; }
     // for (i=0;i<text_length;i++) { text_char 8 }
     QString Text(void) const
-        { return dvb_decode_text(&_data[7 + _data[5]], TextLength()); }
+        { return dvb_decode_text(&m_data[7 + m_data[5]], TextLength()); }
 
     // HACK beg -- Pro7Sat is missing encoding
     QString EventName(const unsigned char *encoding_override,
                       uint encoding_length) const
     {
-        return dvb_decode_text(&_data[6], _data[5],
+        return dvb_decode_text(&m_data[6], m_data[5],
                                encoding_override, encoding_length);
     }
 
     QString Text(const unsigned char *encoding_override,
                  uint encoding_length) const
     {
-        return dvb_decode_text(&_data[7 + _data[5]], TextLength(),
+        return dvb_decode_text(&m_data[7 + m_data[5]], TextLength(),
                                encoding_override, encoding_length);
     }
     // HACK end -- Pro7Sat is missing encoding
@@ -1747,7 +1747,7 @@ class StreamIdentifierDescriptor : public MPEGDescriptor
     // descriptor_length        8   1.0       0x01
 
     // component_tag            8   2.0
-    uint ComponentTag(void) const { return _data[2]; }
+    uint ComponentTag(void) const { return m_data[2]; }
     QString toString(void) const override // MPEGDescriptor
     {
         return QString("Stream Identifier Descriptor (0x52): ComponentTag=0x%1")
@@ -1787,7 +1787,7 @@ class SubtitlingDescriptor : public MPEGDescriptor
     // {
     //   ISO_639_language_code 24   0.0+(i*8)
     int LanguageKey(uint i) const
-        { return iso639_str3_to_key(&_data[2 + (i<<3)]); }
+        { return iso639_str3_to_key(&m_data[2 + (i<<3)]); }
     QString LanguageString(uint i) const
         { return iso639_key_to_str3(LanguageKey(i)); }
     int CanonicalLanguageKey(uint i) const
@@ -1797,13 +1797,13 @@ class SubtitlingDescriptor : public MPEGDescriptor
 
     //   subtitling_type        8   3.0+(i*8)
     uint SubtitleType(uint i) const
-        { return _data[5 + (i<<3)]; }
+        { return m_data[5 + (i<<3)]; }
     //   composition_page_id   16   4.0+(i*8)
     uint CompositionPageID(uint i) const
-        { return (_data[6 + (i<<3)] << 8) | _data[7 + (i<<3)]; }
+        { return (m_data[6 + (i<<3)] << 8) | m_data[7 + (i<<3)]; }
     //   ancillary_page_id     16   6.0+(i*8)
     uint AncillaryPageID(uint i) const
-        { return (_data[8 + (i<<3)] << 8) | _data[9 + (i<<3)]; }
+        { return (m_data[8 + (i<<3)] << 8) | m_data[9 + (i<<3)]; }
     // }                            8.0
 };
 
@@ -1856,7 +1856,7 @@ class TeletextDescriptor : public MPEGDescriptor
     // {
     //   ISO_639_language_code 24  0.0
     int LanguageKey(uint i) const
-        { return iso639_str3_to_key(&_data[2 + (i*5)]); }
+        { return iso639_str3_to_key(&m_data[2 + (i*5)]); }
     QString LanguageString(uint i) const
         { return iso639_key_to_str3(LanguageKey(i)); }
     int CanonicalLanguageKey(uint i) const
@@ -1865,13 +1865,13 @@ class TeletextDescriptor : public MPEGDescriptor
         { return iso639_key_to_str3(CanonicalLanguageKey(i)); }
     //   teletext_type         5   3.0
     uint TeletextType(uint i) const
-        { return _data[5 + (i*5)] >> 3; }
+        { return m_data[5 + (i*5)] >> 3; }
     //   teletext_magazine_num 3   3.5
     uint TeletextMagazineNum(uint i) const
-        { return _data[5 + (i*5)] & 0x7; }
+        { return m_data[5 + (i*5)] & 0x7; }
     //   teletext_page_num     8   4.0
     uint TeletextPageNum(uint i) const
-        { return _data[6 + (i*5)]; }
+        { return m_data[6 + (i*5)]; }
     // }                           5.0
     QString toString(void) const override; // MPEGDescriptor
 };
@@ -1915,7 +1915,7 @@ class TransportStreamDescriptor : public MPEGDescriptor
 
     // for (i=0; i<N; i++) { byte 8 }
     QString Data(void) const
-        { return dvb_decode_text(&_data[2], DescriptorLength()); }
+        { return dvb_decode_text(&m_data[2], DescriptorLength()); }
     QString toString(void) const override // MPEGDescriptor
         { return QString("TransportStreamDescriptor data(%1)").arg(Data()); }
 };
@@ -1982,14 +1982,14 @@ class PartialTransportStreamDescriptor : public MPEGDescriptor
     // DVB_reserved_future_use  2   2.0
     // peak_rate               22   2.2
     uint PeakRate(void) const
-        { return (_data[2] & 0x3f) << 16 | _data[3] | _data[4]; }
+        { return (m_data[2] & 0x3f) << 16 | m_data[3] | m_data[4]; }
     // DVB_reserved_future_use  2   5.0
     // min_overall_smooth_rate 22   5.2
     uint SmoothRate(void) const
-        { return (_data[5] & 0x3f) << 16 | _data[6] | _data[7]; }
+        { return (m_data[5] & 0x3f) << 16 | m_data[6] | m_data[7]; }
     // DVB_reserved_future_use  2   8.0
     // max_overall_smooth_buf  14   8.2
-    uint SmoothBuf(void) const { return ((_data[8] & 0x3f) << 8) | _data[9]; }
+    uint SmoothBuf(void) const { return ((m_data[8] & 0x3f) << 8) | m_data[9]; }
     QString toString(void) const override; // MPEGDescriptor
 };
 
@@ -2005,21 +2005,21 @@ class AC3Descriptor : public MPEGDescriptor
     // descriptor_length        8   1.0
 
     // component_type_flag      1   2.0
-    bool HasComponentType(void) const { return ( _data[2] & 0x80 ) != 0; }
+    bool HasComponentType(void) const { return ( m_data[2] & 0x80 ) != 0; }
     // bsid_flag                1   2.1
-    bool HasBSID(void) const { return ( _data[2] & 0x40 ) != 0; }
+    bool HasBSID(void) const { return ( m_data[2] & 0x40 ) != 0; }
     // mainid_flag              1   2.2
-    bool HasMainID(void) const { return ( _data[2] & 0x20 ) != 0; }
+    bool HasMainID(void) const { return ( m_data[2] & 0x20 ) != 0; }
     // asvc_flag                1   2.3
-    bool HasASVC(void) const { return ( _data[2] & 0x10 ) != 0; }
+    bool HasASVC(void) const { return ( m_data[2] & 0x10 ) != 0; }
     // reserved_flags           4   2.4
     // if (component_type_flag == 1)
     //   { component_type       8 uimsbf }
-    uint ComponentType(void) const { return _data[3]; }
+    uint ComponentType(void) const { return m_data[3]; }
     // if (bsid_flag == 1)
     //   { bsid                 8 uimsbf }
     uint BSID(void) const
-        { return (HasComponentType()) ? _data[4] : _data[3]; }
+        { return (HasComponentType()) ? m_data[4] : m_data[3]; }
     // if (mainid_flag == 1)
     //   { mainid               8 uimsbf }
     uint MainID(void) const
@@ -2027,7 +2027,7 @@ class AC3Descriptor : public MPEGDescriptor
         int offset = 3;
         offset += (HasComponentType()) ? 1 : 0;
         offset += (HasBSID()) ? 1 : 0;
-        return _data[offset];
+        return m_data[offset];
     }
     // if (asvc_flag==1)
     //   { asvc                 8 uimsbf }
@@ -2037,7 +2037,7 @@ class AC3Descriptor : public MPEGDescriptor
         offset += (HasComponentType()) ? 1 : 0;
         offset += (HasBSID()) ? 1 : 0;
         offset += (HasMainID()) ? 1 : 0;
-        return _data[offset];
+        return m_data[offset];
     }
     // for (I=0;I<N;I++)
     //   { additional_info[i] N*8 uimsbf }
@@ -2081,10 +2081,10 @@ class DVBLogicalChannelDescriptor : public MPEGDescriptor
     uint ChannelCount(void) const { return DescriptorLength() >> 2; }
 
     uint ServiceID(uint i) const
-        { return (_data[2 + (i<<2)] << 8) | _data[3 + (i<<2)]; }
+        { return (m_data[2 + (i<<2)] << 8) | m_data[3 + (i<<2)]; }
 
     uint ChannelNumber(uint i) const
-        { return ((_data[4 + (i<<2)] << 8) | _data[5 + (i<<2)]) & 0x3ff; }
+        { return ((m_data[4 + (i<<2)] << 8) | m_data[5 + (i<<2)]) & 0x3ff; }
 
     QString toString(void) const override; // MPEGDescriptor
 };
@@ -2109,10 +2109,10 @@ class DVBSimulcastChannelDescriptor : public MPEGDescriptor
     uint ChannelCount(void) const { return DescriptorLength() >> 2; }
 
     uint ServiceID(uint i) const
-        { return (_data[2 + (i<<2)] << 8) | _data[3 + (i<<2)]; }
+        { return (m_data[2 + (i<<2)] << 8) | m_data[3 + (i<<2)]; }
 
     uint ChannelNumber(uint i) const
-        { return ((_data[4 + (i<<2)] << 8) | _data[5 + (i<<2)]) & 0x3ff; }
+        { return ((m_data[4 + (i<<2)] << 8) | m_data[5 + (i<<2)]) & 0x3ff; }
 
     QString toString(void) const override; // MPEGDescriptor
 };
@@ -2266,10 +2266,10 @@ class FreesatCallsignDescriptor : public MPEGDescriptor
     //    callsign_char         8
 
     const QString Language(void) const
-        { return QString::fromLatin1((char *) _data +2, 3); }
+        { return QString::fromLatin1((char *) m_data +2, 3); }
 
     QString Callsign(void) const
-        { return dvb_decode_short_name(&_data[6], _data[5]); }
+        { return dvb_decode_short_name(&m_data[6], m_data[5]); }
 
     QString toString(void) const override; // MPEGDescriptor
 };
@@ -2306,28 +2306,28 @@ class BSkyBLCNDescriptor : public MPEGDescriptor
     // }
 
     uint RegionID(void) const
-        { return (*(_data + 3) != 0xFF) ? *(_data + 3) : 0xFFFF;}
+        { return (*(m_data + 3) != 0xFF) ? *(m_data + 3) : 0xFFFF;}
 
     uint RegionRaw(void) const
-        { return *(_data + 2) << 8 | *(_data + 3);}
+        { return *(m_data + 2) << 8 | *(m_data + 3);}
 
     uint ServiceCount(void) const
         { return (DescriptorLength() - 2) / 9; }
 
     uint ServiceID(int i) const
-        { return *(_data + 4 + i*9) << 8 | *(_data + 5 + i*9); }
+        { return *(m_data + 4 + i*9) << 8 | *(m_data + 5 + i*9); }
 
     uint ServiceType(int i) const
-        { return *(_data + 6 + i*9); }
+        { return *(m_data + 6 + i*9); }
 
     uint Unknown1(int i) const
-        { return *(_data + 7 + i*9) << 8 | *(_data + 8 + i*9); }
+        { return *(m_data + 7 + i*9) << 8 | *(m_data + 8 + i*9); }
 
     uint LogicalChannelNumber(int i) const
-        { return *(_data + 9 + i*9) << 8 | *(_data + 10 + i*9); }
+        { return *(m_data + 9 + i*9) << 8 | *(m_data + 10 + i*9); }
 
     uint Unknown2(int i) const
-        { return *(_data + 11 + i*9) << 8 | *(_data + 12 + i*9); }
+        { return *(m_data + 11 + i*9) << 8 | *(m_data + 12 + i*9); }
 
     QString toString(void) const override; // MPEGDescriptor
 };
@@ -2346,10 +2346,10 @@ class DVBContentIdentifierDescriptor : public MPEGDescriptor
         if (IsValid())
         {
             uint8_t position = 2; /// position points to the first byte of the "sub"descriptor
-            while (_data[1] >= position)
+            while (m_data[1] >= position)
             {
-                size_t length = _data[position+1];
-                m_crid[count] = &_data[position];
+                size_t length = m_data[position+1];
+                m_crid[count] = &m_data[position];
                 count++;
                 position+=length+2;
             }
@@ -2401,7 +2401,7 @@ class DefaultAuthorityDescriptor : public MPEGDescriptor
 
     QString DefaultAuthority(void) const
     {
-        return QString::fromLatin1((const char *)_data+2, _data[1]);
+        return QString::fromLatin1((const char *)m_data+2, m_data[1]);
     }
 
     QString toString(void) const override // MPEGDescriptor
@@ -2426,7 +2426,7 @@ class PrivateUPCCablecomEpisodeTitleDescriptor : public MPEGDescriptor
     // ISO_639_language_code   24   2.0
     int LanguageKey(void) const
     {
-        return iso639_str3_to_key(&_data[2]);
+        return iso639_str3_to_key(&m_data[2]);
     }
     QString LanguageString(void) const
     {
@@ -2443,12 +2443,12 @@ class PrivateUPCCablecomEpisodeTitleDescriptor : public MPEGDescriptor
 
     uint TextLength(void) const
     {
-        return _data[1] - 3;
+        return m_data[1] - 3;
     }
 
     QString Text(void) const
     {
-        return dvb_decode_text(&_data[5], TextLength());
+        return dvb_decode_text(&m_data[5], TextLength());
     }
 };
 

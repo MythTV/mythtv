@@ -163,25 +163,25 @@ QString MultipleStringStructure::Uncompressed(
 
 void MultipleStringStructure::Parse(void) const
 {
-    _ptrs.clear();
-    _ptrs[Index(0,-1)] = _data + 1;
+    m_ptrs.clear();
+    m_ptrs[Index(0,-1)] = m_data + 1;
     for (uint i = 0; i < StringCount(); i++)
     {
-        _ptrs[Index(i,0)] = Offset(i,-1) + 4;
+        m_ptrs[Index(i,0)] = Offset(i,-1) + 4;
         uint j = 0;
         for (; j < SegmentCount(i); j++)
-            _ptrs[Index(i,j+1)] = Offset(i,j) + Bytes(i,j) + 3;
-        _ptrs[Index(i+1,-1)] = Offset(i,j);
+            m_ptrs[Index(i,j+1)] = Offset(i,j) + Bytes(i,j) + 3;
+        m_ptrs[Index(i+1,-1)] = Offset(i,j);
     }
 }
 
 bool CaptionServiceDescriptor::Parse(void)
 {
-    _ptrs.clear();
-    _ptrs[Index(0,-1)] = _data+3;
+    m_ptrs.clear();
+    m_ptrs[Index(0,-1)] = m_data+3;
 
     for (uint i = 0; i < ServicesCount(); i++)
-        _ptrs[Index(i+1,-1)] = Offset(i,-1) + 6;
+        m_ptrs[Index(i+1,-1)] = Offset(i,-1) + 6;
 
     return true;
 }
@@ -209,18 +209,18 @@ QString CaptionServiceDescriptor::toString(void) const
 
 bool ContentAdvisoryDescriptor::Parse(void)
 {
-    _ptrs.clear();
-    _ptrs[Index(0,-1)] = _data + 2;
+    m_ptrs.clear();
+    m_ptrs[Index(0,-1)] = m_data + 2;
 
     for (uint i = 0; i < RatingRegionCount(); i++)
     {
-        _ptrs[Index(i,0)] = Offset(i,-1)+2;
+        m_ptrs[Index(i,0)] = Offset(i,-1)+2;
         uint j = 0;
         for (; j < RatedDimensions(i); j++)
-            _ptrs[Index(i,j+1)] = Offset(i,j) + 2;
+            m_ptrs[Index(i,j+1)] = Offset(i,j) + 2;
         const unsigned char *tmp = Offset(i,-1) + 3 + (RatedDimensions(i)<<1);
         uint len = RatingDescriptionLength(i);
-        _ptrs[Index(i+1,-1)] = tmp + len;
+        m_ptrs[Index(i+1,-1)] = tmp + len;
     }
 
     return true;
@@ -332,7 +332,7 @@ QString AudioStreamDescriptor::toString() const
 MultipleStringStructure ExtendedChannelNameDescriptor::LongChannelName(
     void) const
 {
-    return MultipleStringStructure(_data + 2);
+    return MultipleStringStructure(m_data + 2);
 }
 
 /** \fn ExtendedChannelNameDescriptor::LongChannelNameString(void) const

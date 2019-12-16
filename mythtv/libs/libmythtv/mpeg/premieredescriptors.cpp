@@ -8,8 +8,8 @@ bool PremiereContentTransmissionDescriptor::Parse(void)
     _transmission_count = 0;
     _date_ptrs.clear();
     _time_ptrs.clear();
-    const uint8_t *dataptr = _data + 8;
-    while ((dataptr + 6) <= (_data + 2 + DescriptorLength()))
+    const uint8_t *dataptr = m_data + 8;
+    while ((dataptr + 6) <= (m_data + 2 + DescriptorLength()))
     {
         uint starttime_no = *(dataptr+2);
         for (uint i=0; i < starttime_no; i+=3)
