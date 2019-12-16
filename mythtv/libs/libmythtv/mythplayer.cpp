@@ -1588,7 +1588,7 @@ void MythPlayer::AVSync(VideoFrame *buffer)
     auto playspeed1000 = static_cast<int64_t>(1000.0F / m_playSpeed);
     bool reset = false;
     // controller gain
-    static float const s_av_control_gain = 0.04F;
+    static float const s_av_control_gain = 0.4F;
     // time weighted exponential filter coefficient
     static float const s_sync_fc = 0.6F;
 
