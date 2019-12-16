@@ -1635,7 +1635,7 @@ bool CardUtil::SetStartChannel(uint inputid, const QString &channum)
 
 bool CardUtil::GetInputInfo(InputInfo &input, vector<uint> *groupids)
 {
-    if (!input.m_inputid)
+    if (!input.m_inputId)
         return false;
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1644,7 +1644,7 @@ bool CardUtil::GetInputInfo(InputInfo &input, vector<uint> *groupids)
                   "schedorder, displayname, recpriority, quicktune "
                   "FROM capturecard "
                   "WHERE cardid = :INPUTID");
-    query.bindValue(":INPUTID", input.m_inputid);
+    query.bindValue(":INPUTID", input.m_inputId);
 
     if (!query.exec())
     {
@@ -1656,7 +1656,7 @@ bool CardUtil::GetInputInfo(InputInfo &input, vector<uint> *groupids)
         return false;
 
     input.m_name          = query.value(0).toString();
-    input.m_sourceid      = query.value(1).toUInt();
+    input.m_sourceId      = query.value(1).toUInt();
     input.m_liveTvOrder   = query.value(2).toUInt();
     input.m_scheduleOrder = query.value(3).toUInt();
     input.m_displayName   = query.value(4).toString();
@@ -1664,7 +1664,7 @@ bool CardUtil::GetInputInfo(InputInfo &input, vector<uint> *groupids)
     input.m_quickTune     = query.value(6).toBool();
 
     if (groupids)
-        *groupids = GetInputGroups(input.m_inputid);
+        *groupids = GetInputGroups(input.m_inputId);
 
     return true;
 }
@@ -1688,9 +1688,9 @@ QList<InputInfo> CardUtil::GetAllInputInfo()
     while (query.next())
     {
         InputInfo input;
-        input.m_inputid       = query.value(0).toUInt();
+        input.m_inputId       = query.value(0).toUInt();
         input.m_name          = query.value(1).toString();
-        input.m_sourceid      = query.value(2).toUInt();
+        input.m_sourceId      = query.value(2).toUInt();
         input.m_liveTvOrder   = query.value(3).toUInt();
         input.m_scheduleOrder = query.value(4).toUInt();
         input.m_displayName   = query.value(5).toString();

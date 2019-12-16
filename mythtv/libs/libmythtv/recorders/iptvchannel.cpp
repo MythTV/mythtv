@@ -22,7 +22,7 @@
 #include "mythlogging.h"
 #include "mythdb.h"
 
-#define LOC QString("IPTVChan[%1]: ").arg(m_inputid)
+#define LOC QString("IPTVChan[%1]: ").arg(m_inputId)
 
 IPTVChannel::IPTVChannel(TVRec *rec, QString videodev) :
     DTVChannel(rec), m_videoDev(std::move(videodev))

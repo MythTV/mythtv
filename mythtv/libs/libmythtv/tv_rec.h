@@ -229,9 +229,9 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
                         const QString& channame, const QString& xmltvid);
 
     /// \brief Returns the inputid
-    uint GetInputId(void) { return m_inputid; }
-    uint GetParentId(void) { return m_parentid; }
-    uint GetMajorId(void) { return m_parentid ? m_parentid : m_inputid; }
+    uint GetInputId(void) { return m_inputId; }
+    uint GetParentId(void) { return m_parentId; }
+    uint GetMajorId(void) { return m_parentId ? m_parentId : m_inputId; }
     /// \brief Returns true is "errored" is true, false otherwise.
     bool IsErrored(void)  const { return HasFlags(kFlagErrored); }
 
@@ -364,9 +364,9 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     QString            m_overRecordCategory;
 
     // Configuration variables from setup routines
-    uint               m_inputid;
-    uint               m_parentid                 {0};
-    bool               m_ispip                    {false};
+    uint               m_inputId;
+    uint               m_parentId                 {0};
+    bool               m_isPip                    {false};
 
     // Configuration variables from database, based on inputid
     GeneralDBOptions   m_genOpt;

@@ -35,26 +35,26 @@ class ChannelImporterBasicStats
   public:
     ChannelImporterBasicStats()
     {
-        memset(m_atsc_channels, 0, sizeof(m_atsc_channels));
-        memset(m_dvb_channels,  0, sizeof(m_dvb_channels));
-        memset(m_scte_channels, 0, sizeof(m_scte_channels));
-        memset(m_mpeg_channels, 0, sizeof(m_mpeg_channels));
-        memset(m_ntsc_channels, 0, sizeof(m_ntsc_channels));
+        memset(m_atscChannels, 0, sizeof(m_atscChannels));
+        memset(m_dvbChannels,  0, sizeof(m_dvbChannels));
+        memset(m_scteChannels, 0, sizeof(m_scteChannels));
+        memset(m_mpegChannels, 0, sizeof(m_mpegChannels));
+        memset(m_ntscChannels, 0, sizeof(m_ntscChannels));
     }
 
     // totals
-    uint m_atsc_channels[3];
-    uint m_dvb_channels [3];
-    uint m_scte_channels[3];
-    uint m_mpeg_channels[3];
-    uint m_ntsc_channels[3];
+    uint m_atscChannels[3];
+    uint m_dvbChannels [3];
+    uint m_scteChannels[3];
+    uint m_mpegChannels[3];
+    uint m_ntscChannels[3];
 
     // per channel counts
-    QMap<uint,uint>    m_prognum_cnt;
-    QMap<uint,uint>    m_atscnum_cnt;
-    QMap<uint,uint>    m_atscmin_cnt;
-    QMap<uint,uint>    m_atscmaj_cnt;
-    QMap<QString,uint> m_channum_cnt;
+    QMap<uint,uint>    m_progNumCnt;
+    QMap<uint,uint>    m_atscNumCnt;
+    QMap<uint,uint>    m_atscMinCnt;
+    QMap<uint,uint>    m_atscMajCnt;
+    QMap<QString,uint> m_chanNumCnt;
 };
 
 class ChannelImporterUniquenessStats
@@ -62,12 +62,12 @@ class ChannelImporterUniquenessStats
   public:
     ChannelImporterUniquenessStats() = default;
 
-    uint m_unique_prognum {0};
-    uint m_unique_atscnum {0};
-    uint m_unique_atscmin {0};
-    uint m_unique_channum {0};
-    uint m_unique_total   {0};
-    uint m_max_atscmajcnt {0};
+    uint m_uniqueProgNum {0};
+    uint m_uniqueAtscNum {0};
+    uint m_uniqueAtscMin {0};
+    uint m_uniqueChanNum {0};
+    uint m_uniqueTotal   {0};
+    uint m_maxAtscMajCnt {0};
 };
 
 class MTV_PUBLIC ChannelImporter

@@ -30,7 +30,7 @@ using namespace std;
 #include "channelutil.h"
 #include "hdhrstreamhandler.h"
 
-#define LOC     QString("HDHRChan[%1](%2): ").arg(m_inputid).arg(HDHRChannel::GetDevice())
+#define LOC     QString("HDHRChan[%1](%2): ").arg(m_inputId).arg(HDHRChannel::GetDevice())
 
 HDHRChannel::HDHRChannel(TVRec *parent, QString device)
     : DTVChannel(parent),

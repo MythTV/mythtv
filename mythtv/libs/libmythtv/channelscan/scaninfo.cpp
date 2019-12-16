@@ -28,7 +28,7 @@ uint SaveScan(const ScanDTVTransportList &scan)
     if (scan.empty() || scan[0].m_channels.empty())
         return scanid;
 
-    uint sourceid = scan[0].m_channels[0].m_source_id;
+    uint sourceid = scan[0].m_channels[0].m_sourceId;
     uint cardid   = scan[0].m_cardid;
 
     // Delete very old scans

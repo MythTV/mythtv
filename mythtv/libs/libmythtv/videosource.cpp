@@ -3032,7 +3032,7 @@ void StartingChannel::SetSourceID(const QString &sourceid)
 
     for (size_t i = 0; i < channels.size(); i++)
     {
-        const QString channum = channels[i].m_channum;
+        const QString channum = channels[i].m_chanNum;
         bool sel = channum == startChan;
         if (!has_visible || channels[i].m_visible || sel)
         {

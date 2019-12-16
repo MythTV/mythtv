@@ -37,8 +37,8 @@ class SchedInputInfo
         m_conflictingInputs() {};
     ~SchedInputInfo(void) = default;
 
-    uint          m_inputid      {0};
-    uint          m_sgroupid     {0};
+    uint          m_inputId      {0};
+    uint          m_sgroupId     {0};
     bool          m_schedGroup   {false};
     vector<uint>  m_groupInputs;
     vector<uint>  m_conflictingInputs;

@@ -32,9 +32,9 @@ class channelSort
     public:
         bool operator()(const RecPriorityInfo &a, const RecPriorityInfo &b)
         {
-            if (a.m_chan->m_channum.toInt() == b.m_chan->m_channum.toInt())
-                return(a.m_chan->m_sourceid > b.m_chan->m_sourceid);
-            return(a.m_chan->m_channum.toInt() > b.m_chan->m_channum.toInt());
+            if (a.m_chan->m_chanNum.toInt() == b.m_chan->m_chanNum.toInt())
+                return(a.m_chan->m_sourceId > b.m_chan->m_sourceId);
+            return(a.m_chan->m_chanNum.toInt() > b.m_chan->m_chanNum.toInt());
         }
 };
 
@@ -43,9 +43,9 @@ class channelRecPrioritySort
     public:
         bool operator()(const RecPriorityInfo &a, const RecPriorityInfo &b)
         {
-            if (a.m_chan->m_recpriority == b.m_chan->m_recpriority)
-                return (a.m_chan->m_channum.toInt() > b.m_chan->m_channum.toInt());
-            return (a.m_chan->m_recpriority < b.m_chan->m_recpriority);
+            if (a.m_chan->m_recPriority == b.m_chan->m_recPriority)
+                return (a.m_chan->m_chanNum.toInt() > b.m_chan->m_chanNum.toInt());
+            return (a.m_chan->m_recPriority < b.m_chan->m_recPriority);
         }
 };
 
@@ -185,17 +185,17 @@ void ChannelRecPriority::changeRecPriority(int howMuch)
     auto *chanInfo = item->GetData().value<ChannelInfo *>();
 
     // inc/dec recording priority
-    int tempRecPriority = chanInfo->m_recpriority + howMuch;
+    int tempRecPriority = chanInfo->m_recPriority + howMuch;
     if (tempRecPriority > -100 && tempRecPriority < 100)
     {
-        chanInfo->m_recpriority = tempRecPriority;
+        chanInfo->m_recPriority = tempRecPriority;
 
         // order may change if sorting by recoring priority, so resort
         if (m_sortType == byRecPriority)
             SortList();
         else
         {
-            item->SetText(QString::number(chanInfo->m_recpriority), "priority");
+            item->SetText(QString::number(chanInfo->m_recPriority), "priority");
             updateInfo(item);
         }
     }
@@ -221,13 +221,13 @@ void ChannelRecPriority::saveRecPriority(void)
     for (it = m_channelData.begin(); it != m_channelData.end(); ++it)
     {
         ChannelInfo *chanInfo = &(*it);
-        QString key = QString::number(chanInfo->m_chanid);
+        QString key = QString::number(chanInfo->m_chanId);
 
         // if this channel's recording priority changed from when we entered
         // save new value out to db
-        if (QString::number(chanInfo->m_recpriority) != m_origRecPriorityData[key])
-            applyChannelRecPriorityChange(QString::number(chanInfo->m_chanid),
-                                          QString::number(chanInfo->m_recpriority));
+        if (QString::number(chanInfo->m_recPriority) != m_origRecPriorityData[key])
+            applyChannelRecPriorityChange(QString::number(chanInfo->m_chanId),
+                                          QString::number(chanInfo->m_recPriority));
     }
     ScheduledRecording::ReschedulePlace("SaveChannelPriority");
 }
@@ -259,25 +259,25 @@ void ChannelRecPriority::FillList(void)
         while (result.next())
         {
             auto *chaninfo = new ChannelInfo;
-            chaninfo->m_chanid = result.value(0).toInt();
-            chaninfo->m_channum = result.value(1).toString();
-            chaninfo->m_sourceid = result.value(2).toInt();
-            chaninfo->m_callsign = result.value(3).toString();
+            chaninfo->m_chanId = result.value(0).toInt();
+            chaninfo->m_chanNum = result.value(1).toString();
+            chaninfo->m_sourceId = result.value(2).toInt();
+            chaninfo->m_callSign = result.value(3).toString();
             QString iconurl = result.value(4).toString();
             if (!iconurl.isEmpty())
                 iconurl = gCoreContext->GetMasterHostPrefix( "ChannelIcons", iconurl);
             chaninfo->m_icon = iconurl;
-            chaninfo->m_recpriority = result.value(5).toInt();
+            chaninfo->m_recPriority = result.value(5).toInt();
             chaninfo->m_name = result.value(6).toString();
 
-            chaninfo->SetSourceName(srcMap[chaninfo->m_sourceid]);
+            chaninfo->SetSourceName(srcMap[chaninfo->m_sourceId]);
 
             m_channelData[QString::number(cnt)] = *chaninfo;
 
             // save recording priority value in map so we don't have to save
             // all channel's recording priority values when we exit
-            m_origRecPriorityData[QString::number(chaninfo->m_chanid)] =
-                    chaninfo->m_recpriority;
+            m_origRecPriorityData[QString::number(chaninfo->m_chanId)] =
+                    chaninfo->m_recPriority;
 
             cnt--;
         }
@@ -319,7 +319,7 @@ void ChannelRecPriority::updateList()
             item->SetImage(iconUrl);
         }
 
-        item->SetText(QString::number(chanInfo->m_recpriority), "priority", fontState);
+        item->SetText(QString::number(chanInfo->m_recPriority), "priority", fontState);
 
         if (m_currentItem == chanInfo)
             m_channelList->SetItemCurrent(item);
@@ -430,10 +430,10 @@ void ChannelRecPriority::upcoming()
 
     auto *chanInfo = item->GetData().value<ChannelInfo *>();
 
-    if (!chanInfo || chanInfo->m_chanid < 1)
+    if (!chanInfo || chanInfo->m_chanId < 1)
         return;
 
-    QString chanID = QString("%1").arg(chanInfo->m_chanid);
+    QString chanID = QString("%1").arg(chanInfo->m_chanId);
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     auto *pl = new ProgLister(mainStack, plChannel, chanID, "");
     if (pl->Create())

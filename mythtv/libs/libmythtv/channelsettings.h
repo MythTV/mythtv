@@ -121,10 +121,10 @@ class MTV_PUBLIC ChannelOptionsCommon: public GroupSetting
     void sourceChanged(const QString&);
 
   protected:
-    OnAirGuide     *m_onairguide  {nullptr};
+    OnAirGuide     *m_onAirGuide  {nullptr};
     XmltvID        *m_xmltvID     {nullptr};
-    Freqid         *m_freqid      {nullptr};
-    TransportID_CO *m_transportid {nullptr};
+    Freqid         *m_freqId      {nullptr};
+    TransportID_CO *m_transportId {nullptr};
     Frequency_CO   *m_frequency   {nullptr};
 };
 

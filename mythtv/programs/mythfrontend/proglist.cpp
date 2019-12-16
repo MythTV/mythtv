@@ -733,7 +733,7 @@ void ProgLister::FillViewList(const QString &view)
         {
             QString chantext = channels[i].GetFormatted(ChannelInfo::kChannelShort);
 
-            m_viewList.push_back(QString::number(channels[i].m_chanid));
+            m_viewList.push_back(QString::number(channels[i].m_chanId));
             m_viewTextList.push_back(chantext);
         }
 

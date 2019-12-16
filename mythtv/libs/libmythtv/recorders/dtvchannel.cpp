@@ -8,7 +8,7 @@
 #include "mpegtables.h"
 #include "mythlogging.h"
 
-#define LOC QString("DTVChan[%1](%2): ").arg(m_inputid).arg(GetDevice())
+#define LOC QString("DTVChan[%1](%2): ").arg(m_inputId).arg(GetDevice())
 
 QReadWriteLock DTVChannel::s_master_map_lock(QReadWriteLock::Recursive);
 using MasterMap = QMap<QString,QList<DTVChannel*> >;
@@ -58,8 +58,8 @@ QString DTVChannel::GetSuggestedTuningMode(bool is_live_tv) const
     QString input = GetInputName();
 
     uint quickTuning = 0;
-    if (m_inputid && !input.isEmpty())
-        quickTuning = CardUtil::GetQuickTuning(m_inputid, input);
+    if (m_inputId && !input.isEmpty())
+        quickTuning = CardUtil::GetQuickTuning(m_inputId, input);
 
     bool useQuickTuning = (quickTuning && is_live_tv) || (quickTuning > 1);
 
@@ -168,7 +168,7 @@ bool DTVChannel::SetChannelByString(const QString &channum)
         return false;
     }
 
-    if (!m_inputid)
+    if (!m_inputId)
         return false;
 
     uint mplexid_restriction;
@@ -178,7 +178,7 @@ bool DTVChannel::SetChannelByString(const QString &channum)
         LOG(VB_GENERAL, LOG_INFO, loc +
             QString("Requested channel '%1' is on input '%2' "
                     "which is in a busy input group")
-                .arg(channum).arg(m_inputid));
+                .arg(channum).arg(m_inputId));
 
         return false;
     }
@@ -200,11 +200,11 @@ bool DTVChannel::SetChannelByString(const QString &channum)
     uint netid;
 
     if (!ChannelUtil::GetChannelData(
-        m_sourceid, chanid, channum,
+        m_sourceId, chanid, channum,
         tvformat, modulation, freqtable, freqid,
         finetune, frequency,
         si_std, mpeg_prog_num, atsc_major, atsc_minor, tsid, netid,
-        mplexid, m_commfree))
+        mplexid, m_commFree))
     {
         LOG(VB_GENERAL, LOG_ERR, loc + "Unable to find channel in database.");
 
@@ -259,7 +259,7 @@ bool DTVChannel::SetChannelByString(const QString &channum)
     {
         if (IsIPTV())
         {
-            int chanid2 = ChannelUtil::GetChanID(m_sourceid, channum);
+            int chanid2 = ChannelUtil::GetChanID(m_sourceId, channum);
             IPTVTuningData tuning = ChannelUtil::GetIPTVTuningData(chanid2);
             if (!Tune(tuning, false))
             {
@@ -331,7 +331,7 @@ bool DTVChannel::SetChannelByString(const QString &channum)
     {
         // We need to pull the pid_cache since there are no tuning tables
         pid_cache_t pid_cache;
-        int chanid3 = ChannelUtil::GetChanID(m_sourceid, channum);
+        int chanid3 = ChannelUtil::GetChanID(m_sourceId, channum);
         ChannelUtil::GetCachedPids(chanid3, pid_cache);
         if (pid_cache.empty())
         {
@@ -370,7 +370,7 @@ bool DTVChannel::SetChannelByString(const QString &channum)
     }
 
     // Set the current channum to the new channel's channum
-    m_curchannelname = channum;
+    m_curChannelName = channum;
 
     // Setup filters & recording picture attributes for framegrabing recorders
     // now that the new curchannelname has been established.

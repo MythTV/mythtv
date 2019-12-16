@@ -17,7 +17,7 @@ class DummyChannel : public ChannelBase
 {
   public:
     explicit DummyChannel(TVRec *parent): ChannelBase(parent)
-        { (void)parent; m_curchannelname.clear(); m_curInputName.clear(); return; }
+        { (void)parent; m_curChannelName.clear(); m_curInputName.clear(); return; }
     ~DummyChannel(void) { return; }
 
     bool IsTunable(const QString &/*channum*/) const override // ChannelBase
@@ -30,7 +30,7 @@ class DummyChannel : public ChannelBase
 
     // Sets
     bool SetChannelByString(const QString &chan) override // ChannelBase
-        { m_curchannelname = chan; return true; }
+        { m_curChannelName = chan; return true; }
 
     // Gets
     bool    IsOpen(void)             const override // ChannelBase

@@ -106,11 +106,11 @@ RecordingInfo::RecordingInfo(
         _seriesid, _programid, _inetref, _inputname),
     m_oldrecstatus(_oldrecstatus),
     m_future(_future),
-    m_schedorder(_schedorder),
-    m_mplexid(_mplexid),
-    m_sgroupid(_sgroupid),
-    m_desiredrecstartts(_startts),
-    m_desiredrecendts(_endts)
+    m_schedOrder(_schedorder),
+    m_mplexId(_mplexid),
+    m_sgroupId(_sgroupid),
+    m_desiredRecStartTs(_startts),
+    m_desiredRecEndTs(_endts)
 {
     m_hostname = _hostname;
     m_storagegroup = _storagegroup;
@@ -206,8 +206,8 @@ RecordingInfo::RecordingInfo(
         QString(), _recgroup, _playgroup,
         _startts, _endts, _recstartts, _recendts,
         _seriesid, _programid, _inetref, ""),
-    m_desiredrecstartts(_startts),
-    m_desiredrecendts(_endts)
+    m_desiredRecStartTs(_startts),
+    m_desiredRecEndTs(_endts)
 {
     m_recpriority = _recpriority;
 
@@ -356,8 +356,8 @@ RecordingInfo::RecordingInfo(
     if (status)
         *status = kFakedLiveTVProgram;
 
-    m_desiredrecstartts = m_startts;
-    m_desiredrecendts = m_endts;
+    m_desiredRecStartTs = m_startts;
+    m_desiredRecEndTs = m_endts;
 
     LoadRecordingFile();
 }
@@ -385,11 +385,11 @@ void RecordingInfo::clone(const RecordingInfo &other,
         m_oldrecstatus      = other.m_oldrecstatus;
         m_savedrecstatus    = other.m_savedrecstatus;
         m_future            = other.m_future;
-        m_schedorder        = other.m_schedorder;
-        m_mplexid           = other.m_mplexid;
-        m_sgroupid          = other.m_sgroupid;
-        m_desiredrecstartts = other.m_desiredrecstartts;
-        m_desiredrecendts   = other.m_desiredrecendts;
+        m_schedOrder        = other.m_schedOrder;
+        m_mplexId           = other.m_mplexId;
+        m_sgroupId          = other.m_sgroupId;
+        m_desiredRecStartTs = other.m_desiredRecStartTs;
+        m_desiredRecEndTs   = other.m_desiredRecEndTs;
     }
 
     delete m_recordingFile;
@@ -418,11 +418,11 @@ void RecordingInfo::clone(const ProgramInfo &other,
     m_oldrecstatus      = RecStatus::Unknown;
     m_savedrecstatus    = RecStatus::Unknown;
     m_future            = false;
-    m_schedorder        = 0;
-    m_mplexid           = 0;
-    m_sgroupid          = 0;
-    m_desiredrecstartts = QDateTime();
-    m_desiredrecendts   = QDateTime();
+    m_schedOrder        = 0;
+    m_mplexId           = 0;
+    m_sgroupId          = 0;
+    m_desiredRecStartTs = QDateTime();
+    m_desiredRecEndTs   = QDateTime();
 
     delete m_recordingFile;
     m_recordingFile = nullptr;
@@ -439,11 +439,11 @@ void RecordingInfo::clear(void)
     m_oldrecstatus      = RecStatus::Unknown;
     m_savedrecstatus    = RecStatus::Unknown;
     m_future            = false;
-    m_schedorder        = 0;
-    m_mplexid           = 0;
-    m_sgroupid          = 0;
-    m_desiredrecstartts = QDateTime();
-    m_desiredrecendts   = QDateTime();
+    m_schedOrder        = 0;
+    m_mplexId           = 0;
+    m_sgroupId          = 0;
+    m_desiredRecStartTs = QDateTime();
+    m_desiredRecEndTs   = QDateTime();
 
     delete m_recordingFile;
     m_recordingFile = nullptr;

@@ -16,7 +16,7 @@
 #endif
 #include "firewirechannel.h"
 
-#define LOC QString("FireChan[%1](%2): ").arg(m_inputid).arg(FirewireChannel::GetDevice())
+#define LOC QString("FireChan[%1](%2): ").arg(m_inputId).arg(FirewireChannel::GetDevice())
 
 FirewireChannel::FirewireChannel(TVRec *parent, QString _videodevice,
                                  FireWireDBOptions firewire_opts) :
@@ -57,7 +57,7 @@ bool FirewireChannel::Open(void)
     if (!InitializeInput())
         return false;
 
-    if (!m_inputid)
+    if (!m_inputId)
         return false;
 
     if (!FirewireDevice::IsSTBSupported(m_fw_opts.m_model) &&

@@ -2764,7 +2764,7 @@ static HostComboBoxSetting *ChannelGroupDefault()
     ChannelGroupList::iterator it;
 
     for (it = changrplist.begin(); it < changrplist.end(); ++it)
-       gc->addSelection(it->m_name, QString("%1").arg(it->m_grpid));
+       gc->addSelection(it->m_name, QString("%1").arg(it->m_grpId));
 
     gc->setHelpText(ChannelGroupSettings::tr("Default channel group to be "
                                              "shown in the EPG.  Pressing "

@@ -29,7 +29,7 @@ using namespace std;
 #define DEBUG_ATTRIB 1
 
 #define LOC      QString("V4LChannel[%1](%2): ") \
-                 .arg(m_inputid).arg(GetDevice())
+                 .arg(m_inputId).arg(GetDevice())
 
 static int format_to_mode(const QString &fmt);
 static QString mode_to_format(int mode);
@@ -253,7 +253,7 @@ bool V4LChannel::InitializeInputs(void)
     // print it
     LOG(VB_CHANNEL, LOG_INFO, LOC +
         QString("Input #%1: '%2' schan(%3) tun(%4) v4l2(%6)")
-        .arg(m_inputid).arg(m_name).arg(m_startChanNum)
+        .arg(m_inputId).arg(m_name).arg(m_startChanNum)
         .arg(m_tuneToChannel)
         .arg(mode_to_format(m_videoModeV4L2)));
 
@@ -274,12 +274,12 @@ void V4LChannel::SetFormat(const QString &format)
     if (!Open())
         return;
 
-    int inputNum = m_inputid;
+    int inputNum = m_inputId;
 
     QString fmt = format;
     if ((fmt == "Default") || format.isEmpty())
     {
-        if (m_inputid)
+        if (m_inputId)
             fmt = mode_to_format(m_videoModeV4L2);
     }
 
@@ -484,7 +484,7 @@ QString V4LChannel::GetFormatForChannel(const QString& channum, const QString& i
         "      capturecard.sourceid = channel.sourceid");
     query.bindValue(":CHANNUM",   channum);
     query.bindValue(":INPUTNAME", inputname);
-    query.bindValue(":INPUTID",    m_inputid);
+    query.bindValue(":INPUTID",    m_inputId);
 
     QString fmt;
     if (!query.exec() || !query.isActive())
@@ -496,7 +496,7 @@ QString V4LChannel::GetFormatForChannel(const QString& channum, const QString& i
 
 bool V4LChannel::SetInputAndFormat(int inputNum, const QString& newFmt)
 {
-    if (!m_inputid || m_inputNumV4L < 0)
+    if (!m_inputId || m_inputNumV4L < 0)
         return false;
 
     int inputNumV4L = m_inputNumV4L;
@@ -601,9 +601,9 @@ bool V4LChannel::InitPictureAttribute(const QString &db_col_name)
         return false;
 
     int cfield = ChannelUtil::GetChannelValueInt(
-        db_col_name, GetSourceID(), m_curchannelname);
+        db_col_name, GetSourceID(), m_curChannelName);
     int sfield = CardUtil::GetValueInt(
-        db_col_name, m_inputid);
+        db_col_name, m_inputId);
 
     if ((cfield == -1) || (sfield == -1))
         return false;
@@ -680,9 +680,9 @@ int V4LChannel::GetPictureAttribute(PictureAttribute attr) const
         return -1;
 
     int cfield = ChannelUtil::GetChannelValueInt(
-        db_col_name, GetSourceID(), m_curchannelname);
+        db_col_name, GetSourceID(), m_curChannelName);
     int sfield = CardUtil::GetValueInt(
-        db_col_name, m_inputid);
+        db_col_name, m_inputId);
     int dfield = 0;
 
     if (m_pictAttrDefault.find(db_col_name) != m_pictAttrDefault.end())
@@ -794,23 +794,23 @@ int V4LChannel::ChangePictureAttribute(
     if (kAdjustingPicture_Channel == type)
     {
         int adj_value = ChannelUtil::GetChannelValueInt(
-            db_col_name, GetSourceID(), m_curchannelname);
+            db_col_name, GetSourceID(), m_curChannelName);
 
         int tmp = new_value - old_value + adj_value;
         tmp = (tmp < 0)      ? tmp + 0x10000 : tmp;
         tmp = (tmp > 0xffff) ? tmp - 0x10000 : tmp;
         ChannelUtil::SetChannelValue(db_col_name, QString::number(tmp),
-                                     GetSourceID(), m_curchannelname);
+                                     GetSourceID(), m_curChannelName);
     }
     else if (kAdjustingPicture_Recording == type)
     {
         int adj_value = CardUtil::GetValueInt(
-            db_col_name, m_inputid);
+            db_col_name, m_inputId);
 
         int tmp = new_value - old_value + adj_value;
         tmp = (tmp < 0)      ? tmp + 0x10000 : tmp;
         tmp = (tmp > 0xffff) ? tmp - 0x10000 : tmp;
-        CardUtil::SetValue(db_col_name, m_inputid, tmp);
+        CardUtil::SetValue(db_col_name, m_inputId, tmp);
     }
 
     return new_value;

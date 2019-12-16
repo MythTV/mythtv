@@ -37,7 +37,7 @@ bool ASIChannel::Open(void)
     if (!InitializeInput())
         return false;
 
-    if (!m_inputid)
+    if (!m_inputId)
         return false;
 
     m_isOpen = true;

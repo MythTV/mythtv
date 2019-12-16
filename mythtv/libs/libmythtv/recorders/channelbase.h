@@ -62,18 +62,18 @@ class ChannelBase
     virtual uint GetNextChannel(uint chanid, ChannelChangeDirection direction) const;
     virtual uint GetNextChannel(const QString &channum, ChannelChangeDirection direction) const;
     virtual QString GetChannelName(void) const
-        { return m_curchannelname; }
+        { return m_curChannelName; }
     virtual int GetChanID(void) const;
     virtual int GetInputID(void) const
-        { return m_inputid; }
+        { return m_inputId; }
     virtual QString GetInputName(void) const
         { return m_name; }
     virtual uint GetSourceID(void) const
-        { return m_sourceid; }
+        { return m_sourceId; }
 
     /// \brief Returns true iff commercial detection is not required
     //         on current channel, for BBC, CBC, etc.
-    bool IsCommercialFree(void) const { return m_commfree; }
+    bool IsCommercialFree(void) const { return m_commFree; }
     /// \brief Returns String representing device, useful for debugging
     virtual QString GetDevice(void) const { return ""; }
 
@@ -98,7 +98,7 @@ class ChannelBase
     bool CheckChannel(const QString &channum) const;
 
     // \brief Set inputid for scanning
-    void SetInputID(uint _inputid) { m_inputid = _inputid; }
+    void SetInputID(uint _inputid) { m_inputId = _inputid; }
 
     // \brief Get major input ID
     int GetMajorID(void);
@@ -132,10 +132,10 @@ class ChannelBase
                                uint cardinputid);
 
     TVRec            *m_pParent        {nullptr};
-    QString           m_curchannelname;
-    bool              m_commfree       {false};
-    uint              m_inputid        {0};
-    uint              m_sourceid       {0};
+    QString           m_curChannelName;
+    bool              m_commFree       {false};
+    uint              m_inputId        {0};
+    uint              m_sourceId       {0};
     QString           m_name;
     QString           m_startChanNum;
     QString           m_externalChanger;
@@ -147,7 +147,7 @@ class ChannelBase
     /// These get mapped from the GENERIC_EXIT_* to these values for use
     /// with the signalmonitor code.
     /// 0 == unknown, 1 == pending, 2 == failed, 3 == success
-    uint              m_system_status  {0};
+    uint              m_systemStatus  {0};
 };
 
 

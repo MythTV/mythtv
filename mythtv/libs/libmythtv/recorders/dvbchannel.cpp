@@ -66,7 +66,7 @@ static DTVMultiplex dvbparams_to_dtvmultiplex(
 int64_t concurrent_tunings_delay = 1000;
 QDateTime DVBChannel::s_lastTuning = QDateTime::currentDateTime();
 
-#define LOC QString("DVBChan[%1](%2): ").arg(m_inputid).arg(DVBChannel::GetDevice())
+#define LOC QString("DVBChan[%1](%2): ").arg(m_inputId).arg(DVBChannel::GetDevice())
 
 /** \class DVBChannel
  *  \brief Provides interface to the tuning hardware when using DVB drivers
@@ -183,7 +183,7 @@ bool DVBChannel::Open(DVBChannel *who)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Opening DVB channel");
 
-    if (!m_inputid)
+    if (!m_inputId)
     {
         if (!InitializeInput())
             return false;
@@ -268,7 +268,7 @@ bool DVBChannel::Open(DVBChannel *who)
     m_symbolRateMinimum   = info.symbol_rate_min;
     m_symbolRateMaximum   = info.symbol_rate_max;
 
-    CardUtil::SetDefaultDeliverySystem(m_inputid, m_fdFrontend);
+    CardUtil::SetDefaultDeliverySystem(m_inputId, m_fdFrontend);
     m_tunerType = CardUtil::ProbeTunerType(m_fdFrontend);
 
     LOG(VB_RECORD, LOG_INFO, LOC +
@@ -279,7 +279,7 @@ bool DVBChannel::Open(DVBChannel *who)
     if (m_tunerType.IsDiSEqCSupported())
     {
 
-        m_diseqcTree = DiSEqCDev::FindTree(m_inputid);
+        m_diseqcTree = DiSEqCDev::FindTree(m_inputId);
         if (m_diseqcTree)
         {
             bool is_SCR = false;
@@ -512,7 +512,7 @@ void DVBChannel::SetTimeOffset(double offset)
 
 bool DVBChannel::Tune(const DTVMultiplex &tuning)
 {
-    if (!m_inputid)
+    if (!m_inputId)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Tune(): Invalid input."));
         return false;
@@ -715,7 +715,7 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
         {
             // configure for new input
             if (!same_input)
-                m_diseqcSettings.Load(m_inputid);
+                m_diseqcSettings.Load(m_inputId);
 
             // execute diseqc commands
             if (!m_diseqcTree->Execute(m_diseqcSettings, tuning))
@@ -964,8 +964,8 @@ int DVBChannel::GetChanID() const
                   "      channel.channum = :CHANNUM AND "
                   "      capturecard.cardid = :INPUTID");
 
-    query.bindValue(":CHANNUM", m_curchannelname);
-    query.bindValue(":INPUTID", m_inputid);
+    query.bindValue(":CHANNUM", m_curChannelName);
+    query.bindValue(":INPUTID", m_inputId);
 
     if (!query.exec() || !query.isActive())
     {
@@ -984,14 +984,14 @@ int DVBChannel::GetChanID() const
     {
         LOG(VB_GENERAL, LOG_INFO,
             QString("No visible channel ids for %1")
-            .arg(m_curchannelname));
+            .arg(m_curChannelName));
     }
 
     if (found > 1)
     {
         LOG(VB_GENERAL, LOG_WARNING,
             QString("Found multiple visible channel ids for %1")
-            .arg(m_curchannelname));
+            .arg(m_curChannelName));
     }
 
     return id;
