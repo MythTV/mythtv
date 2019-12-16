@@ -159,67 +159,67 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other) :
     m_description(other.m_description),
     m_season(other.m_season),
     m_episode(other.m_episode),
-    m_totalepisodes(other.m_totalepisodes),
-    m_syndicatedepisode(other.m_syndicatedepisode),
+    m_totalEpisodes(other.m_totalEpisodes),
+    m_syndicatedEpisode(other.m_syndicatedEpisode),
     m_category(other.m_category),
     m_director(other.m_director),
 
-    m_recpriority(other.m_recpriority),
+    m_recPriority(other.m_recPriority),
 
-    m_chanid(other.m_chanid),
-    m_chanstr(other.m_chanstr),
-    m_chansign(other.m_chansign),
-    m_channame(other.m_channame),
-    m_chanplaybackfilters(other.m_chanplaybackfilters),
+    m_chanId(other.m_chanId),
+    m_chanStr(other.m_chanStr),
+    m_chanSign(other.m_chanSign),
+    m_chanName(other.m_chanName),
+    m_chanPlaybackFilters(other.m_chanPlaybackFilters),
 
-    m_recgroup(other.m_recgroup),
-    m_playgroup(other.m_playgroup),
+    m_recGroup(other.m_recGroup),
+    m_playGroup(other.m_playGroup),
 
     m_pathname(other.m_pathname),
 
     m_hostname(other.m_hostname),
-    m_storagegroup(other.m_storagegroup),
+    m_storageGroup(other.m_storageGroup),
 
-    m_seriesid(other.m_seriesid),
-    m_programid(other.m_programid),
-    m_inetref(other.m_inetref),
+    m_seriesId(other.m_seriesId),
+    m_programId(other.m_programId),
+    m_inetRef(other.m_inetRef),
     m_catType(other.m_catType),
 
-    m_filesize(other.m_filesize),
+    m_fileSize(other.m_fileSize),
 
-    m_startts(other.m_startts),
-    m_endts(other.m_endts),
-    m_recstartts(other.m_recstartts),
-    m_recendts(other.m_recendts),
+    m_startTs(other.m_startTs),
+    m_endTs(other.m_endTs),
+    m_recStartTs(other.m_recStartTs),
+    m_recEndTs(other.m_recEndTs),
 
     m_stars(other.m_stars),
 
     m_originalAirDate(other.m_originalAirDate),
-    m_lastmodified(other.m_lastmodified),
+    m_lastModified(other.m_lastModified),
     m_lastInUseTime(MythDate::current().addSecs(-4 * 60 * 60)),
 
-    m_recpriority2(other.m_recpriority2),
-    m_recordid(other.m_recordid),
-    m_parentid(other.m_parentid),
+    m_recPriority2(other.m_recPriority2),
+    m_recordId(other.m_recordId),
+    m_parentId(other.m_parentId),
 
-    m_sourceid(other.m_sourceid),
-    m_inputid(other.m_inputid),
+    m_sourceId(other.m_sourceId),
+    m_inputId(other.m_inputId),
 
-    m_findid(other.m_findid),
-    m_programflags(other.m_programflags),
+    m_findId(other.m_findId),
+    m_programFlags(other.m_programFlags),
     m_properties(other.m_properties),
     m_year(other.m_year),
-    m_partnumber(other.m_partnumber),
-    m_parttotal(other.m_parttotal),
+    m_partNumber(other.m_partNumber),
+    m_partTotal(other.m_partTotal),
 
-    m_recstatus(other.m_recstatus),
-    m_rectype(other.m_rectype),
-    m_dupin(other.m_dupin),
-    m_dupmethod(other.m_dupmethod),
+    m_recStatus(other.m_recStatus),
+    m_recType(other.m_recType),
+    m_dupIn(other.m_dupIn),
+    m_dupMethod(other.m_dupMethod),
 
-    m_recordedid(other.m_recordedid),
-    m_inputname(other.m_inputname),
-    m_bookmarkupdate(other.m_bookmarkupdate),
+    m_recordedId(other.m_recordedId),
+    m_inputName(other.m_inputName),
+    m_bookmarkUpdate(other.m_bookmarkUpdate),
 
     // everything below this line is not serialized
     m_availableStatus(other.m_availableStatus),
@@ -348,62 +348,62 @@ ProgramInfo::ProgramInfo(
     m_description(std::move(_description)),
     m_season(_season),
     m_episode(_episode),
-    m_totalepisodes(_totalepisodes),
-    m_syndicatedepisode(std::move(_syndicatedepisode)),
+    m_totalEpisodes(_totalepisodes),
+    m_syndicatedEpisode(std::move(_syndicatedepisode)),
     m_category(std::move(_category)),
 
-    m_recpriority(_recpriority),
+    m_recPriority(_recpriority),
 
-    m_chanid(_chanid),
-    m_chanstr(std::move(_channum)),
-    m_chansign(std::move(_chansign)),
-    m_channame(std::move(_channame)),
-    m_chanplaybackfilters(std::move(_chanplaybackfilters)),
+    m_chanId(_chanid),
+    m_chanStr(std::move(_channum)),
+    m_chanSign(std::move(_chansign)),
+    m_chanName(std::move(_channame)),
+    m_chanPlaybackFilters(std::move(_chanplaybackfilters)),
 
-    m_recgroup(std::move(_recgroup)),
-    m_playgroup(std::move(_playgroup)),
+    m_recGroup(std::move(_recgroup)),
+    m_playGroup(std::move(_playgroup)),
 
     m_pathname(_pathname),
 
     m_hostname(std::move(_hostname)),
-    m_storagegroup(std::move(_storagegroup)),
+    m_storageGroup(std::move(_storagegroup)),
 
-    m_seriesid(std::move(_seriesid)),
-    m_programid(std::move(_programid)),
-    m_inetref(std::move(_inetref)),
+    m_seriesId(std::move(_seriesid)),
+    m_programId(std::move(_programid)),
+    m_inetRef(std::move(_inetref)),
     m_catType(_catType),
 
-    m_filesize(_filesize),
+    m_fileSize(_filesize),
 
-    m_startts(std::move(_startts)),
-    m_endts(std::move(_endts)),
-    m_recstartts(std::move(_recstartts)),
-    m_recendts(std::move(_recendts)),
+    m_startTs(std::move(_startts)),
+    m_endTs(std::move(_endts)),
+    m_recStartTs(std::move(_recstartts)),
+    m_recEndTs(std::move(_recendts)),
 
     m_stars(clamp(_stars, 0.0F, 1.0F)),
 
     m_originalAirDate(_originalAirDate),
-    m_lastmodified(std::move(_lastmodified)),
+    m_lastModified(std::move(_lastmodified)),
     m_lastInUseTime(MythDate::current().addSecs(-4 * 60 * 60)),
 
-    m_recordid(_recordid),
-    m_findid(_findid),
+    m_recordId(_recordid),
+    m_findId(_findid),
 
-    m_programflags(_programflags),
+    m_programFlags(_programflags),
     m_properties((_subtitleType    << kSubtitlePropertyOffset) |
                (_videoproperties << kVideoPropertyOffset)    |
                (_audioproperties << kAudioPropertyOffset)),
     m_year(_year),
-    m_partnumber(_partnumber),
-    m_parttotal(_parttotal),
+    m_partNumber(_partnumber),
+    m_partTotal(_parttotal),
 
-    m_recstatus(_recstatus),
-    m_dupin(_dupin),
-    m_dupmethod(_dupmethod),
+    m_recStatus(_recstatus),
+    m_dupIn(_dupin),
+    m_dupMethod(_dupmethod),
 
-    m_recordedid(_recordedid),
-    m_inputname(std::move(_inputname)),
-    m_bookmarkupdate(std::move(_bookmarkupdate))
+    m_recordedId(_recordedid),
+    m_inputName(std::move(_inputname)),
+    m_bookmarkUpdate(std::move(_bookmarkupdate))
 {
     if (m_originalAirDate.isValid() && m_originalAirDate < QDate(1940, 1, 1))
         m_originalAirDate = QDate();
@@ -457,32 +457,32 @@ ProgramInfo::ProgramInfo(
     m_episode(_episode),
     m_category(std::move(_category)),
 
-    m_chanid(_chanid),
-    m_chanstr(std::move(_channum)),
-    m_chansign(std::move(_chansign)),
-    m_channame(std::move(_channame)),
+    m_chanId(_chanid),
+    m_chanStr(std::move(_channum)),
+    m_chanSign(std::move(_chansign)),
+    m_chanName(std::move(_channame)),
 
-    m_seriesid(std::move(_seriesid)),
-    m_programid(std::move(_programid)),
-    m_inetref(std::move(_inetref)),
+    m_seriesId(std::move(_seriesid)),
+    m_programId(std::move(_programid)),
+    m_inetRef(std::move(_inetref)),
 
-    m_startts(std::move(_startts)),
-    m_endts(std::move(_endts)),
-    m_recstartts(std::move(_recstartts)),
-    m_recendts(std::move(_recendts)),
+    m_startTs(std::move(_startts)),
+    m_endTs(std::move(_endts)),
+    m_recStartTs(std::move(_recstartts)),
+    m_recEndTs(std::move(_recendts)),
 
-    m_lastmodified(m_startts),
+    m_lastModified(m_startTs),
     m_lastInUseTime(MythDate::current().addSecs(-4 * 60 * 60)),
 
-    m_recordid(_recordid),
-    m_findid(_findid),
+    m_recordId(_recordid),
+    m_findId(_findid),
 
-    m_programflags((duplicate) ? FL_DUPLICATE : 0),
+    m_programFlags((duplicate) ? FL_DUPLICATE : 0),
 
-    m_recstatus(_recstatus),
-    m_rectype(_rectype),
-    m_dupin(kDupsUnset),
-    m_dupmethod(kDupCheckUnset)
+    m_recStatus(_recstatus),
+    m_recType(_rectype),
+    m_dupIn(kDupsUnset),
+    m_dupMethod(kDupCheckUnset)
 {
     ensureSortFields();
 }
@@ -544,47 +544,47 @@ ProgramInfo::ProgramInfo(
     m_description(std::move(_description)),
     m_season(_season),
     m_episode(_episode),
-    m_totalepisodes(_totalepisodes),
-    m_syndicatedepisode(std::move(_syndicatedepisode)),
+    m_totalEpisodes(_totalepisodes),
+    m_syndicatedEpisode(std::move(_syndicatedepisode)),
     m_category(std::move(_category)),
 
-    m_chanid(_chanid),
-    m_chanstr(std::move(_channum)),
-    m_chansign(std::move(_chansign)),
-    m_channame(std::move(_channame)),
-    m_chanplaybackfilters(std::move(_chanplaybackfilters)),
+    m_chanId(_chanid),
+    m_chanStr(std::move(_channum)),
+    m_chanSign(std::move(_chansign)),
+    m_chanName(std::move(_channame)),
+    m_chanPlaybackFilters(std::move(_chanplaybackfilters)),
 
-    m_seriesid(std::move(_seriesid)),
-    m_programid(std::move(_programid)),
+    m_seriesId(std::move(_seriesid)),
+    m_programId(std::move(_programid)),
     m_catType(_catType),
 
-    m_startts(std::move(_startts)),
-    m_endts(std::move(_endts)),
-    m_recstartts(std::move(_recstartts)),
-    m_recendts(std::move(_recendts)),
+    m_startTs(std::move(_startts)),
+    m_endTs(std::move(_endts)),
+    m_recStartTs(std::move(_recstartts)),
+    m_recEndTs(std::move(_recendts)),
 
     m_stars(clamp(_stars, 0.0F, 1.0F)),
 
     m_originalAirDate(_originalAirDate),
-    m_lastmodified(m_startts),
-    m_lastInUseTime(m_startts.addSecs(-4 * 60 * 60)),
+    m_lastModified(m_startTs),
+    m_lastInUseTime(m_startTs.addSecs(-4 * 60 * 60)),
 
-    m_recordid(_recordid),
-    m_findid(_findid),
+    m_recordId(_recordid),
+    m_findId(_findid),
 
-    m_programflags(FL_NONE),
+    m_programFlags(FL_NONE),
     m_properties((_subtitleType    << kSubtitlePropertyOffset) |
                (_videoproperties << kVideoPropertyOffset)    |
                (_audioproperties << kAudioPropertyOffset)),
     m_year(_year),
-    m_partnumber(_partnumber),
-    m_parttotal(_parttotal),
+    m_partNumber(_partnumber),
+    m_partTotal(_parttotal),
 
-    m_recstatus(_recstatus),
-    m_rectype(_rectype)
+    m_recStatus(_recstatus),
+    m_recType(_rectype)
 {
-    m_programflags |= (commfree) ? FL_CHANCOMMFREE : 0;
-    m_programflags |= (repeat)   ? FL_REPEAT       : 0;
+    m_programFlags |= (commfree) ? FL_CHANCOMMFREE : 0;
+    m_programFlags |= (repeat)   ? FL_REPEAT       : 0;
 
     if (m_originalAirDate.isValid() && m_originalAirDate < QDate(1940, 1, 1))
         m_originalAirDate = QDate();
@@ -602,33 +602,33 @@ ProgramInfo::ProgramInfo(
             continue;
 
         const ProgramInfo &s = **it;
-        m_recordid    = s.m_recordid;
-        m_rectype     = s.m_rectype;
-        m_recpriority = s.m_recpriority;
-        m_recstartts  = s.m_recstartts;
-        m_recendts    = s.m_recendts;
-        m_inputid     = s.m_inputid;
-        m_dupin       = s.m_dupin;
-        m_dupmethod   = s.m_dupmethod;
-        m_findid      = s.m_findid;
-        m_recordedid  = s.m_recordedid;
+        m_recordId    = s.m_recordId;
+        m_recType     = s.m_recType;
+        m_recPriority = s.m_recPriority;
+        m_recStartTs  = s.m_recStartTs;
+        m_recEndTs    = s.m_recEndTs;
+        m_inputId     = s.m_inputId;
+        m_dupIn       = s.m_dupIn;
+        m_dupMethod   = s.m_dupMethod;
+        m_findId      = s.m_findId;
+        m_recordedId  = s.m_recordedId;
         m_hostname    = s.m_hostname;
-        m_inputname   = s.m_inputname;
+        m_inputName   = s.m_inputName;
 
         // This is the exact showing (same chanid or callsign)
         // which will be recorded
         if (IsSameChannel(s))
         {
-            m_recstatus   = s.m_recstatus;
+            m_recStatus   = s.m_recStatus;
             break;
         }
 
-        if (s.m_recstatus == RecStatus::WillRecord ||
-            s.m_recstatus == RecStatus::Pending ||
-            s.m_recstatus == RecStatus::Recording ||
-            s.m_recstatus == RecStatus::Tuning ||
-            s.m_recstatus == RecStatus::Failing)
-        m_recstatus = s.m_recstatus;
+        if (s.m_recStatus == RecStatus::WillRecord ||
+            s.m_recStatus == RecStatus::Pending ||
+            s.m_recStatus == RecStatus::Recording ||
+            s.m_recStatus == RecStatus::Tuning ||
+            s.m_recStatus == RecStatus::Failing)
+        m_recStatus = s.m_recStatus;
     }
     ensureSortFields();
 }
@@ -672,31 +672,31 @@ ProgramInfo::ProgramInfo(
     m_description(std::move(_description)),
     m_season(_season),
     m_episode(_episode),
-    m_totalepisodes(_totalepisodes),
+    m_totalEpisodes(_totalepisodes),
     m_category(std::move(_category)),
 
-    m_chanid(_chanid),
-    m_chanstr(std::move(_channum)),
-    m_chansign(std::move(_chansign)),
-    m_channame(std::move(_channame)),
-    m_chanplaybackfilters(std::move(_chanplaybackfilters)),
+    m_chanId(_chanid),
+    m_chanStr(std::move(_channum)),
+    m_chanSign(std::move(_chansign)),
+    m_chanName(std::move(_channame)),
+    m_chanPlaybackFilters(std::move(_chanplaybackfilters)),
 
-    m_recgroup(std::move(_recgroup)),
-    m_playgroup(std::move(_playgroup)),
+    m_recGroup(std::move(_recgroup)),
+    m_playGroup(std::move(_playgroup)),
 
-    m_seriesid(std::move(_seriesid)),
-    m_programid(std::move(_programid)),
-    m_inetref(std::move(_inetref)),
+    m_seriesId(std::move(_seriesid)),
+    m_programId(std::move(_programid)),
+    m_inetRef(std::move(_inetref)),
 
-    m_startts(std::move(_startts)),
-    m_endts(std::move(_endts)),
-    m_recstartts(std::move(_recstartts)),
-    m_recendts(std::move(_recendts)),
+    m_startTs(std::move(_startts)),
+    m_endTs(std::move(_endts)),
+    m_recStartTs(std::move(_recstartts)),
+    m_recEndTs(std::move(_recendts)),
 
-    m_lastmodified(MythDate::current()),
-    m_lastInUseTime(m_lastmodified.addSecs(-4 * 60 * 60)),
+    m_lastModified(MythDate::current()),
+    m_lastInUseTime(m_lastModified.addSecs(-4 * 60 * 60)),
 
-    m_inputname(std::move(_inputname))
+    m_inputName(std::move(_inputname))
 {
     ensureSortFields();
 }
@@ -724,8 +724,8 @@ ProgramInfo::ProgramInfo(const QString &_pathname)
     ProgramInfo::clear();
 
     QDateTime cur = MythDate::current();
-    m_recstartts = m_startts = cur.addSecs(-4 * 60 * 60 - 1);
-    m_recendts   = m_endts   = cur.addSecs(-1);
+    m_recStartTs = m_startTs = cur.addSecs(-4 * 60 * 60 - 1);
+    m_recEndTs   = m_endTs   = cur.addSecs(-1);
 
     QString basename = _pathname.section('/', -1);
     if (_pathname == basename)
@@ -763,15 +763,15 @@ ProgramInfo::ProgramInfo(const QString &_pathname,
     m_season = _season;
     m_episode = _episode;
     m_director = _director;
-    m_programid = _programid;
-    m_inetref = _inetref;
+    m_programId = _programid;
+    m_inetRef = _inetref;
     m_year = _year;
 
     QDateTime cur = MythDate::current();
-    m_recstartts = cur.addSecs(((int)_length_in_minutes + 1) * -60);
-    m_recendts   = m_recstartts.addSecs(_length_in_minutes * 60);
-    m_startts    = QDateTime(QDate(m_year,1,1),QTime(0,0,0), Qt::UTC);
-    m_endts      = m_startts.addSecs(_length_in_minutes * 60);
+    m_recStartTs = cur.addSecs(((int)_length_in_minutes + 1) * -60);
+    m_recEndTs   = m_recStartTs.addSecs(_length_in_minutes * 60);
+    m_startTs    = QDateTime(QDate(m_year,1,1),QTime(0,0,0), Qt::UTC);
+    m_endTs      = m_startTs.addSecs(_length_in_minutes * 60);
 
     QString pn = _pathname;
     if (!_pathname.startsWith("myth://"))
@@ -798,17 +798,17 @@ ProgramInfo::ProgramInfo(const QString &_title, uint _chanid,
     query.bindValue(":CHANID", _chanid);
     if (query.exec() && query.next())
     {
-        m_chanstr  = query.value(1).toString();
-        m_chansign = query.value(2).toString();
-        m_channame = query.value(3).toString();
-        m_chanplaybackfilters = query.value(4).toString();
-        set_flag(m_programflags, FL_CHANCOMMFREE,
+        m_chanStr  = query.value(1).toString();
+        m_chanSign = query.value(2).toString();
+        m_chanName = query.value(3).toString();
+        m_chanPlaybackFilters = query.value(4).toString();
+        set_flag(m_programFlags, FL_CHANCOMMFREE,
                  query.value(5).toInt() == COMM_DETECT_COMMFREE);
     }
 
-    m_chanid  = _chanid;
-    m_startts = _startts;
-    m_endts   = _endts;
+    m_chanId  = _chanid;
+    m_startTs = _startts;
+    m_endTs   = _endts;
 
     m_title = _title;
     if (m_title.isEmpty())
@@ -817,7 +817,7 @@ ProgramInfo::ProgramInfo(const QString &_title, uint _chanid,
             gCoreContext->GetSetting("ChannelFormat", "<num> <sign>");
 
         m_title = QString("%1 - %2").arg(ChannelText(channelFormat))
-            .arg(MythDate::toString(m_startts, MythDate::kTime));
+            .arg(MythDate::toString(m_startTs, MythDate::kTime));
     }
 
     m_description = m_title =
@@ -842,9 +842,9 @@ void ProgramInfo::clone(const ProgramInfo &other,
                         bool ignore_non_serialized_data)
 {
     bool is_same =
-        (m_chanid && m_recstartts.isValid() && m_startts.isValid() &&
-         m_chanid == other.m_chanid && m_recstartts == other.m_recstartts &&
-         m_startts == other.m_startts);
+        (m_chanId && m_recStartTs.isValid() && m_startTs.isValid() &&
+         m_chanId == other.m_chanId && m_recStartTs == other.m_recStartTs &&
+         m_startTs == other.m_startTs);
 
     m_title = other.m_title;
     m_sortTitle = other.m_sortTitle;
@@ -853,19 +853,19 @@ void ProgramInfo::clone(const ProgramInfo &other,
     m_description = other.m_description;
     m_season = other.m_season;
     m_episode = other.m_episode;
-    m_totalepisodes = other.m_totalepisodes;
-    m_syndicatedepisode = other.m_syndicatedepisode;
+    m_totalEpisodes = other.m_totalEpisodes;
+    m_syndicatedEpisode = other.m_syndicatedEpisode;
     m_category = other.m_category;
     m_director = other.m_director;
 
-    m_chanid = other.m_chanid;
-    m_chanstr = other.m_chanstr;
-    m_chansign = other.m_chansign;
-    m_channame = other.m_channame;
-    m_chanplaybackfilters = other.m_chanplaybackfilters;
+    m_chanId = other.m_chanId;
+    m_chanStr = other.m_chanStr;
+    m_chanSign = other.m_chanSign;
+    m_chanName = other.m_chanName;
+    m_chanPlaybackFilters = other.m_chanPlaybackFilters;
 
-    m_recgroup = other.m_recgroup;
-    m_playgroup = other.m_playgroup;
+    m_recGroup = other.m_recGroup;
+    m_playGroup = other.m_playGroup;
 
     if (!ignore_non_serialized_data || !is_same ||
         (GetBasename() != other.GetBasename()))
@@ -874,51 +874,51 @@ void ProgramInfo::clone(const ProgramInfo &other,
     }
 
     m_hostname = other.m_hostname;
-    m_storagegroup = other.m_storagegroup;
+    m_storageGroup = other.m_storageGroup;
 
-    m_seriesid = other.m_seriesid;
-    m_programid = other.m_programid;
-    m_inetref = other.m_inetref;
+    m_seriesId = other.m_seriesId;
+    m_programId = other.m_programId;
+    m_inetRef = other.m_inetRef;
     m_catType = other.m_catType;
 
-    m_recpriority = other.m_recpriority;
+    m_recPriority = other.m_recPriority;
 
-    m_filesize = other.m_filesize;
+    m_fileSize = other.m_fileSize;
 
-    m_startts = other.m_startts;
-    m_endts = other.m_endts;
-    m_recstartts = other.m_recstartts;
-    m_recendts = other.m_recendts;
+    m_startTs = other.m_startTs;
+    m_endTs = other.m_endTs;
+    m_recStartTs = other.m_recStartTs;
+    m_recEndTs = other.m_recEndTs;
 
     m_stars = other.m_stars;
 
     m_year = other.m_year;
-    m_partnumber = other.m_partnumber;
-    m_parttotal = other.m_parttotal;
+    m_partNumber = other.m_partNumber;
+    m_partTotal = other.m_partTotal;
 
     m_originalAirDate = other.m_originalAirDate;
-    m_lastmodified = other.m_lastmodified;
+    m_lastModified = other.m_lastModified;
     m_lastInUseTime = MythDate::current().addSecs(-4 * 60 * 60);
 
-    m_recstatus = other.m_recstatus;
+    m_recStatus = other.m_recStatus;
 
-    m_recpriority2 = other.m_recpriority2;
-    m_recordid = other.m_recordid;
-    m_parentid = other.m_parentid;
+    m_recPriority2 = other.m_recPriority2;
+    m_recordId = other.m_recordId;
+    m_parentId = other.m_parentId;
 
-    m_rectype = other.m_rectype;
-    m_dupin = other.m_dupin;
-    m_dupmethod = other.m_dupmethod;
+    m_recType = other.m_recType;
+    m_dupIn = other.m_dupIn;
+    m_dupMethod = other.m_dupMethod;
 
-    m_recordedid = other.m_recordedid;
-    m_inputname = other.m_inputname;
-    m_bookmarkupdate = other.m_bookmarkupdate;
+    m_recordedId = other.m_recordedId;
+    m_inputName = other.m_inputName;
+    m_bookmarkUpdate = other.m_bookmarkUpdate;
 
-    m_sourceid = other.m_sourceid;
-    m_inputid = other.m_inputid;
+    m_sourceId = other.m_sourceId;
+    m_inputId = other.m_inputId;
 
-    m_findid = other.m_findid;
-    m_programflags = other.m_programflags;
+    m_findId = other.m_findId;
+    m_programFlags = other.m_programFlags;
     m_properties = other.m_properties;
 
     if (!ignore_non_serialized_data)
@@ -941,69 +941,69 @@ void ProgramInfo::clear(void)
     m_description.clear();
     m_season = 0;
     m_episode = 0;
-    m_totalepisodes = 0;
-    m_syndicatedepisode.clear();
+    m_totalEpisodes = 0;
+    m_syndicatedEpisode.clear();
     m_category.clear();
     m_director.clear();
 
-    m_chanid = 0;
-    m_chanstr.clear();
-    m_chansign.clear();
-    m_channame.clear();
-    m_chanplaybackfilters.clear();
+    m_chanId = 0;
+    m_chanStr.clear();
+    m_chanSign.clear();
+    m_chanName.clear();
+    m_chanPlaybackFilters.clear();
 
-    m_recgroup = "Default";
-    m_playgroup = "Default";
+    m_recGroup = "Default";
+    m_playGroup = "Default";
 
     m_pathname.clear();
 
     m_hostname.clear();
-    m_storagegroup = "Default";
+    m_storageGroup = "Default";
 
     m_year = 0;
-    m_partnumber = 0;
-    m_parttotal = 0;
+    m_partNumber = 0;
+    m_partTotal = 0;
 
-    m_seriesid.clear();
-    m_programid.clear();
-    m_inetref.clear();
+    m_seriesId.clear();
+    m_programId.clear();
+    m_inetRef.clear();
     m_catType = kCategoryNone;
 
-    m_recpriority = 0;
+    m_recPriority = 0;
 
-    m_filesize = 0ULL;
+    m_fileSize = 0ULL;
 
-    m_startts = MythDate::current(true);
-    m_endts = m_startts;
-    m_recstartts = m_startts;
-    m_recendts = m_startts;
+    m_startTs = MythDate::current(true);
+    m_endTs = m_startTs;
+    m_recStartTs = m_startTs;
+    m_recEndTs = m_startTs;
 
     m_stars = 0.0F;
 
     m_originalAirDate = QDate();
-    m_lastmodified = m_startts;
-    m_lastInUseTime = m_startts.addSecs(-4 * 60 * 60);
+    m_lastModified = m_startTs;
+    m_lastInUseTime = m_startTs.addSecs(-4 * 60 * 60);
 
-    m_recstatus = RecStatus::Unknown;
+    m_recStatus = RecStatus::Unknown;
 
-    m_recpriority2 = 0;
-    m_recordid = 0;
-    m_parentid = 0;
+    m_recPriority2 = 0;
+    m_recordId = 0;
+    m_parentId = 0;
 
-    m_rectype = kNotRecording;
-    m_dupin = kDupsInAll;
-    m_dupmethod = kDupCheckSubThenDesc;
+    m_recType = kNotRecording;
+    m_dupIn = kDupsInAll;
+    m_dupMethod = kDupCheckSubThenDesc;
 
-    m_recordedid = 0;
-    m_inputname.clear();
-    m_bookmarkupdate = QDateTime();
+    m_recordedId = 0;
+    m_inputName.clear();
+    m_bookmarkUpdate = QDateTime();
 
-    m_sourceid = 0;
-    m_inputid = 0;
+    m_sourceId = 0;
+    m_inputId = 0;
 
-    m_findid = 0;
+    m_findId = 0;
 
-    m_programflags = FL_NONE;
+    m_programFlags = FL_NONE;
     m_properties = 0;
 
     // everything below this line is not serialized
@@ -1049,8 +1049,8 @@ bool ProgramInfo::operator==(const ProgramInfo& rhs)
         (m_description != rhs.m_description) ||
         (m_season != rhs.m_season) ||
         (m_episode != rhs.m_episode) ||
-        (m_totalepisodes != rhs.m_totalepisodes) ||
-        (m_syndicatedepisode != rhs.m_syndicatedepisode) ||
+        (m_totalEpisodes != rhs.m_totalEpisodes) ||
+        (m_syndicatedEpisode != rhs.m_syndicatedEpisode) ||
         (m_category != rhs.m_category)
 #if 0
         || (m_director != rhs.m_director)
@@ -1058,79 +1058,79 @@ bool ProgramInfo::operator==(const ProgramInfo& rhs)
         )
         return false;
 
-    if (m_recpriority != rhs.m_recpriority)
+    if (m_recPriority != rhs.m_recPriority)
         return false;
 
-    if ((m_chanid != rhs.m_chanid) ||
-        (m_chanstr != rhs.m_chanstr) ||
-        (m_chansign != rhs.m_chansign) ||
-        (m_channame != rhs.m_channame) ||
-        (m_chanplaybackfilters != rhs.m_chanplaybackfilters))
+    if ((m_chanId != rhs.m_chanId) ||
+        (m_chanStr != rhs.m_chanStr) ||
+        (m_chanSign != rhs.m_chanSign) ||
+        (m_chanName != rhs.m_chanName) ||
+        (m_chanPlaybackFilters != rhs.m_chanPlaybackFilters))
         return false;
 
-    if (!qstringEqualOrDefault(m_recgroup, rhs.m_recgroup) ||
-        !qstringEqualOrDefault(m_playgroup, rhs.m_playgroup))
+    if (!qstringEqualOrDefault(m_recGroup, rhs.m_recGroup) ||
+        !qstringEqualOrDefault(m_playGroup, rhs.m_playGroup))
         return false;
 
     if (m_pathname != rhs.m_pathname)
         return false;
 
     if ((m_hostname != rhs.m_hostname) ||
-        !qstringEqualOrDefault(m_storagegroup, rhs.m_storagegroup))
+        !qstringEqualOrDefault(m_storageGroup, rhs.m_storageGroup))
         return false;
 
-    if ((m_seriesid != rhs.m_seriesid) ||
-        (m_programid != rhs.m_programid) ||
-        (m_inetref != rhs.m_inetref) ||
+    if ((m_seriesId != rhs.m_seriesId) ||
+        (m_programId != rhs.m_programId) ||
+        (m_inetRef != rhs.m_inetRef) ||
         (m_catType != rhs.m_catType))
         return false;
 
-    if (m_filesize != rhs.m_filesize)
+    if (m_fileSize != rhs.m_fileSize)
         return false;
 
-    if ((m_startts != rhs.m_startts) ||
-        (m_endts != rhs.m_endts) ||
-        (m_recstartts != rhs.m_recstartts) ||
-        (m_recendts != rhs.m_recendts))
+    if ((m_startTs != rhs.m_startTs) ||
+        (m_endTs != rhs.m_endTs) ||
+        (m_recStartTs != rhs.m_recStartTs) ||
+        (m_recEndTs != rhs.m_recEndTs))
         return false;
 
     if ((m_stars != rhs.m_stars) ||
         (m_originalAirDate != rhs.m_originalAirDate) ||
-        (m_lastmodified != rhs.m_lastmodified)
+        (m_lastModified != rhs.m_lastModified)
 #if 0
         || (m_lastInUseTime != rhs.m_lastInUseTime)
 #endif
         )
         return false;
 
-    if (m_recpriority2 != rhs.m_recpriority2)
+    if (m_recPriority2 != rhs.m_recPriority2)
         return false;
 
-    if ((m_recordid != rhs.m_recordid) ||
-        (m_parentid != rhs.m_parentid))
+    if ((m_recordId != rhs.m_recordId) ||
+        (m_parentId != rhs.m_parentId))
         return false;
 
-    if ((m_sourceid != rhs.m_sourceid) ||
-        (m_inputid != rhs.m_inputid) ||
-        (m_findid != rhs.m_findid))
+    if ((m_sourceId != rhs.m_sourceId) ||
+        (m_inputId != rhs.m_inputId) ||
+        (m_findId != rhs.m_findId))
         return false;
 
-    if ((m_programflags != rhs.m_programflags) ||
+    if ((m_programFlags != rhs.m_programFlags) ||
         (m_properties != rhs.m_properties) ||
         (m_year != rhs.m_year) ||
-        (m_partnumber != rhs.m_partnumber) ||
-        (m_parttotal != rhs.m_parttotal))
+        (m_partNumber != rhs.m_partNumber) ||
+        (m_partTotal != rhs.m_partTotal))
         return false;
 
-    if ((m_recstatus != rhs.m_recstatus) ||
-        (m_rectype != rhs.m_rectype) ||
-        (m_dupin != rhs.m_dupin) ||
-        (m_dupmethod != rhs.m_dupmethod))
+    if ((m_recStatus != rhs.m_recStatus) ||
+        (m_recType != rhs.m_recType) ||
+        (m_dupIn != rhs.m_dupIn) ||
+        (m_dupMethod != rhs.m_dupMethod))
         return false;
 
-    if ((m_recordedid != rhs.m_recordedid) ||
-        (m_inputname != rhs.m_inputname) ||
-        (m_bookmarkupdate != rhs.m_bookmarkupdate))
+    if ((m_recordedId != rhs.m_recordedId) ||
+        (m_inputName != rhs.m_inputName) ||
+        (m_bookmarkUpdate != rhs.m_bookmarkUpdate))
         return false;
 
     return true;
@@ -1285,58 +1285,58 @@ void ProgramInfo::ToStringList(QStringList &list) const
     STR_TO_LIST(m_description);  // 2
     INT_TO_LIST(m_season);       // 3
     INT_TO_LIST(m_episode);      // 4
-    INT_TO_LIST(m_totalepisodes); // 5
-    STR_TO_LIST(m_syndicatedepisode); // 6
+    INT_TO_LIST(m_totalEpisodes); // 5
+    STR_TO_LIST(m_syndicatedEpisode); // 6
     STR_TO_LIST(m_category);     // 7
-    INT_TO_LIST(m_chanid);       // 8
-    STR_TO_LIST(m_chanstr);      // 9
-    STR_TO_LIST(m_chansign);     // 10
-    STR_TO_LIST(m_channame);     // 11
+    INT_TO_LIST(m_chanId);       // 8
+    STR_TO_LIST(m_chanStr);      // 9
+    STR_TO_LIST(m_chanSign);     // 10
+    STR_TO_LIST(m_chanName);     // 11
     STR_TO_LIST(m_pathname);     // 12
-    INT_TO_LIST(m_filesize);     // 13
+    INT_TO_LIST(m_fileSize);     // 13
 
-    DATETIME_TO_LIST(m_startts); // 14
-    DATETIME_TO_LIST(m_endts);   // 15
-    INT_TO_LIST(m_findid);       // 16
+    DATETIME_TO_LIST(m_startTs); // 14
+    DATETIME_TO_LIST(m_endTs);   // 15
+    INT_TO_LIST(m_findId);       // 16
     STR_TO_LIST(m_hostname);     // 17
-    INT_TO_LIST(m_sourceid);     // 18
-    INT_TO_LIST(m_inputid);      // 19 (m_formerly cardid)
-    INT_TO_LIST(m_inputid);      // 20
-    INT_TO_LIST(m_recpriority);  // 21
-    INT_TO_LIST(m_recstatus);    // 22
-    INT_TO_LIST(m_recordid);     // 23
+    INT_TO_LIST(m_sourceId);     // 18
+    INT_TO_LIST(m_inputId);      // 19 (m_formerly cardid)
+    INT_TO_LIST(m_inputId);      // 20
+    INT_TO_LIST(m_recPriority);  // 21
+    INT_TO_LIST(m_recStatus);    // 22
+    INT_TO_LIST(m_recordId);     // 23
 
-    INT_TO_LIST(m_rectype);      // 24
-    INT_TO_LIST(m_dupin);        // 25
-    INT_TO_LIST(m_dupmethod);    // 26
-    DATETIME_TO_LIST(m_recstartts);//27
-    DATETIME_TO_LIST(m_recendts);// 28
-    INT_TO_LIST(m_programflags); // 29
-    STR_TO_LIST(!m_recgroup.isEmpty() ? m_recgroup : "Default"); // 30
-    STR_TO_LIST(m_chanplaybackfilters); // 31
-    STR_TO_LIST(m_seriesid);     // 32
-    STR_TO_LIST(m_programid);    // 33
-    STR_TO_LIST(m_inetref);      // 34
+    INT_TO_LIST(m_recType);      // 24
+    INT_TO_LIST(m_dupIn);        // 25
+    INT_TO_LIST(m_dupMethod);    // 26
+    DATETIME_TO_LIST(m_recStartTs);//27
+    DATETIME_TO_LIST(m_recEndTs);// 28
+    INT_TO_LIST(m_programFlags); // 29
+    STR_TO_LIST(!m_recGroup.isEmpty() ? m_recGroup : "Default"); // 30
+    STR_TO_LIST(m_chanPlaybackFilters); // 31
+    STR_TO_LIST(m_seriesId);     // 32
+    STR_TO_LIST(m_programId);    // 33
+    STR_TO_LIST(m_inetRef);      // 34
 
-    DATETIME_TO_LIST(m_lastmodified); // 35
+    DATETIME_TO_LIST(m_lastModified); // 35
     FLOAT_TO_LIST(m_stars);           // 36
     DATE_TO_LIST(m_originalAirDate);  // 37
-    STR_TO_LIST((!m_playgroup.isEmpty()) ? m_playgroup : "Default"); // 38
-    INT_TO_LIST(m_recpriority2);      // 39
-    INT_TO_LIST(m_parentid);          // 40
-    STR_TO_LIST((!m_storagegroup.isEmpty()) ? m_storagegroup : "Default"); // 41
+    STR_TO_LIST((!m_playGroup.isEmpty()) ? m_playGroup : "Default"); // 38
+    INT_TO_LIST(m_recPriority2);      // 39
+    INT_TO_LIST(m_parentId);          // 40
+    STR_TO_LIST((!m_storageGroup.isEmpty()) ? m_storageGroup : "Default"); // 41
     INT_TO_LIST(GetAudioProperties()); // 42
     INT_TO_LIST(GetVideoProperties()); // 43
     INT_TO_LIST(GetSubtitleType());    // 44
 
     INT_TO_LIST(m_year);              // 45
-    INT_TO_LIST(m_partnumber);   // 46
-    INT_TO_LIST(m_parttotal);    // 47
+    INT_TO_LIST(m_partNumber);   // 46
+    INT_TO_LIST(m_partTotal);    // 47
     INT_TO_LIST(m_catType);      // 48
 
-    INT_TO_LIST(m_recordedid);          // 49
-    STR_TO_LIST(m_inputname);           // 50
-    DATETIME_TO_LIST(m_bookmarkupdate); // 51
+    INT_TO_LIST(m_recordedId);          // 49
+    STR_TO_LIST(m_inputName);           // 50
+    DATETIME_TO_LIST(m_bookmarkUpdate); // 51
 /* do not forget to update the NUMPROGRAMLINES defines! */
 }
 
@@ -1395,54 +1395,54 @@ bool ProgramInfo::FromStringList(QStringList::const_iterator &it,
     QString listerror = LOC + "FromStringList, not enough items in list.";
     QString ts;
 
-    uint      origChanid     = m_chanid;
-    QDateTime origRecstartts = m_recstartts;
+    uint      origChanid     = m_chanId;
+    QDateTime origRecstartts = m_recStartTs;
 
     STR_FROM_LIST(m_title);            // 0
     STR_FROM_LIST(m_subtitle);         // 1
     STR_FROM_LIST(m_description);      // 2
     INT_FROM_LIST(m_season);           // 3
     INT_FROM_LIST(m_episode);          // 4
-    INT_FROM_LIST(m_totalepisodes);    // 5
-    STR_FROM_LIST(m_syndicatedepisode); // 6
+    INT_FROM_LIST(m_totalEpisodes);    // 5
+    STR_FROM_LIST(m_syndicatedEpisode); // 6
     STR_FROM_LIST(m_category);         // 7
-    INT_FROM_LIST(m_chanid);           // 8
-    STR_FROM_LIST(m_chanstr);          // 9
-    STR_FROM_LIST(m_chansign);         // 10
-    STR_FROM_LIST(m_channame);         // 11
+    INT_FROM_LIST(m_chanId);           // 8
+    STR_FROM_LIST(m_chanStr);          // 9
+    STR_FROM_LIST(m_chanSign);         // 10
+    STR_FROM_LIST(m_chanName);         // 11
     STR_FROM_LIST(m_pathname);         // 12
-    INT_FROM_LIST(m_filesize);         // 13
+    INT_FROM_LIST(m_fileSize);         // 13
 
-    DATETIME_FROM_LIST(m_startts);     // 14
-    DATETIME_FROM_LIST(m_endts);       // 15
-    INT_FROM_LIST(m_findid);           // 16
+    DATETIME_FROM_LIST(m_startTs);     // 14
+    DATETIME_FROM_LIST(m_endTs);       // 15
+    INT_FROM_LIST(m_findId);           // 16
     STR_FROM_LIST(m_hostname);         // 17
-    INT_FROM_LIST(m_sourceid);         // 18
+    INT_FROM_LIST(m_sourceId);         // 18
     NEXT_STR();                      // 19 (formerly cardid)
-    INT_FROM_LIST(m_inputid);          // 20
-    INT_FROM_LIST(m_recpriority);      // 21
-    ENUM_FROM_LIST(m_recstatus, RecStatus::Type); // 22
-    INT_FROM_LIST(m_recordid);         // 23
+    INT_FROM_LIST(m_inputId);          // 20
+    INT_FROM_LIST(m_recPriority);      // 21
+    ENUM_FROM_LIST(m_recStatus, RecStatus::Type); // 22
+    INT_FROM_LIST(m_recordId);         // 23
 
-    ENUM_FROM_LIST(m_rectype, RecordingType);            // 24
-    ENUM_FROM_LIST(m_dupin, RecordingDupInType);         // 25
-    ENUM_FROM_LIST(m_dupmethod, RecordingDupMethodType); // 26
-    DATETIME_FROM_LIST(m_recstartts);   // 27
-    DATETIME_FROM_LIST(m_recendts);     // 28
-    INT_FROM_LIST(m_programflags);      // 29
-    STR_FROM_LIST(m_recgroup);          // 30
-    STR_FROM_LIST(m_chanplaybackfilters);//31
-    STR_FROM_LIST(m_seriesid);          // 32
-    STR_FROM_LIST(m_programid);         // 33
-    STR_FROM_LIST(m_inetref);           // 34
+    ENUM_FROM_LIST(m_recType, RecordingType);            // 24
+    ENUM_FROM_LIST(m_dupIn, RecordingDupInType);         // 25
+    ENUM_FROM_LIST(m_dupMethod, RecordingDupMethodType); // 26
+    DATETIME_FROM_LIST(m_recStartTs);   // 27
+    DATETIME_FROM_LIST(m_recEndTs);     // 28
+    INT_FROM_LIST(m_programFlags);      // 29
+    STR_FROM_LIST(m_recGroup);          // 30
+    STR_FROM_LIST(m_chanPlaybackFilters);//31
+    STR_FROM_LIST(m_seriesId);          // 32
+    STR_FROM_LIST(m_programId);         // 33
+    STR_FROM_LIST(m_inetRef);           // 34
 
-    DATETIME_FROM_LIST(m_lastmodified); // 35
+    DATETIME_FROM_LIST(m_lastModified); // 35
     FLOAT_FROM_LIST(m_stars);           // 36
     DATE_FROM_LIST(m_originalAirDate);; // 37
-    STR_FROM_LIST(m_playgroup);         // 38
-    INT_FROM_LIST(m_recpriority2);      // 39
-    INT_FROM_LIST(m_parentid);          // 40
-    STR_FROM_LIST(m_storagegroup);      // 41
+    STR_FROM_LIST(m_playGroup);         // 38
+    INT_FROM_LIST(m_recPriority2);      // 39
+    INT_FROM_LIST(m_parentId);          // 40
+    STR_FROM_LIST(m_storageGroup);      // 41
     uint audioproperties = 0;
     uint videoproperties = 0;
     uint subtitleType = 0;
@@ -1454,16 +1454,16 @@ bool ProgramInfo::FromStringList(QStringList::const_iterator &it,
                     (audioproperties << kAudioPropertyOffset));
 
     INT_FROM_LIST(m_year);              // 45
-    INT_FROM_LIST(m_partnumber);        // 46
-    INT_FROM_LIST(m_parttotal);         // 47
+    INT_FROM_LIST(m_partNumber);        // 46
+    INT_FROM_LIST(m_partTotal);         // 47
     ENUM_FROM_LIST(m_catType, CategoryType); // 48
 
-    INT_FROM_LIST(m_recordedid);          // 49
-    STR_FROM_LIST(m_inputname);           // 50
-    DATETIME_FROM_LIST(m_bookmarkupdate); // 51
+    INT_FROM_LIST(m_recordedId);          // 49
+    STR_FROM_LIST(m_inputName);           // 50
+    DATETIME_FROM_LIST(m_bookmarkUpdate); // 51
 
     if (!origChanid || !origRecstartts.isValid() ||
-        (origChanid != m_chanid) || (origRecstartts != m_recstartts))
+        (origChanid != m_chanId) || (origRecstartts != m_recStartTs))
     {
         m_availableStatus = asAvailable;
         m_spread = -1;
@@ -1518,7 +1518,7 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     {
         progMap["season"] = format_season_and_episode(m_season, 1);
         progMap["episode"] = format_season_and_episode(m_episode, 1);
-        progMap["totalepisodes"] = format_season_and_episode(m_totalepisodes, 1);
+        progMap["totalepisodes"] = format_season_and_episode(m_totalEpisodes, 1);
         progMap["s00e00"] = QString("s%1e%2")
             .arg(format_season_and_episode(GetSeason(), 2))
             .arg(format_season_and_episode(GetEpisode(), 2));
@@ -1532,14 +1532,14 @@ void ProgramInfo::ToMap(InfoMap &progMap,
         progMap["totalepisodes"] = "";
         progMap["s00e00"] = progMap["00x00"] = "";
     }
-    progMap["syndicatedepisode"] = m_syndicatedepisode;
+    progMap["syndicatedepisode"] = m_syndicatedEpisode;
 
     progMap["category"] = m_category;
     progMap["director"] = m_director;
 
-    progMap["callsign"] = m_chansign;
-    progMap["commfree"] = (m_programflags & FL_CHANCOMMFREE) ? 1 : 0;
-    progMap["outputfilters"] = m_chanplaybackfilters;
+    progMap["callsign"] = m_chanSign;
+    progMap["commfree"] = (m_programFlags & FL_CHANCOMMFREE) ? 1 : 0;
+    progMap["outputfilters"] = m_chanPlaybackFilters;
     if (IsVideo())
     {
         progMap["starttime"] = "";
@@ -1551,82 +1551,82 @@ void ProgramInfo::ToMap(InfoMap &progMap,
         progMap["recendtime"] = "";
         progMap["recenddate"] = "";
 
-        if (m_startts.date().year() == 1895)
+        if (m_startTs.date().year() == 1895)
         {
            progMap["startdate"] = "";
            progMap["recstartdate"] = "";
         }
         else
         {
-            progMap["startdate"] = m_startts.toLocalTime().toString("yyyy");
-            progMap["recstartdate"] = m_startts.toLocalTime().toString("yyyy");
+            progMap["startdate"] = m_startTs.toLocalTime().toString("yyyy");
+            progMap["recstartdate"] = m_startTs.toLocalTime().toString("yyyy");
         }
     }
     else // if (IsRecording())
     {
         using namespace MythDate;
-        progMap["starttime"] = MythDate::toString(m_startts, kTime);
+        progMap["starttime"] = MythDate::toString(m_startTs, kTime);
         progMap["startdate"] =
-            MythDate::toString(m_startts, kDateFull | kSimplify);
-        progMap["shortstartdate"] = MythDate::toString(m_startts, kDateShort);
-        progMap["endtime"] = MythDate::toString(m_endts, kTime);
-        progMap["enddate"] = MythDate::toString(m_endts, kDateFull | kSimplify);
-        progMap["shortenddate"] = MythDate::toString(m_endts, kDateShort);
-        progMap["recstarttime"] = MythDate::toString(m_recstartts, kTime);
-        progMap["recstartdate"] = MythDate::toString(m_recstartts, kDateShort);
-        progMap["recendtime"] = MythDate::toString(m_recendts, kTime);
-        progMap["recenddate"] = MythDate::toString(m_recendts, kDateShort);
+            MythDate::toString(m_startTs, kDateFull | kSimplify);
+        progMap["shortstartdate"] = MythDate::toString(m_startTs, kDateShort);
+        progMap["endtime"] = MythDate::toString(m_endTs, kTime);
+        progMap["enddate"] = MythDate::toString(m_endTs, kDateFull | kSimplify);
+        progMap["shortenddate"] = MythDate::toString(m_endTs, kDateShort);
+        progMap["recstarttime"] = MythDate::toString(m_recStartTs, kTime);
+        progMap["recstartdate"] = MythDate::toString(m_recStartTs, kDateShort);
+        progMap["recendtime"] = MythDate::toString(m_recEndTs, kTime);
+        progMap["recenddate"] = MythDate::toString(m_recEndTs, kDateShort);
 #if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-        progMap["startts"] = QString::number(m_startts.toTime_t());
-        progMap["endts"]   = QString::number(m_endts.toTime_t());
+        progMap["startts"] = QString::number(m_startTs.toTime_t());
+        progMap["endts"]   = QString::number(m_endTs.toTime_t());
 #else
-        progMap["startts"] = QString::number(m_startts.toSecsSinceEpoch());
-        progMap["endts"]   = QString::number(m_endts.toSecsSinceEpoch());
+        progMap["startts"] = QString::number(m_startTs.toSecsSinceEpoch());
+        progMap["endts"]   = QString::number(m_endTs.toSecsSinceEpoch());
 #endif
         if (timeNow.toLocalTime().date().year() !=
-            m_startts.toLocalTime().date().year())
-            progMap["startyear"] = m_startts.toLocalTime().toString("yyyy");
+            m_startTs.toLocalTime().date().year())
+            progMap["startyear"] = m_startTs.toLocalTime().toString("yyyy");
         if (timeNow.toLocalTime().date().year() !=
-            m_endts.toLocalTime().date().year())
-            progMap["endyear"] = m_endts.toLocalTime().toString("yyyy");
+            m_endTs.toLocalTime().date().year())
+            progMap["endyear"] = m_endTs.toLocalTime().toString("yyyy");
     }
 
     using namespace MythDate;
     progMap["timedate"] =
-        MythDate::toString(m_recstartts, kDateTimeFull | kSimplify) + " - " +
-        MythDate::toString(m_recendts, kTime);
+        MythDate::toString(m_recStartTs, kDateTimeFull | kSimplify) + " - " +
+        MythDate::toString(m_recEndTs, kTime);
 
     progMap["shorttimedate"] =
-        MythDate::toString(m_recstartts, kDateTimeShort | kSimplify) + " - " +
-        MythDate::toString(m_recendts, kTime);
+        MythDate::toString(m_recStartTs, kDateTimeShort | kSimplify) + " - " +
+        MythDate::toString(m_recEndTs, kTime);
 
     progMap["starttimedate"] =
-        MythDate::toString(m_recstartts, kDateTimeFull | kSimplify);
+        MythDate::toString(m_recStartTs, kDateTimeFull | kSimplify);
 
     progMap["shortstarttimedate"] =
-        MythDate::toString(m_recstartts, kDateTimeShort | kSimplify);
+        MythDate::toString(m_recStartTs, kDateTimeShort | kSimplify);
 
-    progMap["lastmodifiedtime"] = MythDate::toString(m_lastmodified, kTime);
+    progMap["lastmodifiedtime"] = MythDate::toString(m_lastModified, kTime);
     progMap["lastmodifieddate"] =
-        MythDate::toString(m_lastmodified, kDateFull | kSimplify);
+        MythDate::toString(m_lastModified, kDateFull | kSimplify);
     progMap["lastmodified"] =
-        MythDate::toString(m_lastmodified, kDateTimeFull | kSimplify);
+        MythDate::toString(m_lastModified, kDateTimeFull | kSimplify);
 
-    if (m_recordedid)
-        progMap["recordedid"] = m_recordedid;
+    if (m_recordedId)
+        progMap["recordedid"] = m_recordedId;
 
-    progMap["channum"] = m_chanstr;
-    progMap["chanid"] = m_chanid;
-    progMap["channame"] = m_channame;
+    progMap["channum"] = m_chanStr;
+    progMap["chanid"] = m_chanId;
+    progMap["channame"] = m_chanName;
     progMap["channel"] = ChannelText(channelFormat);
     progMap["longchannel"] = ChannelText(longChannelFormat);
 
-    QString tmpSize = locale.toString(m_filesize * (1.0 / (1024.0 * 1024.0 * 1024.0)), 'f', 2);
+    QString tmpSize = locale.toString(m_fileSize * (1.0 / (1024.0 * 1024.0 * 1024.0)), 'f', 2);
     progMap["filesize_str"] = QObject::tr("%1 GB", "GigaBytes").arg(tmpSize);
 
-    progMap["filesize"] = locale.toString((quint64)m_filesize);
+    progMap["filesize"] = locale.toString((quint64)m_fileSize);
 
-    int seconds = m_recstartts.secsTo(m_recendts);
+    int seconds = m_recStartTs.secsTo(m_recEndTs);
     int minutes = seconds / 60;
 
     QString min_str = QObject::tr("%n minute(s)","",minutes);
@@ -1653,12 +1653,12 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     QString tmp_rec = progMap["rectype"];
     if (GetRecordingRuleType() != kNotRecording)
     {
-        if (((m_recendts > timeNow) && (m_recstatus <= RecStatus::WillRecord)) ||
-            (m_recstatus == RecStatus::Conflict) || (m_recstatus == RecStatus::LaterShowing))
+        if (((m_recEndTs > timeNow) && (m_recStatus <= RecStatus::WillRecord)) ||
+            (m_recStatus == RecStatus::Conflict) || (m_recStatus == RecStatus::LaterShowing))
         {
-            tmp_rec += QString().sprintf(" %+d", m_recpriority);
-            if (m_recpriority2)
-                tmp_rec += QString().sprintf("/%+d", m_recpriority2);
+            tmp_rec += QString().sprintf(" %+d", m_recPriority);
+            if (m_recPriority2)
+                tmp_rec += QString().sprintf("/%+d", m_recPriority2);
             tmp_rec += " ";
         }
         else
@@ -1677,26 +1677,26 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     }
     progMap["rectypestatus"] = tmp_rec;
 
-    progMap["card"] = RecStatus::toString(GetRecordingStatus(), m_inputid);
+    progMap["card"] = RecStatus::toString(GetRecordingStatus(), m_inputId);
     progMap["input"] = RecStatus::toString(GetRecordingStatus(),
                                            GetShortInputName());
-    progMap["inputname"] = m_inputname;
+    progMap["inputname"] = m_inputName;
     // Don't add bookmarkupdate to progMap, for now.
 
-    progMap["recpriority"] = m_recpriority;
-    progMap["recpriority2"] = m_recpriority2;
-    progMap["recordinggroup"] = (m_recgroup == "Default")
-        ? QObject::tr("Default") : m_recgroup;
-    progMap["playgroup"] = m_playgroup;
+    progMap["recpriority"] = m_recPriority;
+    progMap["recpriority2"] = m_recPriority2;
+    progMap["recordinggroup"] = (m_recGroup == "Default")
+        ? QObject::tr("Default") : m_recGroup;
+    progMap["playgroup"] = m_playGroup;
 
-    if (m_storagegroup == "Default")
+    if (m_storageGroup == "Default")
         progMap["storagegroup"] = QObject::tr("Default");
-    else if (StorageGroup::kSpecialGroups.contains(m_storagegroup))
-        progMap["storagegroup"] = QObject::tr(m_storagegroup.toUtf8().constData());
+    else if (StorageGroup::kSpecialGroups.contains(m_storageGroup))
+        progMap["storagegroup"] = QObject::tr(m_storageGroup.toUtf8().constData());
     else
-        progMap["storagegroup"] = m_storagegroup;
+        progMap["storagegroup"] = m_storageGroup;
 
-    progMap["programflags"] = m_programflags;
+    progMap["programflags"] = m_programFlags;
 
     progMap["audioproperties"] = GetAudioProperties();
     progMap["videoproperties"] = GetVideoProperties();
@@ -1727,15 +1727,15 @@ void ProgramInfo::ToMap(InfoMap &progMap,
         progMap["longrepeat"] = "";
     }
 
-    progMap["seriesid"] = m_seriesid;
-    progMap["programid"] = m_programid;
-    progMap["inetref"] = m_inetref;
+    progMap["seriesid"] = m_seriesId;
+    progMap["programid"] = m_programId;
+    progMap["inetref"] = m_inetRef;
     progMap["catType"] = myth_category_type_to_string(m_catType);
 
     progMap["year"] = m_year > 1895 ? QString::number(m_year) : "";
 
-    progMap["partnumber"] = m_partnumber ? QString::number(m_partnumber) : "";
-    progMap["parttotal"] = m_parttotal ? QString::number(m_parttotal) : "";
+    progMap["partnumber"] = m_partNumber ? QString::number(m_partNumber) : "";
+    progMap["parttotal"] = m_partTotal ? QString::number(m_partTotal) : "";
 
     QString star_str = (m_stars != 0.0F) ?
         QObject::tr("%n star(s)", "", GetStars(star_range)) : "";
@@ -1752,7 +1752,7 @@ void ProgramInfo::ToMap(InfoMap &progMap,
         progMap["yearstars"] = "";
 
     if (!m_originalAirDate.isValid() ||
-        (!m_programid.isEmpty() && m_programid.startsWith("MV")))
+        (!m_programId.isEmpty() && m_programId.startsWith("MV")))
     {
         progMap["originalairdate"] = "";
         progMap["shortoriginalairdate"] = "";
@@ -1805,8 +1805,8 @@ void ProgramInfo::ToMap(InfoMap &progMap,
 /// \brief Returns length of program/recording in seconds.
 uint ProgramInfo::GetSecondsInRecording(void) const
 {
-    int64_t recsecs = m_recstartts.secsTo(m_endts);
-    int64_t duration = m_startts.secsTo(m_endts);
+    int64_t recsecs = m_recStartTs.secsTo(m_endTs);
+    int64_t duration = m_startTs.secsTo(m_endTs);
     return (uint) ((recsecs>0) ? recsecs : max(duration,int64_t(0)));
 }
 
@@ -1840,9 +1840,9 @@ uint64_t ProgramInfo::QueryLastFrameInPosMap(void) const
 bool ProgramInfo::IsGeneric(void) const
 {
     return
-        (m_programid.isEmpty() && m_subtitle.isEmpty() &&
+        (m_programId.isEmpty() && m_subtitle.isEmpty() &&
          m_description.isEmpty()) ||
-        (!m_programid.isEmpty() && m_programid.endsWith("0000")
+        (!m_programId.isEmpty() && m_programId.endsWith("0000")
          && m_catType == kCategorySeries);
 }
 
@@ -1853,10 +1853,10 @@ QString ProgramInfo::toString(const Verbosity v, const QString& sep, const QStri
     switch (v)
     {
         case kLongDescription:
-            str = LOC + "channame(" + m_channame + ") startts(" +
-                m_startts.toString() + ") endts(" + m_endts.toString() + ")\n";
-            str += "             recstartts(" + m_recstartts.toString() +
-                ") recendts(" + m_recendts.toString() + ")\n";
+            str = LOC + "channame(" + m_chanName + ") startts(" +
+                m_startTs.toString() + ") endts(" + m_endTs.toString() + ")\n";
+            str += "             recstartts(" + m_recStartTs.toString() +
+                ") recendts(" + m_recEndTs.toString() + ")\n";
             str += "             title(" + m_title + ")";
             break;
         case kTitleSubtitle:
@@ -1885,7 +1885,7 @@ QString ProgramInfo::toString(const Verbosity v, const QString& sep, const QStri
 
 bool ProgramInfo::Reload(void)
 {
-    ProgramInfo test(m_chanid, m_recstartts);
+    ProgramInfo test(m_chanId, m_recStartTs);
     if (test.GetChanID())
     {
         clone(test, true);
@@ -1927,18 +1927,18 @@ bool ProgramInfo::LoadProgramFromRecorded(
         return false;
     }
 
-    bool is_reload = (m_chanid == _chanid) && (m_recstartts == _recstartts);
+    bool is_reload = (m_chanId == _chanid) && (m_recStartTs == _recstartts);
     if (!is_reload)
     {
         // These items are not initialized below so they need to be cleared
         // if we're loading in a different program into this ProgramInfo
         m_catType = kCategoryNone;
         m_lastInUseTime = MythDate::current().addSecs(-4 * 60 * 60);
-        m_rectype = kNotRecording;
-        m_recpriority2 = 0;
-        m_parentid = 0;
-        m_sourceid = 0;
-        m_inputid = 0;
+        m_recType = kNotRecording;
+        m_recPriority2 = 0;
+        m_parentId = 0;
+        m_sourceId = 0;
+        m_inputId = 0;
 
         // everything below this line (in context) is not serialized
         m_spread = m_startCol = -1;
@@ -1956,25 +1956,25 @@ bool ProgramInfo::LoadProgramFromRecorded(
     m_episode      = query.value(4).toUInt();
     if (m_episode == 0)
         m_episode  = query.value(52).toUInt();
-    m_totalepisodes = query.value(53).toUInt();
-    m_syndicatedepisode = query.value(48).toString();
+    m_totalEpisodes = query.value(53).toUInt();
+    m_syndicatedEpisode = query.value(48).toString();
     m_category     = query.value(5).toString();
 
-    m_chanid       = _chanid;
-    m_chanstr      = QString("#%1").arg(m_chanid);
-    m_chansign     = m_chanstr;
-    m_channame     = m_chanstr;
-    m_chanplaybackfilters.clear();
+    m_chanId       = _chanid;
+    m_chanStr      = QString("#%1").arg(m_chanId);
+    m_chanSign     = m_chanStr;
+    m_chanName     = m_chanStr;
+    m_chanPlaybackFilters.clear();
     if (!query.value(7).toString().isEmpty())
     {
-        m_chanstr  = query.value(7).toString();
-        m_chansign = query.value(8).toString();
-        m_channame = query.value(9).toString();
-        m_chanplaybackfilters = query.value(10).toString();
+        m_chanStr  = query.value(7).toString();
+        m_chanSign = query.value(8).toString();
+        m_chanName = query.value(9).toString();
+        m_chanPlaybackFilters = query.value(10).toString();
     }
 
-    m_recgroup     = query.value(11).toString();
-    m_playgroup    = query.value(12).toString();
+    m_recGroup     = query.value(11).toString();
+    m_playGroup    = query.value(12).toString();
 
     // We don't want to update the pathname if the basename is
     // the same as we may have already expanded pathname from
@@ -1992,73 +1992,73 @@ bool ProgramInfo::LoadProgramFromRecorded(
     }
 
     m_hostname     = query.value(15).toString();
-    m_storagegroup = query.value(13).toString();
+    m_storageGroup = query.value(13).toString();
 
-    m_seriesid     = query.value(17).toString();
-    m_programid    = query.value(18).toString();
-    m_inetref      = query.value(19).toString();
+    m_seriesId     = query.value(17).toString();
+    m_programId    = query.value(18).toString();
+    m_inetRef      = query.value(19).toString();
     m_catType      = string_to_myth_category_type(query.value(54).toString());
 
-    m_recpriority  = query.value(16).toInt();
+    m_recPriority  = query.value(16).toInt();
 
-    m_filesize     = query.value(20).toULongLong();
+    m_fileSize     = query.value(20).toULongLong();
 
-    m_startts      = MythDate::as_utc(query.value(21).toDateTime());
-    m_endts        = MythDate::as_utc(query.value(22).toDateTime());
-    m_recstartts   = MythDate::as_utc(query.value(24).toDateTime());
-    m_recendts     = MythDate::as_utc(query.value(25).toDateTime());
+    m_startTs      = MythDate::as_utc(query.value(21).toDateTime());
+    m_endTs        = MythDate::as_utc(query.value(22).toDateTime());
+    m_recStartTs   = MythDate::as_utc(query.value(24).toDateTime());
+    m_recEndTs     = MythDate::as_utc(query.value(25).toDateTime());
 
     m_stars        = clamp((float)query.value(23).toDouble(), 0.0F, 1.0F);
 
     m_year         = query.value(26).toUInt();
-    m_partnumber   = query.value(49).toUInt();
-    m_parttotal    = query.value(50).toUInt();
+    m_partNumber   = query.value(49).toUInt();
+    m_partTotal    = query.value(50).toUInt();
 
     m_originalAirDate = query.value(27).toDate();
-    m_lastmodified = MythDate::as_utc(query.value(28).toDateTime());
+    m_lastModified = MythDate::as_utc(query.value(28).toDateTime());
     /**///m_lastInUseTime;
 
-    m_recstatus    = RecStatus::Recorded;
+    m_recStatus    = RecStatus::Recorded;
 
-    /**///m_recpriority2;
+    /**///m_recPriority2;
 
-    m_recordid     = query.value(29).toUInt();
-    /**///m_parentid;
+    m_recordId     = query.value(29).toUInt();
+    /**///m_parentId;
 
     /**///m_sourcid;
-    /**///m_inputid;
+    /**///m_inputId;
     /**///m_cardid;
-    m_findid       = query.value(45).toUInt();
+    m_findId       = query.value(45).toUInt();
 
-    /**///m_rectype;
-    m_dupin        = RecordingDupInType(query.value(46).toInt());
-    m_dupmethod    = RecordingDupMethodType(query.value(47).toInt());
+    /**///m_recType;
+    m_dupIn        = RecordingDupInType(query.value(46).toInt());
+    m_dupMethod    = RecordingDupMethodType(query.value(47).toInt());
 
-    m_recordedid   = query.value(55).toUInt();
-    m_inputname    = query.value(56).toString();
-    m_bookmarkupdate = MythDate::as_utc(query.value(57).toDateTime());
+    m_recordedId   = query.value(55).toUInt();
+    m_inputName    = query.value(56).toString();
+    m_bookmarkUpdate = MythDate::as_utc(query.value(57).toDateTime());
 
     // ancillary data -- begin
-    m_programflags = FL_NONE;
-    set_flag(m_programflags, FL_CHANCOMMFREE,
+    m_programFlags = FL_NONE;
+    set_flag(m_programFlags, FL_CHANCOMMFREE,
              query.value(30).toInt() == COMM_DETECT_COMMFREE);
-    set_flag(m_programflags, FL_COMMFLAG,
+    set_flag(m_programFlags, FL_COMMFLAG,
              query.value(31).toInt() == COMM_FLAG_DONE);
-    set_flag(m_programflags, FL_COMMPROCESSING ,
+    set_flag(m_programFlags, FL_COMMPROCESSING ,
              query.value(31).toInt() == COMM_FLAG_PROCESSING);
-    set_flag(m_programflags, FL_REPEAT,        query.value(32).toBool());
-    set_flag(m_programflags, FL_TRANSCODED,
+    set_flag(m_programFlags, FL_REPEAT,        query.value(32).toBool());
+    set_flag(m_programFlags, FL_TRANSCODED,
              query.value(34).toInt() == TRANSCODING_COMPLETE);
-    set_flag(m_programflags, FL_DELETEPENDING, query.value(35).toBool());
-    set_flag(m_programflags, FL_PRESERVED,     query.value(36).toBool());
-    set_flag(m_programflags, FL_CUTLIST,       query.value(37).toBool());
-    set_flag(m_programflags, FL_AUTOEXP,       query.value(38).toBool());
-    set_flag(m_programflags, FL_REALLYEDITING, query.value(39).toBool());
-    set_flag(m_programflags, FL_BOOKMARK,      query.value(40).toBool());
-    set_flag(m_programflags, FL_WATCHED,       query.value(41).toBool());
-    set_flag(m_programflags, FL_EDITING,
-             ((m_programflags & FL_REALLYEDITING) != 0U) ||
-             ((m_programflags & FL_COMMPROCESSING) != 0U));
+    set_flag(m_programFlags, FL_DELETEPENDING, query.value(35).toBool());
+    set_flag(m_programFlags, FL_PRESERVED,     query.value(36).toBool());
+    set_flag(m_programFlags, FL_CUTLIST,       query.value(37).toBool());
+    set_flag(m_programFlags, FL_AUTOEXP,       query.value(38).toBool());
+    set_flag(m_programFlags, FL_REALLYEDITING, query.value(39).toBool());
+    set_flag(m_programFlags, FL_BOOKMARK,      query.value(40).toBool());
+    set_flag(m_programFlags, FL_WATCHED,       query.value(41).toBool());
+    set_flag(m_programFlags, FL_EDITING,
+             ((m_programFlags & FL_REALLYEDITING) != 0U) ||
+             ((m_programFlags & FL_COMMPROCESSING) != 0U));
 
     m_properties = ((query.value(44).toUInt() << kSubtitlePropertyOffset) |
                     (query.value(43).toUInt() << kVideoPropertyOffset)    |
@@ -2085,8 +2085,8 @@ bool ProgramInfo::LoadProgramFromRecorded(
 bool ProgramInfo::IsSameProgramWeakCheck(const ProgramInfo &other) const
 {
     return (m_title == other.m_title &&
-            m_chanid == other.m_chanid &&
-            m_startts == other.m_startts);
+            m_chanId == other.m_chanId &&
+            m_startTs == other.m_startTs);
 }
 
 /**
@@ -2096,13 +2096,13 @@ bool ProgramInfo::IsSameProgramWeakCheck(const ProgramInfo &other) const
 bool ProgramInfo::IsDuplicateProgram(const ProgramInfo& other) const
 {
     if (GetRecordingRuleType() == kOneRecord)
-        return m_recordid == other.m_recordid;
+        return m_recordId == other.m_recordId;
 
-    if (m_findid && m_findid == other.m_findid &&
-        (m_recordid == other.m_recordid || m_recordid == other.m_parentid))
+    if (m_findId && m_findId == other.m_findId &&
+        (m_recordId == other.m_recordId || m_recordId == other.m_parentId))
            return true;
 
-    if (m_dupmethod & kDupCheckNone)
+    if (m_dupMethod & kDupCheckNone)
         return false;
 
     if (m_title.compare(other.m_title, Qt::CaseInsensitive) != 0)
@@ -2110,37 +2110,37 @@ bool ProgramInfo::IsDuplicateProgram(const ProgramInfo& other) const
 
     if (m_catType == kCategorySeries)
     {
-        if (m_programid.endsWith("0000"))
+        if (m_programId.endsWith("0000"))
             return false;
     }
 
-    if (!m_programid.isEmpty() && !other.m_programid.isEmpty())
+    if (!m_programId.isEmpty() && !other.m_programId.isEmpty())
     {
         if (s_usingProgIDAuth)
         {
-            int index = m_programid.indexOf('/');
-            int oindex = other.m_programid.indexOf('/');
+            int index = m_programId.indexOf('/');
+            int oindex = other.m_programId.indexOf('/');
             if (index == oindex && (index < 0 ||
-                m_programid.leftRef(index) == other.m_programid.leftRef(oindex)))
-                return m_programid == other.m_programid;
+                m_programId.leftRef(index) == other.m_programId.leftRef(oindex)))
+                return m_programId == other.m_programId;
         }
         else
         {
-            return m_programid == other.m_programid;
+            return m_programId == other.m_programId;
         }
     }
 
-    if ((m_dupmethod & kDupCheckSub) &&
+    if ((m_dupMethod & kDupCheckSub) &&
         ((m_subtitle.isEmpty()) ||
          (m_subtitle.compare(other.m_subtitle, Qt::CaseInsensitive) != 0)))
         return false;
 
-    if ((m_dupmethod & kDupCheckDesc) &&
+    if ((m_dupMethod & kDupCheckDesc) &&
         ((m_description.isEmpty()) ||
          (m_description.compare(other.m_description, Qt::CaseInsensitive) != 0)))
         return false;
 
-    if ((m_dupmethod & kDupCheckSubThenDesc) &&
+    if ((m_dupMethod & kDupCheckSubThenDesc) &&
         ((m_subtitle.isEmpty() &&
           ((!other.m_subtitle.isEmpty() &&
             m_description.compare(other.m_subtitle, Qt::CaseInsensitive) != 0) ||
@@ -2167,39 +2167,39 @@ bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
     if (m_title.compare(other.m_title, Qt::CaseInsensitive) != 0)
         return false;
 
-    if (!m_programid.isEmpty() && !other.m_programid.isEmpty())
+    if (!m_programId.isEmpty() && !other.m_programId.isEmpty())
     {
         if (m_catType == kCategorySeries)
         {
-            if (m_programid.endsWith("0000"))
+            if (m_programId.endsWith("0000"))
                 return false;
         }
 
         if (s_usingProgIDAuth)
         {
-            int index = m_programid.indexOf('/');
-            int oindex = other.m_programid.indexOf('/');
+            int index = m_programId.indexOf('/');
+            int oindex = other.m_programId.indexOf('/');
             if (index == oindex && (index < 0 ||
-                m_programid.leftRef(index) == other.m_programid.leftRef(oindex)))
-                return m_programid == other.m_programid;
+                m_programId.leftRef(index) == other.m_programId.leftRef(oindex)))
+                return m_programId == other.m_programId;
         }
         else
         {
-            return m_programid == other.m_programid;
+            return m_programId == other.m_programId;
         }
     }
 
-    if ((m_dupmethod & kDupCheckSub) &&
+    if ((m_dupMethod & kDupCheckSub) &&
         ((m_subtitle.isEmpty()) ||
          (m_subtitle.compare(other.m_subtitle, Qt::CaseInsensitive) != 0)))
         return false;
 
-    if ((m_dupmethod & kDupCheckDesc) &&
+    if ((m_dupMethod & kDupCheckDesc) &&
         ((m_description.isEmpty()) ||
          (m_description.compare(other.m_description, Qt::CaseInsensitive) != 0)))
         return false;
 
-    if ((m_dupmethod & kDupCheckSubThenDesc) &&
+    if ((m_dupMethod & kDupCheckSubThenDesc) &&
         ((m_subtitle.isEmpty() &&
           ((!other.m_subtitle.isEmpty() &&
             m_description.compare(other.m_subtitle, Qt::CaseInsensitive) != 0) ||
@@ -2222,7 +2222,7 @@ bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
  */
 bool ProgramInfo::IsSameProgramAndStartTime(const ProgramInfo& other) const
 {
-    if (m_startts != other.m_startts)
+    if (m_startTs != other.m_startTs)
         return false;
     if (IsSameChannel(other))
         return true;
@@ -2240,7 +2240,7 @@ bool ProgramInfo::IsSameTitleStartTimeAndChannel(const ProgramInfo& other) const
 {
     if (m_title.compare(other.m_title, Qt::CaseInsensitive) != 0)
         return false;
-    return m_startts == other.m_startts &&
+    return m_startTs == other.m_startTs &&
         IsSameChannel(other);
 }
 
@@ -2255,8 +2255,8 @@ bool ProgramInfo::IsSameTitleTimeslotAndChannel(const ProgramInfo &other) const
     if (m_title.compare(other.m_title, Qt::CaseInsensitive) != 0)
         return false;
     return IsSameChannel(other) &&
-        m_startts < other.m_endts &&
-        m_endts > other.m_startts;
+        m_startTs < other.m_endTs &&
+        m_endTs > other.m_startTs;
 }
 
 /**
@@ -2267,9 +2267,9 @@ bool ProgramInfo::IsSameTitleTimeslotAndChannel(const ProgramInfo &other) const
  */
 bool ProgramInfo::IsSameChannel(const ProgramInfo& other) const
 {
-    return m_chanid == other.m_chanid ||
-         (!m_chansign.isEmpty() &&
-          m_chansign.compare(other.m_chansign, Qt::CaseInsensitive) == 0);
+    return m_chanId == other.m_chanId ||
+         (!m_chanSign.isEmpty() &&
+          m_chanSign.compare(other.m_chanSign, Qt::CaseInsensitive) == 0);
 }
 
 void ProgramInfo::CheckProgramIDAuthorities(void)
@@ -2309,9 +2309,9 @@ void ProgramInfo::CheckProgramIDAuthorities(void)
  */
 QString ProgramInfo::CreateRecordBasename(const QString &ext) const
 {
-    QString starts = MythDate::toString(m_recstartts, MythDate::kFilename);
+    QString starts = MythDate::toString(m_recStartTs, MythDate::kFilename);
 
-    QString retval = QString("%1_%2.%3").arg(m_chanid)
+    QString retval = QString("%1_%2.%3").arg(m_chanId)
                              .arg(starts).arg(ext);
 
     return retval;
@@ -2357,13 +2357,13 @@ void ProgramInfo::SetPathname(const QString &pn)
 {
     m_pathname = pn;
 
-    ProgramInfoType pit = discover_program_info_type(m_chanid, m_pathname, false);
+    ProgramInfoType pit = discover_program_info_type(m_chanId, m_pathname, false);
     SetProgramInfoType(pit);
 }
 
 ProgramInfoType ProgramInfo::DiscoverProgramInfoType(void) const
 {
-    return discover_program_info_type(m_chanid, m_pathname, true);
+    return discover_program_info_type(m_chanId, m_pathname, true);
 }
 
 void ProgramInfo::SetAvailableStatus(
@@ -2389,7 +2389,7 @@ bool ProgramInfo::SaveBasename(const QString &basename)
     query.prepare("UPDATE recorded "
                   "SET basename = :BASENAME "
                   "WHERE recordedid = :RECORDEDID;");
-    query.bindValue(":RECORDEDID", m_recordedid);
+    query.bindValue(":RECORDEDID", m_recordedId);
     query.bindValue(":BASENAME", basename);
 
     if (!query.exec())
@@ -2401,7 +2401,7 @@ bool ProgramInfo::SaveBasename(const QString &basename)
     query.prepare("UPDATE recordedfile "
                   "SET basename = :BASENAME "
                   "WHERE recordedid = :RECORDEDID;");
-    query.bindValue(":RECORDEDID", m_recordedid);
+    query.bindValue(":RECORDEDID", m_recordedId);
     query.bindValue(":BASENAME", basename);
 
     if (!query.exec())
@@ -2434,7 +2434,7 @@ QString ProgramInfo::QueryBasename(void) const
         "SELECT basename "
         "FROM recordedfile "
         "WHERE recordedid = :RECORDEDID;");
-    query.bindValue(":RECORDEDID", m_recordedid);
+    query.bindValue(":RECORDEDID", m_recordedId);
 
     if (!query.exec())
     {
@@ -2448,7 +2448,7 @@ QString ProgramInfo::QueryBasename(void) const
     {
         LOG(VB_GENERAL, LOG_INFO,
                  QString("QueryBasename found no entry for recording ID %1")
-                     .arg(m_recordedid));
+                     .arg(m_recordedId));
     }
 
     return QString();
@@ -2507,7 +2507,7 @@ QString ProgramInfo::GetPlaybackURL(
     if (checklocal)
     {
         // Check to see if the file exists locally
-        StorageGroup sgroup(m_storagegroup);
+        StorageGroup sgroup(m_storageGroup);
 #if 0
         LOG(VB_FILE, LOG_DEBUG, LOC +
             QString("GetPlaybackURL: CHECKING SG : %1 : ").arg(tmpURL));
@@ -2562,13 +2562,13 @@ QString ProgramInfo::GetPlaybackURL(
 uint ProgramInfo::QueryMplexID(void) const
 {
     uint ret = 0U;
-    if (m_chanid)
+    if (m_chanId)
     {
         MSqlQuery query(MSqlQuery::InitCon());
 
         query.prepare("SELECT mplexid FROM channel "
                       "WHERE chanid = :CHANID");
-        query.bindValue(":CHANID", m_chanid);
+        query.bindValue(":CHANID", m_chanId);
 
         if (!query.exec())
             MythDB::DBError("QueryMplexID", query);
@@ -2596,7 +2596,7 @@ void ProgramInfo::SaveBookmark(uint64_t frame)
         SaveMarkupMap(bookmarkmap);
     }
 
-    set_flag(m_programflags, FL_BOOKMARK, is_valid);
+    set_flag(m_programFlags, FL_BOOKMARK, is_valid);
 
     if (IsRecording())
     {
@@ -2609,8 +2609,8 @@ void ProgramInfo::SaveBookmark(uint64_t frame)
             "      starttime = :STARTTIME");
 
         query.bindValue(":BOOKMARKFLAG", is_valid);
-        query.bindValue(":CHANID",       m_chanid);
-        query.bindValue(":STARTTIME",    m_recstartts);
+        query.bindValue(":CHANID",       m_chanId);
+        query.bindValue(":STARTTIME",    m_recStartTs);
 
         if (!query.exec())
             MythDB::DBError("bookmark flag update", query);
@@ -2621,17 +2621,17 @@ void ProgramInfo::SaveBookmark(uint64_t frame)
 
 void ProgramInfo::SendUpdateEvent(void)
 {
-    s_updater->insert(m_recordedid, kPIUpdate);
+    s_updater->insert(m_recordedId, kPIUpdate);
 }
 
 void ProgramInfo::SendAddedEvent(void) const
 {
-    s_updater->insert(m_recordedid, kPIAdd);
+    s_updater->insert(m_recordedId, kPIAdd);
 }
 
 void ProgramInfo::SendDeletedEvent(void) const
 {
-    s_updater->insert(m_recordedid, kPIDelete);
+    s_updater->insert(m_recordedId, kPIDelete);
 }
 
 /** \brief Queries Latest bookmark timestamp from the database.
@@ -2645,8 +2645,8 @@ QDateTime ProgramInfo::QueryBookmarkTimeStamp(void) const
         "FROM recorded "
         "WHERE chanid    = :CHANID AND"
         "      starttime = :STARTTIME");
-    query.bindValue(":CHANID",    m_chanid);
-    query.bindValue(":STARTTIME", m_recstartts);
+    query.bindValue(":CHANID",    m_chanId);
+    query.bindValue(":STARTTIME", m_recStartTs);
 
     QDateTime ts;
 
@@ -2666,7 +2666,7 @@ QDateTime ProgramInfo::QueryBookmarkTimeStamp(void) const
  */
 uint64_t ProgramInfo::QueryBookmark(void) const
 {
-    if (m_programflags & FL_IGNOREBOOKMARK)
+    if (m_programFlags & FL_IGNOREBOOKMARK)
         return 0;
 
     frm_dir_map_t bookmarkmap;
@@ -2693,7 +2693,7 @@ uint64_t ProgramInfo::QueryBookmark(uint chanid, const QDateTime &recstartts)
  */
 uint64_t ProgramInfo::QueryProgStart(void) const
 {
-    if (m_programflags & FL_IGNOREPROGSTART)
+    if (m_programFlags & FL_IGNOREPROGSTART)
         return 0;
 
     frm_dir_map_t bookmarkmap;
@@ -2710,7 +2710,7 @@ uint64_t ProgramInfo::QueryProgStart(void) const
  */
 uint64_t ProgramInfo::QueryLastPlayPos(void) const
 {
-    if (!(m_programflags & FL_ALLOWLASTPLAYPOS))
+    if (!(m_programFlags & FL_ALLOWLASTPLAYPOS))
         return 0;
 
     frm_dir_map_t bookmarkmap;
@@ -2730,7 +2730,7 @@ QStringList ProgramInfo::QueryDVDBookmark(
     QStringList fields = QStringList();
     MSqlQuery query(MSqlQuery::InitCon());
 
-    if (!(m_programflags & FL_IGNOREBOOKMARK))
+    if (!(m_programFlags & FL_IGNOREBOOKMARK))
     {
         query.prepare(" SELECT dvdstate, title, framenum, audionum, subtitlenum "
                         " FROM dvdbookmark "
@@ -2806,7 +2806,7 @@ QStringList ProgramInfo::QueryBDBookmark(const QString &serialid) const
     QStringList fields = QStringList();
     MSqlQuery query(MSqlQuery::InitCon());
 
-    if (!(m_programflags & FL_IGNOREBOOKMARK))
+    if (!(m_programFlags & FL_IGNOREBOOKMARK))
     {
         query.prepare(" SELECT bdstate FROM bdbookmark "
                         " WHERE serialid = :SERIALID ");
@@ -2876,8 +2876,8 @@ ProgramInfo::CategoryType ProgramInfo::QueryCategoryType(void) const
                   " WHERE chanid = :CHANID "
                   " AND starttime = :STARTTIME;");
 
-    query.bindValue(":CHANID", m_chanid);
-    query.bindValue(":STARTTIME", m_startts);
+    query.bindValue(":CHANID", m_chanId);
+    query.bindValue(":STARTTIME", m_startTs);
 
     if (query.exec() && query.next())
     {
@@ -2898,8 +2898,8 @@ void ProgramInfo::SaveWatched(bool watched)
                     " SET watched = :WATCHEDFLAG"
                     " WHERE chanid = :CHANID"
                     " AND starttime = :STARTTIME ;");
-        query.bindValue(":CHANID", m_chanid);
-        query.bindValue(":STARTTIME", m_recstartts);
+        query.bindValue(":CHANID", m_chanId);
+        query.bindValue(":STARTTIME", m_recStartTs);
         query.bindValue(":WATCHEDFLAG", watched);
 
         if (!query.exec())
@@ -2933,7 +2933,7 @@ void ProgramInfo::SaveWatched(bool watched)
             MythDB::DBError("Set watched flag", query);
     }
 
-    set_flag(m_programflags, FL_WATCHED, watched);
+    set_flag(m_programFlags, FL_WATCHED, watched);
 }
 
 /** \brief Queries "recorded" table for its "editing" field
@@ -2942,15 +2942,15 @@ void ProgramInfo::SaveWatched(bool watched)
  */
 bool ProgramInfo::QueryIsEditing(void) const
 {
-    bool editing = (m_programflags & FL_REALLYEDITING) != 0U;
+    bool editing = (m_programFlags & FL_REALLYEDITING) != 0U;
 
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT editing FROM recorded"
                   " WHERE chanid = :CHANID"
                   " AND starttime = :STARTTIME ;");
-    query.bindValue(":CHANID", m_chanid);
-    query.bindValue(":STARTTIME", m_recstartts);
+    query.bindValue(":CHANID", m_chanId);
+    query.bindValue(":STARTTIME", m_recStartTs);
 
     if (query.exec() && query.next())
         editing = query.value(0).toBool();
@@ -2975,15 +2975,15 @@ void ProgramInfo::SaveEditing(bool edit)
                   " WHERE chanid = :CHANID"
                   " AND starttime = :STARTTIME ;");
     query.bindValue(":EDIT", edit);
-    query.bindValue(":CHANID", m_chanid);
-    query.bindValue(":STARTTIME", m_recstartts);
+    query.bindValue(":CHANID", m_chanId);
+    query.bindValue(":STARTTIME", m_recStartTs);
 
     if (!query.exec())
         MythDB::DBError("Edit status update", query);
 
-    set_flag(m_programflags, FL_REALLYEDITING, edit);
-    set_flag(m_programflags, FL_EDITING, (((m_programflags & FL_REALLYEDITING) != 0U) ||
-                                          ((m_programflags & COMM_FLAG_PROCESSING) != 0U)));
+    set_flag(m_programFlags, FL_REALLYEDITING, edit);
+    set_flag(m_programFlags, FL_EDITING, (((m_programFlags & FL_REALLYEDITING) != 0U) ||
+                                          ((m_programFlags & COMM_FLAG_PROCESSING) != 0U)));
 
     SendUpdateEvent();
 }
@@ -3000,14 +3000,14 @@ void ProgramInfo::SaveDeletePendingFlag(bool deleteFlag)
                   "     duplicate = 0 "
                   " WHERE chanid = :CHANID"
                   " AND starttime = :STARTTIME ;");
-    query.bindValue(":CHANID", m_chanid);
-    query.bindValue(":STARTTIME", m_recstartts);
+    query.bindValue(":CHANID", m_chanId);
+    query.bindValue(":STARTTIME", m_recStartTs);
     query.bindValue(":DELETEFLAG", deleteFlag);
 
     if (!query.exec())
         MythDB::DBError("SaveDeletePendingFlag", query);
 
-    set_flag(m_programflags, FL_DELETEPENDING, deleteFlag);
+    set_flag(m_programFlags, FL_DELETEPENDING, deleteFlag);
 
     if (!deleteFlag)
         SendAddedEvent();
@@ -3031,8 +3031,8 @@ bool ProgramInfo::QueryIsInUse(QStringList &byWho) const
                   " WHERE chanid = :CHANID"
                   " AND starttime = :STARTTIME "
                   " AND lastupdatetime > :ONEHOURAGO ;");
-    query.bindValue(":CHANID", m_chanid);
-    query.bindValue(":STARTTIME", m_recstartts);
+    query.bindValue(":CHANID", m_chanId);
+    query.bindValue(":STARTTIME", m_recStartTs);
     query.bindValue(":ONEHOURAGO", oneHourAgo);
 
     byWho.clear();
@@ -3141,8 +3141,8 @@ TranscodingStatus ProgramInfo::QueryTranscodeStatus(void) const
     query.prepare("SELECT transcoded FROM recorded"
                  " WHERE chanid = :CHANID"
                  " AND starttime = :STARTTIME ;");
-    query.bindValue(":CHANID", m_chanid);
-    query.bindValue(":STARTTIME", m_recstartts);
+    query.bindValue(":CHANID", m_chanId);
+    query.bindValue(":STARTTIME", m_recStartTs);
 
     if (query.exec() && query.next())
         return (TranscodingStatus) query.value(0).toUInt();
@@ -3164,13 +3164,13 @@ void ProgramInfo::SaveTranscodeStatus(TranscodingStatus trans)
         "WHERE chanid    = :CHANID AND"
         "      starttime = :STARTTIME");
     query.bindValue(":VALUE", (uint)trans);
-    query.bindValue(":CHANID", m_chanid);
-    query.bindValue(":STARTTIME", m_recstartts);
+    query.bindValue(":CHANID", m_chanId);
+    query.bindValue(":STARTTIME", m_recStartTs);
 
     if (!query.exec())
         MythDB::DBError("Transcoded status update", query);
 
-    set_flag(m_programflags, FL_TRANSCODED, TRANSCODING_COMPLETE == trans);
+    set_flag(m_programFlags, FL_TRANSCODED, TRANSCODING_COMPLETE == trans);
     SendUpdateEvent();
 }
 
@@ -3186,16 +3186,16 @@ void ProgramInfo::SaveCommFlagged(CommFlagStatus flag)
                   " WHERE chanid = :CHANID"
                   " AND starttime = :STARTTIME ;");
     query.bindValue(":FLAG", (int)flag);
-    query.bindValue(":CHANID", m_chanid);
-    query.bindValue(":STARTTIME", m_recstartts);
+    query.bindValue(":CHANID", m_chanId);
+    query.bindValue(":STARTTIME", m_recStartTs);
 
     if (!query.exec())
         MythDB::DBError("Commercial Flagged status update", query);
 
-    set_flag(m_programflags, FL_COMMFLAG,       COMM_FLAG_DONE == flag);
-    set_flag(m_programflags, FL_COMMPROCESSING, COMM_FLAG_PROCESSING == flag);
-    set_flag(m_programflags, FL_EDITING, (((m_programflags & FL_REALLYEDITING) != 0U) ||
-                                          ((m_programflags & COMM_FLAG_PROCESSING) != 0U)));
+    set_flag(m_programFlags, FL_COMMFLAG,       COMM_FLAG_DONE == flag);
+    set_flag(m_programFlags, FL_COMMPROCESSING, COMM_FLAG_PROCESSING == flag);
+    set_flag(m_programFlags, FL_EDITING, (((m_programFlags & FL_REALLYEDITING) != 0U) ||
+                                          ((m_programFlags & COMM_FLAG_PROCESSING) != 0U)));
     SendUpdateEvent();
 }
 
@@ -3212,15 +3212,15 @@ void ProgramInfo::SavePreserve(bool preserveEpisode)
                   " WHERE chanid = :CHANID"
                   " AND starttime = :STARTTIME ;");
     query.bindValue(":PRESERVE", preserveEpisode);
-    query.bindValue(":CHANID", m_chanid);
-    query.bindValue(":STARTTIME", m_recstartts);
+    query.bindValue(":CHANID", m_chanId);
+    query.bindValue(":STARTTIME", m_recStartTs);
 
     if (!query.exec())
         MythDB::DBError("PreserveEpisode update", query);
     else
         UpdateLastDelete(false);
 
-    set_flag(m_programflags, FL_PRESERVED, preserveEpisode);
+    set_flag(m_programFlags, FL_PRESERVED, preserveEpisode);
 
     SendUpdateEvent();
 }
@@ -3239,15 +3239,15 @@ void ProgramInfo::SaveAutoExpire(AutoExpireType autoExpire, bool updateDelete)
                   " WHERE chanid = :CHANID"
                   " AND starttime = :STARTTIME ;");
     query.bindValue(":AUTOEXPIRE", (uint)autoExpire);
-    query.bindValue(":CHANID", m_chanid);
-    query.bindValue(":STARTTIME", m_recstartts);
+    query.bindValue(":CHANID", m_chanId);
+    query.bindValue(":STARTTIME", m_recStartTs);
 
     if (!query.exec())
         MythDB::DBError("AutoExpire update", query);
     else if (updateDelete)
         UpdateLastDelete(true);
 
-    set_flag(m_programflags, FL_AUTOEXP, autoExpire != kDisableAutoExpire);
+    set_flag(m_programFlags, FL_AUTOEXP, autoExpire != kDisableAutoExpire);
 
     SendUpdateEvent();
 }
@@ -3263,7 +3263,7 @@ void ProgramInfo::UpdateLastDelete(bool setTime) const
     if (setTime)
     {
         QDateTime timeNow = MythDate::current();
-        int delay = m_recstartts.secsTo(timeNow) / 3600;
+        int delay = m_recStartTs.secsTo(timeNow) / 3600;
 
         if (delay > 200)
             delay = 200;
@@ -3281,7 +3281,7 @@ void ProgramInfo::UpdateLastDelete(bool setTime) const
         query.prepare("UPDATE record SET last_delete = NULL "
                       "WHERE recordid = :RECORDID");
     }
-    query.bindValue(":RECORDID", m_recordid);
+    query.bindValue(":RECORDID", m_recordId);
 
     if (!query.exec())
         MythDB::DBError("Update last_delete", query);
@@ -3295,8 +3295,8 @@ AutoExpireType ProgramInfo::QueryAutoExpire(void) const
     query.prepare("SELECT autoexpire FROM recorded"
                   " WHERE chanid = :CHANID"
                   " AND starttime = :STARTTIME ;");
-    query.bindValue(":CHANID", m_chanid);
-    query.bindValue(":STARTTIME", m_recstartts);
+    query.bindValue(":CHANID", m_chanId);
+    query.bindValue(":STARTTIME", m_recStartTs);
 
     if (query.exec() && query.next())
         return (AutoExpireType) query.value(0).toInt();
@@ -3375,8 +3375,8 @@ void ProgramInfo::SaveCutList(frm_dir_map_t &delMap, bool isAutoSave) const
                       " AND starttime = :STARTTIME ;");
 
         query.bindValue(":CUTLIST", delMap.isEmpty() ? 0 : 1);
-        query.bindValue(":CHANID", m_chanid);
-        query.bindValue(":STARTTIME", m_recstartts);
+        query.bindValue(":CHANID", m_chanId);
+        query.bindValue(":STARTTIME", m_recStartTs);
 
         if (!query.exec())
             MythDB::DBError("cutlist flag update", query);
@@ -3424,8 +3424,8 @@ void ProgramInfo::ClearMarkupMap(
                       " WHERE chanid = :CHANID"
                       " AND STARTTIME = :STARTTIME"
                       + comp + ';');
-        query.bindValue(":CHANID", m_chanid);
-        query.bindValue(":STARTTIME", m_recstartts);
+        query.bindValue(":CHANID", m_chanId);
+        query.bindValue(":STARTTIME", m_recStartTs);
     }
     else
     {
@@ -3454,8 +3454,8 @@ void ProgramInfo::SaveMarkupMap(
         query.prepare("SELECT starttime FROM recorded"
                       " WHERE chanid = :CHANID"
                       " AND starttime = :STARTTIME ;");
-        query.bindValue(":CHANID", m_chanid);
-        query.bindValue(":STARTTIME", m_recstartts);
+        query.bindValue(":CHANID", m_chanId);
+        query.bindValue(":STARTTIME", m_recStartTs);
 
         if (!query.exec())
             MythDB::DBError("SaveMarkupMap checking record table", query);
@@ -3493,8 +3493,8 @@ void ProgramInfo::SaveMarkupMap(
             query.prepare("INSERT INTO recordedmarkup"
                           " (chanid, starttime, mark, type)"
                           " VALUES ( :CHANID , :STARTTIME , :MARK , :TYPE );");
-            query.bindValue(":CHANID", m_chanid);
-            query.bindValue(":STARTTIME", m_recstartts);
+            query.bindValue(":CHANID", m_chanId);
+            query.bindValue(":STARTTIME", m_recStartTs);
         }
         query.bindValue(":MARK", (quint64)frame);
         query.bindValue(":TYPE", mark_type);
@@ -3517,7 +3517,7 @@ void ProgramInfo::QueryMarkupMap(
     }
     else if (IsRecording())
     {
-        QueryMarkupMap(m_chanid, m_recstartts, marks, type, merge);
+        QueryMarkupMap(m_chanId, m_recStartTs, marks, type, merge);
     }
 }
 
@@ -3630,8 +3630,8 @@ void ProgramInfo::QueryPositionMap(
                       " WHERE chanid = :CHANID"
                       " AND starttime = :STARTTIME"
                       " AND type = :TYPE ;");
-        query.bindValue(":CHANID", m_chanid);
-        query.bindValue(":STARTTIME", m_recstartts);
+        query.bindValue(":CHANID", m_chanId);
+        query.bindValue(":STARTTIME", m_recStartTs);
     }
     else
     {
@@ -3673,8 +3673,8 @@ void ProgramInfo::ClearPositionMap(MarkTypes type) const
                       " WHERE chanid = :CHANID"
                       " AND starttime = :STARTTIME"
                       " AND type = :TYPE ;");
-        query.bindValue(":CHANID", m_chanid);
-        query.bindValue(":STARTTIME", m_recstartts);
+        query.bindValue(":CHANID", m_chanId);
+        query.bindValue(":STARTTIME", m_recStartTs);
     }
     else
     {
@@ -3760,8 +3760,8 @@ void ProgramInfo::SavePositionMap(
                       " AND starttime = :STARTTIME"
                       " AND type = :TYPE"
                       + comp + ';');
-        query.bindValue(":CHANID", m_chanid);
-        query.bindValue(":STARTTIME", m_recstartts);
+        query.bindValue(":CHANID", m_chanId);
+        query.bindValue(":STARTTIME", m_recStartTs);
     }
     else
     {
@@ -3795,8 +3795,8 @@ void ProgramInfo::SavePositionMap(
     {
         q << "recordedseek (chanid, starttime, type, mark, offset)";
         qfields = QString("(%1,'%2',%3,") .
-            arg(m_chanid) .
-            arg(m_recstartts.toString(Qt::ISODate)) .
+            arg(m_chanId) .
+            arg(m_recStartTs.toString(Qt::ISODate)) .
             arg(type);
     }
     q << " VALUES ";
@@ -3865,8 +3865,8 @@ void ProgramInfo::SavePositionMapDelta(
     {
         q << "recordedseek (chanid, starttime, type, mark, offset)";
         qfields = QString("(%1,'%2',%3,") .
-            arg(m_chanid) .
-            arg(m_recstartts.toString(Qt::ISODate)) .
+            arg(m_chanId) .
+            arg(m_recStartTs.toString(Qt::ISODate)) .
             arg(type);
     }
     else
@@ -3979,8 +3979,8 @@ bool ProgramInfo::QueryKeyFrameInfo(uint64_t * result,
             query.prepare(from_recordedseek_desc);
         else
             query.prepare(from_recordedseek_asc);
-        query.bindValue(":CHANID", m_chanid);
-        query.bindValue(":STARTTIME", m_recstartts);
+        query.bindValue(":CHANID", m_chanId);
+        query.bindValue(":STARTTIME", m_recStartTs);
     }
     query.bindValue(":TYPE", type);
     query.bindValue(":QUERY_ARG", (unsigned long long)position_or_keyframe);
@@ -4011,8 +4011,8 @@ bool ProgramInfo::QueryKeyFrameInfo(uint64_t * result,
             query.prepare(from_recordedseek_asc);
         else
             query.prepare(from_recordedseek_desc);
-        query.bindValue(":CHANID", m_chanid);
-        query.bindValue(":STARTTIME", m_recstartts);
+        query.bindValue(":CHANID", m_chanId);
+        query.bindValue(":STARTTIME", m_recStartTs);
     }
     query.bindValue(":TYPE", type);
     query.bindValue(":QUERY_ARG", (unsigned long long)position_or_keyframe);
@@ -4085,8 +4085,8 @@ void ProgramInfo::SaveAspect(
                     " (chanid, starttime, mark, type, data)"
                     " VALUES"
                     " ( :CHANID, :STARTTIME, :MARK, :TYPE, :DATA);");
-    query.bindValue(":CHANID", m_chanid);
-    query.bindValue(":STARTTIME", m_recstartts);
+    query.bindValue(":CHANID", m_chanId);
+    query.bindValue(":STARTTIME", m_recStartTs);
 
     query.bindValue(":MARK", (quint64)frame);
     query.bindValue(":TYPE", type);
@@ -4114,8 +4114,8 @@ void ProgramInfo::SaveFrameRate(uint64_t frame, uint framerate)
                   "    (chanid, starttime, mark, type, data)"
                   "    VALUES"
                   " ( :CHANID, :STARTTIME, :MARK, :TYPE, :DATA);");
-    query.bindValue(":CHANID", m_chanid);
-    query.bindValue(":STARTTIME", m_recstartts);
+    query.bindValue(":CHANID", m_chanId);
+    query.bindValue(":STARTTIME", m_recStartTs);
     query.bindValue(":MARK", (quint64)frame);
     query.bindValue(":TYPE", MARK_VIDEO_RATE);
     query.bindValue(":DATA", framerate);
@@ -4137,8 +4137,8 @@ void ProgramInfo::SaveTotalDuration(int64_t duration)
                   " WHERE chanid=:CHANID "
                   " AND starttime=:STARTTIME "
                   " AND type=:TYPE");
-    query.bindValue(":CHANID", m_chanid);
-    query.bindValue(":STARTTIME", m_recstartts);
+    query.bindValue(":CHANID", m_chanId);
+    query.bindValue(":STARTTIME", m_recStartTs);
     query.bindValue(":TYPE", MARK_DURATION_MS);
 
     if (!query.exec())
@@ -4148,8 +4148,8 @@ void ProgramInfo::SaveTotalDuration(int64_t duration)
                   "    (chanid, starttime, mark, type, data)"
                   "    VALUES"
                   " ( :CHANID, :STARTTIME, 0, :TYPE, :DATA);");
-    query.bindValue(":CHANID", m_chanid);
-    query.bindValue(":STARTTIME", m_recstartts);
+    query.bindValue(":CHANID", m_chanId);
+    query.bindValue(":STARTTIME", m_recStartTs);
     query.bindValue(":TYPE", MARK_DURATION_MS);
     query.bindValue(":DATA", (uint)(duration / 1000));
 
@@ -4169,8 +4169,8 @@ void ProgramInfo::SaveTotalFrames(int64_t frames)
                   " WHERE chanid=:CHANID "
                   " AND starttime=:STARTTIME "
                   " AND type=:TYPE");
-    query.bindValue(":CHANID", m_chanid);
-    query.bindValue(":STARTTIME", m_recstartts);
+    query.bindValue(":CHANID", m_chanId);
+    query.bindValue(":STARTTIME", m_recStartTs);
     query.bindValue(":TYPE", MARK_TOTAL_FRAMES);
 
     if (!query.exec())
@@ -4180,8 +4180,8 @@ void ProgramInfo::SaveTotalFrames(int64_t frames)
                   "    (chanid, starttime, mark, type, data)"
                   "    VALUES"
                   " ( :CHANID, :STARTTIME, 0, :TYPE, :DATA);");
-    query.bindValue(":CHANID", m_chanid);
-    query.bindValue(":STARTTIME", m_recstartts);
+    query.bindValue(":CHANID", m_chanId);
+    query.bindValue(":STARTTIME", m_recStartTs);
     query.bindValue(":TYPE", MARK_TOTAL_FRAMES);
     query.bindValue(":DATA", (uint)(frames));
 
@@ -4203,8 +4203,8 @@ void ProgramInfo::SaveResolution(uint64_t frame, uint width, uint height)
                   "    (chanid, starttime, mark, type, data)"
                   "    VALUES"
                   " ( :CHANID, :STARTTIME, :MARK, :TYPE, :DATA);");
-    query.bindValue(":CHANID", m_chanid);
-    query.bindValue(":STARTTIME", m_recstartts);
+    query.bindValue(":CHANID", m_chanId);
+    query.bindValue(":STARTTIME", m_recStartTs);
     query.bindValue(":MARK", (quint64)frame);
     query.bindValue(":TYPE", MARK_VIDEO_WIDTH);
     query.bindValue(":DATA", width);
@@ -4216,8 +4216,8 @@ void ProgramInfo::SaveResolution(uint64_t frame, uint width, uint height)
                   "    (chanid, starttime, mark, type, data)"
                   "    VALUES"
                   " ( :CHANID, :STARTTIME, :MARK, :TYPE, :DATA);");
-    query.bindValue(":CHANID", m_chanid);
-    query.bindValue(":STARTTIME", m_recstartts);
+    query.bindValue(":CHANID", m_chanId);
+    query.bindValue(":STARTTIME", m_recStartTs);
     query.bindValue(":MARK", (quint64)frame);
     query.bindValue(":TYPE", MARK_VIDEO_HEIGHT);
     query.bindValue(":DATA", height);
@@ -4268,7 +4268,7 @@ static uint load_markup_datum(
  */
 uint ProgramInfo::QueryAverageHeight(void) const
 {
-    return load_markup_datum(MARK_VIDEO_HEIGHT, m_chanid, m_recstartts);
+    return load_markup_datum(MARK_VIDEO_HEIGHT, m_chanId, m_recStartTs);
 }
 
 /** \brief If present in recording this loads average width of the
@@ -4277,7 +4277,7 @@ uint ProgramInfo::QueryAverageHeight(void) const
  */
 uint ProgramInfo::QueryAverageWidth(void) const
 {
-    return load_markup_datum(MARK_VIDEO_WIDTH, m_chanid, m_recstartts);
+    return load_markup_datum(MARK_VIDEO_WIDTH, m_chanId, m_recStartTs);
 }
 
 /** \brief If present in recording this loads average frame rate of the
@@ -4286,7 +4286,7 @@ uint ProgramInfo::QueryAverageWidth(void) const
  */
 uint ProgramInfo::QueryAverageFrameRate(void) const
 {
-    return load_markup_datum(MARK_VIDEO_RATE, m_chanid, m_recstartts);
+    return load_markup_datum(MARK_VIDEO_RATE, m_chanId, m_recStartTs);
 }
 
 MarkTypes ProgramInfo::QueryAverageAspectRatio(void ) const
@@ -4315,8 +4315,8 @@ MarkTypes ProgramInfo::QueryAverageAspectRatio(void ) const
                 "              ) - recordedmarkup.mark "
                 "            ) DESC "
                 "LIMIT 1");
-    query.bindValue(":CHANID", m_chanid);
-    query.bindValue(":STARTTIME", m_recstartts);
+    query.bindValue(":CHANID", m_chanId);
+    query.bindValue(":STARTTIME", m_recStartTs);
     query.bindValue(":ASPECTSTART", MARK_ASPECT_4_3); // 11
     query.bindValue(":ASPECTEND", MARK_ASPECT_CUSTOM); // 14
     query.bindValue(":ASPECTSTART2", MARK_ASPECT_4_3); // 11
@@ -4347,7 +4347,7 @@ uint32_t ProgramInfo::QueryTotalDuration(void) const
     // 32Bits is more than sufficient. A recording would need to be almost a
     // month long to wrap and this is impossible since we cap the maximum
     // recording length to 6 hours.
-    uint32_t msec = load_markup_datum(MARK_DURATION_MS, m_chanid, m_recstartts);
+    uint32_t msec = load_markup_datum(MARK_DURATION_MS, m_chanId, m_recStartTs);
 
 // Impossible condition, load_markup_datum returns an unsigned int
 //     if (msec < 0)
@@ -4361,7 +4361,7 @@ uint32_t ProgramInfo::QueryTotalDuration(void) const
  */
 int64_t ProgramInfo::QueryTotalFrames(void) const
 {
-    int64_t frames = load_markup_datum(MARK_TOTAL_FRAMES, m_chanid, m_recstartts);
+    int64_t frames = load_markup_datum(MARK_TOTAL_FRAMES, m_chanId, m_recStartTs);
     return frames;
 }
 
@@ -4386,8 +4386,8 @@ void ProgramInfo::QueryMarkup(QVector<MarkupEntry> &mapMark,
                       " WHERE chanid = :CHANID"
                       " AND STARTTIME = :STARTTIME"
                       " ORDER BY mark, type");
-        query.bindValue(":CHANID", m_chanid);
-        query.bindValue(":STARTTIME", m_recstartts);
+        query.bindValue(":CHANID", m_chanId);
+        query.bindValue(":STARTTIME", m_recStartTs);
     }
     else
     {
@@ -4426,8 +4426,8 @@ void ProgramInfo::QueryMarkup(QVector<MarkupEntry> &mapMark,
                       " WHERE chanid = :CHANID"
                       " AND STARTTIME = :STARTTIME"
                       " ORDER BY mark, type");
-        query.bindValue(":CHANID", m_chanid);
-        query.bindValue(":STARTTIME", m_recstartts);
+        query.bindValue(":CHANID", m_chanId);
+        query.bindValue(":STARTTIME", m_recStartTs);
     }
     if (!query.exec())
     {
@@ -4554,8 +4554,8 @@ void ProgramInfo::SaveMarkup(const QVector<MarkupEntry> &mapMark,
             query.prepare("DELETE FROM recordedmarkup"
                           " WHERE chanid = :CHANID"
                           " AND starttime = :STARTTIME");
-            query.bindValue(":CHANID", m_chanid);
-            query.bindValue(":STARTTIME", m_recstartts);
+            query.bindValue(":CHANID", m_chanId);
+            query.bindValue(":STARTTIME", m_recStartTs);
             if (!query.exec())
             {
                 MythDB::DBError("SaveMarkup seektable data", query);
@@ -4578,8 +4578,8 @@ void ProgramInfo::SaveMarkup(const QVector<MarkupEntry> &mapMark,
                                   "         :TYPE,:MARK,:OFFSET)");
                     query.bindValue(":OFFSET", (quint64)entry.data);
                 }
-                query.bindValue(":CHANID", m_chanid);
-                query.bindValue(":STARTTIME", m_recstartts);
+                query.bindValue(":CHANID", m_chanId);
+                query.bindValue(":STARTTIME", m_recStartTs);
                 query.bindValue(":TYPE", entry.type);
                 query.bindValue(":MARK", (quint64)entry.frame);
                 if (!query.exec())
@@ -4600,8 +4600,8 @@ void ProgramInfo::SaveMarkup(const QVector<MarkupEntry> &mapMark,
             query.prepare("DELETE FROM recordedseek"
                           " WHERE chanid = :CHANID"
                           " AND starttime = :STARTTIME");
-            query.bindValue(":CHANID", m_chanid);
-            query.bindValue(":STARTTIME", m_recstartts);
+            query.bindValue(":CHANID", m_chanId);
+            query.bindValue(":STARTTIME", m_recStartTs);
             if (!query.exec())
             {
                 MythDB::DBError("SaveMarkup seektable data", query);
@@ -4618,8 +4618,8 @@ void ProgramInfo::SaveMarkup(const QVector<MarkupEntry> &mapMark,
                               " (chanid,starttime,type,mark,offset)"
                               " VALUES (:CHANID,:STARTTIME,"
                               "         :TYPE,:MARK,:OFFSET)");
-                query.bindValue(":CHANID", m_chanid);
-                query.bindValue(":STARTTIME", m_recstartts);
+                query.bindValue(":CHANID", m_chanId);
+                query.bindValue(":STARTTIME", m_recStartTs);
                 query.bindValue(":TYPE", entry.type);
                 query.bindValue(":MARK", (quint64)entry.frame);
                 query.bindValue(":OFFSET", (quint64)entry.data);
@@ -4648,8 +4648,8 @@ void ProgramInfo::SaveVideoProperties(uint mask, uint video_property_flags)
 
     query.bindValue(":OTHERFLAGS", ~mask);
     query.bindValue(":FLAGS",      video_property_flags);
-    query.bindValue(":CHANID",     m_chanid);
-    query.bindValue(":STARTTIME",  m_startts);
+    query.bindValue(":CHANID",     m_chanId);
+    query.bindValue(":STARTTIME",  m_startTs);
     if (!query.exec())
     {
         MythDB::DBError("SaveVideoProperties", query);
@@ -4678,9 +4678,9 @@ void ProgramInfo::SaveVideoProperties(uint mask, uint video_property_flags)
 QString ProgramInfo::ChannelText(const QString &format) const
 {
     QString chan(format);
-    chan.replace("<num>", m_chanstr)
-        .replace("<sign>", m_chansign)
-        .replace("<name>", m_channame);
+    chan.replace("<num>", m_chanStr)
+        .replace("<sign>", m_chanSign)
+        .replace("<name>", m_chanName);
     return chan;
 }
 
@@ -4713,9 +4713,9 @@ void ProgramInfo::SaveSeasonEpisode(uint seas, uint ep)
 
     query.bindValue(":SEASON",     seas);
     query.bindValue(":EPISODE",    ep);
-    query.bindValue(":CHANID",     m_chanid);
-    query.bindValue(":STARTTIME",  m_recstartts);
-    query.bindValue(":RECORDID",   m_recordid);
+    query.bindValue(":CHANID",     m_chanId);
+    query.bindValue(":STARTTIME",  m_recStartTs);
+    query.bindValue(":RECORDID",   m_recordId);
     if (!query.exec())
     {
         MythDB::DBError("SaveSeasonEpisode", query);
@@ -4736,9 +4736,9 @@ void ProgramInfo::SaveInetRef(const QString &inet)
         "AND recordid = :RECORDID");
 
     query.bindValue(":INETREF",    inet);
-    query.bindValue(":CHANID",     m_chanid);
-    query.bindValue(":STARTTIME",  m_recstartts);
-    query.bindValue(":RECORDID",   m_recordid);
+    query.bindValue(":CHANID",     m_chanId);
+    query.bindValue(":STARTTIME",  m_recStartTs);
+    query.bindValue(":RECORDID",   m_recordId);
     query.exec();
 
     SendUpdateEvent();
@@ -4790,10 +4790,10 @@ QString ProgramInfo::QueryRecordingGroup(void) const
     query.prepare("SELECT recgroup FROM recorded "
                   "WHERE chanid    = :CHANID AND "
                   "      starttime = :START");
-    query.bindValue(":START", m_recstartts);
-    query.bindValue(":CHANID", m_chanid);
+    query.bindValue(":START", m_recStartTs);
+    query.bindValue(":CHANID", m_chanId);
 
-    QString grp = m_recgroup;
+    QString grp = m_recGroup;
     if (query.exec() && query.next())
         grp = query.value(0).toString();
 
@@ -4806,8 +4806,8 @@ uint ProgramInfo::QueryTranscoderID(void) const
     query.prepare("SELECT transcoder FROM recorded "
                   "WHERE chanid    = :CHANID AND "
                   "      starttime = :START");
-    query.bindValue(":CHANID", m_chanid);
-    query.bindValue(":START",  m_recstartts);
+    query.bindValue(":CHANID", m_chanId);
+    query.bindValue(":START",  m_recStartTs);
 
     if (query.exec() && query.next())
         return query.value(0).toUInt();
@@ -4952,8 +4952,8 @@ void ProgramInfo::MarkAsInUse(bool inuse, const QString& usedFor)
             "DELETE FROM inuseprograms "
             "WHERE chanid   = :CHANID   AND starttime = :STARTTIME AND "
             "      hostname = :HOSTNAME AND recusage  = :RECUSAGE");
-        query.bindValue(":CHANID",    m_chanid);
-        query.bindValue(":STARTTIME", m_recstartts);
+        query.bindValue(":CHANID",    m_chanId);
+        query.bindValue(":STARTTIME", m_recStartTs);
         query.bindValue(":HOSTNAME",  gCoreContext->GetHostName());
         query.bindValue(":RECUSAGE",  m_inUseForWhat);
 
@@ -4979,8 +4979,8 @@ void ProgramInfo::MarkAsInUse(bool inuse, const QString& usedFor)
         "FROM inuseprograms "
         "WHERE chanid   = :CHANID   AND starttime = :STARTTIME AND "
         "      hostname = :HOSTNAME AND recusage  = :RECUSAGE");
-    query.bindValue(":CHANID",    m_chanid);
-    query.bindValue(":STARTTIME", m_recstartts);
+    query.bindValue(":CHANID",    m_chanId);
+    query.bindValue(":STARTTIME", m_recStartTs);
     query.bindValue(":HOSTNAME",  gCoreContext->GetHostName());
     query.bindValue(":RECUSAGE",  m_inUseForWhat);
 
@@ -4999,8 +4999,8 @@ void ProgramInfo::MarkAsInUse(bool inuse, const QString& usedFor)
             "SET lastupdatetime = :UPDATETIME "
             "WHERE chanid   = :CHANID   AND starttime = :STARTTIME AND "
             "      hostname = :HOSTNAME AND recusage  = :RECUSAGE");
-        query.bindValue(":CHANID",     m_chanid);
-        query.bindValue(":STARTTIME",  m_recstartts);
+        query.bindValue(":CHANID",     m_chanId);
+        query.bindValue(":STARTTIME",  m_recStartTs);
         query.bindValue(":HOSTNAME",   gCoreContext->GetHostName());
         query.bindValue(":RECUSAGE",   m_inUseForWhat);
         query.bindValue(":UPDATETIME", inUseTime);
@@ -5019,8 +5019,8 @@ void ProgramInfo::MarkAsInUse(bool inuse, const QString& usedFor)
             "VALUES "
             " (:CHANID,       :STARTTIME, :RECUSAGE, :HOSTNAME, "
             "  :UPDATETIME,   :RECHOST,   :RECDIR)");
-        query.bindValue(":CHANID",     m_chanid);
-        query.bindValue(":STARTTIME",  m_recstartts);
+        query.bindValue(":CHANID",     m_chanId);
+        query.bindValue(":STARTTIME",  m_recStartTs);
         query.bindValue(":HOSTNAME",   gCoreContext->GetHostName());
         query.bindValue(":RECUSAGE",   m_inUseForWhat);
         query.bindValue(":UPDATETIME", inUseTime);
@@ -5045,22 +5045,22 @@ void ProgramInfo::MarkAsInUse(bool inuse, const QString& usedFor)
                   "WHERE lastupdatetime >= :ONEHOURAGO AND "
                   "      chanid          = :CHANID     AND "
                   "      starttime       = :STARTTIME");
-    query.bindValue(":CHANID",     m_chanid);
-    query.bindValue(":STARTTIME",  m_recstartts);
+    query.bindValue(":CHANID",     m_chanId);
+    query.bindValue(":STARTTIME",  m_recStartTs);
     query.bindValue(":ONEHOURAGO", oneHourAgo);
     if (!query.exec())
         return; // not safe to send update event...
 
-    m_programflags &= ~(FL_INUSEPLAYING | FL_INUSERECORDING | FL_INUSEOTHER);
+    m_programFlags &= ~(FL_INUSEPLAYING | FL_INUSERECORDING | FL_INUSEOTHER);
     while (query.next())
     {
         QString inUseForWhat = query.value(0).toString();
         if (inUseForWhat.contains(kPlayerInUseID))
-            m_programflags |= FL_INUSEPLAYING;
+            m_programFlags |= FL_INUSEPLAYING;
         else if (inUseForWhat == kRecorderInUseID)
-            m_programflags |= FL_INUSERECORDING;
+            m_programFlags |= FL_INUSERECORDING;
         else
-            m_programflags |= FL_INUSEOTHER;
+            m_programFlags |= FL_INUSEOTHER;
     }
     SendUpdateEvent();
 }
@@ -5081,9 +5081,9 @@ bool ProgramInfo::QueryTuningInfo(QString &channum, QString &input) const
                   "WHERE channel.chanid       = :CHANID            AND "
                   "      capturecard.sourceid = :SOURCEID          AND "
                   "      capturecard.cardid   = :INPUTID");
-    query.bindValue(":CHANID",   m_chanid);
-    query.bindValue(":SOURCEID", m_sourceid);
-    query.bindValue(":INPUTID",  m_inputid);
+    query.bindValue(":CHANID",   m_chanId);
+    query.bindValue(":SOURCEID", m_sourceId);
+    query.bindValue(":INPUTID",  m_inputId);
 
     if (query.exec() && query.next())
     {
@@ -5212,23 +5212,23 @@ void ProgramInfo::SubstituteMatches(QString &str)
     str.replace(QString("%SUBTITLE%"), m_subtitle);
     str.replace(QString("%SEASON%"), QString::number(m_season));
     str.replace(QString("%EPISODE%"), QString::number(m_episode));
-    str.replace(QString("%TOTALEPISODES%"), QString::number(m_totalepisodes));
-    str.replace(QString("%SYNDICATEDEPISODE%"), m_syndicatedepisode);
+    str.replace(QString("%TOTALEPISODES%"), QString::number(m_totalEpisodes));
+    str.replace(QString("%SYNDICATEDEPISODE%"), m_syndicatedEpisode);
     str.replace(QString("%DESCRIPTION%"), m_description);
     str.replace(QString("%HOSTNAME%"), m_hostname);
     str.replace(QString("%CATEGORY%"), m_category);
-    str.replace(QString("%RECGROUP%"), m_recgroup);
-    str.replace(QString("%PLAYGROUP%"), m_playgroup);
-    str.replace(QString("%CHANID%"), QString::number(m_chanid));
-    str.replace(QString("%INETREF%"), m_inetref);
-    str.replace(QString("%PARTNUMBER%"), QString::number(m_partnumber));
-    str.replace(QString("%PARTTOTAL%"), QString::number(m_parttotal));
+    str.replace(QString("%RECGROUP%"), m_recGroup);
+    str.replace(QString("%PLAYGROUP%"), m_playGroup);
+    str.replace(QString("%CHANID%"), QString::number(m_chanId));
+    str.replace(QString("%INETREF%"), m_inetRef);
+    str.replace(QString("%PARTNUMBER%"), QString::number(m_partNumber));
+    str.replace(QString("%PARTTOTAL%"), QString::number(m_partTotal));
     str.replace(QString("%ORIGINALAIRDATE%"),
                 m_originalAirDate.toString(Qt::ISODate));
     static const char *s_timeStr[] =
         { "STARTTIME", "ENDTIME", "PROGSTART", "PROGEND", };
     const QDateTime *time_dtr[] =
-        { &m_recstartts, &m_recendts, &m_startts, &m_endts, };
+        { &m_recStartTs, &m_recEndTs, &m_startTs, &m_endTs, };
     for (size_t i = 0; i < sizeof(s_timeStr)/sizeof(char*); i++)
     {
         str.replace(QString("%%1%").arg(s_timeStr[i]),
@@ -5240,7 +5240,7 @@ void ProgramInfo::SubstituteMatches(QString &str)
         str.replace(QString("%%1ISOUTC%").arg(s_timeStr[i]),
                     time_dtr[i]->toString(Qt::ISODate));
     }
-    str.replace(QString("%RECORDEDID%"), QString::number(m_recordedid));
+    str.replace(QString("%RECORDEDID%"), QString::number(m_recordedId));
 }
 
 QMap<QString,uint32_t> ProgramInfo::QueryInUseMap(void)
@@ -6098,7 +6098,7 @@ MPUBLIC QString format_season_and_episode(int seasEp, int digits)
 void ProgramInfo::SetFilesize(uint64_t sz)
 {
     //LOG(VB_GENERAL, LOG_DEBUG, "FIXME: ProgramInfo::SetFilesize() called instead of RecordingInfo::SetFilesize()");
-    m_filesize   = sz;
+    m_fileSize   = sz;
 }
 
 
@@ -6117,19 +6117,19 @@ void ProgramInfo::SaveFilesize(uint64_t fsize)
         "WHERE chanid    = :CHANID AND "
         "      starttime = :STARTTIME");
     query.bindValue(":FILESIZE",  (quint64)fsize);
-    query.bindValue(":CHANID",    m_chanid);
-    query.bindValue(":STARTTIME", m_recstartts);
+    query.bindValue(":CHANID",    m_chanId);
+    query.bindValue(":STARTTIME", m_recStartTs);
 
     if (!query.exec())
         MythDB::DBError("File size update", query);
 
-    s_updater->insert(m_recordedid, kPIUpdateFileSize, fsize);
+    s_updater->insert(m_recordedId, kPIUpdateFileSize, fsize);
 }
 
 //uint64_t ProgramInfo::GetFilesize(void) const
 //{
     //LOG(VB_GENERAL, LOG_DEBUG, "FIXME: ProgramInfo::GetFilesize() called instead of RecordingInfo::GetFilesize()");
-//    return m_filesize;
+//    return m_fileSize;
 //}
 
 // Restore the original query. When a recording finishes, a
@@ -6139,8 +6139,8 @@ void ProgramInfo::SaveFilesize(uint64_t fsize)
 uint64_t ProgramInfo::GetFilesize(void) const
 {
 
-    if (m_filesize)
-        return m_filesize;
+    if (m_fileSize)
+        return m_fileSize;
 
     // Always query in the 0 case because we can't
     // tell if the filesize was 'lost'. Other than
@@ -6156,8 +6156,8 @@ uint64_t ProgramInfo::GetFilesize(void) const
         "FROM recorded "
         "WHERE chanid    = :CHANID AND "
         "      starttime = :STARTTIME");
-    query.bindValue(":CHANID",    m_chanid);
-    query.bindValue(":STARTTIME", m_recstartts);
+    query.bindValue(":CHANID",    m_chanId);
+    query.bindValue(":STARTTIME", m_recStartTs);
     if (query.exec() && query.next())
         db_filesize = query.value(0).toULongLong();
 

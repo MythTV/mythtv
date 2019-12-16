@@ -123,9 +123,9 @@ class ProgramRecPriority : public ScheduleCommon
     MythUIText *m_lastRecordedText        {nullptr};
     MythUIText *m_lastRecordedDateText    {nullptr};
     MythUIText *m_lastRecordedTimeText    {nullptr};
-    MythUIText *m_channameText            {nullptr};
-    MythUIText *m_channumText             {nullptr};
-    MythUIText *m_callsignText            {nullptr};
+    MythUIText *m_chanNameText            {nullptr};
+    MythUIText *m_chanNumText             {nullptr};
+    MythUIText *m_callSignText            {nullptr};
     MythUIText *m_recProfileText          {nullptr};
 
     ProgramRecPriorityInfo *m_currentItem {nullptr};

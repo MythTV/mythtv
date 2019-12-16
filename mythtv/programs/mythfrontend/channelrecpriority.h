@@ -57,11 +57,11 @@ class ChannelRecPriority : public MythScreenType
     MythUIButtonList *m_channelList {nullptr};
 
     MythUIText *m_chanstringText    {nullptr};
-    MythUIText *m_channameText      {nullptr};
-    MythUIText *m_channumText       {nullptr};
-    MythUIText *m_callsignText      {nullptr};
-    MythUIText *m_sourcenameText    {nullptr};
-    MythUIText *m_sourceidText      {nullptr};
+    MythUIText *m_chanNameText      {nullptr};
+    MythUIText *m_chanNumText       {nullptr};
+    MythUIText *m_callSignText      {nullptr};
+    MythUIText *m_sourceNameText    {nullptr};
+    MythUIText *m_sourceIdText      {nullptr};
     MythUIText *m_priorityText      {nullptr};
 
     MythUIImage *m_iconImage        {nullptr};

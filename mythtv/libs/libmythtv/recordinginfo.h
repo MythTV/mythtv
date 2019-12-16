@@ -47,21 +47,21 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         m_desiredRecEndTs(other.m_desiredRecEndTs)  { LoadRecordingFile(); }
     explicit RecordingInfo(const ProgramInfo &other) :
         ProgramInfo(other),
-        m_desiredRecStartTs(m_startts),
-        m_desiredRecEndTs(m_endts)  { LoadRecordingFile(); }
+        m_desiredRecStartTs(m_startTs),
+        m_desiredRecEndTs(m_endTs)  { LoadRecordingFile(); }
     explicit RecordingInfo(uint _recordedid) :
         ProgramInfo(_recordedid),
-        m_desiredRecStartTs(m_startts),
-        m_desiredRecEndTs(m_endts)  { LoadRecordingFile(); }
+        m_desiredRecStartTs(m_startTs),
+        m_desiredRecEndTs(m_endTs)  { LoadRecordingFile(); }
     RecordingInfo(uint _chanid, const QDateTime &_recstartts) : /// DEPRECATED
         ProgramInfo(_chanid, _recstartts),
-        m_desiredRecStartTs(m_startts),
-        m_desiredRecEndTs(m_endts)  { LoadRecordingFile(); }
+        m_desiredRecStartTs(m_startTs),
+        m_desiredRecEndTs(m_endTs)  { LoadRecordingFile(); }
     RecordingInfo(QStringList::const_iterator &it,
                   QStringList::const_iterator  end) :
         ProgramInfo(it, end),
-        m_desiredRecStartTs(m_startts),
-        m_desiredRecEndTs(m_endts)  { LoadRecordingFile(); }
+        m_desiredRecStartTs(m_startTs),
+        m_desiredRecEndTs(m_endTs)  { LoadRecordingFile(); }
     /// Create RecordingInfo from 'program'+'record'+'channel' tables,
     /// used in scheduler.cpp @ ~ 3296
     RecordingInfo(
@@ -211,14 +211,14 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
     void SubstituteMatches(QString &str) override; // ProgramInfo
 
     void SetRecordingID(uint _recordedid) override // ProgramInfo
-        {  m_recordedid = _recordedid;
+        {  m_recordedId = _recordedid;
             m_recordingFile->m_recordingId = _recordedid; }
 
     // Quick gets
     /// Creates a unique string that can be used to identify a
     /// scheduled recording.
     QString MakeUniqueSchedulerKey(void) const
-        { return MakeUniqueKey(m_chanid, m_startts); }
+        { return MakeUniqueKey(m_chanId, m_startTs); }
 
     // Used to query and set RecordingRule info
     RecordingRule *GetRecordingRule(void);
