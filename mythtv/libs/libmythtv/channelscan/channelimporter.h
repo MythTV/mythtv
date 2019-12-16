@@ -81,17 +81,17 @@ class MTV_PUBLIC ChannelImporter
                     bool full_channel_search,
                     ServiceRequirements service_requirements,
                     bool success = false) :
-        m_use_gui(gui),
-        m_is_interactive(interactive),
-        m_do_delete(_delete),
-        m_do_insert(insert),
-        m_do_save(save),
-        m_fta_only(fta_only),
-        m_lcn_only(lcn_only),
-        m_complete_only(complete_only),
-        m_full_channel_search(full_channel_search),
+        m_useGui(gui),
+        m_isInteractive(interactive),
+        m_doDelete(_delete),
+        m_doInsert(insert),
+        m_doSave(save),
+        m_ftaOnly(fta_only),
+        m_lcnOnly(lcn_only),
+        m_completeOnly(complete_only),
+        m_fullChannelSearch(full_channel_search),
         m_success(success),
-        m_service_requirements(service_requirements) { }
+        m_serviceRequirements(service_requirements) { }
 
     void Process(const ScanDTVTransportList&, int sourceid = -1);
 
@@ -252,25 +252,25 @@ class MTV_PUBLIC ChannelImporter
         const ChannelInsertInfo &chan);
 
   private:
-    bool                m_use_gui;
-    bool                m_is_interactive;
-    bool                m_do_delete;
-    bool                m_do_insert;
-    bool                m_do_save;
+    bool                m_useGui;
+    bool                m_isInteractive;
+    bool                m_doDelete;
+    bool                m_doInsert;
+    bool                m_doSave;
     /// Only FreeToAir (non-encrypted) channels desired post scan?
-    bool                m_fta_only;
+    bool                m_ftaOnly;
     /// Only services with logical channel numbers desired post scan?
-    bool                m_lcn_only;
+    bool                m_lcnOnly;
     /// Only services with complete scandata desired post scan?
-    bool                m_complete_only;
+    bool                m_completeOnly;
     /// Keep existing channel numbers on channel update
-    bool                m_keep_channel_numbers      {true};
+    bool                m_keepChannelNumbers      {true};
     /// Full search for old channels
-    bool                m_full_channel_search       {false};
+    bool                m_fullChannelSearch       {false};
     /// To pass information IPTV channel scan succeeded
     bool                m_success {false};
     /// Services desired post scan
-    ServiceRequirements m_service_requirements;
+    ServiceRequirements m_serviceRequirements;
 
     QEventLoop          m_eventLoop;
 };

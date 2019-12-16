@@ -344,7 +344,7 @@ void NuppelVideoRecorder::Pause(bool clear)
     QMutexLocker locker(&m_pauseLock);
     m_cleartimeonpause = clear;
     m_writepaused = m_audiopaused = m_mainpaused = false;
-    m_request_pause = true;
+    m_requestPause = true;
 
     // The wakeAll is to make sure [write|audio|main]paused are
     // set immediately, even if we were already paused previously.
@@ -428,7 +428,7 @@ bool NuppelVideoRecorder::SetupAVCodecVideo(void)
     if (m_targetbitrate == -1)
         usebitrate = -1;
 
-    m_mpa_vidctx->time_base.den = (int)ceil(m_video_frame_rate * 100 *
+    m_mpa_vidctx->time_base.den = (int)ceil(m_videoFrameRate * 100 *
                                     m_framerate_multiplier);
     m_mpa_vidctx->time_base.num = 100;
 
@@ -538,7 +538,7 @@ void NuppelVideoRecorder::UpdateResolutions(void)
         ResolutionChange(m_w_out, tot_height, 0);
     }
 
-    int den = (int)ceil(m_video_frame_rate * 100 * m_framerate_multiplier);
+    int den = (int)ceil(m_videoFrameRate * 100 * m_framerate_multiplier);
     int num = 100;
 
     // avcodec needs specific settings for mpeg2 compression
@@ -630,18 +630,18 @@ int NuppelVideoRecorder::AudioInit(bool skipdevice)
     if (!skipdevice)
     {
         int blocksize;
-        m_audio_device = AudioInput::CreateDevice(m_audiodevice.toLatin1());
+        m_audio_device = AudioInput::CreateDevice(m_audioDeviceName.toLatin1());
         if (!m_audio_device)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("Failed to create audio device: %1") .arg(m_audiodevice));
+                QString("Failed to create audio device: %1") .arg(m_audioDeviceName));
             return 1;
         }
 
         if (!m_audio_device->Open(m_audio_bits, m_audio_samplerate, m_audio_channels))
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("Failed to open audio device %1").arg(m_audiodevice));
+                QString("Failed to open audio device %1").arg(m_audioDeviceName));
             return 1;
         }
 
@@ -650,7 +650,7 @@ int NuppelVideoRecorder::AudioInit(bool skipdevice)
             blocksize = 1024;
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("Failed to determine audio block size on %1,"
-                        "using default 1024 bytes").arg(m_audiodevice));
+                        "using default 1024 bytes").arg(m_audioDeviceName));
         }
 
         m_audio_device->Close();
@@ -949,8 +949,8 @@ void NuppelVideoRecorder::run(void)
 
     {
         QMutexLocker locker(&m_pauseLock);
-        m_request_recording = true;
-        m_request_helper = true;
+        m_requestRecording = true;
+        m_requestHelper = true;
         m_recording = true;
         m_recordingWait.wakeAll();
     }
@@ -961,8 +961,8 @@ void NuppelVideoRecorder::run(void)
     m_audio_thread = new NVRAudioThread(this);
     m_audio_thread->start();
 
-    if ((m_vbimode != VBIMode::None) && (OpenVBIDevice() >= 0))
-        m_vbi_thread = new VBIThread(this);
+    if ((m_vbiMode != VBIMode::None) && (OpenVBIDevice() >= 0))
+        m_vbiThread = new VBIThread(this);
 
     // save the start time
     gettimeofday(&m_stm, &m_tzone);
@@ -980,8 +980,8 @@ void NuppelVideoRecorder::run(void)
 
     {
         QMutexLocker locker(&m_pauseLock);
-        m_request_recording = false;
-        m_request_helper = false;
+        m_requestRecording = false;
+        m_requestHelper = false;
         m_recording = false;
         m_recordingWait.wakeAll();
     }
@@ -1463,7 +1463,7 @@ void NuppelVideoRecorder::DoV4L2(void)
 again:
         {
             QMutexLocker locker(&m_pauseLock);
-            if (m_request_pause)
+            if (m_requestPause)
             {
                 if (!m_mainpaused)
                 {
@@ -1478,7 +1478,7 @@ again:
                 continue;
             }
 
-            if (!m_request_pause && m_mainpaused)
+            if (!m_requestPause && m_mainpaused)
             {
                 m_mainpaused = false;
                 m_unpauseWait.wakeAll();
@@ -1554,7 +1554,7 @@ again:
         if (m_go7007)
             forcekey = ((vbuf.flags & V4L2_BUF_FLAG_KEYFRAME) != 0U);
 
-        if (!m_request_pause)
+        if (!m_requestPause)
         {
             if ((m_v4l2_pixelformat == V4L2_PIX_FMT_YUYV) &&
                      (output_buffer != nullptr))
@@ -1764,7 +1764,7 @@ void NuppelVideoRecorder::KillChildren(void)
 {
     {
         QMutexLocker locker(&m_pauseLock);
-        m_request_helper = false;
+        m_requestHelper = false;
         m_unpauseWait.wakeAll();
     }
 
@@ -1782,11 +1782,11 @@ void NuppelVideoRecorder::KillChildren(void)
         m_audio_thread = nullptr;
     }
 
-    if (m_vbi_thread)
+    if (m_vbiThread)
     {
-        m_vbi_thread->wait();
-        delete m_vbi_thread;
-        m_vbi_thread = nullptr;
+        m_vbiThread->wait();
+        delete m_vbiThread;
+        m_vbiThread = nullptr;
         CloseVBIDevice();
     }
 }
@@ -1820,7 +1820,7 @@ void NuppelVideoRecorder::BufferIt(unsigned char *buf, int len, bool forcekey)
      // the difference should be less than 1,5*timeperframe or we have
      // missed at least one frame, this code might be inaccurate!
 
-            if (m_ntsc_framerate)
+            if (m_ntscFrameRate)
                 fn = (fn+16)/33;
             else
                 fn = (fn+20)/40;
@@ -1843,7 +1843,7 @@ void NuppelVideoRecorder::BufferIt(unsigned char *buf, int len, bool forcekey)
 
     // record the time at the start of this frame.
     // 'tcres' is at the end of the frame, so subtract the right # of ms
-    videobuffer[act]->timecode = (m_ntsc_framerate) ? (tcres - 33) : (tcres - 40);
+    videobuffer[act]->timecode = (m_ntscFrameRate) ? (tcres - 33) : (tcres - 40);
 
     memcpy(videobuffer[act]->buffer, buf, len);
     videobuffer[act]->bufferlen = len;
@@ -1897,7 +1897,7 @@ void NuppelVideoRecorder::WriteFileHeader(void)
     fileheader.desiredheight = 0;
     fileheader.pimode = 'P';
     fileheader.aspect = m_video_aspect;
-    fileheader.fps = m_video_frame_rate;
+    fileheader.fps = m_videoFrameRate;
     fileheader.fps *= m_framerate_multiplier;
     fileheader.videoblocks = -1;
     fileheader.audioblocks = -1;
@@ -2200,21 +2200,21 @@ void NuppelVideoRecorder::doAudioThread(void)
     if (!m_audio_device)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("Invalid audio device (%1), exiting").arg(m_audiodevice));
+            QString("Invalid audio device (%1), exiting").arg(m_audioDeviceName));
         return;
     }
 
     if (!m_audio_device->Open(m_audio_bits, m_audio_samplerate, m_audio_channels))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("Failed to open audio device %1").arg(m_audiodevice));
+            QString("Failed to open audio device %1").arg(m_audioDeviceName));
         return;
     }
 
     if (!m_audio_device->Start())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("Failed to start audio capture on %1").arg(m_audiodevice));
+            QString("Failed to start audio capture on %1").arg(m_audioDeviceName));
         return;
     }
 
@@ -2226,7 +2226,7 @@ void NuppelVideoRecorder::doAudioThread(void)
     {
         {
             QMutexLocker locker(&m_pauseLock);
-            if (m_request_pause)
+            if (m_requestPause)
             {
                 if (!m_audiopaused)
                 {
@@ -2239,7 +2239,7 @@ void NuppelVideoRecorder::doAudioThread(void)
                 continue;
             }
 
-            if (!m_request_pause && m_audiopaused)
+            if (!m_requestPause && m_audiopaused)
             {
                 m_audiopaused = false;
                 m_unpauseWait.wakeAll();
@@ -2254,7 +2254,7 @@ void NuppelVideoRecorder::doAudioThread(void)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("Short read, %1 of %2 bytes from ")
-                    .arg(lastread).arg(m_audio_buffer_size) + m_audiodevice);
+                    .arg(lastread).arg(m_audio_buffer_size) + m_audioDeviceName);
         }
 
         /* record the current time */
@@ -2516,7 +2516,7 @@ void NuppelVideoRecorder::doWriteThread(void)
     {
         {
             QMutexLocker locker(&m_pauseLock);
-            if (m_request_pause)
+            if (m_requestPause)
             {
                 if (!m_writepaused)
                 {
@@ -2529,7 +2529,7 @@ void NuppelVideoRecorder::doWriteThread(void)
                 continue;
             }
 
-            if (!m_request_pause && m_writepaused)
+            if (!m_requestPause && m_writepaused)
             {
                 m_writepaused = false;
                 m_unpauseWait.wakeAll();
@@ -3041,7 +3041,7 @@ void NuppelVideoRecorder::WriteText(unsigned char *buf, int len, int timecode,
     frameheader.frametype = 'T'; // text frame
     frameheader.timecode = timecode;
 
-    if (VBIMode::PAL_TT == m_vbimode)
+    if (VBIMode::PAL_TT == m_vbiMode)
     {
         frameheader.comptype = 'T'; // european teletext
         frameheader.packetlength = len + 4;
@@ -3057,7 +3057,7 @@ void NuppelVideoRecorder::WriteText(unsigned char *buf, int len, int timecode,
         m_ringBuffer->Write(&v.m_val8.m_a, sizeof(int8_t));
         m_ringBuffer->Write(buf, len);
     }
-    else if (VBIMode::NTSC_CC == m_vbimode)
+    else if (VBIMode::NTSC_CC == m_vbiMode)
     {
         frameheader.comptype = 'C'; // NTSC CC
         frameheader.packetlength = len;

@@ -87,7 +87,7 @@ MHIContext::MHIContext(InteractiveTV *parent)
     {
         // TODO: We need bold and italic versions.
         if (LoadFont(FONT_TO_USE))
-            m_face_loaded = true;
+            m_faceLoaded = true;
     }
 }
 
@@ -127,7 +127,7 @@ MHIContext::~MHIContext()
     StopEngine();
     delete(m_engine);
     delete(m_dsmcc);
-    if (m_face_loaded) FT_Done_Face(m_face);
+    if (m_faceLoaded) FT_Done_Face(m_face);
 
     ClearDisplay();
     ClearQueue();
@@ -172,7 +172,7 @@ void MHIContext::StopEngine(void)
 // Start or restart the MHEG engine.
 void MHIContext::Restart(int chanid, int sourceid, bool isLive)
 {
-    int tuneinfo = m_tuneinfo.isEmpty() ? 0 : m_tuneinfo.takeFirst();
+    int tuneinfo = m_tuneInfo.isEmpty() ? 0 : m_tuneInfo.takeFirst();
 
     LOG(VB_MHEG, LOG_INFO,
         QString("[mhi] Restart ch=%1 source=%2 live=%3 tuneinfo=0x%4")
@@ -349,7 +349,7 @@ void MHIContext::NetworkBootRequested(void)
             m_dsmcc->Reset();
             m_engine->SetBooting();
             locker.unlock();
-            {QMutexLocker locker2(&m_display_lock);
+            {QMutexLocker locker2(&m_displayLock);
             ClearDisplay();
             m_updated = true;}
             break;
@@ -668,7 +668,7 @@ void MHIContext::UpdateOSD(InteractiveScreen *osdWindow,
     if (!osdWindow || !osdPainter)
         return;
 
-    QMutexLocker locker(&m_display_lock);
+    QMutexLocker locker(&m_displayLock);
 
     // In MHEG the video is just another item in the display stack
     // but when we create the OSD we overlay everything over the video.
@@ -753,22 +753,22 @@ void MHIContext::GetInitialStreams(int &audioTag, int &videoTag)
 void MHIContext::RequireRedraw(const QRegion & /*region*/)
 {
     m_updated = false;
-    m_display_lock.lock();
+    m_displayLock.lock();
     ClearDisplay();
-    m_display_lock.unlock();
+    m_displayLock.unlock();
     // Always redraw the whole screen
-    m_engine->DrawDisplay(QRegion(0, 0, StdDisplayWidth, StdDisplayHeight));
+    m_engine->DrawDisplay(QRegion(0, 0, kStdDisplayWidth, kStdDisplayHeight));
     m_updated = true;
 }
 
 inline int MHIContext::ScaleX(int n, bool roundup) const
 {
-    return (n * m_displayRect.width() + (roundup ? StdDisplayWidth - 1 : 0)) / StdDisplayWidth;
+    return (n * m_displayRect.width() + (roundup ? kStdDisplayWidth - 1 : 0)) / kStdDisplayWidth;
 }
 
 inline int MHIContext::ScaleY(int n, bool roundup) const
 {
-    return (n * m_displayRect.height() + (roundup ? StdDisplayHeight - 1 : 0)) / StdDisplayHeight;
+    return (n * m_displayRect.height() + (roundup ? kStdDisplayHeight - 1 : 0)) / kStdDisplayHeight;
 }
 
 inline QRect MHIContext::Scale(const QRect &r) const
@@ -779,12 +779,12 @@ inline QRect MHIContext::Scale(const QRect &r) const
 
 inline int MHIContext::ScaleVideoX(int n, bool roundup) const
 {
-    return (n * m_videoRect.width() + (roundup ? StdDisplayWidth - 1 : 0)) / StdDisplayWidth;
+    return (n * m_videoRect.width() + (roundup ? kStdDisplayWidth - 1 : 0)) / kStdDisplayWidth;
 }
 
 inline int MHIContext::ScaleVideoY(int n, bool roundup) const
 {
-    return (n * m_videoRect.height() + (roundup ? StdDisplayHeight - 1 : 0)) / StdDisplayHeight;
+    return (n * m_videoRect.height() + (roundup ? kStdDisplayHeight - 1 : 0)) / kStdDisplayHeight;
 }
 
 inline QRect MHIContext::ScaleVideo(const QRect &r) const
@@ -806,7 +806,7 @@ void MHIContext::AddToDisplay(const QImage &image, const QRect &displayRect, boo
     data->m_y = scaledRect.y();
     data->m_bUnder = bUnder;
 
-    QMutexLocker locker(&m_display_lock);
+    QMutexLocker locker(&m_displayLock);
     if (!bUnder)
         m_display.push_back(data);
     else
@@ -843,7 +843,7 @@ void MHIContext::DrawVideo(const QRect &videoRect, const QRect &dispRect)
     if (m_parent->GetNVP())
     {
         QRect vidRect;
-        if (videoRect != QRect(QPoint(0,0),QSize(StdDisplayWidth,StdDisplayHeight)))
+        if (videoRect != QRect(QPoint(0,0),QSize(kStdDisplayWidth,kStdDisplayHeight)))
         {
             vidRect = ScaleVideo(videoRect);
             vidRect.setWidth(Roundup(vidRect.width(), 2));
@@ -855,7 +855,7 @@ void MHIContext::DrawVideo(const QRect &videoRect, const QRect &dispRect)
     m_videoDisplayRect = Scale(dispRect);
 
     // Mark all existing items in the display stack as under the video
-    QMutexLocker locker(&m_display_lock);
+    QMutexLocker locker(&m_displayLock);
     auto it = m_display.begin();
     for (; it != m_display.end(); ++it)
     {
@@ -1018,7 +1018,7 @@ bool MHIContext::TuneTo(int channel, int tuneinfo)
 
     LOG(VB_GENERAL, LOG_INFO, QString("[mhi] TuneTo %1 0x%2")
         .arg(channel).arg(tuneinfo,0,16));
-    m_tuneinfo.append(tuneinfo);
+    m_tuneInfo.append(tuneinfo);
 
     // Post an event requesting a channel change.
     MythEvent me(QString("NETWORK_CONTROL CHANID %1").arg(channel));
@@ -1249,7 +1249,7 @@ void MHIText::SetSize(int width, int height)
 
 void MHIText::SetFont(int size, bool isBold, bool isItalic)
 {
-    m_fontsize = size;
+    m_fontSize = size;
     m_fontItalic = isItalic;
     m_fontBold = isBold;
     // TODO: Only the size is currently used.
@@ -1281,7 +1281,7 @@ QRect MHIText::GetBounds(const QString &str, int &strLen, int maxSize)
         return {0,0,0,0};
 
     FT_Face face = m_parent->GetFontFace();
-    FT_Error error = FT_Set_Char_Size(face, 0, Point2FT(m_fontsize),
+    FT_Error error = FT_Set_Char_Size(face, 0, Point2FT(m_fontSize),
                                       FONT_WIDTHRES, FONT_HEIGHTRES);
     if (error)
         return {0,0,0,0};
@@ -1374,7 +1374,7 @@ void MHIText::AddText(int x, int y, const QString &str, MHRgba colour)
     FT_Face face = m_parent->GetFontFace();
     FT_Error error;
 
-    FT_Set_Char_Size(face, 0, Point2FT(m_fontsize),
+    FT_Set_Char_Size(face, 0, Point2FT(m_fontSize),
                                       FONT_WIDTHRES, FONT_HEIGHTRES);
 
     // X positions are computed to 64ths and rounded.

@@ -40,7 +40,7 @@ class DVBStreamHandler : public StreamHandler
 
     void RetuneMonitor(void);
 
-    bool IsRetuneAllowed(void) const { return _allow_retune; }
+    bool IsRetuneAllowed(void) const { return m_allowRetune; }
 
     void SetRetuneAllowed(bool              allow,
                           DTVSignalMonitor *sigmon,
@@ -61,21 +61,21 @@ class DVBStreamHandler : public StreamHandler
         { return new DVBPIDInfo(pid, stream_type, pes_type); }
 
   private:
-    QString           _dvr_dev_path;
-    volatile bool     _allow_retune;
+    QString           m_dvrDevPath;
+    volatile bool     m_allowRetune;
 
-    DTVSignalMonitor *_sigmon;
-    DVBChannel       *_dvbchannel;
-    DeviceReadBuffer *_drb;
+    DTVSignalMonitor *m_sigMon;
+    DVBChannel       *m_dvbChannel;
+    DeviceReadBuffer *m_drb;
 
     // for caching TS monitoring supported value.
-    static QMutex             s_rec_supports_ts_monitoring_lock;
-    static QMap<QString,bool> s_rec_supports_ts_monitoring;
+    static QMutex             s_rec_supportsTsMonitoringLock;
+    static QMap<QString,bool> s_recSupportsTsMonitoring;
 
     // for implementing Get & Return
-    static QMutex                          s_handlers_lock;
+    static QMutex                          s_handlersLock;
     static QMap<QString,DVBStreamHandler*> s_handlers;
-    static QMap<QString,uint>              s_handlers_refcnt;
+    static QMap<QString,uint>              s_handlersRefCnt;
 };
 
 #endif // _DVBSTREAMHANDLER_H_

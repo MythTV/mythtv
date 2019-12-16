@@ -22,15 +22,15 @@ class AnalogSignalMonitor : public SignalMonitor
     bool VerifyHDPVRaudio(int videofd);
     bool handleHDPVR(int videofd);
 
-    bool      m_usingv4l2   {false};
+    bool      m_usingV4l2   {false};
     QString   m_card;
     QString   m_driver;
     uint32_t  m_version     {0};
     uint      m_width       {0};
-    int       m_stable_time {2000};
-    uint      m_lock_cnt    {0};
+    int       m_stableTime  {2000};
+    uint      m_lockCnt     {0};
     MythTimer m_timer;
-    int       m_log_idx     {40};
+    int       m_logIdx      {40};
 };
 
 #endif // _ANALOG_SIGNAL_MONITOR_H_

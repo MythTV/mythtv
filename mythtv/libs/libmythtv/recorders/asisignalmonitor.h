@@ -27,8 +27,8 @@ class ASISignalMonitor: public DTVSignalMonitor
     ASIChannel *GetASIChannel(void);
 
   protected:
-    bool              streamHandlerStarted {false};
-    ASIStreamHandler *streamHandler        {nullptr};
+    bool              m_streamHandlerStarted {false};
+    ASIStreamHandler *m_streamHandler        {nullptr};
 };
 
 #endif // ASISIGNALMONITOR_H

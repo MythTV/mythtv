@@ -19,16 +19,16 @@
 DSMCCCacheModuleData::DSMCCCacheModuleData(DsmccDii *dii,
                                            DsmccModuleInfo *info,
                                            unsigned short streamTag)
-    : m_carousel_id(dii->m_download_id), m_module_id(info->m_module_id),
-      m_stream_id(streamTag),          m_version(info->m_module_version),
-      m_moduleSize(info->m_module_size)
+    : m_carouselId(dii->m_downloadId), m_moduleId(info->m_moduleId),
+      m_streamId(streamTag),           m_version(info->m_moduleVersion),
+      m_moduleSize(info->m_moduleSize)
 {
     // The number of blocks needed to hold this module.
-    int num_blocks = (m_moduleSize + dii->m_block_size - 1) / dii->m_block_size;
+    int num_blocks = (m_moduleSize + dii->m_blockSize - 1) / dii->m_blockSize;
     m_blocks.resize(num_blocks, nullptr); // Set it to all zeros
 
     // Copy the descriptor information.
-    m_descriptorData = info->m_modinfo.m_descriptorData;
+    m_descriptorData = info->m_modInfo.m_descriptorData;
 }
 
 DSMCCCacheModuleData::~DSMCCCacheModuleData()
@@ -46,46 +46,46 @@ DSMCCCacheModuleData::~DSMCCCacheModuleData()
 unsigned char *DSMCCCacheModuleData::AddModuleData(DsmccDb *ddb,
                                                    const unsigned char *data)
 {
-    if (m_version != ddb->m_module_version)
+    if (m_version != ddb->m_moduleVersion)
     {
         LOG(VB_DSMCC, LOG_WARNING, QString("[dsmcc] Module %1 my version %2 != %3")
-            .arg(ddb->m_module_id).arg(m_version).arg(ddb->m_module_version));
+            .arg(ddb->m_moduleId).arg(m_version).arg(ddb->m_moduleVersion));
         return nullptr; // Wrong version
     }
 
     if (m_completed)
         return nullptr; // Already got it.
 
-    if (ddb->m_block_number >= m_blocks.size())
+    if (ddb->m_blockNumber >= m_blocks.size())
     {
         LOG(VB_DSMCC, LOG_WARNING, QString("[dsmcc] Module %1 block number %2 "
                                            "is larger than %3")
-            .arg(ddb->m_module_id).arg(ddb->m_block_number)
+            .arg(ddb->m_moduleId).arg(ddb->m_blockNumber)
             .arg(m_blocks.size()));
         return nullptr;
     }
 
     // Check if we have this block already or not. If not append to list
-    if (m_blocks[ddb->m_block_number])
+    if (m_blocks[ddb->m_blockNumber])
     {
         QString s;
         for (size_t i = 0; i < m_blocks.size(); ++i)
             s += m_blocks[i] ? '+' : 'X';
 
         LOG(VB_DSMCC, LOG_INFO, QString("[dsmcc] Module %1 block %2 dup: %3")
-            .arg(ddb->m_module_id).arg(ddb->m_block_number +1).arg(s));
+            .arg(ddb->m_moduleId).arg(ddb->m_blockNumber +1).arg(s));
 
         return nullptr; // We have seen this block before.
     }
 
     // Add this to our set of blocks.
-    m_blocks[ddb->m_block_number] = new QByteArray((char*) data, ddb->m_len);
-    if (m_blocks[ddb->m_block_number])
+    m_blocks[ddb->m_blockNumber] = new QByteArray((char*) data, ddb->m_len);
+    if (m_blocks[ddb->m_blockNumber])
         m_receivedData += ddb->m_len;
 
     LOG(VB_DSMCC, LOG_INFO, QString("[dsmcc] Module %1 block %2/%3 bytes %4/%5")
-        .arg(ddb->m_module_id)
-        .arg(ddb->m_block_number +1).arg(m_blocks.size())
+        .arg(ddb->m_moduleId)
+        .arg(ddb->m_blockNumber +1).arg(m_blocks.size())
         .arg(m_receivedData).arg(m_moduleSize));
 
     if (m_receivedData < m_moduleSize)
@@ -93,7 +93,7 @@ unsigned char *DSMCCCacheModuleData::AddModuleData(DsmccDb *ddb,
 
     LOG(VB_DSMCC, LOG_INFO,
         QString("[dsmcc] Reconstructing module %1 from blocks")
-            .arg(m_module_id));
+            .arg(m_moduleId));
 
     // Re-assemble the blocks into the complete module.
     auto *tmp_data = (unsigned char*) malloc(m_receivedData);
@@ -157,7 +157,7 @@ ObjCarousel::~ObjCarousel()
 void ObjCarousel::AddModuleInfo(DsmccDii *dii, Dsmcc *status,
                                 unsigned short streamTag)
 {
-    for (int i = 0; i < dii->m_number_modules; i++)
+    for (int i = 0; i < dii->m_numberModules; i++)
     {
         DsmccModuleInfo *info = &(dii->m_modules[i]);
         bool bFound = false;
@@ -168,16 +168,16 @@ void ObjCarousel::AddModuleInfo(DsmccDii *dii, Dsmcc *status,
         for ( ; it != m_Cache.end(); ++it)
         {
             DSMCCCacheModuleData *cachep = *it;
-            if (cachep->CarouselId() == dii->m_download_id &&
-                    cachep->ModuleId() == info->m_module_id)
+            if (cachep->CarouselId() == dii->m_downloadId &&
+                    cachep->ModuleId() == info->m_moduleId)
             {
                 /* already known */
-                if (cachep->Version() == info->m_module_version)
+                if (cachep->Version() == info->m_moduleVersion)
                 {
                     LOG(VB_DSMCC, LOG_DEBUG, QString("[dsmcc] Already Know Module %1")
-                            .arg(info->m_module_id));
+                            .arg(info->m_moduleId));
 
-                    if (cachep->ModuleSize() == info->m_module_size)
+                    if (cachep->ModuleSize() == info->m_moduleSize)
                     {
                         bFound = true;
                         break;
@@ -188,13 +188,13 @@ void ObjCarousel::AddModuleInfo(DsmccDii *dii, Dsmcc *status,
                     LOG(VB_DSMCC, LOG_ERR,
                         QString("[dsmcc] Module %1 size has changed (%2 to %3) "
                                 "but version has not!!")
-                             .arg(info->m_module_id)
-                             .arg(info->m_module_size)
+                             .arg(info->m_moduleId)
+                             .arg(info->m_moduleSize)
                              .arg(cachep->DataSize()));
                 }
                 // Version has changed - Drop old data.
                 LOG(VB_DSMCC, LOG_INFO, QString("[dsmcc] Updated Module %1")
-                        .arg(info->m_module_id));
+                        .arg(info->m_moduleId));
 
                 // Remove and delete the cache object.
                 m_Cache.erase(it);
@@ -207,11 +207,11 @@ void ObjCarousel::AddModuleInfo(DsmccDii *dii, Dsmcc *status,
             continue;
 
         LOG(VB_DSMCC, LOG_INFO, QString("[dsmcc] Saving info for module %1")
-                .arg(dii->m_modules[i].m_module_id));
+                .arg(dii->m_modules[i].m_moduleId));
 
         // Create a new cache module data object.
         auto *cachep = new DSMCCCacheModuleData(dii, info, streamTag);
-        int tag = info->m_modinfo.m_tap.m_assoc_tag;
+        int tag = info->m_modInfo.m_tap.m_assocTag;
         LOG(VB_DSMCC, LOG_DEBUG, QString("[dsmcc] Module info tap identifies "
                                          "tag %1 with carousel %2")
             .arg(tag).arg(cachep->CarouselId()));
@@ -239,7 +239,7 @@ void ObjCarousel::AddModuleData(DsmccDb *ddb, const unsigned char *data)
     {
         DSMCCCacheModuleData *cachep = *it;
         if (cachep->CarouselId() == m_id &&
-            (cachep->ModuleId() == ddb->m_module_id))
+            (cachep->ModuleId() == ddb->m_moduleId))
         {
             // Add the block to the module
             unsigned char *tmp_data = cachep->AddModuleData(ddb, data);
@@ -256,7 +256,7 @@ void ObjCarousel::AddModuleData(DsmccDb *ddb, const unsigned char *data)
                 while (curp < len)
                 {
                     BiopMessage bm;
-                    if (!bm.Process(cachep, &m_filecache, tmp_data, &curp))
+                    if (!bm.Process(cachep, &m_fileCache, tmp_data, &curp))
                         break;
                 }
                 free(tmp_data);
@@ -265,5 +265,5 @@ void ObjCarousel::AddModuleData(DsmccDb *ddb, const unsigned char *data)
         }
     }
     LOG(VB_DSMCC, LOG_INFO, QString("[dsmcc] Data block module %1 not on carousel %2")
-        .arg(ddb->m_module_id).arg(m_id));
+        .arg(ddb->m_moduleId).arg(m_id));
 }

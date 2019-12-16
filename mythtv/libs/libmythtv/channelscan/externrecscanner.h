@@ -40,15 +40,15 @@ class ExternRecChannelScanner : public QRunnable
     void run(void) override; // QRunnable
 
   private:
-    ScanMonitor *m_scan_monitor   {nullptr};
-    uint         m_cardid;
-    QString      m_inputname;
-    uint         m_sourceid;
-    uint         m_channel_total  {0};
-    uint         m_channel_cnt    {1};
-    bool         m_thread_running {false};
-    bool         m_stop_now       {false};
-    MThread     *m_thread         {nullptr};
+    ScanMonitor *m_scanMonitor   {nullptr};
+    uint         m_cardId;
+    QString      m_inputName;
+    uint         m_sourceId;
+    uint         m_channelTotal  {0};
+    uint         m_channelCnt    {1};
+    bool         m_threadRunning {false};
+    bool         m_stopNow       {false};
+    MThread     *m_thread        {nullptr};
     QMutex       m_lock;
 };
 

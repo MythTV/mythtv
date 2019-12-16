@@ -422,7 +422,7 @@ uint ChannelUtil::CreateMultiplex(uint sourceid, const DTVMultiplex &mux,
         mux.m_frequency,                     mux.m_modulation.toString(),
         // DVB specific
         transport_id,                        network_id,
-        mux.m_symbolrate,                    mux.m_bandwidth.toChar().toLatin1(),
+        mux.m_symbolRate,                    mux.m_bandwidth.toChar().toLatin1(),
         mux.m_polarity.toChar().toLatin1(),  mux.m_inversion.toChar().toLatin1(),
         mux.m_transMode.toChar().toLatin1(),
         mux.m_fec.toString(),                mux.m_modulation.toString(),

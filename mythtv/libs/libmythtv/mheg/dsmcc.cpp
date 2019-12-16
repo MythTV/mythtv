@@ -92,7 +92,7 @@ bool Dsmcc::ProcessSectionHeader(DsmccSectionHeader *header,
 {
     int crc_offset = 0;
 
-    header->m_table_id = data[0];
+    header->m_tableId = data[0];
     header->m_flags[0] = data[1];
     header->m_flags[1] = data[2];
 
@@ -106,7 +106,7 @@ bool Dsmcc::ProcessSectionHeader(DsmccSectionHeader *header,
 
     /* data[3] - reserved */
 
-    header->m_table_id_extension = (data[4] << 8) | data[5];
+    header->m_tableIdExtension = (data[4] << 8) | data[5];
 
     header->m_flags2 = data[6];
 
@@ -165,10 +165,10 @@ void Dsmcc::ProcessDownloadServerInitiate(const unsigned char *data,
     if (ret <= 0)
         return; /* error */
 
-    if (strcmp(gatewayProfile.m_type_id, "srg") != 0)
+    if (strcmp(gatewayProfile.m_typeId, "srg") != 0)
     {
         LOG(VB_DSMCC, LOG_WARNING, QString("[dsmcc] IOR unexpected type_id: '%1'")
-            .arg(gatewayProfile.m_type_id));
+            .arg(gatewayProfile.m_typeId));
         return; /* error */
     }
     if (ret + 4 > data_len)
@@ -182,33 +182,33 @@ void Dsmcc::ProcessDownloadServerInitiate(const unsigned char *data,
     // Process any new taps
     gatewayProfile.AddTap(this);
 
-    DSMCCCacheReference *ref = gatewayProfile.m_profile_body->GetReference();
+    DSMCCCacheReference *ref = gatewayProfile.m_profileBody->GetReference();
     unsigned carouselId = ref->m_nCarouselId;
     ObjCarousel *car = GetCarouselById(carouselId);
 
     // This provides us with a map from component tag to carousel ID.
-    auto *full = dynamic_cast<ProfileBodyFull*>(gatewayProfile.m_profile_body);
+    auto *full = dynamic_cast<ProfileBodyFull*>(gatewayProfile.m_profileBody);
     if (full)
     {
         LOG(VB_DSMCC, LOG_DEBUG, QString("[dsmcc] DSI ServiceGateway"
             " carousel %1 tag %2 module %3 key %4")
-            .arg(carouselId).arg(full->m_dsm_conn.m_tap.m_assoc_tag)
-            .arg(ref->m_nModuleId).arg(ref->m_Key.toString()));
+            .arg(carouselId).arg(full->m_dsmConn.m_tap.m_assocTag)
+            .arg(ref->m_nModuleId).arg(ref->m_key.toString()));
 
         // Add the tap to the map and create a new carousel if necessary.
-        car = AddTap(full->m_dsm_conn.m_tap.m_assoc_tag, carouselId);
+        car = AddTap(full->m_dsmConn.m_tap.m_assocTag, carouselId);
     }
     else
     {
         LOG(VB_DSMCC, LOG_INFO, QString("[dsmcc] DSI ServiceGateway"
             " carousel %1 module %2 key %3")
             .arg(carouselId).arg(ref->m_nModuleId)
-            .arg(ref->m_Key.toString()));
+            .arg(ref->m_key.toString()));
     }
 
     // Set the gateway (if it isn't already set).
     if (car)
-        car->m_filecache.SetGateway(*ref);
+        car->m_fileCache.SetGateway(*ref);
 
     // The UK profile says that we can have the file to boot in
     // the serviceContextList but in practice this seems not to
@@ -244,49 +244,49 @@ void Dsmcc::ProcessDownloadInfoIndication(const unsigned char *data,
     DsmccDii dii;
     int off = 0;
 
-    dii.m_download_id = COMBINE32(data, 0);
+    dii.m_downloadId = COMBINE32(data, 0);
 
-    ObjCarousel *car = GetCarouselById(dii.m_download_id);
+    ObjCarousel *car = GetCarouselById(dii.m_downloadId);
 
     if (car == nullptr)
     {
         LOG(VB_DSMCC, LOG_ERR, QString("[dsmcc] Section Info for "
                                        "unknown carousel %1")
-                .arg(dii.m_download_id));
+                .arg(dii.m_downloadId));
         // No known carousels yet (possible?)
         return;
     }
 
     off += 4;
-    dii.m_block_size = data[off] << 8 | data[off+1];
+    dii.m_blockSize = data[off] << 8 | data[off+1];
     off += 2;
 
     off += 6; /* not used fields */
-    dii.m_tc_download_scenario = COMBINE32(data, off);
+    dii.m_tcDownloadScenario = COMBINE32(data, off);
     off += 4;
 
     /* skip unused compatibility descriptor len */
     off += 2;
-    dii.m_number_modules = (data[off] << 8) | data[off + 1];
+    dii.m_numberModules = (data[off] << 8) | data[off + 1];
     off += 2;
-    dii.m_modules = new DsmccModuleInfo[dii.m_number_modules];
+    dii.m_modules = new DsmccModuleInfo[dii.m_numberModules];
 
-    for (uint i = 0; i < dii.m_number_modules; i++)
+    for (uint i = 0; i < dii.m_numberModules; i++)
     {
-        dii.m_modules[i].m_module_id = (data[off] << 8) | data[off + 1];
+        dii.m_modules[i].m_moduleId = (data[off] << 8) | data[off + 1];
         off += 2;
-        dii.m_modules[i].m_module_size = COMBINE32(data, off);
+        dii.m_modules[i].m_moduleSize = COMBINE32(data, off);
         off += 4;
-        dii.m_modules[i].m_module_version  = data[off++];
-        dii.m_modules[i].m_module_info_len = data[off++];
+        dii.m_modules[i].m_moduleVersion  = data[off++];
+        dii.m_modules[i].m_moduleInfoLen  = data[off++];
 
         LOG(VB_DSMCC, LOG_DEBUG, QString("[dsmcc] Module %1 -> "
                                         "Size = %2 Version = %3")
-                .arg(dii.m_modules[i].m_module_id)
-                .arg(dii.m_modules[i].m_module_size)
-                .arg(dii.m_modules[i].m_module_version));
+                .arg(dii.m_modules[i].m_moduleId)
+                .arg(dii.m_modules[i].m_moduleSize)
+                .arg(dii.m_modules[i].m_moduleVersion));
 
-        int ret = dii.m_modules[i].m_modinfo.Process(data + off);
+        int ret = dii.m_modules[i].m_modInfo.Process(data + off);
 
         if (ret > 0)
         {
@@ -298,7 +298,7 @@ void Dsmcc::ProcessDownloadInfoIndication(const unsigned char *data,
         }
     }
 
-    dii.m_private_data_len = (data[off] << 8) | data[off + 1];
+    dii.m_privateDataLen = (data[off] << 8) | data[off + 1];
 
     car->AddModuleInfo(&dii, this, streamTag);
 }
@@ -416,15 +416,15 @@ void Dsmcc::ProcessSectionData(const unsigned char *data, int length)
     const unsigned char *blockData = data + DSMCC_DDB_OFFSET;
     DsmccDb ddb;
 
-    ddb.m_module_id      = (blockData[0] << 8) | blockData[1];
-    ddb.m_module_version = blockData[2];
+    ddb.m_moduleId      = (blockData[0] << 8) | blockData[1];
+    ddb.m_moduleVersion = blockData[2];
     /* skip reserved byte */
-    ddb.m_block_number   = (blockData[4] << 8) | blockData[5];
+    ddb.m_blockNumber   = (blockData[4] << 8) | blockData[5];
     ddb.m_len = message_len - 6;
 
     LOG(VB_DSMCC, LOG_DEBUG,
         QString("[dsmcc] Data Block ModID %1 Pos %2 Version %3")
-            .arg(ddb.m_module_id).arg(ddb.m_block_number).arg(ddb.m_module_version));
+            .arg(ddb.m_moduleId).arg(ddb.m_blockNumber).arg(ddb.m_moduleVersion));
 
     ObjCarousel *car = GetCarouselById(download_id);
     if (car != nullptr)
@@ -432,7 +432,7 @@ void Dsmcc::ProcessSectionData(const unsigned char *data, int length)
     else
         LOG(VB_DSMCC, LOG_WARNING, QString("[dsmcc] Data Block ModID %1 Pos %2"
             " unknown carousel %3")
-            .arg(ddb.m_module_id).arg(ddb.m_block_number).arg(download_id));
+            .arg(ddb.m_moduleId).arg(ddb.m_blockNumber).arg(download_id));
 }
 
 void Dsmcc::ProcessSectionDesc(const unsigned char *data, int length)
@@ -557,7 +557,7 @@ int Dsmcc::GetDSMCCObject(QStringList &objectPath, QByteArray &result)
     // Can we actually have more than one carousel?
     for (; it != m_carousels.end(); ++it)
     {
-        int res = (*it)->m_filecache.GetDSMObject(objectPath, result);
+        int res = (*it)->m_fileCache.GetDSMObject(objectPath, result);
         if (res != -1)
             return res;
     }

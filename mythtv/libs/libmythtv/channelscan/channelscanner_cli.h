@@ -57,11 +57,11 @@ class MTV_PUBLIC ChannelScannerCLI : public ChannelScanner
     bool    m_done            {false};
     bool    m_onlysavescan;
     bool    m_interactive;
-    bool    m_status_lock     {false};
-    uint    m_status_complete {0};
-    float   m_status_snr      {0.0};
-    QString m_status_text;
-    QString m_status_last_log;
+    bool    m_statusLock      {false};
+    uint    m_statusComplete  {0};
+    float   m_statusSnr       {0.0};
+    QString m_statusText;
+    QString m_statusLastLog;
 };
 
 #endif // _CHANNEL_SCANNER_CLI_H_

@@ -27,8 +27,8 @@ class HDHRSignalMonitor: public DTVSignalMonitor
     HDHRChannel *GetHDHRChannel(void);
 
   protected:
-    bool               streamHandlerStarted;
-    HDHRStreamHandler *streamHandler;
+    bool               m_streamHandlerStarted {false};
+    HDHRStreamHandler *m_streamHandler        {nullptr};
 };
 
 #endif // HDHRSIGNALMONITOR_H

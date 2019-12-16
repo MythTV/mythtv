@@ -187,13 +187,13 @@ ChannelScanSM::ChannelScanSM(ScanMonitor *_scan_monitor,
             LOG(VB_CHANSCAN, LOG_INFO, LOC +
                 QString("Setting NIT-ID to %1").arg(nitid));
 
-            m_bouquet_id = query.value(1).toUInt();
-            m_region_id = query.value(2).toUInt();
+            m_bouquetId = query.value(1).toUInt();
+            m_regionId = query.value(2).toUInt();
         }
 
         LOG(VB_CHANSCAN, LOG_INFO, LOC +
             QString("Freesat/BSkyB bouquet_id:%1 region_id:%2")
-                .arg(m_bouquet_id).arg(m_region_id));
+                .arg(m_bouquetId).arg(m_regionId));
 
         dtvSigMon->SetStreamData(data);
         dtvSigMon->AddFlags(SignalMonitor::kDTVSigMon_WaitForMGT |
@@ -1497,7 +1497,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
         const BouquetAssociationTable *bat = *bats_it;
 
         // Only the bouquet selected by user
-        if (bat->BouquetID() != m_bouquet_id)
+        if (bat->BouquetID() != m_bouquetId)
             continue;
 
         for (uint t = 0; t < bat->TransportStreamCount(); ++t)
@@ -1536,7 +1536,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
                             {
                                 uint region_id = ld.RegionID(i,j);
                                 uint lcn = ld.LogicalChannelNumber(i,j);
-                                if (region_id == m_region_id)
+                                if (region_id == m_regionId)
                                 {
                                     lcn_sid[lcn] = ((qlonglong)netid<<32) | service_id;
                                 }
@@ -1562,7 +1562,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
                         {
                             uint service_id = ld.ServiceID(i);
                             uint lcn = ld.LogicalChannelNumber(i);
-                            if (region_id == m_region_id)
+                            if (region_id == m_regionId)
                             {
                                 lcn_sid[lcn] = ((qlonglong)netid<<32) | service_id;
                             }

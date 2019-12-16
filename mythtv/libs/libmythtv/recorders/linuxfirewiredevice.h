@@ -90,8 +90,8 @@ class LinuxFirewireDevice : public FirewireDevice, public QRunnable
 
   private:
     uint     m_bufsz;
-    bool     m_db_reset_disabled {false};
-    bool     m_use_p2p;
+    bool     m_dbResetDisabled   {false};
+    bool     m_useP2P;
     LFDPriv *m_priv              {nullptr};
 };
 

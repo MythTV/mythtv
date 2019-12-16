@@ -23,8 +23,8 @@ class BiopNameComp
 
     int Process(const unsigned char *);
 
-    unsigned char  m_id_len   {0};
-    unsigned char  m_kind_len {0};
+    unsigned char  m_idLen    {0};
+    unsigned char  m_kindLen  {0};
     char          *m_id       {nullptr};
     char          *m_kind     {nullptr};
 };
@@ -37,7 +37,7 @@ class BiopName
 
     int Process(const unsigned char*);
 
-    unsigned char  m_comp_count {0};
+    unsigned char  m_compCount  {0};
     BiopNameComp  *m_comps      {nullptr};
 };
 
@@ -52,9 +52,9 @@ class BiopTap
     unsigned short  m_id            {0};
     unsigned short  m_use           {0};
     // Only the association tag is currently used.
-    unsigned short  m_assoc_tag     {0};
-    unsigned short  m_selector_len  {0};
-    char           *m_selector_data {nullptr};
+    unsigned short  m_assocTag      {0};
+    unsigned short  m_selectorLen   {0};
+    char           *m_selectorData  {nullptr};
 };
 
 class BiopConnbinder
@@ -63,9 +63,9 @@ class BiopConnbinder
     BiopConnbinder() = default;
     int Process(const unsigned char*); 
 
-    unsigned long m_component_tag      {0};
-    unsigned char m_component_data_len {0};
-    unsigned char m_taps_count         {0};
+    unsigned long m_componentTag      {0};
+    unsigned char m_componentDataLen  {0};
+    unsigned char m_tapsCount         {0};
     BiopTap       m_tap;
 };
 
@@ -77,11 +77,11 @@ class BiopObjLocation
 
     int Process(const unsigned char*);
 
-    unsigned long       m_component_tag      {0};
-    char                m_component_data_len {0};
-    char                m_version_major      {0};
-    char                m_version_minor      {0};
-    DSMCCCacheReference m_Reference;
+    unsigned long       m_componentTag      {0};
+    char                m_componentDataLen  {0};
+    char                m_versionMajor      {0};
+    char                m_versionMinor      {0};
+    DSMCCCacheReference m_reference;
 };
 
 class ProfileBody
@@ -99,17 +99,17 @@ class ProfileBodyFull: public ProfileBody
     virtual ~ProfileBodyFull() = default;
     int Process(const unsigned char *) override; // ProfileBody
     DSMCCCacheReference *GetReference() override // ProfileBody
-        { return &m_obj_loc.m_Reference; }
+        { return &m_objLoc.m_reference; }
 
   protected:
-    unsigned long   m_data_len              {0};
-    char            m_byte_order            {0};
-    char            m_lite_components_count {0};
-    BiopObjLocation m_obj_loc;
+    unsigned long   m_dataLen              {0};
+    char            m_byteOrder            {0};
+    char            m_liteComponentsCount  {0};
+    BiopObjLocation m_objLoc;
 
     /* Just for the moment make this public */
   public:
-    BiopConnbinder  m_dsm_conn;
+    BiopConnbinder  m_dsmConn;
     /* ignore the rest  */
 };
 
@@ -131,18 +131,18 @@ class BiopIor
     BiopIor() = default;
     ~BiopIor()
     {
-        free(m_type_id);
-        delete m_profile_body;
+        free(m_typeId);
+        delete m_profileBody;
     }
  
     int Process(const unsigned char *);
     void AddTap(Dsmcc *pStatus);
 
-    unsigned long  m_type_id_len           {0};
-    char          *m_type_id               {nullptr};
-    unsigned long  m_tagged_profiles_count {0};
-    unsigned long  m_profile_id_tag        {0};
-    ProfileBody   *m_profile_body          {nullptr};
+    unsigned long  m_typeIdLen            {0};
+    char          *m_typeId               {nullptr};
+    unsigned long  m_taggedProfilesCount  {0};
+    unsigned long  m_profileIdTag         {0};
+    ProfileBody   *m_profileBody          {nullptr};
 
     /* UKProfile - ignore other profiles */
 };
@@ -156,10 +156,10 @@ class BiopBinding
     int Process(const unsigned char *data);
 
     BiopName      m_name;
-    char          m_binding_type {0};
+    char          m_bindingType  {0};
     BiopIor       m_ior;
-    unsigned int  m_objinfo_len  {0};
-    char         *m_objinfo      {nullptr};
+    unsigned int  m_objInfoLen   {0};
+    char         *m_objInfo      {nullptr};
 };
 
 class ObjCarousel;
@@ -185,16 +185,16 @@ class BiopMessage
     bool ProcessMsgHdr(const unsigned char *data, unsigned long *curp);
 
   protected:
-    unsigned char  m_version_major {0};
-    unsigned char  m_version_minor {0};
-    unsigned int   m_message_size  {0};
-    DSMCCCacheKey  m_objkey;
-    unsigned long  m_objkind_len   {0};
-    unsigned int   m_objinfo_len   {0};
-    char          *m_objinfo       {nullptr};
+    unsigned char  m_versionMajor {0};
+    unsigned char  m_versionMinor {0};
+    unsigned int   m_messageSize  {0};
+    DSMCCCacheKey  m_objKey;
+    unsigned long  m_objKindLen   {0};
+    unsigned int   m_objInfoLen   {0};
+    char          *m_objInfo      {nullptr};
 
   public:
-    char          *m_objkind       {nullptr};
+    char          *m_objKind       {nullptr};
 };
 
 // Data extracted from the descriptors in a BiopModuleInfo message
@@ -214,10 +214,10 @@ class BiopModuleInfo
   public:
     int Process(const unsigned char *Data);
 
-    unsigned long        m_mod_timeout;
-    unsigned long        m_block_timeout;
-    unsigned long        m_min_blocktime;
-    unsigned char        m_taps_count;
+    unsigned long        m_modTimeout;
+    unsigned long        m_blockTimeout;
+    unsigned long        m_minBlockTime;
+    unsigned char        m_tapsCount;
     BiopTap              m_tap;
 
     ModuleDescriptorData m_descriptorData;
@@ -226,13 +226,13 @@ class BiopModuleInfo
 class DsmccModuleInfo
 {
   public:
-    unsigned short  m_module_id;
-    unsigned long   m_module_size;
-    unsigned char   m_module_version;
-    unsigned char   m_module_info_len;
+    unsigned short  m_moduleId;
+    unsigned long   m_moduleSize;
+    unsigned char   m_moduleVersion;
+    unsigned char   m_moduleInfoLen;
     unsigned char  *m_data            {nullptr};
     unsigned int    m_curp;
-    BiopModuleInfo  m_modinfo;
+    BiopModuleInfo  m_modInfo;
 };
 
 #endif

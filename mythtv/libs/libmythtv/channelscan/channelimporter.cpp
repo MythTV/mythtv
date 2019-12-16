@@ -37,7 +37,7 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
 {
     if (_transports.empty())
     {
-        if (m_use_gui)
+        if (m_useGui)
         {
             int channels = ChannelUtil::GetChannelCount(sourceid);
 
@@ -69,13 +69,13 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
     // Print some scan parameters
     {
         cout << endl << "Scan parameters:" << endl;
-        bool require_av = (m_service_requirements & kRequireAV) == kRequireAV;
-        bool require_a  = (m_service_requirements & kRequireAudio) != 0;
+        bool require_av = (m_serviceRequirements & kRequireAV) == kRequireAV;
+        bool require_a  = (m_serviceRequirements & kRequireAudio) != 0;
         cout << "Desired Services            : " << (require_av ? "tv" : require_a ? "tv+radio" : "all") << endl;
-        cout << "Unencrypted Only            : " << (m_fta_only            ? "yes" : "no") << endl;
-        cout << "Logical Channel Numbers only: " << (m_lcn_only            ? "yes" : "no") << endl;
-        cout << "Complete scan data required : " << (m_complete_only       ? "yes" : "no") << endl;
-        cout << "Full search for old channels: " << (m_full_channel_search ? "yes" : "no") << endl;
+        cout << "Unencrypted Only            : " << (m_ftaOnly           ? "yes" : "no") << endl;
+        cout << "Logical Channel Numbers only: " << (m_lcnOnly           ? "yes" : "no") << endl;
+        cout << "Complete scan data required : " << (m_completeOnly      ? "yes" : "no") << endl;
+        cout << "Full search for old channels: " << (m_fullChannelSearch ? "yes" : "no") << endl;
     }
 
     // Print out each channel
@@ -89,7 +89,7 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
     }
 
     uint saved_scan = 0;
-    if (m_do_save)
+    if (m_doSave)
         saved_scan = SaveScan(transports);
 
     CleanupDuplicates(transports);
@@ -125,7 +125,7 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
 
     // Add channels from the DB to the channels from the scan
     // and possibly delete one or more of the off-air channels
-    if (m_do_delete)
+    if (m_doDelete)
     {
         ScanDTVTransportList trans = transports;
         for (size_t i = 0; i < db_trans.size(); ++i)
@@ -151,13 +151,13 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
     QString msg = GetSummary(transports_scanned_size, info, stats);
     cout << msg.toLatin1().constData() << endl << endl;
 
-    if (m_do_insert)
+    if (m_doInsert)
         InsertChannels(transports, info);
 
-    if (m_do_delete && sourceid)
+    if (m_doDelete && sourceid)
         DeleteUnusedTransports(sourceid);
 
-    if (m_do_delete || m_do_insert)
+    if (m_doDelete || m_doInsert)
         ScanInfo::MarkProcessed(saved_scan);
 }
 
@@ -255,7 +255,7 @@ uint ChannelImporter::DeleteChannels(
         // TODO manual delete
     }
 
-    // TODO delete encrypted channels when m_fta_only set
+    // TODO delete encrypted channels when m_ftaOnly set
 
     if (deleted.empty())
         return 0;
@@ -377,7 +377,7 @@ void ChannelImporter::InsertChannels(
         }
     }
 
-    if (!m_is_interactive)
+    if (!m_isInteractive)
         return;
 
     // If any of the potential uniques is high and inserting
@@ -560,7 +560,7 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
                 }
 
                 // Only ask if not already asked before with kInsertManual
-                if (m_is_interactive && !asked &&
+                if (m_isInteractive && !asked &&
                     (conflicting || (kChannelTypeConflictingFirst <= type)))
                 {
                     bool ok_done = false;
@@ -747,7 +747,7 @@ ScanDTVTransportList ChannelImporter::UpdateChannels(
             {
                 bool conflicting = false;
 
-                if (m_keep_channel_numbers)
+                if (m_keepChannelNumbers)
                 {
                     ChannelUtil::UpdateChannelNumberFromDB(chan);
                 }
@@ -937,15 +937,15 @@ void ChannelImporter::CleanupDuplicates(ScanDTVTransportList &transports)
 
 void ChannelImporter::FilterServices(ScanDTVTransportList &transports) const
 {
-    bool require_av = (m_service_requirements & kRequireAV) == kRequireAV;
-    bool require_a  = (m_service_requirements & kRequireAudio) != 0;
+    bool require_av = (m_serviceRequirements & kRequireAV) == kRequireAV;
+    bool require_a  = (m_serviceRequirements & kRequireAudio) != 0;
 
     for (size_t i = 0; i < transports.size(); ++i)
     {
         ChannelInsertInfoList filtered;
         for (size_t k = 0; k < transports[i].m_channels.size(); ++k)
         {
-            if (m_fta_only && transports[i].m_channels[k].m_is_encrypted &&
+            if (m_ftaOnly && transports[i].m_channels[k].m_is_encrypted &&
                 transports[i].m_channels[k].m_decryption_status != kEncDecrypted)
                 continue;
 
@@ -956,7 +956,7 @@ void ChannelImporter::FilterServices(ScanDTVTransportList &transports) const
                 continue;
 
             // Filter channels out that do not have a logical channel number
-            if (m_lcn_only && transports[i].m_channels[k].m_chan_num.isEmpty())
+            if (m_lcnOnly && transports[i].m_channels[k].m_chan_num.isEmpty())
             {
                 QString msg = FormatChannel(transports[i], transports[i].m_channels[k]);
                 LOG(VB_CHANSCAN, LOG_INFO, LOC + QString("No LCN: %1").arg(msg));
@@ -964,7 +964,7 @@ void ChannelImporter::FilterServices(ScanDTVTransportList &transports) const
             }
 
             // Filter channels out that are not present in PAT and PMT.
-            if (m_complete_only &&
+            if (m_completeOnly &&
                 !(transports[i].m_channels[k].m_in_pat &&
                   transports[i].m_channels[k].m_in_pmt ))
             {
@@ -974,7 +974,7 @@ void ChannelImporter::FilterServices(ScanDTVTransportList &transports) const
             }
 
             // Filter channels out that are not present in SDT and that are not ATSC
-            if (m_complete_only &&
+            if (m_completeOnly &&
                 transports[i].m_channels[k].m_atsc_major_channel == 0 &&
                 transports[i].m_channels[k].m_atsc_minor_channel == 0 &&
                 !(transports[i].m_channels[k].m_in_pat &&
@@ -989,7 +989,7 @@ void ChannelImporter::FilterServices(ScanDTVTransportList &transports) const
             }
 
             // Filter channels out that do not have a name
-            if (m_complete_only && transports[i].m_channels[k].m_service_name.isEmpty())
+            if (m_completeOnly && transports[i].m_channels[k].m_service_name.isEmpty())
             {
                 QString msg = FormatChannel(transports[i], transports[i].m_channels[k]);
                 LOG(VB_CHANSCAN, LOG_INFO, LOC + QString("No name: %1").arg(msg));
@@ -1102,7 +1102,7 @@ ScanDTVTransportList ChannelImporter::GetDBTransports(
         // Search for old channels in all transports of the scan.
         // This is done for all channels that have not yet been found.
         // This can identify the channels that have moved to another transport.
-        if (m_full_channel_search)
+        if (m_fullChannelSearch)
         {
             for (size_t idc = 0; idc < db_transport.m_channels.size(); ++idc)               // All channels in database transport
             {
@@ -1637,7 +1637,7 @@ ChannelImporter::DeleteAction
 ChannelImporter::QueryUserDelete(const QString &msg)
 {
     DeleteAction action = kDeleteAll;
-    if (m_use_gui)
+    if (m_useGui)
     {
         int ret = -1;
         do
@@ -1671,7 +1671,7 @@ ChannelImporter::QueryUserDelete(const QString &msg)
 //        action = (2 == m_deleteChannelResult) ? kDeleteManual    : action;
 //        action = (3 == m_deleteChannelResult) ? kDeleteIgnoreAll : action;
     }
-    else if (m_is_interactive)
+    else if (m_isInteractive)
     {
         cout << msg.toLatin1().constData()
              << endl
@@ -1712,7 +1712,7 @@ ChannelImporter::InsertAction
 ChannelImporter::QueryUserInsert(const QString &msg)
 {
     InsertAction action = kInsertAll;
-    if (m_use_gui)
+    if (m_useGui)
     {
         int ret = -1;
         do
@@ -1743,7 +1743,7 @@ ChannelImporter::QueryUserInsert(const QString &msg)
         action = (1 == ret) ? kInsertManual    : action;
         action = (2 == ret) ? kInsertIgnoreAll : action;
     }
-    else if (m_is_interactive)
+    else if (m_isInteractive)
     {
         cout << msg.toLatin1().constData()
              << endl
@@ -1782,7 +1782,7 @@ ChannelImporter::QueryUserUpdate(const QString &msg)
 {
     UpdateAction action = kUpdateAll;
 
-    if (m_use_gui)
+    if (m_useGui)
     {
         int ret = -1;
         do
@@ -1811,7 +1811,7 @@ ChannelImporter::QueryUserUpdate(const QString &msg)
         action = (0 == ret) ? kUpdateAll       : action;
         action = (1 == ret) ? kUpdateIgnoreAll : action;
     }
-    else if (m_is_interactive)
+    else if (m_isInteractive)
     {
         cout << msg.toLatin1().constData()
              << endl
@@ -1995,7 +1995,7 @@ OkCancelType ChannelImporter::QueryUserResolve(
 
     OkCancelType ret = kOCTCancel;
 
-    if (m_use_gui)
+    if (m_useGui)
     {
         while (true)
         {
@@ -2021,7 +2021,7 @@ OkCancelType ChannelImporter::QueryUserResolve(
             }
         }
     }
-    else if (m_is_interactive)
+    else if (m_isInteractive)
     {
         cout << msg.toLatin1().constData() << endl;
 
@@ -2072,7 +2072,7 @@ OkCancelType ChannelImporter::QueryUserInsert(
 
     OkCancelType ret = kOCTCancel;
 
-    if (m_use_gui)
+    if (m_useGui)
     {
         while (true)
         {
@@ -2099,7 +2099,7 @@ OkCancelType ChannelImporter::QueryUserInsert(
             }
         }
     }
-    else if (m_is_interactive)
+    else if (m_isInteractive)
     {
         cout << msg.toLatin1().constData() << endl;
 

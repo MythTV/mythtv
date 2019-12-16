@@ -61,5 +61,5 @@ class ExternalRecChannelFetcher
     int     m_cardid;
     QString m_command;
 
-    ExternalStreamHandler *m_stream_handler {nullptr};
+    ExternalStreamHandler *m_streamHandler {nullptr};
 };

@@ -173,7 +173,7 @@ void RecorderBase::SetOption(const QString &name, const QString &value)
             // are far more likely to be using a mix of ATSC and NTSC than
             // a mix of ATSC and PAL or SECAM. The atsc recorder itself
             // does not care about these values, except in so much as tv_rec
-            // cares about m_video_frame_rate which should be neither 29.97
+            // cares about m_videoFrameRate which should be neither 29.97
             // nor 25.0, but based on the actual video.
             m_ntsc = true;
             SetFrameRate(29.97);
@@ -224,17 +224,17 @@ void RecorderBase::SetStrOption(RecordingProfile *profile, const QString &name)
 void RecorderBase::StopRecording(void)
 {
     QMutexLocker locker(&m_pauseLock);
-    m_request_recording = false;
+    m_requestRecording = false;
     m_unpauseWait.wakeAll();
     while (m_recording)
     {
         m_recordingWait.wait(&m_pauseLock, 100);
-        if (m_request_recording)
+        if (m_requestRecording)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 "Programmer Error: Recorder started while we were in "
                 "StopRecording");
-            m_request_recording = false;
+            m_requestRecording = false;
         }
     }
 }
@@ -250,7 +250,7 @@ bool RecorderBase::IsRecording(void)
 bool RecorderBase::IsRecordingRequested(void)
 {
     QMutexLocker locker(&m_pauseLock);
-    return m_request_recording;
+    return m_requestRecording;
 }
 
 /** \brief Pause tells recorder to pause, it should not block.
@@ -264,7 +264,7 @@ void RecorderBase::Pause(bool clear)
 {
     (void) clear;
     QMutexLocker locker(&m_pauseLock);
-    m_request_pause = true;
+    m_requestPause = true;
 }
 
 /** \brief Unpause tells recorder to unpause.
@@ -274,7 +274,7 @@ void RecorderBase::Pause(bool clear)
 void RecorderBase::Unpause(void)
 {
     QMutexLocker locker(&m_pauseLock);
-    m_request_pause = false;
+    m_requestPause = false;
     m_unpauseWait.wakeAll();
 }
 
@@ -301,7 +301,7 @@ bool RecorderBase::WaitForPause(int timeout)
     t.start();
 
     QMutexLocker locker(&m_pauseLock);
-    while (!IsPaused(true) && m_request_pause)
+    while (!IsPaused(true) && m_requestPause)
     {
         int wait = timeout - t.elapsed();
         if (wait <= 0)
@@ -312,7 +312,7 @@ bool RecorderBase::WaitForPause(int timeout)
 }
 
 /** \fn RecorderBase::PauseAndWait(int)
- *  \brief If m_request_pause is true, sets pause and blocks up to
+ *  \brief If m_requestPause is true, sets pause and blocks up to
  *         timeout milliseconds or until unpaused, whichever is
  *         sooner.
  *
@@ -326,7 +326,7 @@ bool RecorderBase::WaitForPause(int timeout)
 bool RecorderBase::PauseAndWait(int timeout)
 {
     QMutexLocker locker(&m_pauseLock);
-    if (m_request_pause)
+    if (m_requestPause)
     {
         if (!IsPaused(true))
         {
@@ -339,7 +339,7 @@ bool RecorderBase::PauseAndWait(int timeout)
         m_unpauseWait.wait(&m_pauseLock, timeout);
     }
 
-    if (!m_request_pause && IsPaused(true))
+    if (!m_requestPause && IsPaused(true))
     {
         m_paused = false;
         m_unpauseWait.wakeAll();

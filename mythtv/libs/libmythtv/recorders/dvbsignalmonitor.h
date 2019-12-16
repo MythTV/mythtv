@@ -34,7 +34,7 @@ class DVBSignalMonitor: public DTVSignalMonitor
     void SetRotorValue(int val) override // DTVSignalMonitor
     {
         QMutexLocker locker(&m_statusLock);
-        rotorPosition.SetValue(val);
+        m_rotorPosition.SetValue(val);
     }
 
     void EmitStatus(void) override; // SignalMonitor
@@ -58,13 +58,13 @@ class DVBSignalMonitor: public DTVSignalMonitor
     DVBChannel *GetDVBChannel(void);
 
   protected:
-    SignalMonitorValue signalToNoise;
-    SignalMonitorValue bitErrorRate;
-    SignalMonitorValue uncorrectedBlocks;
-    SignalMonitorValue rotorPosition;
+    SignalMonitorValue m_signalToNoise;
+    SignalMonitorValue m_bitErrorRate;
+    SignalMonitorValue m_uncorrectedBlocks;
+    SignalMonitorValue m_rotorPosition;
 
-    bool               streamHandlerStarted;
-    DVBStreamHandler  *streamHandler;
+    bool               m_streamHandlerStarted;
+    DVBStreamHandler  *m_streamHandler;
 };
 
 #endif // DVBSIGNALMONITOR_H

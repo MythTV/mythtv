@@ -24,10 +24,10 @@ ExternRecChannelScanner::ExternRecChannelScanner(uint cardid,
                                                  QString inputname,
                                                  uint sourceid,
                                                  ScanMonitor *monitor)
-    : m_scan_monitor(monitor)
-    , m_cardid(cardid)
-    , m_inputname(std::move(inputname))
-    , m_sourceid(sourceid)
+    : m_scanMonitor(monitor)
+    , m_cardId(cardid)
+    , m_inputName(std::move(inputname))
+    , m_sourceId(sourceid)
     , m_thread(new MThread("ExternRecChannelScanner", this))
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Has ScanMonitor %1")
@@ -48,9 +48,9 @@ void ExternRecChannelScanner::Stop(void)
 {
     m_lock.lock();
 
-    while (m_thread_running)
+    while (m_threadRunning)
     {
-        m_stop_now = true;
+        m_stopNow = true;
         m_lock.unlock();
         m_thread->wait(5);
         m_lock.lock();
@@ -65,26 +65,26 @@ void ExternRecChannelScanner::Stop(void)
 void ExternRecChannelScanner::Scan(void)
 {
     Stop();
-    m_stop_now = false;
+    m_stopNow = false;
     m_thread->start();
 }
 
 void ExternRecChannelScanner::run(void)
 {
     m_lock.lock();
-    m_thread_running = true;
+    m_threadRunning = true;
     m_lock.unlock();
 
 
     // Step 1/4 : Get info from DB
-    QString cmd = CardUtil::GetVideoDevice(m_cardid);
+    QString cmd = CardUtil::GetVideoDevice(m_cardId);
 
-    if (m_stop_now || cmd.isEmpty())
+    if (m_stopNow || cmd.isEmpty())
     {
         LOG(VB_CHANNEL, LOG_INFO, LOC + "Invalid external command");
         QMutexLocker locker(&m_lock);
-        m_thread_running = false;
-        m_stop_now = true;
+        m_threadRunning = false;
+        m_stopNow = true;
         return;
     }
 
@@ -92,29 +92,29 @@ void ExternRecChannelScanner::run(void)
 
 
     // Step 2/4 : Download
-    if (m_scan_monitor)
+    if (m_scanMonitor)
     {
-        m_scan_monitor->ScanPercentComplete(1);
-        m_scan_monitor->ScanAppendTextToLog(tr("Creating channel list"));
+        m_scanMonitor->ScanPercentComplete(1);
+        m_scanMonitor->ScanAppendTextToLog(tr("Creating channel list"));
     }
 
-    ExternalRecChannelFetcher fetch(m_cardid, cmd);
+    ExternalRecChannelFetcher fetch(m_cardId, cmd);
 
-    if ((m_channel_total = fetch.LoadChannels()) < 1)
+    if ((m_channelTotal = fetch.LoadChannels()) < 1)
     {
         LOG(VB_CHANNEL, LOG_ERR, LOC + "Failed to load channels");
         QMutexLocker locker(&m_lock);
-        m_thread_running = false;
-        m_stop_now = true;
+        m_threadRunning = false;
+        m_stopNow = true;
         return;
     }
 
-    vector<uint> existing = ChannelUtil::GetChanIDs(m_sourceid);
+    vector<uint> existing = ChannelUtil::GetChanIDs(m_sourceId);
     vector<uint>::iterator Iold;
 
     // Step 3/4 : Process
-    if (m_scan_monitor)
-        m_scan_monitor->ScanAppendTextToLog(tr("Processing channels"));
+    if (m_scanMonitor)
+        m_scanMonitor->ScanAppendTextToLog(tr("Processing channels"));
 
     QString channum;
     QString name;
@@ -126,13 +126,13 @@ void ExternRecChannelScanner::run(void)
     {
         LOG(VB_CHANNEL, LOG_WARNING, LOC + "No channels found.");
         QMutexLocker locker(&m_lock);
-        m_thread_running = false;
-        m_stop_now = true;
+        m_threadRunning = false;
+        m_stopNow = true;
         return;
     }
 
-    if (m_scan_monitor)
-        m_scan_monitor->ScanAppendTextToLog(tr("Adding Channels"));
+    if (m_scanMonitor)
+        m_scanMonitor->ScanAppendTextToLog(tr("Adding Channels"));
 
     uint idx = 0;
     for (;;)
@@ -142,28 +142,28 @@ void ExternRecChannelScanner::run(void)
         LOG(VB_CHANNEL, LOG_INFO, QString("Handling channel %1 %2")
             .arg(channum).arg(name));
 
-        int chanid = ChannelUtil::GetChanID(m_sourceid, channum);
+        int chanid = ChannelUtil::GetChanID(m_sourceId, channum);
 
-        if (m_scan_monitor)
-            m_scan_monitor->ScanPercentComplete(++cnt * 100 / m_channel_total);
+        if (m_scanMonitor)
+            m_scanMonitor->ScanPercentComplete(++cnt * 100 / m_channelTotal);
 
         if (chanid <= 0)
         {
-            if (m_scan_monitor)
-                m_scan_monitor->ScanAppendTextToLog(tr("Adding %1").arg(msg));
+            if (m_scanMonitor)
+                m_scanMonitor->ScanAppendTextToLog(tr("Adding %1").arg(msg));
 
-            chanid = ChannelUtil::CreateChanID(m_sourceid, channum);
-            ChannelUtil::CreateChannel(0, m_sourceid, chanid, callsign, name,
+            chanid = ChannelUtil::CreateChanID(m_sourceId, channum);
+            ChannelUtil::CreateChannel(0, m_sourceId, chanid, callsign, name,
                                        channum, 1, 0, 0,
                                        false, false, false, QString(),
                                        QString(), "Default", xmltvid);
         }
         else
         {
-            if (m_scan_monitor)
-                m_scan_monitor->ScanAppendTextToLog(tr("Updating %1").arg(msg));
+            if (m_scanMonitor)
+                m_scanMonitor->ScanAppendTextToLog(tr("Updating %1").arg(msg));
 
-            ChannelUtil::UpdateChannel(0, m_sourceid, chanid, callsign, name,
+            ChannelUtil::UpdateChannel(0, m_sourceId, chanid, callsign, name,
                                        channum, 1, 0, 0,
                                        false, false, false, QString(),
                                        QString(), "Default", xmltvid);
@@ -177,7 +177,7 @@ void ExternRecChannelScanner::run(void)
             existing.erase(Iold);
         }
 
-        if (++idx < m_channel_total)
+        if (++idx < m_channelTotal)
             fetch.NextChannel(channum, name, callsign, xmltvid);
         else
             break;
@@ -188,8 +188,8 @@ void ExternRecChannelScanner::run(void)
     {
         channum = ChannelUtil::GetChanNum(*Iold);
 
-        if (m_scan_monitor)
-            m_scan_monitor->ScanAppendTextToLog
+        if (m_scanMonitor)
+            m_scanMonitor->ScanAppendTextToLog
                 (tr("Removing unused Channel #%1").arg(channum));
 
         ChannelUtil::DeleteChannel(*Iold);
@@ -197,45 +197,45 @@ void ExternRecChannelScanner::run(void)
 
     // Step 4/4 : Finish up
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Found %1 channels").arg(cnt));
-    if (m_scan_monitor)
-        m_scan_monitor->ScanAppendTextToLog
+    if (m_scanMonitor)
+        m_scanMonitor->ScanAppendTextToLog
             (tr("Found %1 channels.").arg(cnt));
 
-    if (m_scan_monitor)
+    if (m_scanMonitor)
     {
-        m_scan_monitor->ScanAppendTextToLog(tr("Done"));
-        m_scan_monitor->ScanAppendTextToLog("");
-        m_scan_monitor->ScanPercentComplete(100);
-        m_scan_monitor->ScanComplete();
+        m_scanMonitor->ScanAppendTextToLog(tr("Done"));
+        m_scanMonitor->ScanAppendTextToLog("");
+        m_scanMonitor->ScanPercentComplete(100);
+        m_scanMonitor->ScanComplete();
     }
 
     QMutexLocker locker(&m_lock);
-    m_thread_running = false;
-    m_stop_now = true;
+    m_threadRunning = false;
+    m_stopNow = true;
 }
 
 void ExternRecChannelScanner::SetNumChannelsParsed(uint val)
 {
     uint minval = 35;
     uint range = 70 - minval;
-    uint pct = minval + (uint) truncf((((float)val) / m_channel_cnt) * range);
-    if (m_scan_monitor)
-        m_scan_monitor->ScanPercentComplete(pct);
+    uint pct = minval + (uint) truncf((((float)val) / m_channelCnt) * range);
+    if (m_scanMonitor)
+        m_scanMonitor->ScanPercentComplete(pct);
 }
 
 void ExternRecChannelScanner::SetNumChannelsInserted(uint val)
 {
     uint minval = 70;
     uint range = 100 - minval;
-    uint pct = minval + (uint) truncf((((float)val) / m_channel_cnt) * range);
-    if (m_scan_monitor)
-        m_scan_monitor->ScanPercentComplete(pct);
+    uint pct = minval + (uint) truncf((((float)val) / m_channelCnt) * range);
+    if (m_scanMonitor)
+        m_scanMonitor->ScanPercentComplete(pct);
 }
 
 void ExternRecChannelScanner::SetMessage(const QString &status)
 {
-    if (m_scan_monitor)
-        m_scan_monitor->ScanAppendTextToLog(status);
+    if (m_scanMonitor)
+        m_scanMonitor->ScanAppendTextToLog(status);
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

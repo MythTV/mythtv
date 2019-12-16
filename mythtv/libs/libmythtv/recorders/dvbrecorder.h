@@ -39,7 +39,7 @@ class DVBRecorder : public DTVRecorder
 
   private:
     DVBChannel       *m_channel        {nullptr};
-    DVBStreamHandler *m_stream_handler {nullptr};
+    DVBStreamHandler *m_streamHandler  {nullptr};
 };
 
 #endif // _DVB_RECORDER_H_

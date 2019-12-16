@@ -2141,7 +2141,7 @@ class FreesatLCNDescriptor : public MPEGDescriptor
         while ((offset + 5 < DescriptorLength()) &&
                (offset + 5 + payload[offset+4] <= DescriptorLength()))
         {
-            entries.push_back(&payload[offset]);
+            m_entries.push_back(&payload[offset]);
             offset += 5 + payload[offset+4];
         }
     }
@@ -2160,27 +2160,27 @@ class FreesatLCNDescriptor : public MPEGDescriptor
     // }
 
     uint ServiceCount(void) const
-        { return entries.size(); }
+        { return m_entries.size(); }
 
     uint ServiceID(int i) const
-        { return *entries[i] << 8 | *(entries[i]+1); }
+        { return *m_entries[i] << 8 | *(m_entries[i]+1); }
 
     uint ChanID(int i) const
-        { return (*(entries[i] + 2) << 8 | *(entries[i] + 3)) & 0x7FFF; }
+        { return (*(m_entries[i] + 2) << 8 | *(m_entries[i] + 3)) & 0x7FFF; }
 
     uint LCNCount(int i) const
-        { return *(entries[i] + 4) / 4; }
+        { return *(m_entries[i] + 4) / 4; }
 
     uint LogicalChannelNumber(int i, int j) const
-        { return (*(entries[i] + 5 + j*4) << 8 | *(entries[i] + 5 + j*4 + 1)) & 0xFFF; }
+        { return (*(m_entries[i] + 5 + j*4) << 8 | *(m_entries[i] + 5 + j*4 + 1)) & 0xFFF; }
 
     uint RegionID(int i, int j) const
-        { return *(entries[i] + 5 + j*4 + 2) << 8 | *(entries[i] + 5 + j*4 + 3); }
+        { return *(m_entries[i] + 5 + j*4 + 2) << 8 | *(m_entries[i] + 5 + j*4 + 3); }
 
     QString toString(void) const override; // MPEGDescriptor
 
   private:
-    desc_list_t entries;
+    desc_list_t m_entries;
 };
 
 /**
@@ -2206,7 +2206,7 @@ class FreesatRegionDescriptor : public MPEGDescriptor
         while ((offset + 6 < DescriptorLength()) &&
                (offset + 6 + payload[offset+5] <= DescriptorLength()))
         {
-            entries.push_back(&payload[offset]);
+            m_entries.push_back(&payload[offset]);
             offset += 6 + payload[offset+5];
         }
     }
@@ -2223,21 +2223,21 @@ class FreesatRegionDescriptor : public MPEGDescriptor
     // }
 
     uint RegionCount(void) const
-       { return entries.size(); }
+       { return m_entries.size(); }
 
     int RegionID(uint i) const
-        { return *entries[i] << 8 | *(entries[i]+1); }
+        { return *m_entries[i] << 8 | *(m_entries[i]+1); }
 
     const QString Language(uint i) const
-        { return QString::fromLatin1((char *) entries[i] + 2, 3); }
+        { return QString::fromLatin1((char *) m_entries[i] + 2, 3); }
 
     const QString RegionName(uint i) const
-        { return QString::fromLatin1((char *) entries[i] + 6, *(entries[i] + 5)); }
+        { return QString::fromLatin1((char *) m_entries[i] + 6, *(m_entries[i] + 5)); }
 
     QString toString(void) const override; // MPEGDescriptor
 
   private:
-    desc_list_t entries;
+    desc_list_t m_entries;
 };
 
 /**

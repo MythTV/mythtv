@@ -125,12 +125,12 @@ LinuxFirewireDevice::LinuxFirewireDevice(
     uint speed, bool use_p2p, uint av_buffer_size_in_bytes) :
     FirewireDevice(guid, subunitid, speed),
     m_bufsz(av_buffer_size_in_bytes),
-    m_use_p2p(use_p2p), m_priv(new LFDPriv())
+    m_useP2P(use_p2p), m_priv(new LFDPriv())
 {
     if (!m_bufsz)
         m_bufsz = gCoreContext->GetNumSetting("HDRingbufferSize");
 
-    m_db_reset_disabled = gCoreContext->GetBoolSetting("DisableFirewireReset", false);
+    m_dbResetDisabled = gCoreContext->GetBoolSetting("DisableFirewireReset", false);
 
     UpdateDeviceList();
 }
@@ -387,7 +387,7 @@ bool LinuxFirewireDevice::IsPortOpen(void) const
 
 bool LinuxFirewireDevice::OpenNode(void)
 {
-    if (m_use_p2p)
+    if (m_useP2P)
         return OpenP2PNode();
     return OpenBroadcastNode();
 }
@@ -768,7 +768,7 @@ bool LinuxFirewireDevice::ResetBus(void)
 {
     LOG(VB_GENERAL, LOG_INFO, LOC + "ResetBus() -- begin");
 
-    if (m_db_reset_disabled)
+    if (m_dbResetDisabled)
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Bus Reset disabled" + ENO);
         LOG(VB_GENERAL, LOG_INFO, LOC + "ResetBus() -- end");

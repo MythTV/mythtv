@@ -219,8 +219,8 @@ class ChannelScanSM : public MPEGStreamListener,
 
     // Scanning parameters
     uint              m_frequency         {0};
-    uint              m_bouquet_id        {0};
-    uint              m_region_id         {0};
+    uint              m_bouquetId         {0};
+    uint              m_regionId          {0};
 
     // Optional info
     DTVTunerType      m_scanDTVTunerType  {DTVTunerType::kTunerTypeUnknown};

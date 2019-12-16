@@ -31,9 +31,9 @@ class DSMCCCacheModuleData
 
     unsigned char *AddModuleData(DsmccDb *ddb, const unsigned char *Data);
 
-    unsigned long  CarouselId(void) const { return m_carousel_id; }
-    unsigned short ModuleId(void)   const { return m_module_id;   }
-    unsigned short StreamId(void)   const { return m_stream_id;   }
+    unsigned long  CarouselId(void) const { return m_carouselId; }
+    unsigned short ModuleId(void)   const { return m_moduleId;   }
+    unsigned short StreamId(void)   const { return m_streamId;   }
     unsigned char  Version(void)    const { return m_version;     }
     unsigned long  ModuleSize(void) const { return m_moduleSize;  }
 
@@ -46,9 +46,9 @@ class DSMCCCacheModuleData
 
 
   private:
-    unsigned long  m_carousel_id;
-    unsigned short m_module_id;
-    unsigned short m_stream_id;
+    unsigned long  m_carouselId;
+    unsigned short m_moduleId;
+    unsigned short m_streamId;
 
     unsigned char  m_version;
     unsigned long  m_moduleSize;   ///< Total size
@@ -64,12 +64,12 @@ class DSMCCCacheModuleData
 class ObjCarousel
 {
   public:
-    explicit ObjCarousel(Dsmcc*dsmcc) : m_filecache(dsmcc) {}
+    explicit ObjCarousel(Dsmcc*dsmcc) : m_fileCache(dsmcc) {}
     ~ObjCarousel();
     void AddModuleInfo(DsmccDii *dii, Dsmcc *status, unsigned short streamTag);
     void AddModuleData(DsmccDb *ddb, const unsigned char *data);
 
-    DSMCCCache                         m_filecache;
+    DSMCCCache                         m_fileCache;
     QLinkedList<DSMCCCacheModuleData*> m_Cache;
     /// Component tags matched to this carousel.
     vector<unsigned short>             m_Tags;

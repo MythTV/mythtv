@@ -92,7 +92,7 @@ class MTV_PUBLIC DTVMultiplex
   public:
     // Basic tuning
     uint64_t         m_frequency  {0};
-    uint64_t         m_symbolrate {0};
+    uint64_t         m_symbolRate {0};
     DTVInversion     m_inversion;
     DTVBandwidth     m_bandwidth;
     DTVCodeRate      m_hpCodeRate;      ///< High Priority FEC rate

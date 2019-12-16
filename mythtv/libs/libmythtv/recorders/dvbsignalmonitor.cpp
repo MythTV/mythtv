@@ -49,17 +49,17 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
       // This snr setup is incorrect for API 3.x but works better
       // than int16_t range in practice, however this is correct
       // for the 4.0 DVB API which uses a uint16_t for the snr
-      signalToNoise    (QCoreApplication::translate("(Common)",
-                        "Signal To Noise"),  "snr",
-                        0,      true,      0, 65535, 0),
-      bitErrorRate     (tr("Bit Error Rate"),     "ber",
-                        65535,  false,     0, 65535, 0),
-      uncorrectedBlocks(tr("Uncorrected Blocks"), "ucb",
-                        65535,  false,     0, 65535, 0),
-      rotorPosition    (tr("Rotor Progress"),     "pos",
-                        100,    true,      0,   100, 0),
-      streamHandlerStarted(false),
-      streamHandler(nullptr)
+      m_signalToNoise    (QCoreApplication::translate("(Common)",
+                          "Signal To Noise"),  "snr",
+                          0,      true,      0, 65535, 0),
+      m_bitErrorRate     (tr("Bit Error Rate"),     "ber",
+                          65535,  false,     0, 65535, 0),
+      m_uncorrectedBlocks(tr("Uncorrected Blocks"), "ucb",
+                          65535,  false,     0, 65535, 0),
+      m_rotorPosition    (tr("Rotor Progress"),     "pos",
+                          100,    true,      0,   100, 0),
+      m_streamHandlerStarted(false),
+      m_streamHandler(nullptr)
 {
     // This value should probably come from the database...
     int threshold = 0; // signal strength threshold
@@ -120,7 +120,7 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
     if (m_minimum_update_rate > 30)
         usleep(m_minimum_update_rate * 1000);
 
-    streamHandler = DVBStreamHandler::Get(_channel->GetCardNum(), m_inputid);
+    m_streamHandler = DVBStreamHandler::Get(_channel->GetCardNum(), m_inputid);
 }
 
 /** \fn DVBSignalMonitor::~DVBSignalMonitor()
@@ -129,14 +129,14 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
 DVBSignalMonitor::~DVBSignalMonitor()
 {
     DVBSignalMonitor::Stop();
-    DVBStreamHandler::Return(streamHandler, m_inputid);
+    DVBStreamHandler::Return(m_streamHandler, m_inputid);
 }
 
 // documented in dtvsignalmonitor.h
 void DVBSignalMonitor::SetRotorTarget(float target)
 {
     QMutexLocker locker(&m_statusLock);
-    rotorPosition.SetThreshold((int)roundf(100 * target));
+    m_rotorPosition.SetThreshold((int)roundf(100 * target));
 }
 
 void DVBSignalMonitor::GetRotorStatus(bool &was_moving, bool &is_moving)
@@ -150,10 +150,10 @@ void DVBSignalMonitor::GetRotorStatus(bool &was_moving, bool &is_moving)
         return;
 
     QMutexLocker locker(&m_statusLock);
-    was_moving = rotorPosition.GetValue() < 100;
+    was_moving = m_rotorPosition.GetValue() < 100;
     int pos    = (int)truncf(rotor->GetProgress() * 100);
-    rotorPosition.SetValue(pos);
-    is_moving  = rotorPosition.GetValue() < 100;
+    m_rotorPosition.SetValue(pos);
+    is_moving  = m_rotorPosition.GetValue() < 100;
 }
 
 /** \fn DVBSignalMonitor::Stop(void)
@@ -164,9 +164,9 @@ void DVBSignalMonitor::Stop(void)
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Stop() -- begin");
     SignalMonitor::Stop();
     if (GetStreamData())
-        streamHandler->RemoveListener(GetStreamData());
-    streamHandlerStarted = false;
-    streamHandler->SetRetuneAllowed(false, nullptr, nullptr);
+        m_streamHandler->RemoveListener(GetStreamData());
+    m_streamHandlerStarted = false;
+    m_streamHandler->SetRetuneAllowed(false, nullptr, nullptr);
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Stop() -- end");
 }
 
@@ -175,13 +175,13 @@ QStringList DVBSignalMonitor::GetStatusList(void) const
     QStringList list = DTVSignalMonitor::GetStatusList();
     m_statusLock.lock();
     if (HasFlags(kDVBSigMon_WaitForSNR))
-        list<<signalToNoise.GetName()<<signalToNoise.GetStatus();
+        list<<m_signalToNoise.GetName()<<m_signalToNoise.GetStatus();
     if (HasFlags(kDVBSigMon_WaitForBER))
-        list<<bitErrorRate.GetName()<<bitErrorRate.GetStatus();
+        list<<m_bitErrorRate.GetName()<<m_bitErrorRate.GetStatus();
     if (HasFlags(kDVBSigMon_WaitForUB))
-        list<<uncorrectedBlocks.GetName()<<uncorrectedBlocks.GetStatus();
+        list<<m_uncorrectedBlocks.GetName()<<m_uncorrectedBlocks.GetStatus();
     if (HasFlags(kDVBSigMon_WaitForPos))
-        list<<rotorPosition.GetName()<<rotorPosition.GetStatus();
+        list<<m_rotorPosition.GetName()<<m_rotorPosition.GetStatus();
     m_statusLock.unlock();
     return list;
 }
@@ -230,9 +230,9 @@ void DVBSignalMonitor::UpdateValues(void)
     if (!m_running || m_exit)
         return;
 
-    if (streamHandlerStarted)
+    if (m_streamHandlerStarted)
     {
-        if (!streamHandler->IsRunning())
+        if (!m_streamHandler->IsRunning())
         {
             m_error = tr("Error: stream handler died");
             m_update_done = true;
@@ -254,7 +254,7 @@ void DVBSignalMonitor::UpdateValues(void)
                 if (HasFlags(kSigMon_WaitForSig))
                     m_signalStrength.SetValue(sig);
                 if (HasFlags(kDVBSigMon_WaitForSNR))
-                    signalToNoise.SetValue(snr);
+                    m_signalToNoise.SetValue(snr);
 
                 // LOG(VB_CHANSCAN, LOG_DEBUG, LOC +
                 //     QString("Update sig:%1 snr:%2").arg(sig).arg(snr));
@@ -280,9 +280,9 @@ void DVBSignalMonitor::UpdateValues(void)
     {
         if (dvbchannel->GetRotor())
         {
-            if (!streamHandler->IsRetuneAllowed())
-                streamHandler->SetRetuneAllowed(true, this, dvbchannel);
-            streamHandler->RetuneMonitor();
+            if (!m_streamHandler->IsRetuneAllowed())
+                m_streamHandler->SetRetuneAllowed(true, this, dvbchannel);
+            m_streamHandler->RetuneMonitor();
         }
         else
             RemoveFlags(SignalMonitor::kDVBSigMon_WaitForPos);
@@ -306,7 +306,7 @@ void DVBSignalMonitor::UpdateValues(void)
     if (HasFlags(kDVBSigMon_WaitForUB))
         ublocks = (uint) dvbchannel->GetUncorrectedBlockCount();
 
-    has_lock |= streamHandler->IsRunning();
+    has_lock |= m_streamHandler->IsRunning();
 
     // Set SignalMonitorValues from info from card.
     {
@@ -324,11 +324,11 @@ void DVBSignalMonitor::UpdateValues(void)
         if (HasFlags(kSigMon_WaitForSig))
             m_signalStrength.SetValue(sig);
         if (HasFlags(kDVBSigMon_WaitForSNR))
-            signalToNoise.SetValue(snr);
+            m_signalToNoise.SetValue(snr);
         if (HasFlags(kDVBSigMon_WaitForBER))
-            bitErrorRate.SetValue(ber);
+            m_bitErrorRate.SetValue(ber);
         if (HasFlags(kDVBSigMon_WaitForUB))
-            uncorrectedBlocks.SetValue(ublocks);
+            m_uncorrectedBlocks.SetValue(ublocks);
     }
 
     // Debug output
@@ -345,14 +345,14 @@ void DVBSignalMonitor::UpdateValues(void)
     // Start table monitoring if we are waiting on any table
     // and we have a lock.
     if (isLocked && GetStreamData() &&
-        (!HasFlags(kDVBSigMon_WaitForPos) || rotorPosition.IsGood()) &&
+        (!HasFlags(kDVBSigMon_WaitForPos) || m_rotorPosition.IsGood()) &&
         HasAnyFlag(kDTVSigMon_WaitForPAT | kDTVSigMon_WaitForPMT |
                    kDTVSigMon_WaitForMGT | kDTVSigMon_WaitForVCT |
                    kDTVSigMon_WaitForNIT | kDTVSigMon_WaitForSDT))
     {
         GetStreamData()->AddListeningPID(MPEG_PAT_PID);
-        streamHandler->AddListener(GetStreamData(), true, false);
-        streamHandlerStarted = true;
+        m_streamHandler->AddListener(GetStreamData(), true, false);
+        m_streamHandlerStarted = true;
     }
 
     m_update_done = true;
@@ -366,11 +366,11 @@ void DVBSignalMonitor::EmitStatus(void)
     // Emit signals..
     DTVSignalMonitor::EmitStatus();
     if (HasFlags(kDVBSigMon_WaitForSNR))
-        SendMessage(kStatusSignalToNoise,     signalToNoise);
+        SendMessage(kStatusSignalToNoise,     m_signalToNoise);
     if (HasFlags(kDVBSigMon_WaitForBER))
-        SendMessage(kStatusBitErrorRate,      bitErrorRate);
+        SendMessage(kStatusBitErrorRate,      m_bitErrorRate);
     if (HasFlags(kDVBSigMon_WaitForUB))
-        SendMessage(kStatusUncorrectedBlocks, uncorrectedBlocks);
+        SendMessage(kStatusUncorrectedBlocks, m_uncorrectedBlocks);
     if (HasFlags(kDVBSigMon_WaitForPos))
-        SendMessage(kStatusRotorPosition,     rotorPosition);
+        SendMessage(kStatusRotorPosition,     m_rotorPosition);
 }

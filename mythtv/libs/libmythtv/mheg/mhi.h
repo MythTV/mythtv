@@ -161,12 +161,12 @@ class MHIContext : public MHContext, public QRunnable
     QRect ScaleVideo(const QRect &r) const;
 
     FT_Face GetFontFace(void) { return m_face; }
-    bool IsFaceLoaded(void) { return m_face_loaded; }
+    bool IsFaceLoaded(void) { return m_faceLoaded; }
     bool LoadFont(const QString& name);
     bool ImageUpdated(void) { return m_updated; }
 
-    static const int StdDisplayWidth = 720;
-    static const int StdDisplayHeight = 576;
+    static const int kStdDisplayWidth = 720;
+    static const int kStdDisplayHeight = 576;
 
   protected:
     void run(void) override; // QRunnable
@@ -197,13 +197,13 @@ class MHIContext : public MHContext, public QRunnable
     mutable QMutex   m_runLock;
     QWaitCondition   m_engine_wait; // protected by m_runLock
     bool             m_stop           {false}; // protected by m_runLock
-    QMutex           m_display_lock;
+    QMutex           m_displayLock;
     bool             m_updated        {false};
 
     list<MHIImageData*> m_display; // List of items to display
 
     FT_Face          m_face           {nullptr};
-    bool             m_face_loaded    {false};
+    bool             m_faceLoaded     {false};
 
     MThread         *m_engineThread   {nullptr};
 
@@ -214,7 +214,7 @@ class MHIContext : public MHContext, public QRunnable
 
     int              m_audioTag       {-1};
     int              m_videoTag       {-1};
-    QList<int>       m_tuneinfo;
+    QList<int>       m_tuneInfo;
 
     uint             m_lastNbiVersion {NBI_VERSION_UNSET};
     vector<unsigned char> m_nbiData;
@@ -254,7 +254,7 @@ class MHIText : public MHTextDisplay
   public:
     MHIContext *m_parent     {nullptr};
     QImage      m_image;
-    int         m_fontsize   {12};
+    int         m_fontSize   {12};
     bool        m_fontItalic {false};
     bool        m_fontBold   {false};
     int         m_width      {0};

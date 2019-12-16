@@ -17,48 +17,48 @@ void RTPPacketBuffer::PushDataPacket(const UDPPacket &udp_packet)
 
     uint key = packet.GetSequenceNumber();
 
-    bool large_was_seen_recently = m_large_sequence_number_seen_recently > 0;
-    m_large_sequence_number_seen_recently = 
-        (key > (1U<<15)) ? 500 : m_large_sequence_number_seen_recently - 1;
-    m_large_sequence_number_seen_recently =
-        max(m_large_sequence_number_seen_recently, 0);
+    bool large_was_seen_recently = m_largeSequenceNumberSeenRecently > 0;
+    m_largeSequenceNumberSeenRecently = 
+        (key > (1U<<15)) ? 500 : m_largeSequenceNumberSeenRecently - 1;
+    m_largeSequenceNumberSeenRecently =
+        max(m_largeSequenceNumberSeenRecently, 0);
 
-    if (m_large_sequence_number_seen_recently > 0)
+    if (m_largeSequenceNumberSeenRecently > 0)
     {
         if (key < 500) 
             key += 1ULL<<16;
     }
     else if (large_was_seen_recently)
     {
-        m_current_sequence += 1ULL<<16;
+        m_currentSequence += 1ULL<<16;
     }
 
-    key += m_current_sequence;
+    key += m_currentSequence;
 
 /*
     LOG(VB_RECORD, LOG_DEBUG, QString("Pushing %1 as %2 (lr %3)")
         .arg(packet.GetSequenceNumber()).arg(key)
-        .arg(m_large_sequence_number_seen_recently));
+        .arg(m_largeSequenceNumberSeenRecently));
 */
 
-    m_unordered_packets[key] = packet;
+    m_unorderedPackets[key] = packet;
 
     // TODO pushing packets onto the ordered list should be based on
     // the bitrate and the M+N of the FEC.. but for now...
     const int kHighWaterMark = 500;
     const int kLowWaterMark  = 100;
-    if (m_unordered_packets.size() > kHighWaterMark)
+    if (m_unorderedPackets.size() > kHighWaterMark)
     {
-        while (m_unordered_packets.size() > kLowWaterMark)
+        while (m_unorderedPackets.size() > kLowWaterMark)
         {
             QMap<uint64_t, RTPDataPacket>::iterator it =
-                m_unordered_packets.begin();
+                m_unorderedPackets.begin();
 /*
             LOG(VB_RECORD, LOG_DEBUG, QString("Popping %1 as %2")
                 .arg((*it).GetSequenceNumber()).arg(it.key()));
 */
             m_available_packets.push_back(*it);
-            m_unordered_packets.erase(it);
+            m_unorderedPackets.erase(it);
         }
     }
 }

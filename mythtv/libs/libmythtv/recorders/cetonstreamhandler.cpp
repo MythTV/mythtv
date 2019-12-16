@@ -30,14 +30,14 @@
 #define LOC QString("CetonSH[%1](%2): ").arg(m_inputid).arg(m_device)
 
 QMap<QString,CetonStreamHandler*> CetonStreamHandler::s_handlers;
-QMap<QString,uint>                CetonStreamHandler::s_handlers_refcnt;
-QMutex                            CetonStreamHandler::s_handlers_lock;
-QMap<QString, bool>               CetonStreamHandler::s_info_queried;
+QMap<QString,uint>                CetonStreamHandler::s_handlersRefCnt;
+QMutex                            CetonStreamHandler::s_handlersLock;
+QMap<QString, bool>               CetonStreamHandler::s_infoQueried;
 
 CetonStreamHandler *CetonStreamHandler::Get(const QString &devname,
                                             int inputid)
 {
-    QMutexLocker locker(&s_handlers_lock);
+    QMutexLocker locker(&s_handlersLock);
 
     QString devkey = devname.toUpper();
 
@@ -48,7 +48,7 @@ CetonStreamHandler *CetonStreamHandler::Get(const QString &devname,
         auto *newhandler = new CetonStreamHandler(devkey, inputid);
         newhandler->Open();
         s_handlers[devkey] = newhandler;
-        s_handlers_refcnt[devkey] = 1;
+        s_handlersRefCnt[devkey] = 1;
 
         LOG(VB_RECORD, LOG_INFO,
             QString("CetonSH[%1]: Creating new stream handler %2 for %3")
@@ -56,8 +56,8 @@ CetonStreamHandler *CetonStreamHandler::Get(const QString &devname,
     }
     else
     {
-        s_handlers_refcnt[devkey]++;
-        uint rcount = s_handlers_refcnt[devkey];
+        s_handlersRefCnt[devkey]++;
+        uint rcount = s_handlersRefCnt[devkey];
         LOG(VB_RECORD, LOG_INFO,
             QString("CetonSH[%1]: Using existing stream handler %2 for %3")
             .arg(inputid).arg(devkey)
@@ -69,12 +69,12 @@ CetonStreamHandler *CetonStreamHandler::Get(const QString &devname,
 
 void CetonStreamHandler::Return(CetonStreamHandler * & ref, int inputid)
 {
-    QMutexLocker locker(&s_handlers_lock);
+    QMutexLocker locker(&s_handlersLock);
 
     QString devname = ref->m_device;
 
-    QMap<QString,uint>::iterator rit = s_handlers_refcnt.find(devname);
-    if (rit == s_handlers_refcnt.end())
+    QMap<QString,uint>::iterator rit = s_handlersRefCnt.find(devname);
+    if (rit == s_handlersRefCnt.end())
         return;
 
     QMap<QString,CetonStreamHandler*>::iterator it = s_handlers.find(devname);
@@ -101,7 +101,7 @@ void CetonStreamHandler::Return(CetonStreamHandler * & ref, int inputid)
             .arg(inputid).arg(devname));
     }
 
-    s_handlers_refcnt.erase(rit);
+    s_handlersRefCnt.erase(rit);
     ref = nullptr;
 }
 
@@ -118,7 +118,7 @@ CetonStreamHandler::CetonStreamHandler(const QString &device, int inputid)
             QString("Invalid device id %1").arg(m_device));
         return;
     }
-    m_ip_address = parts.at(0);
+    m_ipAddress = parts.at(0);
 
     QStringList tuner_parts = parts.at(1).split(".");
     if (tuner_parts.size() == 2)
@@ -142,16 +142,16 @@ CetonStreamHandler::CetonStreamHandler(const QString &device, int inputid)
 
     int rtspPort = 8554;
     QString url = QString("rtsp://%1:%2/cetonmpeg%3")
-        .arg(m_ip_address).arg(rtspPort).arg(m_tuner);
+        .arg(m_ipAddress).arg(rtspPort).arg(m_tuner);
     m_tuning = IPTVTuningData(url, 0, IPTVTuningData::kNone, "", 0, "", 0);
     m_useRtpStreaming = true;
 
     m_valid = true;
 
     QString cardstatus = GetVar("cas", "CardStatus");
-    m_using_cablecard = cardstatus == "Inserted";
+    m_usingCablecard = cardstatus == "Inserted";
 
-    if (!s_info_queried.contains(m_ip_address))
+    if (!s_infoQueried.contains(m_ipAddress))
     {
         QString sernum = GetVar("diag", "Host_Serial_Number");
         QString firmware_ver = GetVar("diag", "Host_Firmware");
@@ -160,9 +160,9 @@ CetonStreamHandler::CetonStreamHandler(const QString &device, int inputid)
         LOG(VB_RECORD, LOG_INFO, LOC +
             QString("Ceton device %1 initialized. SN: %2, "
                     "Firmware ver. %3, Hardware ver. %4")
-            .arg(m_ip_address).arg(sernum).arg(firmware_ver).arg(hardware_ver));
+            .arg(m_ipAddress).arg(sernum).arg(firmware_ver).arg(hardware_ver));
 
-        if (m_using_cablecard)
+        if (m_usingCablecard)
         {
             QString brand = GetVar("cas", "CardManufacturer");
             QString auth = GetVar("cas", "CardAuthorization");
@@ -176,7 +176,7 @@ CetonStreamHandler::CetonStreamHandler(const QString &device, int inputid)
                 "Cable card NOT installed (operating in QAM tuner mode)");
         }
 
-        s_info_queried.insert(m_ip_address, true);
+        s_infoQueried.insert(m_ipAddress, true);
     }
 }
 
@@ -239,7 +239,7 @@ bool CetonStreamHandler::VerifyTuning(void)
     else
     {
         uint frequency = GetVar("tuner", "Frequency").toUInt();
-        if (frequency != m_last_frequency)
+        if (frequency != m_lastFrequency)
         {
             LOG(VB_RECORD, LOG_WARNING, LOC +
                 "VerifyTuning detected wrong frequency");
@@ -247,7 +247,7 @@ bool CetonStreamHandler::VerifyTuning(void)
         }
 
         QString modulation = GetVar("tuner", "Modulation");
-        if (modulation.toUpper() != m_last_modulation.toUpper())
+        if (modulation.toUpper() != m_lastModulation.toUpper())
         {
             LOG(VB_RECORD, LOG_WARNING, LOC +
                 "VerifyTuning detected wrong modulation");
@@ -255,7 +255,7 @@ bool CetonStreamHandler::VerifyTuning(void)
         }
 
         uint program = GetVar("mux", "ProgramNumber").toUInt();
-        if (program != m_last_program)
+        if (program != m_lastProgram)
         {
             LOG(VB_RECORD, LOG_WARNING, LOC +
                 "VerifyTuning detected wrong program");
@@ -286,19 +286,19 @@ void CetonStreamHandler::RepeatTuning(void)
 {
     if (IsCableCardInstalled())
     {
-        TuneVChannel(m_last_vchannel);
+        TuneVChannel(m_lastVchannel);
     }
     else
     {
-        TuneFrequency(m_last_frequency, m_last_modulation);
-        TuneProgram(m_last_program);
+        TuneFrequency(m_lastFrequency, m_lastModulation);
+        TuneProgram(m_lastProgram);
     }
 }
 
 bool CetonStreamHandler::TunerOff(void)
 {
     bool result;
-    if (m_using_cablecard)
+    if (m_usingCablecard)
         result = TuneVChannel("0");
     else
         result = TuneFrequency(0, "qam_256");
@@ -323,8 +323,8 @@ bool CetonStreamHandler::TuneFrequency(
     if (modulation_id == "")
         return false;
 
-    m_last_frequency = frequency;
-    m_last_modulation = modulation;
+    m_lastFrequency = frequency;
+    m_lastModulation = modulation;
 
     QUrlQuery params;
     params.addQueryItem("instance_id", QString::number(m_tuner));
@@ -364,7 +364,7 @@ bool CetonStreamHandler::TuneProgram(uint program)
     };
 
 
-    m_last_program = program;
+    m_lastProgram = program;
 
     QUrlQuery params;
     params.addQueryItem("instance_id", QString::number(m_tuner));
@@ -419,12 +419,12 @@ bool CetonStreamHandler::TuneVChannel(const QString &vchannel)
         return true;
     }
 
-    if ((vchannel != "0") && (m_last_vchannel != "0"))
+    if ((vchannel != "0") && (m_lastVchannel != "0"))
         ClearProgramNumber();
 
     LOG(VB_RECORD, LOG_INFO, LOC + QString("TuneVChannel(%1)").arg(vchannel));
 
-    m_last_vchannel = vchannel;
+    m_lastVchannel = vchannel;
 
     return PerformTuneVChannel(vchannel);
 }
@@ -469,7 +469,7 @@ QString CetonStreamHandler::GetVar(
     const QString &section, const QString &variable) const
 {
     QString loc = LOC + QString("DoGetVar(%1,%2,%3,%4) - ")
-        .arg(m_ip_address).arg(m_tuner).arg(section,variable);
+        .arg(m_ipAddress).arg(m_tuner).arg(section,variable);
 
     QUrlQuery params;
     params.addQueryItem("i", QString::number(m_tuner));
@@ -501,7 +501,7 @@ QString CetonStreamHandler::GetVar(
 QStringList CetonStreamHandler::GetProgramList()
 {
     QString loc = LOC + QString("CetonHTTP: DoGetProgramList(%1,%2) - ")
-        .arg(m_ip_address).arg(m_tuner);
+        .arg(m_ipAddress).arg(m_tuner);
 
     QUrlQuery params;
     params.addQueryItem("i", QString::number(m_tuner));
@@ -541,7 +541,7 @@ bool CetonStreamHandler::HttpRequest(
     MythDownloadManager *manager = GetMythDownloadManager();
 
     url.setScheme("http");
-    url.setHost(m_ip_address);
+    url.setHost(m_ipAddress);
     url.setPath(script);
 
     // Specify un-cached access to the device

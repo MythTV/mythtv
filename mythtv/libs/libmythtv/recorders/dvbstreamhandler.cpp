@@ -23,17 +23,17 @@
 
 #define LOC      QString("DVBSH[%1](%2): ").arg(m_inputid).arg(m_device)
 
-QMap<QString,bool> DVBStreamHandler::s_rec_supports_ts_monitoring;
-QMutex             DVBStreamHandler::s_rec_supports_ts_monitoring_lock;
+QMap<QString,bool> DVBStreamHandler::s_recSupportsTsMonitoring;
+QMutex             DVBStreamHandler::s_rec_supportsTsMonitoringLock;
 
 QMap<QString,DVBStreamHandler*> DVBStreamHandler::s_handlers;
-QMap<QString,uint>              DVBStreamHandler::s_handlers_refcnt;
-QMutex                          DVBStreamHandler::s_handlers_lock;
+QMap<QString,uint>              DVBStreamHandler::s_handlersRefCnt;
+QMutex                          DVBStreamHandler::s_handlersLock;
 
 DVBStreamHandler *DVBStreamHandler::Get(const QString &devname,
                                         int inputid)
 {
-    QMutexLocker locker(&s_handlers_lock);
+    QMutexLocker locker(&s_handlersLock);
 
     QMap<QString,DVBStreamHandler*>::iterator it =
         s_handlers.find(devname);
@@ -41,7 +41,7 @@ DVBStreamHandler *DVBStreamHandler::Get(const QString &devname,
     if (it == s_handlers.end())
     {
         s_handlers[devname] = new DVBStreamHandler(devname, inputid);
-        s_handlers_refcnt[devname] = 1;
+        s_handlersRefCnt[devname] = 1;
 
         LOG(VB_RECORD, LOG_INFO,
             QString("DVBSH[%1]: Creating new stream handler %2")
@@ -49,8 +49,8 @@ DVBStreamHandler *DVBStreamHandler::Get(const QString &devname,
     }
     else
     {
-        s_handlers_refcnt[devname]++;
-        uint rcount = s_handlers_refcnt[devname];
+        s_handlersRefCnt[devname]++;
+        uint rcount = s_handlersRefCnt[devname];
         LOG(VB_RECORD, LOG_INFO,
             QString("DVBSH[%1]: Using existing stream handler for %2")
             .arg(inputid)
@@ -62,12 +62,12 @@ DVBStreamHandler *DVBStreamHandler::Get(const QString &devname,
 
 void DVBStreamHandler::Return(DVBStreamHandler * & ref, int inputid)
 {
-    QMutexLocker locker(&s_handlers_lock);
+    QMutexLocker locker(&s_handlersLock);
 
     QString devname = ref->m_device;
 
-    QMap<QString,uint>::iterator rit = s_handlers_refcnt.find(devname);
-    if (rit == s_handlers_refcnt.end())
+    QMap<QString,uint>::iterator rit = s_handlersRefCnt.find(devname);
+    if (rit == s_handlersRefCnt.end())
         return;
 
     QMap<QString,DVBStreamHandler*>::iterator it = s_handlers.find(devname);
@@ -93,17 +93,17 @@ void DVBStreamHandler::Return(DVBStreamHandler * & ref, int inputid)
             .arg(inputid).arg(devname));
     }
 
-    s_handlers_refcnt.erase(rit);
+    s_handlersRefCnt.erase(rit);
     ref = nullptr;
 }
 
 DVBStreamHandler::DVBStreamHandler(const QString &dvb_device, int inputid)
     : StreamHandler(dvb_device, inputid)
-    , _dvr_dev_path(CardUtil::GetDeviceName(DVB_DEV_DVR, m_device))
-    , _allow_retune(false)
-    , _sigmon(nullptr)
-    , _dvbchannel(nullptr)
-    , _drb(nullptr)
+    , m_dvrDevPath(CardUtil::GetDeviceName(DVB_DEV_DVR, m_device))
+    , m_allowRetune(false)
+    , m_sigMon(nullptr)
+    , m_dvbChannel(nullptr)
+    , m_drb(nullptr)
 {
     setObjectName("DVBRead");
 }
@@ -134,7 +134,7 @@ void DVBStreamHandler::run(void)
  */
 void DVBStreamHandler::RunTS(void)
 {
-    QByteArray dvr_dev_path = _dvr_dev_path.toLatin1();
+    QByteArray dvr_dev_path = m_dvrDevPath.toLatin1();
     int dvr_fd;
     for (int tries = 1; ; ++tries)
     {
@@ -144,13 +144,13 @@ void DVBStreamHandler::RunTS(void)
 
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             QString("Opening DVR device %1 failed : %2")
-                .arg(_dvr_dev_path).arg(strerror(errno)));
+                .arg(m_dvrDevPath).arg(strerror(errno)));
 
         if (tries >= 20 || (errno != EBUSY && errno != EAGAIN))
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("Failed to open DVR device %1 : %2")
-                    .arg(_dvr_dev_path).arg(strerror(errno)));
+                    .arg(m_dvrDevPath).arg(strerror(errno)));
             m_bError = true;
             return;
         }
@@ -187,12 +187,12 @@ void DVBStreamHandler::RunTS(void)
     }
 
     {
-        // SetRunning() + set _drb
+        // SetRunning() + set m_drb
         QMutexLocker locker(&m_start_stop_lock);
         m_running = true;
         m_using_buffering = m_needs_buffering;
         m_using_section_reader = false;
-        _drb = drb;
+        m_drb = drb;
     }
 
     LOG(VB_RECORD, LOG_DEBUG, LOC + "RunTS(): begin");
@@ -279,7 +279,7 @@ void DVBStreamHandler::RunTS(void)
 
     {
         QMutexLocker locker(&m_start_stop_lock);
-        _drb = nullptr;
+        m_drb = nullptr;
     }
 
     delete drb;
@@ -495,39 +495,39 @@ void DVBStreamHandler::SetRetuneAllowed(
 {
     if (allow && sigmon && dvbchan)
     {
-        _allow_retune = true;
-        _sigmon       = sigmon;
-        _dvbchannel   = dvbchan;
+        m_allowRetune = true;
+        m_sigMon       = sigmon;
+        m_dvbChannel   = dvbchan;
     }
     else
     {
-        _allow_retune = false;
-        _sigmon       = nullptr;
-        _dvbchannel   = nullptr;
+        m_allowRetune = false;
+        m_sigMon       = nullptr;
+        m_dvbChannel   = nullptr;
     }
 }
 
 void DVBStreamHandler::RetuneMonitor(void)
 {
-    if (!_allow_retune)
+    if (!m_allowRetune)
         return;
 
     // Rotor position
-    if (_sigmon->HasFlags(SignalMonitor::kDVBSigMon_WaitForPos))
+    if (m_sigMon->HasFlags(SignalMonitor::kDVBSigMon_WaitForPos))
     {
-        const DiSEqCDevRotor *rotor = _dvbchannel->GetRotor();
+        const DiSEqCDevRotor *rotor = m_dvbChannel->GetRotor();
         if (rotor)
         {
             bool was_moving;
             bool is_moving;
-            _sigmon->GetRotorStatus(was_moving, is_moving);
+            m_sigMon->GetRotorStatus(was_moving, is_moving);
 
             // Retune if move completes normally
             if (was_moving && !is_moving)
             {
                 LOG(VB_CHANNEL, LOG_INFO,
                     LOC + "Retuning for rotor completion");
-                _dvbchannel->Retune();
+                m_dvbChannel->Retune();
 
                 // (optionally) No need to wait for SDT anymore...
                 // RemoveFlags(kDTVSigMon_WaitForSDT);
@@ -536,7 +536,7 @@ void DVBStreamHandler::RetuneMonitor(void)
         else
         {
             // If no rotor is present, pretend the movement is completed
-            _sigmon->SetRotorValue(100);
+            m_sigMon->SetRotorValue(100);
         }
     }
 }
@@ -554,19 +554,19 @@ bool DVBStreamHandler::SupportsTSMonitoring(void)
     const uint pat_pid = 0x0;
 
     {
-        QMutexLocker locker(&s_rec_supports_ts_monitoring_lock);
+        QMutexLocker locker(&s_rec_supportsTsMonitoringLock);
         QMap<QString,bool>::const_iterator it;
-        it = s_rec_supports_ts_monitoring.find(m_device);
-        if (it != s_rec_supports_ts_monitoring.end())
+        it = s_recSupportsTsMonitoring.find(m_device);
+        if (it != s_recSupportsTsMonitoring.end())
             return *it;
     }
 
-    QByteArray dvr_dev_path = _dvr_dev_path.toLatin1();
+    QByteArray dvr_dev_path = m_dvrDevPath.toLatin1();
     int dvr_fd = open(dvr_dev_path.constData(), O_RDONLY | O_NONBLOCK);
     if (dvr_fd < 0)
     {
-        QMutexLocker locker(&s_rec_supports_ts_monitoring_lock);
-        s_rec_supports_ts_monitoring[m_device] = false;
+        QMutexLocker locker(&s_rec_supportsTsMonitoringLock);
+        s_recSupportsTsMonitoring[m_device] = false;
         return false;
     }
 
@@ -579,8 +579,8 @@ bool DVBStreamHandler::SupportsTSMonitoring(void)
 
     close(dvr_fd);
 
-    QMutexLocker locker(&s_rec_supports_ts_monitoring_lock);
-    s_rec_supports_ts_monitoring[m_device] = supports_ts;
+    QMutexLocker locker(&s_rec_supportsTsMonitoringLock);
+    s_recSupportsTsMonitoring[m_device] = supports_ts;
 
     return supports_ts;
 }

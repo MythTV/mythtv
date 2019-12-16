@@ -178,7 +178,7 @@ bool DTVConfParser::ParseConfQAM(const QStringList &tokens)
     PARSE_SKIP(unknown);
     PARSE_UINT(mux.m_frequency);
     PARSE_CONF(mux.m_inversion);
-    PARSE_UINT(mux.m_symbolrate);
+    PARSE_UINT(mux.m_symbolRate);
     PARSE_CONF(mux.m_fec);
     PARSE_CONF(mux.m_modulation);
     PARSE_SKIP(unknown);
@@ -201,7 +201,7 @@ bool DTVConfParser::ParseConfQPSK(const QStringList &tokens)
     PARSE_UINT_1000(mux.m_frequency);
     PARSE_CONF(mux.m_polarity);
     PARSE_SKIP(Satelite_Number);
-    PARSE_UINT_1000(mux.m_symbolrate);
+    PARSE_UINT_1000(mux.m_symbolRate);
     PARSE_SKIP(unknown);
     PARSE_SKIP(unknown);
     PARSE_UINT(chan.m_serviceid);

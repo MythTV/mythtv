@@ -34,7 +34,7 @@ class V4LChannel : public DTVChannel
  public:
     V4LChannel(TVRec *parent, const QString &videodevice,
                const QString &audiodevice = "")
-        : DTVChannel(parent), m_device(videodevice), m_audio_device(audiodevice) {}
+        : DTVChannel(parent), m_device(videodevice), m_audioDevice(audiodevice) {}
     virtual ~V4LChannel(void);
 
     bool Init(QString &startchannel, bool setchan) override; // ChannelBase
@@ -57,10 +57,10 @@ class V4LChannel : public DTVChannel
     bool IsOpen(void)       const override // ChannelBase
         { return GetFd() >= 0; }
     int  GetFd(void)        const override // ChannelBase
-        { return m_videofd; }
+        { return m_videoFd; }
     QString GetDevice(void) const override // ChannelBase
         { return m_device; }
-    QString GetAudioDevice(void) const { return m_audio_device; }
+    QString GetAudioDevice(void) const { return m_audioDevice; }
     QString GetSIStandard(void) const { return "atsc"; }
 
     // Picture attributes.
@@ -91,20 +91,20 @@ class V4LChannel : public DTVChannel
   private:
     // Data
     QString           m_device;
-    QString           m_audio_device;
-    int               m_videofd           {-1};
-    QString           m_device_name;
-    QString           m_driver_name;
-    QMap<QString,int> m_pict_attr_default;
+    QString           m_audioDevice;
+    int               m_videoFd           {-1};
+    QString           m_deviceName;
+    QString           m_driverName;
+    QMap<QString,int> m_pictAttrDefault;
 
     struct CHANLIST *m_curList            {nullptr};
     int              m_totalChannels      {0};
 
-    bool             m_has_stream_io      {false};
-    bool             m_has_std_io         {false};
-    bool             m_has_async_io       {false};
-    bool             m_has_tuner          {false};
-    bool             m_has_sliced_vbi     {false};
+    bool             m_hasStreamIO        {false};
+    bool             m_hasStdIO           {false};
+    bool             m_hasAsyncIO         {false};
+    bool             m_hasTuner           {false};
+    bool             m_hasSlicedVbi       {false};
 
     int              m_defaultFreqTable   {1};
     int              m_inputNumV4L        {0};

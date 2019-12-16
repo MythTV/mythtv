@@ -366,12 +366,12 @@ void DVBChannel::CheckOptions(DTVMultiplex &tuning) const
     if (m_tunerType.IsFECVariable() &&
         m_symbolRateMinimum && m_symbolRateMaximum &&
         (m_symbolRateMinimum <= m_symbolRateMaximum) &&
-        (tuning.m_symbolrate < m_symbolRateMinimum ||
-         tuning.m_symbolrate > m_symbolRateMaximum))
+        (tuning.m_symbolRate < m_symbolRateMinimum ||
+         tuning.m_symbolRate > m_symbolRateMaximum))
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             QString("Symbol Rate setting (%1) is out of range (min/max:%2/%3)")
-                .arg(tuning.m_symbolrate)
+                .arg(tuning.m_symbolRate)
                 .arg(m_symbolRateMinimum).arg(m_symbolRateMaximum));
     }
 
@@ -576,7 +576,7 @@ static struct dtv_properties *dtvmultiplex_to_dtvproperties(
         tuner_type == DTVTunerType::kTunerTypeDVBC)
     {
         cmdseq->props[c].cmd      = DTV_SYMBOL_RATE;
-        cmdseq->props[c++].u.data = tuning.m_symbolrate;
+        cmdseq->props[c++].u.data = tuning.m_symbolRate;
     }
 
     if (tuner_type.IsFECVariable())
@@ -1468,7 +1468,7 @@ static struct dvb_frontend_parameters dtvmultiplex_to_dvbparams(
                 "with a DVB-S card will fail.");
 
         params.frequency = intermediate_freq;
-        params.u.qpsk.symbol_rate = tuning.m_symbolrate;
+        params.u.qpsk.symbol_rate = tuning.m_symbolRate;
         params.u.qpsk.fec_inner   = can_fec_auto ? FEC_AUTO
             : (fe_code_rate_t) (int) tuning.m_fec;
     }
@@ -1482,7 +1482,7 @@ static struct dvb_frontend_parameters dtvmultiplex_to_dvbparams(
 
     if (DTVTunerType::kTunerTypeDVBC == tuner_type)
     {
-        params.u.qam.symbol_rate  = tuning.m_symbolrate;
+        params.u.qam.symbol_rate  = tuning.m_symbolRate;
         params.u.qam.fec_inner    = (fe_code_rate_t) (int) tuning.m_fec;
         params.u.qam.modulation   = (fe_modulation_t) (int) tuning.m_modulation;
     }
@@ -1526,13 +1526,13 @@ static DTVMultiplex dvbparams_to_dtvmultiplex(
     if ((DTVTunerType::kTunerTypeDVBS1 == tuner_type) ||
         (DTVTunerType::kTunerTypeDVBS2 == tuner_type))
     {
-        tuning.m_symbolrate     = params.u.qpsk.symbol_rate;
+        tuning.m_symbolRate     = params.u.qpsk.symbol_rate;
         tuning.m_fec            = params.u.qpsk.fec_inner;
     }
 
     if (DTVTunerType::kTunerTypeDVBC   == tuner_type)
     {
-        tuning.m_symbolrate     = params.u.qam.symbol_rate;
+        tuning.m_symbolRate     = params.u.qam.symbol_rate;
         tuning.m_fec            = params.u.qam.fec_inner;
         tuning.m_modulation     = params.u.qam.modulation;
     }

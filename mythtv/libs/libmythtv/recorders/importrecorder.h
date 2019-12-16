@@ -45,7 +45,7 @@ class ImportRecorder : public DTVRecorder
     void UpdateRecSize();
 
   private:
-    int                 m_import_fd {-1};
+    int                 m_importFd  {-1};
     MythCommFlagPlayer *m_cfp       {nullptr};
     long long           m_nfc       {0};
 };

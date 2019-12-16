@@ -27,13 +27,13 @@
 #define LOC      QString("ASISH[%1](%2): ").arg(m_inputid).arg(m_device)
 
 QMap<QString,ASIStreamHandler*> ASIStreamHandler::s_handlers;
-QMap<QString,uint>              ASIStreamHandler::s_handlers_refcnt;
-QMutex                          ASIStreamHandler::s_handlers_lock;
+QMap<QString,uint>              ASIStreamHandler::s_handlersRefCnt;
+QMutex                          ASIStreamHandler::s_handlersLock;
 
 ASIStreamHandler *ASIStreamHandler::Get(const QString &devname,
                                         int inputid)
 {
-    QMutexLocker locker(&s_handlers_lock);
+    QMutexLocker locker(&s_handlersLock);
 
     const QString& devkey = devname;
 
@@ -44,7 +44,7 @@ ASIStreamHandler *ASIStreamHandler::Get(const QString &devname,
         auto *newhandler = new ASIStreamHandler(devname, inputid);
         newhandler->Open();
         s_handlers[devkey] = newhandler;
-        s_handlers_refcnt[devkey] = 1;
+        s_handlersRefCnt[devkey] = 1;
 
         LOG(VB_RECORD, LOG_INFO,
             QString("ASISH[%1]: Creating new stream handler %2 for %3")
@@ -52,8 +52,8 @@ ASIStreamHandler *ASIStreamHandler::Get(const QString &devname,
     }
     else
     {
-        s_handlers_refcnt[devkey]++;
-        uint rcount = s_handlers_refcnt[devkey];
+        s_handlersRefCnt[devkey]++;
+        uint rcount = s_handlersRefCnt[devkey];
         LOG(VB_RECORD, LOG_INFO,
             QString("ASISH[%1]: Using existing stream handler %2 for %3")
             .arg(inputid).arg(devkey)
@@ -65,12 +65,12 @@ ASIStreamHandler *ASIStreamHandler::Get(const QString &devname,
 
 void ASIStreamHandler::Return(ASIStreamHandler * & ref, int inputid)
 {
-    QMutexLocker locker(&s_handlers_lock);
+    QMutexLocker locker(&s_handlersLock);
 
     QString devname = ref->m_device;
 
-    QMap<QString,uint>::iterator rit = s_handlers_refcnt.find(devname);
-    if (rit == s_handlers_refcnt.end())
+    QMap<QString,uint>::iterator rit = s_handlersRefCnt.find(devname);
+    if (rit == s_handlersRefCnt.end())
         return;
 
     QMap<QString,ASIStreamHandler*>::iterator it = s_handlers.find(devname);
@@ -97,7 +97,7 @@ void ASIStreamHandler::Return(ASIStreamHandler * & ref, int inputid)
             .arg(inputid).arg(devname));
     }
 
-    s_handlers_refcnt.erase(rit);
+    s_handlersRefCnt.erase(rit);
     ref = nullptr;
 }
 
@@ -109,14 +109,14 @@ ASIStreamHandler::ASIStreamHandler(const QString &device, int inputid)
 
 void ASIStreamHandler::SetClockSource(ASIClockSource cs)
 {
-    m_clock_source = cs;
+    m_clockSource = cs;
     // TODO we should make it possible to set this immediately
     // not wait for the next open
 }
 
 void ASIStreamHandler::SetRXMode(ASIRXMode m)
 {
-    m_rx_mode = m;
+    m_rxMode = m;
     // TODO we should make it possible to set this immediately
     // not wait for the next open
 }
@@ -143,8 +143,8 @@ void ASIStreamHandler::run(void)
     }
 
     auto *drb = new DeviceReadBuffer(this, true, false);
-    bool ok = drb->Setup(m_device, m_fd, m_packet_size, m_buf_size,
-                         m_num_buffers / 4);
+    bool ok = drb->Setup(m_device, m_fd, m_packetSize, m_bufSize,
+                         m_numBuffers / 4);
     if (!ok)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to allocate DRB buffer");
@@ -156,7 +156,7 @@ void ASIStreamHandler::run(void)
         return;
     }
 
-    uint buffer_size = m_packet_size * 15000;
+    uint buffer_size = m_packetSize * 15000;
     auto *buffer = new unsigned char[buffer_size];
     if (!buffer)
     {
@@ -264,28 +264,28 @@ bool ASIStreamHandler::Open(void)
         return true;
 
     QString error;
-    m_device_num = CardUtil::GetASIDeviceNumber(m_device, &error);
-    if (m_device_num < 0)
+    m_deviceNum = CardUtil::GetASIDeviceNumber(m_device, &error);
+    if (m_deviceNum < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + error);
         return false;
     }
 
-    m_buf_size = CardUtil::GetASIBufferSize(m_device_num, &error);
-    if (m_buf_size <= 0)
+    m_bufSize = CardUtil::GetASIBufferSize(m_deviceNum, &error);
+    if (m_bufSize <= 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + error);
         return false;
     }
 
-    m_num_buffers = CardUtil::GetASINumBuffers(m_device_num, &error);
-    if (m_num_buffers <= 0)
+    m_numBuffers = CardUtil::GetASINumBuffers(m_deviceNum, &error);
+    if (m_numBuffers <= 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + error);
         return false;
     }
 
-    if (!CardUtil::SetASIMode(m_device_num, (uint)m_rx_mode, &error))
+    if (!CardUtil::SetASIMode(m_deviceNum, (uint)m_rxMode, &error))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to set RX Mode: " + error);
         return false;
@@ -312,19 +312,19 @@ bool ASIStreamHandler::Open(void)
     // TODO? do stuff with capabilities..
 
     // we need to handle 188 & 204 byte packets..
-    switch (m_rx_mode)
+    switch (m_rxMode)
     {
         case kASIRXRawMode:
         case kASIRXSyncOnActualSize:
-            m_packet_size = TSPacket::kDVBEmissionSize *  TSPacket::kSize;
+            m_packetSize = TSPacket::kDVBEmissionSize *  TSPacket::kSize;
             break;
         case kASIRXSyncOn204:
-            m_packet_size = TSPacket::kDVBEmissionSize;
+            m_packetSize = TSPacket::kDVBEmissionSize;
             break;
         case kASIRXSyncOn188:
         case kASIRXSyncOnActualConvertTo188:
         case kASIRXSyncOn204ConvertTo188:
-            m_packet_size = TSPacket::kSize;
+            m_packetSize = TSPacket::kSize;
             break;
     }
 

@@ -74,8 +74,8 @@ class MTV_PUBLIC RecorderBase : public QRunnable
     /// \brief Sets the video frame rate.
     void SetFrameRate(double rate)
     {
-        m_video_frame_rate = rate;
-        m_ntsc_framerate = (29.96 <= rate && 29.98 >= rate);
+        m_videoFrameRate = rate;
+        m_ntscFrameRate = (29.96 <= rate && 29.98 >= rate);
         m_frameRate = FrameRate((rate * 100) + 0.5, 100);
     }
 
@@ -311,8 +311,8 @@ class MTV_PUBLIC RecorderBase : public QRunnable
     QString        m_videodevice;
 
     bool           m_ntsc                 {true};
-    bool           m_ntsc_framerate       {true};
-    double         m_video_frame_rate     {29.97};
+    bool           m_ntscFrameRate        {true};
+    double         m_videoFrameRate       {29.97};
 
     uint           m_videoAspect          {0}; // AspectRatio (1 = 4:3, 2 = 16:9
 
@@ -324,12 +324,12 @@ class MTV_PUBLIC RecorderBase : public QRunnable
 
     // For handling pausing + stop recording
     mutable QMutex m_pauseLock; // also used for request_recording and recording
-    bool           m_request_pause        {false};
+    bool           m_requestPause         {false};
     bool           m_paused               {false};
     QWaitCondition m_pauseWait;
     QWaitCondition m_unpauseWait;
     /// True if API call has requested a recording be [re]started
-    bool           m_request_recording    {false};
+    bool           m_requestRecording     {false};
     /// True while recording is actually being performed
     bool           m_recording            {false};
     QWaitCondition m_recordingWait;

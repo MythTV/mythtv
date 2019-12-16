@@ -35,18 +35,18 @@ class DSMCCCacheReference
     DSMCCCacheReference(unsigned long car, unsigned short m,
                         unsigned short s, const DSMCCCacheKey &k) :
         m_nCarouselId(car),             m_nModuleId(m),
-        m_nStreamTag(s),                m_Key(k) {}
+        m_nStreamTag(s),                m_key(k) {}
 
     DSMCCCacheReference(const DSMCCCacheReference &r) :
         m_nCarouselId(r.m_nCarouselId), m_nModuleId(r.m_nModuleId),
-        m_nStreamTag(r.m_nStreamTag),   m_Key(r.m_Key) {}
+        m_nStreamTag(r.m_nStreamTag),   m_key(r.m_key) {}
 
     DSMCCCacheReference& operator=(const DSMCCCacheReference &rhs)
     {
         m_nCarouselId = rhs.m_nCarouselId;
         m_nModuleId = rhs.m_nModuleId;
         m_nStreamTag = rhs.m_nStreamTag;
-        m_Key = rhs.m_Key;
+        m_key = rhs.m_key;
         return *this;
     }
 
@@ -59,7 +59,7 @@ class DSMCCCacheReference
     unsigned long  m_nCarouselId {0}; // Reference info for the module
     unsigned short m_nModuleId   {0};
     unsigned short m_nStreamTag  {0};
-    DSMCCCacheKey  m_Key;
+    DSMCCCacheKey  m_key;
 
     // Operator required for QMap
     friend bool operator < (const DSMCCCacheReference&,
@@ -71,13 +71,13 @@ class DSMCCCacheDir
 {
   public:
     DSMCCCacheDir() = default;
-    explicit DSMCCCacheDir(const DSMCCCacheReference &r) : m_Reference(r) {}
+    explicit DSMCCCacheDir(const DSMCCCacheReference &r) : m_reference(r) {}
 
     // These maps give the cache reference for each name
-    QMap<QString, DSMCCCacheReference> m_SubDirectories;
-    QMap<QString, DSMCCCacheReference> m_Files;
+    QMap<QString, DSMCCCacheReference> m_subDirectories;
+    QMap<QString, DSMCCCacheReference> m_files;
 
-    DSMCCCacheReference m_Reference;
+    DSMCCCacheReference m_reference;
 };
 
 // The contents of a file.
@@ -85,10 +85,10 @@ class DSMCCCacheFile
 {
   public:
     DSMCCCacheFile() = default;
-    explicit DSMCCCacheFile(const DSMCCCacheReference &r) : m_Reference(r) {}
+    explicit DSMCCCacheFile(const DSMCCCacheReference &r) : m_reference(r) {}
 
-    DSMCCCacheReference m_Reference;
-    QByteArray m_Contents; // Contents of the file.
+    DSMCCCacheReference m_reference;
+    QByteArray m_contents; // Contents of the file.
 };
 
 class DSMCCCache
@@ -124,12 +124,12 @@ class DSMCCCache
     DSMCCCacheReference m_GatewayRef; // Reference to the gateway
 
     // The set of directories, files and gateways.
-    QMap<DSMCCCacheReference, DSMCCCacheDir*> m_Directories;
-    QMap<DSMCCCacheReference, DSMCCCacheDir*> m_Gateways;
-    QMap<DSMCCCacheReference, DSMCCCacheFile*> m_Files;
+    QMap<DSMCCCacheReference, DSMCCCacheDir*> m_directories;
+    QMap<DSMCCCacheReference, DSMCCCacheDir*> m_gateways;
+    QMap<DSMCCCacheReference, DSMCCCacheFile*> m_files;
 
   public:
-    Dsmcc *m_Dsmcc {nullptr};
+    Dsmcc *m_dsmcc {nullptr};
 };
 
 #endif

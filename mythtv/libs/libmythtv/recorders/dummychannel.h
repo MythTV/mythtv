@@ -17,7 +17,7 @@ class DummyChannel : public ChannelBase
 {
   public:
     explicit DummyChannel(TVRec *parent): ChannelBase(parent)
-        { (void)parent; m_curchannelname.clear(); curinputname.clear(); return; }
+        { (void)parent; m_curchannelname.clear(); m_curInputName.clear(); return; }
     ~DummyChannel(void) { return; }
 
     bool IsTunable(const QString &/*channum*/) const override // ChannelBase
@@ -37,11 +37,11 @@ class DummyChannel : public ChannelBase
         { return true; }
     QString GetDevice(void) const override // ChannelBase
         { return "/dev/dummy"; }
-    QString GetCurrentInput(void)    const { return curinputname; }
+    QString GetCurrentInput(void)    const { return m_curInputName; }
     uint    GetCurrentSourceID(void) const { return 0; }
 
   private:
-    QString curinputname;
+    QString m_curInputName;
 };
 
 #endif

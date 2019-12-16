@@ -43,19 +43,19 @@ class MTV_PUBLIC V4LRecorder : public DTVRecorder
     virtual void FormatCC(uint /*code1*/, uint /*code2*/) {}
 
   protected:
-    QString          m_audiodevice;
-    QString          m_vbidevice;
-    int              m_vbimode                {VBIMode::None};
-    struct VBIData  *m_pal_vbi_cb             {nullptr};
-    struct vbi      *m_pal_vbi_tt             {nullptr};
-    uint             m_ntsc_vbi_width         {0};
-    uint             m_ntsc_vbi_start_line    {0};
-    uint             m_ntsc_vbi_line_count    {0};
+    QString          m_audioDeviceName;
+    QString          m_vbiDeviceName;
+    int              m_vbiMode                {VBIMode::None};
+    struct VBIData  *m_palVbiCb               {nullptr};
+    struct vbi      *m_palVbiTt               {nullptr};
+    uint             m_ntscVbiWidth           {0};
+    uint             m_ntscVbiStartLine       {0};
+    uint             m_ntscVbiLineCount       {0};
     VBI608Extractor *m_vbi608                 {nullptr};
-    VBIThread       *m_vbi_thread             {nullptr};
-    QList<struct txtbuffertype*> m_textbuffer;
-    int              m_vbi_fd                 {-1};
-    volatile bool    m_request_helper         {false};
+    VBIThread       *m_vbiThread              {nullptr};
+    QList<struct txtbuffertype*> m_textBuffer;
+    int              m_vbiFd                  {-1};
+    volatile bool    m_requestHelper          {false};
 };
 
 class VBIThread : public MThread

@@ -35,17 +35,17 @@ class V4L2encSignalMonitor: public DTVSignalMonitor
 
   protected:
     V4L2util              m_v4l2;
-    V4L2encStreamHandler *m_stream_handler {nullptr};
+    V4L2encStreamHandler *m_streamHandler  {nullptr};
     bool                  m_isTS           {false};
 
   private:
     int                   m_strength       {0};
-    int                   m_stable_time    {1500};
+    int                   m_stableTime     {1500};
     int                   m_width          {0};
     int                   m_height         {0};
-    uint                  m_lock_cnt       {0};
+    uint                  m_lockCnt        {0};
     MythTimer             m_timer;
-    QDateTime             m_status_time;
+    QDateTime             m_statusTime;
 };
 
 #endif // V4L2encSIGNALMONITOR_H
