@@ -374,21 +374,21 @@ class MTV_PUBLIC PSIPTable : public PESPacket
     void InitPESPacket(TSPacket& tspacket)
     {
         if (tspacket.PayloadStart())
-            _psiOffset = tspacket.AFCOffset() + tspacket.StartOfFieldPointer();
+            m_psiOffset = tspacket.AFCOffset() + tspacket.StartOfFieldPointer();
         else
         {
             LOG(VB_GENERAL, LOG_ERR, "Started PESPacket, but !payloadStart()");
-            _psiOffset = tspacket.AFCOffset();
+            m_psiOffset = tspacket.AFCOffset();
         }
-        _pesdata = tspacket.data() + _psiOffset + 1;
+        m_pesData = tspacket.data() + m_psiOffset + 1;
 
-        _badPacket = true;
+        m_badPacket = true;
         // first check if Length() will return something useful and
         // than check if the packet ends in the first TSPacket
-        if ((_pesdata - tspacket.data()) <= (188-3) &&
-            (_pesdata + Length() - tspacket.data()) <= (188-3))
+        if ((m_pesData - tspacket.data()) <= (188-3) &&
+            (m_pesData + Length() - tspacket.data()) <= (188-3))
         {
-            _badPacket = !VerifyCRC();
+            m_badPacket = !VerifyCRC();
         }
     }
 
@@ -397,13 +397,13 @@ class MTV_PUBLIC PSIPTable : public PESPacket
     PSIPTable(const TSPacket& tspacket, bool)
         : PESPacket()
     {
-        _pesdata = nullptr;
-        _fullbuffer = nullptr;
-         _ccLast = tspacket.ContinuityCounter();
-         _allocSize = 0;
+        m_pesData = nullptr;
+        m_fullBuffer = nullptr;
+        m_ccLast = tspacket.ContinuityCounter();
+        m_allocSize = 0;
         InitPESPacket(const_cast<TSPacket&>(tspacket));
-        _fullbuffer = const_cast<unsigned char*>(tspacket.data());
-        _pesdataSize = TSPacket::kSize - (_pesdata - _fullbuffer);
+        m_fullBuffer = const_cast<unsigned char*>(tspacket.data());
+        m_pesDataSize = TSPacket::kSize - (m_pesData - m_fullBuffer);
     }
 
   public:
@@ -412,16 +412,16 @@ class MTV_PUBLIC PSIPTable : public PESPacket
               const unsigned char *pesdata, uint pes_size)
         : PESPacket()
     { // clone
-        _ccLast = tspacket.ContinuityCounter();
-        _pesdataSize = pes_size;
-        InitPESPacket(const_cast<TSPacket&>(tspacket)); // sets _psiOffset
+        m_ccLast = tspacket.ContinuityCounter();
+        m_pesDataSize = pes_size;
+        InitPESPacket(const_cast<TSPacket&>(tspacket)); // sets m_psiOffset
         int len     = pes_size+4;
         /* make alloc size multiple of 188 */
-        _allocSize  = ((len+_psiOffset+187)/188)*188;
-        _fullbuffer = pes_alloc(_allocSize);
-        _pesdata    = _fullbuffer + _psiOffset + 1;
-        memcpy(_fullbuffer, tspacket.data(), 188);
-        memcpy(_pesdata, pesdata, pes_size-1);
+        m_allocSize  = ((len+m_psiOffset+187)/188)*188;
+        m_fullBuffer = pes_alloc(m_allocSize);
+        m_pesData    = m_fullBuffer + m_psiOffset + 1;
+        memcpy(m_fullBuffer, tspacket.data(), 188);
+        memcpy(m_pesData, pesdata, pes_size-1);
     }
 
   public:
@@ -430,7 +430,7 @@ class MTV_PUBLIC PSIPTable : public PESPacket
         : PESPacket(pesdata)
     {
         // fixup wrong assumption about length for sections without CRC
-        _pesdataSize = SectionLength();
+        m_pesDataSize = SectionLength();
     }
   public:
     PSIPTable(const PSIPTable& table) : PESPacket(table)
@@ -450,17 +450,17 @@ class MTV_PUBLIC PSIPTable : public PESPacket
         // section_syntax_ind   1       1.0       8   should always be 1
         // private_indicator    1       1.1       9   should always be 1
 
-        _ccLast = table.ContinuityCounter();
-        _pesdataSize = 188;
+        m_ccLast = table.ContinuityCounter();
+        m_pesDataSize = 188;
 
         // clone
-        InitPESPacket(const_cast<TSPacket&>(table)); // sets _psiOffset
+        InitPESPacket(const_cast<TSPacket&>(table)); // sets m_psiOffset
 
         int len     = (4*1024) - 256; /* ~4KB */
-        _allocSize  = len + _psiOffset;
-        _fullbuffer = pes_alloc(_allocSize);
-        _pesdata    = _fullbuffer + _psiOffset + 1;
-        memcpy(_fullbuffer, table.data(), TSPacket::kSize);
+        m_allocSize  = len + m_psiOffset;
+        m_fullBuffer = pes_alloc(m_allocSize);
+        m_pesData    = m_fullBuffer + m_psiOffset + 1;
+        memcpy(m_fullBuffer, table.data(), TSPacket::kSize);
     }
 
 
@@ -520,9 +520,9 @@ class MTV_PUBLIC PSIPTable : public PESPacket
 
     // PSIP_table_data      x       8.0      72 (incl. protocolVersion)
     const unsigned char* psipdata(void) const
-        { return pesdata() + PSIP_OFFSET; }
+        { return pesdata() + kPsipOffset; }
     unsigned char* psipdata(void)
-        { return pesdata() + PSIP_OFFSET; }
+        { return pesdata() + kPsipOffset; }
 
     // sets
     void SetTableID(uint id) { SetStreamID(id); }
@@ -552,7 +552,7 @@ class MTV_PUBLIC PSIPTable : public PESPacket
     virtual QString toString(void) const;
     virtual QString toStringXML(uint indent_level) const;
 
-    static const uint PSIP_OFFSET = 8; // general PSIP header offset
+    static const uint kPsipOffset = 8; // general PSIP header offset
 
   protected:
     QString XMLValues(uint indent_level) const;
@@ -599,8 +599,8 @@ class MTV_PUBLIC ProgramAssociationTable : public PSIPTable
 
     uint ProgramCount(void) const
     {
-        if (SectionLength() > (PSIP_OFFSET+2))
-            return (SectionLength()-PSIP_OFFSET-2)>>2;
+        if (SectionLength() > (kPsipOffset+2))
+            return (SectionLength()-kPsipOffset-2)>>2;
         return 0;
     }
 
@@ -700,19 +700,19 @@ class MTV_PUBLIC ProgramMapTable : public PSIPTable
         { return psipdata() + 4; }
 
     uint StreamType(uint i) const
-        { return _ptrs[i][0]; }
+        { return m_ptrs[i][0]; }
 
     uint StreamPID(uint i) const
-        { return ((_ptrs[i][1] << 8) | _ptrs[i][2]) & 0x1fff; }
+        { return ((m_ptrs[i][1] << 8) | m_ptrs[i][2]) & 0x1fff; }
 
     uint StreamInfoLength(uint i) const
-        { return ((_ptrs[i][3] << 8) | _ptrs[i][4]) & 0x0fff; }
+        { return ((m_ptrs[i][3] << 8) | m_ptrs[i][4]) & 0x0fff; }
 
     const unsigned char* StreamInfo(uint i) const
-        { return _ptrs[i] + 5; }
+        { return m_ptrs[i] + 5; }
 
     uint StreamCount(void) const
-        { return (_ptrs.size()) ? _ptrs.size()-1 : 0; }
+        { return (m_ptrs.size()) ? m_ptrs.size()-1 : 0; }
 
     // sets
     void SetPCRPID(uint pid)
@@ -725,12 +725,12 @@ class MTV_PUBLIC ProgramMapTable : public PSIPTable
 
     void SetStreamPID(uint i, uint pid)
     {
-        _ptrs[i][1] = ((pid>>8) & 0x1f) | (_ptrs[i][1] & 0xe0);
-        _ptrs[i][2] = pid & 0xff;
+        m_ptrs[i][1] = ((pid>>8) & 0x1f) | (m_ptrs[i][1] & 0xe0);
+        m_ptrs[i][2] = pid & 0xff;
     }
 
     void SetStreamType(uint i, uint type)
-        { _ptrs[i][0] = type; }
+        { m_ptrs[i][0] = type; }
 
     // helper methods
     bool IsVideo(uint i, const QString& sistandard) const;
@@ -769,9 +769,9 @@ class MTV_PUBLIC ProgramMapTable : public PSIPTable
 
     void RemoveAllStreams(void)
     {
-        memset(psipdata(), 0xff, pmt_header);
+        memset(psipdata(), 0xff, kPmtHeaderMinOffset);
         SetProgramInfoLength(0);
-        _ptrs.clear();
+        m_ptrs.clear();
     }
     void AppendStream(uint pid, uint type, unsigned char* streamInfo = nullptr, uint infoLength = 0);
 
@@ -782,15 +782,15 @@ class MTV_PUBLIC ProgramMapTable : public PSIPTable
   private:
     void SetStreamInfoLength(uint i, uint length)
     {
-        _ptrs[i][3] = ((length>>8) & 0x0f) | (_ptrs[i][3] & 0xf0);
-        _ptrs[i][4] = length & 0xff;
+        m_ptrs[i][3] = ((length>>8) & 0x0f) | (m_ptrs[i][3] & 0xf0);
+        m_ptrs[i][4] = length & 0xff;
     }
 
     void SetStreamProgramInfo(uint i, unsigned char* streamInfo,
                               uint infoLength)
     {
         SetStreamInfoLength(i, infoLength);
-        memcpy(_ptrs[i] + 5, streamInfo, infoLength);
+        memcpy(m_ptrs[i] + 5, streamInfo, infoLength);
     }
 
     void SetProgramInfoLength(uint length)
@@ -807,8 +807,8 @@ class MTV_PUBLIC ProgramMapTable : public PSIPTable
 
     static ProgramMapTable* CreateBlank(bool smallPacket = true);
 
-    static const uint pmt_header = 4; // minimum PMT header offset
-    mutable vector<unsigned char*> _ptrs; // used to parse
+    static const uint kPmtHeaderMinOffset = 4; // minimum PMT header offset
+    mutable vector<unsigned char*> m_ptrs; // used to parse
 };
 
 /** \class ConditionalAccessTable
@@ -839,7 +839,7 @@ class MTV_PUBLIC ConditionalAccessTable : public PSIPTable
     // for (i = 0; i < N; i++)      8.0      64
     //   { descriptor() }
     uint DescriptorsLength(void) const
-        { return SectionLength() - PSIP_OFFSET; }
+        { return SectionLength() - kPsipOffset; }
     const unsigned char *Descriptors(void) const { return psipdata(); }
 
     QString toString(void) const override; // PSIPTable
@@ -851,19 +851,19 @@ class MTV_PUBLIC ConditionalAccessTable : public PSIPTable
 class MTV_PUBLIC SpliceTimeView
 {
   public:
-    explicit SpliceTimeView(const unsigned char *data) : _data(data) { }
+    explicit SpliceTimeView(const unsigned char *data) : m_data(data) { }
     //   time_specified_flag    1  0.0
-    bool IsTimeSpecified(void) const { return ( _data[0] & 0x80 ) != 0; }
+    bool IsTimeSpecified(void) const { return ( m_data[0] & 0x80 ) != 0; }
     //   if (time_specified_flag == 1)
     //     reserved             6  0.1
     //     pts_time            33  0.6
     uint64_t PTSTime(void) const
     {
-        return ((uint64_t(_data[0] & 0x1) << 32) |
-                (uint64_t(_data[1])       << 24) |
-                (uint64_t(_data[2])       << 16) |
-                (uint64_t(_data[3])       <<  8) |
-                (uint64_t(_data[4])));
+        return ((uint64_t(m_data[0] & 0x1) << 32) |
+                (uint64_t(m_data[1])       << 24) |
+                (uint64_t(m_data[2])       << 16) |
+                (uint64_t(m_data[3])       <<  8) |
+                (uint64_t(m_data[4])));
     }
     //   else
     //     reserved             7  0.1
@@ -874,7 +874,7 @@ class MTV_PUBLIC SpliceTimeView
 
     uint size(void) const { return IsTimeSpecified() ? 1 : 5; }
   private:
-    const unsigned char *_data;
+    const unsigned char *m_data;
 };
 
 class MTV_PUBLIC SpliceScheduleView
@@ -882,47 +882,47 @@ class MTV_PUBLIC SpliceScheduleView
   public:
     SpliceScheduleView(const vector<const unsigned char*> &ptrs0,
                        const vector<const unsigned char*> &ptrs1) :
-        _ptrs0(ptrs0), _ptrs1(ptrs1)
+        m_ptrs0(ptrs0), m_ptrs1(ptrs1)
     {
     }
     //   splice_count           8  14.0
-    uint SpliceCount(void) const { return min(_ptrs0.size(), _ptrs1.size()); }
+    uint SpliceCount(void) const { return min(m_ptrs0.size(), m_ptrs1.size()); }
 
-    //   splice_event_id       32  0.0 + _ptrs0[i]
+    //   splice_event_id       32  0.0 + m_ptrs0[i]
     uint SpliceEventID(uint i) const
     {
-        return ((_ptrs0[i][0] << 24) | (_ptrs0[i][1] << 16) |
-                (_ptrs0[i][2] <<  8) | (_ptrs0[i][3]));
+        return ((m_ptrs0[i][0] << 24) | (m_ptrs0[i][1] << 16) |
+                (m_ptrs0[i][2] <<  8) | (m_ptrs0[i][3]));
     }
-    //   splice_event_cancel_indicator 1 4.0 + _ptrs0[i]
-    //   reserved               7   4.1 + _ptrs0[i]
+    //   splice_event_cancel_indicator 1 4.0 + m_ptrs0[i]
+    //   reserved               7   4.1 + m_ptrs0[i]
     //   if (splice_event_cancel_indicator == ‘0’) {
-    //     out_of_network_indicator 1 5.0 + _ptrs0[i]
-    //     program_splice_flag  1 5.1 + _ptrs0[i]
-    //     duration_flag        1 5.2 + _ptrs0[i]
-    //     reserved             5 5.3 + _ptrs0[i]
+    //     out_of_network_indicator 1 5.0 + m_ptrs0[i]
+    //     program_splice_flag  1 5.1 + m_ptrs0[i]
+    //     duration_flag        1 5.2 + m_ptrs0[i]
+    //     reserved             5 5.3 + m_ptrs0[i]
     //     if (program_splice_flag == ‘1’)
-    //       utc_splice_time   32 6.0 + _ptrs0[i]
+    //       utc_splice_time   32 6.0 + m_ptrs0[i]
     //     else {
-    //       component_count    8 6.0 + _ptrs0[i]
+    //       component_count    8 6.0 + m_ptrs0[i]
     //       for(j = 0; j < component_count; j++) {
-    //         component_tag    8 7.0 + _ptrs0[i]+j*5
-    //         utc_splice_time 32 8.0 + _ptrs0[i]+j*5
+    //         component_tag    8 7.0 + m_ptrs0[i]+j*5
+    //         utc_splice_time 32 8.0 + m_ptrs0[i]+j*5
     //       }
     //     }
     //     if (duration_flag) {
-    //       auto_return        1 0.0 + _ptrs1[i]
-    //       reserved           6 0.1 + _ptrs1[i]
-    //       duration          33 0.7 + _ptrs1[i]
+    //       auto_return        1 0.0 + m_ptrs1[i]
+    //       reserved           6 0.1 + m_ptrs1[i]
+    //       duration          33 0.7 + m_ptrs1[i]
     //     }
-    //     unique_program_id   16 0.0 + _ptrs1[i] + (duration_flag)?5:0
-    //     avail_num            8 2.0 + _ptrs1[i] + (duration_flag)?5:0
-    //     avails_expected      8 3.0 + _ptrs1[i] + (duration_flag)?5:0
+    //     unique_program_id   16 0.0 + m_ptrs1[i] + (duration_flag)?5:0
+    //     avail_num            8 2.0 + m_ptrs1[i] + (duration_flag)?5:0
+    //     avails_expected      8 3.0 + m_ptrs1[i] + (duration_flag)?5:0
     //   }
 
   private:
-    vector<const unsigned char*> _ptrs0;
-    vector<const unsigned char*> _ptrs1;
+    vector<const unsigned char*> m_ptrs0;
+    vector<const unsigned char*> m_ptrs1;
 };
 
 class MTV_PUBLIC SpliceInsertView
@@ -930,52 +930,52 @@ class MTV_PUBLIC SpliceInsertView
   public:
     SpliceInsertView(const vector<const unsigned char*> &ptrs0,
                      const vector<const unsigned char*> &ptrs1) :
-        _ptrs0(ptrs0), _ptrs1(ptrs1)
+        m_ptrs0(ptrs0), m_ptrs1(ptrs1)
     {
     }
 
-    //   splice_event_id       32   0.0 + _ptrs1[0]
+    //   splice_event_id       32   0.0 + m_ptrs1[0]
     uint SpliceEventID(void) const
     {
-        return ((_ptrs1[0][0] << 24) | (_ptrs1[0][1] << 16) |
-                (_ptrs1[0][2] <<  8) | (_ptrs1[0][3]));
+        return ((m_ptrs1[0][0] << 24) | (m_ptrs1[0][1] << 16) |
+                (m_ptrs1[0][2] <<  8) | (m_ptrs1[0][3]));
     }
-    //   splice_event_cancel    1    4.0 + _ptrs1[0]
-    bool IsSpliceEventCancel(void) const { return ( _ptrs1[0][4] & 0x80 ) != 0; }
-    //   reserved               7    4.1 + _ptrs1[0]
+    //   splice_event_cancel    1    4.0 + m_ptrs1[0]
+    bool IsSpliceEventCancel(void) const { return ( m_ptrs1[0][4] & 0x80 ) != 0; }
+    //   reserved               7    4.1 + m_ptrs1[0]
     //   if (splice_event_cancel_indicator == 0) {
-    //     out_of_network_flag  1    5.0 + _ptrs1[0]
-    bool IsOutOfNetwork(void) const { return ( _ptrs1[0][5] & 0x80 ) != 0; }
-    //     program_splice_flag  1    5.1 + _ptrs1[0]
-    bool IsProgramSplice(void) const { return ( _ptrs1[0][5] & 0x40 ) != 0; }
-    //     duration_flag        1    5.2 + _ptrs1[0]
-    bool IsDuration(void) const { return ( _ptrs1[0][5] & 0x20 ) != 0; }
-    //     splice_immediate_flag 1   5.3 + _ptrs1[0]
-    bool IsSpliceImmediate(void) const { return ( _ptrs1[0][5] & 0x20 ) != 0; }
-    //     reserved             4    5.4 + _ptrs1[0]
+    //     out_of_network_flag  1    5.0 + m_ptrs1[0]
+    bool IsOutOfNetwork(void) const { return ( m_ptrs1[0][5] & 0x80 ) != 0; }
+    //     program_splice_flag  1    5.1 + m_ptrs1[0]
+    bool IsProgramSplice(void) const { return ( m_ptrs1[0][5] & 0x40 ) != 0; }
+    //     duration_flag        1    5.2 + m_ptrs1[0]
+    bool IsDuration(void) const { return ( m_ptrs1[0][5] & 0x20 ) != 0; }
+    //     splice_immediate_flag 1   5.3 + m_ptrs1[0]
+    bool IsSpliceImmediate(void) const { return ( m_ptrs1[0][5] & 0x20 ) != 0; }
+    //     reserved             4    5.4 + m_ptrs1[0]
     //     if ((program_splice_flag == 1) && (splice_immediate_flag == ‘0’))
-    //       splice_time()   8-38    6.0 + _ptrs1[0]
+    //       splice_time()   8-38    6.0 + m_ptrs1[0]
     SpliceTimeView SpliceTime(void) const
-        { return SpliceTimeView(_ptrs1[0]+6); }
+        { return SpliceTimeView(m_ptrs1[0]+6); }
     //     if (program_splice_flag == 0) {
-    //       component_count    8    6.0 + _ptrs1[0]
+    //       component_count    8    6.0 + m_ptrs1[0]
     //       for (i = 0; i < component_count; i++) {
-    //         component_tag    8    0.0 + _ptrs0[i]
+    //         component_tag    8    0.0 + m_ptrs0[i]
     //         if (splice_immediate_flag == ‘0’)
-    //           splice_time() 8-38  1.0 + _ptrs0[i]
+    //           splice_time() 8-38  1.0 + m_ptrs0[i]
     //       }
     //     }
     //     if (duration_flag == ‘1’)
-    //       auto_return        1    0.0 + _ptrs1[1]
-    //       reserved           6    0.1 + _ptrs1[1]
-    //       duration          33    0.7 + _ptrs1[1]
-    //     unique_program_id   16    0.0 + _ptrs1[2]
+    //       auto_return        1    0.0 + m_ptrs1[1]
+    //       reserved           6    0.1 + m_ptrs1[1]
+    //       duration          33    0.7 + m_ptrs1[1]
+    //     unique_program_id   16    0.0 + m_ptrs1[2]
     uint UniqueProgramID(void) const
-        { return (_ptrs1[2][0]<<8) | _ptrs1[2][1]; }
-    //     avail_num            8    2.0 + _ptrs1[2]
-    uint AvailNum(void) const { return _ptrs1[2][2]; }
-    //     avails_expected      8    3.0 + _ptrs1[2]
-    uint AvailsExpected(void) const { return _ptrs1[2][3]; }
+        { return (m_ptrs1[2][0]<<8) | m_ptrs1[2][1]; }
+    //     avail_num            8    2.0 + m_ptrs1[2]
+    uint AvailNum(void) const { return m_ptrs1[2][2]; }
+    //     avails_expected      8    3.0 + m_ptrs1[2]
+    uint AvailsExpected(void) const { return m_ptrs1[2][3]; }
     //   }
 
     virtual QString toString(int64_t first, int64_t last) const;
@@ -983,29 +983,29 @@ class MTV_PUBLIC SpliceInsertView
         uint indent_level, int64_t first, int64_t last) const;
 
   private:
-    vector<const unsigned char*> _ptrs0;
-    vector<const unsigned char*> _ptrs1;
+    vector<const unsigned char*> m_ptrs0;
+    vector<const unsigned char*> m_ptrs1;
 };
 
 class MTV_PUBLIC SpliceInformationTable : public PSIPTable
 {
   public:
     SpliceInformationTable(const SpliceInformationTable &table) :
-        PSIPTable(table), _epilog(nullptr)
+        PSIPTable(table)
     {
         assert(TableID::SITscte == TableID());
         Parse();
     }
     explicit SpliceInformationTable(const PSIPTable &table) :
-        PSIPTable(table), _epilog(nullptr)
+        PSIPTable(table)
     {
         assert(TableID::SITscte == TableID());
         Parse();
     }
     ~SpliceInformationTable() { ; }
 
-    void setSCTEPID(int ts_pid){scte_pid = ts_pid;}
-    int getSCTEPID(void) const {return scte_pid;}
+    void setSCTEPID(int ts_pid){m_sctePid = ts_pid;}
+    int getSCTEPID(void) const {return m_sctePid;}
 
     // ANCE/SCTE 35 2007
     //       Name             bits  loc  expected value
@@ -1101,13 +1101,13 @@ class MTV_PUBLIC SpliceInformationTable : public PSIPTable
 
     // if (splice_command_type == 0x04) splice_schedule()
     SpliceScheduleView SpliceSchedule(void) const
-        { return SpliceScheduleView(_ptrs0, _ptrs1); }
+        { return SpliceScheduleView(m_ptrs0, m_ptrs1); }
 
     //////////// SPLICE INSERT ////////////
 
     // if (splice_command_type == 0x05) splice_insert()
     SpliceInsertView SpliceInsert(void) const
-        { return SpliceInsertView(_ptrs0, _ptrs1); }
+        { return SpliceInsertView(m_ptrs0, m_ptrs1); }
 
     //////////// TIME SIGNAL ////////////
 
@@ -1131,17 +1131,17 @@ class MTV_PUBLIC SpliceInformationTable : public PSIPTable
     // NOTE: Aside from CRC's we can not interpret things below
     // this comment with private or reserved commands.
 
-    // descriptor_loop_length  16   0.0 + _epilog
+    // descriptor_loop_length  16   0.0 + m_epilog
     uint SpliceDescriptorsLength(uint /*i*/) const
     {
-        return (_epilog[0] << 8) | _epilog[1];
+        return (m_epilog[0] << 8) | m_epilog[1];
     }
 
     // for (i = 0; i < ? ; i++)
     //   splice_descriptor()   ??   ??.?
     const unsigned char *SpliceDescriptors(void) const
     {
-        return (_epilog) ? _epilog + 2 : nullptr;
+        return (m_epilog) ? m_epilog + 2 : nullptr;
     }
     // for (i = 0; i < ?; i++)
     //   alignment_stuffing     8   ??.0
@@ -1161,10 +1161,10 @@ class MTV_PUBLIC SpliceInformationTable : public PSIPTable
     QString toStringXML(uint indent_level, int64_t first, int64_t last) const;
 
   private:
-    vector<const unsigned char*> _ptrs0;
-    vector<const unsigned char*> _ptrs1;
-    const unsigned char *_epilog;
-    int scte_pid {0};
+    vector<const unsigned char*> m_ptrs0;
+    vector<const unsigned char*> m_ptrs1;
+    const unsigned char *m_epilog {nullptr};
+    int m_sctePid {0};
 };
 
 /** \class AdaptationFieldControl
@@ -1179,32 +1179,32 @@ class MTV_PUBLIC SpliceInformationTable : public PSIPTable
 class MTV_PUBLIC AdaptationFieldControl
 {
   public:
-    explicit AdaptationFieldControl(const unsigned char* packet) : _data(packet) { ; }
+    explicit AdaptationFieldControl(const unsigned char* packet) : m_data(packet) { ; }
 
     /** adaptation header length
      * (after which is payload data)         8   0.0
      */
-    uint Length(void) const             { return _data[0]; }
+    uint Length(void) const             { return m_data[0]; }
 
     /** discontinuity_indicator
      *  (time base may change)               1   1.0
      */
-    bool Discontinuity(void) const      { return ( _data[1] & 0x80 ) != 0; }
+    bool Discontinuity(void) const      { return ( m_data[1] & 0x80 ) != 0; }
     // random_access_indicator (?)           1   1.1
-    bool RandomAccess(void) const       { return bool(_data[1] & 0x40); }
+    bool RandomAccess(void) const       { return bool(m_data[1] & 0x40); }
     // elementary_stream_priority_indicator  1   1.2
-    bool Priority(void) const           { return bool(_data[1] & 0x20); }
+    bool Priority(void) const           { return bool(m_data[1] & 0x20); }
 
 // Each of the following extends the adaptation header.  In order:
 
     /** PCR flag (we have PCR data)          1   1.3
      *  (adds 6 bytes after adaptation header)
      */
-    bool PCR(void) const                { return bool(_data[1] & 0x10); }
+    bool PCR(void) const                { return bool(m_data[1] & 0x10); }
     /** OPCR flag (we have OPCR data)        1   1.4
      *  (adds 6 bytes) ((Original) Program Clock Reference; used to time output)
      */
-    bool OPCR(void) const               { return bool(_data[1] & 0x08); }
+    bool OPCR(void) const               { return bool(m_data[1] & 0x08); }
     /** splicing_point_flag                  1   1.5
      *  (adds 1 byte) (we have splice point data)
      *  Splice data is packets until a good splice point for
@@ -1212,25 +1212,25 @@ class MTV_PUBLIC AdaptationFieldControl
      *  might be a good way to recognize potential commercials
      *  for flagging.
      */
-    bool SplicingPoint(void) const      { return bool(_data[1] & 0x04); }
+    bool SplicingPoint(void) const      { return bool(m_data[1] & 0x04); }
     //  transport_private_data_flag          1   1.6
     // (adds 1 byte)
-    bool PrivateTransportData(void) const { return bool(_data[1] & 0x02); }
+    bool PrivateTransportData(void) const { return bool(m_data[1] & 0x02); }
     // adaptation_field_extension_flag       1   1.7
-    bool FieldExtension(void) const     { return bool(_data[1] & 0x1); }
+    bool FieldExtension(void) const     { return bool(m_data[1] & 0x1); }
     // extension length                      8   2.0
-    uint ExtensionLength(void) const    { return _data[2]; }
+    uint ExtensionLength(void) const    { return m_data[2]; }
     // ltw flag                              1   3.0
     // (adds 2 bytes)
-    bool LTW(void) const                { return bool(_data[3] & 0x80); }
+    bool LTW(void) const                { return bool(m_data[3] & 0x80); }
     // piecewise_rate_flag (adds 3 bytes)    1   3.1
-    bool PiecewiseRate(void) const      { return bool(_data[3] & 0x40); }
+    bool PiecewiseRate(void) const      { return bool(m_data[3] & 0x40); }
     // seamless_splice_flag (adds 5 bytes)   1   3.2
-    bool SeamlessSplice(void) const     { return bool(_data[3] & 0x20); }
+    bool SeamlessSplice(void) const     { return bool(m_data[3] & 0x20); }
     // unused flags                          5   3.3
 
   private:
-    const unsigned char* _data;
+    const unsigned char* m_data;
 };
 
 #endif

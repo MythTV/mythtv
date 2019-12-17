@@ -19,12 +19,12 @@ static uint GetPrivateDataSpecifier(const unsigned char *desc, uint priv_dsid)
 
 void NetworkInformationTable::Parse(void) const
 {
-    _tsc_ptr = pesdata() + 10 + NetworkDescriptorsLength();
+    m_tscPtr = pesdata() + 10 + NetworkDescriptorsLength();
 
-    _ptrs.clear();
-    _ptrs.push_back(_tsc_ptr + 2);
-    for (uint i=0; _ptrs[i] + 6 <= _ptrs[0] + TransportStreamDataLength(); i++)
-        _ptrs.push_back(_ptrs[i] + 6 + TransportDescriptorsLength(i));
+    m_ptrs.clear();
+    m_ptrs.push_back(m_tscPtr + 2);
+    for (uint i=0; m_ptrs[i] + 6 <= m_ptrs[0] + TransportStreamDataLength(); i++)
+        m_ptrs.push_back(m_ptrs[i] + 6 + TransportDescriptorsLength(i));
 }
 
 QString NetworkInformationTable::toString(void) const
@@ -79,7 +79,7 @@ QString NetworkInformationTable::toString(void) const
 
 QString NetworkInformationTable::NetworkName() const
 {
-    if (_cached_network_name.isEmpty())
+    if (m_cachedNetworkName.isEmpty())
     {
         desc_list_t parsed =
             MPEGDescriptor::Parse(NetworkDescriptors(),
@@ -92,13 +92,13 @@ QString NetworkInformationTable::NetworkName() const
         {
             auto nndesc = NetworkNameDescriptor(desc);
             if (nndesc.IsValid())
-                _cached_network_name = nndesc.Name();
+                m_cachedNetworkName = nndesc.Name();
         }
-        if (_cached_network_name.isEmpty())
-            _cached_network_name = QString("Net ID 0x%1")
+        if (m_cachedNetworkName.isEmpty())
+            m_cachedNetworkName = QString("Net ID 0x%1")
                 .arg(NetworkID(), 0, 16);
     }
-    return _cached_network_name;
+    return m_cachedNetworkName;
 }
 
 bool NetworkInformationTable::Mutate(void)
@@ -114,12 +114,12 @@ bool NetworkInformationTable::Mutate(void)
 
 void ServiceDescriptionTable::Parse(void) const
 {
-    _ptrs.clear();
-    _ptrs.push_back(pesdata() + 11);
+    m_ptrs.clear();
+    m_ptrs.push_back(pesdata() + 11);
     uint i = 0;
-    while ((_ptrs[i] + 5) < (pesdata() + Length()))
+    while ((m_ptrs[i] + 5) < (pesdata() + Length()))
     {
-        _ptrs.push_back(_ptrs[i] + 5 + ServiceDescriptorsLength(i));
+        m_ptrs.push_back(m_ptrs[i] + 5 + ServiceDescriptorsLength(i));
         i++;
     }
 }
@@ -189,12 +189,12 @@ bool ServiceDescriptionTable::Mutate(void)
 
 void BouquetAssociationTable::Parse(void) const
 {
-    _tsc_ptr = pesdata() + 10 + BouquetDescriptorsLength();
+    m_tscPtr = pesdata() + 10 + BouquetDescriptorsLength();
 
-    _ptrs.clear();
-    _ptrs.push_back(_tsc_ptr + 2);
-    for (uint i=0; _ptrs[i] + 6 <= _ptrs[0] + TransportStreamDataLength(); i++)
-        _ptrs.push_back(_ptrs[i] + 6 + TransportDescriptorsLength(i));
+    m_ptrs.clear();
+    m_ptrs.push_back(m_tscPtr + 2);
+    for (uint i=0; m_ptrs[i] + 6 <= m_ptrs[0] + TransportStreamDataLength(); i++)
+        m_ptrs.push_back(m_ptrs[i] + 6 + TransportDescriptorsLength(i));
 }
 
 QString BouquetAssociationTable::toString(void) const
@@ -252,12 +252,12 @@ QString BouquetAssociationTable::toString(void) const
 
 void DVBEventInformationTable::Parse(void) const
 {
-    _ptrs.clear();
-    _ptrs.push_back(psipdata() + 6);
+    m_ptrs.clear();
+    m_ptrs.push_back(psipdata() + 6);
     uint i = 0;
-    while ((_ptrs[i] + 12) < (pesdata() + Length()))
+    while ((m_ptrs[i] + 12) < (pesdata() + Length()))
     {
-        _ptrs.push_back(_ptrs[i] + 12 + DescriptorsLength(i));
+        m_ptrs.push_back(m_ptrs[i] + 12 + DescriptorsLength(i));
         i++;
     }
 }

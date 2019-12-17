@@ -5,7 +5,7 @@
 
 #define BIT_SEL(x) (1 << (x))
 
-const uint8_t TableStatus::init_bits[8] = {0xfe, 0xfc, 0xf8, 0xf0, 0xe0, 0xc0, 0x80, 0x00};
+const uint8_t TableStatus::kInitBits[8] = {0xfe, 0xfc, 0xf8, 0xf0, 0xe0, 0xc0, 0x80, 0x00};
 
 void TableStatus::InitSections(sections_t &sect, uint32_t last_section)
 {
@@ -15,7 +15,7 @@ void TableStatus::InitSections(sections_t &sect, uint32_t last_section)
     if (endz)
         sect.resize(endz, 0x00);
     sect.resize(32, 0xff);
-    sect[endz] = init_bits[last_section & 0x7];
+    sect[endz] = kInitBits[last_section & 0x7];
 }
 
 void TableStatus::SetVersion(int32_t version, uint32_t last_section)
@@ -34,7 +34,7 @@ void TableStatus::SetSectionSeen(int32_t version, uint32_t section,
     m_sections[section>>3] |= BIT_SEL(section & 0x7);
     if ((segment_last_section != 0xffff) && (last_section != segment_last_section))
         m_sections[segment_last_section >> 3]
-                   |= init_bits[segment_last_section & 0x7];
+                   |= kInitBits[segment_last_section & 0x7];
 
 }
 

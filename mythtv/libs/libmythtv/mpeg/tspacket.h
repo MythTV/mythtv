@@ -29,7 +29,7 @@ class MTV_PUBLIC TSHeader
 
     TSHeader(void)
     {
-        _tsdata[0] = SYNC_BYTE;
+        m_tsData[0] = SYNC_BYTE;
         /*
           no need to init rest of header, this is only a part of a larger
           packets which initialize the rest of the data differently.
@@ -37,7 +37,7 @@ class MTV_PUBLIC TSHeader
     }
     explicit TSHeader(int cc)
     {
-        _tsdata[0] = SYNC_BYTE;
+        m_tsData[0] = SYNC_BYTE;
         SetContinuityCounter(cc);
         /*
           no need to init rest of header, this is only a part of a larger
@@ -47,10 +47,10 @@ class MTV_PUBLIC TSHeader
     void InitHeader(const unsigned char* header) {
         if (header)
         {
-            _tsdata[0]=header[0];
-            _tsdata[1]=header[1];
-            _tsdata[2]=header[2];
-            _tsdata[3]=header[3];
+            m_tsData[0]=header[0];
+            m_tsData[1]=header[1];
+            m_tsData[2]=header[2];
+            m_tsData[3]=header[3];
         }
     }
 
@@ -58,40 +58,40 @@ class MTV_PUBLIC TSHeader
     // gets
 
     //0.0  8 bits SYNC_BYTE
-    bool HasSync(void) const { return SYNC_BYTE == _tsdata[0]; }
+    bool HasSync(void) const { return SYNC_BYTE == m_tsData[0]; }
     //1.0  1 bit transport_packet_error (if set discard immediately:
     //       modem error)
-    bool TransportError(void) const { return bool(_tsdata[1]&0x80); }
+    bool TransportError(void) const { return bool(m_tsData[1]&0x80); }
     //1.1  1 bit payload_unit_start_indicator
     //  (if set this packet starts a section, and has pointerField)
-    bool PayloadStart(void) const { return bool(_tsdata[1]&0x40); }
+    bool PayloadStart(void) const { return bool(m_tsData[1]&0x40); }
        //1.2  1 bit transport_priority (ignore)
-    bool Priority(void) const { return bool(_tsdata[1]&0x20); }
+    bool Priority(void) const { return bool(m_tsData[1]&0x20); }
     //1.3  13 bit PID (packet ID, which transport stream)
     inline unsigned int PID(void) const {
-        return ((_tsdata[1] << 8) + _tsdata[2]) & 0x1fff;
+        return ((m_tsData[1] << 8) + m_tsData[2]) & 0x1fff;
     }
     //3.0  2 bit transport_scrambling_control (00,01 OK; 10,11 scrambled)
-    unsigned int ScramblingControl(void) const { return (_tsdata[3] >> 6) & 0x3; }
+    unsigned int ScramblingControl(void) const { return (m_tsData[3] >> 6) & 0x3; }
     //3.2  2 bit adaptation_field_control
     //       (01-no adaptation field,payload only
     //        10-adaptation field only,no payload
     //        11-adaptation field followed by payload
     //        00-reserved)
     unsigned int AdaptationFieldControl(void) const {
-        return (_tsdata[3] >> 4) & 0x3;
+        return (m_tsData[3] >> 4) & 0x3;
     }
     //3.4  4 bit continuity counter (should cycle 0->15 in sequence
     //       for each PID; if skip, we lost a packet; if dup, we can
     //       ignore packet)
-    unsigned int ContinuityCounter(void) const { return _tsdata[3] & 0xf; }
+    unsigned int ContinuityCounter(void) const { return m_tsData[3] & 0xf; }
 
     // shortcuts
-    bool Scrambled(void) const { return bool(_tsdata[3]&0x80); }
-    bool HasAdaptationField(void) const { return bool(_tsdata[3] & 0x20); }
+    bool Scrambled(void) const { return bool(m_tsData[3]&0x80); }
+    bool HasAdaptationField(void) const { return bool(m_tsData[3] & 0x20); }
     size_t AdaptationFieldSize(void) const
-    { return (HasAdaptationField() ? static_cast<size_t>(_tsdata[4]) : 0); }
-    bool HasPayload(void) const { return bool(_tsdata[3] & 0x10); }
+    { return (HasAdaptationField() ? static_cast<size_t>(m_tsData[4]) : 0); }
+    bool HasPayload(void) const { return bool(m_tsData[3] & 0x10); }
 
     bool GetDiscontinuityIndicator(void) const
     { return AdaptationFieldSize() > 0 && bool(data()[5] & 0x80); }
@@ -127,35 +127,35 @@ class MTV_PUBLIC TSHeader
     { return TimePoint(std::chrono::microseconds(GetPCRraw() / 27)); }
 
     void SetTransportError(bool err) {
-        if (err) _tsdata[1] |= 0x80; else _tsdata[1] &= (0xff-(0x80));
+        if (err) m_tsData[1] |= 0x80; else m_tsData[1] &= (0xff-(0x80));
     }
     void SetPayloadStart(bool start) {
-        if (start) _tsdata[1] |= 0x40; else _tsdata[1] &= (0xff-0x40);
+        if (start) m_tsData[1] |= 0x40; else m_tsData[1] &= (0xff-0x40);
     }
     void SetPriority(bool priority) {
-        if (priority) _tsdata[1] |= 0x20; else _tsdata[1] &= (0xff-0x20);
+        if (priority) m_tsData[1] |= 0x20; else m_tsData[1] &= (0xff-0x20);
     }
     void SetPID(unsigned int pid) {
-        _tsdata[1] = ((pid >> 8) & 0x1F) | (_tsdata[1] & 0xE0);
-        _tsdata[2] = (pid & 0xFF);
+        m_tsData[1] = ((pid >> 8) & 0x1F) | (m_tsData[1] & 0xE0);
+        m_tsData[2] = (pid & 0xFF);
     }
     void SetScrambled(unsigned int scr) {
-        _tsdata[3] = (_tsdata[3] & (0xff-(0x3<<6))) | (scr<<6);
+        m_tsData[3] = (m_tsData[3] & (0xff-(0x3<<6))) | (scr<<6);
     }
     void SetAdaptationFieldControl(unsigned int afc) {
-        _tsdata[3] = (_tsdata[3] & 0xcf) | (afc&0x3)<<4;
+        m_tsData[3] = (m_tsData[3] & 0xcf) | (afc&0x3)<<4;
     }
     void SetContinuityCounter(unsigned int cc) {
-        _tsdata[3] = (_tsdata[3] & 0xf0) | (cc & 0xf);
+        m_tsData[3] = (m_tsData[3] & 0xf0) | (cc & 0xf);
     }
 
-    const unsigned char* data(void) const { return _tsdata; }
-    unsigned char* data(void) { return _tsdata; }
+    const unsigned char* data(void) const { return m_tsData; }
+    unsigned char* data(void) { return m_tsData; }
 
     static const unsigned int kHeaderSize;
     static const unsigned char kPayloadOnlyHeader[4];
   private:
-    unsigned char _tsdata[4];
+    unsigned char m_tsData[4];
 };
 
 /** \class TSPacket
@@ -175,7 +175,7 @@ class MTV_PUBLIC TSPacket : public TSHeader
     {
         TSPacket *pkt = new TSPacket();
         pkt->InitHeader(kPayloadOnlyHeader);
-        memset(pkt->_tspayload, 0xFF, kPayloadSize);
+        memset(pkt->m_tsPayload, 0xFF, kPayloadSize);
         pkt->SetStartOfFieldPointer(0);
         return pkt;
     }
@@ -189,31 +189,31 @@ class MTV_PUBLIC TSPacket : public TSHeader
     void InitPayload(const unsigned char *payload)
     {
         if (payload)
-            memcpy(_tspayload, payload, kPayloadSize);
+            memcpy(m_tsPayload, payload, kPayloadSize);
     }
 
     void InitPayload(const unsigned char *payload, uint size)
     {
         if (payload)
-            memcpy(_tspayload, payload, size);
+            memcpy(m_tsPayload, payload, size);
         else
             size = 0;
 
         if (size < TSPacket::kPayloadSize)
-            memset(_tspayload + size, 0xff, TSPacket::kPayloadSize - size);
+            memset(m_tsPayload + size, 0xff, TSPacket::kPayloadSize - size);
     }
 
     // This points outside the TSHeader data, but is declared here because
     // it is used for the different types of packets that employ a TS Header
     unsigned int AFCOffset(void) const { // only works if AFC fits in TSPacket
-        return HasAdaptationField() ? _tspayload[0]+1+4 : 4;
+        return HasAdaptationField() ? m_tsPayload[0]+1+4 : 4;
     }
 
     //4.0  8 bits, iff payloadStart(), points to start of field
     unsigned int StartOfFieldPointer(void) const
-        { return _tspayload[AFCOffset()-4]; }
+        { return m_tsPayload[AFCOffset()-4]; }
     void SetStartOfFieldPointer(uint sof)
-        { _tspayload[AFCOffset()-4] = sof; }
+        { m_tsPayload[AFCOffset()-4] = sof; }
 
     QString toString(void) const;
 
@@ -224,7 +224,7 @@ class MTV_PUBLIC TSPacket : public TSHeader
     static const unsigned int k8VSBEmissionSize;
     static const TSPacket    *kNullPacket;
   private:
-    unsigned char _tspayload[184];
+    unsigned char m_tsPayload[184];
 };
 
 #if 0 /* not used yet */
@@ -234,7 +234,7 @@ class MTV_PUBLIC TSPacket : public TSHeader
 class MTV_PUBLIC TSDVBEmissionPacket : public TSPacket
 {
   private:
-    unsigned char _tsfec[16];
+    unsigned char m_tsFec[16];
 };
 
 /** \class TSISDBEmissionPacket
@@ -243,7 +243,7 @@ class MTV_PUBLIC TSDVBEmissionPacket : public TSPacket
 class MTV_PUBLIC TSISDBEmissionPacket : public TSPacket
 {
   private:
-    unsigned char _tsfec[16];
+    unsigned char m_tsFec[16];
 };
 
 /** \class TS8VSBEmissionPacket
@@ -252,7 +252,7 @@ class MTV_PUBLIC TSISDBEmissionPacket : public TSPacket
 class MTV_PUBLIC TS8VSBEmissionPacket : public TSPacket
 {
   private:
-    unsigned char _tsfec[20];
+    unsigned char m_tsFec[20];
 };
 #endif
 

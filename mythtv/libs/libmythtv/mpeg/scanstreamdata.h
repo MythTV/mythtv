@@ -36,14 +36,14 @@ class MTV_PUBLIC ScanStreamData :
   private:
     bool DeleteCachedTable(const PSIPTable *psip) const override; // ATSCStreamData
     /// listen for additional Freesat service information
-    bool m_dvb_uk_freesat_si {false};
-    bool m_no_default_pid;
+    bool m_dvbUkFreesatSi {false};
+    bool m_noDefaultPid;
 };
 
 inline void ScanStreamData::SetFreesatAdditionalSI(bool freesat_si)
 {
-    QMutexLocker locker(&_listener_lock);
-    m_dvb_uk_freesat_si = freesat_si;
+    QMutexLocker locker(&m_listenerLock);
+    m_dvbUkFreesatSi = freesat_si;
     if (freesat_si)
         AddListeningPID(FREESAT_SI_PID);
     else

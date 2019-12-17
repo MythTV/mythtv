@@ -21,8 +21,7 @@ class PremiereContentTransmissionDescriptor : public MPEGDescriptor
     PremiereContentTransmissionDescriptor(const unsigned char *data,
                                           int len = 300)
         : MPEGDescriptor(data, len,
-                         PrivateDescriptorID::premiere_content_transmission),
-          _transmission_count(0)
+                         PrivateDescriptorID::premiere_content_transmission)
     {
         if (m_data && !PremiereContentTransmissionDescriptor::Parse())
             m_data = nullptr;
@@ -47,16 +46,16 @@ class PremiereContentTransmissionDescriptor : public MPEGDescriptor
     // for(i=0;i<N;i++)
     //   start_time            24  11.0+x
 
-    uint TransmissionCount(void) const { return _transmission_count; }
+    uint TransmissionCount(void) const { return m_transmissionCount; }
 
     QDateTime StartTimeUTC(uint i) const;
 
   private:
     virtual bool Parse(void);
 
-    uint                                 _transmission_count;
-    mutable vector<const uint8_t*> _date_ptrs;
-    mutable vector<const uint8_t*> _time_ptrs;
+    uint                           m_transmissionCount { 0 };
+    mutable vector<const uint8_t*> m_datePtrs;
+    mutable vector<const uint8_t*> m_timePtrs;
 };
 
 #endif // _PRIVATE_DESCRIPTORS_H_

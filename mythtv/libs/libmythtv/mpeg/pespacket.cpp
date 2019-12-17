@@ -35,7 +35,7 @@ bool PESPacket::AddTSPacket(const TSPacket* packet, bool &broken)
     }
 
     const int cc = packet->ContinuityCounter();
-    const int ccExp = (_ccLast + 1) & 0xf;
+    const int ccExp = (m_ccLast + 1) & 0xf;
     uint payloadSize  = TSPacket::kPayloadSize;
     uint payloadStart = TSPacket::kHeaderSize;
 
@@ -49,25 +49,25 @@ bool PESPacket::AddTSPacket(const TSPacket* packet, bool &broken)
 
     if (ccExp == cc)
     {
-        if (_pesdataSize + payloadSize >= _allocSize)
+        if (m_pesDataSize + payloadSize >= m_allocSize)
         {
-            uint sz = (((_allocSize * 2) + 4095) / 4096) * 4096;
+            uint sz = (((m_allocSize * 2) + 4095) / 4096) * 4096;
             unsigned char *nbuf = pes_alloc(sz);
-            memcpy(nbuf, _fullbuffer, _pesdataSize);
-            pes_free(_fullbuffer);
-            _fullbuffer = nbuf;
-            _pesdata    = _fullbuffer + _psiOffset + 1;
-            _allocSize  = sz;
+            memcpy(nbuf, m_fullBuffer, m_pesDataSize);
+            pes_free(m_fullBuffer);
+            m_fullBuffer = nbuf;
+            m_pesData    = m_fullBuffer + m_psiOffset + 1;
+            m_allocSize  = sz;
         }
 
-        memcpy(_fullbuffer    + _pesdataSize,
+        memcpy(m_fullBuffer   + m_pesDataSize,
                packet->data() + payloadStart,
                payloadSize);
 
-        _ccLast = cc;
-        _pesdataSize += payloadSize;
+        m_ccLast = cc;
+        m_pesDataSize += payloadSize;
     }
-    else if (int(_ccLast) == cc)
+    else if (int(m_ccLast) == cc)
     {
         // do nothing with repeats
     }
@@ -83,14 +83,14 @@ bool PESPacket::AddTSPacket(const TSPacket* packet, bool &broken)
     // packet is correct or incomplete
     broken = false;
     // check if it's safe to call Length
-    if ((_psiOffset + 1 + 3) <=  _pesdataSize)
+    if ((m_psiOffset + 1 + 3) <=  m_pesDataSize)
     {
         // +3 = first 3 bytes of pespacket header, not included in Length()
-        uint tlen = Length() + (_pesdata - _fullbuffer) +3;
+        uint tlen = Length() + (m_pesData - m_fullBuffer) +3;
 
-        if (_pesdataSize >= tlen)
+        if (m_pesDataSize >= tlen)
         {
-            _badPacket = !VerifyCRC();
+            m_badPacket = !VerifyCRC();
             return true;
         }
     }
@@ -105,17 +105,17 @@ void PESPacket::GetAsTSPackets(vector<TSPacket> &output, uint cc) const
 {
 #define INCR_CC(_CC_) do { (_CC_) = ((_CC_) + 1) & 0xf; } while (false)
     uint last_byte_of_pesdata = Length() + 4 - 1;
-    uint size = last_byte_of_pesdata + _pesdata - _fullbuffer;
+    uint size = last_byte_of_pesdata + m_pesData - m_fullBuffer;
 
-    if (_pesdata == _fullbuffer)
+    if (m_pesData == m_fullBuffer)
     {
-        LOG(VB_GENERAL, LOG_ERR, "WriteAsTSPackets _pesdata == _fullbuffer");
+        LOG(VB_GENERAL, LOG_ERR, "WriteAsTSPackets m_pesData == m_fullBuffer");
         output.resize(0);
         return;
     }
 
     output.resize(1);
-    memcpy(output[0].data(), _fullbuffer, TSPacket::kSize);
+    memcpy(output[0].data(), m_fullBuffer, TSPacket::kSize);
     output[0].data()[3] = (output[0].data()[3] & 0xf0) | cc;
     if (size <= TSPacket::kSize)
         return;
@@ -126,7 +126,7 @@ void PESPacket::GetAsTSPackets(vector<TSPacket> &output, uint cc) const
     header.data()[3] = 0x10; // adaptation field control == payload only
     header.SetPID(tsheader()->PID());
 
-    const unsigned char *data = _fullbuffer + TSPacket::kSize;
+    const unsigned char *data = m_fullBuffer + TSPacket::kSize;
     size -= TSPacket::kSize;
     while (size > 0)
     {
@@ -147,7 +147,7 @@ uint PESPacket::CalcCRC(void) const
     if (Length() < 1)
         return kTheMagicNoCRCCRC;
     return av_bswap32(av_crc(av_crc_get_table(AV_CRC_32_IEEE), (uint32_t) -1,
-                             _pesdata, Length() - 1));
+                             m_pesData, Length() - 1));
 }
 
 bool PESPacket::VerifyCRC(void) const
@@ -164,7 +164,7 @@ bool PESPacket::VerifyCRC(void) const
 }
 
 // These are pixel aspect ratios
-const float SequenceHeader::mpeg1_aspect[16] =
+const float SequenceHeader::kMpeg1Aspect[16] =
 {
     0.0000F,       1.0000F,       0.6735F,       0.7031F,
     0.7615F,       0.8055F,       0.8437F,       0.8935F,
@@ -174,7 +174,7 @@ const float SequenceHeader::mpeg1_aspect[16] =
 
 /// The negative values are screen aspect ratios,
 /// while the positive ones are pixel aspect ratios
-const float SequenceHeader::mpeg2_aspect[16] =
+const float SequenceHeader::kMpeg2Aspect[16] =
 {
     0.0000F,       1.0000F,      -3.0F/4.0F,    -9.0F/16.0F,
    -1.0F/2.21F,    0.0000F,       0.0000F,       0.0000F,
@@ -182,7 +182,7 @@ const float SequenceHeader::mpeg2_aspect[16] =
     0.0000F,       0.0000F,       0.0000F,       0.0000F,
 };
 
-const float SequenceHeader::mpeg2_fps[16] =
+const float SequenceHeader::kMpeg2Fps[16] =
 {
     0.0F,          24000/1001.0F, 24.0F,        25.0F,
     30000/1001.0F, 30.0F,         50.0F,        60000/1001.0F,
@@ -197,7 +197,7 @@ float SequenceHeader::aspect(bool mpeg1) const
         return 1.0F; // avoid segfaults on broken seq data
 
     uint  index  = aspectNum();
-    float aspect = (mpeg1) ? mpeg1_aspect[index] : mpeg2_aspect[index];
+    float aspect = (mpeg1) ? kMpeg1Aspect[index] : kMpeg2Aspect[index];
 
     float retval = 0.0F;
     retval = (aspect >  0.0F) ? width() / (aspect * height()) : retval;

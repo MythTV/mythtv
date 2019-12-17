@@ -43,7 +43,7 @@ class MTV_PUBLIC ATSCStreamData : virtual public MPEGStreamData
     bool IsRedundant(uint, const PSIPTable&) const override; // MPEGStreamData
 
     /// Current UTC to GPS time offset in seconds
-    uint GPSOffset(void) const { return _GPS_UTC_offset; }
+    uint GPSOffset(void) const { return m_gpsUtcOffset; }
 
     inline uint GetATSCMajorMinor(uint eit_sourceid) const;
     inline bool HasATSCMajorMinorMap(void) const;
@@ -54,15 +54,15 @@ class MTV_PUBLIC ATSCStreamData : virtual public MPEGStreamData
 
     // Table versions
     void SetVersionMGT(int version)
-        {    _mgt_version     = version; }
+        {    m_mgtVersion     = version; }
     void SetVersionTVCT(uint tsid, int version)
-        { _tvct_version[tsid] = version; }
+        { m_tvctVersion[tsid] = version; }
     void SetVersionCVCT(uint tsid, int version)
-        { _cvct_version[tsid] = version; }
+        { m_cvctVersion[tsid] = version; }
     void SetVersionRRT(uint region, int version)
-        { _rrt_version[region&0xff] = version; }
+        { m_rrtVersion[region&0xff] = version; }
 
-    int VersionMGT() const { return _mgt_version; }
+    int VersionMGT() const { return m_mgtVersion; }
     inline int VersionTVCT(uint tsid) const;
     inline int VersionCVCT(uint tsid) const;
     inline int VersionRRT(uint region) const;
@@ -95,8 +95,8 @@ class MTV_PUBLIC ATSCStreamData : virtual public MPEGStreamData
     bool HasChannel(uint major, uint minor) const;
 
     // Single channel stuff
-    int DesiredMajorChannel(void) const { return _desired_major_channel; }
-    int DesiredMinorChannel(void) const { return _desired_minor_channel; }
+    int DesiredMajorChannel(void) const { return m_desiredMajorChannel; }
+    int DesiredMinorChannel(void) const { return m_desiredMinorChannel; }
 
     void AddATSCMainListener(ATSCMainStreamListener*);
     void AddSCTEMainListener(SCTEMainStreamListener*);
@@ -124,71 +124,71 @@ class MTV_PUBLIC ATSCStreamData : virtual public MPEGStreamData
     bool DeleteCachedTable(const PSIPTable *psip) const override; // MPEGStreamData
 
   private:
-    uint                      _GPS_UTC_offset;
-    mutable bool              _atsc_eit_reset;
-    atsc_eit_pid_map_t        _atsc_eit_pids;
-    atsc_ett_pid_map_t        _atsc_ett_pids;
+    uint                      m_gpsUtcOffset { GPS_LEAP_SECONDS };
+    mutable bool              m_atscEitReset { false };
+    atsc_eit_pid_map_t        m_atscEitPids;
+    atsc_ett_pid_map_t        m_atscEttPids;
 
-    QMap<uint,uint>           _sourceid_to_atsc_maj_min;
+    QMap<uint,uint>           m_sourceIdToAtscMajMin;
 
 
     // Signals
-    atsc_main_listener_vec_t  _atsc_main_listeners;
-    scte_main_listener_vec_t  _scte_main_listeners;
-    atsc_aux_listener_vec_t   _atsc_aux_listeners;
-    atsc_eit_listener_vec_t   _atsc_eit_listeners;
-    atsc81_eit_listener_vec_t _atsc81_eit_listeners;
+    atsc_main_listener_vec_t  m_atscMainListeners;
+    scte_main_listener_vec_t  m_scteMainlisteners;
+    atsc_aux_listener_vec_t   m_atscAuxListeners;
+    atsc_eit_listener_vec_t   m_atscEitListeners;
+    atsc81_eit_listener_vec_t m_atsc81EitListeners;
 
     // Table versions
-    int             _mgt_version;
-    QMap<uint, int> _tvct_version;
-    QMap<uint, int> _cvct_version;
-    QMap<uint, int> _rrt_version;
-    TableStatusMap  _eit_status;
+    int             m_mgtVersion { -1 };
+    QMap<uint, int> m_tvctVersion;
+    QMap<uint, int> m_cvctVersion;
+    QMap<uint, int> m_rrtVersion;
+    TableStatusMap  m_eitStatus;
 
     // Caching
-    mutable MasterGuideTable *_cached_mgt;
-    mutable tvct_cache_t      _cached_tvcts; // pid->tvct
-    mutable cvct_cache_t      _cached_cvcts; // pid->cvct
+    mutable MasterGuideTable *m_cachedMgt { nullptr };
+    mutable tvct_cache_t      m_cachedTvcts; // pid->tvct
+    mutable cvct_cache_t      m_cachedCvcts; // pid->cvct
 
     // Single program variables
-    int _desired_major_channel;
-    int _desired_minor_channel;
+    int m_desiredMajorChannel;
+    int m_desiredMinorChannel;
 };
 
 
 inline uint ATSCStreamData::GetATSCMajorMinor(uint eit_sourceid) const
 {
-    QMutexLocker locker(&_listener_lock);
-    return _sourceid_to_atsc_maj_min[eit_sourceid];
+    QMutexLocker locker(&m_listenerLock);
+    return m_sourceIdToAtscMajMin[eit_sourceid];
 }
 
 inline bool ATSCStreamData::HasATSCMajorMinorMap(void) const
 {
-    QMutexLocker locker(&_listener_lock);
-    return !_sourceid_to_atsc_maj_min.empty();
+    QMutexLocker locker(&m_listenerLock);
+    return !m_sourceIdToAtscMajMin.empty();
 }
 
 inline int ATSCStreamData::VersionTVCT(uint tsid) const
 {
-    const QMap<uint, int>::const_iterator it = _tvct_version.find(tsid);
-    if (it == _tvct_version.end())
+    const QMap<uint, int>::const_iterator it = m_tvctVersion.find(tsid);
+    if (it == m_tvctVersion.end())
         return -1;
     return *it;
 }
 
 inline int ATSCStreamData::VersionCVCT(uint tsid) const
 {
-    const QMap<uint, int>::const_iterator it = _cvct_version.find(tsid);
-    if (it == _cvct_version.end())
+    const QMap<uint, int>::const_iterator it = m_cvctVersion.find(tsid);
+    if (it == m_cvctVersion.end())
         return -1;
     return *it;
 }
 
 inline int ATSCStreamData::VersionRRT(uint region) const
 {
-    const QMap<uint, int>::const_iterator it = _rrt_version.find(region&0xff);
-    if (it == _rrt_version.end())
+    const QMap<uint, int>::const_iterator it = m_rrtVersion.find(region&0xff);
+    if (it == m_rrtVersion.end())
         return -1;
     return *it;
 }

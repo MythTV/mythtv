@@ -5,18 +5,18 @@
 
 bool PremiereContentTransmissionDescriptor::Parse(void)
 {
-    _transmission_count = 0;
-    _date_ptrs.clear();
-    _time_ptrs.clear();
+    m_transmissionCount = 0;
+    m_datePtrs.clear();
+    m_timePtrs.clear();
     const uint8_t *dataptr = m_data + 8;
     while ((dataptr + 6) <= (m_data + 2 + DescriptorLength()))
     {
         uint starttime_no = *(dataptr+2);
         for (uint i=0; i < starttime_no; i+=3)
         {
-            _date_ptrs.push_back(dataptr);
-            _time_ptrs.push_back(dataptr + 3 + i);
-            _transmission_count++;
+            m_datePtrs.push_back(dataptr);
+            m_timePtrs.push_back(dataptr + 3 + i);
+            m_transmissionCount++;
         }
         dataptr += 3 + starttime_no;
     }
@@ -27,10 +27,10 @@ bool PremiereContentTransmissionDescriptor::Parse(void)
 QDateTime PremiereContentTransmissionDescriptor::StartTimeUTC(uint index) const
 {
     // set buf to the startdate
-    const uint8_t *buf = _date_ptrs[index];
+    const uint8_t *buf = m_datePtrs[index];
     uint mjd = (buf[0] << 8) | buf[1];
     // reset buf two bytes before the startime
-    buf = _time_ptrs[index]-2;
+    buf = m_timePtrs[index]-2;
     if (mjd >= 40587)
     {
         // Modified Julian date as number of days since 17th November 1858.
