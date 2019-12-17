@@ -6479,6 +6479,9 @@ case "$cc_type" in
         if test $target_os = "darwin"; then
             disable enforce_nullptr
         fi
+        if enabled compdb; then
+            warn "Enabling clang's compdb support will disable ccache."
+        fi
         ;;
 esac
 
