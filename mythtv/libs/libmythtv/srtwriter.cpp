@@ -9,13 +9,13 @@ void SRTWriter::AddSubtitle(const OneSubtitle &sub, int number)
 {
     m_outStream << number << endl;
 
-    m_outStream << FormatTime(sub.start_time) << " --> ";
-    m_outStream << FormatTime(sub.start_time + sub.length) << endl;
+    m_outStream << FormatTime(sub.m_startTime) << " --> ";
+    m_outStream << FormatTime(sub.m_startTime + sub.m_length) << endl;
 
-    if (!sub.text.isEmpty())
+    if (!sub.m_text.isEmpty())
     {
-        QStringList::const_iterator it = sub.text.begin();
-        for (; it != sub.text.end(); ++it)
+        QStringList::const_iterator it = sub.m_text.begin();
+        for (; it != sub.m_text.end(); ++it)
             m_outStream << *it << endl;
         m_outStream << endl;
     }

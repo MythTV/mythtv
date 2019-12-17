@@ -49,7 +49,7 @@ const int V4L2encStreamHandler::kAudioRateL3[] =
     32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 0
 };
 
-#define LOC      QString("V4L2SH[%1](%2): ").arg(m_inputid).arg(m_device)
+#define LOC      QString("V4L2SH[%1](%2): ").arg(m_inputId).arg(m_device)
 
 QMap<QString,V4L2encStreamHandler*> V4L2encStreamHandler::s_handlers;
 QMap<QString,uint>                  V4L2encStreamHandler::s_handlers_refcnt;
@@ -195,14 +195,14 @@ void V4L2encStreamHandler::run(void)
 
     SetRunning(true, true, false);
 
-    while (m_running_desired && !m_bError)
+    while (m_runningDesired && !m_bError)
     {
         // Get V4L2 data
         if (m_streamingCnt.load() == 0)
         {
             LOG(VB_RECORD, LOG_INFO, LOC + "Waiting for stream start.");
-            QMutexLocker locker(&m_start_stop_lock);
-            m_running_state_changed.wait(&m_start_stop_lock, 5000);
+            QMutexLocker locker(&m_startStopLock);
+            m_runningStateChanged.wait(&m_startStopLock, 5000);
             continue;
         }
 
@@ -286,26 +286,26 @@ void V4L2encStreamHandler::run(void)
         if (len < static_cast<int>(TSPacket::kSize))
             continue;
 
-        if (!m_listener_lock.tryLock())
+        if (!m_listenerLock.tryLock())
             continue;
 
-        if (m_stream_data_list.empty())
+        if (m_streamDataList.empty())
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("run() -- _stream_data_list is empty, %1 buffered")
                 .arg(buffer.size()));
-            m_listener_lock.unlock();
+            m_listenerLock.unlock();
             continue;
         }
 
         int remainder = 0;
-        StreamDataList::const_iterator sit = m_stream_data_list.begin();
-        for (; sit != m_stream_data_list.end(); ++sit)
+        StreamDataList::const_iterator sit = m_streamDataList.begin();
+        for (; sit != m_streamDataList.end(); ++sit)
             remainder = sit.key()->ProcessData
                         (reinterpret_cast<const uint8_t *>
                          (buffer.constData()), len);
 
-        m_listener_lock.unlock();
+        m_listenerLock.unlock();
 
         if (remainder > 0 && (len > remainder)) // leftover bytes
             buffer.remove(0, len - remainder);
@@ -316,7 +316,7 @@ void V4L2encStreamHandler::run(void)
     QString tmp(m_error);
     LOG(VB_GENERAL, LOG_WARNING, LOC +
         QString("_running_desired(%1)  _error(%2)")
-                .arg(m_running_desired).arg(tmp));
+                .arg(m_runningDesired).arg(tmp));
 
     LOG(VB_RECORD, LOG_INFO, LOC + "run() -- finishing up");
     StopEncoding();
@@ -587,7 +587,7 @@ bool V4L2encStreamHandler::StartEncoding(void)
     else
         LOG(VB_RECORD, LOG_INFO, LOC + "Already encoding");
 
-    QMutexLocker listen_lock(&m_listener_lock);
+    QMutexLocker listen_lock(&m_listenerLock);
 
     m_streamingCnt.ref();
 

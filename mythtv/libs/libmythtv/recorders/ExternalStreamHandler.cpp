@@ -28,7 +28,7 @@
 #include "cardutil.h"
 #include "exitcodes.h"
 
-#define LOC QString("ExternSH[%1](%2): ").arg(m_inputid).arg(m_loc)
+#define LOC QString("ExternSH[%1](%2): ").arg(m_inputId).arg(m_loc)
 
 ExternIO::ExternIO(const QString & app,
                    const QStringList & args)
@@ -601,7 +601,7 @@ void ExternalStreamHandler::run(void)
         ready_cmd = "XON";
 
     uint remainder = 0;
-    while (m_running_desired && !m_bError)
+    while (m_runningDesired && !m_bError)
     {
         if (!IsTSOpen())
         {
@@ -778,16 +778,16 @@ void ExternalStreamHandler::run(void)
         if (!m_streamLock.tryLock())
             continue;
 
-        if (!m_listener_lock.tryLock())
+        if (!m_listenerLock.tryLock())
             continue;
 
-        StreamDataList::const_iterator sit = m_stream_data_list.begin();
-        for (; sit != m_stream_data_list.end(); ++sit)
+        StreamDataList::const_iterator sit = m_streamDataList.begin();
+        for (; sit != m_streamDataList.end(); ++sit)
             remainder = sit.key()->ProcessData
                         (reinterpret_cast<const uint8_t *>
                          (buffer.constData()), buffer.size());
 
-        m_listener_lock.unlock();
+        m_listenerLock.unlock();
 
         if (m_replay)
         {
@@ -1083,12 +1083,12 @@ void ExternalStreamHandler::ReplayStream(void)
          * copy of the SPS right at the beginning of the stream,
          * so make sure we don't miss it!
          */
-        QMutexLocker listen_lock(&m_listener_lock);
+        QMutexLocker listen_lock(&m_listenerLock);
 
-        if (!m_stream_data_list.empty())
+        if (!m_streamDataList.empty())
         {
-            StreamDataList::const_iterator sit = m_stream_data_list.begin();
-            for (; sit != m_stream_data_list.end(); ++sit)
+            StreamDataList::const_iterator sit = m_streamDataList.begin();
+            for (; sit != m_streamDataList.end(); ++sit)
                 sit.key()->ProcessData(reinterpret_cast<const uint8_t *>
                                        (m_replayBuffer.constData()),
                                        m_replayBuffer.size());

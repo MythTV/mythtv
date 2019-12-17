@@ -38,9 +38,9 @@ bool LinuxAVCInfo::OpenPort(void)
 {
     LOG(VB_RECORD, LOG_INFO,
         LOC + QString("Getting raw1394 handle for port %1").arg(m_port));
-    m_fw_handle = raw1394_new_handle_on_port(m_port);
+    m_fwHandle = raw1394_new_handle_on_port(m_port);
 
-    if (!m_fw_handle)
+    if (!m_fwHandle)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Unable to get handle for " +
                 QString("port: %1").arg(m_port) + ENO);
@@ -53,11 +53,11 @@ bool LinuxAVCInfo::OpenPort(void)
 
 bool LinuxAVCInfo::ClosePort(void)
 {
-    if (m_fw_handle)
+    if (m_fwHandle)
     {
         LOG(VB_RECORD, LOG_INFO, LOC + "Releasing raw1394 handle");
-        raw1394_destroy_handle(m_fw_handle);
-        m_fw_handle = nullptr;
+        raw1394_destroy_handle(m_fwHandle);
+        m_fwHandle = nullptr;
     }
 
     return true;
@@ -72,7 +72,7 @@ bool LinuxAVCInfo::SendAVCCommand(
 
     result.clear();
 
-    if (!m_fw_handle || (m_node < 0))
+    if (!m_fwHandle || (m_node < 0))
         return false;
 
     vector<uint8_t> cmd = _cmd;
@@ -89,7 +89,7 @@ bool LinuxAVCInfo::SendAVCCommand(
     uint result_length = 0;
 
     uint32_t *ret = avc1394_transaction_block2(
-        m_fw_handle, m_node, cmdbuf, cmd.size() >> 2,
+        m_fwHandle, m_node, cmdbuf, cmd.size() >> 2,
         &result_length, retry_cnt);
 
     if (!ret)
@@ -103,7 +103,7 @@ bool LinuxAVCInfo::SendAVCCommand(
         result.push_back((ret[i])     & 0xff);
     }
 
-    avc1394_transaction_block_close(m_fw_handle);
+    avc1394_transaction_block_close(m_fwHandle);
 
     return true;
 }

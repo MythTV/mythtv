@@ -13,7 +13,7 @@
 #include "mythlogging.h"
 #include "recorders/HLS/HLSReader.h"
 
-#define LOC QString("HLSSH[%1](%2): ").arg(m_inputid).arg(m_device)
+#define LOC QString("HLSSH[%1](%2): ").arg(m_inputId).arg(m_device)
 
 // BUFFER_SIZE is a multiple of TS_SIZE
 #define TS_SIZE     188
@@ -131,7 +131,7 @@ void HLSStreamHandler::run(void)
     m_hls->Throttle(false);
 
     int remainder = 0;
-    while (m_running_desired)
+    while (m_runningDesired)
     {
         if (!m_hls->IsOpen(url))
         {
@@ -186,10 +186,10 @@ void HLSStreamHandler::run(void)
         }
 
         {
-            QMutexLocker locker(&m_listener_lock);
+            QMutexLocker locker(&m_listenerLock);
             HLSStreamHandler::StreamDataList::const_iterator sit;
-            sit = m_stream_data_list.begin();
-            for (; sit != m_stream_data_list.end(); ++sit)
+            sit = m_streamDataList.begin();
+            for (; sit != m_streamDataList.end(); ++sit)
                 remainder = sit.key()->ProcessData(m_readbuffer, size);
         }
 

@@ -23,24 +23,21 @@ class ThreadedFileWriter;
 class PIDInfo
 {
   public:
-    PIDInfo() :
-        _pid(0xffffffff), filter_fd(-1), streamType(0), pesType(-1) {;}
-    explicit PIDInfo(uint pid) :
-        _pid(pid),        filter_fd(-1), streamType(0), pesType(-1) {;}
+    PIDInfo() {}
+    explicit PIDInfo(uint pid) : m_pid(pid) {}
     PIDInfo(uint pid, uint stream_type, int pes_type) :
-        _pid(pid),                       filter_fd(-1),
-        streamType(stream_type),         pesType(pes_type) {;}
+        m_pid(pid), m_streamType(stream_type), m_pesType(pes_type) {;}
     virtual ~PIDInfo() {;}
 
     virtual bool Open(const QString &/*dev*/, bool /*use_section_reader*/)
         { return false; }
     virtual bool Close(const QString &/*dev*/) { return false; }
-    bool IsOpen(void) const { return filter_fd >= 0; }
+    bool IsOpen(void) const { return m_filterFd >= 0; }
 
-    uint        _pid;
-    int         filter_fd;         ///< Input filter file descriptor
-    uint        streamType;        ///< StreamID
-    int         pesType;           ///< PESStreamID
+    uint        m_pid        { UINT_MAX };
+    int         m_filterFd   { -1 };  ///< Input filter file descriptor
+    uint        m_streamType {  0 };  ///< StreamID
+    int         m_pesType    { -1 };  ///< PESStreamID
 };
 // Please do not change this to hash or other unordered container.
 // HDHRStreamHandler::UpdateFilters() relies on the forward
@@ -70,7 +67,7 @@ class StreamHandler : protected MThread, public DeviceReaderCB
 
   protected:
     explicit StreamHandler(const QString &device, int inputid)
-        : MThread("StreamHandler"), m_device(device), m_inputid(inputid) {}
+        : MThread("StreamHandler"), m_device(device), m_inputId(inputid) {}
     ~StreamHandler();
 
     void Start(void);
@@ -108,14 +105,14 @@ class StreamHandler : protected MThread, public DeviceReaderCB
 
   protected:
     QString             m_device;
-    int                 m_inputid;
-    bool                m_needs_buffering       {false};
-    bool                m_allow_section_reader  {false};
+    int                 m_inputId;
+    bool                m_needsBuffering        {false};
+    bool                m_allowSectionReader    {false};
 
-    QMutex              m_add_rm_lock;
+    QMutex              m_addRmLock;
 
-    mutable QMutex      m_start_stop_lock;
-    volatile bool       m_running_desired       {false};
+    mutable QMutex      m_startStopLock;
+    volatile bool       m_runningDesired        {false};
 
     // not to be confused with the other four header files that define
     // m_error to be a QString.  Somehow v4l2encstreamhandler.cpp
@@ -123,24 +120,24 @@ class StreamHandler : protected MThread, public DeviceReaderCB
     volatile bool       m_bError                {false};
     bool                m_running               {false};
     bool                m_restarting            {false};
-    bool                m_using_buffering       {false};
-    bool                m_using_section_reader  {false};
-    QWaitCondition      m_running_state_changed;
+    bool                m_usingBuffering        {false};
+    bool                m_usingSectionReader    {false};
+    QWaitCondition      m_runningStateChanged;
 
-    mutable QMutex      m_pid_lock              {QMutex::Recursive};
-    vector<uint>        m_eit_pids;
-    PIDInfoMap          m_pid_info;
-    uint                m_open_pid_filters      {0};
-    MythTimer           m_cycle_timer;
+    mutable QMutex      m_pidLock               {QMutex::Recursive};
+    vector<uint>        m_eitPids;
+    PIDInfoMap          m_pidInfo;
+    uint                m_openPidFilters        {0};
+    MythTimer           m_cycleTimer;
 
-    ThreadedFileWriter *m_mpts_tfw              {nullptr};
-    QSet<QString>       m_mpts_files;
-    QString             m_mpts_base_file;
-    QMutex              m_mpts_lock;
+    ThreadedFileWriter *m_mptsTfw               {nullptr};
+    QSet<QString>       m_mptsFiles;
+    QString             m_mptsBaseFile;
+    QMutex              m_mptsLock;
 
     using StreamDataList = QMap<MPEGStreamData*,QString>;
-    mutable QMutex      m_listener_lock         {QMutex::Recursive};
-    StreamDataList      m_stream_data_list;
+    mutable QMutex      m_listenerLock         {QMutex::Recursive};
+    StreamDataList      m_streamDataList;
 };
 
 #endif // _STREAM_HANDLER_H_

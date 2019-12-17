@@ -26,7 +26,7 @@
 #include "mythlogging.h"
 #include "cetonrtsp.h"
 
-#define LOC QString("IPTVSH[%1](%2): ").arg(m_inputid).arg(m_device)
+#define LOC QString("IPTVSH[%1](%2): ").arg(m_inputId).arg(m_device)
 
 QMap<QString,IPTVStreamHandler*> IPTVStreamHandler::s_iptvhandlers;
 QMap<QString,uint>               IPTVStreamHandler::s_iptvhandlers_refcnt;
@@ -431,11 +431,11 @@ void IPTVStreamHandlerWriteHelper::timerEvent(QTimerEvent* event)
 
         int remainder = 0;
         {
-            QMutexLocker locker(&m_parent->m_listener_lock);
+            QMutexLocker locker(&m_parent->m_listenerLock);
             QByteArray &data = packet.GetDataReference();
             IPTVStreamHandler::StreamDataList::const_iterator sit;
-            sit = m_parent->m_stream_data_list.begin();
-            for (; sit != m_parent->m_stream_data_list.end(); ++sit)
+            sit = m_parent->m_streamDataList.begin();
+            for (; sit != m_parent->m_streamDataList.end(); ++sit)
             {
                 remainder = sit.key()->ProcessData(
                     reinterpret_cast<const unsigned char*>(data.data()),
@@ -490,18 +490,18 @@ void IPTVStreamHandlerWriteHelper::timerEvent(QTimerEvent* event)
                 QString("Processing RTP packet(seq:%1 ts:%2)")
                 .arg(m_lastSequenceNumber).arg(m_lastTimestamp));
 
-            m_parent->m_listener_lock.lock();
+            m_parent->m_listenerLock.lock();
 
             int remainder = 0;
             IPTVStreamHandler::StreamDataList::const_iterator sit;
-            sit = m_parent->m_stream_data_list.begin();
-            for (; sit != m_parent->m_stream_data_list.end(); ++sit)
+            sit = m_parent->m_streamDataList.begin();
+            for (; sit != m_parent->m_streamDataList.end(); ++sit)
             {
                 remainder = sit.key()->ProcessData(
                     ts_packet.GetTSData(), ts_packet.GetTSDataSize());
             }
 
-            m_parent->m_listener_lock.unlock();
+            m_parent->m_listenerLock.unlock();
 
             if (remainder != 0)
             {

@@ -24,7 +24,7 @@
 #include <dveo/asi.h>
 #include <dveo/master.h>
 
-#define LOC      QString("ASISH[%1](%2): ").arg(m_inputid).arg(m_device)
+#define LOC      QString("ASISH[%1](%2): ").arg(m_inputId).arg(m_device)
 
 QMap<QString,ASIStreamHandler*> ASIStreamHandler::s_handlers;
 QMap<QString,uint>              ASIStreamHandler::s_handlersRefCnt;
@@ -123,7 +123,7 @@ void ASIStreamHandler::SetRXMode(ASIRXMode m)
 
 void ASIStreamHandler::SetRunningDesired(bool desired)
 {
-    if (m_drb && m_running_desired && !desired)
+    if (m_drb && m_runningDesired && !desired)
         m_drb->Stop();
     StreamHandler::SetRunningDesired(desired);
 }
@@ -175,12 +175,12 @@ void ASIStreamHandler::run(void)
     drb->Start();
 
     {
-        QMutexLocker locker(&m_start_stop_lock);
+        QMutexLocker locker(&m_startStopLock);
         m_drb = drb;
     }
 
     int remainder = 0;
-    while (m_running_desired && !m_bError)
+    while (m_runningDesired && !m_bError)
     {
         UpdateFiltersFromStreamData();
 
@@ -189,7 +189,7 @@ void ASIStreamHandler::run(void)
         len = drb->Read(
             &(buffer[remainder]), buffer_size - remainder);
 
-        if (!m_running_desired)
+        if (!m_runningDesired)
             break;
 
         // Check for DRB errors
@@ -213,25 +213,25 @@ void ASIStreamHandler::run(void)
             continue;
         }
 
-        if (!m_listener_lock.tryLock())
+        if (!m_listenerLock.tryLock())
         {
             remainder = len;
             continue;
         }
 
-        if (m_stream_data_list.empty())
+        if (m_streamDataList.empty())
         {
-            m_listener_lock.unlock();
+            m_listenerLock.unlock();
             continue;
         }
 
-        StreamDataList::const_iterator sit = m_stream_data_list.begin();
-        for (; sit != m_stream_data_list.end(); ++sit)
+        StreamDataList::const_iterator sit = m_streamDataList.begin();
+        for (; sit != m_streamDataList.end(); ++sit)
             remainder = sit.key()->ProcessData(buffer, len);
 
         WriteMPTS(buffer, len - remainder);
 
-        m_listener_lock.unlock();
+        m_listenerLock.unlock();
 
         if (remainder > 0 && (len > remainder)) // leftover bytes
             memmove(buffer, &(buffer[len - remainder]), remainder);
@@ -241,7 +241,7 @@ void ASIStreamHandler::run(void)
     RemoveAllPIDFilters();
 
     {
-        QMutexLocker locker(&m_start_stop_lock);
+        QMutexLocker locker(&m_startStopLock);
         m_drb = nullptr;
     }
 

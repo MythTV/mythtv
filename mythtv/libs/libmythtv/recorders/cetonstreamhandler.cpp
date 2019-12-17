@@ -27,7 +27,7 @@
 #include "cardutil.h"
 #include "mythdownloadmanager.h"
 
-#define LOC QString("CetonSH[%1](%2): ").arg(m_inputid).arg(m_device)
+#define LOC QString("CetonSH[%1](%2): ").arg(m_inputId).arg(m_device)
 
 QMap<QString,CetonStreamHandler*> CetonStreamHandler::s_handlers;
 QMap<QString,uint>                CetonStreamHandler::s_handlersRefCnt;
@@ -205,9 +205,9 @@ bool CetonStreamHandler::Connect(void)
 
 bool CetonStreamHandler::EnterPowerSavingMode(void)
 {
-    QMutexLocker locker(&m_listener_lock);
+    QMutexLocker locker(&m_listenerLock);
 
-    if (!m_stream_data_list.empty())
+    if (!m_streamDataList.empty())
     {
         LOG(VB_RECORD, LOG_INFO, LOC +
             "Ignoring request - video streaming active");
