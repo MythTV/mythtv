@@ -49,13 +49,10 @@ MythVAAPIInteropDRM::MythVAAPIInteropDRM(MythRenderOpenGL *Context)
 MythVAAPIInteropDRM::~MythVAAPIInteropDRM()
 {
     OpenGLLocker locker(m_context);
-
     CleanupDRMPRIME();
-
     CleanupReferenceFrames();
     MythVAAPIInteropDRM::DestroyDeinterlacer();
     MythVAAPIInteropDRM::DeleteTextures();
-
     if (m_drmFile.isOpen())
         m_drmFile.close();
 }
@@ -67,12 +64,10 @@ void MythVAAPIInteropDRM::DeleteTextures(void)
     if (!m_openglTextures.isEmpty() && m_context->IsEGL())
     {
         int count = 0;
-        QHash<unsigned long long, vector<MythVideoTexture*> >::const_iterator it = m_openglTextures.constBegin();
-        for ( ; it != m_openglTextures.constEnd(); ++it)
+        for (auto it = m_openglTextures.constBegin() ; it != m_openglTextures.constEnd(); ++it)
         {
             vector<MythVideoTexture*> textures = it.value();
-            auto it2 = textures.begin();
-            for ( ; it2 != textures.end(); ++it2)
+            for (auto it2 = textures.begin() ; it2 != textures.end(); ++it2)
             {
                 if ((*it2)->m_data)
                 {
@@ -95,6 +90,7 @@ void MythVAAPIInteropDRM::DestroyDeinterlacer(void)
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Deleting deinterlacer frame cache");
         DeleteTextures();
+        CleanupDRMPRIME();
     }
     MythVAAPIInterop::DestroyDeinterlacer();
 }
@@ -104,6 +100,7 @@ void MythVAAPIInteropDRM::PostInitDeinterlacer(void)
     // remove the old, non-deinterlaced frame cache
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "Deleting progressive frame cache");
     DeleteTextures();
+    CleanupDRMPRIME();
 }
 
 void MythVAAPIInteropDRM::CleanupReferenceFrames(void)
@@ -346,8 +343,8 @@ VideoFrameType MythVAAPIInteropDRM::VATypeToMythType(uint32_t Fourcc)
         case VA_FOURCC_IYUV:
         case VA_FOURCC_I420: return FMT_YV12;
         case VA_FOURCC_NV12: return FMT_NV12;
-        case VA_FOURCC_YUY2: return FMT_YUY2; // NOLINT(bugprone-branch-clone)
-        case VA_FOURCC_UYVY: return FMT_YUY2; // ?
+        case VA_FOURCC_YUY2:
+        case VA_FOURCC_UYVY: return FMT_YUY2;
         case VA_FOURCC_P010: return FMT_P010;
         case VA_FOURCC_P016: return FMT_P016;
         case VA_FOURCC_ARGB: return FMT_ARGB32;
@@ -415,7 +412,6 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::AcquirePrime(VASurfaceID Id,
 
     if (!m_drmFrames.contains(Id))
         return result;
-
     result = CreateTextures(m_drmFrames[Id], Context, Frame);
 #else
     (void)Id;
@@ -427,17 +423,17 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::AcquirePrime(VASurfaceID Id,
 
 void MythVAAPIInteropDRM::CleanupDRMPRIME(void)
 {
-    if (!m_drmFrames.isEmpty())
+    if (m_drmFrames.isEmpty())
+        return;
+
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Releasing %1 DRM descriptors").arg(m_drmFrames.size()));
+    for (auto it = m_drmFrames.begin() ; it != m_drmFrames.end(); ++it)
     {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Releasing %1 DRM descriptors").arg(m_drmFrames.size()));
-        QHash<unsigned long long, AVDRMFrameDescriptor*>::iterator it = m_drmFrames.begin();
-        for ( ; it != m_drmFrames.end(); ++it)
-        {
-            for (int i = 0; i < (*it)->nb_objects; i++)
-                close((*it)->objects[i].fd);
-            av_freep(&(*it));
-        }
+        for (int i = 0; i < (*it)->nb_objects; i++)
+            close((*it)->objects[i].fd);
+        av_freep(&(*it));
     }
+    m_drmFrames.clear();
 }
 
 bool MythVAAPIInteropDRM::TestPrimeInterop(void)

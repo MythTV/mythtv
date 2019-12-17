@@ -137,6 +137,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     void  DeleteShaderProgram(QOpenGLShaderProgram* Program);
     bool  EnableShaderProgram(QOpenGLShaderProgram* Program);
     void  SetShaderProgramParams(QOpenGLShaderProgram* Program, const QMatrix4x4 &Value, const char* Uniform);
+    void  SetShaderProjection(QOpenGLShaderProgram* Program);
 
     void  DrawBitmap(MythGLTexture *Texture, QOpenGLFramebufferObject *Target,
                      const QRect &Source, const QRect &Destination,

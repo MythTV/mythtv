@@ -21,11 +21,21 @@ int MythMediaCodecContext::InitialiseDecoder(AVCodecContext *Context)
     if (!Context || !gCoreContext->IsUIThread())
         return -1;
 
-    // Create interop class
+    // We need a player to release the interop
+    MythPlayer *player = nullptr;
+    auto *decoder = reinterpret_cast<AvFormatDecoder*>(Context->opaque);
+    if (decoder)
+        player = decoder->GetPlayer();
+    if (!player)
+        return -1;
+
+    // Retrieve OpenGL render context
     MythRenderOpenGL* render = MythRenderOpenGL::GetOpenGLRender();
     if (!render)
         return -1;
+    OpenGLLocker locker(render);
 
+    // Create interop - NB no interop check here or in MythMediaCodecInterop
     QSize size(Context->width, Context->height);
     MythMediaCodecInterop *interop = MythMediaCodecInterop::Create(render, size);
     if (!interop)
@@ -35,6 +45,9 @@ int MythMediaCodecContext::InitialiseDecoder(AVCodecContext *Context)
         interop->DecrRef();
         return -1;
     }
+
+    // Set player
+    interop->SetPlayer(player);
 
     // Create the hardware context
     AVBufferRef *hwdeviceref = av_hwdevice_ctx_alloc(AV_HWDEVICE_TYPE_MEDIACODEC);

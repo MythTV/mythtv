@@ -19,7 +19,8 @@ class MythDeinterlacer
     MythDeinterlacer() = default;
    ~MythDeinterlacer();
 
-    void             Filter       (VideoFrame *Frame, FrameScanType Scan);
+    void             Filter       (VideoFrame *Frame, FrameScanType Scan,
+                                   bool Force = false);
 
   private:
     bool             Initialise   (VideoFrame *Frame, MythDeintType Deinterlacer,
@@ -27,6 +28,8 @@ class MythDeinterlacer
     inline void      Cleanup      (void);
 
   private:
+    Q_DISABLE_COPY(MythDeinterlacer)
+
     VideoFrameType   m_inputType  { FMT_NONE };
     AVPixelFormat    m_inputFmt   { AV_PIX_FMT_NONE };
     int              m_width      { 0 };

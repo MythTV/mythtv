@@ -3719,6 +3719,17 @@ void DVBConfigurationGroup::reloadDiseqcTree(const QString &videodevice)
 {
     if (m_diseqcTree)
         m_diseqcTree->Load(videodevice);
+
+    if (m_cardType->getValue() == "DVB-S" ||
+        m_cardType->getValue() == "DVB-S2" )
+    {
+        m_diseqcBtn->setVisible(true);
+    }
+    else
+    {
+        m_diseqcBtn->setVisible(false);
+    }
+    emit getParent()->settingsChanged(this);
 }
 
 void DVBConfigurationGroup::probeCard(const QString &videodevice)
@@ -3938,7 +3949,6 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent,
     m_diseqcBtn = new DeviceTree(*m_diseqcTree);
     m_diseqcBtn->setLabel(tr("DiSEqC (Switch, LNB, and Rotor Configuration)"));
     m_diseqcBtn->setHelpText(tr("Input and satellite settings."));
-    m_diseqcBtn->setVisible(false);
 
     m_tuningDelay = new DVBTuningDelay(m_parent);
     cardType.addTargetedChild("DVB", m_tuningDelay);

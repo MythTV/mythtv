@@ -118,25 +118,4 @@ class MBASE_PUBLIC MythInfoMapEvent : public MythEvent
   private:
     InfoMap m_infoMap;
 };
-
-class MBASE_PUBLIC MythCallbackEvent : public QEvent
-{
-  public:
-    using Callback = void (*)(void*, void*, void*);
-    MythCallbackEvent(Callback Function, void *Opaque1, void *Opaque2, void* Opaque3)
-      : QEvent(kCallbackType),
-        m_function(Function),
-        m_opaque1(Opaque1),
-        m_opaque2(Opaque2),
-        m_opaque3(Opaque3)
-    {
-    }
-
-    static Type kCallbackType;
-    Callback m_function;
-    void* m_opaque1;
-    void* m_opaque2;
-    void* m_opaque3;
-};
-
 #endif /* MYTHEVENT_H */

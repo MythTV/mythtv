@@ -517,7 +517,7 @@ template_alloc(const unsigned int *scores, int width, int height,
             goto free_thresh;
         }
         unsigned int maxscore = sortedscores[nn - 1];
-        for (int ii = 0; ii < nn; ii++)
+        for (ii = 0; ii < nn; ii++)
             scored.data[0][ii] = scores[ii] * UCHAR_MAX / maxscore;
         bool success = writeJPG(debugdir + "/TemplateFinder-scores", &scored,
                 height);

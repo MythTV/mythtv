@@ -167,7 +167,7 @@ void MythPowerOSX::PowerSourceCallBack(void *Reference)
  * from main menu bar) will cause signals to be sent to MythFrontend - which
  * usually trigger the exit prompt.
 */
-void MythPowerOSX::PowerCallBack(void *Reference, io_service_t Service,
+void MythPowerOSX::PowerCallBack(void *Reference, io_service_t,
                                  natural_t Type, void *Data)
 {
     CocoaAutoReleasePool pool;

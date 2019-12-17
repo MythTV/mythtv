@@ -30,7 +30,7 @@ FS_M_FILTER=True
 
 try:
     # This doesn't appear to be used and the old rpm command didn't return mounts.
-    p = Popen(['findmnt', '--noheadings', '--output', 'TARGET', '--raw', '--real'], stdout=PIPE)
+    p = Popen(['findmnt', '--noheadings', '--output', 'TARGET', '--raw', '--fstab'], stdout=PIPE)
     FS_MOUNTS = p.stdout.read().decode('utf-8')
 except OSError:
     FS_MOUNTS = ''

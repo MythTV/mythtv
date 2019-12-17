@@ -2295,9 +2295,14 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             bool foundgpudecoder = false;
             if (version && FlagIsSet(kDecodeAllowGPU))
             {
+                // We need to set this so that MythyCodecContext can callback
+                // to the player in use to check interop support.
+                enc->opaque = static_cast<void*>(this);
                 MythCodecID hwcodec = MythCodecContext::FindDecoder(dec, stream, &enc, &codec);
                 if (hwcodec != kCodec_NONE)
                 {
+                    // the context may have changed
+                    enc->opaque = static_cast<void*>(this);
                     m_videoCodecId = hwcodec;
                     foundgpudecoder = true;
                 }
@@ -2687,17 +2692,26 @@ int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic, int flags)
     if (!frame)
         return -1;
 
-    // workaround for 1080/1088 issues. We now default to the actual reported height
-    // for frames (which is usually 1080). FFmpeg appears to want/need 1088 for MPEG2, VC1 etc
-    // as we get some chroma corruption with 1080.
-    int height = pic->height;
-    if ((decoder->m_videoCodecId != kCodec_H264) && (decoder->m_videoCodecId != kCodec_HEVC))
-        height = (pic->height + 15) & ~0xf;
-    // the decoder will also sometimes decide that 1088 is the way to go for H.264
-    // and 544 for interlaced HEVC...
-    if ((frame->codec != type) || (frame->width != pic->width) || (frame->height != height))
-        if (!VideoBuffers::ReinitBuffer(frame, type, decoder->m_videoCodecId, pic->width, height))
+    // We pre-allocate frames to certain alignments. If the coded size differs from
+    // those alignments then re-allocate the frame. Changes in frame type (e.g.
+    // YV12 to NV12) are always reallocated.
+    int width  = (frame->width + MYTH_WIDTH_ALIGNMENT - 1) & ~(MYTH_WIDTH_ALIGNMENT - 1);
+    int height = (frame->height + MYTH_HEIGHT_ALIGNMENT - 1) & ~(MYTH_HEIGHT_ALIGNMENT - 1);
+
+    if ((frame->codec != type) || (pic->width > width) || (pic->height > height))
+    {
+        if (!VideoBuffers::ReinitBuffer(frame, type, decoder->m_videoCodecId, pic->width, pic->height))
             return -1;
+        // NB the video frame may now have a new size which is currenly not an issue
+        // as the underlying size has already been passed through to the player.
+        // But may cause issues down the line. We should add coded_width/height to
+        // VideoFrame as well to ensure consistentency through the rendering
+        // pipeline.
+        // NB remember to compare coded width/height - not 'true' values - otherwsie
+        // we continually re-allocate the frame.
+        //frame->width = c->width;
+        //frame->height = c->height;
+    }
 
     frame->colorshifted = 0;
     uint max = planes(frame->codec);

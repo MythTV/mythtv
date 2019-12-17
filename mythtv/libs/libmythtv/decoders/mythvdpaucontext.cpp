@@ -31,15 +31,22 @@ int MythVDPAUContext::InitialiseContext(AVCodecContext* Context)
     if (!gCoreContext->IsUIThread() || !Context)
         return -1;
 
+    // We need a player to release the interop
+    MythPlayer *player = nullptr;
+    auto *decoder = reinterpret_cast<AvFormatDecoder*>(Context->opaque);
+    if (decoder)
+        player = decoder->GetPlayer();
+    if (!player)
+        return -1;
+
     // Retrieve OpenGL render context
     MythRenderOpenGL* render = MythRenderOpenGL::GetOpenGLRender();
     if (!render)
         return -1;
-
-    // Lock
     OpenGLLocker locker(render);
 
-    if (MythOpenGLInterop::GetInteropType(FMT_VDPAU) == MythOpenGLInterop::Unsupported)
+    // Check interop support
+    if (MythOpenGLInterop::GetInteropType(FMT_VDPAU, player) == MythOpenGLInterop::Unsupported)
         return -1;
 
     // Create interop
@@ -47,6 +54,9 @@ int MythVDPAUContext::InitialiseContext(AVCodecContext* Context)
     MythVDPAUInterop *interop = MythVDPAUInterop::Create(render, vdpauid);
     if (!interop)
         return -1;
+
+    // Set player
+    interop->SetPlayer(player);
 
     // Allocate the device context
     AVBufferRef* hwdeviceref = MythCodecContext::CreateDevice(AV_HWDEVICE_TYPE_VDPAU, interop);
@@ -62,6 +72,7 @@ int MythVDPAUContext::InitialiseContext(AVCodecContext* Context)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to initialise device context");
         av_buffer_unref(&hwdeviceref);
+        interop->DecrRef();
         return -1;
     }
 
@@ -123,9 +134,22 @@ MythCodecID MythVDPAUContext::GetSupportedCodec(AVCodecContext **Context,
     if (!Decoder.startsWith("vdpau") || getenv("NO_VDPAU") || IsUnsupportedProfile(*Context))
         return failure;
 
-    // direct rendering needs interop support
-    if (!decodeonly && (MythOpenGLInterop::GetInteropType(FMT_VDPAU) == MythOpenGLInterop::Unsupported))
-        return failure;
+    if (!decodeonly)
+    {
+        // If called from outside of the main thread, we need a MythPlayer instance to
+        // process the callback interop check callback - which may fail otherwise
+        MythPlayer* player = nullptr;
+        if (!gCoreContext->IsUIThread())
+        {
+            AvFormatDecoder* decoder = reinterpret_cast<AvFormatDecoder*>((*Context)->opaque);
+            if (decoder)
+                player = decoder->GetPlayer();
+        }
+
+        // direct rendering needs interop support
+        if (MythOpenGLInterop::GetInteropType(FMT_VDPAU, player) == MythOpenGLInterop::Unsupported)
+            return failure;
+    }
 
     QString codec   = ff_codec_id_string((*Context)->codec_id);
     QString profile = avcodec_profile_name((*Context)->codec_id, (*Context)->profile);
