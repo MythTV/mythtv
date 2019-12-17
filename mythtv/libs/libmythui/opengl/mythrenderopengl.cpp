@@ -776,9 +776,7 @@ void MythRenderOpenGL::DrawBitmap(MythGLTexture *Texture, QOpenGLFramebufferObje
         Program = m_defaultPrograms[kShaderDefault];
 
     BindFramebuffer(Target);
-
-    SetShaderProgramParams(Program, m_projection, "u_projection");
-    SetShaderProgramParams(Program, m_transforms.top(), "u_transform");
+    SetShaderProjection(Program);
 
     GLenum textarget = Texture->m_target;
     Program->setUniformValue("s_texture0", 0);
@@ -836,8 +834,7 @@ void MythRenderOpenGL::DrawBitmap(MythGLTexture **Textures, uint TextureCount,
     if (!first || (first && !((first->m_texture || first->m_textureId) && first->m_vbo)))
         return;
 
-    SetShaderProgramParams(Program, m_projection, "u_projection");
-    SetShaderProgramParams(Program, m_transforms.top(), "u_transform");
+    SetShaderProjection(Program);
 
     GLenum textarget = first->m_target;
     uint active_tex = 0;
@@ -894,9 +891,7 @@ void MythRenderOpenGL::ClearRect(QOpenGLFramebufferObject *Target, const QRect &
     // Set the fill color
     float color = m_fullRange ? Color / 255.0F : (Color * kLimitedRangeScale) + kLimitedRangeOffset;
     glVertexAttrib4f(COLOR_INDEX, color, color, color, 255.0F);
-
-    SetShaderProgramParams(m_defaultPrograms[kShaderSimple], m_projection, "u_projection");
-    SetShaderProgramParams(m_defaultPrograms[kShaderSimple], m_transforms.top(), "u_transform");
+    SetShaderProjection(m_defaultPrograms[kShaderSimple]);
 
     GetCachedVBO(GL_TRIANGLE_STRIP, Area);
     glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(GLfloat), kVertexOffset);
@@ -971,8 +966,7 @@ void MythRenderOpenGL::DrawRoundRect(QOpenGLFramebufferObject *Target,
         m_parameters(3,0) = rad - 1.0F;
 
         // Enable the Circle shader
-        SetShaderProgramParams(elip, m_projection, "u_projection");
-        SetShaderProgramParams(elip, m_transforms.top(), "u_transform");
+        SetShaderProjection(elip);
 
         // Draw the top left segment
         m_parameters(0,0) = tl.left() + rad;
@@ -1012,8 +1006,7 @@ void MythRenderOpenGL::DrawRoundRect(QOpenGLFramebufferObject *Target,
         QRect left(r.left(), r.top() + rad, rad, r.height() - dia);
         QRect right(r.left() + r.width() - rad, r.top() + rad, rad, r.height() - dia);
 
-        SetShaderProgramParams(fill, m_projection, "u_projection");
-        SetShaderProgramParams(fill, m_transforms.top(), "u_transform");
+        SetShaderProjection(fill);
 
         GetCachedVBO(GL_TRIANGLE_STRIP, main);
         glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(GLfloat), kVertexOffset);
@@ -1057,8 +1050,7 @@ void MythRenderOpenGL::DrawRoundRect(QOpenGLFramebufferObject *Target,
         m_parameters(3,0) = lineWidth / 2.0F;
 
         // Enable the edge shader
-        SetShaderProgramParams(edge, m_projection, "u_projection");
-        SetShaderProgramParams(edge, m_transforms.top(), "u_transform");
+        SetShaderProjection(edge);
 
         // Draw the top left edge segment
         m_parameters(0,0) = tl.left() + rad;
@@ -1093,8 +1085,7 @@ void MythRenderOpenGL::DrawRoundRect(QOpenGLFramebufferObject *Target,
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         // Vertical lines
-        SetShaderProgramParams(vline, m_projection, "u_projection");
-        SetShaderProgramParams(vline, m_transforms.top(), "u_transform");
+        SetShaderProjection(vline);
 
         m_parameters(1,0) = lineWidth / 2.0F;
         QRect vl(r.left(), r.top() + rad, lineWidth, r.height() - dia);
@@ -1115,8 +1106,7 @@ void MythRenderOpenGL::DrawRoundRect(QOpenGLFramebufferObject *Target,
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         // Horizontal lines
-        SetShaderProgramParams(hline, m_projection, "u_projection");
-        SetShaderProgramParams(hline, m_transforms.top(), "u_transform");
+        SetShaderProjection(hline);
         QRect hl(r.left() + rad, r.top(), r.width() - dia, lineWidth);
 
         // Draw the top line segment
@@ -1524,6 +1514,15 @@ bool MythRenderOpenGL::EnableShaderProgram(QOpenGLShaderProgram* Program)
     m_activeProgram = Program;
     doneCurrent();
     return true;
+}
+
+inline void MythRenderOpenGL::SetShaderProjection(QOpenGLShaderProgram *Program)
+{
+    if (Program)
+    {
+        SetShaderProgramParams(Program, m_projection,       "u_projection");
+        SetShaderProgramParams(Program, m_transforms.top(), "u_transform");
+    }
 }
 
 void MythRenderOpenGL::SetShaderProgramParams(QOpenGLShaderProgram *Program, const QMatrix4x4 &Value, const char *Uniform)
