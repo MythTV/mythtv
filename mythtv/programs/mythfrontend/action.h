@@ -91,15 +91,8 @@ class ActionID
      */
     ActionID(const QString &context, const QString &action)
         : m_context(context), m_action(action) {}
-    ActionID(const ActionID &other)
-        : m_context(other.m_context), m_action(other.m_action) {}
-
-    ActionID& operator=(const ActionID &rhs)
-    {
-        m_context = rhs.m_context;
-        m_action = rhs.m_action;
-        return *this;
-    }
+    ActionID(const ActionID &other) = default;
+    ActionID& operator=(const ActionID &rhs) = default;
 
     /// \brief Returns the context name.
     QString GetContext(void) const { return m_context; }

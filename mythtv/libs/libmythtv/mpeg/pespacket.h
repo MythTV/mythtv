@@ -26,7 +26,7 @@ class MTV_PUBLIC PESPacket
 {
   protected:
     /** noop constructor, only for use by derived classes */
-    PESPacket() {}
+    PESPacket() = default;
 
   public:
     // does not create it's own data

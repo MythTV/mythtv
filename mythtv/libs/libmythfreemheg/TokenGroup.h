@@ -39,7 +39,7 @@ class MHEngine;
 class MHTokenGroupItem
 {
   public:
-    MHTokenGroupItem() {}
+    MHTokenGroupItem() = default;
     void Initialise(MHParseNode *p, MHEngine *engine);
     void PrintMe(FILE *fd, int nTabs) const;
     MHObjectRef m_Object;

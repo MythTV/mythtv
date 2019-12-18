@@ -9,7 +9,7 @@
 class MBASE_PUBLIC DatabaseParams
 {
   public:
-    DatabaseParams() {}
+    DatabaseParams() = default;
 
     void LoadDefaults(void);
     bool IsValid(const QString &source = QString("Unknown")) const;

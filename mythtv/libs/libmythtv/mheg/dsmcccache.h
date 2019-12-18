@@ -31,24 +31,13 @@ class DSMCCCacheReference
 {
   public:
     DSMCCCacheReference() = default;
-
     DSMCCCacheReference(unsigned long car, unsigned short m,
                         unsigned short s, const DSMCCCacheKey &k) :
         m_nCarouselId(car),             m_nModuleId(m),
         m_nStreamTag(s),                m_key(k) {}
 
-    DSMCCCacheReference(const DSMCCCacheReference &r) :
-        m_nCarouselId(r.m_nCarouselId), m_nModuleId(r.m_nModuleId),
-        m_nStreamTag(r.m_nStreamTag),   m_key(r.m_key) {}
-
-    DSMCCCacheReference& operator=(const DSMCCCacheReference &rhs)
-    {
-        m_nCarouselId = rhs.m_nCarouselId;
-        m_nModuleId = rhs.m_nModuleId;
-        m_nStreamTag = rhs.m_nStreamTag;
-        m_key = rhs.m_key;
-        return *this;
-    }
+    DSMCCCacheReference(const DSMCCCacheReference &r) = default;
+    DSMCCCacheReference& operator=(const DSMCCCacheReference &rhs) = default;
 
     bool Equal(const DSMCCCacheReference &r) const;
     bool Equal(const DSMCCCacheReference *p) const;

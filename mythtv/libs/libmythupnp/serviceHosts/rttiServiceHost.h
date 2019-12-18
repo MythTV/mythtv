@@ -51,9 +51,7 @@ class RttiServiceHost : public ServiceHost
         {
         }
 
-        virtual ~RttiServiceHost()
-        {
-        }
+        virtual ~RttiServiceHost() = default;
 };
 
 #endif

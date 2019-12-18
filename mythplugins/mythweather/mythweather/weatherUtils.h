@@ -26,8 +26,7 @@ class TypeListInfo
 {
   public:
 
-    TypeListInfo(const TypeListInfo& info)
-        : m_name(info.m_name), m_location(info.m_location), m_src(info.m_src) {}
+    TypeListInfo(const TypeListInfo& info) = default;
     explicit TypeListInfo(const QString &_name)
         : m_name(_name) {}
     TypeListInfo(const QString &_name, const QString &_location)
@@ -47,17 +46,7 @@ class ScreenListInfo
 {
   public:
     ScreenListInfo() = default;
-    ScreenListInfo(const ScreenListInfo& info) :
-        m_name(info.m_name),
-        m_title(info.m_title),
-        m_types(info.m_types),
-        m_dataTypes(info.m_dataTypes),
-        m_helptxt(info.m_helptxt),
-        m_sources(info.m_sources),
-        m_units(info.m_units),
-        m_hasUnits(info.m_hasUnits),
-        m_multiLoc(info.m_multiLoc),
-        m_updating(info.m_updating) {}
+    ScreenListInfo(const ScreenListInfo& info) = default;
 
     TypeListInfo GetCurrentTypeList(void) const;
 

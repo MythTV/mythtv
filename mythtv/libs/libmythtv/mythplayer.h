@@ -136,7 +136,7 @@ class DecoderCallback
 {
   public:
     using Callback = void (*)(void*, void*, void*);
-    DecoderCallback() { }
+    DecoderCallback() = default;
     DecoderCallback(QString &Debug, Callback Function, void *Opaque1, void *Opaque2, void *Opaque3)
       : m_debug(std::move(Debug)),
         m_function(Function),

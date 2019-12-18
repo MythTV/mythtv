@@ -171,7 +171,7 @@ class MHObjectRef
 class MHContentRef
 {
   public:
-    MHContentRef() {}
+    MHContentRef() = default;
 
     MHContentRef& operator=(const MHContentRef&) = default;
 
@@ -221,7 +221,7 @@ protected:
 class MHGenericOctetString: public MHGenericBase
 {
   public:
-    MHGenericOctetString() {}
+    MHGenericOctetString() = default;
     void Initialise(MHParseNode *p, MHEngine *engine);
     void PrintMe(FILE *fd, int nTabs) const;
     void GetValue(MHOctetString &str, MHEngine *engine) const; // Return the value, looking up any indirect ref.
@@ -232,7 +232,7 @@ protected:
 class MHGenericObjectRef: public MHGenericBase
 {
   public:
-    MHGenericObjectRef() {}
+    MHGenericObjectRef() = default;
     void Initialise(MHParseNode *p, MHEngine *engine);
     void PrintMe(FILE *fd, int nTabs) const;
     void GetValue(MHObjectRef &ref, MHEngine *engine) const; // Return the value, looking up any indirect ref.
@@ -243,7 +243,7 @@ protected:
 class MHGenericContentRef: public MHGenericBase
 {
   public:
-    MHGenericContentRef() {}
+    MHGenericContentRef() = default;
     void Initialise(MHParseNode *p, MHEngine *engine);
     void PrintMe(FILE *fd, int nTabs) const;
     void GetValue(MHContentRef &ref, MHEngine *engine) const; // Return the value, looking up any indirect ref.
@@ -255,7 +255,7 @@ protected:
 class MHParameter
 {
   public:
-    MHParameter() {}
+    MHParameter() = default;
     void Initialise(MHParseNode *p, MHEngine *engine);
     void PrintMe(FILE *fd, int nTabs) const;
     MHObjectRef *GetReference(); // Get an indirect reference.
@@ -306,7 +306,7 @@ class MHUnion
 class MHFontBody {
     // A font body can either be a string or an object reference
   public:
-    MHFontBody() {}
+    MHFontBody() = default;
     void Initialise(MHParseNode *p, MHEngine *engine);
     void PrintMe(FILE *fd, int nTabs) const;
     bool IsSet() const { return m_DirFont.Size() != 0 || m_IndirFont.IsSet(); }
@@ -319,7 +319,7 @@ protected:
 // This is used only in DynamicLineArt
 class MHPointArg {
   public:
-    MHPointArg() {}
+    MHPointArg() = default;
     void Initialise(MHParseNode *p, MHEngine *engine);
     void PrintMe(FILE *fd, int nTabs) const;
     MHGenericInteger m_x, m_y;

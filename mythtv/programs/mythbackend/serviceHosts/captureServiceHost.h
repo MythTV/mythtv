@@ -51,9 +51,7 @@ class CaptureServiceHost : public ServiceHost
         {
         }
 
-        virtual ~CaptureServiceHost()
-        {
-        }
+        virtual ~CaptureServiceHost() = default;
 };
 
 #endif

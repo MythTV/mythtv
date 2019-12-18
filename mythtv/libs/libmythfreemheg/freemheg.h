@@ -48,7 +48,7 @@ extern void MHSetLogging(FILE *logStream, unsigned int logLevel);
 class MHEG
 {
   public:
-    virtual ~MHEG() {}
+    virtual ~MHEG() = default;
     virtual void SetBooting() = 0;
     virtual void DrawDisplay(QRegion toDraw) = 0;
     // Run synchronous actions and process any asynchronous events until the queues are empty.
@@ -92,7 +92,7 @@ class MHRgba
 class MHContext
 {
   public:
-    virtual ~MHContext() {} // Declared to avoid warnings
+    virtual ~MHContext() = default; // Declared to avoid warnings
     // Interface to MHEG engine.
 
     // Test for an object in the carousel.  Returns true if the object is present and
@@ -168,7 +168,7 @@ class MHContext
 class MHDLADisplay
 {
   public:
-    virtual ~MHDLADisplay() {}
+    virtual ~MHDLADisplay() = default;
     // Draw the completed drawing onto the display.
     virtual void Draw(int x, int y) = 0;
     // Set the box size.  Also clears the drawing.
@@ -188,7 +188,7 @@ class MHDLADisplay
 
 class MHTextDisplay {
   public:
-    virtual ~MHTextDisplay() {}
+    virtual ~MHTextDisplay() = default;
     // Draw the completed drawing onto the display.  x and y give the position of the image
     // relative to the screen.  rect gives the bounding box for the image, again relative to
     // the screen.
@@ -205,7 +205,7 @@ class MHTextDisplay {
 class MHBitmapDisplay
 {
   public:
-    virtual ~MHBitmapDisplay() {}
+    virtual ~MHBitmapDisplay() = default;
     // Draw the completed drawing onto the display.  x and y give the position of the image
     // relative to the screen.  rect gives the bounding box for the image, again relative to
     // the screen.

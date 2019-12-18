@@ -51,9 +51,7 @@ class VideoServiceHost : public ServiceHost
         {
         }
 
-        virtual ~VideoServiceHost()
-        {
-        }
+        virtual ~VideoServiceHost() = default;
 };
 
 #endif

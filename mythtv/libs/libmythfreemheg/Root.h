@@ -43,9 +43,9 @@ enum EventType { EventIsAvailable = 1, EventContentAvailable, EventIsDeleted, Ev
 class MHRoot  
 {
   public:
-    MHRoot() {}
+    MHRoot() = default;
     MHRoot(const MHRoot &/*ref*/) {}
-    virtual ~MHRoot() {}
+    virtual ~MHRoot() = default;
     // Initialise - set up the item from the parse tree.
     virtual void Initialise(MHParseNode *p, MHEngine *engine); // Set this up from the parse tree.
     // Print this item.

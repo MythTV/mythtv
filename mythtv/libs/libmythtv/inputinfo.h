@@ -23,40 +23,16 @@ class MTV_PUBLIC InputInfo
         m_chanId(_chanid),
         m_liveTvOrder(_livetvorder) {}
 
-    InputInfo(const InputInfo &other) :
-        m_name(other.m_name),
-        m_sourceId(other.m_sourceId),
-        m_inputId(other.m_inputId),
-        m_mplexId(other.m_mplexId),
-        m_chanId(other.m_chanId),
-        m_displayName(other.m_displayName),
-        m_recPriority(other.m_recPriority),
-        m_scheduleOrder(other.m_scheduleOrder),
-        m_liveTvOrder(other.m_liveTvOrder),
-        m_quickTune(other.m_quickTune) {}
+    virtual ~InputInfo() = default;
 
-    InputInfo &operator=(const InputInfo &other)
-    {
-        m_name          = other.m_name;
-        m_sourceId      = other.m_sourceId;
-        m_inputId       = other.m_inputId;
-        m_mplexId       = other.m_mplexId;
-        m_chanId        = other.m_chanId;
-        m_displayName   = other.m_displayName;
-        m_recPriority   = other.m_recPriority;
-        m_scheduleOrder = other.m_scheduleOrder;
-        m_liveTvOrder   = other.m_liveTvOrder;
-        m_quickTune     = other.m_quickTune;
-        return *this;
-    }
+    InputInfo(const InputInfo &other) = default;
+    InputInfo &operator=(const InputInfo &other) = default;
 
     bool operator == (uint inputid) const
         { return m_inputId == inputid; }
 
     bool operator == (const QString &name) const
         { return m_name == name; }
-
-    virtual ~InputInfo() = default;
 
     virtual bool FromStringList(QStringList::const_iterator &it,
                                 const QStringList::const_iterator& end);

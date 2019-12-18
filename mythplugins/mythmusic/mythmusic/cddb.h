@@ -21,7 +21,7 @@ struct Cddb
         QString artist;
         QString title;
 
-        Match() {}
+        Match() = default;
         Match(const char *g, discid_t d, const char *a, const char *t) :
             discGenre(g), discID(d), artist(a), title(t)
         {}
@@ -41,7 +41,7 @@ struct Cddb
         using    match_t = QVector< Match >;
         match_t  matches;
 
-        Matches() {}
+        Matches() = default;
     };
 
     struct Msf

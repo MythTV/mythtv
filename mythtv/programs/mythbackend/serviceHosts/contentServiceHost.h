@@ -51,9 +51,7 @@ class ContentServiceHost : public ServiceHost
         {
         }
 
-        virtual ~ContentServiceHost()
-        {
-        }
+        virtual ~ContentServiceHost() = default;
 };
 
 #endif

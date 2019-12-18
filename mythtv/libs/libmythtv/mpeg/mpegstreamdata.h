@@ -63,7 +63,7 @@ enum CryptStatus
 class MTV_PUBLIC CryptInfo
 {
   public:
-    CryptInfo() { }
+    CryptInfo() = default;
     CryptInfo(uint e, uint d) : m_encryptedMin(e), m_decryptedMin(d) { }
 
   public:

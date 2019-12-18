@@ -121,8 +121,8 @@ class MHLineArt : public MHVisible
 class MHRectangle : public MHLineArt  
 {
   public:
-    MHRectangle() {}
-    MHRectangle(const MHRectangle &ref): MHLineArt(ref) {}
+    MHRectangle() = default;
+    MHRectangle(const MHRectangle &ref) = default;
     const char *ClassName() override // MHLineArt
         { return "Rectangle"; }
     void PrintMe(FILE *fd, int nTabs) const override; // MHLineArt

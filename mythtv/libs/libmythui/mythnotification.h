@@ -75,9 +75,7 @@ class MUI_PUBLIC MythNotification : public MythEvent
         FromStringList();
     }
 
-    virtual ~MythNotification()
-    {
-    }
+    virtual ~MythNotification() = default;
 
     MythEvent *clone(void) const override // MythEvent
         { return new MythNotification(*this); }
@@ -255,10 +253,7 @@ class MUI_PUBLIC MythImageNotification : public virtual MythNotification
     QString GetImagePath(void) const        { return m_imagePath; }
 
   protected:
-    MythImageNotification(const MythImageNotification &o)
-        : MythNotification(o), m_image(o.m_image), m_imagePath(o.m_imagePath)
-    {
-    }
+    MythImageNotification(const MythImageNotification &o) = default;
 
   protected:
     QImage      m_image;
@@ -310,11 +305,7 @@ class MUI_PUBLIC MythPlaybackNotification : public virtual MythNotification
     static QString stringFromSeconds(int time);
 
   protected:
-    MythPlaybackNotification(const MythPlaybackNotification &o)
-        : MythNotification(o),
-        m_progress(o.m_progress), m_progressText(o.m_progressText)
-    {
-    }
+    MythPlaybackNotification(const MythPlaybackNotification &o) = default;
 
   protected:
     float       m_progress;

@@ -53,7 +53,7 @@ class MHAsynchEvent {
 // the code so for the moment we do.
 class MHPSEntry {
   public:
-    MHPSEntry() {}
+    MHPSEntry() = default;
     MHOctetString m_FileName;
     MHOwnPtrSequence <MHUnion> m_Data;
 };

@@ -51,9 +51,7 @@ class GuideServiceHost : public ServiceHost
         {
         }
 
-        virtual ~GuideServiceHost()
-        {
-        }
+        virtual ~GuideServiceHost() = default;
 };
 
 #endif

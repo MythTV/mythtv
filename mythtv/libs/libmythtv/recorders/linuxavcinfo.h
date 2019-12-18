@@ -23,7 +23,7 @@ using namespace std;
 class LinuxAVCInfo : public AVCInfo
 {
   public:
-    LinuxAVCInfo() {}
+    LinuxAVCInfo() = default;
 
     bool Update(uint64_t _guid, raw1394handle_t handle,
                 uint _port, uint _node);

@@ -17,8 +17,7 @@ class CC608Text
   public:
     CC608Text(const QString &T, int X, int Y) :
         m_text(T), m_x(X), m_y(Y) {}
-    CC608Text(const CC608Text &other) :
-        m_text(other.m_text), m_x(other.m_x), m_y(other.m_y) {}
+    CC608Text(const CC608Text &other)  = default;
     QString m_text;
     int     m_x;
     int     m_y;

@@ -31,8 +31,8 @@
 class MHVariable : public MHIngredient  
 {
   public:
-    MHVariable() {}
-    virtual ~MHVariable() {}
+    MHVariable() = default;
+    virtual ~MHVariable() = default;
 
     // Internal behaviours.
     void Activation(MHEngine *engine) override; // MHRoot
@@ -86,7 +86,7 @@ class MHIntegerVar : public MHVariable
 class MHOctetStrVar : public MHVariable  
 {
   public:
-    MHOctetStrVar() {}
+    MHOctetStrVar() = default;
     const char *ClassName() override // MHRoot
         { return "OctetStringVariable"; }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHIngredient
@@ -107,7 +107,7 @@ class MHOctetStrVar : public MHVariable
 class MHObjectRefVar : public MHVariable  
 {
   public:
-    MHObjectRefVar() {}
+    MHObjectRefVar() = default;
     const char *ClassName() override // MHRoot
         { return "ObjectRefVariable"; }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHIngredient
@@ -128,7 +128,7 @@ class MHObjectRefVar : public MHVariable
 class MHContentRefVar : public MHVariable  
 {
   public:
-    MHContentRefVar() {}
+    MHContentRefVar() = default;
     const char *ClassName() override // MHRoot
         { return "ContentRefVariable"; }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHIngredient

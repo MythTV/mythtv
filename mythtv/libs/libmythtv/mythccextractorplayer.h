@@ -42,7 +42,7 @@ class MTV_PUBLIC OneSubtitle
     /// Shift of image on the screen.
     QPoint m_imgShift { 0,0 };
 
-    OneSubtitle() {}
+    OneSubtitle() = default;
 
     static const int kDefaultLength;
 };
@@ -68,7 +68,7 @@ class SRTStuff
 class CC608Stuff : public SRTStuff
 {
   public:
-    CC608Stuff() { }
+    CC608Stuff() = default;
     ~CC608Stuff();
     CC608Reader     *m_reader { nullptr };
     CC608StreamType  m_subs;
@@ -78,7 +78,7 @@ using CC608Info = QHash<uint, CC608Stuff>;
 class CC708Stuff : public SRTStuff
 {
   public:
-    CC708Stuff() { }
+    CC708Stuff() = default;
     ~CC708Stuff();
     CC708Reader     *m_reader { nullptr };
     CC708StreamType  m_subs;
@@ -89,7 +89,7 @@ class TeletextExtractorReader;
 class TeletextStuff : public SRTStuff
 {
   public:
-    TeletextStuff() { }
+    TeletextStuff() = default;
     ~TeletextStuff();
     TeletextExtractorReader *m_reader { nullptr };
     TeletextStreamType       m_subs;
@@ -99,7 +99,7 @@ using TeletextInfo = QHash<uint, TeletextStuff>;
 class DVBSubStuff
 {
   public:
-    DVBSubStuff() { }
+    DVBSubStuff() = default;
     ~DVBSubStuff();
     SubtitleReader *m_reader  { nullptr };
     int             m_subsNum {       0 };

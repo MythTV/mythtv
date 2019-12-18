@@ -23,7 +23,7 @@ class ThreadedFileWriter;
 class PIDInfo
 {
   public:
-    PIDInfo() {}
+    PIDInfo() = default;
     explicit PIDInfo(uint pid) : m_pid(pid) {}
     PIDInfo(uint pid, uint stream_type, int pes_type) :
         m_pid(pid), m_streamType(stream_type), m_pesType(pes_type) {;}

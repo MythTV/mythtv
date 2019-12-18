@@ -16,7 +16,7 @@ extern "C" {
 class MTV_PUBLIC AVFormatWriter : public FileWriterBase
 {
   public:
-    AVFormatWriter() {};
+    AVFormatWriter() = default;;
    ~AVFormatWriter();
 
     bool Init(void) override; // FileWriterBase
