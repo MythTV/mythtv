@@ -56,7 +56,7 @@ void MythServer::newTcpConnection(qt_socket_fd_t socket)
 }
 
 MythSocketManager::MythSocketManager() :
-    m_server(nullptr), m_threadPool("MythSocketManager")
+    m_threadPool("MythSocketManager")
 {
 }
 

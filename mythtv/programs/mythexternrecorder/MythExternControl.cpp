@@ -38,13 +38,6 @@ const QString VERSION = "0.6";
 MythExternControl::MythExternControl(void)
     : m_buffer(this)
     , m_commands(this)
-    , m_run(true)
-    , m_commands_running(true)
-    , m_buffer_running(true)
-    , m_fatal(false)
-    , m_streaming(false)
-    , m_xon(false)
-    , m_ready(false)
 {
     setObjectName("Control");
 

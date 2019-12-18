@@ -665,14 +665,13 @@ class MPUBLIC ProgramInfo
     // Get/set all markup
     struct MarkupEntry
     {
-        int type; // MarkTypes
-        uint64_t frame;
-        uint64_t data;
-        bool isDataNull;
+        int      type       {   -1 }; // MarkTypes
+        uint64_t frame      {    0 };
+        uint64_t data       {    0 };
+        bool     isDataNull { true };
         MarkupEntry(int t, uint64_t f, uint64_t d, bool n)
             : type(t), frame(f), data(d), isDataNull(n) {}
-        MarkupEntry(void)
-            : type(-1), frame(0), data(0), isDataNull(true) {}
+        MarkupEntry(void) = default;
     };
     void QueryMarkup(QVector<MarkupEntry> &mapMark,
                      QVector<MarkupEntry> &mapSeek) const;

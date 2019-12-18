@@ -565,7 +565,7 @@ void HouseKeepingThread::run(void)
  *  Tasks cannot be removed from the housekeeper once added.
  *
  */
-HouseKeeper::HouseKeeper(void) : m_timer(nullptr)
+HouseKeeper::HouseKeeper(void)
 {
     m_timer = new QTimer(this);
     connect(m_timer, SIGNAL(timeout()), this, SLOT(Run()));

@@ -78,13 +78,13 @@ class MHRgba
   public:
     MHRgba(int red, int green, int blue, int alpha):
       m_red(red), m_green(green), m_blue(blue), m_alpha(alpha) {};
-    MHRgba(): m_red(0), m_green(0), m_blue(0), m_alpha(0) {};
+    MHRgba() = default;
     int red() const { return m_red; }
     int green() const { return m_green; }
     int blue() const { return m_blue; }
     int alpha() const { return m_alpha; }
   private:
-    unsigned char m_red, m_green, m_blue, m_alpha;
+    unsigned char m_red{0}, m_green{0}, m_blue{0}, m_alpha{0};
 };
 
 // This abstract class provides operations that the surrounding context must provide

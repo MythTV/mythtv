@@ -29,7 +29,7 @@ class CommDetectorBase : public QObject
     Q_OBJECT
 
 public:
-    CommDetectorBase();
+    CommDetectorBase() = default;
 
     virtual bool go() = 0;
     void stop();
@@ -51,9 +51,8 @@ signals:
 
 protected:    
     ~CommDetectorBase() = default;
-    bool m_bPaused;
-    bool m_bStop;    
-    
+    bool m_bPaused { false };
+    bool m_bStop   { false };
 };
 
 #endif

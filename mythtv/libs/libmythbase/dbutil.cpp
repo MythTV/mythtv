@@ -27,15 +27,6 @@
 
 const int DBUtil::kUnknownVersionNumber = INT_MIN;
 
-/** \fn DBUtil::DBUtil(void)
- *  \brief Constructs the DBUtil object.
- */
-DBUtil::DBUtil(void)
-    : m_versionMajor(-1), m_versionMinor(-1),
-      m_versionPoint(-1)
-{
-}
-
 /** \fn DBUtil::GetDBMSVersion(void)
  *  \brief Returns the QString version name of the DBMS or QString() in
  *         the event of an error.

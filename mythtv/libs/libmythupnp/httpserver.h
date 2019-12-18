@@ -148,7 +148,7 @@ class UPNP_PUBLIC HttpServer : public ServerPool
     QMultiMap< QString, HttpServerExtension* >  m_basePaths;
     QString                 m_sSharePath;
     MThreadPool             m_threadPool;
-    bool                    m_running; // protected by m_rwlock
+    bool                    m_running    { true }; // protected by m_rwlock
 
     static QMutex           s_platformLock;
     static QString          s_platform;

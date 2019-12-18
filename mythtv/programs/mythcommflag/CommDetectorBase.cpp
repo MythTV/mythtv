@@ -1,9 +1,5 @@
 #include "CommDetectorBase.h"
 
-CommDetectorBase::CommDetectorBase() : m_bPaused(false), m_bStop(false)
-{
-}
-
 void CommDetectorBase::stop()
 {
     m_bStop = true;

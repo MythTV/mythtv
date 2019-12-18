@@ -13,7 +13,7 @@ class PROTOSERVER_PUBLIC SocketRequestHandler : public QObject
 {
     Q_OBJECT
   public:
-    SocketRequestHandler() : m_parent(nullptr) {};
+    SocketRequestHandler() = default;
    ~SocketRequestHandler() = default;
 
     virtual bool HandleAnnounce(MythSocket */*socket*/, QStringList &/*commands*/,
@@ -30,7 +30,7 @@ class PROTOSERVER_PUBLIC SocketRequestHandler : public QObject
     MythSocketManager *GetParent(void)                  { return m_parent; }
 
   protected:
-    MythSocketManager *m_parent;
+    MythSocketManager *m_parent { nullptr };
 };
 
 #endif

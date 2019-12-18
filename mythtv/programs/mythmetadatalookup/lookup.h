@@ -29,11 +29,11 @@ class LookerUpper : public QObject
   private:
     void customEvent(QEvent *event) override; // QObject
 
-    MetadataFactory      *m_metadataFactory;
+    MetadataFactory      *m_metadataFactory { nullptr };
 
     QList<ProgramInfo*>   m_busyRecList;
-    bool                  m_updaterules;
-    bool                  m_updateartwork;
+    bool                  m_updaterules     { false };
+    bool                  m_updateartwork   { false };
 };
 
 #endif //LOOKUP_H_

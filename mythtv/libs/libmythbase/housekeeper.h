@@ -164,7 +164,7 @@ class MBASE_PUBLIC HouseKeeper : public QObject
     void Run(void);
 
   private:
-    QTimer                         *m_timer;
+    QTimer                         *m_timer { nullptr };
 
     QQueue<HouseKeeperTask*>        m_taskQueue;
     QMutex                          m_queueLock;

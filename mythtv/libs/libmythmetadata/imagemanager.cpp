@@ -1063,8 +1063,7 @@ ImageDbSg::ImageDbSg() : ImageDb(DB_TABLE)
  \brief Local database constructor
 */
 ImageDbLocal::ImageDbLocal()
-    : ImageDb(QString("`%1_%2`").arg(DB_TABLE, gCoreContext->GetHostName())),
-      m_DbExists(false)
+    : ImageDb(QString("`%1_%2`").arg(DB_TABLE, gCoreContext->GetHostName()))
 {
     // Remove any table leftover from a previous FE crash
     DropTable();

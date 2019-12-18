@@ -322,7 +322,7 @@ protected:
     ImageDbLocal();
     ~ImageDbLocal()          { DropTable(); }
     bool CreateTable();
-    bool m_DbExists;
+    bool m_DbExists { false };
 
 private:
     void DropTable();

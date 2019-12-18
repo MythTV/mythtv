@@ -499,9 +499,8 @@ void ThemeUpdateTask::Terminate(void)
     m_running = false;
 }
 
-RadioStreamUpdateTask::RadioStreamUpdateTask(void) : DailyHouseKeeperTask("UpdateRadioStreams",
-                                                       kHKGlobal, kHKRunOnStartup),
-    m_msMU(nullptr)
+RadioStreamUpdateTask::RadioStreamUpdateTask(void)
+    : DailyHouseKeeperTask("UpdateRadioStreams", kHKGlobal, kHKRunOnStartup)
 {
 }
 
@@ -566,9 +565,8 @@ void RadioStreamUpdateTask::Terminate(void)
         m_msMU->Term(true);
 }
 
-ArtworkTask::ArtworkTask(void) : DailyHouseKeeperTask("RecordedArtworkUpdate",
-                                         kHKGlobal, kHKRunOnStartup),
-    m_msMML(nullptr)
+ArtworkTask::ArtworkTask(void)
+    : DailyHouseKeeperTask("RecordedArtworkUpdate", kHKGlobal, kHKRunOnStartup)
 {
 }
 
@@ -635,7 +633,7 @@ bool JobQueueRecoverTask::DoRun(void)
 }
 
 MythFillDatabaseTask::MythFillDatabaseTask(void) :
-    DailyHouseKeeperTask("MythFillDB"), m_msMFD(nullptr)
+    DailyHouseKeeperTask("MythFillDB")
 {
     SetHourWindowFromDB();
 }

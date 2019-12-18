@@ -173,20 +173,20 @@ class MHQuit: public MHElemAction
 class MHSendEvent: public MHElemAction
 {
   public:
-    MHSendEvent(): MHElemAction(":SendEvent"), m_EventType(EventIsAvailable) {}
+    MHSendEvent(): MHElemAction(":SendEvent") {}
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
     void Perform(MHEngine *engine) override; // MHElemAction
     void PrintArgs(FILE *fd, int nTabs) const override; // MHElemAction
   protected:
     MHGenericObjectRef m_EventSource; // Event source
-    enum EventType m_EventType; // Event type
+    enum EventType m_EventType { EventIsAvailable }; // Event type
     MHParameter m_EventData; // Optional - Null means not specified.  Can only be bool, int or string.
 };
 
 class MHSetTimer: public MHElemAction
 {
   public:
-    MHSetTimer(): MHElemAction(":SetTimer"), m_TimerType(ST_NoNewTimer) {}
+    MHSetTimer(): MHElemAction(":SetTimer") {}
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
     void Perform(MHEngine *engine) override; // MHElemAction
   protected:
@@ -194,7 +194,11 @@ class MHSetTimer: public MHElemAction
     MHGenericInteger m_TimerId;
     // A new timer may not be specified in which case this cancels the timer.
     // If the timer is specified the "absolute" flag is optional.
-    enum { ST_NoNewTimer, ST_TimerAbsolute, ST_TimerRelative } m_TimerType;
+    enum {
+        ST_NoNewTimer,
+        ST_TimerAbsolute,
+        ST_TimerRelative
+    } m_TimerType { ST_NoNewTimer };
     MHGenericInteger m_TimerValue;
     MHGenericBoolean m_AbsFlag;
 };

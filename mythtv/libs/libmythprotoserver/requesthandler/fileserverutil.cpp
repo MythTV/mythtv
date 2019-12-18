@@ -17,7 +17,7 @@
 #include "programinfo.h"
 
 DeleteHandler::DeleteHandler(void) :
-    ReferenceCounter("DeleteHandler"), m_fd(-1), m_size(0)
+    ReferenceCounter("DeleteHandler")
 {
 }
 

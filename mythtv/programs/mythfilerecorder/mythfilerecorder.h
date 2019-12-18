@@ -71,9 +71,9 @@ class Commands : public QObject
   private:
     QString   m_fileName;
     Streamer *m_streamer { nullptr };
-    int       m_timeout;
-    bool      m_run;
-    QAtomicInt m_eof;
+    int       m_timeout  {      10 };
+    bool      m_run      {    true };
+    QAtomicInt m_eof     {       0 };
 };
 
 #endif

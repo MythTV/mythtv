@@ -164,21 +164,21 @@ class MythExternControl : public QObject
     Commands     m_commands;
     QString      m_desc;
 
-    std::atomic<bool> m_run;
-    std::atomic<bool> m_commands_running;
-    std::atomic<bool> m_buffer_running;
+    std::atomic<bool> m_run              {true};
+    std::atomic<bool> m_commands_running {true};
+    std::atomic<bool> m_buffer_running   {true};
     std::mutex   m_run_mutex;
     std::condition_variable m_run_cond;
     std::mutex   m_msg_mutex;
 
-    bool         m_fatal;
+    bool         m_fatal                 {false};
     QString      m_errmsg;
 
     std::mutex        m_flow_mutex;
     std::condition_variable m_flow_cond;
-    std::atomic<bool> m_streaming;
-    std::atomic<bool> m_xon;
-    std::atomic<bool> m_ready;
+    std::atomic<bool> m_streaming        {false};
+    std::atomic<bool> m_xon              {false};
+    std::atomic<bool> m_ready            {false};
 };
 
 #endif

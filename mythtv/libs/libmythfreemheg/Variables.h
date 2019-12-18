@@ -164,12 +164,12 @@ class MHSetVariable: public MHElemAction
 class MHTestVariable: public MHElemAction
 {
   public:
-    MHTestVariable(): MHElemAction(":TestVariable"), m_nOperator(0) {}
+    MHTestVariable(): MHElemAction(":TestVariable") {}
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
     void Perform(MHEngine *engine) override; // MHElemAction
   protected:
     void PrintArgs(FILE *fd, int nTabs) const override; // MHElemAction
-    int m_nOperator;
+    int m_nOperator {0};
     MHParameter m_Comparison; // Value to compare with.
 };
 

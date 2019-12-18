@@ -22,7 +22,7 @@ class UDPPacket
   public:
     UDPPacket(const UDPPacket &o) : m_key(o.m_key), m_data(o.m_data) { }
     explicit UDPPacket(uint64_t key) : m_key(key) { }
-    UDPPacket(void) : m_key(0ULL) { }
+    UDPPacket(void) = default;
     virtual ~UDPPacket() = default;
 
     UDPPacket& operator=(const UDPPacket &rhs)
@@ -43,7 +43,7 @@ class UDPPacket
 
   protected:
     /// Key used to ensure we avoid extra memory allocation in m_data QByteArray
-    uint64_t m_key;
+    uint64_t   m_key  { 0ULL };
     QByteArray m_data;
 };
 

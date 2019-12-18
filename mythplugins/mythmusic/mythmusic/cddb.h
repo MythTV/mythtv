@@ -17,11 +17,11 @@ struct Cddb
     struct Match
     {
         QString discGenre;
-        discid_t discID;
+        discid_t discID { 0 };
         QString artist;
         QString title;
 
-        Match() : discID(0) {}
+        Match() {}
         Match(const char *g, discid_t d, const char *a, const char *t) :
             discGenre(g), discID(d), artist(a), title(t)
         {}
@@ -36,12 +36,12 @@ struct Cddb
     // CDDB query results
     struct Matches
     {
-        discid_t discID; // discID of query
-        bool isExact;
-        using match_t = QVector< Match >;
-        match_t matches;
+        discid_t discID  {     0 }; // discID of query
+        bool     isExact { false };
+        using    match_t = QVector< Match >;
+        match_t  matches;
 
-        Matches() : discID(0), isExact(false) {}
+        Matches() {}
     };
 
     struct Msf
@@ -65,10 +65,10 @@ struct Cddb
         QString artist;
         QString title;
         QString genre;     // the genre from the DGENRE= item
-        int year;
+        int     year          { 0 };
         QString submitter;
-        int rev;
-        bool isCompilation;
+        int     rev           { 1 };
+        bool    isCompilation { false };
         using track_t = QVector< Track >;
         track_t tracks;
         QString extd;
@@ -77,7 +77,7 @@ struct Cddb
         Toc toc;
 
         Album(discid_t d = 0, const char* g = nullptr) :
-            discGenre(g), discID(d), year(0), rev(1), isCompilation(false) {}
+            discGenre(g), discID(d) {}
 
         explicit Album(const QString& s) { *this = s; }
 

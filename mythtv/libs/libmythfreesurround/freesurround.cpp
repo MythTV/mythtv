@@ -131,12 +131,7 @@ void FreeSurround::SetParams()
 FreeSurround::fsurround_params::fsurround_params(int32_t center_width,
                                                  int32_t dimension) :
     center_width(center_width),
-    dimension(dimension),
-    coeff_a(0.8165),coeff_b(0.5774),
-    phasemode(0),
-    steering(1),
-    front_sep(100),
-    rear_sep(100)
+    dimension(dimension)
 {
 }
 

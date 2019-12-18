@@ -12,8 +12,7 @@
 
 #include "requesthandler/outboundhandler.h"
 
-OutboundRequestHandler::OutboundRequestHandler(void) :
-    m_socket(nullptr)
+OutboundRequestHandler::OutboundRequestHandler(void) 
 {
     m_timer.setSingleShot(true);
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(ConnectToMaster()));

@@ -33,7 +33,7 @@ class RTPDataPacket : public UDPPacket
     RTPDataPacket(const RTPDataPacket &o) : UDPPacket(o), m_off(o.m_off) { }
     explicit RTPDataPacket(const UDPPacket &o) : UDPPacket(o), m_off(0) { }
     explicit RTPDataPacket(uint64_t key) : UDPPacket(key), m_off(0) { }
-    RTPDataPacket(void) : UDPPacket(0ULL), m_off(0) { }
+    RTPDataPacket(void) : UDPPacket(0ULL) { }
 
     RTPDataPacket& operator=(const RTPDataPacket &rhs)
     {
@@ -129,7 +129,7 @@ class RTPDataPacket : public UDPPacket
     }
 
   protected:
-    mutable uint m_off;
+    mutable uint m_off { 0 };
 };
 
 #endif // _RTP_DATA_PACKET_H_

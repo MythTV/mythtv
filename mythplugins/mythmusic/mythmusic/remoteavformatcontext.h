@@ -18,9 +18,7 @@ extern "C" {
 class RemoteAVFormatContext
 {
   public:
-    explicit RemoteAVFormatContext(const QString &filename = "") :
-        m_inputFC(nullptr), m_inputIsRemote(false), m_isOpen(false),
-        m_rf(nullptr), m_byteIOContext(nullptr), m_buffer(nullptr)
+    explicit RemoteAVFormatContext(const QString &filename = "")
     { if (!filename.isEmpty()) Open(filename); }
 
     ~RemoteAVFormatContext()
@@ -152,11 +150,11 @@ class RemoteAVFormatContext
     }
 
   private:
-    AVFormatContext *m_inputFC;
-    bool m_inputIsRemote;
-    bool m_isOpen;
-    RemoteFile *m_rf;
-    AVIOContext *m_byteIOContext;
-    unsigned char *m_buffer;
+    AVFormatContext *m_inputFC       { nullptr };
+    bool             m_inputIsRemote {   false };
+    bool             m_isOpen        {   false };
+    RemoteFile      *m_rf            { nullptr };
+    AVIOContext     *m_byteIOContext { nullptr };
+    unsigned char   *m_buffer        { nullptr };
 };
 #endif // REMOTEAVFORMATCONTEXT_H

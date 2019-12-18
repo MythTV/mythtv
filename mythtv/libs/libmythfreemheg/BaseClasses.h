@@ -255,12 +255,19 @@ protected:
 class MHParameter
 {
   public:
-    MHParameter(): m_Type(P_Null) {}
+    MHParameter() {}
     void Initialise(MHParseNode *p, MHEngine *engine);
     void PrintMe(FILE *fd, int nTabs) const;
     MHObjectRef *GetReference(); // Get an indirect reference.
 
-    enum ParamTypes { P_Int, P_Bool, P_String, P_ObjRef, P_ContentRef, P_Null } m_Type; // Null is used when this is optional
+    enum ParamTypes {
+        P_Int,
+        P_Bool,
+        P_String,
+        P_ObjRef,
+        P_ContentRef,
+        P_Null
+    } m_Type { P_Null }; // Null is used when this is optional
 
     MHGenericInteger        m_IntVal;
     MHGenericBoolean        m_BoolVal;
@@ -275,7 +282,7 @@ class MHUnion
   public:
     MHUnion() = default;
     MHUnion(int nVal) : m_Type(U_Int), m_nIntVal(nVal) {}
-    MHUnion(bool fVal) : m_Type(U_Bool), m_nIntVal(0), m_fBoolVal(fVal)  {}
+    MHUnion(bool fVal) : m_Type(U_Bool),  m_fBoolVal(fVal)  {}
     MHUnion(const MHOctetString &strVal) : m_Type(U_String) { m_StrVal.Copy(strVal); }
     MHUnion(const MHObjectRef &objVal) : m_Type(U_ObjRef) { m_ObjRefVal.Copy(objVal); };
     MHUnion(const MHContentRef &cnVal) : m_Type(U_ContentRef) { m_ContentRefVal.Copy(cnVal); }

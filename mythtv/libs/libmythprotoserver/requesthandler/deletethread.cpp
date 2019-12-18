@@ -27,7 +27,7 @@ using namespace std;
 */
 
 DeleteThread::DeleteThread(void) :
-    MThread("Delete"), m_increment(9961472), m_run(true)
+    MThread("Delete")
 {
     m_slow = (bool) gCoreContext->GetNumSetting("TruncateDeletesSlowly", 0);
     m_link = (bool) gCoreContext->GetNumSetting("DeletesFollowLinks", 0);

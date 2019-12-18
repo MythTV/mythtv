@@ -46,11 +46,11 @@ class UPNP_PUBLIC UPnpIcon
   public:
     QString     m_sURL;
     QString     m_sMimeType;
-    int         m_nWidth;
-    int         m_nHeight;
-    int         m_nDepth;
+    int         m_nWidth    { 0 };
+    int         m_nHeight   { 0 };
+    int         m_nDepth    { 0 };
 
-    UPnpIcon() : m_nWidth(0), m_nHeight(0), m_nDepth(0) {}
+    UPnpIcon() = default;
 
     QString toString(uint padding) const
     {
@@ -112,7 +112,7 @@ class UPNP_PUBLIC UPnpDevice
         NameValues      m_lstExtra;
 
         /// MythTV specific information
-        bool            m_securityPin;
+        bool            m_securityPin     { false };
         QString         m_protocolVersion;
 
         UPnpIconList    m_listIcons;
