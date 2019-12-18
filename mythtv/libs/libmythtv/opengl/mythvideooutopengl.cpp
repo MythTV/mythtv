@@ -126,7 +126,12 @@ MythVideoOutputOpenGL::MythVideoOutputOpenGL(QString Profile)
     }
 
     // Disallow unsupported video texturing on GLES2/GL1.X
-    if (m_render->GetExtraFeatures() & kGLLegacyTextures)
+    // Also disallow GLES3.X - further work required as GLES3.0 needs specific,
+    // unsigned integer texture formats. It is not enough to just use these texture
+    // formats - we need to scale integer values in the shaders, use unsigned samplers
+    // and force nearest texture filters.
+    // NOTE: this is not the same as the legacy texture format support.
+    if ((m_render->GetExtraFeatures() & kGLLegacyTextures) || m_render->isOpenGLES())
     {
         LOG(VB_GENERAL, LOG_INFO, LOC +
             "Disabling unsupported texture formats for this OpenGL version");
