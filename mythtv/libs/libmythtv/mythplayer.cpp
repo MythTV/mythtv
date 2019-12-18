@@ -1590,7 +1590,7 @@ void MythPlayer::AVSync(VideoFrame *buffer)
     // controller gain
     static float const s_av_control_gain = 0.4F;
     // time weighted exponential filter coefficient
-    static float const s_sync_fc = 0.6F;
+    static float const s_sync_fc = 0.9F;
 
     while (framedue == 0)
     {
