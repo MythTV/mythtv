@@ -622,7 +622,7 @@ void MythPlayer::SetVideoParams(int width, int height, double fps,
 {
     bool paramsChanged = ForceUpdate;
 
-    if (width >= 1 && height >= 1)
+    if (width >= 0 && height >= 0)
     {
         paramsChanged  = true;
         m_videoDim      = m_videoDispDim = QSize(width, height);
