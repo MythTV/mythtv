@@ -394,6 +394,7 @@ class MTV_PUBLIC MythPlayer
     QString GetVisualiserName(void);
     QStringList GetVisualiserList(void);
     bool EnableVisualisation(bool enable, const QString &name = QString(""));
+    void AutoVisualise(void);
 
     void SaveTotalDuration(void);
     void ResetTotalDuration(void);

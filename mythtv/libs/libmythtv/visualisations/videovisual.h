@@ -7,6 +7,7 @@
 #include <QList>
 #include <QDateTime>
 
+#include "mythtvexp.h"
 #include "mythlogging.h"
 #include "visual.h"
 #include "mythrender_base.h"
@@ -36,7 +37,7 @@ class VisualNode
     long   m_offset;
 };
 
-class VideoVisual : public MythTV::Visual
+class MTV_PUBLIC VideoVisual : public MythTV::Visual
 {
   public:
     static bool CanVisualise(AudioPlayer *audio, MythRender *render);

@@ -4793,6 +4793,8 @@ void TV::EnableVisualisation(const PlayerContext *ctx, bool enable,
     ctx->LockDeletePlayer(__FILE__, __LINE__);
     if (ctx->m_player && ctx->m_player->CanVisualise())
     {
+        if (visualiser.isEmpty())
+            visualiser = gCoreContext->GetSetting("AudioVisualiser", "");
         bool want = enable || !visualiser.isEmpty();
         if (toggle && visualiser.isEmpty())
             want = !ctx->m_player->IsVisualising();
