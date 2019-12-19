@@ -521,7 +521,9 @@ using_frontend {
 
         using_libfftw3 {
             HEADERS += visualisations/videovisualcircles.h
+            HEADERS += visualisations/videovisualmonoscope.h
             SOURCES += visualisations/videovisualcircles.cpp
+            SOURCES += visualisations/videovisualmonoscope.cpp
         }
 
         !win32-msvc* {
