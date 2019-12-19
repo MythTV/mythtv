@@ -2408,18 +2408,9 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     // video params are set properly
     if (m_selectedTrack[kTrackTypeVideo].m_av_stream_index == -1)
     {
-        QString tvformat = gCoreContext->GetSetting("TVFormat").toLower();
-        if (tvformat == "ntsc" || tvformat == "ntsc-jp" ||
-            tvformat == "pal-m" || tvformat == "atsc")
-        {
-            m_fps = 29.97F;
-            m_parent->SetVideoParams(-1, -1, 29.97, 1.0F, false, 16);
-        }
-        else
-        {
-            m_fps = 25.0F;
-            m_parent->SetVideoParams(-1, -1, 25.0, 1.0F, false, 16);
-        }
+        m_fps = 23.97F; // minimum likey display refresh rate
+        // N.B. we know longer need a 'dummy' frame to render overlays into
+        m_parent->SetVideoParams(0, 0, 23.97, 1.0F, false, 0);
     }
 
     if (m_parent->IsErrored())

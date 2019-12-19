@@ -113,15 +113,6 @@ void VideoOutWindow::MoveResize(void)
     m_videoRect = QRect(QPoint(0, 0), m_videoDispDim);
     m_displayVideoRect = m_displayVisibleRect;
 
-
-    // Avoid too small frames for audio only streams (for OSD).
-    if ((m_videoRect.width() <= 0) || (m_videoRect.height() <= 0))
-    {
-        m_videoDispDim = m_displayVisibleRect.size();
-        m_videoDim     = fix_alignment(m_displayVisibleRect.size());
-        m_videoRect    = QRect(QPoint(0, 0), m_videoDim);
-    }
-
     // Apply various modifications
     ApplyDBScaleAndMove();
     ApplyLetterboxing();
