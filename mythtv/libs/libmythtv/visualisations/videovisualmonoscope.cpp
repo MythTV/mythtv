@@ -186,11 +186,9 @@ void VideoVisualMonoScope::Draw(const QRect &Area, MythPainter*, QPaintDevice*)
                                 static_cast<GLfloat>(color.blueF()), 1.0F);
     render->SetShaderProjection(m_shader);
     render->glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
-    render->glEnable(GL_LINE_SMOOTH);
     render->glLineWidth(static_cast<int>(m_area.height() * 0.004f));
     render->glDrawArrays(GL_LINE_STRIP, 0, NUM_SAMPLES);
     render->glLineWidth(1);
-    render->glDisable(GL_LINE_SMOOTH);
     QOpenGLBuffer::release(QOpenGLBuffer::VertexBuffer);
     render->glDisableVertexAttribArray(0);
 
