@@ -493,6 +493,8 @@ void MythPlayer::ReinitVideo(bool ForceUpdate)
 
     if (m_textDisplayMode)
         EnableSubtitles(true);
+
+    AutoVisualise();
 }
 
 static inline QString toQString(FrameScanType scan) {
@@ -2203,6 +2205,8 @@ void MythPlayer::VideoStart(void)
 
     InitAVSync();
     m_videoSync->Start();
+
+    AutoVisualise();
 }
 
 bool MythPlayer::VideoLoop(void)
@@ -5446,6 +5450,21 @@ bool MythPlayer::EnableVisualisation(bool enable, const QString &name)
     if (m_videoOutput)
         return m_videoOutput->EnableVisualisation(&m_audio, enable, name);
     return false;
+}
+
+/*! \brief Enable visualisation if possible, there is no video and user has requested.
+*/
+void MythPlayer::AutoVisualise(void)
+{
+    if (!m_videoOutput || !m_audio.HasAudioIn() || !m_videoDim.isEmpty())
+        return;
+
+    if (!CanVisualise() || IsVisualising())
+        return;
+
+    auto visualiser = gCoreContext->GetSetting("AudioVisualiser", "");
+    if (!visualiser.isEmpty())
+        EnableVisualisation(true, visualiser);
 }
 
 void MythPlayer::SetOSDMessage(const QString &msg, OSDTimeout timeout)

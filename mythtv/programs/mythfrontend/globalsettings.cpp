@@ -38,6 +38,7 @@
 #include "langsettings.h"
 #include "decoders/mythcodeccontext.h"
 #include "mythsorthelper.h"
+#include "visualisations/videovisual.h"
 #ifdef USING_OPENGL
 #include "opengl/mythrenderopengl.h"
 #endif
@@ -1620,6 +1621,19 @@ static HostCheckBoxSetting *EnableMHEGic()
                                     "content over the Internet. This is used "
                                     "for BBC iPlayer."));
     return gc;
+}
+
+static HostComboBoxSetting *Visualiser()
+{
+    auto *combo = new HostComboBoxSetting("AudioVisualiser");
+    combo->setLabel(OSDSettings::tr("Visualiser for audio only playback"));
+    combo->setHelpText(OSDSettings::tr("Select a visualisation to use when there "
+                                       "is no video. Defaults to none."));
+    combo->addSelection("None", "");
+    QStringList visuals = VideoVisual::GetVisualiserList(RenderType::kRenderOpenGL);
+    for (auto visual = visuals.cbegin(); visual != visuals.cend(); ++visual)
+        combo->addSelection(*visual, *visual);
+    return combo;
 }
 
 static HostCheckBoxSetting *PersistentBrowseMode()
@@ -4313,6 +4327,7 @@ OSDSettings::OSDSettings()
 
     addChild(EnableMHEG());
     addChild(EnableMHEGic());
+    addChild(Visualiser());
     addChild(PersistentBrowseMode());
     addChild(BrowseAllTuners());
     addChild(DefaultCCMode());
