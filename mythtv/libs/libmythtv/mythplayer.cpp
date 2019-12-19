@@ -1616,14 +1616,15 @@ void MythPlayer::AVSync(VideoFrame *buffer)
             if (videotimecode == 0)
                 videotimecode = m_audio.GetAudioTime();;
 
-            // minor 'hack' to ensure data only streams work - always ensure
-            // m_rtcBase is set so we don't continually fail the next check
-            m_rtcBase = unow - videotimecode * playspeed1000;
+            // cater for data only streams (i.e. MHEG)
+            bool dataonly = !m_audio.HasAudioIn() && m_videoDim.isEmpty();
 
             // On first frame we get nothing, so exit out.
-            if (videotimecode == 0)
+            // FIXME - does this mean we skip the first frame? Should be avoidable.
+            if (videotimecode == 0 && !dataonly)
                 return;
 
+            m_rtcBase = unow - videotimecode * playspeed1000;
             m_maxTcVal = 0;
             m_maxTcFrames = 0;
             m_numDroppedFrames = 0;
