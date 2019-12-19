@@ -38,7 +38,6 @@
 
 #define LOC QString("VideoWin: ")
 
-static QSize fix_alignment(QSize raw);
 static float fix_aspect(float raw);
 static float snap(float value, float snapto, float diff);
 
@@ -1060,12 +1059,6 @@ void VideoOutWindow::SetPIPState(PIPState Setting)
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("SetPIPState: %1").arg(toString(Setting)));
         m_pipState = Setting;
     }
-}
-
-/// Correct for underalignment
-static QSize fix_alignment(QSize raw)
-{
-    return { (raw.width() + 15) & (~0xf), (raw.height() + 15) & (~0xf) };
 }
 
 static float snap(float value, float snapto, float diff)
