@@ -1516,7 +1516,7 @@ bool MythRenderOpenGL::EnableShaderProgram(QOpenGLShaderProgram* Program)
     return true;
 }
 
-inline void MythRenderOpenGL::SetShaderProjection(QOpenGLShaderProgram *Program)
+void MythRenderOpenGL::SetShaderProjection(QOpenGLShaderProgram *Program)
 {
     if (Program)
     {
