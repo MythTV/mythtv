@@ -25,7 +25,7 @@ class StreamView : public MusicCommon
     ~StreamView(void) = default;
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent *) override; // MusicCommon
+    bool keyPressEvent(QKeyEvent *event) override; // MusicCommon
 
     void addStream(MusicMetadata *mdata);
     void deleteStream(MusicMetadata *mdata);

@@ -66,7 +66,7 @@ class MythSystemLegacyManager : public MThread
             : MThread("SystemManager") {}
         ~MythSystemLegacyManager() { wait(); }
         void run(void) override; // MThread
-        void append(MythSystemLegacyUnix *);
+        void append(MythSystemLegacyUnix *ms);
         void jumpAbort(void);
     private:
         MSMap_t    m_pMap;

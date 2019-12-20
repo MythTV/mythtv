@@ -245,19 +245,19 @@ class DecoderBase
     inline  int  IncrementTrack(uint type);
     inline  int  DecrementTrack(uint type);
     inline  int  ChangeTrack(uint type, int dir);
-    virtual bool InsertTrack(uint type, const StreamInfo&);
+    virtual bool InsertTrack(uint type, const StreamInfo &info);
     inline int   NextTrack(uint type);
 
     virtual int  GetTeletextDecoderType(void) const { return -1; }
 
-    virtual QString GetXDS(const QString&) const { return QString(); }
+    virtual QString GetXDS(const QString &/*key*/) const { return QString(); }
     virtual QByteArray GetSubHeader(uint /*trackNo*/) const { return QByteArray(); }
     virtual void GetAttachmentData(uint /*trackNo*/, QByteArray &/*filename*/,
                                    QByteArray &/*data*/) {}
 
     // MHEG/MHI stuff
-    virtual bool SetAudioByComponentTag(int) { return false; }
-    virtual bool SetVideoByComponentTag(int) { return false; }
+    virtual bool SetAudioByComponentTag(int /*tag*/) { return false; }
+    virtual bool SetVideoByComponentTag(int /*tag*/) { return false; }
 
     void SaveTotalDuration(void);
     void ResetTotalDuration(void) { m_totalDuration = AVRationalInit(0); }

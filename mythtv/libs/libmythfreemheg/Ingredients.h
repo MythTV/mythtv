@@ -59,7 +59,7 @@ class MHIngredient : public MHRoot
         { Destruction(engine); }
 
     // Called by the engine to deliver external content.
-    virtual void ContentArrived(const unsigned char *, int, MHEngine *) { }
+    virtual void ContentArrived(const unsigned char */*data*/, int/*length*/, MHEngine */*engine*/) { }
 
   protected:
     bool    m_fInitiallyActive         {true}; // Default is true

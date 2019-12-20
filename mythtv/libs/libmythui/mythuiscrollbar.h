@@ -25,9 +25,9 @@ class MUI_PUBLIC MythUIScrollBar : public MythUIType
 
     enum LayoutType { LayoutVertical, LayoutHorizontal };
 
-    void SetPageStep(int);
-    void SetSliderPosition(int);
-    void SetMaximum(int);
+    void SetPageStep(int value);
+    void SetSliderPosition(int value);
+    void SetMaximum(int value);
 
   protected slots:
     void DoneFading(void);
@@ -40,7 +40,7 @@ class MUI_PUBLIC MythUIScrollBar : public MythUIType
     void Finalize(void) override; // MythUIType
 
     void CalculatePosition(void);
-    void timerEvent(QTimerEvent *) override; // QObject
+    void timerEvent(QTimerEvent *event) override; // QObject
 
     LayoutType m_layout   {LayoutVertical};
 

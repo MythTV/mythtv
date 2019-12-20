@@ -344,10 +344,10 @@ class MTV_PUBLIC MythPlayer
     // Public MHEG/MHI stream selection
     bool SetAudioByComponentTag(int tag);
     bool SetVideoByComponentTag(int tag);
-    bool SetStream(const QString &);
+    bool SetStream(const QString &stream);
     long GetStreamPos(); // mS
     long GetStreamMaxPos(); // mS
-    long SetStreamPos(long); // mS
+    long SetStreamPos(long ms); // mS
     void StreamPlay(bool play = true);
 
     // LiveTV public stuff
@@ -418,7 +418,7 @@ class MTV_PUBLIC MythPlayer
     bool RemovePIPPlayer(MythPlayer *pip);
     void NextScanType(void)
         { SetScanType((FrameScanType)(((int)m_scan + 1) & 0x3)); }
-    void SetScanType(FrameScanType);
+    void SetScanType(FrameScanType scan);
     FrameScanType GetScanType(void) const { return m_scan; }
     bool IsScanTypeLocked(void) const { return m_scanLocked; }
     void Zoom(ZoomDirection direction);
@@ -555,7 +555,7 @@ class MTV_PUBLIC MythPlayer
     bool ToggleCaptions(void);
     bool ToggleCaptions(uint type);
     bool HasTextSubtitles(void)        { return m_subReader.HasTextSubtitles(); }
-    void SetCaptionsEnabled(bool, bool osd_msg=true);
+    void SetCaptionsEnabled(bool enable, bool osd_msg=true);
     bool GetCaptionsEnabled(void);
     virtual void DisableCaptions(uint mode, bool osd_msg=true);
     virtual void EnableCaptions(uint mode, bool osd_msg=true);
@@ -619,7 +619,7 @@ class MTV_PUBLIC MythPlayer
 
     virtual bool DecoderGetFrameFFREW(void);
     virtual bool DecoderGetFrameREW(void);
-    bool         DecoderGetFrame(DecodeType, bool unsafe = false);
+    bool         DecoderGetFrame(DecodeType decodetype, bool unsafe = false);
     bool         DoGetFrame(DecodeType DecodeType);
 
     // These actually execute commands requested by public members
@@ -655,7 +655,7 @@ class MTV_PUBLIC MythPlayer
     // Private LiveTV stuff
     void  SwitchToProgram(void);
     void  JumpToProgram(void);
-    void  JumpToStream(const QString&);
+    void  JumpToStream(const QString &stream);
 
   protected:
     PlayerFlags      m_playerFlags;

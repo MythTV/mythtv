@@ -194,7 +194,7 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
                                   ResolveType type = ResolveAny,
                                   bool keepscope = false);
     static QString resolveAddress(const QString &host,
-                                  ResolveType = ResolveAny,
+                                  ResolveType type = ResolveAny,
                                   bool keepscope = false) ;
     bool CheckSubnet(const QAbstractSocket *socket);
     bool CheckSubnet(const QHostAddress &peer);

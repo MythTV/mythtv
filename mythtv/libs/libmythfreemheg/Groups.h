@@ -57,7 +57,7 @@ class MHGroup : public MHRoot
     MHRoot *FindByObjectNo(int n) override; // MHRoot
 
     // Actions.
-    void SetTimer(int nTimerId, bool fAbsolute, int nMilliSecs, MHEngine *) override; // MHRoot
+    void SetTimer(int nTimerId, bool fAbsolute, int nMilliSecs, MHEngine *engine) override; // MHRoot
     // This isn't an MHEG action as such but is used as part of the implementation of "Clone"
     void MakeClone(MHRoot *pTarget, MHRoot *pRef, MHEngine *engine) override; // MHRoot
 

@@ -88,7 +88,7 @@ class MTV_PUBLIC AudioPlayer
     bool      IsMuted(void) { return GetMuteState() == kMuteAll; }
     bool      SetMuted(bool mute);
     MuteState GetMuteState(void);
-    MuteState SetMuteState(MuteState);
+    MuteState SetMuteState(MuteState mstate);
     MuteState IncrMuteState(void);
 
     void AddAudioData(char *buffer, int len, int64_t timecode, int frames);

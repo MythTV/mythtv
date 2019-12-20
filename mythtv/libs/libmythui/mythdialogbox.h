@@ -105,7 +105,7 @@ class MUI_PUBLIC MythMenu
 
   private:
     void Init(void) {}
-    void AddItem(MythMenuItem *, bool selected, MythMenu *subMenu);
+    void AddItem(MythMenuItem *item, bool selected, MythMenu *subMenu);
 
     MythMenu *m_parentMenu   {nullptr};
     QString   m_title;
@@ -229,7 +229,7 @@ class MUI_PUBLIC MythConfirmationDialog : public MythScreenType
      void haveResult(bool);
 
   private:
-    void sendResult(bool);
+    void sendResult(bool ok);
     MythUIText *m_messageText {nullptr};
     QString     m_message;
     bool        m_showCancel  {true};

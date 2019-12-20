@@ -89,19 +89,19 @@ class MTV_PUBLIC PreviewGeneratorQueue : public QObject, public MThread
     {
         GetPreviewImage(pginfo, QSize(0,0), "", -1, true, token);
     }
-    static void GetPreviewImage(const ProgramInfo&, const QSize&,
+    static void GetPreviewImage(const ProgramInfo &pginfo, const QSize &outputsize,
                                 const QString &outputfile,
                                 long long time, bool in_seconds,
                                 const QString& token);
-    static void AddListener(QObject*);
-    static void RemoveListener(QObject*);
+    static void AddListener(QObject *listener);
+    static void RemoveListener(QObject *listener);
 
   private:
     PreviewGeneratorQueue(PreviewGenerator::Mode mode,
                           uint maxAttempts, uint minBlockSeconds);
     ~PreviewGeneratorQueue();
 
-    QString GeneratePreviewImage(ProgramInfo &pginfo, const QSize&,
+    QString GeneratePreviewImage(ProgramInfo &pginfo, const QSize &size,
                                  const QString &outputfile,
                                  long long time, bool in_seconds,
                                  const QString& token);

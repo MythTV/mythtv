@@ -27,19 +27,19 @@ class IPTVChannel : QObject, public DTVChannel
     friend class IPTVRecorder;
 
   public:
-    IPTVChannel(TVRec*, QString);
+    IPTVChannel(TVRec *rec, QString videodev);
     ~IPTVChannel();
 
     // Commands
     bool Open(void) override; // ChannelBase
 
     using DTVChannel::Tune;
-    bool Tune(const IPTVTuningData&, bool scanning) override ; // DTVChannel
-    bool Tune(const DTVMultiplex&) override // DTVChannel
+    bool Tune(const IPTVTuningData &tuning, bool scanning) override ; // DTVChannel
+    bool Tune(const DTVMultiplex &/*tuning*/) override // DTVChannel
         { return false; }
 
     // Sets
-    void SetStreamData(MPEGStreamData*);
+    void SetStreamData(MPEGStreamData *sd);
 
     // Gets
     bool IsOpen(void) const override; // ChannelBase

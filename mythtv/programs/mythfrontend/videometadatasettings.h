@@ -20,7 +20,7 @@ class MetadataSettings : public MythScreenType
     ~MetadataSettings() = default;
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
   private:
     MythUISpinBox      *m_trailerSpin         {nullptr};

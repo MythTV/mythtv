@@ -18,7 +18,7 @@ class IPTVChannel;
 class IPTVRecorder : public DTVRecorder
 {
   public:
-    IPTVRecorder(TVRec*, IPTVChannel*);
+    IPTVRecorder(TVRec *rec, IPTVChannel *channel);
     ~IPTVRecorder();
 
     bool Open(void);
@@ -26,7 +26,7 @@ class IPTVRecorder : public DTVRecorder
     bool IsOpen(void) const;
     void StartNewFile(void) override; // RecorderBase
 
-    void SetStreamData(MPEGStreamData*) override; // DTVRecorder
+    void SetStreamData(MPEGStreamData *data) override; // DTVRecorder
     bool PauseAndWait(int timeout = 100) override; // RecorderBase
 
     void run(void) override; // RecorderBase

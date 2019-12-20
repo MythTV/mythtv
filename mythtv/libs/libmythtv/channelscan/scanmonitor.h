@@ -53,7 +53,7 @@ class ScanMonitor :
     explicit ScanMonitor(ChannelScanner *cs) : m_channelScanner(cs) { }
     virtual void deleteLater(void);
 
-    void customEvent(QEvent*) override; // QObject
+    void customEvent(QEvent *event) override; // QObject
 
     // Values from 1-100 of scan completion
     void ScanPercentComplete(int pct);
@@ -65,15 +65,15 @@ class ScanMonitor :
 
     // SignalMonitorListener
     void AllGood(void) override { } // SignalMonitorListener
-    void StatusSignalLock(const SignalMonitorValue&) override; // SignalMonitorListener
-    void StatusChannelTuned(const SignalMonitorValue&) override; // SignalMonitorListener
-    void StatusSignalStrength(const SignalMonitorValue&) override; // SignalMonitorListener
+    void StatusSignalLock(const SignalMonitorValue &val) override; // SignalMonitorListener
+    void StatusChannelTuned(const SignalMonitorValue &val) override; // SignalMonitorListener
+    void StatusSignalStrength(const SignalMonitorValue &val) override; // SignalMonitorListener
 
     // DVBSignalMonitorListener
-    void StatusSignalToNoise(const SignalMonitorValue&) override; // DVBSignalMonitorListener
-    void StatusBitErrorRate(const SignalMonitorValue&) override { } // DVBSignalMonitorListener
-    void StatusUncorrectedBlocks(const SignalMonitorValue&) override { } // DVBSignalMonitorListener
-    void StatusRotorPosition(const SignalMonitorValue&) override; // DVBSignalMonitorListener
+    void StatusSignalToNoise(const SignalMonitorValue &val) override; // DVBSignalMonitorListener
+    void StatusBitErrorRate(const SignalMonitorValue &/*val*/) override { } // DVBSignalMonitorListener
+    void StatusUncorrectedBlocks(const SignalMonitorValue &/*val*/) override { } // DVBSignalMonitorListener
+    void StatusRotorPosition(const SignalMonitorValue &val) override; // DVBSignalMonitorListener
 
   private:
     ~ScanMonitor() = default;

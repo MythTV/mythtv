@@ -51,7 +51,7 @@ class UPNP_PUBLIC SSDPCacheEntries : public ReferenceCounter
 
     DeviceLocation *GetFirst(void);
 
-    void GetEntryMap(EntryMap&);
+    void GetEntryMap(EntryMap &map);
 
     QTextStream &OutputXML(QTextStream &os, uint *pnEntryCount = nullptr) const;
     void Dump(uint &nEntryCount) const;

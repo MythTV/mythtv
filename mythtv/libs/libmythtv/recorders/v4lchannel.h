@@ -65,9 +65,9 @@ class V4LChannel : public DTVChannel
 
     // Picture attributes.
     bool InitPictureAttributes(void) override; // ChannelBase
-    int  GetPictureAttribute(PictureAttribute) const override; // ChannelBase
-    int  ChangePictureAttribute(PictureAdjustType,
-                                PictureAttribute, bool up) override; // ChannelBase
+    int  GetPictureAttribute(PictureAttribute attr) const override; // ChannelBase
+    int  ChangePictureAttribute(PictureAdjustType type,
+                                PictureAttribute attr, bool up) override; // ChannelBase
 
   protected:
     bool IsExternalChannelChangeSupported(void) override // ChannelBase

@@ -35,7 +35,7 @@ class MTV_PUBLIC RecordingQuality
     RecordingQuality(const RecordingInfo *ri,
                      RecordingGaps rg);
     RecordingQuality(
-        const RecordingInfo*, RecordingGaps,
+        const RecordingInfo *ri, RecordingGaps rg,
         const QDateTime &firstData, const QDateTime &latestData);
 
     void AddTSStatistics(int continuity_error_count, int packet_count);

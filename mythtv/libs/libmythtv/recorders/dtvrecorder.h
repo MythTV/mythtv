@@ -43,7 +43,7 @@ class DTVRecorder :
     void SetOption(const QString &name, int value) override; // RecorderBase
     void SetOptionsFromProfile(
         RecordingProfile *profile, const QString &videodev,
-        const QString&, const QString&) override; // RecorderBase
+        const QString &audiodev, const QString &vbidev) override; // RecorderBase
 
     bool IsErrored(void) override // RecorderBase
         { return !m_error.isEmpty(); }
@@ -61,12 +61,12 @@ class DTVRecorder :
 
     void Reset(void) override; // RecorderBase
     void ClearStatistics(void) override; // RecorderBase
-    RecordingQuality *GetRecordingQuality(const RecordingInfo*) const override; // RecorderBase
+    RecordingQuality *GetRecordingQuality(const RecordingInfo *r) const override; // RecorderBase
 
     // MPEG Stream Listener
-    void HandlePAT(const ProgramAssociationTable*) override; // MPEGStreamListener
-    void HandleCAT(const ConditionalAccessTable*) override {} // MPEGStreamListener
-    void HandlePMT(uint progNum, const ProgramMapTable*) override; // MPEGStreamListener
+    void HandlePAT(const ProgramAssociationTable *_pat) override; // MPEGStreamListener
+    void HandleCAT(const ConditionalAccessTable */*cat*/) override {} // MPEGStreamListener
+    void HandlePMT(uint progNum, const ProgramMapTable *_pmt) override; // MPEGStreamListener
     void HandleEncryptionStatus(uint /*pnum*/, bool /*encrypted*/) override { } // MPEGStreamListener
 
     // MPEG Single Program Stream Listener
@@ -74,14 +74,14 @@ class DTVRecorder :
     void HandleSingleProgramPMT(ProgramMapTable *pmt, bool insert) override; // MPEGSingleProgramStreamListener
 
     // ATSC Main
-    void HandleSTT(const SystemTimeTable*) override { UpdateCAMTimeOffset(); } // ATSCMainStreamListener
-    void HandleVCT(uint /*tsid*/, const VirtualChannelTable*) override {} // ATSCMainStreamListener
-    void HandleMGT(const MasterGuideTable*) override {} // ATSCMainStreamListener
+    void HandleSTT(const SystemTimeTable */*stt*/) override { UpdateCAMTimeOffset(); } // ATSCMainStreamListener
+    void HandleVCT(uint /*tsid*/, const VirtualChannelTable */*vct*/) override {} // ATSCMainStreamListener
+    void HandleMGT(const MasterGuideTable */*mgt*/) override {} // ATSCMainStreamListener
 
     // DVBMainStreamListener
-    void HandleTDT(const TimeDateTable*) override { UpdateCAMTimeOffset(); } // DVBMainStreamListener
-    void HandleNIT(const NetworkInformationTable*) override {} // DVBMainStreamListener
-    void HandleSDT(uint /*tsid*/, const ServiceDescriptionTable*) override {} // DVBMainStreamListener
+    void HandleTDT(const TimeDateTable */*tdt*/) override { UpdateCAMTimeOffset(); } // DVBMainStreamListener
+    void HandleNIT(const NetworkInformationTable */*nit*/) override {} // DVBMainStreamListener
+    void HandleSDT(uint /*tsid*/, const ServiceDescriptionTable */*sdt*/) override {} // DVBMainStreamListener
 
     // TSPacketListener
     bool ProcessTSPacket(const TSPacket &tspacket) override; // TSPacketListener
@@ -124,7 +124,7 @@ class DTVRecorder :
     inline bool CheckCC(uint pid, uint cc);
 
     virtual QString GetSIStandard(void) const { return "mpeg"; }
-    virtual void SetCAMPMT(const ProgramMapTable*) {}
+    virtual void SetCAMPMT(const ProgramMapTable */*pmt*/) {}
     virtual void UpdateCAMTimeOffset(void) {}
 
     // file handle for stream

@@ -46,7 +46,7 @@ class VideoSync
 // virtual base class
 {
   public:
-    VideoSync(MythVideoOutput*, int refreshint);
+    VideoSync(MythVideoOutput *video_output, int refreshint);
     virtual ~VideoSync() = default;
 
     /// \brief Returns name of instanciated VSync method.
@@ -89,7 +89,7 @@ class VideoSync
     virtual void Stop(void) {}
 
     // documented in vsync.cpp
-    static VideoSync *BestMethod(MythVideoOutput *, uint refresh_interval);
+    static VideoSync *BestMethod(MythVideoOutput *video_output, uint refresh_interval);
 
   protected:
     static int64_t GetTime(void);
@@ -113,7 +113,7 @@ class VideoSync
 class DRMVideoSync : public VideoSync
 {
   public:
-    DRMVideoSync(MythVideoOutput *, int refresh_interval);
+    DRMVideoSync(MythVideoOutput *vo, int refresh_interval);
     ~DRMVideoSync();
 
     QString getName(void) const override // VideoSync
@@ -143,7 +143,7 @@ class DRMVideoSync : public VideoSync
 class RTCVideoSync : public VideoSync
 {
   public:
-    RTCVideoSync(MythVideoOutput *, int refresh_interval);
+    RTCVideoSync(MythVideoOutput *vo, int refresh_interval);
     ~RTCVideoSync();
 
     QString getName(void) const override // VideoSync

@@ -12,7 +12,7 @@ class BackendConnectionManager : public QObject
     BackendConnectionManager();
     ~BackendConnectionManager();
 
-    void customEvent(QEvent*) override; // QObject
+    void customEvent(QEvent *event) override; // QObject
 
   protected slots:
     void ReconnectToBackend(void);

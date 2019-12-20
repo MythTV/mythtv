@@ -50,10 +50,10 @@ class MHStream : public MHPresentable
     void StopPlaying(MHEngine *engine) override; // MHPresentable
 
     // Actions
-    void GetCounterPosition(MHRoot *, MHEngine *) override; // MHRoot
-    void GetCounterMaxPosition(MHRoot *, MHEngine *) override; // MHRoot
-    void SetCounterPosition(int /*pos*/, MHEngine *) override; // MHRoot
-    void SetSpeed(int, MHEngine *engine) override; // MHRoot
+    void GetCounterPosition(MHRoot *pResult, MHEngine *engine) override; // MHRoot
+    void GetCounterMaxPosition(MHRoot *pResult, MHEngine *engine) override; // MHRoot
+    void SetCounterPosition(int /*pos*/, MHEngine *engine) override; // MHRoot
+    void SetSpeed(int speed, MHEngine *engine) override; // MHRoot
 
   protected:
     MHOwnPtrSequence <MHPresentable> m_Multiplex;
@@ -99,15 +99,15 @@ class MHVideo : public MHVisible
     void Activation(MHEngine *engine) override; // MHVisible
     void Deactivation(MHEngine *engine) override; // MHVisible
 
-    void Display(MHEngine *) override; // MHVisible
+    void Display(MHEngine *engine) override; // MHVisible
     QRegion GetVisibleArea() override; // MHVisible
     QRegion GetOpaqueArea() override // MHVisible
         { return GetVisibleArea(); } // Fully opaque.
 
     // Actions.
-    void ScaleVideo(int xScale, int yScale, MHEngine *) override; // MHRoot
-    void SetVideoDecodeOffset(int newXOffset, int newYOffset, MHEngine *) override; // MHRoot
-    void GetVideoDecodeOffset(MHRoot *pXOffset, MHRoot *pYOffset, MHEngine *) override; // MHRoot
+    void ScaleVideo(int xScale, int yScale, MHEngine *engine) override; // MHRoot
+    void SetVideoDecodeOffset(int newXOffset, int newYOffset, MHEngine *engine) override; // MHRoot
+    void GetVideoDecodeOffset(MHRoot *pXOffset, MHRoot *pYOffset, MHEngine *engine) override; // MHRoot
 
     void BeginPlaying(MHEngine *engine) override; // MHPresentable
     void StopPlaying(MHEngine *engine) override; // MHPresentable
@@ -134,7 +134,7 @@ class MHRTGraphics : public MHVisible
     virtual ~MHRTGraphics() = default;
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHVisible
     void PrintMe(FILE *fd, int nTabs) const override; // MHVisible
-    void Display(MHEngine *) override {} // MHVisible - Not supported
+    void Display(MHEngine */*engine*/) override {} // MHVisible - Not supported
 };
 
 
@@ -210,7 +210,7 @@ public:
         Target(engine)->SetSpeed(m_Argument.GetValue(engine), engine);
     }
 protected:
-    void PrintArgs(FILE *fd, int) const override // MHElemAction
+    void PrintArgs(FILE *fd, int /*nTabs*/) const override // MHElemAction
         { m_Argument.PrintMe(fd, 0); }
     MHGenericInteger m_Argument;
 };

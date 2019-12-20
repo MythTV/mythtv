@@ -117,13 +117,13 @@ class UPNP_PUBLIC HttpServer : public ServerPool
     HttpServer();
     virtual ~HttpServer();
 
-    void RegisterExtension(HttpServerExtension*);
-    void UnregisterExtension(HttpServerExtension*);
-    void DelegateRequest(HTTPRequest*);
+    void RegisterExtension(HttpServerExtension *pExtension);
+    void UnregisterExtension(HttpServerExtension *pExtension);
+    void DelegateRequest(HTTPRequest *pRequest);
     /**
      * \brief Get the idle socket timeout value for the relevant extension
      */
-    uint GetSocketTimeout(HTTPRequest*) const;
+    uint GetSocketTimeout(HTTPRequest *pRequest) const;
 
     QString GetSharePath(void) const
     { // never modified after creation, so no need to lock

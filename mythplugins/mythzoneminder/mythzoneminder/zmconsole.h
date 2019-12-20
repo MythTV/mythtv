@@ -62,7 +62,7 @@ class ZMConsole : public MythScreenType
     ~ZMConsole();
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
   private slots:
     void updateTime();

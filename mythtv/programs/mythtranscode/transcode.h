@@ -42,7 +42,7 @@ class Transcode : public QObject
     bool GetProfile(const QString& profileName, const QString& encodingType, int height,
                     int frameRate);
     void ReencoderAddKFA(long curframe, long lastkey, long num_keyframes);
-    void SetPlayerContext(PlayerContext*);
+    void SetPlayerContext(PlayerContext* player_ctx);
     PlayerContext *GetPlayerContext(void) { return m_ctx; }
     MythPlayer *GetPlayer(void) { return (m_ctx) ? m_ctx->m_player : nullptr; }
 

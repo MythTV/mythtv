@@ -249,8 +249,8 @@ class WebSocketWorker : public QObject
     bool SendBinary(const QByteArray &data);
 
   protected:
-    bool ProcessHandshake(QTcpSocket *); /// Returns false if an error occurs
-    void ProcessFrames(QTcpSocket *); /// Returns false if an error occurs
+    bool ProcessHandshake(QTcpSocket *socket); /// Returns false if an error occurs
+    void ProcessFrames(QTcpSocket *socket); /// Returns false if an error occurs
 
     void HandleControlFrame(const WebSocketFrame &frame);
     void HandleDataFrame(const WebSocketFrame &frame);

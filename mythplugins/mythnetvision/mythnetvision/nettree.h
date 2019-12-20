@@ -47,7 +47,7 @@ class NetTree : public NetBase
     ~NetTree();
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
   protected:
     ResultItem *GetStreamItem() override; // NetBase

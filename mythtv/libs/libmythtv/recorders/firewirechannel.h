@@ -26,7 +26,7 @@ class FirewireChannel : public DTVChannel
     void Close(void) override; // ChannelBase
 
     using DTVChannel::Tune;
-    bool Tune(const DTVMultiplex&) override // DTVChannel
+    bool Tune(const DTVMultiplex &/*tuning*/) override // DTVChannel
         { return false; }
     bool Tune(const QString &freqid, int finetune) override; // DTVChannel
     bool Retune(void) override; // ChannelBase

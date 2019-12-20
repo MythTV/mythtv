@@ -65,7 +65,7 @@ public:
 
     //! Encode original & current orientation to a single Db field
     int Composite() { return m_current * 10 + m_file; }
-    int Transform(int);
+    int Transform(int transform);
     int GetCurrent(bool compensate);
     QString Description();
 
@@ -74,7 +74,7 @@ public:
 private:
     static QString AsText(int orientation);
 
-    int Apply(int);
+    int Apply(int transform);
 
     using Matrix = QHash<int, QHash<int, int> >;
 

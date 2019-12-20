@@ -59,7 +59,7 @@ class GameHandler : public QObject
   public:
     GameHandler() : QObject() {}
 
-    static void updateSettings(GameHandler*);
+    static void updateSettings(GameHandler *handler);
     static GameHandler *getHandler(uint i);
     static GameHandler *newHandler(QString name);
     static uint count(void);
@@ -80,9 +80,9 @@ class GameHandler : public QObject
     void buildFileList(const QString& directory, GameHandler *handler,
                        int* filecount);
 
-    void processGames(GameHandler *);
+    void processGames(GameHandler *handler);
     static void processAllGames(void);
-    static void registerHandler(GameHandler *);
+    static void registerHandler(GameHandler *handler);
     static void Launchgame(RomInfo *romdata, const QString& systemname);
     static void EditSettings(RomInfo *romdata);
     static void EditSystemSettings(RomInfo *romdata);

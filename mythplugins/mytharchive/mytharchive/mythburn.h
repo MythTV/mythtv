@@ -60,7 +60,7 @@ class MythBurn : public MythScreenType
     ~MythBurn(void);
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
     void createConfigFile(const QString &filename);
 

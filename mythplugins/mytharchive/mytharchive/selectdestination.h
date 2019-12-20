@@ -28,7 +28,7 @@ class SelectDestination : public MythScreenType
     ~SelectDestination(void);
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
   public slots:
 

@@ -99,8 +99,8 @@ public:
     virtual ~OutputListeners() = default;
 
     bool hasVisual(void) { return m_visuals.size(); }
-    void addVisual(MythTV::Visual *);
-    void removeVisual(MythTV::Visual *);
+    void addVisual(MythTV::Visual *v);
+    void removeVisual(MythTV::Visual *v);
 
     QMutex *mutex() { return &m_mtx; }
 

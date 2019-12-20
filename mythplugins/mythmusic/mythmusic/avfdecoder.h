@@ -17,12 +17,12 @@ class avfDecoder : public QObject, public Decoder
   Q_OBJECT
 
   public:
-    avfDecoder(const QString &file, DecoderFactory *, AudioOutput *);
+    avfDecoder(const QString &file, DecoderFactory *d, AudioOutput *o);
     virtual ~avfDecoder(void);
 
     bool initialize() override; // Decoder
     double lengthInSeconds();
-    void seek(double) override; // Decoder
+    void seek(double pos) override; // Decoder
     void stop() override; // Decoder
 
   protected slots:

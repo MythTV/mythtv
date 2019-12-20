@@ -51,12 +51,12 @@ class EditMetadataDialog : public MythScreenType
     void SetYear();
     void SetUserRating();
     void SetLength();
-    void SetCategory(MythUIButtonListItem*);
+    void SetCategory(MythUIButtonListItem *item);
     void SetPlayer();
     void SetSeason();
     void SetEpisode();
-    void SetLevel(MythUIButtonListItem*);
-    void SetChild(MythUIButtonListItem*);
+    void SetLevel(MythUIButtonListItem *item);
+    void SetChild(MythUIButtonListItem *item);
     void ToggleBrowse();
     void ToggleWatched();
     void FindCoverArt();

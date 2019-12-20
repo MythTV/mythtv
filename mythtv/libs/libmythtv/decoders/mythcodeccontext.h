@@ -71,16 +71,16 @@ class MTV_PUBLIC MythCodecContext
 
     virtual void   InitVideoCodec          (AVCodecContext *Context,
                                             bool SelectedStream, bool &DirectRendering);
-    virtual int    HwDecoderInit           (AVCodecContext*) { return 0; }
-    virtual bool   RetrieveFrame           (AVCodecContext*, VideoFrame*, AVFrame*) { return false; }
+    virtual int    HwDecoderInit           (AVCodecContext */*Context*/) { return 0; }
+    virtual bool   RetrieveFrame           (AVCodecContext */*Context*/, VideoFrame */*Frame*/, AVFrame */*AvFrame*/) { return false; }
     virtual int    FilteredReceiveFrame    (AVCodecContext *Context, AVFrame *Frame);
-    virtual void   SetDeinterlacing        (AVCodecContext*, VideoDisplayProfile*, bool) {}
-    virtual void   PostProcessFrame        (AVCodecContext*, VideoFrame*) {}
-    virtual bool   IsDeinterlacing         (bool &, bool = false) { return false; }
-    virtual void   SetDecoderOptions       (AVCodecContext*, AVCodec*) { return; }
+    virtual void   SetDeinterlacing        (AVCodecContext */*Context*/, VideoDisplayProfile */*Profile*/, bool /*DoubleRate*/) {}
+    virtual void   PostProcessFrame        (AVCodecContext */*Context*/, VideoFrame */*Frame*/) {}
+    virtual bool   IsDeinterlacing         (bool &/*DoubleRate*/, bool /*StreamChange*/ = false) { return false; }
+    virtual void   SetDecoderOptions       (AVCodecContext */*Context*/, AVCodec */*Codec*/) { return; }
     virtual bool   DecoderWillResetOnFlush (void) { return false; }
     virtual bool   DecoderWillResetOnAspect(void) { return false; }
-    virtual bool   DecoderNeedsReset       (AVCodecContext*) { return m_resetRequired; }
+    virtual bool   DecoderNeedsReset       (AVCodecContext */*Context*/) { return m_resetRequired; }
 
   protected:
     virtual bool   RetrieveHWFrame         (VideoFrame* Frame, AVFrame* AvFrame);

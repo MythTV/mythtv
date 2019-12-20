@@ -122,7 +122,7 @@ class ScanOptionalConfig : public GroupSetting
     QString GetFrequencyStandard(void)       const;
     QString GetModulation(void)              const;
     QString GetFrequencyTable(void)          const;
-    bool    GetFrequencyTableRange(QString&,QString&) const;
+    bool    GetFrequencyTableRange(QString &start, QString &end) const;
     bool    DoIgnoreSignalTimeout(void)      const;
     bool    DoFollowNIT(void)                const;
     QString GetFilename(void)                const;
@@ -132,7 +132,7 @@ class ScanOptionalConfig : public GroupSetting
     void    SetTuningPaneValues(uint frequency, const DTVMultiplex &mpx);
 
   public slots:
-    void SetSourceID(const QString&);
+    void SetSourceID(const QString &sourceid);
 
   private:
     ScanTypeSetting        *m_scanType                 {nullptr};

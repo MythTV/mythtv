@@ -162,7 +162,7 @@ class RecordingProfileEditor :
 
   public slots:
     void ShowNewProfileDialog();
-    void CreateNewProfile(const QString&);
+    void CreateNewProfile(const QString &profName);
 
   protected:
     int             m_group;

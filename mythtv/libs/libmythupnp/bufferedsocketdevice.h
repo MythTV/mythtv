@@ -76,7 +76,7 @@ class BufferedSocketDevice
         void                Flush               ();
         qint64              Size                ();
         static qint64       At                  () ; 
-        bool                At                  ( qlonglong );
+        bool                At                  ( qlonglong index );
         bool                AtEnd               ();
 
         qulonglong          BytesAvailable      (); 
@@ -95,8 +95,8 @@ class BufferedSocketDevice
                                                   qulonglong len );
 
         int                 Getch               ();
-        int                 Putch               ( int );
-        int                 Ungetch             (int);
+        int                 Putch               ( int ch );
+        int                 Ungetch             ( int ch );
 
         bool                CanReadLine         ();
         QString             ReadLine            ();
@@ -109,7 +109,7 @@ class BufferedSocketDevice
         QHostAddress        Address             () const;
         QHostAddress        PeerAddress         () const;
 
-        void                SetReadBufferSize   ( qulonglong );
+        void                SetReadBufferSize   ( qulonglong bufSize );
         qulonglong             ReadBufferSize      () const;
 
         bool                IsValid             () { return( ( m_pSocket ) ? m_pSocket->isValid() : false ); }

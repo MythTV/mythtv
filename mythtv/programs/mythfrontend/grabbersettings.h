@@ -21,7 +21,7 @@ class GrabberSettings : public MythScreenType
     ~GrabberSettings() = default;
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
   private:
     void Load(void) override; // MythScreenType

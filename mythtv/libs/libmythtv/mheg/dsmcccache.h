@@ -51,8 +51,8 @@ class DSMCCCacheReference
     DSMCCCacheKey  m_key;
 
     // Operator required for QMap
-    friend bool operator < (const DSMCCCacheReference&,
-                            const DSMCCCacheReference&);
+    friend bool operator < (const DSMCCCacheReference &ref1,
+                            const DSMCCCacheReference &ref2);
 };
 
 // A directory
@@ -83,7 +83,7 @@ class DSMCCCacheFile
 class DSMCCCache
 {
   public:
-    explicit DSMCCCache(Dsmcc *);
+    explicit DSMCCCache(Dsmcc *dsmcc);
     ~DSMCCCache();
 
     // Create a new gateway.
@@ -91,9 +91,9 @@ class DSMCCCache
     // Create a new directory.
     DSMCCCacheDir *Directory(const DSMCCCacheReference &ref);
     // Add a file to the directory or gateway.
-    static void AddFileInfo(DSMCCCacheDir *dir, const BiopBinding *);
+    static void AddFileInfo(DSMCCCacheDir *dir, const BiopBinding *pBB);
     // Add a directory to the directory or gateway.
-    static void AddDirInfo(DSMCCCacheDir *dir, const BiopBinding *);
+    static void AddDirInfo(DSMCCCacheDir *dir, const BiopBinding *pBB);
 
     // Add the contents of a file.
     void CacheFileData(const DSMCCCacheReference &ref, const QByteArray &data);

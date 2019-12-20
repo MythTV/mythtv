@@ -18,8 +18,8 @@ class MediaMonitorUnix : public MediaMonitor
 #if CONFIG_QTDBUS
     Q_OBJECT
   public slots:
-    Q_NOREPLY void deviceAdded(const QDBusObjectPath&);
-    Q_NOREPLY void deviceRemoved(const QDBusObjectPath&);
+    Q_NOREPLY void deviceAdded(const QDBusObjectPath& o);
+    Q_NOREPLY void deviceRemoved(const QDBusObjectPath& o);
 #endif
 
   public:

@@ -32,8 +32,8 @@ class LinuxFirewireDevice : public FirewireDevice, public QRunnable
     bool ClosePort(void) override; // FirewireDevice
     bool ResetBus(void) override; // FirewireDevice
 
-    void AddListener(TSDataListener*) override; // FirewireDevice
-    void RemoveListener(TSDataListener*) override; // FirewireDevice
+    void AddListener(TSDataListener *listener) override; // FirewireDevice
+    void RemoveListener(TSDataListener *listener) override; // FirewireDevice
 
     // Gets
     bool IsPortOpen(void) const override; // FirewireDevice

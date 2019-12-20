@@ -21,7 +21,7 @@ class DVBChannel;
 class DVBRecorder : public DTVRecorder
 {
   public:
-    DVBRecorder(TVRec*, DVBChannel*);
+    DVBRecorder(TVRec *rec, DVBChannel *channel);
 
     void run(void) override; // RecorderBase
 
@@ -34,7 +34,7 @@ class DVBRecorder : public DTVRecorder
     bool PauseAndWait(int timeout = 100) override; // RecorderBase
 
     QString GetSIStandard(void) const override; // DTVRecorder
-    void SetCAMPMT(const ProgramMapTable*) override; // DTVRecorder
+    void SetCAMPMT(const ProgramMapTable *pmt) override; // DTVRecorder
     void UpdateCAMTimeOffset(void) override; // DTVRecorder
 
   private:

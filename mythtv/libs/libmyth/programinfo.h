@@ -331,7 +331,7 @@ class MPUBLIC ProgramInfo
     QString MakeUniqueKey(void) const
         { return MakeUniqueKey(m_chanId, m_recStartTs); }
     uint GetSecondsInRecording(void) const;
-    QString ChannelText(const QString&) const;
+    QString ChannelText(const QString& format) const;
     QString GetPathname(void) const { return m_pathname; }
     QString GetBasename(void) const { return m_pathname.section('/', -1); }
     bool IsVideoFile(void) const
@@ -503,7 +503,7 @@ class MPUBLIC ProgramInfo
     void SetSubtitle(const QString &st, const QString &sst = nullptr);
     void SetProgramInfoType(ProgramInfoType t)
         { m_programFlags &= ~FL_TYPEMASK; m_programFlags |= ((uint32_t)t<<20); }
-    void SetPathname(const QString&);
+    void SetPathname(const QString& pn);
     void SetChanID(uint _chanid)                  { m_chanId       = _chanid; }
     void SetScheduledStartTime(const QDateTime &dt) { m_startTs      = dt;    }
     void SetScheduledEndTime(  const QDateTime &dt) { m_endTs        = dt;    }
@@ -632,34 +632,34 @@ class MPUBLIC ProgramInfo
     ProgramInfoType DiscoverProgramInfoType(void) const;
 
     // Edit flagging map
-    bool QueryCutList(frm_dir_map_t &, bool loadAutosave=false) const;
-    void SaveCutList(frm_dir_map_t &, bool isAutoSave=false) const;
+    bool QueryCutList(frm_dir_map_t &delMap, bool loadAutosave=false) const;
+    void SaveCutList(frm_dir_map_t &delMap, bool isAutoSave=false) const;
 
     // Commercial flagging map
-    void QueryCommBreakList(frm_dir_map_t &) const;
-    void SaveCommBreakList(frm_dir_map_t &) const;
+    void QueryCommBreakList(frm_dir_map_t &frames) const;
+    void SaveCommBreakList(frm_dir_map_t &frames) const;
 
     // Keyframe positions map
-    void QueryPositionMap(frm_pos_map_t &, MarkTypes type) const;
+    void QueryPositionMap(frm_pos_map_t &posMap, MarkTypes type) const;
     void ClearPositionMap(MarkTypes type) const;
-    void SavePositionMap(frm_pos_map_t &, MarkTypes type,
+    void SavePositionMap(frm_pos_map_t &posMap, MarkTypes type,
                          int64_t min_frame = -1, int64_t max_frame = -1) const;
-    void SavePositionMapDelta(frm_pos_map_t &, MarkTypes type) const;
+    void SavePositionMapDelta(frm_pos_map_t &posMap, MarkTypes type) const;
 
     // Get position/duration for keyframe and vice versa
-    bool QueryKeyFrameInfo(uint64_t *, uint64_t position_or_keyframe,
+    bool QueryKeyFrameInfo(uint64_t *result, uint64_t position_or_keyframe,
                            bool backwards,
                            MarkTypes type, const char *from_filemarkup_asc,
                            const char *from_filemarkup_desc,
                            const char *from_recordedseek_asc,
                            const char *from_recordedseek_desc) const;
-    bool QueryKeyFramePosition(uint64_t *, uint64_t keyframe,
+    bool QueryKeyFramePosition(uint64_t *position, uint64_t keyframe,
                                bool backwards) const;
-    bool QueryPositionKeyFrame(uint64_t *, uint64_t position,
+    bool QueryPositionKeyFrame(uint64_t *keyframe, uint64_t position,
                                bool backwards) const;
-    bool QueryKeyFrameDuration(uint64_t *, uint64_t keyframe,
+    bool QueryKeyFrameDuration(uint64_t *duration, uint64_t keyframe,
                                bool backwards) const;
-    bool QueryDurationKeyFrame(uint64_t *, uint64_t duration,
+    bool QueryDurationKeyFrame(uint64_t *keyframe, uint64_t duration,
                                bool backwards) const;
 
     // Get/set all markup
@@ -686,7 +686,7 @@ class MPUBLIC ProgramInfo
     void SendDeletedEvent(void) const;
 
     /// Translations for play,recording, & storage groups +
-    static QString i18n(const QString&);
+    static QString i18n(const QString &msg);
 
     static QString MakeUniqueKey(uint chanid, const QDateTime &recstartts);
     static bool ExtractKey(const QString &uniquekey,
@@ -705,9 +705,9 @@ class MPUBLIC ProgramInfo
     static QStringList LoadFromScheduler(const QString &tmptable, int recordid);
 
     // Flagging map support methods
-    void QueryMarkupMap(frm_dir_map_t&, MarkTypes type,
+    void QueryMarkupMap(frm_dir_map_t&marks, MarkTypes type,
                         bool merge = false) const;
-    void SaveMarkupMap(const frm_dir_map_t &, MarkTypes type = MARK_ALL,
+    void SaveMarkupMap(const frm_dir_map_t &marks, MarkTypes type = MARK_ALL,
                        int64_t min_frame = -1, int64_t max_frame = -1) const;
     void ClearMarkupMap(MarkTypes type = MARK_ALL,
                         int64_t min_frame = -1, int64_t max_frame = -1) const;
@@ -724,10 +724,10 @@ class MPUBLIC ProgramInfo
 
     static void QueryMarkupMap(
         const QString &video_pathname,
-        frm_dir_map_t&, MarkTypes type, bool merge = false);
+        frm_dir_map_t &marks, MarkTypes type, bool merge = false);
     static void QueryMarkupMap(
         uint chanid, const QDateTime &recstartts,
-        frm_dir_map_t&, MarkTypes type, bool merge = false);
+        frm_dir_map_t &marks, MarkTypes type, bool merge = false);
 
     static int InitStatics(void);
 

@@ -56,7 +56,7 @@ class DTVChannel : public ChannelBase
     /// will need to implement this when adding support for new hardware.
     virtual bool Tune(const DTVMultiplex &tuning) = 0;
     /// \brief Performs IPTV Tuning. Only implemented by IPTVChannel.
-    virtual bool Tune(const IPTVTuningData&, bool /*scanning*/) { return false; }
+    virtual bool Tune(const IPTVTuningData &/*tuning*/, bool /*scanning*/) { return false; }
     /// \brief Leave it up to the implementation to map the channnum
     /// appropriately.
     ///
@@ -125,7 +125,7 @@ class DTVChannel : public ChannelBase
     void DeregisterForMaster(const QString &key);
     static DTVChannel *GetMasterLock(const QString &key);
     using DTVChannelP = DTVChannel*;
-    static void ReturnMasterLock(DTVChannelP&);
+    static void ReturnMasterLock(DTVChannelP &chan);
 
     /// \brief Returns true if this is the first of a number of multi-rec devs
     virtual bool IsMaster(void) const { return false; }
@@ -148,7 +148,7 @@ class DTVChannel : public ChannelBase
 
   protected:
     /// \brief Sets PSIP table standard: MPEG, DVB, ATSC, or OpenCable
-    void SetSIStandard(const QString&);
+    void SetSIStandard(const QString &si_std);
     void SetDTVInfo(uint atsc_major, uint atsc_minor,
                     uint dvb_orig_netid,
                     uint mpeg_tsid, int mpeg_pnum);

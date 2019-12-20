@@ -147,7 +147,7 @@ class TransportScanItem
                       QString strFmt,  /* fmt for info shown to user  */
                       uint freqNum,
                       uint frequency,         /* center frequency to use     */
-                      const FrequencyTable&,  /* freq table to get info from */
+                      const FrequencyTable &ft,  /* freq table to get info from */
                       uint                _timeoutTune);
 
     TransportScanItem(uint                  _sourceid,
@@ -250,13 +250,13 @@ class transport_scan_items_it_t
     list<TransportScanItem>::iterator m_it;
     int m_offset {0};
 
-    friend bool operator==(const transport_scan_items_it_t&,
-                           const transport_scan_items_it_t&);
-    friend bool operator!=(const transport_scan_items_it_t&,
-                           const transport_scan_items_it_t&);
+    friend bool operator==(const transport_scan_items_it_t&A,
+                           const transport_scan_items_it_t&B);
+    friend bool operator!=(const transport_scan_items_it_t&A,
+                           const transport_scan_items_it_t&B);
 
-    friend bool operator==(const transport_scan_items_it_t&,
-                           const list<TransportScanItem>::iterator&);
+    friend bool operator==(const transport_scan_items_it_t&A,
+                           const list<TransportScanItem>::iterator&B);
 };
 
 inline bool operator==(const transport_scan_items_it_t& A,

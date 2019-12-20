@@ -124,7 +124,7 @@ class MPUBLIC RSSManager : public QObject
 
   private slots:
     void slotRefreshRSS(void);
-    void slotRSSRetrieved(RSSSite*);
+    void slotRSSRetrieved(RSSSite *site);
 
   private:
     void processAndInsertRSS(RSSSite *site);

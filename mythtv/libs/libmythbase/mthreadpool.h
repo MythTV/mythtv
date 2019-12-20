@@ -47,9 +47,9 @@ class MBASE_PUBLIC MThreadPool
   private:
     MThreadPool(const MThreadPool &) = delete;            // not copyable
     MThreadPool &operator=(const MThreadPool &) = delete; // not copyable
-    bool TryStartInternal(QRunnable*, const QString&, bool);
-    void NotifyAvailable(MPoolThread*);
-    void NotifyDone(MPoolThread*);
+    bool TryStartInternal(QRunnable *runnable, const QString& debugName, bool reserved);
+    void NotifyAvailable(MPoolThread *thread);
+    void NotifyDone(MPoolThread *thread);
     void ReleaseThread(void);
 
 

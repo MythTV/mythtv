@@ -40,7 +40,7 @@ class ExportNative : public MythScreenType
     ~ExportNative(void);
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
     void createConfigFile(const QString &filename);
 

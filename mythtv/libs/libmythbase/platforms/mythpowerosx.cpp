@@ -84,7 +84,7 @@ void MythPowerOSX::Init(void)
     MythPower::Init();
 }
 
-bool MythPowerOSX::DoFeature(bool)
+bool MythPowerOSX::DoFeature(bool /*Delayed*/)
 {
     if (!((m_features & m_scheduledFeature) && m_scheduledFeature))
         return false;

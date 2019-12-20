@@ -81,18 +81,18 @@ struct Cddb
 
         explicit Album(const QString& s) { *this = s; }
 
-        Album& operator = (const QString&);
+        Album& operator = (const QString& rhs);
         operator QString () const;
     };
 
     // Primary cddb access
-    static bool Query(Matches&, const Toc&);
-    static bool Read(Album&, const QString& genre, discid_t);
-    static bool Write(const Album&, bool bLocalOnly = true);
+    static bool Query(Matches& res, const Toc& toc);
+    static bool Read(Album& album, const QString& genre, discid_t discID);
+    static bool Write(const Album& album, bool bLocalOnly = true);
 
     // Support
-    static discid_t Discid(unsigned& secs, const Msf [], unsigned tracks);
-    static void Alias(const Album&, discid_t);
+    static discid_t Discid(unsigned& secs, const Msf v[], unsigned tracks);
+    static void Alias(const Album& album, discid_t discID);
 };
 
 #endif //ndef CDDB_H_

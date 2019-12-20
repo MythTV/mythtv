@@ -102,7 +102,7 @@ class PlaybackSock : public ReferenceCounter
     void SetNextLiveTVDir(int capturecardnum, const QString& dir);
     void CancelNextRecording(int capturecardnum, bool cancel);
 
-    QStringList ForwardRequest(const QStringList&);
+    QStringList ForwardRequest(const QStringList &slist);
 
     bool ReadStringList(QStringList &list);
 

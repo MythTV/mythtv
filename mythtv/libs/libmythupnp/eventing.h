@@ -163,9 +163,9 @@ class UPNP_PUBLIC  StateVariable : public StateVariableBase
 //////////////////////////////////////////////////////////////////////////////
 
 template<typename T>
-inline T state_var_init(const T*) { return (T)(0); }
+inline T state_var_init(const T */*unused*/) { return (T)(0); }
 template<>
-inline QString state_var_init(const QString*) { return QString(); }
+inline QString state_var_init(const QString */*unused*/) { return QString(); }
 
 class UPNP_PUBLIC StateVariables
 {

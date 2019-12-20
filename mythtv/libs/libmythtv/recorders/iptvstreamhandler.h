@@ -65,7 +65,7 @@ public:
     void SendRTCPReport(void);
 
 private:
-    void timerEvent(QTimerEvent*) override; // QObject
+    void timerEvent(QTimerEvent *event) override; // QObject
 
 private:
     IPTVStreamHandler *m_parent                        {nullptr};

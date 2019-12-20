@@ -76,7 +76,7 @@ class DishEventNameDescriptor : public MPEGDescriptor
     // unknown                  8   2.0
     // event_name            dlen-1 3.0
     bool HasName(void) const { return DescriptorLength() > 1; }
-    QString Name(uint) const;
+    QString Name(uint compression_type) const;
 };
 
 class DishEventDescriptionDescriptor : public MPEGDescriptor
@@ -93,7 +93,7 @@ class DishEventDescriptionDescriptor : public MPEGDescriptor
     const unsigned char *DescriptionRaw(void) const;
     uint DescriptionRawLength(void) const;
     bool HasDescription(void) const { return DescriptionRawLength(); }
-    QString Description(uint) const;
+    QString Description(uint compression_type) const;
 };
 
 class DishEventPropertiesDescriptor : public MPEGDescriptor

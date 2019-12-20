@@ -122,18 +122,18 @@ class PlaybackBox : public ScheduleCommon
     bool Create(void) override; // MythScreenType
     void Load(void) override; // MythScreenType
     void Init(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
     void customEvent(QEvent *event) override; // ScheduleCommon
 
     void setInitialRecGroup(const QString& initialGroup) { m_recGroup = initialGroup; }
-    static void * RunPlaybackBox(void *player, bool);
+    static void * RunPlaybackBox(void *player, bool showTV);
 
   public slots:
     void displayRecGroup(const QString &newRecGroup = "");
     void groupSelectorClosed(void);
 
   protected slots:
-    void updateRecList(MythUIButtonListItem *);
+    void updateRecList(MythUIButtonListItem *sel_item);
     void ItemSelected(MythUIButtonListItem *item)
         { UpdateUIListItem(item, true); }
     void ItemVisible(MythUIButtonListItem *item);
@@ -178,7 +178,7 @@ class PlaybackBox : public ScheduleCommon
 
     void askDelete();
     void Undelete(void);
-    void Delete(DeleteFlags = kNoFlags);
+    void Delete(DeleteFlags flags = kNoFlags);
     void DeleteForgetHistory(void)      { Delete(kForgetHistory); }
     void DeleteForce(void)              { Delete(kForce);         }
     void DeleteIgnore(void)             { Delete(kIgnore);        }
@@ -292,15 +292,15 @@ class PlaybackBox : public ScheduleCommon
     void processNetworkControlCommands(void);
     void processNetworkControlCommand(const QString &command);
 
-    ProgramInfo *FindProgramInUILists(const ProgramInfo&);
+    ProgramInfo *FindProgramInUILists(const ProgramInfo &pginfo);
     ProgramInfo *FindProgramInUILists(uint recordingID,
                                       const QString& recgroup = "NotLiveTV");
 
     void RemoveProgram(uint recordingID,
                        bool forgetHistory, bool forceMetadataDelete);
-    void ShowDeletePopup(DeletePopupType);
-    static void ShowAvailabilityPopup(const ProgramInfo&);
-    void ShowActionPopup(const ProgramInfo&);
+    void ShowDeletePopup(DeletePopupType type);
+    static void ShowAvailabilityPopup(const ProgramInfo &pginfo);
+    void ShowActionPopup(const ProgramInfo &pginfo);
 
     QString getRecGroupPassword(const QString &recGroup);
     void fillRecGroupPasswordCache(void);

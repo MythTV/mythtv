@@ -23,7 +23,7 @@ class CustomEdit : public MythScreenType
    ~CustomEdit(void);
 
     bool Create() override; // MythScreenType
-    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
     void customEvent(QEvent *event) override; // MythUIType
 
   protected slots:
@@ -34,7 +34,7 @@ class CustomEdit : public MythScreenType
     void testClicked(void);
     void recordClicked(void);
     void storeClicked(void);
-    void scheduleCreated(int);
+    void scheduleCreated(int ruleID);
 
   private:
     void loadData(void);

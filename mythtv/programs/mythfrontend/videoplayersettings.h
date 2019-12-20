@@ -19,7 +19,7 @@ class PlayerSettings : public MythScreenType
     ~PlayerSettings() = default;
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
   private:
     MythUITextEdit   *m_defaultPlayerEdit {nullptr};

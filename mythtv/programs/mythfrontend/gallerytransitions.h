@@ -30,7 +30,7 @@ public:
     virtual ~Transition()              = default;
 
     virtual void Start(Slide &from, Slide &to, bool forwards, float speed = 1.0);
-    virtual void SetSpeed(float)       {}
+    virtual void SetSpeed(float /*speed*/) {}
     virtual void Pulse(int interval)   = 0;
     virtual void Initialise()          {}
     virtual void Finalise()            {}
@@ -73,7 +73,7 @@ public:
     TransitionNone() : Transition("None") {}
     void Start(Slide &from, Slide &to,
                bool forwards, float speed = 1.0) override; // Transition
-    void Pulse(int)  override {} // Transition
+    void Pulse(int /*interval*/)  override {} // Transition
 };
 
 

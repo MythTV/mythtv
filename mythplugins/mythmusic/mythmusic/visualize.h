@@ -80,7 +80,7 @@ class VisualBase
 
     // this is called on nodes that will not be displayed :: Not needed for most visualizations
     // (i.e. between the displayed frames, if you need the whole audio stream)
-    virtual bool processUndisplayed( VisualNode * )
+    virtual bool processUndisplayed( VisualNode */*node*/ )
     {
         return true; // By default this does nothing : Ignore the in-between chunks of audio data
     };
@@ -150,15 +150,15 @@ class MonoScope : public StereoScope
 class LogScale
 {
   public:
-    LogScale(int = 0, int = 0);
+    LogScale(int maxscale = 0, int maxrange = 0);
     ~LogScale();
 
     int scale() const { return m_s; }
     int range() const { return m_r; }
 
-    void setMax(int, int);
+    void setMax(int maxscale, int maxrange);
 
-    int operator[](int);
+    int operator[](int index);
 
 
   private:

@@ -36,7 +36,7 @@ class ThemeChooser : public MythScreenType
     bool Create(void) override; // MythScreenType
     void Load(void) override; // MythScreenType
     void Init(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent*) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
     void customEvent(QEvent *e) override; // MythUIType
 
   private slots:

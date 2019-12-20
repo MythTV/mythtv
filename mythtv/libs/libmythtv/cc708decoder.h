@@ -35,7 +35,7 @@ class CC708Decoder
     void decode_cc_null(void);
 
     /// \return Services seen in last few seconds as specified.
-    void services(uint seconds, bool[64]) const;
+    void services(uint seconds, bool seen[64]) const;
 
   private:
     CaptionPacket  m_partialPacket;

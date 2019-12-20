@@ -17,7 +17,7 @@ class ImportSettings : public MythScreenType
     ~ImportSettings() = default;
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
   private:
     MythUIButtonList   *m_paranoiaLevel     {nullptr};

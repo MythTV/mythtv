@@ -90,7 +90,7 @@ struct lirc_config_entry
 struct lirc_state *lirc_init(const char *lircrc_root_file,
                              const char *lircrc_user_file,
                              const char *prog, const char *lircd, int verbose);
-int lirc_deinit(struct lirc_state*);
+int lirc_deinit(struct lirc_state *state);
 
 int lirc_readconfig(const struct lirc_state *state,
                     const char *file,struct lirc_config **config,

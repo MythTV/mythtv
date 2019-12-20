@@ -47,15 +47,15 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
     uint DesiredTransportID(void) const { return m_desiredTsId;  }
 
     // Table processing
-    bool HandleTables(uint pid, const PSIPTable&) override; // MPEGStreamData
-    bool IsRedundant(uint pid, const PSIPTable&) const override; // MPEGStreamData
-    void ProcessSDT(uint tsid, const ServiceDescriptionTable*);
+    bool HandleTables(uint pid, const PSIPTable &psip) override; // MPEGStreamData
+    bool IsRedundant(uint pid, const PSIPTable &psip) const override; // MPEGStreamData
+    void ProcessSDT(uint tsid, const ServiceDescriptionTable *sdt);
 
     // NIT for broken providers
-    inline void SetRealNetworkID(int);
+    inline void SetRealNetworkID(int real_network_id);
 
     // EIT info/processing
-    inline void SetDishNetEIT(bool);
+    inline void SetDishNetEIT(bool use_dishnet_eit);
     inline bool HasAnyEIT(void) const;
     inline bool HasEIT(uint serviceid) const;
     bool HasEITPIDChanges(const uint_vec_t &in_use_pids) const override; // MPEGStreamData
@@ -105,24 +105,24 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
     sdt_vec_t GetCachedSDTSections(uint tsid, bool current = true) const;
     sdt_vec_t GetCachedSDTs(bool current = true) const;
 
-    void ReturnCachedSDTTables(sdt_vec_t&) const;
+    void ReturnCachedSDTTables(sdt_vec_t &sdts) const;
 
     bat_const_ptr_t GetCachedBAT(uint batid, uint section_num, bool current = true) const;
     bat_vec_t GetCachedBATs(bool current = true) const;
 
-    void AddDVBMainListener(DVBMainStreamListener*);
-    void AddDVBOtherListener(DVBOtherStreamListener*);
-    void AddDVBEITListener(DVBEITStreamListener*);
+    void AddDVBMainListener(DVBMainStreamListener *val);
+    void AddDVBOtherListener(DVBOtherStreamListener *val);
+    void AddDVBEITListener(DVBEITStreamListener *val);
 
-    void RemoveDVBMainListener(DVBMainStreamListener*);
-    void RemoveDVBOtherListener(DVBOtherStreamListener*);
-    void RemoveDVBEITListener(DVBEITStreamListener*);
+    void RemoveDVBMainListener(DVBMainStreamListener *val);
+    void RemoveDVBOtherListener(DVBOtherStreamListener *val);
+    void RemoveDVBEITListener(DVBEITStreamListener *val);
 
   private:
     // Caching
-    void CacheNIT(NetworkInformationTable*);
-    void CacheSDT(ServiceDescriptionTable*);
-    void CacheBAT(BouquetAssociationTable*);
+    void CacheNIT(NetworkInformationTable *nit);
+    void CacheSDT(ServiceDescriptionTable *sdt);
+    void CacheBAT(BouquetAssociationTable * bat);
 
   protected:
     bool DeleteCachedTable(const PSIPTable *psip) const override; // MPEGStreamData

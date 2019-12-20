@@ -55,7 +55,7 @@ class ChannelBase
     virtual void SetFd(int fd) { (void)fd; };
     /// \brief Returns file descriptor, -1 if it does not exist.
     virtual int GetFd(void) const { return -1; };
-    virtual bool Tune(const QString &, int) { return true; }
+    virtual bool Tune(const QString &/*freqid*/, int /*finetune*/) { return true; }
     virtual bool IsExternalChannelChangeInUse(void);
 
     // Gets
@@ -91,9 +91,9 @@ class ChannelBase
 
     // Picture attribute settings
     virtual bool InitPictureAttributes(void) { return false; }
-    virtual int  GetPictureAttribute(PictureAttribute) const { return -1; }
+    virtual int  GetPictureAttribute(PictureAttribute /*attr*/) const { return -1; }
     virtual int  ChangePictureAttribute(
-        PictureAdjustType, PictureAttribute, bool) { return -1; }
+        PictureAdjustType /*type*/, PictureAttribute /*attr*/, bool /*direction*/) { return -1; }
 
     bool CheckChannel(const QString &channum) const;
 

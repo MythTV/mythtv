@@ -43,8 +43,8 @@ class MHPresentable : public MHIngredient
     void Stop(MHEngine *engine) override; // MHRoot
 
     // Additional actions for stream components.
-    virtual void BeginPlaying(MHEngine *) {}
-    virtual void StopPlaying(MHEngine *) {}
+    virtual void BeginPlaying(MHEngine */*engine*/) {}
+    virtual void StopPlaying(MHEngine */*engine*/) {}
 };
 
 // Run and stop actions.

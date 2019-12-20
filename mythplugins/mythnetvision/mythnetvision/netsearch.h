@@ -26,7 +26,7 @@ class NetSearch : public NetBase
     ~NetSearch();
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
     void PopulateResultList(ResultItem::resultList list);
 

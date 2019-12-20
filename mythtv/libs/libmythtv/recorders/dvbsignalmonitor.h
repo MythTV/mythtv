@@ -40,13 +40,13 @@ class DVBSignalMonitor: public DTVSignalMonitor
     void EmitStatus(void) override; // SignalMonitor
 
     // MPEG
-    void HandlePMT(uint, const ProgramMapTable*) override; // DTVSignalMonitor
+    void HandlePMT(uint program_num, const ProgramMapTable *pmt) override; // DTVSignalMonitor
 
     // ATSC Main
-    void HandleSTT(const SystemTimeTable*) override; // DTVSignalMonitor
+    void HandleSTT(const SystemTimeTable *stt) override; // DTVSignalMonitor
 
     // DVB Main
-    void HandleTDT(const TimeDateTable*) override; // DTVSignalMonitor
+    void HandleTDT(const TimeDateTable *tdt) override; // DTVSignalMonitor
 
   protected:
     DVBSignalMonitor(void);

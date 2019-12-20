@@ -394,7 +394,7 @@ class MTV_PUBLIC PSIPTable : public PESPacket
 
   protected:
     // does not create it's own data
-    PSIPTable(const TSPacket& tspacket, bool)
+    PSIPTable(const TSPacket& tspacket, bool /*unused*/)
         : PESPacket()
     {
         m_pesData = nullptr;

@@ -63,7 +63,7 @@ class ProgFinder : public ScheduleCommon
     void getShowNames(void);
     void updateShowList();
     void updateTimesList();
-    void selectShowData(QString, int);
+    void selectShowData(QString progTitle, int newCurShow);
 
     ShowName m_showNames;
 

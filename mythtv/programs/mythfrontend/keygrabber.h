@@ -21,7 +21,7 @@ class KeyGrabPopupBox : public MythScreenType
         : MythScreenType (parent, "keygrabberdialog") {}
     ~KeyGrabPopupBox() = default;
 
-    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
     bool Create(void) override; // MythScreenType
 
   signals:

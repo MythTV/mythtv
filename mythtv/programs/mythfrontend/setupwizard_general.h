@@ -21,7 +21,7 @@ class GeneralSetupWizard : public MythScreenType
     ~GeneralSetupWizard() = default;
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
     void save(void);
 

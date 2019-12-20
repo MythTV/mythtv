@@ -27,8 +27,8 @@ class MythNews : public MythScreenType
     ~MythNews();
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
-    void customEvent(QEvent*) override; // MythUIType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
+    void customEvent(QEvent *event) override; // MythUIType
 
   private:
     void updateInfoView(void);
@@ -72,11 +72,11 @@ class MythNews : public MythScreenType
 
   private slots:
     void loadSites(void);
-    void updateInfoView(MythUIButtonListItem*);
-    void slotViewArticle(MythUIButtonListItem*);
+    void updateInfoView(MythUIButtonListItem *selected);
+    void slotViewArticle(MythUIButtonListItem *articlesListItem);
     void slotRetrieveNews(void);
-    void slotNewsRetrieved(NewsSite*);
-    void slotSiteSelected(MythUIButtonListItem*);
+    void slotNewsRetrieved(NewsSite *site);
+    void slotSiteSelected(MythUIButtonListItem *item);
 };
 
 #endif /* MYTHNEWS_H */

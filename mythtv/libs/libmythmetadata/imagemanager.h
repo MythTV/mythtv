@@ -334,19 +334,19 @@ template <class DBFS>
 class META_PUBLIC ImageHandler : protected DBFS
 {
 public:
-    QStringList HandleRename(const QString &, const QString &) const;
-    QStringList HandleDelete(const QString &) const;
-    QStringList HandleDbCreate(QStringList) const;
-    QStringList HandleDbMove(const QString &, const QString &, QString) const;
-    QStringList HandleHide(bool, const QString &ids) const;
-    QStringList HandleTransform(int, const QString &) const;
-    QStringList HandleDirs(const QString &, bool rescan,
+    QStringList HandleRename(const QString &id, const QString &newBase) const;
+    QStringList HandleDelete(const QString &ids) const;
+    QStringList HandleDbCreate(QStringList defs) const;
+    QStringList HandleDbMove(const QString &ids, const QString &srcPath, QString destPath) const;
+    QStringList HandleHide(bool hide, const QString &ids) const;
+    QStringList HandleTransform(int transform, const QString &ids) const;
+    QStringList HandleDirs(const QString &destId, bool rescan,
                            const QStringList &relPaths) const;
-    QStringList HandleCover(int, int) const;
-    QStringList HandleIgnore(const QString &) const;
-    QStringList HandleScanRequest(const QString &, int devId = DEVICE_INVALID) const;
-    QStringList HandleCreateThumbnails(const QStringList &) const;
-    QStringList HandleGetMetadata(const QString &) const;
+    QStringList HandleCover(int dir, int cover) const;
+    QStringList HandleIgnore(const QString &exclusions) const;
+    QStringList HandleScanRequest(const QString &command, int devId = DEVICE_INVALID) const;
+    QStringList HandleCreateThumbnails(const QStringList &message) const;
+    QStringList HandleGetMetadata(const QString &id) const;
 
 protected:
     ImageHandler() : DBFS(),
@@ -359,7 +359,7 @@ protected:
         delete m_thumbGen;
     }
 
-    void RemoveFiles(ImageList &) const;
+    void RemoveFiles(ImageList &images) const;
 
     ImageThumb<DBFS>      *m_thumbGen {nullptr}; //!< Thumbnail generator
     ImageScanThread<DBFS> *m_scanner  {nullptr}; //!< File scanner
@@ -464,11 +464,11 @@ public:
     QString     SetCover(int parent, int cover);
     void        RequestMetaData(int id);
     static QString     IgnoreDirs(const QString &excludes);
-    QString     MakeDir(int, const QStringList &names, bool rescan = true);
+    QString     MakeDir(int parent, const QStringList &names, bool rescan = true);
     QString     RenameFile(const ImagePtrK& im, const QString &name);
-    QString     CreateImages(int, const ImageListK &images);
-    QString     MoveDbImages(const ImagePtrK& destDir, ImageListK &images, const QString &);
-    QString     DeleteFiles(const ImageIdList &);
+    QString     CreateImages(int destId, const ImageListK &images);
+    QString     MoveDbImages(const ImagePtrK& destDir, ImageListK &images, const QString &srcPath);
+    QString     DeleteFiles(const ImageIdList &ids);
     static void ClearStorageGroup();
     void        CloseDevices(int devId = DEVICE_INVALID, bool eject = false);
 
@@ -483,8 +483,8 @@ public:
 
     // UI helper functions
     void SetDateFormat(const QString &format)    { m_dateFormat = format; }
-    static QString LongDateOf(const ImagePtrK&) ;
-    QString ShortDateOf(const ImagePtrK&) const;
+    static QString LongDateOf(const ImagePtrK &im) ;
+    QString ShortDateOf(const ImagePtrK &im) const;
     QString DeviceCaption(ImageItemK &im) const;
     QString CrumbName(ImageItemK &im, bool getPath = false) const;
 

@@ -16,7 +16,7 @@ class MPUBLIC MiniPlayer : public MusicCommon
     ~MiniPlayer();
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent *) override; // MusicCommon
+    bool keyPressEvent(QKeyEvent *event) override; // MusicCommon
 
   public slots:
     void timerTimeout(void);

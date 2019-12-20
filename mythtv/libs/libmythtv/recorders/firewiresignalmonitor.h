@@ -39,8 +39,8 @@ class FirewireSignalMonitor : public DTVSignalMonitor, public TSDataListener
                           bool _release_stream,
                           uint64_t _flags = kFWSigMon_WaitForPower);
 
-    void HandlePAT(const ProgramAssociationTable*) override; // DTVSignalMonitor
-    void HandlePMT(uint, const ProgramMapTable*) override; // DTVSignalMonitor
+    void HandlePAT(const ProgramAssociationTable *pat) override; // DTVSignalMonitor
+    void HandlePMT(uint pnum, const ProgramMapTable *pmt) override; // DTVSignalMonitor
 
     void Stop(void) override; // SignalMonitor
 

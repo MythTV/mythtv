@@ -45,10 +45,11 @@ class MainVisual :  public QObject, public MythTV::Visual
 
     void resize(const QSize &size);
 
-    void add(const void *, unsigned long, unsigned long, int, int) override; // Visual
+    void add(const void *buffer, unsigned long b_len, unsigned long timecode,
+             int source_channel, int bits_per_sample) override; // Visual
     void prepare(void) override; // Visual
 
-    void customEvent(QEvent *) override; // QObject
+    void customEvent(QEvent *event) override; // QObject
 
     void setFrameRate(int newfps);
     int frameRate(void) const { return m_fps; }

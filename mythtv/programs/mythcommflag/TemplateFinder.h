@@ -44,7 +44,7 @@ public:
             long long frameno, long long *pNextFrame) override; // FrameAnalyzer
     int finished(long long nframes, bool final) override; // FrameAnalyzer
     int reportTime(void) const override; // FrameAnalyzer
-    FrameMap GetMap(unsigned int) const override // FrameAnalyzer
+    FrameMap GetMap(unsigned int /*index*/) const override // FrameAnalyzer
         { FrameMap map; return map; }
 
     /* TemplateFinder implementation. */

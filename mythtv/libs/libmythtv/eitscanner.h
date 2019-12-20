@@ -33,10 +33,10 @@ class EITScanner : public QRunnable
     explicit EITScanner(uint cardnum);
     ~EITScanner() { TeardownAll(); }
 
-    void StartPassiveScan(ChannelBase*, EITSource*);
+    void StartPassiveScan(ChannelBase *channel, EITSource *eitSource);
     void StopPassiveScan(void);
 
-    void StartActiveScan(TVRec*, uint max_seconds_per_source);
+    void StartActiveScan(TVRec *_rec, uint max_seconds_per_source);
 
     void StopActiveScan(void);
 

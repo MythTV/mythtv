@@ -27,7 +27,7 @@ class MythNewsEditor : public MythScreenType
    ~MythNewsEditor();
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent*) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
   private:
     mutable QMutex  m_lock             {QMutex::Recursive};

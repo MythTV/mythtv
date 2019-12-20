@@ -27,7 +27,7 @@ class ChannelRecPriority : public MythScreenType
     ~ChannelRecPriority();
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
     void customEvent(QEvent *event) override; // MythUIType
 
     enum SortType
@@ -37,7 +37,7 @@ class ChannelRecPriority : public MythScreenType
     };
 
   protected slots:
-    void updateInfo(MythUIButtonListItem *);
+    void updateInfo(MythUIButtonListItem *item);
 
   private:
     void FillList(void);
@@ -46,7 +46,7 @@ class ChannelRecPriority : public MythScreenType
     void ShowMenu(void) override; // MythScreenType
     void upcoming(void);
     void changeRecPriority(int howMuch);
-    static void applyChannelRecPriorityChange(const QString&, const QString&);
+    static void applyChannelRecPriorityChange(const QString &chanid, const QString &newrecpriority);
 
     void saveRecPriority(void);
 

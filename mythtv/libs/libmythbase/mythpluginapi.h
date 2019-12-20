@@ -5,7 +5,7 @@
 #include "mythplugin.h" // for MythPluginType
 
 extern "C" {
-    MPUBLIC int mythplugin_init(const char *);
+    MPUBLIC int mythplugin_init(const char *libversion);
     MPUBLIC int mythplugin_run();
     MPUBLIC int mythplugin_config();
     MPUBLIC MythPluginType mythplugin_type();

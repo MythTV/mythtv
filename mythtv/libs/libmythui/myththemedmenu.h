@@ -49,7 +49,7 @@ class MUI_PUBLIC MythThemedMenuState : public MythScreenType
     MythUIText       *m_descriptionText {nullptr};
 
   protected:
-    void CopyFrom(MythUIType*) override; // MythScreenType
+    void CopyFrom(MythUIType *base) override; // MythScreenType
 };
 
 /// \brief Themed menu class, used for main menus in %MythTV frontend

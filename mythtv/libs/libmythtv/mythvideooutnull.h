@@ -15,8 +15,8 @@ class MythVideoOutputNull : public MythVideoOutput
               float aspect, MythDisplay *Display,
               const QRect &win_rect, MythCodecID codec_id) override;
     void SetDeinterlacing(bool Enable, bool DoubleRate, MythDeintType Force = DEINT_NONE) override;
-    void PrepareFrame(VideoFrame *buffer, FrameScanType, OSD *osd) override; // VideoOutput
-    void Show(FrameScanType ) override; // VideoOutput
+    void PrepareFrame(VideoFrame *buffer, FrameScanType t, OSD *osd) override; // VideoOutput
+    void Show(FrameScanType scan) override; // VideoOutput
     void CreatePauseFrame(void);
     bool InputChanged(const QSize &video_dim_buf,
                       const QSize &video_dim_disp,
@@ -34,8 +34,8 @@ class MythVideoOutputNull : public MythVideoOutput
                       FrameScanType scan) override; // VideoOutput
     static QStringList GetAllowedRenderers(MythCodecID myth_codec_id,
                                            const QSize &video_dim);
-    bool SetupVisualisation(AudioPlayer *, MythRender *,
-                            const QString &) override // VideoOutput
+    bool SetupVisualisation(AudioPlayer */*Audio*/, MythRender */*Render*/,
+                            const QString &/*Name*/) override // VideoOutput
         { return false; }
 
   private:

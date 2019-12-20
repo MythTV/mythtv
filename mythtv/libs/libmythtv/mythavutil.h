@@ -91,10 +91,10 @@ class MTV_PUBLIC MythCodecMap
     MythCodecMap() = default;
     ~MythCodecMap();
     static MythCodecMap *getInstance();
-    AVCodecContext *getCodecContext(const AVStream*,
+    AVCodecContext *getCodecContext(const AVStream *stream,
         const AVCodec *pCodec = nullptr, bool nullCodec = false);
-    AVCodecContext *hasCodecContext(const AVStream*);
-    void freeCodecContext(const AVStream*);
+    AVCodecContext *hasCodecContext(const AVStream *stream);
+    void freeCodecContext(const AVStream *stream);
     void freeAllCodecContexts();
   protected:
     QMap<const AVStream*, AVCodecContext*> m_streamMap;

@@ -135,9 +135,9 @@ class MHIContext : public MHContext, public QRunnable
     // Get current stream size, -1 if unknown
     long GetStreamMaxPos() override; // MHContext
     // Set current stream position
-    long SetStreamPos(long) override; // MHContext
+    long SetStreamPos(long pos) override; // MHContext
     // Play or pause a stream
-    void StreamPlay(bool) override; // MHContext
+    void StreamPlay(bool play) override; // MHContext
 
     // Get the context id strings.  The format of these strings is specified
     // by the UK MHEG profile.
@@ -153,11 +153,11 @@ class MHIContext : public MHContext, public QRunnable
     // Operations used by the display classes
     // Add an item to the display vector
     void AddToDisplay(const QImage &image, const QRect &rect, bool bUnder = false);
-    int ScaleX(int, bool roundup = false) const;
-    int ScaleY(int, bool roundup = false) const;
+    int ScaleX(int n, bool roundup = false) const;
+    int ScaleY(int n, bool roundup = false) const;
     QRect Scale(const QRect &r) const;
-    int ScaleVideoX(int, bool roundup = false) const;
-    int ScaleVideoY(int, bool roundup = false) const;
+    int ScaleVideoX(int n, bool roundup = false) const;
+    int ScaleVideoY(int n, bool roundup = false) const;
     QRect ScaleVideo(const QRect &r) const;
 
     FT_Face GetFontFace(void) { return m_face; }
@@ -244,7 +244,7 @@ class MHIText : public MHTextDisplay
 
     void Draw(int x, int y) override; // MHTextDisplay
     void Clear(void) override; // MHTextDisplay
-    void AddText(int x, int y, const QString &, MHRgba colour) override; // MHTextDisplay
+    void AddText(int x, int y, const QString &str, MHRgba colour) override; // MHTextDisplay
 
     void SetSize(int width, int height) override; // MHTextDisplay
     void SetFont(int size, bool isBold, bool isItalic) override; // MHTextDisplay

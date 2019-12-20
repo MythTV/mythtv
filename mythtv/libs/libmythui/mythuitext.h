@@ -62,7 +62,7 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     QString GetDBValue(void) const override // StorageUser
         { return GetText(); }
 
-    void SetFontState(const QString&);
+    void SetFontState(const QString &state);
     void SetJustification(int just);
 
   protected:

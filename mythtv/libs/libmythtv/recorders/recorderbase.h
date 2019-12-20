@@ -148,7 +148,7 @@ class MTV_PUBLIC RecorderBase : public QRunnable
      *
      *   This calls TVRec::RingBufferChanged() when the switch happens.
      */
-    void SetNextRecording(const RecordingInfo*, RingBuffer*);
+    void SetNextRecording(const RecordingInfo *ri, RingBuffer *rb);
 
     /** \brief This is called between SetOptionsFromProfile() and
      *         run() to initialize any devices, etc.
@@ -204,16 +204,16 @@ class MTV_PUBLIC RecorderBase : public QRunnable
      */
     long long GetKeyframePosition(long long desired) const;
     bool GetKeyframePositions(
-        long long start, long long end, frm_pos_map_t&) const;
+        long long start, long long end, frm_pos_map_t &map) const;
     bool GetKeyframeDurations(
-        long long start, long long end, frm_pos_map_t&) const;
+        long long start, long long end, frm_pos_map_t &map) const;
 
     virtual void StopRecording(void);
     virtual bool IsRecording(void);
     virtual bool IsRecordingRequested(void);
 
     /// \brief Returns a report about the current recordings quality.
-    virtual RecordingQuality *GetRecordingQuality(const RecordingInfo*) const;
+    virtual RecordingQuality *GetRecordingQuality(const RecordingInfo *ri) const;
 
     // pausing interface
     virtual void Pause(bool clear = true);

@@ -68,7 +68,7 @@ class HDHRStreamHandler : public StreamHandler
     bool TuneVChannel(const QString &vchn);
 
   private:
-    explicit HDHRStreamHandler(const QString &, int inputid, int majorid);
+    explicit HDHRStreamHandler(const QString &device, int inputid, int majorid);
 
     bool Connect(void);
 

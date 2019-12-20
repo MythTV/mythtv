@@ -81,15 +81,15 @@ class LoggingItem: public QObject, public ReferenceCounter
     Q_PROPERTY(QString message READ message WRITE setMessage)
 
     friend class LoggerThread;
-    friend void LogPrintLine(uint64_t, LogLevel_t, const char *, int,
-                             const char *, int, const char *, ... );
+    friend void LogPrintLine(uint64_t mask, LogLevel_t level, const char *file, int line,
+                             const char *function, int fromQString, const char *format, ... );
 
   public:
     char *getThreadName(void);
     int64_t getThreadTid(void);
     void setThreadTid(void);
-    static LoggingItem *create(const char *, const char *, int, LogLevel_t,
-                               LoggingType);
+    static LoggingItem *create(const char *_file, const char *_function, int _line, LogLevel_t _level,
+                               LoggingType _type);
     static LoggingItem *create(QByteArray &buf);
     QByteArray toByteArray(void);
 
@@ -172,8 +172,8 @@ class LoggerThread : public QObject, public MThread
 {
     Q_OBJECT
 
-    friend void LogPrintLine(uint64_t, LogLevel_t, const char *, int,
-                             const char *, int, const char *, ... );
+    friend void LogPrintLine(uint64_t mask, LogLevel_t lavel, const char *file, int line,
+                             const char *funcion, int fromQString, const char *format, ... );
   public:
     LoggerThread(QString filename, bool progress, bool quiet, QString table,
                  int facility);

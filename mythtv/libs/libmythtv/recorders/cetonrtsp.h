@@ -27,7 +27,7 @@ class CetonRTSP : QObject
 
   public:
     explicit CetonRTSP(const QString &ip, uint tuner, ushort port);
-    explicit CetonRTSP(const QUrl&);
+    explicit CetonRTSP(const QUrl &url);
     ~CetonRTSP();
 
     bool GetOptions(QStringList &options);
@@ -50,7 +50,7 @@ protected:
     static QStringList splitLines(const QByteArray &lines);
     QString readParameters(const QString &key, Params &parameters);
     QUrl GetBaseUrl(void);
-    void timerEvent(QTimerEvent*) override; // QObject
+    void timerEvent(QTimerEvent *event) override; // QObject
 
     QTcpSocket    *m_socket          {nullptr};
     uint           m_sequenceNumber  {0};

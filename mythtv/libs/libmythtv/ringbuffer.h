@@ -121,7 +121,7 @@ class MTV_PUBLIC RingBuffer : protected MThread
     virtual bool IsInMenu(void) const                       { return false; }
     virtual bool IsInStillFrame(void) const                 { return false; }
     virtual bool IsInDiscMenuOrStillFrame(void) const       { return IsInMenu() || IsInStillFrame(); }
-    virtual bool HandleAction(const QStringList &, int64_t) { return false; }
+    virtual bool HandleAction(const QStringList &/*action*/, int64_t /*frane*/) { return false; }
 
     // General Commands
 

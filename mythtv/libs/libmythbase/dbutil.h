@@ -49,8 +49,8 @@ class MBASE_PUBLIC DBUtil
     static bool IsBackupInProgress(void);
     static int  CountClients(void);
 
-    static bool TryLockSchema(MSqlQuery &, uint timeout_secs);
-    static void UnlockSchema(MSqlQuery &);
+    static bool TryLockSchema(MSqlQuery &query, uint timeout_secs);
+    static void UnlockSchema(MSqlQuery &query);
 
     static bool CheckTimeZoneSupport(void);
 

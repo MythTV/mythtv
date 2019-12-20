@@ -23,11 +23,11 @@ class ASIChannel : public DTVChannel
     void Close(void) override; // ChannelBase
 
     using DTVChannel::Tune;
-    bool Tune(const DTVMultiplex&) override // DTVChannel
+    bool Tune(const DTVMultiplex &/*tuning*/) override // DTVChannel
         { return true; }
-    bool Tune(const QString&, int) override // ChannelBase
+    bool Tune(const QString &/*freqid*/, int /*finetune*/) override // ChannelBase
         { return true; }
-    bool Tune(uint64_t) override // DTVChannel
+    bool Tune(uint64_t /*frequency*/) override // DTVChannel
         { return true; }
     // Gets
     bool IsOpen(void) const  override // ChannelBase

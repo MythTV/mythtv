@@ -22,7 +22,7 @@ class DiseqcConfigBase : public GroupSetting
     Q_OBJECT
 
   public:
-    bool keyPressEvent(QKeyEvent *) override; // StandardSetting
+    bool keyPressEvent(QKeyEvent *event) override; // StandardSetting
     static DiseqcConfigBase* CreateByType(DiSEqCDevDevice *dev,
                                           StandardSetting *parent);
 
@@ -60,7 +60,7 @@ class RotorPosMap : public GroupSetting
     void Save(void) override; // StandardSetting
 
   private slots:
-    void valueChanged(StandardSetting*);
+    void valueChanged(StandardSetting *setting);
 
   protected:
     void PopulateList(void);

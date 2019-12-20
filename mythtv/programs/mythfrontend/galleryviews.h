@@ -167,7 +167,7 @@ thumbnails from their subtree
 class DirectoryView : public FlatView
 {
 public:
-    explicit DirectoryView(SlideOrderType);
+    explicit DirectoryView(SlideOrderType order);
 
     ImagePtrK GetParent() const
     { return m_sequence.isEmpty() ? ImagePtrK() : m_images.value(m_sequence.at(0)); }
@@ -179,21 +179,21 @@ public:
     QStringList  RemoveImage(int id, bool deleted = false);
     void         ClearCache();
     void         MarkAll();
-    void         Mark(int, bool);
+    void         Mark(int id, bool mark);
     void         InvertMarked();
     void         ClearMarked();
     bool         IsMarked(int id) const
     { return m_marked.contains(id) || m_prevMarked.contains(id); }
 
 protected:
-    void         SetDirectory(int);
-    void         LoadDirThumbs(ImageItem &, int thumbsNeeded, int level = 0);
-    void         PopulateThumbs(ImageItem &, int thumbsNeeded,
+    void         SetDirectory(int nreParent);
+    void         LoadDirThumbs(ImageItem &parent, int thumbsNeeded, int level = 0);
+    void         PopulateThumbs(ImageItem &parent, int thumbsNeeded,
                                 const ImageList &files, const ImageList &dirs,
                                 int level = 0);
     ImageIdList  GetChildren() const  { return m_sequence.mid(1); }
-    bool         PopulateFromCache(ImageItem &, int required);
-    void         Cache(ImageItemK &, int thumbCount);
+    bool         PopulateFromCache(ImageItem &dir, int required);
+    void         Cache(ImageItemK &dir, int thumbCount);
 
     MarkedFiles m_marked;       //!< Marked items in current dir/view
     MarkedFiles m_prevMarked;   //!< Marked items in previous dir

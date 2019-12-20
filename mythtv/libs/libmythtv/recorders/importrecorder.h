@@ -40,7 +40,7 @@ class ImportRecorder : public DTVRecorder
     void InitStreamData(void) override {} // DTVRecorder
 
     long long GetFramesWritten(void) override; // DTVRecorder
-    RecordingQuality *GetRecordingQuality(const RecordingInfo*) const override // DTVRecorder
+    RecordingQuality *GetRecordingQuality(const RecordingInfo */*r*/) const override // DTVRecorder
         {return nullptr;}
     void UpdateRecSize();
 

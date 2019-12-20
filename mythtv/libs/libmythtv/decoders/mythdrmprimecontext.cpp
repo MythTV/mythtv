@@ -146,7 +146,7 @@ bool MythDRMPRIMEContext::RetrieveFrame(AVCodecContext *Context, VideoFrame *Fra
     return false;
 }
 
-AVPixelFormat MythDRMPRIMEContext::GetFormat(AVCodecContext*, const AVPixelFormat *PixFmt)
+AVPixelFormat MythDRMPRIMEContext::GetFormat(AVCodecContext */*Context*/, const AVPixelFormat *PixFmt)
 {
     while (*PixFmt != AV_PIX_FMT_NONE)
     {
@@ -157,7 +157,7 @@ AVPixelFormat MythDRMPRIMEContext::GetFormat(AVCodecContext*, const AVPixelForma
     return AV_PIX_FMT_NONE;
 }
 
-bool MythDRMPRIMEContext::GetDRMBuffer(AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame, int)
+bool MythDRMPRIMEContext::GetDRMBuffer(AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame, int /*unused*/)
 {
     if (!Context || !AvFrame || !Frame)
         return false;

@@ -28,7 +28,7 @@ class NetEditorBase : public MythScreenType
     virtual ~NetEditorBase();
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent*) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
   private:
     void LoadData(void);

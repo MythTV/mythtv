@@ -110,7 +110,7 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
 
     // Table processin
     void SetIgnoreCRC(bool haveCRCbug) { m_haveCrcBug = haveCRCbug; }
-    virtual bool IsRedundant(uint pid, const PSIPTable&) const;
+    virtual bool IsRedundant(uint pid, const PSIPTable &psip) const;
     virtual bool HandleTables(uint pid, const PSIPTable &psip);
     virtual void HandleTSTables(const TSPacket* tspacket);
     virtual bool ProcessTSPacket(const TSPacket& tspacket);
@@ -150,7 +150,7 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     const pid_map_t& WritingPIDs(void) const
         { return m_pidsWriting; }
 
-    uint GetPIDs(pid_map_t&) const;
+    uint GetPIDs(pid_map_t &pids) const;
 
     // PID Priorities
     PIDPriority GetPIDPriority(uint pid) const;
@@ -203,12 +203,12 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     pmt_map_t GetCachedPMTMap(void) const;
 
     virtual void ReturnCachedTable(const PSIPTable *psip) const;
-    virtual void ReturnCachedPATTables(pat_vec_t&) const;
-    virtual void ReturnCachedPATTables(pat_map_t&) const;
-    virtual void ReturnCachedCATTables(cat_vec_t&) const;
-    virtual void ReturnCachedCATTables(cat_map_t&) const;
-    virtual void ReturnCachedPMTTables(pmt_vec_t&) const;
-    virtual void ReturnCachedPMTTables(pmt_map_t&) const;
+    virtual void ReturnCachedPATTables(pat_vec_t &pats) const;
+    virtual void ReturnCachedPATTables(pat_map_t &pats) const;
+    virtual void ReturnCachedCATTables(cat_vec_t &cats) const;
+    virtual void ReturnCachedCATTables(cat_map_t &cats) const;
+    virtual void ReturnCachedPMTTables(pmt_vec_t &pmts) const;
+    virtual void ReturnCachedPMTTables(pmt_map_t &pmts) const;
 
     // Encryption Monitoring
     void AddEncryptionTestPID(uint pnum, uint pid, bool isvideo);
@@ -222,22 +222,17 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     bool IsProgramEncrypted(uint pnum) const;
 
     // "signals"
-    void AddMPEGListener(MPEGStreamListener*);
-    void RemoveMPEGListener(MPEGStreamListener*);
-    void UpdatePAT(const ProgramAssociationTable*);
-    void UpdateCAT(const ConditionalAccessTable*);
-    void UpdatePMT(uint program_num, const ProgramMapTable*);
+    void AddMPEGListener(MPEGStreamListener *val);
+    void RemoveMPEGListener(MPEGStreamListener *val);
 
-    void AddWritingListener(TSPacketListener*);
-    void RemoveWritingListener(TSPacketListener*);
+    void AddWritingListener(TSPacketListener *val);
+    void RemoveWritingListener(TSPacketListener *val);
 
     // Single Program Stuff, signals with processed tables
-    void AddMPEGSPListener(MPEGSingleProgramStreamListener*);
-    void RemoveMPEGSPListener(MPEGSingleProgramStreamListener*);
-    void AddAVListener(TSPacketListenerAV*);
-    void RemoveAVListener(TSPacketListenerAV*);
-    void UpdatePATSingleProgram(ProgramAssociationTable*);
-    void UpdatePMTSingleProgram(ProgramMapTable*);
+    void AddMPEGSPListener(MPEGSingleProgramStreamListener *val);
+    void RemoveMPEGSPListener(MPEGSingleProgramStreamListener *val);
+    void AddAVListener(TSPacketListenerAV *val);
+    void RemoveAVListener(TSPacketListenerAV *val);
 
     // Program Stream Stuff
     void AddPSStreamListener(PSStreamListener *val);
@@ -246,8 +241,8 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
   public:
     // Single program stuff, sets
     void SetDesiredProgram(int p);
-    inline void SetPATSingleProgram(ProgramAssociationTable*);
-    inline void SetPMTSingleProgram(ProgramMapTable*);
+    inline void SetPATSingleProgram(ProgramAssociationTable *pat);
+    inline void SetPMTSingleProgram(ProgramMapTable *pmt);
     void SetVideoStreamsRequired(uint num)
         { m_pmtSingleProgramNumVideo = num;  }
     uint GetVideoStreamsRequired() const
@@ -277,8 +272,8 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     int VersionPATSingleProgram(void) const;
     int VersionPMTSingleProgram(void) const;
 
-    bool CreatePATSingleProgram(const ProgramAssociationTable&);
-    bool CreatePMTSingleProgram(const ProgramMapTable&);
+    bool CreatePATSingleProgram(const ProgramAssociationTable &pat);
+    bool CreatePMTSingleProgram(const ProgramMapTable &pmt);
 
   protected:
     // Table processing -- for internal use
@@ -293,7 +288,7 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     void ProcessPAT(const ProgramAssociationTable *pat);
     void ProcessCAT(const ConditionalAccessTable *cat);
     void ProcessPMT(const ProgramMapTable *pmt);
-    void ProcessEncryptedPacket(const TSPacket&);
+    void ProcessEncryptedPacket(const TSPacket &tspacket);
 
     static int ResyncStream(const unsigned char *buffer, int curr_pos, int len);
 
@@ -403,7 +398,7 @@ inline int MPEGStreamData::VersionPMTSingleProgram() const
     return (m_pmtSingleProgram) ? int(m_pmtSingleProgram->Version()) : -1;
 }
 
-inline void MPEGStreamData::HandleAdaptationFieldControl(const TSPacket*)
+inline void MPEGStreamData::HandleAdaptationFieldControl(const TSPacket */*tspacket*/)
 {
     // TODO
     //AdaptationFieldControl afc(tspacket.data()+4);

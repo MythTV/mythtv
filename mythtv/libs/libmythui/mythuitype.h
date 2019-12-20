@@ -89,7 +89,7 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     // Check set if this can take focus
     bool CanTakeFocus(void) const;
     void SetCanTakeFocus(bool set = true);
-    void SetFocusOrder(int);
+    void SetFocusOrder(int order);
 
     bool IsEnabled(void) const { return m_Enabled; }
     void SetEnabled(bool enable);

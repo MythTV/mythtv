@@ -40,7 +40,7 @@ class CetonStreamHandler : public IPTVStreamHandler
     uint GetProgramNumber(void) const;
 
   private:
-    explicit CetonStreamHandler(const QString &, int inputid);
+    explicit CetonStreamHandler(const QString &device, int inputid);
 
     bool Connect(void);
 

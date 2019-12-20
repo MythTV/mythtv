@@ -293,7 +293,7 @@ class MHUnion
     QString Printable() const;
 
     enum UnionTypes { U_Int, U_Bool, U_String, U_ObjRef, U_ContentRef, U_None } m_Type {U_None};
-    void CheckType (enum UnionTypes) const; // Check a type and fail if it doesn't match. 
+    void CheckType (enum UnionTypes t) const; // Check a type and fail if it doesn't match.
     static const char *GetAsString(enum UnionTypes t);
 
     int             m_nIntVal  {0};

@@ -22,14 +22,14 @@ class MTV_PUBLIC ChannelInfo
 {
  public:
     ChannelInfo() = default;
-    ChannelInfo(const ChannelInfo&);
+    ChannelInfo(const ChannelInfo &other);
     ChannelInfo(const QString &_channum, const QString &_callsign,
               uint _chanid, uint _major_chan, uint _minor_chan,
               uint _mplexid, bool _visible,
               const QString &_name, const QString &_icon,
               uint _sourceid);
     
-    ChannelInfo& operator=(const ChannelInfo&);
+    ChannelInfo& operator=(const ChannelInfo &other);
 
     bool operator == (uint chanid) const
         { return m_chanId == chanid; }
@@ -193,7 +193,7 @@ class MTV_PUBLIC ChannelInsertInfo
     ChannelInsertInfo(const ChannelInsertInfo &other) { (*this = other); }
     ChannelInsertInfo &operator=(const ChannelInsertInfo &other) = default;
 
-    bool IsSameChannel(const ChannelInsertInfo&, int relaxed = 0) const;
+    bool IsSameChannel(const ChannelInsertInfo &other, int relaxed = 0) const;
 
     bool SaveScan(uint scanid, uint transportid) const;
 

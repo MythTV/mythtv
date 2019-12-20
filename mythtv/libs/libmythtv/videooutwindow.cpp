@@ -58,7 +58,7 @@ VideoOutWindow::VideoOutWindow()
     m_dbUseGUISize = gCoreContext->GetBoolSetting("GuiSizeForTV", false);
 }
 
-void VideoOutWindow::ScreenChanged(QScreen*)
+void VideoOutWindow::ScreenChanged(QScreen */*screen*/)
 {
     PopulateGeometry();
     MoveResize();

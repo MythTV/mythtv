@@ -148,7 +148,7 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
 
     bool keyPressEvent(QKeyEvent *event) override; // MythUIType
     bool gestureEvent(MythGestureEvent *event) override; // MythUIType
-    void customEvent(QEvent *) override; // MythUIType
+    void customEvent(QEvent *event) override; // MythUIType
 
     enum MovementUnit { MoveItem, MoveColumn, MoveRow, MovePage, MoveMax,
                         MoveMid, MoveByAmount };

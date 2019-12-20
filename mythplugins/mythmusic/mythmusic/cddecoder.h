@@ -28,12 +28,12 @@ class CdDecoder : public Decoder
      Q_DECLARE_TR_FUNCTIONS(CdDecoder);
 
   public:
-    CdDecoder(const QString &file, DecoderFactory *, AudioOutput *);
+    CdDecoder(const QString &file, DecoderFactory *d, AudioOutput *o);
     virtual ~CdDecoder();
 
     // Decoder implementation
     bool initialize() override; // Decoder
-    void seek(double) override; // Decoder
+    void seek(double pos) override; // Decoder
     void stop() override; // Decoder
 
     MusicMetadata *getMetadata(void);

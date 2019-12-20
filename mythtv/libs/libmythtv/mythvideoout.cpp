@@ -902,7 +902,7 @@ void MythVideoOutput::DiscardFrame(VideoFrame *Frame)
 
 /// \brief Releases all frames not being actively displayed from any queue
 ///        onto the queue of frames ready for decoding onto.
-void MythVideoOutput::DiscardFrames(bool KeyFrame, bool /*unused*/)
+void MythVideoOutput::DiscardFrames(bool KeyFrame, bool /*Flushed*/)
 {
     m_videoBuffers.DiscardFrames(KeyFrame);
 }

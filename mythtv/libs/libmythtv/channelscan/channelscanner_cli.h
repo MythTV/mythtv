@@ -50,7 +50,7 @@ class MTV_PUBLIC ChannelScannerCLI : public ChannelScanner
 
   protected:
     void InformUser(const QString &error) override; // ChannelScanner
-    virtual void Process(const ScanDTVTransportList&);
+    virtual void Process(const ScanDTVTransportList &_transports);
     void MonitorProgress(bool lock, bool strength,
                          bool snr, bool rotor) override; // ChannelScanner
   private:

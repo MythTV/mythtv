@@ -73,7 +73,7 @@ class MPUBLIC MusicCommon : public MythScreenType
     void next(void);
     void seekforward(void);
     void seekback(void);
-    void seek(int);
+    void seek(int pos);
     void stopAll(void);
     static void changeRating(bool increase);
 

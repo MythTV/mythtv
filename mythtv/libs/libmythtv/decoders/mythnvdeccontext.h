@@ -31,7 +31,7 @@ class MythNVDECContext : public MythCodecContext
     void SetDeinterlacing                (AVCodecContext *Context,
                                           VideoDisplayProfile *Profile, bool DoubleRate) override;
     void PostProcessFrame                (AVCodecContext *Context, VideoFrame *Frame) override;
-    bool IsDeinterlacing                 (bool &DoubleRate, bool = false) override;
+    bool IsDeinterlacing                 (bool &DoubleRate, bool StreamChange = false) override;
     static MythCodecID GetSupportedCodec (AVCodecContext **CodecContext,
                                           AVCodec       **Codec,
                                           const QString  &Decoder,

@@ -64,7 +64,7 @@ class ChannelScannerGUI :
 
     void InformUser(const QString &error) override; // ChannelScanner
 
-    virtual void Process(const ScanDTVTransportList&, bool success = false);
+    virtual void Process(const ScanDTVTransportList &_transports, bool success = false);
 
     void MonitorProgress(bool lock, bool strength,
                          bool snr, bool rotor) override; // ChannelScanner

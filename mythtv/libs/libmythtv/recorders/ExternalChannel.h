@@ -28,7 +28,7 @@ class ExternalChannel : public DTVChannel
 
     // ATSC/DVB scanning/tuning stuff
     using DTVChannel::Tune;
-    bool Tune(const DTVMultiplex&) override // DTVChannel
+    bool Tune(const DTVMultiplex &/*tuning*/) override // DTVChannel
         { return true; }
     bool Tune(const QString &channum) override; // DTVChannel
     bool Tune(const QString &freqid, int /*finetune*/) override; // DTVChannel

@@ -67,9 +67,9 @@ class VideoDialog : public MythScreenType
 
   private slots:
     void UpdatePosition();
-    void UpdateText(MythUIButtonListItem *);
-    void handleSelect(MythUIButtonListItem *);
-    void SetCurrentNode(MythGenericTree *);
+    void UpdateText(MythUIButtonListItem *item);
+    void handleSelect(MythUIButtonListItem *item);
+    void SetCurrentNode(MythGenericTree *node);
 
     void playVideo();
     void playVideoAlt();
@@ -100,7 +100,7 @@ class VideoDialog : public MythScreenType
     void ToggleWatched();
     void ToggleProcess();
     void RemoveVideo();
-    void OnRemoveVideo(bool);
+    void OnRemoveVideo(bool dodelete);
 
     void VideoMenu();
     MythMenu* CreateInfoMenu();
@@ -136,7 +136,7 @@ class VideoDialog : public MythScreenType
     void doVideoScan();
 
   protected slots:
-    void scanFinished(bool);
+    void scanFinished(bool dbChanged);
     void reloadData();
     void refreshData();
     void UpdateItem(MythUIButtonListItem *item);

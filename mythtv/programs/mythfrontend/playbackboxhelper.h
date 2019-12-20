@@ -35,14 +35,14 @@ class PlaybackBoxHelper : public MThread
     ~PlaybackBoxHelper(void);
 
     void ForceFreeSpaceUpdate(void);
-    void StopRecording(const ProgramInfo&);
+    void StopRecording(const ProgramInfo &pginfo);
     void DeleteRecording( uint recordingID, bool forceDelete,
                           bool forgetHistory);
-    void DeleteRecordings(const QStringList&);
+    void DeleteRecordings(const QStringList &list);
     void UndeleteRecording(uint recordingID);
-    void CheckAvailability(const ProgramInfo&,
+    void CheckAvailability(const ProgramInfo &pginfo,
                            CheckAvailabilityType cat = kCheckForCache);
-    QString GetPreviewImage(const ProgramInfo&, bool check_availability = true);
+    QString GetPreviewImage(const ProgramInfo &pginfo, bool check_availability = true);
 
     QString LocateArtwork(const QString &inetref, uint season,
                           VideoArtworkType type, const ProgramInfo *pginfo,

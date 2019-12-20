@@ -98,8 +98,8 @@ class Ripper : public MythScreenType
    ~Ripper(void);
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
-    void customEvent(QEvent *) override; // MythUIType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
+    void customEvent(QEvent *event) override; // MythUIType
 
     bool somethingWasRipped();
     void scanCD(void);
@@ -124,8 +124,8 @@ class Ripper : public MythScreenType
     void setAlbum(const QString& album);
     void setGenre(const QString& genre);
     void RipComplete(bool result);
-    void toggleTrackActive(MythUIButtonListItem *);
-    void showEditMetadataDialog(MythUIButtonListItem *);
+    void toggleTrackActive(MythUIButtonListItem *item);
+    void showEditMetadataDialog(MythUIButtonListItem *item);
     void EjectFinished(void);
     void ScanFinished(void);
     void metadataChanged(void);
@@ -141,8 +141,8 @@ class Ripper : public MythScreenType
     void deleteAllExistingTracks(void);
     void updateTrackList(void);
     void updateTrackLengths(void);
-    void toggleTrackActive(RipTrack *);
-    void ShowConflictMenu(RipTrack *);
+    void toggleTrackActive(RipTrack *track);
+    void ShowConflictMenu(RipTrack *track);
 
     QString             m_musicStorageDir;
 
@@ -220,7 +220,7 @@ class RipStatus : public MythScreenType
     ~RipStatus(void);
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
   signals:
     void Result(bool);

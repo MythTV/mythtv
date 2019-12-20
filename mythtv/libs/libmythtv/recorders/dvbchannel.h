@@ -40,7 +40,7 @@ class DVBChannel : public DTVChannel
     bool Init(QString &startchannel, bool setchan) override; // ChannelBase
 
     // Sets
-    void SetPMT(const ProgramMapTable*);
+    void SetPMT(const ProgramMapTable *pmt);
     void SetTimeOffset(double offset);
     void SetSlowTuning(uint how_slow_in_ms)
         { m_tuningDelay = how_slow_in_ms; }
@@ -92,8 +92,8 @@ class DVBChannel : public DTVChannel
     bool ProbeTuningParams(DTVMultiplex &tuning) const;
 
   private:
-    bool Open(DVBChannel*);
-    void Close(DVBChannel*);
+    bool Open(DVBChannel *who);
+    void Close(DVBChannel *who);
 
     int  GetChanID(void) const override; // ChannelBase
 

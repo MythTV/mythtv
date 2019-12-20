@@ -19,10 +19,10 @@ class RTPPacketBuffer : public PacketBuffer
         PacketBuffer(bitrate) {}
 
     /// Adds RFC 3550 RTP data packet
-    void PushDataPacket(const UDPPacket&) override; // PacketBuffer
+    void PushDataPacket(const UDPPacket &udp_packet) override; // PacketBuffer
 
     /// Adds SMPTE 2022 Forward Error Correction Stream packet
-    void PushFECPacket(const UDPPacket&, unsigned int fec_stream_num) override; // PacketBuffer
+    void PushFECPacket(const UDPPacket &packet, unsigned int fec_stream_num) override; // PacketBuffer
 
   private:
     int      m_largeSequenceNumberSeenRecently { 0   };

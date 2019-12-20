@@ -71,7 +71,7 @@ public:
     void Set(const QVariant& from, const QVariant& to,
              int duration = 500,
              const QEasingCurve& curve = QEasingCurve::InOutCubic,
-             UIEffects::Centre = UIEffects::Middle);
+             UIEffects::Centre centre = UIEffects::Middle);
     void updateCurrentValue(const QVariant &value) override; // QVariantAnimation
 
 protected:
@@ -165,7 +165,7 @@ public:
     bool      LoadSlide(const ImagePtrK& im, int direction = 0, bool notifyCompletion = false);
     ImagePtrK GetImageData() const  { return m_data; }
     void      Zoom(int percentage);
-    void      SetZoom(float);
+    void      SetZoom(float zoom);
     void      Pan(QPoint offset);
     void      SetPan(QPoint pos);
     bool      CanZoomIn() const     { return m_zoom < MAX_ZOOM; }
@@ -242,7 +242,7 @@ signals:
     void SlideReady(int count);
 
 private slots:
-    void Flush(Slide*, const QString& reason = "Loaded");
+    void Flush(Slide *slide, const QString& reason = "Loaded");
 
 protected:
     QString BufferState();

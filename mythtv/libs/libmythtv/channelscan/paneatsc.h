@@ -92,7 +92,7 @@ class PaneATSC : public GroupSetting
         ResetTransportRange();
     }
 
-    void TransportRangeChanged(const QString&)
+    void TransportRangeChanged(const QString &/*range*/)
     {
         int a = m_transport_start->getValueIndex(m_transport_start->getValue());
         int b = m_transport_end->getValueIndex(m_transport_end->getValue());

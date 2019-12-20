@@ -121,7 +121,7 @@ class TuningRequest
     int            m_progNum   {-1};
 };
 using TuningQueue = MythDeque<TuningRequest>;
-inline TuningRequest myth_deque_init(const TuningRequest*) { return (TuningRequest)(0); }
+inline TuningRequest myth_deque_init(const TuningRequest */*request*/) { return (TuningRequest)(0); }
 
 class PendingInfo
 {
@@ -187,13 +187,13 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     long long GetFilePosition(void);
     long long GetMaxBitrate(void) const;
     int64_t GetKeyframePosition(uint64_t desired) const;
-    bool GetKeyframePositions(int64_t start, int64_t end, frm_pos_map_t&) const;
-    bool GetKeyframeDurations(int64_t start, int64_t end, frm_pos_map_t&) const;
+    bool GetKeyframePositions(int64_t start, int64_t end, frm_pos_map_t &map) const;
+    bool GetKeyframeDurations(int64_t start, int64_t end, frm_pos_map_t &map) const;
     void SpawnLiveTV(LiveTVChain *newchain, bool pip, QString startchan);
     QString GetChainID(void);
     void StopLiveTV(void);
     void PauseRecorder(void);
-    void ToggleChannelFavorite(const QString&);
+    void ToggleChannelFavorite(const QString &changroupname);
 
     void SetLiveRecording(int recording);
 
@@ -213,7 +213,8 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
                                 bool direction);
     bool CheckChannel(const QString& name) const;
     bool ShouldSwitchToAnotherInput(const QString& chanid);
-    bool CheckChannelPrefix(const QString&,uint&,bool&,QString&);
+    bool CheckChannelPrefix(const QString &prefix, uint &complete_valid_channel_on_rec,
+                            bool &is_extra_char_useful, QString &needed_spacer);
     void GetNextProgram(BrowseDirection direction,
                         QString &title,       QString &subtitle,
                         QString &desc,        QString &category,
@@ -235,7 +236,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     /// \brief Returns true is "errored" is true, false otherwise.
     bool IsErrored(void)  const { return HasFlags(kFlagErrored); }
 
-    void RingBufferChanged(RingBuffer*, RecordingInfo*, RecordingQuality*);
+    void RingBufferChanged(RingBuffer *rb, RecordingInfo *pginfo, RecordingQuality *recq);
     void RecorderPaused(void);
 
     void SetNextLiveTVDir(QString dir);
@@ -245,17 +246,17 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     static TVRec *GetTVRec(uint inputid);
 
     void AllGood(void) override { WakeEventLoop(); } // SignalMonitorListener
-    void StatusChannelTuned(const SignalMonitorValue&) override { } // SignalMonitorListener
-    void StatusSignalLock(const SignalMonitorValue&) override { } // SignalMonitorListener
-    void StatusSignalStrength(const SignalMonitorValue&) override { } // SignalMonitorListener
+    void StatusChannelTuned(const SignalMonitorValue &/*val*/) override { } // SignalMonitorListener
+    void StatusSignalLock(const SignalMonitorValue &/*val*/) override { } // SignalMonitorListener
+    void StatusSignalStrength(const SignalMonitorValue &/*val*/) override { } // SignalMonitorListener
 
   protected:
     void run(void) override; // QRunnable
     bool WaitForEventThreadSleep(bool wake = true, ulong time = ULONG_MAX);
 
   private:
-    void SetRingBuffer(RingBuffer *);
-    void SetPseudoLiveTVRecording(RecordingInfo*);
+    void SetRingBuffer(RingBuffer *rb);
+    void SetPseudoLiveTVRecording(RecordingInfo *pi);
     void TeardownAll(void);
     void WakeEventLoop(void);
 
@@ -285,16 +286,16 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     bool HasFlags(uint f) const { return (m_stateFlags & f) == f; }
     void SetFlags(uint f, const QString & file, int line);
     void ClearFlags(uint f, const QString & file, int line);
-    static QString FlagToString(uint);
+    static QString FlagToString(uint f);
 
     void HandleTuning(void);
-    void TuningShutdowns(const TuningRequest&);
-    void TuningFrequency(const TuningRequest&);
+    void TuningShutdowns(const TuningRequest &request);
+    void TuningFrequency(const TuningRequest &request);
     MPEGStreamData *TuningSignalCheck(void);
 
-    void TuningNewRecorder(MPEGStreamData*);
+    void TuningNewRecorder(MPEGStreamData *streamData);
     void TuningRestartRecorder(void);
-    QString TuningGetChanNum(const TuningRequest&, QString &input) const;
+    QString TuningGetChanNum(const TuningRequest &request, QString &input) const;
     bool TuningOnSameMultiplex(TuningRequest &request);
 
     void HandleStateChange(void);
@@ -315,20 +316,20 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
 
     RecordingInfo *SwitchRecordingRingBuffer(const RecordingInfo &rcinfo);
 
-    void StartedRecording(RecordingInfo*);
-    void FinishedRecording(RecordingInfo*, RecordingQuality*);
-    QDateTime GetRecordEndTime(const ProgramInfo*) const;
+    void StartedRecording(RecordingInfo *curRec);
+    void FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq);
+    QDateTime GetRecordEndTime(const ProgramInfo *pi) const;
     void CheckForRecGroupChange(void);
-    void NotifySchedulerOfRecording(RecordingInfo*);
+    void NotifySchedulerOfRecording(RecordingInfo *rec);
     enum AutoRunInitType { kAutoRunProfile, kAutoRunNone, };
-    void InitAutoRunJobs(RecordingInfo*, AutoRunInitType,
-                         RecordingProfile *, int line);
+    void InitAutoRunJobs(RecordingInfo *rec, AutoRunInitType t,
+                         RecordingProfile *recpro, int line);
 
     void SetRecordingStatus(
         RecStatus::Type new_status, int line, bool have_lock = false);
 
-    QString LoadProfile(void*, RecordingInfo*,
-                        RecordingProfile&);
+    QString LoadProfile(void *tvchan, RecordingInfo *rec,
+                        RecordingProfile &profile);
 
     // Various components TVRec coordinates
     RecorderBase      *m_recorder                 {nullptr};

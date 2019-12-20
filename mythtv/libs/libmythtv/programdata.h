@@ -40,7 +40,7 @@ class MTV_PUBLIC DBPerson
         kGuest,
     };
 
-    DBPerson(const DBPerson&);
+    DBPerson(const DBPerson &other);
     DBPerson(Role _role, QString _name);
     DBPerson(const QString &_role, QString _name);
 
@@ -105,7 +105,7 @@ class MTV_PUBLIC DBEvent
 
     virtual ~DBEvent() { delete m_credits; }
 
-    void AddPerson(DBPerson::Role, const QString &name);
+    void AddPerson(DBPerson::Role role, const QString &name);
     void AddPerson(const QString &role, const QString &name);
 
     uint UpdateDB(MSqlQuery &query, uint chanid, int match_threshold) const;
@@ -113,20 +113,20 @@ class MTV_PUBLIC DBEvent
     bool HasCredits(void) const { return m_credits; }
     bool HasTimeConflict(const DBEvent &other) const;
 
-    DBEvent &operator=(const DBEvent&);
+    DBEvent &operator=(const DBEvent &other);
 
   protected:
     uint GetOverlappingPrograms(
-        MSqlQuery&, uint chanid, vector<DBEvent> &programs) const;
+        MSqlQuery &query, uint chanid, vector<DBEvent> &programs) const;
     int  GetMatch(
         const vector<DBEvent> &programs, int &bestmatch) const;
     uint UpdateDB(
-        MSqlQuery&, uint chanid, const vector<DBEvent> &p, int match) const;
+        MSqlQuery &q, uint chanid, const vector<DBEvent> &p, int match) const;
     uint UpdateDB(
-        MSqlQuery&, uint chanid, const DBEvent &match) const;
+        MSqlQuery &query, uint chanid, const DBEvent &match) const;
     bool MoveOutOfTheWayDB(
-        MSqlQuery&, uint chanid, const DBEvent &prog) const;
-    virtual uint InsertDB(MSqlQuery&, uint chanid) const;
+        MSqlQuery &query, uint chanid, const DBEvent &prog) const;
+    virtual uint InsertDB(MSqlQuery &query, uint chanid) const;
     virtual void Squeeze(void);
 
   public:
@@ -220,7 +220,7 @@ class MTV_PUBLIC ProgInfo : public DBEvent
 
     void Squeeze(void) override; // DBEvent
 
-    ProgInfo &operator=(const ProgInfo&);
+    ProgInfo &operator=(const ProgInfo &other);
 
   public:
     // extra XMLTV stuff

@@ -9,15 +9,15 @@
 using std::deque;
 
 template<typename T>
-inline T myth_deque_init(const T*) { return nullptr; }
+inline T myth_deque_init(const T */*unused*/) { return nullptr; }
 template<>
-inline int myth_deque_init(const int*) { return 0; }
+inline int myth_deque_init(const int * /*unused*/) { return 0; }
 template<>
-inline uint myth_deque_init(const uint*) { return 0; }
+inline uint myth_deque_init(const uint * /*unused*/) { return 0; }
 template<>
-inline QString myth_deque_init(const QString*) { return QString(); }
+inline QString myth_deque_init(const QString * /*unused*/) { return QString(); }
 template<>
-inline QStringList myth_deque_init(const QStringList*) { return QStringList(); }
+inline QStringList myth_deque_init(const QStringList * /*unused*/) { return QStringList(); }
 
 /** \class MythDeque
  *  \brief MythDeque is similar to QPtrQueue, while being based off

@@ -49,8 +49,8 @@ class MUI_PUBLIC MythScreenType : public MythUIComposite
     virtual ~MythScreenType();
 
     virtual bool Create(void); // do the actual work of making the screen.
-    bool keyPressEvent(QKeyEvent *) override; // MythUIType
-    bool gestureEvent(MythGestureEvent *) override; // MythUIType
+    bool keyPressEvent(QKeyEvent *event) override; // MythUIType
+    bool gestureEvent(MythGestureEvent *event) override; // MythUIType
     virtual void ShowMenu(void);
 
     void doInit(void);

@@ -73,7 +73,7 @@ class MythXLocker
 };
 
 MUI_PUBLIC void          LockMythXDisplays(bool lock);
-MUI_PUBLIC MythXDisplay *GetMythXDisplay(Display*);
+MUI_PUBLIC MythXDisplay *GetMythXDisplay(Display *d);
 MUI_PUBLIC MythXDisplay *OpenMythXDisplay(bool Warn = true);
 #define XLOCK(dpy, arg) { dpy->Lock(); arg; dpy->Unlock(); }
 #endif // USING_X11

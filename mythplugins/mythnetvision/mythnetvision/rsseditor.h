@@ -41,7 +41,7 @@ class RSSEditPopup : public MythScreenType
    ~RSSEditPopup();
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent*) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
   private:
     static QUrl redirectUrl(const QUrl& possibleRedirectUrl,
@@ -90,7 +90,7 @@ class RSSEditor : public MythScreenType
    ~RSSEditor();
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent*) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
   private:
     void fillRSSButtonList();

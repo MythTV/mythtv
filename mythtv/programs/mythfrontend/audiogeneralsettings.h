@@ -43,7 +43,7 @@ class AudioConfigSettings : public GroupSetting
     void CheckConfiguration(void);
 
   private slots:
-    void UpdateVisibility(StandardSetting *);
+    void UpdateVisibility(StandardSetting */*setting*/);
     AudioOutputSettings UpdateCapabilities(bool restore = true,
                                            bool AC3 = false);
     AudioOutputSettings UpdateCapabilitiesAC3(void);
@@ -112,7 +112,7 @@ class AudioDeviceComboBox : public HostComboBoxSetting
 {
     Q_OBJECT
   public:
-    explicit AudioDeviceComboBox(AudioConfigSettings*);
+    explicit AudioDeviceComboBox(AudioConfigSettings *parent);
     void AudioRescan();
 
     void edit(MythScreenType * screen) override; // MythUIComboBoxSetting

@@ -16,7 +16,7 @@ class MPUBLIC ZMMiniPlayer : public ZMLivePlayer
     ~ZMMiniPlayer();
 
     bool Create(void) override; // ZMLivePlayer
-    bool keyPressEvent(QKeyEvent *) override; // ZMLivePlayer
+    bool keyPressEvent(QKeyEvent *event) override; // ZMLivePlayer
     void customEvent (QEvent* event) override; // MythUIType
 
     void setAlarmMonitor(int monID) { m_alarmMonitor = monID; }

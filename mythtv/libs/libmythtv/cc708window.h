@@ -194,12 +194,12 @@ class MTV_PUBLIC CC708Window
                       int pen_style,        int window_style);
     void Resize(uint new_rows, uint new_columns);
     void Clear(void);
-    void SetWindowStyle(uint);
+    void SetWindowStyle(uint style);
 
-    void AddChar(QChar);
+    void AddChar(QChar ch);
     void IncrPenLocation(void);
     void DecrPenLocation(void);
-    void SetPenLocation(uint, uint);
+    void SetPenLocation(uint row, uint column);
     void LimitPenLocation(void);
 
     bool IsPenValid(void) const

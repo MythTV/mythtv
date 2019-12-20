@@ -65,7 +65,7 @@ class ProgramRecPriority : public ScheduleCommon
    ~ProgramRecPriority() = default;
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
     void customEvent(QEvent *event) override; // ScheduleCommon
 
     enum SortType

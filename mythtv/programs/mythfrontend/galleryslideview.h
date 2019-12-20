@@ -37,15 +37,15 @@ signals:
     void ImageSelected(int);
 
 private:
-    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
-    void customEvent(QEvent *) override; // MythUIType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
+    void customEvent(QEvent *event) override; // MythUIType
     void MenuMain();
-    void MenuTransforms(MythMenu &);
+    void MenuTransforms(MythMenu &mainMenu);
     void Suspend();
     void Release();
-    void Transform(ImageFileTransform);
-    void Zoom(int = 0);
-    void Pan(QPoint = QPoint(0, 0));
+    void Transform(ImageFileTransform state);
+    void Zoom(int increment = 0);
+    void Pan(QPoint offset = QPoint(0, 0));
     void SetStatus(QString msg, bool delay = false);
     void ClearStatus(Slide &slide);
 

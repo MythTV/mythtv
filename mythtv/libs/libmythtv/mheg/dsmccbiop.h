@@ -21,7 +21,7 @@ class BiopNameComp
     BiopNameComp() = default;
     ~BiopNameComp();
 
-    int Process(const unsigned char *);
+    int Process(const unsigned char *data);
 
     unsigned char  m_idLen    {0};
     unsigned char  m_kindLen  {0};
@@ -35,7 +35,7 @@ class BiopName
     BiopName() = default;
     ~BiopName();
 
-    int Process(const unsigned char*);
+    int Process(const unsigned char *data);
 
     unsigned char  m_compCount  {0};
     BiopNameComp  *m_comps      {nullptr};
@@ -47,7 +47,7 @@ class BiopTap
     BiopTap() = default;
     ~BiopTap();
 
-    int Process(const unsigned char*);
+    int Process(const unsigned char *data);
 
     unsigned short  m_id            {0};
     unsigned short  m_use           {0};
@@ -61,7 +61,7 @@ class BiopConnbinder
 {
   public:
     BiopConnbinder() = default;
-    int Process(const unsigned char*); 
+    int Process(const unsigned char *data);
 
     unsigned long m_componentTag      {0};
     unsigned char m_componentDataLen  {0};
@@ -75,7 +75,7 @@ class BiopObjLocation
     BiopObjLocation() = default;
     ~BiopObjLocation() = default;
 
-    int Process(const unsigned char*);
+    int Process(const unsigned char *data);
 
     unsigned long       m_componentTag      {0};
     char                m_componentDataLen  {0};
@@ -97,7 +97,7 @@ class ProfileBodyFull: public ProfileBody
   public:
     ProfileBodyFull() = default;
     virtual ~ProfileBodyFull() = default;
-    int Process(const unsigned char *) override; // ProfileBody
+    int Process(const unsigned char *data) override; // ProfileBody
     DSMCCCacheReference *GetReference() override // ProfileBody
         { return &m_objLoc.m_reference; }
 
@@ -117,7 +117,7 @@ class ProfileBodyLite: public ProfileBody
 {
   public:
 
-    int Process(const unsigned char *) override; // ProfileBody
+    int Process(const unsigned char *data) override; // ProfileBody
 
     // TODO Not currently implemented
     DSMCCCacheReference *GetReference() override // ProfileBody
@@ -135,7 +135,7 @@ class BiopIor
         delete m_profileBody;
     }
  
-    int Process(const unsigned char *);
+    int Process(const unsigned char *data);
     void AddTap(Dsmcc *pStatus);
 
     unsigned long  m_typeIdLen            {0};

@@ -53,7 +53,7 @@ class MHBooleanVar : public MHVariable
 
     // Actions implemented
     void TestVariable(int nOp, const MHUnion &parm, MHEngine *engine) override; // MHRoot
-    void GetVariableValue(MHUnion &value, MHEngine *) override; // MHRoot
+    void GetVariableValue(MHUnion &value, MHEngine *engine) override; // MHRoot
     void SetVariableValue(const MHUnion &value) override; // MHRoot
 
   protected:
@@ -76,7 +76,7 @@ class MHIntegerVar : public MHVariable
 
     // Actions implemented
     void TestVariable(int nOp, const MHUnion &parmm, MHEngine *engine) override; // MHRoot
-    void GetVariableValue(MHUnion &value, MHEngine *) override; // MHRoot
+    void GetVariableValue(MHUnion &value, MHEngine *engine) override; // MHRoot
     void SetVariableValue(const MHUnion &value) override; // MHRoot
   protected:
     int m_nOriginalValue {0};
@@ -98,7 +98,7 @@ class MHOctetStrVar : public MHVariable
 
     // Actions implemented
     void TestVariable(int nOp, const MHUnion &parm, MHEngine *engine) override; // MHRoot
-    void GetVariableValue(MHUnion &value, MHEngine *) override; // MHRoot
+    void GetVariableValue(MHUnion &value, MHEngine *engine) override; // MHRoot
     void SetVariableValue(const MHUnion &value) override; // MHRoot
   protected:
     MHOctetString m_OriginalValue, m_Value;
@@ -119,7 +119,7 @@ class MHObjectRefVar : public MHVariable
 
     // Actions implemented
     void TestVariable(int nOp, const MHUnion &parm, MHEngine *engine) override; // MHRoot
-    void GetVariableValue(MHUnion &value, MHEngine *) override; // MHRoot
+    void GetVariableValue(MHUnion &value, MHEngine *engine) override; // MHRoot
     void SetVariableValue(const MHUnion &value) override; // MHRoot
   protected:
     MHObjectRef m_OriginalValue, m_Value;
@@ -140,7 +140,7 @@ class MHContentRefVar : public MHVariable
 
     // Actions implemented
     void TestVariable(int nOp, const MHUnion &parm, MHEngine *engine) override; // MHRoot
-    void GetVariableValue(MHUnion &value, MHEngine *) override; // MHRoot
+    void GetVariableValue(MHUnion &value, MHEngine *engine) override; // MHRoot
     void SetVariableValue(const MHUnion &value) override; // MHRoot
   protected:
     MHContentRef m_OriginalValue, m_Value;

@@ -44,6 +44,6 @@ struct demux_sputext_t {
 };
 
 
-subtitle_t *sub_read_file (demux_sputext_t*);
+subtitle_t *sub_read_file (demux_sputext_t *demuxstr);
 
 #endif

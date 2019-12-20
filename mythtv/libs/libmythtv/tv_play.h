@@ -311,7 +311,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     // static functions
     static void InitKeys(void);
     static void ReloadKeys(void);
-    static void SetFuncPtr(const char *, void *);
+    static void SetFuncPtr(const char *string, void *lptr);
     static int  ConfiguredTunerCards(void);
     static bool IsTunable(uint chanid);
 
@@ -327,7 +327,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
 
   public slots:
     void HandleOSDClosed(int osdType);
-    void timerEvent(QTimerEvent*) override; // QObject
+    void timerEvent(QTimerEvent *event) override; // QObject
     void StopPlayback(void);
 
   protected:
@@ -363,32 +363,32 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     void PlaybackLoop(void);
 
     // Private event handling
-    bool ProcessKeypressOrGesture(PlayerContext*, QEvent *e);
+    bool ProcessKeypressOrGesture(PlayerContext *actx, QEvent *e);
     bool TranslateKeyPressOrGesture(const QString &context, QEvent *e,
                                     QStringList &actions, bool isLiveTV,
                                     bool allowJumps = true);
     bool TranslateGesture(const QString &context, MythGestureEvent *e,
                           QStringList &actions, bool isLiveTV);
-    void ProcessNetworkControlCommand(PlayerContext *, const QString &command);
+    void ProcessNetworkControlCommand(PlayerContext *ctx, const QString &command);
 
-    bool HandleTrackAction(PlayerContext*, const QString &action);
-    bool ActiveHandleAction(PlayerContext*,
+    bool HandleTrackAction(PlayerContext *ctx, const QString &action);
+    bool ActiveHandleAction(PlayerContext *ctx,
                             const QStringList &actions,
                             bool isDVD, bool isDVDStillFrame);
-    bool BrowseHandleAction(PlayerContext*, const QStringList &actions);
+    bool BrowseHandleAction(PlayerContext *ctx, const QStringList &actions);
     void OSDDialogEvent(int result, const QString& text, QString action);
-    bool PxPHandleAction(PlayerContext*,const QStringList &actions);
-    bool ToggleHandleAction(PlayerContext*,
+    bool PxPHandleAction(PlayerContext *ctx,const QStringList &actions);
+    bool ToggleHandleAction(PlayerContext *ctx,
                             const QStringList &actions, bool isDVD);
-    bool FFRewHandleAction(PlayerContext*, const QStringList &actions);
-    bool ActivePostQHandleAction(PlayerContext*, const QStringList &actions);
+    bool FFRewHandleAction(PlayerContext *ctx, const QStringList &actions);
+    bool ActivePostQHandleAction(PlayerContext *ctx, const QStringList &actions);
     bool HandleJumpToProgramAction(PlayerContext *ctx,
                                    const QStringList   &actions);
     bool SeekHandleAction(PlayerContext *actx, const QStringList &actions,
                           const bool isDVD);
-    bool TimeStretchHandleAction(PlayerContext*,
+    bool TimeStretchHandleAction(PlayerContext *ctx,
                                  const QStringList &actions);
-    static bool DiscMenuHandleAction(PlayerContext*, const QStringList &actions);
+    static bool DiscMenuHandleAction(PlayerContext *ctx, const QStringList &actions);
     bool Handle3D(PlayerContext *ctx, const QString &action);
 
     // Timers and timer events
@@ -402,31 +402,31 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     void HandleVideoExitDialogTimerEvent(void);
     void HandlePseudoLiveTVTimerEvent(void);
     void HandleSpeedChangeTimerEvent(void);
-    void ToggleSleepTimer(const PlayerContext*);
-    void ToggleSleepTimer(const PlayerContext*, const QString &time);
+    void ToggleSleepTimer(const PlayerContext *ctx);
+    void ToggleSleepTimer(const PlayerContext *ctx, const QString &time);
     bool HandlePxPTimerEvent(void);
     bool HandleLCDTimerEvent(void);
     void HandleLCDVolumeTimerEvent(void);
     void HandleSaveLastPlayPosEvent();
 
     // Commands used by frontend UI screens (PlaybackBox, GuideGrid etc)
-    void EditSchedule(const PlayerContext*,
+    void EditSchedule(const PlayerContext *ctx,
                       int editType = kScheduleProgramGuide);
-    bool StartEmbedding(const QRect&);
+    bool StartEmbedding(const QRect &embedRect);
     void StopEmbedding(void);
-    static bool IsTunable(const PlayerContext*, uint chanid);
-    static QSet<uint> IsTunableOn(const PlayerContext*, uint chanid);
-    void ChangeChannel(const PlayerContext*, const ChannelInfoList &options);
+    static bool IsTunable(const PlayerContext *ctx, uint chanid);
+    static QSet<uint> IsTunableOn(const PlayerContext *ctx, uint chanid);
+    void ChangeChannel(const PlayerContext *ctx, const ChannelInfoList &options);
     void DoEditSchedule(int editType = kScheduleProgramGuide);
     QString GetRecordingGroup(int player_idx) const;
-    void ChangeVolume(PlayerContext*, bool up, int newvolume = -1);
-    void ToggleMute(PlayerContext*, const bool muteIndividualChannels = false);
+    void ChangeVolume(PlayerContext *ctx, bool up, int newvolume = -1);
+    void ToggleMute(PlayerContext *ctx, const bool muteIndividualChannels = false);
     void UpdateChannelList(int groupID);
 
     // Lock handling
-    OSD *GetOSDL(const char *, int);
-    OSD *GetOSDL(const PlayerContext*,const char *, int);
-    void ReturnOSDLock(const PlayerContext*,OSD*&);
+    OSD *GetOSDL(const char *file, int location);
+    OSD *GetOSDL(const PlayerContext *ctx, const char *file, int location);
+    void ReturnOSDLock(const PlayerContext *ctx, OSD *&osd);
     PlayerContext       *GetPlayerWriteLock(
         int which, const char *file, int location);
     PlayerContext       *GetPlayerReadLock(
@@ -434,17 +434,17 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     const PlayerContext *GetPlayerReadLock(
         int which, const char *file, int location) const;
     PlayerContext       *GetPlayerHaveLock(
-        PlayerContext*,
+        PlayerContext *ctx,
         int which, const char *file, int location);
     const PlayerContext *GetPlayerHaveLock(
-        const PlayerContext*,
+        const PlayerContext *ctx,
         int which, const char *file, int location) const;
-    void ReturnPlayerLock(PlayerContext*&);
-    void ReturnPlayerLock(const PlayerContext*&) const;
+    void ReturnPlayerLock(PlayerContext *&ctx);
+    void ReturnPlayerLock(const PlayerContext *&ctx) const;
 
     // Other toggles
-    void ToggleAutoExpire(PlayerContext*);
-    void QuickRecord(PlayerContext*);
+    void ToggleAutoExpire(PlayerContext *ctx);
+    void QuickRecord(PlayerContext *ctx);
 
     // General TV state
     static bool StateIsRecording(TVState state);
@@ -452,26 +452,26 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     static bool StateIsLiveTV(TVState state);
 
     TVState GetState(int player_idx) const;
-    static TVState GetState(const PlayerContext*);
+    static TVState GetState(const PlayerContext *actx);
     void HandleStateChange(PlayerContext *mctx, PlayerContext *ctx);
     void GetStatus(void);
-    void ForceNextStateNone(PlayerContext*);
-    void ScheduleStateChange(PlayerContext*);
-    void SetErrored(PlayerContext*);
+    void ForceNextStateNone(PlayerContext *ctx);
+    void ScheduleStateChange(PlayerContext *ctx);
+    void SetErrored(PlayerContext *ctx);
     void setInPlayList(bool setting) { m_inPlaylist = setting; }
     void setUnderNetworkControl(bool setting) { m_underNetworkControl = setting; }
-    void PrepToSwitchToRecordedProgram(PlayerContext*,
-                                       const ProgramInfo &);
+    void PrepToSwitchToRecordedProgram(PlayerContext *ctx,
+                                       const ProgramInfo &p);
     enum BookmarkAction {
         kBookmarkAlways,
         kBookmarkNever,
         kBookmarkAuto // set iff db_playback_exit_prompt==2
     };
-    void PrepareToExitPlayer(PlayerContext*, int line,
+    void PrepareToExitPlayer(PlayerContext *ctx, int line,
                              BookmarkAction bookmark = kBookmarkAuto);
     void SetExitPlayer(bool set_it, bool wants_to);
 
-    bool RequestNextRecorder(PlayerContext *, bool,
+    bool RequestNextRecorder(PlayerContext *ctx, bool showDialogs,
                              const ChannelInfoList &sel = ChannelInfoList());
     void DeleteRecorder();
 
@@ -484,7 +484,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     bool StartPlayer(PlayerContext *mctx, PlayerContext *ctx,
                      TVState desiredState);
 
-    vector<long long> TeardownAllPlayers(PlayerContext*);
+    vector<long long> TeardownAllPlayers(PlayerContext *lctx);
     void RestartAllPlayers(PlayerContext *lctx,
                            const vector<long long> &pos,
                            MuteState mctx_mute);
@@ -500,22 +500,22 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     /// This is set if the user asked MythTV to jump to the previous
     /// recording in the playlist.
     bool getJumpToProgram(void)  const { return m_jumpToProgram; }
-    static bool IsDeleteAllowed(const PlayerContext*);
+    static bool IsDeleteAllowed(const PlayerContext *ctx);
 
     // Channels
     static void ToggleChannelFavorite(PlayerContext *ctx);
-    static void ToggleChannelFavorite(PlayerContext*, const QString&);
-    void ChangeChannel(PlayerContext*, ChannelChangeDirection direction);
-    void ChangeChannel(PlayerContext*, uint chanid, const QString &channum);
+    static void ToggleChannelFavorite(PlayerContext *ctx, const QString &changroup_name);
+    void ChangeChannel(PlayerContext *ctx, ChannelChangeDirection direction);
+    void ChangeChannel(PlayerContext *ctx, uint chanid, const QString &channum);
 
-    void ShowPreviousChannel(PlayerContext*);
-    void PopPreviousChannel(PlayerContext*, bool immediate_change);
+    void ShowPreviousChannel(PlayerContext *ctx);
+    void PopPreviousChannel(PlayerContext *ctx, bool immediate_change);
 
     // key queue commands
-    void AddKeyToInputQueue(PlayerContext*, char key);
-    void ClearInputQueues(const PlayerContext*, bool hideosd);
-    bool CommitQueuedInput(PlayerContext*);
-    bool ProcessSmartChannel(const PlayerContext*, QString&);
+    void AddKeyToInputQueue(PlayerContext *ctx, char key);
+    void ClearInputQueues(const PlayerContext *ctx, bool hideosd);
+    bool CommitQueuedInput(PlayerContext *ctx);
+    bool ProcessSmartChannel(const PlayerContext *ctx, QString &inputStr);
 
     // query key queues
     bool HasQueuedInput(void) const
@@ -530,18 +530,18 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     uint    GetQueuedChanID(void)  const { return m_queuedChanID; }
 
     // Source and input
-    void SwitchSource(PlayerContext*, uint source_direction);
-    void SwitchInputs(PlayerContext*,
+    void SwitchSource(PlayerContext *ctx, uint source_direction);
+    void SwitchInputs(PlayerContext *ctx,
                       uint chanid = 0, QString channum = "", uint inputid = 0);
 
     // Pause/play
-    void PauseLiveTV(PlayerContext*);
-    void UnpauseLiveTV(PlayerContext*, bool bQuietly = false);
-    void DoPlay(PlayerContext*);
-    float DoTogglePauseStart(PlayerContext*);
-    void DoTogglePauseFinish(PlayerContext*, float time, bool showOSD);
-    void DoTogglePause(PlayerContext*, bool showOSD);
-    vector<bool> DoSetPauseState(PlayerContext *lctx, const vector<bool>&);
+    void PauseLiveTV(PlayerContext *ctx);
+    void UnpauseLiveTV(PlayerContext *ctx, bool bQuietly = false);
+    void DoPlay(PlayerContext *ctx);
+    float DoTogglePauseStart(PlayerContext *ctx);
+    void DoTogglePauseFinish(PlayerContext *ctx, float time, bool showOSD);
+    void DoTogglePause(PlayerContext *ctx, bool showOSD);
+    vector<bool> DoSetPauseState(PlayerContext *lctx, const vector<bool>&pause);
     static bool ContextIsPaused(PlayerContext *ctx, const char *file, int location);
 
     // Program jumping stuff
@@ -549,9 +549,9 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     ProgramInfo *GetLastProgram(void) const;
 
     // Seek, skip, jump, speed
-    void DoSeek(PlayerContext*, float time, const QString &mesg,
+    void DoSeek(PlayerContext *ctx, float time, const QString &mesg,
                 bool timeIsOffset, bool honorCutlist);
-    bool DoPlayerSeek(PlayerContext*, float time);
+    bool DoPlayerSeek(PlayerContext *ctx, float time);
     bool DoPlayerSeekToFrame(PlayerContext *ctx, uint64_t target);
     enum ArbSeekWhence {
         ARBSEEK_SET = 0,
@@ -560,60 +560,60 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
         ARBSEEK_END
     };
     void DoSeekAbsolute(PlayerContext *ctx, long long seconds, bool honorCutlist);
-    void DoArbSeek(PlayerContext*, ArbSeekWhence whence, bool honorCutlist);
+    void DoArbSeek(PlayerContext *ctx, ArbSeekWhence whence, bool honorCutlist);
     void DoJumpFFWD(PlayerContext *ctx);
     void DoJumpRWND(PlayerContext *ctx);
     void DoSeekFFWD(PlayerContext *ctx);
     void DoSeekRWND(PlayerContext *ctx);
-    void NormalSpeed(PlayerContext*);
-    void ChangeSpeed(PlayerContext*, int direction);
-    void ToggleTimeStretch(PlayerContext*);
-    void ChangeTimeStretch(PlayerContext*, int dir, bool allowEdit = true);
-    void DVDJumpBack(PlayerContext*);
-    void DVDJumpForward(PlayerContext*);
-    float StopFFRew(PlayerContext*);
-    void ChangeFFRew(PlayerContext*, int direction);
-    void SetFFRew(PlayerContext*, int index);
+    void NormalSpeed(PlayerContext *ctx);
+    void ChangeSpeed(PlayerContext *ctx, int direction);
+    void ToggleTimeStretch(PlayerContext *ctx);
+    void ChangeTimeStretch(PlayerContext *ctx, int dir, bool allowEdit = true);
+    void DVDJumpBack(PlayerContext *ctx);
+    void DVDJumpForward(PlayerContext *ctx);
+    float StopFFRew(PlayerContext *ctx);
+    void ChangeFFRew(PlayerContext *ctx, int direction);
+    void SetFFRew(PlayerContext *ctx, int index);
 
     // Private audio methods
-    void EnableUpmix(PlayerContext*, bool enable, bool toggle = false);
-    void ChangeAudioSync(PlayerContext*, int dir, int newsync = -9999);
-    bool AudioSyncHandleAction(PlayerContext*, const QStringList &actions);
+    void EnableUpmix(PlayerContext *ctx, bool enable, bool toggle = false);
+    void ChangeAudioSync(PlayerContext *ctx, int dir, int newsync = -9999);
+    bool AudioSyncHandleAction(PlayerContext *ctx, const QStringList &actions);
     static void PauseAudioUntilBuffered(PlayerContext *ctx);
 
     // Chapters, titles and angles
-    static int  GetNumChapters(const PlayerContext*);
-    static void GetChapterTimes(const PlayerContext*, QList<long long> &times);
-    static int  GetCurrentChapter(const PlayerContext*);
+    static int  GetNumChapters(const PlayerContext *ctx);
+    static void GetChapterTimes(const PlayerContext *ctx, QList<long long> &times);
+    static int  GetCurrentChapter(const PlayerContext *ctx);
     static int  GetNumTitles(const PlayerContext *ctx);
     static int  GetCurrentTitle(const PlayerContext *ctx);
     static int  GetTitleDuration(const PlayerContext *ctx, int title);
     static QString GetTitleName(const PlayerContext *ctx, int title);
-    void DoSwitchTitle(PlayerContext*, int title);
+    void DoSwitchTitle(PlayerContext *ctx, int title);
     static int  GetNumAngles(const PlayerContext *ctx);
     static int  GetCurrentAngle(const PlayerContext *ctx);
     static QString GetAngleName(const PlayerContext *ctx, int angle);
-    void DoSwitchAngle(PlayerContext*, int angle);
-    void DoJumpChapter(PlayerContext*, int chapter);
+    void DoSwitchAngle(PlayerContext *ctx, int angle);
+    void DoJumpChapter(PlayerContext *ctx, int chapter);
 
     // Commercial skipping
-    void DoSkipCommercials(PlayerContext*, int direction);
-    void SetAutoCommercialSkip(const PlayerContext*,
+    void DoSkipCommercials(PlayerContext *ctx, int direction);
+    void SetAutoCommercialSkip(const PlayerContext *ctx,
                                CommSkipMode skipMode = kCommSkipOff);
 
     // Transcode
-    void DoQueueTranscode(PlayerContext*, const QString& profile);
+    void DoQueueTranscode(PlayerContext *ctx, const QString& profile);
 
     // Bookmarks
-    static bool IsBookmarkAllowed(const PlayerContext*);
+    static bool IsBookmarkAllowed(const PlayerContext *ctx);
     void SetBookmark(PlayerContext* ctx, bool clear = false);
 
     // OSD
-    bool ClearOSD(const PlayerContext*);
-    void ToggleOSD(PlayerContext*, bool includeStatusOSD);
-    void ToggleOSDDebug(PlayerContext*);
+    bool ClearOSD(const PlayerContext *ctx);
+    void ToggleOSD(PlayerContext *ctx, bool includeStatusOSD);
+    void ToggleOSDDebug(PlayerContext *ctx);
     void UpdateOSDDebug(const PlayerContext *ctx);
-    void UpdateOSDProgInfo(const PlayerContext*, const char *whichInfo);
+    void UpdateOSDProgInfo(const PlayerContext *ctx, const char *whichInfo);
     void UpdateOSDStatus(const PlayerContext *ctx, const QString& title, const QString& desc,
                          const QString& value, int type, const QString& units,
                          int position = 0,
@@ -621,11 +621,11 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     void UpdateOSDStatus(const PlayerContext *ctx, osdInfo &info,
                          int type, enum OSDTimeout timeout);
 
-    void UpdateOSDSeekMessage(const PlayerContext*,
+    void UpdateOSDSeekMessage(const PlayerContext *ctx,
                               const QString &mesg, enum OSDTimeout timeout);
-    void UpdateOSDInput(const PlayerContext*);
-    void UpdateOSDSignal(PlayerContext*, const QStringList &strlist);
-    void UpdateOSDTimeoutMessage(PlayerContext*);
+    void UpdateOSDInput(const PlayerContext *ctx);
+    void UpdateOSDSignal(PlayerContext *ctx, const QStringList &strlist);
+    void UpdateOSDTimeoutMessage(PlayerContext *ctx);
     void UpdateOSDAskAllowDialog(PlayerContext*);
     void SetUpdateOSDPosition(bool set_it);
 
@@ -640,7 +640,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     // PxP handling
     bool CreatePBP(PlayerContext *lctx, const ProgramInfo *info);
     bool CreatePIP(PlayerContext *lctx, const ProgramInfo *info);
-    bool ResizePIPWindow(PlayerContext*);
+    bool ResizePIPWindow(PlayerContext *ctx);
     bool IsPBPSupported(const PlayerContext *ctx = nullptr) const;
     bool IsPIPSupported(const PlayerContext *ctx = nullptr) const;
     void PxPToggleView(  PlayerContext *actx, bool wantPBP);
@@ -656,54 +656,55 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     // Video controls
     void ToggleMoveBottomLine(PlayerContext *ctx);
     void SaveBottomLine(PlayerContext *ctx);
-    void ToggleAspectOverride(PlayerContext*,
+    void ToggleAspectOverride(PlayerContext *ctx,
                               AspectOverrideMode aspectMode = kAspect_Toggle);
-    void ToggleAdjustFill(PlayerContext*,
+    void ToggleAdjustFill(PlayerContext *ctx,
                           AdjustFillMode adjustfillMode = kAdjustFill_Toggle);
-    static void DoToggleNightMode(const PlayerContext*);
-    void DoTogglePictureAttribute(const PlayerContext*,
+    static void DoToggleNightMode(const PlayerContext *ctx);
+    void DoTogglePictureAttribute(const PlayerContext *ctx,
                                   PictureAdjustType type);
     void DoChangePictureAttribute(
-        PlayerContext*,
+        PlayerContext *ctx,
         PictureAdjustType type, PictureAttribute attr,
         bool up, int newvalue = -1);
-    bool PictureAttributeHandleAction(PlayerContext*,
+    bool PictureAttributeHandleAction(PlayerContext *ctx,
                                       const QStringList &actions);
     static PictureAttribute NextPictureAdjustType(
         PictureAdjustType type, MythPlayer *mp, PictureAttribute attr);
     static void HandleDeinterlacer(PlayerContext* ctx, const QString &action);
 
     // Sundry on screen
-    static void ITVRestart(PlayerContext*, bool isLive);
-    void EnableVisualisation(const PlayerContext*, bool enable, bool toggle = false,
+    static void ITVRestart(PlayerContext *ctx, bool isLive);
+    void EnableVisualisation(const PlayerContext *ctx, bool enable, bool toggle = false,
                              const QString &action = QString(""));
 
     // Manual zoom mode
-    void SetManualZoom(const PlayerContext *, bool zoomON, const QString& desc);
+    void SetManualZoom(const PlayerContext *ctx, bool zoomON, const QString& desc);
     bool ManualZoomHandleAction(PlayerContext *actx,
                                 const QStringList &actions);
 
     // Channel editing support
-    void StartChannelEditMode(PlayerContext*);
-    bool HandleOSDChannelEdit(PlayerContext*, const QString& action);
-    static void ChannelEditAutoFill(const PlayerContext*, InfoMap&);
-    static void ChannelEditXDSFill(const PlayerContext*, InfoMap&);
+    void StartChannelEditMode(PlayerContext *ctx);
+    bool HandleOSDChannelEdit(PlayerContext *ctx, const QString& action);
+    static void ChannelEditAutoFill(const PlayerContext *ctx, InfoMap &infoMap);
+    static void ChannelEditXDSFill(const PlayerContext *ctx, InfoMap &infoMap);
 
     // General dialog handling
     bool DialogIsVisible(PlayerContext *ctx, const QString &dialog);
     void HandleOSDInfo(PlayerContext *ctx, const QString& action);
-    void ShowNoRecorderDialog(const PlayerContext*,
+    void ShowNoRecorderDialog(const PlayerContext *ctx,
                               NoRecorderMsg msgType = kNoRecorders);
 
     // AskAllow dialog handling
     void ShowOSDAskAllow(PlayerContext *ctx);
     void HandleOSDAskAllow(PlayerContext *ctx, const QString& action);
-    void AskAllowRecording(PlayerContext*, const QStringList&, int, bool, bool);
+    void AskAllowRecording(PlayerContext *ctx, const QStringList &msg,
+                           int timeuntil, bool hasrec, bool haslater);
 
     // Program editing support
     void ShowOSDCutpoint(PlayerContext *ctx, const QString &type);
     bool HandleOSDCutpoint(PlayerContext *ctx, const QString& action);
-    void StartProgramEditMode(PlayerContext*);
+    void StartProgramEditMode(PlayerContext *ctx);
 
     // Already editing dialog
     void ShowOSDAlreadyEditing(PlayerContext *ctx);
@@ -750,8 +751,8 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
 
     // LCD
     void UpdateLCD(void);
-    void ShowLCDChannelInfo(const PlayerContext*);
-    void ShowLCDDVDInfo(const PlayerContext*);
+    void ShowLCDChannelInfo(const PlayerContext *ctx);
+    void ShowLCDDVDInfo(const PlayerContext *ctx);
 
     // Other stuff
     int GetLastRecorderNum(int player_idx) const;
@@ -760,11 +761,11 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     static QStringList GetValidRecorderList(uint, const QString&);
 
     static TVState RemoveRecording(TVState state);
-    void RestoreScreenSaver(const PlayerContext*);
+    void RestoreScreenSaver(const PlayerContext *ctx);
 
     // for temp debugging only..
-    int find_player_index(const PlayerContext*) const;
-    static QString GetLiveTVIndex(const PlayerContext*);
+    int find_player_index(const PlayerContext *ctx) const;
+    static QString GetLiveTVIndex(const PlayerContext *ctx);
 
   private:
     // Configuration variables from database

@@ -93,7 +93,7 @@ class MTV_PUBLIC ChannelImporter
         m_success(success),
         m_serviceRequirements(service_requirements) { }
 
-    void Process(const ScanDTVTransportList&, int sourceid = -1);
+    void Process(const ScanDTVTransportList &_transports, int sourceid = -1);
 
   protected:
     enum DeleteAction
@@ -143,13 +143,13 @@ class MTV_PUBLIC ChannelImporter
     static void CleanupDuplicates(ScanDTVTransportList &transports);
     void FilterServices(ScanDTVTransportList &transports) const;
     ScanDTVTransportList GetDBTransports(
-        uint sourceid, ScanDTVTransportList&) const;
+        uint sourceid, ScanDTVTransportList &transports) const;
 
-    uint DeleteChannels(ScanDTVTransportList&);
+    uint DeleteChannels(ScanDTVTransportList &transports);
     uint DeleteUnusedTransports(uint sourceid);
 
-    void InsertChannels(const ScanDTVTransportList&,
-                        const ChannelImporterBasicStats&);
+    void InsertChannels(const ScanDTVTransportList &transports,
+                        const ChannelImporterBasicStats &info);
 
     ScanDTVTransportList InsertChannels(
         const ScanDTVTransportList &transports,

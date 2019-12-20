@@ -20,9 +20,9 @@ class InputInfo;
 class CardInput;
 using InputNames = QMap<int,QString>;
 
-MTV_PUBLIC QString get_on_input(const QString&, uint);
+MTV_PUBLIC QString get_on_input(const QString &to_get, uint inputid);
 
-MTV_PUBLIC bool set_on_input(const QString&, uint, const QString&);
+MTV_PUBLIC bool set_on_input(const QString &to_set, uint inputid, const QString &value);
 
 enum dvb_dev_type_t
 {
@@ -400,7 +400,7 @@ class MTV_PUBLIC CardUtil
     static int          SetDeliverySystem(uint inputid, DTVModulationSystem delsys, int fd);
     static int          OpenVideoDevice(int inputid);
     static int          OpenVideoDevice(const QString &device);
-    static QString      GetDeviceName(dvb_dev_type_t, const QString &device);
+    static QString      GetDeviceName(dvb_dev_type_t type, const QString &device);
     static InputNames   GetConfiguredDVBInputs(const QString &device);
 
     // V4L info

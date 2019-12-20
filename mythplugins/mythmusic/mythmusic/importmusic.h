@@ -63,8 +63,8 @@ class ImportMusicDialog : public MythScreenType
     ~ImportMusicDialog();
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
-    void customEvent(QEvent *) override; // MythUIType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
+    void customEvent(QEvent *event) override; // MythUIType
 
     bool somethingWasImported() { return m_somethingWasImported; }
     void doScan(void);
@@ -172,7 +172,7 @@ class ImportCoverArtDialog : public MythScreenType
     ~ImportCoverArtDialog() = default;
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
   public slots:
     void copyPressed(void);

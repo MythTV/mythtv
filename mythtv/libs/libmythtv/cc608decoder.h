@@ -62,7 +62,7 @@ class CC608Decoder
     QString GetXDS(const QString &key) const;
 
     /// \return Services seen in last few seconds as specified.
-    void GetServices(uint seconds, bool[4]) const;
+    void GetServices(uint seconds, bool seen[4]) const;
 
     static QString ToASCII(const QString &cc608, bool suppress_unknown);
 
@@ -72,7 +72,7 @@ class CC608Decoder
     void BufferCC(int mode, int len, int clr);
     int NewRowCC(int mode, int len);
 
-    QString XDSDecodeString(const vector<unsigned char>&,
+    QString XDSDecodeString(const vector<unsigned char>&buf,
                             uint start, uint end) const;
     bool XDSDecode(int field, int b1, int b2);
 

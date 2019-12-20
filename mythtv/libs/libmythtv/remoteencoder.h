@@ -54,19 +54,20 @@ class MTV_PUBLIC RemoteEncoder
 
     void SetLiveRecording(bool recording);
     QString GetInput(void);
-    QString SetInput(const QString&);
+    QString SetInput(const QString &input);
     int  GetPictureAttribute(PictureAttribute attr);
     int  ChangePictureAttribute(
         PictureAdjustType type, PictureAttribute attr, bool up);
     void ChangeChannel(int channeldirection);
     void ChangeDeinterlacer(int deint_mode);
-    void ToggleChannelFavorite(const QString&);
+    void ToggleChannelFavorite(const QString &changroupname);
     void SetChannel(const QString& channel);
     int  SetSignalMonitoringRate(int rate, bool notifyFrontend = true);
     uint GetSignalLockTimeout(const QString& input);
     bool CheckChannel(const QString& channel);
     bool ShouldSwitchToAnotherCard(const QString& channelid);
-    bool CheckChannelPrefix(const QString&,uint&,bool&,QString&);
+    bool CheckChannelPrefix(const QString &prefix, uint &complete_valid_channel_on_rec,
+                            bool &is_extra_char_useful, QString &needed_spacer);
     void GetNextProgram(int direction,
                         QString &title, QString &subtitle, QString &desc, 
                         QString &category, QString &starttime, QString &endtime,

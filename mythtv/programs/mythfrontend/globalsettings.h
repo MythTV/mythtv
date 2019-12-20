@@ -163,7 +163,7 @@ class HostRefreshRateComboBoxSetting : public HostComboBoxSetting
 
   public slots:
 #if defined(USING_XRANDR) || CONFIG_DARWIN
-    virtual void ChangeResolution(StandardSetting *);
+    virtual void ChangeResolution(StandardSetting *setting);
 #endif
 
   private:
@@ -180,7 +180,7 @@ class MainGeneralSettings : public GroupSetting
 
 #ifdef USING_LIBCEC
   public slots:
-    void cecChanged(bool);
+    void cecChanged(bool setting);
   protected:
     HostCheckBoxSetting *m_cecPowerOnTVAllowed  {nullptr};
     HostCheckBoxSetting *m_cecPowerOffTVAllowed {nullptr};
@@ -209,7 +209,7 @@ class PlaybackProfileItemConfig : public GroupSetting
     void Load(void) override; // StandardSetting
     void Save(void) override; // StandardSetting
 
-    bool keyPressEvent(QKeyEvent *) override; // StandardSetting
+    bool keyPressEvent(QKeyEvent *e) override; // StandardSetting
     uint GetIndex(void) const;
     void ShowDeleteDialog(void);
     void DecreasePriority(void);
@@ -231,7 +231,7 @@ class PlaybackProfileItemConfig : public GroupSetting
                               TransMythUICheckBoxSetting *Shader,
                               TransMythUICheckBoxSetting *Driver);
     void InitLabel(void);
-    void DoDeleteSlot(bool);
+    void DoDeleteSlot(bool doDelete);
 
   private:
     ProfileItem                &m_item;
@@ -272,7 +272,7 @@ class PlaybackProfileConfig : public GroupSetting
 
   private:
     void InitUI(StandardSetting *parent);
-    StandardSetting * InitProfileItem(uint, StandardSetting *);
+    StandardSetting * InitProfileItem(uint i, StandardSetting *parent);
 
   private:
     void ReloadSettings(void);

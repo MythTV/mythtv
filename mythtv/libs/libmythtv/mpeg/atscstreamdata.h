@@ -40,7 +40,7 @@ class MTV_PUBLIC ATSCStreamData : virtual public MPEGStreamData
 
     // Table processing
     bool HandleTables(uint pid, const PSIPTable &psip) override; // MPEGStreamData
-    bool IsRedundant(uint, const PSIPTable&) const override; // MPEGStreamData
+    bool IsRedundant(uint pid, const PSIPTable &psip) const override; // MPEGStreamData
 
     /// Current UTC to GPS time offset in seconds
     uint GPSOffset(void) const { return m_gpsUtcOffset; }
@@ -89,8 +89,8 @@ class MTV_PUBLIC ATSCStreamData : virtual public MPEGStreamData
     tvct_vec_t GetCachedTVCTs(bool current = true) const;
     cvct_vec_t GetCachedCVCTs(bool current = true) const;
 
-    void ReturnCachedTVCTTables(tvct_vec_t&) const;
-    void ReturnCachedCVCTTables(cvct_vec_t&) const;
+    void ReturnCachedTVCTTables(tvct_vec_t &tvcts) const;
+    void ReturnCachedCVCTTables(cvct_vec_t &cvcts) const;
 
     bool HasChannel(uint major, uint minor) const;
 
@@ -98,28 +98,28 @@ class MTV_PUBLIC ATSCStreamData : virtual public MPEGStreamData
     int DesiredMajorChannel(void) const { return m_desiredMajorChannel; }
     int DesiredMinorChannel(void) const { return m_desiredMinorChannel; }
 
-    void AddATSCMainListener(ATSCMainStreamListener*);
-    void AddSCTEMainListener(SCTEMainStreamListener*);
-    void AddATSCAuxListener(ATSCAuxStreamListener*);
-    void AddATSCEITListener(ATSCEITStreamListener*);
-    void AddATSC81EITListener(ATSC81EITStreamListener*);
+    void AddATSCMainListener(ATSCMainStreamListener *val);
+    void AddSCTEMainListener(SCTEMainStreamListener *val);
+    void AddATSCAuxListener(ATSCAuxStreamListener *val);
+    void AddATSCEITListener(ATSCEITStreamListener *val);
+    void AddATSC81EITListener(ATSC81EITStreamListener *val);
 
-    void RemoveATSCMainListener(ATSCMainStreamListener*);
-    void RemoveSCTEMainListener(SCTEMainStreamListener*);
-    void RemoveATSCAuxListener(ATSCAuxStreamListener*);
-    void RemoveATSCEITListener(ATSCEITStreamListener*);
-    void RemoveATSC81EITListener(ATSC81EITStreamListener*);
+    void RemoveATSCMainListener(ATSCMainStreamListener *val);
+    void RemoveSCTEMainListener(SCTEMainStreamListener *val);
+    void RemoveATSCAuxListener(ATSCAuxStreamListener *val);
+    void RemoveATSCEITListener(ATSCEITStreamListener *val);
+    void RemoveATSC81EITListener(ATSC81EITStreamListener *val);
 
   private:
-    void ProcessMGT(const MasterGuideTable*);
-    void ProcessVCT(uint tsid, const VirtualChannelTable*);
-    void ProcessTVCT(uint tsid, const TerrestrialVirtualChannelTable*);
-    void ProcessCVCT(uint tsid, const CableVirtualChannelTable*);
+    void ProcessMGT(const MasterGuideTable *mgt);
+    void ProcessVCT(uint tsid, const VirtualChannelTable *vct);
+    void ProcessTVCT(uint tsid, const TerrestrialVirtualChannelTable *vct);
+    void ProcessCVCT(uint tsid, const CableVirtualChannelTable *vct);
 
     // Caching
-    void CacheMGT(MasterGuideTable*);
-    void CacheTVCT(uint pid, TerrestrialVirtualChannelTable*);
-    void CacheCVCT(uint pid, CableVirtualChannelTable*);
+    void CacheMGT(MasterGuideTable *mgt);
+    void CacheTVCT(uint pid, TerrestrialVirtualChannelTable *tvct);
+    void CacheCVCT(uint pid, CableVirtualChannelTable *cvct);
   protected:
     bool DeleteCachedTable(const PSIPTable *psip) const override; // MPEGStreamData
 

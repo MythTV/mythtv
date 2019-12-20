@@ -229,7 +229,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
     RecordingType GetProgramRecordingStatus(void);
     QString GetProgramRecordingProfile(void) const;
     void ApplyRecordStateChange(RecordingType newstate, bool save = true);
-    void ApplyRecordRecPriorityChange(int);
+    void ApplyRecordRecPriorityChange(int newrecpriority);
     void QuickRecord(void);
 
     // Used in determining start and end for RecordingQuality determination
@@ -259,7 +259,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
                                    const QString &newSubtitle,
                                    const QString &newDescription);
     void ApplyTranscoderProfileChange(const QString &profile) const;//pi
-    void ApplyTranscoderProfileChangeById(int);
+    void ApplyTranscoderProfileChangeById(int id);
     void ApplyNeverRecord(void);
 
     // Temporary while we transition from string to integer

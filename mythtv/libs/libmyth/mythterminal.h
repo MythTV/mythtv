@@ -34,7 +34,7 @@ class MPUBLIC MythTerminal : public MythScreenType
     void Start(void);
     void Kill(void);
     bool IsDone(void) const;
-    void AddText(const QString&);
+    void AddText(const QString& _str);
 
   protected slots:
     void ProcessHasText(void); // connected to from process' readyRead signal

@@ -24,7 +24,7 @@ class MUI_PUBLIC MythUICheckBox : public MythUIType
                      SelectedInactive };
 
     bool gestureEvent(MythGestureEvent *event) override; // MythUIType
-    bool keyPressEvent(QKeyEvent *) override; // MythUIType
+    bool keyPressEvent(QKeyEvent *event) override; // MythUIType
 
     void toggleCheckState(void);
 

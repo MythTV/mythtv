@@ -58,7 +58,7 @@ class BackendSelection : public MythScreenType
 
   protected slots:
     void Accept(void);
-    void Accept(MythUIButtonListItem *);
+    void Accept(MythUIButtonListItem *item);
     void Manual(void);   ///< Linked to 'Configure Manually' button
     void Cancel(void);  ///< Linked to 'Cancel' button
 
@@ -70,7 +70,7 @@ class BackendSelection : public MythScreenType
     void RemoveItem(const QString& USN);
     bool TryDBfromURL(const QString &error, QString URL);
     void PromptForPassword(void);
-    void CloseWithDecision(Decision);
+    void CloseWithDecision(Decision d);
 
     DatabaseParams   *m_dbParams        {nullptr};
     Configuration    *m_pConfig         {nullptr};

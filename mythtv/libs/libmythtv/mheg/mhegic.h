@@ -39,7 +39,7 @@ public:
     // Implementation
 private slots:
     // NetStream signals
-    void slotFinished(QObject*);
+    void slotFinished(QObject *obj);
 
 private:
     Q_DISABLE_COPY(MHInteractionChannel)

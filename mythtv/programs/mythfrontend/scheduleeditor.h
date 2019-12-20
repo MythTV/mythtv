@@ -69,7 +69,7 @@ class StoreOptMixin
     void Load(void);
     void Save(void);
     void RuleChanged(void);
-    void MaxEpisodesChanged(MythUIButtonListItem *);
+    void MaxEpisodesChanged(MythUIButtonListItem *item);
     void PromptForRecGroup(void);
     void SetRecGroup(int recgroupID, QString recgroup);
 
@@ -185,9 +185,9 @@ class ScheduleEditor : public ScheduleCommon,
 
   protected slots:
     void RuleChanged(MythUIButtonListItem *item);
-    void DupMethodChanged(MythUIButtonListItem *);
-    static void FilterChanged(MythUIButtonListItem *);
-    void MaxEpisodesChanged(MythUIButtonListItem *);
+    void DupMethodChanged(MythUIButtonListItem *item);
+    static void FilterChanged(MythUIButtonListItem *item);
+    void MaxEpisodesChanged(MythUIButtonListItem *item);
     void PromptForRecGroup(void);
     void TranscodeChanged(bool enable);
     void ShowSchedInfo(void);
@@ -285,7 +285,7 @@ class SchedOptEditor : public SchedEditChild, public SchedOptMixin
     bool Create(void) override; // MythScreenType
 
   protected slots:
-    void DupMethodChanged(MythUIButtonListItem *);
+    void DupMethodChanged(MythUIButtonListItem *item);
 
   private:
     void Load(void) override; // SchedEditChild
@@ -324,7 +324,7 @@ class StoreOptEditor : public SchedEditChild, public StoreOptMixin
     void customEvent(QEvent *event) override; // MythUIType
 
   protected slots:
-    void MaxEpisodesChanged(MythUIButtonListItem *);
+    void MaxEpisodesChanged(MythUIButtonListItem *item);
     void PromptForRecGroup(void);
 
   private:

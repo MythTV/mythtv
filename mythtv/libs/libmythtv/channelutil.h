@@ -70,7 +70,7 @@ class MTV_PUBLIC ChannelUtil
         const QString& lp_code_rate, const QString& guard_interval,
         const QString& mod_sys,      const QString& rolloff);
 
-    static uint    CreateMultiplex(uint sourceid, const DTVMultiplex&,
+    static uint    CreateMultiplex(uint sourceid, const DTVMultiplex &mux,
                                    int transport_id, int network_id);
 
     static vector<uint> CreateMultiplexes(

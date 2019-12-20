@@ -10,9 +10,9 @@
 #include "mpegtables.h"
 #include "mythtvexp.h"
 
-MTV_PUBLIC QDateTime dvbdate2qt(const unsigned char*);
-MTV_PUBLIC time_t dvbdate2unix(const unsigned char*);
-uint32_t dvbdate2key(const unsigned char*);
+MTV_PUBLIC QDateTime dvbdate2qt(const unsigned char *buf);
+MTV_PUBLIC time_t dvbdate2unix(const unsigned char *buf);
+uint32_t dvbdate2key(const unsigned char *buf);
 
 /** \class NetworkInformationTable
  *  \brief This table tells the decoder on which PIDs to find other tables.

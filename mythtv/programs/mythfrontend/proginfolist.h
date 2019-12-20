@@ -37,7 +37,7 @@ class ProgInfoList : QObject
     void Clear()   { m_btnList->Reset(); }
 
   private:
-    void CreateButton(const QString&, const QString&);
+    void CreateButton(const QString &name, const QString &value);
 
     MythScreenType   &m_screen;                //!< Parent screen
     MythUIButtonList *m_btnList     {nullptr}; //!< Overlay buttonlist

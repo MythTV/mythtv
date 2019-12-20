@@ -113,7 +113,7 @@ class MBASE_PUBLIC CommandLineArg : public ReferenceCounter
 class MBASE_PUBLIC MythCommandLineParser
 {
   public:
-    explicit MythCommandLineParser(QString);
+    explicit MythCommandLineParser(QString appname);
    ~MythCommandLineParser();
 
     virtual void LoadArguments(void) {};

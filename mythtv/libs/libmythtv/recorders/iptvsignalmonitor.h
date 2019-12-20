@@ -22,7 +22,7 @@ class IPTVSignalMonitor : public DTVSignalMonitor
     void SetStreamData(MPEGStreamData *data) override; // DTVSignalMonitor
 
     // MPEG
-    void HandlePAT(const ProgramAssociationTable*) override; // DTVSignalMonitor
+    void HandlePAT(const ProgramAssociationTable *pat) override; // DTVSignalMonitor
 
   protected:
     IPTVSignalMonitor(void);

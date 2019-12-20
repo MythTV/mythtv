@@ -71,7 +71,7 @@ class UPnpSearchTask : public Task
                         QString      sUDN );
 
         QString Name() override { return( "Search" ); } // Task
-        void Execute( TaskQueue * ) override; // Task
+        void Execute( TaskQueue *pQueue ) override; // Task
 
 };
 

@@ -26,7 +26,7 @@ class ScheduleCommon : public MythScreenType
     static void EditScheduled(RecordingInfo *recinfo);
     static void MakeOverride(RecordingInfo *recinfo);
 
-    void customEvent(QEvent*) override; // MythUIType
+    void customEvent(QEvent *event) override; // MythUIType
     virtual ProgramInfo *GetCurrentProgram(void) const { return nullptr; };
 
   public slots:
