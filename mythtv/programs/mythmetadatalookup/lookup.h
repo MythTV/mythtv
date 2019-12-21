@@ -13,7 +13,7 @@ class LookerUpper : public QObject
     LookerUpper();
     ~LookerUpper();
 
-    bool AllOK() { return m_metadataFactory->VideoGrabbersFunctional(); };
+    static bool AllOK() { return MetadataFactory::VideoGrabbersFunctional(); };
 
     bool StillWorking();
 

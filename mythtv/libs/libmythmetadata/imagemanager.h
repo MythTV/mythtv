@@ -229,7 +229,7 @@ class ImageAdapterSg : public ImageAdapterBase
 public:
     ImageAdapterSg() : ImageAdapterBase(),
         m_hostname(gCoreContext->GetMasterHostName()),
-        m_hostport(gCoreContext->GetMasterServerPort()),
+        m_hostport(MythCoreContext::GetMasterServerPort()),
         m_sg(StorageGroup(IMAGE_STORAGE_GROUP, m_hostname, false)) {}
 
     ImageItem *CreateItem(const QFileInfo &fi, int parentId, int devId,
@@ -239,12 +239,12 @@ public:
 
     //! Construct URL of a remote image.
     QString MakeFileUrl(const QString &path) const
-    { return gCoreContext->GenMythURL(m_hostname, m_hostport, path,
+    { return MythCoreContext::GenMythURL(m_hostname, m_hostport, path,
                                       IMAGE_STORAGE_GROUP); }
 
     //! Construct URL of the thumbnail of a remote image
     QString MakeThumbUrl(const QString &devPath, const QString &path = "") const
-    { return gCoreContext->GenMythURL(m_hostname, m_hostport,
+    { return MythCoreContext::GenMythURL(m_hostname, m_hostport,
                                       devPath + "/" + path,
                                       THUMBNAIL_STORAGE_GROUP); }
 

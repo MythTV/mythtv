@@ -4524,7 +4524,7 @@ AppearanceSettings::AppearanceSettings()
     m_xineramaAspect = XineramaMonitorAspectRatio();
     screen->addChild(m_xineramaScreen);
     screen->addChild(m_xineramaAspect);
-    PopulateScreens(m_display->GetScreenCount());
+    PopulateScreens(MythDisplay::GetScreenCount());
     connect(m_display, &MythDisplay::ScreenCountChanged, this, &AppearanceSettings::PopulateScreens);
 
 //    screen->addChild(DisplaySizeHeight());
@@ -4534,7 +4534,7 @@ AppearanceSettings::AppearanceSettings()
 
     screen->addChild(GuiSizeForTV());
     screen->addChild(HideMouseCursor());
-    if (!GetMythMainWindow()->WindowIsAlwaysFullscreen())
+    if (!MythMainWindow::WindowIsAlwaysFullscreen())
     {
         screen->addChild(RunInWindow());
         screen->addChild(AlwaysOnTop());

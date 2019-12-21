@@ -246,7 +246,7 @@ void MythUIHelperPrivate::GetScreenBounds()
     LOG(VB_GUI, LOG_INFO, LOC +
         QString("Primary screen: %1.").arg(primary->name()));
 
-    int numScreens = m_display->GetScreenCount();
+    int numScreens = MythDisplay::GetScreenCount();
     QSize dim = primary->virtualSize();
     LOG(VB_GUI, LOG_INFO, LOC +
         QString("Total desktop dim: %1x%2, over %3 screen[s].")

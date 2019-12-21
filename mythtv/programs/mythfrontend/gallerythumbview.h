@@ -31,7 +31,7 @@ public:
 public slots:
     void    Start();
     void    Close() override; // MythScreenType
-    void    ClearSgDb()  { m_mgr.ClearStorageGroup(); }
+    static void    ClearSgDb()  { ImageManagerFe::ClearStorageGroup(); }
 
 private:
     bool    keyPressEvent(QKeyEvent *event) override; // MythScreenType
