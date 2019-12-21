@@ -29,7 +29,7 @@ class PremiereContentInformationTable : public PSIPTable
     uint DescriptorsLength() const
         { return ((psipdata()[7] & 0x0F) << 8) | psipdata()[8]; }
 
-    uint EventCount(void) const
+    static uint EventCount(void)
         { return 1; }
 
     // descriptor length        x   9.0

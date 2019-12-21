@@ -27,7 +27,7 @@ class TestProgramInfo : public QObject
 {
     Q_OBJECT
   private:
-    ProgramInfo mockMovie (QString const &inetref, QString const &programid, QString const &title, unsigned int year)
+    static ProgramInfo mockMovie (QString const &inetref, QString const &programid, QString const &title, unsigned int year)
     {
         return ProgramInfo (
             (uint) 0, /* recordedid */
@@ -176,7 +176,7 @@ class TestProgramInfo : public QObject
     /**
      * test for https://code.mythtv.org/trac/ticket/12049
      */
-    void programFromVideo_test(void)
+    static void programFromVideo_test(void)
     {
         ProgramInfo program (
             "/pathname",
@@ -209,7 +209,7 @@ class TestProgramInfo : public QObject
     /**
      * test comparing programmes
      */
-    void movieComparison_test(void)
+    static void movieComparison_test(void)
     {
         /* tt0021814 - Dracula (1931) */
         ProgramInfo programA (mockMovie ("128", "tt0021814", "Dracula", 1931));

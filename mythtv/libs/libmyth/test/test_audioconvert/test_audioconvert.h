@@ -35,12 +35,12 @@ class TestAudioConvert: public QObject
 
   private slots:
     // called at the beginning of these sets of tests
-    void initTestCase(void)
+    static void initTestCase(void)
     {
         gCoreContext = new MythCoreContext("bin_version", nullptr);
     }
 
-    void Identical_data(void)
+    static void Identical_data(void)
     {
         QTest::addColumn<int>("SAMPLES");
         QTest::newRow("Full Range") << (INT16_MAX - INT16_MIN);
@@ -50,7 +50,7 @@ class TestAudioConvert: public QObject
     }
 
     // test s16 -> float -> s16
-    void Identical(void)
+    static void Identical(void)
     {
         QFETCH(int, SAMPLES);
 
@@ -76,7 +76,7 @@ class TestAudioConvert: public QObject
         av_free(arrays2);
     }
 
-    void S16ToFloat_data(void)
+    static void S16ToFloat_data(void)
     {
         QTest::addColumn<int>("SAMPLES");
         QTest::newRow("Full Range") << (INT16_MAX - INT16_MIN);
@@ -86,7 +86,7 @@ class TestAudioConvert: public QObject
     }
 
     // test s16 -> float -> s16 is lossless
-    void S16ToFloat(void)
+    static void S16ToFloat(void)
     {
         QFETCH(int, SAMPLES);
 
@@ -118,7 +118,7 @@ class TestAudioConvert: public QObject
         av_free(arrayf);
     }
 
-    void S16ToS24LSB_data(void)
+    static void S16ToS24LSB_data(void)
     {
         QTest::addColumn<int>("SAMPLES");
         QTest::newRow("Full Range") << (INT16_MAX - INT16_MIN);
@@ -128,7 +128,7 @@ class TestAudioConvert: public QObject
     }
 
     // test S16 -> S24LSB -> S16 is lossless
-    void S16ToS24LSB(void)
+    static void S16ToS24LSB(void)
     {
         QFETCH(int, SAMPLES);
 
@@ -164,7 +164,7 @@ class TestAudioConvert: public QObject
         av_free(arrays24);
     }
 
-    void S24LSBToS32_data(void)
+    static void S24LSBToS32_data(void)
     {
         QTest::addColumn<int>("SAMPLES");
         QTest::newRow("Full Range") << (INT16_MAX - INT16_MIN);
@@ -173,7 +173,7 @@ class TestAudioConvert: public QObject
         QTest::newRow("0 bytes") << 0;
     }
 
-    void S24LSBToS32(void)
+    static void S24LSBToS32(void)
     {
         QFETCH(int, SAMPLES);
 
@@ -206,7 +206,7 @@ class TestAudioConvert: public QObject
         av_free(arrays32);
     }
 
-    void S16ToS24_data(void)
+    static void S16ToS24_data(void)
     {
         QTest::addColumn<int>("SAMPLES");
         QTest::newRow("Full Range") << (INT16_MAX - INT16_MIN);
@@ -216,7 +216,7 @@ class TestAudioConvert: public QObject
     }
 
     // test S16 -> S24 -> S16 is lossless
-    void S16ToS24(void)
+    static void S16ToS24(void)
     {
         QFETCH(int, SAMPLES);
 
@@ -251,7 +251,7 @@ class TestAudioConvert: public QObject
         av_free(arrays24);
     }
 
-    void S24ToS32_data(void)
+    static void S24ToS32_data(void)
     {
         QTest::addColumn<int>("SAMPLES");
         QTest::newRow("Full Range") << (INT16_MAX - INT16_MIN);
@@ -260,7 +260,7 @@ class TestAudioConvert: public QObject
         QTest::newRow("0 bytes") << 0;
     }
 
-    void S24ToS32(void)
+    static void S24ToS32(void)
     {
         QFETCH(int, SAMPLES);
 
@@ -293,7 +293,7 @@ class TestAudioConvert: public QObject
         av_free(arrays32);
     }
 
-    void S16ToS32_data(void)
+    static void S16ToS32_data(void)
     {
         QTest::addColumn<int>("SAMPLES");
         QTest::newRow("Full Range") << (INT16_MAX - INT16_MIN);
@@ -303,7 +303,7 @@ class TestAudioConvert: public QObject
     }
 
     // test S16 -> S24 -> S16 is lossless
-    void S16ToS32(void)
+    static void S16ToS32(void)
     {
         QFETCH(int, SAMPLES);
 
@@ -336,7 +336,7 @@ class TestAudioConvert: public QObject
         av_free(arrays32);
     }
 
-    void U8ToS16_data(void)
+    static void U8ToS16_data(void)
     {
         QTest::addColumn<int>("SAMPLES");
         QTest::newRow("Full Range") << 256;
@@ -346,7 +346,7 @@ class TestAudioConvert: public QObject
     }
 
     // test U8 -> S16 -> U8 is lossless
-    void U8ToS16(void)
+    static void U8ToS16(void)
     {
         QFETCH(int, SAMPLES);
 
@@ -379,7 +379,7 @@ class TestAudioConvert: public QObject
         av_free(arrays32);
     }
 
-    void S32ClipTest(void)
+    static void S32ClipTest(void)
     {
         int SIZEARRAY       = 256;
         // +1 will never be 16-bytes aligned, forcing C-code
@@ -424,14 +424,14 @@ class TestAudioConvert: public QObject
         av_free(arrayf2);
     }
 
-    void FloatS32ClipTest3_data(void)
+    static void FloatS32ClipTest3_data(void)
     {
         QTest::addColumn<int>("OFFSET");
         QTest::newRow("Use SSE accelerated code") << 0;
         QTest::newRow("Use C code") << 1;
     }
 
-    void FloatS32ClipTest3(void)
+    static void FloatS32ClipTest3(void)
     {
         int SIZEARRAY       = 256;
         QFETCH(int, OFFSET);
@@ -480,14 +480,14 @@ class TestAudioConvert: public QObject
         av_free(arrayf1);
     }
 
-    void FloatS16ClipTest3_data(void)
+    static void FloatS16ClipTest3_data(void)
     {
         QTest::addColumn<int>("OFFSET");
         QTest::newRow("Use SSE accelerated code") << 0;
         QTest::newRow("Use C code") << 1;
     }
 
-    void FloatS16ClipTest3(void)
+    static void FloatS16ClipTest3(void)
     {
         int SIZEARRAY       = 256;
         QFETCH(int, OFFSET);
@@ -536,14 +536,14 @@ class TestAudioConvert: public QObject
         av_free(arrayf1);
     }
 
-    void FloatU8ClipTest3_data(void)
+    static void FloatU8ClipTest3_data(void)
     {
         QTest::addColumn<int>("OFFSET");
         QTest::newRow("Use SSE accelerated code") << 0;
         QTest::newRow("Use C code") << 1;
     }
 
-    void FloatU8ClipTest3(void)
+    static void FloatU8ClipTest3(void)
     {
         int SIZEARRAY       = 256;
         QFETCH(int, OFFSET);

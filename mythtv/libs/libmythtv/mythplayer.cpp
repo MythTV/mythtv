@@ -3973,6 +3973,7 @@ void MythPlayer::ClearAfterSeek(bool clearvideobuffers)
  * using a position map.
  * \note m_watchingRecording does not appear to be accurate - so is currently ignored.
 */
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 void MythPlayer::ClearBeforeSeek(uint64_t Frames)
 {
 #ifdef USING_MEDIACODEC

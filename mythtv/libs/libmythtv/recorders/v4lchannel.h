@@ -65,7 +65,7 @@ class V4LChannel : public DTVChannel
     QString GetDevice(void) const override // ChannelBase
         { return m_device; }
     QString GetAudioDevice(void) const { return m_audioDevice; }
-    QString GetSIStandard(void) const { return "atsc"; }
+    static QString GetSIStandard(void) { return "atsc"; }
 
     // Picture attributes.
     bool InitPictureAttributes(void) override; // ChannelBase

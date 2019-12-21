@@ -57,8 +57,8 @@ private slots:
     void ShowSlide(int direction = 0);
     void Stop();
     void Play(bool useTransition = true);
-    void RepeatOn(int on = 1)   { gCoreContext->SaveSetting("GalleryRepeat", on); }
-    void RepeatOff()            { RepeatOn(0); }
+    static void RepeatOn(int on = 1)   { gCoreContext->SaveSetting("GalleryRepeat", on); }
+    static void RepeatOff()            { RepeatOn(0); }
     void ShowInfo();
     void HideInfo();
     void ShowCaptions();

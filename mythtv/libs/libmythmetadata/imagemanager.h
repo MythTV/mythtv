@@ -198,24 +198,24 @@ public:
     StringMap GetScanDirs() const  { return GetDeviceDirs(); }
 
     //! Get absolute filepath for a local image
-    QString GetAbsFilePath(const ImagePtrK &im) const
+    static QString GetAbsFilePath(const ImagePtrK &im)
     { return im->m_filePath; }
 
     //! Construct URL of a local image, which is an absolute path
-    QString MakeFileUrl(const QString &path) const { return path; }
+    static QString MakeFileUrl(const QString &path) { return path; }
 
     //! Construct URL of the thumbnail of a local image (An absolute path)
-    QString MakeThumbUrl(const QString &devPath, const QString &path = "") const
+    static QString MakeThumbUrl(const QString &devPath, const QString &path = "")
     { return GetAbsThumbPath(devPath, path); }
 
     static void Notify(const QString &mesg, const QStringList &extra) ;
 
 protected:
     // Adapter functions used by Database for local images. Negate ids in & out
-    int     ImageId(int id) const            { return ImageItem::ToLocalId(id); }
-    QString ImageId(const QString &id) const { return ImageItem::ToLocalId(id); }
-    int     DbId(int id) const               { return ImageItem::ToDbId(id); }
-    QString DbIds(const QString &ids) const  { return ImageItem::ToDbId(ids); }
+    static int     ImageId(int id)            { return ImageItem::ToLocalId(id); }
+    static QString ImageId(const QString &id) { return ImageItem::ToLocalId(id); }
+    static int     DbId(int id)               { return ImageItem::ToDbId(id); }
+    static QString DbIds(const QString &ids)  { return ImageItem::ToDbId(ids); }
 };
 
 
@@ -252,10 +252,10 @@ public:
 
 protected:
     // Adapter functions used by Database for remote images. Do nothing
-    int     ImageId(int id) const            { return id; }
-    QString ImageId(const QString &id) const { return id; }
-    int     DbId(int id) const               { return id; }
-    QString DbIds(const QString &ids) const  { return ids; }
+    static int     ImageId(int id)            { return id; }
+    static QString ImageId(const QString &id) { return id; }
+    static int     DbId(int id)               { return id; }
+    static QString DbIds(const QString &ids)  { return ids; }
 
 private:
     //! Host of SG

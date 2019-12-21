@@ -162,7 +162,7 @@ class MTV_PUBLIC IPTVTuningData
         return QString();
     }
 
-    uint GetURLCount(void) const { return 3; }
+    static uint GetURLCount(void) { return 3; }
 
     bool IsValid(void) const
     {

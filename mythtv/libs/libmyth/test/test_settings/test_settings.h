@@ -11,7 +11,7 @@ class TestSettings: public QObject
 
   private slots:
 
-    void ByName(void)
+    static void ByName(void)
     {
         GroupSetting parent;
         auto setting = new ButtonStandardSetting("setting");

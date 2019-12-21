@@ -35,12 +35,12 @@ class TestAudioUtils: public QObject
 
   private slots:
     // called at the beginning of these sets of tests
-    void initTestCase(void)
+    static void initTestCase(void)
     {
         gCoreContext = new MythCoreContext("bin_version", nullptr);
     }
 
-    void S16ToFloatSSE_data(void)
+    static void S16ToFloatSSE_data(void)
     {
         QTest::addColumn<int>("SAMPLES");
         QTest::newRow("Full Range") << (INT16_MAX - INT16_MIN);
@@ -50,7 +50,7 @@ class TestAudioUtils: public QObject
     }
 
     // test s16 -> float -> s16 is lossless (SSE code)
-    void S16ToFloatSSE(void)
+    static void S16ToFloatSSE(void)
     {
         QFETCH(int, SAMPLES);
 
@@ -81,7 +81,7 @@ class TestAudioUtils: public QObject
         av_free(arrayf);
     }
 
-    void S16ToFloatC_data(void)
+    static void S16ToFloatC_data(void)
     {
         QTest::addColumn<int>("SAMPLES");
         QTest::newRow("Full Range") << (INT16_MAX - INT16_MIN);
@@ -91,7 +91,7 @@ class TestAudioUtils: public QObject
     }
 
     // test s16 -> float -> s16 is lossless (C code)
-    void S16ToFloatC(void)
+    static void S16ToFloatC(void)
     {
         QFETCH(int, SAMPLES);
 
@@ -128,7 +128,7 @@ class TestAudioUtils: public QObject
     }
 
     // test s16 -> float -> s16 SSE vs C-code. Also compare converted floats
-    void S16ToFloatCvsSSE(void)
+    static void S16ToFloatCvsSSE(void)
     {
         int SIZEARRAY       = (INT16_MAX - INT16_MIN);
         // +1 will never be 16-bytes aligned, forcing C-code
@@ -175,7 +175,7 @@ class TestAudioUtils: public QObject
         av_free(arrayf2);
     }
 
-    void S16ToFloatBoundsSSE_data(void)
+    static void S16ToFloatBoundsSSE_data(void)
     {
         QTest::addColumn<int>("SAMPLES");
         QTest::newRow("Full Range") << (INT16_MAX - INT16_MIN);
@@ -185,7 +185,7 @@ class TestAudioUtils: public QObject
     }
 
     // Test that float conversion only write where it's supposed to (SSE code)
-    void S16ToFloatBoundsSSE(void)
+    static void S16ToFloatBoundsSSE(void)
     {
         QFETCH(int, SAMPLES);
 
@@ -270,7 +270,7 @@ class TestAudioUtils: public QObject
         av_free(arrayf);
     }
 
-    void S16ClipTest(void)
+    static void S16ClipTest(void)
     {
         int SIZEARRAY       = (INT16_MAX - INT16_MIN);
         // +1 will never be 16-bytes aligned, forcing C-code
@@ -318,14 +318,14 @@ class TestAudioUtils: public QObject
         av_free(arrayf2);
     }
 
-    void S16ToFloatCvsSSESpeed_data(void)
+    static void S16ToFloatCvsSSESpeed_data(void)
     {
         QTest::addColumn<bool>("useSSE");
         QTest::newRow("Aligned memory") << true;
         QTest::newRow("Unaligned memory") << false;
     }
 
-    void S16ToFloatCvsSSESpeed(void)
+    static void S16ToFloatCvsSSESpeed(void)
     {
         int SIZEARRAY       = (INT16_MAX - INT16_MIN);
         // +1 will never be 16-bytes aligned, forcing C-code
@@ -378,7 +378,7 @@ class TestAudioUtils: public QObject
     }
 
     // test u8 -> float -> u8 is lossless (SSE code)
-    void U8ToFloatSSE(void)
+    static void U8ToFloatSSE(void)
     {
         int SIZEARRAY       = 256;
         uchar *arrays1      = (uchar*)av_malloc(SIZEARRAY * ISIZEOF(uchar));
@@ -408,7 +408,7 @@ class TestAudioUtils: public QObject
     }
 
     // test u8 -> float -> u8 is lossless (C code)
-    void U8ToFloatC(void)
+    static void U8ToFloatC(void)
     {
         int SIZEARRAY       = 256;
         // +1 will never be 16-bytes aligned, forcing C-code
@@ -443,7 +443,7 @@ class TestAudioUtils: public QObject
     }
 
     // test u8 -> float -> u8 SSE vs C-code. Also compare converted floats
-    void U8ToFloatCvsSSE(void)
+    static void U8ToFloatCvsSSE(void)
     {
         int SIZEARRAY       = 256;
         // +1 will never be 16-bytes aligned, forcing C-code
@@ -489,7 +489,7 @@ class TestAudioUtils: public QObject
     }
 
     // Test that float conversion only write where it's supposed to (SSE code)
-    void U8ToFloatBoundsSSE(void)
+    static void U8ToFloatBoundsSSE(void)
     {
         int SIZEARRAY       = 256;
         int offsetuchar     = SSEALIGN / ISIZEOF(uchar);
@@ -571,7 +571,7 @@ class TestAudioUtils: public QObject
         av_free(arrayf);
     }
 
-    void U8ClipTest(void)
+    static void U8ClipTest(void)
     {
         int SIZEARRAY       = 256;
         // +1 will never be 16-bytes aligned, forcing C-code
@@ -618,7 +618,7 @@ class TestAudioUtils: public QObject
     }
 
     // test s16 -> float -> s16 SSE vs C-code. Also compare converted floats
-    void S32ToFloatCvsSSE(void)
+    static void S32ToFloatCvsSSE(void)
     {
         int SIZEARRAY       = (INT16_MAX - INT16_MIN);
         // +1 will never be 16-bytes aligned, forcing C-code
@@ -669,7 +669,7 @@ class TestAudioUtils: public QObject
     }
 
     // Test that float conversion only write where it's supposed to (SSE code)
-    void S32ToFloatBoundsSSE(void)
+    static void S32ToFloatBoundsSSE(void)
     {
         int SIZEARRAY       = (INT16_MAX - INT16_MIN);
         int offsetint32_t   = SSEALIGN / ISIZEOF(int32_t);
@@ -752,7 +752,7 @@ class TestAudioUtils: public QObject
         av_free(arrayf);
     }
 
-    void S32ClipTest(void)
+    static void S32ClipTest(void)
     {
         int SIZEARRAY       = 256;
         // +1 will never be 16-bytes aligned, forcing C-code
@@ -800,14 +800,14 @@ class TestAudioUtils: public QObject
         av_free(arrayf2);
     }
 
-    void FloatToS32CvsSSESpeed_data(void)
+    static void FloatToS32CvsSSESpeed_data(void)
     {
         QTest::addColumn<bool>("useSSE");
         QTest::newRow("Aligned memory") << true;
         QTest::newRow("Unaligned memory") << false;
     }
 
-    void FloatToS32CvsSSESpeed(void)
+    static void FloatToS32CvsSSESpeed(void)
     {
         int SIZEARRAY       = (INT16_MAX - INT16_MIN);
         // +1 will never be 16-bytes aligned, forcing C-code
@@ -859,7 +859,7 @@ class TestAudioUtils: public QObject
         av_free(arrayf2);
     }
 
-    void FloatClipping(void)
+    static void FloatClipping(void)
     {
         int SIZEARRAY       = 256;
         // +1 will never be 16-bytes aligned, forcing C-code

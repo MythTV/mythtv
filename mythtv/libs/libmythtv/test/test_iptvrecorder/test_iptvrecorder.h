@@ -33,7 +33,7 @@ class TestIPTVRecorder: public QObject
     /**
      * Test if supported Urls really are considered valid.
      */
-    void TuningData(void)
+    static void TuningData(void)
     {
         IPTVTuningData tuning;
 
@@ -72,7 +72,7 @@ class TestIPTVRecorder: public QObject
     /**
      * Test if the expectation "if the Url works with VLC it should work with MythTV" is being met.
      */
-    void TuningDataVLCStyle(void)
+    static void TuningDataVLCStyle(void)
     {
         QSKIP ("Do we want to support non-conformant urls that happen to work with VLC?");
         IPTVTuningData tuning;
@@ -96,7 +96,7 @@ class TestIPTVRecorder: public QObject
     /**
      * Test parsing a playlist
      */
-    void ParseChanInfo(void)
+    static void ParseChanInfo(void)
     {
         /* #12077 - DVB with Neutrino - Sweden */
         QString rawdataHTTP ("#EXTM3U\n"
@@ -250,7 +250,7 @@ class TestIPTVRecorder: public QObject
     /**
      * Test parsing of RTP packets
      */
-    void ParseRTP(void)
+    static void ParseRTP(void)
     {
         /* #11852 - RTP packet from VLC - minimal RTP header and 7 TS packets */
         unsigned char packet_data0[1328] = {

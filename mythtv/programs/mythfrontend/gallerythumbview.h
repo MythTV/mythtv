@@ -110,8 +110,8 @@ private slots:
     void    Copy(bool deleteAfter = false);
     void    Move();
     void    ShowPassword();
-    void    RepeatOn(int on = 1)   { gCoreContext->SaveSetting("GalleryRepeat", on); }
-    void    RepeatOff()            { RepeatOn(0); }
+    static void RepeatOn(int on = 1)   { gCoreContext->SaveSetting("GalleryRepeat", on); }
+    static void RepeatOff()            { RepeatOn(0); }
 
 private:
     using IntPair = QPair<int,int>;

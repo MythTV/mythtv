@@ -38,7 +38,7 @@ class DummyChannel : public ChannelBase
     QString GetDevice(void) const override // ChannelBase
         { return "/dev/dummy"; }
     QString GetCurrentInput(void)    const { return m_curInputName; }
-    uint    GetCurrentSourceID(void) const { return 0; }
+    static uint GetCurrentSourceID(void) { return 0; }
 
   private:
     QString m_curInputName;

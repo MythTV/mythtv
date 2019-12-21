@@ -788,7 +788,7 @@ class StartingChannel : public MythUIComboBoxSetting
                     QObject::tr("This is updated on every successful "
                                 "channel change."));
     }
-    void fillSelections(void) {;}
+    static void fillSelections(void) {;}
   public slots:
     void SetSourceID(const QString &sourceid);
 };

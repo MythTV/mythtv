@@ -34,12 +34,12 @@ class TestCopyFrames: public QObject
 
   private slots:
     // called at the beginning of these sets of tests
-    void initTestCase(void)
+    static void initTestCase(void)
     {
         gCoreContext = new MythCoreContext("bin_version", nullptr);
     }
 
-    void YV12copy_data(void)
+    static void YV12copy_data(void)
     {
         QTest::addColumn<bool>("SSE");
         QTest::newRow("SSE") << true;
@@ -47,7 +47,7 @@ class TestCopyFrames: public QObject
     }
 
     // YV12 -> YV12 SSE
-    void YV12copy(void)
+    static void YV12copy(void)
     {
         QFETCH(bool, SSE);
         VideoFrame src, dst;
@@ -128,7 +128,7 @@ class TestCopyFrames: public QObject
         av_freep(&bufdst);
     }
 
-    void NV12copy_data(void)
+    static void NV12copy_data(void)
     {
         QTest::addColumn<bool>("SSE");
         QTest::newRow("SSE") << true;
@@ -136,7 +136,7 @@ class TestCopyFrames: public QObject
     }
 
     // NV12 -> YV12
-    void NV12copy(void)
+    static void NV12copy(void)
     {
         QFETCH(bool, SSE);
         int ALIGN = 64;
@@ -203,7 +203,7 @@ class TestCopyFrames: public QObject
         av_freep(&bufdst);
     }
 
-    void NV12SSEcopy_data(void)
+    static void NV12SSEcopy_data(void)
     {
         QTest::addColumn<int>("ALIGN");
         QTest::newRow("64") << 64;
@@ -213,7 +213,7 @@ class TestCopyFrames: public QObject
     }
 
     // NV12 -> YV12 SSE, various stride aligned sizes
-    void NV12SSEcopy(void)
+    static void NV12SSEcopy(void)
     {
         QFETCH(int, ALIGN);
         const int ALIGNDST = 0;
@@ -283,7 +283,7 @@ class TestCopyFrames: public QObject
         av_freep(&bufdst);
     }
 
-    void NV12StrideAligned_data(void)
+    static void NV12StrideAligned_data(void)
     {
         QTest::addColumn<int>("ALIGNDST");
         QTest::newRow("64") << 64;
@@ -293,7 +293,7 @@ class TestCopyFrames: public QObject
     }
 
     // NV12 -> YV12 SSE
-    void NV12StrideAligned(void)
+    static void NV12StrideAligned(void)
     {
         QFETCH(int, ALIGNDST);
         const int ALIGN = 0;
@@ -364,7 +364,7 @@ class TestCopyFrames: public QObject
         av_freep(&bufdst);
     }
 
-    void NV12SSEcopySrcNotAligned_data(void)
+    static void NV12SSEcopySrcNotAligned_data(void)
     {
         QTest::addColumn<int>("ALIGN");
         QTest::newRow("64") << 64;
@@ -374,7 +374,7 @@ class TestCopyFrames: public QObject
     }
 
     // NV12 -> YV12 SSE
-    void NV12SSEcopySrcNotAligned(void)
+    static void NV12SSEcopySrcNotAligned(void)
     {
         QFETCH(int, ALIGN);
         const int ALIGNDST = 0;
@@ -444,7 +444,7 @@ class TestCopyFrames: public QObject
         av_freep(&bufdst);
     }
 
-    void NV12StrideAligned_DstNotAligned_data(void)
+    static void NV12StrideAligned_DstNotAligned_data(void)
     {
         QTest::addColumn<int>("ALIGNDST");
         QTest::newRow("64") << 64;
@@ -454,7 +454,7 @@ class TestCopyFrames: public QObject
     }
 
     // NV12 -> YV12 SSE
-    void NV12StrideAligned_DstNotAligned(void)
+    static void NV12StrideAligned_DstNotAligned(void)
     {
         QFETCH(int, ALIGNDST);
         const int ALIGN = 0;
@@ -525,7 +525,7 @@ class TestCopyFrames: public QObject
         av_freep(&bufdst);
     }
 
-    void NV12StrideAligned_NeitherAligned_data(void)
+    static void NV12StrideAligned_NeitherAligned_data(void)
     {
         QTest::addColumn<int>("ALIGNDST");
         QTest::newRow("64") << 64;
@@ -536,7 +536,7 @@ class TestCopyFrames: public QObject
     }
 
     // NV12 -> YV12 SSE
-    void NV12StrideAligned_NeitherAligned(void)
+    static void NV12StrideAligned_NeitherAligned(void)
     {
         QFETCH(int, ALIGNDST);
         const int ALIGN = 0;
@@ -607,7 +607,7 @@ class TestCopyFrames: public QObject
         av_freep(&bufdst);
     }
 
-    void NV12VariousWidth_data(void)
+    static void NV12VariousWidth_data(void)
     {
         QTest::addColumn<int>("width");
         QTest::newRow("1080") << 1080;
@@ -618,7 +618,7 @@ class TestCopyFrames: public QObject
     }
 
     // NV12 -> YV12
-    void NV12VariousWidth(void)
+    static void NV12VariousWidth(void)
     {
         QFETCH(int, width);
         int ALIGN = 64;
@@ -686,7 +686,7 @@ class TestCopyFrames: public QObject
     }
 
     // YV12 -> YV12 USWC
-    void YV12USWCcopy(void)
+    static void YV12USWCcopy(void)
     {
         VideoFrame src, dst;
         MythUSWCCopy mythcopy(WIDTH);
@@ -768,7 +768,7 @@ class TestCopyFrames: public QObject
         av_freep(&bufdst);
     }
 
-    void NV12USWCcopy_data(void)
+    static void NV12USWCcopy_data(void)
     {
         QTest::addColumn<int>("ALIGN");
         QTest::newRow("64") << 64;
@@ -778,7 +778,7 @@ class TestCopyFrames: public QObject
     }
 
     // NV12 -> YV12 SSE, various stride aligned sizes
-    void NV12USWCcopy(void)
+    static void NV12USWCcopy(void)
     {
         QFETCH(int, ALIGN);
         const int ALIGNDST = 0;
@@ -850,7 +850,7 @@ class TestCopyFrames: public QObject
         av_freep(&bufdst);
     }
 
-    void NV12USWCStrideAligned_data(void)
+    static void NV12USWCStrideAligned_data(void)
     {
         QTest::addColumn<int>("ALIGNDST");
         QTest::newRow("64") << 64;
@@ -860,7 +860,7 @@ class TestCopyFrames: public QObject
     }
 
     // NV12 -> YV12 SSE
-    void NV12USWCStrideAligned(void)
+    static void NV12USWCStrideAligned(void)
     {
         QFETCH(int, ALIGNDST);
         const int ALIGN = 0;
@@ -933,7 +933,7 @@ class TestCopyFrames: public QObject
         av_freep(&bufdst);
     }
 
-    void NV12USWCcopySrcNotAligned_data(void)
+    static void NV12USWCcopySrcNotAligned_data(void)
     {
         QTest::addColumn<int>("ALIGN");
         QTest::newRow("64") << 64;
@@ -943,7 +943,7 @@ class TestCopyFrames: public QObject
     }
 
     // NV12 -> YV12 SSE
-    void NV12USWCcopySrcNotAligned(void)
+    static void NV12USWCcopySrcNotAligned(void)
     {
         QFETCH(int, ALIGN);
         const int ALIGNDST = 0;
@@ -1015,7 +1015,7 @@ class TestCopyFrames: public QObject
         av_freep(&bufdst);
     }
 
-    void NV12USWCStrideAligned_DstNotAligned_data(void)
+    static void NV12USWCStrideAligned_DstNotAligned_data(void)
     {
         QTest::addColumn<int>("ALIGNDST");
         QTest::newRow("64") << 64;
@@ -1025,7 +1025,7 @@ class TestCopyFrames: public QObject
     }
 
     // NV12 -> YV12 SSE
-    void NV12USWCStrideAligned_DstNotAligned(void)
+    static void NV12USWCStrideAligned_DstNotAligned(void)
     {
         QFETCH(int, ALIGNDST);
         const int ALIGN = 0;
@@ -1098,7 +1098,7 @@ class TestCopyFrames: public QObject
         av_freep(&bufdst);
     }
 
-    void NV12USWCStrideAligned_NeitherAligned_data(void)
+    static void NV12USWCStrideAligned_NeitherAligned_data(void)
     {
         QTest::addColumn<int>("ALIGNDST");
         QTest::newRow("64") << 64;
@@ -1109,7 +1109,7 @@ class TestCopyFrames: public QObject
     }
 
     // NV12 -> YV12 SSE
-    void NV12USWCStrideAligned_NeitherAligned(void)
+    static void NV12USWCStrideAligned_NeitherAligned(void)
     {
         QFETCH(int, ALIGNDST);
         const int ALIGN = 0;
@@ -1182,7 +1182,7 @@ class TestCopyFrames: public QObject
         av_freep(&bufdst);
     }
 
-    void NV12USWCVariousWidth_data(void)
+    static void NV12USWCVariousWidth_data(void)
     {
         QTest::addColumn<int>("width");
         QTest::newRow("1080") << 1080;
@@ -1193,7 +1193,7 @@ class TestCopyFrames: public QObject
     }
 
     // NV12 -> YV12
-    void NV12USWCVariousWidth(void)
+    static void NV12USWCVariousWidth(void)
     {
         QFETCH(int, width);
         int ALIGN = 64;

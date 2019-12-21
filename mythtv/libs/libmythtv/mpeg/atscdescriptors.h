@@ -123,7 +123,7 @@ class CaptionServiceDescriptor : public MPEGDescriptor
     QString toString() const override; // MPEGDescriptor
 
   private:
-    int Index(int i, int j) const { return (i<<8) | (j & 0xff); }
+    static int Index(int i, int j) { return (i<<8) | (j & 0xff); }
     const unsigned char *Offset(int i, int j) const
         { return m_ptrs[Index(i,j)]; }
 
@@ -176,7 +176,7 @@ class ContentAdvisoryDescriptor : public MPEGDescriptor
     bool Parse(void);
     QString toString() const override; // MPEGDescriptor
   protected:
-    int Index(int i, int j) const { return (i<<8)|(j&0xff); }
+    static int Index(int i, int j) { return (i<<8)|(j&0xff); }
     const unsigned char *Offset(int i, int j) const
     {
         IntToBuf::const_iterator it = m_ptrs.find(Index(i,j));
@@ -277,6 +277,8 @@ class AudioStreamDescriptor : public MPEGDescriptor
     // for(i=0; i<M; i++) {
     //        text[i] 8 bslbf
     // }
+
+    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
     QString Text(void) const
     { // TODO
 #if 0
