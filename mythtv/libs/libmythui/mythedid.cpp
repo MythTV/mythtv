@@ -40,6 +40,16 @@ int MythEDID::PhysicalAddress(void)
     return m_physicalAddress;
 }
 
+int MythEDID::AudioLatency(bool Interlaced)
+{
+    return m_audioLatency[Interlaced ? 1 : 0];
+}
+
+int MythEDID::VideoLatency(bool Interlaced)
+{
+    return m_videoLatency[Interlaced ? 1 : 0];
+}
+
 // from QEdidParser
 static QString ParseEdidString(const quint8 *data, bool Replace)
 {
@@ -118,11 +128,46 @@ void MythEDID::Parse(void)
     for (int i = 129; i < m_data.size() - 4; ++i)
     {
         // HDMI VSDB
-        if (data[i] == 0x03 && data[i + 1] == 0x0C && data[i + 2] == 0x0)
+        while (data[i] == 0x03 && data[i + 1] == 0x0C && data[i + 2] == 0x0)
         {
             int length = data[i - 1] & 0xf;
-            if (length > 5)
-                m_physicalAddress = (data[i + 3] << 8) + data[i + 4];
+            if (length < 5)
+                break;
+
+            m_physicalAddress = (data[i + 3] << 8) + data[i + 4];
+            if  (length < 8 || (m_data.size()) <= (i + 7))
+                break;
+
+            quint8 flags    = data[i + 7];
+            bool latencies  = flags & 0x80;
+            bool ilatencies = flags & 0x40;
+
+            if (length < 10|| (m_data.size()) <= (i + 9))
+                break;
+
+            if (latencies)
+            {
+                quint8 video = data[i + 8];
+                if (video > 0 && video <= 251)
+                    m_videoLatency[0] = (video - 1) << 1;
+                quint8 audio = data[i + 9];
+                if (audio > 0 && audio <= 251)
+                    m_audioLatency[0] = (audio - 1) << 1;
+            }
+
+            if (length < 12 || (m_data.size() <= (i + 11)))
+                break;
+
+            if (ilatencies)
+            {
+                quint8 video = data[i + 10];
+                if (video > 0 && video <= 251)
+                    m_videoLatency[1] = (video - 1) << 1;
+                quint8 audio = data[i + 11];
+                if (audio > 0 && audio <= 251)
+                    m_audioLatency[1] = (audio - 1) << 1;
+            }
+            break;
         }
     }
 }
