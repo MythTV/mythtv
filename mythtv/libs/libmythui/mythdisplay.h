@@ -44,7 +44,7 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
   public:
     static MythDisplay* AcquireRelease(bool Acquire = true);
 
-    typedef enum
+    enum Mode
     {
         GUI          = 0,
         VIDEO        = 1,
@@ -52,7 +52,7 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
         CUSTOM_VIDEO = 3,
         DESKTOP      = 4,
         MAX_MODES    = 5,
-    } Mode;
+    };
 
     QScreen*   GetCurrentScreen (void);
     static int GetScreenCount   (void);

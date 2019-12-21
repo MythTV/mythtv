@@ -7,27 +7,27 @@
 #include "mythtvexp.h"
 #include "tablestatus.h"
 
-typedef NetworkInformationTable* nit_ptr_t;
-typedef NetworkInformationTable const* nit_const_ptr_t;
-typedef vector<const NetworkInformationTable*>  nit_vec_t;
-typedef QMap<uint, nit_ptr_t>    nit_cache_t; // section->sdts
+using nit_ptr_t       = NetworkInformationTable*;
+using nit_const_ptr_t = NetworkInformationTable const*;
+using nit_vec_t       = vector<const NetworkInformationTable*>;
+using nit_cache_t     = QMap<uint, nit_ptr_t>; // section->sdts
 
-typedef ServiceDescriptionTable* sdt_ptr_t;
-typedef ServiceDescriptionTable const* sdt_const_ptr_t;
-typedef vector<const ServiceDescriptionTable*>  sdt_vec_t;
-typedef QMap<uint, sdt_ptr_t>    sdt_cache_t; // tsid+section->sdts
-typedef QMap<uint, sdt_vec_t>    sdt_map_t;   // tsid->sdts
+using sdt_ptr_t       = ServiceDescriptionTable*;
+using sdt_const_ptr_t = ServiceDescriptionTable const*;
+using sdt_vec_t       = vector<const ServiceDescriptionTable*>;
+using sdt_cache_t     = QMap<uint, sdt_ptr_t>; // tsid+section->sdts
+using sdt_map_t       = QMap<uint, sdt_vec_t>;   // tsid->sdts
 
-typedef BouquetAssociationTable*  bat_ptr_t;
-typedef BouquetAssociationTable const*  bat_const_ptr_t;
-typedef vector<const BouquetAssociationTable*>  bat_vec_t;
-typedef QMap<uint, bat_ptr_t>    bat_cache_t;  // batid+section->bats
+using bat_ptr_t       = BouquetAssociationTable*;
+using bat_const_ptr_t = BouquetAssociationTable const*;
+using bat_vec_t       = vector<const BouquetAssociationTable*>;
+using bat_cache_t     = QMap<uint, bat_ptr_t>;  // batid+section->bats
 
-typedef vector<DVBMainStreamListener*>   dvb_main_listener_vec_t;
-typedef vector<DVBOtherStreamListener*>  dvb_other_listener_vec_t;
-typedef vector<DVBEITStreamListener*>    dvb_eit_listener_vec_t;
+using dvb_main_listener_vec_t  = vector<DVBMainStreamListener*>;
+using dvb_other_listener_vec_t = vector<DVBOtherStreamListener*>;
+using dvb_eit_listener_vec_t   = vector<DVBEITStreamListener*>;
 
-typedef QMap<uint, bool>                 dvb_has_eit_t;
+using dvb_has_eit_t = QMap<uint, bool>;
 
 class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
 {

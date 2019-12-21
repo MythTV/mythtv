@@ -14,7 +14,7 @@ using namespace std;
 class TableStatus
 {
 public:
-    typedef vector<uint8_t>   sections_t;
+    using sections_t = vector<uint8_t>;
     static void InitSections(sections_t &sect, uint32_t last_section);
 
     TableStatus() = default;

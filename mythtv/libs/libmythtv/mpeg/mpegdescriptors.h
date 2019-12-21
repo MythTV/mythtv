@@ -15,7 +15,7 @@ using namespace std;
 #include "iso639.h"
 #include "mythtvexp.h"
 
-typedef vector<const unsigned char*> desc_list_t;
+using desc_list_t = vector<const unsigned char *>;
 
 class DescriptorID
 {

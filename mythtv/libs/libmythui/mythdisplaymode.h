@@ -15,8 +15,8 @@
 
 class MythDisplayMode;
 using namespace std;
-typedef vector<MythDisplayMode> DisplayModeVector;
-typedef map<uint64_t, MythDisplayMode> DisplayModeMap;
+using DisplayModeVector = vector<MythDisplayMode>;
+using DisplayModeMap    = map<uint64_t, MythDisplayMode>;
 
 class MUI_PUBLIC MythDisplayMode
 {

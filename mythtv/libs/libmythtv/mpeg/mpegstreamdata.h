@@ -22,36 +22,36 @@ class EITHelper;
 class PSIPTable;
 class RingBuffer;
 
-typedef vector<uint>                    uint_vec_t;
+using uint_vec_t = vector<uint>;
 
-typedef QMap<unsigned int, PSIPTable*>  pid_psip_map_t;
-typedef QMap<const PSIPTable*, int>     psip_refcnt_map_t;
+using pid_psip_map_t    = QMap<unsigned int, PSIPTable*>;
+using psip_refcnt_map_t = QMap<const PSIPTable*, int>;
 
-typedef ProgramAssociationTable*               pat_ptr_t;
-typedef ProgramAssociationTable const*         pat_const_ptr_t;
-typedef vector<const ProgramAssociationTable*> pat_vec_t;
-typedef QMap<uint, pat_vec_t>                  pat_map_t;
-typedef QMap<uint, ProgramAssociationTable*>   pat_cache_t;
+using pat_ptr_t         = ProgramAssociationTable *;
+using pat_const_ptr_t   = const ProgramAssociationTable *;
+using pat_vec_t         = vector<const ProgramAssociationTable *>;
+using pat_map_t         = QMap<uint, pat_vec_t>;
+using pat_cache_t       = QMap<uint, ProgramAssociationTable*>;
 
-typedef ConditionalAccessTable*                cat_ptr_t;
-typedef ConditionalAccessTable const*          cat_const_ptr_t;
-typedef vector<const ConditionalAccessTable*>  cat_vec_t;
-typedef QMap<uint, cat_vec_t>                  cat_map_t;
-typedef QMap<uint, ConditionalAccessTable*>    cat_cache_t;
+using cat_ptr_t         = ConditionalAccessTable *;
+using cat_const_ptr_t   = const ConditionalAccessTable *;
+using cat_vec_t         = vector<const ConditionalAccessTable *>;
+using cat_map_t         = QMap<uint, cat_vec_t>;
+using cat_cache_t       = QMap<uint, ConditionalAccessTable*>;
 
-typedef ProgramMapTable*                pmt_ptr_t;
-typedef ProgramMapTable const*          pmt_const_ptr_t;
-typedef vector<const ProgramMapTable*>  pmt_vec_t;
-typedef QMap<uint, pmt_vec_t>           pmt_map_t;
-typedef QMap<uint, ProgramMapTable*>    pmt_cache_t;
+using pmt_ptr_t         = ProgramMapTable*;
+using pmt_const_ptr_t   = ProgramMapTable const*;
+using pmt_vec_t         = vector<const ProgramMapTable*>;
+using pmt_map_t         = QMap<uint, pmt_vec_t>;
+using pmt_cache_t       = QMap<uint, ProgramMapTable*>;
 
-typedef vector<unsigned char>           uchar_vec_t;
+using uchar_vec_t       = vector<unsigned char>;
 
-typedef vector<MPEGStreamListener*>     mpeg_listener_vec_t;
-typedef vector<TSPacketListener*>       ts_listener_vec_t;
-typedef vector<TSPacketListenerAV*>     ts_av_listener_vec_t;
-typedef vector<MPEGSingleProgramStreamListener*> mpeg_sp_listener_vec_t;
-typedef vector<PSStreamListener*>       ps_listener_vec_t;
+using mpeg_listener_vec_t    = vector<MPEGStreamListener*>;
+using ts_listener_vec_t      = vector<TSPacketListener*>;
+using ts_av_listener_vec_t   = vector<TSPacketListenerAV*>;
+using mpeg_sp_listener_vec_t = vector<MPEGSingleProgramStreamListener*>;
+using ps_listener_vec_t      = vector<PSStreamListener*>;
 
 enum CryptStatus
 {
@@ -81,7 +81,7 @@ enum PIDPriority
     kPIDPriorityNormal = 2,
     kPIDPriorityHigh   = 3,
 };
-typedef QMap<uint, PIDPriority> pid_map_t;
+using pid_map_t = QMap<uint, PIDPriority>;
 
 class MTV_PUBLIC MPEGStreamData : public EITSource
 {

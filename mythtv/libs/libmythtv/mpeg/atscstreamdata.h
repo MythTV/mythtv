@@ -7,23 +7,23 @@
 #include "mythtvexp.h"
 #include "tablestatus.h"
 
-typedef QMap<uint, uint_vec_t>          pid_tsid_vec_t;
-typedef TerrestrialVirtualChannelTable* tvct_ptr_t;
-typedef TerrestrialVirtualChannelTable const* tvct_const_ptr_t;
-typedef CableVirtualChannelTable*       cvct_ptr_t;
-typedef CableVirtualChannelTable const* cvct_const_ptr_t;
-typedef vector<const TerrestrialVirtualChannelTable*> tvct_vec_t;
-typedef vector<const CableVirtualChannelTable*>       cvct_vec_t;
-typedef QMap<uint, tvct_ptr_t>          tvct_cache_t;
-typedef QMap<uint, cvct_ptr_t>          cvct_cache_t;
-typedef QMap<uint, uint>                atsc_eit_pid_map_t;
-typedef QMap<uint, uint>                atsc_ett_pid_map_t;
+using pid_tsid_vec_t     = QMap<uint, uint_vec_t>;
+using tvct_ptr_t         = TerrestrialVirtualChannelTable *;
+using tvct_const_ptr_t   = const TerrestrialVirtualChannelTable *;
+using cvct_ptr_t         = CableVirtualChannelTable *;
+using cvct_const_ptr_t   = const CableVirtualChannelTable *;
+using tvct_vec_t         = vector<const TerrestrialVirtualChannelTable *>;
+using cvct_vec_t         = vector<const CableVirtualChannelTable *>;
+using tvct_cache_t       = QMap<uint, tvct_ptr_t>;
+using cvct_cache_t       = QMap<uint, cvct_ptr_t>;
+using atsc_eit_pid_map_t = QMap<uint, uint>;
+using atsc_ett_pid_map_t = QMap<uint, uint>;
 
-typedef vector<ATSCMainStreamListener*> atsc_main_listener_vec_t;
-typedef vector<SCTEMainStreamListener*> scte_main_listener_vec_t;
-typedef vector<ATSCAuxStreamListener*>  atsc_aux_listener_vec_t;
-typedef vector<ATSCEITStreamListener*>  atsc_eit_listener_vec_t;
-typedef vector<ATSC81EITStreamListener*> atsc81_eit_listener_vec_t;
+using atsc_main_listener_vec_t  = vector<ATSCMainStreamListener *>;
+using scte_main_listener_vec_t  = vector<SCTEMainStreamListener *>;
+using atsc_aux_listener_vec_t   = vector<ATSCAuxStreamListener *>;
+using atsc_eit_listener_vec_t   = vector<ATSCEITStreamListener *>;
+using atsc81_eit_listener_vec_t = vector<ATSC81EITStreamListener *>;
 
 class MTV_PUBLIC ATSCStreamData : virtual public MPEGStreamData
 {
