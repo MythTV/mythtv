@@ -1,10 +1,14 @@
 #ifndef _MYTHFONTMANAGER_H
 #define _MYTHFONTMANAGER_H
 
+#include <utility>
+
+// Qt headers
 #include <QMultiHash>
 #include <QMutex>
 #include <QString>
 
+// MythTV headers
 #include "mythuiexp.h"
 
 class MythFontReference;
@@ -40,9 +44,11 @@ MUI_PUBLIC MythFontManager *GetGlobalFontManager(void);
 class MythFontReference
 {
   public:
-    MythFontReference(const QString &fontPath, const QString &registeredFor,
+    MythFontReference(QString fontPath, QString registeredFor,
                       const int fontID)
-        : m_fontPath(fontPath), m_registeredFor(registeredFor), m_fontID(fontID) {}
+        : m_fontPath(std::move(fontPath)),
+          m_registeredFor(std::move(registeredFor)),
+          m_fontID(fontID) {}
 
     QString GetFontPath(void) const { return m_fontPath; }
     QString GetRegisteredFor(void) const { return m_registeredFor; }

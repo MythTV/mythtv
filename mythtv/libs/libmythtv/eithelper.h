@@ -6,6 +6,7 @@
 // C+ headers
 #include <cstdint>
 #include <ctime>
+#include <utility>
 
 // Qt includes
 #include <QDateTime>
@@ -24,9 +25,10 @@ class MSqlQuery;
 class ATSCEvent
 {
   public:
-    ATSCEvent(uint a, uint b, uint c, const QString& d,
+    ATSCEvent(uint a, uint b, uint c, QString  d,
               const unsigned char *e, uint f)
-        : m_startTime(a), m_length(b), m_etm(c), m_descLength(f), m_title(d), m_desc(e),
+        : m_startTime(a), m_length(b), m_etm(c), m_descLength(f),
+          m_title(std::move(d)), m_desc(e),
           m_scanTime(time(nullptr)) {}
 
     bool IsStale() const {
@@ -52,8 +54,8 @@ class ATSCEvent
 class ATSCEtt
 {
   public:
-    explicit ATSCEtt(const QString& text) :
-        m_ett_text(text), m_scanTime(time(nullptr)) {}
+    explicit ATSCEtt(QString  text) :
+        m_ett_text(std::move(text)), m_scanTime(time(nullptr)) {}
 
     bool IsStale() const {
         // The minimum recommended repetition time for ETT events according to

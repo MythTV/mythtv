@@ -4,13 +4,16 @@
 #ifndef _CC708_WINDOW_
 #define _CC708_WINDOW_
 
+#include <utility>
 #include <vector>
 using namespace std;
 
+// Qt headers
 #include <QString>
 #include <QMutex>
 #include <QColor>
 
+// MythTV headers
 #include "mythtvexp.h"
 
 extern const uint k708JustifyLeft;
@@ -97,7 +100,7 @@ class CC708CharacterAttribute
         m_underline(isUnderline),
         m_italics(isItalic),
         m_boldface(isBold),
-        m_actualFgColor(fgColor)
+        m_actualFgColor(std::move(fgColor))
     {
     }
 

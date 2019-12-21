@@ -1,10 +1,14 @@
 #ifndef MYTHAUDIOSETTINGS_H
 #define MYTHAUDIOSETTINGS_H
 
-#include <QStringList>
-#include <QObject>
-#include <QMutex>
+#include <utility>
 
+// Qt headers
+#include <QMutex>
+#include <QObject>
+#include <QStringList>
+
+// MythTV headers
 #include "mythuistatetype.h"
 #include "mythscreentype.h"
 #include "mythdialogbox.h"
@@ -127,8 +131,8 @@ class AudioDeviceComboBox : public HostComboBoxSetting
 class ChannelChangedEvent : public QEvent
 {
   public:
-    ChannelChangedEvent(const QString& channame, bool fulltest) :
-        QEvent(kEventType), m_channel(channame), m_fulltest(fulltest) {}
+    ChannelChangedEvent(QString  channame, bool fulltest) :
+        QEvent(kEventType), m_channel(std::move(channame)), m_fulltest(fulltest) {}
     ~ChannelChangedEvent() = default;
 
     QString m_channel;

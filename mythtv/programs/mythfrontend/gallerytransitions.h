@@ -4,6 +4,9 @@
 #ifndef GALLERYTRANSITIONS_H
 #define GALLERYTRANSITIONS_H
 
+#include <utility>
+
+// MythTV headers
 #include "galleryslide.h"
 
 
@@ -155,8 +158,8 @@ class TransitionRandom : public Transition
 {
     Q_OBJECT
 public:
-    explicit TransitionRandom(const QList<Transition*>& peers)
-        : Transition(Transition::tr("Random")), m_peers(peers) {}
+    explicit TransitionRandom(QList<Transition*>  peers)
+        : Transition(Transition::tr("Random")), m_peers(std::move(peers)) {}
     void Start(Slide &from, Slide &to, bool forwards, float speed = 1.0) override; // Transition
     void SetSpeed(float speed) override // Transition
         { if (m_current) m_current->SetSpeed(speed); }

@@ -45,6 +45,12 @@
 #ifndef IMAGEMANAGER_H
 #define IMAGEMANAGER_H
 
+#include <utility>
+
+// Qt headers
+#include <QTemporaryDir>
+
+// MythTV headers
 #include "mythcorecontext.h"
 #include "storagegroup.h"
 #include "mythdirs.h"
@@ -63,8 +69,6 @@
 #define THUMBNAIL_SUBDIR            "Images"
 
 #define DEVICE_INVALID -1
-
-#include <QTemporaryDir>
 
 class MythMediaDevice;
 class MythMediaEvent;
@@ -297,7 +301,7 @@ public:
                             int &videos, int &sizeKb) const;
 
 protected:
-    explicit ImageDb(const QString &table) : FS(), m_table(table) {}
+    explicit ImageDb(QString table) : FS(), m_table(std::move(table)) {}
 
     ImageItem *CreateImage(const MSqlQuery &query) const;
     int        ReadImages(ImageList &dirs, ImageList &files,
@@ -497,7 +501,7 @@ protected:
     ImageManagerFe(int order, int dirOrder, bool showAll, int showType,
                    QString dateFormat)
         : ImageDbReader(order, dirOrder, showAll, showType),
-          m_dateFormat(dateFormat)
+          m_dateFormat(std::move(dateFormat))
     {
         // Cleanup & terminate child threads before application exits
         connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(deleteLater()));

@@ -2,6 +2,7 @@
 #define CHANNELGROUP_H
 
 // c/c++
+#include <utility>
 #include <vector>
 using namespace std;
 
@@ -16,8 +17,8 @@ class MTV_PUBLIC ChannelGroupItem
 {
   public:
     ChannelGroupItem(const ChannelGroupItem &other)  = default;
-    ChannelGroupItem(const uint grpid, const QString &name) :
-        m_grpId(grpid), m_name(name) {}
+    ChannelGroupItem(const uint grpid, QString name) :
+        m_grpId(grpid), m_name(std::move(name)) {}
 
     bool operator == (uint grpid) const
         { return m_grpId == grpid; }

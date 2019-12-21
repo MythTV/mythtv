@@ -2,6 +2,7 @@
 #define VIEWSCHEDULEDIFF_H_
 
 // C++ headers
+#include <utility>
 #include <vector>
 
 // mythui
@@ -24,10 +25,10 @@ class ViewScheduleDiff : public MythScreenType
 {
     Q_OBJECT
   public:
-    ViewScheduleDiff(MythScreenStack *parent, const QString& altTbl,
-                     int recordid = -1, const QString& ltitle = "")
+    ViewScheduleDiff(MythScreenStack *parent, QString  altTbl,
+                     int recordid = -1, QString  ltitle = "")
         : MythScreenType(parent, "ViewScheduleDiff"),
-          m_altTable(altTbl), m_title(ltitle),
+          m_altTable(std::move(altTbl)), m_title(std::move(ltitle)),
           m_recordid(recordid) {}
     ~ViewScheduleDiff() = default;
 

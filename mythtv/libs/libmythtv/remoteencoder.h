@@ -2,12 +2,15 @@
 #define REMOTEENCODER_H_
 
 #include <cstdint>
+#include <utility>
 
-#include <QString>
-#include <QMutex>
+// Qt headers
 #include <QHash>
 #include <QMap>
+#include <QMutex>
+#include <QString>
 
+// MythTV headers
 #include "mythtvexp.h"
 #include "videoouttypes.h"
 #include "tv.h"
@@ -22,8 +25,8 @@ class MythSocket;
 class MTV_PUBLIC RemoteEncoder
 {
   public:
-    RemoteEncoder(int num, const QString &host, short port)
-    : m_recordernum(num), m_remotehost(host), m_remoteport(port) {}
+    RemoteEncoder(int num, QString host, short port)
+    : m_recordernum(num), m_remotehost(std::move(host)), m_remoteport(port) {}
    ~RemoteEncoder(void);
 
     bool Setup(void);

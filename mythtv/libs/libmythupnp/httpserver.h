@@ -20,6 +20,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #endif
+#include <utility>
 
 // Qt headers
 #include <QReadWriteLock>
@@ -28,11 +29,10 @@
 #include <QPointer>
 #include <QMutex>
 #include <QList>
-
 #include <QSslConfiguration>
 #include <QSslError>
-#include <QSslSocket>
 #include <QSslKey>
+#include <QSslSocket>
 
 // MythTV headers
 #include "mythqtcompat.h"
@@ -82,8 +82,8 @@ class UPNP_PUBLIC HttpServerExtension : public QObject
         
     public:
 
-        HttpServerExtension( const QString &sName, const  QString &sSharePath)
-           : m_sName( sName ), m_sSharePath( sSharePath ),
+        HttpServerExtension( QString sName, QString sSharePath)
+           : m_sName(std::move( sName )), m_sSharePath(std::move( sSharePath )),
              m_nSocketTimeout(-1),
              m_nSupportedMethods((RequestTypeGet | RequestTypePost | // Defaults, extensions may extend the list
                                   RequestTypeHead | RequestTypeOptions)) {};

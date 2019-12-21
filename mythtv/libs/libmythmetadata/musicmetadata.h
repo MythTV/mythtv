@@ -3,14 +3,16 @@
 
 // C/C++
 #include <cstdint>
+#include <utility>
+
 
 // qt
-#include <QStringList>
-#include <QMap>
+#include <QCoreApplication>
 #include <QDateTime>
 #include <QImage>
+#include <QMap>
 #include <QMetaType>
-#include <QCoreApplication>
+#include <QStringList>
 
 // mythtv
 #include "mythtypes.h"
@@ -88,22 +90,22 @@ class META_PUBLIC MusicMetadata
              int lyear = 0, int ltracknum = 0, int llength = 0, int lid = 0,
              int lrating = 0, int lplaycount = 0, QDateTime llastplay = QDateTime(),
              QDateTime ldateadded = QDateTime(), bool lcompilation = false, QString lformat = "")
-                : m_artist(lartist),
-                   m_compilationArtist(lcompilation_artist),
-                   m_album(lalbum),
-                   m_title(ltitle),
-                   m_genre(lgenre),
-                   m_format(lformat),
+                : m_artist(std::move(lartist)),
+                   m_compilationArtist(std::move(lcompilation_artist)),
+                   m_album(std::move(lalbum)),
+                   m_title(std::move(ltitle)),
+                   m_genre(std::move(lgenre)),
+                   m_format(std::move(lformat)),
                    m_year(lyear),
                    m_trackNum(ltracknum),
                    m_length(llength),
                    m_rating(lrating),
-                   m_lastPlay(llastplay),
-                   m_dateAdded(ldateadded),
+                   m_lastPlay(std::move(llastplay)),
+                   m_dateAdded(std::move(ldateadded)),
                    m_playCount(lplaycount),
                    m_compilation(lcompilation),
                    m_id(lid),
-                   m_filename(lfilename)
+                   m_filename(std::move(lfilename))
     {
         checkEmptyFields();
         ensureSortFields();
@@ -496,7 +498,7 @@ class AlbumArtScannerThread: public MThread
 {
   public:
     explicit AlbumArtScannerThread(QStringList strList) :
-            MThread("AlbumArtScanner"), m_strList(strList) {}
+            MThread("AlbumArtScanner"), m_strList(std::move(strList)) {}
 
     void run() override // MThread
     {

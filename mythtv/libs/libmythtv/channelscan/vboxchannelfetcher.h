@@ -1,13 +1,15 @@
 #ifndef _VBOXCHANNELFETCHER_H_
 #define _VBOXCHANNELFETCHER_H_
 
+#include <utility>
+
 // Qt headers
-#include <QString>
-#include <QRunnable>
-#include <QObject>
-#include <QMutex>
-#include <QMap>
 #include <QCoreApplication>
+#include <QMap>
+#include <QMutex>
+#include <QObject>
+#include <QRunnable>
+#include <QString>
 
 // MythTV headers
 #include "iptvtuningdata.h"
@@ -23,18 +25,20 @@ class VBoxChannelInfo
 
   public:
     VBoxChannelInfo() = default;
-    VBoxChannelInfo(const QString &name,
-                    const QString &xmltvid,
+    VBoxChannelInfo(QString name,
+                    QString xmltvid,
                     const QString &data_url,
                     bool fta,
-                    const QString &chanType,
-                    const QString &transType,
+                    QString chanType,
+                    QString transType,
                     uint serviceID,
                     uint networkID,
                     uint transportID):
-        m_name(name), m_xmltvid(xmltvid), m_serviceID(serviceID),
-        m_fta(fta), m_channelType(chanType), m_transType(transType),
-        m_tuning(data_url, IPTVTuningData::http_ts), m_networkID(networkID), m_transportID(transportID)
+        m_name(std::move(name)), m_xmltvid(std::move(xmltvid)),
+        m_serviceID(serviceID), m_fta(fta), m_channelType(std::move(chanType)),
+        m_transType(std::move(transType)),
+        m_tuning(data_url, IPTVTuningData::http_ts), m_networkID(networkID),
+        m_transportID(transportID)
     {
     }
 

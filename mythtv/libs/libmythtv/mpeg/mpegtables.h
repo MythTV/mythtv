@@ -4,6 +4,9 @@
 #define _MPEG_TABLES_H_
 
 #include <cassert>
+#include <utility>
+
+// MythTV headers
 #include "mpegdescriptors.h"
 #include "pespacket.h"
 #include "mythtvexp.h"
@@ -878,9 +881,9 @@ class MTV_PUBLIC SpliceTimeView
 class MTV_PUBLIC SpliceScheduleView
 {
   public:
-    SpliceScheduleView(const vector<const unsigned char*> &ptrs0,
-                       const vector<const unsigned char*> &ptrs1) :
-        m_ptrs0(ptrs0), m_ptrs1(ptrs1)
+    SpliceScheduleView(vector<const unsigned char*> ptrs0,
+                       vector<const unsigned char*> ptrs1) :
+        m_ptrs0(std::move(ptrs0)), m_ptrs1(std::move(ptrs1))
     {
     }
     //   splice_count           8  14.0
@@ -926,9 +929,9 @@ class MTV_PUBLIC SpliceScheduleView
 class MTV_PUBLIC SpliceInsertView
 {
   public:
-    SpliceInsertView(const vector<const unsigned char*> &ptrs0,
-                     const vector<const unsigned char*> &ptrs1) :
-        m_ptrs0(ptrs0), m_ptrs1(ptrs1)
+    SpliceInsertView(vector<const unsigned char*> ptrs0,
+                     vector<const unsigned char*> ptrs1) :
+        m_ptrs0(std::move(ptrs0)), m_ptrs1(std::move(ptrs1))
     {
     }
 

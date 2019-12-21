@@ -1,9 +1,10 @@
 #ifndef DBACCESS_H_
 #define DBACCESS_H_
 
+#include <utility>
 #include <vector>
-#include <utility> // for std::pair
 
+// MythTV headers
 #include "mythmetaexp.h"
 
 class SingleValueImp;
@@ -144,10 +145,10 @@ class META_PUBLIC FileAssociations
         bool use_default    {false};
 
         file_association() = default;
-        file_association(unsigned int l_id, const QString &ext,
-                         const QString &playcmd, bool l_ignore,
+        file_association(unsigned int l_id, QString ext,
+                         QString playcmd, bool l_ignore,
                          bool l_use_default)
-            : id(l_id), extension(ext), playcommand(playcmd),
+            : id(l_id), extension(std::move(ext)), playcommand(std::move(playcmd)),
               ignore(l_ignore), use_default(l_use_default) {}
     };
     using association_list = std::vector<file_association>;

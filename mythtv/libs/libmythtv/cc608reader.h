@@ -2,9 +2,12 @@
 #define CC608READER_H
 
 #include <cstdint>
+#include <utility>
 
+// Qt headers
 #include <QMutex>
 
+// MythTV headers
 #include "cc608decoder.h"
 
 #include "mythtvexp.h"
@@ -15,8 +18,8 @@
 class CC608Text
 {
   public:
-    CC608Text(const QString &T, int X, int Y) :
-        m_text(T), m_x(X), m_y(Y) {}
+    CC608Text(QString T, int X, int Y) :
+        m_text(std::move(T)), m_x(X), m_y(Y) {}
     CC608Text(const CC608Text &other)  = default;
     QString m_text;
     int     m_x;

@@ -6,6 +6,7 @@
 // C++ headers
 #include <cstdint> // for [u]int[32,64]_t
 #include <deque>
+#include <utility>
 #include <vector>
 using namespace std;
 
@@ -476,11 +477,12 @@ class GroupSelector : public MythScreenType
     Q_OBJECT
 
   public:
-    GroupSelector(MythScreenStack *lparent, const QString &label,
-                  const QStringList &list, const QStringList &data,
-                  const QString &selected)
-        : MythScreenType(lparent, "groupselector"), m_label(label),
-          m_list(list), m_data(data), m_selected(selected) {}
+    GroupSelector(MythScreenStack *lparent, QString label,
+                  QStringList list, QStringList data,
+                  QString selected)
+        : MythScreenType(lparent, "groupselector"), m_label(std::move(label)),
+          m_list(std::move(list)), m_data(std::move(data)),
+          m_selected(std::move(selected)) {}
 
     bool Create(void) override; // MythScreenType
 
@@ -527,9 +529,9 @@ class PasswordChange : public MythScreenType
     Q_OBJECT
 
   public:
-    PasswordChange(MythScreenStack *lparent, const QString& oldpassword)
+    PasswordChange(MythScreenStack *lparent, QString  oldpassword)
         : MythScreenType(lparent, "passwordchanger"),
-          m_oldPassword(oldpassword){}
+          m_oldPassword(std::move(oldpassword)){}
 
     bool Create(void) override; // MythScreenType
 

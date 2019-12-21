@@ -13,17 +13,21 @@
 #ifndef SERVERSIDESCRIPTING_H_
 #define SERVERSIDESCRIPTING_H_
 
+#include <utility>
+
+// Qt headers
+#include <QDateTime>
+#include <QMap>
+#include <QMutex>
+#include <QScriptEngine>
+#include <QScriptable>
+#include <QString>
+#include <QTextStream>
+
+// MythTV headers
 #include "upnpexp.h"
 #include "upnputil.h"
 #include "httprequest.h"
-
-#include <QString> 
-#include <QMap>
-#include <QDateTime>
-#include <QMutex>
-#include <QTextStream> 
-#include <QScriptEngine>
-#include <QScriptable>
 
 #ifdef _WIN32
 #include <QScriptEngineDebugger>
@@ -38,7 +42,7 @@ class ScriptInfo
     ScriptInfo() = default;
 
     ScriptInfo( QScriptValue func, QDateTime dt )
-        : m_oFunc( func ), m_dtTimeStamp( dt )
+        : m_oFunc( func ), m_dtTimeStamp(std::move( dt ))
     {}
 };
 

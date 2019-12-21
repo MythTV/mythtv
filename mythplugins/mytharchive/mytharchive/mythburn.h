@@ -1,6 +1,8 @@
 #ifndef MYTHBURN_H_
 #define MYTHBURN_H_
 
+#include <utility>
+
 // mythtv
 #include <mythscreentype.h>
 
@@ -23,7 +25,7 @@ class ProfileDialog : public MythScreenType
                   QList<EncoderProfile *> profileList)
          : MythScreenType(parent, "functionpopup"),
            m_archiveItem(archiveItem),
-           m_profileList(profileList) {}
+           m_profileList(std::move(profileList)) {}
     bool Create() override; // MythScreenType
 
   signals:

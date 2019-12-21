@@ -23,9 +23,11 @@
 #ifndef ACTION_H
 #define ACTION_H
 
+#include <utility>
+
 // Qt headers
-#include <QStringList>
 #include <QHash>
+#include <QStringList>
 
 /** \class Action
  *  \brief An action (for this plugin) consists of a description,
@@ -39,7 +41,7 @@ class Action
 {
   public:
     /// \brief Create a new empty action.
-    explicit Action(const QString &description) : m_description(description) {}
+    explicit Action(QString description) : m_description(std::move(description)) {}
     Action(QString description, const QString &keys);
 
     // Commands
@@ -89,8 +91,8 @@ class ActionID
      *  \param context The action's context
      *  \param action The action's name
      */
-    ActionID(const QString &context, const QString &action)
-        : m_context(context), m_action(action) {}
+    ActionID(QString context, QString action)
+        : m_context(std::move(context)), m_action(std::move(action)) {}
     ActionID(const ActionID &other) = default;
     ActionID& operator=(const ActionID &rhs) = default;
 

@@ -15,6 +15,7 @@
 #ifndef ZMDEFINES_H
 #define ZMDEFINES_H
 
+#include <utility>
 #include <vector>
 
 // qt
@@ -26,16 +27,16 @@ class Event
 {
   public:
     Event(int eventID,
-          const QString &eventName,
+          QString eventName,
           int monitorID,
-          const QString &monitorName,
+          QString monitorName,
           const QDateTime &startTime,
-          const QString &length) :
+          QString length) :
         m_monitorID(monitorID),
         m_eventID(eventID),
-        m_eventName(eventName),
-        m_monitorName(monitorName),
-        m_length(length),
+        m_eventName(std::move(eventName)),
+        m_monitorName(std::move(monitorName)),
+        m_length(std::move(length)),
         m_startTime(startTime.toLocalTime())
     {
     }

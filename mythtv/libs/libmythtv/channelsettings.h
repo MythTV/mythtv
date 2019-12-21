@@ -3,6 +3,7 @@
 
 // C++
 #include <cstdlib>
+#include <utility>
 #include <vector>
 
 // Qt
@@ -19,9 +20,9 @@ class QWidget;
 class ChannelID : public GroupSetting
 {
   public:
-    ChannelID(const QString& field = "chanid",
-              const QString& table = "channel") :
-        m_field(field), m_table(table)
+    ChannelID(QString  field = "chanid",
+              QString  table = "channel") :
+        m_field(std::move(field)), m_table(std::move(table))
     {
         setVisible(false);
     }

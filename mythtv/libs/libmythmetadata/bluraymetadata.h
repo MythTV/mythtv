@@ -1,10 +1,14 @@
 #ifndef BLURAYMETADATA_H_
 #define BLURAYMETADATA_H_
 
+#include <utility>
+
+// Qt headers
 #include <QList>
 #include <QPair>
 #include <QString>
 
+// MythTV headers
 #include "mythtypes.h"
 #include "mythmetaexp.h"
 #include "libbluray/bluray.h"
@@ -19,8 +23,8 @@ class META_PUBLIC BlurayMetadata : public QObject
     Q_DECLARE_TR_FUNCTIONS(BlurayMetadata);
 
   public:
-    explicit BlurayMetadata(const QString &path)
-        : m_path(path) {}
+    explicit BlurayMetadata(QString path)
+        : m_path(std::move(path)) {}
     ~BlurayMetadata();
 
     void toMap(InfoMap &metadataMap);

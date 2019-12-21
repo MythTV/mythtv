@@ -13,13 +13,17 @@
 #ifndef HTTPREQUEST_H_
 #define HTTPREQUEST_H_
 
+#include <utility>
+
+// Qt headers
+#include <QBuffer>
+#include <QDateTime>
 #include <QFile>
 #include <QRegExp>
-#include <QBuffer>
-#include <QTextStream>
 #include <QTcpSocket>
-#include <QDateTime>
+#include <QTextStream>
 
+// MythTV headers
 #include "mythsession.h"
 
 #include "upnpexp.h"
@@ -301,8 +305,8 @@ class UPNP_PUBLIC HttpException
         int     m_code {-1};
         QString m_msg;
 
-        HttpException( int nCode = -1, const QString &sMsg = "")
-               : m_code( nCode ), m_msg ( sMsg  )
+        HttpException( int nCode = -1, QString sMsg = "")
+               : m_code( nCode ), m_msg (std::move( sMsg  ))
         {}
 
         // Needed to force a v-table.
@@ -316,10 +320,10 @@ class UPNP_PUBLIC HttpRedirectException : public HttpException
         QString m_hostName;
       //int     m_port;
 
-        HttpRedirectException( const QString &sHostName = "",
+        HttpRedirectException( QString sHostName = "",
                                      int      nCode     = -1,
                                const QString &sMsg      = "" )
-               : HttpException( nCode, sMsg ), m_hostName( sHostName )
+               : HttpException( nCode, sMsg ), m_hostName(std::move( sHostName ))
         {}
 
         virtual ~HttpRedirectException() = default;

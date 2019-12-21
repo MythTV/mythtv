@@ -5,6 +5,7 @@
 
 // C++
 #include <cstdint>
+#include <utility>
 #include <vector>
 using namespace std;
 
@@ -116,8 +117,8 @@ class AskProgramInfo
 {
   public:
     AskProgramInfo() = default;
-    AskProgramInfo(const QDateTime &e, bool r, bool l, ProgramInfo *i) :
-        m_expiry(e), m_hasRec(r), m_hasLater(l), m_info(i) {}
+    AskProgramInfo(QDateTime e, bool r, bool l, ProgramInfo *i) :
+        m_expiry(std::move(e)), m_hasRec(r), m_hasLater(l), m_info(i) {}
 
     QDateTime    m_expiry;
     bool         m_hasRec             {false};
@@ -152,13 +153,13 @@ public:
     // Constructor for a menu element.
     MenuItemContext(const MenuBase &menu,
                     const QDomNode &node,
-                    const QString &menuName,
+                    QString menuName,
                     MenuCurrentContext current,
                     bool doDisplay) :
         m_menu(menu),
         m_node(node),
         m_category(kMenuCategoryMenu),
-        m_menuName(menuName),
+        m_menuName(std::move(menuName)),
         m_showContext(kMenuShowAlways),
         m_currentContext(current),
         m_action(""),
@@ -169,8 +170,8 @@ public:
                     const QDomNode &node,
                     MenuShowContext showContext,
                     MenuCurrentContext current,
-                    const QString &action,
-                    const QString &actionText,
+                    QString action,
+                    QString actionText,
                     bool doDisplay) :
         m_menu(menu),
         m_node(node),
@@ -178,15 +179,15 @@ public:
         m_menuName(""),
         m_showContext(showContext),
         m_currentContext(current),
-        m_action(action),
-        m_actionText(actionText),
+        m_action(std::move(action)),
+        m_actionText(std::move(actionText)),
         m_doDisplay(doDisplay) {}
     // Constructor for an itemlist element.
     MenuItemContext(const MenuBase &menu,
                     const QDomNode &node,
                     MenuShowContext showContext,
                     MenuCurrentContext current,
-                    const QString &action,
+                    QString action,
                     bool doDisplay) :
         m_menu(menu),
         m_node(node),
@@ -194,7 +195,7 @@ public:
         m_menuName(""),
         m_showContext(showContext),
         m_currentContext(current),
-        m_action(action),
+        m_action(std::move(action)),
         m_actionText(""),
         m_doDisplay(doDisplay) {}
     const MenuBase    &m_menu;
@@ -319,8 +320,8 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     class SleepTimerInfo
     {
       public:
-        SleepTimerInfo(const QString& str, unsigned long secs)
-            : dispString(str), seconds(secs) { ; }
+        SleepTimerInfo(QString  str, unsigned long secs)
+            : dispString(std::move(str)), seconds(secs) { ; }
         QString   dispString;
         unsigned long seconds;
     };

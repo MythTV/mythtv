@@ -9,11 +9,15 @@
 #ifndef IMAGEMETADATA_H
 #define IMAGEMETADATA_H
 
+#include <utility>
+
+// Qt headers
 #include <QCoreApplication> // for tr()
+#include <QDateTime>
 #include <QStringBuilder>
 #include <QStringList>
-#include <QDateTime>
 
+// MythTV headers
 #include "mythmetaexp.h"
 
 
@@ -122,7 +126,8 @@ public:
     virtual QString     GetComment(bool *exists = nullptr)          = 0;
 
 protected:
-    explicit ImageMetaData(const QString &filePath) : m_filePath(filePath) {}
+    explicit ImageMetaData(QString filePath)
+        : m_filePath(std::move(filePath)) {}
 
     //! Image filepath
     QString m_filePath;

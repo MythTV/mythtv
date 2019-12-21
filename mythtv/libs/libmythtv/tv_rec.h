@@ -1,6 +1,10 @@
 #ifndef TVREC_H
 #define TVREC_H
 
+// C++ headers
+#include <utility>
+#include <vector>                       // for vector
+
 // Qt headers
 #include <QWaitCondition>
 #include <QStringList>
@@ -11,9 +15,6 @@
 #include <QMutex>                       // for QMutex
 #include <QReadWriteLock>
 #include <QHash>                        // for QHash
-
-// C++ headers
-#include <vector>                       // for vector
 
 // MythTV headers
 #include "mythtimer.h"
@@ -104,8 +105,8 @@ class TuningRequest
         m_flags(f) {;}
     TuningRequest(uint f, RecordingInfo *p) :
         m_flags(f), m_program(p) {;}
-    TuningRequest(uint f, const QString& ch, const QString& in = QString()) :
-        m_flags(f), m_channel(ch), m_input(in) {;}
+    TuningRequest(uint f, QString  ch, QString  in = QString()) :
+        m_flags(f), m_channel(std::move(ch)), m_input(std::move(in)) {;}
 
     QString toString(void) const;
 

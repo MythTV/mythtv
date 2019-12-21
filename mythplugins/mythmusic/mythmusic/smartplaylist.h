@@ -2,6 +2,7 @@
 #define SMARTPLAYLIST_H_
 
 // c/c++
+#include <utility>
 #include <vector>
 
 class MythUIButton;using namespace std;
@@ -46,10 +47,10 @@ class SmartPLCriteriaRow
 
   public:
 
-    SmartPLCriteriaRow(const QString &_Field, const QString &_Operator,
-                       const QString &_Value1, const QString &_Value2)
-        : m_field(_Field), m_operator(_Operator),
-          m_value1(_Value1), m_value2(_Value2) {}
+    SmartPLCriteriaRow(QString _Field, QString _Operator,
+                       QString _Value1, QString _Value2)
+        : m_field(std::move(_Field)), m_operator(std::move(_Operator)),
+          m_value1(std::move(_Value1)), m_value2(std::move(_Value2)) {}
     SmartPLCriteriaRow(void) = default;
     ~SmartPLCriteriaRow(void) = default;
 

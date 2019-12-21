@@ -5,6 +5,7 @@
 
 // ANSI C
 #include <cstdint> // for [u]int[32,64]_t
+#include <utility>
 #include <vector> // for GetNextRecordingList
 
 #include <QStringList>
@@ -272,10 +273,11 @@ class MPUBLIC ProgramInfo
     ProgramInfo(const QString &_title, uint _chanid,
                 const QDateTime &_startts, const QDateTime &_endts);
     /// Constructs a Dummy ProgramInfo (used by GuideGrid)
-    ProgramInfo(const QString   &_title,   const QString   &_category,
-                const QDateTime &_startts, const QDateTime &_endts)
-        : m_title(_title), m_category(_category),
-          m_startTs(_startts), m_endTs(_endts) { ensureSortFields(); }
+    ProgramInfo(QString _title,   QString _category,
+                QDateTime _startts, QDateTime _endts)
+        : m_title(std::move(_title)), m_category(std::move(_category)),
+          m_startTs(std::move(_startts)), m_endTs(std::move(_endts))
+    { ensureSortFields(); }
     ProgramInfo(QStringList::const_iterator &it,
                 QStringList::const_iterator  end)
     {

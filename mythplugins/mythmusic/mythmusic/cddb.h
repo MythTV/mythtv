@@ -1,6 +1,8 @@
 #ifndef CDDB_H_
 #define CDDB_H_
 
+#include <utility>
+
 #include <QString>
 #include <QStringList>
 #include <QVector>
@@ -25,8 +27,8 @@ struct Cddb
         Match(const char *g, discid_t d, const char *a, const char *t) :
             discGenre(g), discID(d), artist(a), title(t)
         {}
-        Match(const QString &g, discid_t d, const QString &a, const QString &t) :
-            discGenre(g), discID(d), artist(a), title(t)
+        Match(QString g, discid_t d, QString a, QString t) :
+            discGenre(std::move(g)), discID(d), artist(std::move(a)), title(std::move(t))
         {}
         explicit Match(const Album& a) : discGenre(a.discGenre), discID(a.discID),
             artist(a.artist), title(a.title)

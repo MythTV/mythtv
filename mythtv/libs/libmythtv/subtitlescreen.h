@@ -3,20 +3,23 @@
 #ifndef SUBTITLESCREEN_H
 #define SUBTITLESCREEN_H
 
-#include <QStringList>
-#include <QRegExp>
-#include <QVector>
-#include <QFont>
-#include <QHash>
-#include <QRect>
-#include <QSize>
-
+#include <utility>
 #ifdef USING_LIBASS
 extern "C" {
 #include <ass/ass.h>
 }
 #endif
 
+// Qt headers
+#include <QFont>
+#include <QHash>
+#include <QRect>
+#include <QRegExp>
+#include <QSize>
+#include <QStringList>
+#include <QVector>
+
+// MythTV headers
 #include "mythscreentype.h"
 #include "subtitlereader.h"
 #include "mythplayer.h"
@@ -29,10 +32,10 @@ class SubtitleScreen;
 class FormattedTextChunk
 {
 public:
-    FormattedTextChunk(const QString &t,
-                       const CC708CharacterAttribute &formatting,
+    FormattedTextChunk(QString t,
+                       CC708CharacterAttribute formatting,
                        SubtitleScreen *p)
-        : m_text(t), m_format(formatting), m_parent(p) {}
+        : m_text(std::move(t)), m_format(std::move(formatting)), m_parent(p) {}
     FormattedTextChunk(void) = default;
 
     QSize CalcSize(float layoutSpacing = 0.0F) const;
@@ -71,10 +74,10 @@ public:
 class FormattedTextSubtitle
 {
 protected:
-    FormattedTextSubtitle(const QString &base, const QRect &safearea,
+    FormattedTextSubtitle(QString base, const QRect &safearea,
                           uint64_t start, uint64_t duration,
                           SubtitleScreen *p) :
-        m_base(base), m_safeArea(safearea),
+        m_base(std::move(base)), m_safeArea(safearea),
         m_start(start), m_duration(duration), m_subScreen(p) {}
     FormattedTextSubtitle(void) = default;
 public:

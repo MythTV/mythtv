@@ -9,10 +9,14 @@
 #ifndef __MythTV__mythnotification__
 #define __MythTV__mythnotification__
 
-#include <QMutex>
-#include <QMap>
-#include <QImage>
+#include <utility>
 
+// Qt headers
+#include <QImage>
+#include <QMap>
+#include <QMutex>
+
+// MythTV headers
 #include "mythevent.h"
 #include "mythuiexp.h"
 
@@ -63,8 +67,8 @@ class MUI_PUBLIC MythNotification : public MythEvent
         ToStringList();
     }
 
-    MythNotification(Type type, const DMAP &metadata)
-        : MythEvent(type, "NOTIFICATION"), m_metadata(metadata)
+    MythNotification(Type type, DMAP metadata)
+        : MythEvent(type, "NOTIFICATION"), m_metadata(std::move(metadata))
     {
         ToStringList();
     }
@@ -215,23 +219,23 @@ class MUI_PUBLIC MythNotification : public MythEvent
 class MUI_PUBLIC MythImageNotification : public virtual MythNotification
 {
   public:
-    MythImageNotification(Type type, const QImage &image)
-        : MythNotification(type), m_image(image)
+    MythImageNotification(Type type, QImage image)
+        : MythNotification(type), m_image(std::move(image))
     {
     }
 
-    MythImageNotification(Type type, const QString &imagePath)
-        : MythNotification(type), m_imagePath(imagePath)
+    MythImageNotification(Type type, QString imagePath)
+        : MythNotification(type), m_imagePath(std::move(imagePath))
     {
     }
 
-    MythImageNotification(Type type, const QImage &image, const DMAP &metadata)
-        : MythNotification(type, metadata), m_image(image)
+    MythImageNotification(Type type, QImage image, const DMAP &metadata)
+        : MythNotification(type, metadata), m_image(std::move(image))
     {
     }
 
-    MythImageNotification(Type type, const QString &imagePath, const DMAP &metadata)
-        : MythNotification(type, metadata), m_imagePath(imagePath)
+    MythImageNotification(Type type, QString imagePath, const DMAP &metadata)
+        : MythNotification(type, metadata), m_imagePath(std::move(imagePath))
     {
     }
 
@@ -263,15 +267,15 @@ class MUI_PUBLIC MythImageNotification : public virtual MythNotification
 class MUI_PUBLIC MythPlaybackNotification : public virtual MythNotification
 {
   public:
-    MythPlaybackNotification(Type type, float progress, const QString &progressText)
-        : MythNotification(type), m_progress(progress), m_progressText(progressText)
+    MythPlaybackNotification(Type type, float progress, QString progressText)
+        : MythNotification(type), m_progress(progress), m_progressText(std::move(progressText))
     {
     }
 
-    MythPlaybackNotification(Type type, float progress, const QString &progressText,
+    MythPlaybackNotification(Type type, float progress, QString progressText,
                              const DMAP &metadata)
         : MythNotification(type, metadata),
-        m_progress(progress), m_progressText(progressText)
+        m_progress(progress), m_progressText(std::move(progressText))
     {
     }
 

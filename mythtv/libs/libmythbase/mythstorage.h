@@ -3,6 +3,8 @@
 #ifndef MYTHSTORAGE_H
 #define MYTHSTORAGE_H
 
+#include <utility>
+
 // Qt headers
 #include <QString>
 
@@ -34,8 +36,10 @@ class MBASE_PUBLIC Storage
 class MBASE_PUBLIC DBStorage : public Storage
 {
   public:
-    DBStorage(StorageUser *user, const QString &table, const QString &column) :
-        m_user(user), m_tablename(table), m_columnname(column) { }
+    DBStorage(StorageUser *user, QString table, QString column) :
+        m_user(user),
+        m_tablename(std::move(table)),
+        m_columnname(std::move(column)) { }
 
     virtual ~DBStorage() = default;
 
@@ -75,9 +79,10 @@ class MBASE_PUBLIC GenericDBStorage : public SimpleDBStorage
   public:
     GenericDBStorage(StorageUser *user,
                      const QString &table, const QString &column,
-                     const QString &keycolumn, const QString &keyvalue = QString()) :
+                     QString keycolumn, QString keyvalue = QString()) :
         SimpleDBStorage(user, table, column),
-        m_keycolumn(keycolumn), m_keyvalue(keyvalue) {}
+        m_keycolumn(std::move(keycolumn)),
+        m_keyvalue(std::move(keyvalue)) {}
     virtual ~GenericDBStorage() = default;
 
     void SetKeyValue(const QString &val) { m_keyvalue = val; }

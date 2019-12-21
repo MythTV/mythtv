@@ -2,10 +2,12 @@
 #ifndef GAMEHANDLER_H_
 #define GAMEHANDLER_H_
 
-#include <QStringList>
+#include <utility>
+
+#include <QEvent>
 #include <QMap>
 #include <QObject>
-#include <QEvent>
+#include <QStringList>
 
 #include <mythdbcon.h>
 
@@ -29,8 +31,11 @@ class GameScan
     GameScan(QString lromname = "", QString lromfullpath = "",
              int lfoundloc    = 0,  QString lgamename = "",
              QString lrompath = "") :
-         m_romname(lromname),  m_romfullpath(lromfullpath),  m_gamename(lgamename),
-         m_rompath(lrompath),  m_foundloc(lfoundloc) {}
+         m_romname(std::move(lromname)),
+         m_romfullpath(std::move(lromfullpath)),
+         m_gamename(std::move(lgamename)),
+         m_rompath(std::move(lrompath)),
+         m_foundloc(lfoundloc) {}
 
     QString Rom(void)         const { return m_romname;       }
     QString RomFullPath(void) const { return m_romfullpath;   }

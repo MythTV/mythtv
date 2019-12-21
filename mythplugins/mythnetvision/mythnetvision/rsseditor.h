@@ -1,13 +1,15 @@
 #ifndef RSSEDITOR_H
 #define RSSEDITOR_H
 
+#include <utility>
+
 // Qt headers
-#include <QMutex>
-#include <QString>
 #include <QDomDocument>
-#include <QNetworkRequest>
-#include <QNetworkReply>
+#include <QMutex>
 #include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QNetworkRequest>
+#include <QString>
 
 // MythTV headers
 #include <mythscreentype.h>
@@ -34,10 +36,10 @@ class RSSEditPopup : public MythScreenType
      *  \param parent Pointer to the screen stack
      *  \param name The name of the window
      */
-    RSSEditPopup(const QString &url, bool edit, MythScreenStack *parent,
+    RSSEditPopup(QString url, bool edit, MythScreenStack *parent,
                  const QString &name = "RSSEditPopup")
         : MythScreenType(parent, name),
-          m_urlText(url), m_editing(edit) {}
+          m_urlText(std::move(url)), m_editing(edit) {}
    ~RSSEditPopup();
 
     bool Create(void) override; // MythScreenType

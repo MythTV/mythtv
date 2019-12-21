@@ -5,8 +5,11 @@
 #ifndef DSMCC_CACHE_H
 #define DSMCC_CACHE_H
 
-#include <QStringList>
+#include <utility>
+
+// Qt headers
 #include <QMap>
+#include <QStringList>
 
 class BiopBinding;
 
@@ -32,9 +35,9 @@ class DSMCCCacheReference
   public:
     DSMCCCacheReference() = default;
     DSMCCCacheReference(unsigned long car, unsigned short m,
-                        unsigned short s, const DSMCCCacheKey &k) :
+                        unsigned short s, DSMCCCacheKey k) :
         m_nCarouselId(car),             m_nModuleId(m),
-        m_nStreamTag(s),                m_key(k) {}
+        m_nStreamTag(s),                m_key(std::move(k)) {}
 
     DSMCCCacheReference(const DSMCCCacheReference &r) = default;
     DSMCCCacheReference& operator=(const DSMCCCacheReference &rhs) = default;

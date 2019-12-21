@@ -13,10 +13,14 @@
 #ifndef __UPNPDEVICE_H__
 #define __UPNPDEVICE_H__
 
+#include <utility>
+
+// Qt headers
 #include <QDomDocument>
 #include <QUrl>
 #include <QUrlQuery>
 
+// MythTV headers
 #include "compat.h"
 #include "upnpexp.h"
 #include "upnputil.h"
@@ -234,15 +238,15 @@ class UPNP_PUBLIC DeviceLocation : public ReferenceCounter
 
         // ==================================================================
 
-        DeviceLocation( const QString &sURI,
-                        const QString &sUSN,
-                        const QString &sLocation,
+        DeviceLocation( QString sURI,
+                        QString sUSN,
+                        QString sLocation,
                         TaskTime       ttExpires ) : ReferenceCounter(
                                                          "DeviceLocation"     ),
                                                      m_pDeviceDesc( nullptr   ),
-                                                     m_sURI       ( sURI      ),
-                                                     m_sUSN       ( sUSN      ),
-                                                     m_sLocation  ( sLocation ),
+                                                     m_sURI       (std::move( sURI      )),
+                                                     m_sUSN       (std::move( sUSN      )),
+                                                     m_sLocation  (std::move( sLocation )),
                                                      m_ttExpires  ( ttExpires )
         {
             // Should be atomic increment

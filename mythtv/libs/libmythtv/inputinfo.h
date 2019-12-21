@@ -2,9 +2,11 @@
 #ifndef _INPUTINFO_H_
 #define _INPUTINFO_H_
 
+#include <utility>
+
 // Qt headers
-#include <QStringList>
 #include <QMap>
+#include <QStringList>
 
 // MythTV headers
 #include "channelinfo.h" // for ChannelInfoList
@@ -13,10 +15,10 @@ class MTV_PUBLIC InputInfo
 {
   public:
     InputInfo() = default;
-    InputInfo(const QString &_name,
+    InputInfo(QString _name,
               uint _sourceid, uint _inputid, uint _mplexid,
               uint _chanid, uint _livetvorder) :
-        m_name(_name),
+        m_name(std::move(_name)),
         m_sourceId(_sourceid),
         m_inputId(_inputid),
         m_mplexId(_mplexid),

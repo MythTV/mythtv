@@ -1,10 +1,12 @@
 #ifndef CDRIP_H_
 #define CDRIP_H_
 
+#include <utility>
+
 // qt
+#include <QCoreApplication>
 #include <QEvent>
 #include <QVector>
-#include <QCoreApplication>
 
 // mythtv
 #include <musicmetadata.h>
@@ -187,8 +189,8 @@ class RipStatusEvent : public QEvent
   public:
     RipStatusEvent(Type type, int val) :
         QEvent(type), m_text(""), m_value(val) {}
-    RipStatusEvent(Type type, const QString &val) :
-        QEvent(type), m_text(val) {}
+    RipStatusEvent(Type type, QString val) :
+        QEvent(type), m_text(std::move(val)) {}
     ~RipStatusEvent() = default;
 
     QString m_text;
@@ -213,10 +215,10 @@ class RipStatus : public MythScreenType
 {
   Q_OBJECT
   public:
-    RipStatus(MythScreenStack *parent, const QString &device,
+    RipStatus(MythScreenStack *parent, QString device,
               QVector<RipTrack*> *tracks, int quality)
         : MythScreenType(parent, "ripstatus"), m_tracks(tracks),
-          m_quality(quality), m_cdDevice(device) {}
+          m_quality(quality), m_cdDevice(std::move(device)) {}
     ~RipStatus(void);
 
     bool Create(void) override; // MythScreenType

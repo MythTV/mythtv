@@ -4,6 +4,7 @@
 #define _EXTERNAL_CHANNEL_H_
 
 #include <cstdint>
+#include <utility>
 #include <vector>
 using namespace std;
 
@@ -17,8 +18,8 @@ using namespace std;
 class ExternalChannel : public DTVChannel
 {
   public:
-    ExternalChannel(TVRec *parent, const QString & device)
-        : DTVChannel(parent), m_device(device),
+    ExternalChannel(TVRec *parent, QString  device)
+        : DTVChannel(parent), m_device(std::move(device)),
           m_loc(ExternalChannel::GetDevice()) {}
     ~ExternalChannel(void);
 

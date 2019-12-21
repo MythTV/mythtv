@@ -3,11 +3,15 @@
 #ifndef _TV_BROWSE_HELPER_H_
 #define _TV_BROWSE_HELPER_H_
 
-#include <QWaitCondition>
+#include <utility>
+
+// Qt headers
+#include <QHash>
 #include <QMultiMap>
 #include <QString>
-#include <QHash>
+#include <QWaitCondition>
 
+// MythTV headers
 #include "channelinfo.h"   // for ChannelInfoList
 #include "programtypes.h"  // for InfoMap
 #include "mthread.h"
@@ -25,16 +29,16 @@ class BrowseInfo
     {
     }
     BrowseInfo(BrowseDirection dir,
-               const QString &channum,
+               QString channum,
                uint           chanid,
-               const QString &starttime) :
-        m_dir(dir),         m_chanNum(channum),
-        m_chanId(chanid),   m_startTime(starttime)
+               QString starttime) :
+        m_dir(dir),         m_chanNum(std::move(channum)),
+        m_chanId(chanid),   m_startTime(std::move(starttime))
     {
     }
-    BrowseInfo(const QString &channum,
+    BrowseInfo(QString channum,
                uint           sourceid) :
-        m_chanNum(channum),
+        m_chanNum(std::move(channum)),
         m_sourceId(sourceid)
     {
     }

@@ -3,6 +3,7 @@
 
 // C++ headers
 #include <cstdint>
+#include <utility>
 #include <vector>
 
 using namespace std;
@@ -126,23 +127,23 @@ class MTV_PUBLIC ChannelInsertInfo
     ChannelInsertInfo(void) = default;
     ChannelInsertInfo(
         uint           _db_mplexid,         uint           _source_id,
-        uint           _channel_id,         const QString& _callsign,
-        const QString& _service_name,       const QString& _chan_num,
+        uint           _channel_id,         QString        _callsign,
+        QString        _service_name,       QString        _chan_num,
         uint           _service_id,
 
         uint           _atsc_major_channel, uint           _atsc_minor_channel,
         bool           _use_on_air_guide,   bool           _hidden,
         bool           _hidden_in_guide,
 
-        const QString& _freqid,             const QString& _icon,
-        const QString& _format,             const QString& _xmltvid,
+        QString        _freqid,             QString        _icon,
+        QString        _format,             QString        _xmltvid,
 
         uint           _pat_tsid,           uint           _vct_tsid,
         uint           _vct_chan_tsid,      uint           _sdt_tsid,
 
         uint           _orig_netid,         uint           _netid,
 
-        const QString& _si_standard,
+        QString        _si_standard,
 
         bool           _in_channels_conf,   bool           _in_pat,
         bool           _in_pmt,             bool           _in_vct,
@@ -151,13 +152,13 @@ class MTV_PUBLIC ChannelInsertInfo
         bool           _is_encrypted,       bool           _is_data_service,
         bool           _is_audio_service,   bool           _is_opencable,
         bool           _could_be_opencable, int            _decryption_status,
-        const QString& _default_authority,  uint           _service_type) :
+        QString        _default_authority,  uint           _service_type) :
     m_dbMplexId(_db_mplexid),
     m_sourceId(_source_id),
     m_channelId(_channel_id),
-    m_callSign(_callsign),
-    m_serviceName(_service_name),
-    m_chanNum(_chan_num),
+    m_callSign(std::move(_callsign)),
+    m_serviceName(std::move(_service_name)),
+    m_chanNum(std::move(_chan_num)),
     m_serviceId(_service_id),
     m_serviceType(_service_type),
     m_atscMajorChannel(_atsc_major_channel),
@@ -165,18 +166,18 @@ class MTV_PUBLIC ChannelInsertInfo
     m_useOnAirGuide(_use_on_air_guide),
     m_hidden(_hidden),
     m_hiddenInGuide(_hidden_in_guide),
-    m_freqId(_freqid),
-    m_icon(_icon),
-    m_format(_format),
-    m_xmltvId(_xmltvid),
-    m_defaultAuthority(_default_authority),
+    m_freqId(std::move(_freqid)),
+    m_icon(std::move(_icon)),
+    m_format(std::move(_format)),
+    m_xmltvId(std::move(_xmltvid)),
+    m_defaultAuthority(std::move(_default_authority)),
     m_patTsId(_pat_tsid),
     m_vctTsId(_vct_tsid),
     m_vctChanTsId(_vct_chan_tsid),
     m_sdtTsId(_sdt_tsid),
     m_origNetId(_orig_netid),
     m_netId(_netid),
-    m_siStandard(_si_standard),
+    m_siStandard(std::move(_si_standard)),
     m_inChannelsConf(_in_channels_conf),
     m_inPat(_in_pat),
     m_inPmt(_in_pmt),

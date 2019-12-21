@@ -3,14 +3,17 @@
 #ifndef _STREAM_HANDLER_H_
 #define _STREAM_HANDLER_H_
 
+#include <utility>
 #include <vector>
 using namespace std;
 
+// Qt headers
 #include <QWaitCondition>
 #include <QString>
 #include <QMutex>
 #include <QMap>
 
+// MythTV headers
 #include "DeviceReadBuffer.h" // for ReaderPausedCB
 #include "mpegstreamdata.h" // for PIDPriority
 #include "mthread.h"
@@ -66,8 +69,8 @@ class StreamHandler : protected MThread, public DeviceReaderCB
     virtual void RemoveNamedOutputFile(const QString &filename);
 
   protected:
-    explicit StreamHandler(const QString &device, int inputid)
-        : MThread("StreamHandler"), m_device(device), m_inputId(inputid) {}
+    explicit StreamHandler(QString device, int inputid)
+        : MThread("StreamHandler"), m_device(std::move(device)), m_inputId(inputid) {}
     ~StreamHandler();
 
     void Start(void);

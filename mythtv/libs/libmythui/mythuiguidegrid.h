@@ -1,10 +1,12 @@
 #ifndef MYTHUIGUIDEGRID_H_
 #define MYTHUIGUIDEGRID_H_
 
+#include <utility>
+
 // QT
-#include <QPixmap>
-#include <QPen>
 #include <QBrush>
+#include <QPen>
+#include <QPixmap>
 
 // MythDB
 #include "mythuiexp.h"
@@ -81,9 +83,9 @@ class MUI_PUBLIC MythUIGuideGrid : public MythUIType
     {
       public:
         UIGTCon() { m_arrow = GridTimeNormal; m_recType = m_recStat = 0; };
-        UIGTCon(const QRect &drawArea, const QString &title,
+        UIGTCon(const QRect &drawArea, QString title,
                 const QString &category, int arrow, int recType, int recStat) :
-                m_drawArea(drawArea),               m_title(title),
+                m_drawArea(drawArea),               m_title(std::move(title)),
                 m_category(category.trimmed()),     m_arrow(arrow),
                 m_recType(recType),                 m_recStat(recStat)
         {}

@@ -1,17 +1,20 @@
 #ifndef UPNPSCANNER_H
 #define UPNPSCANNER_H
 
-#include <QNetworkAccessManager>
-#include <QNetworkRequest>
-#include <QNetworkReply>
+#include <utility>
+
+// Qt headers
 #include <QDomDocument>
 #include <QMutex>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QNetworkRequest>
 #include <QTimer>
 
+// MythTV headers
 #include "upnpsubscription.h"
 #include "mthread.h"
 #include "upnpexp.h"
-
 #include "videometadatalistmanager.h"
 
 class MediaServer;
@@ -22,9 +25,10 @@ class MediaServerItem
 {
   public:
     MediaServerItem() = default;
-    MediaServerItem(const QString& id, const QString& parent,
-                    const QString& name, const QString& url)
-      : m_id(id), m_parentid(parent), m_name(name), m_url(url) { }
+    MediaServerItem(QString  id, QString  parent,
+                    QString  name, QString  url)
+      : m_id(std::move(id)), m_parentid(std::move(parent)),
+        m_name(std::move(name)), m_url(std::move(url)) { }
     QString NextUnbrowsed(void);
     MediaServerItem* Find(QString &id);
     bool Add(MediaServerItem &item);

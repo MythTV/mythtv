@@ -35,6 +35,7 @@
 // C++ headers
 #include <cstdint>
 #include <unistd.h>
+#include <utility>
 #include <vector>
 using namespace std;
 
@@ -78,8 +79,8 @@ class DTVConfParser
     enum return_t   { ERROR_CARDTYPE, ERROR_OPEN, ERROR_PARSE, OK };
     enum cardtype_t { ATSC, OFDM, QPSK, QAM, DVBS2, UNKNOWN };
 
-    DTVConfParser(enum cardtype_t type, uint sourceid, const QString &file)
-        : m_type(type), m_sourceid(sourceid), m_filename(file) {}
+    DTVConfParser(enum cardtype_t type, uint sourceid, QString file)
+        : m_type(type), m_sourceid(sourceid), m_filename(std::move(file)) {}
     virtual ~DTVConfParser() = default;
 
     return_t Parse(void);

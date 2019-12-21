@@ -1,6 +1,8 @@
 #ifndef METADATAFACTORY_H_
 #define METADATAFACTORY_H_
 
+#include <utility>
+
 // Needed to perform a lookup
 #include "metadatacommon.h"
 #include "metadataimagedownload.h"
@@ -82,8 +84,9 @@ class META_PUBLIC MetadataFactoryVideoChanges : public QEvent
   public:
     MetadataFactoryVideoChanges(QList<int> adds, QList<int> movs,
                                 QList<int>dels) : QEvent(kEventType),
-                                m_additions(adds), m_moved(movs),
-                                m_deleted(dels) {}
+                                m_additions(std::move(adds)),
+                                m_moved(std::move(movs)),
+                                m_deleted(std::move(dels)) {}
     ~MetadataFactoryVideoChanges() = default;
 
     QList<int> m_additions; // newly added intids

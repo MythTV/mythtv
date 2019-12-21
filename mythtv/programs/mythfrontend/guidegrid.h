@@ -3,6 +3,7 @@
 #define GUIDEGRID_H_
 
 // c++
+#include <utility>
 #include <vector>
 using namespace std;
 
@@ -84,10 +85,10 @@ class JumpToChannel : public QObject
 class GuideUIElement {
 public:
     GuideUIElement(int row, int col, const QRect &area,
-                   const QString &title, const QString &category,
+                   QString title, QString category,
                    int arrow, int recType, int recStat, bool selected)
-        : m_row(row), m_col(col), m_area(area), m_title(title),
-          m_category(category), m_arrow(arrow), m_recType(recType),
+        : m_row(row), m_col(col), m_area(area), m_title(std::move(title)),
+          m_category(std::move(category)), m_arrow(arrow), m_recType(recType),
           m_recStat(recStat), m_selected(selected) {}
     const int m_row;
     const int m_col;

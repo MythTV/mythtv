@@ -1,9 +1,11 @@
 #ifndef VIDEOSOURCE_H
 #define VIDEOSOURCE_H
 
+#include <utility>
 #include <vector>
 using namespace std;
 
+// MythTV headers
 #include "mthread.h"
 #include "standardsettings.h"
 #include "mythcontext.h"
@@ -707,9 +709,9 @@ class CaptureCardButton : public ButtonStandardSetting
     Q_OBJECT
 
   public:
-     CaptureCardButton(const QString &label, const QString &value)
+     CaptureCardButton(const QString &label, QString value)
          : ButtonStandardSetting(label),
-         m_value(value)
+         m_value(std::move(value))
     {
     }
 

@@ -8,6 +8,8 @@
 #ifndef CETONCHANNEL_H
 #define CETONCHANNEL_H
 
+#include <utility>
+
 // Qt headers
 #include <QString>
 
@@ -23,8 +25,8 @@ class CetonChannel : public DTVChannel
     friend class CetonRecorder;
 
   public:
-    CetonChannel(TVRec *parent, const QString &device)
-        : DTVChannel(parent), m_deviceId(device) {}
+    CetonChannel(TVRec *parent, QString device)
+        : DTVChannel(parent), m_deviceId(std::move(device)) {}
     ~CetonChannel(void);
 
     bool Open(void) override; // ChannelBase

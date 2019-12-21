@@ -4,6 +4,8 @@
 
 #include <QDateTime>
 #include <QList>
+#include <utility>
+
 
 #include "mythtvexp.h"
 
@@ -12,8 +14,8 @@ class RecordingInfo;
 class RecordingGap
 {
   public:
-    RecordingGap(const QDateTime &start, const QDateTime &end) :
-        m_start(start), m_end(end) { }
+    RecordingGap(QDateTime start, QDateTime end) :
+        m_start(std::move(start)), m_end(std::move(end)) { }
     QDateTime GetStart(void) const { return m_start; }
     QDateTime GetEnd(void) const { return m_end; }
     QString toString(void) const

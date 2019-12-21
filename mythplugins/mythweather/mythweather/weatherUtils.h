@@ -1,13 +1,15 @@
 #ifndef _WEATHERUTILS_H_
 #define _WEATHERUTILS_H_
 
+#include <utility>
+
 // QT headers
-#include <QMap>
-#include <QMultiHash>
-#include <QString>
 #include <QDomElement>
 #include <QFile>
+#include <QMap>
 #include <QMetaType>
+#include <QMultiHash>
+#include <QString>
 
 // MythTV headers
 #include <mythcontext.h>
@@ -27,13 +29,13 @@ class TypeListInfo
   public:
 
     TypeListInfo(const TypeListInfo& info) = default;
-    explicit TypeListInfo(const QString &_name)
-        : m_name(_name) {}
-    TypeListInfo(const QString &_name, const QString &_location)
-        : m_name(_name), m_location(_location) {}
-    TypeListInfo(const QString &_name, const QString &_location,
+    explicit TypeListInfo(QString _name)
+        : m_name(std::move(_name)) {}
+    TypeListInfo(QString _name, QString _location)
+        : m_name(std::move(_name)), m_location(std::move(_location)) {}
+    TypeListInfo(QString _name, QString _location,
                  ScriptInfo *_src)
-        : m_name(_name), m_location(_location), m_src(_src) {}
+        : m_name(std::move(_name)), m_location(std::move(_location)), m_src(_src) {}
 
   public:
     QString     m_name;

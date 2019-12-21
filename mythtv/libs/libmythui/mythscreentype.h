@@ -1,11 +1,15 @@
 #ifndef MYTHSCREEN_TYPE_H_
 #define MYTHSCREEN_TYPE_H_
 
+#include <utility>
+
+// Qt headers
+#include <QEvent>
+#include <QSemaphore>
+
+// MythTV headers
 #include "mythuicomposite.h"
 #include "mythuiutils.h"
-
-#include <QSemaphore>
-#include <QEvent>
 
 class ScreenLoadTask;
 class MythScreenStack;
@@ -20,8 +24,8 @@ class MythUIBusyDialog;
 class MUI_PUBLIC ScreenLoadCompletionEvent : public QEvent
 {
   public:
-    explicit ScreenLoadCompletionEvent(const QString &id) :
-        QEvent(kEventType), m_id(id) { }
+    explicit ScreenLoadCompletionEvent(QString id) :
+        QEvent(kEventType), m_id(std::move(id)) { }
 
     QString GetId() { return m_id; }
 

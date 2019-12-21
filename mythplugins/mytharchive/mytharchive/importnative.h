@@ -3,13 +3,14 @@
 
 #include <cstdint>
 #include <iostream>
+#include <utility>
 
 // qt
-#include <QString>
-#include <QStringList>
+#include <QDateTime>
 #include <QKeyEvent>
 #include <QList>
-#include <QDateTime>
+#include <QString>
+#include <QStringList>
 
 // myth
 #include <mythscreentype.h>
@@ -76,10 +77,10 @@ class ImportNative : public MythScreenType
 
   public:
       ImportNative(MythScreenStack *parent, MythScreenType *previousScreen,
-                   const QString &xmlFile, FileDetails details)
+                   QString xmlFile, FileDetails details)
           : MythScreenType(parent, "ImportNative"),
-            m_xmlFile(xmlFile),
-            m_details(details),
+            m_xmlFile(std::move(xmlFile)),
+            m_details(std::move(details)),
             m_previousScreen(previousScreen) {}
       ~ImportNative() = default;
 

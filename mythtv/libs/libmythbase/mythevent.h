@@ -20,35 +20,42 @@ class MBASE_PUBLIC MythEvent : public QEvent
     { }
 
     // lmessage is passed by value for thread safety reasons per DanielK
-    MythEvent(int type, QString lmessage) : QEvent((QEvent::Type)type),
-        m_message(::std::move(lmessage)),    m_extradata("empty")
+    MythEvent(int type, QString lmessage)
+        : QEvent((QEvent::Type)type),
+        m_message(::std::move(lmessage)),
+        m_extradata("empty")
     {
     }
 
     // lmessage is passed by value for thread safety reasons per DanielK
-    MythEvent(int type, QString lmessage, const QStringList &lextradata)
-           : QEvent((QEvent::Type)type),
-            m_message(::std::move(lmessage)),    m_extradata(lextradata)
+    MythEvent(int type, QString lmessage, QStringList lextradata)
+        : QEvent((QEvent::Type)type),
+        m_message(::std::move(lmessage)),
+        m_extradata(std::move(lextradata))
     {
     }
 
     // lmessage is passed by value for thread safety reasons per DanielK
-    explicit MythEvent(QString lmessage) : QEvent(MythEventMessage),
-            m_message(::std::move(lmessage)),    m_extradata("empty")
+    explicit MythEvent(QString lmessage)
+        : QEvent(MythEventMessage),
+        m_message(::std::move(lmessage)),
+        m_extradata("empty")
     {
     }
 
     // lmessage is passed by value for thread safety reasons per DanielK
-    MythEvent(QString lmessage, const QStringList &lextradata)
-           : QEvent(MythEventMessage),
-           m_message(::std::move(lmessage)),    m_extradata(lextradata)
+    MythEvent(QString lmessage, QStringList lextradata)
+        : QEvent(MythEventMessage),
+        m_message(::std::move(lmessage)),
+        m_extradata(std::move(lextradata))
     {
     }
 
     // lmessage is passed by value for thread safety reasons per DanielK
     MythEvent(QString lmessage, const QString lextradata)
-           : QEvent(MythEventMessage),
-           m_message(::std::move(lmessage)),    m_extradata(lextradata)
+        : QEvent(MythEventMessage),
+        m_message(::std::move(lmessage)),
+        m_extradata(lextradata)
     {
     }
 
@@ -98,8 +105,8 @@ class MBASE_PUBLIC ExternalKeycodeEvent : public QEvent
 class MBASE_PUBLIC UpdateBrowseInfoEvent : public QEvent
 {
   public:
-    explicit UpdateBrowseInfoEvent(const InfoMap &infoMap) :
-        QEvent(MythEvent::kUpdateBrowseInfoEventType), m_im(infoMap) {}
+    explicit UpdateBrowseInfoEvent(InfoMap infoMap) :
+        QEvent(MythEvent::kUpdateBrowseInfoEventType), m_im(std::move(infoMap)) {}
     InfoMap m_im;
 };
 
@@ -108,8 +115,8 @@ class MBASE_PUBLIC MythInfoMapEvent : public MythEvent
 {
   public:
     MythInfoMapEvent(const QString &lmessage,
-                     const InfoMap &linfoMap)
-      : MythEvent(lmessage), m_infoMap(linfoMap) { }
+                     InfoMap linfoMap)
+      : MythEvent(lmessage), m_infoMap(std::move(linfoMap)) { }
 
     MythInfoMapEvent *clone() const override // MythEvent
         { return new MythInfoMapEvent(Message(), m_infoMap); }

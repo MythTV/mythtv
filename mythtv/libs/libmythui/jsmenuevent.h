@@ -7,6 +7,9 @@
 #ifndef JSMENUEVENT_H_
 #define JSMENUEVENT_H_
 
+#include <utility>
+
+// Qt headers
 #include <QEvent>
 #include <QString>
 
@@ -14,8 +17,8 @@ class JoystickKeycodeEvent : public QEvent
 {
   public:
     JoystickKeycodeEvent(
-        const QString &jsmenuevent_text, int key_code, bool key_down) :
-        QEvent(kEventType), m_jsmenueventtext(jsmenuevent_text),
+        QString jsmenuevent_text, int key_code, bool key_down) :
+        QEvent(kEventType), m_jsmenueventtext(std::move(jsmenuevent_text)),
         m_keycode(key_code), m_keydown(key_down)
     {
     }

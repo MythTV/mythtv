@@ -11,6 +11,9 @@
 #ifndef GALLERYVIEWS_H
 #define GALLERYVIEWS_H
 
+#include <utility>
+
+// MythTV headers
 #include "imagemanager.h"
 
 
@@ -75,8 +78,8 @@ class FileCacheEntry
 public:
     // Default constructor for QHash 'undefined entry'
     FileCacheEntry() = default;
-    FileCacheEntry(int parent, const QString &url, const QString &thumbUrl)
-        : m_parent(parent), m_url(url), m_thumbUrl(thumbUrl)  {}
+    FileCacheEntry(int parent, QString url, QString thumbUrl)
+        : m_parent(parent), m_url(std::move(url)), m_thumbUrl(std::move(thumbUrl))  {}
 
     QString ToString(int id)
     { return QString("File %1 Parent %2").arg(id).arg(m_parent); }
@@ -144,9 +147,9 @@ class DirCacheEntry
 public:
     DirCacheEntry() = default;
     DirCacheEntry(int parentId, int dirs, int files,
-                  const QList<ThumbPair> &thumbs, int thumbCount)
+                  QList<ThumbPair> thumbs, int thumbCount)
         : m_parent(parentId), m_thumbCount(thumbCount),
-          m_dirCount(dirs), m_fileCount(files), m_thumbs(thumbs) {}
+          m_dirCount(dirs), m_fileCount(files), m_thumbs(std::move(thumbs)) {}
 
     QString ToString(int id) const;
 

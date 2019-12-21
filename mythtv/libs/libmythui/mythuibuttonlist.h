@@ -1,11 +1,15 @@
 #ifndef MYTHUIBUTTONLIST_H_
 #define MYTHUIBUTTONLIST_H_
 
-#include <QList>
+#include <utility>
+
+// Qt headers
 #include <QHash>
+#include <QList>
 #include <QString>
 #include <QVariant>
 
+// MythTV headers
 #include "mythuitype.h"
 #include "mythscreentype.h"
 #include "mythimage.h"
@@ -351,7 +355,7 @@ class MUI_PUBLIC SearchButtonListDialog : public MythScreenType
     SearchButtonListDialog(MythScreenStack *parent, const char *name,
                            MythUIButtonList *parentList, QString searchText)
         : MythScreenType(parent, name, false),
-          m_parentList(parentList), m_searchText(searchText) {}
+          m_parentList(parentList), m_searchText(std::move(searchText)) {}
     ~SearchButtonListDialog(void) = default;
 
     bool Create(void) override; // MythScreenType
