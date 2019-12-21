@@ -107,7 +107,7 @@ class SERVICE_PUBLIC ChannelInfo : public QObject
               m_FineTune        ( 0      ),
               m_SourceId        ( 0      ),
               m_InputId         ( 0      ),
-              m_CommFree        ( 0      ),
+              m_CommFree        ( false  ),
               m_UseEIT          ( false  ),
               m_Visible         ( true   ),
               m_SerializeDetails( true   )

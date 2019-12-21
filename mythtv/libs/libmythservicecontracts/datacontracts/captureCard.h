@@ -125,7 +125,7 @@ class SERVICE_PUBLIC CaptureCard : public QObject
             m_FirewireConnection(0), m_SignalTimeout(1000),
             m_ChannelTimeout(3000), m_DVBTuningDelay(0),
             m_Contrast(0), m_Brightness(0), m_Colour(0),
-            m_Hue(0), m_DiSEqCId(0), m_DVBEITScan(1),
+            m_Hue(0), m_DiSEqCId(0), m_DVBEITScan(true),
             m_SourceId(0), m_DishnetEit(false), m_RecPriority(0),
             m_QuickTune(false), m_SchedOrder(0), m_LiveTVOrder(0),
             m_RecLimit(0), m_SchedGroup(false)

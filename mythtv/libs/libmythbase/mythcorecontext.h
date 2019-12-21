@@ -161,13 +161,13 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     QString GetSettingOnHost(const QString &key, const QString &host,
                              const QString &defaultval = "");
     bool GetBoolSettingOnHost(const QString &key, const QString &host,
-                             bool defaultval = 0);
+                             bool defaultval = false);
     int GetNumSettingOnHost(const QString &key, const QString &host,
                             int defaultval = 0);
     int GetBoolSettingOnHost(const QString &key, const QString &host,
                              int defaultval) = delete;
     bool GetNumSettingOnHost(const QString &key, const QString &host,
-                            bool defaultval = 0) = delete;
+                            bool defaultval = false) = delete;
     double GetFloatSettingOnHost(const QString &key, const QString &host,
                                  double defaultval = 0.0);
 

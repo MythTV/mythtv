@@ -155,7 +155,7 @@ class CC708Pen
         m_attr.m_edgeType  = edge_type;
         m_attr.m_underline = underline;
         m_attr.m_italics   = italics;
-        m_attr.m_boldface  = 0;
+        m_attr.m_boldface  = false;
     }
   public:
     CC708CharacterAttribute m_attr;
