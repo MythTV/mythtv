@@ -283,7 +283,7 @@ class AudioStreamDescriptor : public MPEGDescriptor
         char *tmp = new char[TextLength()+2];
         if (IsTextLatin1())
         {
-            memcpy(tmp, &_data[(Channels()==0)?9:8], TextLength());
+            memcpy(tmp, &m_data[(Channels()==0)?9:8], TextLength());
             tmp[TextLength()]=0;
             for (uint i=0; i<TextLength(); i++)
                 if (!tmp[i]) tmp[i]='H';
@@ -294,7 +294,7 @@ class AudioStreamDescriptor : public MPEGDescriptor
         else
         {
             QString str; int len = TextLength();
-            const unsigned char *buf = (&_data[(Channels()==0)?9:8]);
+            const unsigned char *buf = (&m_data[(Channels()==0)?9:8]);
             const unsigned short* ustr =
                 reinterpret_cast<const unsigned short*>(buf);
             for (int j=0; j<(len>>1); j++)
