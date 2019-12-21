@@ -23,7 +23,7 @@ DeleteHandler::DeleteHandler(void) :
 
 DeleteHandler::DeleteHandler(const QString& filename) :
     ReferenceCounter(QString("DeleteHandler:%1").arg(filename)),
-    m_path(filename), m_fd(-1), m_size(0)
+    m_path(filename)
 {
 }
 
