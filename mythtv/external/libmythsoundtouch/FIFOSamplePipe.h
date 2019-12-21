@@ -48,8 +48,8 @@
 #ifndef FIFOSamplePipe_H
 #define FIFOSamplePipe_H
 
-#include <assert.h>
-#include <stdlib.h>
+#include <cassert>
+#include <cstdlib>
 #include "STTypes.h"
 
 /// Abstract base class for FIFO (first-in-first-out) sample processing classes.

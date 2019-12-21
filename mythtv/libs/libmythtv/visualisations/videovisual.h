@@ -1,7 +1,7 @@
 #ifndef VIDEOVISUAL_H
 #define VIDEOVISUAL_H
 
-#include "stdint.h"
+#include <cstdint>
 
 #include <QRect>
 #include <QList>
