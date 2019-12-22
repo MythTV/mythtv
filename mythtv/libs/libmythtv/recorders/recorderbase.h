@@ -76,7 +76,7 @@ class MTV_PUBLIC RecorderBase : public QRunnable
     {
         m_videoFrameRate = rate;
         m_ntscFrameRate = (29.96 <= rate && 29.98 >= rate);
-        m_frameRate = FrameRate((rate * 100) + 0.5, 100);
+        m_frameRate = FrameRate(lround(rate * 100), 100);
     }
 
     /** \brief Changes the Recording from the one set initially with

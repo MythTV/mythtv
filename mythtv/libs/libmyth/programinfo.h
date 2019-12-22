@@ -435,7 +435,7 @@ class MPUBLIC ProgramInfo
     int     GetRecordingPriority2(void)   const { return m_recPriority2; }
     float   GetStars(void)                const { return m_stars;        }
     uint    GetStars(uint range_max)      const
-        { return (int)(m_stars * range_max + 0.5F); }
+        { return lroundf(m_stars * range_max); }
 
     uint    GetRecordingID(void)              const { return m_recordedId; }
     RecStatus::Type GetRecordingStatus(void)    const
