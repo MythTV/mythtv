@@ -61,7 +61,7 @@
             VB_LAST_ITEM \
         };
     #define VERBOSE_MAP(name,mask,additive,help) \
-        name = mask,
+        name = (mask),
 #else
     // msvc can't have 64bit enums
     #define VERBOSE_PREAMBLE
