@@ -123,7 +123,7 @@ class MTV_PUBLIC VideoDisplayProfile
   private:
     mutable QMutex        m_lock                { QMutex::Recursive };
     QSize                 m_lastSize            { 0, 0 };
-    float                 m_lastRate            { 0.0f };
+    float                 m_lastRate            { 0.0F };
     QString               m_lastCodecName       { };
     QString               m_lastVideoRenderer   { };
     QMap<QString,QString> m_currentPreferences  { };

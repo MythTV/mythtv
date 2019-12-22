@@ -149,7 +149,7 @@ public:
                              const QString &base = "",
                              const QRect &safearea = QRect(),
                              SubtitleScreen *p = nullptr,
-                             float aspect = 1.77777f) :
+                             float aspect = 1.77777F) :
         FormattedTextSubtitle(base, safearea, 0, 0, p),
         m_num(num),
         m_bgFillAlpha(win.GetFillAlpha()),

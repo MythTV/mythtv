@@ -60,7 +60,7 @@ class MUI_PUBLIC MythGLTexture
     bool            m_crop                    { false };
     QRect           m_source                  { QRect() };
     QRect           m_destination             { QRect() };
-    GLfloat         m_vertexData[16]          { 0.0f };
+    GLfloat         m_vertexData[16]          { 0.0F };
     GLenum          m_target                  { QOpenGLTexture::Target2D };
     int             m_rotation                { 0 };
 

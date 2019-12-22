@@ -297,7 +297,7 @@ class DecoderBase
 
     int                  m_currentWidth            {640};
     int                  m_currentHeight           {480};
-    float                m_currentAspect           {1.33333f};
+    float                m_currentAspect           {1.33333F};
     double               m_fps                     {29.97};
     int                  m_fpsMultiplier           {1};
     int                  m_fpsSkip                 {0};

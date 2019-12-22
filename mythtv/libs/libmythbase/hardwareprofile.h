@@ -54,8 +54,8 @@ class MBASE_PUBLIC HardwareProfileTask : public PeriodicHouseKeeperTask
   public:
     HardwareProfileTask(void) : PeriodicHouseKeeperTask("HardwareProfiler",
                                             2592000,  // 30 days in seconds
-                                            0.96667f, // up to one day early
-                                            1.03333f, // up to one day late
+                                            0.96667F, // up to one day early
+                                            1.03333F, // up to one day late
                                             86400, // retry daily on error
                                             kHKLocal, kHKRunOnStartup) {}
     bool DoCheckRun(QDateTime now) override; // HouseKeeperTask
