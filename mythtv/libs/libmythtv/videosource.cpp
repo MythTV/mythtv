@@ -3947,7 +3947,7 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent,
     cardType.addTargetedChild("DVB", new DVBEITScan(m_parent));
 
     m_diseqcBtn = new DeviceTree(*m_diseqcTree);
-    m_diseqcBtn->setLabel(tr("DiSEqC (Switch, LNB, and Rotor Configuration)"));
+    m_diseqcBtn->setLabel(tr("DiSEqC (Switch, LNB and Rotor Configuration)"));
     m_diseqcBtn->setHelpText(tr("Input and satellite settings."));
 
     m_tuningDelay = new DVBTuningDelay(m_parent);
