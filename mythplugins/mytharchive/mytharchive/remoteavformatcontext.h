@@ -106,8 +106,7 @@ class RemoteAVFormatContext
     {
         if (m_inputIsRemote)
             return (m_inputFC != nullptr && m_rf != nullptr && m_rf->isOpen());
-        else
-            return (m_inputFC != nullptr);
+        return (m_inputFC != nullptr);
     }
 
     operator AVFormatContext * () const { return m_inputFC; }

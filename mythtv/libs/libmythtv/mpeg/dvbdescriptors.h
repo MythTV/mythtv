@@ -1133,9 +1133,8 @@ class FrequencyListDescriptor : public MPEGDescriptor
                                         (m_data[i*4+4]<<16) |
                                         (m_data[i*4+5]<<8)  |
                                         (m_data[i*4+6]));
-        else
-            return byte4BCD2int(m_data[i*4+3], m_data[i*4+4],
-                                m_data[i*4+5], m_data[i*4+6]);
+        return byte4BCD2int(m_data[i*4+3], m_data[i*4+4],
+                            m_data[i*4+5], m_data[i*4+6]);
     }
     unsigned long long FrequencyHz(uint i) const
     {
@@ -1351,13 +1350,8 @@ class ParentalRatingDescriptor : public MPEGDescriptor
     {
         int o = 2 + i*4;
         if (i < Count())
-        {
             return QString(m_data[o]) + QChar(m_data[o+1]) + QChar(m_data[o+2]);
-        }
-        else
-        {
-            return QString("");
-        }
+        return QString("");
     }
     int Rating(uint i) const
     {
@@ -1372,16 +1366,14 @@ class ParentalRatingDescriptor : public MPEGDescriptor
             // 0x00 - undefined
             return -1;
         }
-        else if ((rawRating >= 0x01) && (rawRating <= 0x0F))
+        if ((rawRating >= 0x01) && (rawRating <= 0x0F))
         {
             // 0x01 to 0x0F - minumum age = rating + 3 years
             return rawRating + 3;
         }
-        else
-        {
-            // 0x10 to 0xFF - defined by the broadcaster
-            return -1;
-        }
+
+        // 0x10 to 0xFF - defined by the broadcaster
+        return -1;
     }
 };
 

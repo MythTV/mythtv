@@ -175,8 +175,7 @@ class MHEngine: public MHEG {
     MHApplication *CurrentApp() {
         if (m_ApplicationStack.isEmpty())
             return nullptr;
-        else
-            return m_ApplicationStack.top();
+        return m_ApplicationStack.top();
     }
     MHScene *CurrentScene() { return CurrentApp() == nullptr ? nullptr : CurrentApp()->m_pCurrentScene; }
 

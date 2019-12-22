@@ -383,8 +383,7 @@ inline int DecoderBase::ChangeTrack(uint type, int dir)
 {
     if (dir > 0)
         return IncrementTrack(type);
-    else
-        return DecrementTrack(type);
+    return DecrementTrack(type);
 }
 
 inline void DecoderBase::AutoSelectTracks(void)

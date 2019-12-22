@@ -79,7 +79,7 @@ double MythDisplayMode::RefreshRate() const
 {
     if (m_refreshRates.size() >= 1)
         return m_refreshRates[0];
-    else return 0.0;
+    return 0.0;
 }
 
 void MythDisplayMode::SetAspectRatio(double AspectRatio)

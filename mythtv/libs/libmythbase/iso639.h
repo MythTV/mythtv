@@ -73,15 +73,10 @@ static inline int iso639_str3_to_key(const char *iso639_2)
 static inline int iso639_str3_to_key(const QString &iso639_2)
 {
     if (iso639_2.length() < 3)
-    {
         return iso639_str3_to_key("und");
-    }
-    else
-    {
-        return ((iso639_2.at(0).toLatin1()<<16) |
-                (iso639_2.at(1).toLatin1()<<8) |
-                (iso639_2.at(2).toLatin1()));
-    }
+    return ((iso639_2.at(0).toLatin1()<<16) |
+            (iso639_2.at(1).toLatin1()<<8) |
+            (iso639_2.at(2).toLatin1()));
 }
 
 

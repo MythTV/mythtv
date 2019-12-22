@@ -137,12 +137,11 @@ class MTV_PUBLIC IPTVTuningData
     {
         if (0 == i)
             return GetDataURL();
-        else if (1 == i)
+        if (1 == i)
             return GetFECURL0();
-        else if (2 == i)
+        if (2 == i)
             return GetFECURL1();
-        else
-            return QUrl();
+        return QUrl();
     }
     uint GetBitrate(uint i) const { return m_bitrate[i]; }
 

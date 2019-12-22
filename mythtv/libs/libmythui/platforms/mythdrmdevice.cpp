@@ -180,7 +180,7 @@ bool MythDRMDevice::Initialise(void)
                     m_serialNumber = serial;
                     break;
                 }
-                else if (!edid.Valid())
+                if (!edid.Valid())
                 {
                         LOG(VB_GENERAL, m_verbose, LOC + "Connected device has invalid EDID");
                 }

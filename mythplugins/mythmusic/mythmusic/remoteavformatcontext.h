@@ -75,10 +75,7 @@ class RemoteAVFormatContext
                 LOG(VB_GENERAL, LOG_ERR,  QString("RemoteAVFormatContext::Open: Failed to probe file: %1").arg(filename));
                 return false;
             }
-            else
-            {
-                LOG(VB_PLAYBACK, LOG_INFO,  QString("RemoteAVFormatContext::Open: probed file as %1").arg(fmt->name));
-            }
+            LOG(VB_PLAYBACK, LOG_INFO,  QString("RemoteAVFormatContext::Open: probed file as %1").arg(fmt->name));
 
             m_rf->Seek(0, SEEK_SET);
 

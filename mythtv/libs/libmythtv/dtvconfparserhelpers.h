@@ -200,8 +200,11 @@ class DTVInversion : public DTVParamHelper
 
     QString toString() const { return toString(m_value); }
     QChar   toChar() const
-        { if (toString().length() > 0)
-              return toString()[0]; else return {0}; }
+        {
+            if (toString().length() > 0)
+                return toString()[0];
+            return {0};
+        }
 
     static QString toString(int _value)
         { return DTVParamHelper::toString(s_dbStr, _value, kDBStrCnt); }
@@ -253,8 +256,11 @@ class DTVBandwidth : public DTVParamHelper
 
     QString toString() const { return toString(m_value); }
     QChar   toChar() const
-        { if (toString().length() > 0)
-              return toString()[0]; else return {0}; }
+        {
+            if (toString().length() > 0)
+                return toString()[0];
+            return {0};
+        }
 
     static QString toString(int _value)
         { return DTVParamHelper::toString(s_dbStr, _value, kDBStrCnt); }
@@ -379,7 +385,7 @@ class DTVModulation : public DTVParamHelper
     {
         if (kModulationInvalid == _value)
             return "invalid";
-        else if (kModulationAnalog == _value)
+        if (kModulationAnalog == _value)
             return "analog";
         return DTVParamHelper::toString(s_dbStr, _value, kDBStrCnt);
     }
@@ -430,8 +436,11 @@ class DTVTransmitMode : public DTVParamHelper
 
     QString toString() const { return toString(m_value); }
     QChar   toChar() const
-        { if (toString().length() > 0)
-              return toString()[0]; else return {0}; }
+        {
+            if (toString().length() > 0)
+                return toString()[0];
+            return {0};
+        }
 
     static QString toString(int _value)
         { return DTVParamHelper::toString(s_dbStr, _value, kDBStrCnt); }
@@ -535,8 +544,11 @@ class DTVHierarchy : public DTVParamHelper
 
     QString toString() const { return toString(m_value); }
     QChar   toChar() const
-        { if (toString().length() > 0)
-              return toString()[0]; else return {0}; }
+        {
+            if (toString().length() > 0)
+                return toString()[0];
+            return {0};
+        }
 
     static QString toString(int _value)
         { return DTVParamHelper::toString(s_dbStr, _value, kDBStrCnt); }
@@ -572,8 +584,11 @@ class DTVPolarity : public DTVParamHelper
 
     QString toString() const { return toString(m_value); }
     QChar   toChar() const
-        { if (toString().length() > 0)
-              return toString()[0]; else return {0}; }
+        {
+            if (toString().length() > 0)
+                return toString()[0];
+            return {0};
+        }
 
     static QString toString(int _value)
         { return DTVParamHelper::toString(s_dbStr, _value, kDBStrCnt); }
