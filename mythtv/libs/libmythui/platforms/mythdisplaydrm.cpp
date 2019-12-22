@@ -12,8 +12,7 @@ MythDisplayDRM::MythDisplayDRM()
 
 MythDisplayDRM::~MythDisplayDRM()
 {
-    if (m_device)
-        delete m_device;
+    delete m_device;
 }
 
 void MythDisplayDRM::ScreenChanged(QScreen *qScreen)

@@ -118,8 +118,7 @@ inline void DeleteListContents( QVariantList &list )
 
         const QObject *pObject = vValue.value< QObject* >();
 
-        if (pObject != nullptr)
-            delete pObject;
+        delete pObject;
     }
 }
 

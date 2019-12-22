@@ -35,8 +35,7 @@ class RemoteAVFormatContext
             avformat_free_context(m_inputFC);
         m_inputFC = avformat_alloc_context();
 
-        if (m_rf)
-            delete m_rf;
+        delete m_rf;
 
         m_inputIsRemote = filename.startsWith("myth://");
         if (m_inputIsRemote)

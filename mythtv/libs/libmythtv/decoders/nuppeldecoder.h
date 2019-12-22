@@ -24,7 +24,7 @@ class RawDataList
   public:
     RawDataList(struct rtframeheader frameh, unsigned char *data) :
         frameheader(frameh), packet(data) {}
-   ~RawDataList() { if (packet) delete [] packet; }
+   ~RawDataList() { delete [] packet; }
   
     struct rtframeheader frameheader;
     unsigned char *packet;
