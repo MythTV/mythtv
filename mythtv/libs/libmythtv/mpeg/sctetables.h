@@ -229,10 +229,10 @@ class MTV_PUBLIC SCTENetworkInformationTable : public PSIPTable
     // for (i = 0; i < number_of_records; i++) {
     //   if (kCarrierDefinitionSubtable == table_subtype) {
     CarrierDefinitionSubtable CarrierDefinition(uint i) const
-        { return CarrierDefinitionSubtable(m_ptrs[i], m_ptrs[i+1]); }
+        { return {m_ptrs[i], m_ptrs[i+1]}; }
     //   if (kModulationModeSubtable == table_subtype) {
     ModulationModeSubtable ModulationMode(uint i) const
-        { return ModulationModeSubtable(m_ptrs[i], m_ptrs[i+1]); }
+        { return {m_ptrs[i], m_ptrs[i+1]}; }
 
     // }
     // for (i=0; i<N; i++)
@@ -539,7 +539,7 @@ class MTV_PUBLIC ShortVirtualChannelTable : public PSIPTable
     // }
     // if (table_subtype==kVirtualChannelMap) {
     VirtualChannelMapSubtable VirtualChannelMap(void) const
-        { return VirtualChannelMapSubtable(pesdata(), m_ptrs); }
+    { return { pesdata(), m_ptrs}; }
     // }
     // if (table_subtype==kInverseChannelMap) {
     InverseChannelMapSubtable InverseChannelMap(void) const

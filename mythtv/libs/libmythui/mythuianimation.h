@@ -27,7 +27,7 @@ class UIEffects
             x += rect.width();
         if (Bottom == m_centre || BottomLeft == m_centre || BottomRight == m_centre)
             y += rect.height();
-        return QPointF(x, y);
+        return {x, y};
     }
 
     QRect GetExtent(const QSize &size);

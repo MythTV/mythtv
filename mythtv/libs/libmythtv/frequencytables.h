@@ -244,7 +244,7 @@ class transport_scan_items_it_t
     transport_scan_items_it_t nextTransport() const
     {
         list<TransportScanItem>::iterator tmp = m_it;
-        return transport_scan_items_it_t(++tmp);
+        return {++tmp};
     }
 
   private:

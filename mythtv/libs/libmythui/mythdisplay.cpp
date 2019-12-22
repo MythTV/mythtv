@@ -714,12 +714,12 @@ double MythDisplay::EstimateVirtualAspectRatio(void)
 
 QSize MythDisplay::GetResolution(void)
 {
-    return QSize(m_last.Width(), m_last.Height());
+    return {m_last.Width(), m_last.Height()};
 }
 
 QSize MythDisplay::GetPhysicalSize(void)
 {
-    return QSize(m_last.WidthMM(), m_last.HeightMM());
+    return {m_last.WidthMM(), m_last.HeightMM()};
 }
 
 void MythDisplay::WaitForScreenChange(void)

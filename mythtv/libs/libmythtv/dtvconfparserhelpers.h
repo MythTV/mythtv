@@ -201,7 +201,7 @@ class DTVInversion : public DTVParamHelper
     QString toString() const { return toString(m_value); }
     QChar   toChar() const
         { if (toString().length() > 0)
-              return toString()[0]; else return QChar(0); }
+              return toString()[0]; else return {0}; }
 
     static QString toString(int _value)
         { return DTVParamHelper::toString(s_dbStr, _value, kDBStrCnt); }
@@ -254,7 +254,7 @@ class DTVBandwidth : public DTVParamHelper
     QString toString() const { return toString(m_value); }
     QChar   toChar() const
         { if (toString().length() > 0)
-              return toString()[0]; else return QChar(0); }
+              return toString()[0]; else return {0}; }
 
     static QString toString(int _value)
         { return DTVParamHelper::toString(s_dbStr, _value, kDBStrCnt); }
@@ -431,7 +431,7 @@ class DTVTransmitMode : public DTVParamHelper
     QString toString() const { return toString(m_value); }
     QChar   toChar() const
         { if (toString().length() > 0)
-              return toString()[0]; else return QChar(0); }
+              return toString()[0]; else return {0}; }
 
     static QString toString(int _value)
         { return DTVParamHelper::toString(s_dbStr, _value, kDBStrCnt); }
@@ -536,7 +536,7 @@ class DTVHierarchy : public DTVParamHelper
     QString toString() const { return toString(m_value); }
     QChar   toChar() const
         { if (toString().length() > 0)
-              return toString()[0]; else return QChar(0); }
+              return toString()[0]; else return {0}; }
 
     static QString toString(int _value)
         { return DTVParamHelper::toString(s_dbStr, _value, kDBStrCnt); }
@@ -573,7 +573,7 @@ class DTVPolarity : public DTVParamHelper
     QString toString() const { return toString(m_value); }
     QChar   toChar() const
         { if (toString().length() > 0)
-              return toString()[0]; else return QChar(0); }
+              return toString()[0]; else return {0}; }
 
     static QString toString(int _value)
         { return DTVParamHelper::toString(s_dbStr, _value, kDBStrCnt); }
