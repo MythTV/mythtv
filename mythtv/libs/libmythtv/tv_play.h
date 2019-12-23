@@ -328,7 +328,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
 
   public slots:
     void HandleOSDClosed(int osdType);
-    void timerEvent(QTimerEvent *event) override; // QObject
+    void timerEvent(QTimerEvent *te) override; // QObject
     void StopPlayback(void);
 
   protected:
@@ -435,10 +435,10 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     const PlayerContext *GetPlayerReadLock(
         int which, const char *file, int location) const;
     PlayerContext       *GetPlayerHaveLock(
-        PlayerContext *ctx,
+        PlayerContext *locked_context,
         int which, const char *file, int location);
     const PlayerContext *GetPlayerHaveLock(
-        const PlayerContext *ctx,
+        const PlayerContext *locked_context,
         int which, const char *file, int location) const;
     void ReturnPlayerLock(PlayerContext *&ctx);
     void ReturnPlayerLock(const PlayerContext *&ctx) const;

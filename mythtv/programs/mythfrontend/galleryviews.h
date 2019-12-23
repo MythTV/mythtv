@@ -189,7 +189,7 @@ public:
     { return m_marked.contains(id) || m_prevMarked.contains(id); }
 
 protected:
-    void         SetDirectory(int nreParent);
+    void         SetDirectory(int newParent);
     void         LoadDirThumbs(ImageItem &parent, int thumbsNeeded, int level = 0);
     void         PopulateThumbs(ImageItem &parent, int thumbsNeeded,
                                 const ImageList &files, const ImageList &dirs,

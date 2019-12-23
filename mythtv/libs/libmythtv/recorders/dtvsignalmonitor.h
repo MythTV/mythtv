@@ -77,7 +77,7 @@ class DTVSignalMonitor : public SignalMonitor,
     bool IsAllGood(void) const override; // SignalMonitor
 
     // MPEG
-    void HandlePAT(const ProgramAssociationTable *pad) override; // MPEGStreamListener
+    void HandlePAT(const ProgramAssociationTable *pat) override; // MPEGStreamListener
     void HandleCAT(const ConditionalAccessTable */*cat*/) override {}  // MPEGStreamListener
     void HandlePMT(uint program_num, const ProgramMapTable *pmt) override; // MPEGStreamListener
     void HandleEncryptionStatus(uint pnum, bool enc_status) override; // MPEGStreamListener

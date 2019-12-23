@@ -2038,9 +2038,9 @@ class AC3Descriptor : public MPEGDescriptor
     QString toString(void) const override; // MPEGDescriptor
 };
 
-static QString coderate_inner(uint cr)
+static QString coderate_inner(uint coderate)
 {
-    switch (cr)
+    switch (coderate)
     {
         case 0x0:  return "auto"; // not actually defined in spec
         case 0x1:  return "1/2";

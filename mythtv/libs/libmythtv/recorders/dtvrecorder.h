@@ -121,7 +121,7 @@ class DTVRecorder :
     // For handling other (non audio/video) packets
     bool FindOtherKeyframes(const TSPacket *tspacket);
 
-    inline bool CheckCC(uint pid, uint cc);
+    inline bool CheckCC(uint pid, uint new_cnt);
 
     virtual QString GetSIStandard(void) const { return "mpeg"; }
     virtual void SetCAMPMT(const ProgramMapTable */*pmt*/) {}

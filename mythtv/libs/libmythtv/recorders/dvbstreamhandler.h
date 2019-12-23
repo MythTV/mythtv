@@ -47,7 +47,7 @@ class DVBStreamHandler : public StreamHandler
                           DVBChannel       *dvbchan);
 
   private:
-    explicit DVBStreamHandler(const QString &dvb_debice, int inputid);
+    explicit DVBStreamHandler(const QString &dvb_device, int inputid);
 
     void run(void) override; // MThread
     void RunTS(void);

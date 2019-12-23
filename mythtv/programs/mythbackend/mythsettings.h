@@ -111,7 +111,7 @@ class MythSetting : public MythSettingBase
     {
     }
 
-    QString ToHTML(uint depth) const override; // MythSettingBase
+    QString ToHTML(uint level) const override; // MythSettingBase
 
   public:
     QString m_value;

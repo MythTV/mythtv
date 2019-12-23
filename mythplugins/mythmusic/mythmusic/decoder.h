@@ -127,7 +127,7 @@ public:
     bool supports(const QString &source) const override; // DecoderFactory
     const QString &extension() const override; // DecoderFactory
     const QString &description() const override; // DecoderFactory
-    Decoder *create(const QString &source, AudioOutput *output, bool deletable) override; // DecoderFactory
+    Decoder *create(const QString &file, AudioOutput *output, bool deletable) override; // DecoderFactory
 };
 
 class avfDecoderFactory : public DecoderFactory
@@ -138,7 +138,7 @@ public:
     bool supports(const QString &source) const override; // DecoderFactory
     const QString &extension() const override; // DecoderFactory
     const QString &description() const override; // DecoderFactory
-    Decoder *create(const QString &source, AudioOutput *output, bool deletable) override; // DecoderFactory
+    Decoder *create(const QString &file, AudioOutput *output, bool deletable) override; // DecoderFactory
 };
 
 #endif
