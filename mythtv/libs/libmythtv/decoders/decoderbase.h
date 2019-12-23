@@ -155,7 +155,7 @@ class DecoderBase
 
     virtual int GetNumChapters(void)                      { return 0; }
     virtual int GetCurrentChapter(long long /*framesPlayed*/) { return 0; }
-    virtual void GetChapterTimes(QList<long long> &/*times*/) { return;   }
+    virtual void GetChapterTimes(QList<long long> &/*times*/) { }
     virtual long long GetChapter(int /*chapter*/)             { return m_framesPlayed; }
     virtual bool DoRewind(long long desiredFrame, bool discardFrames = true);
     virtual bool DoFastForward(long long desiredFrame, bool discardFrames = true);
@@ -188,7 +188,7 @@ class DecoderBase
     virtual bool IsLastFrameKey(void) const = 0;
     virtual void WriteStoredData(RingBuffer *rb, bool storevid,
                                  long timecodeOffset) = 0;
-    virtual void ClearStoredData(void) { return; }
+    virtual void ClearStoredData(void) { }
     virtual void SetRawAudioState(bool state) { m_getRawFrames = state; }
     virtual bool GetRawAudioState(void) const { return m_getRawFrames; }
     virtual void SetRawVideoState(bool state) { m_getRawVideo = state; }

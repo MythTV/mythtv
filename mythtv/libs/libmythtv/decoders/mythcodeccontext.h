@@ -77,7 +77,7 @@ class MTV_PUBLIC MythCodecContext
     virtual void   SetDeinterlacing        (AVCodecContext */*Context*/, VideoDisplayProfile */*Profile*/, bool /*DoubleRate*/) {}
     virtual void   PostProcessFrame        (AVCodecContext */*Context*/, VideoFrame */*Frame*/) {}
     virtual bool   IsDeinterlacing         (bool &/*DoubleRate*/, bool /*StreamChange*/ = false) { return false; }
-    virtual void   SetDecoderOptions       (AVCodecContext */*Context*/, AVCodec */*Codec*/) { return; }
+    virtual void   SetDecoderOptions       (AVCodecContext */*Context*/, AVCodec */*Codec*/) { }
     virtual bool   DecoderWillResetOnFlush (void) { return false; }
     virtual bool   DecoderWillResetOnAspect(void) { return false; }
     virtual bool   DecoderNeedsReset       (AVCodecContext */*Context*/) { return m_resetRequired; }

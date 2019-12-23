@@ -58,13 +58,13 @@ class AudioReencodeBuffer : public AudioOutput
     void      ToggleMute(void) override             { } // VolumeBase
     MuteState GetMuteState(void) const override     { return kMuteOff; } // VolumeBase
     virtual MuteState IterateMutedChannels(void)    { return kMuteOff; }
-    void      SetSWVolume(int /*new_volume*/, bool /*save*/) override       { return; } // VolumeBase
+    void      SetSWVolume(int /*new_volume*/, bool /*save*/) override       { } // VolumeBase
     int       GetSWVolume(void) override            { return 100; } // VolumeBase
     bool      CanPassthrough(int /*samplerate*/, int /*channels*/, AVCodecID /*codec*/, int /*profile*/) const override // AudioOutput
                       { return m_initpassthru; }
 
     //  These are pure virtual in AudioOutput, but we don't need them here
-    void      bufferOutputData(bool /*y*/) override       { return; } // AudioOutput
+    void      bufferOutputData(bool /*y*/) override       { } // AudioOutput
     int       readOutputData(unsigned char */*read_buffer*/, int /*max_length*/) override { return 0; } // AudioOutput
 
     int                  m_channels        {-1};
