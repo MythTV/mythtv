@@ -27,7 +27,7 @@ class MBASE_PUBLIC MythLocale
 
     QString GetLocaleCode() const { return m_localeCode; }
 
-    const QLocale ToQLocale() const { return m_qtLocale; }
+    QLocale ToQLocale() const { return m_qtLocale; }
 
     bool LoadDefaultsFromXML(void);
     void SaveLocaleDefaults(bool overwrite = false);

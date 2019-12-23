@@ -222,7 +222,7 @@ class MTV_PUBLIC VirtualChannelTable : public PSIPTable
 
     // for(i=0; i<num_channels_in_section; i++) {
     //   short_name          7*16   0.0 (7 UCS-2 chars padded by 0x0000)
-    const QString ShortChannelName(uint i) const
+    QString ShortChannelName(uint i) const
     {
         if (i >= ChannelCount())
             return QString();
@@ -663,7 +663,7 @@ class MTV_PUBLIC ExtendedTextTable : public PSIPTable
         { return (psipdata()[3] << 6) | (psipdata()[4] >> 2); }
 
     // extended_text_message    *  14.0  multiple string structure a/65b p81
-    const MultipleStringStructure ExtendedTextMessage() const
+    MultipleStringStructure ExtendedTextMessage() const
     {
         return MultipleStringStructure(psipdata() + 5);
     }

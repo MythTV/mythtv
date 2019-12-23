@@ -32,15 +32,15 @@ class MBASE_PUBLIC MythUserSession
      */
     bool IsValid(void) const;
 
-    const QString GetUserName(void) const { return m_name; }
+    QString GetUserName(void) const { return m_name; }
     uint  GetUserId(void) const { return m_userId; }
 
-    const QString GetSessionToken(void) const { return m_sessionToken; }
-    const QString GetSessionClient(void) const { return m_sessionClient; }
+    QString GetSessionToken(void) const { return m_sessionToken; }
+    QString GetSessionClient(void) const { return m_sessionClient; }
 
-    const QDateTime GetSessionCreated() const { return m_sessionCreated; }
-    const QDateTime GetSessionLastActive() const { return m_sessionLastActive; }
-    const QDateTime GetSessionExpires() const { return m_sessionExpires; }
+    QDateTime GetSessionCreated() const { return m_sessionCreated; }
+    QDateTime GetSessionLastActive() const { return m_sessionLastActive; }
+    QDateTime GetSessionExpires() const { return m_sessionExpires; }
 
     /**
      * \brief Check if the user has the given permission in a context

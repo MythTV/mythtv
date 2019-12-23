@@ -48,8 +48,8 @@ class BackendContext
     void SetFrontendConnected(Frontend *frontend);
     void SetFrontendDisconnected(const QString &name);
 
-    const QMap<QString, Frontend*> GetConnectedFrontends() const { return m_connectedFrontends; }
-    const QMap<QString, Frontend*> GetFrontends() const { return m_knownFrontends; }
+    QMap<QString, Frontend*> GetConnectedFrontends() const { return m_connectedFrontends; }
+    QMap<QString, Frontend*> GetFrontends() const { return m_knownFrontends; }
 
   private:
     QMap<QString, Frontend*> m_connectedFrontends;

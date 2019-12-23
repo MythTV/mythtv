@@ -84,7 +84,7 @@ class MUI_PUBLIC MythGenericTree
     QString GetState(const QString &name="") const;
 
     void SetData(QVariant data) { m_data = data; }
-    const QVariant GetData(void) const { return m_data; }
+    QVariant GetData(void) const { return m_data; }
 
     int childCount(void) const;
     uint visibleChildCount() const { return m_visibleCount; }

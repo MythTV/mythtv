@@ -2220,10 +2220,10 @@ class FreesatRegionDescriptor : public MPEGDescriptor
     int RegionID(uint i) const
         { return *m_entries[i] << 8 | *(m_entries[i]+1); }
 
-    const QString Language(uint i) const
+    QString Language(uint i) const
         { return QString::fromLatin1((char *) m_entries[i] + 2, 3); }
 
-    const QString RegionName(uint i) const
+    QString RegionName(uint i) const
         { return QString::fromLatin1((char *) m_entries[i] + 6, *(m_entries[i] + 5)); }
 
     QString toString(void) const override; // MPEGDescriptor
@@ -2257,7 +2257,7 @@ class FreesatCallsignDescriptor : public MPEGDescriptor
     // for (j=0;j<N;j++) {
     //    callsign_char         8
 
-    const QString Language(void) const
+    QString Language(void) const
         { return QString::fromLatin1((char *) m_data +2, 3); }
 
     QString Callsign(void) const

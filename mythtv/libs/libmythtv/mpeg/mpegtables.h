@@ -465,13 +465,13 @@ class MTV_PUBLIC PSIPTable : public PESPacket
     }
 
 
-    static const PSIPTable View(const TSPacket& tspacket)
+    static PSIPTable View(const TSPacket& tspacket)
         { return PSIPTable(tspacket, false); }
 
     static PSIPTable View(TSPacket& tspacket)
         { return PSIPTable(tspacket, false); }
 
-    static const PSIPTable ViewData(const unsigned char* pesdata)
+    static PSIPTable ViewData(const unsigned char* pesdata)
         { return PSIPTable(pesdata); }
 
     // Section            Bits   Start Byte sbit
@@ -670,7 +670,7 @@ class MTV_PUBLIC ProgramMapTable : public PSIPTable
         Parse();
     }
 
-    static const ProgramMapTable ViewData(const unsigned char* pesdata)
+    static ProgramMapTable ViewData(const unsigned char* pesdata)
     {
         /* needed to call Parse() */
         return ProgramMapTable(PSIPTable::ViewData(pesdata));

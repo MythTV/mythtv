@@ -45,7 +45,7 @@ class MTV_PUBLIC ChannelInfo
     void SetSourceName(const QString &lname) { m_sourceName = lname; }
 
     
-    const QList<uint> GetGroupIds() const { return m_groupIdList; }
+    QList<uint> GetGroupIds() const { return m_groupIdList; }
     void LoadGroupIds();
     void AddGroupId(uint lgroupid)
     {
@@ -55,7 +55,7 @@ class MTV_PUBLIC ChannelInfo
     void RemoveGroupId(uint lgroupid) { m_groupIdList.removeOne(lgroupid); }
 
     
-    const QList<uint> GetInputIds() const { return m_inputIdList; }
+    QList<uint> GetInputIds() const { return m_inputIdList; }
     void LoadInputIds();
     // Since inputids must only appear once in a list, protect access
     // to it

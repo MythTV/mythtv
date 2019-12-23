@@ -187,7 +187,7 @@ class TransitionRegistry
 public:
     explicit TransitionRegistry(bool includeAnimations);
     ~TransitionRegistry()    { qDeleteAll(m_map); }
-    const TransitionMap GetAll() const { return m_map; }
+    TransitionMap GetAll() const { return m_map; }
     Transition &Select(int setting);
 
     //! A transition that updates instantly

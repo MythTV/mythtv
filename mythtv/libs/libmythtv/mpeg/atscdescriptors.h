@@ -166,7 +166,7 @@ class ContentAdvisoryDescriptor : public MPEGDescriptor
     uint RatingDescriptionLength(uint i) const
         { return (*(Offset(i,-1) + 2 + (RatedDimensions(i)<<1)));  }
     //   rating_desc_text         x+2+(rated_dimensions*2)+1.0
-    const MultipleStringStructure RatingDescription(uint i) const
+    MultipleStringStructure RatingDescription(uint i) const
     {
         const unsigned char *data = Offset(i,-1) + 3 + (RatedDimensions(i)<<1);
         return MultipleStringStructure(data);
@@ -192,7 +192,7 @@ class ComponentNameDescriptor : public MPEGDescriptor
         MPEGDescriptor(data, len, DescriptorID::component_name)
     {
     }
-    const MultipleStringStructure ComponentNameStrings() const
+    MultipleStringStructure ComponentNameStrings() const
     {
         return MultipleStringStructure(m_data+2);
     }
