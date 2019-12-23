@@ -70,7 +70,7 @@ class MHInteractible;
 
 class MHEngine: public MHEG {
   public:
-    MHEngine(MHContext *context);
+    explicit MHEngine(MHContext *context);
     ~MHEngine() override;
 
     void SetBooting() override // MHEG

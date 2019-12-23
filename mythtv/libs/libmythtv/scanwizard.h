@@ -46,7 +46,7 @@ class MTV_PUBLIC ScanWizard : public GroupSetting
     Q_OBJECT
 
   public:
-    ScanWizard(uint           default_sourceid  = 0,
+    explicit ScanWizard(uint  default_sourceid  = 0,
                uint           default_cardid    = 0,
                const QString& default_inputname = QString());
 

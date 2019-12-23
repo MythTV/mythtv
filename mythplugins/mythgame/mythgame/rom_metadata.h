@@ -7,7 +7,7 @@
 class RomData
 {
   public:
-    RomData(QString lgenre = "", QString lyear = "",
+    explicit RomData(QString lgenre = "", QString lyear = "",
             QString lcountry = "", QString lgamename = "",
             QString ldescription = "", QString lpublisher = "",
             QString lplatform = "", QString lversion = ""  )

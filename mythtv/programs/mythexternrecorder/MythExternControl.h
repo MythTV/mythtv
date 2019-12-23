@@ -40,7 +40,7 @@ class Buffer : QObject
   public:
     enum constants {MAX_QUEUE = 500};
 
-    Buffer(MythExternControl * parent);
+    explicit Buffer(MythExternControl * parent);
     ~Buffer(void) override = default;
     void Start(void) {
         m_thread = std::thread(&Buffer::Run, this);
@@ -75,7 +75,7 @@ class Commands : public QObject
     Q_OBJECT
 
   public:
-    Commands(MythExternControl * parent)
+    explicit Commands(MythExternControl * parent)
         : m_parent(parent)
         , m_apiVersion(-1) {}
     ~Commands(void) override = default;

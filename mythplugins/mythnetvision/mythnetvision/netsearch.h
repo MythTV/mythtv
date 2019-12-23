@@ -22,7 +22,7 @@ class NetSearch : public NetBase
 
   public:
 
-    NetSearch(MythScreenStack *parent, const char *name = nullptr);
+    explicit NetSearch(MythScreenStack *parent, const char *name = nullptr);
     ~NetSearch() override;
 
     bool Create(void) override; // MythScreenType

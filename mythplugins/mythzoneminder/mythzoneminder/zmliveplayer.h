@@ -63,7 +63,7 @@ class ZMLivePlayer : public MythScreenType
     Q_OBJECT
 
   public:
-    ZMLivePlayer(MythScreenStack *parent, bool isMiniPlayer = false);
+    explicit ZMLivePlayer(MythScreenStack *parent, bool isMiniPlayer = false);
     ~ZMLivePlayer() override;
 
     bool Create(void) override; // MythScreenType

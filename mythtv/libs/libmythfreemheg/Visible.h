@@ -138,7 +138,7 @@ class MHRectangle : public MHLineArt
 class MHInteractible
 {
   public:
-    MHInteractible(MHVisible *parent)
+    explicit MHInteractible(MHVisible *parent)
         : m_parent(parent) {}
     virtual ~MHInteractible() = default;
     void Initialise(MHParseNode *p, MHEngine *engine);
@@ -321,7 +321,7 @@ class MHSwitchButton : public MHPushButton
 class MHSetColour: public MHElemAction
 {
   public:
-    MHSetColour(const char *name): MHElemAction(name), m_ColourType(CT_None) { }
+    explicit MHSetColour(const char *name): MHElemAction(name), m_ColourType(CT_None) { }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
     void Perform(MHEngine *engine) override; // MHElemAction
   protected:

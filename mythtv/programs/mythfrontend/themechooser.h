@@ -29,7 +29,7 @@ class ThemeChooser : public MythScreenType
     Q_OBJECT
 
   public:
-    ThemeChooser(MythScreenStack *parent,
+    explicit ThemeChooser(MythScreenStack *parent,
                const QString &name = "ThemeChooser");
    ~ThemeChooser() override;
 

@@ -35,7 +35,7 @@ class MUI_PUBLIC MythNotification : public MythEvent
     static Type Check;
     static Type Busy;
 
-    MythNotification(Type type, void *parent = nullptr)
+    explicit MythNotification(Type type, void *parent = nullptr)
         : MythEvent(type, "NOTIFICATION"), m_parent(parent) {}
 
     MythNotification(int id, void *parent)

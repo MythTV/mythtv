@@ -70,7 +70,7 @@ private:
         int32_t front_sep {    100 };   // front stereo separation
         int32_t rear_sep  {    100 };   // rear stereo separation
         // (default) constructor
-        fsurround_params(int32_t center_width=100, int32_t dimension=0);
+        explicit fsurround_params(int32_t center_width=100, int32_t dimension=0);
     } m_params;
 
     // additional settings

@@ -87,7 +87,7 @@ class RSSEditor : public MythScreenType
     Q_OBJECT
 
   public:
-    RSSEditor(MythScreenStack *parent, const QString &name = "RSSEditor")
+    explicit RSSEditor(MythScreenStack *parent, const QString &name = "RSSEditor")
         : MythScreenType(parent, name) {}
    ~RSSEditor() override;
 

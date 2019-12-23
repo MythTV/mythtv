@@ -11,7 +11,7 @@ class SearchEditor : public NetEditorBase
     Q_OBJECT
 
   public:
-    SearchEditor(MythScreenStack *parent,
+    explicit SearchEditor(MythScreenStack *parent,
                  const QString &name = "SearchEditor")
         : NetEditorBase(parent, name) {}
 

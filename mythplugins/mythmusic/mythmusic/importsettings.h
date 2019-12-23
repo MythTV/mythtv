@@ -12,7 +12,7 @@ class ImportSettings : public MythScreenType
 {
     Q_OBJECT
   public:
-    ImportSettings(MythScreenStack *parent, const char *name = nullptr)
+    explicit ImportSettings(MythScreenStack *parent, const char *name = nullptr)
         : MythScreenType(parent, name) {}
     ~ImportSettings() override = default;
 

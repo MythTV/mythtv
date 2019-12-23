@@ -41,7 +41,7 @@ class META_PUBLIC VideoMetadata
     static QString TrimTitle(const QString &title, bool ignore_case);
 
   public:
-    VideoMetadata(const QString &filename = QString(),
+    explicit VideoMetadata(const QString &filename = QString(),
              const QString &sortFilename = QString(),
              const QString &hash = QString(),
              const QString &trailer = QString(),

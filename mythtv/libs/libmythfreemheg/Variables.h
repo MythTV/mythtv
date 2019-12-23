@@ -179,7 +179,7 @@ class MHTestVariable: public MHElemAction
 class MHIntegerAction: public MHElemAction
 {
   public:
-    MHIntegerAction(const char *name): MHElemAction(name) {}
+    explicit MHIntegerAction(const char *name): MHElemAction(name) {}
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
     void Perform(MHEngine *engine) override; // MHElemAction
   protected:

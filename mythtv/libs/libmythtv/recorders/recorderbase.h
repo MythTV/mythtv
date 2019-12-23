@@ -36,7 +36,7 @@ class TVRec;
 class FrameRate
 {
 public:
-    FrameRate(uint n, uint d=1) : m_num(n), m_den(d) {}
+    explicit FrameRate(uint n, uint d=1) : m_num(n), m_den(d) {}
     double toDouble(void) const { return m_num / (double)m_den; }
     bool isNonzero(void) const { return m_num; }
     uint getNum(void) const { return m_num; }

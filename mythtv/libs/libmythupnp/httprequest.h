@@ -305,7 +305,7 @@ class UPNP_PUBLIC HttpException
         int     m_code {-1};
         QString m_msg;
 
-        HttpException( int nCode = -1, QString sMsg = "")
+        explicit HttpException( int nCode = -1, QString sMsg = "")
                : m_code( nCode ), m_msg (std::move( sMsg  ))
         {}
 
@@ -320,7 +320,7 @@ class UPNP_PUBLIC HttpRedirectException : public HttpException
         QString m_hostName;
       //int     m_port;
 
-        HttpRedirectException( QString sHostName = "",
+        explicit HttpRedirectException( QString sHostName = "",
                                      int      nCode     = -1,
                                const QString &sMsg      = "" )
                : HttpException( nCode, sMsg ), m_hostName(std::move( sHostName ))

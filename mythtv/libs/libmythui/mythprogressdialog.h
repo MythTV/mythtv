@@ -16,7 +16,7 @@ class MythUIProgressBar;
 class MUI_PUBLIC ProgressUpdateEvent : public QEvent
 {
   public:
-    ProgressUpdateEvent(uint count, uint total=0, QString message="") :
+    explicit ProgressUpdateEvent(uint count, uint total=0, QString message="") :
         QEvent(kEventType), m_total(total), m_count(count),
         m_message(std::move(message)) { }
 

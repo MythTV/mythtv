@@ -23,7 +23,7 @@ class MPUBLIC LanguageSelection : public MythScreenType
     Q_OBJECT
 
   public:
-    LanguageSelection(MythScreenStack *parent, bool exitOnFinish = false);
+    explicit LanguageSelection(MythScreenStack *parent, bool exitOnFinish = false);
    ~LanguageSelection(void) override;
 
     /// Ask the user for the language to use. If a

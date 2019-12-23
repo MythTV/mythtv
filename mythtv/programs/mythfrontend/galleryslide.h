@@ -63,7 +63,7 @@ public:
       \param image Image to be animated
       \param type Effect to be animated
     */
-    Animation(Slide *image, Type type = Alpha)
+    explicit Animation(Slide *image, Type type = Alpha)
         : AbstractAnimation(), QVariantAnimation(),
           m_parent(image), m_type(type) {}
     void Start(bool forwards = true, float speed = 1.0) override; // AbstractAnimation

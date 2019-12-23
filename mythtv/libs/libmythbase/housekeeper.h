@@ -39,7 +39,7 @@ enum HouseKeeperStartup {
 class MBASE_PUBLIC HouseKeeperTask : public ReferenceCounter
 {
   public:
-    HouseKeeperTask(const QString &dbTag, HouseKeeperScope scope=kHKGlobal,
+    explicit HouseKeeperTask(const QString &dbTag, HouseKeeperScope scope=kHKGlobal,
                     HouseKeeperStartup startup=kHKNormal);
    ~HouseKeeperTask() override = default;
 
@@ -107,7 +107,7 @@ class MBASE_PUBLIC PeriodicHouseKeeperTask : public HouseKeeperTask
 class MBASE_PUBLIC DailyHouseKeeperTask : public PeriodicHouseKeeperTask
 {
   public:
-    DailyHouseKeeperTask(const QString &dbTag,
+    explicit DailyHouseKeeperTask(const QString &dbTag,
                          HouseKeeperScope scope=kHKGlobal,
                          HouseKeeperStartup startup=kHKNormal);
     DailyHouseKeeperTask(const QString &dbTag, int minhour, int maxhour,

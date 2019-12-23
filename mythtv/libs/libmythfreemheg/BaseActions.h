@@ -34,7 +34,7 @@ class MHRoot;
 class MHElemAction
 {
   public:
-    MHElemAction(const char *name): m_ActionName(name) {}
+    explicit MHElemAction(const char *name): m_ActionName(name) {}
     virtual ~MHElemAction() = default;
     virtual void Initialise(MHParseNode *p, MHEngine *engine);
     virtual void PrintMe(FILE *fd, int nTabs) const;
@@ -51,7 +51,7 @@ class MHElemAction
 class MHActionInt: public MHElemAction
 {
   public:
-    MHActionInt(const char *name): MHElemAction(name) {}
+    explicit MHActionInt(const char *name): MHElemAction(name) {}
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
     void PrintArgs(FILE *fd, int /*nTabs*/) const override // MHElemAction
         { m_Argument.PrintMe(fd, 0); }
@@ -65,7 +65,7 @@ class MHActionInt: public MHElemAction
 class MHActionIntInt: public MHElemAction
 {
   public:
-    MHActionIntInt(const char *name): MHElemAction(name) {}
+    explicit MHActionIntInt(const char *name): MHElemAction(name) {}
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
     void PrintArgs(FILE *fd, int/* nTabs*/) const override // MHElemAction
         { m_Argument1.PrintMe(fd, 0); m_Argument2.PrintMe(fd, 0); }
@@ -79,7 +79,7 @@ class MHActionIntInt: public MHElemAction
 class MHActionInt3: public MHElemAction
 {
   public:
-    MHActionInt3(const char *name): MHElemAction(name) {}
+    explicit MHActionInt3(const char *name): MHElemAction(name) {}
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
     void PrintArgs(FILE *fd, int nTabs) const override; // MHElemAction
     void Perform(MHEngine *engine) override; // MHElemAction
@@ -92,7 +92,7 @@ class MHActionInt3: public MHElemAction
 class MHActionInt4: public MHElemAction
 {
   public:
-    MHActionInt4(const char *name): MHElemAction(name) {}
+    explicit MHActionInt4(const char *name): MHElemAction(name) {}
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
     void PrintArgs(FILE *fd, int nTabs) const override; // MHElemAction
     void Perform(MHEngine *engine) override; // MHElemAction
@@ -105,7 +105,7 @@ class MHActionInt4: public MHElemAction
 class MHActionInt6: public MHElemAction
 {
   public:
-    MHActionInt6(const char *name): MHElemAction(name) {}
+    explicit MHActionInt6(const char *name): MHElemAction(name) {}
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
     void PrintArgs(FILE *fd, int nTabs) const override; // MHElemAction
     void Perform(MHEngine *engine) override; // MHElemAction
@@ -119,7 +119,7 @@ class MHActionInt6: public MHElemAction
 class MHActionObjectRef: public MHElemAction
 {
   public:
-    MHActionObjectRef(const char *name): MHElemAction(name) {}
+    explicit MHActionObjectRef(const char *name): MHElemAction(name) {}
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
     void Perform(MHEngine *engine) override; // MHElemAction
     virtual void CallAction(MHEngine *engine, MHRoot *pTarget, MHRoot *pArg) = 0;
@@ -133,7 +133,7 @@ class MHActionObjectRef: public MHElemAction
 class MHActionObjectRef2: public MHElemAction
 {
   public:
-    MHActionObjectRef2(const char *name): MHElemAction(name) {}
+    explicit MHActionObjectRef2(const char *name): MHElemAction(name) {}
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
     void Perform(MHEngine *engine) override; // MHElemAction
     virtual void CallAction(MHEngine *engine, MHRoot *pTarget, MHRoot *pArg1, MHRoot *pArg2) = 0;
@@ -146,7 +146,7 @@ class MHActionObjectRef2: public MHElemAction
 class MHActionGenericObjectRef: public MHElemAction
 {
   public:
-    MHActionGenericObjectRef(const char *name): MHElemAction(name) {}
+    explicit MHActionGenericObjectRef(const char *name): MHElemAction(name) {}
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
     void Perform(MHEngine *engine) override; // MHElemAction
     virtual void CallAction(MHEngine *engine, MHRoot *pTarget, MHRoot *pObj) = 0;
@@ -161,7 +161,7 @@ class MHActionGenericObjectRef: public MHElemAction
 class MHActionBool: public MHElemAction
 {
   public:
-    MHActionBool(const char *name): MHElemAction(name) {}
+    explicit MHActionBool(const char *name): MHElemAction(name) {}
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
     void PrintArgs(FILE *fd, int /*nTabs*/) const override // MHElemAction
         { m_Argument.PrintMe(fd, 0); }

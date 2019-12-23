@@ -28,7 +28,7 @@ enum GameFound
 class GameScan
 {
   public:
-    GameScan(QString lromname = "", QString lromfullpath = "",
+    explicit GameScan(QString lromname = "", QString lromfullpath = "",
              int lfoundloc    = 0,  QString lgamename = "",
              QString lrompath = "") :
          m_romname(std::move(lromname)),

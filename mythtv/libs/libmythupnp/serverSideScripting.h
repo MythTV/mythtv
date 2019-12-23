@@ -96,7 +96,7 @@ class OutputStream : public QObject, public QScriptable
 
     public:
 
-         OutputStream( QTextStream *pStream, QObject *parent = nullptr )
+         explicit OutputStream( QTextStream *pStream, QObject *parent = nullptr )
              : QObject( parent ), m_pTextStream( pStream )  {}
 
          ~OutputStream() override = default;

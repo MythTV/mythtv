@@ -92,7 +92,7 @@ class MUI_PUBLIC MythGestureEvent : public QEvent
      * \param gesture What type of gesture was performed.
      * \param button The button (if any) that was pressed during the gesture.
      */
-    MythGestureEvent(Gesture gesture, Button button = LeftButton) :
+    explicit MythGestureEvent(Gesture gesture, Button button = LeftButton) :
         QEvent(kEventType), m_gesture(Unknown)
     {
         m_button = button;
@@ -110,7 +110,7 @@ class MUI_PUBLIC MythGestureEvent : public QEvent
      * \brief Get the symbolic name of the gesture.
      * \return A string containing the symbolic name of the gesture.
      */
-    operator QString() const;
+    explicit operator QString() const;
 
     void SetPosition(QPoint position) { m_position = position; }
     QPoint GetPosition() const { return m_position; }

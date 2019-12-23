@@ -259,7 +259,7 @@ class MTV_PUBLIC MPEGDescriptor
   public:
     operator const unsigned char*() const { return m_data; }
 
-    MPEGDescriptor(const unsigned char *data, int len = 300) : m_data(data)
+    explicit MPEGDescriptor(const unsigned char *data, int len = 300) : m_data(data)
     {
         if ((len < 2) || (int(DescriptorLength()) + 2) > len)
             m_data = nullptr;
@@ -318,7 +318,7 @@ class MTV_PUBLIC MPEGDescriptor
 class RegistrationDescriptor : public MPEGDescriptor
 {
   public:
-    RegistrationDescriptor(const unsigned char *data, int len = 300) :
+    explicit RegistrationDescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, DescriptorID::registration)
     {
         // The HD-PVR outputs a registration descriptor with a length
@@ -349,7 +349,7 @@ class RegistrationDescriptor : public MPEGDescriptor
 class ConditionalAccessDescriptor : public MPEGDescriptor
 {
   public:
-    ConditionalAccessDescriptor(const unsigned char *data, int len = 300) :
+    explicit ConditionalAccessDescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, DescriptorID::conditional_access) { }
 
     uint SystemID(void) const { return  m_data[2] << 8 | m_data[3]; }
@@ -362,7 +362,7 @@ class ConditionalAccessDescriptor : public MPEGDescriptor
 class ISO639LanguageDescriptor : public MPEGDescriptor
 {
   public:
-    ISO639LanguageDescriptor(const unsigned char *data, int len = 300) :
+    explicit ISO639LanguageDescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, DescriptorID::iso_639_language) { }
 
     const unsigned char* CodeRaw() const { return &m_data[2]; }
@@ -384,7 +384,7 @@ class ISO639LanguageDescriptor : public MPEGDescriptor
 class AVCVideoDescriptor : public MPEGDescriptor
 {
   public:
-    AVCVideoDescriptor(const unsigned char *data, int len = 300) :
+    explicit AVCVideoDescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, DescriptorID::avc_video) { }
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x
@@ -415,7 +415,7 @@ class AVCVideoDescriptor : public MPEGDescriptor
 class AVCTimingAndHRDDescriptor : public MPEGDescriptor
 {
   public:
-    AVCTimingAndHRDDescriptor(const unsigned char *data, int len = 300) :
+    explicit AVCTimingAndHRDDescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, DescriptorID::avc_timing_and_hrd) { }
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x
@@ -444,7 +444,7 @@ class AVCTimingAndHRDDescriptor : public MPEGDescriptor
 class HEVCVideoDescriptor : public MPEGDescriptor
 {
   public:
-    HEVCVideoDescriptor(const unsigned char *data, int len = 300) :
+    explicit HEVCVideoDescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, DescriptorID::avc_video) { }
     //       Name                      bits  loc  expected value
     // descriptor_tag                    8   0.0       0x38

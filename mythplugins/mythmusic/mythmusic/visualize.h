@@ -150,7 +150,7 @@ class MonoScope : public StereoScope
 class LogScale
 {
   public:
-    LogScale(int maxscale = 0, int maxrange = 0);
+    explicit LogScale(int maxscale = 0, int maxrange = 0);
     ~LogScale();
 
     int scale() const { return m_s; }

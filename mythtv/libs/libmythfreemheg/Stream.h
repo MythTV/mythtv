@@ -165,7 +165,7 @@ class MHGetVideoDecodeOffset: public MHActionObjectRef2
 class MHActionGenericObjectRefFix: public MHActionGenericObjectRef
 {
 public:
-    MHActionGenericObjectRefFix(const char *name) : MHActionGenericObjectRef(name) {}
+    explicit MHActionGenericObjectRefFix(const char *name) : MHActionGenericObjectRef(name) {}
     void Perform(MHEngine *engine) override; // MHActionGenericObjectRef
 };
 

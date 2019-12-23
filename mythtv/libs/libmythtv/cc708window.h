@@ -93,7 +93,7 @@ class CC708CharacterAttribute
 
     QColor m_actualFgColor;   // if !isValid(), then convert m_fgColor
 
-    CC708CharacterAttribute(bool isItalic = false,
+    explicit CC708CharacterAttribute(bool isItalic = false,
                             bool isBold = false,
                             bool isUnderline = false,
                             QColor fgColor = QColor()) :

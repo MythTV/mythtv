@@ -21,7 +21,7 @@ class MUI_PUBLIC MythGenericTree
     using IntVector = QVector<int>;
 
   public:
-    MythGenericTree(const QString &a_string = "", int an_int = 0,
+    explicit MythGenericTree(const QString &a_string = "", int an_int = 0,
                     bool selectable_flag = false);
     virtual ~MythGenericTree();
 

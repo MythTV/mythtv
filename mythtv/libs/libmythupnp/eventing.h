@@ -124,7 +124,7 @@ class UPNP_PUBLIC  StateVariable : public StateVariableBase
 
         // ------------------------------------------------------------------
 
-        StateVariable( const QString &sName, bool bNotify = false ) : StateVariableBase( sName, bNotify ), m_value( T( ) )
+        explicit StateVariable( const QString &sName, bool bNotify = false ) : StateVariableBase( sName, bNotify ), m_value( T( ) )
         {
         }
 

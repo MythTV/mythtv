@@ -20,7 +20,7 @@ class QWidget;
 class ChannelID : public GroupSetting
 {
   public:
-    ChannelID(QString  field = "chanid",
+    explicit ChannelID(QString  field = "chanid",
               QString  table = "channel") :
         m_field(std::move(field)), m_table(std::move(table))
     {

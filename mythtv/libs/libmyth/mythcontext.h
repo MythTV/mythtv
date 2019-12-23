@@ -42,7 +42,7 @@ class MythContextSlotHandler : public QObject
 class MPUBLIC MythContext
 {
   public:
-    MythContext(QString binversion, bool needsBackend = false);
+    explicit MythContext(QString binversion, bool needsBackend = false);
     virtual ~MythContext();
 
     bool Init(const bool gui = true,

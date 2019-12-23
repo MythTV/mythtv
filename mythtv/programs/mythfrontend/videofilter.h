@@ -92,7 +92,7 @@ class VideoFilterSettings
     };
 
   public:
-    VideoFilterSettings(bool loaddefaultsettings = true,
+    explicit VideoFilterSettings(bool loaddefaultsettings = true,
                         const QString &_prefix = "");
     VideoFilterSettings(const VideoFilterSettings &rhs);
     VideoFilterSettings &operator=(const VideoFilterSettings &rhs);

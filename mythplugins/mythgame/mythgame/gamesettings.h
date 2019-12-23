@@ -16,7 +16,7 @@ public:
 
 struct PlayerId : public AutoIncrementSetting
 {
-    PlayerId(uint id) : AutoIncrementSetting("gameplayers", "gameplayerid")
+    explicit PlayerId(uint id) : AutoIncrementSetting("gameplayers", "gameplayerid")
     { setValue(id); }
 
     int Value() const { return getValue().toInt(); }
@@ -26,7 +26,7 @@ class GamePlayerSetting : public GroupSetting
 {
     Q_OBJECT
 public:
-    GamePlayerSetting(const QString& name, uint id = 0);
+    explicit GamePlayerSetting(const QString& name, uint id = 0);
 
     void Save()         override;                   // StandardSetting
     bool canDelete()    override { return true; }   // GroupSetting

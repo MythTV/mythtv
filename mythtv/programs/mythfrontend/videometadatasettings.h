@@ -15,7 +15,7 @@ class MetadataSettings : public MythScreenType
 
   public:
 
-    MetadataSettings(MythScreenStack *parent, const char *name = nullptr)
+    explicit MetadataSettings(MythScreenStack *parent, const char *name = nullptr)
         : MythScreenType(parent, name) {}
     ~MetadataSettings() override = default;
 

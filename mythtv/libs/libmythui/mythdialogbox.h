@@ -68,7 +68,7 @@ using MythUIButtonCallback = std::function<void(void)>;
 class MUI_PUBLIC MythMenuItem
 {
   public:
-    MythMenuItem(QString text, QVariant data = 0, bool checked = false, MythMenu *subMenu = nullptr) :
+    explicit MythMenuItem(QString text, QVariant data = 0, bool checked = false, MythMenu *subMenu = nullptr) :
         m_text(std::move(text)), m_data(std::move(data)),
         m_checked(checked), m_subMenu(subMenu), m_useSlot(false) { Init(); }
     MythMenuItem(QString text, const char *slot, bool checked = false, MythMenu *subMenu = nullptr) :

@@ -36,7 +36,7 @@ class BrowserConfig : public MythScreenType
 
   public:
 
-    BrowserConfig(MythScreenStack *parent, const char *name = nullptr)
+    explicit BrowserConfig(MythScreenStack *parent, const char *name = nullptr)
         : MythScreenType(parent, name) {}
     ~BrowserConfig() override = default;
 

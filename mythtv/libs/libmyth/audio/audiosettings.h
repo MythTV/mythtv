@@ -51,7 +51,7 @@ class MPUBLIC AudioSettings
                   int           upmixer_startup = 0,
                   int           codec_profile = 0);
 
-    AudioSettings(QString main_device,
+    explicit AudioSettings(QString main_device,
                   QString passthru_device = QString())
         : m_mainDevice(std::move(main_device)),
           m_passthruDevice(std::move(passthru_device)) {}

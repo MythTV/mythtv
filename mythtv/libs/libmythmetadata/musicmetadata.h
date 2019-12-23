@@ -85,7 +85,7 @@ class META_PUBLIC MusicMetadata
 
     using IdType = uint32_t;
 
-    MusicMetadata(QString lfilename = "", QString lartist = "", QString lcompilation_artist = "",
+    explicit MusicMetadata(QString lfilename = "", QString lartist = "", QString lcompilation_artist = "",
              QString lalbum = "", QString ltitle = "", QString lgenre = "",
              int lyear = 0, int ltracknum = 0, int llength = 0, int lid = 0,
              int lrating = 0, int lplaycount = 0, QDateTime llastplay = QDateTime(),
@@ -518,7 +518,7 @@ class META_PUBLIC AlbumArtImages
     Q_DECLARE_TR_FUNCTIONS(AlbumArtImages);
 
   public:
-    AlbumArtImages(MusicMetadata *metadata, bool loadFromDB = true);
+    explicit AlbumArtImages(MusicMetadata *metadata, bool loadFromDB = true);
     ~AlbumArtImages();
 
     void           scanForImages(void);

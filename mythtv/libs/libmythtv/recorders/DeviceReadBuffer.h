@@ -33,7 +33,7 @@ class DeviceReaderCB
 class DeviceReadBuffer : protected MThread
 {
   public:
-    DeviceReadBuffer(DeviceReaderCB *cb,
+    explicit DeviceReadBuffer(DeviceReaderCB *cb,
                      bool use_poll = true,
                      bool error_exit_on_poll_timeout = true);
    ~DeviceReadBuffer() override;

@@ -28,7 +28,7 @@ class MPUBLIC RawSettingsEditor : public MythScreenType
 
   public:
     // Constructor
-    RawSettingsEditor(MythScreenStack *parent, const char *name = nullptr);
+    explicit RawSettingsEditor(MythScreenStack *parent, const char *name = nullptr);
 
     // Destructor
    ~RawSettingsEditor() override = default;

@@ -52,7 +52,7 @@ class MTV_PUBLIC MythSystemEventEditor : public RawSettingsEditor
     Q_OBJECT
 
   public:
-    MythSystemEventEditor(MythScreenStack *parent, const char *name = nullptr);
+    explicit MythSystemEventEditor(MythScreenStack *parent, const char *name = nullptr);
 };
 
 #endif

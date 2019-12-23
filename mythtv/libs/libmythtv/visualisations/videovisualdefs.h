@@ -6,7 +6,7 @@
 class LogScale
 {
   public:
-    LogScale(int maxscale = 0, int maxrange = 0)
+    explicit LogScale(int maxscale = 0, int maxrange = 0)
     {
         setMax(maxscale, maxrange);
     }

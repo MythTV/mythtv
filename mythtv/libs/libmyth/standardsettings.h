@@ -238,7 +238,7 @@ class MPUBLIC MythUIComboBoxSetting : public StandardSetting
      *                 created with a call to XXXStorage.
      * \param rw if set to true, the user can input it's own value
      */
-    MythUIComboBoxSetting(Storage *_storage = nullptr, bool rw = false)
+    explicit MythUIComboBoxSetting(Storage *_storage = nullptr, bool rw = false)
         : StandardSetting(_storage), m_rewrite(rw) {}
     ~MythUIComboBoxSetting() override;
     QVector<QString> m_labels;
@@ -253,7 +253,7 @@ class MPUBLIC MythUIComboBoxSetting : public StandardSetting
 class MPUBLIC HostComboBoxSetting: public MythUIComboBoxSetting
 {
   public:
-    HostComboBoxSetting(const QString &name, bool rw = false) :
+    explicit HostComboBoxSetting(const QString &name, bool rw = false) :
         MythUIComboBoxSetting(new HostDBStorage(this, name), rw) { }
 };
 
@@ -261,7 +261,7 @@ class MPUBLIC HostComboBoxSetting: public MythUIComboBoxSetting
 class MPUBLIC GlobalComboBoxSetting: public MythUIComboBoxSetting
 {
   public:
-    GlobalComboBoxSetting(const QString &name, bool rw = false) :
+    explicit GlobalComboBoxSetting(const QString &name, bool rw = false) :
         MythUIComboBoxSetting(new GlobalDBStorage(this, name), rw) { }
 };
 
@@ -275,7 +275,7 @@ class MPUBLIC TransMythUIComboBoxSetting: public MythUIComboBoxSetting
 class MPUBLIC HostTimeBoxSetting : public HostComboBoxSetting
 {
   public:
-    HostTimeBoxSetting(const QString &name,
+    explicit HostTimeBoxSetting(const QString &name,
                        const QString &defaultTime = "00:00",
                        const int interval = 1) :
         HostComboBoxSetting(name, false)
@@ -299,7 +299,7 @@ class MPUBLIC HostTimeBoxSetting : public HostComboBoxSetting
 class MPUBLIC GlobalTimeBoxSetting : public GlobalComboBoxSetting
 {
   public:
-    GlobalTimeBoxSetting(const QString &name,
+    explicit GlobalTimeBoxSetting(const QString &name,
                        const QString &defaultTime = "00:00",
                        const int interval = 1) :
         GlobalComboBoxSetting(name, false)

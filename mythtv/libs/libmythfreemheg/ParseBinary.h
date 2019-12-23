@@ -31,7 +31,7 @@ class MHGroup;
 class MHParseBinary: public MHParseBase
 {
   public:
-    MHParseBinary(QByteArray &program)
+    explicit MHParseBinary(QByteArray &program)
         : m_data(program) {}
     ~MHParseBinary() override = default;
 

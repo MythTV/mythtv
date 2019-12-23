@@ -79,7 +79,7 @@ class VideoSourceShow : public GroupSetting
     Q_OBJECT
 
   public:
-    VideoSourceShow(uint    _initial_sourceid);
+    explicit VideoSourceShow(uint _initial_sourceid);
 
     void Load(void) override; // StandardSetting
 
@@ -262,7 +262,7 @@ class TunerCardAudioInput : public CaptureCardComboBoxSetting
 {
     Q_OBJECT
   public:
-    TunerCardAudioInput(const CaptureCard &parent,
+    explicit TunerCardAudioInput(const CaptureCard &parent,
                         QString dev  = QString(),
                         QString type = QString());
 

@@ -17,7 +17,7 @@ class GeneralSetupWizard : public MythScreenType
 
   public:
 
-    GeneralSetupWizard(MythScreenStack *parent, const char *name = nullptr);
+    explicit GeneralSetupWizard(MythScreenStack *parent, const char *name = nullptr);
     ~GeneralSetupWizard() override = default;
 
     bool Create(void) override; // MythScreenType

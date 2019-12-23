@@ -93,7 +93,7 @@ class MHTokenGroup : public MHPresentable
 // which only work on visibles.
 class MHListItem {
   public:
-    MHListItem(MHRoot *pVis): m_pVisible(pVis), m_fSelected(false) {}
+    explicit MHListItem(MHRoot *pVis): m_pVisible(pVis), m_fSelected(false) {}
     MHRoot *m_pVisible;
     bool   m_fSelected;
 };
@@ -204,7 +204,7 @@ class MHDelItem: public MHActionGenericObjectRef {
 // Base class for a few actions.
 class MHGetListActionData: public MHElemAction {
   public:
-    MHGetListActionData(const char *name): MHElemAction(name) {}
+    explicit MHGetListActionData(const char *name): MHElemAction(name) {}
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
     void PrintArgs(FILE *fd, int /*nTabs*/) const override; // MHElemAction
   protected:

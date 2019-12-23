@@ -148,7 +148,7 @@ class MythNotificationScreen : public MythScreenType
     Q_OBJECT
 
 public:
-    MythNotificationScreen(MythScreenStack *stack,
+    explicit MythNotificationScreen(MythScreenStack *stack,
                              int id = -1);
     MythNotificationScreen(MythScreenStack *stack,
                              MythNotification &notification);

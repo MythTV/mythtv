@@ -49,7 +49,7 @@ struct Cddb
     struct Msf
     {
         int min, sec, frame;
-        Msf(int m = 0, int s = 0, int f = 0) : min(m), sec(s), frame(f) {}
+        explicit Msf(int m = 0, int s = 0, int f = 0) : min(m), sec(s), frame(f) {}
     };
     using Toc = QVector< Msf >;
 
@@ -78,7 +78,7 @@ struct Cddb
         ext_t ext;
         Toc toc;
 
-        Album(discid_t d = 0, const char* g = nullptr) :
+        explicit Album(discid_t d = 0, const char* g = nullptr) :
             discGenre(g), discID(d) {}
 
         explicit Album(const QString& s) { *this = s; }

@@ -29,7 +29,7 @@ using IsOpenMap = QMap<const DVBChannel*,bool>;
 class DVBChannel : public DTVChannel
 {
   public:
-    DVBChannel(QString device, TVRec *parent = nullptr);
+    explicit DVBChannel(QString device, TVRec *parent = nullptr);
     ~DVBChannel() override;
 
     bool Open(void) override // ChannelBase

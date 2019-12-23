@@ -40,7 +40,7 @@ class MBASE_PUBLIC PrivTcpServer : public QTcpServer
 {
     Q_OBJECT
   public:
-    PrivTcpServer(QObject *parent = nullptr,
+    explicit PrivTcpServer(QObject *parent = nullptr,
                   PoolServerType type = kTCPServer);
    ~PrivTcpServer() override = default;
 

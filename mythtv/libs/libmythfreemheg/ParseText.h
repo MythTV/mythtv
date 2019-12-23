@@ -30,7 +30,7 @@ class MHGroup;
 class MHParseText: public MHParseBase
 {
   public:
-    MHParseText(QByteArray &program)
+    explicit MHParseText(QByteArray &program)
         : m_String((unsigned char *)malloc(100)),
           m_data(program) {}
     ~MHParseText() override;

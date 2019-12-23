@@ -76,7 +76,7 @@ class MultipleStringStructure
 class CaptionServiceDescriptor : public MPEGDescriptor
 {
   public:
-    CaptionServiceDescriptor(const unsigned char *data, int len = 300) :
+    explicit CaptionServiceDescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, DescriptorID::caption_service)
     {
         if (m_data && !Parse())
@@ -134,7 +134,7 @@ class CaptionServiceDescriptor : public MPEGDescriptor
 class ContentAdvisoryDescriptor : public MPEGDescriptor
 {
   public:
-    ContentAdvisoryDescriptor(const unsigned char *data, int len = 300) :
+    explicit ContentAdvisoryDescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, DescriptorID::content_advisory)
     {
         if (m_data && !Parse())
@@ -188,7 +188,7 @@ class ContentAdvisoryDescriptor : public MPEGDescriptor
 class ComponentNameDescriptor : public MPEGDescriptor
 {
   public:
-    ComponentNameDescriptor(const unsigned char *data, int len = 300) :
+    explicit ComponentNameDescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, DescriptorID::component_name)
     {
     }
@@ -208,7 +208,7 @@ class ComponentNameDescriptor : public MPEGDescriptor
 class AudioStreamDescriptor : public MPEGDescriptor
 {
   public:
-    AudioStreamDescriptor(const unsigned char *data, int len = 300) :
+    explicit AudioStreamDescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, DescriptorID::ac3_audio_stream) { }
     // descriptor_tag                        8   0.0   0x81
     // sample_rate_code                      3   2.0
@@ -319,7 +319,7 @@ class AudioStreamDescriptor : public MPEGDescriptor
  */
 class ContentIdentifierDescriptor : public MPEGDescriptor
 {
-    ContentIdentifierDescriptor(const unsigned char *data, int len = 300) :
+    explicit ContentIdentifierDescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, DescriptorID::atsc_content_identifier) { }
     // descriptor_tag                        8   0.0  0xB6
     // descriptor_length                     8   1.0
@@ -342,7 +342,7 @@ class ContentIdentifierDescriptor : public MPEGDescriptor
 class ExtendedChannelNameDescriptor : public MPEGDescriptor
 {
   public:
-    ExtendedChannelNameDescriptor(const unsigned char *data, int len = 300) :
+    explicit ExtendedChannelNameDescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, DescriptorID::extended_channel_name) { }
     MultipleStringStructure LongChannelName(void) const;
     QString LongChannelNameString(void) const;

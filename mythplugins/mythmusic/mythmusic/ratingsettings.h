@@ -10,7 +10,7 @@ class RatingSettings : public MythScreenType
 {
     Q_OBJECT
 public:
-    RatingSettings(MythScreenStack *parent, const char *name = nullptr)
+    explicit RatingSettings(MythScreenStack *parent, const char *name = nullptr)
         : MythScreenType(parent, name) {}
     ~RatingSettings() override = default;
 

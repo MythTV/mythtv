@@ -30,7 +30,7 @@ class MBASE_PUBLIC MythSocket : public QObject, public ReferenceCounter
     friend class MythSocketManager;
 
   public:
-    MythSocket(qt_socket_fd_t socket = -1, MythSocketCBs *cb = nullptr,
+    explicit MythSocket(qt_socket_fd_t socket = -1, MythSocketCBs *cb = nullptr,
                bool use_shared_thread = false);
 
     bool ConnectToHost(const QString &hostname, quint16 port);
