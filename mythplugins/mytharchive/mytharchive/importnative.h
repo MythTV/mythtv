@@ -50,7 +50,7 @@ class ArchiveFileSelector : public FileSelector
 
   public:
     explicit ArchiveFileSelector(MythScreenStack *parent);
-    ~ArchiveFileSelector(void);
+    ~ArchiveFileSelector(void) override;
 
     bool Create(void) override; // FileSelector
 
@@ -82,7 +82,7 @@ class ImportNative : public MythScreenType
             m_xmlFile(std::move(xmlFile)),
             m_details(std::move(details)),
             m_previousScreen(previousScreen) {}
-      ~ImportNative() = default;
+      ~ImportNative() override = default;
 
       bool Create(void) override; // MythScreenType
       bool keyPressEvent(QKeyEvent *e) override; // MythScreenType

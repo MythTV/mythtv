@@ -30,7 +30,7 @@ class MTV_PUBLIC MythSystemEventHandler : public QObject
     MythSystemEventHandler();
 
     // Destructor
-   ~MythSystemEventHandler();
+   ~MythSystemEventHandler() override;
 
   private:
     // Helpers for converting incoming events to command lines

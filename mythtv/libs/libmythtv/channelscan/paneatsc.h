@@ -51,7 +51,7 @@ class PaneATSC : public GroupSetting
         ResetTransportRange();
     }
 
-    ~PaneATSC()
+    ~PaneATSC() override
     {
         while (!m_tables.empty())
         {

@@ -33,7 +33,7 @@ public:
     /* Ctor/dtor. */
     TemplateFinder(PGMConverter *pgmc, BorderDetector *bd, EdgeDetector *ed,
             MythPlayer *player, int proglen, const QString& debugdir);
-    ~TemplateFinder(void);
+    ~TemplateFinder(void) override;
 
     /* FrameAnalyzer interface. */
     const char *name(void) const override // FrameAnalyzer

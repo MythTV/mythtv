@@ -10,7 +10,7 @@ class BackendConnectionManager : public QObject
 
   public:
     BackendConnectionManager();
-    ~BackendConnectionManager();
+    ~BackendConnectionManager() override;
 
     void customEvent(QEvent *event) override; // QObject
 

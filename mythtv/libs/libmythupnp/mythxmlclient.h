@@ -34,7 +34,7 @@ class UPNP_PUBLIC MythXMLClient : public SOAPClient
     public:
 
         explicit MythXMLClient( const QUrl &url );
-        virtual ~MythXMLClient( ) = default;
+        ~MythXMLClient( ) override = default;
 
         UPnPResultCode GetConnectionInfo( const QString &sPin, DatabaseParams *pParams, QString &sMsg );
 

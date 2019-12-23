@@ -24,7 +24,7 @@ class Streamer : public QObject
   public:
     Streamer(Commands *parent, QString fname, int data_rate,
              bool loopinput);
-    virtual ~Streamer(void);
+    ~Streamer(void) override;
     void BlockSize(int val) { m_blockSize = val; }
     bool IsOpen(void) const { return m_file; }
     QString ErrorString(void) const { return m_error; }
@@ -60,7 +60,7 @@ class Commands : public QObject
 
   public:
     Commands(void);
-    virtual ~Commands(void) = default;
+    ~Commands(void) override = default;
     bool Run(const QString & filename, int data_rate, bool loopinput);
     void setEoF(void) { m_eof = true; }
 

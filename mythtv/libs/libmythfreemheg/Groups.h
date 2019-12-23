@@ -46,7 +46,7 @@ class MHGroup : public MHRoot
 {
   public:
     MHGroup() = default;
-    virtual ~MHGroup();
+    ~MHGroup() override;
     void PrintMe(FILE *fd, int nTabs) const override; // MHRoot
 
     void Preparation(MHEngine *engine) override; // MHRoot
@@ -116,7 +116,7 @@ class MHApplication : public MHGroup
 {
   public:
     MHApplication() { m_fIsApp = true; }
-    virtual ~MHApplication();
+    ~MHApplication() override;
     const char *ClassName() override // MHRoot
         { return "Application"; }
     // Set this up from the parse tree.

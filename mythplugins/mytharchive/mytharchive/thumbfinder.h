@@ -44,7 +44,7 @@ class ThumbFinder : public MythScreenType
 
       ThumbFinder(MythScreenStack *parent, ArchiveItem *archiveItem,
                   const QString &menuTheme);
-    ~ThumbFinder();
+    ~ThumbFinder() override;
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType

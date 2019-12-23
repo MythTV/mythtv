@@ -216,7 +216,7 @@ class UPNP_PUBLIC DeviceLocation : public ReferenceCounter
         // Destructor protected to force use of Release Method
         // ==================================================================
 
-        virtual        ~DeviceLocation()
+        ~DeviceLocation() override
         {
             // Should be atomic decrement
             g_nAllocated--;

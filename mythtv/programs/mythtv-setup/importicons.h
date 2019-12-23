@@ -32,7 +32,7 @@ class ImportIconsWizard : public MythScreenType
   public:
     ImportIconsWizard(MythScreenStack *parent, bool fRefresh,
                       QString channelname = "");
-   ~ImportIconsWizard();
+   ~ImportIconsWizard() override;
 
     bool Create(void) override; // MythScreenType
     void Load(void) override; // MythScreenType

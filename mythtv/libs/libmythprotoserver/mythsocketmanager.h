@@ -36,7 +36,7 @@ class PROTOSERVER_PUBLIC MythSocketManager : public QObject, public MythSocketCB
     Q_OBJECT
   public:
     MythSocketManager();
-   ~MythSocketManager();
+   ~MythSocketManager() override;
 
     void readyRead(MythSocket *socket) override; // MythSocketCBs
     void connectionClosed(MythSocket *socket) override; // MythSocketCBs

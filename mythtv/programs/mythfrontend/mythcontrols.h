@@ -58,7 +58,7 @@ class MythControls : public MythScreenType
      */
     MythControls(MythScreenStack *parent, const char *name)
         : MythScreenType (parent, name) {}
-    ~MythControls();
+    ~MythControls() override;
 
     bool Create(void) override; // MythScreenType
     void customEvent(QEvent *event) override; // MythUIType

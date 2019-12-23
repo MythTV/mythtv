@@ -13,7 +13,7 @@ class MBASE_PUBLIC BonjourRegister : public QObject
     Q_OBJECT
   public:
     explicit BonjourRegister(QObject *parent = nullptr);
-    virtual ~BonjourRegister();
+    ~BonjourRegister() override;
 
     bool Register(uint16_t port, const QByteArray &type, const QByteArray &name,
                   const QByteArray &txt);

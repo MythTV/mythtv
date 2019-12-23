@@ -10,7 +10,7 @@ class MTV_PUBLIC FileRingBuffer : public RingBuffer
 
     friend class RingBuffer;
   public:
-    ~FileRingBuffer();
+    ~FileRingBuffer() override;
 
     // Gets
     bool      IsOpen(void)          const override; // RingBuffer

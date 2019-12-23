@@ -36,7 +36,7 @@ class DeviceReadBuffer : protected MThread
     DeviceReadBuffer(DeviceReaderCB *cb,
                      bool use_poll = true,
                      bool error_exit_on_poll_timeout = true);
-   ~DeviceReadBuffer();
+   ~DeviceReadBuffer() override;
 
     bool Setup(const QString &streamName,
                int streamfd,

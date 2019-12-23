@@ -71,7 +71,7 @@ class MHInteractible;
 class MHEngine: public MHEG {
   public:
     MHEngine(MHContext *context);
-    virtual ~MHEngine();
+    ~MHEngine() override;
 
     void SetBooting() override // MHEG
         { m_fBooting = true; }

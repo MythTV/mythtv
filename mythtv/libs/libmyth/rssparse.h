@@ -192,7 +192,7 @@ class MPUBLIC Parse : public QObject
 
   public:
     Parse() = default;
-    virtual ~Parse() = default;
+    ~Parse() override = default;
 
     ResultItem::resultList parseRSS(const QDomDocument& domDoc);
     ResultItem* ParseItem(const QDomElement& item) const;

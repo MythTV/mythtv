@@ -41,7 +41,7 @@ class MBASE_PUBLIC HouseKeeperTask : public ReferenceCounter
   public:
     HouseKeeperTask(const QString &dbTag, HouseKeeperScope scope=kHKGlobal,
                     HouseKeeperStartup startup=kHKNormal);
-   ~HouseKeeperTask() = default;
+   ~HouseKeeperTask() override = default;
 
     bool            CheckRun(QDateTime now);
     bool            Run(void);
@@ -129,7 +129,7 @@ class HouseKeepingThread : public MThread
     explicit HouseKeepingThread(HouseKeeper *p) :
         MThread("HouseKeeping"), m_idle(true), m_keepRunning(true),
         m_parent(p) {}
-   ~HouseKeepingThread() = default;
+   ~HouseKeepingThread() override = default;
     void run(void) override; // MThread
     void Discard(void)                  { m_keepRunning = false;        }
     bool isIdle(void)                   { return m_idle;                }
@@ -151,7 +151,7 @@ class MBASE_PUBLIC HouseKeeper : public QObject
 
   public:
     HouseKeeper(void);
-   ~HouseKeeper();
+   ~HouseKeeper() override;
 
     void RegisterTask(HouseKeeperTask *task);
     void Start(void);

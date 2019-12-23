@@ -33,7 +33,7 @@ class AudioReencodeBuffer : public AudioOutput
   public:
     AudioReencodeBuffer(AudioFormat audio_format, int audio_channels,
                         bool passthru);
-    ~AudioReencodeBuffer();
+    ~AudioReencodeBuffer() override;
 
     void      Reconfigure(const AudioSettings &settings) override; // AudioOutput
     void      SetEffDsp(int dsprate) override; // AudioOutput

@@ -68,7 +68,7 @@ class IPTVChannelFetcher : public QRunnable
   public:
     IPTVChannelFetcher(uint cardid, QString inputname, uint sourceid,
                        bool is_mpts, ScanMonitor *monitor = nullptr);
-    ~IPTVChannelFetcher();
+    ~IPTVChannelFetcher() override;
 
     void Scan(void);
     void Stop(void);

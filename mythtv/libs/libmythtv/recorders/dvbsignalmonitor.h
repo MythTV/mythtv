@@ -24,7 +24,7 @@ class DVBSignalMonitor: public DTVSignalMonitor
                      uint64_t _flags =
                      kSigMon_WaitForSig    | kDVBSigMon_WaitForSNR |
                      kDVBSigMon_WaitForBER | kDVBSigMon_WaitForUB);
-    virtual ~DVBSignalMonitor();
+    ~DVBSignalMonitor() override;
 
     QStringList GetStatusList(void) const override; // DTVSignalMonitor
     void Stop(void) override; // SignalMonitor

@@ -70,7 +70,7 @@ class ClassicCommDetector : public CommDetectorBase
         friend class ClassicLogoDetector;
 
     protected:
-        virtual ~ClassicCommDetector() = default;
+        ~ClassicCommDetector() override = default;
 
     private:
         struct FrameBlock

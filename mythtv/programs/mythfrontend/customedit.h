@@ -20,7 +20,7 @@ class CustomEdit : public MythScreenType
   public:
 
     explicit CustomEdit(MythScreenStack *parent, ProgramInfo *m_pginfo = nullptr);
-   ~CustomEdit(void);
+   ~CustomEdit(void) override;
 
     bool Create() override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType

@@ -17,7 +17,7 @@ class ExternalSignalMonitor: public DTVSignalMonitor
   public:
     ExternalSignalMonitor(int db_cardnum, ExternalChannel *_channel,
                           bool _release_stream, uint64_t _flags = 0);
-    virtual ~ExternalSignalMonitor();
+    ~ExternalSignalMonitor() override;
 
     void Stop(void) override; // SignalMonitor
 

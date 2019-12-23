@@ -39,7 +39,7 @@ class V4LChannel : public DTVChannel
                QString audiodevice = "")
         : DTVChannel(parent), m_device(std::move(videodevice)),
           m_audioDevice(std::move(audiodevice)) {}
-    virtual ~V4LChannel(void);
+    ~V4LChannel(void) override;
 
     bool Init(QString &startchannel, bool setchan) override; // ChannelBase
 

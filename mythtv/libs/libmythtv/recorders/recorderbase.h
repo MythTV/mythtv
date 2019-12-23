@@ -69,7 +69,7 @@ class MTV_PUBLIC RecorderBase : public QRunnable
 
   public:
     explicit RecorderBase(TVRec *rec);
-    virtual ~RecorderBase();
+    ~RecorderBase() override;
 
     /// \brief Sets the video frame rate.
     void SetFrameRate(double rate)

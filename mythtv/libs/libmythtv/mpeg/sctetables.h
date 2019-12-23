@@ -201,7 +201,7 @@ class MTV_PUBLIC SCTENetworkInformationTable : public PSIPTable
         assert(TableID::NITscte == TableID());
         Parse();
     }
-    ~SCTENetworkInformationTable() { ; }
+    ~SCTENetworkInformationTable() override { ; }
     // SCTE65-2002, page 15, Table 5.1
     //       Name             bits  loc  expected value
     // table_id                 8   0.0       0xC2
@@ -265,7 +265,7 @@ class MTV_PUBLIC NetworkTextTable : public PSIPTable
         assert(TableID::NTT == TableID());
         Parse();
     }
-    ~NetworkTextTable() { ; }
+    ~NetworkTextTable() override { ; }
     // SCTE65-2002, page 20, Table 5.10
     //       Name             bits  loc  expected value
     // table_id                 8   0.0       0xC3
@@ -510,7 +510,7 @@ class MTV_PUBLIC ShortVirtualChannelTable : public PSIPTable
         assert(TableID::SVCTscte == TableID());
         Parse();
     }
-    ~ShortVirtualChannelTable() { ; }
+    ~ShortVirtualChannelTable() override { ; }
     //       Name             bits  loc  expected value
     // table_id                 8   0.0       0xC4
     // zero                     2   1.0       0

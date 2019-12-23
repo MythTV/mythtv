@@ -177,7 +177,7 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     QMap<QString, QString> GetDependsMap() const { return m_dependsMap; }
 
   protected:
-    virtual ~MythUIType();
+    ~MythUIType() override;
     void customEvent(QEvent *event) override; // QObject
 
   public slots:

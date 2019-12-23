@@ -131,7 +131,7 @@ class MHRTGraphics : public MHVisible
     MHRTGraphics() = default;
     const char *ClassName() override // MHRoot
         { return "RTGraphics"; }
-    virtual ~MHRTGraphics() = default;
+    ~MHRTGraphics() override = default;
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHVisible
     void PrintMe(FILE *fd, int nTabs) const override; // MHVisible
     void Display(MHEngine */*engine*/) override {} // MHVisible - Not supported

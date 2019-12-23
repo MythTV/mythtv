@@ -29,7 +29,7 @@ class CdDecoder : public Decoder
 
   public:
     CdDecoder(const QString &file, DecoderFactory *d, AudioOutput *o);
-    virtual ~CdDecoder();
+    ~CdDecoder() override;
 
     // Decoder implementation
     bool initialize() override; // Decoder

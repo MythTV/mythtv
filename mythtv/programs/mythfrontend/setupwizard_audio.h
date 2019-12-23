@@ -20,7 +20,7 @@ class AudioSetupWizard : public MythScreenType
                      const char *name = nullptr)
         : MythScreenType(parent, name),
           m_generalScreen(generalScreen) {}
-    ~AudioSetupWizard();
+    ~AudioSetupWizard() override;
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType

@@ -12,7 +12,7 @@ class StreamingRingBuffer : public RingBuffer
 {
   public:
     explicit StreamingRingBuffer(const QString &lfilename);
-    virtual ~StreamingRingBuffer();
+    ~StreamingRingBuffer() override;
 
     // RingBuffer implementation
     bool IsOpen(void) const override; // RingBuffer

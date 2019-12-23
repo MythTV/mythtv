@@ -25,7 +25,7 @@ class GallerySlideView : public MythScreenType
     Q_OBJECT
 public:
     GallerySlideView(MythScreenStack *parent, const char *name, bool editsAllowed);
-    ~GallerySlideView();
+    ~GallerySlideView() override;
     bool Create() override; // MythScreenType
 
 public slots:

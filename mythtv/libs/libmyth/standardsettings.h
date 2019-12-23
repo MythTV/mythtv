@@ -102,7 +102,7 @@ class MPUBLIC StandardSetting : public QObject, public StorageUser
   protected:
     explicit StandardSetting(Storage *_storage = nullptr)
         : m_storage(_storage) {}
-    virtual ~StandardSetting();
+    ~StandardSetting() override;
     void setParent(StandardSetting *parent);
     QString m_settingValue;
     bool    m_enabled         {true};
@@ -240,7 +240,7 @@ class MPUBLIC MythUIComboBoxSetting : public StandardSetting
      */
     MythUIComboBoxSetting(Storage *_storage = nullptr, bool rw = false)
         : StandardSetting(_storage), m_rewrite(rw) {}
-    ~MythUIComboBoxSetting();
+    ~MythUIComboBoxSetting() override;
     QVector<QString> m_labels;
     QVector<QString> m_values;
 
@@ -475,7 +475,7 @@ class MPUBLIC StandardSettingDialog : public MythScreenType
     StandardSettingDialog(MythScreenStack *parent, const char *name,
                           GroupSetting *groupSettings = nullptr)
         : MythScreenType(parent, name), m_settingsTree(groupSettings) {}
-    virtual ~StandardSettingDialog();
+    ~StandardSettingDialog() override;
     bool Create(void) override; // MythScreenType
     void customEvent(QEvent *event) override; // MythUIType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType

@@ -46,7 +46,7 @@ class MPUBLIC RSSSite : public QObject
             const bool& download,
             QDateTime updated);
 
-    ~RSSSite() = default;
+    ~RSSSite() override = default;
 
     using rssList = QList<RSSSite *>;
 
@@ -112,7 +112,7 @@ class MPUBLIC RSSManager : public QObject
 
   public:
     RSSManager();
-    ~RSSManager();
+    ~RSSManager() override;
     void startTimer();
     void stopTimer();
 

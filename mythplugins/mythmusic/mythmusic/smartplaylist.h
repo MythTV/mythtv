@@ -76,7 +76,7 @@ class SmartPlaylistEditor : public MythScreenType
 
     explicit SmartPlaylistEditor(MythScreenStack *parent)
         : MythScreenType(parent, "smartplaylisteditor") {}
-   ~SmartPlaylistEditor(void);
+   ~SmartPlaylistEditor(void) override;
 
     bool Create(void) override; // MythScreenType
 
@@ -157,7 +157,7 @@ class CriteriaRowEditor : public MythScreenType
     CriteriaRowEditor(MythScreenStack *parent, SmartPLCriteriaRow *row)
         : MythScreenType(parent, "CriteriaRowEditor"),
           m_criteriaRow(row) {}
-   ~CriteriaRowEditor(void) = default;
+   ~CriteriaRowEditor(void) override = default;
 
     bool Create(void) override; // MythScreenType
 
@@ -218,7 +218,7 @@ class SmartPLResultViewer : public MythScreenType
 
     explicit SmartPLResultViewer(MythScreenStack *parent)
         : MythScreenType(parent, "SmartPLResultViewer") {}
-   ~SmartPLResultViewer(void) = default;
+   ~SmartPLResultViewer(void) override = default;
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
@@ -244,7 +244,7 @@ class SmartPLOrderByDialog: public MythScreenType
 
     explicit SmartPLOrderByDialog(MythScreenStack *parent)
         :MythScreenType(parent, "SmartPLOrderByDialog") {}
-    ~SmartPLOrderByDialog() = default;
+    ~SmartPLOrderByDialog() override = default;
 
     bool Create(void) override; // MythScreenType
 
@@ -288,7 +288,7 @@ class SmartPLDateDialog: public MythScreenType
 
     explicit SmartPLDateDialog(MythScreenStack *parent)
         :MythScreenType(parent, "SmartPLDateDialog") {}
-    ~SmartPLDateDialog() = default;
+    ~SmartPLDateDialog() override = default;
 
     bool Create(void) override; // MythScreenType
 

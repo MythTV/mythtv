@@ -12,7 +12,7 @@ class RatingSettings : public MythScreenType
 public:
     RatingSettings(MythScreenStack *parent, const char *name = nullptr)
         : MythScreenType(parent, name) {}
-    ~RatingSettings() = default;
+    ~RatingSettings() override = default;
 
     bool Create(void) override; // MythScreenType
 

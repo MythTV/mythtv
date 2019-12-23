@@ -66,7 +66,7 @@ class CDRipperThread: public MThread
     public:
         CDRipperThread(RipStatus *parent,  QString device,
                        QVector<RipTrack*> *tracks, int quality);
-        ~CDRipperThread();
+        ~CDRipperThread() override;
 
         void cancel(void);
 
@@ -97,7 +97,7 @@ class Ripper : public MythScreenType
     Q_OBJECT
   public:
     Ripper(MythScreenStack *parent, QString device);
-   ~Ripper(void);
+   ~Ripper(void) override;
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
@@ -191,7 +191,7 @@ class RipStatusEvent : public QEvent
         QEvent(type), m_text(""), m_value(val) {}
     RipStatusEvent(Type type, QString val) :
         QEvent(type), m_text(std::move(val)) {}
-    ~RipStatusEvent() = default;
+    ~RipStatusEvent() override = default;
 
     QString m_text;
     int     m_value {-1};
@@ -219,7 +219,7 @@ class RipStatus : public MythScreenType
               QVector<RipTrack*> *tracks, int quality)
         : MythScreenType(parent, "ripstatus"), m_tracks(tracks),
           m_quality(quality), m_cdDevice(std::move(device)) {}
-    ~RipStatus(void);
+    ~RipStatus(void) override;
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType

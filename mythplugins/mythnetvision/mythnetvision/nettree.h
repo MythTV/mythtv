@@ -44,7 +44,7 @@ class NetTree : public NetBase
 
   public:
     NetTree(DialogType type, MythScreenStack *parent, const char *name = nullptr);
-    ~NetTree();
+    ~NetTree() override;
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType

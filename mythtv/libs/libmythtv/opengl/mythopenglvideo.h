@@ -38,7 +38,7 @@ class MythOpenGLVideo : public QObject
                     QSize VideoDim, QSize VideoDispDim, QRect DisplayVisibleRect,
                     QRect DisplayVideoRect, QRect videoRect,
                     bool ViewportControl, QString Profile);
-   ~MythOpenGLVideo();
+   ~MythOpenGLVideo() override;
 
     bool    IsValid(void) const;
     void    ProcessFrame(const VideoFrame *Frame, FrameScanType Scan = kScan_Progressive);

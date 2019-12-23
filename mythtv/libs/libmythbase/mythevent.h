@@ -60,7 +60,7 @@ class MBASE_PUBLIC MythEvent : public QEvent
     }
 
 
-    virtual ~MythEvent() = default;
+    ~MythEvent() override = default;
 
     const QString& Message() const { return m_message; }
     const QString& ExtraData(int idx = 0) const { return m_extradata[idx]; }

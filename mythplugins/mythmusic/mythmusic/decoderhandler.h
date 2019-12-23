@@ -36,7 +36,7 @@ class DecoderHandlerEvent : public MythEvent
         : MythEvent(type), m_available(available), m_maxSize(maxSize) {}
 
     DecoderHandlerEvent(Type type, const MusicMetadata &m);
-    ~DecoderHandlerEvent();
+    ~DecoderHandlerEvent() override;
 
     QString *getMessage(void) const { return m_msg; }
     MusicMetadata *getMetadata(void) const { return m_meta; }
@@ -80,7 +80,7 @@ class DecoderHandler : public QObject, public MythObservable
     };
 
     DecoderHandler(void) = default;
-    virtual ~DecoderHandler(void);
+    ~DecoderHandler(void) override;
 
     Decoder *getDecoder(void) { return m_decoder; }
 

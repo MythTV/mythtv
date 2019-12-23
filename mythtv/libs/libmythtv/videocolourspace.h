@@ -54,7 +54,7 @@ class VideoColourSpace : public QObject, public QMatrix4x4, public ReferenceCoun
     void  PictureAttributeChanged(PictureAttribute Attribute, int Value);
 
   protected:
-    ~VideoColourSpace();
+    ~VideoColourSpace() override;
 
   private:
     void  SetFullRange(bool FullRange);

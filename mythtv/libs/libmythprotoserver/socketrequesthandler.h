@@ -14,7 +14,7 @@ class PROTOSERVER_PUBLIC SocketRequestHandler : public QObject
     Q_OBJECT
   public:
     SocketRequestHandler() = default;
-   ~SocketRequestHandler() = default;
+   ~SocketRequestHandler() override = default;
 
     virtual bool HandleAnnounce(MythSocket */*socket*/, QStringList &/*commands*/,
                                 QStringList &/*slist*/)

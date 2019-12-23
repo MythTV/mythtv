@@ -17,7 +17,7 @@ class MpegRecorder : public V4LRecorder,
   public:
     explicit MpegRecorder(TVRec*rec)
         : V4LRecorder(rec) {};
-   ~MpegRecorder() { TeardownAll(); }
+   ~MpegRecorder() override { TeardownAll(); }
     void TeardownAll(void);
 
     void SetOption(const QString &opt, int value) override; // DTVRecorder

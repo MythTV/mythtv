@@ -41,7 +41,7 @@ class MBASE_PUBLIC DBStorage : public Storage
         m_tablename(std::move(table)),
         m_columnname(std::move(column)) { }
 
-    virtual ~DBStorage() = default;
+    ~DBStorage() override = default;
 
   protected:
     QString GetColumnName(void) const { return m_columnname; }
@@ -58,7 +58,7 @@ class MBASE_PUBLIC SimpleDBStorage : public DBStorage
     SimpleDBStorage(StorageUser *user,
                     const QString &table, const QString &column) :
         DBStorage(user, table, column) { m_initval.clear(); }
-    virtual ~SimpleDBStorage() = default;
+    ~SimpleDBStorage() override = default;
 
     void Load(void) override; // Storage
     void Save(void) override; // Storage
@@ -83,7 +83,7 @@ class MBASE_PUBLIC GenericDBStorage : public SimpleDBStorage
         SimpleDBStorage(user, table, column),
         m_keycolumn(std::move(keycolumn)),
         m_keyvalue(std::move(keyvalue)) {}
-    virtual ~GenericDBStorage() = default;
+    ~GenericDBStorage() override = default;
 
     void SetKeyValue(const QString &val) { m_keyvalue = val; }
     void SetKeyValue(long long val) { m_keyvalue = QString::number(val); }
@@ -101,7 +101,7 @@ class MBASE_PUBLIC TransientStorage : public Storage
 {
   public:
     TransientStorage() = default;
-    virtual ~TransientStorage() = default;
+    ~TransientStorage() override = default;
 
     void Load(void) override { } // Storage
     void Save(void) override { } // Storage

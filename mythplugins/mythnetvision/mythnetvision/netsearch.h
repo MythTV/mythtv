@@ -23,7 +23,7 @@ class NetSearch : public NetBase
   public:
 
     NetSearch(MythScreenStack *parent, const char *name = nullptr);
-    ~NetSearch();
+    ~NetSearch() override;
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType

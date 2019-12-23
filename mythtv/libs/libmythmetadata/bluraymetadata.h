@@ -25,7 +25,7 @@ class META_PUBLIC BlurayMetadata : public QObject
   public:
     explicit BlurayMetadata(QString path)
         : m_path(std::move(path)) {}
-    ~BlurayMetadata();
+    ~BlurayMetadata() override;
 
     void toMap(InfoMap &metadataMap);
 

@@ -39,7 +39,7 @@ class MHText : public MHVisible
   public:
     MHText() = default;
     MHText(const MHText &ref);
-    ~MHText();
+    ~MHText() override;
     const char *ClassName() override // MHRoot
         { return "Text"; }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHVisible
@@ -104,7 +104,7 @@ class MHHyperText : public MHText, public MHInteractible
     MHHyperText() : MHInteractible(this) {}
     const char *ClassName() override // MHText
         { return "HyperText"; }
-    virtual ~MHHyperText() = default;
+    ~MHHyperText() override = default;
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHText
     void PrintMe(FILE *fd, int nTabs) const override; // MHText
 

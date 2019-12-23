@@ -94,7 +94,7 @@ public:
     */
     ThumbThread(const QString &name, DBFS *const dbfs)
         : MThread(name), m_dbfs(*dbfs) {}
-    ~ThumbThread();
+    ~ThumbThread() override;
 
     void cancel();
     void Enqueue(const TaskPtr &task);

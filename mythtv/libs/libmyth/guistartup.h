@@ -57,7 +57,7 @@ class MPUBLIC GUIStartup : public MythScreenType
     bool m_Search {false};
 
     GUIStartup(MythScreenStack *parent, QEventLoop *eventLoop);
-   ~GUIStartup(void);
+   ~GUIStartup(void) override;
     bool Create(void) override; // MythScreenType
     bool setStatusState(const QString &name);
     bool setMessageState(const QString &name);

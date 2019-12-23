@@ -28,7 +28,7 @@ class IPTVChannel : QObject, public DTVChannel
 
   public:
     IPTVChannel(TVRec *rec, QString videodev);
-    ~IPTVChannel();
+    ~IPTVChannel() override;
 
     // Commands
     bool Open(void) override; // ChannelBase

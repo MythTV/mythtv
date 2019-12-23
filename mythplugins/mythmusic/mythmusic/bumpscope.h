@@ -13,7 +13,7 @@ class BumpScope : public VisualBase
 {
 public:
     BumpScope();
-    virtual ~BumpScope();
+    ~BumpScope() override;
 
     void resize(const QSize &size) override; // VisualBase
     bool process(VisualNode *node) override; // VisualBase

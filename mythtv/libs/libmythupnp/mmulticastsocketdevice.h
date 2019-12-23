@@ -52,9 +52,9 @@ class MMulticastSocketDevice : public MSocketDevice
         m_localAddresses(QNetworkInterface::allAddresses()) {}
     MMulticastSocketDevice(const QString& sAddress, quint16 nPort, u_char ttl = 0);
 
-    virtual ~MMulticastSocketDevice();
+    ~MMulticastSocketDevice() override;
 
-    virtual qint64 writeBlock(
+    qint64 writeBlock(
         const char *data, quint64 len,
         const QHostAddress & host, quint16 port) override; // MSocketDevice
 

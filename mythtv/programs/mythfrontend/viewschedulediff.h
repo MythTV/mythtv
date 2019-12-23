@@ -30,7 +30,7 @@ class ViewScheduleDiff : public MythScreenType
         : MythScreenType(parent, "ViewScheduleDiff"),
           m_altTable(std::move(altTbl)), m_title(std::move(ltitle)),
           m_recordid(recordid) {}
-    ~ViewScheduleDiff() = default;
+    ~ViewScheduleDiff() override = default;
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType

@@ -162,7 +162,7 @@ class LoggingItem: public QObject, public ReferenceCounter
         : ReferenceCounter("LoggingItem", false) {};
     LoggingItem(const char *_file, const char *_function,
                 int _line, LogLevel_t _level, LoggingType _type);
-    ~LoggingItem();
+    ~LoggingItem() override;
     Q_DISABLE_COPY(LoggingItem);
 };
 
@@ -177,7 +177,7 @@ class LoggerThread : public QObject, public MThread
   public:
     LoggerThread(QString filename, bool progress, bool quiet, QString table,
                  int facility);
-    ~LoggerThread();
+    ~LoggerThread() override;
     void run(void) override; // MThread
     void stop(void);
     bool flush(int timeoutMS = 200000);

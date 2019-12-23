@@ -20,7 +20,7 @@ class MythBrowser : public MythScreenType
 
   public:
     MythBrowser(MythScreenStack *parent, QStringList &urlList);
-    ~MythBrowser();
+    ~MythBrowser() override;
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType

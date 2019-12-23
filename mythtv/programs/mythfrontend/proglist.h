@@ -43,7 +43,7 @@ class ProgLister : public ScheduleCommon
                QDateTime selectedTime = QDateTime());
     explicit ProgLister(MythScreenStack *parent, uint recid = 0,
                         QString title = QString());
-    ~ProgLister();
+    ~ProgLister() override;
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType

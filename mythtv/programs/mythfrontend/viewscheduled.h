@@ -30,7 +30,7 @@ class ViewScheduled : public ScheduleCommon
   public:
     explicit ViewScheduled(MythScreenStack *parent, TV *player = nullptr,
                   bool showTV = false);
-    ~ViewScheduled();
+    ~ViewScheduled() override;
 
     static void * RunViewScheduled(void *player, bool showTv);
 

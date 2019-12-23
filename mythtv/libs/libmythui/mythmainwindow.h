@@ -151,7 +151,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
 
   protected:
     explicit MythMainWindow(const bool useDB = true);
-    virtual ~MythMainWindow();
+    ~MythMainWindow() override;
 
     void InitKeys(void);
 

@@ -13,7 +13,7 @@ class MPUBLIC ZMMiniPlayer : public ZMLivePlayer
 
   public:
     explicit ZMMiniPlayer(MythScreenStack *parent);
-    ~ZMMiniPlayer();
+    ~ZMMiniPlayer() override;
 
     bool Create(void) override; // ZMLivePlayer
     bool keyPressEvent(QKeyEvent *event) override; // ZMLivePlayer

@@ -34,7 +34,7 @@ public:
     /* Ctor/dtor. */
     TemplateMatcher(PGMConverter *pgmc, EdgeDetector *ed, TemplateFinder *tf,
             const QString& debugdir);
-    ~TemplateMatcher(void);
+    ~TemplateMatcher(void) override;
 
     /* FrameAnalyzer interface. */
     const char *name(void) const override // FrameAnalyzer

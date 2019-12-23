@@ -62,7 +62,7 @@ class ImportMusicDialog : public MythScreenType
 
   public:
     explicit ImportMusicDialog(MythScreenStack *parent);
-    ~ImportMusicDialog();
+    ~ImportMusicDialog() override;
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
@@ -173,7 +173,7 @@ class ImportCoverArtDialog : public MythScreenType
           m_sourceDir(std::move(sourceDir)),
           m_musicStorageDir(std::move(storageDir)),
           m_metadata(metadata) {}
-    ~ImportCoverArtDialog() = default;
+    ~ImportCoverArtDialog() override = default;
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType

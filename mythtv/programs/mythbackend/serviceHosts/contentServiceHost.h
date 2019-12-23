@@ -51,7 +51,7 @@ class ContentServiceHost : public ServiceHost
         {
         }
 
-        virtual ~ContentServiceHost() = default;
+        ~ContentServiceHost() override = default;
 };
 
 #endif

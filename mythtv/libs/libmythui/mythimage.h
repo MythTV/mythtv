@@ -100,7 +100,7 @@ class MUI_PUBLIC MythImage : public QImage, public ReferenceCounter
     }
 
   protected:
-    virtual ~MythImage();
+    ~MythImage() override;
     static void MakeGradient(QImage &image, const QColor &begin,
                              const QColor &end, int alpha,
                              bool drawBoundary=true,

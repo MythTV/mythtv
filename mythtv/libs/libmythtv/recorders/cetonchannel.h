@@ -27,7 +27,7 @@ class CetonChannel : public DTVChannel
   public:
     CetonChannel(TVRec *parent, QString device)
         : DTVChannel(parent), m_deviceId(std::move(device)) {}
-    ~CetonChannel(void);
+    ~CetonChannel(void) override;
 
     bool Open(void) override; // ChannelBase
     void Close(void) override; // ChannelBase

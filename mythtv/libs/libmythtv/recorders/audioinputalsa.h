@@ -36,7 +36,7 @@ class AudioInputALSA : public AudioInput
     explicit AudioInputALSA(const QString &device)
         : AudioInput(device)
         , m_alsaDevice(device.right(device.size()-5).toLatin1()) {}
-    ~AudioInputALSA() { Close(); };
+    ~AudioInputALSA() override { Close(); };
 
     bool Open(uint sample_bits, uint sample_rate, uint channels) override; // AudioInput
     inline bool IsOpen(void) override // AudioInput

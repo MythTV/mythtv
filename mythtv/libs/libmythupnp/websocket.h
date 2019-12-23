@@ -40,7 +40,7 @@ class UPNP_PUBLIC WebSocketServer : public ServerPool
 
   public:
     WebSocketServer();
-    virtual ~WebSocketServer();
+    ~WebSocketServer() override;
 
     bool IsRunning(void) const
     {
@@ -139,7 +139,7 @@ class WebSocketExtension : public QObject
 
   public:
     WebSocketExtension() : QObject() { };
-    virtual ~WebSocketExtension() = default;
+    ~WebSocketExtension() override = default;
 
     virtual bool HandleTextFrame(const WebSocketFrame &/*frame*/) { return false; }
     virtual bool HandleBinaryFrame(const WebSocketFrame &/*frame*/) { return false; }
@@ -163,7 +163,7 @@ class WebSocketWorkerThread : public QRunnable
                           , const QSslConfiguration& sslConfig
 #endif
                         );
-    virtual ~WebSocketWorkerThread() = default;
+    ~WebSocketWorkerThread() override = default;
 
     void run(void) override; // QRunnable
 
@@ -212,7 +212,7 @@ class WebSocketWorker : public QObject
                     , const QSslConfiguration& sslConfig
 #endif
                     );
-    virtual ~WebSocketWorker();
+    ~WebSocketWorker() override;
 
     void Exec();
 

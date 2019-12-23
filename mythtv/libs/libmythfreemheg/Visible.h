@@ -175,7 +175,7 @@ class MHSlider : public MHVisible, public MHInteractible
 {
   public:
     MHSlider() : MHInteractible(this) {}
-    virtual ~MHSlider() = default;
+    ~MHSlider() override = default;
     const char *ClassName() override // MHRoot
         { return "Slider"; }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHVisible
@@ -245,7 +245,7 @@ class MHEntryField : public MHVisible, public MHInteractible
 {
   public:
     MHEntryField(): MHInteractible(this) {}
-    virtual ~MHEntryField() = default;
+    ~MHEntryField() override = default;
     const char *ClassName() override // MHRoot
         { return "EntryField"; }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHVisible
@@ -270,7 +270,7 @@ class MHButton : public MHVisible
 {
   public:
     MHButton() = default;
-    virtual ~MHButton() = default;
+    ~MHButton() override = default;
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHVisible
     void PrintMe(FILE *fd, int nTabs) const override; // MHVisible
     void Display(MHEngine */*engine*/) override {} // MHVisible - Not (yet?) supported
@@ -281,7 +281,7 @@ class MHHotSpot : public MHButton
 {
   public:
     MHHotSpot() = default;
-    virtual ~MHHotSpot() = default;
+    ~MHHotSpot() override = default;
     const char *ClassName() override // MHRoot
         { return "HotSpot"; }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHButton
@@ -294,7 +294,7 @@ class MHPushButton : public MHButton
 {
   public:
     MHPushButton() = default;
-    virtual ~MHPushButton() = default;
+    ~MHPushButton() override = default;
     const char *ClassName() override // MHRoot
         { return "PushButton"; }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHButton
@@ -307,7 +307,7 @@ class MHSwitchButton : public MHPushButton
 {
   public:
     MHSwitchButton() = default;
-    virtual ~MHSwitchButton() = default;
+    ~MHSwitchButton() override = default;
     const char *ClassName() override // MHPushButton
         { return "SwitchButton"; }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHPushButton

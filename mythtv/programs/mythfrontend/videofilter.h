@@ -277,7 +277,7 @@ class VideoFilterDialog : public MythScreenType
   public:
     VideoFilterDialog( MythScreenStack *lparent, const QString& lname,
                        VideoList *video_list);
-    ~VideoFilterDialog();
+    ~VideoFilterDialog() override;
 
     bool Create() override; // MythScreenType
 

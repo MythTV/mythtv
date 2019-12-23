@@ -33,7 +33,7 @@ class DecoderEvent : public MythEvent
 
     explicit DecoderEvent(QString *e) : MythEvent(Error), m_errorMsg(e) { ; }
 
-    ~DecoderEvent()
+    ~DecoderEvent() override
     {
         delete m_errorMsg;
     }
@@ -65,7 +65,7 @@ class DecoderEvent : public MythEvent
 class Decoder : public MThread, public MythObservable
 {
   public:
-    virtual ~Decoder();
+    ~Decoder() override;
 
     virtual bool initialize() = 0;
     virtual void seek(double) = 0;

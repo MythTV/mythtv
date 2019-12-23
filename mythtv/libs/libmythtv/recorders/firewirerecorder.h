@@ -30,7 +30,7 @@ class FirewireRecorder :
 
   public:
     FirewireRecorder(TVRec *rec, FirewireChannel *chan);
-    virtual ~FirewireRecorder();
+    ~FirewireRecorder() override;
 
     // Commands
     bool Open(void);

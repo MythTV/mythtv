@@ -19,7 +19,7 @@ class MythDRMDevice : public ReferenceCounter
 {
   public:
     MythDRMDevice(QScreen *qScreen, QString Device = QString());
-   ~MythDRMDevice();
+   ~MythDRMDevice() override;
 
     QString  GetSerialNumber(void) const;
     QScreen* GetScreen      (void) const;

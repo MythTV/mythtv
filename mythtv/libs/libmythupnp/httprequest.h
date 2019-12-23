@@ -282,7 +282,7 @@ class BufferedSocketDeviceRequest : public HTTPRequest
 
         explicit BufferedSocketDeviceRequest( QTcpSocket *pSocket )
             : m_pSocket(pSocket) {}
-        virtual ~BufferedSocketDeviceRequest() = default;
+        ~BufferedSocketDeviceRequest() override = default;
 
         QString  ReadLine        ( int msecs ) override; // HTTPRequest
         qint64   ReadBlock       ( char *pData, qint64 nMaxLen, int msecs = 0  ) override; // HTTPRequest
@@ -326,7 +326,7 @@ class UPNP_PUBLIC HttpRedirectException : public HttpException
                : HttpException( nCode, sMsg ), m_hostName(std::move( sHostName ))
         {}
 
-        virtual ~HttpRedirectException() = default;
+        ~HttpRedirectException() override = default;
 
 };
 

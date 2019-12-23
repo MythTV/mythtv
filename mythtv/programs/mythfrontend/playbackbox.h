@@ -118,7 +118,7 @@ class PlaybackBox : public ScheduleCommon
 
     PlaybackBox(MythScreenStack *parent, const QString& name,
                 TV *player = nullptr, bool showTV = false);
-   ~PlaybackBox(void);
+   ~PlaybackBox(void) override;
 
     bool Create(void) override; // MythScreenType
     void Load(void) override; // MythScreenType

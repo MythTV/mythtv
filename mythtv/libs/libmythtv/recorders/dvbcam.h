@@ -24,7 +24,7 @@ class DVBCam : public QRunnable
 {
   public:
     explicit DVBCam(QString device);
-    ~DVBCam();
+    ~DVBCam() override;
 
     bool Start(void);
     bool Stop(void);

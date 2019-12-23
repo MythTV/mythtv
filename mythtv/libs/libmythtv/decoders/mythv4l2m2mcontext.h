@@ -8,7 +8,7 @@ class MythV4L2M2MContext : public MythDRMPRIMEContext
 {
   public:
     MythV4L2M2MContext(DecoderBase *Parent, MythCodecID CodecID);
-   ~MythV4L2M2MContext() = default;
+   ~MythV4L2M2MContext() override = default;
     static MythCodecID GetSupportedCodec (AVCodecContext **Context,
                                           AVCodec       **Codec,
                                           const QString  &Decoder,

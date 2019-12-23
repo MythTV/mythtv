@@ -64,7 +64,7 @@ class JumpToChannel : public QObject
     virtual void deleteLater(void);
 
   private:
-    ~JumpToChannel() = default;
+    ~JumpToChannel() override = default;
     bool Update(void);
 
   private:
@@ -165,7 +165,7 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
               bool embedVideo = false,
               bool allowFinder = true,
               int changrpid = -1);
-   ~GuideGrid();
+   ~GuideGrid() override;
     ProgramInfo *GetCurrentProgram(void) const override // ScheduleCommon
         { return m_programInfos[m_currentRow][m_currentCol]; };
 

@@ -26,7 +26,7 @@ class SlotRelayer : public QObject
     void relay() {if (m_fpVoid) m_fpVoid();}
 
   private:
-    virtual ~SlotRelayer() = default;
+    ~SlotRelayer() override = default;
     void (*m_fpQstring)(const QString&) { nullptr };
     void (*m_fpVoid)()                  { nullptr };
 };

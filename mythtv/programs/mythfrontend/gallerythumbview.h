@@ -25,7 +25,7 @@ class GalleryThumbView : public MythScreenType
     Q_OBJECT
 public:
     GalleryThumbView(MythScreenStack *parent, const char *name);
-    ~GalleryThumbView();
+    ~GalleryThumbView() override;
     bool    Create() override; // MythScreenType
 
 public slots:

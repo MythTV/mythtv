@@ -18,7 +18,7 @@ class CannyEdgeDetector : public EdgeDetector
 {
 public:
     CannyEdgeDetector(void);
-    ~CannyEdgeDetector(void);
+    ~CannyEdgeDetector(void) override;
     int MythPlayerInited(const MythPlayer *player, int width, int height);
     int setExcludeArea(int row, int col, int width, int height) override; // EdgeDetector
     const AVFrame *detectEdges(const AVFrame *pgm, int pgmheight,

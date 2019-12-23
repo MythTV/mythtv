@@ -24,7 +24,7 @@ class ImportRecorder : public DTVRecorder
 {
   public:
     explicit ImportRecorder(TVRec*rec) : DTVRecorder(rec) {}
-    ~ImportRecorder() = default;
+    ~ImportRecorder() override = default;
 
     // RecorderBase
     void SetOptionsFromProfile(RecordingProfile *profile,

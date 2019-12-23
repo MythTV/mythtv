@@ -69,7 +69,7 @@ class CC608Stuff : public SRTStuff
 {
   public:
     CC608Stuff() = default;
-    ~CC608Stuff();
+    ~CC608Stuff() override;
     CC608Reader     *m_reader { nullptr };
     CC608StreamType  m_subs;
 };
@@ -79,7 +79,7 @@ class CC708Stuff : public SRTStuff
 {
   public:
     CC708Stuff() = default;
-    ~CC708Stuff();
+    ~CC708Stuff() override;
     CC708Reader     *m_reader { nullptr };
     CC708StreamType  m_subs;
 };
@@ -90,7 +90,7 @@ class TeletextStuff : public SRTStuff
 {
   public:
     TeletextStuff() = default;
-    ~TeletextStuff();
+    ~TeletextStuff() override;
     TeletextExtractorReader *m_reader { nullptr };
     TeletextStreamType       m_subs;
 };
@@ -115,7 +115,7 @@ class MTV_PUBLIC MythCCExtractorPlayer : public MythPlayer
     MythCCExtractorPlayer(PlayerFlags flags, bool showProgress,
                           QString fileName, const QString & destdir);
     MythCCExtractorPlayer(const MythCCExtractorPlayer& rhs);
-    ~MythCCExtractorPlayer() = default;
+    ~MythCCExtractorPlayer() override = default;
 
     bool run(void);
 

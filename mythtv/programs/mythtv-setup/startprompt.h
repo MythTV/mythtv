@@ -9,7 +9,7 @@ class StartPrompter : public QObject
 
   public:
     StartPrompter();
-    ~StartPrompter();
+    ~StartPrompter() override;
 
   public slots:
     void handleStart();

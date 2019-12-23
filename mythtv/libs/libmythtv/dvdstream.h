@@ -23,7 +23,7 @@ class MTV_PUBLIC DVDStream : public RingBuffer
 
 public:
     explicit DVDStream(const QString &filename);
-    virtual ~DVDStream();
+    ~DVDStream() override;
 
 public:
     // RingBuffer methods

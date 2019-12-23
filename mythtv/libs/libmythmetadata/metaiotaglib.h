@@ -21,7 +21,7 @@ class META_PUBLIC MetaIOTagLib : public MetaIO
 {
   public:
     MetaIOTagLib(void) : MetaIO() {}
-    virtual ~MetaIOTagLib(void) = default;
+    ~MetaIOTagLib(void) override = default;
 
     bool write(const QString &filename, MusicMetadata* mdata) override = 0; // MetaIO
     MusicMetadata* read(const QString &filename) override = 0; // MetaIO

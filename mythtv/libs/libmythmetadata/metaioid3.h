@@ -34,7 +34,7 @@ class META_PUBLIC MetaIOID3 : public MetaIOTagLib
 {
   public:
     MetaIOID3(void) : MetaIOTagLib() {}
-    virtual ~MetaIOID3(void) { CloseFile(); }
+    ~MetaIOID3(void) override { CloseFile(); }
 
     bool write(const QString &filename, MusicMetadata* mdata) override; // MetaIOTagLib
     bool writeVolatileMetadata(const QString &filename, MusicMetadata* mdata) override; // MetaIO

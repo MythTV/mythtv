@@ -47,7 +47,7 @@ class UPNPScanner : public QObject
    Q_OBJECT
 
   public:
-   ~UPNPScanner();
+   ~UPNPScanner() override;
 
     static void         Enable(bool enable, UPNPSubscription *sub = nullptr);
     static UPNPScanner* Instance(UPNPSubscription *sub = nullptr);

@@ -42,7 +42,7 @@ class ExpireThread : public MThread
 {
   public:
     explicit ExpireThread(AutoExpire *p) : MThread("Expire"), m_parent(p) {}
-    virtual ~ExpireThread() { wait(); }
+    ~ExpireThread() override { wait(); }
     void run(void) override; // MThread
   private:
     QPointer<AutoExpire> m_parent;
@@ -66,7 +66,7 @@ class AutoExpire : public QObject
   public:
     explicit AutoExpire(QMap<int, EncoderLink *> *tvList);
     AutoExpire() = default;
-   ~AutoExpire();
+   ~AutoExpire() override;
 
     void CalcParams(void);
     void PrintExpireList(const QString& expHost = "ALL");

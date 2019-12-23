@@ -71,7 +71,7 @@ class MTV_PUBLIC PreviewGenerator : public QObject, public MThread
     void deleteLater();
 
   protected:
-    virtual ~PreviewGenerator();
+    ~PreviewGenerator() override;
     void TeardownAll(void);
 
     bool RemotePreviewRun(void);

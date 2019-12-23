@@ -31,7 +31,7 @@ class ThemeChooser : public MythScreenType
   public:
     ThemeChooser(MythScreenStack *parent,
                const QString &name = "ThemeChooser");
-   ~ThemeChooser();
+   ~ThemeChooser() override;
 
     bool Create(void) override; // MythScreenType
     void Load(void) override; // MythScreenType
@@ -101,7 +101,7 @@ class ThemeUpdateChecker : public QObject
 
   public:
     ThemeUpdateChecker(void);
-   ~ThemeUpdateChecker(void);
+   ~ThemeUpdateChecker(void) override;
 
   protected slots:
     void checkForUpdate(void);

@@ -89,7 +89,7 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
 
   protected:
     MythDisplay();
-    virtual ~MythDisplay();
+    ~MythDisplay() override;
 
     void            DebugModes         (void) const;
     void            SetWidget          (QWidget *MainWindow);

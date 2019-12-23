@@ -40,7 +40,7 @@ class RSSEditPopup : public MythScreenType
                  const QString &name = "RSSEditPopup")
         : MythScreenType(parent, name),
           m_urlText(std::move(url)), m_editing(edit) {}
-   ~RSSEditPopup();
+   ~RSSEditPopup() override;
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
@@ -89,7 +89,7 @@ class RSSEditor : public MythScreenType
   public:
     RSSEditor(MythScreenStack *parent, const QString &name = "RSSEditor")
         : MythScreenType(parent, name) {}
-   ~RSSEditor();
+   ~RSSEditor() override;
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType

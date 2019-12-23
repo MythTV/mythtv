@@ -11,7 +11,7 @@ class ExitPrompter : public QObject
 
   public:
     ExitPrompter() = default;
-   ~ExitPrompter() = default;
+   ~ExitPrompter() override = default;
 
   public slots:
     static void quit(void);

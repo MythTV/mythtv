@@ -15,7 +15,7 @@ class META_PUBLIC ImageSearchResultsDialog : public MythScreenType
     ImageSearchResultsDialog(MythScreenStack *lparent,
             ArtworkList list, const VideoArtworkType type);
 
-    ~ImageSearchResultsDialog();
+    ~ImageSearchResultsDialog() override;
 
     bool Create() override; // MythScreenType
     static void cleanCacheDir();

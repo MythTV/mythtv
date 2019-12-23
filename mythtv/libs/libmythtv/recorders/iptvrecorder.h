@@ -19,7 +19,7 @@ class IPTVRecorder : public DTVRecorder
 {
   public:
     IPTVRecorder(TVRec *rec, IPTVChannel *channel);
-    ~IPTVRecorder();
+    ~IPTVRecorder() override;
 
     bool Open(void);
     void Close(void);

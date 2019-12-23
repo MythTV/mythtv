@@ -51,7 +51,7 @@ class MHIContext : public MHContext, public QRunnable
 {
   public:
     explicit MHIContext(InteractiveTV *parent);
-    virtual ~MHIContext();
+    ~MHIContext() override;
 
     void QueueDSMCCPacket(unsigned char *data, int length, int componentTag,
         unsigned carouselId, int dataBroadcastId);
@@ -240,7 +240,7 @@ class MHIText : public MHTextDisplay
   public:
     explicit MHIText(MHIContext *parent)
         : m_parent(parent) {}
-    virtual ~MHIText() = default;
+    ~MHIText() override = default;
 
     void Draw(int x, int y) override; // MHTextDisplay
     void Clear(void) override; // MHTextDisplay
@@ -272,7 +272,7 @@ class MHIBitmap : public MHBitmapDisplay
 
   public:
     MHIBitmap(MHIContext *parent, bool tiled);
-    virtual ~MHIBitmap();
+    ~MHIBitmap() override;
 
     /// Create bitmap from PNG
     void CreateFromPNG(const unsigned char *data, int length) override; // MHBitmapDisplay

@@ -114,7 +114,7 @@ class DRMVideoSync : public VideoSync
 {
   public:
     DRMVideoSync(MythVideoOutput *vo, int refresh_interval);
-    ~DRMVideoSync();
+    ~DRMVideoSync() override;
 
     QString getName(void) const override // VideoSync
         { return QString("DRM"); }
@@ -144,7 +144,7 @@ class RTCVideoSync : public VideoSync
 {
   public:
     RTCVideoSync(MythVideoOutput *vo, int refresh_interval);
-    ~RTCVideoSync();
+    ~RTCVideoSync() override;
 
     QString getName(void) const override // VideoSync
         { return QString("RTC"); }
@@ -170,7 +170,7 @@ class BusyWaitVideoSync : public VideoSync
 {
   public:
     BusyWaitVideoSync(MythVideoOutput *vo, int ri) : VideoSync(vo, ri) {};
-    ~BusyWaitVideoSync() = default;
+    ~BusyWaitVideoSync() override = default;
 
     QString getName(void) const override // VideoSync
         { return QString("USleep with busy wait"); }
@@ -196,7 +196,7 @@ class USleepVideoSync : public VideoSync
 {
   public:
     USleepVideoSync(MythVideoOutput *vo, int ri) : VideoSync(vo, ri) {}
-    ~USleepVideoSync() = default;
+    ~USleepVideoSync() override = default;
 
     QString getName(void) const override // VideoSync
         { return QString("USleep"); }
@@ -208,7 +208,7 @@ class DummyVideoSync : public VideoSync
 {
   public:
     DummyVideoSync(MythVideoOutput* vo, int ri) : VideoSync(vo, ri) { }
-    ~DummyVideoSync() = default;
+    ~DummyVideoSync() override = default;
 
     QString getName(void) const override // VideoSync
         { return QString("Dummy"); }

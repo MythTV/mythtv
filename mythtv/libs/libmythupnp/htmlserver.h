@@ -34,7 +34,7 @@ class UPNP_PUBLIC HtmlServerExtension : public HttpServerExtension
     public:
                  HtmlServerExtension( const QString &sSharePath,
                                       const QString &sApplicationPrefix);
-        virtual ~HtmlServerExtension( ) = default;
+        ~HtmlServerExtension( ) override = default;
 
         // Special case, this extension is called if no other extension
         // processes the request.  

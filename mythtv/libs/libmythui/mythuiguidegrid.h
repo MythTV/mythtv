@@ -42,7 +42,7 @@ class MUI_PUBLIC MythUIGuideGrid : public MythUIType
 {
   public:
     MythUIGuideGrid(MythUIType *parent, const QString &name);
-    ~MythUIGuideGrid();
+    ~MythUIGuideGrid() override;
 
     void DrawSelf(MythPainter *p, int xoffset, int yoffset,
                   int alphaMod, QRect clipRect) override; // MythUIType

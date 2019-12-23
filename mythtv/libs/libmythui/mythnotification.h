@@ -79,7 +79,7 @@ class MUI_PUBLIC MythNotification : public MythEvent
         FromStringList();
     }
 
-    virtual ~MythNotification() = default;
+    ~MythNotification() override = default;
 
     MythEvent *clone(void) const override // MythEvent
         { return new MythNotification(*this); }

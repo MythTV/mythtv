@@ -24,7 +24,7 @@ class MPUBLIC LanguageSelection : public MythScreenType
 
   public:
     LanguageSelection(MythScreenStack *parent, bool exitOnFinish = false);
-   ~LanguageSelection(void);
+   ~LanguageSelection(void) override;
 
     /// Ask the user for the language to use. If a
     /// language was already specified at the last

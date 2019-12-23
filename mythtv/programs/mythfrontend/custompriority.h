@@ -17,7 +17,7 @@ class CustomPriority : public MythScreenType
   public:
     explicit CustomPriority(MythScreenStack *parent,
                             ProgramInfo *proginfo = nullptr);
-   ~CustomPriority();
+   ~CustomPriority() override;
 
     bool Create() override; // MythScreenType
 

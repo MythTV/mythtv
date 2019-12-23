@@ -24,7 +24,7 @@ class DVDThemeSelector : public MythScreenType
   public:
     DVDThemeSelector(MythScreenStack *parent, MythScreenType *destinationScreen,
                      ArchiveDestination archiveDestination, const QString& name);
-    ~DVDThemeSelector(void);
+    ~DVDThemeSelector(void) override;
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType

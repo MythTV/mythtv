@@ -24,7 +24,7 @@ class MythPlugin : public QLibrary
   public:
     MythPlugin(const QString &libname, QString plugname)
         : QLibrary(libname), m_plugName(std::move(plugname)) {}
-    virtual ~MythPlugin() = default;
+    ~MythPlugin() override = default;
 
     // This method will call the mythplugin_init() function of the library.
     int init(const char *libversion);

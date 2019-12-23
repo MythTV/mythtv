@@ -55,7 +55,7 @@ class UPnpSearchTask : public Task
 
         // Destructor protected to force use of Release Method
 
-        virtual ~UPnpSearchTask() = default;
+        ~UPnpSearchTask() override = default;
 
         void     ProcessDevice ( MSocketDevice *pSocket, UPnpDevice *pDevice );
         void     SendMsg       ( MSocketDevice  *pSocket,

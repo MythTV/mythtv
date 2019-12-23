@@ -35,7 +35,7 @@ public:
     explicit ZMEvents(MythScreenStack *parent)
         : MythScreenType(parent, "zmevents"),
           m_eventList(new std::vector<Event*>) {}
-    ~ZMEvents();
+    ~ZMEvents() override;
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType

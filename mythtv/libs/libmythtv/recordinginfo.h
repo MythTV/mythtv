@@ -205,7 +205,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
     void clear(void) override; // ProgramInfo
 
     // Destructor
-    virtual ~RecordingInfo();
+    ~RecordingInfo() override;
 
     // Serializers
     void SubstituteMatches(QString &str) override; // ProgramInfo

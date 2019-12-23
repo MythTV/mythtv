@@ -173,7 +173,7 @@ class SubtitleScreen : public MythScreenType
 {
 public:
     SubtitleScreen(MythPlayer *player, const char * name, int fontStretch);
-    virtual ~SubtitleScreen();
+    ~SubtitleScreen() override;
 
     void EnableSubtitles(int type, bool forced_only = false);
     void DisableForcedSubtitles(void);

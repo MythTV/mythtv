@@ -32,7 +32,7 @@ class MHVariable : public MHIngredient
 {
   public:
     MHVariable() = default;
-    virtual ~MHVariable() = default;
+    ~MHVariable() override = default;
 
     // Internal behaviours.
     void Activation(MHEngine *engine) override; // MHRoot

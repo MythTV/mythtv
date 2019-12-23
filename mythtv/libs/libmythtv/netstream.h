@@ -35,7 +35,7 @@ public:
     enum EMode { kNeverCache, kPreferCache, kAlwaysCache };
     NetStream(const QUrl &url, EMode mode = kPreferCache,
               QByteArray cert = QByteArray());
-    virtual ~NetStream();
+    ~NetStream() override;
 
 public:
     // RingBuffer interface
@@ -119,7 +119,7 @@ class NAMThread : public QThread
 
 public:
     static NAMThread & manager(); // Singleton
-    virtual ~NAMThread();
+    ~NAMThread() override;
 
     static inline void PostEvent(QEvent *e) { manager().Post(e); }
     void Post(QEvent *event);

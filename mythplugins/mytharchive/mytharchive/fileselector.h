@@ -48,7 +48,7 @@ class FileSelector : public MythScreenType
           m_filemask(std::move(filemask)),
           m_curDirectory(std::move(startDir)),
           m_archiveList(archiveList) {}
-    ~FileSelector();
+    ~FileSelector() override;
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *e) override; // MythScreenType

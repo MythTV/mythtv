@@ -24,7 +24,7 @@ class TFWWriteThread : public MThread
 {
   public:
     explicit TFWWriteThread(ThreadedFileWriter *p) : MThread("TFWWrite"), m_parent(p) {}
-    virtual ~TFWWriteThread() { wait(); m_parent = nullptr; }
+    ~TFWWriteThread() override { wait(); m_parent = nullptr; }
     void run(void) override; // MThread
   private:
     ThreadedFileWriter *m_parent {nullptr};
@@ -34,7 +34,7 @@ class TFWSyncThread : public MThread
 {
   public:
     explicit TFWSyncThread(ThreadedFileWriter *p) : MThread("TFWSync"), m_parent(p) {}
-    virtual ~TFWSyncThread() { wait(); m_parent = nullptr; }
+    ~TFWSyncThread() override { wait(); m_parent = nullptr; }
     void run(void) override; // MThread
   private:
     ThreadedFileWriter *m_parent {nullptr};

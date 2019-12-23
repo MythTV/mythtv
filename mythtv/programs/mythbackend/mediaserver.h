@@ -49,7 +49,7 @@ class MediaServer : public UPnp
         explicit MediaServer();
         void Init(bool bIsMaster, bool bDisableUPnp = false);
 
-        virtual ~MediaServer();
+        ~MediaServer() override;
 
         void     RegisterExtension  ( UPnpCDSExtension    *pExtension );
         void     UnregisterExtension( UPnpCDSExtension    *pExtension );

@@ -33,7 +33,7 @@ class MHParseBinary: public MHParseBase
   public:
     MHParseBinary(QByteArray &program)
         : m_data(program) {}
-    virtual ~MHParseBinary() = default;
+    ~MHParseBinary() override = default;
 
     // Parse the binary and return a pointer to the parse tree
     MHParseNode *Parse() override // MHParseBase

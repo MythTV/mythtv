@@ -62,7 +62,7 @@ class ProgramRecPriority : public ScheduleCommon
     Q_OBJECT
   public:
     ProgramRecPriority(MythScreenStack *parent, const QString &name);
-   ~ProgramRecPriority() = default;
+   ~ProgramRecPriority() override = default;
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType

@@ -24,7 +24,7 @@ class HDHRChannel : public DTVChannel
 
   public:
     HDHRChannel(TVRec *parent, QString device);
-    ~HDHRChannel(void);
+    ~HDHRChannel(void) override;
 
     bool Open(void) override; // ChannelBase
     void Close(void) override; // ChannelBase

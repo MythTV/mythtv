@@ -217,7 +217,7 @@ class DiSEqCDevSwitch : public DiSEqCDevDevice
 {
   public:
     DiSEqCDevSwitch(DiSEqCDevTree &tree, uint devid);
-    ~DiSEqCDevSwitch();
+    ~DiSEqCDevSwitch() override;
 
     // Commands
     void Reset(void) override; // DiSEqCDevDevice
@@ -297,7 +297,7 @@ class DiSEqCDevRotor : public DiSEqCDevDevice
   public:
     DiSEqCDevRotor(DiSEqCDevTree &tree, uint devid)
         : DiSEqCDevDevice(tree, devid) { DiSEqCDevRotor::Reset(); }
-    ~DiSEqCDevRotor();
+    ~DiSEqCDevRotor() override;
 
     // Commands
     void Reset(void) override; // DiSEqCDevDevice
@@ -377,7 +377,7 @@ class DiSEqCDevSCR : public DiSEqCDevDevice
   public:
     DiSEqCDevSCR(DiSEqCDevTree &tree, uint devid)
         : DiSEqCDevDevice(tree, devid) { DiSEqCDevSCR::Reset(); }
-    ~DiSEqCDevSCR();
+    ~DiSEqCDevSCR() override;
 
     // Commands
     void Reset(void) override; // DiSEqCDevDevice

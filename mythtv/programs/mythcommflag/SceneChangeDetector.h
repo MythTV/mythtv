@@ -42,7 +42,7 @@ public:
     using SceneChangeData = scenechange_data[UCHAR_MAX + 1];
 
   protected:
-    virtual ~SceneChangeDetector(void) = default;
+    ~SceneChangeDetector(void) override = default;
 
   private:
     HistogramAnalyzer       *m_histogramAnalyzer {nullptr};

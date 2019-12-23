@@ -99,7 +99,7 @@ class OutputStream : public QObject, public QScriptable
          OutputStream( QTextStream *pStream, QObject *parent = nullptr )
              : QObject( parent ), m_pTextStream( pStream )  {}
 
-         ~OutputStream() = default;
+         ~OutputStream() override = default;
 
     public slots:
 

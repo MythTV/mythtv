@@ -17,7 +17,7 @@ class MythPowerDBus : public MythPower
     static bool IsAvailable(void);
 
   public slots:
-    virtual void CancelFeature(void) override;
+    void CancelFeature(void) override;
     void Changed          (void);
     void DeviceAdded      (const QDBusObjectPath& Device);
     void DeviceRemoved    (const QDBusObjectPath& Device);

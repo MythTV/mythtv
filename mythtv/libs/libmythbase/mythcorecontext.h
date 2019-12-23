@@ -54,7 +54,7 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     Q_OBJECT
   public:
     MythCoreContext(const QString &binversion, QObject *guiContext);
-    virtual ~MythCoreContext();
+    ~MythCoreContext() override;
 
     bool Init(void);
 

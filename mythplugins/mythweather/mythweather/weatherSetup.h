@@ -44,7 +44,7 @@ class GlobalSetup : public MythScreenType
   public:
     GlobalSetup(MythScreenStack *parent, const QString &name)
         : MythScreenType(parent, name) {}
-    ~GlobalSetup() = default;
+    ~GlobalSetup() override = default;
 
     bool Create(void) override; // MythScreenType
 
@@ -67,7 +67,7 @@ class ScreenSetup : public MythScreenType
 
   public:
     ScreenSetup(MythScreenStack *parent, const QString &name, SourceManager *srcman);
-    ~ScreenSetup();
+    ~ScreenSetup() override;
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
@@ -101,7 +101,7 @@ class SourceSetup : public MythScreenType
 
   public:
     SourceSetup(MythScreenStack *parent, const QString &name);
-    ~SourceSetup();
+    ~SourceSetup() override;
 
     bool Create(void) override; // MythScreenType
 
@@ -139,7 +139,7 @@ class LocationDialog : public MythScreenType
     LocationDialog(MythScreenStack *parent, const QString &name,
                    MythScreenType *retScreen,
                    ScreenListInfo *si, SourceManager *srcman);
-    ~LocationDialog();
+    ~LocationDialog() override;
 
     bool Create(void) override; // MythScreenType
 

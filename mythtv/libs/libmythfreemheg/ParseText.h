@@ -33,7 +33,7 @@ class MHParseText: public MHParseBase
     MHParseText(QByteArray &program)
         : m_String((unsigned char *)malloc(100)),
           m_data(program) {}
-    virtual ~MHParseText();
+    ~MHParseText() override;
 
     // Parse the text and return a pointer to the parse tree
     MHParseNode *Parse() override; // MHParseBase

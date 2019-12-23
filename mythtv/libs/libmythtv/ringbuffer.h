@@ -59,7 +59,7 @@ class MTV_PUBLIC RingBuffer : protected MThread
                               bool usereadahead = true,
                               int timeout_ms = kDefaultOpenTimeout,
                               bool stream_only = false);
-    virtual ~RingBuffer() = 0;
+    ~RingBuffer() override = 0;
 
     // Sets
     void SetWriteBufferSize(int newSize);

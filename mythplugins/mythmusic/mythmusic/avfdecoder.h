@@ -18,7 +18,7 @@ class avfDecoder : public QObject, public Decoder
 
   public:
     avfDecoder(const QString &file, DecoderFactory *d, AudioOutput *o);
-    virtual ~avfDecoder(void);
+    ~avfDecoder(void) override;
 
     bool initialize() override; // Decoder
     double lengthInSeconds();

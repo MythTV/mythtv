@@ -11,7 +11,7 @@ class DummyDecoder : public DecoderBase
   public:
     DummyDecoder(MythPlayer *parent, const ProgramInfo &pginfo) :
         DecoderBase(parent, pginfo) {}
-    virtual ~DummyDecoder() = default;
+    ~DummyDecoder() override = default;
 
     // DecoderBase
     int         OpenFile(RingBuffer */*rbuffer*/, bool /*novideo*/, char */*testbuf*/, int /*testbufsize*/) override

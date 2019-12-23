@@ -18,7 +18,7 @@ class MUI_PUBLIC MythUICheckBox : public MythUIType
 
   public:
     MythUICheckBox(MythUIType *parent, const QString &name);
-   ~MythUICheckBox() = default;
+   ~MythUICheckBox() override = default;
 
     enum StateType { None = 0, Normal, Disabled, Active, Selected,
                      SelectedInactive };

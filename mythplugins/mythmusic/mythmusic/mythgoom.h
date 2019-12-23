@@ -10,7 +10,7 @@ class Goom : public VisualBase
 {
 public:
     Goom(void);
-    virtual ~Goom();
+    ~Goom() override;
 
     void resize(const QSize &size) override; // VisualBase
     bool process(VisualNode *node) override; // VisualBase

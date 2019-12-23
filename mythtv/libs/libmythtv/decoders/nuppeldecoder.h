@@ -34,7 +34,7 @@ class NuppelDecoder : public DecoderBase
 {
   public:
     NuppelDecoder(MythPlayer *parent, const ProgramInfo &pginfo);
-   ~NuppelDecoder();
+   ~NuppelDecoder() override;
 
     static bool CanHandle(char testbuf[kDecoderProbeBufferSize], 
                           int testbufsize = kDecoderProbeBufferSize);

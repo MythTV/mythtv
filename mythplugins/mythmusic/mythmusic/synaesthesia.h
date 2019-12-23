@@ -20,7 +20,7 @@ class Synaesthesia : public VisualBase
 {
 public:
     Synaesthesia(void);
-    virtual ~Synaesthesia();
+    ~Synaesthesia() override;
 
     void resize(const QSize &size) override; // VisualBase
     bool process(VisualNode *node) override; // VisualBase

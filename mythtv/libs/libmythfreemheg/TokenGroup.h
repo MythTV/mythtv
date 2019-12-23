@@ -102,7 +102,7 @@ class MHListGroup : public MHTokenGroup
 {
   public:
     MHListGroup() = default;
-    ~MHListGroup();
+    ~MHListGroup() override;
     const char *ClassName() override // MHTokenGroup
         { return "ListGroup"; }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHTokenGroup

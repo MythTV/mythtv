@@ -96,7 +96,7 @@ class ProfileBodyFull: public ProfileBody
 {
   public:
     ProfileBodyFull() = default;
-    virtual ~ProfileBodyFull() = default;
+    ~ProfileBodyFull() override = default;
     int Process(const unsigned char *data) override; // ProfileBody
     DSMCCCacheReference *GetReference() override // ProfileBody
         { return &m_objLoc.m_reference; }

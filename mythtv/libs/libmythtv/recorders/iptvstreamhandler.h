@@ -51,7 +51,7 @@ class IPTVStreamHandlerWriteHelper : QObject
 public:
     explicit IPTVStreamHandlerWriteHelper(IPTVStreamHandler *p)
         : m_parent(p) {}
-    ~IPTVStreamHandlerWriteHelper();
+    ~IPTVStreamHandlerWriteHelper() override;
 
     void Start(void)
     {

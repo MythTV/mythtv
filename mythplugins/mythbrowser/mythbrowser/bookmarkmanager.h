@@ -38,7 +38,7 @@ class BrowserConfig : public MythScreenType
 
     BrowserConfig(MythScreenStack *parent, const char *name = nullptr)
         : MythScreenType(parent, name) {}
-    ~BrowserConfig() = default;
+    ~BrowserConfig() override = default;
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
@@ -66,7 +66,7 @@ class BookmarkManager : public MythScreenType
   public:
     BookmarkManager(MythScreenStack *parent, const char *name)
         : MythScreenType(parent, name) {}
-    ~BookmarkManager();
+    ~BookmarkManager() override;
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType

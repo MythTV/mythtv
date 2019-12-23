@@ -17,7 +17,7 @@ class MTV_PUBLIC AVFormatWriter : public FileWriterBase
 {
   public:
     AVFormatWriter() = default;;
-   ~AVFormatWriter();
+   ~AVFormatWriter() override;
 
     bool Init(void) override; // FileWriterBase
     bool OpenFile(void) override; // FileWriterBase

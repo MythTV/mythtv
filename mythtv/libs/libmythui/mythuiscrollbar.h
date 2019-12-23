@@ -19,7 +19,7 @@ class MUI_PUBLIC MythUIScrollBar : public MythUIType
   public:
     MythUIScrollBar(MythUIType *parent, const QString &name)
         : MythUIType(parent, name) {}
-   ~MythUIScrollBar() = default;
+   ~MythUIScrollBar() override = default;
 
     void Reset(void) override; // MythUIType
 

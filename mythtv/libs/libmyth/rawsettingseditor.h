@@ -31,7 +31,7 @@ class MPUBLIC RawSettingsEditor : public MythScreenType
     RawSettingsEditor(MythScreenStack *parent, const char *name = nullptr);
 
     // Destructor
-   ~RawSettingsEditor() = default;
+   ~RawSettingsEditor() override = default;
 
     // MythScreenType overrides
     bool Create(void) override; // MythScreenType

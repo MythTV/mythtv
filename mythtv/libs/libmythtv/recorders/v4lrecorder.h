@@ -26,7 +26,7 @@ class MTV_PUBLIC V4LRecorder : public DTVRecorder
     friend class VBIThread;
   public:
     explicit V4LRecorder(TVRec *rec) : DTVRecorder(rec) {}
-    virtual ~V4LRecorder();
+    ~V4LRecorder() override;
 
     void StopRecording(void) override; // RecorderBase
     void SetOption(const QString &name, const QString &value) override; // DTVRecorder
@@ -67,7 +67,7 @@ class VBIThread : public MThread
         start();
     }
 
-    virtual ~VBIThread()
+    ~VBIThread() override
     {
         while (isRunning())
         {

@@ -13,7 +13,7 @@ class HLSStreamWorker : public MThread
 {
   public:
     explicit HLSStreamWorker(HLSReader* parent);
-    ~HLSStreamWorker(void);
+    ~HLSStreamWorker(void) override;
 
     void Cancel(void);
     void CancelCurrentDownload(void);

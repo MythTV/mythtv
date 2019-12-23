@@ -1003,7 +1003,7 @@ class MTV_PUBLIC SpliceInformationTable : public PSIPTable
         assert(TableID::SITscte == TableID());
         Parse();
     }
-    ~SpliceInformationTable() { ; }
+    ~SpliceInformationTable() override { ; }
 
     void setSCTEPID(int ts_pid){m_sctePid = ts_pid;}
     int getSCTEPID(void) const {return m_sctePid;}

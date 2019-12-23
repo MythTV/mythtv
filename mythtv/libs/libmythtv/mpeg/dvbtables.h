@@ -33,7 +33,7 @@ class MTV_PUBLIC NetworkInformationTable : public PSIPTable
         assert(TableID::NIT == TableID() || TableID::NITo == TableID());
         Parse();
     }
-    ~NetworkInformationTable() { ; }
+    ~NetworkInformationTable() override { ; }
 
     // table_id                 8   0.0       0x40/0x41
     // section_syntax_indicator 1   1.0          1
@@ -112,7 +112,7 @@ class MTV_PUBLIC ServiceDescriptionTable : public PSIPTable
         assert(TableID::SDT == TableID() || TableID::SDTo == TableID());
         Parse();
     }
-    ~ServiceDescriptionTable() { ; }
+    ~ServiceDescriptionTable() override { ; }
 
     // table_id                 8   0.0       0x42/0x46
     // section_syntax_indicator 1   1.0          1
@@ -184,7 +184,7 @@ class MTV_PUBLIC BouquetAssociationTable : public PSIPTable
        assert(TableID::BAT == TableID());
        Parse();
     }
-    ~BouquetAssociationTable() { ; }
+    ~BouquetAssociationTable() override { ; }
 
     // table_id                 8   0.0       0x4a
     // section_syntax_indicator 1   1.0          1
@@ -378,7 +378,7 @@ class MTV_PUBLIC TimeDateTable : public PSIPTable
     {
         assert(TableID::TDT == TableID());
     }
-    ~TimeDateTable() { ; }
+    ~TimeDateTable() override { ; }
 
     // table_id                 8   0.0       0x70
     // section_syntax_indicator 1   1.0          0

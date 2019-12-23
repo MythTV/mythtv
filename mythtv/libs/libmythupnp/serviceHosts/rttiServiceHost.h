@@ -51,7 +51,7 @@ class RttiServiceHost : public ServiceHost
         {
         }
 
-        virtual ~RttiServiceHost() = default;
+        ~RttiServiceHost() override = default;
 };
 
 #endif

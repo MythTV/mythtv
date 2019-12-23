@@ -35,7 +35,7 @@ class DTVChannel : public ChannelBase
 {
   public:
     explicit DTVChannel(TVRec *parent) : ChannelBase(parent) {}
-    virtual ~DTVChannel();
+    ~DTVChannel() override;
 
     // Commands
     bool SetChannelByString(const QString &chan) override; // ChannelBase

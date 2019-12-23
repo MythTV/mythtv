@@ -32,7 +32,7 @@ class PlaybackBoxHelper : public MThread
 
   public:
     explicit PlaybackBoxHelper(QObject *listener);
-    ~PlaybackBoxHelper(void);
+    ~PlaybackBoxHelper(void) override;
 
     void ForceFreeSpaceUpdate(void);
     void StopRecording(const ProgramInfo &pginfo);

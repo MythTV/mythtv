@@ -47,7 +47,7 @@ class FileTransfer : public ReferenceCounter
     void SetTimeout(bool fast);
 
   private:
-   ~FileTransfer();
+   ~FileTransfer() override;
 
     volatile bool   m_readthreadlive    {true};
     bool            m_readsLocked       {false};

@@ -24,7 +24,7 @@ class LogoDetectorBase : public QObject
                             float debugValue = 0.0);
 
   protected:
-    virtual ~LogoDetectorBase() = default;
+    ~LogoDetectorBase() override = default;
 
   protected:
     bool m_foundLogo {false};

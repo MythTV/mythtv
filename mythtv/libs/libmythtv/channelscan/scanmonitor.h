@@ -76,7 +76,7 @@ class ScanMonitor :
     void StatusRotorPosition(const SignalMonitorValue &val) override; // DVBSignalMonitorListener
 
   private:
-    ~ScanMonitor() = default;
+    ~ScanMonitor() override = default;
 
     ChannelScanner *m_channelScanner {nullptr};
 };
@@ -117,7 +117,7 @@ class ScannerEvent : public QEvent
     static Type SetStatusChannelTuned;
 
   private:
-    ~ScannerEvent() = default;
+    ~ScannerEvent() override = default;
 
   private:
     QString       m_str;

@@ -26,7 +26,7 @@ class NetworkControlClient : public QObject
     Q_OBJECT
   public:
     explicit NetworkControlClient(QTcpSocket *s);
-   ~NetworkControlClient();
+   ~NetworkControlClient() override;
 
     QTcpSocket  *getSocket()     { return m_socket; }
     QTextStream *getTextStream() { return m_textStream; }
@@ -96,7 +96,7 @@ class NetworkControl : public ServerPool, public QRunnable
 
   public:
     NetworkControl();
-    ~NetworkControl();
+    ~NetworkControl() override;
 
   private slots:
     void newConnection(QTcpSocket *client);

@@ -15,7 +15,7 @@ class MythVAAPIInteropDRM : public MythVAAPIInterop, public MythEGLDMABUF
     ~MythVAAPIInteropDRM() override;
     vector<MythVideoTexture*> Acquire(MythRenderOpenGL *Context,
                                       VideoColourSpace *ColourSpace,
-                                      VideoFrame *Frame,FrameScanType Scan) final override;
+                                      VideoFrame *Frame,FrameScanType Scan) final;
     static bool    IsSupported(MythRenderOpenGL *Context);
     void           DeleteTextures(void) override;
 

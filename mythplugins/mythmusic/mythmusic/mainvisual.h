@@ -36,7 +36,7 @@ class MainVisual :  public QObject, public MythTV::Visual
 
   public:
     explicit MainVisual(MythUIVideo *visualizer);
-    virtual ~MainVisual();
+    ~MainVisual() override;
 
     VisualBase *visual(void) const { return m_vis; }
     void setVisual(const QString &name);

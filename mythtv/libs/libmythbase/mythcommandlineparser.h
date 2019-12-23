@@ -22,7 +22,7 @@ class MBASE_PUBLIC CommandLineArg : public ReferenceCounter
                    QString help, QString longhelp);
     CommandLineArg(const QString& name, QVariant::Type type, QVariant def);
     explicit CommandLineArg(const QString& name);
-   ~CommandLineArg() = default;
+   ~CommandLineArg() override = default;
 
     CommandLineArg* SetGroup(const QString &group)    { m_group = group;
                                                       return this; }

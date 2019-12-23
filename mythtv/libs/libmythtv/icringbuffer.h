@@ -11,7 +11,7 @@ class ICRingBuffer : public RingBuffer
     static enum RingBufferType const kRingBufferType = kRingBuffer_MHEG;
 
     ICRingBuffer(const QString &url, RingBuffer *parent = nullptr);
-    virtual ~ICRingBuffer();
+    ~ICRingBuffer() override;
 
     // RingBuffer implementation
     bool IsOpen(void) const override; // RingBuffer

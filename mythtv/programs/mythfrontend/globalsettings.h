@@ -159,7 +159,7 @@ class HostRefreshRateComboBoxSetting : public HostComboBoxSetting
   public:
     explicit HostRefreshRateComboBoxSetting(const QString &name) :
         HostComboBoxSetting(name) { }
-    virtual ~HostRefreshRateComboBoxSetting() = default;
+    ~HostRefreshRateComboBoxSetting() override = default;
 
   public slots:
 #if defined(USING_XRANDR) || CONFIG_DARWIN
@@ -259,7 +259,7 @@ class PlaybackProfileConfig : public GroupSetting
 
   public:
     PlaybackProfileConfig(QString profilename, StandardSetting *parent);
-    virtual ~PlaybackProfileConfig() = default;
+    ~PlaybackProfileConfig() override = default;
 
     void Save(void) override; // StandardSetting
 

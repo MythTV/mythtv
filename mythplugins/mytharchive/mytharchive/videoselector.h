@@ -42,7 +42,7 @@ class VideoSelector : public MythScreenType
   public:
     VideoSelector(MythScreenStack *parent, QList<ArchiveItem *> *archiveList);
 
-    ~VideoSelector(void);
+    ~VideoSelector(void) override;
 
     bool Create() override; // MythScreenType
     bool keyPressEvent(QKeyEvent *e) override; // MythScreenType

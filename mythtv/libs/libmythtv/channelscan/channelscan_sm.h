@@ -95,7 +95,7 @@ class ChannelScanSM : public MPEGStreamListener,
                   const QString &_cardtype, ChannelBase* _channel, int _sourceID,
                   uint signal_timeout, uint channel_timeout,
                   QString _inputname, bool test_decryption);
-    ~ChannelScanSM();
+    ~ChannelScanSM() override;
 
     void StartScanner(void);
     void StopScanner(void);

@@ -20,7 +20,7 @@ class StatusBox : public MythScreenType
     Q_OBJECT
   public:
     explicit StatusBox(MythScreenStack *parent);
-   ~StatusBox(void);
+   ~StatusBox(void) override;
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType

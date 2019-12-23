@@ -21,7 +21,7 @@ class ExternalChannel : public DTVChannel
     ExternalChannel(TVRec *parent, QString  device)
         : DTVChannel(parent), m_device(std::move(device)),
           m_loc(ExternalChannel::GetDevice()) {}
-    ~ExternalChannel(void);
+    ~ExternalChannel(void) override;
 
     // Commands
     bool Open(void) override; // ChannelBase

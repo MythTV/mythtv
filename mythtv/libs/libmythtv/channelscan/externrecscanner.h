@@ -26,7 +26,7 @@ class ExternRecChannelScanner : public QRunnable
   public:
     ExternRecChannelScanner(uint cardid, QString inputname, uint sourceid,
                             ScanMonitor *monitor = nullptr);
-    ~ExternRecChannelScanner();
+    ~ExternRecChannelScanner() override;
 
     void Scan(void);
     void Stop(void);

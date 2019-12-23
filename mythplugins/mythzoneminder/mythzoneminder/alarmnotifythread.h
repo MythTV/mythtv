@@ -17,7 +17,7 @@ class AlarmNotifyThread : public MThread
     static AlarmNotifyThread *m_alarmNotifyThread;
 
   public:
-    ~AlarmNotifyThread(void);
+    ~AlarmNotifyThread(void) override;
 
     static AlarmNotifyThread *get(void);
     void stop(void);

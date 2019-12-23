@@ -180,7 +180,7 @@ private:
   cLlCiHandler(const cLlCiHandler &) = delete;            // not copyable
   cLlCiHandler &operator=(const cLlCiHandler &) = delete; // not copyable
 public:
-  virtual ~cLlCiHandler();
+  ~cLlCiHandler() override;
   int NumSlots(void) override // cCiHandler
       { return m_numSlots; }
   bool Process(void) override; // cCiHandler
@@ -213,7 +213,7 @@ class cHlCiHandler : public cCiHandler {
     int GetData(unsigned tag, struct ca_msg *msg);
     int SendData(unsigned tag, struct ca_msg *msg);
   public:
-    virtual ~cHlCiHandler();
+    ~cHlCiHandler() override;
     int NumSlots(void) override // cCiHandler
         { return m_numSlots; }
     bool Process(void) override; // cCiHandler

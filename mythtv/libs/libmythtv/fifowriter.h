@@ -18,7 +18,7 @@ class FIFOThread : public MThread
 {
   public:
     FIFOThread() : MThread("FIFOThread") {}
-    virtual ~FIFOThread() { wait(); m_parent = nullptr; m_id = -1; }
+    ~FIFOThread() override { wait(); m_parent = nullptr; m_id = -1; }
     void SetId(int id) { m_id = id; }
     void SetParent(FIFOWriter *parent) { m_parent = parent; }
     void run(void) override; // MThread

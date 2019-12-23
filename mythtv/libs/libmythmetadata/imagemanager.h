@@ -324,7 +324,7 @@ class META_PUBLIC ImageDbLocal : public ImageDb<ImageAdapterLocal>
 {
 protected:
     ImageDbLocal();
-    ~ImageDbLocal()          { DropTable(); }
+    ~ImageDbLocal() override          { DropTable(); }
     bool CreateTable();
     bool m_DbExists { false };
 
@@ -357,7 +357,7 @@ protected:
         m_thumbGen(new ImageThumb<DBFS>(this)),
         m_scanner(new ImageScanThread<DBFS>(this, m_thumbGen)) {}
 
-    ~ImageHandler()
+    ~ImageHandler() override
     {
         delete m_scanner;
         delete m_thumbGen;
@@ -400,7 +400,7 @@ protected:
 class META_PUBLIC ImageDbReader : protected ImageHandler<ImageDbLocal>
 {
 public:
-    ~ImageDbReader() { delete m_remote; }
+    ~ImageDbReader() override { delete m_remote; }
 
     int  GetType()        { return m_showType; }
     bool GetVisibility()  { return m_showHidden; }

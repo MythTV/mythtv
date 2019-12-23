@@ -24,7 +24,7 @@ class EditMetadataCommon : public MythScreenType
     EditMetadataCommon(MythScreenStack *parent, const QString &name)
         : MythScreenType(parent, name) {}
 
-    ~EditMetadataCommon(void);
+    ~EditMetadataCommon(void) override;
 
     bool CreateCommon(void);
 
@@ -64,7 +64,7 @@ class EditMetadataDialog : public EditMetadataCommon
   public:
     EditMetadataDialog(MythScreenStack *parent, MusicMetadata *source_metadata);
     explicit EditMetadataDialog(MythScreenStack *parent);
-    ~EditMetadataDialog(void);
+    ~EditMetadataDialog(void) override;
 
     bool Create(void) override; // MythScreenType
 
@@ -145,7 +145,7 @@ class EditAlbumartDialog : public EditMetadataCommon
 
   public:
     explicit EditAlbumartDialog(MythScreenStack *parent);
-    ~EditAlbumartDialog();
+    ~EditAlbumartDialog() override;
 
     bool Create(void) override; // MythScreenType
 

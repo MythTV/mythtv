@@ -108,7 +108,7 @@ class NewsSite : public QObject
     QString  errorMsg(void) const;
 
   private:
-    ~NewsSite();
+    ~NewsSite() override;
 
     mutable QMutex m_lock {QMutex::Recursive};
     QString    m_name;

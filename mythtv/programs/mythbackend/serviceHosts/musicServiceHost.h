@@ -34,7 +34,7 @@ class MusicServiceHost : public ServiceHost
         {
         }
 
-        virtual ~MusicServiceHost() = default;
+        ~MusicServiceHost() override = default;
 };
 
 #endif

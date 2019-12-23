@@ -148,7 +148,7 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
     MythUIButtonList(MythUIType *parent, const QString &name,
                    const QRect &area, bool showArrow = true,
                    bool showScrollBar = false);
-    ~MythUIButtonList();
+    ~MythUIButtonList() override;
 
     bool keyPressEvent(QKeyEvent *event) override; // MythUIType
     bool gestureEvent(MythGestureEvent *event) override; // MythUIType
@@ -356,7 +356,7 @@ class MUI_PUBLIC SearchButtonListDialog : public MythScreenType
                            MythUIButtonList *parentList, QString searchText)
         : MythScreenType(parent, name, false),
           m_parentList(parentList), m_searchText(std::move(searchText)) {}
-    ~SearchButtonListDialog(void) = default;
+    ~SearchButtonListDialog(void) override = default;
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType

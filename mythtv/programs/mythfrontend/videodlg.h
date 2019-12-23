@@ -50,7 +50,7 @@ class VideoDialog : public MythScreenType
     VideoDialog(MythScreenStack *lparent, const QString& lname,
             const VideoListPtr& video_list, DialogType type,
             BrowseType browse);
-    ~VideoDialog();
+    ~VideoDialog() override;
 
     bool Create() override; // MythScreenType
     bool keyPressEvent(QKeyEvent *levent) override; // MythScreenType
@@ -220,7 +220,7 @@ class VideoListDeathDelay : public QObject
 
   public:
     explicit VideoListDeathDelay(const VideoDialog::VideoListPtr& toSave);
-    ~VideoListDeathDelay();
+    ~VideoListDeathDelay() override;
 
     VideoDialog::VideoListPtr GetSaved();
     // When exiting MythVideo, we delay destroying the data for kDelayTimeMS

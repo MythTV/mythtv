@@ -87,7 +87,7 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
 {
   public:
     MPEGStreamData(int desiredProgram, int cardnum, bool cacheTables);
-    virtual ~MPEGStreamData();
+    ~MPEGStreamData() override;
 
     void SetCaching(bool cacheTables) { m_cacheTables = cacheTables; }
     void SetListeningDisabled(bool lt) { m_listeningDisabled = lt; }

@@ -572,7 +572,7 @@ class DVBConfigurationGroup : public GroupSetting
 
   public:
     DVBConfigurationGroup(CaptureCard& a_parent, CardType& cardType);
-    ~DVBConfigurationGroup();
+    ~DVBConfigurationGroup() override;
 
     void Load(void) override; // StandardSetting
 
@@ -799,7 +799,7 @@ class CardInput : public GroupSetting
   public:
     CardInput(const QString & cardtype, const QString & device,
               int cardid);
-    ~CardInput();
+    ~CardInput() override;
 
     int getInputID(void) const { return m_id->intValue(); };
 

@@ -151,7 +151,7 @@ class MUI_PUBLIC MythDialogBox : public MythScreenType
                    bool fullscreen = false, bool osd = false)
         : MythScreenType(parent, name, false), m_fullscreen(fullscreen),
           m_osdDialog(osd), m_menu(menu), m_currentMenu(menu) {}
-    ~MythDialogBox(void);
+    ~MythDialogBox(void) override;
 
     bool Create(void) override; // MythScreenType
 

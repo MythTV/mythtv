@@ -22,7 +22,7 @@ class META_PUBLIC MetaIOFLACVorbis : public MetaIOTagLib
 {
 public:
     MetaIOFLACVorbis(void) = default;
-    virtual ~MetaIOFLACVorbis(void) = default;
+    ~MetaIOFLACVorbis(void) override = default;
 
     bool write(const QString &filename, MusicMetadata* mdata) override; // MetaIOTagLib
     bool writeAlbumArt(const QString &filename, const AlbumArtImage *albumart) override; // MetaIO

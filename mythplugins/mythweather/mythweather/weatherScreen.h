@@ -29,7 +29,7 @@ class WeatherScreen : public MythScreenType
 
   public:
     WeatherScreen(MythScreenStack *parent, ScreenListInfo *screenDefn, int id);
-    ~WeatherScreen() = default;
+    ~WeatherScreen() override = default;
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType

@@ -36,7 +36,7 @@ class CustomEventRelayer : public QObject
         { m_fp(e); }
 
   protected:
-    virtual ~CustomEventRelayer() = default;
+    ~CustomEventRelayer() override = default;
 
   private:
     void (*m_fp)(QEvent*);

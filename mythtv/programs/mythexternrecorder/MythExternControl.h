@@ -41,7 +41,7 @@ class Buffer : QObject
     enum constants {MAX_QUEUE = 500};
 
     Buffer(MythExternControl * parent);
-    ~Buffer(void) = default;
+    ~Buffer(void) override = default;
     void Start(void) {
         m_thread = std::thread(&Buffer::Run, this);
     }
@@ -78,7 +78,7 @@ class Commands : public QObject
     Commands(MythExternControl * parent)
         : m_parent(parent)
         , m_apiVersion(-1) {}
-    ~Commands(void) = default;
+    ~Commands(void) override = default;
     void Start(void) {
         m_thread = std::thread(&Commands::Run, this);
     }
@@ -123,7 +123,7 @@ class MythExternControl : public QObject
 
   public:
     MythExternControl(void);
-    ~MythExternControl(void);
+    ~MythExternControl(void) override;
 
     QString Desc(void) const { return QString("%1: ").arg(m_desc); }
 

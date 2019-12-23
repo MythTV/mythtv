@@ -24,7 +24,7 @@ class MythNews : public MythScreenType
 
   public:
     MythNews(MythScreenStack *parent, const QString &name);
-    ~MythNews();
+    ~MythNews() override;
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType

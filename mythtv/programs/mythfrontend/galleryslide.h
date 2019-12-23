@@ -92,7 +92,7 @@ class GroupAnimation : public AbstractAnimation
 {
 public:
     GroupAnimation() : AbstractAnimation()            {}
-    virtual ~GroupAnimation()                         { GroupAnimation::Clear(); }
+    ~GroupAnimation() override                        { GroupAnimation::Clear(); }
     void Pulse(int interval) override                     = 0; // AbstractAnimation
     void Start(bool forwards, float speed = 1.0) override      // AbstractAnimation
         { AbstractAnimation::Start(forwards, speed); }
@@ -159,7 +159,7 @@ class Slide : public MythUIImage
     Q_OBJECT
 public:
     Slide(MythUIType *parent, const QString& name, MythUIImage *image);
-    ~Slide();
+    ~Slide() override;
 
     void      Clear();
     bool      LoadSlide(const ImagePtrK& im, int direction = 0, bool notifyCompletion = false);
@@ -218,7 +218,7 @@ class SlideBuffer : public QObject
     Q_OBJECT
 public:
     SlideBuffer() = default;
-    ~SlideBuffer();
+    ~SlideBuffer() override;
 
     void   Initialise(MythUIImage &image);
     void   Teardown();

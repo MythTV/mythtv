@@ -30,7 +30,7 @@ class Transition : public QObject
     Q_OBJECT
 public:
     explicit Transition(const QString& name);
-    virtual ~Transition()              = default;
+    ~Transition() override = default;
 
     virtual void Start(Slide &from, Slide &to, bool forwards, float speed = 1.0);
     virtual void SetSpeed(float /*speed*/) {}
@@ -85,7 +85,7 @@ class GroupTransition : public Transition
 {
 public:
     GroupTransition(GroupAnimation *animation, const QString& name);
-    virtual ~GroupTransition();
+    ~GroupTransition() override;
     void Start(Slide &from, Slide &to,
                bool forwards, float speed = 1.0) override; // Transition
     void SetSpeed(float speed) override; // Transition

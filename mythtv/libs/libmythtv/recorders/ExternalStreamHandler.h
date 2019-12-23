@@ -72,7 +72,7 @@ class ExternalStreamHandler : public StreamHandler
   public:
     explicit ExternalStreamHandler(const QString & path, int inputid,
                                    int majorid);
-    ~ExternalStreamHandler(void) { CloseApp(); }
+    ~ExternalStreamHandler(void) override { CloseApp(); }
 
     void run(void) override; // MThread
     void PriorityEvent(int fd) override; // DeviceReaderCB

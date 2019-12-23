@@ -120,7 +120,7 @@ class StereoScope : public VisualBase
 {
   public:
     StereoScope();
-    virtual ~StereoScope() = default;
+    ~StereoScope() override = default;
 
     void resize( const QSize &size ) override; // VisualBase
     bool process( VisualNode *node ) override; // VisualBase
@@ -141,7 +141,7 @@ class MonoScope : public StereoScope
 {
   public:
     MonoScope() = default;
-    virtual ~MonoScope() = default;
+    ~MonoScope() override = default;
 
     bool process( VisualNode *node ) override; // StereoScope
     bool draw( QPainter *p, const QColor &back ) override; // StereoScope
@@ -176,7 +176,7 @@ class Spectrum : public VisualBase
     
   public:
     Spectrum();
-    virtual ~Spectrum();
+    ~Spectrum() override;
 
     void resize(const QSize &size) override; // VisualBase
     bool process(VisualNode *node) override; // VisualBase
@@ -212,7 +212,7 @@ class Squares : public Spectrum
 {
   public:
     Squares();
-    virtual ~Squares() = default;
+    ~Squares() override = default;
 
     void resize (const QSize &newsize) override; // Spectrum
     bool draw(QPainter *p, const QColor &back = Qt::black) override; // Spectrum
@@ -260,7 +260,7 @@ struct piano_key_data {
 
   public:
     Piano();
-    virtual ~Piano();
+    ~Piano() override;
 
     void resize(const QSize &size) override; // VisualBase
 
@@ -301,7 +301,7 @@ class AlbumArt : public VisualBase
 
   public:
     AlbumArt(void);
-    virtual ~AlbumArt() = default;
+    ~AlbumArt() override = default;
 
     void resize(const QSize &size) override; // VisualBase
     bool process(VisualNode *node = nullptr) override; // VisualBase
@@ -327,7 +327,7 @@ class Blank : public VisualBase
     // This draws ... well ... nothing    
   public:
     Blank();
-    virtual ~Blank() = default;
+    ~Blank() override = default;
 
     void resize(const QSize &size) override; // VisualBase
     bool process(VisualNode *node = nullptr) override; // VisualBase

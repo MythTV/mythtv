@@ -8,7 +8,7 @@ class VideoVisualGoom : public VideoVisual
 {
   public:
     VideoVisualGoom(AudioPlayer *audio, MythRender *render, bool hd);
-    virtual ~VideoVisualGoom() override;
+    ~VideoVisualGoom() override;
 
     // VideoVisual
     void Draw(const QRect &area, MythPainter *painter, QPaintDevice* device) override;

@@ -74,7 +74,7 @@ class MBASE_PUBLIC MythSystemLegacy : public QObject
     MythSystemLegacy(const QString &command, uint flags, QObject *parent = nullptr);
     MythSystemLegacy(const QString &command, const QStringList &args, uint flags,
                      QObject *parent = nullptr);
-    ~MythSystemLegacy(void);
+    ~MythSystemLegacy(void) override;
 
     // FIXME: We should not allow a MythSystemLegacy to be reused for a new command.
     void SetCommand(const QString &command, uint flags);

@@ -29,7 +29,7 @@ class MPUBLIC SchemaUpgradeWizard : public QObject, public DBUtil
   public:
     SchemaUpgradeWizard(QString DBSchemaSetting, QString appName,
                         QString upgradeSchemaVal);
-    ~SchemaUpgradeWizard();
+    ~SchemaUpgradeWizard() override;
 
 
     /// Call DBUtil::BackupDB(), and store results

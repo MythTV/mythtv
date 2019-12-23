@@ -59,7 +59,7 @@ class ZMConsole : public MythScreenType
 
   public:
     explicit ZMConsole(MythScreenStack *parent);
-    ~ZMConsole();
+    ~ZMConsole() override;
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType

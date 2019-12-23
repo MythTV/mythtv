@@ -15,7 +15,7 @@ class Transcode : public QObject
 {
   public:
     explicit Transcode(ProgramInfo *pginfo);
-    ~Transcode();
+    ~Transcode() override;
     int TranscodeFile(
         const QString &inputname,
         const QString &outputname,

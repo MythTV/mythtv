@@ -25,7 +25,7 @@ class HTTPTSStreamHandler : public IPTVStreamHandler
 
 protected:
     explicit HTTPTSStreamHandler(const IPTVTuningData &tuning, int inputid);
-    virtual ~HTTPTSStreamHandler(void);
+    ~HTTPTSStreamHandler(void) override;
     void run(void) override; // MThread
 
   protected:

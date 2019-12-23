@@ -34,7 +34,7 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     MythUIText(const QString &text, const MythFontProperties &font,
                QRect displayRect, QRect altDisplayRect,
                MythUIType *parent, const QString &name);
-    ~MythUIText();
+    ~MythUIText() override;
 
     void Reset(void) override; // MythUIType
     void ResetMap(const InfoMap &map);

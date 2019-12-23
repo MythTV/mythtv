@@ -50,7 +50,7 @@ class BackendSelection : public MythScreenType
 
     BackendSelection(MythScreenStack *parent, DatabaseParams *params,
                      Configuration *pConfig, bool exitOnFinish = false);
-    virtual ~BackendSelection();
+    ~BackendSelection() override;
 
     bool Create(void) override; // MythScreenType
     void Close(void) override; // MythScreenType

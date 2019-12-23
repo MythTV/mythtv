@@ -24,7 +24,7 @@ class VideoSetupWizard : public MythScreenType
 
     VideoSetupWizard(MythScreenStack *parent, MythScreenType *general,
                      MythScreenType *audio, const char *name = nullptr);
-    ~VideoSetupWizard();
+    ~VideoSetupWizard() override;
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType

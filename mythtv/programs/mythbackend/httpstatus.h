@@ -83,7 +83,7 @@ class HttpStatus : public HttpServerExtension
     public:
                  HttpStatus( QMap<int, EncoderLink *> *tvList, Scheduler *sched,
                              AutoExpire *expirer, bool bIsMaster );
-        virtual ~HttpStatus() = default;
+        ~HttpStatus() override = default;
 
         void     SetMainServer(MainServer *mainServer)
                     { m_pMainServer = mainServer; }

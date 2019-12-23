@@ -41,7 +41,7 @@ class MPUBLIC MythTerminal : public MythScreenType
     void ProcessFinished(int exitCode, QProcess::ExitStatus exitStatus);
 
   protected:
-    virtual ~MythTerminal() { TeardownAll(); }
+    ~MythTerminal() override { TeardownAll(); }
     void TeardownAll(void);
 
     mutable QMutex         m_lock        {QMutex::Recursive};

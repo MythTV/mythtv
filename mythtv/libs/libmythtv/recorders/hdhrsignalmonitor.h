@@ -15,7 +15,7 @@ class HDHRSignalMonitor: public DTVSignalMonitor
   public:
     HDHRSignalMonitor(int db_cardnum, HDHRChannel* _channel,
                       bool _release_stream, uint64_t _flags = 0);
-    virtual ~HDHRSignalMonitor();
+    ~HDHRSignalMonitor() override;
 
     void Stop(void) override; // SignalMonitor
 

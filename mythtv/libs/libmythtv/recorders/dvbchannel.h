@@ -30,7 +30,7 @@ class DVBChannel : public DTVChannel
 {
   public:
     DVBChannel(QString device, TVRec *parent = nullptr);
-    ~DVBChannel();
+    ~DVBChannel() override;
 
     bool Open(void) override // ChannelBase
         { return Open(this); }

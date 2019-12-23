@@ -14,7 +14,7 @@ class MythQtPainter : public MythPainter
 {
   public:
     MythQtPainter() : MythPainter() {}
-   ~MythQtPainter();
+   ~MythQtPainter() override;
 
     QString GetName(void) override // MythPainter
         { return QString("Qt"); }

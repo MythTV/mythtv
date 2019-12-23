@@ -14,7 +14,7 @@ class MUI_PUBLIC MythUIProgressBar : public MythUIType
   public:
     MythUIProgressBar(MythUIType *parent, const QString &name)
         : MythUIType(parent, name) {}
-   ~MythUIProgressBar() = default;
+   ~MythUIProgressBar() override = default;
 
     void Reset(void) override; // MythUIType
 

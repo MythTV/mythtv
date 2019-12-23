@@ -99,7 +99,7 @@ class MTV_PUBLIC PreviewGeneratorQueue : public QObject, public MThread
   private:
     PreviewGeneratorQueue(PreviewGenerator::Mode mode,
                           uint maxAttempts, uint minBlockSeconds);
-    ~PreviewGeneratorQueue();
+    ~PreviewGeneratorQueue() override;
 
     QString GeneratePreviewImage(ProgramInfo &pginfo, const QSize &size,
                                  const QString &outputfile,

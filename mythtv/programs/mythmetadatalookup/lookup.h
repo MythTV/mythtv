@@ -11,7 +11,7 @@ class LookerUpper : public QObject
 {
   public:
     LookerUpper();
-    ~LookerUpper();
+    ~LookerUpper() override;
 
     static bool AllOK() { return MetadataFactory::VideoGrabbersFunctional(); };
 

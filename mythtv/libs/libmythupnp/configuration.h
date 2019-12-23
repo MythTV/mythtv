@@ -65,7 +65,7 @@ class UPNP_PUBLIC XmlConfiguration : public Configuration
 
         explicit XmlConfiguration( const QString &sFileName );
 
-        virtual ~XmlConfiguration() = default;
+        ~XmlConfiguration() override = default;
 
         bool    Load    ( void ) override; // Configuration
         bool    Save    ( void ) override; // Configuration
@@ -92,7 +92,7 @@ class UPNP_PUBLIC DBConfiguration : public Configuration
 
         DBConfiguration() = default;
 
-        virtual ~DBConfiguration() = default;
+        ~DBConfiguration() override = default;
 
         bool    Load    ( void ) override; // Configuration
         bool    Save    ( void ) override; // Configuration

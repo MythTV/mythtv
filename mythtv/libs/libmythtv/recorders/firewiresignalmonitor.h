@@ -25,7 +25,7 @@ class FirewireTableMonitorThread : public MThread
   public:
     explicit FirewireTableMonitorThread(FirewireSignalMonitor *p) :
         MThread("FirewireTableMonitor"), m_parent(p) { start(); }
-    virtual ~FirewireTableMonitorThread() { wait(); m_parent = nullptr; }
+    ~FirewireTableMonitorThread() override { wait(); m_parent = nullptr; }
     void run(void) override; // MThread
   private:
     FirewireSignalMonitor *m_parent;
@@ -47,7 +47,7 @@ class FirewireSignalMonitor : public DTVSignalMonitor, public TSDataListener
   protected:
     FirewireSignalMonitor(void);
     FirewireSignalMonitor(const FirewireSignalMonitor&);
-    virtual ~FirewireSignalMonitor();
+    ~FirewireSignalMonitor() override;
 
     void UpdateValues(void) override; // SignalMonitor
 

@@ -33,7 +33,7 @@ class MythSystemLegacyIOHandler: public MThread
         explicit MythSystemLegacyIOHandler(bool read)
             : MThread(QString("SystemIOHandler%1").arg(read ? "R" : "W")),
               m_pMap(PMap_t()), m_read(read) {};
-        ~MythSystemLegacyIOHandler() { wait(); }
+        ~MythSystemLegacyIOHandler() override { wait(); }
         void   run(void) override; // MThread
 
         void   insert(int fd, QBuffer *buff);
@@ -64,7 +64,7 @@ class MythSystemLegacyManager : public MThread
     public:
         MythSystemLegacyManager()
             : MThread("SystemManager") {}
-        ~MythSystemLegacyManager() { wait(); }
+        ~MythSystemLegacyManager() override { wait(); }
         void run(void) override; // MThread
         void append(MythSystemLegacyUnix *ms);
         void jumpAbort(void);
@@ -81,7 +81,7 @@ class MythSystemLegacySignalManager : public MThread
     public:
         MythSystemLegacySignalManager()
             : MThread("SystemSignalManager") {}
-        ~MythSystemLegacySignalManager() { wait(); }
+        ~MythSystemLegacySignalManager() override { wait(); }
         void run(void) override; // MThread
     private:
 };
@@ -93,7 +93,7 @@ class MBASE_PUBLIC MythSystemLegacyUnix : public MythSystemLegacyPrivate
 
     public:
         explicit MythSystemLegacyUnix(MythSystemLegacy *parent);
-        ~MythSystemLegacyUnix() = default;
+        ~MythSystemLegacyUnix() override = default;
 
         void Fork(time_t timeout) override; // MythSystemLegacyPrivate
         void Manage(void) override; // MythSystemLegacyPrivate

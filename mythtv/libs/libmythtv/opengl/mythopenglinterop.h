@@ -52,7 +52,7 @@ class MythOpenGLInterop : public QObject, public ReferenceCounter
     static QString     TypeToString          (Type InteropType);
     static MythOpenGLInterop* CreateDummy    (void);
 
-    virtual ~MythOpenGLInterop();
+    ~MythOpenGLInterop() override;
     virtual vector<MythVideoTexture*> Acquire(MythRenderOpenGL *Context,
                                               VideoColourSpace *ColourSpace,
                                               VideoFrame *Frame, FrameScanType Scan);

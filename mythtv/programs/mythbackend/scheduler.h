@@ -50,7 +50,7 @@ class Scheduler : public MThread, public MythScheduler
   public:
     Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
               const QString& tmptable = "record", Scheduler *master_sched = nullptr);
-    ~Scheduler();
+    ~Scheduler() override;
 
     void Stop(void);
     void Wait(void) { MThread::wait(); }

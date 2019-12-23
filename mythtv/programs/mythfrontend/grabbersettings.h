@@ -18,7 +18,7 @@ class GrabberSettings : public MythScreenType
 
     GrabberSettings(MythScreenStack *parent, const char *name = nullptr)
         : MythScreenType(parent, name) {}
-    ~GrabberSettings() = default;
+    ~GrabberSettings() override = default;
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType

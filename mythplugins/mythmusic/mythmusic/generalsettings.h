@@ -16,7 +16,7 @@ class GeneralSettings : public MythScreenType
   public:
     GeneralSettings(MythScreenStack *parent, const char *name = nullptr)
         : MythScreenType(parent, name) {}
-    ~GeneralSettings() = default;
+    ~GeneralSettings() override = default;
 
     bool Create(void) override; // MythScreenType
 

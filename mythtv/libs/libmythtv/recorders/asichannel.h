@@ -16,7 +16,7 @@ class ASIChannel : public DTVChannel
 {
   public:
     ASIChannel(TVRec *parent, QString device);
-    ~ASIChannel(void);
+    ~ASIChannel(void) override;
 
     // Commands
     bool Open(void) override; // ChannelBase

@@ -11,7 +11,7 @@ class VorbisEncoder : public Encoder
 {
   public:
     VorbisEncoder(const QString &outfile, int qualitylevel, MusicMetadata *metadata);
-   ~VorbisEncoder();
+   ~VorbisEncoder() override;
     int addSamples(int16_t *bytes, unsigned int len) override; // Encoder
 
   private:

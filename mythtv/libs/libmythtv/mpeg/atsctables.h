@@ -84,7 +84,7 @@ class MTV_PUBLIC MasterGuideTable : public PSIPTable
         assert(TableID::MGT == TableID());
         Parse();
     }
-    ~MasterGuideTable() { ; }
+    ~MasterGuideTable() override { ; }
 
     //       Name             bits  loc  expected value
     // table_id                 8   0.0       0xC7
@@ -200,7 +200,7 @@ class MTV_PUBLIC VirtualChannelTable : public PSIPTable
         Parse();
     }
 
-    ~VirtualChannelTable() { ; }
+    ~VirtualChannelTable() override { ; }
 
     //       Name             bits  loc  expected value
     // table_id                 8   0.0      0xC8/0xC9
@@ -356,7 +356,7 @@ class MTV_PUBLIC TerrestrialVirtualChannelTable : public VirtualChannelTable
     {
         assert(TableID::TVCT == TableID());
     }
-    ~TerrestrialVirtualChannelTable() { ; }
+    ~TerrestrialVirtualChannelTable() override { ; }
 
     //       Name             bits  loc  expected value
     // table_id                 8   0.0       0xC8
@@ -425,7 +425,7 @@ class MTV_PUBLIC CableVirtualChannelTable : public VirtualChannelTable
     {
         assert(TableID::CVCT == TableID());
     }
-    ~CableVirtualChannelTable() { ; }
+    ~CableVirtualChannelTable() override { ; }
 
     //       Name             bits  loc  expected value
     // table_id                 8   0.0       0xC9
@@ -532,7 +532,7 @@ class MTV_PUBLIC EventInformationTable : public PSIPTable
         assert(TableID::EIT == TableID());
         Parse();
     }
-    ~EventInformationTable() { ; }
+    ~EventInformationTable() override { ; }
 
     //       Name             bits  loc  expected value
     // table_id                 8   0.0       0xCB
@@ -633,7 +633,7 @@ class MTV_PUBLIC ExtendedTextTable : public PSIPTable
     {
         assert(TableID::ETT == TableID());
     }
-    ~ExtendedTextTable() { ; }
+    ~ExtendedTextTable() override { ; }
 
     //       Name             bits  loc  expected value
     // table_id                 8   0.0       0xCC

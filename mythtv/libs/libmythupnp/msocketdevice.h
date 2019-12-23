@@ -61,7 +61,7 @@ public:
     explicit MSocketDevice(Type type = Stream);
     MSocketDevice(Type type, Protocol protocol, int dummy);
     MSocketDevice(int socket, Type type);
-    virtual ~MSocketDevice();
+    ~MSocketDevice() override;
 
     bool  isValid() const;
     Type  type() const;

@@ -40,7 +40,7 @@ class SignalMonitor : protected MThread
     static SignalMonitor *Init(const QString& cardtype, int db_cardnum,
                                ChannelBase *channel,
                                bool release_stream);
-    virtual ~SignalMonitor();
+    ~SignalMonitor() override;
 
     // // // // // // // // // // // // // // // // // // // // // // // //
     // Control  // // // // // // // // // // // // // // // // // // // //

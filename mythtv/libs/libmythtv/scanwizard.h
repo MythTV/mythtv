@@ -50,7 +50,7 @@ class MTV_PUBLIC ScanWizard : public GroupSetting
                uint           default_cardid    = 0,
                const QString& default_inputname = QString());
 
-    ~ScanWizard() = default;
+    ~ScanWizard() override = default;
 
   protected slots:
     void Scan();

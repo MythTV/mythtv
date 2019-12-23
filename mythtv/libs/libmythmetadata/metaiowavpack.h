@@ -24,7 +24,7 @@ class META_PUBLIC MetaIOWavPack : public MetaIOTagLib
 {
 public:
     MetaIOWavPack(void) : MetaIOTagLib() {}
-    virtual ~MetaIOWavPack(void) = default;
+    ~MetaIOWavPack(void) override = default;
 
     bool write(const QString &filename, MusicMetadata* mdata) override; // MetaIOTagLib
     MusicMetadata* read(const QString &filename) override; // MetaIOTagLib

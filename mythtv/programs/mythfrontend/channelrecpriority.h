@@ -24,7 +24,7 @@ class ChannelRecPriority : public MythScreenType
     Q_OBJECT
   public:
     explicit ChannelRecPriority(MythScreenStack *parent);
-    ~ChannelRecPriority();
+    ~ChannelRecPriority() override;
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType

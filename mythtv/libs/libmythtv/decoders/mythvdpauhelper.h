@@ -40,7 +40,7 @@ class MythVDPAUHelper : public QObject
     static bool   CheckHEVCDecode(AVCodecContext *Context);
 
     explicit MythVDPAUHelper(AVVDPAUDeviceContext *Context);
-    ~MythVDPAUHelper(void);
+    ~MythVDPAUHelper(void) override;
 
     bool             IsValid(void);
     void             SetPreempted(void);

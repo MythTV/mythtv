@@ -42,7 +42,7 @@ class MusicData : public QObject
   public:
 
     MusicData() = default;
-    ~MusicData();
+    ~MusicData() override;
 
     static void scanMusic(void);
     void loadMusic(void);

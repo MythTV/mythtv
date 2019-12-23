@@ -32,7 +32,7 @@ class GameScannerThread : public MThread
 {
   public:
     explicit GameScannerThread(void);
-    ~GameScannerThread() = default;
+    ~GameScannerThread() override = default;
 
     void run(void) override; // MThread
 
@@ -72,7 +72,7 @@ class GameScanner : public QObject
 
   public:
     GameScanner();
-    ~GameScanner();
+    ~GameScanner() override;
 
     void doScan(QList<GameHandler*> handlers);
     void doScanAll(void);

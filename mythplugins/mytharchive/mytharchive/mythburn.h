@@ -59,7 +59,7 @@ class MythBurn : public MythScreenType
              MythScreenType *destinationScreen, MythScreenType *themeScreen,
              ArchiveDestination archiveDestination, const QString& name);
 
-    ~MythBurn(void);
+    ~MythBurn(void) override;
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
@@ -139,7 +139,7 @@ class BurnMenu : public QObject
 
   public:
     BurnMenu(void);
-    ~BurnMenu(void) = default;
+    ~BurnMenu(void) override = default;
 
     void start(void);
 

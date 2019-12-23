@@ -42,7 +42,7 @@ class MHBitmap : public MHVisible
           m_nOrigTransparency(ref.m_nOrigTransparency) {}
     const char *ClassName() override // MHRoot
         { return "Bitmap"; }
-    virtual ~MHBitmap();
+    ~MHBitmap() override;
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHVisible
     void PrintMe(FILE *fd, int nTabs) const override; // MHVisible
 

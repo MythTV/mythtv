@@ -23,7 +23,7 @@ class ManualSchedule : public MythScreenType
   public:
 
     explicit ManualSchedule(MythScreenStack *parent);
-   ~ManualSchedule(void) = default;
+   ~ManualSchedule(void) override = default;
 
     bool Create(void) override; // MythScreenType
 

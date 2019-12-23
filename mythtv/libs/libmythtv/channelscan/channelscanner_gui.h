@@ -60,7 +60,7 @@ class ChannelScannerGUI :
     void HandleEvent(const ScannerEvent *scanEvent) override; // ChannelScanner
 
   protected:
-    virtual ~ChannelScannerGUI();
+    ~ChannelScannerGUI() override;
 
     void InformUser(const QString &error) override; // ChannelScanner
 

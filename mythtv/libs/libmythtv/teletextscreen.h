@@ -13,7 +13,7 @@ class TeletextScreen: public MythScreenType
 
   public:
     TeletextScreen(MythPlayer *player, const char * name, int fontStretch);
-    virtual ~TeletextScreen();
+    ~TeletextScreen() override;
 
     // MythScreenType methods
     bool Create(void) override; // MythScreenType

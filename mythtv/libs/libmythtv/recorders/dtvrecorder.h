@@ -37,7 +37,7 @@ class DTVRecorder :
 {
   public:
     explicit DTVRecorder(TVRec *rec);
-    virtual ~DTVRecorder();
+    ~DTVRecorder() override;
 
     void SetOption(const QString &name, const QString &value) override; // RecorderBase
     void SetOption(const QString &name, int value) override; // RecorderBase

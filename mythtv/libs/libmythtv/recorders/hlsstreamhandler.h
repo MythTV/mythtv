@@ -29,7 +29,7 @@ class HLSStreamHandler : public IPTVStreamHandler
 
   protected:
     explicit HLSStreamHandler(const IPTVTuningData &tuning, int inputid);
-    virtual ~HLSStreamHandler(void);
+    ~HLSStreamHandler(void) override;
 
     void run(void) override; // MThread
 

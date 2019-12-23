@@ -36,7 +36,7 @@ class UPnpEventTask : public Task
 
         // Destructor protected to force use of Release Method
 
-        virtual ~UPnpEventTask();
+        ~UPnpEventTask() override;
 
     public:
 

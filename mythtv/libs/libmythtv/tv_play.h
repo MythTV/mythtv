@@ -347,7 +347,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
 
   private:
     TV();
-   ~TV();
+   ~TV() override;
     static TV*      GetTV(void);
     static void     ReleaseTV(TV* tv);
     static QMutex  *gTVLock;

@@ -12,7 +12,7 @@ class FrontendServiceHost : public ServiceHost
     {
     }
 
-    virtual ~FrontendServiceHost() = default;
+    ~FrontendServiceHost() override = default;
 };
 
 #endif // FRONTENDSERVICEHOST_H

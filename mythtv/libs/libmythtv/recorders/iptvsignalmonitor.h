@@ -14,7 +14,7 @@ class IPTVSignalMonitor : public DTVSignalMonitor
   public:
     IPTVSignalMonitor(int db_cardnum, IPTVChannel *_channel,
                       bool _release_stream, uint64_t _flags = 0);
-    virtual ~IPTVSignalMonitor();
+    ~IPTVSignalMonitor() override;
 
     void Stop(void) override; // SignalMonitor
 

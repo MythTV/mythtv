@@ -14,7 +14,7 @@ class MTV_PUBLIC ScanStreamData :
 {
   public:
     explicit ScanStreamData(bool no_default_pid = false);
-    virtual ~ScanStreamData();
+    ~ScanStreamData() override;
 
     bool IsRedundant(uint pid, const PSIPTable &psip) const override; // ATSCStreamData
     bool HandleTables(uint pid, const PSIPTable &psip) override; // ATSCStreamData

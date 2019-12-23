@@ -12,7 +12,7 @@ class PlayerSettings : public MythScreenType
 public:
     PlayerSettings(MythScreenStack *parent, const char *name = nullptr)
         : MythScreenType(parent, name) {}
-    ~PlayerSettings() = default;
+    ~PlayerSettings() override = default;
 
     bool Create(void) override; // MythScreenType
 

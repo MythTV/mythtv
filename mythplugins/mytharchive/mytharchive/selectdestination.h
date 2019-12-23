@@ -25,7 +25,7 @@ class SelectDestination : public MythScreenType
   public:
     SelectDestination(MythScreenStack *parent, bool nativeMode, const QString& name)
         : MythScreenType(parent, name), m_nativeMode(nativeMode) {};
-    ~SelectDestination(void);
+    ~SelectDestination(void) override;
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType

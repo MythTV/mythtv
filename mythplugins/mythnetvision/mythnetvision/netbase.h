@@ -21,7 +21,7 @@ class NetBase : public MythScreenType
 
   public:
     NetBase(MythScreenStack *parent, const char *name = nullptr);
-    virtual ~NetBase();
+    ~NetBase() override;
 
   protected:
     void Init() override; // MythScreenType

@@ -124,7 +124,7 @@ class MainServer : public QObject, public MythSocketCBs
                QMap<int, EncoderLink *> *tvList,
                Scheduler *sched, AutoExpire *expirer);
 
-    ~MainServer();
+    ~MainServer() override;
 
     void Stop(void);
 

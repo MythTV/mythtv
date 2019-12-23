@@ -35,7 +35,7 @@ class SSDPCacheTask : public Task
 
         // Destructor protected to force use of Release Method
 
-        virtual ~SSDPCacheTask() = default;
+        ~SSDPCacheTask() override = default;
 
     public:
 

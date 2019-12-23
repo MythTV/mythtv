@@ -48,7 +48,7 @@ class LameEncoder : public Encoder
   public:
     LameEncoder(const QString &outfile, int qualitylevel, MusicMetadata *metadata,
                 bool vbr = false);
-   ~LameEncoder();
+   ~LameEncoder() override;
     int addSamples(int16_t *bytes, unsigned int len) override; // Encoder
 
   private:

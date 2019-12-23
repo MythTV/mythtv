@@ -25,7 +25,7 @@ class MythContextSlotHandler : public QObject
     void OnCloseDialog(void);
 
   private:
-    ~MythContextSlotHandler() = default;
+    ~MythContextSlotHandler() override = default;
 
     MythContextPrivate *d {nullptr}; // NOLINT(readability-identifier-naming)
 };

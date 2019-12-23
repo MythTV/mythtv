@@ -12,7 +12,7 @@ class VisualizationSettings : public MythScreenType
 public:
     VisualizationSettings(MythScreenStack *parent, const char *name = nullptr)
         : MythScreenType(parent, name) {}
-    ~VisualizationSettings() = default;
+    ~VisualizationSettings() override = default;
 
     bool Create(void) override; // MythScreenType
 

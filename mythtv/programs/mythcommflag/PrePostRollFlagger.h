@@ -14,7 +14,7 @@ public:
                             const QDateTime& recordingStopsAt_in);
 
     void GetCommercialBreakList(frm_dir_map_t &marks) override; // ClassicCommDetector
-    virtual ~PrePostRollFlagger() = default;
+    ~PrePostRollFlagger() override = default;
     bool go() override; // ClassicCommDetector
 
 private:

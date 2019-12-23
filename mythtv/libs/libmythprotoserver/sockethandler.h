@@ -18,7 +18,7 @@ class PROTOSERVER_PUBLIC SocketHandler : public ReferenceCounter
   public:
     SocketHandler(MythSocket *sock, MythSocketManager *parent,
                   QString hostname);
-   ~SocketHandler();
+   ~SocketHandler() override;
 
     bool DoesBlockShutdown(void)        { return m_blockShutdown; }
     bool GetsStandardEvents(void)       { return m_standardEvents; }

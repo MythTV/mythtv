@@ -13,7 +13,7 @@ class MPUBLIC MiniPlayer : public MusicCommon
 
   public:
     explicit MiniPlayer(MythScreenStack *parent);
-    ~MiniPlayer();
+    ~MiniPlayer() override;
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MusicCommon

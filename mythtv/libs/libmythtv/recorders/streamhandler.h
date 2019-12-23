@@ -71,7 +71,7 @@ class StreamHandler : protected MThread, public DeviceReaderCB
   protected:
     explicit StreamHandler(QString device, int inputid)
         : MThread("StreamHandler"), m_device(std::move(device)), m_inputId(inputid) {}
-    ~StreamHandler();
+    ~StreamHandler() override;
 
     void Start(void);
     void Stop(void);

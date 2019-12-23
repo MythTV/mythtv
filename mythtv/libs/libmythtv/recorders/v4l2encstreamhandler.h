@@ -32,7 +32,7 @@ class V4L2encStreamHandler : public StreamHandler
 
   public:
     V4L2encStreamHandler(const QString & device, int audio_input, int inputid);
-    ~V4L2encStreamHandler(void);
+    ~V4L2encStreamHandler(void) override;
 
     void run(void) override; // MThread
 #if 0

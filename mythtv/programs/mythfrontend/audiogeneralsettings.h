@@ -133,7 +133,7 @@ class ChannelChangedEvent : public QEvent
   public:
     ChannelChangedEvent(QString  channame, bool fulltest) :
         QEvent(kEventType), m_channel(std::move(channame)), m_fulltest(fulltest) {}
-    ~ChannelChangedEvent() = default;
+    ~ChannelChangedEvent() override = default;
 
     QString m_channel;
     bool    m_fulltest;
@@ -149,7 +149,7 @@ class AudioTestThread : public MThread
 
     AudioTestThread(QObject *parent, QString main, QString passthrough,
                     int channels, AudioOutputSettings &settings, bool hd);
-    ~AudioTestThread();
+    ~AudioTestThread() override;
 
     void cancel();
     QString result();
@@ -176,7 +176,7 @@ class AudioTest : public GroupSetting
     Q_OBJECT
   public:
     AudioTest();
-    ~AudioTest();
+    ~AudioTest() override;
     void UpdateCapabilities(const QString &main, const QString &passthrough,
                             int channels, const AudioOutputSettings &settings);
     bool event(QEvent *event) override; // QObject

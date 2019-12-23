@@ -92,7 +92,7 @@ class AvFormatDecoder : public DecoderBase
     static void GetDecoders(RenderOptions &opts);
     AvFormatDecoder(MythPlayer *parent, const ProgramInfo &pginfo,
                     PlayerFlags flags);
-    virtual ~AvFormatDecoder();
+    ~AvFormatDecoder() override;
 
     void SetEof(bool eof) override; // DecoderBase
 

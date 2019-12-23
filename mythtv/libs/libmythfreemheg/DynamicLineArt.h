@@ -33,7 +33,7 @@ class MHDynamicLineArt : public MHLineArt
 {
   public:
     MHDynamicLineArt() = default;
-    virtual ~MHDynamicLineArt();
+    ~MHDynamicLineArt() override;
     const char *ClassName() override // MHLineArt
         { return "DynamicLineArt"; }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHLineArt

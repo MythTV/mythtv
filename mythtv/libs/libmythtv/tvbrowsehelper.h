@@ -73,7 +73,7 @@ class TVBrowseHelper : public MThread
                    bool     use_channel_groups,
                    const QString&  db_channel_ordering);
 
-    virtual ~TVBrowseHelper()
+    ~TVBrowseHelper() override
     {
         Stop();
         Wait();

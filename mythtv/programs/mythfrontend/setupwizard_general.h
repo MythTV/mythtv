@@ -18,7 +18,7 @@ class GeneralSetupWizard : public MythScreenType
   public:
 
     GeneralSetupWizard(MythScreenStack *parent, const char *name = nullptr);
-    ~GeneralSetupWizard() = default;
+    ~GeneralSetupWizard() override = default;
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType

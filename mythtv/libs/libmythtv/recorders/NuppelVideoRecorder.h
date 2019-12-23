@@ -52,7 +52,7 @@ class NVRWriteThread : public MThread
   public:
     explicit NVRWriteThread(NuppelVideoRecorder *parent) :
         MThread("NVRWrite"), m_parent(parent) {}
-    virtual ~NVRWriteThread() { wait(); m_parent = nullptr; }
+    ~NVRWriteThread() override { wait(); m_parent = nullptr; }
     void run(void) override; // MThread
   private:
     NuppelVideoRecorder *m_parent;
@@ -63,7 +63,7 @@ class NVRAudioThread : public MThread
   public:
     explicit NVRAudioThread(NuppelVideoRecorder *parent) :
         MThread("NVRAudio"), m_parent(parent) {}
-    virtual ~NVRAudioThread() { wait(); m_parent = nullptr; }
+    ~NVRAudioThread() override { wait(); m_parent = nullptr; }
     void run(void) override; // MThread
   private:
     NuppelVideoRecorder *m_parent;
@@ -75,7 +75,7 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
     friend class NVRAudioThread;
   public:
     NuppelVideoRecorder(TVRec *rec, ChannelBase *channel);
-   ~NuppelVideoRecorder();
+   ~NuppelVideoRecorder() override;
 
     void SetOption(const QString &opt, int value) override; // DTVRecorder
     void SetOption(const QString &name, const QString &value) override; // DTVRecorder

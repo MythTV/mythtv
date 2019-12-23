@@ -78,7 +78,7 @@ class MUI_PUBLIC MythUIFileBrowser : public MythScreenType
 
   public:
     MythUIFileBrowser(MythScreenStack *parent, const QString &startPath);
-   ~MythUIFileBrowser() = default;
+   ~MythUIFileBrowser() override = default;
 
     bool Create(void) override; // MythScreenType
 

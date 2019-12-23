@@ -94,7 +94,7 @@ class MBASE_PUBLIC MythSocket : public QObject, public ReferenceCounter
     void IsDataAvailableReal(bool *ret) const;
 
   protected:
-    ~MythSocket(); // force reference counting
+    ~MythSocket() override; // force reference counting
 
     QTcpSocket     *m_tcpSocket        {nullptr}; // only set in ctor
     MThread        *m_thread           {nullptr}; // only set in ctor

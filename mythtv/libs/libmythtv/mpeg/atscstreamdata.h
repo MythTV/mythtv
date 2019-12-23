@@ -31,7 +31,7 @@ class MTV_PUBLIC ATSCStreamData : virtual public MPEGStreamData
     ATSCStreamData(int desiredMajorChannel,
                    int desiredMinorChannel,
                    int cardnum, bool cacheTables = false);
-    virtual ~ATSCStreamData();
+    ~ATSCStreamData() override;
 
     void Reset(void) override { Reset(-1, -1); } // MPEGStreamData
     void Reset(int desiredProgram) override; // MPEGStreamData

@@ -36,7 +36,7 @@ class MythExternRecApp : public QObject
   public:
     MythExternRecApp(QString command,  QString conf_file,
                      QString log_file, QString logging);
-    ~MythExternRecApp(void);
+    ~MythExternRecApp(void) override;
 
     bool Open(void);
     void Run(void);

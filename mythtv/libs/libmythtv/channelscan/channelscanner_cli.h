@@ -42,7 +42,7 @@ class MTV_PUBLIC ChannelScannerCLI : public ChannelScanner
   public:
     ChannelScannerCLI(bool doScanSaveOnly, bool promptsOk)
         : m_onlysavescan(doScanSaveOnly), m_interactive(promptsOk) {}
-    virtual ~ChannelScannerCLI() = default;
+    ~ChannelScannerCLI() override = default;
 
     void HandleEvent(const ScannerEvent *scanEvent) override; // ChannelScanner
 

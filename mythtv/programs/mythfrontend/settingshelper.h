@@ -12,7 +12,7 @@
 
         SettingsHelper(void) = default;
 
-        ~SettingsHelper(void) = default;
+        ~SettingsHelper(void) override = default;
 
       public slots:
         void RunProlog(const QString &settingsPage)

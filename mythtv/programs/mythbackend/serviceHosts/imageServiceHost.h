@@ -41,7 +41,7 @@ class ImageServiceHost : public ServiceHost
         {
         }
 
-        virtual ~ImageServiceHost() = default;
+        ~ImageServiceHost() override = default;
 };
 
 #endif

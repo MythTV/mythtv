@@ -82,7 +82,7 @@ class MTV_PUBLIC CC608Reader : public CC608Input
 {
   public:
     explicit CC608Reader(MythPlayer *parent);
-   ~CC608Reader();
+   ~CC608Reader() override;
 
     void SetTTPageNum(int page)  { m_ccPageNum = page; }
     void SetEnabled(bool enable) { m_enabled = enable; }

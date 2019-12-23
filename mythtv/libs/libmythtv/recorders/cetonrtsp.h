@@ -28,7 +28,7 @@ class CetonRTSP : QObject
   public:
     explicit CetonRTSP(const QString &ip, uint tuner, ushort port);
     explicit CetonRTSP(const QUrl &url);
-    ~CetonRTSP();
+    ~CetonRTSP() override;
 
     bool GetOptions(QStringList &options);
     bool Describe(void);

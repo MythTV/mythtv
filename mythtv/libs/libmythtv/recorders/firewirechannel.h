@@ -19,7 +19,7 @@ class FirewireChannel : public DTVChannel
   public:
     FirewireChannel(TVRec *parent, QString videodevice,
                     FireWireDBOptions firewire_opts);
-    virtual ~FirewireChannel();
+    ~FirewireChannel() override;
 
     // Commands
      bool Open(void) override; // ChannelBase

@@ -18,7 +18,7 @@ class V4L2encSignalMonitor: public DTVSignalMonitor
   public:
     V4L2encSignalMonitor(int db_cardnum, V4LChannel *_channel,
                          bool _release_stream, uint64_t _flags = 0);
-    virtual ~V4L2encSignalMonitor();
+    ~V4L2encSignalMonitor() override;
 
     void Stop(void) override; // SignalMonitor
 

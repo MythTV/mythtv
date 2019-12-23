@@ -22,7 +22,7 @@ class LogViewer : public MythScreenType
   public:
 
     explicit LogViewer(MythScreenStack *parent);
-   ~LogViewer(void);
+   ~LogViewer(void) override;
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *e) override; // MythScreenType

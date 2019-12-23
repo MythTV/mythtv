@@ -25,7 +25,7 @@ class LCDProcClient : public QObject
 
     void customEvent(QEvent  *e) override; // QObject
 
-   ~LCDProcClient();
+   ~LCDProcClient() override;
 
     bool SetupLCD(void);
     void reset(void);

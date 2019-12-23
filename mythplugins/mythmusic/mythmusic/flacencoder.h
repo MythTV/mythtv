@@ -83,7 +83,7 @@ class FlacEncoder : public Encoder
 {
   public:
     FlacEncoder(const QString &outfile, int qualitylevel, MusicMetadata *metadata);
-   ~FlacEncoder();
+   ~FlacEncoder() override;
     int addSamples(int16_t *bytes, unsigned int len) override; // Encoder
 
   private:

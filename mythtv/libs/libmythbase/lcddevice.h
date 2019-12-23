@@ -178,7 +178,7 @@ class MBASE_PUBLIC LCD : public QObject
     static bool m_enabled;
 
   public:
-   ~LCD();
+   ~LCD() override;
 
     enum {
         MUSIC_REPEAT_NONE  = 0,

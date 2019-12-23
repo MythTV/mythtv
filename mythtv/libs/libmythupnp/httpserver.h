@@ -88,7 +88,7 @@ class UPNP_PUBLIC HttpServerExtension : public QObject
              m_nSupportedMethods((RequestTypeGet | RequestTypePost | // Defaults, extensions may extend the list
                                   RequestTypeHead | RequestTypeOptions)) {};
 
-        virtual ~HttpServerExtension() = default;
+        ~HttpServerExtension() override = default;
 
         virtual bool ProcessRequest(HTTPRequest *pRequest) = 0;
 
@@ -115,7 +115,7 @@ class UPNP_PUBLIC HttpServer : public ServerPool
 
   public:
     HttpServer();
-    virtual ~HttpServer();
+    ~HttpServer() override;
 
     void RegisterExtension(HttpServerExtension *pExtension);
     void UnregisterExtension(HttpServerExtension *pExtension);

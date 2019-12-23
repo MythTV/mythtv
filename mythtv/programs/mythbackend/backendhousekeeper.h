@@ -31,7 +31,7 @@ class RadioStreamUpdateTask : public DailyHouseKeeperTask
 {
   public:
     RadioStreamUpdateTask(void);
-    virtual ~RadioStreamUpdateTask(void);
+    ~RadioStreamUpdateTask(void) override;
     bool DoRun(void) override; // HouseKeeperTask
     bool DoCheckRun(QDateTime now) override; // PeriodicHouseKeeperTask
     void Terminate(void) override; // HouseKeeperTask
@@ -58,7 +58,7 @@ class ArtworkTask : public DailyHouseKeeperTask
 {
   public:
     ArtworkTask(void);
-    virtual ~ArtworkTask(void);
+    ~ArtworkTask(void) override;
     bool DoRun(void) override; // HouseKeeperTask
     bool DoCheckRun(QDateTime now) override; // PeriodicHouseKeeperTask
     void Terminate(void) override; // HouseKeeperTask
@@ -80,7 +80,7 @@ class MythFillDatabaseTask : public DailyHouseKeeperTask
 {
   public:
     MythFillDatabaseTask(void);
-    virtual ~MythFillDatabaseTask(void);
+    ~MythFillDatabaseTask(void) override;
 
     static bool UseSuggestedTime(void);
 

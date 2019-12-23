@@ -18,7 +18,7 @@ class VideoDecodeBuffer : public QRunnable
         bool cutlist, int size = 5)
         : m_player(player),        m_videoOutput(videoout),
           m_honorCutlist(cutlist), m_maxFrames(size) {}
-    virtual ~VideoDecodeBuffer();
+    ~VideoDecodeBuffer() override;
 
     void          stop(void);
     void run() override; // QRunnable

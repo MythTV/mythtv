@@ -38,7 +38,7 @@ class MPUBLIC MusicGenericTree : public MythGenericTree
                      const QString &action = "",
                      MythUIButtonListItem::CheckState check = MythUIButtonListItem::CantCheck,
                      bool showArrow = true);
-    virtual ~MusicGenericTree() = default;
+    ~MusicGenericTree() override = default;
 
     QString getAction(void) const { return m_action; }
 
@@ -64,7 +64,7 @@ class PlaylistEditorView : public MusicCommon
   public:
     PlaylistEditorView(MythScreenStack *parent, MythScreenType *parentScreen,
                        const QString &layout, bool restorePosition = false);
-    ~PlaylistEditorView(void);
+    ~PlaylistEditorView(void) override;
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MusicCommon

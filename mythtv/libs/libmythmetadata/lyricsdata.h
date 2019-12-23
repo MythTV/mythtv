@@ -59,7 +59,7 @@ class META_PUBLIC LyricsData : public QObject
         : m_parent(parent), m_grabber(std::move(grabber)),
           m_artist(std::move(artist)), m_album(std::move(album)),
           m_title(std::move(title)), m_syncronized(syncronized) {}
-    ~LyricsData();
+    ~LyricsData() override;
 
     QString grabber(void) { return m_grabber; }
     void setGrabber(const QString &grabber) { m_grabber = grabber; }

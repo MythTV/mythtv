@@ -50,7 +50,7 @@ class MUI_PUBLIC MythScreenType : public MythUIComposite
   public:
     MythScreenType(MythScreenStack *parent, const QString &name,
                    bool fullscreen = true);
-    virtual ~MythScreenType();
+    ~MythScreenType() override;
 
     virtual bool Create(void); // do the actual work of making the screen.
     bool keyPressEvent(QKeyEvent *event) override; // MythUIType

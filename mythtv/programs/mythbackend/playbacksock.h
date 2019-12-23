@@ -110,7 +110,7 @@ class PlaybackSock : public ReferenceCounter
 
     // Enforce reference counting
   protected:
-    virtual ~PlaybackSock();
+    ~PlaybackSock() override;
 
   private:
     bool SendReceiveStringList(QStringList &strlist, uint min_reply_length = 0);

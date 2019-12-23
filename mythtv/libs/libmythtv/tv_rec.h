@@ -148,7 +148,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
 
   public:
     explicit TVRec(int _inputid);
-   ~TVRec(void);
+   ~TVRec(void) override;
 
     bool Init(void);
 

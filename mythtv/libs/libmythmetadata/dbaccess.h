@@ -70,7 +70,7 @@ class META_PUBLIC VideoCategory : public SingleValue
 
   private:
     VideoCategory();
-    ~VideoCategory() = default;
+    ~VideoCategory() override = default;
 };
 
 class META_PUBLIC VideoCountry : public SingleValue
@@ -80,7 +80,7 @@ class META_PUBLIC VideoCountry : public SingleValue
 
   private:
     VideoCountry();
-    ~VideoCountry() = default;
+    ~VideoCountry() override = default;
 };
 
 class META_PUBLIC VideoGenre : public SingleValue
@@ -90,7 +90,7 @@ class META_PUBLIC VideoGenre : public SingleValue
 
   private:
     VideoGenre();
-    ~VideoGenre() = default;
+    ~VideoGenre() override = default;
 };
 
 class META_PUBLIC VideoGenreMap : public MultiValue
@@ -100,7 +100,7 @@ class META_PUBLIC VideoGenreMap : public MultiValue
 
   private:
     VideoGenreMap();
-    ~VideoGenreMap() = default;
+    ~VideoGenreMap() override = default;
 };
 
 class META_PUBLIC VideoCountryMap : public MultiValue
@@ -110,7 +110,7 @@ class META_PUBLIC VideoCountryMap : public MultiValue
 
   private:
     VideoCountryMap();
-    ~VideoCountryMap() = default;
+    ~VideoCountryMap() override = default;
 };
 
 class META_PUBLIC VideoCast : public SingleValue
@@ -120,7 +120,7 @@ class META_PUBLIC VideoCast : public SingleValue
 
   private:
     VideoCast();
-    ~VideoCast() = default;
+    ~VideoCast() override = default;
 };
 
 class META_PUBLIC VideoCastMap : public MultiValue
@@ -130,7 +130,7 @@ class META_PUBLIC VideoCastMap : public MultiValue
 
   private:
     VideoCastMap();
-    ~VideoCastMap() = default;
+    ~VideoCastMap() override = default;
 };
 
 class META_PUBLIC FileAssociations

@@ -25,7 +25,7 @@ class LinuxFirewireDevice : public FirewireDevice, public QRunnable
     LinuxFirewireDevice(uint64_t guid, uint subunitid,
                         uint speed, bool use_p2p,
                         uint av_buffer_size_in_bytes = 0);
-    ~LinuxFirewireDevice();
+    ~LinuxFirewireDevice() override;
 
     // Commands
     bool OpenPort(void) override; // FirewireDevice

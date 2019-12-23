@@ -23,7 +23,7 @@ class DTVSignalMonitor : public SignalMonitor,
                      DTVChannel *_channel,
                      bool _release_stream,
                      uint64_t wait_for_mask);
-    virtual ~DTVSignalMonitor();
+    ~DTVSignalMonitor() override;
 
   public:
     QStringList GetStatusList(void) const override; // SignalMonitor

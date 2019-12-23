@@ -30,7 +30,7 @@ class ProgFinder : public ScheduleCommon
           m_player(player),
           m_embedVideo(embedVideo),
           m_allowEPG(allowEPG) {}
-    virtual ~ProgFinder();
+    ~ProgFinder() override;
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType

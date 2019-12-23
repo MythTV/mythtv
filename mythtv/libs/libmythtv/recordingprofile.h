@@ -77,7 +77,7 @@ class MTV_PUBLIC RecordingProfile : public GroupSetting
   public:
     // initializers
     explicit RecordingProfile(const QString& profName = QString());
-    virtual ~RecordingProfile(void);
+    ~RecordingProfile(void) override;
     virtual void loadByID(int id);
     virtual bool loadByType(const QString &name, const QString &cardtype,
                             const QString &videodev);
@@ -156,7 +156,7 @@ class RecordingProfileEditor :
 
   public:
     RecordingProfileEditor(int id, QString profName);
-    virtual ~RecordingProfileEditor() = default;
+    ~RecordingProfileEditor() override = default;
 
     void Load(void) override; // StandardSetting
 

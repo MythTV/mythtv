@@ -19,7 +19,7 @@ class MBASE_PUBLIC HardwareProfile : public QObject
 
   public:
     HardwareProfile();
-   ~HardwareProfile(void) = default;
+   ~HardwareProfile(void) override = default;
 
     void Enable(void);
     static void Disable(void);

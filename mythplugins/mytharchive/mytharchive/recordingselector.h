@@ -35,7 +35,7 @@ class RecordingSelector : public MythScreenType
     RecordingSelector(MythScreenStack *parent, QList<ArchiveItem *> *archiveList)
         : MythScreenType(parent, "RecordingSelector"),
           m_archiveList(archiveList) {}
-    ~RecordingSelector(void);
+    ~RecordingSelector(void) override;
 
     bool Create() override; // MythScreenType
     bool keyPressEvent(QKeyEvent *e) override; // MythScreenType
