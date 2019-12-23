@@ -1403,9 +1403,7 @@ bool MythMainWindow::WindowIsAlwaysFullscreen(void)
     return true;
 #else
     // this may need to cover other platform plugins
-    if (qApp->platformName().toLower().contains("eglfs"))
-        return true;
-    return false;
+    return qApp->platformName().toLower().contains("eglfs");
 #endif
 }
 
