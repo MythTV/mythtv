@@ -146,7 +146,8 @@ public:
     */
     static StringPair PartitionIds(const ImageIdList &ids)
     {
-        QStringList local, remote;
+        QStringList local;
+        QStringList remote;
         foreach(int id, ids)
         {
             if (ImageItem::IsLocalId(id))

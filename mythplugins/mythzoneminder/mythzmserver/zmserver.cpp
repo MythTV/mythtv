@@ -762,7 +762,8 @@ void ZMServer::handleGetServerStatus(void)
 
     // get free space on the disk where the events are stored
     char buf[15];
-    long long total = 0, used = 0;
+    long long total = 0;
+    long long used = 0;
     string eventsDir = g_webPath + "/events/";
     getDiskSpace(eventsDir, total, used);
     sprintf(buf, "%d%%", (int) ((100.0F / ((float) total / used))));

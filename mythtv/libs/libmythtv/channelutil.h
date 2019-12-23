@@ -96,7 +96,11 @@ class MTV_PUBLIC ChannelUtil
     static bool    GetATSCChannel(uint sourceid, const QString &channum,
                                   uint &major,   uint          &minor);
     static bool    IsATSCChannel(uint sourceid, const QString &channum)
-        { uint m1, m2; GetATSCChannel(sourceid, channum, m1,m2); return m2; }
+        {
+            uint m1;
+            uint m2;
+            GetATSCChannel(sourceid, channum, m1,m2); return m2;
+        }
 
     // Channel/Service Stuff
     static int     CreateChanID(uint sourceid, const QString &chan_num);

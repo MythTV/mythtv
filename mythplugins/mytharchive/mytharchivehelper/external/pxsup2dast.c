@@ -346,7 +346,9 @@ static void ifopalette(const char * filename,
     fclose(fh);
     for (int i = 0; i < 16; i++)
     {
-        eu8 r = 0, g = 0, b = 0;
+        eu8 r = 0;
+        eu8 g = 0;
+        eu8 b = 0;
         eu8 * p = buf + i * 4 + 1;
         yuvpalette[i][0] =p[0]; yuvpalette[i][1] =p[1]; yuvpalette[i][2] =p[2];
         yuv2rgb(p[0], p[1], p[2], &r, &g, &b);
@@ -357,8 +359,9 @@ static void ifopalette(const char * filename,
 
 static void set2palettes(int value, eu8 * yuvpalpart, eu8 * rgbpalpart) 
 {
-    eu8 y = 0, cr = 0, cb = 0;
-
+    eu8 y = 0;
+    eu8 cr = 0;
+    eu8 cb = 0;
     eu8 r = value >> 16;
     eu8 g = value >> 8;
     eu8 b = value;
@@ -525,7 +528,8 @@ static void getpixelline(eu8 ** data, int width, Png4File * picfile)
 {
     int nibble = -1;
     int col = 0;
-    int number = 0, cindex = 0;
+    int number = 0;
+    int cindex = 0;
     /* Originally from gtkspu - this from the python implementation of this */
 
     while (1) 
@@ -688,8 +692,12 @@ static void pxsubtitle(const char * supfile, FILE * ofh, eu8 palette[16][3],
             exc_end(2);
             {
                 BoundStr bs;
-                int x1 = -1, x2 = -1, y1 = -1, y2 = -1;
-                int top_field = -1, bot_field = -1;
+                int x1 = -1;
+                int x2 = -1;
+                int y1 = -1;
+                int y2 = -1;
+                int top_field = -1;
+                int bot_field = -1;
                 int end = 0;
                 eu8 this_palette[4][3];
                 boundstr_init(&bs, ctrl, size - pack);
@@ -853,7 +861,9 @@ static bool samepalette(char * filename, eu8 palette[16][3])
     FILE *fh = xfopen(filename, "rb");
     for (int i = 0; i < 16; i++)
     {
-        unsigned int r=0,g=0,b=0;
+        unsigned int r=0;
+        unsigned int g=0;
+        unsigned int b=0;
         if (fscanf(fh, "%02x%02x%02x\n", &r, &g, &b) != 3 ||
                r != palette[i][0] || g != palette[i][1] || b != palette[i][2]) 
         {
@@ -870,7 +880,8 @@ int sup2dast(const char *supfile, const char *ifofile ,int delay_ms)
     exc_try(1)
     {
         int i = 0;
-        eu8 yuvpalette[16][3], rgbpalette[16][3];
+        eu8 yuvpalette[16][3];
+        eu8 rgbpalette[16][3];
         char fnbuf[1024];
         char * p = NULL;
 

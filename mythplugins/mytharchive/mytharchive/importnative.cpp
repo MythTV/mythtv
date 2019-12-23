@@ -47,7 +47,8 @@ static bool loadDetailsFromXML(const QString &filename, FileDetails *details)
     if (docType == "MYTHARCHIVEITEM")
     {
         QDomNodeList itemNodeList = doc.elementsByTagName("item");
-        QString type, dbVersion;
+        QString type;
+        QString dbVersion;
 
         if (itemNodeList.count() < 1)
         {

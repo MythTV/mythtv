@@ -110,7 +110,12 @@ void NetEditorBase::SlotLoadedData()
 
     while (!grabber.isNull())
     {
-        QString title, author, image, description, type, commandline;
+        QString title;
+        QString author;
+        QString image;
+        QString description;
+        QString type;
+        QString commandline;
         bool search = false;
         bool tree = false;
 

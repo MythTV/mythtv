@@ -408,7 +408,11 @@ class MTV_PUBLIC CardUtil
     static bool         GetV4LInfo(int videofd, QString &input, QString &driver,
                                    uint32_t &version, uint32_t &capabilities);
     static bool         GetV4LInfo(int videofd, QString &input, QString &driver)
-        { uint32_t d1,d2; return GetV4LInfo(videofd, input, driver, d1, d2); }
+        {
+            uint32_t d1;
+            uint32_t d2;
+            return GetV4LInfo(videofd, input, driver, d1, d2);
+        }
     static InputNames   ProbeV4LVideoInputs(int videofd, bool &ok);
     static InputNames   ProbeV4LAudioInputs(int videofd, bool &ok);
 

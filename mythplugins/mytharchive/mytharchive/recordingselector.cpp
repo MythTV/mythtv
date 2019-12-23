@@ -412,7 +412,8 @@ void RecordingSelector::updateRecordingList(void)
 
                 uint season = p->GetSeason();
                 uint episode = p->GetEpisode();
-                QString seasone, seasonx;
+                QString seasone;
+                QString seasonx;
 
                 if (season && episode)
                 {

@@ -403,7 +403,9 @@ vector<VideoInfo *> *VideoSelector::getVideoListFromDB(void)
     if (query.exec() && query.size())
     {
         auto *videoList = new vector<VideoInfo*>;
-        QString artist, genre, episode;
+        QString artist;
+        QString genre;
+        QString episode;
         while (query.next())
         {
             // Exclude iso images as they aren't supported

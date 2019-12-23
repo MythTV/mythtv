@@ -205,7 +205,9 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
                        "filename NOT LIKE ('%://%');"))
         {
             int i = 0;
-            QString intid, name, newname;
+            QString intid;
+            QString name;
+            QString newname;
 
             MSqlQuery modify(MSqlQuery::InitCon());
             while (query.next())

@@ -259,8 +259,8 @@ int main(int argc, char **argv)
     connectToDatabase();
 
     // clear the master and temp sets
-    FD_ZERO(&master);
-    FD_ZERO(&read_fds);
+    FD_ZERO(&master);   // NOLINT(readability-isolate-declaration)
+    FD_ZERO(&read_fds); // NOLINT(readability-isolate-declaration)
 
     // get the listener
     if ((listener = socket(AF_INET, SOCK_STREAM, 0)) == -1)
