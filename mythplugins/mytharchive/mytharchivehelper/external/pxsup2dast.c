@@ -709,7 +709,6 @@ static void pxsubtitle(const char * supfile, FILE * ofh, eu8 palette[16][3],
                         switch (cmd) 
                         {
                             case 0x00:      /* force display: */
-                                continue;
                             case 0x01:      /* start date (read above) */
                                 continue;
                             case 0x02:      /* stop date (read above) */

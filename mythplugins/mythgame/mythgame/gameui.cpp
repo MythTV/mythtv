@@ -196,9 +196,7 @@ bool GameUI::keyPressEvent(QKeyEvent *event)
             showInfo();
         else if (action == "TOGGLEFAV")
             toggleFavorite();
-        else if (action == "INCSEARCH")
-            searchStart();
-        else if (action == "INCSEARCHNEXT")
+        else if ((action == "INCSEARCH") || (action == "INCSEARCHNEXT"))
             searchStart();
         else if (action == "DOWNLOADDATA")
             gameSearch();

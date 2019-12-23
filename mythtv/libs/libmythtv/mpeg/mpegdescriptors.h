@@ -267,19 +267,16 @@ class MTV_PUBLIC MPEGDescriptor
     MPEGDescriptor(const unsigned char *data,
                    int len, uint tag) : m_data(data)
     {
-        if ((len < 2) || (int(DescriptorLength()) + 2) > len)
-            m_data = nullptr;
-        else if (DescriptorTag() != tag)
+        if ((len < 2) || ((int(DescriptorLength()) + 2) > len)
+            || (DescriptorTag() != tag))
             m_data = nullptr;
     }
     MPEGDescriptor(const unsigned char *data,
                    int len, uint tag, uint req_desc_len) : m_data(data)
     {
-        if ((len < 2) || (int(DescriptorLength()) + 2) > len)
-            m_data = nullptr;
-        else if (DescriptorTag() != tag)
-            m_data = nullptr;
-        else if (DescriptorLength() != req_desc_len)
+        if ((len < 2) || ((int(DescriptorLength()) + 2) > len)
+            || (DescriptorTag() != tag)
+            || (DescriptorLength() != req_desc_len))
             m_data = nullptr;
     }
     virtual ~MPEGDescriptor() = default;

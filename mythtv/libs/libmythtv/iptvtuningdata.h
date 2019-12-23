@@ -202,7 +202,7 @@ class MTV_PUBLIC IPTVTuningData
     void GuessProtocol(void)
     {
         if (!m_dataUrl.isValid())
-            m_protocol = IPTVTuningData::inValid;
+            m_protocol = IPTVTuningData::inValid; // NOLINT(bugprone-branch-clone)
         else if (m_dataUrl.scheme() == "udp")
             m_protocol = IPTVTuningData::udp;
         else if (m_dataUrl.scheme() == "rtp")

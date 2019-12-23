@@ -456,6 +456,7 @@ class ComponentDescriptor : public MPEGDescriptor
     {
         switch(ComponentType())
         {
+            // NOLINTNEXTLINE(bugprone-branch-clone)
             case 0x0: case 0x1:
             case 0x2: case 0x3:
                 return VID_HDTV;

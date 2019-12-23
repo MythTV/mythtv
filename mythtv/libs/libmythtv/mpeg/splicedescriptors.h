@@ -52,9 +52,8 @@ class SpliceDescriptor
     SpliceDescriptor(const unsigned char *data,
                      int len, uint tag) : m_data(data)
     {
-        if ((len < 2) || (int(DescriptorLength()) + 2) > len)
-            m_data = nullptr;
-        else if (DescriptorTag() != tag)
+        if ((len < 2) || ((int(DescriptorLength()) + 2) > len)
+            || (DescriptorTag() != tag))
             m_data = nullptr;
     }
     virtual ~SpliceDescriptor(void) = default;
