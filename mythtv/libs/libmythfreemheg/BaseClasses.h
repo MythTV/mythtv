@@ -51,6 +51,7 @@ template <class BASE> class MHSequence {
         // and anything above it up one place.
         void InsertAt(BASE b, int n) {
             MHASSERT(n >= 0 && n <= m_VecSize);
+            // NOLINTNEXTLINE(bugprone-sizeof-expression)
             BASE *ptr = (BASE*)realloc(m_Values, (m_VecSize+1) * sizeof(BASE));
             if (ptr == nullptr) throw "Out of Memory";
             m_Values = ptr;
