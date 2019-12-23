@@ -179,7 +179,7 @@ class ScriptableMyth : public QObject
 
     public:
 
-        Q_INVOKABLE ScriptableMyth( QScriptEngine *pEngine, QObject *parent = nullptr ) : QObject( parent )
+        Q_INVOKABLE explicit ScriptableMyth( QScriptEngine *pEngine, QObject *parent = nullptr ) : QObject( parent )
         {
             m_pEngine = pEngine;
         }

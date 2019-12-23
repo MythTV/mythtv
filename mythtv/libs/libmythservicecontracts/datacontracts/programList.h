@@ -56,7 +56,7 @@ class SERVICE_PUBLIC ProgramList : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Q_INVOKABLE ProgramList(QObject *parent = nullptr)
+        Q_INVOKABLE explicit ProgramList(QObject *parent = nullptr)
             : QObject         ( parent ),
               m_StartIndex    ( 0      ),
               m_Count         ( 0      ),

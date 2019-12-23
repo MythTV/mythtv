@@ -316,7 +316,7 @@ class ScriptableDvr : public QObject
 
     public:
 
-        Q_INVOKABLE ScriptableDvr( QScriptEngine *pEngine, QObject *parent = nullptr ) : QObject( parent )
+        Q_INVOKABLE explicit ScriptableDvr( QScriptEngine *pEngine, QObject *parent = nullptr ) : QObject( parent )
         {
             m_pEngine = pEngine;
         }

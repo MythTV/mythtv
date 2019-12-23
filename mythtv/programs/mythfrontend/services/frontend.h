@@ -74,7 +74,7 @@ class ScriptableFrontend : public QObject
     QScriptEngine *m_pEngine;
 
   public:
-    Q_INVOKABLE ScriptableFrontend( QScriptEngine *pEngine, QObject *parent = nullptr ) : QObject( parent )
+    Q_INVOKABLE explicit ScriptableFrontend( QScriptEngine *pEngine, QObject *parent = nullptr ) : QObject( parent )
     {
         m_pEngine = pEngine;
     }

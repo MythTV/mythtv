@@ -40,7 +40,7 @@ class SERVICE_PUBLIC ArtworkInfoList : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Q_INVOKABLE ArtworkInfoList(QObject *parent = nullptr)
+        Q_INVOKABLE explicit ArtworkInfoList(QObject *parent = nullptr)
             : QObject         ( parent )
         {
         }

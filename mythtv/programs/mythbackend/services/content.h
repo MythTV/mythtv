@@ -153,7 +153,7 @@ class ScriptableContent : public QObject
 
     public:
 
-        Q_INVOKABLE ScriptableContent( QScriptEngine *pEngine, QObject *parent = nullptr ) : QObject( parent )
+        Q_INVOKABLE explicit ScriptableContent( QScriptEngine *pEngine, QObject *parent = nullptr ) : QObject( parent )
         {
             m_pEngine = pEngine;
         }
