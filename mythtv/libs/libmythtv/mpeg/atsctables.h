@@ -228,8 +228,7 @@ class MTV_PUBLIC VirtualChannelTable : public PSIPTable
             return QString();
 
         QString str;
-        const unsigned short* ustr =
-            reinterpret_cast<const unsigned short*>(m_ptrs[i]);
+        const auto* ustr = reinterpret_cast<const unsigned short*>(m_ptrs[i]);
         for (int j=0; j<7; j++)
         {
             QChar c((ustr[j]<<8) | (ustr[j]>>8));

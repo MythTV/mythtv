@@ -144,6 +144,7 @@ class ScriptableImage : public QObject
         }
 };
 
+// NOLINTNEXTLINE(modernize-use-auto)
 Q_SCRIPT_DECLARE_QMETAOBJECT_MYTHTV( ScriptableImage, QObject*)
 
 #endif

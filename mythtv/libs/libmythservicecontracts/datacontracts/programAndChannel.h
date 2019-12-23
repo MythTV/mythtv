@@ -307,7 +307,7 @@ inline Program *ChannelInfo::AddNewProgram()
     // We must make sure the object added to the QVariantList has
     // a parent of 'this'
 
-    Program *pObject = new Program( this );
+    auto *pObject = new Program( this );
     m_Programs.append( QVariant::fromValue<QObject *>( pObject ));
 
     return pObject;

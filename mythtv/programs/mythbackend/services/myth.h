@@ -436,6 +436,7 @@ class ScriptableMyth : public QObject
         }
 };
 
+// NOLINTNEXTLINE(modernize-use-auto)
 Q_SCRIPT_DECLARE_QMETAOBJECT_MYTHTV( ScriptableMyth, QObject*);
 
 #endif

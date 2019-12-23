@@ -54,11 +54,11 @@ class TestAudioConvert: public QObject
     {
         QFETCH(int, SAMPLES);
 
-        int    SIZEARRAY    = SAMPLES;
-        short* arrays1      = (short*)av_malloc(SIZEARRAY * ISIZEOF(short));
-        short* arrays2      = (short*)av_malloc(SIZEARRAY * ISIZEOF(short));
+        int   SIZEARRAY = SAMPLES;
+        auto *arrays1   = (uint16_t*)av_malloc(SIZEARRAY * ISIZEOF(uint16_t));
+        auto *arrays2   = (uint16_t*)av_malloc(SIZEARRAY * ISIZEOF(uint16_t));
 
-        short j = INT16_MIN;
+        uint16_t j = INT16_MIN;
         for (int i = 0; i < SAMPLES; i++, j++)
         {
             arrays1[i] = j;
@@ -90,12 +90,12 @@ class TestAudioConvert: public QObject
     {
         QFETCH(int, SAMPLES);
 
-        int    SIZEARRAY    = SAMPLES;
-        short* arrays1      = (short*)av_malloc(SIZEARRAY * ISIZEOF(short));
-        short* arrays2      = (short*)av_malloc(SIZEARRAY * ISIZEOF(short));
-        float* arrayf       = (float*)av_malloc(SIZEARRAY * ISIZEOF(float));
+        int   SIZEARRAY = SAMPLES;
+        auto *arrays1   = (uint16_t*)av_malloc(SIZEARRAY * ISIZEOF(uint16_t));
+        auto *arrays2   = (uint16_t*)av_malloc(SIZEARRAY * ISIZEOF(uint16_t));
+        auto *arrayf    = (float*)av_malloc(SIZEARRAY * ISIZEOF(float));
 
-        short j = INT16_MIN;
+        uint16_t j = INT16_MIN;
         for (int i = 0; i < SAMPLES; i++, j++)
         {
             arrays1[i] = j;
@@ -132,13 +132,13 @@ class TestAudioConvert: public QObject
     {
         QFETCH(int, SAMPLES);
 
-        int SIZEARRAY       = SAMPLES;
+        int SIZEARRAY  = SAMPLES;
 
-        short*   arrays1    = (short*)av_malloc(SIZEARRAY * ISIZEOF(short));
-        short*   arrays2    = (short*)av_malloc(SIZEARRAY * ISIZEOF(short));
-        int32_t* arrays24   = (int32_t*)av_malloc(SIZEARRAY * ISIZEOF(int32_t));
+        auto *arrays1  = (uint16_t*)av_malloc(SIZEARRAY * ISIZEOF(uint16_t));
+        auto *arrays2  = (uint16_t*)av_malloc(SIZEARRAY * ISIZEOF(uint16_t));
+        auto *arrays24 = (int32_t*)av_malloc(SIZEARRAY * ISIZEOF(int32_t));
 
-        short j = INT16_MIN;
+        uint16_t j = INT16_MIN;
         for (int i = 0; i < SAMPLES; i++, j++)
         {
             arrays1[i] = j;
@@ -177,13 +177,13 @@ class TestAudioConvert: public QObject
     {
         QFETCH(int, SAMPLES);
 
-        int SIZEARRAY       = SAMPLES;
+        int SIZEARRAY  = SAMPLES;
 
-        int32_t*   arrays1  = (int32_t*)av_malloc(SIZEARRAY * ISIZEOF(int32_t));
-        int32_t*   arrays2  = (int32_t*)av_malloc(SIZEARRAY * ISIZEOF(int32_t));
-        int32_t*   arrays32 = (int32_t*)av_malloc(SIZEARRAY * ISIZEOF(int32_t));
+        auto *arrays1  = (int32_t*)av_malloc(SIZEARRAY * ISIZEOF(int32_t));
+        auto *arrays2  = (int32_t*)av_malloc(SIZEARRAY * ISIZEOF(int32_t));
+        auto *arrays32 = (int32_t*)av_malloc(SIZEARRAY * ISIZEOF(int32_t));
 
-        short j = INT16_MIN;
+        uint16_t j = INT16_MIN;
         for (int i = 0; i < SAMPLES; i++, j++)
         {
             arrays1[i] = j;
@@ -220,13 +220,13 @@ class TestAudioConvert: public QObject
     {
         QFETCH(int, SAMPLES);
 
-        int SIZEARRAY       = SAMPLES;
+        int SIZEARRAY  = SAMPLES;
 
-        short*   arrays1    = (short*)av_malloc(SIZEARRAY * ISIZEOF(short));
-        short*   arrays2    = (short*)av_malloc(SIZEARRAY * ISIZEOF(short));
-        int32_t* arrays24   = (int32_t*)av_malloc(SIZEARRAY * ISIZEOF(int32_t));
+        auto *arrays1  = (uint16_t*)av_malloc(SIZEARRAY * ISIZEOF(uint16_t));
+        auto *arrays2  = (uint16_t*)av_malloc(SIZEARRAY * ISIZEOF(uint16_t));
+        auto *arrays24 = (int32_t*)av_malloc(SIZEARRAY * ISIZEOF(int32_t));
 
-        short j = INT16_MIN;
+        uint16_t j = INT16_MIN;
         for (int i = 0; i < SAMPLES; i++, j++)
         {
             arrays1[i] = j << 8;
@@ -264,13 +264,13 @@ class TestAudioConvert: public QObject
     {
         QFETCH(int, SAMPLES);
 
-        int SIZEARRAY       = SAMPLES;
+        int SIZEARRAY  = SAMPLES;
 
-        int32_t*   arrays1  = (int32_t*)av_malloc(SIZEARRAY * ISIZEOF(int32_t));
-        int32_t*   arrays2  = (int32_t*)av_malloc(SIZEARRAY * ISIZEOF(int32_t));
-        int32_t*   arrays32 = (int32_t*)av_malloc(SIZEARRAY * ISIZEOF(int32_t));
+        auto *arrays1  = (int32_t*)av_malloc(SIZEARRAY * ISIZEOF(int32_t));
+        auto *arrays2  = (int32_t*)av_malloc(SIZEARRAY * ISIZEOF(int32_t));
+        auto *arrays32 = (int32_t*)av_malloc(SIZEARRAY * ISIZEOF(int32_t));
 
-        short j = INT16_MIN;
+        uint16_t j = INT16_MIN;
         for (int i = 0; i < SAMPLES; i++, j++)
         {
             arrays1[i] = j << 8;
@@ -307,13 +307,13 @@ class TestAudioConvert: public QObject
     {
         QFETCH(int, SAMPLES);
 
-        int SIZEARRAY       = SAMPLES;
+        int SIZEARRAY  = SAMPLES;
 
-        short*   arrays1    = (short*)av_malloc(SIZEARRAY * ISIZEOF(short));
-        short*   arrays2    = (short*)av_malloc(SIZEARRAY * ISIZEOF(short));
-        int32_t* arrays32   = (int32_t*)av_malloc(SIZEARRAY * ISIZEOF(int32_t));
+        auto *arrays1  = (uint16_t*)av_malloc(SIZEARRAY * ISIZEOF(uint16_t));
+        auto *arrays2  = (uint16_t*)av_malloc(SIZEARRAY * ISIZEOF(uint16_t));
+        auto *arrays32 = (int32_t*)av_malloc(SIZEARRAY * ISIZEOF(int32_t));
 
-        short j = INT16_MIN;
+        uint16_t j = INT16_MIN;
         for (int i = 0; i < SAMPLES; i++, j++)
         {
             arrays1[i] = j;
@@ -350,13 +350,13 @@ class TestAudioConvert: public QObject
     {
         QFETCH(int, SAMPLES);
 
-        int SIZEARRAY       = 256;
+        int SIZEARRAY  = 256;
 
-        uchar*   arrays1    = (uchar*)av_malloc(SIZEARRAY * ISIZEOF(uchar));
-        uchar*   arrays2    = (uchar*)av_malloc(SIZEARRAY * ISIZEOF(uchar));
-        short*  arrays32    = (short*)av_malloc(SIZEARRAY * ISIZEOF(short));
+        auto *arrays1  = (uint8_t*)av_malloc(SIZEARRAY * ISIZEOF(uint8_t));
+        auto *arrays2  = (uint8_t*)av_malloc(SIZEARRAY * ISIZEOF(uint8_t));
+        auto *arrays32 = (uint16_t*)av_malloc(SIZEARRAY * ISIZEOF(uint16_t));
 
-        uchar j = 0;
+        uint8_t j = 0;
         for (int i = 0; i < SAMPLES; i++, j++)
         {
             arrays1[i] = j;
@@ -387,11 +387,11 @@ class TestAudioConvert: public QObject
         int offsetfloat1    = 1;
         int offsetfloat2    = 0;
 
-        int32_t *arrays1    = (int32_t*)av_malloc((SIZEARRAY+offsetint32_t+4) * ISIZEOF(int32_t));
+        auto *arrays1 = (int32_t*)av_malloc((SIZEARRAY+offsetint32_t+4) * ISIZEOF(int32_t));
         // has to be 16 int32_t for 16 bytes boundary * 2
-        int32_t *arrays2    = (int32_t*)av_malloc((SIZEARRAY+offsetint32_t+4) * ISIZEOF(int32_t));
-        float *arrayf1      = (float*)av_malloc((SIZEARRAY+offsetfloat1+4) * ISIZEOF(float));
-        float *arrayf2      = (float*)av_malloc((SIZEARRAY+offsetfloat2+4) * ISIZEOF(float));
+        auto *arrays2 = (int32_t*)av_malloc((SIZEARRAY+offsetint32_t+4) * ISIZEOF(int32_t));
+        auto *arrayf1 = (float*)av_malloc((SIZEARRAY+offsetfloat1+4) * ISIZEOF(float));
+        auto *arrayf2 = (float*)av_malloc((SIZEARRAY+offsetfloat2+4) * ISIZEOF(float));
 
         arrayf1[0+offsetfloat1] = -1.2;
         arrayf1[1+offsetfloat1] = -1.1;
@@ -439,10 +439,10 @@ class TestAudioConvert: public QObject
         int offsetint32_t   = 0;
         int offsetfloat1    = OFFSET;
 
-        int32_t *arrays1    = (int32_t*)av_malloc((SIZEARRAY+offsetint32_t+4) * ISIZEOF(int32_t));
+        auto *arrays1 = (int32_t*)av_malloc((SIZEARRAY+offsetint32_t+4) * ISIZEOF(int32_t));
         // has to be 16 int32_t for 16 bytes boundary * 2
-        int32_t *arrays2    = (int32_t*)av_malloc((SIZEARRAY+offsetint32_t+4) * ISIZEOF(int32_t));
-        float *arrayf1      = (float*)av_malloc((SIZEARRAY+offsetfloat1+4) * ISIZEOF(float));
+        auto *arrays2 = (int32_t*)av_malloc((SIZEARRAY+offsetint32_t+4) * ISIZEOF(int32_t));
+        auto *arrayf1 = (float*)av_malloc((SIZEARRAY+offsetfloat1+4) * ISIZEOF(float));
 
         arrayf1[0+offsetfloat1] = -1.2;
         arrayf1[1+offsetfloat1] = -1.1;
@@ -495,10 +495,10 @@ class TestAudioConvert: public QObject
         int offsetint32_t   = 0;
         int offsetfloat1    = OFFSET;
 
-        short *arrays1      = (short*)av_malloc((SIZEARRAY+offsetint32_t+4) * ISIZEOF(short));
+        auto *arrays1 = (uint16_t*)av_malloc((SIZEARRAY+offsetint32_t+4) * ISIZEOF(uint16_t));
         // has to be 16 int32_t for 16 bytes boundary * 2
-        short *arrays2      = (short*)av_malloc((SIZEARRAY+offsetint32_t+4) * ISIZEOF(short));
-        float *arrayf1      = (float*)av_malloc((SIZEARRAY+offsetfloat1+4) * ISIZEOF(float));
+        auto *arrays2 = (uint16_t*)av_malloc((SIZEARRAY+offsetint32_t+4) * ISIZEOF(uint16_t));
+        auto *arrayf1 = (float*)av_malloc((SIZEARRAY+offsetfloat1+4) * ISIZEOF(float));
 
         arrayf1[0+offsetfloat1] = -1.2;
         arrayf1[1+offsetfloat1] = -1.1;
@@ -551,10 +551,10 @@ class TestAudioConvert: public QObject
         int offsetint32_t   = 0;
         int offsetfloat1    = OFFSET;
 
-        uchar *arrays1      = (uchar*)av_malloc((SIZEARRAY+offsetint32_t+4) * ISIZEOF(uchar));
+        auto *arrays1 = (uint8_t*)av_malloc((SIZEARRAY+offsetint32_t+4) * ISIZEOF(uint8_t));
         // has to be 16 int32_t for 16 bytes boundary * 2
-        uchar *arrays2      = (uchar*)av_malloc((SIZEARRAY+offsetint32_t+4) * ISIZEOF(uchar));
-        float *arrayf1      = (float*)av_malloc((SIZEARRAY+offsetfloat1+4) * ISIZEOF(float));
+        auto *arrays2 = (uint8_t*)av_malloc((SIZEARRAY+offsetint32_t+4) * ISIZEOF(uint8_t));
+        auto *arrayf1 = (float*)av_malloc((SIZEARRAY+offsetfloat1+4) * ISIZEOF(float));
 
         arrayf1[0+offsetfloat1] = -1.2;
         arrayf1[1+offsetfloat1] = -1.1;

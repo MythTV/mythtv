@@ -346,7 +346,7 @@ drmModePropertyBlobPtr MythDRMDevice::GetBlobProperty(drmModeConnectorPtr Connec
         drmModePropertyPtr propid = drmModeGetProperty(m_fd, Connector->props[i]);
         if ((propid->flags & DRM_MODE_PROP_BLOB) && propid->name == Property)
         {
-            uint32_t blobid = static_cast<uint32_t>(Connector->prop_values[i]);
+            auto blobid = static_cast<uint32_t>(Connector->prop_values[i]);
             result = drmModeGetPropertyBlob(m_fd, blobid);
         }
         drmModeFreeProperty(propid);

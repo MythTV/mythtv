@@ -173,7 +173,7 @@ class MTV_PUBLIC TSPacket : public TSHeader
 
     static TSPacket* CreatePayloadOnlyPacket(void)
     {
-        TSPacket *pkt = new TSPacket();
+        auto *pkt = new TSPacket();
         pkt->InitHeader(kPayloadOnlyHeader);
         memset(pkt->m_tsPayload, 0xFF, kPayloadSize);
         pkt->SetStartOfFieldPointer(0);
@@ -181,7 +181,7 @@ class MTV_PUBLIC TSPacket : public TSHeader
     }
 
     inline TSPacket* CreateClone(void) const {
-        TSPacket *pkt = new TSPacket();
+        auto *pkt = new TSPacket();
         memcpy(pkt, this, kSize);
         return pkt;
     }

@@ -41,7 +41,7 @@ class CC608Buffer
     void Clear(void)
     {
         m_lock.lock();
-        vector<CC608Text*>::iterator i = m_buffers.begin();
+        auto i = m_buffers.begin();
         for (; i != m_buffers.end(); ++i)
         {
             CC608Text *cc = (*i);

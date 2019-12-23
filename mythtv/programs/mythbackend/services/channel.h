@@ -353,6 +353,7 @@ class ScriptableChannel : public QObject
 };
 
 
+// NOLINTNEXTLINE(modernize-use-auto)
 Q_SCRIPT_DECLARE_QMETAOBJECT_MYTHTV( ScriptableChannel, QObject*);
 
 #endif

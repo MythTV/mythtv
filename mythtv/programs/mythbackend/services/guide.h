@@ -214,6 +214,7 @@ class ScriptableGuide : public QObject
         }
 };
 
+// NOLINTNEXTLINE(modernize-use-auto)
 Q_SCRIPT_DECLARE_QMETAOBJECT_MYTHTV( ScriptableGuide, QObject*);
 
 #endif

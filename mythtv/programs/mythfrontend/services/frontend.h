@@ -83,6 +83,7 @@ class ScriptableFrontend : public QObject
                                     return m_obj.GetStatus(); ) }
 };
 
+// NOLINTNEXTLINE(modernize-use-auto)
 Q_SCRIPT_DECLARE_QMETAOBJECT_MYTHTV(ScriptableFrontend, QObject*);
 
 #endif // FRONTEND_H

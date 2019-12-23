@@ -179,6 +179,7 @@ class ScriptableCapture : public QObject
 };
 
 
+// NOLINTNEXTLINE(modernize-use-auto)
 Q_SCRIPT_DECLARE_QMETAOBJECT_MYTHTV( ScriptableCapture, QObject*);
 
 #endif

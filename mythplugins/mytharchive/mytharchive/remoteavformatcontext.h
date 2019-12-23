@@ -114,7 +114,7 @@ class RemoteAVFormatContext
   private:
     static int ReadFunc(void *opaque, uint8_t *buf, int buf_size)
     {
-        RemoteFile *rf = reinterpret_cast< RemoteFile* >(opaque);
+        auto *rf = reinterpret_cast< RemoteFile* >(opaque);
         return rf->Read(buf, buf_size);
     }
 
@@ -123,7 +123,7 @@ class RemoteAVFormatContext
 
     static int64_t SeekFunc(void *opaque, int64_t offset, int whence)
     {
-        RemoteFile *rf = reinterpret_cast< RemoteFile* >(opaque);
+        auto *rf = reinterpret_cast< RemoteFile* >(opaque);
         if (whence == AVSEEK_SIZE)
             return rf->GetFileSize();
 

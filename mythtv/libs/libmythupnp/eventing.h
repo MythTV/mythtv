@@ -203,8 +203,7 @@ class UPNP_PUBLIC StateVariables
             if (it == m_map.end())
                 return false;
 
-            StateVariable< T > *pVariable =
-                dynamic_cast< StateVariable< T > *>( *it );
+            auto *pVariable = dynamic_cast< StateVariable< T > *>( *it );
 
             if (pVariable == nullptr)
                 return false;           // It's not the expected type.
@@ -230,8 +229,7 @@ class UPNP_PUBLIC StateVariables
             if (it == m_map.end())
                 return state_var_init(dummy);
 
-            StateVariable< T > *pVariable =
-                dynamic_cast< StateVariable< T > *>( *it );
+            auto *pVariable = dynamic_cast< StateVariable< T > *>( *it );
 
             if (pVariable != nullptr)
                 return pVariable->GetValue();

@@ -30,8 +30,8 @@ class LogScale
         delete [] m_indices;
 
         double alpha;
-        long double domain = (long double) maxscale;
-        long double range  = (long double) maxrange;
+        auto domain = (long double) maxscale;
+        auto range  = (long double) maxrange;
         long double x  = 1.0;
         long double dx = 1.0;
         long double e4 = 1.0E-8;

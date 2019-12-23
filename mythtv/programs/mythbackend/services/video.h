@@ -288,6 +288,7 @@ class ScriptableVideo : public QObject
         }
 };
 
+// NOLINTNEXTLINE(modernize-use-auto)
 Q_SCRIPT_DECLARE_QMETAOBJECT_MYTHTV( ScriptableVideo, QObject*);
 
 #endif

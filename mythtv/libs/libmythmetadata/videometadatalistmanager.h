@@ -130,7 +130,7 @@ class META_PUBLIC meta_dir_node : public meta_node
         m_subdirs.sort(dir_sort);
         m_entries.sort(entry_sort);
 
-        for (meta_dir_list::iterator p = m_subdirs.begin();
+        for (auto p = m_subdirs.begin();
         p != m_subdirs.end(); ++p)
         {
             (*p)->sort(dir_sort, entry_sort);
