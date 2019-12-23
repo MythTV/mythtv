@@ -56,6 +56,9 @@ class MBASE_PUBLIC MThread
     explicit MThread(const QString &objectName, QRunnable *runnable);
     virtual ~MThread();
 
+    MThread(const MThread &) = delete;            // not copyable
+    MThread &operator=(const MThread &) = delete; // not copyable
+
     /// \brief Sets up a thread, call this if you reimplement run().
     void RunProlog(void);
     /// \brief Cleans up a thread's resources, call this if you reimplement
@@ -112,10 +115,6 @@ class MBASE_PUBLIC MThread
     static void GetAllRunningThreadNames(QStringList &list);
 
     static const int kDefaultStartTimeout;
-
-  private:
-    MThread(const MThread &) = delete;            // not copyable
-    MThread &operator=(const MThread &) = delete; // not copyable
 
   protected:
     /// \brief Runs the Qt event loop unless we have a QRunnable,

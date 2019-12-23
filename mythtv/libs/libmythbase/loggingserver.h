@@ -168,6 +168,9 @@ class DBLoggerThread : public MThread
   public:
     explicit DBLoggerThread(DatabaseLogger *logger);
     ~DBLoggerThread();
+    DBLoggerThread(const DBLoggerThread &) = delete;            // not copyable
+    DBLoggerThread &operator=(const DBLoggerThread &) = delete; // not copyable
+
     void run(void) override; // MThread
     void stop(void);
     /// \brief Enqueues a LoggingItem onto the queue for the thread to
@@ -182,9 +185,6 @@ class DBLoggerThread : public MThread
         return (m_queue->size() >= MAX_QUEUE_LEN);
     }
   private:
-    DBLoggerThread(const DBLoggerThread &) = delete;            // not copyable
-    DBLoggerThread &operator=(const DBLoggerThread &) = delete; // not copyable
-
     DatabaseLogger *m_logger {nullptr};///< The associated logger instance
     QMutex m_queueMutex;               ///< Mutex for protecting the queue
     QQueue<LoggingItem *> *m_queue {nullptr}; ///< Queue of LoggingItems to insert

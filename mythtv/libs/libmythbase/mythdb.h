@@ -17,6 +17,9 @@ class MBASE_PUBLIC MythDB
   public:
     MDBManager *GetDBManager(void);
 
+    MythDB(const MythDB &) = delete;            // not copyable
+    MythDB &operator=(const MythDB &) = delete; // not copyable
+
     static QString GetError(const QString &where, const MSqlQuery &query);
     static void DBError(const QString &where, const MSqlQuery &query);
     static QString DBErrorMessage(const QSqlError &err);
@@ -91,8 +94,6 @@ class MBASE_PUBLIC MythDB
    ~MythDB();
 
   private:
-    MythDB(const MythDB &) = delete;            // not copyable
-    MythDB &operator=(const MythDB &) = delete; // not copyable
     MythDBPrivate *d {nullptr}; // NOLINT(readability-identifier-naming)
 };
 
