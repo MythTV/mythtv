@@ -156,8 +156,7 @@ class MPUBLIC MythUITextEditSetting : public StandardSetting
 class MPUBLIC TransTextEditSetting: public MythUITextEditSetting
 {
   public:
-    TransTextEditSetting() :
-        MythUITextEditSetting() { }
+    TransTextEditSetting() = default;
 };
 
 
@@ -411,8 +410,7 @@ class MPUBLIC MythUICheckBoxSetting : public StandardSetting
 class MPUBLIC TransMythUICheckBoxSetting: public MythUICheckBoxSetting
 {
   public:
-    TransMythUICheckBoxSetting() :
-        MythUICheckBoxSetting() { }
+    TransMythUICheckBoxSetting() = default;
 };
 
 class MPUBLIC HostCheckBoxSetting: public MythUICheckBoxSetting

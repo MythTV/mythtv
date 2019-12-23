@@ -24,7 +24,7 @@ class MPEGDescriptor;
 class MTV_PUBLIC DTVMultiplex
 {
   public:
-  DTVMultiplex() = default;
+    DTVMultiplex() = default;
     DTVMultiplex(const DTVMultiplex &/*other*/) = default;
     DTVMultiplex &operator=(const DTVMultiplex &/*other*/) = default;
     virtual ~DTVMultiplex() = default;
@@ -115,8 +115,7 @@ class MTV_PUBLIC DTVMultiplex
 class MTV_PUBLIC ScanDTVTransport : public DTVMultiplex
 {
   public:
-    ScanDTVTransport() :
-        DTVMultiplex() { }
+    ScanDTVTransport() = default;
     ScanDTVTransport(const DTVMultiplex &mplex, DTVTunerType tt, uint cid) :
         DTVMultiplex(mplex), m_tuner_type(tt), m_cardid(cid) { }
     ~ScanDTVTransport() override = default;

@@ -13,7 +13,7 @@ class QPainter;
 class MythQtPainter : public MythPainter
 {
   public:
-    MythQtPainter() : MythPainter() {}
+    MythQtPainter() = default;
    ~MythQtPainter() override;
 
     QString GetName(void) override // MythPainter

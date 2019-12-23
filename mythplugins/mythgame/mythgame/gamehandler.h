@@ -62,7 +62,7 @@ class GameHandler : public QObject
     Q_OBJECT
 
   public:
-    GameHandler() : QObject() {}
+    GameHandler() = default;
 
     static void updateSettings(GameHandler *handler);
     static GameHandler *getHandler(uint i);

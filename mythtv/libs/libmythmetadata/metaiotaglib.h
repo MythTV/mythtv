@@ -20,7 +20,7 @@ using TagLib::String;
 class META_PUBLIC MetaIOTagLib : public MetaIO
 {
   public:
-    MetaIOTagLib(void) : MetaIO() {}
+    MetaIOTagLib(void) = default;
     ~MetaIOTagLib(void) override = default;
 
     bool write(const QString &filename, MusicMetadata* mdata) override = 0; // MetaIO

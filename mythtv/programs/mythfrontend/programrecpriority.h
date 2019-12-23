@@ -27,8 +27,7 @@ class ProgramRecPriorityInfo : public RecordingInfo
     friend class ProgramRecPriority;
 
   public:
-    ProgramRecPriorityInfo():
-        RecordingInfo() {}
+    ProgramRecPriorityInfo() = default;
     ProgramRecPriorityInfo(const ProgramRecPriorityInfo &/*other*/) = default;
     ProgramRecPriorityInfo &operator=(const ProgramRecPriorityInfo &other)
         { clone(other); return *this; }

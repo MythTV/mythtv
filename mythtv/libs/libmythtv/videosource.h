@@ -619,7 +619,7 @@ class FirewireDesc : public GroupSetting
 
   public:
     explicit FirewireDesc(const FirewireGUID *_guid) :
-        GroupSetting(), m_guid(_guid) { }
+        m_guid(_guid) { }
 
   public slots:
     void SetGUID(const QString &_guid);

@@ -146,8 +146,7 @@ public:
 class TransitionSpin : public TransitionBlend
 {
 public:
-    TransitionSpin() : TransitionBlend() 
-    { setObjectName(Transition::tr("Spin")); }
+    TransitionSpin() { setObjectName(Transition::tr("Spin")); }
     void Initialise() override; // TransitionBlend
     void Finalise() override; // TransitionBlend
 };

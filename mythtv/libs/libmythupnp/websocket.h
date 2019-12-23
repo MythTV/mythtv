@@ -138,7 +138,7 @@ class WebSocketExtension : public QObject
   Q_OBJECT
 
   public:
-    WebSocketExtension() : QObject() { };
+    WebSocketExtension() = default;;
     ~WebSocketExtension() override = default;
 
     virtual bool HandleTextFrame(const WebSocketFrame &/*frame*/) { return false; }

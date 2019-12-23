@@ -398,7 +398,6 @@ class MTV_PUBLIC PSIPTable : public PESPacket
   protected:
     // does not create it's own data
     PSIPTable(const TSPacket& tspacket, bool /*unused*/)
-        : PESPacket()
     {
         m_pesData = nullptr;
         m_fullBuffer = nullptr;
@@ -413,7 +412,6 @@ class MTV_PUBLIC PSIPTable : public PESPacket
     // may be modified
     PSIPTable(const TSPacket &tspacket,
               const unsigned char *pesdata, uint pes_size)
-        : PESPacket()
     { // clone
         m_ccLast = tspacket.ContinuityCounter();
         m_pesDataSize = pes_size;
@@ -446,7 +444,6 @@ class MTV_PUBLIC PSIPTable : public PESPacket
     }
     // may be modified
     explicit PSIPTable(const TSPacket& table)
-        : PESPacket()
     {
         // section_syntax_ind   1       1.0       8   should always be 1
         // private_indicator    1       1.1       9   should always be 1

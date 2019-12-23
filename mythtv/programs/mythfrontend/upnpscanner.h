@@ -73,7 +73,7 @@ class UPNPScanner : public QObject
 
   private:
     explicit UPNPScanner(UPNPSubscription *sub)
-        : QObject(), m_subscription(sub) {}
+        :  m_subscription(sub) {}
     void ScheduleUpdate(void);
     void CheckFailure(const QUrl &url);
     void Debug(void);

@@ -169,7 +169,7 @@ class MTV_PUBLIC TSPacket : public TSHeader
   public:
     /* note: payload is intentionally left uninitialized */
     // cppcheck-suppress uninitMemberVar
-    TSPacket(void) : TSHeader() { }
+    TSPacket(void) = default;
 
     static TSPacket* CreatePayloadOnlyPacket(void)
     {

@@ -109,7 +109,7 @@ protected:
     StringMap   GetDeviceDirs() const;
     QList<int>  GetAbsentees();
 
-    DeviceManager() : m_devices() {}
+    DeviceManager() = default;
     ~DeviceManager();
 
 private:
@@ -189,7 +189,7 @@ private:
 class ImageAdapterLocal : public ImageAdapterBase
 {
 public:
-    ImageAdapterLocal() : ImageAdapterBase() {}
+    ImageAdapterLocal() = default;
 
     ImageItem *CreateItem(const QFileInfo &fi, int parentId, int devId,
                           const QString &base) const;
@@ -227,7 +227,7 @@ protected:
 class ImageAdapterSg : public ImageAdapterBase
 {
 public:
-    ImageAdapterSg() : ImageAdapterBase(),
+    ImageAdapterSg() :
         m_hostname(gCoreContext->GetMasterHostName()),
         m_hostport(MythCoreContext::GetMasterServerPort()),
         m_sg(StorageGroup(IMAGE_STORAGE_GROUP, m_hostname, false)) {}
@@ -381,7 +381,7 @@ public:
     static ImageManagerBe* getInstance();
 
 protected:
-    ImageManagerBe() :QObject(), ImageHandler()
+    ImageManagerBe()
     {
         // Cleanup & terminate child threads before application exits
         connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(deleteLater()));
@@ -425,7 +425,7 @@ public:
                             int &sizeKb) const;
 protected:
     ImageDbReader(int order, int dirOrder, bool showAll, int showType)
-        : ImageHandler(),        m_remote(new ImageDbSg()),
+        : m_remote(new ImageDbSg()),
           m_dirOrder(dirOrder),  m_fileOrder(order),
           m_showHidden(showAll), m_showType(showType)
     { SetRefinementClause(); }

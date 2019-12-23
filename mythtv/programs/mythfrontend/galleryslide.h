@@ -64,8 +64,7 @@ public:
       \param type Effect to be animated
     */
     explicit Animation(Slide *image, Type type = Alpha)
-        : AbstractAnimation(), QVariantAnimation(),
-          m_parent(image), m_type(type) {}
+        : m_parent(image), m_type(type) {}
     void Start(bool forwards = true, float speed = 1.0) override; // AbstractAnimation
     void Pulse(int interval) override; // AbstractAnimation
     void Set(const QVariant& from, const QVariant& to,
@@ -91,7 +90,7 @@ protected:
 class GroupAnimation : public AbstractAnimation
 {
 public:
-    GroupAnimation() : AbstractAnimation()            {}
+    GroupAnimation() = default;
     ~GroupAnimation() override                        { GroupAnimation::Clear(); }
     void Pulse(int interval) override                     = 0; // AbstractAnimation
     void Start(bool forwards, float speed = 1.0) override      // AbstractAnimation
@@ -112,7 +111,7 @@ class SequentialAnimation : public GroupAnimation
 {
     Q_OBJECT
 public:
-    SequentialAnimation() : GroupAnimation()  {}
+    SequentialAnimation() = default;
     void Pulse(int interval) override; // GroupAnimation
     void Start(bool forwards, float speed = 1.0) override; // GroupAnimation
     void SetSpeed(float speed) override; // GroupAnimation
@@ -130,7 +129,7 @@ class ParallelAnimation : public GroupAnimation
 {
     Q_OBJECT
 public:
-    ParallelAnimation() : GroupAnimation()  {}
+    ParallelAnimation() = default;
     void Pulse(int interval) override; // GroupAnimation
     void Start(bool forwards, float speed = 1.0) override; // GroupAnimation
     void SetSpeed(float speed) override; // GroupAnimation

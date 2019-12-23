@@ -32,9 +32,7 @@ class Scheduler;
 class SchedInputInfo
 {
   public:
-    SchedInputInfo(void) :
-        m_groupInputs(),
-        m_conflictingInputs() {};
+    SchedInputInfo(void) = default;;
     ~SchedInputInfo(void) = default;
 
     uint          m_inputId      {0};
