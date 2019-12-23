@@ -975,7 +975,7 @@ int DVBChannel::GetChanID() const
 
     while (query.next())
     {
-        found += query.value(1).toInt();
+        found += query.value(1).toInt() > 0;
         if (id == -1 || found)
             id = query.value(0).toInt();
     }

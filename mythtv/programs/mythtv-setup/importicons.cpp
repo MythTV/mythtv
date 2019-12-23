@@ -295,7 +295,7 @@ bool ImportIconsWizard::initialLoad(const QString& name)
     if (!name.isEmpty())
         querystring.append("name=\"" + name + "\"");
     else
-        querystring.append("channel.visible");
+        querystring.append("channel.visible > 0");
     querystring.append(" ORDER BY name");
 
     MSqlQuery query(MSqlQuery::InitCon());

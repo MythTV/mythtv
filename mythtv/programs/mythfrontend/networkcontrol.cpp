@@ -1783,7 +1783,7 @@ QString NetworkControl::listChannels(const uint start, const uint limit)
         sqlStart--;
 
     queryStr = "select chanid, callsign, name from channel "
-        "where deleted IS NULL and visible = 1 "
+        "where deleted IS NULL and visible > 0 "
         "ORDER BY callsign";
 
     if (limit > 0)  // only if a limit is specified, we limit the results

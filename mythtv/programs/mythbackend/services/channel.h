@@ -64,7 +64,8 @@ class Channel : public ChannelServices
                                                      uint          ATSCMajorChannel,
                                                      uint          ATSCMinorChannel,
                                                      bool          UseEIT,
-                                                     bool          visible,
+                                                     bool          Visible,
+                                                     const QString &ExtendedVisible,
                                                      const QString &FrequencyID,
                                                      const QString &Icon,
                                                      const QString &Format,
@@ -82,7 +83,8 @@ class Channel : public ChannelServices
                                                      uint          ATSCMajorChannel,
                                                      uint          ATSCMinorChannel,
                                                      bool          UseEIT,
-                                                     bool          visible,
+                                                     bool          Visible,
+                                                     const QString &ExtendedVisible,
                                                      const QString &FrequencyID,
                                                      const QString &Icon,
                                                      const QString &Format,
@@ -213,7 +215,8 @@ class ScriptableChannel : public QObject
                                    uint          ATSCMajorChannel,
                                    uint          ATSCMinorChannel,
                                    bool          UseEIT,
-                                   bool          visible,
+                                   bool          Visible,
+                                   const QString &ExtendedVisible,
                                    const QString &FrequencyID,
                                    const QString &Icon,
                                    const QString &Format,
@@ -225,7 +228,7 @@ class ScriptableChannel : public QObject
                 return m_obj.UpdateDBChannel(MplexID, SourceID, ChannelID,
                                          CallSign, ChannelName, ChannelNumber,
                                          ServiceID, ATSCMajorChannel, ATSCMinorChannel,
-                                         UseEIT, visible, FrequencyID, Icon, Format,
+                                         UseEIT, Visible, ExtendedVisible, FrequencyID, Icon, Format,
                                          XMLTVID, DefaultAuthority, ServiceType);
             )
         }
@@ -241,6 +244,7 @@ class ScriptableChannel : public QObject
                                    uint          ATSCMinorChannel,
                                    bool          UseEIT,
                                    bool          Visible,
+                                   const QString &ExtendedVisible,
                                    const QString &FrequencyID,
                                    const QString &Icon,
                                    const QString &Format,
@@ -252,7 +256,7 @@ class ScriptableChannel : public QObject
                 return m_obj.AddDBChannel(MplexID, SourceID, ChannelID,
                                       CallSign, ChannelName, ChannelNumber,
                                       ServiceID, ATSCMajorChannel, ATSCMinorChannel,
-                                      UseEIT, Visible, FrequencyID, Icon, Format,
+                                      UseEIT, Visible, ExtendedVisible, FrequencyID, Icon, Format,
                                       XMLTVID, DefaultAuthority, ServiceType);
             )
         }

@@ -388,18 +388,30 @@ class CommMethod : public MythUIComboBoxSetting
     }
 };
 
-class Visible : public MythUICheckBoxSetting
+class Visible : public MythUIComboBoxSetting
 {
   public:
-    explicit Visible(const ChannelID &id) :
-        MythUICheckBoxSetting(new ChannelDBStorage(this, id, "visible"))
+    Visible(const ChannelID &id) :
+        MythUIComboBoxSetting(new ChannelDBStorage(this, id, "visible"))
     {
-        setValue(true);
+        setValue(kChannelVisible);
 
         setLabel(QCoreApplication::translate("(ChannelSettings)", "Visible"));
 
         setHelpText(QCoreApplication::translate("(ChannelSettings)",
-            "If enabled, the channel will be visible in the EPG."));
+            "If set to yes or always, the channel will be visible in the "
+            "EPG.  Set to always or never to prevent MythTV and other "
+            "utilities from automatically managing the value for this "
+            "channel."));
+
+        addSelection(QCoreApplication::translate("(Common)", "Always Visible"),
+                     QString::number(kChannelAlwaysVisible));
+        addSelection(QCoreApplication::translate("(Common)", "Visible"),
+                     QString::number(kChannelVisible));
+        addSelection(QCoreApplication::translate("(Common)", "Not Visible"),
+                     QString::number(kChannelNotVisible));
+        addSelection(QCoreApplication::translate("(Common)", "Never Visible"),
+                     QString::number(kChannelNeverVisible));
     }
 };
 

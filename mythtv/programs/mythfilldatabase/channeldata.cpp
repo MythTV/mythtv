@@ -438,8 +438,7 @@ void ChannelData::handleChannels(int id, ChannelInfoList *chanlist)
                         mplexid,          id,               chanid,
                         (*i).m_callSign,  (*i).m_name,      (*i).m_chanNum,
                         0 /*service id*/, major,            minor,
-                        false /*use on air guide*/, false /*hidden*/,
-                        false /*hidden in guide*/,
+                        false /*use on air guide*/, kChannelVisible,
                         (*i).m_freqId,    localfile,        (*i).m_tvFormat,
                         (*i).m_xmltvId))
                 {
@@ -502,8 +501,7 @@ void ChannelData::handleChannels(int id, ChannelInfoList *chanlist)
                                                      0 /*service id*/,
                                                      major, minor,
                                                      false /*use on air guide*/,
-                                                     false /*hidden*/,
-                                                     false /*hidden in guide*/,
+                                                     kChannelVisible,
                                                      (*i).m_freqId,
                                                      localfile,
                                                      (*i).m_tvFormat,

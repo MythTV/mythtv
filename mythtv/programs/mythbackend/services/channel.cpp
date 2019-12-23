@@ -151,7 +151,8 @@ bool Channel::UpdateDBChannel( uint          MplexID,
                                uint          ATSCMajorChannel,
                                uint          ATSCMinorChannel,
                                bool          UseEIT,
-                               bool          visible,
+                               bool          Visible,
+                               const QString &ExtendedVisible,
                                const QString &FrequencyID,
                                const QString &Icon,
                                const QString &Format,
@@ -159,12 +160,67 @@ bool Channel::UpdateDBChannel( uint          MplexID,
                                const QString &DefaultAuthority,
                                uint          ServiceType )
 {
-    bool bResult = ChannelUtil::UpdateChannel( MplexID, SourceID, ChannelID,
-                             CallSign, ChannelName, ChannelNumber,
-                             ServiceID, ATSCMajorChannel, ATSCMinorChannel,
-                             UseEIT, !visible, false, FrequencyID,
-                             Icon, Format, XMLTVID, DefaultAuthority,
-                             ServiceType );
+    if (!HAS_PARAM("channelid"))
+        throw QString("ChannelId is required");
+
+    if (m_parsedParams.size() < 2 )
+        throw QString("Nothing to update");
+
+    ChannelInfo channel;
+    if (!channel.Load(ChannelID))
+        throw QString("ChannelId %1 doesn't exist");
+
+    if (HAS_PARAM("mplexid"))
+        channel.m_mplexId = MplexID;
+    if (HAS_PARAM("sourceid"))
+        channel.m_sourceId = SourceID;
+    if (HAS_PARAM("callsign"))
+        channel.m_callSign = CallSign;
+    if (HAS_PARAM("channelname"))
+        channel.m_name = ChannelName;
+    if (HAS_PARAM("channelnumber"))
+        channel.m_chanNum = ChannelNumber;
+    if (HAS_PARAM("serviceid"))
+        channel.m_serviceId = ServiceID;
+    if (HAS_PARAM("atscmajorchannel"))
+        channel.m_atscMajorChan = ATSCMajorChannel;
+    if (HAS_PARAM("atscminorchannel"))
+        channel.m_atscMinorChan = ATSCMinorChannel;
+    if (HAS_PARAM("useeit"))
+        channel.m_useOnAirGuide = UseEIT;
+    if (HAS_PARAM("extendedvisible"))
+        channel.m_visible = channelVisibleTypeFromString(ExtendedVisible);
+    else if (HAS_PARAM("visible"))
+    {
+        if (channel.m_visible == kChannelVisible ||
+            channel.m_visible == kChannelNotVisible)
+            channel.m_visible =
+                (Visible ? kChannelVisible : kChannelNotVisible);
+        else if ((channel.m_visible == kChannelAlwaysVisible && !Visible) ||
+                 (channel.m_visible == kChannelNeverVisible && Visible))
+            throw QString("Can't override Always/NeverVisible");
+    }
+    if (HAS_PARAM("frequencyid"))
+        channel.m_freqId = FrequencyID;
+    if (HAS_PARAM("icon"))
+        channel.m_icon = Icon;
+    if (HAS_PARAM("format"))
+        channel.m_tvFormat = Format;
+    if (HAS_PARAM("xmltvid"))
+        channel.m_xmltvId = XMLTVID;
+    if (HAS_PARAM("defaultauthority"))
+        channel.m_defaultAuthority = DefaultAuthority;
+    if (HAS_PARAM("servicetype"))
+        channel.m_serviceType = ServiceType;
+
+    bool bResult = ChannelUtil::UpdateChannel(
+        channel.m_mplexId, channel.m_sourceId, channel.m_chanId,
+        channel.m_callSign, channel.m_name, channel.m_chanNum,
+        channel.m_serviceId, channel.m_atscMajorChan,
+        channel.m_atscMinorChan, channel.m_useOnAirGuide,
+        channel.m_visible, channel.m_freqId,
+        channel.m_icon, channel.m_tvFormat, channel.m_xmltvId,
+        channel.m_defaultAuthority, channel.m_serviceType );
 
     return bResult;
 }
@@ -179,7 +235,8 @@ bool Channel::AddDBChannel( uint          MplexID,
                             uint          ATSCMajorChannel,
                             uint          ATSCMinorChannel,
                             bool          UseEIT,
-                            bool          visible,
+                            bool          Visible,
+                            const QString &ExtendedVisible,
                             const QString &FrequencyID,
                             const QString &Icon,
                             const QString &Format,
@@ -187,10 +244,16 @@ bool Channel::AddDBChannel( uint          MplexID,
                             const QString &DefaultAuthority,
                             uint          ServiceType )
 {
+    ChannelVisibleType chan_visible = kChannelVisible;
+    if (HAS_PARAM("extendedvisible"))
+        chan_visible = channelVisibleTypeFromString(ExtendedVisible);
+    else if (HAS_PARAM("visible"))
+        chan_visible = (Visible ? kChannelVisible : kChannelNotVisible);
+    
     bool bResult = ChannelUtil::CreateChannel( MplexID, SourceID, ChannelID,
                              CallSign, ChannelName, ChannelNumber,
                              ServiceID, ATSCMajorChannel, ATSCMinorChannel,
-                             UseEIT, !visible, false, FrequencyID,
+                             UseEIT, chan_visible, FrequencyID,
                              Icon, Format, XMLTVID, DefaultAuthority,
                              ServiceType );
 

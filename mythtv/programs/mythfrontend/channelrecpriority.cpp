@@ -251,7 +251,7 @@ void ChannelRecPriority::FillList(void)
     }
     result.prepare("SELECT chanid, channum, sourceid, callsign, "
                    "icon, recpriority, name FROM channel "
-                   "WHERE deleted IS NULL AND visible = 1");
+                   "WHERE deleted IS NULL AND visible > 0");
 
     if (result.exec())
     {

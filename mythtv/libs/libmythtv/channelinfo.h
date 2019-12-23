@@ -19,6 +19,17 @@ using namespace std;
 #include "mythtypes.h"
 #include "programtypes.h"
 
+enum ChannelVisibleType
+{
+    kChannelAlwaysVisible = 2,
+    kChannelVisible       = 1,
+    kChannelNotVisible    = 0,
+    kChannelNeverVisible  = -1
+};
+MPUBLIC QString toString(ChannelVisibleType);
+MPUBLIC QString toRawString(ChannelVisibleType);
+MPUBLIC ChannelVisibleType channelVisibleTypeFromString(const QString&);
+
 class MTV_PUBLIC ChannelInfo
 {
  public:
@@ -26,7 +37,7 @@ class MTV_PUBLIC ChannelInfo
     ChannelInfo(const ChannelInfo &other);
     ChannelInfo(const QString &_channum, const QString &_callsign,
               uint _chanid, uint _major_chan, uint _minor_chan,
-              uint _mplexid, bool _visible,
+              uint _mplexid, ChannelVisibleType _visible,
               const QString &_name, const QString &_icon,
               uint _sourceid);
     
@@ -94,7 +105,7 @@ class MTV_PUBLIC ChannelInfo
     uint         m_hue               {32768};
 
     QString      m_tvFormat;
-    bool         m_visible           {true};
+    ChannelVisibleType m_visible     {kChannelVisible};
     QString      m_outputFilters;
     bool         m_useOnAirGuide     {false};
     
@@ -214,6 +225,7 @@ class MTV_PUBLIC ChannelInsertInfo
     bool    m_useOnAirGuide      {false};
     bool    m_hidden             {false};
     bool    m_hiddenInGuide      {false};
+    ChannelVisibleType m_visible {kChannelVisible};
     QString m_freqId;
     QString m_icon;
     QString m_format;

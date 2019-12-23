@@ -1266,7 +1266,7 @@ QString ChannelUtil::GetIcon(uint chanid)
     QString iconquery = "SELECT chanid, icon FROM channel";
 
     if (s_runInit)
-        iconquery += " WHERE visible = 1";
+        iconquery += " WHERE visible > 0";
     else
         iconquery += " WHERE chanid = :CHANID";
 
@@ -1492,8 +1492,7 @@ bool ChannelUtil::CreateChannel(uint db_mplexid,
                                 uint atsc_major_channel,
                                 uint atsc_minor_channel,
                                 bool use_on_air_guide,
-                                bool hidden,
-                                bool hidden_in_guide,
+                                ChannelVisibleType visible,
                                 const QString &freqid,
                                 const QString& icon,
                                 QString format,
@@ -1543,8 +1542,7 @@ bool ChannelUtil::CreateChannel(uint db_mplexid,
     query.bindValue(":MAJORCHAN", atsc_major_channel);
     query.bindValue(":MINORCHAN", atsc_minor_channel);
     query.bindValue(":USEOAG",    use_on_air_guide);
-    query.bindValue(":VISIBLE",   !hidden);
-    (void) hidden_in_guide; // MythTV can't hide the channel in just the guide.
+    query.bindValue(":VISIBLE",   visible);
 
     if (!freqid.isEmpty())
         query.bindValue(":FREQID",    freqid);
@@ -1574,8 +1572,7 @@ bool ChannelUtil::UpdateChannel(uint db_mplexid,
                                 uint atsc_major_channel,
                                 uint atsc_minor_channel,
                                 bool use_on_air_guide,
-                                bool hidden,
-                                bool hidden_in_guide,
+                                ChannelVisibleType visible,
                                 const QString& freqid,
                                 const QString& icon,
                                 QString format,
@@ -1622,10 +1619,8 @@ bool ChannelUtil::UpdateChannel(uint db_mplexid,
     query.bindValue(":MAJORCHAN",   atsc_major_channel);
     query.bindValue(":MINORCHAN",   atsc_minor_channel);
     query.bindValue(":USEOAG",      use_on_air_guide);
-    query.bindValue(":VISIBLE",     !hidden);
+    query.bindValue(":VISIBLE",     visible);
     query.bindValue(":SERVICETYPE", service_type);
-
-    (void) hidden_in_guide; // MythTV can't hide the channel in just the guide.
 
     if (!freqid.isEmpty())
         query.bindValue(":FREQID",    freqid);
@@ -1693,7 +1688,8 @@ void ChannelUtil::UpdateInsertInfoFromDB(ChannelInsertInfo &chan)
     {
         QString xmltvid = query.value(0).toString();
         bool useeit     = query.value(1).toBool();
-        bool visible    = query.value(2).toBool();
+        ChannelVisibleType visible =
+            static_cast<ChannelVisibleType>(query.value(2).toInt());
 
         if (!xmltvid.isEmpty())
         {
@@ -1706,7 +1702,9 @@ void ChannelUtil::UpdateInsertInfoFromDB(ChannelInsertInfo &chan)
             chan.m_xmltvId = xmltvid;
         }
         chan.m_useOnAirGuide = useeit;
-        chan.m_hidden = !visible;
+        chan.m_hidden = (visible == kChannelNotVisible ||
+                         visible == kChannelNeverVisible);
+        chan.m_visible = visible;
     }
 }
 
@@ -1797,7 +1795,7 @@ bool ChannelUtil::DeleteChannel(uint channel_id)
     return true;
 }
 
-bool ChannelUtil::SetVisible(uint channel_id, bool visible)
+bool ChannelUtil::SetVisible(uint channel_id, ChannelVisibleType visible)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
@@ -1922,7 +1920,7 @@ bool ChannelUtil::GetChannelData(
         "      videosource.sourceid = channel.sourceid AND "
         "      channum              = :CHANNUM         AND "
         "      channel.sourceid     = :SOURCEID "
-        "ORDER BY channel.visible DESC, channel.chanid ");
+        "ORDER BY channel.visible > 0 DESC, channel.chanid ");
     query.bindValue(":CHANNUM",  channum);
     query.bindValue(":SOURCEID", sourceid);
 
@@ -2088,7 +2086,7 @@ ChannelInfoList ChannelUtil::GetChannelsInternal(
         qstr += QString("AND channelgroup.grpid = '%1' ").arg(channel_groupid);
 
     if (visible_only)
-        qstr += QString("AND visible = 1 ");
+        qstr += QString("AND visible > 0 ");
 
     qstr += " GROUP BY chanid";
 
@@ -2114,7 +2112,8 @@ ChannelInfoList ChannelUtil::GetChannelsInternal(
             query.value(3).toUInt(),                      /* ATSC major */
             query.value(4).toUInt(),                      /* ATSC minor */
             query.value(7).toUInt(),                      /* mplexid    */
-            query.value(8).toBool(),                      /* visible    */
+            static_cast<ChannelVisibleType>(query.value(8).toInt()),
+                                                          /* visible    */
             query.value(5).toString(),                    /* name       */
             query.value(6).toString(),                    /* icon       */
             query.value(9).toUInt());                     /* sourceid   */
@@ -2147,7 +2146,7 @@ vector<uint> ChannelUtil::GetChanIDs(int sourceid, bool onlyVisible)
     if (onlyVisible || sourceid > 0)
     {
         if (onlyVisible)
-            select += "AND visible = 1 ";
+            select += "AND visible > 0 ";
         if (sourceid > 0)
             select += "AND sourceid=" + QString::number(sourceid);
     }
@@ -2374,7 +2373,7 @@ uint ChannelUtil::GetNextChannel(
                 --it;
         }
         while ((it != start) &&
-               ((skip_non_visible && !it->m_visible) ||
+               ((skip_non_visible && it->m_visible < kChannelVisible) ||
                 (skip_same_channum_and_callsign &&
                  it->m_chanNum  == start->m_chanNum &&
                  it->m_callSign == start->m_callSign) ||
@@ -2393,7 +2392,7 @@ uint ChannelUtil::GetNextChannel(
                 it = sorted.begin();
         }
         while ((it != start) &&
-               ((skip_non_visible && !it->m_visible) ||
+               ((skip_non_visible && it->m_visible < kChannelVisible) ||
                 (skip_same_channum_and_callsign &&
                  it->m_chanNum  == start->m_chanNum &&
                  it->m_callSign == start->m_callSign) ||
@@ -2442,7 +2441,7 @@ ChannelInfoList ChannelUtil::LoadChannels(uint startIndex, uint count,
 
     sql += "WHERE channel.deleted IS NULL ";
     if (ignoreHidden)
-        sql += "AND channel.visible = 1 ";
+        sql += "AND channel.visible > 0 ";
 
     if (channelGroupID > 0)
         sql += "AND channelgroup.grpid = :CHANGROUPID ";
@@ -2532,7 +2531,8 @@ ChannelInfoList ChannelUtil::LoadChannels(uint startIndex, uint count,
         channelInfo.m_colour            = query.value(12).toUInt();
         channelInfo.m_hue               = query.value(13).toUInt();
         channelInfo.m_tvFormat          = query.value(14).toString();
-        channelInfo.m_visible           = query.value(15).toBool();
+        channelInfo.m_visible           =
+            static_cast<ChannelVisibleType>(query.value(15).toInt());
         channelInfo.m_outputFilters     = query.value(16).toString();
         channelInfo.m_useOnAirGuide     = query.value(17).toBool();
         channelInfo.m_mplexId           = query.value(18).toUInt();

@@ -4090,7 +4090,7 @@ void Scheduler::UpdateMatches(uint recordid, uint sourceid, uint mplexid,
 "      ON channel.chanid = program.chanid) ") + fromclauses[clause] + QString(
 " WHERE ") + whereclauses[clause] +
     QString(" AND channel.deleted IS NULL "
-            " AND channel.visible = 1 ") +
+            " AND channel.visible > 0 ") +
     filterClause + QString(" AND "
 
 "("

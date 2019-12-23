@@ -115,8 +115,7 @@ class MTV_PUBLIC ChannelUtil
                                  uint atsc_major_channel,
                                  uint atsc_minor_channel,
                                  bool use_on_air_guide,
-                                 bool hidden,
-                                 bool hidden_in_guide,
+                                 ChannelVisibleType visible,
                                  const QString &freqid,
                                  const QString& icon    = QString(),
                                  QString format  = "Default",
@@ -134,8 +133,7 @@ class MTV_PUBLIC ChannelUtil
                                  uint atsc_major_channel,
                                  uint atsc_minor_channel,
                                  bool use_on_air_guide,
-                                 bool hidden,
-                                 bool hidden_in_guide,
+                                 ChannelVisibleType visible,
                                  const QString& freqid  = QString(),
                                  const QString& icon    = QString(),
                                  QString format  = QString(),
@@ -157,7 +155,7 @@ class MTV_PUBLIC ChannelUtil
 
     static bool    DeleteChannel(uint channel_id);
 
-    static bool    SetVisible(uint channel_id, bool visible);
+    static bool    SetVisible(uint channel_id, ChannelVisibleType visible);
 
     static bool    SetServiceVersion(int mplexid, int version);
 
