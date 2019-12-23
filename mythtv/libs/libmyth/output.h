@@ -98,7 +98,7 @@ public:
     OutputListeners() = default;
     ~OutputListeners() override = default;
 
-    bool hasVisual(void) { return m_visuals.size(); }
+    bool hasVisual(void) { return !m_visuals.empty(); }
     void addVisual(MythTV::Visual *v);
     void removeVisual(MythTV::Visual *v);
 

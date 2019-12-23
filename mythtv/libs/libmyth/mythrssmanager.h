@@ -27,7 +27,7 @@ class MPUBLIC RSSSite : public QObject
       public:
         void clear(void)
         {
-            while (size())
+            while (!empty())
             {
                 RSSSite *tmp = back();
                 pop_back();

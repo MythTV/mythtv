@@ -67,7 +67,7 @@ class NewsSite : public QObject
       public:
         void clear(void)
         {
-            while (size())
+            while (!empty())
             {
                 NewsSite *tmp = back();
                 pop_back();

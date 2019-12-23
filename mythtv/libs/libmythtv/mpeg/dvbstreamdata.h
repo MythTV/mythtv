@@ -176,7 +176,7 @@ inline void DVBStreamData::SetRealNetworkID(int real_network_id)
 inline bool DVBStreamData::HasAnyEIT(void) const
 {
     QMutexLocker locker(&m_listenerLock);
-    return m_dvbHasEit.size();
+    return !m_dvbHasEit.empty();
 }
 
 inline bool DVBStreamData::HasEIT(uint serviceid) const
