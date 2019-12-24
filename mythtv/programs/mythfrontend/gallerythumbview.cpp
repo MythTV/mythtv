@@ -295,11 +295,15 @@ bool GalleryThumbView::keyPressEvent(QKeyEvent *event)
             if (m_editsAllowed && im)
             {
                 if (im == m_view->GetParent())
+                {
                     // Reset dir
                     m_mgr.SetCover(im->m_id, 0);
+                }
                 else
+                {
                     // Set parent cover
                     m_mgr.SetCover(im->m_parentId, im->m_id);
+                }
             }
         }
         else if (action == "PLAY")
@@ -698,11 +702,15 @@ void GalleryThumbView::UpdateImageItem(MythUIButtonListItem *item)
     case kCloneDir:
     case kDirectory:
         if (im->m_dirCount > 0)
+        {
             item->SetText(QString("%1/%2")
                           .arg(im->m_fileCount).arg(im->m_dirCount),
                           "childcount");
+        }
         else
+        {
             item->SetText(QString::number(im->m_fileCount), "childcount");
+        }
 
         item->DisplayState(im->IsDevice() ? "device" : "subfolder", "buttontype");
         break;
@@ -1414,11 +1422,15 @@ void GalleryThumbView::StartSlideshow(ImageSlideShowType mode)
                 this, SLOT(SelectImage(int)));
 
         if (selected->IsDirectory())
+        {
             // Show selected dir
             slide->Start(mode, selected->m_id);
+        }
         else
+        {
             // Show current dir starting at selection
             slide->Start(mode, selected->m_parentId, selected->m_id);
+        }
     }
     else
         delete slide;
@@ -1552,13 +1564,14 @@ void GalleryThumbView::HideItem(bool hide)
 
         QString err = m_mgr.HideFiles(hide, ids);
         if (!err.isEmpty())
-
+        {
             ShowOkPopup(err);
-
+        }
         else if (hide && !m_mgr.GetVisibility())
-
+        {
             // Unmark invisible file
             m_view->Mark(m_menuState.m_selected->m_id, false);
+        }
     }
 }
 
@@ -1571,14 +1584,15 @@ void GalleryThumbView::HideMarked(bool hide)
 {
     QString err = m_mgr.HideFiles(hide, m_menuState.m_markedId);
     if (!err.isEmpty())
-
+    {
         ShowOkPopup(err);
-
+    }
     else if (hide && !m_mgr.GetVisibility())
-
+    {
         // Unmark invisible files
         foreach (int id, m_menuState.m_markedId)
             m_view->Mark(id, false);
+    }
 }
 
 

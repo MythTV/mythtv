@@ -367,8 +367,10 @@ void StorageGroupListEditor::Load(void)
                   "ORDER BY groupname;");
     query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
     if (!query.exec())
+    {
         MythDB::DBError("StorageGroup::Load getting local group names",
                              query);
+    }
     else
     {
         while (query.next())
@@ -379,8 +381,10 @@ void StorageGroupListEditor::Load(void)
                   "FROM storagegroup "
                   "ORDER BY groupname;");
     if (!query.exec())
+    {
         MythDB::DBError("StorageGroup::Load getting all group names",
                              query);
+    }
     else
     {
         while (query.next())
@@ -431,10 +435,12 @@ void StorageGroupListEditor::Load(void)
     {
         groupName = StorageGroup::kSpecialGroups[curGroup];
         if (createAddSpecialGroupButton[curGroup])
+        {
             AddSelection(tr("(Create %1 group)")
                 .arg(QCoreApplication::translate("(StorageGroups)",
                     groupName.toLatin1().constData())),
                 groupName);
+        }
         curGroup++;
     }
 
@@ -452,9 +458,11 @@ void StorageGroupListEditor::Load(void)
             if ((masterNames[curName] != "Default") &&
                 (!StorageGroup::kSpecialGroups.contains(masterNames[curName])) &&
                 (!names.contains(masterNames[curName])))
+            {
                 AddSelection(tr("(Create %1 group)")
                                 .arg(masterNames[curName]),
                              masterNames[curName]);
+            }
             curName++;
         }
     }

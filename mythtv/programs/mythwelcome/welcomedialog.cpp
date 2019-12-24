@@ -534,10 +534,14 @@ void WelcomeDialog::updateStatusMessage(void)
     if (m_statusList.empty())
     {
         if (m_willShutdown && m_secondsToShutdown != -1)
+        {
             m_statusList.append(tr("MythTV is idle and will shutdown in %n "
                                    "second(s).", "", m_secondsToShutdown));
+        }
         else
+        {
             m_statusList.append(tr("MythTV is idle."));
+        }
     }
 
     m_warningText->SetVisible(m_hasConflicts);

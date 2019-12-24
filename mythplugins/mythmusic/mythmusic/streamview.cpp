@@ -397,10 +397,12 @@ void StreamView::removeStream(void)
         auto *mdata = item->GetData().value<MusicMetadata *>();
 
         if (mdata)
+        {
             ShowOkPopup(tr("Are you sure you want to delete this Stream?\n"
                            "Broadcaster: %1 - Channel: %2")
                            .arg(mdata->Broadcaster()).arg(mdata->Channel()),
                         this, SLOT(doRemoveStream(bool)), true);
+        }
     }
 }
 

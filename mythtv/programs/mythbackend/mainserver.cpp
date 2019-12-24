@@ -1391,12 +1391,18 @@ void MainServer::customEvent(QEvent *e)
             QStringList tokens = me->Message()
                 .split(" ", QString::SkipEmptyParts);
             if (!m_ismaster)
+            {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                     "ADD_CHILD_INPUT event received in slave context");
+            }
             else if (tokens.size() != 2)
+            {
                 LOG(VB_GENERAL, LOG_ERR, LOC + "Bad ADD_CHILD_INPUT message");
+            }
             else
+            {
                 HandleAddChildInput(tokens[1].toUInt());
+            }
             return;
         }
 
@@ -3460,9 +3466,11 @@ void MainServer::HandleQueryLoad(PlaybackSock *pbs)
         strlist << "getloadavg() failed";
     }
     else
+    {
         strlist << QString::number(loads[0])
                 << QString::number(loads[1])
                 << QString::number(loads[2]);
+    }
 #endif
 
     SendResponse(pbssock, strlist);
@@ -3520,8 +3528,10 @@ void MainServer::HandleQueryMemStats(PlaybackSock *pbs)
     int         freeVM = 0;
 
     if (getMemStats(totalMB, freeMB, totalVM, freeVM))
+    {
         strlist << QString::number(totalMB) << QString::number(freeMB)
                 << QString::number(totalVM) << QString::number(freeVM);
+    }
     else
     {
         strlist << "ERROR";
@@ -3944,9 +3954,11 @@ void MainServer::HandleQueryFindFile(QStringList &slist, PlaybackSock *pbs)
     QStringList fileList;
 
     if (!QHostAddress(hostname).isNull())
+    {
         LOG(VB_GENERAL, LOG_ERR, QString("Mainserver: QUERY_FINDFILE called "
                                          "with IP (%1) instead of hostname. "
                                          "This is invalid.").arg(hostname));
+    }
 
     if (hostname.isEmpty())
         hostname = gCoreContext->GetHostName();
@@ -7573,11 +7585,13 @@ void MainServer::HandlePixmapGetIfModified(
 
     QDateTime cachemodified;
     if (!slist[1].isEmpty() && (slist[1].toInt() != -1))
+    {
 #if QT_VERSION < QT_VERSION_CHECK(5,8,0)
         cachemodified = MythDate::fromTime_t(slist[1].toInt());
 #else
         cachemodified = MythDate::fromSecsSinceEpoch(slist[1].toLongLong());
 #endif
+    }
 
     int max_file_size = slist[2].toInt();
 

@@ -136,9 +136,11 @@ void MusicFileScanner::BuildFileList(QString &directory, MusicLoadedMap &music_f
                 music_files[filename] = fdata;
             }
             else
+            {
                 LOG(VB_GENERAL, LOG_INFO,
                         QString("Found file with unsupported extension %1")
                             .arg(filename));
+            }
         }
     }
 }

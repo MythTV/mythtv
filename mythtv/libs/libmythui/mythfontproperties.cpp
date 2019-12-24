@@ -95,9 +95,11 @@ void MythFontProperties::CalcHash(void)
                                 .arg(m_hasOutline);
 
     if (m_hasShadow)
+    {
         m_hash += QString("%1%2%3%4").arg(m_shadowOffset.x())
                  .arg(m_shadowOffset.y()).arg(m_shadowColor.name())
                  .arg(m_shadowAlpha);
+    }
 
     if (m_hasOutline)
         m_hash += QString("%1%2%3").arg(m_outlineColor.name())
@@ -181,9 +183,11 @@ MythFontProperties *MythFontProperties::ParseFromXml(
     newFont->Freeze();
 
     if (element.tagName() == "font")
+    {
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             QString("File %1: Use of 'font' is deprecated in favour of "
                     "'fontdef'") .arg(filename));
+    }
 
     QString name = element.attribute("name", "");
     if (name.isEmpty())

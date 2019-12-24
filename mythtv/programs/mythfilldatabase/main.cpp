@@ -167,9 +167,11 @@ int main(int argc, char *argv[])
         cmdline.SetValue("refresh",
                 cmdline.toStringList("refresh") << "all");
     if (cmdline.toBool("refreshday"))
+    {
         cmdline.SetValue("refresh",
                 cmdline.toStringList("refresh") <<
                                         cmdline.toStringList("refreshday"));
+    }
 
     QStringList sl = cmdline.toStringList("refresh");
     if (!sl.isEmpty())
@@ -273,13 +275,17 @@ int main(int argc, char *argv[])
     }
 
     if (gCoreContext->SafeConnectToMasterServer(true, false))
+    {
         LOG(VB_GENERAL, LOG_INFO,
             "Opening blocking connection to master backend");
+    }
     else
+    {
         LOG(VB_GENERAL, LOG_WARNING,
             "Failed to connect to master backend. MythFillDatabase will "
             "continue running but will be unable to prevent backend from "
             "shutting down, or triggering a reschedule when complete.");
+    }
 
     if (from_file)
     {
@@ -325,11 +331,15 @@ int main(int argc, char *argv[])
         }
 
         if (GuideDataAfter == GuideDataBefore)
+        {
             status = QObject::tr("mythfilldatabase ran, but did not insert "
                     "any new data into the Guide.  This can indicate a "
                     "potential problem with the XML file used for the update.");
+        }
         else
+        {
             status = QObject::tr("Successful.");
+        }
 
         updateLastRunStatus(status);
     }
@@ -489,9 +499,11 @@ int main(int argc, char *argv[])
                     "WHERE p.originalairdate IS NULL");
 
     if (query.exec())
+    {
         LOG(VB_GENERAL, LOG_INFO,
             QString("    Found %1 with programids")
             .arg(query.numRowsAffected()));
+    }
 
     query.prepare("UPDATE program p "
                     "JOIN ( "
@@ -509,9 +521,11 @@ int main(int argc, char *argv[])
                     "WHERE p.originalairdate IS NULL");
 
     if (query.exec())
+    {
         LOG(VB_GENERAL, LOG_INFO,
             QString("    Found %1 without programids")
             .arg(query.numRowsAffected()));
+    }
 
     if (mark_repeats)
     {

@@ -417,10 +417,14 @@ bool RecordingRule::Save(bool sendSig)
 
     QString sqlquery;
     if (m_recordID > 0 || (m_recordTable != "record" && m_tempID > 0))
+    {
         sqlquery = QString("UPDATE %1 %2 WHERE recordid = :RECORDID;")
                                                         .arg(m_recordTable).arg(sql);
+    }
     else
+    {
         sqlquery = QString("INSERT INTO %1 %2;").arg(m_recordTable).arg(sql);
+    }
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(sqlquery);

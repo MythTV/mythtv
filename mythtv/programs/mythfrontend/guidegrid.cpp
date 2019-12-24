@@ -370,8 +370,10 @@ public:
         if (m_updater)
         {
             if (m_updater->ExecuteNonUI())
+            {
                 QCoreApplication::postEvent(m_guide,
                                             new UpdateGuideEvent(m_updater));
+            }
             else
             {
                 delete m_updater;
@@ -789,11 +791,13 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
                 }
             }
             else
+            {
                 // Edit Recording should include "Watch this channel"
                 // is we selected a show that is current.
                 EditRecording(!m_player
                     && SelectionIsTunable(GetSelection())
                     && (secsTillStart / 60) < m_selectRecThreshold);
+            }
         }
         else if (action == "EDIT")
             EditScheduled();
@@ -2322,11 +2326,15 @@ void GuideGrid::toggleChannelFavorite(int grpid)
     uint chanid = ch->m_chanId;
 
     if (m_changrpid == -1)
+    {
         // If currently viewing all channels, allow to add only not delete
         ChannelGroup::ToggleChannel(chanid, grpid, false);
+    }
     else
+    {
         // Only allow delete if viewing the favorite group in question
         ChannelGroup::ToggleChannel(chanid, grpid, true);
+    }
 
     //regenerate the list of non empty group in case it did change
     m_changrplist = ChannelGroup::GetChannelGroups(false);

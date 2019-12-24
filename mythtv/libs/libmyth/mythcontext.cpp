@@ -186,11 +186,15 @@ static void exec_program_tv_cb(const QString &cmd)
         if (cardidok)
         {
             if (cardid == -1)
+            {
                 label = QObject::tr("Could not find specified tuner (%1).")
                                     .arg(wantcardid);
+            }
             else
+            {
                 label = QObject::tr("Specified tuner (%1) is already in use.")
                                     .arg(wantcardid);
+            }
         }
         else
         {

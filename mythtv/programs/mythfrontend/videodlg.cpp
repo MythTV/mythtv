@@ -174,16 +174,20 @@ namespace
                 if (episode > 0 || season > 0)
                 {
                     if (isScreenshot)
+                    {
                         sfn += hntm.arg(QString("%1 Season %2x%3_%4")
                                  .arg(title).arg(QString::number(season))
                                  .arg(QString::number(episode))
                                  .arg(suffix))
                                  .arg(*ext);
+                    }
                     else
+                    {
                         sfn += hntm.arg(QString("%1 Season %2_%3")
                                  .arg(title).arg(QString::number(season))
                                  .arg(suffix))
                                  .arg(*ext);
+                    }
 
                 }
                 else
@@ -217,17 +221,20 @@ namespace
                 if (season > 0 || episode > 0)
                 {
                     if (isScreenshot)
+                    {
                         sfn += fntm.arg(*dir).arg(QString("%1 Season %2x%3_%4")
                                  .arg(title).arg(QString::number(season))
                                  .arg(QString::number(episode))
                                  .arg(suffix))
                                  .arg(*ext);
+                    }
                     else if (!isScreenshot)
+                    {
                         sfn += fntm.arg(*dir).arg(QString("%1 Season %2_%3")
                                  .arg(title).arg(QString::number(season))
                                  .arg(suffix))
                                  .arg(*ext);
-
+                    }
                 }
                 if (!isScreenshot)
                 {
@@ -1514,20 +1521,26 @@ QString VideoDialog::GetImageFromFolder(VideoMetadata *metadata)
         if (!fList.isEmpty())
         {
             if (host.isEmpty())
-                icon_file = QString("%1/%2")
-                                .arg(prefix)
-                                .arg(fList.at(0));
+            {
+                icon_file = QString("%1/%2").arg(prefix).arg(fList.at(0));
+            }
             else
+            {
                 icon_file = generate_file_url("Videos", host, fList.at(0));
+            }
         }
     }
 
     if (!icon_file.isEmpty())
+    {
         LOG(VB_GENERAL, LOG_DEBUG, QString("Found Image : %1 :")
                 .arg(icon_file));
+    }
     else
+    {
         LOG(VB_GENERAL, LOG_DEBUG, QString("Could not find cover Image : %1 ")
                 .arg(prefix));
+    }
 
     if (IsDefaultCoverFile(icon_file))
         icon_file.clear();
@@ -1710,21 +1723,29 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
             if (!fList.isEmpty())
             {
                 if (host.isEmpty())
+                {
                     icon_file = QString("%1/%2")
                                     .arg(folder_path)
                                     .arg(fList.at(0));
+                }
                 else
+                {
                     icon_file = generate_file_url("Videos", host, fList.at(0));
+                }
             }
         }
 
         if (!icon_file.isEmpty())
+        {
             LOG(VB_GENERAL, LOG_DEBUG, QString("Found Image : %1 :")
                     .arg(icon_file));
+        }
         else
+        {
             LOG(VB_GENERAL, LOG_DEBUG,
                 QString("Could not find folder cover Image : %1 ")
                     .arg(folder_path));
+        }
     }
     else
     {
@@ -2397,10 +2418,14 @@ void VideoDialog::VideoMenu()
     if (metadata)
     {
         if (!metadata->GetSubtitle().isEmpty())
+        {
             label = tr("Video Options\n%1\n%2").arg(metadata->GetTitle())
                                            .arg(metadata->GetSubtitle());
+        }
         else
+        {
             label = tr("Video Options\n%1").arg(metadata->GetTitle());
+        }
     }
     else
         label = tr("Video Options");
@@ -3208,10 +3233,14 @@ void VideoDialog::playTrailer()
     QString url;
 
     if (metadata->IsHostSet() && !metadata->GetTrailer().startsWith("/"))
+    {
         url = generate_file_url("Trailers", metadata->GetHost(),
                         metadata->GetTrailer());
+    }
     else
+    {
         url = metadata->GetTrailer();
+    }
 
     VideoPlayerCommand::PlayerFor(url).Play();
 }

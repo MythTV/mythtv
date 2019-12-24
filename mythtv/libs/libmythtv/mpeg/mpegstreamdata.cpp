@@ -1018,12 +1018,14 @@ bool MPEGStreamData::ProcessTSPacket(const TSPacket& tspacket)
             m_pmtSingleProgram->PCRPID())
         {
             if (tspacket.HasPCR())
+            {
                 LOG(VB_RECORD, LOG_DEBUG, LOC +
                     QString("PID %1 (0x%2) has PCR %3μs")
                     .arg(m_pmtSingleProgram->PCRPID())
                     .arg(m_pmtSingleProgram->PCRPID(), 0, 16)
                     .arg(std::chrono::duration_cast<std::chrono::microseconds>
                          (tspacket.GetPCR().time_since_epoch()).count()));
+            }
         }
     }
 

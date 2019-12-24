@@ -1961,11 +1961,13 @@ void ZMServer::handleSetMonitorFunction(vector<string> tokens)
     monitor->m_enabled = newEnabled;
 
     if (m_debug)
+    {
         cout << "SetMonitorFunction MonitorId: " << monitorID << endl <<
                 "  oldEnabled: " << oldEnabled << endl <<
                 "  newEnabled: " << newEnabled << endl <<
                 " oldFunction: " << oldFunction << endl <<
                 " newFunction: " << newFunction << endl;
+    }
 
     if ( newFunction != oldFunction || newEnabled != oldEnabled)
     {

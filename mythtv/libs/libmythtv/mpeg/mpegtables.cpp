@@ -686,29 +686,35 @@ uint ProgramMapTable::FindPIDs(uint           type,
     if ((StreamID::AnyMask & type) != StreamID::AnyMask)
     {
         for (uint i=0; i < StreamCount(); i++)
+        {
             if (type == StreamType(i))
             {
                 pids.push_back(StreamPID(i));
                 types.push_back(StreamType(i));
             }
+        }
     }
     else if (StreamID::AnyVideo == type)
     {
         for (uint i=0; i < StreamCount(); i++)
+        {
             if (IsVideo(i, sistandard))
             {
                 pids.push_back(StreamPID(i));
                 types.push_back(StreamType(i));
             }
+        }
     }
     else if (StreamID::AnyAudio == type)
     {
         for (uint i=0; i < StreamCount(); i++)
+        {
             if (IsAudio(i, sistandard))
             {
                 pids.push_back(StreamPID(i));
                 types.push_back(StreamType(i));
             }
+        }
     }
 
     if (!normalize)

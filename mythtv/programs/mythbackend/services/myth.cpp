@@ -248,9 +248,11 @@ DTC::StorageGroupDirList *Myth::GetStorageGroupDirs( const QString &sGroupName,
         query.bindValue(":GROUP", sGroupName);
     }
     else
+    {
         query.prepare("SELECT id, groupname, hostname, dirname "
                       "FROM storagegroup "
                       "ORDER BY groupname, hostname, dirname" );
+    }
 
     if (!query.exec())
     {
@@ -1121,18 +1123,24 @@ bool Myth::ManageUrlProtection( const QString &sServices,
     QStringList protectedURLs;
 
     if (serviceList.size() == 1 && serviceList.first() == "All")
+    {
         for (const QString& service : KnownServices)
             protectedURLs << '/' + service;
+    }
     else if (serviceList.size() == 1 && serviceList.first() == "None")
+    {
         protectedURLs << "Unprotected";
+    }
     else
     {
         for (const QString& service : serviceList)
+        {
             if (KnownServices.contains(service))
                 protectedURLs << '/' + service;
             else
                 LOG(VB_GENERAL, LOG_ERR, QString("Invalid service name: '%1'")
                                                   .arg(service));
+        }
     }
 
     if (protectedURLs.isEmpty())

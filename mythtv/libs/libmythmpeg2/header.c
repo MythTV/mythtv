@@ -78,19 +78,21 @@ void mpeg2_header_state_init (mpeg2dec_t * mpeg2dec)
 {
     if (mpeg2dec->sequence.width != (unsigned)-1) {
 	mpeg2dec->sequence.width = (unsigned)-1;
-	if (!mpeg2dec->custom_fbuf)
+	if (!mpeg2dec->custom_fbuf) {
 	    for (int i = mpeg2dec->alloc_index_user;
 		 i < mpeg2dec->alloc_index; i++) {
 		mpeg2_free (mpeg2dec->fbuf_alloc[i].fbuf.buf[0]);
 		mpeg2_free (mpeg2dec->fbuf_alloc[i].fbuf.buf[1]);
 		mpeg2_free (mpeg2dec->fbuf_alloc[i].fbuf.buf[2]);
 	    }
-	if (mpeg2dec->convert_start)
+	}
+	if (mpeg2dec->convert_start) {
 	    for (int i = 0; i < 3; i++) {
 		mpeg2_free (mpeg2dec->yuv_buf[i][0]);
 		mpeg2_free (mpeg2dec->yuv_buf[i][1]);
 		mpeg2_free (mpeg2dec->yuv_buf[i][2]);
 	    }
+	}
 	if (mpeg2dec->decoder.convert_id)
 	    mpeg2_free (mpeg2dec->decoder.convert_id);
     }
@@ -171,17 +173,19 @@ int mpeg2_header_sequence (mpeg2dec_t * mpeg2dec)
 	    mpeg2dec->new_quantizer_matrix[0][mpeg2_scan_norm[i]] =
 		(buffer[i+7] << 7) | (buffer[i+8] >> 1);
 	buffer += 64;
-    } else
+    } else {
 	for (i = 0; i < 64; i++)
 	    mpeg2dec->new_quantizer_matrix[0][mpeg2_scan_norm[i]] =
 		default_intra_quantizer_matrix[i];
+    }
 
-    if (buffer[7] & 1)
+    if (buffer[7] & 1) {
 	for (i = 0; i < 64; i++)
 	    mpeg2dec->new_quantizer_matrix[1][mpeg2_scan_norm[i]] =
 		buffer[i+8];
-    else
+    } else {
 	memset (mpeg2dec->new_quantizer_matrix[1], 16, 64);
+    }
 
     sequence->profile_level_id = 0x80;
     sequence->colour_primaries = 0;
@@ -520,7 +524,7 @@ void mpeg2_header_gop_finalize (mpeg2dec_t * mpeg2dec)
 
 void mpeg2_set_fbuf (mpeg2dec_t * mpeg2dec, int b_type)
 {
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 3; i++) {
 	if (mpeg2dec->fbuf[1] != &mpeg2dec->fbuf_alloc[i].fbuf &&
 	    mpeg2dec->fbuf[2] != &mpeg2dec->fbuf_alloc[i].fbuf) {
 	    mpeg2dec->fbuf[0] = &mpeg2dec->fbuf_alloc[i].fbuf;
@@ -532,6 +536,7 @@ void mpeg2_set_fbuf (mpeg2dec_t * mpeg2dec, int b_type)
 	    }
 	    break;
 	}
+    }
 }
 
 int mpeg2_header_picture (mpeg2dec_t * mpeg2dec)
@@ -803,7 +808,7 @@ static int quant_matrix_ext (mpeg2dec_t * mpeg2dec)
 {
     uint8_t * buffer = mpeg2dec->chunk_start;
 
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < 4; i++) {
 	if (buffer[0] & (8 >> i)) {
 	    for (int j = 0; j < 64; j++)
 		mpeg2dec->new_quantizer_matrix[i][mpeg2_scan_norm[j]] =
@@ -811,6 +816,7 @@ static int quant_matrix_ext (mpeg2dec_t * mpeg2dec)
 	    mpeg2dec->copy_matrix |= 1 << i;
 	    buffer += 64;
 	}
+    }
 
     return 0;
 }
@@ -886,11 +892,11 @@ mpeg2_state_t mpeg2_header_slice_start (mpeg2dec_t * mpeg2dec)
 	mpeg2dec->convert_start (decoder->convert_id, mpeg2dec->fbuf[0],
 				 mpeg2dec->picture, mpeg2dec->info.gop);
 
-	if (mpeg2dec->decoder.coding_type == B_TYPE)
+	if (mpeg2dec->decoder.coding_type == B_TYPE) {
 	    mpeg2_init_fbuf (&(mpeg2dec->decoder), mpeg2dec->yuv_buf[2],
 			     mpeg2dec->yuv_buf[mpeg2dec->yuv_index ^ 1],
 			     mpeg2dec->yuv_buf[mpeg2dec->yuv_index]);
-	else {
+	} else {
 	    mpeg2_init_fbuf (&(mpeg2dec->decoder),
 			     mpeg2dec->yuv_buf[mpeg2dec->yuv_index ^ 1],
 			     mpeg2dec->yuv_buf[mpeg2dec->yuv_index],

@@ -583,11 +583,13 @@ static bool rightsize_buf(CC708Reader* cc, uint service_num, uint block_size)
 #endif
     }
     if (min_new_size >= cc->m_bufAlloc[service_num])
+    {
         LOG(VB_VBI, LOG_ERR,
             QString("buffer resize error: min_new_size=%1, buf_alloc[%2]=%3")
             .arg(min_new_size)
             .arg(service_num)
             .arg(cc->m_bufAlloc[service_num]));
+    }
     return ret;
 }
 
@@ -694,9 +696,11 @@ static void parse_cc_packet(CC708Reader* cb_cbs, CaptionPacket* pkt,
     if (off<pkt_size) // must end in null service block, if packet is not full.
     {
         if (pkt_buf[off] != 0)
+        {
             LOG(VB_VBI, LOG_ERR,
                 QString("CEA-708 packet error: pkt_size=%1, pkt_buf[%2]=%3")
                 .arg(pkt_size).arg(off).arg(pkt_buf[off]));
+        }
     }
 }
 

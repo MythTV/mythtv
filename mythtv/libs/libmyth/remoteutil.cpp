@@ -275,11 +275,13 @@ QDateTime RemoteGetPreviewIfModified(
     QDateTime retdatetime;
     qlonglong timet = strlist[0].toLongLong();
     if (timet >= 0)
+    {
 #if QT_VERSION < QT_VERSION_CHECK(5,8,0)
         retdatetime = MythDate::fromTime_t(timet);
 #else
         retdatetime = MythDate::fromSecsSinceEpoch(timet);
 #endif
+    }
 
     if (strlist.size() < 4)
     {

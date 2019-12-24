@@ -1037,12 +1037,16 @@ void StatusBox::doJobQueueStatus()
                 detail += " (" + (*it).hostname + ')';
 
             if ((*it).schedruntime > MythDate::current())
+            {
                 detail += '\n' + tr("Scheduled Run Time:") + ' ' +
                     MythDate::toString(
                         (*it).schedruntime,
                         MythDate::kDateTimeFull | MythDate::kSimplify);
+            }
             else
+            {
                 detail += '\n' + (*it).comment;
+            }
 
             line = QString("%1 @ %2").arg(pginfo.GetTitle())
                 .arg(MythDate::toString(
@@ -1141,10 +1145,14 @@ static void disk_usage_with_rec_time_kb(QStringList& out, long long total,
         if (minLeft%60 == 0)
             out<<remainstring.arg(hourstring) + pro;
         else if (minLeft > 60)
+        {
             out<<StatusBox::tr("%1 and %2 remaining", "time").arg(hourstring)
                                                    .arg(minstring) + pro;
+        }
         else
+        {
             out<<remainstring.arg(minstring) + pro;
+        }
     }
 }
 
@@ -1515,9 +1523,11 @@ void StatusBox::doAutoExpireList(bool updateExpList)
                             .arg(sm_str(liveTVSize / 1024));
 
     if (deletedGroupCount)
+    {
         staticInfo += tr("%n (is) Deleted and consume(s) %1\n", "",
                         deletedGroupCount)
                         .arg(sm_str(deletedGroupSize / 1024));
+    }
 
     for (it = m_expList.begin(); it != m_expList.end(); ++it)
     {

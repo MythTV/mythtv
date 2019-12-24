@@ -302,9 +302,11 @@ long long copy(QFile &dst, QFile &src, uint block_size)
         return -1LL;
 
     if (!dst.isWritable() && !dst.isOpen())
+    {
         odst = dst.open(QIODevice::Unbuffered |
                         QIODevice::WriteOnly  |
                         QIODevice::Truncate);
+    }
 
     if (!src.isReadable() && !src.isOpen())
         osrc = src.open(QIODevice::Unbuffered|QIODevice::ReadOnly);
@@ -867,13 +869,17 @@ void setHttpProxy(void)
             url.setPort(port);
         }
         else if (!ping(host, 1))
+        {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("cannot locate host %1").arg(host) +
                 "\n\t\t\tPlease check HTTP_PROXY environment variable!");
+        }
         else if (!telnet(host,port))
+        {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("%1:%2 - cannot connect!").arg(host).arg(port) +
                 "\n\t\t\tPlease check HTTP_PROXY environment variable!");
+        }
 
 #if 0
         LOG(VB_NETWORK, LOG_DEBUG, LOC + QString("using http://%1:%2@%3:%4")
@@ -919,10 +925,14 @@ void setHttpProxy(void)
         QString url;
 
         if (!p.user().isEmpty())
+        {
             url = "http://%1:%2@%3:%4",
             url = url.arg(p.user()).arg(p.password());
+        }
         else
+        {
             url = "http://%1:%2";
+        }
 
         url = url.arg(p.hostName()).arg(p.port());
         setenv("HTTP_PROXY", url.toLatin1(), 1);

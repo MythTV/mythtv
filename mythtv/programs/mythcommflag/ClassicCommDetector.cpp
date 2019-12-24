@@ -532,13 +532,17 @@ bool ClassicCommDetector::go()
             }
 
             if (myTotalFrames)
+            {
                 emit statusUpdate(QCoreApplication::translate("(mythcommflag)",
                     "%1% Completed @ %2 fps.")
                         .arg(percentage).arg(flagFPS));
+            }
             else
+            {
                 emit statusUpdate(QCoreApplication::translate("(mythcommflag)",
                     "%1 Frames Completed @ %2 fps.")
                         .arg(currentFrameNumber).arg(flagFPS));
+            }
 
             if (percentage % 10 == 0 && prevpercent != percentage)
             {
@@ -974,6 +978,7 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
     // scenechangedetectors might.
 
     if (m_verboseDebugging)
+    {
         LOG(VB_COMMFLAG, LOG_DEBUG,
             QString().sprintf("Frame: %6ld -> %3d %3d %3d %3d %1d %1d %04x",
                 (long)m_curFrameNumber,
@@ -984,6 +989,7 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
                 m_frameInfo[m_curFrameNumber].format,
                 m_frameInfo[m_curFrameNumber].aspect,
                 m_frameInfo[m_curFrameNumber].flagMask ));
+    }
 
 #ifdef SHOW_DEBUG_WIN
     comm_debug_show(frame->buf);
@@ -1243,10 +1249,12 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
 
         for(int64_t i = m_preRoll;
             i < ((int64_t)m_framesProcessed - (int64_t)m_postRoll); i++ )
+        {
             if ((m_frameInfo.contains(i)) &&
                 (m_frameInfo[i].format >= 0) &&
                 (m_frameInfo[i].format < COMM_FORMAT_MAX))
                 formatCounts[m_frameInfo[i].format]++;
+        }
 
         uint64_t formatFrames = 0;
         for(int i = 0; i < COMM_FORMAT_MAX; i++)
@@ -1365,9 +1373,11 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
                 (fbp->bfCount < (fbp->frames * 0.10)))
             {
                 if (m_verboseDebugging)
+                {
                     LOG(VB_COMMFLAG, LOG_DEBUG,
                         "      length > 4 && logoCount > frames * 0.60 && "
                         "bfCount < frames * .10");
+                }
                 if (fbp->length > m_commDetectMaxCommBreakLength)
                 {
                     if (m_verboseDebugging)
@@ -1388,9 +1398,11 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
                 (fbp->logoCount < (fbp->frames * 0.50)))
             {
                 if (m_verboseDebugging)
+                {
                     LOG(VB_COMMFLAG, LOG_DEBUG,
                         "      logoInfoAvailable && logoCount < frames * .50, "
                         "-10");
+                }
                 fbp->score -= 10;
             }
 
@@ -1421,9 +1433,11 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
                 (fbp->formatMatch < (fbp->frames * .10)))
             {
                 if (m_verboseDebugging)
+                {
                     LOG(VB_COMMFLAG, LOG_DEBUG,
                         "      < 10% of frames match show letter/pillar-box "
                         "format, -20");
+                }
                 fbp->score -= 20;
             }
 
@@ -1457,9 +1471,11 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
                 (fbp->formatMatch < (fbp->frames * .10)))
             {
                 if (m_verboseDebugging)
+                {
                     LOG(VB_COMMFLAG, LOG_DEBUG,
                         "      < 10% of frames match show letter/pillar-box "
                         "format, -10");
+                }
                 fbp->score -= 10;
             }
 
@@ -1513,9 +1529,11 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
             if ((lastScore < 0) && (nextScore < 0) && (fbp->length < 35))
             {
                 if (m_verboseDebugging)
+                {
                     LOG(VB_COMMFLAG, LOG_DEBUG,
                         "      lastScore < 0 && nextScore < 0 "
                         "&& length < 35, setting -10");
+                }
                 fbp->score -= 10;
             }
 
@@ -1524,9 +1542,11 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
                 (lastScore < 0 && nextScore < 0))
             {
                 if (m_verboseDebugging)
+                {
                     LOG(VB_COMMFLAG, LOG_DEBUG,
                         "      blanks > frames * 0.95 && frames < 2*m_fps && "
                         "lastScore < 0 && nextScore < 0, setting -10");
+                }
                 fbp->score -= 10;
             }
 
@@ -1537,9 +1557,11 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
                 (nextScore < 0))
             {
                 if (m_verboseDebugging)
+                {
                     LOG(VB_COMMFLAG, LOG_DEBUG,
                         "      frames < 120 * m_fps && (-20 < lastScore < 0) && "
                         "thisScore > 0 && nextScore < 0, setting score = -10");
+                }
                 fbp->score = -10;
             }
 
@@ -1550,9 +1572,11 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
                 (nextScore > 0))
             {
                 if (m_verboseDebugging)
+                {
                     LOG(VB_COMMFLAG, LOG_DEBUG,
                         "      frames < 30 * m_fps && (0 < lastScore < 20) && "
                         "thisScore < 0 && nextScore > 0, setting score = 10");
+                }
                 fbp->score = 10;
             }
         }
@@ -1574,9 +1598,11 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
                     {
                         fblock[curBlock + offset].score += 10;
                         if (m_verboseDebugging)
+                        {
                             LOG(VB_COMMFLAG, LOG_DEBUG,
                                 QString("      Setting block %1 score +10")
                                     .arg(curBlock+offset));
+                        }
                     }
                 }
                 else if (fblock[curBlock + offset + 1].score < 0)
@@ -1585,9 +1611,11 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
                     {
                         fblock[curBlock + offset].score -= 10;
                         if (m_verboseDebugging)
+                        {
                             LOG(VB_COMMFLAG, LOG_DEBUG,
                                 QString("      Setting block %1 score -10")
                                     .arg(curBlock+offset));
+                        }
                     }
                 }
             }
@@ -1624,6 +1652,7 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
                 (breakStart == 0))
             {
                 if (m_verboseDebugging)
+                {
                     LOG(VB_COMMFLAG, LOG_DEBUG,
                         QString("Closing commercial block at start of "
                                 "frame block %1 with length %2, frame "
@@ -1632,6 +1661,7 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
                             .arg(curBlock).arg(fbp->start - breakStart)
                             .arg(fbp->frames)
                             .arg(m_commDetectMaxCommBreakLength));
+                }
 
                 m_commBreakMap[breakStart] = MARK_COMM_START;
                 m_commBreakMap[fbp->start] = MARK_COMM_END;
@@ -1642,6 +1672,7 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
             else
             {
                 if (m_verboseDebugging)
+                {
                     LOG(VB_COMMFLAG, LOG_DEBUG,
                         QString("Ignoring what appears to be commercial"
                                 " block at frame %1 with length %2, "
@@ -1651,6 +1682,7 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
                             .arg(fbp->start - breakStart)
                             .arg(fbp->frames)
                             .arg(m_commDetectMinCommBreakLength));
+                }
                 breakStart = -1;
             }
         }
@@ -1671,16 +1703,20 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
                     if (m_verboseDebugging)
                     {
                         if (breakStart)
+                        {
                             LOG(VB_COMMFLAG, LOG_DEBUG,
                                 QString("ReOpening commercial block at "
                                         "frame %1 because show less than "
                                         "%2 seconds")
                                     .arg(breakStart)
                                     .arg(m_commDetectMinShowLength));
+                        }
                         else
+                        {
                             LOG(VB_COMMFLAG, LOG_DEBUG,
                                 "Opening initial commercial block "
                                 "at start of recording, block 0.");
+                        }
                     }
                 }
                 else
@@ -1688,10 +1724,12 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
                     breakStart = fbp->start;
 
                     if (m_verboseDebugging)
+                    {
                         LOG(VB_COMMFLAG, LOG_DEBUG,
                             QString("Starting new commercial block at "
                                     "frame %1 from start of frame block %2")
                                 .arg(fbp->start).arg(curBlock));
+                    }
                 }
             }
             else if (curBlock == maxBlock)
@@ -1703,9 +1741,11 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
                         ((int64_t)m_framesProcessed - (int64_t)(2 * m_fps) - 2))
                     {
                         if (m_verboseDebugging)
+                        {
                             LOG(VB_COMMFLAG, LOG_DEBUG,
                                 QString("Closing final commercial block at "
                                         "frame %1").arg(fbp->end));
+                        }
 
                         m_commBreakMap[breakStart] = MARK_COMM_START;
                         m_commBreakMap[fbp->end] = MARK_COMM_END;
@@ -1717,6 +1757,7 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
                 else
                 {
                     if (m_verboseDebugging)
+                    {
                         LOG(VB_COMMFLAG, LOG_DEBUG,
                             QString("Ignoring what appears to be commercial"
                                     " block at frame %1 with length %2, "
@@ -1726,6 +1767,7 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
                                 .arg(fbp->start - breakStart)
                                 .arg(fbp->frames)
                                 .arg(m_commDetectMinCommBreakLength));
+                    }
                     breakStart = -1;
                 }
             }
@@ -1744,13 +1786,16 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
                 lastEnd = fbp->start;
 
                 if (m_verboseDebugging)
+                {
                     LOG(VB_COMMFLAG, LOG_DEBUG,
                         QString("Closing commercial block at frame %1")
                             .arg(fbp->start));
+                }
             }
             else
             {
                 if (m_verboseDebugging)
+                {
                     LOG(VB_COMMFLAG, LOG_DEBUG,
                         QString("Ignoring what appears to be commercial "
                                 "block at frame %1 with length %2, "
@@ -1760,6 +1805,7 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
                             .arg(fbp->start - breakStart)
                             .arg(fbp->frames)
                             .arg(m_commDetectMinCommBreakLength));
+                }
             }
             breakStart = -1;
         }
@@ -1776,12 +1822,14 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
         (breakStart <= ((int64_t)m_framesProcessed - (int64_t)(2 * m_fps) - 2)))
     {
         if (m_verboseDebugging)
+        {
             LOG(VB_COMMFLAG, LOG_DEBUG,
                 QString("Closing final commercial block started at "
                         "block %1 and going to end of program. length "
                         "is %2 frames")
                     .arg(curBlock)
                     .arg((m_framesProcessed - breakStart - 1)));
+        }
 
         m_commBreakMap[breakStart] = MARK_COMM_START;
         // Create what is essentially an open-ended final skip region

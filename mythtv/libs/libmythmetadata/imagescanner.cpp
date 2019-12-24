@@ -547,7 +547,9 @@ void ImageScanThread<DBFS>::CountTree(QDir &dir)
             continue;
 
         if (fileInfo.isFile())
+        {
             ++m_progressTotalCount;
+        }
         // Ignore missing dirs
         else if (dir.cd(fileInfo.fileName()))
         {

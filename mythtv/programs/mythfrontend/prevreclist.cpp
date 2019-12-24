@@ -225,11 +225,15 @@ bool PrevRecordedList::LoadTitles(void)
         m_titleData.push_back(program);
     }
     if (m_reverseSort)
+    {
         std::stable_sort(m_titleData.begin(), m_titleData.end(),
             comp_sorttitle_lt_rev);
+    }
     else
+    {
         std::stable_sort(m_titleData.begin(), m_titleData.end(),
             comp_sorttitle_lt);
+    }
     return true;
 }
 
@@ -280,11 +284,15 @@ bool PrevRecordedList::LoadDates(void)
         m_titleData.push_back(program);
     }
     if (m_reverseSort)
+    {
         std::stable_sort(m_titleData.begin(), m_titleData.end(),
             comp_sortdate_lt_rev);
+    }
     else
+    {
         std::stable_sort(m_titleData.begin(), m_titleData.end(),
             comp_sortdate_lt);
+    }
     return true;
 }
 
@@ -353,10 +361,12 @@ void PrevRecordedList::updateInfo(void)
             if (m_help1Text)
                 m_help1Text->SetText(tr("Select a program..."));
             if (m_help2Text)
+            {
                 m_help2Text->SetText(tr(
                 "Select the title of the program you wish to find. "
                 "When finished return with the left arrow key. "
                 "To search by date press 1."));
+            }
             if (m_curviewText)
             {
                 if (m_reverseSort)
@@ -372,10 +382,12 @@ void PrevRecordedList::updateInfo(void)
             if (m_help1Text)
                 m_help1Text->SetText(tr("Select a month ..."));
             if (m_help2Text)
+            {
                 m_help2Text->SetText(tr(
                 "Select a month to search. "
                 "When finished return with the left arrow key. "
                 "To search by title press 2."));
+            }
             if (m_curviewText)
             {
                 if (m_reverseSort)

@@ -213,10 +213,14 @@ QStringList TextSubtitles::GetSubtitles(uint64_t timecode)
         {
             const int maxReloadInterval = 1000; // ms
             if (IsFrameBasedTiming())
+            {
                 // Assume conservative 24fps
                 endCode = startCode + maxReloadInterval / 24;
+            }
             else
+            {
                 endCode = startCode + maxReloadInterval;
+            }
             QDateTime now = QDateTime::currentDateTimeUtc();
             if (!m_fileName.isEmpty() &&
                 m_lastLoaded.msecsTo(now) >= maxReloadInterval)
@@ -270,9 +274,11 @@ void TextSubtitleParser::LoadSubtitles(const QString &fileName,
     if (inBackground)
     {
         if (!SubtitleLoadHelper::IsLoading(&target))
+        {
             MThreadPool::globalInstance()->
                 start(new SubtitleLoadHelper(fileName, &target),
                       "SubtitleLoadHelper");
+        }
         return;
     }
     demux_sputext_t sub_data;

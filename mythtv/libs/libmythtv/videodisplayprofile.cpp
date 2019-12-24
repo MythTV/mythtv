@@ -811,29 +811,39 @@ QString VideoDisplayProfile::GetDecoderHelp(const QString& Decoder)
         msg += QObject::tr("Standard will use the FFmpeg library for software decoding.");
 
     if (Decoder.startsWith("vdpau"))
+    {
         msg += QObject::tr(
             "VDPAU will attempt to use the graphics hardware to "
             "accelerate video decoding.");
+    }
 
     if (Decoder.startsWith("vaapi"))
+    {
         msg += QObject::tr(
             "VAAPI will attempt to use the graphics hardware to "
             "accelerate video decoding and playback.");
+    }
 
     if (Decoder.startsWith("dxva2"))
+    {
         msg += QObject::tr(
             "DXVA2 will use the graphics hardware to "
             "accelerate video decoding and playback. ");
+    }
 
     if (Decoder.startsWith("mediacodec"))
+    {
         msg += QObject::tr(
             "Mediacodec will use Android graphics hardware to "
             "accelerate video decoding and playback. ");
+    }
 
     if (Decoder.startsWith("nvdec"))
+    {
         msg += QObject::tr(
             "Nvdec uses the NVDEC API to "
             "accelerate video decoding and playback with NVIDIA Graphics Adapters. ");
+    }
 
     if (Decoder.startsWith("vtb"))
         msg += QObject::tr(
@@ -847,20 +857,26 @@ QString VideoDisplayProfile::GetDecoderHelp(const QString& Decoder)
         msg += "Highly experimental: ";
 
     if (Decoder.startsWith("v4l2"))
+    {
         msg += QObject::tr(
             "Video4Linux codecs are used to accelerate video decoding on "
             "supported platforms. ");
+    }
 
     if (Decoder == "drmprime")
+    {
         msg += QObject::tr(
             "DRM-PRIME decoders are used to accelerate video decoding on "
             "supported platforms. ");
+    }
 
     if (Decoder.endsWith("-dec"))
+    {
         msg += QObject::tr("The decoder will transfer frames back to system memory "
                            "which will significantly reduce performance but may allow "
                            "other functionality to be used (such as automatic "
                            "letterbox detection). ");
+    }
     return msg;
 }
 
@@ -1237,10 +1253,12 @@ QString VideoDisplayProfile::GetVideoRendererHelp(const QString &Renderer)
             "Render video offscreen. Used internally.");
 
     if (Renderer == "direct3d")
+    {
         msg = QObject::tr(
             "Windows video renderer based on Direct3D. Requires "
             "video card compatible with Direct3D 9. This is the preferred "
             "renderer for current Windows systems.");
+    }
 
     if (Renderer == "opengl")
     {

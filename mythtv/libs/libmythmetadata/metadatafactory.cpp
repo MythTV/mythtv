@@ -597,9 +597,11 @@ void MetadataFactory::customEvent(QEvent *levent)
                 .arg(deletions.count()));
 
             if (parent())
+            {
                 QCoreApplication::postEvent(parent(),
                     new MetadataFactoryVideoChanges(additions, moves,
                                                     deletions));
+            }
         }
         else
         {

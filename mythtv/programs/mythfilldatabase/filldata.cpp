@@ -345,10 +345,12 @@ bool FillData::Run(SourceList &sourcelist)
                                                  flags);
             grabber_capabilities_proc.Run(25);
             if (grabber_capabilities_proc.Wait() != GENERIC_EXIT_OK)
+            {
                 LOG(VB_GENERAL, LOG_ERR,
                     QString("%1  --capabilities failed or we timed out waiting."                            
                     " You may need to upgrade your xmltv grabber")
                         .arg(xmltv_grabber));
+            }
             else
             {
                 QByteArray result = grabber_capabilities_proc.ReadAll();
@@ -389,10 +391,12 @@ bool FillData::Run(SourceList &sourcelist)
                                            flags);
             grabber_method_proc.Run(15);
             if (grabber_method_proc.Wait() != GENERIC_EXIT_OK)
+            {
                 LOG(VB_GENERAL, LOG_ERR,
                     QString("%1 --preferredmethod failed or we timed out "
                             "waiting. You may need to upgrade your xmltv "
                             "grabber").arg(xmltv_grabber));
+            }
             else
             {
                 QTextStream ostream(grabber_method_proc.ReadAll());
@@ -426,11 +430,13 @@ bool FillData::Run(SourceList &sourcelist)
             vector<bool> refresh_request;
             refresh_request.resize(grabdays, m_refreshAll);
             if (!m_refreshAll)
+            {
                 // Set up days to grab if all is not specified
                 // If all was specified the vector was initialized
                 // with true in all occurrences.
                 for (int i = 0; i < grabdays; i++)
                     refresh_request[i] = m_refreshDay[i];
+            }
 
             for (int i = 0; i < grabdays; i++)
             {
@@ -688,14 +694,18 @@ bool FillData::Run(SourceList &sourcelist)
     {
         if (nonewdata > 0 &&
             (total_sources != externally_handled))
+        {
             status = QObject::tr(
                      "mythfilldatabase ran, but did not insert "
                      "any new data into the Guide for %1 of %2 sources. "
                      "This can indicate a potential grabber failure.")
                      .arg(nonewdata)
                      .arg(total_sources);
+        }
         else
+        {
             status = QObject::tr("Successful.");
+        }
 
         updateLastRunStatus(status);
     }

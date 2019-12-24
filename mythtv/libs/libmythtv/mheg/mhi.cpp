@@ -933,15 +933,18 @@ int MHIContext::GetChannelIndex(const QString &str)
                 break;
             if (transportID < 0)
                 nResult = Cid(it);
-            else do
+            else
             {
-                if (Tid(it) == transportID)
+                do
                 {
-                    nResult = Cid(it);
-                    break;
+                    if (Tid(it) == transportID)
+                    {
+                        nResult = Cid(it);
+                        break;
+                    }
                 }
+                while (++it != m_channelCache.end());
             }
-            while (++it != m_channelCache.end());
         }
         else if (str.startsWith("rec://svc/lcn/"))
         {

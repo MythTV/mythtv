@@ -986,9 +986,11 @@ void PlaybackProfileItemConfig::decoderChanged(const QString &dec)
 
     m_vidRend->clearSelections();
     for (it = renderers.begin(); it != renderers.end(); ++it)
+    {
         if ((!(*it).contains("null")))
             m_vidRend->addSelection(VideoDisplayProfile::GetVideoRendererName(*it),
                                     *it, (*it == prenderer));
+    }
     QString vrenderer2 = m_vidRend->getValue();
     vrenderChanged(vrenderer2);
 
@@ -4098,13 +4100,17 @@ void PlayBackScaling::updateButton(MythUIButtonListItem *item)
         m_horizScan->getValue() == "0" &&
         m_yScan->getValue() == "0" &&
         m_xScan->getValue() == "0")
+    {
         item->SetText(tr("No scaling"),"value");
+    }
     else
+    {
         item->SetText(QString("%1%x%2%+%3%+%4%")
                 .arg(m_horizScan->getValue())
                 .arg(m_vertScan->getValue())
                 .arg(m_xScan->getValue())
                 .arg(m_yScan->getValue()), "value");
+    }
 }
 
 void PlayBackScaling::childChanged(StandardSetting * /*setting*/)
@@ -4477,13 +4483,17 @@ void GuiDimension::updateButton(MythUIButtonListItem *item)
          m_height->getValue() == "0") &&
         m_offsetX->getValue() == "0" &&
         m_offsetY->getValue() == "0")
+    {
         item->SetText(AppearanceSettings::tr("Fullscreen"), "value");
+    }
     else
+    {
         item->SetText(QString("%1x%2+%3+%4")
                       .arg(m_width->getValue())
                       .arg(m_height->getValue())
                       .arg(m_offsetX->getValue())
                       .arg(m_offsetY->getValue()), "value");
+    }
 }
 
 void GuiDimension::childChanged(StandardSetting * /*setting*/)

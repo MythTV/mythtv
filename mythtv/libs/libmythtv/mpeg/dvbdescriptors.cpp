@@ -97,10 +97,14 @@ QString dvb_decode_text(const unsigned char *src, uint raw_length,
     for (uint i = 0; i < raw_length; i++)
     {
         if ((src[i] < 0x80) || (src[i] > 0x9F))
+        {
             dst[length++] = src[i];
         // replace CR/LF with a space
+        }
         else if (src[i] == 0x8A)
+        {
             dst[length++] = 0x20;
+        }
     }
 
     // Exit on empty string, sans formatting.
@@ -193,15 +197,23 @@ QString dvb_decode_short_name(const unsigned char *src, uint raw_length)
 
     // check for emphasis control codes
     for (uint i = 0; i < raw_length; i++)
+    {
         if (src[i] == 0x86)
+        {
             while ((++i < raw_length) && (src[i] != 0x87))
             {
                 if ((src[i] < 0x80) || (src[i] > 0x9F))
+                {
                     dst[length++] = src[i];
+                }
                 // replace CR/LF with a space
                 else if (src[i] == 0x8A)
+                {
                     dst[length++] = 0x20;
+                }
             }
+        }
+    }
 
     QString sStr = (!length) ? dvb_decode_text(src, raw_length)
                              : decode_text(dst, length);

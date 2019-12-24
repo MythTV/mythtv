@@ -108,9 +108,11 @@ bool Cutter::InhibitUseVideoFrame()
     m_videoFramesToCut--;
 
     if(m_videoFramesToCut == 0)
+    {
         LOG(VB_GENERAL, LOG_INFO,
             QString("Clean cut: end of video cut; audio frames left "
                     "to cut %1") .arg(m_audioFramesToCut));
+    }
 
     return true;
 }
@@ -131,9 +133,11 @@ bool Cutter::InhibitUseAudioFrames(int64_t frames, long *totalAudio)
         // so gets us closer to zero left to drop
         m_audioFramesToCut -= frames;
         if(m_audioFramesToCut == 0)
+        {
             LOG(VB_GENERAL, LOG_INFO,
                 QString("Clean cut: end of audio cut; vidio frames left "
                         "to cut %1") .arg(m_videoFramesToCut));
+        }
         return true;
     }
 

@@ -870,11 +870,13 @@ void MythMainWindow::GrabWindow(QImage &image)
     if (active)
         winid = active->winId();
     else
+    {
         // According to the following we page, you "just pass 0 as the
         // window id, indicating that we want to grab the entire screen".
         //
         // https://doc.qt.io/qt-5/qtwidgets-desktop-screenshot-example.html#screenshot-class-implementation
         winid = 0;
+    }
 
     QScreen *screen = MythDisplay::AcquireRelease()->GetCurrentScreen();
     MythDisplay::AcquireRelease(false);

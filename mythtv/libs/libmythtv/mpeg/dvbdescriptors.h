@@ -1130,10 +1130,12 @@ class FrequencyListDescriptor : public MPEGDescriptor
     unsigned long long Frequency(uint i) const
     {
         if (kCodingTypeTerrestrial == CodingType())
+        {
             return (((unsigned long long)m_data[i*4+3]<<24) |
                                         (m_data[i*4+4]<<16) |
                                         (m_data[i*4+5]<<8)  |
                                         (m_data[i*4+6]));
+        }
         return byte4BCD2int(m_data[i*4+3], m_data[i*4+4],
                             m_data[i*4+5], m_data[i*4+6]);
     }

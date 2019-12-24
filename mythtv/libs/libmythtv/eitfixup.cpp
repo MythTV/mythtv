@@ -950,9 +950,11 @@ void EITFixUp::FixUK(DBEventEIT &event) const
                 .arg(event.m_title, event.m_description));
 
             if (position2 == 0)
+            {
      		    // Remove from the start of the description.
 		        // Otherwise it ends up in the subtitle.
                 event.m_description.remove(tmpSeries.cap(form));
+            }
         }
     }
 
@@ -2455,10 +2457,14 @@ void EITFixUp::FixDK(DBEventEIT &event) const
     {
         QString newid;
         if (event.m_seriesId[1] == '1')
+        {
             newid = QString("%1%2").arg(event.m_chanid).
                     arg(event.m_seriesId.mid(2,8));
+        }
         else
+        {
             newid = event.m_seriesId.mid(2,8);
+        }
         event.m_seriesId = newid;
     }
 

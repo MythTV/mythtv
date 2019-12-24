@@ -166,11 +166,9 @@ QString GetDisplayBrowse(bool browse)
     QString ret;
 
     if (browse)
-        ret = QCoreApplication::translate("(Common)", 
-                                           "Yes");
+        ret = QCoreApplication::translate("(Common)", "Yes");
     else
-        ret = QCoreApplication::translate("(Common)", 
-                                           "No");
+        ret = QCoreApplication::translate("(Common)", "No");
 
     return ret;
 }
@@ -180,11 +178,9 @@ QString GetDisplayWatched(bool watched)
     QString ret;
 
     if (watched)
-        ret = QCoreApplication::translate("(Common)", 
-                                           "Yes");
+        ret = QCoreApplication::translate("(Common)", "Yes");
     else
-        ret = QCoreApplication::translate("(Common)", 
-                                           "No");
+        ret = QCoreApplication::translate("(Common)", "No");
 
     return ret;
 }
@@ -194,11 +190,15 @@ QString GetDisplayProcessed(bool processed)
     QString ret;
 
     if (processed)
+    {
         ret = QCoreApplication::translate("(VideoUtils)", 
                                            "Details Downloaded");
+    }
     else
+    {
         ret = QCoreApplication::translate("(VideoUtils)", 
                                            "Waiting for Detail Download");
+    }
 
     return ret;
 }

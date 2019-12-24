@@ -5077,10 +5077,14 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
                     int denominator = matches[2].toInt(&ok);
 
                     if (ok && denominator != 0)
+                    {
                         tmpSpeed = static_cast<float>(numerator) /
                                    static_cast<float>(denominator);
+                    }
                     else
+                    {
                         ok = false;
+                    }
                 }
             }
 
@@ -5165,17 +5169,23 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
             return;
 
         if (tokens[2] == "BEGINNING")
+        {
             DoSeek(ctx, 0, tr("Jump to Beginning"),
                    /*timeIsOffset*/false,
                    /*honorCutlist*/true);
+        }
         else if (tokens[2] == "FORWARD")
+        {
             DoSeek(ctx, ctx->m_fftime, tr("Skip Ahead"),
                    /*timeIsOffset*/true,
                    /*honorCutlist*/true);
+        }
         else if (tokens[2] == "BACKWARD")
+        {
             DoSeek(ctx, -ctx->m_rewtime, tr("Skip Back"),
                    /*timeIsOffset*/true,
                    /*honorCutlist*/true);
+        }
         else if ((tokens[2] == "POSITION" ||
                   tokens[2] == "POSITIONWITHCUTLIST") &&
                  (tokens.size() == 4) &&
@@ -6583,13 +6593,17 @@ bool TV::SeekHandleAction(PlayerContext *actx, const QStringList &actions,
     else
     {
         if (m_smartForward && m_doSmartForward)
+        {
             DoSeek(actx, actx->m_rewtime, tr("Skip Ahead"),
                    /*timeIsOffset*/true,
                    /*honorCutlist*/(flags & kIgnoreCutlist) == 0);
+        }
         else
+        {
             DoSeek(actx, actx->m_fftime, tr("Skip Ahead"),
                    /*timeIsOffset*/true,
                    /*honorCutlist*/(flags & kIgnoreCutlist) == 0);
+        }
     }
     UpdateNavDialog(actx);
     return true;
@@ -6660,11 +6674,15 @@ void TV::DoArbSeek(PlayerContext *ctx, ArbSeekWhence whence,
     float time = (int(seek / 100) * 3600) + ((seek % 100) * 60);
 
     if (whence == ARBSEEK_FORWARD)
+    {
         DoSeek(ctx, time, tr("Jump Ahead"),
                /*timeIsOffset*/true, honorCutlist);
+    }
     else if (whence == ARBSEEK_REWIND)
+    {
         DoSeek(ctx, -time, tr("Jump Back"),
                /*timeIsOffset*/true, honorCutlist);
+    }
     else if (whence == ARBSEEK_END)
     {
         ctx->LockDeletePlayer(__FILE__, __LINE__);
@@ -9277,10 +9295,14 @@ void TV::customEvent(QEvent *e)
         {
             MenuNodeTuple data = dce->GetData().value<MenuNodeTuple>();
             if (dce->GetResult() == -1) // menu exit/back
+            {
                 PlaybackMenuShow(data.m_menu, data.m_node.parentNode(),
                                  data.m_node);
+            }
             else
+            {
                 PlaybackMenuShow(data.m_menu, data.m_node, QDomNode());
+            }
         }
         else
             OSDDialogEvent(dce->GetResult(), dce->GetResultText(),
@@ -9352,29 +9374,45 @@ void TV::customEvent(QEvent *e)
         else if (message == ACTION_SETAUDIOSYNC)
             ChangeAudioSync(ctx, 0, value);
         else if (message == ACTION_SETBRIGHTNESS)
+        {
             DoChangePictureAttribute(ctx, kAdjustingPicture_Playback,
                                      kPictureAttribute_Brightness,
                                      false, value);
+        }
         else if (message == ACTION_SETCONTRAST)
+        {
             DoChangePictureAttribute(ctx, kAdjustingPicture_Playback,
                                      kPictureAttribute_Contrast,
                                      false, value);
+        }
         else if (message == ACTION_SETCOLOUR)
+        {
             DoChangePictureAttribute(ctx, kAdjustingPicture_Playback,
                                      kPictureAttribute_Colour,
                                      false, value);
+        }
         else if (message == ACTION_SETHUE)
+        {
             DoChangePictureAttribute(ctx, kAdjustingPicture_Playback,
                                      kPictureAttribute_Hue,
                                      false, value);
+        }
         else if (message == ACTION_JUMPCHAPTER)
+        {
             DoJumpChapter(ctx, value);
+        }
         else if (message == ACTION_SWITCHTITLE)
+        {
             DoSwitchTitle(ctx, value - 1);
+        }
         else if (message == ACTION_SWITCHANGLE)
+        {
             DoSwitchAngle(ctx, value);
+        }
         else if (message == ACTION_SEEKABSOLUTE)
+        {
             DoSeekAbsolute(ctx, value, /*honorCutlist*/true);
+        }
         ReturnPlayerLock(ctx);
     }
 
@@ -10093,9 +10131,11 @@ void TV::ShowOSDCutpoint(PlayerContext *ctx, const QString &type)
                                        "TV Editing");
         }
         if (m_cutlistMenu.IsLoaded())
+        {
             PlaybackMenuShow(m_cutlistMenu,
                              m_cutlistMenu.GetRoot(),
                              QDomNode());
+        }
     }
     else if (type == "EDIT_CUT_POINTS_COMPACT")
     {
@@ -10108,9 +10148,11 @@ void TV::ShowOSDCutpoint(PlayerContext *ctx, const QString &type)
                                               "TV Editing");
         }
         if (m_cutlistCompactMenu.IsLoaded())
+        {
             PlaybackMenuShow(m_cutlistCompactMenu,
                              m_cutlistCompactMenu.GetRoot(),
                              QDomNode());
+        }
     }
     else if (type == "EXIT_EDIT_MODE")
     {
@@ -10708,20 +10750,34 @@ void TV::OSDDialogEvent(int result, const QString& text, QString action)
         else if (action == "TOGGLEAUTOEXPIRE")
             ToggleAutoExpire(actx);
         else if (action.startsWith("TOGGLECOMMSKIP"))
+        {
             SetAutoCommercialSkip(
                 actx, (CommSkipMode)(action.right(1).toInt()));
+        }
         else if (action == "QUEUETRANSCODE")
+        {
             DoQueueTranscode(actx, "Default");
+        }
         else if (action == "QUEUETRANSCODE_AUTO")
+        {
             DoQueueTranscode(actx, "Autodetect");
+        }
         else if (action == "QUEUETRANSCODE_HIGH")
+        {
             DoQueueTranscode(actx, "High Quality");
+        }
         else if (action == "QUEUETRANSCODE_MEDIUM")
+        {
             DoQueueTranscode(actx, "Medium Quality");
+        }
         else if (action == "QUEUETRANSCODE_LOW")
+        {
             DoQueueTranscode(actx, "Low Quality");
+        }
         else
+        {
             handled = false;
+        }
     }
     if (!handled)
     {
@@ -11773,10 +11829,12 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
                 if (m_lastProgram->GetSubtitle().isEmpty())
                     BUTTON(actionName, m_lastProgram->GetTitle());
                 else
+                {
                     BUTTON(actionName,
                            QString("%1: %2")
                            .arg(m_lastProgram->GetTitle())
                            .arg(m_lastProgram->GetSubtitle()));
+                }
             }
         }
         else if (actionName == "EDIT")
@@ -12120,13 +12178,17 @@ void TV::ShowOSDMenu(bool isCompact)
                                            "TV Playback");
     }
     if (isCompact && m_playbackCompactMenu.IsLoaded())
+    {
         PlaybackMenuShow(m_playbackCompactMenu,
                          m_playbackCompactMenu.GetRoot(),
                          QDomNode());
+    }
     else if (m_playbackMenu.IsLoaded())
+    {
         PlaybackMenuShow(m_playbackMenu,
                          m_playbackMenu.GetRoot(),
                          QDomNode());
+    }
 }
 
 void TV::FillOSDMenuJumpRec(PlayerContext* ctx, const QString &category,
@@ -12641,9 +12703,11 @@ void TV::DoJumpFFWD(PlayerContext *ctx)
     else if (GetNumChapters(ctx) > 0)
         DoJumpChapter(ctx, 9999);
     else
+    {
         DoSeek(ctx, ctx->m_jumptime * 60, tr("Jump Ahead"),
                /*timeIsOffset*/true,
                /*honorCutlist*/true);
+    }
 }
 
 void TV::DoSeekFFWD(PlayerContext *ctx)
@@ -12660,9 +12724,11 @@ void TV::DoJumpRWND(PlayerContext *ctx)
     else if (GetNumChapters(ctx) > 0)
         DoJumpChapter(ctx, -1);
     else
+    {
         DoSeek(ctx, -ctx->m_jumptime * 60, tr("Jump Back"),
                /*timeIsOffset*/true,
                /*honorCutlist*/true);
+    }
 }
 
 void TV::DoSeekRWND(PlayerContext *ctx)

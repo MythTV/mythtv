@@ -634,10 +634,12 @@ RecStatus::Type TVRec::StartRecording(ProgramInfo *pginfo)
         }
 
         if (m_curRecording && m_internalState == kState_RecordingOnly)
+        {
             msg += QString("\n\t\t\tCurrently recording: %1 %2 %3 %4")
                 .arg(m_curRecording->GetTitle()).arg(m_curRecording->GetChanID())
                 .arg(m_curRecording->GetRecordingStartTime(MythDate::ISODate))
                 .arg(m_curRecording->GetRecordingEndTime(MythDate::ISODate));
+        }
 
         LOG(VB_GENERAL, LOG_INFO, LOC + msg);
     }
@@ -2641,14 +2643,22 @@ long long TVRec::GetMaxBitrate(void) const
 {
     long long bitrate;
     if (m_genOpt.m_inputType == "MPEG")
+    {
         // NOLINTNEXTLINE(bugprone-branch-clone)
         bitrate = 10080000LL; // use DVD max bit rate
+    }
     else if (m_genOpt.m_inputType == "HDPVR")
+    {
         bitrate = 20200000LL; // Peek bit rate for HD-PVR
+    }
     else if (!CardUtil::IsEncoder(m_genOpt.m_inputType))
+    {
         bitrate = 22200000LL; // 1080i
+    }
     else // frame grabber
+    {
         bitrate = 10080000LL; // use DVD max bit rate, probably too big
+    }
 
     return bitrate;
 }
@@ -2981,9 +2991,11 @@ void TVRec::ToggleChannelFavorite(const QString& changroupname)
         if (!result)
            LOG(VB_RECORD, LOG_ERR, LOC + "Unable to toggle channel favorite.");
         else
+        {
            LOG(VB_RECORD, LOG_INFO, LOC +
                QString("Toggled channel favorite.channum %1, chan group %2")
                    .arg(channum).arg(changroupname));
+        }
     }
 }
 
@@ -3173,9 +3185,10 @@ void TVRec::GetNextProgram(BrowseDirection direction,
         else if (BROWSE_DOWN == direction)
             chanid = m_channel->GetNextChannel(chanid, CHANNEL_DIRECTION_DOWN);
         else if (BROWSE_FAVORITE == direction)
+        {
             chanid = m_channel->GetNextChannel(
                 chanid, CHANNEL_DIRECTION_FAVORITE);
-
+        }
         else if (BROWSE_LEFT == direction)
         {
             compare = "<";
@@ -3196,8 +3209,10 @@ void TVRec::GetNextProgram(BrowseDirection direction,
         else if (BROWSE_DOWN == direction)
             chanid = m_channel->GetNextChannel(channum, CHANNEL_DIRECTION_DOWN);
         else if (BROWSE_FAVORITE == direction)
+        {
             chanid = m_channel->GetNextChannel(channum,
                                              CHANNEL_DIRECTION_FAVORITE);
+        }
         else if (BROWSE_LEFT == direction)
         {
             chanid = m_channel->GetNextChannel(channum, CHANNEL_DIRECTION_SAME);

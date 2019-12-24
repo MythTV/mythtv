@@ -1350,9 +1350,11 @@ void ProgramRecPriority::UpdateList()
                                       progInfo->GetRecordingRuleType()));
         }
         else
+        {
             matchInfo = tr("Recording %1 of %2")
                         .arg(m_recMatch[progInfo->GetRecordingRuleID()])
                         .arg(m_listMatch[progInfo->GetRecordingRuleID()]);
+        }
 
         subtitle = QString("(%1) %2").arg(matchInfo).arg(subtitle);
         item->SetText(subtitle, "scheduleinfo", state);
@@ -1442,9 +1444,11 @@ void ProgramRecPriority::updateInfo(MythUIButtonListItem *item)
                           pgRecInfo->GetRecordingRuleType()));
     }
     else
+    {
         matchInfo = tr("Recording %1 of %2")
             .arg(m_recMatch[pgRecInfo->GetRecordingRuleID()])
             .arg(m_listMatch[pgRecInfo->GetRecordingRuleID()]);
+    }
 
     subtitle = QString("(%1) %2").arg(matchInfo).arg(subtitle);
 

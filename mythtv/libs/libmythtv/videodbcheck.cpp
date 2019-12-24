@@ -137,12 +137,16 @@ static void UpdateHashes(void)
             updatequery.bindValue(":FILENAME", filename);
             updatequery.bindValue(":HOST", host);
             if (!updatequery.exec())
+            {
                 MythDB::DBError(QObject::tr("Error: failed to hash file "
                                             "'%1'").arg(filename), updatequery);
+            }
             else
+            {
                 LOG(VB_GENERAL, LOG_INFO,
                     QString("Hash (%1) generated for file (%2)")
                         .arg(hash).arg(filename));
+            }
         }
     }
 }
@@ -697,9 +701,11 @@ bool doUpgradeVideoDatabaseSchema(void)
                                    " DROP INDEX title_2");
 
                     if (!update.exec())
+                    {
                          MythDB::DBError("Unable to drop duplicate index "
                                          "on videometadata. Ignoring.",
                                          update);
+                    }
                     break;
                 }
             }

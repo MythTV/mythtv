@@ -164,18 +164,28 @@ bool JoystickMenuThread::ReadConfig(const QString& config_file)
         QString firstTok = tokens[0].toLower();
 
         if (firstTok.startsWith("devicename") && tokens.count() == 2)
+        {
             m_devicename = tokens[1];
+        }
         else if (firstTok.startsWith("button") && tokens.count() == 3)
+        {
             m_map.AddButton(tokens[1].toInt(), tokens[2]);
+        }
         else if (firstTok.startsWith("axis") && tokens.count() == 5)
+        {
             m_map.AddAxis(tokens[1].toInt(), tokens[2].toInt(),
                           tokens[3].toInt(), tokens[4]);
+        }
         else if (firstTok.startsWith("chord") && tokens.count() == 4)
+        {
             m_map.AddButton(tokens[2].toInt(), tokens[3], tokens[1].toInt());
+        }
         else
+        {
             LOG(VB_GENERAL, LOG_WARNING, LOC +
                 QString("ReadConfig(%1) unrecognized or malformed line \"%2\" ")
                                         .arg(line) .arg(rawline));
+        }
     }
 
     fclose(fp);

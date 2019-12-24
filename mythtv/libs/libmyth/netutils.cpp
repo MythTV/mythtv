@@ -291,11 +291,15 @@ bool removeGrabberFromDB(const QString &commandline, const bool &search)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     if (search)
+    {
         query.prepare("DELETE FROM internetcontent WHERE commandline = :COMMAND "
                   "AND host = :HOST AND search = 1;");
+    }
     else
+    {
         query.prepare("DELETE FROM internetcontent WHERE commandline = :COMMAND "
                   "AND host = :HOST AND search = 0;");
+    }
     QFileInfo fi(commandline);
     query.bindValue(":COMMAND", fi.fileName());
     query.bindValue(":HOST", gCoreContext->GetHostName());

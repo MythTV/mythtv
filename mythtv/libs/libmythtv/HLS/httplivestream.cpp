@@ -81,9 +81,11 @@ class HTTPLiveStreamThread : public QRunnable
         uint result = myth_system(command, flags);
 
         if (result != GENERIC_EXIT_OK)
+        {
             LOG(VB_GENERAL, LOG_WARNING, SLOC +
                 QString("Command '%1' returned %2")
                     .arg(command).arg(result));
+        }
     }
 
   private:

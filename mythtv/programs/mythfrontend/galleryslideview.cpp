@@ -191,10 +191,14 @@ bool GallerySlideView::keyPressEvent(QKeyEvent *event)
         else if (action == "RECENTER")
             Pan();
         else if (action == "ESCAPE" && !GetMythMainWindow()->IsExitingToMain())
+        {
             // Exit info details, if shown
             handled = m_infoList.Hide();
+        }
         else
+        {
             handled = false;
+        }
     }
 
     if (!handled)
@@ -667,12 +671,15 @@ void GallerySlideView::TransitionComplete()
 void GallerySlideView::ShowPrevSlide(int inc)
 {
     if (m_playing && m_view->HasPrev(inc) == nullptr)
+    {
         // Prohibit back-wrapping during slideshow: it will cause premature end
         //: Cannot go back beyond first slide of slideshow
         SetStatus(tr("Start"));
-
+    }
     else if (m_view->Prev(inc))
+    {
         ShowSlide(-1);
+    }
 }
 
 

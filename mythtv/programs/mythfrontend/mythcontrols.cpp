@@ -575,13 +575,17 @@ void MythControls::ResolveConflict(ActionID *conflict, int error_level,
     bool error = (KeyBindings::kKeyBindingError == error_level);
 
     if (error)
+    {
         label = tr("This key binding conflicts with %1 in the %2 context. "
                    "Unable to bind key.")
                     .arg(conflict->GetAction()).arg(conflict->GetContext());
+    }
     else
+    {
         label = tr("This key binding conflicts with %1 in the %2 context. "
                    "Do you want to bind it anyway?")
                     .arg(conflict->GetAction()).arg(conflict->GetContext());
+    }
 
     MythScreenStack *popupStack =
                             GetMythMainWindow()->GetStack("popup stack");
@@ -651,10 +655,14 @@ void MythControls::AddKeyToAction(const QString& key, bool ignoreconflict)
     }
 
     if (binding_index < keys.count())
+    {
         m_bindings->ReplaceActionKey(context, action, key,
                                      keys[binding_index]);
+    }
     else
+    {
         m_bindings->AddActionKey(context, action, key);
+    }
 
     RefreshKeyInformation();
 }

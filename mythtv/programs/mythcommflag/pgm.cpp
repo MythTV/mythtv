@@ -120,9 +120,11 @@ static int pgm_expand(AVFrame *dst, const AVFrame *src, int srcheight,
 
     /* Copy the image. */
     for (int rr = 0; rr < srcheight; rr++)
+    {
         memcpy(dst->data[0] + (rr + extratop) * newwidth + extraleft,
                 src->data[0] + rr * srcwidth,
                 srcwidth);
+    }
 
     /* Pad the top. */
     const uchar *srcdata = src->data[0];
@@ -136,15 +138,19 @@ static int pgm_expand(AVFrame *dst, const AVFrame *src, int srcheight,
 
     /* Pad the left. */
     for (int rr = 0; rr < newheight; rr++)
+    {
         memset(dst->data[0] + rr * newwidth,
                 dst->data[0][rr * newwidth + extraleft],
                 extraleft);
+    }
 
     /* Pad the right. */
     for (int rr = 0; rr < newheight; rr++)
+    {
         memset(dst->data[0] + rr * newwidth + extraleft + srcwidth,
                 dst->data[0][rr * newwidth + extraleft + srcwidth - 1],
                 extraright);
+    }
 
     return 0;
 }
@@ -169,9 +175,11 @@ int pgm_crop(AVFrame *dst, const AVFrame *src, int srcheight,
     }
 
     for (int rr = 0; rr < cropheight; rr++)
+    {
         memcpy(dst->data[0] + rr * cropwidth,
                 src->data[0] + (srcrow + rr) * srcwidth + srccol,
                 cropwidth);
+    }
 
     (void)srcheight;    /* gcc */
     return 0;
@@ -201,9 +209,11 @@ int pgm_overlay(AVFrame *dst, const AVFrame *s1, int s1height,
 
     /* Overwrite overlay area of "dst" with "s2". */
     for (int rr = 0; rr < s2height; rr++)
+    {
         memcpy(dst->data[0] + (s1row + rr) * s1width + s1col,
                 s2->data[0] + rr * s2width,
                 s2width);
+    }
 
     return 0;
 }

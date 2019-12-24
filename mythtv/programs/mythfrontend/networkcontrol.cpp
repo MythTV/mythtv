@@ -314,11 +314,15 @@ void NetworkControl::processNetworkControlCommand(NetworkCommand *nc)
     else if (is_abbrev("theme", nc->getArg(0)))
         result = processTheme(nc);
     else if ((nc->getArg(0).toLower() == "exit") || (nc->getArg(0).toLower() == "quit"))
+    {
         QCoreApplication::postEvent(this,
                                 new NetworkControlCloseEvent(nc->getClient()));
+    }
     else if (! nc->getArg(0).isEmpty())
+    {
         result = QString("INVALID command '%1', try 'help' for more info")
                          .arg(nc->getArg(0));
+    }
 
     m_nrLock.lock();
     m_networkControlReplies.push_back(new NetworkCommand(nc->getClient(),result));
@@ -554,9 +558,11 @@ QString NetworkControl::processKey(NetworkCommand *nc)
             QCoreApplication::postEvent(keyDest, event);
         }
         else
+        {
             return QString("ERROR: Invalid syntax at '%1', see 'help %2' for "
                            "usage information")
                            .arg(nc->getArg(curToken)).arg(nc->getArg(0));
+        }
 
         curToken++;
     }
@@ -753,23 +759,33 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
         else if (nc->getArgCount() > 3)
         {
             if (is_abbrev("setvolume", nc->getArg(2)))
+            {
                 message = QString("MUSIC_COMMAND %1 SET_VOLUME %2")
                                 .arg(hostname)
                                 .arg(nc->getArg(3));
+            }
             else if (is_abbrev("track", nc->getArg(2)))
+            {
                 message = QString("MUSIC_COMMAND %1 PLAY_TRACK %2")
                                 .arg(hostname)
                                 .arg(nc->getArg(3));
+            }
             else if (is_abbrev("url", nc->getArg(2)))
+            {
                 message = QString("MUSIC_COMMAND %1 PLAY_URL %2")
                                 .arg(hostname)
                                 .arg(nc->getArg(3));
+            }
             else if (is_abbrev("file", nc->getArg(2)))
+            {
                 message = QString("MUSIC_COMMAND %1 PLAY_FILE '%2'")
                                 .arg(hostname)
                                 .arg(nc->getFrom(3));
+            }
             else
+            {
                 return QString("ERROR: Invalid 'play music' command");
+            }
         }
         else
             return QString("ERROR: Invalid 'play music' command");
@@ -873,11 +889,15 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
         if (nc->getArgCount() < 3)
             message = QString("NETWORK_CONTROL SUBTITLES 0");
         else if (!nc->getArg(2).toLower().contains(QRegExp("^\\d+$")))
+        {
             return QString("ERROR: See 'help %1' for usage information")
                 .arg(nc->getArg(0));
+        }
         else
+        {
             message = QString("NETWORK_CONTROL SUBTITLES %1")
                 .arg(nc->getArg(2));
+        }
     }
     else
         return QString("ERROR: See 'help %1' for usage information")
@@ -993,10 +1013,14 @@ QString NetworkControl::processQuery(NetworkCommand *nc)
         int     freeVM = 0;
 
         if (getMemStats(totalMB, freeMB, totalVM, freeVM))
+        {
             str = QString("%1 %2 %3 %4")
                           .arg(totalMB).arg(freeMB).arg(totalVM).arg(freeVM);
+        }
         else
+        {
             str = QString("Could not determine memory stats.");
+        }
         return str;
     }
     else if (is_abbrev("volume", nc->getArg(1)))
@@ -1062,9 +1086,11 @@ QString NetworkControl::processSet(NetworkCommand *nc)
             return QString("ERROR: Missing filter name.");
 
         if (nc->getArgCount() > 3)
+        {
             return QString("ERROR: Separate filters with commas with no "
                            "space: playback,audio\r\n See 'help %1' for usage "
                            "information").arg(nc->getArg(0));
+        }
 
         QString oldVerboseString = verboseString;
         QString result = "OK";
@@ -1520,9 +1546,11 @@ void NetworkControl::sendReplyToClient(NetworkControlClient *ncc,
                                        QString &reply)
 {
     if (!m_clients.contains(ncc))
+    {
         // NetworkControl instance is unaware of control client
         // assume connection to client has been terminated and bail
         return;
+    }
 
     QRegExp crlfRegEx("\r\n$");
     QRegExp crlfcrlfRegEx("\r\n.*\r\n");
@@ -1718,11 +1746,15 @@ QString NetworkControl::listRecordings(const QString& chanid, const QString& sta
             subtitle = query.value(3).toString();
 
             if (!subtitle.isEmpty())
+            {
                 episode = QString("%1 -\"%2\"")
                                   .arg(title)
                                   .arg(subtitle);
+            }
             else
+            {
                 episode = title;
+            }
 
             result +=
                 QString("%1 %2 %3").arg(query.value(0).toInt())

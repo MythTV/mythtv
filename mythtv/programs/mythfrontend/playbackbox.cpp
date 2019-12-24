@@ -513,10 +513,14 @@ bool PlaybackBox::Create()
     if (m_recgroupList)
     {
         if (gCoreContext->GetBoolSetting("RecGroupsFocusable", false))
+        {
         connect(m_recgroupList, SIGNAL(itemSelected(MythUIButtonListItem*)),
             SLOT(updateRecGroup(MythUIButtonListItem*)));
+        }
         else
+        {
             m_recgroupList->SetCanTakeFocus(false);
+        }
     }
 
     connect(m_groupList, SIGNAL(itemSelected(MythUIButtonListItem*)),
@@ -2772,11 +2776,15 @@ MythMenu* PlaybackBox::createPlaylistMenu(void)
     if (GetFocusWidget() == m_groupList)
     {
         if ((m_viewMask & VIEW_TITLES))
+        {
             menu->AddItem(tr("Toggle playlist for this Category/Title"),
                           SLOT(togglePlayListTitle()));
+        }
         else
+        {
             menu->AddItem(tr("Toggle playlist for this Group"),
                           SLOT(togglePlayListTitle()));
+        }
     }
     else
         menu->AddItem(tr("Toggle playlist for this recording"),
@@ -2887,11 +2895,15 @@ MythMenu* PlaybackBox::createPlaylistJobMenu(void)
         jobTitle = gCoreContext->GetSetting("UserJobDesc1");
 
         if (!isRunningUserJob1)
+        {
             menu->AddItem(tr("Begin") + ' ' + jobTitle,
                           SLOT(doPlaylistBeginUserJob1()));
+        }
         else
+        {
             menu->AddItem(tr("Stop") + ' ' + jobTitle,
                           SLOT(stopPlaylistUserJob1()));
+        }
     }
 
     command = gCoreContext->GetSetting("UserJob2", "");
@@ -2900,11 +2912,15 @@ MythMenu* PlaybackBox::createPlaylistJobMenu(void)
         jobTitle = gCoreContext->GetSetting("UserJobDesc2");
 
         if (!isRunningUserJob2)
+        {
             menu->AddItem(tr("Begin") + ' ' + jobTitle,
                           SLOT(doPlaylistBeginUserJob2()));
+        }
         else
+        {
             menu->AddItem(tr("Stop") + ' ' + jobTitle,
                           SLOT(stopPlaylistUserJob2()));
+        }
     }
 
     command = gCoreContext->GetSetting("UserJob3", "");
@@ -2913,11 +2929,15 @@ MythMenu* PlaybackBox::createPlaylistJobMenu(void)
         jobTitle = gCoreContext->GetSetting("UserJobDesc3");
 
         if (!isRunningUserJob3)
+        {
             menu->AddItem(tr("Begin") + ' ' + jobTitle,
                           SLOT(doPlaylistBeginUserJob3()));
+        }
         else
+        {
             menu->AddItem(tr("Stop") + ' ' + jobTitle,
                           SLOT(stopPlaylistUserJob3()));
+        }
     }
 
     command = gCoreContext->GetSetting("UserJob4", "");
@@ -2926,11 +2946,15 @@ MythMenu* PlaybackBox::createPlaylistJobMenu(void)
         jobTitle = gCoreContext->GetSetting("UserJobDesc4");
 
         if (!isRunningUserJob4)
+        {
             menu->AddItem(QString("%1 %2").arg(tr("Begin")).arg(jobTitle),
                           SLOT(doPlaylistBeginUserJob4()));
+        }
         else
+        {
             menu->AddItem(QString("%1 %2").arg(tr("Stop")).arg(jobTitle),
                           SLOT(stopPlaylistUserJob4()));
+        }
     }
 
     return menu;
@@ -3216,11 +3240,15 @@ void PlaybackBox::ShowActionPopup(const ProgramInfo &pginfo)
         m_popupMenu->AddItem(tr("Recording Options"), nullptr, createRecordingMenu());
 
         if (m_groupList->GetItemPos(m_groupList->GetItemCurrent()) == 0)
+        {
             m_popupMenu->AddItem(tr("List Recorded Episodes"),
                                  SLOT(ShowRecordedEpisodes()));
+        }
         else
+        {
             m_popupMenu->AddItem(tr("List All Recordings"),
                                  SLOT(ShowAllRecordings()));
+        }
 
         m_popupMenu->AddItem(tr("Delete"), SLOT(askDelete()));
 
@@ -3248,11 +3276,15 @@ void PlaybackBox::ShowActionPopup(const ProgramInfo &pginfo)
     if (!m_player)
     {
         if (m_playList.contains(pginfo.GetRecordingID()))
+        {
             m_popupMenu->AddItem(tr("Remove from Playlist"),
                                  SLOT(togglePlayListItem()));
+        }
         else
+        {
             m_popupMenu->AddItem(tr("Add to Playlist"),
                                  SLOT(togglePlayListItem()));
+        }
         if (!m_playList.isEmpty())
         {
             m_popupMenu->AddItem(tr("Playlist Options"), nullptr, createPlaylistMenu());
@@ -3279,11 +3311,15 @@ void PlaybackBox::ShowActionPopup(const ProgramInfo &pginfo)
     m_popupMenu->AddItem(tr("Job Options"), nullptr, createJobMenu());
 
     if (m_groupList->GetItemPos(m_groupList->GetItemCurrent()) == 0)
+    {
         m_popupMenu->AddItem(tr("List Recorded Episodes"),
                              SLOT(ShowRecordedEpisodes()));
+    }
     else
+    {
         m_popupMenu->AddItem(tr("List All Recordings"),
                              SLOT(ShowAllRecordings()));
+    }
 
     if (!sameProgram)
     {

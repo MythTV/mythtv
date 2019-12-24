@@ -78,9 +78,11 @@ bool ImageSearchResultsDialog::Create()
                 if (QFile::exists(dlfile))
                     button->SetImage(dlfile);
                 else
+                {
                     m_imageDownload->addThumb(info.label,
                                      artfile,
                                      qVariantFromValue<uint>(pos));
+                }
             }
 
             button->SetData(qVariantFromValue<ArtworkInfo>(*i));

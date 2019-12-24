@@ -899,9 +899,11 @@ bool ChannelUtil::SaveCachedPids(uint chanid,
     if (delete_all)
         query.prepare("DELETE FROM pidcache WHERE chanid = :CHANID");
     else
+    {
         query.prepare(
             "DELETE FROM pidcache "
             "WHERE chanid = :CHANID AND tableid < 65536");
+    }
 
     query.bindValue(":CHANID", chanid);
 
@@ -1696,9 +1698,11 @@ void ChannelUtil::UpdateInsertInfoFromDB(ChannelInsertInfo &chan)
         if (!xmltvid.isEmpty())
         {
             if (useeit)
+            {
                 LOG(VB_GENERAL, LOG_ERR,
                     "Using EIT and xmltv for the same channel "
                     "is an unsupported configuration.");
+            }
             chan.m_xmltvId = xmltvid;
         }
         chan.m_useOnAirGuide = useeit;

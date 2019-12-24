@@ -198,10 +198,14 @@ QString CaptionServiceDescriptor::toString(void) const
         str.append(QString("easy_reader(%1) wide(%2) ")
                    .arg(EasyReader(i)).arg(WideAspectRatio(i)));
         if (Type(i))
+        {
             str.append(QString("service_num(%1)")
                        .arg(CaptionServiceNumber(i)));
+        }
         else
+        {
             str.append(QString("line_21_field(%1)").arg(Line21Field(i)));
+        }
     }
 
     return str;

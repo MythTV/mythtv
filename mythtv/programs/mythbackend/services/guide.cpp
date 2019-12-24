@@ -220,9 +220,11 @@ DTC::ProgramList* Guide::GetProgramList(int              nStartIndex,
         sSQL = "WHERE ";
 
     if (bOnlyNew)
+    {
         sSQL = "LEFT JOIN oldprogram ON oldprogram.oldtitle = program.title "
                 + sSQL
                 + "oldprogram.oldtitle IS NULL AND ";
+    }
 
     sSQL += "deleted IS NULL AND ";
 

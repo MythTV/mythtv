@@ -204,17 +204,21 @@ bool FileLogger::logmsg(LoggingItem *item)
     }
 
     if( item->tid() )
+    {
         snprintf( line, MAX_STRING_LENGTH,
                   "%s %c [%d/%" PREFIX64 "d] %s %s:%d (%s) - %s\n",
                   timestamp, shortname, item->pid(), item->tid(),
                   item->rawThreadName(), item->rawFile(), item->line(),
                   item->rawFunction(), item->rawMessage() );
+    }
     else
+    {
         snprintf( line, MAX_STRING_LENGTH,
                   "%s %c [%d] %s %s:%d (%s) - %s\n",
                   timestamp, shortname, item->pid(), item->rawThreadName(),
                   item->rawFile(), item->line(), item->rawFunction(),
                   item->rawMessage() );
+    }
 
     int result = write(m_fd, line, strlen(line));
 

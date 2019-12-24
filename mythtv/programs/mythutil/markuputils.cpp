@@ -146,10 +146,12 @@ static int CopySkipListToCutList(const MythUtilCommandLineParser &cmdline)
 
     pginfo.QueryCommBreakList(cutlist);
     for (it = cutlist.begin(); it != cutlist.end(); ++it)
+    {
         if (*it == MARK_COMM_START)
             cutlist[it.key()] = MARK_CUT_START;
         else
             cutlist[it.key()] = MARK_CUT_END;
+    }
     pginfo.SaveCutList(cutlist);
 
     cout << "Commercial Skip List copied to Cutlist\n";

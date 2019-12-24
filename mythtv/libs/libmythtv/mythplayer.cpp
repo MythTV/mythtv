@@ -1745,9 +1745,11 @@ void MythPlayer::AVSync(VideoFrame *buffer)
         m_numDroppedFrames = 0;
 
     if (dropframe)
+    {
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("dropping frame to catch up, lateness=%1 usec")
                 .arg(lateness));
+    }
     else if (!FlagIsSet(kVideoIsNull) && buffer)
     {
         // if we get here, we're actually going to do video output
@@ -1789,7 +1791,9 @@ void MythPlayer::AVSync(VideoFrame *buffer)
         }
     }
     else
+    {
         WaitForTime(framedue);
+    }
 
     LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC +
         QString("A/V timecodes audio=%1 video=%2 frameinterval=%3 "
@@ -1900,9 +1904,11 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
             if (framesLeft < margin)
             {
                 if (m_rtcBase)
+                {
                     LOG(VB_PLAYBACK, LOG_NOTICE, LOC +
                         QString("Pause to allow live tv catch up. Position in sec. Current: %2, Total: %3")
                         .arg(m_framesPlayed).arg(frameCount));
+                }
                 m_audio.Pause(true);
                 m_avsyncAudioPaused = true;
                 m_rtcBase = 0;
@@ -1917,13 +1923,17 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
                 LOG(VB_GENERAL, LOG_NOTICE, LOC +
                     "To see more buffering messages use -v playback");
             if (m_bufferingCounter >= 10)
+            {
                 LOG(VB_PLAYBACK, LOG_NOTICE, LOC +
                     QString("Waited %1ms for video buffers %2")
                     .arg(waited_for).arg(m_videoOutput->GetFrameStatus()));
+            }
             else
+            {
                 LOG(VB_GENERAL, LOG_NOTICE, LOC +
                     QString("Waited %1ms for video buffers %2")
                         .arg(waited_for).arg(m_videoOutput->GetFrameStatus()));
+            }
             m_bufferingLastMsg = QTime::currentTime();
             if (m_audio.IsBufferAlmostFull() && m_framesPlayed < 5
                 && gCoreContext->GetBoolSetting("MusicChoiceEnabled", false))
@@ -2879,9 +2889,11 @@ void MythPlayer::EventLoop(void)
         if (eof != kEofStateDelayed || (videoDrained && audioDrained))
         {
             if (eof == kEofStateDelayed)
+            {
                 LOG(VB_PLAYBACK, LOG_INFO,
                     QString("waiting for no video frames %1")
                     .arg(m_videoOutput->ValidVideoFrames()));
+            }
             LOG(VB_PLAYBACK, LOG_INFO,
                 QString("HasReachedEof() at framesPlayed=%1 totalFrames=%2")
                 .arg(m_framesPlayed).arg(GetCurrentFrameCount()));
@@ -4107,22 +4119,30 @@ bool MythPlayer::HandleProgramEditorActions(QStringList &actions)
             if (seekamount == 0) // 1 frame
                 DoRewind(1, kInaccuracyNone);
             else if (seekamount > 0)
+            {
                 // Use fully-accurate seeks for less than 1 second.
                 DoRewindSecs(seekamount, seekamount < 1.0F ? kInaccuracyNone :
                              kInaccuracyEditor, false);
+            }
             else
+            {
                 HandleArbSeek(false);
+            }
         }
         else if (action == ACTION_RIGHT)
         {
             if (seekamount == 0) // 1 frame
                 DoFastForward(1, kInaccuracyNone);
             else if (seekamount > 0)
+            {
                 // Use fully-accurate seeks for less than 1 second.
                 DoFastForwardSecs(seekamount, seekamount < 1.0F ? kInaccuracyNone :
                              kInaccuracyEditor, false);
+            }
             else
+            {
                 HandleArbSeek(true);
+            }
         }
         else if (action == ACTION_LOADCOMMSKIP)
         {
@@ -4153,22 +4173,30 @@ bool MythPlayer::HandleProgramEditorActions(QStringList &actions)
             if (seekamount == 0)
                 DoRewind(FFREW_MULTICOUNT, kInaccuracyNone);
             else if (seekamount > 0)
+            {
                 DoRewindSecs(seekamount * FFREW_MULTICOUNT,
                              kInaccuracyEditor, false);
+            }
             else
+            {
                 DoRewindSecs(FFREW_MULTICOUNT / 2,
                              kInaccuracyNone, false);
+            }
         }
         else if (action == ACTION_BIGJUMPFWD)
         {
             if (seekamount == 0)
                 DoFastForward(FFREW_MULTICOUNT, kInaccuracyNone);
             else if (seekamount > 0)
+            {
                 DoFastForwardSecs(seekamount * FFREW_MULTICOUNT,
                                   kInaccuracyEditor, false);
+            }
             else
+            {
                 DoFastForwardSecs(FFREW_MULTICOUNT / 2,
                                   kInaccuracyNone, false);
+            }
         }
         else if (action == ACTION_SELECT)
         {

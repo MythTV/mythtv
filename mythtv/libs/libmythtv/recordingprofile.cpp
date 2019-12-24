@@ -499,11 +499,13 @@ class AudioCompressionSettings : public GroupSetting
                             }
 
                             if (layer1 || layer2 || layer3)
+                            {
                                 m_codecName->addTargetedChild(*Icodec,
                                        new MPEG2AudioBitrateSettings(m_parent,
                                                                      layer1,
                                                                      layer2,
                                                                      layer3, 2));
+                            }
                         }
                         else if ((*Iopt).m_category == DriverOption::VOLUME)
                         {
@@ -1108,12 +1110,14 @@ class VideoCompressionSettings : public GroupSetting
                                              (*Iopt).m_step / 1000));
                             }
                             else
+                            {
                                 bit_low->addChild(new PeakBitrate(m_parent,
                                              "mpeg2maxbitrate",
                                              (*Iopt).m_minimum / 1000,
                                              (*Iopt).m_maximum / 1000,
                                              (*Iopt).m_defaultValue / 1000,
                                              (*Iopt).m_step / 1000));
+                            }
                         }
                     }
 

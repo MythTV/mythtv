@@ -553,15 +553,21 @@ int main(int argc, char *argv[])
     if (!build_index)
     {
         if (cmdline.toBool("hlsstreamid"))
+        {
             LOG(VB_GENERAL, LOG_NOTICE,
                 QString("Transcoding HTTP Live Stream ID %1")
                         .arg(cmdline.toInt("hlsstreamid")));
+        }
         else if (fifodir.isEmpty())
+        {
             LOG(VB_GENERAL, LOG_NOTICE, QString("Transcoding from %1 to %2")
                     .arg(infile).arg(outfile));
+        }
         else
+        {
             LOG(VB_GENERAL, LOG_NOTICE, QString("Transcoding from %1 to FIFO")
                     .arg(infile));
+        }
     }
 
     if (cmdline.toBool("avf"))
@@ -983,9 +989,11 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
             {
                 int err = transUnlink(aoldfile.constData(), pginfo);
                 if (err)
+                {
                     LOG(VB_GENERAL, LOG_ERR,
                         QString("mythtranscode: Error deleting '%1': ")
                             .arg(oldfile) + ENO);
+                }
             }
         }
 
@@ -1115,13 +1123,19 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
         if (jobID >= 0)
         {
             if (status == JOB_ABORTING)                     // Stop command was sent
+            {
                 JobQueue::ChangeJobStatus(jobID, JOB_ABORTED,
                                         QObject::tr("Job Aborted"));
+            }
             else if (status != JOB_ERRORING)                // Recoverable error
+            {
                 exitCode = GENERIC_EXIT_RESTART;
+            }
             else                                            // Unrecoverable error
+            {
                 JobQueue::ChangeJobStatus(jobID, JOB_ERRORED,
                                         QObject::tr("Unrecoverable error"));
+            }
         }
     }
 }

@@ -312,9 +312,11 @@ void MythRAOPConnection::udpDataReady(QByteArray buf, const QHostAddress& /*peer
             m_resends.remove(seq);
         }
         else
+        {
             LOG(VB_PLAYBACK, LOG_WARNING, LOC +
                 QString("Received unexpected resent packet %1")
                 .arg(seq));
+        }
     }
 
     // Check that the audio packet is valid, do so by decoding it. If an error

@@ -175,10 +175,14 @@ bool AudioInputALSA::PrepHwParams(void)
         uint rate_den = 0;
         if (!AlsaBad(snd_pcm_hw_params_get_rate_numden(hwparams, &rate_num,
                      &rate_den), "snd_pcm_hw_params_get_rate_numden failed"))
+        {
             if (m_audio_sample_rate != (int)(rate_num / rate_den))
+            {
                 LOG(VB_GENERAL, LOG_ERR, LOC_DEV +
                     QString("device reports sample rate as %1")
                         .arg(rate_num / rate_den));
+            }
+        }
         return false;
     }
     uint buffer_time = 64000; // 64 msec
@@ -285,9 +289,11 @@ int AudioInputALSA::PcmRead(void* buf, uint nbytes)
         ++retries;
     }
     if (nframes > 0)
+    {
         LOG(VB_AUDIO, LOG_ERR, LOC_DEV +
             QString("short pcm read, %1 of %2 frames, retries %3")
                 .arg(to_read - nframes).arg(to_read).arg(retries));
+    }
     return snd_pcm_frames_to_bytes(m_pcmHandle, to_read - nframes);
 }
 

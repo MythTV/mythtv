@@ -3142,11 +3142,13 @@ void Scheduler::HandleIdleShutdown(
 
                 auto idleIter = m_recList.begin();
                 for ( ; idleIter != m_recList.end(); ++idleIter)
+                {
                     if ((*idleIter)->GetRecordingStatus() ==
                         RecStatus::WillRecord ||
                         (*idleIter)->GetRecordingStatus() ==
                         RecStatus::Pending)
                         break;
+                }
 
                 if (idleIter != m_recList.end())
                 {
@@ -3343,9 +3345,11 @@ void Scheduler::ShutdownServer(int prerollseconds, QDateTime &idleSince)
 
     auto recIter = m_recList.begin();
     for ( ; recIter != m_recList.end(); ++recIter)
+    {
         if ((*recIter)->GetRecordingStatus() == RecStatus::WillRecord ||
             (*recIter)->GetRecordingStatus() == RecStatus::Pending)
             break;
+    }
 
     // set the wakeuptime if needed
     QDateTime restarttime;
@@ -3509,14 +3513,18 @@ void Scheduler::PutInactiveSlavesToSleep(void)
             {
                 if (pginfo->GetRecordingStatus() == RecStatus::WillRecord ||
                     pginfo->GetRecordingStatus() == RecStatus::Pending)
+                {
                     LOG(VB_SCHEDULE, LOG_DEBUG,
                         QString("    Slave %1 will be in use in %2 minutes")
                             .arg(enc->GetHostName()) .arg(secsleft / 60));
+                }
                 else
+                {
                     LOG(VB_SCHEDULE, LOG_DEBUG,
                         QString("    Slave %1 is in use currently "
                                 "recording '%1'")
                             .arg(enc->GetHostName()).arg(pginfo->GetTitle()));
+                }
                 SlavesInUse << enc->GetHostName();
             }
         }
@@ -4414,14 +4422,18 @@ void Scheduler::AddNewRecords(void)
         "(FIND_IN_SET('ONSCREEN', program.subtitletypes) > 0) * %1").arg(onscrpriority);
 
     if (ccpriority)
+    {
         pwrpri += QString(" + "
         "(FIND_IN_SET('NORMAL', program.subtitletypes) > 0 OR "
         "program.closecaptioned > 0 OR program.subtitled > 0) * %1").arg(ccpriority);
+    }
 
     if (hhpriority)
+    {
         pwrpri += QString(" + "
         "(FIND_IN_SET('HARDHEAR', program.subtitletypes) > 0 OR "
         "FIND_IN_SET('HARDHEAR', program.audioprop) > 0) * %1").arg(hhpriority);
+    }
 
     if (adpriority)
         pwrpri += QString(" + "
@@ -5546,6 +5558,7 @@ int Scheduler::FillRecordingDir(
                     fsID = fs->getFSysID();
 
                     if (pass == 1)
+                    {
                         LOG(VB_FILE, LOG_INFO,
                             QString("pass 1: '%1' will record in "
                                     "'%2' which has %3 MB free. This recording "
@@ -5556,7 +5569,9 @@ int Scheduler::FillRecordingDir(
                                 .arg(fs->getFreeSpace() / 1024)
                                 .arg(maxSizeKB / 1024)
                                 .arg(desiredSpaceKB / 1024));
+                    }
                     else
+                    {
                         LOG(VB_FILE, LOG_INFO,
                             QString("pass %1: '%2' will record in "
                                 "'%3' although there is only %4 MB free and "
@@ -5568,6 +5583,7 @@ int Scheduler::FillRecordingDir(
                                 .arg(recording_dir)
                                 .arg(fs->getFreeSpace() / 1024)
                                 .arg(desiredSpaceKB / 1024));
+                    }
 
                     foundDir = true;
                     break;
@@ -5698,9 +5714,11 @@ bool Scheduler::WasStartedAutomatically()
                 "NOT close to auto-start time, USER-initiated startup assumed");
     }
     else if (!s.isEmpty())
+    {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Invalid MythShutdownWakeupTime specified in database (%1)")
                 .arg(s));
+    }
 
     return autoStart;
 }

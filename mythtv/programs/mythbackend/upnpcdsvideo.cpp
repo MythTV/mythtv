@@ -306,9 +306,11 @@ bool UPnpCDSVideo::LoadMetadata(const UPnpCDSRequest* pRequest,
         return LoadVideos(pRequest, pResults, tokens);
     }
     else
+    {
         LOG(VB_GENERAL, LOG_ERR,
             QString("UPnpCDSVideo::LoadMetadata(): "
                     "Unhandled metadata request for '%1'.").arg(currentToken));
+    }
 
     return false;
 }

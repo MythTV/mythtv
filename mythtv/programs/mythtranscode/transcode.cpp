@@ -1574,13 +1574,17 @@ int Transcode::TranscodeFile(const QString &inputname,
                     hls->UpdatePercentComplete(percentage);
 
                 if (jobID >= 0)
+                {
                     JobQueue::ChangeJobComment(jobID,
                               QObject::tr("%1% Completed @ %2 fps.")
                                           .arg(percentage).arg(flagFPS));
+                }
                 else
+                {
                     LOG(VB_GENERAL, LOG_INFO,
                         QString("mythtranscode: %1% Completed @ %2 fps.")
                             .arg(percentage).arg(flagFPS));
+                }
 
             }
             curtime = MythDate::current().addSecs(20);

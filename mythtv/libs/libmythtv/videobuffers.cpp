@@ -220,21 +220,35 @@ void VideoBuffers::SetDeinterlacingFlags(VideoFrame &Frame, MythDeintType Single
             Frame.deinterlace_allowed = kSoftware | kShader;
     }
     else if (FMT_DRMPRIME == Frame.codec)
+    {
         // NOLINTNEXTLINE(bugprone-branch-clone)
         Frame.deinterlace_allowed = kShader; // No driver deint - if RGBA frames are returned, shaders will be disabled
+    }
     else if (FMT_MMAL == Frame.codec)
+    {
         Frame.deinterlace_allowed = kShader; // No driver deint yet (TODO) and YUV frames returned
+    }
     else if (FMT_VTB == Frame.codec)
+    {
         Frame.deinterlace_allowed = kShader; // No driver deint and YUV frames returned
+    }
     else if (FMT_NVDEC == Frame.codec)
+    {
         Frame.deinterlace_allowed = kShader | kDriver; // YUV frames and decoder deint
+    }
     else if (FMT_VDPAU == Frame.codec)
+    {
         // NOLINTNEXTLINE(bugprone-branch-clone)
         Frame.deinterlace_allowed = kDriver; // No YUV frames for shaders
+    }
     else if (FMT_VAAPI == Frame.codec)
+    {
         Frame.deinterlace_allowed = kDriver; // DRM will allow shader if no VPP
+    }
     else
+    {
         Frame.deinterlace_allowed = kSoftware | kShader;
+    }
 }
 
 /**

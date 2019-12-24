@@ -59,11 +59,13 @@ bool DTVMultiplex::IsEqual(DTVTunerType type, const DTVMultiplex &other,
     if (DTVTunerType::kTunerTypeDVBC == type)
     {
         if (fuzzy)
+        {
             return
                 m_inversion.IsCompatible(other.m_inversion)   &&
                 (m_symbolRate == other.m_symbolRate)          &&
                 m_fec.IsCompatible(other.m_fec)               &&
                 m_modulation.IsCompatible(other.m_modulation);
+        }
         return
             (m_inversion  == other.m_inversion)  &&
             (m_symbolRate == other.m_symbolRate) &&
@@ -75,6 +77,7 @@ bool DTVMultiplex::IsEqual(DTVTunerType type, const DTVMultiplex &other,
         (DTVTunerType::kTunerTypeDVBT2 == type))
     {
         if (fuzzy)
+        {
             return
                 m_inversion.IsCompatible(other.m_inversion)           &&
                 m_bandwidth.IsCompatible(other.m_bandwidth)           &&
@@ -85,6 +88,7 @@ bool DTVMultiplex::IsEqual(DTVTunerType type, const DTVMultiplex &other,
                 m_transMode.IsCompatible(other.m_transMode)         &&
                 m_hierarchy.IsCompatible(other.m_hierarchy)           &&
                 m_modSys.IsCompatible(other.m_modSys);
+        }
         return
             (m_inversion      == other.m_inversion)      &&
             (m_bandwidth      == other.m_bandwidth)      &&
@@ -113,10 +117,12 @@ bool DTVMultiplex::IsEqual(DTVTunerType type, const DTVMultiplex &other,
             (m_modSys    == other.m_modSys);
 
         if (fuzzy)
+        {
             return ret &&
                 m_inversion.IsCompatible(other.m_inversion) &&
                 m_fec.IsCompatible(other.m_fec)             &&
                 m_rolloff.IsCompatible(other.m_rolloff);
+        }
         return ret &&
             (m_inversion  == other.m_inversion)  &&
             (m_fec        == other.m_fec)        &&

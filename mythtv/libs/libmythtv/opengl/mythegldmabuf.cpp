@@ -44,9 +44,11 @@ static void inline DebugDRMFrame(AVDRMFrameDescriptor* Desc)
             .arg(i).arg(fourcc_str(static_cast<int>(Desc->layers[i].format)))
             .arg(Desc->layers[i].nb_planes));
         for (int j = 0; j < Desc->layers[i].nb_planes; ++j)
+        {
             LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("  Plane %1: Index %2 Offset %3 Pitch %4")
                 .arg(j).arg(Desc->layers[i].planes[j].object_index)
                 .arg(Desc->layers[i].planes[j].offset).arg(Desc->layers[i].planes[j].pitch));
+        }
     }
     for (int i = 0; i < Desc->nb_objects; ++i)
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("Object: %1 FD %2 Mods 0x%3")

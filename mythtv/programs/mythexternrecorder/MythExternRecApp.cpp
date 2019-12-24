@@ -560,11 +560,15 @@ Q_SLOT void MythExternRecApp::StopStreaming(const QString & serial, bool silent)
     else
     {
         if (silent)
+        {
             emit SendMessage("StopStreaming", serial,
                              "STATUS:Already not Streaming");
+        }
         else
+        {
             emit SendMessage("StopStreaming", serial,
                              "WARN:Already not Streaming");
+        }
     }
 
     emit Streaming(false);

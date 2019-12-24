@@ -1264,22 +1264,30 @@ void FormattedTextSubtitle608::Init(const vector<CC608Text*> &buffers)
 
         int x;
         if (xmid)
+        {
             // center horizontally
             x = xmid + (orig_x - xscale / 2) * fontwidth;
+        }
         else
+        {
             // fallback
             x = (orig_x + 3) * m_safeArea.width() / xscale;
+        }
 
         int orig_y = cc->m_y;
         int y;
         if (orig_y < yscale / 2)
+        {
             // top half -- anchor up
             y = (orig_y * m_safeArea.height() * zoom / (yscale * 100));
+        }
         else
+        {
             // bottom half -- anchor down
             y = m_safeArea.height() -
                 ((yscale - orig_y - 0.5) * m_safeArea.height() * zoom /
                  (yscale * 100));
+        }
 
         FormattedTextLine line(x, y, orig_x, orig_y);
         while (!text.isNull())
@@ -2046,13 +2054,16 @@ int SubtitleScreen::DisplayScaledAVSubtitles(const AVSubtitleRect *rect,
                      m_textFontZoom * scaled.left()) /
                     100);
     if (top)
+    {
         // anchor up
         scaled.moveTop(scaled.top() * m_textFontZoom / 100);
+    }
     else
+    {
         // anchor down
         scaled.moveTop(((100 - m_textFontZoom) * vsize +
-                        m_textFontZoom * scaled.top()) /
-                       100);
+                        m_textFontZoom * scaled.top()) / 100);
+    }
 
 
     MythPainter *osd_painter = videoOut->GetOSDPainter();

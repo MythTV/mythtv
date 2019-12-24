@@ -332,9 +332,11 @@ static void startAppearWiz(void)
     bool reload = false;
 
     if (isWindowed)
+    {
         ShowOkPopup(qApp->translate("(MythFrontendMain)",
                     "The ScreenSetupWizard cannot be used while "
                     "mythfrontend is operating in windowed mode."));
+    }
     else
     {
         auto *wizard = new MythSystemLegacy(
@@ -2140,9 +2142,11 @@ int main(int argc, char **argv)
         int port = gCoreContext->GetNumSetting("NetworkControlPort", 6546);
         networkControl = new NetworkControl();
         if (!networkControl->listen(port))
+        {
             LOG(VB_GENERAL, LOG_ERR,
                 QString("NetworkControl failed to bind to port %1.")
                    .arg(port));
+        }
     }
 
 #if CONFIG_DARWIN

@@ -368,6 +368,7 @@ vbi_line(struct vbi *vbi, const unsigned char *p)
 
     /* search start-byte 11100100 */
     for (i = 4*bpb + vbi->pll_adj*bpb/10; i < 16*bpb; i += bpb)
+    {
        if (p[i/FAC] > thr && p[(i+bpb)/FAC] > thr) // two ones is enough...
        {
            /* got it... */
@@ -389,6 +390,7 @@ vbi_line(struct vbi *vbi, const unsigned char *p)
            }
            return 0;
        }
+    }
     return -1;
 }
 
@@ -463,11 +465,13 @@ vbi_del_handler(struct vbi *vbi, void *handler, void *data)
     struct vbi_client *cl;
 
     for (cl = (void*) vbi->clients->first; cl->node->next; cl = (void*) cl->node->next)
+    {
        if (cl->handler == handler && cl->data == data)
        {
            dl_remove(cl->node);
            break;
        }
+    }
 }
 
 #ifdef USING_V4L2

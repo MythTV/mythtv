@@ -466,11 +466,15 @@ MythMenu* NetTree::CreateShowManageMenu()
     menu->AddItem(tr("Manage Site Subscriptions"), SLOT(RunTreeEditor()));
     menu->AddItem(tr("Manage RSS Subscriptions"), SLOT(RunRSSEditor()));
     if (!m_treeAutoUpdate)
+    {
         menu->AddItem(tr("Enable Automatic Site Updates"),
                       SLOT(ToggleTreeUpdates()));
+    }
     else
+    {
         menu->AddItem(tr("Disable Automatic Site Updates"),
                       SLOT(ToggleTreeUpdates()));
+    }
 //    if (!m_rssAutoUpdate)
 //        menu->AddItem(tr("Enable Automatic RSS Updates"), SLOT(ToggleRSSUpdates()));
 //    else

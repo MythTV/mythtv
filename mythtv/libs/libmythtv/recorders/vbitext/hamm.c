@@ -229,10 +229,12 @@ chk_parity(unsigned char *p, int n)
     int err;
 
     for (err = 0; n--; p++)
+    {
        if (hamm24par[0][*p] & 32)
            *p &= 0x7f;
        else
            *p = BAD_CHAR, err++;
+    }
     return err;
 }
 

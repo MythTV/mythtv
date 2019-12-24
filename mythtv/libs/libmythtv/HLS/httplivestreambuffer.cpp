@@ -2725,10 +2725,12 @@ int HLSRingBuffer::safe_read(void *data, uint sz)
         }
 
         if (segment->SizePlayed() == 0)
+        {
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
                 QString("started reading segment %1 [id:%2] from stream %3 (%4 buffered)")
                 .arg(segnum).arg(segment->Id()).arg(stream)
                 .arg(m_streamworker->CurrentPlaybackBuffer()));
+        }
 
         int32_t len = segment->Read((uint8_t*)data + used, i_read, m_fd);
         used    += len;

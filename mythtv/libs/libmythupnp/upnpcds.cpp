@@ -1122,9 +1122,11 @@ bool UPnPShortcutFeature::AddShortCut(ShortCutType type,
     if (!m_shortcuts.contains(type))
         m_shortcuts.insert(type, objectID);
     else
+    {
         LOG(VB_GENERAL, LOG_ERR, QString("UPnPCDSShortcuts::AddShortCut(): "
                                          "Attempted to register duplicate "
                                          "shortcut").arg(TypeToName(type)));
+    }
 
     return false;
 }

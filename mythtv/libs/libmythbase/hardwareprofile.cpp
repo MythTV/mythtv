@@ -195,9 +195,11 @@ bool HardwareProfile::SubmitProfile(bool updateTime)
         Enable();
 
     if (!m_hardwareProfile.isEmpty())
+    {
         LOG(VB_GENERAL, LOG_INFO,
                  QString("Submitting the following hardware profile:  %1")
                          .arg(m_hardwareProfile));
+    }
 
     QString cmd = GetShareDir() + "hardwareprofile/sendProfile.py";
     QStringList args;

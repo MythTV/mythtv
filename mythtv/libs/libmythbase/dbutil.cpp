@@ -298,10 +298,14 @@ bool DBUtil::CheckTables(const bool repair, const QString &options)
         LOG(VB_GENERAL, LOG_CRIT, QString("Found crashed database table(s): %1")
                                       .arg(tables.join(", ")));
         if (repair)
+        {
             // If RepairTables() repairs the crashed tables, return true
             result = RepairTables(tables);
+        }
         else
+        {
             result = false;
+        }
     }
 
     return result;
@@ -491,11 +495,13 @@ QString DBUtil::GetBackupDirectory()
     }
 
     if (directory.isNull())
+    {
         // Rather than use kDefaultStorageDir, the default for
         // FindNextDirMostFree() when no dirs are defined for the StorageGroup,
         // use /tmp as it's possible that kDefaultStorageDir doesn't exist
         // and (at least on *nix) less possible that /tmp doesn't exist
         directory = "/tmp";
+    }
 
     return directory;
 }

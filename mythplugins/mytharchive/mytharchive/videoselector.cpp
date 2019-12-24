@@ -231,9 +231,11 @@ void VideoSelector::titleChanged(MythUIButtonListItem *item)
                 v->size = (uint64_t)fileinfo.st_size;
 
             if (!bExists)
+            {
                 LOG(VB_GENERAL, LOG_ERR,
                     QString("VideoSelector: Cannot find file: %1")
                         .arg(v->filename));
+            }
         }
 
         m_filesizeText->SetText(formatSize(v->size / 1024));

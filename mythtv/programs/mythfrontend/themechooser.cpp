@@ -309,10 +309,12 @@ void ThemeChooser::LoadVersion(const QString &version,
             }
         }
         else
+        {
             LOG(VB_GUI, LOG_INFO, LOC +
                 QString("Unzipped '%1' to '%2'")
                 .arg(remoteThemesFile)
                 .arg(destdir));
+        }
     }
 
     QDir themes;
@@ -543,11 +545,15 @@ void ThemeChooser::showPopupMenu(void)
     if (m_fullPreviewStateType)
     {
         if (m_fullPreviewShowing)
+        {
             m_popupMenu->AddButton(tr("Hide Fullscreen Preview"),
                                    SLOT(toggleFullscreenPreview()));
+        }
         else
+        {
             m_popupMenu->AddButton(tr("Show Fullscreen Preview"),
                                    SLOT(toggleFullscreenPreview()));
+        }
     }
 
     m_popupMenu->AddButton(tr("Refresh Downloadable Themes"),
@@ -570,11 +576,15 @@ void ThemeChooser::showPopupMenu(void)
     }
 
     if (gCoreContext->GetBoolSetting("ThemeUpdateNofications", true))
+    {
         m_popupMenu->AddButton(tr("Disable Theme Update Notifications"),
                                SLOT(toggleThemeUpdateNotifications()));
+    }
     else
+    {
         m_popupMenu->AddButton(tr("Enable Theme Update Notifications"),
                                SLOT(toggleThemeUpdateNotifications()));
+    }
 }
 
 void ThemeChooser::popupClosed(const QString& which, int result)
@@ -995,8 +1005,10 @@ ThemeUpdateChecker::ThemeUpdateChecker(void) :
     QString version = MYTH_SOURCE_PATH;
 
     if (!version.isEmpty() && !version.startsWith("fixes/"))
+    {
         // Treat devel branches as master
         m_mythVersions << "trunk";
+    }
     else
     {
         version = MYTH_BINARY_VERSION; // Example: 0.25.20101017-1

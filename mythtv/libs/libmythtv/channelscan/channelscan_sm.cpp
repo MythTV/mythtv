@@ -1170,9 +1170,11 @@ static void update_info(ChannelInsertInfo &info,
     {
         callsign = desc->ServiceShortName();
         if (callsign.trimmed().isEmpty())
+        {
             callsign = QString("%1-%2-%3")
                 .arg(ChannelUtil::GetUnknownCallsign()).arg(sdt->TSID())
                 .arg(sdt->ServiceID(i));
+        }
 
         service_name = desc->ServiceName();
         if (service_name.trimmed().isEmpty())
@@ -1686,13 +1688,17 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
             (info.m_siStandard == "opencable"))
         {
             if (info.m_freqId.isEmpty())
+            {
                 info.m_chanNum = QString("%1-%2")
                     .arg(info.m_sourceId)
                     .arg(info.m_serviceId);
+            }
             else
+            {
                 info.m_chanNum = QString("%1-%2")
                     .arg(info.m_freqId)
                     .arg(info.m_serviceId);
+            }
         }
     }
 
@@ -1748,21 +1754,33 @@ ScanDTVTransportList ChannelScanSM::GetChannelList(bool addFullTS) const
                 info.m_serviceId = info.m_sdtTsId ? info.m_sdtTsId : info.m_patTsId;
 
                 if (tuner_type == DTVTunerType::kTunerTypeASI)
+                {
                     info.m_callSign = QString("MPTS_%1")
                                     .arg(CardUtil::GetDisplayName(cardid));
+                }
                 else if (info.m_siStandard == "mpeg" ||
                          info.m_siStandard == "scte" ||
                          info.m_siStandard == "opencable")
+                {
                     info.m_callSign = QString("MPTS_%1").arg(info.m_freqId);
+                }
                 else if (info.m_atscMajorChannel > 0)
+                {
                     info.m_callSign =
                         QString("MPTS_%1").arg(info.m_atscMajorChannel);
+                }
                 else if (info.m_serviceId > 0)
+                {
                     info.m_callSign = QString("MPTS_%1").arg(info.m_serviceId);
+                }
                 else if (!info.m_chanNum.isEmpty())
+                {
                     info.m_callSign = QString("MPTS_%1").arg(info.m_chanNum);
+                }
                 else
+                {
                     info.m_callSign = "MPTS_UNKNOWN";
+                }
 
                 info.m_serviceName = info.m_callSign;
                 info.m_atscMinorChannel = 0;

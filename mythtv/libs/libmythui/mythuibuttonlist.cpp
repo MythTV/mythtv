@@ -279,11 +279,15 @@ bool MythUIButtonList::DistributeRow(int &first_button, int &last_button,
      * only one button per row, and this would be it.
      */
     if (grow_right)
+    {
         buttonstate = PrepareButton(last_button, last_item,
                                     selectedIdx, button_shift);
+    }
     else
+    {
         buttonstate = PrepareButton(first_button, first_item,
                                     selectedIdx, button_shift);
+    }
 
     if (buttonstate == nullptr)
     {
@@ -793,13 +797,19 @@ bool MythUIButtonList::DistributeButtons(void)
                 {
                     if (m_itemCount - m_selPosition - 1 <
                         (m_ButtonList.size() / 2))
+                    {
                         start_button = m_ButtonList.size() -
                                        (m_itemCount - m_selPosition) + 1;
+                    }
                     else if (m_selPosition >
                              (m_ButtonList.size() / 2))
+                    {
                         start_button = (m_ButtonList.size() / 2);
+                    }
                     else
+                    {
                         start_button = m_selPosition;
+                    }
                 }
                 else
                     start_button = 0;
@@ -1962,16 +1972,24 @@ bool MythUIButtonList::MoveUp(MovementUnit unit, uint amount)
 
         case MoveColumn:
             if (pos % m_columns > 0)
+            {
                 --m_selPosition;
+            }
             else if (m_wrapStyle == WrapFlowing)
+            {
                 if (m_selPosition == 0)
                     --m_selPosition = m_itemList.size() - 1;
                 else
                     --m_selPosition;
+            }
             else if (m_wrapStyle > WrapNone)
+            {
                 m_selPosition = pos + (m_columns - 1);
+            }
             else if (m_wrapStyle == WrapCaptive)
+            {
                 return true;
+            }
 
             FindEnabledUp(unit);
 
@@ -2172,16 +2190,24 @@ bool MythUIButtonList::MoveDown(MovementUnit unit, uint amount)
 
         case MoveColumn:
             if ((pos + 1) % m_columns > 0)
+            {
                 ++m_selPosition;
+            }
             else if (m_wrapStyle == WrapFlowing)
+            {
                 if (m_selPosition < m_itemList.size() - 1)
                     ++m_selPosition;
                 else
                     m_selPosition = 0;
+            }
             else if (m_wrapStyle > WrapNone)
+            {
                 m_selPosition = pos - (m_columns - 1);
+            }
             else if (m_wrapStyle == WrapCaptive)
+            {
                 return true;
+            }
 
             FindEnabledDown(unit);
 
@@ -2213,10 +2239,14 @@ bool MythUIButtonList::MoveDown(MovementUnit unit, uint amount)
 
         case MovePage:
             if (m_arrange == ArrangeFixed)
+            {
                 m_selPosition = qMin(m_itemCount - 1,
                                      m_selPosition + (int)m_itemsVisible);
+            }
             else
+            {
                 m_selPosition = PageDown();
+            }
 
             FindEnabledDown(unit);
 

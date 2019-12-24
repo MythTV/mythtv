@@ -271,9 +271,11 @@ void ProgDetails::PowerPriorities(const QString & ptable)
     }
 
     if (recordid)
+    {
         recmatch = QString("INNER JOIN record "
                            "      ON ( record.recordid = %1 ) ")
                    .arg(recordid);
+    }
 
     for (Itest = tests.begin(); Itest != tests.end(); ++Itest)
     {
@@ -490,18 +492,22 @@ void ProgDetails::loadPage(void)
     if (m_progInfo.GetScheduledEndTime() != m_progInfo.GetScheduledStartTime())
     {
         if (recorded)
+        {
             query.prepare("SELECT role,people.name FROM recordedcredits"
                           " AS credits"
                           " LEFT JOIN people ON credits.person = people.person"
                           " WHERE credits.chanid = :CHANID"
                           " AND credits.starttime = :STARTTIME"
                           " ORDER BY role;");
+        }
         else
+        {
             query.prepare("SELECT role,people.name FROM credits"
                           " LEFT JOIN people ON credits.person = people.person"
                           " WHERE credits.chanid = :CHANID"
                           " AND credits.starttime = :STARTTIME"
                           " ORDER BY role;");
+        }
         query.bindValue(":CHANID",    m_progInfo.GetChanID());
         query.bindValue(":STARTTIME", m_progInfo.GetScheduledStartTime());
 
@@ -640,11 +646,14 @@ void ProgDetails::loadPage(void)
     if (m_progInfo.GetEpisode() > 0)
     {
         if (m_progInfo.GetEpisodeTotal() > 0)
+        {
             s = tr("%1 of %2").arg(m_progInfo.GetEpisode())
                               .arg(m_progInfo.GetEpisodeTotal());
+        }
         else
+        {
             s = QString::number(m_progInfo.GetEpisode());
-
+        }
     }
     addItem(tr("Episode"), s, ProgInfoList::kLevel1);
 
@@ -751,13 +760,17 @@ void ProgDetails::loadPage(void)
         if (query.exec() && query.next())
         {
             if (query.value(0).toDateTime().isValid())
+            {
                 lastRecorded = MythDate::toString(
                     MythDate::as_utc(query.value(0).toDateTime()),
                     MythDate::kDateFull | MythDate::kAddYear);
+            }
             if (query.value(1).toDateTime().isValid())
+            {
                 nextRecording = MythDate::toString(
                     MythDate::as_utc(query.value(1).toDateTime()),
                     MythDate::kDateFull | MythDate::kAddYear);
+            }
             if (query.value(2).toInt() > 0)
                 averageTimeShift = tr("%n hour(s)", "",
                                                 query.value(2).toInt());

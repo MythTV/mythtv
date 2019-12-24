@@ -343,9 +343,11 @@ void MythUIVirtualKeyboard::updateKeys(bool connectSignals)
                 }
             }
             else
+            {
                 LOG(VB_GENERAL, LOG_WARNING,
                     QString("WARNING - Key '%1' not found in map")
                         .arg(button->objectName()));
+            }
         }
     }
 }

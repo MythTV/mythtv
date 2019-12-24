@@ -4522,9 +4522,11 @@ void ProgramInfo::SaveMarkup(const QVector<MarkupEntry> &mapMark,
             for (int i = 0; i < mapSeek.size(); ++i)
             {
                 if (i > 0 && (i % 1000 == 0))
+                {
                     LOG(VB_GENERAL, LOG_INFO,
                         QString("Inserted %1 of %2 records")
                         .arg(i).arg(mapSeek.size()));
+                }
                 const MarkupEntry &entry = mapSeek[i];
                 query.prepare("INSERT INTO filemarkup"
                               " (filename,type,mark,offset)"
@@ -4610,9 +4612,11 @@ void ProgramInfo::SaveMarkup(const QVector<MarkupEntry> &mapMark,
             for (int i = 0; i < mapSeek.size(); ++i)
             {
                 if (i > 0 && (i % 1000 == 0))
+                {
                     LOG(VB_GENERAL, LOG_INFO,
                         QString("Inserted %1 of %2 records")
                         .arg(i).arg(mapSeek.size()));
+                }
                 const MarkupEntry &entry = mapSeek[i];
                 query.prepare("INSERT INTO recordedseek"
                               " (chanid,starttime,type,mark,offset)"
@@ -5521,14 +5525,18 @@ bool LoadFromProgram( ProgramList &destination,
     destination.clear();
 
     if (sql.contains(" OFFSET", Qt::CaseInsensitive))
+    {
         LOG(VB_GENERAL, LOG_WARNING, "LoadFromProgram(): SQL contains OFFSET "
                                      "clause, caller should be updated to use "
                                      "start parameter instead");
+    }
 
     if (sql.contains(" LIMIT", Qt::CaseInsensitive))
+    {
         LOG(VB_GENERAL, LOG_WARNING, "LoadFromProgram(): SQL contains LIMIT "
                                      "clause, caller should be updated to use "
                                      "limit parameter instead");
+    }
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.setForwardOnly(true);

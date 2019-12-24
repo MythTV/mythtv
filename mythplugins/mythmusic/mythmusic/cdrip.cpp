@@ -427,10 +427,14 @@ int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
 
     cdrom_paranoia *paranoia = paranoia_init(device);
     if (gCoreContext->GetSetting("ParanoiaLevel") == "full")
+    {
         paranoia_modeset(paranoia, PARANOIA_MODE_FULL |
                 PARANOIA_MODE_NEVERSKIP);
+    }
     else
+    {
         paranoia_modeset(paranoia, PARANOIA_MODE_OVERLAP);
+    }
 
     paranoia_seek(paranoia, start, SEEK_SET);
 

@@ -783,9 +783,11 @@ void ExternalStreamHandler::run(void)
 
         StreamDataList::const_iterator sit = m_streamDataList.begin();
         for (; sit != m_streamDataList.end(); ++sit)
+        {
             remainder = sit.key()->ProcessData
                         (reinterpret_cast<const uint8_t *>
                          (buffer.constData()), buffer.size());
+        }
 
         m_listenerLock.unlock();
 
@@ -1089,9 +1091,11 @@ void ExternalStreamHandler::ReplayStream(void)
         {
             StreamDataList::const_iterator sit = m_streamDataList.begin();
             for (; sit != m_streamDataList.end(); ++sit)
+            {
                 sit.key()->ProcessData(reinterpret_cast<const uint8_t *>
                                        (m_replayBuffer.constData()),
                                        m_replayBuffer.size());
+            }
         }
         LOG(VB_RECORD, LOG_INFO, LOC + QString("Replayed %1 bytes")
             .arg(m_replayBuffer.size()));

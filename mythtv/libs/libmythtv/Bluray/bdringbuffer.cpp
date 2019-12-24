@@ -1001,9 +1001,11 @@ bool BDRingBuffer::UpdateTitleInfo(void)
     }
 
     if (m_currentTitleInfo->clip_count > 1 && still != BLURAY_STILL_NONE)
+    {
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             "Warning: more than 1 clip, following still "
             "frame analysis may be wrong");
+    }
 
     if (still == BLURAY_STILL_TIME)
     {

@@ -358,14 +358,18 @@ void SendMythSystemRecEvent(const QString &msg, const RecordingInfo *pginfo)
 void SendMythSystemPlayEvent(const QString &msg, const ProgramInfo *pginfo)
 {
     if (pginfo)
+    {
         gCoreContext->SendSystemEvent(
             QString("%1 HOSTNAME %2 CHANID %3 STARTTIME %4")
                     .arg(msg).arg(gCoreContext->GetHostName())
                     .arg(pginfo->GetChanID())
                     .arg(pginfo->GetRecordingStartTime(MythDate::ISODate)));
+    }
     else
+    {
         LOG(VB_GENERAL, LOG_ERR, LOC + "SendMythSystemPlayEvent() called with "
                                        "empty ProgramInfo");
+    }
 }
 
 /****************************************************************************/

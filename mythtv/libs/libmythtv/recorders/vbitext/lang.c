@@ -148,6 +148,7 @@ do_enhancements(struct enhance *eh, struct vt_page *vtp)
        return;
 
     for (unsigned int *p = eh->trip, *e = p + eh->next_des * 13; p < e; p++)
+    {
        if (*p % 2048 != 2047)
        {
            int adr = *p % 64;
@@ -206,6 +207,7 @@ do_enhancements(struct enhance *eh, struct vt_page *vtp)
                }
            }
        }
+    }
     //printf("\n");
 }
 

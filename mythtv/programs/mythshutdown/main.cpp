@@ -679,9 +679,11 @@ static int shutdown()
                     );
             }
             else
+            {
                 nvramCommand.replace(
                     "$time", dtWakeupTime.toLocalTime()
                     .toString(wakeup_timeformat));
+            }
 
             LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
                 QObject::tr("Sending command to set time in BIOS %1",

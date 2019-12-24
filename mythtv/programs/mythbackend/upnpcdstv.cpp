@@ -337,9 +337,11 @@ bool UPnpCDSTv::LoadMetadata(const UPnpCDSRequest* pRequest,
         return LoadMovies(pRequest, pResults, tokens);
     }
     else
+    {
         LOG(VB_GENERAL, LOG_ERR,
             QString("UPnpCDSTV::LoadMetadata(): "
                     "Unhandled metadata request for '%1'.").arg(currentToken));
+    }
 
     return false;
 }

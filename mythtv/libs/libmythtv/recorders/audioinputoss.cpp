@@ -117,9 +117,11 @@ bool AudioInputOSS::Open(uint sample_bits, uint sample_rate, uint channels)
         return false;
     }
     if (m_audio_sample_bits != choice)
+    {
         LOG(VB_GENERAL, LOG_ERR, LOC_DEV +
             QString("requested %1 sample bits, got %2")
                             .arg(choice).arg(m_audio_sample_bits));
+    }
     // channels
     m_audio_channels = choice = channels;
     if (ioctl(m_dspFd, SNDCTL_DSP_CHANNELS, &m_audio_channels) < 0)
@@ -130,9 +132,11 @@ bool AudioInputOSS::Open(uint sample_bits, uint sample_rate, uint channels)
         return false;
     }
     if (m_audio_channels != choice)
+    {
         LOG(VB_GENERAL, LOG_ERR, LOC_DEV +
             QString("requested %1 channels, got %2")
                 .arg(choice).arg(m_audio_channels));
+    }
 
     // sample rate
     int choice_sample_rate;
@@ -145,9 +149,11 @@ bool AudioInputOSS::Open(uint sample_bits, uint sample_rate, uint channels)
         return false;
     }
     if (m_audio_sample_rate != choice_sample_rate)
+    {
         LOG(VB_GENERAL, LOG_ERR, LOC_DEV +
             QString("requested sample rate %1, got %2")
                 .arg(choice_sample_rate).arg(m_audio_sample_rate));
+    }
     LOG(VB_AUDIO, LOG_INFO, LOC_DEV + "device open");
     return true;
 }
@@ -244,9 +250,11 @@ int AudioInputOSS::GetSamples(void *buffer, uint num_bytes)
             ++retries;
         }
         if (num_bytes > bytes_read)
+        {
             LOG(VB_GENERAL, LOG_ERR, LOC_DEV +
                 QString("GetSamples short read, %1 of %2 bytes")
                     .arg(bytes_read).arg(num_bytes));
+        }
     }
     return bytes_read;
 }

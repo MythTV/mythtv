@@ -799,9 +799,11 @@ nullptr
                                    " DROP INDEX recgroup");
 
                     if (!update.exec())
+                    {
                          MythDB::DBError("Unable to drop duplicate index on "
                                          "recgrouppassword. Ignoring.",
                                          update);
+                    }
                     break;
                 }
             }
@@ -3361,11 +3363,14 @@ nullptr
         QString master;
         // Create new MasterServerName setting
         if (gCoreContext->IsMasterHost())
+        {
             master =
             "insert into settings (value,data,hostname) "
             "values('MasterServerName','"
                 + gCoreContext->GetHostName() + "', null);";
+        }
         else
+        {
             master =
             "insert into settings (value,data,hostname) "
             "select 'MasterServerName', b.hostname, null "
@@ -3373,6 +3378,7 @@ nullptr
             "where a.value = 'MasterServerIP' "
             "and b.value in ('BackendServerIP','BackendServerIP6')"
             "and a.data = b.data;";
+        }
 
         const char *updates[] = {
             // Create new MasterServerName setting

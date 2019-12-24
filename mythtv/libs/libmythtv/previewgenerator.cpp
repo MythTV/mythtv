@@ -842,12 +842,16 @@ char *PreviewGenerator::GetScreenGrab(
     ctx->m_player->SetPlayerInfo(nullptr, nullptr, ctx);
 
     if (time_in_secs)
+    {
         retbuf = ctx->m_player->GetScreenGrab(seektime, bufferlen,
                                     video_width, video_height, video_aspect);
+    }
     else
+    {
         retbuf = ctx->m_player->GetScreenGrabAtFrame(
             seektime, true, bufferlen,
             video_width, video_height, video_aspect);
+    }
 
     delete ctx;
 

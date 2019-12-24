@@ -298,9 +298,11 @@ class ImageLoader
         if (image && !bFoundInCache)
         {
             if (imProps.m_isReflected)
+            {
                 image->Reflect(imProps.m_reflectAxis, imProps.m_reflectShear,
                                imProps.m_reflectScale, imProps.m_reflectLength,
                                imProps.m_reflectSpacing);
+            }
 
             if (imProps.m_isGreyscale)
                 image->ToGreyscale();
@@ -767,11 +769,13 @@ void MythUIImage::SetImage(MythImage *img)
     }
 
     if (m_imageProperties.m_isReflected && !img->IsReflected())
+    {
         img->Reflect(m_imageProperties.m_reflectAxis,
                      m_imageProperties.m_reflectShear,
                      m_imageProperties.m_reflectScale,
                      m_imageProperties.m_reflectLength,
                      m_imageProperties.m_reflectSpacing);
+    }
 
     if (m_imageProperties.m_isGreyscale && !img->isGrayscale())
         img->ToGreyscale();
@@ -834,11 +838,13 @@ void MythUIImage::SetImages(QVector<MythImage *> *images)
         }
 
         if (m_imageProperties.m_isReflected && !im->IsReflected())
+        {
             im->Reflect(m_imageProperties.m_reflectAxis,
                         m_imageProperties.m_reflectShear,
                         m_imageProperties.m_reflectScale,
                         m_imageProperties.m_reflectLength,
                         m_imageProperties.m_reflectSpacing);
+        }
 
         if (m_imageProperties.m_isGreyscale && !im->isGrayscale())
             im->ToGreyscale();
@@ -1063,9 +1069,11 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
 
                 // TODO We might want to handle an abort here more gracefully
                 if (aborted)
+                {
                     LOG(VB_GUI, LOG_DEBUG, QString("Aborted loading animated"
                                                    "image %1 in foreground")
                                                                 .arg(filename));
+                }
 
                 SetAnimationFrames(*myFrames);
 
@@ -1082,9 +1090,11 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
 
                 // TODO We might want to handle an abort here more gracefully
                 if (aborted)
+                {
                     LOG(VB_GUI, LOG_DEBUG, QString("Aborted loading animated"
                                                    "image %1 in foreground")
                                                                 .arg(filename));
+                }
 
                 if (image)
                 {

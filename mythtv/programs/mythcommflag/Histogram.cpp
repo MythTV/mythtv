@@ -22,11 +22,13 @@ void Histogram::generateFromImage(VideoFrame* frame, unsigned int frameWidth,
     unsigned char* framePtr = frame->buf;
     int bytesPerLine = frame->pitches[0];
     for(unsigned int y = minScanY; y < maxScanY; y += YSpacing)
+    {
         for(unsigned int x = minScanX; x < maxScanX; x += XSpacing)
         {
             m_data[framePtr[y * bytesPerLine + x]]++;
             m_numberOfSamples++;
         }
+    }
 }
 
 unsigned int Histogram::getAverageIntensity(void) const

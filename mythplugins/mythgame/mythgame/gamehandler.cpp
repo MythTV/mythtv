@@ -126,11 +126,15 @@ void GameHandler::InitMetaDataMap(const QString& GameType)
     }
 
     if (m_romDB.count() == 0)
+    {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("No romDB data read from "
             "database for gametype %1 . Not imported?").arg(GameType));
+    }
     else
+    {
         LOG(VB_GENERAL, LOG_INFO, LOC +
             QString("Loaded %1 items from romDB Database") .arg(m_romDB.count()));
+    }
 }
 
 void GameHandler::GetMetadata(GameHandler *handler, const QString& rom, QString* Genre, QString* Year,

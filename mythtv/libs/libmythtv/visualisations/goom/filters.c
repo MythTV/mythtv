@@ -307,12 +307,13 @@ calculatePXandPY (int x, int y, int *px, int *py)
 		if (fvitesse < -3024)
 			fvitesse = -3024;
 
-		if (vx < 0)									// pb avec decalage sur nb negatif
+		if (vx < 0) { // pb avec decalage sur nb negatif
 			ppx = -(-(vx * fvitesse) >> 16);
 		/* 16 = 9 + 7 (7 = nb chiffre virgule de vitesse * (v = 128 => immobile)
 		 * * * * * 9 = nb chiffre virgule de vx) */
-		else
+		} else {
 			ppx = ((vx * fvitesse) >> 16);
+                }
 
 		if (vy < 0)
 			ppy = -(-(vy * fvitesse) >> 16);
@@ -722,13 +723,15 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 
 #ifdef USE_ASM
 #ifdef MMX
-	if (zf_use_xmmx)
-		zoom_filter_xmmx (prevX, prevY,expix1, expix2,
-											brutS, brutD, buffratio, precalCoef);
-	else if (zf_use_mmx)
+	if (zf_use_xmmx) {
+            zoom_filter_xmmx (prevX, prevY,expix1, expix2,
+                              brutS, brutD, buffratio, precalCoef);
+	} else if (zf_use_mmx) {
 		zoom_filter_mmx (prevX, prevY,expix1, expix2,
-										 brutS, brutD, buffratio, precalCoef);
-	else c_zoom (expix1, expix2, prevX, prevY, brutS, brutD);
+                                 brutS, brutD, buffratio, precalCoef);
+	} else {
+            c_zoom (expix1, expix2, prevX, prevY, brutS, brutD);
+        }
 #endif
 
 #ifdef POWERPC

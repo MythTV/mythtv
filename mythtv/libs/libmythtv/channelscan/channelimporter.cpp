@@ -1267,6 +1267,7 @@ QString ChannelImporter::FormatChannel(
         QString("scte") : chan.m_siStandard;
 
     if (si_standard == "atsc" || si_standard == "scte")
+    {
         ssMsg << (QString("%1:%2:%3-%4:%5:%6=%7=%8:%9")
                   .arg(chan.m_callSign).arg(chan.m_chanNum)
                   .arg(chan.m_atscMajorChannel)
@@ -1276,7 +1277,9 @@ QString ChannelImporter::FormatChannel(
                   .arg(chan.m_vctChanTsId)
                   .arg(chan.m_patTsId)
                   .arg(si_standard)).toLatin1().constData();
+    }
     else if (si_standard == "dvb")
+    {
         ssMsg << (QString("%1:%2:%3:%4:%5:%6=%7:%8")
                   .arg(chan.m_serviceName).arg(chan.m_chanNum)
                   .arg(chan.m_netId).arg(chan.m_origNetId)
@@ -1284,12 +1287,15 @@ QString ChannelImporter::FormatChannel(
                   .arg(chan.m_sdtTsId)
                   .arg(chan.m_patTsId)
                   .arg(si_standard)).toLatin1().constData();
+    }
     else
+    {
         ssMsg << (QString("%1:%2:%3:%4:%5")
                   .arg(chan.m_callSign).arg(chan.m_chanNum)
                   .arg(chan.m_serviceId)
                   .arg(chan.m_patTsId)
                   .arg(si_standard)).toLatin1().constData();
+    }
 
     if (info)
     {
@@ -1344,34 +1350,46 @@ QString ChannelImporter::SimpleFormatChannel(
     {
 
         if (si_standard == "atsc")
+        {
             ssMsg << (QString("%1-%2")
                   .arg(chan.m_atscMajorChannel)
                   .arg(chan.m_atscMinorChannel)).toLatin1().constData();
+        }
         else if (chan.m_freqId.isEmpty())
+        {
             ssMsg << (QString("%1-%2")
                   .arg(chan.m_sourceId)
                   .arg(chan.m_serviceId)).toLatin1().constData();
+        }
         else
+        {
             ssMsg << (QString("%1-%2")
                   .arg(chan.m_freqId)
                   .arg(chan.m_serviceId)).toLatin1().constData();
+        }
 
         if (!chan.m_callSign.isEmpty())
             ssMsg << (QString(" (%1)")
                   .arg(chan.m_callSign)).toLatin1().constData();
     }
     else if (si_standard == "dvb")
+    {
         ssMsg << (QString("%1 (%2 %3)")
                   .arg(chan.m_serviceName).arg(chan.m_serviceId)
                   .arg(chan.m_netId)).toLatin1().constData();
+    }
     else if (chan.m_freqId.isEmpty())
+    {
         ssMsg << (QString("%1-%2")
                   .arg(chan.m_sourceId).arg(chan.m_serviceId))
                   .toLatin1().constData();
+    }
     else
+    {
         ssMsg << (QString("%1-%2")
                   .arg(chan.m_freqId).arg(chan.m_serviceId))
                   .toLatin1().constData();
+    }
 
     return msg;
 }
@@ -1394,9 +1412,11 @@ QString ChannelImporter::FormatChannels(
     QString msg;
 
     for (size_t i = 0; i < transports.size(); ++i)
+    {
         for (size_t j = 0; j < transports[i].m_channels.size(); ++j)
             msg += FormatChannel(transports[i], transports[i].m_channels[j],
                                  info) + "\n";
+    }
 
     return msg;
 }

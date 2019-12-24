@@ -779,11 +779,15 @@ void MythBurn::ShowMenu()
     if (curItem->hasCutlist)
     {
         if (curItem->useCutlist)
+        {
             menuPopup->AddButton(tr("Don't Use Cut List"),
                                  SLOT(toggleUseCutlist()));
+        }
         else
+        {
             menuPopup->AddButton(tr("Use Cut List"),
                                  SLOT(toggleUseCutlist()));
+        }
     }
 
     menuPopup->AddButton(tr("Remove Item"), SLOT(removeItem()));

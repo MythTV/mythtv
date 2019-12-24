@@ -81,10 +81,12 @@ void StorageGroup::StaticInit(void)
             qdir.mkpath(it.value());
 
         if (!qdir.exists())
+        {
             LOG(VB_GENERAL, LOG_ERR,
                 QString("SG() Error: Could not create builtin"
                         "Storage Group directory '%1' for '%2'").arg(it.value())
                     .arg(it.key()));
+        }
     }
 }
 
@@ -714,11 +716,15 @@ QString StorageGroup::FindNextDirMostFree(void)
     }
 
     if (nextDir.isEmpty())
+    {
         LOG(VB_FILE, LOG_ERR, LOC +
             "FindNextDirMostFree: Unable to find any directories to use.");
+    }
     else
+    {
         LOG(VB_FILE, LOG_DEBUG, LOC +
             QString("FindNextDirMostFree: Using '%1'").arg(nextDir));
+    }
 
     return nextDir;
 }
@@ -775,10 +781,12 @@ void StorageGroup::CheckAllStorageGroupDirs(void)
             if (testFile.open(QIODevice::WriteOnly))
                 testFile.remove();
             else
+            {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                     QString("Group '%1' wants to use directory '%2', but "
                             "this directory is not writeable.")
                         .arg(m_groupname).arg(dirname));
+            }
         }
     }
 }

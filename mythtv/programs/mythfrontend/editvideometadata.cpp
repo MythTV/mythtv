@@ -367,11 +367,15 @@ void EditMetadataDialog::fillWidgets()
     {
         QString title;
         if ((*p)->GetSeason() > 0 || (*p)->GetEpisode() > 0)
+        {
             title = QString("%1 %2x%3").arg((*p)->GetTitle())
                                        .arg(QString::number((*p)->GetSeason()))
                                        .arg(QString::number((*p)->GetEpisode()));
+        }
         else
+        {
             title = (*p)->GetTitle();
+        }
         tc.push_back(std::make_pair((*p)->GetID(), title));
     }
     std::sort(tc.begin(), tc.end(), title_sort<title_list::value_type>());
@@ -625,13 +629,13 @@ void EditMetadataDialog::FindCoverArt()
         QString url = generate_file_url("Coverart",
                       m_workingMetadata->GetHost(),
                       "");
-        FindImagePopup(url,"",
-                       *this, CEID_COVERARTFILE);
+        FindImagePopup(url, "", *this, CEID_COVERARTFILE);
     }
     else
+    {
         FindImagePopup(gCoreContext->GetSetting("VideoArtworkDir"),
-                GetConfDir() + "/MythVideo",
-                *this, CEID_COVERARTFILE);
+                GetConfDir() + "/MythVideo", *this, CEID_COVERARTFILE);
+    }
 }
 
 void EditMetadataDialog::OnArtworkSearchDone(MetadataLookup *lookup)
@@ -802,13 +806,13 @@ void EditMetadataDialog::FindBanner()
         QString url = generate_file_url("Banners",
                       m_workingMetadata->GetHost(),
                       "");
-        FindImagePopup(url,"",
-                *this, CEID_BANNERFILE);
+        FindImagePopup(url, "", *this, CEID_BANNERFILE);
     }
     else
+    {
         FindImagePopup(gCoreContext->GetSetting("mythvideo.bannerDir"),
-                GetConfDir() + "/MythVideo/Banners",
-                *this, CEID_BANNERFILE);
+                GetConfDir() + "/MythVideo/Banners", *this, CEID_BANNERFILE);
+    }
 }
 
 void EditMetadataDialog::SetBanner(QString file)
@@ -847,13 +851,13 @@ void EditMetadataDialog::FindFanart()
         QString url = generate_file_url("Fanart",
                       m_workingMetadata->GetHost(),
                       "");
-        FindImagePopup(url,"",
-                *this, CEID_FANARTFILE);
+        FindImagePopup(url, "", *this, CEID_FANARTFILE);
     }
     else
+    {
         FindImagePopup(gCoreContext->GetSetting("mythvideo.fanartDir"),
-                GetConfDir() + "/MythVideo/Fanart",
-                *this, CEID_FANARTFILE);
+                GetConfDir() + "/MythVideo/Fanart", *this, CEID_FANARTFILE);
+    }
 }
 
 void EditMetadataDialog::SetFanart(QString file)
@@ -892,13 +896,14 @@ void EditMetadataDialog::FindScreenshot()
         QString url = generate_file_url("Screenshots",
                       m_workingMetadata->GetHost(),
                       "");
-        FindImagePopup(url,"",
-                *this, CEID_SCREENSHOTFILE);
+        FindImagePopup(url, "", *this, CEID_SCREENSHOTFILE);
     }
     else
+    {
         FindImagePopup(gCoreContext->GetSetting("mythvideo.screenshotDir"),
                 GetConfDir() + "/MythVideo/Screenshots",
                 *this, CEID_SCREENSHOTFILE);
+    }
 }
 
 void EditMetadataDialog::SetScreenshot(QString file)
@@ -937,13 +942,13 @@ void EditMetadataDialog::FindTrailer()
         QString url = generate_file_url("Trailers",
                       m_workingMetadata->GetHost(),
                       "");
-        FindVideoFilePopup(url,"",
-                *this, CEID_TRAILERFILE);
+        FindVideoFilePopup(url, "", *this, CEID_TRAILERFILE);
     }
     else
+    {
         FindVideoFilePopup(gCoreContext->GetSetting("mythvideo.TrailersDir"),
-                GetConfDir() + "/MythVideo/Trailers",
-                *this, CEID_TRAILERFILE);
+                GetConfDir() + "/MythVideo/Trailers", *this, CEID_TRAILERFILE);
+    }
 }
 
 void EditMetadataDialog::SetTrailer(QString file)

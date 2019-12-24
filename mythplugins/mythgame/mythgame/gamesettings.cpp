@@ -381,15 +381,18 @@ void GamePlayersList::Load()
     {
         MythDB::DBError("GamePlayersSetting::Load", query);
     }
-    else while (query.next())
+    else
     {
-        int     id   = query.value(0).toInt();
-        QString name = query.value(1).toString();
-        QString type = query.value(2).toString();
+        while (query.next())
+        {
+            int     id   = query.value(0).toInt();
+            QString name = query.value(1).toString();
+            QString type = query.value(2).toString();
 
-        auto child = new GamePlayerSetting(name, id);
-        addChild(child);
-        child->setLabel(playerDisp.arg(name, GetGameTypeName(type)));
+            auto child = new GamePlayerSetting(name, id);
+            addChild(child);
+            child->setLabel(playerDisp.arg(name, GetGameTypeName(type)));
+        }
     }
 
     GroupSetting::Load();
@@ -417,12 +420,14 @@ void GamePlayersList::CreateNewPlayer(const QString& name)
 
     // Database name must be unique
     for (StandardSetting* child : *getSubSettings())
+    {
         if (child->getName() == name)
         {
             LOG(VB_GENERAL, LOG_ERR,
                 QString("Player name %1 is already used").arg(name));
             return;
         }
+    }
 
     addChild(new GamePlayerSetting(name));
 

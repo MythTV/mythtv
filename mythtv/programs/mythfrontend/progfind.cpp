@@ -369,9 +369,11 @@ void ProgFinder::updateInfo(void)
         if (m_help1Text)
             m_help1Text->SetText(tr("Select a program..."));
         if (m_help2Text)
+        {
             m_help2Text->SetText(tr("Select the title of the program you wish to find. "
                                     "When finished return with the left arrow key. "
                                     "Press SELECT to schedule a recording."));
+        }
 
         ResetMap(m_infoMap);
     }
@@ -383,9 +385,11 @@ void ProgFinder::updateInfo(void)
             if (m_help1Text)
                 m_help1Text->SetText(tr("No Programs"));
             if (m_help2Text)
+            {
                 m_help2Text->SetText(tr("There are no available programs under "
                                         "this search. Please select another "
                                         "search."));
+            }
         }
         else
         {

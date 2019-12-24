@@ -274,9 +274,11 @@ void V4L2encStreamHandler::run(void)
         if (len < 0)
         {
             if (errno != EAGAIN)
+            {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                     QString("run() -- error reading from: %1")
                     .arg(m_device) + ENO);
+            }
             continue;
         }
 
@@ -301,9 +303,11 @@ void V4L2encStreamHandler::run(void)
         int remainder = 0;
         StreamDataList::const_iterator sit = m_streamDataList.begin();
         for (; sit != m_streamDataList.end(); ++sit)
+        {
             remainder = sit.key()->ProcessData
                         (reinterpret_cast<const uint8_t *>
                          (buffer.constData()), len);
+        }
 
         m_listenerLock.unlock();
 
@@ -705,12 +709,18 @@ bool V4L2encStreamHandler::SetOption(const QString &opt, int value)
     else if (opt == "height")
         m_height = value;
     else if (opt == "mpeg2bitratemode")
+    {
         m_bitrateMode = value ? V4L2_MPEG_VIDEO_BITRATE_MODE_CBR :
                          V4L2_MPEG_VIDEO_BITRATE_MODE_VBR;
+    }
     else if (opt == "mpeg2bitrate")
+    {
         m_bitrate = value;
+    }
     else if (opt == "mpeg2maxbitrate")
+    {
         m_maxBitrate = value;
+    }
     else if (opt == "samplerate")
     {
         switch (value)

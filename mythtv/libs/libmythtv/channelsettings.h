@@ -75,10 +75,11 @@ class ChannelID : public GroupSetting
         }
 
         if (query.size() > 0)
+        {
             while (query.next())
                 if (tmpfloor <= query.value(0).toInt())
                     tmpfloor = query.value(0).toInt() + 1;
-
+        }
         return floor<tmpfloor?tmpfloor:floor;
     };
 

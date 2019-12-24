@@ -443,11 +443,13 @@ void UPnpCDSMusic::PopulateArtworkURIS(CDSObject* pItem, int nSongID)
         }
     }
     else
+    {
         LOG(VB_GENERAL, LOG_ERR, QString("Unable to designate album artwork "
                                          "for '%1' with class '%2' and id '%3'")
                                             .arg(pItem->m_sId)
                                             .arg(pItem->m_sClass)
                                             .arg(nSongID));
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////

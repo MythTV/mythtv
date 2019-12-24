@@ -47,15 +47,23 @@ void MythRect::CalculateArea(const MythRect & parentArea)
     if (m_percentY > 0.0F)
         Y = (int) (m_percentY * (float)m_parentArea.height()) + m_offsetY;
     if (m_percentWidth > 0.0F)
+    {
         w = (int) (m_percentWidth * (float)(m_parentArea.width() - X))
             + m_offsetWidth;
+    }
     else if (m_offsetWidth != 0)
+    {
         w = m_parentArea.width() - X + m_offsetWidth;
+    }
     if (m_percentHeight > 0.0F)
+    {
         h = (int) (m_percentHeight * (float)(m_parentArea.height() - Y))
             + m_offsetHeight;
+    }
     else if (m_offsetHeight != 0)
+    {
         h = m_parentArea.height() - Y + m_offsetHeight;
+    }
 
     QRect::setRect(X,Y,w,h);
 

@@ -659,18 +659,22 @@ ChannelOptionsRawTS::ChannelOptionsRawTS(const ChannelID &id) :
         {
             QString desc = StreamID::GetDescription(j&0xff);
             if (!desc.isEmpty())
+            {
                 m_sids[i]->addSelection(
                     QString("%1 (0x%2)")
                     .arg(desc).arg(j&0xff,2,16,QLatin1Char('0')),
                     QString::number(j), false);
+            }
         }
         for (uint j = 0x101; j <= 0x1ff; j++)
         {
             QString desc = StreamID::GetDescription(j&0xff);
             if (desc.isEmpty())
+            {
                 m_sids[i]->addSelection(
                     QString("0x%1").arg(j&0xff,2,16,QLatin1Char('0')),
                     QString::number(j), false);
+            }
         }
 /* we don't allow tables right now, PAT & PMT generated on the fly
         for (uint j = 0; j <= 0xff; j++)

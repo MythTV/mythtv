@@ -118,9 +118,11 @@ void ShoutCastMetaParser::setMetaFormat(const QString &metaformat)
             assign_index++;
         }
         else
+        {
             LOG(VB_GENERAL, LOG_ERR,
                 QString("ShoutCastMetaParser: malformed metaformat '%1'")
                     .arg(m_metaFormat));
+        }
 
         pos = m_metaFormat.indexOf("%", pos);
     }

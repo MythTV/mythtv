@@ -192,9 +192,11 @@ DTC::VideoLookupList* Video::LookupVideo( const QString    &Title,
     auto *factory = new MetadataFactory(nullptr);
 
     if (factory)
+    {
         list = factory->SynchronousLookup(Title, Subtitle,
                                          Inetref, Season, Episode,
                                          GrabberType, AllowGeneric);
+    }
 
     if ( list.empty() )
         return pVideoLookups;

@@ -1951,6 +1951,7 @@ ImageManagerBe* ImageManagerBe::getInstance()
 ImageManagerFe& ImageManagerFe::getInstance()
 {
     if (!s_instance)
+    {
         // Use saved settings
         s_instance = new ImageManagerFe
                 (gCoreContext->GetNumSetting("GalleryImageOrder"),
@@ -1958,6 +1959,7 @@ ImageManagerFe& ImageManagerFe::getInstance()
                  gCoreContext->GetBoolSetting("GalleryShowHidden"),
                  gCoreContext->GetNumSetting("GalleryShowType"),
                  gCoreContext->GetSetting("GalleryDateFormat"));
+    }
     return *s_instance;
 }
 

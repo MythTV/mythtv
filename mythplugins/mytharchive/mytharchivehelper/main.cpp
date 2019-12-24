@@ -204,10 +204,14 @@ static int burnISOImage(int mediaType, bool bEraseDVDRW, bool nativeFormat)
 
     uint res = myth_system(command);
     if (res != GENERIC_EXIT_OK)
+    {
         LOG(VB_JOBQUEUE, LOG_ERR,
             QString("Failed while running growisofs. Result: %1") .arg(res));
+    }
     else
+    {
         LOG(VB_JOBQUEUE, LOG_INFO, "Finished burning ISO image");
+    }
 
     return res;
 }
@@ -1229,8 +1233,10 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
     query.bindValue(":CATEGORY", 0);
 
     if (query.exec())
+    {
         LOG(VB_JOBQUEUE, LOG_INFO,
             "Inserted videometadata details into database");
+    }
     else
     {
         MythDB::DBError("videometadata insert", query);

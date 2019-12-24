@@ -1463,9 +1463,11 @@ static struct dvb_frontend_parameters dtvmultiplex_to_dvbparams(
     if (DTVTunerType::kTunerTypeDVBS1 == tuner_type)
     {
         if (tuning.m_modSys == DTVModulationSystem::kModulationSystem_DVBS2)
+        {
             LOG(VB_GENERAL, LOG_ERR,
                 "DVBChan: Error, Tuning of a DVB-S2 transport "
                 "with a DVB-S card will fail.");
+        }
 
         params.frequency = intermediate_freq;
         params.u.qpsk.symbol_rate = tuning.m_symbolRate;

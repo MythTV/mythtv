@@ -224,10 +224,14 @@ void DTVRecorder::InitStreamData(void)
     auto *atsc = dynamic_cast<ATSCStreamData*>(m_streamData);
 
     if (atsc && atsc->DesiredMinorChannel())
+    {
         atsc->SetDesiredChannel(atsc->DesiredMajorChannel(),
                                 atsc->DesiredMinorChannel());
+    }
     else if (m_streamData->DesiredProgram() >= 0)
+    {
         m_streamData->SetDesiredProgram(m_streamData->DesiredProgram());
+    }
 }
 
 void DTVRecorder::BufferedWrite(const TSPacket &tspacket, bool insert)
@@ -255,11 +259,15 @@ void DTVRecorder::BufferedWrite(const TSPacket &tspacket, bool insert)
             uint elapsed = m_timeOfLatestDataTimer.restart();
             int interval = thresh;
             if (elapsed > kTimeOfLatestDataIntervalTarget + 250)
+            {
                 interval = m_timeOfLatestDataPacketInterval
                            .fetchAndStoreRelaxed(thresh * 4 / 5);
+            }
             else if (elapsed + 250 < kTimeOfLatestDataIntervalTarget)
+            {
                 interval = m_timeOfLatestDataPacketInterval
                            .fetchAndStoreRelaxed(thresh * 9 / 8);
+            }
 
             m_timeOfLatestDataCount.fetchAndStoreRelaxed(1);
             m_timeOfLatestData = MythDate::current();
@@ -676,6 +684,7 @@ void DTVRecorder::UpdateFramesWritten(void)
     }
 
     if (m_framesWrittenCount < 2000 || m_framesWrittenCount % 1000 == 0)
+    {
         LOG(VB_RECORD, LOG_DEBUG,
             QString("count=%1 m_frameRate=%2 tick_frameRate=%3 "
                     "tick_cnt=%4 tick_base=%5 _total_dur=%6")
@@ -685,6 +694,7 @@ void DTVRecorder::UpdateFramesWritten(void)
             .arg(m_tdTickCount)
             .arg(m_tdBase)
             .arg(m_totalDuration));
+    }
 }
 
 bool DTVRecorder::FindAudioKeyframes(const TSPacket* /*tspacket*/)

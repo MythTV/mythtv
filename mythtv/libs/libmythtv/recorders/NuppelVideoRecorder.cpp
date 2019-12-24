@@ -2413,11 +2413,13 @@ void NuppelVideoRecorder::FormatTT(struct VBIData *vbidata)
                     break;
             }
             if (gfx)
+            {
                 if ((c & 0xa0) == 0x20)
                 {
                     last_c = c;
                     c += (c & 0x40) ? 32 : -32;
                 }
+            }
             if (hid)
                 c = ' ';
 
@@ -2808,11 +2810,15 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
         {
             int r = 0;
             if (raw)
+            {
                 r = lzo1x_1_compress(frame->buf, frame->size,
                                      m_out, &out_len, wrkmem);
+            }
             else
+            {
                 r = lzo1x_1_compress((unsigned char *)m_strm, tmp, m_out,
                                      &out_len, wrkmem);
+            }
             if (r != LZO_E_OK)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC + "lzo compression failed");

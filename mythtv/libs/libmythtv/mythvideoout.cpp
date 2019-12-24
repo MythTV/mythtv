@@ -106,16 +106,22 @@ MythVideoOutput *MythVideoOutput::Create(const QString &Decoder,    MythCodecID 
 
         /* these cases are mutually exlusive */
         if (renderer == "null")
+        {
             vo = new MythVideoOutputNull();
+        }
 
 #ifdef _WIN32
         else if (renderer == "direct3d")
+        {
             vo = new VideoOutputD3D();
+        }
 #endif // _WIN32
 
 #ifdef USING_OPENGL
         else if (renderer.contains("opengl"))
+        {
             vo = new MythVideoOutputOpenGL(renderer);
+        }
 #endif // USING_OPENGL
 
         if (vo)

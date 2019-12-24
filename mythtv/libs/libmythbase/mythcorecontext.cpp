@@ -272,12 +272,14 @@ bool MythCoreContext::Init(void)
     LOG(VB_GENERAL, LOG_INFO, QString("Assumed character encoding: %1")
                                      .arg(lc_value));
     if (!lang_variables.isEmpty())
+    {
         LOG(VB_GENERAL, LOG_WARNING, QString("This application expects to "
             "be running a locale that specifies a UTF-8 codeset, and many "
             "features may behave improperly with your current language "
             "settings. Please set the %1 variable(s) in the environment "
             "in which this program is executed to include a UTF-8 codeset "
             "(such as 'en_US.UTF-8').").arg(lang_variables));
+    }
 #endif
 
     return true;
@@ -319,11 +321,15 @@ bool MythCoreContext::SetupCommandSocket(MythSocket *serverSock,
         strlist.empty() || (strlist[0] == "ERROR"))
     {
         if (!strlist.empty())
+        {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Problem connecting "
                                            "server socket to master backend");
+        }
         else
+        {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Timeout connecting "
                                            "server socket to master backend");
+        }
         return false;
     }
 
@@ -1432,13 +1438,17 @@ bool MythCoreContext::SendReceiveStringList(
         else if (strlist[0] == "ERROR")
         {
             if (strlist.size() == 2)
+            {
                 LOG(VB_GENERAL, LOG_INFO, LOC +
                     QString("Protocol query '%1' responded with the error '%2'")
                         .arg(query_type).arg(strlist[1]));
+            }
             else
+            {
                 LOG(VB_GENERAL, LOG_INFO, LOC +
                     QString("Protocol query '%1' responded with an error, but "
                             "no error message.") .arg(query_type));
+            }
 
             ok = false;
         }

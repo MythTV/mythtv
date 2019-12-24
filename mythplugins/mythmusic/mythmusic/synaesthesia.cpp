@@ -265,10 +265,14 @@ void Synaesthesia::fadeFade(void)
     do {
         uint32_t x = *ptr;
         if (x)
+        {
             *(ptr++) = x - ((x & (uintptr_t)0xf0f0f0f0) >> 4) -
                            ((x & (uintptr_t)0xe0e0e0e0) >> 5);
+        }
         else
+        {
             ptr++;
+        }
     } while (--i > 0);
 }
 
@@ -481,10 +485,14 @@ bool Synaesthesia::process(VisualNode *node)
         a[i] = sqrt(aa = (x1 + x2) * (x1 + x2) + (y1 - y2) * (y1 - y2));
         b[i] = sqrt(bb = (x1 - x2) * (x1 - x2) + (y2 + y2) * (y1 + y2));
         if (aa + bb != 0.0)
+        {
             clarity[i] = (int)(((x1 + x2) * (x1 - x2) + (y1 + y2) * (y1 - y2)) /
                          (aa + bb) * 256);
+        }
         else
+        {
             clarity[i] = 0;
+        }
 
         energy += (aa + bb) * i * i;
     }

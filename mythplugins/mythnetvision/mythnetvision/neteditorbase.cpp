@@ -201,10 +201,14 @@ void NetEditorBase::FillGrabberButtonList()
         QString thumb;
 
         if (!img.startsWith("/") && !img.isEmpty())
+        {
             thumb = QString("%1mythnetvision/icons/%2").arg(GetShareDir())
                 .arg((*i)->GetImage());
+        }
         else
+        {
             thumb = img;
+        }
 
         item->SetImage(thumb);
         item->setCheckable(true);

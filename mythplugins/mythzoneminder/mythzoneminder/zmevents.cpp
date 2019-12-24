@@ -228,10 +228,14 @@ void ZMEvents::eventChanged(MythUIButtonListItem *item)
     if (m_eventNoText)
     {
         if (m_eventGrid->GetCount() > 0)
+        {
             m_eventNoText->SetText(QString("%1/%2")
                     .arg(m_eventGrid->GetCurrentPos() + 1).arg(m_eventGrid->GetCount()));
+        }
         else
+        {
             m_eventNoText->SetText("0/0");
+        }
     }
 }
 

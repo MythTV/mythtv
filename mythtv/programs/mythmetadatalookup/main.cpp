@@ -137,9 +137,11 @@ int main(int argc, char *argv[])
                                       cmdline.toBool("refresh-rules"));
     }
     else if (cmdline.toBool("chanid") && cmdline.toBool("starttime"))
+    {
         lookup->HandleSingleRecording(cmdline.toUInt("chanid"),
                                       cmdline.toDateTime("starttime"),
                                       cmdline.toBool("refresh-rules"));
+    }
     else if (cmdline.toBool("refresh-all-rules"))
     {
         lookup->HandleAllRecordingRules();

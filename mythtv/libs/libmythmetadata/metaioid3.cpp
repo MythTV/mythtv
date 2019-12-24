@@ -75,11 +75,15 @@ bool MetaIOID3::OpenFile(const QString &filename, bool forWriting)
     if (!m_file->isOpen() || (forWriting && m_file->readOnly()))
     {
         if (m_file->isOpen())
+        {
             LOG(VB_FILE, LOG_NOTICE,
                 QString("Could not open file for writing: %1").arg(m_filename));
+        }
         else
+        {
             LOG(VB_FILE, LOG_ERR,
                 QString("Could not open file: %1").arg(m_filename));
+        }
 
         CloseFile();
         return false;

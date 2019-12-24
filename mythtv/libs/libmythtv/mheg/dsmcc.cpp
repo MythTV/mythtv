@@ -430,9 +430,11 @@ void Dsmcc::ProcessSectionData(const unsigned char *data, int length)
     if (car != nullptr)
         car->AddModuleData(&ddb, blockData + 6);
     else
+    {
         LOG(VB_DSMCC, LOG_WARNING, QString("[dsmcc] Data Block ModID %1 Pos %2"
             " unknown carousel %3")
             .arg(ddb.m_moduleId).arg(ddb.m_blockNumber).arg(download_id));
+    }
 }
 
 void Dsmcc::ProcessSectionDesc(const unsigned char *data, int length)

@@ -292,18 +292,26 @@ void ViewScheduleDiff::updateUIList(void)
         item->SetTextFromMap(infoMap, state);
 
         if (s.m_before)
+        {
             item->SetText(RecStatus::toString(s.m_before->GetRecordingStatus(),
                                    s.m_before->GetInputID()), "statusbefore",
                           state);
+        }
         else
+        {
             item->SetText("-", "statusbefore");
+        }
 
         if (s.m_after)
+        {
             item->SetText(RecStatus::toString(s.m_after->GetRecordingStatus(),
                                    s.m_after->GetInputID()), "statusafter",
                           state);
+        }
         else
+        {
             item->SetText("-", "statusafter");
+        }
     }
 
     if (m_noChangesText)

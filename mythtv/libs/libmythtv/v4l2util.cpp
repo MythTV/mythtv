@@ -342,9 +342,11 @@ void V4L2util::log_qctrl(struct v4l2_queryctrl& queryctrl,
             if (queryctrl.type == V4L2_CTRL_TYPE_MENU)
                 msg += QString("\t\t%1: %2").arg(idx).arg((char *)qmenu.name);
             else
+            {
                 msg += QString("\t\t%1: %2 (0x%3)")
                        .arg(idx).arg(qmenu.value)
                        .arg(qmenu.value, 0, 16, QChar('0'));
+            }
         }
     }
 

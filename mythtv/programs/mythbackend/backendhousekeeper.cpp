@@ -164,10 +164,12 @@ void CleanupTask::CleanupOrphanedLiveTV(void)
     QString msg;
     QString keepChains;
     while (query.next())
+    {
         if (keepChains.isEmpty())
             keepChains = "'" + query.value(0).toString() + "'";
         else
             keepChains += ", '" + query.value(0).toString() + "'";
+    }
 
     if (keepChains.isEmpty())
         msg = "DELETE FROM tvchain WHERE endtime < now();";

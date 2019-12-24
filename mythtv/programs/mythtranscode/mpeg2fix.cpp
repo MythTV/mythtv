@@ -115,11 +115,13 @@ void MPEG2frame::ensure_size(int size)
     {
         int oldSize = m_pkt.size;
         if ((av_grow_packet(&m_pkt, size - m_pkt.size) < 0) || m_pkt.size < size)
+        {
             LOG(VB_GENERAL, LOG_CRIT, QString("MPEG2frame::ensure_size(): "
                                               "Failed to grow packet size "
                                               "from %1 to %2, result was %3")
                                                 .arg(oldSize).arg(size)
                                                 .arg(m_pkt.size));
+        }
     }
 }
 
@@ -711,9 +713,11 @@ int MPEG2fixup::AddFrame(MPEG2frame *f)
             ok = 0;
 
         for (int i = 0; i < m_extCount; i++)
+        {
             if (rbi != &m_rx.m_indexExtrbuf[i] &&
                     ring_avail(&m_rx.m_indexExtrbuf[i]) < sizeof(index_unit))
                 ok = 0;
+        }
 
         if (!ok && ring_free(rb) < (unsigned int)f->m_pkt.size &&
                     ring_free(rbi) >= sizeof(index_unit))
@@ -854,9 +858,11 @@ bool MPEG2fixup::InitAV(const QString& inputfile, const char *type, int64_t offs
                     m_aFrame[i] = new FrameList();
                 }
                 else
+                {
                     LOG(VB_GENERAL, LOG_ERR,
                         QString("Skipping unsupported audio stream: %1")
                             .arg(m_inputFC->streams[i]->codecpar->codec_id));
+                }
                 break;
             default:
                 LOG(VB_GENERAL, LOG_ERR,
@@ -1180,11 +1186,15 @@ bool MPEG2fixup::BuildFrame(AVPacket *pkt, const QString& fname)
     }
 
     if (info->display_picture->nb_fields % 2)
+    {
         m_picture->top_field_first = ((info->display_picture->flags &
                                        PIC_FLAG_TOP_FIELD_FIRST) != 0) ? 0 : 1;
+    }
     else
+    {
         m_picture->top_field_first = ((info->display_picture->flags &
                                        PIC_FLAG_TOP_FIELD_FIRST) != 0) ? 1 : 0;
+    }
 
     m_picture->interlaced_frame = ((info->display_picture->flags &
                                     PIC_FLAG_PROGRESSIVE_FRAME) != 0) ? 0 : 1;
@@ -1913,10 +1923,12 @@ void MPEG2fixup::ShowRangeMap(frm_dir_map_t *mapPtr, QString msg)
         int64_t start = 0;
         frm_dir_map_t::iterator it = mapPtr->begin();
         for (; it != mapPtr->end(); ++it)
+        {
             if (*it == MARK_CUT_END)
                 msg += QString("\n\t\t%1 - %2").arg(start).arg(it.key());
             else
                 start = it.key();
+        }
         if (*(--it) == MARK_CUT_START)
             msg += QString("\n\t\t%1 - end").arg(start);
         LOG(VB_PROCESS, LOG_INFO, msg);

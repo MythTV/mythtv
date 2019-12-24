@@ -558,12 +558,16 @@ void Buffer::Run(void)
             send_time = time (nullptr) + (60 * 5);
             write_total += written;
             if (m_parent->m_streaming)
+            {
                 LOG(VB_RECORD, LOG_NOTICE, LOC +
                     QString("Count: %1, Empty cnt %2, Written %3, Total %4")
                     .arg(write_cnt).arg(empty_cnt)
                     .arg(written).arg(write_total));
+            }
             else
+            {
                 LOG(VB_GENERAL, LOG_NOTICE, LOC + "Not streaming.");
+            }
 
             write_cnt = empty_cnt = written = 0;
         }

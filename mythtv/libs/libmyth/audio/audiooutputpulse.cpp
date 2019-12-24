@@ -263,10 +263,12 @@ void AudioOutputPulseAudio::WriteAudio(uchar *aubuf, int size)
         if (to_write > 0)
         {
             if (write_status != 0)
+            {
                 VBERROR(fn_log_tag + QString("stream write failed: %1")
                                      .arg(write_status == PA_ERR_BADSTATE
                                                 ? "PA_ERR_BADSTATE"
                                                 : "PA_ERR_INVALID"));
+            }
 
             VBERROR(fn_log_tag + QString("short write, %1 of %2")
                                  .arg(size - to_write).arg(size));
@@ -347,11 +349,13 @@ void AudioOutputPulseAudio::SetVolumeChannel(int channel, int volume)
         if (op)
             pa_operation_unref(op);
         else
+        {
             VBERROR(fn_log_tag +
                     QString("set stream volume operation failed, stream %1, "
                             "error %2 ")
                     .arg(stream_index)
                     .arg(pa_strerror(pa_context_errno(m_pcontext))));
+        }
     }
     else
     {
@@ -365,11 +369,13 @@ void AudioOutputPulseAudio::SetVolumeChannel(int channel, int volume)
         if (op)
             pa_operation_unref(op);
         else
+        {
             VBERROR(fn_log_tag +
                     QString("set sink volume operation failed, sink %1, "
                             "error %2 ")
                     .arg(sink_index)
                     .arg(pa_strerror(pa_context_errno(m_pcontext))));
+        }
     }
 }
 
@@ -480,9 +486,11 @@ char *AudioOutputPulseAudio::ChooseHost(void)
         if ((pulse_host = new char[strlen(host) + 1]))
             strcpy(pulse_host, host);
         else
+        {
             VBERROR(fn_log_tag +
                     QString("allocation of pulse host '%1' char[%2] failed")
                     .arg(host).arg(strlen(host) + 1));
+        }
     }
 
     if (!pulse_host && host && strcmp(host,"default") != 0)

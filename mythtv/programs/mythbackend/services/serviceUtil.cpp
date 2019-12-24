@@ -543,18 +543,22 @@ void FillCastMemberList(DTC::CastMemberList* pCastMemberList,
 
     MSqlQuery query(MSqlQuery::InitCon());
     if (pInfo->GetFilesize() > 0) // FIXME: This shouldn't be the way to determine what is or isn't a recording!
+    {
         query.prepare("SELECT role, people.name FROM recordedcredits"
                         " AS credits"
                         " LEFT JOIN people ON credits.person = people.person"
                         " WHERE credits.chanid = :CHANID"
                         " AND credits.starttime = :STARTTIME"
                         " ORDER BY role;");
+    }
     else
+    {
         query.prepare("SELECT role, people.name FROM credits"
                         " LEFT JOIN people ON credits.person = people.person"
                         " WHERE credits.chanid = :CHANID"
                         " AND credits.starttime = :STARTTIME"
                         " ORDER BY role;");
+    }
     query.bindValue(":CHANID",    pInfo->GetChanID());
     query.bindValue(":STARTTIME", pInfo->GetScheduledStartTime());
 

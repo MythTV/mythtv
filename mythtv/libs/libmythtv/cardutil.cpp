@@ -351,7 +351,9 @@ CardUtil::InputTypes CardUtil::GetInputTypes(void)
         {
             cardtype = query.value(0).toString();
             if (cardtype != "V4L2ENC")
+            {
                 inputtypes[cardtype] = "";
+            }
 #ifdef USING_V4L2
             else
             {

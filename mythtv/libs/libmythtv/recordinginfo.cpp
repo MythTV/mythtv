@@ -1089,12 +1089,18 @@ bool RecordingInfo::InsertProgram(RecordingInfo *pg,
         query.bindValue(":RECORDID",    pg->m_recordId);
 
     if (pg->m_originalAirDate.isValid())
+    {
         query.bindValue(":ORIGAIRDATE", pg->m_originalAirDate);
     // If there is no originalairdate use "year"
+    }
     else if (pg->m_year >= 1940)
+    {
         query.bindValue(":ORIGAIRDATE", QDate(pg->m_year,1,1));
+    }
     else
+    {
         query.bindValue(":ORIGAIRDATE", "0000-00-00");
+    }
 
     query.bindValue(":CHANID",      pg->m_chanId);
     query.bindValue(":STARTS",      pg->m_recStartTs);
@@ -1136,8 +1142,10 @@ bool RecordingInfo::InsertProgram(RecordingInfo *pg,
         MythDB::DBError("InsertProgram -- unlock tables", query);
 
     if (!ok && !active)
+    {
         MythDB::DBError("InsertProgram -- insert", query);
 
+    }
     else if (pg->m_recordId > 0)
     {
         query.prepare("UPDATE channel SET last_record = NOW() "

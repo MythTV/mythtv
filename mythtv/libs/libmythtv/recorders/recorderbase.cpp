@@ -93,10 +93,14 @@ void RecorderBase::SetRingBuffer(RingBuffer *rbuf)
 void RecorderBase::SetRecording(const RecordingInfo *pginfo)
 {
     if (pginfo)
+    {
         LOG(VB_RECORD, LOG_INFO, LOC + QString("SetRecording(0x%1) title(%2)")
                 .arg((uint64_t)pginfo,0,16).arg(pginfo->GetTitle()));
+    }
     else
+    {
         LOG(VB_RECORD, LOG_INFO, LOC + "SetRecording(0x0)");
+    }
 
     ProgramInfo *oldrec = m_curRecording;
     if (pginfo)
