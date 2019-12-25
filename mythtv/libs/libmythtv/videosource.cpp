@@ -3784,21 +3784,21 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
         case CardUtil::QAM:
             m_cardType->setValue("DVB-C");
             m_cardName->setValue(frontend_name);
-            m_signalTimeout->setValue(1000);
-            m_channelTimeout->setValue(3000);
+            m_signalTimeout->setValue(3000);
+            m_channelTimeout->setValue(6000);
             break;
         case CardUtil::DVBT2:
             m_cardType->setValue("DVB-T2");
             m_cardName->setValue(frontend_name);
-            m_signalTimeout->setValue(1000);
-            m_channelTimeout->setValue(3000);
+            m_signalTimeout->setValue(3000);
+            m_channelTimeout->setValue(6000);
             break;
         case CardUtil::OFDM:
         {
             m_cardType->setValue("DVB-T");
             m_cardName->setValue(frontend_name);
-            m_signalTimeout->setValue(1000);
-            m_channelTimeout->setValue(3000);
+            m_signalTimeout->setValue(3000);
+            m_channelTimeout->setValue(6000);
             if (frontend_name.toLower().indexOf("usb") >= 0)
             {
                 m_signalTimeout->setValue(40000);
@@ -3830,8 +3830,8 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
             QString short_name = remove_chaff(frontend_name);
             m_cardType->setValue("ATSC");
             m_cardName->setValue(short_name);
-            m_signalTimeout->setValue(500);
-            m_channelTimeout->setValue(3000);
+            m_signalTimeout->setValue(2000);
+            m_channelTimeout->setValue(4000);
 
             // According to #1779 and #1935 the AverMedia 180 needs
             // a 3000 ms signal timeout, at least for QAM tuning.
@@ -3947,7 +3947,7 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent,
     cardType.addTargetedChild("DVB", new DVBEITScan(m_parent));
 
     m_diseqcBtn = new DeviceTree(*m_diseqcTree);
-    m_diseqcBtn->setLabel(tr("DiSEqC (Switch, LNB, and Rotor Configuration)"));
+    m_diseqcBtn->setLabel(tr("DiSEqC (Switch, LNB and Rotor Configuration)"));
     m_diseqcBtn->setHelpText(tr("Input and satellite settings."));
 
     m_tuningDelay = new DVBTuningDelay(m_parent);

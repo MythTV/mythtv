@@ -13,6 +13,8 @@ class MythEDID
     bool        Valid             (void);
     QStringList SerialNumbers     (void);
     int         PhysicalAddress   (void);
+    int         AudioLatency      (bool Interlaced);
+    int         VideoLatency      (bool Interlaced);
 
   private:
     void        Parse(void);
@@ -21,6 +23,8 @@ class MythEDID
     QByteArray  m_data            { };
     QStringList m_serialNumbers   { };
     int         m_physicalAddress { 0 };
+    int         m_audioLatency[2] { 0 };
+    int         m_videoLatency[2] { 0 };
 };
 
 #endif // MYTHEDID_H
