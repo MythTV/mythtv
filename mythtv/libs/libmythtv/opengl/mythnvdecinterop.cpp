@@ -26,7 +26,7 @@ MythNVDECInterop::MythNVDECInterop(MythRenderOpenGL *Context)
 MythNVDECInterop::~MythNVDECInterop()
 {
     m_referenceFrames.clear();
-    DeleteTextures();
+    MythNVDECInterop::DeleteTextures();
     CleanupContext(m_context, m_cudaFuncs, m_cudaContext);
 }
 

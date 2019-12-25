@@ -89,7 +89,7 @@ void MythVAAPIInteropDRM::DestroyDeinterlacer(void)
     if (m_filterGraph)
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Deleting deinterlacer frame cache");
-        DeleteTextures();
+        MythVAAPIInteropDRM::DeleteTextures();
         CleanupDRMPRIME();
     }
     MythVAAPIInterop::DestroyDeinterlacer();
