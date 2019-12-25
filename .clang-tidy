@@ -21,6 +21,21 @@
 # dynamic_cast and gives lots of false positives.
 #,
 
+# Skip warnings that are in files in an "external" directory.  Also
+# ignore warnings from a file in an "include" directory to ignore
+# files that are "installed" from mythtv for mythplugins.  These will
+# be caught when processing files in the mythtv directory.
+#
+# Sadly this doesn't work because llvm regex doesn't support lookahead. ,
+# HeaderFilterRegex: '^((?!/(external|include)/).)*$'
+
+# This doesn't seem to work either. ,
+#HeaderFilterRegex: '[A-Za-z0-9]+.h|.*/libmyth.*|.*/mythplugins/.*'
+
+# Include warnings from header files. ,
+#HeaderFilterRegex: '.*'
+
+
 Checks: '-*,
 
     bugprone-*,
@@ -159,8 +174,6 @@ Checks: '-*,
     readability-*,
 
         # Not investigated yet. ,
-       -readability-braces-around-statements,
-        # Not investigated yet. ,
        -readability-function-size,
 
         # Wants to convert all "if (x)" pointer validity checks to be
@@ -182,9 +195,9 @@ CheckOptions:
   - { key: modernize-make-shared.IgnoreMacros,             value: '0' }
   - { key: modernize-make-unique.IgnoreMacros,             value: '0' }
   - { key: modernize-use-bool-literals.IgnoreMacros,       value: '1' }
-  - { key: modernize-use-default-member-init.IgnoreMacros, value: '0' }
+  - { key: modernize-use-default-member-init.IgnoreMacros, value: '1' }
   - { key: modernize-use-equals-default.IgnoreMacros,      value: '0' }
-  - { key: modernize-use-using.IgnoreMacros,               value: '0' }
+  - { key: modernize-use-using.IgnoreMacros,               value: '1' }
 
   - { key: performance-inefficient-vector-operation.VectorLikeClasses,
     value: '::std::vector,QList,QByteArrayList,QItemSelection,QQueue,QStringList' }
@@ -212,5 +225,4 @@ CheckOptions:
   - { key: readability-identifier-naming.ClassConstantCase,     value: 'Any_Case' }
   - { key: readability-identifier-naming.ClassConstantPrefix,   value: 'k' }
 
-  - { key: google-runtime-int.SignedTypeSuffix,   value: '_t' }
-  - { key: google-runtime-int.UnsignedTypeSuffix, value: '_t' }
+  - { key: google-runtime-int.TypeSuffix,   value: '_t' }
