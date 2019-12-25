@@ -39,7 +39,7 @@ class MUI_PUBLIC MythDisplayMode
     void   ClearRefreshRates(void);
     void   SetRefreshRate(double Rate);
     const std::vector<double>& RefreshRates(void) const;
-    static int      FindBestMatch (const DisplayModeVector Modes,
+    static int      FindBestMatch (const DisplayModeVector& Modes,
                                    const MythDisplayMode& Mode, double& TargetRate);
     static uint64_t CalcKey       (int Width, int Height, double Rate);
     static bool     CompareRates  (double First, double Second, double Precision = 0.01);

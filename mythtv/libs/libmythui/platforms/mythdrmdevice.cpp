@@ -14,7 +14,7 @@
 
 #define LOC (QString("%1: ").arg(m_deviceName))
 
-MythDRMDevice::MythDRMDevice(QScreen *qScreen, QString Device)
+MythDRMDevice::MythDRMDevice(QScreen *qScreen, const QString& Device)
   : ReferenceCounter("DRMDev"),
     m_screen(qScreen),
     m_deviceName(Device),
@@ -319,7 +319,7 @@ QString MythDRMDevice::FindBestDevice(void)
     return QString();
 }
 
-bool MythDRMDevice::ConfirmDevice(QString Device)
+bool MythDRMDevice::ConfirmDevice(const QString& Device)
 {
     bool result = false;
     int fd = open(Device.toLocal8Bit().constData(), O_RDWR);
@@ -335,7 +335,7 @@ bool MythDRMDevice::ConfirmDevice(QString Device)
     return result;
 }
 
-drmModePropertyBlobPtr MythDRMDevice::GetBlobProperty(drmModeConnectorPtr Connector, QString Property)
+drmModePropertyBlobPtr MythDRMDevice::GetBlobProperty(drmModeConnectorPtr Connector, const QString& Property)
 {
     drmModePropertyBlobPtr result = nullptr;
     if (!Connector || Property.isEmpty())
