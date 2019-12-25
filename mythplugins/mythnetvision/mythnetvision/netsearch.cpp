@@ -373,15 +373,11 @@ void NetSearch::SearchFinished(void)
     m_nextPageToken = item->nextPageToken();
     m_prevPageToken = item->prevPageToken();
 
-    if (returned > 0)
-    {
-        m_siteList->GetItemAt(m_currentGrabber)->
-                  SetText(QString::number(searchresults), "count");
-    }
-    else
-    {
+    if (returned <= 0)
         return;
-    }
+
+    m_siteList->GetItemAt(m_currentGrabber)->
+        SetText(QString::number(searchresults), "count");
 
     if (firstitem + returned == searchresults)
         m_maxpage = m_pagenum;
