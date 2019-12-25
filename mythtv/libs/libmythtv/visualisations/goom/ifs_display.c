@@ -8,8 +8,7 @@
 #include "goom_tools.h"
 
 /* NOLINTNEXTLINE(readability-non-const-parameter) */
-void
-ifs_update (guint32 * data, const guint32 * back, int width, int height,
+void ifs_update (guint32 * data, const guint32 * back, int width, int height,
 						int increment)
 {
 	static int s_couleur = 0xc0c0c0c0;

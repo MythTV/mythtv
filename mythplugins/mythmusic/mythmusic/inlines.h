@@ -13,7 +13,7 @@
 
 static inline void stereo16_from_stereopcm8(short *l,
 					    short *r,
-					    uchar *c,
+					    const uchar *c,
 					    long cnt)
 {
     while (cnt >= 4L) {
@@ -48,7 +48,7 @@ static inline void stereo16_from_stereopcm8(short *l,
 
 static inline void stereo16_from_stereopcm16(short *l,
 					     short *r,
-					     short *s,
+					     const short *s,
 					     long cnt)
 {
     while (cnt >= 4L) {
@@ -106,7 +106,7 @@ static inline void stereo16_from_stereopcmfloat(short *l,
 
 
 static inline void mono16_from_monopcm8(short *l,
-					uchar *c,
+					const uchar *c,
 					long cnt)
 {
     while (cnt >= 4L) {
@@ -132,7 +132,7 @@ static inline void mono16_from_monopcm8(short *l,
 
 
 static inline void mono16_from_monopcm16(short *l,
-					 short *s,
+					 const short *s,
 					 long cnt)
 {
     while (cnt >= 4L) {
@@ -202,7 +202,7 @@ static inline void fast_short_set(short *p,
 
 
 static inline void fast_real_set_from_short(fftw_real *d,
-					    short *s,
+					    const short *s,
 					    long c)
 {
     while (c >= 4L) {
