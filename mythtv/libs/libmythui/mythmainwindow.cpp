@@ -262,7 +262,7 @@ int MythMainWindowPrivate::TranslateKeyNum(QKeyEvent* e)
             if ((modifiers & Qt::AltModifier) != 0U)
                 modnum |= Qt::ALT;
             modnum &= ~Qt::UNICODE_ACCEL;
-            return (keynum |= modnum);
+            return (keynum | modnum);
         }
     }
 
