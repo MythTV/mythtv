@@ -1224,7 +1224,7 @@ void DTVRecorder::HandlePAT(const ProgramAssociationTable *_pat)
         return;
     }
 
-    LOG(VB_RECORD, LOG_INFO, LOC + QString("SetPAT(%1 on 0x%2)")
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("SetPAT(%1 on pid 0x%2)")
             .arg(progNum).arg(pmtpid,0,16));
 
     ProgramAssociationTable *oldpat = m_input_pat;
