@@ -13,6 +13,7 @@ moc_*.h
 *.dylib
 object_script.*
 *~
+.#*
 .DS_Store
 .*.swp
 *.pc
