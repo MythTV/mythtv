@@ -6,6 +6,8 @@
 #include "v4l2util.h"
 #include "fourcc.h"
 #include "avformatdecoder.h"
+#include "opengl/mythrenderopengl.h"
+#include "opengl/mythdrmprimeinterop.h"
 #include "mythv4l2m2mcontext.h"
 
 // Sys
@@ -17,6 +19,8 @@ extern "C" {
 }
 
 #define LOC QString("V4L2_M2M: ")
+
+static bool s_useV4L2Request = !qgetenv("MYTHTV_V4L2_REQUEST").isEmpty();
 
 /*! \class MythV4L2M2MContext
  * \brief A handler for V4L2 Memory2Memory codecs.
@@ -76,11 +80,12 @@ MythCodecID MythV4L2M2MContext::GetSupportedCodec(AVCodecContext **Context,
     if (!HaveV4L2Codecs((*Codec)->id))
         return failure;
 
-    if (!qgetenv("MYTHTV_V4L2_REQUEST").isEmpty() && !decodeonly)
+    if (s_useV4L2Request && !decodeonly)
     {
-        return MythDRMPRIMEContext::GetPrimeCodec(Context, Codec, Stream,
-                                                  success, failure, "v4l2request",
-                                                  AV_PIX_FMT_DRM_PRIME);
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Forcing support for %1 v42l_request")
+            .arg(ff_codec_id_string((*Context)->codec_id)));
+        (*Context)->pix_fmt = AV_PIX_FMT_DRM_PRIME;
+        return success;
     }
 
     return MythDRMPRIMEContext::GetPrimeCodec(Context, Codec, Stream,
@@ -92,6 +97,8 @@ int MythV4L2M2MContext::HwDecoderInit(AVCodecContext *Context)
 {
     if (!Context)
         return -1;
+    if (s_useV4L2Request && codec_is_v4l2(m_codecID))
+        return 0;
     if (codec_is_v4l2_dec(m_codecID))
         return 0;
     return MythDRMPRIMEContext::HwDecoderInit(Context);
@@ -99,6 +106,12 @@ int MythV4L2M2MContext::HwDecoderInit(AVCodecContext *Context)
 
 void MythV4L2M2MContext::InitVideoCodec(AVCodecContext *Context, bool SelectedStream, bool &DirectRendering)
 {
+    if (s_useV4L2Request && codec_is_v4l2(m_codecID))
+    {
+        Context->get_format  = MythV4L2M2MContext::GetV4L2RequestFormat;
+        return;
+    }
+
     if (codec_is_v4l2_dec(m_codecID))
     {
         DirectRendering = false;
@@ -109,6 +122,9 @@ void MythV4L2M2MContext::InitVideoCodec(AVCodecContext *Context, bool SelectedSt
 
 bool MythV4L2M2MContext::RetrieveFrame(AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame)
 {
+    if (s_useV4L2Request && codec_is_v4l2(m_codecID))
+        return MythCodecContext::GetBuffer2(Context, Frame, AvFrame, 0);
+
     if (codec_is_v4l2_dec(m_codecID))
         return GetBuffer(Context, Frame, AvFrame, 0);
     return MythDRMPRIMEContext::RetrieveFrame(Context, Frame, AvFrame);
@@ -121,6 +137,9 @@ bool MythV4L2M2MContext::RetrieveFrame(AVCodecContext *Context, VideoFrame *Fram
 */
 void MythV4L2M2MContext::SetDecoderOptions(AVCodecContext* Context, AVCodec* Codec)
 {
+    if (s_useV4L2Request && codec_is_v4l2(m_codecID))
+        return;
+
     if (!(Context && Codec))
         return;
     if (!(Codec->priv_class && Context->priv_data))
@@ -191,7 +210,8 @@ bool MythV4L2M2MContext::HaveV4L2Codecs(AVCodecID Codec /* = AV_CODEC_ID_NONE */
 
     QMutexLocker locker(&s_drmPrimeLock);
 
-    if (!qgetenv("MYTHTV_V4L2_REQUEST").isEmpty())
+    // this a temporary workaround for v4l2_request support - assume available
+    if (s_useV4L2Request)
     {
         s_needscheck = false;
         s_supportedV4L2Codecs = s_avcodecs;
@@ -318,4 +338,77 @@ bool MythV4L2M2MContext::HaveV4L2Codecs(AVCodecID Codec /* = AV_CODEC_ID_NONE */
     if (!Codec)
         return !s_supportedV4L2Codecs.isEmpty();
     return s_supportedV4L2Codecs.contains(Codec);
+}
+
+AVPixelFormat MythV4L2M2MContext::GetV4L2RequestFormat(AVCodecContext *Context, const AVPixelFormat *PixFmt)
+{
+    while (*PixFmt != AV_PIX_FMT_NONE)
+    {
+        if (*PixFmt == AV_PIX_FMT_DRM_PRIME)
+            if (MythCodecContext::InitialiseDecoder(Context, MythV4L2M2MContext::InitialiseV4L2RequestContext,
+                                                    "V4L2 request context creation") >= 0)
+                return AV_PIX_FMT_DRM_PRIME;
+        PixFmt++;
+    }
+    return AV_PIX_FMT_NONE;
+}
+
+int MythV4L2M2MContext::InitialiseV4L2RequestContext(AVCodecContext *Context)
+{
+    if (!Context || !gCoreContext->IsUIThread())
+        return -1;
+
+    // We need a render device
+    MythRenderOpenGL* render = MythRenderOpenGL::GetOpenGLRender();
+    if (!render)
+        return -1;
+
+    // The interop must have a reference to the player so it can be deleted
+    // from the main thread.
+    MythPlayer *player = nullptr;
+    auto *decoder = reinterpret_cast<AvFormatDecoder*>(Context->opaque);
+    if (decoder)
+        player = decoder->GetPlayer();
+    if (!player)
+        return -1;
+
+    // Check interop support
+    MythOpenGLInterop::Type type = MythOpenGLInterop::GetInteropType(FMT_DRMPRIME, player);
+    if (type == MythOpenGLInterop::Unsupported)
+        return -1;
+
+    // Create interop
+    MythDRMPRIMEInterop *interop = MythDRMPRIMEInterop::Create(render, type);
+    if (!interop)
+        return -1;
+
+    // Set the player required to process interop release
+    interop->SetPlayer(player);
+
+    // Allocate the device context
+    AVBufferRef* hwdeviceref = MythCodecContext::CreateDevice(AV_HWDEVICE_TYPE_DRM, interop);
+    if (!hwdeviceref)
+    {
+        interop->DecrRef();
+        return -1;
+    }
+
+    auto* hwdevicecontext = reinterpret_cast<AVHWDeviceContext*>(hwdeviceref->data);
+    if (!hwdevicecontext || (hwdevicecontext && !hwdevicecontext->hwctx))
+    {
+        interop->DecrRef();
+        return -1;
+    }
+
+    // Initialise device context
+    if (av_hwdevice_ctx_init(hwdeviceref) < 0)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to initialise device context");
+        av_buffer_unref(&hwdeviceref);
+        interop->DecrRef();
+        return -1;
+    }
+
+    Context->hw_device_ctx = hwdeviceref;
+    return 0;
 }
