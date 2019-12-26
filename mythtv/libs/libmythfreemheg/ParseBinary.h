@@ -31,9 +31,9 @@ class MHGroup;
 class MHParseBinary: public MHParseBase
 {
   public:
-    MHParseBinary(QByteArray &program)
+    explicit MHParseBinary(QByteArray &program)
         : m_data(program) {}
-    virtual ~MHParseBinary() {}
+    ~MHParseBinary() override = default;
 
     // Parse the binary and return a pointer to the parse tree
     MHParseNode *Parse() override // MHParseBase

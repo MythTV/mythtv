@@ -8,7 +8,7 @@ class ScreenSaverDBus : public ScreenSaver
 {
   public:
     ScreenSaverDBus();
-    ~ScreenSaverDBus();
+    ~ScreenSaverDBus() override;
 
     void Disable(void) override; // ScreenSaver
     void Restore(void) override; // ScreenSaver

@@ -120,8 +120,8 @@ class TeletextReader
     TeletextPage *FindPage(int page, int dir = 0)
         { return const_cast<TeletextPage*>(FindPageInternal(page, dir)); }
 
-    const TeletextSubPage *FindSubPageInternal(int,int,int) const;
-    const TeletextPage    *FindPageInternal(int,int) const;
+    const TeletextSubPage *FindSubPageInternal(int page, int subpage, int direction) const;
+    const TeletextPage    *FindPageInternal(int page, int direction) const;
 
     int              m_curpage            {0x100};
     int              m_cursubpage         {-1};

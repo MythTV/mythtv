@@ -24,10 +24,10 @@ class MythNewsEditor : public MythScreenType
   public:
     MythNewsEditor(NewsSite *site, bool edit, MythScreenStack *parent,
                    const QString &name = "MythNewsEditor");
-   ~MythNewsEditor();
+   ~MythNewsEditor() override;
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent*) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
   private:
     mutable QMutex  m_lock             {QMutex::Recursive};

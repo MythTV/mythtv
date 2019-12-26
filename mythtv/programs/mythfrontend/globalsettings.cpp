@@ -688,14 +688,14 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
     PlaybackProfileConfig *parent, uint idx, ProfileItem &_item) :
     m_item(_item), m_parentConfig(parent), m_index(idx)
 {
-    m_width_range  = new TransTextEditSetting();
-    m_height_range = new TransTextEditSetting();
+    m_widthRange   = new TransTextEditSetting();
+    m_heightRange  = new TransTextEditSetting();
     m_codecs       = new TransMythUIComboBoxSetting(true);
     m_framerate    = new TransTextEditSetting();
     m_decoder      = new TransMythUIComboBoxSetting();
-    m_max_cpus     = new TransMythUISpinBoxSetting(1, HAVE_THREADS ? 8 : 1, 1, 1);
-    m_skiploop     = new TransMythUICheckBoxSetting();
-    m_vidrend      = new TransMythUIComboBoxSetting();
+    m_maxCpus      = new TransMythUISpinBoxSetting(1, HAVE_THREADS ? 8 : 1, 1, 1);
+    m_skipLoop     = new TransMythUICheckBoxSetting();
+    m_vidRend      = new TransMythUIComboBoxSetting();
     m_singleDeint  = new TransMythUIComboBoxSetting();
     m_singleShader = new TransMythUICheckBoxSetting();
     m_singleDriver = new TransMythUICheckBoxSetting();
@@ -708,11 +708,11 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
         "[<= nnnn]. Also [nnnn] for an exact match. "
         "You can also use more than 1 expression with & between."));
     const QString rangeHelpDec(tr("Numbers can have up to 3 decimal places."));
-    m_width_range->setLabel(tr("Width Range"));
-    m_width_range->setHelpText(tr("Optional setting to restrict this profile "
+    m_widthRange->setLabel(tr("Width Range"));
+    m_widthRange->setHelpText(tr("Optional setting to restrict this profile "
         "to videos with a selected width range. ") + rangeHelp);
-    m_height_range->setLabel(tr("Height Range"));
-    m_height_range->setHelpText(tr("Optional setting to restrict this profile "
+    m_heightRange->setLabel(tr("Height Range"));
+    m_heightRange->setHelpText(tr("Optional setting to restrict this profile "
         "to videos with a selected height range. ") + rangeHelp);
     m_codecs->setLabel(tr("Video Formats"));
     m_codecs->addSelection("","",true);
@@ -730,9 +730,9 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
     m_framerate->setHelpText(tr("Optional setting to restrict this profile "
         "to a range of frame rates. ") + rangeHelp +" "+rangeHelpDec);
     m_decoder->setLabel(tr("Decoder"));
-    m_max_cpus->setLabel(tr("Max CPUs"));
-    m_skiploop->setLabel(tr("Deblocking filter"));
-    m_vidrend->setLabel(tr("Video renderer"));
+    m_maxCpus->setLabel(tr("Max CPUs"));
+    m_skipLoop->setLabel(tr("Deblocking filter"));
+    m_vidRend->setLabel(tr("Video renderer"));
 
     QString shaderdesc = "\t" + tr("Prefer OpenGL deinterlacers");
     QString driverdesc = "\t" + tr("Prefer driver deinterlacers");
@@ -780,26 +780,26 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
         m_doubleDeint->addSelection(it->second, it->first);
     }
 
-    m_max_cpus->setHelpText(
+    m_maxCpus->setHelpText(
         tr("Maximum number of CPU cores used for video decoding and filtering.") +
         (HAVE_THREADS ? "" :
          tr(" Multithreaded decoding disabled-only one CPU "
             "will be used, please recompile with "
             "--enable-ffmpeg-pthreads to enable.")));
 
-    m_skiploop->setHelpText(
+    m_skipLoop->setHelpText(
         tr("When unchecked the deblocking loopfilter will be disabled. ") + "\n" +
         tr("Disabling will significantly reduce the load on the CPU for software decoding of "
            "H.264 and HEVC material but may significantly reduce video quality."));
 
-    addChild(m_width_range);
-    addChild(m_height_range);
+    addChild(m_widthRange);
+    addChild(m_heightRange);
     addChild(m_codecs);
     addChild(m_framerate);
     addChild(m_decoder);
-    addChild(m_max_cpus);
-    addChild(m_skiploop);
-    addChild(m_vidrend);
+    addChild(m_maxCpus);
+    addChild(m_skipLoop);
+    addChild(m_vidRend);
 
     addChild(m_singleDeint);
     addChild(m_singleShader);
@@ -808,9 +808,9 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
     addChild(m_doubleShader);
     addChild(m_doubleDriver);
 
-    connect(m_width_range, SIGNAL(valueChanged(const QString&)),
+    connect(m_widthRange, SIGNAL(valueChanged(const QString&)),
             this,    SLOT(widthChanged(const QString&)));
-    connect(m_height_range, SIGNAL(valueChanged(const QString&)),
+    connect(m_heightRange, SIGNAL(valueChanged(const QString&)),
             this,    SLOT(heightChanged(const QString&)));
     connect(m_codecs, SIGNAL(valueChanged(const QString&)),
             this,    SLOT(InitLabel()));
@@ -818,7 +818,7 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
             this,    SLOT(framerateChanged(const QString&)));
     connect(m_decoder, SIGNAL(valueChanged(const QString&)),
             this,    SLOT(decoderChanged(const QString&)));
-    connect(m_vidrend, SIGNAL(valueChanged(const QString&)),
+    connect(m_vidRend, SIGNAL(valueChanged(const QString&)),
             this,    SLOT(vrenderChanged(const QString&)));
     connect(m_singleDeint, SIGNAL(valueChanged(const QString&)),
             this,    SLOT(SingleQualityChanged(const QString&)));
@@ -871,8 +871,8 @@ void PlaybackProfileItemConfig::Load(void)
         height_value.append(tmp);
     }
 
-    m_width_range->setValue(width_value);
-    m_height_range->setValue(height_value);
+    m_widthRange->setValue(width_value);
+    m_heightRange->setValue(height_value);
     m_codecs->setValue(m_item.Get("cond_codecs"));
     m_framerate->setValue(m_item.Get("cond_framerate"));
 
@@ -901,12 +901,12 @@ void PlaybackProfileItemConfig::Load(void)
     m_decoder->setHelpText(VideoDisplayProfile::GetDecoderHelp(pdecoder));
 
     if (!pmax_cpus.isEmpty())
-        m_max_cpus->setValue(pmax_cpus.toInt());
+        m_maxCpus->setValue(pmax_cpus.toInt());
 
-    m_skiploop->setValue((!pskiploop.isEmpty()) ? (pskiploop.toInt() > 0) : true);
+    m_skipLoop->setValue((!pskiploop.isEmpty()) ? (pskiploop.toInt() > 0) : true);
 
     if (!prenderer.isEmpty())
-        m_vidrend->setValue(prenderer);
+        m_vidRend->setValue(prenderer);
 
     LoadQuality(m_singleDeint, m_singleShader, m_singleDriver, psingledeint);
     LoadQuality(m_doubleDeint, m_doubleShader, m_doubleDriver, pdoubledeint);
@@ -918,14 +918,14 @@ void PlaybackProfileItemConfig::Save(void)
 {
     m_item.Set("pref_cmp0",          QString());
     m_item.Set("pref_cmp1",          QString());
-    m_item.Set("cond_width",         m_width_range->getValue());
-    m_item.Set("cond_height",        m_height_range->getValue());
+    m_item.Set("cond_width",         m_widthRange->getValue());
+    m_item.Set("cond_height",        m_heightRange->getValue());
     m_item.Set("cond_codecs",        m_codecs->getValue());
     m_item.Set("cond_framerate",     m_framerate->getValue());
     m_item.Set("pref_decoder",       m_decoder->getValue());
-    m_item.Set("pref_max_cpus",      m_max_cpus->getValue());
-    m_item.Set("pref_skiploop",      (m_skiploop->boolValue()) ? "1" : "0");
-    m_item.Set("pref_videorenderer", m_vidrend->getValue());
+    m_item.Set("pref_max_cpus",      m_maxCpus->getValue());
+    m_item.Set("pref_skiploop",      (m_skipLoop->boolValue()) ? "1" : "0");
+    m_item.Set("pref_videorenderer", m_vidRend->getValue());
     m_item.Set("pref_deint0", GetQuality(m_singleDeint, m_singleShader, m_singleDriver));
     m_item.Set("pref_deint1", GetQuality(m_doubleDeint, m_doubleShader, m_doubleDriver));
 }
@@ -939,7 +939,7 @@ void PlaybackProfileItemConfig::widthChanged(const QString &val)
     if (!ok)
     {
         ShowOkPopup(tr("Invalid width specification(%1), discarded").arg(val));
-        m_width_range->setValue(oldvalue);
+        m_widthRange->setValue(oldvalue);
     }
     InitLabel();
 }
@@ -953,7 +953,7 @@ void PlaybackProfileItemConfig::heightChanged(const QString &val)
     if (!ok)
     {
         ShowOkPopup(tr("Invalid height specification(%1), discarded").arg(val));
-        m_height_range->setValue(oldvalue);
+        m_heightRange->setValue(oldvalue);
     }
     InitLabel();
 }
@@ -974,7 +974,7 @@ void PlaybackProfileItemConfig::framerateChanged(const QString &val)
 
 void PlaybackProfileItemConfig::decoderChanged(const QString &dec)
 {
-    QString     vrenderer = m_vidrend->getValue();
+    QString     vrenderer = m_vidRend->getValue();
     QStringList renderers = VideoDisplayProfile::GetVideoRenderers(dec);
     QStringList::const_iterator it;
 
@@ -984,12 +984,14 @@ void PlaybackProfileItemConfig::decoderChanged(const QString &dec)
     if (prenderer.isEmpty())
         prenderer = VideoDisplayProfile::GetPreferredVideoRenderer(dec);
 
-    m_vidrend->clearSelections();
+    m_vidRend->clearSelections();
     for (it = renderers.begin(); it != renderers.end(); ++it)
+    {
         if ((!(*it).contains("null")))
-            m_vidrend->addSelection(VideoDisplayProfile::GetVideoRendererName(*it),
+            m_vidRend->addSelection(VideoDisplayProfile::GetVideoRendererName(*it),
                                     *it, (*it == prenderer));
-    QString vrenderer2 = m_vidrend->getValue();
+    }
+    QString vrenderer2 = m_vidRend->getValue();
     vrenderChanged(vrenderer2);
 
     m_decoder->setHelpText(VideoDisplayProfile::GetDecoderHelp(dec));
@@ -998,7 +1000,7 @@ void PlaybackProfileItemConfig::decoderChanged(const QString &dec)
 
 void PlaybackProfileItemConfig::vrenderChanged(const QString &renderer)
 {
-    m_vidrend->setHelpText(VideoDisplayProfile::GetVideoRendererHelp(renderer));
+    m_vidRend->setHelpText(VideoDisplayProfile::GetVideoRendererHelp(renderer));
     InitLabel();
 }
 
@@ -1127,12 +1129,12 @@ void PlaybackProfileItemConfig::IncreasePriority(void)
 
 PlaybackProfileConfig::PlaybackProfileConfig(QString profilename,
                                              StandardSetting *parent) :
-    m_profile_name(std::move(profilename))
+    m_profileName(std::move(profilename))
 {
     setVisible(false);
-    m_groupid = VideoDisplayProfile::GetProfileGroupID(
-        m_profile_name, gCoreContext->GetHostName());
-    m_items = VideoDisplayProfile::LoadDB(m_groupid);
+    m_groupId = VideoDisplayProfile::GetProfileGroupID(
+        m_profileName, gCoreContext->GetHostName());
+    m_items = VideoDisplayProfile::LoadDB(m_groupId);
     InitUI(parent);
 }
 
@@ -1141,10 +1143,10 @@ void PlaybackProfileItemConfig::InitLabel(void)
     QString andStr = tr("&", "and");
     QString str;
 
-    QString width = m_width_range->getValue();
+    QString width = m_widthRange->getValue();
     if (!width.isEmpty())
         str += " " + tr("width","video formats") + " " + width;
-    QString height = m_height_range->getValue();
+    QString height = m_heightRange->getValue();
     if (!height.isEmpty())
         str += " " + tr("height","video formats") + " " + height;
 
@@ -1158,7 +1160,7 @@ void PlaybackProfileItemConfig::InitLabel(void)
     str += " -> ";
     str += VideoDisplayProfile::GetDecoderName(m_decoder->getValue());
     str += " " + andStr + ' ';
-    str += VideoDisplayProfile::GetVideoRendererName(m_vidrend->getValue());
+    str += VideoDisplayProfile::GetVideoRendererName(m_vidRend->getValue());
     setLabel(str);
 }
 
@@ -1168,8 +1170,8 @@ void PlaybackProfileConfig::InitUI(StandardSetting *parent)
     m_markForDeletion->setLabel(tr("Mark for deletion"));
     m_addNewEntry = new ButtonStandardSetting(tr("Add New Entry"));
 
-    parent->addTargetedChild(m_profile_name, m_markForDeletion);
-    parent->addTargetedChild(m_profile_name, m_addNewEntry);
+    parent->addTargetedChild(m_profileName, m_markForDeletion);
+    parent->addTargetedChild(m_profileName, m_addNewEntry);
 
     connect(m_addNewEntry, SIGNAL(clicked()), SLOT(AddNewEntry()));
 
@@ -1184,7 +1186,7 @@ StandardSetting * PlaybackProfileConfig::InitProfileItem(
 
     m_items[i].Set("pref_priority", QString::number(i + 1));
 
-    parent->addTargetedChild(m_profile_name, ppic);
+    parent->addTargetedChild(m_profileName, ppic);
     m_profiles.push_back(ppic);
     return ppic;
 }
@@ -1193,7 +1195,7 @@ void PlaybackProfileConfig::Save(void)
 {
     if (m_markForDeletion->boolValue())
     {
-        VideoDisplayProfile::DeleteProfileGroup(m_profile_name,
+        VideoDisplayProfile::DeleteProfileGroup(m_profileName,
                                                 gCoreContext->GetHostName());
         return;
     }
@@ -1203,7 +1205,7 @@ void PlaybackProfileConfig::Save(void)
         profile->Save();
     }
 
-    bool ok = VideoDisplayProfile::DeleteDB(m_groupid, m_del_items);
+    bool ok = VideoDisplayProfile::DeleteDB(m_groupId, m_delItems);
     if (!ok)
     {
         LOG(VB_GENERAL, LOG_ERR,
@@ -1211,7 +1213,7 @@ void PlaybackProfileConfig::Save(void)
         return;
     }
 
-    ok = VideoDisplayProfile::SaveDB(m_groupid, m_items);
+    ok = VideoDisplayProfile::SaveDB(m_groupId, m_items);
     if (!ok)
     {
         LOG(VB_GENERAL, LOG_ERR,
@@ -1229,7 +1231,7 @@ void PlaybackProfileConfig::DeleteProfileItem(
     }
 
     uint i = profileToDelete->GetIndex();
-    m_del_items.push_back(m_items[i]);
+    m_delItems.push_back(m_items[i]);
     m_items.erase(m_items.begin() + i);
 
     ReloadSettings();
@@ -1251,12 +1253,12 @@ void PlaybackProfileConfig::AddNewEntry(void)
 
 void PlaybackProfileConfig::ReloadSettings(void)
 {
-    getParent()->removeTargetedChild(m_profile_name, m_markForDeletion);
-    getParent()->removeTargetedChild(m_profile_name, m_addNewEntry);
+    getParent()->removeTargetedChild(m_profileName, m_markForDeletion);
+    getParent()->removeTargetedChild(m_profileName, m_addNewEntry);
 
     foreach (StandardSetting *setting, m_profiles)
     {
-        getParent()->removeTargetedChild(m_profile_name, setting);
+        getParent()->removeTargetedChild(m_profileName, setting);
     }
     m_profiles.clear();
 
@@ -2777,7 +2779,7 @@ static HostComboBoxSetting *ChannelGroupDefault()
     ChannelGroupList::iterator it;
 
     for (it = changrplist.begin(); it < changrplist.end(); ++it)
-       gc->addSelection(it->m_name, QString("%1").arg(it->m_grpid));
+       gc->addSelection(it->m_name, QString("%1").arg(it->m_grpId));
 
     gc->setHelpText(ChannelGroupSettings::tr("Default channel group to be "
                                              "shown in the EPG.  Pressing "
@@ -3998,17 +4000,17 @@ MainGeneralSettings::MainGeneralSettings()
 #ifdef USING_LIBCEC
     HostCheckBoxSetting *cec = CECEnabled();
     remotecontrol->addChild(cec);
-    m_CECPowerOnTVAllowed = CECPowerOnTVAllowed();
-    m_CECPowerOffTVAllowed = CECPowerOffTVAllowed();
-    m_CECPowerOnTVOnStart = CECPowerOnTVOnStart();
-    m_CECPowerOffTVOnExit = CECPowerOffTVOnExit();
-    cec->addTargetedChild("1",m_CECPowerOnTVAllowed);
-    cec->addTargetedChild("1",m_CECPowerOffTVAllowed);
-    cec->addTargetedChild("1",m_CECPowerOnTVOnStart);
-    cec->addTargetedChild("1",m_CECPowerOffTVOnExit);
-    connect(m_CECPowerOnTVAllowed, SIGNAL(valueChanged(bool)),
+    m_cecPowerOnTVAllowed = CECPowerOnTVAllowed();
+    m_cecPowerOffTVAllowed = CECPowerOffTVAllowed();
+    m_cecPowerOnTVOnStart = CECPowerOnTVOnStart();
+    m_cecPowerOffTVOnExit = CECPowerOffTVOnExit();
+    cec->addTargetedChild("1",m_cecPowerOnTVAllowed);
+    cec->addTargetedChild("1",m_cecPowerOffTVAllowed);
+    cec->addTargetedChild("1",m_cecPowerOnTVOnStart);
+    cec->addTargetedChild("1",m_cecPowerOffTVOnExit);
+    connect(m_cecPowerOnTVAllowed, SIGNAL(valueChanged(bool)),
             this, SLOT(cecChanged(bool)));
-    connect(m_CECPowerOffTVAllowed, SIGNAL(valueChanged(bool)),
+    connect(m_cecPowerOffTVAllowed, SIGNAL(valueChanged(bool)),
             this, SLOT(cecChanged(bool)));
 #endif // USING_LIBCEC
     addChild(remotecontrol);
@@ -4029,20 +4031,20 @@ MainGeneralSettings::MainGeneralSettings()
 #ifdef USING_LIBCEC
 void MainGeneralSettings::cecChanged(bool /*setting*/)
 {
-    if (m_CECPowerOnTVAllowed->boolValue())
-        m_CECPowerOnTVOnStart->setEnabled(true);
+    if (m_cecPowerOnTVAllowed->boolValue())
+        m_cecPowerOnTVOnStart->setEnabled(true);
     else
     {
-        m_CECPowerOnTVOnStart->setEnabled(false);
-        m_CECPowerOnTVOnStart->setValue(false);
+        m_cecPowerOnTVOnStart->setEnabled(false);
+        m_cecPowerOnTVOnStart->setValue(false);
     }
 
-    if (m_CECPowerOffTVAllowed->boolValue())
-        m_CECPowerOffTVOnExit->setEnabled(true);
+    if (m_cecPowerOffTVAllowed->boolValue())
+        m_cecPowerOffTVOnExit->setEnabled(true);
     else
     {
-        m_CECPowerOffTVOnExit->setEnabled(false);
-        m_CECPowerOffTVOnExit->setValue(false);
+        m_cecPowerOffTVOnExit->setEnabled(false);
+        m_cecPowerOffTVOnExit->setValue(false);
     }
 }
 #endif  // USING_LIBCEC
@@ -4097,13 +4099,17 @@ void PlayBackScaling::updateButton(MythUIButtonListItem *item)
         m_horizScan->getValue() == "0" &&
         m_yScan->getValue() == "0" &&
         m_xScan->getValue() == "0")
+    {
         item->SetText(tr("No scaling"),"value");
+    }
     else
+    {
         item->SetText(QString("%1%x%2%+%3%+%4%")
                 .arg(m_horizScan->getValue())
                 .arg(m_vertScan->getValue())
                 .arg(m_xScan->getValue())
                 .arg(m_yScan->getValue()), "value");
+    }
 }
 
 void PlayBackScaling::childChanged(StandardSetting * /*setting*/)
@@ -4476,13 +4482,17 @@ void GuiDimension::updateButton(MythUIButtonListItem *item)
          m_height->getValue() == "0") &&
         m_offsetX->getValue() == "0" &&
         m_offsetY->getValue() == "0")
+    {
         item->SetText(AppearanceSettings::tr("Fullscreen"), "value");
+    }
     else
+    {
         item->SetText(QString("%1x%2+%3+%4")
                       .arg(m_width->getValue())
                       .arg(m_height->getValue())
                       .arg(m_offsetX->getValue())
                       .arg(m_offsetY->getValue()), "value");
+    }
 }
 
 void GuiDimension::childChanged(StandardSetting * /*setting*/)
@@ -4523,7 +4533,7 @@ AppearanceSettings::AppearanceSettings()
     m_xineramaAspect = XineramaMonitorAspectRatio();
     screen->addChild(m_xineramaScreen);
     screen->addChild(m_xineramaAspect);
-    PopulateScreens(m_display->GetScreenCount());
+    PopulateScreens(MythDisplay::GetScreenCount());
     connect(m_display, &MythDisplay::ScreenCountChanged, this, &AppearanceSettings::PopulateScreens);
 
 //    screen->addChild(DisplaySizeHeight());
@@ -4533,7 +4543,7 @@ AppearanceSettings::AppearanceSettings()
 
     screen->addChild(GuiSizeForTV());
     screen->addChild(HideMouseCursor());
-    if (!GetMythMainWindow()->WindowIsAlwaysFullscreen())
+    if (!MythMainWindow::WindowIsAlwaysFullscreen())
     {
         screen->addChild(RunInWindow());
         screen->addChild(AlwaysOnTop());

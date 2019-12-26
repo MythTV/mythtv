@@ -18,7 +18,7 @@ class MUI_PUBLIC MythUIEditBar : public MythUIType
   public:
     MythUIEditBar(MythUIType *parent, const QString &name)
         : MythUIType(parent, name) {}
-   ~MythUIEditBar() = default;
+   ~MythUIEditBar() override = default;
 
     void SetTotal(double total);
     void SetEditPosition(double position);

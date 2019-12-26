@@ -14,9 +14,11 @@ void ScheduledRecording::SendReschedule(const QStringList &request)
         slist << QString("RESCHEDULE_RECORDINGS");
         slist << request;
         if (!gCoreContext->SendReceiveStringList(slist))
+        {
             LOG(VB_GENERAL, LOG_ERR,
                 QString("Error rescheduling %1 in "
                         "ScheduledRecording::SendReschedule").arg(request[0]));
+        }
     }
 }
 

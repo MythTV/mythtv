@@ -56,7 +56,7 @@ void MythServer::newTcpConnection(qt_socket_fd_t socket)
 }
 
 MythSocketManager::MythSocketManager() :
-    m_server(nullptr), m_threadPool("MythSocketManager")
+    m_threadPool("MythSocketManager")
 {
 }
 
@@ -321,9 +321,11 @@ void MythSocketManager::ProcessRequestWork(MythSocket *sock)
     if (!handled)
     {
         if (command == "BACKEND_MESSAGE")
+        {
             // never respond to these... ever, even if they are not otherwise
             // handled by something in m_handlerMap
             return;
+        }
 
         listline.clear();
         listline << "ERROR" << "unknown command";

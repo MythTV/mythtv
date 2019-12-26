@@ -27,7 +27,7 @@ class UIEffects
             x += rect.width();
         if (Bottom == m_centre || BottomLeft == m_centre || BottomRight == m_centre)
             y += rect.height();
-        return QPointF(x, y);
+        return {x, y};
     }
 
     QRect GetExtent(const QSize &size);
@@ -45,7 +45,7 @@ class MythUIAnimation : public QVariantAnimation, XMLParseBase
     enum Type    { Alpha, Position, Zoom, HorizontalZoom, VerticalZoom, Angle };
     enum Trigger { AboutToHide, AboutToShow };
 
-    MythUIAnimation(MythUIType* parent = nullptr,
+    explicit MythUIAnimation(MythUIType* parent = nullptr,
                     Trigger trigger = AboutToShow, Type type = Alpha)
         : m_parent(parent), m_type(type), m_trigger(trigger) {}
     void Activate(void);

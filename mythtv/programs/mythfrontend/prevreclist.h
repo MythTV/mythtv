@@ -32,7 +32,7 @@ class PrevRecordedList : public ScheduleCommon
   public:
     explicit PrevRecordedList(MythScreenStack *parent, uint recid = 0,
                         QString title = QString());
-    ~PrevRecordedList();
+    ~PrevRecordedList() override;
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *e) override; // MythScreenType
     void customEvent(QEvent *event) override; // ScheduleCommon

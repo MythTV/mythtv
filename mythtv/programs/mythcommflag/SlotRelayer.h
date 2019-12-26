@@ -18,18 +18,17 @@ class SlotRelayer : public QObject
     Q_OBJECT
 
   public:
-    explicit SlotRelayer(void (*fp_in)(const QString&)) :
-        fp_qstring(fp_in), fp_void(nullptr) {}
-    explicit SlotRelayer(void (*fp_in)()) : fp_qstring(nullptr), fp_void(fp_in) {};
+    explicit SlotRelayer(void (*fp_in)(const QString&)) : m_fpQstring(fp_in) {}
+    explicit SlotRelayer(void (*fp_in)()) : m_fpVoid(fp_in) {};
 
   public slots:
-    void relay(const QString& arg) {if (fp_qstring) fp_qstring(arg);}
-    void relay() {if (fp_void) fp_void();}
+    void relay(const QString& arg) {if (m_fpQstring) m_fpQstring(arg);}
+    void relay() {if (m_fpVoid) m_fpVoid();}
 
   private:
-    virtual ~SlotRelayer() = default;
-    void (*fp_qstring)(const QString&);
-    void (*fp_void)();
+    ~SlotRelayer() override = default;
+    void (*m_fpQstring)(const QString&) { nullptr };
+    void (*m_fpVoid)()                  { nullptr };
 };
 
 #endif

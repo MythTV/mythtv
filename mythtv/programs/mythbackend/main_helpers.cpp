@@ -303,9 +303,11 @@ int handle_command(const MythBackendCommandLineParser &cmdline)
     if (cmdline.toBool("event"))
         eventString = cmdline.toString("event");
     else if (cmdline.toBool("systemevent"))
+    {
         eventString = "SYSTEM_EVENT " +
                       cmdline.toString("systemevent") +
                       QString(" SENDER %1").arg(gCoreContext->GetHostName());
+    }
 
     if (!eventString.isEmpty())
     {

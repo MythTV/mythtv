@@ -232,7 +232,7 @@ void MythRAOPConnection::udpDataReady(QByteArray buf, const QHostAddress& /*peer
     if (m_watchdogTimer)
         m_watchdogTimer->start(10000);
 
-    if (!m_audio || !m_codec || !m_codeccontext)
+    if (!m_audio || !m_codec || !m_codecContext)
         return;
 
     uint8_t  type;
@@ -312,9 +312,11 @@ void MythRAOPConnection::udpDataReady(QByteArray buf, const QHostAddress& /*peer
             m_resends.remove(seq);
         }
         else
+        {
             LOG(VB_PLAYBACK, LOG_WARNING, LOC +
                 QString("Received unexpected resent packet %1")
                 .arg(seq));
+        }
     }
 
     // Check that the audio packet is valid, do so by decoding it. If an error
@@ -613,14 +615,14 @@ uint32_t MythRAOPConnection::decodeAudioPacket(uint8_t type,
     int aeslen = len & ~0xf;
     unsigned char iv[16];
     unsigned char decrypted_data[MAX_PACKET_SIZE];
-    memcpy(iv, m_AESIV.constData(), sizeof(iv));
+    memcpy(iv, m_aesIV.constData(), sizeof(iv));
     AES_cbc_encrypt((const unsigned char *)data_in,
                     decrypted_data, aeslen,
                     &m_aesKey, iv, AES_DECRYPT);
     memcpy(decrypted_data + aeslen, data_in + aeslen, len - aeslen);
 
     AVPacket tmp_pkt;
-    AVCodecContext *ctx = m_codeccontext;
+    AVCodecContext *ctx = m_codecContext;
 
     av_init_packet(&tmp_pkt);
     tmp_pkt.data = decrypted_data;
@@ -805,7 +807,7 @@ void MythRAOPConnection::audioRetry(void)
         CreateDecoder();
     }
 
-    if (m_audio && m_codec && m_codeccontext)
+    if (m_audio && m_codec && m_codecContext)
     {
         StopAudioTimer();
     }
@@ -1078,10 +1080,10 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
             else if (line.startsWith("a=aesiv:"))
             {
                 QString aesiv = line.mid(8).trimmed();
-                m_AESIV = QByteArray::fromBase64(aesiv.toLatin1());
+                m_aesIV = QByteArray::fromBase64(aesiv.toLatin1());
                 LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
                     QString("AESIV: %1 (decoded size %2)")
-                    .arg(aesiv).arg(m_AESIV.size()));
+                    .arg(aesiv).arg(m_aesIV.size()));
             }
             else if (line.startsWith("a=fmtp:"))
             {
@@ -1615,8 +1617,8 @@ bool MythRAOPConnection::CreateDecoder(void)
         return false;
     }
 
-    m_codeccontext = avcodec_alloc_context3(m_codec);
-    if (m_codeccontext)
+    m_codecContext = avcodec_alloc_context3(m_codec);
+    if (m_codecContext)
     {
         auto *extradata = new unsigned char[36];
         memset(extradata, 0, 36);
@@ -1638,10 +1640,10 @@ bool MythRAOPConnection::CreateDecoder(void)
             extradata[19] = m_audioFormat[5]; // rice_initialhistory
             extradata[20] = m_audioFormat[6]; // rice_kmodifier
         }
-        m_codeccontext->extradata = extradata;
-        m_codeccontext->extradata_size = 36;
-        m_codeccontext->channels = m_channels;
-        if (avcodec_open2(m_codeccontext, m_codec, nullptr) < 0)
+        m_codecContext->extradata = extradata;
+        m_codecContext->extradata_size = 36;
+        m_codecContext->channels = m_channels;
+        if (avcodec_open2(m_codecContext, m_codec, nullptr) < 0)
         {
             LOG(VB_PLAYBACK, LOG_ERR, LOC +
                 "Failed to open ALAC decoder - going silent...");
@@ -1656,9 +1658,9 @@ bool MythRAOPConnection::CreateDecoder(void)
 
 void MythRAOPConnection::DestroyDecoder(void)
 {
-    if (m_codeccontext)
+    if (m_codecContext)
     {
-        avcodec_free_context(&m_codeccontext);
+        avcodec_free_context(&m_codecContext);
     }
     m_codec = nullptr;
 }
@@ -1782,7 +1784,7 @@ void MythRAOPConnection::SendNotification(bool update)
 
     MythNotification *n;
 
-    if (!update || !m_firstsend)
+    if (!update || !m_firstSend)
     {
         n = new MythMediaNotification(MythNotification::New,
                                       image, m_dmap, duration, position);
@@ -1797,6 +1799,6 @@ void MythRAOPConnection::SendNotification(bool update)
     n->SetDuration(5);
     n->SetFullScreen(gCoreContext->GetBoolSetting("AirPlayFullScreen"));
     GetNotificationCenter()->Queue(*n);
-    m_firstsend = true;
+    m_firstSend = true;
     delete n;
 }

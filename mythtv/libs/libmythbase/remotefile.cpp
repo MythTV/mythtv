@@ -1354,9 +1354,11 @@ QStringList RemoteFile::FindFileList(const QString& filename, const QString& hos
         else
         {
             if (!sgroup.FindFile(filename).isEmpty())
+            {
                 strList << MythCoreContext::GenMythURL(hostName,
                                                        gCoreContext->GetBackendServerPort(hostName),
                                                        filename, storageGroup);
+            }
         }
 
         if (!strList.isEmpty() || !allowFallback)

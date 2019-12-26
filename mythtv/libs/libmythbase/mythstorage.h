@@ -3,6 +3,8 @@
 #ifndef MYTHSTORAGE_H
 #define MYTHSTORAGE_H
 
+#include <utility>
+
 // Qt headers
 #include <QString>
 
@@ -34,10 +36,12 @@ class MBASE_PUBLIC Storage
 class MBASE_PUBLIC DBStorage : public Storage
 {
   public:
-    DBStorage(StorageUser *user, const QString &table, const QString &column) :
-        m_user(user), m_tablename(table), m_columnname(column) { }
+    DBStorage(StorageUser *user, QString table, QString column) :
+        m_user(user),
+        m_tablename(std::move(table)),
+        m_columnname(std::move(column)) { }
 
-    virtual ~DBStorage() = default;
+    ~DBStorage() override = default;
 
   protected:
     QString GetColumnName(void) const { return m_columnname; }
@@ -54,7 +58,7 @@ class MBASE_PUBLIC SimpleDBStorage : public DBStorage
     SimpleDBStorage(StorageUser *user,
                     const QString &table, const QString &column) :
         DBStorage(user, table, column) { m_initval.clear(); }
-    virtual ~SimpleDBStorage() = default;
+    ~SimpleDBStorage() override = default;
 
     void Load(void) override; // Storage
     void Save(void) override; // Storage
@@ -75,10 +79,11 @@ class MBASE_PUBLIC GenericDBStorage : public SimpleDBStorage
   public:
     GenericDBStorage(StorageUser *user,
                      const QString &table, const QString &column,
-                     const QString &keycolumn, const QString &keyvalue = QString()) :
+                     QString keycolumn, QString keyvalue = QString()) :
         SimpleDBStorage(user, table, column),
-        m_keycolumn(keycolumn), m_keyvalue(keyvalue) {}
-    virtual ~GenericDBStorage() = default;
+        m_keycolumn(std::move(keycolumn)),
+        m_keyvalue(std::move(keyvalue)) {}
+    ~GenericDBStorage() override = default;
 
     void SetKeyValue(const QString &val) { m_keyvalue = val; }
     void SetKeyValue(long long val) { m_keyvalue = QString::number(val); }
@@ -96,7 +101,7 @@ class MBASE_PUBLIC TransientStorage : public Storage
 {
   public:
     TransientStorage() = default;
-    virtual ~TransientStorage() = default;
+    ~TransientStorage() override = default;
 
     void Load(void) override { } // Storage
     void Save(void) override { } // Storage

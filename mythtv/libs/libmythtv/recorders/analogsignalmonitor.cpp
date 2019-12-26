@@ -30,7 +30,7 @@ AnalogSignalMonitor::AnalogSignalMonitor(int db_cardnum,
         if (!CardUtil::GetV4LInfo(videofd, m_card, m_driver, m_version, caps))
             return;
 
-        m_usingv4l2 = ((caps & V4L2_CAP_VIDEO_CAPTURE) != 0U);
+        m_usingV4l2 = ((caps & V4L2_CAP_VIDEO_CAPTURE) != 0U);
         LOG(VB_RECORD, LOG_INFO, QString("card '%1' driver '%2' version '%3'")
                 .arg(m_card).arg(m_driver).arg(m_version));
     }
@@ -107,7 +107,7 @@ bool AnalogSignalMonitor::VerifyHDPVRaudio(int videofd)
     return true;
 }
 
-/* m_stable_time is used to designate how long we need to see a stable
+/* m_stableTime is used to designate how long we need to see a stable
  * resolution reported from the HD-PVR driver, before we consider it a
  * good lock.  In my testing 2 seconds is safe, while 1 second worked
  * most of the time.  --jp
@@ -125,10 +125,10 @@ bool AnalogSignalMonitor::handleHDPVR(int videofd)
         {
             LOG(VB_RECORD, LOG_ERR, QString("hd-pvr resolution %1 x %2")
                 .arg(vfmt.fmt.pix.width).arg(vfmt.fmt.pix.height));
-            ++m_lock_cnt;
+            ++m_lockCnt;
             m_timer.start();
         }
-        else if (m_timer.elapsed() > m_stable_time)
+        else if (m_timer.elapsed() > m_stableTime)
         {
             LOG(VB_RECORD, LOG_ERR, QString("hd-pvr stable at %1 x %2")
                 .arg(vfmt.fmt.pix.width).arg(vfmt.fmt.pix.height));
@@ -138,20 +138,20 @@ bool AnalogSignalMonitor::handleHDPVR(int videofd)
         else
         {
             QMutexLocker locker(&m_statusLock);
-            m_signalStrength.SetValue(60 + m_lock_cnt);
+            m_signalStrength.SetValue(60 + m_lockCnt);
         }
     }
     else
     {
-        if (--m_log_idx == 0)
+        if (--m_logIdx == 0)
         {
             LOG(VB_RECORD, LOG_ERR, "hd-pvr waiting for valid resolution");
-            m_log_idx = 40;
+            m_logIdx = 40;
         }
         m_width = vfmt.fmt.pix.width;
         m_timer.stop();
         QMutexLocker locker(&m_statusLock);
-        m_signalStrength.SetValue(20 + m_lock_cnt);
+        m_signalStrength.SetValue(20 + m_lockCnt);
     }
 
     return false;
@@ -175,7 +175,7 @@ void AnalogSignalMonitor::UpdateValues(void)
         return;
 
     bool isLocked = false;
-    if (m_usingv4l2)
+    if (m_usingV4l2)
     {
         if (m_driver == "hdpvr")
             isLocked = handleHDPVR(videofd);

@@ -56,7 +56,7 @@ class SERVICE_PUBLIC ProgramList : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Q_INVOKABLE ProgramList(QObject *parent = nullptr)
+        Q_INVOKABLE explicit ProgramList(QObject *parent = nullptr)
             : QObject         ( parent ),
               m_StartIndex    ( 0      ),
               m_Count         ( 0      ),
@@ -81,7 +81,7 @@ class SERVICE_PUBLIC ProgramList : public QObject
             // We must make sure the object added to the QVariantList has
             // a parent of 'this'
 
-            Program *pObject = new Program( this );
+            auto *pObject = new Program( this );
             m_Programs.append( QVariant::fromValue<QObject *>( pObject ));
 
             return pObject;

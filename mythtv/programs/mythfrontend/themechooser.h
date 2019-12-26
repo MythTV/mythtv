@@ -29,14 +29,14 @@ class ThemeChooser : public MythScreenType
     Q_OBJECT
 
   public:
-    ThemeChooser(MythScreenStack *parent,
+    explicit ThemeChooser(MythScreenStack *parent,
                const QString &name = "ThemeChooser");
-   ~ThemeChooser();
+   ~ThemeChooser() override;
 
     bool Create(void) override; // MythScreenType
     void Load(void) override; // MythScreenType
     void Init(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent*) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
     void customEvent(QEvent *e) override; // MythUIType
 
   private slots:
@@ -101,7 +101,7 @@ class ThemeUpdateChecker : public QObject
 
   public:
     ThemeUpdateChecker(void);
-   ~ThemeUpdateChecker(void);
+   ~ThemeUpdateChecker(void) override;
 
   protected slots:
     void checkForUpdate(void);

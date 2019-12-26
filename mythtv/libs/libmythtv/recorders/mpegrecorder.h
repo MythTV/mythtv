@@ -17,12 +17,12 @@ class MpegRecorder : public V4LRecorder,
   public:
     explicit MpegRecorder(TVRec*rec)
         : V4LRecorder(rec) {};
-   ~MpegRecorder() { TeardownAll(); }
+   ~MpegRecorder() override { TeardownAll(); }
     void TeardownAll(void);
 
     void SetOption(const QString &opt, int value) override; // DTVRecorder
     void SetOption(const QString &opt, const QString &value) override; // DTVRecorder
-    void SetVideoFilters(QString&) override {} // DTVRecorder
+    void SetVideoFilters(QString &/*filters*/) override {} // DTVRecorder
 
     void SetOptionsFromProfile(RecordingProfile *profile,
                                const QString &videodev,
@@ -84,49 +84,49 @@ class MpegRecorder : public V4LRecorder,
     QString        m_card;
     QString        m_driver;
     uint32_t       m_version                  {0};
-    bool           m_supports_sliced_vbi      {false};
+    bool           m_supportsSlicedVbi        {false};
 
     // State
-    mutable QMutex m_start_stop_encoding_lock {QMutex::Recursive};
+    mutable QMutex m_startStopEncodingLock    {QMutex::Recursive};
 
     // Pausing state
-    bool           m_cleartimeonpause         {false};
+    bool           m_clearTimeOnPause         {false};
 
     // Encoding info
     int            m_width                    {720};
     int            m_height                   {480};
     int            m_bitrate                  {4500};
-    int            m_maxbitrate               {6000};
-    int            m_streamtype               {0};
-    int            m_aspectratio              {2};
-    int            m_audtype                  {2};
-    int            m_audsamplerate            {48000};
-    int            m_audbitratel1             {14};
-    int            m_audbitratel2             {14};
-    int            m_audbitratel3             {10};
-    int            m_audvolume                {80};
+    int            m_maxBitrate               {6000};
+    int            m_streamType               {0};
+    int            m_aspectRatio              {2};
+    int            m_audType                  {2};
+    int            m_audSampleRate            {48000};
+    int            m_audBitrateL1             {14};
+    int            m_audBitrateL2             {14};
+    int            m_audBitrateL3             {10};
+    int            m_audVolume                {80};
                    /// 0 is Main Lang; 1 is SAP Lang; 2 is Dual
     unsigned int   m_language                 {0};
-    unsigned int   m_low_mpeg4avgbitrate      { 4500};
-    unsigned int   m_low_mpeg4peakbitrate     { 6000};
-    unsigned int   m_medium_mpeg4avgbitrate   { 9000};
-    unsigned int   m_medium_mpeg4peakbitrate  {13500};
-    unsigned int   m_high_mpeg4avgbitrate     {13500};
-    unsigned int   m_high_mpeg4peakbitrate    {20200};
+    unsigned int   m_lowMpeg4AvgBitrate       { 4500};
+    unsigned int   m_lowMpeg4PeakBitrate      { 6000};
+    unsigned int   m_mediumMpeg4AvgBitrate   { 9000};
+    unsigned int   m_mediumMpeg4PeakBitrate  {13500};
+    unsigned int   m_highMpeg4AvgBitrate     {13500};
+    unsigned int   m_highMpeg4PeakBitrate    {20200};
 
     // Input file descriptors
     int            m_chanfd                   {-1};
     int            m_readfd                   {-1};
 
-    static const int   s_audRateL1[];
-    static const int   s_audRateL2[];
-    static const int   s_audRateL3[];
-    static const char *s_streamType[];
-    static const char *s_aspectRatio[];
+    static const int   kAudRateL1[];
+    static const int   kAudRateL2[];
+    static const int   kAudRateL3[];
+    static const char *kStreamType[];
+    static const char *kAspectRatio[];
     static const unsigned int kBuildBufferMaxSize;
 
     // Buffer device reads
-    DeviceReadBuffer *m_device_read_buffer  {nullptr};
+    DeviceReadBuffer *m_deviceReadBuffer      {nullptr};
 };
 
 #endif

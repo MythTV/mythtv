@@ -40,16 +40,16 @@ const int OneSubtitle::kDefaultLength = 750; /* ms */
 
 SRTStuff::~SRTStuff()
 {
-    while (!srtwriters.empty())
+    while (!m_srtWriters.empty())
     {
-        delete *srtwriters.begin();
-        srtwriters.erase(srtwriters.begin());
+        delete *m_srtWriters.begin();
+        m_srtWriters.erase(m_srtWriters.begin());
     }
 }
-CC608Stuff::~CC608Stuff() { delete reader; }
-CC708Stuff::~CC708Stuff() { delete reader; }
-TeletextStuff::~TeletextStuff() { delete reader; }
-DVBSubStuff::~DVBSubStuff() { delete reader; }
+CC608Stuff::~CC608Stuff() { delete m_reader; }
+CC708Stuff::~CC708Stuff() { delete m_reader; }
+TeletextStuff::~TeletextStuff() { delete m_reader; }
+DVBSubStuff::~DVBSubStuff() { delete m_reader; }
 
 MythCCExtractorPlayer::MythCCExtractorPlayer(PlayerFlags flags, bool showProgress,
                                              QString fileName,
@@ -224,31 +224,31 @@ void MythCCExtractorPlayer::IngestSubtitle(
 {
     bool update_last =
         !list.isEmpty() &&
-        (int64_t)m_curTime == list.back().start_time &&
+        (int64_t)m_curTime == list.back().m_startTime &&
         !content.isEmpty();
 
     if (update_last)
     {
         //update text only (need for cc608)
-        list.back().text = content;
+        list.back().m_text = content;
         return;
     }
 
     OneSubtitle last_one = list.isEmpty() ? OneSubtitle() : list.back();
-    if (content != last_one.text || last_one.length >= 0)
+    if (content != last_one.m_text || last_one.m_length >= 0)
     {
         // Finish previous subtitle.
-        if (!last_one.text.isEmpty() && last_one.length < 0)
+        if (!last_one.m_text.isEmpty() && last_one.m_length < 0)
         {
-            list.back().length = (int64_t)m_curTime - last_one.start_time;
+            list.back().m_length = (int64_t)m_curTime - last_one.m_startTime;
         }
 
         // Put new one if it isn't empty.
         if (!content.isEmpty())
         {
             OneSubtitle new_one;
-            new_one.start_time = (int64_t)m_curTime;
-            new_one.text = content;
+            new_one.m_startTime = (int64_t)m_curTime;
+            new_one.m_text = content;
 
             list.push_back(new_one);
         }
@@ -260,37 +260,37 @@ void MythCCExtractorPlayer::IngestSubtitle(
  * This is a version for DVB graphical subtitles only.
  * @param list Queue of subtitles we modify.
  * @param content Content of the new subtitle (may be empty).
- * We're going to use it's img & start_time fields.
+ * We're going to use it's m_img & m_startTime fields.
  */
 void MythCCExtractorPlayer::IngestSubtitle(
     QList<OneSubtitle> &list, const OneSubtitle &content)
 {
     bool update_last =
         !list.isEmpty() &&
-        content.start_time == list.back().start_time &&
-        !content.img.isNull();
+        content.m_startTime == list.back().m_startTime &&
+        !content.m_img.isNull();
 
     if (update_last)
     {
-        list.back().img = content.img; // update image only
+        list.back().m_img = content.m_img; // update image only
         return;
     }
 
     OneSubtitle last_one = list.isEmpty() ? OneSubtitle() : list.back();
-    if (content.img != last_one.img || last_one.length >= 0)
+    if (content.m_img != last_one.m_img || last_one.m_length >= 0)
     {
         // Finish previous subtitle.
-        if (!last_one.img.isNull() && last_one.length < 0)
+        if (!last_one.m_img.isNull() && last_one.m_length < 0)
         {
-            list.back().length = content.start_time - last_one.start_time;
+            list.back().m_length = content.m_startTime - last_one.m_startTime;
         }
 
         // Put new one if it isn't empty.
-        if (!content.img.isNull())
+        if (!content.m_img.isNull())
         {
             OneSubtitle new_one;
-            new_one.start_time = content.start_time;
-            new_one.img = content.img;
+            new_one.m_startTime = content.m_startTime;
+            new_one.m_img = content.m_img;
 
             list.push_back(new_one);
         }
@@ -311,14 +311,14 @@ void MythCCExtractorPlayer::Ingest608Captions(void)
     };
 
     // for each CC of each video...
-    CC608Info::iterator it = m_cc608_info.begin();
-    for (; it != m_cc608_info.end(); ++it)
+    CC608Info::iterator it = m_cc608Info.begin();
+    for (; it != m_cc608Info.end(); ++it)
     {
         while (true)
         {
             bool changed = false;
             int streamRawIdx = -1;
-            CC608Buffer *textlist = (*it).reader->GetOutputText(
+            CC608Buffer *textlist = (*it).m_reader->GetOutputText(
                 changed, streamRawIdx);
 
             if (!changed || !textlist)
@@ -342,7 +342,7 @@ void MythCCExtractorPlayer::Ingest608Captions(void)
 
             textlist->m_lock.unlock();
 
-            IngestSubtitle((*it).subs[ccIdx], content);
+            IngestSubtitle((*it).m_subs[ccIdx], content);
         }
     }
 }
@@ -351,13 +351,13 @@ void MythCCExtractorPlayer::Ingest608Captions(void)
 void MythCCExtractorPlayer::Process608Captions(uint flags)
 {
     int i = 0;
-    CC608Info::iterator cc608it = m_cc608_info.begin();
-    for (; cc608it != m_cc608_info.end(); ++cc608it)
+    CC608Info::iterator cc608it = m_cc608Info.begin();
+    for (; cc608it != m_cc608Info.end(); ++cc608it)
     {
-        QString stream_id_str = (m_cc608_info.size() <= 1) ?
+        QString stream_id_str = (m_cc608Info.size() <= 1) ?
             QString("") : QString("%1.").arg(i,2,10,QChar('0'));
 
-        CC608StreamType &subs = (*cc608it).subs;
+        CC608StreamType &subs = (*cc608it).m_subs;
         CC608StreamType::iterator it = subs.begin();
         for (; it != subs.end(); ++it)
         {
@@ -368,7 +368,7 @@ void MythCCExtractorPlayer::Process608Captions(uint flags)
 
             int idx = it.key();
 
-            if (!(*cc608it).srtwriters[idx])
+            if (!(*cc608it).m_srtWriters[idx])
             {
                 int langCode = 0;
                 auto *avd = dynamic_cast<AvFormatDecoder *>(m_decoder);
@@ -384,11 +384,11 @@ void MythCCExtractorPlayer::Process608Captions(uint flags)
                     .arg(m_baseName).arg(stream_id_str).arg("608")
                     .arg(service_key).arg(lang);
 
-                (*cc608it).srtwriters[idx] = new SRTWriter(
+                (*cc608it).m_srtWriters[idx] = new SRTWriter(
                     m_workingDir.filePath(filename));
             }
 
-            if (!(*cc608it).srtwriters[idx]->IsOpen())
+            if (!(*cc608it).m_srtWriters[idx]->IsOpen())
             {
                 (*it).clear();
                 continue;
@@ -396,15 +396,15 @@ void MythCCExtractorPlayer::Process608Captions(uint flags)
 
             while ((*it).size() > ((kProcessFinalize & flags) ? 0 : 1))
             {
-                if ((*it).front().length <= 0)
-                    (*it).front().length = OneSubtitle::kDefaultLength;
+                if ((*it).front().m_length <= 0)
+                    (*it).front().m_length = OneSubtitle::kDefaultLength;
 
-                (*cc608it).srtwriters[idx]->AddSubtitle(
-                    (*it).front(), ++(*cc608it).subs_num[idx]);
+                (*cc608it).m_srtWriters[idx]->AddSubtitle(
+                    (*it).front(), ++(*cc608it).m_subsNum[idx]);
                 (*it).pop_front();
             }
 
-            (*cc608it).srtwriters[idx]->Flush();
+            (*cc608it).m_srtWriters[idx]->Flush();
         }
     }
 }
@@ -412,12 +412,12 @@ void MythCCExtractorPlayer::Process608Captions(uint flags)
 void MythCCExtractorPlayer::Ingest708Captions(void)
 {
     // For each window of each service of each video...
-    CC708Info::const_iterator it = m_cc708_info.begin();
-    for (; it != m_cc708_info.end(); ++it)
+    CC708Info::const_iterator it = m_cc708Info.begin();
+    for (; it != m_cc708Info.end(); ++it)
     {
         for (uint serviceIdx = 1; serviceIdx < k708MaxServices; ++serviceIdx)
         {
-            CC708Service *service = (*it).reader->GetService(serviceIdx);
+            CC708Service *service = (*it).m_reader->GetService(serviceIdx);
             for (uint windowIdx = 0; windowIdx < 8; ++windowIdx)
             {
                 CC708Window &win = service->m_windows[windowIdx];
@@ -448,7 +448,7 @@ void MythCCExtractorPlayer::Ingest708Caption(
     FormattedTextSubtitle708 fsub(win, windowIdx, content);
     QStringList winContent = fsub.ToSRT();
 
-    QMap<int, Window> &cc708win = m_cc708_windows[streamId][serviceIdx];
+    QMap<int, Window> &cc708win = m_cc708Windows[streamId][serviceIdx];
     cc708win[windowIdx].row = start_row;
     cc708win[windowIdx].column = start_column;
     cc708win[windowIdx].text = winContent;
@@ -471,20 +471,20 @@ void MythCCExtractorPlayer::Ingest708Caption(
     {
         screenContent += *oit;
     }
-    IngestSubtitle(m_cc708_info[streamId].subs[serviceIdx], screenContent);
+    IngestSubtitle(m_cc708Info[streamId].m_subs[serviceIdx], screenContent);
 }
 
 // Note: GetCaptionLanguage() will not return valid if there are multiple videos
 void MythCCExtractorPlayer::Process708Captions(uint flags)
 {
     int i = 0;
-    CC708Info::iterator cc708it = m_cc708_info.begin();
-    for (; cc708it != m_cc708_info.end(); ++cc708it)
+    CC708Info::iterator cc708it = m_cc708Info.begin();
+    for (; cc708it != m_cc708Info.end(); ++cc708it)
     {
-        QString stream_id_str = (m_cc708_info.size() <= 1) ?
+        QString stream_id_str = (m_cc708Info.size() <= 1) ?
             QString("") : QString("%1.").arg(i,2,10,QChar('0'));
 
-        CC708StreamType &subs = (*cc708it).subs;
+        CC708StreamType &subs = (*cc708it).m_subs;
         CC708StreamType::iterator it = subs.begin();
         for (; it != subs.end(); ++it)
         {
@@ -495,7 +495,7 @@ void MythCCExtractorPlayer::Process708Captions(uint flags)
 
             int idx = it.key();
 
-            if (!(*cc708it).srtwriters[idx])
+            if (!(*cc708it).m_srtWriters[idx])
             {
                 int langCode = 0;
                 auto *avd = dynamic_cast<AvFormatDecoder*>(m_decoder);
@@ -512,11 +512,11 @@ void MythCCExtractorPlayer::Process708Captions(uint flags)
                     .arg(m_baseName).arg(stream_id_str).arg("708")
                     .arg(service_key).arg(lang);
 
-                (*cc708it).srtwriters[idx] = new SRTWriter(
+                (*cc708it).m_srtWriters[idx] = new SRTWriter(
                     m_workingDir.filePath(filename));
             }
 
-            if (!(*cc708it).srtwriters[idx]->IsOpen())
+            if (!(*cc708it).m_srtWriters[idx]->IsOpen())
             {
                 (*it).clear();
                 continue;
@@ -524,15 +524,15 @@ void MythCCExtractorPlayer::Process708Captions(uint flags)
 
             while ((*it).size() > ((kProcessFinalize & flags) ? 0 : 1))
             {
-                if ((*it).front().length <= 0)
-                    (*it).front().length = OneSubtitle::kDefaultLength;
+                if ((*it).front().m_length <= 0)
+                    (*it).front().m_length = OneSubtitle::kDefaultLength;
 
-                (*cc708it).srtwriters[idx]->AddSubtitle(
-                    (*it).front(), ++(*cc708it).subs_num[idx]);
+                (*cc708it).m_srtWriters[idx]->AddSubtitle(
+                    (*it).front(), ++(*cc708it).m_subsNum[idx]);
                 (*it).pop_front();
             }
 
-            (*cc708it).srtwriters[idx]->Flush();
+            (*cc708it).m_srtWriters[idx]->Flush();
         }
     }
 }
@@ -552,40 +552,40 @@ static QStringList to_string_list(const TeletextSubPage &subPage)
 
 void MythCCExtractorPlayer::IngestTeletext(void)
 {
-    TeletextInfo::iterator ttxit = m_ttx_info.begin();
-    for (; ttxit != m_ttx_info.end(); ++ttxit)
+    TeletextInfo::iterator ttxit = m_ttxInfo.begin();
+    for (; ttxit != m_ttxInfo.end(); ++ttxit)
     {
         using qpii = QPair<int, int>;
-        QSet<qpii> updatedPages = (*ttxit).reader->GetUpdatedPages();
+        QSet<qpii> updatedPages = (*ttxit).m_reader->GetUpdatedPages();
         if (updatedPages.isEmpty())
             continue;
 
         QSet<qpii>::const_iterator it = updatedPages.constBegin();
         for (; it != updatedPages.constEnd(); ++it)
         {
-            (*ttxit).reader->SetPage((*it).first, (*it).second);
-            TeletextSubPage *subpage = (*ttxit).reader->FindSubPage();
+            (*ttxit).m_reader->SetPage((*it).first, (*it).second);
+            TeletextSubPage *subpage = (*ttxit).m_reader->FindSubPage();
             if (subpage && subpage->subtitle)
             {
-                IngestSubtitle((*ttxit).subs[(*it).first],
+                IngestSubtitle((*ttxit).m_subs[(*it).first],
                                to_string_list(*subpage));
             }
         }
 
-        (*ttxit).reader->ClearUpdatedPages();
+        (*ttxit).m_reader->ClearUpdatedPages();
     }
 }
 
 void MythCCExtractorPlayer::ProcessTeletext(uint flags)
 {
     int i = 0;
-    TeletextInfo::iterator ttxit = m_ttx_info.begin();
-    for (; ttxit != m_ttx_info.end(); ++ttxit)
+    TeletextInfo::iterator ttxit = m_ttxInfo.begin();
+    for (; ttxit != m_ttxInfo.end(); ++ttxit)
     {
-        QString stream_id_str = (m_cc608_info.size() <= 1) ?
+        QString stream_id_str = (m_cc608Info.size() <= 1) ?
             QString("") : QString("%1.").arg(i,2,10,QChar('0'));
 
-        TeletextStreamType &subs = (*ttxit).subs;
+        TeletextStreamType &subs = (*ttxit).m_subs;
         TeletextStreamType::iterator it = subs.begin();
         for (; it != subs.end(); ++it)
         {
@@ -596,7 +596,7 @@ void MythCCExtractorPlayer::ProcessTeletext(uint flags)
 
             uint page = it.key();
 
-            if (!(*ttxit).srtwriters[page])
+            if (!(*ttxit).m_srtWriters[page])
             {
                 int langCode = 0;
                 auto *avd = dynamic_cast<AvFormatDecoder *>(m_decoder);
@@ -612,11 +612,11 @@ void MythCCExtractorPlayer::ProcessTeletext(uint flags)
                     .arg(stream_id_str)
                     .arg(page, 3, 16, QChar('0'));
 
-                (*ttxit).srtwriters[page] = new SRTWriter(
+                (*ttxit).m_srtWriters[page] = new SRTWriter(
                     m_workingDir.filePath(filename));
             }
 
-            if (!(*ttxit).srtwriters[page]->IsOpen())
+            if (!(*ttxit).m_srtWriters[page]->IsOpen())
             {
                 (*it).clear();
                 continue;
@@ -624,26 +624,26 @@ void MythCCExtractorPlayer::ProcessTeletext(uint flags)
 
             while ((*it).size() > ((kProcessFinalize & flags) ? 0 : 1))
             {
-                if ((*it).front().length <= 0)
-                    (*it).front().length = OneSubtitle::kDefaultLength;
+                if ((*it).front().m_length <= 0)
+                    (*it).front().m_length = OneSubtitle::kDefaultLength;
 
-                (*ttxit).srtwriters[page]->AddSubtitle(
-                    (*it).front(), ++(*ttxit).subs_num[page]);
+                (*ttxit).m_srtWriters[page]->AddSubtitle(
+                    (*it).front(), ++(*ttxit).m_subsNum[page]);
                 (*it).pop_front();
             }
 
-            (*ttxit).srtwriters[page]->Flush();
+            (*ttxit).m_srtWriters[page]->Flush();
         }
     }
 }
 
 void MythCCExtractorPlayer::IngestDVBSubtitles(void)
 {
-    DVBSubInfo::iterator subit = m_dvbsub_info.begin();
-    for (; subit != m_dvbsub_info.end(); ++subit)
+    DVBSubInfo::iterator subit = m_dvbsubInfo.begin();
+    for (; subit != m_dvbsubInfo.end(); ++subit)
     {
         /// INFO -- start
-        if ((*subit).reader->HasTextSubtitles())
+        if ((*subit).m_reader->HasTextSubtitles())
         {
             LOG(VB_VBI, LOG_DEBUG,
                 "There are unhandled text dvb subtitles");
@@ -651,7 +651,7 @@ void MythCCExtractorPlayer::IngestDVBSubtitles(void)
 
         uint64_t duration;
         const QStringList rawSubs =
-            (*subit).reader->GetRawTextSubtitles(duration);
+            (*subit).m_reader->GetRawTextSubtitles(duration);
         if (!rawSubs.isEmpty())
         {
             LOG(VB_VBI, LOG_DEBUG,
@@ -660,7 +660,7 @@ void MythCCExtractorPlayer::IngestDVBSubtitles(void)
         }
         /// INFO -- end
 
-        AVSubtitles *avsubtitles = (*subit).reader->GetAVSubtitles();
+        AVSubtitles *avsubtitles = (*subit).m_reader->GetAVSubtitles();
 
         QMutexLocker locker(&(avsubtitles->m_lock));
 
@@ -710,16 +710,16 @@ void MythCCExtractorPlayer::IngestDVBSubtitles(void)
             painter.end();
 
             OneSubtitle sub;
-            sub.start_time = subtitle.start_display_time;
-            sub.length =
+            sub.m_startTime = subtitle.start_display_time;
+            sub.m_length =
                 subtitle.end_display_time - subtitle.start_display_time;
 
             SubtitleReader::FreeAVSubtitle(subtitle);
 
             if (min_x < max_x && min_y < max_y)
             {
-                sub.img_shift = QPoint(min_x, min_y);
-                sub.img = sub_pict.copy(
+                sub.m_imgShift = QPoint(min_x, min_y);
+                sub.m_img = sub_pict.copy(
                     min_x, min_y, max_x - min_x, max_y - min_y);
             }
             else
@@ -727,21 +727,21 @@ void MythCCExtractorPlayer::IngestDVBSubtitles(void)
                 // Empty subtitle, do nothing.
             }
 
-            IngestSubtitle((*subit).subs, sub);
+            IngestSubtitle((*subit).m_subs, sub);
         }
 
         locker.unlock();
 
-        (*subit).reader->ClearRawTextSubtitles();
+        (*subit).m_reader->ClearRawTextSubtitles();
     }
 }
 
 void MythCCExtractorPlayer::ProcessDVBSubtitles(uint flags)
 {
     // Process (DVB) subtitle streams.
-    DVBSubInfo::iterator subit = m_dvbsub_info.begin();
+    DVBSubInfo::iterator subit = m_dvbsubInfo.begin();
     int subtitleStreamCount = 0;
-    for (; subit != m_dvbsub_info.end(); ++subit)
+    for (; subit != m_dvbsubInfo.end(); ++subit)
     {
         int langCode = 0;
         auto *avd = dynamic_cast<AvFormatDecoder *>(m_decoder);
@@ -757,11 +757,11 @@ void MythCCExtractorPlayer::ProcessDVBSubtitles(uint flags)
         {
             LOG(VB_GENERAL, LOG_ERR, QString("Can't create directory '%1'")
                 .arg(dir_name));
-            (*subit).subs.clear();
+            (*subit).m_subs.clear();
             continue;
         }
 
-        DVBStreamType &subs = (*subit).subs;
+        DVBStreamType &subs = (*subit).m_subs;
         if (subs.empty())
             continue; // Skip empty subtitle streams.
         if (((kProcessFinalize & flags) == 0) && (subs.size() <= 1))
@@ -770,33 +770,33 @@ void MythCCExtractorPlayer::ProcessDVBSubtitles(uint flags)
         QDir stream_dir(m_workingDir.filePath(dir_name));
         while (subs.size() > ((kProcessFinalize & flags) ? 0 : 1))
         {
-            if (subs.front().length <= 0)
-                subs.front().length = OneSubtitle::kDefaultLength;
+            if (subs.front().m_length <= 0)
+                subs.front().m_length = OneSubtitle::kDefaultLength;
 
             const OneSubtitle &sub = subs.front();
-            int64_t end_time = sub.start_time + sub.length;
+            int64_t end_time = sub.m_startTime + sub.m_length;
             const QString file_name =
                 stream_dir.filePath(
                     QString("%1_%2-to-%3.png")
-                    .arg((*subit).subs_num)
-                    .arg(sub.start_time).arg(end_time));
+                    .arg((*subit).m_subsNum)
+                    .arg(sub.m_startTime).arg(end_time));
 
-            if (end_time > sub.start_time)
+            if (end_time > sub.m_startTime)
             {
-                //check is there exist file with same start_time
+                //check is there exist file with same m_startTime
                 QStringList filter;
-                filter << QString("*_%1*.png").arg(sub.start_time);
+                filter << QString("*_%1*.png").arg(sub.m_startTime);
                 QFileInfoList found = stream_dir.entryInfoList(filter);
                 if (found.isEmpty())
                 {
-                    //no same start_time founded
-                    if (!sub.img.save(file_name))
+                    //no same m_startTime founded
+                    if (!sub.m_img.save(file_name))
                     {
                         LOG(VB_GENERAL, LOG_ERR,
                             QString("Can't write file '%1'")
                             .arg(file_name));
                     }
-                    (*subit).subs_num++;
+                    (*subit).m_subsNum++;
                 }
             }
             subs.pop_front();
@@ -807,40 +807,40 @@ void MythCCExtractorPlayer::ProcessDVBSubtitles(uint flags)
 
 CC708Reader *MythCCExtractorPlayer::GetCC708Reader(uint id)
 {
-    if (!m_cc708_info[id].reader)
+    if (!m_cc708Info[id].m_reader)
     {
-        m_cc708_info[id].reader = new CC708Reader(this);
-        m_cc708_info[id].reader->SetEnabled(true);
+        m_cc708Info[id].m_reader = new CC708Reader(this);
+        m_cc708Info[id].m_reader->SetEnabled(true);
         LOG(VB_GENERAL, LOG_INFO, "Created CC708Reader");
     }
-    return m_cc708_info[id].reader;
+    return m_cc708Info[id].m_reader;
 }
 
 CC608Reader *MythCCExtractorPlayer::GetCC608Reader(uint id)
 {
-    if (!m_cc608_info[id].reader)
+    if (!m_cc608Info[id].m_reader)
     {
-        m_cc608_info[id].reader = new CC608Reader(this);
-        m_cc608_info[id].reader->SetEnabled(true);
+        m_cc608Info[id].m_reader = new CC608Reader(this);
+        m_cc608Info[id].m_reader->SetEnabled(true);
     }
-    return m_cc608_info[id].reader;
+    return m_cc608Info[id].m_reader;
 }
 
 TeletextReader *MythCCExtractorPlayer::GetTeletextReader(uint id)
 {
-    if (!m_ttx_info[id].reader)
-        m_ttx_info[id].reader = new TeletextExtractorReader();
-    return m_ttx_info[id].reader;
+    if (!m_ttxInfo[id].m_reader)
+        m_ttxInfo[id].m_reader = new TeletextExtractorReader();
+    return m_ttxInfo[id].m_reader;
 }
 
 SubtitleReader *MythCCExtractorPlayer::GetSubReader(uint id)
 {
-    if (!m_dvbsub_info[id].reader)
+    if (!m_dvbsubInfo[id].m_reader)
     {
-        m_dvbsub_info[id].reader = new SubtitleReader();
-        m_dvbsub_info[id].reader->EnableAVSubtitles(true);
-        m_dvbsub_info[id].reader->EnableTextSubtitles(true);
-        m_dvbsub_info[id].reader->EnableRawTextSubtitles(true);
+        m_dvbsubInfo[id].m_reader = new SubtitleReader();
+        m_dvbsubInfo[id].m_reader->EnableAVSubtitles(true);
+        m_dvbsubInfo[id].m_reader->EnableTextSubtitles(true);
+        m_dvbsubInfo[id].m_reader->EnableRawTextSubtitles(true);
     }
-    return m_dvbsub_info[id].reader;
+    return m_dvbsubInfo[id].m_reader;
 }

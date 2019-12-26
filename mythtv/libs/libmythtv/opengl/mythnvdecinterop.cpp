@@ -26,7 +26,7 @@ MythNVDECInterop::MythNVDECInterop(MythRenderOpenGL *Context)
 MythNVDECInterop::~MythNVDECInterop()
 {
     m_referenceFrames.clear();
-    DeleteTextures();
+    MythNVDECInterop::DeleteTextures();
     CleanupContext(m_context, m_cudaFuncs, m_cudaContext);
 }
 
@@ -114,9 +114,11 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
     if (m_openglTextureSize != surfacesize)
     {
         if (!m_openglTextureSize.isEmpty())
+        {
             LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Video texture size changed! %1x%2->%3x%4")
                 .arg(m_openglTextureSize.width()).arg(m_openglTextureSize.height())
                 .arg(Frame->width).arg(Frame->height));
+        }
         DeleteTextures();
         m_openglTextureSize = surfacesize;
     }

@@ -14,16 +14,16 @@ class MUI_PUBLIC MythUIProgressBar : public MythUIType
   public:
     MythUIProgressBar(MythUIType *parent, const QString &name)
         : MythUIType(parent, name) {}
-   ~MythUIProgressBar() = default;
+   ~MythUIProgressBar() override = default;
 
     void Reset(void) override; // MythUIType
 
     enum LayoutType { LayoutVertical, LayoutHorizontal };
     enum EffectType { EffectReveal, EffectSlide, EffectAnimate };
 
-    void SetStart(int);
-    void SetUsed(int);
-    void SetTotal(int);
+    void SetStart(int value);
+    void SetUsed(int value);
+    void SetTotal(int value);
     int  GetUsed(void) { return m_current; }
     void SetVisible(bool visible) override; // MythUIType
 

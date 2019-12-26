@@ -14,7 +14,7 @@
 
 #define LOC (QString("%1: ").arg(m_deviceName))
 
-MythDRMDevice::MythDRMDevice(QScreen *qScreen, QString Device)
+MythDRMDevice::MythDRMDevice(QScreen *qScreen, const QString& Device)
   : ReferenceCounter("DRMDev"),
     m_screen(qScreen),
     m_deviceName(Device),
@@ -186,7 +186,7 @@ bool MythDRMDevice::Initialise(void)
                     m_edid = edid;
                     break;
                 }
-                else if (!edid.Valid())
+                if (!edid.Valid())
                 {
                         LOG(VB_GENERAL, m_verbose, LOC + "Connected device has invalid EDID");
                 }
@@ -325,7 +325,7 @@ QString MythDRMDevice::FindBestDevice(void)
     return QString();
 }
 
-bool MythDRMDevice::ConfirmDevice(QString Device)
+bool MythDRMDevice::ConfirmDevice(const QString& Device)
 {
     bool result = false;
     int fd = open(Device.toLocal8Bit().constData(), O_RDWR);
@@ -341,7 +341,7 @@ bool MythDRMDevice::ConfirmDevice(QString Device)
     return result;
 }
 
-drmModePropertyBlobPtr MythDRMDevice::GetBlobProperty(drmModeConnectorPtr Connector, QString Property)
+drmModePropertyBlobPtr MythDRMDevice::GetBlobProperty(drmModeConnectorPtr Connector, const QString& Property)
 {
     drmModePropertyBlobPtr result = nullptr;
     if (!Connector || Property.isEmpty())
@@ -352,7 +352,7 @@ drmModePropertyBlobPtr MythDRMDevice::GetBlobProperty(drmModeConnectorPtr Connec
         drmModePropertyPtr propid = drmModeGetProperty(m_fd, Connector->props[i]);
         if ((propid->flags & DRM_MODE_PROP_BLOB) && propid->name == Property)
         {
-            uint32_t blobid = static_cast<uint32_t>(Connector->prop_values[i]);
+            auto blobid = static_cast<uint32_t>(Connector->prop_values[i]);
             result = drmModeGetPropertyBlob(m_fd, blobid);
         }
         drmModeFreeProperty(propid);

@@ -202,11 +202,15 @@ void NetSearch::ShowMenu(void)
                     GetFocusWidget() == m_searchResultList)
                 {
                     if (exists)
+                    {
                         menuPopup->AddButton(tr("Play"),
                                              SLOT(DoPlayVideo(filename)));
+                    }
                     else
+                    {
                         menuPopup->AddButton(tr("Save This Video"),
                                              SLOT(DoDownloadAndPlay()));
+                    }
                 }
 
                 if (item->GetDownloadable() &&
@@ -369,11 +373,11 @@ void NetSearch::SearchFinished(void)
     m_nextPageToken = item->nextPageToken();
     m_prevPageToken = item->prevPageToken();
 
-    if (returned > 0)
-        m_siteList->GetItemAt(m_currentGrabber)->
-                  SetText(QString::number(searchresults), "count");
-    else
+    if (returned <= 0)
         return;
+
+    m_siteList->GetItemAt(m_currentGrabber)->
+        SetText(QString::number(searchresults), "count");
 
     if (firstitem + returned == searchresults)
         m_maxpage = m_pagenum;
@@ -384,9 +388,11 @@ void NetSearch::SearchFinished(void)
             m_maxpage++;
     }
     if (m_pageText && m_maxpage > 0 && m_pagenum > 0 && returned > 0)
+    {
         m_pageText->SetText(QString("%1 / %2")
                         .arg(QString::number(m_pagenum))
                         .arg(QString::number(m_maxpage)));
+    }
 
     ResultItem::resultList list = item->GetVideoList();
     PopulateResultList(list);

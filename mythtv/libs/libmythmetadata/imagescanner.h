@@ -29,7 +29,7 @@ class META_PUBLIC ImageScanThread : public MThread
 {
 public:
     ImageScanThread(DBFS *const dbfs, ImageThumb<DBFS> *thumbGen);
-    ~ImageScanThread();
+    ~ImageScanThread() override;
 
     void        cancel();
     bool        IsScanning();

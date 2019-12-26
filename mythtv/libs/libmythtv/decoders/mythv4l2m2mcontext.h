@@ -19,7 +19,7 @@ class MythV4L2M2MContext : public MythDRMPRIMEContext
     void        SetDecoderOptions        (AVCodecContext* Context, AVCodec* Codec) override;
     int         HwDecoderInit            (AVCodecContext *Context) override;
     bool        DecoderWillResetOnFlush  (void) override;
-    static bool GetBuffer                (AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame, int);
+    static bool GetBuffer                (AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame, int/*Flags*/);
     static bool HaveV4L2Codecs           (AVCodecID Codec = AV_CODEC_ID_NONE);
 
     static enum AVPixelFormat GetV4L2RequestFormat(AVCodecContext *Context, const AVPixelFormat *PixFmt);

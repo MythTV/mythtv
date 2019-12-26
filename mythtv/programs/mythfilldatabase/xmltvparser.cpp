@@ -31,7 +31,7 @@
 
 XMLTVParser::XMLTVParser()
 {
-    m_current_year = MythDate::current().date().toString("yyyy").toUInt();
+    m_currentYear = MythDate::current().date().toString("yyyy").toUInt();
 }
 
 void XMLTVParser::lateInit()
@@ -78,8 +78,8 @@ ChannelInfo *XMLTVParser::parseChannel(QDomElement &element, QUrl &baseUrl)
 
     QString xmltvid = element.attribute("id", "");
 
-    chaninfo->m_xmltvid = xmltvid;
-    chaninfo->m_tvformat = "Default";
+    chaninfo->m_xmltvId = xmltvid;
+    chaninfo->m_tvFormat = "Default";
 
     for (QDomNode child = element.firstChild(); !child.isNull();
          child = child.nextSibling())
@@ -112,19 +112,19 @@ ChannelInfo *XMLTVParser::parseChannel(QDomElement &element, QUrl &baseUrl)
                 {
                     chaninfo->m_name = info.text();
                 }
-                else if (chaninfo->m_callsign.isEmpty())
+                else if (chaninfo->m_callSign.isEmpty())
                 {
-                    chaninfo->m_callsign = info.text();
+                    chaninfo->m_callSign = info.text();
                 }
-                else if (chaninfo->m_channum.isEmpty())
+                else if (chaninfo->m_chanNum.isEmpty())
                 {
-                    chaninfo->m_channum = info.text();
+                    chaninfo->m_chanNum = info.text();
                 }
             }
         }
     }
 
-    chaninfo->m_freqid = chaninfo->m_channum;
+    chaninfo->m_freqId = chaninfo->m_chanNum;
     return chaninfo;
 }
 
@@ -591,7 +591,7 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
 
     if (!pginfo->m_airdate
         && ProgramInfo::kCategorySeries != pginfo->m_categoryType)
-        pginfo->m_airdate = m_current_year;
+        pginfo->m_airdate = m_currentYear;
 
     if (programid.isEmpty())
     {
@@ -696,7 +696,7 @@ bool XMLTVParser::parseFile(
             if (e.tagName() == "channel")
             {
                 ChannelInfo *chinfo = parseChannel(e, baseUrl);
-                if (!chinfo->m_xmltvid.isEmpty())
+                if (!chinfo->m_xmltvId.isEmpty())
                     chanlist->push_back(*chinfo);
                 delete chinfo;
             }

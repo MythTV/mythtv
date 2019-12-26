@@ -2,6 +2,7 @@
 #define IMPORTMUSIC_H_
 
 #include <iostream>
+#include <utility>
 #include <vector>
 using namespace std;
 
@@ -41,8 +42,9 @@ class FileScannerThread: public MThread
 class FileCopyThread: public MThread
 {
     public:
-        FileCopyThread(const QString &src, const QString &dst)
-            : MThread("FileCopy"), m_srcFile(src), m_dstFile(dst) {}
+        FileCopyThread(QString src, QString dst)
+            : MThread("FileCopy"), m_srcFile(std::move(src)),
+              m_dstFile(std::move(dst)) {}
         void run() override; // MThread
 
         bool GetResult(void) { return m_result; }
@@ -60,11 +62,11 @@ class ImportMusicDialog : public MythScreenType
 
   public:
     explicit ImportMusicDialog(MythScreenStack *parent);
-    ~ImportMusicDialog();
+    ~ImportMusicDialog() override;
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
-    void customEvent(QEvent *) override; // MythUIType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
+    void customEvent(QEvent *event) override; // MythUIType
 
     bool somethingWasImported() { return m_somethingWasImported; }
     void doScan(void);
@@ -165,14 +167,16 @@ class ImportCoverArtDialog : public MythScreenType
 
   public:
 
-    ImportCoverArtDialog(MythScreenStack *parent, const QString &sourceDir,
-                         MusicMetadata *metadata, const QString &storageDir)
-        : MythScreenType(parent, "import_coverart"), m_sourceDir(sourceDir),
-          m_musicStorageDir(storageDir), m_metadata(metadata) {}
-    ~ImportCoverArtDialog() = default;
+    ImportCoverArtDialog(MythScreenStack *parent, QString sourceDir,
+                         MusicMetadata *metadata, QString storageDir)
+        : MythScreenType(parent, "import_coverart"),
+          m_sourceDir(std::move(sourceDir)),
+          m_musicStorageDir(std::move(storageDir)),
+          m_metadata(metadata) {}
+    ~ImportCoverArtDialog() override = default;
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
   public slots:
     void copyPressed(void);

@@ -25,7 +25,7 @@ class HDHRRecorder : public DTVRecorder
     void run(void) override; // RecorderBase
 
     bool Open(void);
-    bool IsOpen(void) const { return m_stream_handler; }
+    bool IsOpen(void) const { return m_streamHandler; }
     void Close(void);
     void StartNewFile(void) override; // RecorderBase
 
@@ -37,7 +37,7 @@ class HDHRRecorder : public DTVRecorder
 
   private:
     HDHRChannel       *m_channel        {nullptr};
-    HDHRStreamHandler *m_stream_handler {nullptr};
+    HDHRStreamHandler *m_streamHandler  {nullptr};
 };
 
 #endif

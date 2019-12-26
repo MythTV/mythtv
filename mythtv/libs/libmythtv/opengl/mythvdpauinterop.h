@@ -41,7 +41,7 @@ class MythVDPAUInterop : public MythOpenGLInterop
   protected:
     static Type GetInteropType(VideoFrameType Format);
     MythVDPAUInterop(MythRenderOpenGL *Context, MythCodecID CodecID);
-    virtual ~MythVDPAUInterop() override;
+    ~MythVDPAUInterop() override;
 
   private:
     bool  InitNV(AVVDPAUDeviceContext* DeviceContext);

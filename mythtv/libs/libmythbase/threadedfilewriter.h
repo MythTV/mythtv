@@ -2,17 +2,19 @@
 #ifndef TFW_H_
 #define TFW_H_
 
+#include <cstdint>
+#include <fcntl.h>
+#include <utility>
 #include <vector>
 using namespace std;
 
+// Qt headers
 #include <QWaitCondition>
 #include <QDateTime>
 #include <QString>
 #include <QMutex>
 
-#include <cstdint>
-#include <fcntl.h>
-
+// MythTV headers
 #include "mythbaseexp.h"
 #include "mthread.h"
 
@@ -22,7 +24,7 @@ class TFWWriteThread : public MThread
 {
   public:
     explicit TFWWriteThread(ThreadedFileWriter *p) : MThread("TFWWrite"), m_parent(p) {}
-    virtual ~TFWWriteThread() { wait(); m_parent = nullptr; }
+    ~TFWWriteThread() override { wait(); m_parent = nullptr; }
     void run(void) override; // MThread
   private:
     ThreadedFileWriter *m_parent {nullptr};
@@ -32,7 +34,7 @@ class TFWSyncThread : public MThread
 {
   public:
     explicit TFWSyncThread(ThreadedFileWriter *p) : MThread("TFWSync"), m_parent(p) {}
-    virtual ~TFWSyncThread() { wait(); m_parent = nullptr; }
+    ~TFWSyncThread() override { wait(); m_parent = nullptr; }
     void run(void) override; // MThread
   private:
     ThreadedFileWriter *m_parent {nullptr};
@@ -46,8 +48,8 @@ class MBASE_PUBLIC ThreadedFileWriter
     /** \fn ThreadedFileWriter::ThreadedFileWriter(const QString&,int,mode_t)
      *  \brief Creates a threaded file writer.
      */
-    ThreadedFileWriter(const QString &fname, int flags, mode_t mode)
-        : m_filename(fname), m_flags(flags), m_mode(mode) {}
+    ThreadedFileWriter(QString fname, int flags, mode_t mode)
+        : m_filename(std::move(fname)), m_flags(flags), m_mode(mode) {}
     ~ThreadedFileWriter();
 
     bool Open(void);

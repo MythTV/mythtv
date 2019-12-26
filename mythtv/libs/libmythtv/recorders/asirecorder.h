@@ -71,7 +71,7 @@ class ASIRecorder : public DTVRecorder
 
   private:
     ASIChannel       *m_channel        {nullptr};
-    ASIStreamHandler *m_stream_handler {nullptr};
+    ASIStreamHandler *m_streamHandler  {nullptr};
 };
 
 #endif // _ASI_RECORDER_H_

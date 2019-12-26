@@ -40,9 +40,9 @@ class MBASE_PUBLIC PrivTcpServer : public QTcpServer
 {
     Q_OBJECT
   public:
-    PrivTcpServer(QObject *parent = nullptr,
+    explicit PrivTcpServer(QObject *parent = nullptr,
                   PoolServerType type = kTCPServer);
-   ~PrivTcpServer() = default;
+   ~PrivTcpServer() override = default;
 
    PoolServerType GetServerType(void) { return m_serverType; }
 
@@ -63,7 +63,7 @@ class MBASE_PUBLIC ServerPool : public QObject
   public:
     explicit ServerPool(QObject *parent=nullptr)
         : QObject(parent) {}
-   ~ServerPool(void);
+   ~ServerPool(void) override;
 
     static void RefreshDefaultListen(void);
     static QList<QHostAddress> DefaultListen(void);

@@ -155,7 +155,7 @@ class DecoderBase
 
     virtual int GetNumChapters(void)                      { return 0; }
     virtual int GetCurrentChapter(long long /*framesPlayed*/) { return 0; }
-    virtual void GetChapterTimes(QList<long long> &/*times*/) { return;   }
+    virtual void GetChapterTimes(QList<long long> &/*times*/) { }
     virtual long long GetChapter(int /*chapter*/)             { return m_framesPlayed; }
     virtual bool DoRewind(long long desiredFrame, bool discardFrames = true);
     virtual bool DoFastForward(long long desiredFrame, bool discardFrames = true);
@@ -188,7 +188,7 @@ class DecoderBase
     virtual bool IsLastFrameKey(void) const = 0;
     virtual void WriteStoredData(RingBuffer *rb, bool storevid,
                                  long timecodeOffset) = 0;
-    virtual void ClearStoredData(void) { return; }
+    virtual void ClearStoredData(void) { }
     virtual void SetRawAudioState(bool state) { m_getRawFrames = state; }
     virtual bool GetRawAudioState(void) const { return m_getRawFrames; }
     virtual void SetRawVideoState(bool state) { m_getRawVideo = state; }
@@ -245,19 +245,19 @@ class DecoderBase
     inline  int  IncrementTrack(uint type);
     inline  int  DecrementTrack(uint type);
     inline  int  ChangeTrack(uint type, int dir);
-    virtual bool InsertTrack(uint type, const StreamInfo&);
+    virtual bool InsertTrack(uint type, const StreamInfo &info);
     inline int   NextTrack(uint type);
 
     virtual int  GetTeletextDecoderType(void) const { return -1; }
 
-    virtual QString GetXDS(const QString&) const { return QString(); }
+    virtual QString GetXDS(const QString &/*key*/) const { return QString(); }
     virtual QByteArray GetSubHeader(uint /*trackNo*/) const { return QByteArray(); }
     virtual void GetAttachmentData(uint /*trackNo*/, QByteArray &/*filename*/,
                                    QByteArray &/*data*/) {}
 
     // MHEG/MHI stuff
-    virtual bool SetAudioByComponentTag(int) { return false; }
-    virtual bool SetVideoByComponentTag(int) { return false; }
+    virtual bool SetAudioByComponentTag(int /*tag*/) { return false; }
+    virtual bool SetVideoByComponentTag(int /*tag*/) { return false; }
 
     void SaveTotalDuration(void);
     void ResetTotalDuration(void) { m_totalDuration = AVRationalInit(0); }
@@ -297,7 +297,7 @@ class DecoderBase
 
     int                  m_currentWidth            {640};
     int                  m_currentHeight           {480};
-    float                m_currentAspect           {1.33333f};
+    float                m_currentAspect           {1.33333F};
     double               m_fps                     {29.97};
     int                  m_fpsMultiplier           {1};
     int                  m_fpsSkip                 {0};
@@ -383,8 +383,7 @@ inline int DecoderBase::ChangeTrack(uint type, int dir)
 {
     if (dir > 0)
         return IncrementTrack(type);
-    else
-        return DecrementTrack(type);
+    return DecrementTrack(type);
 }
 
 inline void DecoderBase::AutoSelectTracks(void)

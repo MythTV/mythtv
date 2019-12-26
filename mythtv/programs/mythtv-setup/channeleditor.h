@@ -17,7 +17,7 @@ class ChannelEditor : public MythScreenType
     explicit ChannelEditor(MythScreenStack *parent);
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
     void customEvent(QEvent *event) override; // MythUIType
 
   protected slots:

@@ -701,10 +701,14 @@ QOpenGLFramebufferObject* MythRenderOpenGL::CreateFramebuffer(QSize &Size, GLenu
     OpenGLLocker locker(this);
     QOpenGLFramebufferObject *framebuffer;
     if (InternalFormat)
+    {
         framebuffer = new QOpenGLFramebufferObject(Size, QOpenGLFramebufferObject::NoAttachment,
                                                    GL_TEXTURE_2D, InternalFormat);
+    }
     else
+    {
         framebuffer = new QOpenGLFramebufferObject(Size);
+    }
     if (framebuffer->isValid())
     {
         if (framebuffer->isBound())

@@ -244,9 +244,9 @@ bool PSIPTable::VerifyPSIP(bool verify_crc) const
         return false;
     }
 
-    unsigned char *bufend = _fullbuffer + _allocSize;
+    unsigned char *bufend = m_fullBuffer + m_allocSize;
 
-    if ((_pesdata + 2) >= bufend)
+    if ((m_pesData + 2) >= bufend)
         return false; // can't query length
 
     if (psipdata() >= bufend)
@@ -254,7 +254,7 @@ bool PSIPTable::VerifyPSIP(bool verify_crc) const
 
     if (TableID::PAT == TableID())
     {
-        uint pcnt = (SectionLength() - PSIP_OFFSET - 2) >> 2;
+        uint pcnt = (SectionLength() - kPsipOffset - 2) >> 2;
         bool ok = (psipdata() + (pcnt << 2) + 3 < bufend);
         if (!ok)
         {
@@ -351,10 +351,10 @@ ProgramAssociationTable* ProgramAssociationTable::Create(
     ProgramAssociationTable* pat = CreateBlank();
     pat->SetVersionNumber(version);
     pat->SetTranportStreamID(tsid);
-    pat->SetTotalLength(PSIP_OFFSET + (count * 4));
+    pat->SetTotalLength(kPsipOffset + (count * 4));
 
     // create PAT data
-    if ((count * 4) >= (184 - (PSIP_OFFSET+1)))
+    if ((count * 4) >= (184 - (kPsipOffset+1)))
     { // old PAT must be in single TS for this create function
         LOG(VB_GENERAL, LOG_ERR,
             "PAT::Create: Error, old PAT size exceeds maximum PAT size.");
@@ -362,7 +362,7 @@ ProgramAssociationTable* ProgramAssociationTable::Create(
         return nullptr;
     }
 
-    uint offset = PSIP_OFFSET;
+    uint offset = kPsipOffset;
     for (uint i = 0; i < count; i++)
     {
         // pnum
@@ -468,19 +468,19 @@ ProgramMapTable* ProgramMapTable::Create(
 
 void ProgramMapTable::Parse() const
 {
-    _ptrs.clear();
-    const unsigned char *cpos = psipdata() + pmt_header + ProgramInfoLength();
+    m_ptrs.clear();
+    const unsigned char *cpos = psipdata() + kPmtHeaderMinOffset + ProgramInfoLength();
     auto *pos = const_cast<unsigned char*>(cpos);
     for (uint i = 0; pos < psipdata() + Length() - 9; i++)
     {
-        _ptrs.push_back(pos);
+        m_ptrs.push_back(pos);
         pos += 5 + StreamInfoLength(i);
 #if 0
         LOG(VB_SIPARSER, LOG_DEBUG, QString("Parsing PMT(0x%1) i(%2) len(%3)")
                 .arg((uint64_t)this, 0, 16) .arg(i) .arg(StreamInfoLength(i)));
 #endif
     }
-    _ptrs.push_back(pos);
+    m_ptrs.push_back(pos);
 #if 0
     LOG(VB_SIPARSER, LOG_DEBUG, QString("Parsed PMT(0x%1)\n%2")
             .arg((uint64_t)this, 0, 16) .arg(toString()));
@@ -492,13 +492,13 @@ void ProgramMapTable::AppendStream(
     unsigned char* streamInfo, uint infoLength)
 {
     if (!StreamCount())
-        _ptrs.push_back(psipdata() + pmt_header + ProgramInfoLength());
-    memset(_ptrs[StreamCount()], 0xff, 5);
+        m_ptrs.push_back(psipdata() + kPmtHeaderMinOffset + ProgramInfoLength());
+    memset(m_ptrs[StreamCount()], 0xff, 5);
     SetStreamPID(StreamCount(), pid);
     SetStreamType(StreamCount(), type);
     SetStreamProgramInfo(StreamCount(), streamInfo, infoLength);
-    _ptrs.push_back(_ptrs[StreamCount()]+5+StreamInfoLength(StreamCount()));
-    SetTotalLength(_ptrs[StreamCount()] - pesdata());
+    m_ptrs.push_back(m_ptrs[StreamCount()]+5+StreamInfoLength(StreamCount()));
+    SetTotalLength(m_ptrs[StreamCount()] - pesdata());
 }
 
 /**
@@ -686,29 +686,35 @@ uint ProgramMapTable::FindPIDs(uint           type,
     if ((StreamID::AnyMask & type) != StreamID::AnyMask)
     {
         for (uint i=0; i < StreamCount(); i++)
+        {
             if (type == StreamType(i))
             {
                 pids.push_back(StreamPID(i));
                 types.push_back(StreamType(i));
             }
+        }
     }
     else if (StreamID::AnyVideo == type)
     {
         for (uint i=0; i < StreamCount(); i++)
+        {
             if (IsVideo(i, sistandard))
             {
                 pids.push_back(StreamPID(i));
                 types.push_back(StreamType(i));
             }
+        }
     }
     else if (StreamID::AnyAudio == type)
     {
         for (uint i=0; i < StreamCount(); i++)
+        {
             if (IsAudio(i, sistandard))
             {
                 pids.push_back(StreamPID(i));
                 types.push_back(StreamType(i));
             }
+        }
     }
 
     if (!normalize)
@@ -1275,9 +1281,9 @@ SpliceInformationTable *SpliceInformationTable::GetDecrypted(
 
 bool SpliceInformationTable::Parse(void)
 {
-    _epilog = nullptr;
-    _ptrs0.clear();
-    _ptrs1.clear();
+    m_epilog = nullptr;
+    m_ptrs0.clear();
+    m_ptrs1.clear();
 
     if (TableID::SITscte != TableID())
         return false;
@@ -1291,11 +1297,11 @@ bool SpliceInformationTable::Parse(void)
     uint type = SpliceCommandType();
     if (kSCTNull == type || kSCTBandwidthReservation == type)
     {
-        _epilog = pesdata() + 14;
+        m_epilog = pesdata() + 14;
     }
     else if (kSCTTimeSignal == type)
     {
-        _epilog = pesdata() + 14 + TimeSignal().size();
+        m_epilog = pesdata() + 14 + TimeSignal().size();
     }
     else if (kSCTSpliceSchedule == type)
     {
@@ -1303,35 +1309,35 @@ bool SpliceInformationTable::Parse(void)
         const unsigned char *cur = pesdata() + 15;
         for (uint i = 0; i < splice_count; i++)
         {
-            _ptrs0.push_back(cur);
+            m_ptrs0.push_back(cur);
             bool event_cancel = (cur[4] & 0x80) != 0;
             if (event_cancel)
             {
-                _ptrs1.push_back(nullptr);
+                m_ptrs1.push_back(nullptr);
                 cur += 5;
                 continue;
             }
             bool program_slice = (cur[5] & 0x40) != 0;
             uint component_count = cur[6];
-            _ptrs1.push_back(cur + (program_slice ? 10 : 7 * component_count));
+            m_ptrs1.push_back(cur + (program_slice ? 10 : 7 * component_count));
         }
         if (splice_count)
         {
-            bool duration = (_ptrs0.back()[5] & 0x2) != 0;
-            _epilog = _ptrs1.back() + ((duration) ? 9 : 4);
+            bool duration = (m_ptrs0.back()[5] & 0x2) != 0;
+            m_epilog = m_ptrs1.back() + ((duration) ? 9 : 4);
         }
         else
         {
-            _epilog = cur;
+            m_epilog = cur;
         }
     }
     else if (kSCTSpliceInsert == type)
     {
-        _ptrs1.push_back(pesdata() + 14);
+        m_ptrs1.push_back(pesdata() + 14);
         bool splice_cancel = (pesdata()[18] & 0x80) != 0;
         if (splice_cancel)
         {
-            _epilog = pesdata() + 19;
+            m_epilog = pesdata() + 19;
         }
         else
         {
@@ -1349,21 +1355,21 @@ bool SpliceInformationTable::Parse(void)
                 cur = pesdata() + 21;
                 for (uint i = 0; i < component_count; i++)
                 {
-                    _ptrs0.push_back(cur);
+                    m_ptrs0.push_back(cur);
                     cur += (splice_immediate) ?
                         1 : 1 + SpliceTimeView(cur).size();
                 }
             }
-            _ptrs1.push_back(cur);
-            _ptrs1.push_back(cur + (duration ? 5 : 0));
+            m_ptrs1.push_back(cur);
+            m_ptrs1.push_back(cur + (duration ? 5 : 0));
         }
     }
     else
     {
-        _epilog = nullptr;
+        m_epilog = nullptr;
     }
 
-    return _epilog != nullptr;
+    return m_epilog != nullptr;
 }
 
 QString SpliceInformationTable::EncryptionAlgorithmString(void) const

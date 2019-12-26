@@ -45,7 +45,7 @@ ASISignalMonitor::ASISignalMonitor(int db_cardnum,
     : DTVSignalMonitor(db_cardnum, _channel, _release_stream, _flags)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
-    streamHandler = ASIStreamHandler::Get(_channel->GetDevice(), m_inputid);
+    m_streamHandler = ASIStreamHandler::Get(_channel->GetDevice(), m_inputid);
 }
 
 /** \fn ASISignalMonitor::~ASISignalMonitor()
@@ -55,7 +55,7 @@ ASISignalMonitor::~ASISignalMonitor()
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "dtor");
     ASISignalMonitor::Stop();
-    ASIStreamHandler::Return(streamHandler, m_inputid);
+    ASIStreamHandler::Return(m_streamHandler, m_inputid);
 }
 
 /** \fn ASISignalMonitor::Stop(void)
@@ -66,8 +66,8 @@ void ASISignalMonitor::Stop(void)
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Stop() -- begin");
     SignalMonitor::Stop();
     if (GetStreamData())
-        streamHandler->RemoveListener(GetStreamData());
-    streamHandlerStarted = false;
+        m_streamHandler->RemoveListener(GetStreamData());
+    m_streamHandlerStarted = false;
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Stop() -- end");
 }
@@ -88,7 +88,7 @@ void ASISignalMonitor::UpdateValues(void)
     if (!m_running || m_exit)
         return;
 
-    if (streamHandlerStarted)
+    if (m_streamHandlerStarted)
     {
         EmitStatus();
         if (IsAllGood())
@@ -119,8 +119,8 @@ void ASISignalMonitor::UpdateValues(void)
                    kDTVSigMon_WaitForMGT | kDTVSigMon_WaitForVCT |
                    kDTVSigMon_WaitForNIT | kDTVSigMon_WaitForSDT))
     {
-        streamHandler->AddListener(GetStreamData());
-        streamHandlerStarted = true;
+        m_streamHandler->AddListener(GetStreamData());
+        m_streamHandlerStarted = true;
     }
 
     m_update_done = true;

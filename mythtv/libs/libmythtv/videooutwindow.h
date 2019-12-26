@@ -44,7 +44,7 @@ class VideoOutWindow : public QObject
     void WindowRectChanged      (const QRect &WindowRect);
 
   public slots:
-    void ScreenChanged          (QScreen*);
+    void ScreenChanged          (QScreen *screen);
 
     // Sets
     void InputChanged           (const QSize &VideoDim, const QSize &VideoDispDim, float Aspect);

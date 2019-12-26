@@ -26,9 +26,11 @@ void MythUICheckBox::SetInitialStates()
     m_CheckState = dynamic_cast<MythUIStateType *>(GetChild("checkstate"));
 
     if (!m_CheckState || !m_BackgroundState)
+    {
         LOG(VB_GENERAL, LOG_ERR,
             QString("Checkbox %1 is missing required elements")
             .arg(objectName()));
+    }
 
     if (m_CheckState)
         m_CheckState->DisplayState(m_currentCheckState);

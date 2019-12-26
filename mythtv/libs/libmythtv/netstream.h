@@ -33,17 +33,17 @@ class NetStream : public QObject
 
 public:
     enum EMode { kNeverCache, kPreferCache, kAlwaysCache };
-    NetStream(const QUrl &, EMode mode = kPreferCache,
+    NetStream(const QUrl &url, EMode mode = kPreferCache,
               QByteArray cert = QByteArray());
-    virtual ~NetStream();
+    ~NetStream() override;
 
 public:
     // RingBuffer interface
-    static bool IsSupported(const QUrl &);
+    static bool IsSupported(const QUrl &url);
     bool IsOpen() const;
     void Abort();
     int safe_read(void *data, unsigned sz, unsigned millisecs = 0);
-    qlonglong Seek(qlonglong);
+    qlonglong Seek(qlonglong pos);
     qlonglong GetReadPosition() const;
     qlonglong GetSize() const;
 
@@ -76,7 +76,7 @@ public:
     // Implementation
 private slots:
     // NAMThread signals
-    void slotRequestStarted(int, QNetworkReply *);
+    void slotRequestStarted(int id, QNetworkReply *reply);
     // QNetworkReply signals
     void slotFinished();
 #ifndef QT_NO_OPENSSL
@@ -88,7 +88,7 @@ private slots:
 private:
     Q_DISABLE_COPY(NetStream)
 
-    bool Request(const QUrl &);
+    bool Request(const QUrl &url);
 
     const int m_id; // Unique request ID
     const QUrl m_url;
@@ -119,7 +119,7 @@ class NAMThread : public QThread
 
 public:
     static NAMThread & manager(); // Singleton
-    virtual ~NAMThread();
+    ~NAMThread() override;
 
     static inline void PostEvent(QEvent *e) { manager().Post(e); }
     void Post(QEvent *event);
@@ -135,9 +135,9 @@ signals:
     // Implementation
 protected:
     void run() override; // QThread
-    bool NewRequest(QEvent *);
-    bool StartRequest(NetStreamRequest *);
-    static bool AbortRequest(NetStreamAbort *);
+    bool NewRequest(QEvent *event);
+    bool StartRequest(NetStreamRequest *p);
+    static bool AbortRequest(NetStreamAbort *p);
 
 private slots:
     void quit();

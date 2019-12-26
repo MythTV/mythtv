@@ -73,9 +73,11 @@ QString getTempDirectory(bool showError)
     QString tempDir = gCoreContext->GetSetting("MythArchiveTempDir", "");
 
     if (tempDir == "" && showError)
+    {
         ShowOkPopup(QCoreApplication::translate("(ArchiveUtils)", 
             "Cannot find the MythArchive work directory.\n"
             "Have you set the correct path in the settings?"));
+    }
 
     if (tempDir == "")
         return "";
@@ -112,9 +114,11 @@ void checkTempDirectory()
     {
         dir.mkdir(workDir);
         if( chmod(qPrintable(workDir), 0777) != 0 )
+        {
             LOG(VB_GENERAL, LOG_ERR,
                 "Failed to change permissions on archive work directory: " +
                 ENO);
+        }
     }
 
     dir = QDir(logDir);
@@ -122,18 +126,22 @@ void checkTempDirectory()
     {
         dir.mkdir(logDir);
         if( chmod(qPrintable(logDir), 0777) != 0 )
+        {
             LOG(VB_GENERAL, LOG_ERR,
                 "Failed to change permissions on archive log directory: " +
                 ENO);
+        }
     }
     dir = QDir(configDir);
     if (!dir.exists())
     {
         dir.mkdir(configDir);
         if( chmod(qPrintable(configDir), 0777) != 0 )
+        {
             LOG(VB_GENERAL, LOG_ERR, 
                 "Failed to change permissions on archive config directory: " +
                 ENO);
+        }
     }
 }
 
@@ -180,7 +188,8 @@ bool extractDetailsFromFilename(const QString &inFile,
 ProgramInfo *getProgramInfoForFile(const QString &inFile)
 {
     ProgramInfo *pinfo = nullptr;
-    QString chanID, startTime;
+    QString chanID;
+    QString startTime;
 
     bool bIsMythRecording = extractDetailsFromFilename(inFile, chanID, startTime);
 
@@ -303,10 +312,14 @@ void recalcItemSize(ArchiveItem *item)
     if (profile->name == "NONE")
     {
         if (item->hasCutlist && item->useCutlist)
+        {
             item->newsize = (int64_t) (item->size /
                     ((float)item->duration / (float)item->cutDuration));
+        }
         else
+        {
             item->newsize = item->size;
+        }
     }
     else
     {

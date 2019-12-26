@@ -29,7 +29,7 @@ public:
             long long frameno, long long *pNextFrame) override; // FrameAnalyzer
     int finished(long long nframes, bool final) override; // FrameAnalyzer
     int reportTime(void) const override; // FrameAnalyzer
-    FrameMap GetMap(unsigned int) const override // FrameAnalyzer
+    FrameMap GetMap(unsigned int /*index*/) const override // FrameAnalyzer
         { return m_changeMap; }
 
     /* SceneChangeDetector interface. */
@@ -42,23 +42,23 @@ public:
     using SceneChangeData = scenechange_data[UCHAR_MAX + 1];
 
   protected:
-    virtual ~SceneChangeDetector(void) = default;
+    ~SceneChangeDetector(void) override = default;
 
   private:
     HistogramAnalyzer       *m_histogramAnalyzer {nullptr};
     float                   m_fps                {0.0F};
 
     /* per-frame info */
-    SceneChangeData         *m_scdata            {nullptr};
-    unsigned short          *m_scdiff            {nullptr};
+    SceneChangeData         *m_scData            {nullptr};
+    unsigned short          *m_scDiff            {nullptr};
 
     FrameAnalyzer::FrameMap m_changeMap;
 
     /* Debugging */
     int                     m_debugLevel         {0};
-    QString                 m_debugdata;            /* filename */
-    bool                    m_debug_scenechange  {false};
-    bool                    m_scenechange_done   {false};
+    QString                 m_debugData;            /* filename */
+    bool                    m_debugSceneChange   {false};
+    bool                    m_sceneChangeDone    {false};
 };
 
 #endif  /* !__SCENECHANGEDETECTOR_H__ */

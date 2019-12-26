@@ -27,7 +27,7 @@ class PROTOSERVER_PUBLIC OutboundRequestHandler : public SocketRequestHandler
 
   protected:
     virtual bool AnnounceSocket(void)               { return false; }
-    MythSocket *m_socket;
+    MythSocket *m_socket { nullptr };
 
   private:
     bool DoConnectToMaster(void);

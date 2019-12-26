@@ -33,7 +33,7 @@ public:
     /* Ctor/dtor. */
     TemplateFinder(PGMConverter *pgmc, BorderDetector *bd, EdgeDetector *ed,
             MythPlayer *player, int proglen, const QString& debugdir);
-    ~TemplateFinder(void);
+    ~TemplateFinder(void) override;
 
     /* FrameAnalyzer interface. */
     const char *name(void) const override // FrameAnalyzer
@@ -44,7 +44,7 @@ public:
             long long frameno, long long *pNextFrame) override; // FrameAnalyzer
     int finished(long long nframes, bool final) override; // FrameAnalyzer
     int reportTime(void) const override; // FrameAnalyzer
-    FrameMap GetMap(unsigned int) const override // FrameAnalyzer
+    FrameMap GetMap(unsigned int /*index*/) const override // FrameAnalyzer
         { FrameMap map; return map; }
 
     /* TemplateFinder implementation. */
@@ -65,18 +65,18 @@ private:
 
     int             m_width            {-1};      /* dimensions of frames */
     int             m_height           {-1};      /* dimensions of frames */
-    unsigned int   *scores             {nullptr}; /* pixel "edge" scores */
+    unsigned int   *m_scores           {nullptr}; /* pixel "edge" scores */
 
-    int             mincontentrow      {INT_MAX}; /* limits of content area of images */
-    int             mincontentcol      {INT_MAX};
-    int             maxcontentrow1     {INT_MAX}; /* minrow + height ("maxrow + 1") */
-    int             maxcontentcol1     {INT_MAX}; /* mincol + width ("maxcol + 1") */
+    int             m_minContentRow    {INT_MAX}; /* limits of content area of images */
+    int             m_minContentCol    {INT_MAX};
+    int             m_maxContentRow1   {INT_MAX}; /* minrow + height ("maxrow + 1") */
+    int             m_maxContentCol1   {INT_MAX}; /* mincol + width ("maxcol + 1") */
 
     AVFrame         m_tmpl             {};        /* logo-matching template */
-    int             m_tmplrow          {-1};
-    int             m_tmplcol          {-1};
-    int             m_tmplwidth        {-1};
-    int             m_tmplheight       {-1};
+    int             m_tmplRow          {-1};
+    int             m_tmplCol          {-1};
+    int             m_tmplWidth        {-1};
+    int             m_tmplHeight       {-1};
 
     AVFrame         m_cropped          {};        /* cropped version of frame */
     int             m_cwidth           {-1};      /* cropped width */
@@ -84,15 +84,15 @@ private:
 
     /* Debugging. */
     int             m_debugLevel       {0};
-    QString         m_debugdir;
-    QString         m_debugdata;                  /* filename: template location */
-    QString         m_debugtmpl;                  /* filename: logo template */
-    bool            m_debug_template   {false};
-    bool            m_debug_edgecounts {false};
-    bool            m_debug_frames     {false};
-    bool            m_tmpl_valid       {false};
-    bool            m_tmpl_done        {false};
-    struct timeval  m_analyze_time     {0,0};
+    QString         m_debugDir;
+    QString         m_debugData;                  /* filename: template location */
+    QString         m_debugTmpl;                  /* filename: logo template */
+    bool            m_debugTemplate    {false};
+    bool            m_debugEdgeCounts  {false};
+    bool            m_debugFrames      {false};
+    bool            m_tmplValid        {false};
+    bool            m_tmplDone         {false};
+    struct timeval  m_analyzeTime      {0,0};
 };
 
 #endif  /* !__TEMPLATEFINDER_H__ */

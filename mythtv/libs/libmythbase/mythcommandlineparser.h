@@ -22,7 +22,7 @@ class MBASE_PUBLIC CommandLineArg : public ReferenceCounter
                    QString help, QString longhelp);
     CommandLineArg(const QString& name, QVariant::Type type, QVariant def);
     explicit CommandLineArg(const QString& name);
-   ~CommandLineArg() = default;
+   ~CommandLineArg() override = default;
 
     CommandLineArg* SetGroup(const QString &group)    { m_group = group;
                                                       return this; }
@@ -113,7 +113,7 @@ class MBASE_PUBLIC CommandLineArg : public ReferenceCounter
 class MBASE_PUBLIC MythCommandLineParser
 {
   public:
-    explicit MythCommandLineParser(QString);
+    explicit MythCommandLineParser(QString appname);
    ~MythCommandLineParser();
 
     virtual void LoadArguments(void) {};

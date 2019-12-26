@@ -186,6 +186,7 @@ bool SignalMonitorValue::AllGood(const SignalMonitorList& slist)
         QString msg("AllGood failed on ");
         it = slist.begin();
         for (; it != slist.end(); ++it)
+        {
             if (!it->IsGood())
             {
                 msg += it->m_noSpaceName;
@@ -194,6 +195,7 @@ bool SignalMonitorValue::AllGood(const SignalMonitorList& slist)
                            .arg(it->m_highThreshold ? "<" : ">")
                            .arg(it->GetThreshold());
             }
+        }
         LOG(VB_GENERAL, LOG_DEBUG, msg);
     }
 #endif

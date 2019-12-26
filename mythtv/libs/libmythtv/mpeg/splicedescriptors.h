@@ -42,41 +42,40 @@ class SpliceDescriptorID
 class SpliceDescriptor
 {
   public:
-    operator const unsigned char*(void) const { return _data; }
+    operator const unsigned char*(void) const { return m_data; }
 
-    SpliceDescriptor(const unsigned char *data, int len) : _data(data)
+    SpliceDescriptor(const unsigned char *data, int len) : m_data(data)
     {
         if ((len < 2) || (int(DescriptorLength()) + 2) > len)
-            _data = nullptr;
+            m_data = nullptr;
     }
     SpliceDescriptor(const unsigned char *data,
-                     int len, uint tag) : _data(data)
+                     int len, uint tag) : m_data(data)
     {
-        if ((len < 2) || (int(DescriptorLength()) + 2) > len)
-            _data = nullptr;
-        else if (DescriptorTag() != tag)
-            _data = nullptr;
+        if ((len < 2) || ((int(DescriptorLength()) + 2) > len)
+            || (DescriptorTag() != tag))
+            m_data = nullptr;
     }
     virtual ~SpliceDescriptor(void) = default;
 
-    bool IsValid(void) const { return _data; }
+    bool IsValid(void) const { return m_data; }
     uint size(void) const { return DescriptorLength() + 2; }
 
     //       Name             bits  loc  expected value
     // splice_descriptor_tag    8   0.0  0x01
-    uint DescriptorTag(void) const { return _data[0]; }
+    uint DescriptorTag(void) const { return m_data[0]; }
     QString DescriptorTagString(void) const;
     // descriptor_length        8   1.0
-    uint DescriptorLength(void) const { return _data[1]; }
+    uint DescriptorLength(void) const { return m_data[1]; }
     // identifier              32   2.0  0x43554549 "CUEI"
     uint Identifier(void) const
     {
-        return (_data[2]<<24) | (_data[3]<<16) | (_data[4]<<8) | _data[5];
+        return (m_data[2]<<24) | (m_data[3]<<16) | (m_data[4]<<8) | m_data[5];
     }
     QString IdentifierString(void) const
     {
-        return QString(QChar(_data[2])) + QChar(_data[3]) +
-            QChar(_data[4]) + QChar(_data[5]);
+        return QString(QChar(m_data[2])) + QChar(m_data[3]) +
+            QChar(m_data[4]) + QChar(m_data[5]);
     }
 
     virtual QString toString(void) const;
@@ -94,7 +93,7 @@ class SpliceDescriptor
   protected:
     virtual bool Parse(void) { return true; }
 
-    const unsigned char *_data;
+    const unsigned char *m_data {nullptr};
 };
 
 class AvailDescriptor : public SpliceDescriptor
@@ -109,12 +108,12 @@ class AvailDescriptor : public SpliceDescriptor
     // provider_avail_id       32   6.0  
     uint ProviderAvailId(void) const
     {
-        return (_data[2]<<24) | (_data[3]<<16) | (_data[4]<<8) | _data[5];
+        return (m_data[2]<<24) | (m_data[3]<<16) | (m_data[4]<<8) | m_data[5];
     }
     QString ProviderAvailIdString(void) const
     {
-        return QString(QChar(_data[6])) + QChar(_data[7]) +
-            QChar(_data[8]) + QChar(_data[9]);
+        return QString(QChar(m_data[6])) + QChar(m_data[7]) +
+            QChar(m_data[8]) + QChar(m_data[9]);
     }
 
     QString toString(void) const override // SpliceDescriptor
@@ -134,16 +133,16 @@ class DTMFDescriptor : public SpliceDescriptor
     // descriptor_length        8   1.0
     // identifier              32   2.0  0x43554549 "CUEI"
     // preroll                  8   6.0
-    uint Preroll(void) const { return _data[6]; }
+    uint Preroll(void) const { return m_data[6]; }
     // dtmf_count               3   7.0
-    uint DTMFCount(void) const { return _data[7]>>5; }
+    uint DTMFCount(void) const { return m_data[7]>>5; }
     // reserved                 5   7.3
     // for (i = 0; i < dtmf_count; i++)
     //   DTMF_char              8   8.0+i
-    char DTMFChar(uint i) const { return _data[8+i]; }
+    char DTMFChar(uint i) const { return m_data[8+i]; }
     QString DTMFString(void) const
     {
-        QByteArray ba(reinterpret_cast<const char*>(_data+8), DTMFCount());
+        QByteArray ba(reinterpret_cast<const char*>(m_data+8), DTMFCount());
         return QString(ba);
     }
 
@@ -162,8 +161,8 @@ class SegmentationDescriptor : public SpliceDescriptor
         SpliceDescriptor(data, len, SpliceDescriptorID::segmentation)
     {
         _ptrs[2] = _ptrs[1] = _ptrs[0] = nullptr;
-        if (_data && !SegmentationDescriptor::Parse())
-            _data = nullptr;
+        if (m_data && !SegmentationDescriptor::Parse())
+            m_data = nullptr;
     }
 
     //       Name             bits  loc  expected value
@@ -173,37 +172,37 @@ class SegmentationDescriptor : public SpliceDescriptor
     // segmentation_event_id   32   6.0
     uint SegmentationEventId(void) const
     {
-        return (_data[2]<<24) | (_data[3]<<16) | (_data[4]<<8) | _data[5];
+        return (m_data[2]<<24) | (m_data[3]<<16) | (m_data[4]<<8) | m_data[5];
     }
     QString SegmentationEventIdString(void) const
     {
-        return QString(QChar(_data[6])) + QChar(_data[7]) +
-            QChar(_data[8]) + QChar(_data[9]);
+        return QString(QChar(m_data[6])) + QChar(m_data[7]) +
+            QChar(m_data[8]) + QChar(m_data[9]);
     }
     // segmentation_event_cancel_indicator 1 10.0
-    bool IsSegmentationEventCancel(void) const { return ( _data[10] & 0x80 ) != 0; }
+    bool IsSegmentationEventCancel(void) const { return ( m_data[10] & 0x80 ) != 0; }
     // reserved                 7  10.1
     // if (segmentation_event_cancel_indicator == ‘0’) {
     //   program_seg_flag       1  11.0
-    bool IsProgramSegmentation(void) const { return ( _data[11] & 0x80 ) != 0; }
+    bool IsProgramSegmentation(void) const { return ( m_data[11] & 0x80 ) != 0; }
     //   seg_duration_flag      1  11.1
-    bool HasSegmentationDuration(void) const { return ( _data[11] & 0x40 ) != 0; }
+    bool HasSegmentationDuration(void) const { return ( m_data[11] & 0x40 ) != 0; }
     //   reserved               6  11.2
     //   if (program_segmentation_flag == ‘0’) {
     //     component_count      8  12
-    uint ComponentCount(void) const { return _data[12]; }
+    uint ComponentCount(void) const { return m_data[12]; }
     //     for (i = 0; i < component_count; i++) {
     //       component_tag      8  13 + i * 6
-    uint ComponentTag(uint i) const { return _data[13 + i * 6]; }
+    uint ComponentTag(uint i) const { return m_data[13 + i * 6]; }
     //       reserved           7  14.1 + i * 6
     //       pts_offset        33  14.7 + i * 6
     uint64_t PTSOffset(uint i)
     {
-        return ((uint64_t(_data[14+(i*6)] & 0x1) << 32) |
-                (uint64_t(_data[15+(i*6)])       << 24) |
-                (uint64_t(_data[16+(i*6)])       << 16) |
-                (uint64_t(_data[17+(i*6)])       <<  8) |
-                (uint64_t(_data[18+(i*6)])));
+        return ((uint64_t(m_data[14+(i*6)] & 0x1) << 32) |
+                (uint64_t(m_data[15+(i*6)])       << 24) |
+                (uint64_t(m_data[16+(i*6)])       << 16) |
+                (uint64_t(m_data[17+(i*6)])       <<  8) |
+                (uint64_t(m_data[18+(i*6)])));
     }
     //     }
     //   }

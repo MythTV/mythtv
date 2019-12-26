@@ -81,10 +81,12 @@ bool GeneralSettings::Create()
                  "accordingly. Features such as ID3 playcounts "
                  "and ratings depend on this being enabled."));
     if (m_resetDBButton)
+    {
         m_resetDBButton->SetHelpText(tr("This will clear all the MythMusic database tables allowing "
                  "for a fresh start. NOTE: You may lose any manual or automatic changes made to "
                  "a tracks metadata like rating or playcount unless you told MythMusic to "
                  "write those to the tag."));
+    }
     m_cancelButton->SetHelpText(tr("Exit without saving settings"));
     m_saveButton->SetHelpText(tr("Save settings and Exit"));
 

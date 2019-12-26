@@ -25,7 +25,7 @@ class GallerySlideView : public MythScreenType
     Q_OBJECT
 public:
     GallerySlideView(MythScreenStack *parent, const char *name, bool editsAllowed);
-    ~GallerySlideView();
+    ~GallerySlideView() override;
     bool Create() override; // MythScreenType
 
 public slots:
@@ -37,15 +37,15 @@ signals:
     void ImageSelected(int);
 
 private:
-    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
-    void customEvent(QEvent *) override; // MythUIType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
+    void customEvent(QEvent *event) override; // MythUIType
     void MenuMain();
-    void MenuTransforms(MythMenu &);
+    void MenuTransforms(MythMenu &mainMenu);
     void Suspend();
     void Release();
-    void Transform(ImageFileTransform);
-    void Zoom(int = 0);
-    void Pan(QPoint = QPoint(0, 0));
+    void Transform(ImageFileTransform state);
+    void Zoom(int increment = 0);
+    void Pan(QPoint offset = QPoint(0, 0));
     void SetStatus(QString msg, bool delay = false);
     void ClearStatus(Slide &slide);
 
@@ -57,8 +57,8 @@ private slots:
     void ShowSlide(int direction = 0);
     void Stop();
     void Play(bool useTransition = true);
-    void RepeatOn(int on = 1)   { gCoreContext->SaveSetting("GalleryRepeat", on); }
-    void RepeatOff()            { RepeatOn(0); }
+    static void RepeatOn(int on = 1)   { gCoreContext->SaveSetting("GalleryRepeat", on); }
+    static void RepeatOff()            { RepeatOn(0); }
     void ShowInfo();
     void HideInfo();
     void ShowCaptions();

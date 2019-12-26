@@ -18,13 +18,13 @@ class MUI_PUBLIC MythUICheckBox : public MythUIType
 
   public:
     MythUICheckBox(MythUIType *parent, const QString &name);
-   ~MythUICheckBox() = default;
+   ~MythUICheckBox() override = default;
 
     enum StateType { None = 0, Normal, Disabled, Active, Selected,
                      SelectedInactive };
 
     bool gestureEvent(MythGestureEvent *event) override; // MythUIType
-    bool keyPressEvent(QKeyEvent *) override; // MythUIType
+    bool keyPressEvent(QKeyEvent *event) override; // MythUIType
 
     void toggleCheckState(void);
 

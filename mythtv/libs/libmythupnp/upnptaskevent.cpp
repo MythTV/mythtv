@@ -99,9 +99,11 @@ void UPnpEventTask::Execute( TaskQueue * /*pQueue*/ )
             }
         }
         else
+        {
             LOG(VB_UPNP, LOG_ERR,
                 QString("UPnpEventTask::Execute - Error sending to %1:%2.")
                     .arg(m_PeerAddress.toString()) .arg(m_nPeerPort));
+        }
 
         sock.Close();
     }

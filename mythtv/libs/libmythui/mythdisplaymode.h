@@ -16,7 +16,7 @@
 
 class MythDisplayMode;
 using namespace std;
-typedef map<uint64_t, MythDisplayMode> DisplayModeMap;
+using DisplayModeMap =  map<uint64_t, MythDisplayMode>;
 
 class MUI_PUBLIC MythDisplayMode
 {

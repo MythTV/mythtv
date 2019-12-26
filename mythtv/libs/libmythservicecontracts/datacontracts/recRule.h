@@ -122,7 +122,7 @@ class SERVICE_PUBLIC RecRule : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Q_INVOKABLE RecRule(QObject *parent = nullptr)
+        Q_INVOKABLE explicit RecRule(QObject *parent = nullptr)
             : QObject         ( parent ),
               m_Id            ( 0      ),
               m_ParentId      ( 0      ),

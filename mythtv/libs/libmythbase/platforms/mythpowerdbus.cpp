@@ -61,7 +61,7 @@ MythPowerDBus::MythPowerDBus()
 {
     m_delayTimer.setSingleShot(true);
     connect(&m_delayTimer, &QTimer::timeout, this, &MythPowerDBus::ReleaseLock);
-    Init();
+    MythPowerDBus::Init();
 }
 
 MythPowerDBus::~MythPowerDBus()

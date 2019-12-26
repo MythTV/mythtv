@@ -429,10 +429,12 @@ qint64 HTTPRequest::SendResponse( void )
     nBytes  = WriteBlock( sHeader.constData(), sHeader.length() );
 
     if (nBytes < sHeader.length())
+    {
         LOG( VB_HTTP, LOG_ERR, QString("HttpRequest::SendResponse(): "
                                        "Incomplete write of header, "
                                        "%1 written of %2")
                                         .arg(nBytes).arg(sHeader.length()));
+    }
 
     // ----------------------------------------------------------------------
     // Write out Response buffer.
@@ -590,10 +592,12 @@ qint64 HTTPRequest::SendResponseFile( const QString& sFileName )
     nBytes = WriteBlock( sHeader.constData(), sHeader.length() );
 
     if (nBytes < sHeader.length())
+    {
         LOG( VB_HTTP, LOG_ERR, QString("HttpRequest::SendResponseFile(): "
                                        "Incomplete write of header, "
                                        "%1 written of %2")
                                         .arg(nBytes).arg(sHeader.length()));
+    }
 
     // ----------------------------------------------------------------------
     // Write out File.
@@ -1686,9 +1690,11 @@ bool HTTPRequest::ProcessSOAPPayload( const QString &sSOAPAction )
     QDomNodeList oNodeList = doc.elementsByTagNameNS( m_sNameSpace, m_sMethod );
 
     if (oNodeList.count() == 0)
+    {
         oNodeList =
             doc.elementsByTagNameNS("http://schemas.xmlsoap.org/soap/envelope/",
                                     "Body");
+    }
 
     if (oNodeList.count() > 0)
     {
@@ -1736,18 +1742,24 @@ Serializer *HTTPRequest::GetSerializer()
     Serializer *pSerializer = nullptr;
 
     if (m_bSOAPRequest)
+    {
         pSerializer = (Serializer *)new SoapSerializer(&m_response,
                                                        m_sNameSpace, m_sMethod);
+    }
     else
     {
         QString sAccept = GetRequestHeader( "Accept", "*/*" );
 
         if (sAccept.contains( "application/json", Qt::CaseInsensitive ) ||
             sAccept.contains( "text/javascript", Qt::CaseInsensitive ))
+        {
             pSerializer = (Serializer *)new JSONSerializer(&m_response,
                                                            m_sMethod);
+        }
         else if (sAccept.contains( "text/x-apple-plist+xml", Qt::CaseInsensitive ))
+        {
             pSerializer = (Serializer *)new XmlPListSerializer(&m_response);
+        }
     }
 
     // Default to XML
@@ -2304,17 +2316,23 @@ void HTTPRequest::AddCORSHeaders( const QString &sOrigin )
 
         if (*it == "*" || (!(*it).startsWith("http://") &&
             !(*it).startsWith("https://")))
+        {
             LOG(VB_GENERAL, LOG_ERR, QString("Illegal AllowedOriginsList"
                 " entry '%1'. Must start with http[s]:// and not be *")
                 .arg(*it));
+        }
         else
+        {
             allowedOrigins << *it;
+        }
     }
 
     if (VERBOSE_LEVEL_CHECK(VB_HTTP, LOG_DEBUG))
+    {
         for (QStringList::const_iterator it = allowedOrigins.begin();
                                          it != allowedOrigins.end(); it++)
             LOG(VB_HTTP, LOG_DEBUG, QString("Will allow Origin: %1").arg(*it));
+    }
 
     if (allowedOrigins.contains(sOrigin))
     {
@@ -2324,9 +2342,11 @@ void HTTPRequest::AddCORSHeaders( const QString &sOrigin )
         LOG(VB_HTTP, LOG_DEBUG, QString("Allow-Origin: %1)").arg(sOrigin));
     }
     else
+    {
         LOG(VB_GENERAL, LOG_CRIT, QString("HTTPRequest: Cross-origin request "
                                           "received with origin (%1)")
                                           .arg(sOrigin));
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////

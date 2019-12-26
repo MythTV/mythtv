@@ -15,12 +15,12 @@ class MetadataSettings : public MythScreenType
 
   public:
 
-    MetadataSettings(MythScreenStack *parent, const char *name = nullptr)
+    explicit MetadataSettings(MythScreenStack *parent, const char *name = nullptr)
         : MythScreenType(parent, name) {}
-    ~MetadataSettings() = default;
+    ~MetadataSettings() override = default;
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
   private:
     MythUISpinBox      *m_trailerSpin         {nullptr};

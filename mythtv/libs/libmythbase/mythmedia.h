@@ -127,7 +127,7 @@ class MBASE_PUBLIC MythMediaDevice : public QObject
     void statusChanged(MythMediaStatus oldStatus, MythMediaDevice* pMedia);
 
  protected:
-    virtual ~MythMediaDevice() = default; // use deleteLater...
+    ~MythMediaDevice() override = default; // use deleteLater...
 
     /// Override this to perform any post mount logic.
     virtual void onDeviceMounted(void)

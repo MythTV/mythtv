@@ -65,7 +65,7 @@ class UPnpNotifyTask : public Task
 
         // Destructor protected to force use of Release Method
 
-        virtual ~UPnpNotifyTask() = default;
+        ~UPnpNotifyTask() override = default;
 
         void     ProcessDevice( MSocketDevice *pSocket, UPnpDevice *pDevice );
         void     SendNotifyMsg( MSocketDevice *pSocket, const QString& sNT, const QString& sUDN );
@@ -75,7 +75,7 @@ class UPnpNotifyTask : public Task
         explicit UPnpNotifyTask( int nServicePort );
 
         QString Name() override { return( "Notify" ); } // Task
-        void Execute( TaskQueue * ) override; // Task
+        void Execute( TaskQueue *pQueue ) override; // Task
 
         // ------------------------------------------------------------------
 

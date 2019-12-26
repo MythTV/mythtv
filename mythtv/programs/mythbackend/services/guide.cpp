@@ -133,7 +133,7 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &rawStartTime,
 
         // Load the list of programmes for this channel
         ProgramList  progList;
-        bindings[":CHANID"] = (*chan_it).m_chanid;
+        bindings[":CHANID"] = (*chan_it).m_chanId;
         LoadFromProgram( progList, sWhere, sOrderBy, sOrderBy, bindings,
                          schedList );
 
@@ -220,9 +220,11 @@ DTC::ProgramList* Guide::GetProgramList(int              nStartIndex,
         sSQL = "WHERE ";
 
     if (bOnlyNew)
+    {
         sSQL = "LEFT JOIN oldprogram ON oldprogram.oldtitle = program.title "
                 + sSQL
                 + "oldprogram.oldtitle IS NULL AND ";
+    }
 
     sSQL += "deleted IS NULL AND ";
 

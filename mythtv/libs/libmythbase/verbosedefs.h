@@ -61,7 +61,7 @@
             VB_LAST_ITEM \
         };
     #define VERBOSE_MAP(name,mask,additive,help) \
-        name = mask,
+        name = (mask),
 #else
     // msvc can't have 64bit enums
     #define VERBOSE_PREAMBLE
@@ -200,21 +200,21 @@ LOGLEVEL_POSTAMBLE
 
 #ifndef _IMPLEMENT_VERBOSE
 #ifdef __cplusplus
-typedef struct {
+struct VerboseDef {
     uint64_t    mask;
     QString     name;
     bool        additive;
     QString     helpText;
-} VerboseDef;
-typedef QMap<QString, VerboseDef *> VerboseMap;
+};
+using VerboseMap = QMap<QString, VerboseDef *>;
 
-typedef struct {
+struct LoglevelDef {
     int         value;
     QString     name;
     char        shortname;
-} LoglevelDef;
-typedef QMap<int, LoglevelDef *> LoglevelMap;
-typedef QMap<uint64_t, LogLevel_t> ComponentLogLevelMap;
+};
+using LoglevelMap = QMap<int, LoglevelDef *>;
+using ComponentLogLevelMap = QMap<uint64_t, LogLevel_t>;
 
 extern VerboseMap verboseMap;
 extern QMutex verboseMapMutex;

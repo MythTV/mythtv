@@ -445,10 +445,12 @@ RecStatus::Type EncoderLink::StartRecording(ProgramInfo *rec)
         retval = m_sock->StartRecording(m_inputid, rec);
     }
     else
+    {
         LOG(VB_GENERAL, LOG_ERR,
             QString("Wanted to start recording on recorder %1,\n\t\t\t"
                     "but the backend is not there anymore\n")
                 .arg(m_inputid));
+    }
 
     if (retval != RecStatus::Recording &&
         retval != RecStatus::Tuning &&
@@ -474,10 +476,12 @@ RecStatus::Type EncoderLink::GetRecordingStatus(void)
         retval = m_sock->GetRecordingStatus(m_inputid);
     }
     else
+    {
         LOG(VB_GENERAL, LOG_ERR,
             QString("Wanted to get status on recorder %1,\n\t\t\t"
                     "but the backend is not there anymore\n")
                 .arg(m_inputid));
+    }
 
     if (retval != RecStatus::Recording &&
         retval != RecStatus::Tuning &&

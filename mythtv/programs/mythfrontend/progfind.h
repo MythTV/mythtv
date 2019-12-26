@@ -30,7 +30,7 @@ class ProgFinder : public ScheduleCommon
           m_player(player),
           m_embedVideo(embedVideo),
           m_allowEPG(allowEPG) {}
-    virtual ~ProgFinder();
+    ~ProgFinder() override;
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
@@ -63,7 +63,7 @@ class ProgFinder : public ScheduleCommon
     void getShowNames(void);
     void updateShowList();
     void updateTimesList();
-    void selectShowData(QString, int);
+    void selectShowData(QString progTitle, int newCurShow);
 
     ShowName m_showNames;
 
@@ -103,7 +103,7 @@ class JaProgFinder : public ProgFinder
     void whereClauseGetSearchData(QString &where, MSqlBindings &bindings) override; // ProgFinder
 
   private:
-    static const QChar s_searchChars[];
+    static const QChar kSearchChars[];
     int m_numberOfSearchChars;
 };
 
@@ -121,7 +121,7 @@ class HeProgFinder : public ProgFinder
     void whereClauseGetSearchData(QString &where, MSqlBindings &bindings) override; // ProgFinder
 
   private:
-    static const QChar s_searchChars[];
+    static const QChar kSearchChars[];
     int m_numberOfSearchChars;
 };
 ///////////////////////////////
@@ -139,7 +139,7 @@ class RuProgFinder : public ProgFinder
     void whereClauseGetSearchData(QString &where, MSqlBindings &bindings) override; // ProgFinder
                                              
   private:
-    static const QChar s_searchChars[];
+    static const QChar kSearchChars[];
     int m_numberOfSearchChars;
 };
 ///////////////////////////////////

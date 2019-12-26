@@ -2,9 +2,12 @@
 #define CC608READER_H
 
 #include <cstdint>
+#include <utility>
 
+// Qt headers
 #include <QMutex>
 
+// MythTV headers
 #include "cc608decoder.h"
 
 #include "mythtvexp.h"
@@ -15,10 +18,9 @@
 class CC608Text
 {
   public:
-    CC608Text(const QString &T, int X, int Y) :
-        m_text(T), m_x(X), m_y(Y) {}
-    CC608Text(const CC608Text &other) :
-        m_text(other.m_text), m_x(other.m_x), m_y(other.m_y) {}
+    CC608Text(QString T, int X, int Y) :
+        m_text(std::move(T)), m_x(X), m_y(Y) {}
+    CC608Text(const CC608Text &other)  = default;
     QString m_text;
     int     m_x;
     int     m_y;
@@ -39,7 +41,7 @@ class CC608Buffer
     void Clear(void)
     {
         m_lock.lock();
-        vector<CC608Text*>::iterator i = m_buffers.begin();
+        auto i = m_buffers.begin();
         for (; i != m_buffers.end(); ++i)
         {
             CC608Text *cc = (*i);
@@ -80,7 +82,7 @@ class MTV_PUBLIC CC608Reader : public CC608Input
 {
   public:
     explicit CC608Reader(MythPlayer *parent);
-   ~CC608Reader();
+   ~CC608Reader() override;
 
     void SetTTPageNum(int page)  { m_ccPageNum = page; }
     void SetEnabled(bool enable) { m_enabled = enable; }

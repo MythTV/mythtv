@@ -48,7 +48,7 @@ class MBroadcastSocketDevice : public MSocketDevice
         bind(m_address, m_port);
     }
 
-    virtual ~MBroadcastSocketDevice()
+    ~MBroadcastSocketDevice() override
     {
         int zero = 0;
         if (setsockopt(socket(), SOL_SOCKET, SO_BROADCAST, (const char *)&zero,

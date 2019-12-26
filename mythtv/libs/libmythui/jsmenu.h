@@ -83,7 +83,7 @@ class JoystickMenuThread : public MThread
   public:
     explicit JoystickMenuThread(QObject *main_window)
         : MThread("JoystickMenu"), m_mainWindow(main_window) {}
-    ~JoystickMenuThread();
+    ~JoystickMenuThread() override;
     bool Init(QString &config_file);
 
     void ButtonUp(int button);

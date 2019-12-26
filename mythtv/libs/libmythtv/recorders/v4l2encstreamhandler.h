@@ -32,7 +32,7 @@ class V4L2encStreamHandler : public StreamHandler
 
   public:
     V4L2encStreamHandler(const QString & device, int audio_input, int inputid);
-    ~V4L2encStreamHandler(void);
+    ~V4L2encStreamHandler(void) override;
 
     void run(void) override; // MThread
 #if 0
@@ -101,54 +101,52 @@ class V4L2encStreamHandler : public StreamHandler
     int           m_bufferSize             {1000 * (int)TSPacket::kSize};
 
     // Encoding info
-    int           m_desired_stream_type    {-1};
-    int           m_stream_type            {-1};
-    int           m_aspect_ratio           {-1};
-    int           m_bitrate_mode           {V4L2_MPEG_VIDEO_BITRATE_MODE_VBR};
+    int           m_desiredStreamType      {-1};
+    int           m_streamType             {-1};
+    int           m_aspectRatio            {-1};
+    int           m_bitrateMode            {V4L2_MPEG_VIDEO_BITRATE_MODE_VBR};
     int           m_bitrate                {-1};
-    int           m_max_bitrate            {-1};
-    int           m_audio_codec            {-1};
-    int           m_audio_layer            {V4L2_MPEG_AUDIO_ENCODING_LAYER_1};
-    int           m_audio_samplerate       {-1};
-    int           m_audio_bitrateL1        {-1};
-    int           m_audio_bitrateL2        {-1};
-    int           m_audio_bitrateL3        {-1};
-    int           m_audio_volume           {-1};
-    int           m_lang_mode              {-1}; ///< 0 is Main Lang; 1 is SAP Lang; 2 is Dual
-    uint          m_low_bitrate_mode       {V4L2_MPEG_VIDEO_BITRATE_MODE_VBR};
-    uint          m_low_bitrate            {UINT_MAX};
-    uint          m_low_peak_bitrate       {UINT_MAX};
-    uint          m_medium_bitrate_mode    {V4L2_MPEG_VIDEO_BITRATE_MODE_VBR};
-    uint          m_medium_bitrate         {UINT_MAX};
-    uint          m_medium_peak_bitrate    {UINT_MAX};
-    uint          m_high_bitrate_mode      {V4L2_MPEG_VIDEO_BITRATE_MODE_VBR};
-    uint          m_high_bitrate           {UINT_MAX};
-    uint          m_high_peak_bitrate      {UINT_MAX};
+    int           m_maxBitrate             {-1};
+    int           m_audioCodec             {-1};
+    int           m_audioLayer             {V4L2_MPEG_AUDIO_ENCODING_LAYER_1};
+    int           m_audioSampleRate        {-1};
+    int           m_audioBitrateL1         {-1};
+    int           m_audioBitrateL2         {-1};
+    int           m_audioBitrateL3         {-1};
+    int           m_audioVolume            {-1};
+    int           m_langMode               {-1}; ///< 0 is Main Lang; 1 is SAP Lang; 2 is Dual
+    uint          m_lowBitrateMode         {V4L2_MPEG_VIDEO_BITRATE_MODE_VBR};
+    uint          m_lowBitrate             {UINT_MAX};
+    uint          m_lowPeakBitrate         {UINT_MAX};
+    uint          m_mediumBitrateMode      {V4L2_MPEG_VIDEO_BITRATE_MODE_VBR};
+    uint          m_mediumBitrate          {UINT_MAX};
+    uint          m_mediumPeakBitrate      {UINT_MAX};
+    uint          m_highBitrateMode        {V4L2_MPEG_VIDEO_BITRATE_MODE_VBR};
+    uint          m_highBitrate            {UINT_MAX};
+    uint          m_highPeakBitrate        {UINT_MAX};
 
-    static const int   s_audio_rateL1[];
-    static const int   s_audio_rateL2[];
-    static const int   s_audio_rateL3[];
-    static const char *s_stream_types[];
-    static const char *s_aspect_ratios[];
+    static const int   kAudioRateL1[];
+    static const int   kAudioRateL2[];
+    static const int   kAudioRateL3[];
+    static const char *kStreamTypes[];
 
     int           m_fd                     {-1};
-    int           m_audio_input;
+    int           m_audioInput             {-1};
 
     uint          m_width                  {UINT_MAX};
     uint          m_height                 {UINT_MAX};
-    bool          m_has_lock               {false};
-    uint          m_signal_strength        {UINT_MAX};
+    uint          m_signalStrength         {UINT_MAX};
 
     V4L2util      m_v4l2;
     DeviceReadBuffer *m_drb                {nullptr};
 
     // VBI
-    QString       m_vbi_device;
+    QString       m_vbiDevice;
 
-    QAtomicInt    m_streaming_cnt          {0};
-    QMutex        m_stream_lock;
+    QAtomicInt    m_streamingCnt           {0};
+    QMutex        m_streamLock;
 
-    bool          m_pause_encoding_allowed {true};
+    bool          m_pauseEncodingAllowed   {true};
 };
 
 #endif // _V4L2encSTREAMHANDLER_H_

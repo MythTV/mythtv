@@ -103,7 +103,7 @@ class MUI_PUBLIC MythUIImage : public MythUIType
                 MythUIType *parent, const QString &name);
     MythUIImage(const QString &filename, MythUIType *parent, const QString &name);
     MythUIImage(MythUIType *parent, const QString &name);
-   ~MythUIImage();
+   ~MythUIImage() override;
 
     QString GetFilename(void) { return m_Filename; }
 

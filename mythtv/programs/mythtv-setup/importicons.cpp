@@ -28,10 +28,14 @@ ImportIconsWizard::ImportIconsWizard(MythScreenStack *parent, bool fRefresh,
     m_strChannelname(std::move(channelname)), m_fRefresh(fRefresh)
 {
     if (!m_strChannelname.isEmpty())
+    {
         LOG(VB_GENERAL, LOG_INFO,
             QString("Fetching icon for channel %1").arg(m_strChannelname));
+    }
     else
+    {
         LOG(VB_GENERAL, LOG_INFO, "Fetching icons for multiple channels");
+    }
 
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
 
@@ -469,10 +473,14 @@ bool ImportIconsWizard::doLoad()
                         .arg((*m_missingIter).strName));
     m_manualEdit->SetText((*m_missingIter).strName);
     if (!search((*m_missingIter).strName))
+    {
         m_statusText->SetText(tr("No matches found for %1")
                               .arg((*m_missingIter).strName));
+    }
     else
+    {
         m_statusText->Reset();
+    }
 
     return true;
 }

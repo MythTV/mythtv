@@ -636,8 +636,10 @@ void DirectoryView::PopulateThumbs(ImageItem &parent, int thumbsNeeded,
         // Prevent lengthy/infinite recursion due to deep/cyclic folder
         // structures
         if (++level > 10)
+        {
             LOG(VB_GENERAL, LOG_NOTICE, LOC +
                 "Directory thumbnails are more than 10 levels deep");
+        }
         else
         {
             // Recursively load subdir thumbs to try to get 1 thumb from each

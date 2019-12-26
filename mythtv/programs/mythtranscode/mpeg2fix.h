@@ -79,7 +79,7 @@ class PTSOffsetQueue
     QMap<int, QList<poq_idx_t> > m_offset;
     QMap<int, QList<poq_idx_t> > m_orig;
     QList<int> m_keyList;
-    int m_vid_id;
+    int m_vidId;
 };
 
 //container for all multiplex related variables
@@ -93,11 +93,11 @@ class MPEG2replex
     int             m_done                    {0};
     QString         m_outfile;
     int             m_otype                   {0};
-    ringbuffer      m_vrbuf                   {};
+    ringbuffer      m_vrBuf                   {};
     ringbuffer      m_extrbuf[N_AUDIO]        {};
-    ringbuffer      m_index_vrbuf             {};
-    ringbuffer      m_index_extrbuf[N_AUDIO]  {};
-    int             m_ext_count               {0};
+    ringbuffer      m_indexVrbuf              {};
+    ringbuffer      m_indexExtrbuf[N_AUDIO]   {};
+    int             m_extCount                {0};
     int             m_exttype[N_AUDIO]        {0};
     int             m_exttypcnt[N_AUDIO]      {0};
 
@@ -127,7 +127,7 @@ class MPEG2fixup
     static void ShowRangeMap(frm_dir_map_t *mapPtr, QString msg);
     int BuildKeyframeIndex(QString &file, frm_pos_map_t &posMap, frm_pos_map_t &durMap);
 
-    void SetAllAudio(bool keep) { m_allaudio = keep; }
+    void SetAllAudio(bool keep) { m_allAudio = keep; }
 
     static void dec2x33(int64_t *pts1, int64_t pts2);
     static void inc2x33(int64_t *pts1, int64_t pts2);
@@ -210,19 +210,19 @@ class MPEG2fixup
 
     static void dumpList(FrameList *list);
 
-    int (*check_abort)()                      {nullptr};
-    void (*update_status)(float percent_done) {nullptr};
+    int (*m_checkAbort)()                      {nullptr};
+    void (*m_updateStatus)(float percent_done) {nullptr};
 
     FrameList     m_vSecondary;
-    bool          m_use_secondary  {false};
+    bool          m_useSecondary  {false};
 
     FrameList     m_vFrame;
     FrameMap      m_aFrame;
     FrameQueue    m_framePool;
     FrameQueue    m_unreadFrames;
     int           m_displayFrame    {0};
-    mpeg2dec_t   *m_header_decoder  {nullptr};
-    mpeg2dec_t   *m_img_decoder     {nullptr};
+    mpeg2dec_t   *m_headerDecoder   {nullptr};
+    mpeg2dec_t   *m_imgDecoder      {nullptr};
 
     frm_dir_map_t m_delMap;
     frm_dir_map_t m_saveMap;
@@ -232,32 +232,34 @@ class MPEG2fixup
     AVFormatContext *m_inputFC      {nullptr};
     AVFrame         *m_picture      {nullptr};
 
-    int             m_vid_id        {-1};
-    int             m_ext_count     {0};
-    QMap <int, int> m_aud_map;
+    int             m_vidId         {-1};
+    int             m_extCount      {0};
+    QMap <int, int> m_audMap;
     int64_t         m_ptsIncrement  {0};
-    bool            m_mkvfile       {false};
+    bool            m_mkvFile       {false};
 
     bool            m_discard       {false};
     //control options
-    int             m_no_repeat, m_fix_PTS, m_maxframes;
+    int             m_noRepeat;
+    int             m_fixPts;
+    int             m_maxFrames;
     QString         m_infile;
     const char     *m_format        {nullptr};
-    bool            m_allaudio      {false};
+    bool            m_allAudio      {false};
 
     //complete?
-    bool            m_file_end      {false};
-    bool            m_real_file_end {false};
+    bool            m_fileEnd       {false};
+    bool            m_realFileEnd   {false};
 
     //progress indicators
-    QDateTime       m_statustime;
-    bool            m_showprogress  {false};
-    uint64_t        m_filesize      {0};
-    int             m_framenum      {0};
-    int             m_status_update_time      {5};
-    uint64_t        m_last_written_pos        {0};
-    uint16_t        m_inv_zigzag_direct16[64] {};
-    bool            m_zigzag_init   {false};
+    QDateTime       m_statusTime;
+    bool            m_showProgress          {false};
+    uint64_t        m_fileSize              {0};
+    int             m_frameNum              {0};
+    int             m_statusUpdateTime      {5};
+    uint64_t        m_lastWrittenPos        {0};
+    uint16_t        m_invZigzagDirect16[64] {};
+    bool            m_zigzagInit            {false};
 };
 
 #ifdef NO_MYTH

@@ -47,7 +47,8 @@ static bool loadDetailsFromXML(const QString &filename, FileDetails *details)
     if (docType == "MYTHARCHIVEITEM")
     {
         QDomNodeList itemNodeList = doc.elementsByTagName("item");
-        QString type, dbVersion;
+        QString type;
+        QString dbVersion;
 
         if (itemNodeList.count() < 1)
         {
@@ -294,24 +295,24 @@ bool ImportNative::Create(void)
         return false;
 
     bool err = false;
-    UIUtilE::Assign(this, m_progTitle_text, "progtitle", &err);
-    UIUtilE::Assign(this, m_progDateTime_text, "progdatetime", &err);
-    UIUtilE::Assign(this, m_progDescription_text, "progdescription", &err);
+    UIUtilE::Assign(this, m_progTitleText, "progtitle", &err);
+    UIUtilE::Assign(this, m_progDateTimeText, "progdatetime", &err);
+    UIUtilE::Assign(this, m_progDescriptionText, "progdescription", &err);
 
-    UIUtilE::Assign(this, m_chanID_text, "chanid", &err);
-    UIUtilE::Assign(this, m_chanNo_text, "channo", &err);
-    UIUtilE::Assign(this, m_chanName_text, "name", &err);
-    UIUtilE::Assign(this, m_callsign_text, "callsign", &err);
+    UIUtilE::Assign(this, m_chanIDText, "chanid", &err);
+    UIUtilE::Assign(this, m_chanNoText, "channo", &err);
+    UIUtilE::Assign(this, m_chanNameText, "name", &err);
+    UIUtilE::Assign(this, m_callsignText, "callsign", &err);
 
-    UIUtilE::Assign(this, m_localChanID_text, "local_chanid", &err);
-    UIUtilE::Assign(this, m_localChanNo_text, "local_channo", &err);
-    UIUtilE::Assign(this, m_localChanName_text, "local_name", &err);
-    UIUtilE::Assign(this, m_localCallsign_text, "local_callsign", &err);
+    UIUtilE::Assign(this, m_localChanIDText, "local_chanid", &err);
+    UIUtilE::Assign(this, m_localChanNoText, "local_channo", &err);
+    UIUtilE::Assign(this, m_localChanNameText, "local_name", &err);
+    UIUtilE::Assign(this, m_localCallsignText, "local_callsign", &err);
 
-    UIUtilE::Assign(this, m_searchChanID_button, "searchchanid_button", &err);
-    UIUtilE::Assign(this, m_searchChanNo_button, "searchchanno_button", &err);
-    UIUtilE::Assign(this, m_searchChanName_button, "searchname_button", &err);
-    UIUtilE::Assign(this, m_searchCallsign_button ,"searchcallsign_button", &err);
+    UIUtilE::Assign(this, m_searchChanIDButton, "searchchanid_button", &err);
+    UIUtilE::Assign(this, m_searchChanNoButton, "searchchanno_button", &err);
+    UIUtilE::Assign(this, m_searchChanNameButton, "searchname_button", &err);
+    UIUtilE::Assign(this, m_searchCallsignButton ,"searchcallsign_button", &err);
 
     UIUtilE::Assign(this, m_finishButton, "finish_button", &err);
     UIUtilE::Assign(this, m_prevButton, "prev_button", &err);
@@ -327,22 +328,22 @@ bool ImportNative::Create(void)
     connect(m_prevButton, SIGNAL(Clicked()), this, SLOT(prevPressed()));
     connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(cancelPressed()));
 
-    connect(m_searchChanID_button, SIGNAL(Clicked()), this, SLOT(searchChanID()));
-    connect(m_searchChanNo_button, SIGNAL(Clicked()), this, SLOT(searchChanNo()));
-    connect(m_searchChanName_button, SIGNAL(Clicked()), this, SLOT(searchName()));
-    connect(m_searchCallsign_button, SIGNAL(Clicked()), this, SLOT(searchCallsign()));
+    connect(m_searchChanIDButton, SIGNAL(Clicked()), this, SLOT(searchChanID()));
+    connect(m_searchChanNoButton, SIGNAL(Clicked()), this, SLOT(searchChanNo()));
+    connect(m_searchChanNameButton, SIGNAL(Clicked()), this, SLOT(searchName()));
+    connect(m_searchCallsignButton, SIGNAL(Clicked()), this, SLOT(searchCallsign()));
 
-    m_progTitle_text->SetText(m_details.title);
+    m_progTitleText->SetText(m_details.title);
 
-    m_progDateTime_text->SetText(m_details.startTime.toLocalTime()
+    m_progDateTimeText->SetText(m_details.startTime.toLocalTime()
                                  .toString("dd MMM yy (hh:mm)"));
-    m_progDescription_text->SetText(
+    m_progDescriptionText->SetText(
         (m_details.subtitle == "" ? m_details.subtitle + "\n" : "") + m_details.description);
 
-    m_chanID_text->SetText(m_details.chanID);
-    m_chanNo_text->SetText(m_details.chanNo);
-    m_chanName_text->SetText(m_details.chanName);
-    m_callsign_text->SetText(m_details.callsign);
+    m_chanIDText->SetText(m_details.chanID);
+    m_chanNoText->SetText(m_details.chanNo);
+    m_chanNameText->SetText(m_details.chanName);
+    m_callsignText->SetText(m_details.callsign);
 
     findChannelMatch(m_details.chanID, m_details.chanNo,
                      m_details.chanName, m_details.callsign);
@@ -383,7 +384,7 @@ bool ImportNative::keyPressEvent(QKeyEvent *event)
 void ImportNative::finishedPressed()
 
 {
-    if (m_details.chanID != "N/A" && m_localChanID_text->GetText() == "")
+    if (m_details.chanID != "N/A" && m_localChanIDText->GetText() == "")
     {
         ShowOkPopup(tr("You need to select a valid channel id!"));
         return;
@@ -391,7 +392,7 @@ void ImportNative::finishedPressed()
 
     QString commandline;
     QString tempDir = gCoreContext->GetSetting("MythArchiveTempDir", "");
-    QString chanID = m_localChanID_text->GetText();
+    QString chanID = m_localChanIDText->GetText();
 
     if (chanID == "")
         chanID = m_details.chanID;
@@ -456,10 +457,10 @@ void ImportNative::findChannelMatch(const QString &chanID, const QString &chanNo
     if (query.exec() && query.next())
     {
         // got match
-        m_localChanID_text->SetText(query.value(0).toString());
-        m_localChanNo_text->SetText(query.value(1).toString());
-        m_localChanName_text->SetText(query.value(2).toString());
-        m_localCallsign_text->SetText(query.value(3).toString());
+        m_localChanIDText->SetText(query.value(0).toString());
+        m_localChanNoText->SetText(query.value(1).toString());
+        m_localChanNameText->SetText(query.value(2).toString());
+        m_localCallsignText->SetText(query.value(3).toString());
         return;
     }
 
@@ -471,10 +472,10 @@ void ImportNative::findChannelMatch(const QString &chanID, const QString &chanNo
     if (query.exec() && query.next())
     {
         // got match
-        m_localChanID_text->SetText(query.value(0).toString());
-        m_localChanNo_text->SetText(query.value(1).toString());
-        m_localChanName_text->SetText(query.value(2).toString());
-        m_localCallsign_text->SetText(query.value(3).toString());
+        m_localChanIDText->SetText(query.value(0).toString());
+        m_localChanNoText->SetText(query.value(1).toString());
+        m_localChanNameText->SetText(query.value(2).toString());
+        m_localCallsignText->SetText(query.value(3).toString());
         return;
     }
 
@@ -486,18 +487,18 @@ void ImportNative::findChannelMatch(const QString &chanID, const QString &chanNo
     if (query.exec() && query.next())
     {
         // got match
-        m_localChanID_text->SetText(query.value(0).toString());
-        m_localChanNo_text->SetText(query.value(1).toString());
-        m_localChanName_text->SetText(query.value(2).toString());
-        m_localCallsign_text->SetText(query.value(3).toString());
+        m_localChanIDText->SetText(query.value(0).toString());
+        m_localChanNoText->SetText(query.value(1).toString());
+        m_localChanNameText->SetText(query.value(2).toString());
+        m_localCallsignText->SetText(query.value(3).toString());
         return;
     }
 
     // give up
-    m_localChanID_text->Reset();
-    m_localChanNo_text->Reset();
-    m_localChanName_text->Reset();
-    m_localCallsign_text->Reset();
+    m_localChanIDText->Reset();
+    m_localChanNoText->Reset();
+    m_localChanNameText->Reset();
+    m_localCallsignText->Reset();
 }
 
 void ImportNative::showList(const QString &caption, QString &value,
@@ -545,7 +546,7 @@ void ImportNative::searchChanID()
 
     fillSearchList("chanid");
 
-    s = m_chanID_text->GetText();
+    s = m_chanIDText->GetText();
     showList(tr("Select a channel id"), s, SLOT(gotChanID(QString)));
 }
 
@@ -558,10 +559,10 @@ void ImportNative::gotChanID(const QString& value)
 
     if (query.exec() && query.next())
     {
-        m_localChanID_text->SetText(query.value(0).toString());
-        m_localChanNo_text->SetText(query.value(1).toString());
-        m_localChanName_text->SetText(query.value(2).toString());
-        m_localCallsign_text->SetText(query.value(3).toString());
+        m_localChanIDText->SetText(query.value(0).toString());
+        m_localChanNoText->SetText(query.value(1).toString());
+        m_localChanNameText->SetText(query.value(2).toString());
+        m_localCallsignText->SetText(query.value(3).toString());
     }
 }
 
@@ -571,7 +572,7 @@ void ImportNative::searchChanNo()
 
     fillSearchList("channum");
 
-    s = m_chanNo_text->GetText();
+    s = m_chanNoText->GetText();
     showList(tr("Select a channel number"), s, SLOT(gotChanNo(QString)));
 }
 
@@ -584,10 +585,10 @@ void ImportNative::gotChanNo(const QString& value)
 
     if (query.exec() && query.next())
     {
-        m_localChanID_text->SetText(query.value(0).toString());
-        m_localChanNo_text->SetText(query.value(1).toString());
-        m_localChanName_text->SetText(query.value(2).toString());
-        m_localCallsign_text->SetText(query.value(3).toString());
+        m_localChanIDText->SetText(query.value(0).toString());
+        m_localChanNoText->SetText(query.value(1).toString());
+        m_localChanNameText->SetText(query.value(2).toString());
+        m_localCallsignText->SetText(query.value(3).toString());
     }
 }
 
@@ -597,7 +598,7 @@ void ImportNative::searchName()
 
     fillSearchList("name");
 
-    s = m_chanName_text->GetText();
+    s = m_chanNameText->GetText();
     showList(tr("Select a channel name"), s, SLOT(gotName(QString)));
 }
 
@@ -610,10 +611,10 @@ void ImportNative::gotName(const QString& value)
 
     if (query.exec() && query.next())
     {
-        m_localChanID_text->SetText(query.value(0).toString());
-        m_localChanNo_text->SetText(query.value(1).toString());
-        m_localChanName_text->SetText(query.value(2).toString());
-        m_localCallsign_text->SetText(query.value(3).toString());
+        m_localChanIDText->SetText(query.value(0).toString());
+        m_localChanNoText->SetText(query.value(1).toString());
+        m_localChanNameText->SetText(query.value(2).toString());
+        m_localCallsignText->SetText(query.value(3).toString());
     }
 }
 
@@ -623,7 +624,7 @@ void ImportNative::searchCallsign()
 
     fillSearchList("callsign");
 
-    s = m_callsign_text->GetText();
+    s = m_callsignText->GetText();
     showList(tr("Select a Callsign"), s, SLOT(gotCallsign(QString)));
 }
 
@@ -636,9 +637,9 @@ void ImportNative::gotCallsign(const QString& value)
 
     if (query.exec() && query.next())
     {
-        m_localChanID_text->SetText(query.value(0).toString());
-        m_localChanNo_text->SetText(query.value(1).toString());
-        m_localChanName_text->SetText(query.value(2).toString());
-        m_localCallsign_text->SetText(query.value(3).toString());
+        m_localChanIDText->SetText(query.value(0).toString());
+        m_localChanNoText->SetText(query.value(1).toString());
+        m_localChanNameText->SetText(query.value(2).toString());
+        m_localCallsignText->SetText(query.value(3).toString());
     }
 }

@@ -204,10 +204,14 @@ bool NetStream::Request(const QUrl& url)
         }
 
         if (clist.isEmpty())
+        {
             // The BBC servers use a self certified cert so don't verify it
             ssl.setPeerVerifyMode(QSslSocket::VerifyNone);
+        }
         else
+        {
             ssl.setCaCertificates(clist);
+        }
 
         // We need to provide a client certificate for the BBC,  See:
         // openssl s_client -state -prexit -connect securegate.iplayer.bbc.co.uk:443
@@ -226,9 +230,11 @@ bool NetStream::Request(const QUrl& url)
                         QString("'%1' is an invalid certificate").arg(f1.fileName()) );
             }
             else
+            {
                 LOG(VB_GENERAL, LOG_WARNING, LOC +
                     QString("Opening client certificate '%1': %2")
                     .arg(f1.fileName()).arg(f1.errorString()) );
+            }
 
             // Get the private key
             fname = gCoreContext->GetSetting("MhegClientKey", "");
@@ -246,9 +252,11 @@ bool NetStream::Request(const QUrl& url)
                             QString("'%1' is an invalid key").arg(f2.fileName()) );
                 }
                 else
+                {
                     LOG(VB_GENERAL, LOG_WARNING, LOC +
                         QString("Opening private key '%1': %2")
                         .arg(f2.fileName()).arg(f2.errorString()) );
+                }
             }
         }
 
@@ -379,9 +387,11 @@ void NetStream::slotReadyRead()
             {
                 m_size = ContentLength(m_reply);
                 if (m_state < kReady || m_size >= 0)
+                {
                     LOG(VB_FILE, LOG_INFO, LOC +
                         QString("(%1) Ready 0x%2, content length %3")
                         .arg(m_id).arg(quintptr(m_reply),0,16).arg(m_size) );
+                }
             }
         }
 

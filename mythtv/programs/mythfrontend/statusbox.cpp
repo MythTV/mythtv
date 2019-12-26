@@ -1037,12 +1037,16 @@ void StatusBox::doJobQueueStatus()
                 detail += " (" + (*it).hostname + ')';
 
             if ((*it).schedruntime > MythDate::current())
+            {
                 detail += '\n' + tr("Scheduled Run Time:") + ' ' +
                     MythDate::toString(
                         (*it).schedruntime,
                         MythDate::kDateTimeFull | MythDate::kSimplify);
+            }
             else
+            {
                 detail += '\n' + (*it).comment;
+            }
 
             line = QString("%1 @ %2").arg(pginfo.GetTitle())
                 .arg(MythDate::toString(
@@ -1141,10 +1145,14 @@ static void disk_usage_with_rec_time_kb(QStringList& out, long long total,
         if (minLeft%60 == 0)
             out<<remainstring.arg(hourstring) + pro;
         else if (minLeft > 60)
+        {
             out<<StatusBox::tr("%1 and %2 remaining", "time").arg(hourstring)
                                                    .arg(minstring) + pro;
+        }
         else
+        {
             out<<remainstring.arg(minstring) + pro;
+        }
     }
 }
 
@@ -1178,11 +1186,11 @@ static QString uptimeStr(time_t uptime)
 }
 
 /** \fn StatusBox::getActualRecordedBPS(QString hostnames)
- *  \brief Fills in recordingProfilesBPS w/ average bitrate from recorded table
+ *  \brief Fills in m_recordingProfilesBps w/ average bitrate from recorded table
  */
 void StatusBox::getActualRecordedBPS(const QString& hostnames)
 {
-    recordingProfilesBPS.clear();
+    m_recordingProfilesBps.clear();
 
     QString querystr;
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1203,7 +1211,7 @@ void StatusBox::getActualRecordedBPS(const QString& hostnames)
 
         // Don't user a tr() directly here as the Qt tools will
         // not be able to extract the string for translation.
-        recordingProfilesBPS[rateStr] =
+        m_recordingProfilesBps[rateStr] =
             (int)(query.value(0).toDouble());
     }
 
@@ -1223,7 +1231,7 @@ void StatusBox::getActualRecordedBPS(const QString& hostnames)
 
         // Don't user a tr() directly here as the Qt tools will
         // not be able to extract the string for translation.
-        recordingProfilesBPS[rateStr] =
+        m_recordingProfilesBps[rateStr] =
             (int)(query.value(0).toDouble());
     }
 }
@@ -1412,7 +1420,7 @@ void StatusBox::doMachineStatus()
         disk_usage_with_rec_time_kb(list,
             fsInfos[i].getTotalSpace(), fsInfos[i].getUsedSpace(),
             fsInfos[i].getTotalSpace() - fsInfos[i].getUsedSpace(),
-            recordingProfilesBPS);
+            m_recordingProfilesBps);
 
         if (fsInfos[i].getPath() == "TotalDiskSpace")
         {
@@ -1515,9 +1523,11 @@ void StatusBox::doAutoExpireList(bool updateExpList)
                             .arg(sm_str(liveTVSize / 1024));
 
     if (deletedGroupCount)
+    {
         staticInfo += tr("%n (is) Deleted and consume(s) %1\n", "",
                         deletedGroupCount)
                         .arg(sm_str(deletedGroupSize / 1024));
+    }
 
     for (it = m_expList.begin(); it != m_expList.end(); ++it)
     {

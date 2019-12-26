@@ -65,8 +65,8 @@ V4L2encSignalMonitor::~V4L2encSignalMonitor()
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "dtor");
     V4L2encSignalMonitor::Stop();
-    if (m_stream_handler)
-        V4L2encStreamHandler::Return(m_stream_handler, m_inputid);
+    if (m_streamHandler)
+        V4L2encStreamHandler::Return(m_streamHandler, m_inputid);
 }
 
 /** \fn V4L2encSignalMonitor::Stop(void)
@@ -77,8 +77,8 @@ void V4L2encSignalMonitor::Stop(void)
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Stop() -- begin");
 
     SignalMonitor::Stop();
-    if (m_stream_handler && GetStreamData())
-            m_stream_handler->RemoveListener(GetStreamData());
+    if (m_streamHandler && GetStreamData())
+            m_streamHandler->RemoveListener(GetStreamData());
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Stop() -- end");
 }
@@ -109,7 +109,7 @@ void V4L2encSignalMonitor::UpdateValues(void)
         }
     }
 
-    if (m_stream_handler)
+    if (m_streamHandler)
     {
         EmitStatus();
         if (IsAllGood())
@@ -135,24 +135,23 @@ void V4L2encSignalMonitor::UpdateValues(void)
 
     // Start table monitoring if we are waiting on any table
     // and we have a lock.
-    if (isLocked && !m_stream_handler && GetStreamData() &&
+    if (isLocked && !m_streamHandler && GetStreamData() &&
             HasAnyFlag(kDTVSigMon_WaitForPAT | kDTVSigMon_WaitForPMT |
                        kDTVSigMon_WaitForMGT | kDTVSigMon_WaitForVCT |
                        kDTVSigMon_WaitForNIT | kDTVSigMon_WaitForSDT))
     {
         auto* chn = reinterpret_cast<V4LChannel*>(m_channel);
-        m_stream_handler =
-            V4L2encStreamHandler::Get(chn->GetDevice(),
+        m_streamHandler = V4L2encStreamHandler::Get(chn->GetDevice(),
                                       chn->GetAudioDevice().toInt(), m_inputid);
-        if (!m_stream_handler || m_stream_handler->HasError())
+        if (!m_streamHandler || m_streamHandler->HasError())
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 "V4L2encSignalMonitor -- failed to start StreamHandler.");
         }
         else
         {
-            m_stream_handler->AddListener(GetStreamData());
-            m_stream_handler->StartEncoding();
+            m_streamHandler->AddListener(GetStreamData());
+            m_streamHandler->StartEncoding();
         }
     }
 
@@ -180,7 +179,7 @@ bool V4L2encSignalMonitor::HasLock(void)
  *  \brief Wait for a stable signal
  *
  *  The HD-PVR will produce garbage if the resolution or audio type
- *  changes after it is told to start encoding.  m_stable_time is used
+ *  changes after it is told to start encoding.  m_stableTime is used
  *  to designate how long we need to see a stable resolution reported
  *  from the HD-PVR driver, before we consider it a good lock.  In my
  *  testing 2 seconds is safe, while 1 second worked most of the time. --jp
@@ -210,11 +209,11 @@ int V4L2encSignalMonitor::StableResolution(void)
         {
             LOG(VB_CHANNEL, LOG_INFO, QString("Resolution %1 x %2")
                 .arg(width).arg(height));
-            if (++m_lock_cnt > 9)
-                m_lock_cnt = 1;
+            if (++m_lockCnt > 9)
+                m_lockCnt = 1;
             m_timer.start();
         }
-        else if (m_timer.elapsed() > m_stable_time)
+        else if (m_timer.elapsed() > m_stableTime)
         {
             LOG(VB_CHANNEL, LOG_INFO, QString("Resolution stable at %1 x %2")
                 .arg(width).arg(height));
@@ -222,19 +221,19 @@ int V4L2encSignalMonitor::StableResolution(void)
             return 100;
         }
         else
-            return 40 + m_lock_cnt;
+            return 40 + m_lockCnt;
     }
     else
     {
         // Indicate that we are still waiting for a valid res, every 3 seconds.
-        if (!m_status_time.isValid() || MythDate::current() > m_status_time)
+        if (!m_statusTime.isValid() || MythDate::current() > m_statusTime)
         {
             LOG(VB_CHANNEL, LOG_WARNING, "Waiting for valid resolution");
-            m_status_time = MythDate::current().addSecs(3);
+            m_statusTime = MythDate::current().addSecs(3);
         }
         m_timer.stop();
     }
 
     m_width = width;
-    return 20 + m_lock_cnt;
+    return 20 + m_lockCnt;
 }

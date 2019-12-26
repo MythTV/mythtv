@@ -70,18 +70,18 @@ class MBASE_PUBLIC MythSystemLegacy : public QObject
     Q_OBJECT;
 
   public:
-    explicit MythSystemLegacy(QObject * = nullptr);
-    MythSystemLegacy(const QString &, uint, QObject * = nullptr);
-    MythSystemLegacy(const QString &, const QStringList &, uint,
-                     QObject * = nullptr);
-    ~MythSystemLegacy(void);
+    explicit MythSystemLegacy(QObject *parent = nullptr);
+    MythSystemLegacy(const QString &command, uint flags, QObject *parent = nullptr);
+    MythSystemLegacy(const QString &command, const QStringList &args, uint flags,
+                     QObject *parent = nullptr);
+    ~MythSystemLegacy(void) override;
 
     // FIXME: We should not allow a MythSystemLegacy to be reused for a new command.
-    void SetCommand(const QString &, uint);
+    void SetCommand(const QString &command, uint flags);
     // FIXME: We should not allow a MythSystemLegacy to be reused for a new command.
-    void SetCommand(const QString &, const QStringList &, uint);
+    void SetCommand(const QString &command, const QStringList &args, uint flags);
     // FIXME: This should only be in the constructor
-    void SetDirectory(const QString &);
+    void SetDirectory(const QString &directory);
     // FIXME: This should only be in the constructor
     bool SetNice(int nice);
     // FIXME: This should only be in the constructor
@@ -93,7 +93,7 @@ class MBASE_PUBLIC MythSystemLegacy : public QObject
     // FIXME: This should just return a bool telling us if we hit the timeout.
     uint Wait(time_t timeout = 0);
 
-    int Write(const QByteArray&);
+    int Write(const QByteArray &ba);
     QByteArray Read(int size);
     QByteArray ReadErr(int size);
     // FIXME: We should not return a reference here
@@ -103,7 +103,7 @@ class MBASE_PUBLIC MythSystemLegacy : public QObject
 
     // FIXME: Can Term be wrapped into Signal?
     void Term(bool force = false);
-    void Signal(MythSignal);
+    void Signal(MythSignal sig);
 
     // FIXME: Should be IsBackground() + documented
     bool isBackground(void)   { return GetSetting("RunInBackground"); }

@@ -12,7 +12,7 @@ class MTV_PUBLIC TSStreamData : public MPEGStreamData
 {
   public:
     explicit TSStreamData(int cardnum);
-    virtual ~TSStreamData() { ; }
+    ~TSStreamData() override { ; }
 
     bool ProcessTSPacket(const TSPacket& tspacket) override; // MPEGStreamData
 

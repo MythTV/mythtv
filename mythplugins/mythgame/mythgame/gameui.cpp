@@ -196,9 +196,7 @@ bool GameUI::keyPressEvent(QKeyEvent *event)
             showInfo();
         else if (action == "TOGGLEFAV")
             toggleFavorite();
-        else if (action == "INCSEARCH")
-            searchStart();
-        else if (action == "INCSEARCHNEXT")
+        else if ((action == "INCSEARCH") || (action == "INCSEARCHNEXT"))
             searchStart();
         else if (action == "DOWNLOADDATA")
             gameSearch();
@@ -978,7 +976,9 @@ void GameUI::OnGameSearchDone(MetadataLookup *lookup)
     metadata->setPlot(lookup->GetDescription());
     metadata->setSystem(lookup->GetSystem());
 
-    QStringList coverart, fanart, screenshot;
+    QStringList coverart;
+    QStringList fanart;
+    QStringList screenshot;
 
     // Imagery
     ArtworkList coverartlist = lookup->GetArtwork(kArtworkCoverart);

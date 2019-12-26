@@ -17,7 +17,7 @@ class PROTOSERVER_PUBLIC DeleteHandler : public ReferenceCounter
   public:
     DeleteHandler(void);
     explicit DeleteHandler(const QString& filename);
-   ~DeleteHandler(void);
+   ~DeleteHandler(void) override;
 
     void Close(void);
 
@@ -35,8 +35,8 @@ class PROTOSERVER_PUBLIC DeleteHandler : public ReferenceCounter
 
   private:
     QString     m_path;
-    int         m_fd;
-    off_t       m_size;
+    int         m_fd   { -1 };
+    off_t       m_size {  0 };
     QDateTime   m_wait;
 
 };

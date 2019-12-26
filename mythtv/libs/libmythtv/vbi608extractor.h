@@ -29,12 +29,12 @@
 class VBI608Extractor
 {
   public:
-    VBI608Extractor() {};
+    VBI608Extractor() = default;;
 
     uint16_t GetCode1(void) const { return m_code[0]; }
     uint16_t GetCode2(void) const { return m_code[1]; }
 
-    bool ExtractCC(const VideoFrame*, uint max_lines = 4);
+    bool ExtractCC(const VideoFrame *picframe, uint max_lines = 4);
     bool ExtractCC12(const unsigned char *buf, uint width);
     bool ExtractCC34(const unsigned char *buf, uint width);
 

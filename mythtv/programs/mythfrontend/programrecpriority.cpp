@@ -407,9 +407,9 @@ bool ProgramRecPriority::Create()
     m_lastRecordedText = dynamic_cast<MythUIText *> (GetChild("lastrecorded"));
     m_lastRecordedDateText = dynamic_cast<MythUIText *> (GetChild("lastrecordeddate"));
     m_lastRecordedTimeText = dynamic_cast<MythUIText *> (GetChild("lastrecordedtime"));
-    m_channameText = dynamic_cast<MythUIText *> (GetChild("channel"));
-    m_channumText = dynamic_cast<MythUIText *> (GetChild("channum"));
-    m_callsignText = dynamic_cast<MythUIText *> (GetChild("callsign"));
+    m_chanNameText = dynamic_cast<MythUIText *> (GetChild("channel"));
+    m_chanNumText = dynamic_cast<MythUIText *> (GetChild("channum"));
+    m_callSignText = dynamic_cast<MythUIText *> (GetChild("callsign"));
     m_recProfileText = dynamic_cast<MythUIText *> (GetChild("recordingprofile"));
 
     if (!m_programList)
@@ -911,7 +911,7 @@ void ProgramRecPriority::scheduleChanged(int recid)
         progInfo.SetCategory(record.m_category);
         progInfo.SetRecordingPriority(record.m_recPriority);
         progInfo.m_recType = record.m_type;
-        progInfo.m_recstatus = record.m_isInactive ?
+        progInfo.m_recStatus = record.m_isInactive ?
             RecStatus::Inactive : RecStatus::Unknown;
         progInfo.m_profile = record.m_recProfile;
         progInfo.m_last_record = record.m_lastRecorded;
@@ -950,7 +950,7 @@ void ProgramRecPriority::scheduleChanged(int recid)
         m_origRecPriorityData[pgRecInfo->GetRecordingRuleID()] =
             pgRecInfo->GetRecordingPriority();
         // also set the active/inactive state
-        pgRecInfo->m_recstatus = inactive ? RecStatus::Inactive : RecStatus::Unknown;
+        pgRecInfo->m_recStatus = inactive ? RecStatus::Inactive : RecStatus::Unknown;
 
         SortList();
     }
@@ -1046,7 +1046,7 @@ void ProgramRecPriority::deactivate(void)
                     QString("DeactivateRule %1 %2")
                     .arg(pgRecInfo->GetRecordingRuleID())
                     .arg(pgRecInfo->GetTitle()));
-                pgRecInfo->m_recstatus = inactive ? RecStatus::Inactive : RecStatus::Unknown;
+                pgRecInfo->m_recStatus = inactive ? RecStatus::Inactive : RecStatus::Unknown;
                 item->DisplayState("disabled", "status");
             }
         }
@@ -1067,7 +1067,7 @@ void ProgramRecPriority::changeRecPriority(int howMuch)
     int tempRecPriority = pgRecInfo->GetRecordingPriority() + howMuch;
     if (tempRecPriority > -100 && tempRecPriority < 100)
     {
-        pgRecInfo->m_recpriority = tempRecPriority;
+        pgRecInfo->m_recPriority = tempRecPriority;
 
         // order may change if sorting by recording priority, so resort
         if (m_sortType == byRecPriority)
@@ -1180,15 +1180,15 @@ void ProgramRecPriority::FillList(void)
                 progInfo->m_profile = profile;
 
                 if (inactive)
-                    progInfo->m_recstatus = RecStatus::Inactive;
+                    progInfo->m_recStatus = RecStatus::Inactive;
                 else if (m_conMatch[progInfo->GetRecordingRuleID()] > 0)
-                    progInfo->m_recstatus = RecStatus::Conflict;
+                    progInfo->m_recStatus = RecStatus::Conflict;
                 else if (m_nowMatch[progInfo->GetRecordingRuleID()] > 0)
-                    progInfo->m_recstatus = RecStatus::Recording;
+                    progInfo->m_recStatus = RecStatus::Recording;
                 else if (m_recMatch[progInfo->GetRecordingRuleID()] > 0)
-                    progInfo->m_recstatus = RecStatus::WillRecord;
+                    progInfo->m_recStatus = RecStatus::WillRecord;
                 else
-                    progInfo->m_recstatus = RecStatus::Unknown;
+                    progInfo->m_recStatus = RecStatus::Unknown;
             }
         } while (result.next());
     }
@@ -1301,9 +1301,9 @@ void ProgramRecPriority::UpdateList()
 
         int progRecPriority = progInfo->GetRecordingPriority();
 
-        if ((progInfo->m_rectype == kSingleRecord ||
-                progInfo->m_rectype == kOverrideRecord ||
-                progInfo->m_rectype == kDontRecord) &&
+        if ((progInfo->m_recType == kSingleRecord ||
+                progInfo->m_recType == kOverrideRecord ||
+                progInfo->m_recType == kDontRecord) &&
             !(progInfo->GetSubtitle()).trimmed().isEmpty())
         {
             QString rating = QString::number(progInfo->GetStars(10));
@@ -1316,7 +1316,7 @@ void ProgramRecPriority::UpdateList()
         QString state;
         if (progInfo->m_recType == kDontRecord ||
             (progInfo->m_recType != kTemplateRecord &&
-             progInfo->m_recstatus == RecStatus::Inactive))
+             progInfo->m_recStatus == RecStatus::Inactive))
             state = "disabled";
         else if (m_conMatch[progInfo->GetRecordingRuleID()] > 0)
             state = "error";
@@ -1334,9 +1334,9 @@ void ProgramRecPriority::UpdateList()
 
         QString subtitle;
         if (progInfo->m_subtitle != "(null)" &&
-            (progInfo->m_rectype == kSingleRecord ||
-             progInfo->m_rectype == kOverrideRecord ||
-             progInfo->m_rectype == kDontRecord))
+            (progInfo->m_recType == kSingleRecord ||
+             progInfo->m_recType == kOverrideRecord ||
+             progInfo->m_recType == kDontRecord))
         {
             subtitle = progInfo->m_subtitle;
         }
@@ -1350,9 +1350,11 @@ void ProgramRecPriority::UpdateList()
                                       progInfo->GetRecordingRuleType()));
         }
         else
+        {
             matchInfo = tr("Recording %1 of %2")
                         .arg(m_recMatch[progInfo->GetRecordingRuleID()])
                         .arg(m_listMatch[progInfo->GetRecordingRuleID()]);
+        }
 
         subtitle = QString("(%1) %2").arg(matchInfo).arg(subtitle);
         item->SetText(subtitle, "scheduleinfo", state);
@@ -1375,9 +1377,9 @@ void ProgramRecPriority::UpdateList()
             progInfo->m_last_record, MythDate::kTime);
         item->SetText(tempTime, "lastrecordedtime", state);
 
-        QString channame = progInfo->m_channame;
-        QString channum = progInfo->m_chanstr;
-        QString callsign = progInfo->m_chansign;
+        QString channame = progInfo->m_chanName;
+        QString channum = progInfo->m_chanStr;
+        QString callsign = progInfo->m_chanSign;
         if (progInfo->m_recType != kSingleRecord &&
             progInfo->m_recType != kOverrideRecord &&
             progInfo->m_recType != kDontRecord &&
@@ -1426,9 +1428,9 @@ void ProgramRecPriority::updateInfo(MythUIButtonListItem *item)
 
     QString subtitle;
     if (pgRecInfo->m_subtitle != "(null)" &&
-        (pgRecInfo->m_rectype == kSingleRecord ||
-            pgRecInfo->m_rectype == kOverrideRecord ||
-            pgRecInfo->m_rectype == kDontRecord))
+        (pgRecInfo->m_recType == kSingleRecord ||
+            pgRecInfo->m_recType == kOverrideRecord ||
+            pgRecInfo->m_recType == kDontRecord))
     {
         subtitle = pgRecInfo->m_subtitle;
     }
@@ -1442,9 +1444,11 @@ void ProgramRecPriority::updateInfo(MythUIButtonListItem *item)
                           pgRecInfo->GetRecordingRuleType()));
     }
     else
+    {
         matchInfo = tr("Recording %1 of %2")
             .arg(m_recMatch[pgRecInfo->GetRecordingRuleID()])
             .arg(m_listMatch[pgRecInfo->GetRecordingRuleID()]);
+    }
 
     subtitle = QString("(%1) %2").arg(matchInfo).arg(subtitle);
 
@@ -1487,11 +1491,11 @@ void ProgramRecPriority::updateInfo(MythUIButtonListItem *item)
         m_lastRecordedTimeText->SetText(tempTime);
     }
 
-    if (m_channameText || m_channumText || m_callsignText)
+    if (m_chanNameText || m_chanNumText || m_callSignText)
     {
-        QString channame = pgRecInfo->m_channame;
-        QString channum = pgRecInfo->m_chanstr;
-        QString callsign = pgRecInfo->m_chansign;
+        QString channame = pgRecInfo->m_chanName;
+        QString channum = pgRecInfo->m_chanStr;
+        QString callsign = pgRecInfo->m_chanSign;
         if (pgRecInfo->m_recType != kSingleRecord &&
             pgRecInfo->m_recType != kOverrideRecord &&
             pgRecInfo->m_recType != kDontRecord &&
@@ -1502,12 +1506,12 @@ void ProgramRecPriority::updateInfo(MythUIButtonListItem *item)
             channum = tr("Any");
             callsign = tr("Any");
         }
-        if (m_channameText)
-            m_channameText->SetText(channame);
-        if (m_channumText)
-            m_channumText->SetText(channum);
-        if (m_callsignText)
-            m_callsignText->SetText(callsign);
+        if (m_chanNameText)
+            m_chanNameText->SetText(channame);
+        if (m_chanNumText)
+            m_chanNumText->SetText(channum);
+        if (m_callSignText)
+            m_callSignText->SetText(callsign);
     }
 
     if (m_recProfileText)

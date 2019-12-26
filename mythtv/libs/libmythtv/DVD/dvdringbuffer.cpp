@@ -132,10 +132,12 @@ void DVDInfo::GetNameAndSerialNum(dvdnav_t* nav,
                             .arg(serialnum));
             }
             else
+            {
                 LOG(VB_GENERAL, LOG_ERR,
                     QString("%1Unable to open %2 to generate serial number")
                             .arg(logPrefix)
                             .arg(ifo));
+            }
         }
     }
 }

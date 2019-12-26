@@ -8,6 +8,8 @@
 #ifndef CETONCHANNEL_H
 #define CETONCHANNEL_H
 
+#include <utility>
+
 // Qt headers
 #include <QString>
 
@@ -23,9 +25,9 @@ class CetonChannel : public DTVChannel
     friend class CetonRecorder;
 
   public:
-    CetonChannel(TVRec *parent, const QString &device)
-        : DTVChannel(parent), m_device_id(device) {}
-    ~CetonChannel(void);
+    CetonChannel(TVRec *parent, QString device)
+        : DTVChannel(parent), m_deviceId(std::move(device)) {}
+    ~CetonChannel(void) override;
 
     bool Open(void) override; // ChannelBase
     void Close(void) override; // ChannelBase
@@ -34,9 +36,9 @@ class CetonChannel : public DTVChannel
     // Gets
     bool IsOpen(void) const override; // ChannelBase
     QString GetDevice(void) const override // ChannelBase
-        { return m_device_id; }
+        { return m_deviceId; }
     vector<DTVTunerType> GetTunerTypes(void) const override // DTVChannel
-        { return m_tuner_types; }
+        { return m_tunerTypes; }
 
     // Sets
     bool SetChannelByString(const QString &channum) override; // ChannelBase
@@ -49,9 +51,9 @@ class CetonChannel : public DTVChannel
     bool Tune(const QString &freqid, int /*finetune*/) override; // ChannelBase
 
   private:
-    QString               m_device_id;
-    CetonStreamHandler   *m_stream_handler {nullptr};
-    vector<DTVTunerType>  m_tuner_types;
+    QString               m_deviceId;
+    CetonStreamHandler   *m_streamHandler {nullptr};
+    vector<DTVTunerType>  m_tunerTypes;
 };
 
 #endif

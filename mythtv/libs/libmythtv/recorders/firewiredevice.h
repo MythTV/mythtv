@@ -197,8 +197,8 @@ class FirewireDevice
     virtual bool ClosePort(void) = 0;
     virtual bool ResetBus(void) { return false; }
 
-    virtual void AddListener(TSDataListener*);
-    virtual void RemoveListener(TSDataListener*);
+    virtual void AddListener(TSDataListener *listener);
+    virtual void RemoveListener(TSDataListener *listener);
 
     // Sets
     virtual bool SetPowerState(bool on);
@@ -226,7 +226,7 @@ class FirewireDevice
     bool GetSubunitInfo(uint8_t table[32]);
 
     void SetLastChannel(uint channel);
-    void ProcessPATPacket(const TSPacket&);
+    void ProcessPATPacket(const TSPacket &tspacket);
     virtual void BroadcastToListeners(
         const unsigned char *data, uint dataSize);
 

@@ -197,7 +197,7 @@ enum class uswcState {
 class MTV_PUBLIC MythUSWCCopy
 {
 public:
-    MythUSWCCopy(int width, bool nocache = false);
+    explicit MythUSWCCopy(int width, bool nocache = false);
     virtual ~MythUSWCCopy();
 
     void copy(VideoFrame *dst, const VideoFrame *src);

@@ -57,7 +57,7 @@ class MTV_PUBLIC PreviewGenerator : public QObject, public MThread
         { SetPreviewTime(seconds_in, true); }
     void SetPreviewTimeAsFrameNumber(long long frame_number)
         { SetPreviewTime(frame_number, false); }
-    void SetOutputFilename(const QString&);
+    void SetOutputFilename(const QString &fileName);
     void SetOutputSize(const QSize &size) { m_outSize = size; }
 
     QString GetToken(void) const { return m_token; }
@@ -65,13 +65,13 @@ class MTV_PUBLIC PreviewGenerator : public QObject, public MThread
     void run(void) override; // MThread
     bool Run(void);
 
-    void AttachSignals(QObject*);
+    void AttachSignals(QObject *obj);
 
   public slots:
     void deleteLater();
 
   protected:
-    virtual ~PreviewGenerator();
+    ~PreviewGenerator() override;
     void TeardownAll(void);
 
     bool RemotePreviewRun(void);

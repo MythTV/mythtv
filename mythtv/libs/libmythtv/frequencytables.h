@@ -5,6 +5,7 @@
 
 // C++ includes
 #include <list>
+#include <utility>
 #include <vector>
 using namespace std;
 
@@ -38,20 +39,20 @@ int get_closest_freqid(
 class FrequencyTable
 {
   public:
-    FrequencyTable(const QString&          _name_format,
+    FrequencyTable(QString                 _name_format,
                    int                     _name_offset,
                    uint64_t                _frequencyStart,
                    uint64_t                _frequencyEnd,
                    uint                    _frequencyStep,
                    DTVModulation::Types    _modulation)
-        : m_nameFormat(_name_format),        m_nameOffset(_name_offset),
+        : m_nameFormat(std::move(_name_format)), m_nameOffset(_name_offset),
           m_frequencyStart(_frequencyStart), m_frequencyEnd(_frequencyEnd),
           m_frequencyStep(_frequencyStep),   m_modulation(_modulation) {}
 
     FrequencyTable(uint64_t                _frequencyStart,
                    uint64_t                _frequencyEnd,
                    uint                    _frequencyStep,
-                   const QString&          _name_format,
+                   QString                 _name_format,
                    int                     _name_offset,
                    DTVInversion::Types     _inversion,
                    DTVBandwidth::Types     _bandwidth,
@@ -64,7 +65,7 @@ class FrequencyTable
                    DTVModulation::Types    _modulation,
                    int                     _offset1,
                    int                     _offset2)
-        : m_nameFormat(_name_format),        m_nameOffset(_name_offset),
+        : m_nameFormat(std::move(_name_format)), m_nameOffset(_name_offset),
           m_frequencyStart(_frequencyStart), m_frequencyEnd(_frequencyEnd),
           m_frequencyStep(_frequencyStep),   m_modulation(_modulation),
           m_offset1(_offset1),               m_offset2(_offset2),
@@ -76,14 +77,14 @@ class FrequencyTable
     FrequencyTable(uint64_t                _frequencyStart,
                    uint64_t                _frequencyEnd,
                    uint                    _frequencyStep,
-                   const QString&          _name_format,
+                   QString                 _name_format,
                    int                     _name_offset,
                    DTVCodeRate::Types      _fec_inner,
                    DTVModulation::Types    _modulation,
                    uint                    _symbol_rate,
                    int                     _offset1,
                    int                     _offset2)
-        : m_nameFormat(_name_format),        m_nameOffset(_name_offset),
+        : m_nameFormat(std::move(_name_format)), m_nameOffset(_name_offset),
           m_frequencyStart(_frequencyStart), m_frequencyEnd(_frequencyEnd),
           m_frequencyStep(_frequencyStep),   m_modulation(_modulation),
           m_offset1(_offset1),               m_offset2(_offset2),
@@ -147,7 +148,7 @@ class TransportScanItem
                       QString strFmt,  /* fmt for info shown to user  */
                       uint freqNum,
                       uint frequency,         /* center frequency to use     */
-                      const FrequencyTable&,  /* freq table to get info from */
+                      const FrequencyTable &ft,  /* freq table to get info from */
                       uint                _timeoutTune);
 
     TransportScanItem(uint                  _sourceid,
@@ -243,20 +244,20 @@ class transport_scan_items_it_t
     transport_scan_items_it_t nextTransport() const
     {
         list<TransportScanItem>::iterator tmp = m_it;
-        return transport_scan_items_it_t(++tmp);
+        return {++tmp};
     }
 
   private:
     list<TransportScanItem>::iterator m_it;
     int m_offset {0};
 
-    friend bool operator==(const transport_scan_items_it_t&,
-                           const transport_scan_items_it_t&);
-    friend bool operator!=(const transport_scan_items_it_t&,
-                           const transport_scan_items_it_t&);
+    friend bool operator==(const transport_scan_items_it_t&A,
+                           const transport_scan_items_it_t&B);
+    friend bool operator!=(const transport_scan_items_it_t&A,
+                           const transport_scan_items_it_t&B);
 
-    friend bool operator==(const transport_scan_items_it_t&,
-                           const list<TransportScanItem>::iterator&);
+    friend bool operator==(const transport_scan_items_it_t&A,
+                           const list<TransportScanItem>::iterator&B);
 };
 
 inline bool operator==(const transport_scan_items_it_t& A,

@@ -20,11 +20,11 @@ class StatusBox : public MythScreenType
     Q_OBJECT
   public:
     explicit StatusBox(MythScreenStack *parent);
-   ~StatusBox(void);
+   ~StatusBox(void) override;
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
-    void customEvent(QEvent*) override; // MythUIType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
+    void customEvent(QEvent *event) override; // MythUIType
 
   signals:
     void updateLog();
@@ -61,8 +61,7 @@ class StatusBox : public MythScreenType
     MythUIButtonList  *m_logList         {nullptr};
     MythUIStateType   *m_iconState       {nullptr};
 
-    QMap<int, QString> contentData;
-    recprof2bps_t      recordingProfilesBPS;
+    recprof2bps_t      m_recordingProfilesBps;
 
     vector<ProgramInfo *> m_expList;
 

@@ -75,12 +75,12 @@ bool ManualSchedule::Create(void)
         InfoMap infomap;
         channels[i].ToMap(infomap);
         item->SetTextFromMap(infomap);
-        if (channels[i].m_channum == startchan)
+        if (channels[i].m_chanNum == startchan)
         {
             m_channelList->SetItemCurrent(i);
             startchan = "";
         }
-        m_chanids.push_back(channels[i].m_chanid);
+        m_chanids.push_back(channels[i].m_chanId);
     }
 
     for (uint index = 0; index <= 60; index++)

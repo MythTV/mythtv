@@ -42,8 +42,7 @@ HDHRSignalMonitor::HDHRSignalMonitor(int db_cardnum,
                                      HDHRChannel* _channel,
                                      bool _release_stream,
                                      uint64_t _flags)
-    : DTVSignalMonitor(db_cardnum, _channel, _release_stream, _flags),
-      streamHandlerStarted(false), streamHandler(nullptr)
+    : DTVSignalMonitor(db_cardnum, _channel, _release_stream, _flags)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
 
@@ -51,7 +50,7 @@ HDHRSignalMonitor::HDHRSignalMonitor(int db_cardnum,
 
     AddFlags(kSigMon_WaitForSig);
 
-    streamHandler = HDHRStreamHandler::Get(m_channel->GetDevice(),
+    m_streamHandler = HDHRStreamHandler::Get(m_channel->GetDevice(),
                                            m_channel->GetInputID(),
                                            m_channel->GetMajorID());
 }
@@ -63,7 +62,7 @@ HDHRSignalMonitor::~HDHRSignalMonitor()
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "dtor");
     HDHRSignalMonitor::Stop();
-    HDHRStreamHandler::Return(streamHandler, m_inputid);
+    HDHRStreamHandler::Return(m_streamHandler, m_inputid);
 }
 
 /** \fn HDHRSignalMonitor::Stop(void)
@@ -74,8 +73,8 @@ void HDHRSignalMonitor::Stop(void)
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Stop() -- begin");
     SignalMonitor::Stop();
     if (GetStreamData())
-        streamHandler->RemoveListener(GetStreamData());
-    streamHandlerStarted = false;
+        m_streamHandler->RemoveListener(GetStreamData());
+    m_streamHandlerStarted = false;
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Stop() -- end");
 }
@@ -96,7 +95,7 @@ void HDHRSignalMonitor::UpdateValues(void)
     if (!m_running || m_exit)
         return;
 
-    if (streamHandlerStarted)
+    if (m_streamHandlerStarted)
     {
         EmitStatus();
         if (IsAllGood())
@@ -109,7 +108,7 @@ void HDHRSignalMonitor::UpdateValues(void)
     }
 
     struct hdhomerun_tuner_status_t status {};
-    streamHandler->GetTunerStatus(&status);
+    m_streamHandler->GetTunerStatus(&status);
 
     uint sig = status.signal_strength;
     uint snq = status.signal_to_noise_quality;
@@ -141,8 +140,8 @@ void HDHRSignalMonitor::UpdateValues(void)
                    kDTVSigMon_WaitForMGT | kDTVSigMon_WaitForVCT |
                    kDTVSigMon_WaitForNIT | kDTVSigMon_WaitForSDT))
     {
-        streamHandler->AddListener(GetStreamData());
-        streamHandlerStarted = true;
+        m_streamHandler->AddListener(GetStreamData());
+        m_streamHandlerStarted = true;
     }
 
     m_update_done = true;

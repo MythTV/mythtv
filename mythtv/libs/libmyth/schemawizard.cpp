@@ -56,8 +56,10 @@ SchemaUpgradeWizard::Get(const QString &DBSchemaSetting,
                          const QString &upgradeSchemaVal)
 {
     if (c_wizard == nullptr)
+    {
         c_wizard = new SchemaUpgradeWizard(DBSchemaSetting, appName,
                                            upgradeSchemaVal);
+    }
     else
     {
         c_wizard->m_DBver          = QString();
@@ -111,9 +113,11 @@ int SchemaUpgradeWizard::Compare(void)
         }
     }
     else
+    {
         LOG(VB_GENERAL, LOG_INFO,
                  QString("Current %1 Schema Version (%2): %3")
                      .arg(m_schemaName).arg(m_schemaSetting).arg(m_DBver));
+    }
 
 #if TESTING
     //m_DBver = "9" + m_DBver + "-testing";
@@ -266,13 +270,13 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
         warnOtherCl = tr("There are also other clients using this"
                          " database. They should be shut down first.");
     if (!validDBMS)
+    {
         warnOldDBMS = tr("Error: This version of Myth%1"
                          " requires MySQL %2.%3.%4 or later."
                          "  You seem to be running MySQL version %5.")
                       .arg(name).arg(minDBMSmajor).arg(minDBMSminor)
                       .arg(minDBMSpoint).arg(GetDBMSVersion());
-
-
+    }
 
     //
     // 1. Deal with the trivial cases (No user prompting required)
@@ -344,9 +348,11 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
             message = tr("Warning: MythTV wants to upgrade your database,")
                       + "\n" + tr("for the %1 schema, from %2 to %3.");
             if (m_expertMode)
+            {
                 // Not translated. This string can't appear in released builds.
                 message += "\n\nYou can try using the old schema,"
                            " but that may cause problems.";
+            }
         }
     }
     else if (!validDBMS)
@@ -365,9 +371,11 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
     else   // This client is too old
     {
         if (m_expertMode)
+        {
             // Not translated. This string can't appear in released builds.
             message = "Warning: MythTV database has newer"
                       " %1 schema (%2) than expected (%3).";
+        }
         else
         {
             message = tr("Error: MythTV database has newer"
@@ -438,13 +446,17 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
         return MYTH_SCHEMA_ERROR;
 
     if (m_backupStatus == kDB_Backup_Failed)
+    {
         cout << "WARNING: MythTV was unable to backup your database."
              << endl << endl;
+    }
     else if ((m_backupStatus == kDB_Backup_Completed) &&
              (m_backupResult != ""))
+    {
         cout << "If your system becomes unstable, "
                 "a database backup is located in "
              << m_backupResult.toLocal8Bit().constData() << endl << endl;
+    }
 
     if (m_expertMode)
     {

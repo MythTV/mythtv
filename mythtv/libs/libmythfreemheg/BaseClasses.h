@@ -51,6 +51,7 @@ template <class BASE> class MHSequence {
         // and anything above it up one place.
         void InsertAt(BASE b, int n) {
             MHASSERT(n >= 0 && n <= m_VecSize);
+            // NOLINTNEXTLINE(bugprone-sizeof-expression)
             BASE *ptr = (BASE*)realloc(m_Values, (m_VecSize+1) * sizeof(BASE));
             if (ptr == nullptr) throw "Out of Memory";
             m_Values = ptr;
@@ -171,7 +172,7 @@ class MHObjectRef
 class MHContentRef
 {
   public:
-    MHContentRef() {}
+    MHContentRef() = default;
 
     MHContentRef& operator=(const MHContentRef&) = default;
 
@@ -221,7 +222,7 @@ protected:
 class MHGenericOctetString: public MHGenericBase
 {
   public:
-    MHGenericOctetString() {}
+    MHGenericOctetString() = default;
     void Initialise(MHParseNode *p, MHEngine *engine);
     void PrintMe(FILE *fd, int nTabs) const;
     void GetValue(MHOctetString &str, MHEngine *engine) const; // Return the value, looking up any indirect ref.
@@ -232,7 +233,7 @@ protected:
 class MHGenericObjectRef: public MHGenericBase
 {
   public:
-    MHGenericObjectRef() {}
+    MHGenericObjectRef() = default;
     void Initialise(MHParseNode *p, MHEngine *engine);
     void PrintMe(FILE *fd, int nTabs) const;
     void GetValue(MHObjectRef &ref, MHEngine *engine) const; // Return the value, looking up any indirect ref.
@@ -243,7 +244,7 @@ protected:
 class MHGenericContentRef: public MHGenericBase
 {
   public:
-    MHGenericContentRef() {}
+    MHGenericContentRef() = default;
     void Initialise(MHParseNode *p, MHEngine *engine);
     void PrintMe(FILE *fd, int nTabs) const;
     void GetValue(MHContentRef &ref, MHEngine *engine) const; // Return the value, looking up any indirect ref.
@@ -255,12 +256,19 @@ protected:
 class MHParameter
 {
   public:
-    MHParameter(): m_Type(P_Null) {}
+    MHParameter() = default;
     void Initialise(MHParseNode *p, MHEngine *engine);
     void PrintMe(FILE *fd, int nTabs) const;
     MHObjectRef *GetReference(); // Get an indirect reference.
 
-    enum ParamTypes { P_Int, P_Bool, P_String, P_ObjRef, P_ContentRef, P_Null } m_Type; // Null is used when this is optional
+    enum ParamTypes {
+        P_Int,
+        P_Bool,
+        P_String,
+        P_ObjRef,
+        P_ContentRef,
+        P_Null
+    } m_Type { P_Null }; // Null is used when this is optional
 
     MHGenericInteger        m_IntVal;
     MHGenericBoolean        m_BoolVal;
@@ -275,7 +283,7 @@ class MHUnion
   public:
     MHUnion() = default;
     MHUnion(int nVal) : m_Type(U_Int), m_nIntVal(nVal) {}
-    MHUnion(bool fVal) : m_Type(U_Bool), m_nIntVal(0), m_fBoolVal(fVal)  {}
+    MHUnion(bool fVal) : m_Type(U_Bool),  m_fBoolVal(fVal)  {}
     MHUnion(const MHOctetString &strVal) : m_Type(U_String) { m_StrVal.Copy(strVal); }
     MHUnion(const MHObjectRef &objVal) : m_Type(U_ObjRef) { m_ObjRefVal.Copy(objVal); };
     MHUnion(const MHContentRef &cnVal) : m_Type(U_ContentRef) { m_ContentRefVal.Copy(cnVal); }
@@ -286,7 +294,7 @@ class MHUnion
     QString Printable() const;
 
     enum UnionTypes { U_Int, U_Bool, U_String, U_ObjRef, U_ContentRef, U_None } m_Type {U_None};
-    void CheckType (enum UnionTypes) const; // Check a type and fail if it doesn't match. 
+    void CheckType (enum UnionTypes t) const; // Check a type and fail if it doesn't match.
     static const char *GetAsString(enum UnionTypes t);
 
     int             m_nIntVal  {0};
@@ -299,7 +307,7 @@ class MHUnion
 class MHFontBody {
     // A font body can either be a string or an object reference
   public:
-    MHFontBody() {}
+    MHFontBody() = default;
     void Initialise(MHParseNode *p, MHEngine *engine);
     void PrintMe(FILE *fd, int nTabs) const;
     bool IsSet() const { return m_DirFont.Size() != 0 || m_IndirFont.IsSet(); }
@@ -312,7 +320,7 @@ protected:
 // This is used only in DynamicLineArt
 class MHPointArg {
   public:
-    MHPointArg() {}
+    MHPointArg() = default;
     void Initialise(MHParseNode *p, MHEngine *engine);
     void PrintMe(FILE *fd, int nTabs) const;
     MHGenericInteger m_x, m_y;

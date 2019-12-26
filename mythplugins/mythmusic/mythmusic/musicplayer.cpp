@@ -644,9 +644,11 @@ void MusicPlayer::customEvent(QEvent *event)
                         playFile(mdata);
                     }
                     else
+                    {
                         LOG(VB_GENERAL, LOG_ERR,
                             QString("MusicPlayer: got invalid MUSIC_COMMAND "
                                     "PLAY_FILE - %1").arg(me->Message()));
+                    }
                 }
                 else if (list[2] == "PLAY_URL")
                 {
@@ -658,9 +660,11 @@ void MusicPlayer::customEvent(QEvent *event)
                         playFile(mdata);
                     }
                     else
+                    {
                         LOG(VB_GENERAL, LOG_ERR,
                             QString("MusicPlayer: got invalid MUSIC_COMMAND "
                                     "PLAY_URL - %1").arg(me->Message()));
+                    }
                 }
                 else if (list[2] == "PLAY_TRACK")
                 {
@@ -672,9 +676,11 @@ void MusicPlayer::customEvent(QEvent *event)
                             playFile(*mdata);
                     }
                     else
+                    {
                         LOG(VB_GENERAL, LOG_ERR,
                              QString("MusicPlayer: got invalid MUSIC_COMMAND "
                                      "PLAY_TRACK - %1").arg(me->Message()));
+                    }
                 }
                 else if (list[2] == "GET_METADATA")
                 {
@@ -706,9 +712,11 @@ void MusicPlayer::customEvent(QEvent *event)
                 }
             }
             else
+            {
                 LOG(VB_GENERAL, LOG_ERR,
                     QString("MusicPlayer: got unknown/invalid MUSIC_COMMAND "
                             "- %1").arg(me->Message()));
+            }
         }
         else if (me->Message().startsWith("MUSIC_SETTINGS_CHANGED"))
         {
@@ -778,14 +786,18 @@ void MusicPlayer::customEvent(QEvent *event)
                 int id = getNotificationID(host);
 
                 if (error == "Already_Running")
+                {
                     sendNotification(id, tr(""),
                                      tr("Music File Scanner"),
                                      tr("Can't run the music file scanner because it is already running on %1").arg(host));
+                }
                 else if (error == "Stalled")
+                {
                     sendNotification(id, tr(""),
                                      tr("Music File Scanner"),
                                      tr("The music file scanner has been running for more than 60 minutes on %1.\nResetting and trying again")
                                          .arg(host));
+                }
             }
         }
     }

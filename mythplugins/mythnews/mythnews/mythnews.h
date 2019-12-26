@@ -24,11 +24,11 @@ class MythNews : public MythScreenType
 
   public:
     MythNews(MythScreenStack *parent, const QString &name);
-    ~MythNews();
+    ~MythNews() override;
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
-    void customEvent(QEvent*) override; // MythUIType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
+    void customEvent(QEvent *event) override; // MythUIType
 
   private:
     void updateInfoView(void);
@@ -46,11 +46,11 @@ class MythNews : public MythScreenType
     void ShowFeedManager();
 
     mutable QMutex m_lock            {QMutex::Recursive};
-    NewsSite::List m_NewsSites;
+    NewsSite::List m_newsSites;
 
-    QTimer        *m_RetrieveTimer   {nullptr};
-    int            m_TimerTimeout    {10*60*1000};
-    unsigned int   m_UpdateFreq      {30};
+    QTimer        *m_retrieveTimer   {nullptr};
+    int            m_timerTimeout    {10*60*1000};
+    unsigned int   m_updateFreq      {30};
 
     QString        m_zoom            {"1.0"};
     QString        m_browser;
@@ -72,11 +72,11 @@ class MythNews : public MythScreenType
 
   private slots:
     void loadSites(void);
-    void updateInfoView(MythUIButtonListItem*);
-    void slotViewArticle(MythUIButtonListItem*);
+    void updateInfoView(MythUIButtonListItem *selected);
+    void slotViewArticle(MythUIButtonListItem *articlesListItem);
     void slotRetrieveNews(void);
-    void slotNewsRetrieved(NewsSite*);
-    void slotSiteSelected(MythUIButtonListItem*);
+    void slotNewsRetrieved(NewsSite *site);
+    void slotSiteSelected(MythUIButtonListItem *item);
 };
 
 #endif /* MYTHNEWS_H */

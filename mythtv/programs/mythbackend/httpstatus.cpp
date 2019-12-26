@@ -955,10 +955,12 @@ int HttpStatus::PrintScheduled( QTextStream &os, const QDomElement& scheduled )
                     os << "<em>" << sSubTitle << "</em><br /><br />";
 
                 if ( airDate.isValid())
+                {
                     os << "Orig. Airdate: "
                        << MythDate::toString(airDate, MythDate::kDateFull |
                                                       MythDate::kAddYear)
                        << "<br /><br />";
+                }
 
                 os << sDesc << "<br /><br />"
                    << "This recording will start "  << sTimeToStart
@@ -1156,11 +1158,13 @@ int HttpStatus::PrintJobQueue( QTextStream &os, const QDomElement& jobs )
                     os << "Job: " << JobQueue::JobText( nType ) << "<br />";
 
                     if (schedRunTime > MythDate::current())
+                    {
                         os << "Scheduled Run Time: "
                            << MythDate::toString(schedRunTime,
                                                  MythDate::kDateFull |
                                                  MythDate::kTime)
                            << "<br />";
+                    }
 
                     os << "Status: <font" << statusColor << ">"
                        << JobQueue::StatusText( nStatus )

@@ -15,7 +15,7 @@ class META_PUBLIC MetadataResultsDialog : public MythScreenType
   public:
     MetadataResultsDialog(MythScreenStack *lparent,
                           const MetadataLookupList &results);
-    ~MetadataResultsDialog();
+    ~MetadataResultsDialog() override;
 
     bool Create() override; // MythScreenType
 

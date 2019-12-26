@@ -50,7 +50,7 @@ class MythVideoOutput
     virtual bool Init(const QSize &VideoDim, const QSize &VideoDispDim,
                       float VideoAspect, MythDisplay *Display,
                       const QRect &WindowRect, MythCodecID CodecID);
-    virtual void SetVideoFrameRate(float);
+    virtual void SetVideoFrameRate(float playback_fps);
     virtual void SetDeinterlacing(bool Enable, bool DoubleRate, MythDeintType Force = DEINT_NONE);
     virtual void ProcessFrame(VideoFrame *Frame, OSD *Osd, const PIPMap &PipPlayers,
                               FrameScanType Scan = kScan_Ignore) = 0;
@@ -58,7 +58,7 @@ class MythVideoOutput
     virtual void Show(FrameScanType) = 0;
     void         SetReferenceFrames(int ReferenceFrames);
     VideoDisplayProfile *GetProfile() { return m_dbDisplayProfile; }
-    virtual void WindowResized(const QSize &) {}
+    virtual void WindowResized(const QSize &/*size*/) {}
     virtual bool InputChanged(const QSize &VideoDim, const QSize &VideoDispDim,
                               float VideoAspect, MythCodecID  CodecID,
                               bool &AspectChanged, MythMultiLocker* Locks,
@@ -108,7 +108,7 @@ class MythVideoOutput
     virtual void StartDisplayingFrame(void);
     virtual void DoneDisplayingFrame(VideoFrame *Frame);
     virtual void DiscardFrame(VideoFrame *frame);
-    virtual void DiscardFrames(bool KeyFrame, bool);
+    virtual void DiscardFrames(bool KeyFrame, bool Flushed);
     virtual void CheckFrameStates(void) { }
     virtual VideoFrame *GetLastDecodedFrame(void);
     virtual VideoFrame *GetLastShownFrame(void);
@@ -120,7 +120,7 @@ class MythVideoOutput
     virtual QRect GetPIPRect(PIPLocation Location,
                              MythPlayer *PiPPlayer = nullptr,
                              bool DoPixelAdj = true) const;
-    virtual void RemovePIP(MythPlayer *) { }
+    virtual void RemovePIP(MythPlayer */*pipplayer*/) { }
     virtual void SetPIPState(PIPState Setting);
     virtual MythPainter *GetOSDPainter(void) { return nullptr; }
 
@@ -147,7 +147,7 @@ class MythVideoOutput
     virtual void MoveResize(void);
     void         InitDisplayMeasurements(void);
     virtual void ShowPIPs(VideoFrame *Frame, const PIPMap &PiPPlayers);
-    virtual void ShowPIP(VideoFrame*, MythPlayer*, PIPLocation) { }
+    virtual void ShowPIP(VideoFrame* /*Frame*/, MythPlayer */*PiPPlayer*/, PIPLocation /*Location*/) { }
 
     QRect        GetVisibleOSDBounds(float& VisibleAspect,
                                      float& FontScaling,

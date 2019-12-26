@@ -29,7 +29,7 @@ class CetonRecorder : public DTVRecorder
     void Close(void);
     void StartNewFile(void) override; // RecorderBase
 
-    bool IsOpen(void) const { return m_stream_handler; }
+    bool IsOpen(void) const { return m_streamHandler; }
 
     QString GetSIStandard(void) const override; // DTVRecorder
 
@@ -39,7 +39,7 @@ class CetonRecorder : public DTVRecorder
 
   private:
     CetonChannel       *m_channel        {nullptr};
-    CetonStreamHandler *m_stream_handler {nullptr};
+    CetonStreamHandler *m_streamHandler  {nullptr};
 };
 
 #endif

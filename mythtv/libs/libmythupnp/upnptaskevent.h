@@ -36,7 +36,7 @@ class UPnpEventTask : public Task
 
         // Destructor protected to force use of Release Method
 
-        virtual ~UPnpEventTask();
+        ~UPnpEventTask() override;
 
     public:
 
@@ -45,7 +45,7 @@ class UPnpEventTask : public Task
                        QByteArray  *m_pPayload );
 
         QString Name() override { return( "Event" ); } // Task
-        void Execute( TaskQueue * ) override; // Task
+        void Execute( TaskQueue *pQueue ) override; // Task
 
 };
 

@@ -28,11 +28,11 @@ class AudioInputOSS : public AudioInput
 {
     public:
         explicit AudioInputOSS(const QString &device);
-        ~AudioInputOSS() { Close(); };
+        ~AudioInputOSS() override { Close(); };
 
         bool Open(uint sample_bits, uint sample_rate, uint channels) override; // AudioInput
         inline bool IsOpen(void) override // AudioInput
-            { return (dsp_fd > -1); }
+            { return (m_dspFd > -1); }
         void Close(void) override; // AudioInput
 
         bool Start(void) override; // AudioInput
@@ -43,8 +43,8 @@ class AudioInputOSS : public AudioInput
         int GetNumReadyBytes(void) override; // AudioInput
 
     private:
-        QByteArray m_device_name;
-    int dsp_fd {-1};
+        QByteArray m_deviceName;
+        int m_dspFd {-1};
 };
 #endif /* _AUDIOINPUTOSS_H_ */
 

@@ -24,7 +24,7 @@ class RawDataList
   public:
     RawDataList(struct rtframeheader frameh, unsigned char *data) :
         frameheader(frameh), packet(data) {}
-   ~RawDataList() { if (packet) delete [] packet; }
+   ~RawDataList() { delete [] packet; }
   
     struct rtframeheader frameheader;
     unsigned char *packet;
@@ -34,7 +34,7 @@ class NuppelDecoder : public DecoderBase
 {
   public:
     NuppelDecoder(MythPlayer *parent, const ProgramInfo &pginfo);
-   ~NuppelDecoder();
+   ~NuppelDecoder() override;
 
     static bool CanHandle(char testbuf[kDecoderProbeBufferSize], 
                           int testbufsize = kDecoderProbeBufferSize);
@@ -43,7 +43,7 @@ class NuppelDecoder : public DecoderBase
                  char testbuf[kDecoderProbeBufferSize], 
                  int testbufsize = kDecoderProbeBufferSize) override; // DecoderBase
 
-    bool GetFrame(DecodeType, bool&) override; // DecoderBase
+    bool GetFrame(DecodeType /*Type*/, bool &/*Retry*/) override; // DecoderBase
 
     // lastFrame is really (m_framesPlayed - 1) since we increment after getting
     bool IsLastFrameKey(void) const override // DecoderBase

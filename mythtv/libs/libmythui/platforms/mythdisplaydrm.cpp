@@ -5,7 +5,6 @@
 #define LOC QString("DispDRM: ")
 
 MythDisplayDRM::MythDisplayDRM()
-  : MythDisplay()
 {
     m_device = new MythDRMDevice(m_screen);
     Initialise();
@@ -13,8 +12,7 @@ MythDisplayDRM::MythDisplayDRM()
 
 MythDisplayDRM::~MythDisplayDRM()
 {
-    if (m_device)
-        delete m_device;
+    delete m_device;
 }
 
 void MythDisplayDRM::ScreenChanged(QScreen *qScreen)

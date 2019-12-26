@@ -60,7 +60,7 @@ class HDHRStreamHandler : public StreamHandler
 
     void GetTunerStatus(struct hdhomerun_tuner_status_t *status);
     bool IsConnected(void) const;
-    vector<DTVTunerType> GetTunerTypes(void) const { return m_tuner_types; }
+    vector<DTVTunerType> GetTunerTypes(void) const { return m_tunerTypes; }
 
     // Commands
     bool TuneChannel(const QString &chanid);
@@ -68,7 +68,7 @@ class HDHRStreamHandler : public StreamHandler
     bool TuneVChannel(const QString &vchn);
 
   private:
-    explicit HDHRStreamHandler(const QString &, int inputid, int majorid);
+    explicit HDHRStreamHandler(const QString &device, int inputid, int majorid);
 
     bool Connect(void);
 
@@ -87,19 +87,19 @@ class HDHRStreamHandler : public StreamHandler
     bool UpdateFilters(void) override; // StreamHandler
 
   private:
-    hdhomerun_device_t          *m_hdhomerun_device {nullptr};
-    hdhomerun_device_selector_t *m_device_selector  {nullptr};
+    hdhomerun_device_t          *m_hdhomerunDevice  {nullptr};
+    hdhomerun_device_selector_t *m_deviceSelector   {nullptr};
     int                          m_tuner            {-1};
-    vector<DTVTunerType>         m_tuner_types;
-    HDHRTuneMode                 m_tune_mode        {hdhrTuneModeNone}; // debug self check
-    int                          m_majorid;
+    vector<DTVTunerType>         m_tunerTypes;
+    HDHRTuneMode                 m_tuneMode         {hdhrTuneModeNone}; // debug self check
+    int                          m_majorId;
 
-    mutable QMutex               m_hdhr_lock        {QMutex::Recursive};
+    mutable QMutex               m_hdhrLock         {QMutex::Recursive};
 
     // for implementing Get & Return
-    static QMutex                            s_handlers_lock;
+    static QMutex                            s_handlersLock;
     static QMap<int, HDHRStreamHandler*>     s_handlers;
-    static QMap<int, uint>                   s_handlers_refcnt;
+    static QMap<int, uint>                   s_handlersRefCnt;
 };
 
 #endif // _HDHRSTREAMHANDLER_H_

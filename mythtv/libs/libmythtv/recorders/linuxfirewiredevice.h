@@ -25,15 +25,15 @@ class LinuxFirewireDevice : public FirewireDevice, public QRunnable
     LinuxFirewireDevice(uint64_t guid, uint subunitid,
                         uint speed, bool use_p2p,
                         uint av_buffer_size_in_bytes = 0);
-    ~LinuxFirewireDevice();
+    ~LinuxFirewireDevice() override;
 
     // Commands
     bool OpenPort(void) override; // FirewireDevice
     bool ClosePort(void) override; // FirewireDevice
     bool ResetBus(void) override; // FirewireDevice
 
-    void AddListener(TSDataListener*) override; // FirewireDevice
-    void RemoveListener(TSDataListener*) override; // FirewireDevice
+    void AddListener(TSDataListener *listener) override; // FirewireDevice
+    void RemoveListener(TSDataListener *listener) override; // FirewireDevice
 
     // Gets
     bool IsPortOpen(void) const override; // FirewireDevice
@@ -90,8 +90,8 @@ class LinuxFirewireDevice : public FirewireDevice, public QRunnable
 
   private:
     uint     m_bufsz;
-    bool     m_db_reset_disabled {false};
-    bool     m_use_p2p;
+    bool     m_dbResetDisabled   {false};
+    bool     m_useP2P;
     LFDPriv *m_priv              {nullptr};
 };
 

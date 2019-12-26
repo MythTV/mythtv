@@ -11,13 +11,13 @@ class MythFlashPlayer : public MythScreenType
 
   public:
     MythFlashPlayer(MythScreenStack *parent, QStringList &urlList);
-    ~MythFlashPlayer();
+    ~MythFlashPlayer() override;
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
   private:
-    QVariant evaluateJavaScript(const QString&);
+    QVariant evaluateJavaScript(const QString& source);
     MythUIWebBrowser*         m_browser  {nullptr};
     QString                   m_url;
     int                       m_fftime   {30};

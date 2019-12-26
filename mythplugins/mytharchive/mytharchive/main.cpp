@@ -95,9 +95,11 @@ static bool checkLockFile(const QString &lockFile)
                 "Found a lock file but the owning process isn't running!\n"
                 "Removing stale lock file."));
             if (!file.remove())
+            {
                 LOG(VB_GENERAL, LOG_ERR,
                     QString("Failed to remove stale lock file - %1")
                         .arg(lockFile));
+            }
         }
         else
         {

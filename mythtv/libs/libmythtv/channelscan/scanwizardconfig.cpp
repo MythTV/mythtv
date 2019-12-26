@@ -601,7 +601,7 @@ void ScanOptionalConfig::SetTuningPaneValues(uint frequency, const DTVMultiplex 
         if (frequency == mpx.m_frequency)
         {
             pane->setInversion(mpx.m_inversion.toString());
-            pane->setSymbolrate(QString("%1").arg(mpx.m_symbolrate));
+            pane->setSymbolrate(QString("%1").arg(mpx.m_symbolRate));
             pane->setFec(mpx.m_fec.toString());
             pane->setModulation(mpx.m_modulation.toString());
         }
@@ -613,7 +613,7 @@ void ScanOptionalConfig::SetTuningPaneValues(uint frequency, const DTVMultiplex 
         pane->setFrequency(frequency);
         if (frequency == mpx.m_frequency)
         {
-            pane->setSymbolrate(QString("%1").arg(mpx.m_symbolrate));
+            pane->setSymbolrate(QString("%1").arg(mpx.m_symbolRate));
             pane->setInversion(mpx.m_inversion.toString());
             pane->setFec(mpx.m_fec.toString());
             pane->setPolarity(mpx.m_polarity.toString());
@@ -626,7 +626,7 @@ void ScanOptionalConfig::SetTuningPaneValues(uint frequency, const DTVMultiplex 
         pane->setFrequency(frequency);
         if (frequency == mpx.m_frequency)
         {
-            pane->setSymbolrate(QString("%1").arg(mpx.m_symbolrate));
+            pane->setSymbolrate(QString("%1").arg(mpx.m_symbolRate));
             pane->setInversion(mpx.m_inversion.toString());
             pane->setFec(mpx.m_fec.toString());
             pane->setPolarity(mpx.m_polarity.toString());

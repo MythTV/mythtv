@@ -26,7 +26,7 @@ class MBASE_PUBLIC MythSingleDownload : public QObject
 
   public:
    MythSingleDownload(void) = default;
-   ~MythSingleDownload(void) = default;
+   ~MythSingleDownload(void) override = default;
 
    bool DownloadURL(const QUrl &url, QByteArray *buffer, uint timeout = 30000,
                     uint redirs = 0, qint64 maxsize = 0, QString *final_url = nullptr);

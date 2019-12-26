@@ -39,11 +39,11 @@ class MHText : public MHVisible
   public:
     MHText() = default;
     MHText(const MHText &ref);
-    ~MHText();
+    ~MHText() override;
     const char *ClassName() override // MHRoot
         { return "Text"; }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHVisible
-    void PrintMe(FILE *, int nTabs) const override; // MHVisible
+    void PrintMe(FILE *fd, int nTabs) const override; // MHVisible
 
     void Preparation(MHEngine *engine) override; // MHVisible
     void ContentPreparation(MHEngine *engine) override; // MHIngredient
@@ -51,9 +51,9 @@ class MHText : public MHVisible
 
     // Actions.
     // Extract the text from an object.  This can be used to load content from a file.
-    void GetTextData(MHRoot *pDestination, MHEngine *) override // MHRoot
+    void GetTextData(MHRoot *pDestination, MHEngine */*engine*/) override // MHRoot
         { pDestination->SetVariableValue(m_Content); }
-    MHIngredient *Clone(MHEngine *) override // MHRoot
+    MHIngredient *Clone(MHEngine */*engine*/) override // MHRoot
         { return new MHText(*this); } // Create a clone of this ingredient.
     void SetBackgroundColour(const MHColour &colour, MHEngine *engine) override; // MHRoot
     void SetTextColour(const MHColour &colour, MHEngine *engine) override; // MHRoot
@@ -104,7 +104,7 @@ class MHHyperText : public MHText, public MHInteractible
     MHHyperText() : MHInteractible(this) {}
     const char *ClassName() override // MHText
         { return "HyperText"; }
-    virtual ~MHHyperText() = default;
+    ~MHHyperText() override = default;
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHText
     void PrintMe(FILE *fd, int nTabs) const override; // MHText
 

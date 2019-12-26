@@ -46,13 +46,13 @@ class TestTemplate: public QObject
     }
 
     // example passing test
-    void example_passing_unit_test(void)
+    static void example_passing_unit_test(void)
     {
         QVERIFY(true);
     }
 
     // example benchmark test
-    void example_benchmark_test(void)
+    static void example_benchmark_test(void)
     {
         QBENCHMARK
         {
@@ -63,7 +63,7 @@ class TestTemplate: public QObject
     }
 
     // example skipped test
-    void example_skipped_test(void)
+    static void example_skipped_test(void)
     {
         QSKIP("this test should pass, but doesn't yet");
         QVERIFY(true); // yes this really would pass, but this is an example

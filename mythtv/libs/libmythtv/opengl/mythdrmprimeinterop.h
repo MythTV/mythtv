@@ -20,7 +20,7 @@ class MythDRMPRIMEInterop : public MythOpenGLInterop, public MythEGLDMABUF
 
   protected:
     MythDRMPRIMEInterop(MythRenderOpenGL *Context);
-    virtual ~MythDRMPRIMEInterop() override;
+    ~MythDRMPRIMEInterop() override;
     static Type GetInteropType(VideoFrameType Format);
 
   private:

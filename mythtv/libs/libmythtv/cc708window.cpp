@@ -222,17 +222,21 @@ void CC708Window::Resize(uint new_rows, uint new_columns)
         // At least one dimension expanded into existing space, so
         // those newly exposed characters must be cleared.
         for (uint i = 0; i < m_row_count; ++i)
+        {
             for (uint j = m_column_count; j < new_columns; ++j)
             {
                 m_text[i * m_true_column_count + j].m_character = ' ';
                 m_text[i * m_true_column_count + j].m_attr = m_pen.m_attr;
             }
+        }
         for (uint i = m_row_count; i < new_rows; ++i)
+        {
             for (uint j = 0; j < new_columns; ++j)
             {
                 m_text[i * m_true_column_count + j].m_character = ' ';
                 m_text[i * m_true_column_count + j].m_attr = m_pen.m_attr;
             }
+        }
         SetChanged();
     }
     SetExists(true);
@@ -468,9 +472,11 @@ void CC708Window::Scroll(int row, int col)
         (row >= (int)m_true_row_count))
     {
         for (uint j = 0; j < m_true_row_count - 1; j++)
+        {
             for (uint i = 0; i < m_true_column_count; i++)
                 m_text[(m_true_column_count * j) + i] =
                     m_text[(m_true_column_count * (j+1)) + i];
+        }
         //uint colsz = m_true_column_count * sizeof(CC708Character);
         //memmove(m_text, m_text + colsz, colsz * (m_true_row_count - 1));
 

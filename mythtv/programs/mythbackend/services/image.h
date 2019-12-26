@@ -78,7 +78,7 @@ class ScriptableImage : public QObject
 
     public:
 
-        Q_INVOKABLE ScriptableImage( QScriptEngine *pEngine, QObject *parent = nullptr ) : QObject( parent )
+        Q_INVOKABLE explicit ScriptableImage( QScriptEngine *pEngine, QObject *parent = nullptr ) : QObject( parent )
         {
             m_pEngine = pEngine;
         }
@@ -144,6 +144,7 @@ class ScriptableImage : public QObject
         }
 };
 
+// NOLINTNEXTLINE(modernize-use-auto)
 Q_SCRIPT_DECLARE_QMETAOBJECT_MYTHTV( ScriptableImage, QObject*)
 
 #endif

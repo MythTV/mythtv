@@ -192,24 +192,22 @@ class MPUBLIC Parse : public QObject
 
   public:
     Parse() = default;
-    virtual ~Parse() = default;
+    ~Parse() override = default;
 
     ResultItem::resultList parseRSS(const QDomDocument& domDoc);
     ResultItem* ParseItem(const QDomElement& item) const;
 
-    static QString GetLink(const QDomElement&);
-    static QString GetAuthor(const QDomElement&);
-    static QString GetCommentsRSS(const QDomElement&);
-    static QString GetCommentsLink(const QDomElement&);
-    static QDateTime GetDCDateTime(const QDomElement&);
-    static QDateTime FromRFC3339(const QString&);
-    QDateTime RFC822TimeToQDateTime (const QString&) const;
-    int GetNumComments (const QDomElement&) const;
+    static QString GetLink(const QDomElement& parent);
+    static QString GetAuthor(const QDomElement& parent);
+    static QString GetCommentsRSS(const QDomElement& parent);
+    static QString GetCommentsLink(const QDomElement& parent);
+    static QDateTime GetDCDateTime(const QDomElement& parent);
+    static QDateTime FromRFC3339(const QString& t);
+    QDateTime RFC822TimeToQDateTime (const QString& parent) const;
     QStringList GetAllCategories (const QDomElement&) const;
-    QPair<double, double> GetGeoPoint (const QDomElement&) const;
-    static QList<MRSSEntry> GetMediaRSS (const QDomElement&);
+    static QList<MRSSEntry> GetMediaRSS (const QDomElement& item);
     static QList<Enclosure> GetEnclosures(const QDomElement& entry);
-    static QString UnescapeHTML (const QString&);
+    static QString UnescapeHTML (const QString& escaped);
 
   private:
     QMap<QString, int> m_timezoneOffsets;

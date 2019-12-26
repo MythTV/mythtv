@@ -25,7 +25,7 @@ class BrowserApi : public QObject
     Q_OBJECT
   public:
     explicit BrowserApi(QObject *parent);
-    ~BrowserApi(void);
+    ~BrowserApi(void) override;
 
     void setWebView(QWebView *view);
 
@@ -72,7 +72,7 @@ class MythWebPage : public QWebPage
 
   public:
     explicit MythWebPage(QObject *parent = nullptr);
-    ~MythWebPage();
+    ~MythWebPage() override;
 
     bool extension (Extension extension, const ExtensionOption *option = nullptr,
                     ExtensionReturn *output = nullptr) override; // QWebPage
@@ -91,7 +91,7 @@ class MythWebView : public QWebView
 
   public:
     MythWebView(QWidget *parent, MythUIWebBrowser *parentBrowser);
-    ~MythWebView(void);
+    ~MythWebView(void) override;
 
     void keyPressEvent(QKeyEvent *event) override; // QWidget
     void customEvent(QEvent *e) override; // QWidget
@@ -135,7 +135,7 @@ class MUI_PUBLIC MythUIWebBrowser : public MythUIType
 
   public:
     MythUIWebBrowser(MythUIType *parent, const QString &name);
-    ~MythUIWebBrowser();
+    ~MythUIWebBrowser() override;
 
     void Init(void);
 

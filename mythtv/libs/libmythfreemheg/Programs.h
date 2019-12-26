@@ -70,7 +70,7 @@ class MHRemoteProgram : public MHProgram
     MHRemoteProgram() = default;
     const char *ClassName() override // MHRoot
         { return "RemoteProgram"; }
-    virtual ~MHRemoteProgram() = default;
+    ~MHRemoteProgram() override = default;
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHProgram
     void PrintMe(FILE *fd, int nTabs) const override; // MHProgram
 };
@@ -82,7 +82,7 @@ class MHInterChgProgram : public MHProgram
     MHInterChgProgram() = default;
     const char *ClassName() override // MHRoot
         { return "InterChgProgram"; }
-    virtual ~MHInterChgProgram() = default;
+    ~MHInterChgProgram() override = default;
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHProgram
     void PrintMe(FILE *fd, int nTabs) const override; // MHProgram
 };

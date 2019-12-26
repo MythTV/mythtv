@@ -995,10 +995,14 @@ bool MythDownloadManager::downloadNowLinkLocal(MythDownloadInfo *dlInfo, bool de
             QByteArray delim("\r\n\r\n");
             int delimLoc=aBuffer->indexOf(delim);
             if (delimLoc > -1)
+            {
                 *aBuffer = aBuffer->right
                   (aBuffer->size()-delimLoc-4);
+            }
             else
+            {
                 isOK=false;
+            }
         }
         socket.close();
     }
@@ -1387,9 +1391,11 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
 
         m_infoLock->lock();
         if (!m_downloadInfos.remove(dlInfo->m_url))
+        {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("ERROR download finished but failed to remove url: %1")
                         .arg(dlInfo->m_url));
+        }
 
         if (reply)
             m_downloadReplies.remove(reply);

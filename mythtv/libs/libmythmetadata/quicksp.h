@@ -75,7 +75,7 @@ class simple_ref_ptr
         m_ref = new ref(ptr);
     }
 
-    typedef T *(simple_ref_ptr<T>::*fake_bool)() const;
+    using fake_bool = T *(simple_ref_ptr<T>::*)() const;
 
     operator fake_bool() const
     {

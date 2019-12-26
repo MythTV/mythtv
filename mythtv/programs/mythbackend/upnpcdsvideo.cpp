@@ -30,9 +30,9 @@ UPnpCDSVideo::UPnpCDSVideo()
 {
     QString sServerIp   = gCoreContext->GetBackendServerIP();
     int sPort           = gCoreContext->GetBackendStatusPort();
-    m_URIBase.setScheme("http");
-    m_URIBase.setHost(sServerIp);
-    m_URIBase.setPort(sPort);
+    m_uriBase.setScheme("http");
+    m_uriBase.setHost(sServerIp);
+    m_uriBase.setPort(sPort);
 
     // ShortCuts
     m_shortcuts.insert(UPnPShortcutFeature::VIDEOS, "Videos");
@@ -306,9 +306,11 @@ bool UPnpCDSVideo::LoadMetadata(const UPnpCDSRequest* pRequest,
         return LoadVideos(pRequest, pResults, tokens);
     }
     else
+    {
         LOG(VB_GENERAL, LOG_ERR,
             QString("UPnpCDSVideo::LoadMetadata(): "
                     "Unhandled metadata request for '%1'.").arg(currentToken));
+    }
 
     return false;
 }
@@ -418,7 +420,7 @@ bool UPnpCDSVideo::LoadSeries(const UPnpCDSRequest* pRequest,
         pContainer->SetChildCount(nSeasonCount);
         pContainer->SetChildContainerCount(nSeasonCount);
 
-        PopulateArtworkURIS(pContainer, nVidID, m_URIBase);
+        PopulateArtworkURIS(pContainer, nVidID, m_uriBase);
 
         pResults->Add(pContainer);
         pContainer->DecrRef();
@@ -495,7 +497,7 @@ bool UPnpCDSVideo::LoadSeasons(const UPnpCDSRequest* pRequest,
         pContainer->SetChildCount(nVideoCount);
         pContainer->SetChildContainerCount(0);
 
-        PopulateArtworkURIS(pContainer, nVidID, m_URIBase);
+        PopulateArtworkURIS(pContainer, nVidID, m_uriBase);
 
         pResults->Add(pContainer);
         pContainer->DecrRef();

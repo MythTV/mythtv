@@ -115,7 +115,7 @@ QString  HttpServer::s_platform;
 
 HttpServer::HttpServer() :
     m_sSharePath(GetShareDir()),
-    m_threadPool("HttpServerPool"), m_running(true),
+    m_threadPool("HttpServerPool"),
     m_privateToken(QUuid::createUuid().toString()) // Cryptographically random and sufficiently long enough to act as a secure token
 {
     // Number of connections processed concurrently

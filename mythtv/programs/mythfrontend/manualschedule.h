@@ -23,7 +23,7 @@ class ManualSchedule : public MythScreenType
   public:
 
     explicit ManualSchedule(MythScreenStack *parent);
-   ~ManualSchedule(void) = default;
+   ~ManualSchedule(void) override = default;
 
     bool Create(void) override; // MythScreenType
 
@@ -32,7 +32,7 @@ class ManualSchedule : public MythScreenType
     void hourRollover(void);
     void minuteRollover(void);
     void recordClicked(void);
-    void scheduleCreated(int);
+    void scheduleCreated(int ruleid);
 
   private:
     void connectSignals();

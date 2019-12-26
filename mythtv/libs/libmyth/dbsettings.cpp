@@ -17,14 +17,18 @@ DatabaseSettings::DatabaseSettings(const QString &DBhostOverride)
 
     MSqlQuery query(MSqlQuery::InitCon());
     if (query.isConnected())
+    {
         setHelpText(
             DatabaseSettings::tr("All database settings take effect when "
                                  "you restart this program."));
+    }
     else
+    {
         setHelpText(
             DatabaseSettings::tr("MythTV could not connect to the database. "
                                  "Please verify your database settings "
                                  "below."));
+    }
 
     m_dbHostName = new TransTextEditSetting();
     m_dbHostName->setLabel(DatabaseSettings::tr("Hostname"));
@@ -140,9 +144,11 @@ void DatabaseSettings::Load(void)
         params.m_dbUserName.isEmpty() ||
         params.m_dbPassword.isEmpty() ||
         params.m_dbName.isEmpty())
+    {
         setHelpText(getHelpText() + "\n" +
                     DatabaseSettings::tr("Required fields are"
                                          " marked with an asterisk (*)."));
+    }
 
     if (params.m_dbHostName.isEmpty())
     {

@@ -33,7 +33,7 @@ class MHDynamicLineArt : public MHLineArt
 {
   public:
     MHDynamicLineArt() = default;
-    virtual ~MHDynamicLineArt();
+    ~MHDynamicLineArt() override;
     const char *ClassName() override // MHLineArt
         { return "DynamicLineArt"; }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHLineArt
@@ -51,10 +51,10 @@ class MHDynamicLineArt : public MHLineArt
     // Actions
     void Clear() override; // MHRoot
     // These actions set the properties for subsequent drawing but don't affect anything drawn so far.
-    void SetFillColour(const MHColour &colour, MHEngine *) override; // MHLineArt
-    void SetLineColour(const MHColour &colour, MHEngine *) override; // MHLineArt
-    void SetLineWidth(int nWidth, MHEngine *) override; // MHLineArt
-    void SetLineStyle(int nStyle, MHEngine *) override; // MHLineArt
+    void SetFillColour(const MHColour &colour, MHEngine *engine) override; // MHLineArt
+    void SetLineColour(const MHColour &colour, MHEngine *engine) override; // MHLineArt
+    void SetLineWidth(int nWidth, MHEngine *engine) override; // MHLineArt
+    void SetLineStyle(int nStyle, MHEngine *engine) override; // MHLineArt
 
     void GetLineWidth(MHRoot *pResult) override // MHRoot
         { pResult->SetVariableValue(m_nLineWidth); }
@@ -62,11 +62,11 @@ class MHDynamicLineArt : public MHLineArt
         { pResult->SetVariableValue(m_LineStyle); }
     void GetLineColour(MHRoot *pResult) override; // MHRoot
     void GetFillColour(MHRoot *pResult) override; // MHRoot
-    void DrawArcSector(bool fIsSector, int x, int y, int width, int height, int start, int arc, MHEngine *) override; // MHRoot
-    void DrawLine(int x1, int y1, int x2, int y2, MHEngine *) override; // MHRoot
-    void DrawOval(int x1, int y1, int width, int height, MHEngine *) override; // MHRoot
-    void DrawRectangle(int x1, int y1, int x2, int y2, MHEngine *) override; // MHRoot
-    void DrawPoly(bool fIsPolygon, int nPoints, const int *xArray, const int *yArray, MHEngine *) override; // MHRoot
+    void DrawArcSector(bool fIsSector, int x, int y, int width, int height, int start, int arc, MHEngine *engine) override; // MHRoot
+    void DrawLine(int x1, int y1, int x2, int y2, MHEngine *engine) override; // MHRoot
+    void DrawOval(int x1, int y1, int width, int height, MHEngine *engine) override; // MHRoot
+    void DrawRectangle(int x1, int y1, int x2, int y2, MHEngine *engine) override; // MHRoot
+    void DrawPoly(bool fIsPolygon, int nPoints, const int *xArray, const int *yArray, MHEngine *engine) override; // MHRoot
 
   protected:
     MHDLADisplay *m_picture {nullptr}; // The sequence of drawing actions.
@@ -78,7 +78,7 @@ class MHGetLineWidth: public MHActionObjectRef
 {
   public:
     MHGetLineWidth(): MHActionObjectRef(":GetLineWidth")  {}
-    void CallAction(MHEngine *, MHRoot *pTarget, MHRoot *pResult) override // MHActionObjectRef
+    void CallAction(MHEngine */*engine*/, MHRoot *pTarget, MHRoot *pResult) override // MHActionObjectRef
         { pTarget->GetLineWidth(pResult); }
 };
 
@@ -87,7 +87,7 @@ class MHGetLineStyle: public MHActionObjectRef
 {
   public:
     MHGetLineStyle(): MHActionObjectRef(":GetLineStyle")  {}
-    void CallAction(MHEngine *, MHRoot *pTarget, MHRoot *pResult) override // MHActionObjectRef
+    void CallAction(MHEngine */*engine*/, MHRoot *pTarget, MHRoot *pResult) override // MHActionObjectRef
         { pTarget->GetLineStyle(pResult); }
 };
 // Get Line Colour - return the current line colour.
@@ -95,7 +95,7 @@ class MHGetLineColour: public MHActionObjectRef
 {
   public:
     MHGetLineColour(): MHActionObjectRef(":GetLineColour")  {}
-    void CallAction(MHEngine *, MHRoot *pTarget, MHRoot *pResult) override // MHActionObjectRef
+    void CallAction(MHEngine */*engine*/, MHRoot *pTarget, MHRoot *pResult) override // MHActionObjectRef
         { pTarget->GetLineColour(pResult); }
 };
 // Get Fill Colour - return the current fill colour.
@@ -103,7 +103,7 @@ class MHGetFillColour: public MHActionObjectRef
 {
   public:
     MHGetFillColour(): MHActionObjectRef(":GetFillColour")  {}
-    void CallAction(MHEngine *, MHRoot *pTarget, MHRoot *pResult) override // MHActionObjectRef
+    void CallAction(MHEngine */*engine*/, MHRoot *pTarget, MHRoot *pResult) override // MHActionObjectRef
         { pTarget->GetLineWidth(pResult); }
 };
 // Clear - reset the drawing

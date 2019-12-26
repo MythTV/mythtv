@@ -22,10 +22,10 @@ class MythVideoOutputOpenGL : public MythVideoOutput
     bool Init(const QSize &VideoDim, const QSize &VideoDispDim, float Aspect,
               MythDisplay *Display, const QRect &DisplayVisibleRect, MythCodecID CodecId) override;
 
-    void PrepareFrame(VideoFrame *Frame, FrameScanType, OSD *Osd) override;
+    void PrepareFrame(VideoFrame *Frame, FrameScanType Scan, OSD *Osd) override;
     void ProcessFrame(VideoFrame *Frame, OSD *Osd,
                       const PIPMap &PiPPlayers, FrameScanType Scan) override;
-    void Show(FrameScanType ) override;
+    void Show(FrameScanType Scan) override;
     void ClearAfterSeek(void) override;
     bool InputChanged(const QSize &VideoDim, const QSize &VideoDispDim,
                       float Aspect, MythCodecID CodecId, bool &AspectOnly,

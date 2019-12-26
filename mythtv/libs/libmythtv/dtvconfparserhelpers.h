@@ -73,7 +73,7 @@ class DTVParamHelper
 
 class DTVTunerType : public DTVParamHelper
 {
-    static const DTVParamHelperStruct s_parseTable[];
+    static const DTVParamHelperStruct kParseTable[];
 
   public:
     // WARNING: kTunerTypes cannot be defined by a C++03 enum
@@ -127,7 +127,7 @@ class DTVTunerType : public DTVParamHelper
     DTVTunerType& operator=(int type) { m_value = type; return *this; }
 
     bool Parse(const QString &_value)
-        { return ParseParam(_value, m_value, s_parseTable); }
+        { return ParseParam(_value, m_value, kParseTable); }
 
     bool IsFECVariable(void) const
     {
@@ -158,9 +158,9 @@ class DTVTunerType : public DTVParamHelper
 class DTVInversion : public DTVParamHelper
 {
   protected:
-    static const DTVParamHelperStruct s_confTable[];
-    static const DTVParamHelperStruct s_vdrTable[];
-    static const DTVParamHelperStruct s_parseTable[];
+    static const DTVParamHelperStruct kConfTable[];
+    static const DTVParamHelperStruct kVdrTable[];
+    static const DTVParamHelperStruct kParseTable[];
     static const uint kDBStrCnt = 3;
     static const char *s_dbStr[kDBStrCnt];
 
@@ -192,16 +192,19 @@ class DTVInversion : public DTVParamHelper
         }
 
     bool ParseConf(const QString &_value)
-       { return ParseParam(_value, m_value, s_confTable); }
+       { return ParseParam(_value, m_value, kConfTable); }
     bool ParseVDR(const QString &_value)
-       { return ParseParam(_value, m_value, s_vdrTable); }
+       { return ParseParam(_value, m_value, kVdrTable); }
     bool Parse(const QString &_value)
-       { return ParseParam(_value, m_value, s_parseTable); }
+       { return ParseParam(_value, m_value, kParseTable); }
 
     QString toString() const { return toString(m_value); }
     QChar   toChar() const
-        { if (toString().length() > 0)
-              return toString()[0]; else return QChar(0); }
+        {
+            if (toString().length() > 0)
+                return toString()[0];
+            return {0};
+        }
 
     static QString toString(int _value)
         { return DTVParamHelper::toString(s_dbStr, _value, kDBStrCnt); }
@@ -210,9 +213,9 @@ class DTVInversion : public DTVParamHelper
 class DTVBandwidth : public DTVParamHelper
 {
   protected:
-    static const DTVParamHelperStruct s_confTable[];
-    static const DTVParamHelperStruct s_vdrTable[];
-    static const DTVParamHelperStruct s_parseTable[];
+    static const DTVParamHelperStruct kConfTable[];
+    static const DTVParamHelperStruct kVdrTable[];
+    static const DTVParamHelperStruct kParseTable[];
     static const uint kDBStrCnt = 4;
     static const char *s_dbStr[kDBStrCnt];
 
@@ -245,16 +248,19 @@ class DTVBandwidth : public DTVParamHelper
         }
 
     bool ParseConf(const QString &_value)
-       { return ParseParam(_value, m_value, s_confTable); }
+       { return ParseParam(_value, m_value, kConfTable); }
     bool ParseVDR(const QString &_value)
-       { return ParseParam(_value, m_value, s_vdrTable); }
+       { return ParseParam(_value, m_value, kVdrTable); }
     bool Parse(const QString &_value)
-       { return ParseParam(_value, m_value, s_parseTable); }
+       { return ParseParam(_value, m_value, kParseTable); }
 
     QString toString() const { return toString(m_value); }
     QChar   toChar() const
-        { if (toString().length() > 0)
-              return toString()[0]; else return QChar(0); }
+        {
+            if (toString().length() > 0)
+                return toString()[0];
+            return {0};
+        }
 
     static QString toString(int _value)
         { return DTVParamHelper::toString(s_dbStr, _value, kDBStrCnt); }
@@ -263,9 +269,9 @@ class DTVBandwidth : public DTVParamHelper
 class DTVCodeRate : public DTVParamHelper
 {
   protected:
-    static const DTVParamHelperStruct s_confTable[];
-    static const DTVParamHelperStruct s_vdrTable[];
-    static const DTVParamHelperStruct s_parseTable[];
+    static const DTVParamHelperStruct kConfTable[];
+    static const DTVParamHelperStruct kVdrTable[];
+    static const DTVParamHelperStruct kParseTable[];
     static const uint kDBStrCnt = 12;
     static const char *s_dbStr[kDBStrCnt];
 
@@ -306,11 +312,11 @@ class DTVCodeRate : public DTVParamHelper
         }
 
     bool ParseConf(const QString &_value)
-       { return ParseParam(_value, m_value, s_confTable); }
+       { return ParseParam(_value, m_value, kConfTable); }
     bool ParseVDR(const QString &_value)
-       { return ParseParam(_value, m_value, s_vdrTable); }
+       { return ParseParam(_value, m_value, kVdrTable); }
     bool Parse(const QString &_value)
-       { return ParseParam(_value, m_value, s_parseTable); }
+       { return ParseParam(_value, m_value, kParseTable); }
 
     QString toString() const { return toString(m_value); }
 
@@ -321,9 +327,9 @@ class DTVCodeRate : public DTVParamHelper
 class DTVModulation : public DTVParamHelper
 {
   protected:
-    static const DTVParamHelperStruct s_confTable[];
-    static const DTVParamHelperStruct s_vdrTable[];
-    static const DTVParamHelperStruct s_parseTable[];
+    static const DTVParamHelperStruct kConfTable[];
+    static const DTVParamHelperStruct kVdrTable[];
+    static const DTVParamHelperStruct kParseTable[];
     static const uint kDBStrCnt = 13;
     static const char *s_dbStr[kDBStrCnt];
 
@@ -367,11 +373,11 @@ class DTVModulation : public DTVParamHelper
         }
 
     bool ParseConf(const QString &_value)
-       { return ParseParam(_value, m_value, s_confTable); }
+       { return ParseParam(_value, m_value, kConfTable); }
     bool ParseVDR(const QString &_value)
-       { return ParseParam(_value, m_value, s_vdrTable); }
+       { return ParseParam(_value, m_value, kVdrTable); }
     bool Parse(const QString &_value)
-       { return ParseParam(_value, m_value, s_parseTable); }
+       { return ParseParam(_value, m_value, kParseTable); }
 
     QString toString() const { return toString(m_value); }
 
@@ -379,7 +385,7 @@ class DTVModulation : public DTVParamHelper
     {
         if (kModulationInvalid == _value)
             return "invalid";
-        else if (kModulationAnalog == _value)
+        if (kModulationAnalog == _value)
             return "analog";
         return DTVParamHelper::toString(s_dbStr, _value, kDBStrCnt);
     }
@@ -388,9 +394,9 @@ class DTVModulation : public DTVParamHelper
 class DTVTransmitMode : public DTVParamHelper
 {
   protected:
-    static const DTVParamHelperStruct s_confTable[];
-    static const DTVParamHelperStruct s_vdrTable[];
-    static const DTVParamHelperStruct s_parseTable[];
+    static const DTVParamHelperStruct kConfTable[];
+    static const DTVParamHelperStruct kVdrTable[];
+    static const DTVParamHelperStruct kParseTable[];
     static const uint kDBStrCnt = 3;
     static const char *s_dbStr[kDBStrCnt];
 
@@ -422,16 +428,19 @@ class DTVTransmitMode : public DTVParamHelper
         }
 
     bool ParseConf(const QString &_value)
-       { return ParseParam(_value, m_value, s_confTable); }
+       { return ParseParam(_value, m_value, kConfTable); }
     bool ParseVDR(const QString &_value)
-       { return ParseParam(_value, m_value, s_vdrTable); }
+       { return ParseParam(_value, m_value, kVdrTable); }
     bool Parse(const QString &_value)
-       { return ParseParam(_value, m_value, s_parseTable); }
+       { return ParseParam(_value, m_value, kParseTable); }
 
     QString toString() const { return toString(m_value); }
     QChar   toChar() const
-        { if (toString().length() > 0)
-              return toString()[0]; else return QChar(0); }
+        {
+            if (toString().length() > 0)
+                return toString()[0];
+            return {0};
+        }
 
     static QString toString(int _value)
         { return DTVParamHelper::toString(s_dbStr, _value, kDBStrCnt); }
@@ -440,9 +449,9 @@ class DTVTransmitMode : public DTVParamHelper
 class DTVGuardInterval : public DTVParamHelper
 {
   protected:
-    static const DTVParamHelperStruct s_confTable[];
-    static const DTVParamHelperStruct s_vdrTable[];
-    static const DTVParamHelperStruct s_parseTable[];
+    static const DTVParamHelperStruct kConfTable[];
+    static const DTVParamHelperStruct kVdrTable[];
+    static const DTVParamHelperStruct kParseTable[];
     static const uint kDBStrCnt = 5;
     static const char *s_dbStr[kDBStrCnt];
 
@@ -476,11 +485,11 @@ class DTVGuardInterval : public DTVParamHelper
         }
 
     bool ParseConf(const QString &_value)
-       { return ParseParam(_value, m_value, s_confTable); }
+       { return ParseParam(_value, m_value, kConfTable); }
     bool ParseVDR(const QString &_value)
-       { return ParseParam(_value, m_value, s_vdrTable); }
+       { return ParseParam(_value, m_value, kVdrTable); }
     bool Parse(const QString &_value)
-       { return ParseParam(_value, m_value, s_parseTable); }
+       { return ParseParam(_value, m_value, kParseTable); }
 
     QString toString() const { return toString(m_value); }
 
@@ -491,9 +500,9 @@ class DTVGuardInterval : public DTVParamHelper
 class DTVHierarchy : public DTVParamHelper
 {
   protected:
-    static const DTVParamHelperStruct s_confTable[];
-    static const DTVParamHelperStruct s_vdrTable[];
-    static const DTVParamHelperStruct s_parseTable[];
+    static const DTVParamHelperStruct kConfTable[];
+    static const DTVParamHelperStruct kVdrTable[];
+    static const DTVParamHelperStruct kParseTable[];
     static const uint kDBStrCnt = 5;
     static const char *s_dbStr[kDBStrCnt];
 
@@ -527,16 +536,19 @@ class DTVHierarchy : public DTVParamHelper
         }
 
     bool ParseConf(const QString &_value)
-       { return ParseParam(_value, m_value, s_confTable); }
+       { return ParseParam(_value, m_value, kConfTable); }
     bool ParseVDR(const QString &_value)
-       { return ParseParam(_value, m_value, s_vdrTable); }
+       { return ParseParam(_value, m_value, kVdrTable); }
     bool Parse(const QString &_value)
-       { return ParseParam(_value, m_value, s_parseTable); }
+       { return ParseParam(_value, m_value, kParseTable); }
 
     QString toString() const { return toString(m_value); }
     QChar   toChar() const
-        { if (toString().length() > 0)
-              return toString()[0]; else return QChar(0); }
+        {
+            if (toString().length() > 0)
+                return toString()[0];
+            return {0};
+        }
 
     static QString toString(int _value)
         { return DTVParamHelper::toString(s_dbStr, _value, kDBStrCnt); }
@@ -545,7 +557,7 @@ class DTVHierarchy : public DTVParamHelper
 class DTVPolarity : public DTVParamHelper
 {
   protected:
-    static const DTVParamHelperStruct s_parseTable[];
+    static const DTVParamHelperStruct kParseTable[];
     static const uint kDBStrCnt = 4;
     static const char *s_dbStr[kDBStrCnt];
 
@@ -564,16 +576,19 @@ class DTVPolarity : public DTVParamHelper
         { m_value = _value; return *this; }
 
     bool ParseConf(const QString &_value)
-       { return ParseParam(_value, m_value, s_parseTable); }
+       { return ParseParam(_value, m_value, kParseTable); }
     bool ParseVDR(const QString &_value)
-       { return ParseParam(_value, m_value, s_parseTable); }
+       { return ParseParam(_value, m_value, kParseTable); }
     bool Parse(const QString &_value)
-       { return ParseParam(_value, m_value, s_parseTable); }
+       { return ParseParam(_value, m_value, kParseTable); }
 
     QString toString() const { return toString(m_value); }
     QChar   toChar() const
-        { if (toString().length() > 0)
-              return toString()[0]; else return QChar(0); }
+        {
+            if (toString().length() > 0)
+                return toString()[0];
+            return {0};
+        }
 
     static QString toString(int _value)
         { return DTVParamHelper::toString(s_dbStr, _value, kDBStrCnt); }
@@ -582,9 +597,9 @@ class DTVPolarity : public DTVParamHelper
 class DTVModulationSystem : public DTVParamHelper
 {
   protected:
-    static const DTVParamHelperStruct s_confTable[];
-    static const DTVParamHelperStruct s_vdrTable[];
-    static const DTVParamHelperStruct s_parseTable[];
+    static const DTVParamHelperStruct kConfTable[];
+    static const DTVParamHelperStruct kVdrTable[];
+    static const DTVParamHelperStruct kParseTable[];
     static const uint kDBStrCnt = 19;
     static const char *s_dbStr[kDBStrCnt];
 
@@ -634,11 +649,11 @@ class DTVModulationSystem : public DTVParamHelper
         }
 
     bool ParseConf(const QString &_value)
-       { return ParseParam(_value, m_value, s_confTable); }
+       { return ParseParam(_value, m_value, kConfTable); }
     bool ParseVDR(const QString &_value)
-       { return ParseParam(_value, m_value, s_vdrTable); }
+       { return ParseParam(_value, m_value, kVdrTable); }
     bool Parse(const QString &_value)
-       { return ParseParam(_value, m_value, s_parseTable); }
+       { return ParseParam(_value, m_value, kParseTable); }
 
     QString toString() const { return toString(m_value); }
 
@@ -649,9 +664,9 @@ class DTVModulationSystem : public DTVParamHelper
 class DTVRollOff : public DTVParamHelper
 {
   protected:
-    static const DTVParamHelperStruct s_confTable[];
-    static const DTVParamHelperStruct s_vdrTable[];
-    static const DTVParamHelperStruct s_parseTable[];
+    static const DTVParamHelperStruct kConfTable[];
+    static const DTVParamHelperStruct kVdrTable[];
+    static const DTVParamHelperStruct kParseTable[];
     static const uint kDBStrCnt = 4;
     static const char *s_dbStr[kDBStrCnt];
 
@@ -684,11 +699,11 @@ class DTVRollOff : public DTVParamHelper
         }
 
     bool ParseConf(const QString &_value)
-       { return ParseParam(_value, m_value, s_confTable); }
+       { return ParseParam(_value, m_value, kConfTable); }
     bool ParseVDR(const QString &_value)
-       { return ParseParam(_value, m_value, s_vdrTable); }
+       { return ParseParam(_value, m_value, kVdrTable); }
     bool Parse(const QString &_value)
-       { return ParseParam(_value, m_value, s_parseTable); }
+       { return ParseParam(_value, m_value, kParseTable); }
 
     QString toString() const { return toString(m_value); }
 

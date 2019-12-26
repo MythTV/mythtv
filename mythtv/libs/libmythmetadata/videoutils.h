@@ -67,7 +67,7 @@ inline QString generate_file_url(
 {
     uint port = gCoreContext->GetBackendServerPort(host);
 
-    return gCoreContext->GenMythURL(host, port, path,
+    return MythCoreContext::GenMythURL(host, port, path,
                                     StorageGroup::GetGroupToUse(host, storage_group));
 
 }

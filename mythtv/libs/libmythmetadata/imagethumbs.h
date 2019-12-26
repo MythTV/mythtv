@@ -14,10 +14,14 @@
 #ifndef IMAGETHUMBS_H
 #define IMAGETHUMBS_H
 
+#include <utility>
+
+// Qt headers
 #include <QMap>
 #include <QMutex>
 #include <QWaitCondition>
 
+// MythTV headers
 #include "imagetypes.h"
 #include "mthread.h"
 
@@ -47,7 +51,7 @@ public:
     */
     ThumbTask(QString action, ImagePtrK im,
               int priority = kUrgentPriority, bool notify = false)
-        : m_action(action), m_priority(priority), m_notify(notify)
+        : m_action(std::move(action)), m_priority(priority), m_notify(notify)
     { m_images.append(im); }
 
     /*!
@@ -58,10 +62,10 @@ public:
      \param priority Request priority
      \param notify If true a 'thumbnail exists' event will be broadcast when done.
     */
-    ThumbTask(QString action, const ImageListK &list,
+    ThumbTask(QString action, ImageListK list,
               int priority = kUrgentPriority, bool notify = false)
-        : m_images(list),
-          m_action(action),
+        : m_images(std::move(list)),
+          m_action(std::move(action)),
           m_priority(priority),
           m_notify(notify)      {}
 
@@ -90,7 +94,7 @@ public:
     */
     ThumbThread(const QString &name, DBFS *const dbfs)
         : MThread(name), m_dbfs(*dbfs) {}
-    ~ThumbThread();
+    ~ThumbThread() override;
 
     void cancel();
     void Enqueue(const TaskPtr &task);

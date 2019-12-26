@@ -195,10 +195,12 @@ static int CopySkipListToCutList(uint chanid, const QDateTime& starttime)
 
     pginfo.QueryCommBreakList(cutlist);
     for (it = cutlist.begin(); it != cutlist.end(); ++it)
+    {
         if (*it == MARK_COMM_START)
             cutlist[it.key()] = MARK_CUT_START;
         else
             cutlist[it.key()] = MARK_CUT_END;
+    }
     pginfo.SaveCutList(cutlist);
 
     return GENERIC_EXIT_OK;
@@ -795,9 +797,11 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
                                 "method").arg(program_info->GetChanID()));
             }
             else if (commDetectMethod == COMM_DETECT_UNINIT)
+            {
                 // no value set, so use the database default
                 commDetectMethod = (SkipType)gCoreContext->GetNumSetting(
                                      "CommercialSkipMethod", COMM_DETECT_ALL);
+            }
             LOG(VB_COMMFLAG, LOG_INFO,
                 QString("Using method: %1 from channel %2")
                     .arg(commDetectMethod).arg(program_info->GetChanID()));
@@ -1206,16 +1210,20 @@ int main(int argc, char *argv[])
             ret = FlagCommercials(chanid, starttime, jobID, "", jobQueueCPU != 0);
 
         if (ret > GENERIC_EXIT_NOT_OK)
+        {
             JobQueue::ChangeJobStatus(jobID, JOB_ERRORED,
                 QCoreApplication::translate("(mythcommflag)",
                                             "Failed with exit status %1",
                                             "Job status").arg(ret));
+        }
         else
+        {
             JobQueue::ChangeJobStatus(jobID, JOB_FINISHED,
                 QCoreApplication::translate("(mythcommflag)",
                                             "%n commercial break(s)",
                                             "Job status",
                                             ret));
+        }
     }
     else if (cmdline.toBool("video"))
     {
@@ -1250,14 +1258,18 @@ int main(int argc, char *argv[])
             // inefficient, but it lets the other function
             // handle sanity checking
             if (cmdline.toBool("rebuild"))
+            {
                 result = RebuildSeekTable(pginfo.GetChanID(),
                                           pginfo.GetRecordingStartTime(),
                                           -1, cmdline.toBool("writefile"));
+            }
             else
+            {
                 result = FlagCommercials(pginfo.GetChanID(),
                                          pginfo.GetRecordingStartTime(),
                                          -1, cmdline.toString("outputfile"),
                                          true);
+            }
         }
     }
     else if (cmdline.toBool("queue"))

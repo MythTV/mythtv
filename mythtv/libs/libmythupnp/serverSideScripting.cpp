@@ -640,10 +640,12 @@ bool ServerSideScripting::ProcessLine( QTextStream &sCode,
                                   << "\n";
                         }
                         else
+                        {
                             LOG(VB_GENERAL, LOG_ERR,
                                 QString("ServerSideScripting::ProcessLine 'import' - File not found: %1%2")
                                    .arg(m_sResRootPath)
                                    .arg(sFileName));
+                        }
                     }
                     else
                     {

@@ -30,7 +30,7 @@ class MTV_PUBLIC MythSystemEventHandler : public QObject
     MythSystemEventHandler();
 
     // Destructor
-   ~MythSystemEventHandler();
+   ~MythSystemEventHandler() override;
 
   private:
     // Helpers for converting incoming events to command lines
@@ -52,7 +52,7 @@ class MTV_PUBLIC MythSystemEventEditor : public RawSettingsEditor
     Q_OBJECT
 
   public:
-    MythSystemEventEditor(MythScreenStack *parent, const char *name = nullptr);
+    explicit MythSystemEventEditor(MythScreenStack *parent, const char *name = nullptr);
 };
 
 #endif

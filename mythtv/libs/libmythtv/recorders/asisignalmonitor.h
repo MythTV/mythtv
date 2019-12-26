@@ -15,7 +15,7 @@ class ASISignalMonitor: public DTVSignalMonitor
   public:
     ASISignalMonitor(int db_cardnum, ASIChannel *_channel,
                      bool _release_stream = true, uint64_t _flags = 0);
-    virtual ~ASISignalMonitor();
+    ~ASISignalMonitor() override;
 
     void Stop(void) override; // SignalMonitor
 
@@ -27,8 +27,8 @@ class ASISignalMonitor: public DTVSignalMonitor
     ASIChannel *GetASIChannel(void);
 
   protected:
-    bool              streamHandlerStarted {false};
-    ASIStreamHandler *streamHandler        {nullptr};
+    bool              m_streamHandlerStarted {false};
+    ASIStreamHandler *m_streamHandler        {nullptr};
 };
 
 #endif // ASISIGNALMONITOR_H

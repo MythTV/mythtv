@@ -347,11 +347,15 @@ void ScheduleCommon::EditRecording(bool may_watch_now)
         if (!recinfo.IsGeneric())
         {
             if (recinfo.GetCategoryType() == ProgramInfo::kCategoryMovie)
+            {
                 menuPopup->AddButton(tr("Record one showing"),
                                      qVariantFromValue(recinfo));
+            }
             else
+            {
                 menuPopup->AddButton(tr("Record one showing (this episode)"),
                                      qVariantFromValue(recinfo));
+            }
 
         }
         menuPopup->AddButton(tr("Record all showings (this channel)"),

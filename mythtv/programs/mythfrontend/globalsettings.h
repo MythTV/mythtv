@@ -159,11 +159,11 @@ class HostRefreshRateComboBoxSetting : public HostComboBoxSetting
   public:
     explicit HostRefreshRateComboBoxSetting(const QString &name) :
         HostComboBoxSetting(name) { }
-    virtual ~HostRefreshRateComboBoxSetting() = default;
+    ~HostRefreshRateComboBoxSetting() override = default;
 
   public slots:
 #if defined(USING_XRANDR) || CONFIG_DARWIN
-    virtual void ChangeResolution(StandardSetting *);
+    virtual void ChangeResolution(StandardSetting *setting);
 #endif
 
   private:
@@ -180,12 +180,12 @@ class MainGeneralSettings : public GroupSetting
 
 #ifdef USING_LIBCEC
   public slots:
-    void cecChanged(bool);
+    void cecChanged(bool setting);
   protected:
-    HostCheckBoxSetting *m_CECPowerOnTVAllowed  {nullptr};
-    HostCheckBoxSetting *m_CECPowerOffTVAllowed {nullptr};
-    HostCheckBoxSetting *m_CECPowerOnTVOnStart  {nullptr};
-    HostCheckBoxSetting *m_CECPowerOffTVOnExit  {nullptr};
+    HostCheckBoxSetting *m_cecPowerOnTVAllowed  {nullptr};
+    HostCheckBoxSetting *m_cecPowerOffTVAllowed {nullptr};
+    HostCheckBoxSetting *m_cecPowerOnTVOnStart  {nullptr};
+    HostCheckBoxSetting *m_cecPowerOffTVOnExit  {nullptr};
 #endif  // USING_LIBCEC
 };
 
@@ -209,7 +209,7 @@ class PlaybackProfileItemConfig : public GroupSetting
     void Load(void) override; // StandardSetting
     void Save(void) override; // StandardSetting
 
-    bool keyPressEvent(QKeyEvent *) override; // StandardSetting
+    bool keyPressEvent(QKeyEvent *e) override; // StandardSetting
     uint GetIndex(void) const;
     void ShowDeleteDialog(void);
     void DecreasePriority(void);
@@ -231,18 +231,18 @@ class PlaybackProfileItemConfig : public GroupSetting
                               TransMythUICheckBoxSetting *Shader,
                               TransMythUICheckBoxSetting *Driver);
     void InitLabel(void);
-    void DoDeleteSlot(bool);
+    void DoDeleteSlot(bool doDelete);
 
   private:
     ProfileItem                &m_item;
-    TransTextEditSetting       *m_width_range  {nullptr};
-    TransTextEditSetting       *m_height_range {nullptr};
+    TransTextEditSetting       *m_widthRange   {nullptr};
+    TransTextEditSetting       *m_heightRange  {nullptr};
     MythUIComboBoxSetting      *m_codecs       {nullptr};
     TransTextEditSetting       *m_framerate    {nullptr};
     TransMythUIComboBoxSetting *m_decoder      {nullptr};
-    TransMythUISpinBoxSetting  *m_max_cpus     {nullptr};
-    TransMythUICheckBoxSetting *m_skiploop     {nullptr};
-    TransMythUIComboBoxSetting *m_vidrend      {nullptr};
+    TransMythUISpinBoxSetting  *m_maxCpus      {nullptr};
+    TransMythUICheckBoxSetting *m_skipLoop     {nullptr};
+    TransMythUIComboBoxSetting *m_vidRend      {nullptr};
     TransMythUIComboBoxSetting *m_singleDeint  {nullptr};
     TransMythUICheckBoxSetting *m_singleShader {nullptr};
     TransMythUICheckBoxSetting *m_singleDriver {nullptr};
@@ -259,7 +259,7 @@ class PlaybackProfileConfig : public GroupSetting
 
   public:
     PlaybackProfileConfig(QString profilename, StandardSetting *parent);
-    virtual ~PlaybackProfileConfig() = default;
+    ~PlaybackProfileConfig() override = default;
 
     void Save(void) override; // StandardSetting
 
@@ -272,19 +272,19 @@ class PlaybackProfileConfig : public GroupSetting
 
   private:
     void InitUI(StandardSetting *parent);
-    StandardSetting * InitProfileItem(uint, StandardSetting *);
+    StandardSetting * InitProfileItem(uint i, StandardSetting *parent);
 
   private:
     void ReloadSettings(void);
     vector<ProfileItem> m_items;
-    vector<ProfileItem> m_del_items;
-    QString     m_profile_name;
-    uint        m_groupid {0};
+    vector<ProfileItem> m_delItems;
+    QString     m_profileName;
+    uint        m_groupId {0};
 
     TransMythUICheckBoxSetting *m_markForDeletion {nullptr};
     ButtonStandardSetting      *m_addNewEntry     {nullptr};
     vector<PlaybackProfileItemConfig*> m_profiles;
-    vector<TransMythUISpinBoxSetting*> priority;
+    vector<TransMythUISpinBoxSetting*> m_priority;
 };
 
 class ChannelGroupSetting : public GroupSetting

@@ -29,15 +29,8 @@
 
 WelcomeDialog::WelcomeDialog(MythScreenStack *parent, const char *name)
               :MythScreenType(parent, name),
-    m_status_text(nullptr),     m_recording_text(nullptr), m_scheduled_text(nullptr),
-    m_warning_text(nullptr),    m_startfrontend_button(nullptr),
-    m_menuPopup(nullptr),       m_updateStatusTimer(new QTimer(this)),
-    m_updateScreenTimer(new QTimer(this)),                 m_isRecording(false),
-    m_hasConflicts(false),      m_bWillShutdown(false),
-    m_secondsToShutdown(-1),    m_preRollSeconds(0),       m_idleWaitForRecordingTime(0),
-    m_idleTimeoutSecs(0),       m_screenTunerNo(0),        m_screenScheduledNo(0),
-    m_statusListNo(0),          m_frontendIsRunning(false),
-    m_pendingRecListUpdate(false), m_pendingSchedUpdate(false)
+               m_updateStatusTimer(new QTimer(this)),
+               m_updateScreenTimer(new QTimer(this))
 {
     gCoreContext->addListener(this);
 
@@ -47,7 +40,7 @@ WelcomeDialog::WelcomeDialog(MythScreenStack *parent, const char *name)
                        gCoreContext->GetNumSetting("idleWaitForRecordingTime", 15);
 
     // if idleTimeoutSecs is 0, the user disabled the auto-shutdown feature
-    m_bWillShutdown = (gCoreContext->GetNumSetting("idleTimeoutSecs", 0) != 0);
+    m_willShutdown = (gCoreContext->GetNumSetting("idleTimeoutSecs", 0) != 0);
 
     m_idleTimeoutSecs = gCoreContext->GetNumSetting("idleTimeoutSecs", 0);
 
@@ -67,11 +60,11 @@ bool WelcomeDialog::Create(void)
         return false;
 
     bool err = false;
-    UIUtilE::Assign(this, m_status_text, "status_text", &err);
-    UIUtilE::Assign(this, m_recording_text, "recording_text", &err);
-    UIUtilE::Assign(this, m_scheduled_text, "scheduled_text", &err);
-    UIUtilE::Assign(this, m_warning_text, "conflicts_text", &err);
-    UIUtilE::Assign(this, m_startfrontend_button, "startfrontend_button", &err);
+    UIUtilE::Assign(this, m_statusText, "status_text", &err);
+    UIUtilE::Assign(this, m_recordingText, "recording_text", &err);
+    UIUtilE::Assign(this, m_scheduledText, "scheduled_text", &err);
+    UIUtilE::Assign(this, m_warningText, "conflicts_text", &err);
+    UIUtilE::Assign(this, m_startFrontendButton, "startfrontend_button", &err);
 
     if (err)
     {
@@ -79,15 +72,15 @@ bool WelcomeDialog::Create(void)
         return false;
     }
 
-    m_warning_text->SetVisible(false);
+    m_warningText->SetVisible(false);
 
-    m_startfrontend_button->SetText(tr("Start Frontend"));
-    connect(m_startfrontend_button, SIGNAL(Clicked()),
+    m_startFrontendButton->SetText(tr("Start Frontend"));
+    connect(m_startFrontendButton, SIGNAL(Clicked()),
             this, SLOT(startFrontendClick()));
 
     BuildFocusList();
 
-    SetFocusWidget(m_startfrontend_button);
+    SetFocusWidget(m_startFrontendButton);
 
     checkConnectionToServer();
     checkAutoStart();
@@ -150,7 +143,7 @@ void WelcomeDialog::customEvent(QEvent *e)
             LOG(VB_GENERAL, LOG_NOTICE,
                 "MythWelcome received a recording list change event");
 
-            QMutexLocker lock(&m_RecListUpdateMuxtex);
+            QMutexLocker lock(&m_recListUpdateMuxtex);
 
             if (pendingRecListUpdate())
             {
@@ -169,7 +162,7 @@ void WelcomeDialog::customEvent(QEvent *e)
             LOG(VB_GENERAL, LOG_NOTICE,
                 "MythWelcome received a SCHEDULE_CHANGE event");
 
-            QMutexLocker lock(&m_SchedUpdateMuxtex);
+            QMutexLocker lock(&m_schedUpdateMuxtex);
 
             if (pendingSchedUpdate())
             {
@@ -332,9 +325,9 @@ void WelcomeDialog::updateScreen(void)
 
     if (!gCoreContext->IsConnectedToMaster())
     {
-        m_recording_text->SetText(tr("Cannot connect to server!"));
-        m_scheduled_text->SetText(tr("Cannot connect to server!"));
-        m_warning_text->SetVisible(false);
+        m_recordingText->SetText(tr("Cannot connect to server!"));
+        m_scheduledText->SetText(tr("Cannot connect to server!"));
+        m_warningText->SetVisible(false);
     }
     else
     {
@@ -368,7 +361,7 @@ void WelcomeDialog::updateScreen(void)
         else
             status = tr("There are no recordings currently taking place");
 
-        m_recording_text->SetText(status);
+        m_recordingText->SetText(status);
 
         // update scheduled
         if (!m_scheduledList.empty())
@@ -398,7 +391,7 @@ void WelcomeDialog::updateScreen(void)
         else
             status = tr("There are no scheduled recordings");
 
-        m_scheduled_text->SetText(status);
+        m_scheduledText->SetText(status);
     }
 
     // update status message
@@ -412,7 +405,7 @@ void WelcomeDialog::updateScreen(void)
         status = m_statusList[m_statusListNo];
         if (m_statusList.count() > 1)
             status += "...";
-        m_status_text->SetText(status);
+        m_statusText->SetText(status);
 
         if ((int)m_statusListNo < m_statusList.count() - 1)
             m_statusListNo++;
@@ -456,7 +449,7 @@ bool WelcomeDialog::updateRecordingList()
     {
         // clear pending flag early in case something happens while
         // we're updating
-        QMutexLocker lock(&m_RecListUpdateMuxtex);
+        QMutexLocker lock(&m_recListUpdateMuxtex);
         setPendingRecListUpdate(false);
     }
 
@@ -477,7 +470,7 @@ bool WelcomeDialog::updateScheduledList()
     {
         // clear pending flag early in case something happens while
         // we're updating
-        QMutexLocker lock(&m_SchedUpdateMuxtex);
+        QMutexLocker lock(&m_schedUpdateMuxtex);
         setPendingSchedUpdate(false);
     }
 
@@ -540,14 +533,18 @@ void WelcomeDialog::updateStatusMessage(void)
 
     if (m_statusList.empty())
     {
-        if (m_bWillShutdown && m_secondsToShutdown != -1)
+        if (m_willShutdown && m_secondsToShutdown != -1)
+        {
             m_statusList.append(tr("MythTV is idle and will shutdown in %n "
                                    "second(s).", "", m_secondsToShutdown));
+        }
         else
+        {
             m_statusList.append(tr("MythTV is idle."));
+        }
     }
 
-    m_warning_text->SetVisible(m_hasConflicts);
+    m_warningText->SetVisible(m_hasConflicts);
 }
 
 bool WelcomeDialog::checkConnectionToServer(void)

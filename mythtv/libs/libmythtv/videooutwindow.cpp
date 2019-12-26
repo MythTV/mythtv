@@ -57,7 +57,7 @@ VideoOutWindow::VideoOutWindow()
     m_dbUseGUISize = gCoreContext->GetBoolSetting("GuiSizeForTV", false);
 }
 
-void VideoOutWindow::ScreenChanged(QScreen*)
+void VideoOutWindow::ScreenChanged(QScreen */*screen*/)
 {
     PopulateGeometry();
     MoveResize();
@@ -76,7 +76,7 @@ void VideoOutWindow::PopulateGeometry(void)
     if (!screen)
         return;
 
-    if (MythDisplay::SpanAllScreens() && m_display->GetScreenCount() > 1)
+    if (MythDisplay::SpanAllScreens() && MythDisplay::GetScreenCount() > 1)
     {
         m_usingXinerama = true;
         m_screenGeometry = screen->virtualGeometry();

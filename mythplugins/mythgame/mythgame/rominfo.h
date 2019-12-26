@@ -13,7 +13,7 @@ class RomInfo
     static QList<RomInfo*> GetAllRomInfo();
     static RomInfo *GetRomInfoById(int id);
 
-    RomInfo(int lid = 0, QString lromname = "", QString lsystem = "", QString lgamename ="",
+    explicit RomInfo(int lid = 0, QString lromname = "", QString lsystem = "", QString lgamename ="",
             QString lgenre = "", QString lyear = "", bool lfavorite = false,
             QString lrompath = "", QString lcountry ="", QString lcrc_value = "",
             int ldiskcount = 0, QString lgametype = "", int lromcount = 0,

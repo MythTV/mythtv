@@ -10,7 +10,7 @@ class UPNP_PUBLIC UPNPSubscription : public HttpServerExtension, public MythObse
 {
   public:
     UPNPSubscription(const QString &share_path, int port);
-    virtual ~UPNPSubscription();
+    ~UPNPSubscription() override;
 
     QStringList GetBasePaths() override // HttpServerExtension
         { return QStringList( "/Subscriptions" ); }

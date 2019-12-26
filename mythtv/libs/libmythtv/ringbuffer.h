@@ -59,7 +59,7 @@ class MTV_PUBLIC RingBuffer : protected MThread
                               bool usereadahead = true,
                               int timeout_ms = kDefaultOpenTimeout,
                               bool stream_only = false);
-    virtual ~RingBuffer() = 0;
+    ~RingBuffer() override = 0;
 
     // Sets
     void SetWriteBufferSize(int newSize);
@@ -77,7 +77,7 @@ class MTV_PUBLIC RingBuffer : protected MThread
     QString   GetSubtitleFilename(void) const;
     QString   GetLastError(void)     const;
     bool      GetCommsError(void) const { return m_commsError; }
-    void      ResetCommsError(void) { m_commsError = 0; }
+    void      ResetCommsError(void) { m_commsError = false; }
 
     /// Returns value of stopreads
     /// \sa StartReads(void), StopReads(void)
@@ -121,7 +121,7 @@ class MTV_PUBLIC RingBuffer : protected MThread
     virtual bool IsInMenu(void) const                       { return false; }
     virtual bool IsInStillFrame(void) const                 { return false; }
     virtual bool IsInDiscMenuOrStillFrame(void) const       { return IsInMenu() || IsInStillFrame(); }
-    virtual bool HandleAction(const QStringList &, int64_t) { return false; }
+    virtual bool HandleAction(const QStringList &/*action*/, int64_t /*frane*/) { return false; }
 
     // General Commands
 

@@ -14,9 +14,9 @@ class GeneralSettings : public MythScreenType
 {
     Q_OBJECT
   public:
-    GeneralSettings(MythScreenStack *parent, const char *name = nullptr)
+    explicit GeneralSettings(MythScreenStack *parent, const char *name = nullptr)
         : MythScreenType(parent, name) {}
-    ~GeneralSettings() = default;
+    ~GeneralSettings() override = default;
 
     bool Create(void) override; // MythScreenType
 

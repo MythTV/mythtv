@@ -183,9 +183,11 @@ void ServerPool::SelectDefaultListen(bool force)
                         naList_4.append(*qnai);
                     }
                     else
+                    {
                         LOG(VB_GENERAL, LOG_DEBUG, QString("Skipping "
                            "non-private address during IPv4 autoselection: %1")
                                     .arg(PRETTYIP_(ip)));
+                    }
                 }
 
                 else
@@ -239,13 +241,17 @@ void ServerPool::SelectDefaultListen(bool force)
                 else if (config_v6.isNull())
                 {
                     if (ip.isInSubnet(kLinkLocal6))
+                    {
                         LOG(VB_GENERAL, LOG_DEBUG,
                             QString("Adding link-local '%1' to address list.")
                                 .arg(PRETTYIP_(ip)));
+                    }
                     else
+                    {
                         LOG(VB_GENERAL, LOG_DEBUG,
                             QString("Adding '%1' to address list.")
                                 .arg(PRETTYIP_(ip)));
+                    }
 
                     naList_6.append(*qnai);
                 }
@@ -343,9 +349,11 @@ QList<QHostAddress> ServerPool::DefaultBroadcastIPv4(void)
     QList<QHostAddress> blist;
     QList<QNetworkAddressEntry>::const_iterator it;
     for (it = naList_4.begin(); it != naList_4.end(); ++it)
+    {
         if (!blist.contains(it->broadcast()) && (it->prefixLength() != 32) &&
                 (it->ip() != QHostAddress::LocalHost))
             blist << it->broadcast();
+    }
 
     return blist;
 }

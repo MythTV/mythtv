@@ -37,7 +37,7 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
 {
     if (_transports.empty())
     {
-        if (m_use_gui)
+        if (m_useGui)
         {
             int channels = ChannelUtil::GetChannelCount(sourceid);
 
@@ -69,13 +69,13 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
     // Print some scan parameters
     {
         cout << endl << "Scan parameters:" << endl;
-        bool require_av = (m_service_requirements & kRequireAV) == kRequireAV;
-        bool require_a  = (m_service_requirements & kRequireAudio) != 0;
+        bool require_av = (m_serviceRequirements & kRequireAV) == kRequireAV;
+        bool require_a  = (m_serviceRequirements & kRequireAudio) != 0;
         cout << "Desired Services            : " << (require_av ? "tv" : require_a ? "tv+radio" : "all") << endl;
-        cout << "Unencrypted Only            : " << (m_fta_only            ? "yes" : "no") << endl;
-        cout << "Logical Channel Numbers only: " << (m_lcn_only            ? "yes" : "no") << endl;
-        cout << "Complete scan data required : " << (m_complete_only       ? "yes" : "no") << endl;
-        cout << "Full search for old channels: " << (m_full_channel_search ? "yes" : "no") << endl;
+        cout << "Unencrypted Only            : " << (m_ftaOnly           ? "yes" : "no") << endl;
+        cout << "Logical Channel Numbers only: " << (m_lcnOnly           ? "yes" : "no") << endl;
+        cout << "Complete scan data required : " << (m_completeOnly      ? "yes" : "no") << endl;
+        cout << "Full search for old channels: " << (m_fullChannelSearch ? "yes" : "no") << endl;
     }
 
     // Print out each channel
@@ -89,7 +89,7 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
     }
 
     uint saved_scan = 0;
-    if (m_do_save)
+    if (m_doSave)
         saved_scan = SaveScan(transports);
 
     CleanupDuplicates(transports);
@@ -107,7 +107,7 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
 
     // Pull in DB info in transports
     // Channels not found in scan but only in DB are returned in db_trans
-    sourceid = transports[0].m_channels[0].m_source_id;
+    sourceid = transports[0].m_channels[0].m_sourceId;
     ScanDTVTransportList db_trans = GetDBTransports(sourceid, transports);
 
     // Make sure "Open Cable" channels are marked that way.
@@ -125,7 +125,7 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
 
     // Add channels from the DB to the channels from the scan
     // and possibly delete one or more of the off-air channels
-    if (m_do_delete)
+    if (m_doDelete)
     {
         ScanDTVTransportList trans = transports;
         for (size_t i = 0; i < db_trans.size(); ++i)
@@ -151,13 +151,13 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
     QString msg = GetSummary(transports_scanned_size, info, stats);
     cout << msg.toLatin1().constData() << endl << endl;
 
-    if (m_do_insert)
+    if (m_doInsert)
         InsertChannels(transports, info);
 
-    if (m_do_delete && sourceid)
+    if (m_doDelete && sourceid)
         DeleteUnusedTransports(sourceid);
 
-    if (m_do_delete || m_do_insert)
+    if (m_doDelete || m_doInsert)
         ScanInfo::MarkProcessed(saved_scan);
 }
 
@@ -196,11 +196,11 @@ uint ChannelImporter::DeleteChannels(
         for (size_t j = 0; j < transports[i].m_channels.size(); ++j)
         {
             ChannelInsertInfo chan = transports[i].m_channels[j];
-            bool was_in_db = chan.m_db_mplexid && chan.m_channel_id;
+            bool was_in_db = chan.m_dbMplexId && chan.m_channelId;
             if (!was_in_db)
                 continue;
 
-            if (!chan.m_in_pmt)
+            if (!chan.m_inPmt)
             {
                 off_air_list.push_back(i<<16|j);
                 AddChanToCopy(transport_copy, transports[i], chan);
@@ -233,7 +233,7 @@ uint ChannelImporter::DeleteChannels(
             int i = off_air_list[k] >> 16;
             int j = off_air_list[k] & 0xFFFF;
             ChannelUtil::DeleteChannel(
-                transports[i].m_channels[j].m_channel_id);
+                transports[i].m_channels[j].m_channelId);
             deleted[off_air_list[k]] = true;
         }
     }
@@ -243,7 +243,7 @@ uint ChannelImporter::DeleteChannels(
         {
             int i = off_air_list[k] >> 16;
             int j = off_air_list[k] & 0xFFFF;
-            int chanid = transports[i].m_channels[j].m_channel_id;
+            int chanid = transports[i].m_channels[j].m_channelId;
             QString channum = ChannelUtil::GetChanNum(chanid);
             ChannelUtil::SetVisible(chanid, false);
             ChannelUtil::SetChannelValue("channum", QString("_%1").arg(channum),
@@ -255,7 +255,7 @@ uint ChannelImporter::DeleteChannels(
         // TODO manual delete
     }
 
-    // TODO delete encrypted channels when m_fta_only set
+    // TODO delete encrypted channels when m_ftaOnly set
 
     if (deleted.empty())
         return 0;
@@ -377,7 +377,7 @@ void ChannelImporter::InsertChannels(
         }
     }
 
-    if (!m_is_interactive)
+    if (!m_isInteractive)
         return;
 
     // If any of the potential uniques is high and inserting
@@ -490,12 +490,12 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
             bool asked = false;
             bool filter = false;
             bool handle = false;
-            if (!chan.m_channel_id && (kInsertIgnoreAll == action) &&
+            if (!chan.m_channelId && (kInsertIgnoreAll == action) &&
                 IsType(info, chan, type))
             {
                 filter = true;
             }
-            else if (!chan.m_channel_id && IsType(info, chan, type))
+            else if (!chan.m_channelId && IsType(info, chan, type))
             {
                 handle = true;
             }
@@ -527,40 +527,39 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
             {
                 bool conflicting = false;
 
-                if (chan.m_chan_num.isEmpty() ||
-                    ChannelUtil::IsConflicting(chan.m_chan_num, chan.m_source_id))
+                if (chan.m_chanNum.isEmpty() ||
+                    ChannelUtil::IsConflicting(chan.m_chanNum, chan.m_sourceId))
                 {
                     if ((kATSCNonConflicting == type) ||
                         (kATSCConflicting == type))
                     {
-                        chan.m_chan_num = channelFormat
-                            .arg(chan.m_atsc_major_channel)
-                            .arg(chan.m_atsc_minor_channel);
+                        chan.m_chanNum = channelFormat
+                            .arg(chan.m_atscMajorChannel)
+                            .arg(chan.m_atscMinorChannel);
                     }
-                    else if (chan.m_si_standard == "dvb")
+                    else if (chan.m_siStandard == "dvb")
                     {
-                        chan.m_chan_num = QString("%1")
-                                            .arg(chan.m_service_id);
+                        chan.m_chanNum = QString("%1").arg(chan.m_serviceId);
                     }
-                    else if (chan.m_freqid.isEmpty())
+                    else if (chan.m_freqId.isEmpty())
                     {
-                        chan.m_chan_num = QString("%1-%2")
-                                            .arg(chan.m_source_id)
-                                            .arg(chan.m_service_id);
+                        chan.m_chanNum = QString("%1-%2")
+                                            .arg(chan.m_sourceId)
+                                            .arg(chan.m_serviceId);
                     }
                     else
                     {
-                        chan.m_chan_num = QString("%1-%2")
-                                            .arg(chan.m_freqid)
-                                            .arg(chan.m_service_id);
+                        chan.m_chanNum = QString("%1-%2")
+                                            .arg(chan.m_freqId)
+                                            .arg(chan.m_serviceId);
                     }
 
                     conflicting = ChannelUtil::IsConflicting(
-                        chan.m_chan_num, chan.m_source_id);
+                        chan.m_chanNum, chan.m_sourceId);
                 }
 
                 // Only ask if not already asked before with kInsertManual
-                if (m_is_interactive && !asked &&
+                if (m_isInteractive && !asked &&
                     (conflicting || (kChannelTypeConflictingFirst <= type)))
                 {
                     bool ok_done = false;
@@ -570,7 +569,7 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
                         bool ok = CheckChannelNumber(val, chan);
                         if (ok)
                         {
-                            chan.m_chan_num = val;
+                            chan.m_chanNum = val;
                             conflicting = false;
                             ok_done = true;
                         }
@@ -607,59 +606,59 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
             if (handle)
             {
                 int chanid = ChannelUtil::CreateChanID(
-                    chan.m_source_id, chan.m_chan_num);
+                    chan.m_sourceId, chan.m_chanNum);
 
-                chan.m_channel_id = (chanid > 0) ? chanid : chan.m_channel_id;
+                chan.m_channelId = (chanid > 0) ? chanid : chan.m_channelId;
 
-                if (chan.m_channel_id)
+                if (chan.m_channelId)
                 {
-                    uint tsid = chan.m_vct_tsid;
-                    tsid = (tsid) ? tsid : chan.m_sdt_tsid;
-                    tsid = (tsid) ? tsid : chan.m_pat_tsid;
-                    tsid = (tsid) ? tsid : chan.m_vct_chan_tsid;
+                    uint tsid = chan.m_vctTsId;
+                    tsid = (tsid) ? tsid : chan.m_sdtTsId;
+                    tsid = (tsid) ? tsid : chan.m_patTsId;
+                    tsid = (tsid) ? tsid : chan.m_vctChanTsId;
 
-                    if (!chan.m_db_mplexid)
+                    if (!chan.m_dbMplexId)
                     {
-                        chan.m_db_mplexid = ChannelUtil::CreateMultiplex(
-                            chan.m_source_id, transports[i], tsid, chan.m_orig_netid);
+                        chan.m_dbMplexId = ChannelUtil::CreateMultiplex(
+                            chan.m_sourceId, transports[i], tsid, chan.m_origNetId);
                     }
                     else
                     {
                         // Find the matching multiplex. This updates the
                         // transport and network ID's in case the transport
                         // was created manually
-                        int id = ChannelUtil::GetBetterMplexID(chan.m_db_mplexid,
-                                    tsid, chan.m_orig_netid);
+                        int id = ChannelUtil::GetBetterMplexID(chan.m_dbMplexId,
+                                    tsid, chan.m_origNetId);
                         if (id >= 0)
-                            chan.m_db_mplexid = id;
+                            chan.m_dbMplexId = id;
                     }
                 }
 
-                if (chan.m_channel_id && chan.m_db_mplexid)
+                if (chan.m_channelId && chan.m_dbMplexId)
                 {
-                    chan.m_channel_id = chanid;
+                    chan.m_channelId = chanid;
 
                     inserted = ChannelUtil::CreateChannel(
-                        chan.m_db_mplexid,
-                        chan.m_source_id,
-                        chan.m_channel_id,
-                        chan.m_callsign,
-                        chan.m_service_name,
-                        chan.m_chan_num,
-                        chan.m_service_id,
-                        chan.m_atsc_major_channel,
-                        chan.m_atsc_minor_channel,
-                        chan.m_use_on_air_guide,
-                        chan.m_hidden, chan.m_hidden_in_guide,
-                        chan.m_freqid,
+                        chan.m_dbMplexId,
+                        chan.m_sourceId,
+                        chan.m_channelId,
+                        chan.m_callSign,
+                        chan.m_serviceName,
+                        chan.m_chanNum,
+                        chan.m_serviceId,
+                        chan.m_atscMajorChannel,
+                        chan.m_atscMinorChannel,
+                        chan.m_useOnAirGuide,
+                        chan.m_hidden, chan.m_hiddenInGuide,
+                        chan.m_freqId,
                         QString(),
                         chan.m_format,
                         QString(),
-                        chan.m_default_authority,
-                        chan.m_service_type);
+                        chan.m_defaultAuthority,
+                        chan.m_serviceType);
 
                     if (!transports[i].m_iptvTuning.GetDataURL().isEmpty())
-                        ChannelUtil::CreateIPTVTuningData(chan.m_channel_id,
+                        ChannelUtil::CreateIPTVTuningData(chan.m_channelId,
                                           transports[i].m_iptvTuning);
                 }
             }
@@ -733,12 +732,12 @@ ScanDTVTransportList ChannelImporter::UpdateChannels(
 
             bool filter = false;
             bool handle = false;
-            if (chan.m_channel_id && (kUpdateIgnoreAll == action) &&
+            if (chan.m_channelId && (kUpdateIgnoreAll == action) &&
                 IsType(info, chan, type))
             {
                 filter = true;
             }
-            else if (chan.m_channel_id && IsType(info, chan, type))
+            else if (chan.m_channelId && IsType(info, chan, type))
             {
                 handle = true;
             }
@@ -747,40 +746,39 @@ ScanDTVTransportList ChannelImporter::UpdateChannels(
             {
                 bool conflicting = false;
 
-                if (m_keep_channel_numbers)
+                if (m_keepChannelNumbers)
                 {
                     ChannelUtil::UpdateChannelNumberFromDB(chan);
                 }
-                if (chan.m_chan_num.isEmpty() || renameChannels ||
+                if (chan.m_chanNum.isEmpty() || renameChannels ||
                     ChannelUtil::IsConflicting(
-                        chan.m_chan_num, chan.m_source_id, chan.m_channel_id))
+                        chan.m_chanNum, chan.m_sourceId, chan.m_channelId))
                 {
                     if (kATSCNonConflicting == type)
                     {
-                        chan.m_chan_num = channelFormat
-                            .arg(chan.m_atsc_major_channel)
-                            .arg(chan.m_atsc_minor_channel);
+                        chan.m_chanNum = channelFormat
+                            .arg(chan.m_atscMajorChannel)
+                            .arg(chan.m_atscMinorChannel);
                     }
-                    else if (chan.m_si_standard == "dvb")
+                    else if (chan.m_siStandard == "dvb")
                     {
-                        chan.m_chan_num = QString("%1")
-                                            .arg(chan.m_service_id);
+                        chan.m_chanNum = QString("%1").arg(chan.m_serviceId);
                     }
-                    else if (chan.m_freqid.isEmpty())
+                    else if (chan.m_freqId.isEmpty())
                     {
-                        chan.m_chan_num = QString("%1-%2")
-                                            .arg(chan.m_source_id)
-                                            .arg(chan.m_service_id);
+                        chan.m_chanNum = QString("%1-%2")
+                                            .arg(chan.m_sourceId)
+                                            .arg(chan.m_serviceId);
                     }
                     else
                     {
-                        chan.m_chan_num = QString("%1-%2")
-                                            .arg(chan.m_freqid)
-                                            .arg(chan.m_service_id);
+                        chan.m_chanNum = QString("%1-%2")
+                                            .arg(chan.m_freqId)
+                                            .arg(chan.m_serviceId);
                     }
 
                     conflicting = ChannelUtil::IsConflicting(
-                        chan.m_chan_num, chan.m_source_id, chan.m_channel_id);
+                        chan.m_chanNum, chan.m_sourceId, chan.m_channelId);
                 }
 
                 if (conflicting)
@@ -800,33 +798,33 @@ ScanDTVTransportList ChannelImporter::UpdateChannels(
                 // Find the matching multiplex. This updates the
                 // transport and network ID's in case the transport
                 // was created manually
-                uint tsid = chan.m_vct_tsid;
-                tsid = (tsid) ? tsid : chan.m_sdt_tsid;
-                tsid = (tsid) ? tsid : chan.m_pat_tsid;
-                tsid = (tsid) ? tsid : chan.m_vct_chan_tsid;
-                int id = ChannelUtil::GetBetterMplexID(chan.m_db_mplexid,
-                            tsid, chan.m_orig_netid);
+                uint tsid = chan.m_vctTsId;
+                tsid = (tsid) ? tsid : chan.m_sdtTsId;
+                tsid = (tsid) ? tsid : chan.m_patTsId;
+                tsid = (tsid) ? tsid : chan.m_vctChanTsId;
+                int id = ChannelUtil::GetBetterMplexID(chan.m_dbMplexId,
+                            tsid, chan.m_origNetId);
                 if (id >= 0)
-                    chan.m_db_mplexid = id;
+                    chan.m_dbMplexId = id;
 
                 updated = ChannelUtil::UpdateChannel(
-                    chan.m_db_mplexid,
-                    chan.m_source_id,
-                    chan.m_channel_id,
-                    chan.m_callsign,
-                    chan.m_service_name,
-                    chan.m_chan_num,
-                    chan.m_service_id,
-                    chan.m_atsc_major_channel,
-                    chan.m_atsc_minor_channel,
-                    chan.m_use_on_air_guide,
-                    chan.m_hidden, chan.m_hidden_in_guide,
-                    chan.m_freqid,
+                    chan.m_dbMplexId,
+                    chan.m_sourceId,
+                    chan.m_channelId,
+                    chan.m_callSign,
+                    chan.m_serviceName,
+                    chan.m_chanNum,
+                    chan.m_serviceId,
+                    chan.m_atscMajorChannel,
+                    chan.m_atscMinorChannel,
+                    chan.m_useOnAirGuide,
+                    chan.m_hidden, chan.m_hiddenInGuide,
+                    chan.m_freqId,
                     QString(),
                     chan.m_format,
                     QString(),
-                    chan.m_default_authority,
-                    chan.m_service_type);
+                    chan.m_defaultAuthority,
+                    chan.m_serviceType);
             }
 
             if (updated)
@@ -937,26 +935,26 @@ void ChannelImporter::CleanupDuplicates(ScanDTVTransportList &transports)
 
 void ChannelImporter::FilterServices(ScanDTVTransportList &transports) const
 {
-    bool require_av = (m_service_requirements & kRequireAV) == kRequireAV;
-    bool require_a  = (m_service_requirements & kRequireAudio) != 0;
+    bool require_av = (m_serviceRequirements & kRequireAV) == kRequireAV;
+    bool require_a  = (m_serviceRequirements & kRequireAudio) != 0;
 
     for (size_t i = 0; i < transports.size(); ++i)
     {
         ChannelInsertInfoList filtered;
         for (size_t k = 0; k < transports[i].m_channels.size(); ++k)
         {
-            if (m_fta_only && transports[i].m_channels[k].m_is_encrypted &&
-                transports[i].m_channels[k].m_decryption_status != kEncDecrypted)
+            if (m_ftaOnly && transports[i].m_channels[k].m_isEncrypted &&
+                transports[i].m_channels[k].m_decryptionStatus != kEncDecrypted)
                 continue;
 
-            if (require_a && transports[i].m_channels[k].m_is_data_service)
+            if (require_a && transports[i].m_channels[k].m_isDataService)
                 continue;
 
-            if (require_av && transports[i].m_channels[k].m_is_audio_service)
+            if (require_av && transports[i].m_channels[k].m_isAudioService)
                 continue;
 
             // Filter channels out that do not have a logical channel number
-            if (m_lcn_only && transports[i].m_channels[k].m_chan_num.isEmpty())
+            if (m_lcnOnly && transports[i].m_channels[k].m_chanNum.isEmpty())
             {
                 QString msg = FormatChannel(transports[i], transports[i].m_channels[k]);
                 LOG(VB_CHANSCAN, LOG_INFO, LOC + QString("No LCN: %1").arg(msg));
@@ -964,9 +962,9 @@ void ChannelImporter::FilterServices(ScanDTVTransportList &transports) const
             }
 
             // Filter channels out that are not present in PAT and PMT.
-            if (m_complete_only &&
-                !(transports[i].m_channels[k].m_in_pat &&
-                  transports[i].m_channels[k].m_in_pmt ))
+            if (m_completeOnly &&
+                !(transports[i].m_channels[k].m_inPat &&
+                  transports[i].m_channels[k].m_inPmt ))
             {
                 QString msg = FormatChannel(transports[i], transports[i].m_channels[k]);
                 LOG(VB_CHANSCAN, LOG_INFO, LOC + QString("Not in PAT/PMT: %1").arg(msg));
@@ -974,14 +972,14 @@ void ChannelImporter::FilterServices(ScanDTVTransportList &transports) const
             }
 
             // Filter channels out that are not present in SDT and that are not ATSC
-            if (m_complete_only &&
-                transports[i].m_channels[k].m_atsc_major_channel == 0 &&
-                transports[i].m_channels[k].m_atsc_minor_channel == 0 &&
-                !(transports[i].m_channels[k].m_in_pat &&
-                  transports[i].m_channels[k].m_in_pmt &&
-                  transports[i].m_channels[k].m_in_sdt &&
-                 (transports[i].m_channels[k].m_pat_tsid ==
-                  transports[i].m_channels[k].m_sdt_tsid)))
+            if (m_completeOnly &&
+                transports[i].m_channels[k].m_atscMajorChannel == 0 &&
+                transports[i].m_channels[k].m_atscMinorChannel == 0 &&
+                !(transports[i].m_channels[k].m_inPat &&
+                  transports[i].m_channels[k].m_inPmt &&
+                  transports[i].m_channels[k].m_inSdt &&
+                 (transports[i].m_channels[k].m_patTsId ==
+                  transports[i].m_channels[k].m_sdtTsId)))
             {
                 QString msg = FormatChannel(transports[i], transports[i].m_channels[k]);
                 LOG(VB_CHANSCAN, LOG_INFO, LOC + QString("Not in PAT/PMT/SDT: %1").arg(msg));
@@ -989,7 +987,7 @@ void ChannelImporter::FilterServices(ScanDTVTransportList &transports) const
             }
 
             // Filter channels out that do not have a name
-            if (m_complete_only && transports[i].m_channels[k].m_service_name.isEmpty())
+            if (m_completeOnly && transports[i].m_channels[k].m_serviceName.isEmpty())
             {
                 QString msg = FormatChannel(transports[i], transports[i].m_channels[k]);
                 LOG(VB_CHANSCAN, LOG_INFO, LOC + QString("No name: %1").arg(msg));
@@ -997,12 +995,12 @@ void ChannelImporter::FilterServices(ScanDTVTransportList &transports) const
             }
 
             // Filter channels out only in channels.conf, i.e. not found
-            if (transports[i].m_channels[k].m_in_channels_conf &&
-                !(transports[i].m_channels[k].m_in_pat ||
-                  transports[i].m_channels[k].m_in_pmt ||
-                  transports[i].m_channels[k].m_in_vct ||
-                  transports[i].m_channels[k].m_in_nit ||
-                  transports[i].m_channels[k].m_in_sdt))
+            if (transports[i].m_channels[k].m_inChannelsConf &&
+                !(transports[i].m_channels[k].m_inPat ||
+                  transports[i].m_channels[k].m_inPmt ||
+                  transports[i].m_channels[k].m_inVct ||
+                  transports[i].m_channels[k].m_inNit ||
+                  transports[i].m_channels[k].m_inSdt))
                 continue;
 
             filtered.push_back(transports[i].m_channels[k]);
@@ -1089,8 +1087,8 @@ ScanDTVTransportList ChannelImporter::GetDBTransports(
                             {
                                 found_in_same_transport++;
                                 found_chan[jdc] = true;                                     // Found channel from database in scan
-                                chan.m_db_mplexid = mplexid;                                // Found multiplex
-                                chan.m_channel_id = db_chan.m_channel_id;                   // This is the crucial field
+                                chan.m_dbMplexId = mplexid;                                 // Found multiplex
+                                chan.m_channelId = db_chan.m_channelId;                     // This is the crucial field
                                 break;                                                      // Ready with scanned transport
                             }
                         }
@@ -1102,7 +1100,7 @@ ScanDTVTransportList ChannelImporter::GetDBTransports(
         // Search for old channels in all transports of the scan.
         // This is done for all channels that have not yet been found.
         // This can identify the channels that have moved to another transport.
-        if (m_full_channel_search)
+        if (m_fullChannelSearch)
         {
             for (size_t idc = 0; idc < db_transport.m_channels.size(); ++idc)               // All channels in database transport
             {
@@ -1118,7 +1116,7 @@ ScanDTVTransportList ChannelImporter::GetDBTransports(
                         {                                                                   // network id and service id
                             found_in_other_transport++;
                             found_chan[idc] = true;                                         // Found channel from database in scan
-                            chan.m_channel_id = db_chan.m_channel_id;                       // This is the crucial field
+                            chan.m_channelId = db_chan.m_channelId;                         // This is the crucial field
                             break;                                                          // Ready with scanned transport
                         }
                     }
@@ -1168,10 +1166,10 @@ void ChannelImporter::FixUpOpenCable(ScanDTVTransportList &transports)
         for (size_t j = 0; j < transports[i].m_channels.size(); ++j)
         {
             ChannelInsertInfo &chan = transports[i].m_channels[j];
-            if (((chan.m_could_be_opencable && (chan.m_si_standard == "mpeg")) ||
-                 chan.m_is_opencable) && !chan.m_in_vct)
+            if (((chan.m_couldBeOpencable && (chan.m_siStandard == "mpeg")) ||
+                 chan.m_isOpencable) && !chan.m_inVct)
             {
-                chan.m_si_standard = "opencable";
+                chan.m_siStandard = "opencable";
             }
         }
     }
@@ -1186,29 +1184,29 @@ ChannelImporterBasicStats ChannelImporter::CollectStats(
         for (size_t j = 0; j < transports[i].m_channels.size(); ++j)
         {
             const ChannelInsertInfo &chan = transports[i].m_channels[j];
-            int enc = (chan.m_is_encrypted) ?
-                ((chan.m_decryption_status == kEncDecrypted) ? 2 : 1) : 0;
-            info.m_atsc_channels[enc] += (chan.m_si_standard == "atsc");
-            info.m_dvb_channels [enc] += (chan.m_si_standard == "dvb");
-            info.m_mpeg_channels[enc] += (chan.m_si_standard == "mpeg");
-            info.m_scte_channels[enc] += (chan.m_si_standard == "opencable");
-            info.m_ntsc_channels[enc] += (chan.m_si_standard == "ntsc");
-            if (chan.m_si_standard != "ntsc")
+            int enc = (chan.m_isEncrypted) ?
+                ((chan.m_decryptionStatus == kEncDecrypted) ? 2 : 1) : 0;
+            info.m_atscChannels[enc] += (chan.m_siStandard == "atsc");
+            info.m_dvbChannels [enc] += (chan.m_siStandard == "dvb");
+            info.m_mpegChannels[enc] += (chan.m_siStandard == "mpeg");
+            info.m_scteChannels[enc] += (chan.m_siStandard == "opencable");
+            info.m_ntscChannels[enc] += (chan.m_siStandard == "ntsc");
+            if (chan.m_siStandard != "ntsc")
             {
-                ++info.m_prognum_cnt[chan.m_service_id];
-                ++info.m_channum_cnt[map_str(chan.m_chan_num)];
+                ++info.m_progNumCnt[chan.m_serviceId];
+                ++info.m_chanNumCnt[map_str(chan.m_chanNum)];
             }
-            if (chan.m_si_standard == "atsc")
+            if (chan.m_siStandard == "atsc")
             {
-                ++info.m_atscnum_cnt[(chan.m_atsc_major_channel << 16) |
-                                     (chan.m_atsc_minor_channel)];
-                ++info.m_atscmin_cnt[chan.m_atsc_minor_channel];
-                ++info.m_atscmaj_cnt[chan.m_atsc_major_channel];
+                ++info.m_atscNumCnt[(chan.m_atscMajorChannel << 16) |
+                                     (chan.m_atscMinorChannel)];
+                ++info.m_atscMinCnt[chan.m_atscMinorChannel];
+                ++info.m_atscMajCnt[chan.m_atscMajorChannel];
             }
-            if (chan.m_si_standard == "ntsc")
+            if (chan.m_siStandard == "ntsc")
             {
-                ++info.m_atscnum_cnt[(chan.m_atsc_major_channel << 16) |
-                                     (chan.m_atsc_minor_channel)];
+                ++info.m_atscNumCnt[(chan.m_atscMajorChannel << 16) |
+                                     (chan.m_atscMinorChannel)];
             }
         }
     }
@@ -1227,27 +1225,27 @@ ChannelImporterUniquenessStats ChannelImporter::CollectUniquenessStats(
         for (size_t j = 0; j < transports[i].m_channels.size(); ++j)
         {
             const ChannelInsertInfo &chan = transports[i].m_channels[j];
-            stats.m_unique_prognum +=
-                (info.m_prognum_cnt[chan.m_service_id] == 1) ? 1 : 0;
-            stats.m_unique_channum +=
-                (info.m_channum_cnt[map_str(chan.m_chan_num)] == 1) ? 1 : 0;
+            stats.m_uniqueProgNum +=
+                (info.m_progNumCnt[chan.m_serviceId] == 1) ? 1 : 0;
+            stats.m_uniqueChanNum +=
+                (info.m_chanNumCnt[map_str(chan.m_chanNum)] == 1) ? 1 : 0;
 
-            if (chan.m_si_standard == "atsc")
+            if (chan.m_siStandard == "atsc")
             {
-                stats.m_unique_atscnum +=
-                    (info.m_atscnum_cnt[(chan.m_atsc_major_channel << 16) |
-                                        (chan.m_atsc_minor_channel)] == 1) ? 1 : 0;
-                stats.m_unique_atscmin +=
-                    (info.m_atscmin_cnt[(chan.m_atsc_minor_channel)] == 1) ? 1 : 0;
-                stats.m_max_atscmajcnt = max(
-                    stats.m_max_atscmajcnt,
-                    info.m_atscmaj_cnt[chan.m_atsc_major_channel]);
+                stats.m_uniqueAtscNum +=
+                    (info.m_atscNumCnt[(chan.m_atscMajorChannel << 16) |
+                                        (chan.m_atscMinorChannel)] == 1) ? 1 : 0;
+                stats.m_uniqueAtscMin +=
+                    (info.m_atscMinCnt[(chan.m_atscMinorChannel)] == 1) ? 1 : 0;
+                stats.m_maxAtscMajCnt = max(
+                    stats.m_maxAtscMajCnt,
+                    info.m_atscMajCnt[chan.m_atscMajorChannel]);
             }
         }
     }
 
-    stats.m_unique_total = (stats.m_unique_prognum + stats.m_unique_atscnum +
-                          stats.m_unique_atscmin + stats.m_unique_channum);
+    stats.m_uniqueTotal = (stats.m_uniqueProgNum + stats.m_uniqueAtscNum +
+                          stats.m_uniqueAtscMin + stats.m_uniqueChanNum);
 
     return stats;
 }
@@ -1265,56 +1263,61 @@ QString ChannelImporter::FormatChannel(
           << ":";
     ssMsg << transport.m_frequency << ":";
 
-    QString si_standard = (chan.m_si_standard=="opencable") ?
-        QString("scte") : chan.m_si_standard;
+    QString si_standard = (chan.m_siStandard=="opencable") ?
+        QString("scte") : chan.m_siStandard;
 
     if (si_standard == "atsc" || si_standard == "scte")
+    {
         ssMsg << (QString("%1:%2:%3-%4:%5:%6=%7=%8:%9")
-                  .arg(chan.m_callsign).arg(chan.m_chan_num)
-                  .arg(chan.m_atsc_major_channel)
-                  .arg(chan.m_atsc_minor_channel)
-                  .arg(chan.m_service_id)
-                  .arg(chan.m_vct_tsid)
-                  .arg(chan.m_vct_chan_tsid)
-                  .arg(chan.m_pat_tsid)
+                  .arg(chan.m_callSign).arg(chan.m_chanNum)
+                  .arg(chan.m_atscMajorChannel)
+                  .arg(chan.m_atscMinorChannel)
+                  .arg(chan.m_serviceId)
+                  .arg(chan.m_vctTsId)
+                  .arg(chan.m_vctChanTsId)
+                  .arg(chan.m_patTsId)
                   .arg(si_standard)).toLatin1().constData();
+    }
     else if (si_standard == "dvb")
+    {
         ssMsg << (QString("%1:%2:%3:%4:%5:%6=%7:%8")
-                  .arg(chan.m_service_name).arg(chan.m_chan_num)
-                  .arg(chan.m_netid).arg(chan.m_orig_netid)
-                  .arg(chan.m_service_id)
-                  .arg(chan.m_sdt_tsid)
-                  .arg(chan.m_pat_tsid)
+                  .arg(chan.m_serviceName).arg(chan.m_chanNum)
+                  .arg(chan.m_netId).arg(chan.m_origNetId)
+                  .arg(chan.m_serviceId)
+                  .arg(chan.m_sdtTsId)
+                  .arg(chan.m_patTsId)
                   .arg(si_standard)).toLatin1().constData();
+    }
     else
+    {
         ssMsg << (QString("%1:%2:%3:%4:%5")
-                  .arg(chan.m_callsign).arg(chan.m_chan_num)
-                  .arg(chan.m_service_id)
-                  .arg(chan.m_pat_tsid)
+                  .arg(chan.m_callSign).arg(chan.m_chanNum)
+                  .arg(chan.m_serviceId)
+                  .arg(chan.m_patTsId)
                   .arg(si_standard)).toLatin1().constData();
+    }
 
     if (info)
     {
         ssMsg <<"\t"
-              << chan.m_channel_id;
+              << chan.m_channelId;
     }
 
     if (info)
     {
         ssMsg << ":"
               << (QString("cnt(pnum:%1,channum:%2)")
-                  .arg(info->m_prognum_cnt[chan.m_service_id])
-                  .arg(info->m_channum_cnt[map_str(chan.m_chan_num)])
+                  .arg(info->m_progNumCnt[chan.m_serviceId])
+                  .arg(info->m_chanNumCnt[map_str(chan.m_chanNum)])
                   ).toLatin1().constData();
-        if (chan.m_si_standard == "atsc")
+        if (chan.m_siStandard == "atsc")
         {
             ssMsg <<
                 (QString(":atsc_cnt(tot:%1,minor:%2)")
-                 .arg(info->m_atscnum_cnt[
-                          (chan.m_atsc_major_channel << 16) |
-                          (chan.m_atsc_minor_channel)])
-                 .arg(info->m_atscmin_cnt[
-                          chan.m_atsc_minor_channel])
+                 .arg(info->m_atscNumCnt[
+                          (chan.m_atscMajorChannel << 16) |
+                          (chan.m_atscMinorChannel)])
+                 .arg(info->m_atscMinCnt[chan.m_atscMinorChannel])
                     ).toLatin1().constData();
         }
     }
@@ -1340,41 +1343,53 @@ QString ChannelImporter::SimpleFormatChannel(
     QString msg;
     QTextStream ssMsg(&msg);
 
-    QString si_standard = (chan.m_si_standard=="opencable") ?
-        QString("scte") : chan.m_si_standard;
+    QString si_standard = (chan.m_siStandard=="opencable") ?
+        QString("scte") : chan.m_siStandard;
 
     if (si_standard == "atsc" || si_standard == "scte")
     {
 
         if (si_standard == "atsc")
+        {
             ssMsg << (QString("%1-%2")
-                  .arg(chan.m_atsc_major_channel)
-                  .arg(chan.m_atsc_minor_channel)).toLatin1().constData();
-        else if (chan.m_freqid.isEmpty())
+                  .arg(chan.m_atscMajorChannel)
+                  .arg(chan.m_atscMinorChannel)).toLatin1().constData();
+        }
+        else if (chan.m_freqId.isEmpty())
+        {
             ssMsg << (QString("%1-%2")
-                  .arg(chan.m_source_id)
-                  .arg(chan.m_service_id)).toLatin1().constData();
+                  .arg(chan.m_sourceId)
+                  .arg(chan.m_serviceId)).toLatin1().constData();
+        }
         else
+        {
             ssMsg << (QString("%1-%2")
-                  .arg(chan.m_freqid)
-                  .arg(chan.m_service_id)).toLatin1().constData();
+                  .arg(chan.m_freqId)
+                  .arg(chan.m_serviceId)).toLatin1().constData();
+        }
 
-        if (!chan.m_callsign.isEmpty())
+        if (!chan.m_callSign.isEmpty())
             ssMsg << (QString(" (%1)")
-                  .arg(chan.m_callsign)).toLatin1().constData();
+                  .arg(chan.m_callSign)).toLatin1().constData();
     }
     else if (si_standard == "dvb")
+    {
         ssMsg << (QString("%1 (%2 %3)")
-                  .arg(chan.m_service_name).arg(chan.m_service_id)
-                  .arg(chan.m_netid)).toLatin1().constData();
-    else if (chan.m_freqid.isEmpty())
+                  .arg(chan.m_serviceName).arg(chan.m_serviceId)
+                  .arg(chan.m_netId)).toLatin1().constData();
+    }
+    else if (chan.m_freqId.isEmpty())
+    {
         ssMsg << (QString("%1-%2")
-                  .arg(chan.m_source_id).arg(chan.m_service_id))
+                  .arg(chan.m_sourceId).arg(chan.m_serviceId))
                   .toLatin1().constData();
+    }
     else
+    {
         ssMsg << (QString("%1-%2")
-                  .arg(chan.m_freqid).arg(chan.m_service_id))
+                  .arg(chan.m_freqId).arg(chan.m_serviceId))
                   .toLatin1().constData();
+    }
 
     return msg;
 }
@@ -1397,9 +1412,11 @@ QString ChannelImporter::FormatChannels(
     QString msg;
 
     for (size_t i = 0; i < transports.size(); ++i)
+    {
         for (size_t j = 0; j < transports[i].m_channels.size(); ++j)
             msg += FormatChannel(transports[i], transports[i].m_channels[j],
                                  info) + "\n";
+    }
 
     return msg;
 }
@@ -1444,23 +1461,23 @@ QString ChannelImporter::GetSummary(
     QString msg = tr("Found %n transport(s):\n", "", transport_count);
     msg += tr("Channels: FTA Enc Dec\n") +
         QString("ATSC      %1 %2 %3\n")
-        .arg(info.m_atsc_channels[0],3).arg(info.m_atsc_channels[1],3)
-        .arg(info.m_atsc_channels[2],3) +
+        .arg(info.m_atscChannels[0],3).arg(info.m_atscChannels[1],3)
+        .arg(info.m_atscChannels[2],3) +
         QString("DVB       %1 %2 %3\n")
-        .arg(info.m_dvb_channels [0],3).arg(info.m_dvb_channels [1],3)
-        .arg(info.m_dvb_channels [2],3) +
+        .arg(info.m_dvbChannels [0],3).arg(info.m_dvbChannels [1],3)
+        .arg(info.m_dvbChannels [2],3) +
         QString("SCTE      %1 %2 %3\n")
-        .arg(info.m_scte_channels[0],3).arg(info.m_scte_channels[1],3)
-        .arg(info.m_scte_channels[2],3) +
+        .arg(info.m_scteChannels[0],3).arg(info.m_scteChannels[1],3)
+        .arg(info.m_scteChannels[2],3) +
         QString("MPEG      %1 %2 %3\n")
-        .arg(info.m_mpeg_channels[0],3).arg(info.m_mpeg_channels[1],3)
-        .arg(info.m_mpeg_channels[2],3) +
-        QString("NTSC      %1\n").arg(info.m_ntsc_channels[0],3) +
+        .arg(info.m_mpegChannels[0],3).arg(info.m_mpegChannels[1],3)
+        .arg(info.m_mpegChannels[2],3) +
+        QString("NTSC      %1\n").arg(info.m_ntscChannels[0],3) +
         tr("Unique: prog %1 atsc %2 atsc minor %3 channum %4\n")
-        .arg(stats.m_unique_prognum).arg(stats.m_unique_atscnum)
-        .arg(stats.m_unique_atscmin).arg(stats.m_unique_channum) +
+        .arg(stats.m_uniqueProgNum).arg(stats.m_uniqueAtscNum)
+        .arg(stats.m_uniqueAtscMin).arg(stats.m_uniqueChanNum) +
         tr("Max atsc major count: %1")
-        .arg(stats.m_max_atscmajcnt);
+        .arg(stats.m_maxAtscMajCnt);
 
     return msg;
 }
@@ -1472,50 +1489,50 @@ bool ChannelImporter::IsType(
     switch (type)
     {
         case kATSCNonConflicting:
-            return ((chan.m_si_standard == "atsc") /* &&
-                    (info.m_atscnum_cnt[(chan.m_atsc_major_channel << 16) |
-                                        (chan.m_atsc_minor_channel)] == 1) */);
+            return ((chan.m_siStandard == "atsc") /* &&
+                    (info.m_atscNumCnt[(chan.m_atscMajorChannel << 16) |
+                                        (chan.m_atscMinorChannel)] == 1) */);
 
         case kDVBNonConflicting:
-            return ((chan.m_si_standard == "dvb") /* &&
-                    (info.m_prognum_cnt[chan.m_service_id] == 1) */);
+            return ((chan.m_siStandard == "dvb") /* &&
+                    (info.m_progNumCnt[chan.m_serviceId] == 1) */);
 
         case kMPEGNonConflicting:
-            return ((chan.m_si_standard == "mpeg") &&
-                    (info.m_channum_cnt[map_str(chan.m_chan_num)] == 1));
+            return ((chan.m_siStandard == "mpeg") &&
+                    (info.m_chanNumCnt[map_str(chan.m_chanNum)] == 1));
 
         case kSCTENonConflicting:
-            return (((chan.m_si_standard == "scte") ||
-                    (chan.m_si_standard == "opencable")) &&
-                    (info.m_channum_cnt[map_str(chan.m_chan_num)] == 1));
+            return (((chan.m_siStandard == "scte") ||
+                    (chan.m_siStandard == "opencable")) &&
+                    (info.m_chanNumCnt[map_str(chan.m_chanNum)] == 1));
 
         case kNTSCNonConflicting:
-            return ((chan.m_si_standard == "ntsc") &&
-                    (info.m_atscnum_cnt[(chan.m_atsc_major_channel << 16) |
-                                        (chan.m_atsc_minor_channel)] == 1));
+            return ((chan.m_siStandard == "ntsc") &&
+                    (info.m_atscNumCnt[(chan.m_atscMajorChannel << 16) |
+                                        (chan.m_atscMinorChannel)] == 1));
 
         case kATSCConflicting:
-            return ((chan.m_si_standard == "atsc") &&
-                    (info.m_atscnum_cnt[(chan.m_atsc_major_channel << 16) |
-                                        (chan.m_atsc_minor_channel)] != 1));
+            return ((chan.m_siStandard == "atsc") &&
+                    (info.m_atscNumCnt[(chan.m_atscMajorChannel << 16) |
+                                        (chan.m_atscMinorChannel)] != 1));
 
         case kDVBConflicting:
-            return ((chan.m_si_standard == "dvb") &&
-                    (info.m_prognum_cnt[chan.m_service_id] != 1));
+            return ((chan.m_siStandard == "dvb") &&
+                    (info.m_progNumCnt[chan.m_serviceId] != 1));
 
         case kMPEGConflicting:
-            return ((chan.m_si_standard == "mpeg") &&
-                    (info.m_channum_cnt[map_str(chan.m_chan_num)] != 1));
+            return ((chan.m_siStandard == "mpeg") &&
+                    (info.m_chanNumCnt[map_str(chan.m_chanNum)] != 1));
 
         case kSCTEConflicting:
-            return (((chan.m_si_standard == "scte") ||
-                    (chan.m_si_standard == "opencable")) &&
-                    (info.m_channum_cnt[map_str(chan.m_chan_num)] != 1));
+            return (((chan.m_siStandard == "scte") ||
+                    (chan.m_siStandard == "opencable")) &&
+                    (info.m_chanNumCnt[map_str(chan.m_chanNum)] != 1));
 
         case kNTSCConflicting:
-            return ((chan.m_si_standard == "ntsc") &&
-                    (info.m_atscnum_cnt[(chan.m_atsc_major_channel << 16) |
-                                        (chan.m_atsc_minor_channel)] != 1));
+            return ((chan.m_siStandard == "ntsc") &&
+                    (info.m_atscNumCnt[(chan.m_atscMajorChannel << 16) |
+                                        (chan.m_atscMinorChannel)] != 1));
     }
     return false;
 }
@@ -1533,7 +1550,7 @@ void ChannelImporter::CountChannels(
             ChannelInsertInfo chan = transports[i].m_channels[j];
             if (IsType(info, chan, type))
             {
-                if (chan.m_channel_id)
+                if (chan.m_channelId)
                     ++old_chan;
                 else
                     ++new_chan;
@@ -1571,64 +1588,60 @@ QString ChannelImporter::ComputeSuggestedChannelNum(
     static QMap<uint,uint> s_lastFreeChanNumMap;
 
     // Suggest existing channel number if non-conflicting
-    if (!ChannelUtil::IsConflicting(chan.m_chan_num, chan.m_source_id))
-        return chan.m_chan_num;
+    if (!ChannelUtil::IsConflicting(chan.m_chanNum, chan.m_sourceId))
+        return chan.m_chanNum;
 
     // ATSC major-minor channel number
     QString channelFormat = "%1_%2";
     QString chan_num = channelFormat
-        .arg(chan.m_atsc_major_channel)
-        .arg(chan.m_atsc_minor_channel);
-    if (chan.m_atsc_minor_channel)
+        .arg(chan.m_atscMajorChannel)
+        .arg(chan.m_atscMinorChannel);
+    if (chan.m_atscMinorChannel)
     {
-        if (!ChannelUtil::IsConflicting(chan_num, chan.m_source_id))
+        if (!ChannelUtil::IsConflicting(chan_num, chan.m_sourceId))
             return chan_num;
     }
 
     // DVB
-    if (chan.m_si_standard == "dvb")
+    if (chan.m_siStandard == "dvb")
     {
         // Service ID
-        chan_num = QString("%1").arg(chan.m_service_id);
-        if (!ChannelUtil::IsConflicting(chan_num, chan.m_source_id))
+        chan_num = QString("%1").arg(chan.m_serviceId);
+        if (!ChannelUtil::IsConflicting(chan_num, chan.m_sourceId))
             return chan_num;
 
         // Frequency ID (channel) - Service ID
-        if (!chan.m_freqid.isEmpty())
+        if (!chan.m_freqId.isEmpty())
         {
             chan_num = QString("%1-%2")
-                          .arg(chan.m_freqid)
-                          .arg(chan.m_service_id);
-            if (!ChannelUtil::IsConflicting(chan_num, chan.m_source_id))
+                          .arg(chan.m_freqId)
+                          .arg(chan.m_serviceId);
+            if (!ChannelUtil::IsConflicting(chan_num, chan.m_sourceId))
                 return chan_num;
         }
 
         // Service ID - Network ID
-        chan_num = QString("%1-%2")
-                        .arg(chan.m_service_id)
-                        .arg(chan.m_netid);
-        if (!ChannelUtil::IsConflicting(chan_num, chan.m_source_id))
+        chan_num = QString("%1-%2").arg(chan.m_serviceId).arg(chan.m_netId);
+        if (!ChannelUtil::IsConflicting(chan_num, chan.m_sourceId))
             return chan_num;
 
         // Service ID - Transport ID
-        chan_num = QString("%1-%2")
-                        .arg(chan.m_service_id)
-                        .arg(chan.m_pat_tsid);
-        if (!ChannelUtil::IsConflicting(chan_num, chan.m_source_id))
+        chan_num = QString("%1-%2").arg(chan.m_serviceId).arg(chan.m_patTsId);
+        if (!ChannelUtil::IsConflicting(chan_num, chan.m_sourceId))
             return chan_num;
     }
 
     // Find unused channel number
     QMutexLocker locker(&s_lastFreeLock);
-    uint last_free_chan_num = s_lastFreeChanNumMap[chan.m_source_id];
+    uint last_free_chan_num = s_lastFreeChanNumMap[chan.m_sourceId];
     for (last_free_chan_num++; ; ++last_free_chan_num)
     {
         chan_num = QString::number(last_free_chan_num);
-        if (!ChannelUtil::IsConflicting(chan_num, chan.m_source_id))
+        if (!ChannelUtil::IsConflicting(chan_num, chan.m_sourceId))
             break;
     }
     // cppcheck-suppress unreadVariable
-    s_lastFreeChanNumMap[chan.m_source_id] = last_free_chan_num;
+    s_lastFreeChanNumMap[chan.m_sourceId] = last_free_chan_num;
 
     return chan_num;
 }
@@ -1637,7 +1650,7 @@ ChannelImporter::DeleteAction
 ChannelImporter::QueryUserDelete(const QString &msg)
 {
     DeleteAction action = kDeleteAll;
-    if (m_use_gui)
+    if (m_useGui)
     {
         int ret = -1;
         do
@@ -1671,7 +1684,7 @@ ChannelImporter::QueryUserDelete(const QString &msg)
 //        action = (2 == m_deleteChannelResult) ? kDeleteManual    : action;
 //        action = (3 == m_deleteChannelResult) ? kDeleteIgnoreAll : action;
     }
-    else if (m_is_interactive)
+    else if (m_isInteractive)
     {
         cout << msg.toLatin1().constData()
              << endl
@@ -1712,7 +1725,7 @@ ChannelImporter::InsertAction
 ChannelImporter::QueryUserInsert(const QString &msg)
 {
     InsertAction action = kInsertAll;
-    if (m_use_gui)
+    if (m_useGui)
     {
         int ret = -1;
         do
@@ -1743,7 +1756,7 @@ ChannelImporter::QueryUserInsert(const QString &msg)
         action = (1 == ret) ? kInsertManual    : action;
         action = (2 == ret) ? kInsertIgnoreAll : action;
     }
-    else if (m_is_interactive)
+    else if (m_isInteractive)
     {
         cout << msg.toLatin1().constData()
              << endl
@@ -1782,7 +1795,7 @@ ChannelImporter::QueryUserUpdate(const QString &msg)
 {
     UpdateAction action = kUpdateAll;
 
-    if (m_use_gui)
+    if (m_useGui)
     {
         int ret = -1;
         do
@@ -1811,7 +1824,7 @@ ChannelImporter::QueryUserUpdate(const QString &msg)
         action = (0 == ret) ? kUpdateAll       : action;
         action = (1 == ret) ? kUpdateIgnoreAll : action;
     }
-    else if (m_is_interactive)
+    else if (m_isInteractive)
     {
         cout << msg.toLatin1().constData()
              << endl
@@ -1991,11 +2004,11 @@ OkCancelType ChannelImporter::QueryUserResolve(
 {
     QString msg = tr("Channel %1 has channel number %2 but that is already in use.")
                     .arg(SimpleFormatChannel(transport, chan))
-                    .arg(chan.m_chan_num);
+                    .arg(chan.m_chanNum);
 
     OkCancelType ret = kOCTCancel;
 
-    if (m_use_gui)
+    if (m_useGui)
     {
         while (true)
         {
@@ -2016,12 +2029,12 @@ OkCancelType ChannelImporter::QueryUserResolve(
             bool ok = CheckChannelNumber(val, chan);
             if (ok)
             {
-                chan.m_chan_num = val;
+                chan.m_chanNum = val;
                 break;
             }
         }
     }
-    else if (m_is_interactive)
+    else if (m_isInteractive)
     {
         cout << msg.toLatin1().constData() << endl;
 
@@ -2053,7 +2066,7 @@ OkCancelType ChannelImporter::QueryUserResolve(
             bool ok = CheckChannelNumber(val, chan);
             if (ok)
             {
-                chan.m_chan_num = val;
+                chan.m_chanNum = val;
                 ret = kOCTOk;
                 break;
             }
@@ -2072,7 +2085,7 @@ OkCancelType ChannelImporter::QueryUserInsert(
 
     OkCancelType ret = kOCTCancel;
 
-    if (m_use_gui)
+    if (m_useGui)
     {
         while (true)
         {
@@ -2093,13 +2106,13 @@ OkCancelType ChannelImporter::QueryUserInsert(
             bool ok = CheckChannelNumber(val, chan);
             if (ok)
             {
-                chan.m_chan_num = val;
+                chan.m_chanNum = val;
                 ret = kOCTOk;
                 break;
             }
         }
     }
-    else if (m_is_interactive)
+    else if (m_isInteractive)
     {
         cout << msg.toLatin1().constData() << endl;
 
@@ -2131,7 +2144,7 @@ OkCancelType ChannelImporter::QueryUserInsert(
             bool ok = CheckChannelNumber(val, chan);
             if (ok)
             {
-                chan.m_chan_num = val;
+                chan.m_chanNum = val;
                 ret = kOCTOk;
                 break;
             }
@@ -2154,6 +2167,6 @@ bool ChannelImporter::CheckChannelNumber(
     bool ok = (num.length() >= 1);
     ok = ok && ((num[0] >= '0') && (num[0] <= '9'));
     ok = ok && !ChannelUtil::IsConflicting(
-        num, chan.m_source_id, chan.m_channel_id);
+        num, chan.m_sourceId, chan.m_channelId);
     return ok;
 }

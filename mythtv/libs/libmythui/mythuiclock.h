@@ -26,7 +26,7 @@ class MUI_PUBLIC MythUIClock : public MythUIText
 {
   public:
     MythUIClock(MythUIType *parent, const QString &name);
-   ~MythUIClock();
+   ~MythUIClock() override;
 
     void Pulse(void) override; // MythUIText
     void SetText(const QString &text) override; // MythUIText

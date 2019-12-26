@@ -83,7 +83,7 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
 {
   public:
     MetadataLookup(void) : ReferenceCounter("MetadataLookup") {}
-    ~MetadataLookup() = default;
+    ~MetadataLookup() override = default;
 
     MetadataLookup(
         MetadataType type,

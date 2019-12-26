@@ -10,9 +10,9 @@ class PlayerSettings : public MythScreenType
 {
     Q_OBJECT
 public:
-    PlayerSettings(MythScreenStack *parent, const char *name = nullptr)
+    explicit PlayerSettings(MythScreenStack *parent, const char *name = nullptr)
         : MythScreenType(parent, name) {}
-    ~PlayerSettings() = default;
+    ~PlayerSettings() override = default;
 
     bool Create(void) override; // MythScreenType
 

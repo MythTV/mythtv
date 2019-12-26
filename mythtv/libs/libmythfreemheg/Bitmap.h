@@ -42,7 +42,7 @@ class MHBitmap : public MHVisible
           m_nOrigTransparency(ref.m_nOrigTransparency) {}
     const char *ClassName() override // MHRoot
         { return "Bitmap"; }
-    virtual ~MHBitmap();
+    ~MHBitmap() override;
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHVisible
     void PrintMe(FILE *fd, int nTabs) const override; // MHVisible
 
@@ -51,11 +51,11 @@ class MHBitmap : public MHVisible
     void ContentArrived(const unsigned char *data, int length, MHEngine *engine) override; // MHIngredient
 
     // Actions.
-    void SetTransparency(int nTransPerCent, MHEngine *) override; // MHRoot
+    void SetTransparency(int nTransPerCent, MHEngine *engine) override; // MHRoot
     void ScaleBitmap(int xScale, int yScale, MHEngine *engine) override; // MHRoot
     void SetBitmapDecodeOffset(int newXOffset, int newYOffset, MHEngine *engine) override; // MHRoot
     void GetBitmapDecodeOffset(MHRoot *pXOffset, MHRoot *pYOffset) override; // MHRoot
-    MHIngredient *Clone(MHEngine *) override // MHRoot
+    MHIngredient *Clone(MHEngine */*engine*/) override // MHRoot
         { return new MHBitmap(*this); } // Create a clone of this ingredient.
 
     // Display function.
@@ -106,7 +106,7 @@ class MHGetBitmapDecodeOffset: public MHActionObjectRef2
 {
   public:
     MHGetBitmapDecodeOffset(): MHActionObjectRef2(":GetBitmapDecodeOffset")  {}
-    void CallAction(MHEngine *, MHRoot *pTarget, MHRoot *pArg1, MHRoot *pArg2) override // MHActionObjectRef2
+    void CallAction(MHEngine */*engine*/, MHRoot *pTarget, MHRoot *pArg1, MHRoot *pArg2) override // MHActionObjectRef2
         { pTarget->GetBitmapDecodeOffset(pArg1, pArg2); }
 };
 

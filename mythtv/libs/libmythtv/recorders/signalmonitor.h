@@ -25,7 +25,7 @@ using namespace std;
 #define DBG_SM(FUNC, MSG) LOG(VB_CHANNEL, LOG_DEBUG, \
     QString("SM(%1)::%2: %3") .arg(channel->GetDevice()).arg(FUNC).arg(<MSG));
 
-inline QString sm_flags_to_string(uint64_t);
+inline QString sm_flags_to_string(uint64_t flags);
 
 class TVRec;
 
@@ -40,7 +40,7 @@ class SignalMonitor : protected MThread
     static SignalMonitor *Init(const QString& cardtype, int db_cardnum,
                                ChannelBase *channel,
                                bool release_stream);
-    virtual ~SignalMonitor();
+    ~SignalMonitor() override;
 
     // // // // // // // // // // // // // // // // // // // // // // // //
     // Control  // // // // // // // // // // // // // // // // // // // //

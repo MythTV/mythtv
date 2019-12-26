@@ -88,9 +88,11 @@ static int CopyFile(const MythUtilCommandLineParser &cmdline)
 
         int percentComplete = totalBytesCopied * 100 / totalBytes;
         if ((percentComplete % 5) == 0)
+        {
         LOG(VB_GENERAL, LOG_INFO,
             QString("%1 bytes copied, %2%% complete")
                     .arg(totalBytesCopied).arg(percentComplete));
+        }
     }
 
     LOG(VB_GENERAL, LOG_INFO,

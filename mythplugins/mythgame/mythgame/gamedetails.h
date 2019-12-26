@@ -14,7 +14,7 @@ class GameDetailsPopup : public MythScreenType
     GameDetailsPopup(MythScreenStack *parent, const RomInfo *romInfo) :
         MythScreenType (parent, "gamedetailspopup"),
         m_romInfo(romInfo) {}
-    ~GameDetailsPopup() = default;
+    ~GameDetailsPopup() override = default;
 
     bool Create(void) override; // MythScreenType
     void SetReturnEvent(QObject *retobject, const QString &resultid);

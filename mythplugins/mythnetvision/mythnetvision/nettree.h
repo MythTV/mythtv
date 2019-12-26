@@ -44,10 +44,10 @@ class NetTree : public NetBase
 
   public:
     NetTree(DialogType type, MythScreenStack *parent, const char *name = nullptr);
-    ~NetTree();
+    ~NetTree() override;
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
   protected:
     ResultItem *GetStreamItem() override; // NetBase
@@ -123,9 +123,9 @@ class NetTree : public NetBase
     void customEvent(QEvent *levent) override; // NetBase
 
   protected:
-    static const QString RSSNode;
-    static const QString SearchNode;
-    static const QString DownloadNode;
+    static const QString kRSSNode;
+    static const QString kSearchNode;
+    static const QString kDownloadNode;
 };
 
 #endif

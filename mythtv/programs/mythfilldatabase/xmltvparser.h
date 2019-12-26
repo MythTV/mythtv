@@ -25,7 +25,7 @@ class XMLTVParser
                    QMap<QString, QList<ProgInfo> > *proglist);
 
   private:
-    unsigned int m_current_year {0};
+    unsigned int m_currentYear {0};
     QString m_movieGrabberPath;
     QString m_tvGrabberPath;
 };

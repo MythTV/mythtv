@@ -4,6 +4,9 @@
 #ifndef GALLERYTRANSITIONS_H
 #define GALLERYTRANSITIONS_H
 
+#include <utility>
+
+// MythTV headers
 #include "galleryslide.h"
 
 
@@ -27,10 +30,10 @@ class Transition : public QObject
     Q_OBJECT
 public:
     explicit Transition(const QString& name);
-    virtual ~Transition()              = default;
+    ~Transition() override = default;
 
     virtual void Start(Slide &from, Slide &to, bool forwards, float speed = 1.0);
-    virtual void SetSpeed(float)       {}
+    virtual void SetSpeed(float /*speed*/) {}
     virtual void Pulse(int interval)   = 0;
     virtual void Initialise()          {}
     virtual void Finalise()            {}
@@ -73,7 +76,7 @@ public:
     TransitionNone() : Transition("None") {}
     void Start(Slide &from, Slide &to,
                bool forwards, float speed = 1.0) override; // Transition
-    void Pulse(int)  override {} // Transition
+    void Pulse(int /*interval*/)  override {} // Transition
 };
 
 
@@ -82,7 +85,7 @@ class GroupTransition : public Transition
 {
 public:
     GroupTransition(GroupAnimation *animation, const QString& name);
-    virtual ~GroupTransition();
+    ~GroupTransition() override;
     void Start(Slide &from, Slide &to,
                bool forwards, float speed = 1.0) override; // Transition
     void SetSpeed(float speed) override; // Transition
@@ -143,8 +146,7 @@ public:
 class TransitionSpin : public TransitionBlend
 {
 public:
-    TransitionSpin() : TransitionBlend() 
-    { setObjectName(Transition::tr("Spin")); }
+    TransitionSpin() { setObjectName(Transition::tr("Spin")); }
     void Initialise() override; // TransitionBlend
     void Finalise() override; // TransitionBlend
 };
@@ -155,8 +157,8 @@ class TransitionRandom : public Transition
 {
     Q_OBJECT
 public:
-    explicit TransitionRandom(const QList<Transition*>& peers)
-        : Transition(Transition::tr("Random")), m_peers(peers) {}
+    explicit TransitionRandom(QList<Transition*>  peers)
+        : Transition(Transition::tr("Random")), m_peers(std::move(peers)) {}
     void Start(Slide &from, Slide &to, bool forwards, float speed = 1.0) override; // Transition
     void SetSpeed(float speed) override // Transition
         { if (m_current) m_current->SetSpeed(speed); }
@@ -184,7 +186,7 @@ class TransitionRegistry
 public:
     explicit TransitionRegistry(bool includeAnimations);
     ~TransitionRegistry()    { qDeleteAll(m_map); }
-    const TransitionMap GetAll() const { return m_map; }
+    TransitionMap GetAll() const { return m_map; }
     Transition &Select(int setting);
 
     //! A transition that updates instantly

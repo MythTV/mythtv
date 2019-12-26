@@ -35,7 +35,7 @@ class UPNP_PUBLIC SSDPCacheEntries : public ReferenceCounter
 {
   protected:
     /// Destructor protected to enforce Release method usage
-    virtual ~SSDPCacheEntries();
+    ~SSDPCacheEntries() override;
 
   public:
     SSDPCacheEntries();
@@ -51,7 +51,7 @@ class UPNP_PUBLIC SSDPCacheEntries : public ReferenceCounter
 
     DeviceLocation *GetFirst(void);
 
-    void GetEntryMap(EntryMap&);
+    void GetEntryMap(EntryMap &map);
 
     QTextStream &OutputXML(QTextStream &os, uint *pnEntryCount = nullptr) const;
     void Dump(uint &nEntryCount) const;
@@ -111,7 +111,7 @@ class UPNP_PUBLIC SSDPCache : public QObject,
 
         static SSDPCache* Instance();
 
-        virtual ~SSDPCache();
+        ~SSDPCache() override;
 
         void Lock       () { m_mutex.lock();   }
         void Unlock     () { m_mutex.unlock(); }

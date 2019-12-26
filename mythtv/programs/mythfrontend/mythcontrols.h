@@ -58,10 +58,10 @@ class MythControls : public MythScreenType
      */
     MythControls(MythScreenStack *parent, const char *name)
         : MythScreenType (parent, name) {}
-    ~MythControls();
+    ~MythControls() override;
 
     bool Create(void) override; // MythScreenType
-    void customEvent(QEvent*) override; // MythUIType
+    void customEvent(QEvent *event) override; // MythUIType
 
     enum ListType
     {
@@ -101,10 +101,10 @@ class MythControls : public MythScreenType
     QString GetTypeDesc(ListType type) const;
 
   private slots:
-    void LeftSelected(MythUIButtonListItem*);
-    void RightSelected(MythUIButtonListItem*);
-    void LeftPressed(MythUIButtonListItem*);
-    void RightPressed(MythUIButtonListItem*);
+    void LeftSelected(MythUIButtonListItem *item);
+    void RightSelected(MythUIButtonListItem *item);
+    void LeftPressed(MythUIButtonListItem *item);
+    void RightPressed(MythUIButtonListItem *item);
     void ActionButtonPressed();
     void RefreshKeyInformation(void);
     void AddKeyToAction(const QString& key, bool ignoreconflict = false);

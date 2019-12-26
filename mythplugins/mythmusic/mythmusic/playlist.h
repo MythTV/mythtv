@@ -45,7 +45,7 @@ class Playlist : public QObject
 
   public:
     Playlist(void);
-    ~Playlist();
+    ~Playlist() override;
 
     void setParent(PlaylistContainer *myparent) { m_parent = myparent; }
 

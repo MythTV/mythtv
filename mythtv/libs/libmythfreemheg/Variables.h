@@ -31,8 +31,8 @@
 class MHVariable : public MHIngredient  
 {
   public:
-    MHVariable() {}
-    virtual ~MHVariable() {}
+    MHVariable() = default;
+    ~MHVariable() override = default;
 
     // Internal behaviours.
     void Activation(MHEngine *engine) override; // MHRoot
@@ -53,7 +53,7 @@ class MHBooleanVar : public MHVariable
 
     // Actions implemented
     void TestVariable(int nOp, const MHUnion &parm, MHEngine *engine) override; // MHRoot
-    void GetVariableValue(MHUnion &value, MHEngine *) override; // MHRoot
+    void GetVariableValue(MHUnion &value, MHEngine *engine) override; // MHRoot
     void SetVariableValue(const MHUnion &value) override; // MHRoot
 
   protected:
@@ -76,7 +76,7 @@ class MHIntegerVar : public MHVariable
 
     // Actions implemented
     void TestVariable(int nOp, const MHUnion &parmm, MHEngine *engine) override; // MHRoot
-    void GetVariableValue(MHUnion &value, MHEngine *) override; // MHRoot
+    void GetVariableValue(MHUnion &value, MHEngine *engine) override; // MHRoot
     void SetVariableValue(const MHUnion &value) override; // MHRoot
   protected:
     int m_nOriginalValue {0};
@@ -86,7 +86,7 @@ class MHIntegerVar : public MHVariable
 class MHOctetStrVar : public MHVariable  
 {
   public:
-    MHOctetStrVar() {}
+    MHOctetStrVar() = default;
     const char *ClassName() override // MHRoot
         { return "OctetStringVariable"; }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHIngredient
@@ -98,7 +98,7 @@ class MHOctetStrVar : public MHVariable
 
     // Actions implemented
     void TestVariable(int nOp, const MHUnion &parm, MHEngine *engine) override; // MHRoot
-    void GetVariableValue(MHUnion &value, MHEngine *) override; // MHRoot
+    void GetVariableValue(MHUnion &value, MHEngine *engine) override; // MHRoot
     void SetVariableValue(const MHUnion &value) override; // MHRoot
   protected:
     MHOctetString m_OriginalValue, m_Value;
@@ -107,7 +107,7 @@ class MHOctetStrVar : public MHVariable
 class MHObjectRefVar : public MHVariable  
 {
   public:
-    MHObjectRefVar() {}
+    MHObjectRefVar() = default;
     const char *ClassName() override // MHRoot
         { return "ObjectRefVariable"; }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHIngredient
@@ -119,7 +119,7 @@ class MHObjectRefVar : public MHVariable
 
     // Actions implemented
     void TestVariable(int nOp, const MHUnion &parm, MHEngine *engine) override; // MHRoot
-    void GetVariableValue(MHUnion &value, MHEngine *) override; // MHRoot
+    void GetVariableValue(MHUnion &value, MHEngine *engine) override; // MHRoot
     void SetVariableValue(const MHUnion &value) override; // MHRoot
   protected:
     MHObjectRef m_OriginalValue, m_Value;
@@ -128,7 +128,7 @@ class MHObjectRefVar : public MHVariable
 class MHContentRefVar : public MHVariable  
 {
   public:
-    MHContentRefVar() {}
+    MHContentRefVar() = default;
     const char *ClassName() override // MHRoot
         { return "ContentRefVariable"; }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHIngredient
@@ -140,7 +140,7 @@ class MHContentRefVar : public MHVariable
 
     // Actions implemented
     void TestVariable(int nOp, const MHUnion &parm, MHEngine *engine) override; // MHRoot
-    void GetVariableValue(MHUnion &value, MHEngine *) override; // MHRoot
+    void GetVariableValue(MHUnion &value, MHEngine *engine) override; // MHRoot
     void SetVariableValue(const MHUnion &value) override; // MHRoot
   protected:
     MHContentRef m_OriginalValue, m_Value;
@@ -164,12 +164,12 @@ class MHSetVariable: public MHElemAction
 class MHTestVariable: public MHElemAction
 {
   public:
-    MHTestVariable(): MHElemAction(":TestVariable"), m_nOperator(0) {}
+    MHTestVariable(): MHElemAction(":TestVariable") {}
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
     void Perform(MHEngine *engine) override; // MHElemAction
   protected:
     void PrintArgs(FILE *fd, int nTabs) const override; // MHElemAction
-    int m_nOperator;
+    int m_nOperator {0};
     MHParameter m_Comparison; // Value to compare with.
 };
 
@@ -179,7 +179,7 @@ class MHTestVariable: public MHElemAction
 class MHIntegerAction: public MHElemAction
 {
   public:
-    MHIntegerAction(const char *name): MHElemAction(name) {}
+    explicit MHIntegerAction(const char *name): MHElemAction(name) {}
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
     void Perform(MHEngine *engine) override; // MHElemAction
   protected:

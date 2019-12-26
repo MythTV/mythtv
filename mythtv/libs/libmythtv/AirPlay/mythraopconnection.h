@@ -134,14 +134,14 @@ class MTV_PUBLIC MythRAOPConnection : public QObject
     // incoming audio
     QMap<uint16_t,uint64_t> m_resends;
     // crypto
-    QByteArray      m_AESIV;
+    QByteArray      m_aesIV;
     AES_KEY         m_aesKey;
     static RSA     *g_rsa;
     static QString  g_rsaLastError;
     // audio out
     AudioOutput    *m_audio               {nullptr};
     AVCodec        *m_codec               {nullptr};
-    AVCodecContext *m_codeccontext        {nullptr};
+    AVCodecContext *m_codecContext        {nullptr};
     QList<int>      m_audioFormat;
     int             m_channels            {2};
     int             m_sampleSize          {16};
@@ -190,7 +190,7 @@ class MTV_PUBLIC MythRAOPConnection : public QObject
 
     // Notification Center registration Id
     int             m_id;
-    bool            m_firstsend           {false};
+    bool            m_firstSend           {false};
     bool            m_playbackStarted     {false};
 
   private slots:

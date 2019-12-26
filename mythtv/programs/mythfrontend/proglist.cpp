@@ -123,11 +123,15 @@ bool ProgLister::Create()
             this,       SLOT(  HandleVisible(  MythUIButtonListItem*)));
 
     if (m_type == plPreviouslyRecorded)
+    {
         connect(m_progList, SIGNAL(itemClicked(MythUIButtonListItem*)),
                 this,       SLOT(  ShowOldRecordedMenu()));
+    }
     else
+    {
         connect(m_progList, SIGNAL(itemClicked(MythUIButtonListItem*)),
                 this,       SLOT(  EditRecording()));
+    }
 
     m_progList->SetLCDTitles(tr("Program List"), "title|channel|shortstarttimedate");
     m_progList->SetSearchFields("titlesubtitle");
@@ -733,7 +737,7 @@ void ProgLister::FillViewList(const QString &view)
         {
             QString chantext = channels[i].GetFormatted(ChannelInfo::kChannelShort);
 
-            m_viewList.push_back(QString::number(channels[i].m_chanid));
+            m_viewList.push_back(QString::number(channels[i].m_chanId));
             m_viewTextList.push_back(chantext);
         }
 
@@ -1186,9 +1190,11 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
         if (!powerWhere.isEmpty())
         {
             if (genreflag)
+            {
                 where = QString("LEFT JOIN programgenres ON "
                                 "program.chanid = programgenres.chanid AND "
                                 "program.starttime = programgenres.starttime ");
+            }
 
             where += QString("WHERE channel.deleted IS NULL "
                              "  AND channel.visible = 1 "
@@ -1397,22 +1403,33 @@ void ProgLister::SortList(SortBy sortby, bool reverseSort)
     if (reverseSort)
     {
         if (kTimeSort == sortby)
+        {
             stable_sort(m_itemList.rbegin(), m_itemList.rend(), plTimeSort());
+        }
         else if (kPrevTitleSort == sortby)
+        {
             stable_sort(m_itemList.rbegin(), m_itemList.rend(),
                         plPrevTitleSort());
+        }
         else
+        {
             stable_sort(m_itemList.rbegin(), m_itemList.rend(), plTitleSort());
+        }
     }
     else
     {
         if (kTimeSort == sortby)
+        {
             stable_sort(m_itemList.begin(), m_itemList.end(), plTimeSort());
+        }
         else if (kPrevTitleSort == sortby)
-            stable_sort(m_itemList.begin(), m_itemList.end(),
-                        plPrevTitleSort());
+        {
+            stable_sort(m_itemList.begin(), m_itemList.end(),plPrevTitleSort());
+        }
         else
+        {
             stable_sort(m_itemList.begin(), m_itemList.end(), plTitleSort());
+        }
     }
 }
 

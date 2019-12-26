@@ -4,13 +4,16 @@
 #ifndef _CC708_WINDOW_
 #define _CC708_WINDOW_
 
+#include <utility>
 #include <vector>
 using namespace std;
 
+// Qt headers
 #include <QString>
 #include <QMutex>
 #include <QColor>
 
+// MythTV headers
 #include "mythtvexp.h"
 
 extern const uint k708JustifyLeft;
@@ -90,14 +93,14 @@ class CC708CharacterAttribute
 
     QColor m_actualFgColor;   // if !isValid(), then convert m_fgColor
 
-    CC708CharacterAttribute(bool isItalic = false,
+    explicit CC708CharacterAttribute(bool isItalic = false,
                             bool isBold = false,
                             bool isUnderline = false,
                             QColor fgColor = QColor()) :
         m_underline(isUnderline),
         m_italics(isItalic),
         m_boldface(isBold),
-        m_actualFgColor(fgColor)
+        m_actualFgColor(std::move(fgColor))
     {
     }
 
@@ -152,7 +155,7 @@ class CC708Pen
         m_attr.m_edgeType  = edge_type;
         m_attr.m_underline = underline;
         m_attr.m_italics   = italics;
-        m_attr.m_boldface  = 0;
+        m_attr.m_boldface  = false;
     }
   public:
     CC708CharacterAttribute m_attr;
@@ -194,12 +197,12 @@ class MTV_PUBLIC CC708Window
                       int pen_style,        int window_style);
     void Resize(uint new_rows, uint new_columns);
     void Clear(void);
-    void SetWindowStyle(uint);
+    void SetWindowStyle(uint style);
 
-    void AddChar(QChar);
+    void AddChar(QChar ch);
     void IncrPenLocation(void);
     void DecrPenLocation(void);
-    void SetPenLocation(uint, uint);
+    void SetPenLocation(uint row, uint column);
     void LimitPenLocation(void);
 
     bool IsPenValid(void) const

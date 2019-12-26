@@ -80,7 +80,7 @@ class UPNP_PUBLIC UPnpCMGR : public Eventing
                             const QString &sSourceProtocols = "",
                             const QString &sSinkProtocols   = "" );
 
-        virtual ~UPnpCMGR() = default;
+        ~UPnpCMGR() override = default;
 
         void    AddSourceProtocol( const QString &sProtocol );
         void    AddSinkProtocol  ( const QString &sProtocol );

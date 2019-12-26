@@ -125,10 +125,14 @@ int main(int argc, char **argv)
 
     MythScreenType *screen = nullptr;
     if (bShowSettings)
+    {
         screen = new StandardSettingDialog(mainStack, "shutdown",
                                            new MythShutdownSettings());
+    }
     else
+    {
         screen = new WelcomeDialog(mainStack, "mythwelcome");
+    }
 
     bool ok = screen->Create();
     if (ok)

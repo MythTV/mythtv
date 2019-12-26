@@ -89,11 +89,12 @@ void InfoList::Toggle(const ImagePtrK& im)
     // Only focusable lists have an extra 'full' state as they can
     // be scrolled to view it all
     if (m_btnList->CanTakeFocus())
-
+    {
         // Start showing basic info then toggle between basic/full
         m_infoVisible = m_infoVisible == kBasicInfo ? kFullInfo : kBasicInfo;
 
     // Toggle between off/basic
+    }
     else if (m_infoVisible == kBasicInfo)
     {
         m_infoVisible = kNoInfo;
@@ -176,11 +177,13 @@ void InfoList::CreateCount(ImageItemK &im)
         int64_t used = 0;
         int64_t free = getDiskSpace(im.m_filePath, total, used);
         if (total > 0)
+        {
             CreateButton(tr("Free space"), tr("%L1 (%L2\%) Used: %L3 / %L4")
                          .arg(ImageAdapterBase::FormatSize(free))
                          .arg(100 * free / total)
                          .arg(ImageAdapterBase::FormatSize(used),
                               ImageAdapterBase::FormatSize(total)));
+        }
     }
 }
 
@@ -243,25 +246,33 @@ void InfoList::Display(ImageItemK &im, const QStringList &tagStrings)
     CreateButton(tr("Path"), QString("%1%2 %3").arg(host, tagPath, clone));
 
     if (im.IsDevice())
-        CreateButton(tr("Last scan"),
+    {
 #if QT_VERSION < QT_VERSION_CHECK(5,8,0)
+        CreateButton(tr("Last scan"),
                      MythDate::toString(QDateTime::fromTime_t(im.m_date),
-#else
-                     MythDate::toString(QDateTime::fromSecsSinceEpoch(im.m_date),
-#endif
                                         MythDate::kDateTimeFull | MythDate::kAddYear));
+#else
+        CreateButton(tr("Last scan"),
+                     MythDate::toString(QDateTime::fromSecsSinceEpoch(im.m_date),
+                                        MythDate::kDateTimeFull | MythDate::kAddYear));
+#endif
+    }
 
     if (im.IsDirectory())
         CreateCount(im);
 
     if (!im.IsDevice())
-        CreateButton(tr("Modified"),
+    {
 #if QT_VERSION < QT_VERSION_CHECK(5,8,0)
+        CreateButton(tr("Modified"),
                      MythDate::toString(QDateTime::fromTime_t(im.m_modTime),
-#else
-                     MythDate::toString(QDateTime::fromSecsSinceEpoch(im.m_modTime),
-#endif
                                         MythDate::kDateTimeFull | MythDate::kAddYear));
+#else
+        CreateButton(tr("Modified"),
+                     MythDate::toString(QDateTime::fromSecsSinceEpoch(im.m_modTime),
+                                        MythDate::kDateTimeFull | MythDate::kAddYear));
+#endif
+    }
 
     if (im.IsFile())
     {

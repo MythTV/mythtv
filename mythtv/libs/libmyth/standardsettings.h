@@ -80,7 +80,7 @@ class MPUBLIC StandardSetting : public QObject, public StorageUser
                              std::initializer_list<StandardSetting *> settings);
     void removeTargetedChild(const QString &value, StandardSetting *child);
 
-    virtual bool keyPressEvent(QKeyEvent *);
+    virtual bool keyPressEvent(QKeyEvent *event);
 
     void MoveToThread(QThread *thread);
 
@@ -89,20 +89,20 @@ class MPUBLIC StandardSetting : public QObject, public StorageUser
     void setVisible(bool visible);
     virtual void setValue(const QString &newValue);
     virtual void setValue(int newValue);
-    virtual void childChanged(StandardSetting *) {}
+    virtual void childChanged(StandardSetting */*child*/) {}
 
   signals:
-    void valueChanged(const QString &);
-    void valueChanged(StandardSetting *);
-    void ShouldRedraw(StandardSetting *);
+    void valueChanged(const QString &newValue);
+    void valueChanged(StandardSetting *setting);
+    void ShouldRedraw(StandardSetting *setting);
     void settingsChanged(StandardSetting *selectedSetting = nullptr);
     void ChangeSaved();
-    void helpTextChanged(const QString &);
+    void helpTextChanged(const QString &newValue);
 
   protected:
     explicit StandardSetting(Storage *_storage = nullptr)
         : m_storage(_storage) {}
-    virtual ~StandardSetting();
+    ~StandardSetting() override;
     void setParent(StandardSetting *parent);
     QString m_settingValue;
     bool    m_enabled         {true};
@@ -156,8 +156,7 @@ class MPUBLIC MythUITextEditSetting : public StandardSetting
 class MPUBLIC TransTextEditSetting: public MythUITextEditSetting
 {
   public:
-    TransTextEditSetting() :
-        MythUITextEditSetting() { }
+    TransTextEditSetting() = default;
 };
 
 
@@ -228,7 +227,7 @@ class MPUBLIC MythUIComboBoxSetting : public StandardSetting
     virtual int size(void) const;
 
   public slots:
-    void setValue(const QString&) override; // StandardSetting
+    void setValue(const QString &newValue) override; // StandardSetting
 
   protected:
     /**
@@ -238,9 +237,9 @@ class MPUBLIC MythUIComboBoxSetting : public StandardSetting
      *                 created with a call to XXXStorage.
      * \param rw if set to true, the user can input it's own value
      */
-    MythUIComboBoxSetting(Storage *_storage = nullptr, bool rw = false)
+    explicit MythUIComboBoxSetting(Storage *_storage = nullptr, bool rw = false)
         : StandardSetting(_storage), m_rewrite(rw) {}
-    ~MythUIComboBoxSetting();
+    ~MythUIComboBoxSetting() override;
     QVector<QString> m_labels;
     QVector<QString> m_values;
 
@@ -253,7 +252,7 @@ class MPUBLIC MythUIComboBoxSetting : public StandardSetting
 class MPUBLIC HostComboBoxSetting: public MythUIComboBoxSetting
 {
   public:
-    HostComboBoxSetting(const QString &name, bool rw = false) :
+    explicit HostComboBoxSetting(const QString &name, bool rw = false) :
         MythUIComboBoxSetting(new HostDBStorage(this, name), rw) { }
 };
 
@@ -261,7 +260,7 @@ class MPUBLIC HostComboBoxSetting: public MythUIComboBoxSetting
 class MPUBLIC GlobalComboBoxSetting: public MythUIComboBoxSetting
 {
   public:
-    GlobalComboBoxSetting(const QString &name, bool rw = false) :
+    explicit GlobalComboBoxSetting(const QString &name, bool rw = false) :
         MythUIComboBoxSetting(new GlobalDBStorage(this, name), rw) { }
 };
 
@@ -275,7 +274,7 @@ class MPUBLIC TransMythUIComboBoxSetting: public MythUIComboBoxSetting
 class MPUBLIC HostTimeBoxSetting : public HostComboBoxSetting
 {
   public:
-    HostTimeBoxSetting(const QString &name,
+    explicit HostTimeBoxSetting(const QString &name,
                        const QString &defaultTime = "00:00",
                        const int interval = 1) :
         HostComboBoxSetting(name, false)
@@ -299,7 +298,7 @@ class MPUBLIC HostTimeBoxSetting : public HostComboBoxSetting
 class MPUBLIC GlobalTimeBoxSetting : public GlobalComboBoxSetting
 {
   public:
-    GlobalTimeBoxSetting(const QString &name,
+    explicit GlobalTimeBoxSetting(const QString &name,
                        const QString &defaultTime = "00:00",
                        const int interval = 1) :
         GlobalComboBoxSetting(name, false)
@@ -395,7 +394,7 @@ class MPUBLIC MythUICheckBoxSetting : public StandardSetting
     void resultEdit(DialogCompletionEvent *dce) override; // StandardSetting
     void edit(MythScreenType *screen) override; // StandardSetting
     void updateButton(MythUIButtonListItem *item) override; // StandardSetting
-    void setValue(const QString&) override; // StandardSetting
+    void setValue(const QString &newValue) override; // StandardSetting
     virtual void setValue(bool value);
     using StandardSetting::setValue;
     bool boolValue() { return m_settingValue == "1"; }
@@ -411,8 +410,7 @@ class MPUBLIC MythUICheckBoxSetting : public StandardSetting
 class MPUBLIC TransMythUICheckBoxSetting: public MythUICheckBoxSetting
 {
   public:
-    TransMythUICheckBoxSetting() :
-        MythUICheckBoxSetting() { }
+    TransMythUICheckBoxSetting() = default;
 };
 
 class MPUBLIC HostCheckBoxSetting: public MythUICheckBoxSetting
@@ -441,7 +439,7 @@ class MPUBLIC GroupSetting : public StandardSetting
     GroupSetting() = default;
 
     void edit(MythScreenType *screen) override; // StandardSetting
-    void resultEdit(DialogCompletionEvent *) override {} // StandardSetting
+    void resultEdit(DialogCompletionEvent */*dce*/) override {} // StandardSetting
     virtual void applyChange() {}
     void updateButton(MythUIButtonListItem *item) override; // StandardSetting
     virtual bool canDelete(void) {return false;}
@@ -456,7 +454,7 @@ class MPUBLIC ButtonStandardSetting : public StandardSetting
     explicit ButtonStandardSetting(const QString &label);
 
     void edit(MythScreenType *screen) override; // StandardSetting
-    void resultEdit(DialogCompletionEvent *) override {}; // StandardSetting
+    void resultEdit(DialogCompletionEvent */*dce*/) override {}; // StandardSetting
 
   signals:
     void clicked();
@@ -475,10 +473,10 @@ class MPUBLIC StandardSettingDialog : public MythScreenType
     StandardSettingDialog(MythScreenStack *parent, const char *name,
                           GroupSetting *groupSettings = nullptr)
         : MythScreenType(parent, name), m_settingsTree(groupSettings) {}
-    virtual ~StandardSettingDialog();
+    ~StandardSettingDialog() override;
     bool Create(void) override; // MythScreenType
     void customEvent(QEvent *event) override; // MythUIType
-    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
     void ShowMenu(void) override; // MythScreenType
     void deleteEntry(void);
 

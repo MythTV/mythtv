@@ -20,7 +20,7 @@ class ClassicLogoDetector : public LogoDetectorBase
     unsigned int getRequiredAvailableBufferForSearch() override; // LogoDetectorBase
 
   protected:
-    virtual ~ClassicLogoDetector() = default;
+    ~ClassicLogoDetector() override = default;
 
   private:
     void SetLogoMaskArea();

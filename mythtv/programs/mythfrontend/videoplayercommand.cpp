@@ -208,10 +208,14 @@ class VideoPlayerCommandPrivate
             QString filename;
 
             if (item->IsHostSet())
+            {
                 filename = generate_file_url("Videos", item->GetHost(),
                         item->GetFilename());
+            }
             else
+            {
                 filename = item->GetFilename();
+            }
 
             if (play_command.length())
             {
@@ -237,10 +241,14 @@ class VideoPlayerCommandPrivate
             QString filename;
 
             if (item->IsHostSet())
+            {
                 filename = generate_file_url("Videos", item->GetHost(),
                         item->GetFilename());
+            }
             else
+            {
                 filename = item->GetFilename();
+            }
 
             if (play_command.length())
             {

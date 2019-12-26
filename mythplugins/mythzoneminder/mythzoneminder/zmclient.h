@@ -23,7 +23,7 @@ class MPUBLIC ZMClient : public QObject
     static ZMClient *m_zmclient;
 
   public:
-    ~ZMClient();
+    ~ZMClient() override;
 
     static ZMClient *get(void);
     static bool setupZMClient (void);

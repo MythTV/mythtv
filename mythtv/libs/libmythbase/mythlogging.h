@@ -23,7 +23,7 @@ extern "C" {
 #ifdef __cplusplus
 #define VERBOSE_LEVEL_CHECK(_MASK_, _LEVEL_) \
     (componentLogLevel.contains(_MASK_) ?                               \
-     (*(componentLogLevel.find(_MASK_)) >= _LEVEL_) :                   \
+     (*(componentLogLevel.find(_MASK_)) >= (_LEVEL_)) :                   \
      (((verboseMask & (_MASK_)) == (_MASK_)) && logLevel >= (_LEVEL_)))
 #else
 #define VERBOSE_LEVEL_CHECK(_MASK_, _LEVEL_) \

@@ -179,9 +179,11 @@ void PhrasePopup::recordClicked(void)
 
         MSqlBindings bindings;
         if (ProgLister::PowerStringToSQL(text, what, bindings))
+        {
             fromgenre = QString("LEFT JOIN programgenres ON "
                                 "program.chanid = programgenres.chanid AND "
                                 "program.starttime = programgenres.starttime ");
+        }
 
         if (what.isEmpty())
             return;
@@ -359,10 +361,12 @@ void PowerSearchPopup::recordClicked(void)
 
         MSqlBindings bindings;
         if (ProgLister::PowerStringToSQL(text, what, bindings))
+        {
             fromgenre = QString(
                 "LEFT JOIN programgenres ON "
                 "program.chanid = programgenres.chanid AND "
                 "program.starttime = programgenres.starttime ");
+        }
 
         if (what.isEmpty())
             return;
@@ -527,7 +531,7 @@ void EditPowerSearchPopup::initLists(void)
     {
         QString chantext = channels[i].GetFormatted(ChannelInfo::kChannelShort);
 
-        m_parent->m_viewList << QString::number(channels[i].m_chanid);
+        m_parent->m_viewList << QString::number(channels[i].m_chanId);
         m_parent->m_viewTextList << chantext;
 
         auto *item = new MythUIButtonListItem(m_channelList, chantext,
@@ -537,8 +541,8 @@ void EditPowerSearchPopup::initLists(void)
         channels[i].ToMap(chanmap);
         item->SetTextFromMap(chanmap);
 
-        m_channels << channels[i].m_callsign;
-        if (channels[i].m_callsign == field[5])
+        m_channels << channels[i].m_callSign;
+        if (channels[i].m_callSign == field[5])
             m_channelList->SetItemCurrent(m_channelList->GetCount() - 1);
     }
 }

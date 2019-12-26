@@ -19,7 +19,7 @@ class MUI_PUBLIC MythUISpinBox : public MythUIButtonList
   public:
     MythUISpinBox(MythUIType *parent, const QString &name)
         : MythUIButtonList(parent, name) {}
-    ~MythUISpinBox() = default;
+    ~MythUISpinBox() override = default;
 
     void SetRange(int low, int high, int step, uint pageMultiple = 5);
 
@@ -64,7 +64,7 @@ class MUI_PUBLIC SpinBoxEntryDialog : public MythScreenType
     SpinBoxEntryDialog(MythScreenStack *parent, const char *name,
         MythUIButtonList *parentList, QString searchText,
         int low, int high, int step);
-    ~SpinBoxEntryDialog(void) = default;
+    ~SpinBoxEntryDialog(void) override = default;
 
     bool Create(void) override; // MythScreenType
 

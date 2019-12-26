@@ -202,7 +202,7 @@ class MTV_PUBLIC BDRingBuffer : public RingBuffer
     int                m_currentSecondaryAudioStream {0};
     int                m_currentSecondaryVideoStream {0};
 
-    bool               m_PGTextSTEnabled             {false};
+    bool               m_pgTextSTEnabled             {false};
     bool               m_secondaryAudioEnabled       {false};
     bool               m_secondaryVideoEnabled       {false};
     bool               m_secondaryVideoIsFullscreen  {false};

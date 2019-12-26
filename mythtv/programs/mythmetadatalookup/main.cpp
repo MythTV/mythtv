@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
 
     LOG(VB_GENERAL, LOG_INFO,
             "Testing grabbers and metadata sites for functionality...");
-    if (!lookup->AllOK())
+    if (!LookerUpper::AllOK())
     {
         delete lookup;
         return GENERIC_EXIT_NOT_OK;
@@ -137,9 +137,11 @@ int main(int argc, char *argv[])
                                       cmdline.toBool("refresh-rules"));
     }
     else if (cmdline.toBool("chanid") && cmdline.toBool("starttime"))
+    {
         lookup->HandleSingleRecording(cmdline.toUInt("chanid"),
                                       cmdline.toDateTime("starttime"),
                                       cmdline.toBool("refresh-rules"));
+    }
     else if (cmdline.toBool("refresh-all-rules"))
     {
         lookup->HandleAllRecordingRules();

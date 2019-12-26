@@ -13,13 +13,17 @@
 #ifndef HTTPREQUEST_H_
 #define HTTPREQUEST_H_
 
+#include <utility>
+
+// Qt headers
+#include <QBuffer>
+#include <QDateTime>
 #include <QFile>
 #include <QRegExp>
-#include <QBuffer>
-#include <QTextStream>
 #include <QTcpSocket>
-#include <QDateTime>
+#include <QTextStream>
 
+// MythTV headers
 #include "mythsession.h"
 
 #include "upnpexp.h"
@@ -278,7 +282,7 @@ class BufferedSocketDeviceRequest : public HTTPRequest
 
         explicit BufferedSocketDeviceRequest( QTcpSocket *pSocket )
             : m_pSocket(pSocket) {}
-        virtual ~BufferedSocketDeviceRequest() = default;
+        ~BufferedSocketDeviceRequest() override = default;
 
         QString  ReadLine        ( int msecs ) override; // HTTPRequest
         qint64   ReadBlock       ( char *pData, qint64 nMaxLen, int msecs = 0  ) override; // HTTPRequest
@@ -301,8 +305,8 @@ class UPNP_PUBLIC HttpException
         int     m_code {-1};
         QString m_msg;
 
-        HttpException( int nCode = -1, const QString &sMsg = "")
-               : m_code( nCode ), m_msg ( sMsg  )
+        explicit HttpException( int nCode = -1, QString sMsg = "")
+               : m_code( nCode ), m_msg (std::move( sMsg  ))
         {}
 
         // Needed to force a v-table.
@@ -316,13 +320,13 @@ class UPNP_PUBLIC HttpRedirectException : public HttpException
         QString m_hostName;
       //int     m_port;
 
-        HttpRedirectException( const QString &sHostName = "",
+        explicit HttpRedirectException( QString sHostName = "",
                                      int      nCode     = -1,
                                const QString &sMsg      = "" )
-               : HttpException( nCode, sMsg ), m_hostName( sHostName )
+               : HttpException( nCode, sMsg ), m_hostName(std::move( sHostName ))
         {}
 
-        virtual ~HttpRedirectException() = default;
+        ~HttpRedirectException() override = default;
 
 };
 

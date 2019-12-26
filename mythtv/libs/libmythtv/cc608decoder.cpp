@@ -425,9 +425,11 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
                             if (m_ignoreTimeCode ||
                                 (tc - m_lastClr[mode]) > 5000 ||
                                 m_lastClr[mode] == 0)
+                            {
                                 // don't overflow the frontend with
                                 // too many redundant erase codes
                                 BufferCC(mode, 0, 1);
+                            }
                             if (m_style[mode] != CC_STYLE_POPUP)
                             {
                                 m_row[mode] = 0;
@@ -460,11 +462,15 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
                             else if (m_ignoreTimeCode ||
                                      (tc - m_lastClr[mode]) > 5000 ||
                                      m_lastClr[mode] == 0)
+                            {
                                 // clear and flush
                                 BufferCC(mode, len, 1);
+                            }
                             else if (len)
+                            {
                                 // flush
                                 BufferCC(mode, len, 0);
+                            }
                             m_ccBuf[mode] = "";
                             m_row[mode] = 0;
                             m_col[mode] = 0;
@@ -496,12 +502,14 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
                         NewRowCC(mode, len);
                     }
                     else
+                    {
                         // illegal?
                         for (int x = 0; x < (b2 & 0x03); x++)
                         {
                             m_ccBuf[mode] += ' ';
                             m_col[mode]++;
                         }
+                    }
                     break;
             }
         }
@@ -766,8 +774,10 @@ int CC608Decoder::NewRowCC(int mode, int len)
         {
             // same row
             if (m_newCol[mode] >= m_col[mode])
+            {
                 // new line appends to current line
                 m_newCol[mode] -= m_col[mode];
+            }
             else
             {
                 // new line overwrites current line;

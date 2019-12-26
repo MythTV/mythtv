@@ -51,7 +51,7 @@ class IPTVStreamHandlerWriteHelper : QObject
 public:
     explicit IPTVStreamHandlerWriteHelper(IPTVStreamHandler *p)
         : m_parent(p) {}
-    ~IPTVStreamHandlerWriteHelper();
+    ~IPTVStreamHandlerWriteHelper() override;
 
     void Start(void)
     {
@@ -59,23 +59,23 @@ public:
     }
     void StartRTCPRR(void)
     {
-        m_timer_rtcp = startTimer(RTCP_TIMER * 1000);
+        m_timerRtcp = startTimer(RTCP_TIMER * 1000);
     }
 
     void SendRTCPReport(void);
 
 private:
-    void timerEvent(QTimerEvent*) override; // QObject
+    void timerEvent(QTimerEvent *event) override; // QObject
 
 private:
     IPTVStreamHandler *m_parent                        {nullptr};
     int                m_timer                         {0};
-    int                m_timer_rtcp                    {0};
-    uint               m_last_sequence_number          {0};
-    uint               m_last_timestamp                {0};
-    uint               m_previous_last_sequence_number {0};
+    int                m_timerRtcp                     {0};
+    uint               m_lastSequenceNumber            {0};
+    uint               m_lastTimestamp                 {0};
+    uint               m_previousLastSequenceNumber    {0};
     int                m_lost                          {0};
-    int                m_lost_interval                 {0};
+    int                m_lostInterval                  {0};
 };
 
 class IPTVStreamHandler : public StreamHandler
@@ -103,16 +103,16 @@ class IPTVStreamHandler : public StreamHandler
   protected:
     IPTVTuningData                m_tuning;
     QUdpSocket                   *m_sockets[IPTV_SOCKET_COUNT] {};
-    IPTVStreamHandlerReadHelper  *m_read_helpers[IPTV_SOCKET_COUNT] {};
+    IPTVStreamHandlerReadHelper  *m_readHelpers[IPTV_SOCKET_COUNT] {};
     QHostAddress                  m_sender[IPTV_SOCKET_COUNT];
-    IPTVStreamHandlerWriteHelper *m_write_helper      {nullptr};
+    IPTVStreamHandlerWriteHelper *m_writeHelper       {nullptr};
     PacketBuffer                 *m_buffer            {nullptr};
 
-    bool                          m_use_rtp_streaming;
-    ushort                        m_rtsp_rtp_port     {0};
-    ushort                        m_rtsp_rtcp_port    {0};
-    uint32_t                      m_rtsp_ssrc         {0};
-    QHostAddress                  m_rtcp_dest;
+    bool                          m_useRtpStreaming;
+    ushort                        m_rtspRtpPort       {0};
+    ushort                        m_rtspRtcpPort      {0};
+    uint32_t                      m_rtspSsrc          {0};
+    QHostAddress                  m_rtcpDest;
 
     // for implementing Get & Return
     static QMutex                            s_iptvhandlers_lock;

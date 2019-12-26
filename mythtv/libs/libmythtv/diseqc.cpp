@@ -2454,7 +2454,7 @@ bool DiSEqCDevLNB::Load(void)
         m_lofSwitch  = query.value(1).toInt();
         m_lofHi      = query.value(2).toInt();
         m_lofLo      = query.value(3).toInt();
-        m_pol_inv    = query.value(4).toBool();
+        m_polInv     = query.value(4).toBool();
         m_repeat     = query.value(5).toUInt();
     }
 
@@ -2508,7 +2508,7 @@ bool DiSEqCDevLNB::Store(void) const
     query.bindValue(":LOFSW",   m_lofSwitch);
     query.bindValue(":LOFLO",   m_lofLo);
     query.bindValue(":LOFHI",   m_lofHi);
-    query.bindValue(":POLINV",  m_pol_inv);
+    query.bindValue(":POLINV",  m_polInv);
     query.bindValue(":REPEAT",  m_repeat);
 
     // update dev_id

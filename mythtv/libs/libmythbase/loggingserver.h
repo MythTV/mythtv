@@ -32,7 +32,7 @@ class LoggerBase : public QObject
     /// \brief LoggerBase Constructor
     explicit LoggerBase(const char *string);
     /// \brief LoggerBase Deconstructor
-    virtual ~LoggerBase();
+    ~LoggerBase() override;
     /// \brief Process a log message for the logger instance
     /// \param item LoggingItem containing the log message to process
     virtual bool logmsg(LoggingItem *item) = 0;
@@ -51,7 +51,7 @@ class FileLogger : public LoggerBase
 
   public:
     explicit FileLogger(const char *filename);
-    ~FileLogger();
+    ~FileLogger() override;
     bool logmsg(LoggingItem *item) override; // LoggerBase
     void reopen(void) override; // LoggerBase
     static FileLogger *create(const QString& filename, QMutex *mutex);
@@ -68,7 +68,7 @@ class SyslogLogger : public LoggerBase
   public:
     SyslogLogger();
     explicit SyslogLogger(bool open);
-    ~SyslogLogger();
+    ~SyslogLogger() override;
     bool logmsg(LoggingItem *item) override; // LoggerBase
     /// \brief Unused for this logger.
     void reopen(void) override { }; // LoggerBase
@@ -84,7 +84,7 @@ class JournalLogger : public LoggerBase
 
   public:
     JournalLogger();
-    ~JournalLogger();
+    ~JournalLogger() override;
     bool logmsg(LoggingItem *item) override; // LoggerBase
     /// \brief Unused for this logger.
     void reopen(void) override { }; // LoggerBase
@@ -102,7 +102,7 @@ class DatabaseLogger : public LoggerBase
     friend class DBLoggerThread;
   public:
     explicit DatabaseLogger(const char *table);
-    ~DatabaseLogger();
+    ~DatabaseLogger() override;
     bool logmsg(LoggingItem *item) override; // LoggerBase
     void reopen(void) override { }; // LoggerBase
     void stopDatabaseAccess(void) override; // LoggerBase
@@ -137,7 +137,7 @@ class LogForwardThread : public QObject, public MThread
     friend void logSigHup(void);
   public:
     LogForwardThread();
-    ~LogForwardThread();
+    ~LogForwardThread() override;
     void run(void) override; // MThread
     void stop(void);
   private:
@@ -167,7 +167,10 @@ class DBLoggerThread : public MThread
 {
   public:
     explicit DBLoggerThread(DatabaseLogger *logger);
-    ~DBLoggerThread();
+    ~DBLoggerThread() override;
+    DBLoggerThread(const DBLoggerThread &) = delete;            // not copyable
+    DBLoggerThread &operator=(const DBLoggerThread &) = delete; // not copyable
+
     void run(void) override; // MThread
     void stop(void);
     /// \brief Enqueues a LoggingItem onto the queue for the thread to
@@ -182,9 +185,6 @@ class DBLoggerThread : public MThread
         return (m_queue->size() >= MAX_QUEUE_LEN);
     }
   private:
-    DBLoggerThread(const DBLoggerThread &) = delete;            // not copyable
-    DBLoggerThread &operator=(const DBLoggerThread &) = delete; // not copyable
-
     DatabaseLogger *m_logger {nullptr};///< The associated logger instance
     QMutex m_queueMutex;               ///< Mutex for protecting the queue
     QQueue<LoggingItem *> *m_queue {nullptr}; ///< Queue of LoggingItems to insert

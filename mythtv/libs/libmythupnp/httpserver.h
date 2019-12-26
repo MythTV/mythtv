@@ -20,6 +20,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #endif
+#include <utility>
 
 // Qt headers
 #include <QReadWriteLock>
@@ -28,11 +29,10 @@
 #include <QPointer>
 #include <QMutex>
 #include <QList>
-
 #include <QSslConfiguration>
 #include <QSslError>
-#include <QSslSocket>
 #include <QSslKey>
+#include <QSslSocket>
 
 // MythTV headers
 #include "mythqtcompat.h"
@@ -82,13 +82,13 @@ class UPNP_PUBLIC HttpServerExtension : public QObject
         
     public:
 
-        HttpServerExtension( const QString &sName, const  QString &sSharePath)
-           : m_sName( sName ), m_sSharePath( sSharePath ),
+        HttpServerExtension( QString sName, QString sSharePath)
+           : m_sName(std::move( sName )), m_sSharePath(std::move( sSharePath )),
              m_nSocketTimeout(-1),
              m_nSupportedMethods((RequestTypeGet | RequestTypePost | // Defaults, extensions may extend the list
                                   RequestTypeHead | RequestTypeOptions)) {};
 
-        virtual ~HttpServerExtension() = default;
+        ~HttpServerExtension() override = default;
 
         virtual bool ProcessRequest(HTTPRequest *pRequest) = 0;
 
@@ -115,15 +115,15 @@ class UPNP_PUBLIC HttpServer : public ServerPool
 
   public:
     HttpServer();
-    virtual ~HttpServer();
+    ~HttpServer() override;
 
-    void RegisterExtension(HttpServerExtension*);
-    void UnregisterExtension(HttpServerExtension*);
-    void DelegateRequest(HTTPRequest*);
+    void RegisterExtension(HttpServerExtension *pExtension);
+    void UnregisterExtension(HttpServerExtension *pExtension);
+    void DelegateRequest(HTTPRequest *pRequest);
     /**
      * \brief Get the idle socket timeout value for the relevant extension
      */
-    uint GetSocketTimeout(HTTPRequest*) const;
+    uint GetSocketTimeout(HTTPRequest *pRequest) const;
 
     QString GetSharePath(void) const
     { // never modified after creation, so no need to lock
@@ -148,7 +148,7 @@ class UPNP_PUBLIC HttpServer : public ServerPool
     QMultiMap< QString, HttpServerExtension* >  m_basePaths;
     QString                 m_sSharePath;
     MThreadPool             m_threadPool;
-    bool                    m_running; // protected by m_rwlock
+    bool                    m_running    { true }; // protected by m_rwlock
 
     static QMutex           s_platformLock;
     static QString          s_platform;

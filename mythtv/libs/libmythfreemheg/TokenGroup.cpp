@@ -612,10 +612,12 @@ void MHListGroup::Select(int nIndex, MHEngine *engine)
     {
         // Deselect any existing selections.
         for (int i = 0; i < m_ItemList.size(); i++)
+        {
             if (m_ItemList.at(i)->m_fSelected)
             {
                 Deselect(i + 1, engine);
             }
+        }
     }
 
     pListItem->m_fSelected = true;

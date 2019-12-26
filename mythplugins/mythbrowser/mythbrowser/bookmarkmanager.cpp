@@ -107,21 +107,31 @@ void BrowserConfig::slotFocusChanged(void)
 
     QString msg = "";
     if (GetFocusWidget() == m_commandEdit)
+    {
         msg = tr("This is the command that will be used to show the web browser. "
                  "Use 'Internal' to use the built in web browser'. "
                  "%ZOOM% and %URL% will be replaced with the zoom level and URL list.");
+    }
     else if (GetFocusWidget() == m_zoomEdit)
+    {
         msg = tr("This is the default text size that will be used. Valid values "
                  "for the Internal browser are from 0.3 to 5.0 with 1.0 being "
                  "normal size less than 1 is smaller and greater than 1 is "
                  "larger than normal size.");
+    }
     else if (GetFocusWidget() == m_enablePluginsCheck)
+    {
         msg = tr("If checked this will enable browser plugins if the 'Internal' "
                  "browser is being used.");
+    }
     else if (GetFocusWidget() == m_cancelButton)
+    {
         msg = tr("Exit without saving settings");
+    }
     else if (GetFocusWidget() == m_okButton)
+    {
         msg = tr("Save settings and Exit");
+    }
 
     m_descriptionText->SetText(msg);
 }

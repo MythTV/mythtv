@@ -113,9 +113,11 @@ int MetaIOTagLib::getTrackLength(const QString &filename)
 
     // If we didn't get a valid length, add the metadata but show warning.
     if (milliseconds <= 1000)
+    {
         LOG(VB_GENERAL, LOG_ERR,
             QString("MetaIOTagLib: Failed to read length "
                     "from '%1'. It may be corrupt.").arg(filename));
+    }
 
     delete file;
 

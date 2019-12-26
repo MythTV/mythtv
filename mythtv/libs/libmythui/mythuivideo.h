@@ -15,7 +15,7 @@ class MUI_PUBLIC MythUIVideo : public MythUIType
 {
   public:
     MythUIVideo(MythUIType *parent, const QString &name);
-   ~MythUIVideo();
+   ~MythUIVideo() override;
 
     void UpdateFrame(MythImage *image);
     void UpdateFrame(QPixmap *pixmap);

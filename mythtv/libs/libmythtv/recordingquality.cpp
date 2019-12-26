@@ -16,99 +16,99 @@ static QDateTime get_end(const RecordingInfo& /*ri*/);
 
 RecordingQuality::RecordingQuality(const RecordingInfo *ri,
                                    RecordingGaps rg)
-                 : m_recording_gaps(std::move(rg))
+                 : m_recordingGaps(std::move(rg))
 {
     if (!ri)
         return;
 
-    stable_sort(m_recording_gaps.begin(), m_recording_gaps.end());
-    merge_overlapping(m_recording_gaps);
+    stable_sort(m_recordingGaps.begin(), m_recordingGaps.end());
+    merge_overlapping(m_recordingGaps);
 
-    m_overall_score = score_gaps(*ri, m_recording_gaps);
+    m_overallScore = score_gaps(*ri, m_recordingGaps);
 
     LOG(VB_RECORD, LOG_INFO,
-        QString("RecordingQuality() score(%3)").arg(m_overall_score));
+        QString("RecordingQuality() score(%3)").arg(m_overallScore));
 }
 
 RecordingQuality::RecordingQuality(
     const RecordingInfo *ri, RecordingGaps rg,
     const QDateTime &first, const QDateTime &latest) :
-    m_recording_gaps(std::move(rg))
+    m_recordingGaps(std::move(rg))
 {
     if (!ri)
         return;
 
-    m_program_key = ri->MakeUniqueKey();
+    m_programKey = ri->MakeUniqueKey();
 
     // trim start
     QDateTime start = get_start(*ri);
-    while (!m_recording_gaps.empty() &&
-           m_recording_gaps.first().GetStart() < start)
+    while (!m_recordingGaps.empty() &&
+           m_recordingGaps.first().GetStart() < start)
     {
-        RecordingGap &firstGap = m_recording_gaps.first();
+        RecordingGap &firstGap = m_recordingGaps.first();
         if (start < firstGap.GetEnd())
             firstGap = RecordingGap(start, firstGap.GetEnd());
         else
-            m_recording_gaps.pop_front();
+            m_recordingGaps.pop_front();
     }
 
     // trim end
     QDateTime end = get_end(*ri);
-    while (!m_recording_gaps.empty() &&
-           m_recording_gaps.back().GetEnd() > end)
+    while (!m_recordingGaps.empty() &&
+           m_recordingGaps.back().GetEnd() > end)
     {
-        RecordingGap &back = m_recording_gaps.back();
+        RecordingGap &back = m_recordingGaps.back();
         if (back.GetStart() < end)
             back = RecordingGap(back.GetStart(), end);
         else
-            m_recording_gaps.pop_back();
+            m_recordingGaps.pop_back();
     }
 
     // account for late start
     int start_gap = (first.isValid()) ? start.secsTo(first) : 0;
     if (start_gap > 15)
-        m_recording_gaps.push_front(RecordingGap(start, first));
+        m_recordingGaps.push_front(RecordingGap(start, first));
 
     // account for missing end
     int end_gap = (latest.isValid()) ? latest.secsTo(end) : 0;
     if (end_gap > 15)
-        m_recording_gaps.push_back(RecordingGap(latest, end));
+        m_recordingGaps.push_back(RecordingGap(latest, end));
 
-    stable_sort(m_recording_gaps.begin(), m_recording_gaps.end());
-    merge_overlapping(m_recording_gaps);
+    stable_sort(m_recordingGaps.begin(), m_recordingGaps.end());
+    merge_overlapping(m_recordingGaps);
 
-    m_overall_score = score_gaps(*ri, m_recording_gaps);
+    m_overallScore = score_gaps(*ri, m_recordingGaps);
 
     LOG(VB_RECORD, LOG_INFO,
         QString("RecordingQuality() start(%1) end(%2) score(%3)")
         .arg(MythDate::toString(start, MythDate::ISODate))
         .arg(MythDate::toString(end, MythDate::ISODate))
-        .arg(m_overall_score));
+        .arg(m_overallScore));
 }
 
 void RecordingQuality::AddTSStatistics(
     int continuity_error_count, int packet_count)
 {
-    m_continuity_error_count = continuity_error_count;
-    m_packet_count = packet_count;
-    if (!m_packet_count)
+    m_continuityErrorCount = continuity_error_count;
+    m_packetCount = packet_count;
+    if (!m_packetCount)
         return;
 
-    double er = double(m_continuity_error_count) / double(m_packet_count);
+    double er = double(m_continuityErrorCount) / double(m_packetCount);
     if (er >= 0.01)
-        m_overall_score = max(m_overall_score * 0.60, 0.0);
+        m_overallScore = max(m_overallScore * 0.60, 0.0);
     else if (er >= 0.001)
-        m_overall_score = max(m_overall_score * 0.80, 0.0);
+        m_overallScore = max(m_overallScore * 0.80, 0.0);
     else if (er >= 0.0001)
-        m_overall_score = max(m_overall_score * 0.90, 0.0);
+        m_overallScore = max(m_overallScore * 0.90, 0.0);
 
     if (er >= 0.01)
-        m_overall_score = min(m_overall_score, 0.5);
+        m_overallScore = min(m_overallScore, 0.5);
 }
 
 bool RecordingQuality::IsDamaged(void) const
 {
-    return (m_overall_score * 100) <
+    return (m_overallScore * 100) <
         gCoreContext->GetNumSetting("MinimumRecordingQuality", 95);
 }
 
@@ -116,21 +116,21 @@ QString RecordingQuality::toStringXML(void) const
 {
     QString str =
         QString("<RecordingQuality overall_score=\"%1\" key=\"%2\"")
-        .arg(m_overall_score).arg(m_program_key);
+        .arg(m_overallScore).arg(m_programKey);
 
-    if (m_packet_count)
+    if (m_packetCount)
     {
         str += QString(" continuity_error_count=\"%1\" packet_count=\"%2\"")
-            .arg(m_continuity_error_count).arg(m_packet_count);
+            .arg(m_continuityErrorCount).arg(m_packetCount);
     }
 
-    if (m_recording_gaps.empty())
+    if (m_recordingGaps.empty())
         return str + " />";
 
     str += ">\n";
 
-    RecordingGaps::const_iterator it = m_recording_gaps.begin();
-    for (; it != m_recording_gaps.end(); ++it)
+    RecordingGaps::const_iterator it = m_recordingGaps.begin();
+    for (; it != m_recordingGaps.end(); ++it)
     {
         str += xml_indent(1) +
             QString("<Gap start=\"%1\" end=\"%2\" duration=\"%3\" />\n")

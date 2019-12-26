@@ -36,7 +36,7 @@ class TVRec;
 class FrameRate
 {
 public:
-    FrameRate(uint n, uint d=1) : m_num(n), m_den(d) {}
+    explicit FrameRate(uint n, uint d=1) : m_num(n), m_den(d) {}
     double toDouble(void) const { return m_num / (double)m_den; }
     bool isNonzero(void) const { return m_num; }
     uint getNum(void) const { return m_num; }
@@ -69,14 +69,14 @@ class MTV_PUBLIC RecorderBase : public QRunnable
 
   public:
     explicit RecorderBase(TVRec *rec);
-    virtual ~RecorderBase();
+    ~RecorderBase() override;
 
     /// \brief Sets the video frame rate.
     void SetFrameRate(double rate)
     {
-        m_video_frame_rate = rate;
-        m_ntsc_framerate = (29.96 <= rate && 29.98 >= rate);
-        m_frameRate = FrameRate((rate * 100) + 0.5, 100);
+        m_videoFrameRate = rate;
+        m_ntscFrameRate = (29.96 <= rate && 29.98 >= rate);
+        m_frameRate = FrameRate(lround(rate * 100), 100);
     }
 
     /** \brief Changes the Recording from the one set initially with
@@ -148,7 +148,7 @@ class MTV_PUBLIC RecorderBase : public QRunnable
      *
      *   This calls TVRec::RingBufferChanged() when the switch happens.
      */
-    void SetNextRecording(const RecordingInfo*, RingBuffer*);
+    void SetNextRecording(const RecordingInfo *ri, RingBuffer *rb);
 
     /** \brief This is called between SetOptionsFromProfile() and
      *         run() to initialize any devices, etc.
@@ -204,16 +204,16 @@ class MTV_PUBLIC RecorderBase : public QRunnable
      */
     long long GetKeyframePosition(long long desired) const;
     bool GetKeyframePositions(
-        long long start, long long end, frm_pos_map_t&) const;
+        long long start, long long end, frm_pos_map_t &map) const;
     bool GetKeyframeDurations(
-        long long start, long long end, frm_pos_map_t&) const;
+        long long start, long long end, frm_pos_map_t &map) const;
 
     virtual void StopRecording(void);
     virtual bool IsRecording(void);
     virtual bool IsRecordingRequested(void);
 
     /// \brief Returns a report about the current recordings quality.
-    virtual RecordingQuality *GetRecordingQuality(const RecordingInfo*) const;
+    virtual RecordingQuality *GetRecordingQuality(const RecordingInfo *ri) const;
 
     // pausing interface
     virtual void Pause(bool clear = true);
@@ -311,8 +311,8 @@ class MTV_PUBLIC RecorderBase : public QRunnable
     QString        m_videodevice;
 
     bool           m_ntsc                 {true};
-    bool           m_ntsc_framerate       {true};
-    double         m_video_frame_rate     {29.97};
+    bool           m_ntscFrameRate        {true};
+    double         m_videoFrameRate       {29.97};
 
     uint           m_videoAspect          {0}; // AspectRatio (1 = 4:3, 2 = 16:9
 
@@ -324,12 +324,12 @@ class MTV_PUBLIC RecorderBase : public QRunnable
 
     // For handling pausing + stop recording
     mutable QMutex m_pauseLock; // also used for request_recording and recording
-    bool           m_request_pause        {false};
+    bool           m_requestPause         {false};
     bool           m_paused               {false};
     QWaitCondition m_pauseWait;
     QWaitCondition m_unpauseWait;
     /// True if API call has requested a recording be [re]started
-    bool           m_request_recording    {false};
+    bool           m_requestRecording     {false};
     /// True while recording is actually being performed
     bool           m_recording            {false};
     QWaitCondition m_recordingWait;

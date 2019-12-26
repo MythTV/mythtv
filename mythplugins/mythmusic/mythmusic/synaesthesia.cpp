@@ -265,10 +265,14 @@ void Synaesthesia::fadeFade(void)
     do {
         uint32_t x = *ptr;
         if (x)
+        {
             *(ptr++) = x - ((x & (uintptr_t)0xf0f0f0f0) >> 4) -
                            ((x & (uintptr_t)0xe0e0e0e0) >> 5);
+        }
         else
+        {
             ptr++;
+        }
     } while (--i > 0);
 }
 
@@ -481,10 +485,14 @@ bool Synaesthesia::process(VisualNode *node)
         a[i] = sqrt(aa = (x1 + x2) * (x1 + x2) + (y1 - y2) * (y1 - y2));
         b[i] = sqrt(bb = (x1 - x2) * (x1 - x2) + (y2 + y2) * (y1 + y2));
         if (aa + bb != 0.0)
+        {
             clarity[i] = (int)(((x1 + x2) * (x1 - x2) + (y1 + y2) * (y1 - y2)) /
                          (aa + bb) * 256);
+        }
         else
+        {
             clarity[i] = 0;
+        }
 
         energy += (aa + bb) * i * i;
     }
@@ -498,9 +506,9 @@ bool Synaesthesia::process(VisualNode *node)
     double brightFactor2 = (brightFactor / 65536.0 / NumSamples) *
                            sqrt(m_outHeight * m_outWidth / (320.0 * 200.0));
 
-    m_energy_avg = m_energy_avg * 0.95 + energy * 0.05;
-    if (m_energy_avg > 0.0)
-        brightFactor2 *= 80.0 / (m_energy_avg + 5.0);
+    m_energyAvg = m_energyAvg * 0.95 + energy * 0.05;
+    if (m_energyAvg > 0.0)
+        brightFactor2 *= 80.0 / (m_energyAvg + 5.0);
 
     for (int i = 1; i < NumSamples / 2; i++)
     {

@@ -51,9 +51,7 @@ class MythServiceHost : public ServiceHost
         {
         }
 
-        virtual ~MythServiceHost()
-        {
-        }
+        ~MythServiceHost() override = default;
 };
 
 #endif

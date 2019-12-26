@@ -16,8 +16,8 @@ struct AVFormatContext;
 class META_PUBLIC MetaIOMP4 : public MetaIO
 {
   public:
-    MetaIOMP4(void) : MetaIO() {}
-    virtual ~MetaIOMP4(void) = default;
+    MetaIOMP4(void) = default;
+    ~MetaIOMP4(void) override = default;
 
     bool write(const QString &filename, MusicMetadata* mdata) override; // MetaIO
     MusicMetadata* read(const QString &filename) override; // MetaIO

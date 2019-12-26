@@ -221,7 +221,7 @@ class UPNP_PUBLIC CDSObject : public ReferenceCounter
         explicit      CDSObject( const QString &sId = "-1",
                                  const QString &sTitle = "",
                                  const QString &sParentId = "-1" );
-        virtual      ~CDSObject();
+        ~CDSObject() override;
 
         Property         *AddProperty( Property *pProp  );
         QList<Property*>  GetProperties( const QString &sName );

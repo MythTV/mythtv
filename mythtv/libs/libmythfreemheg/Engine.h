@@ -53,7 +53,7 @@ class MHAsynchEvent {
 // the code so for the moment we do.
 class MHPSEntry {
   public:
-    MHPSEntry() {}
+    MHPSEntry() = default;
     MHOctetString m_FileName;
     MHOwnPtrSequence <MHUnion> m_Data;
 };
@@ -70,8 +70,8 @@ class MHInteractible;
 
 class MHEngine: public MHEG {
   public:
-    MHEngine(MHContext *context);
-    virtual ~MHEngine();
+    explicit MHEngine(MHContext *context);
+    ~MHEngine() override;
 
     void SetBooting() override // MHEG
         { m_fBooting = true; }
@@ -79,7 +79,7 @@ class MHEngine: public MHEG {
     void DrawDisplay(QRegion toDraw) override; // MHEG
 
     void BootApplication(const char *fileName);
-    void TransitionToScene(const MHObjectRef &);
+    void TransitionToScene(const MHObjectRef &target);
     bool Launch(const MHObjectRef &target, bool fIsSpawn=false);
     void Spawn(const MHObjectRef &target) { Launch(target, true); }
     void Quit();
@@ -92,7 +92,7 @@ class MHEngine: public MHEG {
     // Called when an event is triggered.  Either queues the event or finds a link that matches.
     void EventTriggered(MHRoot *pSource, enum EventType ev)
     { EventTriggered(pSource, ev , MHUnion()); }
-    void EventTriggered(MHRoot *pSource, enum EventType, const MHUnion &evData);
+    void EventTriggered(MHRoot *pSource, enum EventType ev, const MHUnion &evData);
 
     // Called when a link fires to add the actions to the action stack.
     void AddActions(const MHActionSequence &actions);
@@ -118,7 +118,7 @@ class MHEngine: public MHEG {
     // Generate a UserAction event i.e. a key press.
     void GenerateUserAction(int nCode) override; // MHEG
     void EngineEvent(int nCode) override; // MHEG
-    void StreamStarted(MHStream*, bool bStarted) override; // MHEG
+    void StreamStarted(MHStream *stream, bool bStarted) override; // MHEG
 
     // Called from an ingredient to request a load of external content.
     void RequestExternalContent(MHIngredient *pRequester);
@@ -175,8 +175,7 @@ class MHEngine: public MHEG {
     MHApplication *CurrentApp() {
         if (m_ApplicationStack.isEmpty())
             return nullptr;
-        else
-            return m_ApplicationStack.top();
+        return m_ApplicationStack.top();
     }
     MHScene *CurrentScene() { return CurrentApp() == nullptr ? nullptr : CurrentApp()->m_pCurrentScene; }
 

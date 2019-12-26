@@ -25,7 +25,7 @@ class LCDProcClient : public QObject
 
     void customEvent(QEvent  *e) override; // QObject
 
-   ~LCDProcClient();
+   ~LCDProcClient() override;
 
     bool SetupLCD(void);
     void reset(void);
@@ -128,11 +128,11 @@ class LCDProcClient : public QObject
     void startVolume(const QString& app_name);
     void showStartupMessage(void);
 
-    void setWidth(unsigned int);
-    void setHeight(unsigned int);
-    void setCellWidth(unsigned int);
-    void setCellHeight(unsigned int);
-    void setVersion(const QString &, const QString &);
+    void setWidth(unsigned int x);
+    void setHeight(unsigned int x);
+    void setCellWidth(unsigned int x);
+    void setCellHeight(unsigned int x);
+    void setVersion(const QString &sversion, const QString &pversion);
     void describeServer();
 
     QString             m_activeScreen;

@@ -14,7 +14,7 @@ public:
              unsigned int maxScanX, unsigned int minScanY,
              unsigned int maxScanY, unsigned int XSpacing,
              unsigned int YSpacing);
-    float calculateSimilarityWith(const Histogram&) const;
+    float calculateSimilarityWith(const Histogram &other) const;
     unsigned int getAverageIntensity() const;
     unsigned int getThresholdForPercentageOfPixels(float percentage) const;
 

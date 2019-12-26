@@ -52,7 +52,7 @@ class MPUBLIC MusicCommon : public MythScreenType
 
     MusicCommon(MythScreenStack *parent, MythScreenType *parentScreen,
                 const QString &name);
-    ~MusicCommon(void);
+    ~MusicCommon(void) override;
 
     bool CreateCommon(void);
 
@@ -73,7 +73,7 @@ class MPUBLIC MusicCommon : public MythScreenType
     void next(void);
     void seekforward(void);
     void seekback(void);
-    void seek(int);
+    void seek(int pos);
     void stopAll(void);
     static void changeRating(bool increase);
 
@@ -212,7 +212,7 @@ class MPUBLIC MythMusicVolumeDialog : public MythScreenType
   public:
     MythMusicVolumeDialog(MythScreenStack *parent, const char *name)
         : MythScreenType(parent, name, false) {}
-    ~MythMusicVolumeDialog(void);
+    ~MythMusicVolumeDialog(void) override;
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
@@ -238,7 +238,7 @@ class MPUBLIC TrackInfoDialog : public MythScreenType
     TrackInfoDialog(MythScreenStack *parent, MusicMetadata *mdata, const char *name)
         : MythScreenType(parent, name, false),
           m_metadata(mdata) {}
-    ~TrackInfoDialog(void) = default;
+    ~TrackInfoDialog(void) override = default;
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType

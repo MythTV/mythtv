@@ -34,7 +34,7 @@ public:
     /* Ctor/dtor. */
     TemplateMatcher(PGMConverter *pgmc, EdgeDetector *ed, TemplateFinder *tf,
             const QString& debugdir);
-    ~TemplateMatcher(void);
+    ~TemplateMatcher(void) override;
 
     /* FrameAnalyzer interface. */
     const char *name(void) const override // FrameAnalyzer
@@ -45,7 +45,7 @@ public:
             long long frameno, long long *pNextFrame) override; // FrameAnalyzer
     int finished(long long nframes, bool final) override; // FrameAnalyzer
     int reportTime(void) const override; // FrameAnalyzer
-    FrameMap GetMap(unsigned int) const override // FrameAnalyzer
+    FrameMap GetMap(unsigned int /*index*/) const override // FrameAnalyzer
         { return m_breakMap; }
 
     /* TemplateMatcher interface. */
@@ -59,10 +59,10 @@ private:
     EdgeDetector           *m_edgeDetector      {nullptr};
     TemplateFinder         *m_templateFinder    {nullptr};
     const struct AVFrame   *m_tmpl              {nullptr};  /* template image */
-    int                     m_tmplrow           {-1};       /* template location */
-    int                     m_tmplcol           {-1};       /* template location */
-    int                     m_tmplwidth         {-1};       /* template dimensions */
-    int                     m_tmplheight        {-1};       /* template dimensions */
+    int                     m_tmplRow           {-1};       /* template location */
+    int                     m_tmplCol           {-1};       /* template location */
+    int                     m_tmplWidth         {-1};       /* template dimensions */
+    int                     m_tmplHeight        {-1};       /* template dimensions */
 
     /* Per-frame info. */
     unsigned short         *m_matches           {nullptr};  /* matching pixels */
@@ -74,13 +74,13 @@ private:
 
     /* Debugging */
     int                     m_debugLevel        {0};
-    QString                 m_debugdir;
-    QString                 m_debugdata;                   /* filename */
+    QString                 m_debugDir;
+    QString                 m_debugData;                   /* filename */
     MythPlayer             *m_player            {nullptr};
-    bool                    m_debug_matches     {false};
-    bool                    m_debug_removerunts {false};
-    bool                    m_matches_done      {false};
-    struct timeval          m_analyze_time      {0,0};
+    bool                    m_debugMatches      {false};
+    bool                    m_debugRemoveRunts  {false};
+    bool                    m_matchesDone       {false};
+    struct timeval          m_analyzeTime       {0,0};
 };
 
 #endif  /* !__TEMPLATEMATCHER_H__ */

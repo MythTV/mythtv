@@ -254,13 +254,17 @@ QString CommandLineArg::GetHelpString(int off, const QString& group, bool force)
     if (termwidth < off)
     {
         if (off > 70)
+        {
             // developer has configured some absurdly long command line
             // arguments, but we still need to do something
             termwidth = off+40;
+        }
         else
+        {
             // user is running uselessly narrow console, use a sane console
             // width instead
             termwidth = 79;
+        }
     }
 
     if (m_help.isEmpty() && !force)
@@ -272,9 +276,11 @@ QString CommandLineArg::GetHelpString(int off, const QString& group, bool force)
         return helpstr;
 
     if (!m_parents.isEmpty() && !force)
+    {
         // only print if an independent option, not subject
         // to a parent option
         return helpstr;
+    }
 
     if (!m_deprecated.isEmpty())
         // option is marked as deprecated, do not show
@@ -328,10 +334,14 @@ QString CommandLineArg::GetLongHelpString(QString keyword) const
 
     // argument has been marked as removed, so warn user of such
     if (!m_removed.isEmpty())
+    {
         PrintRemovedWarning(keyword);
     // argument has been marked as deprecated, so warn user of such
+    }
     else if (!m_deprecated.isEmpty())
+    {
         PrintDeprecatedWarning(keyword);
+    }
 
     msg << "Option:      " << keyword << endl << endl;
 
@@ -968,9 +978,11 @@ bool CommandLineArg::TestLinks(void) const
                  << " requires all of the following be defined as well"
                  << endl;
             for (i = m_requires.constBegin(); i != m_requires.constEnd(); ++i)
+            {
                 cerr << " "
                      << (*i)->GetPreferredKeyword().toLocal8Bit()
                                                    .constData();
+            }
             cerr << endl << endl;
             return false;
         }
@@ -984,9 +996,11 @@ bool CommandLineArg::TestLinks(void) const
             cerr << "ERROR: " << m_usedKeyword.toLocal8Bit().constData()
                  << " requires that none of the following be defined" << endl;
             for (i = m_blocks.constBegin(); i != m_blocks.constEnd(); ++i)
+            {
                 cerr << " "
                      << (*i)->GetPreferredKeyword().toLocal8Bit()
                                                    .constData();
+            }
             cerr << endl << endl;
             return false;
         }
@@ -1072,9 +1086,11 @@ void CommandLineArg::PrintVerbose(void) const
         cerr << '"' << it2->toByteArray().constData() << '"';
         ++it2;
         for (; it2 != vlist.end(); ++it2)
+        {
             cerr << ", \""
                  << it2->constData()
                  << '"';
+        }
         cerr << endl;
         break;
 
@@ -1235,9 +1251,11 @@ CommandLineArg* MythCommandLineParser::add(QStringList arglist,
         {
             arg->AddKeyword(*i);
             if (m_verbose)
+            {
                 cerr << "Adding " << (*i).toLocal8Bit().constData()
                      << " as taking type '" << QVariant::typeToName(type)
                      << "'" << endl;
+            }
             arg->IncrRef();
             m_optionedArgs.insert(*i, arg);
         }
@@ -1440,9 +1458,11 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
         res = getOpt(argc, argv, argpos, opt, val);
 
         if (m_verbose)
+        {
             cerr << "res: " << NamedOptType(res) << endl
                  << "opt:  " << opt.toLocal8Bit().constData() << endl
                  << "val:  " << val.constData() << endl << endl;
+        }
 
         // '--' found on command line, enable passthrough mode
         if (res == kPassthrough && !m_namedArgs.contains("_passthrough"))
@@ -1670,10 +1690,12 @@ bool MythCommandLineParser::ReconcileLinks(void)
 
             // replace linked argument
             if (m_verbose)
+            {
                 cerr << QString("  Setting %1 as child of %2")
                             .arg((*args_it)->m_name).arg((*links_it)->m_name)
                             .toLocal8Bit().constData()
                      << endl;
+            }
             (*args_it)->SetChildOf(m_namedArgs[(*links_it)->m_name]);
         }
 
@@ -1697,10 +1719,12 @@ bool MythCommandLineParser::ReconcileLinks(void)
 
             // replace linked argument
             if (m_verbose)
+            {
                 cerr << QString("  Setting %1 as parent of %2")
                             .arg((*args_it)->m_name).arg((*links_it)->m_name)
                             .toLocal8Bit().constData()
                      << endl;
+            }
             (*args_it)->SetParentOf(m_namedArgs[(*links_it)->m_name]);
         }
 
@@ -1724,10 +1748,12 @@ bool MythCommandLineParser::ReconcileLinks(void)
 
             // replace linked argument
             if (m_verbose)
+            {
                 cerr << QString("  Setting %1 as requiring %2")
                             .arg((*args_it)->m_name).arg((*links_it)->m_name)
                             .toLocal8Bit().constData()
                      << endl;
+            }
             (*args_it)->SetRequires(m_namedArgs[(*links_it)->m_name]);
         }
 
@@ -2694,9 +2720,11 @@ bool setUser(const QString &username)
         }
 #if defined(__linux__) || defined(__LINUX__)
         if (dumpability && (prctl(PR_SET_DUMPABLE, dumpability) == -1))
+        {
             LOG(VB_GENERAL, LOG_WARNING, "Unable to re-enable core file "
                     "creation. Run without the --user argument to use "
                     "shell-specified limits.");
+        }
 #endif
     }
     else

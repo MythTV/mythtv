@@ -4,14 +4,14 @@
 
 void TeletextExtractorReader::PageUpdated(int page, int subpage)
 {
-    m_updated_pages.insert(qMakePair(page, subpage));
+    m_updatedPages.insert(qMakePair(page, subpage));
     TeletextReader::PageUpdated(page, subpage);
 }
 
 void TeletextExtractorReader::HeaderUpdated(
     int page, int subpage, uint8_t *page_ptr, int lang)
 {
-    m_updated_pages.insert(qMakePair(page, subpage));
+    m_updatedPages.insert(qMakePair(page, subpage));
     TeletextReader::HeaderUpdated(page, subpage, page_ptr, lang);
 }
 

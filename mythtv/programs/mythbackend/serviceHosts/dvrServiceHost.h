@@ -51,9 +51,7 @@ class DvrServiceHost : public ServiceHost
         {
         }
 
-        virtual ~DvrServiceHost()
-        {
-        }
+        ~DvrServiceHost() override = default;
 };
 
 #endif

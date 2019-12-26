@@ -33,7 +33,7 @@ class AudioReencodeBuffer : public AudioOutput
   public:
     AudioReencodeBuffer(AudioFormat audio_format, int audio_channels,
                         bool passthru);
-    ~AudioReencodeBuffer();
+    ~AudioReencodeBuffer() override;
 
     void      Reconfigure(const AudioSettings &settings) override; // AudioOutput
     void      SetEffDsp(int dsprate) override; // AudioOutput
@@ -49,24 +49,23 @@ class AudioReencodeBuffer : public AudioOutput
     void      PauseUntilBuffered(void) override     { } // AudioOutput
     void      Drain(void) override                  { } // AudioOutput
     int64_t   GetAudiotime(void) override           { return m_last_audiotime; } // AudioOutput
-    int       GetVolumeChannel(int) const override  { return 100; } // VolumeBase
-    void      SetVolumeChannel(int, int) override   { } // VolumeBase
-    void      SetVolumeAll(int)                     { }
+    int       GetVolumeChannel(int /*channel*/) const override  { return 100; } // VolumeBase
+    void      SetVolumeChannel(int /*channel*/, int /*volume*/) override   { } // VolumeBase
     uint      GetCurrentVolume(void) const override { return 100; } // VolumeBase
-    void      SetCurrentVolume(int) override        { } // VolumeBase
-    void      AdjustCurrentVolume(int) override     { } // VolumeBase
-    virtual void      SetMute(bool)                 { }
+    void      SetCurrentVolume(int /*value*/) override { } // VolumeBase
+    void      AdjustCurrentVolume(int /*change*/) override { } // VolumeBase
+    virtual void      SetMute(bool /*mute  */)      { }
     void      ToggleMute(void) override             { } // VolumeBase
     MuteState GetMuteState(void) const override     { return kMuteOff; } // VolumeBase
     virtual MuteState IterateMutedChannels(void)    { return kMuteOff; }
-    void      SetSWVolume(int, bool) override       { return; } // VolumeBase
+    void      SetSWVolume(int /*new_volume*/, bool /*save*/) override       { } // VolumeBase
     int       GetSWVolume(void) override            { return 100; } // VolumeBase
-    bool      CanPassthrough(int, int, AVCodecID, int) const override // AudioOutput
+    bool      CanPassthrough(int /*samplerate*/, int /*channels*/, AVCodecID /*codec*/, int /*profile*/) const override // AudioOutput
                       { return m_initpassthru; }
 
     //  These are pure virtual in AudioOutput, but we don't need them here
-    void      bufferOutputData(bool) override       { return; } // AudioOutput
-    int       readOutputData(unsigned char*, int ) override { return 0; } // AudioOutput
+    void      bufferOutputData(bool /*y*/) override       { } // AudioOutput
+    int       readOutputData(unsigned char */*read_buffer*/, int /*max_length*/) override { return 0; } // AudioOutput
 
     int                  m_channels        {-1};
     int                  m_bytes_per_frame {-1};

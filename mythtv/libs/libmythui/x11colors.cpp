@@ -775,9 +775,11 @@ QColor createColor(const QString &color)
         };
 
         for (size_t i = 0; i < (sizeof(kCMap) / sizeof(kCMap[0])); i++)
+        {
             s_x11ColorMap[QString(kCMap[i].m_name)] = QColor(kCMap[i].m_r,
                                                              kCMap[i].m_g,
                                                              kCMap[i].m_b);
+        }
     }
 
     QMap<QString, QColor>::const_iterator it = s_x11ColorMap.find(color.toLower());

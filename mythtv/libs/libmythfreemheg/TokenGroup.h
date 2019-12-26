@@ -39,7 +39,7 @@ class MHEngine;
 class MHTokenGroupItem
 {
   public:
-    MHTokenGroupItem() {}
+    MHTokenGroupItem() = default;
     void Initialise(MHParseNode *p, MHEngine *engine);
     void PrintMe(FILE *fd, int nTabs) const;
     MHObjectRef m_Object;
@@ -73,7 +73,7 @@ class MHTokenGroup : public MHPresentable
     void Move(int n, MHEngine *engine) override; // MHRoot
     void MoveTo(int n, MHEngine *engine) override // MHRoot
         { TransferToken(n, engine); }
-    void GetTokenPosition(MHRoot *pResult, MHEngine *) override // MHRoot
+    void GetTokenPosition(MHRoot *pResult, MHEngine */*engine*/) override // MHRoot
         { pResult->SetVariableValue(m_nTokenPosition); }
 
   protected:
@@ -93,7 +93,7 @@ class MHTokenGroup : public MHPresentable
 // which only work on visibles.
 class MHListItem {
   public:
-    MHListItem(MHRoot *pVis): m_pVisible(pVis), m_fSelected(false) {}
+    explicit MHListItem(MHRoot *pVis): m_pVisible(pVis), m_fSelected(false) {}
     MHRoot *m_pVisible;
     bool   m_fSelected;
 };
@@ -102,7 +102,7 @@ class MHListGroup : public MHTokenGroup
 {
   public:
     MHListGroup() = default;
-    ~MHListGroup();
+    ~MHListGroup() override;
     const char *ClassName() override // MHTokenGroup
         { return "ListGroup"; }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHTokenGroup
@@ -123,9 +123,9 @@ class MHListGroup : public MHTokenGroup
     void ToggleItem(int nCell, MHEngine *engine) override; // MHRoot
     void ScrollItems(int nCell, MHEngine *engine) override; // MHRoot
     void SetFirstItem(int nCell, MHEngine *engine) override; // MHRoot
-    void GetFirstItem(MHRoot *pResult, MHEngine *) override // MHRoot
+    void GetFirstItem(MHRoot *pResult, MHEngine */*engine*/) override // MHRoot
         { pResult->SetVariableValue(m_nFirstItem); }
-    void GetListSize(MHRoot *pResult, MHEngine *) override // MHRoot
+    void GetListSize(MHRoot *pResult, MHEngine */*engine*/) override // MHRoot
         { pResult->SetVariableValue(m_ItemList.size()); }
 
   protected:
@@ -186,7 +186,7 @@ class MHAddItem: public MHElemAction {
   public:
     MHAddItem(): MHElemAction(":AddItem") {}
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
-    void PrintArgs(FILE *fd, int) const override; // MHElemAction
+    void PrintArgs(FILE *fd, int /*nTabs*/) const override; // MHElemAction
     void Perform(MHEngine *engine) override; // MHElemAction
   protected:
     MHGenericInteger m_Index;
@@ -204,9 +204,9 @@ class MHDelItem: public MHActionGenericObjectRef {
 // Base class for a few actions.
 class MHGetListActionData: public MHElemAction {
   public:
-    MHGetListActionData(const char *name): MHElemAction(name) {}
+    explicit MHGetListActionData(const char *name): MHElemAction(name) {}
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
-    void PrintArgs(FILE *fd, int) const override; // MHElemAction
+    void PrintArgs(FILE *fd, int /*nTabs*/) const override; // MHElemAction
   protected:
     MHGenericInteger m_Index;
     MHObjectRef m_Result;

@@ -98,12 +98,16 @@ MythOpenGLInterop::Type MythOpenGLInterop::GetInteropType(VideoFrameType Format,
         if (!gCoreContext->IsUIThread())
         {
             if (!Player)
+            {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                     "GetInteropType called from another thread without player");
+            }
             else
+            {
                 MythPlayer::HandleDecoderCallback(Player, "interop check",
                                                   MythOpenGLInterop::GetInteropTypeCallback,
                                                   &Format, &supported);
+            }
             return supported;
         }
 
@@ -145,11 +149,15 @@ MythOpenGLInterop::Type MythOpenGLInterop::GetInteropType(VideoFrameType Format,
     }
 
     if (Unsupported == supported)
+    {
         LOG(VB_GENERAL, LOG_WARNING, LOC + QString("No render support for frame type '%1'")
             .arg(format_description(Format)));
+    }
     else
+    {
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Rendering supported for frame type '%1' with %2")
             .arg(format_description(Format)).arg(TypeToString(supported)));
+    }
     return supported;
 }
 

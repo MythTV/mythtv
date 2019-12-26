@@ -80,7 +80,7 @@ class UPNP_PUBLIC ServiceHost : public HttpServerExtension
                               const QString     &sExtensionName,
                               const QString     &sBaseUrl,
                               const QString     &sSharePath );
-        virtual ~ServiceHost() = default;
+        ~ServiceHost() override = default;
 
         QStringList GetBasePaths() override; // HttpServerExtension
 

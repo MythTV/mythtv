@@ -59,10 +59,10 @@ class ZMConsole : public MythScreenType
 
   public:
     explicit ZMConsole(MythScreenStack *parent);
-    ~ZMConsole();
+    ~ZMConsole() override;
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
   private slots:
     void updateTime();
@@ -76,13 +76,13 @@ class ZMConsole : public MythScreenType
     void updateMonitorList();
     void setMonitorFunction(const QString &function, int enabled);
 
-    MythUIButtonList  *m_monitor_list   {nullptr};
-    MythUIText        *m_running_text   {nullptr};
-    MythUIText        *m_status_text    {nullptr};
-    MythUIText        *m_time_text      {nullptr};
-    MythUIText        *m_date_text      {nullptr};
-    MythUIText        *m_load_text      {nullptr};
-    MythUIText        *m_disk_text      {nullptr};
+    MythUIButtonList  *m_monitorList    {nullptr};
+    MythUIText        *m_runningText    {nullptr};
+    MythUIText        *m_statusText     {nullptr};
+    MythUIText        *m_timeText       {nullptr};
+    MythUIText        *m_dateText       {nullptr};
+    MythUIText        *m_loadText       {nullptr};
+    MythUIText        *m_diskText       {nullptr};
 
     FunctionDialog    *m_functionDialog {nullptr};
     MythScreenStack   *m_popupStack     {nullptr};

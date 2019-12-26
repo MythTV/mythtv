@@ -167,7 +167,7 @@ QString ModulationModeSubtable::toStringXML(uint indent_level) const
 
 bool SCTENetworkInformationTable::Parse(void)
 {
-    _ptrs.clear();
+    m_ptrs.clear();
 
     if ((kCarrierDefinitionSubtable == TableSubtype()) ||
         (kModulationModeSubtable == TableSubtype()))
@@ -176,7 +176,7 @@ bool SCTENetworkInformationTable::Parse(void)
         const unsigned char *next = pesdata() + 7;
         for (uint i = 0; i < NumberOfRecords(); i++)
         {
-            _ptrs.push_back(next);
+            m_ptrs.push_back(next);
             uint desc_count = next[offset-1];
             next += offset;
             for (uint j = 0; j < desc_count; j++)
@@ -184,13 +184,13 @@ bool SCTENetworkInformationTable::Parse(void)
                 MPEGDescriptor desc(next);
                 if (!desc.IsValid())
                 {
-                    _ptrs.clear();
+                    m_ptrs.clear();
                     return false;
                 }
                 next += desc.size();
             }
         }
-        _ptrs.push_back(next);
+        m_ptrs.push_back(next);
         return true;
     }
 
@@ -294,11 +294,11 @@ QString NetworkTextTable::toStringXML(uint indent_level) const
 
 bool ShortVirtualChannelTable::Parse(void)
 {
-    _ptrs.clear();
+    m_ptrs.clear();
 
     if (kDefinedChannelsMap == TableSubtype())
     {
-        _ptrs.push_back(pesdata() + DefinedChannelsMap().Size() + 7);
+        m_ptrs.push_back(pesdata() + DefinedChannelsMap().Size() + 7);
     }
     else if (kVirtualChannelMap == TableSubtype())
     {
@@ -309,16 +309,16 @@ bool ShortVirtualChannelTable::Parse(void)
         {
             for (uint i = 0; i < number_of_vc_records; i++)
             {
-                _ptrs.push_back(next);
+                m_ptrs.push_back(next);
                 next += 9;
             }
-            _ptrs.push_back(next);
+            m_ptrs.push_back(next);
         }
         else
         {
             for (uint i = 0; i < number_of_vc_records; i++)
             {
-                _ptrs.push_back(next);
+                m_ptrs.push_back(next);
                 uint desc_count = next[10];
                 next += 10;
                 for (uint j = 0; j < desc_count; j++)
@@ -326,18 +326,18 @@ bool ShortVirtualChannelTable::Parse(void)
                     MPEGDescriptor desc(next);
                     if (!desc.IsValid())
                     {
-                        _ptrs.clear();
+                        m_ptrs.clear();
                         return false;
                     }
                     next += desc.size();
                 }
             }
         }
-        _ptrs.push_back(next);
+        m_ptrs.push_back(next);
     }
     else if (kInverseChannelMap == TableSubtype())
     {
-        _ptrs.push_back(pesdata() + InverseChannelMap().Size() + 7);
+        m_ptrs.push_back(pesdata() + InverseChannelMap().Size() + 7);
     }
     else
     {

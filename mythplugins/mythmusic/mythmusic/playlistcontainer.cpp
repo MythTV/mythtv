@@ -14,11 +14,11 @@
 void PlaylistLoadingThread::run()
 {
     RunProlog();
-    while (!all_music->doneLoading())
+    while (!m_allMusic->doneLoading())
     {
         msleep(250);
     }
-    parent->load();
+    m_parent->load();
     RunEpilog();
 }
 

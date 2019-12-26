@@ -32,9 +32,9 @@ class ProgramInfoCache
 
     // All the following public methods must only be called from the UI Thread.
     void Refresh(void);
-    void Add(const ProgramInfo&);
+    void Add(const ProgramInfo &pginfo);
     bool Remove(uint recordingID);
-    bool Update(const ProgramInfo&);
+    bool Update(const ProgramInfo &pginfo);
     bool UpdateFileSize(uint recordingID, uint64_t filesize);
     QString GetRecGroup(uint recordingID) const;
     void GetOrdered(vector<ProgramInfo*> &list, bool newest_first = false);
@@ -56,11 +56,11 @@ class ProgramInfoCache
 
     mutable QMutex          m_lock;
     Cache                   m_cache;
-    vector<ProgramInfo*>   *m_next_cache        {nullptr};
+    vector<ProgramInfo*>   *m_nextCache         {nullptr};
     QObject                *m_listener          {nullptr};
-    bool                    m_load_is_queued    {false};
-    uint                    m_loads_in_progress {0};
-    mutable QWaitCondition  m_load_wait;
+    bool                    m_loadIsQueued      {false};
+    uint                    m_loadsInProgress   {0};
+    mutable QWaitCondition  m_loadWait;
 };
 
 #endif // _PROGRAM_INFO_CACHE_H_

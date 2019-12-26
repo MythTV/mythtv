@@ -123,7 +123,7 @@ class UPNP_PUBLIC UPnp
 
         static void CleanUp      ();
 
-        UPnpDevice *RootDevice() { return &(g_UPnpDeviceDesc.m_rootDevice); }
+        static UPnpDevice *RootDevice() { return &(g_UPnpDeviceDesc.m_rootDevice); }
 
         HttpServer *GetHttpServer() { return m_pHttpServer; }
 

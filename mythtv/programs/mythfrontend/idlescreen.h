@@ -15,7 +15,7 @@ class IdleScreen : public MythScreenType
 
   public:
     explicit IdleScreen(MythScreenStack *parent);
-    virtual ~IdleScreen();
+    ~IdleScreen() override;
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType

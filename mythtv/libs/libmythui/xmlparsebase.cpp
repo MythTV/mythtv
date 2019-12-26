@@ -503,24 +503,23 @@ MythUIType *XMLParseBase::ParseUIType(
         uitype = new MythUIClock(parent, name);
     else if (type == "progressbar")
         uitype = new MythUIProgressBar(parent, name);
-    else if (type == "scrollbar")
+    else if (type == "scrollbar") {
         uitype = new MythUIScrollBar(parent, name);
 #if CONFIG_QTWEBKIT
-    else if (type == "webbrowser")
+    } else if (type == "webbrowser") {
         uitype = new MythUIWebBrowser(parent, name);
 #endif
-    else if (type == "guidegrid")
+    } else if (type == "guidegrid") {
         uitype = new MythUIGuideGrid(parent, name);
-    else if (type == "shape")
+    } else if (type == "shape") {
         uitype = new MythUIShape(parent, name);
-    else if (type == "editbar")
+    } else if (type == "editbar") {
         uitype = new MythUIEditBar(parent, name);
-    else if (type == "video")
+    } else if (type == "video") {
         uitype = new MythUIVideo(parent, name);
-    else if (type == "window" && parent == GetGlobalObjectStore())
+    } else if (type == "window" && parent == GetGlobalObjectStore()) {
         uitype = new MythScreenType(parent, name);
-    else
-    {
+    } else {
         VERBOSE_XML(VB_GENERAL, LOG_ERR, filename, element,
                     "Unknown widget type.");
         return nullptr;

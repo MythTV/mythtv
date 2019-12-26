@@ -41,7 +41,7 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
         : MThread("DownloadManager"),
           m_infoLock(new QMutex(QMutex::Recursive)) {}
 
-   ~MythDownloadManager();
+   ~MythDownloadManager() override;
 
     // Methods for starting the queue manager thread
     void run(void) override; // MThread

@@ -114,7 +114,7 @@ enum SkipType {
                                    | COMM_DETECT_SCENE)
 };
 
-MPUBLIC QString SkipTypeToString(int);
+MPUBLIC QString SkipTypeToString(int flags);
 MPUBLIC std::deque<int> GetPreferredSkipTypeCombinations(void);
 
 enum TranscodingStatus {
@@ -218,7 +218,7 @@ enum AvailableStatusType {
     asZeroByte,
     asDeleted
 }; // note stored in uint8_t in ProgramInfo
-MPUBLIC QString toString(AvailableStatusType);
+MPUBLIC QString toString(AvailableStatusType status);
 
 enum WatchListStatus {
     wlDeleted = -4,

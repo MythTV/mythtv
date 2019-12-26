@@ -3,6 +3,7 @@
 
 // C++
 #include <cstdlib>
+#include <utility>
 #include <vector>
 
 // Qt
@@ -19,9 +20,9 @@ class QWidget;
 class ChannelID : public GroupSetting
 {
   public:
-    ChannelID(const QString& field = "chanid",
-              const QString& table = "channel") :
-        m_field(field), m_table(table)
+    explicit ChannelID(QString  field = "chanid",
+              QString  table = "channel") :
+        m_field(std::move(field)), m_table(std::move(table))
     {
         setVisible(false);
     }
@@ -74,10 +75,11 @@ class ChannelID : public GroupSetting
         }
 
         if (query.size() > 0)
+        {
             while (query.next())
                 if (tmpfloor <= query.value(0).toInt())
                     tmpfloor = query.value(0).toInt() + 1;
-
+        }
         return floor<tmpfloor?tmpfloor:floor;
     };
 
@@ -117,14 +119,14 @@ class MTV_PUBLIC ChannelOptionsCommon: public GroupSetting
         uint default_sourceid,  bool add_freqid);
 
   public slots:
-    static void onAirGuideChanged(bool);
-    void sourceChanged(const QString&);
+    static void onAirGuideChanged(bool fValue);
+    void sourceChanged(const QString &sourceid);
 
   protected:
-    OnAirGuide     *m_onairguide  {nullptr};
+    OnAirGuide     *m_onAirGuide  {nullptr};
     XmltvID        *m_xmltvID     {nullptr};
-    Freqid         *m_freqid      {nullptr};
-    TransportID_CO *m_transportid {nullptr};
+    Freqid         *m_freqId      {nullptr};
+    TransportID_CO *m_transportId {nullptr};
     Frequency_CO   *m_frequency   {nullptr};
 };
 

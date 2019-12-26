@@ -32,7 +32,7 @@ class ImportIconsWizard : public MythScreenType
   public:
     ImportIconsWizard(MythScreenStack *parent, bool fRefresh,
                       QString channelname = "");
-   ~ImportIconsWizard();
+   ~ImportIconsWizard() override;
 
     bool Create(void) override; // MythScreenType
     void Load(void) override; // MythScreenType
@@ -147,7 +147,7 @@ class ImportIconsWizard : public MythScreenType
   protected slots:
     void enableControls(dialogState state=STATE_NORMAL);         //!< enable/disable the controls
     void manualSearch();           //!< process the manual search
-    void menuSelection(MythUIButtonListItem *);//!< process the icon selection
+    void menuSelection(MythUIButtonListItem *item);//!< process the icon selection
     void skip();                   //!< skip this icon
     void askSubmit(const QString& strParam);
     void Close() override; // MythScreenType

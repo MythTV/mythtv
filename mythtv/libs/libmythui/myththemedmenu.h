@@ -33,7 +33,7 @@ class MUI_PUBLIC MythThemedMenuState : public MythScreenType
   public:
     MythThemedMenuState(MythScreenStack *parent, const QString &name)
         : MythScreenType(parent, name) {}
-   ~MythThemedMenuState() = default;
+   ~MythThemedMenuState() override = default;
 
     bool Create(void) override; // MythScreenType
 
@@ -49,7 +49,7 @@ class MUI_PUBLIC MythThemedMenuState : public MythScreenType
     MythUIText       *m_descriptionText {nullptr};
 
   protected:
-    void CopyFrom(MythUIType*) override; // MythScreenType
+    void CopyFrom(MythUIType *base) override; // MythScreenType
 };
 
 /// \brief Themed menu class, used for main menus in %MythTV frontend
@@ -60,7 +60,7 @@ class MUI_PUBLIC MythThemedMenu : public MythThemedMenuState
     MythThemedMenu(const QString &cdir, const QString &menufile,
                     MythScreenStack *parent, const QString &name,
                     bool allowreorder = false, MythThemedMenuState *state = nullptr);
-   ~MythThemedMenu();
+   ~MythThemedMenu() override;
 
     bool foundTheme(void);
 

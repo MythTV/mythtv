@@ -8,7 +8,7 @@ class VideoVisualSpectrum : public VideoVisual
 {
   public:
     VideoVisualSpectrum(AudioPlayer *audio, MythRender *render);
-    virtual ~VideoVisualSpectrum();
+    ~VideoVisualSpectrum() override;
 
     void Draw(const QRect &area, MythPainter *painter,
               QPaintDevice* device) override; // VideoVisual

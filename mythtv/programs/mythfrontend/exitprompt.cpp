@@ -91,9 +91,11 @@ void ExitPrompter::halt(bool Confirmed)
     {
         ret = myth_system(halt_cmd);
         if (ret != GENERIC_EXIT_OK)
+        {
             LOG(VB_GENERAL, LOG_ERR,
                 "User defined HaltCommand failed, falling back to "
                 "alternative methods.");
+        }
     }
 
     /* If supported, use DBus to shutdown */
@@ -161,9 +163,11 @@ void ExitPrompter::reboot(bool Confirmed)
     {
         ret = myth_system(reboot_cmd);
         if (ret != GENERIC_EXIT_OK)
+        {
             LOG(VB_GENERAL, LOG_ERR,
                 "User defined RebootCommand failed, falling back to "
                 "alternative methods.");
+        }
     }
 
     /* If supported, use DBus to reboot */

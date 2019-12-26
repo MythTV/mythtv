@@ -664,11 +664,15 @@ bool NuppelDecoder::InitAVCodecVideo(int codec)
     if (!m_mpaVidCodec)
     {
         if (m_usingExtraData)
+        {
             LOG(VB_GENERAL, LOG_ERR,
                 QString("couldn't find video codec (%1)")
                     .arg(m_extraData.video_fourcc));
+        }
         else
+        {
             LOG(VB_GENERAL, LOG_ERR, "couldn't find video codec");
+        }
         return false;
     }
 
@@ -739,10 +743,14 @@ bool NuppelDecoder::InitAVCodecAudio(int codec)
     if (!m_mpaAudCodec)
     {
         if (m_usingExtraData)
+        {
             LOG(VB_GENERAL, LOG_ERR, QString("couldn't find audio codec (%1)")
                     .arg(m_extraData.audio_fourcc));
+        }
         else
+        {
             LOG(VB_GENERAL, LOG_ERR, "couldn't find audio codec");
+        }
         return false;
     }
 

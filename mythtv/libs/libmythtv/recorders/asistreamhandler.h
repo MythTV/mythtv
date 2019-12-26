@@ -59,7 +59,7 @@ class ASIStreamHandler : public StreamHandler
     void SetRXMode(ASIRXMode m);
 
   private:
-    explicit ASIStreamHandler(const QString &, int inputid);
+    explicit ASIStreamHandler(const QString &device, int inputid);
 
     bool Open(void);
     void Close(void);
@@ -71,19 +71,19 @@ class ASIStreamHandler : public StreamHandler
     void SetRunningDesired(bool desired) override; // StreamHandler
 
   private:
-    int               m_device_num   {-1};
-    int               m_buf_size     {-1};
-    int               m_num_buffers  {-1};
+    int               m_deviceNum    {-1};
+    int               m_bufSize      {-1};
+    int               m_numBuffers   {-1};
     int               m_fd           {-1};
-    uint              m_packet_size  {TSPacket::kSize};
-    ASIClockSource    m_clock_source {kASIInternalClock};
-    ASIRXMode         m_rx_mode      {kASIRXSyncOnActualConvertTo188};
+    uint              m_packetSize   {TSPacket::kSize};
+    ASIClockSource    m_clockSource  {kASIInternalClock};
+    ASIRXMode         m_rxMode       {kASIRXSyncOnActualConvertTo188};
     DeviceReadBuffer *m_drb          {nullptr};
 
     // for implementing Get & Return
-    static QMutex                           s_handlers_lock;
+    static QMutex                           s_handlersLock;
     static QMap<QString, ASIStreamHandler*> s_handlers;
-    static QMap<QString, uint>              s_handlers_refcnt;
+    static QMap<QString, uint>              s_handlersRefCnt;
 };
 
 #endif // _ASISTREAMHANDLER_H_

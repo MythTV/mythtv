@@ -207,9 +207,11 @@ void SequentialAnimation::Finished()
 void ParallelAnimation::Pulse(int interval)
 {
     if (m_running)
+    {
         // Pulse all children
         foreach(AbstractAnimation *animation, m_group)
             animation->Pulse(interval);
+    }
 }
 
 

@@ -96,7 +96,7 @@ class MHLineArt : public MHVisible
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHVisible
     void PrintMe(FILE *fd, int nTabs) const override; // MHVisible
     // Only DynamicLineArt and Rectangle are supported
-    void Display(MHEngine *) override {} // MHVisible
+    void Display(MHEngine */*engine*/) override {} // MHVisible
     void Preparation(MHEngine *engine) override; // MHVisible
 
     // Actions on LineArt
@@ -121,15 +121,15 @@ class MHLineArt : public MHVisible
 class MHRectangle : public MHLineArt  
 {
   public:
-    MHRectangle() {}
-    MHRectangle(const MHRectangle &ref): MHLineArt(ref) {}
+    MHRectangle() = default;
+    MHRectangle(const MHRectangle &ref) = default;
     const char *ClassName() override // MHLineArt
         { return "Rectangle"; }
     void PrintMe(FILE *fd, int nTabs) const override; // MHLineArt
     // Display function.
     void Display(MHEngine *engine) override; // MHLineArt
     QRegion GetOpaqueArea() override; // MHVisible
-    MHIngredient *Clone(MHEngine *) override // MHRoot
+    MHIngredient *Clone(MHEngine */*engine*/) override // MHRoot
         { return new MHRectangle(*this); } // Create a clone of this ingredient.
 };
 
@@ -138,7 +138,7 @@ class MHRectangle : public MHLineArt
 class MHInteractible
 {
   public:
-    MHInteractible(MHVisible *parent)
+    explicit MHInteractible(MHVisible *parent)
         : m_parent(parent) {}
     virtual ~MHInteractible() = default;
     void Initialise(MHParseNode *p, MHEngine *engine);
@@ -175,12 +175,12 @@ class MHSlider : public MHVisible, public MHInteractible
 {
   public:
     MHSlider() : MHInteractible(this) {}
-    virtual ~MHSlider() = default;
+    ~MHSlider() override = default;
     const char *ClassName() override // MHRoot
         { return "Slider"; }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHVisible
     void PrintMe(FILE *fd, int nTabs) const override; // MHVisible
-    void Display(MHEngine *) override; // MHVisible
+    void Display(MHEngine *engine) override; // MHVisible
     void Preparation(MHEngine *engine) override; // MHVisible
 
     void Interaction(MHEngine *engine) override; // MHInteractible
@@ -245,12 +245,12 @@ class MHEntryField : public MHVisible, public MHInteractible
 {
   public:
     MHEntryField(): MHInteractible(this) {}
-    virtual ~MHEntryField() = default;
+    ~MHEntryField() override = default;
     const char *ClassName() override // MHRoot
         { return "EntryField"; }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHVisible
     void PrintMe(FILE *fd, int nTabs) const override; // MHVisible
-    void Display(MHEngine *) override {} // MHVisible - Not (yet?) supported
+    void Display(MHEngine */*engine*/) override {} // MHVisible - Not (yet?) supported
 
     // Implement the actions in the main inheritance line.
     void SetInteractionStatus(bool newStatus, MHEngine *engine) override // MHRoot
@@ -270,10 +270,10 @@ class MHButton : public MHVisible
 {
   public:
     MHButton() = default;
-    virtual ~MHButton() = default;
+    ~MHButton() override = default;
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHVisible
     void PrintMe(FILE *fd, int nTabs) const override; // MHVisible
-    void Display(MHEngine *) override {} // MHVisible - Not (yet?) supported
+    void Display(MHEngine */*engine*/) override {} // MHVisible - Not (yet?) supported
 };
 
 // HotSpot - not needed for UK MHEG.
@@ -281,12 +281,12 @@ class MHHotSpot : public MHButton
 {
   public:
     MHHotSpot() = default;
-    virtual ~MHHotSpot() = default;
+    ~MHHotSpot() override = default;
     const char *ClassName() override // MHRoot
         { return "HotSpot"; }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHButton
     void PrintMe(FILE *fd, int nTabs) const override; // MHButton
-    void Display(MHEngine *) override {} // MHButton - Not supported
+    void Display(MHEngine */*engine*/) override {} // MHButton - Not supported
 };
 
 // PushButton - not needed for UK MHEG.
@@ -294,12 +294,12 @@ class MHPushButton : public MHButton
 {
   public:
     MHPushButton() = default;
-    virtual ~MHPushButton() = default;
+    ~MHPushButton() override = default;
     const char *ClassName() override // MHRoot
         { return "PushButton"; }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHButton
     void PrintMe(FILE *fd, int nTabs) const override; // MHButton
-    void Display(MHEngine *) override {} // MHButton - Not supported
+    void Display(MHEngine */*engine*/) override {} // MHButton - Not supported
 };
 
 // SwitchButton - not needed for UK MHEG.
@@ -307,12 +307,12 @@ class MHSwitchButton : public MHPushButton
 {
   public:
     MHSwitchButton() = default;
-    virtual ~MHSwitchButton() = default;
+    ~MHSwitchButton() override = default;
     const char *ClassName() override // MHPushButton
         { return "SwitchButton"; }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHPushButton
     void PrintMe(FILE *fd, int nTabs) const override; // MHPushButton
-    void Display(MHEngine *) override {} // MHPushButton - Not supported
+    void Display(MHEngine */*engine*/) override {} // MHPushButton - Not supported
 };
 
 // Actions
@@ -321,7 +321,7 @@ class MHSwitchButton : public MHPushButton
 class MHSetColour: public MHElemAction
 {
   public:
-    MHSetColour(const char *name): MHElemAction(name), m_ColourType(CT_None) { }
+    explicit MHSetColour(const char *name): MHElemAction(name), m_ColourType(CT_None) { }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
     void Perform(MHEngine *engine) override; // MHElemAction
   protected:
@@ -407,7 +407,7 @@ class MHGetBoxSize: public MHActionObjectRef2
 {
   public:
     MHGetBoxSize(): MHActionObjectRef2(":GetBoxSize")  {}
-    void CallAction(MHEngine *, MHRoot *pTarget, MHRoot *pArg1, MHRoot *pArg2) override // MHActionObjectRef2
+    void CallAction(MHEngine */*engine*/, MHRoot *pTarget, MHRoot *pArg1, MHRoot *pArg2) override // MHActionObjectRef2
         { pTarget->GetBoxSize(pArg1, pArg2); }
 };
 
@@ -416,7 +416,7 @@ class MHGetPosition: public MHActionObjectRef2
 {
   public:
     MHGetPosition(): MHActionObjectRef2(":GetPosition")  {}
-    void CallAction(MHEngine *, MHRoot *pTarget, MHRoot *pArg1, MHRoot *pArg2) override // MHActionObjectRef2
+    void CallAction(MHEngine */*engine*/, MHRoot *pTarget, MHRoot *pArg1, MHRoot *pArg2) override // MHActionObjectRef2
         { pTarget->GetPosition(pArg1, pArg2); }
 };
 
@@ -448,7 +448,7 @@ class MHGetInteractionStatus: public MHActionObjectRef
 {
   public:
     MHGetInteractionStatus(): MHActionObjectRef(":GetInteractionStatus")  {}
-    void CallAction(MHEngine *, MHRoot *pTarget, MHRoot *pResult) override // MHActionObjectRef
+    void CallAction(MHEngine */*engine*/, MHRoot *pTarget, MHRoot *pResult) override // MHActionObjectRef
         { pResult->SetVariableValue(pTarget->GetInteractionStatus());}
 };
 
@@ -464,7 +464,7 @@ class MHGetHighlightStatus: public MHActionObjectRef
 {
   public:
     MHGetHighlightStatus(): MHActionObjectRef(":GetHighlightStatus")  {}
-    void CallAction(MHEngine *, MHRoot *pTarget, MHRoot *pResult) override // MHActionObjectRef
+    void CallAction(MHEngine */*engine*/, MHRoot *pTarget, MHRoot *pResult) override // MHActionObjectRef
         { pResult->SetVariableValue(pTarget->GetHighlightStatus());}
 };
 
@@ -488,7 +488,7 @@ class MHGetSliderValue: public MHActionObjectRef
 {
   public:
     MHGetSliderValue(): MHActionObjectRef(":GetSliderValue")  {}
-    void CallAction(MHEngine *, MHRoot *pTarget, MHRoot *pResult) override // MHActionObjectRef
+    void CallAction(MHEngine */*engine*/, MHRoot *pTarget, MHRoot *pResult) override // MHActionObjectRef
         { pResult->SetVariableValue(pTarget->GetSliderValue());}
 };
 
@@ -504,7 +504,7 @@ class MHGetPortion: public MHActionObjectRef
 {
   public:
     MHGetPortion(): MHActionObjectRef(":GetPortion")  {}
-    void CallAction(MHEngine *, MHRoot *pTarget, MHRoot *pResult) override // MHActionObjectRef
+    void CallAction(MHEngine */*engine*/, MHRoot *pTarget, MHRoot *pResult) override // MHActionObjectRef
         { pResult->SetVariableValue(pTarget->GetPortion());}
 };
 

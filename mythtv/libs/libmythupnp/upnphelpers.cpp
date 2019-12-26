@@ -366,9 +366,11 @@ QString ProtocolInfoString(UPNPProtocol::TransferProtocol protocol,
     QString str = protocolInfoFields.join(":");
 
     if (str.length() > 256)
+    {
         LOG(VB_GENERAL, LOG_WARNING, "DLNA::ProtocolInfoString() : ProtocolInfo string exceeds "
                                      "256 byte limit for compatibility with older UPnP devices. "
                                      "Consider omitting optional DLNA information such as ci-param");
+    }
     return str;
 }
 

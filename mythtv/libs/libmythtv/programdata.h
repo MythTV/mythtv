@@ -3,6 +3,7 @@
 
 // C++ headers
 #include <cstdint>
+#include <utility>
 #include <vector>
 using namespace std;
 
@@ -40,7 +41,7 @@ class MTV_PUBLIC DBPerson
         kGuest,
     };
 
-    DBPerson(const DBPerson&);
+    DBPerson(const DBPerson &other);
     DBPerson(Role _role, QString _name);
     DBPerson(const QString &_role, QString _name);
 
@@ -74,28 +75,28 @@ class MTV_PUBLIC DBEvent
     explicit DBEvent(uint listingsource) :
         m_listingsource(listingsource) {}
 
-    DBEvent(const QString   &_title,     const QString   &_subtitle,
-            const QString   &_desc,
-            const QString   &_category,  ProgramInfo::CategoryType _category_type,
-            const QDateTime &_start,     const QDateTime &_end,
+    DBEvent(QString   _title,     QString _subtitle,
+            QString   _desc,
+            QString   _category,  ProgramInfo::CategoryType _category_type,
+            QDateTime _start,     QDateTime _end,
             unsigned char    _subtitleType,
             unsigned char    _audioProps,
             unsigned char    _videoProps,
             float            _stars,
-            const QString   &_seriesId,  const QString   &_programId,
+            QString          _seriesId,  QString _programId,
             uint32_t         _listingsource,
             uint _season,                uint _episode,
             uint _totalepisodes ) :
-        m_title(_title),           m_subtitle(_subtitle),
-        m_description(_desc),
-        m_category(_category),
-        m_starttime(_start),       m_endtime(_end),
+        m_title(std::move(_title)),           m_subtitle(std::move(_subtitle)),
+        m_description(std::move(_desc)),
+        m_category(std::move(_category)),
+        m_starttime(std::move(_start)),       m_endtime(std::move(_end)),
         m_subtitleType(_subtitleType),
         m_audioProps(_audioProps), m_videoProps(_videoProps),
         m_stars(_stars),
         m_categoryType(_category_type),
-        m_seriesId(_seriesId),
-        m_programId(_programId),
+        m_seriesId(std::move(_seriesId)),
+        m_programId(std::move(_programId)),
         m_listingsource(_listingsource),
         m_season(_season),
         m_episode(_episode),
@@ -105,7 +106,7 @@ class MTV_PUBLIC DBEvent
 
     virtual ~DBEvent() { delete m_credits; }
 
-    void AddPerson(DBPerson::Role, const QString &name);
+    void AddPerson(DBPerson::Role role, const QString &name);
     void AddPerson(const QString &role, const QString &name);
 
     uint UpdateDB(MSqlQuery &query, uint chanid, int match_threshold) const;
@@ -113,20 +114,20 @@ class MTV_PUBLIC DBEvent
     bool HasCredits(void) const { return m_credits; }
     bool HasTimeConflict(const DBEvent &other) const;
 
-    DBEvent &operator=(const DBEvent&);
+    DBEvent &operator=(const DBEvent &other);
 
   protected:
     uint GetOverlappingPrograms(
-        MSqlQuery&, uint chanid, vector<DBEvent> &programs) const;
+        MSqlQuery &query, uint chanid, vector<DBEvent> &programs) const;
     int  GetMatch(
         const vector<DBEvent> &programs, int &bestmatch) const;
     uint UpdateDB(
-        MSqlQuery&, uint chanid, const vector<DBEvent> &p, int match) const;
+        MSqlQuery &q, uint chanid, const vector<DBEvent> &p, int match) const;
     uint UpdateDB(
-        MSqlQuery&, uint chanid, const DBEvent &match) const;
+        MSqlQuery &query, uint chanid, const DBEvent &match) const;
     bool MoveOutOfTheWayDB(
-        MSqlQuery&, uint chanid, const DBEvent &prog) const;
-    virtual uint InsertDB(MSqlQuery&, uint chanid) const;
+        MSqlQuery &query, uint chanid, const DBEvent &prog) const;
+    virtual uint InsertDB(MSqlQuery &query, uint chanid) const;
     virtual void Squeeze(void);
 
   public:
@@ -220,7 +221,7 @@ class MTV_PUBLIC ProgInfo : public DBEvent
 
     void Squeeze(void) override; // DBEvent
 
-    ProgInfo &operator=(const ProgInfo&);
+    ProgInfo &operator=(const ProgInfo &other);
 
   public:
     // extra XMLTV stuff

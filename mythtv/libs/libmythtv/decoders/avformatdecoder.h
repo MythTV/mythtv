@@ -39,9 +39,7 @@ class MythSqlDatabase;
 
 struct SwsContext;
 
-extern "C" void HandleStreamChange(void*);
-extern "C" void HandleDVDStreamChange(void*);
-extern "C" void HandleBDStreamChange(void*);
+extern "C" void HandleStreamChange(void *data);
 
 class AudioInfo
 {
@@ -89,14 +87,12 @@ class AudioInfo
 /// It's used as a decoder of last resort after trying the NuppelDecoder
 class AvFormatDecoder : public DecoderBase
 {
-    friend void HandleStreamChange(void*);
-    friend void HandleDVDStreamChange(void*);
-    friend void HandleBDStreamChange(void*);
+    friend void HandleStreamChange(void *data);
   public:
     static void GetDecoders(RenderOptions &opts);
     AvFormatDecoder(MythPlayer *parent, const ProgramInfo &pginfo,
                     PlayerFlags flags);
-    virtual ~AvFormatDecoder();
+    ~AvFormatDecoder() override;
 
     void SetEof(bool eof) override; // DecoderBase
 
@@ -168,7 +164,7 @@ class AvFormatDecoder : public DecoderBase
 
     int  GetTeletextDecoderType(void) const override; // DecoderBase
 
-    QString GetXDS(const QString&) const override; // DecoderBase
+    QString GetXDS(const QString &key) const override; // DecoderBase
     QByteArray GetSubHeader(uint trackNo) const override; // DecoderBase
     void GetAttachmentData(uint trackNo, QByteArray &filename,
                            QByteArray &data) override; // DecoderBase
@@ -236,7 +232,7 @@ class AvFormatDecoder : public DecoderBase
     void ProcessDVBDataPacket(const AVStream *stream, const AVPacket *pkt);
     void ProcessDSMCCPacket(const AVStream *stream, const AVPacket *pkt);
 
-    void SeekReset(long long, uint skipFrames, bool doFlush, bool discardFrames) override; // DecoderBase
+    void SeekReset(long long newkey, uint skipFrames, bool doFlush, bool discardFrames) override; // DecoderBase
 
     inline bool DecoderWillDownmix(const AVCodecContext *ctx);
     bool DoPassThrough(const AVCodecParameters *par, bool withProfile=true);

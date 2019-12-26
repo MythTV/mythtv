@@ -1508,8 +1508,10 @@ void PlaylistEditorView::getSmartPlaylistTracks(MusicGenericTree *node, int play
             QString value1 = query.value(2).toString();
             QString value2 = query.value(3).toString();
             if (!bFirst)
+            {
                 whereClause += matchType + getCriteriaSQL(fieldName,
                                            operatorName, value1, value2);
+            }
             else
             {
                bFirst = false;

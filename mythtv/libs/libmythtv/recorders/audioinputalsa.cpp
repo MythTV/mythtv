@@ -23,31 +23,31 @@
 #include "audioinputalsa.h"
 
 #define LOC     QString("AudioInALSA: ")
-#define LOC_DEV QString("AudioInALSA(%1): ").arg(alsa_device.constData())
+#define LOC_DEV QString("AudioInALSA(%1): ").arg(m_alsaDevice.constData())
 
 bool AudioInputALSA::Open(uint sample_bits, uint sample_rate, uint channels)
 {
-    if (alsa_device.isEmpty())
+    if (m_alsaDevice.isEmpty())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("invalid alsa device name, %1")
-                          .arg(alsa_device.constData()));
+                          .arg(m_alsaDevice.constData()));
         return false;
     }
     (void)AlsaBad(snd_config_update_free_global(), "failed to update snd config");
     m_audio_sample_rate = sample_rate;
     m_audio_channels = channels;
     m_audio_sample_bits = sample_bits;
-    if (AlsaBad(snd_pcm_open(&pcm_handle, alsa_device.constData(),
+    if (AlsaBad(snd_pcm_open(&m_pcmHandle, m_alsaDevice.constData(),
                              SND_PCM_STREAM_CAPTURE, 0), // blocking mode
                 "pcm open failed"))
     {
-        pcm_handle = nullptr;
+        m_pcmHandle = nullptr;
         return false;
     }
     if (!(PrepHwParams() && PrepSwParams()))
     {
-        (void)snd_pcm_close(pcm_handle);
-        pcm_handle = nullptr;
+        (void)snd_pcm_close(m_pcmHandle);
+        m_pcmHandle = nullptr;
         return false;
     }
     LOG(VB_AUDIO, LOG_INFO, LOC_DEV + "pcm open");
@@ -56,19 +56,19 @@ bool AudioInputALSA::Open(uint sample_bits, uint sample_rate, uint channels)
 
 void AudioInputALSA::Close(void)
 {
-    if (pcm_handle != nullptr)
+    if (m_pcmHandle != nullptr)
     {
         Stop();
-        (void)AlsaBad(snd_pcm_close(pcm_handle), "Close close failed");
+        (void)AlsaBad(snd_pcm_close(m_pcmHandle), "Close close failed");
     }
-    pcm_handle = nullptr;
+    m_pcmHandle = nullptr;
 }
 
 bool AudioInputALSA::Stop(void)
 {
     bool stopped = false;
-    if (pcm_handle != nullptr &&
-        !AlsaBad(snd_pcm_drop(pcm_handle), "Stop drop failed"))
+    if (m_pcmHandle != nullptr &&
+        !AlsaBad(snd_pcm_drop(m_pcmHandle), "Stop drop failed"))
     {
         stopped = true;
         LOG(VB_AUDIO, LOG_INFO, LOC_DEV + "capture stopped");
@@ -78,10 +78,10 @@ bool AudioInputALSA::Stop(void)
 
 int AudioInputALSA::GetSamples(void* buf, uint nbytes)
 {
-    if (!pcm_handle)
+    if (!m_pcmHandle)
        return 0;
     int bytes_read = 0;
-    int pcm_state = snd_pcm_state(pcm_handle);
+    int pcm_state = snd_pcm_state(m_pcmHandle);
     switch (pcm_state)
     {
         case SND_PCM_STATE_XRUN:
@@ -95,7 +95,7 @@ int AudioInputALSA::GetSamples(void* buf, uint nbytes)
         }
         [[clang::fallthrough]];
         case SND_PCM_STATE_PREPARED:
-            if (AlsaBad(snd_pcm_start(pcm_handle), "pcm start failed"))
+            if (AlsaBad(snd_pcm_start(m_pcmHandle), "pcm start failed"))
                  break;
             [[clang::fallthrough]];
         case SND_PCM_STATE_RUNNING:
@@ -113,17 +113,17 @@ int AudioInputALSA::GetSamples(void* buf, uint nbytes)
 int AudioInputALSA::GetNumReadyBytes(void)
 {
     int bytes_avail = 0;
-    if (pcm_handle != nullptr)
+    if (m_pcmHandle != nullptr)
     {
         snd_pcm_sframes_t frames_avail;
-        int pcm_state = snd_pcm_state(pcm_handle);
+        int pcm_state = snd_pcm_state(m_pcmHandle);
         switch (pcm_state)
         {
             case SND_PCM_STATE_PREPARED:
             case SND_PCM_STATE_RUNNING:
-                if (!AlsaBad((frames_avail = snd_pcm_avail_update(pcm_handle)),
+                if (!AlsaBad((frames_avail = snd_pcm_avail_update(m_pcmHandle)),
                              "GetNumReadyBytes, available update failed"))
-                    bytes_avail = snd_pcm_frames_to_bytes(pcm_handle,
+                    bytes_avail = snd_pcm_frames_to_bytes(m_pcmHandle,
                                                           frames_avail);
         }
     }
@@ -134,16 +134,16 @@ bool AudioInputALSA::PrepHwParams(void)
 {
     snd_pcm_hw_params_t* hwparams;
     snd_pcm_hw_params_alloca(&hwparams);
-    if (AlsaBad(snd_pcm_hw_params_any(pcm_handle, hwparams),
+    if (AlsaBad(snd_pcm_hw_params_any(m_pcmHandle, hwparams),
                 "failed to init hw params"))
         return false;
     snd_pcm_access_t axs = SND_PCM_ACCESS_RW_INTERLEAVED; //always?
-    if (AlsaBad(snd_pcm_hw_params_set_access(pcm_handle, hwparams, axs),
+    if (AlsaBad(snd_pcm_hw_params_set_access(m_pcmHandle, hwparams, axs),
                 "failed to set interleaved rw io"))
         return false;
     snd_pcm_format_t format =
         (m_audio_sample_bits > 8) ? SND_PCM_FORMAT_S16 : SND_PCM_FORMAT_U8;
-    if (AlsaBad(snd_pcm_hw_params_set_format(pcm_handle, hwparams, format),
+    if (AlsaBad(snd_pcm_hw_params_set_format(m_pcmHandle, hwparams, format),
                 QString("failed to set sample format %1")
                         .arg(snd_pcm_format_description(format))))
         return false;
@@ -161,13 +161,13 @@ bool AudioInputALSA::PrepHwParams(void)
             QString("min channels %1, max channels %2, myth requests %3")
                           .arg(min_chans).arg(max_chans).arg(m_audio_channels));
     }
-    if (AlsaBad(snd_pcm_hw_params_set_channels(pcm_handle, hwparams,
+    if (AlsaBad(snd_pcm_hw_params_set_channels(m_pcmHandle, hwparams,
                 m_audio_channels), QString("failed to set channels to %1")
                                            .arg(m_audio_channels)))
     {
         return false;
     }
-    if (AlsaBad(snd_pcm_hw_params_set_rate(pcm_handle, hwparams,
+    if (AlsaBad(snd_pcm_hw_params_set_rate(m_pcmHandle, hwparams,
                 m_audio_sample_rate, 0), QString("failed to set sample rate %1")
                                                  .arg(m_audio_sample_rate)))
     {
@@ -175,36 +175,40 @@ bool AudioInputALSA::PrepHwParams(void)
         uint rate_den = 0;
         if (!AlsaBad(snd_pcm_hw_params_get_rate_numden(hwparams, &rate_num,
                      &rate_den), "snd_pcm_hw_params_get_rate_numden failed"))
+        {
             if (m_audio_sample_rate != (int)(rate_num / rate_den))
+            {
                 LOG(VB_GENERAL, LOG_ERR, LOC_DEV +
                     QString("device reports sample rate as %1")
                         .arg(rate_num / rate_den));
+            }
+        }
         return false;
     }
     uint buffer_time = 64000; // 64 msec
     uint period_time = buffer_time / 4;
-    if (AlsaBad(snd_pcm_hw_params_set_period_time_near(pcm_handle, hwparams, &period_time, nullptr),
+    if (AlsaBad(snd_pcm_hw_params_set_period_time_near(m_pcmHandle, hwparams, &period_time, nullptr),
                 "failed to set period time"))
         return false;
-    if (AlsaBad(snd_pcm_hw_params_set_buffer_time_near(pcm_handle, hwparams, &buffer_time, nullptr),
+    if (AlsaBad(snd_pcm_hw_params_set_buffer_time_near(m_pcmHandle, hwparams, &buffer_time, nullptr),
                 "failed to set buffer time"))
         return false;
-    if (AlsaBad(snd_pcm_hw_params_get_period_size(hwparams, &period_size, nullptr),
+    if (AlsaBad(snd_pcm_hw_params_get_period_size(hwparams, &m_periodSize, nullptr),
                 "failed to get period size"))
         return false;
 
-    if (AlsaBad(snd_pcm_hw_params (pcm_handle, hwparams),
+    if (AlsaBad(snd_pcm_hw_params (m_pcmHandle, hwparams),
                 "failed to set hwparams"))
         return false;
 
-    myth_block_bytes = snd_pcm_frames_to_bytes(pcm_handle, period_size);
+    m_mythBlockBytes = snd_pcm_frames_to_bytes(m_pcmHandle, m_periodSize);
     LOG(VB_AUDIO, LOG_INFO, LOC_DEV +
             QString("channels %1, sample rate %2, buffer_time %3 msec, period "
                     "size %4").arg(m_audio_channels)
                 .arg(m_audio_sample_rate).arg(buffer_time / 1000.0, -1, 'f', 1)
-                .arg(period_size));
+                .arg(m_periodSize));
     LOG(VB_AUDIO, LOG_DEBUG, LOC_DEV + QString("myth block size %1")
-                                           .arg(myth_block_bytes));
+                                           .arg(m_mythBlockBytes));
     return true;
 }
 
@@ -213,20 +217,20 @@ bool AudioInputALSA::PrepSwParams(void)
     snd_pcm_sw_params_t* swparams;
     snd_pcm_sw_params_alloca(&swparams);
     snd_pcm_uframes_t boundary;
-    if (AlsaBad(snd_pcm_sw_params_current(pcm_handle, swparams),
+    if (AlsaBad(snd_pcm_sw_params_current(m_pcmHandle, swparams),
                "failed to get swparams"))
         return false;
    if (AlsaBad(snd_pcm_sw_params_get_boundary(swparams, &boundary),
                "failed to get boundary"))
         return false;
     // explicit start, not auto start
-    if (AlsaBad(snd_pcm_sw_params_set_start_threshold(pcm_handle, swparams,
+    if (AlsaBad(snd_pcm_sw_params_set_start_threshold(m_pcmHandle, swparams,
                 boundary), "failed to set start threshold"))
         return false;
-    if (AlsaBad(snd_pcm_sw_params_set_stop_threshold(pcm_handle, swparams,
+    if (AlsaBad(snd_pcm_sw_params_set_stop_threshold(m_pcmHandle, swparams,
                 boundary), "failed to set stop threshold"))
         return false;
-    if (AlsaBad(snd_pcm_sw_params(pcm_handle, swparams),
+    if (AlsaBad(snd_pcm_sw_params(m_pcmHandle, swparams),
                 "failed to set software parameters"))
         return false;
 
@@ -236,14 +240,14 @@ bool AudioInputALSA::PrepSwParams(void)
 int AudioInputALSA::PcmRead(void* buf, uint nbytes)
 {
     auto* bufptr = (unsigned char*)buf;
-    snd_pcm_uframes_t to_read = snd_pcm_bytes_to_frames(pcm_handle, nbytes);
+    snd_pcm_uframes_t to_read = snd_pcm_bytes_to_frames(m_pcmHandle, nbytes);
     snd_pcm_uframes_t nframes = to_read;
     snd_pcm_sframes_t nread;
     snd_pcm_sframes_t avail;
     int retries = 0;
     while (nframes > 0 && retries < 3)
     {
-        if (AlsaBad((avail = snd_pcm_avail_update(pcm_handle)),
+        if (AlsaBad((avail = snd_pcm_avail_update(m_pcmHandle)),
                     "available update failed"))
         {
             if (!Recovery(avail))
@@ -252,7 +256,7 @@ int AudioInputALSA::PcmRead(void* buf, uint nbytes)
                 continue;
             }
         }
-        if ((nread = snd_pcm_readi(pcm_handle, bufptr, nframes)) < 0)
+        if ((nread = snd_pcm_readi(m_pcmHandle, bufptr, nframes)) < 0)
         {
             switch (nread)
             {
@@ -280,15 +284,17 @@ int AudioInputALSA::PcmRead(void* buf, uint nbytes)
         else
         {
             nframes -= nread;
-            bufptr += snd_pcm_frames_to_bytes(pcm_handle, nread);
+            bufptr += snd_pcm_frames_to_bytes(m_pcmHandle, nread);
         }
         ++retries;
     }
     if (nframes > 0)
+    {
         LOG(VB_AUDIO, LOG_ERR, LOC_DEV +
             QString("short pcm read, %1 of %2 frames, retries %3")
                 .arg(to_read - nframes).arg(to_read).arg(retries));
-    return snd_pcm_frames_to_bytes(pcm_handle, to_read - nframes);
+    }
+    return snd_pcm_frames_to_bytes(m_pcmHandle, to_read - nframes);
 }
 
 bool AudioInputALSA::Recovery(int err)
@@ -310,7 +316,7 @@ bool AudioInputALSA::Recovery(int err)
 #endif
         case -EPIPE:
         {
-            int ret = snd_pcm_prepare(pcm_handle);
+            int ret = snd_pcm_prepare(m_pcmHandle);
             if (ret < 0)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC_DEV +

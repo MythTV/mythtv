@@ -35,7 +35,7 @@ ExternalRecChannelFetcher::ExternalRecChannelFetcher(int cardid,
     : m_cardid(cardid)
     , m_command(std::move(cmd))
 {
-    m_stream_handler = ExternalStreamHandler::Get(m_command, m_cardid, m_cardid);
+    m_streamHandler = ExternalStreamHandler::Get(m_command, m_cardid, m_cardid);
 }
 
 ExternalRecChannelFetcher::~ExternalRecChannelFetcher(void)
@@ -45,19 +45,19 @@ ExternalRecChannelFetcher::~ExternalRecChannelFetcher(void)
 
 void ExternalRecChannelFetcher::Close(void)
 {
-    if (m_stream_handler)
-        ExternalStreamHandler::Return(m_stream_handler, m_cardid);
+    if (m_streamHandler)
+        ExternalStreamHandler::Return(m_streamHandler, m_cardid);
 }
 
 bool ExternalRecChannelFetcher::Valid(void) const
 {
-    if (!m_stream_handler)
+    if (!m_streamHandler)
     {
         LOG(VB_CHANNEL, LOG_ERR, LOC + "Failed to open external app.");
         return false;
     }
 
-    if (!m_stream_handler->HasTuner())
+    if (!m_streamHandler->HasTuner())
     {
         LOG(VB_CHANNEL, LOG_ERR, LOC + "External app does not have a tuner.");
         return false;
@@ -77,7 +77,7 @@ bool ExternalRecChannelFetcher::FetchChannel(const QString & cmd,
 
     QString result;
 
-    if (!m_stream_handler->ProcessCommand(cmd, result))
+    if (!m_streamHandler->ProcessCommand(cmd, result))
     {
         LOG(VB_CHANNEL, LOG_ERR, LOC + QString("%1 command failed.").arg(cmd));
         return false;
@@ -122,7 +122,7 @@ int ExternalRecChannelFetcher::LoadChannels(void)
     QString result;
     int     cnt = -1;
 
-    if (!m_stream_handler->ProcessCommand("LoadChannels", result, 50000))
+    if (!m_streamHandler->ProcessCommand("LoadChannels", result, 50000))
     {
         LOG(VB_CHANNEL, LOG_ERR, LOC + "LoadChannels command failed.");
         return -1;

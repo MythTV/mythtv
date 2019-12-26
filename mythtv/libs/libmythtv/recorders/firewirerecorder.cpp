@@ -69,7 +69,7 @@ void FirewireRecorder::run(void)
 
     {
         QMutexLocker locker(&m_pauseLock);
-        m_request_recording = true;
+        m_requestRecording = true;
         m_recording = true;
         m_recordingWait.wakeAll();
     }
@@ -87,7 +87,7 @@ void FirewireRecorder::run(void)
         {   // sleep 1 seconds unless StopRecording() or Unpause() is called,
             // just to avoid running this too often.
             QMutexLocker locker(&m_pauseLock);
-            if (!m_request_recording || m_request_pause)
+            if (!m_requestRecording || m_requestPause)
                 continue;
             m_unpauseWait.wait(&m_pauseLock, 1000);
         }
@@ -187,7 +187,7 @@ void FirewireRecorder::SetOptionsFromProfile(RecordingProfile *profile,
 bool FirewireRecorder::PauseAndWait(int timeout)
 {
     QMutexLocker locker(&m_pauseLock);
-    if (m_request_pause)
+    if (m_requestPause)
     {
         LOG(VB_RECORD, LOG_INFO, LOC +
             QString("PauseAndWait(%1) -- pause").arg(timeout));
@@ -202,7 +202,7 @@ bool FirewireRecorder::PauseAndWait(int timeout)
         m_unpauseWait.wait(&m_pauseLock, timeout);
     }
 
-    if (!m_request_pause && IsPaused(true))
+    if (!m_requestPause && IsPaused(true))
     {
         LOG(VB_RECORD, LOG_INFO, LOC +
             QString("PauseAndWait(%1) -- unpause").arg(timeout));
@@ -216,8 +216,8 @@ bool FirewireRecorder::PauseAndWait(int timeout)
 
 void FirewireRecorder::InitStreamData(void)
 {
-    m_stream_data->AddMPEGSPListener(this);
+    m_streamData->AddMPEGSPListener(this);
 
-    if (m_stream_data->DesiredProgram() >= 0)
-        m_stream_data->SetDesiredProgram(m_stream_data->DesiredProgram());
+    if (m_streamData->DesiredProgram() >= 0)
+        m_streamData->SetDesiredProgram(m_streamData->DesiredProgram());
 }

@@ -45,7 +45,7 @@ class MUI_PUBLIC MythUIVirtualKeyboard : public MythScreenType
 
   public:
     MythUIVirtualKeyboard(MythScreenStack *parentStack,  MythUITextEdit *m_parentEdit);
-    ~MythUIVirtualKeyboard() = default;
+    ~MythUIVirtualKeyboard() override = default;
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *e) override; // MythScreenType
 

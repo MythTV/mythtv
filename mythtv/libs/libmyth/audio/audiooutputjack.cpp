@@ -410,9 +410,11 @@ int AudioOutputJACK::JackCallback(jack_nframes_t nframes)
         // play silence on buffer underrun
         memset(m_auBuf + bytes_read, 0, bytes_needed - bytes_read);
         if (!m_pauseAudio)
+        {
             VBERROR(QString("Having to insert silence because GetAudioData "
                             "hasn't returned enough data. Wanted: %1 Got: %2")
                                     .arg(bytes_needed).arg(bytes_read));
+        }
     }
     // Now deinterleave audio (and convert to float)
     DeinterleaveAudio((float*)m_auBuf, bufs, nframes, m_chanVolumes);

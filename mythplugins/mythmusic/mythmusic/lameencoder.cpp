@@ -101,7 +101,7 @@ int LameEncoder::init_encoder(lame_global_flags *gf, int quality, bool vbr)
 LameEncoder::LameEncoder(const QString &outfile, int qualitylevel,
                          MusicMetadata *metadata, bool vbr) :
     Encoder(outfile, qualitylevel, metadata),
-    m_mp3buf(new char[m_mp3buf_size]),
+    m_mp3Buf(new char[m_mp3BufSize]),
     m_gf(lame_init())
 {
     init_id3tags(m_gf);
@@ -124,7 +124,7 @@ LameEncoder::~LameEncoder()
         lame_mp3_tags_fid (m_gf, m_out);
     if (m_gf)
         lame_close(m_gf);
-    delete[] m_mp3buf;
+    delete[] m_mp3Buf;
 
     // Need to close the file here.
     if (m_out)
@@ -144,19 +144,19 @@ int LameEncoder::addSamples(int16_t * bytes, unsigned int length)
 {
     int lameret = 0;
 
-    m_samples_per_channel = length / m_bytes_per_sample;
+    m_samplesPerChannel = length / m_bytesPerSample;
 
     if (length > 0)
     {
         lameret = lame_encode_buffer_interleaved(m_gf, bytes,
-                                                 m_samples_per_channel,
-                                                 (unsigned char *)m_mp3buf,
-                                                 m_mp3buf_size);
+                                                 m_samplesPerChannel,
+                                                 (unsigned char *)m_mp3Buf,
+                                                 m_mp3BufSize);
     }
     else
     {
-        lameret = lame_encode_flush(m_gf, (unsigned char *)m_mp3buf,
-                                          m_mp3buf_size);
+        lameret = lame_encode_flush(m_gf, (unsigned char *)m_mp3Buf,
+                                          m_mp3BufSize);
     }
 
     if (lameret < 0)
@@ -165,7 +165,7 @@ int LameEncoder::addSamples(int16_t * bytes, unsigned int length)
     } 
     else if (lameret > 0 && m_out)
     {
-        if (write_buffer(m_mp3buf, lameret, m_out) != lameret)
+        if (write_buffer(m_mp3Buf, lameret, m_out) != lameret)
         {
             LOG(VB_GENERAL, LOG_ERR, "Failed to write mp3 data. Aborting.");
             return EENCODEERROR;

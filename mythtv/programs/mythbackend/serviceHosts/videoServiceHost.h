@@ -51,9 +51,7 @@ class VideoServiceHost : public ServiceHost
         {
         }
 
-        virtual ~VideoServiceHost()
-        {
-        }
+        ~VideoServiceHost() override = default;
 };
 
 #endif

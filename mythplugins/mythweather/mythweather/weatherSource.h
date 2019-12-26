@@ -45,7 +45,7 @@ class WeatherSource : public QObject
     static bool ProbeInfo(ScriptInfo &scriptInfo);
 
     explicit WeatherSource(ScriptInfo *info);
-    ~WeatherSource();
+    ~WeatherSource() override;
 
     bool isReady() { return m_ready; }
     QString getVersion() { return m_info->version; }

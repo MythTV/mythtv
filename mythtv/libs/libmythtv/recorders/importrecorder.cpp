@@ -95,7 +95,7 @@ void ImportRecorder::run(void)
 
     {
         QMutexLocker locker(&m_pauseLock);
-        m_request_recording = true;
+        m_requestRecording = true;
         m_recording = true;
         m_recordingWait.wakeAll();
     }
@@ -109,14 +109,14 @@ void ImportRecorder::run(void)
     {   // sleep 250 milliseconds unless StopRecording() or Unpause()
         // is called, just to avoid running this loop too often.
         QMutexLocker locker(&m_pauseLock);
-        if (m_request_recording)
+        if (m_requestRecording)
             m_unpauseWait.wait(&m_pauseLock, 15000);
     }
 
     m_curRecording->SaveFilesize(m_ringBuffer->GetRealFileSize());
 
     // build seek table
-    if (m_import_fd && IsRecordingRequested() && !IsErrored())
+    if (m_importFd && IsRecordingRequested() && !IsErrored())
     {
         auto *cfp =
             new MythCommFlagPlayer((PlayerFlags)(kAudioMuted | kVideoIsNull | kNoITV));
@@ -157,7 +157,7 @@ void ImportRecorder::run(void)
 
 bool ImportRecorder::Open(void)
 {
-    if (m_import_fd >= 0)   // already open
+    if (m_importFd >= 0)   // already open
         return true;
 
     if (!m_curRecording)
@@ -224,21 +224,21 @@ bool ImportRecorder::Open(void)
         return false;
     }
 
-    m_import_fd = open(fn.toLocal8Bit().constData(), O_RDONLY);
-    if (m_import_fd < 0)
+    m_importFd = open(fn.toLocal8Bit().constData(), O_RDONLY);
+    if (m_importFd < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Couldn't open '%1'").arg(fn) + ENO);
     }
 
-    return m_import_fd >= 0;
+    return m_importFd >= 0;
 }
 
 void ImportRecorder::Close(void)
 {
-    if (m_import_fd >= 0)
+    if (m_importFd >= 0)
     {
-        close(m_import_fd);
-        m_import_fd = -1;
+        close(m_importFd);
+        m_importFd = -1;
     }
 }

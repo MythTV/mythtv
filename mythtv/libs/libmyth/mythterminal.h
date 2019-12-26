@@ -34,14 +34,14 @@ class MPUBLIC MythTerminal : public MythScreenType
     void Start(void);
     void Kill(void);
     bool IsDone(void) const;
-    void AddText(const QString&);
+    void AddText(const QString& _str);
 
   protected slots:
     void ProcessHasText(void); // connected to from process' readyRead signal
     void ProcessFinished(int exitCode, QProcess::ExitStatus exitStatus);
 
   protected:
-    virtual ~MythTerminal() { TeardownAll(); }
+    ~MythTerminal() override { TeardownAll(); }
     void TeardownAll(void);
 
     mutable QMutex         m_lock        {QMutex::Recursive};

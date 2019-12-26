@@ -51,7 +51,7 @@ class MHIContext : public MHContext, public QRunnable
 {
   public:
     explicit MHIContext(InteractiveTV *parent);
-    virtual ~MHIContext();
+    ~MHIContext() override;
 
     void QueueDSMCCPacket(unsigned char *data, int length, int componentTag,
         unsigned carouselId, int dataBroadcastId);
@@ -135,9 +135,9 @@ class MHIContext : public MHContext, public QRunnable
     // Get current stream size, -1 if unknown
     long GetStreamMaxPos() override; // MHContext
     // Set current stream position
-    long SetStreamPos(long) override; // MHContext
+    long SetStreamPos(long pos) override; // MHContext
     // Play or pause a stream
-    void StreamPlay(bool) override; // MHContext
+    void StreamPlay(bool play) override; // MHContext
 
     // Get the context id strings.  The format of these strings is specified
     // by the UK MHEG profile.
@@ -153,20 +153,20 @@ class MHIContext : public MHContext, public QRunnable
     // Operations used by the display classes
     // Add an item to the display vector
     void AddToDisplay(const QImage &image, const QRect &rect, bool bUnder = false);
-    int ScaleX(int, bool roundup = false) const;
-    int ScaleY(int, bool roundup = false) const;
+    int ScaleX(int n, bool roundup = false) const;
+    int ScaleY(int n, bool roundup = false) const;
     QRect Scale(const QRect &r) const;
-    int ScaleVideoX(int, bool roundup = false) const;
-    int ScaleVideoY(int, bool roundup = false) const;
+    int ScaleVideoX(int n, bool roundup = false) const;
+    int ScaleVideoY(int n, bool roundup = false) const;
     QRect ScaleVideo(const QRect &r) const;
 
     FT_Face GetFontFace(void) { return m_face; }
-    bool IsFaceLoaded(void) { return m_face_loaded; }
+    bool IsFaceLoaded(void) { return m_faceLoaded; }
     bool LoadFont(const QString& name);
     bool ImageUpdated(void) { return m_updated; }
 
-    static const int StdDisplayWidth = 720;
-    static const int StdDisplayHeight = 576;
+    static const int kStdDisplayWidth = 720;
+    static const int kStdDisplayHeight = 576;
 
   protected:
     void run(void) override; // QRunnable
@@ -197,13 +197,13 @@ class MHIContext : public MHContext, public QRunnable
     mutable QMutex   m_runLock;
     QWaitCondition   m_engine_wait; // protected by m_runLock
     bool             m_stop           {false}; // protected by m_runLock
-    QMutex           m_display_lock;
+    QMutex           m_displayLock;
     bool             m_updated        {false};
 
     list<MHIImageData*> m_display; // List of items to display
 
     FT_Face          m_face           {nullptr};
-    bool             m_face_loaded    {false};
+    bool             m_faceLoaded     {false};
 
     MThread         *m_engineThread   {nullptr};
 
@@ -214,7 +214,7 @@ class MHIContext : public MHContext, public QRunnable
 
     int              m_audioTag       {-1};
     int              m_videoTag       {-1};
-    QList<int>       m_tuneinfo;
+    QList<int>       m_tuneInfo;
 
     uint             m_lastNbiVersion {NBI_VERSION_UNSET};
     vector<unsigned char> m_nbiData;
@@ -240,11 +240,11 @@ class MHIText : public MHTextDisplay
   public:
     explicit MHIText(MHIContext *parent)
         : m_parent(parent) {}
-    virtual ~MHIText() = default;
+    ~MHIText() override = default;
 
     void Draw(int x, int y) override; // MHTextDisplay
     void Clear(void) override; // MHTextDisplay
-    void AddText(int x, int y, const QString &, MHRgba colour) override; // MHTextDisplay
+    void AddText(int x, int y, const QString &str, MHRgba colour) override; // MHTextDisplay
 
     void SetSize(int width, int height) override; // MHTextDisplay
     void SetFont(int size, bool isBold, bool isItalic) override; // MHTextDisplay
@@ -254,7 +254,7 @@ class MHIText : public MHTextDisplay
   public:
     MHIContext *m_parent     {nullptr};
     QImage      m_image;
-    int         m_fontsize   {12};
+    int         m_fontSize   {12};
     bool        m_fontItalic {false};
     bool        m_fontBold   {false};
     int         m_width      {0};
@@ -272,7 +272,7 @@ class MHIBitmap : public MHBitmapDisplay
 
   public:
     MHIBitmap(MHIContext *parent, bool tiled);
-    virtual ~MHIBitmap();
+    ~MHIBitmap() override;
 
     /// Create bitmap from PNG
     void CreateFromPNG(const unsigned char *data, int length) override; // MHBitmapDisplay

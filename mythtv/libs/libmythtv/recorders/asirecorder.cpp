@@ -41,8 +41,8 @@ ASIRecorder::ASIRecorder(TVRec *rec, ASIChannel *channel) :
         // MPTS only.  Use TSStreamData to write out unfiltered data
         LOG(VB_RECORD, LOG_INFO, LOC + "Using TSStreamData");
         SetStreamData(new TSStreamData(m_tvrec ? m_tvrec->GetInputId() : -1));
-        m_record_mpts_only = true;
-        m_record_mpts = false;
+        m_recordMptsOnly = true;
+        m_recordMpts = false;
     }
     else
     {
@@ -50,7 +50,7 @@ ASIRecorder::ASIRecorder(TVRec *rec, ASIChannel *channel) :
         SetStreamData(new MPEGStreamData(-1, rec ? rec->GetInputId() : -1,
                                          false));
         if (channel->GetProgramNumber() < 0 || !channel->GetMinorChannel())
-            m_stream_data->SetListeningDisabled(true);
+            m_streamData->SetListeningDisabled(true);
     }
 }
 
@@ -68,14 +68,14 @@ void ASIRecorder::SetOptionsFromProfile(RecordingProfile *profile,
 
 void ASIRecorder::StartNewFile(void)
 {
-    if (!m_record_mpts_only)
+    if (!m_recordMptsOnly)
     {
-        if (m_record_mpts)
-            m_stream_handler->AddNamedOutputFile(m_ringBuffer->GetFilename());
+        if (m_recordMpts)
+            m_streamHandler->AddNamedOutputFile(m_ringBuffer->GetFilename());
 
         // Make sure the first things in the file are a PAT & PMT
-        HandleSingleProgramPAT(m_stream_data->PATSingleProgram(), true);
-        HandleSingleProgramPMT(m_stream_data->PMTSingleProgram(), true);
+        HandleSingleProgramPAT(m_streamData->PATSingleProgram(), true);
+        HandleSingleProgramPMT(m_streamData->PMTSingleProgram(), true);
     }
 }
 
@@ -89,7 +89,7 @@ void ASIRecorder::run(void)
         return;
     }
 
-    if (!m_stream_data)
+    if (!m_streamData)
     {
         m_error = "MPEGStreamData pointer has not been set";
         LOG(VB_GENERAL, LOG_ERR, LOC + m_error);
@@ -99,7 +99,7 @@ void ASIRecorder::run(void)
 
     {
         QMutexLocker locker(&m_pauseLock);
-        m_request_recording = true;
+        m_requestRecording = true;
         m_recording = true;
         m_recordingWait.wakeAll();
     }
@@ -108,22 +108,22 @@ void ASIRecorder::run(void)
     {
         const ProgramAssociationTable *pat = m_channel->GetGeneratedPAT();
         const ProgramMapTable         *pmt = m_channel->GetGeneratedPMT();
-        m_stream_data->Reset(pat->ProgramNumber(0));
-        m_stream_data->HandleTables(MPEG_PAT_PID, *pat);
-        m_stream_data->HandleTables(pat->ProgramPID(0), *pmt);
+        m_streamData->Reset(pat->ProgramNumber(0));
+        m_streamData->HandleTables(MPEG_PAT_PID, *pat);
+        m_streamData->HandleTables(pat->ProgramPID(0), *pmt);
     }
 
     // Listen for time table on DVB standard streams
     if (m_channel && (m_channel->GetSIStandard() == "dvb"))
-        m_stream_data->AddListeningPID(DVB_TDT_PID);
+        m_streamData->AddListeningPID(DVB_TDT_PID);
 
     StartNewFile();
 
-    m_stream_data->AddAVListener(this);
-    m_stream_data->AddWritingListener(this);
-    m_stream_handler->AddListener(
-        m_stream_data, false, true,
-        (m_record_mpts) ? m_ringBuffer->GetFilename() : QString());
+    m_streamData->AddAVListener(this);
+    m_streamData->AddWritingListener(this);
+    m_streamHandler->AddListener(
+        m_streamData, false, true,
+        (m_recordMpts) ? m_ringBuffer->GetFilename() : QString());
 
     while (IsRecordingRequested() && !IsErrored())
     {
@@ -133,12 +133,12 @@ void ASIRecorder::run(void)
         {   // sleep 100 milliseconds unless StopRecording() or Unpause()
             // is called, just to avoid running this too often.
             QMutexLocker locker(&m_pauseLock);
-            if (!m_request_recording || m_request_pause)
+            if (!m_requestRecording || m_requestPause)
                 continue;
             m_unpauseWait.wait(&m_pauseLock, 100);
         }
 
-        if (!m_input_pmt && !m_record_mpts_only)
+        if (!m_inputPmt && !m_recordMptsOnly)
         {
             LOG(VB_GENERAL, LOG_WARNING, LOC +
                 "Recording will not commence until a PMT is set.");
@@ -146,16 +146,16 @@ void ASIRecorder::run(void)
             continue;
         }
 
-        if (!m_stream_handler->IsRunning())
+        if (!m_streamHandler->IsRunning())
         {
             m_error = "Stream handler died unexpectedly.";
             LOG(VB_GENERAL, LOG_ERR, LOC + m_error);
         }
     }
 
-    m_stream_handler->RemoveListener(m_stream_data);
-    m_stream_data->RemoveWritingListener(this);
-    m_stream_data->RemoveAVListener(this);
+    m_streamHandler->RemoveListener(m_streamData);
+    m_streamData->RemoveWritingListener(this);
+    m_streamData->RemoveAVListener(this);
 
     Close();
 
@@ -176,7 +176,7 @@ bool ASIRecorder::Open(void)
 
     ResetForNewFile();
 
-    m_stream_handler = ASIStreamHandler::Get(m_channel->GetDevice(),
+    m_streamHandler = ASIStreamHandler::Get(m_channel->GetDevice(),
                                              m_tvrec ? m_tvrec->GetInputId() : -1);
 
 
@@ -187,7 +187,7 @@ bool ASIRecorder::Open(void)
 
 bool ASIRecorder::IsOpen(void) const
 {
-    return m_stream_handler;
+    return m_streamHandler;
 }
 
 void ASIRecorder::Close(void)
@@ -195,7 +195,7 @@ void ASIRecorder::Close(void)
     LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- begin");
 
     if (IsOpen())
-        ASIStreamHandler::Return(m_stream_handler,
+        ASIStreamHandler::Return(m_streamHandler,
                                  m_tvrec ? m_tvrec->GetInputId() : -1);
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- end");

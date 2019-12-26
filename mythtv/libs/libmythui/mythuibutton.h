@@ -23,7 +23,7 @@ class MUI_PUBLIC MythUIButton : public MythUIType
     Q_OBJECT
   public:
     MythUIButton(MythUIType *parent, const QString &name);
-   ~MythUIButton();
+   ~MythUIButton() override;
 
     void Reset(void) override; // MythUIType
 

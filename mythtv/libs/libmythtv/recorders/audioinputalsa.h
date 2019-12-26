@@ -35,20 +35,20 @@ class AudioInputALSA : public AudioInput
   public:
     explicit AudioInputALSA(const QString &device)
         : AudioInput(device)
-        , alsa_device(device.right(device.size()-5).toLatin1()) {}
-    ~AudioInputALSA() { Close(); };
+        , m_alsaDevice(device.right(device.size()-5).toLatin1()) {}
+    ~AudioInputALSA() override { Close(); };
 
     bool Open(uint sample_bits, uint sample_rate, uint channels) override; // AudioInput
     inline bool IsOpen(void) override // AudioInput
-        { return (pcm_handle != nullptr); }
+        { return (m_pcmHandle != nullptr); }
     void Close(void) override; // AudioInput
 
     bool Start(void) override // AudioInput
-        { return (pcm_handle != nullptr); }
+        { return (m_pcmHandle != nullptr); }
     bool Stop(void) override; // AudioInput
 
     inline int GetBlockSize(void) override // AudioInput
-        { return myth_block_bytes; };
+        { return m_mythBlockBytes; };
     int GetSamples(void* buf, uint nbytes) override; // AudioInput
     int GetNumReadyBytes(void) override; // AudioInput
 
@@ -59,10 +59,10 @@ class AudioInputALSA : public AudioInput
     bool Recovery(int err);
     bool AlsaBad(int op_result, const QString& errmsg);
 
-    QByteArray          alsa_device;
-    snd_pcm_t*          pcm_handle       {nullptr};
-    snd_pcm_uframes_t   period_size      {0};
-    int                 myth_block_bytes {0};
+    QByteArray          m_alsaDevice;
+    snd_pcm_t*          m_pcmHandle      {nullptr};
+    snd_pcm_uframes_t   m_periodSize     {0};
+    int                 m_mythBlockBytes {0};
 };
 #endif /* _AUDIOINPUTALSA_H_ */
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

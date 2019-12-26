@@ -12,7 +12,7 @@ using namespace std;
 #include "ringbuffer.h"
 #include "eithelper.h"
 
-#define LOC QString("ATSCStream[%1]: ").arg(_cardid)
+#define LOC QString("ATSCStream[%1]: ").arg(m_cardId)
 
 /** \class ATSCStreamData
  *  \brief Encapsulates data about ATSC stream and emits events for most tables.
@@ -36,12 +36,8 @@ ATSCStreamData::ATSCStreamData(int desiredMajorChannel,
                                int desiredMinorChannel,
                                int cardnum, bool cacheTables)
     : MPEGStreamData(-1, cardnum, cacheTables),
-      _GPS_UTC_offset(GPS_LEAP_SECONDS),
-      _atsc_eit_reset(false),
-      _mgt_version(-1),
-      _cached_mgt(nullptr),
-      _desired_major_channel(desiredMajorChannel),
-      _desired_minor_channel(desiredMinorChannel)
+      m_desiredMajorChannel(desiredMajorChannel),
+      m_desiredMinorChannel(desiredMinorChannel)
 {
     AddListeningPID(ATSC_PSIP_PID);
     AddListeningPID(SCTE_PSIP_PID);
@@ -51,13 +47,13 @@ ATSCStreamData::~ATSCStreamData()
 {
     Reset(-1,-1);
 
-    QMutexLocker locker(&_listener_lock);
-    _atsc_main_listeners.clear();
-    _atsc_aux_listeners.clear();
-    _atsc_eit_listeners.clear();
+    QMutexLocker locker(&m_listenerLock);
+    m_atscMainListeners.clear();
+    m_atscAuxListeners.clear();
+    m_atscEitListeners.clear();
 
-    _scte_main_listeners.clear();
-    _atsc81_eit_listeners.clear();
+    m_scteMainlisteners.clear();
+    m_atsc81EitListeners.clear();
 }
 
 void ATSCStreamData::SetDesiredChannel(int major, int minor)
@@ -86,8 +82,8 @@ void ATSCStreamData::SetDesiredChannel(int major, int minor)
 
         if (chan_idx >= 0)
         {
-            _desired_major_channel = major;
-            _desired_minor_channel = minor;
+            m_desiredMajorChannel = major;
+            m_desiredMinorChannel = minor;
 
             ProcessMGT(mgt);
 
@@ -121,34 +117,34 @@ void ATSCStreamData::Reset(int desiredProgram)
 
 void ATSCStreamData::Reset(int desiredMajorChannel, int desiredMinorChannel)
 {
-    _desired_major_channel = desiredMajorChannel;
-    _desired_minor_channel = desiredMinorChannel;
+    m_desiredMajorChannel = desiredMajorChannel;
+    m_desiredMinorChannel = desiredMinorChannel;
 
     MPEGStreamData::Reset(-1);
-    _mgt_version = -1;
-    _tvct_version.clear();
-    _cvct_version.clear();
-    _eit_status.clear();
+    m_mgtVersion = -1;
+    m_tvctVersion.clear();
+    m_cvctVersion.clear();
+    m_eitStatus.clear();
 
-    _sourceid_to_atsc_maj_min.clear();
-    _atsc_eit_pids.clear();
-    _atsc_ett_pids.clear();
+    m_sourceIdToAtscMajMin.clear();
+    m_atscEitPids.clear();
+    m_atscEttPids.clear();
 
     {
-        QMutexLocker locker(&_cache_lock);
+        QMutexLocker locker(&m_cacheLock);
 
-        DeleteCachedTable(_cached_mgt);
-        _cached_mgt = nullptr;
+        DeleteCachedTable(m_cachedMgt);
+        m_cachedMgt = nullptr;
 
-        tvct_cache_t::iterator tit = _cached_tvcts.begin();
-        for (; tit != _cached_tvcts.end(); ++tit)
+        tvct_cache_t::iterator tit = m_cachedTvcts.begin();
+        for (; tit != m_cachedTvcts.end(); ++tit)
             DeleteCachedTable(*tit);
-        _cached_tvcts.clear();
+        m_cachedTvcts.clear();
 
-        cvct_cache_t::iterator cit = _cached_cvcts.begin();
-        for (; cit != _cached_cvcts.end(); ++cit)
+        cvct_cache_t::iterator cit = m_cachedCvcts.begin();
+        for (; cit != m_cachedCvcts.end(); ++cit)
             DeleteCachedTable(*cit);
-        _cached_cvcts.clear();
+        m_cachedCvcts.clear();
     }
 
     AddListeningPID(ATSC_PSIP_PID);
@@ -172,7 +168,7 @@ bool ATSCStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
     if (TableID::EIT == table_id)
     {
         uint key = (pid<<16) | psip.TableIDExtension();
-        return _eit_status.IsSectionSeen(key, version, psip.Section());
+        return m_eitStatus.IsSectionSeen(key, version, psip.Section());
     }
 
     if (TableID::ETT == table_id)
@@ -225,7 +221,7 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
         case TableID::MGT:
         {
             SetVersionMGT(version);
-            if (_cache_tables)
+            if (m_cacheTables)
             {
                 auto *mgt = new MasterGuideTable(psip);
                 CacheMGT(mgt);
@@ -242,7 +238,7 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
         {
             uint tsid = psip.TableIDExtension();
             SetVersionTVCT(tsid, version);
-            if (_cache_tables)
+            if (m_cacheTables)
             {
                 auto *vct = new TerrestrialVirtualChannelTable(psip);
                 CacheTVCT(pid, vct);
@@ -259,7 +255,7 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
         {
             uint tsid = psip.TableIDExtension();
             SetVersionCVCT(tsid, version);
-            if (_cache_tables)
+            if (m_cacheTables)
             {
                 auto *vct = new CableVirtualChannelTable(psip);
                 CacheCVCT(pid, vct);
@@ -277,27 +273,27 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
             uint region = psip.TableIDExtension();
             SetVersionRRT(region, version);
             RatingRegionTable rrt(psip);
-            QMutexLocker locker(&_listener_lock);
-            for (size_t i = 0; i < _atsc_aux_listeners.size(); i++)
-                _atsc_aux_listeners[i]->HandleRRT(&rrt);
+            QMutexLocker locker(&m_listenerLock);
+            for (size_t i = 0; i < m_atscAuxListeners.size(); i++)
+                m_atscAuxListeners[i]->HandleRRT(&rrt);
             return true;
         }
         case TableID::EIT:
         {
-            QMutexLocker locker(&_listener_lock);
-            if (_atsc_eit_listeners.empty() && !_eit_helper)
+            QMutexLocker locker(&m_listenerLock);
+            if (m_atscEitListeners.empty() && !m_eitHelper)
                 return true;
 
             uint key = (pid<<16) | psip.TableIDExtension();
-            _eit_status.SetSectionSeen(key, version, psip.Section(), psip.LastSection());
+            m_eitStatus.SetSectionSeen(key, version, psip.Section(), psip.LastSection());
 
             EventInformationTable eit(psip);
-            for (size_t i = 0; i < _atsc_eit_listeners.size(); i++)
-                _atsc_eit_listeners[i]->HandleEIT(pid, &eit);
+            for (size_t i = 0; i < m_atscEitListeners.size(); i++)
+                m_atscEitListeners[i]->HandleEIT(pid, &eit);
 
             const uint mm = GetATSCMajorMinor(eit.SourceID());
-            if (mm && _eit_helper)
-                _eit_helper->AddEIT(mm >> 16, mm & 0xffff, &eit);
+            if (mm && m_eitHelper)
+                m_eitHelper->AddEIT(mm >> 16, mm & 0xffff, &eit);
 
             return true;
         }
@@ -305,15 +301,15 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
         {
             ExtendedTextTable ett(psip);
 
-            QMutexLocker locker(&_listener_lock);
-            for (size_t i = 0; i < _atsc_eit_listeners.size(); i++)
-                _atsc_eit_listeners[i]->HandleETT(pid, &ett);
+            QMutexLocker locker(&m_listenerLock);
+            for (size_t i = 0; i < m_atscEitListeners.size(); i++)
+                m_atscEitListeners[i]->HandleETT(pid, &ett);
 
-            if (ett.IsEventETM() && _eit_helper) // Guide ETTs
+            if (ett.IsEventETM() && m_eitHelper) // Guide ETTs
             {
                 const uint mm = GetATSCMajorMinor(ett.SourceID());
                 if (mm)
-                    _eit_helper->AddETT(mm >> 16, mm & 0xffff, &ett);
+                    m_eitHelper->AddETT(mm >> 16, mm & 0xffff, &ett);
             }
 
             return true;
@@ -325,16 +321,16 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
             UpdateTimeOffset(stt.UTCUnix());
 
             // only update internal offset if it changes
-            if (stt.GPSOffset() != _GPS_UTC_offset)
-                _GPS_UTC_offset = stt.GPSOffset();
+            if (stt.GPSOffset() != m_gpsUtcOffset)
+                m_gpsUtcOffset = stt.GPSOffset();
 
-            _listener_lock.lock();
-            for (size_t i = 0; i < _atsc_main_listeners.size(); i++)
-                _atsc_main_listeners[i]->HandleSTT(&stt);
-            _listener_lock.unlock();
+            m_listenerLock.lock();
+            for (size_t i = 0; i < m_atscMainListeners.size(); i++)
+                m_atscMainListeners[i]->HandleSTT(&stt);
+            m_listenerLock.unlock();
 
-            if (_eit_helper && GPSOffset() != _eit_helper->GetGPSOffset())
-                _eit_helper->SetGPSOffset(GPSOffset());
+            if (m_eitHelper && GPSOffset() != m_eitHelper->GetGPSOffset())
+                m_eitHelper->SetGPSOffset(GPSOffset());
 
             return true;
         }
@@ -342,9 +338,9 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
         {
             DirectedChannelChangeTable dcct(psip);
 
-            QMutexLocker locker(&_listener_lock);
-            for (size_t i = 0; i < _atsc_aux_listeners.size(); i++)
-                _atsc_aux_listeners[i]->HandleDCCT(&dcct);
+            QMutexLocker locker(&m_listenerLock);
+            for (size_t i = 0; i < m_atscAuxListeners.size(); i++)
+                m_atscAuxListeners[i]->HandleDCCT(&dcct);
 
             return true;
         }
@@ -352,9 +348,9 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
         {
             DirectedChannelChangeSelectionCodeTable dccsct(psip);
 
-            QMutexLocker locker(&_listener_lock);
-            for (size_t i = 0; i < _atsc_aux_listeners.size(); i++)
-                _atsc_aux_listeners[i]->HandleDCCSCT(&dccsct);
+            QMutexLocker locker(&m_listenerLock);
+            for (size_t i = 0; i < m_atscAuxListeners.size(); i++)
+                m_atscAuxListeners[i]->HandleDCCSCT(&dccsct);
 
             return true;
         }
@@ -364,9 +360,9 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
         {
             AggregateEventInformationTable aeit(psip);
 
-            QMutexLocker locker(&_listener_lock);
-            for (size_t i = 0; i < _atsc81_eit_listeners.size(); i++)
-                _atsc81_eit_listeners[i]->HandleAEIT(pid, &aeit);
+            QMutexLocker locker(&m_listenerLock);
+            for (size_t i = 0; i < m_atsc81EitListeners.size(); i++)
+                m_atsc81EitListeners[i]->HandleAEIT(pid, &aeit);
 
             return true;
         }
@@ -374,9 +370,9 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
         {
             AggregateExtendedTextTable aett(psip);
 
-            QMutexLocker locker(&_listener_lock);
-            for (size_t i = 0; i < _atsc81_eit_listeners.size(); i++)
-                _atsc81_eit_listeners[i]->HandleAETT(pid, &aett);
+            QMutexLocker locker(&m_listenerLock);
+            for (size_t i = 0; i < m_atsc81EitListeners.size(); i++)
+                m_atsc81EitListeners[i]->HandleAETT(pid, &aett);
 
             return true;
         }
@@ -386,9 +382,9 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
         {
             SCTENetworkInformationTable nit(psip);
 
-            QMutexLocker locker(&_listener_lock);
-            for (size_t i = 0; i < _scte_main_listeners.size(); i++)
-                _scte_main_listeners[i]->HandleNIT(&nit);
+            QMutexLocker locker(&m_listenerLock);
+            for (size_t i = 0; i < m_scteMainlisteners.size(); i++)
+                m_scteMainlisteners[i]->HandleNIT(&nit);
 
             return true;
         }
@@ -396,9 +392,9 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
         {
             NetworkTextTable ntt(psip);
 
-            QMutexLocker locker(&_listener_lock);
-            for (size_t i = 0; i < _scte_main_listeners.size(); i++)
-                _scte_main_listeners[i]->HandleNTT(&ntt);
+            QMutexLocker locker(&m_listenerLock);
+            for (size_t i = 0; i < m_scteMainlisteners.size(); i++)
+                m_scteMainlisteners[i]->HandleNTT(&ntt);
 
             return true;
         }
@@ -406,9 +402,9 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
         {
             ShortVirtualChannelTable svct(psip);
 
-            QMutexLocker locker(&_listener_lock);
-            for (size_t i = 0; i < _scte_main_listeners.size(); i++)
-                _scte_main_listeners[i]->HandleSVCT(&svct);
+            QMutexLocker locker(&m_listenerLock);
+            for (size_t i = 0; i < m_scteMainlisteners.size(); i++)
+                m_scteMainlisteners[i]->HandleSVCT(&svct);
 
             return true;
         }
@@ -416,9 +412,9 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
         {
             SCTESystemTimeTable stt(psip);
 
-            QMutexLocker locker(&_listener_lock);
-            for (size_t i = 0; i < _scte_main_listeners.size(); i++)
-                _scte_main_listeners[i]->HandleSTT(&stt);
+            QMutexLocker locker(&m_listenerLock);
+            for (size_t i = 0; i < m_scteMainlisteners.size(); i++)
+                m_scteMainlisteners[i]->HandleSTT(&stt);
 
             return true;
         }
@@ -428,9 +424,9 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
         {
             ProgramInformationMessageTable pim(psip);
 
-            QMutexLocker locker(&_listener_lock);
-            for (size_t i = 0; i < _scte_main_listeners.size(); i++)
-                _scte_main_listeners[i]->HandlePIM(&pim);
+            QMutexLocker locker(&m_listenerLock);
+            for (size_t i = 0; i < m_scteMainlisteners.size(); i++)
+                m_scteMainlisteners[i]->HandlePIM(&pim);
 
             return true;
         }
@@ -439,9 +435,9 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
         {
             ProgramNameMessageTable pnm(psip);
 
-            QMutexLocker locker(&_listener_lock);
-            for (size_t i = 0; i < _scte_main_listeners.size(); i++)
-                _scte_main_listeners[i]->HandlePNM(&pnm);
+            QMutexLocker locker(&m_listenerLock);
+            for (size_t i = 0; i < m_scteMainlisteners.size(); i++)
+                m_scteMainlisteners[i]->HandlePNM(&pnm);
 
             return true;
         }
@@ -451,9 +447,9 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
         {
             AggregateDataEventTable adet(psip);
 
-            QMutexLocker locker(&_listener_lock);
-            for (size_t i = 0; i < _scte_main_listeners.size(); i++)
-                _scte_main_listeners[i]->HandleADET(&adet);
+            QMutexLocker locker(&m_listenerLock);
+            for (size_t i = 0; i < m_scteMainlisteners.size(); i++)
+                m_scteMainlisteners[i]->HandleADET(&adet);
 
             return true;
         }
@@ -485,35 +481,35 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
 
 bool ATSCStreamData::HasEITPIDChanges(const uint_vec_t &in_use_pids) const
 {
-    QMutexLocker locker(&_listener_lock);
-    uint eit_count = (uint) round(_atsc_eit_pids.size() * _eit_rate);
-    uint ett_count = (uint) round(_atsc_ett_pids.size() * _eit_rate);
-    return (in_use_pids.size() != (eit_count + ett_count) || _atsc_eit_reset);
+    QMutexLocker locker(&m_listenerLock);
+    uint eit_count = (uint) round(m_atscEitPids.size() * m_eitRate);
+    uint ett_count = (uint) round(m_atscEttPids.size() * m_eitRate);
+    return (in_use_pids.size() != (eit_count + ett_count) || m_atscEitReset);
 }
 
 bool ATSCStreamData::GetEITPIDChanges(const uint_vec_t &cur_pids,
                                       uint_vec_t &add_pids,
                                       uint_vec_t &del_pids) const
 {
-    QMutexLocker locker(&_listener_lock);
+    QMutexLocker locker(&m_listenerLock);
 
-    _atsc_eit_reset = false;
+    m_atscEitReset = false;
 
-    uint eit_count = (uint) round(_atsc_eit_pids.size() * _eit_rate);
-    uint ett_count = (uint) round(_atsc_ett_pids.size() * _eit_rate);
+    uint eit_count = (uint) round(m_atscEitPids.size() * m_eitRate);
+    uint ett_count = (uint) round(m_atscEttPids.size() * m_eitRate);
 
 #if 0
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("eit size: %1, rate: %2, cnt: %3")
-            .arg(_atsc_eit_pids.size()).arg(_eit_rate).arg(eit_count));
+            .arg(m_atscEitPids.size()).arg(m_eitRate).arg(eit_count));
 #endif
 
     uint_vec_t add_pids_tmp;
-    atsc_eit_pid_map_t::const_iterator it = _atsc_eit_pids.begin();
-    for (uint i = 0; it != _atsc_eit_pids.end() && (i < eit_count); (++it),(i++))
+    atsc_eit_pid_map_t::const_iterator it = m_atscEitPids.begin();
+    for (uint i = 0; it != m_atscEitPids.end() && (i < eit_count); (++it),(i++))
         add_pids_tmp.push_back(*it);
 
-    atsc_ett_pid_map_t::const_iterator it2 = _atsc_ett_pids.begin();
-    for (uint i = 0; it2 != _atsc_ett_pids.end() && (i < ett_count); (++it2),(i++))
+    atsc_ett_pid_map_t::const_iterator it2 = m_atscEttPids.begin();
+    for (uint i = 0; it2 != m_atscEttPids.end() && (i < ett_count); (++it2),(i++))
         add_pids_tmp.push_back(*it2);
 
     uint_vec_t::const_iterator it3;
@@ -536,11 +532,11 @@ bool ATSCStreamData::GetEITPIDChanges(const uint_vec_t &cur_pids,
 
 void ATSCStreamData::ProcessMGT(const MasterGuideTable *mgt)
 {
-    QMutexLocker locker(&_listener_lock);
+    QMutexLocker locker(&m_listenerLock);
 
-    _atsc_eit_reset = true;
-    _atsc_eit_pids.clear();
-    _atsc_ett_pids.clear();
+    m_atscEitReset = true;
+    m_atscEitPids.clear();
+    m_atscEttPids.clear();
 
     for (uint i = 0 ; i < mgt->TableCount(); i++)
     {
@@ -550,25 +546,25 @@ void ATSCStreamData::ProcessMGT(const MasterGuideTable *mgt)
         if (table_class == TableClass::EIT)
         {
             const uint num = mgt->TableType(i) - 0x100;
-            _atsc_eit_pids[num] = pid;
+            m_atscEitPids[num] = pid;
         }
         else if (table_class == TableClass::ETTe)
         {
             const uint num = mgt->TableType(i) - 0x200;
-            _atsc_ett_pids[num] = pid;
+            m_atscEttPids[num] = pid;
         }
     }
 
-    for (size_t i = 0; i < _atsc_main_listeners.size(); i++)
-        _atsc_main_listeners[i]->HandleMGT(mgt);
+    for (size_t i = 0; i < m_atscMainListeners.size(); i++)
+        m_atscMainListeners[i]->HandleMGT(mgt);
 }
 
 void ATSCStreamData::ProcessVCT(uint tsid, const VirtualChannelTable *vct)
 {
-    for (size_t i = 0; i < _atsc_main_listeners.size(); i++)
-        _atsc_main_listeners[i]->HandleVCT(tsid, vct);
+    for (size_t i = 0; i < m_atscMainListeners.size(); i++)
+        m_atscMainListeners[i]->HandleVCT(tsid, vct);
 
-    _sourceid_to_atsc_maj_min.clear();
+    m_sourceIdToAtscMajMin.clear();
     for (uint i = 0; i < vct->ChannelCount() ; i++)
     {
         if (vct->IsHidden(i) && vct->IsHiddenInGuide(i))
@@ -594,7 +590,7 @@ void ATSCStreamData::ProcessVCT(uint tsid, const VirtualChannelTable *vct)
                 .arg(vct->MajorChannel(i))
                 .arg(vct->MinorChannel(i)));
 
-        _sourceid_to_atsc_maj_min[vct->SourceID(i)] =
+        m_sourceIdToAtscMajMin[vct->SourceID(i)] =
             vct->MajorChannel(i) << 16 | vct->MinorChannel(i);
     }
 }
@@ -602,19 +598,19 @@ void ATSCStreamData::ProcessVCT(uint tsid, const VirtualChannelTable *vct)
 void ATSCStreamData::ProcessTVCT(uint tsid,
                                  const TerrestrialVirtualChannelTable *vct)
 {
-    QMutexLocker locker(&_listener_lock);
+    QMutexLocker locker(&m_listenerLock);
     ProcessVCT(tsid, vct);
-    for (size_t i = 0; i < _atsc_aux_listeners.size(); i++)
-        _atsc_aux_listeners[i]->HandleTVCT(tsid, vct);
+    for (size_t i = 0; i < m_atscAuxListeners.size(); i++)
+        m_atscAuxListeners[i]->HandleTVCT(tsid, vct);
 }
 
 void ATSCStreamData::ProcessCVCT(uint tsid,
                                  const CableVirtualChannelTable *vct)
 {
-    QMutexLocker locker(&_listener_lock);
+    QMutexLocker locker(&m_listenerLock);
     ProcessVCT(tsid, vct);
-    for (size_t i = 0; i < _atsc_aux_listeners.size(); i++)
-        _atsc_aux_listeners[i]->HandleCVCT(tsid, vct);
+    for (size_t i = 0; i < m_atscAuxListeners.size(); i++)
+        m_atscAuxListeners[i]->HandleCVCT(tsid, vct);
 }
 
 bool ATSCStreamData::HasCachedMGT(bool current) const
@@ -623,7 +619,7 @@ bool ATSCStreamData::HasCachedMGT(bool current) const
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             "Currently we ignore \'current\' param");
 
-    return (bool)(_cached_mgt);
+    return (bool)(m_cachedMgt);
 }
 
 bool ATSCStreamData::HasChannel(uint major, uint minor) const
@@ -660,10 +656,10 @@ bool ATSCStreamData::HasCachedTVCT(uint pid, bool current) const
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             "Currently we ignore \'current\' param");
 
-    _cache_lock.lock();
-    tvct_cache_t::const_iterator it = _cached_tvcts.find(pid);
-    bool exists = (it != _cached_tvcts.end());
-    _cache_lock.unlock();
+    m_cacheLock.lock();
+    tvct_cache_t::const_iterator it = m_cachedTvcts.find(pid);
+    bool exists = (it != m_cachedTvcts.end());
+    m_cacheLock.unlock();
 
     return exists;
 }
@@ -674,10 +670,10 @@ bool ATSCStreamData::HasCachedCVCT(uint pid, bool current) const
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             "Currently we ignore \'current\' param");
 
-    _cache_lock.lock();
-    cvct_cache_t::const_iterator it = _cached_cvcts.find(pid);
-    bool exists = (it != _cached_cvcts.end());
-    _cache_lock.unlock();
+    m_cacheLock.lock();
+    cvct_cache_t::const_iterator it = m_cachedCvcts.find(pid);
+    bool exists = (it != m_cachedCvcts.end());
+    m_cacheLock.unlock();
 
     return exists;
 }
@@ -688,17 +684,17 @@ bool ATSCStreamData::HasCachedAllTVCTs(bool current) const
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             "Currently we ignore \'current\' param");
 
-    if (!_cached_mgt)
+    if (!m_cachedMgt)
         return false;
 
-    _cache_lock.lock();
+    m_cacheLock.lock();
     bool ret = true;
-    for (uint i = 0; ret && (i < _cached_mgt->TableCount()); ++i)
+    for (uint i = 0; ret && (i < m_cachedMgt->TableCount()); ++i)
     {
-        if (TableClass::TVCTc == _cached_mgt->TableClass(i))
-            ret &= HasCachedTVCT(_cached_mgt->TablePID(i));
+        if (TableClass::TVCTc == m_cachedMgt->TableClass(i))
+            ret &= HasCachedTVCT(m_cachedMgt->TablePID(i));
     }
-    _cache_lock.unlock();
+    m_cacheLock.unlock();
 
     return ret;
 }
@@ -709,17 +705,17 @@ bool ATSCStreamData::HasCachedAllCVCTs(bool current) const
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             "Currently we ignore \'current\' param");
 
-    if (!_cached_mgt)
+    if (!m_cachedMgt)
         return false;
 
-    _cache_lock.lock();
+    m_cacheLock.lock();
     bool ret = true;
-    for (uint i = 0; ret && (i < _cached_mgt->TableCount()); ++i)
+    for (uint i = 0; ret && (i < m_cachedMgt->TableCount()); ++i)
     {
-        if (TableClass::CVCTc == _cached_mgt->TableClass(i))
-            ret &= HasCachedCVCT(_cached_mgt->TablePID(i));
+        if (TableClass::CVCTc == m_cachedMgt->TableClass(i))
+            ret &= HasCachedCVCT(m_cachedMgt->TablePID(i));
     }
-    _cache_lock.unlock();
+    m_cacheLock.unlock();
 
     return ret;
 }
@@ -730,8 +726,8 @@ bool ATSCStreamData::HasCachedAnyTVCTs(bool current) const
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             "Currently we ignore \'current\' param");
 
-    QMutexLocker locker(&_cache_lock);
-    return !_cached_tvcts.empty();
+    QMutexLocker locker(&m_cacheLock);
+    return !m_cachedTvcts.empty();
 }
 
 bool ATSCStreamData::HasCachedAnyCVCTs(bool current) const
@@ -740,8 +736,8 @@ bool ATSCStreamData::HasCachedAnyCVCTs(bool current) const
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             "Currently we ignore \'current\' param");
 
-    QMutexLocker locker(&_cache_lock);
-    return !_cached_cvcts.empty();
+    QMutexLocker locker(&m_cacheLock);
+    return !m_cachedCvcts.empty();
 }
 
 const MasterGuideTable *ATSCStreamData::GetCachedMGT(bool current) const
@@ -750,10 +746,10 @@ const MasterGuideTable *ATSCStreamData::GetCachedMGT(bool current) const
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             "Currently we ignore \'current\' param");
 
-    _cache_lock.lock();
-    const MasterGuideTable *mgt = _cached_mgt;
+    m_cacheLock.lock();
+    const MasterGuideTable *mgt = m_cachedMgt;
     IncrementRefCnt(mgt);
-    _cache_lock.unlock();
+    m_cacheLock.unlock();
 
     return mgt;
 }
@@ -766,11 +762,11 @@ tvct_const_ptr_t ATSCStreamData::GetCachedTVCT(uint pid, bool current) const
 
     tvct_ptr_t tvct = nullptr;
 
-    _cache_lock.lock();
-    tvct_cache_t::const_iterator it = _cached_tvcts.find(pid);
-    if (it != _cached_tvcts.end())
+    m_cacheLock.lock();
+    tvct_cache_t::const_iterator it = m_cachedTvcts.find(pid);
+    if (it != m_cachedTvcts.end())
         IncrementRefCnt(tvct = *it);
-    _cache_lock.unlock();
+    m_cacheLock.unlock();
 
     return tvct;
 }
@@ -783,11 +779,11 @@ cvct_const_ptr_t ATSCStreamData::GetCachedCVCT(uint pid, bool current) const
 
     cvct_ptr_t cvct = nullptr;
 
-    _cache_lock.lock();
-    cvct_cache_t::const_iterator it = _cached_cvcts.find(pid);
-    if (it != _cached_cvcts.end())
+    m_cacheLock.lock();
+    cvct_cache_t::const_iterator it = m_cachedCvcts.find(pid);
+    if (it != m_cachedCvcts.end())
         IncrementRefCnt(cvct = *it);
-    _cache_lock.unlock();
+    m_cacheLock.unlock();
 
     return cvct;
 }
@@ -800,15 +796,15 @@ tvct_vec_t ATSCStreamData::GetCachedTVCTs(bool current) const
 
     vector<const TerrestrialVirtualChannelTable*> tvcts;
 
-    _cache_lock.lock();
-    tvct_cache_t::const_iterator it = _cached_tvcts.begin();
-    for (; it != _cached_tvcts.end(); ++it)
+    m_cacheLock.lock();
+    tvct_cache_t::const_iterator it = m_cachedTvcts.begin();
+    for (; it != m_cachedTvcts.end(); ++it)
     {
         TerrestrialVirtualChannelTable* tvct = *it;
         IncrementRefCnt(tvct);
         tvcts.push_back(tvct);
     }
-    _cache_lock.unlock();
+    m_cacheLock.unlock();
 
     return tvcts;
 }
@@ -821,41 +817,41 @@ cvct_vec_t ATSCStreamData::GetCachedCVCTs(bool current) const
 
     vector<const CableVirtualChannelTable*> cvcts;
 
-    _cache_lock.lock();
-    cvct_cache_t::const_iterator it = _cached_cvcts.begin();
-    for (; it != _cached_cvcts.end(); ++it)
+    m_cacheLock.lock();
+    cvct_cache_t::const_iterator it = m_cachedCvcts.begin();
+    for (; it != m_cachedCvcts.end(); ++it)
     {
         CableVirtualChannelTable* cvct = *it;
         IncrementRefCnt(cvct);
         cvcts.push_back(cvct);
     }
-    _cache_lock.unlock();
+    m_cacheLock.unlock();
 
     return cvcts;
 }
 
 void ATSCStreamData::CacheMGT(MasterGuideTable *mgt)
 {
-    QMutexLocker locker(&_cache_lock);
+    QMutexLocker locker(&m_cacheLock);
 
-    DeleteCachedTable(_cached_mgt);
-    _cached_mgt = mgt;
+    DeleteCachedTable(m_cachedMgt);
+    m_cachedMgt = mgt;
 }
 
 void ATSCStreamData::CacheTVCT(uint pid, TerrestrialVirtualChannelTable* tvct)
 {
-    QMutexLocker locker(&_cache_lock);
+    QMutexLocker locker(&m_cacheLock);
 
-    DeleteCachedTable(_cached_tvcts[pid]);
-    _cached_tvcts[pid] = tvct;
+    DeleteCachedTable(m_cachedTvcts[pid]);
+    m_cachedTvcts[pid] = tvct;
 }
 
 void ATSCStreamData::CacheCVCT(uint pid, CableVirtualChannelTable* cvct)
 {
-    QMutexLocker locker(&_cache_lock);
+    QMutexLocker locker(&m_cacheLock);
 
-    DeleteCachedTable(_cached_cvcts[pid]);
-    _cached_cvcts[pid] = cvct;
+    DeleteCachedTable(m_cachedCvcts[pid]);
+    m_cachedCvcts[pid] = cvct;
 }
 
 bool ATSCStreamData::DeleteCachedTable(const PSIPTable *psip) const
@@ -863,28 +859,28 @@ bool ATSCStreamData::DeleteCachedTable(const PSIPTable *psip) const
     if (!psip)
         return false;
 
-    QMutexLocker locker(&_cache_lock);
-    if (_cached_ref_cnt[psip] > 0)
+    QMutexLocker locker(&m_cacheLock);
+    if (m_cachedRefCnt[psip] > 0)
     {
-        _cached_slated_for_deletion[psip] = 1;
+        m_cachedSlatedForDeletion[psip] = 1;
         return false;
     }
     if (TableID::MGT == psip->TableID())
     {
-        if (psip == _cached_mgt)
-            _cached_mgt = nullptr;
+        if (psip == m_cachedMgt)
+            m_cachedMgt = nullptr;
         delete psip;
     }
     else if ((TableID::TVCT == psip->TableID()) &&
-             _cached_tvcts[psip->tsheader()->PID()])
+             m_cachedTvcts[psip->tsheader()->PID()])
     {
-        _cached_tvcts[psip->tsheader()->PID()] = nullptr;
+        m_cachedTvcts[psip->tsheader()->PID()] = nullptr;
         delete psip;
     }
     else if ((TableID::CVCT == psip->TableID()) &&
-             _cached_cvcts[psip->tsheader()->PID()])
+             m_cachedCvcts[psip->tsheader()->PID()])
     {
-        _cached_cvcts[psip->tsheader()->PID()] = nullptr;
+        m_cachedCvcts[psip->tsheader()->PID()] = nullptr;
         delete psip;
     }
     else
@@ -892,9 +888,9 @@ bool ATSCStreamData::DeleteCachedTable(const PSIPTable *psip) const
         return MPEGStreamData::DeleteCachedTable(psip);
     }
     psip_refcnt_map_t::iterator it;
-    it = _cached_slated_for_deletion.find(psip);
-    if (it != _cached_slated_for_deletion.end())
-        _cached_slated_for_deletion.erase(it);
+    it = m_cachedSlatedForDeletion.find(psip);
+    if (it != m_cachedSlatedForDeletion.end())
+        m_cachedSlatedForDeletion.erase(it);
 
     return true;
 }
@@ -915,26 +911,26 @@ void ATSCStreamData::ReturnCachedCVCTTables(cvct_vec_t &cvcts) const
 
 void ATSCStreamData::AddATSCMainListener(ATSCMainStreamListener *val)
 {
-    QMutexLocker locker(&_listener_lock);
+    QMutexLocker locker(&m_listenerLock);
 
-    auto it = _atsc_main_listeners.begin();
-    for (; it != _atsc_main_listeners.end(); ++it)
+    auto it = m_atscMainListeners.begin();
+    for (; it != m_atscMainListeners.end(); ++it)
         if (((void*)val) == ((void*)*it))
             return;
 
-    _atsc_main_listeners.push_back(val);
+    m_atscMainListeners.push_back(val);
 }
 
 void ATSCStreamData::RemoveATSCMainListener(ATSCMainStreamListener *val)
 {
-    QMutexLocker locker(&_listener_lock);
+    QMutexLocker locker(&m_listenerLock);
 
-    auto it = _atsc_main_listeners.begin();
-    for (; it != _atsc_main_listeners.end(); ++it)
+    auto it = m_atscMainListeners.begin();
+    for (; it != m_atscMainListeners.end(); ++it)
     {
         if (((void*)val) == ((void*)*it))
         {
-            _atsc_main_listeners.erase(it);
+            m_atscMainListeners.erase(it);
             return;
         }
     }
@@ -942,26 +938,26 @@ void ATSCStreamData::RemoveATSCMainListener(ATSCMainStreamListener *val)
 
 void ATSCStreamData::AddSCTEMainListener(SCTEMainStreamListener *val)
 {
-    QMutexLocker locker(&_listener_lock);
+    QMutexLocker locker(&m_listenerLock);
 
-    auto it = _scte_main_listeners.begin();
-    for (; it != _scte_main_listeners.end(); ++it)
+    auto it = m_scteMainlisteners.begin();
+    for (; it != m_scteMainlisteners.end(); ++it)
         if (((void*)val) == ((void*)*it))
             return;
 
-    _scte_main_listeners.push_back(val);
+    m_scteMainlisteners.push_back(val);
 }
 
 void ATSCStreamData::RemoveSCTEMainListener(SCTEMainStreamListener *val)
 {
-    QMutexLocker locker(&_listener_lock);
+    QMutexLocker locker(&m_listenerLock);
 
-    auto it = _scte_main_listeners.begin();
-    for (; it != _scte_main_listeners.end(); ++it)
+    auto it = m_scteMainlisteners.begin();
+    for (; it != m_scteMainlisteners.end(); ++it)
     {
         if (((void*)val) == ((void*)*it))
         {
-            _scte_main_listeners.erase(it);
+            m_scteMainlisteners.erase(it);
             return;
         }
     }
@@ -969,26 +965,26 @@ void ATSCStreamData::RemoveSCTEMainListener(SCTEMainStreamListener *val)
 
 void ATSCStreamData::AddATSCAuxListener(ATSCAuxStreamListener *val)
 {
-    QMutexLocker locker(&_listener_lock);
+    QMutexLocker locker(&m_listenerLock);
 
-    auto it = _atsc_aux_listeners.begin();
-    for (; it != _atsc_aux_listeners.end(); ++it)
+    auto it = m_atscAuxListeners.begin();
+    for (; it != m_atscAuxListeners.end(); ++it)
         if (((void*)val) == ((void*)*it))
             return;
 
-    _atsc_aux_listeners.push_back(val);
+    m_atscAuxListeners.push_back(val);
 }
 
 void ATSCStreamData::RemoveATSCAuxListener(ATSCAuxStreamListener *val)
 {
-    QMutexLocker locker(&_listener_lock);
+    QMutexLocker locker(&m_listenerLock);
 
-    auto it = _atsc_aux_listeners.begin();
-    for (; it != _atsc_aux_listeners.end(); ++it)
+    auto it = m_atscAuxListeners.begin();
+    for (; it != m_atscAuxListeners.end(); ++it)
     {
         if (((void*)val) == ((void*)*it))
         {
-            _atsc_aux_listeners.erase(it);
+            m_atscAuxListeners.erase(it);
             return;
         }
     }
@@ -996,26 +992,26 @@ void ATSCStreamData::RemoveATSCAuxListener(ATSCAuxStreamListener *val)
 
 void ATSCStreamData::AddATSCEITListener(ATSCEITStreamListener *val)
 {
-    QMutexLocker locker(&_listener_lock);
+    QMutexLocker locker(&m_listenerLock);
 
-    auto it = _atsc_eit_listeners.begin();
-    for (; it != _atsc_eit_listeners.end(); ++it)
+    auto it = m_atscEitListeners.begin();
+    for (; it != m_atscEitListeners.end(); ++it)
         if (((void*)val) == ((void*)*it))
             return;
 
-    _atsc_eit_listeners.push_back(val);
+    m_atscEitListeners.push_back(val);
 }
 
 void ATSCStreamData::RemoveATSCEITListener(ATSCEITStreamListener *val)
 {
-    QMutexLocker locker(&_listener_lock);
+    QMutexLocker locker(&m_listenerLock);
 
-    auto it = _atsc_eit_listeners.begin();
-    for (; it != _atsc_eit_listeners.end(); ++it)
+    auto it = m_atscEitListeners.begin();
+    for (; it != m_atscEitListeners.end(); ++it)
     {
         if (((void*)val) == ((void*)*it))
         {
-            _atsc_eit_listeners.erase(it);
+            m_atscEitListeners.erase(it);
             return;
         }
     }
@@ -1023,26 +1019,26 @@ void ATSCStreamData::RemoveATSCEITListener(ATSCEITStreamListener *val)
 
 void ATSCStreamData::AddATSC81EITListener(ATSC81EITStreamListener *val)
 {
-    QMutexLocker locker(&_listener_lock);
+    QMutexLocker locker(&m_listenerLock);
 
-    auto it = _atsc81_eit_listeners.begin();
-    for (; it != _atsc81_eit_listeners.end(); ++it)
+    auto it = m_atsc81EitListeners.begin();
+    for (; it != m_atsc81EitListeners.end(); ++it)
         if (((void*)val) == ((void*)*it))
             return;
 
-    _atsc81_eit_listeners.push_back(val);
+    m_atsc81EitListeners.push_back(val);
 }
 
 void ATSCStreamData::RemoveATSC81EITListener(ATSC81EITStreamListener *val)
 {
-    QMutexLocker locker(&_listener_lock);
+    QMutexLocker locker(&m_listenerLock);
 
-    auto it = _atsc81_eit_listeners.begin();
-    for (; it != _atsc81_eit_listeners.end(); ++it)
+    auto it = m_atsc81EitListeners.begin();
+    for (; it != m_atsc81EitListeners.end(); ++it)
     {
         if (((void*)val) == ((void*)*it))
         {
-            _atsc81_eit_listeners.erase(it);
+            m_atsc81EitListeners.erase(it);
             return;
         }
     }

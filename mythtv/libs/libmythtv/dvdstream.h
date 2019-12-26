@@ -22,8 +22,8 @@ class MTV_PUBLIC DVDStream : public RingBuffer
     Q_DISABLE_COPY(DVDStream);
 
 public:
-    explicit DVDStream(const QString&);
-    virtual ~DVDStream();
+    explicit DVDStream(const QString &filename);
+    ~DVDStream() override;
 
 public:
     // RingBuffer methods

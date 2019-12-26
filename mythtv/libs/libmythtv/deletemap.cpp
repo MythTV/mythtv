@@ -114,14 +114,22 @@ bool DeleteMap::HandleAction(QString &action, uint64_t frame)
     else if (action == "NEWCUT")
         NewCut(frame);
     else if (action == "DELETE")
+    {
         //: Delete the current cut or preserved region
         Delete(frame, tr("Delete"));
+    }
     else if (action == "UNDO")
+    {
         Undo();
+    }
     else if (action == "REDO")
+    {
         Redo();
+    }
     else
+    {
         handled = false;
+    }
     return handled;
 }
 

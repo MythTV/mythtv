@@ -136,9 +136,9 @@ UPnpCDSTv::UPnpCDSTv()
 {
     QString sServerIp   = gCoreContext->GetBackendServerIP();
     int sPort           = gCoreContext->GetBackendStatusPort();
-    m_URIBase.setScheme("http");
-    m_URIBase.setHost(sServerIp);
-    m_URIBase.setPort(sPort);
+    m_uriBase.setScheme("http");
+    m_uriBase.setHost(sServerIp);
+    m_uriBase.setPort(sPort);
 
     // ShortCuts
     m_shortcuts.insert(UPnPShortcutFeature::VIDEOS_RECORDINGS, "Recordings");
@@ -337,9 +337,11 @@ bool UPnpCDSTv::LoadMetadata(const UPnpCDSRequest* pRequest,
         return LoadMovies(pRequest, pResults, tokens);
     }
     else
+    {
         LOG(VB_GENERAL, LOG_ERR,
             QString("UPnpCDSTV::LoadMetadata(): "
                     "Unhandled metadata request for '%1'.").arg(currentToken));
+    }
 
     return false;
 }
@@ -572,7 +574,7 @@ bool UPnpCDSTv::LoadTitles(const UPnpCDSRequest* pRequest,
             pContainer->SetPropValue("storageMedium", "HDD");
 
             // Artwork
-            PopulateArtworkURIS(pContainer, sInetRef, 0, m_URIBase); // No particular season
+            PopulateArtworkURIS(pContainer, sInetRef, 0, m_uriBase); // No particular season
 
             pResults->Add(pContainer);
             pContainer->DecrRef();

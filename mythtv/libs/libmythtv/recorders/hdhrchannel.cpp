@@ -30,24 +30,24 @@ using namespace std;
 #include "channelutil.h"
 #include "hdhrstreamhandler.h"
 
-#define LOC     QString("HDHRChan[%1](%2): ").arg(m_inputid).arg(HDHRChannel::GetDevice())
+#define LOC     QString("HDHRChan[%1](%2): ").arg(m_inputId).arg(HDHRChannel::GetDevice())
 
 HDHRChannel::HDHRChannel(TVRec *parent, QString device)
     : DTVChannel(parent),
-      m_device_id(std::move(device))
+      m_deviceId(std::move(device))
 {
-    RegisterForMaster(m_device_id);
+    RegisterForMaster(m_deviceId);
 }
 
 HDHRChannel::~HDHRChannel(void)
 {
     HDHRChannel::Close();
-    DeregisterForMaster(m_device_id);
+    DeregisterForMaster(m_deviceId);
 }
 
 bool HDHRChannel::IsMaster(void) const
 {
-    DTVChannel *master = DTVChannel::GetMasterLock(m_device_id);
+    DTVChannel *master = DTVChannel::GetMasterLock(m_deviceId);
     bool is_master = (master == static_cast<const DTVChannel*>(this));
     DTVChannel::ReturnMasterLock(master);
     return is_master;
@@ -60,12 +60,12 @@ bool HDHRChannel::Open(void)
     if (IsOpen())
         return true;
 
-    m_stream_handler = HDHRStreamHandler::Get(GetDevice(), GetInputID(),
+    m_streamHandler = HDHRStreamHandler::Get(GetDevice(), GetInputID(),
                                              GetMajorID());
 
-    m_tuner_types = m_stream_handler->GetTunerTypes();
-    m_tunerType = (m_tuner_types.empty()) ?
-        DTVTunerType::kTunerTypeUnknown : (int) m_tuner_types[0];
+    m_tunerTypes = m_streamHandler->GetTunerTypes();
+    m_tunerType = (m_tunerTypes.empty()) ?
+        DTVTunerType::kTunerTypeUnknown : (int) m_tunerTypes[0];
 
     if (!InitializeInput())
     {
@@ -73,7 +73,7 @@ bool HDHRChannel::Open(void)
         return false;
     }
 
-    return m_stream_handler->IsConnected();
+    return m_streamHandler->IsConnected();
 }
 
 void HDHRChannel::Close(void)
@@ -83,7 +83,7 @@ void HDHRChannel::Close(void)
     if (!HDHRChannel::IsOpen())
         return; // this caller didn't have it open in the first place..
 
-    HDHRStreamHandler::Return(m_stream_handler, GetInputID());
+    HDHRStreamHandler::Return(m_streamHandler, GetInputID());
 }
 
 bool HDHRChannel::EnterPowerSavingMode(void)
@@ -94,13 +94,13 @@ bool HDHRChannel::EnterPowerSavingMode(void)
 
 bool HDHRChannel::IsOpen(void) const
 {
-      return m_stream_handler;
+      return m_streamHandler;
 }
 
 /// This is used when the tuner type is kTunerTypeOCUR
 bool HDHRChannel::Tune(const QString &freqid, int /*finetune*/)
 {
-    return m_stream_handler->TuneVChannel(freqid);
+    return m_streamHandler->TuneVChannel(freqid);
 }
 
 static QString format_modulation(const DTVMultiplex &tuning)
@@ -137,14 +137,14 @@ static QString format_dvbc(const DTVMultiplex &tuning, const QString &mod)
     const QChar b = tuning.m_bandwidth.toChar();
 
     // need bandwidth to set modulation and symbol rate
-    if ((QChar('a') == b) && (mod != "auto") && (tuning.m_symbolrate > 0))
+    if ((QChar('a') == b) && (mod != "auto") && (tuning.m_symbolRate > 0))
         return QString("a8%1-%2")
-            .arg(mod).arg(tuning.m_symbolrate/1000);
+            .arg(mod).arg(tuning.m_symbolRate/1000);
     if ((QChar('a') == b) || (mod == "auto"))
         return "auto"; // uses bandwidth from channel map
-    if ((QChar('a') != b) && (tuning.m_symbolrate > 0))
+    if ((QChar('a') != b) && (tuning.m_symbolRate > 0))
         return QString("a%1%2-%3")
-            .arg(b).arg(mod).arg(tuning.m_symbolrate/1000);
+            .arg(b).arg(mod).arg(tuning.m_symbolRate/1000);
     return QString("auto%1c").arg(b);
 }
 
@@ -171,7 +171,7 @@ bool HDHRChannel::Tune(const DTVMultiplex &tuning)
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Tuning to " + chan);
 
-    if (m_stream_handler->TuneChannel(chan))
+    if (m_streamHandler->TuneChannel(chan))
     {
         SetSIStandard(tuning.m_sistandard);
         return true;
@@ -191,8 +191,8 @@ bool HDHRChannel::SetChannelByString(const QString &channum)
     {
         bool has_dvbc = false;
         bool has_dvbt = false;
-        vector<DTVTunerType>::const_iterator it = m_tuner_types.begin();
-        for (; it != m_tuner_types.end(); ++it)
+        vector<DTVTunerType>::const_iterator it = m_tunerTypes.begin();
+        for (; it != m_tunerTypes.end(); ++it)
         {
             has_dvbt |= (DTVTunerType::kTunerTypeDVBT == *it);
             has_dvbc |= (DTVTunerType::kTunerTypeDVBC == *it);

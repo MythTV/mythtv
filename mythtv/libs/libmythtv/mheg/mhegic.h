@@ -19,7 +19,7 @@ class MHInteractionChannel : public QObject
 
 public:
     explicit MHInteractionChannel(QObject* parent = nullptr);
-    virtual ~MHInteractionChannel();
+    ~MHInteractionChannel() override;
 
     // Properties
 public:
@@ -39,7 +39,7 @@ public:
     // Implementation
 private slots:
     // NetStream signals
-    void slotFinished(QObject*);
+    void slotFinished(QObject *obj);
 
 private:
     Q_DISABLE_COPY(MHInteractionChannel)

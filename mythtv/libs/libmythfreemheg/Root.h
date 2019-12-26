@@ -43,9 +43,9 @@ enum EventType { EventIsAvailable = 1, EventContentAvailable, EventIsDeleted, Ev
 class MHRoot  
 {
   public:
-    MHRoot() {}
+    MHRoot() = default;
     MHRoot(const MHRoot &/*ref*/) {}
-    virtual ~MHRoot() {}
+    virtual ~MHRoot() = default;
     // Initialise - set up the item from the parse tree.
     virtual void Initialise(MHParseNode *p, MHEngine *engine); // Set this up from the parse tree.
     // Print this item.
@@ -63,7 +63,7 @@ class MHRoot
     // Destruction - deletes the run-time representation.  Clears m_fAvailable.
     virtual void Destruction(MHEngine *engine);
     // Prepare the content - This action is added in the corrigendum to the standard.
-    virtual void ContentPreparation(MHEngine *) {}
+    virtual void ContentPreparation(MHEngine */*engine*/) {}
 
     // Return an object with a given object number.  In the root class this returns this object
     // if it matches.  Group and Stream classes also search their components.
@@ -76,86 +76,117 @@ class MHRoot
     virtual bool GetRunningStatus() { return m_fRunning; }
 
     // Actions on Groups
-    virtual void SetTimer(int/*nTimerId*/, bool/*fAbsolute*/, int /*nMilliSecs*/, MHEngine *) { InvalidAction("SetTimer"); }
+    virtual void SetTimer(int/*nTimerId*/, bool/*fAbsolute*/, int /*nMilliSecs*/, MHEngine */*engine*/)
+        { InvalidAction("SetTimer"); }
     // This isn't an MHEG action as such but is used as part of the implementation of "Clone"
-    virtual void MakeClone(MHRoot* /*pTarget*/, MHRoot* /*pRef*/, MHEngine *) { InvalidAction("MakeClone"); }
-    virtual void SetInputRegister(int /*nReg*/, MHEngine *) { InvalidAction("SetInputRegister"); }
+    virtual void MakeClone(MHRoot* /*pTarget*/, MHRoot* /*pRef*/, MHEngine */*engine*/)
+        { InvalidAction("MakeClone"); }
+    virtual void SetInputRegister(int /*nReg*/, MHEngine */*engine*/)
+        { InvalidAction("SetInputRegister"); }
 
     // Actions on Ingredients.
-    virtual void SetData(const MHOctetString &/*included*/, MHEngine *) { InvalidAction("SetData"); }
-    virtual void SetData(const MHContentRef &/*referenced*/, bool /*fSizeGiven*/, int /*size*/, bool /*fCCGiven*/, int /*cc*/, MHEngine *)
+    virtual void SetData(const MHOctetString &/*included*/, MHEngine */*engine*/)
+        { InvalidAction("SetData"); }
+    virtual void SetData(const MHContentRef &/*referenced*/, bool /*fSizeGiven*/,
+                         int /*size*/, bool /*fCCGiven*/, int /*cc*/, MHEngine */*engine*/)
          { InvalidAction("SetData"); }
-    virtual void Preload(MHEngine *) { InvalidAction("Preload"); }
-    virtual void Unload(MHEngine *) { InvalidAction("Unload"); }
+    virtual void Preload(MHEngine */*engine*/) { InvalidAction("Preload"); }
+    virtual void Unload(MHEngine */*engine*/) { InvalidAction("Unload"); }
     // The UK MHEG profile only requires cloning for Text, Bitmap and Rectangle.
-    virtual MHIngredient *Clone(MHEngine *) { InvalidAction("Clone"); return nullptr; }
+    virtual MHIngredient *Clone(MHEngine */*engine*/) { InvalidAction("Clone"); return nullptr; }
 
     // Actions on Presentables.  The Run/Stop actions on presentables and the Activate/Deactivate actions
     // on Links have identical effects.  They could be merged.
-    virtual void Run(MHEngine *) { InvalidAction("Run"); }
-    virtual void Stop(MHEngine *) { InvalidAction("Stop"); }
+    virtual void Run(MHEngine */*engine*/) { InvalidAction("Run"); }
+    virtual void Stop(MHEngine */*engine*/) { InvalidAction("Stop"); }
 
     // Actions on variables.
-    virtual void TestVariable(int /*nOp*/, const MHUnion &/*parm*/, MHEngine *)  { InvalidAction("TestVariable"); }
-    virtual void GetVariableValue(MHUnion &, MHEngine *) { InvalidAction("GetVariableValue"); }
-    virtual void SetVariableValue(const MHUnion &) { InvalidAction("SetVariableValue"); }
+    virtual void TestVariable(int /*nOp*/, const MHUnion &/*parm*/, MHEngine */*engine*/)
+        { InvalidAction("TestVariable"); }
+    virtual void GetVariableValue(MHUnion &/*value*/, MHEngine */*engine*/)
+        { InvalidAction("GetVariableValue"); }
+    virtual void SetVariableValue(const MHUnion &/*value*/)
+        { InvalidAction("SetVariableValue"); }
 
     // Actions on Text objects
-    virtual void GetTextData(MHRoot * /*pDestination*/, MHEngine *) { InvalidAction("GetTextData"); }
-    virtual void SetBackgroundColour(const MHColour &/*colour*/, MHEngine *) { InvalidAction("SetBackgroundColour"); }
-    virtual void SetTextColour(const MHColour &/*colour*/, MHEngine *) { InvalidAction("SetTextColour"); }
-    virtual void SetFontAttributes(const MHOctetString &/*fontAttrs*/, MHEngine *) { InvalidAction("SetFontAttributes"); }
+    virtual void GetTextData(MHRoot * /*pDestination*/, MHEngine */*engine*/)
+        { InvalidAction("GetTextData"); }
+    virtual void SetBackgroundColour(const MHColour &/*colour*/, MHEngine */*engine*/)
+        { InvalidAction("SetBackgroundColour"); }
+    virtual void SetTextColour(const MHColour &/*colour*/, MHEngine */*engine*/)
+        { InvalidAction("SetTextColour"); }
+    virtual void SetFontAttributes(const MHOctetString &/*fontAttrs*/, MHEngine */*engine*/)
+        { InvalidAction("SetFontAttributes"); }
 
     // Actions on Links
-    virtual void Activate(bool /*f*/, MHEngine *) { InvalidAction("Activate/Deactivate"); } // Activate/Deactivate
+    virtual void Activate(bool /*f*/, MHEngine */*engine*/)
+        { InvalidAction("Activate/Deactivate"); } // Activate/Deactivate
 
     // Actions on Programs.
     virtual void CallProgram(bool /*fIsFork*/, const MHObjectRef &/*success*/,
-        const MHSequence<MHParameter *> &/*args*/, MHEngine *) { InvalidAction("CallProgram"); }
+        const MHSequence<MHParameter *> &/*args*/, MHEngine */*engine*/)
+        { InvalidAction("CallProgram"); }
 
     // Actions on TokenGroups
-    virtual void CallActionSlot(int, MHEngine *) { InvalidAction("CallActionSlot"); }
-    virtual void Move(int, MHEngine *) { InvalidAction("Move"); }
-    virtual void MoveTo(int, MHEngine *) { InvalidAction("MoveTo"); }
-    virtual void GetTokenPosition(MHRoot * /*pResult*/, MHEngine *) { InvalidAction("GetTokenPosition"); }
+    virtual void CallActionSlot(int /*n*/, MHEngine */*engine*/) { InvalidAction("CallActionSlot"); }
+    virtual void Move(int /*n*/, MHEngine */*engine*/) { InvalidAction("Move"); }
+    virtual void MoveTo(int /*n*/, MHEngine */*engine*/) { InvalidAction("MoveTo"); }
+    virtual void GetTokenPosition(MHRoot * /*pResult*/, MHEngine */*engine*/)
+        { InvalidAction("GetTokenPosition"); }
 
     // Actions on ListGroups
-    virtual void AddItem(int /*nIndex*/, MHRoot * /*pItem*/, MHEngine *) { InvalidAction("GetCellItem"); }
-    virtual void DelItem(MHRoot * /*pItem*/, MHEngine *) { InvalidAction("GetCellItem"); }
-    virtual void GetCellItem(int /*nCell*/, const MHObjectRef &/*itemDest*/, MHEngine *) { InvalidAction("GetCellItem"); }
-    virtual void GetListItem(int /*nCell*/, const MHObjectRef &/*itemDest*/, MHEngine *) { InvalidAction("GetCellItem"); }
-    virtual void GetItemStatus(int /*nCell*/, const MHObjectRef &/*itemDest*/, MHEngine *) { InvalidAction("GetItemStatus"); }
-    virtual void SelectItem(int /*nCell*/, MHEngine *) { InvalidAction("SelectItem"); }
-    virtual void DeselectItem(int /*nCell*/, MHEngine *) { InvalidAction("DeselectItem"); }
-    virtual void ToggleItem(int /*nCell*/, MHEngine *) { InvalidAction("ToggleItem"); }
-    virtual void ScrollItems(int /*nCell*/, MHEngine *) { InvalidAction("ScrollItems"); }
-    virtual void SetFirstItem(int /*nCell*/, MHEngine *) { InvalidAction("SetFirstItem"); }
-    virtual void GetFirstItem(MHRoot * /*pResult*/, MHEngine *) { InvalidAction("GetFirstItem"); }
-    virtual void GetListSize(MHRoot * /*pResult*/, MHEngine *) { InvalidAction("GetListSize"); }
+    virtual void AddItem(int /*nIndex*/, MHRoot * /*pItem*/, MHEngine */*engine*/)
+        { InvalidAction("GetCellItem"); }
+    virtual void DelItem(MHRoot * /*pItem*/, MHEngine */*engine*/)
+        { InvalidAction("GetCellItem"); }
+    virtual void GetCellItem(int /*nCell*/, const MHObjectRef &/*itemDest*/, MHEngine */*engine*/)
+        { InvalidAction("GetCellItem"); }
+    virtual void GetListItem(int /*nCell*/, const MHObjectRef &/*itemDest*/, MHEngine */*engine*/)
+        { InvalidAction("GetCellItem"); }
+    virtual void GetItemStatus(int /*nCell*/, const MHObjectRef &/*itemDest*/, MHEngine */*engine*/)
+        { InvalidAction("GetItemStatus"); }
+    virtual void SelectItem(int /*nCell*/, MHEngine */*engine*/) { InvalidAction("SelectItem"); }
+    virtual void DeselectItem(int /*nCell*/, MHEngine */*engine*/) { InvalidAction("DeselectItem"); }
+    virtual void ToggleItem(int /*nCell*/, MHEngine */*engine*/) { InvalidAction("ToggleItem"); }
+    virtual void ScrollItems(int /*nCell*/, MHEngine */*engine*/) { InvalidAction("ScrollItems"); }
+    virtual void SetFirstItem(int /*nCell*/, MHEngine */*engine*/) { InvalidAction("SetFirstItem"); }
+    virtual void GetFirstItem(MHRoot * /*pResult*/, MHEngine */*engine*/) { InvalidAction("GetFirstItem"); }
+    virtual void GetListSize(MHRoot * /*pResult*/, MHEngine */*engine*/) { InvalidAction("GetListSize"); }
 
     // Actions on Visibles.
-    virtual void SetPosition(int /*nXPosition*/, int /*nYPosition*/, MHEngine *) { InvalidAction("SetPosition"); }
-    virtual void GetPosition(MHRoot * /*pXPosN*/, MHRoot * /*pYPosN*/) { InvalidAction("GetPosition"); }
-    virtual void SetBoxSize(int /*nWidth*/, int /*nHeight*/, MHEngine *) { InvalidAction("SetBoxSize"); }
-    virtual void GetBoxSize(MHRoot * /*pWidthDest*/, MHRoot * /*HeightDest*/) { InvalidAction("GetBoxSize"); }
-    virtual void SetPaletteRef(const MHObjectRef /*newPalette*/, MHEngine *) { InvalidAction("SetPaletteRef"); }
-    virtual void BringToFront(MHEngine *) { InvalidAction("BringToFront"); }
-    virtual void SendToBack(MHEngine *) { InvalidAction("SendToBack"); }
-    virtual void PutBefore(const MHRoot * /*pRef*/, MHEngine *) { InvalidAction("PutBefore"); }
-    virtual void PutBehind(const MHRoot * /*pRef*/, MHEngine *) { InvalidAction("PutBehind"); }
+    virtual void SetPosition(int /*nXPosition*/, int /*nYPosition*/, MHEngine */*engine*/)
+        { InvalidAction("SetPosition"); }
+    virtual void GetPosition(MHRoot * /*pXPosN*/, MHRoot * /*pYPosN*/)
+        { InvalidAction("GetPosition"); }
+    virtual void SetBoxSize(int /*nWidth*/, int /*nHeight*/, MHEngine */*engine*/)
+        { InvalidAction("SetBoxSize"); }
+    virtual void GetBoxSize(MHRoot * /*pWidthDest*/, MHRoot * /*HeightDest*/)
+        { InvalidAction("GetBoxSize"); }
+    virtual void SetPaletteRef(const MHObjectRef /*newPalette*/, MHEngine */*engine*/)
+        { InvalidAction("SetPaletteRef"); }
+    virtual void BringToFront(MHEngine */*engine*/) { InvalidAction("BringToFront"); }
+    virtual void SendToBack(MHEngine */*engine*/) { InvalidAction("SendToBack"); }
+    virtual void PutBefore(const MHRoot * /*pRef*/, MHEngine */*engine*/) { InvalidAction("PutBefore"); }
+    virtual void PutBehind(const MHRoot * /*pRef*/, MHEngine */*engine*/) { InvalidAction("PutBehind"); }
     virtual void ResetPosition()  { InvalidAction("ResetPosition"); } // Used internally by ListGroup
 
     // Actions on LineArt
-    virtual void SetFillColour(const MHColour &/*colour*/, MHEngine *) { InvalidAction("SetFillColour"); }
-    virtual void SetLineColour(const MHColour &/*colour*/, MHEngine *) { InvalidAction("SetLineColour"); }
-    virtual void SetLineWidth(int /*nWidth*/, MHEngine *) { InvalidAction("SetLineWidth"); }
-    virtual void SetLineStyle(int /*nStyle*/, MHEngine *) { InvalidAction("SetLineStyle"); }
+    virtual void SetFillColour(const MHColour &/*colour*/, MHEngine */*engine*/)
+        { InvalidAction("SetFillColour"); }
+    virtual void SetLineColour(const MHColour &/*colour*/, MHEngine */*engine*/)
+        { InvalidAction("SetLineColour"); }
+    virtual void SetLineWidth(int /*nWidth*/, MHEngine */*engine*/) { InvalidAction("SetLineWidth"); }
+    virtual void SetLineStyle(int /*nStyle*/, MHEngine */*engine*/) { InvalidAction("SetLineStyle"); }
 
     // Actions on Bitmaps
-    virtual void SetTransparency(int /*nTransPerCent*/, MHEngine *) { InvalidAction("SetTransparency"); }
-    virtual void ScaleBitmap(int /*xScale*/, int /*yScale*/, MHEngine *) { InvalidAction("ScaleBitmap"); } 
-    virtual void SetBitmapDecodeOffset(int /*newXOffset*/, int /*newYOffset*/, MHEngine *) { InvalidAction("SetBitmapDecodeOffset"); }
-    virtual void GetBitmapDecodeOffset(MHRoot * /*pXOffset*/, MHRoot * /*pYOffset*/) { InvalidAction("GetBitmapDecodeOffset"); }
+    virtual void SetTransparency(int /*nTransPerCent*/, MHEngine */*engine*/)
+        { InvalidAction("SetTransparency"); }
+    virtual void ScaleBitmap(int /*xScale*/, int /*yScale*/, MHEngine */*engine*/)
+        { InvalidAction("ScaleBitmap"); }
+    virtual void SetBitmapDecodeOffset(int /*newXOffset*/, int /*newYOffset*/, MHEngine */*engine*/)
+        { InvalidAction("SetBitmapDecodeOffset"); }
+    virtual void GetBitmapDecodeOffset(MHRoot * /*pXOffset*/, MHRoot * /*pYOffset*/)
+        { InvalidAction("GetBitmapDecodeOffset"); }
 
     // Actions on Dynamic Line Art
     virtual void Clear() { InvalidAction(""); }
@@ -164,31 +195,44 @@ class MHRoot
     virtual void GetLineColour(MHRoot * /*pResult*/) { InvalidAction("GetLineColour"); }
     virtual void GetFillColour(MHRoot * /*pResult*/) { InvalidAction("GetFillColour"); }
     virtual void DrawArcSector(bool /*fIsSector*/, int /*x*/, int /*y*/, int /*width*/, int /*height*/, int /*start*/,
-        int /*arc*/, MHEngine *) { InvalidAction("DrawArc/Sector"); }
-    virtual void DrawLine(int /*x1*/, int /*y1*/, int /*x2*/, int /*y2*/, MHEngine *) { InvalidAction("DrawLine"); }
-    virtual void DrawOval(int /*x1*/, int /*y1*/, int /*width*/, int /*height*/, MHEngine *) { InvalidAction("DrawOval"); }
-    virtual void DrawRectangle(int /*x1*/, int /*y1*/, int /*x2*/, int /*y2*/, MHEngine *) { InvalidAction("DrawRectangle"); }
-    virtual void DrawPoly(bool /*fIsPolygon*/, int /*nPoints*/, const int * /*xArray*/, const int * /*yArray*/, MHEngine *)
+        int /*arc*/, MHEngine */*engine*/) { InvalidAction("DrawArc/Sector"); }
+    virtual void DrawLine(int /*x1*/, int /*y1*/, int /*x2*/, int /*y2*/, MHEngine */*engine*/)
+        { InvalidAction("DrawLine"); }
+    virtual void DrawOval(int /*x1*/, int /*y1*/, int /*width*/, int /*height*/, MHEngine */*engine*/)
+        { InvalidAction("DrawOval"); }
+    virtual void DrawRectangle(int /*x1*/, int /*y1*/, int /*x2*/, int /*y2*/, MHEngine */*engine*/)
+        { InvalidAction("DrawRectangle"); }
+    virtual void DrawPoly(bool /*fIsPolygon*/, int /*nPoints*/, const int * /*xArray*/, const int * /*yArray*/, MHEngine */*engine*/)
          { InvalidAction("DrawPoly(gon/line)"); }
 
     // Actions on Video streams.
-    virtual void ScaleVideo(int /*xScale*/, int /*yScale*/, MHEngine *) { InvalidAction("ScaleVideo"); }
-    virtual void SetVideoDecodeOffset(int /*newXOffset*/, int /*newYOffset*/, MHEngine *) { InvalidAction("SetVideoDecodeOffset"); }
-    virtual void GetVideoDecodeOffset(MHRoot * /*pXOffset*/, MHRoot * /*pYOffset*/, MHEngine *) { InvalidAction("GetVideoDecodeOffset"); }
-    virtual void GetCounterPosition(MHRoot * /*pPos*/, MHEngine *) { InvalidAction("GetCounterPosition"); }
-    virtual void GetCounterMaxPosition(MHRoot * /*pPos*/, MHEngine *) { InvalidAction("GetCounterMaxPosition"); }
-    virtual void SetCounterPosition(int /*pos*/, MHEngine *) { InvalidAction("SetCounterPosition"); }
-    virtual void SetSpeed(int /*speed 0=stop*/, MHEngine *) { InvalidAction("SetSpeed"); }
+    virtual void ScaleVideo(int /*xScale*/, int /*yScale*/, MHEngine */*engine*/)
+        { InvalidAction("ScaleVideo"); }
+    virtual void SetVideoDecodeOffset(int /*newXOffset*/, int /*newYOffset*/, MHEngine */*engine*/)
+        { InvalidAction("SetVideoDecodeOffset"); }
+    virtual void GetVideoDecodeOffset(MHRoot * /*pXOffset*/, MHRoot * /*pYOffset*/, MHEngine */*engine*/)
+        { InvalidAction("GetVideoDecodeOffset"); }
+    virtual void GetCounterPosition(MHRoot * /*pPos*/, MHEngine */*engine*/)
+        { InvalidAction("GetCounterPosition"); }
+    virtual void GetCounterMaxPosition(MHRoot * /*pPos*/, MHEngine */*engine*/)
+        { InvalidAction("GetCounterMaxPosition"); }
+    virtual void SetCounterPosition(int /*pos*/, MHEngine */*engine*/)
+        { InvalidAction("SetCounterPosition"); }
+    virtual void SetSpeed(int /*speed 0=stop*/, MHEngine */*engine*/)
+        { InvalidAction("SetSpeed"); }
 
     // Actions on Interactibles.
-    virtual void SetInteractionStatus(bool /*newStatus*/, MHEngine *) { InvalidAction("SetInteractionStatus"); }
+    virtual void SetInteractionStatus(bool /*newStatus*/, MHEngine */*engine*/)
+        { InvalidAction("SetInteractionStatus"); }
     virtual bool GetInteractionStatus(void) { InvalidAction("GetInteractionStatus"); return false; }
-    virtual void SetHighlightStatus(bool /*newStatus*/, MHEngine */*engine*/) { InvalidAction("SetHighlightStatus"); }
+    virtual void SetHighlightStatus(bool /*newStatus*/, MHEngine */*engine*/)
+        { InvalidAction("SetHighlightStatus"); }
     virtual bool GetHighlightStatus(void) { InvalidAction("GetHighlightStatus"); return false; }
 
     // Actions on Sliders.
     virtual void Step(int /*nbSteps*/, MHEngine * /*engine*/) { InvalidAction("Step"); }
-    virtual void SetSliderValue(int /*nbSteps*/, MHEngine * /*engine*/) { InvalidAction("SetSliderValue"); }
+    virtual void SetSliderValue(int /*nbSteps*/, MHEngine * /*engine*/)
+        { InvalidAction("SetSliderValue"); }
     virtual int GetSliderValue(void) { InvalidAction("GetSliderValue"); return 0; }
     virtual void SetPortion(int /*newPortion*/, MHEngine * /*engine*/) { InvalidAction("SetPortion"); }
     virtual int GetPortion(void) { InvalidAction("GetPortion"); return 0; }
@@ -228,7 +272,7 @@ class MHGetRunningStatus: public MHActionObjectRef
 {
   public:
     MHGetRunningStatus(): MHActionObjectRef(":GetRunningStatus")  {}
-    void CallAction(MHEngine *, MHRoot *pTarget, MHRoot *pResult) override // MHActionObjectRef
+    void CallAction(MHEngine */*engine*/, MHRoot *pTarget, MHRoot *pResult) override // MHActionObjectRef
         { pResult->SetVariableValue(pTarget->GetRunningStatus());}
 };
 

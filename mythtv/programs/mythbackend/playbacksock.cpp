@@ -313,11 +313,13 @@ QDateTime PlaybackSock::PixmapLastModified(const ProgramInfo *pginfo)
     SendReceiveStringList(strlist);
 
     if (!strlist.empty() && !strlist[0].isEmpty() && (strlist[0] != "BAD"))
+    {
 #if QT_VERSION < QT_VERSION_CHECK(5,8,0)
         return MythDate::fromTime_t(strlist[0].toUInt());
 #else
         return MythDate::fromSecsSinceEpoch(strlist[0].toLongLong());
 #endif
+    }
 
     return QDateTime();
 }

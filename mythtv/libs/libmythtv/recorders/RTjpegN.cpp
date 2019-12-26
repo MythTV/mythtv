@@ -3039,12 +3039,14 @@ inline void RTjpeg::decompress8(int8_t *sp, uint8_t **planes)
  for(int i=0; i<m_height; i+=8)
  {
   for(int j=0; j<m_width; j+=8)
+  {
    if (*sp==-1)sp++;
    else
    {
     sp += s2b(m_block, sp, m_lB8, m_liqt);
     Idct(bp+j, m_block, m_width);
    }
+  }
   bp += m_width<<3;
  }
 }

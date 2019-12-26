@@ -1,13 +1,17 @@
 #ifndef LCDDEVICE_H_
 #define LCDDEVICE_H_
 
+#include <utility>
+
+// Qt headers
+#include <QList>
+#include <QMutex>
 #include <QObject>
 #include <QStringList>
-#include <QMutex>
-#include <QList>
 
 class QTimer;
 
+// MythTV headers
 #include "mythbaseexp.h"
 
 enum CHECKED_STATE {CHECKED = 0, UNCHECKED, NOTCHECKABLE };
@@ -18,10 +22,10 @@ class MBASE_PUBLIC LCDMenuItem
 {
   public:
     LCDMenuItem(bool item_selected, CHECKED_STATE item_checked,
-                const QString& item_name, unsigned int item_indent  = 0,
+                QString  item_name, unsigned int item_indent  = 0,
                 bool item_scroll = false) :
             m_selected(item_selected),  m_checked(item_checked),
-            m_name(item_name),          m_scroll(item_scroll),
+            m_name(std::move(item_name)),          m_scroll(item_scroll),
             m_indent(item_indent),      m_scrollPosition(item_indent)
     {
     }
@@ -55,12 +59,12 @@ enum TEXT_ALIGNMENT {ALIGN_LEFT, ALIGN_RIGHT, ALIGN_CENTERED };
 class MBASE_PUBLIC LCDTextItem
 {
   public:
-    LCDTextItem(unsigned int row, TEXT_ALIGNMENT align, const QString &text,
-                const QString &screen = "Generic", bool scroll = false,
-                const QString &widget = "textWidget") :
+    LCDTextItem(unsigned int row, TEXT_ALIGNMENT align, QString text,
+                QString screen = "Generic", bool scroll = false,
+                QString widget = "textWidget") :
                 m_itemRow(row),     m_itemAlignment(align),
-                m_itemText(text),   m_itemScreen(screen),
-                m_itemWidget(widget),   m_itemScrollable(scroll)
+                m_itemText(std::move(text)),   m_itemScreen(std::move(screen)),
+                m_itemWidget(std::move(widget)),   m_itemScrollable(scroll)
     {
     }
 
@@ -174,7 +178,7 @@ class MBASE_PUBLIC LCD : public QObject
     static bool m_enabled;
 
   public:
-   ~LCD();
+   ~LCD() override;
 
     enum {
         MUSIC_REPEAT_NONE  = 0,

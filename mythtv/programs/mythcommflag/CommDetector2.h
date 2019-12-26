@@ -50,7 +50,7 @@ class CommDetector2 : public CommDetectorBase
                       bool verbose) const override; // CommDetectorBase
 
   private:
-    virtual ~CommDetector2() = default;
+    ~CommDetector2() override = default;
 
     void reportState(int elapsedms, long long frameno, long long nframes,
             unsigned int passno, unsigned int npasses);

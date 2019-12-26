@@ -94,10 +94,11 @@ int ring_write(ringbuffer *rbuf, uint8_t *data, int count)
 	int free = ring_free(rbuf);
 
 	if ( free < count ){
-		if (DEBUG)
+		if (DEBUG) {
 			LOG(VB_GENERAL, LOG_ERR,
 			    "ringbuffer overflow %d<%d %d",
 				free, count, rbuf->size);
+		}
 		return FULL_BUFFER;
 	}
 	
@@ -247,10 +248,11 @@ int ring_write_file(ringbuffer *rbuf, int fd, int count)
 	int free = ring_free(rbuf);
 
 	if ( free < count ){
-		if (DEBUG)
+		if (DEBUG) {
 			LOG(VB_GENERAL, LOG_ERR,
 			    "ringbuffer overflow %d<%d %d %d\n",
 				free, count, pos, rbuf->read_pos);
+		}
 		return FULL_BUFFER;
 	}
 	

@@ -8,7 +8,7 @@ class MUI_PUBLIC MythUIComposite : public MythUIType
 {
 public:
     MythUIComposite(QObject *parent, const QString &name);
-    virtual ~MythUIComposite() = default;
+    ~MythUIComposite() override = default;
 
     virtual void SetTextFromMap(const InfoMap &infoMap);
     virtual void ResetMap(const InfoMap &infoMap);

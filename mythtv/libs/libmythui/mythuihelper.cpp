@@ -247,7 +247,7 @@ void MythUIHelperPrivate::GetScreenBounds()
     LOG(VB_GUI, LOG_INFO, LOC +
         QString("Primary screen: %1.").arg(primary->name()));
 
-    int numScreens = m_display->GetScreenCount();
+    int numScreens = MythDisplay::GetScreenCount();
     QSize dim = primary->virtualSize();
     LOG(VB_GUI, LOG_INFO, LOC +
         QString("Total desktop dim: %1x%2, over %3 screen[s].")
@@ -521,21 +521,25 @@ MythImage *MythUIHelper::GetImageFromCache(const QString &url)
 void MythUIHelper::IncludeInCacheSize(MythImage *im)
 {
     if (im)
+    {
 #if QT_VERSION < QT_VERSION_CHECK(5,10,0)
         d->m_cacheSize.fetchAndAddOrdered(im->byteCount());
 #else
         d->m_cacheSize.fetchAndAddOrdered(im->sizeInBytes());
 #endif
+    }
 }
 
 void MythUIHelper::ExcludeFromCacheSize(MythImage *im)
 {
     if (im)
+    {
 #if QT_VERSION < QT_VERSION_CHECK(5,10,0)
         d->m_cacheSize.fetchAndAddOrdered(-im->byteCount());
 #else
         d->m_cacheSize.fetchAndAddOrdered(-im->sizeInBytes());
 #endif
+    }
 }
 
 MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
@@ -705,9 +709,11 @@ void MythUIHelper::RemoveFromCacheByFile(const QString &fname)
                 .arg(fileInfo.fileName()));
 
             if (!dir.remove(fileInfo.fileName()))
+            {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                     QString("Failed to delete %1 from the theme cache")
                     .arg(fileInfo.fileName()));
+            }
         }
     }
 }

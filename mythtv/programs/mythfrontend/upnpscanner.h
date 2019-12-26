@@ -1,17 +1,20 @@
 #ifndef UPNPSCANNER_H
 #define UPNPSCANNER_H
 
-#include <QNetworkAccessManager>
-#include <QNetworkRequest>
-#include <QNetworkReply>
+#include <utility>
+
+// Qt headers
 #include <QDomDocument>
 #include <QMutex>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QNetworkRequest>
 #include <QTimer>
 
+// MythTV headers
 #include "upnpsubscription.h"
 #include "mthread.h"
 #include "upnpexp.h"
-
 #include "videometadatalistmanager.h"
 
 class MediaServer;
@@ -21,10 +24,11 @@ class meta_dir_node;
 class MediaServerItem
 {
   public:
-    MediaServerItem() : m_scanned(false) { }
-    MediaServerItem(const QString& id, const QString& parent,
-                    const QString& name, const QString& url)
-      : m_id(id), m_parentid(parent), m_name(name), m_url(url) { }
+    MediaServerItem() = default;
+    MediaServerItem(QString  id, QString  parent,
+                    QString  name, QString  url)
+      : m_id(std::move(id)), m_parentid(std::move(parent)),
+        m_name(std::move(name)), m_url(std::move(url)) { }
     QString NextUnbrowsed(void);
     MediaServerItem* Find(QString &id);
     bool Add(MediaServerItem &item);
@@ -43,7 +47,7 @@ class UPNPScanner : public QObject
    Q_OBJECT
 
   public:
-   ~UPNPScanner();
+   ~UPNPScanner() override;
 
     static void         Enable(bool enable, UPNPSubscription *sub = nullptr);
     static UPNPScanner* Instance(UPNPSubscription *sub = nullptr);
@@ -69,7 +73,7 @@ class UPNPScanner : public QObject
 
   private:
     explicit UPNPScanner(UPNPSubscription *sub)
-        : QObject(), m_subscription(sub) {}
+        :  m_subscription(sub) {}
     void ScheduleUpdate(void);
     void CheckFailure(const QUrl &url);
     void Debug(void);

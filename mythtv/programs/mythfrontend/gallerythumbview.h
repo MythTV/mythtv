@@ -25,48 +25,48 @@ class GalleryThumbView : public MythScreenType
     Q_OBJECT
 public:
     GalleryThumbView(MythScreenStack *parent, const char *name);
-    ~GalleryThumbView();
+    ~GalleryThumbView() override;
     bool    Create() override; // MythScreenType
 
 public slots:
     void    Start();
     void    Close() override; // MythScreenType
-    void    ClearSgDb()  { m_mgr.ClearStorageGroup(); }
+    static void    ClearSgDb()  { ImageManagerFe::ClearStorageGroup(); }
 
 private:
-    bool    keyPressEvent(QKeyEvent *) override; // MythScreenType
+    bool    keyPressEvent(QKeyEvent *event) override; // MythScreenType
     void    mediaEvent(MythMediaEvent *event) override // MythUIType
             { m_mgr.DeviceEvent(event); }
-    void    customEvent(QEvent *) override; // MythUIType
+    void    customEvent(QEvent *event) override; // MythUIType
     void    RemoveImages(const QStringList &ids, bool deleted = true);
     void    BuildImageList();
     void    ResetUiSelection();
     void    TransformItem(ImageFileTransform tran = kRotateCW);
     void    TransformMarked(ImageFileTransform tran = kRotateCW);
-    void    UpdateImageItem(MythUIButtonListItem *);
-    void    UpdateScanProgress(const QString &, int, int);
+    void    UpdateImageItem(MythUIButtonListItem *item);
+    void    UpdateScanProgress(const QString &scanner, int current, int total);
     void    StartSlideshow(ImageSlideShowType mode);
     void    SelectZoomWidget(int change);
-    QString CheckThumbnail(MythUIButtonListItem *, const ImagePtrK&,
-                           ImageIdList &request, int);
-    static void    UpdateThumbnail(MythUIButtonListItem *, const ImagePtrK&,
-                            const QString &url, int);
+    QString CheckThumbnail(MythUIButtonListItem *item, const ImagePtrK &im,
+                           ImageIdList &request, int index);
+    static void    UpdateThumbnail(MythUIButtonListItem *button, const ImagePtrK &im,
+                            const QString &url, int index);
     void    MenuMain();
-    void    MenuShow(MythMenu *);
-    void    MenuMarked(MythMenu *);
-    void    MenuPaste(MythMenu *);
-    void    MenuTransform(MythMenu *);
-    void    MenuAction(MythMenu *);
-    void    MenuSlideshow(MythMenu *);
+    void    MenuShow(MythMenu *mainMenu);
+    void    MenuMarked(MythMenu *mainMenu);
+    void    MenuPaste(MythMenu *mainMenu);
+    void    MenuTransform(MythMenu *mainMenu);
+    void    MenuAction(MythMenu *mainMenu);
+    void    MenuSlideshow(MythMenu *mainMenu);
     bool    DirSelectUp();
     void    DirSelectDown();
-    void    ShowDialog(const QString&, const QString& = "");
+    void    ShowDialog(const QString &msg, const QString &event = "");
 
 private slots:
-    void    LoadData(int);
-    void    SelectImage(int);
-    void    ItemClicked(MythUIButtonListItem *);
-    void    SetUiSelection(MythUIButtonListItem *);
+    void    LoadData(int parent);
+    void    SelectImage(int id);
+    void    ItemClicked(MythUIButtonListItem *item);
+    void    SetUiSelection(MythUIButtonListItem *item);
     void    Slideshow()            { StartSlideshow(kNormalSlideShow); }
     void    RecursiveSlideshow()   { StartSlideshow(kRecursiveSlideShow); }
     void    ShowDetails();
@@ -80,9 +80,9 @@ private slots:
     void    FlipHorizontalMarked() { TransformMarked(kFlipHorizontal); }
     void    FlipVerticalMarked()   { TransformMarked(kFlipVertical); }
     void    ResetExifMarked()      { TransformMarked(kResetToExif); }
-    void    MarkItem(bool = true);
+    void    MarkItem(bool mark = true);
     void    UnmarkItem()           { MarkItem(false); }
-    void    MarkAll(bool = true);
+    void    MarkAll(bool mark = true);
     void    UnmarkAll()            { MarkAll(false); }
     void    MarkInvertAll();
     void    HideItem(bool hide = true);
@@ -94,7 +94,7 @@ private slots:
     void    HideHidden()           { ShowHidden(false); }
     void    SetCover(bool reset = false);
     void    ResetCover()           { SetCover(true); }
-    void    ShowType(int = kPicAndVideo);
+    void    ShowType(int type = kPicAndVideo);
     void    HidePictures()         { ShowType(kVideoOnly); }
     void    HideVideos()           { ShowType(kPicOnly); }
     void    ZoomIn();
@@ -110,8 +110,8 @@ private slots:
     void    Copy(bool deleteAfter = false);
     void    Move();
     void    ShowPassword();
-    void    RepeatOn(int on = 1)   { gCoreContext->SaveSetting("GalleryRepeat", on); }
-    void    RepeatOff()            { RepeatOn(0); }
+    static void RepeatOn(int on = 1)   { gCoreContext->SaveSetting("GalleryRepeat", on); }
+    static void RepeatOff()            { RepeatOn(0); }
 
 private:
     using IntPair = QPair<int,int>;

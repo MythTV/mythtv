@@ -29,9 +29,9 @@
 
 class GrabberScript;
 
-const QString NetTree::RSSNode = tr("RSS Feeds");
-const QString NetTree::SearchNode = tr("Searches");
-const QString NetTree::DownloadNode = tr("Downloaded Files");
+const QString NetTree::kRSSNode = tr("RSS Feeds");
+const QString NetTree::kSearchNode = tr("Searches");
+const QString NetTree::kDownloadNode = tr("Downloaded Files");
 
 namespace
 {
@@ -466,11 +466,15 @@ MythMenu* NetTree::CreateShowManageMenu()
     menu->AddItem(tr("Manage Site Subscriptions"), SLOT(RunTreeEditor()));
     menu->AddItem(tr("Manage RSS Subscriptions"), SLOT(RunRSSEditor()));
     if (!m_treeAutoUpdate)
+    {
         menu->AddItem(tr("Enable Automatic Site Updates"),
                       SLOT(ToggleTreeUpdates()));
+    }
     else
+    {
         menu->AddItem(tr("Disable Automatic Site Updates"),
                       SLOT(ToggleTreeUpdates()));
+    }
 //    if (!m_rssAutoUpdate)
 //        menu->AddItem(tr("Enable Automatic RSS Updates"), SLOT(ToggleRSSUpdates()));
 //    else
@@ -519,7 +523,7 @@ void NetTree::FillTree()
     // First let's add all the RSS
     if (!m_rssList.isEmpty())
     {
-        auto *rssGeneric = new MythGenericTree(RSSNode, kSubFolder, false);
+        auto *rssGeneric = new MythGenericTree(kRSSNode, kSubFolder, false);
 
         // Add an upfolder
         if (m_type != DLG_TREE)

@@ -103,9 +103,11 @@ void LyricsData::findLyrics(const QString &grabber)
     QString album = m_parent->Album().isEmpty() ? "*Unknown*" : m_parent->Album();
 
     if (!m_parent->isDBTrack())
+    {
         slist << artist
               << album
               << title;
+    }
 
    LOG(VB_NETWORK, LOG_INFO, QString("LyricsData:: Sending command %1").arg(slist.join('~')));
 

@@ -22,36 +22,36 @@ class EITHelper;
 class PSIPTable;
 class RingBuffer;
 
-typedef vector<uint>                    uint_vec_t;
+using uint_vec_t = vector<uint>;
 
-typedef QMap<unsigned int, PSIPTable*>  pid_psip_map_t;
-typedef QMap<const PSIPTable*, int>     psip_refcnt_map_t;
+using pid_psip_map_t    = QMap<unsigned int, PSIPTable*>;
+using psip_refcnt_map_t = QMap<const PSIPTable*, int>;
 
-typedef ProgramAssociationTable*               pat_ptr_t;
-typedef ProgramAssociationTable const*         pat_const_ptr_t;
-typedef vector<const ProgramAssociationTable*> pat_vec_t;
-typedef QMap<uint, pat_vec_t>                  pat_map_t;
-typedef QMap<uint, ProgramAssociationTable*>   pat_cache_t;
+using pat_ptr_t         = ProgramAssociationTable *;
+using pat_const_ptr_t   = const ProgramAssociationTable *;
+using pat_vec_t         = vector<const ProgramAssociationTable *>;
+using pat_map_t         = QMap<uint, pat_vec_t>;
+using pat_cache_t       = QMap<uint, ProgramAssociationTable*>;
 
-typedef ConditionalAccessTable*                cat_ptr_t;
-typedef ConditionalAccessTable const*          cat_const_ptr_t;
-typedef vector<const ConditionalAccessTable*>  cat_vec_t;
-typedef QMap<uint, cat_vec_t>                  cat_map_t;
-typedef QMap<uint, ConditionalAccessTable*>    cat_cache_t;
+using cat_ptr_t         = ConditionalAccessTable *;
+using cat_const_ptr_t   = const ConditionalAccessTable *;
+using cat_vec_t         = vector<const ConditionalAccessTable *>;
+using cat_map_t         = QMap<uint, cat_vec_t>;
+using cat_cache_t       = QMap<uint, ConditionalAccessTable*>;
 
-typedef ProgramMapTable*                pmt_ptr_t;
-typedef ProgramMapTable const*          pmt_const_ptr_t;
-typedef vector<const ProgramMapTable*>  pmt_vec_t;
-typedef QMap<uint, pmt_vec_t>           pmt_map_t;
-typedef QMap<uint, ProgramMapTable*>    pmt_cache_t;
+using pmt_ptr_t         = ProgramMapTable*;
+using pmt_const_ptr_t   = ProgramMapTable const*;
+using pmt_vec_t         = vector<const ProgramMapTable*>;
+using pmt_map_t         = QMap<uint, pmt_vec_t>;
+using pmt_cache_t       = QMap<uint, ProgramMapTable*>;
 
-typedef vector<unsigned char>           uchar_vec_t;
+using uchar_vec_t       = vector<unsigned char>;
 
-typedef vector<MPEGStreamListener*>     mpeg_listener_vec_t;
-typedef vector<TSPacketListener*>       ts_listener_vec_t;
-typedef vector<TSPacketListenerAV*>     ts_av_listener_vec_t;
-typedef vector<MPEGSingleProgramStreamListener*> mpeg_sp_listener_vec_t;
-typedef vector<PSStreamListener*>       ps_listener_vec_t;
+using mpeg_listener_vec_t    = vector<MPEGStreamListener*>;
+using ts_listener_vec_t      = vector<TSPacketListener*>;
+using ts_av_listener_vec_t   = vector<TSPacketListenerAV*>;
+using mpeg_sp_listener_vec_t = vector<MPEGSingleProgramStreamListener*>;
+using ps_listener_vec_t      = vector<PSStreamListener*>;
 
 enum CryptStatus
 {
@@ -63,19 +63,15 @@ enum CryptStatus
 class MTV_PUBLIC CryptInfo
 {
   public:
-    CryptInfo() :
-        status(kEncUnknown), encrypted_packets(0), decrypted_packets(0),
-        encrypted_min(1000), decrypted_min(8) { }
-    CryptInfo(uint e, uint d) :
-        status(kEncUnknown), encrypted_packets(0), decrypted_packets(0),
-        encrypted_min(e), decrypted_min(d) { }
+    CryptInfo() = default;
+    CryptInfo(uint e, uint d) : m_encryptedMin(e), m_decryptedMin(d) { }
 
   public:
-    CryptStatus status;
-    uint encrypted_packets;
-    uint decrypted_packets;
-    uint encrypted_min;
-    uint decrypted_min;
+    CryptStatus m_status            {kEncUnknown};
+    uint        m_encryptedPackets {0};
+    uint        m_decryptedPackets {0};
+    uint        m_encryptedMin     {1000};
+    uint        m_decryptedMin     {8};
 };
 
 enum PIDPriority
@@ -85,16 +81,16 @@ enum PIDPriority
     kPIDPriorityNormal = 2,
     kPIDPriorityHigh   = 3,
 };
-typedef QMap<uint, PIDPriority> pid_map_t;
+using pid_map_t = QMap<uint, PIDPriority>;
 
 class MTV_PUBLIC MPEGStreamData : public EITSource
 {
   public:
     MPEGStreamData(int desiredProgram, int cardnum, bool cacheTables);
-    virtual ~MPEGStreamData();
+    ~MPEGStreamData() override;
 
-    void SetCaching(bool cacheTables) { _cache_tables = cacheTables; }
-    void SetListeningDisabled(bool lt) { _listening_disabled = lt; }
+    void SetCaching(bool cacheTables) { m_cacheTables = cacheTables; }
+    void SetListeningDisabled(bool lt) { m_listeningDisabled = lt; }
 
     virtual void Reset(void) { Reset(-1); }
     virtual void Reset(int desiredProgram);
@@ -113,8 +109,8 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
         { return false; }
 
     // Table processing
-    void SetIgnoreCRC(bool haveCRCbug) { _have_CRC_bug = haveCRCbug; }
-    virtual bool IsRedundant(uint pid, const PSIPTable&) const;
+    void SetIgnoreCRC(bool haveCRCbug) { m_haveCrcBug = haveCRCbug; }
+    virtual bool IsRedundant(uint pid, const PSIPTable &psip) const;
     virtual bool HandleTables(uint pid, const PSIPTable &psip);
     virtual void HandleTSTables(const TSPacket* tspacket);
     virtual bool ProcessTSPacket(const TSPacket& tspacket);
@@ -124,37 +120,37 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     // Listening
     virtual void AddListeningPID(
         uint pid, PIDPriority priority = kPIDPriorityNormal)
-        { _pids_listening[pid] = priority; }
+        { m_pidsListening[pid] = priority; }
     virtual void AddNotListeningPID(uint pid)
-        { _pids_notlistening[pid] = kPIDPriorityNormal; }
+        { m_pidsNotListening[pid] = kPIDPriorityNormal; }
     virtual void AddWritingPID(
         uint pid, PIDPriority priority = kPIDPriorityHigh)
-        { _pids_writing[pid] = priority; }
+        { m_pidsWriting[pid] = priority; }
     virtual void AddAudioPID(
         uint pid, PIDPriority priority = kPIDPriorityHigh)
-        { _pids_audio[pid] = priority; }
+        { m_pidsAudio[pid] = priority; }
 
-    virtual void RemoveListeningPID(uint pid) { _pids_listening.remove(pid);  }
+    virtual void RemoveListeningPID(uint pid) { m_pidsListening.remove(pid);  }
     virtual void RemoveNotListeningPID(uint pid)
-        { _pids_notlistening.remove(pid); }
-    virtual void RemoveWritingPID(uint pid) { _pids_writing.remove(pid);    }
-    virtual void RemoveAudioPID(uint pid)   { _pids_audio.remove(pid);      }
+        { m_pidsNotListening.remove(pid); }
+    virtual void RemoveWritingPID(uint pid) { m_pidsWriting.remove(pid);    }
+    virtual void RemoveAudioPID(uint pid)   { m_pidsAudio.remove(pid);      }
 
     virtual bool IsListeningPID(uint pid) const;
     virtual bool IsNotListeningPID(uint pid) const;
     virtual bool IsWritingPID(uint pid) const;
     bool IsVideoPID(uint pid) const
-        { return _pid_video_single_program == pid; }
+        { return m_pidVideoSingleProgram == pid; }
     virtual bool IsAudioPID(uint pid) const;
 
     const pid_map_t& ListeningPIDs(void) const
-        { return _pids_listening; }
+        { return m_pidsListening; }
     const pid_map_t& AudioPIDs(void) const
-        { return _pids_audio; }
+        { return m_pidsAudio; }
     const pid_map_t& WritingPIDs(void) const
-        { return _pids_writing; }
+        { return m_pidsWriting; }
 
-    uint GetPIDs(pid_map_t&) const;
+    uint GetPIDs(pid_map_t &pids) const;
 
     // PID Priorities
     PIDPriority GetPIDPriority(uint pid) const;
@@ -162,11 +158,11 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     // Table versions
     void SetVersionPAT(uint tsid, int version, uint last_section)
     {
-        _pat_status.SetVersion(tsid, version, last_section);
+        m_patStatus.SetVersion(tsid, version, last_section);
     }
     void SetVersionPMT(uint pnum, int version, uint last_section)
     {
-        _pmt_status.SetVersion(pnum, version, last_section);
+        m_pmtStatus.SetVersion(pnum, version, last_section);
     }
 
     // Sections seen
@@ -207,12 +203,12 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     pmt_map_t GetCachedPMTMap(void) const;
 
     virtual void ReturnCachedTable(const PSIPTable *psip) const;
-    virtual void ReturnCachedPATTables(pat_vec_t&) const;
-    virtual void ReturnCachedPATTables(pat_map_t&) const;
-    virtual void ReturnCachedCATTables(cat_vec_t&) const;
-    virtual void ReturnCachedCATTables(cat_map_t&) const;
-    virtual void ReturnCachedPMTTables(pmt_vec_t&) const;
-    virtual void ReturnCachedPMTTables(pmt_map_t&) const;
+    virtual void ReturnCachedPATTables(pat_vec_t &pats) const;
+    virtual void ReturnCachedPATTables(pat_map_t &pats) const;
+    virtual void ReturnCachedCATTables(cat_vec_t &cats) const;
+    virtual void ReturnCachedCATTables(cat_map_t &cats) const;
+    virtual void ReturnCachedPMTTables(pmt_vec_t &pmts) const;
+    virtual void ReturnCachedPMTTables(pmt_map_t &pmts) const;
 
     // Encryption Monitoring
     void AddEncryptionTestPID(uint pnum, uint pid, bool isvideo);
@@ -226,22 +222,17 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     bool IsProgramEncrypted(uint pnum) const;
 
     // "signals"
-    void AddMPEGListener(MPEGStreamListener*);
-    void RemoveMPEGListener(MPEGStreamListener*);
-    void UpdatePAT(const ProgramAssociationTable*);
-    void UpdateCAT(const ConditionalAccessTable*);
-    void UpdatePMT(uint program_num, const ProgramMapTable*);
+    void AddMPEGListener(MPEGStreamListener *val);
+    void RemoveMPEGListener(MPEGStreamListener *val);
 
-    void AddWritingListener(TSPacketListener*);
-    void RemoveWritingListener(TSPacketListener*);
+    void AddWritingListener(TSPacketListener *val);
+    void RemoveWritingListener(TSPacketListener *val);
 
     // Single Program Stuff, signals with processed tables
-    void AddMPEGSPListener(MPEGSingleProgramStreamListener*);
-    void RemoveMPEGSPListener(MPEGSingleProgramStreamListener*);
-    void AddAVListener(TSPacketListenerAV*);
-    void RemoveAVListener(TSPacketListenerAV*);
-    void UpdatePATSingleProgram(ProgramAssociationTable*);
-    void UpdatePMTSingleProgram(ProgramMapTable*);
+    void AddMPEGSPListener(MPEGSingleProgramStreamListener *val);
+    void RemoveMPEGSPListener(MPEGSingleProgramStreamListener *val);
+    void AddAVListener(TSPacketListenerAV *val);
+    void RemoveAVListener(TSPacketListenerAV *val);
 
     // Program Stream Stuff
     void AddPSStreamListener(PSStreamListener *val);
@@ -250,39 +241,39 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
   public:
     // Single program stuff, sets
     void SetDesiredProgram(int p);
-    inline void SetPATSingleProgram(ProgramAssociationTable*);
-    inline void SetPMTSingleProgram(ProgramMapTable*);
+    inline void SetPATSingleProgram(ProgramAssociationTable *pat);
+    inline void SetPMTSingleProgram(ProgramMapTable *pmt);
     void SetVideoStreamsRequired(uint num)
-        { _pmt_single_program_num_video = num;  }
+        { m_pmtSingleProgramNumVideo = num;  }
     uint GetVideoStreamsRequired() const
-        { return _pmt_single_program_num_video; }
+        { return m_pmtSingleProgramNumVideo; }
     void SetAudioStreamsRequired(uint num)
-        { _pmt_single_program_num_audio = num;  }
+        { m_pmtSingleProgramNumAudio = num;  }
     uint GetAudioStreamsRequired() const
-        { return _pmt_single_program_num_audio; }
+        { return m_pmtSingleProgramNumAudio; }
     void SetRecordingType(const QString &recording_type);
 
     // Single program stuff, gets
-    int DesiredProgram(void) const          { return _desired_program; }
-    uint VideoPIDSingleProgram(void) const  { return _pid_video_single_program; }
-    QString GetRecordingType(void) const    { return _recording_type; }
+    int DesiredProgram(void) const          { return m_desiredProgram; }
+    uint VideoPIDSingleProgram(void) const  { return m_pidVideoSingleProgram; }
+    QString GetRecordingType(void) const    { return m_recordingType; }
 
     const ProgramAssociationTable* PATSingleProgram(void) const
-        { return _pat_single_program; }
+        { return m_patSingleProgram; }
     const ProgramMapTable* PMTSingleProgram(void) const
-        { return _pmt_single_program; }
+        { return m_pmtSingleProgram; }
 
     ProgramAssociationTable* PATSingleProgram(void)
-        { return _pat_single_program; }
+        { return m_patSingleProgram; }
     ProgramMapTable* PMTSingleProgram(void)
-        { return _pmt_single_program; }
+        { return m_pmtSingleProgram; }
 
     // Single program stuff, mostly used internally
     int VersionPATSingleProgram(void) const;
     int VersionPMTSingleProgram(void) const;
 
-    bool CreatePATSingleProgram(const ProgramAssociationTable&);
-    bool CreatePMTSingleProgram(const ProgramMapTable&);
+    bool CreatePATSingleProgram(const ProgramAssociationTable &pat);
+    bool CreatePMTSingleProgram(const ProgramMapTable &pmt);
 
   protected:
     // Table processing -- for internal use
@@ -290,14 +281,14 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     bool AssemblePSIP(PSIPTable& psip, TSPacket* tspacket);
     void SavePartialPSIP(uint pid, PSIPTable* packet);
     PSIPTable* GetPartialPSIP(uint pid)
-        { return _partial_psip_packet_cache[pid]; }
+        { return m_partialPsipPacketCache[pid]; }
     void ClearPartialPSIP(uint pid)
-        { _partial_psip_packet_cache.remove(pid); }
+        { m_partialPsipPacketCache.remove(pid); }
     void DeletePartialPSIP(uint pid);
     void ProcessPAT(const ProgramAssociationTable *pat);
     void ProcessCAT(const ConditionalAccessTable *cat);
     void ProcessPMT(const ProgramMapTable *pmt);
-    void ProcessEncryptedPacket(const TSPacket&);
+    void ProcessEncryptedPacket(const TSPacket &tspacket);
 
     static int ResyncStream(const unsigned char *buffer, int curr_pos, int len);
 
@@ -311,103 +302,103 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     void CachePMT(const ProgramMapTable *pmt);
 
   protected:
-    int                       _cardid;
-    QString                   _sistandard                   {"mpeg"};
+    int                       m_cardId;
+    QString                   m_siStandard                  {"mpeg"};
 
-    bool                      _have_CRC_bug {false};
+    bool                      m_haveCrcBug                  {false};
 
-    mutable QMutex            _si_time_lock;
-    uint                      _si_time_offset_cnt           {0};
-    uint                      _si_time_offset_indx          {0};
-    double                    _si_time_offsets[16]          {0.0};
+    mutable QMutex            m_siTimeLock;
+    uint                      m_siTimeOffsetCnt             {0};
+    uint                      m_siTimeOffsetIndx            {0};
+    double                    m_siTimeOffsets[16]           {0.0};
 
     // Generic EIT stuff used for ATSC and DVB
-    EITHelper                *_eit_helper                   {nullptr};
-    float                     _eit_rate                     {0.0F};
+    EITHelper                *m_eitHelper                   {nullptr};
+    float                     m_eitRate                     {0.0F};
 
     // Listening
-    pid_map_t                 _pids_listening;
-    pid_map_t                 _pids_notlistening;
-    pid_map_t                 _pids_writing;
-    pid_map_t                 _pids_audio;
-    bool                      _listening_disabled           {false};
+    pid_map_t                 m_pidsListening;
+    pid_map_t                 m_pidsNotListening;
+    pid_map_t                 m_pidsWriting;
+    pid_map_t                 m_pidsAudio;
+    bool                      m_listeningDisabled           {false};
 
     // Encryption monitoring
-    mutable QMutex            _encryption_lock              {QMutex::Recursive};
-    QMap<uint, CryptInfo>     _encryption_pid_to_info;
-    QMap<uint, uint_vec_t>    _encryption_pnum_to_pids;
-    QMap<uint, uint_vec_t>    _encryption_pid_to_pnums;
-    QMap<uint, CryptStatus>   _encryption_pnum_to_status;
+    mutable QMutex            m_encryptionLock              {QMutex::Recursive};
+    QMap<uint, CryptInfo>     m_encryptionPidToInfo;
+    QMap<uint, uint_vec_t>    m_encryptionPnumToPids;
+    QMap<uint, uint_vec_t>    m_encryptionPidToPnums;
+    QMap<uint, CryptStatus>   m_encryptionPnumToStatus;
 
     // Signals
-    mutable QMutex            _listener_lock                {QMutex::Recursive};
-    mpeg_listener_vec_t       _mpeg_listeners;
-    mpeg_sp_listener_vec_t    _mpeg_sp_listeners;
-    ts_listener_vec_t         _ts_writing_listeners;
-    ts_av_listener_vec_t      _ts_av_listeners;
-    ps_listener_vec_t         _ps_listeners;
+    mutable QMutex            m_listenerLock                {QMutex::Recursive};
+    mpeg_listener_vec_t       m_mpegListeners;
+    mpeg_sp_listener_vec_t    m_mpegSpListeners;
+    ts_listener_vec_t         m_tsWritingListeners;
+    ts_av_listener_vec_t      m_tsAvListeners;
+    ps_listener_vec_t         m_psListeners;
 
     // Table versions
-    TableStatusMap            _pat_status;
-    TableStatusMap            _cat_status;
-    TableStatusMap            _pmt_status;
+    TableStatusMap            m_patStatus;
+    TableStatusMap            m_catStatus;
+    TableStatusMap            m_pmtStatus;
 
     // PSIP construction
-    pid_psip_map_t            _partial_psip_packet_cache;
+    pid_psip_map_t            m_partialPsipPacketCache;
 
     // Caching
-    bool                             _cache_tables;
-    mutable QMutex                   _cache_lock            {QMutex::Recursive};
-    mutable pat_cache_t              _cached_pats;
-    mutable cat_cache_t              _cached_cats;
-    mutable pmt_cache_t              _cached_pmts;
-    mutable psip_refcnt_map_t        _cached_ref_cnt;
-    mutable psip_refcnt_map_t        _cached_slated_for_deletion;
+    bool                             m_cacheTables;
+    mutable QMutex                   m_cacheLock            {QMutex::Recursive};
+    mutable pat_cache_t              m_cachedPats;
+    mutable cat_cache_t              m_cachedCats;
+    mutable pmt_cache_t              m_cachedPmts;
+    mutable psip_refcnt_map_t        m_cachedRefCnt;
+    mutable psip_refcnt_map_t        m_cachedSlatedForDeletion;
 
     // Single program variables
-    int                       _desired_program;
-    QString                   _recording_type               {"all"};
-    bool                      _strip_pmt_descriptors        {false};
-    bool                      _normalize_stream_type        {true};
-    uint                      _pid_video_single_program     {0xffffffff};
-    uint                      _pid_pmt_single_program       {0xffffffff};
-    uint                      _pmt_single_program_num_video {1};
-    uint                      _pmt_single_program_num_audio {0};
-    ProgramAssociationTable  *_pat_single_program           {nullptr};
-    ProgramMapTable          *_pmt_single_program           {nullptr};
+    int                       m_desiredProgram;
+    QString                   m_recordingType               {"all"};
+    bool                      m_stripPmtDescriptors         {false};
+    bool                      m_normalizeStreamType         {true};
+    uint                      m_pidVideoSingleProgram       {0xffffffff};
+    uint                      m_pidPmtSingleProgram         {0xffffffff};
+    uint                      m_pmtSingleProgramNumVideo    {1};
+    uint                      m_pmtSingleProgramNumAudio    {0};
+    ProgramAssociationTable  *m_patSingleProgram            {nullptr};
+    ProgramMapTable          *m_pmtSingleProgram            {nullptr};
 
   // PAT Timeout handling.
   private:
-    bool                      _invalid_pat_seen             {false};
-    bool                      _invalid_pat_warning          {false};
-    MythTimer                 _invalid_pat_timer;
+    bool                      m_invalidPatSeen              {false};
+    bool                      m_invalidPatWarning           {false};
+    MythTimer                 m_invalidPatTimer;
 };
 
 #include "mpegtables.h"
 
 inline void MPEGStreamData::SetPATSingleProgram(ProgramAssociationTable* pat)
 {
-    delete _pat_single_program;
-    _pat_single_program = pat;
+    delete m_patSingleProgram;
+    m_patSingleProgram = pat;
 }
 
 inline void MPEGStreamData::SetPMTSingleProgram(ProgramMapTable* pmt)
 {
-    delete _pmt_single_program;
-    _pmt_single_program = pmt;
+    delete m_pmtSingleProgram;
+    m_pmtSingleProgram = pmt;
 }
 
 inline int MPEGStreamData::VersionPATSingleProgram() const
 {
-    return (_pat_single_program) ? int(_pat_single_program->Version()) : -1;
+    return (m_patSingleProgram) ? int(m_patSingleProgram->Version()) : -1;
 }
 
 inline int MPEGStreamData::VersionPMTSingleProgram() const
 {
-    return (_pmt_single_program) ? int(_pmt_single_program->Version()) : -1;
+    return (m_pmtSingleProgram) ? int(m_pmtSingleProgram->Version()) : -1;
 }
 
-inline void MPEGStreamData::HandleAdaptationFieldControl(const TSPacket*)
+inline void MPEGStreamData::HandleAdaptationFieldControl(const TSPacket */*tspacket*/)
 {
     // TODO
     //AdaptationFieldControl afc(tspacket.data()+4);

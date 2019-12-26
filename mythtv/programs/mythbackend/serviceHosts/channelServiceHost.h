@@ -51,9 +51,7 @@ class ChannelServiceHost : public ServiceHost
         {
         }
 
-        virtual ~ChannelServiceHost()
-        {
-        }
+        ~ChannelServiceHost() override = default;
 };
 
 #endif

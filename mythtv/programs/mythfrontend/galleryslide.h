@@ -63,15 +63,14 @@ public:
       \param image Image to be animated
       \param type Effect to be animated
     */
-    Animation(Slide *image, Type type = Alpha)
-        : AbstractAnimation(), QVariantAnimation(),
-          m_parent(image), m_type(type) {}
+    explicit Animation(Slide *image, Type type = Alpha)
+        : m_parent(image), m_type(type) {}
     void Start(bool forwards = true, float speed = 1.0) override; // AbstractAnimation
     void Pulse(int interval) override; // AbstractAnimation
     void Set(const QVariant& from, const QVariant& to,
              int duration = 500,
              const QEasingCurve& curve = QEasingCurve::InOutCubic,
-             UIEffects::Centre = UIEffects::Middle);
+             UIEffects::Centre centre = UIEffects::Middle);
     void updateCurrentValue(const QVariant &value) override; // QVariantAnimation
 
 protected:
@@ -91,8 +90,8 @@ protected:
 class GroupAnimation : public AbstractAnimation
 {
 public:
-    GroupAnimation() : AbstractAnimation()            {}
-    virtual ~GroupAnimation()                         { GroupAnimation::Clear(); }
+    GroupAnimation() = default;
+    ~GroupAnimation() override                        { GroupAnimation::Clear(); }
     void Pulse(int interval) override                     = 0; // AbstractAnimation
     void Start(bool forwards, float speed = 1.0) override      // AbstractAnimation
         { AbstractAnimation::Start(forwards, speed); }
@@ -112,7 +111,7 @@ class SequentialAnimation : public GroupAnimation
 {
     Q_OBJECT
 public:
-    SequentialAnimation() : GroupAnimation()  {}
+    SequentialAnimation() = default;
     void Pulse(int interval) override; // GroupAnimation
     void Start(bool forwards, float speed = 1.0) override; // GroupAnimation
     void SetSpeed(float speed) override; // GroupAnimation
@@ -130,7 +129,7 @@ class ParallelAnimation : public GroupAnimation
 {
     Q_OBJECT
 public:
-    ParallelAnimation() : GroupAnimation()  {}
+    ParallelAnimation() = default;
     void Pulse(int interval) override; // GroupAnimation
     void Start(bool forwards, float speed = 1.0) override; // GroupAnimation
     void SetSpeed(float speed) override; // GroupAnimation
@@ -159,13 +158,13 @@ class Slide : public MythUIImage
     Q_OBJECT
 public:
     Slide(MythUIType *parent, const QString& name, MythUIImage *image);
-    ~Slide();
+    ~Slide() override;
 
     void      Clear();
     bool      LoadSlide(const ImagePtrK& im, int direction = 0, bool notifyCompletion = false);
     ImagePtrK GetImageData() const  { return m_data; }
     void      Zoom(int percentage);
-    void      SetZoom(float);
+    void      SetZoom(float zoom);
     void      Pan(QPoint offset);
     void      SetPan(QPoint pos);
     bool      CanZoomIn() const     { return m_zoom < MAX_ZOOM; }
@@ -218,7 +217,7 @@ class SlideBuffer : public QObject
     Q_OBJECT
 public:
     SlideBuffer() = default;
-    ~SlideBuffer();
+    ~SlideBuffer() override;
 
     void   Initialise(MythUIImage &image);
     void   Teardown();
@@ -242,7 +241,7 @@ signals:
     void SlideReady(int count);
 
 private slots:
-    void Flush(Slide*, const QString& reason = "Loaded");
+    void Flush(Slide *slide, const QString& reason = "Loaded");
 
 protected:
     QString BufferState();

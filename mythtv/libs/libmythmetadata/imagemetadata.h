@@ -9,11 +9,15 @@
 #ifndef IMAGEMETADATA_H
 #define IMAGEMETADATA_H
 
+#include <utility>
+
+// Qt headers
 #include <QCoreApplication> // for tr()
+#include <QDateTime>
 #include <QStringBuilder>
 #include <QStringList>
-#include <QDateTime>
 
+// MythTV headers
 #include "mythmetaexp.h"
 
 
@@ -65,7 +69,7 @@ public:
 
     //! Encode original & current orientation to a single Db field
     int Composite() { return m_current * 10 + m_file; }
-    int Transform(int);
+    int Transform(int transform);
     int GetCurrent(bool compensate);
     QString Description();
 
@@ -74,7 +78,7 @@ public:
 private:
     static QString AsText(int orientation);
 
-    int Apply(int);
+    int Apply(int transform);
 
     using Matrix = QHash<int, QHash<int, int> >;
 
@@ -122,7 +126,8 @@ public:
     virtual QString     GetComment(bool *exists = nullptr)          = 0;
 
 protected:
-    explicit ImageMetaData(const QString &filePath) : m_filePath(filePath) {}
+    explicit ImageMetaData(QString filePath)
+        : m_filePath(std::move(filePath)) {}
 
     //! Image filepath
     QString m_filePath;

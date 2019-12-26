@@ -29,19 +29,19 @@ CannyEdgeDetector::CannyEdgeDetector(void)
     const double    TWO_SIGMA2 = 2 * sigma * sigma;
 
     /* The SGM computations require that mask_radius >= 2. */
-    m_mask_radius = max(2, (int)roundf(TRUNCATION * sigma));
-    int mask_width = 2 * m_mask_radius + 1;
+    m_maskRadius = max(2, (int)roundf(TRUNCATION * sigma));
+    int mask_width = 2 * m_maskRadius + 1;
 
     /* Compute Gaussian mask. */
     m_mask = new double[mask_width];
     double val = 1.0;  /* Initialize center of Gaussian mask (rr=0 => exp(0)). */
-    m_mask[m_mask_radius] = val;
+    m_mask[m_maskRadius] = val;
     double sum = val;
-    for (int rr = 1; rr <= m_mask_radius; rr++)
+    for (int rr = 1; rr <= m_maskRadius; rr++)
     {
         val = exp(-(rr * rr) / TWO_SIGMA2); // Gaussian weight(rr,sigma)
-        m_mask[m_mask_radius + rr] = val;
-        m_mask[m_mask_radius - rr] = val;
+        m_mask[m_maskRadius + rr] = val;
+        m_mask[m_maskRadius - rr] = val;
         sum += 2 * val;
     }
     for (int ii = 0; ii < mask_width; ii++)
@@ -54,7 +54,7 @@ CannyEdgeDetector::~CannyEdgeDetector(void)
     av_freep(&m_convolved.data[0]);
     av_freep(&m_s2.data[0]);
     av_freep(&m_s1.data[0]);
-    delete []m_sgmsorted;
+    delete []m_sgmSorted;
     delete []m_sgm;
     delete []m_mask;
 }
@@ -75,12 +75,12 @@ CannyEdgeDetector::resetBuffers(int newwidth, int newheight)
         av_freep(&m_convolved.data[0]);
         av_freep(&m_edges.data[0]);
         delete []m_sgm;
-        delete []m_sgmsorted;
+        delete []m_sgmSorted;
         m_sgm = nullptr;
     }
 
-    const int   padded_width = newwidth + 2 * m_mask_radius;
-    const int   padded_height = newheight + 2 * m_mask_radius;
+    const int   padded_width = newwidth + 2 * m_maskRadius;
+    const int   padded_height = newheight + 2 * m_maskRadius;
 
     if (av_image_alloc(m_s1.data, m_s1.linesize,
         padded_width, padded_height, AV_PIX_FMT_GRAY8, IMAGE_ALIGN))
@@ -115,7 +115,7 @@ CannyEdgeDetector::resetBuffers(int newwidth, int newheight)
     }
 
     m_sgm = new unsigned int[padded_width * padded_height];
-    m_sgmsorted = new unsigned int[newwidth * newheight];
+    m_sgmSorted = new unsigned int[newwidth * newheight];
 
     m_ewidth = newwidth;
     m_eheight = newheight;
@@ -153,20 +153,20 @@ CannyEdgeDetector::detectEdges(const AVFrame *pgm, int pgmheight,
      */
 
     const int   pgmwidth = pgm->linesize[0];
-    const int   padded_height = pgmheight + 2 * m_mask_radius;
+    const int   padded_height = pgmheight + 2 * m_maskRadius;
 
     if (resetBuffers(pgmwidth, pgmheight))
         return nullptr;
 
     if (pgm_convolve_radial(&m_convolved, &m_s1, &m_s2, pgm, pgmheight,
-                m_mask, m_mask_radius))
+                m_mask, m_maskRadius))
         return nullptr;
 
-    if (edge_mark_uniform_exclude(&m_edges, pgmheight, m_mask_radius,
+    if (edge_mark_uniform_exclude(&m_edges, pgmheight, m_maskRadius,
                 sgm_init_exclude(m_sgm, &m_convolved, padded_height,
-                    m_exclude.row + m_mask_radius, m_exclude.col + m_mask_radius,
+                    m_exclude.row + m_maskRadius, m_exclude.col + m_maskRadius,
                     m_exclude.width, m_exclude.height),
-                m_sgmsorted, percentile,
+                m_sgmSorted, percentile,
                 m_exclude.row, m_exclude.col, m_exclude.width, m_exclude.height))
         return nullptr;
 

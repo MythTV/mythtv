@@ -13,11 +13,11 @@ class HLSStreamWorker : public MThread
 {
   public:
     explicit HLSStreamWorker(HLSReader* parent);
-    ~HLSStreamWorker(void);
+    ~HLSStreamWorker(void) override;
 
     void Cancel(void);
     void CancelCurrentDownload(void);
-    void Wakeup(void) { QMutexLocker lock(&m_lock); m_waitcond.wakeAll(); }
+    void Wakeup(void) { QMutexLocker lock(&m_lock); m_waitCond.wakeAll(); }
 
   protected:
     void run() override; // MThread
@@ -31,8 +31,8 @@ class HLSStreamWorker : public MThread
     bool                m_cancel     {false};
     bool                m_wokenup    {false};
     mutable QMutex      m_lock;
-    QMutex              m_downloader_lock;
-    QWaitCondition      m_waitcond;
+    QMutex              m_downloaderLock;
+    QWaitCondition      m_waitCond;
 };
 
 #endif

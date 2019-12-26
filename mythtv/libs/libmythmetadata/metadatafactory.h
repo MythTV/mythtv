@@ -1,6 +1,8 @@
 #ifndef METADATAFACTORY_H_
 #define METADATAFACTORY_H_
 
+#include <utility>
+
 // Needed to perform a lookup
 #include "metadatacommon.h"
 #include "metadataimagedownload.h"
@@ -20,7 +22,7 @@ class META_PUBLIC MetadataFactoryMultiResult : public QEvent
   public:
     explicit MetadataFactoryMultiResult(MetadataLookupList res)
         : QEvent(kEventType), m_results(res) {}
-    ~MetadataFactoryMultiResult() = default;
+    ~MetadataFactoryMultiResult() override = default;
 
     MetadataLookupList m_results;
 
@@ -38,7 +40,7 @@ class META_PUBLIC MetadataFactorySingleResult : public QEvent
             m_result->IncrRef();
         }
     }
-    ~MetadataFactorySingleResult()
+    ~MetadataFactorySingleResult() override
     {
         if (m_result)
         {
@@ -63,7 +65,7 @@ class META_PUBLIC MetadataFactoryNoResult : public QEvent
             m_result->IncrRef();
         }
     }
-    ~MetadataFactoryNoResult()
+    ~MetadataFactoryNoResult() override
     {
         if (m_result)
         {
@@ -82,9 +84,10 @@ class META_PUBLIC MetadataFactoryVideoChanges : public QEvent
   public:
     MetadataFactoryVideoChanges(QList<int> adds, QList<int> movs,
                                 QList<int>dels) : QEvent(kEventType),
-                                m_additions(adds), m_moved(movs),
-                                m_deleted(dels) {}
-    ~MetadataFactoryVideoChanges() = default;
+                                m_additions(std::move(adds)),
+                                m_moved(std::move(movs)),
+                                m_deleted(std::move(dels)) {}
+    ~MetadataFactoryVideoChanges() override = default;
 
     QList<int> m_additions; // newly added intids
     QList<int> m_moved; // intids moved to new filename
@@ -99,7 +102,7 @@ class META_PUBLIC MetadataFactory : public QObject
   public:
 
     explicit MetadataFactory(QObject *parent);
-    ~MetadataFactory();
+    ~MetadataFactory() override;
 
     void Lookup(ProgramInfo *pginfo, bool automatic = true,
            bool getimages = true, bool allowgeneric = false);

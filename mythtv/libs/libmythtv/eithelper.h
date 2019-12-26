@@ -6,6 +6,7 @@
 // C+ headers
 #include <cstdint>
 #include <ctime>
+#include <utility>
 
 // Qt includes
 #include <QDateTime>
@@ -24,49 +25,50 @@ class MSqlQuery;
 class ATSCEvent
 {
   public:
-    ATSCEvent(uint a, uint b, uint c, const QString& d,
+    ATSCEvent(uint a, uint b, uint c, QString  d,
               const unsigned char *e, uint f)
-        : m_start_time(a), m_length(b), m_etm(c), m_desc_length(f), m_title(d), m_desc(e),
-          m_scan_time(time(nullptr)) {}
+        : m_startTime(a), m_length(b), m_etm(c), m_descLength(f),
+          m_title(std::move(d)), m_desc(e),
+          m_scanTime(time(nullptr)) {}
 
     bool IsStale() const {
         // The minimum recommended repetition time for EIT events according to
         // http://atsc.org/wp-content/uploads/2015/03/Program-and-system-information-protocol-implementation-guidelines-for-broadcaster.pdf
         // is one minute. Consider any EIT event seen > 2 minutes in the past as stale.
-        return m_scan_time + 2 * 60 < time(nullptr);
+        return m_scanTime + 2 * 60 < time(nullptr);
     }
 
-    uint32_t             m_start_time;
+    uint32_t             m_startTime;
     uint32_t             m_length;
     uint32_t             m_etm;
-    uint32_t             m_desc_length;
+    uint32_t             m_descLength;
     QString              m_title;
     const unsigned char *m_desc {nullptr};
 
   private:
     // The time the event was created.
-    time_t               m_scan_time;
+    time_t               m_scanTime;
 };
 
 // An entry from the ETT table containing description text for an event.
 class ATSCEtt
 {
   public:
-    explicit ATSCEtt(const QString& text) :
-        m_ett_text(text), m_scan_time(time(nullptr)) {}
+    explicit ATSCEtt(QString  text) :
+        m_ett_text(std::move(text)), m_scanTime(time(nullptr)) {}
 
     bool IsStale() const {
         // The minimum recommended repetition time for ETT events according to
         // http://atsc.org/wp-content/uploads/2015/03/Program-and-system-information-protocol-implementation-guidelines-for-broadcaster.pdf
         // is one minute. Consider any ETT event seen > 2 minutes in the past as stale.
-        return m_scan_time + 2 * 60 < time(nullptr);
+        return m_scanTime + 2 * 60 < time(nullptr);
     }
 
     QString m_ett_text;
 
   private:
     // The time the ETT was created.
-    time_t m_scan_time;
+    time_t m_scanTime;
 };
 
 using EventIDToATSCEvent = QMap<uint,ATSCEvent> ;
@@ -114,10 +116,10 @@ class EITHelper
     void AddEIT(const DVBEventInformationTable *eit);
     void AddEIT(const PremiereContentInformationTable *cit);
 #else // if !USING_BACKEND
-    void AddEIT(uint, uint, const EventInformationTable*) {}
-    void AddETT(uint, uint, const ExtendedTextTable*) {}
-    void AddEIT(const DVBEventInformationTable*) {}
-    void AddEIT(const PremiereContentInformationTable*) {}
+    void AddEIT(uint /*atsc_major*/, uint /*atsc_minor*/, const EventInformationTable */*eit*/) {}
+    void AddETT(uint /*atsc_major*/, uint /*atsc_minor*/, const ExtendedTextTable */*ett*/) {}
+    void AddEIT(const DVBEventInformationTable */*eit*/) {}
+    void AddEIT(const PremiereContentInformationTable */*cit*/) {}
 #endif // !USING_BACKEND
 
     // EIT cache handling

@@ -30,9 +30,9 @@ bool HDHRRecorder::Open(void)
 
     ResetForNewFile();
 
-    m_stream_handler = HDHRStreamHandler::Get(m_channel->GetDevice(),
-                                              m_channel->GetInputID(),
-                                              m_channel->GetMajorID());
+    m_streamHandler = HDHRStreamHandler::Get(m_channel->GetDevice(),
+                                             m_channel->GetInputID(),
+                                             m_channel->GetMajorID());
 
     LOG(VB_RECORD, LOG_INFO, LOC + "HDHR opened successfully");
 
@@ -44,7 +44,7 @@ void HDHRRecorder::Close(void)
     LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- begin");
 
     if (IsOpen())
-        HDHRStreamHandler::Return(m_stream_handler,
+        HDHRStreamHandler::Return(m_streamHandler,
                                   (m_tvrec ? m_tvrec->GetInputId() : -1));
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- end");
@@ -52,12 +52,12 @@ void HDHRRecorder::Close(void)
 
 void HDHRRecorder::StartNewFile(void)
 {
-    if (m_record_mpts)
-        m_stream_handler->AddNamedOutputFile(m_ringBuffer->GetFilename());
+    if (m_recordMpts)
+        m_streamHandler->AddNamedOutputFile(m_ringBuffer->GetFilename());
 
     // Make sure the first things in the file are a PAT & PMT
-    HandleSingleProgramPAT(m_stream_data->PATSingleProgram(), true);
-    HandleSingleProgramPMT(m_stream_data->PMTSingleProgram(), true);
+    HandleSingleProgramPAT(m_streamData->PATSingleProgram(), true);
+    HandleSingleProgramPMT(m_streamData->PMTSingleProgram(), true);
 }
 
 void HDHRRecorder::run(void)
@@ -74,17 +74,17 @@ void HDHRRecorder::run(void)
 
     {
         QMutexLocker locker(&m_pauseLock);
-        m_request_recording = true;
+        m_requestRecording = true;
         m_recording = true;
         m_recordingWait.wakeAll();
     }
 
     StartNewFile();
 
-    m_stream_data->AddAVListener(this);
-    m_stream_data->AddWritingListener(this);
-    m_stream_handler->AddListener(m_stream_data, false, false,
-                         (m_record_mpts) ? m_ringBuffer->GetFilename() : QString());
+    m_streamData->AddAVListener(this);
+    m_streamData->AddWritingListener(this);
+    m_streamHandler->AddListener(m_streamData, false, false,
+                         (m_recordMpts) ? m_ringBuffer->GetFilename() : QString());
 
     while (IsRecordingRequested() && !IsErrored())
     {
@@ -97,12 +97,12 @@ void HDHRRecorder::run(void)
         {   // sleep 100 milliseconds unless StopRecording() or Unpause()
             // is called, just to avoid running this too often.
             QMutexLocker locker(&m_pauseLock);
-            if (!m_request_recording || m_request_pause)
+            if (!m_requestRecording || m_requestPause)
                 continue;
             m_unpauseWait.wait(&m_pauseLock, 100);
         }
 
-        if (!m_input_pmt)
+        if (!m_inputPmt)
         {
             LOG(VB_GENERAL, LOG_WARNING, LOC +
                     "Recording will not commence until a PMT is set.");
@@ -110,7 +110,7 @@ void HDHRRecorder::run(void)
             continue;
         }
 
-        if (!m_stream_handler->IsRunning())
+        if (!m_streamHandler->IsRunning())
         {
             m_error = "Stream handler died unexpectedly.";
             LOG(VB_GENERAL, LOG_ERR, LOC + m_error);
@@ -119,9 +119,9 @@ void HDHRRecorder::run(void)
 
     LOG(VB_RECORD, LOG_INFO, LOC + "run -- ending...");
 
-    m_stream_handler->RemoveListener(m_stream_data);
-    m_stream_data->RemoveWritingListener(this);
-    m_stream_data->RemoveAVListener(this);
+    m_streamHandler->RemoveListener(m_streamData);
+    m_streamData->RemoveWritingListener(this);
+    m_streamData->RemoveAVListener(this);
 
     Close();
 
@@ -137,11 +137,11 @@ void HDHRRecorder::run(void)
 bool HDHRRecorder::PauseAndWait(int timeout)
 {
     QMutexLocker locker(&m_pauseLock);
-    if (m_request_pause)
+    if (m_requestPause)
     {
         if (!IsPaused(true))
         {
-            m_stream_handler->RemoveListener(m_stream_data);
+            m_streamHandler->RemoveListener(m_streamData);
 
             m_paused = true;
             m_pauseWait.wakeAll();
@@ -152,10 +152,10 @@ bool HDHRRecorder::PauseAndWait(int timeout)
         m_unpauseWait.wait(&m_pauseLock, timeout);
     }
 
-    if (!m_request_pause && IsPaused(true))
+    if (!m_requestPause && IsPaused(true))
     {
         m_paused = false;
-        m_stream_handler->AddListener(m_stream_data);
+        m_streamHandler->AddListener(m_streamData);
         m_unpauseWait.wakeAll();
     }
 

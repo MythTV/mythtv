@@ -43,27 +43,27 @@ int MasterGuideTable::TableClass(uint i) const
 
 void MasterGuideTable::Parse(void) const
 {
-    _ptrs.clear();
-    _ptrs.push_back(const_cast<unsigned char*>(psipdata()) + 3);
+    m_ptrs.clear();
+    m_ptrs.push_back(const_cast<unsigned char*>(psipdata()) + 3);
     for (uint i = 0; i < TableCount(); i++)
-        _ptrs.push_back(_ptrs[i] + 11 + TableDescriptorsLength(i));
+        m_ptrs.push_back(m_ptrs[i] + 11 + TableDescriptorsLength(i));
 }
 
 
 void VirtualChannelTable::Parse(void) const
 {
-    _ptrs.clear();
-    _ptrs.push_back(const_cast<unsigned char*>(psipdata()) + 2);
+    m_ptrs.clear();
+    m_ptrs.push_back(const_cast<unsigned char*>(psipdata()) + 2);
     for (uint i = 0; i < ChannelCount(); i++)
-        _ptrs.push_back(_ptrs[i] + 32 + DescriptorsLength(i));
+        m_ptrs.push_back(m_ptrs[i] + 32 + DescriptorsLength(i));
 }
 
 void EventInformationTable::Parse(void) const
 {
-    _ptrs.clear();
-    _ptrs.push_back(const_cast<unsigned char*>(psipdata()) + 2);
+    m_ptrs.clear();
+    m_ptrs.push_back(const_cast<unsigned char*>(psipdata()) + 2);
     for (uint i = 0; i < EventCount(); i++)
-        _ptrs.push_back(_ptrs[i] + 12 + TitleLength(i) + DescriptorsLength(i));
+        m_ptrs.push_back(m_ptrs[i] + 12 + TitleLength(i) + DescriptorsLength(i));
 }
 
 QString MasterGuideTable::toString(void) const
@@ -74,10 +74,10 @@ QString MasterGuideTable::toString(void) const
                .arg(PSIPTable::toString())
                .arg(TableCount()));
 
-    if (_ptrs.size() < TableCount())
+    if (m_ptrs.size() < TableCount())
         LOG(VB_GENERAL, LOG_ERR, "MasterGuideTable::toString(): Table count mismatch");
 
-    for (uint i = 0; i < TableCount() && i < _ptrs.size(); i++)
+    for (uint i = 0; i < TableCount() && i < m_ptrs.size(); i++)
     {
         str.append(QString("  Table #%1 ").arg(i, 2, 10));
         str.append(QString("pid(0x%1) ver(%2) ")
@@ -136,10 +136,10 @@ QString MasterGuideTable::toStringXML(uint indent_level) const
             .toStringXML(indent_level + 1) + "\n";
     }
 
-    if (_ptrs.size() < TableCount())
+    if (m_ptrs.size() < TableCount())
         LOG(VB_GENERAL, LOG_ERR, "MasterGuideTable::toStringXML(): Table count mismatch");
 
-    for (uint i = 0; i < TableCount() && i < _ptrs.size(); i++)
+    for (uint i = 0; i < TableCount() && i < m_ptrs.size(); i++)
     {
         str += QString(
             "%1<Table pid=\"0x%2\" version=\"%3\""

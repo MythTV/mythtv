@@ -107,7 +107,7 @@ class UPNP_PUBLIC SSDP : public MThread
         static SSDP* Instance();
         static void Shutdown();
 
-            ~SSDP();
+            ~SSDP() override;
 
         void RequestTerminate(void);
 
@@ -155,7 +155,7 @@ class SSDPExtension : public HttpServerExtension
 
     public:
                  SSDPExtension( int nServicePort, const QString &sSharePath);
-        virtual ~SSDPExtension( ) = default;
+        ~SSDPExtension( ) override = default;
 
         QStringList GetBasePaths() override; // HttpServerExtension
         

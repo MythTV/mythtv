@@ -350,10 +350,12 @@ void AutoIncrementSetting::Save(void)
                 setValue(lii);
             }
             else
+            {
                 LOG(VB_GENERAL, LOG_EMERG,
                     "Can't determine the Id of the last insert "
                     "QSqlQuery.lastInsertId() failed, the workaround "
                     "failed too!");
+            }
         }
         // XXX -- HACK END:
     }
@@ -529,10 +531,12 @@ void MythUIComboBoxSetting::edit(MythScreenType * screen)
         menuPopup->SetReturnEvent(screen, "editsetting");
 
         if (m_rewrite)
+        {
             menuPopup->AddButton(QObject::tr("New entry"),
                                  QString("NEWENTRY"),
                                  false,
                                  m_settingValue == "");
+        }
         for (int i = 0; i < m_labels.size() && !m_values.empty(); ++i)
         {
             QString value = m_values.at(i);

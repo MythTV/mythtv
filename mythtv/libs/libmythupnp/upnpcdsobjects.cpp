@@ -121,9 +121,11 @@ void CDSObject::SetPropValue( const QString &sName, const QString &sValue,
     if (it !=  m_properties.end() && *it)
     {
         if ((*it)->m_bMultiValue)
+        {
             LOG(VB_UPNP, LOG_WARNING,
                 QString("SetPropValue(%1) called on property with bAllowMulti. "
                         "Only the last inserted property will be updated.").arg(sName));
+        }
         (*it)->SetValue(sValue);
 
         if (!sType.isEmpty())
@@ -145,9 +147,11 @@ QString CDSObject::GetPropValue(const QString &sName) const
     if (it !=  m_properties.end() && *it)
     {
         if ((*it)->m_bMultiValue)
+        {
             LOG(VB_UPNP, LOG_WARNING,
                 QString("GetPropValue(%1) called on property with bAllowMulti. "
                         "Only the last inserted property will be return."));
+        }
         return (*it)->GetValue().toUtf8();
     }
     

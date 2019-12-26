@@ -88,7 +88,7 @@ enum TVState
      */
     kState_ChangingState,
 };
-inline TVState myth_deque_init(const TVState*) { return (TVState)(0); }
+inline TVState myth_deque_init(const TVState */*state*/) { return (TVState)(0); }
 
 QString StateToString(TVState state);
 

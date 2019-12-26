@@ -48,7 +48,7 @@ extern void MHSetLogging(FILE *logStream, unsigned int logLevel);
 class MHEG
 {
   public:
-    virtual ~MHEG() {}
+    virtual ~MHEG() = default;
     virtual void SetBooting() = 0;
     virtual void DrawDisplay(QRegion toDraw) = 0;
     // Run synchronous actions and process any asynchronous events until the queues are empty.
@@ -78,13 +78,13 @@ class MHRgba
   public:
     MHRgba(int red, int green, int blue, int alpha):
       m_red(red), m_green(green), m_blue(blue), m_alpha(alpha) {};
-    MHRgba(): m_red(0), m_green(0), m_blue(0), m_alpha(0) {};
+    MHRgba() = default;
     int red() const { return m_red; }
     int green() const { return m_green; }
     int blue() const { return m_blue; }
     int alpha() const { return m_alpha; }
   private:
-    unsigned char m_red, m_green, m_blue, m_alpha;
+    unsigned char m_red{0}, m_green{0}, m_blue{0}, m_alpha{0};
 };
 
 // This abstract class provides operations that the surrounding context must provide
@@ -92,7 +92,7 @@ class MHRgba
 class MHContext
 {
   public:
-    virtual ~MHContext() {} // Declared to avoid warnings
+    virtual ~MHContext() = default; // Declared to avoid warnings
     // Interface to MHEG engine.
 
     // Test for an object in the carousel.  Returns true if the object is present and
@@ -168,7 +168,7 @@ class MHContext
 class MHDLADisplay
 {
   public:
-    virtual ~MHDLADisplay() {}
+    virtual ~MHDLADisplay() = default;
     // Draw the completed drawing onto the display.
     virtual void Draw(int x, int y) = 0;
     // Set the box size.  Also clears the drawing.
@@ -188,7 +188,7 @@ class MHDLADisplay
 
 class MHTextDisplay {
   public:
-    virtual ~MHTextDisplay() {}
+    virtual ~MHTextDisplay() = default;
     // Draw the completed drawing onto the display.  x and y give the position of the image
     // relative to the screen.  rect gives the bounding box for the image, again relative to
     // the screen.
@@ -205,7 +205,7 @@ class MHTextDisplay {
 class MHBitmapDisplay
 {
   public:
-    virtual ~MHBitmapDisplay() {}
+    virtual ~MHBitmapDisplay() = default;
     // Draw the completed drawing onto the display.  x and y give the position of the image
     // relative to the screen.  rect gives the bounding box for the image, again relative to
     // the screen.

@@ -59,14 +59,16 @@ bool DTVMultiplex::IsEqual(DTVTunerType type, const DTVMultiplex &other,
     if (DTVTunerType::kTunerTypeDVBC == type)
     {
         if (fuzzy)
+        {
             return
                 m_inversion.IsCompatible(other.m_inversion)   &&
-                (m_symbolrate == other.m_symbolrate)          &&
+                (m_symbolRate == other.m_symbolRate)          &&
                 m_fec.IsCompatible(other.m_fec)               &&
                 m_modulation.IsCompatible(other.m_modulation);
+        }
         return
             (m_inversion  == other.m_inversion)  &&
-            (m_symbolrate == other.m_symbolrate) &&
+            (m_symbolRate == other.m_symbolRate) &&
             (m_fec        == other.m_fec)        &&
             (m_modulation == other.m_modulation);
     }
@@ -75,6 +77,7 @@ bool DTVMultiplex::IsEqual(DTVTunerType type, const DTVMultiplex &other,
         (DTVTunerType::kTunerTypeDVBT2 == type))
     {
         if (fuzzy)
+        {
             return
                 m_inversion.IsCompatible(other.m_inversion)           &&
                 m_bandwidth.IsCompatible(other.m_bandwidth)           &&
@@ -85,6 +88,7 @@ bool DTVMultiplex::IsEqual(DTVTunerType type, const DTVMultiplex &other,
                 m_transMode.IsCompatible(other.m_transMode)         &&
                 m_hierarchy.IsCompatible(other.m_hierarchy)           &&
                 m_modSys.IsCompatible(other.m_modSys);
+        }
         return
             (m_inversion      == other.m_inversion)      &&
             (m_bandwidth      == other.m_bandwidth)      &&
@@ -108,15 +112,17 @@ bool DTVMultiplex::IsEqual(DTVTunerType type, const DTVMultiplex &other,
         (DTVTunerType::kTunerTypeDVBS2 == type))
     {
         bool ret =
-            (m_symbolrate == other.m_symbolrate)        &&
+            (m_symbolRate == other.m_symbolRate)        &&
             (m_polarity   == other.m_polarity)          &&
             (m_modSys    == other.m_modSys);
 
         if (fuzzy)
+        {
             return ret &&
                 m_inversion.IsCompatible(other.m_inversion) &&
                 m_fec.IsCompatible(other.m_fec)             &&
                 m_rolloff.IsCompatible(other.m_rolloff);
+        }
         return ret &&
             (m_inversion  == other.m_inversion)  &&
             (m_fec        == other.m_fec)        &&
@@ -200,8 +206,8 @@ bool DTVMultiplex::ParseDVB_S_and_C(
         ok = true;
     }
 
-    m_symbolrate = _symbol_rate.toInt();
-    if (!m_symbolrate)
+    m_symbolRate = _symbol_rate.toInt();
+    if (!m_symbolRate)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid symbol rate " +
             QString("parameter '%1', aborting.").arg(_symbol_rate));
@@ -641,7 +647,7 @@ uint ScanDTVTransport::SaveScan(uint scanid) const
     query.bindValue(":MPLEXID", m_mplex);
     query.bindValue(":FREQUENCY", QString::number(m_frequency));
     query.bindValue(":INVERSION", m_inversion.toString());
-    query.bindValue(":SYMBOLRATE", QString::number(m_symbolrate));
+    query.bindValue(":SYMBOLRATE", QString::number(m_symbolRate));
     query.bindValue(":FEC", m_fec.toString());
     query.bindValue(":POLARITY", m_polarity.toString());
     query.bindValue(":HP_CODE_RATE", m_hpCodeRate.toString());

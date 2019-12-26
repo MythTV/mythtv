@@ -35,7 +35,7 @@ class LIRC : public QObject, public MThread
     virtual void deleteLater(void);
 
   private:
-    virtual ~LIRC();
+    ~LIRC() override;
     void TeardownAll();
 
     bool IsDoRunSet(void) const;

@@ -24,7 +24,7 @@ class fsurround_decoder {
 public:
 	// create an instance of the decoder
 	//  blocksize is fixed over the lifetime of this object for performance reasons
-	fsurround_decoder(unsigned blocksize=8192);
+	explicit fsurround_decoder(unsigned blocksize=8192);
 	// destructor
 	~fsurround_decoder();
 	

@@ -38,7 +38,7 @@ class PacketBuffer
      *        the reference count on the QByteArrays from going to
      *        0 we can reuse the byte array and avoid mallocs.
      */
-    void FreePacket(const UDPPacket &);
+    void FreePacket(const UDPPacket &packet);
 
   protected:
     uint m_bitrate;

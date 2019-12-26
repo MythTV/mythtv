@@ -60,7 +60,7 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
 
   protected:
     MythDisplay();
-    virtual ~MythDisplay();
+    ~MythDisplay() override;
 
     virtual void    UpdateCurrentMode  (void);
     virtual bool    SwitchToVideoMode  (QSize Size, double Framerate);

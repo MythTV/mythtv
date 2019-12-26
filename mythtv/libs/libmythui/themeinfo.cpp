@@ -25,10 +25,14 @@ ThemeInfo::ThemeInfo(const QString& theme)
     m_theme = QFileInfo(themeNoTrailingSlash);
 
     if (m_theme.exists())
+    {
         // since all the usages have a / inserted, remove the one in the url
         m_themeurl = m_theme.absoluteFilePath();
+    }
     else
+    {
         m_themeurl = theme;
+    }
 
     // since all the usages have a / insterted, remove the one in the url
     if (m_themeurl.endsWith('/'))

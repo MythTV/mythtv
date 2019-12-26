@@ -131,11 +131,11 @@ class MTV_PUBLIC JobQueue : public QObject, public QRunnable
     friend class QueueProcessorThread;
   public:
     explicit JobQueue(bool master);
-    ~JobQueue(void);
+    ~JobQueue(void) override;
     void customEvent(QEvent *e)  override; // QObject
 
     static bool QueueRecordingJobs(
-        const RecordingInfo&, int jobTypes = JOB_NONE);
+        const RecordingInfo &recinfo, int jobTypes = JOB_NONE);
     static bool QueueJob(int jobType, uint chanid,
                          const QDateTime &recstartts, const QString& args = "",
                          const QString& comment = "", QString host = "",

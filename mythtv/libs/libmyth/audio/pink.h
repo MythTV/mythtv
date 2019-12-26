@@ -7,6 +7,7 @@
 #define PINK_RANDOM_BITS       (24)
 #define PINK_RANDOM_SHIFT      ((sizeof(long)*8)-PINK_RANDOM_BITS)
 
+// NOLINTNEXTLINE(modernize-use-using)
 typedef struct
 {
   long      pink_rows[PINK_MAX_RANDOM_ROWS];

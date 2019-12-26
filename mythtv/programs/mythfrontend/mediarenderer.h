@@ -35,7 +35,7 @@ class MediaRenderer : public UPnp
 
     public:
                  MediaRenderer();
-        virtual ~MediaRenderer();
+        ~MediaRenderer() override;
 
         DeviceLocation *GetDefaultMaster();
         void            SetDefaultMaster( DeviceLocation *pDeviceLoc,

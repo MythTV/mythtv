@@ -28,12 +28,12 @@ class CdDecoder : public Decoder
      Q_DECLARE_TR_FUNCTIONS(CdDecoder);
 
   public:
-    CdDecoder(const QString &file, DecoderFactory *, AudioOutput *);
-    virtual ~CdDecoder();
+    CdDecoder(const QString &file, DecoderFactory *d, AudioOutput *o);
+    ~CdDecoder() override;
 
     // Decoder implementation
     bool initialize() override; // Decoder
-    void seek(double) override; // Decoder
+    void seek(double pos) override; // Decoder
     void stop() override; // Decoder
 
     MusicMetadata *getMetadata(void);
@@ -59,9 +59,9 @@ class CdDecoder : public Decoder
     void deinit();
 
     volatile bool      m_inited      {false};
-    volatile bool      m_user_stop   {false};
+    volatile bool      m_userStop    {false};
 
-    QString            m_devicename;
+    QString            m_deviceName;
 
 #if CONFIG_DARWIN
     void lookupCDDB(const QString &hexID, uint tracks);
@@ -76,8 +76,8 @@ class CdDecoder : public Decoder
     static QMutex& getCdioMutex();
 
     DecoderEvent::Type m_stat        {DecoderEvent::Error};
-    char              *m_output_buf  {nullptr};
-    std::size_t        m_output_at   {0};
+    char              *m_outputBuf   {nullptr};
+    std::size_t        m_outputAt    {0};
 
     std::size_t        m_bks         {0};
     std::size_t        m_bksFrames   {0};
@@ -88,8 +88,8 @@ class CdDecoder : public Decoder
     int                m_chan        {0};
     double             m_seekTime    {-1.0};
 
-    int                m_settracknum {-1};
-    int                m_tracknum    {0};
+    int                m_setTrackNum {-1};
+    int                m_trackNum    {0};
 
 #ifdef HAVE_CDIO
     CdIo_t            *m_cdio        {nullptr};
@@ -97,7 +97,7 @@ class CdDecoder : public Decoder
     cdrom_paranoia_t  *m_paranoia    {nullptr};
     lsn_t              m_start       {CDIO_INVALID_LSN};
     lsn_t              m_end         {CDIO_INVALID_LSN};
-    lsn_t              m_curpos      {CDIO_INVALID_LSN};
+    lsn_t              m_curPos      {CDIO_INVALID_LSN};
 #endif
 };
 

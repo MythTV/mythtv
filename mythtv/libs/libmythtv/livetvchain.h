@@ -32,7 +32,7 @@ class MTV_PUBLIC LiveTVChain : public ReferenceCounter
 {
   public:
     LiveTVChain();
-   ~LiveTVChain();
+   ~LiveTVChain() override;
 
     QString InitializeNewChain(const QString &seed);
     void LoadFromExistingChain(const QString &id);

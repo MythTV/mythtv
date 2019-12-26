@@ -41,7 +41,7 @@ class MPUBLIC OutputEvent : public MythEvent
         m_errorMsg = new QString(tmp.constData());
     }
 
-    ~OutputEvent()
+    ~OutputEvent() override
     {
         delete m_errorMsg;
     }
@@ -96,11 +96,11 @@ class MPUBLIC OutputListeners : public MythObservable
 {
 public:
     OutputListeners() = default;
-    virtual ~OutputListeners() = default;
+    ~OutputListeners() override = default;
 
-    bool hasVisual(void) { return m_visuals.size(); }
-    void addVisual(MythTV::Visual *);
-    void removeVisual(MythTV::Visual *);
+    bool hasVisual(void) { return !m_visuals.empty(); }
+    void addVisual(MythTV::Visual *v);
+    void removeVisual(MythTV::Visual *v);
 
     QMutex *mutex() { return &m_mtx; }
 

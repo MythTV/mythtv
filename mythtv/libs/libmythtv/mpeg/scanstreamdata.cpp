@@ -8,10 +8,10 @@ ScanStreamData::ScanStreamData(bool no_default_pid) :
     MPEGStreamData(-1, -1, true),
     ATSCStreamData(-1, -1, -1, true),
     DVBStreamData(0, 0, -1, -1, true),
-    m_no_default_pid(no_default_pid)
+    m_noDefaultPid(no_default_pid)
 {
-    if (m_no_default_pid)
-        _pids_listening.clear();
+    if (m_noDefaultPid)
+        m_pidsListening.clear();
 }
 
 ScanStreamData::~ScanStreamData() { ; }
@@ -41,9 +41,9 @@ void ScanStreamData::Reset(void)
     ATSCStreamData::Reset(-1,-1);
     DVBStreamData::Reset(0,0,-1);
 
-    if (m_no_default_pid)
+    if (m_noDefaultPid)
     {
-        _pids_listening.clear();
+        m_pidsListening.clear();
         return;
     }
 
@@ -51,7 +51,7 @@ void ScanStreamData::Reset(void)
     AddListeningPID(ATSC_PSIP_PID);
     AddListeningPID(DVB_NIT_PID);
     AddListeningPID(DVB_SDT_PID);
-    if (m_dvb_uk_freesat_si)
+    if (m_dvbUkFreesatSi)
         AddListeningPID(FREESAT_SI_PID);
 }
 
@@ -63,10 +63,10 @@ QString ScanStreamData::GetSIStandard(const QString& guess) const
     if (HasCachedAnyNIT())
         return "dvb";
 
-    QMutexLocker locker(&_cache_lock);
+    QMutexLocker locker(&m_cacheLock);
 
-    pmt_cache_t::const_iterator it = _cached_pmts.begin();
-    for (; it != _cached_pmts.end(); ++it)
+    pmt_cache_t::const_iterator it = m_cachedPmts.begin();
+    for (; it != m_cachedPmts.end(); ++it)
     {
         ProgramMapTable *pmt = *it;
 

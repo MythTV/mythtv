@@ -17,13 +17,13 @@
 #include "programinfo.h"
 
 DeleteHandler::DeleteHandler(void) :
-    ReferenceCounter("DeleteHandler"), m_fd(-1), m_size(0)
+    ReferenceCounter("DeleteHandler")
 {
 }
 
 DeleteHandler::DeleteHandler(const QString& filename) :
     ReferenceCounter(QString("DeleteHandler:%1").arg(filename)),
-    m_path(filename), m_fd(-1), m_size(0)
+    m_path(filename)
 {
 }
 

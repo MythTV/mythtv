@@ -13,10 +13,15 @@
 #ifndef _UPNPIMPL_H_
 #define _UPNPIMPL_H_
 
+#include <utility>
+
+// Qt headers
+#include <QString>
+
+// MythTV headers
 #include "upnpexp.h"
 #include "upnputil.h"
 
-#include <QString>
 
 class UPnpDevice;
 
@@ -45,8 +50,8 @@ class UPNP_PUBLIC UPnpServiceImpl
 class UPNP_PUBLIC UPnPFeature
 {
   public:
-    UPnPFeature(const QString &name, int version) :
-        m_name(name), m_version(version) {}
+    UPnPFeature(QString name, int version) :
+        m_name(std::move(name)), m_version(version) {}
     virtual ~UPnPFeature() = default;
 
     QString toXML();

@@ -4,6 +4,8 @@
 
 #include <QDateTime>
 #include <QList>
+#include <utility>
+
 
 #include "mythtvexp.h"
 
@@ -12,8 +14,8 @@ class RecordingInfo;
 class RecordingGap
 {
   public:
-    RecordingGap(const QDateTime &start, const QDateTime &end) :
-        m_start(start), m_end(end) { }
+    RecordingGap(QDateTime start, QDateTime end) :
+        m_start(std::move(start)), m_end(std::move(end)) { }
     QDateTime GetStart(void) const { return m_start; }
     QDateTime GetEnd(void) const { return m_end; }
     QString toString(void) const
@@ -35,7 +37,7 @@ class MTV_PUBLIC RecordingQuality
     RecordingQuality(const RecordingInfo *ri,
                      RecordingGaps rg);
     RecordingQuality(
-        const RecordingInfo*, RecordingGaps,
+        const RecordingInfo *ri, RecordingGaps rg,
         const QDateTime &firstData, const QDateTime &latestData);
 
     void AddTSStatistics(int continuity_error_count, int packet_count);
@@ -43,11 +45,11 @@ class MTV_PUBLIC RecordingQuality
     QString toStringXML(void) const;
 
   private:
-    int           m_continuity_error_count {0};
-    int           m_packet_count           {0};
-    QString       m_program_key;
-    double        m_overall_score          {1.0};
-    RecordingGaps m_recording_gaps;
+    int           m_continuityErrorCount {0};
+    int           m_packetCount          {0};
+    QString       m_programKey;
+    double        m_overallScore         {1.0};
+    RecordingGaps m_recordingGaps;
 };
 
 #endif // _RECORDER_QUALITY_H_

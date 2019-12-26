@@ -1,10 +1,14 @@
 #ifndef MYTHPLUGIN_H_
 #define MYTHPLUGIN_H_
 
+#include <utility>
+
+// Qt headers
+#include <QHash>
 #include <QLibrary>
 #include <QMap>
-#include <QHash>
 
+// MythTV headers
 #include "mythbaseexp.h"
 
 class QSqlDatabase;
@@ -18,9 +22,9 @@ enum MythPluginType {
 class MythPlugin : public QLibrary
 {
   public:
-    MythPlugin(const QString &libname, const QString &plugname)
-        : QLibrary(libname), m_plugName(plugname) {}
-    virtual ~MythPlugin() = default;
+    MythPlugin(const QString &libname, QString plugname)
+        : QLibrary(libname), m_plugName(std::move(plugname)) {}
+    ~MythPlugin() override = default;
 
     // This method will call the mythplugin_init() function of the library.
     int init(const char *libversion);

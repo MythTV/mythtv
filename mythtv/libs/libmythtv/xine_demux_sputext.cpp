@@ -1203,9 +1203,11 @@ subtitle_t *sub_read_file (demux_sputext_t *demuxstr) {
   }
   /* timeout of last subtitle */
   if (demuxstr->num > 0 && first[demuxstr->num-1].end == -1)
+  {
     if (timeout > 0) {
       first[demuxstr->num-1].end = first[demuxstr->num-1].start + timeout;
     }
+  }
 
 #ifdef DEBUG_XINE_DEMUX_SPUTEXT
   {

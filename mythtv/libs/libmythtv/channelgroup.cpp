@@ -211,7 +211,7 @@ int ChannelGroup::GetNextChannelGroup(const ChannelGroupList &sorted, int grpid)
 
     // If grpid is all channels (-1), then return the first grpid
     if (grpid == -1)
-      return sorted[0].m_grpid;
+      return sorted[0].m_grpId;
 
     auto it = find(sorted.cbegin(), sorted.cend(), grpid);
 
@@ -225,7 +225,7 @@ int ChannelGroup::GetNextChannelGroup(const ChannelGroupList &sorted, int grpid)
     if (it == sorted.end())
        return -1;
 
-    return it->m_grpid;
+    return it->m_grpId;
 }
 
 QString ChannelGroup::GetChannelGroupName(int grpid)

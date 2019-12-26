@@ -94,7 +94,7 @@ computeChangeMap(FrameAnalyzer::FrameMap *changeMap, long long nframes,
 SceneChangeDetector::SceneChangeDetector(HistogramAnalyzer *ha,
         const QString& debugdir)
     : m_histogramAnalyzer(ha)
-    , m_debugdata(debugdir + "/SceneChangeDetector.txt")
+    , m_debugData(debugdir + "/SceneChangeDetector.txt")
 {
     LOG(VB_COMMFLAG, LOG_INFO, "SceneChangeDetector");
 
@@ -109,14 +109,14 @@ SceneChangeDetector::SceneChangeDetector(HistogramAnalyzer *ha,
     {
         createDebugDirectory(debugdir,
             QString("SceneChangeDetector debugLevel %1").arg(m_debugLevel));
-        m_debug_scenechange = true;
+        m_debugSceneChange = true;
     }
 }
 
 void SceneChangeDetector::deleteLater(void)
 {
-    delete []m_scdata;
-    delete []m_scdiff;
+    delete []m_scData;
+    delete []m_scDiff;
 }
 
 enum FrameAnalyzer::analyzeFrameResult
@@ -128,11 +128,11 @@ SceneChangeDetector::MythPlayerInited(MythPlayer *player,
 
     m_fps = player->GetFrameRate();
 
-    m_scdata = new SceneChangeData[nframes];
-    memset(m_scdata, 0, nframes * sizeof(*m_scdata));
+    m_scData = new SceneChangeData[nframes];
+    memset(m_scData, 0, nframes * sizeof(*m_scData));
 
-    m_scdiff = new unsigned short[nframes];
-    memset(m_scdiff, 0, nframes * sizeof(*m_scdiff));
+    m_scDiff = new unsigned short[nframes];
+    memset(m_scDiff, 0, nframes * sizeof(*m_scDiff));
 
     QSize video_disp_dim = player->GetVideoSize();
 
@@ -148,7 +148,7 @@ enum FrameAnalyzer::analyzeFrameResult
 SceneChangeDetector::analyzeFrame(const VideoFrame *frame, long long frameno,
         long long *pNextFrame)
 {
-    *pNextFrame = NEXTFRAME;
+    *pNextFrame = kNextFrame;
 
     if (m_histogramAnalyzer->analyzeFrame(frame, frameno) ==
             FrameAnalyzer::ANALYZE_OK)
@@ -172,32 +172,32 @@ SceneChangeDetector::finished(long long nframes, bool final)
     const HistogramAnalyzer::Histogram *histogram =
         m_histogramAnalyzer->getHistograms();
     for (long long frameno = 0; frameno < nframes; frameno++)
-        scenechange_data_init(&m_scdata[frameno], &histogram[frameno]);
-    m_scdiff[0] = 0;
+        scenechange_data_init(&m_scData[frameno], &histogram[frameno]);
+    m_scDiff[0] = 0;
     for (long long frameno = 1; frameno < nframes; frameno++)
-        m_scdiff[frameno] = scenechange_data_diff(&m_scdata[frameno - 1],
-                &m_scdata[frameno]);
+        m_scDiff[frameno] = scenechange_data_diff(&m_scData[frameno - 1],
+                &m_scData[frameno]);
 
-    if (!m_scenechange_done && m_debug_scenechange)
+    if (!m_sceneChangeDone && m_debugSceneChange)
     {
-        if (final && writeData(m_debugdata, m_scdiff, nframes))
+        if (final && writeData(m_debugData, m_scDiff, nframes))
         {
             LOG(VB_COMMFLAG, LOG_INFO, 
                 QString("SceneChangeDetector::finished wrote %1")
-                    .arg(m_debugdata));
-            m_scenechange_done = true;
+                    .arg(m_debugData));
+            m_sceneChangeDone = true;
         }
     }
 
     /* Identify all scene-change frames (changeMap). */
     auto *scdiffsort = new unsigned short[nframes];
-    memcpy(scdiffsort, m_scdiff, nframes * sizeof(*m_scdiff));
+    memcpy(scdiffsort, m_scDiff, nframes * sizeof(*m_scDiff));
     unsigned short mindiff = quick_select_ushort(scdiffsort, nframes,
                                                  (int)(0.979472 * nframes));
     LOG(VB_COMMFLAG, LOG_INFO,
         QString("SceneChangeDetector::finished applying threshold value %1")
             .arg(mindiff));
-    computeChangeMap(&m_changeMap, nframes, m_scdiff, mindiff);
+    computeChangeMap(&m_changeMap, nframes, m_scDiff, mindiff);
     delete []scdiffsort;
     if (m_debugLevel >= 2)
         frameAnalyzerReportMapms(&m_changeMap, m_fps, "SC frame");

@@ -20,8 +20,8 @@ class NetBase : public MythScreenType
   Q_OBJECT
 
   public:
-    NetBase(MythScreenStack *parent, const char *name = nullptr);
-    virtual ~NetBase();
+    explicit NetBase(MythScreenStack *parent, const char *name = nullptr);
+    ~NetBase() override;
 
   protected:
     void Init() override; // MythScreenType

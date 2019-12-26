@@ -54,7 +54,7 @@ void V4L2encRecorder::SetIntOption(RecordingProfile *profile, const QString &nam
     const StandardSetting *setting = profile->byName(name);
     if (setting)
     {
-        if (!m_stream_handler->SetOption(name, setting->getValue().toInt()))
+        if (!m_streamHandler->SetOption(name, setting->getValue().toInt()))
             V4LRecorder::SetOption(name, setting->getValue().toInt());
     }
 }
@@ -64,7 +64,7 @@ void V4L2encRecorder::SetStrOption(RecordingProfile *profile, const QString &nam
     const StandardSetting *setting = profile->byName(name);
     if (setting)
     {
-        if (!m_stream_handler->SetOption(name, setting->getValue()))
+        if (!m_streamHandler->SetOption(name, setting->getValue()))
             V4LRecorder::SetOption(name, setting->getValue());
     }
 }
@@ -123,8 +123,8 @@ void V4L2encRecorder::StartNewFile(void)
 {
     LOG(VB_RECORD, LOG_INFO, LOC + "StartNewFile -- begin");  // debugging
     // Make sure the first things in the file are a PAT & PMT
-    HandleSingleProgramPAT(m_stream_data->PATSingleProgram(), true);
-    HandleSingleProgramPMT(m_stream_data->PMTSingleProgram(), true);
+    HandleSingleProgramPAT(m_streamData->PATSingleProgram(), true);
+    HandleSingleProgramPMT(m_streamData->PMTSingleProgram(), true);
     LOG(VB_RECORD, LOG_INFO, LOC + "StartNewFile -- end");  // debugging
 }
 
@@ -135,7 +135,7 @@ void V4L2encRecorder::run(void)
 
     bool is_TS = false;
 
-    if (!m_stream_data)
+    if (!m_streamData)
     {
         m_error = "MPEGStreamData pointer has not been set";
         LOG(VB_GENERAL, LOG_ERR, LOC + "run() -- " + m_error);
@@ -143,11 +143,11 @@ void V4L2encRecorder::run(void)
         return;
     }
 
-    m_stream_handler->Configure();
+    m_streamHandler->Configure();
 
     {
         QMutexLocker locker(&m_pauseLock);
-        m_request_recording = true;
+        m_requestRecording = true;
         m_recording = true;
         m_recordingWait.wakeAll();
     }
@@ -156,28 +156,28 @@ void V4L2encRecorder::run(void)
     {
         const ProgramAssociationTable *pat = m_channel->GetGeneratedPAT();
         const ProgramMapTable         *pmt = m_channel->GetGeneratedPMT();
-        m_stream_data->Reset(pat->ProgramNumber(0));
-        m_stream_data->HandleTables(MPEG_PAT_PID, *pat);
-        m_stream_data->HandleTables(pat->ProgramPID(0), *pmt);
+        m_streamData->Reset(pat->ProgramNumber(0));
+        m_streamData->HandleTables(MPEG_PAT_PID, *pat);
+        m_streamData->HandleTables(pat->ProgramPID(0), *pmt);
         LOG(VB_GENERAL, LOG_INFO, LOC + "PMT set"); // debugging
     }
 
     StartNewFile();
-    is_TS = (m_stream_handler->GetStreamType() == V4L2_MPEG_STREAM_TYPE_MPEG2_TS);
+    is_TS = (m_streamHandler->GetStreamType() == V4L2_MPEG_STREAM_TYPE_MPEG2_TS);
 
     if (is_TS)
     {
         LOG(VB_RECORD, LOG_INFO, LOC + "mpeg2ts");
-        m_stream_data->AddAVListener(this);
-        m_stream_data->AddWritingListener(this);
+        m_streamData->AddAVListener(this);
+        m_streamData->AddWritingListener(this);
     }
     else
     {
         LOG(VB_RECORD, LOG_INFO, LOC + "program stream (non mpeg2ts)");
-        m_stream_data->AddPSStreamListener(this);
+        m_streamData->AddPSStreamListener(this);
     }
 
-    m_stream_handler->AddListener(m_stream_data, false, true);
+    m_streamHandler->AddListener(m_streamData, false, true);
 
     StartEncoding();
 
@@ -186,7 +186,7 @@ void V4L2encRecorder::run(void)
         if (PauseAndWait())
             continue;
 
-        if (is_TS && !m_input_pmt)
+        if (is_TS && !m_inputPmt)
         {
             LOG(VB_GENERAL, LOG_WARNING, LOC +
                 "Recording will not commence until a PMT is set.");
@@ -196,7 +196,7 @@ void V4L2encRecorder::run(void)
 
         bool failing;
         bool failed;
-        if (!m_stream_handler->Status(failed, failing))
+        if (!m_streamHandler->Status(failed, failing))
         {
             if (failed)
             {
@@ -213,14 +213,14 @@ void V4L2encRecorder::run(void)
 
     StopEncoding();
 
-    m_stream_handler->RemoveListener(m_stream_data);
-    if (m_stream_handler->GetStreamType() == V4L2_MPEG_STREAM_TYPE_MPEG2_TS)
+    m_streamHandler->RemoveListener(m_streamData);
+    if (m_streamHandler->GetStreamType() == V4L2_MPEG_STREAM_TYPE_MPEG2_TS)
     {
-        m_stream_data->RemoveWritingListener(this);
-        m_stream_data->RemoveAVListener(this);
+        m_streamData->RemoveWritingListener(this);
+        m_streamData->RemoveAVListener(this);
     }
     else
-        m_stream_data->RemovePSStreamListener(this);
+        m_streamData->RemovePSStreamListener(this);
 
     Close();
 
@@ -245,27 +245,27 @@ bool V4L2encRecorder::Open(void)
 
 // ??    ResetForNewFile();
 
-    m_stream_handler = V4L2encStreamHandler::Get(m_channel->GetDevice(),
+    m_streamHandler = V4L2encStreamHandler::Get(m_channel->GetDevice(),
                                          m_channel->GetAudioDevice().toInt(),
                                          m_tvrec ? m_tvrec->GetInputId() : -1);
-    if (!m_stream_handler)
+    if (!m_streamHandler)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             "Open() -- Failed to get a stream handler.");
         return false;
     }
 
-    if (!m_stream_handler->IsOpen())
+    if (!m_streamHandler->IsOpen())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Open() -- Failed to open recorder: %1")
-            .arg(m_stream_handler->ErrorString()));
-        V4L2encStreamHandler::Return(m_stream_handler,
+            .arg(m_streamHandler->ErrorString()));
+        V4L2encStreamHandler::Return(m_streamHandler,
                                      m_tvrec ? m_tvrec->GetInputId() : -1);
         return false;
     }
 
-    m_h264_parser.use_I_forKeyframes(false);
+    m_h264Parser.use_I_forKeyframes(false);
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Open() -- Success.");
     return true;
@@ -276,7 +276,7 @@ void V4L2encRecorder::Close(void)
     LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- begin");
 
     if (IsOpen())
-        V4L2encStreamHandler::Return(m_stream_handler,
+        V4L2encStreamHandler::Return(m_streamHandler,
                                      m_tvrec ? m_tvrec->GetInputId() : -1);
 
 
@@ -286,7 +286,7 @@ void V4L2encRecorder::Close(void)
 bool V4L2encRecorder::PauseAndWait(int timeout)
 {
     QMutexLocker locker(&m_pauseLock);
-    if (m_request_pause)
+    if (m_requestPause)
     {
         if (!IsPaused(true))
         {
@@ -306,8 +306,8 @@ bool V4L2encRecorder::PauseAndWait(int timeout)
         LOG(VB_RECORD, LOG_INFO, LOC + "PauseAndWait() -- unpause");
         StartEncoding();
 
-        if (m_stream_data)
-            m_stream_data->Reset(m_stream_data->DesiredProgram());
+        if (m_streamData)
+            m_streamData->Reset(m_streamData->DesiredProgram());
 
         m_paused = false;
     }
@@ -321,16 +321,16 @@ bool V4L2encRecorder::PauseAndWait(int timeout)
 bool V4L2encRecorder::StartEncoding(void)
 {
     LOG(VB_RECORD, LOG_DEBUG, LOC + "V4L2encRecorder::StartEncoding() -- begin");
-    m_h264_parser.Reset();
-    m_wait_for_keyframe_option = true;
-    m_seen_sps = false;
+    m_h264Parser.Reset();
+    m_waitForKeyframeOption = true;
+    m_seenSps = false;
 
     LOG(VB_RECORD, LOG_DEBUG, LOC + "V4L2encRecorder::StartEncoding() -- end");
-    return (m_stream_handler && m_stream_handler->StartEncoding());
+    return (m_streamHandler && m_streamHandler->StartEncoding());
 }
 
 bool V4L2encRecorder::StopEncoding(void)
 {
     LOG(VB_RECORD, LOG_DEBUG, LOC + "V4L2encRecorder::StopEncoding()");
-    return (m_stream_handler && m_stream_handler->StopEncoding());
+    return (m_streamHandler && m_streamHandler->StopEncoding());
 }

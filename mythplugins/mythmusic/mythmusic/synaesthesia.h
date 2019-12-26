@@ -20,7 +20,7 @@ class Synaesthesia : public VisualBase
 {
 public:
     Synaesthesia(void);
-    virtual ~Synaesthesia();
+    ~Synaesthesia() override;
 
     void resize(const QSize &size) override; // VisualBase
     bool process(VisualNode *node) override; // VisualBase
@@ -61,7 +61,9 @@ private:
     int    m_outWidth            {0};
     int    m_outHeight           {0};
 
-    Bitmap<unsigned short> m_outputBmp, m_lastOutputBmp, m_lastLastOutputBmp;
+    Bitmap<unsigned short> m_outputBmp;
+    Bitmap<unsigned short> m_lastOutputBmp;
+    Bitmap<unsigned short> m_lastLastOutputBmp;
     QImage *m_outputImage        {nullptr};
 
     unsigned char m_palette[768];
@@ -70,7 +72,7 @@ private:
     double m_bgRedSlider         {0.75};
     double m_bgGreenSlider       {0.4};
 
-    double m_energy_avg          {80.0};
+    double m_energyAvg           {80.0};
 };
 
 #endif // SYNAETHESIA

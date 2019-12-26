@@ -14,7 +14,7 @@ class EditRomInfoDialog : public MythScreenType
                        const QString& name,
                        RomInfo *romInfo);
 
-    ~EditRomInfoDialog();
+    ~EditRomInfoDialog() override;
 
     bool Create() override; // MythScreenType
     void customEvent(QEvent *levent) override; // MythUIType

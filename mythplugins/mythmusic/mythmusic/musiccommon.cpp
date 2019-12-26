@@ -2173,11 +2173,14 @@ QString MusicCommon::getTimeString(int exTime, int maxTime)
     else
     {
         if (maxh > 0)
+        {
             time_string.sprintf("%d:%02d:%02d / %02d:%02d:%02d", eh, em,
                     es, maxh, maxm, maxs);
+        }
         else
-            time_string.sprintf("%02d:%02d / %02d:%02d", em, es, maxm,
-                    maxs);
+        {
+            time_string.sprintf("%02d:%02d / %02d:%02d", em, es, maxm, maxs);
+        }
     }
 
     return time_string;

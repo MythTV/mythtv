@@ -2,10 +2,12 @@
 #ifndef GAMEHANDLER_H_
 #define GAMEHANDLER_H_
 
-#include <QStringList>
+#include <utility>
+
+#include <QEvent>
 #include <QMap>
 #include <QObject>
-#include <QEvent>
+#include <QStringList>
 
 #include <mythdbcon.h>
 
@@ -26,11 +28,14 @@ enum GameFound
 class GameScan
 {
   public:
-    GameScan(QString lromname = "", QString lromfullpath = "",
+    explicit GameScan(QString lromname = "", QString lromfullpath = "",
              int lfoundloc    = 0,  QString lgamename = "",
              QString lrompath = "") :
-         m_romname(lromname),  m_romfullpath(lromfullpath),  m_gamename(lgamename),
-         m_rompath(lrompath),  m_foundloc(lfoundloc) {}
+         m_romname(std::move(lromname)),
+         m_romfullpath(std::move(lromfullpath)),
+         m_gamename(std::move(lgamename)),
+         m_rompath(std::move(lrompath)),
+         m_foundloc(lfoundloc) {}
 
     QString Rom(void)         const { return m_romname;       }
     QString RomFullPath(void) const { return m_romfullpath;   }
@@ -57,9 +62,9 @@ class GameHandler : public QObject
     Q_OBJECT
 
   public:
-    GameHandler() : QObject() {}
+    GameHandler() = default;
 
-    static void updateSettings(GameHandler*);
+    static void updateSettings(GameHandler *handler);
     static GameHandler *getHandler(uint i);
     static GameHandler *newHandler(QString name);
     static uint count(void);
@@ -80,9 +85,9 @@ class GameHandler : public QObject
     void buildFileList(const QString& directory, GameHandler *handler,
                        int* filecount);
 
-    void processGames(GameHandler *);
+    void processGames(GameHandler *handler);
     static void processAllGames(void);
-    static void registerHandler(GameHandler *);
+    static void registerHandler(GameHandler *handler);
     static void Launchgame(RomInfo *romdata, const QString& systemname);
     static void EditSettings(RomInfo *romdata);
     static void EditSystemSettings(RomInfo *romdata);

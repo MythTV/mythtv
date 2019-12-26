@@ -71,9 +71,9 @@ JumpToChannel::JumpToChannel(
     int start_chan_idx, int cur_chan_idx, uint rows_disp) :
     m_listener(parent),
     m_entry(std::move(start_entry)),
-    m_previous_start_channel_index(start_chan_idx),
-    m_previous_current_channel_index(cur_chan_idx),
-    m_rows_displayed(rows_disp),
+    m_previousStartChannelIndex(start_chan_idx),
+    m_previousCurrentChannelIndex(cur_chan_idx),
+    m_rowsDisplayed(rows_disp),
     m_timer(new QTimer(this))
 {
     if (parent && m_timer)
@@ -121,8 +121,8 @@ bool JumpToChannel::ProcessEntry(const QStringList &actions, const QKeyEvent *e)
 
     if (has_action("ESCAPE", actions))
     {
-        m_listener->GoTo(m_previous_start_channel_index,
-                         m_previous_current_channel_index);
+        m_listener->GoTo(m_previousStartChannelIndex,
+                         m_previousCurrentChannelIndex);
         deleteLater();
         return true;
     }
@@ -177,8 +177,8 @@ bool JumpToChannel::Update(void)
         m_timer->start(kJumpToChannelTimeout);
 
         // rows_displayed to center
-        int start = i - m_rows_displayed/2;
-        int cur   = m_rows_displayed/2;
+        int start = i - m_rowsDisplayed/2;
+        int cur   = m_rowsDisplayed/2;
         m_listener->GoTo(start, cur);
         return true;
     }
@@ -205,7 +205,7 @@ public:
                 bool verticalLayout,
                 QDateTime firstTime, QDateTime lastTime)
         : m_firstRow(firstRow), m_numRows(numRows),
-          m_channums(std::move(channums)),
+          m_chanNums(std::move(channums)),
           m_ggProgramRect(gg_programRect), m_ggChannelCount(gg_channelCount),
           m_currentStartTime(std::move(currentStartTime)),
           m_currentEndTime(std::move(currentEndTime)),
@@ -214,7 +214,7 @@ public:
           m_timeCount(timeCount), m_verticalLayout(verticalLayout),
           m_firstTime(std::move(firstTime)), m_lastTime(std::move(lastTime)) {}
     const unsigned int m_firstRow, m_numRows;
-    const QVector<int> m_channums;
+    const QVector<int> m_chanNums;
     const MythRect m_ggProgramRect;
     const int m_ggChannelCount;
     const QDateTime m_currentStartTime, m_currentEndTime;
@@ -251,7 +251,7 @@ public:
         : GuideUpdaterBase(guide),
           m_firstRow(gs.m_firstRow),
           m_numRows(gs.m_numRows),
-          m_channums(gs.m_channums),
+          m_chanNums(gs.m_chanNums),
           m_ggProgramRect(gs.m_ggProgramRect),
           m_ggChannelCount(gs.m_ggChannelCount),
           m_currentStartTime(gs.m_currentStartTime),
@@ -282,7 +282,7 @@ public:
             unsigned int row = i + m_firstRow;
             if (!m_proglists[i])
                 m_proglists[i] =
-                    m_guide->getProgramListFromProgram(m_channums[i]);
+                    m_guide->getProgramListFromProgram(m_chanNums[i]);
             fillProgramRowInfosWith(row,
                                     m_currentStartTime,
                                     m_proglists[i]);
@@ -302,7 +302,7 @@ private:
 
     const unsigned int m_firstRow;
     const unsigned int m_numRows;
-    const QVector<int> m_channums;
+    const QVector<int> m_chanNums;
     const MythRect m_ggProgramRect;
     const int m_ggChannelCount;
     const QDateTime m_currentStartTime;
@@ -370,8 +370,10 @@ public:
         if (m_updater)
         {
             if (m_updater->ExecuteNonUI())
+            {
                 QCoreApplication::postEvent(m_guide,
                                             new UpdateGuideEvent(m_updater));
+            }
             else
             {
                 delete m_updater;
@@ -789,11 +791,13 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
                 }
             }
             else
+            {
                 // Edit Recording should include "Watch this channel"
                 // is we selected a show that is current.
                 EditRecording(!m_player
                     && SelectionIsTunable(GetSelection())
                     && (secsTillStart / 60) < m_selectRecThreshold);
+            }
         }
         else if (action == "EDIT")
             EditScheduled();
@@ -1047,7 +1051,7 @@ static bool SelectionIsTunable(const ChannelInfoList &selection)
 {
     for (size_t i = 0; i < selection.size(); ++i)
     {
-        if (TV::IsTunable(selection[i].m_chanid))
+        if (TV::IsTunable(selection[i].m_chanId))
             return true;
     }
     return false;
@@ -1214,12 +1218,12 @@ uint GuideGrid::GetAlternateChannelIndex(
         if (!ciinfo)
             continue;
 
-        bool same_channum = ciinfo->m_channum == chinfo->m_channum;
+        bool same_channum = ciinfo->m_chanNum == chinfo->m_chanNum;
 
         if (with_same_channum != same_channum)
             continue;
 
-        if (!TV::IsTunable(ctx, ciinfo->m_chanid))
+        if (!TV::IsTunable(ctx, ciinfo->m_chanId))
             continue;
 
         if (with_same_channum)
@@ -1228,8 +1232,8 @@ uint GuideGrid::GetAlternateChannelIndex(
             break;
         }
 
-        ProgramList proglist    = GetProgramList(chinfo->m_chanid);
-        ProgramList ch_proglist = GetProgramList(ciinfo->m_chanid);
+        ProgramList proglist    = GetProgramList(chinfo->m_chanId);
+        ProgramList ch_proglist = GetProgramList(ciinfo->m_chanId);
 
         if (proglist.empty() ||
             proglist.size()  != ch_proglist.size())
@@ -1276,7 +1280,7 @@ ChannelInfoList GuideGrid::GetSelection(void) const
     if (m_channelInfos[idx].size() <= 1)
         return selected;
 
-    ProgramList proglist = GetProgramList(selected[0].m_chanid);
+    ProgramList proglist = GetProgramList(selected[0].m_chanId);
 
     if (proglist.empty())
         return selected;
@@ -1285,7 +1289,7 @@ ChannelInfoList GuideGrid::GetSelection(void) const
     {
         const ChannelInfo *ci = GetChannelInfo(idx, i);
         if (ci && (i != si) &&
-            (ci->m_callsign == ch->m_callsign) && (ci->m_channum  == ch->m_channum))
+            (ci->m_callSign == ch->m_callSign) && (ci->m_chanNum  == ch->m_chanNum))
         {
             sel.push_back( MKKEY(idx, i) );
         }
@@ -1295,7 +1299,7 @@ ChannelInfoList GuideGrid::GetSelection(void) const
     {
         const ChannelInfo *ci = GetChannelInfo(idx, i);
         if (ci && (i != si) &&
-            (ci->m_callsign == ch->m_callsign) && (ci->m_channum  != ch->m_channum))
+            (ci->m_callSign == ch->m_callSign) && (ci->m_chanNum  != ch->m_chanNum))
         {
             sel.push_back( MKKEY(idx, i) );
         }
@@ -1304,7 +1308,7 @@ ChannelInfoList GuideGrid::GetSelection(void) const
     for (size_t i = 0; i < m_channelInfos[idx].size(); ++i)
     {
         const ChannelInfo *ci = GetChannelInfo(idx, i);
-        if ((i != si) && (ci->m_callsign != ch->m_callsign))
+        if ((i != si) && (ci->m_callSign != ch->m_callSign))
         {
             sel.push_back( MKKEY(idx, i) );
         }
@@ -1313,7 +1317,7 @@ ChannelInfoList GuideGrid::GetSelection(void) const
     for (size_t i = 1; i < sel.size(); ++i)
     {
         const ChannelInfo *ci = GetChannelInfo(sel[i]>>32, sel[i]&0xffff);
-        const ProgramList ch_proglist = GetProgramList(ch->m_chanid);
+        const ProgramList ch_proglist = GetProgramList(ch->m_chanId);
 
         if (!ci || proglist.size() != ch_proglist.size())
             continue;
@@ -1366,16 +1370,16 @@ void GuideGrid::fillChannelInfos(bool gotostartchannel)
             chan = channels.size() - i - 1;
         }
 
-        bool ndup = !channum_to_index_map[channels[chan].m_channum].empty();
-        bool cdup = !callsign_to_index_map[channels[chan].m_callsign].empty();
+        bool ndup = !channum_to_index_map[channels[chan].m_chanNum].empty();
+        bool cdup = !callsign_to_index_map[channels[chan].m_callSign].empty();
 
         if (ndup && cdup)
             continue;
 
         ChannelInfo val(channels[chan]);
 
-        channum_to_index_map[val.m_channum].push_back(GetChannelCount());
-        callsign_to_index_map[val.m_callsign].push_back(GetChannelCount());
+        channum_to_index_map[val.m_chanNum].push_back(GetChannelCount());
+        callsign_to_index_map[val.m_callSign].push_back(GetChannelCount());
 
         // add the new channel to the list
         db_chan_list_t tmp;
@@ -1386,18 +1390,18 @@ void GuideGrid::fillChannelInfos(bool gotostartchannel)
     // handle duplicates
     for (size_t i = 0; i < channels.size(); ++i)
     {
-        const uint_list_t &ndups = channum_to_index_map[channels[i].m_channum];
+        const uint_list_t &ndups = channum_to_index_map[channels[i].m_chanNum];
         for (size_t j = 0; j < ndups.size(); ++j)
         {
-            if (channels[i].m_chanid   != m_channelInfos[ndups[j]][0].m_chanid &&
-                channels[i].m_callsign == m_channelInfos[ndups[j]][0].m_callsign)
+            if (channels[i].m_chanId   != m_channelInfos[ndups[j]][0].m_chanId &&
+                channels[i].m_callSign == m_channelInfos[ndups[j]][0].m_callSign)
                 m_channelInfos[ndups[j]].push_back(channels[i]);
         }
 
-        const uint_list_t &cdups = callsign_to_index_map[channels[i].m_callsign];
+        const uint_list_t &cdups = callsign_to_index_map[channels[i].m_callSign];
         for (size_t j = 0; j < cdups.size(); ++j)
         {
-            if (channels[i].m_chanid != m_channelInfos[cdups[j]][0].m_chanid)
+            if (channels[i].m_chanId != m_channelInfos[cdups[j]][0].m_chanId)
                 m_channelInfos[cdups[j]].push_back(channels[i]);
         }
     }
@@ -1426,7 +1430,7 @@ int GuideGrid::FindChannel(uint chanid, const QString &channum,
     uint i = (chanid) ? 0 : GetChannelCount();
     for (; i < GetChannelCount(); ++i)
     {
-        if (m_channelInfos[i][0].m_chanid == chanid)
+        if (m_channelInfos[i][0].m_chanId == chanid)
                 return i;
     }
 
@@ -1436,7 +1440,7 @@ int GuideGrid::FindChannel(uint chanid, const QString &channum,
     {
         for (size_t j = 1; j < m_channelInfos[i].size(); ++j)
         {
-            if (m_channelInfos[i][j].m_chanid == chanid)
+            if (m_channelInfos[i][j].m_chanId == chanid)
                 return i;
         }
     }
@@ -1445,7 +1449,7 @@ int GuideGrid::FindChannel(uint chanid, const QString &channum,
     i = (channum.isEmpty()) ? GetChannelCount() : 0;
     for (; i < GetChannelCount(); ++i)
     {
-         if (m_channelInfos[i][0].m_channum == channum)
+         if (m_channelInfos[i][0].m_chanNum == channum)
             return i;
     }
 
@@ -1455,7 +1459,7 @@ int GuideGrid::FindChannel(uint chanid, const QString &channum,
     {
         for (size_t j = 1; j < m_channelInfos[i].size(); ++j)
         {
-            if (m_channelInfos[i][j].m_channum == channum)
+            if (m_channelInfos[i][j].m_chanNum == channum)
                 return i;
         }
     }
@@ -1531,7 +1535,7 @@ ProgramList *GuideGrid::getProgramListFromProgram(int chanNum)
                            "  AND program.starttime >= :STARTLIMITTS "
                            "  AND program.manualid = 0 ";
         QDateTime starttime = m_currentStartTime.addSecs(0 - m_currentStartTime.time().second());
-        bindings[":CHANID"]  = GetChannelInfo(chanNum)->m_chanid;
+        bindings[":CHANID"]  = GetChannelInfo(chanNum)->m_chanId;
         bindings[":STARTTS"] = starttime;
         bindings[":STARTLIMITTS"] = starttime.addDays(-1);
         bindings[":ENDTS"] = m_currentEndTime.addSecs(0 - m_currentEndTime.time().second());
@@ -2090,7 +2094,7 @@ void GuideGrid::updateChannelsNonUI(QVector<ChannelInfo *> &chinfos,
             const PlayerContext *ctx = m_player->GetPlayerReadLock(
                 -1, __FILE__, __LINE__);
             if (ctx && chinfo)
-                try_alt = !TV::IsTunable(ctx, chinfo->m_chanid);
+                try_alt = !TV::IsTunable(ctx, chinfo->m_chanId);
             m_player->ReturnPlayerLock(ctx);
         }
 
@@ -2109,7 +2113,7 @@ void GuideGrid::updateChannelsNonUI(QVector<ChannelInfo *> &chinfos,
 
             // Try alternates with different channum if applicable
             if (unavailable && chinfo &&
-                !GetProgramList(chinfo->m_chanid).empty())
+                !GetProgramList(chinfo->m_chanId).empty())
             {
                 alt = GetAlternateChannelIndex(chanNumber, false);
                 unavailable = (alt == m_channelInfoIdx[chanNumber]);
@@ -2319,14 +2323,18 @@ void GuideGrid::toggleChannelFavorite(int grpid)
         chanNum = 0;
 
     ChannelInfo *ch = GetChannelInfo(chanNum);
-    uint chanid = ch->m_chanid;
+    uint chanid = ch->m_chanId;
 
     if (m_changrpid == -1)
+    {
         // If currently viewing all channels, allow to add only not delete
         ChannelGroup::ToggleChannel(chanid, grpid, false);
+    }
     else
+    {
         // Only allow delete if viewing the favorite group in question
         ChannelGroup::ToggleChannel(chanid, grpid, true);
+    }
 
     //regenerate the list of non empty group in case it did change
     m_changrplist = ChannelGroup::GetChannelGroups(false);

@@ -27,7 +27,7 @@ class MythUDPListener : public QObject
                  quint16 senderPort);
 
   private:
-    ~MythUDPListener(void) { Disable(); }
+    ~MythUDPListener(void) override { Disable(); }
 
     void TeardownAll(void) { Disable(); }
 

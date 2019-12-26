@@ -43,11 +43,11 @@ class ProgLister : public ScheduleCommon
                QDateTime selectedTime = QDateTime());
     explicit ProgLister(MythScreenStack *parent, uint recid = 0,
                         QString title = QString());
-    ~ProgLister();
+    ~ProgLister() override;
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
-    void customEvent(QEvent *) override; // ScheduleCommon
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
+    void customEvent(QEvent *event) override; // ScheduleCommon
 
   protected slots:
     void HandleSelected(MythUIButtonListItem *item);

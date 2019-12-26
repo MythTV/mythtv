@@ -23,7 +23,7 @@ class AutoDeleteDeque
             return m_list[index];
         return nullptr;
     }
-    const T operator[](uint index) const
+    T operator[](uint index) const
     {
         if (index < m_list.size())
             return m_list[index];
@@ -61,7 +61,7 @@ class AutoDeleteDeque
     const_reverse_iterator crend(void)   const { return m_list.rend();   }
 
     T back(void)                     { return m_list.back();  }
-    const T back(void)         const { return m_list.back();  }
+    T back(void)               const { return m_list.back();  }
 
     bool empty(void)  const { return m_list.empty(); }
     size_t size(void) const { return m_list.size(); }

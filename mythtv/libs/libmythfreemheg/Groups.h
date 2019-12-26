@@ -46,7 +46,7 @@ class MHGroup : public MHRoot
 {
   public:
     MHGroup() = default;
-    virtual ~MHGroup();
+    ~MHGroup() override;
     void PrintMe(FILE *fd, int nTabs) const override; // MHRoot
 
     void Preparation(MHEngine *engine) override; // MHRoot
@@ -57,7 +57,7 @@ class MHGroup : public MHRoot
     MHRoot *FindByObjectNo(int n) override; // MHRoot
 
     // Actions.
-    void SetTimer(int nTimerId, bool fAbsolute, int nMilliSecs, MHEngine *) override; // MHRoot
+    void SetTimer(int nTimerId, bool fAbsolute, int nMilliSecs, MHEngine *engine) override; // MHRoot
     // This isn't an MHEG action as such but is used as part of the implementation of "Clone"
     void MakeClone(MHRoot *pTarget, MHRoot *pRef, MHEngine *engine) override; // MHRoot
 
@@ -116,7 +116,7 @@ class MHApplication : public MHGroup
 {
   public:
     MHApplication() { m_fIsApp = true; }
-    virtual ~MHApplication();
+    ~MHApplication() override;
     const char *ClassName() override // MHRoot
         { return "Application"; }
     // Set this up from the parse tree.
@@ -173,20 +173,20 @@ class MHQuit: public MHElemAction
 class MHSendEvent: public MHElemAction
 {
   public:
-    MHSendEvent(): MHElemAction(":SendEvent"), m_EventType(EventIsAvailable) {}
+    MHSendEvent(): MHElemAction(":SendEvent") {}
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
     void Perform(MHEngine *engine) override; // MHElemAction
     void PrintArgs(FILE *fd, int nTabs) const override; // MHElemAction
   protected:
     MHGenericObjectRef m_EventSource; // Event source
-    enum EventType m_EventType; // Event type
+    enum EventType m_EventType { EventIsAvailable }; // Event type
     MHParameter m_EventData; // Optional - Null means not specified.  Can only be bool, int or string.
 };
 
 class MHSetTimer: public MHElemAction
 {
   public:
-    MHSetTimer(): MHElemAction(":SetTimer"), m_TimerType(ST_NoNewTimer) {}
+    MHSetTimer(): MHElemAction(":SetTimer") {}
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
     void Perform(MHEngine *engine) override; // MHElemAction
   protected:
@@ -194,7 +194,11 @@ class MHSetTimer: public MHElemAction
     MHGenericInteger m_TimerId;
     // A new timer may not be specified in which case this cancels the timer.
     // If the timer is specified the "absolute" flag is optional.
-    enum { ST_NoNewTimer, ST_TimerAbsolute, ST_TimerRelative } m_TimerType;
+    enum {
+        ST_NoNewTimer,
+        ST_TimerAbsolute,
+        ST_TimerRelative
+    } m_TimerType { ST_NoNewTimer };
     MHGenericInteger m_TimerValue;
     MHGenericBoolean m_AbsFlag;
 };

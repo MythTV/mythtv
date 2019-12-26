@@ -35,7 +35,7 @@ class META_PUBLIC SimpleCleanup : public CleanupProc
         CleanupHooks::getInstance()->addHook(this);
     }
 
-    ~SimpleCleanup()
+    ~SimpleCleanup() override
     {
         CleanupHooks::getInstance()->removeHook(this);
     }

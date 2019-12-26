@@ -24,10 +24,10 @@ class DVDThemeSelector : public MythScreenType
   public:
     DVDThemeSelector(MythScreenStack *parent, MythScreenType *destinationScreen,
                      ArchiveDestination archiveDestination, const QString& name);
-    ~DVDThemeSelector(void);
+    ~DVDThemeSelector(void) override;
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
   protected slots:
     void handleNextPage(void);
@@ -45,18 +45,18 @@ class DVDThemeSelector : public MythScreenType
     MythScreenType    *m_destinationScreen {nullptr};
     ArchiveDestination m_archiveDestination;
 
-    QString themeDir;
+    QString           m_themeDir;
 
-    MythUIButtonList *theme_selector       {nullptr};
-    MythUIImage      *theme_image          {nullptr};
-    int               theme_no             {0};
-    QStringList       theme_list;
+    MythUIButtonList *m_themeSelector      {nullptr};
+    MythUIImage      *m_themeImage         {nullptr};
+    int               m_themeNo            {0};
+    QStringList       m_themeList;
 
-    MythUIImage      *intro_image          {nullptr};
-    MythUIImage      *mainmenu_image       {nullptr};
-    MythUIImage      *chapter_image        {nullptr};
-    MythUIImage      *details_image        {nullptr};
-    MythUIText       *themedesc_text       {nullptr};
+    MythUIImage      *m_introImage         {nullptr};
+    MythUIImage      *m_mainmenuImage      {nullptr};
+    MythUIImage      *m_chapterImage       {nullptr};
+    MythUIImage      *m_detailsImage       {nullptr};
+    MythUIText       *m_themedescText      {nullptr};
 
     MythUIButton     *m_nextButton         {nullptr};
     MythUIButton     *m_prevButton         {nullptr};

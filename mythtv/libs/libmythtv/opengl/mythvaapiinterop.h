@@ -51,7 +51,7 @@ class MythVAAPIInterop : public MythOpenGLInterop
 
   protected:
     MythVAAPIInterop(MythRenderOpenGL *Context, Type InteropType);
-    virtual ~MythVAAPIInterop() override;
+    ~MythVAAPIInterop() override;
 
     static Type GetInteropType       (VideoFrameType Format);
     void        InitaliseDisplay     (void);

@@ -16,23 +16,23 @@ class DsmccDii
         delete[] m_modules;
     }
 
-    unsigned long    m_download_id          {0};
-    unsigned short   m_block_size           {0};
-    unsigned long    m_tc_download_scenario {0};
-    unsigned short   m_number_modules       {0};
-    unsigned short   m_private_data_len     {0};
+    unsigned long    m_downloadId           {0};
+    unsigned short   m_blockSize            {0};
+    unsigned long    m_tcDownloadScenario   {0};
+    unsigned short   m_numberModules        {0};
+    unsigned short   m_privateDataLen       {0};
     DsmccModuleInfo *m_modules              {nullptr};
-    unsigned char   *m_private_data         {nullptr};
+    unsigned char   *m_privateData          {nullptr};
 };
 
 class DsmccSectionHeader
 {
   public:
-    char           m_table_id;  /* always 0x3B */
+    char           m_tableId;  /* always 0x3B */
 
     unsigned char  m_flags[2];
 
-    unsigned short m_table_id_extension;
+    unsigned short m_tableIdExtension;
 
     /*
      *  unsigned int section_syntax_indicator : 1; UKProfile - always 1
@@ -58,9 +58,9 @@ class DsmccDb
     DsmccDb() = default;
     ~DsmccDb() = default;
 
-    unsigned short m_module_id      {0};
-    unsigned char  m_module_version {0};
-    unsigned short m_block_number   {0};
+    unsigned short m_moduleId       {0};
+    unsigned char  m_moduleVersion  {0};
+    unsigned short m_blockNumber    {0};
     unsigned int   m_len            {0};
 };
 

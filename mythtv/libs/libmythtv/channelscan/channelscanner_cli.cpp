@@ -70,15 +70,15 @@ void ChannelScannerCLI::HandleEvent(const ScannerEvent *scanEvent)
         QCoreApplication::exit(0);
     }
     else if (scanEvent->type() == ScannerEvent::AppendTextToLog)
-        m_status_last_log = scanEvent->strValue();
+        m_statusLastLog = scanEvent->strValue();
     else if (scanEvent->type() == ScannerEvent::SetStatusText)
-        m_status_text = scanEvent->strValue();
+        m_statusText = scanEvent->strValue();
     else if (scanEvent->type() == ScannerEvent::SetPercentComplete)
-        m_status_complete = scanEvent->intValue();
+        m_statusComplete = scanEvent->intValue();
     else if (scanEvent->type() == ScannerEvent::SetStatusSignalLock)
-        m_status_lock = scanEvent->boolValue();
+        m_statusLock = scanEvent->boolValue();
     else if (scanEvent->type() == ScannerEvent::SetStatusSignalToNoise)
-        m_status_snr = scanEvent->intValue() / 65535.0;
+        m_statusSnr = scanEvent->intValue() / 65535.0;
 #if THESE_ARE_CURRENTLY_IGNORED
     else if (scanEvent->type() == ScannerEvent::SetStatusTitleText)
         ;
@@ -93,11 +93,11 @@ void ChannelScannerCLI::HandleEvent(const ScannerEvent *scanEvent)
     if (VERBOSE_LEVEL_NONE || VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_INFO))
     {
         msg = QString("%1% S/N %2 %3 : %4 (%5) %6")
-            .arg(m_status_complete, 3)
-            .arg(m_status_snr, 3, 'f', 1)
-            .arg((m_status_lock) ? "l" : "L")
-            .arg(qPrintable(m_status_text))
-            .arg(qPrintable(m_status_last_log))
+            .arg(m_statusComplete, 3)
+            .arg(m_statusSnr, 3, 'f', 1)
+            .arg((m_statusLock) ? "l" : "L")
+            .arg(qPrintable(m_statusText))
+            .arg(qPrintable(m_statusLastLog))
             .arg("", 20);
     }
     //cout<<msg.toLatin1().constData()<<endl;

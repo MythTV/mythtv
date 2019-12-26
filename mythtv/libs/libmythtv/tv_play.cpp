@@ -1674,8 +1674,8 @@ bool TV::RequestNextRecorder(PlayerContext *ctx, bool showDialogs,
     {
         for (size_t i = 0; i < selection.size(); i++)
         {
-            uint    chanid  = selection[i].m_chanid;
-            QString channum = selection[i].m_channum;
+            uint    chanid  = selection[i].m_chanId;
+            QString channum = selection[i].m_chanNum;
             if (!chanid || channum.isEmpty())
                 continue;
             QSet<uint> cards = IsTunableOn(ctx, chanid);
@@ -1834,7 +1834,7 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
             // is busy_input in same input group as recording
             if (!busy_input_grps_loaded)
             {
-                busy_input_grps = CardUtil::GetInputGroups(busy_input.m_inputid);
+                busy_input_grps = CardUtil::GetInputGroups(busy_input.m_inputId);
                 busy_input_grps_loaded = true;
             }
 
@@ -1863,10 +1863,10 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
                 (*it).m_isConflicting = true;    // NOLINT(bugprone-branch-clone)
             else if (!CardUtil::IsTunerShared(cardid, (*it).m_info->GetInputID()))
                 (*it).m_isConflicting = true;
-            else if ((busy_input.m_mplexid &&
-                      (busy_input.m_mplexid  == (*it).m_info->QueryMplexID())) ||
-                     (!busy_input.m_mplexid &&
-                      (busy_input.m_chanid == (*it).m_info->GetChanID())))
+            else if ((busy_input.m_mplexId &&
+                      (busy_input.m_mplexId  == (*it).m_info->QueryMplexID())) ||
+                     (!busy_input.m_mplexId &&
+                      (busy_input.m_chanId == (*it).m_info->GetChanID())))
                 (*it).m_isConflicting = false;
             else
                 (*it).m_isConflicting = true;
@@ -3765,10 +3765,10 @@ QList<QKeyEvent> TV::ConvertScreenPressKeyMap(const QString &keyList)
             keyPressList.append(keyEvent);
         }
     }
-    if (stringKeyList.count() < s_screenPressRegionCount)
+    if (stringKeyList.count() < kScreenPressRegionCount)
     {
         // add default remainders
-        for(; i < s_screenPressRegionCount; i++)
+        for(; i < kScreenPressRegionCount; i++)
         {
             QKeyEvent keyEvent(QEvent::None, Qt::Key_Escape, Qt::NoModifier);
             keyPressList.append(keyEvent);
@@ -5077,10 +5077,14 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
                     int denominator = matches[2].toInt(&ok);
 
                     if (ok && denominator != 0)
+                    {
                         tmpSpeed = static_cast<float>(numerator) /
                                    static_cast<float>(denominator);
+                    }
                     else
+                    {
                         ok = false;
+                    }
                 }
             }
 
@@ -5165,17 +5169,23 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
             return;
 
         if (tokens[2] == "BEGINNING")
+        {
             DoSeek(ctx, 0, tr("Jump to Beginning"),
                    /*timeIsOffset*/false,
                    /*honorCutlist*/true);
+        }
         else if (tokens[2] == "FORWARD")
+        {
             DoSeek(ctx, ctx->m_fftime, tr("Skip Ahead"),
                    /*timeIsOffset*/true,
                    /*honorCutlist*/true);
+        }
         else if (tokens[2] == "BACKWARD")
+        {
             DoSeek(ctx, -ctx->m_rewtime, tr("Skip Back"),
                    /*timeIsOffset*/true,
                    /*honorCutlist*/true);
+        }
         else if ((tokens[2] == "POSITION" ||
                   tokens[2] == "POSITIONWITHCUTLIST") &&
                  (tokens.size() == 4) &&
@@ -6583,13 +6593,17 @@ bool TV::SeekHandleAction(PlayerContext *actx, const QStringList &actions,
     else
     {
         if (m_smartForward && m_doSmartForward)
+        {
             DoSeek(actx, actx->m_rewtime, tr("Skip Ahead"),
                    /*timeIsOffset*/true,
                    /*honorCutlist*/(flags & kIgnoreCutlist) == 0);
+        }
         else
+        {
             DoSeek(actx, actx->m_fftime, tr("Skip Ahead"),
                    /*timeIsOffset*/true,
                    /*honorCutlist*/(flags & kIgnoreCutlist) == 0);
+        }
     }
     UpdateNavDialog(actx);
     return true;
@@ -6660,11 +6674,15 @@ void TV::DoArbSeek(PlayerContext *ctx, ArbSeekWhence whence,
     float time = (int(seek / 100) * 3600) + ((seek % 100) * 60);
 
     if (whence == ARBSEEK_FORWARD)
+    {
         DoSeek(ctx, time, tr("Jump Ahead"),
                /*timeIsOffset*/true, honorCutlist);
+    }
     else if (whence == ARBSEEK_REWIND)
+    {
         DoSeek(ctx, -time, tr("Jump Back"),
                /*timeIsOffset*/true, honorCutlist);
+    }
     else if (whence == ARBSEEK_END)
     {
         ctx->LockDeletePlayer(__FILE__, __LINE__);
@@ -7081,11 +7099,11 @@ void TV::SwitchSource(PlayerContext *ctx, uint source_direction)
     for (size_t i = 0; i < inputs.size(); i++)
     {
         // prefer the current card's input in sources list
-        if ((sources.find(inputs[i].m_sourceid) == sources.end()) ||
-            ((cardid == inputs[i].m_inputid) &&
-             (cardid != sources[inputs[i].m_sourceid].m_inputid)))
+        if ((sources.find(inputs[i].m_sourceId) == sources.end()) ||
+            ((cardid == inputs[i].m_inputId) &&
+             (cardid != sources[inputs[i].m_sourceId].m_inputId)))
         {
-            sources[inputs[i].m_sourceid] = inputs[i];
+            sources[inputs[i].m_sourceId] = inputs[i];
         }
     }
 
@@ -7125,7 +7143,7 @@ void TV::SwitchSource(PlayerContext *ctx, uint source_direction)
         return;
     }
 
-    m_switchToInputId = (*sit).m_inputid;
+    m_switchToInputId = (*sit).m_inputId;
 
     QMutexLocker locker(&m_timerIdLock);
     if (!m_switchToInputTimerId)
@@ -7524,7 +7542,7 @@ bool TV::CommitQueuedInput(PlayerContext *ctx)
 
             commited = true;
             if (channum.isEmpty())
-                channum = m_browseHelper->GetBrowsedInfo().m_channum;
+                channum = m_browseHelper->GetBrowsedInfo().m_chanNum;
             uint chanid = m_browseHelper->GetChanId(
                 channum, ctx->GetCardID(), sourceid);
             if (chanid)
@@ -7789,8 +7807,8 @@ void TV::ChangeChannel(const PlayerContext *ctx, const ChannelInfoList &options)
 {
     for (size_t i = 0; i < options.size(); i++)
     {
-        uint    chanid  = options[i].m_chanid;
-        QString channum = options[i].m_channum;
+        uint    chanid  = options[i].m_chanId;
+        QString channum = options[i].m_chanNum;
 
         if (chanid && !channum.isEmpty() && IsTunable(ctx, chanid))
         {
@@ -8446,18 +8464,18 @@ QSet<uint> TV::IsTunableOn(
 
     for (size_t j = 0; j < inputs.size(); j++)
     {
-        if (inputs[j].m_sourceid != sourceid)
+        if (inputs[j].m_sourceId != sourceid)
             continue;
 
-        if (inputs[j].m_mplexid &&
-            inputs[j].m_mplexid != mplexid)
+        if (inputs[j].m_mplexId &&
+            inputs[j].m_mplexId != mplexid)
             continue;
 
-        if (!inputs[j].m_mplexid && inputs[j].m_chanid &&
-            inputs[j].m_chanid != chanid)
+        if (!inputs[j].m_mplexId && inputs[j].m_chanId &&
+            inputs[j].m_chanId != chanid)
             continue;
 
-        tunable_cards.insert(inputs[j].m_inputid);
+        tunable_cards.insert(inputs[j].m_inputId);
     }
 
     if (tunable_cards.empty())
@@ -9277,10 +9295,14 @@ void TV::customEvent(QEvent *e)
         {
             MenuNodeTuple data = dce->GetData().value<MenuNodeTuple>();
             if (dce->GetResult() == -1) // menu exit/back
+            {
                 PlaybackMenuShow(data.m_menu, data.m_node.parentNode(),
                                  data.m_node);
+            }
             else
+            {
                 PlaybackMenuShow(data.m_menu, data.m_node, QDomNode());
+            }
         }
         else
             OSDDialogEvent(dce->GetResult(), dce->GetResultText(),
@@ -9352,29 +9374,45 @@ void TV::customEvent(QEvent *e)
         else if (message == ACTION_SETAUDIOSYNC)
             ChangeAudioSync(ctx, 0, value);
         else if (message == ACTION_SETBRIGHTNESS)
+        {
             DoChangePictureAttribute(ctx, kAdjustingPicture_Playback,
                                      kPictureAttribute_Brightness,
                                      false, value);
+        }
         else if (message == ACTION_SETCONTRAST)
+        {
             DoChangePictureAttribute(ctx, kAdjustingPicture_Playback,
                                      kPictureAttribute_Contrast,
                                      false, value);
+        }
         else if (message == ACTION_SETCOLOUR)
+        {
             DoChangePictureAttribute(ctx, kAdjustingPicture_Playback,
                                      kPictureAttribute_Colour,
                                      false, value);
+        }
         else if (message == ACTION_SETHUE)
+        {
             DoChangePictureAttribute(ctx, kAdjustingPicture_Playback,
                                      kPictureAttribute_Hue,
                                      false, value);
+        }
         else if (message == ACTION_JUMPCHAPTER)
+        {
             DoJumpChapter(ctx, value);
+        }
         else if (message == ACTION_SWITCHTITLE)
+        {
             DoSwitchTitle(ctx, value - 1);
+        }
         else if (message == ACTION_SWITCHANGLE)
+        {
             DoSwitchAngle(ctx, value);
+        }
         else if (message == ACTION_SEEKABSOLUTE)
+        {
             DoSeekAbsolute(ctx, value, /*honorCutlist*/true);
+        }
         ReturnPlayerLock(ctx);
     }
 
@@ -9799,13 +9837,13 @@ void TV::customEvent(QEvent *e)
 void TV::QuickRecord(PlayerContext *ctx)
 {
     BrowseInfo bi = m_browseHelper->GetBrowsedInfo();
-    if (bi.m_chanid)
+    if (bi.m_chanId)
     {
         InfoMap infoMap;
-        QDateTime startts = MythDate::fromString(bi.m_starttime);
+        QDateTime startts = MythDate::fromString(bi.m_startTime);
 
         RecordingInfo::LoadStatus status;
-        RecordingInfo recinfo(bi.m_chanid, startts, false, 0, &status);
+        RecordingInfo recinfo(bi.m_chanId, startts, false, 0, &status);
         if (RecordingInfo::kFoundProgram == status)
             recinfo.QuickRecord();
         recinfo.ToMap(infoMap);
@@ -10093,9 +10131,11 @@ void TV::ShowOSDCutpoint(PlayerContext *ctx, const QString &type)
                                        "TV Editing");
         }
         if (m_cutlistMenu.IsLoaded())
+        {
             PlaybackMenuShow(m_cutlistMenu,
                              m_cutlistMenu.GetRoot(),
                              QDomNode());
+        }
     }
     else if (type == "EDIT_CUT_POINTS_COMPACT")
     {
@@ -10108,9 +10148,11 @@ void TV::ShowOSDCutpoint(PlayerContext *ctx, const QString &type)
                                               "TV Editing");
         }
         if (m_cutlistCompactMenu.IsLoaded())
+        {
             PlaybackMenuShow(m_cutlistCompactMenu,
                              m_cutlistCompactMenu.GetRoot(),
                              QDomNode());
+        }
     }
     else if (type == "EXIT_EDIT_MODE")
     {
@@ -10584,7 +10626,7 @@ void TV::OSDDialogEvent(int result, const QString& text, QString action)
                 auto it = list.cbegin();
                 for (; it != list.cend(); ++it)
                 {
-                    if ((*it).m_channum == cur_channum)
+                    if ((*it).m_chanNum == cur_channum)
                     {
                         break;
                     }
@@ -10596,7 +10638,7 @@ void TV::OSDDialogEvent(int result, const QString& text, QString action)
                     // first channel in the group
                     it = list.begin();
                     if (it != list.end())
-                        new_channum = (*it).m_channum;
+                        new_channum = (*it).m_chanNum;
                 }
 
                 LOG(VB_CHANNEL, LOG_INFO, LOC +
@@ -10708,20 +10750,34 @@ void TV::OSDDialogEvent(int result, const QString& text, QString action)
         else if (action == "TOGGLEAUTOEXPIRE")
             ToggleAutoExpire(actx);
         else if (action.startsWith("TOGGLECOMMSKIP"))
+        {
             SetAutoCommercialSkip(
                 actx, (CommSkipMode)(action.right(1).toInt()));
+        }
         else if (action == "QUEUETRANSCODE")
+        {
             DoQueueTranscode(actx, "Default");
+        }
         else if (action == "QUEUETRANSCODE_AUTO")
+        {
             DoQueueTranscode(actx, "Autodetect");
+        }
         else if (action == "QUEUETRANSCODE_HIGH")
+        {
             DoQueueTranscode(actx, "High Quality");
+        }
         else if (action == "QUEUETRANSCODE_MEDIUM")
+        {
             DoQueueTranscode(actx, "Medium Quality");
+        }
         else if (action == "QUEUETRANSCODE_LOW")
+        {
             DoQueueTranscode(actx, "Low Quality");
+        }
         else
+        {
             handled = false;
+        }
     }
     if (!handled)
     {
@@ -11378,8 +11434,8 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
             for (it = m_dbChannelGroups.begin();
                  it != m_dbChannelGroups.end(); ++it)
             {
-                QString action = prefix + QString::number(it->m_grpid);
-                active = ((int)(it->m_grpid) == m_channelGroupId);
+                QString action = prefix + QString::number(it->m_grpId);
+                active = ((int)(it->m_grpId) == m_channelGroupId);
                 BUTTON(action, it->m_name);
             }
         }
@@ -11460,13 +11516,13 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
             addednames += CardUtil::GetDisplayName(inputid);
             for (; it != inputs.end(); ++it)
             {
-                if ((*it).m_inputid == inputid ||
+                if ((*it).m_inputId == inputid ||
                     addednames.contains((*it).m_displayName))
                     continue;
                 active = false;
                 addednames += (*it).m_displayName;
                 QString action = QString("SWITCHTOINPUT_") +
-                    QString::number((*it).m_inputid);
+                    QString::number((*it).m_inputId);
                 BUTTON(action, (*it).m_displayName);
             }
         }
@@ -11484,14 +11540,14 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
             auto it = inputs.begin();
             for (; it != inputs.end(); ++it)
             {
-                if ((*it).m_sourceid == sourceid ||
-                    sourceids[(*it).m_sourceid])
+                if ((*it).m_sourceId == sourceid ||
+                    sourceids[(*it).m_sourceId])
                     continue;
                 active = false;
-                sourceids[(*it).m_sourceid] = true;
+                sourceids[(*it).m_sourceId] = true;
                 QString action = QString("SWITCHTOINPUT_") +
-                    QString::number((*it).m_inputid);
-                BUTTON(action, SourceUtil::GetSourceName((*it).m_sourceid));
+                    QString::number((*it).m_inputId);
+                BUTTON(action, SourceUtil::GetSourceName((*it).m_sourceId));
             }
         }
     }
@@ -11773,10 +11829,12 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
                 if (m_lastProgram->GetSubtitle().isEmpty())
                     BUTTON(actionName, m_lastProgram->GetTitle());
                 else
+                {
                     BUTTON(actionName,
                            QString("%1: %2")
                            .arg(m_lastProgram->GetTitle())
                            .arg(m_lastProgram->GetSubtitle()));
+                }
             }
         }
         else if (actionName == "EDIT")
@@ -12120,13 +12178,17 @@ void TV::ShowOSDMenu(bool isCompact)
                                            "TV Playback");
     }
     if (isCompact && m_playbackCompactMenu.IsLoaded())
+    {
         PlaybackMenuShow(m_playbackCompactMenu,
                          m_playbackCompactMenu.GetRoot(),
                          QDomNode());
+    }
     else if (m_playbackMenu.IsLoaded())
+    {
         PlaybackMenuShow(m_playbackMenu,
                          m_playbackMenu.GetRoot(),
                          QDomNode());
+    }
 }
 
 void TV::FillOSDMenuJumpRec(PlayerContext* ctx, const QString &category,
@@ -12641,9 +12703,11 @@ void TV::DoJumpFFWD(PlayerContext *ctx)
     else if (GetNumChapters(ctx) > 0)
         DoJumpChapter(ctx, 9999);
     else
+    {
         DoSeek(ctx, ctx->m_jumptime * 60, tr("Jump Ahead"),
                /*timeIsOffset*/true,
                /*honorCutlist*/true);
+    }
 }
 
 void TV::DoSeekFFWD(PlayerContext *ctx)
@@ -12660,9 +12724,11 @@ void TV::DoJumpRWND(PlayerContext *ctx)
     else if (GetNumChapters(ctx) > 0)
         DoJumpChapter(ctx, -1);
     else
+    {
         DoSeek(ctx, -ctx->m_jumptime * 60, tr("Jump Back"),
                /*timeIsOffset*/true,
                /*honorCutlist*/true);
+    }
 }
 
 void TV::DoSeekRWND(PlayerContext *ctx)

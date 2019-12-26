@@ -1846,7 +1846,7 @@ QString JobQueue::GetJobCommand(int id, int jobType, ProgramInfo *tmpInfo)
 
         uint transcoder = tmpInfo->QueryTranscoderID();
         command.replace("%TRANSPROFILE%",
-                        (RecordingProfile::TranscoderAutodetect == transcoder) ?
+                        (RecordingProfile::kTranscoderAutodetect == transcoder) ?
                         "autodetect" : QString::number(transcoder));
     }
 
@@ -1947,7 +1947,7 @@ void JobQueue::DoTranscodeThread(int jobID)
 
     uint transcoder = program_info->QueryTranscoderID();
     QString profilearg =
-        (RecordingProfile::TranscoderAutodetect == transcoder) ?
+        (RecordingProfile::kTranscoderAutodetect == transcoder) ?
         "autodetect" : QString::number(transcoder);
 
     QString path;
@@ -1980,7 +1980,7 @@ void JobQueue::DoTranscodeThread(int jobID)
     }
 
     QString transcoderName;
-    if (transcoder == RecordingProfile::TranscoderAutodetect)
+    if (transcoder == RecordingProfile::kTranscoderAutodetect)
     {
         transcoderName = "Autodetect";
     }

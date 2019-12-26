@@ -36,7 +36,7 @@ class DecoderHandlerEvent : public MythEvent
         : MythEvent(type), m_available(available), m_maxSize(maxSize) {}
 
     DecoderHandlerEvent(Type type, const MusicMetadata &m);
-    ~DecoderHandlerEvent();
+    ~DecoderHandlerEvent() override;
 
     QString *getMessage(void) const { return m_msg; }
     MusicMetadata *getMetadata(void) const { return m_meta; }
@@ -80,7 +80,7 @@ class DecoderHandler : public QObject, public MythObservable
     };
 
     DecoderHandler(void) = default;
-    virtual ~DecoderHandler(void);
+    ~DecoderHandler(void) override;
 
     Decoder *getDecoder(void) { return m_decoder; }
 
@@ -111,15 +111,13 @@ class DecoderHandler : public QObject, public MythObservable
     void createPlaylistFromRemoteUrl(const QUrl &url);
 
     int               m_state        {STOPPED};
-    int               m_playlist_pos {0};
+    int               m_playlistPos  {0};
     PlayListFile      m_playlist;
     Decoder          *m_decoder      {nullptr};
     MusicMetadata     m_meta;
     QUrl              m_url;
     bool              m_op           {false};
     uint              m_redirects    {0};
-
-    static const uint MaxRedirects = 3;
 };
 
 #endif /* DECODERHANDLER_H_ */

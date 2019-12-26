@@ -74,9 +74,9 @@ class AnalogSignalHandler : public SignalMonitorListener
 
   public:
     inline void AllGood(void) override; // SignalMonitorListener
-    void StatusSignalLock(const SignalMonitorValue&) override { } // SignalMonitorListener
-    void StatusChannelTuned(const SignalMonitorValue&) override { } // SignalMonitorListener
-    void StatusSignalStrength(const SignalMonitorValue&) override { } // SignalMonitorListener
+    void StatusSignalLock(const SignalMonitorValue &/*val*/) override { } // SignalMonitorListener
+    void StatusChannelTuned(const SignalMonitorValue &/*val*/) override { } // SignalMonitorListener
+    void StatusSignalStrength(const SignalMonitorValue &/*val*/) override { } // SignalMonitorListener
 
   private:
     ChannelScanSM *m_siScan;
@@ -95,7 +95,7 @@ class ChannelScanSM : public MPEGStreamListener,
                   const QString &_cardtype, ChannelBase* _channel, int _sourceID,
                   uint signal_timeout, uint channel_timeout,
                   QString _inputname, bool test_decryption);
-    ~ChannelScanSM();
+    ~ChannelScanSM() override;
 
     void StartScanner(void);
     void StopScanner(void);
@@ -110,7 +110,7 @@ class ChannelScanSM : public MPEGStreamListener,
     bool ScanCurrentTransport(const QString &sistandard);
     bool ScanForChannels(
         uint sourceid, const QString &std, const QString &cardtype,
-        const DTVChannelList&);
+        const DTVChannelList &channels);
     bool ScanIPTVChannels(uint sourceid, const fbox_chan_map_t &iptv_channels);
 
     bool ScanExistingTransports(uint sourceid, bool follow_nit);
@@ -136,25 +136,25 @@ class ChannelScanSM : public MPEGStreamListener,
     ScanDTVTransportList GetChannelList(bool addFullTS) const;
 
     // MPEG
-    void HandlePAT(const ProgramAssociationTable*) override; // MPEGStreamListener
-    void HandleCAT(const ConditionalAccessTable*) override { } // MPEGStreamListener
-    void HandlePMT(uint, const ProgramMapTable*) override; // MPEGStreamListener
+    void HandlePAT(const ProgramAssociationTable *pat) override; // MPEGStreamListener
+    void HandleCAT(const ConditionalAccessTable */*cat*/) override { } // MPEGStreamListener
+    void HandlePMT(uint program_num, const ProgramMapTable *pmt) override; // MPEGStreamListener
     void HandleEncryptionStatus(uint pnum, bool encrypted) override; // MPEGStreamListener
 
     // ATSC Main
-    void HandleSTT(const SystemTimeTable*) override {} // ATSCMainStreamListener
-    void HandleMGT(const MasterGuideTable*) override; // ATSCMainStreamListener
-    void HandleVCT(uint tsid, const VirtualChannelTable*) override; // ATSCMainStreamListener
+    void HandleSTT(const SystemTimeTable */*stt*/) override {} // ATSCMainStreamListener
+    void HandleMGT(const MasterGuideTable *mgt) override; // ATSCMainStreamListener
+    void HandleVCT(uint tsid, const VirtualChannelTable *vct) override; // ATSCMainStreamListener
 
     // DVB Main
-    void HandleNIT(const NetworkInformationTable*) override; // DVBMainStreamListener
-    void HandleSDT(uint tsid, const ServiceDescriptionTable*) override; // DVBMainStreamListener
-    void HandleTDT(const TimeDateTable*) override {} // DVBMainStreamListener
+    void HandleNIT(const NetworkInformationTable *nit) override; // DVBMainStreamListener
+    void HandleSDT(uint tsid, const ServiceDescriptionTable *sdt) override; // DVBMainStreamListener
+    void HandleTDT(const TimeDateTable */*tdt*/) override {} // DVBMainStreamListener
 
     // DVB Other
-    void HandleNITo(const NetworkInformationTable*) override {} // DVBOtherStreamListener
-    void HandleSDTo(uint tsid, const ServiceDescriptionTable*) override; // DVBOtherStreamListener
-    void HandleBAT(const BouquetAssociationTable*) override; // DVBOtherStreamListener
+    void HandleNITo(const NetworkInformationTable */*nit*/) override {} // DVBOtherStreamListener
+    void HandleSDTo(uint tsid, const ServiceDescriptionTable *sdt) override; // DVBOtherStreamListener
+    void HandleBAT(const BouquetAssociationTable *bat) override; // DVBOtherStreamListener
 
   private:
     // some useful gets
@@ -171,13 +171,13 @@ class ChannelScanSM : public MPEGStreamListener,
     void HandleActiveScan(void);
     bool Tune(const transport_scan_items_it_t &transport);
     void ScanTransport(const transport_scan_items_it_t &transport);
-    DTVTunerType GuessDTVTunerType(DTVTunerType) const;
+    DTVTunerType GuessDTVTunerType(DTVTunerType type) const;
     static void LogLines(const QString& string);
 
     /// \brief Updates Transport Scan progress bar
     inline void UpdateScanPercentCompleted(void);
 
-    bool CheckImportedList(const DTVChannelInfoList&,
+    bool CheckImportedList(const DTVChannelInfoList &channels,
                            uint mpeg_program_num,
                            QString &service_name,
                            QString &callsign,
@@ -196,7 +196,7 @@ class ChannelScanSM : public MPEGStreamListener,
 
     bool AddToList(uint mplexid);
 
-    static QString loc(const ChannelScanSM*);
+    static QString loc(const ChannelScanSM *siscan);
 
     static const uint kDVBTableTimeout;
     static const uint kATSCTableTimeout;
@@ -219,8 +219,8 @@ class ChannelScanSM : public MPEGStreamListener,
 
     // Scanning parameters
     uint              m_frequency         {0};
-    uint              m_bouquet_id        {0};
-    uint              m_region_id         {0};
+    uint              m_bouquetId         {0};
+    uint              m_regionId          {0};
 
     // Optional info
     DTVTunerType      m_scanDTVTunerType  {DTVTunerType::kTunerTypeUnknown};

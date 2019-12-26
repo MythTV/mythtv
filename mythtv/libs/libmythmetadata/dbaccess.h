@@ -1,9 +1,10 @@
 #ifndef DBACCESS_H_
 #define DBACCESS_H_
 
+#include <utility>
 #include <vector>
-#include <utility> // for std::pair
 
+// MythTV headers
 #include "mythmetaexp.h"
 
 class SingleValueImp;
@@ -69,7 +70,7 @@ class META_PUBLIC VideoCategory : public SingleValue
 
   private:
     VideoCategory();
-    ~VideoCategory() = default;
+    ~VideoCategory() override = default;
 };
 
 class META_PUBLIC VideoCountry : public SingleValue
@@ -79,7 +80,7 @@ class META_PUBLIC VideoCountry : public SingleValue
 
   private:
     VideoCountry();
-    ~VideoCountry() = default;
+    ~VideoCountry() override = default;
 };
 
 class META_PUBLIC VideoGenre : public SingleValue
@@ -89,7 +90,7 @@ class META_PUBLIC VideoGenre : public SingleValue
 
   private:
     VideoGenre();
-    ~VideoGenre() = default;
+    ~VideoGenre() override = default;
 };
 
 class META_PUBLIC VideoGenreMap : public MultiValue
@@ -99,7 +100,7 @@ class META_PUBLIC VideoGenreMap : public MultiValue
 
   private:
     VideoGenreMap();
-    ~VideoGenreMap() = default;
+    ~VideoGenreMap() override = default;
 };
 
 class META_PUBLIC VideoCountryMap : public MultiValue
@@ -109,7 +110,7 @@ class META_PUBLIC VideoCountryMap : public MultiValue
 
   private:
     VideoCountryMap();
-    ~VideoCountryMap() = default;
+    ~VideoCountryMap() override = default;
 };
 
 class META_PUBLIC VideoCast : public SingleValue
@@ -119,7 +120,7 @@ class META_PUBLIC VideoCast : public SingleValue
 
   private:
     VideoCast();
-    ~VideoCast() = default;
+    ~VideoCast() override = default;
 };
 
 class META_PUBLIC VideoCastMap : public MultiValue
@@ -129,7 +130,7 @@ class META_PUBLIC VideoCastMap : public MultiValue
 
   private:
     VideoCastMap();
-    ~VideoCastMap() = default;
+    ~VideoCastMap() override = default;
 };
 
 class META_PUBLIC FileAssociations
@@ -144,10 +145,10 @@ class META_PUBLIC FileAssociations
         bool use_default    {false};
 
         file_association() = default;
-        file_association(unsigned int l_id, const QString &ext,
-                         const QString &playcmd, bool l_ignore,
+        file_association(unsigned int l_id, QString ext,
+                         QString playcmd, bool l_ignore,
                          bool l_use_default)
-            : id(l_id), extension(ext), playcommand(playcmd),
+            : id(l_id), extension(std::move(ext)), playcommand(std::move(playcmd)),
               ignore(l_ignore), use_default(l_use_default) {}
     };
     using association_list = std::vector<file_association>;

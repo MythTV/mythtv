@@ -20,10 +20,10 @@ class LyricsView : public MusicCommon
 
   public:
     LyricsView(MythScreenStack *parent, MythScreenType *parentScreen);
-    ~LyricsView(void);
+    ~LyricsView(void) override;
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent *) override; // MusicCommon
+    bool keyPressEvent(QKeyEvent *event) override; // MusicCommon
 
     void ShowMenu(void) override; // MusicCommon
 
@@ -63,7 +63,7 @@ class EditLyricsDialog : public MythScreenType
   public:
 
     EditLyricsDialog(MythScreenStack *parent, LyricsData *sourceData);
-    ~EditLyricsDialog() = default;
+    ~EditLyricsDialog() override = default;
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *e) override; // MythScreenType

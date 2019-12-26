@@ -22,7 +22,7 @@ class CECAdapter : public QObject, public MThread
 
   public:
     CECAdapter();
-    virtual ~CECAdapter();
+    ~CECAdapter() override;
     bool IsValid();
     void Action(const QString &action);
 

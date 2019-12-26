@@ -14,7 +14,7 @@ class EITFixUp
 {
   protected:
     // max length of subtitle field in db.
-    static const uint SUBTITLE_MAX_LEN = 128;
+    static const uint kSubtitleMaxLen = 128;
     // max number of words included in a subtitle
     static const uint kMaxToTitle = 14;
     // max number of words up to a period, question mark
@@ -194,22 +194,22 @@ class EITFixUp
     const QRegExp m_mcaYear;
     const QRegExp m_mcaCC;
     const QRegExp m_mcaDD;
-    const QRegExp m_RTLrepeat;
-    const QRegExp m_RTLSubtitle;
-    const QRegExp m_RTLSubtitle1;
-    const QRegExp m_RTLSubtitle2;
-    const QRegExp m_RTLSubtitle3;
-    const QRegExp m_RTLSubtitle4;
-    const QRegExp m_RTLSubtitle5;
-    const QRegExp m_PRO7Subtitle;
-    const QRegExp m_PRO7Crew;
-    const QRegExp m_PRO7CrewOne;
-    const QRegExp m_PRO7Cast;
-    const QRegExp m_PRO7CastOne;
-    const QRegExp m_ATVSubtitle;
-    const QRegExp m_DisneyChannelSubtitle;
-    const QRegExp m_RTLEpisodeNo1;
-    const QRegExp m_RTLEpisodeNo2;
+    const QRegExp m_rtlRepeat;
+    const QRegExp m_rtlSubtitle;
+    const QRegExp m_rtlSubtitle1;
+    const QRegExp m_rtlSubtitle2;
+    const QRegExp m_rtlSubtitle3;
+    const QRegExp m_rtlSubtitle4;
+    const QRegExp m_rtlSubtitle5;
+    const QRegExp m_pro7Subtitle;
+    const QRegExp m_pro7Crew;
+    const QRegExp m_pro7CrewOne;
+    const QRegExp m_pro7Cast;
+    const QRegExp m_pro7CastOne;
+    const QRegExp m_atvSubtitle;
+    const QRegExp m_disneyChannelSubtitle;
+    const QRegExp m_rtlEpisodeNo1;
+    const QRegExp m_rtlEpisodeNo2;
     const QRegExp m_fiRerun;
     const QRegExp m_fiRerun2;
     const QRegExp m_fiAgeLimit;
@@ -239,7 +239,7 @@ class EITFixUp
     const QRegExp m_noColonSubtitle;
     const QRegExp m_noNRKCategories;
     const QRegExp m_noPremiere;
-    const QRegExp m_Stereo;
+    const QRegExp m_stereo;
     const QRegExp m_dkEpisode;
     const QRegExp m_dkPart;
     const QRegExp m_dkSubtitle1;
@@ -258,11 +258,11 @@ class EITFixUp
     const QRegExp m_dkPersonsSeparator;
     const QRegExp m_dkDirector;
     const QRegExp m_dkYear;
-    const QRegExp m_AUFreeviewSY;//subtitle, year
-    const QRegExp m_AUFreeviewY;//year
-    const QRegExp m_AUFreeviewYC;//year, cast
-    const QRegExp m_AUFreeviewSYC;//subtitle, year, cast
-    const QRegExp m_HTML;
+    const QRegExp m_auFreeviewSY;//subtitle, year
+    const QRegExp m_auFreeviewY;//year
+    const QRegExp m_auFreeviewYC;//year, cast
+    const QRegExp m_auFreeviewSYC;//subtitle, year, cast
+    const QRegExp m_html;
     const QRegExp m_grReplay; //Greek rerun
     const QRegExp m_grDescriptionFinale; //Greek last m_grEpisode
     const QRegExp m_grActors; //Greek actors
@@ -274,7 +274,7 @@ class EITFixUp
     const QRegExp m_grYear; // Greek release year.
     const QRegExp m_grCountry; // Greek event country of origin.
     const QRegExp m_grlongEp; // Greek Episode
-    const QRegExp m_grSeason_as_RomanNumerals; // Greek Episode in Roman numerals
+    const QRegExp m_grSeasonAsRomanNumerals; // Greek Episode in Roman numerals
     const QRegExp m_grSeason; // Greek Season
     const QRegExp m_grSeries;
     const QRegExp m_grRealTitleinDescription; // The original title is often in the descr in parenthesis.

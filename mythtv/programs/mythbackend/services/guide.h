@@ -117,7 +117,7 @@ class ScriptableGuide : public QObject
 
     public:
 
-        Q_INVOKABLE ScriptableGuide( QScriptEngine *pEngine, QObject *parent = nullptr ) : QObject( parent )
+        Q_INVOKABLE explicit ScriptableGuide( QScriptEngine *pEngine, QObject *parent = nullptr ) : QObject( parent )
         {
             m_pEngine = pEngine;
         }
@@ -214,6 +214,7 @@ class ScriptableGuide : public QObject
         }
 };
 
+// NOLINTNEXTLINE(modernize-use-auto)
 Q_SCRIPT_DECLARE_QMETAOBJECT_MYTHTV( ScriptableGuide, QObject*);
 
 #endif

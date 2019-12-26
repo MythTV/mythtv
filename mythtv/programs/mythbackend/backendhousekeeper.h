@@ -31,27 +31,26 @@ class RadioStreamUpdateTask : public DailyHouseKeeperTask
 {
   public:
     RadioStreamUpdateTask(void);
-    virtual ~RadioStreamUpdateTask(void);
+    ~RadioStreamUpdateTask(void) override;
     bool DoRun(void) override; // HouseKeeperTask
     bool DoCheckRun(QDateTime now) override; // PeriodicHouseKeeperTask
     void Terminate(void) override; // HouseKeeperTask
   private:
-    MythSystemLegacy *m_msMU;
+    MythSystemLegacy *m_msMU { nullptr };
 };
 
 class ThemeUpdateTask : public DailyHouseKeeperTask
 {
   public:
     ThemeUpdateTask(void) : DailyHouseKeeperTask("ThemeUpdateNotifications",
-                                            kHKGlobal, kHKRunOnStartup),
-                            m_running(false) {};
+                                            kHKGlobal, kHKRunOnStartup) {};
     bool DoRun(void) override; // HouseKeeperTask
     bool DoCheckRun(QDateTime now) override; // PeriodicHouseKeeperTask
     void Terminate(void) override; // HouseKeeperTask
   private:
     bool LoadVersion(const QString &version, int download_log_level);
 
-    bool m_running;
+    bool m_running { false };
     QString m_url;
 };
 
@@ -59,12 +58,12 @@ class ArtworkTask : public DailyHouseKeeperTask
 {
   public:
     ArtworkTask(void);
-    virtual ~ArtworkTask(void);
+    ~ArtworkTask(void) override;
     bool DoRun(void) override; // HouseKeeperTask
     bool DoCheckRun(QDateTime now) override; // PeriodicHouseKeeperTask
     void Terminate(void) override; // HouseKeeperTask
   private:
-    MythSystemLegacy *m_msMML;
+    MythSystemLegacy *m_msMML { nullptr };
 };
 
 
@@ -81,7 +80,7 @@ class MythFillDatabaseTask : public DailyHouseKeeperTask
 {
   public:
     MythFillDatabaseTask(void);
-    virtual ~MythFillDatabaseTask(void);
+    ~MythFillDatabaseTask(void) override;
 
     static bool UseSuggestedTime(void);
 
@@ -92,7 +91,7 @@ class MythFillDatabaseTask : public DailyHouseKeeperTask
 
     void SetHourWindowFromDB(void);
   private:
-    MythSystemLegacy *m_msMFD;
+    MythSystemLegacy *m_msMFD { nullptr };
 //    bool m_running;
 };
 

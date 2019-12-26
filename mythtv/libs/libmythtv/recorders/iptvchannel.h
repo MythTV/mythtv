@@ -27,25 +27,25 @@ class IPTVChannel : QObject, public DTVChannel
     friend class IPTVRecorder;
 
   public:
-    IPTVChannel(TVRec*, QString);
-    ~IPTVChannel();
+    IPTVChannel(TVRec *rec, QString videodev);
+    ~IPTVChannel() override;
 
     // Commands
     bool Open(void) override; // ChannelBase
 
     using DTVChannel::Tune;
-    bool Tune(const IPTVTuningData&, bool scanning) override ; // DTVChannel
-    bool Tune(const DTVMultiplex&) override // DTVChannel
+    bool Tune(const IPTVTuningData &tuning, bool scanning) override ; // DTVChannel
+    bool Tune(const DTVMultiplex &/*tuning*/) override // DTVChannel
         { return false; }
 
     // Sets
-    void SetStreamData(MPEGStreamData*);
+    void SetStreamData(MPEGStreamData *sd);
 
     // Gets
     bool IsOpen(void) const override; // ChannelBase
     QString GetDevice(void) const override // ChannelBase
-        { return m_last_tuning.GetDeviceKey(); }
-    IPTVStreamHandler *GetStreamHandler(void) const { return m_stream_handler; }
+        { return m_lastTuning.GetDeviceKey(); }
+    IPTVStreamHandler *GetStreamHandler(void) const { return m_streamHandler; }
     bool IsIPTV(void) const override { return true; } // DTVChannel
     bool IsPIDTuningSupported(void) const  override // DTVChannel
         { return true; }
@@ -61,13 +61,13 @@ class IPTVChannel : QObject, public DTVChannel
     void CloseStreamHandler(void);
 
   private:
-    mutable QMutex     m_tune_lock;
-    volatile bool      m_firsttune      {true};
-    IPTVTuningData     m_last_tuning;
-    mutable QMutex     m_stream_lock;
-    IPTVStreamHandler *m_stream_handler {nullptr};
-    MPEGStreamData    *m_stream_data    {nullptr};
-    QString            m_videodev;
+    mutable QMutex     m_tuneLock;
+    volatile bool      m_firstTune      {true};
+    IPTVTuningData     m_lastTuning;
+    mutable QMutex     m_streamLock;
+    IPTVStreamHandler *m_streamHandler  {nullptr};
+    MPEGStreamData    *m_streamData     {nullptr};
+    QString            m_videoDev;
 };
 
 #endif // _IPTV_CHANNEL_H_

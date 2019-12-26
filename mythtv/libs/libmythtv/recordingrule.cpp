@@ -30,7 +30,7 @@ RecordingRule::RecordingRule()
   : m_findtime(QTime::fromString("00:00:00", Qt::ISODate)),
     m_findid(QDate(1970, 1, 1).daysTo(MythDate::current().toLocalTime().date())
              + 719528),
-    m_transcoder(RecordingProfile::TranscoderAutodetect)
+    m_transcoder(RecordingProfile::kTranscoderAutodetect)
 {
     QDateTime dt = MythDate::current();
     m_enddate = m_startdate = dt.date();
@@ -417,10 +417,14 @@ bool RecordingRule::Save(bool sendSig)
 
     QString sqlquery;
     if (m_recordID > 0 || (m_recordTable != "record" && m_tempID > 0))
+    {
         sqlquery = QString("UPDATE %1 %2 WHERE recordid = :RECORDID;")
                                                         .arg(m_recordTable).arg(sql);
+    }
     else
+    {
         sqlquery = QString("INSERT INTO %1 %2;").arg(m_recordTable).arg(sql);
+    }
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(sqlquery);

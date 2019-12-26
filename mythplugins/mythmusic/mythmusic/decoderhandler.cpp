@@ -78,7 +78,7 @@ void DecoderHandler::start(MusicMetadata *mdata)
 
     m_playlist.clear();
     m_meta = *mdata;
-    m_playlist_pos = -1;
+    m_playlistPos = -1;
     m_redirects = 0;
 
     if (QFileInfo(mdata->Filename()).isAbsolute())
@@ -126,7 +126,7 @@ bool DecoderHandler::done(void)
     if (m_state == STOPPED)
         return true;
 
-    if (m_playlist_pos + 1 >= m_playlist.size())
+    if (m_playlistPos + 1 >= m_playlist.size())
     {
         m_state = STOPPED;
         return true;
@@ -142,14 +142,14 @@ bool DecoderHandler::next(void)
 
     if (m_meta.Format() == "cast")
     {
-        m_playlist_pos = random() % m_playlist.size();
+        m_playlistPos = random() % m_playlist.size();
     }
     else
     {
-        m_playlist_pos++;
+        m_playlistPos++;
     }
 
-    PlayListFileEntry *entry = m_playlist.get(m_playlist_pos);
+    PlayListFileEntry *entry = m_playlist.get(m_playlistPos);
 
     if (QFileInfo(entry->File()).isAbsolute())
         m_url = QUrl::fromLocalFile(entry->File());

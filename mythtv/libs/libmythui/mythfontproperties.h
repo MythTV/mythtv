@@ -69,7 +69,7 @@ class MUI_PUBLIC MythFontProperties: public XMLParseBase
     int     m_outlineSize   {0};
     int     m_outlineAlpha  {255};
 
-    float   m_relativeSize  {0.5f};
+    float   m_relativeSize  {0.5F};
 
     QString m_hash;
 

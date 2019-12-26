@@ -126,11 +126,15 @@ void GameHandler::InitMetaDataMap(const QString& GameType)
     }
 
     if (m_romDB.count() == 0)
+    {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("No romDB data read from "
             "database for gametype %1 . Not imported?").arg(GameType));
+    }
     else
+    {
         LOG(VB_GENERAL, LOG_INFO, LOC +
             QString("Loaded %1 items from romDB Database") .arg(m_romDB.count()));
+    }
 }
 
 void GameHandler::GetMetadata(GameHandler *handler, const QString& rom, QString* Genre, QString* Year,
@@ -292,7 +296,9 @@ static void UpdateGameCounts(QStringList updatelist)
     QRegExp multiDiskRGXP = QRegExp( "[0-4]$", Qt::CaseSensitive, QRegExp::RegExp);
     int pos = 0;
 
-    QString lastrom, firstname, basename;
+    QString lastrom;
+    QString firstname;
+    QString basename;
 
     for ( QStringList::Iterator it = updatelist.begin(); it != updatelist.end(); ++it )
     {
@@ -387,9 +393,19 @@ void GameHandler::UpdateGameDB(GameHandler *handler)
 
     GameScanMap::Iterator iter;
 
-    QString GameName, Genre, Country, CRC32, Year, Plot;
-    QString Publisher, Version, Fanart, Boxart, ScreenShot;
-    QString thequery, queryvalues;
+    QString GameName;
+    QString Genre;
+    QString Country;
+    QString CRC32;
+    QString Year;
+    QString Plot;
+    QString Publisher;
+    QString Version;
+    QString Fanart;
+    QString Boxart;
+    QString ScreenShot;
+    QString thequery;
+    QString queryvalues;
 
     int removalprompt = gCoreContext->GetSetting("GameRemovalPrompt").toInt();
     int indepth = gCoreContext->GetSetting("GameDeepScan").toInt();

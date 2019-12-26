@@ -74,7 +74,7 @@ class ScriptableFrontend : public QObject
     QScriptEngine *m_pEngine;
 
   public:
-    Q_INVOKABLE ScriptableFrontend( QScriptEngine *pEngine, QObject *parent = nullptr ) : QObject( parent )
+    Q_INVOKABLE explicit ScriptableFrontend( QScriptEngine *pEngine, QObject *parent = nullptr ) : QObject( parent )
     {
         m_pEngine = pEngine;
     }
@@ -83,6 +83,7 @@ class ScriptableFrontend : public QObject
                                     return m_obj.GetStatus(); ) }
 };
 
+// NOLINTNEXTLINE(modernize-use-auto)
 Q_SCRIPT_DECLARE_QMETAOBJECT_MYTHTV(ScriptableFrontend, QObject*);
 
 #endif // FRONTEND_H

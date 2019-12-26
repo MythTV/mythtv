@@ -29,7 +29,7 @@ class MPUBLIC GrabberScript : public QObject, public MThread
                   const QString& description,
                   const QString& commandline,
                   const double& version);
-    ~GrabberScript();
+    ~GrabberScript() override;
 
     const QString& GetTitle() const { return m_title; }
     const QString& GetImage() const { return m_image; }
@@ -74,7 +74,7 @@ class MPUBLIC GrabberManager : public QObject
 
   public:
     GrabberManager();
-    ~GrabberManager();
+    ~GrabberManager() override;
     void startTimer();
     void stopTimer();
     void doUpdate();
@@ -103,7 +103,7 @@ class MPUBLIC GrabberUpdateEvent : public QEvent
   public:
     GrabberUpdateEvent(void)
          : QEvent((QEvent::Type)kGrabberUpdateEventType) {}
-    ~GrabberUpdateEvent() = default;
+    ~GrabberUpdateEvent() override = default;
 };
 
 class MPUBLIC GrabberDownloadThread : public QObject, public MThread
@@ -113,7 +113,7 @@ class MPUBLIC GrabberDownloadThread : public QObject, public MThread
   public:
 
     explicit GrabberDownloadThread(QObject *parent);
-    ~GrabberDownloadThread();
+    ~GrabberDownloadThread() override;
     
     void refreshAll();
     void cancel();
@@ -142,7 +142,7 @@ class MPUBLIC Search : public QObject
   public:
 
     Search();
-    ~Search();
+    ~Search() override;
 
     void resetSearch(void);
     void executeSearch(const QString &script, const QString &query,

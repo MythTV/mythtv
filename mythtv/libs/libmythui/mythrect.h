@@ -18,8 +18,7 @@ class MUI_PUBLIC MythRect : public QRect
 {
 
   public:
-    MythRect()
-        : QRect() {}
+    MythRect() = default;
     MythRect(int x, int y, int width, int height)
         : QRect(x, y, width, height) {}
     MythRect(const QString &sX, const QString &sY, const QString &sWidth,

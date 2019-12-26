@@ -22,11 +22,11 @@ class NetSearch : public NetBase
 
   public:
 
-    NetSearch(MythScreenStack *parent, const char *name = nullptr);
-    ~NetSearch();
+    explicit NetSearch(MythScreenStack *parent, const char *name = nullptr);
+    ~NetSearch() override;
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
     void PopulateResultList(ResultItem::resultList list);
 

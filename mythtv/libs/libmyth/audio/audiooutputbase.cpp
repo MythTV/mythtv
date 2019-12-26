@@ -1454,10 +1454,12 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
 
         // Perform downmix if necessary
         if (m_needsDownmix)
+        {
             if(AudioOutputDownmix::DownmixFrames(m_sourceChannels,
                                                  m_configuredChannels,
                                                  m_srcIn, m_srcIn, frames) < 0)
                 VBERROR("Error occurred while downmixing");
+        }
 
         // Resample if necessary
         if (m_needResampler && m_srcCtx)
@@ -1674,9 +1676,11 @@ void AudioOutputBase::OutputAudioLoop(void)
         if (m_fragmentSize > ready)
         {
             if (ready > 0)  // only log if we're sending some audio
+            {
                 VBAUDIOTS(QString("audio waiting for buffer to fill: "
                                   "have %1 want %2")
                           .arg(ready).arg(m_fragmentSize));
+            }
 
             usleep(10000);
             continue;
@@ -1763,8 +1767,10 @@ int AudioOutputBase::GetAudioData(uchar *buffer, int size, bool full_buffer,
     if (bdiff <= frag_size)
     {
         if (fromFloats)
+        {
             off = AudioOutputUtil::fromFloat(m_outputFormat, buffer,
                                              LRPOS, bdiff);
+        }
         else
         {
             memcpy(buffer, LRPOS, bdiff);
@@ -1777,10 +1783,14 @@ int AudioOutputBase::GetAudioData(uchar *buffer, int size, bool full_buffer,
     if (frag_size > 0)
     {
         if (fromFloats)
+        {
             AudioOutputUtil::fromFloat(m_outputFormat, buffer + off,
                                        LRPOS, frag_size);
+        }
         else
+        {
             memcpy(buffer + off, LRPOS, frag_size);
+        }
     }
 
     *local_raud += frag_size;

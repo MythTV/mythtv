@@ -44,7 +44,7 @@ class MBASE_PUBLIC SignalHandler: public QObject
 
   private:
     SignalHandler(QList<int> &signallist, QObject *parent);
-    ~SignalHandler();
+    ~SignalHandler() override;
     void SetHandlerPrivate(int signum, SigHandlerFunc handler);
 
     static int s_sigFd[2];

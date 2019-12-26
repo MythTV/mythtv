@@ -137,12 +137,11 @@ class MTV_PUBLIC IPTVTuningData
     {
         if (0 == i)
             return GetDataURL();
-        else if (1 == i)
+        if (1 == i)
             return GetFECURL0();
-        else if (2 == i)
+        if (2 == i)
             return GetFECURL1();
-        else
-            return QUrl();
+        return QUrl();
     }
     uint GetBitrate(uint i) const { return m_bitrate[i]; }
 
@@ -162,7 +161,7 @@ class MTV_PUBLIC IPTVTuningData
         return QString();
     }
 
-    uint GetURLCount(void) const { return 3; }
+    static uint GetURLCount(void) { return 3; }
 
     bool IsValid(void) const
     {
@@ -203,7 +202,7 @@ class MTV_PUBLIC IPTVTuningData
     void GuessProtocol(void)
     {
         if (!m_dataUrl.isValid())
-            m_protocol = IPTVTuningData::inValid;
+            m_protocol = IPTVTuningData::inValid; // NOLINT(bugprone-branch-clone)
         else if (m_dataUrl.scheme() == "udp")
             m_protocol = IPTVTuningData::udp;
         else if (m_dataUrl.scheme() == "rtp")

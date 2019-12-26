@@ -20,10 +20,10 @@ class AudioSetupWizard : public MythScreenType
                      const char *name = nullptr)
         : MythScreenType(parent, name),
           m_generalScreen(generalScreen) {}
-    ~AudioSetupWizard();
+    ~AudioSetupWizard() override;
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
     void save(void);
 
@@ -55,7 +55,7 @@ class AudioSetupWizard : public MythScreenType
   private slots:
     AudioOutputSettings UpdateCapabilities(bool restore = true,
                                            bool AC3 = false);
-    AudioOutputSettings UpdateCapabilities(MythUIButtonListItem*);
+    AudioOutputSettings UpdateCapabilities(MythUIButtonListItem *item);
     AudioOutputSettings UpdateCapabilitiesAC3(void);
     void slotNext(void);
     void slotPrevious(void);

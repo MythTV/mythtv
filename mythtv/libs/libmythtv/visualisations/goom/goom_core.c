@@ -326,84 +326,86 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 
 		// changement eventuel de mode
 		if (iRAND(16) == 0)
-		switch (iRAND (32)) {
-		case 0:
-		case 10:
+                {
+                    switch (iRAND (32)) {
+                    case 0:
+                    case 10:
 			s_zfd.hypercosEffect = iRAND (2);
 			// Checked Fedora26 get-plugins-good sources.
 			// No break statement there.
 			// fall through
-		case 13:
-		case 20:
-		case 21:
+                    case 13:
+                    case 20:
+                    case 21:
 			s_zfd.mode = WAVE_MODE;
 			s_zfd.reverse = 0;
 			s_zfd.waveEffect = (iRAND (3) == 0);
 			if (iRAND (2))
-				s_zfd.vitesse = (s_zfd.vitesse + 127) >> 1;
+                            s_zfd.vitesse = (s_zfd.vitesse + 127) >> 1;
 			break;
-		case 1:
-		case 11:
+                    case 1:
+                    case 11:
 			s_zfd.mode = CRYSTAL_BALL_MODE;
 			s_zfd.waveEffect = 0;
 			s_zfd.hypercosEffect = 0;
 			break;
-		case 2:
-		case 12:
+                    case 2:
+                    case 12:
 			s_zfd.mode = AMULETTE_MODE;
 			s_zfd.waveEffect = 0;
 			s_zfd.hypercosEffect = 0;
 			break;
-		case 3:
+                    case 3:
 			s_zfd.mode = WATER_MODE;
 			s_zfd.waveEffect = 0;
 			s_zfd.hypercosEffect = 0;
 			break;
-		case 4:
-		case 14:
+                    case 4:
+                    case 14:
 			s_zfd.mode = SCRUNCH_MODE;
 			s_zfd.waveEffect = 0;
 			s_zfd.hypercosEffect = 0;
 			break;
-		case 5:
-  	case 15:
-		case 22:
+                    case 5:
+                    case 15:
+                    case 22:
 			s_zfd.mode = HYPERCOS1_MODE;
 			s_zfd.waveEffect = 0;
 			s_zfd.hypercosEffect = (iRAND (3) == 0);
 			break;
-		case 6:
-		case 16:
+                    case 6:
+                    case 16:
 			s_zfd.mode = HYPERCOS2_MODE;
 			s_zfd.waveEffect = 0;
 			s_zfd.hypercosEffect = 0;
 			break;
-		case 7:
-		case 17:
+                    case 7:
+                    case 17:
 			s_zfd.mode = CRYSTAL_BALL_MODE;
 			s_zfd.waveEffect = (iRAND (4) == 0);
 			s_zfd.hypercosEffect = iRAND (2);
 			break;
-		case 8:
-		case 18:
-		case 19:
+                    case 8:
+                    case 18:
+                    case 19:
 			s_zfd.mode = SCRUNCH_MODE;
 			s_zfd.waveEffect = 1;
 			s_zfd.hypercosEffect = 1;
 			break;
-	  case 29:
-	 	case 30:
+                    case 29:
+                    case 30:
 			s_zfd.mode = YONLY_MODE;
 			break;
-	  case 31:
-	 	case 32:
+                    case 31:
+                    case 32:
 			s_zfd.mode = SPEEDWAY_MODE;
 			break;
-		default:
+                    default:
 			s_zfd.mode = NORMAL_MODE;
 			s_zfd.waveEffect = 0;
 			s_zfd.hypercosEffect = 0;
-		}
+                    }
+                }
 	}
 	
 	// tout ceci ne sera fait qu'en cas de non-blocage
@@ -422,10 +424,11 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 			}
 			else if (s_blocker) s_blocker--;
 
-			for (int j=0;j<STATES_NB;j++)
+			for (int j=0;j<STATES_NB;j++) {
 				if ((s_rndn >= states[j].m_rangeMin)
 				    && (s_rndn <= states[j].m_rangeMax))
 					curGState = states+j;
+                        }
 
 			if ((curGState->m_drawIfs) && (s_ifsIncr<=0)) {
 				s_recayIfs = 5;

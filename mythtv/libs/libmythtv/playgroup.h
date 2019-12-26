@@ -28,7 +28,7 @@ class MTV_PUBLIC PlayGroupEditor : public GroupSetting
 
   public slots:
     void CreateNewPlayBackGroup();
-    void CreateNewPlayBackGroupSlot(const QString&);
+    void CreateNewPlayBackGroupSlot(const QString &name);
 
   private:
     ButtonStandardSetting *m_addGroupButton {nullptr};

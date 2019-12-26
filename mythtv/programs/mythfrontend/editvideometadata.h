@@ -25,7 +25,7 @@ class EditMetadataDialog : public MythScreenType
                        const QString& lname,
                        VideoMetadata *source_metadata,
                        const VideoMetadataListManager &cache);
-    ~EditMetadataDialog();
+    ~EditMetadataDialog() override;
 
     bool Create() override; // MythScreenType
     void customEvent(QEvent *levent) override; // MythUIType
@@ -51,12 +51,12 @@ class EditMetadataDialog : public MythScreenType
     void SetYear();
     void SetUserRating();
     void SetLength();
-    void SetCategory(MythUIButtonListItem*);
+    void SetCategory(MythUIButtonListItem *item);
     void SetPlayer();
     void SetSeason();
     void SetEpisode();
-    void SetLevel(MythUIButtonListItem*);
-    void SetChild(MythUIButtonListItem*);
+    void SetLevel(MythUIButtonListItem *item);
+    void SetChild(MythUIButtonListItem *item);
     void ToggleBrowse();
     void ToggleWatched();
     void FindCoverArt();
@@ -135,7 +135,7 @@ class EditMetadataDialog : public MythScreenType
     //  child videos on and off
     //
 
-    int cachedChildSelection                        {0};
+    int               m_cachedChildSelection        {0};
 
     const VideoMetadataListManager &m_metaCache;
     MetadataDownload               *m_query         {nullptr};

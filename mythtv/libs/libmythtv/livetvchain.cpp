@@ -100,10 +100,12 @@ void LiveTVChain::AppendNewProgram(ProgramInfo *pginfo, const QString& channum,
     if (!query.exec() || !query.isActive())
         MythDB::DBError("Chain: AppendNewProgram", query);
     else
+    {
         LOG(VB_RECORD, LOG_INFO, QString("Chain: Appended@%3 '%1_%2'")
             .arg(newent.chanid)
             .arg(MythDate::toString(newent.starttime, MythDate::kFilename))
             .arg(m_maxPos));
+    }
 
     m_maxPos++;
     BroadcastUpdate();
@@ -123,11 +125,13 @@ void LiveTVChain::FinishedRecording(ProgramInfo *pginfo)
     if (!query.exec() || !query.isActive())
         MythDB::DBError("Chain: FinishedRecording", query);
     else
+    {
         LOG(VB_RECORD, LOG_INFO,
             QString("Chain: Updated endtime for '%1_%2' to %3")
                 .arg(pginfo->GetChanID())
                 .arg(pginfo->GetRecordingStartTime(MythDate::kFilename))
                 .arg(pginfo->GetRecordingEndTime(MythDate::kFilename)));
+    }
 
     QList<LiveTVChainEntry>::iterator it;
     for (it = m_chain.begin(); it != m_chain.end(); ++it)
@@ -281,12 +285,14 @@ void LiveTVChain::GetEntryAt(int at, LiveTVChainEntry &entry) const
     {
         LOG(VB_GENERAL, LOG_ERR, QString("GetEntryAt(%1) failed.").arg(at));
         if (at == -1)
+        {
             LOG(VB_GENERAL, LOG_ERR, "It appears that your backend may "
                 "be misconfigured.  Check your backend logs to determine "
                 "whether your inputs, lineups, channels, or storage "
                 "configuration are reporting errors.  This issue is commonly "
                 "caused by failing to complete all setup steps properly.  You "
                 "may wish to review the documentation for mythtv-setup.");
+        }
         clear(entry);
     }
 }

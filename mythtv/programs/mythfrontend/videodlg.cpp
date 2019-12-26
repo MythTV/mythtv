@@ -174,16 +174,20 @@ namespace
                 if (episode > 0 || season > 0)
                 {
                     if (isScreenshot)
+                    {
                         sfn += hntm.arg(QString("%1 Season %2x%3_%4")
                                  .arg(title).arg(QString::number(season))
                                  .arg(QString::number(episode))
                                  .arg(suffix))
                                  .arg(*ext);
+                    }
                     else
+                    {
                         sfn += hntm.arg(QString("%1 Season %2_%3")
                                  .arg(title).arg(QString::number(season))
                                  .arg(suffix))
                                  .arg(*ext);
+                    }
 
                 }
                 else
@@ -217,17 +221,20 @@ namespace
                 if (season > 0 || episode > 0)
                 {
                     if (isScreenshot)
+                    {
                         sfn += fntm.arg(*dir).arg(QString("%1 Season %2x%3_%4")
                                  .arg(title).arg(QString::number(season))
                                  .arg(QString::number(episode))
                                  .arg(suffix))
                                  .arg(*ext);
+                    }
                     else if (!isScreenshot)
+                    {
                         sfn += fntm.arg(*dir).arg(QString("%1 Season %2_%3")
                                  .arg(title).arg(QString::number(season))
                                  .arg(suffix))
                                  .arg(*ext);
-
+                    }
                 }
                 if (!isScreenshot)
                 {
@@ -562,20 +569,20 @@ class ItemDetailPopup : public MythScreenType
     static bool Exists()
     {
         // TODO: Add ability to theme loader to do this a better way.
-        return LoadWindowFromXML("video-ui.xml", WINDOW_NAME, nullptr);
+        return LoadWindowFromXML("video-ui.xml", kWindowName, nullptr);
     }
 
   public:
     ItemDetailPopup(MythScreenStack *lparent, VideoMetadata *metadata,
             const VideoMetadataListManager &listManager) :
-        MythScreenType(lparent, WINDOW_NAME), m_metadata(metadata),
+        MythScreenType(lparent, kWindowName), m_metadata(metadata),
         m_listManager(listManager)
     {
     }
 
     bool Create() override // MythScreenType
     {
-        if (!LoadWindowFromXML("video-ui.xml", WINDOW_NAME, this))
+        if (!LoadWindowFromXML("video-ui.xml", kWindowName, this))
             return false;
 
         UIUtilW::Assign(this, m_playButton, "play_button");
@@ -651,7 +658,7 @@ class ItemDetailPopup : public MythScreenType
     }
 
   private:
-    static const char * const WINDOW_NAME;
+    static const char * const kWindowName;
     VideoMetadata *m_metadata   {nullptr};
     const VideoMetadataListManager &m_listManager;
 
@@ -659,7 +666,7 @@ class ItemDetailPopup : public MythScreenType
     MythUIButton  *m_doneButton {nullptr};
 };
 
-const char * const ItemDetailPopup::WINDOW_NAME = "itemdetailpopup";
+const char * const ItemDetailPopup::kWindowName = "itemdetailpopup";
 
 class VideoDialogPrivate
 {
@@ -1514,20 +1521,26 @@ QString VideoDialog::GetImageFromFolder(VideoMetadata *metadata)
         if (!fList.isEmpty())
         {
             if (host.isEmpty())
-                icon_file = QString("%1/%2")
-                                .arg(prefix)
-                                .arg(fList.at(0));
+            {
+                icon_file = QString("%1/%2").arg(prefix).arg(fList.at(0));
+            }
             else
+            {
                 icon_file = generate_file_url("Videos", host, fList.at(0));
+            }
         }
     }
 
     if (!icon_file.isEmpty())
+    {
         LOG(VB_GENERAL, LOG_DEBUG, QString("Found Image : %1 :")
                 .arg(icon_file));
+    }
     else
+    {
         LOG(VB_GENERAL, LOG_DEBUG, QString("Could not find cover Image : %1 ")
                 .arg(prefix));
+    }
 
     if (IsDefaultCoverFile(icon_file))
         icon_file.clear();
@@ -1710,21 +1723,29 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
             if (!fList.isEmpty())
             {
                 if (host.isEmpty())
+                {
                     icon_file = QString("%1/%2")
                                     .arg(folder_path)
                                     .arg(fList.at(0));
+                }
                 else
+                {
                     icon_file = generate_file_url("Videos", host, fList.at(0));
+                }
             }
         }
 
         if (!icon_file.isEmpty())
+        {
             LOG(VB_GENERAL, LOG_DEBUG, QString("Found Image : %1 :")
                     .arg(icon_file));
+        }
         else
+        {
             LOG(VB_GENERAL, LOG_DEBUG,
                 QString("Could not find folder cover Image : %1 ")
                     .arg(folder_path));
+        }
     }
     else
     {
@@ -2397,10 +2418,14 @@ void VideoDialog::VideoMenu()
     if (metadata)
     {
         if (!metadata->GetSubtitle().isEmpty())
+        {
             label = tr("Video Options\n%1\n%2").arg(metadata->GetTitle())
                                            .arg(metadata->GetSubtitle());
+        }
         else
+        {
             label = tr("Video Options\n%1").arg(metadata->GetTitle());
+        }
     }
     else
         label = tr("Video Options");
@@ -3208,10 +3233,14 @@ void VideoDialog::playTrailer()
     QString url;
 
     if (metadata->IsHostSet() && !metadata->GetTrailer().startsWith("/"))
+    {
         url = generate_file_url("Trailers", metadata->GetHost(),
                         metadata->GetTrailer());
+    }
     else
+    {
         url = metadata->GetTrailer();
+    }
 
     VideoPlayerCommand::PlayerFor(url).Play();
 }

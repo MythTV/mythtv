@@ -48,8 +48,8 @@
 #ifndef FIFOSamplePipe_H
 #define FIFOSamplePipe_H
 
-#include <assert.h>
-#include <stdlib.h>
+#include <cassert>
+#include <cstdlib>
 #include "STTypes.h"
 
 /// Abstract base class for FIFO (first-in-first-out) sample processing classes.
@@ -109,7 +109,7 @@ public:
     virtual void clear() = 0;
 
     /// Destructor to shut gcc 4 up
-    virtual ~FIFOSamplePipe() {}
+    virtual ~FIFOSamplePipe() = default;
 };
 
 
@@ -154,9 +154,7 @@ protected:
 
 
     /// Destructor.
-    virtual ~FIFOProcessor()
-    {
-    }
+    virtual ~FIFOProcessor() = default;
 
 
     /// Returns a pointer to the beginning of the output samples. 

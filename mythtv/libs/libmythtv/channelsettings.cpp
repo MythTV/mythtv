@@ -513,11 +513,11 @@ ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID &id,
     addChild(channum);
     if (add_freqid)
     {
-        m_freqid = new Freqid(id);
-        addChild(m_freqid);
+        m_freqId = new Freqid(id);
+        addChild(m_freqId);
     }
     else
-        m_freqid = nullptr;
+        m_freqId = nullptr;
     addChild(new Callsign(id));
 
 
@@ -525,24 +525,24 @@ ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID &id,
     addChild(new Visible(id));
     addChild(new ServiceID(id));
 
-    addChild(m_transportid = new TransportID_CO());
+    addChild(m_transportId = new TransportID_CO());
     addChild(m_frequency = new Frequency_CO());
 
     addChild(source);
     addChild(new ChannelTVFormat(id));
     addChild(new Priority(id));
 
-    addChild(m_onairguide = new OnAirGuide(id));
+    addChild(m_onAirGuide = new OnAirGuide(id));
     addChild(m_xmltvID = new XmltvID(id, source->getValueLabel()));
     addChild(new TimeOffset(id));
 
     addChild(new CommMethod(id));
     addChild(new Icon(id));
 
-    connect(m_onairguide, SIGNAL(valueChanged(     bool)),
-            this,       SLOT(  onAirGuideChanged(bool)));
-    connect(source,     SIGNAL(valueChanged( const QString&)),
-            this,       SLOT(  sourceChanged(const QString&)));
+    connect(m_onAirGuide, SIGNAL(valueChanged(     bool)),
+            this,         SLOT(  onAirGuideChanged(bool)));
+    connect(source,       SIGNAL(valueChanged( const QString&)),
+            this,         SLOT(  sourceChanged(const QString&)));
 
     // Transport stream ID and frequency from dtv_multiplex
     MSqlQuery query(MSqlQuery::InitCon());
@@ -557,7 +557,7 @@ ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID &id,
         MythDB::DBError("ChannelOptionsCommon::ChannelOptionsCommon", query);
     else if (query.next())
     {
-        m_transportid->setValue(query.value(0).toString());
+        m_transportId->setValue(query.value(0).toString());
         m_frequency->setValue(query.value(1).toString());
     }
 };
@@ -607,7 +607,7 @@ void ChannelOptionsCommon::sourceChanged(const QString& sourceid)
         }
     }
 
-    m_onairguide->setEnabled(supports_eit);
+    m_onAirGuide->setEnabled(supports_eit);
     m_xmltvID->setEnabled(!uses_eit_only);
     m_xmltvID->Load();
 }
@@ -659,18 +659,22 @@ ChannelOptionsRawTS::ChannelOptionsRawTS(const ChannelID &id) :
         {
             QString desc = StreamID::GetDescription(j&0xff);
             if (!desc.isEmpty())
+            {
                 m_sids[i]->addSelection(
                     QString("%1 (0x%2)")
                     .arg(desc).arg(j&0xff,2,16,QLatin1Char('0')),
                     QString::number(j), false);
+            }
         }
         for (uint j = 0x101; j <= 0x1ff; j++)
         {
             QString desc = StreamID::GetDescription(j&0xff);
             if (desc.isEmpty())
+            {
                 m_sids[i]->addSelection(
                     QString("0x%1").arg(j&0xff,2,16,QLatin1Char('0')),
                     QString::number(j), false);
+            }
         }
 /* we don't allow tables right now, PAT & PMT generated on the fly
         for (uint j = 0; j <= 0xff; j++)

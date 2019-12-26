@@ -6,6 +6,7 @@
 // C++ headers
 #include <cstdint> // for [u]int[32,64]_t
 #include <deque>
+#include <utility>
 #include <vector>
 using namespace std;
 
@@ -117,23 +118,23 @@ class PlaybackBox : public ScheduleCommon
 
     PlaybackBox(MythScreenStack *parent, const QString& name,
                 TV *player = nullptr, bool showTV = false);
-   ~PlaybackBox(void);
+   ~PlaybackBox(void) override;
 
     bool Create(void) override; // MythScreenType
     void Load(void) override; // MythScreenType
     void Init(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
     void customEvent(QEvent *event) override; // ScheduleCommon
 
     void setInitialRecGroup(const QString& initialGroup) { m_recGroup = initialGroup; }
-    static void * RunPlaybackBox(void *player, bool);
+    static void * RunPlaybackBox(void *player, bool showTV);
 
   public slots:
     void displayRecGroup(const QString &newRecGroup = "");
     void groupSelectorClosed(void);
 
   protected slots:
-    void updateRecList(MythUIButtonListItem *);
+    void updateRecList(MythUIButtonListItem *sel_item);
     void ItemSelected(MythUIButtonListItem *item)
         { UpdateUIListItem(item, true); }
     void ItemVisible(MythUIButtonListItem *item);
@@ -178,7 +179,7 @@ class PlaybackBox : public ScheduleCommon
 
     void askDelete();
     void Undelete(void);
-    void Delete(DeleteFlags = kNoFlags);
+    void Delete(DeleteFlags flags = kNoFlags);
     void DeleteForgetHistory(void)      { Delete(kForgetHistory); }
     void DeleteForce(void)              { Delete(kForce);         }
     void DeleteIgnore(void)             { Delete(kIgnore);        }
@@ -292,15 +293,15 @@ class PlaybackBox : public ScheduleCommon
     void processNetworkControlCommands(void);
     void processNetworkControlCommand(const QString &command);
 
-    ProgramInfo *FindProgramInUILists(const ProgramInfo&);
+    ProgramInfo *FindProgramInUILists(const ProgramInfo &pginfo);
     ProgramInfo *FindProgramInUILists(uint recordingID,
                                       const QString& recgroup = "NotLiveTV");
 
     void RemoveProgram(uint recordingID,
                        bool forgetHistory, bool forceMetadataDelete);
-    void ShowDeletePopup(DeletePopupType);
-    static void ShowAvailabilityPopup(const ProgramInfo&);
-    void ShowActionPopup(const ProgramInfo&);
+    void ShowDeletePopup(DeletePopupType type);
+    static void ShowAvailabilityPopup(const ProgramInfo &pginfo);
+    void ShowActionPopup(const ProgramInfo &pginfo);
 
     QString getRecGroupPassword(const QString &recGroup);
     void fillRecGroupPasswordCache(void);
@@ -416,7 +417,7 @@ class PlaybackBox : public ScheduleCommon
 
     // Play List support
     QList<uint>         m_playList;   ///< list of selected items "play list"
-    bool                m_op_on_playlist      {false};
+    bool                m_opOnPlaylist        {false};
     QList<uint>         m_playListPlay; ///< list of items being played.
 
     ProgramInfoCache    m_programInfoCache;
@@ -436,11 +437,11 @@ class PlaybackBox : public ScheduleCommon
 
     // Other
     TV                 *m_player              {nullptr};
-    QStringList         m_player_selected_new_show;
+    QStringList         m_playerSelectedNewShow;
     /// Main helper thread
     PlaybackBoxHelper   m_helper;
     /// Outstanding preview image requests
-    QSet<QString>       m_preview_tokens;
+    QSet<QString>       m_previewTokens;
 
     bool                m_firstGroup          {true};
     bool                m_usingGroupSelector  {false};
@@ -476,11 +477,12 @@ class GroupSelector : public MythScreenType
     Q_OBJECT
 
   public:
-    GroupSelector(MythScreenStack *lparent, const QString &label,
-                  const QStringList &list, const QStringList &data,
-                  const QString &selected)
-        : MythScreenType(lparent, "groupselector"), m_label(label),
-          m_List(list), m_Data(data), m_selected(selected) {}
+    GroupSelector(MythScreenStack *lparent, QString label,
+                  QStringList list, QStringList data,
+                  QString selected)
+        : MythScreenType(lparent, "groupselector"), m_label(std::move(label)),
+          m_list(std::move(list)), m_data(std::move(data)),
+          m_selected(std::move(selected)) {}
 
     bool Create(void) override; // MythScreenType
 
@@ -494,8 +496,8 @@ class GroupSelector : public MythScreenType
     void loadGroups(void);
 
     QString m_label;
-    QStringList m_List;
-    QStringList m_Data;
+    QStringList m_list;
+    QStringList m_data;
     QString m_selected;
 };
 
@@ -527,9 +529,9 @@ class PasswordChange : public MythScreenType
     Q_OBJECT
 
   public:
-    PasswordChange(MythScreenStack *lparent, const QString& oldpassword)
+    PasswordChange(MythScreenStack *lparent, QString  oldpassword)
         : MythScreenType(lparent, "passwordchanger"),
-          m_oldPassword(oldpassword){}
+          m_oldPassword(std::move(oldpassword)){}
 
     bool Create(void) override; // MythScreenType
 

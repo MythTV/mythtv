@@ -45,6 +45,12 @@
 #ifndef IMAGEMANAGER_H
 #define IMAGEMANAGER_H
 
+#include <utility>
+
+// Qt headers
+#include <QTemporaryDir>
+
+// MythTV headers
 #include "mythcorecontext.h"
 #include "storagegroup.h"
 #include "mythdirs.h"
@@ -63,8 +69,6 @@
 #define THUMBNAIL_SUBDIR            "Images"
 
 #define DEVICE_INVALID -1
-
-#include <QTemporaryDir>
 
 class MythMediaDevice;
 class MythMediaEvent;
@@ -105,7 +109,7 @@ protected:
     StringMap   GetDeviceDirs() const;
     QList<int>  GetAbsentees();
 
-    DeviceManager() : m_devices() {}
+    DeviceManager() = default;
     ~DeviceManager();
 
 private:
@@ -185,7 +189,7 @@ private:
 class ImageAdapterLocal : public ImageAdapterBase
 {
 public:
-    ImageAdapterLocal() : ImageAdapterBase() {}
+    ImageAdapterLocal() = default;
 
     ImageItem *CreateItem(const QFileInfo &fi, int parentId, int devId,
                           const QString &base) const;
@@ -194,24 +198,24 @@ public:
     StringMap GetScanDirs() const  { return GetDeviceDirs(); }
 
     //! Get absolute filepath for a local image
-    QString GetAbsFilePath(const ImagePtrK &im) const
+    static QString GetAbsFilePath(const ImagePtrK &im)
     { return im->m_filePath; }
 
     //! Construct URL of a local image, which is an absolute path
-    QString MakeFileUrl(const QString &path) const { return path; }
+    static QString MakeFileUrl(const QString &path) { return path; }
 
     //! Construct URL of the thumbnail of a local image (An absolute path)
-    QString MakeThumbUrl(const QString &devPath, const QString &path = "") const
+    static QString MakeThumbUrl(const QString &devPath, const QString &path = "")
     { return GetAbsThumbPath(devPath, path); }
 
     static void Notify(const QString &mesg, const QStringList &extra) ;
 
 protected:
     // Adapter functions used by Database for local images. Negate ids in & out
-    int     ImageId(int id) const            { return ImageItem::ToLocalId(id); }
-    QString ImageId(const QString &id) const { return ImageItem::ToLocalId(id); }
-    int     DbId(int id) const               { return ImageItem::ToDbId(id); }
-    QString DbIds(const QString &ids) const  { return ImageItem::ToDbId(ids); }
+    static int     ImageId(int id)            { return ImageItem::ToLocalId(id); }
+    static QString ImageId(const QString &id) { return ImageItem::ToLocalId(id); }
+    static int     DbId(int id)               { return ImageItem::ToDbId(id); }
+    static QString DbIds(const QString &ids)  { return ImageItem::ToDbId(ids); }
 };
 
 
@@ -223,9 +227,9 @@ protected:
 class ImageAdapterSg : public ImageAdapterBase
 {
 public:
-    ImageAdapterSg() : ImageAdapterBase(),
+    ImageAdapterSg() :
         m_hostname(gCoreContext->GetMasterHostName()),
-        m_hostport(gCoreContext->GetMasterServerPort()),
+        m_hostport(MythCoreContext::GetMasterServerPort()),
         m_sg(StorageGroup(IMAGE_STORAGE_GROUP, m_hostname, false)) {}
 
     ImageItem *CreateItem(const QFileInfo &fi, int parentId, int devId,
@@ -235,12 +239,12 @@ public:
 
     //! Construct URL of a remote image.
     QString MakeFileUrl(const QString &path) const
-    { return gCoreContext->GenMythURL(m_hostname, m_hostport, path,
+    { return MythCoreContext::GenMythURL(m_hostname, m_hostport, path,
                                       IMAGE_STORAGE_GROUP); }
 
     //! Construct URL of the thumbnail of a remote image
     QString MakeThumbUrl(const QString &devPath, const QString &path = "") const
-    { return gCoreContext->GenMythURL(m_hostname, m_hostport,
+    { return MythCoreContext::GenMythURL(m_hostname, m_hostport,
                                       devPath + "/" + path,
                                       THUMBNAIL_STORAGE_GROUP); }
 
@@ -248,10 +252,10 @@ public:
 
 protected:
     // Adapter functions used by Database for remote images. Do nothing
-    int     ImageId(int id) const            { return id; }
-    QString ImageId(const QString &id) const { return id; }
-    int     DbId(int id) const               { return id; }
-    QString DbIds(const QString &ids) const  { return ids; }
+    static int     ImageId(int id)            { return id; }
+    static QString ImageId(const QString &id) { return id; }
+    static int     DbId(int id)               { return id; }
+    static QString DbIds(const QString &ids)  { return ids; }
 
 private:
     //! Host of SG
@@ -297,7 +301,7 @@ public:
                             int &videos, int &sizeKb) const;
 
 protected:
-    explicit ImageDb(const QString &table) : FS(), m_table(table) {}
+    explicit ImageDb(QString table) : FS(), m_table(std::move(table)) {}
 
     ImageItem *CreateImage(const MSqlQuery &query) const;
     int        ReadImages(ImageList &dirs, ImageList &files,
@@ -320,9 +324,9 @@ class META_PUBLIC ImageDbLocal : public ImageDb<ImageAdapterLocal>
 {
 protected:
     ImageDbLocal();
-    ~ImageDbLocal()          { DropTable(); }
+    ~ImageDbLocal() override          { DropTable(); }
     bool CreateTable();
-    bool m_DbExists;
+    bool m_DbExists { false };
 
 private:
     void DropTable();
@@ -334,32 +338,32 @@ template <class DBFS>
 class META_PUBLIC ImageHandler : protected DBFS
 {
 public:
-    QStringList HandleRename(const QString &, const QString &) const;
-    QStringList HandleDelete(const QString &) const;
-    QStringList HandleDbCreate(QStringList) const;
-    QStringList HandleDbMove(const QString &, const QString &, QString) const;
-    QStringList HandleHide(bool, const QString &ids) const;
-    QStringList HandleTransform(int, const QString &) const;
-    QStringList HandleDirs(const QString &, bool rescan,
+    QStringList HandleRename(const QString &id, const QString &newBase) const;
+    QStringList HandleDelete(const QString &ids) const;
+    QStringList HandleDbCreate(QStringList defs) const;
+    QStringList HandleDbMove(const QString &ids, const QString &srcPath, QString destPath) const;
+    QStringList HandleHide(bool hide, const QString &ids) const;
+    QStringList HandleTransform(int transform, const QString &ids) const;
+    QStringList HandleDirs(const QString &destId, bool rescan,
                            const QStringList &relPaths) const;
-    QStringList HandleCover(int, int) const;
-    QStringList HandleIgnore(const QString &) const;
-    QStringList HandleScanRequest(const QString &, int devId = DEVICE_INVALID) const;
-    QStringList HandleCreateThumbnails(const QStringList &) const;
-    QStringList HandleGetMetadata(const QString &) const;
+    QStringList HandleCover(int dir, int cover) const;
+    QStringList HandleIgnore(const QString &exclusions) const;
+    QStringList HandleScanRequest(const QString &command, int devId = DEVICE_INVALID) const;
+    QStringList HandleCreateThumbnails(const QStringList &message) const;
+    QStringList HandleGetMetadata(const QString &id) const;
 
 protected:
     ImageHandler() : DBFS(),
         m_thumbGen(new ImageThumb<DBFS>(this)),
         m_scanner(new ImageScanThread<DBFS>(this, m_thumbGen)) {}
 
-    ~ImageHandler()
+    ~ImageHandler() override
     {
         delete m_scanner;
         delete m_thumbGen;
     }
 
-    void RemoveFiles(ImageList &) const;
+    void RemoveFiles(ImageList &images) const;
 
     ImageThumb<DBFS>      *m_thumbGen {nullptr}; //!< Thumbnail generator
     ImageScanThread<DBFS> *m_scanner  {nullptr}; //!< File scanner
@@ -377,7 +381,7 @@ public:
     static ImageManagerBe* getInstance();
 
 protected:
-    ImageManagerBe() :QObject(), ImageHandler()
+    ImageManagerBe()
     {
         // Cleanup & terminate child threads before application exits
         connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(deleteLater()));
@@ -396,7 +400,7 @@ protected:
 class META_PUBLIC ImageDbReader : protected ImageHandler<ImageDbLocal>
 {
 public:
-    ~ImageDbReader() { delete m_remote; }
+    ~ImageDbReader() override { delete m_remote; }
 
     int  GetType()        { return m_showType; }
     bool GetVisibility()  { return m_showHidden; }
@@ -421,7 +425,7 @@ public:
                             int &sizeKb) const;
 protected:
     ImageDbReader(int order, int dirOrder, bool showAll, int showType)
-        : ImageHandler(),        m_remote(new ImageDbSg()),
+        : m_remote(new ImageDbSg()),
           m_dirOrder(dirOrder),  m_fileOrder(order),
           m_showHidden(showAll), m_showType(showType)
     { SetRefinementClause(); }
@@ -464,11 +468,11 @@ public:
     QString     SetCover(int parent, int cover);
     void        RequestMetaData(int id);
     static QString     IgnoreDirs(const QString &excludes);
-    QString     MakeDir(int, const QStringList &names, bool rescan = true);
+    QString     MakeDir(int parent, const QStringList &names, bool rescan = true);
     QString     RenameFile(const ImagePtrK& im, const QString &name);
-    QString     CreateImages(int, const ImageListK &images);
-    QString     MoveDbImages(const ImagePtrK& destDir, ImageListK &images, const QString &);
-    QString     DeleteFiles(const ImageIdList &);
+    QString     CreateImages(int destId, const ImageListK &images);
+    QString     MoveDbImages(const ImagePtrK& destDir, ImageListK &images, const QString &srcPath);
+    QString     DeleteFiles(const ImageIdList &ids);
     static void ClearStorageGroup();
     void        CloseDevices(int devId = DEVICE_INVALID, bool eject = false);
 
@@ -483,8 +487,8 @@ public:
 
     // UI helper functions
     void SetDateFormat(const QString &format)    { m_dateFormat = format; }
-    static QString LongDateOf(const ImagePtrK&) ;
-    QString ShortDateOf(const ImagePtrK&) const;
+    static QString LongDateOf(const ImagePtrK &im) ;
+    QString ShortDateOf(const ImagePtrK &im) const;
     QString DeviceCaption(ImageItemK &im) const;
     QString CrumbName(ImageItemK &im, bool getPath = false) const;
 
@@ -497,7 +501,7 @@ protected:
     ImageManagerFe(int order, int dirOrder, bool showAll, int showType,
                    QString dateFormat)
         : ImageDbReader(order, dirOrder, showAll, showType),
-          m_dateFormat(dateFormat)
+          m_dateFormat(std::move(dateFormat))
     {
         // Cleanup & terminate child threads before application exits
         connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(deleteLater()));

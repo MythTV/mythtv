@@ -609,9 +609,11 @@ class FileAssociationsImp
             query.bindValue(":ID", ret_fa.id);
         }
         else
+        {
             query.prepare("INSERT INTO videotypes (extension, playcommand, "
                           "f_ignore, use_default) VALUES "
                           "(:EXT, :PLAYCMD, :IGNORED, :USEDEFAULT)");
+        }
 
         query.bindValue(":EXT", ret_fa.extension);
         query.bindValue(":PLAYCMD", ret_fa.playcommand);

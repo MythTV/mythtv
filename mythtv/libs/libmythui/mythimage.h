@@ -34,7 +34,7 @@ class MUI_PUBLIC MythImage : public QImage, public ReferenceCounter
     static QImage ApplyExifOrientation(QImage &image, int orientation);
 
     /// Creates a reference counted image, call DecrRef() to delete.
-    MythImage(MythPainter *parent, const char *name = "MythImage");
+    explicit MythImage(MythPainter *parent, const char *name = "MythImage");
 
     MythPainter* GetParent(void)        { return m_Parent;   }
     void SetParent(MythPainter *parent) { m_Parent = parent; }
@@ -100,7 +100,7 @@ class MUI_PUBLIC MythImage : public QImage, public ReferenceCounter
     }
 
   protected:
-    virtual ~MythImage();
+    ~MythImage() override;
     static void MakeGradient(QImage &image, const QColor &begin,
                              const QColor &end, int alpha,
                              bool drawBoundary=true,

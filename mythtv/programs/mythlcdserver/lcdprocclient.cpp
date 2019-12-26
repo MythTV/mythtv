@@ -329,10 +329,12 @@ void LCDProcClient::serverSendingData()
         lineFromServer = lineFromServer.replace( QRegExp("\r"), "" );
 
         if (debug_level > 0)
+        {
         // Make debugging be less noisy
             if (lineFromServer != "success")
                 LOG(VB_NETWORK, LOG_INFO,
                     "LCDProcClient: Received from server: " + lineFromServer);
+        }
 
         aList = lineFromServer.split(" ");
         if (aList.first() == "connect")
@@ -830,8 +832,10 @@ void LCDProcClient::outputText(QList<LCDTextItem> *textItems)
         num.setNum(curItem->getRow());
 
         if (curItem->getScroll())
+        {
             assignScrollingWidgets(curItem->getText(), curItem->getScreen(),
                                 "textWidget" + num, curItem->getRow());
+        }
         else
         {
             switch (curItem->getAlignment())
@@ -2373,9 +2377,11 @@ void LCDProcClient::removeWidgets()
 LCDProcClient::~LCDProcClient()
 {
     if (debug_level > 1)
+    {
         LOG(VB_GENERAL, LOG_INFO,
             "LCDProcClient: An LCD device is being snuffed out"
             "of existence (~LCDProcClient() was called)");
+    }
 
     if (m_socket)
     {

@@ -30,7 +30,7 @@ class MBASE_PUBLIC MythSocket : public QObject, public ReferenceCounter
     friend class MythSocketManager;
 
   public:
-    MythSocket(qt_socket_fd_t socket = -1, MythSocketCBs *cb = nullptr,
+    explicit MythSocket(qt_socket_fd_t socket = -1, MythSocketCBs *cb = nullptr,
                bool use_shared_thread = false);
 
     bool ConnectToHost(const QString &hostname, quint16 port);
@@ -64,8 +64,8 @@ class MBASE_PUBLIC MythSocket : public QObject, public ReferenceCounter
     int GetSocketDescriptor(void) const;
 
     // RemoteFile stuff
-    int Write(const char*, int size);
-    int Read(char*, int size, int max_wait_ms);
+    int Write(const char *data, int size);
+    int Read(char *data, int size, int max_wait_ms);
     void Reset(void);
 
     static const uint kShortTimeout;
@@ -76,7 +76,7 @@ class MBASE_PUBLIC MythSocket : public QObject, public ReferenceCounter
 
   protected slots:
     void ConnectHandler(void);
-    void ErrorHandler(QAbstractSocket::SocketError);
+    void ErrorHandler(QAbstractSocket::SocketError err);
     void AboutToCloseHandler(void);
     void DisconnectHandler(void);
     void ReadyReadHandler(void);
@@ -87,14 +87,14 @@ class MBASE_PUBLIC MythSocket : public QObject, public ReferenceCounter
     void ConnectToHostReal(const QHostAddress& addr, quint16 port, bool *ret);
     void DisconnectFromHostReal(void);
 
-    void WriteReal(const char*, int size, int *ret);
-    void ReadReal(char*, int size, int max_wait_ms, int *ret);
+    void WriteReal(const char *data, int size, int *ret);
+    void ReadReal(char *data, int size, int max_wait_ms, int *ret);
     void ResetReal(void);
 
     void IsDataAvailableReal(bool *ret) const;
 
   protected:
-    ~MythSocket(); // force reference counting
+    ~MythSocket() override; // force reference counting
 
     QTcpSocket     *m_tcpSocket        {nullptr}; // only set in ctor
     MThread        *m_thread           {nullptr}; // only set in ctor

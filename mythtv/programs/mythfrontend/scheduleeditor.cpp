@@ -283,25 +283,35 @@ void ScheduleEditor::Load()
                                      toDescription(kNotRecording),
                                      ENUM_TO_QVARIANT(kNotRecording));
             if (hasChannel)
+            {
                 new MythUIButtonListItem(m_rulesList,
                                          toDescription(kSingleRecord),
                                          ENUM_TO_QVARIANT(kSingleRecord));
+            }
             if (!isManual)
+            {
                 new MythUIButtonListItem(m_rulesList,
                                          toDescription(kOneRecord),
                                          ENUM_TO_QVARIANT(kOneRecord));
+            }
             if (!hasChannel || isManual)
+            {
                 new MythUIButtonListItem(m_rulesList,
                                          toDescription(kWeeklyRecord),
                                          ENUM_TO_QVARIANT(kWeeklyRecord));
+            }
             if (!hasChannel || isManual)
+            {
                 new MythUIButtonListItem(m_rulesList,
                                          toDescription(kDailyRecord),
                                          ENUM_TO_QVARIANT(kDailyRecord));
+            }
             if (!isManual)
+            {
                 new MythUIButtonListItem(m_rulesList,
                                          toDescription(kAllRecord),
                                          ENUM_TO_QVARIANT(kAllRecord));
+            }
         }
 
         m_recordingRule->m_type = type;

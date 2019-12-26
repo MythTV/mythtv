@@ -3,11 +3,15 @@
 #ifndef _TV_BROWSE_HELPER_H_
 #define _TV_BROWSE_HELPER_H_
 
-#include <QWaitCondition>
+#include <utility>
+
+// Qt headers
+#include <QHash>
 #include <QMultiMap>
 #include <QString>
-#include <QHash>
+#include <QWaitCondition>
 
+// MythTV headers
 #include "channelinfo.h"   // for ChannelInfoList
 #include "programtypes.h"  // for InfoMap
 #include "mthread.h"
@@ -21,21 +25,21 @@ class BrowseInfo
 {
   public:
     explicit BrowseInfo(BrowseDirection dir) :
-        m_dir(dir), m_chanid(0), m_sourceid(0)
+        m_dir(dir)
     {
     }
     BrowseInfo(BrowseDirection dir,
-               const QString &channum,
+               QString channum,
                uint           chanid,
-               const QString &starttime) :
-        m_dir(dir),         m_channum(channum),
-        m_chanid(chanid),   m_starttime(starttime)
+               QString starttime) :
+        m_dir(dir),         m_chanNum(std::move(channum)),
+        m_chanId(chanid),   m_startTime(std::move(starttime))
     {
     }
-    BrowseInfo(const QString &channum,
+    BrowseInfo(QString channum,
                uint           sourceid) :
-        m_channum(channum),
-        m_sourceid(sourceid)
+        m_chanNum(std::move(channum)),
+        m_sourceId(sourceid)
     {
     }
 
@@ -46,17 +50,17 @@ class BrowseInfo
                  BROWSE_UP  ==m_dir?"UP":
                  BROWSE_DOWN==m_dir?"DOWN":
                  QString::number(m_dir))
-            .arg(m_channum)
-            .arg(m_chanid)
-            .arg(m_starttime)
-            .arg(m_sourceid);
+            .arg(m_chanNum)
+            .arg(m_chanId)
+            .arg(m_startTime)
+            .arg(m_sourceId);
     }
 
     BrowseDirection m_dir      {BROWSE_SAME};
-    QString         m_channum;
-    uint            m_chanid   {0};
-    QString         m_starttime;
-    uint            m_sourceid {0};
+    QString         m_chanNum;
+    uint            m_chanId   {0};
+    QString         m_startTime;
+    uint            m_sourceId {0};
 };
 
 
@@ -69,7 +73,7 @@ class TVBrowseHelper : public MThread
                    bool     use_channel_groups,
                    const QString&  db_channel_ordering);
 
-    virtual ~TVBrowseHelper()
+    ~TVBrowseHelper() override
     {
         Stop();
         Wait();
@@ -121,9 +125,9 @@ class TVBrowseHelper : public MThread
 
     mutable QMutex           m_lock; // protects variables below
     PlayerContext           *m_ctx       {nullptr};
-    QString                  m_channum;
-    uint                     m_chanid    {0};
-    QString                  m_starttime;
+    QString                  m_chanNum;
+    uint                     m_chanId    {0};
+    QString                  m_startTime;
     bool                     m_run       {true};
     QWaitCondition           m_wait;
     QList<BrowseInfo>        m_list;

@@ -36,7 +36,7 @@ class PROTOSERVER_PUBLIC MythSocketManager : public QObject, public MythSocketCB
     Q_OBJECT
   public:
     MythSocketManager();
-   ~MythSocketManager();
+   ~MythSocketManager() override;
 
     void readyRead(MythSocket *socket) override; // MythSocketCBs
     void connectionClosed(MythSocket *socket) override; // MythSocketCBs
@@ -69,7 +69,7 @@ class PROTOSERVER_PUBLIC MythSocketManager : public QObject, public MythSocketCB
     QMap<QString, SocketRequestHandler*>    m_handlerMap;
     QReadWriteLock                          m_handlerLock;
 
-    MythServer     *m_server;
+    MythServer     *m_server     { nullptr };
     MThreadPool     m_threadPool;
 
     QMutex m_socketListLock;

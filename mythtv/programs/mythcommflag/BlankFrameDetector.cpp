@@ -409,7 +409,7 @@ enum FrameAnalyzer::analyzeFrameResult
 BlankFrameDetector::analyzeFrame(const VideoFrame *frame, long long frameno,
         long long *pNextFrame)
 {
-    *pNextFrame = NEXTFRAME;
+    *pNextFrame = kNextFrame;
 
     if (m_histogramAnalyzer->analyzeFrame(frame, frameno) ==
             FrameAnalyzer::ANALYZE_OK)

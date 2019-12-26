@@ -17,8 +17,8 @@ class QPainter;
 class MUI_PUBLIC MythQImagePainter : public MythPainter
 {
   public:
-    MythQImagePainter() : MythPainter() {}
-   ~MythQImagePainter();
+    MythQImagePainter() = default;
+   ~MythQImagePainter() override;
 
     QString GetName(void) override // MythPainter
         { return QString("QImage"); }

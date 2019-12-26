@@ -81,7 +81,7 @@ class MTV_PUBLIC TransportListEditor : public GroupSetting
     void NewTransport(void);
 
   private:
-    ~TransportListEditor() = default;
+    ~TransportListEditor() override = default;
     void Delete(TransportSetting *transport);
 
   private:

@@ -25,7 +25,7 @@ class FirewireTableMonitorThread : public MThread
   public:
     explicit FirewireTableMonitorThread(FirewireSignalMonitor *p) :
         MThread("FirewireTableMonitor"), m_parent(p) { start(); }
-    virtual ~FirewireTableMonitorThread() { wait(); m_parent = nullptr; }
+    ~FirewireTableMonitorThread() override { wait(); m_parent = nullptr; }
     void run(void) override; // MThread
   private:
     FirewireSignalMonitor *m_parent;
@@ -39,15 +39,15 @@ class FirewireSignalMonitor : public DTVSignalMonitor, public TSDataListener
                           bool _release_stream,
                           uint64_t _flags = kFWSigMon_WaitForPower);
 
-    void HandlePAT(const ProgramAssociationTable*) override; // DTVSignalMonitor
-    void HandlePMT(uint, const ProgramMapTable*) override; // DTVSignalMonitor
+    void HandlePAT(const ProgramAssociationTable *pat) override; // DTVSignalMonitor
+    void HandlePMT(uint pnum, const ProgramMapTable *pmt) override; // DTVSignalMonitor
 
     void Stop(void) override; // SignalMonitor
 
   protected:
     FirewireSignalMonitor(void);
     FirewireSignalMonitor(const FirewireSignalMonitor&);
-    virtual ~FirewireSignalMonitor();
+    ~FirewireSignalMonitor() override;
 
     void UpdateValues(void) override; // SignalMonitor
 

@@ -35,7 +35,7 @@ class UPNP_PUBLIC SoapSerializer : public XmlSerializer
             m_sNamespace = sNamespace;
         }
 
-        virtual ~SoapSerializer() = default;
+        ~SoapSerializer() override = default;
 
         // ------------------------------------------------------------------
         //

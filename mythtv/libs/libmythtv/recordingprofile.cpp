@@ -499,11 +499,13 @@ class AudioCompressionSettings : public GroupSetting
                             }
 
                             if (layer1 || layer2 || layer3)
+                            {
                                 m_codecName->addTargetedChild(*Icodec,
                                        new MPEG2AudioBitrateSettings(m_parent,
                                                                      layer1,
                                                                      layer2,
                                                                      layer3, 2));
+                            }
                         }
                         else if ((*Iopt).m_category == DriverOption::VOLUME)
                         {
@@ -1108,12 +1110,14 @@ class VideoCompressionSettings : public GroupSetting
                                              (*Iopt).m_step / 1000));
                             }
                             else
+                            {
                                 bit_low->addChild(new PeakBitrate(m_parent,
                                              "mpeg2maxbitrate",
                                              (*Iopt).m_minimum / 1000,
                                              (*Iopt).m_maximum / 1000,
                                              (*Iopt).m_defaultValue / 1000,
                                              (*Iopt).m_step / 1000));
+                            }
                         }
                     }
 
@@ -1766,7 +1770,7 @@ void RecordingProfile::fillSelections(GroupSetting *setting, int group,
 
     if (group == RecordingProfile::TranscoderGroup && foldautodetect)
     {
-        QString id = QString::number(RecordingProfile::TranscoderAutodetect);
+        QString id = QString::number(RecordingProfile::kTranscoderAutodetect);
         auto *profile = new GroupSetting();
         profile->setLabel(QObject::tr("Autodetect"));
         setting->addChild(profile);
@@ -1843,7 +1847,7 @@ QMap< int, QString > RecordingProfile::GetProfiles(RecProfileGroup group)
 
     if (group == RecordingProfile::TranscoderGroup)
     {
-        int id = RecordingProfile::TranscoderAutodetect;
+        int id = RecordingProfile::kTranscoderAutodetect;
         profiles[id] = QObject::tr("Transcode using Autodetect");
     }
 

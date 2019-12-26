@@ -19,14 +19,14 @@ class FirewireChannel : public DTVChannel
   public:
     FirewireChannel(TVRec *parent, QString videodevice,
                     FireWireDBOptions firewire_opts);
-    virtual ~FirewireChannel();
+    ~FirewireChannel() override;
 
     // Commands
      bool Open(void) override; // ChannelBase
     void Close(void) override; // ChannelBase
 
     using DTVChannel::Tune;
-    bool Tune(const DTVMultiplex&) override // DTVChannel
+    bool Tune(const DTVMultiplex &/*tuning*/) override // DTVChannel
         { return false; }
     bool Tune(const QString &freqid, int finetune) override; // DTVChannel
     bool Retune(void) override; // ChannelBase

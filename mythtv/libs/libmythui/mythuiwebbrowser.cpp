@@ -466,9 +466,11 @@ void MythWebView::handleUnsupportedContent(QNetworkReply *reply)
         QVariant header = reply->header(QNetworkRequest::ContentTypeHeader);
 
         if (header != QVariant())
+        {
             LOG(VB_GENERAL, LOG_ERR,
                 QString("MythWebView::handleUnsupportedContent - %1")
                 .arg(header.toString()));
+        }
 
         m_downloadReply = reply;
         m_downloadRequest = reply->request();
@@ -629,13 +631,17 @@ void MythWebView::customEvent(QEvent *event)
                     gCoreContext->dispatch(me);
                 }
                 else if (isVideoFile(extension, mimeType))
+                {
                     GetMythMainWindow()->HandleMedia("Internal",
                                             m_downloadRequest.url().toString());
+                }
                 else
+                {
                     LOG(VB_GENERAL, LOG_ERR,
                         QString("MythWebView: Asked to play a file with "
                                 "extension '%1' but don't know how")
                         .arg(extension));
+                }
             }
             else if (resulttext == tr("Download the file"))
             {

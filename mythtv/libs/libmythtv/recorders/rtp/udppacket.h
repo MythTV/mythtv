@@ -20,17 +20,12 @@
 class UDPPacket
 {
   public:
-    UDPPacket(const UDPPacket &o) : m_key(o.m_key), m_data(o.m_data) { }
+    UDPPacket(const UDPPacket &o)  = default;
     explicit UDPPacket(uint64_t key) : m_key(key) { }
-    UDPPacket(void) : m_key(0ULL) { }
+    UDPPacket(void) = default;
     virtual ~UDPPacket() = default;
 
-    UDPPacket& operator=(const UDPPacket &rhs)
-    {
-        m_key = rhs.m_key;
-        m_data = rhs.m_data;
-        return *this;
-    }
+    UDPPacket& operator=(const UDPPacket &rhs) = default;
 
     /// IsValid() must return true before any data access methods are called,
     /// other than GetDataReference() and GetData()
@@ -43,7 +38,7 @@ class UDPPacket
 
   protected:
     /// Key used to ensure we avoid extra memory allocation in m_data QByteArray
-    uint64_t m_key;
+    uint64_t   m_key  { 0ULL };
     QByteArray m_data;
 };
 

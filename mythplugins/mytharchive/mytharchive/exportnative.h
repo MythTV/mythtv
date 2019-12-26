@@ -37,10 +37,10 @@ class ExportNative : public MythScreenType
         : MythScreenType(parent, name),
           m_previousScreen(previousScreen),
           m_archiveDestination(archiveDestination) {}
-    ~ExportNative(void);
+    ~ExportNative(void) override;
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
     void createConfigFile(const QString &filename);
 

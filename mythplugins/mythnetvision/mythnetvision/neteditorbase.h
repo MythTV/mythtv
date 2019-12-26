@@ -25,10 +25,10 @@ class NetEditorBase : public MythScreenType
 
   public:
     NetEditorBase(MythScreenStack *parent, const QString &name);
-    virtual ~NetEditorBase();
+    ~NetEditorBase() override;
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent*) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
   private:
     void LoadData(void);

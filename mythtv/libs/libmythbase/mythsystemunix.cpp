@@ -115,10 +115,12 @@ void MythSystemLegacyIOHandler::run(void)
                 retval = select(m_maxfd+1, nullptr, &fds, nullptr, &tv);
 
             if( retval == -1 )
+            {
                 LOG(VB_SYSTEM, LOG_ERR,
                     QString("MythSystemLegacyIOHandler: select(%1, %2) failed: %3")
                         .arg(m_maxfd+1).arg(m_read).arg(strerror(errno)));
 
+            }
             else if( retval > 0 )
             {
                 PMap_t::iterator i;
@@ -602,14 +604,20 @@ bool MythSystemLegacyUnix::ParseShell(const QString &cmd, QString &abscmd,
             {
                 if ((quote == *i) || (escape == *i) ||
                             whitespace.contains(*i))
+                {
                     // pass through escape (\), quote ("), and any whitespace
                     tmp += *i;
+                }
                 else if (whitechr.contains(*i))
+                {
                     // process whitespace escape code, and pass character
                     tmp += whitespace[whitechr.indexOf(*i)+1];
+                }
                 else
+                {
                     // unhandled escape code, abort
                     return false;
+                }
 
                 escaped = false;
             }
@@ -617,35 +625,48 @@ bool MythSystemLegacyUnix::ParseShell(const QString &cmd, QString &abscmd,
             else if (*i == escape)
             {
                 if (hardquoted)
+                {
                     // hard quotes (') pass everything
                     tmp += *i;
+                }
                 else
+                {
                     // otherwise, mark escaped to handle next character
                     escaped = true;
+                }
             }
 
             else if ((quoted && (*i == quote)) ||
                             (hardquoted && (*i == hardquote)))
+            {
                 // end of quoted sequence
                 quoted = hardquoted = false;
-
+            }
             else
+            {
                 // pass through character
                 tmp += *i;
+            }
         }
 
         else if (escaped)
         {
             if ((*i == quote) || (*i == hardquote) || (*i == escape) ||
                     whitespace.contains(*i))
+            {
                 // pass through special characters
                 tmp += *i;
+            }
             else if (whitechr.contains(*i))
+            {
                 // process whitespace escape code, and pass character
                 tmp += whitespace[whitechr.indexOf(*i)+1];
+            }
             else
+            {
                 // unhandled escape code, abort
                 return false;
+            }
 
             escaped = false;
         }
@@ -656,7 +677,9 @@ bool MythSystemLegacyUnix::ParseShell(const QString &cmd, QString &abscmd,
         else if (hardquote == *i)
             hardquoted = true;
         else if (escape == *i)
+        {
             escaped = true;
+        }
 
         // handle whitespace characters
         else if (whitespace.contains(*i) && !tmp.isEmpty())

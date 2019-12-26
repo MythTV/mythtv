@@ -23,7 +23,7 @@ class MythUIStateType;
 class MUI_PUBLIC MFileInfo : public QFileInfo
 {
   public:
-    MFileInfo(const QString& fileName = "", QString sgDir = "", bool isDir = false,
+    explicit MFileInfo(const QString& fileName = "", QString sgDir = "", bool isDir = false,
               qint64 size = 0);
    ~MFileInfo() = default;
 
@@ -78,7 +78,7 @@ class MUI_PUBLIC MythUIFileBrowser : public MythScreenType
 
   public:
     MythUIFileBrowser(MythScreenStack *parent, const QString &startPath);
-   ~MythUIFileBrowser() = default;
+   ~MythUIFileBrowser() override = default;
 
     bool Create(void) override; // MythScreenType
 

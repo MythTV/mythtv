@@ -63,11 +63,11 @@ class ZMLivePlayer : public MythScreenType
     Q_OBJECT
 
   public:
-    ZMLivePlayer(MythScreenStack *parent, bool isMiniPlayer = false);
-    ~ZMLivePlayer();
+    explicit ZMLivePlayer(MythScreenStack *parent, bool isMiniPlayer = false);
+    ~ZMLivePlayer() override;
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
     void customEvent(QEvent *event) override; // MythUIType
 
     void ShowMenu() override; // MythScreenType

@@ -156,7 +156,8 @@ class DiSEqCDevDevice
     void SetOrdinal(uint ordinal)            { m_ordinal  = ordinal; }
     void SetDescription(const QString &desc) { m_desc     = desc;    }
     void SetRepeatCount(uint repeat)         { m_repeat   = repeat;  }
-    virtual bool SetChild(uint, DiSEqCDevDevice*){return false;      }
+    virtual bool SetChild(uint /*ordinal*/, DiSEqCDevDevice */*device*/)
+                                             {return false;          }
 
     // Gets
     dvbdev_t      GetDeviceType(void)  const { return m_devType;     }
@@ -169,16 +170,16 @@ class DiSEqCDevDevice
     uint          GetRepeatCount(void) const { return m_repeat;      }
     virtual uint  GetChildCount(void)  const { return 0;             }
     virtual bool  IsCommandNeeded(
-        const DiSEqCDevSettings&, const DTVMultiplex&)
+        const DiSEqCDevSettings &/*settings*/, const DTVMultiplex &/*tuning*/)
                                        const { return false;         }
     virtual uint  GetVoltage(
-        const DiSEqCDevSettings&, const DTVMultiplex&) const = 0;
+        const DiSEqCDevSettings &/*settings*/, const DTVMultiplex &/*tuning*/) const = 0;
 
     // Non-const Gets
     DiSEqCDevDevice *FindDevice(uint dev_id);
     virtual DiSEqCDevDevice *GetSelectedChild(
-        const DiSEqCDevSettings&)      const { return nullptr;          }
-    virtual DiSEqCDevDevice *GetChild(uint)  { return nullptr;          }
+        const DiSEqCDevSettings &/*settings*/) const     { return nullptr; }
+    virtual DiSEqCDevDevice *GetChild(uint /*ordinal*/)  { return nullptr; }
 
     // Statics
     static QString DevTypeToString(dvbdev_t type)
@@ -216,11 +217,12 @@ class DiSEqCDevSwitch : public DiSEqCDevDevice
 {
   public:
     DiSEqCDevSwitch(DiSEqCDevTree &tree, uint devid);
-    ~DiSEqCDevSwitch();
+    ~DiSEqCDevSwitch() override;
 
     // Commands
     void Reset(void) override; // DiSEqCDevDevice
-    bool Execute(const DiSEqCDevSettings&, const DTVMultiplex&) override; // DiSEqCDevDevice
+    bool Execute(const DiSEqCDevSettings &/*settings*/,
+                 const DTVMultiplex &/*tuning*/) override; // DiSEqCDevDevice
     bool Load(void) override; // DiSEqCDevDevice
     bool Store(void) const override; // DiSEqCDevDevice
 
@@ -239,7 +241,7 @@ class DiSEqCDevSwitch : public DiSEqCDevDevice
     void SetType(dvbdev_switch_t type)        { m_type = type;       }
     void SetAddress(uint address)             { m_address = address; }
     void SetNumPorts(uint num_ports);
-    bool SetChild(uint, DiSEqCDevDevice*) override; // DiSEqCDevDevice
+    bool SetChild(uint ordinal, DiSEqCDevDevice *device) override; // DiSEqCDevDevice
 
     // Gets
     dvbdev_switch_t GetType(void)       const { return m_type;       }
@@ -248,14 +250,14 @@ class DiSEqCDevSwitch : public DiSEqCDevDevice
     bool            ShouldSwitch(const DiSEqCDevSettings &settings,
                                  const DTVMultiplex &tuning) const;
     uint    GetChildCount(void) const override; // DiSEqCDevDevice
-    bool    IsCommandNeeded(const DiSEqCDevSettings&,
-                            const DTVMultiplex&) const override; // DiSEqCDevDevice
-    uint    GetVoltage(const DiSEqCDevSettings&,
-                       const DTVMultiplex&) const override; // DiSEqCDevDevice
+    bool    IsCommandNeeded(const DiSEqCDevSettings &settings,
+                            const DTVMultiplex &tuning) const override; // DiSEqCDevDevice
+    uint    GetVoltage(const DiSEqCDevSettings &settings,
+                       const DTVMultiplex &tuning) const override; // DiSEqCDevDevice
 
     // Non-const Gets
-    DiSEqCDevDevice *GetSelectedChild(const DiSEqCDevSettings&) const override; // DiSEqCDevDevice
-    DiSEqCDevDevice *GetChild(uint) override; // DiSEqCDevDevice
+    DiSEqCDevDevice *GetSelectedChild(const DiSEqCDevSettings &settings) const override; // DiSEqCDevDevice
+    DiSEqCDevDevice *GetChild(uint ordinal) override; // DiSEqCDevDevice
 
     // Statics
     static QString SwitchTypeToString(dvbdev_switch_t type)
@@ -266,17 +268,17 @@ class DiSEqCDevSwitch : public DiSEqCDevDevice
 
   protected:
     bool ExecuteLegacy(
-        const DiSEqCDevSettings&, const DTVMultiplex&, uint pos);
+        const DiSEqCDevSettings &settings, const DTVMultiplex &tuning, uint pos);
     bool ExecuteTone(
-        const DiSEqCDevSettings&, const DTVMultiplex&, uint pos);
+        const DiSEqCDevSettings &settings, const DTVMultiplex &tuning, uint pos);
     bool ExecuteVoltage(
-        const DiSEqCDevSettings&, const DTVMultiplex&, uint pos);
+        const DiSEqCDevSettings &settings, const DTVMultiplex &tuning, uint pos);
     bool ExecuteMiniDiSEqC(
-        const DiSEqCDevSettings&, const DTVMultiplex&, uint pos);
+        const DiSEqCDevSettings &settings, const DTVMultiplex &tuning, uint pos);
     bool ExecuteDiseqc(
-        const DiSEqCDevSettings&, const DTVMultiplex&, uint pos);
+        const DiSEqCDevSettings &settings, const DTVMultiplex &tuning, uint pos);
 
-    int  GetPosition(  const DiSEqCDevSettings&) const;
+    int  GetPosition(  const DiSEqCDevSettings &settings) const;
 
   private:
     dvbdev_switch_t m_type            {kTypeTone};
@@ -295,11 +297,11 @@ class DiSEqCDevRotor : public DiSEqCDevDevice
   public:
     DiSEqCDevRotor(DiSEqCDevTree &tree, uint devid)
         : DiSEqCDevDevice(tree, devid) { DiSEqCDevRotor::Reset(); }
-    ~DiSEqCDevRotor();
+    ~DiSEqCDevRotor() override;
 
     // Commands
     void Reset(void) override; // DiSEqCDevDevice
-    bool Execute(const DiSEqCDevSettings&, const DTVMultiplex&) override; // DiSEqCDevDevice
+    bool Execute(const DiSEqCDevSettings &settings, const DTVMultiplex &tuning) override; // DiSEqCDevDevice
     bool Load(void) override; // DiSEqCDevDevice
     bool Store(void) const override; // DiSEqCDevDevice
 
@@ -321,15 +323,15 @@ class DiSEqCDevRotor : public DiSEqCDevDevice
     bool           IsPositionKnown(void) const;
     uint   GetChildCount(void)           const override // DiSEqCDevDevice
         { return 1; }
-    bool   IsCommandNeeded(const DiSEqCDevSettings&,
-                           const DTVMultiplex&) const override; // DiSEqCDevDevice
-    bool           IsMoving(const DiSEqCDevSettings&) const;
-    uint   GetVoltage(const DiSEqCDevSettings&,
-                      const DTVMultiplex&) const override; // DiSEqCDevDevice
+    bool   IsCommandNeeded(const DiSEqCDevSettings &settings,
+                           const DTVMultiplex &tuning) const override; // DiSEqCDevDevice
+    bool           IsMoving(const DiSEqCDevSettings &settings) const;
+    uint   GetVoltage(const DiSEqCDevSettings &settings,
+                      const DTVMultiplex &tuning) const override; // DiSEqCDevDevice
 
     // Non-const Gets
-    DiSEqCDevDevice *GetSelectedChild(const DiSEqCDevSettings&) const override; // DiSEqCDevDevice
-    DiSEqCDevDevice *GetChild(uint) override // DiSEqCDevDevice
+    DiSEqCDevDevice *GetSelectedChild(const DiSEqCDevSettings &setting) const override; // DiSEqCDevDevice
+    DiSEqCDevDevice *GetChild(uint /*ordinal*/) override // DiSEqCDevDevice
         { return m_child;     }
 
     // Statics
@@ -339,9 +341,9 @@ class DiSEqCDevRotor : public DiSEqCDevDevice
         { return (dvbdev_rotor_t) TableFromString(type, kRotorTypeTable); }
 
   protected:
-    bool   ExecuteRotor(const DiSEqCDevSettings&, const DTVMultiplex&,
+    bool   ExecuteRotor(const DiSEqCDevSettings &settings, const DTVMultiplex &tuning,
                         double angle);
-    bool   ExecuteUSALS(const DiSEqCDevSettings&, const DTVMultiplex&,
+    bool   ExecuteUSALS(const DiSEqCDevSettings &settings, const DTVMultiplex &tuning,
                         double angle);
     void   StartRotorPositionTracking(double azimuth);
 
@@ -375,11 +377,11 @@ class DiSEqCDevSCR : public DiSEqCDevDevice
   public:
     DiSEqCDevSCR(DiSEqCDevTree &tree, uint devid)
         : DiSEqCDevDevice(tree, devid) { DiSEqCDevSCR::Reset(); }
-    ~DiSEqCDevSCR();
+    ~DiSEqCDevSCR() override;
 
     // Commands
     void Reset(void) override; // DiSEqCDevDevice
-    bool Execute(const DiSEqCDevSettings&, const DTVMultiplex&) override; // DiSEqCDevDevice
+    bool Execute(const DiSEqCDevSettings &settings, const DTVMultiplex &tuning) override; // DiSEqCDevDevice
     bool         PowerOff(void) const;
     bool Load(void) override; // DiSEqCDevDevice
     bool Store(void) const override; // DiSEqCDevDevice
@@ -401,17 +403,17 @@ class DiSEqCDevSCR : public DiSEqCDevDevice
     int          GetPIN(void) const        { return m_scrPin;              }
     uint GetChildCount(void) const  override // DiSEqCDevDevice
         { return 1; }
-    bool IsCommandNeeded(const DiSEqCDevSettings&,
-                         const DTVMultiplex&) const  override // DiSEqCDevDevice
+    bool IsCommandNeeded(const DiSEqCDevSettings &/*settings*/,
+                         const DTVMultiplex &/*tuning*/) const  override // DiSEqCDevDevice
         { return false; }
-    uint GetVoltage(const DiSEqCDevSettings&,
-                    const DTVMultiplex&) const override; // DiSEqCDevDevice
+    uint GetVoltage(const DiSEqCDevSettings &settings,
+                    const DTVMultiplex &tuning) const override; // DiSEqCDevDevice
     uint32_t     GetIntermediateFrequency(const uint32_t frequency) const;
 
     // Non-const Gets
-    DiSEqCDevDevice *GetSelectedChild(const DiSEqCDevSettings&) const override // DiSEqCDevDevice
+    DiSEqCDevDevice *GetSelectedChild(const DiSEqCDevSettings &/*settings*/) const override // DiSEqCDevDevice
         { return m_child; }
-    DiSEqCDevDevice *GetChild(uint)  override // DiSEqCDevDevice
+    DiSEqCDevDevice *GetChild(uint /*ordinal*/)  override // DiSEqCDevDevice
         { return m_child; }
 
     // statics
@@ -442,7 +444,7 @@ class DiSEqCDevLNB : public DiSEqCDevDevice
         : DiSEqCDevDevice(tree, devid) { DiSEqCDevLNB::Reset(); }
 
     // Commands
-    bool Execute(const DiSEqCDevSettings&, const DTVMultiplex&) override; // DiSEqCDevDevice
+    bool Execute(const DiSEqCDevSettings &settings, const DTVMultiplex &tuning) override; // DiSEqCDevDevice
     bool Load(void) override; // DiSEqCDevDevice
     bool Store(void) const override; // DiSEqCDevDevice
 
@@ -458,20 +460,20 @@ class DiSEqCDevLNB : public DiSEqCDevDevice
     void SetLOFSwitch(uint lof_switch)    { m_lofSwitch = lof_switch;  }
     void SetLOFHigh(  uint lof_hi)        { m_lofHi     = lof_hi;      }
     void SetLOFLow(   uint lof_lo)        { m_lofLo     = lof_lo;      }
-    void SetPolarityInverted(bool inv)    { m_pol_inv    = inv;        }
+    void SetPolarityInverted(bool inv)    { m_polInv    = inv;         }
 
     // Gets
     dvbdev_lnb_t GetType(void)      const { return m_type;             }
     uint         GetLOFSwitch(void) const { return m_lofSwitch;        }
     uint         GetLOFHigh(void)   const { return m_lofHi;            }
     uint         GetLOFLow(void)    const { return m_lofLo;            }
-    bool         IsPolarityInverted(void) const { return m_pol_inv;    }
-    bool         IsHighBand(const DTVMultiplex&) const;
-    bool         IsHorizontal(const DTVMultiplex&) const;
+    bool         IsPolarityInverted(void) const { return m_polInv;     }
+    bool         IsHighBand(const DTVMultiplex &tuning) const;
+    bool         IsHorizontal(const DTVMultiplex &tuning) const;
     uint32_t     GetIntermediateFrequency(const DiSEqCDevSettings& settings,
                                           const DTVMultiplex &tuning) const;
-    uint GetVoltage(const DiSEqCDevSettings&,
-                    const DTVMultiplex&) const override; // DiSEqCDevDevice
+    uint GetVoltage(const DiSEqCDevSettings &settings,
+                    const DTVMultiplex &tuning) const override; // DiSEqCDevDevice
 
     // statics
     static QString LNBTypeToString(dvbdev_lnb_t type)
@@ -488,7 +490,7 @@ class DiSEqCDevLNB : public DiSEqCDevDevice
     /// If a signal is circularly polarized the polarity will flip
     /// on each reflection, so antenna systems with an even number
     /// of reflectors will need to set this value.
-    bool         m_pol_inv    {false};
+    bool         m_polInv     {false};
 
     static const TypeTable kLNBTypeTable[5];
 };

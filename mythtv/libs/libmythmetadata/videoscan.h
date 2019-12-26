@@ -1,15 +1,18 @@
 #ifndef VIDEO_SCANNER_H
 #define VIDEO_SCANNER_H
 
-#include <set>
 #include <map>
+#include <set>
+#include <utility>
 #include <vector>
 
+// Qt headers
 #include <QObject> // for moc
 #include <QStringList>
 #include <QEvent>
 #include <QCoreApplication>
 
+// MythTV headers
 #include "mythmetaexp.h"
 #include "mthread.h"
 #include "mythprogressdialog.h"
@@ -22,7 +25,7 @@ class META_PUBLIC VideoScanner : public QObject
 
   public:
     VideoScanner();
-    ~VideoScanner();
+    ~VideoScanner() override;
 
     void doScan(const QStringList &dirs);
     void doScanAll(void);
@@ -43,9 +46,9 @@ class META_PUBLIC VideoScanChanges : public QEvent
   public:
     VideoScanChanges(QList<int> adds, QList<int> movs,
                      QList<int>dels) : QEvent(kEventType),
-                     m_additions(adds), m_moved(movs),
-                     m_deleted(dels) {}
-    ~VideoScanChanges() = default;
+                     m_additions(std::move(adds)), m_moved(std::move(movs)),
+                     m_deleted(std::move(dels)) {}
+    ~VideoScanChanges() override = default;
 
     QList<int> m_additions; // newly added intids
     QList<int> m_moved; // intids moved to new filename
@@ -60,7 +63,7 @@ class META_PUBLIC VideoScannerThread : public MThread
 
   public:
     explicit VideoScannerThread(QObject *parent);
-    ~VideoScannerThread();
+    ~VideoScannerThread() override;
 
     void run() override; // MThread
     void SetDirs(QStringList dirs);

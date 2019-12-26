@@ -37,7 +37,7 @@
 #ifndef _NV_ENCODEAPI_H_
 #define _NV_ENCODEAPI_H_
 
-#include <stdlib.h>
+#include <cstdlib>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -55,7 +55,7 @@ typedef short int16_t;
 typedef unsigned short uint16_t;
 #endif
 #else
-#include <stdint.h>
+#include <cstdint>
 #endif
 
 #ifdef __cplusplus

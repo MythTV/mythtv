@@ -39,7 +39,7 @@ public slots:
 
 public:
     NCPrivate(void);
-    virtual ~NCPrivate();
+    ~NCPrivate() override;
 
     /**
      * Queue a notification
@@ -148,14 +148,14 @@ class MythNotificationScreen : public MythScreenType
     Q_OBJECT
 
 public:
-    MythNotificationScreen(MythScreenStack *stack,
+    explicit MythNotificationScreen(MythScreenStack *stack,
                              int id = -1);
     MythNotificationScreen(MythScreenStack *stack,
                              MythNotification &notification);
     MythNotificationScreen(MythScreenStack *stack,
                              const MythNotificationScreen &screen);
     
-    virtual ~MythNotificationScreen();
+    ~MythNotificationScreen() override;
 
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
@@ -245,7 +245,7 @@ public:
     {
     }
 
-    virtual ~MythNotificationScreenStack()
+    ~MythNotificationScreenStack() override
     {
         m_owner->ScreenStackDeleted();
     }

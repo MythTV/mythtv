@@ -1102,10 +1102,14 @@ void MusicMetadata::toMap(InfoMap &metadataMap, const QString &prefix)
         metadataMap[prefix + "length"] = QString().sprintf("%02d:%02d", em, es);
 
     if (m_lastPlay.isValid())
+    {
         metadataMap[prefix + "lastplayed"] =
             MythDate::toString(m_lastPlay, kDateFull | kSimplify | kAddYear);
+    }
     else
+    {
         metadataMap[prefix + "lastplayed"] = tr("Never Played");
+    }
 
     metadataMap[prefix + "dateadded"] = MythDate::toString(
         m_dateAdded, kDateFull | kSimplify | kAddYear);
@@ -1970,20 +1974,28 @@ void AlbumArtImages::findImages(void)
                 if (embedded)
                 {
                     if (url.scheme() == "myth")
+                    {
                         image->m_filename = MythCoreContext::GenMythURL(url.host(), url.port(),
                                                                         QString("AlbumArt/") + query.value(1).toString(),
                                                                         "MusicArt");
+                    }
                     else
+                    {
                         image->m_filename = query.value(1).toString();
+                    }
                 }
                 else
                 {
                     if (url.scheme() == "myth")
+                    {
                         image->m_filename =  MythCoreContext::GenMythURL(url.host(), url.port(),
                                                                          query.value(1).toString(),
                                                                          "Music");
+                    }
                     else
+                    {
                         image->m_filename = query.value(1).toString();
+                    }
                 }
 
                 image->m_imageType = (ImageType) query.value(3).toInt();
@@ -2310,8 +2322,10 @@ void AlbumArtImages::dumpToDatabase(void)
         query.bindValue(":HOSTNAME", image->m_hostname);
 
         if (!query.exec())
+        {
             MythDB::DBError("AlbumArtImages::dumpToDatabase - "
                             "add/update music_albumart", query);
+        }
         else
         {
             if (image->m_id <= 0)

@@ -55,7 +55,7 @@ class UPnpSearchTask : public Task
 
         // Destructor protected to force use of Release Method
 
-        virtual ~UPnpSearchTask() = default;
+        ~UPnpSearchTask() override = default;
 
         void     ProcessDevice ( MSocketDevice *pSocket, UPnpDevice *pDevice );
         void     SendMsg       ( MSocketDevice  *pSocket,
@@ -71,7 +71,7 @@ class UPnpSearchTask : public Task
                         QString      sUDN );
 
         QString Name() override { return( "Search" ); } // Task
-        void Execute( TaskQueue * ) override; // Task
+        void Execute( TaskQueue *pQueue ) override; // Task
 
 };
 

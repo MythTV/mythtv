@@ -18,8 +18,8 @@ class MediaMonitorUnix : public MediaMonitor
 #if CONFIG_QTDBUS
     Q_OBJECT
   public slots:
-    Q_NOREPLY void deviceAdded(const QDBusObjectPath&);
-    Q_NOREPLY void deviceRemoved(const QDBusObjectPath&);
+    Q_NOREPLY void deviceAdded(const QDBusObjectPath& o);
+    Q_NOREPLY void deviceRemoved(const QDBusObjectPath& o);
 #endif
 
   public:
@@ -29,7 +29,7 @@ class MediaMonitorUnix : public MediaMonitor
 #endif
 
   protected:
-    ~MediaMonitorUnix() = default;
+    ~MediaMonitorUnix() override = default;
 
 #if !CONFIG_QTDBUS
     void CheckDeviceNotifications(void) override; // MediaMonitor

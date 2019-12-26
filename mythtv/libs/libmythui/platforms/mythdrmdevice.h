@@ -18,8 +18,8 @@ extern "C" {
 class MythDRMDevice : public ReferenceCounter
 {
   public:
-    MythDRMDevice(QScreen *qScreen, QString Device = QString());
-   ~MythDRMDevice();
+    MythDRMDevice(QScreen *qScreen, const QString& Device = QString());
+   ~MythDRMDevice() override;
 
     QString  GetSerialNumber(void) const;
     QScreen* GetScreen      (void) const;
@@ -37,9 +37,9 @@ class MythDRMDevice : public ReferenceCounter
     bool     Initialise     (void);
 
     QString  FindBestDevice (void);
-    static bool ConfirmDevice(QString Device);
+    static bool ConfirmDevice(const QString& Device);
 
-    drmModePropertyBlobPtr GetBlobProperty(drmModeConnectorPtr Connector, QString Property);
+    drmModePropertyBlobPtr GetBlobProperty(drmModeConnectorPtr Connector, const QString& Property);
 
   private:
     QScreen*           m_screen        { nullptr };

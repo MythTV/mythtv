@@ -115,9 +115,11 @@ bool HouseKeeperTask::CheckRun(QDateTime now)
     LOG(VB_GENERAL, LOG_DEBUG, QString("Checking to run %1").arg(GetTag()));
     bool check = false;
     if (!m_confirm && !m_running && (check = DoCheckRun(std::move(now))))
+    {
         // if m_confirm is already set, the task is already in the queue
         // and should not be queued a second time
         m_confirm = true;
+    }
     return check;
 }
 
@@ -153,12 +155,16 @@ bool HouseKeeperTask::Run(void)
     bool res = DoRun();
     m_running = false;
     if (!res)
+    {
         LOG(VB_GENERAL, LOG_INFO, QString("HouseKeeperTask '%1' Failed.")
                                 .arg(m_dbTag));
+    }
     else
+    {
         LOG(VB_GENERAL, LOG_INFO,
                 QString("HouseKeeperTask '%1' Finished Successfully.")
                     .arg(m_dbTag));
+    }
     return res;
 }
 
@@ -240,36 +246,48 @@ QDateTime HouseKeeperTask::UpdateLastRun(const QDateTime& last, bool successful)
             // not previously set, perform insert
 
             if (m_scope == kHKGlobal)
+            {
                 query.prepare("INSERT INTO housekeeping"
                               "         (tag, lastrun, lastsuccess)"
                               "     VALUES (:TAG, :TIME, :STIME)");
+            }
             else
+            {
                 query.prepare("INSERT INTO housekeeping"
                               "         (tag, hostname, lastrun, lastsuccess)"
                               "     VALUES (:TAG, :HOST, :TIME, :STIME)");
+            }
         }
         else
         {
             // previously set, perform update
 
             if (m_scope == kHKGlobal)
+            {
                 query.prepare("UPDATE housekeeping SET lastrun=:TIME,"
                               "                        lastsuccess=:STIME"
                               " WHERE tag = :TAG"
                               "   AND hostname IS NULL");
+            }
             else
+            {
                 query.prepare("UPDATE housekeeping SET lastrun=:TIME,"
                               "                        lastsuccess=:STIME"
                               " WHERE tag = :TAG"
                               "   AND hostname = :HOST");
+            }
         }
 
         if (m_scope == kHKGlobal)
+        {
             LOG(VB_GENERAL, LOG_DEBUG,
                     QString("Updating global run time for %1").arg(m_dbTag));
+        }
         else
+        {
             LOG(VB_GENERAL, LOG_DEBUG,
                     QString("Updating local run time for %1").arg(m_dbTag));
+        }
 
         if (m_scope == kHKLocal)
             query.bindValue(":HOST", gCoreContext->GetHostName());
@@ -332,9 +350,11 @@ void PeriodicHouseKeeperTask::CalculateWindow(void)
 {
     int period = m_period;
     if (GetLastRun() > GetLastSuccess())
+    {
         // last attempt was not successful
         // try shortened period
         period = m_retry;
+    }
 
     m_windowElapsed.first =
                     (uint32_t)((float)period * m_windowPercent.first);
@@ -565,7 +585,7 @@ void HouseKeepingThread::run(void)
  *  Tasks cannot be removed from the housekeeper once added.
  *
  */
-HouseKeeper::HouseKeeper(void) : m_timer(nullptr)
+HouseKeeper::HouseKeeper(void)
 {
     m_timer = new QTimer(this);
     connect(m_timer, SIGNAL(timeout()), this, SLOT(Run()));
@@ -765,10 +785,12 @@ void HouseKeeper::Run(void)
 
         int count2 = m_threadList.size();
         if (count1 > count2)
+        {
             LOG(VB_GENERAL, LOG_DEBUG,
                 QString("Discarded HouseKeepingThreads have completed and "
                         "been deleted. Current count %1 -> %2.")
                             .arg(count1).arg(count2));
+        }
     }
 }
 
@@ -848,10 +870,12 @@ void HouseKeeper::customEvent(QEvent *e)
                 if ((m_taskMap[tag]->GetScope() == kHKGlobal) ||
                         ((m_taskMap[tag]->GetScope() == kHKLocal) &&
                          (gCoreContext->GetHostName() == hostname)))
+                {
                     // task being run in the same scope as us.
                     // update the run time so we don't attempt to run
                     //      it ourselves
                     m_taskMap[tag]->SetLastRun(last, successful);
+                }
             }
         }
     }

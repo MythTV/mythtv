@@ -3,13 +3,14 @@
 
 #include <cstdint>
 #include <iostream>
+#include <utility>
 
 // qt
-#include <QString>
-#include <QStringList>
+#include <QDateTime>
 #include <QKeyEvent>
 #include <QList>
-#include <QDateTime>
+#include <QString>
+#include <QStringList>
 
 // myth
 #include <mythscreentype.h>
@@ -49,7 +50,7 @@ class ArchiveFileSelector : public FileSelector
 
   public:
     explicit ArchiveFileSelector(MythScreenStack *parent);
-    ~ArchiveFileSelector(void);
+    ~ArchiveFileSelector(void) override;
 
     bool Create(void) override; // FileSelector
 
@@ -76,12 +77,12 @@ class ImportNative : public MythScreenType
 
   public:
       ImportNative(MythScreenStack *parent, MythScreenType *previousScreen,
-                   const QString &xmlFile, FileDetails details)
+                   QString xmlFile, FileDetails details)
           : MythScreenType(parent, "ImportNative"),
-            m_xmlFile(xmlFile),
-            m_details(details),
+            m_xmlFile(std::move(xmlFile)),
+            m_details(std::move(details)),
             m_previousScreen(previousScreen) {}
-      ~ImportNative() = default;
+      ~ImportNative() override = default;
 
       bool Create(void) override; // MythScreenType
       bool keyPressEvent(QKeyEvent *e) override; // MythScreenType
@@ -111,24 +112,24 @@ class ImportNative : public MythScreenType
 
     QStringList     m_searchList;
 
-    MythUIText   *m_progTitle_text        {nullptr};
-    MythUIText   *m_progDateTime_text     {nullptr};
-    MythUIText   *m_progDescription_text  {nullptr};
+    MythUIText   *m_progTitleText         {nullptr};
+    MythUIText   *m_progDateTimeText      {nullptr};
+    MythUIText   *m_progDescriptionText   {nullptr};
 
-    MythUIText   *m_chanID_text           {nullptr};
-    MythUIText   *m_chanNo_text           {nullptr};
-    MythUIText   *m_chanName_text         {nullptr};
-    MythUIText   *m_callsign_text         {nullptr};
+    MythUIText   *m_chanIDText            {nullptr};
+    MythUIText   *m_chanNoText            {nullptr};
+    MythUIText   *m_chanNameText          {nullptr};
+    MythUIText   *m_callsignText          {nullptr};
 
-    MythUIText   *m_localChanID_text      {nullptr};
-    MythUIText   *m_localChanNo_text      {nullptr};
-    MythUIText   *m_localChanName_text    {nullptr};
-    MythUIText   *m_localCallsign_text    {nullptr};
+    MythUIText   *m_localChanIDText       {nullptr};
+    MythUIText   *m_localChanNoText       {nullptr};
+    MythUIText   *m_localChanNameText     {nullptr};
+    MythUIText   *m_localCallsignText     {nullptr};
 
-    MythUIButton *m_searchChanID_button   {nullptr};
-    MythUIButton *m_searchChanNo_button   {nullptr};
-    MythUIButton *m_searchChanName_button {nullptr};
-    MythUIButton *m_searchCallsign_button {nullptr};
+    MythUIButton *m_searchChanIDButton    {nullptr};
+    MythUIButton *m_searchChanNoButton    {nullptr};
+    MythUIButton *m_searchChanNameButton  {nullptr};
+    MythUIButton *m_searchCallsignButton  {nullptr};
 
     MythUIButton *m_finishButton          {nullptr};
     MythUIButton *m_prevButton            {nullptr};

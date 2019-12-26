@@ -293,13 +293,17 @@ bool EITCache::WriteChannelToDB(QStringList &value_clauses, uint chanid)
     unlock_channel(chanid, updated);
 
     if (updated)
+    {
         LOG(VB_EIT, LOG_INFO, LOC + QString("Writing %1 modified entries of %2 "
                                       "for channel %3 to database.")
                 .arg(updated).arg(size).arg(chanid));
+    }
     if (removed)
+    {
         LOG(VB_EIT, LOG_INFO, LOC + QString("Removed %1 old entries of %2 "
                                       "for channel %3 from cache.")
                 .arg(removed).arg(size).arg(chanid));
+    }
     m_pruneCnt += removed;
 
     return true;

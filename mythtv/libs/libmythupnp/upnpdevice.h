@@ -13,10 +13,14 @@
 #ifndef __UPNPDEVICE_H__
 #define __UPNPDEVICE_H__
 
+#include <utility>
+
+// Qt headers
 #include <QDomDocument>
 #include <QUrl>
 #include <QUrlQuery>
 
+// MythTV headers
 #include "compat.h"
 #include "upnpexp.h"
 #include "upnputil.h"
@@ -46,11 +50,11 @@ class UPNP_PUBLIC UPnpIcon
   public:
     QString     m_sURL;
     QString     m_sMimeType;
-    int         m_nWidth;
-    int         m_nHeight;
-    int         m_nDepth;
+    int         m_nWidth    { 0 };
+    int         m_nHeight   { 0 };
+    int         m_nDepth    { 0 };
 
-    UPnpIcon() : m_nWidth(0), m_nHeight(0), m_nDepth(0) {}
+    UPnpIcon() = default;
 
     QString toString(uint padding) const
     {
@@ -112,7 +116,7 @@ class UPNP_PUBLIC UPnpDevice
         NameValues      m_lstExtra;
 
         /// MythTV specific information
-        bool            m_securityPin;
+        bool            m_securityPin     { false };
         QString         m_protocolVersion;
 
         UPnpIconList    m_listIcons;
@@ -212,7 +216,7 @@ class UPNP_PUBLIC DeviceLocation : public ReferenceCounter
         // Destructor protected to force use of Release Method
         // ==================================================================
 
-        virtual        ~DeviceLocation()
+        ~DeviceLocation() override
         {
             // Should be atomic decrement
             g_nAllocated--;
@@ -234,15 +238,15 @@ class UPNP_PUBLIC DeviceLocation : public ReferenceCounter
 
         // ==================================================================
 
-        DeviceLocation( const QString &sURI,
-                        const QString &sUSN,
-                        const QString &sLocation,
+        DeviceLocation( QString sURI,
+                        QString sUSN,
+                        QString sLocation,
                         TaskTime       ttExpires ) : ReferenceCounter(
                                                          "DeviceLocation"     ),
                                                      m_pDeviceDesc( nullptr   ),
-                                                     m_sURI       ( sURI      ),
-                                                     m_sUSN       ( sUSN      ),
-                                                     m_sLocation  ( sLocation ),
+                                                     m_sURI       (std::move( sURI      )),
+                                                     m_sUSN       (std::move( sUSN      )),
+                                                     m_sLocation  (std::move( sLocation )),
                                                      m_ttExpires  ( ttExpires )
         {
             // Should be atomic increment

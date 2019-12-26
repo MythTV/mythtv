@@ -14,12 +14,12 @@ class PlayerSettings : public MythScreenType
 
   public:
 
-    PlayerSettings(MythScreenStack *parent, const char *name = nullptr)
+    explicit PlayerSettings(MythScreenStack *parent, const char *name = nullptr)
         : MythScreenType(parent, name) {}
-    ~PlayerSettings() = default;
+    ~PlayerSettings() override = default;
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
   private:
     MythUITextEdit   *m_defaultPlayerEdit {nullptr};

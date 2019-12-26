@@ -1,7 +1,7 @@
 #ifndef VIDEOVISUAL_H
 #define VIDEOVISUAL_H
 
-#include "stdint.h"
+#include <cstdint>
 
 #include <QRect>
 #include <QList>
@@ -46,7 +46,7 @@ class MTV_PUBLIC VideoVisual : public MythTV::Visual
     static QStringList GetVisualiserList(RenderType type);
 
     VideoVisual(AudioPlayer *audio, MythRender *render);
-   ~VideoVisual();
+   ~VideoVisual() override;
 
     virtual void Draw(const QRect &area, MythPainter *painter,
                       QPaintDevice* device) = 0;

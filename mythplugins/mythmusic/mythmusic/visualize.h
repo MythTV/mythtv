@@ -80,7 +80,7 @@ class VisualBase
 
     // this is called on nodes that will not be displayed :: Not needed for most visualizations
     // (i.e. between the displayed frames, if you need the whole audio stream)
-    virtual bool processUndisplayed( VisualNode * )
+    virtual bool processUndisplayed( VisualNode */*node*/ )
     {
         return true; // By default this does nothing : Ignore the in-between chunks of audio data
     };
@@ -120,7 +120,7 @@ class StereoScope : public VisualBase
 {
   public:
     StereoScope();
-    virtual ~StereoScope() = default;
+    ~StereoScope() override = default;
 
     void resize( const QSize &size ) override; // VisualBase
     bool process( VisualNode *node ) override; // VisualBase
@@ -141,7 +141,7 @@ class MonoScope : public StereoScope
 {
   public:
     MonoScope() = default;
-    virtual ~MonoScope() = default;
+    ~MonoScope() override = default;
 
     bool process( VisualNode *node ) override; // StereoScope
     bool draw( QPainter *p, const QColor &back ) override; // StereoScope
@@ -150,15 +150,15 @@ class MonoScope : public StereoScope
 class LogScale
 {
   public:
-    LogScale(int = 0, int = 0);
+    explicit LogScale(int maxscale = 0, int maxrange = 0);
     ~LogScale();
 
     int scale() const { return m_s; }
     int range() const { return m_r; }
 
-    void setMax(int, int);
+    void setMax(int maxscale, int maxrange);
 
-    int operator[](int);
+    int operator[](int index);
 
 
   private:
@@ -176,7 +176,7 @@ class Spectrum : public VisualBase
     
   public:
     Spectrum();
-    virtual ~Spectrum();
+    ~Spectrum() override;
 
     void resize(const QSize &size) override; // VisualBase
     bool process(VisualNode *node) override; // VisualBase
@@ -212,7 +212,7 @@ class Squares : public Spectrum
 {
   public:
     Squares();
-    virtual ~Squares() = default;
+    ~Squares() override = default;
 
     void resize (const QSize &newsize) override; // Spectrum
     bool draw(QPainter *p, const QColor &back = Qt::black) override; // Spectrum
@@ -222,8 +222,8 @@ class Squares : public Spectrum
   private:
     void drawRect(QPainter *p, QRect *rect, int i, int c, int w, int h);
     QSize m_actualSize        {0,0};
-    int   m_fake_height       {0};
-    int   m_number_of_squares {16};
+    int   m_fakeHeight        {0};
+    int   m_numberOfSquares   {16};
 };
 
 #endif // FFTW3_SUPPORT
@@ -260,7 +260,7 @@ struct piano_key_data {
 
   public:
     Piano();
-    virtual ~Piano();
+    ~Piano() override;
 
     void resize(const QSize &size) override; // VisualBase
 
@@ -301,7 +301,7 @@ class AlbumArt : public VisualBase
 
   public:
     AlbumArt(void);
-    virtual ~AlbumArt() = default;
+    ~AlbumArt() override = default;
 
     void resize(const QSize &size) override; // VisualBase
     bool process(VisualNode *node = nullptr) override; // VisualBase
@@ -327,7 +327,7 @@ class Blank : public VisualBase
     // This draws ... well ... nothing    
   public:
     Blank();
-    virtual ~Blank() = default;
+    ~Blank() override = default;
 
     void resize(const QSize &size) override; // VisualBase
     bool process(VisualNode *node = nullptr) override; // VisualBase

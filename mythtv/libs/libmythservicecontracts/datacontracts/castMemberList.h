@@ -31,7 +31,7 @@ class SERVICE_PUBLIC CastMemberList : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Q_INVOKABLE CastMemberList(QObject *parent = nullptr)
+        Q_INVOKABLE explicit CastMemberList(QObject *parent = nullptr)
             : QObject( parent )
         {
         }
@@ -46,7 +46,7 @@ class SERVICE_PUBLIC CastMemberList : public QObject
             // We must make sure the object added to the QVariantList has
             // a parent of 'this'
 
-            CastMember *pObject = new CastMember( this );
+            auto *pObject = new CastMember( this );
             m_CastMembers.append( QVariant::fromValue<QObject *>( pObject ));
 
             return pObject;

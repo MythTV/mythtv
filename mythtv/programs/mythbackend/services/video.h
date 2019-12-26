@@ -142,7 +142,7 @@ class ScriptableVideo : public QObject
 
     public:
 
-        Q_INVOKABLE ScriptableVideo( QScriptEngine *pEngine, QObject *parent = nullptr ) : QObject( parent )
+        Q_INVOKABLE explicit ScriptableVideo( QScriptEngine *pEngine, QObject *parent = nullptr ) : QObject( parent )
         {
             m_pEngine = pEngine;
         }
@@ -288,6 +288,7 @@ class ScriptableVideo : public QObject
         }
 };
 
+// NOLINTNEXTLINE(modernize-use-auto)
 Q_SCRIPT_DECLARE_QMETAOBJECT_MYTHTV( ScriptableVideo, QObject*);
 
 #endif

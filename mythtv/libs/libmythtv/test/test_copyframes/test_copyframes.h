@@ -34,12 +34,12 @@ class TestCopyFrames: public QObject
 
   private slots:
     // called at the beginning of these sets of tests
-    void initTestCase(void)
+    static void initTestCase(void)
     {
         gCoreContext = new MythCoreContext("bin_version", nullptr);
     }
 
-    void YV12copy_data(void)
+    static void YV12copy_data(void)
     {
         QTest::addColumn<bool>("SSE");
         QTest::newRow("SSE") << true;
@@ -47,14 +47,15 @@ class TestCopyFrames: public QObject
     }
 
     // YV12 -> YV12 SSE
-    void YV12copy(void)
+    static void YV12copy(void)
     {
         QFETCH(bool, SSE);
-        VideoFrame src, dst;
+        VideoFrame src;
+        VideoFrame dst;
         int ALIGN = 64;
         int ALIGNDST = 0;
         int sizesrc = GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGN);
-        unsigned char* bufsrc = (unsigned char*)av_malloc(sizesrc);
+        auto* bufsrc = (unsigned char*)av_malloc(sizesrc);
 
         init(&src, FMT_YV12, bufsrc, WIDTH, HEIGHT, sizesrc,
              nullptr, nullptr, 0, 0, ALIGN);
@@ -79,7 +80,7 @@ class TestCopyFrames: public QObject
         }
 
         int sizedst = GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST);
-        unsigned char* bufdst = (unsigned char*)av_malloc(sizedst);
+        auto* bufdst = (unsigned char*)av_malloc(sizedst);
 
         init(&dst, FMT_YV12, bufdst, WIDTH, HEIGHT, sizedst,
              nullptr, nullptr, 0, 0, ALIGNDST);
@@ -128,7 +129,7 @@ class TestCopyFrames: public QObject
         av_freep(&bufdst);
     }
 
-    void NV12copy_data(void)
+    static void NV12copy_data(void)
     {
         QTest::addColumn<bool>("SSE");
         QTest::newRow("SSE") << true;
@@ -136,14 +137,15 @@ class TestCopyFrames: public QObject
     }
 
     // NV12 -> YV12
-    void NV12copy(void)
+    static void NV12copy(void)
     {
         QFETCH(bool, SSE);
         int ALIGN = 64;
         int ALIGNDST = 0;
-        VideoFrame src, dst;
+        VideoFrame src;
+        VideoFrame dst;
         int sizesrc = GetBufferSize(FMT_NV12, WIDTH, HEIGHT, ALIGN);
-        unsigned char* bufsrc = (unsigned char*)av_malloc(sizesrc);
+        auto* bufsrc = (unsigned char*)av_malloc(sizesrc);
 
         init(&src, FMT_NV12, bufsrc, WIDTH, HEIGHT, sizesrc,
              nullptr, nullptr, 0, 0, ALIGN);
@@ -165,7 +167,7 @@ class TestCopyFrames: public QObject
         }
 
         int sizedst = GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST);
-        unsigned char* bufdst = (unsigned char*)av_malloc(sizedst);
+        auto* bufdst = (unsigned char*)av_malloc(sizedst);
         init(&dst, FMT_YV12, bufdst, WIDTH, HEIGHT, sizedst,
              nullptr, nullptr, 0, 0, ALIGNDST);
 
@@ -203,7 +205,7 @@ class TestCopyFrames: public QObject
         av_freep(&bufdst);
     }
 
-    void NV12SSEcopy_data(void)
+    static void NV12SSEcopy_data(void)
     {
         QTest::addColumn<int>("ALIGN");
         QTest::newRow("64") << 64;
@@ -213,13 +215,14 @@ class TestCopyFrames: public QObject
     }
 
     // NV12 -> YV12 SSE, various stride aligned sizes
-    void NV12SSEcopy(void)
+    static void NV12SSEcopy(void)
     {
         QFETCH(int, ALIGN);
         const int ALIGNDST = 0;
-        VideoFrame src, dst;
+        VideoFrame src;
+        VideoFrame dst;
         int sizesrc = GetBufferSize(FMT_NV12, WIDTH, HEIGHT, ALIGN);
-        unsigned char* bufsrc = (unsigned char*)av_malloc(sizesrc);
+        auto* bufsrc = (unsigned char*)av_malloc(sizesrc);
 
         init(&src, FMT_NV12, bufsrc, WIDTH, HEIGHT, sizesrc,
              nullptr, nullptr, 0, 0, ALIGN);
@@ -241,7 +244,7 @@ class TestCopyFrames: public QObject
         }
 
         int sizedst = GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST);
-        unsigned char* bufdst = (unsigned char*)av_malloc(sizedst);
+        auto* bufdst = (unsigned char*)av_malloc(sizedst);
         init(&dst, FMT_YV12, bufdst, WIDTH, HEIGHT, sizedst,
              nullptr, nullptr, 0, 0, ALIGNDST);
         int stride2 = ALIGNDST ? (WIDTH + ALIGNDST - 1) & ~(ALIGNDST -1) : WIDTH;
@@ -283,7 +286,7 @@ class TestCopyFrames: public QObject
         av_freep(&bufdst);
     }
 
-    void NV12StrideAligned_data(void)
+    static void NV12StrideAligned_data(void)
     {
         QTest::addColumn<int>("ALIGNDST");
         QTest::newRow("64") << 64;
@@ -293,12 +296,13 @@ class TestCopyFrames: public QObject
     }
 
     // NV12 -> YV12 SSE
-    void NV12StrideAligned(void)
+    static void NV12StrideAligned(void)
     {
         QFETCH(int, ALIGNDST);
         const int ALIGN = 0;
-        VideoFrame src, dst;
-        unsigned char* bufsrc =
+        VideoFrame src;
+        VideoFrame dst;
+        auto* bufsrc =
             (unsigned char*)av_malloc(GetBufferSize(FMT_NV12, WIDTH, HEIGHT, ALIGN));
 
         init(&src, FMT_NV12, bufsrc, WIDTH, HEIGHT, GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGN),
@@ -321,7 +325,7 @@ class TestCopyFrames: public QObject
         }
 
         int sizedst = GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST);
-        unsigned char* bufdst = (unsigned char*)av_malloc(sizedst);
+        auto* bufdst = (unsigned char*)av_malloc(sizedst);
         init(&dst, FMT_YV12, bufdst, WIDTH, HEIGHT, sizedst,
              nullptr, nullptr, 0, 0, ALIGNDST);
 
@@ -364,7 +368,7 @@ class TestCopyFrames: public QObject
         av_freep(&bufdst);
     }
 
-    void NV12SSEcopySrcNotAligned_data(void)
+    static void NV12SSEcopySrcNotAligned_data(void)
     {
         QTest::addColumn<int>("ALIGN");
         QTest::newRow("64") << 64;
@@ -374,12 +378,13 @@ class TestCopyFrames: public QObject
     }
 
     // NV12 -> YV12 SSE
-    void NV12SSEcopySrcNotAligned(void)
+    static void NV12SSEcopySrcNotAligned(void)
     {
         QFETCH(int, ALIGN);
         const int ALIGNDST = 0;
-        VideoFrame src, dst;
-        unsigned char* bufsrc =
+        VideoFrame src;
+        VideoFrame dst;
+        auto* bufsrc =
             (unsigned char*)av_malloc(GetBufferSize(FMT_NV12, WIDTH, HEIGHT, ALIGN));
 
         init(&src, FMT_NV12, bufsrc + 1, WIDTH, HEIGHT, GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGN),
@@ -400,7 +405,7 @@ class TestCopyFrames: public QObject
             }
         }
 
-        unsigned char* bufdst =
+        auto* bufdst =
             (unsigned char*)av_malloc(GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST));
 
         init(&dst, FMT_YV12, bufdst, WIDTH, HEIGHT, GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST),
@@ -444,7 +449,7 @@ class TestCopyFrames: public QObject
         av_freep(&bufdst);
     }
 
-    void NV12StrideAligned_DstNotAligned_data(void)
+    static void NV12StrideAligned_DstNotAligned_data(void)
     {
         QTest::addColumn<int>("ALIGNDST");
         QTest::newRow("64") << 64;
@@ -454,12 +459,13 @@ class TestCopyFrames: public QObject
     }
 
     // NV12 -> YV12 SSE
-    void NV12StrideAligned_DstNotAligned(void)
+    static void NV12StrideAligned_DstNotAligned(void)
     {
         QFETCH(int, ALIGNDST);
         const int ALIGN = 0;
-        VideoFrame src, dst;
-        unsigned char* bufsrc =
+        VideoFrame src;
+        VideoFrame dst;
+        auto* bufsrc =
             (unsigned char*)av_malloc(GetBufferSize(FMT_NV12, WIDTH, HEIGHT, ALIGN));
 
         init(&src, FMT_NV12, bufsrc, WIDTH, HEIGHT, GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGN),
@@ -480,7 +486,7 @@ class TestCopyFrames: public QObject
             }
         }
 
-        unsigned char* bufdst =
+        auto* bufdst =
             (unsigned char*)av_malloc(GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST));
 
         init(&dst, FMT_YV12, bufdst + 1, WIDTH, HEIGHT, GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST),
@@ -525,7 +531,7 @@ class TestCopyFrames: public QObject
         av_freep(&bufdst);
     }
 
-    void NV12StrideAligned_NeitherAligned_data(void)
+    static void NV12StrideAligned_NeitherAligned_data(void)
     {
         QTest::addColumn<int>("ALIGNDST");
         QTest::newRow("64") << 64;
@@ -536,12 +542,13 @@ class TestCopyFrames: public QObject
     }
 
     // NV12 -> YV12 SSE
-    void NV12StrideAligned_NeitherAligned(void)
+    static void NV12StrideAligned_NeitherAligned(void)
     {
         QFETCH(int, ALIGNDST);
         const int ALIGN = 0;
-        VideoFrame src, dst;
-        unsigned char* bufsrc =
+        VideoFrame src;
+        VideoFrame dst;
+        auto* bufsrc =
             (unsigned char*)av_malloc(GetBufferSize(FMT_NV12, WIDTH, HEIGHT, ALIGN));
 
         init(&src, FMT_NV12, bufsrc + 1, WIDTH, HEIGHT, GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGN),
@@ -562,7 +569,7 @@ class TestCopyFrames: public QObject
             }
         }
 
-        unsigned char* bufdst =
+        auto* bufdst =
             (unsigned char*)av_malloc(GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST));
 
         init(&dst, FMT_YV12, bufdst + 1, WIDTH, HEIGHT, GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST),
@@ -607,7 +614,7 @@ class TestCopyFrames: public QObject
         av_freep(&bufdst);
     }
 
-    void NV12VariousWidth_data(void)
+    static void NV12VariousWidth_data(void)
     {
         QTest::addColumn<int>("width");
         QTest::newRow("1080") << 1080;
@@ -618,14 +625,15 @@ class TestCopyFrames: public QObject
     }
 
     // NV12 -> YV12
-    void NV12VariousWidth(void)
+    static void NV12VariousWidth(void)
     {
         QFETCH(int, width);
         int ALIGN = 64;
         int ALIGNDST = 0;
-        VideoFrame src, dst;
+        VideoFrame src;
+        VideoFrame dst;
         int sizesrc = GetBufferSize(FMT_NV12, width, HEIGHT, ALIGN);
-        unsigned char* bufsrc = (unsigned char*)av_malloc(sizesrc);
+        auto* bufsrc = (unsigned char*)av_malloc(sizesrc);
 
         init(&src, FMT_NV12, bufsrc, width, HEIGHT, sizesrc,
              nullptr, nullptr, 0, 0, ALIGN);
@@ -647,7 +655,7 @@ class TestCopyFrames: public QObject
         }
 
         int sizedst = GetBufferSize(FMT_YV12, width, HEIGHT, ALIGNDST);
-        unsigned char* bufdst = (unsigned char*)av_malloc(sizedst);
+        auto* bufdst = (unsigned char*)av_malloc(sizedst);
         init(&dst, FMT_YV12, bufdst, width, HEIGHT, sizedst,
              nullptr, nullptr, 0, 0, ALIGNDST);
 
@@ -686,15 +694,16 @@ class TestCopyFrames: public QObject
     }
 
     // YV12 -> YV12 USWC
-    void YV12USWCcopy(void)
+    static void YV12USWCcopy(void)
     {
-        VideoFrame src, dst;
+        VideoFrame src;
+        VideoFrame dst;
         MythUSWCCopy mythcopy(WIDTH);
         mythcopy.setUSWC(true);
         int ALIGN = 64;
         int ALIGNDST = 0;
         int sizesrc = GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGN);
-        unsigned char* bufsrc = (unsigned char*)av_malloc(sizesrc);
+        auto* bufsrc = (unsigned char*)av_malloc(sizesrc);
 
         init(&src, FMT_YV12, bufsrc, WIDTH, HEIGHT, sizesrc,
              nullptr, nullptr, 0, 0, ALIGN);
@@ -719,7 +728,7 @@ class TestCopyFrames: public QObject
         }
 
         int sizedst = GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST);
-        unsigned char* bufdst = (unsigned char*)av_malloc(sizedst);
+        auto* bufdst = (unsigned char*)av_malloc(sizedst);
 
         init(&dst, FMT_YV12, bufdst, WIDTH, HEIGHT, sizedst,
              nullptr, nullptr, 0, 0, ALIGNDST);
@@ -768,7 +777,7 @@ class TestCopyFrames: public QObject
         av_freep(&bufdst);
     }
 
-    void NV12USWCcopy_data(void)
+    static void NV12USWCcopy_data(void)
     {
         QTest::addColumn<int>("ALIGN");
         QTest::newRow("64") << 64;
@@ -778,15 +787,16 @@ class TestCopyFrames: public QObject
     }
 
     // NV12 -> YV12 SSE, various stride aligned sizes
-    void NV12USWCcopy(void)
+    static void NV12USWCcopy(void)
     {
         QFETCH(int, ALIGN);
         const int ALIGNDST = 0;
-        VideoFrame src, dst;
+        VideoFrame src;
+        VideoFrame dst;
         MythUSWCCopy mythcopy(WIDTH);
         mythcopy.setUSWC(true);
         int sizesrc = GetBufferSize(FMT_NV12, WIDTH, HEIGHT, ALIGN);
-        unsigned char* bufsrc = (unsigned char*)av_malloc(sizesrc);
+        auto* bufsrc = (unsigned char*)av_malloc(sizesrc);
 
         init(&src, FMT_NV12, bufsrc, WIDTH, HEIGHT, sizesrc,
              nullptr, nullptr, 0, 0, ALIGN);
@@ -808,7 +818,7 @@ class TestCopyFrames: public QObject
         }
 
         int sizedst = GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST);
-        unsigned char* bufdst = (unsigned char*)av_malloc(sizedst);
+        auto* bufdst = (unsigned char*)av_malloc(sizedst);
         init(&dst, FMT_YV12, bufdst, WIDTH, HEIGHT, sizedst,
              nullptr, nullptr, 0, 0, ALIGNDST);
         int stride2 = ALIGNDST ? (WIDTH + ALIGNDST - 1) & ~(ALIGNDST -1) : WIDTH;
@@ -850,7 +860,7 @@ class TestCopyFrames: public QObject
         av_freep(&bufdst);
     }
 
-    void NV12USWCStrideAligned_data(void)
+    static void NV12USWCStrideAligned_data(void)
     {
         QTest::addColumn<int>("ALIGNDST");
         QTest::newRow("64") << 64;
@@ -860,14 +870,15 @@ class TestCopyFrames: public QObject
     }
 
     // NV12 -> YV12 SSE
-    void NV12USWCStrideAligned(void)
+    static void NV12USWCStrideAligned(void)
     {
         QFETCH(int, ALIGNDST);
         const int ALIGN = 0;
-        VideoFrame src, dst;
+        VideoFrame src;
+        VideoFrame dst;
         MythUSWCCopy mythcopy(WIDTH);
         mythcopy.setUSWC(true);
-        unsigned char* bufsrc =
+        auto* bufsrc =
             (unsigned char*)av_malloc(GetBufferSize(FMT_NV12, WIDTH, HEIGHT, ALIGN));
 
         init(&src, FMT_NV12, bufsrc, WIDTH, HEIGHT, GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGN),
@@ -890,7 +901,7 @@ class TestCopyFrames: public QObject
         }
 
         int sizedst = GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST);
-        unsigned char* bufdst = (unsigned char*)av_malloc(sizedst);
+        auto* bufdst = (unsigned char*)av_malloc(sizedst);
         init(&dst, FMT_YV12, bufdst, WIDTH, HEIGHT, sizedst,
              nullptr, nullptr, 0, 0, ALIGNDST);
 
@@ -933,7 +944,7 @@ class TestCopyFrames: public QObject
         av_freep(&bufdst);
     }
 
-    void NV12USWCcopySrcNotAligned_data(void)
+    static void NV12USWCcopySrcNotAligned_data(void)
     {
         QTest::addColumn<int>("ALIGN");
         QTest::newRow("64") << 64;
@@ -943,14 +954,15 @@ class TestCopyFrames: public QObject
     }
 
     // NV12 -> YV12 SSE
-    void NV12USWCcopySrcNotAligned(void)
+    static void NV12USWCcopySrcNotAligned(void)
     {
         QFETCH(int, ALIGN);
         const int ALIGNDST = 0;
-        VideoFrame src, dst;
+        VideoFrame src;
+        VideoFrame dst;
         MythUSWCCopy mythcopy(WIDTH);
         mythcopy.setUSWC(true);
-        unsigned char* bufsrc =
+        auto* bufsrc =
             (unsigned char*)av_malloc(GetBufferSize(FMT_NV12, WIDTH, HEIGHT, ALIGN));
 
         init(&src, FMT_NV12, bufsrc + 1, WIDTH, HEIGHT, GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGN),
@@ -971,7 +983,7 @@ class TestCopyFrames: public QObject
             }
         }
 
-        unsigned char* bufdst =
+        auto* bufdst =
             (unsigned char*)av_malloc(GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST));
 
         init(&dst, FMT_YV12, bufdst, WIDTH, HEIGHT, GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST),
@@ -1015,7 +1027,7 @@ class TestCopyFrames: public QObject
         av_freep(&bufdst);
     }
 
-    void NV12USWCStrideAligned_DstNotAligned_data(void)
+    static void NV12USWCStrideAligned_DstNotAligned_data(void)
     {
         QTest::addColumn<int>("ALIGNDST");
         QTest::newRow("64") << 64;
@@ -1025,14 +1037,15 @@ class TestCopyFrames: public QObject
     }
 
     // NV12 -> YV12 SSE
-    void NV12USWCStrideAligned_DstNotAligned(void)
+    static void NV12USWCStrideAligned_DstNotAligned(void)
     {
         QFETCH(int, ALIGNDST);
         const int ALIGN = 0;
-        VideoFrame src, dst;
+        VideoFrame src;
+        VideoFrame dst;
         MythUSWCCopy mythcopy(WIDTH);
         mythcopy.setUSWC(true);
-        unsigned char* bufsrc =
+        auto* bufsrc =
             (unsigned char*)av_malloc(GetBufferSize(FMT_NV12, WIDTH, HEIGHT, ALIGN));
 
         init(&src, FMT_NV12, bufsrc, WIDTH, HEIGHT, GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGN),
@@ -1053,7 +1066,7 @@ class TestCopyFrames: public QObject
             }
         }
 
-        unsigned char* bufdst =
+        auto* bufdst =
             (unsigned char*)av_malloc(GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST));
 
         init(&dst, FMT_YV12, bufdst + 1, WIDTH, HEIGHT, GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST),
@@ -1098,7 +1111,7 @@ class TestCopyFrames: public QObject
         av_freep(&bufdst);
     }
 
-    void NV12USWCStrideAligned_NeitherAligned_data(void)
+    static void NV12USWCStrideAligned_NeitherAligned_data(void)
     {
         QTest::addColumn<int>("ALIGNDST");
         QTest::newRow("64") << 64;
@@ -1109,14 +1122,15 @@ class TestCopyFrames: public QObject
     }
 
     // NV12 -> YV12 SSE
-    void NV12USWCStrideAligned_NeitherAligned(void)
+    static void NV12USWCStrideAligned_NeitherAligned(void)
     {
         QFETCH(int, ALIGNDST);
         const int ALIGN = 0;
-        VideoFrame src, dst;
+        VideoFrame src;
+        VideoFrame dst;
         MythUSWCCopy mythcopy(WIDTH);
         mythcopy.setUSWC(true);
-        unsigned char* bufsrc =
+        auto* bufsrc =
             (unsigned char*)av_malloc(GetBufferSize(FMT_NV12, WIDTH, HEIGHT, ALIGN));
 
         init(&src, FMT_NV12, bufsrc + 1, WIDTH, HEIGHT, GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGN),
@@ -1137,7 +1151,7 @@ class TestCopyFrames: public QObject
             }
         }
 
-        unsigned char* bufdst =
+        auto* bufdst =
             (unsigned char*)av_malloc(GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST));
 
         init(&dst, FMT_YV12, bufdst + 1, WIDTH, HEIGHT, GetBufferSize(FMT_YV12, WIDTH, HEIGHT, ALIGNDST),
@@ -1182,7 +1196,7 @@ class TestCopyFrames: public QObject
         av_freep(&bufdst);
     }
 
-    void NV12USWCVariousWidth_data(void)
+    static void NV12USWCVariousWidth_data(void)
     {
         QTest::addColumn<int>("width");
         QTest::newRow("1080") << 1080;
@@ -1193,16 +1207,17 @@ class TestCopyFrames: public QObject
     }
 
     // NV12 -> YV12
-    void NV12USWCVariousWidth(void)
+    static void NV12USWCVariousWidth(void)
     {
         QFETCH(int, width);
         int ALIGN = 64;
         int ALIGNDST = 0;
-        VideoFrame src, dst;
+        VideoFrame src;
+        VideoFrame dst;
         MythUSWCCopy mythcopy(WIDTH);
         mythcopy.setUSWC(true);
         int sizesrc = GetBufferSize(FMT_NV12, width, HEIGHT, ALIGN);
-        unsigned char* bufsrc = (unsigned char*)av_malloc(sizesrc);
+        auto* bufsrc = (unsigned char*)av_malloc(sizesrc);
 
         init(&src, FMT_NV12, bufsrc, width, HEIGHT, sizesrc,
              nullptr, nullptr, 0, 0, ALIGN);
@@ -1224,7 +1239,7 @@ class TestCopyFrames: public QObject
         }
 
         int sizedst = GetBufferSize(FMT_YV12, width, HEIGHT, ALIGNDST);
-        unsigned char* bufdst = (unsigned char*)av_malloc(sizedst);
+        auto* bufdst = (unsigned char*)av_malloc(sizedst);
         init(&dst, FMT_YV12, bufdst, width, HEIGHT, sizedst,
              nullptr, nullptr, 0, 0, ALIGNDST);
 

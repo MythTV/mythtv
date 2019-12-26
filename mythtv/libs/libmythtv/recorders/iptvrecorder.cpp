@@ -43,10 +43,10 @@ bool IPTVRecorder::Open(void)
 
     LOG(VB_RECORD, LOG_INFO, LOC + "opened successfully");
 
-    if (m_stream_data)
-        m_channel->SetStreamData(m_stream_data);
+    if (m_streamData)
+        m_channel->SetStreamData(m_streamData);
 
-    return m_stream_data;
+    return m_streamData;
 }
 
 bool IPTVRecorder::IsOpen(void) const
@@ -67,13 +67,13 @@ void IPTVRecorder::SetStreamData(MPEGStreamData *data)
 {
     DTVRecorder::SetStreamData(data);
     if (IsOpen() && !IsPaused())
-        m_channel->SetStreamData(m_stream_data);
+        m_channel->SetStreamData(m_streamData);
 }
 
 bool IPTVRecorder::PauseAndWait(int timeout)
 {
     QMutexLocker locker(&m_pauseLock);
-    if (m_request_pause)
+    if (m_requestPause)
     {
         if (!IsPaused(true))
         {
@@ -87,9 +87,9 @@ bool IPTVRecorder::PauseAndWait(int timeout)
         m_unpauseWait.wait(&m_pauseLock, timeout);
     }
 
-    if (!m_request_pause && IsPaused(true))
+    if (!m_requestPause && IsPaused(true))
     {
-        m_channel->SetStreamData(m_stream_data);
+        m_channel->SetStreamData(m_streamData);
         m_paused = false;
         m_unpauseWait.wakeAll();
     }
@@ -100,8 +100,8 @@ bool IPTVRecorder::PauseAndWait(int timeout)
 void IPTVRecorder::StartNewFile(void)
 {
     // Make sure the first things in the file are a PAT & PMT
-    HandleSingleProgramPAT(m_stream_data->PATSingleProgram(), true);
-    HandleSingleProgramPMT(m_stream_data->PMTSingleProgram(), true);
+    HandleSingleProgramPAT(m_streamData->PATSingleProgram(), true);
+    HandleSingleProgramPMT(m_streamData->PMTSingleProgram(), true);
 }
 
 void IPTVRecorder::run(void)
@@ -117,15 +117,15 @@ void IPTVRecorder::run(void)
 
     {
         QMutexLocker locker(&m_pauseLock);
-        m_request_recording = true;
+        m_requestRecording = true;
         m_recording = true;
         m_recordingWait.wakeAll();
     }
 
     StartNewFile();
 
-    m_stream_data->AddAVListener(this);
-    m_stream_data->AddWritingListener(this);
+    m_streamData->AddAVListener(this);
+    m_streamData->AddWritingListener(this);
 
     while (IsRecordingRequested() && !IsErrored())
     {
@@ -138,12 +138,12 @@ void IPTVRecorder::run(void)
         {   // sleep 100 milliseconds unless StopRecording() or Unpause()
             // is called, just to avoid running this too often.
             QMutexLocker locker(&m_pauseLock);
-            if (!m_request_recording || m_request_pause)
+            if (!m_requestRecording || m_requestPause)
                 continue;
             m_unpauseWait.wait(&m_pauseLock, 100);
         }
 
-        if (!m_input_pmt)
+        if (!m_inputPmt)
         {
             LOG(VB_GENERAL, LOG_WARNING, LOC +
                     "Recording will not commence until a PMT is set.");
@@ -154,8 +154,8 @@ void IPTVRecorder::run(void)
 
     LOG(VB_RECORD, LOG_INFO, LOC + "run -- ending...");
 
-    m_stream_data->RemoveWritingListener(this);
-    m_stream_data->RemoveAVListener(this);
+    m_streamData->RemoveWritingListener(this);
+    m_streamData->RemoveAVListener(this);
 
     Close();
 

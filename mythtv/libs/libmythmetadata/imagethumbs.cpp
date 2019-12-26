@@ -433,16 +433,18 @@ void ImageThumb<DBFS>::CreateThumbnail(const ImagePtrK &im, int priority,
     TaskPtr task(new ThumbTask("CREATE", im, priority, notify));
 
     if (im->m_type == kImageFile && m_imageThread)
-
+    {
         m_imageThread->Enqueue(task);
-
+    }
     else if (im->m_type == kVideoFile && m_videoThread)
-
+    {
         m_videoThread->Enqueue(task);
-
+    }
     else
+    {
         LOG(VB_FILE, LOG_INFO, QString("Ignoring create thumbnail %1, type %2")
             .arg(im->m_id).arg(im->m_type));
+    }
 }
 
 
@@ -459,16 +461,18 @@ void ImageThumb<DBFS>::MoveThumbnail(const ImagePtrK &im)
     TaskPtr task(new ThumbTask("MOVE", im));
 
     if (im->m_type == kImageFile && m_imageThread)
-
+    {
         m_imageThread->Enqueue(task);
-
+    }
     else if (im->m_type == kVideoFile && m_videoThread)
-
+    {
         m_videoThread->Enqueue(task);
-
+    }
     else
+    {
         LOG(VB_FILE, LOG_INFO, QString("Ignoring move thumbnail %1, type %2")
             .arg(im->m_id).arg(im->m_type));
+    }
 }
 
 

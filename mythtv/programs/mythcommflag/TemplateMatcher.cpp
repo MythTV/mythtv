@@ -310,11 +310,11 @@ TemplateMatcher::TemplateMatcher(PGMConverter *pgmc, EdgeDetector *ed,
                                  TemplateFinder *tf, const QString& debugdir) :
     m_pgmConverter(pgmc),
     m_edgeDetector(ed),   m_templateFinder(tf),
-    m_debugdir(debugdir),
+    m_debugDir(debugdir),
 #ifdef PGM_CONVERT_GREYSCALE
-    m_debugdata(debugdir + "/TemplateMatcher-pgm.txt")
+    m_debugData(debugdir + "/TemplateMatcher-pgm.txt")
 #else  /* !PGM_CONVERT_GREYSCALE */
-    m_debugdata(debugdir + "/TemplateMatcher-yuv.txt")
+    m_debugData(debugdir + "/TemplateMatcher-yuv.txt")
 #endif /* !PGM_CONVERT_GREYSCALE */
 {
     /*
@@ -327,11 +327,11 @@ TemplateMatcher::TemplateMatcher(PGMConverter *pgmc, EdgeDetector *ed,
 
     if (m_debugLevel >= 1)
     {
-        createDebugDirectory(m_debugdir,
+        createDebugDirectory(m_debugDir,
             QString("TemplateMatcher debugLevel %1").arg(m_debugLevel));
-        m_debug_matches = true;
+        m_debugMatches = true;
         if (m_debugLevel >= 2)
-            m_debug_removerunts = true;
+            m_debugRemoveRunts = true;
     }
 }
 
@@ -349,8 +349,8 @@ TemplateMatcher::MythPlayerInited(MythPlayer *_player,
     m_player = _player;
     m_fps = m_player->GetFrameRate();
 
-    if (!(m_tmpl = m_templateFinder->getTemplate(&m_tmplrow, &m_tmplcol,
-                    &m_tmplwidth, &m_tmplheight)))
+    if (!(m_tmpl = m_templateFinder->getTemplate(&m_tmplRow, &m_tmplCol,
+                    &m_tmplWidth, &m_tmplHeight)))
     {
         LOG(VB_COMMFLAG, LOG_ERR,
             QString("TemplateMatcher::MythPlayerInited: no template"));
@@ -358,12 +358,12 @@ TemplateMatcher::MythPlayerInited(MythPlayer *_player,
     }
 
     if (av_image_alloc(m_cropped.data, m_cropped.linesize,
-        m_tmplwidth, m_tmplheight, AV_PIX_FMT_GRAY8, IMAGE_ALIGN))
+        m_tmplWidth, m_tmplHeight, AV_PIX_FMT_GRAY8, IMAGE_ALIGN))
     {
         LOG(VB_COMMFLAG, LOG_ERR,
             QString("TemplateMatcher::MythPlayerInited "
                     "av_image_alloc cropped (%1x%2) failed")
-                .arg(m_tmplwidth).arg(m_tmplheight));
+                .arg(m_tmplWidth).arg(m_tmplHeight));
         return ANALYZE_FATAL;
     }
 
@@ -375,18 +375,18 @@ TemplateMatcher::MythPlayerInited(MythPlayer *_player,
 
     m_match = new unsigned char[nframes];
 
-    if (m_debug_matches)
+    if (m_debugMatches)
     {
-        if (readMatches(m_debugdata, m_matches, nframes))
+        if (readMatches(m_debugData, m_matches, nframes))
         {
             LOG(VB_COMMFLAG, LOG_INFO,
                 QString("TemplateMatcher::MythPlayerInited read %1")
-                    .arg(m_debugdata));
-            m_matches_done = true;
+                    .arg(m_debugData));
+            m_matchesDone = true;
         }
     }
 
-    if (m_matches_done)
+    if (m_matchesDone)
         return ANALYZE_FINISHED;
 
     return ANALYZE_OK;
@@ -442,7 +442,7 @@ TemplateMatcher::analyzeFrame(const VideoFrame *frame, long long frameno,
     struct timeval  end {};
     struct timeval  elapsed {};
 
-    *pNextFrame = NEXTFRAME;
+    *pNextFrame = kNextFrame;
 
     const AVFrame *pgm = m_pgmConverter->getImage(frame, frameno, &pgmwidth, &pgmheight);
     if (pgm == nullptr)
@@ -450,20 +450,20 @@ TemplateMatcher::analyzeFrame(const VideoFrame *frame, long long frameno,
 
     (void)gettimeofday(&start, nullptr);
 
-    if (pgm_crop(&m_cropped, pgm, pgmheight, m_tmplrow, m_tmplcol,
-                m_tmplwidth, m_tmplheight))
+    if (pgm_crop(&m_cropped, pgm, pgmheight, m_tmplRow, m_tmplCol,
+                m_tmplWidth, m_tmplHeight))
         goto error;
 
-    if (!(edges = m_edgeDetector->detectEdges(&m_cropped, m_tmplheight,
+    if (!(edges = m_edgeDetector->detectEdges(&m_cropped, m_tmplHeight,
                     FRAMESGMPCTILE)))
         goto error;
 
-    if (pgm_match(m_tmpl, edges, m_tmplheight, JITTER_RADIUS, &m_matches[frameno]))
+    if (pgm_match(m_tmpl, edges, m_tmplHeight, JITTER_RADIUS, &m_matches[frameno]))
         goto error;
 
     (void)gettimeofday(&end, nullptr);
     timersub(&end, &start, &elapsed);
-    timeradd(&m_analyze_time, &elapsed, &m_analyze_time);
+    timeradd(&m_analyzeTime, &elapsed, &m_analyzeTime);
 
     return ANALYZE_OK;
 
@@ -493,23 +493,23 @@ TemplateMatcher::finished(long long nframes, bool final)
     int       minseglen = 1;
     long long brkb = 0;
 
-    if (!m_matches_done && m_debug_matches)
+    if (!m_matchesDone && m_debugMatches)
     {
-        if (final && writeMatches(m_debugdata, m_matches, nframes))
+        if (final && writeMatches(m_debugData, m_matches, nframes))
         {
             LOG(VB_COMMFLAG, LOG_INFO,
-                QString("TemplateMatcher::finished wrote %1") .arg(m_debugdata));
-            m_matches_done = true;
+                QString("TemplateMatcher::finished wrote %1") .arg(m_debugData));
+            m_matchesDone = true;
         }
     }
 
-    int tmpledges = pgm_set(m_tmpl, m_tmplheight);
+    int tmpledges = pgm_set(m_tmpl, m_tmplHeight);
     int mintmpledges = pick_mintmpledges(m_matches, nframes);
 
     LOG(VB_COMMFLAG, LOG_INFO,
         QString("TemplateMatcher::finished %1x%2@(%3,%4),"
                 " %5 edge pixels, want %6")
-            .arg(m_tmplwidth).arg(m_tmplheight).arg(m_tmplcol).arg(m_tmplrow)
+            .arg(m_tmplWidth).arg(m_tmplHeight).arg(m_tmplCol).arg(m_tmplRow)
             .arg(tmpledges).arg(mintmpledges));
 
     for (long long ii = 0; ii < nframes; ii++)
@@ -547,18 +547,18 @@ TemplateMatcher::finished(long long nframes, bool final)
         if (minbreaklen <= MINBREAKLEN)
         {
             f1 = removeShortBreaks(&m_breakMap, m_fps, minbreaklen,
-                    m_debug_removerunts);
+                    m_debugRemoveRunts);
             minbreaklen++;
         }
         if (minseglen <= MINSEGLEN)
         {
             f2 = removeShortSegments(&m_breakMap, nframes, m_fps, minseglen,
-                    m_debug_removerunts);
+                    m_debugRemoveRunts);
             minseglen++;
         }
         if (minbreaklen > MINBREAKLEN && minseglen > MINSEGLEN)
             break;
-        if (m_debug_removerunts && (f1 || f2))
+        if (m_debugRemoveRunts && (f1 || f2))
             frameAnalyzerReportMap(&m_breakMap, m_fps, "** TM Break");
     }
 
@@ -580,7 +580,7 @@ TemplateMatcher::reportTime(void) const
         return -1;
 
     LOG(VB_COMMFLAG, LOG_INFO, QString("TM Time: analyze=%1s")
-            .arg(strftimeval(&m_analyze_time)));
+            .arg(strftimeval(&m_analyzeTime)));
     return 0;
 }
 

@@ -147,8 +147,7 @@ class H264Parser {
         {
             if (m_bottomFieldFlag == -1)
                 return FRAME;
-            else
-                return m_bottomFieldFlag ? FIELD_BOTTOM : FIELD_TOP;
+            return m_bottomFieldFlag ? FIELD_BOTTOM : FIELD_TOP;
         }
 
     bool onFrameStart(void) const { return m_onFrame; }

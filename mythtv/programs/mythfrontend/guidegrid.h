@@ -3,6 +3,7 @@
 #define GUIDEGRID_H_
 
 // c++
+#include <utility>
 #include <vector>
 using namespace std;
 
@@ -63,15 +64,15 @@ class JumpToChannel : public QObject
     virtual void deleteLater(void);
 
   private:
-    ~JumpToChannel() = default;
+    ~JumpToChannel() override = default;
     bool Update(void);
 
   private:
     JumpToChannelListener *m_listener {nullptr};
     QString  m_entry;
-    int      m_previous_start_channel_index;
-    int      m_previous_current_channel_index;
-    uint     m_rows_displayed;
+    int      m_previousStartChannelIndex;
+    int      m_previousCurrentChannelIndex;
+    uint     m_rowsDisplayed;
     QTimer  *m_timer                  {nullptr}; // audited ref #5318
 
     static const uint kJumpToChannelTimeout = 3500; // ms
@@ -84,10 +85,10 @@ class JumpToChannel : public QObject
 class GuideUIElement {
 public:
     GuideUIElement(int row, int col, const QRect &area,
-                   const QString &title, const QString &category,
+                   QString title, QString category,
                    int arrow, int recType, int recStat, bool selected)
-        : m_row(row), m_col(col), m_area(area), m_title(title),
-          m_category(category), m_arrow(arrow), m_recType(recType),
+        : m_row(row), m_col(col), m_area(area), m_title(std::move(title)),
+          m_category(std::move(category)), m_arrow(arrow), m_recType(recType),
           m_recStat(recStat), m_selected(selected) {}
     const int m_row;
     const int m_col;
@@ -148,7 +149,7 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
 
     void showProgFinder();
     void channelUpdate();
-    void volumeUpdate(bool);
+    void volumeUpdate(bool up);
     void toggleMute(const bool muteIndividualChannels = false);
 
     void deleteRule();
@@ -164,7 +165,7 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
               bool embedVideo = false,
               bool allowFinder = true,
               int changrpid = -1);
-   ~GuideGrid();
+   ~GuideGrid() override;
     ProgramInfo *GetCurrentProgram(void) const override // ScheduleCommon
         { return m_programInfos[m_currentRow][m_currentCol]; };
 

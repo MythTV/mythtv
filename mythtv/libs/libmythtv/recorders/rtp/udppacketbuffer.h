@@ -21,7 +21,7 @@ class UDPPacketBuffer : public PacketBuffer
     }
 
     /// Frees the packet, there is no FEC used by Raw UDP
-    void PushFECPacket(const UDPPacket &packet, unsigned int) override // PacketBuffer
+    void PushFECPacket(const UDPPacket &packet, unsigned int /*fec_stream_num*/) override // PacketBuffer
     {
         FreePacket(packet);
     }

@@ -124,7 +124,7 @@ using MSqlBindings = QMap<QString, QVariant>;
  */
 class MBASE_PUBLIC MSqlQuery : private QSqlQuery
 {
-    MBASE_PUBLIC friend void MSqlEscapeAsAQuery(QString&, MSqlBindings&);
+    MBASE_PUBLIC friend void MSqlEscapeAsAQuery(QString& query, MSqlBindings& bindings);
   public:
     /// \brief Get DB connection from pool
     explicit MSqlQuery(const MSqlQueryInfo &qi);
@@ -151,7 +151,7 @@ class MBASE_PUBLIC MSqlQuery : private QSqlQuery
 
     /// \brief Wrap QSqlQuery::seek(int,bool)
     //         so we can display the query results
-    bool seek(int, bool relative = false);
+    bool seek(int where, bool relative = false);
 
     /// \brief Wrap QSqlQuery::exec(const QString &query) so we can display SQL
     bool exec(const QString &query);
@@ -218,7 +218,7 @@ class MBASE_PUBLIC MSqlQuery : private QSqlQuery
         kNormalConnection,
     };
     /// \brief Only use this in combination with MSqlQuery constructor
-    static MSqlQueryInfo InitCon(ConnectionReuse = kNormalConnection);
+    static MSqlQueryInfo InitCon(ConnectionReuse _reuse = kNormalConnection);
 
     /// \brief Returns dedicated connection. (Required for using temporary SQL tables.)
     static MSqlQueryInfo SchedCon();

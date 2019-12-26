@@ -84,9 +84,11 @@ bool MetadataResultsDialog::Create()
             if (QFile::exists(dlfile))
                 button->SetImage(dlfile);
             else
+            {
                 m_imageDownload->addThumb(m_results[i]->GetTitle(),
                                  coverartfile,
                                  qVariantFromValue<uint>(pos));
+            }
         }
 
         button->SetTextFromMap(metadataMap);

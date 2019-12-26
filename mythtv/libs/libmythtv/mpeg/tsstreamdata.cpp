@@ -3,7 +3,7 @@
 
 #include "tsstreamdata.h"
 
-#define LOC QString("TSStream[%1](0x%2): ").arg(_cardid).arg((intptr_t)this, QT_POINTER_SIZE, 16, QChar('0'))
+#define LOC QString("TSStream[%1](0x%2): ").arg(m_cardId).arg((intptr_t)this, QT_POINTER_SIZE, 16, QChar('0'))
 
 /** \class TSStreamData
  *  \brief Specialized version of MPEGStreamData which is used to 'blindly'
@@ -31,8 +31,8 @@ bool TSStreamData::ProcessTSPacket(const TSPacket& tspacket)
     if (tspacket.Scrambled())
         LOG(VB_GENERAL, LOG_DEBUG, LOC + "ProcessTSPacket: Scrambled.");
 
-    for (size_t j = 0; j < _ts_writing_listeners.size(); j++)
-        _ts_writing_listeners[j]->ProcessTSPacket(tspacket);
+    for (size_t j = 0; j < m_tsWritingListeners.size(); j++)
+        m_tsWritingListeners[j]->ProcessTSPacket(tspacket);
 
     return true;
 }

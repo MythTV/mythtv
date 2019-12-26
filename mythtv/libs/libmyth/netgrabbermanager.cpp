@@ -57,9 +57,11 @@ void GrabberScript::run()
     uint status = getTree.Wait();
 
     if( status == GENERIC_EXIT_CMD_NOT_FOUND )
+    {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Internet Content Source %1 cannot run, file missing.")
                 .arg(m_title));
+    }
     else if( status == GENERIC_EXIT_OK )
     {
         LOG(VB_GENERAL, LOG_INFO, LOC +
@@ -86,9 +88,11 @@ void GrabberScript::run()
                     "marking as updated.").arg(m_title));
     }
     else
+    {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Internet Content Source %1 crashed while grabbing tree.")
                 .arg(m_title));
+    }
 
     // NOLINTNEXTLINE(readability-misleading-indentation)
     emit finished();

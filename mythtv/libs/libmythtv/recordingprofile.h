@@ -77,7 +77,7 @@ class MTV_PUBLIC RecordingProfile : public GroupSetting
   public:
     // initializers
     explicit RecordingProfile(const QString& profName = QString());
-    virtual ~RecordingProfile(void);
+    ~RecordingProfile(void) override;
     virtual void loadByID(int id);
     virtual bool loadByType(const QString &name, const QString &cardtype,
                             const QString &videodev);
@@ -127,7 +127,7 @@ class MTV_PUBLIC RecordingProfile : public GroupSetting
                                int group, bool foldautodetect = false);
 
     // constants
-    static const uint TranscoderAutodetect = 0; ///< sentinel value
+    static const uint kTranscoderAutodetect = 0; ///< sentinel value
 
   private slots:
     void ResizeTranscode(const QString &val);
@@ -156,13 +156,13 @@ class RecordingProfileEditor :
 
   public:
     RecordingProfileEditor(int id, QString profName);
-    virtual ~RecordingProfileEditor() = default;
+    ~RecordingProfileEditor() override = default;
 
     void Load(void) override; // StandardSetting
 
   public slots:
     void ShowNewProfileDialog();
-    void CreateNewProfile(const QString&);
+    void CreateNewProfile(const QString &profName);
 
   protected:
     int             m_group;

@@ -1,13 +1,15 @@
 #ifndef RSSEDITOR_H
 #define RSSEDITOR_H
 
+#include <utility>
+
 // Qt headers
-#include <QMutex>
-#include <QString>
 #include <QDomDocument>
-#include <QNetworkRequest>
-#include <QNetworkReply>
+#include <QMutex>
 #include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QNetworkRequest>
+#include <QString>
 
 // MythTV headers
 #include <mythscreentype.h>
@@ -34,14 +36,14 @@ class RSSEditPopup : public MythScreenType
      *  \param parent Pointer to the screen stack
      *  \param name The name of the window
      */
-    RSSEditPopup(const QString &url, bool edit, MythScreenStack *parent,
+    RSSEditPopup(QString url, bool edit, MythScreenStack *parent,
                  const QString &name = "RSSEditPopup")
         : MythScreenType(parent, name),
-          m_urlText(url), m_editing(edit) {}
-   ~RSSEditPopup();
+          m_urlText(std::move(url)), m_editing(edit) {}
+   ~RSSEditPopup() override;
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent*) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
   private:
     static QUrl redirectUrl(const QUrl& possibleRedirectUrl,
@@ -85,12 +87,12 @@ class RSSEditor : public MythScreenType
     Q_OBJECT
 
   public:
-    RSSEditor(MythScreenStack *parent, const QString &name = "RSSEditor")
+    explicit RSSEditor(MythScreenStack *parent, const QString &name = "RSSEditor")
         : MythScreenType(parent, name) {}
-   ~RSSEditor();
+   ~RSSEditor() override;
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent*) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
   private:
     void fillRSSButtonList();

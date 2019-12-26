@@ -1084,11 +1084,13 @@ void ImportCoverArtDialog::updateStatus()
     if (!m_filelist.empty())
     {
         if (m_currentText)
+        {
             //: %1 is the current position of the file being copied,
             //: %2 is the total number of files
             m_currentText->SetText(tr("%1 of %2", "Current file copied")
                                    .arg(m_currentFile + 1)
                                    .arg(m_filelist.size()));
+        }
         m_filenameText->SetText(m_filelist[m_currentFile]);
         m_coverartImage->SetFilename(m_filelist[m_currentFile]);
         m_coverartImage->Load();

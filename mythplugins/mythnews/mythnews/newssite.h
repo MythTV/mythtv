@@ -67,7 +67,7 @@ class NewsSite : public QObject
       public:
         void clear(void)
         {
-            while (size())
+            while (!empty())
             {
                 NewsSite *tmp = back();
                 pop_back();
@@ -108,7 +108,7 @@ class NewsSite : public QObject
     QString  errorMsg(void) const;
 
   private:
-    ~NewsSite();
+    ~NewsSite() override;
 
     mutable QMutex m_lock {QMutex::Recursive};
     QString    m_name;

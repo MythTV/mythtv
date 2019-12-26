@@ -887,12 +887,13 @@ static inline void slice_intra_DCT (mpeg2_decoder_t * const decoder,
 #define bit_ptr (decoder->bitstream_ptr)
     NEEDBITS (bit_buf, bits, bit_ptr);
     /* Get the intra DC coefficient and inverse quantize it */
-    if (cc == 0)
+    if (cc == 0) {
 	decoder->DCTblock[0] =
 	    decoder->dc_dct_pred[0] += get_luma_dc_dct_diff (decoder);
-    else
+    } else {
 	decoder->DCTblock[0] =
 	    decoder->dc_dct_pred[cc] += get_chroma_dc_dct_diff (decoder);
+    }
 
     if (decoder->mpeg1) {
 	if (decoder->coding_type != D_TYPE)
@@ -1854,18 +1855,21 @@ void mpeg2_slice (mpeg2_decoder_t * const decoder, const int code,
 		    if (coded_block_pattern & 4)
 			slice_non_intra_DCT (decoder, 0, dest_y + DCT_offset,
 					     DCT_stride);
-		    if (coded_block_pattern & 8)
+		    if (coded_block_pattern & 8) {
 			slice_non_intra_DCT (decoder, 0,
 					     dest_y + DCT_offset + 8,
 					     DCT_stride);
-		    if (coded_block_pattern & 16)
+		    }
+		    if (coded_block_pattern & 16) {
 			slice_non_intra_DCT (decoder, 1,
 					     decoder->dest[1] + (offset >> 1),
 					     decoder->uv_stride);
-		    if (coded_block_pattern & 32)
+		    }
+		    if (coded_block_pattern & 32) {
 			slice_non_intra_DCT (decoder, 2,
 					     decoder->dest[2] + (offset >> 1),
 					     decoder->uv_stride);
+		    }
 		} else if (likely (decoder->chroma_format == 1)) {
 		    coded_block_pattern |= bit_buf & (3 << 30);
 		    DUMPBITS (bit_buf, bits, 2);
@@ -1880,29 +1884,34 @@ void mpeg2_slice (mpeg2_decoder_t * const decoder, const int code,
 		    if (coded_block_pattern & 4)
 			slice_non_intra_DCT (decoder, 0, dest_y + DCT_offset,
 					     DCT_stride);
-		    if (coded_block_pattern & 8)
+		    if (coded_block_pattern & 8) {
 			slice_non_intra_DCT (decoder, 0,
 					     dest_y + DCT_offset + 8,
 					     DCT_stride);
+		    }
 
 		    DCT_stride >>= 1;
 		    DCT_offset = (DCT_offset + offset) >> 1;
-		    if (coded_block_pattern & 16)
+		    if (coded_block_pattern & 16) {
 			slice_non_intra_DCT (decoder, 1,
 					     decoder->dest[1] + (offset >> 1),
 					     DCT_stride);
-		    if (coded_block_pattern & 32)
+		    }
+		    if (coded_block_pattern & 32) {
 			slice_non_intra_DCT (decoder, 2,
 					     decoder->dest[2] + (offset >> 1),
 					     DCT_stride);
-		    if (coded_block_pattern & (2 << 30))
+		    }
+		    if (coded_block_pattern & (2 << 30)) {
 			slice_non_intra_DCT (decoder, 1,
 					     decoder->dest[1] + DCT_offset,
 					     DCT_stride);
-		    if (coded_block_pattern & (1 << 30))
+		    }
+		    if (coded_block_pattern & (1 << 30)) {
 			slice_non_intra_DCT (decoder, 2,
 					     decoder->dest[2] + DCT_offset,
 					     DCT_stride);
+		    }
 		} else {
 		    coded_block_pattern |= bit_buf & (63 << 26);
 		    DUMPBITS (bit_buf, bits, 6);
@@ -1920,10 +1929,11 @@ void mpeg2_slice (mpeg2_decoder_t * const decoder, const int code,
 		    if (coded_block_pattern & 4)
 			slice_non_intra_DCT (decoder, 0, dest_y + DCT_offset,
 					     DCT_stride);
-		    if (coded_block_pattern & 8)
+		    if (coded_block_pattern & 8) {
 			slice_non_intra_DCT (decoder, 0,
 					     dest_y + DCT_offset + 8,
 					     DCT_stride);
+		    }
 
 		    if (coded_block_pattern & 16)
 			slice_non_intra_DCT (decoder, 1, dest_u, DCT_stride);
@@ -1941,14 +1951,16 @@ void mpeg2_slice (mpeg2_decoder_t * const decoder, const int code,
 		    if (coded_block_pattern & (4 << 26))
 			slice_non_intra_DCT (decoder, 2, dest_v + 8,
 					     DCT_stride);
-		    if (coded_block_pattern & (2 << 26))
+		    if (coded_block_pattern & (2 << 26)) {
 			slice_non_intra_DCT (decoder, 1,
 					     dest_u + DCT_offset + 8,
 					     DCT_stride);
-		    if (coded_block_pattern & (1 << 26))
+		    }
+		    if (coded_block_pattern & (1 << 26)) {
 			slice_non_intra_DCT (decoder, 2,
 					     dest_v + DCT_offset + 8,
 					     DCT_stride);
+		    }
 		}
 	    }
 

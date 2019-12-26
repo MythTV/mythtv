@@ -25,7 +25,7 @@ class MythContextSlotHandler : public QObject
     void OnCloseDialog(void);
 
   private:
-    ~MythContextSlotHandler() = default;
+    ~MythContextSlotHandler() override = default;
 
     MythContextPrivate *d {nullptr}; // NOLINT(readability-identifier-naming)
 };
@@ -42,7 +42,7 @@ class MythContextSlotHandler : public QObject
 class MPUBLIC MythContext
 {
   public:
-    MythContext(QString binversion, bool needsBackend = false);
+    explicit MythContext(QString binversion, bool needsBackend = false);
     virtual ~MythContext();
 
     bool Init(const bool gui = true,

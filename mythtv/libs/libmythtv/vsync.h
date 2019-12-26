@@ -46,7 +46,7 @@ class VideoSync
 // virtual base class
 {
   public:
-    VideoSync(MythVideoOutput*, int refreshint);
+    VideoSync(MythVideoOutput *video_output, int refreshint);
     virtual ~VideoSync() = default;
 
     /// \brief Returns name of instanciated VSync method.
@@ -89,7 +89,7 @@ class VideoSync
     virtual void Stop(void) {}
 
     // documented in vsync.cpp
-    static VideoSync *BestMethod(MythVideoOutput *, uint refresh_interval);
+    static VideoSync *BestMethod(MythVideoOutput *video_output, uint refresh_interval);
 
   protected:
     static int64_t GetTime(void);
@@ -113,8 +113,8 @@ class VideoSync
 class DRMVideoSync : public VideoSync
 {
   public:
-    DRMVideoSync(MythVideoOutput *, int refresh_interval);
-    ~DRMVideoSync();
+    DRMVideoSync(MythVideoOutput *vo, int refresh_interval);
+    ~DRMVideoSync() override;
 
     QString getName(void) const override // VideoSync
         { return QString("DRM"); }
@@ -143,8 +143,8 @@ class DRMVideoSync : public VideoSync
 class RTCVideoSync : public VideoSync
 {
   public:
-    RTCVideoSync(MythVideoOutput *, int refresh_interval);
-    ~RTCVideoSync();
+    RTCVideoSync(MythVideoOutput *vo, int refresh_interval);
+    ~RTCVideoSync() override;
 
     QString getName(void) const override // VideoSync
         { return QString("RTC"); }
@@ -170,7 +170,7 @@ class BusyWaitVideoSync : public VideoSync
 {
   public:
     BusyWaitVideoSync(MythVideoOutput *vo, int ri) : VideoSync(vo, ri) {};
-    ~BusyWaitVideoSync() = default;
+    ~BusyWaitVideoSync() override = default;
 
     QString getName(void) const override // VideoSync
         { return QString("USleep with busy wait"); }
@@ -196,7 +196,7 @@ class USleepVideoSync : public VideoSync
 {
   public:
     USleepVideoSync(MythVideoOutput *vo, int ri) : VideoSync(vo, ri) {}
-    ~USleepVideoSync() = default;
+    ~USleepVideoSync() override = default;
 
     QString getName(void) const override // VideoSync
         { return QString("USleep"); }
@@ -208,7 +208,7 @@ class DummyVideoSync : public VideoSync
 {
   public:
     DummyVideoSync(MythVideoOutput* vo, int ri) : VideoSync(vo, ri) { }
-    ~DummyVideoSync() = default;
+    ~DummyVideoSync() override = default;
 
     QString getName(void) const override // VideoSync
         { return QString("Dummy"); }

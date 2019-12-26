@@ -128,13 +128,17 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
         // Build a command line for mount/unmount and execute it...
         // Is there a better way to do this?
         if (QFile(PATHTO_PMOUNT).exists() && QFile(PATHTO_PUMOUNT).exists())
+        {
             MountCommand = QString("%1 %2")
                 .arg((DoMount) ? PATHTO_PMOUNT : PATHTO_PUMOUNT)
                 .arg(m_DevicePath);
+        }
         else
+        {
             MountCommand = QString("%1 %2")
                 .arg((DoMount) ? PATHTO_MOUNT : PATHTO_UNMOUNT)
                 .arg(m_DevicePath);
+        }
 
         LOG(VB_MEDIA, LOG_INFO, QString("Executing '%1'").arg(MountCommand));
         int ret = myth_system(MountCommand, kMSDontBlockInputDevs);

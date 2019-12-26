@@ -17,13 +17,13 @@ class MythDRMPRIMEContext : public MythCodecContext
                                           const QString  &Decoder,
                                           AVStream       *Stream,
                                           uint            StreamType);
-    virtual int  HwDecoderInit           (AVCodecContext *Context) override;
-    virtual void InitVideoCodec          (AVCodecContext *Context, bool SelectedStream, bool &DirectRendering) override;
-    virtual bool RetrieveFrame           (AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame) override;
-    virtual bool DecoderWillResetOnFlush (void) override;
+    int  HwDecoderInit           (AVCodecContext *Context) override;
+    void InitVideoCodec          (AVCodecContext *Context, bool SelectedStream, bool &DirectRendering) override;
+    bool RetrieveFrame           (AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame) override;
+    bool DecoderWillResetOnFlush (void) override;
     static bool  HavePrimeDecoders       (AVCodecID Codec = AV_CODEC_ID_NONE);
-    static enum  AVPixelFormat GetFormat (AVCodecContext*, const AVPixelFormat *PixFmt);
-    bool         GetDRMBuffer            (AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame, int);
+    static enum  AVPixelFormat GetFormat (AVCodecContext *Context, const AVPixelFormat *PixFmt);
+    bool         GetDRMBuffer            (AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame, int /*unused*/);
 
   protected:
     static MythCodecID GetPrimeCodec     (AVCodecContext **Context,

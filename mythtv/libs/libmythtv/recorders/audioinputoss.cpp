@@ -33,14 +33,14 @@
 #include <sys/ioctl.h>
 
 #define LOC     QString("AudioInOSS: ")
-#define LOC_DEV QString("AudioInOSS(%1): ").arg(m_device_name.constData())
+#define LOC_DEV QString("AudioInOSS(%1): ").arg(m_deviceName.constData())
 
 AudioInputOSS::AudioInputOSS(const QString &device) : AudioInput(device)
 {
     if (!device.isEmpty())
-        m_device_name = device.toLatin1();
+        m_deviceName = device.toLatin1();
     else
-        m_device_name = QByteArray();
+        m_deviceName = QByteArray();
 }
 
 bool AudioInputOSS::Open(uint sample_bits, uint sample_rate, uint channels)
@@ -54,8 +54,8 @@ bool AudioInputOSS::Open(uint sample_bits, uint sample_rate, uint channels)
         Close();
 
     // Open the device
-    dsp_fd = open(m_device_name.constData(), O_RDONLY);
-    if (dsp_fd < 0)
+    m_dspFd = open(m_deviceName.constData(), O_RDONLY);
+    if (m_dspFd < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC_DEV + QString("open failed: ") + ENO);
         Close();
@@ -63,7 +63,7 @@ bool AudioInputOSS::Open(uint sample_bits, uint sample_rate, uint channels)
     }
 
     chk = 0; // disable input for now
-    if (ioctl(dsp_fd, SNDCTL_DSP_SETTRIGGER, &chk) < 0)
+    if (ioctl(m_dspFd, SNDCTL_DSP_SETTRIGGER, &chk) < 0)
     {
         LOG(VB_GENERAL, LOG_WARNING,
             LOC_DEV + "failed to disable audio device: " + ENO);
@@ -91,7 +91,7 @@ bool AudioInputOSS::Open(uint sample_bits, uint sample_rate, uint channels)
             break;
     }
     format = choice;
-    if (ioctl(dsp_fd, SNDCTL_DSP_SETFMT, &format) < 0)
+    if (ioctl(m_dspFd, SNDCTL_DSP_SETFMT, &format) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC_DEV +
             QString("failed to set audio format %1: ").arg(tag) + ENO);
@@ -108,7 +108,7 @@ bool AudioInputOSS::Open(uint sample_bits, uint sample_rate, uint channels)
 
     // sample size
     m_audio_sample_bits = choice = sample_bits;
-    if (ioctl(dsp_fd, SNDCTL_DSP_SAMPLESIZE, &m_audio_sample_bits) < 0)
+    if (ioctl(m_dspFd, SNDCTL_DSP_SAMPLESIZE, &m_audio_sample_bits) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC_DEV +
             QString("failed to set audio sample bits to %1: ")
@@ -117,12 +117,14 @@ bool AudioInputOSS::Open(uint sample_bits, uint sample_rate, uint channels)
         return false;
     }
     if (m_audio_sample_bits != choice)
+    {
         LOG(VB_GENERAL, LOG_ERR, LOC_DEV +
             QString("requested %1 sample bits, got %2")
                             .arg(choice).arg(m_audio_sample_bits));
+    }
     // channels
     m_audio_channels = choice = channels;
-    if (ioctl(dsp_fd, SNDCTL_DSP_CHANNELS, &m_audio_channels) < 0)
+    if (ioctl(m_dspFd, SNDCTL_DSP_CHANNELS, &m_audio_channels) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC_DEV +
             QString("failed to set audio channels to %1: ").arg(channels)+ENO);
@@ -130,14 +132,16 @@ bool AudioInputOSS::Open(uint sample_bits, uint sample_rate, uint channels)
         return false;
     }
     if (m_audio_channels != choice)
+    {
         LOG(VB_GENERAL, LOG_ERR, LOC_DEV +
             QString("requested %1 channels, got %2")
                 .arg(choice).arg(m_audio_channels));
+    }
 
     // sample rate
     int choice_sample_rate;
     m_audio_sample_rate = choice_sample_rate = sample_rate;
-    if (ioctl(dsp_fd, SNDCTL_DSP_SPEED, &m_audio_sample_rate) < 0)
+    if (ioctl(m_dspFd, SNDCTL_DSP_SPEED, &m_audio_sample_rate) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC_DEV +
             QString("failed to set sample rate to %1: ").arg(sample_rate)+ENO);
@@ -145,9 +149,11 @@ bool AudioInputOSS::Open(uint sample_bits, uint sample_rate, uint channels)
         return false;
     }
     if (m_audio_sample_rate != choice_sample_rate)
+    {
         LOG(VB_GENERAL, LOG_ERR, LOC_DEV +
             QString("requested sample rate %1, got %2")
                 .arg(choice_sample_rate).arg(m_audio_sample_rate));
+    }
     LOG(VB_AUDIO, LOG_INFO, LOC_DEV + "device open");
     return true;
 }
@@ -155,8 +161,8 @@ bool AudioInputOSS::Open(uint sample_bits, uint sample_rate, uint channels)
 void AudioInputOSS::Close(void)
 {
     if (IsOpen())
-        close(dsp_fd);
-    dsp_fd = -1;
+        close(m_dspFd);
+    m_dspFd = -1;
     m_audio_sample_bits = 0;
     m_audio_sample_rate = 0;
     m_audio_channels = 0;
@@ -169,13 +175,13 @@ bool AudioInputOSS::Start(void)
     if (IsOpen())
     {
         int trig = 0; // clear
-        if (ioctl(dsp_fd, SNDCTL_DSP_SETTRIGGER, &trig) < 0)
+        if (ioctl(m_dspFd, SNDCTL_DSP_SETTRIGGER, &trig) < 0)
         {
             LOG(VB_GENERAL, LOG_WARNING,
                 LOC_DEV + "failed to disable audio device: " + ENO);
         }
         trig = PCM_ENABLE_INPUT; // enable input
-        if (ioctl(dsp_fd, SNDCTL_DSP_SETTRIGGER, &trig) < 0)
+        if (ioctl(m_dspFd, SNDCTL_DSP_SETTRIGGER, &trig) < 0)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC_DEV +
                 QString("Start() failed: ") + ENO);
@@ -193,7 +199,7 @@ bool AudioInputOSS::Stop(void)
 {
     bool stopped = false;
     int trig = 0;
-    if (ioctl(dsp_fd, SNDCTL_DSP_SETTRIGGER, &trig) < 0)
+    if (ioctl(m_dspFd, SNDCTL_DSP_SETTRIGGER, &trig) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC_DEV +
             QString("stop action failed: ") + ENO);
@@ -211,7 +217,7 @@ int AudioInputOSS::GetBlockSize(void)
     int frag = 0;
     if (IsOpen())
     {
-        if (ioctl(dsp_fd, SNDCTL_DSP_GETBLKSIZE, &frag) < 0)
+        if (ioctl(m_dspFd, SNDCTL_DSP_GETBLKSIZE, &frag) < 0)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC_DEV +
                 QString("fragment size query failed, returned %1: ").arg(frag) +
@@ -231,7 +237,7 @@ int AudioInputOSS::GetSamples(void *buffer, uint num_bytes)
         int retries = 0;
         while (bytes_read < num_bytes && retries < 3)
         {
-            int this_read = read(dsp_fd, buffer, num_bytes - bytes_read);
+            int this_read = read(m_dspFd, buffer, num_bytes - bytes_read);
             if (this_read < 0)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC_DEV +
@@ -244,9 +250,11 @@ int AudioInputOSS::GetSamples(void *buffer, uint num_bytes)
             ++retries;
         }
         if (num_bytes > bytes_read)
+        {
             LOG(VB_GENERAL, LOG_ERR, LOC_DEV +
                 QString("GetSamples short read, %1 of %2 bytes")
                     .arg(bytes_read).arg(num_bytes));
+        }
     }
     return bytes_read;
 }
@@ -257,7 +265,7 @@ int AudioInputOSS::GetNumReadyBytes(void)
     if (IsOpen())
     {
         audio_buf_info ispace;
-        if (ioctl(dsp_fd, SNDCTL_DSP_GETISPACE, &ispace) < 0)
+        if (ioctl(m_dspFd, SNDCTL_DSP_GETISPACE, &ispace) < 0)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC_DEV +
                 QString("get ready bytes failed, returned %1: ")

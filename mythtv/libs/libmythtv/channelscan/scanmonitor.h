@@ -53,7 +53,7 @@ class ScanMonitor :
     explicit ScanMonitor(ChannelScanner *cs) : m_channelScanner(cs) { }
     virtual void deleteLater(void);
 
-    void customEvent(QEvent*) override; // QObject
+    void customEvent(QEvent *event) override; // QObject
 
     // Values from 1-100 of scan completion
     void ScanPercentComplete(int pct);
@@ -65,18 +65,18 @@ class ScanMonitor :
 
     // SignalMonitorListener
     void AllGood(void) override { } // SignalMonitorListener
-    void StatusSignalLock(const SignalMonitorValue&) override; // SignalMonitorListener
-    void StatusChannelTuned(const SignalMonitorValue&) override; // SignalMonitorListener
-    void StatusSignalStrength(const SignalMonitorValue&) override; // SignalMonitorListener
+    void StatusSignalLock(const SignalMonitorValue &val) override; // SignalMonitorListener
+    void StatusChannelTuned(const SignalMonitorValue &val) override; // SignalMonitorListener
+    void StatusSignalStrength(const SignalMonitorValue &val) override; // SignalMonitorListener
 
     // DVBSignalMonitorListener
-    void StatusSignalToNoise(const SignalMonitorValue&) override; // DVBSignalMonitorListener
-    void StatusBitErrorRate(const SignalMonitorValue&) override { } // DVBSignalMonitorListener
-    void StatusUncorrectedBlocks(const SignalMonitorValue&) override { } // DVBSignalMonitorListener
-    void StatusRotorPosition(const SignalMonitorValue&) override; // DVBSignalMonitorListener
+    void StatusSignalToNoise(const SignalMonitorValue &val) override; // DVBSignalMonitorListener
+    void StatusBitErrorRate(const SignalMonitorValue &/*val*/) override { } // DVBSignalMonitorListener
+    void StatusUncorrectedBlocks(const SignalMonitorValue &/*val*/) override { } // DVBSignalMonitorListener
+    void StatusRotorPosition(const SignalMonitorValue &val) override; // DVBSignalMonitorListener
 
   private:
-    ~ScanMonitor() = default;
+    ~ScanMonitor() override = default;
 
     ChannelScanner *m_channelScanner {nullptr};
 };
@@ -94,14 +94,14 @@ class ScannerEvent : public QEvent
     QString strValue()              const { return m_str; }
     void    strValue(const QString& str)  { m_str = str; }
 
-    int     intValue()       const { return m_intvalue; }
-    void    intValue(int intvalue) { m_intvalue = intvalue; }
+    int     intValue()       const { return m_intValue; }
+    void    intValue(int intvalue) { m_intValue = intvalue; }
 
-    int     boolValue()       const { return m_intvalue != 0; }
+    int     boolValue()       const { return m_intValue != 0; }
 
-    Configurable *ConfigurableValue() const { return m_cfg_ptr; }
+    Configurable *ConfigurableValue() const { return m_cfgPtr; }
     void    ConfigurableValue(Configurable *cfg_ptr)
-        { m_cfg_ptr = cfg_ptr; }
+        { m_cfgPtr = cfg_ptr; }
 
     static Type ScanComplete;
     static Type ScanShutdown;
@@ -117,12 +117,12 @@ class ScannerEvent : public QEvent
     static Type SetStatusChannelTuned;
 
   private:
-    ~ScannerEvent() = default;
+    ~ScannerEvent() override = default;
 
   private:
     QString       m_str;
-    int           m_intvalue {0};
-    Configurable *m_cfg_ptr  {nullptr};
+    int           m_intValue {0};
+    Configurable *m_cfgPtr   {nullptr};
 };
 
 void post_event(QObject *dest, QEvent::Type type, int val);

@@ -1063,8 +1063,7 @@ ImageDbSg::ImageDbSg() : ImageDb(DB_TABLE)
  \brief Local database constructor
 */
 ImageDbLocal::ImageDbLocal()
-    : ImageDb(QString("`%1_%2`").arg(DB_TABLE, gCoreContext->GetHostName())),
-      m_DbExists(false)
+    : ImageDb(QString("`%1_%2`").arg(DB_TABLE, gCoreContext->GetHostName()))
 {
     // Remove any table leftover from a previous FE crash
     DropTable();
@@ -1952,6 +1951,7 @@ ImageManagerBe* ImageManagerBe::getInstance()
 ImageManagerFe& ImageManagerFe::getInstance()
 {
     if (!s_instance)
+    {
         // Use saved settings
         s_instance = new ImageManagerFe
                 (gCoreContext->GetNumSetting("GalleryImageOrder"),
@@ -1959,6 +1959,7 @@ ImageManagerFe& ImageManagerFe::getInstance()
                  gCoreContext->GetBoolSetting("GalleryShowHidden"),
                  gCoreContext->GetNumSetting("GalleryShowType"),
                  gCoreContext->GetSetting("GalleryDateFormat"));
+    }
     return *s_instance;
 }
 

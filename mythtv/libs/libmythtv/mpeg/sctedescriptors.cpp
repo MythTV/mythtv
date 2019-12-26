@@ -24,7 +24,7 @@
 
 QString SCTEComponentNameDescriptor::NameString(uint i) const
 {
-    return dvb_decode_text(&_data[loc(i) + 4], StringLength(i));
+    return dvb_decode_text(&m_data[loc(i) + 4], StringLength(i));
 }
 
 QString SCTEComponentNameDescriptor::toString(void) const

@@ -38,9 +38,9 @@ class FrameRateDescriptor : public MPEGDescriptor
     // descriptor_tag           8   0.0       0x82
     // descriptor_length        8   1.0
     // multiple_frame_rate_flag 1   2.0
-    bool MultipleFrameRates(void) const { return ( _data[2] & 0x80 ) != 0; }
+    bool MultipleFrameRates(void) const { return ( m_data[2] & 0x80 ) != 0; }
     // frame_rate_code          4   2.1
-    uint FrameRateCode(void) const { return (_data[2] >> 3) & 0xF; }
+    uint FrameRateCode(void) const { return (m_data[2] >> 3) & 0xF; }
     /// returns maximum frame rate in video
     double FrameRate(void) const
     {
@@ -88,9 +88,9 @@ class ExtendedVideoDescriptor : public MPEGDescriptor
     // descriptor_tag           8   0.0       0x83
     // descriptor_length        8   1.0
     // catalog_mode_flag        1   2.0
-    bool CatalogModeFlag(void) const { return ( _data[2] & 0x80 ) != 0; }
+    bool CatalogModeFlag(void) const { return ( m_data[2] & 0x80 ) != 0; }
     // video_includes_setup     1   2.1
-    bool VideoIncludesSetup(void) const { return ( _data[2] & 0x40 ) != 0; }
+    bool VideoIncludesSetup(void) const { return ( m_data[2] & 0x40 ) != 0; }
     // reserved                 6   2.2
 
     QString toString(void) const override // MPEGDescriptor
@@ -116,13 +116,13 @@ class SCTEComponentNameDescriptor : public MPEGDescriptor
     // descriptor_length        8   1.0
     // reserved                 2   2.0
     // string_count             6   2.2
-    uint StringCount(void) const { return _data[2] & 0x3F; }
+    uint StringCount(void) const { return m_data[2] & 0x3F; }
 
     // for (i = 0; i < string_count; i++)
     // {
     // ISO_639_language_code   24  loc(i)
     int LanguageKey(uint i) const
-        { return iso639_str3_to_key(&_data[loc(i)]); }
+        { return iso639_str3_to_key(&m_data[loc(i)]); }
     QString LanguageString(uint i) const
         { return iso639_key_to_str3(LanguageKey(loc(i))); }
     int CanonicalLanguageKey(uint i) const
@@ -131,7 +131,7 @@ class SCTEComponentNameDescriptor : public MPEGDescriptor
         { return iso639_key_to_str3(CanonicalLanguageKey(loc(i))); }
     // string_length            8  loc(i)+3
     uint StringLength(uint i) const
-        { return _data[loc(i) + 3]; }
+        { return m_data[loc(i) + 3]; }
     // name_string              *  loc(i)+4
     QString NameString(uint i) const;
     // }
@@ -143,7 +143,7 @@ class SCTEComponentNameDescriptor : public MPEGDescriptor
     {
         uint place = 3;
         for (uint i = 0; i < number; ++i)
-            place += 4 + _data[place + 3];
+            place += 4 + m_data[place + 3];
         return place;
     }
 };
@@ -172,7 +172,7 @@ class CueIdentifierDescriptor : public MPEGDescriptor
         // 0x05-0x7f are reserved for future use
         // 0x80-0xff user defined range
     };
-    uint CueStreamType(void) const { return _data[2]; }
+    uint CueStreamType(void) const { return m_data[2]; }
     QString CueStreamTypeString(void) const;
     QString toString(void) const override; // MPEGDescriptor
 };
@@ -188,12 +188,12 @@ class FrequencySpecificationDescriptor : public MPEGDescriptor
     // descriptor_tag           8   0.0       0x90
     // descriptor_length        8   1.0
     // frequency_unit           1   2.0
-    bool FrequencyUnit(void) const { return ( _data[2] & 0x80 ) != 0; }
+    bool FrequencyUnit(void) const { return ( m_data[2] & 0x80 ) != 0; }
     uint FrequencyUnitHz(void) const
         { return FrequencyUnit() ? 10000 : 125000; }
     // carrier_frequency       15   2.1
     uint CarrierFrequency(void) const
-        { return ((_data[2] << 8) | _data[3]) & 0x7fff; }
+        { return ((m_data[2] << 8) | m_data[3]) & 0x7fff; }
     unsigned long long CarrierFrequnecyHz(void) const
     {
         return FrequencyUnitHz() * ((unsigned long long) CarrierFrequency());
@@ -216,20 +216,20 @@ class ModulationParamsDescriptor : public MPEGDescriptor
     // descriptor_tag           8   0.0       0x91
     // descriptor_length        8   1.0
     // transmissionSystem       4   2.0
-    uint TransmissionSystem(void) const { return _data[2] >> 4; }
+    uint TransmissionSystem(void) const { return m_data[2] >> 4; }
     // inner_coding_mode        4   2.4
-    uint InnerCodingMode(void) const { return _data[2] & 0x0f; }
+    uint InnerCodingMode(void) const { return m_data[2] & 0x0f; }
     // split_bitstream_mode     1   3.0
-    bool SplitBitstreamMode(void) const { return _data[3] >> 7; }
+    bool SplitBitstreamMode(void) const { return m_data[3] >> 7; }
     //reserved                  2   3.1
     //modulation_format         5   3.3
-    uint ModulationFormat(void) const { return _data[3] & 0x1F; }
+    uint ModulationFormat(void) const { return m_data[3] & 0x1F; }
     // reserved                 4   4.0
     // symbol_rate             28   4.4
     uint SymbolRate(void) const
     {
-        return ((_data[4] << 24) | (_data[5] << 16) |
-                (_data[6] << 8) | _data[7]) & 0x7FFF;
+        return ((m_data[4] << 24) | (m_data[5] << 16) |
+                (m_data[6] << 8) | m_data[7]) & 0x7FFF;
     }
 };
 
@@ -244,7 +244,7 @@ class TransportStreamIdDescriptor : public MPEGDescriptor
     // descriptor_length        8   1.0
     // target_transport_stream_id 16 2.0
     uint TargetTransportStreamId(void) const
-        { return (_data[2] << 8) | _data[3]; }
+        { return (m_data[2] << 8) | m_data[3]; }
 
     QString toString(void) const override // MPEGDescriptor
     {
@@ -264,11 +264,11 @@ class RevisionDetectionDescriptor : public MPEGDescriptor
     // descriptor_length        8   1.0       0x01
     // reserved                 3   2.0
     // table_version_number     5   2.3
-    uint TableVersionNumber(void) const { return _data[2] & 0x1f; }
+    uint TableVersionNumber(void) const { return m_data[2] & 0x1f; }
     // section_number           8   3.0
-    uint SectionNumber(void) const { return _data[3]; }
+    uint SectionNumber(void) const { return m_data[3]; }
     // last_section_number      8   4.0
-    uint LastSectionNumber(void) const { return _data[4]; }
+    uint LastSectionNumber(void) const { return m_data[4]; }
 
     QString toString(void) const override; // MPEGDescriptor
 };

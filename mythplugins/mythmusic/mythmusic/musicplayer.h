@@ -25,7 +25,7 @@ class MusicPlayerEvent : public MythEvent
             MythEvent(type), m_trackID(id) {}
         MusicPlayerEvent(Type type, uint vol, bool muted) :
             MythEvent(type), m_trackID(0), m_volume(vol), m_isMuted(muted) {}
-        ~MusicPlayerEvent() = default;
+        ~MusicPlayerEvent() override = default;
 
          MythEvent *clone(void) const override //  MythEvent
             { return new MusicPlayerEvent(*this); }
@@ -57,7 +57,7 @@ class MusicPlayer : public QObject, public MythObservable
 
   public:
      explicit MusicPlayer(QObject *parent);
-    ~MusicPlayer(void);
+    ~MusicPlayer(void) override;
 
     enum PlayMode
     {

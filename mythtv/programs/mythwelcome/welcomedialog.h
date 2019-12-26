@@ -26,7 +26,7 @@ class WelcomeDialog : public MythScreenType
   public:
 
     WelcomeDialog(MythScreenStack *parent, const char *name);
-    ~WelcomeDialog();
+    ~WelcomeDialog() override;
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
@@ -57,44 +57,44 @@ class WelcomeDialog : public MythScreenType
     //
     //  GUI stuff
     //
-    MythUIText    *m_status_text;
-    MythUIText    *m_recording_text;
-    MythUIText    *m_scheduled_text;
-    MythUIText    *m_warning_text;
+    MythUIText    *m_statusText               { nullptr };
+    MythUIText    *m_recordingText            { nullptr };
+    MythUIText    *m_scheduledText            { nullptr };
+    MythUIText    *m_warningText              { nullptr };
 
-    MythUIButton  *m_startfrontend_button;
+    MythUIButton  *m_startFrontendButton      { nullptr };
 
-    MythDialogBox *m_menuPopup;
+    MythDialogBox *m_menuPopup                { nullptr };
 
-    QTimer        *m_updateStatusTimer; // audited ref #5318
-    QTimer        *m_updateScreenTimer; // audited ref #5318
+    QTimer        *m_updateStatusTimer        { nullptr }; // audited ref #5318
+    QTimer        *m_updateScreenTimer        { nullptr }; // audited ref #5318
 
     QString        m_appBinDir;
-    bool           m_isRecording;
-    bool           m_hasConflicts;
-    bool           m_bWillShutdown;
-    int            m_secondsToShutdown;
+    bool           m_isRecording              { false };
+    bool           m_hasConflicts             { false };
+    bool           m_willShutdown             { false };
+    int            m_secondsToShutdown        { -1 };
     QDateTime      m_nextRecordingStart;
-    int            m_preRollSeconds;
-    int            m_idleWaitForRecordingTime;
-    int            m_idleTimeoutSecs;
-    uint           m_screenTunerNo;
-    uint           m_screenScheduledNo;
-    uint           m_statusListNo;
+    int            m_preRollSeconds           { 0 };
+    int            m_idleWaitForRecordingTime { 0 };
+    int            m_idleTimeoutSecs          { 0 };
+    uint           m_screenTunerNo            { 0 };
+    uint           m_screenScheduledNo        { 0 };
+    uint           m_statusListNo             { 0 };
     QStringList    m_statusList;
-    bool           m_frontendIsRunning;
+    bool           m_frontendIsRunning        { false };
 
     vector<TunerStatus> m_tunerList;
     vector<ProgramInfo> m_scheduledList;
 
-    QMutex      m_RecListUpdateMuxtex;
-    bool        m_pendingRecListUpdate;
+    QMutex      m_recListUpdateMuxtex;
+    bool        m_pendingRecListUpdate        { false };
 
     bool pendingRecListUpdate() const           { return m_pendingRecListUpdate; }
     void setPendingRecListUpdate(bool newState) { m_pendingRecListUpdate = newState; }
 
-    QMutex      m_SchedUpdateMuxtex;
-    bool        m_pendingSchedUpdate;
+    QMutex      m_schedUpdateMuxtex;
+    bool        m_pendingSchedUpdate          { false };
 
     bool pendingSchedUpdate() const           { return m_pendingSchedUpdate; }
     void setPendingSchedUpdate(bool newState) { m_pendingSchedUpdate = newState; }

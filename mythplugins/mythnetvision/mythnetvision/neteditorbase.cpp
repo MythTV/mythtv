@@ -110,7 +110,12 @@ void NetEditorBase::SlotLoadedData()
 
     while (!grabber.isNull())
     {
-        QString title, author, image, description, type, commandline;
+        QString title;
+        QString author;
+        QString image;
+        QString description;
+        QString type;
+        QString commandline;
         bool search = false;
         bool tree = false;
 
@@ -196,10 +201,14 @@ void NetEditorBase::FillGrabberButtonList()
         QString thumb;
 
         if (!img.startsWith("/") && !img.isEmpty())
+        {
             thumb = QString("%1mythnetvision/icons/%2").arg(GetShareDir())
                 .arg((*i)->GetImage());
+        }
         else
+        {
             thumb = img;
+        }
 
         item->SetImage(thumb);
         item->setCheckable(true);

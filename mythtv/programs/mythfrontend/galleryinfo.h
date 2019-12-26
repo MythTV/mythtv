@@ -26,9 +26,9 @@ public:
     explicit InfoList(MythScreenType &screen);
 
     bool             Create(bool focusable);
-    void             Toggle(const ImagePtrK&);
+    void             Toggle(const ImagePtrK &im);
     bool             Hide();
-    void             Update(const ImagePtrK&);
+    void             Update(const ImagePtrK &im);
     void             Display(ImageItemK &im, const QStringList &tagStrings);
     InfoVisibleState GetState() const   { return m_infoVisible; }
 
@@ -36,8 +36,8 @@ private slots:
     void Clear()   { m_btnList->Reset(); }
 
 private:
-    void CreateButton(const QString&, const QString&);
-    void CreateCount(ImageItemK &);
+    void CreateButton(const QString &name, const QString &value);
+    void CreateCount(ImageItemK &im);
 
     MythScreenType   &m_screen;      //!< Parent screen
     MythUIButtonList *m_btnList     {nullptr};  //!< Overlay buttonlist

@@ -320,7 +320,7 @@ class UPNP_PUBLIC UPnpCDS : public Eventing
         UPnpCDS( UPnpDevice *pDevice,
                  const QString &sSharePath ); 
 
-        virtual ~UPnpCDS();
+        ~UPnpCDS() override;
 
         void     RegisterExtension  ( UPnpCDSExtension *pExtension );
         void     UnregisterExtension( UPnpCDSExtension *pExtension );

@@ -39,7 +39,7 @@ MBASE_PUBLIC QString current_iso_string(bool stripped = false);
 MBASE_PUBLIC QDateTime as_utc(const QDateTime &dt);
 
 /// Converts kFilename && kISODate formats to QDateTime
-MBASE_PUBLIC QDateTime fromString(const QString&);
+MBASE_PUBLIC QDateTime fromString(const QString &dtstr);
 /// Converts dy in format to QDateTime
 MBASE_PUBLIC QDateTime fromString(const QString &dt, const QString &format);
 #if QT_VERSION < QT_VERSION_CHECK(5,8,0)

@@ -106,55 +106,55 @@ RecordingInfo::RecordingInfo(
         _seriesid, _programid, _inetref, _inputname),
     m_oldrecstatus(_oldrecstatus),
     m_future(_future),
-    m_schedorder(_schedorder),
-    m_mplexid(_mplexid),
-    m_sgroupid(_sgroupid),
-    m_desiredrecstartts(_startts),
-    m_desiredrecendts(_endts)
+    m_schedOrder(_schedorder),
+    m_mplexId(_mplexid),
+    m_sgroupId(_sgroupid),
+    m_desiredRecStartTs(_startts),
+    m_desiredRecEndTs(_endts)
 {
     m_hostname = _hostname;
-    m_storagegroup = _storagegroup;
+    m_storageGroup = _storagegroup;
 
-    m_syndicatedepisode = _syndicatedepisode;
+    m_syndicatedEpisode = _syndicatedepisode;
 
     m_year = _year;
-    m_partnumber = _partnumber;
-    m_parttotal = _parttotal;
+    m_partNumber = _partnumber;
+    m_partTotal = _parttotal;
     m_catType = _catType;
 
-    m_recpriority = _recpriority;
+    m_recPriority = _recpriority;
 
     m_stars = clamp(_stars, 0.0F, 1.0F);
     m_originalAirDate = _originalAirDate;
     if (m_originalAirDate.isValid() && m_originalAirDate < QDate(1940, 1, 1))
         m_originalAirDate = QDate();
 
-    m_programflags &= ~FL_REPEAT;
-    m_programflags |= _repeat ? FL_REPEAT : 0;
-    m_programflags &= ~FL_REACTIVATE;
-    m_programflags |= _reactivate ? FL_REACTIVATE : 0;
-    m_programflags &= ~FL_CHANCOMMFREE;
-    m_programflags |= _commfree ? FL_CHANCOMMFREE : 0;
+    m_programFlags &= ~FL_REPEAT;
+    m_programFlags |= _repeat ? FL_REPEAT : 0;
+    m_programFlags &= ~FL_REACTIVATE;
+    m_programFlags |= _reactivate ? FL_REACTIVATE : 0;
+    m_programFlags &= ~FL_CHANCOMMFREE;
+    m_programFlags |= _commfree ? FL_CHANCOMMFREE : 0;
 
-    m_recordid = _recordid;
-    m_parentid = _parentid;
-    m_rectype = _rectype;
-    m_dupin = _dupin;
-    m_dupmethod = _dupmethod;
+    m_recordId = _recordid;
+    m_parentId = _parentid;
+    m_recType = _rectype;
+    m_dupIn = _dupin;
+    m_dupMethod = _dupmethod;
 
-    m_sourceid = _sourceid;
-    m_inputid = _inputid;
-    m_findid = _findid;
+    m_sourceId = _sourceid;
+    m_inputId = _inputid;
+    m_findId = _findid;
 
     m_properties = ((_subtitleType    << kSubtitlePropertyOffset) |
                   (_videoproperties << kVideoPropertyOffset)  |
                   _audioproperties);
 
-    if (m_recstartts >= m_recendts)
+    if (m_recStartTs >= m_recEndTs)
     {
         // start/end-offsets are invalid so ignore
-        m_recstartts = m_startts;
-        m_recendts   = m_endts;
+        m_recStartTs = m_startTs;
+        m_recEndTs   = m_endTs;
     }
 
     LoadRecordingFile();
@@ -206,22 +206,22 @@ RecordingInfo::RecordingInfo(
         QString(), _recgroup, _playgroup,
         _startts, _endts, _recstartts, _recendts,
         _seriesid, _programid, _inetref, ""),
-    m_desiredrecstartts(_startts),
-    m_desiredrecendts(_endts)
+    m_desiredRecStartTs(_startts),
+    m_desiredRecEndTs(_endts)
 {
-    m_recpriority = _recpriority;
+    m_recPriority = _recpriority;
 
-    m_recstatus = _recstatus,
+    m_recStatus = _recstatus,
 
-    m_recordid = _recordid;
-    m_rectype = _rectype;
-    m_dupin = _dupin;
-    m_dupmethod = _dupmethod;
+    m_recordId = _recordid;
+    m_recType = _rectype;
+    m_dupIn = _dupin;
+    m_dupMethod = _dupmethod;
 
-    m_findid = _findid;
+    m_findId = _findid;
 
-    m_programflags &= ~FL_CHANCOMMFREE;
-    m_programflags |= _commfree ? FL_CHANCOMMFREE : 0;
+    m_programFlags &= ~FL_CHANCOMMFREE;
+    m_programFlags |= _commfree ? FL_CHANCOMMFREE : 0;
 
     LoadRecordingFile();
 }
@@ -273,9 +273,9 @@ RecordingInfo::RecordingInfo(
         return;
     }
 
-    m_recstartts = m_startts = desiredts;
-    m_recendts   = m_endts   = desiredts;
-    m_lastmodified           = desiredts;
+    m_recStartTs = m_startTs = desiredts;
+    m_recEndTs   = m_endTs   = desiredts;
+    m_lastModified           = desiredts;
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT chanid, channum, callsign, name, "
@@ -299,14 +299,14 @@ RecordingInfo::RecordingInfo(
         return;
     }
 
-    m_chanid               = query.value(0).toUInt();
-    m_chanstr              = query.value(1).toString();
-    m_chansign             = query.value(2).toString();
-    m_channame             = query.value(3).toString();
-    m_programflags &= ~FL_CHANCOMMFREE;
-    m_programflags |= (query.value(4).toInt() == COMM_DETECT_COMMFREE) ?
+    m_chanId               = query.value(0).toUInt();
+    m_chanStr              = query.value(1).toString();
+    m_chanSign             = query.value(2).toString();
+    m_chanName             = query.value(3).toString();
+    m_programFlags &= ~FL_CHANCOMMFREE;
+    m_programFlags |= (query.value(4).toInt() == COMM_DETECT_COMMFREE) ?
         FL_CHANCOMMFREE : 0;
-    m_chanplaybackfilters  = query.value(5).toString();
+    m_chanPlaybackFilters  = query.value(5).toString();
 
     {
         QMutexLocker locker(&s_staticDataLock);
@@ -323,22 +323,22 @@ RecordingInfo::RecordingInfo(
     }
 
     // Round endtime up to the next half-hour.
-    m_endts = QDateTime(
-        m_endts.date(),
-        QTime(m_endts.time().hour(),
-              m_endts.time().minute() / kUnknownProgramLength
+    m_endTs = QDateTime(
+        m_endTs.date(),
+        QTime(m_endTs.time().hour(),
+              m_endTs.time().minute() / kUnknownProgramLength
               * kUnknownProgramLength), Qt::UTC);
-    m_endts = m_endts.addSecs(kUnknownProgramLength * 60);
+    m_endTs = m_endTs.addSecs(kUnknownProgramLength * 60);
 
     // if under a minute, bump it up to the next half hour
-    if (m_startts.secsTo(m_endts) < 60)
-        m_endts = m_endts.addSecs(kUnknownProgramLength * 60);
+    if (m_startTs.secsTo(m_endTs) < 60)
+        m_endTs = m_endTs.addSecs(kUnknownProgramLength * 60);
 
-    m_recendts = m_endts;
+    m_recEndTs = m_endTs;
 
     // Find next program starttime
     bindings.clear();
-    QDateTime nextstart = m_startts;
+    QDateTime nextstart = m_startTs;
     querystr = "WHERE program.chanid    = :CHANID  AND "
                "      program.starttime > :STARTTS "
                "GROUP BY program.starttime ORDER BY program.starttime LIMIT 1 ";
@@ -350,14 +350,14 @@ RecordingInfo::RecordingInfo(
     if (!progList.empty())
         nextstart = (*progList.begin())->GetScheduledStartTime();
 
-    if (nextstart > m_startts && nextstart < m_recendts)
-        m_recendts = m_endts = nextstart;
+    if (nextstart > m_startTs && nextstart < m_recEndTs)
+        m_recEndTs = m_endTs = nextstart;
 
     if (status)
         *status = kFakedLiveTVProgram;
 
-    m_desiredrecstartts = m_startts;
-    m_desiredrecendts = m_endts;
+    m_desiredRecStartTs = m_startTs;
+    m_desiredRecEndTs = m_endTs;
 
     LoadRecordingFile();
 }
@@ -367,10 +367,10 @@ void RecordingInfo::clone(const RecordingInfo &other,
                           bool ignore_non_serialized_data)
 {
     bool is_same =
-        (m_chanid && m_recstartts.isValid() && m_startts.isValid() &&
-         m_chanid     == other.GetChanID() &&
-         m_recstartts == other.GetRecordingStartTime() &&
-         m_startts    == other.GetScheduledStartTime());
+        (m_chanId && m_recStartTs.isValid() && m_startTs.isValid() &&
+         m_chanId     == other.GetChanID() &&
+         m_recStartTs == other.GetRecordingStartTime() &&
+         m_startTs    == other.GetScheduledStartTime());
 
     ProgramInfo::clone(other, ignore_non_serialized_data);
 
@@ -385,11 +385,11 @@ void RecordingInfo::clone(const RecordingInfo &other,
         m_oldrecstatus      = other.m_oldrecstatus;
         m_savedrecstatus    = other.m_savedrecstatus;
         m_future            = other.m_future;
-        m_schedorder        = other.m_schedorder;
-        m_mplexid           = other.m_mplexid;
-        m_sgroupid          = other.m_sgroupid;
-        m_desiredrecstartts = other.m_desiredrecstartts;
-        m_desiredrecendts   = other.m_desiredrecendts;
+        m_schedOrder        = other.m_schedOrder;
+        m_mplexId           = other.m_mplexId;
+        m_sgroupId          = other.m_sgroupId;
+        m_desiredRecStartTs = other.m_desiredRecStartTs;
+        m_desiredRecEndTs   = other.m_desiredRecEndTs;
     }
 
     delete m_recordingFile;
@@ -402,10 +402,10 @@ void RecordingInfo::clone(const ProgramInfo &other,
                           bool ignore_non_serialized_data)
 {
     bool is_same =
-        (m_chanid && m_recstartts.isValid() && m_startts.isValid() &&
-         m_chanid     == other.GetChanID() &&
-         m_recstartts == other.GetRecordingStartTime() &&
-         m_startts    == other.GetScheduledStartTime());
+        (m_chanId && m_recStartTs.isValid() && m_startTs.isValid() &&
+         m_chanId     == other.GetChanID() &&
+         m_recStartTs == other.GetRecordingStartTime() &&
+         m_startTs    == other.GetScheduledStartTime());
 
     ProgramInfo::clone(other, ignore_non_serialized_data);
 
@@ -418,11 +418,11 @@ void RecordingInfo::clone(const ProgramInfo &other,
     m_oldrecstatus      = RecStatus::Unknown;
     m_savedrecstatus    = RecStatus::Unknown;
     m_future            = false;
-    m_schedorder        = 0;
-    m_mplexid           = 0;
-    m_sgroupid          = 0;
-    m_desiredrecstartts = QDateTime();
-    m_desiredrecendts   = QDateTime();
+    m_schedOrder        = 0;
+    m_mplexId           = 0;
+    m_sgroupId          = 0;
+    m_desiredRecStartTs = QDateTime();
+    m_desiredRecEndTs   = QDateTime();
 
     delete m_recordingFile;
     m_recordingFile = nullptr;
@@ -439,11 +439,11 @@ void RecordingInfo::clear(void)
     m_oldrecstatus      = RecStatus::Unknown;
     m_savedrecstatus    = RecStatus::Unknown;
     m_future            = false;
-    m_schedorder        = 0;
-    m_mplexid           = 0;
-    m_sgroupid          = 0;
-    m_desiredrecstartts = QDateTime();
-    m_desiredrecendts   = QDateTime();
+    m_schedOrder        = 0;
+    m_mplexId           = 0;
+    m_sgroupId          = 0;
+    m_desiredRecStartTs = QDateTime();
+    m_desiredRecEndTs   = QDateTime();
 
     delete m_recordingFile;
     m_recordingFile = nullptr;
@@ -544,12 +544,12 @@ void RecordingInfo::ApplyRecordRecID(void)
                   "SET recordid = :RECID "
                   "WHERE chanid = :CHANID AND starttime = :START");
 
-    if (m_rectype == kOverrideRecord && m_parentid > 0)
-        query.bindValue(":RECID", m_parentid);
+    if (m_recType == kOverrideRecord && m_parentId > 0)
+        query.bindValue(":RECID", m_parentId);
     else
         query.bindValue(":RECID",  getRecordID());
-    query.bindValue(":CHANID", m_chanid);
-    query.bindValue(":START",  m_recstartts);
+    query.bindValue(":CHANID", m_chanId);
+    query.bindValue(":START",  m_recStartTs);
 
     if (!query.exec())
         MythDB::DBError(LOC + "RecordID update", query);
@@ -624,7 +624,7 @@ void RecordingInfo::ApplyRecordRecGroupChange(const QString &newrecgroup)
     }
 
     LOG(VB_GENERAL, LOG_NOTICE,
-            QString("ApplyRecordRecGroupChange: %1 to %2 (%3)").arg(m_recgroup)
+            QString("ApplyRecordRecGroupChange: %1 to %2 (%3)").arg(m_recGroup)
                                                                .arg(newrecgroup)
                                                                .arg(newrecgroupid));
 
@@ -635,13 +635,13 @@ void RecordingInfo::ApplyRecordRecGroupChange(const QString &newrecgroup)
                   " AND starttime = :START ;");
     query.bindValue(":RECGROUP", null_to_empty(newrecgroup));
     query.bindValue(":RECGROUPID", newrecgroupid);
-    query.bindValue(":START", m_recstartts);
-    query.bindValue(":CHANID", m_chanid);
+    query.bindValue(":START", m_recStartTs);
+    query.bindValue(":CHANID", m_chanId);
 
     if (!query.exec())
         MythDB::DBError("RecGroup update", query);
 
-    m_recgroup = newrecgroup; // Deprecate in favour of recgroupid
+    m_recGroup = newrecgroup; // Deprecate in favour of recgroupid
     //recgroupid = newrecgroupid;
 
     SendUpdateEvent();
@@ -663,20 +663,20 @@ void RecordingInfo::ApplyRecordRecGroupChange(int newrecgroupid)
                     " AND starttime = :START ;");
         query.bindValue(":RECGROUP", null_to_empty(newrecgroup));
         query.bindValue(":RECGROUPID", newrecgroupid);
-        query.bindValue(":START", m_recstartts);
-        query.bindValue(":CHANID", m_chanid);
+        query.bindValue(":START", m_recStartTs);
+        query.bindValue(":CHANID", m_chanId);
 
         if (!query.exec())
             MythDB::DBError("RecGroup update", query);
 
-        m_recgroup = newrecgroup; // Deprecate in favour of recgroupid
+        m_recGroup = newrecgroup; // Deprecate in favour of recgroupid
         //recgroupid = newrecgroupid;
 
         SendUpdateEvent();
     }
 
     LOG(VB_GENERAL, LOG_NOTICE,
-            QString("ApplyRecordRecGroupChange: %1 to %2 (%3)").arg(m_recgroup)
+            QString("ApplyRecordRecGroupChange: %1 to %2 (%3)").arg(m_recGroup)
                                                                .arg(newrecgroup)
                                                                .arg(newrecgroupid));
 }
@@ -695,13 +695,13 @@ void RecordingInfo::ApplyRecordPlayGroupChange(const QString &newplaygroup)
                   " WHERE chanid = :CHANID"
                   " AND starttime = :START ;");
     query.bindValue(":PLAYGROUP", null_to_empty(newplaygroup));
-    query.bindValue(":START", m_recstartts);
-    query.bindValue(":CHANID", m_chanid);
+    query.bindValue(":START", m_recStartTs);
+    query.bindValue(":CHANID", m_chanId);
 
     if (!query.exec())
         MythDB::DBError("PlayGroup update", query);
 
-    m_playgroup = newplaygroup;
+    m_playGroup = newplaygroup;
 
     SendUpdateEvent();
 }
@@ -720,13 +720,13 @@ void RecordingInfo::ApplyStorageGroupChange(const QString &newstoragegroup)
                   " WHERE chanid = :CHANID"
                   " AND starttime = :START ;");
     query.bindValue(":STORAGEGROUP", null_to_empty(newstoragegroup));
-    query.bindValue(":START", m_recstartts);
-    query.bindValue(":CHANID", m_chanid);
+    query.bindValue(":START", m_recStartTs);
+    query.bindValue(":CHANID", m_chanId);
 
     if (!query.exec())
         MythDB::DBError("StorageGroup update", query);
 
-    m_storagegroup = newstoragegroup;
+    m_storageGroup = newstoragegroup;
 
     SendUpdateEvent();
 }
@@ -752,8 +752,8 @@ void RecordingInfo::ApplyRecordRecTitleChange(const QString &newTitle,
     query.bindValue(":SUBTITLE", null_to_empty(newSubtitle));
     if (!newDescription.isNull())
         query.bindValue(":DESCRIPTION", newDescription);
-    query.bindValue(":CHANID", m_chanid);
-    query.bindValue(":START", m_recstartts);
+    query.bindValue(":CHANID", m_chanId);
+    query.bindValue(":START", m_recStartTs);
 
     if (!query.exec())
         MythDB::DBError("RecTitle update", query);
@@ -779,8 +779,8 @@ void RecordingInfo::ApplyTranscoderProfileChangeById(int id)
             "WHERE chanid = :CHANID "
             "AND starttime = :START");
     query.bindValue(":PROFILEID",  id);
-    query.bindValue(":CHANID",  m_chanid);
-    query.bindValue(":START",  m_recstartts);
+    query.bindValue(":CHANID",  m_chanId);
+    query.bindValue(":START",  m_recStartTs);
 
     if (!query.exec())
         MythDB::DBError(LOC + "unable to update transcoder "
@@ -803,8 +803,8 @@ void RecordingInfo::ApplyTranscoderProfileChange(const QString &profile) const
                       "SET transcoder = 0 "
                       "WHERE chanid = :CHANID "
                       "AND starttime = :START");
-        query.bindValue(":CHANID",  m_chanid);
-        query.bindValue(":START",  m_recstartts);
+        query.bindValue(":CHANID",  m_chanId);
+        query.bindValue(":START",  m_recStartTs);
 
         if (!query.exec())
             MythDB::DBError(LOC + "unable to update transcoder "
@@ -832,8 +832,8 @@ void RecordingInfo::ApplyTranscoderProfileChange(const QString &profile) const
                           "WHERE chanid = :CHANID "
                           "AND starttime = :START");
             query.bindValue(":TRANSCODER", pidquery.value(0).toInt());
-            query.bindValue(":CHANID",  m_chanid);
-            query.bindValue(":START",  m_recstartts);
+            query.bindValue(":CHANID",  m_chanId);
+            query.bindValue(":START",  m_recStartTs);
 
             if (!query.exec())
                 MythDB::DBError(LOC + "unable to update transcoder "
@@ -884,8 +884,8 @@ RecordingRule* RecordingInfo::GetRecordingRule(void)
 int RecordingInfo::getRecordID(void)
 {
     GetProgramRecordingStatus();
-    m_recordid = m_record->m_recordID;
-    return m_recordid;
+    m_recordId = m_record->m_recordID;
+    return m_recordId;
 }
 
 bool RecordingInfo::QueryRecordedIdForKey(int & recordedid,
@@ -944,7 +944,7 @@ void RecordingInfo::StartedRecording(const QString& ext)
     int count = 0;
     while (!InsertProgram(this, m_record) && count < 50)
     {
-        m_recstartts = m_recstartts.addSecs(1);
+        m_recStartTs = m_recStartTs.addSecs(1);
         m_pathname = CreateRecordBasename(ext);
         count++;
     }
@@ -965,16 +965,16 @@ void RecordingInfo::StartedRecording(const QString& ext)
 
     query.prepare("DELETE FROM recordedseek WHERE chanid = :CHANID"
                   " AND starttime = :START;");
-    query.bindValue(":CHANID", m_chanid);
-    query.bindValue(":START", m_recstartts);
+    query.bindValue(":CHANID", m_chanId);
+    query.bindValue(":START", m_recStartTs);
 
     if (!query.exec() || !query.isActive())
         MythDB::DBError("Clear seek info on record", query);
 
     query.prepare("DELETE FROM recordedmarkup WHERE chanid = :CHANID"
                   " AND starttime = :START;");
-    query.bindValue(":CHANID", m_chanid);
-    query.bindValue(":START", m_recstartts);
+    query.bindValue(":CHANID", m_chanId);
+    query.bindValue(":START", m_recStartTs);
 
     if (!query.exec() || !query.isActive())
         MythDB::DBError("Clear markup on record", query);
@@ -982,8 +982,8 @@ void RecordingInfo::StartedRecording(const QString& ext)
     query.prepare("REPLACE INTO recordedcredits"
                  " SELECT * FROM credits"
                  " WHERE chanid = :CHANID AND starttime = :START;");
-    query.bindValue(":CHANID", m_chanid);
-    query.bindValue(":START", m_startts);
+    query.bindValue(":CHANID", m_chanId);
+    query.bindValue(":START", m_startTs);
     if (!query.exec() || !query.isActive())
         MythDB::DBError("Copy program credits on record", query);
 
@@ -991,8 +991,8 @@ void RecordingInfo::StartedRecording(const QString& ext)
                  " SELECT * from program"
                  " WHERE chanid = :CHANID AND starttime = :START"
                  " AND title = :TITLE;");
-    query.bindValue(":CHANID", m_chanid);
-    query.bindValue(":START", m_startts);
+    query.bindValue(":CHANID", m_chanId);
+    query.bindValue(":START", m_startTs);
     query.bindValue(":TITLE", m_title);
     if (!query.exec() || !query.isActive())
         MythDB::DBError("Copy program data on record", query);
@@ -1000,8 +1000,8 @@ void RecordingInfo::StartedRecording(const QString& ext)
     query.prepare("REPLACE INTO recordedrating"
                  " SELECT * from programrating"
                  " WHERE chanid = :CHANID AND starttime = :START;");
-    query.bindValue(":CHANID", m_chanid);
-    query.bindValue(":START", m_startts);
+    query.bindValue(":CHANID", m_chanId);
+    query.bindValue(":START", m_startTs);
     if (!query.exec() || !query.isActive())
         MythDB::DBError("Copy program ratings on record", query);
 
@@ -1021,7 +1021,7 @@ bool RecordingInfo::InsertProgram(RecordingInfo *pg,
                                   const RecordingRule *rule)
 {
     QString inputname = pg->GetInputName();
-    int recgroupid = GetRecgroupID(pg->m_recgroup);
+    int recgroupid = GetRecgroupID(pg->m_recGroup);
 
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -1036,8 +1036,8 @@ bool RecordingInfo::InsertProgram(RecordingInfo *pg,
         "    FROM recorded "
         "    WHERE chanid    = :CHANID AND "
         "          starttime = :STARTS");
-    query.bindValue(":CHANID", pg->m_chanid);
-    query.bindValue(":STARTS", pg->m_recstartts);
+    query.bindValue(":CHANID", pg->m_chanId);
+    query.bindValue(":STARTS", pg->m_recStartTs);
 
     bool err = true;
     if (!query.exec())
@@ -1083,22 +1083,28 @@ bool RecordingInfo::InsertProgram(RecordingInfo *pg,
         "   0,         :STORGROUP,  :INPUTNAME,      :RECGROUPID) "
         );
 
-    if (pg->m_rectype == kOverrideRecord)
-        query.bindValue(":RECORDID",    pg->m_parentid);
+    if (pg->m_recType == kOverrideRecord)
+        query.bindValue(":RECORDID",    pg->m_parentId);
     else
-        query.bindValue(":RECORDID",    pg->m_recordid);
+        query.bindValue(":RECORDID",    pg->m_recordId);
 
     if (pg->m_originalAirDate.isValid())
+    {
         query.bindValue(":ORIGAIRDATE", pg->m_originalAirDate);
     // If there is no originalairdate use "year"
+    }
     else if (pg->m_year >= 1940)
+    {
         query.bindValue(":ORIGAIRDATE", QDate(pg->m_year,1,1));
+    }
     else
+    {
         query.bindValue(":ORIGAIRDATE", "0000-00-00");
+    }
 
-    query.bindValue(":CHANID",      pg->m_chanid);
-    query.bindValue(":STARTS",      pg->m_recstartts);
-    query.bindValue(":ENDS",        pg->m_recendts);
+    query.bindValue(":CHANID",      pg->m_chanId);
+    query.bindValue(":STARTS",      pg->m_recStartTs);
+    query.bindValue(":ENDS",        pg->m_recEndTs);
     query.bindValue(":TITLE",       pg->m_title);
     query.bindValue(":SUBTITLE",    null_to_empty(pg->m_subtitle));
     query.bindValue(":DESC",        null_to_empty(pg->m_description));
@@ -1106,21 +1112,21 @@ bool RecordingInfo::InsertProgram(RecordingInfo *pg,
     query.bindValue(":EPISODE",     pg->m_episode);
     query.bindValue(":HOSTNAME",    pg->m_hostname);
     query.bindValue(":CATEGORY",    null_to_empty(pg->m_category));
-    query.bindValue(":RECGROUP",    null_to_empty(pg->m_recgroup));
+    query.bindValue(":RECGROUP",    null_to_empty(pg->m_recGroup));
     query.bindValue(":AUTOEXP",     rule->m_autoExpire);
-    query.bindValue(":SERIESID",    null_to_empty(pg->m_seriesid));
-    query.bindValue(":PROGRAMID",   null_to_empty(pg->m_programid));
-    query.bindValue(":INETREF",     null_to_empty(pg->m_inetref));
-    query.bindValue(":FINDID",      pg->m_findid);
+    query.bindValue(":SERIESID",    null_to_empty(pg->m_seriesId));
+    query.bindValue(":PROGRAMID",   null_to_empty(pg->m_programId));
+    query.bindValue(":INETREF",     null_to_empty(pg->m_inetRef));
+    query.bindValue(":FINDID",      pg->m_findId);
     query.bindValue(":STARS",       pg->m_stars);
     query.bindValue(":REPEAT",      pg->IsRepeat());
     query.bindValue(":TRANSCODER",  rule->m_transcoder);
-    query.bindValue(":PLAYGROUP",   pg->m_playgroup);
+    query.bindValue(":PLAYGROUP",   pg->m_playGroup);
     query.bindValue(":RECPRIORITY", rule->m_recPriority);
     query.bindValue(":BASENAME",    pg->m_pathname);
-    query.bindValue(":STORGROUP",   null_to_empty(pg->m_storagegroup));
-    query.bindValue(":PROGSTART",   pg->m_startts);
-    query.bindValue(":PROGEND",     pg->m_endts);
+    query.bindValue(":STORGROUP",   null_to_empty(pg->m_storageGroup));
+    query.bindValue(":PROGSTART",   pg->m_startTs);
+    query.bindValue(":PROGEND",     pg->m_endTs);
     query.bindValue(":PROFILE",     null_to_empty(rule->m_recProfile));
     query.bindValue(":INPUTNAME",   inputname);
     query.bindValue(":RECGROUPID",  recgroupid);
@@ -1136,9 +1142,11 @@ bool RecordingInfo::InsertProgram(RecordingInfo *pg,
         MythDB::DBError("InsertProgram -- unlock tables", query);
 
     if (!ok && !active)
+    {
         MythDB::DBError("InsertProgram -- insert", query);
 
-    else if (pg->m_recordid > 0)
+    }
+    else if (pg->m_recordId > 0)
     {
         query.prepare("UPDATE channel SET last_record = NOW() "
                       "WHERE chanid = :CHANID");
@@ -1148,15 +1156,15 @@ bool RecordingInfo::InsertProgram(RecordingInfo *pg,
 
         query.prepare("UPDATE record SET last_record = NOW() "
                       "WHERE recordid = :RECORDID");
-        query.bindValue(":RECORDID", pg->m_recordid);
+        query.bindValue(":RECORDID", pg->m_recordId);
         if (!query.exec())
             MythDB::DBError("InsertProgram -- record last_record", query);
 
-        if (pg->m_rectype == kOverrideRecord && pg->m_parentid > 0)
+        if (pg->m_recType == kOverrideRecord && pg->m_parentId > 0)
         {
             query.prepare("UPDATE record SET last_record = NOW() "
                           "WHERE recordid = :PARENTID");
-            query.bindValue(":PARENTID", pg->m_parentid);
+            query.bindValue(":PARENTID", pg->m_parentId);
             if (!query.exec())
                 MythDB::DBError("InsertProgram -- record last_record override",
                                 query);
@@ -1181,9 +1189,9 @@ void RecordingInfo::FinishedRecording(bool allowReRecord)
                   "       duplicate = :DUPLICATE "
                   "WHERE chanid = :CHANID AND "
                   "    starttime = :STARTTIME ");
-    query.bindValue(":ENDTIME", m_recendts);
-    query.bindValue(":CHANID", m_chanid);
-    query.bindValue(":STARTTIME", m_recstartts);
+    query.bindValue(":ENDTIME", m_recEndTs);
+    query.bindValue(":CHANID", m_chanId);
+    query.bindValue(":STARTTIME", m_recStartTs);
     query.bindValue(":DUPLICATE", !allowReRecord);
 
     if (!query.exec())
@@ -1192,15 +1200,15 @@ void RecordingInfo::FinishedRecording(bool allowReRecord)
     GetProgramRecordingStatus();
     if (!allowReRecord)
     {
-        m_recstatus = RecStatus::Recorded;
+        m_recStatus = RecStatus::Recorded;
 
 #if QT_VERSION < QT_VERSION_CHECK(5,8,0)
-        uint starttime = m_recstartts.toTime_t();
-        uint endtime   = m_recendts.toTime_t();
+        uint starttime = m_recStartTs.toTime_t();
+        uint endtime   = m_recEndTs.toTime_t();
         int64_t duration = ((int64_t)endtime - (int64_t)starttime) * 1000000;
 #else
-        qint64 starttime = m_recstartts.toSecsSinceEpoch();
-        qint64 endtime   = m_recendts.toSecsSinceEpoch();
+        qint64 starttime = m_recStartTs.toSecsSinceEpoch();
+        qint64 endtime   = m_recEndTs.toSecsSinceEpoch();
         int64_t duration = (endtime - starttime) * 1000000;
 #endif
         SaveTotalDuration(duration);
@@ -1211,7 +1219,7 @@ void RecordingInfo::FinishedRecording(bool allowReRecord)
         QString details = QString("%1%2: channel %3")
                                         .arg(m_title)
                                         .arg(msg_subtitle)
-                                        .arg(m_chanid);
+                                        .arg(m_chanId);
 
         LOG(VB_GENERAL, LOG_INFO, QString("%1 %2").arg(msg).arg(details));
     }
@@ -1229,10 +1237,10 @@ void RecordingInfo::UpdateRecordingEnd(void)
     query.prepare("UPDATE recorded SET endtime = :ENDTIME "
                   "WHERE chanid = :CHANID AND "
                   "    starttime = :STARTTIME ");
-    query.bindValue(":ENDTIME", m_recendts);
+    query.bindValue(":ENDTIME", m_recEndTs);
 
-    query.bindValue(":CHANID", m_chanid);
-    query.bindValue(":STARTTIME", m_recstartts);
+    query.bindValue(":CHANID", m_chanId);
+    query.bindValue(":STARTTIME", m_recStartTs);
 
     if (!query.exec())
         MythDB::DBError("UpdateRecordingEnd update", query);
@@ -1251,9 +1259,9 @@ void RecordingInfo::ReactivateRecording(void)
                    "WHERE station = :STATION AND "
                    "  starttime = :STARTTIME AND "
                    "  title = :TITLE;");
-    result.bindValue(":STARTTIME", m_startts);
+    result.bindValue(":STARTTIME", m_startTs);
     result.bindValue(":TITLE", m_title);
-    result.bindValue(":STATION", m_chansign);
+    result.bindValue(":STATION", m_chanSign);
 
     if (!result.exec())
         MythDB::DBError("ReactivateRecording", result);
@@ -1276,7 +1284,7 @@ void RecordingInfo::AddHistory(bool resched, bool forcedup, bool future)
         m_oldrecstatus = GetRecordingStatus();
     if (dup)
         SetReactivated(false);
-    uint erecid = m_parentid ? m_parentid : m_recordid;
+    uint erecid = m_parentId ? m_parentId : m_recordId;
 
     MSqlQuery result(MSqlQuery::InitCon());
 
@@ -1289,22 +1297,22 @@ void RecordingInfo::AddHistory(bool resched, bool forcedup, bool future)
                    ":EPISODE,:CATEGORY,:SERIESID,:PROGRAMID,:INETREF,"
                    ":FINDID,:RECORDID,:STATION,:RECTYPE,:RECSTATUS,:DUPLICATE,"
                    ":REACTIVATE,:GENERIC,:FUTURE);");
-    result.bindValue(":CHANID", m_chanid);
-    result.bindValue(":START", m_startts);
-    result.bindValue(":END", m_endts);
+    result.bindValue(":CHANID", m_chanId);
+    result.bindValue(":START", m_startTs);
+    result.bindValue(":END", m_endTs);
     result.bindValue(":TITLE", m_title);
     result.bindValue(":SUBTITLE", null_to_empty(m_subtitle));
     result.bindValue(":DESC", null_to_empty(m_description));
     result.bindValue(":SEASON", m_season);
     result.bindValue(":EPISODE", m_episode);
     result.bindValue(":CATEGORY", null_to_empty(m_category));
-    result.bindValue(":SERIESID", null_to_empty(m_seriesid));
-    result.bindValue(":PROGRAMID", null_to_empty(m_programid));
-    result.bindValue(":INETREF", null_to_empty(m_inetref));
-    result.bindValue(":FINDID", m_findid);
+    result.bindValue(":SERIESID", null_to_empty(m_seriesId));
+    result.bindValue(":PROGRAMID", null_to_empty(m_programId));
+    result.bindValue(":INETREF", null_to_empty(m_inetRef));
+    result.bindValue(":FINDID", m_findId);
     result.bindValue(":RECORDID", erecid);
-    result.bindValue(":STATION", null_to_empty(m_chansign));
-    result.bindValue(":RECTYPE", m_rectype);
+    result.bindValue(":STATION", null_to_empty(m_chanSign));
+    result.bindValue(":RECTYPE", m_recType);
     result.bindValue(":RECSTATUS", rs);
     result.bindValue(":DUPLICATE", dup);
     result.bindValue(":REACTIVATE", 0);
@@ -1314,12 +1322,12 @@ void RecordingInfo::AddHistory(bool resched, bool forcedup, bool future)
     if (!result.exec())
         MythDB::DBError("addHistory", result);
 
-    if (dup && m_findid)
+    if (dup && m_findId)
     {
         result.prepare("REPLACE INTO oldfind (recordid, findid) "
                        "VALUES(:RECORDID,:FINDID);");
         result.bindValue(":RECORDID", erecid);
-        result.bindValue(":FINDID", m_findid);
+        result.bindValue(":FINDID", m_findId);
 
         if (!result.exec())
             MythDB::DBError("addFindHistory", result);
@@ -1336,25 +1344,25 @@ void RecordingInfo::AddHistory(bool resched, bool forcedup, bool future)
  */
 void RecordingInfo::DeleteHistory(void)
 {
-    uint erecid = m_parentid ? m_parentid : m_recordid;
+    uint erecid = m_parentId ? m_parentId : m_recordId;
 
     MSqlQuery result(MSqlQuery::InitCon());
 
     result.prepare("DELETE FROM oldrecorded WHERE title = :TITLE AND "
                    "starttime = :START AND station = :STATION");
     result.bindValue(":TITLE", m_title);
-    result.bindValue(":START", m_recstartts);
-    result.bindValue(":STATION", m_chansign);
+    result.bindValue(":START", m_recStartTs);
+    result.bindValue(":STATION", m_chanSign);
 
     if (!result.exec())
         MythDB::DBError("deleteHistory", result);
 
-    if (/*m_duplicate &&*/ m_findid)
+    if (/*m_duplicate &&*/ m_findId)
     {
         result.prepare("DELETE FROM oldfind WHERE "
                        "recordid = :RECORDID AND findid = :FINDID");
         result.bindValue(":RECORDID", erecid);
-        result.bindValue(":FINDID", m_findid);
+        result.bindValue(":FINDID", m_findId);
 
         if (!result.exec())
             MythDB::DBError("deleteFindHistory", result);
@@ -1375,9 +1383,9 @@ void RecordingInfo::DeleteHistory(void)
  */
 void RecordingInfo::ForgetHistory(void)
 {
-    uint erecid = m_parentid ? m_parentid : m_recordid;
-    uint din = m_dupin;
-    uint dmeth = m_dupmethod;
+    uint erecid = m_parentId ? m_parentId : m_recordId;
+    uint din = m_dupIn;
+    uint dmeth = m_dupMethod;
 
     if (din == kDupsUnset)
         din = kDupsInAll;
@@ -1391,9 +1399,9 @@ void RecordingInfo::ForgetHistory(void)
                    "WHERE chanid = :CHANID "
                        "AND starttime = :STARTTIME "
                        "AND title = :TITLE;");
-    result.bindValue(":STARTTIME", m_recstartts);
+    result.bindValue(":STARTTIME", m_recStartTs);
     result.bindValue(":TITLE", m_title);
-    result.bindValue(":CHANID", m_chanid);
+    result.bindValue(":CHANID", m_chanId);
 
     if (!result.exec())
         MythDB::DBError("forgetRecorded1", result);
@@ -1444,11 +1452,11 @@ void RecordingInfo::ForgetHistory(void)
         result.bindValue(":DESCRIPTION3", null_to_empty(m_description));
         result.bindValue(":DESCRIPTION4", null_to_empty(m_description));
         result.bindValue(":DESCRIPTION5", null_to_empty(m_description));
-        result.bindValue(":PROGRAMID1", null_to_empty(m_programid));
-        result.bindValue(":PROGRAMID2", null_to_empty(m_programid));
-        result.bindValue(":PROGRAMID3", null_to_empty(m_programid));
-        result.bindValue(":PROGRAMID4", null_to_empty(m_programid));
-        result.bindValue(":PROGRAMID5", null_to_empty(m_programid));
+        result.bindValue(":PROGRAMID1", null_to_empty(m_programId));
+        result.bindValue(":PROGRAMID2", null_to_empty(m_programId));
+        result.bindValue(":PROGRAMID3", null_to_empty(m_programId));
+        result.bindValue(":PROGRAMID4", null_to_empty(m_programId));
+        result.bindValue(":PROGRAMID5", null_to_empty(m_programId));
         result.bindValue(":DUPMETHOD1", dmeth);
         result.bindValue(":DUPMETHOD2", dmeth);
         result.bindValue(":DUPMETHOD3", dmeth);
@@ -1462,9 +1470,9 @@ void RecordingInfo::ForgetHistory(void)
                    "WHERE station = :STATION "
                        "AND starttime = :STARTTIME "
                        "AND title = :TITLE;");
-    result.bindValue(":STARTTIME", m_startts);
+    result.bindValue(":STARTTIME", m_startTs);
     result.bindValue(":TITLE", m_title);
-    result.bindValue(":STATION", m_chansign);
+    result.bindValue(":STATION", m_chanSign);
 
     if (!result.exec())
         MythDB::DBError("forgetOldRecorded1", result);
@@ -1515,11 +1523,11 @@ void RecordingInfo::ForgetHistory(void)
         result.bindValue(":DESCRIPTION3", null_to_empty(m_description));
         result.bindValue(":DESCRIPTION4", null_to_empty(m_description));
         result.bindValue(":DESCRIPTION5", null_to_empty(m_description));
-        result.bindValue(":PROGRAMID1", null_to_empty(m_programid));
-        result.bindValue(":PROGRAMID2", null_to_empty(m_programid));
-        result.bindValue(":PROGRAMID3", null_to_empty(m_programid));
-        result.bindValue(":PROGRAMID4", null_to_empty(m_programid));
-        result.bindValue(":PROGRAMID5", null_to_empty(m_programid));
+        result.bindValue(":PROGRAMID1", null_to_empty(m_programId));
+        result.bindValue(":PROGRAMID2", null_to_empty(m_programId));
+        result.bindValue(":PROGRAMID3", null_to_empty(m_programId));
+        result.bindValue(":PROGRAMID4", null_to_empty(m_programId));
+        result.bindValue(":PROGRAMID5", null_to_empty(m_programId));
         result.bindValue(":DUPMETHOD1", dmeth);
         result.bindValue(":DUPMETHOD2", dmeth);
         result.bindValue(":DUPMETHOD3", dmeth);
@@ -1537,12 +1545,12 @@ void RecordingInfo::ForgetHistory(void)
         MythDB::DBError("forgetNeverHistory", result);
 
     // Handle matching entries in oldfind.
-    if (m_findid)
+    if (m_findId)
     {
         result.prepare("DELETE FROM oldfind WHERE "
                        "recordid = :RECORDID AND findid = :FINDID");
         result.bindValue(":RECORDID", erecid);
-        result.bindValue(":FINDID", m_findid);
+        result.bindValue(":FINDID", m_findId);
 
         if (!result.exec())
             MythDB::DBError("forgetFindHistory", result);
@@ -1570,8 +1578,8 @@ void RecordingInfo::SetDupHistory(void)
     result.bindValue(":TITLE", m_title);
     result.bindValue(":SUBTITLE", null_to_empty(m_subtitle));
     result.bindValue(":DESC", null_to_empty(m_description));
-    result.bindValue(":PROGRAMID", null_to_empty(m_programid));
-    result.bindValue(":FINDID", m_findid);
+    result.bindValue(":PROGRAMID", null_to_empty(m_programId));
+    result.bindValue(":FINDID", m_findId);
 
     if (!result.exec())
         MythDB::DBError("setDupHistory", result);
@@ -1586,10 +1594,10 @@ void RecordingInfo::SetDupHistory(void)
 void RecordingInfo::SubstituteMatches(QString &str)
 {
     str.replace("%RECID%", QString::number(getRecordID()));
-    str.replace("%PARENTID%", QString::number(m_parentid));
-    str.replace("%FINDID%", QString::number(m_findid));
-    str.replace("%RECSTATUS%", QString::number(m_recstatus));
-    str.replace("%RECTYPE%", QString::number(m_rectype));
+    str.replace("%PARENTID%", QString::number(m_parentId));
+    str.replace("%FINDID%", QString::number(m_findId));
+    str.replace("%RECSTATUS%", QString::number(m_recStatus));
+    str.replace("%RECTYPE%", QString::number(m_recType));
     str.replace("%REACTIVATE%", IsReactivated() ? "1" : "0");
     str.replace("%INPUTNAME%", GetInputName());
     str.replace("%CHANNUM%", GetChanNum());
@@ -1638,9 +1646,9 @@ void RecordingInfo::LoadRecordingFile()
     if (!m_recordingFile)
     {
         m_recordingFile = new RecordingFile();
-        if (m_recordedid > 0)
+        if (m_recordedId > 0)
         {
-            m_recordingFile->m_recordingId = m_recordedid;
+            m_recordingFile->m_recordingId = m_recordedId;
             m_recordingFile->Load();
         }
     }
@@ -1653,7 +1661,7 @@ void RecordingInfo::SaveFilesize(uint64_t fsize)
     GetRecordingFile()->m_fileSize = fsize;
     GetRecordingFile()->Save(); // Ideally this would be called just the once when all metadata is gathered
 
-    s_updater->insert(m_recordedid, kPIUpdateFileSize, fsize);
+    s_updater->insert(m_recordedId, kPIUpdateFileSize, fsize);
 
     ProgramInfo::SaveFilesize(fsize); // Temporary
 }
@@ -1663,7 +1671,7 @@ void RecordingInfo::SetFilesize(uint64_t fsize)
     if (!GetRecordingFile())
         LoadRecordingFile();
     GetRecordingFile()->m_fileSize = fsize;
-    s_updater->insert(m_recordedid, kPIUpdateFileSize, fsize);
+    s_updater->insert(m_recordedId, kPIUpdateFileSize, fsize);
 
     // Make sure the old storage location is updated for now
     ProgramInfo::SetFilesize(fsize);

@@ -12,12 +12,12 @@ class ImportSettings : public MythScreenType
 {
     Q_OBJECT
   public:
-    ImportSettings(MythScreenStack *parent, const char *name = nullptr)
+    explicit ImportSettings(MythScreenStack *parent, const char *name = nullptr)
         : MythScreenType(parent, name) {}
-    ~ImportSettings() = default;
+    ~ImportSettings() override = default;
 
     bool Create(void) override; // MythScreenType
-    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
   private:
     MythUIButtonList   *m_paranoiaLevel     {nullptr};

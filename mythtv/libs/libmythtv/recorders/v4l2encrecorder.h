@@ -34,7 +34,7 @@ class V4L2encRecorder : public V4LRecorder
     void run(void) override; // RecorderBase
 
     bool Open(void);
-    bool IsOpen(void) const { return m_stream_handler; }
+    bool IsOpen(void) const { return m_streamHandler; }
     void Close(void);
     void StartNewFile(void) override; // RecorderBase
 
@@ -53,7 +53,7 @@ class V4L2encRecorder : public V4LRecorder
 
   private:
     V4LChannel           *m_channel        {nullptr};
-    V4L2encStreamHandler *m_stream_handler {nullptr};
+    V4L2encStreamHandler *m_streamHandler  {nullptr};
 };
 
 #endif // _V4L2enc_RECORDER_H_

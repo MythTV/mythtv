@@ -12,26 +12,26 @@ class HttpConfig : public HttpServerExtension
 {
   public:
     HttpConfig();
-    virtual ~HttpConfig() = default;
+    ~HttpConfig() override = default;
 
     QStringList GetBasePaths() override; // HttpServerExtension
 
     bool ProcessRequest(HTTPRequest *pRequest) override; // HttpServerExtension
 
   private:
-    static void PrintHeader(QBuffer&, const QString &form,
+    static void PrintHeader(QBuffer &buffer, const QString &form,
                             const QString &group = "");
-    static void OpenForm(QBuffer&, const QString &form,
+    static void OpenForm(QBuffer &buffer, const QString &form,
                          const QString &group = "");
-    static void CloseForm(QBuffer&,
+    static void CloseForm(QBuffer &buffer,
                           const QString &group = "");
-    static void PrintFooter(QBuffer&,
+    static void PrintFooter(QBuffer &buffer,
                             const QString &group = "");
     static bool LoadSettings(MythSettingList&, const QString &hostname);
-    static void PrintSettings(QBuffer&, const MythSettingList&);
+    static void PrintSettings(QBuffer &buffer, const MythSettingList &settings);
 
-    MythSettingList m_database_settings;
-    MythSettingList m_general_settings;
+    MythSettingList m_databaseSettings;
+    MythSettingList m_generalSettings;
 };
 
 #endif

@@ -30,6 +30,6 @@
 // Qt headers
 #include <QString>
 
-QString toString(fe_status);
+QString toString(fe_status status);
 
 #endif // DVB_TYPES_H

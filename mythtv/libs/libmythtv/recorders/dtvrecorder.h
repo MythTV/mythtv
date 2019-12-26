@@ -37,36 +37,36 @@ class DTVRecorder :
 {
   public:
     explicit DTVRecorder(TVRec *rec);
-    virtual ~DTVRecorder();
+    ~DTVRecorder() override;
 
     void SetOption(const QString &name, const QString &value) override; // RecorderBase
     void SetOption(const QString &name, int value) override; // RecorderBase
     void SetOptionsFromProfile(
         RecordingProfile *profile, const QString &videodev,
-        const QString&, const QString&) override; // RecorderBase
+        const QString &audiodev, const QString &vbidev) override; // RecorderBase
 
     bool IsErrored(void) override // RecorderBase
         { return !m_error.isEmpty(); }
 
     long long GetFramesWritten(void) override // RecorderBase
-        { return m_frames_written_count; }
+        { return m_framesWrittenCount; }
 
     void SetVideoFilters(QString &/*filters*/) override {;} // RecorderBase
     void Initialize(void) override {;} // RecorderBase
     int GetVideoFd(void) override // RecorderBase
-        { return m_stream_fd; }
+        { return m_streamFd; }
 
     virtual void SetStreamData(MPEGStreamData* data);
-    MPEGStreamData *GetStreamData(void) const { return m_stream_data; }
+    MPEGStreamData *GetStreamData(void) const { return m_streamData; }
 
     void Reset(void) override; // RecorderBase
     void ClearStatistics(void) override; // RecorderBase
-    RecordingQuality *GetRecordingQuality(const RecordingInfo*) const override; // RecorderBase
+    RecordingQuality *GetRecordingQuality(const RecordingInfo *r) const override; // RecorderBase
 
     // MPEG Stream Listener
-    void HandlePAT(const ProgramAssociationTable*) override; // MPEGStreamListener
-    void HandleCAT(const ConditionalAccessTable*) override {} // MPEGStreamListener
-    void HandlePMT(uint progNum, const ProgramMapTable*) override; // MPEGStreamListener
+    void HandlePAT(const ProgramAssociationTable *_pat) override; // MPEGStreamListener
+    void HandleCAT(const ConditionalAccessTable */*cat*/) override {} // MPEGStreamListener
+    void HandlePMT(uint progNum, const ProgramMapTable *_pmt) override; // MPEGStreamListener
     void HandleEncryptionStatus(uint /*pnum*/, bool /*encrypted*/) override { } // MPEGStreamListener
 
     // MPEG Single Program Stream Listener
@@ -74,14 +74,14 @@ class DTVRecorder :
     void HandleSingleProgramPMT(ProgramMapTable *pmt, bool insert) override; // MPEGSingleProgramStreamListener
 
     // ATSC Main
-    void HandleSTT(const SystemTimeTable*) override { UpdateCAMTimeOffset(); } // ATSCMainStreamListener
-    void HandleVCT(uint /*tsid*/, const VirtualChannelTable*) override {} // ATSCMainStreamListener
-    void HandleMGT(const MasterGuideTable*) override {} // ATSCMainStreamListener
+    void HandleSTT(const SystemTimeTable */*stt*/) override { UpdateCAMTimeOffset(); } // ATSCMainStreamListener
+    void HandleVCT(uint /*tsid*/, const VirtualChannelTable */*vct*/) override {} // ATSCMainStreamListener
+    void HandleMGT(const MasterGuideTable */*mgt*/) override {} // ATSCMainStreamListener
 
     // DVBMainStreamListener
-    void HandleTDT(const TimeDateTable*) override { UpdateCAMTimeOffset(); } // DVBMainStreamListener
-    void HandleNIT(const NetworkInformationTable*) override {} // DVBMainStreamListener
-    void HandleSDT(uint /*tsid*/, const ServiceDescriptionTable*) override {} // DVBMainStreamListener
+    void HandleTDT(const TimeDateTable */*tdt*/) override { UpdateCAMTimeOffset(); } // DVBMainStreamListener
+    void HandleNIT(const NetworkInformationTable */*nit*/) override {} // DVBMainStreamListener
+    void HandleSDT(uint /*tsid*/, const ServiceDescriptionTable */*sdt*/) override {} // DVBMainStreamListener
 
     // TSPacketListener
     bool ProcessTSPacket(const TSPacket &tspacket) override; // TSPacketListener
@@ -121,89 +121,89 @@ class DTVRecorder :
     // For handling other (non audio/video) packets
     bool FindOtherKeyframes(const TSPacket *tspacket);
 
-    inline bool CheckCC(uint pid, uint cc);
+    inline bool CheckCC(uint pid, uint new_cnt);
 
     virtual QString GetSIStandard(void) const { return "mpeg"; }
-    virtual void SetCAMPMT(const ProgramMapTable*) {}
+    virtual void SetCAMPMT(const ProgramMapTable */*pmt*/) {}
     virtual void UpdateCAMTimeOffset(void) {}
 
     // file handle for stream
-    int                      m_stream_fd                  {-1};
+    int                      m_streamFd                   {-1};
 
-    QString                  m_recording_type             {"all"};
+    QString                  m_recordingType              {"all"};
 
     // used for scanning pes headers for keyframes
-    QTime                    m_audio_timer;
-    uint32_t                 m_start_code                 {0xffffffff};
-    int                      m_first_keyframe             {-1};
-    unsigned long long       m_last_gop_seen              {0};
-    unsigned long long       m_last_seq_seen              {0};
-    unsigned long long       m_last_keyframe_seen         {0};
-    unsigned int             m_audio_bytes_remaining      {0};
-    unsigned int             m_video_bytes_remaining      {0};
-    unsigned int             m_other_bytes_remaining      {0};
+    QTime                    m_audioTimer;
+    uint32_t                 m_startCode                  {0xffffffff};
+    int                      m_firstKeyframe              {-1};
+    unsigned long long       m_lastGopSeen                {0};
+    unsigned long long       m_lastSeqSeen                {0};
+    unsigned long long       m_lastKeyframeSeen           {0};
+    unsigned int             m_audioBytesRemaining        {0};
+    unsigned int             m_videoBytesRemaining        {0};
+    unsigned int             m_otherBytesRemaining        {0};
 
     // MPEG2 parser information
-    int                      m_progressive_sequence       {0};
-    int                      m_repeat_pict                {0};
+    int                      m_progressiveSequence        {0};
+    int                      m_repeatPict                 {0};
 
     // H.264 support
-    bool                     m_pes_synced                 {false};
-    bool                     m_seen_sps                   {false};
-    H264Parser               m_h264_parser;
+    bool                     m_pesSynced                  {false};
+    bool                     m_seenSps                    {false};
+    H264Parser               m_h264Parser;
 
     /// Wait for the a GOP/SEQ-start before sending data
-    bool                     m_wait_for_keyframe_option   {true};
+    bool                     m_waitForKeyframeOption      {true};
 
-    bool                     m_has_written_other_keyframe {false};
+    bool                     m_hasWrittenOtherKeyframe    {false};
 
     // state tracking variables
     /// non-empty iff irrecoverable recording error detected
     QString                  m_error;
 
-    MPEGStreamData          *m_stream_data                {nullptr};
+    MPEGStreamData          *m_streamData                 {nullptr};
 
     // keyframe finding buffer
-    bool                     m_buffer_packets             {false};
-    vector<unsigned char>    m_payload_buffer;
+    bool                     m_bufferPackets              {false};
+    vector<unsigned char>    m_payloadBuffer;
 
     // general recorder stuff
-    mutable QMutex           m_pid_lock                   {QMutex::Recursive};
+    mutable QMutex           m_pidLock                    {QMutex::Recursive};
                              /// PAT on input side
-    ProgramAssociationTable *m_input_pat                  {nullptr};
+    ProgramAssociationTable *m_inputPat                   {nullptr};
                              /// PMT on input side
-    ProgramMapTable         *m_input_pmt                  {nullptr};
-    bool                     m_has_no_av                  {false};
+    ProgramMapTable         *m_inputPmt                   {nullptr};
+    bool                     m_hasNoAV                    {false};
 
     // TS recorder stuff
-    bool                     m_record_mpts                {false};
-    bool                     m_record_mpts_only           {false};
-    unsigned char            m_stream_id[0x1fff + 1] {0};
-    unsigned char            m_pid_status[0x1fff + 1] {0};
-    unsigned char            m_continuity_counter[0x1fff + 1] {0};
+    bool                     m_recordMpts                 {false};
+    bool                     m_recordMptsOnly             {false};
+    unsigned char            m_streamId[0x1fff + 1]       {0};
+    unsigned char            m_pidStatus[0x1fff + 1]      {0};
+    unsigned char            m_continuityCounter[0x1fff + 1] {0};
     vector<TSPacket>         m_scratch;
 
     // Statistics
-    int                      m_minimum_recording_quality  {95};
+    int                      m_minimumRecordingQuality    {95};
     bool                     m_use_pts                    {false}; // vs use dts
-    uint64_t                 m_ts_count[256]              {0};
-    int64_t                  m_ts_last[256];
-    int64_t                  m_ts_first[256];
-    QDateTime                m_ts_first_dt[256];
-    mutable QAtomicInt       m_packet_count               {0};
-    mutable QAtomicInt       m_continuity_error_count     {0};
-    unsigned long long       m_frames_seen_count          {0};
-    unsigned long long       m_frames_written_count       {0};
-    double                   m_total_duration             {0.0}; // usec
+    uint64_t                 m_tsCount[256]               {0};
+    int64_t                  m_tsLast[256];
+    int64_t                  m_tsFirst[256];
+    QDateTime                m_tsFirstDt[256];
+    mutable QAtomicInt       m_packetCount                {0};
+    mutable QAtomicInt       m_continuityErrorCount       {0};
+    unsigned long long       m_framesSeenCount            {0};
+    unsigned long long       m_framesWrittenCount         {0};
+    double                   m_totalDuration              {0.0}; // usec
     // Calculate m_total_duration as
     // m_td_base + (m_td_tick_count * m_td_tick_framerate / 2)
-    double                   m_td_base                    {0.0};
-    uint64_t                 m_td_tick_count              {0};
-    FrameRate                m_td_tick_framerate          {0};
+    double                   m_tdBase                     {0.0};
+    uint64_t                 m_tdTickCount                {0};
+    FrameRate                m_tdTickFramerate            {0};
 
     // Music Choice
     // Comcast Music Choice uses 3 frames every 6 seconds and no key frames
-    bool                     m_music_choice               {false};
+    bool                     m_musicChoice                {false};
 
     // constants
     /// If the number of regular frames detected since the last
@@ -215,11 +215,11 @@ class DTVRecorder :
 
 inline bool DTVRecorder::CheckCC(uint pid, uint new_cnt)
 {
-    bool ok = ((((m_continuity_counter[pid] + 1) & 0xf) == new_cnt) ||
-               (m_continuity_counter[pid] == new_cnt) ||
-               (m_continuity_counter[pid] == 0xFF));
+    bool ok = ((((m_continuityCounter[pid] + 1) & 0xf) == new_cnt) ||
+               (m_continuityCounter[pid] == new_cnt) ||
+               (m_continuityCounter[pid] == 0xFF));
 
-    m_continuity_counter[pid] = new_cnt & 0xf;
+    m_continuityCounter[pid] = new_cnt & 0xf;
 
     return ok;
 }

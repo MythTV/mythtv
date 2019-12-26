@@ -27,14 +27,12 @@ using namespace std;
 
 Streamer::Streamer(Commands *parent, QString fname,
                    int data_rate, bool loopinput) :
-    m_parent(parent), m_fileName(std::move(fname)), m_file(nullptr),
-    m_loop(loopinput),
-    m_bufferMax(188 * 100000), m_blockSize(m_bufferMax / 4),
-    m_data_rate(data_rate), m_data_read(0)
+    m_parent(parent), m_fileName(std::move(fname)),
+    m_loop(loopinput), m_dataRate(data_rate)
 {
     setObjectName("Streamer");
     OpenFile();
-    LOG(VB_RECORD, LOG_INFO, LOC + QString("Data Rate: %1").arg(m_data_rate));
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("Data Rate: %1").arg(m_dataRate));
 }
 
 Streamer::~Streamer(void)
@@ -91,10 +89,10 @@ void Streamer::SendBytes(void)
     if (!m_file->atEnd())
     {
         int read_sz = m_blockSize.loadAcquire();
-        if (!m_start_time.isValid())
-            m_start_time = MythDate::current();
-        int delta = m_start_time.secsTo(MythDate::current()) + 1;
-        int rate  = (delta * m_data_rate) - m_data_read;
+        if (!m_startTime.isValid())
+            m_startTime = MythDate::current();
+        int delta = m_startTime.secsTo(MythDate::current()) + 1;
+        int rate  = (delta * m_dataRate) - m_dataRead;
 
         read_sz = min(rate, read_sz);
         read_sz = min(m_bufferMax - m_buffer.size(), read_sz);
@@ -106,7 +104,7 @@ void Streamer::SendBytes(void)
             pkt_size = buffer.size();
             if (pkt_size > 0)
             {
-                m_data_read += pkt_size;
+                m_dataRead += pkt_size;
                 if (m_buffer.size() + pkt_size > m_bufferMax)
                 {
                     // This should never happen
@@ -156,8 +154,7 @@ void Streamer::SendBytes(void)
 }
 
 
-Commands::Commands(void) : m_streamer(nullptr), m_timeout(10), m_run(true),
-    m_eof(0)
+Commands::Commands(void)
 {
     setObjectName("Command");
 }

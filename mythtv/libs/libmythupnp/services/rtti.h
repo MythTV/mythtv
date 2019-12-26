@@ -80,6 +80,7 @@ class ScriptableRtti : public QObject
         }
 };
 
+// NOLINTNEXTLINE(modernize-use-auto)
 Q_SCRIPT_DECLARE_QMETAOBJECT( ScriptableRtti, QObject*);
 
 #endif 

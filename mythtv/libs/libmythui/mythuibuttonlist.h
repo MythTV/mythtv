@@ -1,11 +1,15 @@
 #ifndef MYTHUIBUTTONLIST_H_
 #define MYTHUIBUTTONLIST_H_
 
-#include <QList>
+#include <utility>
+
+// Qt headers
 #include <QHash>
+#include <QList>
 #include <QString>
 #include <QVariant>
 
+// MythTV headers
 #include "mythuitype.h"
 #include "mythscreentype.h"
 #include "mythimage.h"
@@ -144,11 +148,11 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
     MythUIButtonList(MythUIType *parent, const QString &name,
                    const QRect &area, bool showArrow = true,
                    bool showScrollBar = false);
-    ~MythUIButtonList();
+    ~MythUIButtonList() override;
 
     bool keyPressEvent(QKeyEvent *event) override; // MythUIType
     bool gestureEvent(MythGestureEvent *event) override; // MythUIType
-    void customEvent(QEvent *) override; // MythUIType
+    void customEvent(QEvent *event) override; // MythUIType
 
     enum MovementUnit { MoveItem, MoveColumn, MoveRow, MovePage, MoveMax,
                         MoveMid, MoveByAmount };
@@ -351,8 +355,8 @@ class MUI_PUBLIC SearchButtonListDialog : public MythScreenType
     SearchButtonListDialog(MythScreenStack *parent, const char *name,
                            MythUIButtonList *parentList, QString searchText)
         : MythScreenType(parent, name, false),
-          m_parentList(parentList), m_searchText(searchText) {}
-    ~SearchButtonListDialog(void) = default;
+          m_parentList(parentList), m_searchText(std::move(searchText)) {}
+    ~SearchButtonListDialog(void) override = default;
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType

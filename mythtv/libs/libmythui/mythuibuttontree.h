@@ -18,9 +18,9 @@ class MUI_PUBLIC MythUIButtonTree : public MythUIType
     Q_OBJECT
   public:
     MythUIButtonTree(MythUIType *parent, const QString &name);
-   ~MythUIButtonTree() = default;
+   ~MythUIButtonTree() override = default;
 
-    bool keyPressEvent(QKeyEvent *) override; // MythUIType
+    bool keyPressEvent(QKeyEvent *event) override; // MythUIType
     bool gestureEvent(MythGestureEvent *event) override; // MythUIType
 
     bool AssignTree(MythGenericTree *tree);

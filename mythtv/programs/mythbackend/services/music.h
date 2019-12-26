@@ -60,7 +60,7 @@ class ScriptableMusic : public QObject
 
     public:
 
-        Q_INVOKABLE ScriptableMusic( QScriptEngine *pEngine, QObject *parent = nullptr ) : QObject( parent )
+        Q_INVOKABLE explicit ScriptableMusic( QScriptEngine *pEngine, QObject *parent = nullptr ) : QObject( parent )
         {
             m_pEngine = pEngine;
         }
@@ -83,6 +83,7 @@ class ScriptableMusic : public QObject
         }
 };
 
+// NOLINTNEXTLINE(modernize-use-auto)
 Q_SCRIPT_DECLARE_QMETAOBJECT_MYTHTV( ScriptableMusic, QObject*);
 
 #endif

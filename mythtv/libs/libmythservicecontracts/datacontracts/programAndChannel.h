@@ -97,7 +97,7 @@ class SERVICE_PUBLIC ChannelInfo : public QObject
 
         static void InitializeCustomTypes();
 
-        Q_INVOKABLE ChannelInfo(QObject *parent = nullptr)
+        Q_INVOKABLE explicit ChannelInfo(QObject *parent = nullptr)
             : QObject           ( parent ),
               m_ChanId          ( 0      ),
               m_MplexId         ( 0      ),
@@ -107,7 +107,7 @@ class SERVICE_PUBLIC ChannelInfo : public QObject
               m_FineTune        ( 0      ),
               m_SourceId        ( 0      ),
               m_InputId         ( 0      ),
-              m_CommFree        ( 0      ),
+              m_CommFree        ( false  ),
               m_UseEIT          ( false  ),
               m_Visible         ( true   ),
               m_SerializeDetails( true   )
@@ -229,7 +229,7 @@ class SERVICE_PUBLIC Program : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Q_INVOKABLE Program(QObject *parent = nullptr)
+        Q_INVOKABLE explicit Program(QObject *parent = nullptr)
             : QObject               ( parent ),
               m_Repeat              ( false  ),
               m_Stars               ( 0      ),
@@ -307,7 +307,7 @@ inline Program *ChannelInfo::AddNewProgram()
     // We must make sure the object added to the QVariantList has
     // a parent of 'this'
 
-    Program *pObject = new Program( this );
+    auto *pObject = new Program( this );
     m_Programs.append( QVariant::fromValue<QObject *>( pObject ));
 
     return pObject;

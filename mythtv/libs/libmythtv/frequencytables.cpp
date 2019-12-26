@@ -68,7 +68,7 @@ TransportScanItem::TransportScanItem(uint                _sourceid,
     m_tuning.ParseTuningParams(
         _tuner_type,
         QString::number(_tuning.m_frequency),  _tuning.m_inversion.toString(),
-        QString::number(_tuning.m_symbolrate), _tuning.m_fec.toString(),
+        QString::number(_tuning.m_symbolRate), _tuning.m_fec.toString(),
         _tuning.m_polarity.toString(),         _tuning.m_hpCodeRate.toString(),
         _tuning.m_lpCodeRate.toString(),       _tuning.m_modulation.toString(),
         _tuning.m_transMode.toString(),        _tuning.m_guardInterval.toString(),
@@ -118,7 +118,7 @@ TransportScanItem::TransportScanItem(uint sourceid,
     }
     else if (std == "dvbc" || std == "dvbs")
     {
-        m_tuning.m_symbolrate     = ft.m_symbolRate;
+        m_tuning.m_symbolRate     = ft.m_symbolRate;
         m_tuning.m_fec            = ft.m_fecInner;
     }
 

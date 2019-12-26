@@ -35,7 +35,7 @@ class MHIngredient : public MHRoot
   public:
     MHIngredient() = default;
     MHIngredient(const MHIngredient &ref);
-    virtual ~MHIngredient() = default;
+    ~MHIngredient() override = default;
     // Set this up from the parse tree.
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHRoot
     void PrintMe(FILE *fd, int nTabs) const override; // MHRoot
@@ -59,7 +59,7 @@ class MHIngredient : public MHRoot
         { Destruction(engine); }
 
     // Called by the engine to deliver external content.
-    virtual void ContentArrived(const unsigned char *, int, MHEngine *) { }
+    virtual void ContentArrived(const unsigned char */*data*/, int/*length*/, MHEngine */*engine*/) { }
 
   protected:
     bool    m_fInitiallyActive         {true}; // Default is true
@@ -86,7 +86,7 @@ class MHFont : public MHIngredient
 {
   public:
     MHFont() = default;
-    virtual ~MHFont() = default;
+    ~MHFont() override = default;
     const char *ClassName() override // MHRoot
         { return "Font"; }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHIngredient
@@ -100,7 +100,7 @@ class MHCursorShape : public MHIngredient
 {
   public:
     MHCursorShape() = default;
-    virtual ~MHCursorShape() = default;
+    ~MHCursorShape() override = default;
     const char *ClassName() override // MHRoot
         { return "CursorShape"; }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHIngredient
@@ -114,7 +114,7 @@ class MHPalette : public MHIngredient
 {
   public:
     MHPalette() = default;
-    virtual ~MHPalette() = default;
+    ~MHPalette() override = default;
     const char *ClassName() override // MHRoot
         { return "Palette"; }
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHIngredient

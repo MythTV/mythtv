@@ -42,55 +42,55 @@ class MTV_PUBLIC CarrierDefinitionSubtable
   public:
     CarrierDefinitionSubtable(
         const unsigned char *beg, const unsigned char *end) :
-        _beg(beg), _end(end) { }
+        m_beg(beg), m_end(end) { }
 
-    //     number_of_carriers   8  0.0+_beg
-    uint NumberOfCarriers(void) const { return _beg[0]; }
-    //     spacing_unit         1  1.0+_beg
+    //     number_of_carriers   8  0.0+m_beg
+    uint NumberOfCarriers(void) const { return m_beg[0]; }
+    //     spacing_unit         1  1.0+m_beg
     enum // Table 5.4 Spacing Unit & Table 5.5 frequency unit
     {
         k10000Hz  = 0x0,
         k125000Hz = 0x1,
     };
-    uint SpacingUnit(void) const { return _beg[1]>>7; }
+    uint SpacingUnit(void) const { return m_beg[1]>>7; }
     uint SpacingUnitHz(void) const { return SpacingUnit() ? 125000 : 1000; }
-    //     zero                 1  1.1+_beg
-    //     frequency_spacing   14  1.2+_beg
+    //     zero                 1  1.1+m_beg
+    //     frequency_spacing   14  1.2+m_beg
     uint FrequencySpacing(void) const
-        { return ((_beg[1] & 0x3) << 8) | _beg[2]; }
+        { return ((m_beg[1] & 0x3) << 8) | m_beg[2]; }
     uint FrequencySpacingHz(void) const
         { return FrequencySpacing() * SpacingUnitHz(); }
-    //     frequency_unit       1  3.0+_beg
-    uint FrequencyUnit(void) const { return _beg[3]>>7; }
+    //     frequency_unit       1  3.0+m_beg
+    uint FrequencyUnit(void) const { return m_beg[3]>>7; }
     uint FrequencyUnitHz(void) const { return FrequencyUnit() ? 125000 : 1000; }
-    //     first_carrier_frequency 15 3.1+_beg
+    //     first_carrier_frequency 15 3.1+m_beg
     uint FirstCarrierFrequency(void) const
-        { return ((_beg[3] & 0x3) << 8) | _beg[4]; }
+        { return ((m_beg[3] & 0x3) << 8) | m_beg[4]; }
     uint64_t FirstCarrierFrequencyHz(void) const
         { return (uint64_t)FirstCarrierFrequency() * FrequencyUnitHz(); }
 
-    //   descriptors_count     8    5.0+_beg
-    uint DescriptorsCount(void) const { return _beg[5]; }
+    //   descriptors_count     8    5.0+m_beg
+    uint DescriptorsCount(void) const { return m_beg[5]; }
     //   for (i=0; i<descriptors_count; i++) {
     //     descriptor()        ?    ?.0
     //   }
-    uint DescriptorsLength(void) const { return _end - _beg - 6; }
-    const unsigned char *Descriptors(void) const { return _beg + 6; }
+    uint DescriptorsLength(void) const { return m_end - m_beg - 6; }
+    const unsigned char *Descriptors(void) const { return m_beg + 6; }
 
     QString toString(void) const;
     QString toStringXML(uint indent_level) const;
 
   private:
-    const unsigned char *_beg;
-    const unsigned char *_end;
+    const unsigned char *m_beg;
+    const unsigned char *m_end;
 };
 
 class ModulationModeSubtable
 {
   public:
     ModulationModeSubtable(const unsigned char *beg, const unsigned char *end) :
-        _beg(beg), _end(end) { }
-    //     transmission_system 4   0.0+_beg
+        m_beg(beg), m_end(end) { }
+    //     transmission_system 4   0.0+m_beg
     enum // Table 5.7 TransmissionSystem
     {
         kTSUnknown       = 0,
@@ -104,9 +104,9 @@ class ModulationModeSubtable
         // Annex B is the 6Mhz North American standard and
         // Annex C is the 6Mhz Japanese standard. (QAM)
     };
-    uint TransmissionSystem(void) const { return _beg[0] >> 4; }
+    uint TransmissionSystem(void) const { return m_beg[0] >> 4; }
     QString TransmissionSystemString(void) const;
-    //     inner_coding_mode   4   0.4+_beg
+    //     inner_coding_mode   4   0.4+m_beg
     enum // Table 5.8
     {
         kRate5_11Coding =  0,
@@ -127,12 +127,12 @@ class ModulationModeSubtable
         kNone           = 15,
         // all other values are reserved
     };
-    uint InnerCodingMode(void) const { return _beg[0] & 0xf; }
+    uint InnerCodingMode(void) const { return m_beg[0] & 0xf; }
     QString InnerCodingModeString(void) const;
-    //     split_bitstream_mode 1   1.0+_beg
-    bool SplitBitstreamMode(void) const { return ( _beg[1] & 0x80 ) != 0; }
-    //     zero                2    1.1+_beg
-    //     modulation_format   5    1.3+_beg
+    //     split_bitstream_mode 1   1.0+m_beg
+    bool SplitBitstreamMode(void) const { return ( m_beg[1] & 0x80 ) != 0; }
+    //     zero                2    1.1+m_beg
+    //     modulation_format   5    1.3+m_beg
     enum // Table 5.9
     {
         kUnknown   =  0,
@@ -162,29 +162,29 @@ class ModulationModeSubtable
         kQAM1024   = 24,
         // all other values are reserved
     };
-    uint ModulationFormat(void) const { return _beg[1] & 0x1f; }
+    uint ModulationFormat(void) const { return m_beg[1] & 0x1f; }
     QString ModulationFormatString(void) const;
-    //     zero                4    2.0+_beg
-    //     symbol_rate        28    2.4+_beg
+    //     zero                4    2.0+m_beg
+    //     symbol_rate        28    2.4+m_beg
     uint SymbolRate(void) const
     {
-        return (((_beg[2]&0xf)<<24) | (_beg[3]<<16) |
-                (_beg[4]<<8) | (_beg[5]));
+        return (((m_beg[2]&0xf)<<24) | (m_beg[3]<<16) |
+                (m_beg[4]<<8) | (m_beg[5]));
     }
-    //   descriptors_count     8    6.0+_beg
-    uint DescriptorsCount(void) const { return _beg[6]; }
+    //   descriptors_count     8    6.0+m_beg
+    uint DescriptorsCount(void) const { return m_beg[6]; }
     //   for (i=0; i<descriptors_count; i++) {
     //     descriptor()        ?    ?.0
     //   }
-    uint DescriptorsLength(void) const { return _end - _beg - 7; }
-    const unsigned char *Descriptors(void) const { return _beg + 7; }
+    uint DescriptorsLength(void) const { return m_end - m_beg - 7; }
+    const unsigned char *Descriptors(void) const { return m_beg + 7; }
 
     static QString toString(void);
     QString toStringXML(uint indent_level) const;
 
   private:
-    const unsigned char *_beg;
-    const unsigned char *_end;
+    const unsigned char *m_beg;
+    const unsigned char *m_end;
 };
 
 class MTV_PUBLIC SCTENetworkInformationTable : public PSIPTable
@@ -201,7 +201,7 @@ class MTV_PUBLIC SCTENetworkInformationTable : public PSIPTable
         assert(TableID::NITscte == TableID());
         Parse();
     }
-    ~SCTENetworkInformationTable() { ; }
+    ~SCTENetworkInformationTable() override { ; }
     // SCTE65-2002, page 15, Table 5.1
     //       Name             bits  loc  expected value
     // table_id                 8   0.0       0xC2
@@ -229,18 +229,18 @@ class MTV_PUBLIC SCTENetworkInformationTable : public PSIPTable
     // for (i = 0; i < number_of_records; i++) {
     //   if (kCarrierDefinitionSubtable == table_subtype) {
     CarrierDefinitionSubtable CarrierDefinition(uint i) const
-        { return CarrierDefinitionSubtable(_ptrs[i], _ptrs[i+1]); }
+        { return {m_ptrs[i], m_ptrs[i+1]}; }
     //   if (kModulationModeSubtable == table_subtype) {
     ModulationModeSubtable ModulationMode(uint i) const
-        { return ModulationModeSubtable(_ptrs[i], _ptrs[i+1]); }
+        { return {m_ptrs[i], m_ptrs[i+1]}; }
 
     // }
     // for (i=0; i<N; i++)
     //   descriptor()          ?    ?.0   optional (determined by looking
     //                                              at section_length)
     uint DescriptorsLength(void) const
-        { return SectionLength() - (_ptrs.back() - pesdata()) - 4/*CRC*/; }
-    const unsigned char * Descriptors(void) const { return _ptrs.back(); }
+        { return SectionLength() - (m_ptrs.back() - pesdata()) - 4/*CRC*/; }
+    const unsigned char * Descriptors(void) const { return m_ptrs.back(); }
     // CRC_32                  32
 
     bool Parse(void);
@@ -248,7 +248,7 @@ class MTV_PUBLIC SCTENetworkInformationTable : public PSIPTable
     QString toStringXML(uint indent_level) const override; // PSIPTable
 
   private:
-    vector<const unsigned char*> _ptrs;
+    vector<const unsigned char*> m_ptrs;
 };
 
 class MTV_PUBLIC NetworkTextTable : public PSIPTable
@@ -265,7 +265,7 @@ class MTV_PUBLIC NetworkTextTable : public PSIPTable
         assert(TableID::NTT == TableID());
         Parse();
     }
-    ~NetworkTextTable() { ; }
+    ~NetworkTextTable() override { ; }
     // SCTE65-2002, page 20, Table 5.10
     //       Name             bits  loc  expected value
     // table_id                 8   0.0       0xC3
@@ -325,26 +325,26 @@ class MTV_PUBLIC NetworkTextTable : public PSIPTable
 class MTV_PUBLIC DefinedChannelsMapSubtable
 {
   public:
-    explicit DefinedChannelsMapSubtable(const unsigned char *data) : _data(data) {}
+    explicit DefinedChannelsMapSubtable(const unsigned char *data) : m_data(data) {}
     //   zero                   4   7.0       0
     //   first_virtual_channel 12   7.4
     uint FirstVirtualChannel(void) const
-        { return ((_data[7]<<8) | _data[8]) & 0xfff; }
+        { return ((m_data[7]<<8) | m_data[8]) & 0xfff; }
     //   zero                   1   9.0
     //   DCM_data_length        7   9.1
-    uint DCMDataLength(void) const { return _data[9] & 0x7f; }
+    uint DCMDataLength(void) const { return m_data[9] & 0x7f; }
     //   for (i=0; i<DCM_data_length; i++) {
     //      range_defined       1  10.0+i
-    bool RangeDefined(uint i) const { return ( _data[10+i] & 0x80 ) != 0; }
+    bool RangeDefined(uint i) const { return ( m_data[10+i] & 0x80 ) != 0; }
     //      channels_count      7  10.1+i
-    uint ChannelsCount(uint i) const { return _data[10+i] & 0x7f; }
+    uint ChannelsCount(uint i) const { return m_data[10+i] & 0x7f; }
     //   }
 
     QString toStringXML(uint indent_level) const;
     uint Size(void) const { return DCMDataLength() + 3; }
 
   private:
-    const unsigned char *_data;
+    const unsigned char *m_data;
 };
 
 class VirtualChannelMapSubtable
@@ -352,20 +352,20 @@ class VirtualChannelMapSubtable
   public:
     VirtualChannelMapSubtable(
         const unsigned char *data, const vector<const unsigned char*> &ptrs) :
-        _data(data), _ptrs(ptrs) {}
+        m_data(data), _ptrs(ptrs) {}
 
     //   zero                   2  7.0
     //   descriptors_included   1  7.2
-    bool DescriptorsIncluded(void) const { return ( _data[7] & 0x20 ) != 0; }
+    bool DescriptorsIncluded(void) const { return ( m_data[7] & 0x20 ) != 0; }
     //   zero                   5  7.3
     //   splice                 1  8.0
-    bool Splice(void) const { return ( _data[8] & 0x80 ) != 0; }
+    bool Splice(void) const { return ( m_data[8] & 0x80 ) != 0; }
     //   zero                   7  8.1
     //   activation_time       32  9.0
     uint ActivationTimeRaw(void) const
     {
-        return ((_data[9] << 24) | (_data[10] << 24) |
-                (_data[11] << 24) | _data[12]);
+        return ((m_data[9] << 24) | (m_data[10] << 24) |
+                (m_data[11] << 24) | m_data[12]);
     }
     /// \note If the GPS_UTC_offset in the SystemTimeTable is zero
     /// this includes the correction for leap seconds. Otherwise
@@ -381,7 +381,7 @@ class VirtualChannelMapSubtable
         return dt;
     }
     //   number_of_VC_records   8 13.0
-    uint NumberOfVCRecords(void) const { return _data[13]; }
+    uint NumberOfVCRecords(void) const { return m_data[13]; }
 
     //   for (i = 0; i < number_of_VC_records; i++) {
     //     zero                 4 0.0+_ptrs[i]
@@ -463,36 +463,36 @@ class VirtualChannelMapSubtable
     //   }
 
     QString toStringXML(uint indent_level) const;
-    uint Size(void) const { return _ptrs.back() - _data; }
+    uint Size(void) const { return _ptrs.back() - m_data; }
 
-    const unsigned char *_data;
+    const unsigned char *m_data;
     const vector<const unsigned char*> &_ptrs;
 };
 
 class MTV_PUBLIC InverseChannelMapSubtable
 {
   public:
-    explicit InverseChannelMapSubtable(const unsigned char *data) : _data(data) {}
+    explicit InverseChannelMapSubtable(const unsigned char *data) : m_data(data) {}
     //   zero                   4 7.0
     //   first_map_index       12 7.4
-    uint FirstMapIndex(void) const { return ((_data[7]<<8)|_data[8]) & 0xfff; }
+    uint FirstMapIndex(void) const { return ((m_data[7]<<8)|m_data[8]) & 0xfff; }
     //   zero                   1 9.0
     //   record_count           7 9.1
-    uint RecordCount(void) const { return _data[9] & 0x7f; }
+    uint RecordCount(void) const { return m_data[9] & 0x7f; }
     //   for (i=0; i<record_count; i++) {
     //     source_id           16 10.0+i*4
-    uint SourceID(uint i) const { return (_data[10+i*4]<<8) | _data[11+i*4]; }
+    uint SourceID(uint i) const { return (m_data[10+i*4]<<8) | m_data[11+i*4]; }
     //     zero                 4 12.0+i*4
     //     virtual_channel_number 12 12.4+i*4
     uint VirtualChannelNumber(uint i) const
-        { return ((_data[12+i*4]<<8) | _data[13+i*4]) & 0xfff; }
+        { return ((m_data[12+i*4]<<8) | m_data[13+i*4]) & 0xfff; }
     //   }
 
     QString toStringXML(uint indent_level) const;
     uint Size(void) const { return RecordCount() * 4 + 3; }
 
   private:
-    const unsigned char *_data;
+    const unsigned char *m_data;
 };
 
 // AKA Short-form Virtual Channel Table
@@ -510,7 +510,7 @@ class MTV_PUBLIC ShortVirtualChannelTable : public PSIPTable
         assert(TableID::SVCTscte == TableID());
         Parse();
     }
-    ~ShortVirtualChannelTable() { ; }
+    ~ShortVirtualChannelTable() override { ; }
     //       Name             bits  loc  expected value
     // table_id                 8   0.0       0xC4
     // zero                     2   1.0       0
@@ -539,7 +539,7 @@ class MTV_PUBLIC ShortVirtualChannelTable : public PSIPTable
     // }
     // if (table_subtype==kVirtualChannelMap) {
     VirtualChannelMapSubtable VirtualChannelMap(void) const
-        { return VirtualChannelMapSubtable(pesdata(), _ptrs); }
+    { return { pesdata(), m_ptrs}; }
     // }
     // if (table_subtype==kInverseChannelMap) {
     InverseChannelMapSubtable InverseChannelMap(void) const
@@ -549,8 +549,8 @@ class MTV_PUBLIC ShortVirtualChannelTable : public PSIPTable
     //   descriptor()           ?   ?.0   optional (determined by looking
     //                                              at section_length)
     uint DescriptorsLength(void) const
-        { return SectionLength() - (_ptrs.back() - pesdata()) - 4/*CRC*/; }
-    const unsigned char * Descriptors(void) const { return _ptrs.back(); }
+        { return SectionLength() - (m_ptrs.back() - pesdata()) - 4/*CRC*/; }
+    const unsigned char * Descriptors(void) const { return m_ptrs.back(); }
     // }
     // CRC_32                  32
 
@@ -559,7 +559,7 @@ class MTV_PUBLIC ShortVirtualChannelTable : public PSIPTable
     QString toStringXML(uint indent_level) const override; // PSIPTable
 
   private:
-    vector<const unsigned char*> _ptrs;
+    vector<const unsigned char*> m_ptrs;
 };
 
 /** \class SCTESystemTimeTable

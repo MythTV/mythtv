@@ -50,7 +50,7 @@ class VideoDialog : public MythScreenType
     VideoDialog(MythScreenStack *lparent, const QString& lname,
             const VideoListPtr& video_list, DialogType type,
             BrowseType browse);
-    ~VideoDialog();
+    ~VideoDialog() override;
 
     bool Create() override; // MythScreenType
     bool keyPressEvent(QKeyEvent *levent) override; // MythScreenType
@@ -67,9 +67,9 @@ class VideoDialog : public MythScreenType
 
   private slots:
     void UpdatePosition();
-    void UpdateText(MythUIButtonListItem *);
-    void handleSelect(MythUIButtonListItem *);
-    void SetCurrentNode(MythGenericTree *);
+    void UpdateText(MythUIButtonListItem *item);
+    void handleSelect(MythUIButtonListItem *item);
+    void SetCurrentNode(MythGenericTree *node);
 
     void playVideo();
     void playVideoAlt();
@@ -100,7 +100,7 @@ class VideoDialog : public MythScreenType
     void ToggleWatched();
     void ToggleProcess();
     void RemoveVideo();
-    void OnRemoveVideo(bool);
+    void OnRemoveVideo(bool dodelete);
 
     void VideoMenu();
     MythMenu* CreateInfoMenu();
@@ -136,7 +136,7 @@ class VideoDialog : public MythScreenType
     void doVideoScan();
 
   protected slots:
-    void scanFinished(bool);
+    void scanFinished(bool dbChanged);
     void reloadData();
     void refreshData();
     void UpdateItem(MythUIButtonListItem *item);
@@ -220,7 +220,7 @@ class VideoListDeathDelay : public QObject
 
   public:
     explicit VideoListDeathDelay(const VideoDialog::VideoListPtr& toSave);
-    ~VideoListDeathDelay();
+    ~VideoListDeathDelay() override;
 
     VideoDialog::VideoListPtr GetSaved();
     // When exiting MythVideo, we delay destroying the data for kDelayTimeMS

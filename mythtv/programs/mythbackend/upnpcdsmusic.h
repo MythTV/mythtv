@@ -24,7 +24,7 @@ class UPnpCDSMusic : public UPnpCDSExtension
     public:
 
         UPnpCDSMusic();
-        virtual ~UPnpCDSMusic() = default;
+        ~UPnpCDSMusic() override = default;
 
     protected:
 
@@ -44,7 +44,7 @@ class UPnpCDSMusic : public UPnpCDSExtension
 
     private:
 
-        QUrl             m_URIBase;
+        QUrl             m_uriBase;
 
         void             PopulateArtworkURIS( CDSObject *pItem,
                                               int songID );

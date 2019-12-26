@@ -24,7 +24,7 @@ class DVBSignalMonitor: public DTVSignalMonitor
                      uint64_t _flags =
                      kSigMon_WaitForSig    | kDVBSigMon_WaitForSNR |
                      kDVBSigMon_WaitForBER | kDVBSigMon_WaitForUB);
-    virtual ~DVBSignalMonitor();
+    ~DVBSignalMonitor() override;
 
     QStringList GetStatusList(void) const override; // DTVSignalMonitor
     void Stop(void) override; // SignalMonitor
@@ -34,19 +34,19 @@ class DVBSignalMonitor: public DTVSignalMonitor
     void SetRotorValue(int val) override // DTVSignalMonitor
     {
         QMutexLocker locker(&m_statusLock);
-        rotorPosition.SetValue(val);
+        m_rotorPosition.SetValue(val);
     }
 
     void EmitStatus(void) override; // SignalMonitor
 
     // MPEG
-    void HandlePMT(uint, const ProgramMapTable*) override; // DTVSignalMonitor
+    void HandlePMT(uint program_num, const ProgramMapTable *pmt) override; // DTVSignalMonitor
 
     // ATSC Main
-    void HandleSTT(const SystemTimeTable*) override; // DTVSignalMonitor
+    void HandleSTT(const SystemTimeTable *stt) override; // DTVSignalMonitor
 
     // DVB Main
-    void HandleTDT(const TimeDateTable*) override; // DTVSignalMonitor
+    void HandleTDT(const TimeDateTable *tdt) override; // DTVSignalMonitor
 
   protected:
     DVBSignalMonitor(void);
@@ -58,13 +58,13 @@ class DVBSignalMonitor: public DTVSignalMonitor
     DVBChannel *GetDVBChannel(void);
 
   protected:
-    SignalMonitorValue signalToNoise;
-    SignalMonitorValue bitErrorRate;
-    SignalMonitorValue uncorrectedBlocks;
-    SignalMonitorValue rotorPosition;
+    SignalMonitorValue m_signalToNoise;
+    SignalMonitorValue m_bitErrorRate;
+    SignalMonitorValue m_uncorrectedBlocks;
+    SignalMonitorValue m_rotorPosition;
 
-    bool               streamHandlerStarted;
-    DVBStreamHandler  *streamHandler;
+    bool               m_streamHandlerStarted;
+    DVBStreamHandler  *m_streamHandler;
 };
 
 #endif // DVBSIGNALMONITOR_H

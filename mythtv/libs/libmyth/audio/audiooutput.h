@@ -1,10 +1,12 @@
 #ifndef AUDIOOUTPUT
 #define AUDIOOUTPUT
 
+#include <utility>
+
 // Qt headers
+#include <QCoreApplication>
 #include <QString>
 #include <QVector>
-#include <QCoreApplication>
 
 // MythTV headers
 #include "compat.h"
@@ -32,9 +34,9 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
         AudioOutputSettings m_settings;
         AudioDeviceConfig(void) :
             m_settings(AudioOutputSettings(true)) { };
-        AudioDeviceConfig(const QString &name,
-                          const QString &desc) :
-            m_name(name), m_desc(desc),
+        AudioDeviceConfig(QString name,
+                          QString desc) :
+            m_name(std::move(name)), m_desc(std::move(desc)),
             m_settings(AudioOutputSettings(true)) { };
         AudioDeviceConfig(const AudioDeviceConfig &) = default;
         AudioDeviceConfig(AudioDeviceConfig &&) = default;

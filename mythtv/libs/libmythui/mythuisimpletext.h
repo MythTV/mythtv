@@ -27,7 +27,7 @@ class MUI_PUBLIC MythUISimpleText : public MythUIType
     MythUISimpleText(const QString &text, const MythFontProperties &font,
                      const QRect &rect, Qt::Alignment align,
                      MythUIType *parent, const QString &name);
-    ~MythUISimpleText() = default;
+    ~MythUISimpleText() override = default;
 
   protected:
     void DrawSelf(MythPainter *p, int xoffset, int yoffset,

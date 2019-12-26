@@ -453,9 +453,11 @@ int64_t AvFormatDecoder::NormalizeVideoTimecode(int64_t timecode)
         return 0;
 
     if (m_ic->start_time != AV_NOPTS_VALUE)
+    {
         start_pts = av_rescale(m_ic->start_time,
                                st->time_base.den,
                                AV_TIME_BASE * (int64_t)st->time_base.num);
+    }
 
     int64_t pts = av_rescale(timecode / 1000.0,
                      st->time_base.den,
@@ -473,9 +475,11 @@ int64_t AvFormatDecoder::NormalizeVideoTimecode(AVStream *st,
     int64_t start_pts = 0;
 
     if (m_ic->start_time != AV_NOPTS_VALUE)
+    {
         start_pts = av_rescale(m_ic->start_time,
                                st->time_base.den,
                                AV_TIME_BASE * (int64_t)st->time_base.num);
+    }
 
     int64_t pts = av_rescale(timecode / 1000.0,
                      st->time_base.den,
@@ -1322,21 +1326,35 @@ float AvFormatDecoder::normalized_fps(AVStream *stream, AVCodecContext *enc)
     if ((QString(m_ic->iformat->name).contains("matroska") ||
         QString(m_ic->iformat->name).contains("mov")) &&
         avg_fps < 121.0 && avg_fps > 3.0)
+    {
         fps = avg_fps;  // NOLINT(bugprone-branch-clone)
+    }
     else if (QString(m_ic->iformat->name).contains("avi") &&
         container_fps < 121.0 && container_fps > 3.0)
+    {
         fps = container_fps; // avi uses container fps for timestamps // NOLINT(bugprone-branch-clone)
+    }
     else if (codec_fps < 121.0 && codec_fps > 3.0)
+    {
         fps = codec_fps;
+    }
     else if (container_fps < 121.0 && container_fps > 3.0)
+    {
         fps = container_fps;
+    }
     else if (avg_fps < 121.0 && avg_fps > 3.0)
+    {
         fps = avg_fps;
+    }
     // certain H.264 interlaced streams are detected at 2x using estimated (i.e. wrong)
     else if (estimated_fps < 121.0 && estimated_fps > 3.0)
+    {
         fps = estimated_fps;
+    }
     else
+    {
         fps = 30000.0 / 1001.0; // 29.97 fps
+    }
 
     if (!qFuzzyCompare(static_cast<float>(fps), m_fps))
     {
@@ -4827,10 +4845,12 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
             else if (decodetype & kDecodeVideo)
             {
                 if (m_storedPackets.count() >= max_video_queue_size)
+                {
                     LOG(VB_GENERAL, LOG_WARNING, LOC +
                         QString("Audio %1 ms behind video but already %2 "
                                 "video frames queued. AV-Sync might be broken.")
                             .arg(m_lastVPts-m_lastAPts).arg(m_storedPackets.count()));
+                }
                 m_allowedQuit = true;
                 continue;
             }
@@ -5191,11 +5211,15 @@ bool AvFormatDecoder::DoPassThrough(const AVCodecParameters *par, bool withProfi
     // if withProfile == false, we will accept any DTS stream regardless
     // of its profile. We do so, so we can bitstream DTS-HD as DTS core
     if (!withProfile && par->codec_id == AV_CODEC_ID_DTS && !m_audio->CanDTSHD())
+    {
         passthru = m_audio->CanPassthrough(par->sample_rate, par->channels,
                                            par->codec_id, FF_PROFILE_DTS);
+    }
     else
+    {
         passthru = m_audio->CanPassthrough(par->sample_rate, par->channels,
                                            par->codec_id, par->profile);
+    }
 
     passthru &= !m_disablePassthru;
 

@@ -297,11 +297,15 @@ bool MythDB::SaveSettingOnHost(const QString &key,
     {
 
         if (!host.isEmpty())
+        {
             query.prepare("DELETE FROM settings WHERE value = :KEY "
                           "AND hostname = :HOSTNAME ;");
+        }
         else
+        {
             query.prepare("DELETE FROM settings WHERE value = :KEY "
                           "AND hostname is NULL;");
+        }
 
         query.bindValue(":KEY", key);
         if (!host.isEmpty())
@@ -321,11 +325,15 @@ bool MythDB::SaveSettingOnHost(const QString &key,
     if (success && (newValue != kClearSettingValue))
     {
         if (!host.isEmpty())
+        {
             query.prepare("INSERT INTO settings (value,data,hostname) "
                           "VALUES ( :VALUE, :DATA, :HOSTNAME );");
+        }
         else
+        {
             query.prepare("INSERT INTO settings (value,data ) "
                           "VALUES ( :VALUE, :DATA );");
+        }
 
         query.bindValue(":VALUE", key);
         query.bindValue(":DATA", newValue);
@@ -642,9 +650,11 @@ QString MythDB::GetSettingOnHost(const QString &_key, const QString &_host,
     if (!query.isConnected())
     {
         if (!d->m_suppressDBMessages)
+        {
             LOG(VB_GENERAL, LOG_ERR,
                 QString("Database not open while trying to "
                         "load setting: %1").arg(key));
+        }
         return value;
     }
 

@@ -23,7 +23,7 @@ class MBASE_PUBLIC MythSignalingTimer : private QObject, private MThread
 
   public:
     MythSignalingTimer(QObject *parent, const char *slot);
-    ~MythSignalingTimer();
+    ~MythSignalingTimer() override;
 
     virtual void stop(void);
     virtual void start(int msec);

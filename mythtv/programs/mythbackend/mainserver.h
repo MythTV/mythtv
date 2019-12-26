@@ -1,6 +1,11 @@
 #ifndef MAINSERVER_H_
 #define MAINSERVER_H_
 
+#include <utility>
+#include <vector>
+using namespace std;
+
+// Qt headers
 #include <QReadWriteLock>
 #include <QStringList>
 #include <QRunnable>
@@ -9,9 +14,7 @@
 #include <QHash>
 #include <QMap>
 
-#include <vector>
-using namespace std;
-
+// MythTV headers
 #include "tv.h"
 #include "playbacksock.h"
 #include "mthreadpool.h"
@@ -40,19 +43,19 @@ class DeleteStruct
 {
     friend class MainServer;
   public:
-    DeleteStruct(MainServer *ms, const QString& filename, const QString& title,
+    DeleteStruct(MainServer *ms, QString  filename, QString  title,
                  uint chanid, QDateTime recstartts, QDateTime recendts,
                  uint recordedId,
                  bool forceMetadataDelete) : 
-        m_ms(ms), m_filename(filename), m_title(title), 
-        m_chanid(chanid), m_recstartts(recstartts), 
-        m_recendts(recendts), m_recordedid(recordedId),
+        m_ms(ms), m_filename(std::move(filename)), m_title(std::move(title)),
+        m_chanid(chanid), m_recstartts(std::move(recstartts)),
+        m_recendts(std::move(recendts)), m_recordedid(recordedId),
         m_forceMetadataDelete(forceMetadataDelete)
     {
     }
 
-    DeleteStruct(MainServer *ms, const QString& filename, int fd, off_t size) :
-        m_ms(ms), m_filename(filename), m_fd(fd), m_size(size)
+    DeleteStruct(MainServer *ms, QString  filename, int fd, off_t size) :
+        m_ms(ms), m_filename(std::move(filename)), m_fd(fd), m_size(size)
     {
     }
 
@@ -96,8 +99,8 @@ class RenameThread : public QRunnable
 {
 public:
     RenameThread(MainServer &ms, PlaybackSock &pbs,
-                 const QString& src, const QString& dst)
-        : m_ms(ms), m_pbs(pbs), m_src(src), m_dst(dst) {}
+                 QString  src, QString  dst)
+        : m_ms(ms), m_pbs(pbs), m_src(std::move(src)), m_dst(std::move(dst)) {}
     void run(void) override; // QRunnable
 
 private:
@@ -121,7 +124,7 @@ class MainServer : public QObject, public MythSocketCBs
                QMap<int, EncoderLink *> *tvList,
                Scheduler *sched, AutoExpire *expirer);
 
-    ~MainServer();
+    ~MainServer() override;
 
     void Stop(void);
 

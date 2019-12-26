@@ -528,11 +528,15 @@ void MythUIFileBrowser::updateRemoteFileList()
         if (tokens[0] == "sgdir")
             dataName = m_baseDirectory;
         else if (m_subDirectory.isEmpty())
+        {
             dataName = QString("%1%2").arg(m_baseDirectory)
                        .arg(displayName);
+        }
         else
+        {
             dataName = QString("%1%2/%3").arg(m_baseDirectory)
                        .arg(m_subDirectory).arg(displayName);
+        }
 
         MFileInfo finfo(dataName, m_storageGroupDir);
 

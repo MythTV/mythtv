@@ -10,9 +10,9 @@ class VisualizationSettings : public MythScreenType
 {
     Q_OBJECT
 public:
-    VisualizationSettings(MythScreenStack *parent, const char *name = nullptr)
+    explicit VisualizationSettings(MythScreenStack *parent, const char *name = nullptr)
         : MythScreenType(parent, name) {}
-    ~VisualizationSettings() = default;
+    ~VisualizationSettings() override = default;
 
     bool Create(void) override; // MythScreenType
 

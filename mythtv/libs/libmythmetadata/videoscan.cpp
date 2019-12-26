@@ -133,25 +133,35 @@ void VideoScannerThread::SetDirs(QStringList dirs)
                 continue;
             }
             if ((host == master) &&  (!mdirs.contains(path)))
+            {
                 // collect paths defined on master backend so other
                 // online backends can be set to fall through to them
                 mdirs.append(path);
+            }
             else if (!searchhosts.contains(host))
+            {
                 // mark host as having directories defined so it
                 // does not fall through to those on the master
                 searchhosts.append(host);
+            }
         }
 
         ++iter;
     }
 
     for (iter = m_liveSGHosts.begin(); iter != m_liveSGHosts.end(); ++iter)
+    {
         if ((!searchhosts.contains(*iter)) && (master != *iter))
+        {
             for (iter2 = mdirs.begin(); iter2 != mdirs.end(); ++iter2)
+            {
                 // backend is online, but has no directories listed
                 // fall back to those on the master backend
                 dirs.append(MythCoreContext::GenMythURL(*iter,
                                                         0, *iter2, "Videos"));
+            }
+        }
+    }
 
     m_directories = dirs;
 }
@@ -270,13 +280,17 @@ void VideoScannerThread::verifyFiles(FileCheckList &files,
             if (iter != files.end())
             {
                 if (lhost != iter->second.host)
+                {
                     // file has changed hosts
                     // add to delete list for further processing
                     remove.push_back(std::make_pair((*p)->GetID(), lname));
+                }
                 else
+                {
                     // file is on disk on the proper host and in the database
                     // we're done with it
                     iter->second.check = true;
+                }
             }
             else if (lhost.isEmpty())
             {

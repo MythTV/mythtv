@@ -11,7 +11,7 @@ class BackendSettings : public GroupSetting
     BackendSettings();
     void Load(void) override; // StandardSetting
     void Save(void) override; // StandardSetting
-    ~BackendSettings();
+    ~BackendSettings() override;
 
   private:
     TransMythUICheckBoxSetting *m_isMasterBackend   {nullptr};
