@@ -96,7 +96,7 @@ QSize MythDRMDevice::GetPhysicalSize(void) const
     return m_physicalSize;
 }
 
-float MythDRMDevice::GetRefreshRate(void) const
+double MythDRMDevice::GetRefreshRate(void) const
 {
     return m_refreshRate;
 }
@@ -104,6 +104,11 @@ float MythDRMDevice::GetRefreshRate(void) const
 bool MythDRMDevice::Authenticated(void) const
 {
     return m_authenticated;
+}
+
+MythEDID MythDRMDevice::GetEDID(void)
+{
+    return m_edid;
 }
 
 static QString GetConnectorName(drmModeConnector *Connector)
@@ -178,6 +183,7 @@ bool MythDRMDevice::Initialise(void)
                     m_physicalSize = QSize(static_cast<int>(connector->mmWidth),
                                            static_cast<int>(connector->mmHeight));
                     m_serialNumber = serial;
+                    m_edid = edid;
                     break;
                 }
                 else if (!edid.Valid())
@@ -260,9 +266,9 @@ bool MythDRMDevice::Initialise(void)
     if (m_crtc->mode_valid)
     {
         drmModeModeInfo mode = m_crtc->mode;
-        m_refreshRate = (mode.clock * 1000.0F) / (mode.htotal * mode.vtotal);
+        m_refreshRate = (mode.clock * 1000.0) / (mode.htotal * mode.vtotal);
         if (mode.flags & DRM_MODE_FLAG_INTERLACE)
-            m_refreshRate *= 2.0F;
+            m_refreshRate *= 2.0;
     }
 
     LOG(VB_GENERAL, LOG_DEBUG, LOC + "Initialised");

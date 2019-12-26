@@ -10,13 +10,14 @@
 MythDisplayAndroid::MythDisplayAndroid()
   : MythDisplay()
 {
+    Initialise();
 }
 
 MythDisplayAndroid::~MythDisplayAndroid()
 {
 }
 
-DisplayInfo MythDisplayAndroid::GetDisplayInfo(int VideoRate)
+void MythDisplayAndroid::UpdateCurrentMode(void)
 {
     DisplayInfo ret;
     QAndroidJniEnvironment env;
@@ -42,13 +43,12 @@ DisplayInfo MythDisplayAndroid::GetDisplayInfo(int VideoRate)
         .arg(xdpi).arg(ydpi)
         );
 
-    if (VALID_RATE(rate))
-        ret.m_rate = 1000000.0F / rate;
-    else
-        ret.m_rate = SanitiseRefreshRate(VideoRate);
-    ret.m_res = QSize((uint)width, (uint)height);
-    ret.m_size = QSize((uint)width, (uint)height);
+    m_refreshRate  = static_cast<double>(rate);
+    m_resolution   = QSize(width, height);
+    m_physicalSize = QSize(width, height);
     if (xdpi > 0 && ydpi > 0)
-        ret.m_size = QSize((uint)width/xdpi*25.4F, (uint)height/ydpi*25.4F);
-    return ret;
+    {
+        m_physicalSize = QSize(static_cast<int>(width  / xdpi * 25.4F),
+                               static_cast<int>(height / ydpi * 25.4F));
+    }
 }

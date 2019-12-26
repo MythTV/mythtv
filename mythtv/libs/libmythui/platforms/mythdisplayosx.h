@@ -13,11 +13,11 @@ class MythDisplayOSX : public MythDisplay
     MythDisplayOSX();
    ~MythDisplayOSX() override;
 
-    DisplayInfo GetDisplayInfo(int VideoRate = 0) override;
+    void UpdateCurrentMode(void) override;
 
     bool UsingVideoModes(void) override;
     const std::vector<MythDisplayMode>& GetVideoModes(void) override;
-    bool SwitchToVideoMode(int Width, int Height, double DesiredRate) override;
+    bool SwitchToVideoMode(QSize Size, double DesiredRate) override;
 
   private:
     void ClearModes(void);

@@ -1,7 +1,8 @@
-/** This file is intended to hold X11 specific utility functions */
+// Std
 #include <map>
 #include <vector>
 
+// MythTV
 #include "config.h" // for CONFIG_DARWIN
 #include "mythlogging.h"
 #include "mythuihelper.h"
@@ -17,15 +18,8 @@ extern "C" {
 }
 using XErrorCallbackType = int (*)(Display *, XErrorEvent *);
 using XErrorVectorType = std::vector<XErrorEvent>;
-std::map<Display*, XErrorVectorType>   xerrors;
-std::map<Display*, XErrorCallbackType> xerror_handlers;
-std::map<Display*, MythXDisplay*>      xdisplays;
-#endif // USING_X11
-
-#include <QMutex>
-
-// Everything below this line is only compiled if using X11
-#ifdef USING_X11
+static std::map<Display*, XErrorVectorType>   xerrors;
+static std::map<Display*, XErrorCallbackType> xerror_handlers;
 
 static int ErrorHandler(Display *d, XErrorEvent *xeev)
 {
@@ -33,30 +27,27 @@ static int ErrorHandler(Display *d, XErrorEvent *xeev)
     return 0;
 }
 
-void LockMythXDisplays(bool lock)
+class MythXLocker
 {
-    if (lock)
+  public:
+    explicit MythXLocker(MythXDisplay* Disp)
+      : m_disp(Disp)
     {
-        std::map<Display*, MythXDisplay*>::iterator it;
-        for (it = xdisplays.begin(); it != xdisplays.end(); ++it)
-            it->second->Lock();
+        if (m_disp)
+            m_disp->Lock();
     }
-    else
+
+    ~MythXLocker()
     {
-        std::map<Display*, MythXDisplay*>::reverse_iterator it;
-        for (it = xdisplays.rbegin(); it != xdisplays.rend(); ++it)
-            it->second->Unlock();
+        if (m_disp)
+            m_disp->Unlock();
     }
-}
 
-MythXDisplay *GetMythXDisplay(Display *d)
-{
-    if (xdisplays.count(d))
-        return xdisplays[d];
-    return nullptr;
-}
+  private:
+    MythXDisplay *m_disp { nullptr };
+};
 
-MythXDisplay *OpenMythXDisplay(bool Warn /*= true*/)
+MythXDisplay* MythXDisplay::OpenMythXDisplay(bool Warn /*= true*/)
 {
     auto *disp = new MythXDisplay();
     if (disp && disp->Open())
@@ -73,11 +64,7 @@ MythXDisplay::~MythXDisplay()
     MythXLocker locker(this);
     if (m_disp)
     {
-        if (m_gc)
-            XFreeGC(m_disp, m_gc);
         StopLog();
-        if (xdisplays.count(m_disp))
-            xdisplays.erase(m_disp);
         XCloseDisplay(m_disp);
         m_disp = nullptr;
     }
@@ -96,44 +83,12 @@ bool MythXDisplay::Open(void)
     if (!m_disp)
         return false;
 
-    xdisplays[m_disp] = this;
     m_screenNum  = DefaultScreen(m_disp);
     m_screen     = DefaultScreenOfDisplay(m_disp);
-    m_black      = XBlackPixel(m_disp, m_screenNum);
     m_depth      = DefaultDepthOfScreen(m_screen);
     m_root       = DefaultRootWindow(m_disp);
 
     return true;
-}
-
-bool MythXDisplay::CreateGC(Window win)
-{
-    StartLog();
-    XLOCK(this, m_gc = XCreateGC(m_disp, win, 0, nullptr));
-    return StopLog();
-}
-
-void MythXDisplay::SetForeground(unsigned long color)
-{
-    if (!m_gc)
-        return;
-    XLOCK(this, XSetForeground(m_disp, m_gc, color));
-}
-
-void MythXDisplay::FillRectangle(Window win, const QRect &rect)
-{
-    if (!m_gc)
-        return;
-    XLOCK(this, XFillRectangle(m_disp, win, m_gc,
-                              rect.left(), rect.top(),
-                              rect.width(), rect.height()));
-}
-
-void MythXDisplay::MoveResizeWin(Window win, const QRect &rect)
-{
-    XLOCK(this, XMoveResizeWindow(m_disp, win,
-                                 rect.left(), rect.top(),
-                                 rect.width(), rect.height()));
 }
 
 /**
@@ -143,10 +98,19 @@ void MythXDisplay::MoveResizeWin(Window win, const QRect &rect)
  */
 QSize MythXDisplay::GetDisplaySize(void)
 {
+    XF86VidModeModeLine mode;
+    int dummy = 0;
     MythXLocker locker(this);
-    int displayWidthPixel  = DisplayWidth( m_disp, m_screenNum);
-    int displayHeightPixel = DisplayHeight(m_disp, m_screenNum);
-    return {displayWidthPixel, displayHeightPixel};
+
+    if (!XF86VidModeGetModeLine(m_disp, m_screenNum, &dummy, &mode))
+    {
+        LOG(VB_GENERAL, LOG_ERR, "X11 ModeLine query failed");
+        // Fallback to old display size code - which is not updated for mode switches
+        return QSize(DisplayWidth(m_disp, m_screenNum),
+                     DisplayHeight(m_disp, m_screenNum));
+    }
+
+    return QSize(mode.hdisplay, mode.vdisplay);
 }
 
 /**
@@ -162,7 +126,7 @@ QSize MythXDisplay::GetDisplayDimensions(void)
     return {displayWidthMM, displayHeightMM};
 }
 
-float MythXDisplay::GetRefreshRate(void)
+double MythXDisplay::GetRefreshRate(void)
 {
     XF86VidModeModeLine mode_line;
     int dot_clock = 0;
@@ -185,8 +149,7 @@ float MythXDisplay::GetRefreshRate(void)
 
     rate = (dot_clock * 1000.0) / rate;
 
-    if (((mode_line.flags & V_INTERLACE) != 0) &&
-        rate > 24.5 && rate < 30.5)
+    if (((mode_line.flags & V_INTERLACE) != 0) && rate > 24.5 && rate < 30.5)
     {
         LOG(VB_PLAYBACK, LOG_INFO,
                 "Doubling refresh rate for interlaced display.");
@@ -196,9 +159,9 @@ float MythXDisplay::GetRefreshRate(void)
     return rate;
 }
 
-void MythXDisplay::Sync(bool flush)
+void MythXDisplay::Sync(bool Flush)
 {
-    XLOCK(this, XSync(m_disp, flush));
+    XLOCK(this, XSync(m_disp, Flush));
 }
 
 void MythXDisplay::StartLog(void)
@@ -222,12 +185,12 @@ bool MythXDisplay::StopLog(void)
     return CheckErrors();
 }
 
-bool MythXDisplay::CheckErrors(Display *disp)
+bool MythXDisplay::CheckErrors(Display *Disp)
 {
-    if (!disp)
+    if (!Disp)
         CheckOrphanedErrors();
 
-    Display *d = disp ? disp : m_disp;
+    Display *d = Disp ? Disp : m_disp;
     if (!d)
         return false;
 
@@ -241,23 +204,16 @@ bool MythXDisplay::CheckErrors(Display *disp)
     if (events.empty())
         return true;
 
-    for (int i = events.size() -1; i>=0; --i)
+    for (size_t i = 0; i < events.size(); ++i)
     {
         char buf[200];
         XGetErrorText(d, events[i].error_code, buf, sizeof(buf));
         LOG(VB_GENERAL, LOG_ERR,
-            QString("\n"
-                   "XError type: %1\n"
-                   "  serial no: %2\n"
-                   "   err code: %3 (%4)\n"
-                   "   req code: %5\n"
-                   " minor code: %6\n"
-                   "resource id: %7\n")
-                   .arg(events[i].type)
-                   .arg(events[i].serial)
+            QString("XError type: %1\nSerial no: %2\nErr code: %3 (%4)\n"
+                   "Req code: %5\nmMinor code: %6\nResource id: %7\n")
+                   .arg(events[i].type).arg(events[i].serial)
                    .arg(events[i].error_code).arg(buf)
-                   .arg(events[i].request_code)
-                   .arg(events[i].minor_code)
+                   .arg(events[i].request_code).arg(events[i].minor_code)
                    .arg(events[i].resourceid));
     }
     xerrors.erase(d);

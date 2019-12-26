@@ -472,7 +472,7 @@ void MythPlayer::ReinitVideo(bool ForceUpdate)
         // the display refresh rate may have been changed by VideoOutput
         if (m_videoSync)
         {
-            int ri = m_display->GetDisplayInfo(m_frameInterval).Rate();
+            int ri = m_display->GetRefreshInterval(m_frameInterval);
             if (ri != m_videoSync->getRefreshInterval())
             {
                 LOG(VB_PLAYBACK, LOG_INFO, LOC +
@@ -1535,7 +1535,7 @@ void MythPlayer::InitAVSync(void)
 {
     m_videoSync->Start();
 
-    m_refreshRate = m_display->GetDisplayInfo(m_frameInterval).Rate();
+    m_refreshRate = m_display->GetRefreshInterval(m_frameInterval);
 
     m_rtcBase = 0;
     m_priorAudioTimecode = 0;
@@ -2079,7 +2079,7 @@ bool MythPlayer::CanSupportDoubleRate(void)
     else if (m_display)
     {
         // used by the decoder before m_videoSync is created
-        refreshinterval = m_display->GetDisplayInfo(m_frameInterval).Rate();
+        refreshinterval = m_display->GetRefreshInterval(m_frameInterval);
     }
 
     // At this point we may not have the correct frame rate.
@@ -2169,8 +2169,8 @@ void MythPlayer::VideoStart(void)
     m_refreshRate = m_frameInterval;
 
     float temp_speed = (m_playSpeed == 0.0F) ? m_audio.GetStretchFactor() : m_playSpeed;
-    int fr_int = (1000000.0 / m_videoFrameRate / static_cast<double>(temp_speed));
-    int rf_int = m_display->GetDisplayInfo(fr_int).Rate();
+    int fr_int = static_cast<int>(1000000.0 / m_videoFrameRate / static_cast<double>(temp_speed));
+    int displayinterval = m_display->GetRefreshInterval(fr_int);
 
     // Default to interlaced playback but set the tracker to progressive
     // Enable autodetection of interlaced/progressive from video stream
@@ -2195,13 +2195,13 @@ void MythPlayer::VideoStart(void)
     }
     else if (m_videoOutput)
     {
-        m_videoSync = VideoSync::BestMethod(m_videoOutput, static_cast<uint>(rf_int));
+        m_videoSync = VideoSync::BestMethod(m_videoOutput, static_cast<uint>(displayinterval));
         m_doubleFramerate = CanSupportDoubleRate(); // needs m_videoSync
         m_videoOutput->SetDeinterlacing(true, m_doubleFramerate);
     }
 
     if (!m_videoSync)
-        m_videoSync = new BusyWaitVideoSync(m_videoOutput, rf_int);
+        m_videoSync = new BusyWaitVideoSync(m_videoOutput, displayinterval);
 
     InitAVSync();
     m_videoSync->Start();

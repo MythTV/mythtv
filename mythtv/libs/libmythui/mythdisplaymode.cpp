@@ -7,6 +7,17 @@
 // Std
 #include <cmath>
 
+MythDisplayMode::MythDisplayMode(QSize Resolution, QSize PhysicalSize,
+                                 double AspectRatio, double RefreshRate)
+  : m_width(Resolution.width()),
+    m_height(Resolution.height()),
+    m_widthMM(PhysicalSize.width()),
+    m_heightMM(PhysicalSize.height())
+{
+    SetAspectRatio(AspectRatio);
+    if (RefreshRate > 0)
+        m_refreshRates.push_back(RefreshRate);
+}
 MythDisplayMode::MythDisplayMode(int Width, int Height, int MMWidth, int MMHeight,
                                  double AspectRatio, double RefreshRate)
   : m_width(Width),
@@ -37,6 +48,11 @@ void MythDisplayMode::Init(void)
 {
     m_width = m_height = m_widthMM = m_heightMM = 0;
     m_aspect = -1.0;
+}
+
+QSize MythDisplayMode::Resolution(void) const
+{
+    return QSize(m_width, m_height);
 }
 
 int MythDisplayMode::Width(void) const
@@ -107,10 +123,10 @@ void MythDisplayMode::SetRefreshRate(double Rate)
     AddRefreshRate(Rate);
 }
 
-uint64_t MythDisplayMode::CalcKey(int Width, int Height, double Rate)
+uint64_t MythDisplayMode::CalcKey(QSize Size, double Rate)
 {
-    return (static_cast<uint64_t>(Width) << 34) |
-           (static_cast<uint64_t>(Height) << 18) |
+    return (static_cast<uint64_t>(Size.width()) << 34) |
+           (static_cast<uint64_t>(Size.height()) << 18) |
            (static_cast<uint64_t>(Rate * 1000.0));
 }
 
@@ -120,7 +136,7 @@ bool MythDisplayMode::CompareRates(double First, double Second, double Precision
     return qAbs(First - Second) < Precision;
 }
 
-int MythDisplayMode::FindBestMatch(const DisplayModeVector Modes,
+int MythDisplayMode::FindBestMatch(const vector<MythDisplayMode> Modes,
                                    const MythDisplayMode& Mode, double &TargetRate)
 {
     double videorate = Mode.RefreshRate();

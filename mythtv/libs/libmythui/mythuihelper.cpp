@@ -203,8 +203,9 @@ MythUIHelperPrivate::~MythUIHelperPrivate()
 
     if (m_display)
     {
-        if (m_display->UsingVideoModes())
-            m_display->SwitchToDesktop();
+        // N.B. we always call this to ensure the desktop mode is restored
+        // in case the setting was changed
+        m_display->SwitchToDesktop();
         MythDisplay::AcquireRelease(false);
     }
 }
@@ -428,7 +429,7 @@ void MythUIHelper::LoadQtConfig(void)
 
     // Switch to desired GUI resolution
     if (d->m_display->UsingVideoModes())
-        d->m_display->SwitchToGUI(MythDisplay::GUI, true);
+        d->m_display->SwitchToGUI(true);
 
     // Note the possibly changed screen settings
     d->GetScreenBounds();

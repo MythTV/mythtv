@@ -4,43 +4,37 @@
 MythDisplayWindows::MythDisplayWindows()
   : MythDisplay()
 {
+    Initialise();
 }
 
 MythDisplayWindows::~MythDisplayWindows()
 {
 }
 
-DisplayInfo MythDisplayWindows::GetDisplayInfo(int VideoRate)
+void MythDisplayWindows::UpdateCurrentMode(void)
 {
-    DisplayInfo ret;
     HDC hdc = GetDC((HWND)GetWindowID());
-    int rate = 0;
-    if (hdc)
+    if (!hdc)
     {
-        rate       = GetDeviceCaps(hdc, VREFRESH);
-        int width  = GetDeviceCaps(hdc, HORZSIZE);
-        int height = GetDeviceCaps(hdc, VERTSIZE);
-        ret.m_size = QSize((uint)width, (uint)height);
-        width      = GetDeviceCaps(hdc, HORZRES);
-        height     = GetDeviceCaps(hdc, VERTRES);
-        ret.m_res  = QSize((uint)width, (uint)height);
+        MythDisplay::UpdateCurrentMode();
+        return;
     }
 
-    if (VALID_RATE(rate))
+    int rate   = GetDeviceCaps(hdc, VREFRESH);
+    m_physicalSize = QSize(GetDeviceCaps(hdc, HORZSIZE),
+                           GetDeviceCaps(hdc, VERTSIZE));
+    m_resolution = QSize(GetDeviceCaps(hdc, HORZRES),
+                         GetDeviceCaps(hdc, VERTRES));
+
+    // see http://support.microsoft.com/kb/2006076
+    switch (rate)
     {
-        // see http://support.microsoft.com/kb/2006076
-        switch (rate)
-        {
-            case 23:  ret.m_rate = 41708; break; // 23.976Hz
-            case 29:  ret.m_rate = 33367; break; // 29.970Hz
-            case 47:  ret.m_rate = 20854; break; // 47.952Hz
-            case 59:  ret.m_rate = 16683; break; // 59.940Hz
-            case 71:  ret.m_rate = 13903; break; // 71.928Hz
-            case 119: ret.m_rate = 8342;  break; // 119.880Hz
-            default:  ret.m_rate = 1000000.0F / (float)rate;
-        }
+        case 23:  m_refreshRate = 23.976;  break;
+        case 29:  m_refreshRate = 29.970;  break;
+        case 47:  m_refreshRate = 47.952;  break;
+        case 59:  m_refreshRate = 59.940;  break;
+        case 71:  m_refreshRate = 71.928;  break;
+        case 119: m_refreshRate = 119.880; break;
+        default:  m_refreshRate = static_cast<double>(rate);
     }
-    else
-        ret.m_rate = SanitiseRefreshRate(VideoRate);
-    return ret;
 }

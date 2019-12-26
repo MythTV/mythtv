@@ -2350,28 +2350,27 @@ void HostRefreshRateComboBoxSetting::ChangeResolution(StandardSetting * setting)
     setEnabled(!list.empty());
 }
 
-vector<double> HostRefreshRateComboBoxSetting::GetRefreshRates(
-    const QString &res)
+vector<double> HostRefreshRateComboBoxSetting::GetRefreshRates(const QString &res)
 {
     QStringList slist = res.split("x");
-    int w = 0;
-    int h = 0;
+    int width = 0;
+    int height = 0;
     bool ok0 = false;
     bool ok1 = false;
     if (2 == slist.size())
     {
-        w = slist[0].toInt(&ok0);
-        h = slist[1].toInt(&ok1);
+        width = slist[0].toInt(&ok0);
+        height = slist[1].toInt(&ok1);
     }
 
     vector<double> result;
     if (ok0 && ok1)
     {
+        QSize size(width, height);
         MythDisplay *display = MythDisplay::AcquireRelease();
-        result = display->GetRefreshRates(w, h);
+        result = display->GetRefreshRates(size);
         MythDisplay::AcquireRelease(false);
     }
-
     return result;
 }
 

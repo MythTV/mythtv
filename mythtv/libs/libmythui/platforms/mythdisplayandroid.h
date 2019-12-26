@@ -9,8 +9,7 @@ class MythDisplayAndroid : public MythDisplay
   public:
     MythDisplayAndroid();
    ~MythDisplayAndroid() override;
-
-    DisplayInfo GetDisplayInfo(int VideoRate = 0) override;
+    void UpdateCurrentMode(void) override;
 };
 
 #endif // MYTHDISPLAYANDROID_H

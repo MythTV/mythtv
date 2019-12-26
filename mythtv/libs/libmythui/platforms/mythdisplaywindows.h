@@ -10,7 +10,7 @@ class MythDisplayWindows : public MythDisplay
     MythDisplayWindows();
    ~MythDisplayWindows() override;
 
-    DisplayInfo GetDisplayInfo(int VideoRate = 0) override;
+    void UpdateCurrentMode(void) override;
 };
 
 #endif // MYTHDISPLAYWINDOWS_H

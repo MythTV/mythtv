@@ -150,8 +150,13 @@ void MythDisplay::SetWidget(QWidget *MainWindow)
         QScreen *desired = GetDesiredScreen();
         if (desired && (desired != window->screen()))
         {
-            DebugScreen(desired, "Moving to");
+            // If we have changed the video mode for the old screen then reset
+            // it to the default/desktop mode
+            SwitchToDesktop();
+            // Ensure we completely re-initialise when the new screen is set
+            m_initialised = false;
 
+            DebugScreen(desired, "Moving to");
             // If this is a virtual desktop, move the window into the screen,
             // otherwise just set the screen - both of which should trigger a
             // screenChanged event.
@@ -178,14 +183,18 @@ int MythDisplay::GetScreenCount(void)
 
 double MythDisplay::GetPixelAspectRatio(void)
 {
-    DisplayInfo info = GetDisplayInfo();
-    if (info.m_size.width() > 0 && info.m_size.height() > 0 &&
-        info.m_res.width() > 0 && info.m_res.height() > 0)
+    if (m_physicalSize.width() > 0 && m_physicalSize.height() > 0 &&
+        m_resolution.width() > 0 && m_resolution.height() > 0)
     {
-        return (info.m_size.width() / static_cast<double>(info.m_res.width())) /
-               (info.m_size.height() / static_cast<double>(info.m_res.height()));
+        return (m_physicalSize.width() / static_cast<double>(m_resolution.width())) /
+               (m_physicalSize.height() / static_cast<double>(m_resolution.height()));
     }
     return 1.0;
+}
+
+QSize MythDisplay::GetGUIResolution(void)
+{
+    return m_guiMode.Resolution();
 }
 
 /*! \brief Return a pointer to the screen to use.
@@ -265,8 +274,7 @@ void MythDisplay::ScreenChanged(QScreen *qScreen)
     DebugScreen(qScreen, "Changed to");
     m_screen = qScreen;
     connect(m_screen, &QScreen::geometryChanged, this, &MythDisplay::GeometryChanged);
-    m_videoModes.clear();
-    InitialiseModes();
+    Initialise();
     emit CurrentScreenChanged(qScreen);
 }
 
@@ -293,33 +301,24 @@ void MythDisplay::GeometryChanged(const QRect &Geo)
         .arg(Geo.width()).arg(Geo.height()).arg(Geo.left()).arg(Geo.top()));
 }
 
-float MythDisplay::SanitiseRefreshRate(int Rate)
-{
-    static const float kDefaultRate = 1000000.0F / 60.0F;
-    float fixed = kDefaultRate;
-    if (Rate > 0)
-    {
-        fixed = static_cast<float>(Rate) / 2.0F;
-        if (fixed < kDefaultRate)
-            fixed = kDefaultRate;
-    }
-    return fixed;
-}
-
-DisplayInfo MythDisplay::GetDisplayInfo(int /*VideoRate*/)
+void MythDisplay::UpdateCurrentMode(void)
 {
     // This is the final fallback when no other platform specifics are available
     // It is usually accurate apart from the refresh rate - which is often
     // rounded down.
+    m_edid = MythEDID();
     QScreen *screen = GetCurrentScreen();
-    DisplayInfo ret;
     if (!screen)
-        return ret;
-    ret.m_rate = 1000000.0F / static_cast<float>(screen->refreshRate());
-    ret.m_res  = screen->size();
-    ret.m_size = QSize(static_cast<int>(screen->physicalSize().width()),
-                       static_cast<int>(screen->physicalSize().height()));
-    return ret;
+    {
+        m_refreshRate = 60.0;
+        m_physicalSize = QSize(160, 90);
+        m_resolution = QSize(1920, 1080);
+        return;
+    }
+    m_refreshRate   = screen->refreshRate();
+    m_resolution    = screen->size();
+    m_physicalSize  = QSize(static_cast<int>(screen->physicalSize().width()),
+                            static_cast<int>(screen->physicalSize().height()));
 }
 
 /// \brief Return true if the MythTV windows should span all screens.
@@ -367,46 +366,47 @@ void MythDisplay::DebugScreen(QScreen *qScreen, const QString &Message)
     }
 }
 
-void MythDisplay::InitialiseModes(void)
+void MythDisplay::Initialise(void)
 {
-    m_last.Init();
-    m_curMode = GUI;
+    m_videoModes.clear();
+    m_overrideVideoModes.clear();
+    UpdateCurrentMode();
 
-    // Initialise DESKTOP mode
-    DisplayInfo info = GetDisplayInfo();
-    int pixelwidth = info.m_res.width();
-    int pixelheight = info.m_res.height();
-    int mmwidth = info.m_size.width();
-    int mmheight = info.m_size.height();
-    double refreshrate = 1000000.0 / static_cast<double>(info.m_rate);
+    // Set the desktop mode - which is the mode at startup. We must always return
+    // the screen to this mode.
+    if (!m_initialised)
+    {
+        // Only ever set this once or after a screen change
+        m_initialised = true;
+        m_desktopMode = MythDisplayMode(m_resolution, m_physicalSize, -1.0, m_refreshRate);
+        LOG(VB_GENERAL, LOG_NOTICE, LOC + QString("Desktop video mode: %1x%2 %3Hz")
+            .arg(m_resolution.width()).arg(m_resolution.height()).arg(m_refreshRate, 0, 'f', 3));
+        if (m_edid.Valid())
+        {
+            if (m_edid.IsSRGB())
+                LOG(VB_GENERAL, LOG_NOTICE, LOC + "Display is using sRGB colourspace");
+            else
+                LOG(VB_GENERAL, LOG_NOTICE, LOC + "Display has custom colourspace");
+        }
+    }
 
-    m_mode[DESKTOP].Init();
-    m_mode[DESKTOP] = MythDisplayMode(pixelwidth, pixelheight, mmwidth, mmheight, -1.0, refreshrate);
-    LOG(VB_GENERAL, LOG_NOTICE, LOC + QString("Desktop video mode: %1x%2 %3 Hz")
-        .arg(pixelwidth).arg(pixelheight).arg(refreshrate, 0, 'f', 3));
-
-    // Initialize GUI mode
-    m_mode[GUI].Init();
-    pixelwidth = pixelheight = 0;
+    // Set the gui mode from database settings
+    int pixelwidth     = m_resolution.width();
+    int pixelheight    = m_resolution.height();
+    int mmwidth        = m_physicalSize.width();
+    int mmheight       = m_physicalSize.height();
+    double refreshrate = m_refreshRate;
     double aspectratio = 0.0;
     GetMythDB()->GetResolutionSetting("GuiVidMode", pixelwidth, pixelheight, aspectratio, refreshrate);
     GetMythDB()->GetResolutionSetting("DisplaySize", mmwidth, mmheight);
-    m_mode[GUI] = MythDisplayMode(pixelwidth, pixelheight, mmwidth, mmheight, -1.0, refreshrate);
+    m_guiMode = MythDisplayMode(pixelwidth, pixelheight, mmwidth, mmheight, -1.0, refreshrate);
 
-    if (m_mode[DESKTOP] == m_mode[GUI] && qFuzzyIsNull(refreshrate))
-    {
-        // same resolution as current desktop
-        m_last = m_mode[DESKTOP];
-    }
-
-    // Initialize default VIDEO mode
+    // Set default video mode
     pixelwidth = pixelheight = 0;
     GetMythDB()->GetResolutionSetting("TVVidMode", pixelwidth, pixelheight, aspectratio, refreshrate);
-    m_mode[VIDEO] = MythDisplayMode(pixelwidth, pixelheight, mmwidth, mmheight, aspectratio, refreshrate);
+    m_videoMode = MythDisplayMode(pixelwidth, pixelheight, mmwidth, mmheight, aspectratio, refreshrate);
 
-    // Initialize video override mode
-    m_inSizeToOutputMode.clear();
-
+    // Initialise video override modes
     for (int i = 0; true; ++i)
     {
         int iw = 0;
@@ -421,61 +421,59 @@ void MythDisplay::InitialiseModes(void)
         GetMythDB()->GetResolutionSetting("VidMode", iw, ih, iaspect, irate, i);
         GetMythDB()->GetResolutionSetting("TVVidMode", ow, oh, oaspect, orate, i);
 
-        if (!(iw || ih || !qFuzzyIsNull(irate)))
+        if (!(iw || ih || !qFuzzyIsNull(irate)) || !(ih && ow && oh))
             break;
 
-        if (!(ih && ow && oh))
-            break;
-
-        uint64_t key = MythDisplayMode::CalcKey(iw, ih, irate);
-
-        MythDisplayMode scr(ow, oh, mmwidth, mmheight, oaspect, orate);
-
-        m_inSizeToOutputMode[key] = scr;
+        uint64_t key = MythDisplayMode::CalcKey(QSize(iw, ih), irate);
+        MythDisplayMode scr(QSize(ow, oh), QSize(mmwidth, mmheight), oaspect, orate);
+        m_overrideVideoModes[key] = scr;
     }
 }
 
-/*! \brief Check whether the next mode is smaller in size than the current mode.
+/*! \brief Check whether the next mode is larger in size than the current mode.
  *
  * This is used to allow the caller to force an update of the main window to ensure
  * the window is fully resized and is in no way clipped. Not an issue if the next
  * mode is smaller.
 */
-bool MythDisplay::NextModeIsLarger(Mode NextMode)
+bool MythDisplay::NextModeIsLarger(QSize Size)
 {
-    MythDisplayMode next = m_mode[NextMode];
-    return next.Width() > m_last.Width() || next.Height() > m_last.Height();
+    return Size.width() > m_resolution.width() || Size.height() > m_resolution.height();
 }
 
-bool MythDisplay::NextModeIsLarger(int Width, int Height)
-{
-    return Width > m_last.Width() || Height > m_last.Height();
-}
-
-/// \brief Return the screen to the original desktop settings
+/*! \brief Return the screen to the original desktop video mode
+ *
+ * \note It is assume the app is exiting once this is called.
+*/
 void MythDisplay::SwitchToDesktop()
 {
-    SwitchToGUI(DESKTOP);
+    MythDisplayMode current(m_resolution, m_physicalSize, -1.0, m_refreshRate);
+    if (current == m_desktopMode)
+        return;
+    SwitchToVideoMode(m_desktopMode.Resolution(), m_desktopMode.RefreshRate());
 }
 
 /** \brief Switches to the resolution and refresh rate defined in the
  * database for the specified video resolution and frame rate.
 */
-bool MythDisplay::SwitchToVideo(int Width, int Height, double Rate)
+bool MythDisplay::SwitchToVideo(QSize Size, double Rate)
 {
-    Mode nextmode = VIDEO; // default VIDEO mode
-    MythDisplayMode next = m_mode[nextmode];
+    MythDisplayMode next = m_videoMode;
+    MythDisplayMode current(m_resolution, m_physicalSize, -1.0, m_refreshRate);
     double targetrate = 0.0;
+    double aspectoverride = 0.0;
 
     // try to find video override mode
-    uint64_t key = MythDisplayMode::FindBestScreen(m_inSizeToOutputMode,
-                   Width, Height, Rate);
+    uint64_t key = MythDisplayMode::FindBestScreen(m_overrideVideoModes,
+                   Size.width(), Size.height(), Rate);
 
     if (key != 0)
     {
-        m_mode[nextmode = CUSTOM_VIDEO] = next = m_inSizeToOutputMode[key];
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Found custom screen override %1x%2")
-            .arg(next.Width()).arg(next.Height()));
+        next = m_overrideVideoModes[key];
+        if (next.AspectRatio() > 0.0)
+            aspectoverride = next.AspectRatio();
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Found custom screen override %1x%2 Aspect %3")
+            .arg(next.Width()).arg(next.Height()).arg(aspectoverride));
     }
 
     // If requested refresh rate is 0, attempt to match video fps
@@ -488,116 +486,95 @@ bool MythDisplay::SwitchToVideo(int Width, int Height, double Rate)
 
     // need to change video mode?
     MythDisplayMode::FindBestMatch(GetVideoModes(), next, targetrate);
-
-    bool chg = !(next == m_last) || !(MythDisplayMode::CompareRates(m_last.RefreshRate(), targetrate));
-
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("%1 %2x%3 %4 Hz")
-        .arg(chg ? "Changing to" : "Using")
-        .arg(next.Width()).arg(next.Height())
-        .arg(targetrate, 0, 'f', 3));
-
-    if (chg && !SwitchToVideoMode(next.Width(), next.Height(), targetrate))
+    if ((next == current) && (MythDisplayMode::CompareRates(current.RefreshRate(), targetrate)))
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + QString("SwitchToVideo: Video size %1 x %2: "
-                                               "xrandr failed for %3 x %4")
-            .arg(Width).arg(Height).arg(next.Width()).arg(next.Height()));
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Using current mode %1x%2@%3Hz")
+            .arg(m_resolution.width()).arg(m_resolution.height()).arg(m_refreshRate));
+        return true;
+    }
+
+    LOG(VB_GENERAL, LOG_ERR, LOC + QString("Trying mode %1x%2@%3Hz")
+        .arg(next.Width()).arg(next.Height()).arg(next.RefreshRate(), 0, 'f', 3));
+
+    if (!SwitchToVideoMode(next.Resolution(), targetrate))
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to change mode to %1x%2@%3Hz")
+            .arg(next.Width()).arg(next.Height()).arg(next.RefreshRate(), 0, 'f', 3));
         return false;
     }
 
-    m_curMode = nextmode;
-
-    m_last = next;
-    m_last.SetRefreshRate(targetrate);
-
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("SwitchToVideo: Video size %1x%2")
-        .arg(Width).arg(Height));
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("%1 displaying resolution %2x%3, %4mmx%5mm")
-        .arg((chg) ? "Switched to" : "Already")
-        .arg(m_last.Width()).arg(m_last.Height())
-        .arg(m_last.WidthMM()).arg(m_last.HeightMM()));
-
-    if (chg)
-        PauseForModeSwitch();
-
-    return chg;
-}
-
-/** \brief Switches to the GUI resolution specified.
- *
- * If which_gui is GUI then this switches to the resolution and refresh rate set
- * in the database for the GUI. If which_gui is set to CUSTOM_GUI then we switch
- * to the resolution and refresh rate specified in the last call to SwitchToCustomGUI.
- *
- * \param which_gui either regular GUI or CUSTOM_GUI
- * \sa SwitchToCustomGUI
- */
-bool MythDisplay::SwitchToGUI(Mode NextMode, bool Wait)
-{
-    MythDisplayMode next = m_mode[NextMode];
-    auto targetrate = static_cast<double>(NAN);
-
-    // need to change video mode?
-    // If GuiVidModeRefreshRate is 0, assume any refresh rate is good enough.
-    if (qFuzzyIsNull(next.RefreshRate()))
-        next.SetRefreshRate(m_last.RefreshRate());
-
-    MythDisplayMode::FindBestMatch(GetVideoModes(), next, targetrate);
-    bool chg = !(next == m_last) || !(MythDisplayMode::CompareRates(m_last.RefreshRate(), targetrate));
-
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("%1 %2x%3 %4 Hz")
-        .arg(chg ? "Changing to" : "Using")
-        .arg(next.Width()).arg(next.Height())
-        .arg(targetrate, 0, 'f', 3));
-
-    if (chg && !SwitchToVideoMode(next.Width(), next.Height(), targetrate))
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("SwitchToGUI: xrandr failed for %1x%2 %3  Hz")
-            .arg(next.Width()).arg(next.Height())
-            .arg(next.RefreshRate(), 0, 'f', 3));
-        return false;
-    }
-
-    if (Wait && (next.Width() != m_last.Width() || next.Height() != m_last.Height()))
+    if (next.Resolution() != m_resolution)
         WaitForScreenChange();
 
-    m_curMode = NextMode;
+    // N.B. We used a computed aspect ratio unless overridden
+    m_aspectRatio = aspectoverride > 0.0 ? aspectoverride : 0.0;
+    UpdateCurrentMode();
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Switched to %1x%2@%3Hz for video %4x%5")
+        .arg(m_resolution.width()).arg(m_resolution.height())
+        .arg(m_refreshRate, 0, 'f', 3).arg(Size.width()).arg(Size.height()));
+    PauseForModeSwitch();
+    return true;
+}
 
-    m_last = next;
-    m_last.SetRefreshRate(targetrate);
+/** \brief Switches to the GUI resolution.
+ */
+bool MythDisplay::SwitchToGUI(bool Wait)
+{
+    // If the current resolution is the same as the GUI resolution then do nothing
+    // as refresh rate should not be critical for the GUI.
+    if (m_resolution == m_guiMode.Resolution())
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Using %1x%2@%3Hz for GUI")
+            .arg(m_resolution.width()).arg(m_resolution.height()).arg(m_refreshRate));
+        return true;
+    }
 
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("SwitchToGUI: Switched to %1x%2 %3 Hz")
-        .arg(m_last.Width()).arg(m_last.Height()).arg(GetRefreshRate(), 0, 'f', 3));
+    if (!SwitchToVideoMode(m_guiMode.Resolution(), m_guiMode.RefreshRate()))
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to change mode to %1x%2@%3Hz")
+            .arg(m_guiMode.Width()).arg(m_guiMode.Height()).arg(m_guiMode.RefreshRate(), 0, 'f', 3));
+        return false;
+    }
 
-    return chg;
+    if (Wait && (m_resolution != m_guiMode.Resolution()))
+        WaitForScreenChange();
+
+    UpdateCurrentMode();
+    m_aspectRatio = 0.0;
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Switched to %1x%2@%3Hz")
+        .arg(m_resolution.width()).arg(m_resolution.height()).arg(m_refreshRate, 0, 'f', 3));
+    return true;
 }
 
 double MythDisplay::GetRefreshRate(void)
 {
-    return m_last.RefreshRate();
+    return m_refreshRate;
 }
 
-std::vector<double> MythDisplay::GetRefreshRates(int Width, int Height)
+int MythDisplay::GetRefreshInterval(int Fallback)
 {
-    auto tr = static_cast<double>(NAN);
-    std::vector<double> empty;
-
-    const MythDisplayMode drs(Width, Height, 0, 0, -1.0, 0.0);
-    const DisplayModeVector& drv = GetVideoModes();
-    int t = MythDisplayMode::FindBestMatch(drv, drs, tr);
-
-    if (t < 0)
-        return empty;
-
-    return drv[static_cast<size_t>(t)].RefreshRates();
+    if (m_refreshRate > 20.0 && m_refreshRate < 200.0)
+        return static_cast<int>(lround(1000000.0 / m_refreshRate));
+    return Fallback;
 }
 
-bool MythDisplay::SwitchToVideoMode(int /*Width*/, int /*Height*/, double /*FrameRate*/)
+std::vector<double> MythDisplay::GetRefreshRates(QSize Size)
+{
+    auto targetrate = static_cast<double>(NAN);
+    const MythDisplayMode mode(Size, QSize(0, 0), -1.0, 0.0);
+    const vector<MythDisplayMode>& modes = GetVideoModes();
+    int match = MythDisplayMode::FindBestMatch(modes, mode, targetrate);
+    if (match < 0)
+        return std::vector<double>();
+    return modes[static_cast<size_t>(match)].RefreshRates();
+}
+
+bool MythDisplay::SwitchToVideoMode(QSize, double)
 {
     return false;
 }
 
-const DisplayModeVector& MythDisplay::GetVideoModes(void)
+const vector<MythDisplayMode> &MythDisplay::GetVideoModes(void)
 {
     return m_videoModes;
 }
@@ -609,7 +586,18 @@ const DisplayModeVector& MythDisplay::GetVideoModes(void)
 */
 double MythDisplay::GetAspectRatio(void)
 {
-    return m_last.AspectRatio();
+    if (m_aspectRatio > 0.0)
+        return m_aspectRatio;
+
+    if (m_physicalSize.width() > 0 && m_physicalSize.height() > 0)
+        return static_cast<double>(m_physicalSize.width()) / m_physicalSize.height();
+
+    return 16.0 / 9.0;
+}
+
+MythEDID& MythDisplay::GetEDID(void)
+{
+    return m_edid;
 }
 
 /*! \brief Estimate the overall display aspect ratio for multi screen setups.
@@ -714,12 +702,12 @@ double MythDisplay::EstimateVirtualAspectRatio(void)
 
 QSize MythDisplay::GetResolution(void)
 {
-    return QSize(m_last.Width(), m_last.Height());
+    return m_resolution;
 }
 
 QSize MythDisplay::GetPhysicalSize(void)
 {
-    return QSize(m_last.WidthMM(), m_last.HeightMM());
+    return m_physicalSize;
 }
 
 void MythDisplay::WaitForScreenChange(void)

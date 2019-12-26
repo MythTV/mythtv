@@ -1293,10 +1293,10 @@ TV::~TV(void)
     MythDisplay* display = MythDisplay::AcquireRelease();
     if (display->UsingVideoModes())
     {
-        bool hide = display->NextModeIsLarger(MythDisplay::GUI);
+        bool hide = display->NextModeIsLarger(display->GetGUIResolution());
         if (hide)
             mwnd->hide();
-        display->SwitchToGUI(MythDisplay::GUI, true);
+        display->SwitchToGUI(true);
         if (hide)
             mwnd->Show();
     }
@@ -8639,10 +8639,10 @@ void TV::DoEditSchedule(int editType)
     MythDisplay* display = MythDisplay::AcquireRelease();
     if (display->UsingVideoModes())
     {
-        bool hide = display->NextModeIsLarger(MythDisplay::GUI);
+        bool hide = display->NextModeIsLarger(display->GetGUIResolution());
         if (hide)
             mwnd->hide();
-        display->SwitchToGUI(MythDisplay::GUI, true);
+        display->SwitchToGUI(true);
         if (hide)
             mwnd->Show();
     }

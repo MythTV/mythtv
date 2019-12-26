@@ -17,7 +17,7 @@ class MythDisplayDRM final : public MythDisplay
     MythDisplayDRM();
    ~MythDisplayDRM() override;
 
-    DisplayInfo GetDisplayInfo  (int VideoRate = 0) override;
+    void UpdateCurrentMode(void) override;
 
   public slots:
     void ScreenChanged(QScreen *qScreen) override;
