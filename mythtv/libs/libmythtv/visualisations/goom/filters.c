@@ -603,10 +603,10 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 
 			for (us = 0; us < 0xffff; us++) {
                                 sintable[us] =
-                                    roundf(1024 * sin ((double) us * 360
+                                    roundf(1024 * sin ((float) us * 360
                                                        / ((float)sizeof (sintable)
                                                           / sizeof (sintable[0]) - 1)
-                                                       * 3.141592 / 180));
+                                                       * 3.141592F / 180));
 			}
 
 			{
