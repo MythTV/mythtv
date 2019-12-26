@@ -44,16 +44,16 @@ class AudioOutputJACK : public AudioOutputBase
 
     // Our various callback functions
     inline int JackCallback(jack_nframes_t nframes);
-    static int _JackCallback(jack_nframes_t nframes, void *arg);
+    static int JackCallbackHelper(jack_nframes_t nframes, void *arg);
     inline int JackXRunCallback();
-    static int _JackXRunCallback(void *arg);
+    static int JackXRunCallbackHelper(void *arg);
     inline int JackGraphOrderCallback();
-    static int _JackGraphOrderCallback(void *arg);
+    static int JackGraphOrderCallbackHelper(void *arg);
 
-    static jack_client_t* _jack_client_open(void);
-    const char** _jack_get_ports(void);
-    bool _jack_connect_ports(const char** /*matching_ports*/);
-    inline void _jack_client_close(jack_client_t **client);
+    static jack_client_t* JackClientOpen(void);
+    const char** JackGetPorts(void);
+    bool JackConnectPorts(const char** /*matching_ports*/);
+    inline void JackClientClose(jack_client_t **client);
 
     void DeinterleaveAudio(const float *aubuf, float **bufs,
                            int nframes, const int* channel_volumes);

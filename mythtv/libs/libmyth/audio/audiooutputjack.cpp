@@ -60,7 +60,7 @@ AudioOutputSettings* AudioOutputJACK::GetOutputSettings(bool /*digital*/)
     const char **matching_ports = nullptr;
     auto *settings = new AudioOutputSettings();
 
-    m_client = _jack_client_open();
+    m_client = JackClientOpen();
     if (!m_client)
     {
         JERROR(tr("Cannot start/connect to jack server "
@@ -84,7 +84,7 @@ AudioOutputSettings* AudioOutputJACK::GetOutputSettings(bool /*digital*/)
     settings->AddSupportedFormat(FORMAT_FLT);
 
     // Find some Jack ports to connect to
-    matching_ports = _jack_get_ports();
+    matching_ports = JackGetPorts();
 
     if (!matching_ports || !matching_ports[0])
     {
@@ -102,13 +102,13 @@ AudioOutputSettings* AudioOutputJACK::GetOutputSettings(bool /*digital*/)
 
     // Currently this looks very similar to error code - duplicated for safety
     free(matching_ports);
-    _jack_client_close(&m_client);
+    JackClientClose(&m_client);
     return settings;
 
 err_out:
     // Our abstracted exit point in case of error
     free(matching_ports);
-    _jack_client_close(&m_client);
+    JackClientClose(&m_client);
     delete settings;
     return nullptr;
 }
@@ -141,7 +141,7 @@ bool AudioOutputJACK::OpenDevice()
         VolumeInit();
 
     // Connect to the Jack audio server
-    m_client = _jack_client_open();
+    m_client = JackClientOpen();
     if (!m_client)
     {
         JERROR(tr("Cannot start/connect to jack server"));
@@ -149,7 +149,7 @@ bool AudioOutputJACK::OpenDevice()
     }
 
     // Find some Jack ports to connect to
-    matching_ports = _jack_get_ports();
+    matching_ports = JackGetPorts();
     if (!matching_ports || !matching_ports[0])
     {
         JERROR(tr("No ports available to connect to"));
@@ -194,11 +194,11 @@ bool AudioOutputJACK::OpenDevice()
     // Set our callbacks
     // These will actually get called after jack_activate()!
     // ...Possibly even before this OpenDevice sub returns...
-    if (jack_set_process_callback(m_client, _JackCallback, this))
+    if (jack_set_process_callback(m_client, JackCallbackHelper, this))
         JERROR(tr("Error. Unable to set process callback?!"));
-    if (jack_set_xrun_callback(m_client, _JackXRunCallback, this))
+    if (jack_set_xrun_callback(m_client, JackXRunCallbackHelper, this))
         JERROR(tr("Error. Unable to set xrun callback?!"));
-    if (jack_set_graph_order_callback(m_client, _JackGraphOrderCallback, this))
+    if (jack_set_graph_order_callback(m_client, JackGraphOrderCallbackHelper, this))
         JERROR(tr("Error. Unable to set graph order change callback?!"));
 
     // Activate! Everything comes into life after here. Beware races
@@ -209,7 +209,7 @@ bool AudioOutputJACK::OpenDevice()
     }
 
     // Connect our output ports
-    if (! _jack_connect_ports(matching_ports))
+    if (! JackConnectPorts(matching_ports))
         goto err_out;
 
     // Free up some stuff
@@ -221,14 +221,14 @@ bool AudioOutputJACK::OpenDevice()
 err_out:
     // Our abstracted exit point in case of error
     free(matching_ports);
-    _jack_client_close(&m_client);
+    JackClientClose(&m_client);
     return false;
 }
 
 void AudioOutputJACK::CloseDevice()
 {
-    _jack_client_close(&m_client);
-    _jack_client_close(&m_staleClient);
+    JackClientClose(&m_client);
+    JackClientClose(&m_staleClient);
     if (m_auBuf)
     {
         delete[] m_auBuf;
@@ -342,7 +342,7 @@ void AudioOutputJACK::DeinterleaveAudio(const float *aubuf, float **bufs, int nf
   Jack will call this from a separate thread whenever it needs "feeding"
   Simply calls our real code
 */
-int AudioOutputJACK::_JackCallback(jack_nframes_t nframes, void *arg)
+int AudioOutputJACK::JackCallbackHelper(jack_nframes_t nframes, void *arg)
 {
     auto *aoj = static_cast<AudioOutputJACK*>(arg);
     return aoj->JackCallback(nframes);
@@ -364,7 +364,7 @@ int AudioOutputJACK::JackCallback(jack_nframes_t nframes)
     int bytes_read = 0;
 
     // Check for stale_client set during shutdown callback
-    _jack_client_close(&m_staleClient);
+    JackClientClose(&m_staleClient);
 
     // Deal with xruns which may have occured
     // Basically read and discard the data which should have been played
@@ -433,7 +433,7 @@ int AudioOutputJACK::JackCallback(jack_nframes_t nframes)
   Jack will call this from a separate thread whenever an xrun occurs
   Simply calls our real code
 */
-int AudioOutputJACK::_JackXRunCallback(void *arg)
+int AudioOutputJACK::JackXRunCallbackHelper(void *arg)
 {
     auto *aoj = static_cast<AudioOutputJACK*>(arg);
     return aoj->JackXRunCallback();
@@ -461,7 +461,7 @@ int AudioOutputJACK::JackXRunCallback(void)
   Jack will call this from a separate thread whenever an xrun occurs
   Simply calls our real code
 */
-int AudioOutputJACK::_JackGraphOrderCallback(void *arg)
+int AudioOutputJACK::JackGraphOrderCallbackHelper(void *arg)
 {
     auto *aoj = static_cast<AudioOutputJACK*>(arg);
     return aoj->JackGraphOrderCallback();
@@ -568,7 +568,7 @@ void AudioOutputJACK::WriteAudio(unsigned char *aubuf, int size)
   Jack wrapper and convenience functions
  ***********************************************/
 
-jack_client_t* AudioOutputJACK::_jack_client_open(void)
+jack_client_t* AudioOutputJACK::JackClientOpen(void)
 {
     QString client_name = QString("mythtv_%1").arg(getpid());
     auto open_options = (jack_options_t)(JackUseExactName | JackNoStartServer);
@@ -580,7 +580,7 @@ jack_client_t* AudioOutputJACK::_jack_client_open(void)
     return client;
 }
 
-const char** AudioOutputJACK::_jack_get_ports(void)
+const char** AudioOutputJACK::JackGetPorts(void)
 {
     const char **matching_ports = nullptr;
     unsigned long port_flags=JackPortIsInput;
@@ -602,7 +602,7 @@ const char** AudioOutputJACK::_jack_get_ports(void)
 }
 
 
-bool AudioOutputJACK::_jack_connect_ports(const char** matching_ports)
+bool AudioOutputJACK::JackConnectPorts(const char** matching_ports)
 {
     int i=0;
 
@@ -619,7 +619,7 @@ bool AudioOutputJACK::_jack_connect_ports(const char** matching_ports)
     return true;
 }
 
-void AudioOutputJACK::_jack_client_close(jack_client_t **client)
+void AudioOutputJACK::JackClientClose(jack_client_t **client)
 {
     if (*client)
     {
