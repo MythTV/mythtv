@@ -1,8 +1,7 @@
 include ( ../../mythconfig.mak )
 include ( ../../settings.pro )
 
-TEMPLATE = app
-CONFIG -= moc qt
+TEMPLATE = aux
 
 trans.path = $${PREFIX}/share/mythtv/i18n/
 trans.files += mythzoneminder_sv.qm mythzoneminder_da.qm mythzoneminder_en_gb.qm
@@ -16,5 +15,3 @@ trans.files += mythzoneminder_bg.qm
 trans.files += mythzoneminder_it.qm
 
 INSTALLS += trans
-
-SOURCES += dummy.c

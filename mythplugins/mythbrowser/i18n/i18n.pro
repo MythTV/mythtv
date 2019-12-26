@@ -1,8 +1,7 @@
 include ( ../../mythconfig.mak )
 include ( ../../settings.pro )
 
-TEMPLATE = app
-CONFIG -= moc qt
+TEMPLATE = aux
 
 trans.path = $${PREFIX}/share/mythtv/i18n/
 trans.files += mythbrowser_de.qm mythbrowser_sl.qm mythbrowser_fr.qm
@@ -17,5 +16,3 @@ trans.files += mythbrowser_it.qm
 trans.files += mythbrowser_zh_hk.qm
 
 INSTALLS += trans
-
-SOURCES += dummy.c

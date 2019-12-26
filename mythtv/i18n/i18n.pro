@@ -1,7 +1,6 @@
 include ( ../settings.pro )
 
-TEMPLATE = app
-CONFIG -= moc qt
+TEMPLATE = aux
 
 trans.path = $${PREFIX}/share/mythtv/i18n/
 trans.files  = mythfrontend_bg.qm
@@ -37,5 +36,3 @@ trans.files += mythfrontend_zh_cn.qm
 trans.files += mythfrontend_zh_hk.qm
 
 INSTALLS += trans
-
-SOURCES += dummy.c
