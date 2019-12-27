@@ -42,7 +42,7 @@ void mpeg2_mc_init (uint32_t accel)
 	mpeg2_mc = mpeg2_mc_3dnow;
     else if (accel & MPEG2_ACCEL_X86_MMX)
 	mpeg2_mc = mpeg2_mc_mmx;
-    else
+    else // NOLINT(readability-braces-around-statements)
 #endif /* MMX */
 #endif
 #if HAVE_ALTIVEC
