@@ -187,9 +187,7 @@ bool MythDRMDevice::Initialise(void)
                     break;
                 }
                 if (!edid.Valid())
-                {
-                        LOG(VB_GENERAL, m_verbose, LOC + "Connected device has invalid EDID");
-                }
+                    LOG(VB_GENERAL, m_verbose, LOC + "Connected device has invalid EDID");
                 drmModeFreePropertyBlob(edidblob);
                 if (m_connector && !m_serialNumber.isEmpty())
                     break;

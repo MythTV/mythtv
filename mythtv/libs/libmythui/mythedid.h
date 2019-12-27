@@ -24,7 +24,7 @@ class MUI_PUBLIC MythEDID
 
     bool        Valid             (void);
     QStringList SerialNumbers     (void);
-    int         PhysicalAddress   (void);
+    uint16_t    PhysicalAddress   (void);
     float       Gamma             (void);
     bool        IsSRGB            (void);
     Primaries   ColourPrimaries   (void);
@@ -47,7 +47,7 @@ class MUI_PUBLIC MythEDID
     float       m_gamma           { 0.0F }; // Invalid
     bool        m_sRGB            { false };
     Primaries   m_primaries       { {{0.0F, 0.0F}, {0.0F, 0.0F}, {0.0F, 0.0F}}, {0.0F, 0.0F} };
-    int         m_physicalAddress { 0 };
+    uint16_t    m_physicalAddress { 0 };
     bool        m_latencies       { false };
     bool        m_interLatencies  { false };
     int         m_audioLatency[2] { 0 };

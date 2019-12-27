@@ -37,7 +37,7 @@ QStringList MythEDID::SerialNumbers(void)
     return m_serialNumbers;
 }
 
-int MythEDID::PhysicalAddress(void)
+uint16_t MythEDID::PhysicalAddress(void)
 {
     return m_physicalAddress;
 }
@@ -275,7 +275,7 @@ bool MythEDID::ParseVSDB(const quint8 *Data, uint Offset, uint Length)
             break;
 
         // CEC physical address
-        m_physicalAddress = (Data[Offset + 3] << 8) + Data[Offset + 4];
+        m_physicalAddress = static_cast<uint16_t>((Data[Offset + 3] << 8) + Data[Offset + 4]);
         if (Length < 8 || (Offset + 8 >= m_size))
             break;
 
