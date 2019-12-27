@@ -159,7 +159,7 @@ class MythMainWindowPrivate
 #endif
 
 #ifdef USING_LIBCEC
-    CECAdapter          *m_cecAdapter           {nullptr};
+    MythCECAdapter       m_cecAdapter           { };
 #endif
 
     bool                 m_exitingtomain        {false};
@@ -471,15 +471,6 @@ MythMainWindow::MythMainWindow(const bool useDB)
     }
 #endif
 
-#ifdef USING_LIBCEC
-    d->m_cecAdapter = new CECAdapter();
-    if (!d->m_cecAdapter->IsValid())
-    {
-        delete d->m_cecAdapter;
-        d->m_cecAdapter = nullptr;
-    }
-#endif
-
     d->m_udpListener = new MythUDPListener();
 
     InitKeys();
@@ -582,7 +573,7 @@ MythMainWindow::~MythMainWindow()
 #endif
 
 #ifdef USING_LIBCEC
-    delete d->m_cecAdapter;
+    d->m_cecAdapter.Close();
 #endif
 
     delete d->m_nc;
@@ -1173,9 +1164,14 @@ void MythMainWindow::Init(bool mayReInit)
         d->m_themeBase = new MythThemeBase();
 
     if (!d->m_nc)
-    {
         d->m_nc = new MythNotificationCenter();
-    }
+
+#ifdef USING_LIBCEC
+    // Open any adapter after the window has been created to ensure we capture
+    // the EDID if available. This will close any existing adapter in the event
+    // that the window has been re-init'ed.
+    d->m_cecAdapter.Open();
+#endif
 }
 
 void MythMainWindow::DelayedAction(void)
@@ -1955,8 +1951,7 @@ bool MythMainWindow::HandleMedia(const QString &handler, const QString &mrl,
 void MythMainWindow::HandleTVPower(bool poweron)
 {
 #ifdef USING_LIBCEC
-    if (d->m_cecAdapter)
-        d->m_cecAdapter->Action((poweron) ? ACTION_TVPOWERON : ACTION_TVPOWEROFF);
+    d->m_cecAdapter.Action((poweron) ? ACTION_TVPOWERON : ACTION_TVPOWEROFF);
 #else
     (void) poweron;
 #endif
