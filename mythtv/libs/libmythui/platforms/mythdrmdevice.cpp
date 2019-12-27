@@ -175,6 +175,7 @@ bool MythDRMDevice::Initialise(void)
             {
                 MythEDID edid(reinterpret_cast<const char *>(edidblob->data),
                               static_cast<int>(edidblob->length));
+                drmModeFreePropertyBlob(edidblob);
                 if (edid.Valid() && edid.SerialNumbers().contains(serial))
                 {
                     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Matched connector with serial '%1'")
@@ -188,7 +189,7 @@ bool MythDRMDevice::Initialise(void)
                 }
                 if (!edid.Valid())
                     LOG(VB_GENERAL, m_verbose, LOC + "Connected device has invalid EDID");
-                drmModeFreePropertyBlob(edidblob);
+
                 if (m_connector && !m_serialNumber.isEmpty())
                     break;
             }
