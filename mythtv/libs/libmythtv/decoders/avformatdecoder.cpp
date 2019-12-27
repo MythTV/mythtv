@@ -1326,12 +1326,12 @@ float AvFormatDecoder::normalized_fps(AVStream *stream, AVCodecContext *enc)
     if ((QString(m_ic->iformat->name).contains("matroska") ||
         QString(m_ic->iformat->name).contains("mov")) &&
         avg_fps < 121.0 && avg_fps > 3.0)
-    {
-        fps = avg_fps;  // NOLINT(bugprone-branch-clone)
+    {   // NOLINT(bugprone-branch-clone)
+        fps = avg_fps;
     }
     else if (QString(m_ic->iformat->name).contains("avi") &&
         container_fps < 121.0 && container_fps > 3.0)
-    {
+    {   // NOLINT(bugprone-branch-clone)
         fps = container_fps; // avi uses container fps for timestamps // NOLINT(bugprone-branch-clone)
     }
     else if (codec_fps < 121.0 && codec_fps > 3.0)
