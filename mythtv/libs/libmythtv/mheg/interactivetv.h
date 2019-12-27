@@ -15,8 +15,10 @@ class InteractiveTV
   public:
     // Interface to Myth
     explicit InteractiveTV(MythPlayer *nvp);
-    InteractiveTV(const InteractiveTV& rhs);
     virtual ~InteractiveTV();
+
+    InteractiveTV(const InteractiveTV&) = delete;
+    void operator=(const InteractiveTV&) = delete;
 
     void Restart(int chanid, int sourceid, bool isLive);
     // Process an incoming DSMCC packet.
