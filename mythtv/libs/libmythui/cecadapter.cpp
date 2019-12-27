@@ -252,7 +252,8 @@ void MythCECAdapter::Close(void)
 {
     if (m_adapter)
     {
-        HandleActions(PowerOffTV);
+        if (m_powerOffTVOnExit)
+            HandleActions(PowerOffTV);
         m_adapter->Close();
         UnloadLibCec(m_adapter);
         LOG(VB_GENERAL, LOG_INFO, LOC + "Closing down CEC.");
