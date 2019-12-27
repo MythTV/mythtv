@@ -33,10 +33,10 @@ class MythCECAdapter
     Q_DECLARE_FLAGS(MythCECActions, MythCECAction)
 
 #if CEC_LIB_VERSION_MAJOR <= 3
-    static int  LogMessageCallback(void*, const cec_log_message&);
-    static int  KeyPressCallback  (void*, const cec_keypress&);
-    static int  CommandCallback   (void*, const cec_command&);
-    static int  AlertCallback     (void*, const libcec_alert, const libcec_parameter&);
+    static int  LogMessageCallback(void*, const cec_log_message);
+    static int  KeyPressCallback  (void*, const cec_keypress);
+    static int  CommandCallback   (void*, const cec_command);
+    static int  AlertCallback     (void*, const libcec_alert, const libcec_parameter);
 #else
     static void LogMessageCallback(void*, const cec_log_message*);
     static void KeyPressCallback  (void*, const cec_keypress*);

@@ -23,25 +23,25 @@
 
 #if CEC_LIB_VERSION_MAJOR <= 3
 // cppcheck-suppress passedByValue
-int MythCECAdapter::LogMessageCallback(void*, const cec_log_message &Message)
+int MythCECAdapter::LogMessageCallback(void*, const cec_log_message Message)
 {
     return MythCECAdapter::LogMessage(Message);
 }
 
 // cppcheck-suppress passedByValue
-int MythCECAdapter::KeyPressCallback(void*, const cec_keypress &Keypress)
+int MythCECAdapter::KeyPressCallback(void*, const cec_keypress Keypress)
 {
     return MythCECAdapter::HandleKeyPress(Keypress);
 }
 
 // cppcheck-suppress passedByValue
-int MythCECAdapter::CommandCallback(void*, const cec_command &Command)
+int MythCECAdapter::CommandCallback(void*, const cec_command Command)
 {
     return MythCECAdapter::HandleCommand(Command);
 }
 
 // cppcheck-suppress passedByValue
-int MythCECAdapter::AlertCallback(void*, const libcec_alert Alert, const libcec_parameter &Data)
+int MythCECAdapter::AlertCallback(void*, const libcec_alert Alert, const libcec_parameter Data)
 {
     return MythCECAdapter::HandleAlert(Alert, Data);
 }
