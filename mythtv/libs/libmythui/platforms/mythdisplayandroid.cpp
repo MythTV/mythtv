@@ -19,7 +19,6 @@ MythDisplayAndroid::~MythDisplayAndroid()
 
 void MythDisplayAndroid::UpdateCurrentMode(void)
 {
-    DisplayInfo ret;
     QAndroidJniEnvironment env;
     QAndroidJniObject activity = QtAndroid::androidActivity();
     QAndroidJniObject windowManager =  activity.callObjectMethod("getWindowManager", "()Landroid/view/WindowManager;");
