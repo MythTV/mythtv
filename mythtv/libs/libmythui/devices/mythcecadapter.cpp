@@ -10,7 +10,7 @@
 #include "mythuihelper.h"
 #include "mythmainwindow.h"
 #include "mythdisplay.h"
-#include "cecadapter.h"
+#include "mythcecadapter.h"
 
 // Std
 #include <vector>

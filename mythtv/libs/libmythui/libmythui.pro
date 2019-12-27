@@ -12,7 +12,7 @@ CONFIG += thread dll
 target.path = $${LIBDIR}
 INSTALLS = target
 
-DEPENDPATH  += ./opengl ./platforms
+DEPENDPATH  += ./opengl ./platforms ./devices
 INCLUDEPATH += $$DEPENDPATH
 INCLUDEPATH += ../libmythbase
 INCLUDEPATH += ../.. ../
@@ -158,8 +158,8 @@ using_lirc {
 
 using_libcec {
     DEFINES += USING_LIBCEC
-    HEADERS += cecadapter.h
-    SOURCES += cecadapter.cpp
+    HEADERS += devices/mythcecadapter.h
+    SOURCES += devices/mythcecadapter.cpp
 }
 
 using_xrandr {

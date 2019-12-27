@@ -60,7 +60,7 @@ using namespace std;
 #endif
 
 #ifdef USING_LIBCEC
-#include "cecadapter.h"
+#include "devices/mythcecadapter.h"
 #endif
 
 #include "mythscreentype.h"
