@@ -27,7 +27,7 @@ class MBASE_PUBLIC ReferenceCounter
 {
   public:
     /// Creates reference counter with an initial value of 1.
-    ReferenceCounter(const QString &debugName, bool logDebug = true);
+    explicit ReferenceCounter(const QString &debugName, bool logDebug = true);
 
     /// Increments reference count.
     /// \return last reference count
