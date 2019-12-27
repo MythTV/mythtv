@@ -376,9 +376,14 @@ int AudioOutputJACK::JackCallback(jack_nframes_t nframes)
     }
     m_jackXruns -= t_jack_xruns;
 
-    // Get jack output buffers
-    for (int i = 0; i < m_channels; i++)
+    // Get jack output buffers.  Zero out the extra space in the array
+    // to prevent clang-tidy from complaining that DeinterleaveAudio()
+    // can reference a garbage value.
+    int i = 0;
+    for ( ; i < m_channels; i++)
         bufs[i] = (float*)jack_port_get_buffer(m_ports[i], nframes);
+    for ( ; i < JACK_CHANNELS_MAX; i++)
+        bufs[i] = nullptr;
 
     if (m_pauseAudio || m_killAudio)
     {
