@@ -348,7 +348,7 @@ MythPainterWindowGL::MythPainterWindowGL(MythMainWindow *win,
 #ifdef Q_OS_MACOS
     setVisible(true); // must be visible before OpenGL initialisation on OSX
 #endif
-    m_render->setWidget(this);
+    m_render->SetWidget(this);
 }
 
 QPaintEngine *MythPainterWindowGL::paintEngine() const

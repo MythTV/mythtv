@@ -494,31 +494,34 @@ void MythRenderOpenGL::swapBuffers()
     QOpenGLContext::swapBuffers(m_window);
 }
 
-void MythRenderOpenGL::setWidget(QWidget *Widget)
+void MythRenderOpenGL::SetWidget(QWidget *Widget)
 {
     if (!Widget)
-        return;
-
-    m_window = Widget->windowHandle();
-    if (!m_window)
     {
-        Widget = Widget->nativeParentWidget();
-        if (Widget)
-            m_window = Widget->windowHandle();
+        LOG(VB_GENERAL, LOG_CRIT, LOC + "No widget!");
+        return;
     }
 
-#ifdef ANDROID
-    // change all window surfacetypes to OpenGLSurface
-    // otherwise the raster gets painted on top of the GL surface
+    // We must have a window/surface.
+    m_window = Widget->windowHandle();
+    QWidget* native = Widget->nativeParentWidget();
+    if (!m_window && native)
+        m_window = native->windowHandle();
+
+    if (!m_window)
+    {
+        LOG(VB_GENERAL, LOG_CRIT, LOC + "No window surface!");
+        return;
+    }
+
+    // Ensure surface type is always OpenGL
     m_window->setSurfaceType(QWindow::OpenGLSurface);
-    QWidget* wNativeParent = Widget->nativeParentWidget();
-    if (wNativeParent)
-        wNativeParent->windowHandle()->setSurfaceType(QWindow::OpenGLSurface);
-#endif
+    if (native && native->windowHandle())
+        native->windowHandle()->setSurfaceType(QWindow::OpenGLSurface);
 
     if (!create())
-        LOG(VB_GENERAL, LOG_WARNING, LOC + "setWidget create failed");
-    else if (Widget)
+        LOG(VB_GENERAL, LOG_CRIT, LOC + "Failed to create OpenGLContext!");
+    else
         Widget->setAttribute(Qt::WA_PaintOnScreen);
 }
 

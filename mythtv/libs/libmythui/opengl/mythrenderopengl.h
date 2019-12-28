@@ -98,7 +98,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     void  doneCurrent();
     void  swapBuffers();
 
-    void  setWidget(QWidget *Widget);
+    void  SetWidget(QWidget *Widget);
     bool  Init(void);
     int   GetColorDepth(void) const;
     int   GetMaxTextureSize(void) const;
