@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #-----------------------
 # Name: tmdb_exceptions.py    Common exceptions used in tmdbv3 API library

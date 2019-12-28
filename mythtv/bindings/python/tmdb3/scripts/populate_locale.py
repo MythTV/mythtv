@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #-----------------------
 # Name: populate_locale.py    Helper for grabbing ISO639 and ISO3316 data
