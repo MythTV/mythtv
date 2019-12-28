@@ -345,12 +345,9 @@ MythPainterWindowGL::MythPainterWindowGL(MythMainWindow *win,
     setAttribute(Qt::WA_NativeWindow);
     setAttribute(Qt::WA_DontCreateNativeAncestors);
     winId();
-    bool forceshow = !qgetenv("MYTHTV_FORCE_SHOW").isEmpty();
 #ifdef Q_OS_MACOS
-    forceshow = true; // must be visible before OpenGL initialisation on OSX
+    setVisible(true); // must be visible before OpenGL initialisation on OSX
 #endif
-    if (forceshow)
-        setVisible(true);
     m_render->setWidget(this);
 }
 
