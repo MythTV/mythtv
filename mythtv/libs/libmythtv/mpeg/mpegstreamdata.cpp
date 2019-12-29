@@ -257,7 +257,7 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
                 // create a new partial packet to prevent overflow
                 if ((partial->TSSizeInBuffer() > TSPacket::kSize) &&
                     (packetStart >
-                     partial->TSSizeInBuffer() - TSPacket::PAYLOAD_SIZE))
+                     partial->TSSizeInBuffer() - TSPacket::kPayloadSize))
                 {
                     // Saving will handle deleting the old one
                     SavePartialPSIP(tspacket->PID(),
