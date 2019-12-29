@@ -38,6 +38,7 @@ void MythDisplayX11::UpdateCurrentMode(void)
         m_physicalSize = display->GetDisplayDimensions();
         GetEDID(display);
         delete display;
+        m_modeComplete = true;
         return;
     }
     MythDisplay::UpdateCurrentMode();

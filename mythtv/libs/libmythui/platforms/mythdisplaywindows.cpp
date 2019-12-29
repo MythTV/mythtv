@@ -25,6 +25,7 @@ void MythDisplayWindows::UpdateCurrentMode(void)
                            GetDeviceCaps(hdc, VERTSIZE));
     m_resolution = QSize(GetDeviceCaps(hdc, HORZRES),
                          GetDeviceCaps(hdc, VERTRES));
+    m_modeComplete = true;
 
     // see http://support.microsoft.com/kb/2006076
     switch (rate)

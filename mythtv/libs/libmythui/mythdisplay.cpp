@@ -139,6 +139,8 @@ void MythDisplay::SetWidget(QWidget *MainWindow)
     QWidget* old = m_widget;
     m_widget = MainWindow;
 
+    if (!m_modeComplete)
+        UpdateCurrentMode();
     if (!m_widget)
         return;
     if (m_widget != old)
@@ -301,11 +303,18 @@ void MythDisplay::GeometryChanged(const QRect &Geo)
         .arg(Geo.width()).arg(Geo.height()).arg(Geo.left()).arg(Geo.top()));
 }
 
+/*! \brief Retrieve screen details.
+ *
+ * This is the final fallback when no other platform specifics are available
+ * It is usually accurate apart from the refresh rate - which is often
+ * rounded down.
+*/
 void MythDisplay::UpdateCurrentMode(void)
 {
-    // This is the final fallback when no other platform specifics are available
-    // It is usually accurate apart from the refresh rate - which is often
-    // rounded down.
+    // Certain platform implementations do not have a window to access at startup
+    // and hence use this implementation. Flag the status as incomplete to ensure
+    // we try to retrieve the full details at the first opportunity.
+    m_modeComplete = false;
     m_edid = MythEDID();
     QScreen *screen = GetCurrentScreen();
     if (!screen)
@@ -458,6 +467,9 @@ void MythDisplay::SwitchToDesktop()
 */
 bool MythDisplay::SwitchToVideo(QSize Size, double Rate)
 {
+    if (!m_modeComplete)
+        UpdateCurrentMode();
+
     MythDisplayMode next = m_videoMode;
     MythDisplayMode current(m_resolution, m_physicalSize, -1.0, m_refreshRate);
     double targetrate = 0.0;
@@ -520,6 +532,9 @@ bool MythDisplay::SwitchToVideo(QSize Size, double Rate)
  */
 bool MythDisplay::SwitchToGUI(bool Wait)
 {
+    if (!m_modeComplete)
+        UpdateCurrentMode();
+
     // If the current resolution is the same as the GUI resolution then do nothing
     // as refresh rate should not be critical for the GUI.
     if (m_resolution == m_guiMode.Resolution())

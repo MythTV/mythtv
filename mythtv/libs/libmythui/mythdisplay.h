@@ -72,6 +72,7 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
     void            Initialise         (void);
     void            WaitForScreenChange(void);
 
+    bool            m_modeComplete     { false };
     double          m_refreshRate      { 0.0  };
     double          m_aspectRatio      { 0.0  };
     QSize           m_resolution       { 0, 0 };
@@ -90,8 +91,6 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
     MythDisplayMode m_guiMode          { };
     MythDisplayMode m_videoMode        { };
     DisplayModeMap  m_overrideVideoModes { };
-
-    MythDisplayMode m_last             { };
 };
 
 #endif // MYTHDISPLAY_H

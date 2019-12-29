@@ -45,6 +45,7 @@ void MythDisplayAndroid::UpdateCurrentMode(void)
     m_refreshRate  = static_cast<double>(rate);
     m_resolution   = QSize(width, height);
     m_physicalSize = QSize(width, height);
+    m_modeComplete = true;
     if (xdpi > 0 && ydpi > 0)
     {
         m_physicalSize = QSize(static_cast<int>(width  / xdpi * 25.4F),

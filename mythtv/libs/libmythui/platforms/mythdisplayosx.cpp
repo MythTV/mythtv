@@ -4,6 +4,7 @@
 #include "mythmainwindow.h"
 #include "mythdisplayosx.h"
 #import  "mythosxutils.h"
+#import  "mythutilscocoa.h"
 
 #define LOC QString("DisplayOSX: ")
 
@@ -20,14 +21,19 @@ MythDisplayOSX::~MythDisplayOSX()
 
 void MythDisplayOSX::UpdateCurrentMode(void)
 {
-    if (!HasMythMainWindow())
+    QWidget* widget = m_widget;
+
+    if (!widget)
     {
-        MythDisplay::UpdateCurrentMode();
-        return;
+        if (!HasMythMainWindow())
+        {
+            MythDisplay::UpdateCurrentMode();
+            return;
+        }
+        widget = qobject_cast<QWidget*>(MythMainWindow::getMainWindow());
     }
 
-    WId win = (qobject_cast<QWidget*>(MythMainWindow::getMainWindow()))->winId();
-    CGDirectDisplayID disp = GetOSXDisplay(win);
+    CGDirectDisplayID disp = GetOSXDisplay(widget->winId());
     if (!disp)
     {
         MythDisplay::UpdateCurrentMode();
@@ -40,9 +46,12 @@ void MythDisplayOSX::UpdateCurrentMode(void)
         return;
     }
 
+    m_modeComplete = true;
     m_refreshRate = CGDisplayModeGetRefreshRate(mode);
     m_resolution  = QSize(static_cast<int>(CGDisplayModeGetWidth(mode)),
                           static_cast<int>(CGDisplayModeGetHeight(mode)));
+    QByteArray edid = GetOSXEDID(disp);
+    m_edid = MythEDID(edid);
     //bool interlaced = CGDisplayModeGetIOFlags(mode) & kDisplayModeInterlacedFlag;
     CGDisplayModeRelease(mode);
     CGSize sizemm = CGDisplayScreenSize(disp);

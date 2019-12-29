@@ -37,6 +37,7 @@ void MythDisplayDRM::UpdateCurrentMode(void)
         m_resolution   = m_device->GetResolution();
         m_physicalSize = m_device->GetPhysicalSize();
         m_edid         = m_device->GetEDID();
+        m_modeComplete = true;
         return;
     }
     MythDisplay::UpdateCurrentMode();
