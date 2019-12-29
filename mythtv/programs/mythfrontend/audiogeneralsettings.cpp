@@ -71,10 +71,10 @@ void AudioDeviceComboBox::AudioRescan()
 
     // Adding the current value first avoids marking the setting as changed
     addSelection(value, value, true);
-    for (auto it = vect.begin(); it != vect.end(); ++it)
+    foreach (auto & it, vect)
     {
-        if (value != it->m_name)
-            addSelection(it->m_name, it->m_name);
+        if (value != it.m_name)
+            addSelection(it.m_name, it.m_name);
     }
 }
 
@@ -239,8 +239,8 @@ void AudioConfigSettings::AudioRescan()
     AudioOutput::ADCVect* list = AudioOutput::GetOutputList();
 
     m_audioDevs.clear();
-    for (auto it = list->begin(); it != list->end(); ++it)
-        m_audioDevs.insert(it->m_name, *it);
+    foreach (auto & dev, *list)
+        m_audioDevs.insert(dev.m_name, dev);
 
     m_devices = *list;
     delete list;
@@ -564,14 +564,8 @@ static void fillSelectionsFromDir(HostComboBoxSetting *comboBox,
                                   const QDir& dir, bool absPath = true)
 
 {
-    QFileInfoList il = dir.entryInfoList();
-
-    for (QFileInfoList::Iterator it = il.begin();
-                                 it != il.end();
-                                ++it )
+    foreach (auto & fi, dir.entryInfoList())
     {
-        QFileInfo &fi = *it;
-
         if (absPath)
             comboBox->addSelection( fi.absoluteFilePath() );
         else
@@ -1100,11 +1094,8 @@ HostComboBoxSetting *AudioConfigSettings::MixerControl()
 
     gc->setLabel(tr("Mixer controls"));
 
-    for (size_t i = 0; i < sizeof(kMixerControlControls) / sizeof(char*); ++i)
-    {
-        gc->addSelection(tr(kMixerControlControls[i]),
-                         kMixerControlControls[i]);
-    }
+    for (auto & control : kMixerControlControls)
+        gc->addSelection(tr(control), control);
 
     gc->setHelpText(tr("Changing the volume adjusts the selected mixer."));
 

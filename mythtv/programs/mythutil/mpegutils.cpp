@@ -291,12 +291,12 @@ class PTSListener :
   public:
     PTSListener()
     {
-        for (int i = 0; i < 256; i++)
-            m_ptsCount[i] = 0;
-        for (int i = 0; i < 256; i++)
-            m_ptsFirst[i] = -1LL;
-        for (int i = 0; i < 256; i++)
-            m_ptsLast[i] = -1LL;
+        for (uint & i : m_ptsCount)
+            i = 0;
+        for (int64_t & i : m_ptsFirst)
+            i = -1LL;
+        for (int64_t & i : m_ptsLast)
+            i = -1LL;
 
     }
     bool ProcessTSPacket(const TSPacket &tspacket) override; // TSPacketListener

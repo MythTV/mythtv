@@ -144,8 +144,8 @@ PTSOffsetQueue::PTSOffsetQueue(int vidid, QList<int> keys, int64_t initPTS)
     idx.framenum = 0;
     idx.type = false;
 
-    for (auto it = m_keyList.begin(); it != m_keyList.end(); ++it)
-        m_offset[*it].push_back(idx);
+    foreach (const int & key, m_keyList)
+        m_offset[key].push_back(idx);
 }
 
 int64_t PTSOffsetQueue::Get(int idx, AVPacket *pkt)
@@ -184,8 +184,8 @@ void PTSOffsetQueue::SetNextPTS(int64_t newPTS, int64_t atPTS)
     idx.type = false;
     idx.framenum = 0;
 
-    for (auto it = m_keyList.begin(); it != m_keyList.end(); ++it)
-        m_offset[*it].push_back(idx);
+    foreach (const int & key, m_keyList)
+        m_offset[key].push_back(idx);
 }
 
 void PTSOffsetQueue::SetNextPos(int64_t newPTS, AVPacket *pkt)
@@ -200,12 +200,12 @@ void PTSOffsetQueue::SetNextPos(int64_t newPTS, AVPacket *pkt)
     LOG(VB_FRAME, LOG_INFO, QString("Offset %1 -> %2 (%3) at %4")
             .arg(PtsTime(m_offset[m_vidId].last().newPTS))
             .arg(PtsTime(newPTS)).arg(PtsTime(delta)).arg(pkt->pos));
-    for (auto it = m_keyList.begin(); it != m_keyList.end(); ++it)
+    foreach (const int & key, m_keyList)
     {
         idx.newPTS = newPTS;
-        m_offset[*it].push_back(idx);
+        m_offset[key].push_back(idx);
         idx.newPTS = delta;
-        m_orig[*it].push_back(idx);
+        m_orig[key].push_back(idx);
     }
 }
 
@@ -329,9 +329,8 @@ MPEG2fixup::~MPEG2fixup()
         delete tmpFrame;
     }
 
-    for (auto it = m_aFrame.begin(); it != m_aFrame.end(); it++)
+    foreach (auto af, m_aFrame)
     {
-        FrameList *af = (*it);
         while (af->count())
         {
             MPEG2frame *tmpFrame = af->takeFirst();
@@ -1033,11 +1032,11 @@ void MPEG2fixup::WriteFrame(const QString& filename, MPEG2frame *f)
         return;
     if (!tmpFrame->m_isSequence)
     {
-        for (auto it = m_vFrame.begin(); it != m_vFrame.end(); it++)
+        foreach (auto & vf, m_vFrame)
         {
-            if ((*it)->m_isSequence)
+            if (vf->m_isSequence)
             {
-                AddSequence(tmpFrame, *it);
+                AddSequence(tmpFrame, vf);
                 break;
             }
         }
@@ -1516,10 +1515,8 @@ bool MPEG2fixup::FindStart()
                     //Check all video sequence packets against current
                     //audio packet
                     MPEG2frame *foundframe = nullptr;
-                    for (auto it2 = m_vFrame.begin();
-                         it2 != m_vFrame.end(); it2++)
+                    foreach (auto currFrame, m_vFrame)
                     {
-                        MPEG2frame *currFrame = (*it2);
                         if (currFrame->m_isSequence)
                         {
                             int64_t dlta1 = diff2x33(af->first()->m_pkt.pts,
@@ -1625,10 +1622,10 @@ void MPEG2fixup::SetRepeat(uint8_t *ptr, int size, int fields, bool topff)
 
 MPEG2frame *MPEG2fixup::FindFrameNum(int frameNum)
 {
-    for (auto it = m_vFrame.begin(); it != m_vFrame.end(); it++)
+    foreach (auto & vf, m_vFrame)
     {
-        if (GetFrameNum((*it)) == frameNum)
-            return (*it);
+        if (GetFrameNum(vf) == frameNum)
+            return vf;
     }
 
     return nullptr;
@@ -1666,10 +1663,10 @@ int MPEG2fixup::PlaybackSecondary()
 {
     int frame_num = 0;
     mpeg2_reset(m_imgDecoder, 1);
-    for (auto it = m_vSecondary.begin(); it != m_vSecondary.end(); it++)
+    foreach (auto & vs, m_vSecondary)
     {
-        SetFrameNum((*it)->m_framePos, frame_num++);
-        if (ProcessVideo((*it), m_imgDecoder) < 0)
+        SetFrameNum(vs->m_framePos, frame_num++);
+        if (ProcessVideo(vs, m_imgDecoder) < 0)
             return 1;
     }
     return 0;
@@ -1766,9 +1763,9 @@ int MPEG2fixup::ConvertToI(FrameList *orderedFrames, int headPos)
         if (PlaybackSecondary())
             return 1;
 
-    for (auto it = orderedFrames->begin(); it != orderedFrames->end(); it++)
+    foreach (auto & of, *orderedFrames)
     {
-        int i = GetFrameNum((*it));
+        int i = GetFrameNum(of);
         if ((spare = DecodeToFrame(i, headPos == 0)) == nullptr)
         {
             LOG(VB_GENERAL, LOG_WARNING,
@@ -1887,9 +1884,9 @@ void MPEG2fixup::AddRangeList(QStringList rangelist, int type)
 
     mapPtr->clear();
 
-    for (auto i = rangelist.begin(); i != rangelist.end(); ++i)
+    foreach (auto & range, rangelist)
     {
-        QStringList tmp = (*i).split(" - ");
+        QStringList tmp = range.split(" - ");
         if (tmp.size() < 2)
             continue;
 
@@ -1997,10 +1994,8 @@ void MPEG2fixup::dumpList(FrameList *list)
     LOG(VB_GENERAL, LOG_INFO, QString("List contains %1 items")
             .arg(list->count()));
 
-     for (FrameList::Iterator it = list->begin(); it != list->end(); it++)
+    foreach (auto curFrame, *list)
     {
-        MPEG2frame *curFrame = (*it);
-
         LOG(VB_GENERAL, LOG_INFO,
             QString("VID: %1 #:%2 nb: %3 pts: %4 dts: %5 pos: %6")
                 .arg(GetFrameTypeT(curFrame))
@@ -2155,10 +2150,8 @@ int MPEG2fixup::Start()
                 Lreorder = ReorderDTStoPTS(&m_vFrame, frame_pos);
 
                 //First pass at fixing PTS values (fixes gross errors only)
-                for (FrameList::Iterator it2 = Lreorder.begin();
-                     it2 != Lreorder.end(); it2++)
+                foreach (auto curFrame, Lreorder)
                 {
-                    MPEG2frame *curFrame = (*it2);
                     poq.UpdateOrigPTS(m_vidId, origvPTS, &curFrame->m_pkt);
                     InitialPTSFixup(curFrame, origvPTS, PTSdiscrep, 
                                     m_maxFrames, true);
@@ -2187,10 +2180,8 @@ int MPEG2fixup::Start()
                             FrameList tmpReorder;
                             tmpReorder = ReorderDTStoPTS(&m_vFrame,
                                                          frame_pos + count);
-                            for (FrameList::Iterator it2 = tmpReorder.begin();
-                                 it2 != tmpReorder.end(); it2++)
+                            foreach (auto curFrame, tmpReorder)
                             {
-                                MPEG2frame *curFrame = (*it2);
                                 int64_t tmpPTSdiscrep = 0;
                                 InitialPTSFixup(curFrame, tmp_origvPTS,
                                            tmpPTSdiscrep, numframes, false);
@@ -2314,10 +2305,8 @@ int MPEG2fixup::Start()
                 {
                     int64_t dtsExtra = 0;
                     //check for PTS discontinuity
-                    for (FrameList::Iterator it2 = Lreorder.begin();
-                         it2 != Lreorder.end(); it2++)
+                    foreach (auto curFrame, Lreorder)
                     {
-                        MPEG2frame *curFrame = (*it2);
                         if (markedFrameP && m_discard)
                         {
                             if (curFrame != markedFrameP)

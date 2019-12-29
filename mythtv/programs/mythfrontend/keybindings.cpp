@@ -116,9 +116,9 @@ QStringList KeyBindings::GetKeyContexts(const QString &key) const
     ActionList actions = m_actionSet.GetActions(key);
     QStringList contexts;
 
-    for (int i = 0; i < actions.size(); i++)
+    foreach (auto & action, actions)
     {
-        QString context = actions[i].GetContext();
+        QString context = action.GetContext();
         if (!contexts.contains(context))
             contexts.push_back(context);
     }

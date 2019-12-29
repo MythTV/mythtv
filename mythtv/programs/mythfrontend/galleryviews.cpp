@@ -447,8 +447,8 @@ void FlatView::Cache(int id, int parent, const QString &url, const QString &thum
 QString DirCacheEntry::ToString(int id) const
 {
     QStringList ids;
-    for (int i = 0; i < m_thumbs.size(); ++i)
-        ids << QString::number(m_thumbs.at(i).first);
+    foreach (const auto & thumb, m_thumbs)
+        ids << QString::number(thumb.first);
     return QString("Dir %1 (%2, %3) Thumbs %4 (%5) Parent %6")
             .arg(id).arg(m_fileCount).arg(m_dirCount).arg(ids.join(","))
             .arg(m_thumbCount).arg(m_parent);

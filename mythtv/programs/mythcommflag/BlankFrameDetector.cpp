@@ -220,8 +220,6 @@ computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
         { 30,   5 },
         { 60,   5 },
     };
-    static constexpr unsigned int kNBreakTypes =
-        sizeof(kBreakType)/sizeof(*kBreakType);
 
     /*
      * TUNABLE:
@@ -240,7 +238,7 @@ computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
         long long iilen = *iiblank;
         long long start = brkb + iilen / 2;
 
-        for (unsigned int ii = 0; ii < kNBreakTypes; ii++)
+        for (auto type : kBreakType)
         {
             /* Look for next blank frame that is an acceptable distance away. */
             FrameAnalyzer::FrameMap::const_iterator jjblank = iiblank;
@@ -251,14 +249,14 @@ computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
                 long long end = brke + jjlen / 2;
 
                 auto testlen = (long long)roundf((end - start) / fps);
-                if (testlen > kBreakType[ii].m_len + kBreakType[ii].m_delta)
+                if (testlen > type.m_len + type.m_delta)
                     break;      /* Too far ahead; break to next break length. */
 
-                long long delta = testlen - kBreakType[ii].m_len;
+                long long delta = testlen - type.m_len;
                 if (delta < 0)
                     delta = 0 - delta;
 
-                if (delta > kBreakType[ii].m_delta)
+                if (delta > type.m_delta)
                     continue;   /* Outside delta range; try next end-blank. */
 
                 /* Mark this commercial break. */

@@ -373,11 +373,8 @@ class VideoListImp
     int TryFilter(const VideoFilterSettings &filter) const
     {
         int ret = 0;
-        for (auto p = m_metadata.getList().cbegin();
-             p != m_metadata.getList().cend(); ++p)
-        {
-            if (filter.matches_filter(**p)) ++ret;
-        }
+        for (const auto & md : m_metadata.getList())
+            if (filter.matches_filter(*md)) ++ret;
         return ret;
     }
 
@@ -805,10 +802,8 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
     smart_dir_node sdn1 = video_root->addSubDir("All");
     meta_dir_node* all_group_node = sdn1.get();
 
-    for (auto p = mlist.begin(); p != mlist.end(); ++p)
+    for (auto data : mlist)
     {
-        VideoMetadata *data = *p;
-
         all_group_node->addEntry(smart_meta_node(new meta_data_node(data)));
 
         vector<QString> groups;
@@ -820,11 +815,8 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
                 vector<pair <int, QString> > genres =
                     data->GetGenres();
 
-                for (auto i = genres.begin(); i != genres.end(); ++i)
-                {
-                    pair<int, QString> item = *i;
+                for (auto item : genres)
                     groups.push_back(item.second);
-                }
                 break;
             }
             case ltDBCategoryGroup:
@@ -851,11 +843,8 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
             {
                 vector<pair<int, QString> > cast = data->GetCast();
 
-                for (auto i = cast.begin(); i != cast.end(); ++i)
-                {
-                    pair<int, QString> item = *i;
+                for (auto item : cast)
                     groups.push_back(item.second);
-                }
                 break;
             }
             case ltDBUserRatingGroup:
@@ -893,10 +882,8 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
             group_node->addEntry(smart_meta_node(new meta_data_node(data)));
         }
 
-        for (auto i = groups.begin(); i != groups.end(); ++i)
+        for (auto item : groups)
         {
-            QString item = *i;
-
             meta_dir_node *group_node = gtnm[item];
 
             if (group_node == nullptr)
@@ -935,17 +922,17 @@ void VideoListImp::buildTVList(void)
     smart_dir_node vdn = video_root->addSubDir(QObject::tr("Movies"));
     meta_dir_node* movie_node = vdn.get();
 
-    for (auto p = mlist.begin(); p != mlist.end(); ++p)
+    for (auto & p : mlist)
     {
-        VideoMetadata *data = *p;
+        VideoMetadata *data = p;
 
-        if (((*p)->GetSeason() > 0) || ((*p)->GetEpisode() > 0))
+        if ((p->GetSeason() > 0) || (p->GetEpisode() > 0))
         {
-            smart_dir_node sdn2 = television_node->addSubDir((*p)->GetTitle());
+            smart_dir_node sdn2 = television_node->addSubDir(p->GetTitle());
             meta_dir_node* title_node = sdn2.get();
 
             smart_dir_node ssdn = title_node->addSubDir(
-                QObject::tr("Season %1").arg((*p)->GetSeason()));
+                QObject::tr("Season %1").arg(p->GetSeason()));
             meta_dir_node* season_node = ssdn.get();
 
             season_node->addEntry(smart_meta_node(new meta_data_node(data)));
@@ -993,10 +980,8 @@ void VideoListImp::buildDbList()
         ptnm.insert(prefix_to_node_map::value_type(test_prefix, video_root));
     }
 
-    for (auto p = mlist.begin(); p != mlist.end(); ++p)
-    {
-        AddMetadataToDir(*p, video_root);
-    }
+    for (auto & mv : mlist)
+        AddMetadataToDir(mv, video_root);
 
 //    print_dir_tree(m_metadataTree); // AEW DEBUG
 }
@@ -1032,12 +1017,12 @@ void VideoListImp::buildFsysList()
     // Add all root-nodes to the tree.
     //
     metadata_list ml;
-    for (auto p = node_paths.begin(); p != node_paths.end(); ++p)
+    for (auto & path : node_paths)
     {
-        smart_dir_node root = m_metadataTree.addSubDir(p->second, p->first);
+        smart_dir_node root = m_metadataTree.addSubDir(path.second, path.first);
         root->setPathRoot();
 
-        buildFileList(root, ml, p->second);
+        buildFileList(root, ml, path.second);
     }
 
     // retrieve any MediaServer data that may be available
@@ -1053,10 +1038,8 @@ void VideoListImp::buildFsysList()
         metadata_list db_metadata;
         VideoMetadataListManager::loadAllFromDatabase(db_metadata);
         mdlm.setList(db_metadata);
-        for (auto p = ml.begin(); p != ml.end(); ++p)
-        {
-            (*p)->FillDataFromFilename(mdlm);
-        }
+        for (auto & list : ml)
+            list->FillDataFromFilename(mdlm);
     }
     m_metadata.setList(ml);
 }
@@ -1124,22 +1107,18 @@ void VideoListImp::update_meta_view(bool flat_list)
 
     if (flat_list)
     {
-        for (auto p = m_metadata.getList().cbegin();
-             p != m_metadata.getList().cend(); ++p)
+        for (const auto & md : m_metadata.getList())
         {
-            if (m_videoFilter.matches_filter(*(*p)))
+            if (m_videoFilter.matches_filter(*md))
             {
-                m_metadataViewFlat.push_back(p->get());
+                m_metadataViewFlat.push_back(md.get());
             }
         }
 
         sort_view_data(flat_list);
 
-        for (auto p = m_metadataViewFlat.begin();
-             p != m_metadataViewFlat.end(); ++p)
-        {
-            m_metadataViewTree.addEntry(new meta_data_node(*p));
-        }
+        for (auto & md : m_metadataViewFlat)
+            m_metadataViewTree.addEntry(new meta_data_node(md));
     }
     else
     {

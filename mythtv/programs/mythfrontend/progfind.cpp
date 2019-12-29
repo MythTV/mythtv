@@ -441,19 +441,19 @@ void ProgFinder::updateTimesList()
     {
         QString itemText;
         QDateTime starttime;
-        for (size_t i = 0; i < m_showData.size(); ++i)
+        for (auto show : m_showData)
         {
-            starttime = m_showData[i]->GetScheduledStartTime();
+            starttime = show->GetScheduledStartTime();
             itemText = MythDate::toString(starttime,
                                             MythDate::kDateTimeFull | MythDate::kSimplify);
 
             auto *item = new MythUIButtonListItem(m_timesList, "");
 
-            QString state = RecStatus::toUIState(m_showData[i]->GetRecordingStatus());
+            QString state = RecStatus::toUIState(show->GetRecordingStatus());
             item->SetText(itemText, "buttontext", state);
             item->DisplayState(state, "status");
 
-            m_showData[i]->ToMap(infoMap);
+            show->ToMap(infoMap);
             item->SetTextFromMap(infoMap, state);
         }
     }

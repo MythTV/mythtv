@@ -65,16 +65,16 @@ readData(const QString& filename, float *mean, unsigned char *median, float *std
                     .arg(filename).arg(frameno));
             goto error;
         }
-        for (size_t ii = 0; ii < sizeof(counter)/sizeof(*counter); ii++)
+        for (uint & ctr : counter)
         {
-            if (fscanf(fp, "%20x", &counter[ii]) != 1)
+            if (fscanf(fp, "%20x", &ctr) != 1)
             {
                 LOG(VB_COMMFLAG, LOG_ERR,
                     QString("Not enough data in %1: frame %2")
                         .arg(filename).arg(frameno));
                 goto error;
             }
-            if (counter[ii] > UCHAR_MAX)
+            if (ctr > UCHAR_MAX)
             {
                 LOG(VB_COMMFLAG, LOG_ERR,
                     QString("Data out of range in %1: frame %2")

@@ -204,10 +204,8 @@ bool HttpConfig::ProcessRequest(HTTPRequest *request)
                 QTextStream os(&request->m_response);
                 os << "<ul class=\"jqueryFileTree\" style=\"display: none;\">\r\n";
 
-                for (QStringList::iterator it = entries.begin();
-                     it != entries.end(); ++it)
+                foreach (auto entry, entries)
                 {
-                    QString entry = *it;
                     QStringList parts = entry.split("::");
                     QFileInfo fi(parts[1]);
                     if (dir == "/")
@@ -245,11 +243,8 @@ bool HttpConfig::ProcessRequest(HTTPRequest *request)
                 os << "<ul class=\"jqueryFileTree\" style=\"display: none;\">\r\n";
 
                 QFileInfoList infoList = dir.entryInfoList();
-                for (QFileInfoList::iterator it  = infoList.begin();
-                                             it != infoList.end();
-                                           ++it )
+                foreach (auto & fi, infoList)
                 {
-                    QFileInfo &fi = *it;
                     if (!fi.isDir())
                         continue;
                     if (fi.fileName().startsWith("."))
@@ -265,11 +260,8 @@ bool HttpConfig::ProcessRequest(HTTPRequest *request)
 
                 if (!dirsOnly)
                 {
-                    for (QFileInfoList::iterator it  = infoList.begin();
-                                                 it != infoList.end();
-                                               ++it )
+                    foreach (auto & fi, infoList)
                     {
-                        QFileInfo &fi = *it;
                         if (fi.isDir())
                             continue;
                         if (fi.fileName().startsWith("."))

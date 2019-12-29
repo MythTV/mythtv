@@ -197,10 +197,8 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
 
     TVRec::s_inputsLock.lockForRead();
 
-    for (auto iter = m_pEncoders->begin(); iter != m_pEncoders->end(); ++iter)
+    foreach (auto elink, *m_pEncoders)
     {
-        EncoderLink *elink = *iter;
-
         if (elink != nullptr)
         {
             TVState state = elink->GetState();
@@ -303,14 +301,14 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
         fes = nullptr;
 
         frontends.setAttribute( "count", map.size() );
-        for (EntryMap::iterator it = map.begin(); it != map.end(); ++it)
+        foreach (auto & entry, map)
         {
             QDomElement fe = pDoc->createElement("Frontend");
             frontends.appendChild(fe);
-            QUrl url((*it)->m_sLocation);
+            QUrl url(entry->m_sLocation);
             fe.setAttribute("name", url.host());
             fe.setAttribute("url",  url.toString(QUrl::RemovePath));
-            (*it)->DecrRef();
+            entry->DecrRef();
         }
     }
 
@@ -348,9 +346,9 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
         sbes->DecrRef();
         sbes = nullptr;
 
-        for (EntryMap::iterator it = map.begin(); it != map.end(); ++it)
+        foreach (auto & entry, map)
         {
-            QUrl url((*it)->m_sLocation);
+            QUrl url(entry->m_sLocation);
             if (url.host() != ipaddress)
             {
                 numbes++;
@@ -360,7 +358,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
                 mbe.setAttribute("name", url.host());
                 mbe.setAttribute("url" , url.toString(QUrl::RemovePath));
             }
-            (*it)->DecrRef();
+            entry->DecrRef();
         }
     }
 
@@ -587,11 +585,11 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
         QStringList output = QString(input).split('\n',
                                                   QString::SkipEmptyParts);
 
-        for (auto iter = output.begin(); iter != output.end(); ++iter)
+        foreach (auto & line, output)
         {
             QDomElement info = pDoc->createElement("Information");
 
-            QStringList list = (*iter).split("[]:[]");
+            QStringList list = line.split("[]:[]");
             unsigned int size = list.size();
             unsigned int hasAttributes = 0;
 

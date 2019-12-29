@@ -408,11 +408,11 @@ QStringList GetSettingValueList(const QString &type)
     if (type == "LocalIPAddress")
     {
         QList<QHostAddress> list = QNetworkInterface::allAddresses();
-        for (uint i = 0; i < (uint)list.size(); i++)
+        foreach (auto & addr, list)
         {
-            if (list[i].toString().contains(":"))
+            if (addr.toString().contains(":"))
                 continue; // ignore IP6 addresses for now
-            sList << list[i].toString();
+            sList << addr.toString();
         }
 
         if (sList.isEmpty())

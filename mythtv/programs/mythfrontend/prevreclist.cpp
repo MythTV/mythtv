@@ -310,12 +310,12 @@ void PrevRecordedList::UpdateList(MythUIButtonList *bnList,
     ProgramList *progData, bool isShows)
 {
     bnList->Reset();
-    for (size_t i = 0; i < progData->size(); ++i)
+    for (auto pg : *progData)
     {
         auto *item = new MythUIButtonListItem(bnList, "",
-                                          QVariant::fromValue((*progData)[i]));
+                                          QVariant::fromValue(pg));
         InfoMap infoMap;
-        (*progData)[i]->ToMap(infoMap,true);
+        pg->ToMap(infoMap,true);
         QString state;
         if (isShows)
         {
@@ -325,7 +325,7 @@ void PrevRecordedList::UpdateList(MythUIButtonList *bnList,
             else
                 partTitle = infoMap["titlesubtitle"];
             infoMap["parttitle"] = partTitle;
-            state = RecStatus::toUIState((*progData)[i]->GetRecordingStatus());
+            state = RecStatus::toUIState(pg->GetRecordingStatus());
             if ((state == "warning"))
                 state = "disabled";
         }

@@ -274,8 +274,8 @@ static GlobalComboBoxSetting *CommercialSkipMethod()
 
     deque<int> tmp = GetPreferredSkipTypeCombinations();
 
-    for (size_t i = 0; i < tmp.size(); ++i)
-        bc->addSelection(SkipTypeToString(tmp[i]), QString::number(tmp[i]));
+    for (int pref : tmp)
+        bc->addSelection(SkipTypeToString(pref), QString::number(pref));
 
     return bc;
 }
@@ -1504,9 +1504,9 @@ static HostComboBoxSetting *SubtitleCodec()
 
     QList<QByteArray> list = QTextCodec::availableCodecs();
 
-    for (uint i = 0; i < (uint) list.size(); ++i)
+    foreach (const auto & codec, list)
     {
-        QString val = QString(list[i]);
+        QString val = QString(codec);
         gc->addSelection(val, val, val.toLower() == "utf-8");
     }
 
@@ -1633,8 +1633,8 @@ static HostComboBoxSetting *Visualiser()
                                        "is no video. Defaults to none."));
     combo->addSelection("None", "");
     QStringList visuals = VideoVisual::GetVisualiserList(RenderType::kRenderOpenGL);
-    for (auto visual = visuals.cbegin(); visual != visuals.cend(); ++visual)
-        combo->addSelection(*visual, *visual);
+    foreach (const auto & visual, visuals)
+        combo->addSelection(visual, visual);
     return combo;
 }
 
@@ -2258,10 +2258,10 @@ static HostComboBoxSetting *GuiVidModeResolution()
     MythDisplay* display = MythDisplay::AcquireRelease();
     vector<MythDisplayMode> scr = display->GetVideoModes();
     MythDisplay::AcquireRelease(false);
-    for (size_t i = 0; i< scr.size(); ++i)
+    for (auto & vmode : scr)
     {
-        int w = scr[i].Width();
-        int h = scr[i].Height();
+        int w = vmode.Width();
+        int h = vmode.Height();
         QString sel = QString("%1x%2").arg(w).arg(h);
         gc->addSelection(sel, sel);
     }
@@ -2308,9 +2308,9 @@ static HostComboBoxSetting *TVVidModeResolution(int idx=-1)
     MythDisplay* display = MythDisplay::AcquireRelease();
     vector<MythDisplayMode> scr = display->GetVideoModes();
     MythDisplay::AcquireRelease(false);
-    for (size_t i = 0; i < scr.size(); ++i)
+    for (auto & vmode : scr)
     {
-        QString sel = QString("%1x%2").arg(scr[i].Width()).arg(scr[i].Height());
+        QString sel = QString("%1x%2").arg(vmode.Width()).arg(vmode.Height());
         gc->addSelection(sel, sel);
     }
 
@@ -3060,9 +3060,8 @@ static GlobalComboBoxSetting *MythLanguage()
 
     gc->clearSelections();
 
-    for (QStringList::Iterator it = langs.begin(); it != langs.end(); ++it)
+    foreach (auto label, langs)
     {
-        QString label = *it;
         QString value = langMap.key(label);
         gc->addSelection(label, value, (value.toLower() == langCode));
     }

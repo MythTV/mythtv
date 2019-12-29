@@ -66,7 +66,7 @@ class ThemeChooser : public MythScreenType
         dsExtractingTheme
     };
 
-    ThemeInfo *loadThemeInfo(QFileInfo &theme);
+    ThemeInfo *loadThemeInfo(const QFileInfo &theme);
     void showPopupMenu(void);
     void updateProgressBar(int bytesReceived, int bytesTotal);
     bool removeThemeDir(const QString &dirname);

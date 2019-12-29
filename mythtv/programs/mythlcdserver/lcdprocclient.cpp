@@ -525,9 +525,9 @@ QString LCDProcClient::expandString(const QString &aString)
     QString bString;
 
     // if version 5 then white space seperate the list of characters
-    for (int x = 0; x < aString.length(); x++)
+    foreach (auto x, aString)
     {
-        bString += aString.at(x) + QString(" ");
+        bString += x + QString(" ");
     }
 
     return bString;
@@ -2061,13 +2061,13 @@ QStringList LCDProcClient::formatScrollerText(const QString &text)
     int lastSplit = 0;
     QString line = "";
 
-    for (int x = 0; x < text.length(); x++)
+    foreach (auto x, text)
     {
-        if (separators.contains(text[x]))
+        if (separators.contains(x))
             lastSplit = line.length();
 
-        line += text[x];
-        if (line.length() > (int) m_lcdWidth || text[x] == '|')
+        line += x;
+        if (line.length() > (int) m_lcdWidth || x == '|')
         {
             QString formatedLine;
             formatedLine.fill(' ', m_lcdWidth );

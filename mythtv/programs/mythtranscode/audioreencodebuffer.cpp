@@ -226,11 +226,8 @@ long long AudioReencodeBuffer::GetSamples(long long time)
         return 0;
 
     long long samples = 0;
-    for (QList<AudioBuffer *>::iterator it = m_bufferList.begin();
-         it != m_bufferList.end(); ++it)
+    foreach (auto ab, m_bufferList)
     {
-        AudioBuffer *ab = *it;
-
         if (ab->m_time <= time)
             samples += ab->m_frames;
         else

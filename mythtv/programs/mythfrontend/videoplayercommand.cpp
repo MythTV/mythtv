@@ -185,10 +185,9 @@ class VideoPlayerCommandPrivate
 
     VideoPlayerCommandPrivate(const VideoPlayerCommandPrivate &other)
     {
-        for (auto p = other.m_playerProcs.cbegin();
-                p != other.m_playerProcs.cend(); ++p)
+        for (auto player : other.m_playerProcs)
         {
-            m_playerProcs.push_back((*p)->Clone());
+            m_playerProcs.push_back(player->Clone());
         }
     }
 
@@ -280,12 +279,12 @@ class VideoPlayerCommandPrivate
 
         const FileAssociations::association_list fa_list =
                 FileAssociations::getFileAssociation().getList();
-        for (auto p = fa_list.cbegin(); p != fa_list.cend(); ++p)
+        for (const auto & fa : fa_list)
         {
-            if (p->extension.toLower() == extension.toLower() &&
-                    !p->use_default)
+            if (fa.extension.toLower() == extension.toLower() &&
+                    !fa.use_default)
             {
-                play_command = p->playcommand;
+                play_command = fa.playcommand;
                 break;
             }
         }
@@ -324,19 +323,16 @@ class VideoPlayerCommandPrivate
 
     void ClearPlayerList()
     {
-        for (auto p = m_playerProcs.begin(); p != m_playerProcs.end(); ++p)
-        {
-            delete *p;
-        }
+        for (auto & player : m_playerProcs)
+            delete player;
         m_playerProcs.clear();
     }
 
     void Play() const
     {
-        for (auto p = m_playerProcs.cbegin(); p != m_playerProcs.cend(); ++p)
-        {
-            if ((*p)->Play()) break;
-        }
+        for (auto player : m_playerProcs)
+            if (player->Play())
+                break;
     }
 
     QString GetCommandDisplayName() const

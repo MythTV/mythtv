@@ -738,16 +738,15 @@ void CommDetector2::GetCommercialBreakList(frm_dir_map_t &marks)
 {
     if (!m_finished)
     {
-        for (auto pass = m_frameAnalyzers.begin();
-             pass != m_frameAnalyzers.end(); ++pass)
+        for (auto & analyzer : m_frameAnalyzers)
         {
-            if (*pass == *m_currentPass &&
+            if (analyzer == *m_currentPass &&
                 passFinished(m_finishedAnalyzers, m_currentFrameNumber + 1, false))
             {
                 return;
             }
 
-            if (passFinished(*pass, m_currentFrameNumber + 1, false))
+            if (passFinished(analyzer, m_currentFrameNumber + 1, false))
                 return;
         }
     }

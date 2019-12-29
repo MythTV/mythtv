@@ -273,9 +273,8 @@ void ViewScheduleDiff::fillList(void)
 
 void ViewScheduleDiff::updateUIList(void)
 {
-    for (size_t i = 0; i < m_recList.size(); i++)
+    for (auto s : m_recList)
     {
-        class ProgramStruct s = m_recList[i];
         class ProgramInfo *pginfo = s.m_after;
         if (!pginfo)
             pginfo = s.m_before;

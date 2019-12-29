@@ -1049,9 +1049,9 @@ bool GuideGrid::gestureEvent(MythGestureEvent *event)
 
 static bool SelectionIsTunable(const ChannelInfoList &selection)
 {
-    for (size_t i = 0; i < selection.size(); ++i)
+    for (const auto & chan : selection)
     {
-        if (TV::IsTunable(selection[i].m_chanId))
+        if (TV::IsTunable(chan.m_chanId))
             return true;
     }
     return false;
@@ -1194,9 +1194,8 @@ static ProgramList *CopyProglist(ProgramList *proglist)
     if (!proglist)
         return nullptr;
     auto *result = new ProgramList();
-    for (auto pi = proglist->begin();
-         pi != proglist->end(); ++pi)
-        result->push_back(new ProgramInfo(**pi));
+    for (auto & pi : *proglist)
+        result->push_back(new ProgramInfo(*pi));
     return result;
 }
 
@@ -1388,21 +1387,21 @@ void GuideGrid::fillChannelInfos(bool gotostartchannel)
     }
 
     // handle duplicates
-    for (size_t i = 0; i < channels.size(); ++i)
+    for (auto & channel : channels)
     {
-        const uint_list_t &ndups = channum_to_index_map[channels[i].m_chanNum];
-        for (size_t j = 0; j < ndups.size(); ++j)
+        const uint_list_t &ndups = channum_to_index_map[channel.m_chanNum];
+        for (unsigned int ndup : ndups)
         {
-            if (channels[i].m_chanId   != m_channelInfos[ndups[j]][0].m_chanId &&
-                channels[i].m_callSign == m_channelInfos[ndups[j]][0].m_callSign)
-                m_channelInfos[ndups[j]].push_back(channels[i]);
+            if (channel.m_chanId   != m_channelInfos[ndup][0].m_chanId &&
+                channel.m_callSign == m_channelInfos[ndup][0].m_callSign)
+                m_channelInfos[ndup].push_back(channel);
         }
 
-        const uint_list_t &cdups = callsign_to_index_map[channels[i].m_callSign];
-        for (size_t j = 0; j < cdups.size(); ++j)
+        const uint_list_t &cdups = callsign_to_index_map[channel.m_callSign];
+        for (unsigned int cdup : cdups)
         {
-            if (channels[i].m_chanId != m_channelInfos[cdups[j]][0].m_chanId)
-                m_channelInfos[cdups[j]].push_back(channels[i]);
+            if (channel.m_chanId != m_channelInfos[cdup][0].m_chanId)
+                m_channelInfos[cdup].push_back(channel);
         }
     }
 
@@ -2047,10 +2046,8 @@ void GuideGrid::updateProgramsUI(unsigned int firstRow, unsigned int numRows,
         }
     }
     m_guideGrid->SetProgPast(progPast);
-    for (QLinkedList<GuideUIElement>::const_iterator it = elements.begin();
-         it != elements.end(); ++it)
+    foreach (const auto & r, elements)
     {
-        const GuideUIElement &r = *it;
         m_guideGrid->SetProgramInfo(r.m_row, r.m_col, r.m_area, r.m_title,
                                     r.m_category, r.m_arrow, r.m_recType,
                                     r.m_recStat, r.m_selected);
@@ -2289,9 +2286,9 @@ void GuideGrid::ChannelGroupMenu(int mode)
             menuPopup->AddButton(QObject::tr("All Channels"));
         }
 
-        for (size_t i = 0; i < channels.size(); ++i)
+        for (auto & channel : channels)
         {
-            menuPopup->AddButton(channels[i].m_name);
+            menuPopup->AddButton(channel.m_name);
         }
 
         popupStack->AddScreen(menuPopup);

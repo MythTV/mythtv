@@ -64,9 +64,9 @@ void LookerUpper::HandleAllRecordings(bool updaterules)
 
     LoadFromRecorded( progList, false, inUseMap, isJobRunning, recMap, -1 );
 
-    for( int n = 0; n < (int)progList.size(); n++)
+    for (auto pg : progList)
     {
-        auto *pginfo = new ProgramInfo(*(progList[n]));
+        auto *pginfo = new ProgramInfo(*pg);
         if ((pginfo->GetRecordingGroup() != "Deleted") &&
             (pginfo->GetRecordingGroup() != "LiveTV") &&
             (pginfo->GetInetRef().isEmpty() ||
@@ -94,9 +94,9 @@ void LookerUpper::HandleAllRecordingRules()
 
     RemoteGetAllScheduledRecordings(recordingList);
 
-    for( int n = 0; n < (int)recordingList.size(); n++)
+    for (auto & pg : recordingList)
     {
-        auto *pginfo = new ProgramInfo(*(recordingList[n]));
+        auto *pginfo = new ProgramInfo(*pg);
         if (pginfo->GetInetRef().isEmpty())
         {
             QString msg = QString("Looking up: %1 %2").arg(pginfo->GetTitle())
@@ -124,9 +124,9 @@ void LookerUpper::HandleAllArtwork(bool aggressive)
     RemoteGetAllScheduledRecordings(recordingList);
     int maxartnum = 3;
 
-    for( int n = 0; n < (int)recordingList.size(); n++)
+    for (auto & pg : recordingList)
     {
-        auto *pginfo = new ProgramInfo(*(recordingList[n]));
+        auto *pginfo = new ProgramInfo(*pg);
         bool dolookup = true;
 
         if (pginfo->GetInetRef().isEmpty())
@@ -158,9 +158,9 @@ void LookerUpper::HandleAllArtwork(bool aggressive)
 
     LoadFromRecorded( progList, false, inUseMap, isJobRunning, recMap, -1 );
 
-    for( int n = 0; n < (int)progList.size(); n++)
+    for (auto pg : progList)
     {
-        auto *pginfo = new ProgramInfo(*(progList[n]));
+        auto *pginfo = new ProgramInfo(*pg);
 
         bool dolookup = true;
 
@@ -203,9 +203,9 @@ void LookerUpper::CopyRuleInetrefsToRecordings()
 
     LoadFromRecorded( progList, false, inUseMap, isJobRunning, recMap, -1 );
 
-    for( int n = 0; n < (int)progList.size(); n++)
+    for (auto pg : progList)
     {
-        auto *pginfo = new ProgramInfo(*(progList[n]));
+        auto *pginfo = new ProgramInfo(*pg);
         if (pginfo && pginfo->GetInetRef().isEmpty())
         {
             auto *rule = new RecordingRule();

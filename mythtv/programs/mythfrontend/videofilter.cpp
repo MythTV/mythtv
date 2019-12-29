@@ -216,9 +216,9 @@ bool VideoFilterSettings::matches_filter(const VideoMetadata &mdata) const
         matches = false;
 
         const VideoMetadata::genre_list &gl = mdata.GetGenres();
-        for (auto p = gl.cbegin(); p != gl.cend(); ++p)
+        for (const auto & g : gl)
         {
-            if ((matches = (p->first == m_genre)))
+            if ((matches = (g.first == m_genre)))
             {
                 break;
             }
@@ -230,9 +230,9 @@ bool VideoFilterSettings::matches_filter(const VideoMetadata &mdata) const
         matches = false;
 
         const VideoMetadata::country_list &cl = mdata.GetCountries();
-        for (auto p = cl.cbegin(); p != cl.cend(); ++p)
+        for (const auto & c : cl)
         {
-            if ((matches = (p->first == m_country)))
+            if ((matches = (c.first == m_country)))
             {
                 break;
             }
@@ -251,9 +251,9 @@ bool VideoFilterSettings::matches_filter(const VideoMetadata &mdata) const
         {
             matches = false;
 
-            for (auto p = cl.cbegin(); p != cl.cend(); ++p)
+            for (const auto & c : cl)
             {
-                if ((matches = (p->first == m_cast)))
+                if ((matches = (c.first == m_cast)))
                 {
                     break;
                 }
@@ -560,21 +560,21 @@ void VideoFilterDialog::fillWidgets()
 
     const VideoMetadataListManager::metadata_list &mdl =
             m_videoList.getListCache().getList();
-    for (auto p = mdl.cbegin(); p != mdl.cend(); ++p)
+    for (const auto & md : mdl)
     {
-        int year = (*p)->GetYear();
+        int year = md->GetYear();
         if ((year == 0) || (year == VIDEO_YEAR_DEFAULT))
             have_unknown_year = true;
         else
             years.insert(year);
 
-        int runtime = (*p)->GetLength();
+        int runtime = md->GetLength();
         if (runtime == 0)
             have_unknown_runtime = true;
         else
             runtimes.insert(runtime / 30);
 
-        user_ratings.insert(static_cast<int>((*p)->GetUserRating()));
+        user_ratings.insert(static_cast<int>(md->GetUserRating()));
     }
 
     // Category
@@ -583,10 +583,8 @@ void VideoFilterDialog::fillWidgets()
 
     const VideoCategory::entry_list &vcl =
             VideoCategory::GetCategory().getList();
-    for (auto p = vcl.cbegin(); p != vcl.cend(); ++p)
-    {
-        new MythUIButtonListItem(m_categoryList, p->second, p->first);
-    }
+    for (const auto & vc : vcl)
+        new MythUIButtonListItem(m_categoryList, vc.second, vc.first);
 
     new MythUIButtonListItem(m_categoryList, VIDEO_CATEGORY_UNKNOWN,
                            kCategoryFilterUnknown);
@@ -596,10 +594,8 @@ void VideoFilterDialog::fillWidgets()
     new MythUIButtonListItem(m_genreList, tr("All", "Genre"), kGenreFilterAll);
 
     const VideoGenre::entry_list &gl = VideoGenre::getGenre().getList();
-    for (auto p = gl.cbegin(); p != gl.cend(); ++p)
-    {
-        new MythUIButtonListItem(m_genreList, p->second, p->first);
-    }
+    for (const auto & g : gl)
+        new MythUIButtonListItem(m_genreList, g.second, g.first);
 
     new MythUIButtonListItem(m_genreList, VIDEO_GENRE_UNKNOWN, kGenreFilterUnknown);
     m_genreList->SetValueByData(m_settings.getGenre());
@@ -608,10 +604,8 @@ void VideoFilterDialog::fillWidgets()
     new MythUIButtonListItem(m_castList, tr("All", "Cast"), kCastFilterAll);
 
     const VideoCast::entry_list &cl = VideoCast::GetCast().getList();
-    for (auto p = cl.cbegin(); p != cl.cend(); ++p)
-    {
-        new MythUIButtonListItem(m_castList, p->second, p->first);
-    }
+    for (const auto & c : cl)
+        new MythUIButtonListItem(m_castList, c.second, c.first);
 
     new MythUIButtonListItem(m_castList, VIDEO_CAST_UNKNOWN, kCastFilterUnknown);
     m_castList->SetValueByData(m_settings.GetCast());
@@ -620,10 +614,8 @@ void VideoFilterDialog::fillWidgets()
     new MythUIButtonListItem(m_countryList, tr("All", "Country"), kCountryFilterAll);
 
     const VideoCountry::entry_list &cnl = VideoCountry::getCountry().getList();
-    for (auto p = cnl.cbegin(); p != cnl.cend(); ++p)
-    {
-        new MythUIButtonListItem(m_countryList, p->second, p->first);
-    }
+    for (const auto & cn : cnl)
+        new MythUIButtonListItem(m_countryList, cn.second, cn.first);
 
     new MythUIButtonListItem(m_countryList, VIDEO_COUNTRY_UNKNOWN,
                            kCountryFilterUnknown);
@@ -650,11 +642,11 @@ void VideoFilterDialog::fillWidgets()
         new MythUIButtonListItem(m_runtimeList, VIDEO_RUNTIME_UNKNOWN,
                                kRuntimeFilterUnknown);
 
-    for (auto p = runtimes.cbegin(); p != runtimes.cend(); ++p)
+    for (int runtime : runtimes)
     {
-        QString s = QString("%1 %2 ~ %3 %4").arg(*p * 30).arg(tr("minutes"))
-                .arg((*p + 1) * 30).arg(tr("minutes"));
-        new MythUIButtonListItem(m_runtimeList, s, *p);
+        QString s = QString("%1 %2 ~ %3 %4").arg(runtime * 30).arg(tr("minutes"))
+                .arg((runtime + 1) * 30).arg(tr("minutes"));
+        new MythUIButtonListItem(m_runtimeList, s, runtime);
     }
 
     m_runtimeList->SetValueByData(m_settings.getRuntime());

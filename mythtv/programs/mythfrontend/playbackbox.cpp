@@ -682,9 +682,8 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
         ProgramList  group     = m_progLists[groupname];
         float        groupSize = 0.0;
 
-        for (auto it = group.begin(); it != group.end(); ++it)
+        for (auto info : group)
         {
-            ProgramInfo *info = *it;
             if (info)
             {
                 uint64_t filesize = info->GetFilesize();
@@ -3482,9 +3481,9 @@ void PlaybackBox::doBeginLookup()
 
 void PlaybackBox::doPlaylistJobQueueJob(int jobType, int jobFlags)
 {
-    for (auto it = m_playList.begin(); it != m_playList.end(); ++it)
+    foreach (const uint & pbs, m_playList)
     {
-        ProgramInfo *tmpItem = FindProgramInUILists(*it);
+        ProgramInfo *tmpItem = FindProgramInUILists(pbs);
         if (tmpItem &&
             (!JobQueue::IsJobQueuedOrRunning(
                 jobType,
@@ -5565,10 +5564,9 @@ void PlaybackBox::PbbJobQueue::Update()
         QMap<int, JobQueueEntry> jobs;
         JobQueue::GetJobsInQueue(jobs, JOB_LIST_ALL);
         m_jobs.clear();
-        for (int i = 0; i < jobs.size(); ++i)
+        foreach (auto & job, jobs)
         {
-            JobQueueEntry &entry = jobs[i];
-            m_jobs.insert(qMakePair(entry.chanid, entry.recstartts), entry);
+            m_jobs.insert(qMakePair(job.chanid, job.recstartts), job);
         }
         m_lastUpdated = now;
     }

@@ -123,10 +123,8 @@ namespace
 
         ~BlockSignalsGuard()
         {
-            for (auto p = m_objects.begin(); p != m_objects.end(); ++p)
-            {
-                (*p)->blockSignals(false);
-            }
+            for (auto & obj : m_objects)
+                obj->blockSignals(false);
         }
 
       private:
@@ -175,20 +173,14 @@ class FileAssocDialogPrivate
 
     ~FileAssocDialogPrivate()
     {
-        for (auto p = m_fileAssociations.begin();
-                p != m_fileAssociations.end(); ++p)
-        {
-            delete p->second;
-        }
+        for (auto & fa : m_fileAssociations)
+            delete fa.second;
     }
 
    void SaveFileAssociations()
    {
-        for (auto p = m_fileAssociations.begin();
-                p != m_fileAssociations.end(); ++p)
-        {
-            p->second->CommitChanges();
-        }
+        for (auto & fa : m_fileAssociations)
+            fa.second->CommitChanges();
     }
 
     bool AddExtension(const QString& newExtension, UIDToFAPair::UID_type &new_id)
@@ -290,20 +282,19 @@ class FileAssocDialogPrivate
         tmp_fa_list tmp_fa;
         tmp_fa.reserve(fa_list.size());
 
-        for (auto p = fa_list.cbegin(); p != fa_list.cend(); ++p)
+        for (const auto & fa : fa_list)
         {
             tmp_fa.push_back(UIDToFAPair(++m_nextFAID,
-                            new FileAssociationWrap(*p)));
+                            new FileAssociationWrap(fa)));
         }
 
         std::shuffle(tmp_fa.begin(), tmp_fa.end(),
                      std::mt19937(std::random_device()()));
 
-        for (tmp_fa_list::const_iterator p = tmp_fa.begin(); p != tmp_fa.end();
-                ++p)
+        for (auto fa : tmp_fa)
         {
-            m_fileAssociations.insert(FA_collection::value_type(p->m_uid,
-                            p->m_fileAssoc));
+            m_fileAssociations.insert(FA_collection::value_type(fa.m_uid,
+                            fa.m_fileAssoc));
         }
 
         if (m_fileAssociations.empty())
@@ -497,16 +488,16 @@ void FileAssocDialog::UpdateScreen(bool useSelectionOverride /* = false*/)
         m_extensionList->SetVisible(true);
         m_extensionList->Reset();
 
-        for (auto p = tmp_list.begin(); p != tmp_list.end(); ++p)
+        for (auto & fad : tmp_list)
         {
-            if (p->m_fileAssoc)
+            if (fad.m_fileAssoc)
             {
                 // No memory leak. MythUIButtonListItem adds the new
                 // item into m_extensionList.
                 auto *new_item = new MythUIButtonListItem(m_extensionList,
-                                p->m_fileAssoc->GetExtension(),
-                                QVariant::fromValue(*p));
-                if (selected_id && p->m_uid == selected_id)
+                                fad.m_fileAssoc->GetExtension(),
+                                QVariant::fromValue(fad));
+                if (selected_id && fad.m_uid == selected_id)
                     m_extensionList->SetItemCurrent(new_item);
             }
         }
