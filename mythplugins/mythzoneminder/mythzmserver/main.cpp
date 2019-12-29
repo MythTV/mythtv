@@ -396,11 +396,8 @@ int main(int argc, char **argv)
     }
 
     // cleanly remove all the ZMServer's
-    for (auto it = serverList.begin();
-         it != serverList.end(); ++it)
-    {
-        delete it->second;
-    }
+    for (auto & server : serverList)
+        delete server.second;
 
     mysql_close(&g_dbConn);
 

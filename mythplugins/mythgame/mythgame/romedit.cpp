@@ -87,10 +87,8 @@ namespace
         QStringList ret;
 
         QList<QByteArray> exts = QImageReader::supportedImageFormats();
-        for (QList<QByteArray>::iterator p = exts.begin(); p != exts.end(); ++p)
-        {
-            ret.append(QString("*.").append(*p));
-        }
+        foreach (auto & ext, exts)
+            ret.append(QString("*.").append(ext));
 
         return ret;
     }

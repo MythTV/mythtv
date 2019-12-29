@@ -208,9 +208,8 @@ void FileSelector::OKPressed()
 
         // remove any items that have been removed from the list
         QList<ArchiveItem *> tempAList;
-        for (int x = 0; x < m_archiveList->size(); x++)
+        foreach (auto a, *m_archiveList)
         {
-            ArchiveItem *a = m_archiveList->at(x);
             bool found = false;
 
             for (int y = 0; y < m_selectedList.size(); y++)
@@ -227,8 +226,8 @@ void FileSelector::OKPressed()
                 tempAList.append(a);
         }
 
-        for (int x = 0; x < tempAList.size(); x++)
-            m_archiveList->removeAll(tempAList.at(x));
+        foreach (auto x, tempAList)
+            m_archiveList->removeAll(x);
 
         // remove any items that are already in the list
         QStringList tempSList;
@@ -236,9 +235,8 @@ void FileSelector::OKPressed()
         {
             f = m_selectedList.at(x);
 
-            for (int y = 0; y < m_archiveList->size(); y++)
+            foreach (auto a, *m_archiveList)
             {
-                ArchiveItem *a = m_archiveList->at(y);
                 if (a->filename == f)
                 {
                     tempSList.append(f);
@@ -347,12 +345,10 @@ void FileSelector::updateSelectedList()
         m_selectedList.takeFirst();
     m_selectedList.clear();
 
-    for (int x = 0; x < m_archiveList->size(); x++)
+    foreach (auto a, *m_archiveList)
     {
-        ArchiveItem *a = m_archiveList->at(x);
-        for (int y = 0; y < m_fileData.size(); y++)
+        foreach (auto f, m_fileData)
         {
-            FileData *f = m_fileData.at(y);
             if (f->filename == a->filename)
             {
                 if (m_selectedList.indexOf(f->filename) == -1)
@@ -382,11 +378,9 @@ void FileSelector::updateFileList()
         QStringList filters;
         filters << "*";
         QFileInfoList list = d.entryInfoList(filters, QDir::Dirs, QDir::Name);
-        QFileInfo fi;
 
-        for (int x = 0; x < list.size(); x++)
+        foreach (const auto & fi, list)
         {
-            fi = list.at(x);
             if (fi.fileName() != ".")
             {
                 auto  *data = new FileData;
@@ -411,9 +405,8 @@ void FileSelector::updateFileList()
             filters.clear();
             filters = m_filemask.split(" ", QString::SkipEmptyParts);
             list = d.entryInfoList(filters, QDir::Files, QDir::Name);
-            for (int x = 0; x < list.size(); x++)
+            foreach (const auto & fi, list)
             {
-                fi = list.at(x);
                 auto  *data = new FileData;
                 data->selected = false;
                 data->directory = false;

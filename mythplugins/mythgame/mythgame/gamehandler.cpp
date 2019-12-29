@@ -300,9 +300,8 @@ static void UpdateGameCounts(QStringList updatelist)
     QString firstname;
     QString basename;
 
-    for ( QStringList::Iterator it = updatelist.begin(); it != updatelist.end(); ++it )
+    foreach (auto GameType, updatelist)
     {
-        QString GameType = *it;
         LOG(VB_GENERAL, LOG_NOTICE,
             LOC + QString("Update gametype %1").arg(GameType));
 
@@ -777,10 +776,8 @@ void GameHandler::processAllGames(void)
     checkHandlers();
     QStringList updatelist;
 
-    for (int x = 0; x < handlers->size(); x++)
+    foreach (auto handler, *handlers)
     {
-        GameHandler *handler = handlers->at(x);
-
         if (handler)
         {
             updateSettings(handler);
@@ -800,9 +797,8 @@ GameHandler* GameHandler::GetHandler(RomInfo *rominfo)
     if (!rominfo)
         return nullptr;
 
-    for (int x = 0; x < handlers->size(); x++)
+    foreach (auto handler, *handlers)
     {
-        GameHandler *handler = handlers->at(x);
         if (handler)
         {
             if (rominfo->System() == handler->SystemName())
@@ -818,10 +814,8 @@ GameHandler* GameHandler::GetHandlerByName(const QString& systemname)
     if (systemname.isEmpty() || systemname.isNull())
         return nullptr;
 
-    for (int x = 0; x < handlers->size(); x++)
+    foreach (auto handler, *handlers)
     {
-        GameHandler *handler = handlers->at(x);
-
         if (handler)
         {
             if (handler->SystemName() == systemname)
@@ -920,12 +914,11 @@ void GameHandler::Launchgame(RomInfo *romdata, const QString& systemname)
     QStringList cmdlist = exec.split(";");
     if (cmdlist.count() > 0)
     {
-        for (QStringList::Iterator cmd = cmdlist.begin(); cmd != cmdlist.end();
-             ++cmd )
+        foreach (auto & cmd, cmdlist)
         {
             LOG(VB_GENERAL, LOG_INFO, LOC +
-                QString("Executing : %1").arg(*cmd));
-            myth_system(*cmd, kMSProcessEvents);
+                QString("Executing : %1").arg(cmd));
+            myth_system(cmd, kMSProcessEvents);
         }
     }
     else

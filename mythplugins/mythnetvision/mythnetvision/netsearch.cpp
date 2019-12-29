@@ -245,14 +245,13 @@ void NetSearch::FillGrabberButtonList()
 {
     m_siteList->Reset();
 
-    for (GrabberScript::scriptList::iterator i = m_grabberList.begin();
-            i != m_grabberList.end(); ++i)
+    foreach (auto & g, m_grabberList)
     {
-        auto *item = new MythUIButtonListItem(m_siteList, (*i)->GetTitle());
-        item->SetText((*i)->GetTitle(), "title");
-        item->SetData((*i)->GetCommandline());
+        auto *item = new MythUIButtonListItem(m_siteList, g->GetTitle());
+        item->SetText(g->GetTitle(), "title");
+        item->SetData(g->GetCommandline());
         QString thumb = QString("%1mythnetvision/icons/%2").arg(GetShareDir())
-                            .arg((*i)->GetImage());
+                            .arg(g->GetImage());
         item->SetImage(thumb);
     }
 }
@@ -422,19 +421,18 @@ void NetSearch::SearchTimeout(Search * /*item*/)
 
 void NetSearch::PopulateResultList(ResultItem::resultList list)
 {
-    for (ResultItem::resultList::iterator i = list.begin();
-            i != list.end(); ++i)
+    foreach (auto & result, list)
     {
-        QString title = (*i)->GetTitle();
+        QString title = result->GetTitle();
         auto *item = new MythUIButtonListItem(m_searchResultList, title,
-                                              qVariantFromValue(*i));
+                                              qVariantFromValue(result));
         InfoMap metadataMap;
-        (*i)->toMap(metadataMap);
+        result->toMap(metadataMap);
         item->SetTextFromMap(metadataMap);
 
-        if (!(*i)->GetThumbnail().isEmpty())
+        if (!result->GetThumbnail().isEmpty())
         {
-            QString dlfile = (*i)->GetThumbnail();
+            QString dlfile = result->GetThumbnail();
 
             if (dlfile.contains("%SHAREDIR%"))
             {
@@ -445,8 +443,8 @@ void NetSearch::PopulateResultList(ResultItem::resultList list)
             {
                 uint pos = m_searchResultList->GetItemPos(item);
 
-                m_imageDownload->addThumb((*i)->GetTitle(),
-                                          (*i)->GetThumbnail(),
+                m_imageDownload->addThumb(result->GetTitle(),
+                                          result->GetThumbnail(),
                                           qVariantFromValue<uint>(pos));
             }
         }

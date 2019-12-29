@@ -1029,10 +1029,8 @@ void Piano::resize(const QSize &newsize)
     }
 
     m_magnitude.resize(PIANO_N);
-    for (uint key = 0; key < (uint)m_magnitude.size(); key++)
-    {
-        m_magnitude[key] = 0.0;
-    }
+    for (double & key : m_magnitude)
+        key = 0.0;
 }
 
 unsigned long Piano::getDesiredSamples(void)

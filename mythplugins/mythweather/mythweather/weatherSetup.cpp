@@ -276,11 +276,8 @@ void ScreenSetup::loadData()
         // available to satisfy the requirements.
         if (m_sourceManager->findPossibleSources(type_strs, scriptList))
         {
-            for (int x = 0; x < scriptList.size(); x++)
-            {
-                ScriptInfo *script = scriptList.at(x);
+            foreach (auto script, scriptList)
                 si->m_sources.append(script->name);
-            }
             auto *item = new MythUIButtonListItem(m_inactiveList, si->m_title);
             item->SetData(qVariantFromValue(new ScreenListInfo(*si)));
         }
@@ -332,10 +329,9 @@ void ScreenSetup::loadData()
             auto *item = new MythUIButtonListItem(m_activeList, si->m_title);
 
             // Only insert types meant for this screen
-            for (QStringList::Iterator type_i = types.begin();
-                 type_i != types.end(); ++type_i )
+            foreach (auto & type, types)
             {
-                if (*type_i == dataitem)
+                if (type == dataitem)
                     si->m_types.insert(dataitem, ti);
             }
 
@@ -345,10 +341,9 @@ void ScreenSetup::loadData()
         else
         {
             ScreenListInfo *si = active_screens[draworder];
-            for (QStringList::Iterator type_i = types.begin();
-                 type_i != types.end(); ++type_i )
+            foreach (auto & type, types)
             {
-                if (*type_i == dataitem)
+                if (type == dataitem)
                 {
                     si->m_types.insert(dataitem, ti);
                 }
@@ -950,9 +945,8 @@ void LocationDialog::doSearch()
     // if a screen makes it this far, theres at least one source for it
     m_sourceManager->findPossibleSources(m_types, sources);
     QString search = m_locationEdit->GetText();
-    for (int x = 0; x < sources.size(); x++)
+    foreach (auto si, sources)
     {
-        ScriptInfo *si = sources.at(x);
         if (!result_cache.contains(si))
         {
             QStringList results = m_sourceManager->getLocationList(si, search);

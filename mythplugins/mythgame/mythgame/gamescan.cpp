@@ -64,9 +64,8 @@ void GameScannerThread::verifyFiles()
                           GameScanner::tr("Verifying game files..."));
 
     // For every file we know about, check to see if it still exists.
-    for (auto p1 = m_dbgames.begin(); p1 != m_dbgames.end(); ++p1)
+    foreach (auto info, m_dbgames)
     {
-        RomInfo *info = *p1;
         QString romfile = info->Romname();
         QString system = info->System();
         QString gametype = info->GameType();
@@ -104,14 +103,13 @@ void GameScannerThread::updateDB()
         SendProgressEvent(counter, (uint)(m_files.size() + m_remove.size()),
                           GameScanner::tr("Updating game database..."));
 
-    for (QList<RomFileInfo>::iterator p = m_files.begin();
-                                 p != m_files.end(); ++p)
+    foreach (auto & file, m_files)
     {
-        if (!(*p).indb)
+        if (!file.indb)
         {
-            RomInfo add(0, (*p).romfile, (*p).system,
-                        (*p).romname, "", "", false, (*p).rompath,
-                        "", "", 0, (*p).gametype, 0, "", "", "",
+            RomInfo add(0, file.romfile, file.system,
+                        file.romname, "", "", false, file.rompath,
+                        "", "", 0, file.gametype, 0, "", "", "",
                         "", "", "", "", "");
             add.SaveToDatabase();
             m_dbDataChanged = true;
@@ -120,10 +118,9 @@ void GameScannerThread::updateDB()
             SendProgressEvent(++counter);
     }
 
-    for (QList<uint>::iterator p = m_remove.begin();
-                                 p != m_remove.end(); ++p)
+    foreach (const uint & p, m_remove)
     {
-        removeOrphan(*p);
+        removeOrphan(p);
         m_dbDataChanged = true;
     }
 }
@@ -145,25 +142,23 @@ bool GameScannerThread::buildFileList()
         QDir dir((*iter)->SystemRomPath());
         QStringList extensions = (*iter)->ValidExtensions();
         QStringList filters;
-        for (QStringList::iterator i = extensions.begin();
-             i != extensions.end(); ++i)
+        foreach (auto & ext, extensions)
         {
-            filters.append(QString("*.%1").arg(*i));
+            filters.append(QString("*.%1").arg(ext));
         }
 
         dir.setNameFilters(filters);
         dir.setFilter(QDir::Files | QDir::Readable | QDir::NoDotAndDotDot);
 
         QStringList files = dir.entryList();
-        for (QStringList::iterator i = files.begin();
-             i != files.end(); ++i)
+        foreach (auto & file, files)
         {
             RomFileInfo info;
             info.system = (*iter)->SystemName();
             info.gametype = (*iter)->GameType();
-            info.romfile = *i;
+            info.romfile = file;
             info.rompath = (*iter)->SystemRomPath();
-            info.romname = QFileInfo(*i).baseName();
+            info.romname = QFileInfo(file).baseName();
             info.indb = false;
             m_files.append(info);
         }

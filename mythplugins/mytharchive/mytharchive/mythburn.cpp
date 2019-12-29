@@ -191,11 +191,8 @@ bool MythBurn::keyPressEvent(QKeyEvent *event)
 void MythBurn::updateSizeBar(void)
 {
     int64_t size = 0;
-    for (int x = 0; x < m_archiveList.size(); x++)
-    {
-        ArchiveItem *a = m_archiveList.at(x);
+    foreach (auto a, m_archiveList)
         size += a->newsize;
-    }
 
     uint usedSpace = size / 1024 / 1024;
 
@@ -413,11 +410,9 @@ void MythBurn::updateArchiveList(void)
     }
     else
     {
-        for (int x = 0; x < m_archiveList.size(); x++)
+        foreach (auto a, m_archiveList)
         {
             qApp->processEvents();
-            ArchiveItem *a = m_archiveList.at(x);
-
             // get duration of this file
             if (a->duration == 0)
             {
@@ -552,9 +547,9 @@ EncoderProfile *MythBurn::getDefaultProfile(ArchiveItem *item)
         QString defaultProfile =
                 gCoreContext->GetSetting("MythArchiveDefaultEncProfile", "SP");
 
-        for (int x = 0; x < m_profileList.size(); x++)
-            if (m_profileList.at(x)->name == defaultProfile)
-                profile = m_profileList.at(x);
+        foreach (auto x, m_profileList)
+            if (x->name == defaultProfile)
+                profile = x;
     }
 
     return profile;
@@ -607,11 +602,10 @@ void MythBurn::createConfigFile(const QString &filename)
             QDomElement thumbs = doc.createElement("thumbimages");
             file.appendChild(thumbs);
 
-            for (int y = 0; y < a->thumbList.size(); y++)
+            for (auto thumbImage : a->thumbList)
             {
                 QDomElement thumb = doc.createElement("thumb");
                 thumbs.appendChild(thumb);
-                ThumbImage *thumbImage = a->thumbList.at(y);
                 thumb.setAttribute("caption", thumbImage->caption);
                 thumb.setAttribute("filename", thumbImage->filename);
                 thumb.setAttribute("frame", (int) thumbImage->frame);
@@ -699,9 +693,9 @@ void MythBurn::loadConfiguration(void)
 
 EncoderProfile *MythBurn::getProfileFromName(const QString &profileName)
 {
-    for (int x = 0; x < m_profileList.size(); x++)
-        if (m_profileList.at(x)->name == profileName)
-            return m_profileList.at(x);
+    foreach (auto x, m_profileList)
+        if (x->name == profileName)
+            return x;
 
     return nullptr;
 }
@@ -1032,11 +1026,11 @@ bool ProfileDialog::Create()
         return false;
     }
 
-    for (int x = 0; x < m_profileList.size(); x++)
+    for (auto x : m_profileList)
     {
         auto *item = new
-                MythUIButtonListItem(m_profileBtnList, m_profileList.at(x)->name);
-        item->SetData(qVariantFromValue(m_profileList.at(x)));
+                MythUIButtonListItem(m_profileBtnList, x->name);
+        item->SetData(qVariantFromValue(x));
     }
 
     connect(m_profileBtnList, SIGNAL(itemSelected(MythUIButtonListItem*)),

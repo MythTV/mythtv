@@ -779,8 +779,8 @@ void SmartPlaylistEditor::saveClicked(void)
     }
 
     // save smartplaylist items
-    for (int x = 0; x < m_criteriaRows.size(); x++)
-        m_criteriaRows[x]->saveToDatabase(ID);
+    foreach (auto & row, m_criteriaRows)
+        row->saveToDatabase(ID);
 
     emit smartPLChanged(category, name);
 
@@ -984,9 +984,9 @@ QString SmartPlaylistEditor::getWhereClause(void)
     bool bFirst = true;
     QString sql = "WHERE ";
 
-    for (int x = 0; x <  m_criteriaRows.size(); x++)
+    foreach (auto & row, m_criteriaRows)
     {
-        QString criteria = m_criteriaRows[x]->getSQL();
+        QString criteria = row->getSQL();
         if (criteria.isEmpty())
             continue;
 

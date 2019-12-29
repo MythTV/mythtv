@@ -247,14 +247,12 @@ void VideoSelector::OKPressed()
     // loop though selected videos and add them to the list
     // remove any items that have been removed from the list
     QList<ArchiveItem *> tempAList;
-    for (int x = 0; x < m_archiveList->size(); x++)
+    foreach (auto a, *m_archiveList)
     {
-        ArchiveItem *a = m_archiveList->at(x);
         bool found = false;
 
-        for (int y = 0; y < m_selectedList.size(); y++)
+        foreach (auto v, m_selectedList)
         {
-            VideoInfo *v = m_selectedList.at(y);
             if (a->type != "Video" || a->filename == v->filename)
             {
                 found = true;
@@ -266,18 +264,15 @@ void VideoSelector::OKPressed()
             tempAList.append(a);
     }
 
-    for (int x = 0; x < tempAList.size(); x++)
-        m_archiveList->removeAll(tempAList.at(x));
+    foreach (auto x, tempAList)
+        m_archiveList->removeAll(x);
 
     // remove any items that are already in the list
     QList<VideoInfo *> tempSList;
-    for (int x = 0; x < m_selectedList.size(); x++)
+    foreach (auto v, m_selectedList)
     {
-        VideoInfo *v = m_selectedList.at(x);
-
-        for (int y = 0; y < m_archiveList->size(); y++)
+        foreach (auto a, *m_archiveList)
         {
-            ArchiveItem *a = m_archiveList->at(y);
             if (a->filename == v->filename)
             {
                 tempSList.append(v);
@@ -286,13 +281,12 @@ void VideoSelector::OKPressed()
         }
     }
 
-    for (int x = 0; x < tempSList.size(); x++)
-        m_selectedList.removeAll(tempSList.at(x));
+    foreach (auto x, tempSList)
+        m_selectedList.removeAll(x);
 
     // add all that are left
-    for (int x = 0; x < m_selectedList.size(); x++)
+    foreach (auto v, m_selectedList)
     {
-        VideoInfo *v = m_selectedList.at(x);
         auto *a = new ArchiveItem;
         a->type = "Video";
         a->title = v->title;
@@ -537,12 +531,10 @@ void VideoSelector::updateSelectedList()
 
     m_selectedList.clear();
 
-    for (int x = 0; x < m_archiveList->size(); x++)
+    foreach (auto a, *m_archiveList)
     {
-        ArchiveItem *a = m_archiveList->at(x);
-        for (size_t y = 0; y < m_videoList->size(); y++)
+        foreach (auto v, *m_videoList)
         {
-            VideoInfo *v = m_videoList->at(y);
             if (v->filename == a->filename)
             {
                 if (m_selectedList.indexOf(v) == -1)

@@ -557,29 +557,28 @@ void NetTree::FillTree()
     }
 
     // Now let's add all the grabber trees
-    for (GrabberScript::scriptList::iterator g = m_grabberList.begin();
-            g != m_grabberList.end(); ++g)
+    foreach (auto & g, m_grabberList)
     {
 
         QMultiMap<QPair<QString,QString>, ResultItem*> treePathsNodes =
-                           getTreeArticles((*g)->GetTitle(), VIDEO_FILE);
+                           getTreeArticles(g->GetTitle(), VIDEO_FILE);
 
         QList< QPair<QString,QString> > paths = treePathsNodes.uniqueKeys();
 
-        auto *ret = new MythGenericTree((*g)->GetTitle(), kSubFolder, false);
+        auto *ret = new MythGenericTree(g->GetTitle(), kSubFolder, false);
         QString thumb = QString("%1mythnetvision/icons/%2").arg(GetShareDir())
-                            .arg((*g)->GetImage());
+                            .arg(g->GetImage());
         ret->SetData(qVariantFromValue(thumb));
 
         // Add an upfolder
         if (m_type != DLG_TREE)
             ret->addNode(tr("Back"), kUpFolder, true, false);
 
-        for (auto it2 = paths.begin(); it2 != paths.end(); ++it2)
+        foreach (auto & path, paths)
         {
-            QStringList curPaths = (*it2).first.split("/");
-            QString dirthumb = (*it2).second;
-            QList<ResultItem*> videos = treePathsNodes.values(*it2);
+            QStringList curPaths = path.first.split("/");
+            QString dirthumb = path.second;
+            QList<ResultItem*> videos = treePathsNodes.values(path);
             BuildGenericTree(ret, curPaths, dirthumb, videos);
         }
         m_siteGeneric->addNode(ret);
@@ -622,9 +621,8 @@ void NetTree::BuildGenericTree(MythGenericTree *dst, QStringList paths,
     else
     {
         // File Handling
-        for (QList<ResultItem*>::iterator it = videos.begin();
-                it != videos.end(); ++it)
-            AddFileNode(folder, *it);
+        foreach (auto & video, videos)
+            AddFileNode(folder, video);
     }
     SetSubfolderData(folder);
 }
