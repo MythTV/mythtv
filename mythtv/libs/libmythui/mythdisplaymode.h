@@ -2,6 +2,7 @@
 #define MYTHDISPLAYMODE_H_
 
 // Qt
+#include <QSize>
 #include <QString>
 
 // MythTV
@@ -15,8 +16,7 @@
 
 class MythDisplayMode;
 using namespace std;
-using DisplayModeVector = vector<MythDisplayMode>;
-using DisplayModeMap    = map<uint64_t, MythDisplayMode>;
+using DisplayModeMap =  map<uint64_t, MythDisplayMode>;
 
 class MUI_PUBLIC MythDisplayMode
 {
@@ -25,9 +25,12 @@ class MUI_PUBLIC MythDisplayMode
     bool operator == (const MythDisplayMode& Other) const;
 
     MythDisplayMode() = default;
+    MythDisplayMode(QSize Resolution, QSize PhysicalSize,
+                    double AspectRatio, double RefreshRate);
     MythDisplayMode(int Width, int Height, int MMWidth, int MMHeight,
                     double AspectRatio, double RefreshRate);
     void   Init          (void);
+    QSize  Resolution    (void) const;
     int    Width         (void) const;
     int    Height        (void) const;
     int    WidthMM       (void) const;
@@ -39,9 +42,9 @@ class MUI_PUBLIC MythDisplayMode
     void   ClearRefreshRates(void);
     void   SetRefreshRate(double Rate);
     const std::vector<double>& RefreshRates(void) const;
-    static int      FindBestMatch (const DisplayModeVector& Modes,
+    static int      FindBestMatch (const vector<MythDisplayMode> Modes,
                                    const MythDisplayMode& Mode, double& TargetRate);
-    static uint64_t CalcKey       (int Width, int Height, double Rate);
+    static uint64_t CalcKey       (QSize Size, double Rate);
     static bool     CompareRates  (double First, double Second, double Precision = 0.01);
     static uint64_t FindBestScreen(const DisplayModeMap& Map,
                                    int Width, int Height, double Rate);

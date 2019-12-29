@@ -1,8 +1,7 @@
 include ( ../../mythconfig.mak )
 include ( ../../settings.pro )
 
-TEMPLATE = app
-CONFIG -= moc qt
+TEMPLATE = aux
 
 trans.path = $${PREFIX}/share/mythtv/i18n/
 trans.files  = mythmusic_it.qm mythmusic_es.qm mythmusic_ca.qm
@@ -15,5 +14,3 @@ trans.files += mythmusic_en_us.qm mythmusic_ru.qm mythmusic_el.qm
 trans.files += mythmusic_en_ca.qm mythmusic_pt_br.qm mythmusic_es_es.qm
 
 INSTALLS += trans
-
-SOURCES += dummy.c

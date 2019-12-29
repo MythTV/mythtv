@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 
 __all_exceptions__  = ['MythError', 'MythDBError', 'MythBEError', \
                        'MythFEError', 'MythFileError', 'MythTZError']

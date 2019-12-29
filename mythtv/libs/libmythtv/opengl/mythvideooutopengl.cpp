@@ -229,7 +229,7 @@ bool MythVideoOutputOpenGL::Init(const QSize &VideoDim, const QSize &VideoDispDi
 
     // Set the display mode if required
     if (m_display->UsingVideoModes() && !m_window.IsEmbedding())
-        ResizeForVideo(size.width(), size.height());
+        ResizeForVideo(size);
     InitDisplayMeasurements();
 
     // Create buffers

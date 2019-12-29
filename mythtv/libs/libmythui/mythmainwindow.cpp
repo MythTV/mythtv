@@ -60,7 +60,7 @@ using namespace std;
 #endif
 
 #ifdef USING_LIBCEC
-#include "cecadapter.h"
+#include "devices/mythcecadapter.h"
 #endif
 
 #include "mythscreentype.h"
@@ -159,7 +159,7 @@ class MythMainWindowPrivate
 #endif
 
 #ifdef USING_LIBCEC
-    CECAdapter          *m_cecAdapter           {nullptr};
+    MythCECAdapter       m_cecAdapter           { };
 #endif
 
     bool                 m_exitingtomain        {false};
@@ -345,13 +345,10 @@ MythPainterWindowGL::MythPainterWindowGL(MythMainWindow *win,
     setAttribute(Qt::WA_NativeWindow);
     setAttribute(Qt::WA_DontCreateNativeAncestors);
     winId();
-    bool forceshow = !qgetenv("MYTHTV_FORCE_SHOW").isEmpty();
 #ifdef Q_OS_MACOS
-    forceshow = true; // must be visible before OpenGL initialisation on OSX
+    setVisible(true); // must be visible before OpenGL initialisation on OSX
 #endif
-    if (forceshow)
-        setVisible(true);
-    m_render->setWidget(this);
+    m_render->SetWidget(this);
 }
 
 QPaintEngine *MythPainterWindowGL::paintEngine() const
@@ -471,15 +468,6 @@ MythMainWindow::MythMainWindow(const bool useDB)
     }
 #endif
 
-#ifdef USING_LIBCEC
-    d->m_cecAdapter = new CECAdapter();
-    if (!d->m_cecAdapter->IsValid())
-    {
-        delete d->m_cecAdapter;
-        d->m_cecAdapter = nullptr;
-    }
-#endif
-
     d->m_udpListener = new MythUDPListener();
 
     InitKeys();
@@ -582,7 +570,7 @@ MythMainWindow::~MythMainWindow()
 #endif
 
 #ifdef USING_LIBCEC
-    delete d->m_cecAdapter;
+    d->m_cecAdapter.Close();
 #endif
 
     delete d->m_nc;
@@ -1097,8 +1085,7 @@ void MythMainWindow::Init(bool mayReInit)
     // always use OpenGL by default. Only fallback to Qt painter as a last resort.
     if (!d->m_painter && !d->m_paintwin)
     {
-        QString dummy;
-        MythRenderOpenGL *gl = MythRenderOpenGL::Create(dummy);
+        MythRenderOpenGL *gl = MythRenderOpenGL::Create();
         d->m_render = gl;
         if (!gl)
         {
@@ -1173,9 +1160,14 @@ void MythMainWindow::Init(bool mayReInit)
         d->m_themeBase = new MythThemeBase();
 
     if (!d->m_nc)
-    {
         d->m_nc = new MythNotificationCenter();
-    }
+
+#ifdef USING_LIBCEC
+    // Open any adapter after the window has been created to ensure we capture
+    // the EDID if available. This will close any existing adapter in the event
+    // that the window has been re-init'ed.
+    d->m_cecAdapter.Open();
+#endif
 }
 
 void MythMainWindow::DelayedAction(void)
@@ -1955,8 +1947,7 @@ bool MythMainWindow::HandleMedia(const QString &handler, const QString &mrl,
 void MythMainWindow::HandleTVPower(bool poweron)
 {
 #ifdef USING_LIBCEC
-    if (d->m_cecAdapter)
-        d->m_cecAdapter->Action((poweron) ? ACTION_TVPOWERON : ACTION_TVPOWEROFF);
+    d->m_cecAdapter.Action((poweron) ? ACTION_TVPOWERON : ACTION_TVPOWEROFF);
 #else
     (void) poweron;
 #endif

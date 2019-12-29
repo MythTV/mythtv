@@ -924,29 +924,28 @@ void MythVideoOutput::DiscardFrames(bool KeyFrame, bool /*Flushed*/)
  *
  * \param width,height Resolution of the video we will be playing
  */
-void MythVideoOutput::ResizeForVideo(int Width, int Height)
+void MythVideoOutput::ResizeForVideo(QSize Size)
 {
     if (!m_display)
         return;
     if (!m_display->UsingVideoModes())
         return;
 
-    if (!Width || !Height)
+    if (Size.isEmpty())
     {
-        Width  = m_window.GetVideoDispDim().width();
-        Height = m_window.GetVideoDispDim().height();
-        if (!Width || !Height)
+        Size = m_window.GetVideoDispDim();
+        if (Size.isEmpty())
             return;
     }
 
     float rate = m_dbDisplayProfile ? m_dbDisplayProfile->GetOutput() : 0.0F;
 
-    bool hide = m_display->NextModeIsLarger(Width, Height);
+    bool hide = m_display->NextModeIsLarger(Size);
     MythMainWindow* window = GetMythMainWindow();
     if (hide)
         window->hide();
 
-    if (m_display->SwitchToVideo(Width, Height, static_cast<double>(rate)))
+    if (m_display->SwitchToVideo(Size, static_cast<double>(rate)))
     {
         // Switching to custom display resolution succeeded
         // Make a note of the new size
@@ -993,21 +992,20 @@ void MythVideoOutput::InitDisplayMeasurements(void)
     if (!m_display)
         return;
 
-    DisplayInfo disp = m_display->GetDisplayInfo();
-    QString     source = "Actual";
+    QString source = "Actual";
 
     // get the physical dimensions (in mm) of the display. If using
     // DisplayRes, this will be overridden when we call ResizeForVideo
     float disp_aspect = m_window.GetDisplayAspect();
     QSize disp_dim = m_dbDisplayDimensionsMM;
     if (disp_dim.isEmpty())
-        disp_dim = disp.m_size;
+        disp_dim = m_display->GetPhysicalSize();
     else
         source = "Database";
     m_window.SetDisplayProperties(disp_dim, disp_aspect);
 
     // Determine window and screen dimensions in pixels
-    QSize screen_size = disp.m_res;
+    QSize screen_size = m_display->GetResolution();
     QSize window_size = m_window.GetWindowRect().size();
 
     if (screen_size.isEmpty())

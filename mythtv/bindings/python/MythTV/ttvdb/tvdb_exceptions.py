@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 #encoding:utf-8
 #author:dbr/Ben
 #project:tvdb_api

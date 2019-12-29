@@ -1,9 +1,6 @@
 include ( ../settings.pro )
 
-QMAKE_STRIP = echo
-
-TEMPLATE = app
-CONFIG -= moc qt
+TEMPLATE = aux
 
 themes.path = $${PREFIX}/share/mythtv/themes/
 themes.files = default default-wide classic DVR Slave
@@ -15,6 +12,3 @@ fonts.path = $${PREFIX}/share/mythtv/
 fonts.files = fonts
 
 INSTALLS += themes fonts
-
-# Input
-SOURCES += dummy.c

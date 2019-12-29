@@ -1,8 +1,7 @@
 include ( ../../mythconfig.mak )
 include ( ../../settings.pro )
 
-TEMPLATE = app
-CONFIG -= moc qt
+TEMPLATE = aux
 
 trans.path   = $${PREFIX}/share/mythtv/i18n/
 trans.files  = mythweather_es.qm mythweather_ca.qm mythweather_nl.qm
@@ -15,5 +14,3 @@ trans.files += mythweather_nb.qm mythweather_el.qm mythweather_pl.qm
 trans.files += mythweather_en_ca.qm mythweather_es_es.qm
 
 INSTALLS += trans
-
-SOURCES += dummy.c

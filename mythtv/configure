@@ -6580,8 +6580,7 @@ using namespace std;
 using namespace CEC;
 #include <libcec/cecloader.h>
 int main(void) {
-    #if (CEC_LIB_VERSION_MAJOR < 1 || (CEC_LIB_VERSION_MAJOR == 1 && \
-                                       CEC_LIB_VERSION_MINOR < 7))
+    #if (CEC_LIB_VERSION_MAJOR < 2)
         #error libcec version to old
     #endif
     return 1;

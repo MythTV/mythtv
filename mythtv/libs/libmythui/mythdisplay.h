@@ -10,30 +10,10 @@
 #include "mythuiexp.h"
 #include "referencecounter.h"
 #include "mythdisplaymode.h"
+#include "mythedid.h"
 
 // Std
 #include <cmath>
-
-#define VALID_RATE(rate) ((rate) > 20.0F && (rate) < 200.0F)
-
-class DisplayInfo
-{
-  public:
-    DisplayInfo(void) = default;
-    explicit DisplayInfo(int Rate)
-      : m_rate(Rate)
-    {
-    }
-
-    int Rate(void) const
-    {
-        return static_cast<int>(lroundf(m_rate));
-    }
-
-    QSize m_size { 0, 0};
-    QSize m_res  { 0, 0};
-    float m_rate { -1 };
-};
 
 class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
 {
@@ -44,75 +24,74 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
   public:
     static MythDisplay* AcquireRelease(bool Acquire = true);
 
-    enum Mode
-    {
-        GUI          = 0,
-        VIDEO        = 1,
-        CUSTOM_GUI   = 2,
-        CUSTOM_VIDEO = 3,
-        DESKTOP      = 4,
-        MAX_MODES    = 5,
-    };
+    virtual bool  UsingVideoModes(void) { return false; }
+    virtual const vector<MythDisplayMode>& GetVideoModes(void);
 
-    QScreen*   GetCurrentScreen (void);
-    static int GetScreenCount   (void);
-    double     GetPixelAspectRatio(void);
+    static bool  SpanAllScreens        (void);
+    static QString GetExtraScreenInfo  (QScreen *qScreen);
 
-    virtual DisplayInfo GetDisplayInfo(int VideoRate = 0);
-    static bool         SpanAllScreens(void);
-    static QString      GetExtraScreenInfo(QScreen *qScreen);
-
-    virtual bool UsingVideoModes   (void) { return false; }
-    virtual const DisplayModeVector& GetVideoModes(void);
-    bool         NextModeIsLarger  (Mode NextMode);
-    bool         NextModeIsLarger  (int Width, int Height);
-    void         SwitchToDesktop   (void);
-    bool         SwitchToGUI       (Mode NextMode = GUI, bool Wait = false);
-    bool         SwitchToVideo     (int Width, int Height, double Rate = 0.0);
-    QSize        GetResolution     (void);
-    QSize        GetPhysicalSize   (void);
-    double       GetRefreshRate    (void);
-    double       GetAspectRatio    (void);
+    QScreen*     GetCurrentScreen      (void);
+    static int   GetScreenCount        (void);
+    double       GetPixelAspectRatio   (void);
+    QSize        GetGUIResolution      (void);
+    bool         NextModeIsLarger      (QSize Size);
+    void         SwitchToDesktop       (void);
+    bool         SwitchToGUI           (bool Wait = false);
+    bool         SwitchToVideo         (QSize Size, double Rate = 0.0);
+    QSize        GetResolution         (void);
+    QSize        GetPhysicalSize       (void);
+    double       GetRefreshRate        (void);
+    int          GetRefreshInterval    (int Fallback);
+    double       GetAspectRatio        (void);
     double       EstimateVirtualAspectRatio(void);
-    std::vector<double> GetRefreshRates(int Width, int Height);
+    MythEDID&    GetEDID               (void);
+    std::vector<double> GetRefreshRates(QSize Size);
 
   public slots:
-    virtual void ScreenChanged(QScreen *qScreen);
-    static void PrimaryScreenChanged (QScreen *qScreen);
-    void ScreenAdded          (QScreen *qScreen);
-    void ScreenRemoved        (QScreen *qScreen);
-    static void GeometryChanged (const QRect &Geometry);
+    virtual void ScreenChanged         (QScreen *qScreen);
+    static void  PrimaryScreenChanged  (QScreen *qScreen);
+    void         ScreenAdded           (QScreen *qScreen);
+    void         ScreenRemoved         (QScreen *qScreen);
+    void         GeometryChanged       (const QRect &Geometry);
 
   signals:
-    void CurrentScreenChanged (QScreen *Screen);
-    void ScreenCountChanged   (int Screens);
+    void         CurrentScreenChanged  (QScreen *qScreen);
+    void         ScreenCountChanged    (int Screens);
 
   protected:
     MythDisplay();
     ~MythDisplay() override;
 
+    virtual void    UpdateCurrentMode  (void);
+    virtual bool    SwitchToVideoMode  (QSize Size, double Framerate);
+
     void            DebugModes         (void) const;
     void            SetWidget          (QWidget *MainWindow);
     static QScreen* GetDesiredScreen   (void);
     static void     DebugScreen        (QScreen *qScreen, const QString &Message);
-    static float    SanitiseRefreshRate(int Rate);
+    void            Initialise         (void);
+    void            WaitForScreenChange(void);
 
-    void         InitialiseModes    (void);
-    virtual bool SwitchToVideoMode  (int Width, int Height, double Framerate);
-    void         WaitForScreenChange(void);
-
-    QWidget* m_widget { nullptr };
-    QScreen* m_screen { nullptr };
-    mutable std::vector<MythDisplayMode> m_videoModes { };
+    double          m_refreshRate      { 0.0  };
+    double          m_aspectRatio      { 0.0  };
+    QSize           m_resolution       { 0, 0 };
+    QSize           m_physicalSize     { 0, 0 };
+    MythEDID        m_edid             { };
+    QWidget*        m_widget           { nullptr };
+    QScreen*        m_screen           { nullptr };
+    vector<MythDisplayMode> m_videoModes { };
 
   private:
     Q_DISABLE_COPY(MythDisplay)
     static void PauseForModeSwitch(void);
 
-    Mode            m_curMode            { GUI };
-    MythDisplayMode m_mode[MAX_MODES]    { };
-    MythDisplayMode m_last               { }; // mirror of mode[current_mode]
-    DisplayModeMap  m_inSizeToOutputMode { };
+    bool            m_initialised      { false };
+    MythDisplayMode m_desktopMode      { };
+    MythDisplayMode m_guiMode          { };
+    MythDisplayMode m_videoMode        { };
+    DisplayModeMap  m_overrideVideoModes { };
+
+    MythDisplayMode m_last             { };
 };
 
 #endif // MYTHDISPLAY_H

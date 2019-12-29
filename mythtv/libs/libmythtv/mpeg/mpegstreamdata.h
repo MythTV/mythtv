@@ -108,7 +108,7 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
                                   uint_vec_t& /*del_pids*/) const
         { return false; }
 
-    // Table processin
+    // Table processing
     void SetIgnoreCRC(bool haveCRCbug) { m_haveCrcBug = haveCRCbug; }
     virtual bool IsRedundant(uint pid, const PSIPTable &psip) const;
     virtual bool HandleTables(uint pid, const PSIPTable &psip);

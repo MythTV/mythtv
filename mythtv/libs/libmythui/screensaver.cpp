@@ -30,7 +30,7 @@ ScreenSaverControl::ScreenSaverControl() :
     m_screenSavers.push_back(new ScreenSaverDBus());
 #endif
 #if defined(USING_X11)
-    MythXDisplay* display = OpenMythXDisplay(false);
+    MythXDisplay* display = MythXDisplay::OpenMythXDisplay(false);
     if (display)
     {
         m_screenSavers.push_back(new ScreenSaverX11());

@@ -1,6 +1,7 @@
 // MythTV
 #include "mythcorecontext.h"
 #include "mythlogging.h"
+#include "mythdisplay.h"
 #include "mythavutil.h"
 #include "videocolourspace.h"
 
@@ -82,6 +83,17 @@ VideoColourSpace::VideoColourSpace(VideoColourSpace *Parent)
     SetSaturation(m_dbSettings[kPictureAttribute_Colour]);
     SetHue(m_dbSettings[kPictureAttribute_Hue]);
     SetFullRange(m_dbSettings[kPictureAttribute_Range]);
+    MythDisplay* display = MythDisplay::AcquireRelease();
+    MythEDID& edid = display->GetEDID();
+    // We assume sRGB/Rec709 by default
+    if (edid.Valid() && !edid.IsSRGB())
+    {
+        m_customDisplayGamma = edid.Gamma();
+        m_customDisplayPrimaries = new ColourPrimaries;
+        MythEDID::Primaries displayprimaries = edid.ColourPrimaries();
+        memcpy(m_customDisplayPrimaries, &displayprimaries, sizeof(ColourPrimaries));
+    }
+    MythDisplay::AcquireRelease(false);
     m_updatesDisabled = false;
     Update();
 }
@@ -259,7 +271,7 @@ void VideoColourSpace::Update(void)
     m_primaryMatrix = GetPrimaryConversion(m_colourPrimaries, m_displayPrimaries);
     bool primchanged = !qFuzzyCompare(tmpsrcgamma, m_colourGamma) ||
                        !qFuzzyCompare(tmpdspgamma, m_displayGamma) ||
-                       !qFuzzyCompare(tmpmatrix, m_primaryMatrix);
+                       !qFuzzyCompare(tmpmatrix,   m_primaryMatrix);
     Debug();
     emit Updated(primchanged);
 }
@@ -470,8 +482,9 @@ QMatrix4x4 VideoColourSpace::GetPrimaryConversion(int Source, int Dest)
     QMatrix4x4 result; // identity
     auto source = static_cast<AVColorPrimaries>(Source);
     auto dest   = static_cast<AVColorPrimaries>(Dest);
+    auto force  = m_customDisplayPrimaries != nullptr;
 
-    if ((source == dest) || (m_primariesMode == PrimariesDisabled))
+    if (!force && ((source == dest) || (m_primariesMode == PrimariesDisabled)))
         return result;
 
     ColourPrimaries srcprimaries;
@@ -483,12 +496,11 @@ QMatrix4x4 VideoColourSpace::GetPrimaryConversion(int Source, int Dest)
     // and destination. Most people will not notice the difference bt709 and bt610 etc
     // and we avoid extra GPU processing.
     // BT2020 is currently the main target - which is easily differentiated by its gamma.
-    if ((m_primariesMode == PrimariesAuto) && qFuzzyCompare(m_colourGamma + 1.0F, m_displayGamma + 1.0F))
+    if (!force && (m_primariesMode == PrimariesAuto) && qFuzzyCompare(m_colourGamma + 1.0F, m_displayGamma + 1.0F))
         return result;
 
-    // N.B. Custom primaries are not yet implemented but will, some day soon,
-    // be read from the EDID
-    if (m_customDisplayPrimaries != nullptr)
+    // Use the display's chromaticities if not sRGB
+    if (force)
     {
         dstprimaries = *m_customDisplayPrimaries;
         m_displayGamma = m_customDisplayGamma;

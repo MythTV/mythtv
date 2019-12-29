@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # ----------------------
 # Name: tvdbXslt - XPath and XSLT functions for the tvdb.py XML output

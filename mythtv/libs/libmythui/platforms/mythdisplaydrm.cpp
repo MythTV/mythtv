@@ -7,6 +7,7 @@
 MythDisplayDRM::MythDisplayDRM()
 {
     m_device = new MythDRMDevice(m_screen);
+    Initialise();
 }
 
 MythDisplayDRM::~MythDisplayDRM()
@@ -28,18 +29,15 @@ void MythDisplayDRM::ScreenChanged(QScreen *qScreen)
         m_device = new MythDRMDevice(m_screen);
 }
 
-DisplayInfo MythDisplayDRM::GetDisplayInfo(int VideoRate)
+void MythDisplayDRM::UpdateCurrentMode(void)
 {
-    DisplayInfo result;
-    if (!m_device)
-        return result;
-
-    result.m_size = m_device->GetPhysicalSize();
-    result.m_res  = m_device->GetResolution();
-    float rate = m_device->GetRefreshRate();
-    if (VALID_RATE(rate))
-        result.m_rate = 1000000.0F / rate;
-    else
-        result.m_rate = SanitiseRefreshRate(VideoRate);
-    return result;
+    if (m_device)
+    {
+        m_refreshRate  = m_device->GetRefreshRate();
+        m_resolution   = m_device->GetResolution();
+        m_physicalSize = m_device->GetPhysicalSize();
+        m_edid         = m_device->GetEDID();
+        return;
+    }
+    MythDisplay::UpdateCurrentMode();
 }

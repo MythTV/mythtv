@@ -290,10 +290,6 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext **Context,
     return failure;
 }
 
-/*! \note Creating the decoder here still causes issues on occasion (VP8) where multiple
- * contexts are created. They do appear to be properly released however. FFmpeg will simply
- * not accpet a context created before GetFormat
-*/
 AVPixelFormat MythVAAPIContext::GetFormat(AVCodecContext *Context, const AVPixelFormat *PixFmt)
 {
     while (*PixFmt != AV_PIX_FMT_NONE)

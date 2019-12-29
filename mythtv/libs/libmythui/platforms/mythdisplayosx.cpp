@@ -10,7 +10,7 @@
 MythDisplayOSX::MythDisplayOSX()
   : MythDisplay()
 {
-    InitialiseModes();
+    Initialise();
 }
 
 MythDisplayOSX::~MythDisplayOSX()
@@ -18,34 +18,35 @@ MythDisplayOSX::~MythDisplayOSX()
     ClearModes();
 }
 
-DisplayInfo MythDisplayOSX::GetDisplayInfo(int VideoRate)
+void MythDisplayOSX::UpdateCurrentMode(void)
 {
-    DisplayInfo ret;
     if (!HasMythMainWindow())
-        return ret;
+    {
+        MythDisplay::UpdateCurrentMode();
+        return;
+    }
 
     WId win = (qobject_cast<QWidget*>(MythMainWindow::getMainWindow()))->winId();
     CGDirectDisplayID disp = GetOSXDisplay(win);
     if (!disp)
-        return ret;
+    {
+        MythDisplay::UpdateCurrentMode();
+        return;
+    }
     CGDisplayModeRef mode = CGDisplayCopyDisplayMode(disp);
     if (!mode)
-        return ret;
-    double rate     = CGDisplayModeGetRefreshRate(mode);
+    {
+        MythDisplay::UpdateCurrentMode();
+        return;
+    }
+
+    m_refreshRate = CGDisplayModeGetRefreshRate(mode);
+    m_resolution  = QSize(static_cast<int>(CGDisplayModeGetWidth(mode)),
+                          static_cast<int>(CGDisplayModeGetHeight(mode)));
     //bool interlaced = CGDisplayModeGetIOFlags(mode) & kDisplayModeInterlacedFlag;
-    size_t width    = CGDisplayModeGetWidth(mode);
-    size_t height   = CGDisplayModeGetHeight(mode);
     CGDisplayModeRelease(mode);
-
-    if (VALID_RATE(static_cast<float>(rate)))
-        ret.m_rate = 1000000.0F / static_cast<float>(rate);
-    else
-        ret.m_rate = SanitiseRefreshRate(VideoRate);
-
     CGSize sizemm = CGDisplayScreenSize(disp);
-    ret.m_size = QSize(static_cast<int>(sizemm.width), static_cast<int>(sizemm.height));
-    ret.m_res  = QSize(static_cast<int>(width), static_cast<int>(height));
-    return ret;
+    m_physicalSize = QSize(static_cast<int>(sizemm.width), static_cast<int>(sizemm.height));
 }
 
 bool MythDisplayOSX::UsingVideoModes(void)
@@ -78,8 +79,8 @@ const std::vector<MythDisplayMode>& MythDisplayOSX::GetVideoModes(void)
         CGDisplayModeRef mode = (CGDisplayModeRef)CFArrayGetValueAtIndex(modes, i);
         double rate     = CGDisplayModeGetRefreshRate(mode);
         bool interlaced = CGDisplayModeGetIOFlags(mode) & kDisplayModeInterlacedFlag;
-        size_t width    = CGDisplayModeGetWidth(mode);
-        size_t height   = CGDisplayModeGetHeight(mode);
+        int width       = static_cast<int>(CGDisplayModeGetWidth(mode));
+        int height      = static_cast<int>(CGDisplayModeGetHeight(mode));
 
         // See note in MythDisplayX11
         if (interlaced)
@@ -89,14 +90,14 @@ const std::vector<MythDisplayMode>& MythDisplayOSX::GetVideoModes(void)
             continue;
         }
 
-        uint64_t key = MythDisplayMode::CalcKey(width, height, 0.0);
+        QSize resolution(width, height);
+        uint64_t key = MythDisplayMode::CalcKey(resolution, 0.0);
         if (screen_map.find(key) == screen_map.end())
-            screen_map[key] = MythDisplayMode(width, height, sizemm.width,
-                                              sizemm.height, -1.0, rate);
+            screen_map[key] = MythDisplayMode(resolution, QSize(sizemm.width, sizemm.height),
+                                              -1.0, rate);
         else
             screen_map[key].AddRefreshRate(rate);
-        m_modeMap.insert(MythDisplayMode::CalcKey(width, height, rate),
-                         CGDisplayModeRetain(mode));
+        m_modeMap.insert(MythDisplayMode::CalcKey(resolution, rate), CGDisplayModeRetain(mode));
     }
 
     CFRelease(modes);
@@ -107,7 +108,7 @@ const std::vector<MythDisplayMode>& MythDisplayOSX::GetVideoModes(void)
     return m_videoModes;
 }
 
-bool MythDisplayOSX::SwitchToVideoMode(int Width, int Height, double DesiredRate)
+bool MythDisplayOSX::SwitchToVideoMode(QSize Size, double DesiredRate)
 {
     if (!HasMythMainWindow())
         return false;
@@ -117,7 +118,7 @@ bool MythDisplayOSX::SwitchToVideoMode(int Width, int Height, double DesiredRate
         return false;
 
     auto rate = static_cast<double>(NAN);
-    MythDisplayMode desired(Width, Height, 0, 0, -1.0, DesiredRate);
+    MythDisplayMode desired(Size, QSize(0, 0), -1.0, DesiredRate);
     int idx = MythDisplayMode::FindBestMatch(m_videoModes, desired, rate);
     if (idx < 0)
     {
@@ -125,7 +126,7 @@ bool MythDisplayOSX::SwitchToVideoMode(int Width, int Height, double DesiredRate
         return false;
     }
 
-    auto mode = MythDisplayMode::CalcKey(Width, Height, rate);
+    auto mode = MythDisplayMode::CalcKey(Size, rate);
     if (!m_modeMap.contains(mode))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to find mode");

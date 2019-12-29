@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #-----------------------
 # Name: util.py    Assorted utilities used in tmdb_api

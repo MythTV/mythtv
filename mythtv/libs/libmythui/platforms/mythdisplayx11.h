@@ -6,6 +6,11 @@
 
 // MythTV
 #include "mythdisplay.h"
+#include "mythxdisplay.h"
+
+#ifdef USING_XRANDR
+#include <X11/extensions/Xrandr.h> // always last
+#endif
 
 class MythDisplayX11 : public MythDisplay
 {
@@ -13,15 +18,21 @@ class MythDisplayX11 : public MythDisplay
     MythDisplayX11();
    ~MythDisplayX11() override = default;
     static bool IsAvailable(void);
-    DisplayInfo GetDisplayInfo(int VideoRate = 0) override;
+    void UpdateCurrentMode(void) override final;
 
 #ifdef USING_XRANDR
     bool UsingVideoModes(void) override;
     const std::vector<MythDisplayMode>& GetVideoModes(void) override;
-    bool SwitchToVideoMode(int Width, int Height, double DesiredRate) override;
+    bool SwitchToVideoMode(QSize Size, double DesiredRate) override;
+
+  private:
+    XRROutputInfo* GetOutput(XRRScreenResources* Resources, MythXDisplay* mDisplay,
+                             QScreen* qScreen, RROutput* Output = nullptr);
 #endif
 
   private:
+    void GetEDID(MythXDisplay* mDisplay);
+
     QMap<uint64_t, unsigned long> m_modeMap { };
     unsigned long m_crtc { 0 };
 };
