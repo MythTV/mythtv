@@ -71,7 +71,7 @@ bool DisplayResOSX::SwitchToVideoMode(int width, int height, double refreshrate)
     return (err == kCGErrorSuccess);
 }
 
-const DisplayResVector& DisplayResOSX::GetVideoModes() const
+const DisplayResVector& DisplayResOSX::GetVideoModes()
 {
     if (!m_videoModes.empty())
         return m_videoModes;

@@ -9,7 +9,7 @@ class DisplayResOSX : public DisplayRes
     DisplayResOSX(void);
     ~DisplayResOSX(void);
 
-    const std::vector<DisplayResScreen>& GetVideoModes() const;
+    const std::vector<DisplayResScreen>& GetVideoModes();
 
   protected:
     bool GetDisplayInfo(int &w_pix, int &h_pix, int &w_mm,

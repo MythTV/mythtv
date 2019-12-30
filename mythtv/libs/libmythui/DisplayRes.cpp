@@ -236,7 +236,7 @@ bool DisplayRes::SwitchToCustomGUI(int width, int height, short rate)
 }
 
 const std::vector<double> DisplayRes::GetRefreshRates(int width,
-        int height) const
+        int height)
 {
     double tr;
     std::vector<double> empty;

@@ -131,9 +131,9 @@ class MUI_PUBLIC DisplayRes
     /// \brief Returns the pixel aspect ratio of the display.
     double GetPixelAspectRatio(void) const { return m_pixelAspectRatio; }
     /// \brief Returns all video modes supported by the display.
-    virtual const DisplayResVector& GetVideoModes() const = 0;
+    virtual const DisplayResVector& GetVideoModes() = 0;
     /// \brief Returns refresh rates available at a specific screen resolution.
-    const std::vector<double> GetRefreshRates(int width, int height) const;
+    const std::vector<double> GetRefreshRates(int width, int height);
     /** @} */
 
   protected:

@@ -1,6 +1,8 @@
 #ifndef _DISPLAYRESX_H_
 #define _DISPLAYRESX_H_
 
+#include <QMap>
+
 #include "DisplayRes.h"
 
 class DisplayResX : public DisplayRes
@@ -9,7 +11,7 @@ class DisplayResX : public DisplayRes
     DisplayResX(void);
     ~DisplayResX(void);
 
-    const std::vector<DisplayResScreen>& GetVideoModes(void) const;
+    const std::vector<DisplayResScreen>& GetVideoModes(void);
 
   protected:
     bool GetDisplayInfo(int &w_pix, int &h_pix, int &w_mm,
@@ -18,7 +20,8 @@ class DisplayResX : public DisplayRes
 
   private:
     mutable std::vector<DisplayResScreen> m_videoModes;
-    mutable std::vector<DisplayResScreen> m_videoModesUnsorted;
+    QMap<uint64_t, unsigned long> m_modeMap { };
+    unsigned long m_crtc { 0 };
 };
 
 #endif // _DISPLAYRESX_H_
