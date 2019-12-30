@@ -948,7 +948,7 @@ class Video( CMPVideo, VideoSchema, DBDataWrite ):
             res += u' - %dx%02d' % (self.season, self.episode)
         if self.subtitle:
             res += u' - '+self.subtitle
-        return u"<Video '%s' at %s>" % (res, hex(id(self)))
+        return py23_repr(u"<Video '%s' at %s>" % (res, hex(id(self))))
 
     def _postinit(self):
         self._fill_cm()
@@ -966,7 +966,7 @@ class Video( CMPVideo, VideoSchema, DBDataWrite ):
                 self.hash = self.getHash()
             with self._db as cursor:
                 if cursor.execute("""SELECT intid FROM videometadata
-                                     WHERE hash=%s""", self.hash) > 0:
+                                     WHERE hash=%s""", (self.hash, )) > 0:
                     id = cursor.fetchone()[0]
                     self._evalwheredat([id])
                     self._pull()
