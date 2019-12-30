@@ -1,3 +1,4 @@
 __version__ = "1.0.0"
 
-import utilities, audiofile
+from . import utilities, audiofile
+

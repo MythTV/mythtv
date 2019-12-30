@@ -5,14 +5,18 @@ Scraper for http://www.genius.com
 taxigps
 """
 import sys
-import urllib
-import urllib2
+try:
+    from urllib2 import quote, urlopen, Request
+except ImportError:
+    from urllib.request import urlopen, Request
+    from urllib.parse import quote
+try:
+    import HTMLParser as html_parser
+except ImportError:
+	from html import parser as html_parser
 import socket
 import re
-import chardet
-import HTMLParser
 from hashlib import md5
-import chardet
 import difflib
 from optparse import OptionParser
 from common import utilities
@@ -42,10 +46,10 @@ class LyricsFetcher:
         utilities.log(debug, "%s: searching lyrics for %s - %s - %s" % (__title__, lyrics.artist, lyrics.album, lyrics.title))
 
         try:
-            request = urllib2.Request(self.url % (urllib2.quote(lyrics.artist), '%20', urllib2.quote(lyrics.title)))
+            request = Request(self.url % (quote(lyrics.artist), '%20', quote(lyrics.title)))
             request.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; rv:25.0) Gecko/20100101 Firefox/25.0')
-            req = urllib2.urlopen(request)
-            response = req.read()
+            req = urlopen(request)
+            response = req.read().decode('utf-8')
         except:
             return False
 
@@ -60,23 +64,23 @@ class LyricsFetcher:
         utilities.log(debug, "%s: search url: %s" % (__title__, self.page))
 
         try:
-            request = urllib2.Request(self.page)
+            request = Request(self.page)
             request.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; rv:25.0) Gecko/20100101 Firefox/25.0')
-            req = urllib2.urlopen(request)
-            response = req.read()
+            req = urlopen(request)
+            response = req.read().decode('utf-8')
         except:
             return False
 
         req.close()
-        matchcode = re.search('<div class="lyrics">(.*?)</div>', response, flags=re.DOTALL)
+        matchcode = re.search(u'<div class="lyrics">(.*?)</div>', response, flags=re.DOTALL)
 
         try:
             lyricscode = (matchcode.group(1))
-            htmlparser = HTMLParser.HTMLParser()
-            lyricstext = htmlparser.unescape(lyricscode).replace('<br />', '\n')
-            templyr = re.sub('<[^<]+?>', '', lyricstext)
-            lyr = re.sub('\[(.*?)\]', '', templyr)
-            lyrics.lyrics = lyr.strip().replace('\n\n\n', '\n\n')
+            htmlparser = html_parser.HTMLParser()
+            lyricstext = htmlparser.unescape(lyricscode).replace(u'<br />', u'\n')
+            templyr = re.sub(u'<[^<]+?>', '', lyricstext)
+            lyr = re.sub(u'\[(.*?)\]', '', templyr)
+            lyrics.lyrics = lyr.strip().replace(u'\n\n\n', u'\n\n')
             return True
         except:
             return False
@@ -96,6 +100,7 @@ def performSelfTest():
 
     if found:
         utilities.log(True, "Everything appears in order.")
+        buildLyrics(lyrics)
         sys.exit(0)
 
     utilities.log(True, "The lyrics for the test search failed!")
@@ -114,8 +119,8 @@ def buildLyrics(lyrics):
     for line in lines:
         etree.SubElement(xml, "lyric").text = line
 
-    utilities.log(True, etree.tostring(xml, encoding='UTF-8', pretty_print=True,
-                                       xml_declaration=True))
+    utilities.log(True,  utilities.convert_etree(etree.tostring(xml, encoding='UTF-8',
+                                                 pretty_print=True, xml_declaration=True)))
     sys.exit(0)
 
 def buildVersion():
@@ -130,8 +135,8 @@ def buildVersion():
     etree.SubElement(version, "priority").text = __priority__
     etree.SubElement(version, "syncronized").text = 'True' if __syncronized__ else 'False'
 
-    utilities.log(True, etree.tostring(version, encoding='UTF-8', pretty_print=True,
-                                       xml_declaration=True))
+    utilities.log(True, utilities.convert_etree(etree.tostring(version, encoding='UTF-8',
+                                                pretty_print=True, xml_declaration=True)))
     sys.exit(0)
 
 def main():
@@ -190,4 +195,4 @@ def main():
 
 if __name__ == '__main__':
     main()
- 
+

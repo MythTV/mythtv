@@ -7,8 +7,13 @@ ronie
 
 import sys
 import re
-import urllib
-import urllib2
+try:
+    from urllib import quote_plus
+    from urllib2 import urlopen
+except ImportError:
+    from urllib.parse import quote_plus
+    from urllib.request import urlopen
+
 import socket
 import difflib
 from optparse import OptionParser
@@ -39,7 +44,7 @@ class LyricsFetcher:
             return False
 
         try:
-            request = urllib2.urlopen(self.url % urllib.quote_plus(lyrics.artist))
+            request = urlopen(self.url % quote_plus(lyrics.artist))
             response = request.read()
         except:
             return False
@@ -54,8 +59,8 @@ class LyricsFetcher:
         if url:
             utilities.log(debug, "%s: Artist url is %s"  % (__title__, url))
             try:
-                req = urllib2.urlopen(url)
-                resp = req.read()
+                req = urlopen(url)
+                resp = req.read().decode('utf-8')
             except:
                 return False
             req.close()
@@ -70,16 +75,16 @@ class LyricsFetcher:
                 utilities.log(debug, "%s: Song url is %s"  % (__title__, url))
 
                 try:
-                    req2 = urllib2.urlopen(url)
-                    resp2 = req2.read()
+                    req2 = urlopen(url)
+                    resp2 = req2.read().decode('utf-8')
                 except:
                     return False
                 req2.close()
 
-                matchcode = re.search('<pre.*?>(.*?)</pre>', resp2, flags=re.DOTALL)
+                matchcode = re.search(u'<pre.*?>(.*?)</pre>', resp2, flags=re.DOTALL)
                 if matchcode:
                     lyricscode = (matchcode.group(1))
-                    lyr = re.sub('<[^<]+?>', '', lyricscode)
+                    lyr = re.sub(u'<[^<]+?>', '', lyricscode)
                     lyrics.lyrics = lyr.replace('\\n','\n')
                     return True
 
@@ -105,6 +110,7 @@ def performSelfTest():
 
     if found:
         utilities.log(True, "Everything appears in order.")
+        buildLyrics(lyrics)
         sys.exit(0)
 
     utilities.log(True, "The lyrics for the test search failed!")
@@ -123,8 +129,8 @@ def buildLyrics(lyrics):
     for line in lines:
         etree.SubElement(xml, "lyric").text = line
 
-    utilities.log(True, etree.tostring(xml, encoding='UTF-8', pretty_print=True,
-                                    xml_declaration=True))
+    utilities.log(True, utilities.convert_etree(etree.tostring(xml, encoding='UTF-8',
+                                                pretty_print=True, xml_declaration=True)))
     sys.exit(0)
 
 def buildVersion():
@@ -139,8 +145,8 @@ def buildVersion():
     etree.SubElement(version, "priority").text = __priority__
     etree.SubElement(version, "syncronized").text = 'True' if __syncronized__ else 'False'
 
-    utilities.log(True, etree.tostring(version, encoding='UTF-8', pretty_print=True,
-                                    xml_declaration=True))
+    utilities.log(True, utilities.convert_etree(etree.tostring(version, encoding='UTF-8',
+                                                pretty_print=True, xml_declaration=True)))
     sys.exit(0)
 
 def main():

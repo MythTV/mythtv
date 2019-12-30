@@ -1,6 +1,12 @@
 #-*- coding: UTF-8 -*-
 import sys
-import urllib
+
+try:
+    from urllib import urlopen, quote_plus
+except ImportError:
+    from urllib.request import urlopen
+    from urllib.parse import quote_plus
+
 import re
 from optparse import OptionParser
 from common import utilities
@@ -32,7 +38,7 @@ class LyricsFetcher:
             lyrics_found = False
             while True:
                 utilities.log(debug, "%s: search url: %s" % (__title__, url))
-                song_search = urllib.urlopen(url).read()
+                song_search = urlopen(url).read()
                 if song_search.find("<p id=\"lyrics_text\" class=\"ui-annotatable\">") >= 0:
                     break
 
@@ -43,7 +49,7 @@ class LyricsFetcher:
 
                 # Let's try to use the research box if we didn't yet
                 if not 'search' in url:
-                    url = "http://www.lyricsmode.com/search.php?what=songs&s=" + urllib.quote_plus(title.lower())
+                    url = "http://www.lyricsmode.com/search.php?what=songs&s=" + quote_plus(title.lower())
                 else:
                     # the search gave more than on result, let's try to find our song
                     url = ""
@@ -102,6 +108,7 @@ def performSelfTest():
 
     if found:
         utilities.log(True, "Everything appears in order.")
+        buildLyrics(lyrics)
         sys.exit(0)
 
     utilities.log(True, "The lyrics for the test search failed!")
@@ -120,8 +127,8 @@ def buildLyrics(lyrics):
     for line in lines:
         etree.SubElement(xml, "lyric").text = line
 
-    utilities.log(True, etree.tostring(xml, encoding='UTF-8', pretty_print=True,
-                                       xml_declaration=True))
+    utilities.log(True,  utilities.convert_etree(etree.tostring(xml, encoding='UTF-8',
+                                                 pretty_print=True, xml_declaration=True)))
     sys.exit(0)
 
 def buildVersion():
@@ -136,8 +143,8 @@ def buildVersion():
     etree.SubElement(version, "priority").text = __priority__
     etree.SubElement(version, "syncronized").text = 'True' if __syncronized__ else 'False'
 
-    utilities.log(True, etree.tostring(version, encoding='UTF-8', pretty_print=True,
-                                       xml_declaration=True))
+    utilities.log(True,  utilities.convert_etree(etree.tostring(version, encoding='UTF-8',
+                                                 pretty_print=True, xml_declaration=True)))
     sys.exit(0)
 
 def main():

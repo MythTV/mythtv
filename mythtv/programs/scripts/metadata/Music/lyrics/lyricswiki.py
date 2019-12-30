@@ -1,5 +1,18 @@
 #-*- coding: UTF-8 -*-
-import sys, re, urllib2, socket, HTMLParser
+
+import sys, re, socket
+
+try:
+    from urllib2 import quote, urlopen, HTTPError
+except ImportError:
+    from urllib.request import urlopen, HTTPError
+    from urllib.parse import quote
+
+try:
+    import HTMLParser as html_parser
+except ImportError:
+	from html import parser as html_parser
+
 from optparse import OptionParser
 
 if sys.version_info < (2, 7):
@@ -31,8 +44,8 @@ class LyricsFetcher:
         utilities.log(debug,  "%s: searching lyrics for %s - %s - %s" % (__title__, lyrics.artist, lyrics.album, lyrics.title))
 
         try:
-            req = urllib2.urlopen(self.url % (urllib2.quote(lyrics.artist), urllib2.quote(lyrics.title)))
-            response = req.read()
+            req = urlopen(self.url % (quote(lyrics.artist), quote(lyrics.title)))
+            response = req.read().decode('utf-8')
         except:
             return False
         req.close()
@@ -44,18 +57,18 @@ class LyricsFetcher:
         if not self.page.endswith('action=edit'):
             utilities.log(debug, "%s: search url: %s" % (__title__, self.page))
             try:
-                req = urllib2.urlopen(self.page)
-                response = req.read()
-            except urllib2.HTTPError, error: # strange... sometimes lyrics are returned with a 404 error
+                req = urlopen(self.page)
+                response = req.read().decode('utf-8')
+            except HTTPError as error: # strange... sometimes lyrics are returned with a 404 error
                 if error.code == 404:
-                    response = error.read()
+                    response = error.read().decode('utf-8')
                 else:
                     return False
             req.close()
             matchcode = re.search("lyricbox'>.*?(&#.*?)<div", response)
             try:
                 lyricscode = (matchcode.group(1))
-                htmlparser = HTMLParser.HTMLParser()
+                htmlparser = html_parser.HTMLParser()
                 lyricstext = htmlparser.unescape(lyricscode).replace('<br />', '\n')
                 lyr = re.sub('<[^<]+?>', '', lyricstext)
                 if LIC_TXT in lyr:
@@ -81,6 +94,7 @@ def performSelfTest():
 
     if found:
         utilities.log(True, "Everything appears in order.")
+        buildLyrics(lyrics)
         sys.exit(0)
 
     utilities.log(True, "The lyrics for the test search failed!")
@@ -99,8 +113,8 @@ def buildLyrics(lyrics):
     for line in lines:
         etree.SubElement(xml, "lyric").text = line
 
-    utilities.log(True, etree.tostring(xml, encoding='UTF-8', pretty_print=True,
-                                       xml_declaration=True))
+    utilities.log(True, utilities.convert_etree(etree.tostring(xml, encoding='UTF-8',
+                                                pretty_print=True, xml_declaration=True)))
     sys.exit(0)
 
 def buildVersion():
@@ -115,8 +129,8 @@ def buildVersion():
     etree.SubElement(version, "priority").text = __priority__
     etree.SubElement(version, "syncronized").text = 'True' if __syncronized__ else 'False'
 
-    utilities.log(True, etree.tostring(version, encoding='UTF-8', pretty_print=True,
-                                       xml_declaration=True))
+    utilities.log(True, utilities.convert_etree(etree.tostring(version, encoding='UTF-8',
+                                                pretty_print=True, xml_declaration=True)))
     sys.exit(0)
 
 def main():

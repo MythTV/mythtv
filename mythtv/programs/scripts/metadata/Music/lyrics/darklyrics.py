@@ -6,7 +6,11 @@ scraper by smory
 """
 
 import hashlib
-import urllib2
+try:
+    from urllib2 import quote, urlopen
+except ImportError:
+    from urllib.request import urlopen
+    from urllib.parse import quote
 import re
 import chardet
 import sys
@@ -16,9 +20,9 @@ from common import utilities
 __author__      = "Paul Harrison and smory'"
 __title__       = "DarkLyrics"
 __description__ = "Search http://www.darklyrics.com/ - the largest metal lyrics archive on the Web"
-__priority__    = "180";
+__priority__    = "180"
 __version__     = "0.1"
-__syncronized__ = False;
+__syncronized__ = False
 
 debug = False
 
@@ -29,76 +33,78 @@ class LyricsFetcher:
         self.searchUrl = "http://www.darklyrics.com/search?q=%term%"
 
     def search(self, artist, title):
-        term = urllib2.quote((artist if artist else "") + " " + (title if title else ""));
+        term = quote((artist if artist else "") + " " + (title if title else ""))
 
         try:
-            request = urllib2.urlopen(self.searchUrl.replace("%term%", term))
-            searchResponse = request.read();
+            request = urlopen(self.searchUrl.replace("%term%", term))
+            searchResponse = request.read()
         except:
             return None
 
-        searchResult = re.findall("<h2><a\shref=\"(.*?#([0-9]+))\".*?>(.*?)</a></h2>", searchResponse);
+        searchResult = re.findall(b"<h2><a\shref=\"(.*?#([0-9]+))\".*?>(.*?)</a></h2>", searchResponse)
 
         if len(searchResult) == 0:
-            return None;
+            return None
 
-        links = [];
+        links = []
 
-        i = 0;
+        i = 0
         for result in searchResult:
-            a = [];
-            a.append(result[2] + ( " " + self.getAlbumName(self.base_url + result[0]) if i < 6 else "")); # title from server + album nane
-            a.append(self.base_url + result[0]);  # url with lyrics
-            a.append(artist);
-            a.append(title);
-            a.append(result[1]); # id of the side part containing this song lyrics
-            links.append(a);
-            i += 1;
+            a = []
+            a.append(result[2] + ( b" " + self.getAlbumName(self.base_url + result[0].decode('utf-8') )if i < 6 else b"")) # title from server + album nane
+            a.append(self.base_url + result[0].decode('utf-8'))  # url with lyrics
+            a.append(artist)
+            a.append(title)
+            a.append(result[1]) # id of the side part containing this song lyrics
+            links.append(a)
+            i += 1
 
-        return links;
+        return links
 
     def findLyrics(self, url, index):
         try:
-            request = urllib2.urlopen(url);
-            res = request.read();
+            request = urlopen(url)
+            res = request.read()
         except:
             return None
 
-        pattern = "<a\sname=\"%index%\">(.*?)(?:<h3>|<div)";  # require multi line and dot all mode
-        pattern = pattern.replace("%index%", index);
+        pattern = b"<a\sname=\"%index%\">(.*?)(?:<h3>|<div)"  # require multi line and dot all mode
+        pattern = pattern.replace(b"%index%", index)
 
-        match = re.search(pattern, res, re.MULTILINE | re.DOTALL);
-        if match:  
-            s = match.group(1);
-            s = s.replace("<br />", "");
-            s = s.replace("<i>", "");
-            s = s.replace("</i>", "");
-            s = s.replace("</a>", "");
-            s = s.replace("</h3>", "");
-            return s;
+        match = re.search(pattern, res, re.MULTILINE | re.DOTALL)
+        if match:
+            s = match.group(1)
+            s = s.replace(b"<br />", b"")
+            s = s.replace(b"<i>", b"")
+            s = s.replace(b"</i>", b"")
+            s = s.replace(b"</a>", b"")
+            s = s.replace(b"</h3>", b"")
+            return s
         else:
-            return None;
+            return None
 
     def getAlbumName(self, url):
         try:
-            request = urllib2.urlopen(url);
-            res = request.read();
+            request = urlopen(url)
+            res = request.read()
         except:
-            return "";
+            return b""
 
-        match = re.search("<h2>(?:album|single|ep|live):?\s?(.*?)</h2>", res, re.IGNORECASE);
+        match = re.search(b"<h2>(?:album|single|ep|live):?\s?(.*?)</h2>", res, re.IGNORECASE)
 
         if match:
-            return ("(" + match.group(1) + ")").replace("\"", "");
+            ret = (b"(" + match.group(1) + b")").replace(b"\"", b"")
         else:
-            return "";
+            ret = b""
+        return(ret)
+
 
     def get_lyrics(self, lyrics):
         utilities.log(debug, "%s: searching lyrics for %s - %s - %s" % (__title__, lyrics.artist, lyrics.album, lyrics.title))
-        links = self.search(lyrics.artist, lyrics.title);
+        links = self.search(lyrics.artist, lyrics.title)
 
         if(links == None or len(links) == 0):
-            return False;
+            return False
         elif len(links) > 1:
             lyrics.list = links
 
@@ -109,11 +115,11 @@ class LyricsFetcher:
         enc = chardet.detect(lyr)
         lyr = lyr.decode(enc['encoding'], 'ignore')
         lyrics.lyrics = lyr
-        return True;
+        return True
 
     def get_lyrics_from_list(self, link):
-        title, url, artist, song, index = link;
-        return self.findLyrics(url, index);
+        title, url, artist, song, index = link
+        return self.findLyrics(url, index)
 
 def performSelfTest():
     found = False
@@ -129,6 +135,7 @@ def performSelfTest():
 
     if found:
         utilities.log(True, "Everything appears in order.")
+        buildLyrics(lyrics)
         sys.exit(0)
 
     utilities.log(True, "The lyrics for the test search failed!")
@@ -148,8 +155,8 @@ def buildLyrics(lyrics):
         line2 = re.sub(u'[^\u0020-\uD7FF\u0009\u000A\u000D\uE000-\uFFFD\u10000-\u10FFFF]+', '', line)
         etree.SubElement(xml, "lyric").text = line2
 
-    utilities.log(True, etree.tostring(xml, encoding='UTF-8', pretty_print=True,
-                                    xml_declaration=True))
+    utilities.log(True, utilities.convert_etree(etree.tostring(xml, encoding='UTF-8',
+                                      pretty_print=True, xml_declaration=True)))
     sys.exit(0)
 
 def buildVersion():
@@ -164,8 +171,8 @@ def buildVersion():
     etree.SubElement(version, "priority").text = __priority__
     etree.SubElement(version, "syncronized").text = 'True' if __syncronized__ else 'False'
 
-    utilities.log(True, etree.tostring(version, encoding='UTF-8', pretty_print=True,
-                                    xml_declaration=True))
+    utilities.log(True, utilities.convert_etree(etree.tostring(version, encoding='UTF-8',
+                                      pretty_print=True, xml_declaration=True)))
     sys.exit(0)
 
 def main():
