@@ -1,6 +1,5 @@
 // MythTV
 #include "avformatdecoder.h"
-#include "mythdrmprimeinterop.h"
 #include "mythdrmprimecontext.h"
 
 #define LOC QString("DRMPRIMECtx: ")
@@ -116,8 +115,10 @@ int MythDRMPRIMEContext::HwDecoderInit(AVCodecContext *Context)
     if (Context->pix_fmt != AV_PIX_FMT_DRM_PRIME)
         return -1;
 
+#ifdef USING_EGL
     MythRenderOpenGL *context = MythRenderOpenGL::GetOpenGLRender();
     m_interop = MythDRMPRIMEInterop::Create(context, MythOpenGLInterop::DRMPRIME);
+#endif
     return m_interop ? 0 : -1;
 }
 

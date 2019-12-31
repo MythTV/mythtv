@@ -42,8 +42,10 @@ MythOpenGLInterop::Type MythVAAPIInterop::GetInteropType(VideoFrameType Format)
     bool opengles = context->isOpenGLES();
     bool wayland = qgetenv("XDG_SESSION_TYPE").contains("wayland");
     // best first
+#ifdef USING_EGL
     if (egl && MythVAAPIInteropDRM::IsSupported(context)) // zero copy
         return VAAPIEGLDRM;
+#endif
     if (!egl && !wayland && MythVAAPIInteropGLXPixmap::IsSupported(context)) // copy
         return VAAPIGLXPIX;
     if (!egl && !opengles && !wayland) // 2 * copy
@@ -55,9 +57,10 @@ MythVAAPIInterop* MythVAAPIInterop::Create(MythRenderOpenGL *Context, Type Inter
 {
     if (!Context)
         return nullptr;
-
+#ifdef USING_EGL
     if (InteropType == VAAPIEGLDRM)
         return new MythVAAPIInteropDRM(Context);
+#endif
     if (InteropType == VAAPIGLXPIX)
         return new MythVAAPIInteropGLXPixmap(Context);
     if (InteropType == VAAPIGLXCOPY)

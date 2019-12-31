@@ -7,7 +7,9 @@
 #include "fourcc.h"
 #include "avformatdecoder.h"
 #include "opengl/mythrenderopengl.h"
+#ifdef USING_EGL
 #include "opengl/mythdrmprimeinterop.h"
+#endif
 #include "mythv4l2m2mcontext.h"
 
 // Sys
@@ -378,7 +380,10 @@ int MythV4L2M2MContext::InitialiseV4L2RequestContext(AVCodecContext *Context)
         return -1;
 
     // Create interop
-    MythDRMPRIMEInterop *interop = MythDRMPRIMEInterop::Create(render, type);
+    MythOpenGLInterop *interop = nullptr;
+#ifdef USING_EGL
+    interop = MythDRMPRIMEInterop::Create(render, type);
+#endif
     if (!interop)
         return -1;
 

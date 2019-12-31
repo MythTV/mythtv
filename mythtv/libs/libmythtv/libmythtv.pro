@@ -457,6 +457,9 @@ using_frontend {
 
     using_x11:DEFINES += USING_X11
 
+    HEADERS += decoders/mythdrmprimecontext.h
+    SOURCES += decoders/mythdrmprimecontext.cpp
+
     using_opengl {
         DEFINES += USING_OPENGL
         using_opengles: DEFINES += USING_OPENGLES
@@ -504,9 +507,6 @@ using_frontend {
             HEADERS += opengl/mythdrmprimeinterop.h
             SOURCES += opengl/mythdrmprimeinterop.cpp
             SOURCES += opengl/mythegldmabuf.cpp
-
-            HEADERS += decoders/mythdrmprimecontext.h
-            SOURCES += decoders/mythdrmprimecontext.cpp
 
             using_mmal {
                 HEADERS += opengl/mythmmalinterop.h
