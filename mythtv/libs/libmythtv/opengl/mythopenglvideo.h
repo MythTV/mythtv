@@ -32,7 +32,19 @@ class MythOpenGLVideo : public QObject
         ShaderCount   = 4
     };
 
+    enum VideoResize
+    {
+        None         = 0x000,
+        Deinterlacer = 0x001,
+        Sampling     = 0x002,
+        Performance  = 0x004,
+        Framebuffer  = 0x008
+    };
+
+    Q_DECLARE_FLAGS(VideoResizing, VideoResize)
+
     static QString        TypeToProfile(VideoFrameType Type);
+    static QString        VideoResizeToString(VideoResizing Resize);
 
     MythOpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *ColourSpace,
                     QSize VideoDim, QSize VideoDispDim, QRect DisplayVisibleRect,
@@ -65,10 +77,11 @@ class MythOpenGLVideo : public QObject
     bool    SetupFrameFormat(VideoFrameType InputType, VideoFrameType OutputType,
                              QSize Size, GLenum TextureTarget);
     bool    CreateVideoShader(VideoShaderType Type, MythDeintType Deint = DEINT_NONE);
-    void    LoadTextures(bool Deinterlacing, vector<MythVideoTexture*> &Current,
+    void    BindTextures(bool Deinterlacing, vector<MythVideoTexture*> &Current,
                          MythGLTexture** Textures, uint &TextureCount);
     bool    AddDeinterlacer(const VideoFrame *Frame,  FrameScanType Scan,
                             MythDeintType Filter = DEINT_SHADER, bool CreateReferences = true);
+    QOpenGLFramebufferObject* CreateVideoFrameBuffer(VideoFrameType OutputType, QSize Size);
 
     bool           m_valid      { false };
     QString        m_profile;
@@ -95,7 +108,7 @@ class MythOpenGLVideo : public QObject
     QSize          m_inputTextureSize;    ///< Actual size of input texture(s)
     QOpenGLFunctions::OpenGLFeatures m_features; ///< Default features available from Qt
     int            m_extraFeatures          { 0 };       ///< OR'd list of extra, Myth specific features
-    bool           m_resizing               { false };
+    VideoResizing  m_resizing               { None };
     GLenum         m_textureTarget          { QOpenGLTexture::Target2D }; ///< Some interops require custom texture targets
     long long      m_discontinuityCounter   { 0 }; ///< Check when to release reference frames after a skip
     int            m_lastRotation           { 0 }; ///< Track rotation for pause frame
