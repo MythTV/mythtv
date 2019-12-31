@@ -334,7 +334,7 @@ bool LIRC::IsDoRunSet(void) const
     return m_doRun;
 }
 
-void LIRC::Process(QByteArray &data)
+void LIRC::Process(const QByteArray &data)
 {
     QMutexLocker static_lock(&s_lirclibLock);
 

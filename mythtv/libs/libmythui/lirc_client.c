@@ -106,7 +106,7 @@ static char *lirc_execute(const struct lirc_state *state,
 static int lirc_iscode(struct lirc_config_entry *scan, char *remote,
 		       char *button,unsigned int rep);
 static int lirc_code2char_internal(const struct lirc_state *state,
-				   struct lirc_config *config,char *code,
+				   struct lirc_config *config,const char *code,
 				   char **string, char **prog);
 static const char *lirc_read_string(const struct lirc_state *state, int fd);
 static int lirc_identify(const struct lirc_state *state, int sockfd);
@@ -1626,7 +1626,7 @@ char *lirc_ir2char(const struct lirc_state *state,struct lirc_config *config,cha
 }
 #endif
 
-int lirc_code2char(const struct lirc_state *state, struct lirc_config *config,char *code,char **string)
+int lirc_code2char(const struct lirc_state *state, struct lirc_config *config,const char *code,char **string)
 {
 	if(config->sockfd!=-1)
 	{
@@ -1673,8 +1673,8 @@ int lirc_code2charprog(struct lirc_state *state,struct lirc_config *config,char 
 }
 
 static int lirc_code2char_internal(const struct lirc_state *state,
-								   struct lirc_config *config,char *code,
-								   char **string, char **prog)
+                                   struct lirc_config *config, const char *code,
+                                   char **string, char **prog)
 {
 	unsigned int rep = 0;
 	char *strtok_state = NULL;
