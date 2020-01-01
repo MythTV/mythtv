@@ -891,7 +891,7 @@ QString MythOpenGLVideo::TypeToProfile(VideoFrameType Type)
 QString MythOpenGLVideo::VideoResizeToString(VideoResizing Resize)
 {
     QStringList reasons;
-    if (Resize & Deinterlacer) reasons << "Deinterler";
+    if (Resize & Deinterlacer) reasons << "Deinterlacer";
     if (Resize & Sampling)     reasons << "Sampling";
     if (Resize & Performance)  reasons << "Performance";
     if (Resize & Framebuffer)  reasons << "Framebuffer";
