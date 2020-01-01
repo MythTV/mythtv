@@ -2,6 +2,7 @@
 #define MYTHEDID_H
 
 // Qt
+#include <QSize>
 #include <QStringList>
 
 // MythTV
@@ -22,15 +23,17 @@ class MUI_PUBLIC MythEDID
     MythEDID(QByteArray &Data);
     MythEDID(const char* Data, int Length);
 
-    bool        Valid             (void);
-    QStringList SerialNumbers     (void);
-    uint16_t    PhysicalAddress   (void);
-    float       Gamma             (void);
-    bool        IsSRGB            (void);
-    Primaries   ColourPrimaries   (void);
-    int         AudioLatency      (bool Interlaced);
-    int         VideoLatency      (bool Interlaced);
-    void        Debug             (void);
+    bool        Valid             (void) const;
+    QStringList SerialNumbers     (void) const;
+    QSize       DisplaySize       (void) const;
+    double      DisplayAspect     (void) const;
+    uint16_t    PhysicalAddress   (void) const;
+    float       Gamma             (void) const;
+    bool        IsSRGB            (void) const;
+    Primaries   ColourPrimaries   (void) const;
+    int         AudioLatency      (bool Interlaced) const;
+    int         VideoLatency      (bool Interlaced) const;
+    void        Debug             (void) const;
 
   private:
     void        Parse             (void);
@@ -43,6 +46,8 @@ class MUI_PUBLIC MythEDID
     QByteArray  m_data            { };
     uint        m_size            { 0 };
     quint8      m_minorVersion    { 0 };
+    QSize       m_displaySize     { };    // N.B. Either size or aspect are valid
+    double      m_displayAspect   { 0.0 };
     QStringList m_serialNumbers   { };
     float       m_gamma           { 0.0F }; // Invalid
     bool        m_sRGB            { false };
