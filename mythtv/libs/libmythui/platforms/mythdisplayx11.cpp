@@ -84,36 +84,42 @@ const std::vector<MythDisplayMode>& MythDisplayX11::GetVideoModes(void)
     for (int i = 0; i < output->nmode; ++i)
     {
         RRMode rrmode = output->modes[i];
-        XRRModeInfo mode = res->modes[i];
-        if (mode.id != rrmode)
-            continue;
-        if (!(mode.dotClock > 1 && mode.vTotal > 1 && mode.hTotal > 1))
-            continue;
-        int width = static_cast<int>(mode.width);
-        int height = static_cast<int>(mode.height);
-        double rate = static_cast<double>(mode.dotClock) / (mode.vTotal * mode.hTotal);
-        bool interlaced = mode.modeFlags & RR_Interlace;
-        if (interlaced)
-            rate *= 2.0;
-
-        // TODO don't filter out interlaced modes but ignore them in MythDisplayMode
-        // when not required. This may then be used in future to allow 'exact' match
-        // display modes to display interlaced material on interlaced displays
-        if (interlaced)
+        for (int j = 0; j < res->nmode; ++j)
         {
-            LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Ignoring interlaced mode %1x%2 %3i")
-                .arg(width).arg(height).arg(rate, 2, 'f', 2, '0'));
-            continue;
-        }
+            if (res->modes[j].id != rrmode)
+                continue;
 
-        QSize resolution(width, height);
-        QSize physical(mmwidth, mmheight);
-        uint64_t key = MythDisplayMode::CalcKey(resolution, 0.0);
-        if (screenmap.find(key) == screenmap.end())
-            screenmap[key] = MythDisplayMode(resolution, physical, -1.0, rate);
-        else
-            screenmap[key].AddRefreshRate(rate);
-        m_modeMap.insert(MythDisplayMode::CalcKey(resolution, rate), rrmode);
+            XRRModeInfo mode = res->modes[j];
+            if (mode.id != rrmode)
+                continue;
+            if (!(mode.dotClock > 1 && mode.vTotal > 1 && mode.hTotal > 1))
+                continue;
+            int width = static_cast<int>(mode.width);
+            int height = static_cast<int>(mode.height);
+            double rate = static_cast<double>(mode.dotClock) / (mode.vTotal * mode.hTotal);
+            bool interlaced = mode.modeFlags & RR_Interlace;
+            if (interlaced)
+                rate *= 2.0;
+
+            // TODO don't filter out interlaced modes but ignore them in MythDisplayMode
+            // when not required. This may then be used in future to allow 'exact' match
+            // display modes to display interlaced material on interlaced displays
+            if (interlaced)
+            {
+                LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Ignoring interlaced mode %1x%2 %3i")
+                    .arg(width).arg(height).arg(rate, 2, 'f', 2, '0'));
+                continue;
+            }
+
+            QSize resolution(width, height);
+            QSize physical(mmwidth, mmheight);
+            uint64_t key = MythDisplayMode::CalcKey(resolution, 0.0);
+            if (screenmap.find(key) == screenmap.end())
+                screenmap[key] = MythDisplayMode(resolution, physical, -1.0, rate);
+            else
+                screenmap[key].AddRefreshRate(rate);
+            m_modeMap.insert(MythDisplayMode::CalcKey(resolution, rate), rrmode);
+        }
     }
 
     for (auto it = screenmap.begin(); screenmap.end() != it; ++it)
