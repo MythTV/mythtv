@@ -399,8 +399,8 @@ class Visible : public MythUIComboBoxSetting
         setLabel(QCoreApplication::translate("(ChannelSettings)", "Visible"));
 
         setHelpText(QCoreApplication::translate("(ChannelSettings)",
-            "If set to yes or always, the channel will be visible in the "
-            "EPG.  Set to always or never to prevent MythTV and other "
+            "If set to Always Visible or Visible, the channel will be visible in the "
+            "EPG.  Set to Always Visible or Never Visible to prevent MythTV and other "
             "utilities from automatically managing the value for this "
             "channel."));
 
