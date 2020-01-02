@@ -36,30 +36,26 @@ void MythDisplayX11::UpdateCurrentMode(void)
         m_refreshRate  = display->GetRefreshRate();
         m_resolution   = display->GetDisplaySize();
         GetEDID(display);
-        // MythXDisplay::GetDisplayDimensions is not accurate for multiscreen setups
-        // - so use the EDID or XRANDR if that is not available
-        if (MythDisplay::GetScreenCount() > 1)
+        if (m_edid.Valid() && !m_edid.DisplaySize().isEmpty())
         {
-            if (m_edid.Valid() && !m_edid.DisplaySize().isEmpty())
-            {
-                m_physicalSize = m_edid.DisplaySize();
-            }
-            else
-            {
-                XRRScreenResources* res = XRRGetScreenResourcesCurrent(display->GetDisplay(), display->GetRoot());
-                XRROutputInfo *output = GetOutput(res, display, m_screen);
-                if (output)
-                {
-                    m_physicalSize = QSize(static_cast<int>(output->mm_width),
-                                           static_cast<int>(output->mm_height));
-                    XRRFreeOutputInfo(output);
-                }
-                XRRFreeScreenResources(res);
-            }
+            m_physicalSize = m_edid.DisplaySize();
         }
         else
         {
+#ifdef USING_XRANDR
+            XRRScreenResources* res = XRRGetScreenResourcesCurrent(display->GetDisplay(), display->GetRoot());
+            XRROutputInfo *output = GetOutput(res, display, m_screen);
+            if (output)
+            {
+                m_physicalSize = QSize(static_cast<int>(output->mm_width),
+                                       static_cast<int>(output->mm_height));
+                XRRFreeOutputInfo(output);
+            }
+            XRRFreeScreenResources(res);
+#else
+            // N.B. This is usually innacurate for multiscreen setups
             m_physicalSize = display->GetDisplayDimensions();
+#endif
         }
 
         delete display;
