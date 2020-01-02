@@ -1677,10 +1677,8 @@ bool PlaybackBox::UpdateUILists(void)
         vector<ProgramInfo*> list;
         bool newest_first = (0==m_allOrder);
         m_programInfoCache.GetOrdered(list, newest_first);
-        vector<ProgramInfo*>::const_iterator it = list.begin();
-        for ( ; it != list.end(); ++it)
+        for (auto p : list)
         {
-            ProgramInfo *p = *it;
             if (p->IsDeletePending())
                 continue;
 

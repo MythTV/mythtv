@@ -589,11 +589,8 @@ void Scheduler::PrintList(RecList &list, bool onlyFutureRecordings)
     LOG(VB_SCHEDULE, LOG_INFO, "Title - Subtitle                     Ch Station "
                                "Day Start  End    G  I  T  N Pri");
 
-    auto i = list.begin();
-    for ( ; i != list.end(); ++i)
+    for (auto first : list)
     {
-        RecordingInfo *first = (*i);
-
         if (onlyFutureRecordings &&
             ((first->GetRecordingEndTime() < now &&
               first->GetScheduledEndTime() < now) ||
@@ -1207,10 +1204,8 @@ void Scheduler::MarkOtherShowings(RecordingInfo *p)
 
 void Scheduler::MarkShowingsList(RecList &showinglist, RecordingInfo *p)
 {
-    auto i = showinglist.begin();
-    for ( ; i != showinglist.end(); ++i)
+    for (auto q : showinglist)
     {
-        RecordingInfo *q = *i;
         if (q == p)
             continue;
         if (q->GetRecordingStatus() != RecStatus::Unknown &&
@@ -1267,10 +1262,8 @@ bool Scheduler::TryAnotherShowing(RecordingInfo *p, bool samePriority,
     RecordingInfo *best = nullptr;
     uint bestaffinity = 0;
 
-    auto j = showinglist->begin();
-    for ( ; j != showinglist->end(); ++j)
+    for (auto q : *showinglist)
     {
-        RecordingInfo *q = *j;
         if (q == p)
             continue;
 
@@ -1517,10 +1510,8 @@ void Scheduler::SchedNewRetryPass(const RecIter& start, const RecIter& end,
     }
     SORT_RECLIST(retry_list, comp_retry);
 
-    i = retry_list.begin();
-    for ( ; i != retry_list.end(); ++i)
+    for (auto p : retry_list)
     {
-        RecordingInfo *p = *i;
         if (p->GetRecordingStatus() != RecStatus::Unknown)
             continue;
 
@@ -2559,9 +2550,8 @@ void Scheduler::HandleWakeSlave(RecordingInfo &ri, int prerollseconds)
 
         if (keys.empty())
         {
-            RecConstIter it = m_recList.begin();
-            for ( ; it != m_recList.end(); ++it)
-                keys.insert((*it)->MakeUniqueKey());
+            for (auto rec : m_recList)
+                keys.insert(rec->MakeUniqueKey());
             keys.insert("something");
         }
 
@@ -3473,13 +3463,10 @@ void Scheduler::PutInactiveSlavesToSleep(void)
                 "next %1 minutes.") .arg(sleepThreshold / 60));
 
     LOG(VB_SCHEDULE, LOG_DEBUG, "Checking scheduler's reclist");
-    auto recIter = m_recList.begin();
     QDateTime curtime = MythDate::current();
     QStringList SlavesInUse;
-    for ( ; recIter != m_recList.end(); ++recIter)
+    for (auto pginfo : m_recList)
     {
-        RecordingInfo *pginfo = *recIter;
-
         if (pginfo->GetRecordingStatus() != RecStatus::Recording &&
             pginfo->GetRecordingStatus() != RecStatus::Tuning &&
             pginfo->GetRecordingStatus() != RecStatus::Failing &&
@@ -4730,9 +4717,8 @@ void Scheduler::AddNewRecords(void)
     }
 
     LOG(VB_SCHEDULE, LOG_INFO, " +-- Cleanup...");
-    auto tmp = tmpList.begin();
-    for ( ; tmp != tmpList.end(); ++tmp)
-        m_workList.push_back(*tmp);
+    for (auto & tmp : tmpList)
+        m_workList.push_back(tmp);
 }
 
 void Scheduler::AddNotListed(void) {
@@ -4855,9 +4841,8 @@ void Scheduler::AddNotListed(void) {
         tmpList.push_back(p);
     }
 
-    auto tmp = tmpList.begin();
-    for ( ; tmp != tmpList.end(); ++tmp)
-        m_workList.push_back(*tmp);
+    for (auto & tmp : tmpList)
+        m_workList.push_back(tmp);
 }
 
 /** \brief Returns all scheduled programs
@@ -5152,6 +5137,7 @@ int Scheduler::FillRecordingDir(
     LOG(VB_FILE | VB_SCHEDULE, LOG_INFO, LOC +
         "FillRecordingDir: Calculating initial FS Weights.");
 
+    // NOLINTNEXTLINE(modernize-loop-convert)
     for (auto fsit = m_fsInfoCache.begin(); fsit != m_fsInfoCache.end(); ++fsit)
     {
         FileSystemInfo *fs = &(*fsit);
@@ -5322,6 +5308,7 @@ int Scheduler::FillRecordingDir(
                         .arg(fs->getHostname()).arg(fs->getPath())
                         .arg(fs->getFSysID()).arg(weightPerRecording));
 
+                // NOLINTNEXTLINE(modernize-loop-convert)
                 for (auto fsit2 = m_fsInfoCache.begin();
                      fsit2 != m_fsInfoCache.end(); ++fsit2)
                 {

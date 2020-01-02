@@ -773,11 +773,10 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
     m_doubleDriver->setEnabled(false);
 
     QList<QPair<QString,QString> > options = VideoDisplayProfile::GetDeinterlacers();
-    QList<QPair<QString,QString> >::const_iterator it = options.cbegin();
-    for ( ; it != options.cend(); ++it)
+    foreach (const auto & option, options)
     {
-        m_singleDeint->addSelection(it->second, it->first);
-        m_doubleDeint->addSelection(it->second, it->first);
+        m_singleDeint->addSelection(option.second, option.first);
+        m_doubleDeint->addSelection(option.second, option.first);
     }
 
     m_maxCpus->setHelpText(

@@ -200,8 +200,7 @@ void ThemeChooser::Load(void)
         if (pos > -1)
         {
             QString subversion;
-            int idx = subexp.cap(1).toInt();
-            for ( ; idx > 0; --idx)
+            for (int idx = subexp.cap(1).toInt(); idx > 0; --idx)
             {
                 subversion = MythVersion + "." + QString::number(idx);
                 LOG(VB_GUI, LOG_INFO, QString("Loading themes for %1").arg(subversion));
@@ -1010,8 +1009,7 @@ ThemeUpdateChecker::ThemeUpdateChecker(void) :
         if (pos > -1)
         {
             QString subversion;
-            int idx = subexp.cap(1).toInt();
-            for ( ; idx > 0; --idx)
+            for (int idx = subexp.cap(1).toInt(); idx > 0; --idx)
                 m_mythVersions << version + "." + QString::number(idx);
         }
         m_mythVersions << version;

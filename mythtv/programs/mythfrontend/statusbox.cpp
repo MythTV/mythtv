@@ -898,11 +898,8 @@ void StatusBox::doTunerStatus()
         }
     }
 
-    QList<int>::iterator it = inputids.begin();
-    for ( ; it != inputids.end(); ++it)
+    foreach (int inputid, inputids)
     {
-        int inputid = *it;
-
         QStringList statuslist;
         if (info[inputid].m_errored)
             statuslist << tr("%1 errored").arg(info[inputid].m_errored);

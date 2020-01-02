@@ -138,12 +138,11 @@ ChannelList ChannelData::channelList(int sourceId)
                                                 ChannelUtil::kChanGroupByChanid,
                                                 sourceId);
 
-    auto it = channelList.begin();
-    for ( ; it != channelList.end(); ++it)
+    for (auto & channel : channelList)
     {
-        QString chanName = (*it).m_name;
+        QString chanName = channel.m_name;
         QString key  = normalizeChannelKey(chanName);
-        retList.insert(key, *it);
+        retList.insert(key, channel);
     }
 
     return retList;
