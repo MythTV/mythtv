@@ -199,6 +199,11 @@ QSize MythDisplay::GetGUIResolution(void)
     return m_guiMode.Resolution();
 }
 
+QRect MythDisplay::GetScreenBounds(void)
+{
+    return m_screenBounds;
+}
+
 /*! \brief Return a pointer to the screen to use.
  *
  * This function looks at the users screen preference, and will return
@@ -380,6 +385,7 @@ void MythDisplay::Initialise(void)
     m_videoModes.clear();
     m_overrideVideoModes.clear();
     UpdateCurrentMode();
+    InitScreenBounds();
 
     // Set the desktop mode - which is the mode at startup. We must always return
     // the screen to this mode.
@@ -437,6 +443,57 @@ void MythDisplay::Initialise(void)
         MythDisplayMode scr(QSize(ow, oh), QSize(mmwidth, mmheight), oaspect, orate);
         m_overrideVideoModes[key] = scr;
     }
+}
+
+
+/*! \brief Get screen size from Qt while respecting the user's multiscreen settings
+ *
+ * If the windowing system environment has multiple screens, then use
+ * QScreen::virtualSize() to get the size of the virtual desktop.
+ * Otherwise QScreen::size() or QScreen::availableSize() will provide
+ * the size of an individual screen.
+*/
+void MythDisplay::InitScreenBounds(void)
+{
+    QList<QScreen*> screens = qGuiApp->screens();
+    for (auto it = screens.cbegin(); it != screens.cend(); ++it)
+    {
+        QRect dim = (*it)->geometry();
+        QString extra = MythDisplay::GetExtraScreenInfo(*it);
+        LOG(VB_GUI, LOG_INFO, LOC + QString("Screen %1: %2x%3 %4")
+            .arg((*it)->name()).arg(dim.width()).arg(dim.height()).arg(extra));
+    }
+
+    QScreen *primary = qGuiApp->primaryScreen();
+    LOG(VB_GUI, LOG_INFO, LOC +QString("Primary screen: %1.").arg(primary->name()));
+
+    int numScreens = MythDisplay::GetScreenCount();
+    QSize dim = primary->virtualSize();
+    LOG(VB_GUI, LOG_INFO, LOC + QString("Total desktop dim: %1x%2, over %3 screen[s].")
+        .arg(dim.width()).arg(dim.height()).arg(numScreens));
+
+    if (MythDisplay::SpanAllScreens())
+    {
+        LOG(VB_GUI, LOG_INFO, LOC + QString("Using entire desktop."));
+        m_screenBounds = primary->virtualGeometry();
+        return;
+    }
+
+    if (GetMythDB()->GetBoolSetting("RunFrontendInWindow", false))
+    {
+        LOG(VB_GUI, LOG_INFO, LOC + "Running in a window");
+        // This doesn't include the area occupied by the
+        // Windows taskbar, or the Mac OS X menu bar and Dock
+        m_screenBounds = m_screen->availableGeometry();
+    }
+    else
+    {
+        m_screenBounds = m_screen->geometry();
+    }
+
+    LOG(VB_GUI, LOG_INFO, LOC + QString("Using screen %1: %2x%3 at %4+%5")
+        .arg(m_screen->name()).arg(m_screenBounds.width()).arg(m_screenBounds.height())
+        .arg(m_screenBounds.left()).arg(m_screenBounds.top()));
 }
 
 /*! \brief Check whether the next mode is larger in size than the current mode.

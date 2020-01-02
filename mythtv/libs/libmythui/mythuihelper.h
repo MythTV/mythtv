@@ -73,9 +73,6 @@ class MUI_PUBLIC MythUIHelper
     void GetScreenSettings(int &xbase, int &width, float &wmult,
                            int &ybase, int &height, float &hmult);
 
-    // This returns the raw (drawable) screen size
-    void GetScreenBounds(int &xbase, int &ybase, int &width, int &height);
-
     // Parse an X11 style command line (-geometry) string
     static void ParseGeometryOverride(const QString &geometry);
     static bool IsGeometryOverridden(void);
@@ -129,8 +126,6 @@ class MUI_PUBLIC MythUIHelper
     QString GetCurrentLocation(bool fullPath = false, bool mainStackOnly = true);
 
     MThreadPool *GetImageThreadPool(void);
-
-    double GetPixelAspectRatio(void) const;
     QSize GetBaseSize(void) const;
 
     void SetFontStretch(int stretch);

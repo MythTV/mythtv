@@ -1203,8 +1203,8 @@ bool TV::Init(bool createWindow)
         m_playerBounds = m_savedGuiBounds;
         if (fullscreen)
         {
-            GetMythUI()->GetScreenBounds(xbase, ybase, width, height);
-            m_playerBounds = QRect(xbase, ybase, width, height);
+            m_playerBounds = MythDisplay::AcquireRelease()->GetScreenBounds();
+            MythDisplay::AcquireRelease(false);
         }
 
         // player window sizing

@@ -38,7 +38,7 @@ void MythDisplayX11::UpdateCurrentMode(void)
         GetEDID(display);
         // MythXDisplay::GetDisplayDimensions is not accurate for multiscreen setups
         // - so use the EDID or XRANDR if that is not available
-        if (GetScreenCount() > 1)
+        if (MythDisplay::GetScreenCount() > 1)
         {
             if (m_edid.Valid() && !m_edid.DisplaySize().isEmpty())
             {

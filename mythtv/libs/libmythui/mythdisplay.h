@@ -30,6 +30,7 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
     static bool  SpanAllScreens        (void);
     static QString GetExtraScreenInfo  (QScreen *qScreen);
 
+    QRect        GetScreenBounds       (void);
     QScreen*     GetCurrentScreen      (void);
     static int   GetScreenCount        (void);
     double       GetPixelAspectRatio   (void);
@@ -70,6 +71,7 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
     static QScreen* GetDesiredScreen   (void);
     static void     DebugScreen        (QScreen *qScreen, const QString &Message);
     void            Initialise         (void);
+    void            InitScreenBounds   (void);
     void            WaitForScreenChange(void);
 
     bool            m_modeComplete     { false };
@@ -87,6 +89,7 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
     static void PauseForModeSwitch(void);
 
     bool            m_initialised      { false };
+    QRect           m_screenBounds     { };
     MythDisplayMode m_desktopMode      { };
     MythDisplayMode m_guiMode          { };
     MythDisplayMode m_videoMode        { };
