@@ -361,14 +361,13 @@ void ScreenSetup::saveData()
     {
         MythUIButtonListItem *item = m_activeList->GetItemAt(i);
         auto *si = item->GetData().value<ScreenListInfo *>();
-        TypeListMap::iterator it = si->m_types.begin();
-        for (; it != si->m_types.end(); ++it)
+        foreach (auto & type, si->m_types)
         {
-            if ((*it).m_src)
+            if (type.m_src)
                 continue;
 
-            notDefined << (*it).m_name;
-            LOG(VB_GENERAL, LOG_ERR, QString("Not defined %1").arg((*it).m_name));
+            notDefined << type.m_name;
+            LOG(VB_GENERAL, LOG_ERR, QString("Not defined %1").arg(type.m_name));
         }
     }
 
@@ -421,13 +420,12 @@ void ScreenSetup::saveData()
                     "weatherscreens_screen_id, weathersourcesettings_sourceid) "
                     "VALUES (:LOC, :ITEM, :SCREENID, :SRCID);";
             db2.prepare(query2);
-            TypeListMap::iterator it = si->m_types.begin();
-            for (; it != si->m_types.end(); ++it)
+            foreach (auto & type, si->m_types)
             {
-                db2.bindValue(":LOC",      (*it).m_location);
-                db2.bindValue(":ITEM",     (*it).m_name);
+                db2.bindValue(":LOC",      type.m_location);
+                db2.bindValue(":ITEM",     type.m_name);
                 db2.bindValue(":SCREENID", screen_id);
-                db2.bindValue(":SRCID",    (*it).m_src->id);
+                db2.bindValue(":SRCID",    type.m_src->id);
                 if (!db2.exec())
                 {
                     LOG(VB_GENERAL, LOG_ERR, db2.executedQuery());
@@ -492,9 +490,9 @@ void ScreenSetup::doListSelect(MythUIButtonListItem *selected)
         auto *si = selected->GetData().value<ScreenListInfo *>();
         QStringList type_strs;
 
-        TypeListMap::iterator it = si->m_types.begin();
         TypeListMap types;
-        for (; it != si->m_types.end(); ++it)
+        // NOLINTNEXTLINE(modernize-loop-convert)
+        for (auto it = si->m_types.begin(); it != si->m_types.end(); ++it)
         {
             types.insert(it.key(), *it);
             type_strs << it.key();
@@ -648,10 +646,9 @@ void ScreenSetup::customEvent(QEvent *event)
         {
             auto *si = dce->GetData().value<ScreenListInfo *>();
 
-            TypeListMap::iterator it = si->m_types.begin();
-            for (; it != si->m_types.end(); ++it)
+            foreach (auto & type, si->m_types)
             {
-                if ((*it).m_location.isEmpty())
+                if (type.m_location.isEmpty())
                     return;
             }
 
@@ -865,9 +862,8 @@ LocationDialog::LocationDialog(MythScreenStack *parent, const QString &name,
       m_locationEdit(nullptr),m_searchButton(nullptr),
       m_resultsText(nullptr), m_sourceText(nullptr)
 {
-    TypeListMap::iterator it = si->m_types.begin();
-    for (; it != si->m_types.end(); ++it)
-        m_types << (*it).m_name;
+    foreach (auto & type, si->m_types)
+        m_types << type.m_name;
 }
 
 LocationDialog::~LocationDialog()
@@ -1020,8 +1016,9 @@ void LocationDialog::itemClicked(MythUIButtonListItem *item)
     auto *ri = item->GetData().value<ResultListInfo *>();
     if (ri)
     {
-        TypeListMap::iterator it = m_screenListInfo->m_types.begin();
-        for (; it != m_screenListInfo->m_types.end(); ++it)
+        // NOLINTNEXTLINE(modernize-loop-convert)
+        for (auto it = m_screenListInfo->m_types.begin();
+             it != m_screenListInfo->m_types.end(); ++it)
         {
             (*it).m_location = ri->idstr;
             (*it).m_src      = ri->src;

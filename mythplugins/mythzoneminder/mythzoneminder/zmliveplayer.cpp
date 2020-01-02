@@ -167,10 +167,8 @@ ZMLivePlayer::~ZMLivePlayer()
     if (m_players)
     {
         QString s = "";
-        auto i = m_players->begin();
-        for (; i != m_players->end(); ++i)
+        for (auto p : *m_players)
         {
-            Player *p = *i;
             if (s != "")
                 s += ",";
             s += QString("%1").arg(p->getMonitor()->id);

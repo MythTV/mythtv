@@ -72,6 +72,7 @@ void GameScannerThread::verifyFiles()
         if (!romfile.isEmpty())
         {
             bool found = false;
+            // NOLINTNEXTLINE(modernize-loop-convert)
             for (auto p2 = m_files.begin(); p2 != m_files.end(); ++p2)
             {
                 if ((*p2).romfile == romfile &&

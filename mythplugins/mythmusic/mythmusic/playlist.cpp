@@ -476,11 +476,9 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
         default:
         {
             // copy the raw song list to the shuffled track list
-            SongList::const_iterator it = m_songs.begin();
-            for (; it != m_songs.end(); ++it)
-            {
+            // NOLINTNEXTLINE(modernize-loop-convert)
+            for (auto it = m_songs.begin(); it != m_songs.end(); ++it)
                 m_shuffledSongs.append(*it);
-            }
 
             break;
         }
@@ -652,10 +650,9 @@ void Playlist::fillSongsFromSonglist(const QString& songList)
     bool badTrack = false;
 
     QStringList list = songList.split(",", QString::SkipEmptyParts);
-    QStringList::iterator it = list.begin();
-    for (; it != list.end(); ++it)
+    foreach (auto & song, list)
     {
-        MusicMetadata::IdType id = (*it).toUInt();
+        MusicMetadata::IdType id = song.toUInt();
         int repo = ID_TO_REPO(id);
         if (repo == RT_Radio)
         {
@@ -757,13 +754,12 @@ void Playlist::fillSonglistFromQuery(const QString& whereClause,
         case PL_INSERTAFTERCURRENT:
         {
             QStringList list = orig_songlist.split(",", QString::SkipEmptyParts);
-            QStringList::iterator it = list.begin();
             bool bFound = false;
             QString tempList;
-            for (; it != list.end(); ++it)
+            foreach (auto & song, list)
             {
-                int an_int = (*it).toInt();
-                tempList += "," + *it;
+                int an_int = song.toInt();
+                tempList += "," + song;
                 if (!bFound && an_int == currentTrackID)
                 {
                     bFound = true;
@@ -827,13 +823,12 @@ void Playlist::fillSonglistFromList(const QList<int> &songList,
         case PL_INSERTAFTERCURRENT:
         {
             QStringList list = orig_songlist.split(",", QString::SkipEmptyParts);
-            QStringList::iterator it = list.begin();
             bool bFound = false;
             QString tempList;
-            for (; it != list.end(); ++it)
+            foreach (auto & song, list)
             {
-                int an_int = (*it).toInt();
-                tempList += "," + *it;
+                int an_int = song.toInt();
+                tempList += "," + song;
                 if (!bFound && an_int == currentTrackID)
                 {
                     bFound = true;
@@ -1077,13 +1072,12 @@ QString Playlist::removeDuplicateTracks(const QString &orig_songlist, const QStr
 {
     QStringList curList = orig_songlist.split(",", QString::SkipEmptyParts);
     QStringList newList = new_songlist.split(",", QString::SkipEmptyParts);
-    QStringList::iterator it = newList.begin();
     QString songlist;
 
-    for (; it != newList.end(); ++it)
+    foreach (auto & song, newList)
     {
-        if (curList.indexOf(*it) == -1)
-            songlist += "," + *it;
+        if (curList.indexOf(song) == -1)
+            songlist += "," + song;
     }
     songlist.remove(0, 1);
     return songlist;

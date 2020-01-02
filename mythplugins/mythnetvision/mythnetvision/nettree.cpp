@@ -532,23 +532,21 @@ void NetTree::FillTree()
         rssGeneric->SetData(QString("%1/mythnetvision/icons/rss.png")
                             .arg(GetShareDir()));
 
-        RSSSite::rssList::iterator i = m_rssList.begin();
-        for (; i != m_rssList.end(); ++i)
+        foreach (auto & feed, m_rssList)
         {
-            ResultItem::resultList items = getRSSArticles((*i)->GetTitle(),
+            ResultItem::resultList items = getRSSArticles(feed->GetTitle(),
                                                           VIDEO_PODCAST);
             auto *ret =
-                new MythGenericTree((*i)->GetTitle(), kSubFolder, false);
-            ret->SetData(qVariantFromValue(*i));
+                new MythGenericTree(feed->GetTitle(), kSubFolder, false);
+            ret->SetData(qVariantFromValue(feed));
             rssGeneric->addNode(ret);
 
             // Add an upfolder
             if (m_type != DLG_TREE)
                 ret->addNode(tr("Back"), kUpFolder, true, false);
 
-            ResultItem::resultList::iterator it = items.begin();
-            for (; it != items.end(); ++it)
-                AddFileNode(ret, *it);
+            foreach (auto & item, items)
+                AddFileNode(ret, item);
             SetSubfolderData(ret);
         }
 

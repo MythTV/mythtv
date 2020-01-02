@@ -182,13 +182,12 @@ void MythNews::loadSites(void)
     }
     std::sort(m_newsSites.begin(), m_newsSites.end(), NewsSite::sortByName);
 
-    auto it = m_newsSites.begin();
-    for (; it != m_newsSites.end(); ++it)
+    for (auto & site : m_newsSites)
     {
-        auto *item = new MythUIButtonListItem(m_sitesList, (*it)->name());
-        item->SetData(qVariantFromValue(*it));
+        auto *item = new MythUIButtonListItem(m_sitesList, site->name());
+        item->SetData(qVariantFromValue(site));
 
-        connect(*it, SIGNAL(finished(NewsSite*)),
+        connect(site, SIGNAL(finished(NewsSite*)),
                 this, SLOT(slotNewsRetrieved(NewsSite*)));
     }
 
@@ -455,13 +454,12 @@ void MythNews::slotRetrieveNews(void)
 
     m_retrieveTimer->stop();
 
-    auto it = m_newsSites.begin();
-    for (; it != m_newsSites.end(); ++it)
+    for (auto & site : m_newsSites)
     {
-        if ((*it)->timeSinceLastUpdate() > m_updateFreq)
-            (*it)->retrieve();
+        if (site->timeSinceLastUpdate() > m_updateFreq)
+            site->retrieve();
         else
-            processAndShowNews(*it);
+            processAndShowNews(site);
     }
 
     m_retrieveTimer->stop();
@@ -492,11 +490,10 @@ void MythNews::cancelRetrieve(void)
 {
     QMutexLocker locker(&m_lock);
 
-    auto it = m_newsSites.begin();
-    for (; it != m_newsSites.end(); ++it)
+    for (auto & site : m_newsSites)
     {
-        (*it)->stop();
-        processAndShowNews(*it);
+        site->stop();
+        processAndShowNews(site);
     }
 }
 
@@ -523,12 +520,11 @@ void MythNews::processAndShowNews(NewsSite *site)
     m_articles.clear();
 
     NewsArticle::List articles = site->GetArticleList();
-    auto it = articles.begin();
-    for (; it != articles.end(); ++it)
+    for (auto & article : articles)
     {
         auto *item =
-            new MythUIButtonListItem(m_articlesList, (*it).title());
-        m_articles[item] = *it;
+            new MythUIButtonListItem(m_articlesList, article.title());
+        m_articles[item] = article;
     }
 
     if (m_articlesList->MoveToNamedPosition(currItem))
@@ -550,11 +546,10 @@ void MythNews::slotSiteSelected(MythUIButtonListItem *item)
     m_articles.clear();
 
     NewsArticle::List articles = site->GetArticleList();
-    auto it = articles.begin();
-    for (; it != articles.end(); ++it)
+    for (auto & article : articles)
     {
-        auto *blitem = new MythUIButtonListItem(m_articlesList, (*it).title());
-        m_articles[blitem] = *it;
+        auto *blitem = new MythUIButtonListItem(m_articlesList, article.title());
+        m_articles[blitem] = article;
     }
 
     updateInfoView(item);

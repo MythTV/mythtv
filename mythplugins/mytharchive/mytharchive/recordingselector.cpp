@@ -195,12 +195,8 @@ void RecordingSelector::selectAll()
          m_selectedList.takeFirst();
     m_selectedList.clear();
 
-    auto i = m_recordingList->begin();
-    for ( ; i != m_recordingList->end(); ++i)
-    {
-        ProgramInfo *p = *i;
+    for (auto p : *m_recordingList)
         m_selectedList.append(p);
-    }
 
     updateRecordingList();
 }
@@ -371,11 +367,8 @@ void RecordingSelector::updateRecordingList(void)
 
     if (m_categorySelector)
     {
-        auto i = m_recordingList->begin();
-        for ( ; i != m_recordingList->end(); ++i)
+        for (auto p : *m_recordingList)
         {
-            ProgramInfo *p = *i;
-
             if (p->GetTitle() == m_categorySelector->GetValue() ||
                 m_categorySelector->GetValue() == tr("All Recordings"))
             {

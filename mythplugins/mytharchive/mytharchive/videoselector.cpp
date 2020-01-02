@@ -155,12 +155,8 @@ void VideoSelector::selectAll()
          m_selectedList.takeFirst();
     m_selectedList.clear();
 
-    auto i = m_videoList->begin();
-    for ( ; i != m_videoList->end(); ++i)
-    {
-        VideoInfo *v = *i;
+    for (auto v : *m_videoList)
         m_selectedList.append(v);
-    }
 
     updateVideoList();
 }
@@ -329,11 +325,8 @@ void VideoSelector::updateVideoList(void)
 
     if (m_categorySelector)
     {
-        auto i = m_videoList->begin();
-        for ( ; i != m_videoList->end(); ++i)
+        for (auto v : *m_videoList)
         {
-            VideoInfo *v = *i;
-
             if (v->category == m_categorySelector->GetValue() ||
                 m_categorySelector->GetValue() == tr("All Videos"))
             {
@@ -486,11 +479,8 @@ void VideoSelector::getVideoList(void)
 
     if (m_videoList && !m_videoList->empty())
     {
-        auto i = m_videoList->begin();
-        for ( ; i != m_videoList->end(); ++i)
+        for (auto v : *m_videoList)
         {
-            VideoInfo *v = *i;
-
             if (categories.indexOf(v->category) == -1)
                 categories.append(v->category);
         }
