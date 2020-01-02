@@ -67,11 +67,9 @@ class MUI_PUBLIC MythUIHelper
     static bool IsTopScreenInitialized(void);
 
     // which the user may have set to be different from the raw screen size
-    void GetScreenSettings(float &wmult, float &hmult);
-    void GetScreenSettings(int &width, float &wmult,
-                           int &height, float &hmult);
-    void GetScreenSettings(int &xbase, int &width, float &wmult,
-                           int &ybase, int &height, float &hmult);
+    void GetScreenSettings(QRect &Rect, float &XFactor, float &YFactor);
+    void GetScreenSettings(QSize &Size, float &XFactor, float &YFactor);
+    void GetScreenSettings(float &XFactor, float &YFactor);
 
     // Parse an X11 style command line (-geometry) string
     static void ParseGeometryOverride(const QString &geometry);

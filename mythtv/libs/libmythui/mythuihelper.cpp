@@ -110,8 +110,7 @@ public:
     float m_hmult                            {1.0F};
 
     // Dimensions of the theme
-    int m_baseWidth                          {800};
-    int m_baseHeight                         {600};
+    QSize m_baseSize                         { 800, 600 };
     bool m_isWide                            {false};
 
     QMap<QString, MythImage *> m_imageCache;
@@ -133,14 +132,8 @@ public:
 #endif
 
     // The part of the screen(s) allocated for the GUI. Unless
-    // overridden by the user, defaults to drawable area above.
-    int m_screenxbase                        {0};
-    int m_screenybase                        {0};
-
-    // The part of the screen(s) allocated for the GUI. Unless
-    // overridden by the user, defaults to drawable area above.
-    int m_screenwidth                        {0};
-    int m_screenheight                       {0};
+    // overridden by the user, defaults to the full drawable area.
+    QRect m_screenRect                       { 0, 0, 0, 0};
 
     // Command-line GUI size, which overrides both the above sets of sizes
     static int x_override;
@@ -229,32 +222,23 @@ void MythUIHelperPrivate::StoreGUIsettings()
         GetMythDB()->OverrideSettingForSession("GuiHeight", QString::number(h_override));
     }
 
-    m_screenxbase  = GetMythDB()->GetNumSetting("GuiOffsetX");
-    m_screenybase  = GetMythDB()->GetNumSetting("GuiOffsetY");
-
-    m_screenwidth = m_screenheight = 0;
-    GetMythDB()->GetResolutionSetting("Gui", m_screenwidth, m_screenheight);
+    int x = GetMythDB()->GetNumSetting("GuiOffsetX");
+    int y = GetMythDB()->GetNumSetting("GuiOffsetY");
+    int width = 0;
+    int height = 0;
+    GetMythDB()->GetResolutionSetting("Gui", width, height);
 
     if (!m_display)
         m_display = MythDisplay::AcquireRelease();
     QRect screenbounds = m_display->GetScreenBounds();
 
-    // If any of these was _not_ set by the user,
-    // (i.e. they are 0) use the whole-screen defaults
+    // As per MythMainWindow::Init, fullscreen is indicated by all zero's in settings
+    if (x == 0 && y == 0 && width == 0 && height == 0)
+        m_screenRect = screenbounds;
+    else
+        m_screenRect = QRect(x, y, width, height);
 
-    if (!m_screenxbase)
-        m_screenxbase = screenbounds.left();
-
-    if (!m_screenybase)
-        m_screenybase = screenbounds.top();
-
-    if (!m_screenwidth)
-        m_screenwidth = screenbounds.width();
-
-    if (!m_screenheight)
-        m_screenheight = screenbounds.height();
-
-    if (m_screenheight < 160 || m_screenwidth < 160)
+    if (m_screenRect.width() < 160 || m_screenRect.height() < 160)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             "Somehow, your screen size settings are bad.\n\t\t\t" +
@@ -264,16 +248,14 @@ void MythUIHelperPrivate::StoreGUIsettings()
             .arg(GetMythDB()->GetNumSetting("GuiWidth")) +
             QString("  old GuiHeight: %1\n\t\t\t")
             .arg(GetMythDB()->GetNumSetting("GuiHeight")) +
-            QString("width: %1").arg(screenbounds.width()) +
-            QString("height: %1\n\t\t\t").arg(screenbounds.height()) +
+            QString("width: %1 ").arg(m_screenRect.width()) +
+            QString("height: %1\n\t\t\t").arg(m_screenRect.height()) +
             "Falling back to 640x480");
-
-        m_screenwidth  = 640;
-        m_screenheight = 480;
+        m_screenRect.setSize(QSize(640, 480));
     }
 
-    m_wmult = m_screenwidth  / static_cast<float>(m_baseWidth);
-    m_hmult = m_screenheight / static_cast<float>(m_baseHeight);
+    m_wmult = m_screenRect.width()  / static_cast<float>(m_baseSize.width());
+    m_hmult = m_screenRect.height() / static_cast<float>(m_baseSize.height());
 
     // Default font, _ALL_ fonts inherit from this!
     // e.g All fonts will be 19 pixels unless a new size is explicitly defined.
@@ -361,12 +343,11 @@ void MythUIHelper::LoadQtConfig(void)
     if (themeinfo)
     {
         d->m_isWide = themeinfo->IsWide();
-        d->m_baseWidth = themeinfo->GetBaseRes()->width();
-        d->m_baseHeight = themeinfo->GetBaseRes()->height();
+        d->m_baseSize = themeinfo->GetBaseRes();
         d->m_themename = themeinfo->GetName();
         LOG(VB_GUI, LOG_INFO, LOC +
             QString("Using theme base resolution of %1x%2")
-            .arg(d->m_baseWidth).arg(d->m_baseHeight));
+            .arg(d->m_baseSize.width()).arg(d->m_baseSize.height()));
         delete themeinfo;
     }
 
@@ -654,8 +635,8 @@ QString MythUIHelper::GetThemeCacheDir(void)
     static QString s_oldcachedir;
     QString tmpcachedir = GetThemeBaseCacheDir() + "/" +
                           GetMythDB()->GetSetting("Theme", DEFAULT_UI_THEME) +
-                          "." + QString::number(d->m_screenwidth) +
-                          "." + QString::number(d->m_screenheight);
+                          "." + QString::number(d->m_screenRect.width()) +
+                          "." + QString::number(d->m_screenRect.height());
 
     if (tmpcachedir != s_oldcachedir)
     {
@@ -846,33 +827,24 @@ void MythUIHelper::PruneCacheDir(const QString& dirname)
         .arg(kept).arg(deleted).arg(errcnt));
 }
 
-void MythUIHelper::GetScreenSettings(float &wmult, float &hmult)
+void MythUIHelper::GetScreenSettings(float &XFactor, float &YFactor)
 {
-    wmult = d->m_wmult;
-    hmult = d->m_hmult;
+    XFactor = d->m_wmult;
+    YFactor = d->m_hmult;
 }
 
-void MythUIHelper::GetScreenSettings(int &width, float &wmult,
-                                     int &height, float &hmult)
+void MythUIHelper::GetScreenSettings(QSize &Size, float &XFactor, float &YFactor)
 {
-    height = d->m_screenheight;
-    width = d->m_screenwidth;
-
-    wmult = d->m_wmult;
-    hmult = d->m_hmult;
+    XFactor = d->m_wmult;
+    YFactor = d->m_hmult;
+    Size    = d->m_screenRect.size();
 }
 
-void MythUIHelper::GetScreenSettings(int &xbase, int &width, float &wmult,
-                                     int &ybase, int &height, float &hmult)
+void MythUIHelper::GetScreenSettings(QRect &Rect, float &XFactor, float &YFactor)
 {
-    xbase  = d->m_screenxbase;
-    ybase  = d->m_screenybase;
-
-    height = d->m_screenheight;
-    width = d->m_screenwidth;
-
-    wmult = d->m_wmult;
-    hmult = d->m_hmult;
+    XFactor = d->m_wmult;
+    YFactor = d->m_hmult;
+    Rect    = d->m_screenRect;
 }
 
 /**
@@ -1564,7 +1536,7 @@ MThreadPool *MythUIHelper::GetImageThreadPool(void)
 
 QSize MythUIHelper::GetBaseSize(void) const
 {
-    return {d->m_baseWidth, d->m_baseHeight};
+    return d->m_baseSize;
 }
 
 void MythUIHelper::SetFontStretch(int stretch)

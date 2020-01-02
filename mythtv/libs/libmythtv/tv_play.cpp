@@ -1176,19 +1176,14 @@ bool TV::Init(bool createWindow)
                                  GetMythMainWindow()->size());
 
         // adjust for window manager wierdness.
-        int xbase;
-        int width;
-        int ybase;
-        int height;
-        float wmult;
-        float hmult;
-        GetMythUI()->GetScreenSettings(xbase, width, wmult,
-                                       ybase, height, hmult);
-        if ((abs(m_savedGuiBounds.x()-xbase) < 3) &&
-            (abs(m_savedGuiBounds.y()-ybase) < 3))
+        float dummy1 = 0.0F;
+        float dummy2 = 0.0F;
+        QRect screen;
+        GetMythUI()->GetScreenSettings(screen, dummy1, dummy2);
+        if ((abs(m_savedGuiBounds.x() - screen.left()) < 3) &&
+            (abs(m_savedGuiBounds.y() - screen.top()) < 3))
         {
-            m_savedGuiBounds = QRect(QPoint(xbase, ybase),
-                                     mainwindow->size());
+            m_savedGuiBounds = QRect(screen.topLeft(), mainwindow->size());
         }
 
         // if width && height are zero users expect fullscreen playback

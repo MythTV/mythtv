@@ -102,11 +102,10 @@ bool MythUIVirtualKeyboard::Create()
     loadKeyDefinitions(gCoreContext->GetLanguageAndVariant());
     updateKeys(true);
 
-    int screenWidth = 0;
-    int screenHeight = 0;
-    float xmult = 0;
-    float ymult = 0;
-    GetMythUI()->GetScreenSettings(screenWidth, xmult, screenHeight, ymult);
+    QSize screensize;
+    float dummy1 = 0;
+    float dummy2 = 0;
+    GetMythUI()->GetScreenSettings(screensize, dummy1, dummy2);
     MythRect editArea = m_parentEdit->GetArea();
     MythRect area = GetArea();
     MythPoint newPos;
@@ -136,20 +135,20 @@ bool MythUIVirtualKeyboard::Create()
             break;
 
         case VK_POSTOPDIALOG:
-            newPos = QPoint(screenWidth / 2 - area.width() / 2, 5);
+            newPos = QPoint(screensize.width() / 2 - area.width() / 2, 5);
             break;
 
         case VK_POSBOTTOMDIALOG:
-            newPos = QPoint(screenWidth / 2 - area.width() / 2, screenHeight - 5 - area.height());
+            newPos = QPoint(screensize.width() / 2 - area.width() / 2, screensize.height() - 5 - area.height());
             break;
 
         case VK_POSCENTERDIALOG:
-            newPos = QPoint(screenWidth / 2 - area.width() / 2, screenHeight / 2 - area.height() / 2);
+            newPos = QPoint(screensize.width() / 2 - area.width() / 2, screensize.height() / 2 - area.height() / 2);
             break;
 
         default:
             // VK_POSBELOWEDIT
-            if (editArea.y() + editArea.height() + area.height() + 5 < screenHeight)
+            if (editArea.y() + editArea.height() + area.height() + 5 < screensize.height())
             {
                 newPos = QPoint(editArea.x() + editArea.width() / 2 - area.width() / 2,
                                 editArea.y() + editArea.height() + 5);
@@ -165,12 +164,12 @@ bool MythUIVirtualKeyboard::Create()
     // make sure the popup doesn't go off screen
     if (newPos.x() < 5)
         newPos.setX(5);
-    if (newPos.x() + area.width() + 5 > screenWidth)
-        newPos.setX(screenWidth - area.width() - 5);
+    if (newPos.x() + area.width() + 5 > screensize.width())
+        newPos.setX(screensize.width() - area.width() - 5);
     if (newPos.y() < 5)
         newPos.setY(5);
-    if (newPos.y() + area.height() + 5 > screenHeight)
-        newPos.setY(screenHeight - area.height() - 5);
+    if (newPos.y() + area.height() + 5 > screensize.width())
+        newPos.setY(screensize.width() - area.height() - 5);
 
     SetPosition(newPos);
 

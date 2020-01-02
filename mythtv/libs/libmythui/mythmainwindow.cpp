@@ -134,14 +134,8 @@ class MythMainWindowPrivate
 
     float                m_wmult                {1.0F};
     float                m_hmult                {1.0F};
-    int                  m_screenwidth          {0};
-    int                  m_screenheight         {0};
-
     QRect                m_screenRect;
     QRect                m_uiScreenRect;
-
-    int                  m_xbase                {0};
-    int                  m_ybase                {0};
     bool                 m_doesFillScreen       {false};
 
     bool                 m_ignoreLircKeys       {false};
@@ -979,8 +973,7 @@ void MythMainWindow::Init(bool mayReInit)
     if ( !(mayReInit || d->m_firstinit) )
         return;
 
-    GetMythUI()->GetScreenSettings(d->m_xbase, d->m_screenwidth, d->m_wmult,
-                                   d->m_ybase, d->m_screenheight, d->m_hmult);
+    GetMythUI()->GetScreenSettings(d->m_screenRect, d->m_wmult, d->m_hmult);
 
     d->m_doesFillScreen =
         (GetMythDB()->GetNumSetting("GuiOffsetX") == 0 &&
@@ -1046,12 +1039,9 @@ void MythMainWindow::Init(bool mayReInit)
 
     QTimer::singleShot(1000, this, SLOT(DelayedAction()));
 
-    d->m_screenRect = QRect(d->m_xbase, d->m_ybase, d->m_screenwidth, d->m_screenheight);
-    d->m_uiScreenRect = QRect(0, 0, d->m_screenwidth, d->m_screenheight);
-
+    d->m_uiScreenRect = QRect(QPoint(0, 0), d->m_screenRect.size());
     LOG(VB_GENERAL, LOG_INFO, QString("UI Screen Resolution: %1 x %2")
-        .arg(d->m_screenwidth).arg(d->m_screenheight));
-
+        .arg(d->m_screenRect.width()).arg(d->m_screenRect.height()));
     MoveResize(d->m_screenRect);
     Show();
 
@@ -1060,7 +1050,7 @@ void MythMainWindow::Init(bool mayReInit)
     // Set cursor call must come after Show() to work on some systems.
     ShowMouseCursor(false);
 
-    move(d->m_xbase, d->m_ybase);
+    move(d->m_screenRect.topLeft());
 
     if (d->m_paintwin)
     {
