@@ -28,41 +28,72 @@ bool MythDisplayX11::IsAvailable(void)
     return s_available;
 }
 
+/*! \brief Retrieve details for the current video mode.
+ *
+ * The Qt default implementation tends to get the details correct but only uses
+ * an integer refresh rate for some backends.
+ *
+ * The MythXDisplay methods now use the modeline to get accurate refresh, resolution
+ * and display size details regardless of the number of displays connected - but
+ * the closed source NVidia drivers do their own thing and return fictitious
+ * modelines for mutiple connected displays.
+ *
+ * So we now use the Qt defaults and override where possible with XRANDR versions.
+ * If XRANDR is not available we try and get a more accurate refresh rate only.
+*/
 void MythDisplayX11::UpdateCurrentMode(void)
 {
+    // Get some Qt basics first
+    MythDisplay::UpdateCurrentMode();
+
     MythXDisplay *display = MythXDisplay::OpenMythXDisplay();
     if (display)
     {
-        m_refreshRate  = display->GetRefreshRate();
-        m_resolution   = display->GetDisplaySize();
-        GetEDID(display);
-        if (m_edid.Valid() && !m_edid.DisplaySize().isEmpty())
-        {
-            m_physicalSize = m_edid.DisplaySize();
-        }
-        else
-        {
 #ifdef USING_XRANDR
-            XRRScreenResources* res = XRRGetScreenResourcesCurrent(display->GetDisplay(), display->GetRoot());
-            XRROutputInfo *output = GetOutput(res, display, m_screen);
-            if (output)
-            {
-                m_physicalSize = QSize(static_cast<int>(output->mm_width),
-                                       static_cast<int>(output->mm_height));
-                XRRFreeOutputInfo(output);
-            }
-            XRRFreeScreenResources(res);
-#else
-            // N.B. This is usually innacurate for multiscreen setups
-            m_physicalSize = display->GetDisplayDimensions();
-#endif
+        // XRANDR should always be accurate
+        GetEDID(display);
+        XRRScreenResources* res = XRRGetScreenResourcesCurrent(display->GetDisplay(), display->GetRoot());
+        XRROutputInfo *output = GetOutput(res, display, m_screen);
+        if (output)
+        {
+            m_physicalSize = QSize(static_cast<int>(output->mm_width),
+                                   static_cast<int>(output->mm_height));
+            XRRFreeOutputInfo(output);
         }
 
+        if (!m_crtc)
+            (void)GetVideoModes();
+        while (m_crtc && res)
+        {
+            XRRCrtcInfo *currentcrtc = XRRGetCrtcInfo(display->GetDisplay(), res, m_crtc);
+            if (!currentcrtc)
+                break;
+            for (int i = 0; i < res->nmode; ++i)
+            {
+                if (res->modes[i].id != currentcrtc->mode)
+                    continue;
+                XRRModeInfo mode = res->modes[i];
+                m_resolution = QSize(static_cast<int>(mode.width),
+                                     static_cast<int>(mode.height));
+                if (mode.dotClock > 1 && mode.vTotal > 1 && mode.hTotal > 1)
+                {
+                    m_refreshRate = static_cast<double>(mode.dotClock) / (mode.vTotal * mode.hTotal);
+                    if (mode.modeFlags & RR_Interlace)
+                        m_refreshRate *= 2.0;
+                }
+            }
+            XRRFreeCrtcInfo(currentcrtc);
+            break;
+        }
+        XRRFreeScreenResources(res);
+#else
+        // Use Qt version apart from refresh rate
+        m_refreshRate  = display->GetRefreshRate();
+#endif
         delete display;
         m_modeComplete = true;
         return;
     }
-    MythDisplay::UpdateCurrentMode();
 }
 
 #ifdef USING_XRANDR
