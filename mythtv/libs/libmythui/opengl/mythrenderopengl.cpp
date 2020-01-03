@@ -1211,6 +1211,17 @@ void MythRenderOpenGL::ReleaseResources(void)
         LOG(VB_GENERAL, LOG_ERR, LOC + QString(" %1 unexpired VBOs").arg(m_cachedVertices.size()));
 }
 
+QStringList MythRenderOpenGL::GetDescription(void)
+{
+    QStringList result;
+    result.append(tr("QPA platform")    + "\t: " + QGuiApplication::platformName());
+    result.append(tr("OpenGL vendor")   + "\t: " + reinterpret_cast<const char*>(glGetString(GL_VENDOR)));
+    result.append(tr("OpenGL renderer") + "\t: " + reinterpret_cast<const char*>(glGetString(GL_RENDERER)));
+    result.append(tr("OpenGL version")  + "\t: " + reinterpret_cast<const char*>(glGetString(GL_VERSION)));
+    result.append(tr("Maximum depth")   + "\t: " + QString::number(GetColorDepth()));
+    return result;
+}
+
 bool MythRenderOpenGL::UpdateTextureVertices(MythGLTexture *Texture, const QRect &Source,
                                              const QRect &Destination, int Rotation)
 {

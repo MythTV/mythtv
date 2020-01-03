@@ -114,6 +114,42 @@ MythDisplay* MythDisplay::AcquireRelease(bool Acquire)
     return s_display;
 }
 
+QStringList MythDisplay::GetDescription(void)
+{
+    QStringList result;
+    int screencount = MythDisplay::GetScreenCount();
+    MythDisplay* display = MythDisplay::AcquireRelease();
+
+    if (MythDisplay::SpanAllScreens() && screencount > 1)
+    {
+        result.append(tr("Spanning %1 screens").arg(screencount));
+        result.append(tr("Total bounds") + QString("\t: %1x%2")
+                      .arg(display->GetScreenBounds().width())
+                      .arg(display->GetScreenBounds().height()));
+        MythDisplay::AcquireRelease(false);
+        return result;
+    }
+
+    QScreen *screen = display->GetCurrentScreen();
+    if (screen)
+    {
+        result.append(tr("Screen %1 %2:").arg(screen->name())
+#if QT_VERSION >= QT_VERSION_CHECK(5, 9, 0)
+                .arg(QString("(%1)").arg(screen->manufacturer())));
+#else
+                .arg(""));
+#endif
+    }
+    result.append(tr("Size and aspect") + QString("\t: %1mmx%2mm %3")
+            .arg(display->GetPhysicalSize().width()).arg(display->GetPhysicalSize().height())
+            .arg(display->GetAspectRatio(), 0, 'f', 1));
+    result.append(tr("Current mode") + QString("\t: %1x%2@%3Hz")
+                  .arg(display->GetResolution().width()).arg(display->GetResolution().height())
+                  .arg(display->GetRefreshRate(), 0, 'f', 2));
+    MythDisplay::AcquireRelease(false);
+    return result;
+}
+
 MythDisplay::MythDisplay()
   : ReferenceCounter("Display")
 {

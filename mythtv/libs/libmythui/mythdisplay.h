@@ -23,6 +23,7 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
 
   public:
     static MythDisplay* AcquireRelease(bool Acquire = true);
+    static QStringList  GetDescription(void);
 
     virtual bool  UsingVideoModes(void) { return false; }
     virtual const vector<MythDisplayMode>& GetVideoModes(void);
