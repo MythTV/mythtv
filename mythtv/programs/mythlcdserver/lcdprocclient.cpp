@@ -954,18 +954,16 @@ void LCDProcClient::formatScrollingWidgets()
         return; // Weird...
 
     int max_len = 0;
-    QList<LCDTextItem>::iterator it = m_lcdTextItems->begin();
 
     // Get the length of the longest item to scroll
-    for(; it != m_lcdTextItems->end(); ++it)
+    foreach (auto item, *m_lcdTextItems)
     {
-        LCDTextItem *curItem = &(*it);
-        if (curItem->getText().length() > max_len)
-            max_len = curItem->getText().length();
+        if (item.getText().length() > max_len)
+            max_len = item.getText().length();
     }
 
     // Make all scrollable items the same lenght and do the initial output
-    it = m_lcdTextItems->begin();
+    auto it = m_lcdTextItems->begin();
     while (it != m_lcdTextItems->end())
     {
         LCDTextItem *curItem = &(*it);
@@ -1011,20 +1009,17 @@ void LCDProcClient::scrollWidgets()
     if ( m_lcdTextItems->isEmpty())
         return; // Weird...
 
-    QList<LCDTextItem>::iterator it = m_lcdTextItems->begin();
-
     unsigned int len = 0;
-    for(; it != m_lcdTextItems->end(); ++it)
+    foreach (auto item, *m_lcdTextItems)
     {
-        LCDTextItem *curItem = &(*it);
-        if (curItem->getScroll())
+        if (item.getScroll())
         {
-            // Note that all scrollable items have the same lenght!
-            len = curItem->getText().length();
+            // Note that all scrollable items have the same length!
+            len = item.getText().length();
 
             outputLeftText( m_scrollScreen,
-                        curItem->getText().mid( m_scrollPosition, m_lcdWidth ),
-                        curItem->getWidget(), curItem->getRow());
+                        item.getText().mid( m_scrollPosition, m_lcdWidth ),
+                        item.getWidget(), item.getRow());
         }
     }
 

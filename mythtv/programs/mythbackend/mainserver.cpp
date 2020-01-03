@@ -4395,11 +4395,8 @@ void MainServer::HandleGetFreeInputInfo(PlaybackSock *pbs,
 
     // Loop over each busy input and restrict or delete any free
     // inputs that are in the same group.
-    auto busyiter = busyinputs.begin();
-    for (; busyiter != busyinputs.end(); ++busyiter)
+    for (auto & busyinfo : busyinputs)
     {
-        InputInfo &busyinfo = *busyiter;
-
         auto freeiter = freeinputs.begin();
         while (freeiter != freeinputs.end())
         {

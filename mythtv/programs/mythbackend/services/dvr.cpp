@@ -680,12 +680,8 @@ DTC::EncoderList* Dvr::GetEncoderList()
 
     QReadLocker tvlocker(&TVRec::s_inputsLock);
     QList<InputInfo> inputInfoList = CardUtil::GetAllInputInfo();
-    QMap<int, EncoderLink *>::Iterator iter = tvList.begin();
-
-    for (; iter != tvList.end(); ++iter)
+    foreach (auto elink, tvList)
     {
-        EncoderLink *elink = *iter;
-
         if (elink != nullptr)
         {
             DTC::Encoder *pEncoder = pList->AddNewEncoder();
@@ -702,10 +698,8 @@ DTC::EncoderList* Dvr::GetEncoderList()
             else
                 pEncoder->setHostName( elink->GetHostName() );
 
-            QList<InputInfo>::iterator it = inputInfoList.begin();
-            for (; it < inputInfoList.end(); ++it)
+            foreach (auto inputInfo, inputInfoList)
             {
-                InputInfo inputInfo = *it;
                 if (inputInfo.m_inputId == static_cast<uint>(elink->GetInputID()))
                 {
                     DTC::Input *input = pEncoder->AddNewInput();
@@ -750,10 +744,8 @@ DTC::InputList* Dvr::GetInputList()
     auto *pList = new DTC::InputList();
 
     QList<InputInfo> inputInfoList = CardUtil::GetAllInputInfo();
-    QList<InputInfo>::iterator it = inputInfoList.begin();
-    for (; it < inputInfoList.end(); ++it)
+    foreach (auto inputInfo, inputInfoList)
     {
-        InputInfo inputInfo = *it;
         DTC::Input *input = pList->AddNewInput();
         FillInputInfo(input, inputInfo);
     }
@@ -952,8 +944,8 @@ DTC::ProgramList* Dvr::GetUpcomingList( int  nStartIndex,
         scheduler->GetAllPending(tmpList, nRecordId);
 
     // Sort the upcoming into only those which will record
-    auto it = tmpList.begin();
-    for(; it < tmpList.end(); ++it)
+    // NOLINTNEXTLINE(modernize-loop-convert)
+    for (auto it = tmpList.begin(); it < tmpList.end(); ++it)
     {
         if ((nRecStatus != 0) &&
             ((*it)->GetRecordingStatus() != nRecStatus))
@@ -1033,8 +1025,8 @@ DTC::ProgramList* Dvr::GetConflictList( int  nStartIndex,
         scheduler->GetAllPending(tmpList, nRecordId);
 
     // Sort the upcoming into only those which are conflicts
-    auto it = tmpList.begin();
-    for(; it < tmpList.end(); ++it)
+    // NOLINTNEXTLINE(modernize-loop-convert)
+    for (auto it = tmpList.begin(); it < tmpList.end(); ++it)
     {
         if (((*it)->GetRecordingStatus() == RecStatus::Conflict) &&
             ((*it)->GetRecordingStartTime() >= MythDate::current()))

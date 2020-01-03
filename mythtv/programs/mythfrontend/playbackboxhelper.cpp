@@ -125,12 +125,11 @@ AvailableStatusType PBHEventHandler::CheckAvailability(const QStringList &slist)
     list.push_back(QString::number(tm.second()));
     list.push_back(QString::number(tm.msec()));
 
-    QSet<CheckAvailabilityType>::iterator cit = cats.begin();
-    for (; cit != cats.end(); ++cit)
+    foreach (auto type, cats)
     {
-        if (*cit == kCheckForCache && cats.size() > 1)
+        if (type == kCheckForCache && cats.size() > 1)
             continue;
-        list[1] = QString::number((int)*cit);
+        list[1] = QString::number((int)type);
         auto *e = new MythEvent("AVAILABILITY", list);
         QCoreApplication::postEvent(m_pbh.m_listener, e);
     }

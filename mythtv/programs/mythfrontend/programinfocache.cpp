@@ -21,9 +21,8 @@ static void free_vec(VPI_ptr &v)
 {
     if (v)
     {
-        auto it = v->begin();
-        for (; it != v->end(); ++it)
-            delete *it;
+        for (auto & it : *v)
+            delete it;
         delete v;
         v = nullptr;
     }
@@ -120,13 +119,12 @@ void ProgramInfoCache::Refresh(void)
     if (m_nextCache)
     {
         Clear();
-        auto it = m_nextCache->begin();
-        for (; it != m_nextCache->end(); ++it)
+        for (auto & it : *m_nextCache)
         {
-            if (!(*it)->GetChanID())
+            if (!it->GetChanID())
                 continue;
 
-            m_cache[(*it)->GetRecordingID()] = *it;
+            m_cache[it->GetRecordingID()] = it;
         }
         delete m_nextCache;
         m_nextCache = nullptr;

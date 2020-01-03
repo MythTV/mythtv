@@ -1695,9 +1695,8 @@ void GuideUpdateProgramRow::fillProgramRowInfosWith(int row,
         ts = ts.addSecs(5 * 60);
     }
 
-    auto it = unknownlist.begin();
-    for (; it != unknownlist.end(); ++it)
-        proglist->push_back(*it);
+    for (auto & pi : unknownlist)
+        proglist->push_back(pi);
 
     MythRect programRect = m_ggProgramRect;
 

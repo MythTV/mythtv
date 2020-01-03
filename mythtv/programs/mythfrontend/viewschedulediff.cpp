@@ -99,10 +99,8 @@ void ViewScheduleDiff::showStatus(MythUIButtonListItem */*item*/)
         message += " " + QObject::tr("The following programs will be recorded "
                                      "instead:") + "\n\n";
 
-        ProgramList::const_iterator it = m_recListAfter.begin();
-        for (; it != m_recListAfter.end(); ++it)
+        for (auto pa : m_recListAfter)
         {
-            const ProgramInfo *pa = *it;
             if (pa->GetRecordingStartTime() >= pi->GetRecordingEndTime())
                 break;
             if (pa->GetRecordingEndTime() > pi->GetRecordingStartTime() &&

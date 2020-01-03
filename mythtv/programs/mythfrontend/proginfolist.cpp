@@ -95,11 +95,10 @@ void ProgInfoList::Display(const DataList& data)
     Clear();
 
     // Create buttons for each data pair
-    DataList::const_iterator it = data.begin();
-    for (; it != data.end(); ++it)
+    foreach (const auto & pi, data)
     {
-        if (m_infoVisible != kNone && std::get<2>(*it) <= m_infoVisible)
-            CreateButton(std::get<0>(*it), std::get<1>(*it));
+        if (m_infoVisible != kNone && std::get<2>(pi) <= m_infoVisible)
+            CreateButton(std::get<0>(pi), std::get<1>(pi));
     }
 
     // Only give list focus if requested

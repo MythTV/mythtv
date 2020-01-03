@@ -306,28 +306,26 @@ class PTSListener :
     { return ProcessTSPacket(tspacket); }
     int64_t GetFirstPTS(void) const
     {
-        QMap<uint,uint>::const_iterator it = m_ptsStreams.begin();
         int64_t pts = -1LL;
         uint32_t pts_count = 0;
-        for (; it != m_ptsStreams.end(); ++it)
+        foreach (uint stream, m_ptsStreams)
         {
-            if(m_ptsCount[*it] > pts_count){
-                pts = m_ptsFirst[*it];
-                pts_count = m_ptsCount[*it];
+            if(m_ptsCount[stream] > pts_count){
+                pts = m_ptsFirst[stream];
+                pts_count = m_ptsCount[stream];
             }
         }
         return pts;
     }
     int64_t GetLastPTS(void) const
     {
-        QMap<uint,uint>::const_iterator it = m_ptsStreams.begin();
         int64_t pts = -1LL;
         uint32_t pts_count = 0;
-        for (; it != m_ptsStreams.end(); ++it)
+        foreach (uint stream, m_ptsStreams)
         {
-            if(m_ptsCount[*it] > pts_count){
-                pts = m_ptsLast[*it];
-                pts_count = m_ptsCount[*it];
+            if(m_ptsCount[stream] > pts_count){
+                pts = m_ptsLast[stream];
+                pts_count = m_ptsCount[stream];
             }
         }
         return pts;

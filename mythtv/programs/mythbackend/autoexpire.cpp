@@ -176,9 +176,8 @@ void AutoExpire::CalcParams()
         uint64_t thisKBperMin = 0;
 
         // append unknown recordings to all fsIDs
-        auto unknownfs_it = fsEncoderMap[-1].begin();
-        for (; unknownfs_it != fsEncoderMap[-1].end(); ++unknownfs_it)
-            fsEncoderMap[fsit->getFSysID()].push_back(*unknownfs_it);
+        foreach (auto unknownfs, fsEncoderMap[-1])
+            fsEncoderMap[fsit->getFSysID()].push_back(unknownfs);
 
         if (fsEncoderMap.contains(fsit->getFSysID()))
         {
@@ -189,19 +188,18 @@ void AutoExpire::CalcParams()
                 .arg(fsit->getUsedSpace() / 1024.0 / 1024.0, 7, 'f', 1)
                 .arg(fsit->getFreeSpace() / 1024.0 / 1024.0, 7, 'f', 1));
 
-            auto encit = fsEncoderMap[fsit->getFSysID()].begin();
-            for (; encit != fsEncoderMap[fsit->getFSysID()].end(); ++encit)
+            foreach (auto cardid, fsEncoderMap[fsit->getFSysID()])
             {
-                EncoderLink *enc = *(m_encoderList->find(*encit));
+                EncoderLink *enc = *(m_encoderList->find(cardid));
 
                 if (!enc->IsConnected() || !enc->IsBusy())
                 {
                     // remove encoder since it can't write to any file system
                     LOG(VB_FILE, LOG_INFO, LOC +
                         QString("Cardid %1: is not recoding, removing it "
-                                "from used list.").arg(*encit));
+                                "from used list.").arg(cardid));
                     m_instanceLock.lock();
-                    m_usedEncoders.remove(*encit);
+                    m_usedEncoders.remove(cardid);
                     m_instanceLock.unlock();
                     continue;
                 }
@@ -803,11 +801,8 @@ void AutoExpire::PrintExpireList(const QString& expHost)
     msg += "(programs listed in order of expiration)";
     cout << msg.toLocal8Bit().constData() << endl;
 
-    auto i = expireList.begin();
-    for (; i != expireList.end(); ++i)
+    for (auto first : expireList)
     {
-        ProgramInfo *first = (*i);
-
         if (expHost != "ALL" && first->GetHostname() != expHost)
             continue;
 
@@ -848,9 +843,8 @@ void AutoExpire::GetAllExpiring(QStringList &strList)
 
     strList << QString::number(expireList.size());
 
-    auto it = expireList.begin();
-    for (; it != expireList.end(); ++it)
-        (*it)->ToStringList(strList);
+    for (auto & info : expireList)
+        info->ToStringList(strList);
 
     ClearExpireList(expireList);
 }
@@ -871,9 +865,8 @@ void AutoExpire::GetAllExpiring(pginfolist_t &list)
     FillDBOrdered(expireList, gCoreContext->GetNumSetting("AutoExpireMethod",
                   emOldestFirst));
 
-    auto it = expireList.begin();
-    for (; it != expireList.end(); ++it)
-        list.push_back( new ProgramInfo( *(*it) ));
+    for (auto & info : expireList)
+        list.push_back( new ProgramInfo( *info ));
 
     ClearExpireList(expireList);
 }
@@ -1121,12 +1114,10 @@ bool AutoExpire::IsInDontExpireSet(
 bool AutoExpire::IsInExpireList(
     const pginfolist_t &expireList, uint chanid, const QDateTime &recstartts)
 {
-    pginfolist_t::const_iterator it;
-
-    for (it = expireList.begin(); it != expireList.end(); ++it)
+    for (auto info : expireList)
     {
-        if (((*it)->GetChanID()             == chanid) &&
-            ((*it)->GetRecordingStartTime() == recstartts))
+        if ((info->GetChanID()             == chanid) &&
+            (info->GetRecordingStartTime() == recstartts))
         {
             return true;
         }

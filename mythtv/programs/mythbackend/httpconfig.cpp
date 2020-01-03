@@ -417,7 +417,6 @@ void HttpConfig::PrintSettings(QBuffer &buffer, const MythSettingList &settings)
 {
     QTextStream os(&buffer);
 
-    MythSettingList::const_iterator it = settings.begin();
-    for (; it != settings.end(); ++it)
-        os << (*it)->ToHTML(1);
+    foreach (auto setting, settings)
+        os << setting->ToHTML(1);
 }

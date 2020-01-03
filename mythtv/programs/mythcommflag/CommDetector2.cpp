@@ -166,18 +166,16 @@ long long processFrame(FrameAnalyzerItem &pass,
 
 int passFinished(FrameAnalyzerItem &pass, long long nframes, bool final)
 {
-    auto it = pass.begin();
-    for (; it != pass.end(); ++it)
-        (void)(*it)->finished(nframes, final);
+    for (auto & pas : pass)
+        (void)pas->finished(nframes, final);
 
     return 0;
 }
 
 int passReportTime(const FrameAnalyzerItem &pass)
 {
-    auto it = pass.cbegin();
-    for (; it != pass.cend(); ++it)
-        (void)(*it)->reportTime();
+    for (auto pas : pass)
+        (void)pas->reportTime();
 
     return 0;
 }

@@ -1434,14 +1434,13 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
 
     ProgramList &progList = *pmit;
 
-    auto it = progList.begin();
-    for (; it != progList.end(); ++it)
+    for (auto & prog : progList)
     {
-        if ((*it)->GetAvailableStatus() == asPendingDelete ||
-            (*it)->GetAvailableStatus() == asDeleted)
+        if (prog->GetAvailableStatus() == asPendingDelete ||
+            prog->GetAvailableStatus() == asDeleted)
             continue;
 
-        new PlaybackBoxListItem(this, m_recordingList, *it);
+        new PlaybackBoxListItem(this, m_recordingList, prog);
     }
     m_recordingList->LoadInBackground();
 
@@ -1616,12 +1615,10 @@ bool PlaybackBox::UpdateUILists(void)
 
     if (!m_progLists.isEmpty())
     {
-        auto it = m_progLists[""].begin();
-        auto end = m_progLists[""].end();
-        for (; it != end; ++it)
+        for (auto & prog : m_progLists[""])
         {
-            uint asRecordingID = (*it)->GetRecordingID();
-            asCache[asRecordingID] = (*it)->GetAvailableStatus();
+            uint asRecordingID = prog->GetRecordingID();
+            asCache[asRecordingID] = prog->GetAvailableStatus();
         }
     }
 
@@ -2175,10 +2172,9 @@ bool PlaybackBox::UpdateUILists(void)
     UpdateUIGroupList(groupSelPref);
     UpdateUsageUI();
 
-    QList<uint>::const_iterator it = m_playList.begin();
-    for (; it != m_playList.end(); ++it)
+    foreach (uint id, m_playList)
     {
-        ProgramInfo *pginfo = FindProgramInUILists(*it);
+        ProgramInfo *pginfo = FindProgramInUILists(id);
         if (!pginfo)
             continue;
         MythUIButtonListItem *item =
@@ -3744,12 +3740,10 @@ void PlaybackBox::togglePlayListTitle(void)
 {
     QString groupname = m_groupList->GetItemCurrent()->GetData().toString();
 
-    auto it = m_progLists[groupname].begin();
-    auto end = m_progLists[groupname].end();
-    for (; it != end; ++it)
+    foreach (auto & pl, m_progLists[groupname])
     {
-        if (*it && ((*it)->GetAvailableStatus() == asAvailable))
-            togglePlayListItem(*it);
+        if (pl && (pl->GetAvailableStatus() == asAvailable))
+            togglePlayListItem(pl);
     }
 }
 
@@ -4789,11 +4783,10 @@ void PlaybackBox::ShowPlayGroupChanger(bool use_playlist)
     QStringList displayNames("Default");
 
     QStringList list = PlayGroup::GetNames();
-    QStringList::const_iterator it = list.begin();
-    for (; it != list.end(); ++it)
+    foreach (const auto &name, list)
     {
-        displayNames.push_back(*it);
-        groupNames.push_back(*it);
+        displayNames.push_back(name);
+        groupNames.push_back(name);
     }
 
     QString label = tr("Select Playback Group") +

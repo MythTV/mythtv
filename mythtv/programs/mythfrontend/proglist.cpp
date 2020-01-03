@@ -1541,9 +1541,8 @@ void ProgLister::HandleVisible(MythUIButtonListItem *item)
 
 void ProgLister::UpdateButtonList(void)
 {
-    ProgramList::const_iterator it = m_itemList.begin();
-    for (; it != m_itemList.end(); ++it)
-        new MythUIButtonListItem(m_progList, "", qVariantFromValue(*it));
+    for (auto it : m_itemList)
+        new MythUIButtonListItem(m_progList, "", qVariantFromValue(it));
     m_progList->LoadInBackground();
 
     if (m_positionText)
