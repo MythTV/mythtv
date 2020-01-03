@@ -827,6 +827,11 @@ void MythUIHelper::PruneCacheDir(const QString& dirname)
         .arg(kept).arg(deleted).arg(errcnt));
 }
 
+void MythUIHelper::UpdateScreenSettings(void)
+{
+    d->StoreGUIsettings();
+}
+
 void MythUIHelper::GetScreenSettings(float &XFactor, float &YFactor)
 {
     XFactor = d->m_wmult;

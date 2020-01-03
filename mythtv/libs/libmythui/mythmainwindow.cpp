@@ -970,10 +970,8 @@ void MythMainWindow::Init(bool mayReInit)
 {
     d->m_useDB = ! gCoreContext->GetDB()->SuppressDBMessages();
 
-    if ( !(mayReInit || d->m_firstinit) )
+    if (!(mayReInit || d->m_firstinit))
         return;
-
-    GetMythUI()->GetScreenSettings(d->m_screenRect, d->m_wmult, d->m_hmult);
 
     d->m_doesFillScreen =
         (GetMythDB()->GetNumSetting("GuiOffsetX") == 0 &&
@@ -1032,10 +1030,12 @@ void MythMainWindow::Init(bool mayReInit)
 
     setWindowFlags(flags);
 
-    // NB there may be a chicken and egg problem here with screen dimensions
-    // MythUIHelper will be initialised to the current/default screen but we
-    // may move to a new screen here - which may have different dimensions
+    // SetWidget may move the widget into a new screen.
     d->m_display->SetWidget(this);
+    // Ensure MythUIHelper has latest screen bounds if we have moved
+    GetMythUI()->UpdateScreenSettings();
+    // And use them
+    GetMythUI()->GetScreenSettings(d->m_screenRect, d->m_wmult, d->m_hmult);
 
     QTimer::singleShot(1000, this, SLOT(DelayedAction()));
 

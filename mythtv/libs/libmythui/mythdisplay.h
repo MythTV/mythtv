@@ -73,6 +73,7 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
     void            Initialise         (void);
     void            InitScreenBounds   (void);
     void            WaitForScreenChange(void);
+    void            WaitForNewScreen   (void);
 
     bool            m_modeComplete     { false };
     double          m_refreshRate      { 0.0  };
@@ -89,6 +90,7 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
     static void PauseForModeSwitch(void);
 
     bool            m_initialised      { false };
+    bool            m_firstScreenChange{ true };
     QRect           m_screenBounds     { };
     MythDisplayMode m_desktopMode      { };
     MythDisplayMode m_guiMode          { };

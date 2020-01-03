@@ -149,29 +149,22 @@ void MythDisplay::SetWidget(QWidget *MainWindow)
     QWindow* window = m_widget->windowHandle();
     if (window)
     {
+        connect(window, &QWindow::screenChanged, this, &MythDisplay::ScreenChanged, Qt::UniqueConnection);
         QScreen *desired = GetDesiredScreen();
-        if (desired && (desired != window->screen()))
-        {
-            // If we have changed the video mode for the old screen then reset
-            // it to the default/desktop mode
-            SwitchToDesktop();
-            // Ensure we completely re-initialise when the new screen is set
-            m_initialised = false;
-
-            DebugScreen(desired, "Moving to");
-            // If this is a virtual desktop, move the window into the screen,
-            // otherwise just set the screen - both of which should trigger a
-            // screenChanged event.
-            // TODO Confirm this check for non-virtual screens (OSX?)
-            // TODO If the screens are non-virtual - can we actually safely move?
-            // (SetWidget is only called from MythMainWindow before the render
-            // device is created - so should be safe).
-            if (desired->geometry() == desired->virtualGeometry())
-                window->setScreen(desired);
-            else
-                m_widget->move(desired->geometry().topLeft());
-        }
-        connect(window, &QWindow::screenChanged, this, &MythDisplay::ScreenChanged);
+        // If we have changed the video mode for the old screen then reset
+        // it to the default/desktop mode
+        SwitchToDesktop();
+        // Ensure we completely re-initialise when the new screen is set
+        m_initialised = false;
+        DebugScreen(desired, "Moving to");
+        window->setScreen(desired);
+        // WaitForNewScreen doesn't work as intended. It successfully filters
+        // out unwanted screenChanged signals after moving screens - but always
+        //times out. This just delays startup by 500ms - so ignore on startup as it isn't needed.
+        if (!m_firstScreenChange)
+            WaitForNewScreen();
+        m_firstScreenChange = false;
+        InitScreenBounds();
         return;
     }
 
@@ -225,14 +218,24 @@ QScreen *MythDisplay::GetDesiredScreen(void)
 {
     QScreen* newscreen = nullptr;
 
-    // Lookup by name
-    QString name = gCoreContext->GetSetting("XineramaScreen", nullptr);
-    foreach (QScreen *screen, qGuiApp->screens())
+    // If spanning all screens, then always use the primary display
+    if (MythDisplay::SpanAllScreens())
     {
-        if (!name.isEmpty() && name == screen->name())
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Using primary screen for multiscreen");
+        newscreen = qGuiApp->primaryScreen();
+    }
+
+    QString name = gCoreContext->GetSetting("XineramaScreen", nullptr);
+    // Lookup by name
+    if (!newscreen)
+    {
+        foreach (QScreen *screen, qGuiApp->screens())
         {
-            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Found screen '%1'").arg(name));
-            newscreen = screen;
+            if (!name.isEmpty() && name == screen->name())
+            {
+                LOG(VB_GENERAL, LOG_INFO, LOC + QString("Found screen '%1'").arg(name));
+                newscreen = screen;
+            }
         }
     }
 
@@ -791,6 +794,26 @@ void MythDisplay::WaitForScreenChange(void)
     connect(&timer, &QTimer::timeout, [](){ LOG(VB_GENERAL, LOG_WARNING, LOC + "Timed out wating for screen change"); });
     QObject::connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
     QObject::connect(m_screen, &QScreen::geometryChanged, &loop, &QEventLoop::quit);
+    // 500ms maximum wait
+    timer.start(500);
+    loop.exec();
+}
+
+void MythDisplay::WaitForNewScreen(void)
+{
+    // N.B. This isn't working as intended as it always times out rather than
+    // exiting deliberately. It does however somehow filter out unwanted screenChanged
+    // events that otherwise often put the widget in the wrong screen.
+    // Needs more investigation - but for now it works:)
+    if (!m_widget || (m_widget && !m_widget->windowHandle()))
+        return;
+    LOG(VB_GENERAL, LOG_INFO, LOC + "Waiting for new screen");
+    QEventLoop loop;
+    QTimer timer;
+    timer.setSingleShot(true);
+    connect(&timer, &QTimer::timeout, [](){ LOG(VB_GENERAL, LOG_WARNING, LOC + "Timed out wating for new screen"); });
+    QObject::connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
+    QObject::connect(m_widget->windowHandle(), &QWindow::screenChanged, &loop, &QEventLoop::quit);
     // 500ms maximum wait
     timer.start(500);
     loop.exec();
