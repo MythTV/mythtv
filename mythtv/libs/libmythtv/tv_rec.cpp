@@ -1821,15 +1821,14 @@ static bool ApplyCachedPids(DTVSignalMonitor *dtvMon, const DTVChannel* channel)
 {
     pid_cache_t pid_cache;
     channel->GetCachedPids(pid_cache);
-    pid_cache_t::const_iterator it = pid_cache.begin();
     bool vctpid_cached = false;
-    for (; it != pid_cache.end(); ++it)
+    for (auto pid : pid_cache)
     {
-        if ((it->GetTableID() == TableID::TVCT) ||
-            (it->GetTableID() == TableID::CVCT))
+        if ((pid.GetTableID() == TableID::TVCT) ||
+            (pid.GetTableID() == TableID::CVCT))
         {
             vctpid_cached = true;
-            dtvMon->GetATSCStreamData()->AddListeningPID(it->GetPID());
+            dtvMon->GetATSCStreamData()->AddListeningPID(pid.GetPID());
         }
     }
     return vctpid_cached;
@@ -1998,9 +1997,8 @@ bool TVRec::SetupDTVSignalMonitor(bool EITscan)
     {
         pid_cache_t pid_cache;
         GetDTVChannel()->GetCachedPids(pid_cache);
-        pid_cache_t::const_iterator it = pid_cache.begin();
-        for (; !ok && it != pid_cache.end(); ++it)
-            ok |= it->IsPermanent();
+        for (auto item = pid_cache.cbegin(); !ok && item != pid_cache.cend(); ++item)
+            ok |= item->IsPermanent();
     }
 
     if (!ok)

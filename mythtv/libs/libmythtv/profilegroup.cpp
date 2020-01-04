@@ -82,8 +82,8 @@ bool ProfileGroup::addMissingDynamicProfiles(void)
 
     CardUtil::InputTypes cardtypes = CardUtil::GetInputTypes();
 
-    CardUtil::InputTypes::iterator Itype = cardtypes.begin();
-    for ( ; Itype != cardtypes.end(); ++Itype)
+    for (auto Itype = cardtypes.begin();
+         Itype != cardtypes.end(); ++Itype)
     {
         if (Itype.key().startsWith("V4L2:") && existing.indexOf(Itype.key()) == -1)
         {

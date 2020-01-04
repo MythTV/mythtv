@@ -314,9 +314,8 @@ void FirewireDevice::BroadcastToListeners(
         ProcessPATPacket(*((const TSPacket*)data));
     }
 
-    auto it = m_listeners.begin();
-    for (; it != m_listeners.end(); ++it)
-        (*it)->AddData(data, dataSize);
+    for (auto & listener : m_listeners)
+        listener->AddData(data, dataSize);
 }
 
 void FirewireDevice::SetLastChannel(const uint channel)

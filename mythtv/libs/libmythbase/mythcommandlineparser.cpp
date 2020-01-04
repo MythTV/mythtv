@@ -555,9 +555,8 @@ CommandLineArg* CommandLineArg::SetParentOf(const QString &opt)
  */
 CommandLineArg* CommandLineArg::SetParentOf(QStringList opts)
 {
-    QStringList::const_iterator i = opts.begin();
-    for (; i != opts.end(); ++i)
-        m_children << new CommandLineArg(*i);
+    foreach (const auto opt, opts)
+        m_children << new CommandLineArg(opt);
     return this;
 }
 
@@ -573,9 +572,8 @@ CommandLineArg* CommandLineArg::SetParent(const QString &opt)
  */
 CommandLineArg* CommandLineArg::SetParent(QStringList opts)
 {
-    QStringList::const_iterator i = opts.begin();
-    for (; i != opts.end(); ++i)
-        m_parents << new CommandLineArg(*i);
+    foreach (const auto opt, opts)
+        m_parents << new CommandLineArg(opt);
     return this;
 }
 
@@ -591,9 +589,8 @@ CommandLineArg* CommandLineArg::SetChildOf(const QString &opt)
  */
 CommandLineArg* CommandLineArg::SetChildOf(QStringList opts)
 {
-    QStringList::const_iterator i = opts.begin();
-    for (; i != opts.end(); ++i)
-        m_parents << new CommandLineArg(*i);
+    foreach (const auto opt, opts)
+        m_parents << new CommandLineArg(opt);
     return this;
 }
 
@@ -609,9 +606,8 @@ CommandLineArg* CommandLineArg::SetChild(const QString& opt)
  */
 CommandLineArg* CommandLineArg::SetChild(QStringList opts)
 {
-    QStringList::const_iterator i = opts.begin();
-    for (; i != opts.end(); ++i)
-        m_children << new CommandLineArg(*i);
+    foreach (const auto opt, opts)
+        m_children << new CommandLineArg(opt);
     return this;
 }
 
@@ -628,11 +624,10 @@ CommandLineArg* CommandLineArg::SetRequiredChild(const QString& opt)
  */
 CommandLineArg* CommandLineArg::SetRequiredChild(QStringList opts)
 {
-    QStringList::const_iterator i = opts.begin();
-    for (; i != opts.end(); ++i)
+    foreach (const auto opt, opts)
     {
-        m_children << new CommandLineArg(*i);
-        m_requires << new CommandLineArg(*i);
+        m_children << new CommandLineArg(opt);
+        m_requires << new CommandLineArg(opt);
     }
     return this;
 }
@@ -650,11 +645,10 @@ CommandLineArg* CommandLineArg::SetRequiredChildOf(const QString& opt)
  */
 CommandLineArg* CommandLineArg::SetRequiredChildOf(QStringList opts)
 {
-    QStringList::const_iterator i = opts.begin();
-    for (; i != opts.end(); ++i)
+    foreach (const auto opt, opts)
     {
-        m_parents << new CommandLineArg(*i);
-        m_requiredby << new CommandLineArg(*i);
+        m_parents << new CommandLineArg(opt);
+        m_requiredby << new CommandLineArg(opt);
     }
     return this;
 }
@@ -671,9 +665,8 @@ CommandLineArg* CommandLineArg::SetRequires(const QString& opt)
  */
 CommandLineArg* CommandLineArg::SetRequires(QStringList opts)
 {
-    QStringList::const_iterator i = opts.begin();
-    for (; i != opts.end(); ++i)
-        m_requires << new CommandLineArg(*i);
+    foreach (const auto opt, opts)
+        m_requires << new CommandLineArg(opt);
     return this;
 }
 
@@ -689,9 +682,8 @@ CommandLineArg* CommandLineArg::SetBlocks(const QString &opt)
  */
 CommandLineArg* CommandLineArg::SetBlocks(QStringList opts)
 {
-    QStringList::const_iterator i = opts.begin();
-    for (; i != opts.end(); ++i)
-        m_blocks << new CommandLineArg(*i);
+    foreach (const auto opt, opts)
+        m_blocks << new CommandLineArg(opt);
     return this;
 }
 
@@ -901,8 +893,8 @@ void CommandLineArg::Convert(void)
     else if (m_type == QVariant::Map)
     {
         QVariantMap vmap = m_stored.toMap();
-        QVariantMap::iterator iter = vmap.begin();
-        for (; iter != vmap.end(); ++iter)
+        // NOLINTNEXTLINE(modernize-loop-convert)
+        for (auto iter = vmap.begin(); iter != vmap.end(); ++iter)
             (*iter) = QString::fromLocal8Bit(iter->toByteArray());
     }
     else
@@ -1622,9 +1614,8 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
         {
             cerr << endl << "Extra argument list:" << endl;
             QStringList slist = toStringList("_args");
-            QStringList::const_iterator it2 = slist.begin();
-            for (; it2 != slist.end(); ++it2)
-                cerr << "  " << (*it2).toLocal8Bit().constData() << endl;
+            foreach (auto lopt, slist)
+                cerr << "  " << (lopt).toLocal8Bit().constData() << endl;
         }
 
         if (m_namedArgs.contains("_passthrough"))

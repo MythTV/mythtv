@@ -56,8 +56,8 @@ MPEGStreamData::~MPEGStreamData()
     SetPMTSingleProgram(nullptr);
 
     // Delete any cached tables that haven't been returned
-    psip_refcnt_map_t::iterator it = m_cachedSlatedForDeletion.begin();
-    for (; it != m_cachedSlatedForDeletion.end(); ++it)
+    for (auto it = m_cachedSlatedForDeletion.cbegin();
+         it != m_cachedSlatedForDeletion.cend(); ++it)
         delete it.key();
 
     QMutexLocker locker(&m_listenerLock);
@@ -133,8 +133,7 @@ void MPEGStreamData::Reset(int desiredProgram)
     SetPMTSingleProgram(nullptr);
 
     pid_psip_map_t old = m_partialPsipPacketCache;
-    pid_psip_map_t::iterator it = old.begin();
-    for (; it != old.end(); ++it)
+    for (auto it = old.begin(); it != old.end(); ++it)
         DeletePartialPSIP(it.key());
     m_partialPsipPacketCache.clear();
 
@@ -152,19 +151,16 @@ void MPEGStreamData::Reset(int desiredProgram)
     {
         QMutexLocker locker(&m_cacheLock);
 
-        pat_cache_t::iterator it1 = m_cachedPats.begin();
-        for (; it1 != m_cachedPats.end(); ++it1)
-            DeleteCachedTable(*it1);
+        foreach (auto & cached, m_cachedPats)
+            DeleteCachedTable(cached);
         m_cachedPats.clear();
 
-        pmt_cache_t::iterator it2 = m_cachedPmts.begin();
-        for (; it2 != m_cachedPmts.end(); ++it2)
-            DeleteCachedTable(*it2);
+        foreach (auto & cached, m_cachedPmts)
+            DeleteCachedTable(cached);
         m_cachedPmts.clear();
 
-        cat_cache_t::iterator it3 = m_cachedCats.begin();
-        for (; it3 != m_cachedCats.end(); ++it3)
-            DeleteCachedTable(*it3);
+        foreach (auto & cached, m_cachedCats)
+            DeleteCachedTable(cached);
         m_cachedCats.clear();
     }
 
@@ -1112,16 +1108,13 @@ uint MPEGStreamData::GetPIDs(pid_map_t &pids) const
     if (m_pidVideoSingleProgram < 0x1fff)
         pids[m_pidVideoSingleProgram] = kPIDPriorityHigh;
 
-    pid_map_t::const_iterator it = m_pidsListening.begin();
-    for (; it != m_pidsListening.end(); ++it)
+    for (auto it = m_pidsListening.cbegin(); it != m_pidsListening.cend(); ++it)
         pids[it.key()] = max(pids[it.key()], *it);
 
-    it = m_pidsAudio.begin();
-    for (; it != m_pidsAudio.end(); ++it)
+    for (auto it = m_pidsAudio.cbegin(); it != m_pidsAudio.cend(); ++it)
         pids[it.key()] = max(pids[it.key()], *it);
 
-    it = m_pidsWriting.begin();
-    for (; it != m_pidsWriting.end(); ++it)
+    for (auto it = m_pidsWriting.cbegin(); it != m_pidsWriting.cend(); ++it)
         pids[it.key()] = max(pids[it.key()], *it);
 
     return pids.size() - sz;
@@ -1296,10 +1289,8 @@ bool MPEGStreamData::HasCachedAllPMTs(void) const
     if (m_cachedPats.empty())
         return false;
 
-    pat_cache_t::const_iterator it = m_cachedPats.begin();
-    for (; it != m_cachedPats.end(); ++it)
+    foreach (auto pat, m_cachedPats)
     {
-        const ProgramAssociationTable *pat = *it;
         if (!HasCachedAllPAT(pat->TransportStreamID()))
             return false;
 
@@ -1353,10 +1344,8 @@ pat_vec_t MPEGStreamData::GetCachedPATs(void) const
     QMutexLocker locker(&m_cacheLock);
     pat_vec_t pats;
 
-    pat_cache_t::const_iterator it = m_cachedPats.begin();
-    for (; it != m_cachedPats.end(); ++it)
+    foreach (auto pat, m_cachedPats)
     {
-        ProgramAssociationTable* pat = *it;
         IncrementRefCnt(pat);
         pats.push_back(pat);
     }
@@ -1397,10 +1386,8 @@ cat_vec_t MPEGStreamData::GetCachedCATs(void) const
     QMutexLocker locker(&m_cacheLock);
     cat_vec_t cats;
 
-    cat_cache_t::const_iterator it = m_cachedCats.begin();
-    for (; it != m_cachedCats.end(); ++it)
+    foreach (auto cat, m_cachedCats)
     {
-        ConditionalAccessTable* cat = *it;
         IncrementRefCnt(cat);
         cats.push_back(cat);
     }
@@ -1427,10 +1414,8 @@ pmt_vec_t MPEGStreamData::GetCachedPMTs(void) const
     QMutexLocker locker(&m_cacheLock);
     vector<const ProgramMapTable*> pmts;
 
-    pmt_cache_t::const_iterator it = m_cachedPmts.begin();
-    for (; it != m_cachedPmts.end(); ++it)
+    foreach (auto pmt, m_cachedPmts)
     {
-        ProgramMapTable* pmt = *it;
         IncrementRefCnt(pmt);
         pmts.push_back(pmt);
     }
@@ -1443,10 +1428,8 @@ pmt_map_t MPEGStreamData::GetCachedPMTMap(void) const
     QMutexLocker locker(&m_cacheLock);
     pmt_map_t pmts;
 
-    pmt_cache_t::const_iterator it = m_cachedPmts.begin();
-    for (; it != m_cachedPmts.end(); ++it)
+    foreach (auto pmt, m_cachedPmts)
     {
-        ProgramMapTable* pmt = *it;
         IncrementRefCnt(pmt);
         pmts[pmt->ProgramNumber()].push_back(pmt);
     }
@@ -1480,6 +1463,7 @@ void MPEGStreamData::ReturnCachedPATTables(pat_vec_t &pats) const
 
 void MPEGStreamData::ReturnCachedPATTables(pat_map_t &pats) const
 {
+    // NOLINTNEXTLINE(modernize-loop-convert)
     for (pat_map_t::iterator it = pats.begin(); it != pats.end(); ++it)
         ReturnCachedPATTables(*it);
     pats.clear();
@@ -1494,6 +1478,7 @@ void MPEGStreamData::ReturnCachedCATTables(cat_vec_t &cats) const
 
 void MPEGStreamData::ReturnCachedCATTables(cat_map_t &cats) const
 {
+    // NOLINTNEXTLINE(modernize-loop-convert)
     for (cat_map_t::iterator it = cats.begin(); it != cats.end(); ++it)
         ReturnCachedCATTables(*it);
     cats.clear();
@@ -1508,6 +1493,7 @@ void MPEGStreamData::ReturnCachedPMTTables(pmt_vec_t &pmts) const
 
 void MPEGStreamData::ReturnCachedPMTTables(pmt_map_t &pmts) const
 {
+    // NOLINTNEXTLINE(modernize-loop-convert)
     for (pmt_map_t::iterator it = pmts.begin(); it != pmts.end(); ++it)
         ReturnCachedPMTTables(*it);
     pmts.clear();
@@ -1609,9 +1595,8 @@ void MPEGStreamData::AddMPEGListener(MPEGStreamListener *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    auto it = m_mpegListeners.begin();
-    for (; it != m_mpegListeners.end(); ++it)
-        if (((void*)val) == ((void*)*it))
+    for (auto & listener : m_mpegListeners)
+        if (((void*)val) == ((void*)listener))
             return;
 
     m_mpegListeners.push_back(val);
@@ -1621,8 +1606,7 @@ void MPEGStreamData::RemoveMPEGListener(MPEGStreamListener *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    auto it = m_mpegListeners.begin();
-    for (; it != m_mpegListeners.end(); ++it)
+    for (auto it = m_mpegListeners.begin(); it != m_mpegListeners.end(); ++it)
     {
         if (((void*)val) == ((void*)*it))
         {
@@ -1636,9 +1620,8 @@ void MPEGStreamData::AddWritingListener(TSPacketListener *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    auto it = m_tsWritingListeners.begin();
-    for (; it != m_tsWritingListeners.end(); ++it)
-        if (((void*)val) == ((void*)*it))
+    for (auto & listener : m_tsWritingListeners)
+        if (((void*)val) == ((void*)listener))
             return;
 
     m_tsWritingListeners.push_back(val);
@@ -1648,8 +1631,7 @@ void MPEGStreamData::RemoveWritingListener(TSPacketListener *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    auto it = m_tsWritingListeners.begin();
-    for (; it != m_tsWritingListeners.end(); ++it)
+    for (auto it = m_tsWritingListeners.begin(); it != m_tsWritingListeners.end(); ++it)
     {
         if (((void*)val) == ((void*)*it))
         {
@@ -1663,9 +1645,8 @@ void MPEGStreamData::AddAVListener(TSPacketListenerAV *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    auto it = m_tsAvListeners.begin();
-    for (; it != m_tsAvListeners.end(); ++it)
-        if (((void*)val) == ((void*)*it))
+    for (auto & listener : m_tsAvListeners)
+        if (((void*)val) == ((void*)listener))
             return;
 
     m_tsAvListeners.push_back(val);
@@ -1675,8 +1656,7 @@ void MPEGStreamData::RemoveAVListener(TSPacketListenerAV *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    auto it = m_tsAvListeners.begin();
-    for (; it != m_tsAvListeners.end(); ++it)
+    for (auto it = m_tsAvListeners.begin(); it != m_tsAvListeners.end(); ++it)
     {
         if (((void*)val) == ((void*)*it))
         {
@@ -1690,9 +1670,8 @@ void MPEGStreamData::AddMPEGSPListener(MPEGSingleProgramStreamListener *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    auto it = m_mpegSpListeners.begin();
-    for (; it != m_mpegSpListeners.end(); ++it)
-        if (((void*)val) == ((void*)*it))
+    for (auto & listener : m_mpegSpListeners)
+        if (((void*)val) == ((void*)listener))
             return;
 
     m_mpegSpListeners.push_back(val);
@@ -1702,8 +1681,7 @@ void MPEGStreamData::RemoveMPEGSPListener(MPEGSingleProgramStreamListener *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    auto it = m_mpegSpListeners.begin();
-    for (; it != m_mpegSpListeners.end(); ++it)
+    for (auto it = m_mpegSpListeners.begin(); it != m_mpegSpListeners.end(); ++it)
     {
         if (((void*)val) == ((void*)*it))
         {
@@ -1717,9 +1695,8 @@ void MPEGStreamData::AddPSStreamListener(PSStreamListener *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    auto it = m_psListeners.begin();
-    for (; it != m_psListeners.end(); ++it)
-        if (((void*)val) == ((void*)*it))
+    for (auto & listener : m_psListeners)
+        if (((void*)val) == ((void*)listener))
             return;
 
     m_psListeners.push_back(val);
@@ -1729,8 +1706,7 @@ void MPEGStreamData::RemovePSStreamListener(PSStreamListener *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    auto it = m_psListeners.begin();
-    for (; it != m_psListeners.end(); ++it)
+    for (auto it = m_psListeners.begin(); it != m_psListeners.end(); ++it)
     {
         if (((void*)val) == ((void*)*it))
         {

@@ -73,8 +73,8 @@ void StorageGroup::StaticInit(void)
     m_builtinGroups["Streaming"] = GetConfDir() + "/tmp/hls";
     m_builtinGroups["3rdParty"] = GetConfDir() + "/3rdParty";
 
-    QMap<QString, QString>::iterator it = m_builtinGroups.begin();
-    for (; it != m_builtinGroups.end(); ++it)
+    // NOLINTNEXTLINE(modernize-loop-convert)
+    for (auto it = m_builtinGroups.begin(); it != m_builtinGroups.end(); ++it)
     {
         QDir qdir(it.value());
         if (!qdir.exists())
@@ -499,14 +499,13 @@ QString StorageGroup::GetRelativePathname(const QString &filename)
         }
     }
 
-    QMap<QString, QString>::iterator it = m_builtinGroups.begin();
-    for (; it != m_builtinGroups.end(); ++it)
+    foreach (auto group, m_builtinGroups)
     {
-        QDir qdir(it.value());
+        QDir qdir(group);
         if (!qdir.exists())
-            qdir.mkpath(it.value());
+            qdir.mkpath(group);
 
-        QString directory = it.value();
+        QString directory = group;
         if (filename.startsWith(directory))
         {
             result = filename;

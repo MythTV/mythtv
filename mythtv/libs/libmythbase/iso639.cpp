@@ -60,9 +60,8 @@ vector<int> iso639_get_language_key_list(void)
     if (_language_keys.empty())
     {
         const QStringList list = iso639_get_language_list();
-        QStringList::const_iterator it = list.begin();
-        for (; it != list.end(); ++it)
-            _language_keys.push_back(iso639_str3_to_key(*it));
+        foreach (const auto & it, list)
+            _language_keys.push_back(iso639_str3_to_key(it));
     }
     return _language_keys;
 }

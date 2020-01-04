@@ -898,14 +898,11 @@ void LogForwardThread::forwardMessage(LogMessage *msg)
 
     if (logItem && logItem->m_itemList && !logItem->m_itemList->isEmpty())
     {
-        LoggerList::iterator it = logItem->m_itemList->begin();
         LoggingItem *item = LoggingItem::create(json);
         if (!item)
             return;
-        for (; it != logItem->m_itemList->end(); ++it)
-        {
-            (*it)->logmsg(item);
-        }
+        foreach (auto & it, *logItem->m_itemList)
+            it->logmsg(item);
         item->DecrRef();
     }
 }

@@ -71,11 +71,11 @@ void RSSManager::slotRefreshRSS()
         return;
     }
 
-    RSSSite::rssList::iterator i = m_sites.begin();
-    for (; i != m_sites.end(); ++i)
+    // NOLINTNEXTLINE(modernize-loop-convert)
+    for (auto i = m_sites.begin(); i != m_sites.end(); ++i)
     {
-            (*i)->retrieve();
-            m_inprogress.append(*i);
+        (*i)->retrieve();
+        m_inprogress.append(*i);
     }
 }
 
@@ -87,11 +87,10 @@ void RSSManager::processAndInsertRSS(RSSSite *site)
     clearRSSArticles(site->GetTitle(), site->GetType());
 
     ResultItem::resultList rss = site->GetVideoList();
-    ResultItem::resultList::iterator it = rss.begin();
-    for (; it != rss.end(); ++it)
+    foreach (auto & video, rss)
     {
         // Insert in the DB here.
-        insertRSSArticleInDB(site->GetTitle(), *it, site->GetType());
+        insertRSSArticleInDB(site->GetTitle(), video, site->GetType());
     }
 
     m_inprogress.removeOne(site);

@@ -2189,10 +2189,9 @@ nullptr
             updates_ba.push_back(QByteArray(post));
 
         // Convert update ByteArrays to NULL terminated char**
-        QList<QByteArray>::const_iterator it = updates_ba.begin();
         vector<const char*> updates;
-        for (; it != updates_ba.end(); ++it)
-            updates.push_back((*it).constData());
+        foreach (auto item, updates_ba)
+            updates.push_back(item.constData());
         updates.push_back(nullptr);
 
         // do the actual update
@@ -2242,10 +2241,9 @@ nullptr
         }
 
         // Convert update ByteArrays to NULL terminated char**
-        QList<QByteArray>::const_iterator it = updates_ba.begin();
         vector<const char*> updates;
-        for (; it != updates_ba.end(); ++it)
-            updates.push_back((*it).constData());
+        foreach (auto item, updates_ba)
+            updates.push_back(item.constData());
         updates.push_back(nullptr);
 
         // do the actual update
@@ -2276,10 +2274,9 @@ nullptr
                              .toLocal8Bit());
 
         // Convert update ByteArrays to NULL terminated char**
-        QList<QByteArray>::const_iterator it = updates_ba.begin();
         vector<const char*> updates;
-        for (; it != updates_ba.end(); ++it)
-            updates.push_back((*it).constData());
+        foreach (auto item, updates_ba)
+            updates.push_back(item.constData());
         updates.push_back(nullptr);
 
         if (!performActualUpdate(&updates[0], "1305", dbver))
@@ -2305,10 +2302,9 @@ nullptr
 "                    'Etc/UTC', 'SYSTEM')) ").toLocal8Bit());
 
         // Convert update ByteArrays to NULL terminated char**
-        QList<QByteArray>::const_iterator it = updates_ba.begin();
         vector<const char*> updates;
-        for (; it != updates_ba.end(); ++it)
-            updates.push_back((*it).constData());
+        foreach (auto item, updates_ba)
+            updates.push_back(item.constData());
         updates.push_back(nullptr);
 
         if (!performActualUpdate(&updates[0], "1306", dbver))

@@ -53,20 +53,18 @@ void OutputListeners::dispatchVisual(uchar *buffer, unsigned long b_len,
     if (! buffer)
        return;
 
-    auto it = m_visuals.begin();
-    for (; it != m_visuals.end(); ++it)
+    for (auto & visual : m_visuals)
     {
-        QMutexLocker locker((*it)->mutex());
-        (*it)->add(buffer, b_len, written, chan, prec);
+        QMutexLocker locker(visual->mutex());
+        visual->add(buffer, b_len, written, chan, prec);
     }
 }
 
 void OutputListeners::prepareVisuals()
 {
-    auto it = m_visuals.begin();
-    for (; it != m_visuals.end(); ++it)
+    for (auto & visual : m_visuals)
     {
-        QMutexLocker locker((*it)->mutex());
-        (*it)->prepare();
+        QMutexLocker locker(visual->mutex());
+        visual->prepare();
     }
 }

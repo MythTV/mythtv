@@ -191,11 +191,10 @@ bool HDHRChannel::SetChannelByString(const QString &channum)
     {
         bool has_dvbc = false;
         bool has_dvbt = false;
-        vector<DTVTunerType>::const_iterator it = m_tunerTypes.begin();
-        for (; it != m_tunerTypes.end(); ++it)
+        for (auto type : m_tunerTypes)
         {
-            has_dvbt |= (DTVTunerType::kTunerTypeDVBT == *it);
-            has_dvbc |= (DTVTunerType::kTunerTypeDVBC == *it);
+            has_dvbt |= (DTVTunerType::kTunerTypeDVBT == type);
+            has_dvbc |= (DTVTunerType::kTunerTypeDVBC == type);
         }
 
         if (has_dvbt && has_dvbc)

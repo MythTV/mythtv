@@ -601,8 +601,7 @@ void MythVideoOutputOpenGL::PrepareFrame(VideoFrame *Frame, FrameScanType Scan, 
     // PiPs/PBPs
     if (!m_openGLVideoPiPs.empty())
     {
-        QMap<MythPlayer*,MythOpenGLVideo*>::iterator it = m_openGLVideoPiPs.begin();
-        for (; it != m_openGLVideoPiPs.end(); ++it)
+        for (auto it = m_openGLVideoPiPs.begin(); it != m_openGLVideoPiPs.end(); ++it)
         {
             if (m_openGLVideoPiPsReady[it.key()])
             {

@@ -4184,11 +4184,10 @@ static vector<int> filter_lang(const sinfo_vec_t &tracks, int lang_key,
 {
     vector<int> ret;
 
-    auto it = ftype.cbegin();
-    for (; it != ftype.cend(); ++it)
+    for (int index : ftype)
     {
-        if ((lang_key < 0) || tracks[*it].m_language == lang_key)
-            ret.push_back(*it);
+        if ((lang_key < 0) || tracks[index].m_language == lang_key)
+            ret.push_back(index);
     }
 
     return ret;
@@ -4216,10 +4215,9 @@ int AvFormatDecoder::filter_max_ch(const AVFormatContext *ic,
     int selectedTrack = -1;
     int max_seen = -1;
 
-    auto it = fs.cbegin();
-    for (; it != fs.cend(); ++it)
+    for (int f : fs)
     {
-        const int stream_index = tracks[*it].m_av_stream_index;
+        const int stream_index = tracks[f].m_av_stream_index;
         AVCodecParameters *par = ic->streams[stream_index]->codecpar;
         if ((codecId == AV_CODEC_ID_NONE || codecId == par->codec_id) &&
             (max_seen < par->channels))
@@ -4230,7 +4228,7 @@ int AvFormatDecoder::filter_max_ch(const AVFormatContext *ic,
                 if (!DoPassThrough(par, true) || par->profile != profile)
                     continue;
             }
-            selectedTrack = *it;
+            selectedTrack = f;
             max_seen = par->channels;
         }
     }
@@ -4297,9 +4295,9 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
 
 #if 0
     // enable this to print streams
-    for (uint i = 0; i < atracks.size(); i++)
+    for (const auto & track : atracks)
     {
-        int idx = atracks[i].av_stream_index;
+        int idx = track.m_av_stream_index;
         AVCodecContext *codec_ctx = m_ic->streams[idx]->codec;
         AudioInfo item(codec_ctx->codec_id, codec_ctx->bps,
                        codec_ctx->sample_rate, codec_ctx->channels,

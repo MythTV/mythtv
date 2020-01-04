@@ -339,12 +339,11 @@ MetadataLookup* MetadataDownload::findBestMatch(MetadataLookupList list,
                     .arg(originaltitle).arg(bestTitle));
 
     // Grab the one item that matches the besttitle (IMPERFECT)
-    MetadataLookupList::const_iterator i = list.begin();
-    for (; i != list.end(); ++i)
+    foreach (auto & item, list)
     {
-        if ((*i)->GetTitle() == bestTitle)
+        if (item->GetTitle() == bestTitle)
         {
-            ret = (*i);
+            ret = item;
             break;
         }
     }
@@ -725,8 +724,8 @@ MetadataLookupList MetadataDownload::handleTelevision(MetadataLookup *lookup)
     {
         // mark all results so that search collection is properly handled later
         lookup->SetIsCollection(searchcollection);
-        for (MetadataLookupList::iterator it = list.begin();
-             it != list.end(); ++it)
+        // NOLINTNEXTLINE(modernize-loop-convert)
+        for (auto it = list.begin(); it != list.end(); ++it)
         {
             (*it)->SetIsCollection(searchcollection);
         }

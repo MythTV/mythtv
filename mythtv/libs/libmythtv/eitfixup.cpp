@@ -378,8 +378,7 @@ void EITFixUp::Fix(DBEventEIT &event) const
     // Are any items left unhandled? report them to allow fixups improvements
     if (!event.m_items.empty())
     {
-        QMap<QString,QString>::iterator i;
-        for (i = event.m_items.begin(); i != event.m_items.end(); ++i)
+        for (auto i = event.m_items.begin(); i != event.m_items.end(); ++i)
         {
             LOG(VB_EIT, LOG_DEBUG, QString("Unhandled item in EIT for"
                 " channel id \"%1\", \"%2\": %3").arg(event.m_chanid)
@@ -524,9 +523,8 @@ void EITFixUp::FixBellExpressVu(DBEventEIT &event) const
             QString tmp = event.m_description.left(position-3);
             QStringList actors =
                 tmp.split(m_bellActors, QString::SkipEmptyParts);
-            QStringList::const_iterator it = actors.begin();
-            for (; it != actors.end(); ++it)
-                event.AddPerson(DBPerson::kActor, *it);
+            foreach (const auto & actor, actors)
+                event.AddPerson(DBPerson::kActor, actor);
         }
         // Remove the year and actors from the description
         event.m_description = event.m_description.right(
@@ -1275,9 +1273,8 @@ void EITFixUp::FixComHem(DBEventEIT &event, bool process_subtitle) const
         {
             const QStringList actors =
                 list[5].split(m_comHemPersSeparator, QString::SkipEmptyParts);
-            QStringList::const_iterator it = actors.begin();
-            for (; it != actors.end(); ++it)
-                event.AddPerson(DBPerson::kActor, *it);
+            foreach (const auto & actor, actors)
+                event.AddPerson(DBPerson::kActor, actor);
         }
 
         // Remove year and actors.
@@ -1319,9 +1316,8 @@ void EITFixUp::FixComHem(DBEventEIT &event, bool process_subtitle) const
 
         const QStringList actors =
             list[2].split(m_comHemPersSeparator, QString::SkipEmptyParts);
-        QStringList::const_iterator it = actors.begin();
-        for (; it != actors.end(); ++it)
-            event.AddPerson(role, *it);
+        foreach (const auto & actor, actors)
+            event.AddPerson(role, actor);
 
         // Remove it
         event.m_description=event.m_description.replace(list[0],"");
@@ -1665,9 +1661,8 @@ void EITFixUp::FixMCA(DBEventEIT &event) const
         {
             const QStringList actors = tmpExp1.cap(2).split(
                 m_mcaActorsSeparator, QString::SkipEmptyParts);
-            QStringList::const_iterator it = actors.begin();
-            for (; it != actors.end(); ++it)
-                event.AddPerson(DBPerson::kActor, (*it).trimmed());
+            foreach (const auto & actor, actors)
+                event.AddPerson(DBPerson::kActor, actor.trimmed());
             event.m_description = tmpExp1.cap(1).trimmed();
         }
         event.m_categoryType = ProgramInfo::kCategoryMovie;
@@ -1973,9 +1968,8 @@ void EITFixUp::FixPremiere(DBEventEIT &event) const
         event.AddPerson(DBPerson::kDirector, tmpcredits.cap(1));
         const QStringList actors = tmpcredits.cap(2).split(
             ", ", QString::SkipEmptyParts);
-        QStringList::const_iterator it = actors.begin();
-        for (; it != actors.end(); ++it)
-            event.AddPerson(DBPerson::kActor, *it);
+        foreach (const auto & actor, actors)
+            event.AddPerson(DBPerson::kActor, actor);
         event.m_description = event.m_description.replace(tmpcredits, "");
     }
 
@@ -2177,9 +2171,8 @@ void EITFixUp::FixNL(DBEventEIT &event) const
         tmpActorsString = tmpActorsString.left(tmpActorsString.length() - 5);
         const QStringList actors =
             tmpActorsString.split(", ", QString::SkipEmptyParts);
-        QStringList::const_iterator it = actors.begin();
-        for (; it != actors.end(); ++it)
-            event.AddPerson(DBPerson::kActor, *it);
+        foreach (const auto & actor, actors)
+            event.AddPerson(DBPerson::kActor, actor);
         fullinfo = fullinfo.replace(tmpActors.cap(0), "");
     }
 
@@ -2190,11 +2183,10 @@ void EITFixUp::FixNL(DBEventEIT &event) const
         QString tmpPresString = tmpPres.cap(0);
         tmpPresString = tmpPresString.right(tmpPresString.length() - 14);
         tmpPresString = tmpPresString.left(tmpPresString.length() -1);
-        const QStringList host =
+        const QStringList presenters =
             tmpPresString.split(m_nlPersSeparator, QString::SkipEmptyParts);
-        QStringList::const_iterator it = host.begin();
-        for (; it != host.end(); ++it)
-            event.AddPerson(DBPerson::kPresenter, *it);
+        foreach (const auto & presenter, presenters)
+            event.AddPerson(DBPerson::kPresenter, presenter);
         fullinfo = fullinfo.replace(tmpPres.cap(0), "");
     }
 
@@ -2499,10 +2491,9 @@ void EITFixUp::FixDK(DBEventEIT &event) const
         QString tmpDirectorsString = tmpRegEx.cap(1);
         const QStringList directors =
             tmpDirectorsString.split(m_dkPersonsSeparator, QString::SkipEmptyParts);
-        QStringList::const_iterator it = directors.begin();
-        for (; it != directors.end(); ++it)
+        foreach (const auto & director, directors)
         {
-            tmpDirectorsString = it->split(":").last().trimmed().
+            tmpDirectorsString = director.split(":").last().trimmed().
                     remove(QRegExp("\\.$"));
             if (tmpDirectorsString != "")
                 event.AddPerson(DBPerson::kDirector, tmpDirectorsString);
@@ -2519,10 +2510,9 @@ void EITFixUp::FixDK(DBEventEIT &event) const
             tmpActorsString = tmpActorsString.replace(m_dkDirector,"");
         const QStringList actors =
             tmpActorsString.split(m_dkPersonsSeparator, QString::SkipEmptyParts);
-        QStringList::const_iterator it = actors.begin();
-        for (; it != actors.end(); ++it)
+        foreach (const auto & actor, actors)
         {
-            tmpActorsString = it->split(":").last().trimmed().
+            tmpActorsString = actor.split(":").last().trimmed().
                     remove(QRegExp("\\.$"));
             if (tmpActorsString != "")
                 event.AddPerson(DBPerson::kActor, tmpActorsString);
@@ -2647,10 +2637,9 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event) const
         QString tmpActorsString = tmpRegEx.cap(1);
         const QStringList actors =
             tmpActorsString.split(m_grPeopleSeparator, QString::SkipEmptyParts);
-        QStringList::const_iterator it = actors.begin();
-        for (; it != actors.end(); ++it)
+        foreach (const auto & actor, actors)
         {
-            tmpActorsString = it->split(":").last().trimmed().
+            tmpActorsString = actor.split(":").last().trimmed().
                     remove(QRegExp("\\.$"));
             if (tmpActorsString != "")
                 event.AddPerson(DBPerson::kActor, tmpActorsString);
@@ -2665,10 +2654,9 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event) const
         QString tmpDirectorsString = tmpRegEx.cap(1);
         const QStringList directors =
             tmpDirectorsString.split(m_grPeopleSeparator, QString::SkipEmptyParts);
-        QStringList::const_iterator it = directors.begin();
-        for (; it != directors.end(); ++it)
+        foreach (const auto & director, directors)
         {
-            tmpDirectorsString = it->split(":").last().trimmed().
+            tmpDirectorsString = director.split(":").last().trimmed().
                     remove(QRegExp("\\.$"));
             if (tmpDirectorsString != "")
             {
@@ -2686,10 +2674,9 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event) const
         QString tmpPresentersString = tmpRegEx.cap(1);
         const QStringList presenters =
             tmpPresentersString.split(m_grPeopleSeparator, QString::SkipEmptyParts);
-        QStringList::const_iterator it = presenters.begin();
-        for (; it != presenters.end(); ++it)
+        foreach (const auto & presenter, presenters)
         {
-            tmpPresentersString = it->split(":").last().trimmed().
+            tmpPresentersString = presenter.split(":").last().trimmed().
                     remove(QRegExp("\\.$"));
             if (tmpPresentersString != "")
             {

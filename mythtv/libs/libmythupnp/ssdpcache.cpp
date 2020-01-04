@@ -44,11 +44,10 @@ void SSDPCacheEntries::Clear(void)
 {
     QMutexLocker locker(&m_mutex);
 
-    EntryMap::iterator it = m_mapEntries.begin();
-    for (; it != m_mapEntries.end(); ++it)
+    foreach (auto & entry, m_mapEntries)
     {
-        if ((*it))
-            (*it)->DecrRef();
+        if (entry)
+            entry->DecrRef();
     }
 
     m_mapEntries.clear();
@@ -86,8 +85,7 @@ void SSDPCacheEntries::GetEntryMap(EntryMap &map)
 {
     QMutexLocker locker(&m_mutex);
 
-    EntryMap::const_iterator it = m_mapEntries.begin();
-    for (; it != m_mapEntries.end(); ++it)
+    for (auto it = m_mapEntries.cbegin(); it != m_mapEntries.cend(); ++it)
     {
         (*it)->IncrRef();
         map.insert(it.key(), *it);
@@ -179,17 +177,16 @@ QTextStream &SSDPCacheEntries::OutputXML(
 {
     QMutexLocker locker(&m_mutex);
 
-    EntryMap::const_iterator it  = m_mapEntries.begin();
-    for (; it != m_mapEntries.end(); ++it)
+    foreach (auto entry, m_mapEntries)
     {
-        if (*it == nullptr)
+        if (entry == nullptr)
             continue;
 
         // Note: IncrRef,DecrRef not required since SSDPCacheEntries
         // holds one reference to each entry and we are holding m_mutex.
-        os << "<Service usn='" << (*it)->m_sUSN 
-           << "' expiresInSecs='" << (*it)->ExpiresInSecs()
-           << "' url='" << (*it)->m_sLocation << "' />" << endl;
+        os << "<Service usn='" << entry->m_sUSN
+           << "' expiresInSecs='" << entry->ExpiresInSecs()
+           << "' url='" << entry->m_sLocation << "' />" << endl;
 
         if (pnEntryCount != nullptr)
             (*pnEntryCount)++;
@@ -203,17 +200,16 @@ void SSDPCacheEntries::Dump(uint &nEntryCount) const
 {
     QMutexLocker locker(&m_mutex);
 
-    EntryMap::const_iterator it  = m_mapEntries.begin();
-    for (; it != m_mapEntries.end(); ++it)
+    foreach (auto entry, m_mapEntries)
     {
-        if (*it == nullptr)
+        if (entry == nullptr)
             continue;
 
         // Note: IncrRef,DecrRef not required since SSDPCacheEntries
         // holds one reference to each entry and we are holding m_mutex.
         LOG(VB_UPNP, LOG_DEBUG, QString(" * \t\t%1\t | %2\t | %3 ")
-                .arg((*it)->m_sUSN) .arg((*it)->ExpiresInSecs())
-                .arg((*it)->m_sLocation));
+                .arg(entry->m_sUSN) .arg(entry->ExpiresInSecs())
+                .arg(entry->m_sLocation));
 
         nEntryCount++;
     }
@@ -282,11 +278,10 @@ void SSDPCache::Clear(void)
 {
     QMutexLocker locker(&m_mutex);
 
-    SSDPCacheEntriesMap::iterator it  = m_cache.begin();
-    for (; it != m_cache.end(); ++it)
+    foreach (auto & it, m_cache)
     {
-        if (*it)
-            (*it)->DecrRef();
+        if (it)
+            it->DecrRef();
     }
 
     m_cache.clear();
@@ -466,9 +461,7 @@ int SSDPCache::RemoveStale()
     // Iterate through all Type URI's and build list of stale entries keys
     // ----------------------------------------------------------------------
 
-    for (SSDPCacheEntriesMap::Iterator it  = m_cache.begin();
-                                       it != m_cache.end();
-                                     ++it )
+    for (auto it = m_cache.begin(); it != m_cache.end(); ++it )
     {
         SSDPCacheEntries *pEntries = *it;
 
@@ -556,8 +549,7 @@ QTextStream &SSDPCache::OutputXML(
     if (pnEntryCount != nullptr)
         *pnEntryCount = 0;
 
-    SSDPCacheEntriesMap::const_iterator it = m_cache.begin();
-    for (; it != m_cache.end(); ++it)
+    for (auto it = m_cache.cbegin(); it != m_cache.cend(); ++it)
     {
         if (*it != nullptr)
         {
@@ -600,8 +592,7 @@ void SSDPCache::Dump(void)
                             "---------------------------------------");
 
     uint nCount = 0;
-    SSDPCacheEntriesMap::const_iterator it  = m_cache.begin();
-    for (; it != m_cache.end(); ++it)
+    for (auto it  = m_cache.cbegin(); it != m_cache.cend(); ++it)
     {
         if (*it != nullptr)
         {

@@ -187,9 +187,7 @@ void HLSStreamHandler::run(void)
 
         {
             QMutexLocker locker(&m_listenerLock);
-            HLSStreamHandler::StreamDataList::const_iterator sit;
-            sit = m_streamDataList.begin();
-            for (; sit != m_streamDataList.end(); ++sit)
+            for (auto sit = m_streamDataList.cbegin(); sit != m_streamDataList.cend(); ++sit)
                 remainder = sit.key()->ProcessData(m_readbuffer, size);
         }
 

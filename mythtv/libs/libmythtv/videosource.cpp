@@ -1652,8 +1652,7 @@ void VBoxDeviceIDList::fillSelections(const QString &cur)
 
     const QString& current = cur;
 
-    VBoxDeviceList::iterator it = m_deviceList->begin();
-    for (; it != m_deviceList->end(); ++it)
+    for (auto it = m_deviceList->begin(); it != m_deviceList->end(); ++it)
     {
         devs.push_back(it.key());
         in_use[it.key()] = (*it).m_inUse;
@@ -1663,9 +1662,8 @@ void VBoxDeviceIDList::fillSelections(const QString &cur)
     QString sel = man_addr;
     devs.push_back(sel);
 
-    vector<QString>::const_iterator it2 = devs.begin();
-    for (; it2 != devs.end(); ++it2)
-        sel = (current == *it2) ? *it2 : sel;
+    for (const auto & dev : devs)
+        sel = (current == dev) ? dev : sel;
 
     QString usestr = QString(" -- ");
     usestr += QObject::tr("Warning: already in use");
@@ -3846,13 +3844,12 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
     {
         m_cardType->clearSelections();
         QStringList delsyslist = CardUtil::ProbeDeliverySystems(videodevice);
-        QStringList::iterator it = delsyslist.begin();
-        for (; it != delsyslist.end(); it++)
+        foreach (auto & item, delsyslist)
         {
             LOG(VB_GENERAL, LOG_DEBUG, QString("DVBCardType: add deliverysystem:%1")
-                .arg(*it));
+                .arg(item));
 
-            m_cardType->addSelection(*it, *it);
+            m_cardType->addSelection(item, item);
         }
 
         // Default value, used if not already defined in capturecard/inputname

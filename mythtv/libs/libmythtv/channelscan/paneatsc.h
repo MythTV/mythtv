@@ -116,8 +116,7 @@ class PaneATSC : public GroupSetting
         FetchFrequencyTables();
 
         bool first = true;
-        freq_table_list_t::iterator it = m_tables.begin();
-        for (; it != m_tables.end(); ++it)
+        for (auto it = m_tables.begin(); it != m_tables.end(); ++it)
         {
             freq_table_list_t::iterator next = it;
             ++next;

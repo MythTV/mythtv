@@ -52,9 +52,8 @@ class LFDPriv
 
     ~LFDPriv()
     {
-        avcinfo_list_t::iterator it = m_devices.begin();
-        for (; it != m_devices.end(); ++it)
-            delete (*it);
+        foreach (auto & device, m_devices)
+            delete device;
         m_devices.clear();
 
         if (m_portHandlerThread)
@@ -822,13 +821,12 @@ vector<AVCInfo> LinuxFirewireDevice::GetSTBListPrivate(void)
 
     vector<AVCInfo> list;
 
-    avcinfo_list_t::iterator it = m_priv->m_devices.begin();
-    for (; it != m_priv->m_devices.end(); ++it)
+    foreach (auto & device, m_priv->m_devices)
     {
-        if ((*it)->IsSubunitType(kAVCSubunitTypeTuner) &&
-            (*it)->IsSubunitType(kAVCSubunitTypePanel))
+        if (device->IsSubunitType(kAVCSubunitTypeTuner) &&
+            device->IsSubunitType(kAVCSubunitTypePanel))
         {
-            list.push_back(*(*it));
+            list.push_back(*device);
         }
     }
 
@@ -909,8 +907,7 @@ bool LinuxFirewireDevice::UpdateDeviceList(void)
 
     item.m_port = -1;
     item.m_node = -1;
-    avcinfo_list_t::iterator it = m_priv->m_devices.begin();
-    for (; it != m_priv->m_devices.end(); ++it)
+    for (auto it = m_priv->m_devices.begin(); it != m_priv->m_devices.end(); ++it)
     {
         if (!guid_online[it.key()])
             UpdateDeviceListItem(it.key(), &item);

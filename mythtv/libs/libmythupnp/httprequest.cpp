@@ -785,29 +785,27 @@ void HTTPRequest::FormatActionResponse(const NameValues &args)
     else
         stream << "<" << m_sMethod << "Response>\r\n";
 
-    NameValues::const_iterator nit = args.begin();
-    for (; nit != args.end(); ++nit)
+    foreach (const auto & arg, args)
     {
-        stream << "<" << (*nit).m_sName;
+        stream << "<" << arg.m_sName;
 
-        if ((*nit).m_pAttributes)
+        if (arg.m_pAttributes)
         {
-            NameValues::const_iterator nit2 = (*nit).m_pAttributes->begin();
-            for (; nit2 != (*nit).m_pAttributes->end(); ++nit2)
+            foreach (const auto & attr, *arg.m_pAttributes)
             {
-                stream << " " << (*nit2).m_sName << "='"
-                       << Encode( (*nit2).m_sValue ) << "'";
+                stream << " " << attr.m_sName << "='"
+                       << Encode( attr.m_sValue ) << "'";
             }
         }
 
         stream << ">";
 
         if (m_bSOAPRequest)
-            stream << Encode( (*nit).m_sValue );
+            stream << Encode( arg.m_sValue );
         else
-            stream << (*nit).m_sValue;
+            stream << arg.m_sValue;
 
-        stream << "</" << (*nit).m_sName << ">\r\n";
+        stream << "</" << arg.m_sName << ">\r\n";
     }
 
     if (m_bSOAPRequest)

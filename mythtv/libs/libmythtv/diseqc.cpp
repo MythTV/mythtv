@@ -183,8 +183,7 @@ bool DiSEqCDevSettings::Store(uint card_input_id) const
         "       ( cardinputid, diseqcid, value) "
         "VALUES (:INPUTID,    :DEVID,     :VALUE) ");
 
-    uint_to_dbl_t::const_iterator it = m_config.begin();
-    for (; it != m_config.end(); ++it)
+    for (auto it = m_config.cbegin(); it != m_config.cend(); ++it)
     {
         query.bindValue(":INPUTID", card_input_id);
         query.bindValue(":DEVID",   it.key());
@@ -287,9 +286,8 @@ void DiSEqCDevTrees::InvalidateTrees(void)
 {
     QMutexLocker lock(&m_treesLock);
 
-    cardid_to_diseqc_tree_t::iterator it = m_trees.begin();
-    for (; it != m_trees.end(); ++it)
-        delete *it;
+    for (auto & tree : m_trees)
+        delete tree;
 
     m_trees.clear();
 }
@@ -439,14 +437,13 @@ bool DiSEqCDevTree::Store(uint cardid, const QString &device)
             "DELETE FROM diseqc_config "
             "WHERE diseqcid = :DEVID");
 
-        vector<uint>::const_iterator it = m_delete.begin();
-        for (; it != m_delete.end(); ++it)
+        for (uint devid : m_delete)
         {
-            query0.bindValue(":DEVID", *it);
+            query0.bindValue(":DEVID", devid);
             if (!query0.exec())
                 MythDB::DBError("DiSEqCDevTree::Store 1", query0);
 
-            query1.bindValue(":DEVID", *it);
+            query1.bindValue(":DEVID", devid);
             if (!query1.exec())
                 MythDB::DBError("DiSEqCDevTree::Store 2", query1);
 
@@ -1082,12 +1079,8 @@ DiSEqCDevSwitch::DiSEqCDevSwitch(DiSEqCDevTree &tree, uint devid)
 
 DiSEqCDevSwitch::~DiSEqCDevSwitch()
 {
-    auto it = m_children.begin();
-    for (; it != m_children.end(); ++it)
-    {
-        if (*it)
-            delete *it;
-    }
+    for (auto & child : m_children)
+        delete child;
 }
 
 bool DiSEqCDevSwitch::Execute(const DiSEqCDevSettings &settings,
@@ -1152,11 +1145,10 @@ void DiSEqCDevSwitch::Reset(void)
     m_lastPos = (uint) -1;
     m_lastHighBand = (uint) -1;
     m_lastHorizontal = (uint) -1;
-    auto it = m_children.begin();
-    for (; it != m_children.end(); ++it)
+    for (auto & child : m_children)
     {
-        if (*it)
-            (*it)->Reset();
+        if (child)
+            child->Reset();
     }
 }
 
@@ -1227,12 +1219,8 @@ uint DiSEqCDevSwitch::GetVoltage(const DiSEqCDevSettings &settings,
 bool DiSEqCDevSwitch::Load(void)
 {
     // clear old children
-    auto it = m_children.begin();
-    for (; it != m_children.end(); ++it)
-    {
-        if (*it)
-            delete *it;
-    }
+    for (auto & child : m_children)
+        delete child;
 
     m_children.clear();
 
@@ -1857,10 +1845,9 @@ bool DiSEqCDevRotor::Load(void)
         // form of "angle1=index1:angle2=index2:..."
         QString positions = query.value(1).toString();
         QStringList pos = positions.split(":", QString::SkipEmptyParts);
-        QStringList::const_iterator it = pos.begin();
-        for (; it != pos.end(); ++it)
+        foreach (auto & kv, pos)
         {
-            const QStringList eq = (*it).split("=", QString::SkipEmptyParts);
+            const QStringList eq = kv.split("=", QString::SkipEmptyParts);
             if (eq.size() == 2)
                 m_posmap[eq[0].toFloat()] = eq[1].toUInt();
         }

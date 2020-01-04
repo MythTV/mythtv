@@ -433,9 +433,8 @@ void IPTVStreamHandlerWriteHelper::timerEvent(QTimerEvent* event)
         {
             QMutexLocker locker(&m_parent->m_listenerLock);
             QByteArray &data = packet.GetDataReference();
-            IPTVStreamHandler::StreamDataList::const_iterator sit;
-            sit = m_parent->m_streamDataList.begin();
-            for (; sit != m_parent->m_streamDataList.end(); ++sit)
+            for (auto sit = m_parent->m_streamDataList.cbegin();
+                 sit != m_parent->m_streamDataList.cend(); ++sit)
             {
                 remainder = sit.key()->ProcessData(
                     reinterpret_cast<const unsigned char*>(data.data()),
@@ -493,9 +492,8 @@ void IPTVStreamHandlerWriteHelper::timerEvent(QTimerEvent* event)
             m_parent->m_listenerLock.lock();
 
             int remainder = 0;
-            IPTVStreamHandler::StreamDataList::const_iterator sit;
-            sit = m_parent->m_streamDataList.begin();
-            for (; sit != m_parent->m_streamDataList.end(); ++sit)
+            for (auto sit = m_parent->m_streamDataList.cbegin();
+                 sit != m_parent->m_streamDataList.cend(); ++sit)
             {
                 remainder = sit.key()->ProcessData(
                     ts_packet.GetTSData(), ts_packet.GetTSDataSize());

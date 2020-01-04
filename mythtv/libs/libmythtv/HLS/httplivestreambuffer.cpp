@@ -410,10 +410,8 @@ public:
         if (!copy)
             return;
         // copy all the segments across
-        QList<HLSSegment*>::iterator it = m_segments.begin();
-        for (; it != m_segments.end(); ++it)
+        foreach (auto old, m_segments)
         {
-            const HLSSegment *old = *it;
             auto *segment = new HLSSegment(*old);
             AppendSegment(segment);
         }
@@ -421,11 +419,8 @@ public:
 
     ~HLSStream()
     {
-        QList<HLSSegment*>::iterator it = m_segments.begin();
-        for (; it != m_segments.end(); ++it)
-        {
-            delete *it;
-        }
+        foreach (auto & segment, m_segments)
+            delete segment;
     }
 
     HLSStream &operator=(const HLSStream &rhs)
@@ -771,12 +766,11 @@ public:
     void Cancel(void)
     {
         QMutexLocker lock(&m_lock);
-        QList<HLSSegment*>::iterator it = m_segments.begin();
-        for (; it != m_segments.end(); ++it)
+        foreach (auto & segment, m_segments)
         {
-            if (*it)
+            if (segment)
             {
-                (*it)->CancelDownload();
+                segment->CancelDownload();
             }
         }
     }
@@ -1754,10 +1748,9 @@ QString HLSRingBuffer::ParseAttributes(const QString &line, const char *attr)
         return QString();
 
     QStringList list = line.mid(p+1).split(',');
-    QStringList::iterator it = list.begin();
-    for (; it != list.end(); ++it)
+    foreach (auto & it, list)
     {
-        QString arg = (*it).trimmed();
+        QString arg = it.trimmed();
         if (arg.startsWith(attr))
         {
             int pos = arg.indexOf(QLatin1String("="));

@@ -1036,6 +1036,7 @@ void MythUIType::UpdateDependState(MythUIType *dependee, bool isDefault)
     {
         bool reverse = m_ReverseDepend[dependee];
         visible = reverse ? !isDefault : isDefault;
+        // NOLINTNEXTLINE(modernize-loop-convert)
         for (int i = 0; i < m_dependsValue.size(); i++)
         {
             if (m_dependsValue[i].first != dependee)

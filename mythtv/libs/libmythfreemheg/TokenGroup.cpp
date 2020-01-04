@@ -404,11 +404,10 @@ void MHListGroup::Preparation(MHEngine *engine)
         {
             MHRoot *pItem = engine->FindObject(m_TokenGrpItems.GetAt(i)->m_Object);
             MHListItem *p = nullptr;
-            QList<MHListItem *>::iterator it = m_ItemList.begin();
 
-            for (; it != m_ItemList.end(); ++it)
+            foreach (auto & item, m_ItemList)
             {
-                p = *it;
+                p = item;
 
                 if (p->m_pVisible == pItem)
                 {
@@ -546,11 +545,9 @@ void MHListGroup::Update(MHEngine *engine)
 void MHListGroup::AddItem(int nIndex, MHRoot *pItem, MHEngine *engine)
 {
     // See if the item is already there and ignore this if it is.
-    QList<MHListItem *>::iterator it = m_ItemList.begin();
-
-    for (; it != m_ItemList.end(); ++it)
+    foreach (auto & item, m_ItemList)
     {
-        if ((*it)->m_pVisible == pItem)
+        if (item->m_pVisible == pItem)
         {
             return;
         }

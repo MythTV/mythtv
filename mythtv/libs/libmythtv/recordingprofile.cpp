@@ -448,18 +448,15 @@ class AudioCompressionSettings : public GroupSetting
                 {
                     if (option.m_category == DriverOption::AUDIO_ENCODING)
                     {
-                        DriverOption::menu_t::const_iterator Imenu =
-                            option.m_menu.begin();
-                        for ( ; Imenu != option.m_menu.end(); ++Imenu)
+                        foreach (const auto & Imenu, option.m_menu)
                         {
-                            if (!(*Imenu).isEmpty())
-                                m_v4l2codecs << "V4L2:" + *Imenu;
+                            if (!Imenu.isEmpty())
+                                m_v4l2codecs << "V4L2:" + Imenu;
                         }
                     }
                 }
 
-                QStringList::iterator Icodec = m_v4l2codecs.begin();
-                for ( ; Icodec < m_v4l2codecs.end(); ++Icodec)
+                for (auto Icodec = m_v4l2codecs.begin(); Icodec < m_v4l2codecs.end(); ++Icodec)
                 {
                     foreach (auto & option, options)
                     {
@@ -486,15 +483,13 @@ class AudioCompressionSettings : public GroupSetting
                             bool layer2 = false;
                             bool layer3 = false;
 
-                            DriverOption::menu_t::const_iterator Imenu =
-                                option.m_menu.begin();
-                            for ( ; Imenu != option.m_menu.end(); ++Imenu)
+                            foreach (const auto & Imenu, option.m_menu)
                             {
-                                if ((*Imenu).indexOf("Layer III") >= 0)
+                                if (Imenu.indexOf("Layer III") >= 0)
                                     layer3 = true;
-                                else if ((*Imenu).indexOf("Layer II") >= 0)
+                                else if (Imenu.indexOf("Layer II") >= 0)
                                     layer2 = true;
-                                else if ((*Imenu).indexOf("Layer I") >= 0)
+                                else if (Imenu.indexOf("Layer I") >= 0)
                                     layer1 = true;
                             }
 
@@ -534,9 +529,8 @@ class AudioCompressionSettings : public GroupSetting
             }
             else if (groupType.startsWith("V4L2:"))
             {
-                QStringList::iterator Icodec = m_v4l2codecs.begin();
-                for ( ; Icodec != m_v4l2codecs.end(); ++Icodec)
-                    m_codecName->addSelection(*Icodec);
+                foreach (auto & codec, m_v4l2codecs)
+                    m_codecName->addSelection(codec);
             }
             else
             {
@@ -993,18 +987,15 @@ class VideoCompressionSettings : public GroupSetting
                 {
                     if (option.m_category == DriverOption::VIDEO_ENCODING)
                     {
-                        DriverOption::menu_t::const_iterator Imenu =
-                            option.m_menu.begin();
-                        for ( ; Imenu != option.m_menu.end(); ++Imenu)
+                        foreach (const auto & Imenu, option.m_menu)
                         {
-                            if (!(*Imenu).isEmpty())
-                                m_v4l2codecs << "V4L2:" + *Imenu;
+                            if (!Imenu.isEmpty())
+                                m_v4l2codecs << "V4L2:" + Imenu;
                         }
                     }
                 }
 
-                QStringList::iterator Icodec = m_v4l2codecs.begin();
-                for ( ; Icodec < m_v4l2codecs.end(); ++Icodec)
+                for (auto Icodec = m_v4l2codecs.begin(); Icodec < m_v4l2codecs.end(); ++Icodec)
                 {
                     auto* bit_low    = new GroupSetting();
                     auto* bit_medium = new GroupSetting();
@@ -1143,9 +1134,8 @@ class VideoCompressionSettings : public GroupSetting
                m_codecName->addSelection("MPEG-4 AVC Hardware Encoder");
             else if (groupType.startsWith("V4L2:"))
             {
-                QStringList::iterator Icodec = m_v4l2codecs.begin();
-                for ( ; Icodec != m_v4l2codecs.end(); ++Icodec)
-                    m_codecName->addSelection(*Icodec);
+                foreach (auto & codec, m_v4l2codecs)
+                    m_codecName->addSelection(codec);
             }
             else if (groupType == "MPEG")
                m_codecName->addSelection("MPEG-2 Hardware Encoder");
@@ -1592,11 +1582,10 @@ void RecordingProfile::CompleteLoad(int profileId, const QString &type,
             QStringList devices = CardUtil::GetVideoDevices("V4L2ENC");
             if (!devices.isEmpty())
             {
-                QStringList::iterator Idev = devices.begin();
-                for ( ; Idev != devices.end(); ++Idev)
+                foreach (auto & device, devices)
                 {
                     delete m_v4l2util;
-                    m_v4l2util = new V4L2util(*Idev);
+                    m_v4l2util = new V4L2util(device);
                     if (m_v4l2util->IsOpen() &&
                         m_v4l2util->DriverName() == type.mid(5))
                         break;

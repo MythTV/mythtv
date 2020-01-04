@@ -81,18 +81,17 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext **Context,
     {
         // iterate over known decoder capabilities
         s_NVDECLock->lock();
-        auto it = s_NVDECDecoderCaps.cbegin();
-        for ( ; it != s_NVDECDecoderCaps.cend(); ++it)
+        for (const auto & cap : s_NVDECDecoderCaps)
         {
-            if (((*it).m_codec == cudacodec) && ((*it).m_depth == depth) && ((*it).m_format == cudaformat))
+            if ((cap.m_codec == cudacodec) && (cap.m_depth == depth) && (cap.m_format == cudaformat))
             {
                 // match - now check restrictions
                 int width = (*Context)->width;
                 int height = (*Context)->height;
                 uint mblocks = static_cast<uint>((width * height) / 256);
-                if (((*it).m_maximum.width() >= width) && ((*it).m_maximum.height() >= height) &&
-                    ((*it).m_minimum.width() <= width) && ((*it).m_minimum.height() <= height) &&
-                    ((*it).m_macroBlocks >= mblocks))
+                if ((cap.m_maximum.width() >= width) && (cap.m_maximum.height() >= height) &&
+                    (cap.m_minimum.width() <= width) && (cap.m_minimum.height() <= height) &&
+                    (cap.m_macroBlocks >= mblocks))
                 {
                     supported = true;
                 }
@@ -100,8 +99,8 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext **Context,
                 {
                     LOG(VB_PLAYBACK, LOG_INFO, LOC +
                         QString("Codec '%9' failed size constraints: source: %1x%2 min: %3x%4 max: %5x%6 mbs: %7, max %8")
-                        .arg(width).arg(height).arg((*it).m_minimum.width()).arg((*it).m_minimum.height())
-                        .arg((*it).m_maximum.width()).arg((*it).m_maximum.height()).arg(mblocks).arg((*it).m_macroBlocks)
+                        .arg(width).arg(height).arg(cap.m_minimum.width()).arg(cap.m_minimum.height())
+                        .arg(cap.m_maximum.width()).arg(cap.m_maximum.height()).arg(mblocks).arg(cap.m_macroBlocks)
                         .arg(get_encoding_type(success)));
 
                 }

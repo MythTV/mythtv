@@ -634,10 +634,9 @@ bool XMLParseBase::WindowExists(const QString &xmlfile,
                                 const QString &windowname)
 {
     const QStringList searchpath = GetMythUI()->GetThemeSearchPath();
-    QStringList::const_iterator it = searchpath.begin();
-    for (; it != searchpath.end(); ++it)
+    foreach (const auto & dir, searchpath)
     {
-        QString themefile = *it + xmlfile;
+        QString themefile = dir + xmlfile;
         QFile f(themefile);
 
         if (!f.open(QIODevice::ReadOnly))
@@ -690,10 +689,9 @@ bool XMLParseBase::LoadWindowFromXML(const QString &xmlfile,
     bool showWarnings = true;
 
     const QStringList searchpath = GetMythUI()->GetThemeSearchPath();
-    QStringList::const_iterator it = searchpath.begin();
-    for (; it != searchpath.end(); ++it)
+    foreach (const auto & dir, searchpath)
     {
-        QString themefile = *it + xmlfile;
+        QString themefile = dir + xmlfile;
         LOG(VB_GUI, LOG_INFO, LOC + QString("Loading window %1 from %2").arg(windowname).arg(themefile));
         if (doLoad(windowname, parent, themefile,
                    onlyLoadWindows, showWarnings))
@@ -842,10 +840,9 @@ bool XMLParseBase::LoadBaseTheme(void)
 
     const QStringList searchpath = GetMythUI()->GetThemeSearchPath();
     QMap<QString, QString> dependsMap;
-    QStringList::const_iterator it = searchpath.begin();
-    for (; it != searchpath.end(); ++it)
+    foreach (const auto & dir, searchpath)
     {
-        QString themefile = *it + "base.xml";
+        QString themefile = dir + "base.xml";
         if (doLoad(QString(), GetGlobalObjectStore(), themefile,
                    loadOnlyWindows, showWarnings))
         {
@@ -883,11 +880,9 @@ bool XMLParseBase::LoadBaseTheme(const QString &baseTheme)
     bool showWarnings = true;
 
     const QStringList searchpath = GetMythUI()->GetThemeSearchPath();
-
-    QStringList::const_iterator it = searchpath.begin();
-    for (; it != searchpath.end(); ++it)
+    foreach (const auto & dir, searchpath)
     {
-        QString themefile = *it + baseTheme;
+        QString themefile = dir + baseTheme;
         if (doLoad(QString(), GetGlobalObjectStore(), themefile,
                    loadOnlyWindows, showWarnings))
         {

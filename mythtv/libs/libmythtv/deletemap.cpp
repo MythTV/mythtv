@@ -282,8 +282,7 @@ void DeleteMap::ReverseAll(void)
 {
     EDIT_CHECK;
     Push(tr("Reverse Cuts"));
-    frm_dir_map_t::Iterator it = m_deleteMap.begin();
-    for ( ; it != m_deleteMap.end(); ++it)
+    for (auto it = m_deleteMap.begin(); it != m_deleteMap.end(); ++it)
         Add(it.key(), it.value() == MARK_CUT_END ? MARK_CUT_START :
                                                    MARK_CUT_END);
     CleanMap();
@@ -651,8 +650,7 @@ bool DeleteMap::HasTemporaryMark(void) const
 {
     if (!m_deleteMap.isEmpty())
     {
-        frm_dir_map_t::const_iterator it = m_deleteMap.begin();
-        for ( ; it != m_deleteMap.end(); ++it)
+        for (auto it = m_deleteMap.cbegin(); it != m_deleteMap.cend(); ++it)
             if (MARK_PLACEHOLDER == it.value())
                 return true;
     }
@@ -682,8 +680,7 @@ void DeleteMap::CleanMap(void)
         int64_t lastframe = -1;
         int64_t tempframe = -1;
         QList<int64_t> deleteList;
-        frm_dir_map_t::iterator it = m_deleteMap.begin();
-        for ( ; it != m_deleteMap.end(); ++it)
+        for (auto it = m_deleteMap.begin(); it != m_deleteMap.end(); ++it)
         {
             int      thistype  = it.value();
             uint64_t thisframe = it.key();
@@ -713,10 +710,9 @@ void DeleteMap::CleanMap(void)
 
         // Delete the unwanted frame marks safely, and not while iterating over
         // the map which would lead to a crash
-        QList<int64_t>::iterator dit = deleteList.begin();
-        for (; dit != deleteList.end(); ++dit)
+        foreach (const long & dit, deleteList)
         {
-            Delete(*dit);
+            Delete(dit);
         }
         deleteList.clear();
     }
@@ -738,8 +734,7 @@ void DeleteMap::LoadCommBreakMap(frm_dir_map_t &map)
 {
     Push(tr("Load Detected Commercials"));
     Clear();
-    frm_dir_map_t::Iterator it = map.begin();
-    for ( ; it != map.end(); ++it)
+    for (auto it = map.begin(); it != map.end(); ++it)
         Add(it.key(), it.value() == MARK_COMM_START ?
                 MARK_CUT_START : MARK_CUT_END);
     CleanMap();

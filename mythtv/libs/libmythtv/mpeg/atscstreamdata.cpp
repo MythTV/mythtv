@@ -136,14 +136,12 @@ void ATSCStreamData::Reset(int desiredMajorChannel, int desiredMinorChannel)
         DeleteCachedTable(m_cachedMgt);
         m_cachedMgt = nullptr;
 
-        tvct_cache_t::iterator tit = m_cachedTvcts.begin();
-        for (; tit != m_cachedTvcts.end(); ++tit)
-            DeleteCachedTable(*tit);
+        foreach (auto & cached, m_cachedTvcts)
+            DeleteCachedTable(cached);
         m_cachedTvcts.clear();
 
-        cvct_cache_t::iterator cit = m_cachedCvcts.begin();
-        for (; cit != m_cachedCvcts.end(); ++cit)
-            DeleteCachedTable(*cit);
+        foreach (auto & cached, m_cachedCvcts)
+            DeleteCachedTable(cached);
         m_cachedCvcts.clear();
     }
 
@@ -818,10 +816,8 @@ cvct_vec_t ATSCStreamData::GetCachedCVCTs(bool current) const
     vector<const CableVirtualChannelTable*> cvcts;
 
     m_cacheLock.lock();
-    cvct_cache_t::const_iterator it = m_cachedCvcts.begin();
-    for (; it != m_cachedCvcts.end(); ++it)
+    foreach (auto cvct, m_cachedCvcts)
     {
-        CableVirtualChannelTable* cvct = *it;
         IncrementRefCnt(cvct);
         cvcts.push_back(cvct);
     }
@@ -913,9 +909,8 @@ void ATSCStreamData::AddATSCMainListener(ATSCMainStreamListener *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    auto it = m_atscMainListeners.begin();
-    for (; it != m_atscMainListeners.end(); ++it)
-        if (((void*)val) == ((void*)*it))
+    for (auto & listener : m_atscMainListeners)
+        if (((void*)val) == ((void*)listener))
             return;
 
     m_atscMainListeners.push_back(val);
@@ -925,8 +920,7 @@ void ATSCStreamData::RemoveATSCMainListener(ATSCMainStreamListener *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    auto it = m_atscMainListeners.begin();
-    for (; it != m_atscMainListeners.end(); ++it)
+    for (auto it = m_atscMainListeners.begin(); it != m_atscMainListeners.end(); ++it)
     {
         if (((void*)val) == ((void*)*it))
         {
@@ -940,9 +934,8 @@ void ATSCStreamData::AddSCTEMainListener(SCTEMainStreamListener *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    auto it = m_scteMainlisteners.begin();
-    for (; it != m_scteMainlisteners.end(); ++it)
-        if (((void*)val) == ((void*)*it))
+    for (auto & listener : m_scteMainlisteners)
+        if (((void*)val) == ((void*)listener))
             return;
 
     m_scteMainlisteners.push_back(val);
@@ -952,8 +945,7 @@ void ATSCStreamData::RemoveSCTEMainListener(SCTEMainStreamListener *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    auto it = m_scteMainlisteners.begin();
-    for (; it != m_scteMainlisteners.end(); ++it)
+    for (auto it = m_scteMainlisteners.begin(); it != m_scteMainlisteners.end(); ++it)
     {
         if (((void*)val) == ((void*)*it))
         {
@@ -967,9 +959,8 @@ void ATSCStreamData::AddATSCAuxListener(ATSCAuxStreamListener *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    auto it = m_atscAuxListeners.begin();
-    for (; it != m_atscAuxListeners.end(); ++it)
-        if (((void*)val) == ((void*)*it))
+    for (auto & listener : m_atscAuxListeners)
+        if (((void*)val) == ((void*)listener))
             return;
 
     m_atscAuxListeners.push_back(val);
@@ -979,8 +970,7 @@ void ATSCStreamData::RemoveATSCAuxListener(ATSCAuxStreamListener *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    auto it = m_atscAuxListeners.begin();
-    for (; it != m_atscAuxListeners.end(); ++it)
+    for (auto it = m_atscAuxListeners.begin(); it != m_atscAuxListeners.end(); ++it)
     {
         if (((void*)val) == ((void*)*it))
         {
@@ -994,9 +984,8 @@ void ATSCStreamData::AddATSCEITListener(ATSCEITStreamListener *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    auto it = m_atscEitListeners.begin();
-    for (; it != m_atscEitListeners.end(); ++it)
-        if (((void*)val) == ((void*)*it))
+    for (auto & listener : m_atscEitListeners)
+        if (((void*)val) == ((void*)listener))
             return;
 
     m_atscEitListeners.push_back(val);
@@ -1006,8 +995,7 @@ void ATSCStreamData::RemoveATSCEITListener(ATSCEITStreamListener *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    auto it = m_atscEitListeners.begin();
-    for (; it != m_atscEitListeners.end(); ++it)
+    for (auto it = m_atscEitListeners.begin(); it != m_atscEitListeners.end(); ++it)
     {
         if (((void*)val) == ((void*)*it))
         {
@@ -1021,9 +1009,8 @@ void ATSCStreamData::AddATSC81EITListener(ATSC81EITStreamListener *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    auto it = m_atsc81EitListeners.begin();
-    for (; it != m_atsc81EitListeners.end(); ++it)
-        if (((void*)val) == ((void*)*it))
+    for (auto & listener : m_atsc81EitListeners)
+        if (((void*)val) == ((void*)listener))
             return;
 
     m_atsc81EitListeners.push_back(val);
@@ -1033,8 +1020,7 @@ void ATSCStreamData::RemoveATSC81EITListener(ATSC81EITStreamListener *val)
 {
     QMutexLocker locker(&m_listenerLock);
 
-    auto it = m_atsc81EitListeners.begin();
-    for (; it != m_atsc81EitListeners.end(); ++it)
+    for (auto it = m_atsc81EitListeners.begin(); it != m_atsc81EitListeners.end(); ++it)
     {
         if (((void*)val) == ((void*)*it))
         {

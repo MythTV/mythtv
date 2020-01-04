@@ -239,8 +239,7 @@ bool V4LChannel::InitializeInputs(void)
 
     // Insert info from hardware
     uint valid_cnt = 0;
-    InputNames::const_iterator v4l_it = v4l_inputs.begin();
-    for (; v4l_it != v4l_inputs.end(); ++v4l_it)
+    for (auto v4l_it = v4l_inputs.cbegin(); v4l_it != v4l_inputs.cend(); ++v4l_it)
     {
         if (*v4l_it == m_name)
         {

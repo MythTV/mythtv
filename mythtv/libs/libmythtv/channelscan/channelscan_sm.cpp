@@ -1294,29 +1294,27 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
     }
 
     // PATs
-    pat_map_t::const_iterator pat_list_it = scan_info->m_pats.begin();
-    for (; pat_list_it != scan_info->m_pats.end(); ++pat_list_it)
+    foreach (auto pat_list, scan_info->m_pats)
     {
-        auto pat_it = (*pat_list_it).cbegin();
-        for (; pat_it != (*pat_list_it).cend(); ++pat_it)
+        for (auto pat : pat_list)
         {
             bool could_be_opencable = false;
-            for (uint i = 0; i < (*pat_it)->ProgramCount(); ++i)
+            for (uint i = 0; i < pat->ProgramCount(); ++i)
             {
-                if (((*pat_it)->ProgramNumber(i) == 0) &&
-                    ((*pat_it)->ProgramPID(i) == 0x1ffc))
+                if ((pat->ProgramNumber(i) == 0) &&
+                    (pat->ProgramPID(i) == 0x1ffc))
                 {
                     could_be_opencable = true;
                 }
             }
 
-            for (uint i = 0; i < (*pat_it)->ProgramCount(); ++i)
+            for (uint i = 0; i < pat->ProgramCount(); ++i)
             {
-                uint pnum = (*pat_it)->ProgramNumber(i);
+                uint pnum = pat->ProgramNumber(i);
                 if (pnum)
                 {
                     PCM_INFO_INIT("mpeg");
-                    info.m_patTsId = (*pat_it)->TransportStreamID();
+                    info.m_patTsId = pat->TransportStreamID();
                     info.m_couldBeOpencable = could_be_opencable;
                     info.m_inPat = true;
                 }
@@ -1325,10 +1323,8 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
     }
 
     // PMTs
-    pmt_vec_t::const_iterator pmt_it = scan_info->m_pmts.begin();
-    for (; pmt_it != scan_info->m_pmts.end(); ++pmt_it)
+    foreach (auto pmt, scan_info->m_pmts)
     {
-        const ProgramMapTable *pmt = *pmt_it;
         uint pnum = pmt->ProgramNumber();
         PCM_INFO_INIT("mpeg");
         for (uint i = 0; i < pmt->StreamCount(); ++i)
@@ -1356,41 +1352,37 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
     }
 
     // Cable VCTs
-    cvct_vec_t::const_iterator cvct_it = scan_info->m_cvcts.begin();
-    for (; cvct_it != scan_info->m_cvcts.end(); ++cvct_it)
+    for (auto cvct : scan_info->m_cvcts)
     {
-        for (uint i = 0; i < (*cvct_it)->ChannelCount(); ++i)
+        for (uint i = 0; i < cvct->ChannelCount(); ++i)
         {
-            uint pnum = (*cvct_it)->ProgramNumber(i);
+            uint pnum = cvct->ProgramNumber(i);
             PCM_INFO_INIT("atsc");
-            update_info(info, *cvct_it, i);
+            update_info(info, cvct, i);
         }
     }
 
     // Terrestrial VCTs
-    tvct_vec_t::const_iterator tvct_it = scan_info->m_tvcts.begin();
-    for (; tvct_it != scan_info->m_tvcts.end(); ++tvct_it)
+    for (auto tvct : scan_info->m_tvcts)
     {
-        for (uint i = 0; i < (*tvct_it)->ChannelCount(); ++i)
+        for (uint i = 0; i < tvct->ChannelCount(); ++i)
         {
-            uint pnum = (*tvct_it)->ProgramNumber(i);
+            uint pnum = tvct->ProgramNumber(i);
             PCM_INFO_INIT("atsc");
-            update_info(info, *tvct_it, i);
+            update_info(info, tvct, i);
         }
     }
 
     // SDTs
-    sdt_map_t::const_iterator sdt_list_it = scan_info->m_sdts.begin();
-    for (; sdt_list_it != scan_info->m_sdts.end(); ++sdt_list_it)
+    foreach (auto sdt_list, scan_info->m_sdts)
     {
-        auto sdt_it = (*sdt_list_it).cbegin();
-        for (; sdt_it != (*sdt_list_it).cend(); ++sdt_it)
+        for (auto sdt_it : sdt_list)
         {
-            for (uint i = 0; i < (*sdt_it)->ServiceCount(); ++i)
+            for (uint i = 0; i < sdt_it->ServiceCount(); ++i)
             {
-                uint pnum = (*sdt_it)->ServiceID(i);
+                uint pnum = sdt_it->ServiceID(i);
                 PCM_INFO_INIT("dvb");
-                update_info(info, *sdt_it, i, m_defAuthorities);
+                update_info(info, sdt_it, i, m_defAuthorities);
             }
         }
     }
@@ -1405,12 +1397,11 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
         ChannelInsertInfo &info = *dbchan_it;
 
         // NIT
-        nit_vec_t::const_iterator nits_it = scan_info->m_nits.begin();
-        for (; nits_it != scan_info->m_nits.end(); ++nits_it)
+        for (auto item : scan_info->m_nits)
         {
-            for (uint i = 0; i < (*nits_it)->TransportStreamCount(); ++i)
+            for (uint i = 0; i < item->TransportStreamCount(); ++i)
             {
-                const NetworkInformationTable *nit = (*nits_it);
+                const NetworkInformationTable *nit = item;
                 if ((nit->TSID(i)              == info.m_sdtTsId) &&
                     (nit->OriginalNetworkID(i) == info.m_origNetId))
                 {
@@ -1493,11 +1484,8 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
     // Lookup table from LCN to service ID
     QMap<uint,qlonglong> lcn_sid;
 
-    bat_vec_t::const_iterator bats_it = scan_info->m_bats.begin();
-    for (; bats_it != scan_info->m_bats.end(); ++bats_it)
+    for (auto bat : scan_info->m_bats)
     {
-        const BouquetAssociationTable *bat = *bats_it;
-
         // Only the bouquet selected by user
         if (bat->BouquetID() != m_bouquetId)
             continue;
@@ -1514,21 +1502,20 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
                                       bat->TransportDescriptorsLength(t));
 
             uint priv_dsid = 0;
-            desc_list_t::const_iterator it = parsed.begin();
-            for (; it != parsed.end(); ++it)
+            for (auto item : parsed)
             {
-                if ((*it)[0] == DescriptorID::private_data_specifier)
+                if (item[0] == DescriptorID::private_data_specifier)
                 {
-                    PrivateDataSpecifierDescriptor pd(*it);
+                    PrivateDataSpecifierDescriptor pd(item);
                     if (pd.IsValid())
                         priv_dsid = pd.PrivateDataSpecifier();
                 }
 
                 // Freesat logical channels
                 if (priv_dsid == PrivateDataSpecifierID::FSAT &&
-                    (*it)[0] == PrivateDescriptorID::freesat_lcn_table)
+                    item[0] == PrivateDescriptorID::freesat_lcn_table)
                 {
-                    FreesatLCNDescriptor ld(*it);
+                    FreesatLCNDescriptor ld(item);
                     if (ld.IsValid())
                     {
                         for (uint i = 0; i<ld.ServiceCount(); i++)
@@ -1554,9 +1541,9 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
 
                 // BSkyB logical channels
                 if (priv_dsid == PrivateDataSpecifierID::BSB1 &&
-                    (*it)[0] == PrivateDescriptorID::bskyb_lcn_table)
+                    item[0] == PrivateDescriptorID::bskyb_lcn_table)
                 {
-                    BSkyBLCNDescriptor ld(*it);
+                    BSkyBLCNDescriptor ld(item);
                     if (ld.IsValid())
                     {
                         uint region_id = ld.RegionID();
@@ -1723,14 +1710,13 @@ ScanDTVTransportList ChannelScanSM::GetChannelList(bool addFullTS) const
     DTVTunerType tuner_type(DTVTunerType::kTunerTypeATSC);
     tuner_type = GuessDTVTunerType(tuner_type);
 
-    ChannelList::const_iterator it = m_channelList.begin();
-    for (; it != m_channelList.end(); ++it)
+    foreach (const auto & it, m_channelList)
     {
         QMap<uint,ChannelInsertInfo> pnum_to_dbchan =
-            GetChannelList(it->first, it->second);
+            GetChannelList(it.first, it.second);
 
-        ScanDTVTransport item((*it->first).m_tuning, tuner_type, cardid);
-        item.m_iptvTuning = (*(it->first)).m_iptvTuning;
+        ScanDTVTransport item((*it.first).m_tuning, tuner_type, cardid);
+        item.m_iptvTuning = (*(it.first)).m_iptvTuning;
 
         QMap<uint,ChannelInsertInfo>::iterator dbchan_it;
         for (dbchan_it = pnum_to_dbchan.begin();
@@ -2213,8 +2199,8 @@ bool ChannelScanSM::ScanTransports(
 
     QString start = table_start;
     const QString& end   = table_end;
-    auto it = tables.begin();
-    for (; it != tables.end(); ++it)
+    // NOLINTNEXTLINE(modernize-loop-convert)
+    for (auto it = tables.begin(); it != tables.end(); ++it)
     {
         const FrequencyTable &ft = **it;
         int     name_num         = ft.m_nameOffset;

@@ -457,9 +457,8 @@ bool VideoDisplayProfile::CheckVideoRendererGroup(const QString &Renderer)
         QString("Preferred video renderer: %1 (current: %2)")
                 .arg(Renderer).arg(m_lastVideoRenderer));
 
-    QMap<QString,QStringList>::const_iterator it = s_safe_renderer_group.begin();
-    for (; it != s_safe_renderer_group.end(); ++it)
-        if (it->contains(m_lastVideoRenderer) && it->contains(Renderer))
+    foreach (const auto & group, s_safe_renderer_group)
+        if (group.contains(m_lastVideoRenderer) && group.contains(Renderer))
             return true;
     return false;
 }
@@ -499,8 +498,7 @@ void VideoDisplayProfile::SetPreference(const QString &Key, const QString &Value
 vector<ProfileItem>::const_iterator VideoDisplayProfile::FindMatch
     (const QSize &Size, float Framerate, const QString &CodecName)
 {
-    vector<ProfileItem>::const_iterator it = m_allowedPreferences.begin();
-    for (; it != m_allowedPreferences.end(); ++it)
+    for (auto it = m_allowedPreferences.cbegin(); it != m_allowedPreferences.cend(); ++it)
         if ((*it).IsMatch(Size, Framerate, CodecName))
             return it;
     return m_allowedPreferences.end();
@@ -592,14 +590,13 @@ bool VideoDisplayProfile::DeleteDB(uint GroupId, const vector<ProfileItem> &Item
         "      profileid      = :PROFILEID");
 
     bool ok = true;
-    auto it = Items.cbegin();
-    for (; it != Items.cend(); ++it)
+    for (const auto & item : Items)
     {
-        if (!(*it).GetProfileID())
+        if (!item.GetProfileID())
             continue;
 
         query.bindValue(":GROUPID",   GroupId);
-        query.bindValue(":PROFILEID", (*it).GetProfileID());
+        query.bindValue(":PROFILEID", item.GetProfileID());
         if (!query.exec())
         {
             MythDB::DBError("vdp::deletedb", query);
@@ -637,16 +634,15 @@ bool VideoDisplayProfile::SaveDB(uint GroupId, vector<ProfileItem> &Items)
         "      value          = :VALUE");
 
     bool ok = true;
-    auto it = Items.begin();
-    for (; it != Items.end(); ++it)
+    for (auto & item : Items)
     {
-        QMap<QString,QString> list = (*it).GetAll();
+        QMap<QString,QString> list = item.GetAll();
         if (list.begin() == list.end())
             continue;
 
         QMap<QString,QString>::const_iterator lit = list.begin();
 
-        if (!(*it).GetProfileID())
+        if (!item.GetProfileID())
         {
             // create new profileid
             if (!query.exec("SELECT MAX(profileid) FROM displayprofiles"))
@@ -657,7 +653,7 @@ bool VideoDisplayProfile::SaveDB(uint GroupId, vector<ProfileItem> &Items)
             }
             if (query.next())
             {
-                (*it).SetProfileID(query.value(0).toUInt() + 1);
+                item.SetProfileID(query.value(0).toUInt() + 1);
             }
 
             for (; lit != list.end(); ++lit)
@@ -666,7 +662,7 @@ bool VideoDisplayProfile::SaveDB(uint GroupId, vector<ProfileItem> &Items)
                     continue;
 
                 insert.bindValue(":GROUPID",   GroupId);
-                insert.bindValue(":PROFILEID", (*it).GetProfileID());
+                insert.bindValue(":PROFILEID", item.GetProfileID());
                 insert.bindValue(":VALUE",     lit.key());
                 insert.bindValue(":DATA", ((*lit).isNull()) ? "" : (*lit));
                 if (!insert.exec())
@@ -688,7 +684,7 @@ bool VideoDisplayProfile::SaveDB(uint GroupId, vector<ProfileItem> &Items)
                 "       profileid      = :PROFILEID AND "
                 "       value          = :VALUE");
             query.bindValue(":GROUPID",   GroupId);
-            query.bindValue(":PROFILEID", (*it).GetProfileID());
+            query.bindValue(":PROFILEID", item.GetProfileID());
             query.bindValue(":VALUE",     lit.key());
 
             if (!query.exec())
@@ -702,7 +698,7 @@ bool VideoDisplayProfile::SaveDB(uint GroupId, vector<ProfileItem> &Items)
                 if (lit->isEmpty())
                 {
                     sqldelete.bindValue(":GROUPID",   GroupId);
-                    sqldelete.bindValue(":PROFILEID", (*it).GetProfileID());
+                    sqldelete.bindValue(":PROFILEID", item.GetProfileID());
                     sqldelete.bindValue(":VALUE",     lit.key());
                     if (!sqldelete.exec())
                     {
@@ -714,7 +710,7 @@ bool VideoDisplayProfile::SaveDB(uint GroupId, vector<ProfileItem> &Items)
                 else
                 {
                     update.bindValue(":GROUPID",   GroupId);
-                    update.bindValue(":PROFILEID", (*it).GetProfileID());
+                    update.bindValue(":PROFILEID", item.GetProfileID());
                     update.bindValue(":VALUE",     lit.key());
                     update.bindValue(":DATA", ((*lit).isNull()) ? "" : (*lit));
                     if (!update.exec())
@@ -728,7 +724,7 @@ bool VideoDisplayProfile::SaveDB(uint GroupId, vector<ProfileItem> &Items)
             else
             {
                 insert.bindValue(":GROUPID",   GroupId);
-                insert.bindValue(":PROFILEID", (*it).GetProfileID());
+                insert.bindValue(":PROFILEID", item.GetProfileID());
                 insert.bindValue(":VALUE",     lit.key());
                 insert.bindValue(":DATA", ((*lit).isNull()) ? "" : (*lit));
                 if (!insert.exec())
@@ -756,9 +752,8 @@ QStringList VideoDisplayProfile::GetDecoderNames(void)
     QStringList list;
 
     const QStringList decs = GetDecoders();
-    QStringList::const_iterator it = decs.begin();
-    for (; it != decs.end(); ++it)
-        list += GetDecoderName(*it);
+    foreach (const auto & dec, decs)
+        list += GetDecoderName(dec);
 
     return list;
 }
@@ -1304,10 +1299,9 @@ QStringList VideoDisplayProfile::GetFilteredRenderers(const QString &Decoder, co
     const QStringList dec_list = GetVideoRenderers(Decoder);
     QStringList new_list;
 
-    QStringList::const_iterator it = dec_list.begin();
-    for (; it != dec_list.end(); ++it)
-        if (Renderers.contains(*it))
-            new_list.push_back(*it);
+    foreach (const auto & dec, dec_list)
+        if (Renderers.contains(dec))
+            new_list.push_back(dec);
 
     return new_list;
 }
@@ -1320,14 +1314,13 @@ QString VideoDisplayProfile::GetBestVideoRenderer(const QStringList &Renderers)
     uint    top_priority = 0;
     QString top_renderer;
 
-    QStringList::const_iterator it = Renderers.begin();
-    for (; it != Renderers.end(); ++it)
+    foreach (const auto & renderer, Renderers)
     {
-        QMap<QString,uint>::const_iterator p = s_safe_renderer_priority.find(*it);
+        QMap<QString,uint>::const_iterator p = s_safe_renderer_priority.find(renderer);
         if ((p != s_safe_renderer_priority.end()) && (*p >= top_priority))
         {
             top_priority = *p;
-            top_renderer = *it;
+            top_renderer = renderer;
         }
     }
 

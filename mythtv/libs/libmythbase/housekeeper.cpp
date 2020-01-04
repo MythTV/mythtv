@@ -616,9 +616,8 @@ HouseKeeper::~HouseKeeper(void)
         // issue a terminate call to any long-running tasks
         // this is just a noop unless overwritten by a subclass
         QMutexLocker mapLock(&m_mapLock);
-        QMap<QString,HouseKeeperTask*>::iterator it = m_taskMap.begin();
-        for (; it != m_taskMap.end(); ++it)
-            (*it)->Terminate();
+        foreach (auto & it, m_taskMap)
+            it->Terminate();
     }
 
     if (!m_threadList.isEmpty())

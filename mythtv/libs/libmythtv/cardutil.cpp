@@ -467,33 +467,25 @@ QStringList CardUtil::ProbeVideoDevices(const QString &rawtype)
     if (rawtype.toUpper() == "DVB")
     {
         QDir dir("/dev/dvb", "adapter*", QDir::Name, QDir::Dirs);
-        const QFileInfoList il = dir.entryInfoList();
-
-        QFileInfoList::const_iterator it = il.begin();
-
-        for (; it != il.end(); ++it)
+        foreach (const auto & it, dir.entryInfoList())
         {
-            QDir subdir(it->filePath(), "frontend*", QDir::Name, QDir::Files | QDir::System);
+            QDir subdir(it.filePath(), "frontend*", QDir::Name, QDir::Files | QDir::System);
             const QFileInfoList subil = subdir.entryInfoList();
             if (subil.isEmpty())
                 continue;
 
-            QFileInfoList::const_iterator subit = subil.begin();
-            for (; subit != subil.end(); ++subit)
-                devs.push_back(subit->filePath());
+            foreach (const auto & subit, subil)
+                devs.push_back(subit.filePath());
         }
     }
     else if (rawtype.toUpper() == "ASI")
     {
         QDir dir("/dev/", "asirx*", QDir::Name, QDir::System);
-        const QFileInfoList il = dir.entryInfoList();
-
-        QFileInfoList::const_iterator it = il.begin();
-        for (; it != il.end(); ++it)
+        foreach (const auto & it, dir.entryInfoList())
         {
-            if (GetASIDeviceNumber(it->filePath()) >= 0)
+            if (GetASIDeviceNumber(it.filePath()) >= 0)
             {
-                devs.push_back(it->filePath());
+                devs.push_back(it.filePath());
                 continue;
             }
             break;
@@ -609,12 +601,11 @@ QStringList CardUtil::ProbeDeliverySystems(const QString &device)
 
     delsyslist = ProbeDeliverySystems(fd_frontend);
 
-    QStringList::iterator it = delsyslist.begin();
     QString msg = "Delivery systems:";
-    for (; it != delsyslist.end(); ++it)
+    foreach (auto & item, delsyslist)
     {
         msg += " ";
-        msg += *it;
+        msg += item;
     }
     LOG(VB_GENERAL, LOG_INFO, QString("CardUtil(%1): ").arg(device) + msg);
 
@@ -1007,11 +998,10 @@ DTVModulationSystem CardUtil::ProbeBestDeliverySystem(int fd)
     // Get all supported delivery systems from the card
     QString msg = "Supported delivery systems:";
     QStringList delsyslist = ProbeDeliverySystems(fd);
-    QStringList::iterator it = delsyslist.begin();
-    for (; it != delsyslist.end(); it++)
+    foreach (auto & it, delsyslist)
     {
         msg += " ";
-        msg += *it;
+        msg += it;
     }
     LOG(VB_GENERAL, LOG_INFO, LOC + msg);
 

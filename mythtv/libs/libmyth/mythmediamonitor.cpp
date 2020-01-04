@@ -544,15 +544,14 @@ MythMediaDevice* MediaMonitor::GetMedia(const QString& path)
 {
     QMutexLocker locker(&m_DevicesLock);
 
-    QList<MythMediaDevice*>::iterator it = m_Devices.begin();
-    for (;it != m_Devices.end(); ++it)
+    foreach (auto & dev, m_Devices)
     {
-        if ((*it)->isSameDevice(path) &&
-            (((*it)->getStatus() == MEDIASTAT_USEABLE) ||
-             ((*it)->getStatus() == MEDIASTAT_MOUNTED) ||
-             ((*it)->getStatus() == MEDIASTAT_NOTMOUNTED)))
+        if (dev->isSameDevice(path) &&
+            ((dev->getStatus() == MEDIASTAT_USEABLE) ||
+             (dev->getStatus() == MEDIASTAT_MOUNTED) ||
+             (dev->getStatus() == MEDIASTAT_NOTMOUNTED)))
         {
-            return(*it);
+            return dev;
         }
     }
 
@@ -618,15 +617,14 @@ QList<MythMediaDevice*> MediaMonitor::GetMedias(unsigned mediatypes)
 
     QList<MythMediaDevice*> medias;
 
-    QList<MythMediaDevice*>::iterator it = m_Devices.begin();
-    for (;it != m_Devices.end(); ++it)
+    foreach (auto & dev, m_Devices)
     {
-        if (((*it)->getMediaType() & mediatypes) &&
-            (((*it)->getStatus() == MEDIASTAT_USEABLE) ||
-             ((*it)->getStatus() == MEDIASTAT_MOUNTED) ||
-             ((*it)->getStatus() == MEDIASTAT_NOTMOUNTED)))
+        if ((dev->getMediaType() & mediatypes) &&
+            ((dev->getStatus() == MEDIASTAT_USEABLE) ||
+             (dev->getStatus() == MEDIASTAT_MOUNTED) ||
+             (dev->getStatus() == MEDIASTAT_NOTMOUNTED)))
         {
-            medias.push_back(*it);
+            medias.push_back(dev);
         }
     }
 
@@ -952,15 +950,14 @@ QString MediaMonitor::defaultDVDWriter()
  */
 QString MediaMonitor::listDevices(void)
 {
-    QList<MythMediaDevice*>::const_iterator dev;
     QStringList list;
 
-    for (dev = m_Devices.begin(); dev != m_Devices.end(); ++dev)
+    foreach (auto & dev, m_Devices)
     {
         QString devStr;
-        QString model = (*dev)->getDeviceModel();
-        QString path  = (*dev)->getDevicePath();
-        QString real  = (*dev)->getRealDevice();
+        QString model = dev->getDeviceModel();
+        QString path  = dev->getDevicePath();
+        QString real  = dev->getRealDevice();
 
         if (path != real)
             devStr += path + "->";

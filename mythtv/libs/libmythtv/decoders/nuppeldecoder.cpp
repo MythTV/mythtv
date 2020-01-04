@@ -985,10 +985,8 @@ long NuppelDecoder::UpdateStoredFrameNum(long framenum)
 {
     long sync_offset = 0;
 
-    auto it = m_storedData.begin();
-    for ( ; it != m_storedData.end(); ++it)
+    for (auto data : m_storedData)
     {
-        RawDataList *data = *it;
         if (data->frameheader.frametype == 'S' &&
             data->frameheader.comptype == 'V')
         {

@@ -262,8 +262,7 @@ void DVBStreamHandler::RunTS(void)
             continue;
         }
 
-        StreamDataList::const_iterator sit = m_streamDataList.begin();
-        for (; sit != m_streamDataList.end(); ++sit)
+        for (auto sit = m_streamDataList.cbegin(); sit != m_streamDataList.cend(); ++sit)
             remainder = sit.key()->ProcessData(buffer, len);
 
         WriteMPTS(buffer, len - remainder);
@@ -319,8 +318,7 @@ void DVBStreamHandler::RunSR(void)
         QMutexLocker read_locker(&m_pidLock);
 
         bool readSomething = false;
-        PIDInfoMap::const_iterator fit = m_pidInfo.begin();
-        for (; fit != m_pidInfo.end(); ++fit)
+        for (auto fit = m_pidInfo.cbegin(); fit != m_pidInfo.cend(); ++fit)
         {
             int len = read((*fit)->m_filterFd, buffer, buffer_size);
             if (len <= 0)
@@ -333,8 +331,7 @@ void DVBStreamHandler::RunSR(void)
             if (psip.SectionSyntaxIndicator())
             {
                 m_listenerLock.lock();
-                StreamDataList::const_iterator sit = m_streamDataList.begin();
-                for (; sit != m_streamDataList.end(); ++sit)
+                for (auto sit = m_streamDataList.cbegin(); sit != m_streamDataList.cend(); ++sit)
                     sit.key()->HandleTables(fit.key() /* pid */, psip);
                 m_listenerLock.unlock();
             }
@@ -386,8 +383,7 @@ void DVBStreamHandler::CycleFiltersByPriority(void)
     QMap<PIDPriority, pid_list_t> priority_queue;
     QMap<PIDPriority, uint> priority_open_cnt;
 
-    PIDInfoMap::const_iterator cit = m_pidInfo.begin();
-    for (; cit != m_pidInfo.end(); ++cit)
+    for (auto cit = m_pidInfo.cbegin(); cit != m_pidInfo.cend(); ++cit)
     {
         PIDPriority priority = GetPIDPriority((*cit)->m_pid);
         priority_queue[priority].push_back(cit.key());
@@ -395,9 +391,8 @@ void DVBStreamHandler::CycleFiltersByPriority(void)
             priority_open_cnt[priority]++;
     }
 
-    QMap<PIDPriority, pid_list_t>::iterator it = priority_queue.begin();
-    for (; it != priority_queue.end(); ++it)
-        sort((*it).begin(), (*it).end());
+    for (auto & it : priority_queue)
+        sort(it.begin(), it.end());
 
     for (PIDPriority i = kPIDPriorityHigh; i > kPIDPriorityNone;
          i = (PIDPriority)((int)i-1))

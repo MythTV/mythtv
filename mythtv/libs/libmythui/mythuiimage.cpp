@@ -1340,11 +1340,9 @@ bool MythUIImage::ParseElement(
         {
             QVector<int> delays;
             QStringList tokens = value.split(",");
-            QStringList::iterator it = tokens.begin();
-
-            for (; it != tokens.end(); ++it)
+            foreach (auto & token, tokens)
             {
-                if ((*it).isEmpty())
+                if (token.isEmpty())
                 {
                     if (!delays.empty())
                         delays.append(delays[delays.size()-1]);
@@ -1353,7 +1351,7 @@ bool MythUIImage::ParseElement(
                 }
                 else
                 {
-                    delays.append((*it).toInt());
+                    delays.append(token.toInt());
                 }
             }
 
@@ -1646,11 +1644,9 @@ void MythUIImage::FindRandomImage(void)
     QStringList imageTypes;
 
     QList< QByteArray > exts = QImageReader::supportedImageFormats();
-    QList< QByteArray >::Iterator it = exts.begin();
-
-    for (; it != exts.end(); ++it)
+    foreach (auto & ext, exts)
     {
-        imageTypes.append(QString("*.").append(*it));
+        imageTypes.append(QString("*.").append(ext));
     }
 
     imageDir.setNameFilters(imageTypes);

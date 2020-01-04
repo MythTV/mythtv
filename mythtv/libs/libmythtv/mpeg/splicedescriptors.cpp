@@ -88,11 +88,10 @@ desc_list_t SpliceDescriptor::ParseOnlyInclude(
 const unsigned char *SpliceDescriptor::Find(
     const desc_list_t &parsed, uint desc_tag)
 {
-    auto it = parsed.cbegin();
-    for (; it != parsed.cend(); ++it)
+    for (auto item : parsed)
     {
-        if ((*it)[0] == desc_tag)
-            return *it;
+        if (item[0] == desc_tag)
+            return item;
     }
     return nullptr;
 }
@@ -100,11 +99,10 @@ const unsigned char *SpliceDescriptor::Find(
 desc_list_t SpliceDescriptor::FindAll(const desc_list_t &parsed, uint desc_tag)
 {
     desc_list_t tmp;
-    auto it = parsed.cbegin();
-    for (; it != parsed.cend(); ++it)
+    for (auto item : parsed)
     {
-        if ((*it)[0] == desc_tag)
-            tmp.push_back(*it);
+        if (item[0] == desc_tag)
+            tmp.push_back(item);
     }
     return tmp;
 }

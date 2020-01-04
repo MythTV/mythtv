@@ -191,9 +191,8 @@ void VideoBuffers::SetDeinterlacing(MythDeintType Single, MythDeintType Double,
                                     MythCodecID CodecID)
 {
     QMutexLocker locker(&m_globalLock);
-    auto it = m_buffers.begin();
-    for ( ; it != m_buffers.end(); ++it)
-        SetDeinterlacingFlags(*it, Single, Double, CodecID);
+    for (auto & buffer : m_buffers)
+        SetDeinterlacingFlags(buffer, Single, Double, CodecID);
 }
 
 /*! \brief Set the appropriate flags for single and double rate deinterlacing
@@ -430,14 +429,13 @@ void VideoBuffers::DoneDisplayingFrame(VideoFrame *Frame)
 
     // check if any finished frames are no longer used by decoder and return to available
     frame_queue_t ula(m_finished);
-    auto it = ula.begin();
-    for (; it != ula.end(); ++it)
+    for (auto & it : ula)
     {
-        if (!m_decode.contains(*it))
+        if (!m_decode.contains(it))
         {
-            Remove(kVideoBuffer_finished, *it);
-            ReleaseDecoderResources(*it);
-            Enqueue(kVideoBuffer_avail, *it);
+            Remove(kVideoBuffer_finished, it);
+            ReleaseDecoderResources(it);
+            Enqueue(kVideoBuffer_avail, it);
         }
     }
 }
@@ -717,9 +715,8 @@ void VideoBuffers::DiscardFrames(bool NextFrameIsKeyFrame)
     if (!NextFrameIsKeyFrame)
     {
         frame_queue_t ula(m_used);
-        auto it = ula.begin();
-        for (; it != ula.end(); ++it)
-            DiscardFrame(*it);
+        for (auto & it : ula)
+            DiscardFrame(it);
         LOG(VB_PLAYBACK, LOG_INFO,
             QString("VideoBuffers::DiscardFrames(%1): %2 -- done")
                 .arg(NextFrameIsKeyFrame).arg(GetStatus()));
@@ -1041,10 +1038,9 @@ const QString& DebugString(uint FrameNum, bool Short)
 static unsigned long long to_bitmap(const frame_queue_t& Queue, int Num)
 {
     unsigned long long bitmap = 0;
-    auto it = Queue.cbegin();
-    for (; it != Queue.cend(); ++it)
+    for (auto it : Queue)
     {
-        int shift = DebugNum(*it) % Num;
+        int shift = DebugNum(it) % Num;
         bitmap |= 1ULL << shift;
     }
     return bitmap;

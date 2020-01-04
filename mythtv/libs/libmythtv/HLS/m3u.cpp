@@ -31,10 +31,9 @@ namespace M3U
             return QString();
 
         QStringList list = line.mid(p + 1).split(',');
-        QStringList::iterator it = list.begin();
-        for (; it != list.end(); ++it)
+        foreach (auto & it, list)
         {
-            QString arg = (*it).trimmed();
+            QString arg = it.trimmed();
             if (arg.startsWith(attr))
             {
                 int pos = arg.indexOf(QLatin1String("="));

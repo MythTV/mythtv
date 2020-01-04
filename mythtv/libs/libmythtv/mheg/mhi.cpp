@@ -136,9 +136,8 @@ MHIContext::~MHIContext()
 // NB caller must hold m_display_lock
 void MHIContext::ClearDisplay(void)
 {
-    auto it = m_display.begin();
-    for (; it != m_display.end(); ++it)
-        delete *it;
+    for (auto & it : m_display)
+        delete it;
     m_display.clear();
     m_videoDisplayRect = QRect();
 }
@@ -146,9 +145,8 @@ void MHIContext::ClearDisplay(void)
 // NB caller must hold m_dsmccLock
 void MHIContext::ClearQueue(void)
 {
-    auto it = m_dsmccQueue.begin();
-    for (; it != m_dsmccQueue.end(); ++it)
-        delete *it;
+    for (auto & it : m_dsmccQueue)
+        delete it;
     m_dsmccQueue.clear();
 }
 
@@ -856,11 +854,8 @@ void MHIContext::DrawVideo(const QRect &videoRect, const QRect &dispRect)
 
     // Mark all existing items in the display stack as under the video
     QMutexLocker locker(&m_displayLock);
-    auto it = m_display.begin();
-    for (; it != m_display.end(); ++it)
-    {
-        (*it)->m_bUnder = true;
-    }
+    for (auto & it : m_display)
+        it->m_bUnder = true;
 }
 
 // Caller must hold m_channelMutex

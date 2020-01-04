@@ -92,10 +92,8 @@ QStringList VBox::doUPNPSearch(void)
     EntryMap map;
     vboxes->GetEntryMap(map);
 
-    EntryMap::const_iterator it = map.begin();
-    for (; it != map.end(); ++it)
+    foreach (auto BE, map)
     {
-        DeviceLocation *BE = (*it);
         if (!BE->GetDeviceDesc())
         {
             LOG(VB_GENERAL, LOG_INFO, LOC + QString("GetDeviceDesc() failed for %1").arg(BE->GetFriendlyName()));

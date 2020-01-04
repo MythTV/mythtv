@@ -706,10 +706,9 @@ void MythThemedMenu::buttonAction(MythUIButtonListItem *item, bool skipPass)
     if (!skipPass)
         password = button.password;
 
-    QStringList::Iterator it = button.action.begin();
-    for (; it != button.action.end(); it++)
+    foreach (auto & act, button.action)
     {
-        if (handleAction(*it, password))
+        if (handleAction(act, password))
             break;
     }
 }

@@ -1160,9 +1160,8 @@ void ChannelImporter::FixUpOpenCable(ScanDTVTransportList &transports)
     ChannelImporterBasicStats info;
     for (auto & transport : transports)
     {
-        for (size_t j = 0; j < transport.m_channels.size(); ++j)
+        for (auto & chan : transport.m_channels)
         {
-            ChannelInsertInfo &chan = transport.m_channels[j];
             if (((chan.m_couldBeOpencable && (chan.m_siStandard == "mpeg")) ||
                  chan.m_isOpencable) && !chan.m_inVct)
             {
@@ -1178,9 +1177,8 @@ ChannelImporterBasicStats ChannelImporter::CollectStats(
     ChannelImporterBasicStats info;
     for (const auto & transport : transports)
     {
-        for (size_t j = 0; j < transport.m_channels.size(); ++j)
+        for (const auto & chan : transport.m_channels)
         {
-            const ChannelInsertInfo &chan = transport.m_channels[j];
             int enc = (chan.m_isEncrypted) ?
                 ((chan.m_decryptionStatus == kEncDecrypted) ? 2 : 1) : 0;
             info.m_atscChannels[enc] += (chan.m_siStandard == "atsc");
@@ -1219,9 +1217,8 @@ ChannelImporterUniquenessStats ChannelImporter::CollectUniquenessStats(
 
     for (const auto & transport : transports)
     {
-        for (size_t j = 0; j < transport.m_channels.size(); ++j)
+        for (const auto & chan : transport.m_channels)
         {
-            const ChannelInsertInfo &chan = transport.m_channels[j];
             stats.m_uniqueProgNum +=
                 (info.m_progNumCnt[chan.m_serviceId] == 1) ? 1 : 0;
             stats.m_uniqueChanNum +=
@@ -1542,9 +1539,8 @@ void ChannelImporter::CountChannels(
     new_chan = old_chan = 0;
     for (const auto & transport : transports)
     {
-        for (size_t j = 0; j < transport.m_channels.size(); ++j)
+        for (auto chan : transport.m_channels)
         {
-            ChannelInsertInfo chan = transport.m_channels[j];
             if (IsType(info, chan, type))
             {
                 if (chan.m_channelId)

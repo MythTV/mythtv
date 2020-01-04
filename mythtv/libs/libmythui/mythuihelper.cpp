@@ -803,12 +803,10 @@ void MythUIHelper::ClearOldImageCache(void)
         dirtimes.erase(dirtimes.begin());
     }
 
-    QMap<QDateTime, QString>::const_iterator dit = dirtimes.begin();
-
-    for (; dit != dirtimes.end(); ++dit)
+    foreach (const auto & dirtime, dirtimes)
     {
         LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +
-            QString("Keeping cache dir: %1").arg(*dit));
+            QString("Keeping cache dir: %1").arg(dirtime));
     }
 }
 

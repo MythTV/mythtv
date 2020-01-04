@@ -345,6 +345,7 @@ SubtitleFormat::GetFont(const QString &family,
 
 SubtitleFormat::~SubtitleFormat(void)
 {
+    // NOLINTNEXTLINE(modernize-loop-convert)
     for (int i = 0; i < m_cleanup.size(); ++i)
     {
         m_cleanup[i]->DeleteAllChildren();
@@ -582,8 +583,7 @@ QSet<QString> SubtitleFormat::Diff(const QString &family,
         result << kSubAttrBGfill;
 
     QString values = "";
-    QSet<QString>::const_iterator i = result.constBegin();
-    for (; i != result.constEnd(); ++i)
+    for (auto i = result.constBegin(); i != result.constEnd(); ++i)
         values += " " + (*i);
     LOG(VB_VBI, LOG_INFO,
         QString("Subtitle family %1 allows provider to change:%2")
@@ -812,6 +812,7 @@ void FormattedTextSubtitle::Layout(void)
 
     // Fill in missing coordinates
     int y = anchor_y;
+    // NOLINTNEXTLINE(modernize-loop-convert)
     for (int i = 0; i < m_lines.size(); i++)
     {
         if (m_lines[i].m_xIndent < 0)
@@ -849,6 +850,7 @@ void FormattedTextSubtitle::Layout(void)
 
 void FormattedTextSubtitle::PreRender(void)
 {
+    // NOLINTNEXTLINE(modernize-loop-convert)
     for (int i = 0; i < m_lines.size(); i++)
     {
         int x = m_lines[i].m_xIndent;

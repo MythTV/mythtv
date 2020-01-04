@@ -41,12 +41,8 @@ class CC608Buffer
     void Clear(void)
     {
         m_lock.lock();
-        auto i = m_buffers.begin();
-        for (; i != m_buffers.end(); ++i)
-        {
-            CC608Text *cc = (*i);
+        for (auto cc : m_buffers)
             delete cc;
-        }
         m_buffers.clear();
         m_lock.unlock();
     }

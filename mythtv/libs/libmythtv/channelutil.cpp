@@ -926,18 +926,17 @@ bool ChannelUtil::SaveCachedPids(uint chanid,
 
     bool ok = true;
     pid_cache_t::const_iterator ito = old_cache.begin();
-    pid_cache_t::const_iterator itn = pid_cache.begin();
-    for (; itn != pid_cache.end(); ++itn)
+    for (auto itn : pid_cache)
     {
         // if old pid smaller than current new pid, skip this old pid
-        for (; ito != old_cache.end() && ito->GetPID() < itn->GetPID(); ++ito);
+        for (; ito != old_cache.end() && ito->GetPID() < itn.GetPID(); ++ito);
 
         // if already in DB, skip DB insert
-        if (ito != old_cache.end() && ito->GetPID() == itn->GetPID())
+        if (ito != old_cache.end() && ito->GetPID() == itn.GetPID())
             continue;
 
-        query.bindValue(":PID",     itn->GetPID());
-        query.bindValue(":TABLEID", itn->GetComposite());
+        query.bindValue(":PID",     itn.GetPID());
+        query.bindValue(":TABLEID", itn.GetComposite());
 
         if (!query.exec())
         {

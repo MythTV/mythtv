@@ -93,18 +93,17 @@ qint64 MMulticastSocketDevice::writeBlock(
 #ifdef IP_MULTICAST_IF
     if (host.toString() == "239.255.255.250")
     {
-        QList<QHostAddress>::const_iterator it = m_localAddresses.begin();
         int retx = 0;
-        for (; it != m_localAddresses.end(); ++it)
+        foreach (const auto & address, m_localAddresses)
         {
-            if ((*it).protocol() != QAbstractSocket::IPv4Protocol)
+            if (address.protocol() != QAbstractSocket::IPv4Protocol)
                 continue; // skip IPv6 addresses
 
-            QString addr = (*it).toString();
+            QString addr = address.toString();
             if (addr == "127.0.0.1")
                 continue; // skip localhost address
 
-            uint32_t interface_addr = (*it).toIPv4Address();
+            uint32_t interface_addr = address.toIPv4Address();
             if (setsockopt(socket(), IPPROTO_IP, IP_MULTICAST_IF,
                            (const char *)&interface_addr,
                            sizeof(interface_addr)) < 0)

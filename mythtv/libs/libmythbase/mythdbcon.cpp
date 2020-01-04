@@ -651,6 +651,7 @@ bool MSqlQuery::exec()
         QString err = MythDB::GetError("MSqlQuery", *this);
         MSqlBindings tmp = QSqlQuery::boundValues();
         bool has_null_strings = false;
+        // NOLINTNEXTLINE(modernize-loop-convert)
         for (MSqlBindings::iterator it = tmp.begin(); it != tmp.end(); ++it)
         {
             if (it->type() != QVariant::String)

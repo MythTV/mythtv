@@ -98,9 +98,8 @@ VideoScannerThread::~VideoScannerThread()
 void VideoScannerThread::SetHosts(const QStringList &hosts)
 {
     m_liveSGHosts.clear();
-    QStringList::const_iterator iter = hosts.begin();
-    for (; iter != hosts.end(); ++iter)
-        m_liveSGHosts << iter->toLower();
+    foreach (const auto & host, hosts)
+        m_liveSGHosts << host.toLower();
 }
 
 void VideoScannerThread::SetDirs(QStringList dirs)

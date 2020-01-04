@@ -156,9 +156,8 @@ static QString local_sub_filename(QFileInfo &fileInfo)
             .replace(")", "?");
 
         QMutexLocker locker(&RingBuffer::s_subExtLock);
-        QStringList::const_iterator eit = RingBuffer::s_subExt.begin();
-        for (; eit != RingBuffer::s_subExt.end(); ++eit)
-            el += findBaseName + *eit;
+        for (const auto & ext : RingBuffer::s_subExt)
+            el += findBaseName + ext;
     }
 
     // Some Qt versions do not accept paths in the search string of
@@ -168,10 +167,9 @@ static QString local_sub_filename(QFileInfo &fileInfo)
 
     const QStringList candidates = dir.entryList(el);
 
-    QStringList::const_iterator cit = candidates.begin();
-    for (; cit != candidates.end(); ++cit)
+    for (const auto & candidate : candidates)
     {
-        QFileInfo fi(dirName + "/" + *cit);
+        QFileInfo fi(dirName + "/" + candidate);
         if (fi.exists() && (fi.size() >= kReadTestSize))
             return fi.absoluteFilePath();
     }
@@ -355,9 +353,8 @@ bool FileRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
             if (is_subtitle_possible(extension))
             {
                 QMutexLocker locker(&s_subExtLock);
-                QStringList::const_iterator eit = s_subExt.begin();
-                for (; eit != s_subExt.end(); ++eit)
-                    auxFiles += baseName + *eit;
+                for (const auto & ext : s_subExt)
+                    auxFiles += baseName + ext;
             }
         }
 

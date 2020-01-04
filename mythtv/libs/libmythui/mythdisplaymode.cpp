@@ -232,20 +232,19 @@ uint64_t MythDisplayMode::FindBestScreen(const DisplayModeMap& Map,
     // 4. search for 2x rate
     // 5. search for 1x rate
 
-    auto it = Map.cbegin();
-    for ( ; it != Map.cend(); ++it)
+    for ( auto it = Map.cbegin(); it != Map.cend(); ++it)
     {
         extract_key(it->first);
         if (width == Width && height == Height && CompareRates(Rate, rate, 0.01))
             return it->first;
     }
-    for (it = Map.cbegin(); it != Map.cend(); ++it)
+    for (auto it = Map.cbegin(); it != Map.cend(); ++it)
     {
         extract_key(it->first);
         if (width == Width && height == Height && qFuzzyCompare(rate + 1.0, 1.0))
             return it->first;
     }
-    for (it = Map.cbegin(); it != Map.cend(); ++it)
+    for (auto it = Map.cbegin(); it != Map.cend(); ++it)
     {
         extract_key(it->first);
         if ((width == 0 && height == Height &&

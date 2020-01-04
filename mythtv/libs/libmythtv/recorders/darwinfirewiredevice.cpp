@@ -85,9 +85,8 @@ private:
 
     ~DFDPriv()
     {
-        avcinfo_list_t::iterator it = m_devices.begin();
-        for (; it != m_devices.end(); ++it)
-            delete (*it);
+        foreach (auto dev, m_devices)
+            delete dev;
         m_devices.clear();
 
         if (m_logger)
@@ -639,13 +638,12 @@ vector<AVCInfo> DarwinFirewireDevice::GetSTBListPrivate(void)
 
     vector<AVCInfo> list;
 
-    avcinfo_list_t::iterator it = m_priv->m_devices.begin();
-    for (; it != m_priv->m_devices.end(); ++it)
+    foreach (auto dev, m_priv->m_devices)
     {
-        if ((*it)->IsSubunitType(kAVCSubunitTypeTuner) &&
-            (*it)->IsSubunitType(kAVCSubunitTypePanel))
+        if (dev->IsSubunitType(kAVCSubunitTypeTuner) &&
+            dev->IsSubunitType(kAVCSubunitTypePanel))
         {
-            list.push_back(*(*it));
+            list.push_back(*dev);
         }
     }
 

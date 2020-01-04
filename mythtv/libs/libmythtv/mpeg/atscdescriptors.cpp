@@ -60,9 +60,8 @@ QString MultipleStringStructure::toString() const
 static uint maxPriority(const QMap<uint,uint> &langPrefs)
 {
     uint max_pri = 0;
-    QMap<uint,uint>::const_iterator it = langPrefs.begin();
-    for (; it != langPrefs.end(); ++it)
-        max_pri = max(max_pri, *it);
+    foreach (uint pref, langPrefs)
+        max_pri = max(max_pri, pref);
     return max_pri;
 }
 

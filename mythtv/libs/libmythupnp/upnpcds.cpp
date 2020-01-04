@@ -43,11 +43,10 @@ void UPnpCDSExtensionResults::Add( CDSObject *pObject )
 
 void UPnpCDSExtensionResults::Add( CDSObjects objects )
 {
-    CDSObjects::iterator it;
-    for (it = objects.begin(); it != objects.end(); ++it)
+    foreach (auto & object, objects)
     {
-        (*it)->IncrRef();
-        m_List.append( *it );
+        object->IncrRef();
+        m_List.append( object );
     }
 }
 
@@ -60,9 +59,8 @@ QString UPnpCDSExtensionResults::GetResultXML(FilterMap &filter,
 {
     QString sXML;
 
-    CDSObjects::const_iterator it = m_List.begin();
-    for (; it != m_List.end(); ++it)
-        sXML += (*it)->toXml(filter, ignoreChildren);
+    foreach (auto item, m_List)
+        sXML += item->toXml(filter, ignoreChildren);
 
     return sXML;
 }

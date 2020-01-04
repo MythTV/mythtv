@@ -37,9 +37,8 @@ void MythPainter::Teardown(void)
             .arg(m_allocatedImages.size()));
     }
 
-    QSet<MythImage*>::iterator it = m_allocatedImages.begin();
-    for (; it !=  m_allocatedImages.end(); ++it)
-        (*it)->SetParent(nullptr);
+    foreach (auto image, m_allocatedImages)
+        image->SetParent(nullptr);
     m_allocatedImages.clear();
 }
 
@@ -595,9 +594,8 @@ void MythPainter::ExpireImages(int64_t max)
     if (recompute)
     {
         m_softwareCacheSize = 0;
-        QMap<QString, MythImage*>::iterator it = m_stringToImageMap.begin();
-        for (; it != m_stringToImageMap.end(); ++it)
-            m_softwareCacheSize += (*it)->bytesPerLine() * (*it)->height();
+        foreach (auto & img, m_stringToImageMap)
+            m_softwareCacheSize += img->bytesPerLine() * img->height();
     }
 }
 

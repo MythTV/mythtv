@@ -589,8 +589,7 @@ ProgramInfo::ProgramInfo(
     if (m_originalAirDate.isValid() && m_originalAirDate < QDate(1940, 1, 1))
         m_originalAirDate = QDate();
 
-    auto it = schedList.cbegin();
-    for (; it != schedList.cend(); ++it)
+    for (auto it : schedList)
     {
         // If this showing is scheduled to be recorded, then we need to copy
         // some of the information from the scheduler
@@ -598,10 +597,10 @@ ProgramInfo::ProgramInfo(
         // This applies even if the showing may be on a different channel
         // to the one which is actually being recorded e.g. A regional or HD
         // variant of the same channel
-        if (!IsSameProgramAndStartTime(**it))
+        if (!IsSameProgramAndStartTime(*it))
             continue;
 
-        const ProgramInfo &s = **it;
+        const ProgramInfo &s = *it;
         m_recordId    = s.m_recordId;
         m_recType     = s.m_recType;
         m_recPriority = s.m_recPriority;
@@ -3314,8 +3313,8 @@ bool ProgramInfo::QueryCutList(frm_dir_map_t &delMap, bool loadAutoSave) const
         QueryMarkupMap(autosaveMap, MARK_PLACEHOLDER, true);
         // Convert the temporary marks into regular marks.
         delMap.clear();
-        frm_dir_map_t::const_iterator i = autosaveMap.constBegin();
-        for (; i != autosaveMap.constEnd(); ++i)
+        // NOLINTNEXTLINE(modernize-loop-convert)
+        for (auto i = autosaveMap.constBegin(); i != autosaveMap.constEnd(); ++i)
         {
             uint64_t frame = i.key();
             MarkTypes mark = i.value();
@@ -3348,8 +3347,8 @@ void ProgramInfo::SaveCutList(frm_dir_map_t &delMap, bool isAutoSave) const
     ClearMarkupMap(MARK_TMP_CUT_END);
 
     frm_dir_map_t tmpDelMap;
-    frm_dir_map_t::const_iterator i = delMap.constBegin();
-    for (; i != delMap.constEnd(); ++i)
+    // NOLINTNEXTLINE(modernize-loop-convert)
+    for (auto i = delMap.constBegin(); i != delMap.constEnd(); ++i)
     {
         uint64_t frame = i.key();
         MarkTypes mark = i.value();
@@ -3697,11 +3696,11 @@ void ProgramInfo::SavePositionMap(
 
         if ((min_frame >= 0) || (max_frame >= 0))
         {
-            auto it     = m_positionMapDBReplacement->map[type].begin();
-            auto it_end = m_positionMapDBReplacement->map[type].end();
-
             frm_pos_map_t new_map;
-            for (; it != it_end; ++it)
+            // NOLINTNEXTLINE(modernize-loop-convert)
+            for (auto it = m_positionMapDBReplacement->map[type].begin();
+                 it != m_positionMapDBReplacement->map[type].end();
+                 ++it)
             {
                 uint64_t frame = it.key();
                 if ((min_frame >= 0) && (frame >= (uint64_t)min_frame))
@@ -3717,9 +3716,8 @@ void ProgramInfo::SavePositionMap(
             m_positionMapDBReplacement->map[type].clear();
         }
 
-        frm_pos_map_t::const_iterator it     = posMap.begin();
-        frm_pos_map_t::const_iterator it_end = posMap.end();
-        for (; it != it_end; ++it)
+        // NOLINTNEXTLINE(modernize-loop-convert)
+        for (auto it = posMap.cbegin(); it != posMap.cend(); ++it)
         {
             uint64_t frame = it.key();
             if ((min_frame >= 0) && (frame >= (uint64_t)min_frame))
@@ -3842,9 +3840,7 @@ void ProgramInfo::SavePositionMapDelta(
     {
         QMutexLocker locker(m_positionMapDBReplacement->lock);
 
-        frm_pos_map_t::const_iterator it     = posMap.begin();
-        frm_pos_map_t::const_iterator it_end = posMap.end();
-        for (; it != it_end; ++it)
+        for (auto it = posMap.cbegin(); it != posMap.cend(); ++it)
             m_positionMapDBReplacement->map[type].insert(it.key(), *it);
 
         return;
@@ -6044,15 +6040,14 @@ bool GetNextRecordingList(QDateTime &nextRecordingStart,
         return false;
 
     // find the earliest scheduled recording
-    ProgramList::const_iterator it = progList.begin();
-    for (; it != progList.end(); ++it)
+    for (auto prog : progList)
     {
-        if (((*it)->GetRecordingStatus() == RecStatus::WillRecord ||
-             (*it)->GetRecordingStatus() == RecStatus::Pending) &&
+        if ((prog->GetRecordingStatus() == RecStatus::WillRecord ||
+             prog->GetRecordingStatus() == RecStatus::Pending) &&
             (nextRecordingStart.isNull() ||
-             nextRecordingStart > (*it)->GetRecordingStartTime()))
+             nextRecordingStart > prog->GetRecordingStartTime()))
         {
-            nextRecordingStart = (*it)->GetRecordingStartTime();
+            nextRecordingStart = prog->GetRecordingStartTime();
         }
     }
 
@@ -6060,13 +6055,13 @@ bool GetNextRecordingList(QDateTime &nextRecordingStart,
         return true;
 
     // save the details of the earliest recording(s)
-    for (it = progList.begin(); it != progList.end(); ++it)
+    for (auto & prog : progList)
     {
-        if (((*it)->GetRecordingStatus()    == RecStatus::WillRecord ||
-             (*it)->GetRecordingStatus()    == RecStatus::Pending) &&
-            ((*it)->GetRecordingStartTime() == nextRecordingStart))
+        if ((prog->GetRecordingStatus()    == RecStatus::WillRecord ||
+             prog->GetRecordingStatus()    == RecStatus::Pending) &&
+            (prog->GetRecordingStartTime() == nextRecordingStart))
         {
-            list->push_back(**it);
+            list->push_back(*prog);
         }
     }
 

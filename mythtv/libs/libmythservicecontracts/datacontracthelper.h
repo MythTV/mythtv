@@ -127,10 +127,8 @@ inline void DeleteListContents( QVariantList &list )
 template< class T >
 void CopyListContents( QObject *pParent, QVariantList &dst, const QVariantList &src )
 {
-    for( int nIdx = 0; nIdx < src.size(); nIdx++ )
+    foreach (auto vValue, src)
     {
-        QVariant vValue = src[ nIdx ];
-
         if ( vValue.canConvert< QObject* >())
         {
             const QObject *pObject = vValue.value< QObject* >();

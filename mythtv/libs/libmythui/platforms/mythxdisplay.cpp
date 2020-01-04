@@ -225,10 +225,9 @@ void MythXDisplay::CheckOrphanedErrors(void)
     if (xerrors.empty())
         return;
 
-    auto errors = xerrors.begin();
-    for (; errors != xerrors.end(); ++errors)
-        if (!xerror_handlers.count(errors->first))
-            CheckErrors(errors->first);
+    for (auto & xerror : xerrors)
+        if (!xerror_handlers.count(xerror.first))
+            CheckErrors(xerror.first);
 }
 
 #endif // USING_X11

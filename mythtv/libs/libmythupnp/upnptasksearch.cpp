@@ -200,16 +200,15 @@ void UPnpSearchTask::ProcessDevice(
     // Loop for each service in this device and send the 1 required message
     // ------------------------------------------------------------------
 
-    UPnpServiceList::const_iterator sit = pDevice->m_listServices.begin();
-    for (; sit != pDevice->m_listServices.end(); ++sit)
+    for (auto sit = pDevice->m_listServices.cbegin();
+         sit != pDevice->m_listServices.cend(); ++sit)
         SendMsg(pSocket, (*sit)->m_sServiceType, pDevice->GetUDN());
 
     // ----------------------------------------------------------------------
     // Process any Embedded Devices
     // ----------------------------------------------------------------------
 
-    UPnpDeviceList::const_iterator dit = pDevice->m_listDevices.begin();
-    for (; dit != pDevice->m_listDevices.end(); ++dit)
-        ProcessDevice( pSocket, *dit);
+    foreach (auto device, pDevice->m_listDevices)
+        ProcessDevice( pSocket, device);
 }
 

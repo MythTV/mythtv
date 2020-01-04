@@ -275,14 +275,13 @@ bool MediaMonitorUnix::CheckMountable(void)
     sysfs.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
 
     QStringList devices = sysfs.entryList();
-
-    for (QStringList::iterator it = devices.begin(); it != devices.end(); ++it)
+    foreach (auto & device, devices)
     {
         // ignore floppies, too slow
-        if ((*it).startsWith("fd"))
+        if (device.startsWith("fd"))
             continue;
 
-        sysfs.cd(*it);
+        sysfs.cd(device);
         QString path = sysfs.absolutePath();
         if (CheckRemovable(path))
             FindPartitions(path, true);
@@ -585,12 +584,11 @@ bool MediaMonitorUnix::AddDevice(MythMediaDevice* pDevice)
     //
     // Check if this is a duplicate of a device we have already added
     //
-    QList<MythMediaDevice*>::const_iterator itr = m_Devices.begin();
-    for (; itr != m_Devices.end(); ++itr)
+    foreach (auto & device, m_Devices)
     {
-        if (stat((*itr)->getDevicePath().toLocal8Bit().constData(), &sb) < 0)
+        if (stat(device->getDevicePath().toLocal8Bit().constData(), &sb) < 0)
         {
-            statError(":AddDevice()", (*itr)->getDevicePath());
+            statError(":AddDevice()", device->getDevicePath());
             return false;
         }
 
@@ -600,7 +598,7 @@ bool MediaMonitorUnix::AddDevice(MythMediaDevice* pDevice)
                      LOC + ":AddDevice() - not adding " + path +
                      "\n                        "
                      "because it appears to be a duplicate of " +
-                     (*itr)->getDevicePath());
+                     device->getDevicePath());
             return false;
         }
     }
@@ -788,17 +786,16 @@ bool MediaMonitorUnix::FindPartitions(const QString &dev, bool checkPartitions)
 
         bool found_partitions = false;
         QStringList parts = sysfs.entryList();
-        for (QStringList::iterator pit = parts.begin();
-             pit != parts.end(); ++pit)
+        foreach (auto & part, parts)
         {
             // skip some sysfs dirs that are _not_ sub-partitions
-            if (*pit == "device" || *pit == "holders" || *pit == "queue"
-                                 || *pit == "slaves"  || *pit == "subsystem"
-                                 || *pit == "bdi"     || *pit == "power")
+            if (part == "device" || part == "holders" || part == "queue"
+                                 || part == "slaves"  || part == "subsystem"
+                                 || part == "bdi"     || part == "power")
                 continue;
 
             found_partitions |= FindPartitions(
-                sysfs.absoluteFilePath(*pit), false);
+                sysfs.absoluteFilePath(part), false);
         }
 
         // no partitions on block device, use main device
@@ -859,21 +856,19 @@ void MediaMonitorUnix::CheckDeviceNotifications(void)
         size = read(m_fifo, buffer, 255);
     }
     const QStringList list = qBuffer.split('\n', QString::SkipEmptyParts);
-
-    QStringList::const_iterator it = list.begin();
-    for (; it != list.end(); ++it)
+    foreach (const auto & notif, list)
     {
-        if ((*it).startsWith("add"))
+        if (notif.startsWith("add"))
         {
-            QString dev = (*it).section(' ', 1, 1);
+            QString dev = notif.section(' ', 1, 1);
             LOG(VB_MEDIA, LOG_INFO, "Udev add " + dev);
 
             if (CheckRemovable(dev))
                 FindPartitions(dev, true);
         }
-        else if ((*it).startsWith("remove"))
+        else if (notif.startsWith("remove"))
         {
-            QString dev = (*it).section(' ', 2, 2);
+            QString dev = notif.section(' ', 2, 2);
             LOG(VB_MEDIA, LOG_INFO, "Udev remove " + dev);
             RemoveDevice(dev);
         }

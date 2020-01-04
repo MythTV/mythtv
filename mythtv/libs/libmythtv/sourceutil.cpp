@@ -212,19 +212,18 @@ bool SourceUtil::IsProperlyConnected(uint sourceid, bool strict)
 {
     QStringList types = get_inputtypes(sourceid);
     QMap<QString,uint> counts;
-    QStringList::const_iterator it = types.begin();
-    for (; it != types.end(); ++it)
+    foreach (const auto & type, types)
     {
-        counts[*it]++;
+        counts[type]++;
 
-        counts[CardUtil::IsEncoder(*it)    ? "ENCODER" : "NOT_ENCODER"]++;
-        counts[CardUtil::IsUnscanable(*it) ? "NO_SCAN" : "SCAN"]++;
+        counts[CardUtil::IsEncoder(type)    ? "ENCODER" : "NOT_ENCODER"]++;
+        counts[CardUtil::IsUnscanable(type) ? "NO_SCAN" : "SCAN"]++;
 
-        if (CardUtil::IsTuningAnalog(*it))
+        if (CardUtil::IsTuningAnalog(type))
             counts["ANALOG_TUNING"]++;
-        else if (CardUtil::IsTuningDigital(*it))
+        else if (CardUtil::IsTuningDigital(type))
             counts["DIGITAL_TUNING"]++;
-        else if (CardUtil::IsTuningVirtual(*it))
+        else if (CardUtil::IsTuningVirtual(type))
             counts["VIRTUAL_TUNING"]++;
     }
 
@@ -286,9 +285,8 @@ bool SourceUtil::IsEncoder(uint sourceid, bool strict)
     bool encoder = true;
 
     QStringList types = get_inputtypes(sourceid);
-    QStringList::const_iterator it = types.begin();
-    for (; it != types.end(); ++it)
-        encoder &= CardUtil::IsEncoder(*it);
+    foreach (const auto & type, types)
+        encoder &= CardUtil::IsEncoder(type);
 
     // Source is connected, go by input types for type determination
     if (!types.empty())
@@ -322,9 +320,8 @@ bool SourceUtil::IsUnscanable(uint sourceid)
 {
     bool unscanable = true;
     QStringList types = get_inputtypes(sourceid);
-    QStringList::const_iterator it = types.begin();
-    for (; it != types.end(); ++it)
-        unscanable &= CardUtil::IsUnscanable(*it);
+    foreach (const auto & type, types)
+        unscanable &= CardUtil::IsUnscanable(type);
 
     return types.empty() || unscanable;
 }
@@ -333,11 +330,10 @@ bool SourceUtil::IsCableCardPresent(uint sourceid)
 {
     bool ccpresent = false;
     vector<uint> inputs = CardUtil::GetInputIDs(sourceid);
-    auto it = inputs.begin();
-    for (; it != inputs.end(); ++it)
+    for (uint & input : inputs)
     {
-        if (CardUtil::IsCableCardPresent(*it, CardUtil::GetRawInputType(*it))
-            || CardUtil::GetRawInputType(*it) == "HDHOMERUN")
+        if (CardUtil::IsCableCardPresent(input, CardUtil::GetRawInputType(input))
+            || CardUtil::GetRawInputType(input) == "HDHOMERUN")
             ccpresent = true;
     }
 

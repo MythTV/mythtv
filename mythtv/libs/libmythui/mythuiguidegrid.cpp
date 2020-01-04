@@ -288,12 +288,8 @@ void MythUIGuideGrid::DrawSelf(MythPainter *p, int xoffset, int yoffset,
     p->SetClipRect(clipRect);
     for (int i = 0; i < m_rowCount; i++)
     {
-        QList<UIGTCon *>::iterator it = m_allData[i].begin();
-
-        for (; it != m_allData[i].end(); ++it)
+        foreach (auto data, m_allData[i])
         {
-            UIGTCon *data = *it;
-
             if (data->m_recStat == 0)
                 drawBackground(p, xoffset, yoffset, data, alphaMod);
             else if (data->m_recStat == 1)
@@ -310,11 +306,8 @@ void MythUIGuideGrid::DrawSelf(MythPainter *p, int xoffset, int yoffset,
 
     for (int i = 0; i < m_rowCount; i++)
     {
-        QList<UIGTCon *>::iterator it = m_allData[i].begin();
-
-        for (; it != m_allData[i].end(); ++it)
+        foreach (auto data, m_allData[i])
         {
-            UIGTCon *data = *it;
             drawRecDecoration(p, xoffset, yoffset, data, alphaMod);
         }
     }

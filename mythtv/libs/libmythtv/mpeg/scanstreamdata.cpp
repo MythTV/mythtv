@@ -65,11 +65,8 @@ QString ScanStreamData::GetSIStandard(const QString& guess) const
 
     QMutexLocker locker(&m_cacheLock);
 
-    pmt_cache_t::const_iterator it = m_cachedPmts.begin();
-    for (; it != m_cachedPmts.end(); ++it)
+    foreach (auto pmt, m_cachedPmts)
     {
-        ProgramMapTable *pmt = *it;
-
         for (uint i = 0; (guess != "dvb") && (i < pmt->StreamCount()); i++)
         {
             if (StreamID::OpenCableVideo == pmt->StreamType(i))

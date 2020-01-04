@@ -394,8 +394,8 @@ inline void DecoderBase::AutoSelectTracks(void)
 
 inline void DecoderBase::ResetTracks(void)
 {
-    for (uint i = 0; i < kTrackTypeCount; i++)
-        m_currentTrack[i] = -1;
+    for (int & i : m_currentTrack)
+        i = -1;
 }
 
 inline int DecoderBase::NextTrack(uint type)
