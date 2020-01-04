@@ -126,17 +126,10 @@ MythVideoOutputOpenGL::MythVideoOutputOpenGL(QString Profile)
     }
 
     // Disallow unsupported video texturing on GLES2/GL1.X
-    // Also disallow GLES3.X - further work required as GLES3.0 needs specific,
-    // unsigned integer texture formats. It is not enough to just use these texture
-    // formats - we need to scale integer values in the shaders, use unsigned samplers
-    // and force nearest texture filters.
-    // NOTE: this is not the same as the legacy texture format support.
-    if ((m_render->GetExtraFeatures() & kGLLegacyTextures) || m_render->isOpenGLES())
-    {
-        LOG(VB_GENERAL, LOG_INFO, LOC +
-            "Disabling unsupported texture formats for this OpenGL version");
-        m_legacyTextureFormats = true;
-    }
+    if (m_render->GetExtraFeatures() & kGLLegacyTextures)
+        m_textureFormats = LegacyFormats;
+    else if (m_render->isOpenGLES() && m_render->format().majorVersion() > 2)
+        m_textureFormats = OpenGLES3Formats;
 
     // Retrieve OpenGL painter
     MythMainWindow *win = MythMainWindow::getMainWindow();
@@ -723,17 +716,25 @@ void MythVideoOutputOpenGL::DiscardFrames(bool KeyFrame, bool Flushed)
 
 VideoFrameType* MythVideoOutputOpenGL::DirectRenderFormats(void)
 {
-    static VideoFrameType s_openglFormats[] =
+    // Complete list of formats supported for OpenGL 2.0 and higher
+    static VideoFrameType s_AllFormats[] =
         { FMT_YV12,     FMT_NV12,      FMT_YUY2,      FMT_YUV422P,   FMT_YUV444P,
           FMT_YUV420P9, FMT_YUV420P10, FMT_YUV420P12, FMT_YUV420P14, FMT_YUV420P16,
           FMT_YUV422P9, FMT_YUV422P10, FMT_YUV422P12, FMT_YUV422P14, FMT_YUV422P16,
           FMT_YUV444P9, FMT_YUV444P10, FMT_YUV444P12, FMT_YUV444P14, FMT_YUV444P16,
           FMT_P010, FMT_P016,
           FMT_NONE };
-    // OpenGLES2/OpenGL <2 only allow luminance textures - no RG etc
-    static VideoFrameType s_legacyFormats[] =
+
+    // OpenGL ES 3.0 requires some specific handling for certain types
+    static VideoFrameType s_GLES3Formats[] =
+        { FMT_YV12, FMT_NV12, FMT_YUY2, FMT_YUV422P, FMT_YUV444P, FMT_NONE };
+
+    // OpenGL ES 2.0 and OpenGL1.X only allow luminance textures
+    static VideoFrameType s_LegacyFormats[] =
         { FMT_YV12, FMT_YUY2, FMT_YUV422P, FMT_YUV444P, FMT_NONE };
-    return m_legacyTextureFormats ? &s_legacyFormats[0] : &s_openglFormats[0];
+
+    static VideoFrameType* s_formats[3] = { s_AllFormats, s_GLES3Formats, s_LegacyFormats };
+    return s_formats[m_textureFormats];
 }
 
 void MythVideoOutputOpenGL::WindowResized(const QSize &Size)

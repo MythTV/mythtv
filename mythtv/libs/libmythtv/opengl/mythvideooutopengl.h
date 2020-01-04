@@ -12,6 +12,13 @@ class MythOpenGLPerf;
 class MythVideoOutputOpenGL : public MythVideoOutput
 {
   public:
+    enum TextureFormats
+    {
+        AllFormats       = 0,
+        OpenGLES3Formats = 1,
+        LegacyFormats    = 2
+    };
+
     static void GetRenderOptions(RenderOptions &Options);
     static QStringList GetAllowedRenderers(MythCodecID CodecId, const QSize &VideoDim);
 
@@ -52,7 +59,7 @@ class MythVideoOutputOpenGL : public MythVideoOutput
     QRect GetDisplayVisibleRect(void);
 
     MythRenderOpenGL      *m_render               { nullptr };
-    bool                   m_legacyTextureFormats { false };
+    TextureFormats         m_textureFormats       { AllFormats };
     MythOpenGLVideo       *m_openGLVideo          { nullptr };
     QMap<MythPlayer*,MythOpenGLVideo*> m_openGLVideoPiPs;
     QMap<MythPlayer*,bool> m_openGLVideoPiPsReady;
