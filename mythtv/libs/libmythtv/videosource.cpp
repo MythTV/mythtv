@@ -1443,8 +1443,8 @@ HDHomeRunConfigurationGroup::HDHomeRunConfigurationGroup
 
     auto *buttonRecOpt = new GroupSetting();
     buttonRecOpt->setLabel(tr("Recording Options"));
-    buttonRecOpt->addChild(new SignalTimeout(m_parent, 1000, 250));
-    buttonRecOpt->addChild(new ChannelTimeout(m_parent, 3000, 1750));
+    buttonRecOpt->addChild(new SignalTimeout(m_parent, 3000, 250));
+    buttonRecOpt->addChild(new ChannelTimeout(m_parent, 6000, 1750));
     buttonRecOpt->addChild(new HDHomeRunEITScan(m_parent));
     a_cardtype.addTargetedChild("HDHOMERUN", buttonRecOpt);
 };
