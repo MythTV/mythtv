@@ -3041,7 +3041,7 @@ void AvFormatDecoder::HandleGopStart(
         {
             m_bitrate = (int)((pkt->pos * 8 * m_fps) / (m_framesRead - 1));
             float bytespersec = (float)m_bitrate / 8;
-            float secs = m_ringBuffer->GetRealFileSize() * 1.0 / bytespersec;
+            float secs = m_ringBuffer->GetRealFileSize() * 1.0F / bytespersec;
             m_parent->SetFileLength((int)(secs), (int)(secs * m_fps));
         }
 #endif
