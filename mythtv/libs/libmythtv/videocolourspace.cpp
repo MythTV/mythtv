@@ -3,6 +3,7 @@
 #include "mythlogging.h"
 #include "mythdisplay.h"
 #include "mythavutil.h"
+#include "mythmainwindow.h"
 #include "videocolourspace.h"
 
 // libavutil
@@ -83,17 +84,20 @@ VideoColourSpace::VideoColourSpace(VideoColourSpace *Parent)
     SetSaturation(m_dbSettings[kPictureAttribute_Colour]);
     SetHue(m_dbSettings[kPictureAttribute_Hue]);
     SetFullRange(m_dbSettings[kPictureAttribute_Range]);
-    MythDisplay* display = MythDisplay::AcquireRelease();
-    MythEDID& edid = display->GetEDID();
-    // We assume sRGB/Rec709 by default
-    if (edid.Valid() && !edid.IsSRGB())
+    if (HasMythMainWindow())
     {
-        m_customDisplayGamma = edid.Gamma();
-        m_customDisplayPrimaries = new ColourPrimaries;
-        MythEDID::Primaries displayprimaries = edid.ColourPrimaries();
-        memcpy(m_customDisplayPrimaries, &displayprimaries, sizeof(ColourPrimaries));
+        MythDisplay* display = MythDisplay::AcquireRelease();
+        MythEDID& edid = display->GetEDID();
+        // We assume sRGB/Rec709 by default
+        if (edid.Valid() && !edid.IsSRGB())
+        {
+            m_customDisplayGamma = edid.Gamma();
+            m_customDisplayPrimaries = new ColourPrimaries;
+            MythEDID::Primaries displayprimaries = edid.ColourPrimaries();
+            memcpy(m_customDisplayPrimaries, &displayprimaries, sizeof(ColourPrimaries));
+        }
+        MythDisplay::AcquireRelease(false);
     }
-    MythDisplay::AcquireRelease(false);
     m_updatesDisabled = false;
     Update();
 }
