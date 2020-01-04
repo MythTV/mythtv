@@ -1413,12 +1413,18 @@ int MythRenderOpenGL::GetBufferSize(QSize Size, QOpenGLTexture::PixelFormat Form
 
     switch (Format)
     {
+        case QOpenGLTexture::RGBA_Integer:
+        case QOpenGLTexture::BGRA_Integer:
         case QOpenGLTexture::BGRA:
         case QOpenGLTexture::RGBA: bpp = 4; break;
+        case QOpenGLTexture::RGB_Integer:
+        case QOpenGLTexture::BGR_Integer:
         case QOpenGLTexture::BGR:
         case QOpenGLTexture::RGB:  bpp = 3; break;
+        case QOpenGLTexture::RG_Integer:
         case QOpenGLTexture::RG:   bpp = 2; break;
         case QOpenGLTexture::Red:
+        case QOpenGLTexture::Red_Integer:
         case QOpenGLTexture::Alpha:
         case QOpenGLTexture::Luminance: bpp = 1; break;
         default: break; // unsupported
