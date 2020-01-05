@@ -88,6 +88,7 @@ class MythOpenGLVideo : public QObject
     VideoFrameType m_inputType  { FMT_NONE }; ///< Usually YV12 for software, VDPAU etc for hardware
     VideoFrameType m_outputType { FMT_NONE }; ///< Set by profile for software or decoder for hardware
     MythRenderOpenGL *m_render  { nullptr };
+    int            m_gles       { 0 };
     QSize          m_videoDispDim;        ///< Useful video frame size e.g. 1920x1080
     QSize          m_videoDim;            ///< Total video frame size e.g. 1920x1088
     QSize          m_masterViewportSize;  ///< Current viewport into which OpenGL is rendered, usually the window size

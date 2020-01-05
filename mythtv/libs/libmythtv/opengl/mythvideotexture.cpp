@@ -145,12 +145,38 @@ vector<MythVideoTexture*> MythVideoTexture::CreateSoftwareTextures(MythRenderOpe
         return result;
     }
 
-    // Strict OpenGL ES 2.0 has no GL_RED or GL_R8 so use Luminance alternatives which give the same result
-    // There is no obvious alternative solution for GL_RG/8 for higher bit depths. These will fail on some
-    // implementations.
+    // OpenGL ES 2.0 has very limited texture format support
     bool legacy = Context->GetExtraFeatures() & kGLLegacyTextures;
-    QOpenGLTexture::PixelFormat bytepixfmt   = legacy ? QOpenGLTexture::Luminance       : QOpenGLTexture::Red;
-    QOpenGLTexture::TextureFormat bytetexfmt = legacy ? QOpenGLTexture::LuminanceFormat : QOpenGLTexture::R8_UNorm;
+    // GLES3 supports GL_RED etc and 16bit formats but there are no unsigned,
+    // normalised 16bit integer formats. So we must use unsigned integer formats
+    // for 10bit video textures which force:-
+    //  - only nearest texture filtering - so we must use the resize stage
+    //  - no GLSL mix method for uint/uvec4
+    //  - must use unsigned samplers in the shaders - and convert uint to normalised float as necessary
+    //  - need to use GLSL ES 3.00 - which means new/updated shaders
+    bool gles3  = Context->isOpenGLES() && Context->format().majorVersion() > 2;
+    QOpenGLTexture::PixelFormat   r8pixelfmtnorm  = QOpenGLTexture::Red;
+    QOpenGLTexture::PixelFormat   r8pixelfmtuint  = QOpenGLTexture::Red;
+    QOpenGLTexture::PixelFormat   rg8pixelfmtnorm = QOpenGLTexture::RG;
+    QOpenGLTexture::PixelFormat   rg8pixelfmtuint = QOpenGLTexture::RG;
+    QOpenGLTexture::TextureFormat r8internalfmt   = QOpenGLTexture::R8_UNorm;
+    QOpenGLTexture::TextureFormat r16internalfmt  = QOpenGLTexture::R16_UNorm;
+    QOpenGLTexture::TextureFormat rg8internalfmt  = QOpenGLTexture::RG8_UNorm;
+    QOpenGLTexture::TextureFormat rg16internalfmt = QOpenGLTexture::RG16_UNorm;
+
+    if (gles3)
+    {
+        r8pixelfmtuint  = QOpenGLTexture::Red_Integer;
+        rg8pixelfmtuint = QOpenGLTexture::RG_Integer;
+        r16internalfmt  = QOpenGLTexture::R16U;
+        rg16internalfmt = QOpenGLTexture::RG16U;
+    }
+    else if (legacy)
+    {
+        r8pixelfmtnorm = QOpenGLTexture::Luminance;
+        r8internalfmt  = QOpenGLTexture::LuminanceFormat;
+    }
+
     for (uint plane = 0; plane < count; ++plane)
     {
         QSize size = Sizes[0];
@@ -161,7 +187,7 @@ vector<MythVideoTexture*> MythVideoTexture::CreateSoftwareTextures(MythRenderOpe
                 if (plane > 0)
                     size = QSize(size.width() >> 1, size.height() >> 1);
                 texture = CreateTexture(Context, size, Target,
-                              QOpenGLTexture::UInt8, bytepixfmt, bytetexfmt);
+                              QOpenGLTexture::UInt8, r8pixelfmtnorm, r8internalfmt);
                 break;
             case FMT_YUV420P9:
             case FMT_YUV420P10:
@@ -171,7 +197,7 @@ vector<MythVideoTexture*> MythVideoTexture::CreateSoftwareTextures(MythRenderOpe
                 if (plane > 0)
                     size = QSize(size.width() >> 1, size.height() >> 1);
                 texture = CreateTexture(Context, size, Target,
-                              QOpenGLTexture::UInt16, bytepixfmt, QOpenGLTexture::R16_UNorm);
+                              QOpenGLTexture::UInt16, r8pixelfmtuint, r16internalfmt);
                 break;
             case FMT_YUY2:
                 size.setWidth(size.width() >> 1);
@@ -181,13 +207,13 @@ vector<MythVideoTexture*> MythVideoTexture::CreateSoftwareTextures(MythRenderOpe
                 if (plane == 0)
                 {
                     texture = CreateTexture(Context, size, Target,
-                                  QOpenGLTexture::UInt8, bytepixfmt, bytetexfmt);
+                                  QOpenGLTexture::UInt8, r8pixelfmtnorm, r8internalfmt);
                 }
                 else
                 {
                     size = QSize(size.width() >> 1, size.height() >> 1);
                     texture = CreateTexture(Context, size, Target,
-                                  QOpenGLTexture::UInt8, QOpenGLTexture::RG, QOpenGLTexture::RG8_UNorm);
+                                  QOpenGLTexture::UInt8, rg8pixelfmtnorm, rg8internalfmt);
                 }
                 break;
             case FMT_P010:
@@ -195,20 +221,20 @@ vector<MythVideoTexture*> MythVideoTexture::CreateSoftwareTextures(MythRenderOpe
                 if (plane == 0)
                 {
                     texture = CreateTexture(Context, size, Target,
-                                  QOpenGLTexture::UInt16, bytepixfmt, QOpenGLTexture::R16_UNorm);
+                                  QOpenGLTexture::UInt16, r8pixelfmtuint, r16internalfmt);
                 }
                 else
                 {
                     size = QSize(size.width() >> 1, size.height() >> 1);
                     texture = CreateTexture(Context, size, Target,
-                                  QOpenGLTexture::UInt16, QOpenGLTexture::RG, QOpenGLTexture::RG16_UNorm);
+                                  QOpenGLTexture::UInt16, rg8pixelfmtuint, rg16internalfmt);
                 }
                 break;
             case FMT_YUV422P:
                 if (plane > 0)
                     size = QSize(size.width() >> 1, size.height());
                 texture = CreateTexture(Context, size, Target,
-                              QOpenGLTexture::UInt8, bytepixfmt, bytetexfmt);
+                              QOpenGLTexture::UInt8, r8pixelfmtnorm, r8internalfmt);
                 break;
             case FMT_YUV422P9:
             case FMT_YUV422P10:
@@ -218,11 +244,11 @@ vector<MythVideoTexture*> MythVideoTexture::CreateSoftwareTextures(MythRenderOpe
                 if (plane > 0)
                     size = QSize(size.width() >> 1, size.height());
                 texture = CreateTexture(Context, size, Target,
-                              QOpenGLTexture::UInt16, bytepixfmt, QOpenGLTexture::R16_UNorm);
+                              QOpenGLTexture::UInt16, r8pixelfmtuint, r16internalfmt);
                 break;
             case FMT_YUV444P:
                 texture = CreateTexture(Context, size, Target,
-                              QOpenGLTexture::UInt8, bytepixfmt, bytetexfmt);
+                              QOpenGLTexture::UInt8, r8pixelfmtnorm, r8internalfmt);
                 break;
             case FMT_YUV444P9:
             case FMT_YUV444P10:
@@ -230,7 +256,7 @@ vector<MythVideoTexture*> MythVideoTexture::CreateSoftwareTextures(MythRenderOpe
             case FMT_YUV444P14:
             case FMT_YUV444P16:
                 texture = CreateTexture(Context, size, Target,
-                              QOpenGLTexture::UInt16, bytepixfmt, QOpenGLTexture::R16_UNorm);
+                              QOpenGLTexture::UInt16, r8pixelfmtuint, r16internalfmt);
                 break;
             default: break;
         }

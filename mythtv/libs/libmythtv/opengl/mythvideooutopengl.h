@@ -15,8 +15,7 @@ class MythVideoOutputOpenGL : public MythVideoOutput
     enum TextureFormats
     {
         AllFormats       = 0,
-        OpenGLES3Formats = 1,
-        LegacyFormats    = 2
+        LegacyFormats    = 1
     };
 
     static void GetRenderOptions(RenderOptions &Options);

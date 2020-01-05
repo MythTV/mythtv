@@ -217,4 +217,171 @@ static const QString BicubicShader =
 "    tex10        = mix(tex10, tex11, parmy.z);\n"
 "    gl_FragColor = mix(tex00, tex10, parmx.z);\n"
 "}\n";
+
+/* These are updated versions of the video shaders that use GLSL 3.30 / GLSL ES 3.00.
+ * Used because OpenGL ES3.X requires unsigned integer texture formats for 16bit
+ * software video textures - and unsigned samplers need GLSL ES 3.00.
+ *
+ * Notable differences due to shader language changes:-
+ *  - use of in/out instead of varying/attribute
+ *  - gl_FragColor replaced with user defined 'out highp vec4 fragmentColor'
+ *  - texture2D replaced with texture
+ *  - no mix method for uint/uvec - so must be handled 'manually'
+ *
+ * Changes for unsigned integer sampling:-
+ *  - sampler2D replaced with usampler2D (note - via define to ensure compatibility
+ *    with texture sampling customisation in MythOpenGLVideo).
+ *  - vec4 replaced with uvec4 as needed
+ *  - kernel calculation forces intermediate conversion to float to maintain accuracy
+ *
+ * There is no support here for:-
+ *  - rectangular textures (only currently required for VideoToolBox on OSX - no GLES)
+ *  - MediaCodec vertex transforms (hardware textures only)
+ *  - External OES textures (hardware textures only)
+ *  - YUY2 textures (8bit only currently)
+ *
+ * Other usage considerations:-
+ *  - the correct version define added as the FIRST line.
+ *  - texture filtering must be GL_NEAREST.
+*/
+
+static const QString GLSL300VertexShader =
+"in      highp vec2 a_position;\n"
+"in      highp vec2 a_texcoord0;\n"
+"out     highp vec2 v_texcoord0;\n"
+"uniform highp mat4 u_projection;\n"
+"void main()\n"
+"{\n"
+"    gl_Position = u_projection * vec4(a_position, 0.0, 1.0);\n"
+"    v_texcoord0 = a_texcoord0;\n"
+"}\n";
+
+static const QString GLSL300YUVFragmentExtensions =
+"#define LINEHEIGHT m_frameData.x\n"
+"#define COLUMN     m_frameData.y\n"
+"#define MAXHEIGHT  m_frameData.z\n"
+"#define FIELDSIZE  m_frameData.w\n"
+"#define sampler2D highp usampler2D\n";
+
+static const QString GLSL300YUVFragmentShader =
+"uniform highp mat4 m_colourMatrix;\n"
+"uniform highp vec4 m_frameData;\n"
+"in highp vec2 v_texcoord0;\n"
+"out highp vec4 fragmentColor;\n"
+"#ifdef MYTHTV_COLOURMAPPING\n"
+"uniform highp mat4 m_primaryMatrix;\n"
+"uniform highp float m_colourGamma;\n"
+"uniform highp float m_displayGamma;\n"
+"highp vec4 ColourMap(highp vec4 color)\n"
+"{\n"
+"    highp vec4 res = clamp(color, 0.0, 1.0);\n"
+"    res.rgb = pow(res.rgb, vec3(m_colourGamma));\n"
+"    res = m_primaryMatrix * res;\n"
+"    return vec4(pow(res.rgb, vec3(m_displayGamma)), res.a);\n"
+"}\n"
+"#endif\n"
+
+// Chroma for lines 1 and 3 comes from line 1-2
+// Chroma for lines 2 and 4 comes from line 3-4
+// This is a simple resample that ensures temporal consistency. A more advanced
+// multitap filter would smooth the chroma - but at significant cost and potentially
+// undesirable loss in detail.
+"#ifdef MYTHTV_CUE\n"
+"highp vec2 chromaLocation(highp vec2 xy)\n"
+"{\n"
+"    highp float temp = xy.y * FIELDSIZE;\n"
+"    highp float onetwo = min((floor(temp / 2.0) / (FIELDSIZE / 2.0)) + LINEHEIGHT, MAXHEIGHT);\n"
+"    return vec2(xy.x, mix(onetwo, min(onetwo + (2.0 * LINEHEIGHT), MAXHEIGHT), step(0.5, fract(temp))));\n"
+"}\n"
+"#endif\n"
+
+"#ifdef MYTHTV_NV12\n"
+"highp uvec4 sampleYUV(in sampler2D texture1, in sampler2D texture2, highp vec2 texcoord)\n"
+"{\n"
+"#ifdef MYTHTV_CUE\n"
+"    return uvec4(texture(texture1, texcoord).r, texture(texture2, chromaLocation(texcoord)).rg, 1.0);\n"
+"#else\n"
+"    return uvec4(texture(texture1, texcoord).r, texture(texture2, texcoord).rg, 1.0);\n"
+"#endif\n"
+"}\n"
+"#endif\n"
+
+"#ifdef MYTHTV_YV12\n"
+"highp uvec4 sampleYUV(in sampler2D texture1, in sampler2D texture2, in sampler2D texture3, highp vec2 texcoord)\n"
+"{\n"
+"#ifdef MYTHTV_CUE\n"
+"    highp vec2 field = chromaLocation(texcoord);\n"
+"    return uvec4(texture(texture1, texcoord).r,\n"
+"                 texture(texture2, field).r,\n"
+"                 texture(texture3, field).r,\n"
+"                 1.0);\n"
+"#else\n"
+"    return uvec4(texture(texture1, texcoord).r,\n"
+"                 texture(texture2, texcoord).r,\n"
+"                 texture(texture3, texcoord).r,\n"
+"                 1.0);\n"
+"#endif\n"
+"}\n"
+"#endif\n"
+
+"#ifdef MYTHTV_KERNEL\n"
+"highp uvec4 kernel(in highp uvec4 yuv, sampler2D kernelTex0, sampler2D kernelTex1)\n"
+"{\n"
+"    highp vec2 twoup   = vec2(v_texcoord0.x, max(v_texcoord0.y - (2.0 * LINEHEIGHT), LINEHEIGHT));\n"
+"    highp vec2 twodown = vec2(v_texcoord0.x, min(v_texcoord0.y + (2.0 * LINEHEIGHT), MAXHEIGHT));\n"
+"    highp vec4 yuvf = 0.125 * vec4(yuv);\n"
+"    yuvf +=  0.125  * vec4(sampleYUV(kernelTex1, v_texcoord0));\n"
+"    yuvf +=  0.5    * vec4(sampleYUV(kernelTex0, vec2(v_texcoord0.x, max(v_texcoord0.y - LINEHEIGHT, LINEHEIGHT))));\n"
+"    yuvf +=  0.5    * vec4(sampleYUV(kernelTex0, vec2(v_texcoord0.x, min(v_texcoord0.y + LINEHEIGHT, MAXHEIGHT))));\n"
+"    yuvf += -0.0625 * vec4(sampleYUV(kernelTex0, twoup));\n"
+"    yuvf += -0.0625 * vec4(sampleYUV(kernelTex0, twodown));\n"
+"    yuvf += -0.0625 * vec4(sampleYUV(kernelTex1, twoup));\n"
+"    yuvf += -0.0625 * vec4(sampleYUV(kernelTex1, twodown));\n"
+"    return uvec4(yuv);\n"
+"}\n"
+"#endif\n"
+
+"void main(void)\n"
+"{\n"
+"#ifdef MYTHTV_ONEFIELD\n"
+"#ifdef MYTHTV_TOPFIELD\n"
+"    highp float field = min(v_texcoord0.y + (step(0.5, fract(v_texcoord0.y * FIELDSIZE))) * LINEHEIGHT, MAXHEIGHT);\n"
+"#else\n"
+"    highp float field = max(v_texcoord0.y + (step(0.5, 1.0 - fract(v_texcoord0.y * FIELDSIZE))) * LINEHEIGHT, 0.0);\n"
+"#endif\n"
+"    highp uvec4 yuv = sampleYUV(s_texture0, vec2(v_texcoord0.x, field));\n"
+"#else\n"
+"#ifdef MYTHTV_KERNEL\n"
+"    highp uvec4 yuv = sampleYUV(s_texture1, v_texcoord0);\n"
+"#else\n"
+"    highp uvec4 yuv = sampleYUV(s_texture0, v_texcoord0);\n"
+"#endif\n"
+"#endif\n"
+
+"#ifdef MYTHTV_KERNEL\n"
+"    highp uint field = uint(step(fract(v_texcoord0.y * FIELDSIZE), 0.5));\n"
+"#ifdef MYTHTV_TOPFIELD\n"
+"    yuv = (kernel(yuv, s_texture1, s_texture2) * uvec4(field)) + (yuv * uvec4(1u - field));\n"
+"#else\n"
+"    yuv = (yuv * uvec4(field)) + (kernel(yuv, s_texture1, s_texture0) * uvec4(1u - field));\n"
+"#endif\n"
+"#endif\n"
+
+"#ifdef MYTHTV_LINEARBLEND\n"
+"    highp uvec4 mixed = (sampleYUV(s_texture0, vec2(v_texcoord0.x, min(v_texcoord0.y + LINEHEIGHT, MAXHEIGHT))) +\n"
+"                         sampleYUV(s_texture0, vec2(v_texcoord0.x, max(v_texcoord0.y - LINEHEIGHT, 0.0)))) / uvec4(2.0);\n"
+"    highp uint  field = uint(step(fract(v_texcoord0.y * FIELDSIZE), 0.5));\n"
+"#ifdef MYTHTV_TOPFIELD\n"
+"    yuv = (mixed * uvec4(field)) + (yuv * uvec4(1u - field));\n"
+"#else\n"
+"    yuv = (yuv * uvec4(field)) + (mixed * uvec4(1u - field));\n"
+"#endif\n"
+"#endif\n"
+
+"    fragmentColor = (vec4(yuv) / vec4(65535.0, 65535.0, 65535.0, 1.0)) * m_colourMatrix;\n"
+"#ifdef MYTHTV_COLOURMAPPING\n"
+"    fragmentColor = ColourMap(fragmentColor);\n"
+"#endif\n"
+"}\n";
+
 #endif // MYTH_OPENGLVIDEOSHADERS_H

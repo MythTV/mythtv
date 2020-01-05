@@ -42,6 +42,8 @@ MythOpenGLVideo::MythOpenGLVideo(MythRenderOpenGL *Render, VideoColourSpace *Col
 
     OpenGLLocker ctx_lock(m_render);
     m_render->IncrRef();
+    if (m_render->isOpenGLES())
+        m_gles = m_render->format().majorVersion();
 
     m_videoColourSpace->IncrRef();
     connect(m_videoColourSpace, &VideoColourSpace::Updated, this, &MythOpenGLVideo::UpdateColourSpace);
@@ -238,6 +240,12 @@ bool MythOpenGLVideo::AddDeinterlacer(const VideoFrame *Frame, FrameScanType Sca
         sizes.emplace_back(QSize(m_videoDim));
         m_prevTextures = MythVideoTexture::CreateTextures(m_render, m_inputType, m_outputType, sizes);
         m_nextTextures = MythVideoTexture::CreateTextures(m_render, m_inputType, m_outputType, sizes);
+        // ensure we use GL_NEAREST if resizing is already active
+        if (m_resizing)
+        {
+            MythVideoTexture::SetTextureFilters(m_render, m_prevTextures, QOpenGLTexture::Nearest);
+            MythVideoTexture::SetTextureFilters(m_render, m_nextTextures, QOpenGLTexture::Nearest);
+        }
     }
 
     // ensure they work correctly
@@ -292,6 +300,20 @@ bool MythOpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Dein
     else
     {
         fragment = YUVFragmentShader;
+        QString extensions = YUVFragmentExtensions;
+        QString glsldefines;
+
+        // Any software frames that are not 8bit need to use unsigned integer
+        // samplers with GLES3.x - which need more modern shaders
+        if ((m_gles > 2) && (ColorDepth(m_inputType) > 8))
+        {
+            static const QString glsl300("#version 300 es\n");
+            fragment   = GLSL300YUVFragmentShader;
+            extensions = GLSL300YUVFragmentExtensions;
+            vertex     = glsl300 + GLSL300VertexShader;
+            glsldefines.append(glsl300);
+        }
+
         bool kernel = false;
         bool topfield = InterlacedTop == Type;
         bool progressive = (Progressive == Type) || (Deint == DEINT_NONE);
@@ -378,7 +400,6 @@ bool MythOpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Dein
         defines << m_videoColourSpace->GetColourMappingDefines();
 
         // Add defines
-        QString glsldefines;
         foreach (QString define, defines)
             glsldefines += QString("#define MYTHTV_%1\n").arg(define);
 
@@ -398,7 +419,7 @@ bool MythOpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Dein
             glslsamplers += QString("uniform sampler2D s_texture%1;\n").arg(i);
 
         // construct the final shader string
-        fragment = glsldefines + YUVFragmentExtensions + glslsamplers + fragment;
+        fragment = glsldefines + extensions + glslsamplers + fragment;
     }
 
     m_shaderCost[Type] = cost;
@@ -678,6 +699,9 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame *Frame, bool TopFieldFirst, FrameS
         // UYVY packed pixels must be sampled exactly
         if (FMT_YUY2 == m_outputType)
             resize |= Sampling;
+        // unsigned integer texture formats need GL_NEAREST sampling
+        if ((m_gles > 2) && (ColorDepth(m_inputType) > 8))
+            resize |= Sampling;
 
         if (!resize)
         {
@@ -906,12 +930,11 @@ QOpenGLFramebufferObject* MythOpenGLVideo::CreateVideoFrameBuffer(VideoFrameType
     // and all return RGB formats anyway. The MediaCoded texture format is an unknown but resizing will
     // never be enabled as it returns an RGB frame - so if MediaCodec uses a 16bit texture, precision
     // will be preserved.
-    //bool sixteenbitfb = !(m_render->isOpenGLES() && m_render->format().majorVersion() < 3);
 
     // GLES3.0 needs specific texture formats - needs more work and it
     // is currently unclear whether QOpenGLFrameBufferObject has the
-    // requisite flexibility for those formats. May need QOpenGLTexture::RGBA16.
-    bool sixteenbitfb = !m_render->isOpenGLES();
+    // requisite flexibility for those formats.
+    bool sixteenbitfb = !m_gles;
     bool sixteenbitvid = ColorDepth(OutputType) > 8;
     GLenum format = (sixteenbitfb && sixteenbitvid) ? QOpenGLTexture::RGBA16_UNorm : 0;
     if (format)
