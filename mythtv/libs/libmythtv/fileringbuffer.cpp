@@ -393,7 +393,7 @@ bool FileRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     return ok;
 }
 
-bool FileRingBuffer::ReOpen(QString newFilename)
+bool FileRingBuffer::ReOpen(const QString& newFilename)
 {
     if (!m_writeMode)
     {

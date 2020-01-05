@@ -19,7 +19,7 @@ void MythBDPlayer::PreProcessNormalFrame(void)
     DisplayMenu();
 }
 
-bool MythBDPlayer::GoToMenu(QString str)
+bool MythBDPlayer::GoToMenu(const QString& str)
 {
     if (m_playerCtx->m_buffer->BD() && m_videoOutput)
     {

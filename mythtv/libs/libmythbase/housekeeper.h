@@ -43,7 +43,7 @@ class MBASE_PUBLIC HouseKeeperTask : public ReferenceCounter
                     HouseKeeperStartup startup=kHKNormal);
    ~HouseKeeperTask() override = default;
 
-    bool            CheckRun(QDateTime now);
+    bool            CheckRun(const QDateTime& now);
     bool            Run(void);
     bool            ConfirmRun(void)                { return m_confirm;     }
     bool            IsRunning(void)                 { return m_running;     }
@@ -62,7 +62,7 @@ class MBASE_PUBLIC HouseKeeperTask : public ReferenceCounter
     virtual QDateTime UpdateLastRun(const QDateTime& last, bool successful=true);
     virtual void    SetLastRun(const QDateTime& last, bool successful=true);
 
-    virtual bool    DoCheckRun(QDateTime /*now*/)   { return false;         }
+    virtual bool    DoCheckRun(const QDateTime& /*now*/) { return false;         }
     virtual bool    DoRun(void)                     { return false;         }
 
     virtual void    Terminate(void)                 {}
@@ -87,7 +87,7 @@ class MBASE_PUBLIC PeriodicHouseKeeperTask : public HouseKeeperTask
     PeriodicHouseKeeperTask(const QString &dbTag, int period, float min=0.5,
                             float max=1.1, int retry=0, HouseKeeperScope scope=kHKGlobal,
                             HouseKeeperStartup startup=kHKNormal);
-    bool DoCheckRun(QDateTime now) override; // HouseKeeperTask
+    bool DoCheckRun(const QDateTime& now) override; // HouseKeeperTask
     virtual bool InWindow(const QDateTime& now);
     virtual bool PastWindow(const QDateTime& now);
     QDateTime UpdateLastRun(const QDateTime& last, bool successful=true) override; // HouseKeeperTask

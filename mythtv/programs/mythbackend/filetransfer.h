@@ -30,7 +30,7 @@ class FileTransfer : public ReferenceCounter
     MythSocket *getSocket() { return m_sock; }
 
     bool isOpen(void);
-    bool ReOpen(QString newFilename = "");
+    bool ReOpen(const QString& newFilename = "");
 
     void Stop(void);
 

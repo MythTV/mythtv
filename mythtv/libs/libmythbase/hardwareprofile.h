@@ -58,7 +58,7 @@ class MBASE_PUBLIC HardwareProfileTask : public PeriodicHouseKeeperTask
                                             1.03333F, // up to one day late
                                             86400, // retry daily on error
                                             kHKLocal, kHKRunOnStartup) {}
-    bool DoCheckRun(QDateTime now) override; // HouseKeeperTask
+    bool DoCheckRun(const QDateTime& now) override; // HouseKeeperTask
     bool DoRun(void) override; // HouseKeeperTask
   private:
 

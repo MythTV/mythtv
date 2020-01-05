@@ -15,7 +15,7 @@ class MythBDPlayer : public MythPlayer
     explicit MythBDPlayer(PlayerFlags flags = kNoFlags)
         : MythPlayer(flags) {}
     bool    HasReachedEof(void) const override; // MythPlayer
-    bool    GoToMenu(QString str) override; // MythPlayer
+    bool    GoToMenu(const QString& str) override; // MythPlayer
     int     GetNumChapters(void) override; // MythPlayer
     int     GetCurrentChapter(void) override; // MythPlayer
     void    GetChapterTimes(QList<long long> &times) override; // MythPlayer

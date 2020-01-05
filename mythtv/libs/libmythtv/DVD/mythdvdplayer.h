@@ -21,7 +21,7 @@ class MythDVDPlayer : public MythPlayer
     uint64_t GetBookmark(void) override;
     int64_t  GetSecondsPlayed(bool HonorCutList, int Divisor = 1000) override;
     int64_t  GetTotalSeconds(bool HonorCutList, int Divisor = 1000) const override;
-    bool     GoToMenu(QString Menu) override;
+    bool     GoToMenu(const QString& Menu) override;
     void     GoToDVDProgram(bool Direction) override;
     bool     IsInStillFrame() const override;
     int      GetNumAngles(void) const override;

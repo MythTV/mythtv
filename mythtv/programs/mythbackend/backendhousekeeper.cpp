@@ -398,7 +398,7 @@ void CleanupTask::CleanupProgramListings(void)
         MythDB::DBError("HouseKeeper Cleaning Program Listings", query);
 }
 
-bool ThemeUpdateTask::DoCheckRun(QDateTime now)
+bool ThemeUpdateTask::DoCheckRun(const QDateTime& now)
 {
     return gCoreContext->GetBoolSetting("ThemeUpdateNofications", true) &&
             PeriodicHouseKeeperTask::DoCheckRun(now);
@@ -550,7 +550,7 @@ RadioStreamUpdateTask::~RadioStreamUpdateTask(void)
     m_msMU = nullptr;
 }
 
-bool RadioStreamUpdateTask::DoCheckRun(QDateTime now)
+bool RadioStreamUpdateTask::DoCheckRun(const QDateTime& now)
 {
     // we are only interested in the global setting so remove any local host setting just in case
     GetMythDB()->ClearSetting("MusicStreamListModified");
@@ -615,7 +615,7 @@ ArtworkTask::~ArtworkTask(void)
     m_msMML = nullptr;
 }
 
-bool ArtworkTask::DoCheckRun(QDateTime now)
+bool ArtworkTask::DoCheckRun(const QDateTime& now)
 {
     return gCoreContext->GetBoolSetting("DailyArtworkUpdates", false) &&
             PeriodicHouseKeeperTask::DoCheckRun(now);
@@ -685,7 +685,7 @@ bool MythFillDatabaseTask::UseSuggestedTime(void)
     return gCoreContext->GetBoolSetting("MythFillGrabberSuggestsTime", true);
 }
 
-bool MythFillDatabaseTask::DoCheckRun(QDateTime now)
+bool MythFillDatabaseTask::DoCheckRun(const QDateTime& now)
 {
     if (!gCoreContext->GetBoolSetting("MythFillEnabled", true))
     {
