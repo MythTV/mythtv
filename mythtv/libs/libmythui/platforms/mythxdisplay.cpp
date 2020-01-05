@@ -110,7 +110,7 @@ QSize MythXDisplay::GetDisplaySize(void)
                      DisplayHeight(m_disp, m_screenNum));
     }
 
-    return QSize(mode.hdisplay, mode.vdisplay);
+    return {mode.hdisplay, mode.vdisplay};
 }
 
 /**
