@@ -78,8 +78,8 @@ class DeleteThread : public QRunnable, public DeleteStruct
     DeleteThread(MainServer *ms, const QString& filename, const QString& title, uint chanid,
                  QDateTime recstartts, QDateTime recendts, uint recordingId,
                  bool forceMetadataDelete) :
-                     DeleteStruct(ms, filename, title, chanid, recstartts,
-                                  recendts, recordingId, forceMetadataDelete)  {}
+                     DeleteStruct(ms, filename, title, chanid, std::move(recstartts),
+                                  std::move(recendts), recordingId, forceMetadataDelete)  {}
     void start(void)
         { MThreadPool::globalInstance()->startReserved(this, "DeleteThread"); }
     void run(void) override; // QRunnable

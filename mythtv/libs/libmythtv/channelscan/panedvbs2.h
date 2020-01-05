@@ -37,13 +37,13 @@ class PaneDVBS2 : public GroupSetting
     QString rolloff(void)    const { return m_prolloff->getValue();    }
 
     void setFrequency(uint frequency)      { m_pfrequency->setValue(frequency);  }
-    void setSymbolrate(QString symbolrate) { m_psymbolrate->setValue(symbolrate);}
-    void setInversion(QString inversion)   { m_pinversion->setValue(inversion);  }
-    void setFec(QString fec)               { m_pfec->setValue(fec);              }
-    void setPolarity(QString polarity)     { m_ppolarity->setValue(polarity);    }
-    void setModulation(QString modulation) { m_pmodulation->setValue(modulation);}
-    void setModsys(QString mod_sys)        { m_pmod_sys->setValue(mod_sys);      }
-    void setRolloff(QString rolloff)       { m_prolloff->setValue(rolloff);      }
+    void setSymbolrate(const QString& symbolrate) { m_psymbolrate->setValue(symbolrate);}
+    void setInversion(const QString& inversion)   { m_pinversion->setValue(inversion);  }
+    void setFec(const QString& fec)               { m_pfec->setValue(fec);              }
+    void setPolarity(const QString& polarity)     { m_ppolarity->setValue(polarity);    }
+    void setModulation(const QString& modulation) { m_pmodulation->setValue(modulation);}
+    void setModsys(const QString& mod_sys)        { m_pmod_sys->setValue(mod_sys);      }
+    void setRolloff(const QString& rolloff)       { m_prolloff->setValue(rolloff);      }
 
   protected:
     ScanFrequencykHz   *m_pfrequency  {nullptr};

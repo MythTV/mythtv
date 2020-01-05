@@ -1,9 +1,11 @@
 #ifndef ROMINFO_H_
 #define ROMINFO_H_
 
+#include <utility>
+
+#include <QList>
 #include <QMetaType>
 #include <QString>
-#include <QList>
 
 int romInDB(const QString& rom, const QString& gametype);
 
@@ -22,26 +24,26 @@ class RomInfo
             QString lboxart = "", QString linetref = "")
             {
                 m_id = lid;
-                m_romname = lromname;
-                m_system = lsystem;
-                m_gamename = lgamename;
-                m_genre = lgenre;
-                m_year = lyear;
+                m_romname = std::move(lromname);
+                m_system = std::move(lsystem);
+                m_gamename = std::move(lgamename);
+                m_genre = std::move(lgenre);
+                m_year = std::move(lyear);
                 m_favorite = lfavorite;
-                m_rompath = lrompath;
-                m_screenshot = lscreenshot;
-                m_fanart = lfanart;
-                m_boxart = lboxart;
-                m_country = lcountry;
-                m_crc_value = lcrc_value;
+                m_rompath = std::move(lrompath);
+                m_screenshot = std::move(lscreenshot);
+                m_fanart = std::move(lfanart);
+                m_boxart = std::move(lboxart);
+                m_country = std::move(lcountry);
+                m_crc_value = std::move(lcrc_value);
                 m_diskcount = ldiskcount;
-                m_gametype = lgametype;
+                m_gametype = std::move(lgametype);
                 m_romcount = lromcount;
-                m_allsystems = lallsystems;
-                m_plot = lplot;
-                m_publisher = lpublisher;
-                m_version = lversion;
-                m_inetref = linetref;
+                m_allsystems = std::move(lallsystems);
+                m_plot = std::move(lplot);
+                m_publisher = std::move(lpublisher);
+                m_version = std::move(lversion);
+                m_inetref = std::move(linetref);
             }
 
     RomInfo(const RomInfo &lhs)

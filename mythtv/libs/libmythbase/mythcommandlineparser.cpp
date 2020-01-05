@@ -553,7 +553,7 @@ CommandLineArg* CommandLineArg::SetParentOf(const QString &opt)
 
 /** \brief Set argument as parent of multiple children
  */
-CommandLineArg* CommandLineArg::SetParentOf(QStringList opts)
+CommandLineArg* CommandLineArg::SetParentOf(const QStringList& opts)
 {
     foreach (const auto opt, opts)
         m_children << new CommandLineArg(opt);
@@ -570,7 +570,7 @@ CommandLineArg* CommandLineArg::SetParent(const QString &opt)
 
 /** \brief Set argument as child of multiple parents
  */
-CommandLineArg* CommandLineArg::SetParent(QStringList opts)
+CommandLineArg* CommandLineArg::SetParent(const QStringList& opts)
 {
     foreach (const auto opt, opts)
         m_parents << new CommandLineArg(opt);
@@ -587,7 +587,7 @@ CommandLineArg* CommandLineArg::SetChildOf(const QString &opt)
 
 /** \brief Set argument as child of multiple parents
  */
-CommandLineArg* CommandLineArg::SetChildOf(QStringList opts)
+CommandLineArg* CommandLineArg::SetChildOf(const QStringList& opts)
 {
     foreach (const auto opt, opts)
         m_parents << new CommandLineArg(opt);
@@ -604,7 +604,7 @@ CommandLineArg* CommandLineArg::SetChild(const QString& opt)
 
 /** \brief Set argument as parent of multiple children
  */
-CommandLineArg* CommandLineArg::SetChild(QStringList opts)
+CommandLineArg* CommandLineArg::SetChild(const QStringList& opts)
 {
     foreach (const auto opt, opts)
         m_children << new CommandLineArg(opt);
@@ -622,7 +622,7 @@ CommandLineArg* CommandLineArg::SetRequiredChild(const QString& opt)
 
 /** \brief Set argument as parent of multiple children and mark as required
  */
-CommandLineArg* CommandLineArg::SetRequiredChild(QStringList opts)
+CommandLineArg* CommandLineArg::SetRequiredChild(const QStringList& opts)
 {
     foreach (const auto opt, opts)
     {
@@ -643,7 +643,7 @@ CommandLineArg* CommandLineArg::SetRequiredChildOf(const QString& opt)
 
 /** \brief Set argument as child required by multiple parents
  */
-CommandLineArg* CommandLineArg::SetRequiredChildOf(QStringList opts)
+CommandLineArg* CommandLineArg::SetRequiredChildOf(const QStringList& opts)
 {
     foreach (const auto opt, opts)
     {
@@ -663,7 +663,7 @@ CommandLineArg* CommandLineArg::SetRequires(const QString& opt)
 
 /** \brief Set argument as requiring multiple options
  */
-CommandLineArg* CommandLineArg::SetRequires(QStringList opts)
+CommandLineArg* CommandLineArg::SetRequires(const QStringList& opts)
 {
     foreach (const auto opt, opts)
         m_requires << new CommandLineArg(opt);
@@ -680,7 +680,7 @@ CommandLineArg* CommandLineArg::SetBlocks(const QString &opt)
 
 /** \brief Set argument as incompatible with multiple options
  */
-CommandLineArg* CommandLineArg::SetBlocks(QStringList opts)
+CommandLineArg* CommandLineArg::SetBlocks(const QStringList& opts)
 {
     foreach (const auto opt, opts)
         m_blocks << new CommandLineArg(opt);

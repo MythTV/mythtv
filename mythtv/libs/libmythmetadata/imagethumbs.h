@@ -49,7 +49,7 @@ public:
      \param priority Request priority
      \param notify If true a 'thumbnail exists' event will be broadcast when done.
     */
-    ThumbTask(QString action, ImagePtrK im,
+    ThumbTask(QString action, const ImagePtrK& im,
               int priority = kUrgentPriority, bool notify = false)
         : m_action(std::move(action)), m_priority(priority), m_notify(notify)
     { m_images.append(im); }

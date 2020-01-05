@@ -1,14 +1,16 @@
 #ifndef STANDARDSETTINGS_H_
 #define STANDARDSETTINGS_H_
 
+#include <initializer_list>
+#include <utility>
+
+#include <QMap>
+#include <QObject>
+
 #include "mythexp.h"
 #include "mythuibuttonlist.h"
 #include "mythdialogbox.h"
 #include "mythstorage.h"
-
-#include <QMap>
-#include <QObject>
-#include <initializer_list>
 
 class StandardSetting;
 
@@ -29,7 +31,7 @@ class MPUBLIC StandardSetting : public QObject, public StorageUser
     Q_OBJECT
 
   public:
-    virtual void setLabel(QString str) { m_label = str; }
+    virtual void setLabel(QString str) { m_label = std::move(str); }
     QString getLabel(void) const { return m_label; }
 
     virtual void setHelpText(const QString &str) { m_helptext = str; emit helpTextChanged(m_helptext); }
@@ -186,7 +188,7 @@ class MPUBLIC MythUIFileBrowserSetting : public StandardSetting
     void edit(MythScreenType *screen) override; // StandardSetting
     void updateButton(MythUIButtonListItem *item) override; // StandardSetting
     void SetTypeFilter(QDir::Filters filter) { m_typeFilter = filter; };
-    void SetNameFilter(QStringList filter) { m_nameFilter = filter; };
+    void SetNameFilter(QStringList filter) { m_nameFilter = std::move(filter); };
 
   protected:
     explicit MythUIFileBrowserSetting(Storage *_storage)

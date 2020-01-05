@@ -41,7 +41,7 @@ void UPnpCDSExtensionResults::Add( CDSObject *pObject )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpCDSExtensionResults::Add( CDSObjects objects )
+void UPnpCDSExtensionResults::Add( const CDSObjects& objects )
 {
     foreach (auto & object, objects)
     {

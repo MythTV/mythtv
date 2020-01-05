@@ -279,7 +279,7 @@ class MPUBLIC ProgramInfo
           m_startTs(std::move(_startts)), m_endTs(std::move(_endts))
     { ensureSortFields(); }
     ProgramInfo(QStringList::const_iterator &it,
-                QStringList::const_iterator  end)
+                const QStringList::const_iterator&  end)
     {
         if (!FromStringList(it, end))
             ProgramInfo::clear();
@@ -877,7 +877,7 @@ template<typename TYPE>
 bool LoadFromScheduler(
     AutoDeleteDeque<TYPE*> &destination,
     bool               &hasConflicts,
-    QString             altTable = "",
+    const QString&      altTable = "",
     int                 recordid = -1)
 {
     destination.clear();

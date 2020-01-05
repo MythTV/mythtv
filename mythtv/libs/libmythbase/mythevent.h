@@ -52,7 +52,7 @@ class MBASE_PUBLIC MythEvent : public QEvent
     }
 
     // lmessage is passed by value for thread safety reasons per DanielK
-    MythEvent(QString lmessage, const QString lextradata)
+    MythEvent(QString lmessage, const QString& lextradata)
         : QEvent(MythEventMessage),
         m_message(::std::move(lmessage)),
         m_extradata(lextradata)

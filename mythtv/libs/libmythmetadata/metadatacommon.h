@@ -1,15 +1,19 @@
 #ifndef METADATACOMMON_H_
 #define METADATACOMMON_H_
 
-#include <QList>
-#include <QPair>
-#include <QMultiMap>
-#include <QString>
-#include <QStringList>
-#include <QDateTime>
+// c++
+#include <utility>
+
+// qt
 #include <QDate>
+#include <QDateTime>
 #include <QDomElement>
 #include <QEvent>
+#include <QList>
+#include <QMultiMap>
+#include <QPair>
+#include <QString>
+#include <QStringList>
 
 #include "mythtypes.h"
 #include "mythmetaexp.h"
@@ -234,7 +238,7 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
     // For some lookup, it helps to know the subtype (TV vs. Movie)
     void SetSubtype(LookupType subtype) { m_subtype = subtype; };
     // Reference value- when the event comes back, need to associate with an item.
-    void SetData(QVariant data) { m_data = data; };
+    void SetData(QVariant data) { m_data = std::move(data); };
     // Steps: SEARCH, GETDATA
     void SetStep(LookupStep step) { m_step = step; };
     // Don't prompt the user, just make an educated decision.
@@ -245,7 +249,7 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
     void SetAllowOverwrites(bool allow) { m_allowOverwrites = allow; };
     void SetAllowGeneric(bool allow) { m_allowGeneric = allow; };
     void SetHost(const QString &host) { m_host = host; };
-    void SetDownloads(ArtworkMap map) { m_downloads = map; };
+    void SetDownloads(ArtworkMap map) { m_downloads = std::move(map); };
 
     // General Sets
     void SetTitle(const QString &title)

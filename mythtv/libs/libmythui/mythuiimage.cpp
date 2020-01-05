@@ -725,7 +725,7 @@ void MythUIImage::SetDelay(int delayms)
 /**
  *  \brief Sets the delays between each image in an animation
  */
-void MythUIImage::SetDelays(QVector<int> delays)
+void MythUIImage::SetDelays(const QVector<int>& delays)
 {
     QWriteLocker updateLocker(&d->m_updateLock);
     QMutexLocker imageLocker(&m_ImagesLock);
@@ -872,7 +872,7 @@ void MythUIImage::SetImages(QVector<MythImage *> *images)
     SetRedraw();
 }
 
-void MythUIImage::SetAnimationFrames(AnimationFrames frames)
+void MythUIImage::SetAnimationFrames(const AnimationFrames& frames)
 {
     QVector<int> delays;
     QVector<MythImage *> images;

@@ -289,7 +289,7 @@ static void updateGameName(const QString& romname, const QString& GameName, cons
 }
 
 
-static void UpdateGameCounts(QStringList updatelist)
+static void UpdateGameCounts(const QStringList& updatelist)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 

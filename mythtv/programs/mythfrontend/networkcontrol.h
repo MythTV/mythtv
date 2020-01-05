@@ -46,7 +46,7 @@ class NetworkCommand : public QObject
 {
     Q_OBJECT
   public:
-    NetworkCommand(NetworkControlClient *cli, QString c)
+    NetworkCommand(NetworkControlClient *cli, const QString& c)
     {
         m_command = c.trimmed();
         m_client = cli;

@@ -419,7 +419,7 @@ void NetSearch::SearchTimeout(Search * /*item*/)
     }
 }
 
-void NetSearch::PopulateResultList(ResultItem::resultList list)
+void NetSearch::PopulateResultList(const ResultItem::resultList& list)
 {
     foreach (auto & result, list)
     {

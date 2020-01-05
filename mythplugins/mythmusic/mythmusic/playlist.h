@@ -1,6 +1,9 @@
 #ifndef PLAYLIST_H_
 #define PLAYLIST_H_
 
+// c++
+#include <utility>
+
 // qt
 #include <QList>
 #include <QMap>
@@ -101,7 +104,7 @@ class Playlist : public QObject
     bool doSaves(void) { return m_doSave; }
 
     QString getName(void) { return m_name; } 
-    void    setName(QString a_name) { m_name = a_name; }
+    void    setName(QString a_name) { m_name = std::move(a_name); }
 
     bool isActivePlaylist(void) { return m_name == DEFAULT_PLAYLIST_NAME; }
 

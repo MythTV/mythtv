@@ -1,6 +1,9 @@
 #ifndef PLAYLISTEDITORVIEW_H_
 #define PLAYLISTEDITORVIEW_H_
 
+// c++
+#include <utility>
+
 // qt
 #include <QEvent>
 #include <QVector>
@@ -28,7 +31,7 @@ class MPUBLIC MusicButtonItem : public MythUIButtonListItem, public QObject
         MythUIButtonListItem(lbtype, text, image, checkable, state, showArrow, listPosition) {}
 
     MusicButtonItem(MythUIButtonList *lbtype, const QString& text, QVariant data, int listPosition = -1) :
-        MythUIButtonListItem(lbtype, text, data, listPosition) {}
+        MythUIButtonListItem(lbtype, text, std::move(data), listPosition) {}
 };
 
 class MPUBLIC MusicGenericTree : public MythGenericTree

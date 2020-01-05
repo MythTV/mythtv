@@ -291,7 +291,7 @@ class EmptyAudioDevice : public MythUITextEditSetting
         setValue("");
         GetStorage()->Save();
     }
-    void Save(QString destination)
+    void Save(const QString& destination)
     {
         GetStorage()->SetSaveRequired();
         setValue("");
@@ -316,7 +316,7 @@ class EmptyVBIDevice : public MythUITextEditSetting
         setValue("");
         GetStorage()->Save();
     }
-    void Save(QString destination)
+    void Save(const QString& destination)
     {
         GetStorage()->SetSaveRequired();
         setValue("");

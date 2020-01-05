@@ -1870,7 +1870,7 @@ int MPEG2fixup::InsertFrame(int frameNum, int64_t deltaPTS,
     return increment;
 }
 
-void MPEG2fixup::AddRangeList(QStringList rangelist, int type)
+void MPEG2fixup::AddRangeList(const QStringList& rangelist, int type)
 {
     frm_dir_map_t *mapPtr = nullptr;
 

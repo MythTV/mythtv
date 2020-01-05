@@ -41,7 +41,7 @@ class ScriptInfo
 
     ScriptInfo() = default;
 
-    ScriptInfo( QScriptValue func, QDateTime dt )
+    ScriptInfo( const QScriptValue& func, QDateTime dt )
         : m_oFunc( func ), m_dtTimeStamp(std::move( dt ))
     {}
 };

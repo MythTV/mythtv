@@ -38,9 +38,9 @@ public:
     void Initialise(int id)      { m_valid = true; m_parent = id; clear();}
     void Clear()                 { m_valid = false; clear(); }
     bool IsFor(int id)           { return m_valid && m_parent == id; }
-    void Add(ImageIdList newIds) { unite(newIds.toSet()); }
+    void Add(const ImageIdList& newIds) { unite(newIds.toSet()); }
     void Add(int id)             { insert(id); }
-    void Invert(ImageIdList all) { QSet tmp(all.toSet() - *this); swap(tmp); }
+    void Invert(const ImageIdList& all) { QSet tmp(all.toSet() - *this); swap(tmp); }
 
 private:
     bool m_valid  {false};
@@ -53,7 +53,7 @@ class MenuSubjects
 {
 public:
     MenuSubjects() = default;
-    MenuSubjects(ImagePtrK selection, int childCount,
+    MenuSubjects(const ImagePtrK& selection, int childCount,
                  MarkedFiles &marked, MarkedFiles &prevMarked,
                  bool hiddenMarked, bool unhiddenMarked)
         : m_selected(selection),

@@ -1,12 +1,13 @@
 #ifndef GAMESCAN_H
 #define GAMESCAN_H
 
-#include <set>
 #include <map>
+#include <set>
+#include <utility>
 
+#include <QMap>
 #include <QObject> // for moc
 #include <QStringList>
-#include <QMap>
 
 #include "mthread.h"
 
@@ -36,7 +37,7 @@ class GameScannerThread : public MThread
 
     void run(void) override; // MThread
 
-    void SetHandlers(QList<GameHandler*> handlers) { m_handlers = handlers; };
+    void SetHandlers(QList<GameHandler*> handlers) { m_handlers = std::move(handlers); };
     void SetProgressDialog(MythUIProgressDialog *dialog) { m_dialog = dialog; };
 
     bool getDataChanged() { return m_dbDataChanged; };

@@ -55,10 +55,10 @@ class PaneDVBS : public GroupSetting
     QString polarity(void)   const { return m_ppolarity->getValue();   }
 
     void setFrequency(uint frequency)      { m_pfrequency->setValue(frequency);  }
-    void setSymbolrate(QString symbolrate) { m_psymbolrate->setValue(symbolrate);}
-    void setInversion(QString inversion)   { m_pinversion->setValue(inversion);  }
-    void setFec(QString fec)               { m_pfec->setValue(fec);              }
-    void setPolarity(QString polarity)     { m_ppolarity->setValue(polarity);    }
+    void setSymbolrate(const QString& symbolrate) { m_psymbolrate->setValue(symbolrate);}
+    void setInversion(const QString& inversion)   { m_pinversion->setValue(inversion);  }
+    void setFec(const QString& fec)               { m_pfec->setValue(fec);              }
+    void setPolarity(const QString& polarity)     { m_ppolarity->setValue(polarity);    }
 
   protected:
     ScanFrequencykHz   *m_pfrequency  {nullptr};

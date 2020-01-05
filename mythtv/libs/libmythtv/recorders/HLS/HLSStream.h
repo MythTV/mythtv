@@ -70,7 +70,7 @@ class HLSRecStream
     bool IVLoaded(void) const { return m_ivLoaded; }
 
     uint8_t *AESIV(void) { return m_aesIV; }
-    void SetKeyPath(const QString x) { m_keypath = x; }
+    void SetKeyPath(const QString& x) { m_keypath = x; }
 #endif // USING_LIBCRYPTO
 
   protected:

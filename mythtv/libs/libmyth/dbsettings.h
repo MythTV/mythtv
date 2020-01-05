@@ -16,7 +16,7 @@ class MPUBLIC DatabaseSettings : public GroupSetting
     ~DatabaseSettings() override;
 
     void Load(void) override; // StandardSetting
-    void Save(QString /*destination*/) {}
+    void Save(const QString& /*destination*/) {}
     void Save(void) override; // StandardSetting
 
   signals:

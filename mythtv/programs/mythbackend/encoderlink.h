@@ -1,11 +1,14 @@
 #ifndef ENCODERLINK_H_
 #define ENCODERLINK_H_
 
+// C++ headers
+#include <utility>
+#include <vector>                       // for vector
+
+// QT headers
 #include <QDateTime>                    // for QDateTime
 #include <QMutex>                       // for QMutex
 #include <QString>                      // for QString
-
-#include <vector>                       // for vector
 
 #include "enums/recStatus.h"
 #include "tv.h"                         // for SleepStatus, etc
@@ -38,7 +41,7 @@ class EncoderLink
     /// \brief Get the last time the encoder was put to sleep
     QDateTime GetLastSleepTime(void) const { return m_lastSleepTime; }
     /// \brief Used to set the last wake time of an encoder
-    void SetLastWakeTime(QDateTime newTime) { m_lastWakeTime = newTime; }
+    void SetLastWakeTime(QDateTime newTime) { m_lastWakeTime = std::move(newTime); }
     /// \brief Get the last time the encoder was awakened
     QDateTime GetLastWakeTime(void) const { return m_lastWakeTime; }
 

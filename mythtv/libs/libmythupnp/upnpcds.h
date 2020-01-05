@@ -13,10 +13,14 @@
 #ifndef UPnpCDS_H_
 #define UPnpCDS_H_
 
+// C++ headers
+#include <utility>
+
+// QT headers
 #include <QList>
 #include <QMap>
-#include <QString>
 #include <QObject>
+#include <QString>
 
 #include "upnp.h"
 #include "upnpcdsobjects.h"
@@ -121,7 +125,7 @@ class UPNP_PUBLIC UPnpCDSExtensionResults
         }
 
         void    Add         ( CDSObject *pObject );
-        void    Add         ( CDSObjects objects );
+        void    Add         ( const CDSObjects& objects );
         QString GetResultXML(FilterMap &filter, bool ignoreChildren = false);
 };
 
@@ -245,13 +249,13 @@ class UPNP_PUBLIC UPnpCDSExtension
 
     public:
 
-        UPnpCDSExtension( QString sName, 
+        UPnpCDSExtension( const QString& sName,
                           QString sExtensionId, 
                           QString sClass )
         {
             m_sName        = QObject::tr(sName.toLatin1().constData());
-            m_sExtensionId = sExtensionId;
-            m_sClass       = sClass;
+            m_sExtensionId = std::move(sExtensionId);
+            m_sClass       = std::move(sClass);
         }
 
         virtual CDSObject *GetRoot ( );

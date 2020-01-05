@@ -229,7 +229,7 @@ class MUI_PUBLIC MythConfirmationDialog : public MythScreenType
 
     bool Create(void) override; // MythScreenType
     void SetReturnEvent(QObject *retobject, const QString &resultid);
-    void SetData(QVariant data) { m_resultData = data; }
+    void SetData(QVariant data) { m_resultData = std::move(data); }
     void SetMessage(const QString &message);
 
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
